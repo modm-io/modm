@@ -1,0 +1,4 @@
+While on a x86-system the std-lib with all the containers are available and the 
+allocation of memorie with new is quite fast. But on other system like the  
+microcontroller this is quite slow. This Lib provides a reduce from of the 
+std containers with static allocated memorie.
