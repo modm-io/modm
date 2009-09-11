@@ -68,6 +68,16 @@ namespace xpcc
 		uint8_t size;
 	};
 	
+	/**
+	 * @ingroup		backend
+	 * @brief 		The BackendInterface provides a common interface for to use
+	 * 				different hardware modules to transmit the communication.
+	 *
+	 * All backends have to implement the this interface.
+	 *
+	 * @version		$Id$
+	 * @author		Martin Rosekeit, Fabian Greif
+	 */
 	class BackendInterface
 	{
 	public:

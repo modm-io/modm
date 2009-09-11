@@ -2,7 +2,7 @@
 // ----------------------------------------------------------------------------
 /* Copyright (c) 2009, Roboterclub Aachen e.V.
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *     * Redistributions of source code must retain the above copyright
@@ -13,7 +13,7 @@
  *     * Neither the name of the Roboterclub Aachen e.V. nor the
  *       names of its contributors may be used to endorse or promote products
  *       derived from this software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY ROBOTERCLUB AACHEN E.V. ''AS IS'' AND ANY
  * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -24,64 +24,33 @@
  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  * $Id$
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	CPCC_COMMUNICATION_H
-#define	CPCC_COMMUNICATION_H
+#ifndef XPCC_H_
+#define XPCC_H_
 
-/**
- * @defgroup 	communication Communication
- * @brief 		Interface to the Linux-TIPC.
- *
- * DESC DESC
- *
- * @version		$Id$
- * @author		Martin Rosekeit, Fabian Greif
+/** \mainpage Cross Platform Component Communication
+
+Packet orientated communication library, enabling transparent communication
+between components on PCs and Microcontrollers. It provides an interface to
+communicate via CAN, TCP/IP or TIPC.
+
+The primary part of the project is the \ref communication "Communication" module
+that provides the interface to send messages from one component to another
+component.
+To develop and use this module the need for a logger module accrued that not only
+writes to the console but also could be used on microcontrollers and so the
+\ref logger "Logger" module was created.
+Also there is a lack of few c++-libs on microconrollers like
+the STL, so the there is a reduced version in the \ref std_container "STD Container" module.
+
+\section about About the project
+
+
+
  */
 
-#include "xpcc/backend_interface.h"
-
-namespace xpcc
-{
-	class Communication
-	{
-	public:
-		Communication(CommunicationInterface *interface,
-				componentList,
-				eventList);
-		
-		void
-		update();
-		
-		
-		uint8_t
-		getCurrentComponent() const;
-		
-		void
-		setCurrentComponent(uint8_t id);
-		
-		
-		void
-		callAction();
-		
-		void
-		sendResponse();
-		
-		void
-		sendNegativeResponse();
-		
-		void
-		publishEvent();
-		
-		
-		
-	
-	private:
-		CommunicationInterface * const interface;
-	};
-}
-
-#endif // CPCC_COMMUNICATION_H
+#endif /* XPCC_H_ */
