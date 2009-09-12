@@ -29,59 +29,31 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	CPCC_COMMUNICATION_H
-#define	CPCC_COMMUNICATION_H
+#ifndef	XPCC_BACKEND_AT90CAN_H
+#define	XPCC_BACKEND_AT90CAN_H
 
-/**
- * @defgroup 	communication Communication
- * @brief 		Interface to the Linux-TIPC.
- *
- * DESC DESC
- *
- * @version		$Id$
- * @author		Martin Rosekeit, Fabian Greif
- */
-
-#include "backend/backend_interface.h"
+#include "../backend_interface.h"
 
 namespace xpcc
 {
-	class Communication
+	class At90Can : public BackendInterface
 	{
 	public:
-		Communication(CommunicationInterface *interface,
-				componentList,
-				eventList);
+		At90Can();
 		
-		void
-		update();
+		virtual bool
+		sendPacket(Packet &packet);
 		
 		
-		uint8_t
-		getCurrentComponent() const;
+		virtual bool
+		isPacketAvailable() const;
 		
-		void
-		setCurrentComponent(uint8_t id);
+		virtual void
+		retrievePacket();
 		
-		
-		void
-		callAction();
-		
-		void
-		sendResponse();
-		
-		void
-		sendNegativeResponse();
-		
-		void
-		publishEvent();
-		
-		
-		
-	
-	private:
-		CommunicationInterface * const interface;
+		virtual const Packet&
+		getPacket() const;
 	};
 }
 
-#endif // CPCC_COMMUNICATION_H
+#endif // XPCC_BACKEND_AT90CAN_H

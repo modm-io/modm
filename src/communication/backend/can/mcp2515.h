@@ -29,59 +29,46 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	CPCC_COMMUNICATION_H
-#define	CPCC_COMMUNICATION_H
+#ifndef	XPCC_BACKEND_MCP2515_H
+#define	XPCC_BACKEND_MCP2515_H
 
-/**
- * @defgroup 	communication Communication
- * @brief 		Interface to the Linux-TIPC.
- *
- * DESC DESC
- *
- * @version		$Id$
- * @author		Martin Rosekeit, Fabian Greif
- */
-
-#include "backend/backend_interface.h"
+#include "../backend_interface.h"
 
 namespace xpcc
 {
-	class Communication
+	class Mcp2515 : public BackendInterface
 	{
 	public:
-		Communication(CommunicationInterface *interface,
-				componentList,
-				eventList);
+		struct FilterTable
+		{
+			struct {
+				uint32_t filter[2];
+				uint32_t mask;
+			} bank1;
+			
+			struct {
+				uint32_t filter[4];
+				uint32_t mask;
+			} bank2;
+		};
 		
-		void
-		update();
-		
-		
-		uint8_t
-		getCurrentComponent() const;
-		
-		void
-		setCurrentComponent(uint8_t id);
-		
-		
-		void
-		callAction();
-		
-		void
-		sendResponse();
-		
-		void
-		sendNegativeResponse();
-		
-		void
-		publishEvent();
+	public:
+		Mcp2515(FilterTable& filter);
 		
 		
+		virtual bool
+		sendPacket(Packet &packet);
 		
-	
-	private:
-		CommunicationInterface * const interface;
+		
+		virtual bool
+		isPacketAvailable() const;
+		
+		virtual void
+		retrievePacket();
+		
+		virtual const Packet&
+		getPacket() const;
 	};
 }
 
-#endif // CPCC_COMMUNICATION_H
+#endif // XPCC_BACKEND_MCP2515_H

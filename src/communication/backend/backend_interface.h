@@ -54,8 +54,8 @@ namespace xpcc
 			Type type;
 			Direction direction;
 			
-			bool isMessageIdentifierActive;
-			bool isFragmented;
+			bool isMessageIdentifierActive : 1;
+			bool isFragmented : 1;
 			
 			uint8_t destination;
 			uint8_t source;
@@ -64,8 +64,8 @@ namespace xpcc
 		
 		Header header;
 		
+		uint8_t dataLength;
 		uint8_t data[8];
-		uint8_t size;
 	};
 	
 	/**
@@ -81,16 +81,26 @@ namespace xpcc
 	class BackendInterface
 	{
 	public:
+		//! Send a Packet.
+		//! 
+		//! \return	\b true if the packet could be send, \b false otherwise.
 		virtual bool
 		sendPacket(Packet &packet) = 0;
 		
-		
+		//! Check if a new packet was received by the backend
 		virtual bool
 		isPacketAvailable() const = 0;
 		
+		//! Read the packet from the input buffers
+		//! 
+		//! Must only be called after isPacketAvailable() returned \b true.
 		virtual void
 		retrievePacket() = 0;
 		
+		//! Access the packet.
+		//!
+		//! You need to call retrievePacket() before you can access the
+		//! packet.
 		virtual const Packet&
 		getPacket() const = 0;
 	};
