@@ -1,9 +1,10 @@
 
+Import('env')
+Import('options')
+
 SOURCE = """
 	angle.cpp
 """
-
-Import('env')
 
 objects = []
 for file in Split(SOURCE):

@@ -2,41 +2,33 @@
 #
 # $Id$
 
-import ConfigParser
+import yaml
+config = yaml.load(open('config.cfg'))
 
-class OptionParser:
-	
-	def __init__(self, filename):
-		self.parser = ConfigParser.ConfigParser()
-		self.parser.read(filename)
-	
-	def getOptions(self, commandlineArguments):
-		""" Returns a dictionary with key's of the form
-		<section>.<option> and the values.
-		"""
-		result = { 'build': {} }
-		for section in self.parser.sections():
-			result[section] = {}
-			for option in self.parser.options(section):
-				result[section][option] = self.parser.get(section, option)
-		result['build'].update(commandlineArguments)
-		return result
+#import pprint
+#pprint.pprint(cfg)
 
-options = OptionParser('config.ini').getOptions(ARGLIST)
-
-
-if options['build']['target'] == 'pc':
-	tool = 'pc'
-else:
-	tool = 'avr'
-
-env = Environment(
-			OPTIONS=options,
-			tools=[tool],
+if config['target'] == 'avr':
+	env = Environment(
+			ARCHITECTURE=config['target'],
+			DEVICE=config['avr']['device'],
+			AVRDUDE=config['avr']['avrdude'],
+			CLOCK=config['avr']['clock'],
+			tools=['avr'],
 			toolpath=['misc/scons/'])
+elif config['target'] == 'pc':
+	env = Environment(
+			ARCHITECTURE=config['target'],
+			tools=['pc'],
+			toolpath=['misc/scons/'])
+else:
+	print "please specify a valid target (avr|pc)"
+	Exit(1)
+#print env.Dump()
 
+options = config.get('library', {})
 SConscript('src/SConscript',
 			src='src',
 			variant_dir='build', 
-			exports='env', 
+			exports=['env', 'options'], 
 			duplicate=False)

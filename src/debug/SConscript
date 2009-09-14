@@ -1,7 +1,8 @@
 
 Import('env')
+Import('options')
 
-if env['OPTIONS']['build']['target'] == 'pc':
+if env['ARCHITECTURE'] == 'pc':
 	SOURCE = """
 		logger/logger.cpp
 		logger/console_output_writer.cpp

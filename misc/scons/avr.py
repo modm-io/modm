@@ -40,13 +40,12 @@ from SCons.Script import *
 # elf -> eep		?
 # elf -> lss		ok
 
+# -----------------------------------------------------------------------------
 def show_size(env, source):
 	return [env.Command(None,
 						source,
-						Action("$SIZE --mcu=$MCU --format=avr $SOURCE", 
+						Action("$SIZE --mcu=$DEVICE --format=avr $SOURCE", 
 								cmdstr="$SIZECOMSTR"))]
-
-
 
 # -----------------------------------------------------------------------------
 def generate(env, **kw):
@@ -92,7 +91,7 @@ def generate(env, **kw):
 	
 	# flags for C and C++
 	env['CCFLAGS'] = ' '.join([
-		"-mmcu=%s" % env['OPTIONS']['build']['mcu'], 
+		"-mmcu=$DEVICE", 
 		"-Os -gdwarf-2", 
 		"-funsigned-char",
 		"-funsigned-bitfields", 
@@ -119,10 +118,10 @@ def generate(env, **kw):
 	])
 	
 	# Assembler flags
-	env['ASFLAGS'] = "-mmcu=$MCU -x assembler-with-cpp "
+	env['ASFLAGS'] = "-mmcu=$DEVICE -x assembler-with-cpp "
 	
 	env['LINKFLAGS'] = " ".join([
-		"-mmcu=$MCU", 
+		"-mmcu=$DEVICE", 
 		"-Wl,-Map=${TARGET.base}.map,--cref", 
 		"-Wl,--relax", 
 		"-Wl,--gc-sections", 
@@ -130,10 +129,10 @@ def generate(env, **kw):
 	
 	env['LINKCOM'] = "$LINK -o $TARGET $LINKFLAGS $SOURCES $_LIBDIRFLAGS $_LIBFLAGS -lm"
 	
-	f_cpu = env['OPTIONS']['build']['f_cpu'].lower()
-	if not f_cpu.endswith('ul'):
-		f_cpu += 'ul'
-	env.Append(CPPDEFINES = {'F_CPU' : f_cpu})
+	clock = str(env['CLOCK']).lower()
+	if not clock.endswith('ul'):
+		clock += 'ul'
+	env.Append(CPPDEFINES = {'F_CPU' : clock})
 	
 	env.AddMethod(show_size, 'Size')
 	builder_hex = Builder(action=Action("$OBJCOPY -O ihex -R .eeprom $SOURCE $TARGET",
@@ -150,5 +149,6 @@ def generate(env, **kw):
 		'Listing': builder_listing,
 	})
 
+# -----------------------------------------------------------------------------
 def exists(env):
 	return env.Detect('avr-gcc')

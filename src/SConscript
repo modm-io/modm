@@ -6,11 +6,14 @@ DIRS = """
 """
 
 Import('env')
+Import('options')
 
+dirOptions = options
 objects = []
 for dir in Split(DIRS):
+	options = dirOptions.get(dir, {})
 	object = SConscript(dir + '/SConscript',
-						exports='env')
+						exports=['env', 'options'])
 	objects.append(object)
 
 library = env.Library(target='robot', source=objects)
