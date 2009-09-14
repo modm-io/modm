@@ -25,7 +25,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: logger_message_forwarder.hpp 18 2009-09-10 21:20:17Z thundernail $
+ * $Id$
  */
 // ----------------------------------------------------------------------------
 
