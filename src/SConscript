@@ -1,0 +1,21 @@
+
+DIRS = """
+	communication
+	debug
+	math
+"""
+
+Import('env')
+
+objects = []
+for dir in Split(DIRS):
+	object = SConscript(dir + '/SConscript',
+						exports='env')
+	objects.append(object)
+
+library = env.Library(target='robot', source=objects)
+
+env.Default(library)
+env.Alias('lib', library)
+
+Return('library')

@@ -1,0 +1,12 @@
+
+SOURCE = """
+	
+"""
+
+Import('env')
+
+objects = []
+for file in Split(SOURCE):
+	objects.append(env.Object(file))
+
+Return('objects')

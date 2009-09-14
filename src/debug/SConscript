@@ -1,0 +1,20 @@
+
+Import('env')
+
+if env['OPTIONS']['build']['target'] == 'pc':
+	SOURCE = """
+		logger/logger.cpp
+		logger/console_output_writer.cpp
+		logger/abstract_output_writer.cpp
+		logger/logger_message_forwarder.cpp
+	"""
+else:
+	SOURCE = """
+	
+	"""
+
+objects = []
+for file in Split(SOURCE):
+	objects.append(env.Object(file))
+
+Return('objects')
