@@ -16,14 +16,13 @@ class Angle
 {
 	public:
 		Angle(float angle = 0.0) : angle(angle) {
-			// nothing else to do here
 		}
 		
-		/** \brief	Limit angle to +-Pi */
+		//! \brief	Limit angle to +-Pi
 		void
 		normalize();
 		
-		/** \brief	reverse the angle */
+		//! \brief	reverse the angle
 		void
 		reverse();
 		

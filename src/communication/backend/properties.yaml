@@ -1,0 +1,7 @@
+# Properties for 'communication/backend'
+
+exclude: yes
+
+required-defines:
+  - CS
+  - INT

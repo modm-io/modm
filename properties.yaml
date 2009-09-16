@@ -1,5 +1,5 @@
 
-target: avr
+target: pc
 
 avr:
   device: atmega644
@@ -11,17 +11,15 @@ avr:
 library:
   debug:
     logger:
-      exclude: yes
+      include: no
   math:
   communication:
     backend:
+      include: no
       mcp2515:
-        exclude: yes
-      at90can:
         defines:
         - CS B,6
         - INT B,3
-      tcpip:
-        exclude: yes
-      tipc:
-        exclude: yes
+
+tests:
+  include: no

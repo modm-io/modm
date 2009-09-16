@@ -2,33 +2,43 @@
 #
 # $Id$
 
-import yaml
-config = yaml.load(open('config.cfg'))
+from misc.scons.build_properties import PropertyParser
 
-#import pprint
-#pprint.pprint(cfg)
+# create a new commandline-option to specify a property-file
+AddOption('--properties',
+			dest='properties',
+			default='properties.yaml',
+			metavar='FILE',
+			help='configuration file')
 
-if config['target'] == 'avr':
+# parse the property-file
+parser = PropertyParser(GetOption('properties'), True)
+
+# create a build-environment for the specific target
+build = parser.getGlobalProperties()
+if build.target == 'avr':
 	env = Environment(
-			ARCHITECTURE=config['target'],
-			DEVICE=config['avr']['device'],
-			AVRDUDE=config['avr']['avrdude'],
-			CLOCK=config['avr']['clock'],
-			tools=['avr'],
-			toolpath=['misc/scons/'])
-elif config['target'] == 'pc':
+			ARCHITECTURE = 'avr',
+			AVRDUDE = build.avr.avrdude,
+			AVR_DEVICE = build.avr.device,
+			AVR_CLOCK = build.avr.clock,
+			tools = ['avr'],
+			toolpath = ['misc/scons/'])
+
+elif build.target == 'pc':
 	env = Environment(
-			ARCHITECTURE=config['target'],
-			tools=['pc'],
-			toolpath=['misc/scons/'])
+			ARCHITECTURE = 'pc',
+			tools = ['pc'],
+			toolpath = ['misc/scons/'])
+
 else:
-	print "please specify a valid target (avr|pc)"
+	print "Unknown build target '%s'!" % build.target
 	Exit(1)
-#print env.Dump()
 
-options = config.get('library', {})
+# finally build the library from the src-directory
+sourceFiles = parser.parseDirectory('src/')
 SConscript('src/SConscript',
 			src='src',
 			variant_dir='build', 
-			exports=['env', 'options'], 
+			exports=['env', 'sourceFiles'], 
 			duplicate=False)

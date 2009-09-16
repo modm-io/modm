@@ -41,7 +41,7 @@ Logger::Logger() {
 	this->logLevelIdNameMap_[Logger::WARNING]	=	"WARNING";
 	this->logLevelIdNameMap_[Logger::ERROR]		=	"ERROR";
 	this->logLevelIdNameMap_[Logger::FATAL]		=	"FATAL";
-
+	
 	// Create the default Output-Writer
 	this->defaultOutputWriter_	= new ConsoleOutputWriter("DefaultConsoleOutputWriter");
 
@@ -110,7 +110,7 @@ Logger::setMessageHeader(	const std::string & loggerLocationString,
 	struct sysinfo si;
 	sysinfo(&si);
 	if(sysinfo(&si) == 0) {
-		int precision = std::cout.precision();
+		//int precision = std::cout.precision();
 
 		this->outputWriter_->getOutputStream()
 				<< "\n"

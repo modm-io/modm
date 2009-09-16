@@ -44,7 +44,7 @@ from SCons.Script import *
 def show_size(env, source):
 	return [env.Command(None,
 						source,
-						Action("$SIZE --mcu=$DEVICE --format=avr $SOURCE", 
+						Action("$SIZE --mcu=$AVR_DEVICE --format=avr $SOURCE", 
 								cmdstr="$SIZECOMSTR"))]
 
 # -----------------------------------------------------------------------------
@@ -91,7 +91,7 @@ def generate(env, **kw):
 	
 	# flags for C and C++
 	env['CCFLAGS'] = ' '.join([
-		"-mmcu=$DEVICE", 
+		"-mmcu=$AVR_DEVICE", 
 		"-Os -gdwarf-2", 
 		"-funsigned-char",
 		"-funsigned-bitfields", 
@@ -118,10 +118,10 @@ def generate(env, **kw):
 	])
 	
 	# Assembler flags
-	env['ASFLAGS'] = "-mmcu=$DEVICE -x assembler-with-cpp "
+	env['ASFLAGS'] = "-mmcu=$AVR_DEVICE -x assembler-with-cpp "
 	
 	env['LINKFLAGS'] = " ".join([
-		"-mmcu=$DEVICE", 
+		"-mmcu=$AVR_DEVICE", 
 		"-Wl,-Map=${TARGET.base}.map,--cref", 
 		"-Wl,--relax", 
 		"-Wl,--gc-sections", 
@@ -129,7 +129,7 @@ def generate(env, **kw):
 	
 	env['LINKCOM'] = "$LINK -o $TARGET $LINKFLAGS $SOURCES $_LIBDIRFLAGS $_LIBFLAGS -lm"
 	
-	clock = str(env['CLOCK']).lower()
+	clock = str(env['AVR_CLOCK']).lower()
 	if not clock.endswith('ul'):
 		clock += 'ul'
 	env.Append(CPPDEFINES = {'F_CPU' : clock})
