@@ -5,6 +5,15 @@
 import yaml
 import os
 
+def listify(object):
+	""" Helper function to put a object in a list if the object
+	isn't a list allready. """
+	if isinstance(object, list):
+		return object
+	else:
+		return [object]
+
+
 class GlobalProperties:
 	class AvrProperties:
 		def __init__(self, properties):
@@ -14,7 +23,6 @@ class GlobalProperties:
 	
 	def __init__(self, properties):
 		self.target = properties.get('target', 'pc')
-		
 		if self.target == 'avr':
 			self.avr = AvrProperties(properties.get('avr', {}))
 
@@ -26,15 +34,13 @@ class FileProperties:
 
 class DirectoryProperties:
 	def __init__(self, properties, globalProperties):
-		
-		self._enabled = True
-		
 		if properties:
-			if properties.get('exclude', False):
-				self._enabled = False
-			if 'exclude-target' in properties and \
-					properties['exclude-target'] == globalProperties.target:
-				self._enabled = False
+			self._enabled = False
+			for target in listify(properties['target']):
+				if target == 'all' or target == globalProperties.target:
+					self._enabled = True
+		else:
+			self._enabled = True
 	
 	def createFileProperties(self, filename):
 		return FileProperties(filename)
@@ -44,16 +50,10 @@ class DirectoryProperties:
 
 
 class PropertyParser:
-	
+	""" Parser to read property-files and create a list of files to build. """
 	PROPERTY_FILE = 'properties.yaml'
 	
 	def __init__(self, configFile, verbose=False):
-		""" Create the parser.
-		
-		Keyword arguments:
-		configFile		--	configuration file which specifies
-							how to build the system.
-		"""
 		self.verbose = verbose
 		try:
 			properties = yaml.load(open(configFile))
@@ -67,13 +67,16 @@ class PropertyParser:
 		self.globalProperties = GlobalProperties(properties)
 	
 	def parseDirectory(self, target):
+		""" Reads recursively the property-files from the directories and
+		returns a list of files to build.
+		"""
 		fileList = []
 		for path, directories, files in os.walk(target):
 			# exclude the SVN-directories
 			if '.svn' in directories:
 				directories.remove('.svn')
 			
-			build = self._parsePropertyFile(path)
+			build = self._parseDirectoryProperties(path)
 			if build.shouldBeBuild():
 				for file in files:
 					extension = os.path.splitext(file)[1]
@@ -81,14 +84,14 @@ class PropertyParser:
 						filename = os.path.join(path[len(target):], file)
 						fileList.append(build.createFileProperties(filename))
 			else:
-				# remove all the subdirectories from the list so they will
-				# not be build
+				# if the this directory should be excluded, remove all the
+				# subdirectories from the list to exclude them as well
 				for dir in directories:
 					directories.remove(dir)
 		
 		return fileList
 	
-	def _parsePropertyFile(self, path):
+	def _parseDirectoryProperties(self, path):
 		try:
 			filename = os.path.join(path, self.PROPERTY_FILE)
 			options = yaml.load(open(filename))

@@ -1,7 +1,12 @@
 # Properties for 'communication/backend'
 
-exclude: yes
+target: None
 
-required-defines:
-  - CS
-  - INT
+avr:
+  defines:
+    optional:
+      - FOO
+      - BAR
+    required:
+      - CS
+      - INT

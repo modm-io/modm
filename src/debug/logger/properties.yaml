@@ -1,2 +1,2 @@
 
-exclude-target: avr
+target: pc
