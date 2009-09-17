@@ -5,6 +5,9 @@
 import yaml
 import os
 
+class PropertyException(Exception):
+	pass
+
 def listify(object):
 	""" Helper function to put a object in a list if the object
 	isn't a list allready. """
@@ -16,34 +19,58 @@ def listify(object):
 
 class GlobalProperties:
 	class AvrProperties:
+		""" AVR specific properties """
 		def __init__(self, properties):
 			self.avrdude = properties.get('avrdude', {})
 			self.device = properties['device']
 			self.clock = properties['clock']
 	
 	def __init__(self, properties):
+		self.properties = properties
+		
 		self.target = properties.get('target', 'pc')
 		if self.target == 'avr':
 			self.avr = AvrProperties(properties.get('avr', {}))
+	
+	def getLocalProperties(self, path, target, tag):
+		try:
+			local = self.properties[tag]
+			relpath = path[len(target):]
+			for step in relpath.split(os.sep):
+				local = local[step]
+		except (KeyError, TypeError):
+			local = None
+		
+		return local if (local) else {}
 
 
 class FileProperties:
-	def __init__(self, filename):
+	def __init__(self, filename, defines={}):
 		self.name = filename
+		self.defines = defines
+		#print filename, defines
 
 
 class DirectoryProperties:
-	def __init__(self, properties, globalProperties):
-		if properties:
+	def __init__(self, path, treeProperties, localProperties, globalProperties):
+		self.localProperties = localProperties
+		self.treeProperties = treeProperties
+		self.globalProperties = globalProperties
+		
+		if treeProperties:
 			self._enabled = False
-			for target in listify(properties['target']):
+			for target in listify(treeProperties['target']):
 				if target == 'all' or target == globalProperties.target:
 					self._enabled = True
+			
+			if 'include' in localProperties:
+				self._enabled = localProperties['include']
 		else:
 			self._enabled = True
 	
 	def createFileProperties(self, filename):
-		return FileProperties(filename)
+		defines = self.localProperties.get('defines', {})
+		return FileProperties(filename, defines)
 	
 	def shouldBeBuild(self):
 		return self._enabled
@@ -51,22 +78,18 @@ class DirectoryProperties:
 
 class PropertyParser:
 	""" Parser to read property-files and create a list of files to build. """
-	PROPERTY_FILE = 'properties.yaml'
-	
 	def __init__(self, configFile, verbose=False):
 		self.verbose = verbose
 		try:
 			properties = yaml.load(open(configFile))
 		except yaml.YAMLError, e:
-			print "Error in configuration file:", e
-			Exit(1)
+			raise PropertyException("Error in configuration file:", e)
 		except IOError, e:
-			print "Could not open file '%s'!" % configFile
-			Exit(1)
+			raise PropertyException("Could not open file '%s'!" % configFile)
 		
 		self.globalProperties = GlobalProperties(properties)
 	
-	def parseDirectory(self, target):
+	def parseDirectory(self, target, tag):
 		""" Reads recursively the property-files from the directories and
 		returns a list of files to build.
 		"""
@@ -76,35 +99,37 @@ class PropertyParser:
 			if '.svn' in directories:
 				directories.remove('.svn')
 			
-			build = self._parseDirectoryProperties(path)
-			if build.shouldBeBuild():
+			localProperties = self.globalProperties.getLocalProperties(path, target, tag)
+			directory = self._parseDirectoryProperties(path, localProperties)
+			if directory.shouldBeBuild():
 				for file in files:
 					extension = os.path.splitext(file)[1]
 					if extension == '.cpp' or extension == '.c':
 						filename = os.path.join(path[len(target):], file)
-						fileList.append(build.createFileProperties(filename))
+						fileList.append(directory.createFileProperties(filename))
 			else:
 				# if the this directory should be excluded, remove all the
 				# subdirectories from the list to exclude them as well
-				for dir in directories:
-					directories.remove(dir)
+				tempDirectories = directories[:]
+				for d in tempDirectories:
+					directories.remove(d)
 		
 		return fileList
 	
-	def _parseDirectoryProperties(self, path):
+	def _parseDirectoryProperties(self, path, localProperties):
 		try:
-			filename = os.path.join(path, self.PROPERTY_FILE)
-			options = yaml.load(open(filename))
+			filename = os.path.join(path, 'properties.yaml')
+			treeProperties = yaml.load(open(filename))
 		except yaml.YAMLError, e:
 			print "Error in configuration file:", e
-			Exit(1)
+			raise PropertyException(e)
 		except IOError:
-			options = None
+			treeProperties = None
 		else:
 			if self.verbose:
-				print "load -", path
+				print "parse '%s/properties.yaml'" % path
 		
-		return DirectoryProperties(options, self.globalProperties)
+		return DirectoryProperties(path, treeProperties, localProperties, self.globalProperties)
 	
 	def getGlobalProperties(self):
 		return self.globalProperties

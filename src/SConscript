@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+#
 # $Id$
 
 Import('env')
@@ -6,7 +8,7 @@ Import('sourceFiles')
 # build a object file form each source file
 objects = []
 for file in sourceFiles:
-	object = env.Object(file.name)
+	object = env.Object(file.name, CPPDEFINES=file.defines)
 	objects.append(object)
 
 # link them all together to create the library

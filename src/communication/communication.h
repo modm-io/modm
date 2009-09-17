@@ -44,6 +44,33 @@
 
 #include "backend/backend_interface.h"
 
+template<typename T>
+const T*
+getData() {
+	return static_cast<const T*>(data);
+};
+
+Position& p = getData<Position>();
+
+
+
+template<typename T>
+bool
+getData(T& data) {
+	if (size != sizeof(T)) {
+		return false;
+	}
+	else {
+		memcpy((void *) T, data, sizeof(T));
+		return true;
+	}
+};
+
+Position p;
+getData(p);
+
+
+
 namespace xpcc
 {
 	class Communication
@@ -63,18 +90,21 @@ namespace xpcc
 		void
 		setCurrentComponent(uint8_t id);
 		
-		
+		template<typename T>
 		void
-		callAction();
+		callAction(uint8_t receiver, uint8_t actionIdentifier, const T& data);
 		
+		template<typename T>
 		void
-		sendResponse();
+		sendResponse(const ResponseHandle& handle, const T& data);
 		
+		template<typename T>
 		void
-		sendNegativeResponse();
+		sendNegativeResponse(const ResponseHandle& handle, const T& data);
 		
+		template<typename T>
 		void
-		publishEvent();
+		publishEvent(const T& data);
 		
 		
 		

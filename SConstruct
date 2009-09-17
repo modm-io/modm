@@ -2,7 +2,7 @@
 #
 # $Id$
 
-from misc.scons.build_properties import PropertyParser
+from misc.scons.build_properties import PropertyParser, PropertyException
 
 # create a new commandline-option to specify a property-file
 AddOption('--properties',
@@ -11,7 +11,7 @@ AddOption('--properties',
 			metavar='FILE',
 			help='configuration file')
 
-# parse the property-file
+# parse the global property-file
 parser = PropertyParser(GetOption('properties'), True)
 
 # create a build-environment for the specific target
@@ -36,9 +36,17 @@ else:
 	Exit(1)
 
 # finally build the library from the src-directory
-sourceFiles = parser.parseDirectory('src/')
+sourceFiles = parser.parseDirectory('src/', 'library')
 SConscript('src/SConscript',
 			src='src',
 			variant_dir='build', 
 			exports=['env', 'sourceFiles'], 
 			duplicate=False)
+
+# build the tests
+#sourceFiles = parser.parseDirectory('tests/', 'tests')
+#SConscript('tests/SConscript',
+#			src='src',
+#			variant_dir='build-tests',
+#			exports=['env', 'sourceFiles'], 
+#			duplicate=False)

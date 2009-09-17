@@ -36,6 +36,7 @@
 
 namespace xpcc
 {
+	template <typename N>
 	struct Packet
 	{
 		typedef enum {
@@ -44,18 +45,10 @@ namespace xpcc
 			NEGATIVE_RESPONSE,
 		} Type;
 		
-		typedef enum {
-			REQUEST,
-			ACKNOWLEDGE
-		} Direction;
-		
 		struct Header
 		{
 			Type type;
-			Direction direction;
-			
-			bool isMessageIdentifierActive : 1;
-			bool isFragmented : 1;
+			bool isAcknowledge;
 			
 			uint8_t destination;
 			uint8_t source;
@@ -64,8 +57,7 @@ namespace xpcc
 		
 		Header header;
 		
-		uint8_t dataLength;
-		uint8_t data[8];
+		uint8_t data[N];
 	};
 	
 	/**
@@ -81,21 +73,25 @@ namespace xpcc
 	class BackendInterface
 	{
 	public:
+		virtual void
+		update() = 0;
+		
 		//! Send a Packet.
 		//! 
 		//! \return	\b true if the packet could be send, \b false otherwise.
+		virtual void
+		sendPacket(const Packet &packet) = 0;
+		
 		virtual bool
-		sendPacket(Packet &packet) = 0;
+		isSendPending();
+		
+		virtual void
+		cancelSend();
+		
 		
 		//! Check if a new packet was received by the backend
 		virtual bool
 		isPacketAvailable() const = 0;
-		
-		//! Read the packet from the input buffers
-		//! 
-		//! Must only be called after isPacketAvailable() returned \b true.
-		virtual void
-		retrievePacket() = 0;
 		
 		//! Access the packet.
 		//!
@@ -103,6 +99,9 @@ namespace xpcc
 		//! packet.
 		virtual const Packet&
 		getPacket() const = 0;
+		
+		virtual void
+		dropPacket();
 	};
 }
 

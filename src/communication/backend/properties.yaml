@@ -1,6 +1,6 @@
 # Properties for 'communication/backend'
 
-target: None
+target: none
 
 avr:
   defines:

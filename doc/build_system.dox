@@ -1,0 +1,41 @@
+// coding: utf-8
+// 
+// $Id$
+
+/*!
+\page build_system Build system
+
+In this project SCons (a Python-based build tool) is favored over the tradional
+aproach using Make. The main reason for this decision was that it was a 
+nightmare to create Makefiles which work on Linux and Windows and support 
+different configurations.
+
+The availability of the full power of the Python language in the 
+SConstruct-files  (the equivalent to Makefiles) allowed us to create a easy
+extensible and flexible system. Especially the debugging is much easier.
+
+\section requirements Requirements
+
+For Ubuntu (and other Debian based Linux-Distributions) just type the 
+following in a terminal and you're good to go:
+
+\verbatim
+$ sudo apt-get install python python-yaml scons
+\endverbatim
+
+Windows users have to install the tools by hand. How to do that is explaind
+on each particular website.
+
+http://www.python.org/download/
+http://www.scons.org/download.php
+http://pyyaml.org/wiki/PyYAML
+
+\section organization Organization of the source
+
+\subsection property_files The 'properties.yaml' files
+
+These files describe how to build a specific directory.
+
+*/
+
+// TODO: Extend this documentation
