@@ -34,11 +34,8 @@
 
 
 #include "../../math/arithmetic_traits.hpp"
-#include "typet.h"
+#include "../../utils/typet.h"
 #include "iodevice.hpp"
-#include <stdint.h>
-#include <stdlib.h>
-#include <iostream>
 
 namespace xpcc {
 

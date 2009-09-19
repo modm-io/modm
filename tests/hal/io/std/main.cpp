@@ -30,8 +30,8 @@
 // ----------------------------------------------------------------------------
 
 #include <iostream>
-#include "../../../../src/debug/logger/iostream.hpp"
-#include "../../../../src/debug/logger/backplane/std/std_iodevice.hpp"
+#include "../../../../src/hal/io/iostream.hpp"
+#include "../../../../src/hal/io/backplane/std/std_iodevice.hpp"
 //#include "../logger.hpp"
 //#include "../logger_message_forwarder.hpp"
 //#include "../console_output_writer.hpp"
