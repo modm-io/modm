@@ -29,80 +29,26 @@
  */
 // ----------------------------------------------------------------------------
 
-#include "stream.hpp"
-#include <stdio.h>
-#include <string.h>
+#ifndef XPCC_STD_IODEVICE_HPP_
+#define XPCC_STD_IODEVICE_HPP_
 
-#define DEFAULT_SIZE 8
+#include "../iodevice.hpp"
 
-xpcc::Stream::Stream() :
-	container ( new char[DEFAULT_SIZE] ),
-	size ( DEFAULT_SIZE ),
-	pos ( 0 )
-{
-}
+namespace xpcc {
+	class StdIODevice : public IODevice {
+		public :
+			virtual void
+			put(char c);
 
-// -----------------------------------------------------------------------------
+			virtual void
+			flush();
 
-xpcc::Stream::~Stream()
-{
-	delete[] this->container;
-}
+			virtual bool
+			get(char& value);
+	};
+};
 
-// -----------------------------------------------------------------------------
 
-xpcc::Stream&
-xpcc::Stream::operator<< ( uint8_t value )
-{
-	while( this->pos + 4 > this->size ) {
-		if( !this->allocate() ) {
-			return *this;
-		}
-	}
 
-	this->pos += sprintf(&this->container[this->pos], "%u", value);
+#endif /* XPCC_STD_IODEVICE_HPP_ */
 
-	return *this;
-}
-
-//------------------------------------------------------------------------------
-
-void
-xpcc::Stream::addString( const char* str, uint8_t need )
-{
-	while( this->pos + need > this->size ) {
-		if( !this->allocate() ) {
-			return;
-		}
-	}
-
-	memcpy( &this->container[this->pos], str, need );
-}
-
-// -----------------------------------------------------------------------------
-
-bool
-xpcc::Stream::allocate()
-{
-	char* tmp = new char[2*this->size];
-	// TODO: check that allocation was successful
-
-	memcpy( tmp, &this->container[0], this->size );
-
-	delete[] this->container;
-
-	this->container = tmp;
-	this->size = 2*this->size;
-
-	return true;
-}
-
-// -----------------------------------------------------------------------------
-
-std::ostream&
-xpcc::operator<<(std::ostream& os, const xpcc::Stream& c)
-{
-	os << std::string(c.container);
-
-	return os;
-}

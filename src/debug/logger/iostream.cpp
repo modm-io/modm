@@ -29,26 +29,19 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <iostream>
-#include "../iostream.hpp"
-#include "../backplane/std_iodevice.hpp"
-//#include "../logger.hpp"
-//#include "../logger_message_forwarder.hpp"
-//#include "../console_output_writer.hpp"
+#include "iostream.hpp"
 
-int
-main()
+// -----------------------------------------------------------------------------
+
+xpcc::IOStream::IOStream( IODevice* device ) :
+	device( device )
 {
-	std::cout << "XPCC Logger Test" << std::endl;
-
-	xpcc::IOStream stream( new xpcc::StdIODevice() );
-	stream << static_cast<uint8_t>(0xff) << static_cast<int16_t>(3) << xpcc::endl;
-	stream << 10 << xpcc::endl;
-	stream << 2.2 << xpcc::endl;
-	stream << "Hallo" << xpcc::endl;
-
-	std::cout << "ENDE" << std::endl;
-
-
-	//xpcc::dout << "test";
 }
+
+// -----------------------------------------------------------------------------
+
+xpcc::IOStream::~IOStream()
+{
+	delete this->device;
+}
+

@@ -29,26 +29,82 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <iostream>
-#include "../iostream.hpp"
-#include "../backplane/std_iodevice.hpp"
-//#include "../logger.hpp"
-//#include "../logger_message_forwarder.hpp"
-//#include "../console_output_writer.hpp"
+#include "iostream.hpp"
+#include <stdio.h>
+#include <string.h>
 
-int
-main()
+#define DEFAULT_SIZE 8
+
+xpcc::IOStream::IOStream() :
+	container ( new char[DEFAULT_SIZE] ),
+	size ( DEFAULT_SIZE ),
+	pos ( 0 )
 {
-	std::cout << "XPCC Logger Test" << std::endl;
-
-	xpcc::IOStream stream( new xpcc::StdIODevice() );
-	stream << static_cast<uint8_t>(0xff) << static_cast<int16_t>(3) << xpcc::endl;
-	stream << 10 << xpcc::endl;
-	stream << 2.2 << xpcc::endl;
-	stream << "Hallo" << xpcc::endl;
-
-	std::cout << "ENDE" << std::endl;
-
-
-	//xpcc::dout << "test";
 }
+
+// -----------------------------------------------------------------------------
+
+xpcc::IOStream::~Stream()
+{
+	delete[] this->container;
+}
+
+// -----------------------------------------------------------------------------
+
+xpcc::IOStream&
+xpcc::IOStream::operator<< ( uint8_t value )
+{
+	std::cerr << __FUNCTION__ << (uint16_t) value << " ";
+	while( this->pos + 4 > this->size ) {
+		if( !this->allocate() ) {
+			return *this;
+		}
+	}
+
+	this->pos += sprintf(&this->container[this->pos], "%u", value);
+
+	return *this;
+}
+
+//------------------------------------------------------------------------------
+
+void
+xpcc::IOStream::addString( const char* str, uint8_t need )
+{
+	while( this->pos + need > this->size ) {
+		if( !this->allocate() ) {
+			return;
+		}
+	}
+
+	memcpy( &this->container[this->pos], str, need );
+}
+
+// -----------------------------------------------------------------------------
+
+bool
+xpcc::IOStream::allocate()
+{
+	char* tmp = new char[2*this->size];
+	// TODO: check that allocation was successful
+
+	memcpy( tmp, &this->container[0], this->size );
+
+	delete[] this->container;
+
+	this->container = tmp;
+	this->size = 2*this->size;
+
+	return true;
+}
+
+// -----------------------------------------------------------------------------
+
+std::ostream&
+xpcc::operator<<(std::ostream& os, const xpcc::IOStream& c)
+{
+	os << std::string(c.container);
+
+	return os;
+}
+

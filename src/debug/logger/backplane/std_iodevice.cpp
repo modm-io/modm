@@ -29,51 +29,28 @@
  */
 // ----------------------------------------------------------------------------
 
+#include "std_iodevice.hpp"
 #include <iostream>
 
-#ifndef XPCC_STREAM_HPP_
-#define XPCC_STREAM_HPP_
+void
+xpcc::StdIODevice::put( char c )
+{
+	std::cout << c;
+}
 
-namespace xpcc {
-	class Stream {
-		public :
-			Stream();
+// ----------------------------------------------------------------------------
 
-			~Stream();
+void
+xpcc::StdIODevice::flush()
+{
+	std::cout << std::flush;
+}
 
-			template<typename T>
-			inline Stream&
-			operator<< ( const T& c )
-			{
-				this->addString( (const char*)&c, sizeof(T) );
+// ----------------------------------------------------------------------------
 
-				return *this;
-			}
-
-			Stream&
-			operator<< ( uint8_t );
-
-
-		protected :
-			void
-			addString( const char*, uint8_t size );
-
-			bool
-			allocate();
-
-		public :
-			friend std::ostream&
-			operator<<(std::ostream& os, const Stream& c);
-
-			char* 	container;
-			uint8_t	size;
-			uint8_t	pos;
-
-	};
-
-	std::ostream&
-	operator<<(std::ostream& os, const xpcc::Stream& c);
-};
-
-
-#endif /* XPCC_STREAM_HPP_ */
+bool
+xpcc::StdIODevice::get( char& value )
+{
+	std::cin >> value;
+	return true;
+}

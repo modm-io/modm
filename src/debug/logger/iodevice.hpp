@@ -29,26 +29,34 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <iostream>
-#include "../iostream.hpp"
-#include "../backplane/std_iodevice.hpp"
-//#include "../logger.hpp"
-//#include "../logger_message_forwarder.hpp"
-//#include "../console_output_writer.hpp"
+#ifndef XPCC_IODEVICE_HPP_
+#define XPCC_IODEVICE_HPP_
 
-int
-main()
-{
-	std::cout << "XPCC Logger Test" << std::endl;
+#include <stdint.h>
 
-	xpcc::IOStream stream( new xpcc::StdIODevice() );
-	stream << static_cast<uint8_t>(0xff) << static_cast<int16_t>(3) << xpcc::endl;
-	stream << 10 << xpcc::endl;
-	stream << 2.2 << xpcc::endl;
-	stream << "Hallo" << xpcc::endl;
+namespace xpcc {
+	class IODevice {
+		public :
+			IODevice();
 
-	std::cout << "ENDE" << std::endl;
+			virtual void
+			put(char c) = 0;
+
+			virtual void
+			flush() = 0;
+
+			virtual void
+			putString(const char* str, uint8_t size);
+
+			virtual bool
+			get(char& value) = 0;
+
+		private :
+			IODevice( const IODevice& );
+	};
+};
 
 
-	//xpcc::dout << "test";
-}
+
+#endif /* XPCC_IODEVICE_HPP_ */
+
