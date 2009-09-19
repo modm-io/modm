@@ -1,130 +1,195 @@
 // coding: utf-8
 // ----------------------------------------------------------------------------
-/**
- * \defgroup	arithmetic_trais	Arithmetic Traits
- * \brief		Traits für aritmetische (Zahlen) Typen
- * 
- * Traits bieten elegante Möglichkeit informationen an einen Typen anzuhängen 
- * ohne die Implementation dieses Typs zu ändern.
- * 
- * \section Elemente des Traits
- * 
- * \type	double_type	Kann das Ergenis einer Multiplication des Typs T
- * 						aufnehmen
- * \value	min_value	kleinster darstellbarer Wert (int: Negative, 
- * 						float/double: kleinste pos Zahl)
- * \value	max_value	größte darstellbarer Wert
- * \value	signed_type	TODO
- * \value	unsigned_type	TODO
- * 
- * \section Benutzen der Klasse
- * 
- * \subsection	Einen Typ (T_DOUBLE) definieren, in den das Ergebnis 
- * 				von (T * T) passt
- * \code
- * typedef typename arithmetic_traits<T>::double_type T_DOUBLE;
- * \endcode
- * 
- * \subsection min/max Wert des Typ erhalten
- * \code
- * T min = arithmetic_traits<T>::min_value;
- * T max = arithmetic_traits<T>::max_value;
- * \endcode
+/* Copyright (c) 2009, Roboterclub Aachen e.V.
+ * All rights reserved.
  *
- * \version	$Id: arithmetic_traits.h 8106 2009-08-17 14:57:59Z fabian $
- * \author	Martin Rosekeit <martin.rosekeit@rwth-aachen.de>
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *     * Redistributions of source code must retain the above copyright
+ *       notice, this list of conditions and the following disclaimer.
+ *     * Redistributions in binary form must reproduce the above copyright
+ *       notice, this list of conditions and the following disclaimer in the
+ *       documentation and/or other materials provided with the distribution.
+ *     * Neither the name of the Roboterclub Aachen e.V. nor the
+ *       names of its contributors may be used to endorse or promote products
+ *       derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY ROBOTERCLUB AACHEN E.V. ''AS IS'' AND ANY
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL ROBOTERCLUB AACHEN E.V. BE LIABLE FOR ANY
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+ * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * $Id: iostream.hpp 34 2009-09-19 11:34:11Z thundernail $
  */
 // ----------------------------------------------------------------------------
-/*@{*/
 
-#ifndef ARITHMETIC_TRAITS_H
-#define ARITHMETIC_TRAITS_H
+
+#ifndef XPCC_ARITHMETIC_TRAITS_H
+#define XPCC_ARITHMETIC_TRAITS_H
 
 #include <stdint.h>
 
-// Nutzen des Default-Templates verursacht einen Compiler-Fehler 
-// (gewollt, besser als Laufzeit-Fehler!)
-template<typename T>
-struct arithmetic_traits {
+namespace xpcc {
+
+	/**
+	 * \defgroup	arithmetic_trais	Arithmetic Traits
+	 * \brief		Traits to give numbers more information then they have by
+	 * 				default in C++
+	 *
+	 * \section Values this Traits are Providing
+	 *
+	 * \type	DoubleType	Type that can holds the doubled length of data.
+	 * 						To use by multiplication.
+	 * \value	minValue	smallest value.
+	 * \value	maxValue	biggest value
+	 * \value	isSigned	is this a signed or unsigned type
+	 * \value	isInteger	is this an integer type
+	 * \value	isFloat		is this a float type (float, double)
+	 * \value	digits10	count of digits to display this type in decimal
+	 *
+	 * \section Use
+	 * \code
+	 * 	typedef typename xpcc::ArithmeticTraits<T>::DoubleType T_DOUBLE;
+	 *
+	 * 	T min = xpcc::ArithmeticTraits<T>::minValue;
+	 * 	T max = xpcc::ArithmeticTraits<T>::maxValue;
+	 * \endcode
+	 *
+	 * \version	$Id: arithmetic_traits.h 8106 2009-08-17 14:57:59Z fabian $
+	 * \author	Martin Rosekeit <martin.rosekeit@rwth-aachen.de>
+	 */
+	// -------------------------------------------------------------------------
+	/*@{*/
+	template<typename T>
+	struct ArithmeticTraits {
+		static const bool isInteger = false;
+		static const bool isFloat = false;
+	};
+
+	// -------------------------------------------------------------------------
+	template<>
+	struct ArithmeticTraits<int8_t> {
+		typedef int16_t DoubleType;
+
+		static const int8_t minValue = -0x80;
+		static const int8_t maxValue =  0x7F;
+		static const uint8_t digits10 = 4; // inc sign
+
+		static const bool isInteger = true;
+		static const bool isFloat = false;
+		static const bool isSigned = true;
+	};
+
+	// -------------------------------------------------------------------------
+	template<>
+	struct ArithmeticTraits<uint8_t> {
+		typedef uint16_t DoubleType;
+
+		static const uint8_t minValue = 0;
+		static const uint8_t maxValue = 0xff;
+		static const uint8_t digits10 = 3;
+
+		static const bool isInteger = true;
+		static const bool isFloat = false;
+		static const bool isSigned = false;
+	};
+
+	// -------------------------------------------------------------------------
+	template<>
+	struct ArithmeticTraits<int16_t> {
+		typedef int32_t DoubleType;
+
+		static const int16_t minValue = -0x8000;
+		static const int16_t maxValue =  0x7FFF;
+		static const uint8_t digits10 = 6; // inc. sign
+
+		static const bool isInteger = true;
+		static const bool isFloat = false;
+		static const bool isSigned = true;
+	};
+
+	// -------------------------------------------------------------------------
+	template<>
+	struct ArithmeticTraits<uint16_t> {
+		typedef uint32_t DoubleType;
+
+		static const uint16_t minValue = 0;
+		static const uint16_t maxValue = 0xFFFF;
+		static const uint8_t digits10 = 6;
 	
+		static const bool isInteger = true;
+		static const bool isFloat = false;
+		static const bool isSigned = false;
+	};
+	
+	// -------------------------------------------------------------------------
+	template<>
+	struct ArithmeticTraits<int32_t> {
+#ifdef __NO_LONG__
+		typedef float DoubleType; // int64_t is on AVRs only a int32_t
+#else
+		typedef int64_t DoubleType;
+#endif
+		static const int32_t minValue = -0x80000000;
+		static const int32_t maxValue =  0x7FFFFFFF;
+		static const uint8_t digits10 = 11; // inc. sign
+	
+		static const bool isInteger = true;
+		static const bool isFloat = false;
+		static const bool isSigned = true;
+	};
+	
+	// -------------------------------------------------------------------------
+	template<>
+	struct ArithmeticTraits<uint32_t> {
+#ifdef __NO_LONG__
+		typedef float DoubleType; // int64_t is on AVRs only a int32_t
+#else
+		typedef uint64_t DoubleType;
+#endif
+
+		static const uint32_t minValue = 0;
+		static const uint32_t maxValue = 0xFFFFFFFF;
+		static const uint8_t digits10 = 10;
+
+		static const bool isInteger = true;
+		static const bool isFloat = false;
+		static const bool isSigned = false;
+	};
+	
+	// -------------------------------------------------------------------------
+
+	template<>
+	struct ArithmeticTraits<float> {
+		typedef float DoubleType;
+
+		static const float minValue = -3.40282e+38;
+		static const float maxValue = 3.40282e+38;
+	
+		static const bool isInteger = false;
+		static const bool isFloat = true;
+		static const bool isSigned = true;
+	};
+
+	// -------------------------------------------------------------------------
+
+	template<>
+	struct ArithmeticTraits<double> {
+		typedef double DoubleType;
+		static const double min_value = 2.22507e-308;
+		static const double max_value = 1.79769e+308;
+
+		static const bool isInteger = false;
+		static const bool isFloat = true;
+		static const bool isSigned = true;
+	};
+	/*@}*/
 };
 
-// ----------------------------------------------------------------------------
-template<>
-struct arithmetic_traits<int8_t> {
-	typedef int16_t double_type;
-	typedef int8_t signed_type;
-	typedef uint8_t unsigned_type;
-	
-	static const int8_t min_value = -0x80;
-	static const int8_t max_value =  0x7F;
-};
-
-// ----------------------------------------------------------------------------
-template<>
-struct arithmetic_traits<uint8_t> {
-	typedef uint16_t double_type;
-	typedef int8_t signed_type;
-	typedef uint8_t unsigned_type;
-	
-	static const uint8_t min_value = 0;
-	static const uint8_t max_value = 0xff;
-};
-
-// ----------------------------------------------------------------------------
-template<>
-struct arithmetic_traits<int16_t> {
-	typedef int32_t double_type;
-	typedef int16_t signed_type;
-	typedef uint16_t unsigned_type;
-	
-	static const int16_t min_value = -0x8000;
-	static const int16_t max_value =  0x7FFF;
-};
-
-// ----------------------------------------------------------------------------
-template<>
-struct arithmetic_traits<uint16_t> {
-	typedef uint32_t double_type;
-	typedef int16_t signed_type;
-	typedef uint16_t unsigned_type;
-	
-	static const uint16_t min_value = 0;
-	static const uint16_t max_value = 0xFFFF;
-};
-
-// ----------------------------------------------------------------------------
-template<>
-struct arithmetic_traits<int32_t> {
-	typedef float double_type; // int64_t ist bei AVRs auch nur ein int32_t
-	typedef int32_t signed_type;
-	typedef uint32_t unsigned_type;
-	
-	static const int32_t min_value = -0x80000000;
-	static const int32_t max_value =  0x7FFFFFFF;
-};
-
-// ----------------------------------------------------------------------------
-template<>
-struct arithmetic_traits<uint32_t> {
-	typedef float double_type; // int64_t ist bei AVRs auch nur ein int32_t
-	typedef int32_t signed_type;
-	typedef uint32_t unsigned_type;
-	
-	static const uint32_t min_value = 0;
-	static const uint32_t max_value = 0xFFFFFFFF;
-};
-
-// ----------------------------------------------------------------------------
-template<>
-struct arithmetic_traits<float> {
-	typedef float double_type;
-	typedef float signed_type;
-	typedef float unsigned_type;
-	
-	static const float min_value = 1.17549e-38;
-	static const float max_value = 3.40282e+38;
-};
-
-/*@}*/
-#endif	// ARITHMETIC_TRAITS_H
+#endif	// XPCC_ARITHMETIC_TRAITS_H

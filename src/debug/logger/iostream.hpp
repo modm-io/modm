@@ -33,7 +33,8 @@
 #define XPCC_IOSTREAM_HPP_
 
 
-#include "arithmetic_traits.hpp"
+#include "../../math/arithmetic_traits.hpp"
+#include "typet.h"
 #include "iodevice.hpp"
 #include <stdint.h>
 #include <stdlib.h>
@@ -156,12 +157,12 @@ xpcc::IOStream::operator<< ( const T& v )
 {
 	// typedef (T.is_integer) ? IntegerWriter<T> : ObjectWriter<T>
 	typedef typename xpcc::tm::Select <
-			arithmetic_traits<T>::isFloat,
+			::xpcc::ArithmeticTraits<T>::isFloat,
 			::xpcc::FloatWriter<T>,
 			::xpcc::ObjectWriter<T> >::Result NotIntegerWriter;
 
     typedef typename xpcc::tm::Select <
-			arithmetic_traits<T>::isInteger,
+			::xpcc::ArithmeticTraits<T>::isInteger,
 			::xpcc::IntegerWriter<T>,
 			NotIntegerWriter >::Result Writer;
 
@@ -176,15 +177,13 @@ template<typename T>
 xpcc::IOStream&
 xpcc::IOStream::putInteger( T value )
 {
-	char str[arithmetic_traits<T>::digits10 + 1]; // +1 for '\0'
+	char str[ArithmeticTraits<T>::digits10 + 1]; // +1 for '\0'
 	char *iter(str);
-
-std::cerr << "sizeof=" << sizeof(T) << std::endl;
 
 	// TODO use a optimized function to format output
 	snprintf(str, sizeof(str), "%d", value);
 
-	for( uint8_t i( arithmetic_traits<T>::digits10 ); i>0; --i ) {
+	for( uint8_t i( ArithmeticTraits<T>::digits10 ); i>0; --i ) {
 
 		this->device->put(*iter);
 		++iter;
@@ -206,8 +205,6 @@ xpcc::IOStream::putFloat( T value )
 	// TODO is hard coded for 2.22507e-308
 	char str[13 + 1]; // +1 for '\0'
 	char *iter(str);
-
-std::cerr << "sizeof=" << sizeof(T) << std::endl;
 
 	// TODO use a optimized function to format output
 	snprintf(str, sizeof(str), "%e", value);
