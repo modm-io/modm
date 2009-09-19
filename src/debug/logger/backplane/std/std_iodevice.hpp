@@ -32,7 +32,7 @@
 #ifndef XPCC_STD_IODEVICE_HPP_
 #define XPCC_STD_IODEVICE_HPP_
 
-#include "../iodevice.hpp"
+#include "../../iodevice.hpp"
 
 namespace xpcc {
 	class StdIODevice : public IODevice {
