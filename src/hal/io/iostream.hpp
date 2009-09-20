@@ -43,10 +43,19 @@ namespace xpcc {
 		public :
 
 			//! Constructor
-			//! \param	IODevice*	device to write the stream to, takes ownership of the device
+			//! \param	IODevice*	device to write the stream to, takes ownership of the device and will delete it when itself is destroyed
 			//! \code
 			//!		IOStream stream( new MyIODevice() );
+			//! \endcode
 			IOStream(IODevice*);
+
+			//! Constructor
+			//! \param	IODevice*	device to write the stream to
+			//! \code
+			//!		MyIODevice device;
+			//!		IOStream stream( device );
+			//! \endcode
+			IOStream(IODevice&);
 
 			~IOStream();
 
@@ -75,8 +84,7 @@ namespace xpcc {
 			}
 
 		protected :
-			template <typename T>
-			friend struct ObjectWriter;
+			friend struct StringWriter;
 
 			template <typename T>
 			friend struct IntegerWriter;
@@ -93,7 +101,8 @@ namespace xpcc {
 			putFloat( T value );
 
 		protected :
-			IODevice* device;
+			IODevice* 	device;
+			bool		ownerOfDevice;
 
 	};
 
@@ -116,12 +125,17 @@ namespace xpcc {
 	inline IOStream&
 	flush(IOStream& ios);
 
-	template <typename T>
-	struct ObjectWriter {
+	struct StringWriter {
 		inline void
-		operator()(IOStream& os, const T& v) const
+		operator()(IOStream& os, const char* s) const
 		{
-			os.device->putString( (const char*)& v, sizeof(T) );
+			os.device->put( s );
+		}
+
+		inline void
+		operator()(IOStream& os, char c) const
+		{
+			os.device->put( c );
 		}
 	};
 
@@ -156,7 +170,7 @@ xpcc::IOStream::operator<< ( const T& v )
 	typedef typename xpcc::tm::Select <
 			::xpcc::ArithmeticTraits<T>::isFloat,
 			::xpcc::FloatWriter<T>,
-			::xpcc::ObjectWriter<T> >::Result NotIntegerWriter;
+			::xpcc::StringWriter >::Result NotIntegerWriter;
 
     typedef typename xpcc::tm::Select <
 			::xpcc::ArithmeticTraits<T>::isInteger,
@@ -175,20 +189,11 @@ xpcc::IOStream&
 xpcc::IOStream::putInteger( T value )
 {
 	char str[ArithmeticTraits<T>::digits10 + 1]; // +1 for '\0'
-	char *iter(str);
 
 	// TODO use a optimized function to format output
 	snprintf(str, sizeof(str), "%d", value);
 
-	for( uint8_t i( ArithmeticTraits<T>::digits10 ); i>0; --i ) {
-
-		this->device->put(*iter);
-		++iter;
-
-		if( *iter == '\0' ) {
-			break;
-		}
-	}
+	this->device->put(str);
 
 	return *this;
 }
@@ -206,15 +211,7 @@ xpcc::IOStream::putFloat( T value )
 	// TODO use a optimized function to format output
 	snprintf(str, sizeof(str), "%e", value);
 
-	for( uint8_t i( sizeof(str)-1 ); i>0; --i ) {
-
-		this->device->put(*iter);
-		++iter;
-
-		if( *iter == '\0' ) {
-			break;
-		}
-	}
+	this->device->put(str);
 
 	return *this;
 }

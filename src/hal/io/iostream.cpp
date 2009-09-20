@@ -34,7 +34,15 @@
 // -----------------------------------------------------------------------------
 
 xpcc::IOStream::IOStream( IODevice* device ) :
-	device( device )
+	device( device ),
+	ownerOfDevice( true )
+{
+}
+
+// -----------------------------------------------------------------------------
+xpcc::IOStream::IOStream( IODevice& device ) :
+	device( &device ),
+	ownerOfDevice( false )
 {
 }
 
@@ -42,6 +50,8 @@ xpcc::IOStream::IOStream( IODevice* device ) :
 
 xpcc::IOStream::~IOStream()
 {
-	delete this->device;
+	if( this->ownerOfDevice ) {
+		delete this->device;
+	}
 }
 
