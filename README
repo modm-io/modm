@@ -14,6 +14,6 @@ communicate via CAN, TCP/IP or TIPC.
 
 You need Doxygen (http://www.doxygen.nl/).
 Go to the src folder and invoke doxygen with
-	xpcc/trunk/src$ doxygen doxygen.Doxyfile
+	xpcc/trunk/src$ doxygen ../doc/doxyfile
 The documentation will be wrote to xpcc/trunk/doc/apidoc/html/
 Start the index.html with your favourite browser.
