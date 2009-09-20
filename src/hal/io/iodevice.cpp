@@ -38,11 +38,10 @@ xpcc::IODevice::IODevice()
 // -----------------------------------------------------------------------------
 
 void
-xpcc::IODevice::putString(const char* str, uint8_t size)
+xpcc::IODevice::put(const char* str)
 {
-	while( size > 0 ) {
+	while( str != '\0' ) {
 		this->put( *str );
-		size--;
 		str++;
 	}
 }

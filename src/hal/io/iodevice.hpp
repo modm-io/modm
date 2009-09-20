@@ -43,10 +43,10 @@ namespace xpcc {
 			put(char c) = 0;
 
 			virtual void
-			flush() = 0;
+			put(const char* str);
 
 			virtual void
-			putString(const char* str, uint8_t size);
+			flush() = 0;
 
 			virtual bool
 			get(char& value) = 0;

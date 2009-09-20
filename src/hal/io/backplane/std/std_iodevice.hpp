@@ -41,6 +41,9 @@ namespace xpcc {
 			put(char c);
 
 			virtual void
+			put(const char* s);
+
+			virtual void
 			flush();
 
 			virtual bool
