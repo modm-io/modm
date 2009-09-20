@@ -28,21 +28,8 @@
  * $Id$
  */
 // ----------------------------------------------------------------------------
+
 #include "abstract_output_writer.hpp"
 
 // -----------------------------------------------------------------------------
 
-AbstractOutputWriter::AbstractOutputWriter( const std::string & identifierString ) {
-	this->identifierString_ = identifierString;
-};
-// -----------------------------------------------------------------------------
-AbstractOutputWriter::~AbstractOutputWriter() {
-	
-}
-// -----------------------------------------------------------------------------
-
-const std::string & AbstractOutputWriter::getIdentifier() const {
-	return this->identifierString_;
-};
-
-// -----------------------------------------------------------------------------

@@ -28,47 +28,36 @@
  * $Id$
  */
 // ----------------------------------------------------------------------------
-#ifndef RCA__ABSTRACT_OUTPUT_WRITER_HPP
-#define RCA__ABSTRACT_OUTPUT_WRITER_HPP
+#ifndef XPCC_ABSTRACT_OUTPUT_WRITER_HPP
+#define XPCC_ABSTRACT_OUTPUT_WRITER_HPP
 
-#include <iostream>
+#include "level.hpp"
 
-/**
- * @class 	AbstractOutputWriter 
- * @brief 	??? todo
- *
- * @ingroup logger
- * @version	$Id$
- * @since 	04 December 2006
- * @author	Christofer Hedbrand,
- * 			Carsten Schmidt,
- * 			Martin Rosekeit <martin.rosekeit@rwth-aachen.de>
- */
-class AbstractOutputWriter {
-	public:
-		typedef enum {
-				DEFAULT,
-				WHITE,
-				GREEN,
-				BLUE,
-				YELLOW,
-				RED
-		} TColors;
-		
-		AbstractOutputWriter( const std::string & identifierString );
-		
-		virtual
-		~AbstractOutputWriter();
-		
-		const std::string &
-		getIdentifier() const;
+#include "../../hal/io/iostream.hpp"
 
-		virtual
-		std::ostream&
-		getOutputStream(TColors color = DEFAULT) = 0;
+namespace xpcc {
+	/**
+	 * @class 	AbstractOutputWriter
+	 * @brief 	??? todo
+	 *
+	 * @ingroup logger
+	 * @version	$Id$
+	 * @since 	04 December 2006
+	 * @author	Christofer Hedbrand,
+	 * 			Carsten Schmidt,
+	 * 			Martin Rosekeit <martin.rosekeit@rwth-aachen.de>
+	 */
+	class AbstractOutputWriter {
+		public:
+			virtual void
+			put( char c ) = 0;
 
-	protected:
-		std::string				identifierString_;
-};
+			virtual void
+			put( const char* s ) = 0;
 
-#endif /*RCA__ABSTRACT_OUTPUT_WRITER_HPP*/
+			virtual	void
+			flush() = 0;
+	};
+}
+;
+#endif /*XPCC_ABSTRACT_OUTPUT_WRITER_HPP*/

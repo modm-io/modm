@@ -30,28 +30,7 @@
 // ----------------------------------------------------------------------------
 #include "logger_message_forwarder.hpp"
 
-// -----------------------------------------------------------------------------
+xpcc::LoggerMessageForwarder<xpcc::DEBUG> xpcc::dout;
 
-LoggerMessageForwarder::LoggerMessageForwarder(const Logger::PriorityLevel & loggerPriorityLevel, const std::string & loggerLocationString) {
-	this->loggerPriorityLevel_		= loggerPriorityLevel;
-	this->loggerLocationString_		= loggerLocationString;
-	
-	// This is the default logging level of the current message - it will be overwritten, later.
-	this->messagePriorityLevel_		= Logger::ERROR;
-};
-	
-// -----------------------------------------------------------------------------
-
-void 
-LoggerMessageForwarder::initializeMessage(	const Logger::PriorityLevel & messagePriorityLevel, 
-											const std::string & messageLocationString) {
-	this->messagePriorityLevel_	= messagePriorityLevel;
-	
-	if(this->messagePriorityLevel_ >= this->loggerPriorityLevel_) {
-		Logger::instance().setMessageHeader(this->loggerLocationString_,
-											messageLocationString, 
-											this->messagePriorityLevel_);
-	}
-};
 
 // -----------------------------------------------------------------------------

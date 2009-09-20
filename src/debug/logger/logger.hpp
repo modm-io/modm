@@ -28,8 +28,8 @@
  * $Id$
  */
 // ----------------------------------------------------------------------------
-#ifndef RCA__LOGGER__HPP
-#define RCA__LOGGER__HPP
+#ifndef XPCC_LOGGER__HPP
+#define XPCC_LOGGER__HPP
 /**
  * @defgroup logger Logger
  * @brief Log messages to specifyed destiny.
@@ -52,83 +52,101 @@
  * The following log levels are supported: \n
  * DEBUG < INFO < WARNING < ERROR < FATAL
  * 
+ * \section call_flow Flow of a call
+ * This is to give a overview how many resources a call of the logger is.
+ * The given call is:
+ * \code
+ * 	xpcc::dlog << 100
+ * \endcode
+ * - call of LoggerMessageForwarder<L>::operator << (T) (with L = xpcc::DEBUG, T = int)
+ *   - IOStream::operator << (T) (with T = int) is inline
+ *   - IntegerWriter::operator()(IOStream& os, const T& v) (with T=int) is inline
+ * \code
+ * 	if( xpcc::DEBUGL >= xpcc::LoggerMessageForwarder<xpcc::DEBUG>::level ) {
+ * 		xpcc::IOStream::putInteger( 100 )
+ * 	}
+ * \endcode
+ * - IOStream::putInteger() will create the formated string and calls sprintf() to do this
+ * - the resulting string is send to the device via the Logger: call of
+ *   Logger::put(const char*) (using vTable)
+ * - direct call of ConsoleOutputWriter::put(const char*) (using vTable)
+ * - using of the std::cout ...
+ *
+ * In sum there are 3 nested method calls with two of them using vTables) plus
+ * the call of sprintf().
  * 
- * @todo write examples
+ * \todo 	Finding a solution with less method calls (at least with only one using
+ * 			vTables).
  */
-
-#include <sstream>
-#include <ostream>
-#include <map>
-#include <iomanip>  // std::setw, ::std::setfill 
-#include <ios>      // std::left, ::std::right
 
 #include "abstract_output_writer.hpp"
-#include "console_output_writer.hpp"
-// More to come...
+#include "level.hpp"
+#include "../../hal/io/iodevice.hpp"
 
+namespace xpcc {
+	/**
+	 * @class 	Logger
+	 * @brief 	Logger singelton, connect the LoggerMessageForwarder to the
+	 * 			LoggerOutputWriter
+	 *
+	 * @todo	Logging of templates is not possible, because the static variable
+	 * 			of the logger will be also seen in the file, that include the
+	 * 			header file.
+	 *
+	 * @todo	HowTo: using of OutputWriter
+	 *
+	 * @ingroup logger
+	 * @version	$Id$
+	 * @since 	01 December 2006
+	 * @author	Christofer Hedbrand,
+	 * 			Carsten Schmidt,
+	 * 			Martin Rosekeit <martin.rosekeit@rwth-aachen.de>
+	 */
+	class Logger : public IODevice {
+		public:
+			static Logger&
+			instance();
 
-/**
- * @class 	Logger 
- * @brief 	Logger singelton, connect the LoggerMessageForwarder to the 
- * 			LoggerOutputWriter
- * 
- * @todo	Logging of templates is not possible, because the static variable
- * 			of the logger will be also seen in the file, that include the 
- * 			header file.
- * 
- * @todo	HowTo: using of OutputWriter
- *
- * @ingroup logger
- * @version	$Id$
- * @since 	01 December 2006
- * @author	Christofer Hedbrand,
- * 			Carsten Schmidt,
- * 			Martin Rosekeit <martin.rosekeit@rwth-aachen.de>
- */
-class Logger {
-	public:
-		// Define static log priorities here
-		typedef enum {
-				OFF		=     0,
-				DEBUG	=	100,
-				INFO	=	200,
-				WARNING	=	300,
-				ERROR	=	400,
-				FATAL	=	500,
-		} PriorityLevel;
+			//! set a new output writer in the singleton.
+			//!
+			//! The singleton takes ownership of the output writer (the
+			//! singleton will delete the object)
+			//!
+			//! \code
+			//! 	Logger::instance.setOutputWriter(new MyOutputWriter);
+			//! \endcode
+			void
+			setOutputWriter(AbstractOutputWriter* outputWriter);
 
-		static Logger& 
-		instance();
-		
-		void
-		setDefaultOutputWriter();
+			void
+			setLevel(Level level);
 
-		void 
-		setOutputWriter(AbstractOutputWriter& outputWriter);
-		
-		void 
-		setMessageHeader(	const std::string & loggerLocationString,
-							const std::string & messageLocationString,
-							const Logger::PriorityLevel & messagePriorityLevel);
+			inline const Level&
+			getLevel() const
+			{
+				return this->level;
+			}
 
-		
-		template <class T> 
-		void 
-		log(const T& message ) {
-			this->outputWriter_->getOutputStream() 	<< message
-													<< std::flush;
-		};
-		
-	private:
-		Logger();						// Private destructor because of singelton
-		Logger(const Logger & logger);	// Private copy constructor because of singelton
-		~Logger();
-		
-		std::string								identifierString_;	
-		std::map<PriorityLevel, std::string>	logLevelIdNameMap_;
+			virtual void
+			put(char c);
 
-		AbstractOutputWriter*					outputWriter_;
-		AbstractOutputWriter*					defaultOutputWriter_;
+			virtual void
+			put(const char* s);
+
+			virtual void
+			flush();
+
+			virtual bool
+			get(char& value);
+
+		private:
+			Logger();						// Private constructor because of singleton
+			Logger(const Logger & logger);	// Private copy constructor because of singleton
+			~Logger();
+
+			AbstractOutputWriter*		outputWriter;
+			Level 						level;
+	};
 };
 
 

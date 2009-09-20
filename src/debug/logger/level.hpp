@@ -25,81 +25,19 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id$
+ * $Id: logger.hpp 18 2009-09-10 21:20:17Z thundernail $
  */
-// ----------------------------------------------------------------------------
+#ifndef XPCC_LEVEL_HPP_
+#define XPCC_LEVEL_HPP_
 
-#include "logger.hpp"
-
-// -----------------------------------------------------------------------------
-
-xpcc::Logger::Logger() :
-	outputWriter( 0 )
-{
-};
-
-// -----------------------------------------------------------------------------
-
-xpcc::Logger::~Logger()
-{
-	// Delete the output-Writer
-	delete this->outputWriter;
+namespace xpcc {
+	typedef enum {
+		DEBUG,
+		INFO,
+		WARNING,
+		ERROR,
+		FATAL
+	} Level;
 }
 
-// -----------------------------------------------------------------------------
-
-xpcc::Logger&
-xpcc::Logger::instance()
-{
-	static Logger loggerInstance;
-	return loggerInstance;
-};
-
-// -----------------------------------------------------------------------------
-
-void
-xpcc::Logger::setOutputWriter(AbstractOutputWriter* outputWriter)
-{
-	delete this->outputWriter;
-	this->outputWriter = outputWriter;
-};
-
-// ----------------------------------------------------------------------------
-
-void
-xpcc::Logger::setLevel(Level level)
-{
-	this->level = level;
-}
-
-// -----------------------------------------------------------------------------
-
-void
-xpcc::Logger::put(char c)
-{
-	this->outputWriter->put(c);
-}
-
-// -----------------------------------------------------------------------------
-
-void
-xpcc::Logger::put(const char* s)
-{
-	this->outputWriter->put(s);
-}
-
-// -----------------------------------------------------------------------------
-
-void
-xpcc::Logger::flush()
-{
-	this->outputWriter->flush();
-}
-
-// -----------------------------------------------------------------------------
-
-bool
-xpcc::Logger::get(char& value)
-{
-	return false;
-}
+#endif /* XPCC_LEVEL_HPP_ */

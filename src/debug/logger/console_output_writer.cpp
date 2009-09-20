@@ -29,41 +29,43 @@
  */
 // ----------------------------------------------------------------------------
 #include "console_output_writer.hpp"
+#include <iostream>
+#include <string>
 
-// -----------------------------------------------------------------------------
 
-ConsoleOutputWriter::ConsoleOutputWriter( const std::string & identifierString ) :
-	AbstractOutputWriter(identifierString) {
-};
+xpcc::ConsoleOutputWriter::ConsoleOutputWriter()
+{
+	// Assign log level names to ids
+	this->logLevelIdNameMap[xpcc::DEBUG]	=	"DEBUG";
+	this->logLevelIdNameMap[xpcc::INFO]		=	"INFO";
+	this->logLevelIdNameMap[xpcc::WARNING]	=	"WARNING";
+	this->logLevelIdNameMap[xpcc::ERROR]	=	"ERROR";
+	this->logLevelIdNameMap[xpcc::FATAL]	=	"FATAL";
 
-// -----------------------------------------------------------------------------
-
-std::ostream&
-ConsoleOutputWriter::getOutputStream(TColors color) {
-	// TODO: using Log4CPP, BOOST or whatever
-	// TODO: Maybe optimize the output using the C++ console output stream utils...?!
-
-	switch(color) {
-		case WHITE :
-			std::cout << "\x1b[40m\x1b[37m";
-			break;
-		case GREEN :
-			std::cout << "\x1b[40m\x1b[32m";
-			break;
-		case BLUE :
-			std::cout << "\x1b[40m\x1b[34m";
-			break;
-		case YELLOW :
-			std::cout << "\x1b[40m\x1b[33m";
-			break;
-		case RED :
-			std::cout << "\x1b[40m\x1b[31m";
-			break;
-		case DEFAULT :
-			std::cout << "\x1b[49m\x1b[39m";
-	}
-
-	return std::cout;
 }
 
+// ----------------------------------------------------------------------------
+
+void
+xpcc::ConsoleOutputWriter::put(char c)
+{
+	this->device.put(c);
+}
+
+// ----------------------------------------------------------------------------
+
+void
+xpcc::ConsoleOutputWriter::put(const char* s)
+{
+	this->device.put(s);
+}
+
+// -----------------------------------------------------------------------------
+
+void
+xpcc::ConsoleOutputWriter::flush()
+{
+	this->device.put('\n');
+	this->device.flush();
+}
 // -----------------------------------------------------------------------------
