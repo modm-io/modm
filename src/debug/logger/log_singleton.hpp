@@ -100,25 +100,25 @@ namespace xpcc {
 			static LogSingleton&
 			instance();
 
-			//! set a new output writer in the singleton.
+			//! Set a new log device in the singleton.
 			//!
 			//! The singleton takes ownership of the device (the
 			//! singleton will delete the object)
 			//!
 			//! \code
-			//! 	LogSingleton::instance.setLogDevice(new MyLogDevice);
+			//! 	xpcc::LogSingleton::instance().setLogDevice(new MyLogDevice);
 			//! \endcode
 			void
 			setLogDevice(LogDevice* device);
 
-			//! set a new output writer in the singleton.
+			//! Set a new log device writer in the singleton.
 			//!
 			//! The singleton takes \b not ownership of the device (the
 			//! singleton will \b not delete the object)
 			//!
 			//! \code
 			//!		MyLogDevice device;
-			//! 	LogSingleton::instance.setLogDevice(device);
+			//! 	xpcc::LogSingleton::instance().setLogDevice(device);
 			//! \endcode
 			void
 			setLogDevice(LogDevice& device);
@@ -153,6 +153,46 @@ namespace xpcc {
 			bool			ownDevice;
 			Log::Level 		level;
 	};
+
+	//! Set a new log device in the LogSingleton.
+	//!
+	//! The singleton takes ownership of the device (the
+	//! singleton will delete the object)
+	//!
+	//! \code
+	//! 	xpcc::setLogDevice(new MyLogDevice);
+	//! \endcode
+	//!
+	//! This is a shortcut to call
+	//! \code
+	//! 	xpcc::LogSingleton::instance().setLogDevice(new MyLogDevice);
+	//! \endcode
+	inline void
+	setLogDevice(LogDevice* device)
+	{
+		LogSingleton::instance().setLogDevice(device);
+	}
+
+	//! Set a new log device writer in the LogSingleton.
+	//!
+	//! The singleton takes \b not ownership of the device (the
+	//! singleton will \b not delete the object)
+	//!
+	//! \code
+	//!		MyLogDevice device;
+	//! 	xpcc::setLogDevice(device);
+	//! \endcode
+	//!
+	//! This is a shortcut to call
+	//! \code
+	//!		MyLogDevice device;
+	//! 	LogSingleton::instance().setLogDevice(device);
+	//! \endcode
+	inline void
+	setLogDevice(LogDevice& device)
+	{
+		LogSingleton::instance().setLogDevice(device);
+	}
 };
 
 

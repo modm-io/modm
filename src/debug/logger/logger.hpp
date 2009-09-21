@@ -52,7 +52,7 @@ namespace xpcc {
 	 * 			Carsten Schmidt,
 	 * 			Martin Rosekeit <martin.rosekeit@rwth-aachen.de>
 	 */
-	template<Log::Level L>
+	template<Log::Level L = Log::DEBUG>
 	class Logger : public IOStream {
 		public:
 
