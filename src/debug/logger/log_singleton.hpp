@@ -30,54 +30,7 @@
 // ----------------------------------------------------------------------------
 #ifndef XPCC_LOG_SINGLETON__HPP
 #define XPCC_LOG_SINGLETON__HPP
-/**
- * @defgroup logger Logger
- * @brief Log messages to specifyed destiny.
- * 
- * The Logger write messages a destiny specifyed by the used OutputWriter.
- * The Logger is a singelten an act as server to the log messages and 
- * send them to the OutputWriter.\n
- * To log a message use the LoggerMessageForwarder, that will filter the 
- * messages after level an formward them to the Logger.\n
- * 
- * @section howto HowTo
- * - create a logger singelton with a outputWriter
- * - create a loggerFrowarder in the class or methode you want write a message
- * - use the loggerForwarder to write the log message
- * 
- * @section flow Message Flow
- * LoggerMessageForwarder -> Logger -> LoggerOutputWriter -> destiny
- * 
- * @section loglevels Log Levels
- * The following log levels are supported: \n
- * DEBUG < INFO < WARNING < ERROR < FATAL
- * 
- * \section call_flow Flow of a call
- * This is to give a overview how many resources a call of the logger is.
- * The given call is:
- * \code
- * 	xpcc::dlog << 100
- * \endcode
- * - call of LoggerMessageForwarder<L>::operator << (T) (with L = xpcc::DEBUG, T = int)
- *   - IOStream::operator << (T) (with T = int) is inline
- *   - IntegerWriter::operator()(IOStream& os, const T& v) (with T=int) is inline
- * \code
- * 	if( xpcc::DEBUGL >= xpcc::LoggerMessageForwarder<xpcc::DEBUG>::level ) {
- * 		xpcc::IOStream::putInteger( 100 )
- * 	}
- * \endcode
- * - IOStream::putInteger() will create the formated string and calls sprintf() to do this
- * - the resulting string is send to the device via the Logger: call of
- *   Logger::put(const char*) (using vTable)
- * - direct call of ConsoleOutputWriter::put(const char*) (using vTable)
- * - using of the std::cout ...
- *
- * In sum there are 3 nested method calls with two of them using vTables) plus
- * the call of sprintf().
- * 
- * \todo 	Finding a solution with less method calls (at least with only one using
- * 			vTables).
- */
+
 
 #include "log_device.hpp"
 #include "log_level.hpp"

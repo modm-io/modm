@@ -28,42 +28,30 @@
  * $Id$
  */
 // ----------------------------------------------------------------------------
-#ifndef XPCC_STD_LOG_DEVICE_HPP
-#define XPCC_STD_LOG_DEVICE_HPP
+#include "dev0_log_device.hpp"
 
-#include "../../log_device.hpp"
+xpcc::Dev0LogDevice::Dev0LogDevice()
+{
+}
 
-#include <map>
-#include <string>
+// ----------------------------------------------------------------------------
 
+void
+xpcc::Dev0LogDevice::put(char c)
+{
+}
 
-namespace xpcc {
-	/**
-	 * @class 	StdLogDevice
-	 * @brief 	Writes the logmessage to the console using std::cout
-	 *
-	 * @ingroup logger
-	 * @version	$Id$
-	 * @since 	04 December 2006
-	 * @author	Christofer Hedbrand,
-	 * 			Carsten Schmidt,
-	 * 			Martin Rosekeit <martin.rosekeit@rwth-aachen.de>
-	 */
-	class StdLogDevice : public LogDevice {
-		public:
-			StdLogDevice();
+// ----------------------------------------------------------------------------
 
-			virtual void
-			put(char c);
+void
+xpcc::Dev0LogDevice::put(const char* s)
+{
+}
 
-			virtual void
-			put(const char* s);
+// -----------------------------------------------------------------------------
 
-			virtual void
-			flush();
-
-		private :
-			std::map<Log::Level, std::string>	logLevelIdNameMap;
-	};
-};
-#endif /*XPCC_STD_LOG_DEVICE_HPP*/
+void
+xpcc::Dev0LogDevice::flush()
+{
+}
+// -----------------------------------------------------------------------------

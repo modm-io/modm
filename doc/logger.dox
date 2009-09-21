@@ -1,0 +1,47 @@
+// coding: utf-8
+// 
+// $Id$
+
+/*!
+\defgroup logger Logger
+\brief Log messages to specified destiny.
+ 
+The Logger write messages a destiny specified by the used LogDevice.
+The Logger is a singleten and act as server to the log messages and 
+send them to the LogDevice.
+
+To log a message use the xpcc::xlog. Where x stands for the level, on that
+the message should be logged :
+- d: DEBUG
+- i: INFO
+- w: WARNING
+- e: ERROR
+
+\code
+	xpcc::dlog << "i=" << i << ", y=" << y xpcc::flush;
+\endcode
+
+\section call_flow Flow of a call
+This is to give an estimation how many resources a call of the logger use.
+The given call is:
+\code
+ 	xpcc::dlog << 100
+\endcode
+- call of LoggerMessageForwarder<L>::operator << (T) (with L = xpcc::DEBUG, T = int)
+  - IOStream::operator << (T) (with T = int) is inline
+  - IntegerWriter::operator()(IOStream& os, const T& v) (with T=int) is inline
+\code
+ 	if( xpcc::DEBUGL >= xpcc::LoggerMessageForwarder<xpcc::DEBUG>::level ) {
+ 		xpcc::IOStream::putInteger( 100 )
+ 	}
+\endcode
+- IOStream::putInteger() will create the formated string and calls sprintf() to do this
+- the resulting string is send to the device via the Logger: call of
+  Logger::put(const char*) (using vTable)
+- direct call of ConsoleOutputWriter::put(const char*) (using vTable)
+- using of the std::cout ...
+
+In sum there are 3 nested method calls with two of them using vTables) plus
+the call of sprintf().
+
+*/

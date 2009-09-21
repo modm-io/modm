@@ -36,7 +36,6 @@
 #include "../../hal/io/iostream.hpp"
 
 namespace xpcc {
-
 	/**
 	 * @class 	Logger
 	 * @brief 	Interface to the Logger.
