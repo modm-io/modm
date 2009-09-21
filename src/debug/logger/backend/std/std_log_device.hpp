@@ -28,44 +28,41 @@
  * $Id$
  */
 // ----------------------------------------------------------------------------
-#include "console_output_writer.hpp"
-#include <iostream>
+#ifndef XPCC_STD_LOG_DEVICE_HPP
+#define XPCC_STD_LOG_DEVICE_HPP
+
+#include "../../log_device.hpp"
+
+#include <map>
 #include <string>
 
+/**
+ * @class 	StdLogDevice
+ * @brief 	Writes the logmessage to the console using std::cout
+ *
+ * @ingroup logger
+ * @version	$Id$
+ * @since 	04 December 2006
+ * @author	Christofer Hedbrand,
+ * 			Carsten Schmidt,
+ * 			Martin Rosekeit <martin.rosekeit@rwth-aachen.de>
+ */
+namespace xpcc {
+	class StdLogDevice : public LogDevice {
+		public:
+			StdLogDevice();
 
-xpcc::ConsoleOutputWriter::ConsoleOutputWriter()
-{
-	// Assign log level names to ids
-	this->logLevelIdNameMap[xpcc::DEBUG]	=	"DEBUG";
-	this->logLevelIdNameMap[xpcc::INFO]		=	"INFO";
-	this->logLevelIdNameMap[xpcc::WARNING]	=	"WARNING";
-	this->logLevelIdNameMap[xpcc::ERROR]	=	"ERROR";
-	this->logLevelIdNameMap[xpcc::FATAL]	=	"FATAL";
+			virtual void
+			put(char c);
 
-}
+			virtual void
+			put(const char* s);
 
-// ----------------------------------------------------------------------------
+			virtual void
+			flush();
 
-void
-xpcc::ConsoleOutputWriter::put(char c)
-{
-	this->device.put(c);
-}
-
-// ----------------------------------------------------------------------------
-
-void
-xpcc::ConsoleOutputWriter::put(const char* s)
-{
-	this->device.put(s);
-}
-
-// -----------------------------------------------------------------------------
-
-void
-xpcc::ConsoleOutputWriter::flush()
-{
-	this->device.put('\n');
-	this->device.flush();
-}
-// -----------------------------------------------------------------------------
+		private :
+			std::map<Log::Level, std::string>	logLevelIdNameMap;
+	};
+};
+#endif /*XPCC_STD_LOG_DEVICE_HPP*/

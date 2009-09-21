@@ -28,43 +28,8 @@
  * $Id$
  */
 // ----------------------------------------------------------------------------
-#ifndef XPCC_CONSOLE_OUTPUT_WRITER_HPP
-#define XPCC_CONSOLE_OUTPUT_WRITER_HPP
 
-#include "abstract_output_writer.hpp"
-#include "../../hal/io/backplane/std/std_iodevice.hpp"
-#include <map>
-#include <string>
+#include "log_device.hpp"
 
-/**
- * @class 	ConsoleOutputWriter 
- * @brief 	??? todo
- *
- * @ingroup logger
- * @version	$Id$
- * @since 	04 December 2006
- * @author	Christofer Hedbrand,
- * 			Carsten Schmidt,
- * 			Martin Rosekeit <martin.rosekeit@rwth-aachen.de>
- */
-namespace xpcc {
-	class ConsoleOutputWriter : public AbstractOutputWriter {
-		public:
-			ConsoleOutputWriter();
+// -----------------------------------------------------------------------------
 
-			virtual void
-			put(char c);
-
-			virtual void
-			put(const char* s);
-
-			virtual void
-			flush();
-
-		private :
-			std::map<Level, std::string>	logLevelIdNameMap;
-
-			StdIODevice						device;
-	};
-};
-#endif /*XPCC_ABSTRACT_OUTPUT_WRITER_HPP*/

@@ -28,22 +28,18 @@
  * $Id$
  */
 // ----------------------------------------------------------------------------
-#ifndef XPCC_LOGGER_MESSAGE_FORWARDER_HPP
-#define XPCC_LOGGER_MESSAGE_FORWARDER_HPP
+#ifndef XPCC_LOG_DEVICE_HPP
+#define XPCC_LOG_DEVICE_HPP
 
-#include "level.hpp"
-#include "logger.hpp"
-#include "../../hal/io/iostream.hpp"
+#include "log_level.hpp"
 
 namespace xpcc {
-
 	/**
-	 * @class 	LoggerMessageForwarder
-	 * @brief 	Interface to the Logger.
+	 * @class 	LogDevice
+	 * @brief 	The abstract calls that provides the sink to the logmessages.
 	 *
-	 * This class provides an interface to the logger singleton. It is used by the
-	 * macro defined below. This class overloads the << operator so that it is
-	 * possible to write different message types to the logger.
+	 * The Device takes the pre formated logmessages (all data types are converted
+	 * to char or char*.
 	 *
 	 * @ingroup logger
 	 * @version	$Id$
@@ -52,32 +48,20 @@ namespace xpcc {
 	 * 			Carsten Schmidt,
 	 * 			Martin Rosekeit <martin.rosekeit@rwth-aachen.de>
 	 */
-	template<Level L>
-	class LoggerMessageForwarder : public IOStream {
+	class LogDevice {
 		public:
+			//! Write one char to the sink.
+			virtual void
+			put( char c ) = 0;
 
-			LoggerMessageForwarder() :
-				IOStream( Logger::instance() ),
-				level ( Logger::instance().getLevel() )
-			{};
+			//! Write a string that terminates with '\0' to the sink.
+			virtual void
+			put( const char* s ) = 0;
 
-			template <typename T>
-			inline LoggerMessageForwarder<L>&
-			operator <<(const T& msg)
-			{
-				if(L >= this->level) {
-					*(IOStream*)this << msg;
-				}
-				return *this;
-			};
-
-
-		private:
-			const Level& level;
+			//! The message is complete and can be written/send/displayed.
+			virtual	void
+			flush() = 0;
 	};
-
-	extern LoggerMessageForwarder<DEBUG> dout;
 };
 
-
-#endif /*RCA__LOGGER_MESSAGE_FORWARDER_HPP*/
+#endif /*XPCC_LOG_DEVICE_HPP*/

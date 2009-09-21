@@ -27,17 +27,22 @@
  *
  * $Id: logger.hpp 18 2009-09-10 21:20:17Z thundernail $
  */
-#ifndef XPCC_LEVEL_HPP_
-#define XPCC_LEVEL_HPP_
+#ifndef XPCC_LOG_LEVEL_HPP_
+#define XPCC_LOG_LEVEL_HPP_
 
 namespace xpcc {
-	typedef enum {
-		DEBUG,
-		INFO,
-		WARNING,
-		ERROR,
-		FATAL
-	} Level;
+	struct Log {
+		//! Levels to filter messages.
+		//!
+		//! DEBUG < INFO < WARNING < ERROR < FATAL
+		typedef enum {
+			DEBUG,
+			INFO,
+			WARNING,
+			ERROR,
+			FATAL
+		} Level;
+	};
 }
 
-#endif /* XPCC_LEVEL_HPP_ */
+#endif /* XPCC_LOG_LEVEL_HPP_ */

@@ -28,78 +28,9 @@
  * $Id$
  */
 // ----------------------------------------------------------------------------
-
 #include "logger.hpp"
 
-// -----------------------------------------------------------------------------
+xpcc::Logger<xpcc::Log::DEBUG> xpcc::dout;
 
-xpcc::Logger::Logger() :
-	outputWriter( 0 )
-{
-};
 
 // -----------------------------------------------------------------------------
-
-xpcc::Logger::~Logger()
-{
-	// Delete the output-Writer
-	delete this->outputWriter;
-}
-
-// -----------------------------------------------------------------------------
-
-xpcc::Logger&
-xpcc::Logger::instance()
-{
-	static Logger loggerInstance;
-	return loggerInstance;
-};
-
-// -----------------------------------------------------------------------------
-
-void
-xpcc::Logger::setOutputWriter(AbstractOutputWriter* outputWriter)
-{
-	delete this->outputWriter;
-	this->outputWriter = outputWriter;
-};
-
-// ----------------------------------------------------------------------------
-
-void
-xpcc::Logger::setLevel(Level level)
-{
-	this->level = level;
-}
-
-// -----------------------------------------------------------------------------
-
-void
-xpcc::Logger::put(char c)
-{
-	this->outputWriter->put(c);
-}
-
-// -----------------------------------------------------------------------------
-
-void
-xpcc::Logger::put(const char* s)
-{
-	this->outputWriter->put(s);
-}
-
-// -----------------------------------------------------------------------------
-
-void
-xpcc::Logger::flush()
-{
-	this->outputWriter->flush();
-}
-
-// -----------------------------------------------------------------------------
-
-bool
-xpcc::Logger::get(char& value)
-{
-	return false;
-}

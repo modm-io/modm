@@ -30,124 +30,53 @@
 // ----------------------------------------------------------------------------
 #ifndef XPCC_LOGGER__HPP
 #define XPCC_LOGGER__HPP
-/**
- * @defgroup logger Logger
- * @brief Log messages to specifyed destiny.
- * 
- * The Logger write messages a destiny specifyed by the used OutputWriter.
- * The Logger is a singelten an act as server to the log messages and 
- * send them to the OutputWriter.\n
- * To log a message use the LoggerMessageForwarder, that will filter the 
- * messages after level an formward them to the Logger.\n
- * 
- * @section howto HowTo
- * - create a logger singelton with a outputWriter
- * - create a loggerFrowarder in the class or methode you want write a message
- * - use the loggerForwarder to write the log message
- * 
- * @section flow Message Flow
- * LoggerMessageForwarder -> Logger -> LoggerOutputWriter -> destiny
- * 
- * @section loglevels Log Levels
- * The following log levels are supported: \n
- * DEBUG < INFO < WARNING < ERROR < FATAL
- * 
- * \section call_flow Flow of a call
- * This is to give a overview how many resources a call of the logger is.
- * The given call is:
- * \code
- * 	xpcc::dlog << 100
- * \endcode
- * - call of LoggerMessageForwarder<L>::operator << (T) (with L = xpcc::DEBUG, T = int)
- *   - IOStream::operator << (T) (with T = int) is inline
- *   - IntegerWriter::operator()(IOStream& os, const T& v) (with T=int) is inline
- * \code
- * 	if( xpcc::DEBUGL >= xpcc::LoggerMessageForwarder<xpcc::DEBUG>::level ) {
- * 		xpcc::IOStream::putInteger( 100 )
- * 	}
- * \endcode
- * - IOStream::putInteger() will create the formated string and calls sprintf() to do this
- * - the resulting string is send to the device via the Logger: call of
- *   Logger::put(const char*) (using vTable)
- * - direct call of ConsoleOutputWriter::put(const char*) (using vTable)
- * - using of the std::cout ...
- *
- * In sum there are 3 nested method calls with two of them using vTables) plus
- * the call of sprintf().
- * 
- * \todo 	Finding a solution with less method calls (at least with only one using
- * 			vTables).
- */
 
-#include "abstract_output_writer.hpp"
-#include "level.hpp"
-#include "../../hal/io/iodevice.hpp"
+#include "log_level.hpp"
+#include "log_singleton.hpp"
+#include "../../hal/io/iostream.hpp"
 
 namespace xpcc {
+
 	/**
 	 * @class 	Logger
-	 * @brief 	Logger singelton, connect the LoggerMessageForwarder to the
-	 * 			LoggerOutputWriter
+	 * @brief 	Interface to the Logger.
 	 *
-	 * @todo	Logging of templates is not possible, because the static variable
-	 * 			of the logger will be also seen in the file, that include the
-	 * 			header file.
-	 *
-	 * @todo	HowTo: using of OutputWriter
+	 * This class provides an interface to the logger singleton. It is used by the
+	 * macro defined below. This class overloads the << operator so that it is
+	 * possible to write different message types to the logger.
 	 *
 	 * @ingroup logger
 	 * @version	$Id$
-	 * @since 	01 December 2006
+	 * @since 	04 December 2006
 	 * @author	Christofer Hedbrand,
 	 * 			Carsten Schmidt,
 	 * 			Martin Rosekeit <martin.rosekeit@rwth-aachen.de>
 	 */
-	class Logger : public IODevice {
+	template<Log::Level L>
+	class Logger : public IOStream {
 		public:
-			static Logger&
-			instance();
 
-			//! set a new output writer in the singleton.
-			//!
-			//! The singleton takes ownership of the output writer (the
-			//! singleton will delete the object)
-			//!
-			//! \code
-			//! 	Logger::instance.setOutputWriter(new MyOutputWriter);
-			//! \endcode
-			void
-			setOutputWriter(AbstractOutputWriter* outputWriter);
+			Logger() :
+				IOStream( LogSingleton::instance() ),
+				level( LogSingleton::instance().getLevel() )
+			{};
 
-			void
-			setLevel(Level level);
-
-			inline const Level&
-			getLevel() const
+			template <typename T>
+			inline Logger<L>&
+			operator <<(const T& msg)
 			{
-				return this->level;
-			}
-
-			virtual void
-			put(char c);
-
-			virtual void
-			put(const char* s);
-
-			virtual void
-			flush();
-
-			virtual bool
-			get(char& value);
+				if( L >= this->level ) {
+					*(IOStream*)this << msg;
+				}
+				return *this;
+			};
 
 		private:
-			Logger();						// Private constructor because of singleton
-			Logger(const Logger & logger);	// Private copy constructor because of singleton
-			~Logger();
-
-			AbstractOutputWriter*		outputWriter;
-			Level 						level;
+			const Log::Level&	level;
 	};
+
+	extern Logger<Log::DEBUG> dout;
 };
 
 
-#endif /* RCA__LOGGER__HPP */
+#endif /*XPCC_LOGGER__HPP*/

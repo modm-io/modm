@@ -28,8 +28,42 @@
  * $Id$
  */
 // ----------------------------------------------------------------------------
+#include "std_log_device.hpp"
 
-#include "abstract_output_writer.hpp"
+#include <iostream>
+
+xpcc::StdLogDevice::StdLogDevice()
+{
+	// Assign log level names to ids
+	this->logLevelIdNameMap[xpcc::Log::DEBUG]	=	"DEBUG";
+	this->logLevelIdNameMap[xpcc::Log::INFO]		=	"INFO";
+	this->logLevelIdNameMap[xpcc::Log::WARNING]	=	"WARNING";
+	this->logLevelIdNameMap[xpcc::Log::ERROR]	=	"ERROR";
+	this->logLevelIdNameMap[xpcc::Log::FATAL]	=	"FATAL";
+
+}
+
+// ----------------------------------------------------------------------------
+
+void
+xpcc::StdLogDevice::put(char c)
+{
+	std::cout << c;
+}
+
+// ----------------------------------------------------------------------------
+
+void
+xpcc::StdLogDevice::put(const char* s)
+{
+	std::cout << s;
+}
 
 // -----------------------------------------------------------------------------
 
+void
+xpcc::StdLogDevice::flush()
+{
+	std::cout << std::endl;
+}
+// -----------------------------------------------------------------------------
