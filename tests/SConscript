@@ -6,14 +6,13 @@ import os
 
 Import('env')
 Import('sourceFiles')
+Import('library')
 
 print "tests"
 
 # build a object file form each source file
 for file in sourceFiles:
-    print file.name
     basename = os.path.basename(file.name)
-    name = os.path.splitext(basename)
-    print name[0]
-    env.Program(name[0], file.name)
-    
+    name = os.path.splitext(basename) 
+    program = env.Program(name[0], file.name, LIBS='robot', LIBPATH='../build/')
+    env.Default(program)

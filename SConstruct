@@ -37,16 +37,16 @@ else:
 
 # finally build the library from the src-directory
 sourceFiles = parser.parseDirectory('src/', 'library')
-SConscript('src/SConscript',
+library = SConscript('src/SConscript',
 			src='src',
 			variant_dir='build', 
 			exports=['env', 'sourceFiles'], 
 			duplicate=False)
 
 # build the tests
-#sourceFiles = parser.parseDirectory('tests/', 'tests')
-#SConscript('tests/SConscript',
-#			src='src',
-#			variant_dir='build-tests',
-#			exports=['env', 'sourceFiles'], 
-#			duplicate=False)
+sourceFiles = parser.parseDirectory('tests/', 'tests')
+SConscript('tests/SConscript',
+			src='src',
+			variant_dir='build-tests',
+			exports=['env', 'sourceFiles', 'library'], 
+			duplicate=False)
