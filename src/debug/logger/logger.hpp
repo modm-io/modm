@@ -57,24 +57,33 @@ namespace xpcc {
 
 			Logger() :
 				IOStream( LogSingleton::instance() ),
-				level( LogSingleton::instance().getLevel() )
+				level( &LogSingleton::instance().getLevel() )
+			{};
+
+			virtual
+			~Logger()
 			{};
 
 			template <typename T>
 			inline Logger<L>&
 			operator <<(const T& msg)
 			{
-				if( L >= this->level ) {
+				if( L >= *this->level ) {
 					*(IOStream*)this << msg;
 				}
 				return *this;
 			};
 
 		private:
-			const Log::Level&	level;
+			Logger(const Logger&);
+
+			Logger&
+			operator =(const Logger&);
+
+			const Log::Level* const	level;
 	};
 
-	extern Logger<Log::DEBUG> dout;
+	extern Logger<Log::DEBUG> 	dout;
 };
 
 

@@ -131,7 +131,7 @@ namespace xpcc {
 	// -------------------------------------------------------------------------
 	template<>
 	struct ArithmeticTraits<int32_t> {
-#ifdef __NO_LONG__
+#ifdef __AVR__
 		typedef float DoubleType; // int64_t is on AVRs only a int32_t
 #else
 		typedef int64_t DoubleType;
@@ -148,7 +148,7 @@ namespace xpcc {
 	// -------------------------------------------------------------------------
 	template<>
 	struct ArithmeticTraits<uint32_t> {
-#ifdef __NO_LONG__
+#ifdef __AVR__
 		typedef float DoubleType; // int64_t is on AVRs only a int32_t
 #else
 		typedef uint64_t DoubleType;
@@ -178,7 +178,7 @@ namespace xpcc {
 	};
 
 	// -------------------------------------------------------------------------
-
+#ifndef __AVR__
 	template<>
 	struct ArithmeticTraits<double> {
 		typedef double DoubleType;
@@ -189,6 +189,7 @@ namespace xpcc {
 		static const bool isFloat = true;
 		static const bool isSigned = true;
 	};
+#endif
 	/*@}*/
 };
 

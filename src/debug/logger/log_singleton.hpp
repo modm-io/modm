@@ -100,6 +100,10 @@ namespace xpcc {
 		private:
 			LogSingleton();								// Private constructor because of singleton
 			LogSingleton(const LogSingleton & logger);	// Private copy constructor because of singleton
+
+			LogSingleton&
+			operator =(const LogSingleton & logger);	// Private copy constructor because of singleton
+
 			~LogSingleton();
 
 			LogDevice*		device;

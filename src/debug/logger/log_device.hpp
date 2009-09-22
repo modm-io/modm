@@ -50,6 +50,9 @@ namespace xpcc {
 	 */
 	class LogDevice {
 		public:
+			virtual
+			~LogDevice();
+
 			//! Write one char to the sink.
 			virtual void
 			put( char c ) = 0;

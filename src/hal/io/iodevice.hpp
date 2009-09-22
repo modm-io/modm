@@ -39,6 +39,9 @@ namespace xpcc {
 		public :
 			IODevice();
 
+			virtual
+			~IODevice();
+
 			virtual void
 			put(char c) = 0;
 

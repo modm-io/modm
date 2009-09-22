@@ -57,6 +57,7 @@ namespace xpcc {
 			//! \endcode
 			IOStream(IODevice&);
 
+			virtual
 			~IOStream();
 
 			inline IOStream&
@@ -100,7 +101,12 @@ namespace xpcc {
 			IOStream&
 			putFloat( T value );
 
-		protected :
+		private :
+			IOStream(const IOStream& );
+
+			IOStream&
+			operator =(const IOStream& );
+
 			IODevice* 	device;
 			bool		ownerOfDevice;
 
@@ -206,7 +212,6 @@ xpcc::IOStream::putFloat( T value )
 {
 	// TODO is hard coded for 2.22507e-308
 	char str[13 + 1]; // +1 for '\0'
-	char *iter(str);
 
 	// TODO use a optimized function to format output
 	snprintf(str, sizeof(str), "%e", value);

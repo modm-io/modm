@@ -35,7 +35,8 @@
 
 xpcc::LogSingleton::LogSingleton() :
 	device( 0 ),
-	ownDevice( false )
+	ownDevice( false ),
+	level(xpcc::Log::FATAL)
 {
 };
 
@@ -119,5 +120,6 @@ xpcc::LogSingleton::flush()
 bool
 xpcc::LogSingleton::get(char& value)
 {
+	(void) value;
 	return false;
 }

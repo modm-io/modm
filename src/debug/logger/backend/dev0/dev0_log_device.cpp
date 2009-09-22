@@ -39,6 +39,7 @@ xpcc::Dev0LogDevice::Dev0LogDevice()
 void
 xpcc::Dev0LogDevice::put(char c)
 {
+	(void) c;
 }
 
 // ----------------------------------------------------------------------------
@@ -46,6 +47,7 @@ xpcc::Dev0LogDevice::put(char c)
 void
 xpcc::Dev0LogDevice::put(const char* s)
 {
+	(void) s;
 }
 
 // -----------------------------------------------------------------------------
