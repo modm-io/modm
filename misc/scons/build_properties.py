@@ -30,7 +30,7 @@ class GlobalProperties:
 		
 		self.target = properties.get('target', 'pc')
 		if self.target == 'avr':
-			self.avr = AvrProperties(properties.get('avr', {}))
+			self.avr = self.AvrProperties(properties.get('avr', {}))
 	
 	def getLocalProperties(self, path, target, tag):
 		try:
