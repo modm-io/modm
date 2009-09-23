@@ -189,7 +189,7 @@ operator-(const Saturated<int8_t>& a) {
 }
 
 // ----------------------------------------------------------------------------
-template<typename T>
+template<>
 Saturated<int8_t>
 abs(const Saturated<int8_t>& a) {
 	Saturated<int8_t> temp(a);

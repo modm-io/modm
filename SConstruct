@@ -12,7 +12,8 @@ AddOption('--properties',
 			help='configuration file')
 
 # parse the global property-file
-parser = PropertyParser(GetOption('properties'), True)
+verbose = ARGUMENTS.get('verbose') == '1'
+parser = PropertyParser(GetOption('properties'), verbose)
 
 # create a build-environment for the specific target
 build = parser.getGlobalProperties()

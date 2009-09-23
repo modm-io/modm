@@ -78,6 +78,8 @@ class DirectoryProperties:
 
 class PropertyParser:
 	""" Parser to read property-files and create a list of files to build. """
+	filetypes = ['.cpp', '.c', '.S']
+	
 	def __init__(self, configFile, verbose=False):
 		self.verbose = verbose
 		try:
@@ -104,7 +106,7 @@ class PropertyParser:
 			if directory.shouldBeBuild():
 				for file in files:
 					extension = os.path.splitext(file)[1]
-					if extension == '.cpp' or extension == '.c':
+					if extension in self.filetypes:
 						filename = os.path.join(path[len(target):], file)
 						fileList.append(directory.createFileProperties(filename))
 			else:

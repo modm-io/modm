@@ -32,7 +32,8 @@
 
 #include <iostream>
 
-xpcc::StdLogDevice::StdLogDevice()
+xpcc::StdLogDevice::StdLogDevice() :
+	logLevelIdNameMap()
 {
 	// Assign log level names to ids
 	this->logLevelIdNameMap[xpcc::Log::DEBUG]	=	"DEBUG";

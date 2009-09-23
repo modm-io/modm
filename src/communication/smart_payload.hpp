@@ -25,84 +25,59 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * 
- * $Id$
+ * $Id: backend_interface.h 32 2009-09-17 17:37:50Z dergraaf $
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC_BACKEND_INTERFACE_H
-#define	XPCC_BACKEND_INTERFACE_H
+#ifndef	XPCC_SMART_PAYLOAD_H
+#define	XPCC_SMART_PAYLOAD_H
 
+#include <iostream>
+
+#include <string.h>		// for memcpy
 #include <stdint.h>
 
-namespace xpcc
+class SmartPayload
 {
-	template <typename N>
-	struct Packet
+public:
+	// Must use a pointer to T here, otherwise the compiler can't distinguish
+	// between constructor and copy constructor!
+	template<typename T>
+	SmartPayload(const T *data) 
+	: ptr(new uint8_t[sizeof(T) + 2])
 	{
-		typedef enum {
-			ACTION,
-			RESPONSE,
-			NEGATIVE_RESPONSE,
-		} Type;
-		
-		struct Header
-		{
-			Type type;
-			bool isAcknowledge;
-			
-			uint8_t destination;
-			uint8_t source;
-			uint8_t actionIdentifier;
-		};
-		
-		Header header;
-		
-		uint8_t data[N];
-	};
+		ptr[0] = 1;
+		ptr[1] = sizeof(T);
+		memcpy(ptr + 2, data, sizeof(T));
+	}
 	
-	/**
-	 * @ingroup		backend
-	 * @brief 		The BackendInterface provides a common interface for to use
-	 * 				different hardware modules to transmit the communication.
-	 *
-	 * All backends have to implement the this interface.
-	 *
-	 * @version		$Id$
-	 * @author		Martin Rosekeit, Fabian Greif
-	 */
-	class BackendInterface
+	SmartPayload(const SmartPayload& other) 
+	: ptr(other.ptr)
 	{
-	public:
-		virtual void
-		update() = 0;
-		
-		//! Send a Packet.
-		//! 
-		//! \return	\b true if the packet could be send, \b false otherwise.
-		virtual void
-		sendPacket(const Packet &packet) = 0;
-		
-		virtual bool
-		isSendPending();
-		
-		virtual void
-		cancelSend();
-		
-		
-		//! Check if a new packet was received by the backend
-		virtual bool
-		isPacketAvailable() const = 0;
-		
-		//! Access the packet.
-		//!
-		//! You need to call retrievePacket() before you can access the
-		//! packet.
-		virtual const Packet&
-		getPacket() const = 0;
-		
-		virtual void
-		dropPacket();
-	};
-}
+		ptr[0]++;
+	}
+	
+	~SmartPayload() {
+		if (--ptr[0] == 0) {
+			delete ptr;
+		}
+	}
+	
+	const uint8_t *
+	getPointer() const {
+		return &ptr[2];
+	}
+	
+	uint8_t
+	getSize() const {
+		return ptr[1];
+	}
+	
+private:
+	SmartPayload&
+	operator=(const SmartPayload& other);
+	
+	uint8_t * const ptr;
+};
 
-#endif	// XPCC_BACKEND_INTERFACE_H
+#endif	// XPCC_SMART_PAYLOAD_H

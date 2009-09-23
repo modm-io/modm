@@ -11,17 +11,16 @@ avr:
 library:
     debug:
         logger:
-            include: yes
             defines:
-                FOOBAR: 1
+                FOOBAR: 2
     math:
     communication:
         backend:
-            include: no
-            mcp2515:
-                defines:
-                    CS: B,6
-                    INT: B,3
+            can:
+                mcp2515:
+                    defines:
+                        CS: B,6
+                        INT: B,3
 
 tests:
     include: no
