@@ -44,8 +44,8 @@ xpcc::IODevice::~IODevice()
 void
 xpcc::IODevice::put(const char* str)
 {
-	while( *str != '\0' ) {
-		this->put( *str );
-		str++;
+	char c;
+	while ((c = *str++)) {
+		this->put(c);
 	}
 }

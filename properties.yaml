@@ -1,9 +1,9 @@
 
-target: pc
+target: avr
 
 avr:
   device: atmega644
-  clock: 16000000
+  clock: 14745600
   avrdude:
     programmer: stk500
     port: /dev/ttyUSB0
@@ -25,7 +25,7 @@ library:
     avr:
       defines:
         UART_RX_BUFFER_SIZE: 8
-        UART_TX_BUFFER_SIZE: 8  
+        UART_TX_BUFFER_SIZE: 32
 
 tests:
   include: no

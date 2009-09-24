@@ -29,39 +29,87 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_IODEVICE_HPP
-#define XPCC_IODEVICE_HPP
+#ifndef	XPCC_QUEUE_HPP
+#define	XPCC_QUEUE_HPP
 
-#include <stdint.h>
+#include "deque.hpp"
 
 namespace xpcc
 {
-	class IODevice
+	// ------------------------------------------------------------------------
+	/**
+	 * \ingroup	container
+	 * \brief	FIFO queue
+	 * 
+	 * Elements are pushed into the "back" of the specific container and popped 
+	 * from its "front".
+	 * 
+	 * This class is thread-safe for S = uint8_t if one thread only writes data 
+	 * (using push()) and the other only reads data (using front() and pop()).
+	 * 
+	 * \see		Deque()
+	 */
+	template<typename T,
+			 typename Container>
+	class Queue
 	{
-	public :
-		IODevice();
+	public:
+		typedef typename Container::SizeType SizeType;
+		
+		bool
+		isEmpty() {
+			return c.isEmpty();
+		}
+		
+		bool
+		isFull() {
+			return c.isFull();
+		}
+		
+		SizeType
+		getSize() {
+			return c.getSize();
+		}
+		
+		SizeType
+		getMaxSize() {
+			return c.getMaxSize();
+		}
+		
+		T&
+		get() {
+			return c.front();
+		}
+		
+		const T&
+		get() const {
+			return c.front();
+		}
+		
+		bool
+		push(const T& value) {
+			return c.pushBack(value);
+		}
+		
+		void
+		pop() {
+			c.popFront();
+		}
 
-		virtual
-		~IODevice();
-
-		virtual void
-		put(char c) = 0;
-
-		virtual void
-		put(const char* str);
-
-		virtual void
-		flush() = 0;
-
-		virtual bool
-		get(char& c) = 0;
-
-	private :
-		IODevice( const IODevice& );
+	protected:
+		Container c;
 	};
-};
 
 
+	// ------------------------------------------------------------------------
+	template<typename T, 
+			 int N,
+			 typename S=uint8_t,
+			 typename Container=BoundedDeque<T, N, S> >
+	class BoundedQueue : public Queue<T, Container> {
+		
+	};
 
-#endif // XPCC_IODEVICE_HPP
+}
 
+#endif	// XPCC_QUEUE_HPP

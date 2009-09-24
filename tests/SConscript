@@ -10,7 +10,12 @@ Import('library')
 
 # build a object file form each source file
 for file in sourceFiles:
-    basename = os.path.basename(file.name)
-    name = os.path.splitext(basename) 
-    program = env.Program(name[0], file.name, LIBS='robot', LIBPATH='../build/')
-    env.Default(program)
+	basename = os.path.basename(file.name)
+	name = os.path.splitext(basename)
+	
+	program = env.Program(name[0], file.name, LIBS='robot', LIBPATH='../build/')
+	env.Default(program)
+	
+	if env['ARCHITECTURE'] == 'avr':
+		env.Default(env.Hex(program))
+		env.Default(env.Listing(program))

@@ -34,6 +34,10 @@ extern "C" {
 		// http://sourceware.org/ml/ecos-discuss/2005-02/msg00056.html
 		// http://lists.debian.org/debian-gcc/2003/07/msg00057.html
 		// http://gcc.gnu.org/ml/gcc-patches/2004-09/msg01650.html
+		(void) destructor;
+		(void) object;
+		(void) dso_handle;
+		
 		return 0;
 	}
 	

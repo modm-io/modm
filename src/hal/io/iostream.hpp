@@ -29,9 +29,10 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_IOSTREAM_HPP_
-#define XPCC_IOSTREAM_HPP_
+#ifndef XPCC_IOSTREAM_HPP
+#define XPCC_IOSTREAM_HPP
 
+#include <stdio.h>
 
 #include "../../math/arithmetic_traits.hpp"
 #include "../../utils/typet.h"
@@ -239,4 +240,4 @@ xpcc::flush(IOStream& ios)
 
 // -----------------------------------------------------------------------------
 
-#endif /* XPCC_IOSTREAM_HPP_ */
+#endif // XPCC_IOSTREAM_HPP

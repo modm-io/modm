@@ -29,39 +29,101 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_IODEVICE_HPP
-#define XPCC_IODEVICE_HPP
+#ifndef	XPCC_DEQUE_HPP
+#define	XPCC_DEQUE_HPP
 
 #include <stdint.h>
 
 namespace xpcc
 {
-	class IODevice
+	// ------------------------------------------------------------------------
+	/**
+	 * \ingroup	container
+	 * \brief	Double ended queue
+	 * 
+	 * Internally organised as a ring buffer.
+	 * 
+	 * \verbatim
+	 *              tail --\                        /-- head
+	 *                     |                        |
+	 *           +------+------+---- ----+------+------+
+	 *           |      | data |   ...   | data |      |
+	 *           +------+------+---- ----+------+------+
+	 *              |      |                 |      |
+	 * push_front --/      |                 |      \-- push_back
+	 *                     |                 |
+	 *             front --/                 \-- back
+	 * \endverbatim
+	 * 
+	 * \tparam	T	Type of the elements
+	 * \tparam	N	Size of the queue
+	 * \tparam	S	Type of status Variables (use uint8_t for N < 255 (default),
+	 * 				otherwise uint16_t)
+	 * 
+	 * \warning		This class don't check if the container is not empty before
+	 * 				a pop operation. You have to do this by yourself!
+	 */
+	template<typename T,
+			 int N,
+			 typename S=uint8_t>
+	class BoundedDeque
 	{
-	public :
-		IODevice();
-
-		virtual
-		~IODevice();
-
-		virtual void
-		put(char c) = 0;
-
-		virtual void
-		put(const char* str);
-
-		virtual void
-		flush() = 0;
-
-		virtual bool
-		get(char& c) = 0;
-
-	private :
-		IODevice( const IODevice& );
+	public:
+		typedef S SizeType;
+		
+		BoundedDeque() : head(0), tail(0) {}
+		
+		bool
+		isEmpty() const;
+		
+		bool
+		isFull() const;
+		
+		// TODO
+		//size_type
+		//getSize() const;
+		
+		SizeType
+		getMaxSize() const;
+		
+		// TODO
+		//void
+		//clear();
+		
+		
+		T&
+		front();
+		
+		const T&
+		front() const;
+		
+		T&
+		back();
+		
+		const T&
+		back() const;
+		
+		
+		bool
+		pushBack(const T& value);
+		
+		bool
+		pushFront(const T& value);
+		
+		void
+		popBack();
+		
+		void
+		popFront();
+	
+	private:
+		S head;
+		S tail;
+		
+		T buffer[N];
 	};
-};
+}
 
+#include "deque_impl.hpp"
 
-
-#endif // XPCC_IODEVICE_HPP
-
+#endif	// XPCC_DEQUE_HPP

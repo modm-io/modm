@@ -115,7 +115,7 @@ def generate(env, **kw):
 		"-fuse-cxa-atexit",
 		"-nostdlib",
 #		"-Wnon-virtual-dtor",
-		"-Weffc++",
+#		"-Weffc++",
 		"-Woverloaded-virtual",
 	])
 	

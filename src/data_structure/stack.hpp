@@ -29,39 +29,84 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_IODEVICE_HPP
-#define XPCC_IODEVICE_HPP
+#ifndef	XPCC_STACK_HPP
+#define	XPCC_STACK_HPP
 
-#include <stdint.h>
+#include "deque.hpp"
 
-namespace xpcc
+namespace
 {
-	class IODevice
+	// ------------------------------------------------------------------------
+	/**
+	 * \ingroup	container
+	 * \brief	LIFO stack
+	 * 
+	 * Elements are pushed/popped from the "back" of the specific container,
+	 * which is known as the top of the stack.
+	 * 
+	 * This class is not thread-safe!
+	 * 
+	 * \see		Deque()
+	 */
+	template<typename T,
+			 typename Container>
+	class Stack
 	{
-	public :
-		IODevice();
-
-		virtual
-		~IODevice();
-
-		virtual void
-		put(char c) = 0;
-
-		virtual void
-		put(const char* str);
-
-		virtual void
-		flush() = 0;
-
-		virtual bool
-		get(char& c) = 0;
-
-	private :
-		IODevice( const IODevice& );
+	public:
+		typedef typename Container::SizeType SizeType;
+		
+		bool
+		isEmpty() {
+			return c.isEmpty();
+		}
+		
+		bool
+		isFull() {
+			return c.isFull();
+		}
+		
+		SizeType
+		getSize() {
+			return c.getSize();
+		}
+		
+		SizeType
+		getMaxSize() {
+			return c.maxSize();
+		}
+		
+		T&
+		get() {
+			return c.back();
+		}
+		
+		const T&
+		get() const {
+			return c.back();
+		}
+		
+		bool
+		push(const T& value) {
+			return c.pushBack(value);
+		}
+		
+		void
+		pop() {
+			c.popBack();
+		}
+	
+	protected:
+		Container c;
 	};
-};
 
+	// ------------------------------------------------------------------------
+	template<typename T,
+			 int N,
+			 typename S=uint8_t,
+			 typename Container=BoundedDeque<T, N, S> >
+	class BoundedStack : public Stack<T, Container> {
+		
+	};
+}
 
-
-#endif // XPCC_IODEVICE_HPP
-
+#endif	// XPCC_STACK_HPP
