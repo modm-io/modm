@@ -6,36 +6,65 @@
 \defgroup logger Logger
 \brief Log messages to specified destiny.
  
-The Logger write messages a destiny specified by the used LogDevice.
-The Logger is a singleten and act as server to the log messages and 
-send them to the LogDevice.
+The \ref xpcc::log::Logger "Logger" using the \ref xpcc::IOStream "IOStream" to
+read messages and write them to a given \ref xpcc::log::Device "Device" .
+The Logger use the \ref xpcc::log::Singleton "Singleton" as a server to send the 
+messages to a Device that can be set global in the main-file. Also in the Singleton
+is a filter for \ref xpcc::log::Level "Level".
 
-To log a message use the xpcc::xlog. Where x stands for the level, on that
-the message should be logged :
-- d: DEBUG
-- i: INFO
-- w: WARNING
-- e: ERROR
-
+Write a log message with streams:
 \code
-	xpcc::dlog << "i=" << i << ", y=" << y xpcc::flush;
+	xpcc::log::debug << "i=" << i << ", y=" << y << xpcc::flush;
+\endcode
+The name of the stream represents the log level of the message. There are
+ - debug
+ - info
+ - warning
+ - error
+
+The \ref xpcc::flush "flush" has to be used, to signal that the message is complete
+and can be send. So a log message can also be seperated generated:
+\code
+	int a[3] = {1,2,3};
+	xpcc::log::debug << "a = ";
+	for(int i=0; i<sizeof(a); ++i) {
+		xpcc::log::debug << a[i] << ", ";
+	}
+	xpcc::log::debug << xpcc::flush;
+\endcode
+But remember, that without a flush your message will not be forwarded.
+
+You need to include the logger.hpp from this modul:
+\code
+	#include <debug/logger/logger.hpp>
+\endcode
+
+You have to set the Device befor it is used the first time (otherwise your message
+will be lost):
+\code
+	xpcc::log::DeviceStd device;
+	main()
+	{
+		xpcc::log::setDevice( device );
+		xpcc::log::info << "Logger is set" << xpcc::flush;
+	}
 \endcode
 
 \section call_flow Flow of a call
 This is to give an estimation how many resources a call of the logger use.
 The given call is:
 \code
- 	xpcc::dlog << 100
+ 	xpcc::dlog << 100;
 \endcode
 - call of LoggerMessageForwarder<L>::operator << (T) (with L = xpcc::DEBUG, T = int)
   - IOStream::operator << (T) (with T = int) is inline
   - IntegerWriter::operator()(IOStream& os, const T& v) (with T=int) is inline
 \code
  	if( xpcc::DEBUGL >= xpcc::LoggerMessageForwarder<xpcc::DEBUG>::level ) {
- 		xpcc::IOStream::putInteger( 100 )
+ 		xpcc::IOStream::putInteger( 100 );
  	}
 \endcode
-- IOStream::putInteger() will create the formated string and calls sprintf() to do this
+- IOStream::putInteger() will create the formated string and calls snprintf() to do this
 - the resulting string is send to the device via the Logger: call of
   Logger::put(const char*) (using vTable)
 - direct call of ConsoleOutputWriter::put(const char*) (using vTable)
