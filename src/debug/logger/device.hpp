@@ -31,39 +31,42 @@
 #ifndef XPCC_LOG_DEVICE_HPP
 #define XPCC_LOG_DEVICE_HPP
 
-#include "log_level.hpp"
+#include "level.hpp"
 
 namespace xpcc {
-	/**
-	 * @class 	LogDevice
-	 * @brief 	The abstract calls that provides the sink to the logmessages.
-	 *
-	 * The Device takes the pre formated logmessages (all data types are converted
-	 * to char or char*.
-	 *
-	 * @ingroup logger
-	 * @version	$Id$
-	 * @since 	04 December 2006
-	 * @author	Christofer Hedbrand,
-	 * 			Carsten Schmidt,
-	 * 			Martin Rosekeit <martin.rosekeit@rwth-aachen.de>
-	 */
-	class LogDevice {
-		public:
-			virtual
-			~LogDevice();
+	namespace log {
+		/**
+		 * @class 	Device
+		 * @brief 	The abstract calls that provides the sink to the logmessages.
+		 *
+		 * The Device takes the pre formated logmessages (all data types are converted
+		 * to char or char*.
+		 *
+		 * @ingroup logger
+		 * @version	$Id$
+		 * @since 	04 December 2006
+		 * @author	Christofer Hedbrand,
+		 * 			Carsten Schmidt,
+		 * 			Martin Rosekeit <martin.rosekeit@rwth-aachen.de>
+		 */
+		class Device {
+			public:
+				virtual
+				~Device();
 
-			//! Write one char to the sink.
-			virtual void
-			put( char c ) = 0;
+				//! Write one char to the sink.
+				virtual void
+				put( char c ) = 0;
 
-			//! Write a string that terminates with '\0' to the sink.
-			virtual void
-			put( const char* s ) = 0;
+				//! Write a string that terminates with '\0' to the sink.
+				virtual void
+				put( const char* s ) = 0;
 
-			//! The message is complete and can be written/send/displayed.
-			virtual	void
-			flush() = 0;
+				//! The message is complete and can be written/send/displayed.
+				virtual	void
+				flush() = 0;
+		};
+
 	};
 };
 

@@ -31,10 +31,12 @@
 #define XPCC_LOG_LEVEL_HPP_
 
 namespace xpcc {
-	struct Log {
+	namespace log {
 		//! Levels to filter messages.
 		//!
 		//! DEBUG < INFO < WARNING < ERROR < FATAL
+		//!
+		//! \ingroup logger
 		typedef enum {
 			DEBUG,
 			INFO,

@@ -31,24 +31,25 @@
 #ifndef XPCC_DEV0_LOG_DEVICE_HPP
 #define XPCC_DEV0_LOG_DEVICE_HPP
 
-#include "../../log_device.hpp"
+#include "../../device.hpp"
 
 namespace xpcc {
-	/**
-	 * @class 	Dev0LogDevice
-	 * @brief 	Writes the logmessage to nowhere. This is the default device to
-	 * 			use.
-	 *
-	 * @ingroup logger
-	 * @version	$Id$
-	 * @since 	04 December 2006
-	 * @author	Christofer Hedbrand,
-	 * 			Carsten Schmidt,
-	 * 			Martin Rosekeit <martin.rosekeit@rwth-aachen.de>
-	 */
-	class Dev0LogDevice : public LogDevice {
+	namespace log {
+		/**
+		 * @class 	DeviceDev0
+		 * @brief 	Writes the logmessage to nowhere. This is the default device to
+		 * 			use.
+		 *
+		 * @ingroup logger
+		 * @version	$Id$
+		 * @since 	04 December 2006
+		 * @author	Christofer Hedbrand,
+		 * 			Carsten Schmidt,
+		 * 			Martin Rosekeit <martin.rosekeit@rwth-aachen.de>
+		 */
+		class DeviceDev0 : public Device {
 		public:
-			Dev0LogDevice();
+			DeviceDev0();
 
 			virtual void
 			put(char c);
@@ -58,6 +59,7 @@ namespace xpcc {
 
 			virtual void
 			flush();
+		};
 	};
 };
 #endif /*XPCC_DEV0_LOG_DEVICE_HPP*/

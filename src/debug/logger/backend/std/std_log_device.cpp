@@ -32,22 +32,22 @@
 
 #include <iostream>
 
-xpcc::StdLogDevice::StdLogDevice() :
+xpcc::log::DeviceStd::DeviceStd() :
 	logLevelIdNameMap()
 {
 	// Assign log level names to ids
-	this->logLevelIdNameMap[xpcc::Log::DEBUG]	=	"DEBUG";
-	this->logLevelIdNameMap[xpcc::Log::INFO]		=	"INFO";
-	this->logLevelIdNameMap[xpcc::Log::WARNING]	=	"WARNING";
-	this->logLevelIdNameMap[xpcc::Log::ERROR]	=	"ERROR";
-	this->logLevelIdNameMap[xpcc::Log::FATAL]	=	"FATAL";
+	this->logLevelIdNameMap[xpcc::log::DEBUG]	=	"DEBUG";
+	this->logLevelIdNameMap[xpcc::log::INFO]		=	"INFO";
+	this->logLevelIdNameMap[xpcc::log::WARNING]	=	"WARNING";
+	this->logLevelIdNameMap[xpcc::log::ERROR]	=	"ERROR";
+	this->logLevelIdNameMap[xpcc::log::FATAL]	=	"FATAL";
 
 }
 
 // ----------------------------------------------------------------------------
 
 void
-xpcc::StdLogDevice::put(char c)
+xpcc::log::DeviceStd::put(char c)
 {
 	std::cout << c;
 }
@@ -55,7 +55,7 @@ xpcc::StdLogDevice::put(char c)
 // ----------------------------------------------------------------------------
 
 void
-xpcc::StdLogDevice::put(const char* s)
+xpcc::log::DeviceStd::put(const char* s)
 {
 	std::cout << s;
 }
@@ -63,7 +63,7 @@ xpcc::StdLogDevice::put(const char* s)
 // -----------------------------------------------------------------------------
 
 void
-xpcc::StdLogDevice::flush()
+xpcc::log::DeviceStd::flush()
 {
 	std::cout << std::endl;
 }

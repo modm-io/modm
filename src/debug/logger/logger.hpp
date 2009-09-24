@@ -31,59 +31,61 @@
 #ifndef XPCC_LOGGER__HPP
 #define XPCC_LOGGER__HPP
 
-#include "log_level.hpp"
-#include "log_singleton.hpp"
+#include "level.hpp"
+#include "singleton.hpp"
 #include "../../hal/io/iostream.hpp"
 
 namespace xpcc {
-	/**
-	 * @class 	Logger
-	 * @brief 	Interface to the Logger.
-	 *
-	 * This class provides an interface to the logger singleton. It is used by the
-	 * macro defined below. This class overloads the << operator so that it is
-	 * possible to write different message types to the logger.
-	 *
-	 * @ingroup logger
-	 * @version	$Id$
-	 * @since 	04 December 2006
-	 * @author	Christofer Hedbrand,
-	 * 			Carsten Schmidt,
-	 * 			Martin Rosekeit <martin.rosekeit@rwth-aachen.de>
-	 */
-	template<Log::Level L = Log::DEBUG>
-	class Logger : public IOStream {
-		public:
+	namespace log {
+		/**
+		 * @class 	Logger
+		 * @brief 	Interface to the Logger.
+		 *
+		 * This class provides an interface to the logger singleton. It is used by the
+		 * macro defined below. This class overloads the << operator so that it is
+		 * possible to write different message types to the logger.
+		 *
+		 * @ingroup logger
+		 * @version	$Id$
+		 * @since 	04 December 2006
+		 * @author	Christofer Hedbrand,
+		 * 			Carsten Schmidt,
+		 * 			Martin Rosekeit <martin.rosekeit@rwth-aachen.de>
+		 */
+		template<Level L = DEBUG>
+		class Logger : public IOStream {
+			public:
 
-			Logger() :
-				IOStream( LogSingleton::instance() ),
-				level( &LogSingleton::instance().getLevel() )
-			{};
+				Logger() :
+					IOStream( Singleton::instance() ),
+					filter( &Singleton::instance().getFilter() )
+				{};
 
-			virtual
-			~Logger()
-			{};
+				virtual
+				~Logger()
+				{};
 
-			template <typename T>
-			inline Logger<L>&
-			operator <<(const T& msg)
-			{
-				if( L >= *this->level ) {
-					*(IOStream*)this << msg;
-				}
-				return *this;
-			};
+				template <typename T>
+				inline Logger<L>&
+				operator <<(const T& msg)
+				{
+					if( L >= *this->filter ) {
+						*(IOStream*)this << msg;
+					}
+					return *this;
+				};
 
-		private:
-			Logger(const Logger&);
+			private:
+				Logger(const Logger&);
 
-			Logger&
-			operator =(const Logger&);
+				Logger&
+				operator =(const Logger&);
 
-			const Log::Level* const	level;
-	};
+				const Level* const	filter;
+		};
 
-	extern Logger<Log::DEBUG> 	dout;
+		extern Logger<DEBUG> 	debug;
+	}
 };
 
 

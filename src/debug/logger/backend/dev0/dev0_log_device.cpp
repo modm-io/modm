@@ -30,14 +30,14 @@
 // ----------------------------------------------------------------------------
 #include "dev0_log_device.hpp"
 
-xpcc::Dev0LogDevice::Dev0LogDevice()
+xpcc::log::DeviceDev0::DeviceDev0()
 {
 }
 
 // ----------------------------------------------------------------------------
 
 void
-xpcc::Dev0LogDevice::put(char c)
+xpcc::log::DeviceDev0::put(char c)
 {
 	(void) c;
 }
@@ -45,7 +45,7 @@ xpcc::Dev0LogDevice::put(char c)
 // ----------------------------------------------------------------------------
 
 void
-xpcc::Dev0LogDevice::put(const char* s)
+xpcc::log::DeviceDev0::put(const char* s)
 {
 	(void) s;
 }
@@ -53,7 +53,7 @@ xpcc::Dev0LogDevice::put(const char* s)
 // -----------------------------------------------------------------------------
 
 void
-xpcc::Dev0LogDevice::flush()
+xpcc::log::DeviceDev0::flush()
 {
 }
 // -----------------------------------------------------------------------------

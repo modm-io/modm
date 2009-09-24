@@ -29,20 +29,20 @@
  */
 // ----------------------------------------------------------------------------
 
-#include "log_singleton.hpp"
+#include "singleton.hpp"
 
 // -----------------------------------------------------------------------------
 
-xpcc::LogSingleton::LogSingleton() :
+xpcc::log::Singleton::Singleton() :
 	device( 0 ),
 	ownDevice( false ),
-	level(xpcc::Log::FATAL)
+	level(xpcc::log::DEBUG)
 {
 };
 
 // -----------------------------------------------------------------------------
 
-xpcc::LogSingleton::~LogSingleton()
+xpcc::log::Singleton::~Singleton()
 {
 	// Delete the log device
 	if( this->ownDevice ) {
@@ -52,17 +52,17 @@ xpcc::LogSingleton::~LogSingleton()
 
 // -----------------------------------------------------------------------------
 
-xpcc::LogSingleton&
-xpcc::LogSingleton::instance()
+xpcc::log::Singleton&
+xpcc::log::Singleton::instance()
 {
-	static LogSingleton loggerInstance;
+	static Singleton loggerInstance;
 	return loggerInstance;
 };
 
 // -----------------------------------------------------------------------------
 
 void
-xpcc::LogSingleton::setLogDevice(LogDevice* device)
+xpcc::log::Singleton::setDevice(Device* device)
 {
 	if( this->ownDevice ) {
 		delete this->device;
@@ -74,7 +74,7 @@ xpcc::LogSingleton::setLogDevice(LogDevice* device)
 // -----------------------------------------------------------------------------
 
 void
-xpcc::LogSingleton::setLogDevice(LogDevice& device)
+xpcc::log::Singleton::setDevice(Device& device)
 {
 	if( this->ownDevice ) {
 		delete this->device;
@@ -86,7 +86,7 @@ xpcc::LogSingleton::setLogDevice(LogDevice& device)
 // ----------------------------------------------------------------------------
 
 void
-xpcc::LogSingleton::setLevel(Log::Level level)
+xpcc::log::Singleton::setFilter(Level level)
 {
 	this->level = level;
 }
@@ -94,7 +94,7 @@ xpcc::LogSingleton::setLevel(Log::Level level)
 // -----------------------------------------------------------------------------
 
 void
-xpcc::LogSingleton::put(char c)
+xpcc::log::Singleton::put(char c)
 {
 	this->device->put(c);
 }
@@ -102,7 +102,7 @@ xpcc::LogSingleton::put(char c)
 // -----------------------------------------------------------------------------
 
 void
-xpcc::LogSingleton::put(const char* s)
+xpcc::log::Singleton::put(const char* s)
 {
 	this->device->put(s);
 }
@@ -110,7 +110,7 @@ xpcc::LogSingleton::put(const char* s)
 // -----------------------------------------------------------------------------
 
 void
-xpcc::LogSingleton::flush()
+xpcc::log::Singleton::flush()
 {
 	this->device->flush();
 }
@@ -118,7 +118,7 @@ xpcc::LogSingleton::flush()
 // -----------------------------------------------------------------------------
 
 bool
-xpcc::LogSingleton::get(char& value)
+xpcc::log::Singleton::get(char& value)
 {
 	(void) value;
 	return false;
