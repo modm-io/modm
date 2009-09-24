@@ -3,13 +3,17 @@
 
 #include "can.hpp"
 
-xpcc::Can::Can() :
+xpcc::CanInterface::CanInterface() :
 sendList(0), receivingMessages(0), receivedMessages(0) {
 	
 }
 
+xpcc::CanInterface::~CanInterface() {
+	
+}
+
 void
-xpcc::Can::sendPacket(const Header &header, const SmartPayload& payload)
+xpcc::CanInterface::sendPacket(const Header &header, const SmartPayload& payload)
 {
 	if (0)
 	{
@@ -35,7 +39,7 @@ xpcc::Can::sendPacket(const Header &header, const SmartPayload& payload)
 }
 
 void
-xpcc::Can::dropPacket()
+xpcc::CanInterface::dropPacket()
 {
 	ReceiveListItem *temp = receivedMessages;
 	receivedMessages = receivedMessages->next;
@@ -43,13 +47,13 @@ xpcc::Can::dropPacket()
 }
 
 void
-xpcc::Can::update() {
+xpcc::CanInterface::update() {
 	checkAndReceiveMessages();
 	sendWaitingMessages();
 }
 
 void
-xpcc::Can::sendWaitingMessages()
+xpcc::CanInterface::sendWaitingMessages()
 {
 	if (sendList == 0) {
 		// no message in the queue
@@ -62,7 +66,7 @@ xpcc::Can::sendWaitingMessages()
 	if (size > 8)
 	{
 		// fragmented message
-		uint8_t *data = (uint8_t *) alloca(8);
+		uint8_t data[8];
 		
 		data[0] = sendList->fragmentIndex;
 		data[1] = size;
@@ -99,7 +103,7 @@ xpcc::Can::sendWaitingMessages()
 }
 
 void
-xpcc::Can::checkAndReceiveMessages()
+xpcc::CanInterface::checkAndReceiveMessages()
 {
 	while (isCanMessageAvailable())
 	{
@@ -110,7 +114,7 @@ xpcc::Can::checkAndReceiveMessages()
 }
 
 void
-xpcc::Can::readMessage()
+xpcc::CanInterface::readMessage()
 {
 	//uint32_t identifier = getCanIdentifier();
 	//uint8_t size = getCanSize();

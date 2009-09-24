@@ -2,7 +2,7 @@
 // ----------------------------------------------------------------------------
 /* Copyright (c) 2009, Roboterclub Aachen e.V.
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *     * Redistributions of source code must retain the above copyright
@@ -13,7 +13,7 @@
  *     * Neither the name of the Roboterclub Aachen e.V. nor the
  *       names of its contributors may be used to endorse or promote products
  *       derived from this software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY ROBOTERCLUB AACHEN E.V. ''AS IS'' AND ANY
  * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -24,51 +24,66 @@
  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  * $Id$
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC_BACKEND_MCP2515_H
-#define	XPCC_BACKEND_MCP2515_H
+#ifndef XPCC_UART_HPP
+#define XPCC_UART_HPP
 
-#include "../backend_interface.h"
+#include <stdint.h>
+
+#include "../io/iodevice.hpp"
 
 namespace xpcc
 {
-	class Mcp2515 : public BackendInterface
+	//! \brief	UART baudrate expression
+	//! 
+	//! \param	fcpu		system clock in Mhz, e.g. 4000000L for 4Mhz
+	//! \param	baudrate	baudrate in bps, e.g. 1200, 2400, 9600
+	#define UART_BAUD_SELECT(baudRate,fcpu) ((fcpu)/((baudRate)*16l)-1)
+	
+	//! \brief	UART baudrate expression for ATmega double speed mode
+	//! 
+	//! \param	fcpu		system clock in Mhz, e.g. 4000000L for 4Mhz
+	//! \param	baudrate	baudrate in bps, e.g. 1200, 2400, 9600
+	#define UART_BAUD_SELECT_DOUBLE_SPEED(baudRate,fcpu) (((fcpu)/((baudRate)*8l)-1)|0x8000)
+	
+	class Uart : public IODevice
 	{
 	public:
-		struct FilterTable
-		{
-			struct {
-				uint32_t filter[2];
-				uint32_t mask;
-			} bank1;
-			
-			struct {
-				uint32_t filter[4];
-				uint32_t mask;
-			} bank2;
-		};
+		static Uart&
+		instance() {
+			static Uart uart;
+			return uart;
+		}
 		
-	public:
-		Mcp2515(FilterTable& filter);
-		
-		
-		virtual bool
-		sendPacket(Packet &packet);
-		
-		
-		virtual bool
-		isPacketAvailable() const;
+		void
+		setBitrate(uint16_t baudrate);
 		
 		virtual void
-		retrievePacket();
+		put(char c);
 		
-		virtual const Packet&
-		getPacket() const;
+		virtual void
+		flush() {
+			this->put('\n');
+		}
+		
+		virtual bool
+		get(char& c);
+	
+	private:
+		Uart();
+		
+		virtual
+		~Uart() {};
+		
+		Uart(const Uart&);
+		
+		Uart&
+		operator=(const Uart &);
 	};
 }
 
-#endif // XPCC_BACKEND_MCP2515_H
+#endif // XPCC_UART_HPP

@@ -59,6 +59,5 @@ xpcc::StdIODevice::flush()
 bool
 xpcc::StdIODevice::get( char& value )
 {
-	std::cin >> value;
-	return true;
+	return std::cin.get(value);
 }

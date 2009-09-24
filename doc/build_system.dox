@@ -26,9 +26,9 @@ $ sudo apt-get install python python-yaml scons
 Windows users have to install the tools by hand. How to do that is explaind
 on each particular website.
 
-http://www.python.org/download/
-http://www.scons.org/download.php
-http://pyyaml.org/wiki/PyYAML
+- http://www.python.org/download/
+- http://www.scons.org/download.php
+- http://pyyaml.org/wiki/PyYAML
 
 \section organization Organization of the source
 

@@ -2,25 +2,30 @@
 target: pc
 
 avr:
-    device: atmega644
-    clock: 16000000
-    avrdude:
-        programmer: stk500
-        port: /dev/ttyUSB0
+  device: atmega644
+  clock: 16000000
+  avrdude:
+    programmer: stk500
+    port: /dev/ttyUSB0
 
 library:
-    debug:
-        logger:
-            defines:
-                FOOBAR: 2
-    math:
-    communication:
-        backend:
-            can:
-                mcp2515:
-                    defines:
-                        CS: B,6
-                        INT: B,3
+  debug:
+    logger:
+      defines:
+        FOOBAR: 2
+  math:
+  communication:
+    backend:
+      can:
+        mcp2515:
+          defines:
+            CS: B,6
+            INT: B,3
+  hal:
+    avr:
+      defines:
+        UART_RX_BUFFER_SIZE: 8
+        UART_TX_BUFFER_SIZE: 8  
 
 tests:
-    include: no
+  include: no

@@ -32,8 +32,6 @@
 #ifndef	XPCC_SMART_PAYLOAD_H
 #define	XPCC_SMART_PAYLOAD_H
 
-#include <iostream>
-
 #include <string.h>		// for memcpy
 #include <stdint.h>
 

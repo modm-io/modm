@@ -112,6 +112,8 @@ def generate(env, **kw):
 		"-fno-exceptions", 
 		"-fno-rtti",
 		"-fno-threadsafe-statics",
+		"-fuse-cxa-atexit",
+		"-nostdlib",
 #		"-Wnon-virtual-dtor",
 		"-Weffc++",
 		"-Woverloaded-virtual",
@@ -125,6 +127,7 @@ def generate(env, **kw):
 		"-Wl,-Map=${TARGET.base}.map,--cref", 
 		"-Wl,--relax", 
 		"-Wl,--gc-sections", 
+#		"-static", 
 	])
 	
 	env['LINKCOM'] = "$LINK -o $TARGET $LINKFLAGS $SOURCES $_LIBDIRFLAGS $_LIBFLAGS -lm"

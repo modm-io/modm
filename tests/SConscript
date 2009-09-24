@@ -8,8 +8,6 @@ Import('env')
 Import('sourceFiles')
 Import('library')
 
-print "tests"
-
 # build a object file form each source file
 for file in sourceFiles:
     basename = os.path.basename(file.name)

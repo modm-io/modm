@@ -36,10 +36,13 @@
 
 namespace xpcc
 {
-	class Can : public BackendInterface
+	class CanInterface : public BackendInterface
 	{
 	public:
-		Can();
+		CanInterface();
+		
+		virtual
+		~CanInterface();
 		
 		virtual void
 		sendPacket(const Header &header, const SmartPayload& payload);
@@ -68,7 +71,7 @@ namespace xpcc
 		dropPacket();
 		
 		virtual void
-		update();
+		update() = 0;
 	
 	protected:
 		//! \brief	Try to send a CAN message
@@ -118,6 +121,7 @@ namespace xpcc
 			SmartPayload payload;
 			
 			uint8_t fragmentIndex;
+		
 		private:
 			SendListItem(const SendListItem& other);
 			
@@ -141,6 +145,7 @@ namespace xpcc
 			
 			uint8_t receivedFragments;
 			// TODO timeout
+		
 		private:
 			ReceiveListItem(const ReceiveListItem& other);
 			
