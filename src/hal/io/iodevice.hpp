@@ -34,30 +34,36 @@
 
 #include <stdint.h>
 
-namespace xpcc
-{
-	class IODevice
-	{
-	public :
-		IODevice();
+namespace xpcc {
+	/**
+	 * @class 	IODevice
+	 * @brief 	Abstract calls of io-devices
+	 *
+	 * @ingroup io
+	 * @version	$Id$
+	 * @author	Martin Rosekeit <martin.rosekeit@rwth-aachen.de>
+	 */
+	class IODevice {
+		public :
+			IODevice();
 
-		virtual
-		~IODevice();
+			virtual
+			~IODevice();
 
-		virtual void
-		put(char c) = 0;
+			virtual void
+			put(char c) = 0;
 
-		virtual void
-		put(const char* str);
+			virtual void
+			put(const char* str);
 
-		virtual void
-		flush() = 0;
+			virtual void
+			flush() = 0;
 
-		virtual bool
-		get(char& c) = 0;
+			virtual bool
+			get(char& c) = 0;
 
-	private :
-		IODevice( const IODevice& );
+		private :
+			IODevice( const IODevice& );
 	};
 };
 

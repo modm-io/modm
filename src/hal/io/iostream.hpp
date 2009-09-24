@@ -39,7 +39,16 @@
 #include "iodevice.hpp"
 
 namespace xpcc {
-
+	/**
+	 * @class 	IOStream
+	 * @brief 	This Formats all primary typs into a string stream for
+	 * 			output or it reads values from a input and converts them to
+	 * 			a given type;
+	 *
+	 * @ingroup io
+	 * @version	$Id$
+	 * @author	Martin Rosekeit <martin.rosekeit@rwth-aachen.de>
+	 */
 	class IOStream {
 		public :
 
