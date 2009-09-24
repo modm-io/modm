@@ -33,19 +33,21 @@
 #include "../../../../src/debug/logger/logger.hpp"
 #include "../../../../src/debug/logger/backend/std/std_log_device.hpp"
 
-xpcc::StdLogDevice device;
+xpcc::log::DeviceStd device;
 
 int
 main()
 {
 	std::cout << "XPCC Logger Test" << std::endl;
 
-	xpcc::setLogDevice( device );
-	xpcc::setLogDevice( new xpcc::StdLogDevice );
-	xpcc::setLogDevice( device );
+	xpcc::log::setDevice( device );
+	xpcc::log::setDevice( new xpcc::log::DeviceStd );
+	xpcc::log::setDevice( device );
 
-	xpcc::dout << "Logmessage" << xpcc::flush;
-	xpcc::dout << "100=" << 100 << xpcc::flush;
+	xpcc::log::setFilter(xpcc::log::DEBUG);
+
+	xpcc::log::debug << "Logmessage" << xpcc::flush;
+	xpcc::log::debug << "100=" << 100 << xpcc::flush;
 
 	std::cout << "ENDE" << std::endl;
 
