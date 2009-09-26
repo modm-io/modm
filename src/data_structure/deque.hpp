@@ -36,7 +36,6 @@
 
 namespace xpcc
 {
-	// ------------------------------------------------------------------------
 	/**
 	 * \ingroup	container
 	 * \brief	Double ended queue

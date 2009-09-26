@@ -32,9 +32,8 @@
 #ifndef XPCC_IODEVICE_HPP
 #define XPCC_IODEVICE_HPP
 
-#include <stdint.h>
-
-namespace xpcc {
+namespace xpcc
+{
 	/**
 	 * @class 	IODevice
 	 * @brief 	Abstract calls of io-devices
@@ -67,7 +66,4 @@ namespace xpcc {
 	};
 };
 
-
-
 #endif // XPCC_IODEVICE_HPP
-

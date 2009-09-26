@@ -2,12 +2,12 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 
-#include "../../data_structure/queue.hpp"
+#include "../../data_structure/isr_queue.hpp"
 
 #include "uart_defs.h"
 #include "uart.hpp"
 
-static xpcc::BoundedQueue<char, UART_RX_BUFFER_SIZE, uint8_t> rxBuffer;
+static xpcc::IsrQueue<char, UART_RX_BUFFER_SIZE> rxBuffer;
 
 // ----------------------------------------------------------------------------
 // called when the UART has received a character
@@ -30,6 +30,7 @@ ISR(UART0_RECEIVE_INTERRUPT)
 	last_rx_error = usr & ((1 << FE) | (1 << DOR));
 #endif*/
 	
+	// TODO Fehlerbehandlung
 	rxBuffer.push(data);
 }
 
@@ -116,12 +117,13 @@ xpcc::Uart::initialize(uint16_t baudrate)
 bool
 xpcc::Uart::get(char& c)
 {
-	if (!rxBuffer.isEmpty()) {
+	if (rxBuffer.isEmpty()) {
+		return false;
+	}
+	else {
 		c = rxBuffer.get();
 		rxBuffer.pop();
 		
 		return true;
 	}
-	
-	return false;
 }

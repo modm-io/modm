@@ -29,83 +29,50 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC_STACK_HPP
-#define	XPCC_STACK_HPP
+#ifndef	XPCC_ISR_QUEUE_HPP
+#define	XPCC_ISR_QUEUE_HPP
 
-#include "deque.hpp"
+#include <stdint.h>
 
-namespace
+namespace xpcc
 {
-	/**
-	 * \ingroup	container
-	 * \brief	LIFO stack
-	 * 
-	 * Elements are pushed/popped from the "back" of the specific container,
-	 * which is known as the top of the stack.
-	 * 
-	 * This class is not thread-safe!
-	 * 
-	 * \see		Deque()
-	 */
+	//! \brief	Interrupt save queue
+	//!
+	//! A maximum size of 255 is allowed
+	//!
 	template<typename T,
-			 typename Container>
-	class Stack
+			 int N>
+	class IsrQueue
 	{
 	public:
-		typedef typename Container::SizeType SizeType;
+		IsrQueue();
 		
 		bool
-		isEmpty() {
-			return c.isEmpty();
-		}
+		isFull();
 		
 		bool
-		isFull() {
-			return c.isFull();
-		}
+		isEmpty();
 		
-		SizeType
-		getSize() {
-			return c.getSize();
-		}
-		
-		SizeType
-		getMaxSize() {
-			return c.maxSize();
-		}
-		
-		T&
-		get() {
-			return c.back();
-		}
+		uint8_t
+		getMaxSize();
 		
 		const T&
-		get() const {
-			return c.back();
-		}
+		get() const;
 		
 		bool
-		push(const T& value) {
-			return c.pushBack(value);
-		}
+		push(const T& value);
 		
 		void
-		pop() {
-			c.popBack();
-		}
-	
-	protected:
-		Container c;
-	};
+		pop();
 
-	// ------------------------------------------------------------------------
-	template<typename T,
-			 int N,
-			 typename S=uint8_t,
-			 typename Container=BoundedDeque<T, N, S> >
-	class BoundedStack : public Stack<T, Container> {
+	private:
+		volatile uint8_t head;
+		volatile uint8_t tail;
 		
+		T buffer[N];
 	};
 }
 
-#endif	// XPCC_STACK_HPP
+#include "isr_queue_impl.hpp"
+
+#endif	// XPCC_ISR_QUEUE_HPP

@@ -22,13 +22,17 @@ int main(void)
 	
 	PORTB |= (1 << PB1);
 	
-	/*
 	xpcc::IOStream stream(uart);
 	
-	stream << static_cast<uint8_t>(0xff) << static_cast<int16_t>(3) << xpcc::endl;
+	stream << static_cast<uint8_t>(0xff) << ' ' 
+		   << static_cast<int16_t>(3) << xpcc::endl;
 	stream << 10 << xpcc::endl;
 	stream << 2.2 << xpcc::endl;
 	stream << "Hallo" << xpcc::endl;
-	*/
+	
+	while (1) {
+		
+	}
+	
 	return 0;
 }

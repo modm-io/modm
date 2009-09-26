@@ -137,26 +137,4 @@
 	#error "no UART definition for MCU available"
 #endif
 
-// ----------------------------------------------------------------------------
-extern volatile char uart_tx_buffer[UART_TX_BUFFER_SIZE];
-extern volatile uint8_t uart_tx_head;
-extern volatile uint8_t uart_tx_tail;
-
-extern volatile char uart_rx_buffer[UART_RX_BUFFER_SIZE];
-extern volatile uint8_t uart_rx_head;
-extern volatile uint8_t uart_rx_tail;
-
-extern volatile uint8_t uart_last_rx_error;
-
-// ----------------------------------------------------------------------------
-extern volatile char uart1_tx_buffer[UART_TX_BUFFER_SIZE];
-extern volatile uint8_t uart1_tx_head;
-extern volatile uint8_t uart1_tx_tail;
-
-extern volatile char uart1_rx_buffer[UART_RX_BUFFER_SIZE];
-extern volatile uint8_t uart1_rx_head;
-extern volatile uint8_t uart1_rx_tail;
-
-extern volatile uint8_t uart1_last_rx_error;
-
 #endif	// UART_PRIVATE_H

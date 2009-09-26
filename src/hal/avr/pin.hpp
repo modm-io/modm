@@ -25,87 +25,35 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id$
+ * $Id: iodevice.hpp 55 2009-09-24 17:15:53Z dergraaf $
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC_STACK_HPP
-#define	XPCC_STACK_HPP
+#ifndef XPCC_IODEVICE_HPP
+#define XPCC_IODEVICE_HPP
 
-#include "deque.hpp"
+#include <avr/io.h>
 
-namespace
-{
-	/**
-	 * \ingroup	container
-	 * \brief	LIFO stack
-	 * 
-	 * Elements are pushed/popped from the "back" of the specific container,
-	 * which is known as the top of the stack.
-	 * 
-	 * This class is not thread-safe!
-	 * 
-	 * \see		Deque()
-	 */
-	template<typename T,
-			 typename Container>
-	class Stack
-	{
-	public:
-		typedef typename Container::SizeType SizeType;
-		
-		bool
-		isEmpty() {
-			return c.isEmpty();
-		}
-		
-		bool
-		isFull() {
-			return c.isFull();
-		}
-		
-		SizeType
-		getSize() {
-			return c.getSize();
-		}
-		
-		SizeType
-		getMaxSize() {
-			return c.maxSize();
-		}
-		
-		T&
-		get() {
-			return c.back();
-		}
-		
-		const T&
-		get() const {
-			return c.back();
-		}
-		
-		bool
-		push(const T& value) {
-			return c.pushBack(value);
-		}
-		
-		void
-		pop() {
-			c.popBack();
-		}
-	
-	protected:
-		Container c;
-	};
+#define	CREATE_IO_PIN(name, port, pin) \
+	struct name { \
+		name() { this->setInput() } \
+		inline void setOutput() { DDR ## port |= (1 << pin); } \
+		inline void setInput() { DDR ## port &= ~(1 << pin); } \
+		inline void set() { PORT ## port |= (1 << pin); } \
+		inline void reset() { PORT ## port &= ~(1 << pin); } \
+		inline bool get() { return (PIN ## port & (1 << pin)); } \
+	}
 
-	// ------------------------------------------------------------------------
-	template<typename T,
-			 int N,
-			 typename S=uint8_t,
-			 typename Container=BoundedDeque<T, N, S> >
-	class BoundedStack : public Stack<T, Container> {
-		
-	};
-}
+#define	CREATE_OUTPUT_PIN(name, port, pin) \
+	struct name { \
+		name() { DDR ## port |= (1 << pin); } \
+		inline void set() { PORT ## port |= (1 << pin); } \
+		inline void reset() { PORT ## port &= ~(1 << pin); } \
+	}
+#define CREATE_INPUT_PIN(name, port, pin) \
+	struct name { \
+		name() { DDR ## port &= ~(1 << pin); } \
+		inline bool get() { return (PIN ## port & (1 << pin)); } \
+	}
 
-#endif	// XPCC_STACK_HPP
+#endif // XPCC_PIN_HPP

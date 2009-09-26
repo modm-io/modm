@@ -1,3 +1,4 @@
+
 // coding: utf-8
 // ----------------------------------------------------------------------------
 /* Copyright (c) 2009, Roboterclub Aachen e.V.
@@ -29,83 +30,73 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC_STACK_HPP
-#define	XPCC_STACK_HPP
+#ifndef	XPCC_ISR_QUEUE_IMPL_HPP
+#define	XPCC_ISR_QUEUE_IMPL_HPP
 
-#include "deque.hpp"
+#define VOLATILE(x)  (*(volatile uint8_t *) &(x))
 
-namespace
-{
-	/**
-	 * \ingroup	container
-	 * \brief	LIFO stack
-	 * 
-	 * Elements are pushed/popped from the "back" of the specific container,
-	 * which is known as the top of the stack.
-	 * 
-	 * This class is not thread-safe!
-	 * 
-	 * \see		Deque()
-	 */
-	template<typename T,
-			 typename Container>
-	class Stack
-	{
-	public:
-		typedef typename Container::SizeType SizeType;
-		
-		bool
-		isEmpty() {
-			return c.isEmpty();
-		}
-		
-		bool
-		isFull() {
-			return c.isFull();
-		}
-		
-		SizeType
-		getSize() {
-			return c.getSize();
-		}
-		
-		SizeType
-		getMaxSize() {
-			return c.maxSize();
-		}
-		
-		T&
-		get() {
-			return c.back();
-		}
-		
-		const T&
-		get() const {
-			return c.back();
-		}
-		
-		bool
-		push(const T& value) {
-			return c.pushBack(value);
-		}
-		
-		void
-		pop() {
-			c.popBack();
-		}
-	
-	protected:
-		Container c;
-	};
-
-	// ------------------------------------------------------------------------
-	template<typename T,
-			 int N,
-			 typename S=uint8_t,
-			 typename Container=BoundedDeque<T, N, S> >
-	class BoundedStack : public Stack<T, Container> {
-		
-	};
+template<typename T, int N>
+xpcc::IsrQueue<T, N>::IsrQueue() :
+	head(0), tail(0) {
 }
 
-#endif	// XPCC_STACK_HPP
+template<typename T, int N>
+bool
+xpcc::IsrQueue<T, N>::isFull() {
+	uint8_t tmphead = VOLATILE(head) + 1;
+	if (tmphead >= N) {
+		tmphead = 0;
+	}
+	
+	if (tmphead == VOLATILE(tail)) {
+		return true;
+	}
+	return false;
+}
+
+template<typename T, int N>
+bool
+xpcc::IsrQueue<T, N>::isEmpty() {
+	return (VOLATILE(head) == VOLATILE(tail));
+}
+
+template<typename T, int N>
+uint8_t
+xpcc::IsrQueue<T, N>::getMaxSize() {
+	return N;
+}
+
+template<typename T, int N>
+const T&
+xpcc::IsrQueue<T, N>::get() const {
+	return buffer[tail];
+}
+
+template<typename T, int N>
+bool
+xpcc::IsrQueue<T, N>::push(const T& value) {
+	uint8_t tmphead = head + 1;
+	if (tmphead >= N) {
+		tmphead = 0;
+	}
+	if (tmphead == VOLATILE(tail)) {
+		return false;
+	}
+	else {
+		buffer[head] = value;
+		head = tmphead;
+		return true;
+	}
+}
+
+template<typename T, int N>
+void
+xpcc::IsrQueue<T, N>::pop() {
+	uint8_t tmptail = tail + 1;
+	if (tmptail >= N) {
+		tmptail = 0;
+	}
+	tail = tmptail;
+}
+
+#endif	// XPCC_ISR_QUEUE_IMPL_HPP

@@ -58,6 +58,7 @@ namespace xpcc
 			static Uart uart;
 			return uart;
 		}*/
+		// TODO!
 		Uart() {};
 		
 		void
