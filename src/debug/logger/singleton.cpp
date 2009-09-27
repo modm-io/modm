@@ -35,7 +35,6 @@
 
 xpcc::log::Singleton::Singleton() :
 	device( 0 ),
-	ownDevice( false ),
 	level(xpcc::log::DEBUG)
 {
 };
@@ -44,43 +43,13 @@ xpcc::log::Singleton::Singleton() :
 
 xpcc::log::Singleton::~Singleton()
 {
-	// Delete the log device
-	if( this->ownDevice ) {
-		delete this->device;
-	}
 }
-
-// -----------------------------------------------------------------------------
-
-xpcc::log::Singleton&
-xpcc::log::Singleton::instance()
-{
-	static Singleton loggerInstance;
-	return loggerInstance;
-};
-
-// -----------------------------------------------------------------------------
-
-void
-xpcc::log::Singleton::setDevice(Device* device)
-{
-	if( this->ownDevice ) {
-		delete this->device;
-	}
-	this->device = device;
-	this->ownDevice = true;
-};
-
 // -----------------------------------------------------------------------------
 
 void
 xpcc::log::Singleton::setDevice(Device& device)
 {
-	if( this->ownDevice ) {
-		delete this->device;
-	}
 	this->device = &device;
-	this->ownDevice = false;
 };
 
 // ----------------------------------------------------------------------------

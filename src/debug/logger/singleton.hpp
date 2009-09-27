@@ -50,24 +50,20 @@ namespace xpcc {
 		 */
 		class Singleton : public IODevice {
 			public:
-				static Singleton&
-				instance();
+				inline static Singleton&
+				instance()
+				{
+					static Singleton loggerInstance;
+					return loggerInstance;
+				};
 
-				//! Set a new log device in the singleton.
-				//!
-				//! The singleton takes ownership of the device (the
-				//! singleton will delete the object)
-				//!
-				//! \code
-				//! 	xpcc::LogSingleton::instance().setLogDevice(new MyLogDevice);
-				//! \endcode
-				void
-				setDevice(Device* device);
+				inline static const Singleton&
+				constInstance()
+				{
+					return Singleton::instance();
+				}
 
 				//! Set a new log device writer in the singleton.
-				//!
-				//! The singleton takes \b not ownership of the device (the
-				//! singleton will \b not delete the object)
 				//!
 				//! \code
 				//!		MyLogDevice device;
@@ -98,7 +94,7 @@ namespace xpcc {
 				get(char& value);
 
 			private:
-				Singleton();								// Private constructor because of singleton
+				Singleton();							// Private constructor because of singleton
 				Singleton(const Singleton & logger);	// Private copy constructor because of singleton
 
 				Singleton&
@@ -107,35 +103,10 @@ namespace xpcc {
 				~Singleton();
 
 				Device*		device;
-				bool		ownDevice;
 				Level 		level;
 		};
 
-		//! Set a new log device in the LogSingleton.
-		//!
-		//! The singleton takes ownership of the device (the
-		//! singleton will delete the object)
-		//!
-		//! \code
-		//! 	xpcc::log::setDevice(new MyLogDevice);
-		//! \endcode
-		//!
-		//! This is a shortcut to call
-		//! \code
-		//! 	xpcc::log::Singleton::instance().setDevice(new MyLogDevice);
-		//! \endcode
-		//!
-		//! \ingroup logger
-		inline void
-		setDevice(Device* device)
-		{
-			Singleton::instance().setDevice(device);
-		}
-
 		//! Set a new log device writer in the LogSingleton.
-		//!
-		//! The singleton takes \b not ownership of the device (the
-		//! singleton will \b not delete the object)
 		//!
 		//! \code
 		//!		MyLogDevice device;

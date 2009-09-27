@@ -53,22 +53,12 @@ namespace xpcc {
 		public :
 
 			//! Constructor
-			//! \param	IODevice*	device to write the stream to, takes ownership of the device and will delete it when itself is destroyed
-			//! \code
-			//!		IOStream stream( new MyIODevice() );
-			//! \endcode
-			IOStream(IODevice*);
-
-			//! Constructor
 			//! \param	IODevice*	device to write the stream to
 			//! \code
 			//!		MyIODevice device;
 			//!		IOStream stream( device );
 			//! \endcode
 			IOStream(IODevice&);
-
-			virtual
-			~IOStream();
 
 			inline IOStream&
 			put(char c)
@@ -117,8 +107,7 @@ namespace xpcc {
 			IOStream&
 			operator =(const IOStream& );
 
-			IODevice* 	device;
-			bool		ownerOfDevice;
+			IODevice* const	device;
 
 	};
 

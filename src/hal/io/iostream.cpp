@@ -32,26 +32,10 @@
 #include "iostream.hpp"
 
 // -----------------------------------------------------------------------------
-
-xpcc::IOStream::IOStream( IODevice* device ) :
-	device( device ),
-	ownerOfDevice( true )
-{
-}
-
-// -----------------------------------------------------------------------------
 xpcc::IOStream::IOStream( IODevice& device ) :
-	device( &device ),
-	ownerOfDevice( false )
+	device( &device )
 {
 }
 
-// -----------------------------------------------------------------------------
 
-xpcc::IOStream::~IOStream()
-{
-	if( this->ownerOfDevice ) {
-		delete this->device;
-	}
-}
 
