@@ -55,14 +55,9 @@ namespace xpcc {
 		template<Level L = DEBUG>
 		class Logger : public IOStream {
 			public:
-
 				Logger() :
 					IOStream( Singleton::instance() ),
 					filter( &Singleton::instance().getFilter() )
-				{};
-
-				virtual
-				~Logger()
 				{};
 
 				template <typename T>
@@ -70,7 +65,7 @@ namespace xpcc {
 				operator <<(const T& msg)
 				{
 					if( L >= *this->filter ) {
-						*(IOStream*)this << msg;
+						*static_cast<IOStream*>(this) << msg;
 					}
 					return *this;
 				};
@@ -84,7 +79,16 @@ namespace xpcc {
 				const Level* const	filter;
 		};
 
-		extern Logger<DEBUG> 	debug;
+
+		/**
+		 * @ingroup logger
+		 * @{
+		 */
+		extern Logger<DEBUG> 	debug;		//!	log device to take messages on DEBUG level
+		extern Logger<INFO> 	info;		//!	log device to take messages on INFO level
+		extern Logger<WARNING> 	warning;	//!	log device to take messages on WARNING level
+		extern Logger<ERROR> 	error;		//!	log device to take messages on ERROR level
+		/*@}*/
 	}
 };
 

@@ -44,10 +44,12 @@ main()
 	xpcc::log::setDevice( new xpcc::log::DeviceStd );
 	xpcc::log::setDevice( device );
 
-	xpcc::log::setFilter(xpcc::log::DEBUG);
+	xpcc::log::setFilter(xpcc::log::WARNING);
 
-	xpcc::log::debug << "Logmessage" << xpcc::flush;
-	xpcc::log::debug << "100=" << 100 << xpcc::flush;
+	xpcc::log::debug << "DEBUG: " << "Logmessage" << xpcc::flush;
+	xpcc::log::warning << "WARNING: " << "100=" << 100 << xpcc::flush;
+
+
 
 	std::cout << "ENDE" << std::endl;
 

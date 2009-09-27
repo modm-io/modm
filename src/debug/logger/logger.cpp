@@ -31,6 +31,9 @@
 #include "logger.hpp"
 
 xpcc::log::Logger<xpcc::log::DEBUG> xpcc::log::debug;
+xpcc::log::Logger<xpcc::log::INFO> xpcc::log::info;
+xpcc::log::Logger<xpcc::log::WARNING> xpcc::log::warning;
+xpcc::log::Logger<xpcc::log::ERROR> xpcc::log::error;
 
 
 // -----------------------------------------------------------------------------
