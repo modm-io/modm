@@ -12,16 +12,15 @@
 #ifndef	SATURATED_H
 #define	SATURATED_H
 
-// TODO
-#include "arithmetic_traits.h"
+#include "arithmetic_traits.hpp"
 
 // see http://www.mikrocontroller.net/articles/AVR_Arithmetik/Saturierung
 template<typename T>
 class Saturated
 {
 	public:
-		typedef typename arithmetic_traits<T>::signed_type signed_type;
-		typedef typename arithmetic_traits<T>::unsigned_type unsigned_type;
+		typedef typename ArithmeticTraits<T>::SignedType signed_type;
+		typedef typename ArithmeticTraits<T>::UnsignedType unsigned_type;
 		
 		friend class Saturated<signed_type>;
 		friend class Saturated<unsigned_type>;

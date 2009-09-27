@@ -76,6 +76,8 @@ namespace xpcc {
 	template<>
 	struct ArithmeticTraits<int8_t> {
 		typedef int16_t DoubleType;
+		typedef int8_t SignedType;
+		typedef uint8_t UnsignedType;
 
 		static const int8_t minValue = -0x80;
 		static const int8_t maxValue =  0x7F;
@@ -90,6 +92,8 @@ namespace xpcc {
 	template<>
 	struct ArithmeticTraits<uint8_t> {
 		typedef uint16_t DoubleType;
+		typedef int8_t SignedType;
+		typedef uint8_t UnsignedType;
 
 		static const uint8_t minValue = 0;
 		static const uint8_t maxValue = 0xff;
@@ -104,6 +108,8 @@ namespace xpcc {
 	template<>
 	struct ArithmeticTraits<int16_t> {
 		typedef int32_t DoubleType;
+		typedef int16_t SignedType;
+		typedef uint16_t UnsignedType;
 
 		static const int16_t minValue = -0x8000;
 		static const int16_t maxValue =  0x7FFF;
@@ -118,6 +124,8 @@ namespace xpcc {
 	template<>
 	struct ArithmeticTraits<uint16_t> {
 		typedef uint32_t DoubleType;
+		typedef int16_t SignedType;
+		typedef uint16_t UnsignedType;
 
 		static const uint16_t minValue = 0;
 		static const uint16_t maxValue = 0xFFFF;
@@ -136,6 +144,9 @@ namespace xpcc {
 #else
 		typedef int64_t DoubleType;
 #endif
+		typedef int32_t SignedType;
+		typedef uint32_t UnsignedType;
+
 		static const int32_t minValue = -0x80000000;
 		static const int32_t maxValue =  0x7FFFFFFF;
 		static const uint8_t digits10 = 11; // inc. sign
@@ -153,6 +164,8 @@ namespace xpcc {
 #else
 		typedef uint64_t DoubleType;
 #endif
+		typedef int32_t SignedType;
+		typedef uint32_t UnsignedType;
 
 		static const uint32_t minValue = 0;
 		static const uint32_t maxValue = 0xFFFFFFFF;
@@ -168,6 +181,8 @@ namespace xpcc {
 	template<>
 	struct ArithmeticTraits<float> {
 		typedef float DoubleType;
+		typedef float SignedType;
+		typedef float UnsignedType;
 
 		static const float minValue = -3.40282e+38;
 		static const float maxValue = 3.40282e+38;
@@ -182,8 +197,11 @@ namespace xpcc {
 	template<>
 	struct ArithmeticTraits<double> {
 		typedef double DoubleType;
-		static const double min_value = 2.22507e-308;
-		static const double max_value = 1.79769e+308;
+		typedef double SignedType;
+		typedef double UnsignedType;
+
+		static const double minValue = 2.22507e-308;
+		static const double maxValue = 1.79769e+308;
 
 		static const bool isInteger = false;
 		static const bool isFloat = true;
