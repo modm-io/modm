@@ -30,39 +30,45 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__SCHEDULER_HPP
-#define XPCC__SCHEDULER_HPP
+#ifndef	XPCC__LOCATION_HPP
+#define	XPCC__LOCATION_HPP
 
-#include <stdint.h>
+#include "angle.hpp"
+#include "position.hpp"
 
 namespace xpcc
 {
-	class Event
+	class Location
 	{
 	public:
-		virtual void
-		run() = 0;
-	};
-	
-	class Scheduler
-	{
-	public:
-		typedef uint8_t Priority;
-		typedef int8_t EventId;
-	
-	public:
+		/// \brief	Add a position increment
 		void
-		update();
+		update(Location& diff);
 		
-		EventId
-		addUniqueEvent(Event& event, uint16_t delay, Priority priority);
+		/// \brief	Add a increment only in x-direction
+		void
+		update(int16_t x, Angle& phi);
 		
-		EventId
-		addPeriodicEvent(Event& event, uint16_t period, Priority priority);
-		
-		bool
-		removeEvent(EventId identifier);
+		// Attributes
+		Position position;
+		Angle phi;
 	};
 }
 
-#endif // XPCC__SCHEDULER_HPP
+// ----------------------------------------------------------------------------
+void
+xpcc::Location::update(Location& diff) {
+	this->position += diff.position.rotate(this->phi);
+	this->phi += diff.phi;
+	this->phi.normalize();
+}
+
+// ----------------------------------------------------------------------------
+void
+xpcc::Location::update(int16_t x, Angle& phi) {
+	this->position += Position(x * cos(this->phi), x * sin(this->phi));
+	this->phi += phi;
+	this->phi.normalize();
+}
+
+#endif	// XPCC__LOCATION_HPP

@@ -1,7 +1,7 @@
 
 #include <math.h>
 
-#include "angle.h"
+#include "angle.hpp"
 
 // ----------------------------------------------------------------------------
 // FIXME in eigne Datei verschieben
@@ -28,27 +28,27 @@ is_positive(const float& a) {
 
 // ----------------------------------------------------------------------------
 void
-Angle::normalize()
+xpcc::Angle::normalize()
 {
-	if (is_positive(this->angle)) {
-		while (this->angle > M_PI) {
-			this->angle -= 2 * M_PI;
+	if (is_positive(angle)) {
+		while (angle > M_PI) {
+			angle -= 2 * M_PI;
 		}
 	}
 	else {
-		while (this->angle < -M_PI) {
-			this->angle += 2 * M_PI;
+		while (angle < -M_PI) {
+			angle += 2 * M_PI;
 		}
 	}
 }
 
 // ----------------------------------------------------------------------------
 void
-Angle::reverse() {
-	if (is_positive(this->angle)) {
-		this->angle -= M_PI;
+xpcc::Angle::reverse() {
+	if (is_positive(angle)) {
+		angle -= M_PI;
 	}
 	else {
-		this->angle += M_PI;
+		angle += M_PI;
 	}
 }

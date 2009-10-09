@@ -95,7 +95,7 @@ def generate(env, **kw):
 		"-Os -gdwarf-2", 
 		"-funsigned-char",
 		"-funsigned-bitfields", 
-		"-fpack-struct", 
+		"-fpack-struct", 		# TODO
 		"-fshort-enums", 
 		"-ffunction-sections",
 		"-fdata-sections", 

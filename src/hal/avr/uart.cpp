@@ -2,7 +2,7 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 
-#include "../../utils/atomic/queue.hpp"
+#include "../../hal/atomic/queue.hpp"
 
 #include "uart_defs.h"
 #include "uart.hpp"

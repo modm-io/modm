@@ -30,39 +30,61 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__SCHEDULER_HPP
-#define XPCC__SCHEDULER_HPP
+#ifndef	XPCC__FLASH_READER_AVR_HPP
+#define	XPCC__FLASH_READER_AVR_HPP
 
-#include <stdint.h>
+#include <avr/pgmspace.h>
+
+#define	FLASH(var)		extern const var PROGMEM; const var
+#define	FLASH_STRING(s)	extern const char s[] PROGMEM; const char s[]
 
 namespace xpcc
 {
-	class Event
+	template<typename T, size_t size>
+	struct FlashReader
 	{
-	public:
-		virtual void
-		run() = 0;
+		ALWAYS_INLINE
+		static T
+		read(const void* p)
+		{
+			T retval;
+			memcpy_P(reinterpret_cast<void *>(&retval), p, size);
+			return retval;
+		}
 	};
 	
-	class Scheduler
+	template<typename T>
+	struct FlashReader<T, 1>
 	{
-	public:
-		typedef uint8_t Priority;
-		typedef int8_t EventId;
+		ALWAYS_INLINE
+		static T
+		read(const void* p)
+		{
+			return T(pgm_read_byte(p));
+		}
+	};
 	
-	public:
-		void
-		update();
-		
-		EventId
-		addUniqueEvent(Event& event, uint16_t delay, Priority priority);
-		
-		EventId
-		addPeriodicEvent(Event& event, uint16_t period, Priority priority);
-		
-		bool
-		removeEvent(EventId identifier);
+	template<typename T>
+	struct FlashReader<T, 2>
+	{
+		ALWAYS_INLINE
+		static T
+		read(const void* p)
+		{
+			return T(pgm_read_word(p));
+		}
+	};
+	
+	template<typename T>
+	struct FlashReader<T, 4>
+	{
+		ALWAYS_INLINE
+		static T
+		read(const void* p)
+		{
+			return T(pgm_read_dword(p));
+		}
 	};
 }
 
-#endif // XPCC__SCHEDULER_HPP
+#endif	// XPCC__FLASH_READER_AVR_HPP

@@ -30,39 +30,11 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__SCHEDULER_HPP
-#define XPCC__SCHEDULER_HPP
+#ifndef	MISC_HPP
+#define	MISC_HPP
 
-#include <stdint.h>
+// Macro to force inlining on the functions if needed, because many
+// people compile with -Os, which does not always inline them.
+#define ALWAYS_INLINE  inline __attribute__((always_inline))
 
-namespace xpcc
-{
-	class Event
-	{
-	public:
-		virtual void
-		run() = 0;
-	};
-	
-	class Scheduler
-	{
-	public:
-		typedef uint8_t Priority;
-		typedef int8_t EventId;
-	
-	public:
-		void
-		update();
-		
-		EventId
-		addUniqueEvent(Event& event, uint16_t delay, Priority priority);
-		
-		EventId
-		addPeriodicEvent(Event& event, uint16_t period, Priority priority);
-		
-		bool
-		removeEvent(EventId identifier);
-	};
-}
-
-#endif // XPCC__SCHEDULER_HPP
+#endif	// MISC_HPP

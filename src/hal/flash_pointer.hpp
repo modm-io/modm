@@ -5,6 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
+ *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -29,63 +30,119 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__UART_HPP
-#define XPCC__UART_HPP
+#ifndef	XPCC__FLASH_HPP
+#define	XPCC__FLASH_HPP
 
-#include <stdint.h>
-
-#include "../io/iodevice.hpp"
+#include "../utils/misc.hpp"
+#include "flash_pointer/flash_reader.hpp"
 
 namespace xpcc
 {
-	//! \brief	UART baudrate expression
-	//! 
-	//! \param	fcpu		system clock in Mhz, e.g. 4000000L for 4Mhz
-	//! \param	baudrate	baudrate in bps, e.g. 1200, 2400, 9600
-	#define UART_BAUD_SELECT(baudRate,fcpu) ((fcpu)/((baudRate)*16l)-1)
-	
-	//! \brief	UART baudrate expression for ATmega double speed mode
-	//! 
-	//! \param	fcpu		system clock in Mhz, e.g. 4000000L for 4Mhz
-	//! \param	baudrate	baudrate in bps, e.g. 1200, 2400, 9600
-	#define UART_BAUD_SELECT_DOUBLE_SPEED(baudRate,fcpu) (((fcpu)/((baudRate)*8l)-1)|0x8000)
-	
-	class Uart : public IODevice
+	/**
+	 * \brief	Pointer to flash memory
+	 * 
+	 * This tepmplate can mostly be used like a regular pointer, but operates
+	 * on flash memory. It will automatically read the data from flash when
+	 * dereferenced.
+	 * 
+	 * Based on a implementation of Rolf Magnus, see
+	 * http://www.mikrocontroller.net/topic/78610#656695
+	 * 
+	 * \author	Fabian Greif <fabian.greif@rwth-aachen.de>
+	 */
+	template<typename T>
+	class FlashPointer
 	{
 	public:
-		static Uart&
-		instance() {
-			static Uart uart;
-			return uart;
+		ALWAYS_INLINE
+		explicit FlashPointer(const T* address = 0) : address(address) {
 		}
 		
-		void
-		setBaudrate(uint16_t ubrr);
-		
-		virtual void
-		put(char c);
-		
-		virtual void
-		put(const char* str) {
-			IODevice::put(str);
+		template <typename U>
+		ALWAYS_INLINE
+		explicit FlashPointer(const FlashPointer<U>& rhs)
+		: address((T*)rhs.address) {
 		}
 		
-		virtual void
-		flush() {}
+		ALWAYS_INLINE
+		const T
+		operator *() const {
+			return FlashReader<T, sizeof(T)>::read(address);
+		}
 		
-		virtual bool
-		get(char& c);
+		ALWAYS_INLINE
+		const T
+		operator [](size_t index) const {
+			return FlashReader<T, sizeof(T)>::read(address + index);
+		}
+		
+		ALWAYS_INLINE
+		FlashPointer&
+		operator++()
+		{
+			*this += 1;
+			return *this;
+		}
+
+		ALWAYS_INLINE
+		FlashPointer
+		operator++(int)
+		{
+			FlashPointer ret = *this;
+			++*this;
+			return ret;
+		}
+
+		ALWAYS_INLINE
+		FlashPointer&
+		operator--()
+		{
+			*this -= 1;
+			return *this;
+		}
+
+		ALWAYS_INLINE
+		FlashPointer&
+		operator--(int)
+		{
+			FlashPointer ret = *this;
+			--*this;
+			return ret;
+		}
+		
+		ALWAYS_INLINE
+		FlashPointer&
+		operator+=(size_t rhs)
+		{
+			address += rhs;
+			return *this;
+		}
+		
+		ALWAYS_INLINE
+		FlashPointer&
+		operator-=(size_t rhs)
+		{
+			address -= rhs;
+			return *this;
+		}
+		
+		ALWAYS_INLINE
+		const T*
+		getPointer() const {
+			return address;
+		}
 	
 	private:
-		Uart() {
-			setBaudrate(UART_BAUD_SELECT(115200UL, 8000000UL));
-		};
-		
-		Uart(const Uart&);
-		
-		Uart&
-		operator =(const Uart &);
+		const T* address;
 	};
+	
+	template<typename T>
+	ALWAYS_INLINE
+	FlashPointer<T>
+	Flash(const T* ptr)
+	{
+		return FlashPointer<T>(ptr);
+	}
 }
 
-#endif // XPCC__UART_HPP
+#endif	// XPCC__FLASH_HPP

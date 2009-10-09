@@ -3,8 +3,8 @@
 #include <avr/interrupt.h>
 #include <util/atomic.h>
 
-#include "../../utils/atomic/queue.hpp"
-#include "../../utils/atomic/lock.hpp"
+#include "../../hal/atomic/queue.hpp"
+#include "../../hal/atomic/lock.hpp"
 
 #include "uart_defs.h"
 #include "uart.hpp"

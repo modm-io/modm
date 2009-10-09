@@ -11,7 +11,6 @@ int main(void)
 	PORTB |= (1 << PB0);
 	
 	xpcc::Uart& uart = xpcc::Uart::instance();
-	//xpcc::Uart uart;
 	
 	sei();
 	

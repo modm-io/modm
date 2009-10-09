@@ -43,13 +43,20 @@ namespace xpcc
 		 * 
 		 * Typical usage:
 		 * \code
+		 * function()
 		 * {
-		 *     atomic::Lock lock;
+		 *     // some code with interrupts enabled
 		 *     
-		 *     // code which should be executed with disabled interrupts.
-		 *
-		 *     // with the end of this block the lock object is destroyed and
-		 *     // the interrupts are reenabled.
+		 *     {
+		 *         atomic::Lock lock;
+		 *         
+		 *         // code which should be executed with disabled interrupts.
+		 *         
+		 *         // with the end of this block the lock object is destroyed
+		 *         // and the interrupts are reenabled.
+		 *     }
+		 *     
+		 *     // other code with interrupts enabled
 		 * }
 		 * \endcode
 		 * 

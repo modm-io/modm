@@ -30,39 +30,17 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__SCHEDULER_HPP
-#define XPCC__SCHEDULER_HPP
+#ifndef	XPCC__POSITION_HPP
+#define	XPCC__POSITION_HPP
 
 #include <stdint.h>
 
+#include "cartesian_coordinate.hpp"
+
 namespace xpcc
 {
-	class Event
-	{
-	public:
-		virtual void
-		run() = 0;
-	};
-	
-	class Scheduler
-	{
-	public:
-		typedef uint8_t Priority;
-		typedef int8_t EventId;
-	
-	public:
-		void
-		update();
-		
-		EventId
-		addUniqueEvent(Event& event, uint16_t delay, Priority priority);
-		
-		EventId
-		addPeriodicEvent(Event& event, uint16_t period, Priority priority);
-		
-		bool
-		removeEvent(EventId identifier);
-	};
+	typedef CartesianCoordinate<int16_t> Position;
+	typedef PolarCoordinate<int16_t> PositionPolar;
 }
 
-#endif // XPCC__SCHEDULER_HPP
+#endif	// XPCC__POSITION_HPP

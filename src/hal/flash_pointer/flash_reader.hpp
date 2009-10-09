@@ -30,39 +30,36 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__SCHEDULER_HPP
-#define XPCC__SCHEDULER_HPP
+#ifndef	XPCC__FLASH_READER_HPP
+#define	XPCC__FLASH_READER_HPP
 
-#include <stdint.h>
+#ifdef	__AVR__
+
+	#include "flash_reader_avr.hpp"
+
+#else
+
+#include "../../utils/misc.hpp"
+
+#define	FLASH(var)		const var
+#define	FLASH_STRING(s)	const char s[]
 
 namespace xpcc
 {
-	class Event
+	template<typename T, size_t size>
+	struct FlashReader
 	{
-	public:
-		virtual void
-		run() = 0;
-	};
-	
-	class Scheduler
-	{
-	public:
-		typedef uint8_t Priority;
-		typedef int8_t EventId;
-	
-	public:
-		void
-		update();
-		
-		EventId
-		addUniqueEvent(Event& event, uint16_t delay, Priority priority);
-		
-		EventId
-		addPeriodicEvent(Event& event, uint16_t period, Priority priority);
-		
-		bool
-		removeEvent(EventId identifier);
+		ALWAYS_INLINE
+		static T
+		read(const void* p)
+		{
+			T retval;
+			memcpy(reinterpret_cast<void *>(&retval), p, size);
+			return retval;
+		}
 	};
 }
 
-#endif // XPCC__SCHEDULER_HPP
+#endif	// __AVR__
+
+#endif	// XPCC__FLASH_READER_HPP

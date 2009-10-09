@@ -30,39 +30,59 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__SCHEDULER_HPP
-#define XPCC__SCHEDULER_HPP
+#ifndef	XPCC__POLAR_COORDINATE_HPP
+#define	XPCC__POLAR_COORDINATE_HPP
 
-#include <stdint.h>
+#include <math.h>
+
+#include "angle.hpp"
+#include "cartesian_coordinate.hpp"
 
 namespace xpcc
 {
-	class Event
+	// forward declaration, needed because of circular reference 
+	// with class CartesianCoordinate
+	template<typename T>
+	class CartesianCoordinate;
+
+	/**
+	 * \brief	Polar coordinates
+	 * 
+	 */
+	template<typename T>
+	class PolarCoordinate
 	{
 	public:
-		virtual void
-		run() = 0;
-	};
-	
-	class Scheduler
-	{
-	public:
-		typedef uint8_t Priority;
-		typedef int8_t EventId;
-	
-	public:
+		PolarCoordinate(T r=0, Angle& theta=Angle(0.0));
+		
+		/// \brief	Calculate length
+		T
+		getLength() const;
+		
+		/// \brief	Calculate absolute angle
+		Angle&
+		getAngle() const;
+		
+		/// \brief	Normalize length to 1
 		void
-		update();
+		normalize();
 		
-		EventId
-		addUniqueEvent(Event& event, uint16_t delay, Priority priority);
+		void
+		scale(float a);
 		
-		EventId
-		addPeriodicEvent(Event& event, uint16_t period, Priority priority);
+		/// \brief	Transform to cartesian coordinate system
+		CartesianCoordinate<T>
+		toCartesian();
 		
-		bool
-		removeEvent(EventId identifier);
+		operator CartesianCoordinate<T>() {
+			return this->cartesian();
+		}
+		
+		T r;			//!< radius
+		Angle theta;	//!< azimuth
 	};
 }
 
-#endif // XPCC__SCHEDULER_HPP
+#include "polar_coordinate_impl.hpp"
+
+#endif	// XPCC__POLAR_COORDINATE_HPP
