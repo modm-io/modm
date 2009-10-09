@@ -5,7 +5,6 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -30,31 +29,53 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__PIN_HPP
-#define XPCC__PIN_HPP
+#ifndef	XPCC_ATOMIC__QUEUE_HPP
+#define	XPCC_ATOMIC__QUEUE_HPP
 
-#include <avr/io.h>
+#include <stdint.h>
 
-#define	CREATE_TYPE_IO_PIN(name, port, pin) \
-	struct name { \
-		name() { this->setInput() } \
-		inline void setOutput() { DDR ## port |= (1 << pin); } \
-		inline void setInput() { DDR ## port &= ~(1 << pin); } \
-		inline void set() { PORT ## port |= (1 << pin); } \
-		inline void reset() { PORT ## port &= ~(1 << pin); } \
-		inline bool get() { return (PIN ## port & (1 << pin)); } \
+namespace xpcc
+{
+	namespace atomic
+	{
+		//! \brief	Interrupt save queue
+		//!
+		//! A maximum size of 255 is allowed
+		//!
+		template<typename T,
+				 int N>
+		class Queue
+		{
+		public:
+			Queue();
+			
+			bool
+			isFull();
+			
+			bool
+			isEmpty();
+			
+			uint8_t
+			getMaxSize();
+			
+			const T&
+			get() const;
+			
+			bool
+			push(const T& value);
+			
+			void
+			pop();
+	
+		private:
+			uint8_t head;
+			uint8_t tail;
+			
+			T buffer[N];
+		};
 	}
+}
 
-#define	CREATE_TYPE_OUTPUT_PIN(name, port, pin) \
-	struct name { \
-		name() { DDR ## port |= (1 << pin); } \
-		inline void set() { PORT ## port |= (1 << pin); } \
-		inline void reset() { PORT ## port &= ~(1 << pin); } \
-	}
-#define CREATE_TYPE_INPUT_PIN(name, port, pin) \
-	struct name { \
-		name() { DDR ## port &= ~(1 << pin); } \
-		inline bool get() { return (PIN ## port & (1 << pin)); } \
-	}
+#include "queue_impl.hpp"
 
-#endif // XPCC__PIN_HPP
+#endif	// XPCC_ATOMIC__QUEUE_HPP

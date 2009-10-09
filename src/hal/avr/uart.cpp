@@ -2,12 +2,12 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 
-#include "../../data_structure/isr_queue.hpp"
+#include "../../utils/atomic/queue.hpp"
 
 #include "uart_defs.h"
 #include "uart.hpp"
 
-static xpcc::IsrQueue<char, UART_RX_BUFFER_SIZE> rxBuffer;
+static xpcc::atomic::Queue<char, UART_RX_BUFFER_SIZE> rxBuffer;
 
 // ----------------------------------------------------------------------------
 // called when the UART has received a character
@@ -36,7 +36,7 @@ ISR(UART0_RECEIVE_INTERRUPT)
 
 // ----------------------------------------------------------------------------
 void
-xpcc::Uart::initialize(uint16_t baudrate)
+xpcc::Uart::setBaudrate(uint16_t baudrate)
 {
 	
 #if defined( AT90_UART )

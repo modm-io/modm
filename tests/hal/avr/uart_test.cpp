@@ -10,12 +10,12 @@ int main(void)
 	DDRB = (1 << PB0) | (1 << PB1);
 	PORTB |= (1 << PB0);
 	
-	//xpcc::Uart& uart = xpcc::Uart::instance();
-	xpcc::Uart uart;
+	xpcc::Uart& uart = xpcc::Uart::instance();
+	//xpcc::Uart uart;
 	
 	sei();
 	
-	uart.initialize(UART_BAUD_SELECT(9600UL, F_CPU));
+	uart.setBaudrate(UART_BAUD_SELECT(9600UL, F_CPU));
 	uart.put('a');
 	uart.put('\n');
 	uart.put("Hallo Welt!\n");

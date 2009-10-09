@@ -1,4 +1,3 @@
-
 // coding: utf-8
 // ----------------------------------------------------------------------------
 /* Copyright (c) 2009, Roboterclub Aachen e.V.
@@ -6,6 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
+ *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -30,73 +30,34 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC_ISR_QUEUE_IMPL_HPP
-#define	XPCC_ISR_QUEUE_IMPL_HPP
+#ifndef XPCC_TIMEOUT_HPP
+#define XPCC_TIMEOUT_HPP
 
-#define VOLATILE(x)  (*(volatile uint8_t *) &(x))
+#include <stdint.h>
 
-template<typename T, int N>
-xpcc::IsrQueue<T, N>::IsrQueue() :
-	head(0), tail(0) {
+namespace xpcc
+{
+	// TODO: wie realisieren wir eine globale Zeitbasis?
+	class Timeout
+	{
+	public:
+		Timeout(uint16_t time);
+		
+		//! Check if the timeout time is reached.
+		bool
+		isExpired();
+		
+		//! Set a new timeout time.
+		void
+		reset(uint16_t time);
+		
+		// TODO
+		void
+		update();
+		
+	private:
+		uint16_t endtime;
+	};
 }
 
-template<typename T, int N>
-bool
-xpcc::IsrQueue<T, N>::isFull() {
-	uint8_t tmphead = VOLATILE(head) + 1;
-	if (tmphead >= N) {
-		tmphead = 0;
-	}
-	
-	if (tmphead == VOLATILE(tail)) {
-		return true;
-	}
-	return false;
-}
-
-template<typename T, int N>
-bool
-xpcc::IsrQueue<T, N>::isEmpty() {
-	return (VOLATILE(head) == VOLATILE(tail));
-}
-
-template<typename T, int N>
-uint8_t
-xpcc::IsrQueue<T, N>::getMaxSize() {
-	return N;
-}
-
-template<typename T, int N>
-const T&
-xpcc::IsrQueue<T, N>::get() const {
-	return buffer[tail];
-}
-
-template<typename T, int N>
-bool
-xpcc::IsrQueue<T, N>::push(const T& value) {
-	uint8_t tmphead = head + 1;
-	if (tmphead >= N) {
-		tmphead = 0;
-	}
-	if (tmphead == VOLATILE(tail)) {
-		return false;
-	}
-	else {
-		buffer[head] = value;
-		head = tmphead;
-		return true;
-	}
-}
-
-template<typename T, int N>
-void
-xpcc::IsrQueue<T, N>::pop() {
-	uint8_t tmptail = tail + 1;
-	if (tmptail >= N) {
-		tmptail = 0;
-	}
-	tail = tmptail;
-}
-
-#endif	// XPCC_ISR_QUEUE_IMPL_HPP
+#endif // XPCC_TIMEOUT_HPP

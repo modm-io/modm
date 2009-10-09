@@ -29,50 +29,75 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC_ISR_QUEUE_HPP
-#define	XPCC_ISR_QUEUE_HPP
+#ifndef	XPCC_ATOMIC__QUEUE_IMPL_HPP
+#define	XPCC_ATOMIC__QUEUE_IMPL_HPP
 
-#include <stdint.h>
+// TODO: This implementation should work but could be improved
 
-namespace xpcc
-{
-	//! \brief	Interrupt save queue
-	//!
-	//! A maximum size of 255 is allowed
-	//!
-	template<typename T,
-			 int N>
-	class IsrQueue
-	{
-	public:
-		IsrQueue();
-		
-		bool
-		isFull();
-		
-		bool
-		isEmpty();
-		
-		uint8_t
-		getMaxSize();
-		
-		const T&
-		get() const;
-		
-		bool
-		push(const T& value);
-		
-		void
-		pop();
+#define VOLATILE(x)  (*(volatile uint8_t *) &(x))
 
-	private:
-		volatile uint8_t head;
-		volatile uint8_t tail;
-		
-		T buffer[N];
-	};
+template<typename T, int N>
+xpcc::atomic::Queue<T, N>::Queue() :
+	head(0), tail(0) {
 }
 
-#include "isr_queue_impl.hpp"
+template<typename T, int N>
+bool
+xpcc::atomic::Queue<T, N>::isFull() {
+	uint8_t tmphead = VOLATILE(head) + 1;
+	if (tmphead >= N) {
+		tmphead = 0;
+	}
+	
+	if (tmphead == VOLATILE(tail)) {
+		return true;
+	}
+	return false;
+}
 
-#endif	// XPCC_ISR_QUEUE_HPP
+template<typename T, int N>
+bool
+xpcc::atomic::Queue<T, N>::isEmpty() {
+	return (VOLATILE(head) == VOLATILE(tail));
+}
+
+template<typename T, int N>
+uint8_t
+xpcc::atomic::Queue<T, N>::getMaxSize() {
+	return N;
+}
+
+template<typename T, int N>
+const T&
+xpcc::atomic::Queue<T, N>::get() const {
+	return buffer[tail];
+}
+
+template<typename T, int N>
+bool
+xpcc::atomic::Queue<T, N>::push(const T& value) {
+	uint8_t tmphead = head + 1;
+	if (tmphead >= N) {
+		tmphead = 0;
+	}
+	if (tmphead == VOLATILE(tail)) {
+		return false;
+	}
+	else {
+		buffer[head] = value;
+		head = tmphead;
+		return true;
+	}
+}
+
+template<typename T, int N>
+void
+xpcc::atomic::Queue<T, N>::pop() {
+	uint8_t tmptail = tail + 1;
+	if (tmptail >= N) {
+		tmptail = 0;
+	}
+	tail = tmptail;
+}
+
+#endif	// XPCC_ATOMIC__QUEUE_IMPL_HPP

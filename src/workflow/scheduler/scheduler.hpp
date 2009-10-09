@@ -5,7 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -30,31 +30,26 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__PIN_HPP
-#define XPCC__PIN_HPP
+#ifndef XPCC_SCHEDULER_HPP
+#define XPCC_SCHEDULER_HPP
 
-#include <avr/io.h>
+namespace xpcc
+{
+	class Scheduler
+	{
+	public:
+		
+		void
+		update();
+		
+		int8_t
+		addSingleshotEvent();
+		
+		int8_t
+		addPeriodicalEvent();
+		
+		removeEvent()
+	};
+}
 
-#define	CREATE_TYPE_IO_PIN(name, port, pin) \
-	struct name { \
-		name() { this->setInput() } \
-		inline void setOutput() { DDR ## port |= (1 << pin); } \
-		inline void setInput() { DDR ## port &= ~(1 << pin); } \
-		inline void set() { PORT ## port |= (1 << pin); } \
-		inline void reset() { PORT ## port &= ~(1 << pin); } \
-		inline bool get() { return (PIN ## port & (1 << pin)); } \
-	}
-
-#define	CREATE_TYPE_OUTPUT_PIN(name, port, pin) \
-	struct name { \
-		name() { DDR ## port |= (1 << pin); } \
-		inline void set() { PORT ## port |= (1 << pin); } \
-		inline void reset() { PORT ## port &= ~(1 << pin); } \
-	}
-#define CREATE_TYPE_INPUT_PIN(name, port, pin) \
-	struct name { \
-		name() { DDR ## port &= ~(1 << pin); } \
-		inline bool get() { return (PIN ## port & (1 << pin)); } \
-	}
-
-#endif // XPCC__PIN_HPP
+#endif // XPCC_SCHEDULER_HPP

@@ -5,7 +5,6 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -30,31 +29,55 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__PIN_HPP
-#define XPCC__PIN_HPP
+#ifndef	XPCC_ATOMIC__FLAG_HPP
+#define	XPCC_ATOMIC__FLAG_HPP
 
-#include <avr/io.h>
+#include "lock.hpp"
 
-#define	CREATE_TYPE_IO_PIN(name, port, pin) \
-	struct name { \
-		name() { this->setInput() } \
-		inline void setOutput() { DDR ## port |= (1 << pin); } \
-		inline void setInput() { DDR ## port &= ~(1 << pin); } \
-		inline void set() { PORT ## port |= (1 << pin); } \
-		inline void reset() { PORT ## port &= ~(1 << pin); } \
-		inline bool get() { return (PIN ## port & (1 << pin)); } \
+namespace xpcc
+{
+	namespace atomic
+	{
+		//! \brief	Flag to signal events between interrupts and the main-loop
+		//!
+		//! TODO: Beschreibung
+		class Flag
+		{
+		public:
+			Flag(bool state = false) : state(state) { }
+			
+			inline bool
+			isSet() {
+				return state;
+			}
+			
+			inline void
+			set() {
+				state = true;
+			}
+			
+			inline void
+			reset() {
+				state = false;
+			}
+			
+			inline bool
+			testAndSet(bool newState) {
+				Lock lock;
+				bool oldValue = state;
+				state = newState;
+				return oldValue;
+			}
+		
+		private:
+			Flag(const Flag&);			// TODO
+			
+			Flag&
+			operator=(const Flag&);		// TODO
+			
+			volatile bool state;
+		};
 	}
+}
 
-#define	CREATE_TYPE_OUTPUT_PIN(name, port, pin) \
-	struct name { \
-		name() { DDR ## port |= (1 << pin); } \
-		inline void set() { PORT ## port |= (1 << pin); } \
-		inline void reset() { PORT ## port &= ~(1 << pin); } \
-	}
-#define CREATE_TYPE_INPUT_PIN(name, port, pin) \
-	struct name { \
-		name() { DDR ## port &= ~(1 << pin); } \
-		inline bool get() { return (PIN ## port & (1 << pin)); } \
-	}
-
-#endif // XPCC__PIN_HPP
+#endif	// XPCC_ATOMIC__FLAG_HPP

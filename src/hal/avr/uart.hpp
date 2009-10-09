@@ -53,16 +53,14 @@ namespace xpcc
 	class Uart : public IODevice
 	{
 	public:
-		/*static Uart&
+		static Uart&
 		instance() {
 			static Uart uart;
 			return uart;
-		}*/
-		// TODO!
-		Uart() {};
+		}
 		
 		void
-		initialize(uint16_t baudrate);
+		setBaudrate(uint16_t baudrate);
 		
 		virtual void
 		put(char c);
@@ -73,23 +71,21 @@ namespace xpcc
 		}
 		
 		virtual void
-		flush() {
-			//this->put('\n');
-		}
+		flush() {}
 		
 		virtual bool
 		get(char& c);
 	
 	private:
-		//Uart() {};
+		Uart() {
+			setBaudrate(UART_BAUD_SELECT(115200UL, 8000000UL));
+		};
 		
 		Uart(const Uart&);
 		
 		Uart&
-		operator=(const Uart &);
+		operator =(const Uart &);
 	};
-	
-	//extern Uart uart;
 }
 
 #endif // XPCC_UART_HPP

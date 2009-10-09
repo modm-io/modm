@@ -3,12 +3,13 @@
 #include <avr/interrupt.h>
 #include <util/atomic.h>
 
-#include "../../data_structure/isr_queue.hpp"
+#include "../../utils/atomic/queue.hpp"
+#include "../../utils/atomic/lock.hpp"
 
 #include "uart_defs.h"
 #include "uart.hpp"
 
-static xpcc::IsrQueue<char, UART_TX_BUFFER_SIZE> txBuffer;
+static xpcc::atomic::Queue<char, UART_TX_BUFFER_SIZE> txBuffer;
 
 // ----------------------------------------------------------------------------
 // called when the UART is ready to transmit the next byte
@@ -35,8 +36,8 @@ xpcc::Uart::put(char c)
 		// wait for a free slot in the buffer
 	}
 	
-	ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
-		// enable UDRE interrupt
-		UART0_CONTROL |= (1 << UART0_UDRIE);
-	}
+	atomic::Lock lock;
+	
+	// enable UDRE interrupt
+	UART0_CONTROL |= (1 << UART0_UDRIE);
 }

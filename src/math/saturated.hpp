@@ -12,7 +12,7 @@
 #ifndef	SATURATED_H
 #define	SATURATED_H
 
-#include "arithmetic_traits.hpp"
+#include "../utils/arithmetic_traits.hpp"
 
 // see http://www.mikrocontroller.net/articles/AVR_Arithmetik/Saturierung
 template<typename T>

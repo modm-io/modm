@@ -5,7 +5,6 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -30,31 +29,12 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__PIN_HPP
-#define XPCC__PIN_HPP
+#ifndef	XPCC__ATOMIC_HPP
+#define	XPCC__ATOMIC_HPP
 
-#include <avr/io.h>
+#include "atomic/lock.hpp"
+#include "atomic/flag.hpp"
+#include "atomic/container.hpp"
+#include "atomic/queue.hpp"
 
-#define	CREATE_TYPE_IO_PIN(name, port, pin) \
-	struct name { \
-		name() { this->setInput() } \
-		inline void setOutput() { DDR ## port |= (1 << pin); } \
-		inline void setInput() { DDR ## port &= ~(1 << pin); } \
-		inline void set() { PORT ## port |= (1 << pin); } \
-		inline void reset() { PORT ## port &= ~(1 << pin); } \
-		inline bool get() { return (PIN ## port & (1 << pin)); } \
-	}
-
-#define	CREATE_TYPE_OUTPUT_PIN(name, port, pin) \
-	struct name { \
-		name() { DDR ## port |= (1 << pin); } \
-		inline void set() { PORT ## port |= (1 << pin); } \
-		inline void reset() { PORT ## port &= ~(1 << pin); } \
-	}
-#define CREATE_TYPE_INPUT_PIN(name, port, pin) \
-	struct name { \
-		name() { DDR ## port &= ~(1 << pin); } \
-		inline bool get() { return (PIN ## port & (1 << pin)); } \
-	}
-
-#endif // XPCC__PIN_HPP
+#endif	// XPCC__ATOMIC_HPP

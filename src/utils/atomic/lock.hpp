@@ -5,7 +5,6 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -30,31 +29,63 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__PIN_HPP
-#define XPCC__PIN_HPP
+#ifndef	XPCC_ATOMIC__LOCK_HPP
+#define	XPCC_ATOMIC__LOCK_HPP
 
-#include <avr/io.h>
+#include <stdint.h>
 
-#define	CREATE_TYPE_IO_PIN(name, port, pin) \
-	struct name { \
-		name() { this->setInput() } \
-		inline void setOutput() { DDR ## port |= (1 << pin); } \
-		inline void setInput() { DDR ## port &= ~(1 << pin); } \
-		inline void set() { PORT ## port |= (1 << pin); } \
-		inline void reset() { PORT ## port &= ~(1 << pin); } \
-		inline bool get() { return (PIN ## port & (1 << pin)); } \
+namespace xpcc
+{
+	namespace atomic
+	{
+		/**
+		 * \brief	Critical section
+		 * 
+		 * Typical usage:
+		 * \code
+		 * {
+		 *     atomic::Lock lock;
+		 *     
+		 *     // code which should be executed with disabled interrupts.
+		 *
+		 *     // with the end of this block the lock object is destroyed and
+		 *     // the interrupts are reenabled.
+		 * }
+		 * \endcode
+		 * 
+		 * \warning	Interrupts should be disabled the shortest possible time!
+		 */
+		class Lock
+		{
+		public:
+			Lock();
+			~Lock();
+
+		private:
+			uint8_t sreg;
+		}; 
 	}
+}
 
-#define	CREATE_TYPE_OUTPUT_PIN(name, port, pin) \
-	struct name { \
-		name() { DDR ## port |= (1 << pin); } \
-		inline void set() { PORT ## port |= (1 << pin); } \
-		inline void reset() { PORT ## port &= ~(1 << pin); } \
-	}
-#define CREATE_TYPE_INPUT_PIN(name, port, pin) \
-	struct name { \
-		name() { DDR ## port &= ~(1 << pin); } \
-		inline bool get() { return (PIN ## port & (1 << pin)); } \
-	}
+#ifdef __AVR__
 
-#endif // XPCC__PIN_HPP
+#include <avr/interrupt.h>
+
+xpcc::atomic::Lock::Lock() :
+	sreg(SREG) {
+	cli();
+}
+
+xpcc::atomic::Lock::~Lock() {
+	SREG = sreg;
+}
+
+#else
+
+// TODO: usefull implementation for any non AVR targets
+xpcc::atomic::Lock::Lock() {}
+xpcc::atomic::Lock::~Lock() {}
+
+#endif
+
+#endif	// XPCC_ATOMIC__LOCK_HPP

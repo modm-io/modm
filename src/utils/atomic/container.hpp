@@ -5,7 +5,6 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -30,31 +29,80 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__PIN_HPP
-#define XPCC__PIN_HPP
+#ifndef	XPCC_ATOMIC__CONTAINER_HPP
+#define	XPCC_ATOMIC__CONTAINER_HPP
 
-#include <avr/io.h>
+#include "lock.hpp"
 
-#define	CREATE_TYPE_IO_PIN(name, port, pin) \
-	struct name { \
-		name() { this->setInput() } \
-		inline void setOutput() { DDR ## port |= (1 << pin); } \
-		inline void setInput() { DDR ## port &= ~(1 << pin); } \
-		inline void set() { PORT ## port |= (1 << pin); } \
-		inline void reset() { PORT ## port &= ~(1 << pin); } \
-		inline bool get() { return (PIN ## port & (1 << pin)); } \
+namespace xpcc
+{
+	namespace atomic
+	{
+		/**
+		 * \brief	Atomic access to objects
+		 * 
+		 * Example: 
+		 * \code
+		 * atomic::Containter<uint32_t> data;
+		 * 
+		 * // interrupt routine
+		 * ISR() {
+		 *     data.set(123);
+		 * }
+		 * 
+		 * function() {
+		 *     uint32_t localData = data.get();
+		 *     ...
+		 * }
+		 * \endcode
+		 * 
+		 * \warning	This class should be used with precaution because the
+		 * 			objects are copied for every access.
+		 */
+		template<typename T>
+		class Container
+		{
+		public:
+			Container() {}
+			
+			inline void
+			set(T value) {
+				Lock lock;
+				object = value;
+			}
+			
+			inline T
+			get() {
+				Lock lock;
+				return object;
+			}
+			
+			inline T
+			swap(T value) {
+				Lock lock;
+				T oldValue = object;
+				object = value;
+				return oldValue;
+			}
+			
+			//! \brief		Get direct access to the object
+			//!
+			//! \warning	If the object is access throu this function the
+			//!				operations are not atomic!
+			inline volatile T&
+			getObject() {
+				return object;
+			}
+		
+		private:
+			Container(const Container&);	// TODO
+			
+			Container&
+			operator=(const Container&);	// TODO
+			
+			volatile T object;
+		};
 	}
+}
 
-#define	CREATE_TYPE_OUTPUT_PIN(name, port, pin) \
-	struct name { \
-		name() { DDR ## port |= (1 << pin); } \
-		inline void set() { PORT ## port |= (1 << pin); } \
-		inline void reset() { PORT ## port &= ~(1 << pin); } \
-	}
-#define CREATE_TYPE_INPUT_PIN(name, port, pin) \
-	struct name { \
-		name() { DDR ## port &= ~(1 << pin); } \
-		inline bool get() { return (PIN ## port & (1 << pin)); } \
-	}
-
-#endif // XPCC__PIN_HPP
+#endif	// XPCC_ATOMIC__CONTAINER_HPP

@@ -25,18 +25,17 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: iostream.hpp 34 2009-09-19 11:34:11Z thundernail $
+ * $Id$
  */
 // ----------------------------------------------------------------------------
 
-
-#ifndef XPCC_ARITHMETIC_TRAITS_H
-#define XPCC_ARITHMETIC_TRAITS_H
+#ifndef XPCC__ARITHMETIC_TRAITS_HPP
+#define XPCC__ARITHMETIC_TRAITS_HPP
 
 #include <stdint.h>
 
-namespace xpcc {
-
+namespace xpcc
+{
 	/**
 	 * \defgroup	arithmetic_trais	Arithmetic Traits
 	 * \brief		Traits to give numbers more information then they have by
@@ -61,7 +60,7 @@ namespace xpcc {
 	 * 	T max = xpcc::ArithmeticTraits<T>::maxValue;
 	 * \endcode
 	 *
-	 * \version	$Id: arithmetic_traits.h 8106 2009-08-17 14:57:59Z fabian $
+	 * \version	$Id$
 	 * \author	Martin Rosekeit <martin.rosekeit@rwth-aachen.de>
 	 */
 	// -------------------------------------------------------------------------
@@ -211,4 +210,5 @@ namespace xpcc {
 	/*@}*/
 };
 
-#endif	// XPCC_ARITHMETIC_TRAITS_H
+#endif	// XPCC__ARITHMETIC_TRAITS_HPP
+
