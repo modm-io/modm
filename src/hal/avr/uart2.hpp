@@ -29,66 +29,41 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__UART_HPP
-#define XPCC__UART_HPP
+#ifndef XPCC__UART2_HPP
+#define XPCC__UART2_HPP
 
-#include <stdint.h>
-
-#include "../io/iodevice.hpp"
+#include "uart.hpp"
 
 namespace xpcc
 {
-	class Uart : public IODevice
+	class Uart2 : public Uart
 	{
 	public:
-		/// \brief	Set baud rate
-		///
-		/// If this function is called with a constant value as parameter,
-		/// all the calculation is done by the compiler, so no 32-bit
-		/// arithmetic is need at run-time!
-		///
-		/// \param	baudrate	desired baud rate
-		/// \param	u2x			enabled double speed mode
-		inline void
-		setBaudrate(uint32_t baudrate, bool u2x = false) {
-			uint16_t ubrr;
-			if (u2x) {
-				ubrr  = (F_CPU / (baudrate * 8l)) - 1;
-				ubrr |= 0x8000;
-			}
-			else {
-				ubrr = (F_CPU / (baudrate * 16l)) - 1;
-			}
-			setBaudrateRegister(ubrr);
+		static Uart2&
+		instance() {
+			static Uart2 uart;
+			return uart;
 		}
 		
 		virtual void
-		put(char c) = 0;
+		put(char c);
 		
-		using IODevice::put;
-		
-		virtual void
-		flush() {}
+		using Uart::put;
 		
 		virtual bool
-		get(char& c) = 0;
+		get(char& c);
 	
 	protected:
 		virtual void
-		setBaudrateRegister(uint16_t ubrr) = 0;
+		setBaudrateRegister(uint16_t ubrr);
 		
-		Uart() {};
+		Uart2() {};
 		
-		Uart(const Uart&);
+		Uart2(const Uart2&);
 		
-		Uart&
-		operator =(const Uart &);
+		Uart2&
+		operator =(const Uart2 &);
 	};
 }
 
-#include "uart0.hpp"
-#include "uart1.hpp"
-#include "uart2.hpp"
-#include "uart3.hpp"
-
-#endif // XPCC__UART_HPP
+#endif // XPCC__UART2_HPP

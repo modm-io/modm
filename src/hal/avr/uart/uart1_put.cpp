@@ -1,36 +1,39 @@
 
 #include <avr/io.h>
 #include <avr/interrupt.h>
-#include <util/atomic.h>
 
-#include "../../hal/atomic/queue.hpp"
-#include "../../hal/atomic/lock.hpp"
+#include "../../../hal/atomic/queue.hpp"
+#include "../../../hal/atomic/lock.hpp"
 
-#include "uart_defs.h"
-#include "uart.hpp"
+#include "uart_defines.h"
+#include "uart_defaults.h"
 
-static xpcc::atomic::Queue<char, UART_TX_BUFFER_SIZE> txBuffer;
+#include "../uart1.hpp"
+
+#ifdef ATMEGA_USART1
+
+static xpcc::atomic::Queue<char, UART1_TX_BUFFER_SIZE> txBuffer;
 
 // ----------------------------------------------------------------------------
 // called when the UART is ready to transmit the next byte
 //
-ISR(UART0_TRANSMIT_INTERRUPT)
+ISR(UART1_TRANSMIT_INTERRUPT)
 {
 	if (txBuffer.isEmpty())
 	{
 		// transmission finished, disable UDRE interrupt
-		UART0_CONTROL &= ~(1 << UART0_UDRIE);
+		UART1_CONTROL &= ~(1 << UART1_UDRIE);
 	}
 	else {
 		// get one byte from buffer and write it to UART (starts transmission)
-		UART0_DATA = txBuffer.get();
+		UART1_DATA = txBuffer.get();
 		txBuffer.pop();
 	}
 }
 
 // ----------------------------------------------------------------------------
 void
-xpcc::Uart::put(char c)
+xpcc::Uart1::put(char c)
 {
 	while (!txBuffer.push(c)) {
 		// wait for a free slot in the buffer
@@ -39,5 +42,7 @@ xpcc::Uart::put(char c)
 	atomic::Lock lock;
 	
 	// enable UDRE interrupt
-	UART0_CONTROL |= (1 << UART0_UDRIE);
+	UART1_CONTROL |= (1 << UART1_UDRIE);
 }
+
+#endif	// ATMEGA_USART1

@@ -1,0 +1,40 @@
+
+#ifndef	UART_DEFAULTS_H
+#define	UART_DEFAULTS_H
+
+#ifndef	UART0_TX_BUFFER_SIZE
+	#define	UART0_TX_BUFFER_SIZE	8
+#endif
+
+#ifndef	UART0_RX_BUFFER_SIZE
+	#define	UART0_RX_BUFFER_SIZE	4
+#endif
+
+
+#ifndef	UART1_TX_BUFFER_SIZE
+	#define	UART1_TX_BUFFER_SIZE	8
+#endif
+
+#ifndef	UART1_RX_BUFFER_SIZE
+	#define	UART1_RX_BUFFER_SIZE	4
+#endif
+
+
+#ifndef	UART2_TX_BUFFER_SIZE
+	#define	UART2_TX_BUFFER_SIZE	8
+#endif
+
+#ifndef	UART2_RX_BUFFER_SIZE
+	#define	UART2_RX_BUFFER_SIZE	4
+#endif
+
+
+#ifndef	UART3_TX_BUFFER_SIZE
+	#define	UART3_TX_BUFFER_SIZE	8
+#endif
+
+#ifndef	UART3_RX_BUFFER_SIZE
+	#define	UART3_RX_BUFFER_SIZE	4
+#endif
+
+#endif	// UART_DEFAULTS_H

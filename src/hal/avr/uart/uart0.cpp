@@ -2,12 +2,14 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 
-#include "../../hal/atomic/queue.hpp"
+#include "../../../hal/atomic/queue.hpp"
 
-#include "uart_defs.h"
-#include "uart.hpp"
+#include "uart_defines.h"
+#include "uart_defaults.h"
 
-static xpcc::atomic::Queue<char, UART_RX_BUFFER_SIZE> rxBuffer;
+#include "../uart0.hpp"
+
+static xpcc::atomic::Queue<char, UART0_RX_BUFFER_SIZE> rxBuffer;
 
 // ----------------------------------------------------------------------------
 // called when the UART has received a character
@@ -36,30 +38,28 @@ ISR(UART0_RECEIVE_INTERRUPT)
 
 // ----------------------------------------------------------------------------
 void
-xpcc::Uart::setBaudrate(uint16_t baudrate)
+xpcc::Uart0::setBaudrateRegister(uint16_t ubrr)
 {
-	
-#if defined( AT90_UART )
+#if defined(AT90_UART)
 	
 	// set baud rate
-	UBRR = (uint8_t) baudrate; 
-
+	UBRR = (uint8_t) ubrr; 
+	
 	// enable UART receiver and transmmitter and receive complete interrupt
 	UART0_CONTROL = (1 << RXCIE) | (1 << RXEN) | (1 << TXEN);
 	
-#elif defined (ATMEGA_USART)
+#elif defined(ATMEGA_USART)
 
 	// Set baudrate
-	if (baudrate & 0x8000)
-	{
+	if (ubrr & 0x8000) {
 		UART0_STATUS = (1 << U2X);	// Enable 2x speed 
-		baudrate &= ~0x8000;
+		ubrr &= ~0x8000;
 	}
 	else {
 		UART0_STATUS = 0;
 	}
-	UBRRH = (uint8_t) (baudrate >> 8);
-	UBRRL = (uint8_t)  baudrate;
+	UBRRH = (uint8_t) (ubrr >> 8);
+	UBRRL = (uint8_t)  ubrr;
 
 	// Enable USART receiver and transmitter and receive complete interrupt
 	UART0_CONTROL = (1 << RXCIE) | (1<<RXEN) | (1<<TXEN);
@@ -69,21 +69,20 @@ xpcc::Uart::setBaudrate(uint16_t baudrate)
 	UCSRC = (1 << URSEL) | (3 << UCSZ0);
 	#else
 	UCSRC = (3 << UCSZ0);
-	#endif 
+	#endif
 
-#elif defined (ATMEGA_USART0 )
+#elif defined(ATMEGA_USART0)
 
 	// Set baud rate
-	if (baudrate & 0x8000) 
-	{
+	if (ubrr & 0x8000) {
 		UART0_STATUS = (1 << U2X0);  //Enable 2x speed 
-		baudrate &= ~0x8000;
+		ubrr &= ~0x8000;
 	}
 	else {
 		UART0_STATUS = 0;
 	}
-	UBRR0H = (uint8_t) (baudrate >> 8);
-	UBRR0L = (uint8_t)  baudrate;
+	UBRR0H = (uint8_t) (ubrr >> 8);
+	UBRR0L = (uint8_t)  ubrr;
 
 	// Enable USART receiver and transmitter and receive complete interrupt
 	UART0_CONTROL = (1 << RXCIE0) | (1 << RXEN0) | (1 << TXEN0);
@@ -93,29 +92,30 @@ xpcc::Uart::setBaudrate(uint16_t baudrate)
 	UCSR0C = (1 << URSEL0) | (3 << UCSZ00);
 	#else
 	UCSR0C = (3 << UCSZ00);
-	#endif 
+	#endif
 
-#elif defined ( ATMEGA_UART )
+#elif defined(ATMEGA_UART)
+
 	// set baud rate
-	if (baudrate & 0x8000) 
-	{
+	if (ubrr & 0x8000) {
 		UART0_STATUS = (1 << U2X);  //Enable 2x speed 
-		baudrate &= ~0x8000;
+		ubrr &= ~0x8000;
 	}
 	else {
 		UART0_STATUS = 0;
 	}
-	UBRRHI = (uint8_t) (baudrate >> 8);
-	UBRR   = (uint8_t)  baudrate;
+	UBRRHI = (uint8_t) (ubrr >> 8);
+	UBRR   = (uint8_t)  ubrr;
 	
 	// Enable UART receiver and transmitter and receive complete interrupt
 	UART0_CONTROL = (1 << RXCIE) | (1 << RXEN) | (1 << TXEN);
+
 #endif
 }
 
 // ----------------------------------------------------------------------------
 bool
-xpcc::Uart::get(char& c)
+xpcc::Uart0::get(char& c)
 {
 	if (rxBuffer.isEmpty()) {
 		return false;

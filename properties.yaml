@@ -2,7 +2,7 @@
 target: avr
 
 avr:
-  device: atmega644
+  device: atmega2560
   clock: 14745600
   avrdude:
     programmer: stk500
@@ -23,9 +23,10 @@ library:
             INT: B,3
   hal:
     avr:
-      defines:
-        UART_RX_BUFFER_SIZE: 8
-        UART_TX_BUFFER_SIZE: 32
+      uart:
+        defines:
+          UART0_RX_BUFFER_SIZE: 8
+          UART0_TX_BUFFER_SIZE: 32
 
 tests:
   include: no
