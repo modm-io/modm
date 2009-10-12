@@ -30,32 +30,64 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_TIMEOUT_HPP
-#define XPCC_TIMEOUT_HPP
+#ifndef	XPCC__FLASH_READER_HPP
 
-#include "../../../src/hal/time/local_time.hpp"
+#error	"Don't include this file directly, use \"flash_reader.hpp\" instead!"
+
+#else
+
+#include <avr/pgmspace.h>
+
+#define	FLASH(var)		extern const var PROGMEM; const var
+#define	FLASH_STRING(s)	extern const char s[] PROGMEM; const char s[]
 
 namespace xpcc
 {
-	class Timeout
+	template<typename T, size_t size>
+	struct FlashReader
 	{
-	public:
-		Timeout(LocalTime::Time time);
-		
-		//! Check if the timeout time is reached.
-		bool
-		isExpired();
-		
-		//! Set a new timeout time.
-		void
-		reset(LocalTime::Time time);
-		
-		void
-		update();
-		
-	private:
-		LocalTime::Time endtime;
+		ALWAYS_INLINE
+		static T
+		read(const void* p)
+		{
+			T retval;
+			memcpy_P(reinterpret_cast<void *>(&retval), p, size);
+			return retval;
+		}
+	};
+	
+	template<typename T>
+	struct FlashReader<T, 1>
+	{
+		ALWAYS_INLINE
+		static T
+		read(const void* p)
+		{
+			return T(pgm_read_byte(p));
+		}
+	};
+	
+	template<typename T>
+	struct FlashReader<T, 2>
+	{
+		ALWAYS_INLINE
+		static T
+		read(const void* p)
+		{
+			return T(pgm_read_word(p));
+		}
+	};
+	
+	template<typename T>
+	struct FlashReader<T, 4>
+	{
+		ALWAYS_INLINE
+		static T
+		read(const void* p)
+		{
+			return T(pgm_read_dword(p));
+		}
 	};
 }
 
-#endif // XPCC_TIMEOUT_HPP
+#endif	// XPCC__FLASH_READER_HPP

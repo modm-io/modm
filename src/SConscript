@@ -8,7 +8,10 @@ Import('sourceFiles')
 # build a object file form each source file
 objects = []
 for file in sourceFiles:
-	object = env.Object(file.name, CPPDEFINES=file.defines)
+	defines = env.get('CPPDEFINES', {})
+	defines.update(file.defines)
+	
+	object = env.Object(file.name, CPPDEFINES=defines)
 	objects.append(object)
 
 # link them all together to create the library

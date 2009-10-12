@@ -5,7 +5,6 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -30,119 +29,94 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC__FLASH_HPP
-#define	XPCC__FLASH_HPP
+#ifndef	XPCC__LOCAL_TIME_HPP
+#define	XPCC__LOCAL_TIME_HPP
 
-#include "../utils/misc.hpp"
-#include "flash_pointer/flash_reader.hpp"
+#include <stdint.h>
 
 namespace xpcc
 {
-	/**
-	 * \brief	Pointer to flash memory
-	 * 
-	 * This tepmplate can mostly be used like a regular pointer, but operates
-	 * on flash memory. It will automatically read the data from flash when
-	 * dereferenced.
-	 * 
-	 * Based on a implementation of Rolf Magnus, see
-	 * http://www.mikrocontroller.net/topic/78610#656695
-	 * 
-	 * \author	Fabian Greif <fabian.greif@rwth-aachen.de>
-	 */
-	template<typename T>
-	class FlashPointer
+	class LocalTime
 	{
 	public:
-		ALWAYS_INLINE
-		explicit FlashPointer(const T* address = 0) : address(address) {
+		typedef uint16_t Time;
+		
+		static LocalTime
+		getTime();
+		
+	public:
+		LocalTime(const Time time = 0) : 
+			time(time) {
 		}
 		
-		template <typename U>
-		ALWAYS_INLINE
-		explicit FlashPointer(const FlashPointer<U>& rhs)
-		: address((T*)rhs.address) {
-		}
+		inline LocalTime
+		operator + (const LocalTime& other);
 		
-		ALWAYS_INLINE
-		const T
-		operator *() const {
-			return FlashReader<T, sizeof(T)>::read(address);
-		}
+		// TODO return type?
+		//inline LocalTime
+		//operator - (const LocalTime& other);
 		
-		ALWAYS_INLINE
-		const T
-		operator [](size_t index) const {
-			return FlashReader<T, sizeof(T)>::read(address + index);
-		}
 		
-		ALWAYS_INLINE
-		FlashPointer&
-		operator++()
-		{
-			*this += 1;
-			return *this;
-		}
-
-		ALWAYS_INLINE
-		FlashPointer
-		operator++(int)
-		{
-			FlashPointer ret = *this;
-			++*this;
-			return ret;
-		}
-
-		ALWAYS_INLINE
-		FlashPointer&
-		operator--()
-		{
-			*this -= 1;
-			return *this;
-		}
-
-		ALWAYS_INLINE
-		FlashPointer&
-		operator--(int)
-		{
-			FlashPointer ret = *this;
-			--*this;
-			return ret;
-		}
+		inline bool
+		operator == (const LocalTime& other);
 		
-		ALWAYS_INLINE
-		FlashPointer&
-		operator+=(size_t rhs)
-		{
-			address += rhs;
-			return *this;
-		}
+		inline bool
+		operator != (const LocalTime& other);
 		
-		ALWAYS_INLINE
-		FlashPointer&
-		operator-=(size_t rhs)
-		{
-			address -= rhs;
-			return *this;
-		}
+		inline bool
+		operator < (const LocalTime& other);
 		
-		ALWAYS_INLINE
-		const T*
-		getPointer() const {
-			return address;
-		}
+		inline bool
+		operator > (const LocalTime& other);
+		
+		inline bool
+		operator <= (const LocalTime& other);
+		
+		inline bool
+		operator >= (const LocalTime& other);
+		
 	
 	private:
-		const T* address;
+		Time time;
 	};
-	
-	template<typename T>
-	ALWAYS_INLINE
-	FlashPointer<T>
-	Flash(const T* ptr)
-	{
-		return FlashPointer<T>(ptr);
-	}
 }
 
-#endif	// XPCC__FLASH_HPP
+// ----------------------------------------------------------------------------
+inline xpcc::LocalTime
+xpcc::LocalTime::operator + (const LocalTime& other) {
+	return LocalTime(time + other.time);
+}
+
+
+// ----------------------------------------------------------------------------
+inline bool
+xpcc::LocalTime::operator == (const LocalTime& other) {
+	return (time == other.time);
+}
+
+inline bool
+xpcc::LocalTime::operator != (const LocalTime& other) {
+	return (time != other.time);
+}
+
+inline bool
+xpcc::LocalTime::operator < (const LocalTime& other) {
+	return ((int16_t) (time - other.time)) < 0;
+}
+
+inline bool
+xpcc::LocalTime::operator > (const LocalTime& other) {
+	return ((int16_t) (time - other.time)) > 0;
+}
+
+inline bool
+xpcc::LocalTime::operator <= (const LocalTime& other) {
+	return ((int16_t) (time - other.time)) <= 0;
+}
+
+inline bool
+xpcc::LocalTime::operator >= (const LocalTime& other) {
+	return ((int16_t) (time - other.time)) >= 0;
+}
+
+#endif	// XPCC__LOCAL_TIME_HPP

@@ -5,7 +5,6 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -30,32 +29,20 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_TIMEOUT_HPP
-#define XPCC_TIMEOUT_HPP
+#include "../../../hal/atomic/lock.hpp"
 
-#include "../../../src/hal/time/local_time.hpp"
+#include "../local_time.hpp"
 
-namespace xpcc
+extern xpcc::LocalTime::Time xpcc__local_time;
+
+xpcc::LocalTime
+xpcc::LocalTime::getTime()
 {
-	class Timeout
+	Time tempTime;
 	{
-	public:
-		Timeout(LocalTime::Time time);
-		
-		//! Check if the timeout time is reached.
-		bool
-		isExpired();
-		
-		//! Set a new timeout time.
-		void
-		reset(LocalTime::Time time);
-		
-		void
-		update();
-		
-	private:
-		LocalTime::Time endtime;
-	};
+		atomic::Lock lock;
+		tempTime = xpcc__local_time;
+	}
+	
+	return LocalTime(tempTime);
 }
-
-#endif // XPCC_TIMEOUT_HPP

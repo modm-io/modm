@@ -5,7 +5,6 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -30,32 +29,22 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_TIMEOUT_HPP
-#define XPCC_TIMEOUT_HPP
+#include "../local_time.hpp"
 
-#include "../../../src/hal/time/local_time.hpp"
-
-namespace xpcc
+xpcc::LocalTime
+xpcc::LocalTime::getTime()
 {
-	class Timeout
-	{
-	public:
-		Timeout(LocalTime::Time time);
-		
-		//! Check if the timeout time is reached.
-		bool
-		isExpired();
-		
-		//! Set a new timeout time.
-		void
-		reset(LocalTime::Time time);
-		
-		void
-		update();
-		
-	private:
-		LocalTime::Time endtime;
-	};
+	
+	return LocalTime();
 }
 
-#endif // XPCC_TIMEOUT_HPP
+// see http://stackoverflow.com/questions/588307/c-obtaining-milliseconds-time-on-linux-clock-doesnt-seem-to-work-properly
+// see http://stackoverflow.com/questions/275004/c-timer-function-to-provide-time-in-nano-seconds/275231#275231
+/*#include <sys/time.h>
+
+int main()
+{
+   timespec ts;
+   // clock_gettime(CLOCK_MONOTONIC, &ts); // Works on FreeBSD
+   clock_gettime(CLOCK_REALTIME, &ts); // Works on Linux
+}*/

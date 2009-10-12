@@ -41,8 +41,8 @@ main()
 	std::cout << "XPCC Logger Test" << std::endl;
 
 	xpcc::log::setDevice( device );
-	xpcc::log::setDevice( new xpcc::log::DeviceStd );
-	xpcc::log::setDevice( device );
+	//xpcc::log::setDevice( new xpcc::log::DeviceStd );
+	//xpcc::log::setDevice( device );
 
 	xpcc::log::setFilter(xpcc::log::WARNING);
 

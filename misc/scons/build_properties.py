@@ -70,7 +70,6 @@ class DirectoryProperties:
 	
 	def createFileProperties(self, filename):
 		defines  = self.localProperties.get('defines', {})
-		defines.update({'F_CPU': self.globalProperties.avr.clock})
 		return FileProperties(filename, defines)
 	
 	def shouldBeBuild(self):

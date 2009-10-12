@@ -30,61 +30,119 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC__FLASH_READER_AVR_HPP
-#define	XPCC__FLASH_READER_AVR_HPP
+#ifndef	XPCC__FLASH_HPP
+#define	XPCC__FLASH_HPP
 
-#include <avr/pgmspace.h>
-
-#define	FLASH(var)		extern const var PROGMEM; const var
-#define	FLASH_STRING(s)	extern const char s[] PROGMEM; const char s[]
+#include "../../utils/misc.hpp"
+#include "flash_reader.hpp"
 
 namespace xpcc
 {
-	template<typename T, size_t size>
-	struct FlashReader
+	/**
+	 * \brief	Pointer to flash memory
+	 * 
+	 * This tepmplate can mostly be used like a regular pointer, but operates
+	 * on flash memory. It will automatically read the data from flash when
+	 * dereferenced.
+	 * 
+	 * Based on a implementation of Rolf Magnus, see
+	 * http://www.mikrocontroller.net/topic/78610#656695
+	 * 
+	 * \author	Fabian Greif <fabian.greif@rwth-aachen.de>
+	 */
+	template<typename T>
+	class FlashPointer
 	{
+	public:
 		ALWAYS_INLINE
-		static T
-		read(const void* p)
-		{
-			T retval;
-			memcpy_P(reinterpret_cast<void *>(&retval), p, size);
-			return retval;
+		explicit FlashPointer(const T* address = 0) : address(address) {
 		}
+		
+		template <typename U>
+		ALWAYS_INLINE
+		explicit FlashPointer(const FlashPointer<U>& rhs)
+		: address((T*)rhs.address) {
+		}
+		
+		ALWAYS_INLINE
+		const T
+		operator *() const {
+			return FlashReader<T, sizeof(T)>::read(address);
+		}
+		
+		ALWAYS_INLINE
+		const T
+		operator [](size_t index) const {
+			return FlashReader<T, sizeof(T)>::read(address + index);
+		}
+		
+		ALWAYS_INLINE
+		FlashPointer&
+		operator++()
+		{
+			*this += 1;
+			return *this;
+		}
+
+		ALWAYS_INLINE
+		FlashPointer
+		operator++(int)
+		{
+			FlashPointer ret = *this;
+			++*this;
+			return ret;
+		}
+
+		ALWAYS_INLINE
+		FlashPointer&
+		operator--()
+		{
+			*this -= 1;
+			return *this;
+		}
+
+		ALWAYS_INLINE
+		FlashPointer&
+		operator--(int)
+		{
+			FlashPointer ret = *this;
+			--*this;
+			return ret;
+		}
+		
+		ALWAYS_INLINE
+		FlashPointer&
+		operator+=(size_t rhs)
+		{
+			address += rhs;
+			return *this;
+		}
+		
+		ALWAYS_INLINE
+		FlashPointer&
+		operator-=(size_t rhs)
+		{
+			address -= rhs;
+			return *this;
+		}
+		
+		ALWAYS_INLINE
+		const T*
+		getPointer() const {
+			return address;
+		}
+	
+	private:
+		const T* address;
 	};
 	
 	template<typename T>
-	struct FlashReader<T, 1>
+	ALWAYS_INLINE
+	FlashPointer<T>
+	Flash(const T* ptr)
 	{
-		ALWAYS_INLINE
-		static T
-		read(const void* p)
-		{
-			return T(pgm_read_byte(p));
-		}
-	};
-	
-	template<typename T>
-	struct FlashReader<T, 2>
-	{
-		ALWAYS_INLINE
-		static T
-		read(const void* p)
-		{
-			return T(pgm_read_word(p));
-		}
-	};
-	
-	template<typename T>
-	struct FlashReader<T, 4>
-	{
-		ALWAYS_INLINE
-		static T
-		read(const void* p)
-		{
-			return T(pgm_read_dword(p));
-		}
-	};
+		return FlashPointer<T>(ptr);
+	}
 }
 
-#endif	// XPCC__FLASH_READER_AVR_HPP
+#endif	// XPCC__FLASH_HPP

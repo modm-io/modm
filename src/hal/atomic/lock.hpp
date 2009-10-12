@@ -67,6 +67,22 @@ namespace xpcc
 		public:
 			Lock();
 			~Lock();
+			
+			/// \brief	Reenable interrupts
+			///
+			/// \warning	Don't use this function without a very good reason!
+			void
+			reenableInterrupts();
+			
+			/// \brief	Disable interrupts
+			///
+			/// Could be used together with reenableInterrupts() to create a
+			/// nested block with interrupts enabled inside a block with
+			/// interrupts disabled.
+			///
+			/// \warning	Don't use this function without a very good reason!
+			void
+			disableInterrupts();
 
 		private:
 			uint8_t sreg;
@@ -79,19 +95,41 @@ namespace xpcc
 #include <avr/interrupt.h>
 
 xpcc::atomic::Lock::Lock() :
-	sreg(SREG) {
+	sreg(SREG)
+{
 	cli();
 }
 
-xpcc::atomic::Lock::~Lock() {
+xpcc::atomic::Lock::~Lock()
+{
 	SREG = sreg;
+	__asm__ volatile ("" ::: "memory");
+}
+
+void
+xpcc::atomic::Lock::reenableInterrupts()
+{
+	sei();
+	__asm__ volatile ("" ::: "memory");		// TODO needed here?
+}
+
+void
+xpcc::atomic::Lock::disableInterrupts()
+{
+	cli();
+	__asm__ volatile ("" ::: "memory");		// TODO needed here?
 }
 
 #else
 
 // TODO: usefull implementation for any non AVR targets
-xpcc::atomic::Lock::Lock() {}
-xpcc::atomic::Lock::~Lock() {}
+xpcc::atomic::Lock::Lock()
+{
+}
+
+xpcc::atomic::Lock::~Lock()
+{
+}
 
 #endif
 

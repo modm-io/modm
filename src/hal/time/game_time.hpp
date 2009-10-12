@@ -5,7 +5,6 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -30,32 +29,29 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_TIMEOUT_HPP
-#define XPCC_TIMEOUT_HPP
+#ifndef	XPCC__GAME_TIME_HPP
+#define	XPCC__GAME_TIME_HPP
 
-#include "../../../src/hal/time/local_time.hpp"
+#include <stdint.h>
 
 namespace xpcc
 {
-	class Timeout
+	// TODO interface
+	class GameTime
 	{
 	public:
-		Timeout(LocalTime::Time time);
+		typedef uint16_t Seconds;
+	
+	public:
+		static bool
+		isRunning();
 		
-		//! Check if the timeout time is reached.
-		bool
-		isExpired();
+		static Seconds
+		getTime();
 		
-		//! Set a new timeout time.
-		void
-		reset(LocalTime::Time time);
-		
-		void
-		update();
-		
-	private:
-		LocalTime::Time endtime;
+		static void
+		setTime(Seconds seconds);
 	};
 }
 
-#endif // XPCC_TIMEOUT_HPP
+#endif	// XPCC__GAME_TIME_HPP

@@ -1,5 +1,5 @@
 
-#include "../../../src/hal/flash_pointer.hpp"
+#include "../../../src/hal/flash/flash_pointer.hpp"
 
 //extern const int a PROGMEM;
 //const int a = 12;

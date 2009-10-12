@@ -40,8 +40,10 @@ int
 main()
 {
 	std::cout << "XPCC Logger Test" << std::endl;
-
-	xpcc::IOStream stream( new xpcc::StdIODevice() );
+	
+	xpcc::StdIODevice device;
+	xpcc::IOStream stream(device);
+	
 	stream << static_cast<uint8_t>(0xff) << static_cast<int16_t>(3) << xpcc::endl;
 	stream << 10 << xpcc::endl;
 	stream << 2.2 << xpcc::endl;
