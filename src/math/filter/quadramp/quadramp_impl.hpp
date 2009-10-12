@@ -30,66 +30,21 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__UART_HPP
-#define XPCC__UART_HPP
+#ifndef XPCC__QUADRAMP_IMPL_HPP
+#define XPCC__QUADRAMP_IMPL_HPP
 
-#include <stdint.h>
-
-#include "../io/iodevice.hpp"
-
-namespace xpcc
+template<typename T>
+xpcc::Quadramp<T>::Quadramp(const T& initialValue) :
+	currentValue(initialValue)
 {
-	class Uart : public IODevice
-	{
-	public:
-		/// \brief	Set baud rate
-		///
-		/// If this function is called with a constant value as parameter,
-		/// all the calculation is done by the compiler, so no 32-bit
-		/// arithmetic is need at run-time!
-		///
-		/// \param	baudrate	desired baud rate
-		/// \param	u2x			enabled double speed mode
-		inline void
-		setBaudrate(uint32_t baudrate, bool u2x = false) {
-			uint16_t ubrr;
-			if (u2x) {
-				ubrr  = (F_CPU / (baudrate * 8l)) - 1;
-				ubrr |= 0x8000;
-			}
-			else {
-				ubrr = (F_CPU / (baudrate * 16l)) - 1;
-			}
-			setBaudrateRegister(ubrr);
-		}
-		
-		virtual void
-		put(char c) = 0;
-		
-		using IODevice::put;
-		
-		virtual void
-		flush() {}
-		
-		virtual bool
-		get(char& c) = 0;
-	
-	protected:
-		virtual void
-		setBaudrateRegister(uint16_t ubrr) = 0;
-		
-		Uart() {};
-		
-		Uart(const Uart&);
-		
-		Uart&
-		operator =(const Uart &);
-	};
+	T diff = target - current;
 }
 
-#include "uart0.hpp"
-#include "uart1.hpp"
-#include "uart2.hpp"
-#include "uart3.hpp"
+template<typename T>
+void
+xpcc::Quadramp<T>::update(const T& target)
+{
+	T diff = target - current;
+}
 
-#endif // XPCC__UART_HPP
+#endif // XPCC__QUADRAMP_IMPL_HPP

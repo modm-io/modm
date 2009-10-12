@@ -30,66 +30,82 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__UART_HPP
-#define XPCC__UART_HPP
+#ifndef XPCC__PID_HPP
+#define XPCC__PID_HPP
 
-#include <stdint.h>
-
-#include "../io/iodevice.hpp"
+#include "../../../utils/arithmetic_traits.hpp"
 
 namespace xpcc
 {
-	class Uart : public IODevice
+	template<typename T>
+	T
+	feedforwardDummy(const T& in) {
+		return in;
+	}
+	
+	/// \brief	A proportional–integral–derivative controller (PID controller)
+	///
+	/// \todo	check implementation
+	template<typename T, unsigned int ScaleFactor = 1>
+	class Pid
 	{
+		typedef typename ArithmeticTraits<T>::DoubleType T_DOUBLE;
+		typedef T (* FeedforwardFunction)(const T&);
+	
 	public:
-		/// \brief	Set baud rate
-		///
-		/// If this function is called with a constant value as parameter,
-		/// all the calculation is done by the compiler, so no 32-bit
-		/// arithmetic is need at run-time!
-		///
-		/// \param	baudrate	desired baud rate
-		/// \param	u2x			enabled double speed mode
-		inline void
-		setBaudrate(uint32_t baudrate, bool u2x = false) {
-			uint16_t ubrr;
-			if (u2x) {
-				ubrr  = (F_CPU / (baudrate * 8l)) - 1;
-				ubrr |= 0x8000;
+		struct Parameter
+		{
+			Parameter(const T& kp = 0, const T& ki = 0, const T& kd = 0,
+					  const T& maxErrorSum = 0, const T& maxOutput = 0) :
+				kp(kp), ki(ki), kd(kd),
+				maxErrorSum(maxErrorSum), maxOutput(maxOutput) {
 			}
-			else {
-				ubrr = (F_CPU / (baudrate * 16l)) - 1;
-			}
-			setBaudrateRegister(ubrr);
+			
+			T kp;
+			T ki;
+			T kd;
+			
+			T maxErrorSum;
+			T maxOutput;
+		};
+		
+	public:
+		Pid(Parameter& parameter,
+			FeedforwardFunction feedforward = feedforwardDummy<T>);
+		
+		void
+		setParameter(const Parameter& param);
+		
+		/// \brief	Reset all values
+		void
+		reset();
+		
+		/// \brief	Set a new target value
+		void
+		setTarget(const T& value) {
+			target = value;
 		}
 		
-		virtual void
-		put(char c) = 0;
+		/// \brief	Calculate a new output value
+		void
+		update(const T& input);
 		
-		using IODevice::put;
-		
-		virtual void
-		flush() {}
-		
-		virtual bool
-		get(char& c) = 0;
+		const T&
+		getValue() const {
+			return output;
+		}
 	
-	protected:
-		virtual void
-		setBaudrateRegister(uint16_t ubrr) = 0;
+	private:
+		Parameter parameter;
+		FeedforwardFunction feedforward;
 		
-		Uart() {};
-		
-		Uart(const Uart&);
-		
-		Uart&
-		operator =(const Uart &);
+		T target;
+		T errorSum;
+		T lastError;
+		T output;
 	};
 }
 
-#include "uart0.hpp"
-#include "uart1.hpp"
-#include "uart2.hpp"
-#include "uart3.hpp"
+#include "pid_impl.hpp"
 
-#endif // XPCC__UART_HPP
+#endif // XPCC__PID_HPP

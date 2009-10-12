@@ -30,66 +30,65 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__UART_HPP
-#define XPCC__UART_HPP
+#ifndef XPCC__MOVING_AVERAGE_HPP
+#define XPCC__MOVING_AVERAGE_HPP
 
 #include <stdint.h>
 
-#include "../io/iodevice.hpp"
-
 namespace xpcc
 {
-	class Uart : public IODevice
+	/// \brief	Moving average filter
+	///
+	/// \todo	documentation
+	///
+	/// Input range: N * input::maxValue < T::maxValue
+	///
+	/// \tparam	T
+	/// \tparam	N	Number of samples (maximum 255)
+	template<typename T, unsigned int N>
+	class MovingAverage
 	{
 	public:
-		/// \brief	Set baud rate
-		///
-		/// If this function is called with a constant value as parameter,
-		/// all the calculation is done by the compiler, so no 32-bit
-		/// arithmetic is need at run-time!
-		///
-		/// \param	baudrate	desired baud rate
-		/// \param	u2x			enabled double speed mode
-		inline void
-		setBaudrate(uint32_t baudrate, bool u2x = false) {
-			uint16_t ubrr;
-			if (u2x) {
-				ubrr  = (F_CPU / (baudrate * 8l)) - 1;
-				ubrr |= 0x8000;
-			}
-			else {
-				ubrr = (F_CPU / (baudrate * 16l)) - 1;
-			}
-			setBaudrateRegister(ubrr);
+		MovingAverage(const T& initialValue = 0);
+		
+		void
+		update(const T& input);
+		
+		const T
+		getValue() const {
+			return (sum / N);
 		}
-		
-		virtual void
-		put(char c) = 0;
-		
-		using IODevice::put;
-		
-		virtual void
-		flush() {}
-		
-		virtual bool
-		get(char& c) = 0;
 	
-	protected:
-		virtual void
-		setBaudrateRegister(uint16_t ubrr) = 0;
-		
-		Uart() {};
-		
-		Uart(const Uart&);
-		
-		Uart&
-		operator =(const Uart &);
+	private:
+		uint8_t index;
+		T buffer[N];
+		T sum;
 	};
 }
 
-#include "uart0.hpp"
-#include "uart1.hpp"
-#include "uart2.hpp"
-#include "uart3.hpp"
+// ----------------------------------------------------------------------------
+template<typename T, unsigned int N>
+xpcc::MovingAverage<T, N>::MovingAverage(const T& initialValue) :
+	index(0), sum(N * initialValue)
+{
+	for (uint8_t i = 0; i < N; i++) {
+		buffer[i] = initialValue;
+	}
+}
 
-#endif // XPCC__UART_HPP
+// ----------------------------------------------------------------------------
+template<typename T, unsigned int N>
+void
+xpcc::MovingAverage<T, N>::update(const T& input)
+{
+	sum -= buffer[index];
+	sum += input;
+	buffer[index] = input;
+	
+	index++;
+	if (index >= N) {
+		index = 0;
+	}
+}
+
+#endif // XPCC__MOVING_AVERAGE_HPP

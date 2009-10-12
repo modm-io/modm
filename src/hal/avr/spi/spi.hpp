@@ -30,66 +30,42 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__UART_HPP
-#define XPCC__UART_HPP
+#ifndef XPCC__SPI_HPP
+#define XPCC__SPI_HPP
 
+#include <avr/io.h>
 #include <stdint.h>
-
-#include "../io/iodevice.hpp"
 
 namespace xpcc
 {
-	class Uart : public IODevice
+	class Spi
 	{
 	public:
-		/// \brief	Set baud rate
-		///
-		/// If this function is called with a constant value as parameter,
-		/// all the calculation is done by the compiler, so no 32-bit
-		/// arithmetic is need at run-time!
-		///
-		/// \param	baudrate	desired baud rate
-		/// \param	u2x			enabled double speed mode
-		inline void
-		setBaudrate(uint32_t baudrate, bool u2x = false) {
-			uint16_t ubrr;
-			if (u2x) {
-				ubrr  = (F_CPU / (baudrate * 8l)) - 1;
-				ubrr |= 0x8000;
-			}
-			else {
-				ubrr = (F_CPU / (baudrate * 16l)) - 1;
-			}
-			setBaudrateRegister(ubrr);
-		}
+		typedef enum {
+			MODE_0 = 0,				//!< SCK normal, sample on rising edge
+			MODE_1 = (1 << CPHA),	//!< SCK normal, sample on falling edge
+			MODE_2 = (1 << CPOL),	//!< SCK inverted, sample on falling edge
+			MODE_3 = (1 << CPOL) | (1 << CPHA),	
+									//!< SCK inverted, sample on rising edge
+		} Mode;
 		
-		virtual void
-		put(char c) = 0;
-		
-		using IODevice::put;
-		
-		virtual void
-		flush() {}
-		
-		virtual bool
-		get(char& c) = 0;
+		typedef enum {
+			PRESCALER_2 = 0x80 | 0,
+			PRESCALER_4 = 0,
+			PRESCALER_8 = 0x80 | (1 << SPR0),
+			PRESCALER_16 = (1 << SPR0),
+			PRESCALER_32 = 0x80 | (1 << SPR1),
+			PRESCALER_64 = (1 << SPR1),
+			PRESCALER_128 = (1 << SPR1) | (1 << SPR0),
+		} Prescaler;
 	
-	protected:
-		virtual void
-		setBaudrateRegister(uint16_t ubrr) = 0;
+	public:
+		void
+		configure(Mode mode, Prescaler prescaler);
 		
-		Uart() {};
-		
-		Uart(const Uart&);
-		
-		Uart&
-		operator =(const Uart &);
+		uint8_t
+		send(uint8_t data);
 	};
 }
 
-#include "uart0.hpp"
-#include "uart1.hpp"
-#include "uart2.hpp"
-#include "uart3.hpp"
-
-#endif // XPCC__UART_HPP
+#endif // XPCC__SPI_HPP

@@ -30,66 +30,67 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__UART_HPP
-#define XPCC__UART_HPP
+#ifndef XPCC__PID_IMPL_HPP
+#define XPCC__PID_IMPL_HPP
 
-#include <stdint.h>
-
-#include "../io/iodevice.hpp"
-
-namespace xpcc
+template<typename T, unsigned int ScaleFactor>
+xpcc::Pid<T, ScaleFactor>::Pid(Parameter& parameter,
+							   FeedforwardFunction feedforward) :
+	parameter(parameter), feedforward(feedforward)
 {
-	class Uart : public IODevice
-	{
-	public:
-		/// \brief	Set baud rate
-		///
-		/// If this function is called with a constant value as parameter,
-		/// all the calculation is done by the compiler, so no 32-bit
-		/// arithmetic is need at run-time!
-		///
-		/// \param	baudrate	desired baud rate
-		/// \param	u2x			enabled double speed mode
-		inline void
-		setBaudrate(uint32_t baudrate, bool u2x = false) {
-			uint16_t ubrr;
-			if (u2x) {
-				ubrr  = (F_CPU / (baudrate * 8l)) - 1;
-				ubrr |= 0x8000;
-			}
-			else {
-				ubrr = (F_CPU / (baudrate * 16l)) - 1;
-			}
-			setBaudrateRegister(ubrr);
-		}
-		
-		virtual void
-		put(char c) = 0;
-		
-		using IODevice::put;
-		
-		virtual void
-		flush() {}
-		
-		virtual bool
-		get(char& c) = 0;
-	
-	protected:
-		virtual void
-		setBaudrateRegister(uint16_t ubrr) = 0;
-		
-		Uart() {};
-		
-		Uart(const Uart&);
-		
-		Uart&
-		operator =(const Uart &);
-	};
+	reset();
 }
 
-#include "uart0.hpp"
-#include "uart1.hpp"
-#include "uart2.hpp"
-#include "uart3.hpp"
+template<typename T, unsigned int ScaleFactor>
+void
+xpcc::Pid<T, ScaleFactor>::reset()
+{
+	target = 0;
+	errorSum = 0;
+	lastError = 0;
+	output = 0;
+}
 
-#endif // XPCC__UART_HPP
+template<typename T, unsigned int ScaleFactor>
+void
+xpcc::Pid<T, ScaleFactor>::setParameter(const Parameter& param)
+{
+	parameter = param;
+}
+
+template<typename T, unsigned int ScaleFactor>
+void
+xpcc::Pid<T, ScaleFactor>::update(const T& input)
+{
+	T error = target - input;
+	
+	T_DOUBLE tmp;
+	tmp  = feedforward(input);
+	tmp += parameter.kp * error;
+	tmp += parameter.ki * (errorSum + error);	// TODO
+	tmp += parameter.kd * (error - lastError);
+	
+	tmp = tmp / ScaleFactor;
+	
+	if (tmp > parameter.maxOutput) {
+		output = parameter.maxOutput;
+	}
+	else if (tmp < -parameter.maxOutput) {
+		output = -parameter.maxOutput;
+	}
+	else {
+		output = tmp;
+		
+		errorSum += error;
+		if (errorSum > parameter.maxErrorSum) {
+			errorSum = parameter.maxErrorSum;
+		}
+		else if (errorSum < -parameter.maxErrorSum) {
+			errorSum = -parameter.maxErrorSum;
+		}
+	}
+	
+	lastError = error;
+}
+
+#endif // XPCC__PID_IMPL_HPP

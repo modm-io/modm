@@ -16,11 +16,12 @@ library:
   math:
   communication:
     backend:
-      can:
-        mcp2515:
-          defines:
-            CS: B,6
-            INT: B,3
+  driver:
+    can:
+      mcp2515:
+        defines:
+          CS: B,6
+          INT: B,3
   hal:
     avr:
       uart:

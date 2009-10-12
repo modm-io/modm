@@ -30,66 +30,22 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__UART_HPP
-#define XPCC__UART_HPP
+#include "spi.hpp"
 
-#include <stdint.h>
-
-#include "../io/iodevice.hpp"
-
-namespace xpcc
+// TODO set hardware pins
+void
+xpcc::Spi::configure(Mode mode, Prescaler prescaler)
 {
-	class Uart : public IODevice
-	{
-	public:
-		/// \brief	Set baud rate
-		///
-		/// If this function is called with a constant value as parameter,
-		/// all the calculation is done by the compiler, so no 32-bit
-		/// arithmetic is need at run-time!
-		///
-		/// \param	baudrate	desired baud rate
-		/// \param	u2x			enabled double speed mode
-		inline void
-		setBaudrate(uint32_t baudrate, bool u2x = false) {
-			uint16_t ubrr;
-			if (u2x) {
-				ubrr  = (F_CPU / (baudrate * 8l)) - 1;
-				ubrr |= 0x8000;
-			}
-			else {
-				ubrr = (F_CPU / (baudrate * 16l)) - 1;
-			}
-			setBaudrateRegister(ubrr);
-		}
-		
-		virtual void
-		put(char c) = 0;
-		
-		using IODevice::put;
-		
-		virtual void
-		flush() {}
-		
-		virtual bool
-		get(char& c) = 0;
-	
-	protected:
-		virtual void
-		setBaudrateRegister(uint16_t ubrr) = 0;
-		
-		Uart() {};
-		
-		Uart(const Uart&);
-		
-		Uart&
-		operator =(const Uart &);
-	};
+	SPCR = (1 << SPE) | (1 << MSTR) | (prescaler & ~0x80) | mode;
+	SPSR = (prescaler & 0x80) ? (1 << SPI2X) : 0;
 }
 
-#include "uart0.hpp"
-#include "uart1.hpp"
-#include "uart2.hpp"
-#include "uart3.hpp"
-
-#endif // XPCC__UART_HPP
+uint8_t
+xpcc::Spi::send(uint8_t data)
+{
+	SPDR = data;
+	while (!(SPSR & (1 << SPIF))) {
+		// wait for the transmission to complete
+	}
+	return SPDR;
+}

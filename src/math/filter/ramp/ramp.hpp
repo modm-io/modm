@@ -30,66 +30,71 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__UART_HPP
-#define XPCC__UART_HPP
-
-#include <stdint.h>
-
-#include "../io/iodevice.hpp"
+#ifndef XPCC__RAMP_HPP
+#define XPCC__RAMP_HPP
 
 namespace xpcc
 {
-	class Uart : public IODevice
+	/// \todo	documentation
+	template<typename T>
+	class Ramp
 	{
 	public:
-		/// \brief	Set baud rate
-		///
-		/// If this function is called with a constant value as parameter,
-		/// all the calculation is done by the compiler, so no 32-bit
-		/// arithmetic is need at run-time!
-		///
-		/// \param	baudrate	desired baud rate
-		/// \param	u2x			enabled double speed mode
-		inline void
-		setBaudrate(uint32_t baudrate, bool u2x = false) {
-			uint16_t ubrr;
-			if (u2x) {
-				ubrr  = (F_CPU / (baudrate * 8l)) - 1;
-				ubrr |= 0x8000;
-			}
-			else {
-				ubrr = (F_CPU / (baudrate * 16l)) - 1;
-			}
-			setBaudrateRegister(ubrr);
+		Ramp(const T& positiveIncrement,
+			 const T& negativeIncrement,
+			 const T& initialValue = 0);
+		
+		void
+		update(const T& target);
+		
+		const T&
+		getValue() const {
+			return currentValue;
 		}
-		
-		virtual void
-		put(char c) = 0;
-		
-		using IODevice::put;
-		
-		virtual void
-		flush() {}
-		
-		virtual bool
-		get(char& c) = 0;
 	
-	protected:
-		virtual void
-		setBaudrateRegister(uint16_t ubrr) = 0;
-		
-		Uart() {};
-		
-		Uart(const Uart&);
-		
-		Uart&
-		operator =(const Uart &);
+	private:
+		T currentValue;
+		T positiveIncrement;
+		T negativeIncrement;
 	};
 }
 
-#include "uart0.hpp"
-#include "uart1.hpp"
-#include "uart2.hpp"
-#include "uart3.hpp"
+// ----------------------------------------------------------------------------
+template<typename T>
+xpcc::Ramp<T>::Ramp(const T& positiveIncrement,
+					const T& negativeIncrement,
+					const T& initialValue) : 
+	currentValue(initialValue),
+	positiveIncrement(positiveIncrement),
+	negativeIncrement(negativeIncrement)
+{
+}
 
-#endif // XPCC__UART_HPP
+// ----------------------------------------------------------------------------
+template<typename T>
+void
+xpcc::Ramp<T>::update(const T& target)
+{
+	if (target > currentValue)
+	{
+		T variation = target - currentValue;
+		if (variation > positiveIncrement) {
+			currentValue += positiveIncrement;
+		}
+		else {
+			currentValue = target;
+		}
+	}
+	else
+	{
+		T variation = currentValue - target;
+		if (variation > negativeIncrement) {
+			currentValue -= negativeIncrement;
+		}
+		else {
+			currentValue = target;
+		}
+	}
+}
+
+#endif // XPCC__RAMP_HPP
