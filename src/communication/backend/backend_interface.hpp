@@ -41,7 +41,7 @@ namespace xpcc
 	struct Header
 	{
 		typedef enum {
-			ACTION,
+			REQUEST,
 			RESPONSE,
 			NEGATIVE_RESPONSE,
 		} Type;
@@ -51,7 +51,7 @@ namespace xpcc
 		
 		uint8_t destination;
 		uint8_t source;
-		uint8_t actionIdentifier;
+		uint8_t packetIdentifier;
 		
 		bool
 		operator==(const Header& other) {
@@ -59,7 +59,7 @@ namespace xpcc
 					(isAcknowledge == other.isAcknowledge) &&
 					(destination == other.destination) &&
 					(source == other.source) &&
-					(actionIdentifier == other.actionIdentifier));
+					(packetIdentifier == other.packetIdentifier));
 		}
 	};
 	
@@ -79,9 +79,7 @@ namespace xpcc
 		virtual void
 		update() = 0;
 		
-		//! Send a Message.
-		//! 
-		//! \return	\b true if the packet could be send, \b false otherwise.
+		//! Send a Message. // soll denn der header kopiert werden?
 		virtual void
 		sendPacket(const Header &header, const SmartPayload& payload) = 0;
 		

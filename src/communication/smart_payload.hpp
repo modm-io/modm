@@ -35,47 +35,50 @@
 #include <string.h>		// for memcpy
 #include <stdint.h>
 
-class SmartPayload
+namespace xpcc
 {
-public:
-	// Must use a pointer to T here, otherwise the compiler can't distinguish
-	// between constructor and copy constructor!
-	template<typename T>
-	SmartPayload(const T *data) 
-	: ptr(new uint8_t[sizeof(T) + 2])
+	class SmartPayload
 	{
-		ptr[0] = 1;
-		ptr[1] = sizeof(T);
-		memcpy(ptr + 2, data, sizeof(T));
-	}
-	
-	SmartPayload(const SmartPayload& other) 
-	: ptr(other.ptr)
-	{
-		ptr[0]++;
-	}
-	
-	~SmartPayload() {
-		if (--ptr[0] == 0) {
-			delete ptr;
+	public:
+		// Must use a pointer to T here, otherwise the compiler can't distinguish
+		// between constructor and copy constructor!
+		template<typename T>
+		SmartPayload(const T *data) 
+		: ptr(new uint8_t[sizeof(T) + 2])
+		{
+			ptr[0] = 1;
+			ptr[1] = sizeof(T);
+			memcpy(ptr + 2, data, sizeof(T));
 		}
-	}
-	
-	const uint8_t *
-	getPointer() const {
-		return &ptr[2];
-	}
-	
-	uint8_t
-	getSize() const {
-		return ptr[1];
-	}
-	
-private:
-	SmartPayload&
-	operator=(const SmartPayload& other);
-	
-	uint8_t * const ptr;
-};
+		
+		SmartPayload(const SmartPayload& other) 
+		: ptr(other.ptr)
+		{
+			ptr[0]++;
+		}
+		
+		~SmartPayload() {
+			if (--ptr[0] == 0) {
+				delete ptr;
+			}
+		}
+		
+		const uint8_t *
+		getPointer() const {
+			return &ptr[2];
+		}
+		
+		uint8_t
+		getSize() const {
+			return ptr[1];
+		}
+		
+	private:
+		SmartPayload&
+		operator=(const SmartPayload& other);
+		
+		uint8_t * const ptr;
+	};
+}
 
 #endif	// XPCC_SMART_PAYLOAD_H

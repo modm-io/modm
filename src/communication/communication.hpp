@@ -29,12 +29,12 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	CPCC_COMMUNICATION_H
-#define	CPCC_COMMUNICATION_H
+#ifndef	CPCC_COMMUNICATION_HPP
+#define	CPCC_COMMUNICATION_HPP
 
 /**
  * @defgroup 	communication Communication
- * @brief 		Interface to the Linux-TIPC.
+ * @brief 		Interface to the Communication.
  *
  * DESC DESC
  *
@@ -42,44 +42,48 @@
  * @author		Martin Rosekeit, Fabian Greif
  */
 
-#include "backend/backend_interface.h"
+#include "backend/backend_interface.hpp"
+#include "postman.hpp"
 
-template<typename T>
-const T*
-getData() {
-	return static_cast<const T*>(data);
-};
+//template<typename T>
+//const T*
+//getData() {
+//	return static_cast<const T*>(data);
+//};
 
-Position& p = getData<Position>();
+//Position& p = getData<Position>();
 
 
 
-template<typename T>
-bool
-getData(T& data) {
-	if (size != sizeof(T)) {
-		return false;
-	}
-	else {
-		memcpy((void *) T, data, sizeof(T));
-		return true;
-	}
-};
+//template<typename T>
+//bool
+//getData(T& data) {
+//	if (size != sizeof(T)) {
+//		return false;
+//	}
+//	else {
+//		memcpy((void *) T, data, sizeof(T));
+//		return true;
+//	}
+//};
 
-Position p;
-getData(p);
-
+//Position p;
+//getData(p);
+//if(getData(p));
 
 
 namespace xpcc
 {
+	typedef Header ResponseHandle;
+	
 	class Communication
 	{
 	public:
-		Communication(CommunicationInterface *interface,
-				componentList,
-				eventList);
+		Communication(BackendInterface *backend,
+				Postman* postman);
 		
+		~Communication();
+				
 		void
 		update();
 		
@@ -106,12 +110,14 @@ namespace xpcc
 		void
 		publishEvent(const T& data);
 		
-		
-		
-	
 	private:
-		CommunicationInterface * const interface;
+		BackendInterface * const backend;
+		Postman * const postman;
+		uint8_t currentComponent;
+		
+		void
+		waitForAcknowledge(const Header &header, const SmartPayload& payload);
 	};
 }
 
-#endif // CPCC_COMMUNICATION_H
+#endif // CPCC_COMMUNICATION_HPP
