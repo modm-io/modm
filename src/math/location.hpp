@@ -38,6 +38,8 @@
 
 namespace xpcc
 {
+	/// \ingroup	math
+	/// \brief		Location
 	class Location
 	{
 	public:
@@ -53,22 +55,6 @@ namespace xpcc
 		Position position;
 		Angle phi;
 	};
-}
-
-// ----------------------------------------------------------------------------
-void
-xpcc::Location::update(Location& diff) {
-	this->position += diff.position.rotate(this->phi);
-	this->phi += diff.phi;
-	this->phi.normalize();
-}
-
-// ----------------------------------------------------------------------------
-void
-xpcc::Location::update(int16_t x, Angle& phi) {
-	this->position += Position(x * cos(this->phi), x * sin(this->phi));
-	this->phi += phi;
-	this->phi.normalize();
 }
 
 #endif	// XPCC__LOCATION_HPP

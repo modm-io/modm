@@ -5,6 +5,9 @@
 Import('env')
 Import('sourceFiles')
 
+env = env.Clone()
+env.Append(CPPPATH = '../')
+
 # build a object file form each source file
 objects = []
 for file in sourceFiles:

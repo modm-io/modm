@@ -39,7 +39,10 @@
 
 namespace xpcc
 {
+	/// \ingroup	math
 	typedef CartesianCoordinate<int16_t> Position;
+	
+	/// \ingroup	math
 	typedef PolarCoordinate<int16_t> PositionPolar;
 }
 

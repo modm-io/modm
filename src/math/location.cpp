@@ -30,92 +30,20 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC__ANGLE_HPP
-#define	XPCC__ANGLE_HPP
+#include "location.hpp"
 
-namespace xpcc
-{
-	/// \ingroup	math
-	/// \brief		Representation of a angle
-	class Angle
-	{
-		public:
-			Angle(float angle = 0.0) : angle(angle) {
-			}
-			
-			//! \brief	Limit angle to +-Pi
-			void
-			normalize();
-			
-			//! \brief	reverse the angle
-			void
-			reverse();
-			
-			float
-			getValue() const {
-				return this->angle;
-			}
-			
-			Angle&
-			operator=(const float& angle) {
-				this->angle = angle;
-				return *this;
-			}
-			
-			Angle&
-			operator+=(const Angle &other);
-			
-			Angle&
-			operator-=(const Angle &other);
-		
-		private:
-			float angle;
-	};
+// ----------------------------------------------------------------------------
+void
+xpcc::Location::update(Location& diff) {
+	position += diff.position.rotate(phi);
+	phi += diff.phi;
+	phi.normalize();
 }
 
 // ----------------------------------------------------------------------------
-inline xpcc::Angle&
-xpcc::Angle::operator+=(const Angle &other) {
-	this->angle += other.angle;
-	return *this;
+void
+xpcc::Location::update(int16_t x, Angle& phi) {
+	position += Position(x * cos(this->phi.getValue()), x * sin(this->phi.getValue()));
+	this->phi += phi;
+	this->phi.normalize();
 }
-
-// ----------------------------------------------------------------------------	
-inline xpcc::Angle&
-xpcc::Angle::operator-=(const Angle &other) {
-	this->angle -= other.angle;
-	return *this;
-}
-
-// ----------------------------------------------------------------------------
-inline xpcc::Angle
-operator-(const xpcc::Angle &a) {
-	return xpcc::Angle(-a.getValue());
-}
-
-
-// ----------------------------------------------------------------------------
-inline xpcc::Angle
-operator-(const xpcc::Angle &a, const xpcc::Angle &b) {
-	return xpcc::Angle(a.getValue() - b.getValue());
-}
-
-// ----------------------------------------------------------------------------
-inline xpcc::Angle
-operator+(const xpcc::Angle &a, const xpcc::Angle &b) {
-	return xpcc::Angle(a.getValue() + b.getValue());
-}
-
-// ----------------------------------------------------------------------------
-inline bool
-operator==(const xpcc::Angle &a, const xpcc::Angle &b) {
-	return (a.getValue() == b.getValue());
-}
-
-// ----------------------------------------------------------------------------
-inline bool
-operator!=(const xpcc::Angle &a, const xpcc::Angle &b) {
-	return (a.getValue() != b.getValue());
-}
-
-#endif	// XPCC__ANGLE_HPP

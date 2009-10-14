@@ -53,12 +53,12 @@ namespace xpcc {
 		public :
 
 			//! Constructor
-			//! \param	IODevice*	device to write the stream to
+			//! \param	device	device to write the stream to
 			//! \code
 			//!		MyIODevice device;
 			//!		IOStream stream( device );
 			//! \endcode
-			IOStream(IODevice&);
+			IOStream(IODevice& device);
 
 			inline IOStream&
 			put(char c)
@@ -116,7 +116,7 @@ namespace xpcc {
 	 *
 	 *  This manipulator is often mistakenly used when a simple newline is
 	 *  desired, leading to poor buffering performance.  See
-	 *  http://gcc.gnu.org/onlinedocs/libstdc++/27_io/howto.html#2 for more
+	 *  http://gcc.gnu.org/onlinedocs/libstdc++/manual/bk01pt11ch25s02.html for more
 	 *  on this subject.
 	 */
 	inline IOStream&

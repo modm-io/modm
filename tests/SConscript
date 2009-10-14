@@ -8,6 +8,9 @@ Import('env')
 Import('sourceFiles')
 Import('library')
 
+env = env.Clone()
+env.Append(CPPPATH = '../')
+
 # build a object file form each source file
 for file in sourceFiles:
 	basename = os.path.basename(file.name)

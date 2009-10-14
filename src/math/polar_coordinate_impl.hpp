@@ -30,70 +30,81 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifdef	XPCC__POLAR_COORDINATE_HPP
+#ifndef	XPCC__POLAR_COORDINATE_HPP
+	#error	"Don't include this file directly use 'math/polar_coordinate.hpp' instead!"
+#endif
 
+namespace xpcc
+{
+	// ------------------------------------------------------------------------
+	template<typename T>
+	PolarCoordinate<T>::PolarCoordinate(const T r, const Angle& theta) : 
+		r(r), theta(theta)
+	{
+	}
 
-// ----------------------------------------------------------------------------
-template<typename T>
-xpcc::PolarCoordinate<T>::PolarCoordinate(T r, Angle& theta) : r(r), theta(theta) {
-	// nothing else to do here
+	// ------------------------------------------------------------------------
+	template<typename T>
+	T
+	PolarCoordinate<T>::getLength() const
+	{
+		return r;
+	}
+
+	// ------------------------------------------------------------------------
+	template<typename T>
+	Angle&
+	PolarCoordinate<T>::getAngle() const
+	{
+		return theta;
+	}
+
+	// ------------------------------------------------------------------------
+	template<typename T>
+	void
+	PolarCoordinate<T>::normalize()
+	{
+		r = 1;
+	}
+
+	// ------------------------------------------------------------------------
+	template<typename T>
+	void
+	PolarCoordinate<T>::scale(float a)
+	{
+		r *= a;
+	}
+
+	// ------------------------------------------------------------------------
+	template<typename T>
+	CartesianCoordinate<T>
+	PolarCoordinate<T>::toCartesian()
+	{
+		return CartesianCoordinate<T>(r * cos(theta.getValue()),
+									  r * sin(theta.getValue()));
+	}
+
+	// ------------------------------------------------------------------------
+	template<typename T>
+	PolarCoordinate<T>
+	operator - (const PolarCoordinate<T> &a)
+	{
+		return PolarCoordinate<T>(a.r, -a.theta);
+	}
+
+	// ------------------------------------------------------------------------
+	template<typename T>
+	bool
+	operator == (const PolarCoordinate<T> &a, const PolarCoordinate<T> &b)
+	{
+		return (a.r == b.r) && (a.theta == b.theta);
+	}
+
+	// ------------------------------------------------------------------------
+	template<typename T>
+	bool
+	operator != (const PolarCoordinate<T> &a, const PolarCoordinate<T> &b)
+	{
+		return (a.r != b.r) || (a.theta != b.theta);
+	}
 }
-
-// ----------------------------------------------------------------------------
-template<typename T>
-T
-xpcc::PolarCoordinate<T>::getLength() const {
-	return this->r;
-}
-
-// ----------------------------------------------------------------------------
-template<typename T>
-xpcc::Angle&
-xpcc::PolarCoordinate<T>::getAngle() const {
-	return this->theta;
-}
-
-// ----------------------------------------------------------------------------
-template<typename T>
-void
-xpcc::PolarCoordinate<T>::normalize() {
-	this->r = 1;
-}
-
-// ----------------------------------------------------------------------------
-template<typename T>
-void
-xpcc::PolarCoordinate<T>::scale(float a) {
-	this->r *= a;
-}
-
-// ----------------------------------------------------------------------------
-template<typename T>
-xpcc::CartesianCoordinate<T>
-xpcc::PolarCoordinate<T>::toCartesian() {
-	return CartesianCoordinate<T>(r * cos(theta), r * sin(theta));
-}
-
-// ----------------------------------------------------------------------------
-template<typename T>
-xpcc::PolarCoordinate<T>
-operator-(const xpcc::PolarCoordinate<T> &a) {
-	return xpcc::PolarCoordinate<T>(a.r, -a.theta);
-}
-
-// ----------------------------------------------------------------------------
-template<typename T>
-bool
-operator==(const xpcc::PolarCoordinate<T> &a, const xpcc::PolarCoordinate<T> &b) {
-	return (a.r == b.r) && (a.theta == b.theta);
-}
-
-// ----------------------------------------------------------------------------
-template<typename T>
-bool
-operator!=(const xpcc::PolarCoordinate<T> &a, const xpcc::PolarCoordinate<T> &b) {
-	return (a.r != b.r) || (a.theta != b.theta);
-}
-
-
-#endif	// XPCC__POLAR_COORDINATE_HPP

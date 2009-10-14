@@ -1,205 +1,170 @@
-
-#include "../saturated.h"
-
+// coding: utf-8
 // ----------------------------------------------------------------------------
-// 								uint8_t
+/* Copyright (c) 2009, Roboterclub Aachen e.V.
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ *     * Redistributions of source code must retain the above copyright
+ *       notice, this list of conditions and the following disclaimer.
+ *     * Redistributions in binary form must reproduce the above copyright
+ *       notice, this list of conditions and the following disclaimer in the
+ *       documentation and/or other materials provided with the distribution.
+ *     * Neither the name of the Roboterclub Aachen e.V. nor the
+ *       names of its contributors may be used to endorse or promote products
+ *       derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY ROBOTERCLUB AACHEN E.V. ''AS IS'' AND ANY
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL ROBOTERCLUB AACHEN E.V. BE LIABLE FOR ANY
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+ * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * $Id$
+ */
 // ----------------------------------------------------------------------------
 
-// ----------------------------------------------------------------------------
-template<>
-Saturated<uint8_t>&
-Saturated<uint8_t>::operator+=(const Saturated<unsigned_type>& other) {
-	asm (
-		"add  %[x], %[y]"   "\n\t"
-		"brcc 0f"           "\n\t"	// Falls es einen unsigned Überlauf gab
-									// (C=1) Maximalwert laden
-		"ldi  %[x], 0xff"   "\n"
-		"0:"				"\n\t"
-		: [x] "+d" (this->m_value)
-		: [y] "r"  (other.m_value)
-	);
+#ifndef XPCC__SATURATED_HPP
+	#error	"Don't include this file directly use 'math/saturated.hpp' instead!"
+#endif
+
+#ifdef __AVR__
+	// include faster implementations written in assembly language
+	#include "saturated_impl_avr_u8.hpp"
+	#include "saturated_impl_avr_s8.hpp"
+#endif
+
+namespace xpcc
+{
+	template<typename T>
+	T
+	Saturated<T>::limitValue(DoubleType value)
+	{
+		if (value > ArithmeticTraits<T>::maxValue) {
+			value = ArithmeticTraits<T>::maxValue;
+		}
+		else if (ArithmeticTraits<T>::isSigned &&
+				 value < ArithmeticTraits<T>::minValue) {
+			value = ArithmeticTraits<T>::minValue;
+		}
+		return static_cast<T>(value);
+	}
 	
-	return *this;
-}
-
-// ----------------------------------------------------------------------------
-// Diese Kombination ist am aufwändigsten in der Behandlung und geschieht am
-// einfachsten durch Umskalierung auf zwei signed-Werte, signed-saturierter
-// Operation und nachfolgender Rückskalierung. Zu beachten ist, daß dieser
-// Operator nicht kommutativ ist, d.h. a+b liefert i.A. ein anderes Ergebnis
-// als b+a. 
-template<>
-Saturated<uint8_t>&
-Saturated<uint8_t>::operator+=(const Saturated<signed_type>& other) {
-	asm (
-		"subi %[x], 0x80"	"\n\t"	// Transformation
-									//   [0x00, 0xff] -> [0x80, 0x7f]
-		"add  %[x], %[y]"   "\n\t"
-		"brvc 0f"           "\n\t"	// Falls es einen signed Überlauf gab 
-									// (V=1) Maximalwert laden
-		"ldi  %[x], 0x7f"   "\n\t"
-		"sbrc %[y], 7"		"\n\t"	// R0 ist negativ, daher muss der 
-									// Minimalwert geladen werden
-		"ldi  %[x], 0x80"	"\n"
-		"0:"				"\n\t"
-		"subi %[x], 0x80"	"\n\t"	// Rücktransformation 
-									//   [0x80, 0x7f] -> [0x00, 0xff]
-		: [x] "+d" (this->m_value)
-		: [y] "r"  (other.m_value)
-	);
+	template<typename T>
+	Saturated<T>&
+	Saturated<T>::operator+=(const Saturated<SignedType>& other)
+	{
+		DoubleType temp = static_cast<DoubleType>(value) +
+						  static_cast<DoubleType>(other.value);
+		value = limitValue(temp);
+		
+		return *this;
+	}
 	
-	return *this;
-}
-
-// ----------------------------------------------------------------------------
-template<>
-Saturated<uint8_t>&
-Saturated<uint8_t>::operator-=(const Saturated<unsigned_type>& other) {
-	asm (
-		"sub  %[x], %[y]"   "\n\t"
-		"brcc 0f"           "\n\t"	// Falls es einen unsigned Unterlauf gab 
-									// (C=1) Minimalwert laden
-		"clr  %[x]"   "\n\t"
-		"0:"
-		: [x] "+r" (this->m_value)
-		: [y] "r"  (other.m_value)
-	);
+	template<typename T>
+	Saturated<T>&
+	Saturated<T>::operator+=(const Saturated<UnsignedType>& other)
+	{
+		DoubleType temp = static_cast<DoubleType>(value) +
+						  static_cast<DoubleType>(other.value);
+		value = limitValue(temp);
+		
+		return *this;
+	}
 	
-	return *this;
-}
-
-// ----------------------------------------------------------------------------
-template<>
-Saturated<uint8_t>&
-Saturated<uint8_t>::operator-=(const Saturated<signed_type>& other) {
-	asm (
-		"subi %[x], 0x80"	"\n\t"	// Transformation
-									//   [0x00, 0xff] -> [0x80, 0x7f]
-		"sub  %[x], %[y]"   "\n\t"
-		"brvc 0f"           "\n\t"	// Falls es einen signed Überlauf gab 
-									// (V=1) Minimalwert laden
-		"ldi  %[x], 0x80"   "\n\t"
-		"sbrc %[y], 7"		"\n\t"	// R0 ist negativ, daher muss der 
-									// Maximalwert geladen werden
-		"ldi  %[x], 0x7f"	"\n"
-		"0:"				"\n\t"
-		"subi %[x], 0x80"	"\n\t"	// Rücktransformation 
-									//   [0x80, 0x7f] -> [0x00, 0xff]
-		: [x] "+d" (this->m_value)
-		: [y] "r"  (other.m_value)
-	);
+	template<typename T>
+	Saturated<T>&
+	Saturated<T>::operator-=(const Saturated<SignedType>& other)
+	{
+		DoubleType temp = static_cast<DoubleType>(value) -
+						  static_cast<DoubleType>(other.value);
+		value = limitValue(temp);
+		
+		return *this;
+	}
 	
-	return *this;
-}
-
-// ----------------------------------------------------------------------------
-// 								int8_t
-// ----------------------------------------------------------------------------
-
-// ----------------------------------------------------------------------------
-template<>
-Saturated<int8_t>&
-Saturated<int8_t>::operator+=(const Saturated<signed_type>& other) {
-	asm (
-		"add  %[x], %[y]"	"\n\t"
-		"brvc 0f"			"\n\t"	// Falls es einen signed Überlauf gab (V=1)
-									// Maximalwert laden
-		"ldi  %[x], 0x7f"	"\n\t"
-		"sbrc %[y], 7"		"\n\t"	// y ist negativ, daher muss der
-									// Minimalwert geladen werden
-		"ldi  %[x], 0x80"	"\n\t"
-		"0:"
-		: [x] "+d" (this->m_value)
-		: [y] "r"  (other.m_value)
-	);
+	template<typename T>
+	Saturated<T>&
+	Saturated<T>::operator-=(const Saturated<UnsignedType>& other)
+	{
+		DoubleType temp = static_cast<DoubleType>(value) -
+						  static_cast<DoubleType>(other.value);
+		value = limitValue(temp);
+		
+		return *this;
+	}
 	
-	return *this;
-}
-
-// ----------------------------------------------------------------------------
-// TODO testen
-template<>
-Saturated<int8_t>&
-Saturated<int8_t>::operator+=(const Saturated<unsigned_type>& other) {
-	asm (
-		"add  %[x], %[y]"	"\n\t"
-		"brvc 0f"			"\n\t"	// Falls es einen signed Überlauf gab (V=1)
-									// Maximalwert laden
-		"ldi  %[x], 0xff"	"\n\t"
-		"0:"
-		: [x] "+d" (this->m_value)
-		: [y] "r"  (other.m_value)
-	);
 	
-	return *this;
-}
+	// ----------------------------------------------------------------------------
+	template<typename T>
+	Saturated<typename Saturated<T>::SignedType>
+	operator-(const Saturated<T>& x)
+	{
+		typedef typename ArithmeticTraits<T>::DoubleType DoubleType;
+		
+		DoubleType temp = - static_cast<DoubleType>(x.value);
+		return Saturated<typename Saturated<T>::SignedType>(limitValue(temp));
+	}
 
-// ----------------------------------------------------------------------------
-template<>
-Saturated<int8_t>&
-Saturated<int8_t>::operator-=(const Saturated<signed_type>& other) {
-	asm (
-		"sub  %[x], %[y]"	"\n\t"
-		"brvc 0f"			"\n\t"	// Falls es einen signed Überlauf gab (V=1)
-									// Minimalwert laden
-		"ldi  %[x], 0x80"	"\n\t"
-		"sbrc %[y], 7"		"\n\t"	// y ist negativ, daher muss der
-									// Maximalwert geladen werden
-		"ldi  %[x], 0x7f"		"\n\t"
-		"0:"
-		: [x] "+d" (this->m_value)
-		: [y] "r"  (other.m_value)
-	);
+	// ----------------------------------------------------------------------------
+	// WARNING: this implementation is only correct for unsigned-types,
+	// the functions needs to be specialized for all the signed-types
+	template<typename T>
+	Saturated<T>
+	abs(const Saturated<T>& x)
+	{
+		typedef typename ArithmeticTraits<T>::DoubleType DoubleType;
+		
+		if (ArithmeticTraits<T>::isSigned && x.value < 0)
+		{
+			DoubleType temp = static_cast<DoubleType>(x.value);
+			
+			return Saturated<T>(Saturated<T>::limitValue(-temp));
+		}
+		else {
+			return Saturated<T>(x.value);
+		}
+	}
+
+	// ----------------------------------------------------------------------------
+	template<typename T>
+	Saturated<T>
+	operator-(const Saturated<T>& a, const Saturated<T>& b)
+	{
+		Saturated<T> t(a);
+		t -= b;
+		return t;
+	}
 	
-	return *this;
-}
-
-// ----------------------------------------------------------------------------
-// TODO testen
-template<>
-Saturated<int8_t>&
-Saturated<int8_t>::operator-=(const Saturated<unsigned_type>& other) {
-	asm (
-		"sub  %[x], %[y]"	"\n\t"
-		"brvc 0f"			"\n\t"	// Falls es einen signed Überlauf gab (V=1)
-									// Minimalwert laden
-		"ldi  %[x], 0x80"	"\n\t"
-		"0:"
-		: [x] "+d" (this->m_value)
-		: [y] "r"  (other.m_value)
-	);
+	// ----------------------------------------------------------------------------
+	template<typename T>
+	Saturated<T>
+	operator+(const Saturated<T>& a, const Saturated<T>& b)
+	{
+		Saturated<T> t(a);
+		t += b;
+		return t;
+	}
 	
-	return *this;
-}
+	// ----------------------------------------------------------------------------
+	template<typename T>
+	bool
+	operator==(const Saturated<T>& a, const Saturated<T>& b)
+	{
+		return (a.value == b.value);
+	}
 
-// ----------------------------------------------------------------------------
-template<>
-Saturated<int8_t>
-operator-(const Saturated<int8_t>& a) {
-	Saturated<int8_t> temp(a);
-	asm (
-		"neg %[x]"		"\n\t"
-		"brvc 0f"		"\n\t"	// Signed Überlauf (V=1): Das Ergebnis
-								// ist 0x80 und wird verändert zu 0x7f
-		"dec  %[x]"		"\n\t"
-		"0:"
-		: [x] "+d" (temp.m_value)
-	);
-	return temp;
-}
-
-// ----------------------------------------------------------------------------
-template<>
-Saturated<int8_t>
-abs(const Saturated<int8_t>& a) {
-	Saturated<int8_t> temp(a);
-	asm (
-		"sbrc %[x], 7"	"\n\t"
-		"neg  %[x]"		"\n\t"	// x < 0: negieren
-		"sbrc %[x], 7"	"\n\t"
-		"dec  %[x]"		"\n\t"	// R0 ist immer noch < 0 (also 0x80), 
-								// lade 0x7f
-		: [x] "+d" (temp.m_value)
-	);
-	return temp;
+	// ----------------------------------------------------------------------------
+	template<typename T>
+	bool
+	operator!=(const Saturated<T>& a, const Saturated<T>& b)
+	{
+		return (a.value != b.value);
+	}
 }

@@ -30,71 +30,30 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC__POLAR_COORDINATE_HPP
-#define	XPCC__POLAR_COORDINATE_HPP
-
-#include <math.h>
-
-#include "angle.hpp"
-#include "cartesian_coordinate.hpp"
+#include <stdint.h>
 
 namespace xpcc
 {
-	// forward declaration, needed because of circular reference 
-	// with class CartesianCoordinate
-	template<typename T>
-	class CartesianCoordinate;
-
 	/// \ingroup	math
-	///	\brief		Polar coordinates
-	template<typename T>
-	class PolarCoordinate
+	/// \brief		Fast check if a float variable is positive
+	///
+	/// Checks only the sign bit for the AVR.
+	inline bool
+	isPositive(const float& a)
 	{
-	public:
-		PolarCoordinate(const T r=0, const Angle& theta=Angle(0.0));
-		
-		/// \brief	Calculate length
-		T
-		getLength() const;
-		
-		/// \brief	Calculate absolute angle
-		Angle&
-		getAngle() const;
-		
-		/// \brief	Normalize length to 1
-		void
-		normalize();
-		
-		void
-		scale(float a);
-		
-		/// \brief	Transform to cartesian coordinate system
-		CartesianCoordinate<T>
-		toCartesian();
-		
-		operator CartesianCoordinate<T>() {
-			return this->cartesian();
+#ifdef __AVR__
+		// IEEE 754-1985: the most significant bit is the sign bit
+		// sign = 0 => positive
+		// sign = 1 => negative
+		uint8_t *t = (uint8_t *) &a;
+		if (*(t + 3) & 0x80) {
+			return false;
 		}
-	
-	private:
-		template<typename U>
-		friend PolarCoordinate<U>
-		operator - (const PolarCoordinate<U> &a);
-		
-		template<typename U>
-		friend bool
-		operator == (const PolarCoordinate<U> &a, const PolarCoordinate<U> &b);
-
-		template<typename U>
-		friend bool
-		operator != (const PolarCoordinate<U> &a, const PolarCoordinate<U> &b);
-	
-	private:
-		T r;			//!< radius
-		Angle theta;	//!< azimuth
-	};
+		else {
+			return true;
+		}
+#else
+		return (a > 0.0);
+#endif
+	}
 }
-
-#include "polar_coordinate_impl.hpp"
-
-#endif	// XPCC__POLAR_COORDINATE_HPP

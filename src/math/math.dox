@@ -1,0 +1,10 @@
+// coding: utf-8
+// 
+// $Id$
+
+/*!
+\defgroup math numerical library
+\brief Common mathematical operations and transformations
+
+
+*/

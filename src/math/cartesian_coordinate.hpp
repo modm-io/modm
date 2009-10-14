@@ -46,32 +46,30 @@ namespace xpcc
 	template<typename T>
 	class PolarCoordinate;
 
-	/**
-	 * \brief	Cartesian coordinates
-	 * 
-	 */
+	/// \ingroup	math
+	/// \brief		Cartesian coordinate
 	template<typename T>
 	class CartesianCoordinate
 	{
 	public:
 		CartesianCoordinate(T x=0, T y=0);
 		
-		/** \brief	Calculate length */
+		/// \brief	Calculate length
 		T
 		getLength() const;
 		
-		/** \brief	Calculate absolute angle */
+		/// \brief	Calculate absolute angle
 		Angle
 		getAngle() const;
 		
-		/** \brief	Normalize length to 1 */
+		/// \brief	Normalize length to 1
 		CartesianCoordinate&
 		normalize();
 		
 		CartesianCoordinate&
 		rotate(Angle& phi);
 		
-		/** \brief	Transform to polar coordiante system */
+		/// \brief	Transform to polar coordiante system
 		PolarCoordinate<T>
 		toPolar();
 		
@@ -81,6 +79,28 @@ namespace xpcc
 		CartesianCoordinate &
 		operator-=(const CartesianCoordinate &other);
 		
+	private:
+		template<typename U>
+		friend CartesianCoordinate<U>
+		operator - (const CartesianCoordinate<U> &a);
+		
+		template<typename U>
+		friend CartesianCoordinate<U>
+		operator - (const CartesianCoordinate<U> &a, const CartesianCoordinate<U> &b);
+		
+		template<typename U>
+		friend CartesianCoordinate<U>
+		operator + (const CartesianCoordinate<U> &a, const CartesianCoordinate<U> &b);
+		
+		template<typename U>
+		friend bool
+		operator == (const CartesianCoordinate<U> &a, const CartesianCoordinate<U> &b);
+		
+		template<typename U>
+		friend bool
+		operator != (const CartesianCoordinate<U> &a, const CartesianCoordinate<U> &b);
+	
+	private:
 		T x;
 		T y;
 	};
