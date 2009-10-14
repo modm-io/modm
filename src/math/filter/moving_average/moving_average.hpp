@@ -37,6 +37,7 @@
 
 namespace xpcc
 {
+	/// \ingroup	filter
 	/// \brief	Moving average filter
 	///
 	/// \todo	documentation

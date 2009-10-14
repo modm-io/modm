@@ -37,7 +37,7 @@
 namespace xpcc
 {
 	/**
-	 * \ingroup	container
+	 * \ingroup	data_structure
 	 * \brief	FIFO queue
 	 * 
 	 * Elements are pushed into the "back" of the specific container and popped 
@@ -101,6 +101,8 @@ namespace xpcc
 
 
 	// ------------------------------------------------------------------------
+	/// \ingroup	data_structure
+	/// \brief		Bounded queue
 	template<typename T, 
 			 int N,
 			 typename S=uint8_t,

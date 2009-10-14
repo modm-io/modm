@@ -29,8 +29,9 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC_DEQUE_IMPL_HPP
-#define	XPCC_DEQUE_IMPL_HPP
+#ifndef	XPCC__DEQUE_HPP
+	#error	"Don't include this file directly use 'data_structure/deque.hpp' instead!"
+#endif
 
 // ----------------------------------------------------------------------------
 template<typename T, int N, typename S>
@@ -169,5 +170,3 @@ xpcc::BoundedDeque<T, N, S>::popFront() {
 	}
 	tail = tmptail;
 }
-
-#endif	// XPCC_DEQUE_IMPL_HPP

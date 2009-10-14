@@ -1,0 +1,10 @@
+// coding: utf-8
+// 
+// $Id$
+
+/*!
+\defgroup	data_structure	Data structures
+\brief 		Common data structures (list, queue etc.)
+
+
+*/

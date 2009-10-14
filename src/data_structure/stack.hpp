@@ -29,24 +29,22 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC_STACK_HPP
-#define	XPCC_STACK_HPP
+#ifndef	XPCC__STACK_HPP
+#define	XPCC__STACK_HPP
+
+#include <stdint.h>
 
 #include "deque.hpp"
 
-namespace
+namespace xpcc
 {
-	/**
-	 * \ingroup	container
-	 * \brief	LIFO stack
-	 * 
-	 * Elements are pushed/popped from the "back" of the specific container,
-	 * which is known as the top of the stack.
-	 * 
-	 * This class is not thread-safe!
-	 * 
-	 * \see		Deque()
-	 */
+	/// \ingroup	data_structure
+	/// \brief	LIFO stack
+	/// 
+	///  Elements are pushed/popped from the "back" of the specific container,
+	///  which is known as the top of the stack.
+	///  
+	///  \see		Deque()
 	template<typename T,
 			 typename Container>
 	class Stack
@@ -99,7 +97,9 @@ namespace
 	};
 
 	// ------------------------------------------------------------------------
-	template<typename T,
+	/// \ingroup	data_structure
+	/// \brief		Bounded stack
+	template<typename T, 
 			 int N,
 			 typename S=uint8_t,
 			 typename Container=BoundedDeque<T, N, S> >
@@ -108,4 +108,4 @@ namespace
 	};
 }
 
-#endif	// XPCC_STACK_HPP
+#endif	// XPCC__STACK_HPP

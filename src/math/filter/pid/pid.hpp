@@ -43,6 +43,7 @@ namespace xpcc
 		return in;
 	}
 	
+	/// \ingroup	filter
 	/// \brief	A proportional–integral–derivative controller (PID controller)
 	///
 	/// \todo	check implementation

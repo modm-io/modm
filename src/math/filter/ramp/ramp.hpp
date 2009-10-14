@@ -35,6 +35,9 @@
 
 namespace xpcc
 {
+	/// \ingroup	filter
+	/// \brief		Ramp
+	/// 
 	/// \todo	documentation
 	template<typename T>
 	class Ramp

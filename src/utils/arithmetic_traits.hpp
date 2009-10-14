@@ -37,22 +37,23 @@
 namespace xpcc
 {
 	/**
+	 * \ingroup		utils
 	 * \defgroup	arithmetic_trais	Arithmetic Traits
 	 * \brief		Traits to give numbers more information then they have by
 	 * 				default in C++
 	 *
-	 * \section Values this Traits are Providing
+	 * \section provides	Values this Traits are Providing
 	 *
-	 * \type	DoubleType	Type that can holds the doubled length of data.
+	 * \li \c	DoubleType	Type that can holds the doubled length of data.
 	 * 						To use by multiplication.
-	 * \value	minValue	smallest value.
-	 * \value	maxValue	biggest value
-	 * \value	isSigned	is this a signed or unsigned type
-	 * \value	isInteger	is this an integer type
-	 * \value	isFloat		is this a float type (float, double)
-	 * \value	digits10	count of digits to display this type in decimal
+	 * \li \c	minValue	smallest value.
+	 * \li \c	maxValue	biggest value
+	 * \li \c	isSigned	is this a signed or unsigned type
+	 * \li \c	isInteger	is this an integer type
+	 * \li \c	isFloat		is this a float type (float, double)
+	 * \li \c	digits10	count of digits to display this type in decimal
 	 *
-	 * \section Use
+	 * \section useage	Useage
 	 * \code
 	 * 	typedef typename xpcc::ArithmeticTraits<T>::DoubleType T_DOUBLE;
 	 *

@@ -1,0 +1,10 @@
+// coding: utf-8
+// 
+// $Id$
+
+/*!
+\defgroup	driver	Device drivers
+\brief 		Drivers to control some external devices
+
+
+*/

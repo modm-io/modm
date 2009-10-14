@@ -29,15 +29,15 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC_DEQUE_HPP
-#define	XPCC_DEQUE_HPP
+#ifndef	XPCC__DEQUE_HPP
+#define	XPCC__DEQUE_HPP
 
 #include <stdint.h>
 
 namespace xpcc
 {
 	/**
-	 * \ingroup	container
+	 * \ingroup	data_structure
 	 * \brief	Double ended queue
 	 * 
 	 * Internally organised as a ring buffer.
@@ -125,4 +125,4 @@ namespace xpcc
 
 #include "deque_impl.hpp"
 
-#endif	// XPCC_DEQUE_HPP
+#endif	// XPCC__DEQUE_HPP

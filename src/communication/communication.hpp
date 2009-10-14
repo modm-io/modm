@@ -29,18 +29,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	CPCC_COMMUNICATION_HPP
-#define	CPCC_COMMUNICATION_HPP
-
-/**
- * @defgroup 	communication Communication
- * @brief 		Interface to the Communication.
- *
- * DESC DESC
- *
- * @version		$Id$
- * @author		Martin Rosekeit, Fabian Greif
- */
+#ifndef	XPCC_COMMUNICATION_HPP
+#define	XPCC_COMMUNICATION_HPP
 
 #include "backend/backend_interface.hpp"
 #include "postman.hpp"
@@ -76,6 +66,7 @@ namespace xpcc
 {
 	typedef Header ResponseHandle;
 	
+	/// \ingroup	communication
 	class Communication
 	{
 	public:
@@ -120,4 +111,4 @@ namespace xpcc
 	};
 }
 
-#endif // CPCC_COMMUNICATION_HPP
+#endif // XPCC_COMMUNICATION_HPP
