@@ -30,39 +30,35 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__SCHEDULER_HPP
-#define XPCC__SCHEDULER_HPP
+#include "timeout.hpp"
 
-#include <stdint.h>
-
-namespace xpcc
+xpcc::Timeout::Timeout(LocalTime time) :
+	endTime(LocalTime::getTime() + time), state(ACTIVE)
 {
-	class Event
-	{
-	public:
-		virtual void
-		run() = 0;
-	};
-	
-	class Scheduler
-	{
-	public:
-		typedef uint8_t Priority;		//!< range [0..7]
-		typedef int8_t EventId;
-	
-	public:
-		EventId
-		scheduleEvent(Event& event, uint16_t period, Priority priority = 4);
-		
-		bool
-		removeEvent(EventId identifier);
-		
-		void
-		update();
-		
-	private:
-		
-	};
 }
 
-#endif // XPCC__SCHEDULER_HPP
+bool
+xpcc::Timeout::isExpired()
+{
+	if (state == ACTIVE)
+	{
+		LocalTime currentTime = LocalTime::getTime();
+		
+		if (currentTime > endTime) {
+			state = EXPIRED;
+			return true;
+		}
+	}
+	else if (state == EXPIRED) {
+		return true;
+	}
+	
+	return false;
+}
+
+void
+xpcc::Timeout::restart(LocalTime time)
+{
+	endTime = LocalTime::getTime() + time;
+	state = ACTIVE;
+}

@@ -37,24 +37,35 @@
 
 namespace xpcc
 {
+	/// \brief	Software timer
+	///
+	/// Has to be polled to check if it has expired.
 	class Timeout
 	{
 	public:
-		Timeout(LocalTime::Time time);
+		Timeout(LocalTime time);
 		
-		//! Check if the timeout time is reached.
+		/// \brief	Check if the given time has passed.
 		bool
 		isExpired();
 		
-		//! Set a new timeout time.
-		void
-		reset(LocalTime::Time time);
+		/// \brief	Stop timer
+		inline void
+		stop() {
+			state = STOPPED;
+		}
 		
+		/// \brief	Set a new timeout time.
 		void
-		update();
+		restart(LocalTime time);
 		
 	private:
-		LocalTime::Time endtime;
+		LocalTime endTime;
+		enum {
+			ACTIVE,
+			STOPPED,
+			EXPIRED
+		} state;
 	};
 }
 

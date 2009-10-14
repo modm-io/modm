@@ -36,6 +36,7 @@
 
 namespace xpcc
 {
+	// TODO better Timestamp or simply Time?
 	class LocalTime
 	{
 	public:
@@ -51,10 +52,6 @@ namespace xpcc
 		
 		inline LocalTime
 		operator + (const LocalTime& other);
-		
-		// TODO return type?
-		//inline LocalTime
-		//operator - (const LocalTime& other);
 		
 		
 		inline bool
