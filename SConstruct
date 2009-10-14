@@ -23,13 +23,13 @@ if build.target == 'avr':
 			AVRDUDE = build.avr.avrdude,
 			AVR_DEVICE = build.avr.device,
 			AVR_CLOCK = build.avr.clock,
-			tools = ['avr'],
+			tools = ['avr', 'doxygen'],
 			toolpath = ['misc/scons/'])
 
 elif build.target == 'pc':
 	env = Environment(
 			ARCHITECTURE = 'pc',
-			tools = ['pc'],
+			tools = ['pc', 'doxygen'],
 			toolpath = ['misc/scons/'])
 
 else:
@@ -51,3 +51,6 @@ SConscript('tests/SConscript',
 			variant_dir='build-tests',
 			exports=['env', 'sourceFiles', 'library'], 
 			duplicate=False)
+
+env.Doxygen('doc/doxyfile')
+env.Alias('doc', 'apidoc/html')
