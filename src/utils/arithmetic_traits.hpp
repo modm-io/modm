@@ -53,7 +53,7 @@ namespace xpcc
 	 * \li \c	isFloat		is this a float type (float, double)
 	 * \li \c	digits10	count of digits to display this type in decimal
 	 *
-	 * \section useage	Useage
+	 * \section usage	Usage
 	 * \code
 	 * 	typedef typename xpcc::ArithmeticTraits<T>::DoubleType T_DOUBLE;
 	 *

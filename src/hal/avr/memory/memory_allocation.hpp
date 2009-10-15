@@ -29,24 +29,22 @@
  */
 // ----------------------------------------------------------------------------
 
-#include "../memory/memory_allocation.hpp"
+#ifndef	AVR__MEMORY_ALLOCATION_HPP
+#define	AVR__MEMORY_ALLOCATION_HPP
 
-void *
-operator new(size_t size) {
-	return avr::allocateMemory(size);
+#include <stdint.h>
+#include <stdlib.h>
+
+namespace avr
+{
+	void *
+	allocateMemory(size_t requestedSize);
+	
+	void
+	freeMemory(void *ptr);
+	
+	// TODO functions to retrieve status informations about used memory
 }
 
-void *
-operator new[](size_t size) {
-	return avr::allocateMemory(size);
-}
+#endif	// AVR__MEMORY_ALLOCATION_HPP
 
-void
-operator delete(void* ptr) {
-	avr::freeMemory(ptr);
-}
-
-void
-operator delete[](void* ptr) {
-	avr::freeMemory(ptr);
-}
