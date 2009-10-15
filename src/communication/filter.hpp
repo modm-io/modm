@@ -25,7 +25,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * 
- * $Id: backend_interface.hpp 53 2009-09-23 16:20:07Z dergraaf $
+ * $Id$
  */
 // ----------------------------------------------------------------------------
 
@@ -44,7 +44,7 @@ namespace xpcc
 	 *				Backend in order to filter Packets by destination identifier
 	 *
 	 *
-	 * @version		$Id: backend_interface.hpp 53 2009-09-23 16:20:07Z dergraaf $
+	 * @version		$Id$
 	 */
 	 
 	class Filter
