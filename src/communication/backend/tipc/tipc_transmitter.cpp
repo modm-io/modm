@@ -28,67 +28,61 @@
  * $Id$
  */
 // ----------------------------------------------------------------------------
-#include "./tipc_transmitter.h"
-#include "./tipc_header_definition.h"
+#include "tipc_transmitter.h"
+#include "header.hpp"
 
 #include <iostream>
 #include <boost/shared_array.hpp>
 
-#include <modules/backplane/logging/logger_message_forwarder.hpp>
-SUB_LOGGER_CREATE(logger, Logger::WARNING, "icc::tipc::transmitter");
+#include "../../../debug/logger/logger.hpp"
 
 // TODO: IMPORTANT! If the TIPC-Module is not loaded terminate with appropriate
 // error message!!!!
 
 // -------------------------------------------------------------------------
-rca::tipc::Transmitter::Transmitter(	icc::TChannelId 	channelId, 
-										icc::TComponentId	componentId) :
-	channelId_(channelId),
-	componentId_(componentId)
+xpcc::tipc::Transmitter::Transmitter( ) :
+	tipcTransmitterSocket_()
 {
 }
 // -------------------------------------------------------------------------
-rca::tipc::Transmitter::~Transmitter() 
+xpcc::tipc::Transmitter::~Transmitter()
 {
 }
 // -------------------------------------------------------------------------
 // Attention: This method modifies the header information of the packet!!
 void 
-rca::tipc::Transmitter::transmitPacket(	icc::TChannelId 		receiverChannelId,
-										icc::TComponentId		receiverComponentId,
-										icc::TPayloadId			payloadId,
-										icc::TSize				payloadSize,
-										const void *			payload,
-										icc::TServiceSpecifier	serviceSpecifier,
-										icc::TError				error)
+xpcc::tipc::Transmitter::transmitPacket( const xpcc::Header &header, const SmartPayload& payload )
 {
-	// Speicherplatz fuers ICC-Packet erstellen
-	boost::shared_array<char> iccPacket(new char[sizeof(icc::THeader) + payloadSize]);
+	// Speicherplatz fuers XPCC-Packet erstellen
+	boost::shared_array<char> xpccPacket(new char[sizeof(xpcc::Header) + payload.getSize()]);
 	
 	// Payload an die richtige Stelle im Packet kopieren (hinter den Header)
 	// Es könnte auch Packete ohne Payload geben.
-	if ( payloadSize > 0 ) {
-		memcpy(	iccPacket.get() + sizeof(icc::THeader),
-				payload,
-				payloadSize);
+	if ( payload.getSize() > 0 ) {
+		memcpy(	xpccPacket.get() + sizeof(xpcc::Header),
+				payload.getPointer(),
+				payload.getSize());
 	}
 	
 	// Header setzen vor die payload
-	( *(icc::THeader*) iccPacket.get() ).transmitterChannelId	= this->channelId_;
-	( *(icc::THeader*) iccPacket.get() ).receiverChannelId		= receiverChannelId;
-	( *(icc::THeader*) iccPacket.get() ).transmitterComponentId	= this->componentId_;
-	( *(icc::THeader*) iccPacket.get() ).receiverComponentId	= receiverComponentId;
-	( *(icc::THeader*) iccPacket.get() ).size					= payloadSize;
-	( *(icc::THeader*) iccPacket.get() ).payloadId				= payloadId;
-	( *(icc::THeader*) iccPacket.get() ).error					= error;
-	( *(icc::THeader*) iccPacket.get() ).serviceSpecifier		= serviceSpecifier;
-	
+	( *(xpcc::Header*) xpccPacket.get() ) = header;
 
-	// Send packet using TIPC
-	this->tipcTransmitterSocket_.transmitPayload(	payloadId + TYPE_ID_OFFSET,
-													this->channelId_,
-													iccPacket.get(),
-													sizeof(icc::THeader) + payloadSize );
+	if ( header.destination != 0 ) {
+		// transmitt a request
+		this->tipcTransmitterSocket_.transmitPayload(	REQUEST_OFFSET + header.destination + TYPE_ID_OFFSET,
+														0,
+														xpccPacket.get(),
+														sizeof(xpcc::Header) + payload.getSize() );
+	}
+	else {
+		// transmitt a request
+		this->tipcTransmitterSocket_.transmitPayload(	EVENT_OFFSET + header.packetIdentifier + TYPE_ID_OFFSET,
+														0,
+														xpccPacket.get(),
+														sizeof(xpcc::Header) + payload.getSize() );
+
+	}
+
 }
 // -------------------------------------------------------------------------
 

@@ -41,23 +41,22 @@
 
 #include "tipc_receiver_socket.h"
 
-#include <modules/backplane/logging/logger_message_forwarder.hpp>
-SUB_LOGGER_CREATE(logger, Logger::WARNING, "icc::tipc::receiver_socket");
+#include "../../../debug/logger/logger.hpp"
 
 // -------------------------------------------------------------------------------------------------------
-rca::tipc::ReceiverSocket::ReceiverSocket() :
+xpcc::tipc::ReceiverSocket::ReceiverSocket() :
 	socketDescriptor_ ( socket (AF_TIPC, SOCK_RDM,0) ) // Create the socket
 {
 }
 // -------------------------------------------------------------------------------------------------------
-rca::tipc::ReceiverSocket::~ReceiverSocket() 
+xpcc::tipc::ReceiverSocket::~ReceiverSocket()
 {
 	// Close the socket
 	close(this->socketDescriptor_);
 }
 // -------------------------------------------------------------------------------------------------------
 void 
-rca::tipc::ReceiverSocket::registerOnPacket(	unsigned int typeId,
+xpcc::tipc::ReceiverSocket::registerOnPacket(	unsigned int typeId,
 												unsigned int lowerInstance,
 												unsigned int upperInstance)
 {
@@ -72,8 +71,10 @@ rca::tipc::ReceiverSocket::registerOnPacket(	unsigned int typeId,
 	fromAddress.addr.nameseq.upper	=	upperInstance;
 	fromAddress.scope				=	TIPC_CLUSTER_SCOPE;	// Scope of puplisching is cluster (node < cluster < zone)
 
-	SUB_LOGGER_LOG(logger, Logger::INFO, "registerOnPacket")
-		<< "(typeId, lowerBound, upperBound) = (" << typeId << ", " << lowerInstance << ", " << upperInstance << ")";
+	xpcc::log::info
+		<< __FUNCTION__
+		<< "(typeId, lowerBound, upperBound) = (" << typeId << ", " << lowerInstance << ", " << upperInstance << ")"
+		<< xpcc::flush;
 
 	// Binding means registering to a specific packet
 	result = 	bind (	this->socketDescriptor_, 
@@ -82,9 +83,11 @@ rca::tipc::ReceiverSocket::registerOnPacket(	unsigned int typeId,
 
 	// If there was an error binding the socket throw an exception because this case
 	// cannot be handled here.
-	if (0 != result) {		
-		SUB_LOGGER_LOG(logger, Logger::ERROR, "registerOnPacket")
-			<< "Port {" << typeId << ", " << lowerInstance << ", " << upperInstance << "}  could not be created.";
+	if (0 != result) {
+		xpcc::log::error
+				<< __FUNCTION__
+				<< "Port {" << typeId << ", " << lowerInstance << ", " << upperInstance << "}  could not be created."
+				<< xpcc::flush;
 		// TODO: Throw an exception!!
 	}
 }
@@ -92,17 +95,17 @@ rca::tipc::ReceiverSocket::registerOnPacket(	unsigned int typeId,
 // This method gets the header of the current TIPC data in the queue. 
 // It returns the true if a header was available - otherwise false.
 bool 
-rca::tipc::ReceiverSocket::receiveHeader( THeader & tipcHeader ) 
+xpcc::tipc::ReceiverSocket::receiveHeader( Header & tipcHeader )
 {	
 //	sockaddr_tipc fromAddress;
 //	socklen_t addressLength = sizeof( struct sockaddr_tipc );
-	THeader localTipcHeader;
+	Header localTipcHeader;
   	int result = 0;
 	
 	// First receive the tipc-header
 	result = recv(	this->socketDescriptor_,
 					&localTipcHeader,
-					sizeof(THeader),
+					sizeof(Header),
 					MSG_PEEK | MSG_DONTWAIT);	// Do not delete data from TIPC and do not wait for data
 	
 	if( result > 0) {
@@ -111,17 +114,23 @@ rca::tipc::ReceiverSocket::receiveHeader( THeader & tipcHeader )
 		return true;
 	}
 	else if ( errno == EWOULDBLOCK ) {
-		SUB_LOGGER_LOG(logger, Logger::DEBUG, "receiveHeader")
-			<< "no data in buffer";
+//		xpcc::log::debug
+//				<< __FUNCTION__
+//				<< " no data in buffer"
+//				<< xpcc::flush;
 		// no data in the buffer
 	}
 	else if ( errno == 9 ) {
-		SUB_LOGGER_LOG(logger, Logger::ERROR, "receiveHeader")
-			<< "Bad file descriptor";
+		xpcc::log::error
+				<< __FUNCTION__
+				<< " Bad file descriptor"
+				<< xpcc::flush;
 	}
 	else {
-		SUB_LOGGER_LOG(logger, Logger::ERROR, "receiveHeader")
-			<< "Sorry: unknown Error while receiving data. errno=" << errno;
+		xpcc::log::error
+				<< __FUNCTION__
+				<< " Sorry: unknown Error while receiving data. errno=" << errno
+				<< xpcc::flush;
 		// TODO: Error handling??!!
 	}
 
@@ -132,36 +141,42 @@ rca::tipc::ReceiverSocket::receiveHeader( THeader & tipcHeader )
 // without deleting it. It returns true if the payload could be received
 // correctly from the TIPC socket - otherwise false.
 bool 
-rca::tipc::ReceiverSocket::receivePayload(char* payloadPointer, size_t payloadLength) 
+xpcc::tipc::ReceiverSocket::receivePayload(char* payloadPointer, size_t payloadLength)
 {		
 	int result = 0;
 
 	// Allocate memory for the whole packet inclusive header			
-	boost::scoped_array<char> packetPointer ( new char[ sizeof(THeader) + payloadLength ] );
+	boost::scoped_array<char> packetPointer ( new char[ sizeof(Header) + payloadLength ] );
 
 	result = recv(	this->socketDescriptor_,
 					packetPointer.get(),
-					sizeof(THeader) + payloadLength,
+					sizeof(Header) + payloadLength,
 					MSG_PEEK | MSG_DONTWAIT);	// Do not delete data from TIPC and do not wait for data
 											
 	if( result > 0 ) {
 		
 		// Copy the payload-part of the packet to it's destination!
-		memcpy(payloadPointer, packetPointer.get()+sizeof(THeader), payloadLength);
+		memcpy(payloadPointer, packetPointer.get()+sizeof(Header), payloadLength);
 		
 		return true;
 	}
 	else if ( errno == EWOULDBLOCK ) {
-		SUB_LOGGER_LOG(logger, Logger::DEBUG, "receivePayload")
-			<< "no data in buffer";
+		xpcc::log::debug
+				<< __FUNCTION__
+				<< " no data in buffer"
+				<< xpcc::flush;
 		// no data in the buffer
 	}
 	else if ( errno == 9 ) {
-		SUB_LOGGER_LOG(logger, Logger::ERROR, "receiveHeader")
-			<< "Bad file descriptor";
+		xpcc::log::error
+				<< __FUNCTION__
+				<< " Bad file descriptor"
+				<< xpcc::flush;
 	}
 	else {
-		SUB_LOGGER_LOG(logger, Logger::ERROR, "receivePayload");
+		xpcc::log::error
+				<< __FUNCTION__
+				<< xpcc::flush;
 		// TODO: Error handling??!!
 	}
 	
@@ -172,7 +187,7 @@ rca::tipc::ReceiverSocket::receivePayload(char* payloadPointer, size_t payloadLe
 // If the method was successful (if a message could be removed) the
 // method returns true - otherwise false.
 bool 
-rca::tipc::ReceiverSocket::popPayload() 
+xpcc::tipc::ReceiverSocket::popPayload()
 {
  	int result = 0;
 	
@@ -186,16 +201,22 @@ rca::tipc::ReceiverSocket::popPayload()
 		return true;
 	}
 	else if ( errno == EWOULDBLOCK ) {
-		SUB_LOGGER_LOG(logger, Logger::DEBUG, "popPayload")
-			<< "no data in buffer";
+		xpcc::log::debug
+				<< __FUNCTION__
+				<< "no data in buffer"
+				<< xpcc::flush;
 		// no data in the buffer
 	}
 	else if ( errno == 9 ) {
-		SUB_LOGGER_LOG(logger, Logger::ERROR, "receiveHeader")
-			<< "Bad file descriptor";
+		xpcc::log::error
+				<< __FUNCTION__
+				<< " Bad file descriptor"
+				<< xpcc::flush;
 	}
 	else {
-		SUB_LOGGER_LOG(logger, Logger::ERROR, "popPayload");
+		xpcc::log::error
+				<< __FUNCTION__
+				<< xpcc::flush;
 		// TODO: Error handling??!!
 	}
 	

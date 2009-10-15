@@ -28,50 +28,41 @@
  * $Id$
  */
 // ----------------------------------------------------------------------------
-#ifndef TIPC_TRANSMITTER_H_
-#define TIPC_TRANSMITTER_H_
+#ifndef XPCC__TIPC_TRANSMITTER_H_
+#define XPCC__TIPC_TRANSMITTER_H_
  
 // STD exceptions... 
 //#include <stdexcept>
 
 #include <bitset>
 
-#include "../icc_transmitter_interface.h"
-
 #include "tipc_transmitter_socket.h"
 
-namespace rca {
+#include "../backend_interface.hpp"
+
+namespace xpcc {
 	namespace tipc {
 		/**
 		 * @class		Transmitter
-		 * @brief		Transmitt packets over the TIPC.
+		 * @brief		Transmit packets over the TIPC.
 		 * 
-		 * @todo		exaption handling : now it writs only log-messages
+		 * @todo		exception handling : now it writs only log-messages
 		 * 
 		 * @ingroup		tipc
 		 * @version		$Id$
 		 * @author		Carsten Schmitt < >
 		 */
-		class Transmitter : public icc::TransmitterInterface {
+		class Transmitter {
 			public:
-				Transmitter( 	icc::TChannelId 	channelId, 
-								icc::TComponentId	componentId );
+				Transmitter();
+
 				~Transmitter();
 		
 				void 
-				transmitPacket(	icc::TChannelId 		receiverChannelId,
-								icc::TComponentId		receiverComponentId,
-								icc::TPayloadId			payloadId,
-								icc::TSize				payloadSize,
-								const void * 			payload,
-								icc::TServiceSpecifier	serviceSpecifier = icc::REQUEST,
-								icc::TError				error = icc::ERROR_NON);
+				transmitPacket(	const xpcc::Header &header, const SmartPayload& payload);
 		
 			private:
 				TransmitterSocket 	tipcTransmitterSocket_;
-				
-				icc::TChannelId 	channelId_;
-				icc::TComponentId	componentId_;
 		};
 	}
 }

@@ -28,34 +28,29 @@
  * $Id$
  */
 // ----------------------------------------------------------------------------
-#ifndef XPCC__TIPC_TRANSMITTER_SOCKET_H_
-#define XPCC__TIPC_TRANSMITTER_SOCKET_H_
- 
+
+#ifndef XPCC_TIPC_HEADER_HPP_
+#define XPCC_TIPC_HEADER_HPP_
 
 namespace xpcc {
 	namespace tipc {
+		//!	the first 64 ids (types) are used by tipc itself
+		//! @ingroup tipc
+		const unsigned int TYPE_ID_OFFSET = 64;
+		const unsigned int EVENT_OFFSET   = 0x10000;
+		const unsigned int REQUEST_OFFSET = 0x20000;
+
+
 		/**
-		 * @class		TransmitterSocket
-		 * @brief		Proviede the handling of the socket interface from TIPC.
-		 * 
+		 * @brief		The header, that are send over the tipc.
+		 *
 		 * @ingroup		tipc
 		 * @version		$Id$
-		 * @author		Carsten Schmitt < >
 		 */
-		class TransmitterSocket {
-			public:	
-				TransmitterSocket();
-				~TransmitterSocket();
-		
-				void 
-				transmitPayload(	unsigned int typeId,
-									unsigned int instanceId,
-									char* packet,
-									size_t length);
-		
-			private:
-				const int socketDescriptor_;
+		struct Header {
+			size_t size;
 		};
-	}
-}
-#endif // TIPC_TRANSMITTER_SOCKET_H_
+	};
+};
+
+#endif /* XPCC_TIPC_HEADER_HPP_ */

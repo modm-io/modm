@@ -29,18 +29,18 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef TIPC_RECEIVER_SOCKET_H_
-#define TIPC_RECEIVER_SOCKET_H_
+#ifndef XPCC_TIPC_RECEIVER_SOCKET_H_
+#define XPCC_TIPC_RECEIVER_SOCKET_H_
  
 #include <sys/types.h>
 
-#include "tipc_header_definition.h"
+#include "header.hpp"
 
-namespace rca {
+namespace xpcc {
 	namespace tipc {
 		/**
 		 * @class		ReceiverSocket
-		 * @brief		Proviede the handling of the socket interface from TIPC.
+		 * @brief		Provide the handling of the socket interface from TIPC.
 		 * 
 		 * @ingroup		tipc
 		 * @version		$Id$
@@ -57,7 +57,7 @@ namespace rca {
 									unsigned int upperInstance);
 		
 				bool 
-				receiveHeader(	THeader & tipcHeader );
+				receiveHeader(	tipc::Header & tipcHeader );
 				
 				bool 
 				receivePayload(	char* packetPointer,
@@ -72,4 +72,4 @@ namespace rca {
 	}
 }
 
-#endif /* TIPC_RECEIVER_SOCKET_H_ */
+#endif /* XPCC_TIPC_RECEIVER_SOCKET_H_ */

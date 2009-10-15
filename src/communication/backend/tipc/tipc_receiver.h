@@ -28,23 +28,23 @@
  * $Id$
  */
 // ----------------------------------------------------------------------------
-#ifndef TIPC_RECEIVER_H_
-#define TIPC_RECEIVER_H_
+#ifndef XPCC_TIPC_RECEIVER_H_
+#define XPCC_TIPC_RECEIVER_H_
  
 #include <queue>
 #include <boost/scoped_ptr.hpp>
 #include <boost/shared_array.hpp>
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/thread.hpp>
-
-#include "../icc_receiver_interface.h"
-
+;
+#include "../backend_interface.hpp"
+;
 #include "tipc_receiver_socket.h"
 
-namespace rca {
+namespace xpcc {
 	namespace tipc {
+
 		/**
-		 * @class		Receiver
 		 * @brief		Receive Packets over the TIPC and store them.
 		 * 
 		 * In a seperate thread the packets are taken from the TIPC and saved local.
@@ -53,40 +53,44 @@ namespace rca {
 		 * @version		$Id$
 		 * @author		Carsten Schmitt < >
 		 */
-		class Receiver : public icc::ReceiverInterface {
+		class Receiver {
 			public:
-				Receiver(	icc::TChannelId 	channelId, 
-							icc::TComponentId	componentId);
+				Receiver();
+
 			 	~Receiver();
-			
-				void 
-				addPacketListener(	icc::TChannelId 	channelId,
-									icc::TPayloadId 	payloadId);
+
+				void
+				addEventId(uint8_t id);
+
+				void
+				addReceiverId(uint8_t id);
+
+				bool
+				hasPacket() const;
 		
-			 	bool 
-			 	frontHeader( icc::THeader & header );
+				const ::xpcc::Header&
+			 	frontHeader();
 			 	
-			 	
-				//! @throw	rca::icc::WrongPayloadSizeException
-				bool 
-				frontPayload( void * payload, size_t size );
+				const uint8_t *
+				frontPayload();
 				
 				void 
 				popFront();
 				
-				bool 
-				hasPacket();
-				
 			private:
-				typedef boost::shared_array<char>	TSharedArr;
-				typedef boost::mutex				TMutex;
-				typedef boost::mutex::scoped_lock	TMutexGuard;
-				typedef	boost::thread::thread		TThread;
+				typedef boost::shared_array<char>	SharedArr;
+				typedef boost::mutex				Mutex;
+				typedef boost::mutex::scoped_lock	MutexGuard;
+				typedef	boost::thread::thread		Thread;
 				
-				typedef struct {
-					icc::THeader	iccHeader;
-					TSharedArr		iccPayloadPtr;
-				} TPacketQueueSummary;
+				struct PacketQueueSummary {
+					PacketQueueSummary();
+
+					PacketQueueSummary(xpcc::Header, SharedArr);
+
+					xpcc::Header	header;
+					SharedArr		payloadPtr;
+				};
 				
 				bool 
 				isAlive();
@@ -97,27 +101,16 @@ namespace rca {
 				void 
 				update();
 				
-				icc::TChannelId 					channelId_;
-				icc::TComponentId					componentId_;
+				ReceiverSocket						tipcReceiverSocket_;
+				std::queue<PacketQueueSummary>		packetQueue_;
 				
-				tipc::ReceiverSocket				tipcReceiverSocket_;
-				std::queue<TPacketQueueSummary>		packetQueue_;
-				
-				boost::scoped_ptr<TThread>			receiverThread_;
-				TMutex								receiverSocketLock_;
-				TMutex								packetQueueLock_;
+				boost::scoped_ptr<Thread>			receiverThread_;
+				mutable Mutex						receiverSocketLock_;
+				mutable Mutex						packetQueueLock_;
 				
 				bool								isAlive_;
 		};
+	};
+};
 
-
-	}
-	
-}
-
-// -------------------------------------------------------------------------
-
-
-#endif // TIPC_RECEIVER_H_
-
-
+#endif // XPCC_TIPC_RECEIVER_H_

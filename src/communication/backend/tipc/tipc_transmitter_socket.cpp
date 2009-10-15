@@ -37,26 +37,25 @@
 
 #include <iostream>
 
-#include "./tipc_transmitter_socket.h"
-#include "./tipc_header_definition.h"
+#include "tipc_transmitter_socket.h"
+#include "header.hpp"
 
-#include <modules/backplane/logging/logger_message_forwarder.hpp>
-SUB_LOGGER_CREATE(logger, Logger::WARNING, "icc::tipc::transmitter_socket");
+#include "../../../debug/logger/logger.hpp"
 
 // -------------------------------------------------------------------------------------------------------
-rca::tipc::TransmitterSocket::TransmitterSocket() :
+xpcc::tipc::TransmitterSocket::TransmitterSocket() :
 	socketDescriptor_ ( socket (AF_TIPC, SOCK_RDM,0) )
 {
 }
 // -------------------------------------------------------------------------------------------------------
-rca::tipc::TransmitterSocket::~TransmitterSocket() 
+xpcc::tipc::TransmitterSocket::~TransmitterSocket()
 {
 	// Close the socket
 	close( this->socketDescriptor_ );
 }
 // -------------------------------------------------------------------------------------------------------
 void 
-rca::tipc::TransmitterSocket::transmitPayload(	unsigned int typeId,
+xpcc::tipc::TransmitterSocket::transmitPayload(	unsigned int typeId,
 												unsigned int instanceId,
 												char* payloadPointer,
 												size_t length)  
@@ -76,30 +75,33 @@ rca::tipc::TransmitterSocket::transmitPayload(	unsigned int typeId,
 
 
 	// In the following section the payload will be connected to the tipc-header
-	THeader header;
-	header.payloadLength = length;
+	Header header;
+	header.size = length;
 
 	// Allocate memory for whole packet (header plus payload)
-	boost::shared_array<char> tipcPacketPointer ( new char[ sizeof(THeader) + length ] );
+	boost::shared_array<char> tipcPacketPointer ( new char[ sizeof(Header) + length ] );
 
 	// Put things together - first the tipc-header and then the payload
-	memcpy( tipcPacketPointer.get(), &header, sizeof(THeader) );
-	memcpy( tipcPacketPointer.get()+sizeof(THeader), payloadPointer, length);
+	memcpy( tipcPacketPointer.get(), &header, sizeof(Header) );
+	memcpy( tipcPacketPointer.get()+sizeof(Header), payloadPointer, length);
 
 	sendToResult	=	sendto(	this->socketDescriptor_,
 								(void*)tipcPacketPointer.get(),
-								length + sizeof(THeader),
+								length + sizeof(Header),
 								0,
 								(struct sockaddr*)&tipcToAddresse,
 								(size_t)sizeof(tipcToAddresse));
 
-	SUB_LOGGER_LOG(logger, Logger::DEBUG, "transmitPayload")
-		<< "tid=" << typeId << " iid=" << instanceId;
+	xpcc::log::debug
+			<< __FUNCTION__
+			<< "tid=" << typeId << " iid=" << instanceId;
 	
 	// Check if the sending failed
 	if (sendToResult < 0) {
-		SUB_LOGGER_LOG(logger, Logger::ERROR, "transmitPayload")
-			<< "on transmit";
+		xpcc::log::error
+				<< __FUNCTION__
+				<< "on transmit";
+
 		// Throw an exception because a connection error cannot be handled here.
 		// Just closing and opening the socket again is not suitable because one
 		// should be informed about such bad errors to eliminate the cause and not

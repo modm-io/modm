@@ -28,34 +28,79 @@
  * $Id$
  */
 // ----------------------------------------------------------------------------
-#ifndef XPCC__TIPC_TRANSMITTER_SOCKET_H_
-#define XPCC__TIPC_TRANSMITTER_SOCKET_H_
- 
 
-namespace xpcc {
-	namespace tipc {
-		/**
-		 * @class		TransmitterSocket
-		 * @brief		Proviede the handling of the socket interface from TIPC.
-		 * 
-		 * @ingroup		tipc
-		 * @version		$Id$
-		 * @author		Carsten Schmitt < >
-		 */
-		class TransmitterSocket {
-			public:	
-				TransmitterSocket();
-				~TransmitterSocket();
-		
-				void 
-				transmitPayload(	unsigned int typeId,
-									unsigned int instanceId,
-									char* packet,
-									size_t length);
-		
-			private:
-				const int socketDescriptor_;
-		};
-	}
+#include "tipc.h"
+
+xpcc::tipc::Tipc::Tipc( ) :
+	receiver( )
+{
+
 }
-#endif // TIPC_TRANSMITTER_SOCKET_H_
+
+// ----------------------------------------------------------------------------
+
+xpcc::tipc::Tipc::~Tipc()
+{
+
+}
+
+// ----------------------------------------------------------------------------
+
+void
+xpcc::tipc::Tipc::addFilter(
+		xpcc::Header::Type type,
+		bool isAcknowledge,
+		uint8_t destination,
+		uint8_t source,
+		uint8_t actionIdentifier)
+{
+
+}
+
+// ----------------------------------------------------------------------------
+
+void
+xpcc::tipc::Tipc::sendPacket(const xpcc::Header &header, const SmartPayload& payload)
+{
+
+}
+
+// ----------------------------------------------------------------------------
+
+bool
+xpcc::tipc::Tipc::isPacketAvailable() const
+{
+	return this->receiver.hasPacket();
+}
+
+// ----------------------------------------------------------------------------
+
+const xpcc::Header&
+xpcc::tipc::Tipc::getPacketHeader() const
+{
+
+}
+
+// ----------------------------------------------------------------------------
+
+const uint8_t *
+xpcc::tipc::Tipc::getPacketPayload() const
+{
+
+}
+
+// ----------------------------------------------------------------------------
+
+uint8_t
+xpcc::tipc::Tipc::getPacketPayloadSize() const
+{
+
+}
+
+// ----------------------------------------------------------------------------
+
+void
+xpcc::tipc::Tipc::dropPacket()
+{
+
+}
