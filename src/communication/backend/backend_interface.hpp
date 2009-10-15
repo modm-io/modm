@@ -38,6 +38,14 @@
 
 namespace xpcc
 {
+	/**
+	 * @ingroup		communication
+	 * @brief 		The header of the communication.
+	 *
+	 *
+	 * @version		$Id$
+	 * @author		Martin Rosekeit, Fabian Greif
+	 */
 	struct Header
 	{
 		typedef enum {
@@ -45,6 +53,22 @@ namespace xpcc
 			RESPONSE,
 			NEGATIVE_RESPONSE,
 		} Type;
+
+		Header() :
+			type( REQUEST ),
+			isAcknowledge ( false ),
+			destination ( 0 ),
+			source ( 0 ),
+			packetIdentifier ( 0 )
+		{};
+
+		Header(Type type, bool isAck, uint8_t dest, uint8_t source, uint8_t id) :
+			type( type ),
+			isAcknowledge ( isAck ),
+			destination ( dest ),
+			source ( source ),
+			packetIdentifier ( id )
+		{};
 		
 		Type type;
 		bool isAcknowledge;
@@ -64,7 +88,7 @@ namespace xpcc
 	};
 	
 	/**
-	 * @ingroup		backend
+	 * @ingroup		communication
 	 * @brief 		The BackendInterface provides a common interface for using
 	 * 				different hardware modules to transmit messages.
 	 *
@@ -76,6 +100,9 @@ namespace xpcc
 	class BackendInterface
 	{
 	public:
+		virtual
+		~BackendInterface() {};
+
 		virtual void
 		update() = 0;
 		
