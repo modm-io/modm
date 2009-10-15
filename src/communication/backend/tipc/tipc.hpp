@@ -28,34 +28,68 @@
  * $Id$
  */
 // ----------------------------------------------------------------------------
-#ifndef XPCC__TIPC_TRANSMITTER_SOCKET_H_
-#define XPCC__TIPC_TRANSMITTER_SOCKET_H_
- 
+#ifndef XPCC_TIPC_H_
+#define XPCC_TIPC_H_
+
+
+#include "../backend_interface.hpp"
+#include "header.hpp"
+#include "tipc_receiver.hpp"
+#include "tipc_transmitter.hpp"
 
 namespace xpcc {
 	namespace tipc {
-		/**
-		 * @class		TransmitterSocket
-		 * @brief		Proviede the handling of the socket interface from TIPC.
-		 * 
-		 * @ingroup		tipc
-		 * @version		$Id$
-		 * @author		Carsten Schmitt < >
+
+		/*
+		 * \class	Tipc
+		 * \brief	Class that connects the communication to the tipc.
+		 *
+		 * \ingroup	tipc
+		 * \version	$Id$
+		 * \author	Martin Rosekeit <martin.rosekeit@rwth-aachen.de>
 		 */
-		class TransmitterSocket {
-			public:	
-				TransmitterSocket();
-				~TransmitterSocket();
-		
-				void 
-				transmitPayload(	unsigned int typeId,
-									unsigned int instanceId,
-									char* packet,
-									size_t length);
-		
-			private:
-				const int socketDescriptor_;
+		class Tipc : public BackendInterface
+		{
+			public :
+				Tipc();
+
+				~Tipc();
+
+				void
+				addFilter(
+						xpcc::Header::Type type,
+						bool isAcknowledge,
+						uint8_t destination,
+						uint8_t source,
+						uint8_t actionIdentifier);
+
+				//! Send a Message.
+				//!
+				//! \return	\b true if the packet could be send, \b false otherwise.
+				virtual void
+				sendPacket(const xpcc::Header &header, const SmartPayload& payload);
+
+				//! Check if a new packet was received by the backend
+				virtual bool
+				isPacketAvailable() const;
+
+				//! Access the packet.
+				virtual const xpcc::Header&
+				getPacketHeader() const;
+
+				virtual const uint8_t *
+				getPacketPayload() const;
+
+				virtual uint8_t
+				getPacketPayloadSize() const;
+
+				virtual void
+				dropPacket();
+
+			private :
+				Receiver	receiver;
 		};
-	}
-}
-#endif // TIPC_TRANSMITTER_SOCKET_H_
+	};
+};
+ 
+#endif /*XPCC_TIPC_H_*/

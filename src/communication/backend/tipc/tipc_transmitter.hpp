@@ -28,68 +28,42 @@
  * $Id$
  */
 // ----------------------------------------------------------------------------
-#ifndef XPCC_TIPC_H_
-#define XPCC_TIPC_H_
+#ifndef XPCC__TIPC_TRANSMITTER_H_
+#define XPCC__TIPC_TRANSMITTER_H_
+ 
+// STD exceptions... 
+//#include <stdexcept>
 
+#include <bitset>
+
+#include "tipc_transmitter_socket.hpp"
 
 #include "../backend_interface.hpp"
-#include "header.hpp"
-#include "tipc_receiver.h"
-#include "tipc_transmitter.h"
 
 namespace xpcc {
 	namespace tipc {
-
-		/*
-		 * \class	Tipc
-		 * \brief	Class that connects the communication to the tipc.
-		 *
-		 * \ingroup	tipc
-		 * \version	$Id$
-		 * \author	Martin Rosekeit <martin.rosekeit@rwth-aachen.de>
+		/**
+		 * @class		Transmitter
+		 * @brief		Transmit packets over the TIPC.
+		 * 
+		 * @todo		exception handling : now it writs only log-messages
+		 * 
+		 * @ingroup		tipc
+		 * @version		$Id$
+		 * @author		Carsten Schmitt < >
 		 */
-		class Tipc : public BackendInterface
-		{
-			public :
-				Tipc();
+		class Transmitter {
+			public:
+				Transmitter();
 
-				~Tipc();
-
-				void
-				addFilter(
-						xpcc::Header::Type type,
-						bool isAcknowledge,
-						uint8_t destination,
-						uint8_t source,
-						uint8_t actionIdentifier);
-
-				//! Send a Message.
-				//!
-				//! \return	\b true if the packet could be send, \b false otherwise.
-				virtual void
-				sendPacket(const xpcc::Header &header, const SmartPayload& payload);
-
-				//! Check if a new packet was received by the backend
-				virtual bool
-				isPacketAvailable() const;
-
-				//! Access the packet.
-				virtual const xpcc::Header&
-				getPacketHeader() const;
-
-				virtual const uint8_t *
-				getPacketPayload() const;
-
-				virtual uint8_t
-				getPacketPayloadSize() const;
-
-				virtual void
-				dropPacket();
-
-			private :
-				Receiver	receiver;
+				~Transmitter();
+		
+				void 
+				transmitPacket(	const xpcc::Header &header, const SmartPayload& payload);
+		
+			private:
+				TransmitterSocket 	tipcTransmitterSocket_;
 		};
-	};
-};
- 
-#endif /*XPCC_TIPC_H_*/
+	}
+}
+#endif // TIPC_TRANSMITTER_H_

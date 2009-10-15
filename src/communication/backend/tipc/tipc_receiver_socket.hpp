@@ -28,89 +28,48 @@
  * $Id$
  */
 // ----------------------------------------------------------------------------
-#ifndef XPCC_TIPC_RECEIVER_H_
-#define XPCC_TIPC_RECEIVER_H_
- 
-#include <queue>
-#include <boost/scoped_ptr.hpp>
-#include <boost/shared_array.hpp>
-#include <boost/thread/mutex.hpp>
-#include <boost/thread/thread.hpp>
-;
-#include "../backend_interface.hpp"
-;
-#include "tipc_receiver_socket.h"
+
+#ifndef XPCC_TIPC_RECEIVER_SOCKET_H_
+#define XPCC_TIPC_RECEIVER_SOCKET_H_
+
+#include <boost/scoped_array.hpp>
+
+#include "header.hpp"
 
 namespace xpcc {
 	namespace tipc {
-
 		/**
-		 * @brief		Receive Packets over the TIPC and store them.
+		 * @class		ReceiverSocket
+		 * @brief		Provide the handling of the socket interface from TIPC.
 		 * 
-		 * In a seperate thread the packets are taken from the TIPC and saved local.
-		 *  
 		 * @ingroup		tipc
 		 * @version		$Id$
 		 * @author		Carsten Schmitt < >
 		 */
-		class Receiver {
-			public:
-				Receiver();
-
-			 	~Receiver();
-
-				void
-				addEventId(uint8_t id);
-
-				void
-				addReceiverId(uint8_t id);
-
-				bool
-				hasPacket() const;
+		class ReceiverSocket {
+			public:	
+				ReceiverSocket();
+				~ReceiverSocket();
 		
-				const ::xpcc::Header&
-			 	frontHeader();
-			 	
-				const uint8_t *
-				frontPayload();
-				
 				void 
-				popFront();
-				
-			private:
-				typedef boost::shared_array<char>	SharedArr;
-				typedef boost::mutex				Mutex;
-				typedef boost::mutex::scoped_lock	MutexGuard;
-				typedef	boost::thread::thread		Thread;
-				
-				struct PacketQueueSummary {
-					PacketQueueSummary();
-
-					PacketQueueSummary(xpcc::Header, SharedArr);
-
-					xpcc::Header	header;
-					SharedArr		payloadPtr;
-				};
+				registerOnPacket(	unsigned int typeId,
+									unsigned int lowerInstance,
+									unsigned int upperInstance);
+		
+				bool 
+				receiveHeader(	tipc::Header & tipcHeader );
 				
 				bool 
-				isAlive();
+				receivePayload(	char* packetPointer,
+								size_t payloadLength);
+				
+				bool 
+				popPayload();
 		
-				void* 
-				runReceiver();
-				
-				void 
-				update();
-				
-				ReceiverSocket						tipcReceiverSocket_;
-				std::queue<PacketQueueSummary>		packetQueue_;
-				
-				boost::scoped_ptr<Thread>			receiverThread_;
-				mutable Mutex						receiverSocketLock_;
-				mutable Mutex						packetQueueLock_;
-				
-				bool								isAlive_;
+			private:
+				const int socketDescriptor_;
 		};
-	};
-};
+	}
+}
 
-#endif // XPCC_TIPC_RECEIVER_H_
+#endif /* XPCC_TIPC_RECEIVER_SOCKET_H_ */

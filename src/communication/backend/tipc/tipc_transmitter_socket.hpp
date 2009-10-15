@@ -28,48 +28,35 @@
  * $Id$
  */
 // ----------------------------------------------------------------------------
-
-#ifndef XPCC_TIPC_RECEIVER_SOCKET_H_
-#define XPCC_TIPC_RECEIVER_SOCKET_H_
+#ifndef XPCC__TIPC_TRANSMITTER_SOCKET_H_
+#define XPCC__TIPC_TRANSMITTER_SOCKET_H_
  
-#include <sys/types.h>
-
-#include "header.hpp"
+#include <cstring>
 
 namespace xpcc {
 	namespace tipc {
 		/**
-		 * @class		ReceiverSocket
-		 * @brief		Provide the handling of the socket interface from TIPC.
+		 * @class		TransmitterSocket
+		 * @brief		Proviede the handling of the socket interface from TIPC.
 		 * 
 		 * @ingroup		tipc
 		 * @version		$Id$
 		 * @author		Carsten Schmitt < >
 		 */
-		class ReceiverSocket {
+		class TransmitterSocket {
 			public:	
-				ReceiverSocket();
-				~ReceiverSocket();
+				TransmitterSocket();
+				~TransmitterSocket();
 		
 				void 
-				registerOnPacket(	unsigned int typeId,
-									unsigned int lowerInstance,
-									unsigned int upperInstance);
-		
-				bool 
-				receiveHeader(	tipc::Header & tipcHeader );
-				
-				bool 
-				receivePayload(	char* packetPointer,
-								size_t payloadLength);
-				
-				bool 
-				popPayload();
+				transmitPayload(	unsigned int typeId,
+									unsigned int instanceId,
+									char* packet,
+									size_t length);
 		
 			private:
 				const int socketDescriptor_;
 		};
 	}
 }
-
-#endif /* XPCC_TIPC_RECEIVER_SOCKET_H_ */
+#endif // TIPC_TRANSMITTER_SOCKET_H_

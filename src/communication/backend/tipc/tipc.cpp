@@ -29,7 +29,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include "tipc.h"
+#include "tipc.hpp"
 
 xpcc::tipc::Tipc::Tipc( ) :
 	receiver( )

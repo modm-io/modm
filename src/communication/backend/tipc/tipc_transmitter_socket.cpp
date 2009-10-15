@@ -28,19 +28,16 @@
  * $Id$
  */
 // ----------------------------------------------------------------------------
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <linux/tipc.h>
-#include <boost/shared_array.hpp>
-#include <string.h>
 
-#include <iostream>
-
-#include "tipc_transmitter_socket.h"
+#include "tipc_transmitter_socket.hpp"
 #include "header.hpp"
 
 #include "../../../debug/logger/logger.hpp"
+
+#include <sys/socket.h>
+#include <linux/tipc.h>
+#include <boost/shared_array.hpp>
+#include <cstring>
 
 // -------------------------------------------------------------------------------------------------------
 xpcc::tipc::TransmitterSocket::TransmitterSocket() :

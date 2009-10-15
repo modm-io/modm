@@ -28,42 +28,90 @@
  * $Id$
  */
 // ----------------------------------------------------------------------------
-#ifndef XPCC__TIPC_TRANSMITTER_H_
-#define XPCC__TIPC_TRANSMITTER_H_
+#ifndef XPCC_TIPC_RECEIVER_H_
+#define XPCC_TIPC_RECEIVER_H_
  
-// STD exceptions... 
-//#include <stdexcept>
-
-#include <bitset>
-
-#include "tipc_transmitter_socket.h"
 
 #include "../backend_interface.hpp"
+#include "tipc_receiver_socket.hpp"
+
+#include <queue>
+
+#include <boost/thread/mutex.hpp>
+#include <boost/shared_array.hpp>
+#include <boost/thread/thread.hpp>
+#include <boost/scoped_ptr.hpp>
 
 namespace xpcc {
 	namespace tipc {
+
 		/**
-		 * @class		Transmitter
-		 * @brief		Transmit packets over the TIPC.
+		 * @brief		Receive Packets over the TIPC and store them.
 		 * 
-		 * @todo		exception handling : now it writs only log-messages
-		 * 
+		 * In a seperate thread the packets are taken from the TIPC and saved local.
+		 *  
 		 * @ingroup		tipc
 		 * @version		$Id$
 		 * @author		Carsten Schmitt < >
 		 */
-		class Transmitter {
+		class Receiver {
 			public:
-				Transmitter();
+				Receiver();
 
-				~Transmitter();
+			 	~Receiver();
+
+				void
+				addEventId(uint8_t id);
+
+				void
+				addReceiverId(uint8_t id);
+
+				bool
+				hasPacket() const;
 		
+				const ::xpcc::Header&
+			 	frontHeader();
+			 	
+				const uint8_t *
+				frontPayload();
+				
 				void 
-				transmitPacket(	const xpcc::Header &header, const SmartPayload& payload);
-		
+				popFront();
+				
 			private:
-				TransmitterSocket 	tipcTransmitterSocket_;
+				typedef boost::shared_array<char>	SharedArr;
+				typedef boost::mutex				Mutex;
+				typedef boost::mutex::scoped_lock	MutexGuard;
+				typedef	boost::thread::thread		Thread;
+				
+				struct PacketQueueSummary {
+					PacketQueueSummary();
+
+					PacketQueueSummary(xpcc::Header, SharedArr);
+
+					xpcc::Header	header;
+					SharedArr		payloadPtr;
+				};
+				
+				bool 
+				isAlive();
+		
+				void* 
+				runReceiver();
+				
+				void 
+				update();
+				
+				ReceiverSocket						tipcReceiverSocket_;
+				std::queue<PacketQueueSummary>		packetQueue_;
+				
+				boost::scoped_ptr<Thread>			receiverThread_;
+				mutable Mutex						receiverSocketLock_;
+				mutable Mutex						packetQueueLock_;
+				
+				bool								isAlive_;
 		};
-	}
-}
-#endif // TIPC_TRANSMITTER_H_
+	};
+};
+
+#endif // XPCC_TIPC_RECEIVER_H_

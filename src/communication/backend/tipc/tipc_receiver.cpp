@@ -29,12 +29,12 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <boost/bind.hpp>
-
-#include "tipc_receiver.h"
+#include "tipc_receiver.hpp"
 #include "header.hpp"
 
 #include "../../../debug/logger/logger.hpp"
+
+#include <boost/bind.hpp>
 
 // -------------------------------------------------------------------------------------------------------
 xpcc::tipc::Receiver::Receiver() :

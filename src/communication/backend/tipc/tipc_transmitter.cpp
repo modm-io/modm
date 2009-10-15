@@ -28,13 +28,13 @@
  * $Id$
  */
 // ----------------------------------------------------------------------------
-#include "tipc_transmitter.h"
+
+#include "tipc_transmitter.hpp"
 #include "header.hpp"
 
-#include <iostream>
-#include <boost/shared_array.hpp>
-
 #include "../../../debug/logger/logger.hpp"
+
+#include <boost/shared_array.hpp>
 
 // TODO: IMPORTANT! If the TIPC-Module is not loaded terminate with appropriate
 // error message!!!!

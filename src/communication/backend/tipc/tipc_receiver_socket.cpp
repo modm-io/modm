@@ -28,20 +28,17 @@
  * $Id$
  */
 // ----------------------------------------------------------------------------
-#include <iostream>
-#include <stdlib.h>
-#include <sys/poll.h>
-#include <unistd.h>
-#include <sys/types.h>
+
+#include "tipc_receiver_socket.hpp"
+
+#include "../../../debug/logger/logger.hpp"
+
 #include <sys/socket.h>
 #include <linux/tipc.h>
 #include <errno.h>
+#include <cstring>
+
 #include <boost/scoped_array.hpp>
-#include <string.h>
-
-#include "tipc_receiver_socket.h"
-
-#include "../../../debug/logger/logger.hpp"
 
 // -------------------------------------------------------------------------------------------------------
 xpcc::tipc::ReceiverSocket::ReceiverSocket() :
