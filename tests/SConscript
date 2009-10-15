@@ -16,7 +16,10 @@ for file in sourceFiles:
 	basename = os.path.basename(file.name)
 	name = os.path.splitext(basename)
 	
-	program = env.Program(name[0], file.name, LIBS='robot', LIBPATH='../build/')
+	if env['ARCHITECTURE'] == 'pc':
+		program = env.Program(name[0], file.name, LIBS=['robot','boost_thread'], LIBPATH=['../build/','/usr/lib/'])
+	else:
+		program = env.Program(name[0], file.name, LIBS=['robot'], LIBPATH=['../build/'])
 	env.Default(program)
 	
 	if env['ARCHITECTURE'] == 'avr':
