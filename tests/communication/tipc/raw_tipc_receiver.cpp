@@ -30,10 +30,10 @@
 // ----------------------------------------------------------------------------
 
 #include <iostream>
-#include "../../../src/debug/logger/logger.hpp"
-#include "../../../src/debug/logger/backend/std/std_log_device.hpp"
+#include <src/debug/logger/logger.hpp>
+#include <src/debug/logger/backend/std/std_log_device.hpp>
 
-#include "../../../src/communication/backend/tipc/tipc.hpp"
+#include <src/communication/backend/tipc/tipc.hpp>
 
 xpcc::log::DeviceStd device;
 
@@ -51,8 +51,12 @@ main()
 
 	while(1) {
 		if( receiver.hasPacket() ) {
-			xpcc::log::debug << "has packet" << xpcc::flush;
+			XPCC_LOG_INFO << __FILE__ << __FUNCTION__ << "has packet" << xpcc::flush;
 
+			receiver.popFront();
+		}
+		else {
+			XPCC_LOG_DEBUG << __FILE__ << __FUNCTION__ << "has no packet" << xpcc::flush;
 		}
 
 		usleep(100000);

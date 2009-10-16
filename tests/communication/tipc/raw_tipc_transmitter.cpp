@@ -52,6 +52,7 @@ main()
 	xpcc::SmartPayload payload(&data);
 
 	while(1) {
+		xpcc::log::info << data << xpcc::flush;
 		transmitter.transmitPacket(header, payload);
 		data++;
 		sleep(1);
