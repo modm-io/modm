@@ -33,7 +33,7 @@
 
 #include "level.hpp"
 #include "singleton.hpp"
-#include "../../hal/io/iostream.hpp"
+#include "../../io/iostream.hpp"
 
 namespace xpcc {
 	namespace log {
@@ -91,6 +91,22 @@ namespace xpcc {
 		/*@}*/
 	}
 };
+
+#define XPCC_LOG_DEBUG \
+	if ( XPCC_LOG_LEVEL <= xpcc::log::DEBUG )	\
+		xpcc::log::debug
+
+#define XPCC_LOG_INFO \
+	if ( XPCC_LOG_LEVEL <= xpcc::log::INFO )	\
+		xpcc::log::info
+
+#define XPCC_LOG_WARNING \
+	if ( XPCC_LOG_LEVEL <= xpcc::log::WARNING )	\
+		xpcc::log::warning
+
+#define XPCC_LOG_ERROR \
+	if ( XPCC_LOG_LEVEL <= xpcc::log::ERROR )	\
+		xpcc::log::error
 
 
 #endif /*XPCC_LOGGER__HPP*/

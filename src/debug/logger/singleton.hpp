@@ -33,7 +33,7 @@
 
 #include "device.hpp"
 #include "level.hpp"
-#include "../../hal/io/iodevice.hpp"
+#include "../../io/iodevice.hpp"
 
 namespace xpcc {
 	namespace log {
