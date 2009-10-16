@@ -32,9 +32,12 @@
 #include "tipc_receiver.hpp"
 #include "header.hpp"
 
-#include "../../../debug/logger/logger.hpp"
-
 #include <boost/bind.hpp>
+
+#include "../../../debug/logger/logger.hpp"
+#undef  XPCC_LOG_LEVEL
+#define XPCC_LOG_LEVEL xpcc::log::INFO
+
 
 // -------------------------------------------------------------------------------------------------------
 xpcc::tipc::Receiver::Receiver() :
@@ -91,17 +94,13 @@ void*
 xpcc::tipc::Receiver::runReceiver()
 {
 	while( this->isAlive() ) {
-		//	xpcc::log::debug
-		//		<< __CLASS__ << "::" << __FUNCTION__
-		//		<< xpcc::flush;
+//		XPCC_LOG_DEBUG('is alive');
 		this->update();
 		usleep(1000);
 	}
 
-	xpcc::log::info
-			<< __FUNCTION__
-			<< " has terminated."
-			<< xpcc::flush;
+	XPCC_LOG_INFO << __FILE__ << __FUNCTION__ << "Thread terminates." << xpcc::flush;
+
 	return 0;
 }
 // -------------------------------------------------------------------------
@@ -113,17 +112,9 @@ xpcc::tipc::Receiver::update()
 	// Set the mutex guard for the receiver socket
 	MutexGuard receiverSocketGuard( this->receiverSocketLock_ );
 
-
-//	xpcc::log::debug
-//			<< __FUNCTION__
-//			<< xpcc::flush;
-
 	// Get the TIPC header (typeId and instanceRange) - call by reference
 	while( this->tipcReceiverSocket_.receiveHeader( tipcHeader ) ) {
-		xpcc::log::debug
-			<< __FUNCTION__
-			<< " headerAvailable "
-			<< xpcc::flush;
+		XPCC_LOG_DEBUG << __FILE__ << __FUNCTION__ << "Header available." << xpcc::flush;
 
 		// Try to allocate memory for the packet
 		SharedArr tipcPayloadPtr ( new char[tipcHeader.size] );

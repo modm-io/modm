@@ -31,14 +31,16 @@
 
 #include "tipc_receiver_socket.hpp"
 
-#include "../../../debug/logger/logger.hpp"
-
 #include <sys/socket.h>
 #include <linux/tipc.h>
 #include <errno.h>
 #include <cstring>
 
 #include <boost/scoped_array.hpp>
+
+#include "../../../debug/logger/logger.hpp"
+#undef  XPCC_LOG_LEVEL
+#define XPCC_LOG_LEVEL xpcc::log::INFO
 
 // -------------------------------------------------------------------------------------------------------
 xpcc::tipc::ReceiverSocket::ReceiverSocket() :
@@ -68,10 +70,7 @@ xpcc::tipc::ReceiverSocket::registerOnPacket(	unsigned int typeId,
 	fromAddress.addr.nameseq.upper	=	upperInstance;
 	fromAddress.scope				=	TIPC_CLUSTER_SCOPE;	// Scope of puplisching is cluster (node < cluster < zone)
 
-	xpcc::log::info
-		<< __FUNCTION__
-		<< "(typeId, lowerBound, upperBound) = (" << typeId << ", " << lowerInstance << ", " << upperInstance << ")"
-		<< xpcc::flush;
+	XPCC_LOG_INFO << __FILE__ << __FUNCTION__ << "(typeId, lowerBound, upperBound) = (" << typeId << ", " << lowerInstance << ", " << upperInstance << ")" << xpcc::flush;
 
 	// Binding means registering to a specific packet
 	result = 	bind (	this->socketDescriptor_, 
@@ -81,10 +80,7 @@ xpcc::tipc::ReceiverSocket::registerOnPacket(	unsigned int typeId,
 	// If there was an error binding the socket throw an exception because this case
 	// cannot be handled here.
 	if (0 != result) {
-		xpcc::log::error
-				<< __FUNCTION__
-				<< "Port {" << typeId << ", " << lowerInstance << ", " << upperInstance << "}  could not be created."
-				<< xpcc::flush;
+		XPCC_LOG_ERROR << __FILE__ << __FUNCTION__ << "Port {" << typeId << ", " << lowerInstance << ", " << upperInstance << "}  could not be created." << xpcc::flush;
 		// TODO: Throw an exception!!
 	}
 }
@@ -111,10 +107,7 @@ xpcc::tipc::ReceiverSocket::receiveHeader( Header & tipcHeader )
 		return true;
 	}
 	else if ( errno == EWOULDBLOCK ) {
-//		xpcc::log::debug
-//				<< __FUNCTION__
-//				<< " no data in buffer"
-//				<< xpcc::flush;
+		XPCC_LOG_DEBUG << __FILE__ << __FUNCTION__ << " no data in buffer" << xpcc::flush;
 		// no data in the buffer
 	}
 	else if ( errno == 9 ) {

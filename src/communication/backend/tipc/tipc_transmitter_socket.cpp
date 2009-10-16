@@ -32,12 +32,14 @@
 #include "tipc_transmitter_socket.hpp"
 #include "header.hpp"
 
-#include "../../../debug/logger/logger.hpp"
-
 #include <sys/socket.h>
 #include <linux/tipc.h>
 #include <boost/shared_array.hpp>
 #include <cstring>
+
+#include "../../../debug/logger/logger.hpp"
+#undef  XPCC_LOG_LEVEL
+#define XPCC_LOG_LEVEL xpcc::log::INFO
 
 // -------------------------------------------------------------------------------------------------------
 xpcc::tipc::TransmitterSocket::TransmitterSocket() :
@@ -89,15 +91,11 @@ xpcc::tipc::TransmitterSocket::transmitPayload(	unsigned int typeId,
 								(struct sockaddr*)&tipcToAddresse,
 								(size_t)sizeof(tipcToAddresse));
 
-	xpcc::log::debug
-			<< __FUNCTION__
-			<< "tid=" << typeId << " iid=" << instanceId;
+	XPCC_LOG_DEBUG << __FILE__ << __FUNCTION__ << "tid=" << (int)typeId << " iid=" << (int)instanceId  << xpcc::flush;
 	
 	// Check if the sending failed
 	if (sendToResult < 0) {
-		xpcc::log::error
-				<< __FUNCTION__
-				<< "on transmit";
+		XPCC_LOG_ERROR << __FILE__ << __FUNCTION__ << "on transmit" << xpcc::flush;
 
 		// Throw an exception because a connection error cannot be handled here.
 		// Just closing and opening the socket again is not suitable because one
