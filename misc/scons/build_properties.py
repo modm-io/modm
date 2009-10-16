@@ -47,6 +47,8 @@ class GlobalProperties:
 class FileProperties:
 	def __init__(self, filename, defines={}):
 		self.name = filename
+		# filename without extension
+		self.basename = os.path.splitext(os.path.basename(filename))[0]
 		self.defines = defines
 		#print filename, defines
 

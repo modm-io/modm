@@ -51,12 +51,12 @@ main()
 
 	while(1) {
 		if( receiver.hasPacket() ) {
-			XPCC_LOG_INFO << __FILE__ << __FUNCTION__ << "has packet" << xpcc::flush;
+			XPCC_LOG_INFO << XPCC_FILE_INFO << "has packet" << xpcc::flush;
 
 			receiver.popFront();
 		}
 		else {
-			XPCC_LOG_DEBUG << __FILE__ << __FUNCTION__ << "has no packet" << xpcc::flush;
+			XPCC_LOG_DEBUG << XPCC_FILE_INFO << "has no packet" << xpcc::flush;
 		}
 
 		usleep(100000);

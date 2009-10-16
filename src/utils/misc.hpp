@@ -37,4 +37,8 @@
 // people compile with -Os, which does not always inline them.
 #define ALWAYS_INLINE  inline __attribute__((always_inline))
 
+
+#define	STRINGIFY(s)	STRINGIFY2(s)
+#define	STRINGIFY2(s)	#s
+
 #endif	// MISC_HPP

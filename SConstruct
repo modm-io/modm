@@ -30,7 +30,9 @@ elif build.target == 'pc':
 	env = Environment(
 			ARCHITECTURE = 'pc',
 			tools = ['pc', 'doxygen'],
-			toolpath = ['misc/scons/'])
+			toolpath = ['misc/scons/'],
+			LIBS=['boost_thread'],
+			LIBPATH=['/usr/lib/'])
 
 else:
 	print "Unknown build target '%s'!" % build.target

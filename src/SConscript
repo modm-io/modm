@@ -13,6 +13,7 @@ objects = []
 for file in sourceFiles:
 	defines = env.get('CPPDEFINES', {})
 	defines.update(file.defines)
+	defines['BASENAME'] = file.basename
 	
 	object = env.Object(file.name, CPPDEFINES=defines)
 	objects.append(object)

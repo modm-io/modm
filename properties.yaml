@@ -1,5 +1,5 @@
 
-target: avr
+target: pc
 
 avr:
   device: atmega2560

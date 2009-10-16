@@ -28,15 +28,20 @@
  * $Id$
  */
 // ----------------------------------------------------------------------------
+
 #ifndef XPCC_LOGGER__HPP
 #define XPCC_LOGGER__HPP
 
+#include <src/utils/misc.hpp>
+#include <src/io/iostream.hpp>
+
 #include "level.hpp"
 #include "singleton.hpp"
-#include "../../io/iostream.hpp"
 
-namespace xpcc {
-	namespace log {
+namespace xpcc
+{
+	namespace log
+	{
 		/**
 		 * @class 	Logger
 		 * @brief 	Interface to the Logger.
@@ -90,7 +95,7 @@ namespace xpcc {
 		extern Logger<ERROR> 	error;		//!	log device to take messages on ERROR level
 		/*@}*/
 	}
-};
+}
 
 #define XPCC_LOG_DEBUG \
 	if ( XPCC_LOG_LEVEL <= xpcc::log::DEBUG )	\
@@ -108,5 +113,6 @@ namespace xpcc {
 	if ( XPCC_LOG_LEVEL <= xpcc::log::ERROR )	\
 		xpcc::log::error
 
+#define	XPCC_FILE_INFO		STRINGIFY(BASENAME) "(" STRINGIFY(__LINE__) ") >> "
 
-#endif /*XPCC_LOGGER__HPP*/
+#endif // XPCC_LOGGER__HPP

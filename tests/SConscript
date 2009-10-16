@@ -13,13 +13,14 @@ env.Append(CPPPATH = '../')
 
 # build a object file form each source file
 for file in sourceFiles:
-	basename = os.path.basename(file.name)
-	name = os.path.splitext(basename)
+	defines = env.get('CPPDEFINES', {})
+	defines.update(file.defines)
+	defines['BASENAME'] = file.basename
 	
-	if env['ARCHITECTURE'] == 'pc':
-		program = env.Program(name[0], file.name, LIBS=['robot','boost_thread'], LIBPATH=['../build/','/usr/lib/'])
-	else:
-		program = env.Program(name[0], file.name, LIBS=['robot'], LIBPATH=['../build/'])
+	program = env.Program(file.basename, file.name,
+							CPPDEFINES=defines,
+							LIBS=env['LIBS'] + ['robot'],
+							LIBPATH=env['LIBPATH'] + ['../build/'])
 	env.Default(program)
 	
 	if env['ARCHITECTURE'] == 'avr':
