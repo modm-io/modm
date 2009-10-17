@@ -47,13 +47,16 @@ main()
 
 	xpcc::tipc::Transmitter transmitter;
 
-	xpcc::Header header( xpcc::Header::REQUEST, false, 0x10, 0x20, 0x01 );
+	xpcc::Header actionHeader( xpcc::Header::REQUEST, false, 0x10, 0x20, 0x01 );	// ACTION
+	xpcc::Header eventHeader( xpcc::Header::REQUEST, false, 0x00, 0x20, 0x01 );	// ACTION
+
 	int data(0);
-	xpcc::SmartPayload payload(&data);
 
 	while(1) {
+		xpcc::SmartPayload payload(&data);
 		xpcc::log::info << data << xpcc::flush;
-		transmitter.transmitPacket(header, payload);
+		transmitter.transmitPacket(actionHeader, payload);
+		transmitter.transmitPacket(eventHeader, payload);
 		data++;
 		sleep(1);
 	}

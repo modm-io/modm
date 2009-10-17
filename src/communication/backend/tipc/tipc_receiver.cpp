@@ -59,7 +59,7 @@ xpcc::tipc::Receiver::~Receiver()
 }
 // -------------------------------------------------------------------------
 const ::xpcc::Header&
-xpcc::tipc::Receiver::frontHeader( )
+xpcc::tipc::Receiver::frontHeader( ) const
 {
 	// Set the mutex guard for the packetQueue
 	MutexGuard packetQueueGuard( this->packetQueueLock_);
@@ -114,10 +114,10 @@ xpcc::tipc::Receiver::update()
 
 	// Get the TIPC header (typeId and instanceRange) - call by reference
 	while( this->tipcReceiverSocket_.receiveHeader( tipcHeader ) ) {
-		XPCC_LOG_DEBUG << __FILE__ << __FUNCTION__ << "Header available." << xpcc::flush;
+		XPCC_LOG_DEBUG << XPCC_FILE_INFO << "Header available." << xpcc::flush;
 
 		// Try to allocate memory for the packet
-		SharedArr tipcPayloadPtr ( new char[tipcHeader.size] );
+		SharedArr tipcPayloadPtr ( new uint8_t[tipcHeader.size] );
 
 		// Get the payload by passing a void pointer by reference and the length
 		// of the payload to be read from the socket.
@@ -125,19 +125,16 @@ xpcc::tipc::Receiver::update()
 				tipcPayloadPtr.get(),
 				tipcHeader.size);
 
-		// Place the payload together with it's header in a list
-		PacketQueueSummary packetQueueSummary;
-		packetQueueSummary.header		=	*((xpcc::Header*) tipcPayloadPtr.get()); // the header stand on the beginning of the packet
-
-		packetQueueSummary.payloadPtr.reset( new char[tipcHeader.size - sizeof(xpcc::Header)] );
-		memcpy(	packetQueueSummary.payloadPtr.get(),
-				tipcPayloadPtr.get() + sizeof(xpcc::Header),
-				tipcHeader.size - sizeof(xpcc::Header));
+		// put the payload together with the header into a container
+		PacketQueueSummary packetQueueSummary(
+				*((xpcc::Header*) tipcPayloadPtr.get()), 		// the header stands on the beginning of the packet
+				tipcPayloadPtr.get() + sizeof(xpcc::Header),	// the payload is behind the header
+				tipcHeader.size - sizeof(xpcc::Header) );		// size of the payload is the packet size without the size of the header
 
 		// Set the mutex guard for the packetQueue
 		MutexGuard packetQueueGuard( this->packetQueueLock_);
 
-		// Add the packet to the queue
+		// add the packet to the queue
 		this->packetQueue_.push( packetQueueSummary );
 
 		// Clean the TIPC socket! ( That means removing the current data from the queue)
@@ -145,18 +142,28 @@ xpcc::tipc::Receiver::update()
 	}
 }
 // -------------------------------------------------------------------------
-const uint8_t *
-xpcc::tipc::Receiver::frontPayload()
+unsigned int
+xpcc::tipc::Receiver::frontPayloadSize() const
+{
+	// Set the mutex guard for the packetQueue
+	MutexGuard packetQueueGuard( this->packetQueueLock_);
+
+	return this->packetQueue_.front().size;
+}
+// -------------------------------------------------------------------------
+const uint8_t*
+xpcc::tipc::Receiver::frontPayload() const
 {
 	// Set the mutex guard for the packetQueue
 	MutexGuard packetQueueGuard( this->packetQueueLock_);
 
 	if( !this->packetQueue_.empty() ) {
-		return (uint8_t*) this->packetQueue_.front().payloadPtr.get();
+		return this->packetQueue_.front().payload.get();
 	}
 	else {
 		// No packet was available
-		return 0;
+		XPCC_LOG_ERROR << XPCC_FILE_INFO << "Empty packet queue." << xpcc::flush;
+		throw "xpcc::tipc::Receiver::frontPayload() : Empty packet queue.";
 	}
 }
 // -------------------------------------------------------------------------
@@ -193,23 +200,18 @@ xpcc::tipc::Receiver::addReceiverId(uint8_t id)
 												0x00,
 												0x00);
 }
-// -------------------------------------------------------------------------
-xpcc::tipc::Receiver::PacketQueueSummary::PacketQueueSummary() :
-	header(),
-	payloadPtr()
-{
-
-}
 
 // -----------------------------------------------------------------------------
 
 xpcc::tipc::Receiver::PacketQueueSummary::PacketQueueSummary(
-		xpcc::Header header,
-		SharedArr ptr) :
+		const xpcc::Header& header,
+		const uint8_t* data,
+		unsigned int size) :
 	header( header ),
-	payloadPtr( ptr )
+	size( size ),
+	payload( new uint8_t[size] )
 {
-
+	memcpy(payload.get(), data, size);
 }
 
 // -----------------------------------------------------------------------------

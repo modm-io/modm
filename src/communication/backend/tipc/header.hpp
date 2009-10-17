@@ -32,6 +32,8 @@
 #ifndef XPCC_TIPC_HEADER_HPP_
 #define XPCC_TIPC_HEADER_HPP_
 
+#include <cstring>
+
 namespace xpcc {
 	namespace tipc {
 		//!	the first 64 ids (types) are used by tipc itself

@@ -131,12 +131,12 @@ xpcc::tipc::ReceiverSocket::receiveHeader( Header & tipcHeader )
 // without deleting it. It returns true if the payload could be received
 // correctly from the TIPC socket - otherwise false.
 bool 
-xpcc::tipc::ReceiverSocket::receivePayload(char* payloadPointer, size_t payloadLength)
+xpcc::tipc::ReceiverSocket::receivePayload(uint8_t* payloadPointer, size_t payloadLength)
 {		
 	int result = 0;
 
 	// Allocate memory for the whole packet inclusive header			
-	boost::scoped_array<char> packetPointer ( new char[ sizeof(Header) + payloadLength ] );
+	boost::scoped_array<uint8_t> packetPointer ( new uint8_t[ sizeof(Header) + payloadLength ] );
 
 	result = recv(	this->socketDescriptor_,
 					packetPointer.get(),

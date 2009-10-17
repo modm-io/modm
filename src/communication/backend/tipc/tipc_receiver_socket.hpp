@@ -32,9 +32,10 @@
 #ifndef XPCC_TIPC_RECEIVER_SOCKET_H_
 #define XPCC_TIPC_RECEIVER_SOCKET_H_
 
-#include <boost/scoped_array.hpp>
-
 #include "header.hpp"
+
+#include <boost/scoped_array.hpp>
+#include <stdint.h>
 
 namespace xpcc {
 	namespace tipc {
@@ -60,7 +61,7 @@ namespace xpcc {
 				receiveHeader(	tipc::Header & tipcHeader );
 				
 				bool 
-				receivePayload(	char* packetPointer,
+				receivePayload(	uint8_t* payloadPointer,
 								size_t payloadLength);
 				
 				bool 

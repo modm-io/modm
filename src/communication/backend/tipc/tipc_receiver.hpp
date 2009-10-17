@@ -70,27 +70,34 @@ namespace xpcc {
 				hasPacket() const;
 		
 				const ::xpcc::Header&
-			 	frontHeader();
+			 	frontHeader() const;
+
+				unsigned int
+				frontPayloadSize() const;
 			 	
-				const uint8_t *
-				frontPayload();
+				const uint8_t*
+				frontPayload() const;
 				
 				void 
 				popFront();
 				
 			private:
-				typedef boost::shared_array<char>	SharedArr;
-				typedef boost::mutex				Mutex;
-				typedef boost::mutex::scoped_lock	MutexGuard;
-				typedef	boost::thread::thread		Thread;
+				typedef boost::shared_array<uint8_t>	SharedArr;
+				typedef boost::mutex					Mutex;
+				typedef boost::mutex::scoped_lock		MutexGuard;
+				typedef	boost::thread::thread			Thread;
 				
 				struct PacketQueueSummary {
-					PacketQueueSummary();
-
-					PacketQueueSummary(xpcc::Header, SharedArr);
+					//! @param	xpcc::Header&	header of the packet
+					//! @param	SharedArr&		char array of the payload
+					PacketQueueSummary(
+							const xpcc::Header&,
+							const uint8_t* payload,
+							unsigned int size);
 
 					xpcc::Header	header;
-					SharedArr		payloadPtr;
+					unsigned int	size;
+					SharedArr		payload;
 				};
 				
 				bool 

@@ -48,10 +48,18 @@ main()
 	xpcc::tipc::Receiver receiver;
 
 	receiver.addReceiverId(0x10);
+	receiver.addEventId(0x01);
 
 	while(1) {
 		if( receiver.hasPacket() ) {
-			XPCC_LOG_INFO << XPCC_FILE_INFO << "has packet" << xpcc::flush;
+			const xpcc::Header& header =  receiver.frontHeader();
+			const uint8_t* payload = receiver.frontPayload();
+
+			XPCC_LOG_INFO << XPCC_FILE_INFO << "has ";
+			XPCC_LOG_INFO << ((header.destination != 0) ? "ACTION" : "EVENT");
+			XPCC_LOG_INFO << " from:" << (int)header.source;
+			XPCC_LOG_INFO << " value:" << *(int*) payload;
+			XPCC_LOG_INFO << xpcc::flush;
 
 			receiver.popFront();
 		}
@@ -61,7 +69,6 @@ main()
 
 		usleep(100000);
 	}
-
 
 	xpcc::log::info << "########## XPCC TIPC RAW Test END ##########" << xpcc::flush;
 }
