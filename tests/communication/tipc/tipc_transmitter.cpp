@@ -29,76 +29,52 @@
  */
 // ----------------------------------------------------------------------------
 
-#include "tipc.hpp"
+#include <iostream>
+#include <src/debug/logger/logger.hpp>
+#include <src/debug/logger/backend/std/std_log_device.hpp>
 
-xpcc::tipc::Tipc::Tipc( ) :
-	receiver( ),
-	transmitter( )
+#include <src/communication/backend/tipc/tipc.hpp>
+
+xpcc::log::DeviceStd device;
+
+int
+main()
 {
+	xpcc::log::setDevice( device );
+	xpcc::log::setFilter(xpcc::log::DEBUG);
 
+	xpcc::log::info << "########## XPCC TIPC RAW Test TRANSMIT ##########" << xpcc::flush;
+
+	xpcc::tipc::Tipc tipc;
+	tipc.addReceiverId(0x20);
+
+	xpcc::Header actionHeader( xpcc::Header::REQUEST, false, 0x10, 0x20, 0x01 );	// ACTION
+	xpcc::Header eventHeader( xpcc::Header::REQUEST, false, 0x00, 0x20, 0x01 );	// ACTION
+
+	int data(0);
+
+	while(1) {
+		data++;
+		xpcc::SmartPayload payload(&data);
+		xpcc::log::info << data << xpcc::flush;
+		tipc.sendPacket(actionHeader, payload);
+		tipc.sendPacket(eventHeader, payload);
+
+		if ( tipc.isPacketAvailable() ) {
+			const xpcc::Header& header =  tipc.getPacketHeader();
+
+			XPCC_LOG_INFO << XPCC_FILE_INFO << "has";
+			XPCC_LOG_INFO << ((header.destination != 0) ? " ACTION" : " EVENT");
+			XPCC_LOG_INFO << ((header.isAcknowledge) ? " ACK" : "");
+			XPCC_LOG_INFO << " from:" << (int)header.source;
+			XPCC_LOG_INFO << xpcc::flush;
+
+			tipc.dropPacket();
+		}
+
+		sleep(1);
+	}
+
+
+	xpcc::log::info << "########## XPCC TIPC RAW Test END ##########" << xpcc::flush;
 }
-
-// ----------------------------------------------------------------------------
-
-xpcc::tipc::Tipc::~Tipc()
-{
-
-}
-
-// ----------------------------------------------------------------------------
-
-bool
-xpcc::tipc::Tipc::isPacketAvailable() const
-{
-	return this->receiver.hasPacket();
-}
-
-// ----------------------------------------------------------------------------
-
-const xpcc::Header&
-xpcc::tipc::Tipc::getPacketHeader() const
-{
-	return this->receiver.frontHeader();
-}
-
-// ----------------------------------------------------------------------------
-
-const uint8_t *
-xpcc::tipc::Tipc::getPacketPayload() const
-{
-	return this->receiver.frontPayload();
-}
-
-// ----------------------------------------------------------------------------
-
-uint8_t
-xpcc::tipc::Tipc::getPacketPayloadSize() const
-{
-	return this->receiver.frontPayloadSize();
-}
-
-// ----------------------------------------------------------------------------
-
-void
-xpcc::tipc::Tipc::dropPacket()
-{
-	this->receiver.popFront();
-}
-
-// ----------------------------------------------------------------------------
-
-void
-xpcc::tipc::Tipc::sendPacket(const xpcc::Header &header, const SmartPayload& payload)
-{
-	this->transmitter.transmitPacket(header, payload);
-}
-
-// ----------------------------------------------------------------------------
-
-void
-xpcc::tipc::Tipc::update()
-{
-	// nothing to do, becaus TipcReceiver is using threads
-}
-
-// ----------------------------------------------------------------------------

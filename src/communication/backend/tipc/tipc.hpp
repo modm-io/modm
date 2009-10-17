@@ -55,19 +55,17 @@ namespace xpcc {
 
 				~Tipc();
 
-				void
-				addFilter(
-						xpcc::Header::Type type,
-						bool isAcknowledge,
-						uint8_t destination,
-						uint8_t source,
-						uint8_t actionIdentifier);
+				inline void
+				addEventId(uint8_t id)
+				{
+					this->receiver.addEventId(id);
+				}
 
-				//! Send a Message.
-				//!
-				//! \return	\b true if the packet could be send, \b false otherwise.
-				virtual void
-				sendPacket(const xpcc::Header &header, const SmartPayload& payload);
+				inline void
+				addReceiverId(uint8_t id)
+				{
+					this->receiver.addReceiverId(id);
+				}
 
 				//! Check if a new packet was received by the backend
 				virtual bool
@@ -86,8 +84,18 @@ namespace xpcc {
 				virtual void
 				dropPacket();
 
+				virtual void
+				update();
+
+				//! Send a Message.
+				//!
+				//! \return	\b true if the packet could be send, \b false otherwise.
+				virtual void
+				sendPacket(const xpcc::Header &header, const SmartPayload& payload = SmartPayload());
+
 			private :
 				Receiver	receiver;
+				Transmitter	transmitter;
 		};
 	};
 };
