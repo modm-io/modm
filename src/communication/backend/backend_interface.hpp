@@ -108,7 +108,7 @@ namespace xpcc
 		
 		//! Send a Message. // soll denn der header kopiert werden?
 		virtual void
-		sendPacket(const Header &header, const SmartPayload& payload) = 0;
+		sendPacket( const Header &header, const SmartPayload& payload = SmartPayload() ) = 0;
 		
 		
 		//! Check if a new packet was received by the backend
