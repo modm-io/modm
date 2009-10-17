@@ -25,53 +25,45 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * 
- * $Id$
+ * $Id: smart_payload.hpp 77 2009-10-15 18:34:29Z thundernail $
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC_SMART_PAYLOAD_H
-#define	XPCC_SMART_PAYLOAD_H
+#include "smart_payload.hpp"
 
-#include <string.h>		// for memcpy
-#include <stdint.h>
 
-namespace xpcc
+xpcc::SmartPayload::SmartPayload()
+	: ptr(new uint8_t[2])
 {
-	class SmartPayload
-	{
-	public:
-		// default constructor with empty payload
-		SmartPayload();
-
-		// Must use a pointer to T here, otherwise the compiler can't distinguish
-		// between constructor and copy constructor!
-		template<typename T>
-		SmartPayload(const T *data) 
-		: ptr(new uint8_t[sizeof(T) + 2])
-		{
-			ptr[0] = 1;
-			ptr[1] = sizeof(T);
-			memcpy(ptr + 2, data, sizeof(T));
-		}
-
-		SmartPayload(const SmartPayload& other);
-		
-		~SmartPayload();
-		
-		const uint8_t *
-		getPointer() const;
-		
-		inline uint8_t
-		getSize() const {
-			return ptr[1];
-		}
-		
-	private:
-		SmartPayload&
-		operator=(const SmartPayload& other);
-		
-		uint8_t * const ptr;
-	};
+	ptr[0] = 1;
+	ptr[1] = 0;
 }
 
-#endif	// XPCC_SMART_PAYLOAD_H
+// ----------------------------------------------------------------------------
+
+xpcc::SmartPayload::SmartPayload(const SmartPayload& other)
+	: ptr(other.ptr)
+{
+	ptr[0]++;
+}
+
+// ----------------------------------------------------------------------------
+		
+xpcc::SmartPayload::~SmartPayload()
+{
+	if (--ptr[0] == 0) {
+		delete ptr;
+	}
+}
+
+// ----------------------------------------------------------------------------
+
+const uint8_t *
+xpcc::SmartPayload::getPointer() const {
+	if( ptr[1] > 0 ) {
+		return &ptr[2];
+	}
+	else {
+		return 0;
+	}
+}
