@@ -35,10 +35,12 @@
 
 #include <stdint.h>
 
-#include "../io/iodevice.hpp"
+#include <src/io/iodevice.hpp>
 
 namespace xpcc
 {
+	/// \ingroup	hal
+	/// \brief		Universal asyncronous receiver and transmitter
 	class Uart : public IODevice
 	{
 	public:
@@ -46,7 +48,7 @@ namespace xpcc
 		///
 		/// If this function is called with a constant value as parameter,
 		/// all the calculation is done by the compiler, so no 32-bit
-		/// arithmetic is need at run-time!
+		/// arithmetic is needed at run-time!
 		///
 		/// \param	baudrate	desired baud rate
 		/// \param	u2x			enabled double speed mode

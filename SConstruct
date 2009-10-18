@@ -24,7 +24,9 @@ if build.target == 'avr':
 			AVR_DEVICE = build.avr.device,
 			AVR_CLOCK = build.avr.clock,
 			tools = ['avr', 'doxygen'],
-			toolpath = ['misc/scons/'])
+			toolpath = ['misc/scons/'],
+			LIBS=[],
+			LIBPATH=[])
 
 elif build.target == 'pc':
 	env = Environment(
