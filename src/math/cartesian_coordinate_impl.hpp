@@ -74,7 +74,7 @@ namespace xpcc
 	Angle
 	CartesianCoordinate<T>::getAngle() const
 	{
-		return Angle(atan2(y, x));
+		return atan2(y, x);
 	}
 
 	// ------------------------------------------------------------------------
@@ -95,8 +95,8 @@ namespace xpcc
 	CartesianCoordinate<T>&
 	CartesianCoordinate<T>::rotate(Angle& phi)
 	{
-		float c = cos(phi.getValue());
-		float s = sin(phi.getValue());
+		float c = cos(phi).toFloat();
+		float s = sin(phi).toFloat();
 		
 		T tx = 		c * this->x - s * this->y;
 		this->y =	s * this->x + c * this->y;

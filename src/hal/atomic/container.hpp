@@ -38,27 +38,27 @@ namespace xpcc
 {
 	namespace atomic
 	{
-		/**
-		 * \brief	Atomic access to objects
-		 * 
-		 * Example: 
-		 * \code
-		 * atomic::Containter<uint32_t> data;
-		 * 
-		 * // interrupt routine
-		 * ISR() {
-		 *     data.set(123);
-		 * }
-		 * 
-		 * function() {
-		 *     uint32_t localData = data.get();
-		 *     ...
-		 * }
-		 * \endcode
-		 * 
-		 * \warning	This class should be used with precaution because the
-		 * 			objects are copied for every access.
-		 */
+		/// @ingroup	atomic
+		/// @brief	Atomic access to objects
+		/// 
+		/// Example: 
+		/// @code
+		/// atomic::Containter<uint32_t> data;
+		/// 
+		/// // interrupt routine
+		/// ISR() {
+		///     data.set(123);
+		/// }
+		/// 
+		/// function() {
+		///     uint32_t localData = data.get();
+		///     ...
+		/// }
+		/// @endcode
+		/// 
+		/// @warning	This class should be used with precaution because the
+		/// 			objects are copied for every access.
+		///
 		template<typename T>
 		class Container
 		{
@@ -85,10 +85,10 @@ namespace xpcc
 				return oldValue;
 			}
 			
-			//! \brief		Get direct access to the object
-			//!
-			//! \warning	If the object is access throu this function the
-			//!				operations are not atomic!
+			/// @brief		Get direct access to the object
+			///
+			/// @warning	If the object is access throu this function the
+			///				operations are not atomic!
 			inline volatile T&
 			getObject() {
 				return object;

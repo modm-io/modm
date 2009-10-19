@@ -33,6 +33,8 @@
 #ifndef	XPCC__ANGLE_HPP
 #define	XPCC__ANGLE_HPP
 
+#include <math.h>
+
 namespace xpcc
 {
 	/// \ingroup	math
@@ -40,7 +42,7 @@ namespace xpcc
 	class Angle
 	{
 		public:
-			Angle(float angle = 0.0) : angle(angle) {
+			Angle(float value = 0.0) : value(value) {
 			}
 			
 			//! \brief	Limit angle to +-Pi
@@ -52,13 +54,13 @@ namespace xpcc
 			reverse();
 			
 			float
-			getValue() const {
-				return this->angle;
+			toFloat() const {
+				return this->value;
 			}
 			
 			Angle&
 			operator=(const float& angle) {
-				this->angle = angle;
+				this->value = angle;
 				return *this;
 			}
 			
@@ -69,53 +71,75 @@ namespace xpcc
 			operator-=(const Angle &other);
 		
 		private:
-			float angle;
+			float value;
 	};
 }
 
 // ----------------------------------------------------------------------------
+// inline operator functions
+
 inline xpcc::Angle&
 xpcc::Angle::operator+=(const Angle &other) {
-	this->angle += other.angle;
+	this->value += other.value;
 	return *this;
+}
+
+inline xpcc::Angle&
+xpcc::Angle::operator-=(const Angle &other) {
+	this->value -= other.value;
+	return *this;
+}
+
+// ----------------------------------------------------------------------------
+// overloaded global operator functions
+
+inline xpcc::Angle
+operator-(const xpcc::Angle &a) {
+	return xpcc::Angle(-a.toFloat());
+}
+
+inline xpcc::Angle
+operator-(const xpcc::Angle &a, const xpcc::Angle &b) {
+	return xpcc::Angle(a.toFloat() - b.toFloat());
+}
+
+inline xpcc::Angle
+operator+(const xpcc::Angle &a, const xpcc::Angle &b) {
+	return xpcc::Angle(a.toFloat() + b.toFloat());
+}
+
+inline bool
+operator==(const xpcc::Angle &a, const xpcc::Angle &b) {
+	return (a.toFloat() == b.toFloat());
+}
+
+inline bool
+operator!=(const xpcc::Angle &a, const xpcc::Angle &b) {
+	return (a.toFloat() != b.toFloat());
 }
 
 // ----------------------------------------------------------------------------	
-inline xpcc::Angle&
-xpcc::Angle::operator-=(const Angle &other) {
-	this->angle -= other.angle;
-	return *this;
-}
+// overloaded global functions
 
-// ----------------------------------------------------------------------------
+/// \ingroup	math
+/// \brief		Calculate cosinus of an angle
 inline xpcc::Angle
-operator-(const xpcc::Angle &a) {
-	return xpcc::Angle(-a.getValue());
+cos(const xpcc::Angle& angle) {
+	return cos(angle.toFloat());
 }
 
-
-// ----------------------------------------------------------------------------
+/// \ingroup	math
+/// \brief		Calculate sinus of an angle
 inline xpcc::Angle
-operator-(const xpcc::Angle &a, const xpcc::Angle &b) {
-	return xpcc::Angle(a.getValue() - b.getValue());
+sin(const xpcc::Angle& angle) {
+	return sin(angle.toFloat());
 }
 
-// ----------------------------------------------------------------------------
+/// \ingroup	math
+/// \brief		Calculate tangens of an angle
 inline xpcc::Angle
-operator+(const xpcc::Angle &a, const xpcc::Angle &b) {
-	return xpcc::Angle(a.getValue() + b.getValue());
-}
-
-// ----------------------------------------------------------------------------
-inline bool
-operator==(const xpcc::Angle &a, const xpcc::Angle &b) {
-	return (a.getValue() == b.getValue());
-}
-
-// ----------------------------------------------------------------------------
-inline bool
-operator!=(const xpcc::Angle &a, const xpcc::Angle &b) {
-	return (a.getValue() != b.getValue());
+tan(const xpcc::Angle& angle) {
+	return tan(angle.toFloat());
 }
 
 #endif	// XPCC__ANGLE_HPP

@@ -43,7 +43,7 @@ xpcc::Location::update(Location& diff) {
 // ----------------------------------------------------------------------------
 void
 xpcc::Location::update(int16_t x, Angle& phi) {
-	position += Position(x * cos(this->phi.getValue()), x * sin(this->phi.getValue()));
+	position += Position(x * cos(this->phi).toFloat(), x * sin(this->phi).toFloat());
 	this->phi += phi;
 	this->phi.normalize();
 }

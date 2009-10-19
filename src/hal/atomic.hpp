@@ -32,6 +32,12 @@
 #ifndef	XPCC__ATOMIC_HPP
 #define	XPCC__ATOMIC_HPP
 
+/**
+ * \ingroup		hal
+ * \defgroup	atomic	Atomic operations and container
+ * 
+ */
+
 #include "atomic/lock.hpp"
 #include "atomic/flag.hpp"
 #include "atomic/container.hpp"

@@ -39,25 +39,28 @@
 void
 xpcc::Angle::normalize()
 {
-	if (isPositive(angle)) {
-		while (angle > M_PI) {
-			angle -= 2 * M_PI;
+	if (isPositive(value))
+	{
+		while (value > M_PI) {
+			value -= 2 * M_PI;
 		}
 	}
 	else {
-		while (angle < -M_PI) {
-			angle += 2 * M_PI;
+		while (value < -M_PI) {
+			value += 2 * M_PI;
 		}
 	}
 }
 
 // ----------------------------------------------------------------------------
 void
-xpcc::Angle::reverse() {
-	if (isPositive(angle)) {
-		angle -= M_PI;
+xpcc::Angle::reverse()
+{
+	if (isPositive(value))
+	{
+		value -= M_PI;
 	}
 	else {
-		angle += M_PI;
+		value += M_PI;
 	}
 }

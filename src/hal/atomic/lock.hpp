@@ -38,30 +38,30 @@ namespace xpcc
 {
 	namespace atomic
 	{
-		/**
-		 * \brief	Critical section
-		 * 
-		 * Typical usage:
-		 * \code
-		 * function()
-		 * {
-		 *     // some code with interrupts enabled
-		 *     
-		 *     {
-		 *         atomic::Lock lock;
-		 *         
-		 *         // code which should be executed with disabled interrupts.
-		 *         
-		 *         // with the end of this block the lock object is destroyed
-		 *         // and the interrupts are reenabled.
-		 *     }
-		 *     
-		 *     // other code with interrupts enabled
-		 * }
-		 * \endcode
-		 * 
-		 * \warning	Interrupts should be disabled the shortest possible time!
-		 */
+		/// \ingroup	atomic
+		/// \brief		Critical section
+		///  
+		/// Typical usage:
+		/// \code
+		/// function()
+		/// {
+		///     // some code with interrupts enabled
+		///     
+		///     {
+		///         atomic::Lock lock;
+		///         
+		///         // code which should be executed with disabled interrupts.
+		///         
+		///         // with the end of this block the lock object is destroyed
+		///         // and the interrupts are reenabled.
+		///     }
+		///     
+		///     // other code with interrupts enabled
+		/// }
+		/// \endcode
+		/// 
+		/// \warning	Interrupts should be disabled the shortest possible time!
+		///
 		class Lock
 		{
 		public:

@@ -38,10 +38,11 @@ namespace xpcc
 {
 	namespace atomic
 	{
-		//! \brief	Interrupt save queue
-		//!
-		//! A maximum size of 255 is allowed
-		//!
+		/// @ingroup	atomic
+		/// @brief		Interrupt save queue
+		///
+		/// A maximum size of 255 is allowed
+		///
 		template<typename T,
 				 int N>
 		class Queue

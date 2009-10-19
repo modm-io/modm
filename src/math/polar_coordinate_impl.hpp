@@ -80,8 +80,8 @@ namespace xpcc
 	CartesianCoordinate<T>
 	PolarCoordinate<T>::toCartesian()
 	{
-		return CartesianCoordinate<T>(r * cos(theta.getValue()),
-									  r * sin(theta.getValue()));
+		return CartesianCoordinate<T>(r * cos(theta).toFloat(),
+									  r * sin(theta).toFloat());
 	}
 
 	// ------------------------------------------------------------------------
