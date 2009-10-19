@@ -50,7 +50,6 @@ class FileProperties:
 		# filename without extension
 		self.basename = os.path.splitext(os.path.basename(filename))[0]
 		self.defines = defines
-		#print filename, defines
 
 
 class DirectoryProperties:
@@ -65,8 +64,8 @@ class DirectoryProperties:
 				if target == 'all' or target == globalProperties.target:
 					self._enabled = True
 			
-			if 'include' in localProperties:
-				self._enabled = localProperties['include']
+			if 'enable' in localProperties:
+				self._enabled = localProperties['enable']
 		else:
 			self._enabled = True
 	

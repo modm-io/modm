@@ -10,6 +10,8 @@
 
 #include "../uart0.hpp"
 
+#ifndef __AVR_ATxmega128A1__
+
 static xpcc::atomic::Queue<char, UART0_TX_BUFFER_SIZE> txBuffer;
 
 // ----------------------------------------------------------------------------
@@ -42,3 +44,7 @@ xpcc::Uart0::put(char c)
 	// enable UDRE interrupt
 	UART0_CONTROL |= (1 << UART0_UDRIE);
 }
+
+#else
+	#warning	TODO!
+#endif

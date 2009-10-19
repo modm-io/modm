@@ -1,11 +1,13 @@
 
-#include "../../../src/hal/atomic.hpp"
+#include <src/hal/atomic.hpp>
 
 using namespace xpcc;
 
 atomic::Container<uint32_t> container;
 
 //atomic::Flag flag(true);
+
+volatile uint8_t out;
 
 int main(void)
 {
@@ -22,7 +24,7 @@ int main(void)
 	container.getObject() = 26;
 	
 	if (container.get()) {
-		PORTB = 1;
+		out = 1;
 	}
 	
 	while (1) {

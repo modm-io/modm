@@ -185,7 +185,8 @@
 	#define UART0_UDRIE    UDRIE0
 
 #else
-	#error "no UART definition for MCU available"
+	// TODO
+	#warning "no UART definition for MCU available"
 #endif
 
 #endif	// UART_DEFS_H

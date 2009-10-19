@@ -32,6 +32,8 @@
 
 #include "spi.hpp"
 
+#ifndef __AVR_ATxmega128A1__
+
 // TODO set hardware pins
 void
 xpcc::Spi::configure(Mode mode, Prescaler prescaler)
@@ -49,3 +51,8 @@ xpcc::Spi::send(uint8_t data)
 	}
 	return SPDR;
 }
+
+
+#else
+	#warning	TODO!
+#endif

@@ -33,11 +33,12 @@
 #ifndef XPCC_TIMEOUT_HPP
 #define XPCC_TIMEOUT_HPP
 
-#include "../../../src/hal/time/local_time.hpp"
+#include <src/hal/time/local_time.hpp>
 
 namespace xpcc
 {
-	/// \brief	Software timer
+	/// @ingroup	workflow
+	/// @brief		Software timer
 	///
 	/// Has to be polled to check if it has expired.
 	class Timeout
@@ -45,17 +46,17 @@ namespace xpcc
 	public:
 		Timeout(LocalTime time);
 		
-		/// \brief	Check if the given time has passed.
+		/// @brief	Check if the given time has passed.
 		bool
 		isExpired();
 		
-		/// \brief	Stop timer
+		/// @brief	Stop timer
 		inline void
 		stop() {
 			state = STOPPED;
 		}
 		
-		/// \brief	Set a new timeout time.
+		/// @brief	Set a new timeout time.
 		void
 		restart(LocalTime time);
 		

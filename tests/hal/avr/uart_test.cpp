@@ -7,7 +7,7 @@
 
 int main(void)
 {
-	DDRB = (1 << PB0) | (1 << PB1);
+	/*DDRB = (1 << PB0) | (1 << PB1);
 	PORTB |= (1 << PB0);
 	
 	xpcc::Uart& uart = xpcc::Uart3::instance();
@@ -21,7 +21,7 @@ int main(void)
 	uart.put("Hallo Welt!\n");
 	
 	PORTB |= (1 << PB1);
-	
+	*/
 	/*xpcc::IOStream stream(uart);
 	
 	stream << static_cast<uint8_t>(0xff) << ' ' 

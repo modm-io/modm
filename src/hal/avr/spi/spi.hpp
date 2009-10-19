@@ -36,6 +36,8 @@
 #include <avr/io.h>
 #include <stdint.h>
 
+#ifndef __AVR_ATxmega128A1__
+
 namespace xpcc
 {
 	class Spi
@@ -67,5 +69,9 @@ namespace xpcc
 		send(uint8_t data);
 	};
 }
+
+#else
+	#warning	TODO!
+#endif
 
 #endif // XPCC__SPI_HPP

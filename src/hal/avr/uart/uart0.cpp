@@ -9,6 +9,8 @@
 
 #include "../uart0.hpp"
 
+#ifndef __AVR_ATxmega128A1__
+
 static xpcc::atomic::Queue<char, UART0_RX_BUFFER_SIZE> rxBuffer;
 
 // ----------------------------------------------------------------------------
@@ -21,16 +23,16 @@ ISR(UART0_RECEIVE_INTERRUPT)
 	// read UART status register and UART data register
 	//uint8_t usr  = UART0_STATUS;
 	
-/*	uint8_t last_rx_error;
-#if defined(AT90_UART)
-	last_rx_error = usr & ((1 << FE) | (1 << DOR));
-#elif defined(ATMEGA_USART)
-	last_rx_error = usr & ((1 << FE) | (1 << DOR));
-#elif defined(ATMEGA_USART0)
-	last_rx_error = usr & ((1 << FE0) | (1 << DOR0));
-#elif defined (ATMEGA_UART)
-	last_rx_error = usr & ((1 << FE) | (1 << DOR));
-#endif*/
+//	uint8_t last_rx_error;
+//#if defined(AT90_UART)
+//	last_rx_error = usr & ((1 << FE) | (1 << DOR));
+//#elif defined(ATMEGA_USART)
+//	last_rx_error = usr & ((1 << FE) | (1 << DOR));
+//#elif defined(ATMEGA_USART0)
+//	last_rx_error = usr & ((1 << FE0) | (1 << DOR0));
+//#elif defined (ATMEGA_UART)
+//	last_rx_error = usr & ((1 << FE) | (1 << DOR));
+//#endif
 	
 	// TODO Fehlerbehandlung
 	rxBuffer.push(data);
@@ -127,3 +129,7 @@ xpcc::Uart0::get(char& c)
 		return true;
 	}
 }
+
+#else
+	#warning	TODO!
+#endif

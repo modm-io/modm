@@ -1,16 +1,16 @@
 
 #include "scheduler.hpp"
 
-xpcc::Scheduler::EventId
+void
 xpcc::Scheduler::scheduleEvent(Event& /*event*/,
 							   uint16_t /*period*/,
 							   Priority /*priority*/)
 {
-	return 0;
+	
 }
 
 bool
-xpcc::Scheduler::removeEvent(EventId /*identifier*/)
+xpcc::Scheduler::removeEvent(const Event& /*event*/)
 {
 	return false;
 }

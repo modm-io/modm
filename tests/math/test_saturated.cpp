@@ -8,6 +8,8 @@ Saturated<int8_t> a;
 Saturated<int8_t> b(125);
 Saturated<int8_t> c;
 
+volatile int8_t test;
+
 int
 main(void)
 {
@@ -15,7 +17,7 @@ main(void)
 	
 	c = a + b;
 	
-	PORTB = c.getValue();
+	test = c.getValue();
 	
 	while (1) {
 		

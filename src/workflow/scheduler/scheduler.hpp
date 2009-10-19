@@ -37,6 +37,8 @@
 
 namespace xpcc
 {
+	/// @ingroup	workflow
+	/// @brief		Scheduler event
 	class Event
 	{
 	public:
@@ -44,18 +46,22 @@ namespace xpcc
 		run() = 0;
 	};
 	
+	/// @ingroup	workflow
+	/// @brief		Scheduler
+	/// 
+	/// Timed execution of events
+	///
 	class Scheduler
 	{
 	public:
 		typedef uint8_t Priority;		//!< range [0..7]
-		typedef int8_t EventId;
-	
+
 	public:
-		EventId
+		void
 		scheduleEvent(Event& event, uint16_t period, Priority priority = 4);
 		
 		bool
-		removeEvent(EventId identifier);
+		removeEvent(const Event& event);
 		
 		void
 		update();
