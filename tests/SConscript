@@ -9,7 +9,7 @@ Import('sourceFiles')
 Import('library')
 
 env = env.Clone()
-env.Append(CPPPATH = '../')
+env.Append(CPPPATH = '../src')
 
 # build a object file form each source file
 for file in sourceFiles:

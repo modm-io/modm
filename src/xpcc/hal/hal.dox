@@ -1,0 +1,10 @@
+// coding: utf-8
+// 
+// $Id: hal.dox 94 2009-10-19 18:44:57Z dergraaf $
+
+/*!
+\defgroup hal	Hardware abstraction layer
+
+
+
+*/

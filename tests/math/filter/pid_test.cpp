@@ -1,7 +1,7 @@
 
 #include <stdint.h>
 
-#include <src/math/filter/pid/pid.hpp>
+#include <xpcc/math/filter/pid/pid.hpp>
 
 using namespace xpcc;
 

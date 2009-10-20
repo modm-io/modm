@@ -29,8 +29,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#include "../../../../src/debug/logger/logger.hpp"
-#include "../../../../src/debug/logger/backend/dev0/dev0_log_device.hpp"
+#include <xpcc/debug/logger/logger.hpp>
+#include <xpcc/debug/logger/backend/dev0/dev0_log_device.hpp>
 
 xpcc::log::DeviceDev0 device;
 

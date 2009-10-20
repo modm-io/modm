@@ -1,11 +1,11 @@
 
-target: avr
+target: pc
 
 avr:
-  device: atmega2560
-#  device: atxmega128a1
-#  clock: 32000000
-  clock: 14745600
+#  device: atmega2560
+  device: atxmega128a1
+  clock: 32000000
+#  clock: 14745600
   avrdude:
     programmer: stk500
     port: /dev/ttyUSB0

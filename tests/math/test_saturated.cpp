@@ -1,6 +1,6 @@
 
 #include <avr/io.h>
-#include "../../src/math/saturated.hpp"
+#include <xpcc/math/saturated.hpp>
 
 using namespace xpcc;
 

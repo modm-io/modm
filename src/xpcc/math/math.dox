@@ -1,0 +1,10 @@
+// coding: utf-8
+// 
+// $Id: math.dox 76 2009-10-14 23:29:28Z dergraaf $
+
+/*!
+\defgroup math Math
+\brief Common mathematical operations and transformations
+
+
+*/

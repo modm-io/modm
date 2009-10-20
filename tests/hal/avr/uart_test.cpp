@@ -2,8 +2,8 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 
-#include <src/hal/avr/uart.hpp>
-#include <src/io/iostream.hpp>
+#include <xpcc/hal/avr/uart.hpp>
+#include <xpcc/io/iostream.hpp>
 
 int main(void)
 {

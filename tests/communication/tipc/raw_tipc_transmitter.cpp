@@ -30,10 +30,11 @@
 // ----------------------------------------------------------------------------
 
 #include <iostream>
-#include "../../../src/debug/logger/logger.hpp"
-#include "../../../src/debug/logger/backend/std/std_log_device.hpp"
 
-#include "../../../src/communication/backend/tipc/tipc.hpp"
+#include <xpcc/debug/logger/logger.hpp>
+#include <xpcc/debug/logger/backend/std/std_log_device.hpp>
+
+#include <xpcc/communication/backend/tipc/tipc.hpp>
 
 xpcc::log::DeviceStd device;
 

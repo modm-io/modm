@@ -1,5 +1,5 @@
 
-#include "../../../src/math/filter/moving_average/moving_average.hpp"
+#include <xpcc/math/filter/moving_average/moving_average.hpp>
 
 using namespace xpcc;
 

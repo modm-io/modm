@@ -1,7 +1,7 @@
 
 #include <stdint.h>
 
-#include <src/math/filter/ramp/ramp.hpp>
+#include <xpcc/math/filter/ramp/ramp.hpp>
 
 using namespace xpcc;
 

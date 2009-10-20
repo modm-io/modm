@@ -1,0 +1,10 @@
+// coding: utf-8
+// 
+// $Id: driver.dox 76 2009-10-14 23:29:28Z dergraaf $
+
+/*!
+\defgroup	driver	Device drivers
+\brief 		Drivers to control some external devices
+
+
+*/

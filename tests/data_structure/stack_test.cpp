@@ -1,5 +1,5 @@
 
-#include <src/data_structure/stack.hpp>
+#include <xpcc/data_structure/stack.hpp>
 
 using namespace xpcc;
 

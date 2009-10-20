@@ -1,6 +1,6 @@
 
-#include "../../src/math/polar_coordinate.hpp"
-#include "../../src/math/position.hpp"
+#include <xpcc/math/polar_coordinate.hpp>
+#include <xpcc/math/position.hpp>
 
 using namespace xpcc;
 

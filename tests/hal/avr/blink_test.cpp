@@ -42,17 +42,55 @@ configureExternalOscillator()
 	CLK.CTRL = CLK_SCLKSEL2_bm;
 }
 
+void
+configureUart()
+{
+	// PC2 (RXD0) as input, PC3 (TXD0) as output
+	PORTC.DIRSET = (1 << 3);
+	PORTC.DIRCLR = (1 << 2);
+	
+	// USARTC0, 8 Data bits, No Parity, 1 Stop bit.
+	USARTC0.CTRLC = USART_CHSIZE_8BIT_gc | USART_PMODE_DISABLED_gc;
+	
+	// Set Baudrate to 9600 bps
+	USARTC0.BAUDCTRLA = 207;
+	USARTC0.BAUDCTRLB = (0 << USART_BSCALE0_bp) | (207 >> 8);
+	
+	// Enable TX
+	USARTC0.CTRLB |= USART_TXEN_bm;
+}
+
 int
 main(void)
 {
 	PORTD.DIR = (1 << 0) | (1 << 1);
-	PORTD.OUT = (1 << 0) | (1 << 1);
+	PORTD.OUT = (1 << 0);
 	
 	configureExternalOscillator();
 	
-	while (1) {
-		_delay_ms(500);
+	configureUart();
+	
+	// Send data from 255 down to 0
+	uint8_t sendData = 255;
+	
+	while (sendData)
+	{
+	    // Send one char.
+		do{
+			/* Wait until it is possible to put data into TX data register.
+			 * NOTE: If TXDataRegister never becomes empty this will be a DEADLOCK. */
+		}
+		while ((USARTC0.STATUS & USART_DREIF_bm) == 0);
 		
+		USARTC0.DATA = sendData;
+		sendData--;
+		
+		//_delay_ms(10);
+		//PORTD.OUTTGL = (1 << 0) | (1 << 1);
+	}
+	
+	while (1) {
+		_delay_ms(300);
 		PORTD.OUTTGL = (1 << 0) | (1 << 1);
 	}
 }

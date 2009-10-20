@@ -1,5 +1,5 @@
 
-#include <src/hal/time/local_time.hpp>
+#include <xpcc/hal/time/local_time.hpp>
 
 using namespace xpcc;
 

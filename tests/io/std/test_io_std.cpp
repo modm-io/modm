@@ -30,8 +30,8 @@
 // ----------------------------------------------------------------------------
 
 #include <iostream>
-#include <src/io/iostream.hpp>
-#include <src/io/backplane/std/std_iodevice.hpp>
+#include <xpcc/io/iostream.hpp>
+#include <xpcc/io/backplane/std/std_iodevice.hpp>
 
 int
 main()
