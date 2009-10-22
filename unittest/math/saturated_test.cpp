@@ -32,21 +32,14 @@
 
 #include "saturated_test.hpp"
 
-FLASH_STRING(suiteName) = "saturated_test";
-
-SaturatedTest::SaturatedTest(unittest::Reporter& reporter) : 
-	TestSuite(reporter, xpcc::Flash(suiteName))
-{
-}
-
 void
-SaturatedTest::test8BitSigned()
+SaturatedTest::testSigned()
 {
-	
+	TEST_FAIL("TODO");
 }
 	
 void
-SaturatedTest::test8BitUnsigned()
+SaturatedTest::testUnsigned()
 {
-	
+	TEST_FAIL("TODO");
 }

@@ -32,20 +32,47 @@
 
 #include "reporter.hpp"
 
-unittest::Reporter::Reporter(xpcc::IODevice& device) :
-	outputStream(device), testsPassed(0), testsFailed(0)
+namespace
 {
+	FLASH_STRING(invaildName) = "invalid";
+	FLASH_STRING(failMessage) = "FAIL: ";
+}
+
+unittest::Reporter::Reporter(xpcc::IODevice& device) :
+	outputStream(device), testName(xpcc::Flash(invaildName)),
+	testsPassed(0), testsFailed(0)
+{
+}
+
+void
+unittest::Reporter::nextTestSuite(xpcc::FlashPointer<char> str)
+{
+	testName = str;
+}
+
+void
+unittest::Reporter::reportPass()
+{
+	testsPassed++;
+}
+
+xpcc::IOStream&
+unittest::Reporter::reportFailure(unsigned int lineNumber)
+{
+	testsFailed++;
+	outputStream << xpcc::Flash(failMessage) << testName << ':' << lineNumber << " : ";
+	return outputStream;
 }
 
 void
 unittest::Reporter::printSummary()
 {
 	if (testsFailed == 0) {
-		outputStream << "Running " << testsPassed << " tests\n"
-					 << "OK!" << xpcc::endl;
+		outputStream << "\nPassed " << testsPassed << " tests\n"
+					 << "OK!\n" << xpcc::endl;
 	}
 	else {
-		outputStream << "Failed " << testsFailed << " of " << (testsFailed + testsPassed)
-					 << " tests" << xpcc::endl;
+		outputStream << "\nFailed " << testsFailed << " of " << (testsFailed + testsPassed)
+					 << " tests\n" << xpcc::endl;
 	}
 }

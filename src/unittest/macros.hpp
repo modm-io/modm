@@ -33,7 +33,7 @@
 #ifndef	UNITTEST__MACROS_HPP
 #define	UNITTEST__MACROS_HPP
 
-#include <xpcc/utils/misc.hpp>
+#include "controller.hpp"
 
 #define	TEST_FLOAT_EPISLON		0.00001f
 
@@ -41,7 +41,11 @@
 
 /// @ingroup	unittest
 /// @brief		Verify (expr) is true 
-#define	TEST_ASSERT(expr)
+#define	TEST_ASSERT_TRUE(expr)
+
+/// @ingroup	unittest
+/// @brief		Verify (expr) is false 
+#define	TEST_ASSERT_FALSE(expr)
 
 /// @ingroup	unittest
 /// @brief		Verify (x==y)
@@ -67,18 +71,25 @@
 
 #else // !__DOXYGEN__
 
-#define	TEST_ASSERT(expr)	\
+#define	TEST_ASSERT_TRUE(expr)	\
 	if (expr) { \
-		reportPass(); \
+		unittest::Controller::instance().getReporter().reportPass(); \
 	} else { \
-		reportFailure(__LINE__) << '\n'; \
+		unittest::Controller::instance().getReporter().reportFailure(__LINE__) << '\n'; \
+	}
+
+#define	TEST_ASSERT_FALSE(expr)	\
+	if (expr) { \
+		unittest::Controller::instance().getReporter().reportFailure(__LINE__) << '\n'; \
+	} else { \
+		unittest::Controller::instance().getReporter().reportPass(); \
 	}
 
 #define	TEST_ASSERT_EQUALS(x, y) \
 	if (x == y) { \
-		reportPass(); \
+		unittest::Controller::instance().getReporter().reportPass(); \
 	} else { \
-		reportFailure(__LINE__) << x << " == " << y << '\n'; \
+		unittest::Controller::instance().getReporter().reportFailure(__LINE__) << x << " == " << y << '\n'; \
 	}
 
 #define	TEST_ASSERT_EQUALS_FLOAT(x, y) \
@@ -86,21 +97,21 @@
 
 #define	TEST_ASSERT_DELTA(x, y, d) \
 	if (((x + d) > y) && ((x - d) < y)) { \
-		reportPass(); \
+		unittest::Controller::instance().getReporter().reportPass(); \
 	} else { \
-		reportFailure(__LINE__) << x << " == " << y << '\n'; \
+		unittest::Controller::instance().getReporter().reportFailure(__LINE__) << x << " == " << y << '\n'; \
 	}
 
 #define	TEST_ASSERT_RANGE(value, lower, upper) \
 	if ((value >= lower= && (value <= upper)) { \
-		reportPass(); \
+		unittest::Controller::instance().getReporter().reportPass(); \
 	} else { \
-		reportFailure(__LINE__) << value << "not in range "\
+		unittest::Controller::instance().getReporter().reportFailure(__LINE__) << value << "not in range "\
 					"[" << lower << "," << upper << "]\n"; \
 	}
 
 #define	TEST_FAIL(msg) \
-	{	reportFailure(__LINE__) << '\"' << msg << "\"\n"; } \
+	{	unittest::Controller::instance().getReporter().reportFailure(__LINE__) << msg << '\n'; } \
 
 #endif	// __DOXYGEN__
 

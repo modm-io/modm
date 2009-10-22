@@ -32,13 +32,8 @@
 
 #include <unittest/testsuite.hpp>
 
-#include <xpcc/math/angle.hpp>
-
-class AngleTest : public unittest::TestSuite
+struct AngleTest : public unittest::TestSuite
 {
-public:
-	AngleTest(unittest::Reporter& reporter);
-	
 	void
 	testArithmetic();
 	

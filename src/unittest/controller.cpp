@@ -30,24 +30,27 @@
  */
 // ----------------------------------------------------------------------------
 
-#include "testsuite.hpp"
+#include "controller.hpp"
 
-FLASH_STRING(failMessage) = "FAIL: ";
-
-unittest::TestSuite::TestSuite(Reporter& reporter, 
-							   xpcc::FlashPointer<char> name) :
-	reporter(reporter), name(name)
+unittest::Controller::Controller() :
+	reporter(0)	// FIXME need a dummy implementation
 {
 }
 
-unittest::TestSuite::~TestSuite()
+void
+unittest::Controller::setReporter(Reporter& reporter)
 {
+	this->reporter = &reporter;
 }
 
-xpcc::IOStream&
-unittest::TestSuite::reportFailure(unsigned int lineNumber)
+unittest::Reporter&
+unittest::Controller::getReporter() const
 {
-	reporter.fail();
-	reporter.stream() << failMessage << name << ':' << lineNumber << " : ";
-	return reporter.stream();
+	return *reporter;
+}
+
+void
+unittest::Controller::nextTestSuite(xpcc::FlashPointer<char> str) const
+{
+	reporter->nextTestSuite(str);
 }

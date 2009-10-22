@@ -33,9 +33,6 @@
 #ifndef	UNITTEST__TESTSUITE_HPP
 #define	UNITTEST__TESTSUITE_HPP
 
-#include <xpcc/hal/flash/flash_pointer.hpp>
-
-#include "reporter.hpp"
 #include "macros.hpp"
 
 namespace unittest
@@ -45,12 +42,6 @@ namespace unittest
 	class TestSuite
 	{
 	public:
-		TestSuite(Reporter& reporter, 
-				  xpcc::FlashPointer<char> name);
-		
-		virtual
-		~TestSuite() = 0;
-		
 		virtual inline void
 		setUp()
 		{
@@ -60,24 +51,6 @@ namespace unittest
 		tearDown()
 		{
 		}
-		
-		inline void
-		reportPass() {
-			reporter.pass();
-		}
-		
-		xpcc::IOStream&
-		reportFailure(unsigned int lineNumber);
-		
-	protected:
-		inline xpcc::IOStream&
-		output() {
-			return reporter.stream();
-		}
-		
-		Reporter& reporter;
-		
-		xpcc::FlashPointer<char> name;
 	};
 }
 

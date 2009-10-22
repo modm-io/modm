@@ -30,14 +30,46 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <unittest/testsuite.hpp>
+#ifndef	UNITTEST__CONTROLLER_HPP
+#define	UNITTEST__CONTROLLER_HPP
 
-class SaturatedTest : public unittest::TestSuite
+#include <xpcc/io/iostream.hpp>
+#include <xpcc/hal/flash/flash_pointer.hpp>
+
+#include "reporter.hpp"
+
+namespace unittest
 {
-public:
-	void
-	testSigned();
+	/// \ingroup	unittest
+	/// \brief		Controller singleton
+	class Controller
+	{
+	public:
+		static inline Controller&
+		instance() {
+			static Controller controller;
+			return controller;
+		}
+		
+		void
+		setReporter(Reporter& reporter);
+		
+		Reporter&
+		getReporter() const;
+		
+		void
+		nextTestSuite(xpcc::FlashPointer<char> str) const;
 	
-	void
-	testUnsigned();
-};
+	private:
+		Controller();
+		
+		Controller(const Controller&);
+		
+		Controller&
+		operator =(const Controller&);
+		
+		Reporter *reporter;
+	};
+}
+
+#endif	// UNITTEST__CONTROLLER_HPP

@@ -36,8 +36,9 @@
 
 #ifdef __AVR__
 	// include faster implementations written in assembly language
-	#include "saturated_impl_avr_u8.hpp"
-	#include "saturated_impl_avr_s8.hpp"
+	// FIXME fix this files!
+	//#include "saturated_impl_avr_u8.hpp"
+	//#include "saturated_impl_avr_s8.hpp"
 #endif
 
 namespace xpcc

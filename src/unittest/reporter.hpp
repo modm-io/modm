@@ -30,8 +30,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	UNITTEST__RUNNER_HPP
-#define	UNITTEST__RUNNER_HPP
+#ifndef	UNITTEST__REPORTER_HPP
+#define	UNITTEST__REPORTER_HPP
 
 #include <xpcc/io/iostream.hpp>
 
@@ -44,30 +44,27 @@ namespace unittest
 	public:
 		Reporter(xpcc::IODevice& device);
 		
-		inline xpcc::IOStream&
-		stream() {
-			return outputStream;
-		}
+		void
+		nextTestSuite(xpcc::FlashPointer<char> str);
 		
-		inline void
-		pass() {
-			testsPassed++;
-		}
 		
-		inline void
-		fail() {
-			testsFailed++;
-		}
+		void
+		reportPass();
+		
+		xpcc::IOStream&
+		reportFailure(unsigned int lineNumber);
+		
 		
 		void
 		printSummary();
 		
 	private:
 		xpcc::IOStream outputStream;
+		xpcc::FlashPointer<char> testName;
 		
 		int testsPassed;
 		int testsFailed;
 	};
 }
 
-#endif	// UNITTEST__RUNNER_HPP
+#endif	// UNITTEST__REPORTER_HPP

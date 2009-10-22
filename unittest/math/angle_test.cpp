@@ -30,16 +30,9 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <math.h>
+#include <xpcc/math/angle.hpp>
 
 #include "angle_test.hpp"
-
-FLASH_STRING(suiteName) = "angle_test";
-
-AngleTest::AngleTest(unittest::Reporter& reporter) : 
-	TestSuite(reporter, xpcc::Flash(suiteName))
-{
-}
 
 void
 AngleTest::testArithmetic()
@@ -49,16 +42,19 @@ AngleTest::testArithmetic()
 	
 	angle = 2.9 * M_PI;
 	TEST_ASSERT_EQUALS(angle, 2.9 * M_PI);
+	
 	angle.normalize();
 	TEST_ASSERT_EQUALS_FLOAT(angle, 0.9 * M_PI);
 	
 	angle = -2.9 * M_PI;
 	TEST_ASSERT_EQUALS_FLOAT(angle, -2.9 * M_PI);
+	
 	angle.normalize();
 	TEST_ASSERT_EQUALS_FLOAT(angle, -0.9 * M_PI);
 	
 	angle.reverse();
 	TEST_ASSERT_EQUALS_FLOAT(angle, 0.1 * M_PI);
+	
 	angle = -0.1;
 	angle.reverse();
 	TEST_ASSERT_EQUALS_FLOAT(angle, M_PI - 0.1);
