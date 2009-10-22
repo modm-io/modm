@@ -33,7 +33,7 @@
 #ifndef	XPCC__SATURATED_HPP
 #define	XPCC__SATURATED_HPP
 
-#include "../utils/arithmetic_traits.hpp"
+#include <xpcc/utils/arithmetic_traits.hpp>
 
 namespace xpcc
 {

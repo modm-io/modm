@@ -1,4 +1,5 @@
 
+#target: avr
 target: pc
 
 avr:
@@ -7,8 +8,10 @@ avr:
   clock: 32000000
 #  clock: 14745600
   avrdude:
-    programmer: stk500
-    port: /dev/ttyUSB0
+#    programmer: stk500
+#    port: /dev/ttyUSB0
+    programmer: avrispmkii
+    port: usb
 
 library:
   debug:
@@ -33,3 +36,6 @@ library:
 
 tests:
   include: no
+
+unittest:
+  

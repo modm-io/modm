@@ -70,6 +70,22 @@ namespace xpcc
 			Angle&
 			operator-=(const Angle &other);
 		
+		public:
+			friend inline Angle
+			operator-(const Angle &a);
+			
+			friend inline Angle
+			operator-(const Angle &a, const Angle &b);
+			
+			friend inline Angle
+			operator+(const Angle &a, const Angle &b);
+			
+			friend inline bool
+			operator==(const Angle &a, const Angle &b);
+			
+			friend inline bool
+			operator!=(const Angle &a, const Angle &b);
+		
 		private:
 			float value;
 	};
@@ -92,30 +108,33 @@ xpcc::Angle::operator-=(const Angle &other) {
 
 // ----------------------------------------------------------------------------
 // overloaded global operator functions
+// TODO: check if this works
+namespace xpcc
+{
+	inline Angle
+	operator-(const Angle &a) {
+		return Angle(-a.value);
+	}
 
-inline xpcc::Angle
-operator-(const xpcc::Angle &a) {
-	return xpcc::Angle(-a.toFloat());
-}
+	inline Angle
+	operator-(const Angle &a, const Angle &b) {
+		return Angle(a.value - b.value);
+	}
 
-inline xpcc::Angle
-operator-(const xpcc::Angle &a, const xpcc::Angle &b) {
-	return xpcc::Angle(a.toFloat() - b.toFloat());
-}
+	inline Angle
+	operator+(const Angle &a, const Angle &b) {
+		return Angle(a.value + b.value);
+	}
 
-inline xpcc::Angle
-operator+(const xpcc::Angle &a, const xpcc::Angle &b) {
-	return xpcc::Angle(a.toFloat() + b.toFloat());
-}
+	inline bool
+	operator==(const Angle &a, const Angle &b) {
+		return (a.value == b.value);
+	}
 
-inline bool
-operator==(const xpcc::Angle &a, const xpcc::Angle &b) {
-	return (a.toFloat() == b.toFloat());
-}
-
-inline bool
-operator!=(const xpcc::Angle &a, const xpcc::Angle &b) {
-	return (a.toFloat() != b.toFloat());
+	inline bool
+	operator!=(const Angle &a, const Angle &b) {
+		return (a.value != b.value);
+	}
 }
 
 // ----------------------------------------------------------------------------	

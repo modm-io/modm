@@ -90,9 +90,10 @@ def generate(env, **kw):
 	])
 	
 	# flags for C and C++
-	env['CCFLAGS'] = ' '.join([
+	env['CCFLAGS'] = " ".join([
 		"-mmcu=$AVR_DEVICE", 
-		"-Os -gdwarf-2", 
+		"-Os",
+		"-gdwarf-2", 
 		"-funsigned-char",
 		"-funsigned-bitfields", 
 		"-fpack-struct", 		# TODO

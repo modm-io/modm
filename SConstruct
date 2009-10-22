@@ -47,14 +47,17 @@ library = SConscript('src/SConscript',
 			variant_dir='build', 
 			exports=['env', 'sourceFiles'], 
 			duplicate=False)
+env.Alias('lib', 'build/librobot.a')
 
 # build the tests
 sourceFiles = parser.parseDirectory('tests/', 'tests')
 SConscript('tests/SConscript',
-			src='src',
-			variant_dir='build-tests',
+			src='tests',
+			variant_dir='build/tests',
 			exports=['env', 'sourceFiles', 'library'], 
 			duplicate=False)
+env.Alias('tests', 'build/tests')
+
 
 env.Doxygen('doc/doxyfile')
 env.Alias('doc', 'apidoc/html')
