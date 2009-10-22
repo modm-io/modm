@@ -35,7 +35,15 @@
 namespace
 {
 	FLASH_STRING(invaildName) = "invalid";
-	FLASH_STRING(failMessage) = "FAIL: ";
+	
+	FLASH_STRING(failHeader) = "FAIL: ";
+	FLASH_STRING(failColon) = " : ";
+	
+	FLASH_STRING(reportPassed) = "\nPassed";
+	FLASH_STRING(reportTests) = " tests\n";
+	FLASH_STRING(reportOk) = "OK!\n";
+	FLASH_STRING(reportFailed) = "\nFailed ";
+	FLASH_STRING(reportOf) = " of ";
 }
 
 unittest::Reporter::Reporter(xpcc::IODevice& device) :
@@ -60,7 +68,11 @@ xpcc::IOStream&
 unittest::Reporter::reportFailure(unsigned int lineNumber)
 {
 	testsFailed++;
-	outputStream << xpcc::Flash(failMessage) << testName << ':' << lineNumber << " : ";
+	outputStream << xpcc::Flash(failHeader)
+				 << testName
+				 << ':'
+				 << lineNumber
+				 << xpcc::Flash(failColon);
 	return outputStream;
 }
 
@@ -68,11 +80,18 @@ void
 unittest::Reporter::printSummary()
 {
 	if (testsFailed == 0) {
-		outputStream << "\nPassed " << testsPassed << " tests\n"
-					 << "OK!\n" << xpcc::endl;
+		outputStream << xpcc::Flash(reportPassed)
+					 << testsPassed
+					 << xpcc::Flash(reportTests)
+					 << xpcc::Flash(reportOk)
+					 << xpcc::endl;
 	}
 	else {
-		outputStream << "\nFailed " << testsFailed << " of " << (testsFailed + testsPassed)
-					 << " tests\n" << xpcc::endl;
+		outputStream << xpcc::Flash(reportFailed)
+					 << testsFailed
+					 << xpcc::Flash(reportOf)
+					 << (testsFailed + testsPassed)
+					 << xpcc::Flash(reportTests)
+					 << xpcc::endl;
 	}
 }

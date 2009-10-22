@@ -131,7 +131,7 @@ def generate(env, **kw):
 #		"-static", 
 	])
 	
-	env['LINKCOM'] = "$LINK -o $TARGET $LINKFLAGS $SOURCES $_LIBDIRFLAGS $_LIBFLAGS -lm"
+	env['LINKCOM'] = "$LINK -o $TARGET $LINKFLAGS $SOURCES -lm $_LIBDIRFLAGS $_LIBFLAGS -lm"
 	
 	clock = str(env['AVR_CLOCK']).lower()
 	if not clock.endswith('ul'):

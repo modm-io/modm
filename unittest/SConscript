@@ -22,8 +22,12 @@ for file in sourceFiles:
 	objects.append(object)
 
 program = env.Program('unittest', objects,
-						LIBS=env['LIBS'] + ['robot'],
+						LIBS=['robot'] + env['LIBS'],
 						LIBPATH=env['LIBPATH'] + ['../../build/lib'])
 
-if env['ARCHITECTURE'] == 'pc' and int(ARGUMENTS.get('run', 1)):
-	env.Command('thisfileshouldnotexist', program, './build/unittest/unittest') 
+if env['ARCHITECTURE'] == 'pc':
+	if int(ARGUMENTS.get('run', 1)):
+		env.Command('thisfileshouldnotexist', program, './build/unittest/unittest') 
+else:
+	env.Hex(program)
+	env.Listing(program)

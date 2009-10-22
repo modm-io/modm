@@ -42,6 +42,10 @@
 /// @brief		Define a flash string
 #define	FLASH_STRING(s)
 
+/// @ingroup	hal
+/// @brief		Declare a flash string
+#define	EXTERN_FLASH_STRING(s)
+
 #else
 
 #ifdef	__AVR__
@@ -55,6 +59,7 @@
 
 #define	FLASH(var)		const var
 #define	FLASH_STRING(s)	const char s[]
+#define	EXTERN_FLASH_STRING(s)	extern const char s[]
 
 namespace xpcc
 {

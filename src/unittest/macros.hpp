@@ -71,6 +71,13 @@
 
 #else // !__DOXYGEN__
 
+#include <xpcc/hal/flash/flash_pointer.hpp>
+
+namespace unittest {
+	EXTERN_FLASH_STRING(stringEqual);
+	EXTERN_FLASH_STRING(stringNotInRange);
+}
+
 #define	TEST_ASSERT_TRUE(expr)	\
 	if (expr) { \
 		unittest::Controller::instance().getReporter().reportPass(); \
@@ -89,7 +96,8 @@
 	if (x == y) { \
 		unittest::Controller::instance().getReporter().reportPass(); \
 	} else { \
-		unittest::Controller::instance().getReporter().reportFailure(__LINE__) << x << " == " << y << '\n'; \
+		unittest::Controller::instance().getReporter().reportFailure(__LINE__) \
+			<< x << xpcc::Flash(unittest::stringEqual) << y << '\n'; \
 	}
 
 #define	TEST_ASSERT_EQUALS_FLOAT(x, y) \
@@ -99,19 +107,22 @@
 	if (((x + d) > y) && ((x - d) < y)) { \
 		unittest::Controller::instance().getReporter().reportPass(); \
 	} else { \
-		unittest::Controller::instance().getReporter().reportFailure(__LINE__) << x << " == " << y << '\n'; \
+		unittest::Controller::instance().getReporter().reportFailure(__LINE__) \
+			<< x << xpcc::Flash(unittest::stringEqual) << y << '\n'; \
 	}
 
 #define	TEST_ASSERT_RANGE(value, lower, upper) \
 	if ((value >= lower= && (value <= upper)) { \
 		unittest::Controller::instance().getReporter().reportPass(); \
 	} else { \
-		unittest::Controller::instance().getReporter().reportFailure(__LINE__) << value << "not in range "\
-					"[" << lower << "," << upper << "]\n"; \
+		unittest::Controller::instance().getReporter().reportFailure(__LINE__) \
+			<< value << xpcc::Flash(unittest::stringNotInRange) \
+			<< '[' << lower << ',' << upper << ']' << '\n'; \
 	}
 
 #define	TEST_FAIL(msg) \
-	{	unittest::Controller::instance().getReporter().reportFailure(__LINE__) << msg << '\n'; } \
+	{	unittest::Controller::instance().getReporter().reportFailure(__LINE__) \
+			<< msg << '\n'; } \
 
 #endif	// __DOXYGEN__
 

@@ -26,70 +26,15 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: flash_reader_avr.hpp 71 2009-10-12 21:43:00Z dergraaf $
+ * $Id$
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC__FLASH_READER_HPP
+#include "macros.hpp"
 
-#error	"Don't include this file directly, use \"flash_reader.hpp\" instead!"
-
-#else
-
-#include <string.h>
-#include <avr/pgmspace.h>
-
-#define	FLASH(var)		extern const var PROGMEM; const var
-#define	FLASH_STRING(s)	extern const char s[] PROGMEM; const char s[]
-#define	EXTERN_FLASH_STRING(s)	extern const char s[] PROGMEM
-
-namespace xpcc
+namespace unittest
 {
-	template<typename T, size_t size>
-	struct FlashReader
-	{
-		ALWAYS_INLINE
-		static T
-		read(const void* p)
-		{
-			T retval;
-			memcpy_P(reinterpret_cast<void *>(&retval), p, size);
-			return retval;
-		}
-	};
-	
-	template<typename T>
-	struct FlashReader<T, 1>
-	{
-		ALWAYS_INLINE
-		static T
-		read(const void* p)
-		{
-			return T(pgm_read_byte(p));
-		}
-	};
-	
-	template<typename T>
-	struct FlashReader<T, 2>
-	{
-		ALWAYS_INLINE
-		static T
-		read(const void* p)
-		{
-			return T(pgm_read_word(p));
-		}
-	};
-	
-	template<typename T>
-	struct FlashReader<T, 4>
-	{
-		ALWAYS_INLINE
-		static T
-		read(const void* p)
-		{
-			return T(pgm_read_dword(p));
-		}
-	};
+	FLASH_STRING(stringEqual) = " == ";
+	FLASH_STRING(stringNotInRange) = " not in range ";
 }
 
-#endif	// XPCC__FLASH_READER_HPP

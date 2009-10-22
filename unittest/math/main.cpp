@@ -1,6 +1,8 @@
 // FIXME: this file should be generated automatically
 
 #include <unittest/reporter.hpp>
+
+#include <xpcc/io/iodevice.hpp>
 #include <xpcc/io/backplane/std/std_iodevice.hpp>
 
 #include "angle_test.hpp"
@@ -12,12 +14,27 @@ namespace
 	FLASH_STRING(saturatedTestName) = "saturated_test";
 }
 
+class DummyDevice : public xpcc::IODevice
+{
+	virtual void
+	put(char) {};
+
+	using IODevice::put;
+
+	virtual void
+	flush() {};
+
+	virtual bool
+	get(char&) { return false; };
+};
+
 int
 main(void)
 {
 	// initialize stream
-	xpcc::StdIODevice iodevice;
-	unittest::Reporter reporter(iodevice);
+	xpcc::StdIODevice device;
+	//DummyDevice device;
+	unittest::Reporter reporter(device);
 	
 	unittest::Controller::instance().setReporter(reporter);
 	

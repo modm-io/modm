@@ -19,9 +19,10 @@ for file in sourceFiles:
 	
 	program = env.Program(file.basename, file.name,
 							CPPDEFINES=defines,
-							LIBS=env['LIBS'] + ['robot'],
+							LIBS=['robot'] + env['LIBS'],
 							LIBPATH=env['LIBPATH'] + ['../../build/lib'])
 	
 	if env['ARCHITECTURE'] == 'avr':
 		env.Hex(program)
 		env.Listing(program)
+		env.Size(program)

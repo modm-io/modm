@@ -21,7 +21,4 @@ for file in sourceFiles:
 # link them all together to create the library
 library = env.Library(target='robot', source=objects)
 
-#env.Default(library)
-#env.Alias('lib', library)
-
 Return('library')
