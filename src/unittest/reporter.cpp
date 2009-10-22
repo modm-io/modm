@@ -30,24 +30,22 @@
  */
 // ----------------------------------------------------------------------------
 
-#include "testsuite.hpp"
+#include "reporter.hpp"
 
-FLASH_STRING(failMessage) = "FAIL: ";
-
-unittest::TestSuite::TestSuite(Reporter& reporter, 
-							   xpcc::FlashPointer<char> name) :
-	reporter(reporter), name(name)
+unittest::Reporter::Reporter(xpcc::IODevice& device) :
+	outputStream(device), testsPassed(0), testsFailed(0)
 {
 }
 
-unittest::TestSuite::~TestSuite()
+void
+unittest::Reporter::printSummary()
 {
-}
-
-xpcc::IOStream&
-unittest::TestSuite::reportFailure(unsigned int lineNumber)
-{
-	reporter.fail();
-	reporter.stream() << failMessage << name << ':' << lineNumber << " : ";
-	return reporter.stream();
+	if (testsFailed == 0) {
+		outputStream << "Running " << testsPassed << " tests\n"
+					 << "OK!" << xpcc::endl;
+	}
+	else {
+		outputStream << "Failed " << testsFailed << " of " << (testsFailed + testsPassed)
+					 << " tests" << xpcc::endl;
+	}
 }

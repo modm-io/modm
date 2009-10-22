@@ -20,9 +20,8 @@ for file in sourceFiles:
 	program = env.Program(file.basename, file.name,
 							CPPDEFINES=defines,
 							LIBS=env['LIBS'] + ['robot'],
-							LIBPATH=env['LIBPATH'] + ['../../build'])
-	env.Default(program)
+							LIBPATH=env['LIBPATH'] + ['../../build/lib'])
 	
 	if env['ARCHITECTURE'] == 'avr':
-		env.Default(env.Hex(program))
-		env.Default(env.Listing(program))
+		env.Hex(program)
+		env.Listing(program)

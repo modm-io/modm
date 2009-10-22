@@ -30,22 +30,55 @@
  */
 // ----------------------------------------------------------------------------
 
-#define	TEST_ASSERT(expr)
-#define	TEST_ASSERT_EQUALS(x, y)
-#define	TEST_ASSERT_EQUALS_FLOAT(x, y)
-#define	TEST_ASSERT_DELTA(x, y, d)
-#define	TEST_ASSERT_RANGE(x, l, h)
-#define	TEST_FAIL(msg)
+#ifndef	UNITTEST__TESTSUITE_HPP
+#define	UNITTEST__TESTSUITE_HPP
+
+#include <xpcc/hal/flash/flash_pointer.hpp>
+
+#include "reporter.hpp"
+#include "macros.hpp"
 
 namespace unittest
 {
+	/// \ingroup	unittest
+	/// \brief		Base class for every test suite
 	class TestSuite
 	{
 	public:
+		TestSuite(Reporter& reporter, 
+				  xpcc::FlashPointer<char> name);
 		
+		virtual
+		~TestSuite() = 0;
 		
-	private:
-		static int testCount;
-		static int testsFailed;
+		virtual inline void
+		setUp()
+		{
+		}
+		
+		virtual inline void
+		tearDown()
+		{
+		}
+		
+		inline void
+		reportPass() {
+			reporter.pass();
+		}
+		
+		xpcc::IOStream&
+		reportFailure(unsigned int lineNumber);
+		
+	protected:
+		inline xpcc::IOStream&
+		output() {
+			return reporter.stream();
+		}
+		
+		Reporter& reporter;
+		
+		xpcc::FlashPointer<char> name;
 	};
 }
+
+#endif	// UNITTEST__TESTSUITE_HPP

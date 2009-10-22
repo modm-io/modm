@@ -1,0 +1,29 @@
+#!/usr/bin/env python
+#
+# $Id$
+
+import os
+
+Import('env')
+Import('sourceFiles')
+Import('library')
+
+env = env.Clone()
+env.Append(CPPPATH = '../../src')
+
+objects = []
+for file in sourceFiles:
+	defines = env.get('CPPDEFINES', {})
+	defines.update(file.defines)
+	defines['BASENAME'] = file.basename
+	
+	object = env.Object(file.name,
+						CPPDEFINES=defines)
+	objects.append(object)
+
+program = env.Program('unittest', objects,
+						LIBS=env['LIBS'] + ['robot'],
+						LIBPATH=env['LIBPATH'] + ['../../build/lib'])
+
+if env['ARCHITECTURE'] == 'pc' and int(ARGUMENTS.get('run', 1)):
+	env.Command('thisfileshouldnotexist', program, './build/unittest/unittest') 

@@ -36,6 +36,9 @@
 
 class AngleTest : public unittest::TestSuite
 {
+public:
+	AngleTest(unittest::Reporter& reporter);
+	
 	void
 	testArithmetic();
 	

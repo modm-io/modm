@@ -36,6 +36,7 @@
 
 #else
 
+#include <string.h>
 #include <avr/pgmspace.h>
 
 #define	FLASH(var)		extern const var PROGMEM; const var

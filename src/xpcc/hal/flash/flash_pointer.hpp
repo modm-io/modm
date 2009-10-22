@@ -33,17 +33,18 @@
 #ifndef	XPCC__FLASH_HPP
 #define	XPCC__FLASH_HPP
 
-#include "../../utils/misc.hpp"
+#include <xpcc/utils/misc.hpp>
 #include "flash_reader.hpp"
 
 namespace xpcc
 {
 	/**
+	 * \ingroup	hal
 	 * \brief	Pointer to flash memory
 	 * 
-	 * This tepmplate can mostly be used like a regular pointer, but operates
-	 * on flash memory. It will automatically read the data from flash when
-	 * dereferenced.
+	 * This template can mostly be used like a regular pointer, but operates
+	 * on the flash memory rather than RAM. It will automatically read the 
+	 * data from flash when dereferenced.
 	 * 
 	 * Based on a implementation of Rolf Magnus, see
 	 * http://www.mikrocontroller.net/topic/78610#656695

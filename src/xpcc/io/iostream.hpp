@@ -5,6 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
+ * 
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -29,16 +30,15 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_IOSTREAM_HPP
-#define XPCC_IOSTREAM_HPP
+#ifndef XPCC__IOSTREAM_HPP
+#define XPCC__IOSTREAM_HPP
 
-#include <stdio.h>
+#include <xpcc/hal/flash/flash_pointer.hpp>
 
-#include <xpcc/utils/arithmetic_traits.hpp>
-#include <xpcc/utils/typet.hpp>
 #include "iodevice.hpp"
 
-namespace xpcc {
+namespace xpcc
+{
 	/**
 	 * @class 	IOStream
 	 * @brief 	This Formats all primary typs into a string stream for
@@ -49,7 +49,8 @@ namespace xpcc {
 	 * @version	$Id: iostream.hpp 84 2009-10-16 19:15:12Z thundernail $
 	 * @author	Martin Rosekeit <martin.rosekeit@rwth-aachen.de>
 	 */
-	class IOStream {
+	class IOStream
+	{
 		public :
 
 			//! Constructor
@@ -142,6 +143,15 @@ namespace xpcc {
 		{
 			os.device->put( c );
 		}
+		
+		inline void
+		operator()(IOStream& os, FlashPointer<char> str) const
+		{
+			char c;
+			while ((c = *str++)) {
+				os.device->put(c);
+			}
+		}
 	};
 
 	template <typename T>
@@ -162,80 +172,6 @@ namespace xpcc {
 
 };
 
-// -----------------------------------------------------------------------------
-//
-// -----------------------------------------------------------------------------
+#include "iostream_impl.hpp"
 
-
-template<typename T>
-inline xpcc::IOStream&
-xpcc::IOStream::operator<< ( const T& v )
-{
-	// typedef (T.is_integer) ? IntegerWriter<T> : ObjectWriter<T>
-	typedef typename xpcc::tm::Select <
-			::xpcc::ArithmeticTraits<T>::isFloat,
-			::xpcc::FloatWriter<T>,
-			::xpcc::StringWriter >::Result NotIntegerWriter;
-
-    typedef typename xpcc::tm::Select <
-			::xpcc::ArithmeticTraits<T>::isInteger,
-			::xpcc::IntegerWriter<T>,
-			NotIntegerWriter >::Result Writer;
-
-    Writer()(*this, v);
-
-	return *this;
-}
-
-// -----------------------------------------------------------------------------
-
-template<typename T>
-xpcc::IOStream&
-xpcc::IOStream::putInteger( T value )
-{
-	char str[ArithmeticTraits<T>::digits10 + 1]; // +1 for '\0'
-
-	// TODO use a optimized function to format output
-	snprintf(str, sizeof(str), "%d", value);
-
-	this->device->put(str);
-
-	return *this;
-}
-
-// -----------------------------------------------------------------------------
-
-template<typename T>
-xpcc::IOStream&
-xpcc::IOStream::putFloat( T value )
-{
-	// TODO is hard coded for 2.22507e-308
-	char str[13 + 1]; // +1 for '\0'
-
-	// TODO use a optimized function to format output
-	snprintf(str, sizeof(str), "%e", value);
-
-	this->device->put(str);
-
-	return *this;
-}
-
-// -----------------------------------------------------------------------------
-
-inline xpcc::IOStream&
-xpcc::endl(IOStream& ios)
-{
-	return flush(ios.put('\n'));
-}
-
-// -----------------------------------------------------------------------------
-
-inline xpcc::IOStream&
-xpcc::flush(IOStream& ios)
-{
-	return ios.flush();
-}
-
-// -----------------------------------------------------------------------------
-
-#endif // XPCC_IOSTREAM_HPP
+#endif // XPCC__IOSTREAM_HPP

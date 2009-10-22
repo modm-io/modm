@@ -30,24 +30,78 @@
  */
 // ----------------------------------------------------------------------------
 
-#include "testsuite.hpp"
+#ifndef	UNITTEST__MACROS_HPP
+#define	UNITTEST__MACROS_HPP
 
-FLASH_STRING(failMessage) = "FAIL: ";
+#include <xpcc/utils/misc.hpp>
 
-unittest::TestSuite::TestSuite(Reporter& reporter, 
-							   xpcc::FlashPointer<char> name) :
-	reporter(reporter), name(name)
-{
-}
+#define	TEST_FLOAT_EPISLON		0.00001f
 
-unittest::TestSuite::~TestSuite()
-{
-}
+#ifdef __DOXYGEN__
 
-xpcc::IOStream&
-unittest::TestSuite::reportFailure(unsigned int lineNumber)
-{
-	reporter.fail();
-	reporter.stream() << failMessage << name << ':' << lineNumber << " : ";
-	return reporter.stream();
-}
+/// @ingroup	unittest
+/// @brief		Verify (expr) is true 
+#define	TEST_ASSERT(expr)
+
+/// @ingroup	unittest
+/// @brief		Verify (x==y)
+#define	TEST_ASSERT_EQUALS(x, y)
+
+/// @ingroup	unittest
+/// @brief		Verify (x==y) for floating pointer values
+#define	TEST_ASSERT_EQUALS_FLOAT(x, y)
+
+/// @ingroup	unittest
+/// @brief		Verify (x==y) up to d
+///
+/// This macro verifies two values are equal up to a delta
+#define	TEST_ASSERT_DELTA(x, y, d)
+
+/// @ingroup	unittest
+/// @brief		Verify (lower <= value <= upper)
+#define	TEST_ASSERT_RANGE(value, lower, upper)
+
+/// @ingroup	unittest
+/// @brief		Fail unconditionally  
+#define	TEST_FAIL(msg)
+
+#else // !__DOXYGEN__
+
+#define	TEST_ASSERT(expr)	\
+	if (expr) { \
+		reportPass(); \
+	} else { \
+		reportFailure(__LINE__) << '\n'; \
+	}
+
+#define	TEST_ASSERT_EQUALS(x, y) \
+	if (x == y) { \
+		reportPass(); \
+	} else { \
+		reportFailure(__LINE__) << x << " == " << y << '\n'; \
+	}
+
+#define	TEST_ASSERT_EQUALS_FLOAT(x, y) \
+	TEST_ASSERT_DELTA(x, y, TEST_FLOAT_EPISLON)
+
+#define	TEST_ASSERT_DELTA(x, y, d) \
+	if (((x + d) > y) && ((x - d) < y)) { \
+		reportPass(); \
+	} else { \
+		reportFailure(__LINE__) << x << " == " << y << '\n'; \
+	}
+
+#define	TEST_ASSERT_RANGE(value, lower, upper) \
+	if ((value >= lower= && (value <= upper)) { \
+		reportPass(); \
+	} else { \
+		reportFailure(__LINE__) << value << "not in range "\
+					"[" << lower << "," << upper << "]\n"; \
+	}
+
+#define	TEST_FAIL(msg) \
+	{	reportFailure(__LINE__) << '\"' << msg << "\"\n"; } \
+
+#endif	// __DOXYGEN__
+
+#endif	// UNITTEST__MACROS_HPP

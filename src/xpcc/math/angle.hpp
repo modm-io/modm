@@ -34,6 +34,7 @@
 #define	XPCC__ANGLE_HPP
 
 #include <math.h>
+#include <xpcc/io/iostream.hpp>
 
 namespace xpcc
 {
@@ -59,32 +60,44 @@ namespace xpcc
 			}
 			
 			Angle&
-			operator=(const float& angle) {
+			operator =(const float& angle) {
 				this->value = angle;
 				return *this;
 			}
 			
 			Angle&
-			operator+=(const Angle &other);
+			operator +=(const Angle &other);
 			
 			Angle&
-			operator-=(const Angle &other);
+			operator -=(const Angle &other);
 		
 		public:
 			friend inline Angle
-			operator-(const Angle &a);
+			operator -(const Angle &a);
 			
 			friend inline Angle
-			operator-(const Angle &a, const Angle &b);
+			operator -(const Angle &a, const Angle &b);
 			
 			friend inline Angle
-			operator+(const Angle &a, const Angle &b);
+			operator +(const Angle &a, const Angle &b);
 			
 			friend inline bool
-			operator==(const Angle &a, const Angle &b);
+			operator ==(const Angle &a, const Angle &b);
 			
 			friend inline bool
-			operator!=(const Angle &a, const Angle &b);
+			operator !=(const Angle &a, const Angle &b);
+			
+			friend inline bool
+			operator >(const Angle &a, const Angle &b);
+			
+			friend inline bool
+			operator >=(const Angle &a, const Angle &b);
+			
+			friend inline bool
+			operator <(const Angle &a, const Angle &b);
+			
+			friend inline bool
+			operator <=(const Angle &a, const Angle &b);
 		
 		private:
 			float value;
@@ -108,33 +121,59 @@ xpcc::Angle::operator-=(const Angle &other) {
 
 // ----------------------------------------------------------------------------
 // overloaded global operator functions
-// TODO: check if this works
+
 namespace xpcc
 {
 	inline Angle
-	operator-(const Angle &a) {
+	operator -(const Angle &a) {
 		return Angle(-a.value);
 	}
 
 	inline Angle
-	operator-(const Angle &a, const Angle &b) {
+	operator -(const Angle &a, const Angle &b) {
 		return Angle(a.value - b.value);
 	}
 
 	inline Angle
-	operator+(const Angle &a, const Angle &b) {
+	operator +(const Angle &a, const Angle &b) {
 		return Angle(a.value + b.value);
 	}
 
 	inline bool
-	operator==(const Angle &a, const Angle &b) {
+	operator ==(const Angle &a, const Angle &b) {
 		return (a.value == b.value);
 	}
 
 	inline bool
-	operator!=(const Angle &a, const Angle &b) {
+	operator !=(const Angle &a, const Angle &b) {
 		return (a.value != b.value);
 	}
+	
+	inline bool
+	operator >(const Angle &a, const Angle &b) {
+		return (a.value > b.value);
+	}
+	
+	inline bool
+	operator >=(const Angle &a, const Angle &b) {
+		return (a.value >= b.value);
+	}
+	
+	inline bool
+	operator <(const Angle &a, const Angle &b) {
+		return (a.value < b.value);
+	}
+	
+	inline bool
+	operator <=(const Angle &a, const Angle &b) {
+		return (a.value <= b.value);
+	}
+}
+
+inline xpcc::IOStream&
+operator <<(xpcc::IOStream& stream, xpcc::Angle& angle) {
+	stream << angle.toFloat();
+	return stream;
 }
 
 // ----------------------------------------------------------------------------	

@@ -30,24 +30,44 @@
  */
 // ----------------------------------------------------------------------------
 
-#include "testsuite.hpp"
+#ifndef	UNITTEST__RUNNER_HPP
+#define	UNITTEST__RUNNER_HPP
 
-FLASH_STRING(failMessage) = "FAIL: ";
+#include <xpcc/io/iostream.hpp>
 
-unittest::TestSuite::TestSuite(Reporter& reporter, 
-							   xpcc::FlashPointer<char> name) :
-	reporter(reporter), name(name)
+namespace unittest
 {
+	/// \ingroup	unittest
+	/// \brief		Reporter
+	class Reporter
+	{
+	public:
+		Reporter(xpcc::IODevice& device);
+		
+		inline xpcc::IOStream&
+		stream() {
+			return outputStream;
+		}
+		
+		inline void
+		pass() {
+			testsPassed++;
+		}
+		
+		inline void
+		fail() {
+			testsFailed++;
+		}
+		
+		void
+		printSummary();
+		
+	private:
+		xpcc::IOStream outputStream;
+		
+		int testsPassed;
+		int testsFailed;
+	};
 }
 
-unittest::TestSuite::~TestSuite()
-{
-}
-
-xpcc::IOStream&
-unittest::TestSuite::reportFailure(unsigned int lineNumber)
-{
-	reporter.fail();
-	reporter.stream() << failMessage << name << ':' << lineNumber << " : ";
-	return reporter.stream();
-}
+#endif	// UNITTEST__RUNNER_HPP

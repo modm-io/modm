@@ -5,7 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- *
+ * 
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -30,24 +30,80 @@
  */
 // ----------------------------------------------------------------------------
 
-#include "testsuite.hpp"
+#ifndef XPCC__IOSTREAM_HPP
+	#error	"Don't include this file directly, use 'io/iostream.hpp' instead!"
+#endif
 
-FLASH_STRING(failMessage) = "FAIL: ";
+#include <stdio.h>
 
-unittest::TestSuite::TestSuite(Reporter& reporter, 
-							   xpcc::FlashPointer<char> name) :
-	reporter(reporter), name(name)
+#include <xpcc/utils/arithmetic_traits.hpp>
+#include <xpcc/utils/typet.hpp>
+
+template<typename T>
+inline xpcc::IOStream&
+xpcc::IOStream::operator<< ( const T& v )
 {
+	// typedef (T.is_integer) ? IntegerWriter<T> : ObjectWriter<T>
+	typedef typename xpcc::tm::Select <
+			::xpcc::ArithmeticTraits<T>::isFloat,
+			::xpcc::FloatWriter<T>,
+			::xpcc::StringWriter >::Result NotIntegerWriter;
+
+    typedef typename xpcc::tm::Select <
+			::xpcc::ArithmeticTraits<T>::isInteger,
+			::xpcc::IntegerWriter<T>,
+			NotIntegerWriter >::Result Writer;
+
+    Writer()(*this, v);
+
+	return *this;
 }
 
-unittest::TestSuite::~TestSuite()
-{
-}
+// ----------------------------------------------------------------------------
 
+template<typename T>
 xpcc::IOStream&
-unittest::TestSuite::reportFailure(unsigned int lineNumber)
+xpcc::IOStream::putInteger( T value )
 {
-	reporter.fail();
-	reporter.stream() << failMessage << name << ':' << lineNumber << " : ";
-	return reporter.stream();
+	char str[ArithmeticTraits<T>::digits10 + 1]; // +1 for '\0'
+
+	// TODO use a optimized function to format output
+	snprintf(str, sizeof(str), "%d", value);
+
+	this->device->put(str);
+
+	return *this;
+}
+
+// ----------------------------------------------------------------------------
+
+template<typename T>
+xpcc::IOStream&
+xpcc::IOStream::putFloat( T value )
+{
+	// TODO is hard coded for 2.22507e-308
+	char str[13 + 1]; // +1 for '\0'
+
+	// TODO use a optimized function to format output
+	snprintf(str, sizeof(str), "%e", value);
+
+	this->device->put(str);
+
+	return *this;
+}
+
+// ----------------------------------------------------------------------------
+
+inline xpcc::IOStream&
+xpcc::endl(IOStream& ios)
+{
+	return flush(ios.put('\n'));
+}
+
+// ----------------------------------------------------------------------------
+
+inline xpcc::IOStream&
+xpcc::flush(IOStream& ios)
+{
+	return ios.flush();
 }

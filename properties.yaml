@@ -10,7 +10,7 @@ avr:
   avrdude:
 #    programmer: stk500
 #    port: /dev/ttyUSB0
-    programmer: avrispmkii
+    programmer: avrispmkII
     port: usb
 
 library:

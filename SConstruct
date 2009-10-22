@@ -13,7 +13,9 @@ AddOption('--properties',
 
 # parse the global property-file
 verbose = ARGUMENTS.get('verbose') == '1'
-parser = PropertyParser(GetOption('properties'), verbose)
+target = ARGUMENTS.get('target', None)
+
+parser = PropertyParser(GetOption('properties'), target, verbose)
 
 # create a build-environment for the specific target
 build = parser.getGlobalProperties()
@@ -44,10 +46,10 @@ else:
 sourceFiles = parser.parseDirectory('src/', 'library')
 library = SConscript('src/SConscript',
 			src='src',
-			variant_dir='build', 
+			variant_dir='build/lib', 
 			exports=['env', 'sourceFiles'], 
 			duplicate=False)
-env.Alias('lib', 'build/librobot.a')
+lib = env.Alias('lib', 'build/lib')
 
 # build the tests
 sourceFiles = parser.parseDirectory('tests/', 'tests')
@@ -56,8 +58,20 @@ SConscript('tests/SConscript',
 			variant_dir='build/tests',
 			exports=['env', 'sourceFiles', 'library'], 
 			duplicate=False)
-env.Alias('tests', 'build/tests')
+tests = env.Alias('tests', 'build/tests')
 
+# build the unit tests
+sourceFiles = parser.parseDirectory('unittest/', 'unittest')
+SConscript('unittest/SConscript',
+			src='unittest',
+			variant_dir='build/unittest',
+			exports=['env', 'sourceFiles', 'library'], 
+			duplicate=False)
+unittest = env.Alias('unittest', 'build/unittest')
 
+# create doxygen documentation
 env.Doxygen('doc/doxyfile')
 env.Alias('doc', 'apidoc/html')
+
+env.Alias('all', [lib, tests, unittest])
+env.Default('lib')

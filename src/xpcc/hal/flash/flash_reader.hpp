@@ -33,13 +33,25 @@
 #ifndef	XPCC__FLASH_READER_HPP
 #define	XPCC__FLASH_READER_HPP
 
+#ifdef	__DOXYGEN__
+/// @ingroup	hal
+/// @brief		Define a flash variable
+#define	FLASH(var)
+
+/// @ingroup	hal
+/// @brief		Define a flash string
+#define	FLASH_STRING(s)
+
+#else
+
 #ifdef	__AVR__
 
 	#include "flash_reader_avr.hpp"
 
-#else
+#else // !__DOXYGEN__
 
-#include "../../utils/misc.hpp"
+#include <string.h>
+#include <xpcc/utils/misc.hpp>
 
 #define	FLASH(var)		const var
 #define	FLASH_STRING(s)	const char s[]
@@ -61,5 +73,7 @@ namespace xpcc
 }
 
 #endif	// __AVR__
+
+#endif	// __DOXYGEN__
 
 #endif	// XPCC__FLASH_READER_HPP

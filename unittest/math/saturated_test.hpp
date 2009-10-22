@@ -30,10 +30,15 @@
  */
 // ----------------------------------------------------------------------------
 
+#include <unittest/testsuite.hpp>
+
 #include <xpcc/math/saturated.hpp>
 
-class SaturatedTest
+class SaturatedTest : public unittest::TestSuite
 {
+public:
+	SaturatedTest(unittest::Reporter& reporter);
+	
 	void
 	test8BitSigned();
 	

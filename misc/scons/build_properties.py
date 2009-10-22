@@ -25,10 +25,13 @@ class GlobalProperties:
 			self.device = properties['device']
 			self.clock = properties['clock']
 	
-	def __init__(self, properties):
+	def __init__(self, properties, target=None):
 		self.properties = properties
 		
-		self.target = properties.get('target', 'pc')
+		if not target:
+			target = properties.get('target', 'pc')
+		self.target = target
+		
 		if self.target == 'avr':
 			self.avr = self.AvrProperties(properties.get('avr', {}))
 	
@@ -81,7 +84,7 @@ class PropertyParser:
 	""" Parser to read property-files and create a list of files to build. """
 	filetypes = ['.cpp', '.c', '.S']
 	
-	def __init__(self, configFile, verbose=False):
+	def __init__(self, configFile, target=None, verbose=False):
 		self.verbose = verbose
 		try:
 			properties = yaml.load(open(configFile))
@@ -90,7 +93,7 @@ class PropertyParser:
 		except IOError, e:
 			raise PropertyException("Could not open file '%s'!" % configFile)
 		
-		self.globalProperties = GlobalProperties(properties)
+		self.globalProperties = GlobalProperties(properties, target)
 	
 	def parseDirectory(self, target, tag):
 		""" Reads recursively the property-files from the directories and

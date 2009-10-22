@@ -41,4 +41,10 @@
 #define	STRINGIFY(s)	STRINGIFY2(s)
 #define	STRINGIFY2(s)	#s
 
+#ifndef	BASENAME
+	#define	FILENAME	__FILE__
+#else
+	#define	FILENAME	STRINGIFY(BASENAME)
+#endif
+
 #endif	// MISC_HPP
