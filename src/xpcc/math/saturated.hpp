@@ -50,7 +50,7 @@ namespace xpcc
 	template<typename T>
 	class Saturated
 	{
-		typedef typename ArithmeticTraits<T>::DoubleType DoubleType;
+		typedef typename ArithmeticTraits<typename ArithmeticTraits<T>::SignedType>::DoubleType DoubleType;
 	public:
 		typedef typename ArithmeticTraits<T>::SignedType SignedType;
 		typedef typename ArithmeticTraits<T>::UnsignedType UnsignedType;
@@ -63,7 +63,7 @@ namespace xpcc
 			value(initalValue) {
 		}
 		
-		const T&
+		inline const T&
 		getValue() const {
 			return value;
 		}
@@ -104,6 +104,8 @@ namespace xpcc
 		template<typename U>
 		friend bool
 		operator!=(const Saturated<U>& a, const Saturated<U>& b);
+		
+		// TODO > >= < <=
 	
 	private:
 		static T
@@ -115,30 +117,30 @@ namespace xpcc
 	// ------------------------------------------------------------------------
 	
 	/// \brief	Invert value
-	template<typename T>
-	Saturated<typename Saturated<T>::SignedType>
-	operator-(const Saturated<T>& x);
+	template<typename U>
+	Saturated<typename Saturated<U>::SignedType>
+	operator-(const Saturated<U>& x);
 	
 	/// \brief	Calculate the absolte value
-	template<typename T>
-	Saturated<T>
-	abs(const Saturated<T>& x);
+	template<typename U>
+	Saturated<U>
+	abs(const Saturated<U>& x);
 
-	template<typename T>
-	Saturated<T>
-	operator-(const Saturated<T>& a, const Saturated<T>& b);
+	template<typename U>
+	Saturated<U>
+	operator-(const Saturated<U>& a, const Saturated<U>& b);
 
-	template<typename T>
-	Saturated<T>
-	operator+(const Saturated<T>& a, const Saturated<T>& b);
+	template<typename U>
+	Saturated<U>
+	operator+(const Saturated<U>& a, const Saturated<U>& b);
 	
-	template<typename T>
+	template<typename U>
 	bool
-	operator==(const Saturated<T>& a, const Saturated<T>& b);
+	operator==(const Saturated<U>& a, const Saturated<U>& b);
 	
-	template<typename T>
+	template<typename U>
 	bool
-	operator!=(const Saturated<T>& a, const Saturated<T>& b);
+	operator!=(const Saturated<U>& a, const Saturated<U>& b);
 }
 
 #include "saturated/saturated_impl.hpp"

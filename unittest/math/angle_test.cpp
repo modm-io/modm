@@ -46,9 +46,14 @@ AngleTest::testArithmetic()
 	angle.normalize();
 	TEST_ASSERT_EQUALS_FLOAT(angle, 0.9 * M_PI);
 	
-	angle = -2.9 * M_PI;
-	TEST_ASSERT_EQUALS_FLOAT(angle, -2.9 * M_PI);
+	angle = 1.5 * M_PI;
+	angle.normalize();
+	TEST_ASSERT_EQUALS_FLOAT(angle, -0.5 * M_PI);
 	
+	angle.reverse();
+	TEST_ASSERT_EQUALS_FLOAT(angle, 0.5 * M_PI);
+	
+	angle = -2.9 * M_PI;
 	angle.normalize();
 	TEST_ASSERT_EQUALS_FLOAT(angle, -0.9 * M_PI);
 	

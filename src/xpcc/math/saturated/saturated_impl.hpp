@@ -50,8 +50,7 @@ namespace xpcc
 		if (value > ArithmeticTraits<T>::maxValue) {
 			value = ArithmeticTraits<T>::maxValue;
 		}
-		else if (ArithmeticTraits<T>::isSigned &&
-				 value < ArithmeticTraits<T>::minValue) {
+		else if (value < ArithmeticTraits<T>::minValue) {
 			value = ArithmeticTraits<T>::minValue;
 		}
 		return static_cast<T>(value);
@@ -103,68 +102,69 @@ namespace xpcc
 	
 	
 	// ----------------------------------------------------------------------------
-	template<typename T>
-	Saturated<typename Saturated<T>::SignedType>
-	operator-(const Saturated<T>& x)
+	template<typename U>
+	Saturated<typename Saturated<U>::SignedType>
+	operator-(const Saturated<U>& x)
 	{
-		typedef typename ArithmeticTraits<T>::DoubleType DoubleType;
+		typedef typename ArithmeticTraits<U>::DoubleType DoubleType;
 		
 		DoubleType temp = - static_cast<DoubleType>(x.value);
-		return Saturated<typename Saturated<T>::SignedType>(limitValue(temp));
+		return Saturated<typename Saturated<U>::SignedType>(limitValue(temp));
 	}
 
 	// ----------------------------------------------------------------------------
 	// WARNING: this implementation is only correct for unsigned-types,
 	// the functions needs to be specialized for all the signed-types
-	template<typename T>
-	Saturated<T>
-	abs(const Saturated<T>& x)
+	template<typename U>
+	Saturated<U>
+	abs(const Saturated<U>& x)
 	{
-		typedef typename ArithmeticTraits<T>::DoubleType DoubleType;
+		typedef typename ArithmeticTraits<U>::DoubleType DoubleType;
 		
-		if (ArithmeticTraits<T>::isSigned && x.value < 0)
+		// TODO get rid of the warning for unsigned types
+		if (ArithmeticTraits<U>::isSigned && x.value < 0)
 		{
 			DoubleType temp = static_cast<DoubleType>(x.value);
 			
-			return Saturated<T>(Saturated<T>::limitValue(-temp));
+			return Saturated<U>(Saturated<U>::limitValue(-temp));
 		}
 		else {
-			return Saturated<T>(x.value);
+			return Saturated<U>(x.value);
 		}
 	}
 
 	// ----------------------------------------------------------------------------
-	template<typename T>
-	Saturated<T>
-	operator-(const Saturated<T>& a, const Saturated<T>& b)
+	template<typename U>
+	Saturated<U>
+	operator-(const Saturated<U>& a, const Saturated<U>& b)
 	{
-		Saturated<T> t(a);
+		Saturated<U> t(a);
 		t -= b;
 		return t;
 	}
 	
 	// ----------------------------------------------------------------------------
-	template<typename T>
-	Saturated<T>
-	operator+(const Saturated<T>& a, const Saturated<T>& b)
+	template<typename U>
+	Saturated<U>
+	operator+(const Saturated<U>& a, const Saturated<U>& b)
 	{
-		Saturated<T> t(a);
+		Saturated<U> t(a);
 		t += b;
 		return t;
 	}
 	
 	// ----------------------------------------------------------------------------
-	template<typename T>
+	template<typename U>
 	bool
-	operator==(const Saturated<T>& a, const Saturated<T>& b)
+	operator==(const Saturated<U>& a, const Saturated<U>& b)
 	{
 		return (a.value == b.value);
 	}
 
 	// ----------------------------------------------------------------------------
-	template<typename T>
+	template<typename U>
 	bool
-	operator!=(const Saturated<T>& a, const Saturated<T>& b)
+	operator!=(const Saturated<U>& a, const Saturated<U>& b)
 	{
 		return (a.value != b.value);
 	}

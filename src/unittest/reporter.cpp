@@ -39,11 +39,11 @@ namespace
 	FLASH_STRING(failHeader) = "FAIL: ";
 	FLASH_STRING(failColon) = " : ";
 	
-	FLASH_STRING(reportPassed) = "\nPassed";
-	FLASH_STRING(reportTests) = " tests\n";
-	FLASH_STRING(reportOk) = "OK!\n";
+	FLASH_STRING(reportPassed) = "\nPassed ";
 	FLASH_STRING(reportFailed) = "\nFailed ";
 	FLASH_STRING(reportOf) = " of ";
+	FLASH_STRING(reportTests) = " tests\n";
+	FLASH_STRING(reportOk) = "OK!\n";
 }
 
 unittest::Reporter::Reporter(xpcc::IODevice& device) :
