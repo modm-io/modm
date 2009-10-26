@@ -86,7 +86,7 @@ SaturatedTest::testUnsigned()
 	TEST_FAIL("TODO");
 	
 	y = 200;
-	x = abs(y);
+	//x = abs(y);
 	
-	TEST_ASSERT_EQUALS(x.getValue(), 200);
+	//TEST_ASSERT_EQUALS(x.getValue(), 200);
 }

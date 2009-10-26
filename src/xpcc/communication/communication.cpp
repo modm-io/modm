@@ -56,7 +56,7 @@ xpcc::Communication::setCurrentComponent(uint8_t id)
 }
 		
 void
-xpcc::Communication::waitForAcknowledge(const Header &header, const SmartPayload& payload)
+xpcc::Communication::waitForAcknowledge(const Header& /*header*/, const SmartPayload& /*payload*/)
 {
 	// add header and payload to a list of wating acknowledges
 

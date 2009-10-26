@@ -5,7 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -26,45 +26,113 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: iodevice.hpp 61 2009-09-26 18:50:57Z dergraaf $
+ * $Id$
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__IODEVICE_HPP
-#define XPCC__IODEVICE_HPP
+#include "io_stream_test.hpp"
 
-namespace xpcc
+// ----------------------------------------------------------------------------
+// simple IODevice which stores all data in a memory buffer
+// used for testing the output of an IOStream
+
+class MemoryWriter : public xpcc::IODevice
 {
-	/**
-	 * @class 	IODevice
-	 * @brief 	Abstract calls of io-devices
-	 *
-	 * @ingroup io
-	 * @version	$Id: iodevice.hpp 61 2009-09-26 18:50:57Z dergraaf $
-	 * @author	Martin Rosekeit <martin.rosekeit@rwth-aachen.de>
-	 */
-	class IODevice {
-		public :
-			IODevice();
-
-			virtual
-			~IODevice();
-
-			virtual void
-			put(char c) = 0;
-
-			virtual void
-			put(const char* str);
-
-			virtual void
-			flush() = 0;
-
-			virtual bool
-			get(char& c) = 0;
-
-		private :
-			IODevice( const IODevice& );
-	};
+public:
+	MemoryWriter() :
+		bytesWritten(0) {}
+	
+	virtual void
+	put(char c)
+	{
+		buffer[bytesWritten] = c;
+		bytesWritten++;
+	}
+	
+	using xpcc::IODevice::put;
+	
+	virtual void
+	flush()
+	{
+		// TODO
+		put('\b');
+	}
+	
+	virtual bool
+	get(char& /*c*/)
+	{
+		return false;
+	}
+	
+	void
+	clear()
+	{
+		bytesWritten = 0;
+	}
+	
+	char buffer[20];
+	int bytesWritten;
 };
 
-#endif // XPCC__IODEVICE_HPP
+// ----------------------------------------------------------------------------
+static MemoryWriter device;
+
+void
+IoStreamTest::setUp()
+{
+	device.clear();
+	stream = new xpcc::IOStream(device);
+}
+
+void
+IoStreamTest::tearDown()
+{
+	delete stream;
+}
+
+// ----------------------------------------------------------------------------
+void
+IoStreamTest::testString()
+{
+	char string[] = "abc";
+	
+	(*stream) << string;
+	
+	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 0, 3);
+	TEST_ASSERT_EQUALS(device.bytesWritten, 3);
+}
+
+FLASH_STRING(flashString) = "abc";
+
+void
+IoStreamTest::testFlashString()
+{
+	char string[] = "abc";
+	
+	(*stream) << xpcc::Flash(flashString);
+	
+	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 0, 3);
+	TEST_ASSERT_EQUALS(device.bytesWritten, 3);
+}
+
+void
+IoStreamTest::testInteger()
+{
+	char string[] = "123";
+	
+	(*stream) << 123;
+	
+	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 0, 3);
+	TEST_ASSERT_EQUALS(device.bytesWritten, 3);
+}
+	
+void
+IoStreamTest::testFloat()
+{
+	char string[] = "1.230000e+00";
+	
+	(*stream) << 1.23f;
+	
+	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 0, 12);
+	TEST_ASSERT_EQUALS(device.bytesWritten, 12);
+}

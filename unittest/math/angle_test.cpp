@@ -37,12 +37,18 @@
 void
 AngleTest::testArithmetic()
 {
+	// test constructor
 	xpcc::Angle angle;
 	TEST_ASSERT_EQUALS(angle, 0);
 	
+	xpcc::Angle angle2(1.2);
+	TEST_ASSERT_EQUALS(angle2, 1.2);
+	
+	// test assignment operator
 	angle = 2.9 * M_PI;
 	TEST_ASSERT_EQUALS(angle, 2.9 * M_PI);
 	
+	angle = 2.9 * M_PI;
 	angle.normalize();
 	TEST_ASSERT_EQUALS_FLOAT(angle, 0.9 * M_PI);
 	

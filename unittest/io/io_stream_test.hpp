@@ -5,7 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -26,45 +26,35 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: iodevice.hpp 61 2009-09-26 18:50:57Z dergraaf $
+ * $Id$
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__IODEVICE_HPP
-#define XPCC__IODEVICE_HPP
+#include <unittest/testsuite.hpp>
+#include <xpcc/io/iostream.hpp>
 
-namespace xpcc
+class IoStreamTest : public unittest::TestSuite
 {
-	/**
-	 * @class 	IODevice
-	 * @brief 	Abstract calls of io-devices
-	 *
-	 * @ingroup io
-	 * @version	$Id: iodevice.hpp 61 2009-09-26 18:50:57Z dergraaf $
-	 * @author	Martin Rosekeit <martin.rosekeit@rwth-aachen.de>
-	 */
-	class IODevice {
-		public :
-			IODevice();
+public:
+	virtual void
+	setUp();
+	
+	virtual void
+	tearDown();
+	
+	
+	void
+	testString();
+	
+	void
+	testFlashString();
+	
+	void
+	testInteger();
+	
+	void
+	testFloat();
 
-			virtual
-			~IODevice();
-
-			virtual void
-			put(char c) = 0;
-
-			virtual void
-			put(const char* str);
-
-			virtual void
-			flush() = 0;
-
-			virtual bool
-			get(char& c) = 0;
-
-		private :
-			IODevice( const IODevice& );
-	};
+private:
+	xpcc::IOStream *stream;
 };
-
-#endif // XPCC__IODEVICE_HPP

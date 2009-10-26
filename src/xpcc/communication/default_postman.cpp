@@ -31,7 +31,7 @@
 
 #include "default_postman.hpp"
 
-xpcc::DefaultPostman::DefaultPostman(int eventlist, int componentlist)
+xpcc::DefaultPostman::DefaultPostman(int /*eventlist*/, int /*componentlist*/)
 {
 }
 
@@ -42,7 +42,7 @@ xpcc::DefaultPostman::~DefaultPostman()
 
 // ----------------------------------------------------------------------------
 xpcc::DefaultPostman::DeliverInfo
-xpcc::DefaultPostman::deliverPacket(const BackendInterface * const interface)
+xpcc::DefaultPostman::deliverPacket(const BackendInterface * const /*interface*/)
 {
 	return OK;
 }

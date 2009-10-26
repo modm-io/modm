@@ -26,45 +26,15 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: iodevice.hpp 61 2009-09-26 18:50:57Z dergraaf $
+ * $Id$
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__IODEVICE_HPP
-#define XPCC__IODEVICE_HPP
+#include <unittest/testsuite.hpp>
 
-namespace xpcc
+class MathTest : public unittest::TestSuite
 {
-	/**
-	 * @class 	IODevice
-	 * @brief 	Abstract calls of io-devices
-	 *
-	 * @ingroup io
-	 * @version	$Id: iodevice.hpp 61 2009-09-26 18:50:57Z dergraaf $
-	 * @author	Martin Rosekeit <martin.rosekeit@rwth-aachen.de>
-	 */
-	class IODevice {
-		public :
-			IODevice();
-
-			virtual
-			~IODevice();
-
-			virtual void
-			put(char c) = 0;
-
-			virtual void
-			put(const char* str);
-
-			virtual void
-			flush() = 0;
-
-			virtual bool
-			get(char& c) = 0;
-
-		private :
-			IODevice( const IODevice& );
-	};
+public:
+	void
+	testSqrt();
 };
-
-#endif // XPCC__IODEVICE_HPP

@@ -1,17 +1,21 @@
 // FIXME: this file should be generated automatically
 
 #include <unittest/reporter.hpp>
+#include <unittest/controller.hpp>
 
 #include <xpcc/io/iodevice.hpp>
 #include <xpcc/io/backplane/std/std_iodevice.hpp>
 
-#include "angle_test.hpp"
-#include "saturated_test.hpp"
+#include "math/angle_test.hpp"
+#include "math/saturated_test.hpp"
+
+#include "io/io_stream_test.hpp"
 
 namespace
 {
-	FLASH_STRING(angleTestName) = "angle_test";
-	FLASH_STRING(saturatedTestName) = "saturated_test";
+	FLASH_STRING(angleTestName) = "angle";
+	FLASH_STRING(saturatedTestName) = "saturated";
+	FLASH_STRING(ioStreamTestName) = "io_stream";
 }
 
 class DummyDevice : public xpcc::IODevice
@@ -52,7 +56,28 @@ main(void)
 		angleTest.tearDown();
 	}
 	
-	unittest::Controller::instance().nextTestSuite(xpcc::Flash(saturatedTestName));
+	unittest::Controller::instance().nextTestSuite(xpcc::Flash(ioStreamTestName));
+	{
+		IoStreamTest ioStreamTest;
+		
+		ioStreamTest.setUp();
+		ioStreamTest.testString();
+		ioStreamTest.tearDown();
+		
+		ioStreamTest.setUp();
+		ioStreamTest.testFlashString();
+		ioStreamTest.tearDown();
+		
+		ioStreamTest.setUp();
+		ioStreamTest.testInteger();
+		ioStreamTest.tearDown();
+		
+		ioStreamTest.setUp();
+		ioStreamTest.testFloat();
+		ioStreamTest.tearDown();
+	}
+	
+	/*unittest::Controller::instance().nextTestSuite(xpcc::Flash(saturatedTestName));
 	{
 		SaturatedTest saturatedTest;
 		
@@ -63,7 +88,7 @@ main(void)
 		saturatedTest.setUp();
 		saturatedTest.testUnsigned();
 		saturatedTest.tearDown();
-	}
+	}*/
 	
 	unittest::Controller::instance().getReporter().printSummary();
 	

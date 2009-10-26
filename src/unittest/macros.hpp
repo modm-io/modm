@@ -66,6 +66,10 @@
 #define	TEST_ASSERT_RANGE(value, lower, upper)
 
 /// @ingroup	unittest
+/// @brief		Check if the arrays contains the same data
+#define	TEST_ASSERT_EQUALS_ARRAY(array1, array2, start, count)
+
+/// @ingroup	unittest
 /// @brief		Fail unconditionally  
 #define	TEST_FAIL(msg)
 
@@ -78,26 +82,37 @@ namespace unittest {
 	EXTERN_FLASH_STRING(stringNotInRange);
 }
 
+#ifdef	TEST_RETURN_ON_FAIL
+	#define	TEST_RETURN__	return
+#else
+	#define	TEST_RETURN__	
+#endif
+
+#define	TEST_REPORTER__		unittest::Controller::instance().getReporter()
+
 #define	TEST_ASSERT_TRUE(expr)	\
 	if (expr) { \
-		unittest::Controller::instance().getReporter().reportPass(); \
+		TEST_REPORTER__.reportPass(); \
 	} else { \
-		unittest::Controller::instance().getReporter().reportFailure(__LINE__) << '\n'; \
+		TEST_REPORTER__.reportFailure(__LINE__) << '\n'; \
+		TEST_RETURN__; \
 	}
 
 #define	TEST_ASSERT_FALSE(expr)	\
 	if (expr) { \
-		unittest::Controller::instance().getReporter().reportFailure(__LINE__) << '\n'; \
+		TEST_REPORTER__.reportFailure(__LINE__) << '\n'; \
+		TEST_RETURN__; \
 	} else { \
-		unittest::Controller::instance().getReporter().reportPass(); \
+		TEST_REPORTER__.reportPass(); \
 	}
 
 #define	TEST_ASSERT_EQUALS(x, y) \
 	if (x == y) { \
-		unittest::Controller::instance().getReporter().reportPass(); \
+		TEST_REPORTER__.reportPass(); \
 	} else { \
-		unittest::Controller::instance().getReporter().reportFailure(__LINE__) \
+		TEST_REPORTER__.reportFailure(__LINE__) \
 			<< x << xpcc::Flash(unittest::stringEqual) << y << '\n'; \
+		TEST_RETURN__; \
 	}
 
 #define	TEST_ASSERT_EQUALS_FLOAT(x, y) \
@@ -105,24 +120,59 @@ namespace unittest {
 
 #define	TEST_ASSERT_DELTA(x, y, d) \
 	if (((x + d) > y) && ((x - d) < y)) { \
-		unittest::Controller::instance().getReporter().reportPass(); \
+		TEST_REPORTER__.reportPass(); \
 	} else { \
-		unittest::Controller::instance().getReporter().reportFailure(__LINE__) \
+		TEST_REPORTER__.reportFailure(__LINE__) \
 			<< x << xpcc::Flash(unittest::stringEqual) << y << '\n'; \
+		TEST_RETURN__; \
 	}
 
 #define	TEST_ASSERT_RANGE(value, lower, upper) \
-	if ((value >= lower= && (value <= upper)) { \
-		unittest::Controller::instance().getReporter().reportPass(); \
+	if ((value >= lower) && (value <= upper)) { \
+		TEST_REPORTER__.reportPass(); \
 	} else { \
-		unittest::Controller::instance().getReporter().reportFailure(__LINE__) \
+		TEST_REPORTER__.reportFailure(__LINE__) \
 			<< value << xpcc::Flash(unittest::stringNotInRange) \
 			<< '[' << lower << ',' << upper << ']' << '\n'; \
+		TEST_RETURN__; \
 	}
 
+// FIXME replace with template functions!
+#define	TEST_ASSERT_EQUALS_ARRAY(array1, array2, start, count) \
+	do { \
+		int i; \
+		bool failure = false; \
+		for (i = start; i < (start + count); i++) { \
+			if (array1[i] != array2[i]) { \
+				failure = true; \
+				break; \
+			} \
+		} \
+		if (failure) { \
+			xpcc::IOStream& stream = TEST_REPORTER__.reportFailure(__LINE__); \
+			stream << '\n'; \
+			stream << "["; \
+			for (int k = start; k < (start + count); k++) { \
+				stream << array1[k] << ", "; \
+			} \
+			stream << "]\n"; \
+			\
+			stream << "["; \
+			for (int k = start; k < (start + count); k++) { \
+				stream << array2[k] << ", "; \
+			} \
+			stream << "]\n"; \
+			TEST_RETURN__; \
+		} else { \
+			TEST_REPORTER__.reportPass(); \
+		} \
+	} while (0)
+
 #define	TEST_FAIL(msg) \
-	{	unittest::Controller::instance().getReporter().reportFailure(__LINE__) \
-			<< msg << '\n'; } \
+	do {	TEST_REPORTER__.reportFailure(__LINE__) \
+			<< msg << '\n'; \
+		TEST_RETURN__; \
+	} while (0)
 
 #endif	// __DOXYGEN__
 

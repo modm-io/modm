@@ -44,6 +44,7 @@ namespace
 	FLASH_STRING(reportOf) = " of ";
 	FLASH_STRING(reportTests) = " tests\n";
 	FLASH_STRING(reportOk) = "OK!\n";
+	FLASH_STRING(reportFail) = "FAIL!\n";
 }
 
 unittest::Reporter::Reporter(xpcc::IODevice& device) :
@@ -92,6 +93,7 @@ unittest::Reporter::printSummary()
 					 << xpcc::Flash(reportOf)
 					 << (testsFailed + testsPassed)
 					 << xpcc::Flash(reportTests)
+					 << xpcc::Flash(reportFail)
 					 << xpcc::endl;
 	}
 }
