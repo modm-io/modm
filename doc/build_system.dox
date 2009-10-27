@@ -20,7 +20,7 @@ For Ubuntu (and other Debian based Linux-Distributions) just type the
 following in a terminal and you're good to go:
 
 \verbatim
-$ sudo apt-get install python python-yaml scons
+$ sudo apt-get install python python-yaml scons doxygen graphviz
 \endverbatim
 
 Windows users have to install the tools by hand. How to do that is explaind

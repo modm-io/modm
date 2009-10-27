@@ -1,0 +1,46 @@
+.PS
+copy "sequence.pic";
+
+boxwid = 1.3;
+
+placeholder_object(E,"");
+object(S, "Strategy");
+object(C2, "Component");
+object(D, "Driver");
+
+step();
+sync();
+
+message(E,S, "startGame");
+active(S);
+
+step();
+message(S,C2, "collectColumns");
+active(C2);
+message(C2,D, "driveToPoint");
+active(D);
+message(C2,C2, "collect");
+message(C2,C2, "collect");
+message(C2,C2, "collect");
+message(D,C2, "done");
+inactive(D);
+
+message(C2,S, "found 3 columns");
+inactive(C2);
+
+message(S,C2, "placeColumns");
+active(C2);
+message(C2,D, "driveToBuildArea");
+active(D);
+message(D,C2, "done");
+inactive(D);
+
+message(C2,C2, "buildTemple");
+message(C2,S, "done");
+inactive(C2);
+
+complete(S);
+complete(C2);
+complete(D);
+
+.PE

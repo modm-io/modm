@@ -116,7 +116,7 @@ IoStreamTest::testFlashString()
 }
 
 void
-IoStreamTest::testInteger()
+IoStreamTest::testShortInteger()
 {
 	char string[] = "123";
 	
@@ -125,7 +125,18 @@ IoStreamTest::testInteger()
 	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 0, 3);
 	TEST_ASSERT_EQUALS(device.bytesWritten, 3);
 }
+
+void
+IoStreamTest::testInteger()
+{
+	char string[] = "1234567";
 	
+	(*stream) << 1234567;
+	
+	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 0, 7);
+	TEST_ASSERT_EQUALS(device.bytesWritten, 7);
+}
+
 void
 IoStreamTest::testFloat()
 {

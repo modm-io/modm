@@ -53,6 +53,9 @@ public:
 	testInteger();
 	
 	void
+	testShortInteger();
+	
+	void
 	testFloat();
 
 private:

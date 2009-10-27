@@ -69,6 +69,10 @@ main(void)
 		ioStreamTest.tearDown();
 		
 		ioStreamTest.setUp();
+		ioStreamTest.testShortInteger();
+		ioStreamTest.tearDown();
+		
+		ioStreamTest.setUp();
 		ioStreamTest.testInteger();
 		ioStreamTest.tearDown();
 		
