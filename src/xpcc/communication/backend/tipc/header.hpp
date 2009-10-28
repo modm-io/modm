@@ -39,7 +39,11 @@ namespace xpcc {
 		//!	the first 64 ids (types) are used by tipc itself
 		//! @ingroup tipc
 		const unsigned int TYPE_ID_OFFSET = 64;
+		
+		//! @ingroup tipc
 		const unsigned int EVENT_OFFSET   = 0x10000;
+		
+		//! @ingroup tipc
 		const unsigned int REQUEST_OFFSET = 0x20000;
 
 

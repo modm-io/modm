@@ -40,7 +40,7 @@
 namespace xpcc {
 	namespace tipc {
 
-		/*
+		/**
 		 * @class	Tipc
 		 * @brief	Class that connects the communication to the tipc.
 		 *
@@ -89,7 +89,7 @@ namespace xpcc {
 
 				//! Send a Message.
 				//!
-				//! \return	\b true if the packet could be send, \b false otherwise.
+				//! @return	\b true if the packet could be send, \b false otherwise.
 				virtual void
 				sendPacket(const xpcc::Header &header, const SmartPayload& payload = SmartPayload());
 
