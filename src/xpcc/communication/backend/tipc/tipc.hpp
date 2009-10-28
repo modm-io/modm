@@ -41,12 +41,12 @@ namespace xpcc {
 	namespace tipc {
 
 		/*
-		 * \class	Tipc
-		 * \brief	Class that connects the communication to the tipc.
+		 * @class	Tipc
+		 * @brief	Class that connects the communication to the tipc.
 		 *
-		 * \ingroup	tipc
-		 * \version	$Id: tipc.hpp 92 2009-10-17 15:54:22Z thundernail $
-		 * \author	Martin Rosekeit <martin.rosekeit@rwth-aachen.de>
+		 * @ingroup	tipc
+		 * @version	$Id: tipc.hpp 92 2009-10-17 15:54:22Z thundernail $
+		 * @author	Martin Rosekeit <martin.rosekeit@rwth-aachen.de>
 		 */
 		class Tipc : public BackendInterface
 		{

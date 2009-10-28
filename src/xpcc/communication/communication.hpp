@@ -66,7 +66,7 @@ namespace xpcc
 {
 	typedef Header ResponseHandle;
 	
-	/// \ingroup	communication
+	/// @ingroup	communication
 	class Communication
 	{
 	public:
