@@ -30,7 +30,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/hal/avr/math.hpp>
+#include <xpcc/hal/avr/math/math.hpp>
 
 #include "math_test.hpp"
 

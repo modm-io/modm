@@ -5,14 +5,14 @@
 import os
 
 Import('env')
-Import('sourceFiles')
+Import('sources')
 Import('library')
 
 env = env.Clone()
 env.Append(CPPPATH = '../../src')
 
 # build a object file form each source file
-for file in sourceFiles:
+for file in sources:
 	defines = env.get('CPPDEFINES', {})
 	defines.update(file.defines)
 	defines['BASENAME'] = file.basename

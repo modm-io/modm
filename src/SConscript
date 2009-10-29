@@ -3,14 +3,14 @@
 # $Id: SConscript 88 2009-10-16 23:07:26Z dergraaf $
 
 Import('env')
-Import('sourceFiles')
+Import('sources')
 
 env = env.Clone()
 env.Append(CPPPATH = '.')
 
 # build a object file form each source file
 objects = []
-for file in sourceFiles:
+for file in sources:
 	defines = env.get('CPPDEFINES', {})
 	defines.update(file.defines)
 	defines['BASENAME'] = file.basename

@@ -48,7 +48,19 @@ main(void)
 		AngleTest angleTest;
 		
 		angleTest.setUp();
-		angleTest.testArithmetic();
+		angleTest.testConstructor();
+		angleTest.tearDown();
+		
+		angleTest.setUp();
+		angleTest.testAssignment();
+		angleTest.tearDown();
+		
+		angleTest.setUp();
+		angleTest.testNormalize();
+		angleTest.tearDown();
+		
+		angleTest.setUp();
+		angleTest.testReverse();
 		angleTest.tearDown();
 		
 		angleTest.setUp();

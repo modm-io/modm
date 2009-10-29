@@ -35,7 +35,16 @@
 struct AngleTest : public unittest::TestSuite
 {
 	void
-	testArithmetic();
+	testConstructor();
+	
+	void
+	testAssignment();
+	
+	void
+	testNormalize();
+	
+	void
+	testReverse();
 	
 	void
 	testGlobalFunctions();

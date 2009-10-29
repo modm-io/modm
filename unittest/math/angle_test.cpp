@@ -35,45 +35,76 @@
 #include "angle_test.hpp"
 
 void
-AngleTest::testArithmetic()
+AngleTest::testConstructor()
 {
-	// test constructor
 	xpcc::Angle angle;
 	TEST_ASSERT_EQUALS(angle, 0);
 	
 	xpcc::Angle angle2(1.2);
 	TEST_ASSERT_EQUALS(angle2, 1.2);
+}
+
+void
+AngleTest::testAssignment()
+{
+	xpcc::Angle angle;
 	
-	// test assignment operator
-	angle = 2.9 * M_PI;
-	TEST_ASSERT_EQUALS(angle, 2.9 * M_PI);
+	angle = 0.7 * M_PI;
+	TEST_ASSERT_EQUALS(angle, 0.7 * M_PI);
+	
+	angle = -0.4 * M_PI;
+	TEST_ASSERT_EQUALS(angle, -0.4 * M_PI);
+}
+
+void
+AngleTest::testNormalize()
+{
+	xpcc::Angle angle;
+	
+	angle = 0.3 * M_PI;
+	angle.normalize();
+	TEST_ASSERT_EQUALS_FLOAT(angle, 0.3 * M_PI);
+	
+	angle = -0.6 * M_PI;
+	angle.normalize();
+	TEST_ASSERT_EQUALS_FLOAT(angle, -0.6 * M_PI);
 	
 	angle = 2.9 * M_PI;
 	angle.normalize();
 	TEST_ASSERT_EQUALS_FLOAT(angle, 0.9 * M_PI);
 	
-	angle = 1.5 * M_PI;
-	angle.normalize();
-	TEST_ASSERT_EQUALS_FLOAT(angle, -0.5 * M_PI);
-	
-	angle.reverse();
-	TEST_ASSERT_EQUALS_FLOAT(angle, 0.5 * M_PI);
-	
 	angle = -2.9 * M_PI;
 	angle.normalize();
 	TEST_ASSERT_EQUALS_FLOAT(angle, -0.9 * M_PI);
 	
+	angle = 1.5 * M_PI;
+	angle.normalize();
+	TEST_ASSERT_EQUALS_FLOAT(angle, -0.5 * M_PI);
+}
+
+void
+AngleTest::testReverse()
+{
+	xpcc::Angle angle;
+	
+	angle = -0.5 * M_PI;
+	angle.reverse();
+	TEST_ASSERT_EQUALS_FLOAT(angle, 0.5 * M_PI);
+	
+	angle = -0.9 * M_PI;
 	angle.reverse();
 	TEST_ASSERT_EQUALS_FLOAT(angle, 0.1 * M_PI);
 	
-	angle = -0.1;
+	angle = 0.7 * M_PI;
 	angle.reverse();
-	TEST_ASSERT_EQUALS_FLOAT(angle, M_PI - 0.1);
+	TEST_ASSERT_EQUALS_FLOAT(angle, -0.3 * M_PI);
 }
 
 void
 AngleTest::testGlobalFunctions()
 {
+	xpcc::Angle angle;
+	
 	//cos();
 	//sin();
 	//tan();

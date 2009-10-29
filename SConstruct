@@ -43,29 +43,30 @@ else:
 	Exit(1)
 
 # finally build the library from the src-directory
-sourceFiles = parser.parseDirectory('src/', 'library')
+sources, header = parser.parseDirectory('src/', 'library')
 library = SConscript('src/SConscript',
 			src='src',
 			variant_dir='build/lib', 
-			exports=['env', 'sourceFiles'], 
+			exports=['env', 'sources'], 
 			duplicate=False)
 lib = env.Alias('lib', 'build/lib')
 
 # build the tests
-sourceFiles = parser.parseDirectory('tests/', 'tests')
+sources, header = parser.parseDirectory('tests/', 'tests')
 SConscript('tests/SConscript',
 			src='tests',
 			variant_dir='build/tests',
-			exports=['env', 'sourceFiles', 'library'], 
+			exports=['env', 'sources', 'library'], 
 			duplicate=False)
 tests = env.Alias('tests', 'build/tests')
 
 # build the unit tests
-sourceFiles = parser.parseDirectory('unittest/', 'unittest')
+sources, header = parser.parseDirectory('unittest/', 'unittest')
+basedir = '.'
 SConscript('unittest/SConscript',
 			src='unittest',
 			variant_dir='build/unittest',
-			exports=['env', 'sourceFiles', 'library'], 
+			exports=['env', 'sources', 'header', 'basedir', 'library'], 
 			duplicate=False)
 unittest = env.Alias('unittest', 'build/unittest')
 

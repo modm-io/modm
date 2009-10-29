@@ -3,22 +3,33 @@
 # $Id$
 
 import os
+import re
 
 Import('env')
-Import('sourceFiles')
+Import('sources')
+Import('header')
+Import('basedir')
 Import('library')
 
 env = env.Clone()
 env.Append(CPPPATH = '../../src')
 
+# find all header files named '*_test.hpp'
+headerlist = [file.name for file in header]
+test = re.compile("test\.hpp$", re.IGNORECASE)
+headers = filter(test.search, headerlist)
+
+print headers
+
 objects = []
-for file in sourceFiles:
+for file in sources:
+	print os.path.abspath(file.name)
+	
 	defines = env.get('CPPDEFINES', {})
 	defines.update(file.defines)
 	defines['BASENAME'] = file.basename
 	
-	object = env.Object(file.name,
-						CPPDEFINES=defines)
+	object = env.Object(file.name, CPPDEFINES=defines)
 	objects.append(object)
 
 program = env.Program('unittest', objects,

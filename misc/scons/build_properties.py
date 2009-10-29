@@ -82,7 +82,8 @@ class DirectoryProperties:
 
 class PropertyParser:
 	""" Parser to read property-files and create a list of files to build. """
-	filetypes = ['.cpp', '.c', '.S']
+	sourcetypes = ['.cpp', '.c', '.S']
+	headertypes = ['.h', '.hpp']
 	
 	def __init__(self, configFile, target=None, verbose=False):
 		self.verbose = verbose
@@ -99,7 +100,8 @@ class PropertyParser:
 		""" Reads recursively the property-files from the directories and
 		returns a list of files to build.
 		"""
-		fileList = []
+		sources = []
+		header = []
 		for path, directories, files in os.walk(target):
 			# exclude the SVN-directories
 			if '.svn' in directories:
@@ -110,9 +112,12 @@ class PropertyParser:
 			if directory.shouldBeBuild():
 				for file in files:
 					extension = os.path.splitext(file)[1]
-					if extension in self.filetypes:
+					if extension in self.sourcetypes:
 						filename = os.path.join(path[len(target):], file)
-						fileList.append(directory.createFileProperties(filename))
+						sources.append(directory.createFileProperties(filename))
+					elif extension  in self.headertypes:
+						filename = os.path.join(path[len(target):], file)
+						header.append(directory.createFileProperties(filename))
 			else:
 				# if the this directory should be excluded, remove all the
 				# subdirectories from the list to exclude them as well
@@ -120,7 +125,7 @@ class PropertyParser:
 				for d in tempDirectories:
 					directories.remove(d)
 		
-		return fileList
+		return (sources, header)
 	
 	def _parseDirectoryProperties(self, path, localProperties):
 		try:
