@@ -1,0 +1,29 @@
+// WARNING: This file is generated automatically, do not edit!
+// Please modify the corresponding 'main.cpp.in' file instead.
+// ----------------------------------------------------------------------------
+
+#include <unittest/reporter.hpp>
+#include <unittest/controller.hpp>
+
+$iodeviceInclude
+
+$includes
+
+$nameStrings
+
+int
+main(void)
+{
+	// initialize stream
+	$iodevice device;
+	
+	unittest::Reporter reporter(device);
+	unittest::Controller::instance().setReporter(reporter);
+	
+	// run tests
+	$tests
+	
+	unittest::Controller::instance().getReporter().printSummary();
+	
+	return 0;
+}

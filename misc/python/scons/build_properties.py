@@ -48,11 +48,28 @@ class GlobalProperties:
 
 
 class FileProperties:
-	def __init__(self, filename, defines={}):
+	def __init__(self, filename, abspath, defines=None):
 		self.name = filename
 		# filename without extension
 		self.basename = os.path.splitext(os.path.basename(filename))[0]
-		self.defines = defines
+		self.abspath = abspath
+		if defines:
+			self.defines = defines
+		else:
+			self.defines = {}
+		self.defines['BASENAME'] = self.basename
+	
+	def getDefines(self, globalDefines=None):
+		""" Returns a dictionary with the defines for this file """
+		if globalDefines:
+			defines = self.defines.copy()
+			defines.update(globalDefines)
+			return defines
+		else:
+			return self.defines.copy()
+	
+	def __cmp__(self, other):
+		return cmp(self.name, other)
 
 
 class DirectoryProperties:
@@ -72,9 +89,9 @@ class DirectoryProperties:
 		else:
 			self._enabled = True
 	
-	def createFileProperties(self, filename):
+	def createFileProperties(self, filename, abspath):
 		defines  = self.localProperties.get('defines', {})
-		return FileProperties(filename, defines)
+		return FileProperties(filename, abspath, defines)
 	
 	def shouldBeBuild(self):
 		return self._enabled
@@ -114,10 +131,12 @@ class PropertyParser:
 					extension = os.path.splitext(file)[1]
 					if extension in self.sourcetypes:
 						filename = os.path.join(path[len(target):], file)
-						sources.append(directory.createFileProperties(filename))
+						abspath = os.path.abspath(os.path.join(path, file))
+						sources.append(directory.createFileProperties(filename, abspath))
 					elif extension  in self.headertypes:
 						filename = os.path.join(path[len(target):], file)
-						header.append(directory.createFileProperties(filename))
+						abspath = os.path.abspath(os.path.join(path, file))
+						header.append(directory.createFileProperties(filename, abspath))
 			else:
 				# if the this directory should be excluded, remove all the
 				# subdirectories from the list to exclude them as well

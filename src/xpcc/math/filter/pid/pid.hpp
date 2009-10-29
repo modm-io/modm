@@ -44,7 +44,7 @@ namespace xpcc
 	}
 	
 	/// \ingroup	filter
-	/// \brief	A proportional–integral–derivative controller (PID controller)
+	/// \brief	A proportional-integral-derivative controller (PID controller)
 	///
 	/// \todo	check implementation
 	template<typename T, unsigned int ScaleFactor = 1>

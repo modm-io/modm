@@ -30,11 +30,20 @@
  */
 // ----------------------------------------------------------------------------
 
-#include "macros.hpp"
+#include <unittest/testsuite.hpp>
 
-namespace unittest
+class CartesianTest : public unittest::TestSuite
 {
-	FLASH_STRING(stringEqual) = " == ";
-	FLASH_STRING(stringNotInRange) = " not in range ";
-}
-
+public:
+	void
+	testConstructor();
+	
+	void
+	testLengthAndAngle();
+	
+	void
+	testRotation();
+	
+	void
+	testArithmetics();
+};

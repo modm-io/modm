@@ -33,7 +33,7 @@
 #ifndef	UNITTEST__TESTSUITE_HPP
 #define	UNITTEST__TESTSUITE_HPP
 
-#include "macros.hpp"
+#include "harness.hpp"
 
 namespace unittest
 {

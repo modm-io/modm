@@ -26,22 +26,38 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # 
-# $Id: SConscript 88 2009-10-16 23:07:26Z dergraaf $
+# $Id$
 
-Import('env')
-Import('sources')
+from string import Template
 
-env = env.Clone()
-env.Append(CPPPATH = '../../src')
+from SCons.Script import *
 
-# build a object file form each source file
-objects = []
-for file in sources:
-	object = env.Object(file.name,
-						CPPDEFINES=file.getDefines(env.get('CPPDEFINES', {})))
-	objects.append(object)
+# -----------------------------------------------------------------------------
+def replace_action(target, source, env):
+	if not env.has_key('SUBSTITUTIONS'):
+		raise SCons.Errors.UserError, "'Template' requires SUBSTITUTIONS to be set."
+	
+	source = str(source[0])
+	target = str(target[0])
+	
+	output = Template(open(source, 'r').read()).safe_substitute(env['SUBSTITUTIONS'])
+	
+	open(target, 'w').write(output)
+	return 0
 
-# link them all together to create the library
-library = env.Library(target='robot', source=objects)
+def replace_string(target, source, env):
+	return "Create: '%s' from '%s'" % (str(target[0]), str(source[0]))
 
-Return('library')
+# -----------------------------------------------------------------------------
+def generate(env, **kw):
+	
+	builder = env.Builder(
+		action = env.Action(replace_action, replace_string),
+		src_suffix = '.in',
+		single_source = True
+	)
+	
+	env['BUILDERS']['Template'] = builder
+
+def exists(env):
+	return True

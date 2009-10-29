@@ -1,0 +1,5 @@
+
+ * change the build procedure for the 'tests' folder
+
+ * Replace the TEST_ASSERT_EQUALS_ARRAY implementation in 'src/unittest/harness.hpp'
+   with a template function

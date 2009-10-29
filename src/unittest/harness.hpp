@@ -30,8 +30,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	UNITTEST__MACROS_HPP
-#define	UNITTEST__MACROS_HPP
+#ifndef	UNITTEST__HARNESS_HPP
+#define	UNITTEST__HARNESS_HPP
 
 #include "controller.hpp"
 
@@ -59,11 +59,11 @@
 /// @brief		Verify (x==y) up to d
 ///
 /// This macro verifies two values are equal up to a delta
-#define	TEST_ASSERT_DELTA(x, y, d)
+#define	TEST_ASSERT_EQUALS_DELTA(x, y, d)
 
 /// @ingroup	unittest
 /// @brief		Verify (lower <= value <= upper)
-#define	TEST_ASSERT_RANGE(value, lower, upper)
+#define	TEST_ASSERT_EQUALS_RANGE(value, lower, upper)
 
 /// @ingroup	unittest
 /// @brief		Check if the arrays contains the same data
@@ -116,10 +116,10 @@ namespace unittest {
 	}
 
 #define	TEST_ASSERT_EQUALS_FLOAT(x, y) \
-	TEST_ASSERT_DELTA(x, y, TEST_FLOAT_EPISLON)
+	TEST_ASSERT_EQUALS_DELTA(x, y, TEST_FLOAT_EPISLON)
 
-#define	TEST_ASSERT_DELTA(x, y, d) \
-	if (((x + d) > y) && ((x - d) < y)) { \
+#define	TEST_ASSERT_EQUALS_DELTA(x, y, d) \
+	if ((((x) + d) >= y) && (((x) - d) <= y)) { \
 		TEST_REPORTER__.reportPass(); \
 	} else { \
 		TEST_REPORTER__.reportFailure(__LINE__) \
@@ -127,7 +127,7 @@ namespace unittest {
 		TEST_RETURN__; \
 	}
 
-#define	TEST_ASSERT_RANGE(value, lower, upper) \
+#define	TEST_ASSERT_EQUALS_RANGE(value, lower, upper) \
 	if ((value >= lower) && (value <= upper)) { \
 		TEST_REPORTER__.reportPass(); \
 	} else { \
@@ -176,4 +176,4 @@ namespace unittest {
 
 #endif	// __DOXYGEN__
 
-#endif	// UNITTEST__MACROS_HPP
+#endif	// UNITTEST__HARNESS_HPP

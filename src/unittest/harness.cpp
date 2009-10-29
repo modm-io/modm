@@ -30,63 +30,11 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/math/saturated.hpp>
+#include "harness.hpp"
 
-#include "saturated_test.hpp"
+namespace unittest
+{
+	FLASH_STRING(stringEqual) = " == ";
+	FLASH_STRING(stringNotInRange) = " not in range ";
+}
 
-void
-SaturatedTest::testSigned()
-{
-	//TEST_FAIL("TODO");
-}
-	
-void
-SaturatedTest::testUnsigned()
-{
-	xpcc::Saturated<uint8_t> x;
-	xpcc::Saturated<uint8_t> y(100);
-	
-	TEST_ASSERT_EQUALS(x.getValue(), 0);
-	TEST_ASSERT_EQUALS(y.getValue(), 100);
-	
-	x = 200;
-	
-	TEST_ASSERT_EQUALS(x.getValue(), 200);
-	
-	x += y;
-	
-	TEST_ASSERT_EQUALS(x.getValue(), 255);
-	
-	x = 10;
-	y = 20;
-	x -= y;
-	
-	TEST_ASSERT_EQUALS(x.getValue(), 0);
-	
-	xpcc::Saturated<uint8_t> z;
-	
-	x = 20;
-	y = 10;
-	
-	z = x + y;
-	
-	TEST_ASSERT_EQUALS(x.getValue(), 20);
-	TEST_ASSERT_EQUALS(y.getValue(), 10);
-	TEST_ASSERT_EQUALS(z.getValue(), 30);
-	
-	z = x - y;
-	
-	TEST_ASSERT_EQUALS(x.getValue(), 20);
-	TEST_ASSERT_EQUALS(y.getValue(), 10);
-	TEST_ASSERT_EQUALS(z.getValue(), 10);
-	
-	//x = -z;
-	
-	//TEST_ASSERT_EQUALS(x.getValue(), 0);
-	//TEST_FAIL("TODO");
-	
-	y = 200;
-	//x = abs(y);
-	
-	//TEST_ASSERT_EQUALS(x.getValue(), 200);
-}

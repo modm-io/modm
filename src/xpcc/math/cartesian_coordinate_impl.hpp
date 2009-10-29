@@ -38,10 +38,51 @@ namespace xpcc
 {
 	// ------------------------------------------------------------------------
 	template<typename T>
-	CartesianCoordinate<T>::CartesianCoordinate(T x, T y) : x(x), y(y)
+	CartesianCoordinate<T>::CartesianCoordinate(const T& x, const T& y) : x(x), y(y)
 	{
 	}
-
+	
+	// ------------------------------------------------------------------------
+	template<typename T>
+	void
+	CartesianCoordinate<T>::setX(const T& value)
+	{
+		x = value;
+	}
+	
+	// ------------------------------------------------------------------------
+	template<typename T>
+	void
+	CartesianCoordinate<T>::setY(const T& value)
+	{
+		y = value;
+	}
+	
+	// ------------------------------------------------------------------------
+	template<typename T>
+	void
+	CartesianCoordinate<T>::set(const T& x, const T& y)
+	{
+		this->x = x;
+		this->y = y;
+	}
+	
+	// ------------------------------------------------------------------------
+	template<typename T>
+	const T&
+	CartesianCoordinate<T>::getX() const
+	{
+		return x;
+	}
+	
+	// ------------------------------------------------------------------------
+	template<typename T>
+	const T&
+	CartesianCoordinate<T>::getY() const
+	{
+		return y;
+	}
+	
 	// ------------------------------------------------------------------------
 	template<typename T>
 	T
@@ -80,10 +121,8 @@ namespace xpcc
 	// ------------------------------------------------------------------------
 	template<typename T>
 	CartesianCoordinate<T>&
-	CartesianCoordinate<T>::normalize()
+	CartesianCoordinate<T>::normalize(const T& length)
 	{
-		T length(getLength());
-		
 		x = x / length;
 		y = y / length;
 		
@@ -93,13 +132,14 @@ namespace xpcc
 	// ------------------------------------------------------------------------
 	template<typename T>
 	CartesianCoordinate<T>&
-	CartesianCoordinate<T>::rotate(Angle& phi)
+	CartesianCoordinate<T>::rotate(const Angle& phi)
 	{
 		float c = cos(phi).toFloat();
 		float s = sin(phi).toFloat();
 		
-		T tx = 		c * this->x - s * this->y;
-		this->y =	s * this->x + c * this->y;
+		// without rounding the result might be false for T = integer
+		T tx =    round(c * this->x - s * this->y);
+		this->y = round(s * this->x + c * this->y);
 		this->x = tx;
 		
 		return *this;
