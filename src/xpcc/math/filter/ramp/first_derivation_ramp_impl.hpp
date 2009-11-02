@@ -5,7 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- *
+ * 
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -26,28 +26,18 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: misc.hpp 88 2009-10-16 23:07:26Z dergraaf $
+ * $Id$
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	MISC_HPP
-#define	MISC_HPP
-
-// Macro to force inlining on the functions if needed, because many
-// people compile with -Os, which does not always inline them.
-#define ALWAYS_INLINE  inline __attribute__((always_inline))
-
-
-#define	STRINGIFY(s)	STRINGIFY2(s)
-#define	STRINGIFY2(s)	#s
-
-#define	CONCAT(a,b)		CONCAT2(a,b)
-#define	CONCAT2(a,b)	a ## b
-
-#ifndef	BASENAME
-	#define	FILENAME	__FILE__
-#else
-	#define	FILENAME	STRINGIFY(BASENAME)
+#ifndef XPCC__FIRST_DERIVATION_RAMP_HPP
+	#error	"Don't include this file directly, use 'math/filter/first_derivation_ramp.hpp' instead!"
 #endif
 
-#endif	// MISC_HPP
+// ----------------------------------------------------------------------------
+template<typename T>
+void
+xpcc::FirstDerivationRamp<T>::update(const T& target)
+{
+	
+}

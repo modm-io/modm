@@ -5,6 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
+ * 
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -25,7 +26,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: deque_impl.hpp 76 2009-10-14 23:29:28Z dergraaf $
+ * $Id$
  */
 // ----------------------------------------------------------------------------
 
@@ -46,7 +47,7 @@ bool
 xpcc::BoundedDeque<T, N, S>::isFull() const
 {
 	S tmphead = head + 1;
-	if (tmphead >= N) {
+	if (tmphead >= (N + 1)) {
 		tmphead = 0;
 	}
 	return (tmphead == tail);
@@ -85,8 +86,8 @@ template<typename T, int N, typename S>
 T&
 xpcc::BoundedDeque<T, N, S>::back() {
 	S tmphead = head - 1;
-	if (tmphead >= N) {
-		tmphead = N - 1;
+	if (tmphead >= (N + 1)) {
+		tmphead = (N + 1) - 1;
 	}
 	return buffer[tmphead];
 }
@@ -96,8 +97,8 @@ template<typename T, int N, typename S>
 const T&
 xpcc::BoundedDeque<T, N, S>::back() const {
 	S tmphead = head - 1;
-	if (tmphead >= N) {
-		tmphead = N - 1;
+	if (tmphead >= (N + 1)) {
+		tmphead = (N + 1) - 1;
 	}
 	return buffer[tmphead];
 }
@@ -109,7 +110,7 @@ bool
 xpcc::BoundedDeque<T, N, S>::pushBack(const T& value) {
 	// calculate the new buffer index
 	S tmphead = head + 1;
-	if (tmphead >= N) {
+	if (tmphead >= (N + 1)) {
 		tmphead = 0;
 	}
 	
@@ -131,8 +132,8 @@ bool
 xpcc::BoundedDeque<T, N, S>::pushFront(const T& value) {
 	// calculate the new buffer index
 	S tmptail = tail - 1;
-	if (tmptail >= N) {
-		tmptail = N - 1;
+	if (tmptail >= (N + 1)) {
+		tmptail = (N + 1) - 1;
 	}
 	
 	// check if there is enough space left
@@ -153,8 +154,8 @@ void
 xpcc::BoundedDeque<T, N, S>::popBack() {
 	// calculate and store buffer index
 	S tmphead = head - 1;
-	if (tmphead >= N) {
-		tmphead = N - 1;
+	if (tmphead >= (N + 1)) {
+		tmphead = (N + 1) - 1;
 	}
 	head = tmphead;
 }
@@ -165,7 +166,7 @@ void
 xpcc::BoundedDeque<T, N, S>::popFront() {
 	// calculate and store buffer index
 	S tmptail = tail + 1;
-	if (tmptail >= N) {
+	if (tmptail >= (N + 1)) {
 		tmptail = 0;
 	}
 	tail = tmptail;

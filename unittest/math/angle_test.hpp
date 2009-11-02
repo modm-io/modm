@@ -32,8 +32,9 @@
 
 #include <unittest/testsuite.hpp>
 
-struct AngleTest : public unittest::TestSuite
+class AngleTest : public unittest::TestSuite
 {
+public:
 	void
 	testConstructor();
 	

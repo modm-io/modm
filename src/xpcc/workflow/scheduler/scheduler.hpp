@@ -37,37 +37,79 @@
 
 namespace xpcc
 {
-	/// @ingroup	workflow
-	/// @brief		Scheduler event
-	class Event
+	/**
+	 * @ingroup	workflow
+	 * @brief	%Scheduler task
+	 */
+	class Task
 	{
 	public:
 		virtual void
 		run() = 0;
 	};
 	
-	/// @ingroup	workflow
-	/// @brief		Scheduler
-	/// 
-	/// Timed execution of events
-	///
+	/**
+	 * @ingroup	workflow
+	 * @brief	%Scheduler
+	 * 
+	 * This scheduler is a priority based preemtive scheduler, meaning that
+	 * always the task with the highest priority is executed. It will only
+	 * change tasks if a task with a higher priority becomes ready or the
+	 * current task ends.
+	 * 
+	 * @image	html	scheduler.png
+	 */
 	class Scheduler
 	{
 	public:
 		typedef uint8_t Priority;		//!< range [0..7]
 
 	public:
-		void
-		scheduleEvent(Event& event, uint16_t period, Priority priority = 4);
+		Scheduler();
 		
+		void
+		scheduleTask(Task& task,
+					 uint16_t period,
+					 Priority priority = 4);
+		
+		/// @todo	implement this function
 		bool
-		removeEvent(const Event& event);
+		removeTask(const Task& task);
 		
 		void
 		update();
 		
 	private:
+		struct TaskListItem
+		{
+			TaskListItem(Task& task,
+						 uint16_t period,
+						 Priority priority) :
+				nextTask(0), nextReady(0), task(task),
+				period(period), time(period), priority(priority),
+				state(WAITING)
+			{
+			}
+			
+			TaskListItem *nextTask;
+			TaskListItem *nextReady;
+			
+			Task& task;
+			uint16_t period;
+			uint16_t time;
+			Priority priority;
+			enum {
+				RUNNING,
+				READY,
+				WAITING
+			} state;
+		};
 		
+		inline void
+		addToReadyList(TaskListItem* item);
+		
+		TaskListItem *taskList;
+		TaskListItem *readyList;
 	};
 }
 

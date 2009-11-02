@@ -431,3 +431,14 @@ hr {
 .directory img { 
 	vertical-align: -30%; 
 }
+
+/* footer */
+
+address {
+	color: #cccccc;
+}
+
+address img {
+	margin-bottom: -20px;
+	border-style: none;
+}

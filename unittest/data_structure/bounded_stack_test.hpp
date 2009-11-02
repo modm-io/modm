@@ -5,6 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
+ *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -25,95 +26,15 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: local_time.hpp 74 2009-10-14 21:22:53Z dergraaf $
+ * $Id$
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC__LOCAL_TIME_HPP
-#define	XPCC__LOCAL_TIME_HPP
+#include <unittest/testsuite.hpp>
 
-#include <stdint.h>
-
-namespace xpcc
+class BoundedStackTest : public unittest::TestSuite
 {
-	// TODO better Timestamp or simply Time?
-	class LocalTime
-	{
-	public:
-		typedef uint16_t Time;
-		
-		static LocalTime
-		getTime();
-		
-	public:
-		LocalTime(const Time time = 0) : 
-			time(time) {
-		}
-		
-		inline LocalTime
-		operator + (const LocalTime& other);
-		
-		
-		inline bool
-		operator == (const LocalTime& other);
-		
-		inline bool
-		operator != (const LocalTime& other);
-		
-		inline bool
-		operator < (const LocalTime& other);
-		
-		inline bool
-		operator > (const LocalTime& other);
-		
-		inline bool
-		operator <= (const LocalTime& other);
-		
-		inline bool
-		operator >= (const LocalTime& other);
-		
-	
-	private:
-		Time time;
-	};
-}
-
-// ----------------------------------------------------------------------------
-inline xpcc::LocalTime
-xpcc::LocalTime::operator + (const LocalTime& other) {
-	return LocalTime(time + other.time);
-}
-
-
-// ----------------------------------------------------------------------------
-inline bool
-xpcc::LocalTime::operator == (const LocalTime& other) {
-	return (time == other.time);
-}
-
-inline bool
-xpcc::LocalTime::operator != (const LocalTime& other) {
-	return (time != other.time);
-}
-
-inline bool
-xpcc::LocalTime::operator < (const LocalTime& other) {
-	return ((int16_t) (time - other.time)) < 0;
-}
-
-inline bool
-xpcc::LocalTime::operator > (const LocalTime& other) {
-	return ((int16_t) (time - other.time)) > 0;
-}
-
-inline bool
-xpcc::LocalTime::operator <= (const LocalTime& other) {
-	return ((int16_t) (time - other.time)) <= 0;
-}
-
-inline bool
-xpcc::LocalTime::operator >= (const LocalTime& other) {
-	return ((int16_t) (time - other.time)) >= 0;
-}
-
-#endif	// XPCC__LOCAL_TIME_HPP
+public:
+	void
+	testStack();
+};

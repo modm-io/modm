@@ -38,19 +38,21 @@
 
 namespace xpcc
 {
-	/// \ingroup	math
-	/// \brief		Representation of a angle
+	/**
+	 * @ingroup	math
+	 * @brief	Representation of a angle
+	 */
 	class Angle
 	{
 		public:
 			Angle(float value = 0.0) : value(value) {
 			}
 			
-			//! \brief	Limit angle to +-Pi
+			/// @brief	Limit angle to +-Pi
 			void
 			normalize();
 			
-			//! \brief	reverse the angle
+			/// @brief	reverse the angle
 			void
 			reverse();
 			
@@ -179,22 +181,22 @@ operator <<(xpcc::IOStream& stream, xpcc::Angle& angle) {
 // ----------------------------------------------------------------------------	
 // overloaded global functions
 
-/// \ingroup	math
-/// \brief		Calculate cosinus of an angle
+/// @ingroup	math
+/// @brief		Calculate cosinus of an angle
 inline xpcc::Angle
 cos(const xpcc::Angle& angle) {
 	return cos(angle.toFloat());
 }
 
-/// \ingroup	math
-/// \brief		Calculate sinus of an angle
+/// @ingroup	math
+/// @brief		Calculate sinus of an angle
 inline xpcc::Angle
 sin(const xpcc::Angle& angle) {
 	return sin(angle.toFloat());
 }
 
-/// \ingroup	math
-/// \brief		Calculate tangens of an angle
+/// @ingroup	math
+/// @brief		Calculate tangens of an angle
 inline xpcc::Angle
 tan(const xpcc::Angle& angle) {
 	return tan(angle.toFloat());

@@ -5,6 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
+ * 
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -37,12 +38,12 @@
 namespace xpcc
 {
 	/**
-	 * \ingroup	data_structure
-	 * \brief	Double ended queue
+	 * @ingroup	data_structure
+	 * @brief	Double ended queue
 	 * 
 	 * Internally organised as a ring buffer.
 	 * 
-	 * \verbatim
+	 * @verbatim
 	 *              tail --\                        /-- head
 	 *                     |                        |
 	 *           +------+------+---- ----+------+------+
@@ -52,15 +53,19 @@ namespace xpcc
 	 * push_front --/      |                 |      \-- push_back
 	 *                     |                 |
 	 *             front --/                 \-- back
-	 * \endverbatim
+	 * @endverbatim
 	 * 
-	 * \tparam	T	Type of the elements
-	 * \tparam	N	Size of the queue
-	 * \tparam	S	Type of status Variables (use uint8_t for N < 255 (default),
+	 * @tparam	T	Type of the elements
+	 * @tparam	N	Size of the queue
+	 * @tparam	S	Type of status variables (use uint8_t for N < 255 (default),
 	 * 				otherwise uint16_t)
 	 * 
-	 * \warning		This class don't check if the container is not empty before
+	 * @warning		This class don't check if the container is not empty before
 	 * 				a pop operation. You have to do this by yourself!
+	 * 
+	 * @todo	Replace N+1 with N and find a better mechanism than reserving
+	 * 			a unused place inside the buffer.
+	 * @todo	Implement the getSize() method
 	 */
 	template<typename T,
 			 int N,
@@ -119,7 +124,7 @@ namespace xpcc
 		S head;
 		S tail;
 		
-		T buffer[N];
+		T buffer[N + 1];
 	};
 }
 

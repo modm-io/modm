@@ -30,44 +30,43 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_TIMEOUT_HPP
-#define XPCC_TIMEOUT_HPP
+#include <xpcc/data_structure/stack.hpp>
 
-#include <xpcc/hal/time/local_time.hpp>
+#include "bounded_stack_test.hpp"
 
-namespace xpcc
+void
+BoundedStackTest::testStack()
 {
-	/// @ingroup	workflow
-	/// @brief		Software timer
-	///
-	/// Has to be polled to check if it has expired.
-	class Timeout
-	{
-	public:
-		Timeout(LocalTime time);
-		
-		/// @brief	Check if the given time has passed.
-		bool
-		isExpired();
-		
-		/// @brief	Stop timer
-		inline void
-		stop() {
-			state = STOPPED;
-		}
-		
-		/// @brief	Set a new timeout time.
-		void
-		restart(LocalTime time);
-		
-	private:
-		LocalTime endTime;
-		enum {
-			ACTIVE,
-			STOPPED,
-			EXPIRED
-		} state;
-	};
+	xpcc::BoundedStack<uint16_t, 3> stack;
+	
+	TEST_ASSERT_TRUE(stack.isEmpty());
+	TEST_ASSERT_EQUALS(stack.getMaxSize(), 3);
+	
+	TEST_ASSERT_TRUE(stack.push(1));
+	TEST_ASSERT_TRUE(stack.push(2));
+	TEST_ASSERT_TRUE(stack.push(3));
+	
+	TEST_ASSERT_FALSE(stack.push(4));
+	TEST_ASSERT_TRUE(stack.isFull());
+	
+	TEST_ASSERT_EQUALS(stack.get(), 3);
+	stack.pop();
+	
+	TEST_ASSERT_EQUALS(stack.get(), 2);
+	stack.pop();
+	
+	TEST_ASSERT_TRUE(stack.push(4));
+	TEST_ASSERT_TRUE(stack.push(5));
+	TEST_ASSERT_TRUE(stack.isFull());
+	
+	TEST_ASSERT_EQUALS(stack.get(), 5);
+	stack.pop();
+	
+	TEST_ASSERT_EQUALS(stack.get(), 4);
+	stack.pop();
+	
+	TEST_ASSERT_EQUALS(stack.get(), 1);
+	stack.pop();
+	
+	TEST_ASSERT_TRUE(stack.isEmpty());
 }
-
-#endif // XPCC_TIMEOUT_HPP

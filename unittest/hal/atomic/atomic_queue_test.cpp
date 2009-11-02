@@ -26,28 +26,47 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: misc.hpp 88 2009-10-16 23:07:26Z dergraaf $
+ * $Id$
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	MISC_HPP
-#define	MISC_HPP
+#include <xpcc/hal/atomic/queue.hpp>
 
-// Macro to force inlining on the functions if needed, because many
-// people compile with -Os, which does not always inline them.
-#define ALWAYS_INLINE  inline __attribute__((always_inline))
+#include "atomic_queue_test.hpp"
 
-
-#define	STRINGIFY(s)	STRINGIFY2(s)
-#define	STRINGIFY2(s)	#s
-
-#define	CONCAT(a,b)		CONCAT2(a,b)
-#define	CONCAT2(a,b)	a ## b
-
-#ifndef	BASENAME
-	#define	FILENAME	__FILE__
-#else
-	#define	FILENAME	STRINGIFY(BASENAME)
-#endif
-
-#endif	// MISC_HPP
+void
+AtomicQueueTest::testQueue()
+{
+	xpcc::atomic::Queue<uint16_t, 3> queue;
+	
+	TEST_ASSERT_TRUE(queue.isEmpty());
+	TEST_ASSERT_EQUALS(queue.getMaxSize(), 3);
+	
+	TEST_ASSERT_TRUE(queue.push(1));
+	TEST_ASSERT_TRUE(queue.push(2));
+	TEST_ASSERT_TRUE(queue.push(3));
+	
+	TEST_ASSERT_FALSE(queue.push(4));
+	TEST_ASSERT_TRUE(queue.isFull());
+	
+	TEST_ASSERT_EQUALS(queue.get(), 1);
+	queue.pop();
+	
+	TEST_ASSERT_EQUALS(queue.get(), 2);
+	queue.pop();
+	
+	TEST_ASSERT_TRUE(queue.push(4));
+	TEST_ASSERT_TRUE(queue.push(5));
+	TEST_ASSERT_TRUE(queue.isFull());
+	
+	TEST_ASSERT_EQUALS(queue.get(), 3);
+	queue.pop();
+	
+	TEST_ASSERT_EQUALS(queue.get(), 4);
+	queue.pop();
+	
+	TEST_ASSERT_EQUALS(queue.get(), 5);
+	queue.pop();
+	
+	TEST_ASSERT_TRUE(queue.isEmpty());
+}

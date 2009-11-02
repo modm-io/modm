@@ -38,13 +38,16 @@
 
 namespace xpcc
 {
-	/// \ingroup	data_structure
-	/// \brief	LIFO stack
-	/// 
-	///  Elements are pushed/popped from the "back" of the specific container,
-	///  which is known as the top of the stack.
-	///  
-	///  \see		Deque()
+	/**
+	 * @ingroup		data_structure
+	 * @brief		LIFO stack
+	 * @headerfile	<xpcc/data_structure/stack.hpp>
+	 * 
+	 * Elements are pushed/popped from the "back" of the specific container,
+	 * which is known as the top of the stack.
+	 *  
+	 * @see		Deque()
+	 */
 	template<typename T,
 			 typename Container>
 	class Stack
@@ -53,42 +56,50 @@ namespace xpcc
 		typedef typename Container::SizeType SizeType;
 		
 		bool
-		isEmpty() {
+		isEmpty()
+		{
 			return c.isEmpty();
 		}
 		
 		bool
-		isFull() {
+		isFull()
+		{
 			return c.isFull();
 		}
 		
 		SizeType
-		getSize() {
+		getSize()
+		{
 			return c.getSize();
 		}
 		
 		SizeType
-		getMaxSize() {
-			return c.maxSize();
+		getMaxSize()
+		{
+			return c.getMaxSize();
 		}
 		
 		T&
-		get() {
+		get()
+		{
 			return c.back();
 		}
 		
 		const T&
-		get() const {
+		get() const
+		{
 			return c.back();
 		}
 		
 		bool
-		push(const T& value) {
+		push(const T& value)
+		{
 			return c.pushBack(value);
 		}
 		
 		void
-		pop() {
+		pop()
+		{
 			c.popBack();
 		}
 	
@@ -97,14 +108,16 @@ namespace xpcc
 	};
 
 	// ------------------------------------------------------------------------
-	/// \ingroup	data_structure
-	/// \brief		Bounded stack
+	/**
+	 * @ingroup	data_structure
+	 * @brief		Bounded stack
+	 */
 	template<typename T, 
 			 int N,
 			 typename S=uint8_t,
 			 typename Container=BoundedDeque<T, N, S> >
-	class BoundedStack : public Stack<T, Container> {
-		
+	class BoundedStack : public Stack<T, Container>
+	{
 	};
 }
 

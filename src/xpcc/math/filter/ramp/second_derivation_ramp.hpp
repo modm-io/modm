@@ -5,6 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
+ * 
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -25,13 +26,36 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: global_time.hpp 71 2009-10-12 21:43:00Z dergraaf $
+ * $Id$
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC__GLOBAL_TIME_HPP
-#define	XPCC__GLOBAL_TIME_HPP
+#ifndef XPCC__SECOND_DERIVATION_RAMP_HPP
+#define XPCC__SECOND_DERIVATION_RAMP_HPP
 
-// TODO interface
+namespace xpcc
+{
+	/// @ingroup	filter
+	/// @brief		Generates a S-curve
+	/// 
+	/// @todo	documentation
+	template<typename T>
+	class SecondDerivationRamp
+	{
+	public:
+		void
+		update(const T& target);
+		
+		const T&
+		getValue() const {
+			return currentValue;
+		}
+	
+	private:
+		T currentValue;
+	};
+}
 
-#endif	// XPCC__GLOBAL_TIME_HPP
+#include "second_derivation_ramp_impl.hpp"
+
+#endif // XPCC__SECOND_DERIVATION_RAMP_HPP

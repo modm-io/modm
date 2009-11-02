@@ -5,6 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
+ * 
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -45,7 +46,7 @@ template<typename T, int N>
 bool
 xpcc::atomic::Queue<T, N>::isFull() {
 	uint8_t tmphead = VOLATILE(head) + 1;
-	if (tmphead >= N) {
+	if (tmphead >= (N+1)) {
 		tmphead = 0;
 	}
 	
@@ -77,7 +78,7 @@ template<typename T, int N>
 bool
 xpcc::atomic::Queue<T, N>::push(const T& value) {
 	uint8_t tmphead = head + 1;
-	if (tmphead >= N) {
+	if (tmphead >= (N+1)) {
 		tmphead = 0;
 	}
 	if (tmphead == VOLATILE(tail)) {
@@ -94,7 +95,7 @@ template<typename T, int N>
 void
 xpcc::atomic::Queue<T, N>::pop() {
 	uint8_t tmptail = tail + 1;
-	if (tmptail >= N) {
+	if (tmptail >= (N+1)) {
 		tmptail = 0;
 	}
 	tail = tmptail;

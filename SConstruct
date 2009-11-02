@@ -70,7 +70,7 @@ elif build.target == 'pc':
 			ARCHITECTURE = 'pc',
 			tools = ['pc', 'doxygen', 'template'],
 			toolpath = ['misc/python/scons/'],
-			LIBS=['boost_thread'],
+			LIBS=['boost_thread-mt'],
 			LIBPATH=['/usr/lib/'])
 
 else:

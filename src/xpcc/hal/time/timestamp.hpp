@@ -5,6 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
+ * 
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -25,33 +26,72 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: game_time.hpp 71 2009-10-12 21:43:00Z dergraaf $
+ * $Id$
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC__GAME_TIME_HPP
-#define	XPCC__GAME_TIME_HPP
+#ifndef	XPCC__TIMESTAMP_HPP
+#define	XPCC__TIMESTAMP_HPP
 
 #include <stdint.h>
 
 namespace xpcc
 {
-	// TODO interface
-	class GameTime
+	/// @ingroup	hal
+	/// @brief		simple 16-bit timestamp
+	class Timestamp
 	{
 	public:
-		typedef uint16_t Seconds;
+		Timestamp(const uint16_t time = 0) : 
+			time(time)
+		{
+		}
+		
+		inline Timestamp
+		operator + (const Timestamp& other) const
+		{
+			return Timestamp(time + other.time);
+		}
+		
+		inline bool
+		operator == (const Timestamp& other) const
+		{
+			return (time == other.time);
+		}
+		
+		inline bool
+		operator != (const Timestamp& other) const
+		{
+			return (time != other.time);
+		}
+		
+		inline bool
+		operator < (const Timestamp& other) const
+		{
+			return ((int16_t) (time - other.time)) < 0;
+		}
+		
+		inline bool
+		operator > (const Timestamp& other) const
+		{
+			return ((int16_t) (time - other.time)) > 0;
+		}
+		
+		inline bool
+		operator <= (const Timestamp& other) const
+		{
+			return ((int16_t) (time - other.time)) <= 0;
+		}
+		
+		inline bool
+		operator >= (const Timestamp& other) const
+		{
+			return ((int16_t) (time - other.time)) >= 0;
+		}
 	
-	public:
-		static bool
-		isRunning();
-		
-		static Seconds
-		getTime();
-		
-		static void
-		setTime(Seconds seconds);
+	private:
+		uint16_t time;
 	};
 }
 
-#endif	// XPCC__GAME_TIME_HPP
+#endif	// XPCC__TIMESTAMP_HPP

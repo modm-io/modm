@@ -26,28 +26,65 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: misc.hpp 88 2009-10-16 23:07:26Z dergraaf $
+ * $Id$
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	MISC_HPP
-#define	MISC_HPP
+#include <xpcc/workflow/time/timeout.hpp>
 
-// Macro to force inlining on the functions if needed, because many
-// people compile with -Os, which does not always inline them.
-#define ALWAYS_INLINE  inline __attribute__((always_inline))
+#include "timeout_test.hpp"
 
+// ----------------------------------------------------------------------------
+// dummy implementation to control the time
 
-#define	STRINGIFY(s)	STRINGIFY2(s)
-#define	STRINGIFY2(s)	#s
+class DummyClock
+{
+public:
+	static xpcc::Timestamp
+	now()
+	{
+		return time;
+	}
+	
+	static uint16_t time;
+};
+uint16_t DummyClock::time = 0;
 
-#define	CONCAT(a,b)		CONCAT2(a,b)
-#define	CONCAT2(a,b)	a ## b
+// ----------------------------------------------------------------------------
 
-#ifndef	BASENAME
-	#define	FILENAME	__FILE__
-#else
-	#define	FILENAME	STRINGIFY(BASENAME)
-#endif
+void
+TimeoutTest::setUp()
+{
+	DummyClock::time = 0;
+}
 
-#endif	// MISC_HPP
+void
+TimeoutTest::testBasics()
+{
+	xpcc::Timeout<DummyClock> timeout(10);
+	
+	TEST_ASSERT_FALSE(timeout.isExpired());
+	
+	DummyClock::time = 10;
+	TEST_ASSERT_TRUE(timeout.isExpired());
+	
+	// check if the class holds the state
+	DummyClock::time = 9;
+	TEST_ASSERT_TRUE(timeout.isExpired());
+}
+
+void
+TimeoutTest::testRestart()
+{
+	xpcc::Timeout<DummyClock> timeout;
+	TEST_ASSERT_TRUE(timeout.isExpired());
+	
+	timeout.restart(42);
+	TEST_ASSERT_FALSE(timeout.isExpired());
+	
+	DummyClock::time = 10;
+	TEST_ASSERT_FALSE(timeout.isExpired());
+	
+	DummyClock::time = 600;
+	TEST_ASSERT_TRUE(timeout.isExpired());
+}

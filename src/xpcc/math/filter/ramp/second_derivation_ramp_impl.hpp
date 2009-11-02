@@ -26,25 +26,18 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: quadramp_impl.hpp 70 2009-10-12 14:58:50Z dergraaf $
+ * $Id$
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__QUADRAMP_IMPL_HPP
-#define XPCC__QUADRAMP_IMPL_HPP
+#ifndef XPCC__SECOND_DERIVATION_RAMP_HPP
+	#error	"Don't include this file directly, use 'math/filter/second_derivation_ramp.hpp' instead!"
+#endif
 
-template<typename T>
-xpcc::Quadramp<T>::Quadramp(const T& initialValue) :
-	currentValue(initialValue)
-{
-	T diff = target - current;
-}
-
+// ----------------------------------------------------------------------------
 template<typename T>
 void
-xpcc::Quadramp<T>::update(const T& target)
+xpcc::SecondDerivationRamp<T>::update(const T& target)
 {
-	T diff = target - current;
+	
 }
-
-#endif // XPCC__QUADRAMP_IMPL_HPP

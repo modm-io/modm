@@ -26,28 +26,32 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: misc.hpp 88 2009-10-16 23:07:26Z dergraaf $
+ * $Id$
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	MISC_HPP
-#define	MISC_HPP
+#include <xpcc/hal/flash/flash_pointer.hpp>
 
-// Macro to force inlining on the functions if needed, because many
-// people compile with -Os, which does not always inline them.
-#define ALWAYS_INLINE  inline __attribute__((always_inline))
+#include "flash_test.hpp"
 
+FLASH(int intValue) = 12345;
 
-#define	STRINGIFY(s)	STRINGIFY2(s)
-#define	STRINGIFY2(s)	#s
+void
+FlashTest::testIntegerAccess()
+{
+	xpcc::FlashPointer<int> intPointer(&intValue);
+	
+	TEST_ASSERT_EQUALS(*intPointer, 12345);
+}	
 
-#define	CONCAT(a,b)		CONCAT2(a,b)
-#define	CONCAT2(a,b)	a ## b
+FLASH_STRING(stringValue) = "Hallo Welt!";
 
-#ifndef	BASENAME
-	#define	FILENAME	__FILE__
-#else
-	#define	FILENAME	STRINGIFY(BASENAME)
-#endif
-
-#endif	// MISC_HPP
+void
+FlashTest::testStringAccess()
+{
+	char string[] = "Hallo Welt!";
+	xpcc::FlashPointer<char> stringPointer(stringValue);
+	
+	TEST_ASSERT_EQUALS_ARRAY(stringPointer, string, 0, sizeof(string));
+	TEST_ASSERT_EQUALS_ARRAY(stringPointer, string, 0, 12);
+}

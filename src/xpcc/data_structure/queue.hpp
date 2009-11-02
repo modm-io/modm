@@ -37,16 +37,16 @@
 namespace xpcc
 {
 	/**
-	 * \ingroup	data_structure
-	 * \brief	FIFO queue
+	 * @ingroup	data_structure
+	 * @brief	FIFO queue
 	 * 
 	 * Elements are pushed into the "back" of the specific container and popped 
 	 * from its "front".
 	 * 
-	 * This class is thread-safe for S = uint8_t if one thread only writes data 
-	 * (using push()) and the other only reads data (using front() and pop()).
+	 * @tparam	T			type
+	 * @tparam	Container	container
 	 * 
-	 * \see		Deque()
+	 * @see		Deque()
 	 */
 	template<typename T,
 			 typename Container>
@@ -56,42 +56,50 @@ namespace xpcc
 		typedef typename Container::SizeType SizeType;
 		
 		bool
-		isEmpty() {
+		isEmpty()
+		{
 			return c.isEmpty();
 		}
 		
 		bool
-		isFull() {
+		isFull()
+		{
 			return c.isFull();
 		}
 		
 		SizeType
-		getSize() {
+		getSize()
+		{
 			return c.getSize();
 		}
 		
 		SizeType
-		getMaxSize() {
+		getMaxSize()
+		{
 			return c.getMaxSize();
 		}
 		
 		T&
-		get() {
+		get()
+		{
 			return c.front();
 		}
 		
 		const T&
-		get() const {
+		get() const
+		{
 			return c.front();
 		}
 		
 		bool
-		push(const T& value) {
+		push(const T& value)
+		{
 			return c.pushBack(value);
 		}
 		
 		void
-		pop() {
+		pop()
+		{
 			c.popFront();
 		}
 
@@ -101,8 +109,10 @@ namespace xpcc
 
 
 	// ------------------------------------------------------------------------
-	/// \ingroup	data_structure
-	/// \brief		Bounded queue
+	/**
+	 * @ingroup	data_structure
+	 * @brief	Bounded queue
+	 */
 	template<typename T, 
 			 int N,
 			 typename S=uint8_t,

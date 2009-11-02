@@ -166,7 +166,7 @@ program = env.Program('unittest', objects,
 
 if env['ARCHITECTURE'] == 'pc':
 	if int(ARGUMENTS.get('run', 1)):
-		env.Command('thisfileshouldnotexist', program, './build/unittest/unittest') 
+		env.Command('thisfileshouldnotexist', program, '@./build/unittest/unittest') 
 else:
 	env.Hex(program)
 	env.Listing(program)

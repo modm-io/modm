@@ -35,10 +35,10 @@
 
 namespace xpcc
 {
-	/// \ingroup	filter
-	/// \brief		Ramp
+	/// @ingroup	filter
+	/// @brief		Ramp
 	/// 
-	/// \todo	documentation
+	/// @todo	documentation
 	template<typename T>
 	class Ramp
 	{
@@ -62,42 +62,6 @@ namespace xpcc
 	};
 }
 
-// ----------------------------------------------------------------------------
-template<typename T>
-xpcc::Ramp<T>::Ramp(const T& positiveIncrement,
-					const T& negativeIncrement,
-					const T& initialValue) : 
-	currentValue(initialValue),
-	positiveIncrement(positiveIncrement),
-	negativeIncrement(negativeIncrement)
-{
-}
-
-// ----------------------------------------------------------------------------
-template<typename T>
-void
-xpcc::Ramp<T>::update(const T& target)
-{
-	if (target > currentValue)
-	{
-		T variation = target - currentValue;
-		if (variation > positiveIncrement) {
-			currentValue += positiveIncrement;
-		}
-		else {
-			currentValue = target;
-		}
-	}
-	else
-	{
-		T variation = currentValue - target;
-		if (variation > negativeIncrement) {
-			currentValue -= negativeIncrement;
-		}
-		else {
-			currentValue = target;
-		}
-	}
-}
+#include "ramp_impl.hpp"
 
 #endif // XPCC__RAMP_HPP

@@ -36,5 +36,7 @@ namespace unittest
 {
 	FLASH_STRING(stringEqual) = " == ";
 	FLASH_STRING(stringNotInRange) = " not in range ";
+	FLASH_STRING(stringNotTrue) = "true == false\n";
+	FLASH_STRING(stringNotFalse) = "false == true\n";
 }
 

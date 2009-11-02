@@ -54,9 +54,9 @@ unittest::Reporter::Reporter(xpcc::IODevice& device) :
 }
 
 void
-unittest::Reporter::nextTestSuite(xpcc::FlashPointer<char> str)
+unittest::Reporter::nextTestSuite(xpcc::FlashPointer<char> name)
 {
-	testName = str;
+	testName = name;
 }
 
 void

@@ -5,7 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -26,39 +26,22 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: quadramp.hpp 76 2009-10-14 23:29:28Z dergraaf $
+ * $Id$
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__QUADRAMP_HPP
-#define XPCC__QUADRAMP_HPP
+#include <unittest/testsuite.hpp>
 
-namespace xpcc
+class TimeoutTest : public unittest::TestSuite
 {
-	/// \ingroup	filter
-	/// \brief		Ramp
-	/// 
-	/// \todo	documentation
-	/// \todo	implementation
-	template<typename T>
-	class Quadramp
-	{
-	public:
-		Quadramp(const T& initialValue = 0);
-		
-		void
-		update(const T& target);
-		
-		const T&
-		getValue() const {
-			return currentValue;
-		}
+public:
+	virtual void
+	setUp();
 	
-	private:
-		T currentValue;
-	};
-}
-
-#include "quadramp_impl.hpp"
-
-#endif // XPCC__QUADRAMP_HPP
+	
+	void
+	testBasics();
+	
+	void
+	testRestart();
+};

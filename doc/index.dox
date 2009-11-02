@@ -3,7 +3,8 @@
 // $Id$
 
 /*!
-\mainpage Cross Platform Component Communication
+@mainpage Cross Platform Component Communication
+@image html xpcc_logo.png
 
 Packet orientated communication library, enabling transparent communication
 between components on PCs and Microcontrollers. It provides an interface to

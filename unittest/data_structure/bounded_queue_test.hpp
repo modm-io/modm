@@ -26,28 +26,15 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: misc.hpp 88 2009-10-16 23:07:26Z dergraaf $
+ * $Id$
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	MISC_HPP
-#define	MISC_HPP
+#include <unittest/testsuite.hpp>
 
-// Macro to force inlining on the functions if needed, because many
-// people compile with -Os, which does not always inline them.
-#define ALWAYS_INLINE  inline __attribute__((always_inline))
-
-
-#define	STRINGIFY(s)	STRINGIFY2(s)
-#define	STRINGIFY2(s)	#s
-
-#define	CONCAT(a,b)		CONCAT2(a,b)
-#define	CONCAT2(a,b)	a ## b
-
-#ifndef	BASENAME
-	#define	FILENAME	__FILE__
-#else
-	#define	FILENAME	STRINGIFY(BASENAME)
-#endif
-
-#endif	// MISC_HPP
+class BoundedQueueTest : public unittest::TestSuite
+{
+public:
+	void
+	testQueue();
+};

@@ -40,25 +40,37 @@
 
 namespace unittest
 {
-	/// \ingroup	unittest
-	/// \brief		Controller singleton
+	/// @ingroup	unittest
+	/// @brief		%Controller singleton
+	///
+	/// Used to forward information from the test suites to the reporters.
+	/// All macros form 'harness.hpp' use this class to determine the
+	/// active reporter.
+	/// 
 	class Controller
 	{
 	public:
+		/// @brief	Get instance
 		static inline Controller&
 		instance() {
 			static Controller controller;
 			return controller;
 		}
 		
+		/// @brief	Set a new reporter
 		void
 		setReporter(Reporter& reporter);
 		
+		/// @brief	Get currently active reporter
 		Reporter&
 		getReporter() const;
 		
+		/// @brief	Switch to the next test suite
+		///
+		/// @param	name	Name of the test suite, used by the reporter
+		///					to generate messages
 		void
-		nextTestSuite(xpcc::FlashPointer<char> str) const;
+		nextTestSuite(xpcc::FlashPointer<char> name) const;
 	
 	private:
 		Controller();
@@ -68,7 +80,7 @@ namespace unittest
 		Controller&
 		operator =(const Controller&);
 		
-		Reporter *reporter;
+		Reporter *reporter;		//!< active reporter
 	};
 }
 

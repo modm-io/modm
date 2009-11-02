@@ -5,6 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
+ * 
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -25,26 +26,36 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: local_time_pc.cpp 71 2009-10-12 21:43:00Z dergraaf $
+ * $Id$
  */
 // ----------------------------------------------------------------------------
 
-#include "../local_time.hpp"
+#ifndef XPCC__FIRST_DERIVATION_RAMP_HPP
+#define XPCC__FIRST_DERIVATION_RAMP_HPP
 
-xpcc::LocalTime
-xpcc::LocalTime::getTime()
+namespace xpcc
 {
+	/// @ingroup	filter
+	/// @brief		Generates a S-curve
+	/// 
+	/// @todo	documentation
+	template<typename T>
+	class FirstDerivationRamp
+	{
+	public:
+		void
+		update(const T& target);
+		
+		const T&
+		getValue() const {
+			return currentValue;
+		}
 	
-	return LocalTime();
+	private:
+		T currentValue;
+	};
 }
 
-// see http://stackoverflow.com/questions/588307/c-obtaining-milliseconds-time-on-linux-clock-doesnt-seem-to-work-properly
-// see http://stackoverflow.com/questions/275004/c-timer-function-to-provide-time-in-nano-seconds/275231#275231
-/*#include <sys/time.h>
+#include "first_derivation_ramp.hpp"
 
-int main()
-{
-   timespec ts;
-   // clock_gettime(CLOCK_MONOTONIC, &ts); // Works on FreeBSD
-   clock_gettime(CLOCK_REALTIME, &ts); // Works on Linux
-}*/
+#endif // XPCC__FIRST_DERIVATION_RAMP_HPP

@@ -5,6 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
+ *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -25,24 +26,21 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: local_time_avr.cpp 71 2009-10-12 21:43:00Z dergraaf $
+ * $Id$
  */
 // ----------------------------------------------------------------------------
 
-#include "../../../hal/atomic/lock.hpp"
+#include <unittest/testsuite.hpp>
 
-#include "../local_time.hpp"
-
-extern xpcc::LocalTime::Time xpcc__local_time;
-
-xpcc::LocalTime
-xpcc::LocalTime::getTime()
+class TimestampTest : public unittest::TestSuite
 {
-	Time tempTime;
-	{
-		atomic::Lock lock;
-		tempTime = xpcc__local_time;
-	}
+public:
+	void
+	testConstructors();
 	
-	return LocalTime(tempTime);
-}
+	void
+	testArithmetics();
+	
+	void
+	testComparisons();
+};

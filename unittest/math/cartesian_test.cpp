@@ -109,6 +109,7 @@ CartesianTest::testArithmetics()
 	TEST_ASSERT_EQUALS(y.getY(), 100);
 	
 	y.set(10, 30);
+	
 	x -= y;
 	
 	TEST_ASSERT_EQUALS(x.getX(), 190);

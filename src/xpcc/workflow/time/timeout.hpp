@@ -26,28 +26,56 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: misc.hpp 88 2009-10-16 23:07:26Z dergraaf $
+ * $Id$
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	MISC_HPP
-#define	MISC_HPP
+#ifndef XPCC__TIMEOUT_HPP
+#define XPCC__TIMEOUT_HPP
 
-// Macro to force inlining on the functions if needed, because many
-// people compile with -Os, which does not always inline them.
-#define ALWAYS_INLINE  inline __attribute__((always_inline))
+#include <xpcc/hal/time/internal_clock.hpp>
+#include "timestamp.hpp"
 
+namespace xpcc
+{
+	/// @ingroup	workflow
+	/// @brief		Software timer
+	///
+	/// Has to be polled to check if it has expired.
+	/// 
+	/// @tparam		T	Used timer
+	///
+	template<typename T = InternalClock>
+	class Timeout
+	{
+	public:
+		Timeout(const Timestamp time = 0);
+		
+		/// @brief	Check if the given time has passed.
+		bool
+		isExpired();
+		
+		/// @brief	Stop timer
+		inline void
+		stop()
+		{
+			state = STOPPED;
+		}
+		
+		/// @brief	Set a new timeout time.
+		void
+		restart(Timestamp time);
+		
+	private:
+		Timestamp endTime;
+		enum {
+			ACTIVE,
+			STOPPED,
+			EXPIRED
+		} state;
+	};
+}
 
-#define	STRINGIFY(s)	STRINGIFY2(s)
-#define	STRINGIFY2(s)	#s
+#include "timeout_impl.hpp"
 
-#define	CONCAT(a,b)		CONCAT2(a,b)
-#define	CONCAT2(a,b)	a ## b
-
-#ifndef	BASENAME
-	#define	FILENAME	__FILE__
-#else
-	#define	FILENAME	STRINGIFY(BASENAME)
-#endif
-
-#endif	// MISC_HPP
+#endif // XPCC__TIMEOUT_HPP

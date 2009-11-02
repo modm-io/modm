@@ -5,6 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
+ * 
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -38,99 +39,111 @@ namespace xpcc
 {
 	namespace atomic
 	{
-		/// \ingroup	atomic
-		/// \brief		Critical section
-		///  
-		/// Typical usage:
-		/// \code
-		/// function()
-		/// {
-		///     // some code with interrupts enabled
-		///     
-		///     {
-		///         atomic::Lock lock;
-		///         
-		///         // code which should be executed with disabled interrupts.
-		///         
-		///         // with the end of this block the lock object is destroyed
-		///         // and the interrupts are reenabled.
-		///     }
-		///     
-		///     // other code with interrupts enabled
-		/// }
-		/// \endcode
-		/// 
-		/// \warning	Interrupts should be disabled the shortest possible time!
-		///
+		/**
+		 * @ingroup	atomic
+		 * @brief		Critical section
+		 *  
+		 * Typical usage:
+		 * @code
+		 * function()
+		 * {
+		 *     // some code with interrupts enabled
+		 *     
+		 *     {
+		 *         atomic::Lock lock;
+		 *         
+		 *         // code which should be executed with disabled interrupts.
+		 *         
+		 *         // with the end of this block the lock object is destroyed
+		 *         // and the interrupts are reenabled.
+		 *     }
+		 *     
+		 *     // other code with interrupts enabled
+		 * }
+		 * \endcode
+		 * 
+		 * @warning	Interrupts should be disabled the shortest possible time!
+		 */
 		class Lock
 		{
 		public:
 			Lock();
 			~Lock();
-			
-			/// \brief	Reenable interrupts
-			///
-			/// \warning	Don't use this function without a very good reason!
-			void
-			reenableInterrupts();
-			
-			/// \brief	Disable interrupts
-			///
-			/// Could be used together with reenableInterrupts() to create a
-			/// nested block with interrupts enabled inside a block with
-			/// interrupts disabled.
-			///
-			/// \warning	Don't use this function without a very good reason!
-			void
-			disableInterrupts();
-
+		
 		private:
 			uint8_t sreg;
-		}; 
+		};
+		
+		/**
+		 * @ingroup	atomic
+		 * @brief	Opposite to atomic::Lock
+		 * 
+		 * Use this class to create a block of code with interrupts enabled
+		 * inside a locked block.
+		 * 
+		 * Most of the time you won't need this class.
+		 */
+		class Unlock
+		{
+		public:
+			Unlock();
+			~Unlock();
+		
+		private:
+			uint8_t sreg;
+		};
 	}
 }
 
 #ifdef __AVR__
 
-#include <avr/interrupt.h>
+	#include <avr/interrupt.h>
 
-xpcc::atomic::Lock::Lock() :
-	sreg(SREG)
-{
-	cli();
-}
+	xpcc::atomic::Lock::Lock() :
+		sreg(SREG)
+	{
+		cli();
+	}
 
-xpcc::atomic::Lock::~Lock()
-{
-	SREG = sreg;
-	__asm__ volatile ("" ::: "memory");
-}
+	xpcc::atomic::Lock::~Lock()
+	{
+		SREG = sreg;
+		__asm__ volatile ("" ::: "memory");
+	}
 
-void
-xpcc::atomic::Lock::reenableInterrupts()
-{
-	sei();
-	__asm__ volatile ("" ::: "memory");		// TODO needed here?
-}
+	// ------------------------------------------------------------------------
 
-void
-xpcc::atomic::Lock::disableInterrupts()
-{
-	cli();
-	__asm__ volatile ("" ::: "memory");		// TODO needed here?
-}
+	xpcc::atomic::Unlock::Unlock() :
+		sreg(SREG)
+	{
+		sei();
+	}
+
+	xpcc::atomic::Unlock::~Unlock()
+	{
+		SREG = sreg;
+		__asm__ volatile ("" ::: "memory");
+	}
 
 #else
 
-// TODO: usefull implementation for any non AVR targets
-xpcc::atomic::Lock::Lock()
-{
-}
+	// TODO: usefull implementation for any non AVR targets
+	xpcc::atomic::Lock::Lock()
+	{
+	}
 
-xpcc::atomic::Lock::~Lock()
-{
-}
+	xpcc::atomic::Lock::~Lock()
+	{
+	}
 
-#endif
+	xpcc::atomic::Unlock::Unlock()
+	{
+	}
+
+	xpcc::atomic::Unlock::~Unlock()
+	{
+	}
+
+#endif	// __AVR__
 
 #endif	// XPCC_ATOMIC__LOCK_HPP

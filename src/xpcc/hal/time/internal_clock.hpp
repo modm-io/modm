@@ -26,28 +26,56 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: misc.hpp 88 2009-10-16 23:07:26Z dergraaf $
+ * $Id$
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	MISC_HPP
-#define	MISC_HPP
+#ifndef	XPCC__INTERNAL_CLOCK_HPP
+#define	XPCC__INTERNAL_CLOCK_HPP
 
-// Macro to force inlining on the functions if needed, because many
-// people compile with -Os, which does not always inline them.
-#define ALWAYS_INLINE  inline __attribute__((always_inline))
+#include <xpcc/workflow/time/timestamp.hpp>
 
-
-#define	STRINGIFY(s)	STRINGIFY2(s)
-#define	STRINGIFY2(s)	#s
-
-#define	CONCAT(a,b)		CONCAT2(a,b)
-#define	CONCAT2(a,b)	a ## b
-
-#ifndef	BASENAME
-	#define	FILENAME	__FILE__
-#else
-	#define	FILENAME	STRINGIFY(BASENAME)
+namespace xpcc
+{
+	/**
+	 * @ingroup	hal
+	 * @brief	Internal timer
+	 * @headerfile	<xpcc/hal/time/internal_clock.hpp>
+	 * 
+	 * This class is implemented using 'gettimeofday()' from <sys/time.h> for
+	 * any Unix-OS. 
+	 * 
+	 * For the AVRs targets the user has to use the access() method to
+	 * generate a suiteable timebase, preferably by incrementing the time
+	 * value inside a timer interrupt function.
+	 * 
+	 * Example:
+	 * @code
+	 * ISR(TIMER)
+	 * {
+	 *     InternalClock::access()++;
+	 * }
+	 * @endcode
+	 */ 
+	class InternalClock
+	{
+	public:
+		/// @brief	Get the current time
+		static Timestamp
+		now();
+		
+#if !defined(__unix__)
+		/// @brief	Set the current time
+		static inline uint16_t&
+		access()
+		{
+			return time;
+		}
+		
+	private:
+		static uint16_t time;
 #endif
+	};
+}
 
-#endif	// MISC_HPP
+#endif	// XPCC__INTERNAL_CLOCK_HPP

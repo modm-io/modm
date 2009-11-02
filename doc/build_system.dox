@@ -20,10 +20,16 @@ For Ubuntu (and other Debian based Linux-Distributions) just type the
 following in a terminal and you're good to go:
 
 \verbatim
-$ sudo apt-get install python python-yaml scons doxygen graphviz
+$ sudo apt-get install python python-yaml scons
 \endverbatim
 
-Windows users have to install the tools by hand. How to do that is explaind
+To generate the documentation you need also the following packets:
+
+\verbatim
+$ sudo apt-get install doxygen graphviz
+\endverbatim
+
+Windows users have to install all the tools by hand. How to do that is explaind
 on each particular website.
 
 - http://www.python.org/download/
@@ -36,6 +42,7 @@ on each particular website.
 
 These files describe how to build a specific directory.
 
-*/
+@todo Extend this documentation
 
-// TODO: Extend this documentation
+
+*/

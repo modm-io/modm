@@ -26,28 +26,42 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: misc.hpp 88 2009-10-16 23:07:26Z dergraaf $
+ * $Id$
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	MISC_HPP
-#define	MISC_HPP
+#include <xpcc/hal/atomic/lock.hpp>
 
-// Macro to force inlining on the functions if needed, because many
-// people compile with -Os, which does not always inline them.
-#define ALWAYS_INLINE  inline __attribute__((always_inline))
+#include "internal_clock.hpp"
 
-
-#define	STRINGIFY(s)	STRINGIFY2(s)
-#define	STRINGIFY2(s)	#s
-
-#define	CONCAT(a,b)		CONCAT2(a,b)
-#define	CONCAT2(a,b)	a ## b
-
-#ifndef	BASENAME
-	#define	FILENAME	__FILE__
-#else
-	#define	FILENAME	STRINGIFY(BASENAME)
+#if defined(__unix__)
+	#include <sys/time.h>
+#elif defined(__AVR__)
+	uint16_t InternalClock::time = 0;
 #endif
 
-#endif	// MISC_HPP
+xpcc::Timestamp
+xpcc::InternalClock::now()
+{
+#if defined(__unix__)
+	
+	// see http://stackoverflow.com/questions/588307/c-obtaining-milliseconds-time-on-linux-clock-doesnt-seem-to-work-properly
+	struct timeval now;
+	gettimeofday(&now, 0);
+	
+	return Timestamp(now.tv_usec / 1000);
+	
+#elif defined(__AVR__)
+
+	uint16_t tempTime;
+	{
+		atomic::Lock lock;
+		tempTime = time;
+	}
+	
+	return Timestamp(tempTime);
+
+#else
+	#error	"Don't know how to create a Timestamp for this target!"
+#endif
+}

@@ -77,9 +77,12 @@
 
 #include <xpcc/hal/flash/flash_pointer.hpp>
 
-namespace unittest {
+namespace unittest
+{
 	EXTERN_FLASH_STRING(stringEqual);
 	EXTERN_FLASH_STRING(stringNotInRange);
+	EXTERN_FLASH_STRING(stringNotTrue);
+	EXTERN_FLASH_STRING(stringNotFalse);
 }
 
 #ifdef	TEST_RETURN_ON_FAIL
@@ -94,13 +97,15 @@ namespace unittest {
 	if (expr) { \
 		TEST_REPORTER__.reportPass(); \
 	} else { \
-		TEST_REPORTER__.reportFailure(__LINE__) << '\n'; \
+		TEST_REPORTER__.reportFailure(__LINE__) \
+			<< xpcc::Flash(unittest::stringNotTrue); \
 		TEST_RETURN__; \
 	}
 
 #define	TEST_ASSERT_FALSE(expr)	\
 	if (expr) { \
-		TEST_REPORTER__.reportFailure(__LINE__) << '\n'; \
+		TEST_REPORTER__.reportFailure(__LINE__) \
+			<< xpcc::Flash(unittest::stringNotFalse); \
 		TEST_RETURN__; \
 	} else { \
 		TEST_REPORTER__.reportPass(); \
@@ -140,7 +145,7 @@ namespace unittest {
 // FIXME replace with template functions!
 #define	TEST_ASSERT_EQUALS_ARRAY(array1, array2, start, count) \
 	do { \
-		int i; \
+		unsigned int i; \
 		bool failure = false; \
 		for (i = start; i < (start + count); i++) { \
 			if (array1[i] != array2[i]) { \
@@ -152,13 +157,13 @@ namespace unittest {
 			xpcc::IOStream& stream = TEST_REPORTER__.reportFailure(__LINE__); \
 			stream << '\n'; \
 			stream << "["; \
-			for (int k = start; k < (start + count); k++) { \
+			for (unsigned int k = start; k < (start + count); k++) { \
 				stream << array1[k] << ", "; \
 			} \
 			stream << "]\n"; \
 			\
 			stream << "["; \
-			for (int k = start; k < (start + count); k++) { \
+			for (unsigned int k = start; k < (start + count); k++) { \
 				stream << array2[k] << ", "; \
 			} \
 			stream << "]\n"; \

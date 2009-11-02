@@ -5,6 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
+ * 
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -38,11 +39,12 @@ namespace xpcc
 {
 	namespace atomic
 	{
-		/// @ingroup	atomic
-		/// @brief		Interrupt save queue
-		///
-		/// A maximum size of 255 is allowed
-		///
+		/**
+		 * @ingroup	atomic
+		 * @brief		Interrupt save queue
+		 *
+		 * A maximum size of 254 is allowed
+		 */
 		template<typename T,
 				 int N>
 		class Queue
@@ -72,7 +74,7 @@ namespace xpcc
 			uint8_t head;
 			uint8_t tail;
 			
-			T buffer[N];
+			T buffer[N+1];
 		};
 	}
 }

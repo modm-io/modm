@@ -26,28 +26,58 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: misc.hpp 88 2009-10-16 23:07:26Z dergraaf $
+ * $Id$
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	MISC_HPP
-#define	MISC_HPP
+#include <xpcc/workflow/time/timestamp.hpp>
 
-// Macro to force inlining on the functions if needed, because many
-// people compile with -Os, which does not always inline them.
-#define ALWAYS_INLINE  inline __attribute__((always_inline))
+#include "timestamp_test.hpp"
 
+// ----------------------------------------------------------------------------
+void
+TimestampTest::testConstructors()
+{
+	xpcc::Timestamp t1;
+	TEST_ASSERT_TRUE(t1 == 0);
+	
+	xpcc::Timestamp t2(1000);
+	TEST_ASSERT_TRUE(t2 == 1000);
+	
+	t1 = 500;
+	TEST_ASSERT_TRUE(t1 == 500);
+}
 
-#define	STRINGIFY(s)	STRINGIFY2(s)
-#define	STRINGIFY2(s)	#s
+void
+TimestampTest::testArithmetics()
+{
+	xpcc::Timestamp t1(200);
+	xpcc::Timestamp t2(500);
+	xpcc::Timestamp t3;
+	
+	t3 = t1 + t2;
+	TEST_ASSERT_TRUE(t3 == 700);
+}
 
-#define	CONCAT(a,b)		CONCAT2(a,b)
-#define	CONCAT2(a,b)	a ## b
-
-#ifndef	BASENAME
-	#define	FILENAME	__FILE__
-#else
-	#define	FILENAME	STRINGIFY(BASENAME)
-#endif
-
-#endif	// MISC_HPP
+void
+TimestampTest::testComparisons()
+{
+	xpcc::Timestamp t1;
+	xpcc::Timestamp t2;
+	
+	TEST_ASSERT_TRUE(t1 == t2);
+	TEST_ASSERT_FALSE(t1 != t2);
+	
+	t1 = 32767;
+	
+	TEST_ASSERT_FALSE(t1 == t2);
+	TEST_ASSERT_TRUE(t1 != t2);
+	
+	TEST_ASSERT_TRUE(t1 > t2);
+	TEST_ASSERT_TRUE(t1 >= t2);
+	
+	t1 = 32768;
+	
+	TEST_ASSERT_TRUE(t1 < t2);
+	TEST_ASSERT_TRUE(t1 <= t2);
+}

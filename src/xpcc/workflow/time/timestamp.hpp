@@ -5,7 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- *
+ * 
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -30,35 +30,72 @@
  */
 // ----------------------------------------------------------------------------
 
-#include "timeout.hpp"
+#ifndef	XPCC__TIMESTAMP_HPP
+#define	XPCC__TIMESTAMP_HPP
 
-xpcc::Timeout::Timeout(LocalTime time) :
-	endTime(LocalTime::getTime() + time), state(ACTIVE)
-{
-}
+#include <stdint.h>
 
-bool
-xpcc::Timeout::isExpired()
+namespace xpcc
 {
-	if (state == ACTIVE)
+	/**
+	 * @ingroup	hal
+	 * @brief	Simple 16-bit timestamp
+	 * @headerfile	<xpcc/workflow/time/timestamp.hpp>
+	 * 
+	 */ 
+	class Timestamp
 	{
-		LocalTime currentTime = LocalTime::getTime();
-		
-		if (currentTime > endTime) {
-			state = EXPIRED;
-			return true;
+	public:
+		Timestamp(const uint16_t time = 0) : 
+			time(time)
+		{
 		}
-	}
-	else if (state == EXPIRED) {
-		return true;
-	}
+		
+		inline Timestamp
+		operator + (const Timestamp& other) const
+		{
+			return Timestamp(time + other.time);
+		}
+		
+		inline bool
+		operator == (const Timestamp& other) const
+		{
+			return (time == other.time);
+		}
+		
+		inline bool
+		operator != (const Timestamp& other) const
+		{
+			return (time != other.time);
+		}
+		
+		inline bool
+		operator < (const Timestamp& other) const
+		{
+			return ((int16_t) (time - other.time)) < 0;
+		}
+		
+		inline bool
+		operator > (const Timestamp& other) const
+		{
+			return ((int16_t) (time - other.time)) > 0;
+		}
+		
+		inline bool
+		operator <= (const Timestamp& other) const
+		{
+			return ((int16_t) (time - other.time)) <= 0;
+		}
+		
+		inline bool
+		operator >= (const Timestamp& other) const
+		{
+			return ((int16_t) (time - other.time)) >= 0;
+		}
 	
-	return false;
+	private:
+		uint16_t time;
+	};
 }
 
-void
-xpcc::Timeout::restart(LocalTime time)
-{
-	endTime = LocalTime::getTime() + time;
-	state = ACTIVE;
-}
+#endif	// XPCC__TIMESTAMP_HPP
