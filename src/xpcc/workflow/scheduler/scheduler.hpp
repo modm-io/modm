@@ -34,50 +34,55 @@
 #define XPCC__SCHEDULER_HPP
 
 #include <stdint.h>
+#include <xpcc/utils/misc.hpp>
 
 namespace xpcc
 {
 	/**
 	 * @ingroup	workflow
-	 * @brief	%Scheduler task
-	 */
-	class Task
-	{
-	public:
-		virtual void
-		run() = 0;
-	};
-	
-	/**
-	 * @ingroup	workflow
 	 * @brief	%Scheduler
 	 * 
-	 * This scheduler is a priority based preemtive scheduler, meaning that
-	 * always the task with the highest priority is executed. It will only
-	 * change tasks if a task with a higher priority becomes ready or the
-	 * current task ends.
+	 * If the schedule() method is call from a timer interrupt, this scheduler
+	 * is a priority based preemtive scheduler, meaning that always the task
+	 * with the highest priority is executed. It will only change tasks if a
+	 * task with a higher priority becomes ready or the current task ends.
 	 * 
 	 * @image	html	scheduler.png
+	 * 
+	 * 
+	 * @todo	Check that this implementation works from inside an interrupt
 	 */
 	class Scheduler
 	{
 	public:
-		typedef uint8_t Priority;		//!< range [0..7]
-
+		typedef uint8_t Priority;
+		
+		/// @brief	%Scheduler task
+		class Task
+		{
+		public:
+			virtual void
+			run() = 0;
+		};
+	
 	public:
 		Scheduler();
 		
+		/// @brief	
 		void
 		scheduleTask(Task& task,
 					 uint16_t period,
-					 Priority priority = 4);
+					 Priority priority = 127);
 		
 		/// @todo	implement this function
 		bool
 		removeTask(const Task& task);
 		
 		void
-		update();
+		schedule();
+		
+		ALWAYS_INLINE void
+		scheduleInterupt();
 		
 	private:
 		struct TaskListItem
@@ -105,12 +110,13 @@ namespace xpcc
 			} state;
 		};
 		
-		inline void
-		addToReadyList(TaskListItem* item);
-		
 		TaskListItem *taskList;
 		TaskListItem *readyList;
+		
+		Priority currentPriority;
 	};
 }
+
+#include "scheduler_impl.hpp"
 
 #endif // XPCC__SCHEDULER_HPP

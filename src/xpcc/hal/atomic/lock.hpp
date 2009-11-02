@@ -34,6 +34,7 @@
 #define	XPCC_ATOMIC__LOCK_HPP
 
 #include <stdint.h>
+#include <xpcc/utils/misc.hpp>
 
 namespace xpcc
 {
@@ -67,7 +68,10 @@ namespace xpcc
 		class Lock
 		{
 		public:
+			ALWAYS_INLINE
 			Lock();
+			
+			ALWAYS_INLINE
 			~Lock();
 		
 		private:
@@ -86,7 +90,10 @@ namespace xpcc
 		class Unlock
 		{
 		public:
+			ALWAYS_INLINE
 			Unlock();
+			
+			ALWAYS_INLINE
 			~Unlock();
 		
 		private:

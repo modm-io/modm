@@ -30,39 +30,11 @@
  */
 // ----------------------------------------------------------------------------
 
-#include "scheduler.hpp"
+#include <unittest/testsuite.hpp>
 
-using namespace xpcc;
-
-Scheduler::Scheduler() :
-	taskList(0), readyList(0), currentPriority(0)
+class SchedulerTest : public unittest::TestSuite
 {
-}
-
-void
-Scheduler::scheduleTask(Task& task,
-						uint16_t period,
-						Priority priority)
-{
-	TaskListItem *item = new TaskListItem(task, period, priority);
-	
-	if (taskList == 0) {
-		taskList = item;
-	}
-	else {
-		item->nextTask = taskList;
-		taskList = item;
-	}
-}
-
-bool
-Scheduler::removeTask(const Task& /*task*/)
-{
-	return false;
-}
-
-void
-Scheduler::schedule()
-{
-	scheduleInterupt();
-}
+public:
+	void
+	testScheduler();
+};

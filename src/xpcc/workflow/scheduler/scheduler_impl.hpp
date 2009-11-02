@@ -26,43 +26,87 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id$
+ * $Id: scheduler.hpp 95 2009-10-19 21:39:26Z dergraaf $
  */
 // ----------------------------------------------------------------------------
 
-#include "scheduler.hpp"
+#ifndef XPCC__SCHEDULER_HPP
+	#error	"Don't include this file directly, use 'scheduler.hpp' instead!"
+#endif
 
-using namespace xpcc;
+#include <xpcc/hal/atomic/lock.hpp>
 
-Scheduler::Scheduler() :
-	taskList(0), readyList(0), currentPriority(0)
+inline void
+xpcc::Scheduler::scheduleInterupt()
 {
-}
-
-void
-Scheduler::scheduleTask(Task& task,
-						uint16_t period,
-						Priority priority)
-{
-	TaskListItem *item = new TaskListItem(task, period, priority);
+	/* item is element of two lists (schedule list and ready list)
+	   ready list is order after priority
+	
+	foreach item
+		decrement
+		if time = 0
+			reload time
+			set as ready
+	
+	foreach item is ready orderd per priority
+		run item
+		mark as waiting
+	*/
 	
 	if (taskList == 0) {
-		taskList = item;
+		// nothing to schedule right now
+		return;
 	}
-	else {
-		item->nextTask = taskList;
-		taskList = item;
+	
+	// update all tasks
+	TaskListItem *item = taskList;
+	do {
+		item->time--;
+		if (item->time == 0) {
+			item->time = item->period;
+			
+			// add to ready list
+			if ((readyList == 0) ||
+				(readyList->priority < item->priority))
+			{
+				item->nextReady = readyList;
+				readyList = item;
+			}
+			else {
+				TaskListItem *list = readyList;
+				
+				while (1)
+				{
+					if ((list->nextReady == 0) ||
+						(list->nextReady->priority < item->priority))
+					{
+						item->nextReady = list->nextReady;
+						list->nextReady = item;
+						break;
+					}
+					list = list->nextReady;
+				}
+			}
+			item->state = TaskListItem::READY;
+		}
 	}
-}
-
-bool
-Scheduler::removeTask(const Task& /*task*/)
-{
-	return false;
-}
-
-void
-Scheduler::schedule()
-{
-	scheduleInterupt();
+	while ((item = item->nextTask) != 0);
+	
+	// how execute the tasks which are ready
+	while (((item = readyList) != 0) && (item->priority > currentPriority))
+	{
+		item->state = TaskListItem::RUNNING;
+		currentPriority = item->priority;
+		{
+			xpcc::atomic::Unlock();
+			
+			// the actual execution of the task happens with interrupts
+			// enabled
+			item->task.run();
+		}
+		currentPriority = 0;
+		item->state = TaskListItem::WAITING;
+		
+		readyList = item->nextReady;	// TODO this won't work inside an interrupt
+	}
 }

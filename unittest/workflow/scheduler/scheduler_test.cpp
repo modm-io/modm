@@ -30,39 +30,82 @@
  */
 // ----------------------------------------------------------------------------
 
-#include "scheduler.hpp"
+#include <xpcc/workflow/scheduler/scheduler.hpp>
 
-using namespace xpcc;
+#include "scheduler_test.hpp"
 
-Scheduler::Scheduler() :
-	taskList(0), readyList(0), currentPriority(0)
+// ----------------------------------------------------------------------------
+
+static unsigned int count = 1;
+
+class TestTask : public xpcc::Scheduler::Task
 {
-}
-
-void
-Scheduler::scheduleTask(Task& task,
-						uint16_t period,
-						Priority priority)
-{
-	TaskListItem *item = new TaskListItem(task, period, priority);
+public:
+	TestTask() :
+		order(0)
+	{
+	}
 	
-	if (taskList == 0) {
-		taskList = item;
+	virtual void
+	run()
+	{
+		order = count;
+		count++;
 	}
-	else {
-		item->nextTask = taskList;
-		taskList = item;
-	}
-}
+	
+	uint8_t order;
+};
 
-bool
-Scheduler::removeTask(const Task& /*task*/)
-{
-	return false;
-}
+// ----------------------------------------------------------------------------
 
 void
-Scheduler::schedule()
+SchedulerTest::testScheduler()
 {
-	scheduleInterupt();
+	xpcc::Scheduler scheduler;
+	
+	TestTask task1;
+	TestTask task2;
+	TestTask task3;
+	TestTask task4;
+	
+	scheduler.scheduleTask(task1, 3, 10);
+	scheduler.scheduleTask(task2, 3, 20);
+	scheduler.scheduleTask(task3, 3);
+	scheduler.scheduleTask(task4, 3, 200);
+	
+	scheduler.schedule();
+	scheduler.schedule();
+	
+	TEST_ASSERT_EQUALS(task1.order, 0);
+	TEST_ASSERT_EQUALS(task2.order, 0);
+	TEST_ASSERT_EQUALS(task3.order, 0);
+	TEST_ASSERT_EQUALS(task4.order, 0);
+	
+	scheduler.schedule();
+	
+	TEST_ASSERT_EQUALS(task1.order, 4);
+	TEST_ASSERT_EQUALS(task2.order, 3);
+	TEST_ASSERT_EQUALS(task3.order, 2);
+	TEST_ASSERT_EQUALS(task4.order, 1);
+	
+	count = 1;
+	task1.order = 0;
+	task2.order = 0;
+	task3.order = 0;
+	task4.order = 0;
+	
+	scheduler.schedule();
+	scheduler.schedule();
+	
+	TEST_ASSERT_EQUALS(task1.order, 0);
+	TEST_ASSERT_EQUALS(task2.order, 0);
+	TEST_ASSERT_EQUALS(task3.order, 0);
+	TEST_ASSERT_EQUALS(task4.order, 0);
+	
+	scheduler.schedule();
+	
+	TEST_ASSERT_EQUALS(task1.order, 4);
+	TEST_ASSERT_EQUALS(task2.order, 3);
+	TEST_ASSERT_EQUALS(task3.order, 2);
+	TEST_ASSERT_EQUALS(task4.order, 1);
 }
