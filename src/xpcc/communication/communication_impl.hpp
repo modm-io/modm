@@ -32,20 +32,40 @@
 #ifndef	XPCC_COMMUNICATION_IMPL_HPP
 #define	XPCC_COMMUNICATION_IMPL_HPP
 
+#include "communication.hpp"
+
 // ----------------------------------------------------------------------------
 template<typename T>
 void
 xpcc::Communication::callAction(uint8_t receiver, uint8_t actionIdentifier, const T& data)
 {
-	Header header = {	.type = TYPE.REQUEST;
-						.isAcknowledge = false;
-						.destination = receiver;
-						.source = currentComponent;
-						.packetIdentifier = actionIdentifier};
+	Header header(	Header::REQUEST,
+					false,
+					receiver,
+					currentComponent,
+					actionIdentifier);
+	SmartPayload payload(&data);
+	// todo add action, oder so zur list
+//	waitForAcknowledge(header, payload);
+	backend->sendPacket(header, payload);
+}
+		
+// ----------------------------------------------------------------------------
+template<typename T>
+void
+xpcc::Communication::callAction(uint8_t receiver, uint8_t actionIdentifier, const T& data, ResponseCallback& responseCallback)
+{
+	Header header(	Header::REQUEST,
+					false,
+					receiver,
+					currentComponent,
+					actionIdentifier);
+
 	SmartPayload payload(&data);
 	
-	waitForAcknowledge(header, payload);
-	interface->sendPacket(header, payload);
+	// todo add action, oder so zur list
+//	waitForAcknowledge(header, payload);
+	backend->sendPacket(header, payload);
 }
 		
 // ----------------------------------------------------------------------------
@@ -53,15 +73,17 @@ template<typename T>
 void
 xpcc::Communication::sendResponse(const ResponseHandle& handle, const T& data)
 {
-	Header header = {	.type = TYPE.RESPONSE;
-						.isAcknowledge = false;
-						.destination = handle.source;
-						.source = currentComponent;
-						.packetIdentifier = handle.packetIdentifier};
+	Header header(	Header::RESPONSE,
+					false,
+					handle.source,
+					currentComponent,
+					handle.packetIdentifier);
+					
 	SmartPayload payload(&data);
 	
-	waitForAcknowledge(header, payload);
-	interface->sendPacket(header, payload);
+	// todo add action, oder so zur list
+//	waitForAcknowledge(header, payload);
+	backend->sendPacket(header, payload);
 }
 		
 // ----------------------------------------------------------------------------
@@ -69,15 +91,17 @@ template<typename T>
 void
 xpcc::Communication::sendNegativeResponse(const ResponseHandle& handle, const T& data)
 {
-	Header header = {	.type = TYPE.NEGATIVE_RESPONSE;
-						.isAcknowledge = false;
-						.destination = handle.source;
-						.source = currentComponent;
-						.packetIdentifier = handle.packetIdentifier};
+	Header header(	Header::NEGATIVE_RESPONSE,
+					false,
+					handle.source,
+					currentComponent,
+					handle.packetIdentifier);
+					
 	SmartPayload payload(&data);
 	
-	waitForAcknowledge(header, payload);
-	interface->sendPacket(header, payload);
+	// todo add action, oder so zur list
+//	waitForAcknowledge(header, payload);
+	backend->sendPacket(header, payload);
 }
 		
 // ----------------------------------------------------------------------------
@@ -85,14 +109,14 @@ template<typename T>
 void
 xpcc::Communication::publishEvent(uint8_t eventIdentifier, const T& data)
 {
-	Header header = {	.type = TYPE.REQUEST;
-						.isAcknowledge = false;
-						.destination = 0;
-						.source = currentComponent;
-						.packetIdentifier = handle.packetIdentifier};
-	SmartPayload payload(&data);
+	Header header(	Header::REQUEST,
+					false,
+					0,
+					currentComponent,
+					eventIdentifier);
+	SmartPayload payload(&data);// no metadata is sent with Events
 	
-	interface->sendPacket(header, payload);
+	backend->sendPacket(header, payload);
 }
 
 #endif // XPCC_COMMUNICATION_IMPL_HPP

@@ -2,7 +2,7 @@
 // ----------------------------------------------------------------------------
 /* Copyright (c) 2009, Roboterclub Aachen e.V.
  * All rights reserved.
- *
+ * 
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *     * Redistributions of source code must retain the above copyright
@@ -13,7 +13,7 @@
  *     * Neither the name of the Roboterclub Aachen e.V. nor the
  *       names of its contributors may be used to endorse or promote products
  *       derived from this software without specific prior written permission.
- *
+ * 
  * THIS SOFTWARE IS PROVIDED BY ROBOTERCLUB AACHEN E.V. ''AS IS'' AND ANY
  * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -24,57 +24,54 @@
  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- * $Id$
+ * 
+ * $Id: communication.hpp 76 2009-10-14 23:29:28Z dergraaf $
  */
 // ----------------------------------------------------------------------------
 
-#include "communication.hpp"
+#ifndef	XPCC_RESPONSE_CALLBACK_HPP
+#define	XPCC_RESPONSE_CALLBACK_HPP
 
-xpcc::Communication::Communication(BackendInterface *backend,
-				Postman* postman):backend(backend),postman(postman),responseManager()
+#include "backend/backend_interface.hpp"
+#include "abstract_component.hpp"
+
+namespace xpcc
 {
 
-}
-
-// ----------------------------------------------------------------------------
-xpcc::Communication::~Communication()
-{
-}
-
-// ----------------------------------------------------------------------------
-void
-xpcc::Communication::update(){
-	//Check if a new packet was received by the backend
-	while(backend->isPacketAvailable())
+	/**
+	 * @ingroup		communication
+	 * @brief 		Parameter of the Callbackfunction
+	 */
+	class ResponseMessage// todo, has maybe to be defined somewhere else (other name), for use with requests too
 	{
-		//switch(postman->deliverPacket(backend))){
-		//	case NO_ACTION: // send error message
-		//		break;
-		//	case OK:
-		//	case NO_COMPONENT:
-		//	case NO_EVENT:
-		//}
+	public:
+
+		ResponseMessage(const Header& header, const uint8_t *payload, uint8_t payloadSize);
 		
-		postman->deliverPacket(backend);
-		
-		backend->dropPacket();
-	}
+		const Header& header;
+		const uint8_t * const payload;
+		const uint8_t payloadSize;
+	};
 	
+	/**
+	 * @ingroup		communication
+	 * @brief 		Callback type, which has to be passed to communication during
+	 *				actioncall in order to be able to recieve a response.
+	 */
+	class ResponseCallback
+	{
+	public:
+		typedef void (AbstractComponent::*CallbackFunction)(ResponseMessage& message);
 
-}
-
-// ----------------------------------------------------------------------------
-uint8_t
-xpcc::Communication::getCurrentComponent() const
-{
-	return currentComponent;
-}
+		ResponseCallback(AbstractComponent *object, CallbackFunction callbackFunction);
 		
-// ----------------------------------------------------------------------------
-void
-xpcc::Communication::setCurrentComponent(uint8_t id)
-{
-	currentComponent = id;
+		void
+		handleResponse(const BackendInterface * const backend);
+		
+		AbstractComponent *object;
+		CallbackFunction callbackFunction;
+	};
+	
 }
 
+#endif // XPCC_RESPONSE_CALLBACK_HPP

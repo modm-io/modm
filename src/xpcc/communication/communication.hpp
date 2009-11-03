@@ -33,7 +33,9 @@
 #define	XPCC_COMMUNICATION_HPP
 
 #include "backend/backend_interface.hpp"
+#include "abstract_component.hpp"
 #include "postman.hpp"
+#include "communication_list.hpp"
 
 //template<typename T>
 //const T*
@@ -91,6 +93,10 @@ namespace xpcc
 		
 		template<typename T>
 		void
+		callAction(uint8_t receiver, uint8_t actionIdentifier, const T& data, ResponseCallback& responseCallback);
+		
+		template<typename T>
+		void
 		sendResponse(const ResponseHandle& handle, const T& data);
 		
 		template<typename T>
@@ -99,15 +105,18 @@ namespace xpcc
 		
 		template<typename T>
 		void
-		publishEvent(const T& data);
+		publishEvent(uint8_t eventIdentifier, const T& data);
 		
 	private:
 		BackendInterface * const backend;
 		Postman * const postman;
 		uint8_t currentComponent;
+		CommunicationList responseManager;
 		
 		void
 		waitForAcknowledge(const Header &header, const SmartPayload& payload);
+		
+		
 	};
 }
 

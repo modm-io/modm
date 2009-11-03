@@ -29,8 +29,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	POSTMAN_HPP
-#define	POSTMAN_HPP
+#ifndef	XPCC_POSTMAN_HPP
+#define	XPCC_POSTMAN_HPP
 
 /**
  * @defgroup 	communication Communication
@@ -60,4 +60,4 @@ namespace xpcc{
 		deliverPacket(const BackendInterface * const backend) = 0; //wie muss const?
 	};
 }
-#endif // POSTMAN_HPP
+#endif // XPCC_POSTMAN_HPP

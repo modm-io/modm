@@ -2,7 +2,7 @@
 // ----------------------------------------------------------------------------
 /* Copyright (c) 2009, Roboterclub Aachen e.V.
  * All rights reserved.
- *
+ * 
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *     * Redistributions of source code must retain the above copyright
@@ -13,7 +13,7 @@
  *     * Neither the name of the Roboterclub Aachen e.V. nor the
  *       names of its contributors may be used to endorse or promote products
  *       derived from this software without specific prior written permission.
- *
+ * 
  * THIS SOFTWARE IS PROVIDED BY ROBOTERCLUB AACHEN E.V. ''AS IS'' AND ANY
  * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -24,57 +24,28 @@
  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- * $Id$
+ * 
+ * $Id: postman.hpp 77 2009-10-15 18:34:29Z thundernail $
  */
 // ----------------------------------------------------------------------------
 
-#include "communication.hpp"
 
-xpcc::Communication::Communication(BackendInterface *backend,
-				Postman* postman):backend(backend),postman(postman),responseManager()
-{
+#include "response_callback.hpp"
 
+xpcc::ResponseMessage::ResponseMessage(const Header& header, const uint8_t *payload, uint8_t payloadSize):
+header(header),
+payload(payload),
+payloadSize(payloadSize){
 }
 
-// ----------------------------------------------------------------------------
-xpcc::Communication::~Communication()
-{
-}
-
-// ----------------------------------------------------------------------------
-void
-xpcc::Communication::update(){
-	//Check if a new packet was received by the backend
-	while(backend->isPacketAvailable())
-	{
-		//switch(postman->deliverPacket(backend))){
-		//	case NO_ACTION: // send error message
-		//		break;
-		//	case OK:
-		//	case NO_COMPONENT:
-		//	case NO_EVENT:
-		//}
-		
-		postman->deliverPacket(backend);
-		
-		backend->dropPacket();
-	}
+xpcc::ResponseCallback::ResponseCallback(AbstractComponent *object, CallbackFunction callbackFunction) :
+object( object ),
+callbackFunction ( callbackFunction ){
 	
-
-}
-
-// ----------------------------------------------------------------------------
-uint8_t
-xpcc::Communication::getCurrentComponent() const
-{
-	return currentComponent;
 }
 		
-// ----------------------------------------------------------------------------
 void
-xpcc::Communication::setCurrentComponent(uint8_t id)
-{
-	currentComponent = id;
+xpcc::ResponseCallback::handleResponse(const BackendInterface * const backend){
+	ResponseMessage message(backend->getPacketHeader(), backend->getPacketPayload(), backend->getPacketPayloadSize());
+	(object->*callbackFunction)(message);
 }
-
