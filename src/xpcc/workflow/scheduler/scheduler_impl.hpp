@@ -34,8 +34,6 @@
 	#error	"Don't include this file directly, use 'scheduler.hpp' instead!"
 #endif
 
-#include <xpcc/hal/atomic/lock.hpp>
-
 inline void
 xpcc::Scheduler::scheduleInterupt()
 {
@@ -93,9 +91,11 @@ xpcc::Scheduler::scheduleInterupt()
 	while ((item = item->nextTask) != 0);
 	
 	// how execute the tasks which are ready
-	while (((item = readyList) != 0) && (item->priority > currentPriority))
+	while (((item = xpcc::utils::Volatile(readyList)) != 0) &&
+			(item->priority > currentPriority))
 	{
 		item->state = TaskListItem::RUNNING;
+		readyList = item->nextReady;
 		currentPriority = item->priority;
 		{
 			xpcc::atomic::Unlock();
@@ -106,7 +106,5 @@ xpcc::Scheduler::scheduleInterupt()
 		}
 		currentPriority = 0;
 		item->state = TaskListItem::WAITING;
-		
-		readyList = item->nextReady;	// TODO this won't work inside an interrupt
 	}
 }

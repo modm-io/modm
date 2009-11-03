@@ -35,6 +35,7 @@
 
 #include <stdint.h>
 #include <xpcc/utils/misc.hpp>
+#include <xpcc/hal/atomic/lock.hpp>		// for Scheduler::scheduleInterrupt()
 
 namespace xpcc
 {

@@ -50,4 +50,23 @@
 	#define	FILENAME	STRINGIFY(BASENAME)
 #endif
 
+namespace xpcc
+{
+	namespace utils
+	{
+		/**
+		 * @ingroup	utils
+		 * @brief	Add volatile modifier to T
+		 * 
+		 * @todo	Check if this works as expected!
+		 */
+		template<typename T>
+		volatile T&
+		Volatile(T& value)
+		{
+			return (volatile T&) value;
+		}
+	}
+}
+
 #endif	// MISC_HPP

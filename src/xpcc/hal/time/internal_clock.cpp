@@ -37,7 +37,7 @@
 #if defined(__unix__)
 	#include <sys/time.h>
 #elif defined(__AVR__)
-	uint16_t InternalClock::time = 0;
+	uint16_t xpcc::InternalClock::time = 0;
 #endif
 
 xpcc::Timestamp

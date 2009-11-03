@@ -34,6 +34,7 @@
 #define	XPCC_ATOMIC__QUEUE_HPP
 
 #include <stdint.h>
+#include <xpcc/utils/misc.hpp>
 
 namespace xpcc
 {
@@ -41,9 +42,11 @@ namespace xpcc
 	{
 		/**
 		 * @ingroup	atomic
-		 * @brief		Interrupt save queue
+		 * @brief	Interrupt save queue
 		 *
 		 * A maximum size of 254 is allowed
+		 * 
+		 * @todo	This implementation should work but could be improved
 		 */
 		template<typename T,
 				 int N>

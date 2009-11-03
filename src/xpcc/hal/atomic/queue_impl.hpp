@@ -33,10 +33,6 @@
 #ifndef	XPCC_ATOMIC__QUEUE_IMPL_HPP
 #define	XPCC_ATOMIC__QUEUE_IMPL_HPP
 
-// TODO: This implementation should work but could be improved
-
-#define VOLATILE(x)  (*(volatile uint8_t *) &(x))
-
 template<typename T, int N>
 xpcc::atomic::Queue<T, N>::Queue() :
 	head(0), tail(0) {
@@ -45,12 +41,12 @@ xpcc::atomic::Queue<T, N>::Queue() :
 template<typename T, int N>
 bool
 xpcc::atomic::Queue<T, N>::isFull() {
-	uint8_t tmphead = VOLATILE(head) + 1;
+	uint8_t tmphead = xpcc::utils::Volatile(head) + 1;
 	if (tmphead >= (N+1)) {
 		tmphead = 0;
 	}
 	
-	if (tmphead == VOLATILE(tail)) {
+	if (tmphead == xpcc::utils::Volatile(tail)) {
 		return true;
 	}
 	return false;
@@ -59,7 +55,7 @@ xpcc::atomic::Queue<T, N>::isFull() {
 template<typename T, int N>
 bool
 xpcc::atomic::Queue<T, N>::isEmpty() {
-	return (VOLATILE(head) == VOLATILE(tail));
+	return (xpcc::utils::Volatile(head) == xpcc::utils::Volatile(tail));
 }
 
 template<typename T, int N>
@@ -81,7 +77,7 @@ xpcc::atomic::Queue<T, N>::push(const T& value) {
 	if (tmphead >= (N+1)) {
 		tmphead = 0;
 	}
-	if (tmphead == VOLATILE(tail)) {
+	if (tmphead == xpcc::utils::Volatile(tail)) {
 		return false;
 	}
 	else {

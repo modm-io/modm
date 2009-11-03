@@ -69,8 +69,8 @@ SchedulerTest::testScheduler()
 	TestTask task4;
 	
 	scheduler.scheduleTask(task1, 3, 10);
-	scheduler.scheduleTask(task2, 3, 20);
-	scheduler.scheduleTask(task3, 3);
+	scheduler.scheduleTask(task2, 3);
+	scheduler.scheduleTask(task3, 3, 20);
 	scheduler.scheduleTask(task4, 3, 200);
 	
 	scheduler.schedule();
@@ -84,8 +84,8 @@ SchedulerTest::testScheduler()
 	scheduler.schedule();
 	
 	TEST_ASSERT_EQUALS(task1.order, 4);
-	TEST_ASSERT_EQUALS(task2.order, 3);
-	TEST_ASSERT_EQUALS(task3.order, 2);
+	TEST_ASSERT_EQUALS(task2.order, 2);
+	TEST_ASSERT_EQUALS(task3.order, 3);
 	TEST_ASSERT_EQUALS(task4.order, 1);
 	
 	count = 1;
@@ -105,7 +105,7 @@ SchedulerTest::testScheduler()
 	scheduler.schedule();
 	
 	TEST_ASSERT_EQUALS(task1.order, 4);
-	TEST_ASSERT_EQUALS(task2.order, 3);
-	TEST_ASSERT_EQUALS(task3.order, 2);
+	TEST_ASSERT_EQUALS(task2.order, 2);
+	TEST_ASSERT_EQUALS(task3.order, 3);
 	TEST_ASSERT_EQUALS(task4.order, 1);
 }
