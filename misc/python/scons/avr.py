@@ -88,6 +88,7 @@ def generate(env, **kw):
 	env['CFLAGS'] = ' '.join([
 		"-std=gnu99",
 		"-Wstrict-prototypes",
+		"-fpack-struct", 		# TODO
 	])
 	
 	# flags for C and C++
@@ -97,7 +98,6 @@ def generate(env, **kw):
 		"-gdwarf-2", 
 		"-funsigned-char",
 		"-funsigned-bitfields", 
-		"-fpack-struct", 		# TODO
 		"-fshort-enums", 
 		"-ffunction-sections",
 		"-fdata-sections", 
@@ -122,7 +122,10 @@ def generate(env, **kw):
 	])
 	
 	# Assembler flags
-	env['ASFLAGS'] = "-mmcu=$AVR_DEVICE -x assembler-with-cpp "
+	if str(Platform()) == "win32":
+		env['ASFLAGS'] = "-mmcu=$AVR_DEVICE"
+	else:
+		env['ASFLAGS'] = "-mmcu=$AVR_DEVICE -x assembler-with-cpp "
 	
 	env['LINKFLAGS'] = " ".join([
 		"-mmcu=$AVR_DEVICE", 
