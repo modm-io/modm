@@ -50,13 +50,31 @@ public:
 	testFlashString();
 	
 	void
+	testByte();
+	
+	void
+	testByteSigned();
+	
+	void
+	testShort();
+	
+	void
+	testShortSigned();
+	
+	void
 	testInteger();
 	
 	void
-	testShortInteger();
+	testFloat();
 	
 	void
-	testFloat();
+	testFloat2();
+	
+	void
+	testFloat3();
+	
+	void
+	testFloat4();
 
 private:
 	xpcc::IOStream *stream;

@@ -5,6 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
+ * 
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -29,13 +30,104 @@
  */
 // ----------------------------------------------------------------------------
 
+#include <xpcc/hal/flash/flash_pointer.hpp>
+
 #include "iostream.hpp"
 
-// -----------------------------------------------------------------------------
+namespace
+{
+	FLASH(uint16_t base[]) = { 10, 100, 1000, 10000 };
+}
+
+// ----------------------------------------------------------------------------
 xpcc::IOStream::IOStream( IODevice& device ) :
 	device( &device )
 {
 }
 
+// ----------------------------------------------------------------------------
+xpcc::IOStream&
+xpcc::IOStream::putInteger(int8_t value)
+{
+	return this->putInteger(static_cast<int16_t>(value));
+}
 
+// ----------------------------------------------------------------------------
+xpcc::IOStream&
+xpcc::IOStream::putInteger(uint8_t value)
+{
+	return this->putInteger(static_cast<uint16_t>(value));
+}
 
+// ----------------------------------------------------------------------------
+xpcc::IOStream&
+xpcc::IOStream::putInteger(int16_t value)
+{
+	FlashPointer<uint16_t> basePtr = xpcc::Flash(base);
+	
+	if (value < 0) {
+		value = -value;
+		this->device->put('-');
+	}
+	
+	bool zero = true;
+	uint8_t i = 4;
+	do {
+		i--;
+		char d;
+		for (d = '0'; value >= (int16_t) basePtr[i]; value -= basePtr[i])
+		{
+			d++;
+			zero = false;
+		}
+		if (!zero) {
+			this->device->put(d);
+		}
+	} while (i);
+	
+	this->device->put(static_cast<char>(value) + '0');
+	
+	return *this;
+}
+
+// ----------------------------------------------------------------------------
+xpcc::IOStream&
+xpcc::IOStream::putInteger(uint16_t value)
+{
+	FlashPointer<uint16_t> basePtr = xpcc::Flash(base);
+	
+	bool zero = true;
+	uint8_t i = 4;
+	do {
+		i--;
+		char d;
+		for (d = '0'; value >= basePtr[i]; value -= basePtr[i])
+		{
+			d++;
+			zero = false;
+		}
+		if (!zero) {
+			this->device->put(d);
+		}
+	} while (i);
+	
+	this->device->put(static_cast<char>(value) + '0');
+	
+	return *this;
+}
+
+// ----------------------------------------------------------------------------
+#ifdef __AVR__
+
+	xpcc::IOStream&
+	xpcc::IOStream::putInteger(int32_t value)
+	{
+		// -2147483648 to 2147483647
+		char buffer[12];
+		
+		this->device->put(ltoa(value, buffer, 10));
+		
+		return *this;
+	}
+
+#endif

@@ -30,6 +30,9 @@
  */
 // ----------------------------------------------------------------------------
 
+#ifndef	XPCC__UTILS_HPP
+#define	XPCC__UTILS_HPP
+
 #include <stdint.h>
 
 namespace xpcc
@@ -57,3 +60,5 @@ namespace xpcc
 #endif
 	}
 }
+
+#endif	// XPCC__UTILS_HPP

@@ -34,27 +34,35 @@
 #define XPCC__PIN_HPP
 
 #include <avr/io.h>
+#include <xpcc/utils/misc.hpp>
 
+/// @ingroup	hal
+/// @brief		
 #define	CREATE_TYPE_IO_PIN(name, port, pin) \
 	struct name { \
 		name() { this->setInput() } \
-		inline void setOutput() { DDR ## port |= (1 << pin); } \
-		inline void setInput() { DDR ## port &= ~(1 << pin); } \
-		inline void set() { PORT ## port |= (1 << pin); } \
-		inline void reset() { PORT ## port &= ~(1 << pin); } \
-		inline bool get() { return (PIN ## port & (1 << pin)); } \
+		ALWAYS_INLINE static void setOutput() { DDR ## port |= (1 << pin); } \
+		ALWAYS_INLINE static void setInput() { DDR ## port &= ~(1 << pin); } \
+		ALWAYS_INLINE static void set() { PORT ## port |= (1 << pin); } \
+		ALWAYS_INLINE static void reset() { PORT ## port &= ~(1 << pin); } \
+		ALWAYS_INLINE static bool get() { return (PIN ## port & (1 << pin)); } \
 	}
 
+/// @ingroup	hal
+/// @brief		
 #define	CREATE_TYPE_OUTPUT_PIN(name, port, pin) \
 	struct name { \
 		name() { DDR ## port |= (1 << pin); } \
-		inline void set() { PORT ## port |= (1 << pin); } \
-		inline void reset() { PORT ## port &= ~(1 << pin); } \
+		ALWAYS_INLINE static void set() { PORT ## port |= (1 << pin); } \
+		ALWAYS_INLINE static void reset() { PORT ## port &= ~(1 << pin); } \
 	}
+
+/// @ingroup	hal
+/// @brief		
 #define CREATE_TYPE_INPUT_PIN(name, port, pin) \
 	struct name { \
 		name() { DDR ## port &= ~(1 << pin); } \
-		inline bool get() { return (PIN ## port & (1 << pin)); } \
+		ALWAYS_INLINE static bool get() { return (PIN ## port & (1 << pin)); } \
 	}
 
 #endif // XPCC__PIN_HPP

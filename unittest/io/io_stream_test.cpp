@@ -116,33 +116,100 @@ IoStreamTest::testFlashString()
 }
 
 void
-IoStreamTest::testShortInteger()
+IoStreamTest::testByte()
 {
-	char string[] = "123";
+	char string[] = "244";
 	
-	(*stream) << 123;
+	(*stream) << 244;
 	
 	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 0, 3);
 	TEST_ASSERT_EQUALS(device.bytesWritten, 3);
 }
 
 void
+IoStreamTest::testByteSigned()
+{
+	char string[] = "-123";
+	
+	(*stream) << -123;
+	
+	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 0, 4);
+	TEST_ASSERT_EQUALS(device.bytesWritten, 4);
+}
+
+void
+IoStreamTest::testShort()
+{
+	char string[] = "62412";
+	
+	(*stream) << 62412;
+	
+	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 0, 5);
+	TEST_ASSERT_EQUALS(device.bytesWritten, 5);
+}
+
+
+void
+IoStreamTest::testShortSigned()
+{
+	char string[] = "-12345";
+	
+	(*stream) << -12345;
+	
+	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 0, 6);
+	TEST_ASSERT_EQUALS(device.bytesWritten, 6);
+}
+
+void
 IoStreamTest::testInteger()
 {
-	char string[] = "1234567";
+	char string[] = "12345678";
 	
-	(*stream) << 1234567;
+	(*stream) << 12345678;
 	
-	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 0, 7);
-	TEST_ASSERT_EQUALS(device.bytesWritten, 7);
+	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 0, 8);
+	TEST_ASSERT_EQUALS(device.bytesWritten, 8);
 }
 
 void
 IoStreamTest::testFloat()
 {
-	char string[] = "1.230000e+00";
+	char string[] = "1.23000e+00";
 	
 	(*stream) << 1.23f;
+	
+	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 0, 11);
+	TEST_ASSERT_EQUALS(device.bytesWritten, 11);
+}
+
+void
+IoStreamTest::testFloat2()
+{
+	char string[] = "4.57000e+02";
+	
+	(*stream) << 457.0f;
+	
+	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 0, 11);
+	TEST_ASSERT_EQUALS(device.bytesWritten, 11);
+}
+
+void
+IoStreamTest::testFloat3()
+{
+	char string[] = "-5.12314e+07";
+	
+	(*stream) << -51231400.0f;
+	
+	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 0, 12);
+	TEST_ASSERT_EQUALS(device.bytesWritten, 12);
+}
+
+void
+IoStreamTest::testFloat4()
+{
+	char string[] = "-7.23400e-04";
+	
+	(*stream) << -0.0007234f;
 	
 	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 0, 12);
 	TEST_ASSERT_EQUALS(device.bytesWritten, 12);

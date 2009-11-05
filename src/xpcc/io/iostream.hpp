@@ -33,6 +33,7 @@
 #ifndef XPCC__IOSTREAM_HPP
 #define XPCC__IOSTREAM_HPP
 
+#include <stdint.h>
 #include <xpcc/hal/flash/flash_pointer.hpp>
 
 #include "iodevice.hpp"
@@ -93,11 +94,29 @@ namespace xpcc
 
 			template <typename T>
 			friend struct FloatWriter;
-
+			
+			IOStream&
+			putInteger(int8_t value);
+			
+			IOStream&
+			putInteger(uint8_t value);
+			
+			IOStream&
+			putInteger(int16_t value);
+			
+			IOStream&
+			putInteger(uint16_t value);
+			
+#ifdef __AVR__
+			IOStream&
+			putInteger(int32_t value);
+#endif
+			
+			// default version which is used all the others didn't match
 			template<typename T>
 			IOStream&
 			putInteger( T value );
-
+			
 			template<typename T>
 			IOStream&
 			putFloat( T value );

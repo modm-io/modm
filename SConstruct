@@ -91,13 +91,13 @@ lib = env.Alias('lib', 'build/lib')
 # -----------------------------------------------------------------------------
 # build the tests
 
-sources, header = parser.parseDirectory('tests/', 'tests')
-SConscript('tests/SConscript',
-			src='tests',
-			variant_dir='build/tests',
-			exports=['env', 'sources', 'library'], 
-			duplicate=False)
-tests = env.Alias('tests', 'build/tests')
+#sources, header = parser.parseDirectory('tests/', 'tests')
+#SConscript('tests/SConscript',
+#			src='tests',
+#			variant_dir='build/tests',
+#			exports=['env', 'sources', 'library'], 
+#			duplicate=False)
+#tests = env.Alias('tests', 'build/tests')
 
 # -----------------------------------------------------------------------------
 # build the unit tests
@@ -115,5 +115,5 @@ unittest = env.Alias('unittest', 'build/unittest')
 env.Doxygen('doc/doxyfile')
 env.Alias('doc', 'apidoc/html')
 
-env.Alias('all', [lib, tests, unittest])
+#env.Alias('all', [lib, tests, unittest])
 env.Default('lib')

@@ -131,8 +131,8 @@ def generate(env, **kw):
 		"-mmcu=$AVR_DEVICE", 
 		"-Wl,-Map=${TARGET.base}.map,--cref", 
 		"-Wl,--relax", 
-		"-Wl,--gc-sections", 
-#		"-static", 
+		"-Wl,--gc-sections",
+		"-Wl,-u,vfprintf -lprintf_flt"		# enable float support for vfprinft
 	])
 	
 	env['LINKCOM'] = "$LINK -o $TARGET $LINKFLAGS $SOURCES -lm $_LIBDIRFLAGS $_LIBFLAGS -lm"

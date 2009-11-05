@@ -35,7 +35,9 @@
 #endif
 
 #include <stdio.h>
+#include <stdlib.h>
 
+#include <xpcc/math/utils.hpp>
 #include <xpcc/utils/arithmetic_traits.hpp>
 #include <xpcc/utils/typet.hpp>
 
@@ -66,12 +68,11 @@ xpcc::IOStream&
 xpcc::IOStream::putInteger( T value )
 {
 	char str[ArithmeticTraits<T>::digits10 + 1]; // +1 for '\0'
-
-	// TODO use a optimized function to format output
+	
 	snprintf(str, sizeof(str), "%d", value);
-
+	
 	this->device->put(str);
-
+	
 	return *this;
 }
 
@@ -81,14 +82,16 @@ template<typename T>
 xpcc::IOStream&
 xpcc::IOStream::putFloat( T value )
 {
-	// TODO is hard coded for 2.22507e-308
+	// hard coded for 2.22507e-308
 	char str[13 + 1]; // +1 for '\0'
-
-	// TODO use a optimized function to format output
-	snprintf(str, sizeof(str), "%e", value);
-
+	
+#ifdef __AVR__
+	dtostre(value, str, 5, 0);
+#else
+	snprintf(str, sizeof(str), "%.5e", value);
+#endif
+	
 	this->device->put(str);
-
 	return *this;
 }
 
