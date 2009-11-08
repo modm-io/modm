@@ -5,6 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
+ * 
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -25,28 +26,58 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: newdelete.cpp 83 2009-10-15 19:58:57Z dergraaf $
+ * $Id$
+ */
+// ----------------------------------------------------------------------------
+/*
+ * WARNING: This file is generated automatically, do not edit!
+ * Please modify the corresponding *.tmpl file instead and re-run the
+ * script 'generate.py'.
+ *
+ * Generated 08 Nov 2009, 18:08:18
  */
 // ----------------------------------------------------------------------------
 
-#include "../memory/memory_allocation.hpp"
+#include <avr/io.h>
+#include <avr/interrupt.h>
 
-void *
-operator new(size_t size) {
-	return avr::allocateMemory(size);
+#include <xpcc/hal/atomic/queue.hpp>
+#include <xpcc/hal/atomic/lock.hpp>
+
+#include "uart_defines.h"
+#include "uart_defaults.h"
+
+#include "uart0.hpp"
+
+static xpcc::atomic::Queue<char, UART0_TX_BUFFER_SIZE> txBuffer;
+
+// ----------------------------------------------------------------------------
+// called when the UART is ready to transmit the next byte
+
+ISR(UART0_TRANSMIT_INTERRUPT)
+{
+	if (txBuffer.isEmpty())
+	{
+		// transmission finished, disable UDRE interrupt
+		UART0_CONTROL &= ~(1 << UART0_UDRIE);
+	}
+	else {
+		// get one byte from buffer and write it to UART (starts transmission)
+		UART0_DATA = txBuffer.get();
+		txBuffer.pop();
+	}
 }
 
-void *
-operator new[](size_t size) {
-	return avr::allocateMemory(size);
-}
-
+// ----------------------------------------------------------------------------
 void
-operator delete(void* ptr) {
-	avr::freeMemory(ptr);
-}
-
-void
-operator delete[](void* ptr) {
-	avr::freeMemory(ptr);
+xpcc::Uart0::put(char c)
+{
+	while (!txBuffer.push(c)) {
+		// wait for a free slot in the buffer
+	}
+	
+	atomic::Lock lock;
+	
+	// enable UDRE interrupt
+	UART0_CONTROL |= (1 << UART0_UDRIE);
 }

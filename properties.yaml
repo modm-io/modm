@@ -1,15 +1,19 @@
 
-#target: avr
+#target: atmega
+#target: atxmega
 target: pc
 
-avr:
-#  device: atmega2560
+atmega:
+  device: atmega2560
+  clock: 14745600
+  avrdude:
+    programmer: stk500
+    port: /dev/ttyUSB0
+
+atxmega:
   device: atxmega128a1
   clock: 32000000
-#  clock: 14745600
   avrdude:
-#    programmer: stk500
-#    port: /dev/ttyUSB0
     programmer: avrispmkII
     port: usb
 
@@ -37,5 +41,3 @@ library:
 tests:
   include: no
 
-unittest:
-  

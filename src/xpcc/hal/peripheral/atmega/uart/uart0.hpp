@@ -5,6 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
+ * 
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -25,23 +26,31 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: uart2.hpp 69 2009-10-10 17:51:10Z dergraaf $
+ * $Id$
+ */
+// ----------------------------------------------------------------------------
+/*
+ * WARNING: This file is generated automatically, do not edit!
+ * Please modify the corresponding *.tmpl file instead and re-run the
+ * script 'generate.py'.
+ *
+ * Generated 08 Nov 2009, 18:08:18
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__UART2_HPP
-#define XPCC__UART2_HPP
+#ifndef XPCC__UART0_HPP
+#define XPCC__UART0_HPP
 
 #include "uart.hpp"
 
 namespace xpcc
 {
-	class Uart2 : public Uart
+	class Uart0 : public Uart
 	{
 	public:
-		static Uart2&
+		static Uart0&
 		instance() {
-			static Uart2 uart;
+			static Uart0 uart;
 			return uart;
 		}
 		
@@ -57,13 +66,13 @@ namespace xpcc
 		virtual void
 		setBaudrateRegister(uint16_t ubrr);
 		
-		Uart2() {};
+		Uart0() {};
 		
-		Uart2(const Uart2&);
+		Uart0(const Uart0&);
 		
-		Uart2&
-		operator =(const Uart2 &);
+		Uart0&
+		operator =(const Uart0 &);
 	};
 }
 
-#endif // XPCC__UART2_HPP
+#endif // XPCC__UART0_HPP

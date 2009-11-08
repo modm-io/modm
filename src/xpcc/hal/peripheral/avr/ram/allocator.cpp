@@ -29,7 +29,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include "memory_allocation.hpp"
+#include "allocator.hpp"
 
 #include <stdint.h>
 #include <stdlib.h>
@@ -92,7 +92,7 @@ void initializeMemory(void)
  * TODO description
  */
 void *
-avr::allocateMemory(size_t requestedSize)
+xpcc::avr::allocateMemory(size_t requestedSize)
 {
 	if (requestedSize == 0 ||
 		requestedSize > MAX_BLOCK_PARTS * BLOCK_SIZE)
@@ -171,7 +171,7 @@ avr::allocateMemory(size_t requestedSize)
 
 // ----------------------------------------------------------------------------
 void
-avr::freeMemory(void *ptr)
+xpcc::avr::freeMemory(void *ptr)
 {
 	if (ptr == 0) {
 		return;
@@ -254,13 +254,13 @@ printMemoryLayout(void)
 void *
 allocate(size_t size)
 {
-	return avr::allocateMemory(size);
+	return xpcc::avr::allocateMemory(size);
 }
 
 void
 release(void *p)
 {
-	avr::freeMemory(p);
+	xpcc::avr::freeMemory(p);
 }
 
 int

@@ -34,6 +34,10 @@
 	#error	"Don't include this file directly use 'math/cartesian_coordinate.hpp' instead!"
 #endif
 
+#if defined(__AVR__) && defined(__AVR_HAVE_MUL__)
+#include <xpcc/hal/peripheral/avr/math/math.hpp>
+#endif
+
 namespace xpcc
 {
 	// ------------------------------------------------------------------------
@@ -95,8 +99,6 @@ namespace xpcc
 	}
 
 #if defined(__AVR__) && defined(__AVR_HAVE_MUL__)
-#include <xpcc/hal/avr/math/math.hpp>
-
 	template<>
 	int16_t
 	CartesianCoordinate<int16_t>::getLength() const

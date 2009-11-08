@@ -26,48 +26,16 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: math.hpp 75 2009-10-14 22:48:12Z dergraaf $
+ * $Id$
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	AVR__MATH_HPP
-#define	AVR__MATH_HPP
+#ifndef	XPCC_AVR__MATH_HPP
+	#error	"Don't include this file directly, use 'math.hpp' instead!"
+#endif
 
-#include <stdint.h>
-
-namespace avr
-{
-
-/**
- * \brief	Fast and short 32 bits sqrt routine
- * 
- * Quadratwurzel basierend auf einer Implementierung von Ruud v Gessel,
- * die zusammen mit avr-gcc verwendet werden kann. Je nach Algorithmus wird
- * das Ergebnis zum Nächsten gerundet oder abgerundet. Abrunden ist dann
- * angesagt, wenn die Wurzel aus einer großen Eingabe wie 0xffffffff zu
- * ziehen ist, da bei Aufrunden hier das Ergebnis zu 0 überläuft.
- * 
- * Die Ausführungszeit ist maximal 310 Ticks (inclusive CALL+RET)
- * 
- * \see		http://www.mikrocontroller.net/articles/AVR_Arithmetik#avr-gcc_Implementierung_.2832_Bit.29
- * \see		http://members.chello.nl/j.beentjes3/Ruud/sqrt32avr.htm
- */
-extern "C" uint16_t
-sqrt32_round(uint32_t);
-
-/**
- * 
- */
-extern "C" uint16_t
-sqrt32_floor(uint32_t);
-
-/**
- * \brief	unsigned 16bit x 16bit = 32bit multiplication
- * 
- * \see		AVR201
- */
 inline uint32_t
-mul32(uint16_t a, uint16_t b)
+xpcc::avr::mul32(uint16_t a, uint16_t b)
 {
 	uint32_t result;
 	asm(
@@ -92,13 +60,8 @@ mul32(uint16_t a, uint16_t b)
 	return result;
 }
 
-/**
- * \brief	signed 16bit x 16bit = 32bit multiplication
- * 
- * \see		AVR201
- */
 inline int32_t
-mul32(int16_t a, int16_t b)
+xpcc::avr::mul32(int16_t a, int16_t b)
 {
 	int32_t result;
 	int8_t help_reg;
@@ -134,18 +97,8 @@ mul32(int16_t a, int16_t b)
 	return result;
 }
 
-/**
- * \brief	Signed multiply accumulate of two 16bits numbers with
- * 			a 32bits result
- * 
- * \verbatim
- * result += a * b;
- * \endverbatim
- * 
- * \see		AVR201
- */
 inline int32_t
-mac32(int32_t result, int16_t a, int16_t b)
+xpcc::avr::mac32(int32_t result, int16_t a, int16_t b)
 {
 	int8_t help_reg;
 	
@@ -183,7 +136,3 @@ mac32(int32_t result, int16_t a, int16_t b)
 	
 	return result;
 }
-
-}
-
-#endif	// AVR__MATH_HPP

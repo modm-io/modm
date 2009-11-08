@@ -54,7 +54,7 @@ parser = PropertyParser(GetOption('properties'), target, verbose)
 # create a build-environment for the specific target
 
 build = parser.getGlobalProperties()
-if build.target == 'avr':
+if build.target == 'atmega' or build.target == 'atxmega':
 	env = Environment(
 			ARCHITECTURE = 'avr',
 			AVRDUDE = build.avr.avrdude,

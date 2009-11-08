@@ -5,6 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
+ * 
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -25,26 +26,53 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: memory_allocation.hpp 83 2009-10-15 19:58:57Z dergraaf $
+ * $Id$
+ */
+// ----------------------------------------------------------------------------
+/*
+ * WARNING: This file is generated automatically, do not edit!
+ * Please modify the corresponding *.tmpl file instead and re-run the
+ * script 'generate.py'.
+ *
+ * Generated 08 Nov 2009, 18:08:18
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	AVR__MEMORY_ALLOCATION_HPP
-#define	AVR__MEMORY_ALLOCATION_HPP
+#ifndef XPCC__UART2_HPP
+#define XPCC__UART2_HPP
 
-#include <stdint.h>
-#include <stdlib.h>
+#include "uart.hpp"
 
-namespace avr
+namespace xpcc
 {
-	void *
-	allocateMemory(size_t requestedSize);
+	class Uart2 : public Uart
+	{
+	public:
+		static Uart2&
+		instance() {
+			static Uart2 uart;
+			return uart;
+		}
+		
+		virtual void
+		put(char c);
+		
+		using Uart::put;
+		
+		virtual bool
+		get(char& c);
 	
-	void
-	freeMemory(void *ptr);
-	
-	// TODO functions to retrieve status informations about used memory
+	protected:
+		virtual void
+		setBaudrateRegister(uint16_t ubrr);
+		
+		Uart2() {};
+		
+		Uart2(const Uart2&);
+		
+		Uart2&
+		operator =(const Uart2 &);
+	};
 }
 
-#endif	// AVR__MEMORY_ALLOCATION_HPP
-
+#endif // XPCC__UART2_HPP

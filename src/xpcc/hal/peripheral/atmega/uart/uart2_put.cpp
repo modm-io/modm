@@ -5,6 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
+ * 
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -25,45 +26,58 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: uart1.hpp 69 2009-10-10 17:51:10Z dergraaf $
+ * $Id$
+ */
+// ----------------------------------------------------------------------------
+/*
+ * WARNING: This file is generated automatically, do not edit!
+ * Please modify the corresponding *.tmpl file instead and re-run the
+ * script 'generate.py'.
+ *
+ * Generated 08 Nov 2009, 18:08:18
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__UART1_HPP
-#define XPCC__UART1_HPP
+#include <avr/io.h>
+#include <avr/interrupt.h>
 
-#include "uart.hpp"
+#include <xpcc/hal/atomic/queue.hpp>
+#include <xpcc/hal/atomic/lock.hpp>
 
-namespace xpcc
+#include "uart_defines.h"
+#include "uart_defaults.h"
+
+#include "uart2.hpp"
+
+static xpcc::atomic::Queue<char, UART2_TX_BUFFER_SIZE> txBuffer;
+
+// ----------------------------------------------------------------------------
+// called when the UART is ready to transmit the next byte
+
+ISR(UART2_TRANSMIT_INTERRUPT)
 {
-	class Uart1 : public Uart
+	if (txBuffer.isEmpty())
 	{
-	public:
-		static Uart1&
-		instance() {
-			static Uart1 uart;
-			return uart;
-		}
-		
-		virtual void
-		put(char c);
-		
-		using Uart::put;
-		
-		virtual bool
-		get(char& c);
-	
-	protected:
-		virtual void
-		setBaudrateRegister(uint16_t ubrr);
-		
-		Uart1() {};
-		
-		Uart1(const Uart1&);
-		
-		Uart1&
-		operator =(const Uart1 &);
-	};
+		// transmission finished, disable UDRE interrupt
+		UART2_CONTROL &= ~(1 << UART2_UDRIE);
+	}
+	else {
+		// get one byte from buffer and write it to UART (starts transmission)
+		UART2_DATA = txBuffer.get();
+		txBuffer.pop();
+	}
 }
 
-#endif // XPCC__UART1_HPP
+// ----------------------------------------------------------------------------
+void
+xpcc::Uart2::put(char c)
+{
+	while (!txBuffer.push(c)) {
+		// wait for a free slot in the buffer
+	}
+	
+	atomic::Lock lock;
+	
+	// enable UDRE interrupt
+	UART2_CONTROL |= (1 << UART2_UDRIE);
+}

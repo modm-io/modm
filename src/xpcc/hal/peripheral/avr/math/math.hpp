@@ -5,6 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
+ *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -25,45 +26,78 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: uart0.hpp 69 2009-10-10 17:51:10Z dergraaf $
+ * $Id: math.hpp 75 2009-10-14 22:48:12Z dergraaf $
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__UART0_HPP
-#define XPCC__UART0_HPP
+#ifndef	XPCC_AVR__MATH_HPP
+#define	XPCC_AVR__MATH_HPP
 
-#include "uart.hpp"
+#include <stdint.h>
 
 namespace xpcc
 {
-	class Uart0 : public Uart
+	namespace avr
 	{
-	public:
-		static Uart0&
-		instance() {
-			static Uart0 uart;
-			return uart;
-		}
-		
-		virtual void
-		put(char c);
-		
-		using Uart::put;
-		
-		virtual bool
-		get(char& c);
-	
-	protected:
-		virtual void
-		setBaudrateRegister(uint16_t ubrr);
-		
-		Uart0() {};
-		
-		Uart0(const Uart0&);
-		
-		Uart0&
-		operator =(const Uart0 &);
-	};
+		/**
+		 * @ingroup	avr
+		 * @brief	Fast and short 32 bits sqrt routine
+		 * 
+		 * Quadratwurzel basierend auf einer Implementierung von Ruud v Gessel,
+		 * die zusammen mit avr-gcc verwendet werden kann. Je nach Algorithmus
+		 * wird das Ergebnis zum Nächsten gerundet oder abgerundet. Abrunden
+		 * ist dann angesagt, wenn die Wurzel aus einer großen Eingabe wie
+		 * 0xffffffff zu ziehen ist, da bei Aufrunden hier das Ergebnis
+		 * zu 0 überläuft.
+		 * 
+		 * Die Ausführungszeit ist maximal 310 Ticks (inclusive CALL+RET)
+		 * 
+		 * @see		http://www.mikrocontroller.net/articles/AVR_Arithmetik#avr-gcc_Implementierung_.2832_Bit.29
+		 * @see		http://members.chello.nl/j.beentjes3/Ruud/sqrt32avr.htm
+		 */
+		extern "C" uint16_t
+		sqrt32_round(uint32_t);
+
+		/**
+		 * @ingroup	avr
+		 */
+		extern "C" uint16_t
+		sqrt32_floor(uint32_t);
+
+		/**
+		 * @ingroup	avr
+		 * @brief	unsigned 16bit x 16bit = 32bit multiplication
+		 * 
+		 * @see		AVR201
+		 */
+		inline uint32_t
+		mul32(uint16_t a, uint16_t b);
+
+		/**
+		 * @ingroup	avr
+		 * @brief	signed 16bit x 16bit = 32bit multiplication
+		 * 
+		 * @see		AVR201
+		 */
+		inline int32_t
+		mul32(int16_t a, int16_t b);
+
+		/**
+		 * @ingroup	avr
+		 * @brief	Signed multiply accumulate of two 16bits numbers with
+		 * 			a 32bits result
+		 * 
+		 * @verbatim
+		 * result += a * b;
+		 * @endverbatim
+		 * 
+		 * @see		AVR201
+		 */
+		inline int32_t
+		mac32(int32_t result, int16_t a, int16_t b);
+	}
 }
 
-#endif // XPCC__UART0_HPP
+#include "math_impl.hpp"
+
+#endif	// XPCC_AVR__MATH_HPP

@@ -25,45 +25,29 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: uart3.hpp 69 2009-10-10 17:51:10Z dergraaf $
+ * $Id: newdelete.cpp 83 2009-10-15 19:58:57Z dergraaf $
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__UART3_HPP
-#define XPCC__UART3_HPP
+#include "../ram/allocator.hpp"
 
-#include "uart.hpp"
-
-namespace xpcc
-{
-	class Uart3 : public Uart
-	{
-	public:
-		static Uart3&
-		instance() {
-			static Uart3 uart;
-			return uart;
-		}
-		
-		virtual void
-		put(char c);
-		
-		using Uart::put;
-		
-		virtual bool
-		get(char& c);
-	
-	protected:
-		virtual void
-		setBaudrateRegister(uint16_t ubrr);
-		
-		Uart3() {};
-		
-		Uart3(const Uart3&);
-		
-		Uart3&
-		operator =(const Uart3 &);
-	};
+void *
+operator new(size_t size) {
+	return xpcc::avr::allocateMemory(size);
 }
 
-#endif // XPCC__UART3_HPP
+void *
+operator new[](size_t size) {
+	return xpcc::avr::allocateMemory(size);
+}
+
+void
+operator delete(void* ptr) {
+	xpcc::avr::freeMemory(ptr);
+}
+
+void
+operator delete[](void* ptr) {
+	xpcc::avr::freeMemory(ptr);
+}
+

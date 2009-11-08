@@ -32,8 +32,10 @@ class GlobalProperties:
 			target = properties.get('target', 'pc')
 		self.target = target
 		
-		if self.target == 'avr':
-			self.avr = self.AvrProperties(properties.get('avr', {}))
+		if self.target == 'atmega':
+			self.avr = self.AvrProperties(properties.get('atmega', {}))
+		elif self.target == 'atxmega':
+			self.avr = self.AvrProperties(properties.get('atxmega', {}))
 	
 	def getLocalProperties(self, path, target, tag):
 		try:

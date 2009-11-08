@@ -14,7 +14,6 @@ int main(void)
 	
 	sei();
 	
-	//uart.setBaudrate(UART_BAUD_SELECT(9600UL, F_CPU));
 	uart.setBaudrate(9600);
 	uart.put('a');
 	uart.put('\n');
