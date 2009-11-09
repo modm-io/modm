@@ -42,32 +42,45 @@ BoundedDequeTest::testForward()
 	TEST_ASSERT_TRUE(deque.isEmpty());
 	TEST_ASSERT_EQUALS(deque.getMaxSize(), 3);
 	
+	TEST_ASSERT_EQUALS(deque.getSize(), 0);
+	
 	TEST_ASSERT_TRUE(deque.pushBack(1));
+	TEST_ASSERT_EQUALS(deque.getSize(), 1);
 	TEST_ASSERT_TRUE(deque.pushBack(2));
+	TEST_ASSERT_EQUALS(deque.getSize(), 2);
 	TEST_ASSERT_TRUE(deque.pushBack(3));
+	TEST_ASSERT_EQUALS(deque.getSize(), 3);
 	
 	TEST_ASSERT_FALSE(deque.pushBack(4));
+	TEST_ASSERT_EQUALS(deque.getSize(), 3);
 	TEST_ASSERT_TRUE(deque.isFull());
 	
 	TEST_ASSERT_EQUALS(deque.front(), 1);
 	deque.popFront();
+	TEST_ASSERT_EQUALS(deque.getSize(), 2);
 	
 	TEST_ASSERT_EQUALS(deque.front(), 2);
 	deque.popFront();
+	TEST_ASSERT_EQUALS(deque.getSize(), 1);
 	
 	TEST_ASSERT_TRUE(deque.pushBack(4));
+	TEST_ASSERT_EQUALS(deque.getSize(), 2);
 	TEST_ASSERT_TRUE(deque.pushBack(5));
+	TEST_ASSERT_EQUALS(deque.getSize(), 3);
 	TEST_ASSERT_TRUE(deque.isFull());
 	
 	TEST_ASSERT_EQUALS(deque.front(), 3);
 	deque.popFront();
+	TEST_ASSERT_EQUALS(deque.getSize(), 2);
 	
 	TEST_ASSERT_EQUALS(deque.front(), 4);
 	deque.popFront();
+	TEST_ASSERT_EQUALS(deque.getSize(), 1);
 	
 	TEST_ASSERT_EQUALS(deque.front(), 5);
 	deque.popFront();
 	
+	TEST_ASSERT_EQUALS(deque.getSize(), 0);
 	TEST_ASSERT_TRUE(deque.isEmpty());
 }
 
@@ -110,9 +123,16 @@ BoundedDequeTest::testBoth()
 {
 	xpcc::BoundedDeque<uint16_t, 3> deque;
 	
+	TEST_ASSERT_EQUALS(deque.getSize(), 0);
+	
 	TEST_ASSERT_TRUE(deque.pushFront(12));
+	TEST_ASSERT_EQUALS(deque.getSize(), 1);
+	
 	TEST_ASSERT_TRUE(deque.pushFront(11));
+	TEST_ASSERT_EQUALS(deque.getSize(), 2);
+	
 	TEST_ASSERT_TRUE(deque.pushFront(10));
+	TEST_ASSERT_EQUALS(deque.getSize(), 3);
 	
 	TEST_ASSERT_EQUALS(deque.front(), 10);
 	deque.popFront();
@@ -135,3 +155,56 @@ BoundedDequeTest::testBoth()
 	
 	TEST_ASSERT_TRUE(deque.isEmpty());
 }
+
+void
+BoundedDequeTest::testClear()
+{
+	xpcc::BoundedDeque<uint32_t, 3> deque;
+	
+	TEST_ASSERT_EQUALS(deque.getSize(), 0);
+	
+	TEST_ASSERT_TRUE(deque.pushFront(12));
+	TEST_ASSERT_EQUALS(deque.getSize(), 1);
+	
+	TEST_ASSERT_TRUE(deque.pushFront(11));
+	TEST_ASSERT_EQUALS(deque.getSize(), 2);
+	
+	TEST_ASSERT_TRUE(deque.pushFront(10));
+	TEST_ASSERT_EQUALS(deque.getSize(), 3);
+	
+	deque.clear();
+	
+	TEST_ASSERT_EQUALS(deque.getSize(), 0);
+	TEST_ASSERT_TRUE(deque.isEmpty());
+	
+	TEST_ASSERT_TRUE(deque.pushFront(12));
+	TEST_ASSERT_EQUALS(deque.getSize(), 1);
+	
+	TEST_ASSERT_TRUE(deque.pushFront(11));
+	TEST_ASSERT_EQUALS(deque.getSize(), 2);
+	
+	TEST_ASSERT_TRUE(deque.pushFront(10));
+	TEST_ASSERT_EQUALS(deque.getSize(), 3);
+	
+	TEST_ASSERT_EQUALS(deque.front(), 10);
+	deque.popFront();
+	
+	TEST_ASSERT_EQUALS(deque.front(), 11);
+	deque.popFront();
+	
+	TEST_ASSERT_TRUE(deque.pushBack(13));
+	TEST_ASSERT_TRUE(deque.pushBack(14));
+	TEST_ASSERT_TRUE(deque.isFull());
+	
+	TEST_ASSERT_EQUALS(deque.back(), 14);
+	deque.popBack();
+	
+	TEST_ASSERT_EQUALS(deque.front(), 12);
+	deque.popFront();
+	
+	TEST_ASSERT_EQUALS(deque.back(), 13);
+	deque.popBack();
+	
+	TEST_ASSERT_TRUE(deque.isEmpty());
+}
+

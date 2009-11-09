@@ -35,139 +35,147 @@
 #endif
 
 // ----------------------------------------------------------------------------
+
 template<typename T, int N, typename S>
-bool
-xpcc::BoundedDeque<T, N, S>::isEmpty() const {
-	return (head == tail);
+xpcc::BoundedDeque<T, N, S>::BoundedDeque() : 
+	head(0), tail(1), size(0)
+{
 }
 
 // ----------------------------------------------------------------------------
+
+template<typename T, int N, typename S>
+bool
+xpcc::BoundedDeque<T, N, S>::isEmpty() const
+{
+	return (size == 0);
+}
+
 template<typename T, int N, typename S>
 bool
 xpcc::BoundedDeque<T, N, S>::isFull() const
 {
-	S tmphead = head + 1;
-	if (tmphead >= (N + 1)) {
-		tmphead = 0;
-	}
-	return (tmphead == tail);
+	return (size == N);
 }
 
-// ----------------------------------------------------------------------------
-/*template<typename T, int N, typename S>
-SizeType
-xpcc::BoundedDeque<T, N, S>::getSize() const {
-	return ;
-}*/
-
-// ----------------------------------------------------------------------------
 template<typename T, int N, typename S>
 S
-xpcc::BoundedDeque<T, N, S>::getMaxSize() const {
+xpcc::BoundedDeque<T, N, S>::getSize() const
+{
+	return size;
+}
+
+template<typename T, int N, typename S>
+S
+xpcc::BoundedDeque<T, N, S>::getMaxSize() const
+{
 	return N;
 }
 
 // ----------------------------------------------------------------------------
+
+template<typename T, int N, typename S>
+void
+xpcc::BoundedDeque<T, N, S>::clear()
+{
+	head = 0;
+	tail = 1;
+	size = 0;
+}
+
+// ----------------------------------------------------------------------------
+
 template<typename T, int N, typename S>
 T&
-xpcc::BoundedDeque<T, N, S>::front() {
+xpcc::BoundedDeque<T, N, S>::front()
+{
+	return buffer[tail];
+}
+
+
+template<typename T, int N, typename S>
+const T&
+xpcc::BoundedDeque<T, N, S>::front() const
+{
 	return buffer[tail];
 }
 
 // ----------------------------------------------------------------------------
-template<typename T, int N, typename S>
-const T&
-xpcc::BoundedDeque<T, N, S>::front() const {
-	return buffer[tail];
-}
 
-// ----------------------------------------------------------------------------
 template<typename T, int N, typename S>
 T&
-xpcc::BoundedDeque<T, N, S>::back() {
-	S tmphead = head - 1;
-	if (tmphead >= (N + 1)) {
-		tmphead = (N + 1) - 1;
-	}
-	return buffer[tmphead];
+xpcc::BoundedDeque<T, N, S>::back()
+{
+	return buffer[head];
 }
 
-// ----------------------------------------------------------------------------
 template<typename T, int N, typename S>
 const T&
-xpcc::BoundedDeque<T, N, S>::back() const {
-	S tmphead = head - 1;
-	if (tmphead >= (N + 1)) {
-		tmphead = (N + 1) - 1;
-	}
-	return buffer[tmphead];
+xpcc::BoundedDeque<T, N, S>::back() const
+{
+	return buffer[head];
 }
 
-
 // ----------------------------------------------------------------------------
+
 template<typename T, int N, typename S>
 bool
-xpcc::BoundedDeque<T, N, S>::pushBack(const T& value) {
-	// calculate the new buffer index
-	S tmphead = head + 1;
-	if (tmphead >= (N + 1)) {
-		tmphead = 0;
-	}
-	
-	// check if there is enough space left
-	if (tmphead == tail) {
+xpcc::BoundedDeque<T, N, S>::pushBack(const T& value)
+{
+	if (this->isFull()) {
 		return false;
 	}
 	
-	// save data and store new buffer index
+	head++;
+	if (head >= N) {
+		head = 0;
+	}
+	
 	buffer[head] = value;
-	head = tmphead;
-	
+	size++;
 	return true;
 }
 
+template<typename T, int N, typename S>
+void
+xpcc::BoundedDeque<T, N, S>::popBack()
+{
+	head--;
+	if (head >= N)	// handle unsigned underflow
+	{
+		head = N - 1;
+	}
+	size--;
+}
+
 // ----------------------------------------------------------------------------
+
 template<typename T, int N, typename S>
 bool
-xpcc::BoundedDeque<T, N, S>::pushFront(const T& value) {
-	// calculate the new buffer index
-	S tmptail = tail - 1;
-	if (tmptail >= (N + 1)) {
-		tmptail = (N + 1) - 1;
-	}
-	
-	// check if there is enough space left
-	if (tmptail == head) {
+xpcc::BoundedDeque<T, N, S>::pushFront(const T& value)
+{
+	if (this->isFull()) {
 		return false;
 	}
 	
-	// save data and store new buffer index
-	buffer[tmptail] = value;
-	tail = tmptail;
+	tail--;
+	if (tail >= N)	// handle unsigned underflow
+	{
+		tail = N - 1;
+	}
 	
+	buffer[tail] = value;
+	size++;
 	return true;
 }
 
-// ----------------------------------------------------------------------------
 template<typename T, int N, typename S>
 void
-xpcc::BoundedDeque<T, N, S>::popBack() {
-	// calculate and store buffer index
-	S tmphead = head - 1;
-	if (tmphead >= (N + 1)) {
-		tmphead = (N + 1) - 1;
+xpcc::BoundedDeque<T, N, S>::popFront()
+{
+	tail++;
+	if (tail >= N) {
+		tail = 0;
 	}
-	head = tmphead;
-}
-
-// ----------------------------------------------------------------------------
-template<typename T, int N, typename S>
-void
-xpcc::BoundedDeque<T, N, S>::popFront() {
-	// calculate and store buffer index
-	S tmptail = tail + 1;
-	if (tmptail >= (N + 1)) {
-		tmptail = 0;
-	}
-	tail = tmptail;
+	size--;
 }

@@ -44,10 +44,10 @@ namespace xpcc
 	 * Internally organised as a ring buffer.
 	 * 
 	 * @verbatim
-	 *              tail --\                        /-- head
-	 *                     |                        |
+	 *              tail --\                 /-- head
+	 *                     |                 |
 	 *           +------+------+---- ----+------+------+
-	 *           |      | data |   ...   | data |      |
+	 *         0 |      | data |   ...   | data |      | N-1
 	 *           +------+------+---- ----+------+------+
 	 *              |      |                 |      |
 	 * push_front --/      |                 |      \-- push_back
@@ -57,25 +57,22 @@ namespace xpcc
 	 * 
 	 * @tparam	T	Type of the elements
 	 * @tparam	N	Size of the queue
-	 * @tparam	S	Type of status variables (use uint8_t for N < 255 (default),
-	 * 				otherwise uint16_t)
+	 * @tparam	S	Type of status variables (use uint_fast8_t for N < 255 
+	 * 				(default value) otherwise uint_fast16_t)
 	 * 
 	 * @warning		This class don't check if the container is not empty before
 	 * 				a pop operation. You have to do this by yourself!
-	 * 
-	 * @todo	Replace N+1 with N and find a better mechanism than reserving
-	 * 			a unused place inside the buffer.
-	 * @todo	Implement the getSize() method
 	 */
 	template<typename T,
 			 int N,
-			 typename S=uint8_t>
+			 typename S=uint_fast8_t>
 	class BoundedDeque
 	{
 	public:
 		typedef S SizeType;
-		
-		BoundedDeque() : head(0), tail(0) {}
+	
+	public:
+		BoundedDeque();
 		
 		bool
 		isEmpty() const;
@@ -83,16 +80,17 @@ namespace xpcc
 		bool
 		isFull() const;
 		
-		// TODO
-		//size_type
-		//getSize() const;
+		SizeType
+		getSize() const;
 		
 		SizeType
 		getMaxSize() const;
 		
-		// TODO
-		//void
-		//clear();
+		/// @brief		Clear the container
+		///
+		/// @warning	This will discard all the items in the container
+		void
+		clear();
 		
 		
 		T&
@@ -123,8 +121,9 @@ namespace xpcc
 	private:
 		S head;
 		S tail;
+		SizeType size;
 		
-		T buffer[N + 1];
+		T buffer[N];
 	};
 }
 

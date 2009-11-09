@@ -43,4 +43,7 @@ public:
 	
 	void
 	testBoth();
+	
+	void
+	testClear();
 };
