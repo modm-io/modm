@@ -79,16 +79,32 @@ namespace xpcc
 			return c.getMaxSize();
 		}
 		
+		/// @brief	Access next element
 		T&
-		get()
+		front()
 		{
 			return c.front();
 		}
 		
+		/// @brief	Access next element
 		const T&
-		get() const
+		front() const
 		{
 			return c.front();
+		}
+		
+		/// @brief	Access last element
+		T&
+		back()
+		{
+			return c.back();
+		}
+		
+		/// @brief	Access last element
+		const T&
+		back() const
+		{
+			return c.back();
 		}
 		
 		bool

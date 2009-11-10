@@ -159,17 +159,12 @@ BoundedDequeTest::testBoth()
 void
 BoundedDequeTest::testClear()
 {
-	xpcc::BoundedDeque<uint32_t, 3> deque;
+	xpcc::BoundedDeque<uint16_t, 3> deque;
 	
-	TEST_ASSERT_EQUALS(deque.getSize(), 0);
+	deque.pushFront(12);
+	deque.pushFront(11);
+	deque.pushFront(10);
 	
-	TEST_ASSERT_TRUE(deque.pushFront(12));
-	TEST_ASSERT_EQUALS(deque.getSize(), 1);
-	
-	TEST_ASSERT_TRUE(deque.pushFront(11));
-	TEST_ASSERT_EQUALS(deque.getSize(), 2);
-	
-	TEST_ASSERT_TRUE(deque.pushFront(10));
 	TEST_ASSERT_EQUALS(deque.getSize(), 3);
 	
 	deque.clear();
@@ -177,13 +172,9 @@ BoundedDequeTest::testClear()
 	TEST_ASSERT_EQUALS(deque.getSize(), 0);
 	TEST_ASSERT_TRUE(deque.isEmpty());
 	
-	TEST_ASSERT_TRUE(deque.pushFront(12));
-	TEST_ASSERT_EQUALS(deque.getSize(), 1);
-	
-	TEST_ASSERT_TRUE(deque.pushFront(11));
-	TEST_ASSERT_EQUALS(deque.getSize(), 2);
-	
-	TEST_ASSERT_TRUE(deque.pushFront(10));
+	deque.pushFront(12);
+	deque.pushFront(11);
+	deque.pushFront(10);
 	TEST_ASSERT_EQUALS(deque.getSize(), 3);
 	
 	TEST_ASSERT_EQUALS(deque.front(), 10);
@@ -192,8 +183,8 @@ BoundedDequeTest::testClear()
 	TEST_ASSERT_EQUALS(deque.front(), 11);
 	deque.popFront();
 	
-	TEST_ASSERT_TRUE(deque.pushBack(13));
-	TEST_ASSERT_TRUE(deque.pushBack(14));
+	deque.pushBack(13);
+	deque.pushBack(14);
 	TEST_ASSERT_TRUE(deque.isFull());
 	
 	TEST_ASSERT_EQUALS(deque.back(), 14);
@@ -208,3 +199,34 @@ BoundedDequeTest::testClear()
 	TEST_ASSERT_TRUE(deque.isEmpty());
 }
 
+void
+BoundedDequeTest::testConstIterator()
+{
+	xpcc::BoundedDeque<uint16_t, 5> deque;
+	
+	deque.pushBack(3);
+	deque.pushBack(4);
+	deque.pushFront(2);
+	deque.pushFront(1);
+	
+	xpcc::BoundedDeque<uint16_t, 5>::const_iterator it;
+	it = deque.begin();
+	
+	TEST_ASSERT_TRUE(it != deque.end());
+	TEST_ASSERT_EQUALS(*it, 1);
+	++it;
+	
+	TEST_ASSERT_TRUE(it != deque.end());
+	TEST_ASSERT_EQUALS(*it, 2);
+	++it;
+	
+	TEST_ASSERT_TRUE(it != deque.end());
+	TEST_ASSERT_EQUALS(*it, 3);
+	++it;
+	
+	TEST_ASSERT_TRUE(it != deque.end());
+	TEST_ASSERT_EQUALS(*it, 4);
+	++it;
+	
+	TEST_ASSERT_FALSE(it != deque.end());
+}

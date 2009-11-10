@@ -74,16 +74,16 @@ namespace xpcc
 	public:
 		BoundedDeque();
 		
-		bool
+		inline bool
 		isEmpty() const;
 		
-		bool
+		inline bool
 		isFull() const;
 		
-		SizeType
+		inline SizeType
 		getSize() const;
 		
-		SizeType
+		inline SizeType
 		getMaxSize() const;
 		
 		/// @brief		Clear the container
@@ -93,16 +93,16 @@ namespace xpcc
 		clear();
 		
 		
-		T&
+		inline T&
 		front();
 		
-		const T&
+		inline const T&
 		front() const;
 		
-		T&
+		inline T&
 		back();
 		
-		const T&
+		inline const T&
 		back() const;
 		
 		
@@ -118,6 +118,40 @@ namespace xpcc
 		void
 		popFront();
 	
+	public:
+		friend class const_iterator;
+		
+		/// @brief	Bidirectional const iterator
+		///
+		/// @todo	check if a simpler implementation is possible
+		class const_iterator
+		{
+			friend class BoundedDeque;
+		public:
+			const_iterator();
+			const_iterator(const const_iterator& other);
+			
+			const_iterator& operator = (const const_iterator& other);
+			const_iterator& operator ++ ();
+			const_iterator& operator -- ();
+			bool operator == (const const_iterator& other) const;
+			bool operator != (const const_iterator& other) const;
+			const T& operator * () const;
+			const T* operator -> () const;
+		
+		private:
+			S index;
+			const BoundedDeque * parent;
+			
+			S count;
+		};
+		
+		const_iterator
+		begin() const;
+		
+		const_iterator
+		end() const;
+		
 	private:
 		S head;
 		S tail;

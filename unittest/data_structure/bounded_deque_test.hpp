@@ -46,4 +46,7 @@ public:
 	
 	void
 	testClear();
+	
+	void
+	testConstIterator();
 };

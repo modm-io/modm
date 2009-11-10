@@ -52,29 +52,29 @@ BoundedQueueTest::testQueue()
 	TEST_ASSERT_FALSE(queue.push(6));
 	TEST_ASSERT_TRUE(queue.isFull());
 	
-	TEST_ASSERT_EQUALS(queue.get(), 1);
+	TEST_ASSERT_EQUALS(queue.front(), 1);
 	queue.pop();
 	
-	TEST_ASSERT_EQUALS(queue.get(), 2);
+	TEST_ASSERT_EQUALS(queue.front(), 2);
 	queue.pop();
 	
 	TEST_ASSERT_TRUE(queue.push(6));
 	TEST_ASSERT_TRUE(queue.push(7));
 	TEST_ASSERT_TRUE(queue.isFull());
 	
-	TEST_ASSERT_EQUALS(queue.get(), 3);
+	TEST_ASSERT_EQUALS(queue.front(), 3);
 	queue.pop();
 	
-	TEST_ASSERT_EQUALS(queue.get(), 4);
+	TEST_ASSERT_EQUALS(queue.front(), 4);
 	queue.pop();
 	
-	TEST_ASSERT_EQUALS(queue.get(), 5);
+	TEST_ASSERT_EQUALS(queue.front(), 5);
 	queue.pop();
 	
-	TEST_ASSERT_EQUALS(queue.get(), 6);
+	TEST_ASSERT_EQUALS(queue.front(), 6);
 	queue.pop();
 	
-	TEST_ASSERT_EQUALS(queue.get(), 7);
+	TEST_ASSERT_EQUALS(queue.front(), 7);
 	queue.pop();
 	
 	TEST_ASSERT_TRUE(queue.isEmpty());

@@ -140,10 +140,11 @@ template<typename T, int N, typename S>
 void
 xpcc::BoundedDeque<T, N, S>::popBack()
 {
-	head--;
-	if (head >= N)	// handle unsigned underflow
-	{
+	if (head == 0) {
 		head = N - 1;
+	}
+	else {
+		head--;
 	}
 	size--;
 }
@@ -158,10 +159,11 @@ xpcc::BoundedDeque<T, N, S>::pushFront(const T& value)
 		return false;
 	}
 	
-	tail--;
-	if (tail >= N)	// handle unsigned underflow
-	{
+	if (tail == 0) {
 		tail = N - 1;
+	}
+	else {
+		tail--;
 	}
 	
 	buffer[tail] = value;
@@ -178,4 +180,119 @@ xpcc::BoundedDeque<T, N, S>::popFront()
 		tail = 0;
 	}
 	size--;
+}
+
+// ----------------------------------------------------------------------------
+
+template<typename T, int N, typename S>
+xpcc::BoundedDeque<T, N, S>::const_iterator::const_iterator() :
+	index(0), parent(0), count(0)
+{
+}
+
+template<typename T, int N, typename S>
+xpcc::BoundedDeque<T, N, S>::const_iterator::const_iterator(const const_iterator& other) :
+	index(other.index), parent(other.parent), count(other.count)
+{
+}
+
+template<typename T, int N, typename S>
+typename xpcc::BoundedDeque<T, N, S>::const_iterator&
+xpcc::BoundedDeque<T, N, S>::const_iterator::operator = (const const_iterator& other)
+{
+	index = other.index;
+	count = other.count;
+	parent = other.parent;
+	
+	return *this;
+}
+
+template<typename T, int N, typename S>
+typename xpcc::BoundedDeque<T, N, S>::const_iterator&
+xpcc::BoundedDeque<T, N, S>::const_iterator::operator ++ ()
+{
+	count++;
+	if (count >= parent->size) {
+		index = N;
+	}
+	else {
+		index++;
+		if (index >= N) {
+			index = 0;
+		}
+	}
+	return *this;
+}
+
+template<typename T, int N, typename S>
+typename xpcc::BoundedDeque<T, N, S>::const_iterator&
+xpcc::BoundedDeque<T, N, S>::const_iterator::operator -- ()
+{
+	if (count == 0) {
+		index = N;
+	}
+	else {
+		count--;
+		if (index == 0)	{
+			index = N - 1;
+		}
+		else {
+			index--;
+		}
+	}
+	return *this;
+}
+
+template<typename T, int N, typename S>
+bool
+xpcc::BoundedDeque<T, N, S>::const_iterator::operator == (const const_iterator& other) const
+{
+	return (index == other.index);
+}
+
+template<typename T, int N, typename S>
+bool
+xpcc::BoundedDeque<T, N, S>::const_iterator::operator != (const const_iterator& other) const
+{
+	return (index != other.index);
+}
+
+template<typename T, int N, typename S>
+const T&
+xpcc::BoundedDeque<T, N, S>::const_iterator::operator * () const
+{
+	return parent->buffer[index];
+}
+
+template<typename T, int N, typename S>
+const T*
+xpcc::BoundedDeque<T, N, S>::const_iterator::operator -> () const
+{
+	return &parent->buffer[index];
+}
+
+// ----------------------------------------------------------------------------
+
+template<typename T, int N, typename S>
+typename xpcc::BoundedDeque<T, N, S>::const_iterator
+xpcc::BoundedDeque<T, N, S>::begin() const
+{
+	const_iterator it;
+	
+	it.index = tail;
+	it.parent = this;
+	
+	return it;
+}
+
+template<typename T, int N, typename S>
+typename xpcc::BoundedDeque<T, N, S>::const_iterator
+xpcc::BoundedDeque<T, N, S>::end() const
+{
+	const_iterator it;
+	
+	it.index = N;
+	it.parent = this;
+	
+	return it;
 }
