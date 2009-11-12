@@ -4,7 +4,8 @@
 target: pc
 
 atmega:
-  device: atmega2560
+#  device: atmega2560
+  device: atmega644
   clock: 14745600
   avrdude:
     programmer: stk500

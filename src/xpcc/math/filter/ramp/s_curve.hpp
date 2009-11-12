@@ -30,32 +30,39 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__SECOND_DERIVATION_RAMP_HPP
-#define XPCC__SECOND_DERIVATION_RAMP_HPP
+#ifndef XPCC__S_CURVE_HPP
+#define XPCC__S_CURVE_HPP
 
 namespace xpcc
 {
-	/// @ingroup	filter
-	/// @brief		Generates a S-curve
-	/// 
-	/// @todo	documentation
+	/**
+	 * @ingroup	filter
+	 * @headerfile <xpcc/math/filter/ramp/s_curve.hpp>
+	 * @brief	Trapezoidal S-Curve Trajectory
+	 * 
+	 * @todo	documentation
+	 * @todo	implementation
+	 */
 	template<typename T>
-	class SecondDerivationRamp
+	class SCurve
 	{
 	public:
+		SCurve();
+		
 		void
 		update(const T& target);
 		
 		const T&
-		getValue() const {
-			return currentValue;
+		getValue() const
+		{
+			return value;
 		}
 	
 	private:
-		T currentValue;
+		T value;
 	};
 }
 
-#include "second_derivation_ramp_impl.hpp"
+#include "s_curve_impl.hpp"
 
-#endif // XPCC__SECOND_DERIVATION_RAMP_HPP
+#endif // XPCC__S_CURVE_HPP

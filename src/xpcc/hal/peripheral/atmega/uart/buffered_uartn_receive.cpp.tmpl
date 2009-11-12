@@ -39,6 +39,9 @@
 #include "uart_defines.h"
 #include "uart_defaults.h"
 
+{% if id != 0 -%}
+#ifdef ATMEGA_USART{{ id }}
+{%- endif %}
 #include "buffered_uart{{ id }}.hpp"
 
 static xpcc::atomic::Queue<char, UART{{ id }}_RX_BUFFER_SIZE> rxBuffer;
@@ -151,4 +154,8 @@ xpcc::BufferedUart{{ id }}::get(char& c)
 		return true;
 	}
 }
+
+{% if id != 0 -%}
+#endif
+{%- endif %}
 

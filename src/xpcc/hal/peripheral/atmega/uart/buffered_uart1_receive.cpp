@@ -34,10 +34,9 @@
  * Please modify the corresponding *.tmpl file instead and re-run the
  * script 'generate.py'.
  *
- * Generated 10 Nov 2009, 12:43:59
+ * Generated 12 Nov 2009, 14:35:16
  */
 // ----------------------------------------------------------------------------
-
 
 #include <avr/io.h>
 #include <avr/interrupt.h>
@@ -47,6 +46,7 @@
 #include "uart_defines.h"
 #include "uart_defaults.h"
 
+#ifdef ATMEGA_USART1
 #include "buffered_uart1.hpp"
 
 static xpcc::atomic::Queue<char, UART1_RX_BUFFER_SIZE> rxBuffer;
@@ -115,3 +115,5 @@ xpcc::BufferedUart1::get(char& c)
 		return true;
 	}
 }
+
+#endif

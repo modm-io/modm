@@ -42,11 +42,14 @@ from SCons.Script import *
 # elf -> lss		ok
 
 # -----------------------------------------------------------------------------
+
 def show_size(env, source):
-	return [env.Command(None,
-						source,
-						Action("$SIZE --mcu=$AVR_DEVICE --format=avr $SOURCE", 
-								cmdstr="$SIZECOMSTR"))]
+	return [Action("$SIZE --mcu=$AVR_DEVICE --format=avr $SOURCE", 
+					cmdstr="$SIZECOMSTR")]
+
+def list_symbols(env, source):
+	return [Action("avr-nm $SOURCE -S -C --size-sort -td",
+					cmdstr="$SYMBOLSCOMSTR")]
 
 # -----------------------------------------------------------------------------
 def generate(env, **kw):
@@ -81,11 +84,12 @@ def generate(env, **kw):
 		env['ARCOMSTR'] = "Create Library: $TARGET"
 		
 		env['SIZECOMSTR'] = "Size after:"
+		env['SYMBOLSCOMSTR'] = "Show symbols for '$SOURCE':"
 		env['HEXCOMSTR'] = "Creating load file for Flash: $TARGET"
 		env['LSSCOMSTR'] = "Creating Extended Listing: $TARGET"
 	
 	# C flags
-	env['CFLAGS'] = ' '.join([
+	env['CFLAGS'] = " ".join([
 		"-std=gnu99",
 		"-Wstrict-prototypes",
 		"-fpack-struct", 		# TODO
@@ -109,7 +113,7 @@ def generate(env, **kw):
 	
 	# C++ flags
 	env['CXXFILESUFFIX'] = ".cpp"
-	env['CXXFLAGS'] = ' '.join([
+	env['CXXFLAGS'] = " ".join([
 		"-std=gnu++98",
 		"-fno-exceptions", 
 		"-fno-rtti",
@@ -143,6 +147,8 @@ def generate(env, **kw):
 	env.Append(CPPDEFINES = {'F_CPU' : clock})
 	
 	env.AddMethod(show_size, 'Size')
+	env.AddMethod(list_symbols, 'Symbols')
+	
 	builder_hex = Builder(action=Action("$OBJCOPY -O ihex -R .eeprom $SOURCE $TARGET",
 											cmdstr="$HEXCOMSTR"), 
 								suffix=".hex", 

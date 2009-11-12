@@ -13,8 +13,8 @@ generation = """/*
  *
  * Generated %s
  */
-// ----------------------------------------------------------------------------
-""" % time.strftime("%d %b %Y, %H:%M:%S", time.localtime())
+// ----------------------------------------------------------------------------""" \
+	% time.strftime("%d %b %Y, %H:%M:%S", time.localtime())
 
 env = jinja2.Environment(loader=jinja2.FileSystemLoader(os.getcwd()))
 

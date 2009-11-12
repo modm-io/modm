@@ -40,6 +40,9 @@
 #include "uart_defines.h"
 #include "uart_defaults.h"
 
+{% if id != 0 -%}
+#ifdef ATMEGA_USART{{ id }}
+{%- endif %}
 #include "buffered_uart{{ id }}.hpp"
 
 static xpcc::atomic::Queue<char, UART{{ id }}_TX_BUFFER_SIZE> txBuffer;
@@ -74,4 +77,8 @@ xpcc::BufferedUart{{ id }}::put(char c)
 	// enable UDRE interrupt
 	UART{{ id }}_CONTROL |= (1 << UART{{ id }}_UDRIE);
 }
+
+{% if id != 0 -%}
+#endif
+{%- endif %}
 

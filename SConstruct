@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # 
 # Copyright (c) 2009, Roboterclub Aachen e.V.
 # All rights reserved.
@@ -33,6 +34,12 @@ sys.path.append('misc/python')
 
 from scons.build_properties import PropertyParser, PropertyException
 
+def PhonyTargets(env = None, **kw):
+	if not env:
+		env = DefaultEnvironment()
+	for target,action in kw.items():
+		env.AlwaysBuild(env.Alias(target, [], action))
+
 # -----------------------------------------------------------------------------
 # create a new commandline-option to specify a property-file
 
@@ -60,11 +67,15 @@ if build.target == 'atmega' or build.target == 'atxmega':
 			AVRDUDE = build.avr.avrdude,
 			AVR_DEVICE = build.avr.device,
 			AVR_CLOCK = build.avr.clock,
-			tools = ['avr', 'doxygen', 'template'],
+			tools = ['avr', 'avrdude', 'doxygen', 'template'],
 			toolpath = ['misc/python/scons/'],
 			LIBS=[''],
 			LIBPATH=[])
-
+	
+	# set values for avrdude (only if available)
+	env['AVRDUDE_PROGRAMMER'] = build.avr.avrdude.get('programmer', 'stk500')
+	env['AVRDUDE_PORT'] = build.avr.avrdude.get('port', '/dev/ttyUSB0')
+	
 elif build.target == 'pc':
 	env = Environment(
 			ARCHITECTURE = 'pc',
@@ -121,6 +132,53 @@ unittest = env.Alias('unittest', 'build/unittest')
 
 env.Doxygen('doc/doxyfile')
 env.Alias('doc', 'apidoc/html')
+
+# -----------------------------------------------------------------------------
+# other stuff
+
+programFile = ARGUMENTS.get('program', None)
+if programFile:
+	if env['ARCHITECTURE'] != 'avr':
+		print "ERROR: The 'program' target is no available for any non AVR architectures!"
+		Exit(0)
+	
+	# make sure that that the file we want to program is build
+	env.Alias("program_target", programFile)
+	
+	# make sure that 'avrdude' is executed
+	PhonyTargets(env, program_target = env.ProgramFlash(programFile))
+	
+	# build our dummy target
+	BUILD_TARGETS.append("program_target")
+
+# show the size of a file
+fileSize = ARGUMENTS.get('size', None)
+if fileSize:
+	# make sure that that the file we want to program is build
+	env.Alias("size_target", fileSize)
+	
+	# make sure that 'avrdude' is executed
+	PhonyTargets(env, size_target = env.Size(fileSize))
+	
+	# build our dummy target
+	BUILD_TARGETS.append("size_target")
+
+# show the symbols in a object-file
+symbolsFile = ARGUMENTS.get('symbols', None)
+if symbolsFile:
+	# make sure that that the file we want to program is build
+	env.Alias("symbols_target", symbolsFile)
+	
+	# make sure that 'avrdude' is executed
+	PhonyTargets(env, symbols_target = env.Symbols(symbolsFile))
+	
+	# build our dummy target
+	BUILD_TARGETS.append("symbols_target")
+
+# set fusebits
+#PhonyTargets(env, fuse = env.ProgramFuses())
+
+# -----------------------------------------------------------------------------
 
 env.Alias('all', [lib, tests, unittest])
 env.Default('lib')

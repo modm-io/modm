@@ -42,18 +42,21 @@ namespace xpcc
 	/**
 	 * @ingroup		hal
 	 * @headerfile	<xpcc/hal/peripheral/atmega/uart/uart_device.hpp>
-	 * @brief		Wrapper to use any Uart as IODevice
+	 * @brief		Wrapper to use any Uart as an IODevice
 	 * 
-	 * Universal asyncronous receiver and transmitter
-	 * 
-	 * @tparam		T	Uart which should be used
+	 * @tparam		T	Uart which should be wrapped
 	 */
 	template<typename T>
 	class UartDevice : public IODevice
 	{
 	public:
+		/// @brief	Constructor
+		///
+		/// @param	uart	configured uart object
 		UartDevice(const T& uart)
 		{
+			// get rid of the warning about an unused paramter
+			(void) uart;
 		}
 		
 		virtual inline void

@@ -35,10 +35,13 @@
 
 namespace xpcc
 {
-	/// @ingroup	filter
-	/// @brief		Ramp
-	/// 
-	/// @todo	documentation
+	/**
+	 * @ingroup	filter
+	 * @headerfile <xpcc/math/filter/ramp/ramp.hpp>
+	 * @brief	Ramp
+	 * 
+	 * @todo	documentation
+	 */
 	template<typename T>
 	class Ramp
 	{
@@ -51,12 +54,13 @@ namespace xpcc
 		update(const T& target);
 		
 		const T&
-		getValue() const {
-			return currentValue;
+		getValue() const
+		{
+			return value;
 		}
 	
 	private:
-		T currentValue;
+		T value;
 		T positiveIncrement;
 		T negativeIncrement;
 	};

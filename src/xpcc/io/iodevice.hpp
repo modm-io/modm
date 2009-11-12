@@ -36,11 +36,10 @@
 namespace xpcc
 {
 	/**
-	 * @class 	IODevice
+	 * @headerfile	<xpcc/io/iodevice.hpp>
+	 * @ingroup io
 	 * @brief 	Abstract calls of io-devices
 	 *
-	 * @ingroup io
-	 * @version	$Id: iodevice.hpp 61 2009-09-26 18:50:57Z dergraaf $
 	 * @author	Martin Rosekeit <martin.rosekeit@rwth-aachen.de>
 	 */
 	class IODevice {

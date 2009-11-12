@@ -30,32 +30,21 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__FIRST_DERIVATION_RAMP_HPP
-#define XPCC__FIRST_DERIVATION_RAMP_HPP
+#ifndef XPCC__S_CURVE_HPP
+	#error	"Don't include this file directly, use 's_curve.hpp' instead!"
+#endif
 
-namespace xpcc
+// ----------------------------------------------------------------------------
+
+template<typename T>
+xpcc::SCurve<T>::SCurve()
 {
-	/// @ingroup	filter
-	/// @brief		Generates a S-curve
-	/// 
-	/// @todo	documentation
-	template<typename T>
-	class FirstDerivationRamp
-	{
-	public:
-		void
-		update(const T& target);
-		
-		const T&
-		getValue() const {
-			return currentValue;
-		}
-	
-	private:
-		T currentValue;
-	};
 }
 
-#include "first_derivation_ramp.hpp"
+// ----------------------------------------------------------------------------
 
-#endif // XPCC__FIRST_DERIVATION_RAMP_HPP
+template<typename T>
+void
+xpcc::SCurve<T>::update(const T& target)
+{
+}

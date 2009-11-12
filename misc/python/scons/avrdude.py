@@ -5,6 +5,7 @@
 # 
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
+# 
 #     * Redistributions of source code must retain the above copyright
 #       notice, this list of conditions and the following disclaimer.
 #     * Redistributions in binary form must reproduce the above copyright
@@ -31,29 +32,26 @@ import os
 
 from SCons.Script import *
 
-def avrdude_flash(env):
-	return [Action("avrdude", 
-						cmdstr="$FLASHCOMSTR")]
+# -----------------------------------------------------------------------------
+
+def avrdude_flash(env, source):
+	return [Action("avrdude -p $AVR_DEVICE -c $AVRDUDE_PROGRAMMER -P $AVRDUDE_PORT -U flash:w:$SOURCE", 
+					cmdstr="$FLASHCOMSTR")]
 
 def avrdude_fuse(env):
-	return [Action("avrdude", 
-						cmdstr="$FUSECOMSTR")]
+	return [Action("avrdude -p $AVR_DEVICE -c $AVRDUDE_PROGRAMMER -P $AVRDUDE_PORT -u -U efuse:w:0xff:m", 
+					cmdstr="$FUSECOMSTR")]
 
 # -----------------------------------------------------------------------------
+
 def generate(env, **kw):
-	# used tools
-	env['AVRDUDE'] = "avrdude"
-	
 	# build messages
-	if ARGUMENTS.get('verbose') != '1':
-		env['FLASHCOMSTR'] = "program"
-		env['FUSECOMSTR'] = "set fuse"
+	#if ARGUMENTS.get('verbose') != '1':
+	#	env['FLASHCOMSTR'] = "Program: $SOURCE"
+	#	env['FUSECOMSTR'] = "Set Fuses"
 	
-	flash = env.AddMethod(avrdude_flash, 'Flash')
-	fuse = env.AddMethod(avrdude_fuse, 'Fuse')
-	
-	env.Alias('program', flash)
-	env.Alias('fuse', fuse)
+	env.AddMethod(avrdude_flash, 'ProgramFlash')
+	env.AddMethod(avrdude_fuse, 'ProgramFuses')
 
 def exists(env):
 	return env.Detect('avr-gcc')
