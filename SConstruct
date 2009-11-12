@@ -81,7 +81,7 @@ else:
 # finally build the library from the src-directory
 
 projects = parser.parseDirectory('src/', 'library')
-sources = projects['global'].sources
+sources = projects[0].sources
 
 library = SConscript('src/SConscript',
 			src='src',
@@ -94,7 +94,8 @@ lib = env.Alias('lib', 'build/lib')
 # build the tests
 
 projects = parser.parseDirectory('tests/', 'tests')
-del projects['global']
+projects = projects[1:]
+
 SConscript('tests/SConscript',
 			src='tests',
 			variant_dir='build/tests',
@@ -106,8 +107,8 @@ tests = env.Alias('tests', 'build/tests')
 # build the unit tests
 
 projects = parser.parseDirectory('unittest/', 'unittest')
-sources = projects['global'].sources
-header = projects['global'].header
+sources = projects[0].sources
+header = projects[0].header
 
 SConscript('unittest/SConscript',
 			src='unittest',
@@ -121,5 +122,5 @@ unittest = env.Alias('unittest', 'build/unittest')
 env.Doxygen('doc/doxyfile')
 env.Alias('doc', 'apidoc/html')
 
-#env.Alias('all', [lib, tests, unittest])
+env.Alias('all', [lib, tests, unittest])
 env.Default('lib')

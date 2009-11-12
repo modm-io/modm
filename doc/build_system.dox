@@ -3,7 +3,7 @@
 // $Id$
 
 /*!
-\page build_system Build system
+@page build_system Build system
 
 In this project SCons (a Python-based build tool) is favored over the tradional
 aproach using Make. The main reason for this decision was that it was a 
@@ -14,20 +14,20 @@ The availability of the full power of the Python language in the
 SConstruct-files  (the equivalent to Makefiles) allowed us to create a easy
 extensible and flexible system. Especially the debugging is much easier.
 
-\section requirements Requirements
+@section requirements Requirements
 
 For Ubuntu (and other Debian based Linux-Distributions) just type the 
 following in a terminal and you're good to go:
 
-\verbatim
+@verbatim
 $ sudo apt-get install python python-yaml scons
-\endverbatim
+@endverbatim
 
 To generate the documentation you need also the following packets:
 
-\verbatim
+@verbatim
 $ sudo apt-get install doxygen graphviz
-\endverbatim
+@endverbatim
 
 Windows users have to install all the tools by hand. How to do that is explaind
 on each particular website.
@@ -36,11 +36,29 @@ on each particular website.
 - http://www.scons.org/download.php
 - http://pyyaml.org/wiki/PyYAML
 
-\section organization Organization of the source
+@section organization Organization of the source
 
-\subsection property_files The 'properties.yaml' files
+@subsection property_files The 'properties.yaml' files
 
 These files describe how to build a specific directory.
+
+Example from the tests folder:
+@verbatim
+target: pc						# target architecture
+
+# build this directory as a standalone project
+project:
+  executable: test_io_std		# name of the executable
+  libs:
+    - boost_date_time
+    - boost_filesystem
+  includes: /usr/include		# you can either use this short version
+								# or the list version like 'libs' and 'libpath'
+  libpath:
+    - /usr/lib/
+    - /path/to/library
+@endverbatim
+
 
 @todo Extend this documentation
 

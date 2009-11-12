@@ -31,11 +31,12 @@
 // ----------------------------------------------------------------------------
 
 #include <xpcc/math/interpolation/linear_interpolation.hpp>
+
 #include "linear_interpolation_test.hpp"
 
 void 
 LinearInterpolationTest::testInterpolation()
 {
-	TEST_FAIL("LIN_TEST");
+	TEST_FAIL("TODO: write test");
 }
 

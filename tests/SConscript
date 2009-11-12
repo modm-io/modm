@@ -38,16 +38,24 @@ env.Append(CPPPATH = '#src')
 env.Append(LIBS = 'robot')
 env.Append(LIBPATH = '#build/lib')
 
-for name, project in projects.iteritems():
+for project in projects:
+	# update all parts inside this project with the values from the
+	# build environment
+	project.update(env)
+	
 	objects = []
 	for file in project.sources:
 		object = env.Object(file.name,
-							CPPDEFINES=file.getDefines(env.get('CPPDEFINES', {})))
+							CPPDEFINES=file.defines)
 		objects.append(object)
 	
-	program = env.Program(target=project.name,
-						  source=objects)
+	program = env.Program(target=project.executable,
+						  source=objects,
+						  LIBS=project.libs,
+						  LIBPATH=project.libpath,
+						  CPPPATH=project.includes)
 	
 	if env['ARCHITECTURE'] == 'avr':
 		env.Hex(program)
 		env.Listing(program)
+		env.Size(program)

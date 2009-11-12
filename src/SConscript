@@ -37,8 +37,9 @@ env.Append(CPPPATH = '#src')
 # build a object file form each source file
 objects = []
 for file in sources:
+	file.update(env)
 	object = env.Object(file.name,
-						CPPDEFINES=file.getDefines(env.get('CPPDEFINES', {})))
+						CPPDEFINES=file.defines)
 	objects.append(object)
 
 # link them all together to create the library

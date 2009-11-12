@@ -22,7 +22,7 @@ def listify(object):
 
 class GlobalProperties:
 	"""
-	
+	Representation of the global property-file
 	"""
 	class AvrProperties:
 		"""
@@ -49,6 +49,12 @@ class GlobalProperties:
 			self.avr = self.AvrProperties(self.properties.get('atxmega', {}))
 	
 	def getLocalProperties(self, path, target, tag):
+		"""
+		Keywords arguments:
+		path	--	
+		target	--	
+		tag		--	
+		"""
 		try:
 			local = self.properties[tag]
 			relpath = path[len(target):]
@@ -80,20 +86,89 @@ class FileProperties:
 			self.defines = {}
 		self.defines['BASENAME'] = self.basename
 	
-	def getDefines(self, globalDefines=None):
+	#def getDefines(self, globalDefines=None):
+	#	"""
+	#	Returns a dictionary with the defines for this file.
+	#	"""
+	#	if globalDefines:
+	#		defines = self.defines.copy()
+	#		defines.update(globalDefines)
+	#		return defines
+	#	else:
+	#		return self.defines.copy()
+	
+	def update(self, env):
 		"""
-		Returns a dictionary with the defines for this file.
+		Update the internal values with values from the external SCons
+		build enviroment.
+		
+		Keyword arguments:
+		env		--	SCons enviroment
 		"""
-		if globalDefines:
-			defines = self.defines.copy()
-			defines.update(globalDefines)
-			return defines
-		else:
-			return self.defines.copy()
+		try:
+			self.defines.update(env['CPPDEFINES'])
+		except KeyError:
+			pass
 	
 	def __cmp__(self, other):
 		return cmp(self.name, other)
 
+
+class ProjectProperties:
+	"""
+	Settings for a project
+	
+	Attributes:
+	executable	--	name of the file. The executable should be named accordingly
+	path		--	relative path to the root directory
+	header		--	header files
+	sources		--	source files
+	libs		--	librarys
+	includes	--	list of include paths for the compiler
+	libpath		--	list of paths for the linker to look for librarys
+	"""
+	def __init__(self, path, tree):
+		self.path = path
+		
+		self.header = []
+		self.sources = []
+		
+		self.libs = []
+		self.includes = []
+		self.libpath = []
+		
+		if isinstance(tree, basestring):
+			self.executable = tree
+		else:
+			self.executable = tree['executable']
+			
+			self.libs = self._updateList(self.libs, tree, 'libs')
+			self.libpath = self._updateList(self.libpath, tree, 'libpath')
+			self.includes = self._updateList(self.includes, tree, 'includes')
+	
+	def update(self, env):
+		"""
+		Update the internal values with values from the external SCons
+		build enviroment.
+		
+		Keyword arguments:
+		env		--	SCons enviroment
+		"""
+		for header in self.header:
+			header.update(env)
+		for source in self.sources:
+			source.update(env)
+		
+		self.libs = self._updateList(self.libs, env, 'LIBS')
+		self.includes = self._updateList(self.includes, env, 'CPPPATH')
+		self.libpath = self._updateList(self.libpath, env, 'LIBPATH')
+	
+	def _updateList(self, list, dict, key):
+		try:
+			list += listify(dict[key])
+		except KeyError:
+			pass
+		return list
 
 class DirectoryProperties:
 	""" Contains the information about a directory.
@@ -136,15 +211,15 @@ class DirectoryProperties:
 		else:
 			self.status = self.UNKNOWN
 	
-	def createFileProperties(self, filename, abspath):
+	def getFile(self, filename, abspath):
 		defines  = self.locals.get('defines', {})
 		return FileProperties(filename, abspath, defines)
 	
+	def getProject(self):
+		return ProjectProperties(self.path, self.tree['project'])
+	
 	def isProject(self):
 		return self.status == self.PROJECT
-	
-	def getProjectName(self):
-		return self.tree['project']
 	
 	def isEnabled(self):
 		return (self.status != self.INACTIVE)
@@ -156,23 +231,6 @@ class DirectoryProperties:
 					3: "project" }[self.status]
 		return "%s [%s]" % (self.path, status)
 
-
-class ProjectProperties:
-	"""
-	Settings for a project
-	
-	Attributes:
-	name	--	name of the file. The executable should be named accordingly
-	path	--	relative path to the root directory
-	header	--	header files
-	sources	--	source files
-	
-	"""
-	def __init__(self, name, path):
-		self.name = name
-		self.path = path
-		self.header = []
-		self.sources = []
 
 class PropertyParser:
 	"""
@@ -195,15 +253,18 @@ class PropertyParser:
 	def parseDirectory(self, target, tag):
 		"""
 		Reads recursively the property-files from the directories and
-		returns a list of files to build.
+		returns a list of projects to build.
+		
+		The list has at least one entry. In the first entry are all the
+		files collected which are not assigned to a specific project.
 		
 		Keywords arguments:
 		target	--	directory to be parsed
 		tag		--	tagname corresponding to the directory
 		"""
-		project = ProjectProperties('global', '')
+		project = ProjectProperties('', 'global')
 		
-		projects = {'global': project}
+		projects = [project]
 		projectStack = [project]
 		
 		for path, directories, files in os.walk(target):
@@ -215,11 +276,9 @@ class PropertyParser:
 			directory = self._parseDirectory(path, locals)
 			
 			if directory.isProject():
-				name = directory.getProjectName()
-				# TODO more information inside ProjectProperties (e.g. libs, libpath)
-				project = ProjectProperties(name, path)
+				project = directory.getProject()
 				
-				projects[name] = project
+				projects.append(project)
 				projectStack.append(project)
 			else:
 				project = projectStack[-1]
@@ -244,6 +303,15 @@ class PropertyParser:
 		return projects
 	
 	def _parseDirectory(self, path, locals):
+		"""
+		Parse the properties file in a directory
+		
+		Keyword arguments:
+		path	--	path to the directory
+		locals	--	local part of the properties-tree corresponding to the
+					current directory
+		
+		"""
 		try:
 			filename = os.path.join(path, 'properties.yaml')
 			tree = yaml.load(open(filename))
@@ -259,6 +327,16 @@ class PropertyParser:
 		return DirectoryProperties(path, tree, locals, self.globals)
 	
 	def _parseFiles(self, path, files, directory, target):
+		"""
+		Parse all files inside a directory and create representations of them
+		 
+		Keywords arguments:
+		path		--	path to the directory
+		files		--	list of files
+		directory	--	directory representation
+		target		--	TODO
+		
+		"""
 		sources = []
 		header = []
 		for file in files:
@@ -267,13 +345,11 @@ class PropertyParser:
 			abspath = os.path.abspath(os.path.join(path, file))
 			
 			if extension in self.sourcetypes:
-				sources.append(
-					directory.createFileProperties(filename,
-												   abspath))
+				sources.append(directory.getFile(filename,
+												 abspath))
 			elif extension  in self.headertypes:
-				header.append(
-					directory.createFileProperties(filename,
-												   abspath))
+				header.append(directory.getFile(filename,
+												abspath))
 		return (sources, header)
 	
 	def getGlobalProperties(self):

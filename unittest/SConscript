@@ -41,7 +41,7 @@ Import('header')
 Import('library')
 
 env = env.Clone()
-env.Append(CPPPATH = '../../src')
+env.Append(CPPPATH = '#src')
 
 # -----------------------------------------------------------------------------
 # create a function scanner
@@ -153,13 +153,14 @@ env.AlwaysBuild(runnerFile)		# TODO replace this with real dependencies
 
 objects = [env.Object(runnerFile)]
 for file in sources:
+	file.update(env)
 	object = env.Object(file.name,
-						CPPDEFINES=file.getDefines(env.get('CPPDEFINES', {})))
+						CPPDEFINES=file.defines)
 	objects.append(object)
 
 program = env.Program('unittest', objects,
 						LIBS=['robot'] + env['LIBS'],
-						LIBPATH=env['LIBPATH'] + ['../../build/lib'])
+						LIBPATH=env['LIBPATH'] + ['#build/lib'])
 
 # -----------------------------------------------------------------------------
 # run the unit tests
