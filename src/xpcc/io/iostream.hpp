@@ -41,7 +41,6 @@
 namespace xpcc
 {
 	/**
-	 * @class 	IOStream
 	 * @brief 	This Formats all primary typs into a string stream for
 	 * 			output or it reads values from a input and converts them to
 	 * 			a given type;
@@ -53,13 +52,14 @@ namespace xpcc
 	class IOStream
 	{
 		public :
-
-			//! Constructor
-			//! \param	device	device to write the stream to
-			//! \code
-			//!		MyIODevice device;
-			//!		IOStream stream( device );
-			//! \endcode
+			/// @brief	Constructor
+			/// 
+			/// @param	device	device to write the stream to
+			/// 
+			/// @code
+			///	MyIODevice device;
+			///	IOStream stream( device );
+			/// @endcode
 			IOStream(IODevice& device);
 
 			inline IOStream&
@@ -68,20 +68,20 @@ namespace xpcc
 				this->device->put(c);
 				return *this;
 			}
-
+			
 			inline IOStream&
 			flush()
 			{
 				this->device->flush();
 				return *this;
 			}
-
+			
 			template<typename T>
 			inline IOStream&
-			operator<< ( const T& c );
-
+			operator << ( const T& c );
+			
 			inline IOStream&
-			operator<< ( IOStream& (*function)(IOStream&) )
+			operator << ( IOStream& (*function)(IOStream&) )
 			{
 				return function( *this );
 			}
@@ -112,7 +112,7 @@ namespace xpcc
 			putInteger(int32_t value);
 #endif
 			
-			// default version which is used all the others didn't match
+			// default version which is used when all the others don't match
 			template<typename T>
 			IOStream&
 			putInteger( T value );
@@ -128,29 +128,35 @@ namespace xpcc
 			operator =(const IOStream& );
 
 			IODevice* const	device;
-
 	};
-
+	
 	/**
-	 *  @brief  Write a newline and flush the stream.
+	 * @brief  Flushes the output stream.
 	 *
-	 *  This manipulator is often mistakenly used when a simple newline is
-	 *  desired, leading to poor buffering performance.  See
-	 *  http://gcc.gnu.org/onlinedocs/libstdc++/manual/bk01pt11ch25s02.html for more
-	 *  on this subject.
-	 */
-	inline IOStream&
-	endl(IOStream& ios);
-
-	/**
-	 *  @brief  Flushes the output stream.
-	 *
-	 *  This manipulator simply calls the stream's @c flush() member function.
+	 * This manipulator simply calls the stream's flush() member function.
 	*/
 	inline IOStream&
-	flush(IOStream& ios);
-
-	struct StringWriter {
+	flush(IOStream& ios)
+	{
+		return ios.flush();
+	}
+	
+	/**
+	 * @brief  Write a newline and flush the stream.
+	 *
+	 * This manipulator is often mistakenly used when a simple newline is
+	 * desired, leading to poor buffering performance.
+	 * See http://gcc.gnu.org/onlinedocs/libstdc++/manual/bk01pt11ch25s02.html 
+	 * for more on this subject.
+	 */
+	inline IOStream&
+	endl(IOStream& ios)
+	{
+		return flush(ios.put('\n'));
+	}
+	
+	struct StringWriter
+	{
 		inline void
 		operator()(IOStream& os, const char* s) const
 		{
@@ -174,18 +180,22 @@ namespace xpcc
 	};
 
 	template <typename T>
-	struct IntegerWriter {
-		inline void operator()(IOStream& os, const T& v) const
+	struct IntegerWriter
+	{
+		inline void
+		operator()(IOStream& os, const T& v) const
 		{
-			os.putInteger (v);
+			os.putInteger(v);
 		}
 	};
 
 	template <typename T>
-	struct FloatWriter {
-		inline void operator()(IOStream& os, const T& v) const
+	struct FloatWriter
+	{
+		inline void
+		operator()(IOStream& os, const T& v) const
 		{
-			os.putFloat (v);
+			os.putFloat(v);
 		}
 	};
 

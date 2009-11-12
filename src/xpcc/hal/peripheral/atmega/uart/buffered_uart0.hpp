@@ -26,34 +26,53 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: uart.hpp 93 2009-10-18 15:09:37Z dergraaf $
+ * $Id: buffered_uartn.hpp.tmpl -1   $
+ */
+// ----------------------------------------------------------------------------
+/*
+ * WARNING: This file is generated automatically, do not edit!
+ * Please modify the corresponding *.tmpl file instead and re-run the
+ * script 'generate.py'.
+ *
+ * Generated 10 Nov 2009, 12:43:59
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__UART_HPP
-#define XPCC__UART_HPP
+
+#ifndef XPCC__UART0_HPP
+#define XPCC__UART0_HPP
 
 #include <stdint.h>
 
-#include <xpcc/io/iodevice.hpp>
-
 namespace xpcc
 {
-	/// \ingroup	hal
-	/// \brief		Universal asyncronous receiver and transmitter
-	class Uart : public IODevice
+	/**
+	 * @ingroup		hal
+	 * @headerfile	<xpcc/hal/peripheral/atmega/uart/buffered_uart0.hpp>
+	 * @brief		UART0
+	 * 
+	 * This implementation uses a ringbuffer.
+	 */
+	class BufferedUart0
 	{
 	public:
-		/// \brief	Set baud rate
+		/// @todo	check if this works as desired!
+		BufferedUart0(uint32_t baudrate)
+		{
+			this->setBaudrate(baudrate);
+		}
+		
+		/// @brief	Set baud rate
 		///
 		/// If this function is called with a constant value as parameter,
 		/// all the calculation is done by the compiler, so no 32-bit
 		/// arithmetic is needed at run-time!
 		///
-		/// \param	baudrate	desired baud rate
-		/// \param	u2x			enabled double speed mode
-		inline void
-		setBaudrate(uint32_t baudrate, bool u2x = false) {
+		/// @param	baudrate	desired baud rate
+		/// @param	u2x			enabled double speed mode
+		static inline void
+		setBaudrate(uint32_t baudrate, bool u2x = false)
+		{
 			uint16_t ubrr;
 			if (u2x) {
 				ubrr  = (F_CPU / (baudrate * 8l)) - 1;
@@ -65,33 +84,16 @@ namespace xpcc
 			setBaudrateRegister(ubrr);
 		}
 		
-		virtual void
-		put(char c) = 0;
+		static void
+		put(char data);
 		
-		using IODevice::put;
+		static bool
+		get(char& c);
 		
-		virtual void
-		flush() {}
-		
-		virtual bool
-		get(char& c) = 0;
-	
 	protected:
-		virtual void
-		setBaudrateRegister(uint16_t ubrr) = 0;
-		
-		Uart() {};
-		
-		Uart(const Uart&);
-		
-		Uart&
-		operator =(const Uart &);
+		static void
+		setBaudrateRegister(uint16_t ubrr);
 	};
 }
 
-#include "uart0.hpp"
-#include "uart1.hpp"
-#include "uart2.hpp"
-#include "uart3.hpp"
-
-#endif // XPCC__UART_HPP
+#endif // XPCC__UART0_HPP

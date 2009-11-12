@@ -143,6 +143,6 @@ namespace xpcc
 	operator!=(const Saturated<U>& a, const Saturated<U>& b);
 }
 
-#include "saturated/saturated_impl.hpp"
+#include "saturated_impl.hpp"
 
 #endif	// XPCC__SATURATED_HPP

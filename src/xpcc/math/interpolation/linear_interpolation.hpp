@@ -33,27 +33,29 @@
 
 #ifndef	XPCC__LINEAR_INTERPOLATION_HPP
 #define	XPCC__LINEAR_INTERPOLATION_HPP
-#include<xpcc/hal/flash/flash_pointer.hpp>
-#include<stdint.h>
 
-namespace xpcc{
+#include <xpcc/hal/flash/flash_pointer.hpp>
+#include <stdint.h>
+
+namespace xpcc
+{
 	/// \ingroup	math
 	/// \brief		Linear Interpolation of values in a list
 	template<typename T>
 	class LinearInterpolation
 	{
-		
-		public:
+	public:
 		LinearInterpolation(FlashPointer<T> points, uint8_t numPoints);
 		
 		T 
-		interpolate(T value);
+		interpolate(const T& value);
 		
-		private:
+	private:
 		FlashPointer<T> points;
 		uint8_t numPoints; 
 	};
 }
 
-#include"linear_interpolation_impl.hpp"
+#include "linear_interpolation_impl.hpp"
+
 #endif	// XPCC__LINEAR_INTERPOLATION_HPP

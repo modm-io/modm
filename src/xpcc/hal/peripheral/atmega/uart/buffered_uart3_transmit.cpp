@@ -34,83 +34,51 @@
  * Please modify the corresponding *.tmpl file instead and re-run the
  * script 'generate.py'.
  *
- * Generated 08 Nov 2009, 18:08:18
+ * Generated 10 Nov 2009, 12:43:59
  */
 // ----------------------------------------------------------------------------
+
 
 #include <avr/io.h>
 #include <avr/interrupt.h>
 
 #include <xpcc/hal/atomic/queue.hpp>
+#include <xpcc/hal/atomic/lock.hpp>
 
 #include "uart_defines.h"
 #include "uart_defaults.h"
 
-#include "uart1.hpp"
+#include "buffered_uart3.hpp"
 
-static xpcc::atomic::Queue<char, UART1_RX_BUFFER_SIZE> rxBuffer;
+static xpcc::atomic::Queue<char, UART3_TX_BUFFER_SIZE> txBuffer;
 
 // ----------------------------------------------------------------------------
-// called when the UART has received a character
+// called when the UART is ready to transmit the next byte
 
-ISR(UART1_RECEIVE_INTERRUPT)
+ISR(UART3_TRANSMIT_INTERRUPT)
 {
-	uint8_t data = UART1_DATA;
-	
-	// read UART status register and UART data register
-	//uint8_t usr  = UART1_STATUS;
-	
-//	uint8_t last_rx_error;
-//#if defined(ATMEGA_USART)
-//	last_rx_error = usr & ((1 << FE) | (1 << DOR));
-//#elif defined(ATMEGA_USART1)
-//	last_rx_error = usr & ((1 << FE1) | (1 << DOR1));
-//#elif defined (ATMEGA_UART)
-//	last_rx_error = usr & ((1 << FE) | (1 << DOR));
-//#endif
-	
-	// TODO Fehlerbehandlung
-	rxBuffer.push(data);
+	if (txBuffer.isEmpty())
+	{
+		// transmission finished, disable UDRE interrupt
+		UART3_CONTROL &= ~(1 << UART3_UDRIE);
+	}
+	else {
+		// get one byte from buffer and write it to UART (starts transmission)
+		UART3_DATA = txBuffer.get();
+		txBuffer.pop();
+	}
 }
 
 // ----------------------------------------------------------------------------
 void
-xpcc::Uart1::setBaudrateRegister(uint16_t ubrr)
+xpcc::BufferedUart3::put(char c)
 {
-
-	// Set baud rate
-	if (ubrr & 0x8000) {
-		UART0_STATUS = (1 << U2X0);  //Enable 2x speed 
-		ubrr &= ~0x8000;
+	while (!txBuffer.push(c)) {
+		// wait for a free slot in the buffer
 	}
-	else {
-		UART0_STATUS = 0;
-	}
-	UBRR0H = (uint8_t) (ubrr >> 8);
-	UBRR0L = (uint8_t)  ubrr;
-
-	// Enable USART receiver and transmitter and receive complete interrupt
-	UART0_CONTROL = (1 << RXCIE0) | (1 << RXEN0) | (1 << TXEN0);
 	
-	// Set frame format: asynchronous, 8data, no parity, 1stop bit
-	#ifdef URSEL0
-	UCSR0C = (1 << URSEL0) | (3 << UCSZ00);
-	#else
-	UCSR0C = (3 << UCSZ00);
-	#endif
-}
-
-// ----------------------------------------------------------------------------
-bool
-xpcc::Uart1::get(char& c)
-{
-	if (rxBuffer.isEmpty()) {
-		return false;
-	}
-	else {
-		c = rxBuffer.get();
-		rxBuffer.pop();
-		
-		return true;
-	}
+	atomic::Lock lock;
+	
+	// enable UDRE interrupt
+	UART3_CONTROL |= (1 << UART3_UDRIE);
 }

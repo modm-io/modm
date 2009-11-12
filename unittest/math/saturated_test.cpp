@@ -30,7 +30,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/math/saturated.hpp>
+#include <xpcc/math/saturated/saturated.hpp>
 
 #include "saturated_test.hpp"
 

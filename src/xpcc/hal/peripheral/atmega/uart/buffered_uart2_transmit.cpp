@@ -29,7 +29,15 @@
  * $Id$
  */
 // ----------------------------------------------------------------------------
-{{ generation_block }}
+/*
+ * WARNING: This file is generated automatically, do not edit!
+ * Please modify the corresponding *.tmpl file instead and re-run the
+ * script 'generate.py'.
+ *
+ * Generated 10 Nov 2009, 12:43:59
+ */
+// ----------------------------------------------------------------------------
+
 
 #include <avr/io.h>
 #include <avr/interrupt.h>
@@ -40,30 +48,30 @@
 #include "uart_defines.h"
 #include "uart_defaults.h"
 
-#include "uart{{ id }}.hpp"
+#include "buffered_uart2.hpp"
 
-static xpcc::atomic::Queue<char, UART{{ id }}_TX_BUFFER_SIZE> txBuffer;
+static xpcc::atomic::Queue<char, UART2_TX_BUFFER_SIZE> txBuffer;
 
 // ----------------------------------------------------------------------------
 // called when the UART is ready to transmit the next byte
 
-ISR(UART{{ id }}_TRANSMIT_INTERRUPT)
+ISR(UART2_TRANSMIT_INTERRUPT)
 {
 	if (txBuffer.isEmpty())
 	{
 		// transmission finished, disable UDRE interrupt
-		UART{{ id }}_CONTROL &= ~(1 << UART{{ id }}_UDRIE);
+		UART2_CONTROL &= ~(1 << UART2_UDRIE);
 	}
 	else {
 		// get one byte from buffer and write it to UART (starts transmission)
-		UART{{ id }}_DATA = txBuffer.get();
+		UART2_DATA = txBuffer.get();
 		txBuffer.pop();
 	}
 }
 
 // ----------------------------------------------------------------------------
 void
-xpcc::Uart{{ id }}::put(char c)
+xpcc::BufferedUart2::put(char c)
 {
 	while (!txBuffer.push(c)) {
 		// wait for a free slot in the buffer
@@ -72,6 +80,5 @@ xpcc::Uart{{ id }}::put(char c)
 	atomic::Lock lock;
 	
 	// enable UDRE interrupt
-	UART{{ id }}_CONTROL |= (1 << UART{{ id }}_UDRIE);
+	UART2_CONTROL |= (1 << UART2_UDRIE);
 }
-

@@ -30,11 +30,12 @@
  */
 // ----------------------------------------------------------------------------
 
-#include<xpcc/math/interpolation/lagrange_interpolation.hpp>
+#include <xpcc/math/interpolation/lagrange_interpolation.hpp>
 #include "lagrange_interpolation_test.hpp"
 
 void 
-LagrangeInterpolationTest::testInterpolation(){
+LagrangeInterpolationTest::testInterpolation()
+{
 	TEST_FAIL("LAGTEST");
 }
 

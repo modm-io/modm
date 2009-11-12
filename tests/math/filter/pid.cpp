@@ -1,12 +1,10 @@
 
 #include <stdint.h>
-
 #include <xpcc/math/filter/pid/pid.hpp>
 
 using namespace xpcc;
 
 Pid<int16_t, 64>::Parameter parameter(10, 1, 0, 100, 120);
-
 Pid<int16_t, 64> pid(parameter);
 
 volatile int16_t out;
@@ -26,4 +24,3 @@ int main(void)
 		
 	}
 }
-

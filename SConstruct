@@ -80,7 +80,9 @@ else:
 # -----------------------------------------------------------------------------
 # finally build the library from the src-directory
 
-sources, header = parser.parseDirectory('src/', 'library')
+projects = parser.parseDirectory('src/', 'library')
+sources = projects['global'].sources
+
 library = SConscript('src/SConscript',
 			src='src',
 			variant_dir='build/lib',
@@ -91,18 +93,22 @@ lib = env.Alias('lib', 'build/lib')
 # -----------------------------------------------------------------------------
 # build the tests
 
-#sources, header = parser.parseDirectory('tests/', 'tests')
-#SConscript('tests/SConscript',
-#			src='tests',
-#			variant_dir='build/tests',
-#			exports=['env', 'sources', 'library'], 
-#			duplicate=False)
-#tests = env.Alias('tests', 'build/tests')
+projects = parser.parseDirectory('tests/', 'tests')
+del projects['global']
+SConscript('tests/SConscript',
+			src='tests',
+			variant_dir='build/tests',
+			exports=['env', 'projects', 'library'], 
+			duplicate=False)
+tests = env.Alias('tests', 'build/tests')
 
 # -----------------------------------------------------------------------------
 # build the unit tests
 
-sources, header = parser.parseDirectory('unittest/', 'unittest')
+projects = parser.parseDirectory('unittest/', 'unittest')
+sources = projects['global'].sources
+header = projects['global'].header
+
 SConscript('unittest/SConscript',
 			src='unittest',
 			variant_dir='build/unittest',

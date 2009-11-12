@@ -28,27 +28,26 @@
 # 
 # $Id$
 
-import os
-
 Import('env')
-Import('sources')
+Import('projects')
 Import('library')
 
 env = env.Clone()
-env.Append(CPPPATH = '../../src')
 
-# build a object file form each source file
-for file in sources:
-	defines = env.get('CPPDEFINES', {})
-	defines.update(file.defines)
-	defines['BASENAME'] = file.basename
+env.Append(CPPPATH = '#src')
+env.Append(LIBS = 'robot')
+env.Append(LIBPATH = '#build/lib')
+
+for name, project in projects.iteritems():
+	objects = []
+	for file in project.sources:
+		object = env.Object(file.name,
+							CPPDEFINES=file.getDefines(env.get('CPPDEFINES', {})))
+		objects.append(object)
 	
-	program = env.Program(file.basename, file.name,
-							CPPDEFINES=defines,
-							LIBS=['robot'] + env['LIBS'],
-							LIBPATH=env['LIBPATH'] + ['../../build/lib'])
+	program = env.Program(target=project.name,
+						  source=objects)
 	
 	if env['ARCHITECTURE'] == 'avr':
 		env.Hex(program)
 		env.Listing(program)
-		env.Size(program)

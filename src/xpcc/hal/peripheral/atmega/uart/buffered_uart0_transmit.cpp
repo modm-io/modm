@@ -34,45 +34,51 @@
  * Please modify the corresponding *.tmpl file instead and re-run the
  * script 'generate.py'.
  *
- * Generated 08 Nov 2009, 18:08:18
+ * Generated 10 Nov 2009, 12:43:59
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__UART2_HPP
-#define XPCC__UART2_HPP
 
-#include "uart.hpp"
+#include <avr/io.h>
+#include <avr/interrupt.h>
 
-namespace xpcc
+#include <xpcc/hal/atomic/queue.hpp>
+#include <xpcc/hal/atomic/lock.hpp>
+
+#include "uart_defines.h"
+#include "uart_defaults.h"
+
+#include "buffered_uart0.hpp"
+
+static xpcc::atomic::Queue<char, UART0_TX_BUFFER_SIZE> txBuffer;
+
+// ----------------------------------------------------------------------------
+// called when the UART is ready to transmit the next byte
+
+ISR(UART0_TRANSMIT_INTERRUPT)
 {
-	class Uart2 : public Uart
+	if (txBuffer.isEmpty())
 	{
-	public:
-		static Uart2&
-		instance() {
-			static Uart2 uart;
-			return uart;
-		}
-		
-		virtual void
-		put(char c);
-		
-		using Uart::put;
-		
-		virtual bool
-		get(char& c);
-	
-	protected:
-		virtual void
-		setBaudrateRegister(uint16_t ubrr);
-		
-		Uart2() {};
-		
-		Uart2(const Uart2&);
-		
-		Uart2&
-		operator =(const Uart2 &);
-	};
+		// transmission finished, disable UDRE interrupt
+		UART0_CONTROL &= ~(1 << UART0_UDRIE);
+	}
+	else {
+		// get one byte from buffer and write it to UART (starts transmission)
+		UART0_DATA = txBuffer.get();
+		txBuffer.pop();
+	}
 }
 
-#endif // XPCC__UART2_HPP
+// ----------------------------------------------------------------------------
+void
+xpcc::BufferedUart0::put(char c)
+{
+	while (!txBuffer.push(c)) {
+		// wait for a free slot in the buffer
+	}
+	
+	atomic::Lock lock;
+	
+	// enable UDRE interrupt
+	UART0_CONTROL |= (1 << UART0_UDRIE);
+}

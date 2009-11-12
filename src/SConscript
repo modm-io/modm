@@ -32,7 +32,7 @@ Import('env')
 Import('sources')
 
 env = env.Clone()
-env.Append(CPPPATH = '../../src')
+env.Append(CPPPATH = '#src')
 
 # build a object file form each source file
 objects = []

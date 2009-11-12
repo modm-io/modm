@@ -34,9 +34,10 @@
  * Please modify the corresponding *.tmpl file instead and re-run the
  * script 'generate.py'.
  *
- * Generated 08 Nov 2009, 18:08:18
+ * Generated 10 Nov 2009, 12:43:59
  */
 // ----------------------------------------------------------------------------
+
 
 #include <avr/io.h>
 #include <avr/interrupt.h>
@@ -46,25 +47,25 @@
 #include "uart_defines.h"
 #include "uart_defaults.h"
 
-#include "uart3.hpp"
+#include "buffered_uart0.hpp"
 
-static xpcc::atomic::Queue<char, UART3_RX_BUFFER_SIZE> rxBuffer;
+static xpcc::atomic::Queue<char, UART0_RX_BUFFER_SIZE> rxBuffer;
 
 // ----------------------------------------------------------------------------
 // called when the UART has received a character
 
-ISR(UART3_RECEIVE_INTERRUPT)
+ISR(UART0_RECEIVE_INTERRUPT)
 {
-	uint8_t data = UART3_DATA;
+	uint8_t data = UART0_DATA;
 	
 	// read UART status register and UART data register
-	//uint8_t usr  = UART3_STATUS;
+	//uint8_t usr  = UART0_STATUS;
 	
 //	uint8_t last_rx_error;
 //#if defined(ATMEGA_USART)
 //	last_rx_error = usr & ((1 << FE) | (1 << DOR));
-//#elif defined(ATMEGA_USART3)
-//	last_rx_error = usr & ((1 << FE3) | (1 << DOR3));
+//#elif defined(ATMEGA_USART0)
+//	last_rx_error = usr & ((1 << FE0) | (1 << DOR0));
 //#elif defined (ATMEGA_UART)
 //	last_rx_error = usr & ((1 << FE) | (1 << DOR));
 //#endif
@@ -75,8 +76,48 @@ ISR(UART3_RECEIVE_INTERRUPT)
 
 // ----------------------------------------------------------------------------
 void
-xpcc::Uart3::setBaudrateRegister(uint16_t ubrr)
+xpcc::BufferedUart0::setBaudrateRegister(uint16_t ubrr)
 {
+#if defined(ATMEGA_UART)
+
+	// set baud rate
+	if (ubrr & 0x8000) {
+		UART0_STATUS = (1 << U2X);  //Enable 2x speed 
+		ubrr &= ~0x8000;
+	}
+	else {
+		UART0_STATUS = 0;
+	}
+	UBRRHI = (uint8_t) (ubrr >> 8);
+	UBRR   = (uint8_t)  ubrr;
+	
+	// Enable UART receiver and transmitter and receive complete interrupt
+	UART0_CONTROL = (1 << RXCIE) | (1 << RXEN) | (1 << TXEN);
+
+#elif defined(ATMEGA_USART)
+
+	// Set baudrate
+	if (ubrr & 0x8000) {
+		UART0_STATUS = (1 << U2X);	// Enable 2x speed 
+		ubrr &= ~0x8000;
+	}
+	else {
+		UART0_STATUS = 0;
+	}
+	UBRRH = (uint8_t) (ubrr >> 8);
+	UBRRL = (uint8_t)  ubrr;
+
+	// Enable USART receiver and transmitter and receive complete interrupt
+	UART0_CONTROL = (1 << RXCIE) | (1<<RXEN) | (1<<TXEN);
+	
+	// Set frame format: asynchronous, 8data, no parity, 1stop bit
+	#ifdef URSEL
+	UCSRC = (1 << URSEL) | (3 << UCSZ0);
+	#else
+	UCSRC = (3 << UCSZ0);
+	#endif
+
+#elif defined(ATMEGA_USART0)
 
 	// Set baud rate
 	if (ubrr & 0x8000) {
@@ -98,11 +139,13 @@ xpcc::Uart3::setBaudrateRegister(uint16_t ubrr)
 	#else
 	UCSR0C = (3 << UCSZ00);
 	#endif
+
+#endif
 }
 
 // ----------------------------------------------------------------------------
 bool
-xpcc::Uart3::get(char& c)
+xpcc::BufferedUart0::get(char& c)
 {
 	if (rxBuffer.isEmpty()) {
 		return false;

@@ -30,13 +30,14 @@
 // ----------------------------------------------------------------------------
 
 #include <iostream>
+
 #include <xpcc/io/iostream.hpp>
 #include <xpcc/io/backplane/std/std_iodevice.hpp>
 
 int
 main()
 {
-	std::cout << "XPCC Logger Test" << std::endl;
+	std::cout << "XPCC IOStream Test" << std::endl;
 	
 	xpcc::StdIODevice device;
 	xpcc::IOStream stream(device);

@@ -5,6 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
+ * 
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -29,27 +30,38 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC_PAIR_HPP
-#define	XPCC_PAIR_HPP
-#include<stdint.h>
+#ifndef	XPCC__PAIR_HPP
+#define	XPCC__PAIR_HPP
 
-template<typename T = int8_t>
-class Pair{
-	public:
-	Pair(T first, T second):
-	first(first), second(second)
+#include <stdint.h>
+
+namespace xpcc
+{
+	template<typename T>
+	class Pair
 	{
-	}
-	
-	T getFirst(){
-		return first;
-	}
-	
-	T getSecond(){
-		return second;
-	}
-	
+	public:
+		Pair(const T& first, const T& second):
+			first(first), second(second)
+		{
+		}
+		
+		T&
+		getFirst()
+		{
+			return first;
+		}
+		
+		T&
+		getSecond()
+		{
+			return second;
+		}
+		
 	private:
-	T first;
-	T second;
-};
+		T first;
+		T second;
+	};
+}
+
+#endif	// XPCC__PAIR_HPP

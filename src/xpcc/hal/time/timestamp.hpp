@@ -37,8 +37,11 @@
 
 namespace xpcc
 {
-	/// @ingroup	hal
-	/// @brief		simple 16-bit timestamp
+	/**
+	 * @ingroup		hal
+	 * @headerfile	<xpcc/hal/time/timestamp.hpp>
+	 * @brief		simple 16-bit timestamp
+	 */
 	class Timestamp
 	{
 	public:
@@ -72,15 +75,15 @@ namespace xpcc
 		}
 		
 		inline bool
-		operator > (const Timestamp& other) const
-		{
-			return ((int16_t) (time - other.time)) > 0;
-		}
-		
-		inline bool
 		operator <= (const Timestamp& other) const
 		{
 			return ((int16_t) (time - other.time)) <= 0;
+		}
+		
+		inline bool
+		operator > (const Timestamp& other) const
+		{
+			return ((int16_t) (time - other.time)) > 0;
 		}
 		
 		inline bool

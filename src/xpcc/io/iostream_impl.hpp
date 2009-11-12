@@ -55,9 +55,9 @@ xpcc::IOStream::operator<< ( const T& v )
 			::xpcc::ArithmeticTraits<T>::isInteger,
 			::xpcc::IntegerWriter<T>,
 			NotIntegerWriter >::Result Writer;
-
+	
     Writer()(*this, v);
-
+	
 	return *this;
 }
 
@@ -72,7 +72,6 @@ xpcc::IOStream::putInteger( T value )
 	snprintf(str, sizeof(str), "%d", value);
 	
 	this->device->put(str);
-	
 	return *this;
 }
 
@@ -93,20 +92,4 @@ xpcc::IOStream::putFloat( T value )
 	
 	this->device->put(str);
 	return *this;
-}
-
-// ----------------------------------------------------------------------------
-
-inline xpcc::IOStream&
-xpcc::endl(IOStream& ios)
-{
-	return flush(ios.put('\n'));
-}
-
-// ----------------------------------------------------------------------------
-
-inline xpcc::IOStream&
-xpcc::flush(IOStream& ios)
-{
-	return ios.flush();
 }

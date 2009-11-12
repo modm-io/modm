@@ -37,19 +37,27 @@
 namespace xpcc
 {	
 	template<typename T>
-	LinearInterpolation<T>::LinearInterpolation(FlashPointer<T> points, uint8_t numPoints):
-	points(points), numPoints(numPoints){
-		
+	LinearInterpolation<T>::LinearInterpolation(FlashPointer<T> points,
+												uint8_t numPoints):
+		points(points), numPoints(numPoints)
+	{
 	}
+	
 	template<typename T>
 	T
-	LinearInterpolation<T>::interpolate(T value)
+	LinearInterpolation<T>::interpolate(const T& value)
 	{
 		uint8_t i;
 		
-		T x1 = 0, x2 = 0;
-		if(value <= points[0]) return points[1];
-		if(value >= points[2*(numPoints-1)]) return points[2*(numPoints-1)+1];
+		T x1 = T();
+		T x2 = T();
+		if (value <= points[0]) {
+			return points[1];
+		}
+		if (value >= points[2*(numPoints-1)]) {
+			return points[2*(numPoints-1)+1];
+		}
+		
 		for (i = 0; i < numPoints ; i++) {
 			x2 = points[i*2];
 			if (x2 >= value)

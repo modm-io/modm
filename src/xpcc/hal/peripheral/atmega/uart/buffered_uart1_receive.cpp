@@ -34,45 +34,84 @@
  * Please modify the corresponding *.tmpl file instead and re-run the
  * script 'generate.py'.
  *
- * Generated 08 Nov 2009, 18:08:18
+ * Generated 10 Nov 2009, 12:43:59
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__UART1_HPP
-#define XPCC__UART1_HPP
 
-#include "uart.hpp"
+#include <avr/io.h>
+#include <avr/interrupt.h>
 
-namespace xpcc
+#include <xpcc/hal/atomic/queue.hpp>
+
+#include "uart_defines.h"
+#include "uart_defaults.h"
+
+#include "buffered_uart1.hpp"
+
+static xpcc::atomic::Queue<char, UART1_RX_BUFFER_SIZE> rxBuffer;
+
+// ----------------------------------------------------------------------------
+// called when the UART has received a character
+
+ISR(UART1_RECEIVE_INTERRUPT)
 {
-	class Uart1 : public Uart
-	{
-	public:
-		static Uart1&
-		instance() {
-			static Uart1 uart;
-			return uart;
-		}
-		
-		virtual void
-		put(char c);
-		
-		using Uart::put;
-		
-		virtual bool
-		get(char& c);
+	uint8_t data = UART1_DATA;
 	
-	protected:
-		virtual void
-		setBaudrateRegister(uint16_t ubrr);
-		
-		Uart1() {};
-		
-		Uart1(const Uart1&);
-		
-		Uart1&
-		operator =(const Uart1 &);
-	};
+	// read UART status register and UART data register
+	//uint8_t usr  = UART1_STATUS;
+	
+//	uint8_t last_rx_error;
+//#if defined(ATMEGA_USART)
+//	last_rx_error = usr & ((1 << FE) | (1 << DOR));
+//#elif defined(ATMEGA_USART1)
+//	last_rx_error = usr & ((1 << FE1) | (1 << DOR1));
+//#elif defined (ATMEGA_UART)
+//	last_rx_error = usr & ((1 << FE) | (1 << DOR));
+//#endif
+	
+	// TODO Fehlerbehandlung
+	rxBuffer.push(data);
 }
 
-#endif // XPCC__UART1_HPP
+// ----------------------------------------------------------------------------
+void
+xpcc::BufferedUart1::setBaudrateRegister(uint16_t ubrr)
+{
+
+	// Set baud rate
+	if (ubrr & 0x8000) {
+		UART0_STATUS = (1 << U2X0);  //Enable 2x speed 
+		ubrr &= ~0x8000;
+	}
+	else {
+		UART0_STATUS = 0;
+	}
+	UBRR0H = (uint8_t) (ubrr >> 8);
+	UBRR0L = (uint8_t)  ubrr;
+
+	// Enable USART receiver and transmitter and receive complete interrupt
+	UART0_CONTROL = (1 << RXCIE0) | (1 << RXEN0) | (1 << TXEN0);
+	
+	// Set frame format: asynchronous, 8data, no parity, 1stop bit
+	#ifdef URSEL0
+	UCSR0C = (1 << URSEL0) | (3 << UCSZ00);
+	#else
+	UCSR0C = (3 << UCSZ00);
+	#endif
+}
+
+// ----------------------------------------------------------------------------
+bool
+xpcc::BufferedUart1::get(char& c)
+{
+	if (rxBuffer.isEmpty()) {
+		return false;
+	}
+	else {
+		c = rxBuffer.get();
+		rxBuffer.pop();
+		
+		return true;
+	}
+}

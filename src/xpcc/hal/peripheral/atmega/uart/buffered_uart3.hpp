@@ -26,7 +26,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id$
+ * $Id: buffered_uartn.hpp.tmpl -1   $
  */
 // ----------------------------------------------------------------------------
 /*
@@ -34,50 +34,66 @@
  * Please modify the corresponding *.tmpl file instead and re-run the
  * script 'generate.py'.
  *
- * Generated 08 Nov 2009, 18:08:18
+ * Generated 10 Nov 2009, 12:43:59
  */
 // ----------------------------------------------------------------------------
 
-#include <avr/io.h>
-#include <avr/interrupt.h>
 
-#include <xpcc/hal/atomic/queue.hpp>
-#include <xpcc/hal/atomic/lock.hpp>
+#ifndef XPCC__UART3_HPP
+#define XPCC__UART3_HPP
 
-#include "uart_defines.h"
-#include "uart_defaults.h"
+#include <stdint.h>
 
-#include "uart1.hpp"
-
-static xpcc::atomic::Queue<char, UART1_TX_BUFFER_SIZE> txBuffer;
-
-// ----------------------------------------------------------------------------
-// called when the UART is ready to transmit the next byte
-
-ISR(UART1_TRANSMIT_INTERRUPT)
+namespace xpcc
 {
-	if (txBuffer.isEmpty())
+	/**
+	 * @ingroup		hal
+	 * @headerfile	<xpcc/hal/peripheral/atmega/uart/buffered_uart3.hpp>
+	 * @brief		UART3
+	 * 
+	 * This implementation uses a ringbuffer.
+	 */
+	class BufferedUart3
 	{
-		// transmission finished, disable UDRE interrupt
-		UART1_CONTROL &= ~(1 << UART1_UDRIE);
-	}
-	else {
-		// get one byte from buffer and write it to UART (starts transmission)
-		UART1_DATA = txBuffer.get();
-		txBuffer.pop();
-	}
+	public:
+		/// @todo	check if this works as desired!
+		BufferedUart3(uint32_t baudrate)
+		{
+			this->setBaudrate(baudrate);
+		}
+		
+		/// @brief	Set baud rate
+		///
+		/// If this function is called with a constant value as parameter,
+		/// all the calculation is done by the compiler, so no 32-bit
+		/// arithmetic is needed at run-time!
+		///
+		/// @param	baudrate	desired baud rate
+		/// @param	u2x			enabled double speed mode
+		static inline void
+		setBaudrate(uint32_t baudrate, bool u2x = false)
+		{
+			uint16_t ubrr;
+			if (u2x) {
+				ubrr  = (F_CPU / (baudrate * 8l)) - 1;
+				ubrr |= 0x8000;
+			}
+			else {
+				ubrr = (F_CPU / (baudrate * 16l)) - 1;
+			}
+			setBaudrateRegister(ubrr);
+		}
+		
+		static void
+		put(char data);
+		
+		static bool
+		get(char& c);
+		
+	protected:
+		static void
+		setBaudrateRegister(uint16_t ubrr);
+	};
 }
 
-// ----------------------------------------------------------------------------
-void
-xpcc::Uart1::put(char c)
-{
-	while (!txBuffer.push(c)) {
-		// wait for a free slot in the buffer
-	}
-	
-	atomic::Lock lock;
-	
-	// enable UDRE interrupt
-	UART1_CONTROL |= (1 << UART1_UDRIE);
-}
+#endif // XPCC__UART3_HPP

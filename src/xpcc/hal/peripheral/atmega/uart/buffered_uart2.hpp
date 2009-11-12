@@ -26,47 +26,74 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id$
+ * $Id: buffered_uartn.hpp.tmpl -1   $
  */
 // ----------------------------------------------------------------------------
-{{ generation_block }}
+/*
+ * WARNING: This file is generated automatically, do not edit!
+ * Please modify the corresponding *.tmpl file instead and re-run the
+ * script 'generate.py'.
+ *
+ * Generated 10 Nov 2009, 12:43:59
+ */
+// ----------------------------------------------------------------------------
 
-#ifndef XPCC__UART{{ id }}_HPP
-#define XPCC__UART{{ id }}_HPP
 
-#include "uart.hpp"
+#ifndef XPCC__UART2_HPP
+#define XPCC__UART2_HPP
+
+#include <stdint.h>
 
 namespace xpcc
 {
-	class Uart{{ id }} : public Uart
+	/**
+	 * @ingroup		hal
+	 * @headerfile	<xpcc/hal/peripheral/atmega/uart/buffered_uart2.hpp>
+	 * @brief		UART2
+	 * 
+	 * This implementation uses a ringbuffer.
+	 */
+	class BufferedUart2
 	{
 	public:
-		static Uart{{ id }}&
-		instance() {
-			static Uart{{ id }} uart;
-			return uart;
+		/// @todo	check if this works as desired!
+		BufferedUart2(uint32_t baudrate)
+		{
+			this->setBaudrate(baudrate);
 		}
 		
-		virtual void
-		put(char c);
+		/// @brief	Set baud rate
+		///
+		/// If this function is called with a constant value as parameter,
+		/// all the calculation is done by the compiler, so no 32-bit
+		/// arithmetic is needed at run-time!
+		///
+		/// @param	baudrate	desired baud rate
+		/// @param	u2x			enabled double speed mode
+		static inline void
+		setBaudrate(uint32_t baudrate, bool u2x = false)
+		{
+			uint16_t ubrr;
+			if (u2x) {
+				ubrr  = (F_CPU / (baudrate * 8l)) - 1;
+				ubrr |= 0x8000;
+			}
+			else {
+				ubrr = (F_CPU / (baudrate * 16l)) - 1;
+			}
+			setBaudrateRegister(ubrr);
+		}
 		
-		using Uart::put;
+		static void
+		put(char data);
 		
-		virtual bool
+		static bool
 		get(char& c);
-	
+		
 	protected:
-		virtual void
+		static void
 		setBaudrateRegister(uint16_t ubrr);
-		
-		Uart{{ id }}() {};
-		
-		Uart{{ id }}(const Uart{{ id }}&);
-		
-		Uart{{ id }}&
-		operator =(const Uart{{ id }} &);
 	};
 }
 
-#endif // XPCC__UART{{ id }}_HPP
-
+#endif // XPCC__UART2_HPP

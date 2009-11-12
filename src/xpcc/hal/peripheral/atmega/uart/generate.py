@@ -23,14 +23,14 @@ globals = {
 }
 
 for number in range(0,4):
-	template = env.get_template('uartn.hpp.tmpl', globals=globals)
+	template = env.get_template('buffered_uartn.hpp.tmpl', globals=globals)
 	output = template.render(id=number)
-	open('uart%i.hpp' % number, 'w').write(output)
+	open('buffered_uart%i.hpp' % number, 'w').write(output)
 	
-	template = env.get_template('uartn.cpp.tmpl', globals=globals)
+	template = env.get_template('buffered_uartn_receive.cpp.tmpl', globals=globals)
 	output = template.render(id=number)
-	open('uart%i.cpp' % number, 'w').write(output)
+	open('buffered_uart%i_receive.cpp' % number, 'w').write(output)
 	
-	template = env.get_template('uartn_put.cpp.tmpl', globals=globals)
+	template = env.get_template('buffered_uartn_transmit.cpp.tmpl', globals=globals)
 	output = template.render(id=number)
-	open('uart%i_put.cpp' % number, 'w').write(output)
+	open('buffered_uart%i_transmit.cpp' % number, 'w').write(output)

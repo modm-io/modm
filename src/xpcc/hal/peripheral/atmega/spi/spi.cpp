@@ -32,14 +32,12 @@
 
 #include "spi.hpp"
 
-#ifndef __AVR_ATxmega128A1__
-
-// TODO set hardware pins
-void
-xpcc::Spi::configure(Mode mode, Prescaler prescaler)
+xpcc::Spi::Spi(Mode mode, Prescaler prescaler)
 {
 	SPCR = (1 << SPE) | (1 << MSTR) | (prescaler & ~0x80) | mode;
 	SPSR = (prescaler & 0x80) ? (1 << SPI2X) : 0;
+	
+	// TODO set hardware pins
 }
 
 uint8_t
@@ -51,8 +49,3 @@ xpcc::Spi::send(uint8_t data)
 	}
 	return SPDR;
 }
-
-
-#else
-	#warning	TODO!
-#endif

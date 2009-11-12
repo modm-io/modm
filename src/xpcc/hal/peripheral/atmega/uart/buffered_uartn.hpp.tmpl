@@ -29,50 +29,63 @@
  * $Id$
  */
 // ----------------------------------------------------------------------------
-/*
- * WARNING: This file is generated automatically, do not edit!
- * Please modify the corresponding *.tmpl file instead and re-run the
- * script 'generate.py'.
- *
- * Generated 08 Nov 2009, 18:08:18
- */
-// ----------------------------------------------------------------------------
+{{ generation_block }}
 
-#ifndef XPCC__UART3_HPP
-#define XPCC__UART3_HPP
+#ifndef XPCC__UART{{ id }}_HPP
+#define XPCC__UART{{ id }}_HPP
 
-#include "uart.hpp"
+#include <stdint.h>
 
 namespace xpcc
 {
-	class Uart3 : public Uart
+	/**
+	 * @ingroup		hal
+	 * @headerfile	<xpcc/hal/peripheral/atmega/uart/buffered_uart{{ id }}.hpp>
+	 * @brief		UART{{ id }}
+	 * 
+	 * This implementation uses a ringbuffer.
+	 */
+	class BufferedUart{{ id }}
 	{
 	public:
-		static Uart3&
-		instance() {
-			static Uart3 uart;
-			return uart;
+		/// @todo	check if this works as desired!
+		BufferedUart{{ id }}(uint32_t baudrate)
+		{
+			this->setBaudrate(baudrate);
 		}
 		
-		virtual void
-		put(char c);
+		/// @brief	Set baud rate
+		///
+		/// If this function is called with a constant value as parameter,
+		/// all the calculation is done by the compiler, so no 32-bit
+		/// arithmetic is needed at run-time!
+		///
+		/// @param	baudrate	desired baud rate
+		/// @param	u2x			enabled double speed mode
+		static inline void
+		setBaudrate(uint32_t baudrate, bool u2x = false)
+		{
+			uint16_t ubrr;
+			if (u2x) {
+				ubrr  = (F_CPU / (baudrate * 8l)) - 1;
+				ubrr |= 0x8000;
+			}
+			else {
+				ubrr = (F_CPU / (baudrate * 16l)) - 1;
+			}
+			setBaudrateRegister(ubrr);
+		}
 		
-		using Uart::put;
+		static void
+		put(char data);
 		
-		virtual bool
+		static bool
 		get(char& c);
-	
+		
 	protected:
-		virtual void
+		static void
 		setBaudrateRegister(uint16_t ubrr);
-		
-		Uart3() {};
-		
-		Uart3(const Uart3&);
-		
-		Uart3&
-		operator =(const Uart3 &);
 	};
 }
 
-#endif // XPCC__UART3_HPP
+#endif // XPCC__UART{{ id }}_HPP

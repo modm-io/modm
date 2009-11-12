@@ -1,3 +1,11 @@
 # Properties for 'debug/logger'
 
 target: pc
+
+project: test_io_std
+  libs:
+    - todo1
+    - todo2
+  libpath:
+    - /path/todo1
+    - /path/todo2

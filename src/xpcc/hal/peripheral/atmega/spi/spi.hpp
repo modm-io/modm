@@ -36,8 +36,6 @@
 #include <avr/io.h>
 #include <stdint.h>
 
-#ifndef __AVR_ATxmega128A1__
-
 namespace xpcc
 {
 	class Spi
@@ -62,16 +60,11 @@ namespace xpcc
 		} Prescaler;
 	
 	public:
-		void
-		configure(Mode mode, Prescaler prescaler);
+		Spi(Mode mode, Prescaler prescaler);
 		
-		uint8_t
+		static uint8_t
 		send(uint8_t data);
 	};
 }
-
-#else
-	#warning	TODO!
-#endif
 
 #endif // XPCC__SPI_HPP
