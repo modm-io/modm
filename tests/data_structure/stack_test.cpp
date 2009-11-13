@@ -3,12 +3,16 @@
 
 using namespace xpcc;
 
-BoundedStack<uint32_t, 10> stack;
+BoundedDeque<uint16_t, 300> deque;
+
+volatile uint16_t a;
 
 int
 main(void)
 {
-	stack.push(14);
+	deque.pushBack(14);
+	
+	a = deque.getSize();
 	
 	while (1) {
 		

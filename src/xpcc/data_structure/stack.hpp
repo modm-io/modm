@@ -40,8 +40,9 @@ namespace xpcc
 {
 	/**
 	 * @ingroup		data_structure
-	 * @brief		LIFO stack
 	 * @headerfile	<xpcc/data_structure/stack.hpp>
+	 * 
+	 * @brief		LIFO stack
 	 * 
 	 * Elements are pushed/popped from the "back" of the specific container,
 	 * which is known as the top of the stack.
@@ -53,8 +54,9 @@ namespace xpcc
 	class Stack
 	{
 	public:
-		typedef typename Container::SizeType SizeType;
+		typedef typename Container::Size Size;
 		
+	public:
 		bool
 		isEmpty()
 		{
@@ -67,13 +69,13 @@ namespace xpcc
 			return c.isFull();
 		}
 		
-		SizeType
+		Size
 		getSize()
 		{
 			return c.getSize();
 		}
 		
-		SizeType
+		Size
 		getMaxSize()
 		{
 			return c.getMaxSize();
@@ -109,13 +111,14 @@ namespace xpcc
 
 	// ------------------------------------------------------------------------
 	/**
-	 * @ingroup	data_structure
+	 * @ingroup		data_structure
+	 * @headerfile	<xpcc/data_structure/stack.hpp>
+	 * 
 	 * @brief		Bounded stack
 	 */
 	template<typename T, 
 			 int N,
-			 typename S=uint8_t,
-			 typename Container=BoundedDeque<T, N, S> >
+			 typename Container=BoundedDeque<T, N> >
 	class BoundedStack : public Stack<T, Container>
 	{
 	};

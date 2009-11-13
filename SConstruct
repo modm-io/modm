@@ -134,7 +134,7 @@ env.Doxygen('doc/doxyfile')
 env.Alias('doc', 'apidoc/html')
 
 # -----------------------------------------------------------------------------
-# other stuff
+# transmit the hex file to an AVR
 
 programFile = ARGUMENTS.get('program', None)
 if programFile:
@@ -151,7 +151,9 @@ if programFile:
 	# build our dummy target
 	BUILD_TARGETS.append("program_target")
 
+# -----------------------------------------------------------------------------
 # show the size of a file
+
 fileSize = ARGUMENTS.get('size', None)
 if fileSize:
 	# make sure that that the file we want to program is build
@@ -163,7 +165,9 @@ if fileSize:
 	# build our dummy target
 	BUILD_TARGETS.append("size_target")
 
+# -----------------------------------------------------------------------------
 # show the symbols in a object-file
+
 symbolsFile = ARGUMENTS.get('symbols', None)
 if symbolsFile:
 	# make sure that that the file we want to program is build
@@ -175,8 +179,11 @@ if symbolsFile:
 	# build our dummy target
 	BUILD_TARGETS.append("symbols_target")
 
-# set fusebits
-#PhonyTargets(env, fuse = env.ProgramFuses())
+# -----------------------------------------------------------------------------
+# set fusebits (currently only atmega, not the atxmega!)
+
+if build.target == 'atmega':
+	PhonyTargets(env, fuse = env.ProgramFuses())
 
 # -----------------------------------------------------------------------------
 

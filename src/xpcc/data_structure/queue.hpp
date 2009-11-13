@@ -53,8 +53,9 @@ namespace xpcc
 	class Queue
 	{
 	public:
-		typedef typename Container::SizeType SizeType;
+		typedef typename Container::Size Size;
 		
+	public:
 		bool
 		isEmpty()
 		{
@@ -67,13 +68,13 @@ namespace xpcc
 			return c.isFull();
 		}
 		
-		SizeType
+		Size
 		getSize()
 		{
 			return c.getSize();
 		}
 		
-		SizeType
+		Size
 		getMaxSize()
 		{
 			return c.getMaxSize();
@@ -131,8 +132,7 @@ namespace xpcc
 	 */
 	template<typename T, 
 			 int N,
-			 typename S=uint8_t,
-			 typename Container=BoundedDeque<T, N, S> >
+			 typename Container=BoundedDeque<T, N> >
 	class BoundedQueue : public Queue<T, Container> {
 		
 	};

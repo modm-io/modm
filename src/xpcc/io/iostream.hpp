@@ -51,83 +51,130 @@ namespace xpcc
 	 */
 	class IOStream
 	{
-		public :
-			/// @brief	Constructor
-			/// 
-			/// @param	device	device to write the stream to
-			/// 
-			/// @code
-			///	MyIODevice device;
-			///	IOStream stream( device );
-			/// @endcode
-			IOStream(IODevice& device);
+	public :
+		/// @brief	Constructor
+		/// 
+		/// @param	device	device to write the stream to
+		/// 
+		/// @code
+		///	MyIODevice device;
+		///	IOStream stream( device );
+		/// @endcode
+		IOStream(IODevice& device);
 
-			inline IOStream&
-			put(char c)
-			{
-				this->device->put(c);
-				return *this;
-			}
-			
-			inline IOStream&
-			flush()
-			{
-				this->device->flush();
-				return *this;
-			}
-			
-			template<typename T>
-			inline IOStream&
-			operator << ( const T& c );
-			
-			inline IOStream&
-			operator << ( IOStream& (*function)(IOStream&) )
-			{
-				return function( *this );
-			}
+		inline IOStream&
+		put(char c)
+		{
+			this->device->put(c);
+			return *this;
+		}
+		
+		inline IOStream&
+		flush()
+		{
+			this->device->flush();
+			return *this;
+		}
+		
+		template<typename T>
+		inline IOStream&
+		operator << ( const T& c );
+		
+		inline IOStream&
+		operator << ( IOStream& (*function)(IOStream&) )
+		{
+			return function( *this );
+		}
 
-		protected :
-			friend struct StringWriter;
+	protected :
+		friend struct StringWriter;
 
-			template <typename T>
-			friend struct IntegerWriter;
+		template <typename T>
+		friend struct IntegerWriter;
 
-			template <typename T>
-			friend struct FloatWriter;
-			
-			IOStream&
-			putInteger(int8_t value);
-			
-			IOStream&
-			putInteger(uint8_t value);
-			
-			IOStream&
-			putInteger(int16_t value);
-			
-			IOStream&
-			putInteger(uint16_t value);
-			
+		template <typename T>
+		friend struct FloatWriter;
+		
+		IOStream&
+		putInteger(int8_t value);
+		
+		IOStream&
+		putInteger(uint8_t value);
+		
+		IOStream&
+		putInteger(int16_t value);
+		
+		IOStream&
+		putInteger(uint16_t value);
+		
 #ifdef __AVR__
-			IOStream&
-			putInteger(int32_t value);
+		// uses the optimized non standard function 'ltoa()' which is
+		// not always available. For the general case snprintf() is
+		// used.
+		IOStream&
+		putInteger(int32_t value);
 #endif
+		
+		// default version which is used when all the others don't match
+		template<typename T>
+		IOStream&
+		putInteger( T value );
+		
+		template<typename T>
+		IOStream&
+		putFloat( T value );
+
+	private :
+		IOStream(const IOStream& );
+
+		IOStream&
+		operator =(const IOStream& );
+
+		IODevice* const	device;
+		
+		struct StringWriter
+		{
+			inline void
+			operator()(IOStream& os, const char* s) const
+			{
+				os.device->put( s );
+			}
+
+			inline void
+			operator()(IOStream& os, char c) const
+			{
+				os.device->put( c );
+			}
 			
-			// default version which is used when all the others don't match
-			template<typename T>
-			IOStream&
-			putInteger( T value );
-			
-			template<typename T>
-			IOStream&
-			putFloat( T value );
+			inline void
+			operator()(IOStream& os, FlashPointer<char> str) const
+			{
+				char c;
+				while ((c = *str++)) {
+					os.device->put(c);
+				}
+			}
+		};
 
-		private :
-			IOStream(const IOStream& );
+		template <typename T>
+		struct IntegerWriter
+		{
+			inline void
+			operator()(IOStream& os, const T& v) const
+			{
+				os.putInteger(v);
+			}
+		};
 
-			IOStream&
-			operator =(const IOStream& );
-
-			IODevice* const	device;
+		template <typename T>
+		struct FloatWriter
+		{
+			inline void
+			operator()(IOStream& os, const T& v) const
+			{
+				os.putFloat(v);
+			}
+		};
 	};
 	
 	/**
@@ -154,51 +201,6 @@ namespace xpcc
 	{
 		return flush(ios.put('\n'));
 	}
-	
-	struct StringWriter
-	{
-		inline void
-		operator()(IOStream& os, const char* s) const
-		{
-			os.device->put( s );
-		}
-
-		inline void
-		operator()(IOStream& os, char c) const
-		{
-			os.device->put( c );
-		}
-		
-		inline void
-		operator()(IOStream& os, FlashPointer<char> str) const
-		{
-			char c;
-			while ((c = *str++)) {
-				os.device->put(c);
-			}
-		}
-	};
-
-	template <typename T>
-	struct IntegerWriter
-	{
-		inline void
-		operator()(IOStream& os, const T& v) const
-		{
-			os.putInteger(v);
-		}
-	};
-
-	template <typename T>
-	struct FloatWriter
-	{
-		inline void
-		operator()(IOStream& os, const T& v) const
-		{
-			os.putFloat(v);
-		}
-	};
-
 };
 
 #include "iostream_impl.hpp"

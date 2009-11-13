@@ -26,15 +26,18 @@ $ sudo apt-get install python python-yaml scons
 To generate the documentation you need also the following packets:
 
 @verbatim
-$ sudo apt-get install doxygen graphviz
+$ sudo apt-get install doxygen graphviz python-jinja2
 @endverbatim
 
 Windows users have to install all the tools by hand. How to do that is explaind
-on each particular website.
+on the websites of the respective projects:
 
 - http://www.python.org/download/
 - http://www.scons.org/download.php
 - http://pyyaml.org/wiki/PyYAML
+
+- http://www.stack.nl/~dimitri/doxygen/download.html#latestsrc
+- http://www.graphviz.org/Download_windows.php
 
 @section organization Organization of the source
 
@@ -44,21 +47,35 @@ These files describe how to build a specific directory.
 
 Example from the tests folder:
 @verbatim
-target: pc						# target architecture
+target: pc                  # target architecture
 
-# build this directory as a standalone project
+# build this directory as a standalone project, all the files from the
+# subdirectories will be included as well.
 project:
-  executable: test_io_std		# name of the executable
+  executable: test_io_std   # name of the executable
   libs:
     - boost_date_time
     - boost_filesystem
-  includes: /usr/include		# you can either use this short version
-								# or the list version like 'libs' and 'libpath'
+  includes: /usr/include    # you can either use this short version
+                            # or the list version like 'libs' and 'libpath'
   libpath:
     - /usr/lib/
     - /path/to/library
 @endverbatim
 
+@todo Extend this documentation
+
+@subsection configure_scons Configure SCons
+
+Linux users might want to add the following to the '.bashrc' file (adjust the
+4 to the number of CPUs in your system):
+
+@verbatim
+export SCONSFLAGS="-Q -j4"
+@endverbatim
+
+Windows users achieve the same by setting the 'SCONSFLAGS' Variable in the
+'System Properties' window.
 
 @todo Extend this documentation
 

@@ -48,13 +48,13 @@ xpcc::IOStream::operator<< ( const T& v )
 	// typedef (T.is_integer) ? IntegerWriter<T> : ObjectWriter<T>
 	typedef typename xpcc::tm::Select <
 			::xpcc::ArithmeticTraits<T>::isFloat,
-			::xpcc::FloatWriter<T>,
-			::xpcc::StringWriter >::Result NotIntegerWriter;
-
+				FloatWriter<T>,
+				StringWriter >::Result NotIntegerWriter;
+	
     typedef typename xpcc::tm::Select <
 			::xpcc::ArithmeticTraits<T>::isInteger,
-			::xpcc::IntegerWriter<T>,
-			NotIntegerWriter >::Result Writer;
+				IntegerWriter<T>,
+				NotIntegerWriter >::Result Writer;
 	
     Writer()(*this, v);
 	
@@ -67,7 +67,7 @@ template<typename T>
 xpcc::IOStream&
 xpcc::IOStream::putInteger( T value )
 {
-	char str[ArithmeticTraits<T>::digits10 + 1]; // +1 for '\0'
+	char str[ArithmeticTraits<T>::decimalDigits + 1]; // +1 for '\0'
 	
 	snprintf(str, sizeof(str), "%d", value);
 	

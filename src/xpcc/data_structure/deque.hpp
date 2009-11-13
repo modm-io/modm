@@ -34,11 +34,13 @@
 #define	XPCC__DEQUE_HPP
 
 #include <stdint.h>
+#include <xpcc/utils/typet.hpp>
 
 namespace xpcc
 {
 	/**
 	 * @ingroup	data_structure
+	 * @headerfile <xpcc/data_structure/deque.hpp>
 	 * @brief	Double ended queue
 	 * 
 	 * Internally organised as a ring buffer.
@@ -57,20 +59,25 @@ namespace xpcc
 	 * 
 	 * @tparam	T	Type of the elements
 	 * @tparam	N	Size of the queue
-	 * @tparam	S	Type of status variables (use uint_fast8_t for N < 255 
-	 * 				(default value) otherwise uint_fast16_t)
+	 * 
+	 * Up to a size of 254 small index variables with 8-bits are used, after
+	 * this they are switched to 16-bit.
 	 * 
 	 * @warning		This class don't check if the container is not empty before
 	 * 				a pop operation. You have to do this by yourself!
 	 */
 	template<typename T,
-			 int N,
-			 typename S=uint_fast8_t>
+			 int N>
 	class BoundedDeque
 	{
 	public:
-		typedef S SizeType;
-	
+		// select the type of the index variables with some template magic :-)
+		typedef typename xpcc::tm::Select< (N >= 255),
+											uint_fast16_t,
+											uint_fast8_t >::Result Index;
+		
+		typedef Index Size;
+		
 	public:
 		BoundedDeque();
 		
@@ -80,10 +87,10 @@ namespace xpcc
 		inline bool
 		isFull() const;
 		
-		inline SizeType
+		inline Size
 		getSize() const;
 		
-		inline SizeType
+		inline Size
 		getMaxSize() const;
 		
 		/// @brief		Clear the container
@@ -140,10 +147,10 @@ namespace xpcc
 			const T* operator -> () const;
 		
 		private:
-			S index;
+			Index index;
 			const BoundedDeque * parent;
 			
-			S count;
+			Size count;
 		};
 		
 		const_iterator
@@ -153,9 +160,9 @@ namespace xpcc
 		end() const;
 		
 	private:
-		S head;
-		S tail;
-		SizeType size;
+		Index head;
+		Index tail;
+		Size size;
 		
 		T buffer[N];
 	};

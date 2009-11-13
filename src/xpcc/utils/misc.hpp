@@ -33,8 +33,13 @@
 #ifndef	MISC_HPP
 #define	MISC_HPP
 
-// Macro to force inlining on the functions if needed, because many
-// people compile with -Os, which does not always inline them.
+/**
+ * @ingroup	utils
+ * @brief	Force inlining
+ * 
+ * Macro to force inlining on the functions if needed, because many
+ * people compile with -Os, which does not always inline them.
+ */
 #define ALWAYS_INLINE  inline __attribute__((always_inline))
 
 

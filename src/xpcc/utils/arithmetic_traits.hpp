@@ -37,51 +37,56 @@
 namespace xpcc
 {
 	/**
-	 * \ingroup		utils
-	 * \defgroup	arithmetic_trais	Arithmetic Traits
-	 * \brief		Traits to give numbers more information then they have by
+	 * @ingroup		utils
+	 * @defgroup	arithmetic_trais	Arithmetic Traits
+	 * @brief		Traits to give numbers more information then they have by
 	 * 				default in C++
 	 *
-	 * \section provides	Values this Traits are Providing
+	 * @section provides	Values this Traits are Providing
 	 *
-	 * \li \c	DoubleType	Type that can holds the doubled length of data.
-	 * 						To use by multiplication.
-	 * \li \c	minValue	smallest value.
-	 * \li \c	maxValue	biggest value
-	 * \li \c	isSigned	is this a signed or unsigned type
-	 * \li \c	isInteger	is this an integer type
-	 * \li \c	isFloat		is this a float type (float, double)
-	 * \li \c	digits10	count of digits to display this type in decimal
+	 * @li @c	DoubleType	Type that can holds the doubled length of data.
+	 * 						My be used to hold the result of a multiplication.
+	 * @li @c	SignedType	Signed type for the given type. It applies 
+	 * 						<i>T == SignedType</i> if T is already signed.
+	 * @li @c	UnsignedType	Some as SignedType only for unsigned types
+	 * @li @c	minValue	smallest value.
+	 * @li @c	maxValue	biggest value
+	 * @li @c	isSigned	is this a signed or unsigned type
+	 * @li @c	isInteger	is this an integer type
+	 * @li @c	isFloat		is this a float type (float, double)
+	 * @li @c	decimalDigits	count of digits to display this type in decimal
 	 *
-	 * \section usage	Usage
-	 * \code
-	 * 	typedef typename xpcc::ArithmeticTraits<T>::DoubleType T_DOUBLE;
+	 * @section usage	Usage
+	 * @code
+	 * typedef typename xpcc::ArithmeticTraits<T>::DoubleType T_DOUBLE;
 	 *
-	 * 	T min = xpcc::ArithmeticTraits<T>::minValue;
-	 * 	T max = xpcc::ArithmeticTraits<T>::maxValue;
-	 * \endcode
+	 * T min = xpcc::ArithmeticTraits<T>::minValue;
+	 * T max = xpcc::ArithmeticTraits<T>::maxValue;
+	 * @endcode
 	 *
-	 * \version	$Id: arithmetic_traits.hpp 83 2009-10-15 19:58:57Z dergraaf $
-	 * \author	Martin Rosekeit <martin.rosekeit@rwth-aachen.de>
+	 * @version	$Id: arithmetic_traits.hpp 83 2009-10-15 19:58:57Z dergraaf $
+	 * @author	Martin Rosekeit <martin.rosekeit@rwth-aachen.de>
 	 */
 	// -------------------------------------------------------------------------
 	/*@{*/
 	template<typename T>
-	struct ArithmeticTraits {
+	struct ArithmeticTraits
+	{
 		static const bool isInteger = false;
 		static const bool isFloat = false;
 	};
 
 	// -------------------------------------------------------------------------
 	template<>
-	struct ArithmeticTraits<int8_t> {
+	struct ArithmeticTraits<int8_t>
+	{
 		typedef int16_t DoubleType;
 		typedef int8_t SignedType;
 		typedef uint8_t UnsignedType;
 
 		static const int8_t minValue = -0x80;
 		static const int8_t maxValue =  0x7F;
-		static const uint8_t digits10 = 4; // inc sign
+		static const uint8_t decimalDigits = 4; // inc sign
 
 		static const bool isInteger = true;
 		static const bool isFloat = false;
@@ -90,14 +95,15 @@ namespace xpcc
 
 	// -------------------------------------------------------------------------
 	template<>
-	struct ArithmeticTraits<uint8_t> {
+	struct ArithmeticTraits<uint8_t>
+	{
 		typedef uint16_t DoubleType;
 		typedef int8_t SignedType;
 		typedef uint8_t UnsignedType;
 
 		static const uint8_t minValue = 0;
 		static const uint8_t maxValue = 0xff;
-		static const uint8_t digits10 = 3;
+		static const uint8_t decimalDigits = 3;
 
 		static const bool isInteger = true;
 		static const bool isFloat = false;
@@ -106,14 +112,15 @@ namespace xpcc
 
 	// -------------------------------------------------------------------------
 	template<>
-	struct ArithmeticTraits<int16_t> {
+	struct ArithmeticTraits<int16_t>
+	{
 		typedef int32_t DoubleType;
 		typedef int16_t SignedType;
 		typedef uint16_t UnsignedType;
 
 		static const int16_t minValue = -0x8000;
 		static const int16_t maxValue =  0x7FFF;
-		static const uint8_t digits10 = 6; // inc. sign
+		static const uint8_t decimalDigits = 6; // inc. sign
 
 		static const bool isInteger = true;
 		static const bool isFloat = false;
@@ -122,14 +129,15 @@ namespace xpcc
 
 	// -------------------------------------------------------------------------
 	template<>
-	struct ArithmeticTraits<uint16_t> {
+	struct ArithmeticTraits<uint16_t>
+	{
 		typedef uint32_t DoubleType;
 		typedef int16_t SignedType;
 		typedef uint16_t UnsignedType;
 
 		static const uint16_t minValue = 0;
 		static const uint16_t maxValue = 0xFFFF;
-		static const uint8_t digits10 = 6;
+		static const uint8_t decimalDigits = 6;
 	
 		static const bool isInteger = true;
 		static const bool isFloat = false;
@@ -138,7 +146,8 @@ namespace xpcc
 	
 	// -------------------------------------------------------------------------
 	template<>
-	struct ArithmeticTraits<int32_t> {
+	struct ArithmeticTraits<int32_t>
+	{
 #ifdef __AVR__
 		typedef float DoubleType; // int64_t is on AVRs only a int32_t
 #else
@@ -149,7 +158,7 @@ namespace xpcc
 
 		static const int32_t minValue = -0x80000000;
 		static const int32_t maxValue =  0x7FFFFFFF;
-		static const uint8_t digits10 = 11; // inc. sign
+		static const uint8_t decimalDigits = 11; // inc. sign
 	
 		static const bool isInteger = true;
 		static const bool isFloat = false;
@@ -158,7 +167,8 @@ namespace xpcc
 	
 	// -------------------------------------------------------------------------
 	template<>
-	struct ArithmeticTraits<uint32_t> {
+	struct ArithmeticTraits<uint32_t>
+	{
 #ifdef __AVR__
 		typedef float DoubleType; // int64_t is on AVRs only a int32_t
 #else
@@ -169,7 +179,7 @@ namespace xpcc
 
 		static const uint32_t minValue = 0;
 		static const uint32_t maxValue = 0xFFFFFFFF;
-		static const uint8_t digits10 = 10;
+		static const uint8_t decimalDigits = 10;
 
 		static const bool isInteger = true;
 		static const bool isFloat = false;
@@ -194,8 +204,12 @@ namespace xpcc
 
 	// -------------------------------------------------------------------------
 #ifndef __AVR__
+	// the AVRs don't know a dedicated double type, double are implemented
+	// with sizeof(double) == sizeof(float). Therefore this specialization
+	// would be an ambiguous definition together with ArithmeticTraits<float>.
 	template<>
-	struct ArithmeticTraits<double> {
+	struct ArithmeticTraits<double>
+	{
 		typedef double DoubleType;
 		typedef double SignedType;
 		typedef double UnsignedType;
