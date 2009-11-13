@@ -5,7 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -30,63 +30,33 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC__PAIR_HPP
-#define	XPCC__PAIR_HPP
+#include <xpcc/data_structure/pair.hpp>
+#include <xpcc/hal/flash/flash_pointer.hpp>
 
-namespace xpcc
+#include "pair_test.hpp"
+
+// check if Pair could be used to be stored inside the Flash memory
+typedef xpcc::Pair<int8_t, int16_t> myPair;
+
+FLASH(myPair values[]) = {
+	{ 1, 3 },
+	{ 5, 30 },
+	{ 27, 100 }
+};
+
+void
+PairTest::testPair()
 {
-	/**
-	 * @ingroup		data_structure
-	 * @headerfile	<xpcc/data_structure/pair.hpp>
-	 * 
-	 * @brief		Pair<FirstType, SecondType> is a heterogeneous pair
-	 * 
-	 * It holds one object of type FirstType and ohne object of type
-	 * SecondType.
-	 * 
-	 * @todo	needs a better implementation without losing the POD attribute!
-	 */
-	template<typename FirstType, typename SecondType>
-	class Pair
-	{
-	public:
-		// No non-trivial constructor is allowed, otherwise this class
-		// won't be POD (plain old data) :-(
-		// (this changes with C++0x)
-		/*Pair(const FirstType& first, const SecondType& second) :
-			first(first), second(second)
-		{
-		}*/
-		
-		FirstType&
-		getFirst()
-		{
-			return first;
-		}
-		
-		const FirstType&
-		getFirst() const
-		{
-			return first;
-		}
-		
-		SecondType&
-		getSecond()
-		{
-			return second;
-		}
-		
-		const SecondType&
-		getSecond() const
-		{
-			return second;
-		}
-		
-	// not allowed either :-(
-	//private:
-		FirstType first;
-		SecondType second;
-	};
+	xpcc::FlashPointer<myPair> ptr(values);
+	
+	TEST_ASSERT_EQUALS(ptr[1].getFirst(), 5);
+	TEST_ASSERT_EQUALS(ptr[1].getSecond(), 30);
+	
+	TEST_ASSERT_EQUALS(ptr[2].getFirst(), 27);
+	TEST_ASSERT_EQUALS(ptr[2].getSecond(), 100);
+	
+	xpcc::Pair<int16_t, int16_t> pair = { 124, -1523 };
+	
+	TEST_ASSERT_EQUALS(pair.getFirst(), 124);
+	TEST_ASSERT_EQUALS(pair.getSecond(), -1523);
 }
-
-#endif	// XPCC__PAIR_HPP

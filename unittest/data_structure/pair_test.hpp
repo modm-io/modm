@@ -5,7 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -30,63 +30,11 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC__PAIR_HPP
-#define	XPCC__PAIR_HPP
+#include <unittest/testsuite.hpp>
 
-namespace xpcc
+class PairTest : public unittest::TestSuite
 {
-	/**
-	 * @ingroup		data_structure
-	 * @headerfile	<xpcc/data_structure/pair.hpp>
-	 * 
-	 * @brief		Pair<FirstType, SecondType> is a heterogeneous pair
-	 * 
-	 * It holds one object of type FirstType and ohne object of type
-	 * SecondType.
-	 * 
-	 * @todo	needs a better implementation without losing the POD attribute!
-	 */
-	template<typename FirstType, typename SecondType>
-	class Pair
-	{
-	public:
-		// No non-trivial constructor is allowed, otherwise this class
-		// won't be POD (plain old data) :-(
-		// (this changes with C++0x)
-		/*Pair(const FirstType& first, const SecondType& second) :
-			first(first), second(second)
-		{
-		}*/
-		
-		FirstType&
-		getFirst()
-		{
-			return first;
-		}
-		
-		const FirstType&
-		getFirst() const
-		{
-			return first;
-		}
-		
-		SecondType&
-		getSecond()
-		{
-			return second;
-		}
-		
-		const SecondType&
-		getSecond() const
-		{
-			return second;
-		}
-		
-	// not allowed either :-(
-	//private:
-		FirstType first;
-		SecondType second;
-	};
-}
-
-#endif	// XPCC__PAIR_HPP
+public:
+	void
+	testPair();
+};
