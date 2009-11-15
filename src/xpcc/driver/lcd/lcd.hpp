@@ -30,39 +30,55 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__PIN_HPP
-#define XPCC__PIN_HPP
+#ifndef XPCC__LCD_HPP
+#define XPCC__LCD_HPP
 
-#include <avr/io.h>
-#include <xpcc/utils/misc.hpp>
+#include <xpcc/io/iodevice.hpp>
 
-/// @ingroup	hal
-/// @brief		
-#define	CREATE_TYPE_IO_PIN(name, port, pin) \
-	struct name { \
-		name() { this->setInput() } \
-		ALWAYS_INLINE static void setOutput() { DDR ## port |= (1 << pin); } \
-		ALWAYS_INLINE static void setInput() { DDR ## port &= ~(1 << pin); } \
-		ALWAYS_INLINE static void set() { PORT ## port |= (1 << pin); } \
-		ALWAYS_INLINE static void reset() { PORT ## port &= ~(1 << pin); } \
-		ALWAYS_INLINE static bool get() { return (PIN ## port & (1 << pin)); } \
-	}
+namespace xpcc
+{
+	/**
+	 * @ingroup	driver
+	 * @brief	Base class for alphanumeric LCDs
+	 * 
+	 * 
+	 */
+	class Lcd : public IODevice
+	{
+	public:
+		// TODO: Need to find a suitable subset for all LCDs here!
+		typedef enum {
+			HOME,
+			CLEAR,
+			CURSOR_ON,
+			CURSOR_OFF,
+		} Command;
+		
+	public:
+		virtual void
+		init() = 0;
+		
+		virtual void
+		put(char c) = 0;
+		
+		using IODevice::put;
+		
+		virtual void
+		flush() = 0;
+		
+		// TODO we need a better name here!
+		//virtual void
+		//command(Command command) = 0;
+		
+		virtual void
+		setPosition(uint8_t line, uint8_t column) = 0;
+		
+		virtual bool
+		get(char&)
+		{
+			return false;
+		}
+	};
+}
 
-/// @ingroup	hal
-/// @brief		
-#define	CREATE_TYPE_OUTPUT_PIN(name, port, pin) \
-	struct name { \
-		name() { DDR ## port |= (1 << pin); } \
-		ALWAYS_INLINE static void set() { PORT ## port |= (1 << pin); } \
-		ALWAYS_INLINE static void reset() { PORT ## port &= ~(1 << pin); } \
-	}
-
-/// @ingroup	hal
-/// @brief		
-#define CREATE_TYPE_INPUT_PIN(name, port, pin) \
-	struct name { \
-		name() { DDR ## port &= ~(1 << pin); } \
-		ALWAYS_INLINE static bool get() { return (PIN ## port & (1 << pin)); } \
-	}
-
-#endif // XPCC__PIN_HPP
+#endif // XPCC__LCD_HPP

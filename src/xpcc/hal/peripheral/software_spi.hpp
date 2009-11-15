@@ -30,66 +30,86 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__IOSTREAM_HPP
-	#error	"Don't include this file directly, use 'io/iostream.hpp' instead!"
-#endif
+#ifndef XPCC__SOFTWARE_SPI_HPP
+#define XPCC__SOFTWARE_SPI_HPP
 
-#include <stdio.h>
-#include <stdlib.h>
+#include <stdint.h>
 
-#include <xpcc/math/utils.hpp>
-#include <xpcc/utils/arithmetic_traits.hpp>
-#include <xpcc/utils/typet.hpp>
-
-template<typename T>
-inline xpcc::IOStream&
-xpcc::IOStream::operator<< ( const T& v )
+namespace xpcc
 {
-	// typedef (T.is_integer) ? IntegerWriter<T> : ObjectWriter<T>
-	typedef typename xpcc::tm::Select <
-			::xpcc::ArithmeticTraits<T>::isFloat,
-				FloatWriter<T>,
-				StringWriter >::Result NotIntegerWriter;
-	
-    typedef typename xpcc::tm::Select <
-			::xpcc::ArithmeticTraits<T>::isInteger,
-				IntegerWriter<T>,
-				NotIntegerWriter >::Result Writer;
-	
-    Writer()(*this, v);
-	
-	return *this;
+	/**
+	 * @ingroup	hal
+	 * @headerfile	<xpcc/hal/peripheral/software_spi.hpp>
+	 * 
+	 * @brief	Software emulation of a SPI bus master
+	 * 
+	 * SPI stands for Serial Peripheral Interface Bus.
+	 * 
+	 * @todo	documentation
+	 * 
+	 * @tparam	SCLK		clock pin
+	 * @tparam	MOSI		master out slave in pin
+	 * @tparam	MISO		master in slave out pin
+	 * @tparam	FREQUENCY	requested SPI frequency in Hz
+	 * 
+	 * @see		gpio
+	 */
+	template <typename SCLK,
+			  typename MOSI,
+			  typename MISO,
+			  int32_t FREQUENCY = 1000000>
+	class SoftwareSpi
+	{
+	public:
+		SoftwareSpi()
+		{
+			init();
+		}
+		
+		inline static void
+		init()
+		{
+			SCLK::output();
+			MOSI::output();
+			MISO::input();
+		}
+		
+		static uint8_t
+		put(uint8_t out)
+		{
+			uint8_t in = 0;
+			
+			SCLK::reset();
+			for (uint8_t i = 0; i < 8; ++i)
+			{
+				in <<= 1;
+				if (out & 0x80) {
+					MOSI::set();
+				}
+				else {
+					MOSI::reset();
+				}
+				
+				SCLK::set();
+				_delay_us(delay);
+				
+				if (MISO::get()) {
+					in |= 1;
+				}
+				out <<= 1;
+				
+				SCLK::reset();
+				_delay_us(delay);
+			}
+			
+			return in;
+		}
+		
+	private:
+		// calculate the delay in microseconds needed to achieve the
+		// requested SPI frequency
+		static const float delay = (1000000.0 / FREQUENCY) / 2.0;
+	};
 }
 
-// ----------------------------------------------------------------------------
-
-template<typename T>
-xpcc::IOStream&
-xpcc::IOStream::putInteger( T value )
-{
-	char str[ArithmeticTraits<T>::decimalDigits + 1]; // +1 for '\0'
-	
-	snprintf(str, sizeof(str), "%d", value);
-	
-	this->device->put(str);
-	return *this;
-}
-
-// ----------------------------------------------------------------------------
-
-template<typename T>
-xpcc::IOStream&
-xpcc::IOStream::putFloat( const T& value )
-{
-	// hard coded for 2.22507e-308
-	char str[13 + 1]; // +1 for '\0'
-	
-#ifdef __AVR__
-	dtostre(value, str, 5, 0);
-#else
-	snprintf(str, sizeof(str), "%.5e", value);
-#endif
-	
-	this->device->put(str);
-	return *this;
-}
+#endif // XPCC__SOFTWARE_SPI_HPP

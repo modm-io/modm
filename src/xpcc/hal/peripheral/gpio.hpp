@@ -30,66 +30,75 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__IOSTREAM_HPP
-	#error	"Don't include this file directly, use 'io/iostream.hpp' instead!"
-#endif
+#ifndef XPCC__GPIO_HPP
+#define XPCC__GPIO_HPP
 
-#include <stdio.h>
-#include <stdlib.h>
+#include <xpcc/utils/misc.hpp>
 
-#include <xpcc/math/utils.hpp>
-#include <xpcc/utils/arithmetic_traits.hpp>
-#include <xpcc/utils/typet.hpp>
-
-template<typename T>
-inline xpcc::IOStream&
-xpcc::IOStream::operator<< ( const T& v )
+namespace xpcc
 {
-	// typedef (T.is_integer) ? IntegerWriter<T> : ObjectWriter<T>
-	typedef typename xpcc::tm::Select <
-			::xpcc::ArithmeticTraits<T>::isFloat,
-				FloatWriter<T>,
-				StringWriter >::Result NotIntegerWriter;
-	
-    typedef typename xpcc::tm::Select <
-			::xpcc::ArithmeticTraits<T>::isInteger,
-				IntegerWriter<T>,
-				NotIntegerWriter >::Result Writer;
-	
-    Writer()(*this, v);
-	
-	return *this;
+	/**
+	 * @ingroup	hal
+	 * @headerfile	<xpcc/hal/peripheral/atxmega/gpio.hpp>
+	 */
+	namespace gpio
+	{
+		/**
+		 * @brief	Dummy implementation of an I/O pin
+		 * 
+		 */
+		class Unused
+		{
+		public:
+			ALWAYS_INLINE static void
+			output()
+			{
+			}
+			
+			ALWAYS_INLINE static void
+			input()
+			{
+			}
+			
+			ALWAYS_INLINE static void
+			set()
+			{
+			}
+			
+			ALWAYS_INLINE static void
+			set(bool status)
+			{
+				(void) status;
+			}
+		
+			ALWAYS_INLINE static void
+			reset()
+			{
+			}
+			
+			ALWAYS_INLINE static bool
+			get()
+			{
+				return false;
+			}
+		};
+	}
 }
 
-// ----------------------------------------------------------------------------
+#if defined(__AVR__)
 
-template<typename T>
-xpcc::IOStream&
-xpcc::IOStream::putInteger( T value )
-{
-	char str[ArithmeticTraits<T>::decimalDigits + 1]; // +1 for '\0'
-	
-	snprintf(str, sizeof(str), "%d", value);
-	
-	this->device->put(str);
-	return *this;
-}
+	#if defined(__AVR_XMEGA__)
+		#include "atxmega/gpio.hpp"
+	#elif defined(__AVR_MEGA__)
+		#include "atmega/gpio.hpp"
+	#else
+		#error	"Unknown AVR target!"
+	#endif
 
-// ----------------------------------------------------------------------------
-
-template<typename T>
-xpcc::IOStream&
-xpcc::IOStream::putFloat( const T& value )
-{
-	// hard coded for 2.22507e-308
-	char str[13 + 1]; // +1 for '\0'
-	
-#ifdef __AVR__
-	dtostre(value, str, 5, 0);
 #else
-	snprintf(str, sizeof(str), "%.5e", value);
+
+	#error "No definitions for this target available!"
+
 #endif
-	
-	this->device->put(str);
-	return *this;
-}
+
+#endif // XPCC__GPIO_HPP

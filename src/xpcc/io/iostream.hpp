@@ -122,7 +122,7 @@ namespace xpcc
 		
 		template<typename T>
 		IOStream&
-		putFloat( T value );
+		putFloat( const T& value );
 
 	private :
 		IOStream(const IOStream& );

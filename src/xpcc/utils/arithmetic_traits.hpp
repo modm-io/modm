@@ -189,7 +189,8 @@ namespace xpcc
 	// -------------------------------------------------------------------------
 
 	template<>
-	struct ArithmeticTraits<float> {
+	struct ArithmeticTraits<float>
+	{
 		typedef float DoubleType;
 		typedef float SignedType;
 		typedef float UnsignedType;
@@ -203,10 +204,27 @@ namespace xpcc
 	};
 
 	// -------------------------------------------------------------------------
-#ifndef __AVR__
-	// the AVRs don't know a dedicated double type, double are implemented
-	// with sizeof(double) == sizeof(float). Therefore this specialization
-	// would be an ambiguous definition together with ArithmeticTraits<float>.
+
+#ifdef __AVR__
+	// the AVRs don't know a dedicated double type, double is implemented
+	// with sizeof(double) == sizeof(float).
+	template<>
+	struct ArithmeticTraits<double>
+	{
+		typedef double DoubleType;
+		typedef double SignedType;
+		typedef double UnsignedType;
+
+		static const double minValue = -3.40282e+38;
+		static const double maxValue = 3.40282e+38;
+	
+		static const bool isInteger = false;
+		static const bool isFloat = true;
+		static const bool isSigned = true;
+	};
+
+#else
+
 	template<>
 	struct ArithmeticTraits<double>
 	{
@@ -221,6 +239,7 @@ namespace xpcc
 		static const bool isFloat = true;
 		static const bool isSigned = true;
 	};
+
 #endif
 	/*@}*/
 };

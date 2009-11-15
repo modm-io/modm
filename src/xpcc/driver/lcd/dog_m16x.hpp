@@ -30,66 +30,61 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__IOSTREAM_HPP
-	#error	"Don't include this file directly, use 'io/iostream.hpp' instead!"
-#endif
+#ifndef XPCC__DOG_M16X_HPP
+#define XPCC__DOG_M16X_HPP
 
-#include <stdio.h>
-#include <stdlib.h>
+#include <stdint.h>
+#include <xpcc/driver/lcd/lcd.hpp>
 
-#include <xpcc/math/utils.hpp>
-#include <xpcc/utils/arithmetic_traits.hpp>
-#include <xpcc/utils/typet.hpp>
-
-template<typename T>
-inline xpcc::IOStream&
-xpcc::IOStream::operator<< ( const T& v )
+namespace xpcc
 {
-	// typedef (T.is_integer) ? IntegerWriter<T> : ObjectWriter<T>
-	typedef typename xpcc::tm::Select <
-			::xpcc::ArithmeticTraits<T>::isFloat,
-				FloatWriter<T>,
-				StringWriter >::Result NotIntegerWriter;
+	/**
+	 * @ingroup	driver
+	 * @headerfile	<xpcc/driver/lcd/dog_m16x.hpp>
+	 * 
+	 * @brief	Driver for DOG-M162
+	 * 
+	 * @todo	documentation
+	 * @todo	make this class adaptable to other voltages and line counts!
+	 */
+	template <typename SPI, typename CS, typename RS>
+	class DogM16x : public Lcd
+	{
+	public:
+		virtual void
+		init();
+		
+		virtual void
+		put(char c);
+		
+		virtual void
+		put(const char *s);
+		
+		virtual void
+		flush();
+		
+		//virtual void
+		//command(Command command);
+		
+		virtual void
+		setPosition(uint8_t line, uint8_t column);
+		
+		// TODO
+		//void
+		//setContrast();
 	
-    typedef typename xpcc::tm::Select <
-			::xpcc::ArithmeticTraits<T>::isInteger,
-				IntegerWriter<T>,
-				NotIntegerWriter >::Result Writer;
-	
-    Writer()(*this, v);
-	
-	return *this;
+	protected:
+		void
+		writeData(uint8_t data);
+		
+		void
+		writeCommand(uint8_t command);
+		
+		uint8_t column;
+		uint8_t line;
+	};
 }
 
-// ----------------------------------------------------------------------------
+#include "dog_m16x_impl.hpp"
 
-template<typename T>
-xpcc::IOStream&
-xpcc::IOStream::putInteger( T value )
-{
-	char str[ArithmeticTraits<T>::decimalDigits + 1]; // +1 for '\0'
-	
-	snprintf(str, sizeof(str), "%d", value);
-	
-	this->device->put(str);
-	return *this;
-}
-
-// ----------------------------------------------------------------------------
-
-template<typename T>
-xpcc::IOStream&
-xpcc::IOStream::putFloat( const T& value )
-{
-	// hard coded for 2.22507e-308
-	char str[13 + 1]; // +1 for '\0'
-	
-#ifdef __AVR__
-	dtostre(value, str, 5, 0);
-#else
-	snprintf(str, sizeof(str), "%.5e", value);
-#endif
-	
-	this->device->put(str);
-	return *this;
-}
+#endif // XPCC__DOG_M16X_HPP

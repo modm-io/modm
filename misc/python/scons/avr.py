@@ -136,7 +136,7 @@ def generate(env, **kw):
 		"-Wl,-Map=${TARGET.base}.map,--cref", 
 		"-Wl,--relax", 
 		"-Wl,--gc-sections",
-#		"-Wl,-u,vfprintf -lprintf_flt"		# enable float support for vfprinft
+		"-Wl,-u,vfprintf -lprintf_flt"		# enable float support for vfprinft
 	])
 	
 	env['LINKCOM'] = "$LINK -o $TARGET $LINKFLAGS $SOURCES -lm $_LIBDIRFLAGS $_LIBFLAGS -lm"

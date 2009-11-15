@@ -1,7 +1,7 @@
 
 #target: atmega
-#target: atxmega
-target: pc
+target: atxmega
+#target: pc
 
 atmega:
 #  device: atmega2560
@@ -12,8 +12,10 @@ atmega:
     port: /dev/ttyUSB0
 
 atxmega:
-  device: atxmega128a1
-  clock: 32000000
+  device: atxmega32a4
+#  device: atxmega128a1
+  clock: 2000000
+#  clock: 32000000
   avrdude:
     programmer: avrispmkII
     port: usb

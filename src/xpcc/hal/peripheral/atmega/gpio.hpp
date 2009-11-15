@@ -30,66 +30,47 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__IOSTREAM_HPP
-	#error	"Don't include this file directly, use 'io/iostream.hpp' instead!"
-#endif
+#ifndef XPCC__GPIO_MEGA_HPP
+#define XPCC__GPIO_MEGA_HPP
 
-#include <stdio.h>
-#include <stdlib.h>
+#include <avr/io.h>
+#include <xpcc/utils/misc.hpp>
 
-#include <xpcc/math/utils.hpp>
-#include <xpcc/utils/arithmetic_traits.hpp>
-#include <xpcc/utils/typet.hpp>
+/**
+ * @ingroup	hal
+ * @brief	Create a input/output pin type
+ */
+#define	CREATE_IO_PIN(name, port, pin) \
+	struct name { \
+		name() { this->input() } \
+		ALWAYS_INLINE static void output() { DDR ## port |= (1 << pin); } \
+		ALWAYS_INLINE static void input() { DDR ## port &= ~(1 << pin); } \
+		ALWAYS_INLINE static void set() { PORT ## port |= (1 << pin); } \
+		ALWAYS_INLINE static void reset() { PORT ## port &= ~(1 << pin); } \
+		ALWAYS_INLINE static bool get() { return (PIN ## port & (1 << pin)); } \
+	}
 
-template<typename T>
-inline xpcc::IOStream&
-xpcc::IOStream::operator<< ( const T& v )
-{
-	// typedef (T.is_integer) ? IntegerWriter<T> : ObjectWriter<T>
-	typedef typename xpcc::tm::Select <
-			::xpcc::ArithmeticTraits<T>::isFloat,
-				FloatWriter<T>,
-				StringWriter >::Result NotIntegerWriter;
-	
-    typedef typename xpcc::tm::Select <
-			::xpcc::ArithmeticTraits<T>::isInteger,
-				IntegerWriter<T>,
-				NotIntegerWriter >::Result Writer;
-	
-    Writer()(*this, v);
-	
-	return *this;
-}
+/**
+ * @ingroup	hal
+ * @brief	Create a output pin type
+ */
+#define	CREATE_OUTPUT_PIN(name, port, pin) \
+	struct name { \
+		name() { this->output(); } \
+		ALWAYS_INLINE static void output() { DDR ## port |= (1 << pin); } \
+		ALWAYS_INLINE static void set() { PORT ## port |= (1 << pin); } \
+		ALWAYS_INLINE static void reset() { PORT ## port &= ~(1 << pin); } \
+	}
 
-// ----------------------------------------------------------------------------
+/**
+ * @ingroup	hal
+ * @brief	Create a input type
+ */
+#define CREATE_INPUT_PIN(name, port, pin) \
+	struct name { \
+		name() { this->input(); } \
+		ALWAYS_INLINE static void input() { DDR ## port &= ~(1 << pin); } \
+		ALWAYS_INLINE static bool get() { return (PIN ## port & (1 << pin)); } \
+	}
 
-template<typename T>
-xpcc::IOStream&
-xpcc::IOStream::putInteger( T value )
-{
-	char str[ArithmeticTraits<T>::decimalDigits + 1]; // +1 for '\0'
-	
-	snprintf(str, sizeof(str), "%d", value);
-	
-	this->device->put(str);
-	return *this;
-}
-
-// ----------------------------------------------------------------------------
-
-template<typename T>
-xpcc::IOStream&
-xpcc::IOStream::putFloat( const T& value )
-{
-	// hard coded for 2.22507e-308
-	char str[13 + 1]; // +1 for '\0'
-	
-#ifdef __AVR__
-	dtostre(value, str, 5, 0);
-#else
-	snprintf(str, sizeof(str), "%.5e", value);
-#endif
-	
-	this->device->put(str);
-	return *this;
-}
+#endif // XPCC__GPIO_MEGA_HPP
