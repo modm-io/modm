@@ -242,7 +242,6 @@ namespace xpcc
 
 #endif
 	/*@}*/
-};
+}
 
 #endif	// XPCC__ARITHMETIC_TRAITS_HPP
-

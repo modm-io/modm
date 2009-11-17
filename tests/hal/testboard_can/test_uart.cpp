@@ -2,8 +2,8 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 
-#include <xpcc/hal/peripheral/atmega/uart/buffered_uart0.hpp>
-#include <xpcc/hal/peripheral/atmega/uart/uart_device.hpp>
+#include <xpcc/hal/peripheral/avr/mega/uart/buffered_uart0.hpp>
+#include <xpcc/io/iodevice_wrapper.hpp>
 #include <xpcc/io/iostream.hpp>
 
 int main(void)
@@ -18,7 +18,7 @@ int main(void)
 	xpcc::BufferedUart0::put('\n');
 	
 	// create a generic device from the uart
-	xpcc::UartDevice<xpcc::BufferedUart0> device(uart);
+	xpcc::IODeviceWrapper<xpcc::BufferedUart0> device(uart);
 	device.put("Hallo Welt!\n");
 	
 	// test a stream

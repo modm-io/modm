@@ -47,8 +47,6 @@ xpcc::DogM16x<SPI, CS, RS>::init()
 	CS::output();
 	RS::output();
 	
-	_delay_ms(50);
-	
 	// initialization only vaild for 3,3V!
 	writeCommand(0x39);
 	writeCommand(0x39);
@@ -58,9 +56,10 @@ xpcc::DogM16x<SPI, CS, RS>::init()
 	writeCommand(0x78);
 	
 	writeCommand(0x0f);
-	writeCommand(0x01);
-	writeCommand(0x06);
-	writeCommand(0x0c);		// on, no cursor, no blink
+	writeCommand(0x01);		// clear display
+	writeCommand(0x03);		// return to home position
+	writeCommand(0x06);		// set cursor move direction
+	writeCommand(0x0c);		// display on, disable cursor, no blink
 	
 	line = 0;
 	column = 0;
@@ -70,7 +69,8 @@ template <typename SPI, typename CS, typename RS>
 void
 xpcc::DogM16x<SPI, CS, RS>::put(char c)
 {
-	if (c == '\n') {
+	if (c == '\n')
+	{
 		line++;
 		if (line >= 2) {
 			line = 0;
@@ -79,9 +79,20 @@ xpcc::DogM16x<SPI, CS, RS>::put(char c)
 		setPosition(line, column);
 	}
 	else {
+		if (column >= 16) {
+			this->put('\n');
+		}
 		writeData(c);
 		column++;
 	}
+}
+
+template <typename SPI, typename CS, typename RS>
+void
+xpcc::DogM16x<SPI, CS, RS>::putRaw(char c)
+{
+	writeData(c);
+	column++;
 }
 
 template <typename SPI, typename CS, typename RS>

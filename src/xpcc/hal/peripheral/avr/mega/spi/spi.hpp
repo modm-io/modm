@@ -26,73 +26,45 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: buffered_uartn.hpp.tmpl 122 2009-11-12 00:06:50Z dergraaf $
- */
-// ----------------------------------------------------------------------------
-/*
- * WARNING: This file is generated automatically, do not edit!
- * Please modify the corresponding *.tmpl file instead and re-run the
- * script 'generate.py'.
- *
- * Generated 12 Nov 2009, 14:35:16
+ * $Id$
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__UART3_HPP
-#define XPCC__UART3_HPP
+#ifndef XPCC__MEGA_SPI_HPP
+#define XPCC__MEGA_SPI_HPP
 
+#include <avr/io.h>
 #include <stdint.h>
 
 namespace xpcc
 {
-	/**
-	 * @ingroup		hal
-	 * @headerfile	<xpcc/hal/peripheral/atmega/uart/buffered_uart3.hpp>
-	 * @brief		UART3
-	 * 
-	 * This implementation uses a ringbuffer.
-	 */
-	class BufferedUart3
+	class Spi
 	{
 	public:
-		/// @todo	check if this works as desired!
-		BufferedUart3(uint32_t baudrate)
-		{
-			this->setBaudrate(baudrate);
-		}
+		typedef enum {
+			MODE_0 = 0,				//!< SCK normal, sample on rising edge
+			MODE_1 = (1 << CPHA),	//!< SCK normal, sample on falling edge
+			MODE_2 = (1 << CPOL),	//!< SCK inverted, sample on falling edge
+			MODE_3 = (1 << CPOL) | (1 << CPHA),	
+									//!< SCK inverted, sample on rising edge
+		} Mode;
 		
-		/// @brief	Set baud rate
-		///
-		/// If this function is called with a constant value as parameter,
-		/// all the calculation is done by the compiler, so no 32-bit
-		/// arithmetic is needed at run-time!
-		///
-		/// @param	baudrate	desired baud rate
-		/// @param	u2x			enabled double speed mode
-		static inline void
-		setBaudrate(uint32_t baudrate, bool u2x = false)
-		{
-			uint16_t ubrr;
-			if (u2x) {
-				ubrr  = (F_CPU / (baudrate * 8l)) - 1;
-				ubrr |= 0x8000;
-			}
-			else {
-				ubrr = (F_CPU / (baudrate * 16l)) - 1;
-			}
-			setBaudrateRegister(ubrr);
-		}
+		typedef enum {
+			PRESCALER_2 = 0x80 | 0,
+			PRESCALER_4 = 0,
+			PRESCALER_8 = 0x80 | (1 << SPR0),
+			PRESCALER_16 = (1 << SPR0),
+			PRESCALER_32 = 0x80 | (1 << SPR1),
+			PRESCALER_64 = (1 << SPR1),
+			PRESCALER_128 = (1 << SPR1) | (1 << SPR0),
+		} Prescaler;
+	
+	public:
+		Spi(Mode mode, Prescaler prescaler);
 		
-		static void
-		put(char data);
-		
-		static bool
-		get(char& c);
-		
-	protected:
-		static void
-		setBaudrateRegister(uint16_t ubrr);
+		static uint8_t
+		put(uint8_t data);
 	};
 }
 
-#endif // XPCC__UART3_HPP
+#endif // XPCC__MEGA_SPI_HPP

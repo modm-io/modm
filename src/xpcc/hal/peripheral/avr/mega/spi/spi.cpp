@@ -26,73 +26,26 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: buffered_uartn.hpp.tmpl 122 2009-11-12 00:06:50Z dergraaf $
- */
-// ----------------------------------------------------------------------------
-/*
- * WARNING: This file is generated automatically, do not edit!
- * Please modify the corresponding *.tmpl file instead and re-run the
- * script 'generate.py'.
- *
- * Generated 12 Nov 2009, 14:35:16
+ * $Id$
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__UART0_HPP
-#define XPCC__UART0_HPP
+#include "spi.hpp"
 
-#include <stdint.h>
-
-namespace xpcc
+xpcc::Spi::Spi(Mode mode, Prescaler prescaler)
 {
-	/**
-	 * @ingroup		hal
-	 * @headerfile	<xpcc/hal/peripheral/atmega/uart/buffered_uart0.hpp>
-	 * @brief		UART0
-	 * 
-	 * This implementation uses a ringbuffer.
-	 */
-	class BufferedUart0
-	{
-	public:
-		/// @todo	check if this works as desired!
-		BufferedUart0(uint32_t baudrate)
-		{
-			this->setBaudrate(baudrate);
-		}
-		
-		/// @brief	Set baud rate
-		///
-		/// If this function is called with a constant value as parameter,
-		/// all the calculation is done by the compiler, so no 32-bit
-		/// arithmetic is needed at run-time!
-		///
-		/// @param	baudrate	desired baud rate
-		/// @param	u2x			enabled double speed mode
-		static inline void
-		setBaudrate(uint32_t baudrate, bool u2x = false)
-		{
-			uint16_t ubrr;
-			if (u2x) {
-				ubrr  = (F_CPU / (baudrate * 8l)) - 1;
-				ubrr |= 0x8000;
-			}
-			else {
-				ubrr = (F_CPU / (baudrate * 16l)) - 1;
-			}
-			setBaudrateRegister(ubrr);
-		}
-		
-		static void
-		put(char data);
-		
-		static bool
-		get(char& c);
-		
-	protected:
-		static void
-		setBaudrateRegister(uint16_t ubrr);
-	};
+	SPCR = (1 << SPE) | (1 << MSTR) | (prescaler & ~0x80) | mode;
+	SPSR = (prescaler & 0x80) ? (1 << SPI2X) : 0;
+	
+	// TODO set hardware pins
 }
 
-#endif // XPCC__UART0_HPP
+uint8_t
+xpcc::Spi::put(uint8_t data)
+{
+	SPDR = data;
+	while (!(SPSR & (1 << SPIF))) {
+		// wait for the transmission to complete
+	}
+	return SPDR;
+}

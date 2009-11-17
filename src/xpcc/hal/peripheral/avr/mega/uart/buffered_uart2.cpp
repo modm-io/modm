@@ -34,7 +34,7 @@
  * Please modify the corresponding *.tmpl file instead and re-run the
  * script 'generate.py'.
  *
- * Generated 12 Nov 2009, 14:35:16
+ * Generated 16 Nov 2009, 19:16:08
  */
 // ----------------------------------------------------------------------------
 
@@ -42,6 +42,7 @@
 #include <avr/interrupt.h>
 
 #include <xpcc/hal/atomic/queue.hpp>
+#include <xpcc/hal/atomic/lock.hpp>
 
 #include "uart_defines.h"
 #include "uart_defaults.h"
@@ -50,6 +51,7 @@
 #include "buffered_uart2.hpp"
 
 static xpcc::atomic::Queue<char, UART2_RX_BUFFER_SIZE> rxBuffer;
+static xpcc::atomic::Queue<char, UART2_TX_BUFFER_SIZE> txBuffer;
 
 // ----------------------------------------------------------------------------
 // called when the UART has received a character
@@ -72,6 +74,23 @@ ISR(UART2_RECEIVE_INTERRUPT)
 	
 	// TODO Fehlerbehandlung
 	rxBuffer.push(data);
+}
+
+// ----------------------------------------------------------------------------
+// called when the UART is ready to transmit the next byte
+
+ISR(UART2_TRANSMIT_INTERRUPT)
+{
+	if (txBuffer.isEmpty())
+	{
+		// transmission finished, disable UDRE interrupt
+		UART2_CONTROL &= ~(1 << UART2_UDRIE);
+	}
+	else {
+		// get one byte from buffer and write it to UART (starts transmission)
+		UART2_DATA = txBuffer.get();
+		txBuffer.pop();
+	}
 }
 
 // ----------------------------------------------------------------------------
@@ -99,6 +118,20 @@ xpcc::BufferedUart2::setBaudrateRegister(uint16_t ubrr)
 	#else
 	UCSR0C = (3 << UCSZ00);
 	#endif
+}
+
+// ----------------------------------------------------------------------------
+void
+xpcc::BufferedUart2::put(char c)
+{
+	while (!txBuffer.push(c)) {
+		// wait for a free slot in the buffer
+	}
+	
+	atomic::Lock lock;
+	
+	// enable UDRE interrupt
+	UART2_CONTROL |= (1 << UART2_UDRIE);
 }
 
 // ----------------------------------------------------------------------------

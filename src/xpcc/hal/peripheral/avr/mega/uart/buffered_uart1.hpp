@@ -34,12 +34,12 @@
  * Please modify the corresponding *.tmpl file instead and re-run the
  * script 'generate.py'.
  *
- * Generated 12 Nov 2009, 14:35:16
+ * Generated 16 Nov 2009, 19:16:08
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__UART2_HPP
-#define XPCC__UART2_HPP
+#ifndef XPCC__MEGA_UART1_HPP
+#define XPCC__MEGA_UART1_HPP
 
 #include <stdint.h>
 
@@ -47,16 +47,16 @@ namespace xpcc
 {
 	/**
 	 * @ingroup		hal
-	 * @headerfile	<xpcc/hal/peripheral/atmega/uart/buffered_uart2.hpp>
-	 * @brief		UART2
+	 * @headerfile	<xpcc/hal/peripheral/avr/mega/uart/buffered_uart1.hpp>
+	 * @brief		UART1
 	 * 
 	 * This implementation uses a ringbuffer.
 	 */
-	class BufferedUart2
+	class BufferedUart1
 	{
 	public:
 		/// @todo	check if this works as desired!
-		BufferedUart2(uint32_t baudrate)
+		BufferedUart1(uint32_t baudrate)
 		{
 			this->setBaudrate(baudrate);
 		}
@@ -95,4 +95,4 @@ namespace xpcc
 	};
 }
 
-#endif // XPCC__UART2_HPP
+#endif // XPCC__MEGA_UART1_HPP

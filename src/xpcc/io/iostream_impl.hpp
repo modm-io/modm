@@ -41,6 +41,8 @@
 #include <xpcc/utils/arithmetic_traits.hpp>
 #include <xpcc/utils/typet.hpp>
 
+// ----------------------------------------------------------------------------
+
 template<typename T>
 inline xpcc::IOStream&
 xpcc::IOStream::operator<< ( const T& v )

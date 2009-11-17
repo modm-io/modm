@@ -39,7 +39,7 @@ namespace xpcc
 {
 	/**
 	 * @ingroup	hal
-	 * @headerfile	<xpcc/hal/peripheral/atxmega/gpio.hpp>
+	 * @headerfile	<xpcc/hal/peripheral/gpio.hpp>
 	 */
 	namespace gpio
 	{
@@ -88,9 +88,9 @@ namespace xpcc
 #if defined(__AVR__)
 
 	#if defined(__AVR_XMEGA__)
-		#include "atxmega/gpio.hpp"
+		#include "avr/xmega/gpio.hpp"
 	#elif defined(__AVR_MEGA__)
-		#include "atmega/gpio.hpp"
+		#include "avr/mega/gpio.hpp"
 	#else
 		#error	"Unknown AVR target!"
 	#endif

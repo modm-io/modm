@@ -51,11 +51,23 @@ namespace xpcc
 	class DogM16x : public Lcd
 	{
 	public:
+		/// @brief	Initialize the display
+		/// 
+		/// The display needs some time to initalize after startup. You have
+		/// to wait at least 50 ms until calling this method.
 		virtual void
 		init();
 		
+		/// @brief	Write one character
+		/// 
+		/// This method provides an automatic wrap-round if the output reaches
+		/// the end of line  or a newline character is detected. Use putRaw()
+		/// if this behavior is not wanted.
 		virtual void
 		put(char c);
+		
+		virtual void
+		putRaw(char c);
 		
 		virtual void
 		put(const char *s);

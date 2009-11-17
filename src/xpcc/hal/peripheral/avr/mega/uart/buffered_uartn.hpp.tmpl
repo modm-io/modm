@@ -29,23 +29,63 @@
  * $Id$
  */
 // ----------------------------------------------------------------------------
+{{ generation_block }}
 
-#include "spi.hpp"
+#ifndef XPCC__MEGA_UART{{ id }}_HPP
+#define XPCC__MEGA_UART{{ id }}_HPP
 
-xpcc::Spi::Spi(Mode mode, Prescaler prescaler)
+#include <stdint.h>
+
+namespace xpcc
 {
-	SPCR = (1 << SPE) | (1 << MSTR) | (prescaler & ~0x80) | mode;
-	SPSR = (prescaler & 0x80) ? (1 << SPI2X) : 0;
-	
-	// TODO set hardware pins
+	/**
+	 * @ingroup		hal
+	 * @headerfile	<xpcc/hal/peripheral/avr/mega/uart/buffered_uart{{ id }}.hpp>
+	 * @brief		UART{{ id }}
+	 * 
+	 * This implementation uses a ringbuffer.
+	 */
+	class BufferedUart{{ id }}
+	{
+	public:
+		/// @todo	check if this works as desired!
+		BufferedUart{{ id }}(uint32_t baudrate)
+		{
+			this->setBaudrate(baudrate);
+		}
+		
+		/// @brief	Set baud rate
+		///
+		/// If this function is called with a constant value as parameter,
+		/// all the calculation is done by the compiler, so no 32-bit
+		/// arithmetic is needed at run-time!
+		///
+		/// @param	baudrate	desired baud rate
+		/// @param	u2x			enabled double speed mode
+		static inline void
+		setBaudrate(uint32_t baudrate, bool u2x = false)
+		{
+			uint16_t ubrr;
+			if (u2x) {
+				ubrr  = (F_CPU / (baudrate * 8l)) - 1;
+				ubrr |= 0x8000;
+			}
+			else {
+				ubrr = (F_CPU / (baudrate * 16l)) - 1;
+			}
+			setBaudrateRegister(ubrr);
+		}
+		
+		static void
+		put(char data);
+		
+		static bool
+		get(char& c);
+		
+	protected:
+		static void
+		setBaudrateRegister(uint16_t ubrr);
+	};
 }
 
-uint8_t
-xpcc::Spi::send(uint8_t data)
-{
-	SPDR = data;
-	while (!(SPSR & (1 << SPIF))) {
-		// wait for the transmission to complete
-	}
-	return SPDR;
-}
+#endif // XPCC__MEGA_UART{{ id }}_HPP

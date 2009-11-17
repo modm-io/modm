@@ -30,8 +30,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__GPIO_XMEGA_HPP
-#define XPCC__GPIO_XMEGA_HPP
+#ifndef XPCC__XMEGA_GPIO_HPP
+#define XPCC__XMEGA_GPIO_HPP
 
 #include <avr/io.h>
 #include <xpcc/utils/misc.hpp>
@@ -40,7 +40,7 @@ namespace xpcc
 {
 	/**
 	 * @ingroup	hal
-	 * @headerfile	<xpcc/hal/peripheral/atxmega/gpio.hpp>
+	 * @headerfile	<xpcc/hal/peripheral/avr/xmega/gpio.hpp>
 	 */
 	namespace gpio
 	{
@@ -168,4 +168,4 @@ namespace xpcc
 	}
 
 
-#endif // XPCC__GPIO_XMEGA_HPP
+#endif // XPCC__XMEGA_GPIO_HPP

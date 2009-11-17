@@ -61,6 +61,9 @@ namespace xpcc
 		virtual void
 		put(char c) = 0;
 		
+		virtual void
+		putRaw(char c) = 0;
+		
 		using IODevice::put;
 		
 		virtual void
@@ -73,6 +76,10 @@ namespace xpcc
 		virtual void
 		setPosition(uint8_t line, uint8_t column) = 0;
 		
+		/// @brief	Read a character
+		///
+		/// Because a LCD is a read-only device this method will always return
+		/// \b false.
 		virtual bool
 		get(char&)
 		{

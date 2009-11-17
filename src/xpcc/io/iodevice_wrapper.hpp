@@ -26,61 +26,76 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id$
- */
-// ----------------------------------------------------------------------------
-/*
- * WARNING: This file is generated automatically, do not edit!
- * Please modify the corresponding *.tmpl file instead and re-run the
- * script 'generate.py'.
- *
- * Generated 12 Nov 2009, 14:35:16
+ * $Id: uart.hpp 93 2009-10-18 15:09:37Z dergraaf $
  */
 // ----------------------------------------------------------------------------
 
-#include <avr/io.h>
-#include <avr/interrupt.h>
+#ifndef XPCC__IODEVICE_WRAPPER_HPP
+#define XPCC__IODEVICE_WRAPPER_HPP
 
-#include <xpcc/hal/atomic/queue.hpp>
-#include <xpcc/hal/atomic/lock.hpp>
+#include <stdint.h>
 
-#include "uart_defines.h"
-#include "uart_defaults.h"
+#include "iodevice.hpp"
 
-#ifdef ATMEGA_USART2
-#include "buffered_uart2.hpp"
-
-static xpcc::atomic::Queue<char, UART2_TX_BUFFER_SIZE> txBuffer;
-
-// ----------------------------------------------------------------------------
-// called when the UART is ready to transmit the next byte
-
-ISR(UART2_TRANSMIT_INTERRUPT)
+namespace xpcc
 {
-	if (txBuffer.isEmpty())
+	/**
+	 * @ingroup		io
+	 * @headerfile	<xpcc/iodevice_wrapper.hpp>
+	 * @brief		Wrapper to use any peripheral device that supports static
+	 * 				put() and get() as an IODevice
+	 * 
+	 * @tparam		T	Peripheral which should be wrapped
+	 * 
+	 * Example:
+	 * @code
+	 * // configure a UART
+	 * xpcc::BufferedUart0 uart(9600);
+	 * 
+	 * // wrap it in a IODevice
+	 * xpcc::IODeviceWrapper<xpcc::BufferedUart0> device(uart);
+	 * 
+	 * // use this device to print a message
+	 * device.put("Hello");
+	 * 
+	 * // or create a IOStream and use the stream to print something
+	 * xpcc::IOStream stream(device);
+	 * stream << " World!";
+	 * @endcode
+	 * 
+	 */
+	template<typename T>
+	class IODeviceWrapper : public IODevice
 	{
-		// transmission finished, disable UDRE interrupt
-		UART2_CONTROL &= ~(1 << UART2_UDRIE);
-	}
-	else {
-		// get one byte from buffer and write it to UART (starts transmission)
-		UART2_DATA = txBuffer.get();
-		txBuffer.pop();
-	}
+	public:
+		/// @brief	Constructor
+		///
+		/// @param	device	configured object
+		IODeviceWrapper(const T& device)
+		{
+			// get rid of the warning about an unused paramter
+			(void) device;
+		}
+		
+		virtual inline void
+		put(char c)
+		{
+			T::put(c);
+		}
+		
+		using IODevice::put;
+		
+		virtual inline void
+		flush()
+		{
+		}
+		
+		virtual inline bool
+		get(char& c)
+		{
+			return T::get(c);
+		}
+	};
 }
 
-// ----------------------------------------------------------------------------
-void
-xpcc::BufferedUart2::put(char c)
-{
-	while (!txBuffer.push(c)) {
-		// wait for a free slot in the buffer
-	}
-	
-	atomic::Lock lock;
-	
-	// enable UDRE interrupt
-	UART2_CONTROL |= (1 << UART2_UDRIE);
-}
-
-#endif
+#endif // XPCC__IODEVICE_WRAPPER_HPP

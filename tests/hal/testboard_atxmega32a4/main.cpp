@@ -31,7 +31,7 @@ CREATE_OUTPUT_PIN(mosi, D, 5);
 CREATE_OUTPUT_PIN(lcd_cs, D, 4);
 CREATE_OUTPUT_PIN(lcd_rs, D, 0);
 
-DogM16x < SoftwareSpi < sclk, mosi, gpio::Unused, 10000 >,
+DogM16x < SoftwareSpi < sclk, mosi, gpio::Unused >,
 		  lcd_cs,
 		  lcd_rs> display;
 
@@ -61,7 +61,8 @@ main()
 	
 	stream << "Hallo Fabian :-)\n";
 	stream << "\x19" " = ";
-	stream << 3.14159;
+	
+	float value = 3.14159;
 	
 	while (1)
 	{
@@ -70,9 +71,20 @@ main()
 		led6::toggle();
 		led7::toggle();
 		
-		led0::set(button0::get());
+		/*led0::set(button0::get());
 		led1::set(button1::get());
 		led2::set(button2::get());
 		led3::set(button3::get());
+		*/
+		
+		if (button0::get()) {
+			value += 0.00001;
+		}
+		if (button1::get()) {
+			value -= 0.00001;
+		}
+		
+		display.setPosition(1, 4);
+		stream << value;
 	}
 }

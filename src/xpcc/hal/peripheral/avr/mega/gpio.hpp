@@ -30,41 +30,47 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__SPI_HPP
-#define XPCC__SPI_HPP
+#ifndef XPCC__MEGA_GPIO_HPP
+#define XPCC__MEGA_GPIO_HPP
 
 #include <avr/io.h>
-#include <stdint.h>
+#include <xpcc/utils/misc.hpp>
 
-namespace xpcc
-{
-	class Spi
-	{
-	public:
-		typedef enum {
-			MODE_0 = 0,				//!< SCK normal, sample on rising edge
-			MODE_1 = (1 << CPHA),	//!< SCK normal, sample on falling edge
-			MODE_2 = (1 << CPOL),	//!< SCK inverted, sample on falling edge
-			MODE_3 = (1 << CPOL) | (1 << CPHA),	
-									//!< SCK inverted, sample on rising edge
-		} Mode;
-		
-		typedef enum {
-			PRESCALER_2 = 0x80 | 0,
-			PRESCALER_4 = 0,
-			PRESCALER_8 = 0x80 | (1 << SPR0),
-			PRESCALER_16 = (1 << SPR0),
-			PRESCALER_32 = 0x80 | (1 << SPR1),
-			PRESCALER_64 = (1 << SPR1),
-			PRESCALER_128 = (1 << SPR1) | (1 << SPR0),
-		} Prescaler;
-	
-	public:
-		Spi(Mode mode, Prescaler prescaler);
-		
-		static uint8_t
-		send(uint8_t data);
-	};
-}
+/**
+ * @ingroup	hal
+ * @brief	Create a input/output pin type
+ */
+#define	CREATE_IO_PIN(name, port, pin) \
+	struct name { \
+		name() { this->input() } \
+		ALWAYS_INLINE static void output() { DDR ## port |= (1 << pin); } \
+		ALWAYS_INLINE static void input() { DDR ## port &= ~(1 << pin); } \
+		ALWAYS_INLINE static void set() { PORT ## port |= (1 << pin); } \
+		ALWAYS_INLINE static void reset() { PORT ## port &= ~(1 << pin); } \
+		ALWAYS_INLINE static bool get() { return (PIN ## port & (1 << pin)); } \
+	}
 
-#endif // XPCC__SPI_HPP
+/**
+ * @ingroup	hal
+ * @brief	Create a output pin type
+ */
+#define	CREATE_OUTPUT_PIN(name, port, pin) \
+	struct name { \
+		name() { this->output(); } \
+		ALWAYS_INLINE static void output() { DDR ## port |= (1 << pin); } \
+		ALWAYS_INLINE static void set() { PORT ## port |= (1 << pin); } \
+		ALWAYS_INLINE static void reset() { PORT ## port &= ~(1 << pin); } \
+	}
+
+/**
+ * @ingroup	hal
+ * @brief	Create a input type
+ */
+#define CREATE_INPUT_PIN(name, port, pin) \
+	struct name { \
+		name() { this->input(); } \
+		ALWAYS_INLINE static void input() { DDR ## port &= ~(1 << pin); } \
+		ALWAYS_INLINE static bool get() { return (PIN ## port & (1 << pin)); } \
+	}
+
+#endif // XPCC__MEGA_GPIO_HPP

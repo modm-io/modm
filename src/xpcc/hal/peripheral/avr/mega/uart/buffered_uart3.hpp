@@ -26,7 +26,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id$
+ * $Id: buffered_uartn.hpp.tmpl 122 2009-11-12 00:06:50Z dergraaf $
  */
 // ----------------------------------------------------------------------------
 /*
@@ -34,86 +34,65 @@
  * Please modify the corresponding *.tmpl file instead and re-run the
  * script 'generate.py'.
  *
- * Generated 12 Nov 2009, 14:35:16
+ * Generated 16 Nov 2009, 19:16:08
  */
 // ----------------------------------------------------------------------------
 
-#include <avr/io.h>
-#include <avr/interrupt.h>
+#ifndef XPCC__MEGA_UART3_HPP
+#define XPCC__MEGA_UART3_HPP
 
-#include <xpcc/hal/atomic/queue.hpp>
+#include <stdint.h>
 
-#include "uart_defines.h"
-#include "uart_defaults.h"
-
-#ifdef ATMEGA_USART1
-#include "buffered_uart1.hpp"
-
-static xpcc::atomic::Queue<char, UART1_RX_BUFFER_SIZE> rxBuffer;
-
-// ----------------------------------------------------------------------------
-// called when the UART has received a character
-
-ISR(UART1_RECEIVE_INTERRUPT)
+namespace xpcc
 {
-	uint8_t data = UART1_DATA;
-	
-	// read UART status register and UART data register
-	//uint8_t usr  = UART1_STATUS;
-	
-//	uint8_t last_rx_error;
-//#if defined(ATMEGA_USART)
-//	last_rx_error = usr & ((1 << FE) | (1 << DOR));
-//#elif defined(ATMEGA_USART1)
-//	last_rx_error = usr & ((1 << FE1) | (1 << DOR1));
-//#elif defined (ATMEGA_UART)
-//	last_rx_error = usr & ((1 << FE) | (1 << DOR));
-//#endif
-	
-	// TODO Fehlerbehandlung
-	rxBuffer.push(data);
-}
-
-// ----------------------------------------------------------------------------
-void
-xpcc::BufferedUart1::setBaudrateRegister(uint16_t ubrr)
-{
-
-	// Set baud rate
-	if (ubrr & 0x8000) {
-		UART0_STATUS = (1 << U2X0);  //Enable 2x speed 
-		ubrr &= ~0x8000;
-	}
-	else {
-		UART0_STATUS = 0;
-	}
-	UBRR0H = (uint8_t) (ubrr >> 8);
-	UBRR0L = (uint8_t)  ubrr;
-
-	// Enable USART receiver and transmitter and receive complete interrupt
-	UART0_CONTROL = (1 << RXCIE0) | (1 << RXEN0) | (1 << TXEN0);
-	
-	// Set frame format: asynchronous, 8data, no parity, 1stop bit
-	#ifdef URSEL0
-	UCSR0C = (1 << URSEL0) | (3 << UCSZ00);
-	#else
-	UCSR0C = (3 << UCSZ00);
-	#endif
-}
-
-// ----------------------------------------------------------------------------
-bool
-xpcc::BufferedUart1::get(char& c)
-{
-	if (rxBuffer.isEmpty()) {
-		return false;
-	}
-	else {
-		c = rxBuffer.get();
-		rxBuffer.pop();
+	/**
+	 * @ingroup		hal
+	 * @headerfile	<xpcc/hal/peripheral/avr/mega/uart/buffered_uart3.hpp>
+	 * @brief		UART3
+	 * 
+	 * This implementation uses a ringbuffer.
+	 */
+	class BufferedUart3
+	{
+	public:
+		/// @todo	check if this works as desired!
+		BufferedUart3(uint32_t baudrate)
+		{
+			this->setBaudrate(baudrate);
+		}
 		
-		return true;
-	}
+		/// @brief	Set baud rate
+		///
+		/// If this function is called with a constant value as parameter,
+		/// all the calculation is done by the compiler, so no 32-bit
+		/// arithmetic is needed at run-time!
+		///
+		/// @param	baudrate	desired baud rate
+		/// @param	u2x			enabled double speed mode
+		static inline void
+		setBaudrate(uint32_t baudrate, bool u2x = false)
+		{
+			uint16_t ubrr;
+			if (u2x) {
+				ubrr  = (F_CPU / (baudrate * 8l)) - 1;
+				ubrr |= 0x8000;
+			}
+			else {
+				ubrr = (F_CPU / (baudrate * 16l)) - 1;
+			}
+			setBaudrateRegister(ubrr);
+		}
+		
+		static void
+		put(char data);
+		
+		static bool
+		get(char& c);
+		
+	protected:
+		static void
+		setBaudrateRegister(uint16_t ubrr);
+	};
 }
 
-#endif
+#endif // XPCC__MEGA_UART3_HPP
