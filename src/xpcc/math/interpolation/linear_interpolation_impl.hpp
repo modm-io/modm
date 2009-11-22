@@ -32,7 +32,7 @@
 
 #ifndef	XPCC__LINEAR_INTERPOLATION_HPP
    #error "Don't include this file directly. Use linear_interpolation.hpp instead"
-#endif	//XPCC__LINEAR_INTERPOLATION_HPP
+#endif
 
 namespace xpcc
 {	

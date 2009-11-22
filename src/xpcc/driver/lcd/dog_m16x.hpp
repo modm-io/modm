@@ -35,6 +35,7 @@
 
 #include <stdint.h>
 #include <xpcc/driver/lcd/lcd.hpp>
+#include <xpcc/hal/time/delay.hpp>
 
 namespace xpcc
 {
@@ -56,7 +57,7 @@ namespace xpcc
 		/// The display needs some time to initalize after startup. You have
 		/// to wait at least 50 ms until calling this method.
 		virtual void
-		init();
+		initialize();
 		
 		/// @brief	Write one character
 		/// 

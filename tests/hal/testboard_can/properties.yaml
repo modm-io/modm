@@ -2,4 +2,4 @@
 target: atmega
 
 project:
-  executable: test_uart
+  executable: steuergeraet

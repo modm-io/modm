@@ -30,87 +30,81 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__SOFTWARE_SPI_HPP
-#define XPCC__SOFTWARE_SPI_HPP
+#include <xpcc/hal/atomic/lock.hpp>
 
-#include <stdint.h>
-#include <xpcc/hal/time/delay.hpp>
+#include "debounce.hpp"
 
-namespace xpcc
+xpcc::Debounce::Debounce(uint8_t mask, uint8_t start, uint8_t next) :
+	repeatMask(mask), repeatStart(start), repeatNext(next), repeatCounter(start),
+	state(0), pressState(0), releaseState(0), repeatState(0), ct0(0), ct1(0)
 {
-	/**
-	 * @ingroup	hal
-	 * @headerfile	<xpcc/hal/peripheral/software_spi.hpp>
-	 * 
-	 * @brief	Software emulation of a SPI bus master
-	 * 
-	 * SPI stands for Serial Peripheral Interface Bus.
-	 * 
-	 * @todo	documentation
-	 * 
-	 * @tparam	SCLK		clock pin [output]
-	 * @tparam	MOSI		master out slave in pin [output]
-	 * @tparam	MISO		master in slave out pin [input]
-	 * @tparam	FREQUENCY	requested SPI frequency in Hz
-	 * 
-	 * @see		gpio
-	 */
-	template <typename SCLK,
-			  typename MOSI,
-			  typename MISO,
-			  int32_t FREQUENCY = 1000000>
-	class SoftwareSpi
-	{
-	public:
-		SoftwareSpi()
-		{
-			initialize();
-		}
-		
-		inline static void
-		initialize()
-		{
-			SCLK::output();
-			MOSI::output();
-			MISO::input();
-		}
-		
-		static uint8_t
-		put(uint8_t out)
-		{
-			uint8_t in = 0;
-			
-			SCLK::reset();
-			for (uint8_t i = 0; i < 8; ++i)
-			{
-				in <<= 1;
-				if (out & 0x80) {
-					MOSI::set();
-				}
-				else {
-					MOSI::reset();
-				}
-				
-				SCLK::set();
-				delay_us(delay);
-				
-				if (MISO::get()) {
-					in |= 1;
-				}
-				out <<= 1;
-				
-				SCLK::reset();
-				delay_us(delay);
-			}
-			
-			return in;
-		}
-		
-	private:
-		// calculate the delay in microseconds needed to achieve the
-		// requested SPI frequency
-		static const float delay = (1000000.0 / FREQUENCY) / 2.0;
-	};
 }
 
-#endif // XPCC__SOFTWARE_SPI_HPP
+uint8_t
+xpcc::Debounce::getState(uint8_t mask)
+{
+	atomic::Lock lock;
+	
+	return mask & state;
+}
+
+uint8_t
+xpcc::Debounce::getRelease(uint8_t mask)
+{
+	atomic::Lock lock;
+	
+	mask &= releaseState;
+	releaseState ^= mask;
+	
+	return mask;
+}
+
+uint8_t
+xpcc::Debounce::getPress(uint8_t mask)
+{
+	atomic::Lock lock;
+	
+	mask &= pressState;
+	pressState ^= mask;
+	
+	return mask;
+}
+
+uint8_t
+xpcc::Debounce::getRepeat(uint8_t mask)
+{
+	atomic::Lock lock;
+	
+	mask &= repeatState;
+	repeatState ^= mask;
+	
+	return mask;
+}
+
+uint8_t
+xpcc::Debounce::getShortPress(uint8_t mask)
+{
+	atomic::Lock lock;
+	
+	// get all keys which were pressed but are currently not pressed. This
+	// could only have been a short press, otherwise the getLongPress() method
+	// would have reset pressState.
+	mask &= mask & pressState & ~state;
+	pressState ^= mask;
+	
+	return mask;
+}
+
+uint8_t
+xpcc::Debounce::getLongPress(uint8_t mask)
+{
+	atomic::Lock lock;
+	
+	// get all keys which are long enough pressState so that the repeatState
+	// variable was set
+	mask = mask & repeatState & pressState;
+	repeatState ^= mask;
+	pressState ^= mask;
+	
+	return mask;
+}

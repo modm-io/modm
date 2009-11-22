@@ -30,32 +30,34 @@
  */
 // ----------------------------------------------------------------------------
 
-
 #ifndef	XPCC__LAGRANGE_INTERPOLATION_HPP
 #define	XPCC__LAGRANGE_INTERPOLATION_HPP
-#include<iostream>
-#include<xpcc/hal/flash/flash_pointer.hpp>
-#include<stdint.h>
 
-namespace xpcc{
-	/// \ingroup	math
-	/// \brief		Linear Interpolation of values in a list
+#include <stdint.h>
+#include <xpcc/hal/flash/flash_pointer.hpp>
+
+namespace xpcc
+{
+	/**
+	 * @ingroup	math
+	 * @brief	Lagrange Interpolation
+	 */
 	template<typename T>
 	class LagrangeInterpolation
 	{
-		
-		public:
+	public:
 		LagrangeInterpolation(FlashPointer<T> points, uint8_t numPoints);
 		
 		T 
-		interpolate(T value);
+		interpolate(const T& value);
 		
-		private:
+	private:
 		FlashPointer<T> points;
 		uint8_t numPoints; 
 	};
 }
 
-#include"lagrange_interpolation_impl.hpp"
+#include "lagrange_interpolation_impl.hpp"
+
 #endif	// XPCC__LAGRANGE_INTERPOLATION_HPP
 

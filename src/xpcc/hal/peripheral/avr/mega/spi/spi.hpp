@@ -60,7 +60,8 @@ namespace xpcc
 		} Prescaler;
 	
 	public:
-		Spi(Mode mode, Prescaler prescaler);
+		static void
+		initialize(Mode mode, Prescaler prescaler);
 		
 		static uint8_t
 		put(uint8_t data);

@@ -34,18 +34,22 @@
 #define XPCC__TIMEOUT_HPP
 
 #include <xpcc/hal/time/internal_clock.hpp>
+
 #include "timestamp.hpp"
 
 namespace xpcc
 {
-	/// @ingroup	workflow
-	/// @brief		Software timer
-	///
-	/// Has to be polled to check if it has expired.
-	/// 
-	/// @tparam		T	Used timer
-	///
-	template<typename T = InternalClock>
+	/**
+	 * @ingroup	workflow
+	 * @brief		Software timer
+	 *
+	 * Has to be polled to check if it has expired.
+	 * 
+	 * @tparam		T	Used timer
+	 * 
+	 * @todo	example
+	 */
+	template<typename T = ::xpcc::InternalClock>
 	class Timeout
 	{
 	public:

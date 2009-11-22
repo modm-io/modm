@@ -30,87 +30,54 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__SOFTWARE_SPI_HPP
-#define XPCC__SOFTWARE_SPI_HPP
-
-#include <stdint.h>
-#include <xpcc/hal/time/delay.hpp>
+#include "mcp2515.hpp"
 
 namespace xpcc
 {
-	/**
-	 * @ingroup	hal
-	 * @headerfile	<xpcc/hal/peripheral/software_spi.hpp>
-	 * 
-	 * @brief	Software emulation of a SPI bus master
-	 * 
-	 * SPI stands for Serial Peripheral Interface Bus.
-	 * 
-	 * @todo	documentation
-	 * 
-	 * @tparam	SCLK		clock pin [output]
-	 * @tparam	MOSI		master out slave in pin [output]
-	 * @tparam	MISO		master in slave out pin [input]
-	 * @tparam	FREQUENCY	requested SPI frequency in Hz
-	 * 
-	 * @see		gpio
-	 */
-	template <typename SCLK,
-			  typename MOSI,
-			  typename MISO,
-			  int32_t FREQUENCY = 1000000>
-	class SoftwareSpi
+	namespace mcp2515
 	{
-	public:
-		SoftwareSpi()
+		FLASH(uint8_t configuration[24]) =
 		{
-			initialize();
-		}
-		
-		inline static void
-		initialize()
-		{
-			SCLK::output();
-			MOSI::output();
-			MISO::input();
-		}
-		
-		static uint8_t
-		put(uint8_t out)
-		{
-			uint8_t in = 0;
+			// 10 kbps
+			0x04,
+			0xb6,
+			0xe7,
 			
-			SCLK::reset();
-			for (uint8_t i = 0; i < 8; ++i)
-			{
-				in <<= 1;
-				if (out & 0x80) {
-					MOSI::set();
-				}
-				else {
-					MOSI::reset();
-				}
-				
-				SCLK::set();
-				delay_us(delay);
-				
-				if (MISO::get()) {
-					in |= 1;
-				}
-				out <<= 1;
-				
-				SCLK::reset();
-				delay_us(delay);
-			}
-			
-			return in;
-		}
+			// 20 kbps
+			0x04,
+			0xb6,
+			0xd3,
 		
-	private:
-		// calculate the delay in microseconds needed to achieve the
-		// requested SPI frequency
-		static const float delay = (1000000.0 / FREQUENCY) / 2.0;
-	};
+			// 50 kbps
+			0x04,
+			0xb6,
+			0xc7,
+			
+			// 100 kbps
+			0x04,
+			0xb6,
+			0xc3,
+			
+			// 125 kbps
+			(1<<PHSEG21),					// CNF3
+			(1<<BTLMODE)|(1<<PHSEG11),		// CNF2
+			(1<<BRP2)|(1<<BRP1)|(1<<BRP0),	// CNF1
+			
+			// 250 kbps
+			0x03,
+			0xac,
+			0x81,
+			
+			// 500 kbps
+			0x03,
+			0xac,
+			0x80,
+			
+			// 1 Mbps
+			(1<<PHSEG21),
+			(1<<BTLMODE)|(1<<PHSEG11),
+			0,
+			
+		};
+	}
 }
-
-#endif // XPCC__SOFTWARE_SPI_HPP

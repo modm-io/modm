@@ -36,6 +36,34 @@
 #include <avr/io.h>
 #include <xpcc/utils/misc.hpp>
 
+namespace xpcc
+{
+	/**
+	 * @ingroup	hal
+	 * @headerfile	<xpcc/hal/peripheral/avr/mega/gpio.hpp>
+	 */
+	namespace gpio
+	{
+		/**
+		 * @ingroup	hal
+		 */
+		typedef enum
+		{
+			INPUT,
+			OUTPUT,
+		} Mode;
+		
+		/**
+		 * @ingroup	hal
+		 */
+		typedef enum
+		{
+			NORMAL = 0,
+			PULLUP = 1,
+		} Configuration;
+	}
+}
+
 /**
  * @ingroup	hal
  * @brief	Create a input/output pin type
@@ -58,8 +86,20 @@
 	struct name { \
 		name() { this->output(); } \
 		ALWAYS_INLINE static void output() { DDR ## port |= (1 << pin); } \
+		\
+		ALWAYS_INLINE static void \
+		set(bool status) { \
+			if (status) { \
+				set(); \
+			} \
+			else { \
+				reset(); \
+			} \
+		} \
+		\
 		ALWAYS_INLINE static void set() { PORT ## port |= (1 << pin); } \
 		ALWAYS_INLINE static void reset() { PORT ## port &= ~(1 << pin); } \
+		ALWAYS_INLINE static void toggle() { PORT ## port ^= (1 << pin); } \
 	}
 
 /**
@@ -69,6 +109,18 @@
 #define CREATE_INPUT_PIN(name, port, pin) \
 	struct name { \
 		name() { this->input(); } \
+		\
+		ALWAYS_INLINE static void \
+		configure(::xpcc::gpio::Configuration config = ::xpcc::gpio::NORMAL) { \
+			input(); \
+			if (config == ::xpcc::gpio::PULLUP) { \
+				PORT ## port |= (1 << pin); \
+			} \
+			else { \
+				PORT ## port &= ~(1 << pin); \
+			} \
+		} \
+		\
 		ALWAYS_INLINE static void input() { DDR ## port &= ~(1 << pin); } \
 		ALWAYS_INLINE static bool get() { return (PIN ## port & (1 << pin)); } \
 	}

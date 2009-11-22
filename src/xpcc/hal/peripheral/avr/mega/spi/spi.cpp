@@ -32,7 +32,8 @@
 
 #include "spi.hpp"
 
-xpcc::Spi::Spi(Mode mode, Prescaler prescaler)
+void
+xpcc::Spi::initialize(Mode mode, Prescaler prescaler)
 {
 	SPCR = (1 << SPE) | (1 << MSTR) | (prescaler & ~0x80) | mode;
 	SPSR = (prescaler & 0x80) ? (1 << SPI2X) : 0;

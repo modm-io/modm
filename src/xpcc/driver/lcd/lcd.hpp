@@ -56,7 +56,7 @@ namespace xpcc
 		
 	public:
 		virtual void
-		init() = 0;
+		initialize() = 0;
 		
 		virtual void
 		put(char c) = 0;

@@ -6,10 +6,14 @@ target: atxmega
 atmega:
 #  device: atmega2560
   device: atmega644
+#  device: atmega8
   clock: 14745600
+#  clock: 1000000
   avrdude:
-    programmer: stk500
-    port: /dev/ttyUSB0
+#    programmer: stk500
+#    port: /dev/ttyUSB0
+    programmer: avrispmkII
+    port: usb
 
 atxmega:
   device: atxmega32a4

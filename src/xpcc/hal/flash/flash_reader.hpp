@@ -57,8 +57,10 @@
 #include <string.h>
 #include <xpcc/utils/misc.hpp>
 
-#define	FLASH(var)		const var
-#define	FLASH_STRING(s)	const char s[]
+#define	FLASH(var)				const var
+#define	EXTERN_FLASH(var)		extern const var
+
+#define	FLASH_STRING(s)			const char s[]
 #define	EXTERN_FLASH_STRING(s)	extern const char s[]
 
 namespace xpcc

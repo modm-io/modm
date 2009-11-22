@@ -89,10 +89,11 @@ namespace xpcc
 
 	#if defined(__AVR_XMEGA__)
 		#include "avr/xmega/gpio.hpp"
-	#elif defined(__AVR_MEGA__)
-		#include "avr/mega/gpio.hpp"
 	#else
-		#error	"Unknown AVR target!"
+	//#elif defined(__AVR_MEGA__)
+		#include "avr/mega/gpio.hpp"
+	//#else
+	//	#error	"Unknown AVR target!"
 	#endif
 
 #else

@@ -30,87 +30,59 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__SOFTWARE_SPI_HPP
-#define XPCC__SOFTWARE_SPI_HPP
+#ifndef XPCC__CAN_HPP
+#define XPCC__CAN_HPP
 
 #include <stdint.h>
-#include <xpcc/hal/time/delay.hpp>
 
 namespace xpcc
 {
 	/**
-	 * @ingroup	hal
-	 * @headerfile	<xpcc/hal/peripheral/software_spi.hpp>
-	 * 
-	 * @brief	Software emulation of a SPI bus master
-	 * 
-	 * SPI stands for Serial Peripheral Interface Bus.
-	 * 
-	 * @todo	documentation
-	 * 
-	 * @tparam	SCLK		clock pin [output]
-	 * @tparam	MOSI		master out slave in pin [output]
-	 * @tparam	MISO		master in slave out pin [input]
-	 * @tparam	FREQUENCY	requested SPI frequency in Hz
-	 * 
-	 * @see		gpio
+	 * @ingroup	driver
+	 * @headerfile	<xpcc/driver/can/can.hpp>
 	 */
-	template <typename SCLK,
-			  typename MOSI,
-			  typename MISO,
-			  int32_t FREQUENCY = 1000000>
-	class SoftwareSpi
+	class Can
 	{
 	public:
-		SoftwareSpi()
-		{
-			initialize();
-		}
+		/// @brief	supported bitrates
+		typedef enum {
+			BITRATE_10_KBPS	= 0,
+			BITRATE_20_KBPS	= 1,
+			BITRATE_50_KBPS	= 2,
+			BITRATE_100_KBPS = 3,
+			BITRATE_125_KBPS = 4,
+			BITRATE_250_KBPS = 5,
+			BITRATE_500_KBPS = 6,
+			BITRATE_1_MBPS = 7,
+		} Bitrate;
 		
-		inline static void
-		initialize()
-		{
-			SCLK::output();
-			MOSI::output();
-			MISO::input();
-		}
+		/// @brief	
+		typedef enum {
+			NORMAL,
+			LISTEN_ONLY,
+			LOOPBACK,
+		} Mode;
 		
-		static uint8_t
-		put(uint8_t out)
+		/// @brief	Representation of a CAN message
+		struct Message
 		{
-			uint8_t in = 0;
-			
-			SCLK::reset();
-			for (uint8_t i = 0; i < 8; ++i)
+			Message(const uint32_t& identifier = 0, uint8_t length = 0) :
+				identifier(identifier), data(), flags(), length(length)
 			{
-				in <<= 1;
-				if (out & 0x80) {
-					MOSI::set();
-				}
-				else {
-					MOSI::reset();
-				}
-				
-				SCLK::set();
-				delay_us(delay);
-				
-				if (MISO::get()) {
-					in |= 1;
-				}
-				out <<= 1;
-				
-				SCLK::reset();
-				delay_us(delay);
 			}
 			
-			return in;
-		}
+			uint32_t identifier;
+			uint8_t data[8];
+			struct {
+				bool rtr : 1;
+				bool extended : 1;
+			} flags;
+			uint8_t length;
+		};
+	
+	public:
 		
-	private:
-		// calculate the delay in microseconds needed to achieve the
-		// requested SPI frequency
-		static const float delay = (1000000.0 / FREQUENCY) / 2.0;
 	};
 }
 
-#endif // XPCC__SOFTWARE_SPI_HPP
+#endif // XPCC__CAN_HPP

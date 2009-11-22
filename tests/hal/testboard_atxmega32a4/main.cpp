@@ -6,82 +6,107 @@
 #include <xpcc/hal/peripheral/software_spi.hpp>
 
 #include <xpcc/driver/lcd/dog_m16x.hpp>
+#include <xpcc/driver/debounce.hpp>
 
 #include <xpcc/io/iostream.hpp>
+#include <xpcc/io/iodevice_wrapper.hpp>
 
 using namespace xpcc;
 
-CREATE_OUTPUT_PIN(led0, A, 0);
-CREATE_OUTPUT_PIN(led1, A, 1);
-CREATE_OUTPUT_PIN(led2, A, 2);
-CREATE_OUTPUT_PIN(led3, A, 3);
-CREATE_OUTPUT_PIN(led4, A, 4);
-CREATE_OUTPUT_PIN(led5, A, 5);
-CREATE_OUTPUT_PIN(led6, A, 6);
-CREATE_OUTPUT_PIN(led7, A, 7);
+CREATE_OUTPUT_PIN(Led0, A, 0);
+CREATE_OUTPUT_PIN(Led1, A, 1);
+CREATE_OUTPUT_PIN(Led2, A, 2);
+CREATE_OUTPUT_PIN(Led3, A, 3);
+CREATE_OUTPUT_PIN(Led4, A, 4);
+CREATE_OUTPUT_PIN(Led5, A, 5);
+CREATE_OUTPUT_PIN(Led6, A, 6);
+CREATE_OUTPUT_PIN(Led7, A, 7);
 
-CREATE_INPUT_PIN(button0, B, 0);
-CREATE_INPUT_PIN(button1, B, 1);
-CREATE_INPUT_PIN(button2, B, 2);
-CREATE_INPUT_PIN(button3, B, 3);
+CREATE_INPUT_PIN(Button0, B, 0);
+CREATE_INPUT_PIN(Button1, B, 1);
+CREATE_INPUT_PIN(Button2, B, 2);
+CREATE_INPUT_PIN(Button3, B, 3);
 
-CREATE_OUTPUT_PIN(sclk, D, 7);
-CREATE_OUTPUT_PIN(mosi, D, 5);
+CREATE_INPUT_PIN(EncoderA, C, 0);
+CREATE_INPUT_PIN(EncoderB, C, 1);
+CREATE_INPUT_PIN(EncoderButton, C, 2);
 
-CREATE_OUTPUT_PIN(lcd_cs, D, 4);
-CREATE_OUTPUT_PIN(lcd_rs, D, 0);
+CREATE_OUTPUT_PIN(Sclk, D, 7);
+CREATE_OUTPUT_PIN(Mosi, D, 5);
 
-DogM16x < SoftwareSpi < sclk, mosi, gpio::Unused >,
-		  lcd_cs,
-		  lcd_rs> display;
+CREATE_OUTPUT_PIN(LcdCs, D, 4);
+CREATE_OUTPUT_PIN(LcdRs, D, 0);
+
+DogM16x < SoftwareSpi < Sclk, Mosi, gpio::Unused >,
+		  LcdCs,
+		  LcdRs> display;
+
+Debounce keys(0x07);
+Debounce encoder;
 
 int
 main()
 {
-	led0::output();
-	led1::output();
-	led2::output();
-	led3::output();
-	led4::output();
-	led5::output();
-	led6::output();
-	led7::output();
+	Led0::output();
+	Led1::output();
+	Led2::output();
+	Led3::output();
+	Led4::output();
+	Led5::output();
+	Led6::output();
+	Led7::output();
 	
-	button0::configure(gpio::PULLUP, true);
-	button1::configure(gpio::PULLUP, true);
-	button2::configure(gpio::PULLUP, true);
-	button3::configure(gpio::PULLUP, true);
+	Button0::configure(gpio::PULLUP);
+	Button1::configure(gpio::PULLUP);
+	Button2::configure(gpio::PULLUP);
+	Button3::configure(gpio::PULLUP);
 	
-	led6::set();
-	led7::reset();
+	EncoderButton::configure(gpio::PULLUP);
 	
-	display.init();
+	Led6::set();
+	Led7::reset();
+	
+	_delay_ms(100);
+	
+	display.initialize();
 	
 	IOStream stream(display);
 	
-	stream << "Hallo Fabian :-)\n";
+	stream << "Hello World ;-)\n";
 	stream << "\x19" " = ";
 	
 	float value = 3.14159;
 	
 	while (1)
 	{
-		_delay_ms(200);
+		_delay_ms(10);
 		
-		led6::toggle();
-		led7::toggle();
+		keys.update(PORTB.IN);
 		
-		/*led0::set(button0::get());
-		led1::set(button1::get());
-		led2::set(button2::get());
-		led3::set(button3::get());
-		*/
-		
-		if (button0::get()) {
+		if (keys.getPress(Debounce::KEY0) || keys.getRepeat(Debounce::KEY0)) {
 			value += 0.00001;
 		}
-		if (button1::get()) {
+		if (keys.getPress(Debounce::KEY1) || keys.getRepeat(Debounce::KEY1)) {
 			value -= 0.00001;
+		}
+		
+		if (keys.getShortPress(Debounce::KEY2)) {
+			value -= 0.00001;
+		}
+		if (keys.getLongPress(Debounce::KEY2)) {
+			value += 0.00001;
+		}
+		
+		if (keys.getPress(Debounce::KEY3)) {
+			Led0::toggle();
+		}
+		
+		Led6::set(EncoderA::get());
+		Led7::set(EncoderB::get());
+		
+		// encoder button
+		if (encoder.getPress(Debounce::KEY2)) {
+			Led5::toggle();
 		}
 		
 		display.setPosition(1, 4);

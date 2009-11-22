@@ -39,8 +39,10 @@
 
 namespace xpcc
 {
-	/// \ingroup	math
-	/// \brief		Linear Interpolation of values in a list
+	/**
+	 * @ingroup	math
+	 * @brief	Linear Interpolation of values in a list
+	 */
 	template<typename T>
 	class LinearInterpolation
 	{

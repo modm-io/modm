@@ -1,5 +1,5 @@
 
-#include <xpcc/hal/atomic.hpp>
+#include <xpcc/hal/atomic/container.hpp>
 
 using namespace xpcc;
 

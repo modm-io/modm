@@ -5,6 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
+ * 
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -29,18 +30,27 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC__ATOMIC_HPP
-#define	XPCC__ATOMIC_HPP
+#ifndef	XPCC__DELAY_HPP
+#define	XPCC__DELAY_HPP
 
-/**
- * \ingroup		hal
- * \defgroup	atomic	Atomic operations and container
- * 
- */
+#ifdef __AVR__
+	
+	#include <util/delay.h>
+	
+	#define	delay_us(us)	_delay_us(us)
+	#define	delay_ms(ms)	_delay_ms(ms)
 
-#include "atomic/lock.hpp"
-#include "atomic/flag.hpp"
-#include "atomic/container.hpp"
-#include "atomic/queue.hpp"
+#elif __unix__
 
-#endif	// XPCC__ATOMIC_HPP
+	#include <unistd.h>
+	
+	#define	delay_us(us)	usleep(us)
+	#define	delay_ms(ms)	usleep(ms*1000)
+	
+#else
+
+	#error "Unknown architecture, please add some specific delay functions!"
+
+#endif
+
+#endif	// XPCC__DELAY_HPP

@@ -34,16 +34,13 @@
 	#error	"Don't include this file directly, use 'dog_m16x.hpp' instead!"
 #endif
 
-// FIXME we need a wrapper for this in the hal folder!
-#include <util/delay.h>
-
 // ----------------------------------------------------------------------------	
 
 template <typename SPI, typename CS, typename RS>
 void
-xpcc::DogM16x<SPI, CS, RS>::init()
+xpcc::DogM16x<SPI, CS, RS>::initialize()
 {
-	SPI::init();
+	SPI::initialize();
 	CS::output();
 	RS::output();
 	

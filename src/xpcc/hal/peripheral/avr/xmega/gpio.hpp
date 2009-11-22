@@ -111,6 +111,7 @@ namespace xpcc
 		} \
 		\
 		ALWAYS_INLINE static void reset() { PORT(port).OUTCLR = (1 << pin); } \
+		ALWAYS_INLINE static void toggle() { PORT(port).OUTTGL = (1 << pin); } \
 		ALWAYS_INLINE static bool get() { return (PORT(port).IN & (1 << pin)); } \
 	}
 
