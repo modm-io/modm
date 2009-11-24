@@ -51,7 +51,7 @@ xpcc::StdIODevice::put( const char* s )
 void
 xpcc::StdIODevice::flush()
 {
-	std::cout << std::flush;
+	std::cout << std::endl;
 }
 
 // ----------------------------------------------------------------------------
