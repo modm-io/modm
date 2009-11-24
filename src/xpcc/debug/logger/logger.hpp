@@ -67,7 +67,6 @@ namespace xpcc
 				inline Logger&
 				operator <<(const T& msg)
 				{
-					//this->::xpcc::IOStream::<<( msg );
 					this->xpcc::IOStream::operator <<(msg);
 					return *this;
 				};

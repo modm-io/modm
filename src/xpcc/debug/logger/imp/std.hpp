@@ -27,39 +27,59 @@
  *
  * $Id$
  */
-#ifndef XPCC_LOG_LEVEL_HPP_
-#define XPCC_LOG_LEVEL_HPP_
+// ----------------------------------------------------------------------------
+
+// the default style creates globals objects, so it can only one time be included
+#ifdef XPCC_LOG_STYLE_DEFAULT__HPP
+#error Second includition of a default log style
+#else
+#define XPCC_LOG_STYLE_DEFAULT__HPP
+
+#ifdef __AVR__
+// this version is to use on PC only
+#error not to use on AVRs
+#else
+
+#include "../logger.hpp"
+#include "../style_wrapper.hpp"
+#include "../style/prefix.hpp"
+#include "../style/std_colour.hpp"
+
+#include <xpcc/io/backplane/std/std_iodevice.hpp>
 
 namespace xpcc {
 	namespace log {
-		//! Levels to filter messages.
-		//!
-		//! DEBUG < INFO < WARNING < ERROR < FATAL
-		//!
-		//! \ingroup logger
-		typedef enum {
-			DEBUG,
-			INFO,
-			WARNING,
-			ERROR,
-			FATAL
-		} Level;
-	};
+		xpcc::StdIODevice device;
+
+		template < typename T, Colour TEXT, Colour BACKGROUND >
+		class Wrapper : public StyleWrapper< Prefix< T, StdColour<TEXT, BACKGROUND > > > {
+			public:
+				Wrapper(const T& str, ::xpcc::IODevice &device) :
+					StyleWrapper< Prefix< T, StdColour<TEXT, BACKGROUND > > > (
+							Prefix< T, StdColour<TEXT, BACKGROUND > >(
+									str,
+									StdColour<TEXT, BACKGROUND >( device ) ) )
+				{
+				}
+		};
+
+		Wrapper< char[10], BLUE, NONE > debugWrapper("Debug:   ", device);
+		Logger debug( debugWrapper );
+
+		Wrapper< char[10], GREEN, NONE > debugInfo("Info:    ", device);
+		Logger info( debugInfo );
+
+		Wrapper< char[10], YELLOW, NONE > warningInfo("Warning: ", device);
+		Logger warning( warningInfo );
+
+		Wrapper< char[10], RED, NONE > errorInfo("Error:   ", device);
+		Logger error( errorInfo );
+
+	}
 }
 
-#ifndef XPCC_LOG_LEVEL
-//! Define to set the level of the logging to a defined value for each file.
-//!
-//! To change the logging level in one cpp file use \c #undef
-//! \code
-//!		#undef  XPCC_LOG_LEVEL
-//!		#define XPCC_LOG_LEVEL xpcc::log::INFO
-//! \endcode
-//!
-//! @ingroup logger
-#define XPCC_LOG_LEVEL xpcc::log::DEBUG
 
-#endif // XPCC_LOG_LEVEL
+// -----------------------------------------------------------------------------
+#endif // __AVR__
 
-
-#endif /* XPCC_LOG_LEVEL_HPP_ */
+#endif // XPCC_LOG_STYLE_DEFAULT__HPP

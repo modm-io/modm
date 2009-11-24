@@ -29,6 +29,14 @@
  */
 // ----------------------------------------------------------------------------
 
+#define TEST_DEFAULT_INCLUDION
+
+#ifdef TEST_DEFAULT_INCLUDION
+
+#include <xpcc/debug/logger/imp/std.hpp>
+
+#else
+
 #include <xpcc/io/backplane/std/std_iodevice.hpp>
 #include <xpcc/debug/logger/logger.hpp>
 #include <xpcc/debug/logger/style_wrapper.hpp>
@@ -50,22 +58,31 @@ xpcc::log::Logger xpcc::log::info(wrapperInfo);
 xpcc::log::Logger xpcc::log::warning(device);
 xpcc::log::Logger xpcc::log::error(device);
 
+#endif
+
+// set the Loglevel
+#undef  XPCC_LOG_LEVEL
+#define XPCC_LOG_LEVEL xpcc::log::DEBUG
+
 int
 main()
 {
-	xpcc::log::info << "XPCC Logger Test" << xpcc::flush;
+	xpcc::log::info << "-->XPCC Logger Test" << xpcc::flush;
 
-//	xpcc::log::setDevice( device );
-	//xpcc::log::setDevice( new xpcc::log::DeviceStd );
-	//xpcc::log::setDevice( device );
-
-//	xpcc::log::setFilter(xpcc::log::WARNING);
-
-	xpcc::log::debug << "Logmessage" << xpcc::flush;
+	// direct logging (without loglevel testing)
+	xpcc::log::debug << "Debug Message" << xpcc::flush;
 	xpcc::log::info << "zur info: 100=" << 100 << xpcc::flush;
-	xpcc::log::warning << "100!=" << 1001 << xpcc::flush;
+	xpcc::log::warning << "eine Warnung: 100!=" << 1001 << xpcc::flush;
+	xpcc::log::error << "ein Error: 100!=" << 1001 << xpcc::flush;
 
 
+	xpcc::log::info << "-->Output is controlled by log level now:" << xpcc::flush;
 
-	xpcc::log::info << "ENDE" << xpcc::flush;
+	XPCC_LOG_DEBUG 		<< "Debug Message" << xpcc::flush;
+	XPCC_LOG_INFO 		<< "zur info: 100=" << 100 << xpcc::flush;
+	XPCC_LOG_WARNING 	<< "eine Warnung: 100!=" << 1001 << xpcc::flush;
+	XPCC_LOG_ERROR		<< "ein Error: 100!=" << 1001 << xpcc::flush;
+
+
+	xpcc::log::info << "-->ENDE" << xpcc::flush;
 }
