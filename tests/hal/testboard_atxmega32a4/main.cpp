@@ -3,6 +3,7 @@
 #include <util/delay.h>
 
 #include <xpcc/hal/peripheral/gpio.hpp>
+#include <xpcc/hal/peripheral/avr/xmega/gpio.hpp>
 #include <xpcc/hal/peripheral/software_spi.hpp>
 
 #include <xpcc/driver/lcd/dog_m16x.hpp>
