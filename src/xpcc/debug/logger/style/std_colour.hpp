@@ -117,8 +117,6 @@ xpcc::log::StdColour<TEXT, BACKGROUND, STYLE>::StdColour(IODevice &device) :
 template <xpcc::log::Colour TEXT, xpcc::log::Colour BACKGROUND, typename STYLE>
 xpcc::log::StdColour<TEXT, BACKGROUND, STYLE>::~StdColour()
 {
-	this->Style<STYLE>::put("\033[0m");
-	this->Style<STYLE>::flush();
 }
 
 // ----------------------------------------------------------------------------
