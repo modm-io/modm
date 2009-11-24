@@ -25,15 +25,36 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: logger.cpp 65 2009-09-27 15:23:43Z thundernail $
+ * $Id$
  */
 // ----------------------------------------------------------------------------
 #include "logger.hpp"
 
-xpcc::log::Logger<xpcc::log::DEBUG> xpcc::log::debug;
-xpcc::log::Logger<xpcc::log::INFO> xpcc::log::info;
-xpcc::log::Logger<xpcc::log::WARNING> xpcc::log::warning;
-xpcc::log::Logger<xpcc::log::ERROR> xpcc::log::error;
+#include <xpcc/io/backplane/std/std_iodevice.hpp>
+#include <xpcc/debug/logger/style_wrapper.hpp>
+#include <xpcc/debug/logger/style/std_colour.hpp>
+#include <xpcc/debug/logger/style/prefix.hpp>
 
+xpcc::StdIODevice stdDevice;
 
-// -----------------------------------------------------------------------------
+//xpcc::log::Logger xpcc::log::debug(xpcc::log::StdColour<xpcc::log::BLUE, xpcc::log::BLACK>( stdDevice ));
+//xpcc::log::StdColour<xpcc::log::BLUE, xpcc::log::BLACK> style( xpcc::log::Prefix("DEBUG: ") );
+namespace xl = xpcc::log;
+
+xl::Prefix< char[7] > prefix("DEBUG ", stdDevice);
+xl::StdColour<xl::BLUE, xl::NONE, xl::Prefix< char[7] > > style( prefix );
+xl::StyleWrapper< xl::StdColour<xl::BLUE, xl::NONE, xl::Prefix< char[7] > > > wrapper( style );
+xl::Logger xl::debug( wrapper );
+
+xl::StyleWrapper< xl::Prefix< char[7], xl::StdColour<xl::YELLOW, xl::NONE > > > wrapperInfo (
+		xl::Prefix< char[7], xl::StdColour<xl::YELLOW, xl::NONE > >( "INFO: ",
+				xl::StdColour<xl::YELLOW, xl::NONE >( stdDevice ) ) );
+
+xl::Logger xl::info(wrapperInfo);
+
+xl::Logger xl::warning(stdDevice);
+xl::Logger xpcc::log::error(stdDevice);
+
+//xpcc::log::error.operator <<(22);
+
+//xpcc::log::error << "Logger created";// << xpcc::flush;

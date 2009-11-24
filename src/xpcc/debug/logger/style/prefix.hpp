@@ -25,70 +25,99 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: singleton.cpp 64 2009-09-27 15:19:16Z thundernail $
+ * $Id$
  */
 // ----------------------------------------------------------------------------
+#ifndef XPCC_LOG_STYLE_PREFIX__HPP
+#define XPCC_LOG_STYLE_PREFIX__HPP
 
-#include "singleton.hpp"
+#include "../style.hpp"
+#include <xpcc/utils/typet.hpp>
 
-// -----------------------------------------------------------------------------
+namespace xpcc {
+	namespace log {
+		/**
+		 * @class 	Prefix
+		 * @brief 	Add a prefix to the logmessage
+		 *
+		 * @ingroup logger
+		 * @version	$Id$
+		 * @author	Martin Rosekeit <martin.rosekeit@rwth-aachen.de>
+		 */
+		template <typename T, typename STYLE = DefaultStyle>
+		class Prefix : public Style<STYLE> {
+			public:
+				Prefix(const T& str, STYLE style);
 
-xpcc::log::Singleton::Singleton() :
-	device( 0 ),
-	level(xpcc::log::DEBUG)
-{
-};
+				Prefix(const T& str, IODevice &device);
 
-// -----------------------------------------------------------------------------
+				/// Write one char to the sink.
+				void
+				put( char c );
 
-xpcc::log::Singleton::~Singleton()
-{
+				/// Write a string that terminates with '\0' to the sink.
+				void
+				put( const char* s );
+
+				/// The message is complete and can be written/send/displayed.
+				void
+				flush();
+
+			private:
+				bool	flushed;
+				T		value;
+
+		};
+	}
 }
-// -----------------------------------------------------------------------------
 
+template <typename T, typename STYLE>
+xpcc::log::Prefix<T, STYLE>::Prefix( const T& str, STYLE style ) :
+	Style<STYLE> ( style ),
+	flushed ( true )
+{
+	memcpy( &this->value, &str, sizeof(T) );
+}
+
+template <typename T, typename STYLE>
+xpcc::log::Prefix<T, STYLE>::Prefix( const T& str, IODevice &device ) :
+	Style<STYLE> ( device ),
+	flushed ( true )
+{
+	memcpy( &this->value, &str, sizeof(T) );
+}
+
+template <typename T, typename STYLE>
 void
-xpcc::log::Singleton::setDevice(Device& device)
+xpcc::log::Prefix<T, STYLE>::put( char c )
 {
-	this->device = &device;
-};
+	if( this->flushed ) {
+		this->flushed = false;
+		this->Style<STYLE>::put( this->value );
+	}
+	this->Style<STYLE>::put( c );
+}
 
-// ----------------------------------------------------------------------------
-
+template <typename T, typename STYLE>
 void
-xpcc::log::Singleton::setFilter(Level level)
+xpcc::log::Prefix<T, STYLE>::put( const char* s )
 {
-	this->level = level;
+	if( this->flushed ) {
+		this->flushed = false;
+		this->Style<STYLE>::put( this->value );
+	}
+	this->Style<STYLE>::put( s );
+}
+
+
+template <typename T, typename STYLE>
+void
+xpcc::log::Prefix<T, STYLE>::flush()
+{
+	this->flushed = true;
+	this->Style<STYLE>::flush();
 }
 
 // -----------------------------------------------------------------------------
 
-void
-xpcc::log::Singleton::put(char c)
-{
-	this->device->put(c);
-}
-
-// -----------------------------------------------------------------------------
-
-void
-xpcc::log::Singleton::put(const char* s)
-{
-	this->device->put(s);
-}
-
-// -----------------------------------------------------------------------------
-
-void
-xpcc::log::Singleton::flush()
-{
-	this->device->flush();
-}
-
-// -----------------------------------------------------------------------------
-
-bool
-xpcc::log::Singleton::get(char& value)
-{
-	(void) value;
-	return false;
-}
+#endif // XPCC_LOG_STYLE_PREFIX__HPP

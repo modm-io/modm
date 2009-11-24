@@ -25,7 +25,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: logger.hpp 88 2009-10-16 23:07:26Z dergraaf $
+ * $Id$
  */
 // ----------------------------------------------------------------------------
 
@@ -36,7 +36,6 @@
 #include <xpcc/io/iostream.hpp>
 
 #include "level.hpp"
-#include "singleton.hpp"
 
 namespace xpcc
 {
@@ -46,32 +45,30 @@ namespace xpcc
 		 * @class 	Logger
 		 * @brief 	Interface to the Logger.
 		 *
-		 * This class provides an interface to the logger singleton. It is used by the
+		 * This class provides an interface to the logger. The Logger is an
+		 * IOStream  singleton. It is used by the
 		 * macro defined below. This class overloads the << operator so that it is
 		 * possible to write different message types to the logger.
 		 *
 		 * @ingroup logger
-		 * @version	$Id: logger.hpp 88 2009-10-16 23:07:26Z dergraaf $
+		 * @version	$Id$
 		 * @since 	04 December 2006
 		 * @author	Christofer Hedbrand,
 		 * 			Carsten Schmidt,
 		 * 			Martin Rosekeit <martin.rosekeit@rwth-aachen.de>
 		 */
-		template<Level L = DEBUG>
-		class Logger : public IOStream {
+		class Logger : public ::xpcc::IOStream {
 			public:
-				Logger() :
-					IOStream( Singleton::instance() ),
-					filter( &Singleton::instance().getFilter() )
+				Logger(::xpcc::IODevice& device) :
+					IOStream( device )
 				{};
 
-				template <typename T>
-				inline Logger<L>&
+				template<typename T>
+				inline Logger&
 				operator <<(const T& msg)
 				{
-					if( L >= *this->filter ) {
-						*static_cast<IOStream*>(this) << msg;
-					}
+					//this->::xpcc::IOStream::<<( msg );
+					this->xpcc::IOStream::operator <<(msg);
 					return *this;
 				};
 
@@ -80,19 +77,16 @@ namespace xpcc
 
 				Logger&
 				operator =(const Logger&);
-
-				const Level* const	filter;
 		};
-
 
 		/**
 		 * @ingroup logger
 		 * @{
 		 */
-		extern Logger<DEBUG> 	debug;		//!	log device to take messages on DEBUG level
-		extern Logger<INFO> 	info;		//!	log device to take messages on INFO level
-		extern Logger<WARNING> 	warning;	//!	log device to take messages on WARNING level
-		extern Logger<ERROR> 	error;		//!	log device to take messages on ERROR level
+		extern Logger	debug;		//!	log device to take messages on DEBUG level
+		extern Logger 	info;		//!	log device to take messages on INFO level
+		extern Logger 	warning;	//!	log device to take messages on WARNING level
+		extern Logger 	error;		//!	log device to take messages on ERROR level
 		/*@}*/
 	}
 }
