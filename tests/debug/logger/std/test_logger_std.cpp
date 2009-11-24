@@ -29,30 +29,43 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <iostream>
+#include <xpcc/io/backplane/std/std_iodevice.hpp>
 #include <xpcc/debug/logger/logger.hpp>
-#include <xpcc/debug/logger/backend/std/std_log_device.hpp>
+#include <xpcc/debug/logger/style_wrapper.hpp>
+#include <xpcc/debug/logger/style/std_colour.hpp>
+#include <xpcc/debug/logger/style/prefix.hpp>
 
-xpcc::log::DeviceStd device;
+xpcc::StdIODevice device;
+
+xpcc::log::Prefix< char[8] > prefix("DEBUG: ", device);
+xpcc::log::StdColour<xpcc::log::BLUE, xpcc::log::NONE, xpcc::log::Prefix< char[8] > > style( prefix );
+xpcc::log::StyleWrapper< xpcc::log::StdColour<xpcc::log::BLUE, xpcc::log::NONE, xpcc::log::Prefix< char[8] > > > wrapperDebug( style );
+xpcc::log::Logger xpcc::log::debug( wrapperDebug );
+
+xpcc::log::StyleWrapper< xpcc::log::Prefix< char[7], xpcc::log::StdColour<xpcc::log::YELLOW, xpcc::log::NONE > > > wrapperInfo (
+		xpcc::log::Prefix< char[7], xpcc::log::StdColour<xpcc::log::YELLOW, xpcc::log::NONE > >( "INFO: ",
+				xpcc::log::StdColour<xpcc::log::YELLOW, xpcc::log::NONE >( device ) ) );
+xpcc::log::Logger xpcc::log::info(wrapperInfo);
+
+xpcc::log::Logger xpcc::log::warning(device);
+xpcc::log::Logger xpcc::log::error(device);
 
 int
 main()
 {
-	std::cout << "XPCC Logger Test" << std::endl;
+	xpcc::log::info << "XPCC Logger Test" << xpcc::flush;
 
-	xpcc::log::setDevice( device );
+//	xpcc::log::setDevice( device );
 	//xpcc::log::setDevice( new xpcc::log::DeviceStd );
 	//xpcc::log::setDevice( device );
 
-	xpcc::log::setFilter(xpcc::log::WARNING);
+//	xpcc::log::setFilter(xpcc::log::WARNING);
 
-	xpcc::log::debug << "DEBUG: " << "Logmessage" << xpcc::flush;
-	xpcc::log::warning << "WARNING: " << "100=" << 100 << xpcc::flush;
-
-
-
-	std::cout << "ENDE" << std::endl;
+	xpcc::log::debug << "Logmessage" << xpcc::flush;
+	xpcc::log::info << "zur info: 100=" << 100 << xpcc::flush;
+	xpcc::log::warning << "100!=" << 1001 << xpcc::flush;
 
 
 
+	xpcc::log::info << "ENDE" << xpcc::flush;
 }
