@@ -33,6 +33,8 @@
 #ifndef XPCC__IODEVICE_HPP
 #define XPCC__IODEVICE_HPP
 
+#include <xpcc/io/iodevice.hpp>
+
 namespace xpcc
 {
 	/**
