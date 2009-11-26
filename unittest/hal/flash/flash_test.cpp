@@ -53,5 +53,4 @@ FlashTest::testStringAccess()
 	xpcc::FlashPointer<char> stringPointer(stringValue);
 	
 	TEST_ASSERT_EQUALS_ARRAY(stringPointer, string, 0, sizeof(string));
-	TEST_ASSERT_EQUALS_ARRAY(stringPointer, string, 0, 12);
 }

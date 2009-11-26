@@ -37,4 +37,10 @@ class MathTest : public unittest::TestSuite
 public:
 	void
 	testSqrt();
+	
+	void
+	testMultiplication();
+	
+	void
+	testMultiplyAccumulate();
 };

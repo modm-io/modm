@@ -30,11 +30,86 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/hal/avr/math/math.hpp>
+#include <xpcc/hal/peripheral/avr/math/math.hpp>
 
 #include "math_test.hpp"
 
 void
 MathTest::testSqrt()
 {
+	TEST_ASSERT_EQUALS(xpcc::avr::sqrt32_round(0), 0);
+	TEST_ASSERT_EQUALS(xpcc::avr::sqrt32_round(1), 1);
+	TEST_ASSERT_EQUALS(xpcc::avr::sqrt32_round(10), 3);
+	TEST_ASSERT_EQUALS(xpcc::avr::sqrt32_round(100), 10);
+	TEST_ASSERT_EQUALS(xpcc::avr::sqrt32_round(1000), 32);
+	TEST_ASSERT_EQUALS(xpcc::avr::sqrt32_round(10000), 100);
+	TEST_ASSERT_EQUALS(xpcc::avr::sqrt32_round(100000), 316);
+	TEST_ASSERT_EQUALS(xpcc::avr::sqrt32_round(123456), 351);
+	TEST_ASSERT_EQUALS(xpcc::avr::sqrt32_round(452613), 673);
+	TEST_ASSERT_EQUALS(xpcc::avr::sqrt32_round(1000000), 1000);
+	TEST_ASSERT_EQUALS(xpcc::avr::sqrt32_round(10000000), 3162);
+	TEST_ASSERT_EQUALS(xpcc::avr::sqrt32_floor(4000000000UL), 63245);
+	TEST_ASSERT_EQUALS(xpcc::avr::sqrt32_round(4294800000UL), 65535);
+	
+	TEST_ASSERT_EQUALS(xpcc::avr::sqrt32_floor(0), 0);
+	TEST_ASSERT_EQUALS(xpcc::avr::sqrt32_floor(1), 1);
+	TEST_ASSERT_EQUALS(xpcc::avr::sqrt32_floor(10), 3);
+	TEST_ASSERT_EQUALS(xpcc::avr::sqrt32_floor(100), 10);
+	TEST_ASSERT_EQUALS(xpcc::avr::sqrt32_floor(1000), 31);
+	TEST_ASSERT_EQUALS(xpcc::avr::sqrt32_floor(10000), 100);
+	TEST_ASSERT_EQUALS(xpcc::avr::sqrt32_floor(100000), 316);
+	TEST_ASSERT_EQUALS(xpcc::avr::sqrt32_floor(123456), 351);
+	TEST_ASSERT_EQUALS(xpcc::avr::sqrt32_floor(452613), 672);
+	TEST_ASSERT_EQUALS(xpcc::avr::sqrt32_floor(1000000), 1000);
+	TEST_ASSERT_EQUALS(xpcc::avr::sqrt32_floor(10000000), 3162);
+	TEST_ASSERT_EQUALS(xpcc::avr::sqrt32_floor(4000000000UL), 63245);
+	TEST_ASSERT_EQUALS(xpcc::avr::sqrt32_floor(4294967295UL), 65535);
+}
+
+void
+MathTest::testMultiplication()
+{
+	TEST_ASSERT_EQUALS(xpcc::avr::mul32((uint16_t) 1, (uint16_t) 1), 1);
+	TEST_ASSERT_EQUALS(xpcc::avr::mul32((uint16_t) 10, (uint16_t) 10), 100);
+	TEST_ASSERT_EQUALS(xpcc::avr::mul32((uint16_t) 100, (uint16_t) 100), 10000);
+	TEST_ASSERT_EQUALS(xpcc::avr::mul32((uint16_t) 1000, (uint16_t) 1000), 1000000);
+	TEST_ASSERT_EQUALS(xpcc::avr::mul32((uint16_t) 10000, (uint16_t) 10000), 100000000);
+	TEST_ASSERT_EQUALS(xpcc::avr::mul32((uint16_t) 60000, (uint16_t) 60000), 3600000000UL);
+	
+	TEST_ASSERT_EQUALS(xpcc::avr::mul32((int16_t) 1, (int16_t) 1), 1);
+	TEST_ASSERT_EQUALS(xpcc::avr::mul32((int16_t) 10, (int16_t) 10), 100);
+	TEST_ASSERT_EQUALS(xpcc::avr::mul32((int16_t) 100, (int16_t) 100), 10000);
+	TEST_ASSERT_EQUALS(xpcc::avr::mul32((int16_t) 1000, (int16_t) 1000), 1000000);
+	TEST_ASSERT_EQUALS(xpcc::avr::mul32((int16_t) 10000, (int16_t) 10000), 100000000);
+	
+	TEST_ASSERT_EQUALS(xpcc::avr::mul32((int16_t) -1, (int16_t) -1), 1);
+	TEST_ASSERT_EQUALS(xpcc::avr::mul32((int16_t) -10, (int16_t) 10), -100);
+	TEST_ASSERT_EQUALS(xpcc::avr::mul32((int16_t) 100, (int16_t) -100), -10000);
+	TEST_ASSERT_EQUALS(xpcc::avr::mul32((int16_t) 1000, (int16_t) 1000), 1000000);
+	TEST_ASSERT_EQUALS(xpcc::avr::mul32((int16_t) 32000, (int16_t) 32000), 1024000000);
+	TEST_ASSERT_EQUALS(xpcc::avr::mul32((int16_t) -32000, (int16_t) -32000), 1024000000);
+}
+
+void
+MathTest::testMultiplyAccumulate()
+{
+	int32_t offset = -2130;
+	
+	TEST_ASSERT_EQUALS(xpcc::avr::mac32(offset, (int16_t) 1, (int16_t) 1), 1 - 2130);
+	TEST_ASSERT_EQUALS(xpcc::avr::mac32(offset, (int16_t) 10, (int16_t) 10), 100 - 2130);
+	TEST_ASSERT_EQUALS(xpcc::avr::mac32(offset, (int16_t) 100, (int16_t) 100), 10000 - 2130);
+	TEST_ASSERT_EQUALS(xpcc::avr::mac32(offset, (int16_t) 1000, (int16_t) 1000), 1000000 - 2130);
+	TEST_ASSERT_EQUALS(xpcc::avr::mac32(offset, (int16_t) 10000, (int16_t) 10000), 100000000 - 2130);
+	TEST_ASSERT_EQUALS(xpcc::avr::mac32(offset, (int16_t) -10000, (int16_t) -10000), 100000000 - 2130);
+	
+	offset = 1235678;
+	
+	TEST_ASSERT_EQUALS(xpcc::avr::mac32(offset, (int16_t) -1, (int16_t) -1), 1 + 1235678);
+	TEST_ASSERT_EQUALS(xpcc::avr::mac32(offset, (int16_t) -10, (int16_t) 10), -100 + 1235678);
+	TEST_ASSERT_EQUALS(xpcc::avr::mac32(offset, (int16_t) 100, (int16_t) -100), -10000 + 1235678);
+	TEST_ASSERT_EQUALS(xpcc::avr::mac32(offset, (int16_t) 1000, (int16_t) 1000), 1000000 + 1235678);
+	TEST_ASSERT_EQUALS(xpcc::avr::mac32(offset, (int16_t) -1000, (int16_t) 1000), -1000000 + 1235678);
+	TEST_ASSERT_EQUALS(xpcc::avr::mac32(offset, (int16_t) 32000, (int16_t) 32000), 1024000000 + 1235678);
+	TEST_ASSERT_EQUALS(xpcc::avr::mac32(offset, (int16_t) -32000, (int16_t) -32000), 1024000000 + 1235678);
+	TEST_ASSERT_EQUALS(xpcc::avr::mac32(offset, (int16_t) -32000, (int16_t) 32000), -1024000000 + 1235678);
 }

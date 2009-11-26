@@ -1,3 +1,5 @@
 
-target: avr
+target:
+  - atmega
+  - atxmega
 

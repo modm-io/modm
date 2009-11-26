@@ -13,6 +13,9 @@ using namespace xpcc;
 
 #if defined(__AVR_ATmega644__)
 
+	CREATE_OUTPUT_PIN(LedGreen, B, 0);
+	CREATE_OUTPUT_PIN(LedRed, B, 1);
+	
 	CREATE_OUTPUT_PIN(Cs, B, 4);
 	CREATE_INPUT_PIN(Int, B, 2);
 

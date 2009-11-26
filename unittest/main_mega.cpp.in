@@ -2,30 +2,53 @@
 // Please modify the corresponding 'main_pc.cpp.in' file instead.
 // ----------------------------------------------------------------------------
 
+#include <avr/interrupt.h>
+
 #include <unittest/reporter.hpp>
 #include <unittest/controller.hpp>
 
 #include <xpcc/hal/peripheral/avr/mega/uart/uart0.hpp>
+#include <xpcc/hal/peripheral/gpio.hpp>
+
 #include <xpcc/io/iodevice_wrapper.hpp>
 
 ${includes}
 
 ${names}
 
+CREATE_OUTPUT_PIN(LedGreen, B, 0);
+CREATE_OUTPUT_PIN(LedRed, B, 1);
+
 int
 main(void)
 {
+	LedGreen::output();
+	LedRed::output();
+	
+	LedGreen::reset();
+	LedRed::set();
+	
 	// initialize output device
 	xpcc::Uart0 uart(115200);
 	xpcc::IODeviceWrapper<xpcc::Uart0> device(uart);
 	
+	sei();
+	
+	device.put("Unittests (" __DATE__ ", " __TIME__")\n");
+	
 	unittest::Reporter reporter(device);
 	unittest::Controller::instance().setReporter(reporter);
+	
+	LedGreen::set();
 	
 	// run tests
 	${tests}
 	
 	unittest::Controller::instance().getReporter().printSummary();
 	
-	return 0;
+	LedRed::reset();
+	
+	while (1)
+	{
+	}
 }
