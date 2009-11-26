@@ -3,9 +3,9 @@
 // $Id: filter.dox 76 2009-10-14 23:29:28Z dergraaf $
 
 /*!
-\ingroup	math
-\defgroup	filter	Filter
-\brief		some filter
+@ingroup	math
+@defgroup	filter	Filter
+@brief		Some filter
 
 
 */

@@ -40,7 +40,9 @@ template<typename T>
 xpcc::Ramp<T>::Ramp(const T& positiveIncrement,
 					const T& negativeIncrement,
 					const T& initialValue) : 
+	target(initialValue),
 	value(initialValue),
+	targetReached(true),
 	positiveIncrement(positiveIncrement),
 	negativeIncrement(negativeIncrement)
 {
@@ -50,7 +52,17 @@ xpcc::Ramp<T>::Ramp(const T& positiveIncrement,
 
 template<typename T>
 void
-xpcc::Ramp<T>::update(const T& target)
+xpcc::Ramp<T>::setTarget(const T& target)
+{
+	this->target = target;
+	targetReached = false;
+}
+
+// ----------------------------------------------------------------------------
+
+template<typename T>
+void
+xpcc::Ramp<T>::update()
 {
 	if (target > value)
 	{
@@ -60,6 +72,7 @@ xpcc::Ramp<T>::update(const T& target)
 		}
 		else {
 			value = target;
+			targetReached = true;
 		}
 	}
 	else
@@ -70,6 +83,16 @@ xpcc::Ramp<T>::update(const T& target)
 		}
 		else {
 			value = target;
+			targetReached = true;
 		}
 	}
+}
+
+// ----------------------------------------------------------------------------
+
+template<typename T>
+bool
+xpcc::Ramp<T>::isTargetReached(const T& target) const
+{
+	return targetReached;
 }

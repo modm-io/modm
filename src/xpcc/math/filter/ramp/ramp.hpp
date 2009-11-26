@@ -48,19 +48,28 @@ namespace xpcc
 	public:
 		Ramp(const T& positiveIncrement,
 			 const T& negativeIncrement,
-			 const T& initialValue = 0);
+			 const T& initialValue = T());
+		
+		inline void
+		setTarget(const T& target);
 		
 		void
-		update(const T& target);
+		update();
 		
-		const T&
+		inline const T&
 		getValue() const
 		{
 			return value;
 		}
+		
+		inline bool
+		isTargetReached() const;
 	
 	private:
+		T target;
 		T value;
+		bool targetReached;
+		
 		T positiveIncrement;
 		T negativeIncrement;
 	};

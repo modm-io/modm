@@ -114,6 +114,8 @@ BitOperationTest::testCount8bit()
 	TEST_ASSERT_EQUALS(utils::bitCount((uint8_t) 0x3c), 4);
 	TEST_ASSERT_EQUALS(utils::bitCount((uint8_t) 0x80), 1);
 	TEST_ASSERT_EQUALS(utils::bitCount((uint8_t) 0x07), 3);
+	TEST_ASSERT_EQUALS(utils::bitCount((uint8_t) 0xaa), 4);
+	TEST_ASSERT_EQUALS(utils::bitCount((uint8_t) 0x55), 4);
 	TEST_ASSERT_EQUALS(utils::bitCount((uint8_t) 0xff), 8);
 }
 
@@ -132,6 +134,8 @@ BitOperationTest::testCount16bit()
 	TEST_ASSERT_EQUALS(utils::bitCount((uint16_t) 0x0000), 0);
 	TEST_ASSERT_EQUALS(utils::bitCount((uint16_t) 0x3c00), 4);
 	TEST_ASSERT_EQUALS(utils::bitCount((uint16_t) 0x0080), 1);
+	TEST_ASSERT_EQUALS(utils::bitCount((uint16_t) 0xaaaa), 8);
+	TEST_ASSERT_EQUALS(utils::bitCount((uint16_t) 0x5555), 8);
 	TEST_ASSERT_EQUALS(utils::bitCount((uint16_t) 0xf307), 9);
 	TEST_ASSERT_EQUALS(utils::bitCount((uint16_t) 0xffff), 16);
 }
@@ -151,5 +155,7 @@ BitOperationTest::testCount32bit()
 	TEST_ASSERT_EQUALS(utils::bitCount((uint32_t) 0x00000000), 0);
 	TEST_ASSERT_EQUALS(utils::bitCount((uint32_t) 0x00003c00), 4);
 	TEST_ASSERT_EQUALS(utils::bitCount((uint32_t) 0x0560f307), 13);
+	TEST_ASSERT_EQUALS(utils::bitCount((uint32_t) 0xaaaaaaaa), 16);
+	TEST_ASSERT_EQUALS(utils::bitCount((uint32_t) 0x55555555), 16);
 	TEST_ASSERT_EQUALS(utils::bitCount((uint32_t) 0xffffffff), 32);
 }

@@ -35,8 +35,8 @@
 uint8_t
 xpcc::utils::bitReverse(uint8_t n)
 {
-	n = ((n >> 1) & 0x55) | ((n << 1) & 0xaa);
-	n = ((n >> 2) & 0x33) | ((n << 2) & 0xcc);
+	n = ((uint8_t) (n >> 1) & 0x55) | ((uint8_t) (n << 1) & 0xaa);
+	n = ((uint8_t) (n >> 2) & 0x33) | ((uint8_t) (n << 2) & 0xcc);
 	
 	return swap(n);
 }
@@ -47,9 +47,8 @@ xpcc::utils::bitReverse(uint16_t n)
 	n = ((n >>  1) & 0x5555) | ((n <<  1) & 0xaaaa);
 	n = ((n >>  2) & 0x3333) | ((n <<  2) & 0xcccc);
 	n = ((n >>  4) & 0x0f0f) | ((n <<  4) & 0xf0f0);
-	n = ((n >>  8) & 0x00ff) | ((n <<  8) & 0xff00);
 	
-	return n;
+	return swap(n);
 }
 
 uint32_t
@@ -67,9 +66,9 @@ xpcc::utils::bitReverse(uint32_t n)
 uint_fast8_t
 xpcc::utils::bitCount(uint8_t n)
 {
-	n = ((n >> 1) & 0x55) + (n & 0x55);
-	n = ((n >> 2) & 0x33) + (n & 0x33);
-	n = ((n >> 4) + n) & 0xf;
+	n = ((uint8_t) (n >> 1) & 0x55) + (n & 0x55);
+	n = ((uint8_t) (n >> 2) & 0x33) + (n & 0x33);
+	n = ((uint8_t) (n >> 4) + n) & 0xf;
 	
 	return n;
 }
@@ -77,7 +76,7 @@ xpcc::utils::bitCount(uint8_t n)
 uint_fast8_t
 xpcc::utils::bitCount(uint16_t n)
 {
-	return (bitCount((uint8_t)  n) +
+	return (bitCount((uint8_t) (n)) +
 			bitCount((uint8_t) (n >> 8)));
 }
 

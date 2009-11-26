@@ -1,6 +1,4 @@
 
-#include <avr/io.h>
-
 #include <xpcc/hal/peripheral/gpio.hpp>
 #include <xpcc/hal/peripheral/software_spi.hpp>
 #include <xpcc/hal/time/delay.hpp>
@@ -68,15 +66,7 @@ main()
 	Led6::set();
 	Led7::reset();
 	
-	{
-		volatile uint8_t a = 0xab;
-		a = utils::bitCount(a);
-		
-		volatile uint8_t b = 0xab;
-		b = utils::bitReverse(b);
-	}
-	
-	_delay_ms(100);
+	delay_ms(100);
 	
 	display.initialize();
 	
@@ -89,7 +79,7 @@ main()
 	
 	while (1)
 	{
-		_delay_ms(10);
+		delay_ms(10);
 		
 		keys.update(PORTB.IN);
 		

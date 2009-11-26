@@ -37,7 +37,8 @@
 // ----------------------------------------------------------------------------
 
 template<typename T>
-xpcc::SCurve<T>::SCurve()
+xpcc::SCurve<T>::SCurve() :
+	target(), value(), targetReached(false)
 {
 }
 
@@ -45,6 +46,25 @@ xpcc::SCurve<T>::SCurve()
 
 template<typename T>
 void
-xpcc::SCurve<T>::update(const T& target)
+xpcc::Ramp<T>::setTarget(const T& target)
 {
+	this->target = target;
+	targetReached = false;
+}
+
+// ----------------------------------------------------------------------------
+
+template<typename T>
+void
+xpcc::SCurve<T>::update()
+{
+}
+
+// ----------------------------------------------------------------------------
+
+template<typename T>
+bool
+xpcc::Ramp<T>::isTargetReached(const T& target) const
+{
+	return targetReached;
 }

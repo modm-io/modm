@@ -39,27 +39,42 @@
  * @ingroup	utils
  * @brief	Force inlining
  * 
- * Macro to force inlining on the functions if needed, because many
- * people compile with -Os, which does not always inline them.
+ * Macro to force inlining on function if needed. Compiling with -Os  does not
+ * always inline them when declared only \c inline.
  */
 #define ALWAYS_INLINE  inline __attribute__((always_inline))
 
+#ifdef __DOXYGEN__
 
-#define	STRINGIFY(s)	STRINGIFY2(s)
-#define	STRINGIFY2(s)	STRINGIFY3(s)
-#define	STRINGIFY3(s)	#s
+	/**
+	 * @ingroup	utils
+	 * @brief	Convert the argument into a C-String
+	 */
+	#define	STRINGIFY(s)	#s
 
-#define	CONCAT(a,b)		CONCAT2(a,b)
-#define	CONCAT2(a,b)	CONCAT3(a,b)
-#define	CONCAT3(a,b)	a ## b
+	/**
+	 * @ingroup	utils
+	 * @brief	Concatenate the two arguments
+	 */
+	#define	CONCAT(a,b)		a ## b
 
+#else // !__DOXYGEN__
 
-#ifndef	BASENAME
-	#define	FILENAME	__FILE__
-#else
-	#define	FILENAME	STRINGIFY(BASENAME)
+	#define	STRINGIFY(s)	STRINGIFY2(s)
+	#define	STRINGIFY2(s)	STRINGIFY3(s)
+	#define	STRINGIFY3(s)	#s
+
+	#define	CONCAT(a,b)		CONCAT2(a,b)
+	#define	CONCAT2(a,b)	CONCAT3(a,b)
+	#define	CONCAT3(a,b)	a ## b
+
+	#ifndef	BASENAME
+		#define	FILENAME	__FILE__
+	#else
+		#define	FILENAME	STRINGIFY(BASENAME)
+	#endif
+
 #endif
-
 
 namespace xpcc
 {
@@ -127,6 +142,8 @@ namespace xpcc
 		/**
 		 * @ingroup	utils
 		 * @brief	Reverse the bits in a byte
+		 * 
+		 * 15 cycles on an AVR, without call + return.
 		 */
 		uint8_t
 		bitReverse(uint8_t n);
@@ -149,6 +166,8 @@ namespace xpcc
 		 * @ingroup	utils
 		 * @brief	Count the number of bit set to 1
 		 * 
+		 * 16 cycles on an AVR, without call + return.
+		 * 
 		 * @see		http://infolab.stanford.edu/~manku/bitReverse/bitReverse.html
 		 */
 		uint_fast8_t
@@ -157,6 +176,8 @@ namespace xpcc
 		/**
 		 * @ingroup	utils
 		 * @brief	Count the number of bit set to 1
+		 * 
+		 * 33 cycles on an AVR, without call + return.
 		 */
 		uint_fast8_t
 		bitCount(uint16_t n);

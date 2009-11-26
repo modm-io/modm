@@ -83,7 +83,8 @@ namespace xpcc
 		
 		/// \brief	Set a new target value
 		void
-		setTarget(const T& value) {
+		setTarget(const T& value)
+		{
 			target = value;
 		}
 		
@@ -92,7 +93,8 @@ namespace xpcc
 		update(const T& input);
 		
 		const T&
-		getValue() const {
+		getValue() const
+		{
 			return output;
 		}
 	

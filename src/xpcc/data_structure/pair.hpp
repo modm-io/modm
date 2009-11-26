@@ -41,7 +41,7 @@ namespace xpcc
 	 * 
 	 * @brief		Pair<FirstType, SecondType> is a heterogeneous pair
 	 * 
-	 * It holds one object of type FirstType and ohne object of type
+	 * It holds one object of type FirstType and one object of type
 	 * SecondType.
 	 * 
 	 * @todo	needs a better implementation without losing the POD attribute!

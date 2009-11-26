@@ -10,28 +10,37 @@
 
 #include "misc.hpp"
 
+/**
+ * @ingroup		utils
+ * @defgroup	tm	Template Metaprogramming
+ */
+
 namespace xpcc
 {
 	/**
-	 * @ingroup		utils
+	 * @ingroup	tm
 	 * @headerfile	<xpcc/utils/typet.hpp>
 	 * 
 	 * @brief	Template metaprogramming tools
 	 */
 	namespace tm
 	{
-		/// An empty type useful as a placeholder.
+		/// @ingroup	tm
+		/// @brief	An empty type useful as a placeholder.
 		class NullType
 		{
 		};
 		
-		/// Converts an integer to a type.
+		/// @ingroup	tm
+		/// @brief	Converts an integer to a type.
 		template <int v> struct Int2Type { enum { value = v }; };
 
-		/// Converts an type to a unique empty type.
+		/// @ingroup	tm
+		/// @brief	Converts an type to a unique empty type.
 		template <typename T> struct Type2Type { typedef T OriginalType; };
-
-		/// Selects type Result = flag ? T : U
+		
+		/// @ingroup	tm
+		/// @brief	Selects type Result = flag ? T : U
 		template <bool flag, typename T, typename U>
 		struct Select
 		{
@@ -43,8 +52,9 @@ namespace xpcc
 		{
 			typedef U Result;
 		};
-
-		/// IsSameType<T,U>::value is true when T=U
+		
+		/// @ingroup	tm
+		/// @brief	IsSameType<T,U>::value is true when T=U
 		template <typename T, typename U>
 		struct IsSameType
 		{
@@ -61,6 +71,7 @@ namespace xpcc
 			};
 		};
 		
+		/// @ingroup	tm
 		/// @brief Checks for conversion possibilities between T and U
 		/// 
 		/// Conversion<T,U>::exists is true if T is convertible to U
@@ -128,7 +139,7 @@ namespace xpcc
 		{
 		};
 		
-		/// @ingroup	utils
+		/// @ingroup	tm
 		/// @brief		Static assert support
 		///
 		/// Inspired by the BOOST_STATIC_ASSERT macro.

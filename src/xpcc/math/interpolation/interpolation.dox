@@ -1,0 +1,11 @@
+// coding: utf-8
+// 
+// $Id$
+
+/*!
+@ingroup	math
+@defgroup	interpolation	Interpolation
+@brief		Interpolation methods
+
+
+*/

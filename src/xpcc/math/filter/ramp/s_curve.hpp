@@ -49,17 +49,25 @@ namespace xpcc
 	public:
 		SCurve();
 		
-		void
-		update(const T& target);
+		inline void
+		setTarget(const T& target);
 		
-		const T&
+		void
+		update();
+		
+		inline const T&
 		getValue() const
 		{
 			return value;
 		}
+		
+		inline bool
+		isTargetReached() const;
 	
 	private:
+		T target;
 		T value;
+		bool targetReached;
 	};
 }
 

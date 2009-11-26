@@ -31,7 +31,7 @@
 // ----------------------------------------------------------------------------
 
 #ifndef	XPCC__LINEAR_INTERPOLATION_HPP
-   #error "Don't include this file directly. Use linear_interpolation.hpp instead"
+   #error "Don't include this file directly. Use 'linear_interpolation.hpp' instead!"
 #endif
 
 namespace xpcc
@@ -47,8 +47,6 @@ namespace xpcc
 	T
 	LinearInterpolation<T>::interpolate(const T& value)
 	{
-		uint8_t i;
-		
 		T x1 = T();
 		T x2 = T();
 		if (value <= points[0]) {
@@ -58,6 +56,7 @@ namespace xpcc
 			return points[2*(numPoints-1)+1];
 		}
 		
+		uint8_t i;
 		for (i = 0; i < numPoints ; i++) {
 			x2 = points[i*2];
 			if (x2 >= value)
