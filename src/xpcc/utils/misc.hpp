@@ -33,6 +33,8 @@
 #ifndef	MISC_HPP
 #define	MISC_HPP
 
+#include <stdint.h>
+
 /**
  * @ingroup	utils
  * @brief	Force inlining
@@ -44,16 +46,20 @@
 
 
 #define	STRINGIFY(s)	STRINGIFY2(s)
-#define	STRINGIFY2(s)	#s
+#define	STRINGIFY2(s)	STRINGIFY3(s)
+#define	STRINGIFY3(s)	#s
 
 #define	CONCAT(a,b)		CONCAT2(a,b)
-#define	CONCAT2(a,b)	a ## b
+#define	CONCAT2(a,b)	CONCAT3(a,b)
+#define	CONCAT3(a,b)	a ## b
+
 
 #ifndef	BASENAME
 	#define	FILENAME	__FILE__
 #else
 	#define	FILENAME	STRINGIFY(BASENAME)
 #endif
+
 
 namespace xpcc
 {
@@ -62,15 +68,105 @@ namespace xpcc
 		/**
 		 * @ingroup	utils
 		 * @brief	Add volatile modifier to T
-		 * 
-		 * @todo	Check if this works as expected!
 		 */
 		template<typename T>
 		volatile T&
-		Volatile(T& value)
+		asVolatile(T& value)
 		{
 			return (volatile T&) value;
 		}
+		
+		/**
+		 * @ingroup	utils
+		 * @brief	Exchange the two nibbles of a byte
+		 */
+		ALWAYS_INLINE uint8_t
+		swap(uint8_t n)
+		{
+#ifdef __AVR__
+			if (__builtin_constant_p(n)) {
+				n = (n << 4) | (n >> 4);
+			}
+			else {
+				asm volatile ("swap %0" : "=r" (n) : "0" (n));
+			}
+			return n;
+#else
+			n = (n << 4) | (n >> 4);
+			return n;
+#endif
+		}
+		
+		/**
+		 * @ingroup	utils
+		 * @brief	Exchange the two bytes of a 16-bit integer
+		 */
+		ALWAYS_INLINE uint16_t
+		swap(uint16_t n)
+		{
+#ifdef __AVR__
+			if (__builtin_constant_p(n)) {
+				n = (n << 8) | (n >> 8);
+			}
+			else {
+				asm volatile (
+					"eor %A0, %B0"	"\n\t"
+					"eor %B0, %A0"	"\n\t"
+					"eor %A0, %B0"	"\n\t"
+					: "=r" (n)
+					: "0" (n)
+				);
+			}
+			return n;
+#else
+			n = (n << 8) | (n >> 8);
+			return n;
+#endif
+		}
+		
+		/**
+		 * @ingroup	utils
+		 * @brief	Reverse the bits in a byte
+		 */
+		uint8_t
+		bitReverse(uint8_t n);
+		
+		/**
+		 * @ingroup	utils
+		 * @brief	Reverse the bits in a 16-bit integer
+		 */
+		uint16_t
+		bitReverse(uint16_t n);
+		
+		/**
+		 * @ingroup	utils
+		 * @brief	Reverse the bits in a 32-bit integer
+		 */
+		uint32_t
+		bitReverse(uint32_t n);
+		
+		/**
+		 * @ingroup	utils
+		 * @brief	Count the number of bit set to 1
+		 * 
+		 * @see		http://infolab.stanford.edu/~manku/bitReverse/bitReverse.html
+		 */
+		uint_fast8_t
+		bitCount(uint8_t n);
+		
+		/**
+		 * @ingroup	utils
+		 * @brief	Count the number of bit set to 1
+		 */
+		uint_fast8_t
+		bitCount(uint16_t n);
+		
+		/**
+		 * @ingroup	utils
+		 * @brief	Count the number of bit set to 1
+		 */
+		uint_fast8_t
+		bitCount(uint32_t n);
 	}
 }
 

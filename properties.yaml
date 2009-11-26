@@ -39,12 +39,10 @@ library:
           CS: B,6
           INT: B,3
   hal:
-    avr:
-      uart:
-        defines:
-          UART0_RX_BUFFER_SIZE: 8
-          UART0_TX_BUFFER_SIZE: 32
-
-tests:
-  include: no
-
+    peripheral:
+      avr:
+        mega:
+          uart:
+            defines:
+              UART0_RX_BUFFER_SIZE: 8
+              UART0_TX_BUFFER_SIZE: 32

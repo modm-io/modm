@@ -2,4 +2,4 @@
 target: atmega
 
 project:
-  executable: steuergeraet
+  executable: handsteuerung_v001

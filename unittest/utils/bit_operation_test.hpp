@@ -26,85 +26,33 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: scheduler.hpp 95 2009-10-19 21:39:26Z dergraaf $
+ * $Id$
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__SCHEDULER_HPP
-	#error	"Don't include this file directly, use 'scheduler.hpp' instead!"
-#endif
+#include <unittest/testsuite.hpp>
 
-inline void
-xpcc::Scheduler::scheduleInterupt()
+class BitOperationTest : public unittest::TestSuite
 {
-	/* item is element of two lists (schedule list and ready list)
-	   ready list is order after priority
+public:
+	void
+	testSwap();
 	
-	foreach item
-		decrement
-		if time = 0
-			reload time
-			set as ready
+	void
+	testReverse8bit();
 	
-	foreach item is ready orderd per priority
-		run item
-		mark as waiting
-	*/
+	void
+	testReverse16bit();
 	
-	if (taskList == 0) {
-		// nothing to schedule right now
-		return;
-	}
+	void
+	testReverse32bit();
 	
-	// update all tasks
-	TaskListItem *item = taskList;
-	do {
-		item->time--;
-		if (item->time == 0) {
-			item->time = item->period;
-			
-			// add to ready list
-			if ((readyList == 0) ||
-				(readyList->priority < item->priority))
-			{
-				item->nextReady = readyList;
-				readyList = item;
-			}
-			else {
-				TaskListItem *list = readyList;
-				
-				while (1)
-				{
-					if ((list->nextReady == 0) ||
-						(list->nextReady->priority < item->priority))
-					{
-						item->nextReady = list->nextReady;
-						list->nextReady = item;
-						break;
-					}
-					list = list->nextReady;
-				}
-			}
-			item->state = TaskListItem::READY;
-		}
-	}
-	while ((item = item->nextTask) != 0);
+	void
+	testCount8bit();
 	
-	// how execute the tasks which are ready
-	while (((item = xpcc::utils::asVolatile(readyList)) != 0) &&
-			(item->priority > currentPriority))
-	{
-		item->state = TaskListItem::RUNNING;
-		readyList = item->nextReady;
-		currentPriority = item->priority;
-		{
-			xpcc::atomic::Unlock();
-			
-			// the actual execution of the task happens with interrupts
-			// enabled
-			item->task.run();
-		}
-		currentPriority = 0;
-		item->state = TaskListItem::WAITING;
-	}
-}
+	void
+	testCount16bit();
+	
+	void
+	testCount32bit();
+};

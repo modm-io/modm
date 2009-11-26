@@ -26,85 +26,67 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: scheduler.hpp 95 2009-10-19 21:39:26Z dergraaf $
+ * $Id$
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__SCHEDULER_HPP
-	#error	"Don't include this file directly, use 'scheduler.hpp' instead!"
-#endif
+#include "misc.hpp"
 
-inline void
-xpcc::Scheduler::scheduleInterupt()
+uint8_t
+xpcc::utils::bitReverse(uint8_t n)
 {
-	/* item is element of two lists (schedule list and ready list)
-	   ready list is order after priority
+	n = ((n >> 1) & 0x55) | ((n << 1) & 0xaa);
+	n = ((n >> 2) & 0x33) | ((n << 2) & 0xcc);
 	
-	foreach item
-		decrement
-		if time = 0
-			reload time
-			set as ready
+	return swap(n);
+}
+
+uint16_t
+xpcc::utils::bitReverse(uint16_t n)
+{
+	n = ((n >>  1) & 0x5555) | ((n <<  1) & 0xaaaa);
+	n = ((n >>  2) & 0x3333) | ((n <<  2) & 0xcccc);
+	n = ((n >>  4) & 0x0f0f) | ((n <<  4) & 0xf0f0);
+	n = ((n >>  8) & 0x00ff) | ((n <<  8) & 0xff00);
 	
-	foreach item is ready orderd per priority
-		run item
-		mark as waiting
-	*/
+	return n;
+}
+
+uint32_t
+xpcc::utils::bitReverse(uint32_t n)
+{
+	n = ((n >>  1) & 0x55555555) | ((n <<  1) & 0xaaaaaaaa);
+	n = ((n >>  2) & 0x33333333) | ((n <<  2) & 0xcccccccc);
+	n = ((n >>  4) & 0x0f0f0f0f) | ((n <<  4) & 0xf0f0f0f0);
+	n = ((n >>  8) & 0x00ff00ff) | ((n <<  8) & 0xff00ff00);
+	n = ((n >> 16) & 0x0000ffff) | ((n << 16) & 0xffff0000);
 	
-	if (taskList == 0) {
-		// nothing to schedule right now
-		return;
-	}
+	return n;
+}
+
+uint_fast8_t
+xpcc::utils::bitCount(uint8_t n)
+{
+	n = ((n >> 1) & 0x55) + (n & 0x55);
+	n = ((n >> 2) & 0x33) + (n & 0x33);
+	n = ((n >> 4) + n) & 0xf;
 	
-	// update all tasks
-	TaskListItem *item = taskList;
-	do {
-		item->time--;
-		if (item->time == 0) {
-			item->time = item->period;
-			
-			// add to ready list
-			if ((readyList == 0) ||
-				(readyList->priority < item->priority))
-			{
-				item->nextReady = readyList;
-				readyList = item;
-			}
-			else {
-				TaskListItem *list = readyList;
-				
-				while (1)
-				{
-					if ((list->nextReady == 0) ||
-						(list->nextReady->priority < item->priority))
-					{
-						item->nextReady = list->nextReady;
-						list->nextReady = item;
-						break;
-					}
-					list = list->nextReady;
-				}
-			}
-			item->state = TaskListItem::READY;
-		}
-	}
-	while ((item = item->nextTask) != 0);
+	return n;
+}
+
+uint_fast8_t
+xpcc::utils::bitCount(uint16_t n)
+{
+	return (bitCount((uint8_t)  n) +
+			bitCount((uint8_t) (n >> 8)));
+}
+
+uint_fast8_t
+xpcc::utils::bitCount(uint32_t n)
+{
+	n = ((n >> 1) & 0x55555555) + (n & 0x55555555);
+	n = ((n >> 2) & 0x33333333) + (n & 0x33333333);
+	n = ((n >> 4) & 0x0f0f0f0f) + (n & 0x0f0f0f0f);
 	
-	// how execute the tasks which are ready
-	while (((item = xpcc::utils::asVolatile(readyList)) != 0) &&
-			(item->priority > currentPriority))
-	{
-		item->state = TaskListItem::RUNNING;
-		readyList = item->nextReady;
-		currentPriority = item->priority;
-		{
-			xpcc::atomic::Unlock();
-			
-			// the actual execution of the task happens with interrupts
-			// enabled
-			item->task.run();
-		}
-		currentPriority = 0;
-		item->state = TaskListItem::WAITING;
-	}
+	return n % 255;
 }

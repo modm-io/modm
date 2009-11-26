@@ -1,16 +1,17 @@
 
 #include <avr/io.h>
-#include <util/delay.h>
 
 #include <xpcc/hal/peripheral/gpio.hpp>
-#include <xpcc/hal/peripheral/avr/xmega/gpio.hpp>
 #include <xpcc/hal/peripheral/software_spi.hpp>
+#include <xpcc/hal/time/delay.hpp>
 
 #include <xpcc/driver/lcd/dog_m16x.hpp>
 #include <xpcc/driver/debounce.hpp>
 
 #include <xpcc/io/iostream.hpp>
 #include <xpcc/io/iodevice_wrapper.hpp>
+
+#include <xpcc/utils/misc.hpp>
 
 using namespace xpcc;
 
@@ -66,6 +67,14 @@ main()
 	
 	Led6::set();
 	Led7::reset();
+	
+	{
+		volatile uint8_t a = 0xab;
+		a = utils::bitCount(a);
+		
+		volatile uint8_t b = 0xab;
+		b = utils::bitReverse(b);
+	}
 	
 	_delay_ms(100);
 	
