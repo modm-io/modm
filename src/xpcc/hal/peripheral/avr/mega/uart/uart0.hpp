@@ -29,10 +29,17 @@
  * $Id$
  */
 // ----------------------------------------------------------------------------
-{{ generation_block }}
+/*
+ * WARNING: This file is generated automatically, do not edit!
+ * Please modify the corresponding *.tmpl file instead and re-run the
+ * script 'generate.py'.
+ *
+ * Generated 26 Nov 2009, 23:32:57
+ */
+// ----------------------------------------------------------------------------
 
-#ifndef XPCC__MEGA_UART{{ id }}_HPP
-#define XPCC__MEGA_UART{{ id }}_HPP
+#ifndef XPCC__MEGA_UART0_HPP
+#define XPCC__MEGA_UART0_HPP
 
 #include <stdint.h>
 
@@ -40,16 +47,16 @@ namespace xpcc
 {
 	/**
 	 * @ingroup		hal
-	 * @headerfile	<xpcc/hal/peripheral/avr/mega/uart/buffered_uart{{ id }}.hpp>
-	 * @brief		UART{{ id }}
+	 * @headerfile	<xpcc/hal/peripheral/avr/mega/uart/uart0.hpp>
+	 * @brief		UART0
 	 * 
 	 * This implementation uses a ringbuffer.
 	 */
-	class BufferedUart{{ id }}
+	class Uart0
 	{
 	public:
 		/// @todo	check if this works as desired!
-		BufferedUart{{ id }}(uint32_t baudrate)
+		Uart0(uint32_t baudrate)
 		{
 			this->setBaudrate(baudrate);
 		}
@@ -88,4 +95,4 @@ namespace xpcc
 	};
 }
 
-#endif // XPCC__MEGA_UART{{ id }}_HPP
+#endif // XPCC__MEGA_UART0_HPP

@@ -1,27 +1,27 @@
 // WARNING: This file is generated automatically, do not edit!
-// Please modify the corresponding 'main.cpp.in' file instead.
+// Please modify the corresponding 'main_pc.cpp.in' file instead.
 // ----------------------------------------------------------------------------
 
 #include <unittest/reporter.hpp>
 #include <unittest/controller.hpp>
 
-$iodeviceInclude
+#include <xpcc/hal/peripheral/avr/xmega/uart/uartc0.hpp>
 
-$includes
+${includes}
 
-$nameStrings
+${names}
 
 int
 main(void)
 {
-	// initialize stream
-	$iodevice device;
+	// initialize output device
+	xpcc::IODevice device;
 	
 	unittest::Reporter reporter(device);
 	unittest::Controller::instance().setReporter(reporter);
 	
 	// run tests
-	$tests
+	${tests}
 	
 	unittest::Controller::instance().getReporter().printSummary();
 	

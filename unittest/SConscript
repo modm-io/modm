@@ -38,6 +38,7 @@ import datetime
 Import('env')
 Import('sources')
 Import('header')
+Import('globals')
 Import('library')
 
 env = env.Clone()
@@ -138,14 +139,18 @@ for className, attr in tests.iteritems():
 	testsCases.append(str)
 
 substitutions = {
-	'iodeviceInclude': '#include <xpcc/io/backplane/std/std_iodevice.hpp>',
 	'includes': '\n'.join(includes),
-	'nameStrings': 'namespace\n{\n\t%s\n}' % '\n\t'.join(nameStrings),
-	'iodevice': 'xpcc::StdIODevice',
+	'names': 'namespace\n{\n\t%s\n}' % '\n\t'.join(nameStrings),
 	'tests': '\n'.join(testsCases),
 }
 
-runnerFile = env.Template('main.cpp.in', SUBSTITUTIONS=substitutions)
+properties = globals.properties.get('unittest', {})
+try:
+	templateFile = properties[globals.target]['template']
+except KeyError:
+	templateFile = "main.cpp.in"
+
+runnerFile = env.Template(templateFile, SUBSTITUTIONS=substitutions)
 env.AlwaysBuild(runnerFile)		# TODO replace this with real dependencies
 
 # -----------------------------------------------------------------------------

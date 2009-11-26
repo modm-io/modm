@@ -113,6 +113,9 @@ namespace xpcc
 		// used.
 		IOStream&
 		putInteger(int32_t value);
+		
+		IOStream&
+		putInteger(uint32_t value);
 #endif
 		
 		// default version which is used when all the others don't match

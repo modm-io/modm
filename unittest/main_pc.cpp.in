@@ -1,0 +1,29 @@
+// WARNING: This file is generated automatically, do not edit!
+// Please modify the corresponding 'main_pc.cpp.in' file instead.
+// ----------------------------------------------------------------------------
+
+#include <unittest/reporter.hpp>
+#include <unittest/controller.hpp>
+
+#include <xpcc/io/backplane/std/std_iodevice.hpp>
+
+${includes}
+
+${names}
+
+int
+main(void)
+{
+	// initialize output device
+	xpcc::StdIODevice device;
+	
+	unittest::Reporter reporter(device);
+	unittest::Controller::instance().setReporter(reporter);
+	
+	// run tests
+	${tests}
+	
+	unittest::Controller::instance().getReporter().printSummary();
+	
+	return 0;
+}

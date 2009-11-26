@@ -26,7 +26,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: buffered_uartn.hpp.tmpl 122 2009-11-12 00:06:50Z dergraaf $
+ * $Id$
  */
 // ----------------------------------------------------------------------------
 /*
@@ -34,7 +34,7 @@
  * Please modify the corresponding *.tmpl file instead and re-run the
  * script 'generate.py'.
  *
- * Generated 16 Nov 2009, 19:16:08
+ * Generated 26 Nov 2009, 23:32:57
  */
 // ----------------------------------------------------------------------------
 
@@ -47,16 +47,16 @@ namespace xpcc
 {
 	/**
 	 * @ingroup		hal
-	 * @headerfile	<xpcc/hal/peripheral/avr/mega/uart/buffered_uart1.hpp>
+	 * @headerfile	<xpcc/hal/peripheral/avr/mega/uart/uart1.hpp>
 	 * @brief		UART1
 	 * 
 	 * This implementation uses a ringbuffer.
 	 */
-	class BufferedUart1
+	class Uart1
 	{
 	public:
 		/// @todo	check if this works as desired!
-		BufferedUart1(uint32_t baudrate)
+		Uart1(uint32_t baudrate)
 		{
 			this->setBaudrate(baudrate);
 		}

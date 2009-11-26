@@ -121,11 +121,12 @@ tests = env.Alias('tests', 'build/tests')
 projects = parser.parseDirectory('unittest/', 'unittest')
 sources = projects[0].sources
 header = projects[0].header
+globals = parser.getGlobalProperties()
 
 SConscript('unittest/SConscript',
 			src='unittest',
 			variant_dir='build/unittest',
-			exports=['env', 'sources', 'header', 'library'])
+			exports=['env', 'sources', 'header', 'globals', 'library'])
 unittest = env.Alias('unittest', 'build/unittest')
 
 # -----------------------------------------------------------------------------

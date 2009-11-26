@@ -34,7 +34,7 @@
  * Please modify the corresponding *.tmpl file instead and re-run the
  * script 'generate.py'.
  *
- * Generated 16 Nov 2009, 19:16:08
+ * Generated 26 Nov 2009, 23:32:57
  */
 // ----------------------------------------------------------------------------
 
@@ -48,7 +48,7 @@
 #include "uart_defaults.h"
 
 #ifdef ATMEGA_USART2
-#include "buffered_uart2.hpp"
+#include "uart2.hpp"
 
 static xpcc::atomic::Queue<char, UART2_RX_BUFFER_SIZE> rxBuffer;
 static xpcc::atomic::Queue<char, UART2_TX_BUFFER_SIZE> txBuffer;
@@ -95,7 +95,7 @@ ISR(UART2_TRANSMIT_INTERRUPT)
 
 // ----------------------------------------------------------------------------
 void
-xpcc::BufferedUart2::setBaudrateRegister(uint16_t ubrr)
+xpcc::Uart2::setBaudrateRegister(uint16_t ubrr)
 {
 
 	// Set baud rate
@@ -122,7 +122,7 @@ xpcc::BufferedUart2::setBaudrateRegister(uint16_t ubrr)
 
 // ----------------------------------------------------------------------------
 void
-xpcc::BufferedUart2::put(char c)
+xpcc::Uart2::put(char c)
 {
 	while (!txBuffer.push(c)) {
 		// wait for a free slot in the buffer
@@ -136,7 +136,7 @@ xpcc::BufferedUart2::put(char c)
 
 // ----------------------------------------------------------------------------
 bool
-xpcc::BufferedUart2::get(char& c)
+xpcc::Uart2::get(char& c)
 {
 	if (rxBuffer.isEmpty()) {
 		return false;

@@ -1,6 +1,6 @@
 
-#target: atmega
-target: atxmega
+target: atmega
+#target: atxmega
 #target: pc
 
 atmega:
@@ -33,6 +33,9 @@ library:
   communication:
     backend:
   driver:
+    lcd:
+      defines:
+        DOGM_VOLTAGE: 3
     can:
       mcp2515:
         defines:
@@ -46,3 +49,11 @@ library:
             defines:
               UART0_RX_BUFFER_SIZE: 8
               UART0_TX_BUFFER_SIZE: 32
+
+unittest:
+  pc:
+    template: main_pc.cpp.in
+  atxmega:
+    template: main_xmega.cpp.in
+  atmega:
+    template: main_mega.cpp.in

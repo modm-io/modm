@@ -34,7 +34,7 @@
  * Please modify the corresponding *.tmpl file instead and re-run the
  * script 'generate.py'.
  *
- * Generated 16 Nov 2009, 19:16:08
+ * Generated 26 Nov 2009, 23:32:57
  */
 // ----------------------------------------------------------------------------
 
@@ -47,27 +47,27 @@
 #include "uart_defines.h"
 #include "uart_defaults.h"
 
-#ifdef ATMEGA_USART1
-#include "buffered_uart1.hpp"
+#ifdef ATMEGA_USART3
+#include "uart3.hpp"
 
-static xpcc::atomic::Queue<char, UART1_RX_BUFFER_SIZE> rxBuffer;
-static xpcc::atomic::Queue<char, UART1_TX_BUFFER_SIZE> txBuffer;
+static xpcc::atomic::Queue<char, UART3_RX_BUFFER_SIZE> rxBuffer;
+static xpcc::atomic::Queue<char, UART3_TX_BUFFER_SIZE> txBuffer;
 
 // ----------------------------------------------------------------------------
 // called when the UART has received a character
 
-ISR(UART1_RECEIVE_INTERRUPT)
+ISR(UART3_RECEIVE_INTERRUPT)
 {
-	uint8_t data = UART1_DATA;
+	uint8_t data = UART3_DATA;
 	
 	// read UART status register and UART data register
-	//uint8_t usr  = UART1_STATUS;
+	//uint8_t usr  = UART3_STATUS;
 	
 //	uint8_t last_rx_error;
 //#if defined(ATMEGA_USART)
 //	last_rx_error = usr & ((1 << FE) | (1 << DOR));
-//#elif defined(ATMEGA_USART1)
-//	last_rx_error = usr & ((1 << FE1) | (1 << DOR1));
+//#elif defined(ATMEGA_USART3)
+//	last_rx_error = usr & ((1 << FE3) | (1 << DOR3));
 //#elif defined (ATMEGA_UART)
 //	last_rx_error = usr & ((1 << FE) | (1 << DOR));
 //#endif
@@ -79,23 +79,23 @@ ISR(UART1_RECEIVE_INTERRUPT)
 // ----------------------------------------------------------------------------
 // called when the UART is ready to transmit the next byte
 
-ISR(UART1_TRANSMIT_INTERRUPT)
+ISR(UART3_TRANSMIT_INTERRUPT)
 {
 	if (txBuffer.isEmpty())
 	{
 		// transmission finished, disable UDRE interrupt
-		UART1_CONTROL &= ~(1 << UART1_UDRIE);
+		UART3_CONTROL &= ~(1 << UART3_UDRIE);
 	}
 	else {
 		// get one byte from buffer and write it to UART (starts transmission)
-		UART1_DATA = txBuffer.get();
+		UART3_DATA = txBuffer.get();
 		txBuffer.pop();
 	}
 }
 
 // ----------------------------------------------------------------------------
 void
-xpcc::BufferedUart1::setBaudrateRegister(uint16_t ubrr)
+xpcc::Uart3::setBaudrateRegister(uint16_t ubrr)
 {
 
 	// Set baud rate
@@ -122,7 +122,7 @@ xpcc::BufferedUart1::setBaudrateRegister(uint16_t ubrr)
 
 // ----------------------------------------------------------------------------
 void
-xpcc::BufferedUart1::put(char c)
+xpcc::Uart3::put(char c)
 {
 	while (!txBuffer.push(c)) {
 		// wait for a free slot in the buffer
@@ -131,12 +131,12 @@ xpcc::BufferedUart1::put(char c)
 	atomic::Lock lock;
 	
 	// enable UDRE interrupt
-	UART1_CONTROL |= (1 << UART1_UDRIE);
+	UART3_CONTROL |= (1 << UART3_UDRIE);
 }
 
 // ----------------------------------------------------------------------------
 bool
-xpcc::BufferedUart1::get(char& c)
+xpcc::Uart3::get(char& c)
 {
 	if (rxBuffer.isEmpty()) {
 		return false;

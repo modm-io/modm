@@ -33,8 +33,8 @@
 #ifndef XPCC__DOG_M16X_HPP
 #define XPCC__DOG_M16X_HPP
 
-#include <stdint.h>
 #include <xpcc/driver/lcd/lcd.hpp>
+
 #include <xpcc/hal/time/delay.hpp>
 
 namespace xpcc
@@ -47,11 +47,16 @@ namespace xpcc
 	 * 
 	 * @todo	documentation
 	 * @todo	make this class adaptable to other voltages and line counts!
+	 * 
+	 * @see		Lcd
 	 */
 	template <typename SPI, typename CS, typename RS>
 	class DogM16x : public Lcd
 	{
 	public:
+		/// @brief	Constructor
+		DogM16x();
+		
 		/// @brief	Initialize the display
 		/// 
 		/// The display needs some time to initalize after startup. You have
@@ -59,22 +64,8 @@ namespace xpcc
 		virtual void
 		initialize();
 		
-		/// @brief	Write one character
-		/// 
-		/// This method provides an automatic wrap-round if the output reaches
-		/// the end of line  or a newline character is detected. Use putRaw()
-		/// if this behavior is not wanted.
-		virtual void
-		put(char c);
-		
 		virtual void
 		putRaw(char c);
-		
-		virtual void
-		put(const char *s);
-		
-		virtual void
-		flush();
 		
 		//virtual void
 		//command(Command command);
@@ -92,9 +83,6 @@ namespace xpcc
 		
 		void
 		writeCommand(uint8_t command);
-		
-		uint8_t column;
-		uint8_t line;
 	};
 }
 

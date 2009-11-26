@@ -29,7 +29,14 @@
  * $Id$
  */
 // ----------------------------------------------------------------------------
-{{ generation_block }}
+/*
+ * WARNING: This file is generated automatically, do not edit!
+ * Please modify the corresponding *.tmpl file instead and re-run the
+ * script 'generate.py'.
+ *
+ * Generated 26 Nov 2009, 23:32:57
+ */
+// ----------------------------------------------------------------------------
 
 #include <avr/io.h>
 #include <avr/interrupt.h>
@@ -40,29 +47,27 @@
 #include "uart_defines.h"
 #include "uart_defaults.h"
 
-{% if id != 0 -%}
-#ifdef ATMEGA_USART{{ id }}
-{%- endif %}
-#include "buffered_uart{{ id }}.hpp"
 
-static xpcc::atomic::Queue<char, UART{{ id }}_RX_BUFFER_SIZE> rxBuffer;
-static xpcc::atomic::Queue<char, UART{{ id }}_TX_BUFFER_SIZE> txBuffer;
+#include "uart0.hpp"
+
+static xpcc::atomic::Queue<char, UART0_RX_BUFFER_SIZE> rxBuffer;
+static xpcc::atomic::Queue<char, UART0_TX_BUFFER_SIZE> txBuffer;
 
 // ----------------------------------------------------------------------------
 // called when the UART has received a character
 
-ISR(UART{{ id }}_RECEIVE_INTERRUPT)
+ISR(UART0_RECEIVE_INTERRUPT)
 {
-	uint8_t data = UART{{ id }}_DATA;
+	uint8_t data = UART0_DATA;
 	
 	// read UART status register and UART data register
-	//uint8_t usr  = UART{{ id }}_STATUS;
+	//uint8_t usr  = UART0_STATUS;
 	
 //	uint8_t last_rx_error;
 //#if defined(ATMEGA_USART)
 //	last_rx_error = usr & ((1 << FE) | (1 << DOR));
-//#elif defined(ATMEGA_USART{{ id }})
-//	last_rx_error = usr & ((1 << FE{{ id }}) | (1 << DOR{{ id }}));
+//#elif defined(ATMEGA_USART0)
+//	last_rx_error = usr & ((1 << FE0) | (1 << DOR0));
 //#elif defined (ATMEGA_UART)
 //	last_rx_error = usr & ((1 << FE) | (1 << DOR));
 //#endif
@@ -74,25 +79,24 @@ ISR(UART{{ id }}_RECEIVE_INTERRUPT)
 // ----------------------------------------------------------------------------
 // called when the UART is ready to transmit the next byte
 
-ISR(UART{{ id }}_TRANSMIT_INTERRUPT)
+ISR(UART0_TRANSMIT_INTERRUPT)
 {
 	if (txBuffer.isEmpty())
 	{
 		// transmission finished, disable UDRE interrupt
-		UART{{ id }}_CONTROL &= ~(1 << UART{{ id }}_UDRIE);
+		UART0_CONTROL &= ~(1 << UART0_UDRIE);
 	}
 	else {
 		// get one byte from buffer and write it to UART (starts transmission)
-		UART{{ id }}_DATA = txBuffer.get();
+		UART0_DATA = txBuffer.get();
 		txBuffer.pop();
 	}
 }
 
 // ----------------------------------------------------------------------------
 void
-xpcc::BufferedUart{{ id }}::setBaudrateRegister(uint16_t ubrr)
+xpcc::Uart0::setBaudrateRegister(uint16_t ubrr)
 {
-{% if id == 0 -%}
 #if defined(ATMEGA_UART)
 
 	// set baud rate
@@ -133,7 +137,7 @@ xpcc::BufferedUart{{ id }}::setBaudrateRegister(uint16_t ubrr)
 	#endif
 
 #elif defined(ATMEGA_USART0)
-{% endif %}
+
 	// Set baud rate
 	if (ubrr & 0x8000) {
 		UART0_STATUS = (1 << U2X0);  //Enable 2x speed 
@@ -154,14 +158,13 @@ xpcc::BufferedUart{{ id }}::setBaudrateRegister(uint16_t ubrr)
 	#else
 	UCSR0C = (3 << UCSZ00);
 	#endif
-{% if id == 0 %}
+
 #endif
-{% endif -%}
 }
 
 // ----------------------------------------------------------------------------
 void
-xpcc::BufferedUart{{ id }}::put(char c)
+xpcc::Uart0::put(char c)
 {
 	while (!txBuffer.push(c)) {
 		// wait for a free slot in the buffer
@@ -170,12 +173,12 @@ xpcc::BufferedUart{{ id }}::put(char c)
 	atomic::Lock lock;
 	
 	// enable UDRE interrupt
-	UART{{ id }}_CONTROL |= (1 << UART{{ id }}_UDRIE);
+	UART0_CONTROL |= (1 << UART0_UDRIE);
 }
 
 // ----------------------------------------------------------------------------
 bool
-xpcc::BufferedUart{{ id }}::get(char& c)
+xpcc::Uart0::get(char& c)
 {
 	if (rxBuffer.isEmpty()) {
 		return false;
@@ -188,7 +191,4 @@ xpcc::BufferedUart{{ id }}::get(char& c)
 	}
 }
 
-{% if id != 0 -%}
-#endif
-{%- endif %}
 

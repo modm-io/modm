@@ -1,0 +1,31 @@
+// WARNING: This file is generated automatically, do not edit!
+// Please modify the corresponding 'main_pc.cpp.in' file instead.
+// ----------------------------------------------------------------------------
+
+#include <unittest/reporter.hpp>
+#include <unittest/controller.hpp>
+
+#include <xpcc/hal/peripheral/avr/mega/uart/uart0.hpp>
+#include <xpcc/io/iodevice_wrapper.hpp>
+
+${includes}
+
+${names}
+
+int
+main(void)
+{
+	// initialize output device
+	xpcc::Uart0 uart(115200);
+	xpcc::IODeviceWrapper<xpcc::Uart0> device(uart);
+	
+	unittest::Reporter reporter(device);
+	unittest::Controller::instance().setReporter(reporter);
+	
+	// run tests
+	${tests}
+	
+	unittest::Controller::instance().getReporter().printSummary();
+	
+	return 0;
+}

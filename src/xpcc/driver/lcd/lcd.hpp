@@ -33,58 +33,93 @@
 #ifndef XPCC__LCD_HPP
 #define XPCC__LCD_HPP
 
+#include <stdint.h>
 #include <xpcc/io/iodevice.hpp>
 
 namespace xpcc
 {
 	/**
 	 * @ingroup	driver
-	 * @brief	Base class for alphanumeric LCDs
+	 * @brief	Base class for alphanumeric LCDs (liquid crystal display)
 	 * 
 	 * 
+	 * 
+	 * <h3>About this implementation:</h3> 
+	 * 
+	 * In contrast to other drivers in this library which use static methods,
+	 * this class is directly derived from IODevice with all the virtual
+	 * methods because it will be most likely used to create a IOStream.
+	 * 
+	 * Therefore creating this class with static methods and using a wrapper
+	 * class to create a IODevice seems unnecessary and complicated.
 	 */
 	class Lcd : public IODevice
 	{
 	public:
-		// TODO: Need to find a suitable subset for all LCDs here!
+		// TODO: we need to find a suitable subset for all LCDs here!
 		typedef enum {
-			HOME,
-			CLEAR,
+			CLEAR_DISPLAY,
+			CURSOR_HOME,
 			CURSOR_ON,
 			CURSOR_OFF,
+			CURSOR_BLINK,
 		} Command;
 		
 	public:
+		/// @brief	Constructor
+		Lcd();
+		
+		/// @brief	Initialize the display
 		virtual void
 		initialize() = 0;
 		
+		/// @brief	Write a character
+		/// 
+		/// This method provides an automatic wrap-round if the output reaches
+		/// the end of the current line or a newline character is detected.
+		/// 
+		/// Use putRaw() if this behavior is not wanted.
 		virtual void
-		put(char c) = 0;
+		put(char c);
 		
+		// import the other versions of put() from IODevice
+		using IODevice::put;
+		
+		/// @brief	Write a raw character at cursor position
+		/// 
+		/// Unlike put() no further processing will occur.
+		/// 
+		/// @see	put()
 		virtual void
 		putRaw(char c) = 0;
 		
-		using IODevice::put;
-		
 		virtual void
-		flush() = 0;
+		flush();
 		
 		// TODO we need a better name here!
 		//virtual void
 		//command(Command command) = 0;
 		
+		/// @brief	Set cursor to specified position
+		/// 
+		/// @param	line	vertical position
+		/// @param	column	horizontal position
 		virtual void
 		setPosition(uint8_t line, uint8_t column) = 0;
 		
 		/// @brief	Read a character
 		///
 		/// Because a LCD is a read-only device this method will always return
-		/// \b false.
+		/// \c false.
 		virtual bool
 		get(char&)
 		{
 			return false;
 		}
+		
+	protected:
+		uint8_t column;
+		uint8_t line;
 	};
 }
 

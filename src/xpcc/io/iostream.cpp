@@ -122,10 +122,21 @@ xpcc::IOStream::putInteger(uint16_t value)
 	xpcc::IOStream&
 	xpcc::IOStream::putInteger(int32_t value)
 	{
-		// -2147483648 to 2147483647
+		// -2,147,483,648 to 2,147,483,647
 		char buffer[12];
 		
 		this->device->put(ltoa(value, buffer, 10));
+		
+		return *this;
+	}
+	
+	xpcc::IOStream&
+	xpcc::IOStream::putInteger(uint32_t value)
+	{
+		// 0 to 4,294,967,295
+		char buffer[11];
+		
+		this->device->put(ultoa(value, buffer, 10));
 		
 		return *this;
 	}

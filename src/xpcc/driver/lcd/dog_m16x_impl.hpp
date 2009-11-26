@@ -36,6 +36,20 @@
 
 // ----------------------------------------------------------------------------	
 
+#ifndef	DOGM_VOLTAGE
+	#define	DOGM_VOLTAGE	3
+#endif
+
+// ----------------------------------------------------------------------------	
+
+template <typename SPI, typename CS, typename RS>
+xpcc::DogM16x<SPI, CS, RS>::DogM16x() :
+	Lcd()
+{
+}
+
+// ----------------------------------------------------------------------------	
+
 template <typename SPI, typename CS, typename RS>
 void
 xpcc::DogM16x<SPI, CS, RS>::initialize()
@@ -44,44 +58,31 @@ xpcc::DogM16x<SPI, CS, RS>::initialize()
 	CS::output();
 	RS::output();
 	
-	// initialization only vaild for 3,3V!
-	writeCommand(0x39);
+#if (DOGM_VOLTAGE == 3)
+
 	writeCommand(0x39);
 	writeCommand(0x14);
 	writeCommand(0x55);
 	writeCommand(0x6d);
 	writeCommand(0x78);
+
+#elif (DOGM_VOLTAGE == 5)
+
+	writeCommand(0x39);
+	writeCommand(0x1C);
+	writeCommand(0x52);
+	writeCommand(0x69);
+	writeCommand(0x74);
+
+#else
+	#error "Unknown definition for 'DOGM_VOLTAGE', allowed values are '3' for 3,3V and '5' for 5V!"
+#endif
 	
 	writeCommand(0x0f);
 	writeCommand(0x01);		// clear display
 	writeCommand(0x03);		// return to home position
 	writeCommand(0x06);		// set cursor move direction
 	writeCommand(0x0c);		// display on, disable cursor, no blink
-	
-	line = 0;
-	column = 0;
-}
-
-template <typename SPI, typename CS, typename RS>
-void
-xpcc::DogM16x<SPI, CS, RS>::put(char c)
-{
-	if (c == '\n')
-	{
-		line++;
-		if (line >= 2) {
-			line = 0;
-		}
-		column = 0;
-		setPosition(line, column);
-	}
-	else {
-		if (column >= 16) {
-			this->put('\n');
-		}
-		writeData(c);
-		column++;
-	}
 }
 
 template <typename SPI, typename CS, typename RS>
@@ -89,24 +90,6 @@ void
 xpcc::DogM16x<SPI, CS, RS>::putRaw(char c)
 {
 	writeData(c);
-	column++;
-}
-
-template <typename SPI, typename CS, typename RS>
-void
-xpcc::DogM16x<SPI, CS, RS>::put(const char *s)
-{
-	// TODO
-	while (*s) {
-		put(*s);
-		s++;
-	}
-}
-
-template <typename SPI, typename CS, typename RS>
-void
-xpcc::DogM16x<SPI, CS, RS>::flush()
-{
 }
 
 /*template <typename SPI, typename CS, typename RS>
@@ -150,13 +133,11 @@ xpcc::DogM16x<SPI, CS, RS>::writeCommand(uint8_t command)
 	CS::set();
 	
 	// check if the command is 'clear display' oder 'return home', these
-	// commands take a bit time until they are finished.
-	if ((command & 0xfc) == 0)
-	{
+	// commands take a bit longer until they are finished.
+	if ((command & 0xfc) == 0) {
 		_delay_ms(1.2);
 	}
 	else {
-		// all other command take 26.3µs
 		_delay_us(27);
 	}
 }
