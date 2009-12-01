@@ -137,10 +137,14 @@ namespace xpcc
 		const T* address;
 	};
 	
+	/**
+	 * @ingroup	hal
+	 * @brief	
+	 */
 	template<typename T>
 	ALWAYS_INLINE
 	FlashPointer<T>
-	Flash(const T* ptr)
+	toFlashPointer(const T* ptr)
 	{
 		return FlashPointer<T>(ptr);
 	}

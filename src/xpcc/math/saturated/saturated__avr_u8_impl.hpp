@@ -39,7 +39,7 @@ namespace xpcc
 	// ------------------------------------------------------------------------
 	template<>
 	Saturated<uint8_t>&
-	Saturated<uint8_t>::operator+=(const Saturated<UnsignedType>& other) {
+	Saturated<uint8_t>::operator += (const Saturated& other) {
 		asm (
 			"add  %[x], %[y]"   "\n\t"
 			"brcc 0f"           "\n\t"	// Falls es einen unsigned Überlauf gab
@@ -59,9 +59,9 @@ namespace xpcc
 	// signed-saturierter Operation und nachfolgender Rückskalierung. Zu
 	// beachten ist, daß dieser Operator nicht kommutativ ist, d.h. a+b
 	// liefert i.A. ein anderes Ergebnis als b+a. 
-	template<>
+	/*template<>
 	Saturated<uint8_t>&
-	Saturated<uint8_t>::operator+=(const Saturated<SignedType>& other) {
+	Saturated<uint8_t>::operator += (const Saturated<SignedType>& other) {
 		asm (
 			"subi %[x], 0x80"	"\n\t"	// Transformation
 										//   [0x00, 0xff] -> [0x80, 0x7f]
@@ -80,12 +80,12 @@ namespace xpcc
 		);
 		
 		return *this;
-	}
+	}*/
 
 	// ------------------------------------------------------------------------
 	template<>
 	Saturated<uint8_t>&
-	Saturated<uint8_t>::operator-=(const Saturated<UnsignedType>& other) {
+	Saturated<uint8_t>::operator -= (const Saturated& other) {
 		asm (
 			"sub  %[x], %[y]"   "\n\t"
 			"brcc 0f"           "\n\t"	// Falls es einen unsigned Unterlauf 
@@ -100,7 +100,7 @@ namespace xpcc
 	}
 
 	// ------------------------------------------------------------------------
-	template<>
+	/*template<>
 	Saturated<uint8_t>&
 	Saturated<uint8_t>::operator-=(const Saturated<SignedType>& other) {
 		asm (
@@ -121,7 +121,5 @@ namespace xpcc
 		);
 		
 		return *this;
-	}
-	
-	// TODO operator-
+	}*/
 }

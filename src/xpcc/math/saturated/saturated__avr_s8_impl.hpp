@@ -39,7 +39,7 @@ namespace xpcc
 	// ------------------------------------------------------------------------
 	template<>
 	Saturated<int8_t>&
-	Saturated<int8_t>::operator+=(const Saturated<SignedType>& other) {
+	Saturated<int8_t>::operator+=(const Saturated& other) {
 		asm (
 			"add  %[x], %[y]"	"\n\t"
 			"brvc 0f"			"\n\t"	// Falls es einen signed Überlauf gab
@@ -58,7 +58,7 @@ namespace xpcc
 
 	// ------------------------------------------------------------------------
 	// TODO testen
-	template<>
+	/*template<>
 	Saturated<int8_t>&
 	Saturated<int8_t>::operator+=(const Saturated<UnsignedType>& other) {
 		asm (
@@ -72,12 +72,12 @@ namespace xpcc
 		);
 		
 		return *this;
-	}
+	}*/
 
 	// ------------------------------------------------------------------------
 	template<>
 	Saturated<int8_t>&
-	Saturated<int8_t>::operator-=(const Saturated<SignedType>& other) {
+	Saturated<int8_t>::operator-=(const Saturated& other) {
 		asm (
 			"sub  %[x], %[y]"	"\n\t"
 			"brvc 0f"			"\n\t"	// Falls es einen signed Überlauf gab
@@ -96,7 +96,7 @@ namespace xpcc
 
 	// ------------------------------------------------------------------------
 	// TODO testen
-	template<>
+	/*template<>
 	Saturated<int8_t>&
 	Saturated<int8_t>::operator-=(const Saturated<UnsignedType>& other) {
 		asm (
@@ -110,13 +110,13 @@ namespace xpcc
 		);
 		
 		return *this;
-	}
+	}*/
 
 	// ------------------------------------------------------------------------
 	// FIXME warum funktioniert das nicht???
-	/*template<>
+	template<>
 	Saturated<int8_t>
-	operator-(const Saturated<int8_t>& a) {
+	operator - (const Saturated<int8_t>& a) {
 		Saturated<int8_t> temp(a);
 		asm (
 			"neg %[x]"		"\n\t"
@@ -127,7 +127,7 @@ namespace xpcc
 			: [x] "+d" (temp.value)
 		);
 		return temp;
-	}*/
+	}
 
 	// ------------------------------------------------------------------------
 	template<>

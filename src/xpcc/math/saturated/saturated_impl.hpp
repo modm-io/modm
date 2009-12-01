@@ -35,108 +35,105 @@
 #endif
 
 #ifdef __AVR__
-	// include faster implementations written in assembly language
-	// FIXME fix this files!
-	//#include "saturated__avr_u8_impl.hpp"
-	//#include "saturated__avr_s8_impl.hpp"
+	// include faster implementations written in assembler
+	#include "saturated__avr_u8_impl.hpp"
+	#include "saturated__avr_s8_impl.hpp"
 #endif
 
 namespace xpcc
 {
 	template<typename T>
-	T
-	Saturated<T>::limitValue(DoubleType value)
+	Saturated<T>::Saturated() : 
+		value()
 	{
-		if (value > ArithmeticTraits<T>::maxValue) {
+	}
+	
+	template<typename T>
+	Saturated<T>::Saturated(const T& initialValue) : 
+		value(initialValue)
+	{
+	}
+	
+	template<typename T>
+	void
+	Saturated<T>::setValue(DoubleType in)
+	{
+		if (in > ArithmeticTraits<T>::maxValue) {
 			value = ArithmeticTraits<T>::maxValue;
 		}
-		else if (value < ArithmeticTraits<T>::minValue) {
+		else if (in < ArithmeticTraits<T>::minValue) {
 			value = ArithmeticTraits<T>::minValue;
 		}
-		return static_cast<T>(value);
+		else {
+			value = static_cast<T>(in);
+		}
 	}
 	
 	template<typename T>
 	Saturated<T>&
-	Saturated<T>::operator+=(const Saturated<SignedType>& other)
+	Saturated<T>::operator += (const Saturated& other)
 	{
-		DoubleType temp = static_cast<DoubleType>(value) +
+		DoubleType temp = static_cast<DoubleType>(this->value) +
 						  static_cast<DoubleType>(other.value);
-		value = limitValue(temp);
+		setValue(temp);
 		
 		return *this;
 	}
 	
 	template<typename T>
 	Saturated<T>&
-	Saturated<T>::operator+=(const Saturated<UnsignedType>& other)
-	{
-		DoubleType temp = static_cast<DoubleType>(value) +
-						  static_cast<DoubleType>(other.value);
-		value = limitValue(temp);
-		
-		return *this;
-	}
-	
-	template<typename T>
-	Saturated<T>&
-	Saturated<T>::operator-=(const Saturated<SignedType>& other)
+	Saturated<T>::operator -= (const Saturated& other)
 	{
 		DoubleType temp = static_cast<DoubleType>(value) -
 						  static_cast<DoubleType>(other.value);
-		value = limitValue(temp);
+		setValue(temp);
 		
 		return *this;
 	}
 	
 	template<typename T>
-	Saturated<T>&
-	Saturated<T>::operator-=(const Saturated<UnsignedType>& other)
+	void
+	Saturated<T>::absolute()
 	{
-		DoubleType temp = static_cast<DoubleType>(value) -
-						  static_cast<DoubleType>(other.value);
-		value = limitValue(temp);
-		
-		return *this;
+		if (ArithmeticTraits<T>::isSigned)
+		{
+			if (value < 0) {
+				value = -value;
+			}
+		}
 	}
-	
 	
 	// ----------------------------------------------------------------------------
 	template<typename U>
-	Saturated<typename Saturated<U>::SignedType>
-	operator-(const Saturated<U>& x)
+	Saturated<U>
+	operator - (const Saturated<U>& x)
 	{
 		typedef typename ArithmeticTraits<U>::DoubleType DoubleType;
 		
 		DoubleType temp = - static_cast<DoubleType>(x.value);
-		return Saturated<typename Saturated<U>::SignedType>(limitValue(temp));
+		
+		Saturated<U> result;
+		result.setValue(temp);
+		return result;
 	}
 
 	// ----------------------------------------------------------------------------
-	// WARNING: this implementation is only correct for unsigned-types,
-	// the functions needs to be specialized for all the signed-types
 	template<typename U>
 	Saturated<U>
 	abs(const Saturated<U>& x)
 	{
-		typedef typename ArithmeticTraits<U>::DoubleType DoubleType;
+		Saturated<U> result(x);
 		
-		// TODO get rid of the warning for unsigned types
-		if (ArithmeticTraits<U>::isSigned && x.value < 0)
-		{
-			DoubleType temp = static_cast<DoubleType>(x.value);
-			
-			return Saturated<U>(Saturated<U>::limitValue(-temp));
+		if (ArithmeticTraits<U>::isSigned) {
+			result.absolute();
 		}
-		else {
-			return Saturated<U>(x.value);
-		}
+		return result;
 	}
 
 	// ----------------------------------------------------------------------------
 	template<typename U>
 	Saturated<U>
-	operator-(const Saturated<U>& a, const Saturated<U>& b)
+	operator - (const Saturated<U>& a, const Saturated<U>& b)
 	{
 		Saturated<U> t(a);
 		t -= b;
@@ -146,7 +143,7 @@ namespace xpcc
 	// ----------------------------------------------------------------------------
 	template<typename U>
 	Saturated<U>
-	operator+(const Saturated<U>& a, const Saturated<U>& b)
+	operator + (const Saturated<U>& a, const Saturated<U>& b)
 	{
 		Saturated<U> t(a);
 		t += b;
@@ -155,17 +152,37 @@ namespace xpcc
 	
 	// ----------------------------------------------------------------------------
 	template<typename U>
-	bool
-	operator==(const Saturated<U>& a, const Saturated<U>& b)
+	inline bool
+	operator == (const Saturated<U>& a, const Saturated<U>& b)
 	{
 		return (a.value == b.value);
 	}
 
 	// ----------------------------------------------------------------------------
 	template<typename U>
-	bool
-	operator!=(const Saturated<U>& a, const Saturated<U>& b)
+	inline bool
+	operator != (const Saturated<U>& a, const Saturated<U>& b)
 	{
 		return (a.value != b.value);
+	}
+	
+	// ----------------------------------------------------------------------------
+	
+	template<>
+	void
+	Saturated<uint8_t>::absolute()
+	{
+	}
+	
+	template<>
+	void
+	Saturated<uint16_t>::absolute()
+	{
+	}
+	
+	template<>
+	void
+	Saturated<uint32_t>::absolute()
+	{
 	}
 }

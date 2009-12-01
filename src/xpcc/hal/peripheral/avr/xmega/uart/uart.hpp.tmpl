@@ -5,7 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- *
+ * 
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -26,74 +26,67 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id$
+ * $Id: uart.hpp.tmpl -1   $
  */
 // ----------------------------------------------------------------------------
+{{ generation_block }}
 
-#include "reporter.hpp"
+#ifndef XPCC__XMEGA_UART_{{ id }}_HPP
+#define XPCC__XMEGA_UART_{{ id }}_HPP
 
-namespace
+#include <stdint.h>
+
+namespace xpcc
 {
-	FLASH_STRING(invaildName) = "invalid";
-	
-	FLASH_STRING(failHeader) = "FAIL: ";
-	FLASH_STRING(failColon) = " : ";
-	
-	FLASH_STRING(reportPassed) = "\nPassed ";
-	FLASH_STRING(reportFailed) = "\nFailed ";
-	FLASH_STRING(reportOf) = " of ";
-	FLASH_STRING(reportTests) = " tests\n";
-	FLASH_STRING(reportOk) = "OK!\n";
-	FLASH_STRING(reportFail) = "FAIL!\n";
+	/**
+	 * @ingroup		hal
+	 * @headerfile	<xpcc/hal/peripheral/avr/xmega/uart/uart_{{ id }}.hpp>
+	 * @brief		UART{{ id }}
+	 * 
+	 * This implementation uses a ringbuffer.
+	 */
+	class Uart{{ id }}
+	{
+	public:
+		Uart{{ id }}(uint32_t baudrate)
+		{
+			this->setBaudrate(baudrate);
+		}
+		
+		/**
+		 * @brief	Set baud rate
+		 *
+		 * If this function is called with a constant value as parameter,
+		 * all the calculation is done by the compiler, so no 32-bit
+		 * arithmetic is needed at run-time!
+		 *
+		 * @param	baudrate	desired baud rate
+		 * @param	u2x			enabled double speed mode
+		 */
+		static inline void
+		setBaudrate(uint32_t baudrate, bool u2x = false)
+		{
+			uint16_t ubrr;
+			if (u2x) {
+				ubrr  = (F_CPU / (baudrate * 8l)) - 1;
+				ubrr |= 0x8000;
+			}
+			else {
+				ubrr = (F_CPU / (baudrate * 16l)) - 1;
+			}
+			setBaudrateRegister(ubrr);
+		}
+		
+		static void
+		put(char data);
+		
+		static bool
+		get(char& c);
+		
+	protected:
+		static void
+		setBaudrateRegister(uint16_t ubrr);
+	};
 }
 
-unittest::Reporter::Reporter(xpcc::IODevice& device) :
-	outputStream(device), testName(xpcc::toFlashPointer(invaildName)),
-	testsPassed(0), testsFailed(0)
-{
-}
-
-void
-unittest::Reporter::nextTestSuite(xpcc::FlashPointer<char> name)
-{
-	testName = name;
-}
-
-void
-unittest::Reporter::reportPass()
-{
-	testsPassed++;
-}
-
-xpcc::IOStream&
-unittest::Reporter::reportFailure(unsigned int lineNumber)
-{
-	testsFailed++;
-	outputStream << xpcc::toFlashPointer(failHeader)
-				 << testName
-				 << ':'
-				 << lineNumber
-				 << xpcc::toFlashPointer(failColon);
-	return outputStream;
-}
-
-void
-unittest::Reporter::printSummary()
-{
-	if (testsFailed == 0) {
-		outputStream << xpcc::toFlashPointer(reportPassed)
-					 << testsPassed
-					 << xpcc::toFlashPointer(reportTests)
-					 << xpcc::toFlashPointer(reportOk)
-					 << xpcc::endl;
-	}
-	else {
-		outputStream << xpcc::toFlashPointer(reportFailed)
-					 << testsFailed
-					 << xpcc::toFlashPointer(reportOf)
-					 << (testsFailed + testsPassed)
-					 << xpcc::toFlashPointer(reportTests)
-					 << xpcc::toFlashPointer(reportFail)
-					 << xpcc::endl;
-	}
-}
+#endif // XPCC__XMEGA_UART_{{ id }}_HPP

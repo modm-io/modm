@@ -39,12 +39,13 @@ namespace xpcc
 {
 	/**
 	 * @ingroup	hal
-	 * @headerfile	<xpcc/hal/peripheral/gpio.hpp>
+	 * @brief	General purpose input and/or output pins
 	 */
 	namespace gpio
 	{
 		/**
 		 * @brief	Dummy implementation of an I/O pin
+		 * @headerfile	<xpcc/hal/peripheral/gpio.hpp>
 		 * 
 		 */
 		class Unused

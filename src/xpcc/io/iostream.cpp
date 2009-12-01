@@ -63,7 +63,7 @@ xpcc::IOStream::putInteger(uint8_t value)
 xpcc::IOStream&
 xpcc::IOStream::putInteger(int16_t value)
 {
-	FlashPointer<uint16_t> basePtr = xpcc::Flash(base);
+	FlashPointer<uint16_t> basePtr = xpcc::toFlashPointer(base);
 	
 	if (value < 0) {
 		value = -value;
@@ -94,7 +94,7 @@ xpcc::IOStream::putInteger(int16_t value)
 xpcc::IOStream&
 xpcc::IOStream::putInteger(uint16_t value)
 {
-	FlashPointer<uint16_t> basePtr = xpcc::Flash(base);
+	FlashPointer<uint16_t> basePtr = xpcc::toFlashPointer(base);
 	
 	bool zero = true;
 	uint8_t i = 4;

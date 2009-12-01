@@ -36,8 +36,8 @@ class SaturatedTest : public unittest::TestSuite
 {
 public:
 	void
-	testSigned();
+	testSigned8bit();
 	
 	void
-	testUnsigned();
+	testUnsigned8bit();
 };

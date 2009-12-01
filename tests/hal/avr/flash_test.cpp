@@ -28,7 +28,7 @@ main(void)
 	
 	out = *bar;
 	
-	function(xpcc::Flash(string));
+	function(xpcc::toFlashPointer(string));
 	
 	xpcc::FlashPointer<int32_t> blub(bla);
 	

@@ -5,6 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
+ * 
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -42,10 +43,10 @@ namespace xpcc
 	 * @brief		Traits to give numbers more information then they have by
 	 * 				default in C++
 	 *
-	 * @section provides	Values this Traits are Providing
+	 * @section provides	Values provided by these traits
 	 *
 	 * @li @c	DoubleType	Type that can holds the doubled length of data.
-	 * 						My be used to hold the result of a multiplication.
+	 * 						May be used to hold the result of a multiplication.
 	 * @li @c	SignedType	Signed type for the given type. It applies 
 	 * 						<i>T == SignedType</i> if T is already signed.
 	 * @li @c	UnsignedType	Some as SignedType only for unsigned types
@@ -53,9 +54,9 @@ namespace xpcc
 	 * @li @c	maxValue	biggest value
 	 * @li @c	isSigned	is this a signed or unsigned type
 	 * @li @c	isInteger	is this an integer type
-	 * @li @c	isFloat		is this a float type (float, double)
+	 * @li @c	isFloat		is this a floatingpoint type (float, double)
 	 * @li @c	decimalDigits	count of digits to display this type in decimal
-	 *
+	 * 
 	 * @section usage	Usage
 	 * @code
 	 * typedef typename xpcc::ArithmeticTraits<T>::DoubleType T_DOUBLE;
@@ -63,7 +64,7 @@ namespace xpcc
 	 * T min = xpcc::ArithmeticTraits<T>::minValue;
 	 * T max = xpcc::ArithmeticTraits<T>::maxValue;
 	 * @endcode
-	 *
+	 * 
 	 * @version	$Id: arithmetic_traits.hpp 83 2009-10-15 19:58:57Z dergraaf $
 	 * @author	Martin Rosekeit <martin.rosekeit@rwth-aachen.de>
 	 */

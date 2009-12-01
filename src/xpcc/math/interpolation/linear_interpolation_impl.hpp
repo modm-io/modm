@@ -34,39 +34,46 @@
    #error "Don't include this file directly. Use 'linear_interpolation.hpp' instead!"
 #endif
 
-namespace xpcc
-{	
-	template<typename T>
-	LinearInterpolation<T>::LinearInterpolation(FlashPointer<T> points,
-												uint8_t numPoints):
-		points(points), numPoints(numPoints)
-	{
+// ----------------------------------------------------------------------------
+
+template<typename T>
+xpcc::LinearInterpolation<T>::LinearInterpolation(FlashPointer<T> points,
+												  uint8_t numPoints):
+	points(points), numPoints(numPoints)
+{
+}
+	
+// ----------------------------------------------------------------------------
+
+template<typename T>
+typename xpcc::LinearInterpolation<T>::OutputType
+xpcc::LinearInterpolation<T>::interpolate(const InputType& value) const
+{
+	T current(points[0]);
+	
+	if (value <= current.getFirst()) {
+		return current.getSecond();
 	}
 	
-	template<typename T>
-	T
-	LinearInterpolation<T>::interpolate(const T& value)
+	T last(current);
+	uint8_t i;
+	for (i = 1; i < numPoints; ++i)
 	{
-		T x1 = T();
-		T x2 = T();
-		if (value <= points[0]) {
-			return points[1];
-		}
-		if (value >= points[2*(numPoints-1)]) {
-			return points[2*(numPoints-1)+1];
-		}
+		current = points[i];
 		
-		uint8_t i;
-		for (i = 0; i < numPoints ; i++) {
-			x2 = points[i*2];
-			if (x2 >= value)
-				break;
-			x1 = x2;
+		if (value <= current.getFirst())
+		{
+			InputType x1_in = last.getFirst();
+			InputType x2_in = current.getFirst();
+			
+			OutputType x1_out = last.getSecond();
+			OutputType x2_out = current.getSecond();
+			
+			return ((value - x1_in) * (x2_out - x1_out)) / (x2_in - x1_in) + x1_out;
 		}
 		
-		T t1 = points[i*2-1];
-		T t2 = points[i*2+1];
-		
-		return ((value - x1) * (t2 - t1)) / (x2 - x1) + t1;
+		last = current;
 	}
+	
+	return current.getSecond();
 }

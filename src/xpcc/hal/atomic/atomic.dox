@@ -1,6 +1,16 @@
 /*!
-@ingroup		hal
+@ingroup	hal
 @defgroup	atomic	Atomic operations and container
 
 */
 
+namespace xpcc
+{
+	/**
+	 * @ingroup	atomic
+	 * @brief	Atomic operations and container
+	 */
+	namespace atomic
+	{
+	}
+}

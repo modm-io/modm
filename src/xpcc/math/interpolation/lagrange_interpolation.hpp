@@ -51,7 +51,7 @@ namespace xpcc
 		LagrangeInterpolation(FlashPointer<T> points, uint8_t numPoints);
 		
 		T 
-		interpolate(const T& value);
+		interpolate(const T& value) const;
 		
 	private:
 		FlashPointer<T> points;

@@ -22,12 +22,18 @@ globals = {
 	'generation_block': generation
 }
 
-for number in range(0,4):
-	template = env.get_template('uart.hpp.tmpl', globals=globals)
-	output = template.render(id=number)
-	open('uart%i.hpp' % number, 'w').write(output)
-	
-	template = env.get_template('uart.cpp.tmpl', globals=globals)
-	output = template.render(id=number)
-	open('uart%i.cpp' % number, 'w').write(output)
+for port in ['C', 'D', 'E', 'F']:
+	for number in range(0,2):
+		id = "%c%i" % (port, number)
+		
+		print id.lower()
+		return
+		
+		#template = env.get_template('uart.hpp.tmpl', globals=globals)
+		#output = template.render(id=id)
+		#open('uart_%s.hpp' % id.lower(), 'w').write(output)
+		
+		#template = env.get_template('uart.cpp.tmpl', globals=globals)
+		#output = template.render(id=id)
+		#open('uart_%s.cpp' % id.lower(), 'w').write(output)
 

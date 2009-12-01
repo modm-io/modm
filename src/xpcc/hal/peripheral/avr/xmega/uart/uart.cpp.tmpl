@@ -5,7 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- *
+ * 
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -26,74 +26,37 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id$
+ * $Id: uart.cpp.tmpl -1   $
  */
 // ----------------------------------------------------------------------------
+{{ generation_block }}
 
-#include "reporter.hpp"
+#include <avr/io.h>
+#include <avr/interrupt.h>
 
-namespace
+#include "uart_{{ id }}.hpp"
+
+#ifdef USART{{ id }}
+
+// ----------------------------------------------------------------------------
+void
+xpcc::Uart{{ id }}::setBaudrateRegister(uint16_t ubrr)
 {
-	FLASH_STRING(invaildName) = "invalid";
+}
+
+// ----------------------------------------------------------------------------
+void
+xpcc::Uart{{ id }}::put(char c)
+{
 	
-	FLASH_STRING(failHeader) = "FAIL: ";
-	FLASH_STRING(failColon) = " : ";
-	
-	FLASH_STRING(reportPassed) = "\nPassed ";
-	FLASH_STRING(reportFailed) = "\nFailed ";
-	FLASH_STRING(reportOf) = " of ";
-	FLASH_STRING(reportTests) = " tests\n";
-	FLASH_STRING(reportOk) = "OK!\n";
-	FLASH_STRING(reportFail) = "FAIL!\n";
 }
 
-unittest::Reporter::Reporter(xpcc::IODevice& device) :
-	outputStream(device), testName(xpcc::toFlashPointer(invaildName)),
-	testsPassed(0), testsFailed(0)
+// ----------------------------------------------------------------------------
+bool
+xpcc::Uart{{ id }}::get(char& c)
 {
+	return false;
 }
 
-void
-unittest::Reporter::nextTestSuite(xpcc::FlashPointer<char> name)
-{
-	testName = name;
-}
+#endif // USART{{ id }}
 
-void
-unittest::Reporter::reportPass()
-{
-	testsPassed++;
-}
-
-xpcc::IOStream&
-unittest::Reporter::reportFailure(unsigned int lineNumber)
-{
-	testsFailed++;
-	outputStream << xpcc::toFlashPointer(failHeader)
-				 << testName
-				 << ':'
-				 << lineNumber
-				 << xpcc::toFlashPointer(failColon);
-	return outputStream;
-}
-
-void
-unittest::Reporter::printSummary()
-{
-	if (testsFailed == 0) {
-		outputStream << xpcc::toFlashPointer(reportPassed)
-					 << testsPassed
-					 << xpcc::toFlashPointer(reportTests)
-					 << xpcc::toFlashPointer(reportOk)
-					 << xpcc::endl;
-	}
-	else {
-		outputStream << xpcc::toFlashPointer(reportFailed)
-					 << testsFailed
-					 << xpcc::toFlashPointer(reportOf)
-					 << (testsFailed + testsPassed)
-					 << xpcc::toFlashPointer(reportTests)
-					 << xpcc::toFlashPointer(reportFail)
-					 << xpcc::endl;
-	}
-}

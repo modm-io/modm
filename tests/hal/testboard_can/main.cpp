@@ -96,7 +96,7 @@ main(void)
 			"ret"		"\n"
 		);
 	}
-	can.setFilter(xpcc::Flash(filter));
+	can.setFilter(xpcc::toFlashPointer(filter));
 	
 	// configure input pins
 	DDRD = 0;

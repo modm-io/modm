@@ -1,6 +1,6 @@
 
-target: atmega
-#target: atxmega
+#target: atmega
+target: atxmega
 #target: pc
 
 atmega:

@@ -5,6 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
+ * 
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -29,8 +30,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_LOGGER__HPP
-#define XPCC_LOGGER__HPP
+#ifndef XPCC__LOGGER_HPP
+#define XPCC__LOGGER_HPP
 
 #include <xpcc/utils/misc.hpp>
 #include <xpcc/io/iostream.hpp>
@@ -39,10 +40,14 @@
 
 namespace xpcc
 {
+	/**
+	 * @ingroup	logger
+	 * @brief	Logger
+	 */
 	namespace log
 	{
 		/**
-		 * @class 	Logger
+		 * @ingroup logger
 		 * @brief 	Interface to the Logger.
 		 *
 		 * This class provides an interface to the logger. The Logger is an
@@ -50,43 +55,44 @@ namespace xpcc
 		 * macro defined below. This class overloads the << operator so that it is
 		 * possible to write different message types to the logger.
 		 *
-		 * @ingroup logger
-		 * @version	$Id$
 		 * @since 	04 December 2006
 		 * @author	Christofer Hedbrand,
 		 * 			Carsten Schmidt,
 		 * 			Martin Rosekeit <martin.rosekeit@rwth-aachen.de>
 		 */
-		class Logger : public ::xpcc::IOStream {
+		class Logger : public ::xpcc::IOStream
+		{
 			public:
 				Logger(::xpcc::IODevice& device) :
-					IOStream( device )
-				{};
-
+					IOStream(device)
+				{
+				}
+				
 				template<typename T>
 				inline Logger&
-				operator <<(const T& msg)
+				operator << (const T& msg)
 				{
 					this->xpcc::IOStream::operator <<(msg);
 					return *this;
-				};
+				}
 
 			private:
 				Logger(const Logger&);
 
 				Logger&
-				operator =(const Logger&);
+				operator = (const Logger&);
 		};
 
 		/**
 		 * @ingroup logger
-		 * @{
+		 * @name	Output streams
 		 */
-		extern Logger	debug;		//!	log device to take messages on DEBUG level
-		extern Logger 	info;		//!	log device to take messages on INFO level
-		extern Logger 	warning;	//!	log device to take messages on WARNING level
-		extern Logger 	error;		//!	log device to take messages on ERROR level
-		/*@}*/
+		//@{
+		extern Logger debug;	//!< log device to take messages on DEBUG level
+		extern Logger info;		//!< log device to take messages on INFO level
+		extern Logger warning;	//!< log device to take messages on WARNING level
+		extern Logger error;	//!< log device to take messages on ERROR level
+		//@}
 	}
 }
 
@@ -106,6 +112,12 @@ namespace xpcc
 	if ( XPCC_LOG_LEVEL <= xpcc::log::ERROR )	\
 		xpcc::log::error
 
-#define	XPCC_FILE_INFO		STRINGIFY(BASENAME) "(" STRINGIFY(__LINE__) ") >> "
+#ifndef	BASENAME
+	#define	FILENAME	__FILE__
+#else
+	#define	FILENAME	STRINGIFY(BASENAME)
+#endif
 
-#endif // XPCC_LOGGER__HPP
+#define	XPCC_FILE_INFO		FILENAME "(" STRINGIFY(__LINE__) ") >> "
+
+#endif // XPCC__LOGGER_HPP

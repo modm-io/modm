@@ -23,11 +23,11 @@ globals = {
 }
 
 for number in range(0,4):
-	template = env.get_template('uart.hpp.tmpl', globals=globals)
+	template = env.get_template('uartn.hpp.tmpl', globals=globals)
 	output = template.render(id=number)
 	open('uart%i.hpp' % number, 'w').write(output)
 	
-	template = env.get_template('uart.cpp.tmpl', globals=globals)
+	template = env.get_template('uartn.cpp.tmpl', globals=globals)
 	output = template.render(id=number)
 	open('uart%i.cpp' % number, 'w').write(output)
 

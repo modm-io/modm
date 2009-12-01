@@ -109,7 +109,7 @@ IoStreamTest::testFlashString()
 {
 	char string[] = "abc";
 	
-	(*stream) << xpcc::Flash(flashString);
+	(*stream) << xpcc::toFlashPointer(flashString);
 	
 	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 0, 3);
 	TEST_ASSERT_EQUALS(device.bytesWritten, 3);

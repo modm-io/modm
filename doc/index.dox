@@ -6,21 +6,51 @@
 @mainpage Cross Platform Component Communication
 @image html xpcc_logo.png
 
-Packet orientated communication library, enabling transparent communication
-between components on PCs and Microcontrollers. It provides an interface to
-communicate via CAN, TCP/IP or TIPC.
+This is a packet orientated communication library, enabling transparent
+communication between components on PCs and Microcontrollers. It provides an
+interface to communicate via CAN, TCP/IP or TIPC.
 
 The primary part of the project is the \ref communication "Communication" module
-that provides the interface to send messages from one component to another
-component.
-To develop and use this module the need for a logger module accrued that not only
-writes to the console but also could be used on microcontrollers and so the
-\ref logger "Logger" module was created.
-Also there is a lack of few c++-libs on microconrollers like
-the STL, so the there is a reduced version in the \ref std_container "STD Container" module.
+that provides the interface to exchange messages between components.
 
-\section about About the project
+To develop and use this module the need for a logger module accrued that is not
+only able to write to the console but could also be used on microcontrollers.
+So the \ref logger "Logger" module was created.
 
+Also there is a lack of standard C++-librarys like the STL for small
+microconrollers, so we created a reduced version adapted to the needs of
+microcontroller software. This part can be found in the \ref data_structure
+"STD Container" module.
 
+\section about About the library
+
+The main target of this library are small 8-bit AVR mircocontrollers, but it
+should also be able to generate code for standard x86 PCs. This has partly historical
+reasons but gives also a lot advantages. Especially testing and debugging is
+much easier when you can run your Code native on your PC and don't have to
+reprogram a microcontroller every time. This technique has limits of course,
+but for things like generic algorithms it works very well.
+
+An other advantage is that we can run nearly the same code on both sides when
+the PC communicates with the microcontroller which reduses the efford for
+developing the code.
+
+While a PC has a lot of [rechenpower] it is somewhat limited on a microcontroller.
+Therefore the most optimizations target the 8-bit microcontrollers and accept 
+possible worse code for the PC.
+
+\subsection goals Optimizations goals
+
+- Ease of use and speed
+- size
+
+The main goal of nearly optimizations is speed and [erst an zweiter Stelle]
+speed. Therefore this library is heavily template based. Templates offer the
+possibly of generating optimal code for various occasions with the drawback of
+increased code size.
+For our main target the AVRs this is acceptable because devices with big flash
+memory are available. So, if you want the smallest possible code size this
+isn't the right library for you, but if you wan't easy development with fast
+execution you're welcome :)
 
  */

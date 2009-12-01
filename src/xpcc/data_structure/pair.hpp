@@ -41,18 +41,50 @@ namespace xpcc
 	 * 
 	 * @brief		Pair<FirstType, SecondType> is a heterogeneous pair
 	 * 
-	 * It holds one object of type FirstType and one object of type
+	 * This class holds one object of type FirstType and one object of type
 	 * SecondType.
 	 * 
-	 * @todo	needs a better implementation without losing the POD attribute!
+	 * It provides only the default constructors and public variables to enable
+	 * usage as POD (plain old data) object. Only with this [EIGENSCHAFT] it
+	 * is possible to storage objects of this type in flash-memory which is
+	 * needed for example for the interpolation classes.
+	 * 
+	 * This contraint make a the usage rather unusual. See the example below.
+	 * @code
+	 * // construction
+	 * Pair<uint8_t, uint16_t> pair = { 12, -12345 };
+	 * 
+	 * // this typedef is neccesary to be able to use
+	 * // the type inside the FLASH macro
+	 * typedef Pair<int8_t, int8_t> MyPair;
+	 * 
+	 * // put some values into the flash memory
+	 * FLASH(MyPair pairs[3]) = {
+	 *     { 0, 10 },
+	 *     { 2, 30 },
+	 *     { 5, 60 }
+	 * };
+	 * @endcode
+	 * 
+	 * @note
+	 * Even if this class provides public attributes it is recommend to use
+	 * the accessor methods, because as soon as C++0x is available the
+	 * implementation will be changed and the attributes will be made private.
+	 * Until then just ignore that you can access them directly ;-)
+	 * 
+	 * @see	xpcc::LinearInterpolation
 	 */
-	template<typename FirstType, typename SecondType>
+	template<typename T1, typename T2>
 	class Pair
 	{
 	public:
+		typedef T1 FirstType;
+		typedef T2 SecondType;
+		
+	public:
 		// No non-trivial constructor is allowed, otherwise this class
 		// won't be POD (plain old data) :-(
-		// (this changes with C++0x)
+		// (this behavior changes with C++0x)
 		/*Pair(const FirstType& first, const SecondType& second) :
 			first(first), second(second)
 		{
@@ -82,7 +114,7 @@ namespace xpcc
 			return second;
 		}
 		
-	// not allowed either :-(
+	// ... not allowed either, only public attributes :-(
 	//private:
 		FirstType first;
 		SecondType second;

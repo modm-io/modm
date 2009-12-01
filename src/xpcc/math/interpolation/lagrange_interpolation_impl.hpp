@@ -34,31 +34,33 @@
    #error "Don't include this file directly. Use 'lagrange_interpolation.hpp' instead!"
 #endif
 
-namespace xpcc
+// ----------------------------------------------------------------------------
+
+template<typename T>
+xpcc::LagrangeInterpolation<T>::LagrangeInterpolation(FlashPointer<T> points,
+													  uint8_t numPoints):
+	points(points), numPoints(numPoints)
+{
+}
+
+// ----------------------------------------------------------------------------
+
+template<typename T>
+T
+xpcc::LagrangeInterpolation<T>::interpolate(const T& value) const
 {	
-	template<typename T>
-	LagrangeInterpolation<T>::LagrangeInterpolation(FlashPointer<T> points, uint8_t numPoints):
-		points(points), numPoints(numPoints)
+	T ret = 0;
+	for (uint8_t i = 0; i < this->numPoints; ++i)
 	{
+		T li = 1;
+		for (uint8_t j = 0; j < this->numPoints; ++j)
+		{
+			if (i != j) {
+				li *= (value - points[2 * j]) / (points[2 * i] - points[2 * j]);
+			}
+		}
+		ret += li * points[2*i+1];
 	}
 	
-	template<typename T>
-	T
-	LagrangeInterpolation<T>::interpolate(const T& value)
-	{	
-		T ret = 0;
-		for (uint8_t i = 0; i < this->numPoints; ++i)
-		{
-			T li = 1;
-			for (uint8_t j = 0; j < this->numPoints; ++j)
-			{
-				if (i != j) {
-					li *= (value - points[2 * j]) / (points[2 * i] - points[2 * j]);
-				}
-			}
-			ret += li * points[2*i+1];
-		}
-		
-		return ret;
-	}
+	return ret;
 }

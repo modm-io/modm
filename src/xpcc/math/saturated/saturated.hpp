@@ -37,53 +37,48 @@
 
 namespace xpcc
 {
-	/// \ingroup	math
-	/// \brief	Saturated arithmetics
-	/// 
-	/// \see http://www.mikrocontroller.net/articles/AVR_Arithmetik/Saturierung
-	///
-	/// \author	Fabian Greif <fabian.greif@rwth-aachen.de>
-	/// 
-	/// \todo	extend implementation (multiplication etc.)
-	/// \todo	add 16-bit datetype assembler implementations for AVRs
-	/// \todo	documentation
+	/**
+	 * @ingroup	math
+	 * @brief	Saturated arithmetics
+	 *  
+	 * @see http://www.mikrocontroller.net/articles/AVR_Arithmetik/Saturierung
+	 * 
+	 * @author	Fabian Greif <fabian.greif@rwth-aachen.de>
+	 *  
+	 * @todo	extend implementation (multiplication etc.)
+	 * @todo	add 16-bit datetype assembler implementations for AVRs
+	 * @todo	documentation
+	 */
 	template<typename T>
 	class Saturated
 	{
-		typedef typename ArithmeticTraits<typename ArithmeticTraits<T>::SignedType>::DoubleType DoubleType;
-	public:
 		typedef typename ArithmeticTraits<T>::SignedType SignedType;
-		typedef typename ArithmeticTraits<T>::UnsignedType UnsignedType;
+		typedef typename ArithmeticTraits<SignedType>::DoubleType DoubleType;
 		
-		friend class Saturated<SignedType>;
-		friend class Saturated<UnsignedType>;
-	
 	public:
-		Saturated(const T& initalValue=0) : 
-			value(initalValue) {
-		}
+		Saturated();
+		
+		Saturated(const T& initialValue);
 		
 		inline const T&
-		getValue() const {
+		getValue() const
+		{
 			return value;
 		}
 		
 		Saturated&
-		operator+=(const Saturated<SignedType>& other);
+		operator += (const Saturated& other);
 		
 		Saturated&
-		operator+=(const Saturated<UnsignedType>& other);
+		operator -= (const Saturated& other);
 		
-		Saturated&
-		operator-=(const Saturated<SignedType>& other);
-		
-		Saturated&
-		operator-=(const Saturated<UnsignedType>& other);
+		void
+		absolute();
 	
 	public:
 		template<typename U>
 		friend Saturated<U>
-		operator-(const Saturated<U>& x);
+		operator - (const Saturated<U>& x);
 		
 		template<typename U>
 		friend Saturated<U>
@@ -91,56 +86,56 @@ namespace xpcc
 		
 		template<typename U>
 		friend Saturated<U>
-		operator-(const Saturated<U>& a, const Saturated<U>& b);
+		operator - (const Saturated<U>& a, const Saturated<U>& b);
 
 		template<typename U>
 		friend Saturated<U>
-		operator+(const Saturated<U>& a, const Saturated<U>& b);
+		operator + (const Saturated<U>& a, const Saturated<U>& b);
 		
 		template<typename U>
 		friend bool
-		operator==(const Saturated<U>& a, const Saturated<U>& b);
+		operator == (const Saturated<U>& a, const Saturated<U>& b);
 		
 		template<typename U>
 		friend bool
-		operator!=(const Saturated<U>& a, const Saturated<U>& b);
+		operator != (const Saturated<U>& a, const Saturated<U>& b);
 		
 		// TODO > >= < <=
 	
 	private:
-		static T
-		limitValue(DoubleType value);
+		void
+		setValue(DoubleType value);
 		
 		T value;
 	};
 	
 	// ------------------------------------------------------------------------
 	
-	/// \brief	Invert value
+	/// @brief	Invert value
 	template<typename U>
-	Saturated<typename Saturated<U>::SignedType>
-	operator-(const Saturated<U>& x);
+	Saturated<U>
+	operator - (const Saturated<U>& x);
 	
-	/// \brief	Calculate the absolte value
+	/// @brief	Calculate the absolute value
 	template<typename U>
 	Saturated<U>
 	abs(const Saturated<U>& x);
 
 	template<typename U>
 	Saturated<U>
-	operator-(const Saturated<U>& a, const Saturated<U>& b);
+	operator - (const Saturated<U>& a, const Saturated<U>& b);
 
 	template<typename U>
 	Saturated<U>
-	operator+(const Saturated<U>& a, const Saturated<U>& b);
+	operator + (const Saturated<U>& a, const Saturated<U>& b);
 	
 	template<typename U>
-	bool
-	operator==(const Saturated<U>& a, const Saturated<U>& b);
+	inline bool
+	operator == (const Saturated<U>& a, const Saturated<U>& b);
 	
 	template<typename U>
-	bool
-	operator!=(const Saturated<U>& a, const Saturated<U>& b);
+	inline bool
+	operator != (const Saturated<U>& a, const Saturated<U>& b);
 }
 
 #include "saturated_impl.hpp"

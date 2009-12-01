@@ -35,8 +35,8 @@
 
 #include "pair_test.hpp"
 
-// check if Pair could be used to be stored inside the Flash memory
-typedef xpcc::Pair<int8_t, int16_t> myPair;
+// check if Pair could be stored inside the Flash memory
+typedef xpcc::Pair<uint8_t, int16_t> myPair;
 
 FLASH(myPair values[]) = {
 	{ 1, 3 },

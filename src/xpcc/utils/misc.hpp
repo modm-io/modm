@@ -30,8 +30,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	MISC_HPP
-#define	MISC_HPP
+#ifndef	XPCC__MISC_HPP
+#define	XPCC__MISC_HPP
 
 #include <stdint.h>
 
@@ -68,16 +68,14 @@
 	#define	CONCAT2(a,b)	CONCAT3(a,b)
 	#define	CONCAT3(a,b)	a ## b
 
-	#ifndef	BASENAME
-		#define	FILENAME	__FILE__
-	#else
-		#define	FILENAME	STRINGIFY(BASENAME)
-	#endif
-
 #endif
 
 namespace xpcc
 {
+	/**
+	 * @ingroup	utils
+	 * @brief	Usefull stuff
+	 */
 	namespace utils
 	{
 		/**
@@ -94,6 +92,10 @@ namespace xpcc
 		/**
 		 * @ingroup	utils
 		 * @brief	Exchange the two nibbles of a byte
+		 * 
+		 * @verbatim
+		 * 0xab => 0xba
+		 * @endverbatim
 		 */
 		ALWAYS_INLINE uint8_t
 		swap(uint8_t n)
@@ -115,6 +117,10 @@ namespace xpcc
 		/**
 		 * @ingroup	utils
 		 * @brief	Exchange the two bytes of a 16-bit integer
+		 * 
+		 * @verbatim
+		 * 0xabcd => 0xcdab
+		 * @endverbatim
 		 */
 		ALWAYS_INLINE uint16_t
 		swap(uint16_t n)
@@ -142,6 +148,10 @@ namespace xpcc
 		/**
 		 * @ingroup	utils
 		 * @brief	Reverse the bits in a byte
+		 * 
+		 * @verbatim
+		 * 0b01110100 => 0b00101110
+		 * @endverbatim
 		 * 
 		 * 15 cycles on an AVR, without call + return.
 		 */
@@ -191,4 +201,4 @@ namespace xpcc
 	}
 }
 
-#endif	// MISC_HPP
+#endif	// XPCC__MISC_HPP

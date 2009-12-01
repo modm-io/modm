@@ -66,7 +66,13 @@ namespace xpcc
 		static T
 		read(const void* p)
 		{
-			return T(pgm_read_byte(p));
+			union {
+				uint8_t in;
+				T out;
+			} convert;
+			
+			convert.in = pgm_read_byte(p);
+			return convert.out;
 		}
 	};
 	
@@ -77,9 +83,82 @@ namespace xpcc
 		static T
 		read(const void* p)
 		{
-			return T(pgm_read_word(p));
+			union {
+				uint16_t in;
+				T out;
+			} convert;
+			
+			convert.in = pgm_read_word(p);
+			return convert.out;
 		}
 	};
+	
+#if __AVR_HAVE_LPMX__ && 1		// FIXME!!!
+	template<typename T>
+	struct FlashReader<T, 3>
+	{
+		ALWAYS_INLINE
+		static T
+		read(const void* p)
+		{
+			/*uint16_t addr16 = (uint16_t)(p);
+			union {
+				uint32_t in;
+				T out;
+			} convert;
+			
+			__asm__ (
+				"lpm %A0, Z+"   "\n\t"
+				"lpm %B0, Z+"   "\n\t"
+				"lpm %C0, Z"    "\n\t"
+				: "=r" (convert.in), "=z" (addr16)
+				: "1" (addr16)
+			);
+			
+			return convert.out;*/
+			
+			/*uint16_t addr16 = (uint16_t)(p);
+			uint32_t result;
+			__asm__ (
+				"lpm %A0, Z+"   "\n\t"
+				"lpm %B0, Z+"   "\n\t"
+				"lpm %C0, Z"    "\n\t"
+				: "=r" (result), "=z" (addr16)
+				: "1" (addr16)
+			);
+			
+			return reinterpret_cast<T&>(result);*/
+			
+			/*uint16_t addr = (uint16_t) p;
+			
+			char retval[3];
+			retval[0] = pgm_read_byte(addr++);
+			retval[1] = pgm_read_byte(addr++);
+			retval[2] = pgm_read_byte(addr);
+			
+			return reinterpret_cast<T&>(retval);*/
+			
+			uint16_t addr16 = (uint16_t)(p);
+			union {
+				char in[3];
+				T out;
+			} convert;
+			
+			__asm__ (
+				"lpm %0, Z+"   "\n\t"
+				"lpm %1, Z+"   "\n\t"
+				"lpm %2, Z"    "\n\t"
+				: "=r" (convert.in[0]),
+				  "=r" (convert.in[1]),
+				  "=r" (convert.in[2]),
+				  "=z" (addr16)
+				: "1" (addr16)
+			);
+			
+			return convert.out;
+		}
+	};
+#endif
 	
 	template<typename T>
 	struct FlashReader<T, 4>
@@ -88,7 +167,16 @@ namespace xpcc
 		static T
 		read(const void* p)
 		{
-			return T(pgm_read_dword(p));
+			// we have to work with this union here because the return
+			// type of pgm_read_dword() is always uint32_t and the compiler
+			// refuses to accept a simple cast to T if T is no build-in type.
+			union {
+				uint32_t in;
+				T out;
+			} convert;
+			
+			convert.in = pgm_read_dword(p);
+			return convert.out;
 		}
 	};
 }

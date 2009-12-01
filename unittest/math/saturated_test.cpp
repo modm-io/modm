@@ -35,13 +35,14 @@
 #include "saturated_test.hpp"
 
 void
-SaturatedTest::testSigned()
+SaturatedTest::testSigned8bit()
 {
 	//TEST_FAIL("TODO");
+	
 }
 	
 void
-SaturatedTest::testUnsigned()
+SaturatedTest::testUnsigned8bit()
 {
 	xpcc::Saturated<uint8_t> x;
 	xpcc::Saturated<uint8_t> y(100);
@@ -80,13 +81,20 @@ SaturatedTest::testUnsigned()
 	TEST_ASSERT_EQUALS(y.getValue(), 10);
 	TEST_ASSERT_EQUALS(z.getValue(), 10);
 	
-	//x = -z;
+	y = z - x;
 	
-	//TEST_ASSERT_EQUALS(x.getValue(), 0);
-	//TEST_FAIL("TODO");
+	TEST_ASSERT_EQUALS(x.getValue(), 20);
+	TEST_ASSERT_EQUALS(y.getValue(), 0);
+	TEST_ASSERT_EQUALS(z.getValue(), 10);
+	
+	x = -z;
+	
+	TEST_ASSERT_EQUALS(x.getValue(), 0);
 	
 	y = 200;
 	//x = abs(y);
+	x = y;
+	x.absolute();
 	
-	//TEST_ASSERT_EQUALS(x.getValue(), 200);
+	TEST_ASSERT_EQUALS(x.getValue(), 200);
 }

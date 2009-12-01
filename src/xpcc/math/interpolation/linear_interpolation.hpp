@@ -30,33 +30,61 @@
  */
 // ----------------------------------------------------------------------------
 
-
 #ifndef	XPCC__LINEAR_INTERPOLATION_HPP
 #define	XPCC__LINEAR_INTERPOLATION_HPP
 
-#include <xpcc/hal/flash/flash_pointer.hpp>
 #include <stdint.h>
+
+#include <xpcc/data_structure/pair.hpp>
+#include <xpcc/hal/flash/flash_pointer.hpp>
 
 namespace xpcc
 {
 	/**
 	 * @ingroup	interpolation
-	 * @brief	Linear interpolation of values in a list
+	 * @brief	Linear interpolation between two points
+	 * 
+	 * Example:
+	 * @code
+	 * typedef xpcc::Pair<int8_t, int16_t> MyPair;
+	 * 
+	 * FLASH(MyPair flashValues[6]) = {
+	 *     { 30, -200 },
+	 *     { 50, 0 },
+	 *     { 90, 50 },
+	 *     { 150, 2050 },
+	 *     { 200, 3000 },
+	 *     { 220, 20000 }
+	 * };
+	 * 
+	 * xpcc::LinearInterpolation<MyPair> value(xpcc::toFlashPointer(flashValues), 6);
+	 * 
+	 * ...
+	 * 
+	 * int8_t a = 20;
+	 * int16_t b;
+	 * 
+	 * b = value.interpolate(a);
+	 * @endcode
 	 * 
 	 * @todo	needs documentation
 	 */
-	template<typename T>
+	template <typename T>
 	class LinearInterpolation
 	{
 	public:
+		typedef typename T::FirstType InputType;
+		typedef typename T::SecondType OutputType;
+	
+	public:
 		LinearInterpolation(FlashPointer<T> points, uint8_t numPoints);
 		
-		T 
-		interpolate(const T& value);
+		OutputType 
+		interpolate(const InputType& value) const;
 		
 	private:
-		FlashPointer<T> points;
-		uint8_t numPoints; 
+		const FlashPointer<T> points;
+		const uint8_t numPoints; 
 	};
 }
 

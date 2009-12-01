@@ -7,5 +7,15 @@
 @defgroup	avr		AVR specifiy functions
 
 
-
 */
+
+namespace xpcc
+{
+	/**
+	 * @ingroup	avr
+	 * @brief	AVR specifiy functions
+	 */
+	namespace avr
+	{
+	}
+}

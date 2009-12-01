@@ -122,7 +122,7 @@ for className, attr in tests.iteritems():
 	nameStrings.append('FLASH_STRING(%s) = "%s";' % (testNameString, attr['testName']))
 	
 	str = """
-	unittest::Controller::instance().nextTestSuite(xpcc::Flash(%s));
+	unittest::Controller::instance().nextTestSuite(xpcc::toFlashPointer(%s));
 	{
 		%s %s;
 		""" % (testNameString, className, instanceName)

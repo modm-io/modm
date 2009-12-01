@@ -46,12 +46,13 @@ namespace xpcc
 	 * 
 	 * <h3>About this implementation:</h3> 
 	 * 
-	 * In contrast to other drivers in this library which use static methods,
+	 * In contrast to other drivers which use static methods,
 	 * this class is directly derived from IODevice with all the virtual
-	 * methods because it will be most likely used to create a IOStream.
+	 * methods because it will be most likely used to create a IOStream
+	 * which then handles the output to the display.
 	 * 
 	 * Therefore creating this class with static methods and using a wrapper
-	 * class to create a IODevice seems unnecessary and complicated.
+	 * class to create a IODevice seems unnecessary complicated.
 	 */
 	class Lcd : public IODevice
 	{

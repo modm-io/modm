@@ -5,7 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- *
+ * 
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -30,70 +30,35 @@
  */
 // ----------------------------------------------------------------------------
 
-#include "reporter.hpp"
+#include "lcd.hpp"
 
-namespace
-{
-	FLASH_STRING(invaildName) = "invalid";
-	
-	FLASH_STRING(failHeader) = "FAIL: ";
-	FLASH_STRING(failColon) = " : ";
-	
-	FLASH_STRING(reportPassed) = "\nPassed ";
-	FLASH_STRING(reportFailed) = "\nFailed ";
-	FLASH_STRING(reportOf) = " of ";
-	FLASH_STRING(reportTests) = " tests\n";
-	FLASH_STRING(reportOk) = "OK!\n";
-	FLASH_STRING(reportFail) = "FAIL!\n";
-}
-
-unittest::Reporter::Reporter(xpcc::IODevice& device) :
-	outputStream(device), testName(xpcc::toFlashPointer(invaildName)),
-	testsPassed(0), testsFailed(0)
+xpcc::Lcd::Lcd() :
+	column(0), line(0)
 {
 }
 
 void
-unittest::Reporter::nextTestSuite(xpcc::FlashPointer<char> name)
+xpcc::Lcd::put(char c)
 {
-	testName = name;
-}
-
-void
-unittest::Reporter::reportPass()
-{
-	testsPassed++;
-}
-
-xpcc::IOStream&
-unittest::Reporter::reportFailure(unsigned int lineNumber)
-{
-	testsFailed++;
-	outputStream << xpcc::toFlashPointer(failHeader)
-				 << testName
-				 << ':'
-				 << lineNumber
-				 << xpcc::toFlashPointer(failColon);
-	return outputStream;
-}
-
-void
-unittest::Reporter::printSummary()
-{
-	if (testsFailed == 0) {
-		outputStream << xpcc::toFlashPointer(reportPassed)
-					 << testsPassed
-					 << xpcc::toFlashPointer(reportTests)
-					 << xpcc::toFlashPointer(reportOk)
-					 << xpcc::endl;
+	if (c == '\n')
+	{
+		line++;
+		if (line >= 2) {
+			line = 0;
+		}
+		column = 0;
+		setPosition(line, column);
 	}
 	else {
-		outputStream << xpcc::toFlashPointer(reportFailed)
-					 << testsFailed
-					 << xpcc::toFlashPointer(reportOf)
-					 << (testsFailed + testsPassed)
-					 << xpcc::toFlashPointer(reportTests)
-					 << xpcc::toFlashPointer(reportFail)
-					 << xpcc::endl;
+		if (column >= 16) {
+			this->put('\n');
+		}
+		this->putRaw(c);
+		column++;
 	}
+}
+
+void
+xpcc::Lcd::flush()
+{
 }
