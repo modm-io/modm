@@ -111,7 +111,7 @@ namespace xpcc
 		BackendInterface * const backend;
 		Postman * const postman;
 		uint8_t currentComponent;
-		CommunicationList responseManager;
+		communicationList::List responseManager;
 		
 		void
 		waitForAcknowledge(const Header &header, const SmartPayload& payload);

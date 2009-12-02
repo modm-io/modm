@@ -54,8 +54,13 @@ namespace xpcc
 		~DefaultPostman();
 		
 		virtual DeliverInfo
-		deliverPacket(const BackendInterface * const interface);
+		deliverPacket(const BackendInterface& interface);
+		
+		virtual DeliverInfo
+		deliverPacket(const Header &header, SmartPayload& payload);
 				
+		virtual DeliverInfo
+		deliverPacket(const Header &header);
 		
 	private:
 		// the lists

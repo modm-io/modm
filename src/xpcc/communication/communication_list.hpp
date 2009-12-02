@@ -36,110 +36,200 @@
 
 #include "backend/backend_interface.hpp"
 #include "response_callback.hpp"
+#include "postman.hpp"
 
+/**
+ * @ingroup 	communication
+ * @brief 		Holds information about the response, repeat sending acknowleging for communication.
+ *
+ *
+ * @version		$Id$
+ */
 namespace xpcc{
+namespace communicationList{
 
-	class CommunicationListEntry{
+	/**
+	 * @ingroup 	communication
+	 * @brief 		CommunicationListEntry holds information about one Message has to be sent. Is superclass of all entries
+	 */
+	class Entry{
 	
 	public:
 	
 		typedef enum {
-			EMPTY_ENTRY,
-			PAYLOAD,
+			DEFAULT,
 			CALLBACK,
-			PAYLOAD_CALLBACK,
 		} TypeInfo;
 		
 	
-		CommunicationListEntry(uint8_t typeInfo, Header header);
+		/**
+		 * @brief 		Creates one Entry with given header. this->next is initially set Null
+		 *
+		 * Creates one Entry with given header. this->next is initially set Null.
+		 * The const member this->typeInfo is set to typeInfo and never else changed.
+		 * this->typeInfo replaces runtime information needed by handling of messages.
+		 *
+		 * @see CommunicationList
+		 */
+		Entry(uint8_t typeInfo, const Header& header, SmartPayload& payload);
+		Entry(uint8_t typeInfo, const Header& header);
 		
+		/**
+		 * @brief 		Checks if one Response or ack fitts to the Message represented by this Entry.
+		 */
 		bool
-		headerFits(Header header);
+		headerFits(const Header& header) const;
 		
-		CommunicationListEntry *
-		getNext();
+		/**
+		 * @brief 		Listhandling, return pointer to the next entry.
+		 */
+		const Entry *
+		getNext() const;
 		
-		CommunicationListEntry *next;
+		/**
+		 * @brief 		Communication info, state of sending and retrieving messages and acks.
+		 */
 		typedef enum {
 			WANT_TO_BE_SENT,
 			WAIT_FOR_ACK,
 			WAIT_FOR_RESPONSE,
-			ACK_RECEIVED,
 		} State;
 		
-		// timeout
+		const uint8_t typeInfo;
+		
+		/**
+		 * @brief 		Listhandling, holds pointer to the next entry.
+		 */
+		Entry *next;
+		
+		// todo timeout
 		Header header;
+		SmartPayload payload;
 		State state;
 		
-		const uint8_t typeInfo;
 	};
 
-	class CommunicationListEntryWithPayload:public CommunicationListEntry{
+	class EntryDefault:public Entry{
 	
 	public:
-		CommunicationListEntryWithPayload(Header& header, SmartPayload& smartPayload);
-		
-		SmartPayload smartPayload;
+		EntryDefault(const Header& header);
+		EntryDefault(const Header& header, SmartPayload& payload);
 	};
 
-	class CommunicationListEntryWithPayloadAndCallback:public CommunicationListEntry{
-	
-	public:
-		CommunicationListEntryWithPayloadAndCallback(Header& header, SmartPayload& smartPayload, ResponseCallback& callback);
-
-		SmartPayload smartPayload;
-		ResponseCallback responseCallback;
-	};
-
-	class CommunicationListEntryWithCallback:public CommunicationListEntry{
+	class EntryWithCallback:public Entry{
 
 	public:
-		CommunicationListEntryWithCallback(Header& header, ResponseCallback& callback);
+		EntryWithCallback(const Header& header, SmartPayload& payload, ResponseCallback& callback);
+		EntryWithCallback(const Header& header, ResponseCallback& callback);
 		
 		ResponseCallback responseCallback;
 	};
 
-	class CommunicationList{
+	/**
+	 * @ingroup 	communication
+	 * @brief 		List containts Entries.
+	 *
+	 * Entries are lineary linked.
+	 * The member this->first points at any time to the dummyFirst.
+	 * The member this->last points at any time to the last entry of the list, or to
+	 * the dummyEntry if no entries in the list.
+	 * this->last->next == Null is at anytime true.
+	 *
+	 */
+	class List{
 	public:
-		CommunicationList();
+		/**
+		 * @brief 		Creates one initially valid list.
+		 *
+		 * this->first = &dummyFirst;
+		 * this->last = &dummyFirst;
+		 */
+		List();
 		
 		void
-		addResponse(Header& header, SmartPayload& smartPayload);
+		addEvent(const Header& header, SmartPayload& smartPayload);
 		
 		void
-		addActionCall(uint8_t id, Header& header);
+		addResponse(const Header& header, SmartPayload& smartPayload);
 		
 		void
-		addActionCall(Header& header, SmartPayload& smartPayload);
+		addActionCall(const Header& header);
 		
 		void
-		addActionCall(Header& header, SmartPayload& smartPayload, ResponseCallback& responseCallback);
+		addActionCall(const Header& header, SmartPayload& smartPayload);
 		
 		void
-		addActionCall(Header& header, ResponseCallback& responseCallback);
+		addActionCall(const Header& header, SmartPayload& smartPayload, ResponseCallback& responseCallback);
 		
 		void
-		handlePacket(const BackendInterface * const backend);
+		addActionCall(const Header& header, ResponseCallback& responseCallback);
+		
+		
+		/**
+		 * @brief 		Does not handle responses which are not acknowlege.
+		 *
+		 */
+		void
+		handlePacket(const BackendInterface &backend);
+		
+		/**
+		 * @brief 		Sending messages which are waiting in the list.
+		 *
+		 */
+		void
+		handleWaitingMessages(Postman &postman, BackendInterface &backend);
 		
 	private:
+	
+		/**
+		 * @brief 		Appends one ore more entries to this->last. this->last is updated to the tail of next.
+		 *
+		 */
 		void
-		append(CommunicationListEntry *next);
+		append(Entry *next);
 		
+		/**
+		 * @brief 		fix->next will be set to next. the old entry of fix->next will be set
+		 *				to the tail of next. this->last will be updated to tail of next if 
+		 *				fix->next==Null, which is equivalent to fix==last.
+		 *
+		 * @param fix has to be one element already appended to the list.
+		 * @param next must not be contained by any list. Any element of the next->next chain must not be contained by any list.
+		 */
 		void
-		insertAfter(CommunicationListEntry *fix, CommunicationListEntry *next);
+		insertAfter(Entry *fix, Entry *next);
 
-		CommunicationListEntry *
-		removeNext(CommunicationListEntry *fix);
+		/**
+		 * @brief 		if (fix->next) then fix->next will be set to fix->next->next. this->last
+		 *				will be set to fix if fix->next was the last element.
+		 *				The removed element is returned
+		 *				if fix was the last element nothing is done and Null is returned.
+		 *				For safety the member next of the returned element is set to Null.
+		 *
+		 * @param fix has to be one element already appended to the list.
+		 */
+		Entry *
+		removeNext(Entry *fix);
 		
 
+		/**
+		 * @brief 		Handles the callbacks to responses comming from Backend, if one Entry
+		 *				is found in the list. Deletes entries and calls the callback function.
+		 *
+		 * @param backend pointer to the BackendInterface in order to retrieve response information.
+		 * @param e entry in the list. e->next has to fit to the packet actually hold in backend.
+		 *
+		 */
 		template<typename C>
 		void
-		handleResponseOfNextOfEWithCallback(const BackendInterface * const backend, CommunicationListEntry *e);
+		handleResponseOfNextOfEWithCallback(const BackendInterface &backend, Entry *e);
 
-		CommunicationListEntry *first;
-		CommunicationListEntry *last;
+		EntryDefault dummyFirst;
+		Entry *first;
+		Entry *last;
 		
 	};
+}
 }
 
 #endif // XPCC_COMMUNICATION_LIST_HPP

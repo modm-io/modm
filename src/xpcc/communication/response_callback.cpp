@@ -25,7 +25,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * 
- * $Id: postman.hpp 77 2009-10-15 18:34:29Z thundernail $
+ * $Id$
  */
 // ----------------------------------------------------------------------------
 
@@ -45,7 +45,7 @@ callbackFunction ( callbackFunction ){
 }
 		
 void
-xpcc::ResponseCallback::handleResponse(const BackendInterface * const backend){
-	ResponseMessage message(backend->getPacketHeader(), backend->getPacketPayload(), backend->getPacketPayloadSize());
+xpcc::ResponseCallback::handleResponse(const BackendInterface &backend){
+	ResponseMessage message(backend.getPacketHeader(), backend.getPacketPayload(), backend.getPacketPayloadSize());
 	(object->*callbackFunction)(message);
 }

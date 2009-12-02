@@ -42,9 +42,9 @@ xpcc::DefaultPostman::~DefaultPostman()
 
 // ----------------------------------------------------------------------------
 xpcc::DefaultPostman::DeliverInfo
-xpcc::DefaultPostman::deliverPacket(const BackendInterface * const backend)
+xpcc::DefaultPostman::deliverPacket(const BackendInterface& backend)
 {
-	backend->getPacketHeader();
+	backend.getPacketHeader();
 	return OK;
 }
 

@@ -55,12 +55,22 @@ xpcc::Communication::update(){
 		//	case NO_COMPONENT:
 		//	case NO_EVENT:
 		//}
+		const Header& header(backend->getPacketHeader());
 		
-		postman->deliverPacket(backend);
+		if (header.type == Header::REQUEST && !header.isAcknowledge){
+			postman->deliverPacket(*backend);
+			// check here the deliver state and generate ack, but do it during response too, so synchronize acknowleging!
+		}
+		else{
+			responseManager.handlePacket(*backend);
+		}
 		
+				
 		backend->dropPacket();
 	}
 	
+	// check somehow if there are packets to send
+	responseManager.handleWaitingMessages(*postman, *backend);
 
 }
 

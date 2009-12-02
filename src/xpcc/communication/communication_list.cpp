@@ -32,24 +32,47 @@
 
 #include "communication_list.hpp"
 
-xpcc::CommunicationList::CommunicationList():
-first(new CommunicationListEntry(CommunicationListEntry::EMPTY_ENTRY, Header())), last(0){
+xpcc::communicationList::List::List():
+dummyFirst(Header()),
+first(&dummyFirst),
+last(&dummyFirst){
 
 }
 
-xpcc::CommunicationListEntry::CommunicationListEntry(uint8_t typeInfo, Header header):
-next(0),header(header),typeInfo(typeInfo){
+xpcc::communicationList::Entry::Entry(uint8_t typeInfo, const Header& header, SmartPayload &payload):
+typeInfo(typeInfo),
+next(0),
+header(header),
+payload(payload)
+{
 
 }
 
-xpcc::CommunicationListEntry *
-xpcc::CommunicationListEntry::getNext()
+xpcc::communicationList::Entry::Entry(uint8_t typeInfo, const Header& header):
+typeInfo(typeInfo),
+next(0),
+header(header),
+payload(SmartPayload())
+{
+
+}
+
+const xpcc::communicationList::Entry *
+xpcc::communicationList::Entry::getNext() const
 {
 	return next;
 }
 
+bool
+xpcc::communicationList::Entry::headerFits(const Header& header) const
+{
+	return header.source == this->header.destination && 
+			header.destination == this->header.source &&
+			header.packetIdentifier == this->header.packetIdentifier;
+}
+
 void
-xpcc::CommunicationList::append(CommunicationListEntry *next)
+xpcc::communicationList::List::append(Entry *next)
 {
 	last->next = next;
 	
@@ -60,9 +83,9 @@ xpcc::CommunicationList::append(CommunicationListEntry *next)
 }
 
 void
-xpcc::CommunicationList::insertAfter(CommunicationListEntry *fix, CommunicationListEntry *next)
+xpcc::communicationList::List::insertAfter(Entry *fix, Entry *next)
 {
-	CommunicationListEntry *tmp = fix->next;
+	Entry *tmp = fix->next;
 	fix->next = next;
 	
 	while(next->next)// find tail of next
@@ -71,136 +94,198 @@ xpcc::CommunicationList::insertAfter(CommunicationListEntry *fix, CommunicationL
 	if(tmp){
 		next->next = tmp;
 	}
-	else{// tmp was last
+	else{// fix was the last element, so last has to be uptaded
 		last = next;
 	}
 }
 
-xpcc::CommunicationListEntry *
-xpcc::CommunicationList::removeNext(CommunicationListEntry *fix)
+xpcc::communicationList::Entry *
+xpcc::communicationList::List::removeNext(Entry *fix)
 {
-	CommunicationListEntry *tmp = fix->next;
+	Entry *tmp = fix->next;
 	if(tmp){
 		fix->next = tmp->next;
 		
 		if (tmp == last)
 			last = fix;
-			// tmp->next = 0; // is is null allready
+			// tmp->next = 0; // is null allready
 		else
 			tmp->next = 0;
 	}
 	return tmp;
 }
 
-xpcc::CommunicationListEntryWithPayload::CommunicationListEntryWithPayload(Header& header, SmartPayload& smartPayload):
-CommunicationListEntry(PAYLOAD, header),smartPayload(smartPayload){
+xpcc::communicationList::EntryDefault::EntryDefault(const Header& header):
+Entry(DEFAULT, header){
 }
 
-xpcc::CommunicationListEntryWithPayloadAndCallback::CommunicationListEntryWithPayloadAndCallback(Header& header, SmartPayload& smartPayload, ResponseCallback& responseCallback):
-CommunicationListEntry(PAYLOAD_CALLBACK, header),smartPayload(smartPayload),responseCallback(responseCallback){
-
+xpcc::communicationList::EntryDefault::EntryDefault(const Header& header, SmartPayload& payload):
+Entry(DEFAULT, header, payload){
 }
-	
-xpcc::CommunicationListEntryWithCallback::CommunicationListEntryWithCallback(Header& header, ResponseCallback& responseCallback):
-CommunicationListEntry(CALLBACK, header),responseCallback(responseCallback){
+
+xpcc::communicationList::EntryWithCallback::EntryWithCallback(const Header& header, SmartPayload& payload, ResponseCallback& responseCallback):
+Entry(CALLBACK, header, payload),
+responseCallback(responseCallback){
+}
+
+xpcc::communicationList::EntryWithCallback::EntryWithCallback(const Header& header, ResponseCallback& responseCallback):
+Entry(CALLBACK, header),
+responseCallback(responseCallback){
 }
 
 void
-xpcc::CommunicationList::addActionCall(Header& header, SmartPayload& smartPayload){
-	CommunicationListEntryWithPayload* e = new CommunicationListEntryWithPayload(header, smartPayload);
-	e->state = CommunicationListEntry::WAIT_FOR_ACK;
-	
-	this->append(e);
-}
-		
-void
-xpcc::CommunicationList::handlePacket(const BackendInterface * const backend){
-	const Header& header = backend->getPacketHeader();
-	CommunicationListEntry *e = first;// first is always a dummy entry
-	while(e->next){// !!! be carefull!! what happends if more than one entriy fits to the header and they are not eaqual?
-		switch(e->next->typeInfo){
-			case CommunicationListEntry::PAYLOAD:// waiting for ack, no response can be handled
-			case CommunicationListEntry::EMPTY_ENTRY:// waiting for ack, no response can be handled
-				if(((CommunicationListEntryWithPayload*)e->next)->headerFits(header)){
-					// entry e->next has to be removed
-					
-					e = this->removeNext(e);
-					delete e;
-					
-					return;
+xpcc::communicationList::List::handlePacket(const BackendInterface &backend){
+	const Header& header = backend.getPacketHeader();
+	Entry *e = first;// first is always a dummy entry
+	while(Entry *actual = e->next){// !!! be carefull!! it must not happen, that more than one entry fits to the header
+		switch(actual->typeInfo){
+			case Entry::DEFAULT:// waiting for ack, no response can be handled
+				if(!((EntryDefault*)actual)->headerFits(header)){
+					e = actual;
+					break;
 				}
-				break;
-			case CommunicationListEntry::PAYLOAD_CALLBACK:
-				if(((CommunicationListEntryWithPayloadAndCallback*)e->next)->headerFits(header)){
-					// entry e->next has to be replaced if acknowleded request
-
-					switch(header.type){
-						case Header::REQUEST:// must be ack
-							if(header.isAcknowledge){// make shure no requests passed here
-								e = this->removeNext(e);
-								CommunicationListEntryWithCallback *c = new CommunicationListEntryWithCallback(e->header, ((CommunicationListEntryWithPayloadAndCallback*)e)->responseCallback);
-								c->state = CommunicationListEntry::ACK_RECEIVED;
-								append(c);
-								delete e;
-							}
-							// else there is en error in communication, cause no requests can be handled here
-							break;
-						default: // response or negative response
-							handleResponseOfNextOfEWithCallback<CommunicationListEntryWithPayloadAndCallback>(backend, e);
-							break;
+				// entry e->next has to be removed
+				
+				this->removeNext(e);
+				delete actual;
+				
+				return;
+			case Entry::CALLBACK:// waiting for response
+				if(!((EntryWithCallback*)actual)->headerFits(header)){
+					e = actual;
+					break;
+				}
+				// entry actual has to be marked acknowledged if acknowleded request
+				if(header.type == Header::REQUEST){
+					// must be ack
+					if(header.isAcknowledge){// make shure no requests passed here
+						((EntryWithCallback*)actual)->state = Entry::WAIT_FOR_RESPONSE;
 					}
-					
-					return;
+					// else there is en error in communication, cause no requests can be handled here
 				}
-				break;
-			case CommunicationListEntry::CALLBACK:// waiting for response
-				if(((CommunicationListEntryWithCallback*)e->next)->headerFits(header)){
-					// entry e->next has to be marked acknowledged if acknowleded request
-					switch(header.type){
-						case Header::REQUEST:// must be ack
-							if(header.isAcknowledge){// make shure no requests passed here
-								((CommunicationListEntryWithCallback*)e->next)->state = CommunicationListEntry::ACK_RECEIVED;
-							}
-							// else there is en error in communication, cause no requests can be handled here
-							break;
-						default: // response or negative response
-							handleResponseOfNextOfEWithCallback<CommunicationListEntryWithCallback>(backend, e);
-							break;
+				else{// response or negative response
+					
+					// entry actual = e->next has to be removed, and deleted
+					// handle (neg_)response if (neg_)response, is not acknowledge
+					
+					EntryWithCallback *c = (EntryWithCallback *)this->removeNext(e);
+					
+					if(!header.isAcknowledge){
+						c->responseCallback.handleResponse(backend);
 					}
+					// else cannot happen, since responses with callbacks are not possible
 					
-					return;
+					delete c;
 				}
-				break;
+				return;
 		}
 	}
 	
 	// if here than no handling was possible
 }
 
-template<typename C>
 void
-xpcc::CommunicationList::handleResponseOfNextOfEWithCallback(const BackendInterface * const backend, CommunicationListEntry *e){
-	const Header& header = backend->getPacketHeader();
-	
-	// entry e->next has to be removed
-	// handle (neg_)response if (neg_)response, is not acknowledge
-	
-	// here is no handling of requests, is not checked also
-	C *next = (C *)this->removeNext(e);
-	if(!header.isAcknowledge){
-		switch(header.type){
-			case Header::RESPONSE:
-				// todo handle response of e
-				next->responseCallback.object=0;// delete this line
-				break;
-			case Header::NEGATIVE_RESPONSE:
-				// todo handle negative response of e
-				next->responseCallback.object=0;// delete this line
+xpcc::communicationList::List::handleWaitingMessages(Postman &postman, BackendInterface &backend){
+	Entry *e = first;// first is always a dummy entry
+	while(Entry *actual = e->next){
+		switch(actual->state){
+			case Entry::WANT_TO_BE_SENT:
+				if (actual->header.destination == 0){// event
+					postman.deliverPacket(actual->header);
+					backend.sendPacket(actual->header,SmartPayload());
+					this->removeNext(e);
+					delete actual;
+				}
+				else{// action or response
+					if(postman.isComponentAvaliable(actual->header)){
+						if (actual->header.type == Header::REQUEST){
+							postman.deliverPacket(actual->header); // todo payload?
+							// todo handle postman errors?
+							if (actual->typeInfo == Entry::CALLBACK){
+								actual->state = Entry::WAIT_FOR_RESPONSE;
+								e = actual;
+							}
+							else{
+								this->removeNext(e);
+								delete actual;
+							}
+						}
+						else {// (neg)response
+							// find one waiting callback and handle response
+							// but be carefull with e and actual.
+							e = actual;
+						}
+					}
+					else {// destination not on board, message has to be sent out to backend
+						backend.sendPacket(actual->header, actual->payload);
+						actual->state = Entry::WAIT_FOR_ACK;
+						// todo somhow timeout
+						e = actual;
+					}
+				}
+				
 				break;
 			default:
-				break;
+				break; // no action
 		}
+	
 	}
-	delete e;
+	
+
+}
+
+void
+xpcc::communicationList::List::addEvent(const Header& header, SmartPayload& smartPayload){
+	Entry *e = new EntryDefault(header, smartPayload);
+	e->state = Entry::WANT_TO_BE_SENT;
+
+	append(e);
+}
+
+void
+xpcc::communicationList::List::addResponse(const Header& header, SmartPayload& smartPayload){
+	Entry *e = new EntryDefault(header, smartPayload);
+	e->state = Entry::WANT_TO_BE_SENT;
+
+	this->insertAfter(first, e);
+	// it makes response more important, than requests
+	// it prevents intern loops. Since it is possible to give a response while 
+	// an action is handled and call an action while response is handeled
+	// one component calling one action on another component on same board
+	// handling its response in the same callbackfunction would cause a loop
+	// if responses and actions both are apended at the tail of the list.
+}
+
+void
+xpcc::communicationList::List::addActionCall(const Header& header){
+	SmartPayload p;
+	Entry *e = new EntryDefault(header, p);
+	e->state = Entry::WANT_TO_BE_SENT;
+
+	append(e);
+}
+
+void
+xpcc::communicationList::List::addActionCall(const Header& header, SmartPayload& smartPayload){
+	Entry *e = new EntryDefault(header, smartPayload);
+	e->state = Entry::WANT_TO_BE_SENT;
+	
+	append(e);
+}
+
+void
+xpcc::communicationList::List::addActionCall(const Header& header, SmartPayload& smartPayload, ResponseCallback& responseCallback){
+	Entry *e = new EntryWithCallback(header, smartPayload, responseCallback);
+	e->state = Entry::WANT_TO_BE_SENT;
+
+	append(e);
+}
+
+void
+xpcc::communicationList::List::addActionCall(const Header& header, ResponseCallback& responseCallback){
+	Entry *e = new EntryWithCallback(header, responseCallback);
+	e->state = Entry::WANT_TO_BE_SENT;
+	
+	append(e);
 }
 

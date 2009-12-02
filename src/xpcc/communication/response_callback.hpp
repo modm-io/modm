@@ -66,7 +66,7 @@ namespace xpcc
 		ResponseCallback(AbstractComponent *object, CallbackFunction callbackFunction);
 		
 		void
-		handleResponse(const BackendInterface * const backend);
+		handleResponse(const BackendInterface &backend);
 		
 		AbstractComponent *object;
 		CallbackFunction callbackFunction;

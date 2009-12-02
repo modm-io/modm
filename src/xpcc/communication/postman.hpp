@@ -57,7 +57,17 @@ namespace xpcc{
 		} DeliverInfo;
 		
 		virtual DeliverInfo
-		deliverPacket(const BackendInterface * const backend) = 0; //wie muss const?
+		deliverPacket(const BackendInterface& backend) = 0;
+		
+		virtual DeliverInfo
+		deliverPacket(const Header& header, SmartPayload& payload) = 0;
+		
+		virtual DeliverInfo
+		deliverPacket(const Header& header) = 0;
+		
+		virtual bool
+		isComponentAvaliable(const Header& header) const = 0;
+		
 	};
 }
 #endif // XPCC_POSTMAN_HPP

@@ -25,7 +25,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: communication_impl.hpp 77 2009-10-15 18:34:29Z thundernail $
+ * $Id$
  */
 // ----------------------------------------------------------------------------
 
@@ -45,9 +45,10 @@ xpcc::Communication::callAction(uint8_t receiver, uint8_t actionIdentifier, cons
 					currentComponent,
 					actionIdentifier);
 	SmartPayload payload(&data);
-	// todo add action, oder so zur list
-//	waitForAcknowledge(header, payload);
-	backend->sendPacket(header, payload);
+	
+	responseManager.addActionCall(header, payload);
+	
+//	backend->sendPacket(header, payload);
 }
 		
 // ----------------------------------------------------------------------------
@@ -63,9 +64,9 @@ xpcc::Communication::callAction(uint8_t receiver, uint8_t actionIdentifier, cons
 
 	SmartPayload payload(&data);
 	
-	// todo add action, oder so zur list
-//	waitForAcknowledge(header, payload);
-	backend->sendPacket(header, payload);
+	responseManager.addActionCall(header, payload, responseCallback);
+
+//	backend->sendPacket(header, payload);
 }
 		
 // ----------------------------------------------------------------------------
@@ -81,9 +82,9 @@ xpcc::Communication::sendResponse(const ResponseHandle& handle, const T& data)
 					
 	SmartPayload payload(&data);
 	
-	// todo add action, oder so zur list
-//	waitForAcknowledge(header, payload);
-	backend->sendPacket(header, payload);
+	responseManager.addResponse(header, payload);
+	
+//	backend->sendPacket(header, payload);
 }
 		
 // ----------------------------------------------------------------------------
@@ -99,9 +100,9 @@ xpcc::Communication::sendNegativeResponse(const ResponseHandle& handle, const T&
 					
 	SmartPayload payload(&data);
 	
-	// todo add action, oder so zur list
-//	waitForAcknowledge(header, payload);
-	backend->sendPacket(header, payload);
+	responseManager.addResponse(header, payload);
+
+//	backend->sendPacket(header, payload);
 }
 		
 // ----------------------------------------------------------------------------
@@ -116,7 +117,9 @@ xpcc::Communication::publishEvent(uint8_t eventIdentifier, const T& data)
 					eventIdentifier);
 	SmartPayload payload(&data);// no metadata is sent with Events
 	
-	backend->sendPacket(header, payload);
+	responseManager.addEvent(header, payload);
+	
+//	backend->sendPacket(header, payload);
 }
 
 #endif // XPCC_COMMUNICATION_IMPL_HPP
