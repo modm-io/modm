@@ -56,6 +56,7 @@ namespace xpcc
  */
 #define	CREATE_SPI_MODULE(name, moduleBase) \
 	struct name { \
+		ALWAYS_INLINE static SPI_t &getModuleBase() { return moduleBase; } \
 		ALWAYS_INLINE static void setEnable(bool enable) { moduleBase.CTRL = (moduleBase.CTRL & SPI_ENABLE_bm) | (enable?SPI_ENABLE_bm:0); } \
 		ALWAYS_INLINE static void setMaster(bool master) { moduleBase.CTRL = (moduleBase.CTRL & SPI_MASTER_bm) | (master?SPI_MASTER_bm:0); } \
 		ALWAYS_INLINE static void setPrescaler(SPI_PRESCALER_t prescaler) { moduleBase.CTRL = (moduleBase.CTRL & SPI_PRESCALER_gm) | prescaler; } \

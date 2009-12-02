@@ -89,7 +89,7 @@ xpcc::Debounce::getShortPress(uint8_t mask)
 	// get all keys which were pressed but are currently not pressed. This
 	// could only have been a short press, otherwise the getLongPress() method
 	// would have reset pressState.
-	mask &= mask & pressState & ~state;
+	mask = mask & pressState & ~state;
 	pressState ^= mask;
 	
 	return mask;
@@ -102,8 +102,9 @@ xpcc::Debounce::getLongPress(uint8_t mask)
 	
 	// get all keys which are long enough pressState so that the repeatState
 	// variable was set
-	mask = mask & repeatState & pressState;
+	mask = mask & repeatState;
 	repeatState ^= mask;
+	mask = mask & pressState;
 	pressState ^= mask;
 	
 	return mask;
