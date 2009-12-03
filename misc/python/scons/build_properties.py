@@ -86,17 +86,6 @@ class FileProperties:
 			self.defines = {}
 		self.defines['BASENAME'] = self.basename
 	
-	#def getDefines(self, globalDefines=None):
-	#	"""
-	#	Returns a dictionary with the defines for this file.
-	#	"""
-	#	if globalDefines:
-	#		defines = self.defines.copy()
-	#		defines.update(globalDefines)
-	#		return defines
-	#	else:
-	#		return self.defines.copy()
-	
 	def update(self, env):
 		"""
 		Update the internal values with values from the external SCons
@@ -165,7 +154,8 @@ class ProjectProperties:
 	
 	def _updateList(self, list, dict, key):
 		try:
-			list += listify(dict[key])
+			if dict[key] is not None:
+				list += listify(dict[key])
 		except KeyError:
 			pass
 		return list

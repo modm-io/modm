@@ -36,9 +36,11 @@
 
 // ----------------------------------------------------------------------------	
 
-#ifndef	DOGM_VOLTAGE
-	#define	DOGM_VOLTAGE	3
-#endif
+namespace xpcc {
+	namespace dog_m16x {
+		EXTERN_FLASH(uint8_t configuration[10]);
+	}
+}
 
 // ----------------------------------------------------------------------------	
 
@@ -58,31 +60,11 @@ xpcc::DogM16x<SPI, CS, RS>::initialize()
 	CS::output();
 	RS::output();
 	
-#if (DOGM_VOLTAGE == 3)
-
-	writeCommand(0x39);
-	writeCommand(0x14);
-	writeCommand(0x55);
-	writeCommand(0x6d);
-	writeCommand(0x78);
-
-#elif (DOGM_VOLTAGE == 5)
-
-	writeCommand(0x39);
-	writeCommand(0x1C);
-	writeCommand(0x52);
-	writeCommand(0x69);
-	writeCommand(0x74);
-
-#else
-	#error "Unknown definition for 'DOGM_VOLTAGE', allowed values are '3' for 3,3V and '5' for 5V!"
-#endif
-	
-	writeCommand(0x0f);
-	writeCommand(0x01);		// clear display
-	writeCommand(0x03);		// return to home position
-	writeCommand(0x06);		// set cursor move direction
-	writeCommand(0x0c);		// display on, disable cursor, no blink
+	FlashPointer<uint8_t> cfgPtr(dog_m16x::configuration);
+	for (uint8_t i = 0; i < 10; ++i)
+	{
+		writeCommand(cfgPtr[i]);
+	}
 }
 
 template <typename SPI, typename CS, typename RS>

@@ -38,10 +38,12 @@ namespace xpcc
 	{
 		FLASH(uint8_t configuration[24]) =
 		{
+#if MCP2515_CLOCK == 16000000
+
 			// 10 kbps
-			0x04,
-			0xb6,
-			0xe7,
+			0x04,		// CNF3
+			0xb6,		// CNF2
+			0xe7,		// CNF1
 			
 			// 20 kbps
 			0x04,
@@ -59,9 +61,9 @@ namespace xpcc
 			0xc3,
 			
 			// 125 kbps
-			(1<<PHSEG21),					// CNF3
-			(1<<BTLMODE)|(1<<PHSEG11),		// CNF2
-			(1<<BRP2)|(1<<BRP1)|(1<<BRP0),	// CNF1
+			(1 << PHSEG21),
+			(1 << BTLMODE) | (1 << PHSEG11),
+			(1 << BRP2) | (1 << BRP1) | (1 << BRP0),
 			
 			// 250 kbps
 			0x03,
@@ -74,10 +76,55 @@ namespace xpcc
 			0x80,
 			
 			// 1 Mbps
-			(1<<PHSEG21),
-			(1<<BTLMODE)|(1<<PHSEG11),
+			(1 << PHSEG21),
+			(1 << BTLMODE) | (1 << PHSEG11),
 			0,
+
+#elif MCP2515_CLOCK == 20000000
+
+			// 10 kbps
+			0x04,		// CNF3
+			0xb6,		// CNF2
+			0x31,		// CNF1
 			
+			// 20 kbps
+			0x04,
+			0xb6,
+			0x18,
+		
+			// 50 kbps
+			0x04,
+			0xb6,
+			0x18,
+			
+			// 100 kbps
+			0x04,
+			0xb6,
+			0x04,
+			
+			// 125 kbps
+			0x04,
+			0xb6,
+			0x03,
+			
+			// 250 kbps
+			0x04,
+			0xb6,
+			0x01,
+			
+			// 500 kbps
+			0x04,
+			0xb6,
+			0x00,
+			
+			// 1 Mbps
+			0x02,
+			0x92,
+			0x00,
+
+#else
+	#error "Unknown value for MCP2515 clock frequency, please add the defines in 'mcp2515.cpp'"
+#endif
 		};
 	}
 }

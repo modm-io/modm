@@ -30,56 +30,38 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__CAN_HPP
-#define XPCC__CAN_HPP
-
-#include <stdint.h>
+#include "dog_m16x.hpp"
 
 namespace xpcc
 {
-	/**
-	 * @ingroup	driver
-	 * @headerfile	<xpcc/driver/can/can.hpp>
-	 */
-	class Can
+	namespace dog_m16x
 	{
-	public:
-		/** @brief	supported bitrates */
-		typedef enum {
-			BITRATE_10_KBPS	= 0,
-			BITRATE_20_KBPS	= 1,
-			BITRATE_50_KBPS	= 2,
-			BITRATE_100_KBPS = 3,
-			BITRATE_125_KBPS = 4,
-			BITRATE_250_KBPS = 5,
-			BITRATE_500_KBPS = 6,
-			BITRATE_1_MBPS = 7,
-		} Bitrate;
-		
-		/** @brief	*/
-		typedef enum {
-			NORMAL,
-			LISTEN_ONLY,
-			LOOPBACK,
-		} Mode;
-		
-		/** @brief	Representation of a CAN message */
-		struct Message
+		FLASH(uint8_t configuration[10]) =
 		{
-			Message(const uint32_t& identifier = 0, uint8_t length = 0) :
-				identifier(identifier), data(), flags(), length(length)
-			{
-			}
-			
-			uint32_t identifier;
-			uint8_t data[8];
-			struct {
-				bool rtr : 1;
-				bool extended : 1;
-			} flags;
-			uint8_t length;
-		};
-	};
-}
+#if (DOGM_VOLTAGE == 3)
 
-#endif // XPCC__CAN_HPP
+			0x39,
+			0x14,
+			0x55,
+			0x6d,
+			0x78,
+
+#elif (DOGM_VOLTAGE == 5)
+
+			0x39,
+			0x1C,
+			0x52,
+			0x69,
+			0x74,
+
+#else
+	#error "Unknown definition for 'DOGM_VOLTAGE', allowed values are '3' for 3,3V and '5' for 5V!"
+#endif
+			0x0f,
+			0x01,		// clear display
+			0x03,		// return to home position
+			0x06,		// set cursor move direction
+			0x0c,		// display on, disable cursor, no blink
+		};
+	}
+}

@@ -4,10 +4,9 @@ target: atxmega
 #target: pc
 
 atmega:
-#  device: atmega2560
   device: atmega644
-#  device: atmega8
   clock: 14745600
+#  device: atmega8
 #  clock: 1000000
   avrdude:
 #    programmer: stk500
@@ -17,38 +16,30 @@ atmega:
 
 atxmega:
   device: atxmega32a4
-#  device: atxmega128a1
   clock: 2000000
+#  device: atxmega128a1
 #  clock: 32000000
   avrdude:
     programmer: avrispmkII
     port: usb
 
 library:
-  debug:
-    logger:
-      defines:
-        FOOBAR: 2
-  math:
-  communication:
-    backend:
-  driver:
-    lcd:
-      defines:
-        DOGM_VOLTAGE: 3
-    can:
-      mcp2515:
+  xpcc:
+    driver:
+      lcd:
         defines:
-          CS: B,6
-          INT: B,3
-  hal:
-    peripheral:
-      avr:
-        mega:
-          uart:
-            defines:
-              UART0_RX_BUFFER_SIZE: 8
-              UART0_TX_BUFFER_SIZE: 32
+          DOGM_VOLTAGE: 3
+      can:
+        defines:
+          MCP2515_CLOCK: 16000000
+    hal:
+      peripheral:
+        avr:
+          mega:
+            uart:
+              defines:
+                UART0_RX_BUFFER_SIZE: 8
+                UART0_TX_BUFFER_SIZE: 32
 
 unittest:
   pc:
