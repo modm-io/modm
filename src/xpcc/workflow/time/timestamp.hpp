@@ -57,6 +57,12 @@ namespace xpcc
 			return Timestamp(time + other.time);
 		}
 		
+		inline Timestamp
+		operator - (const Timestamp& other) const
+		{
+			return Timestamp(time - other.time);
+		}
+		
 		inline bool
 		operator == (const Timestamp& other) const
 		{

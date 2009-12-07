@@ -40,21 +40,23 @@ last(&dummyFirst){
 }
 
 xpcc::communicationList::Entry::Entry(uint8_t typeInfo, const Header& header, SmartPayload &payload):
-typeInfo(typeInfo),
-next(0),
-header(header),
-payload(payload)
-{
+	typeInfo(typeInfo),
+	next(0),
+	header(header),
+	payload(payload),
+	time(InternalClock::now()),
+	tries(0){
 
 }
 
-xpcc::communicationList::Entry::Entry(uint8_t typeInfo, const Header& header):
-typeInfo(typeInfo),
-next(0),
-header(header),
-payload(SmartPayload())
-{
-
+xpcc::communicationList::Entry::Entry(uint8_t typeInfo, const Header& header) :
+	typeInfo(typeInfo), 
+	next(0), 
+	header(header), 
+	payload(SmartPayload()),
+	time(InternalClock::now()),
+	tries(0){
+	
 }
 
 const xpcc::communicationList::Entry *
@@ -69,6 +71,24 @@ xpcc::communicationList::Entry::headerFits(const Header& header) const
 	return header.source == this->header.destination && 
 			header.destination == this->header.source &&
 			header.packetIdentifier == this->header.packetIdentifier;
+}
+
+xpcc::communicationList::EntryDefault::EntryDefault(const Header& header):
+Entry(DEFAULT, header){
+}
+
+xpcc::communicationList::EntryDefault::EntryDefault(const Header& header, SmartPayload& payload):
+Entry(DEFAULT, header, payload){
+}
+
+xpcc::communicationList::EntryWithCallback::EntryWithCallback(const Header& header, SmartPayload& payload, ResponseCallback& responseCallback):
+Entry(CALLBACK, header, payload),
+responseCallback(responseCallback){
+}
+
+xpcc::communicationList::EntryWithCallback::EntryWithCallback(const Header& header, ResponseCallback& responseCallback):
+Entry(CALLBACK, header),
+responseCallback(responseCallback){
 }
 
 void
@@ -113,24 +133,6 @@ xpcc::communicationList::List::removeNext(Entry *fix)
 			tmp->next = 0;
 	}
 	return tmp;
-}
-
-xpcc::communicationList::EntryDefault::EntryDefault(const Header& header):
-Entry(DEFAULT, header){
-}
-
-xpcc::communicationList::EntryDefault::EntryDefault(const Header& header, SmartPayload& payload):
-Entry(DEFAULT, header, payload){
-}
-
-xpcc::communicationList::EntryWithCallback::EntryWithCallback(const Header& header, SmartPayload& payload, ResponseCallback& responseCallback):
-Entry(CALLBACK, header, payload),
-responseCallback(responseCallback){
-}
-
-xpcc::communicationList::EntryWithCallback::EntryWithCallback(const Header& header, ResponseCallback& responseCallback):
-Entry(CALLBACK, header),
-responseCallback(responseCallback){
 }
 
 void
@@ -198,11 +200,13 @@ xpcc::communicationList::List::handleWaitingMessages(Postman &postman, BackendIn
 				}
 				else{// action or response
 					if(postman.isComponentAvaliable(actual->header)){
+						// to one component on board inner component
 						if (actual->header.type == Header::REQUEST){
 							postman.deliverPacket(actual->header); // todo payload?
 							// todo handle postman errors?
 							if (actual->typeInfo == Entry::CALLBACK){
 								actual->state = Entry::WAIT_FOR_RESPONSE;
+								actual->time = InternalClock::now();
 								e = actual;
 							}
 							else{
@@ -211,21 +215,61 @@ xpcc::communicationList::List::handleWaitingMessages(Postman &postman, BackendIn
 							}
 						}
 						else {// (neg)response
-							// find one waiting callback and handle response
-							// but be carefull with e and actual.
-							e = actual;
+							// remove actual = e->next
+							// find one waiting request with callback and handle response
+							// responses are insertet at front, requests at end, 
+							// so search only after e (e->next is the first candidate)
+							//		handle found request and delete it
+							// delete actual
+							
+							this->removeNext(e);
+							
+							Entry *tmp = e;
+							while (Entry *s = tmp->next) {
+								if (s->header.type == Header::REQUEST 
+										&& s->state != Entry::WANT_TO_BE_SENT // must be WAIT_FOR_RESPONSE
+										&& s->headerFits(actual->header)) {
+									
+									this->removeNext(tmp);
+									
+									if(s->typeInfo == Entry::CALLBACK){
+										ResponseMessage message(actual->header, actual->payload);
+										((EntryWithCallback*)s)->responseCallback.handleResponse(message);
+									}
+									
+									delete s;
+									break;
+								}
+								tmp = s;
+							}
+							delete actual;
 						}
 					}
 					else {// destination not on board, message has to be sent out to backend
 						backend.sendPacket(actual->header, actual->payload);
 						actual->state = Entry::WAIT_FOR_ACK;
-						// todo somhow timeout
+						actual->time = InternalClock::now();
 						e = actual;
 					}
 				}
 				
 				break;
-			default:
+			case Entry::WAIT_FOR_ACK:
+			{
+				Timestamp a = actual->time;
+				Timestamp n = InternalClock::now();
+				Timestamp diff = n - a;
+				Timestamp cp(100);
+				if (diff > cp && actual->tries > 2){
+					this->removeNext(e);
+					delete actual;
+				}
+				else {
+					e = actual;
+				}
+				break;
+			}
+			default: // WAIT_FOR_RESPONSE think about if it has to be deleted, actually responses stay in the queue for ever if no response comes
 				break; // no action
 		}
 	
@@ -254,6 +298,9 @@ xpcc::communicationList::List::addResponse(const Header& header, SmartPayload& s
 	// one component calling one action on another component on same board
 	// handling its response in the same callbackfunction would cause a loop
 	// if responses and actions both are apended at the tail of the list.
+	// but now responses are handeled in reverse order that's not good
+	// what to do? a separator between responses and requests possible?
+	
 }
 
 void

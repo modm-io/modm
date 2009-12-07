@@ -47,6 +47,7 @@ namespace xpcc
 	public:
 
 		ResponseMessage(const Header& header, const uint8_t *payload, uint8_t payloadSize);
+		ResponseMessage(const Header& header, SmartPayload payload);
 		
 		const Header& header;
 		const uint8_t * const payload;
@@ -61,12 +62,15 @@ namespace xpcc
 	class ResponseCallback
 	{
 	public:
-		typedef void (AbstractComponent::*CallbackFunction)(ResponseMessage& message);
+		typedef void (AbstractComponent::*CallbackFunction)(const ResponseMessage& message);
 
 		ResponseCallback(AbstractComponent *object, CallbackFunction callbackFunction);
 		
 		void
 		handleResponse(const BackendInterface &backend);
+		
+		void
+		handleResponse(const ResponseMessage& message);
 		
 		AbstractComponent *object;
 		CallbackFunction callbackFunction;

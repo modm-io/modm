@@ -37,6 +37,7 @@
 #include "backend/backend_interface.hpp"
 #include "response_callback.hpp"
 #include "postman.hpp"
+#include "../hal/time/internal_clock.hpp"
 
 /**
  * @ingroup 	communication
@@ -106,7 +107,8 @@ namespace communicationList{
 		Header header;
 		SmartPayload payload;
 		State state;
-		
+		Timestamp time;
+		uint8_t tries;
 	};
 
 	class EntryDefault:public Entry{
@@ -166,7 +168,7 @@ namespace communicationList{
 		
 		
 		/**
-		 * @brief 		Does not handle responses which are not acknowlege.
+		 * @brief 		Does not handle requests which are not acknowlege.
 		 *
 		 */
 		void

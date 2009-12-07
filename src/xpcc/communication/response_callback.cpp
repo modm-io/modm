@@ -38,12 +38,23 @@ payload(payload),
 payloadSize(payloadSize){
 }
 
+xpcc::ResponseMessage::ResponseMessage(const Header& header, SmartPayload payload):
+header(header),
+payload(payload.getPointer()),
+payloadSize(payload.getSize()){
+}
+
 xpcc::ResponseCallback::ResponseCallback(AbstractComponent *object, CallbackFunction callbackFunction) :
 object( object ),
 callbackFunction ( callbackFunction ){
 	
 }
 		
+void
+xpcc::ResponseCallback::handleResponse(const ResponseMessage& message){
+	(object->*callbackFunction)(message);
+}
+
 void
 xpcc::ResponseCallback::handleResponse(const BackendInterface &backend){
 	ResponseMessage message(backend.getPacketHeader(), backend.getPacketPayload(), backend.getPacketPayloadSize());
