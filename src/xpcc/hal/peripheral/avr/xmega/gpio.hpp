@@ -93,12 +93,12 @@ namespace xpcc
 			else { \
 				output(); \
 			} \
-			PORT(port).PIN ## pin ## CTRL = config | ((invert) ? PORT_INVEN_bm : 0); \
+			PORT ## port ## _PIN ## pin ## CTRL = config | ((invert) ? PORT_INVEN_bm : 0); \
 		} \
 		\
-		ALWAYS_INLINE static void output() { PORT(port).DIRSET = (1 << pin); } \
-		ALWAYS_INLINE static void input() { PORT(port).DIRCLR = (1 << pin); } \
-		ALWAYS_INLINE static void set() { PORT(port).OUTSET = (1 << pin); } \
+		ALWAYS_INLINE static void output() { PORT ## port ## _DIRSET = (1 << pin); } \
+		ALWAYS_INLINE static void input() { PORT ## port ## _DIRCLR = (1 << pin); } \
+		ALWAYS_INLINE static void set() { PORT ## port ## _OUTSET = (1 << pin); } \
 		\
 		ALWAYS_INLINE static void \
 		set(bool status) { \
@@ -110,9 +110,9 @@ namespace xpcc
 			} \
 		} \
 		\
-		ALWAYS_INLINE static void reset() { PORT(port).OUTCLR = (1 << pin); } \
-		ALWAYS_INLINE static void toggle() { PORT(port).OUTTGL = (1 << pin); } \
-		ALWAYS_INLINE static bool get() { return (PORT(port).IN & (1 << pin)); } \
+		ALWAYS_INLINE static void reset() { PORT ## port ## _OUTCLR = (1 << pin); } \
+		ALWAYS_INLINE static void toggle() { PORT ## port ## _OUTTGL = (1 << pin); } \
+		ALWAYS_INLINE static bool get() { return (PORT ## port ## _IN & (1 << pin)); } \
 	}
 
 /**
@@ -128,11 +128,11 @@ namespace xpcc
 		configure(::xpcc::gpio::Configuration config = ::xpcc::gpio::NORMAL, \
 				  bool invert = false) { \
 			output(); \
-			PORT(port).PIN ## pin ## CTRL = config | ((invert) ? PORT_INVEN_bm : 0); \
+			PORT ## port ## _PIN ## pin ## CTRL = config | ((invert) ? PORT_INVEN_bm : 0); \
 		} \
 		\
-		ALWAYS_INLINE static void output() { PORT(port).DIRSET = (1 << pin); } \
-		ALWAYS_INLINE static void set() { PORT(port).OUTSET = (1 << pin); } \
+		ALWAYS_INLINE static void output() { PORT ## port ## _DIRSET = (1 << pin); } \
+		ALWAYS_INLINE static void set() { PORT ## port ## _OUTSET = (1 << pin); } \
 		\
 		ALWAYS_INLINE static void \
 		set(bool status) { \
@@ -144,8 +144,8 @@ namespace xpcc
 			} \
 		} \
 		\
-		ALWAYS_INLINE static void reset() { PORT(port).OUTCLR = (1 << pin); } \
-		ALWAYS_INLINE static void toggle() { PORT(port).OUTTGL = (1 << pin); } \
+		ALWAYS_INLINE static void reset() { PORT ## port ## _OUTCLR = (1 << pin); } \
+		ALWAYS_INLINE static void toggle() { PORT ## port ## _OUTTGL = (1 << pin); } \
 	}
 
 /**
@@ -161,11 +161,11 @@ namespace xpcc
 		configure(::xpcc::gpio::Configuration config = ::xpcc::gpio::NORMAL, \
 				  bool invert = false) { \
 			input(); \
-			PORT(port).PIN ## pin ## CTRL = config | ((invert) ? PORT_INVEN_bm : 0); \
+			PORT ## port ## _PIN ## pin ## CTRL = config | ((invert) ? PORT_INVEN_bm : 0); \
 		} \
 		\
-		ALWAYS_INLINE static void input() { PORT(port).DIRCLR = (1 << pin); } \
-		ALWAYS_INLINE static bool get() { return (PORT(port).IN & (1 << pin)); } \
+		ALWAYS_INLINE static void input() { PORT ## port ## _DIRCLR = (1 << pin); } \
+		ALWAYS_INLINE static bool get() { return (PORT ## port ## _IN & (1 << pin)); } \
 	}
 
 
