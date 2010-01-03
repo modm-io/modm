@@ -31,8 +31,17 @@
 
 #include "communication.hpp"
 
-xpcc::Communication::Communication(BackendInterface *backend,
-				Postman* postman):backend(backend),postman(postman),responseManager()
+#include <xpcc/debug/logger/logger.hpp>
+// set the Loglevel
+#undef  XPCC_LOG_LEVEL
+#define XPCC_LOG_LEVEL xpcc::log::DEBUG
+
+xpcc::Communication::Communication(
+		BackendInterface *backend,
+		Postman* postman) :
+	backend(backend),
+	postman(postman),
+	responseManager()
 {
 
 }
@@ -46,7 +55,7 @@ xpcc::Communication::~Communication()
 void
 xpcc::Communication::update(){
 	//Check if a new packet was received by the backend
-	while(backend->isPacketAvailable())
+	while( this->backend->isPacketAvailable() )
 	{
 		//switch(postman->deliverPacket(backend))){
 		//	case NO_ACTION: // send error message
@@ -55,16 +64,15 @@ xpcc::Communication::update(){
 		//	case NO_COMPONENT:
 		//	case NO_EVENT:
 		//}
-		const Header& header(backend->getPacketHeader());
+		const Header& header( this->backend->getPacketHeader() );
 		
-		if (header.type == Header::REQUEST && !header.isAcknowledge){
-			postman->deliverPacket(*backend);
+		if ( header.type == Header::REQUEST && !header.isAcknowledge ){
+			postman->deliverPacket( *backend );
 			// check here the deliver state and generate ack, but do it during response too, so synchronize acknowleging!
 		}
 		else{
-			responseManager.handlePacket(*backend);
+			responseManager.handlePacket( *backend );
 		}
-		
 				
 		backend->dropPacket();
 	}
@@ -78,13 +86,14 @@ xpcc::Communication::update(){
 uint8_t
 xpcc::Communication::getCurrentComponent() const
 {
-	return currentComponent;
+	return this->currentComponent;
 }
 		
 // ----------------------------------------------------------------------------
+
 void
 xpcc::Communication::setCurrentComponent(uint8_t id)
 {
-	currentComponent = id;
+	this->currentComponent = id;
 }
 

@@ -31,7 +31,11 @@
 
 #include "default_postman.hpp"
 
-xpcc::DefaultPostman::DefaultPostman(int /*eventlist*/, int /*componentlist*/)
+xpcc::DefaultPostman::DefaultPostman(
+		Pair<uint16_t, ResponseCallback> event,
+		Pair<uint16_t, ResponseCallback> component) :
+	event ( event ),
+	component ( component )
 {
 }
 
@@ -44,7 +48,46 @@ xpcc::DefaultPostman::~DefaultPostman()
 xpcc::DefaultPostman::DeliverInfo
 xpcc::DefaultPostman::deliverPacket(const BackendInterface& backend)
 {
-	backend.getPacketHeader();
+	const xpcc::Header &header = backend.getPacketHeader();
+
+	if( header.destination == this->component.first ) {
+		this->component.second.handleResponse( backend );
+	}
+
 	return OK;
+}
+
+// ----------------------------------------------------------------------------
+
+xpcc::DefaultPostman::DeliverInfo
+xpcc::DefaultPostman::deliverPacket(const Header &header, SmartPayload& payload)
+{
+	(void) header;
+	(void) payload;
+	// TODO ???
+	return NOT_IMPLEMENTED_YET_ERROR;
+}
+
+// ----------------------------------------------------------------------------
+
+xpcc::DefaultPostman::DeliverInfo
+xpcc::DefaultPostman::deliverPacket(const Header &header)
+{
+	(void) header;
+	// TODO ???
+	return NOT_IMPLEMENTED_YET_ERROR;
+}
+
+// ----------------------------------------------------------------------------
+
+bool
+xpcc::DefaultPostman::isComponentAvaliable(const Header& header) const
+{
+	if( header.destination == this->component.first ) {
+		return true;
+	}
+	else {
+		return false;
+	}
 }
 

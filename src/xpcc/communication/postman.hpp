@@ -54,6 +54,7 @@ namespace xpcc{
 			WRONG_ACTION_PARAMETER,
 			NO_EVENT,
 			WRONG_EVENT_PARAMETER,
+			NOT_IMPLEMENTED_YET_ERROR,
 		} DeliverInfo;
 		
 		virtual DeliverInfo

@@ -44,19 +44,30 @@ payload(payload.getPointer()),
 payloadSize(payload.getSize()){
 }
 
+xpcc::ResponseCallback::ResponseCallback() :
+	object( 0 ),
+	callbackFunction ( 0 )
+{
+}
+
 xpcc::ResponseCallback::ResponseCallback(AbstractComponent *object, CallbackFunction callbackFunction) :
-object( object ),
-callbackFunction ( callbackFunction ){
+	object( object ),
+	callbackFunction ( callbackFunction )
+{
 	
 }
 		
 void
 xpcc::ResponseCallback::handleResponse(const ResponseMessage& message){
-	(object->*callbackFunction)(message);
+	if( this->object != 0 ) {
+		(this->object->*callbackFunction)(message);
+	}
 }
 
 void
 xpcc::ResponseCallback::handleResponse(const BackendInterface &backend){
-	ResponseMessage message(backend.getPacketHeader(), backend.getPacketPayload(), backend.getPacketPayloadSize());
-	(object->*callbackFunction)(message);
+	if( this->object != 0 ) {
+		ResponseMessage message(backend.getPacketHeader(), backend.getPacketPayload(), backend.getPacketPayloadSize());
+		(this->object->*callbackFunction)(message);
+	}
 }

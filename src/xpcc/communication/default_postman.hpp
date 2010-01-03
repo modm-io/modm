@@ -43,13 +43,16 @@
  */
 
 #include "postman.hpp"
+#include "response_callback.hpp"
+
+#include "../data_structure/pair.hpp"
 
 namespace xpcc
 {
-	class DefaultPostman:Postman
+	class DefaultPostman : public Postman
 	{
 	public:
-		DefaultPostman(int eventlist, int componentlist);
+		DefaultPostman(Pair<uint16_t, ResponseCallback> event, Pair<uint16_t, ResponseCallback> component);
 		
 		~DefaultPostman();
 		
@@ -62,8 +65,12 @@ namespace xpcc
 		virtual DeliverInfo
 		deliverPacket(const Header &header);
 		
+		virtual bool
+		isComponentAvaliable(const Header& header) const;
+
 	private:
-		// the lists
+		Pair<uint16_t, ResponseCallback> event;
+		Pair<uint16_t, ResponseCallback> component;
 	};
 }
 

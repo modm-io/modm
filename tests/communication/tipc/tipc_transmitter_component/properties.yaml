@@ -1,0 +1,6 @@
+# Properties for 'communication/tipc'
+
+target: pc
+
+project:
+  executable: tipc_transmitter_component

@@ -57,12 +57,22 @@ namespace xpcc
 	/**
 	 * @ingroup		communication
 	 * @brief 		Callback type, which has to be passed to communication during
-	 *				actioncall in order to be able to recieve a response.
+	 *				actioncall in order to be able to receive a response.
+	 *				Is a \b Functor.
 	 */
 	class ResponseCallback
 	{
 	public:
 		typedef void (AbstractComponent::*CallbackFunction)(const ResponseMessage& message);
+
+		ResponseCallback();
+
+		template <class C>
+		ResponseCallback(C *object, void(C::*callbackFunction)(const ResponseMessage& message) ) :
+			object ( object ),
+			callbackFunction ( reinterpret_cast<CallbackFunction>(callbackFunction) )
+		{
+		}
 
 		ResponseCallback(AbstractComponent *object, CallbackFunction callbackFunction);
 		
