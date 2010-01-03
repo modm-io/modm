@@ -1,3 +1,6 @@
 # Properties for 'communication/tipc'
 
 target: pc
+
+project:
+  executable: raw_tipc_receiver

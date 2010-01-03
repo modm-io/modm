@@ -25,35 +25,32 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: raw_tipc_receiver.cpp 88 2009-10-16 23:07:26Z dergraaf $
+ * $Id$
  */
 // ----------------------------------------------------------------------------
 
-#include <iostream>
-#include <xpcc/debug/logger/logger.hpp>
-#include <xpcc/debug/logger/backend/std/std_log_device.hpp>
 
 #include <xpcc/communication/backend/tipc/tipc.hpp>
 
-xpcc::log::DeviceStd device;
+#include <xpcc/debug/logger/imp/std.hpp>
+// set the Loglevel
+#undef  XPCC_LOG_LEVEL
+#define XPCC_LOG_LEVEL xpcc::log::DEBUG
 
 int
 main()
 {
-	xpcc::log::setDevice( device );
-	xpcc::log::setFilter(xpcc::log::DEBUG);
-
 	xpcc::log::info << "########## XPCC TIPC RAW Test ##########" << xpcc::flush;
 
-	xpcc::tipc::Tipc tipc;
+	xpcc::tipc::Receiver receiver;
 
-	tipc.addReceiverId(0x10);
-	tipc.addEventId(0x01);
+	receiver.addReceiverId(0x10);
+	receiver.addEventId(0x01);
 
 	while(1) {
-		if( tipc.isPacketAvailable() ) {
-			const xpcc::Header& header =  tipc.getPacketHeader();
-			const uint8_t* payload = tipc.getPacketPayload();
+		if( receiver.hasPacket() ) {
+			const xpcc::Header& header =  receiver.frontHeader();
+			const uint8_t* payload = receiver.frontPayload();
 
 			XPCC_LOG_INFO << XPCC_FILE_INFO << "has ";
 			XPCC_LOG_INFO << ((header.destination != 0) ? "ACTION" : "EVENT");
@@ -61,12 +58,7 @@ main()
 			XPCC_LOG_INFO << " value:" << *(int*) payload;
 			XPCC_LOG_INFO << xpcc::flush;
 
-			if( header.destination != 0 ) {
-				xpcc::Header ackHeader( xpcc::Header::REQUEST, true, header.source, header.destination, 0x01 );
-				tipc.sendPacket(ackHeader);
-			}
-
-			tipc.dropPacket();
+			receiver.popFront();
 		}
 		else {
 			XPCC_LOG_DEBUG << XPCC_FILE_INFO << "has no packet" << xpcc::flush;

@@ -29,24 +29,19 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <iostream>
-#include <xpcc/debug/logger/logger.hpp>
-#include <xpcc/debug/logger/backend/std/std_log_device.hpp>
-
 #include <xpcc/communication/backend/tipc/tipc.hpp>
 
-xpcc::log::DeviceStd device;
+#include <xpcc/debug/logger/imp/std.hpp>
+// set the Loglevel
+#undef  XPCC_LOG_LEVEL
+#define XPCC_LOG_LEVEL xpcc::log::DEBUG
 
 int
 main()
 {
-	xpcc::log::setDevice( device );
-	xpcc::log::setFilter(xpcc::log::DEBUG);
-
 	xpcc::log::info << "########## XPCC TIPC RAW Test TRANSMIT ##########" << xpcc::flush;
 
-	xpcc::tipc::Tipc tipc;
-	tipc.addReceiverId(0x20);
+	xpcc::tipc::Transmitter transmitter;
 
 	xpcc::Header actionHeader( xpcc::Header::REQUEST, false, 0x10, 0x20, 0x01 );	// ACTION
 	xpcc::Header eventHeader( xpcc::Header::REQUEST, false, 0x00, 0x20, 0x01 );	// ACTION
@@ -54,24 +49,11 @@ main()
 	int data(0);
 
 	while(1) {
-		data++;
 		xpcc::SmartPayload payload(&data);
 		xpcc::log::info << data << xpcc::flush;
-		tipc.sendPacket(actionHeader, payload);
-		tipc.sendPacket(eventHeader, payload);
-
-		if ( tipc.isPacketAvailable() ) {
-			const xpcc::Header& header =  tipc.getPacketHeader();
-
-			XPCC_LOG_INFO << XPCC_FILE_INFO << "has";
-			XPCC_LOG_INFO << ((header.destination != 0) ? " ACTION" : " EVENT");
-			XPCC_LOG_INFO << ((header.isAcknowledge) ? " ACK" : "");
-			XPCC_LOG_INFO << " from:" << (int)header.source;
-			XPCC_LOG_INFO << xpcc::flush;
-
-			tipc.dropPacket();
-		}
-
+		transmitter.transmitPacket(actionHeader, payload);
+		transmitter.transmitPacket(eventHeader, payload);
+		data++;
 		sleep(1);
 	}
 
