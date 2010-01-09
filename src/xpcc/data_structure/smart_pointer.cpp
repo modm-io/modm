@@ -2,7 +2,7 @@
 // ----------------------------------------------------------------------------
 /* Copyright (c) 2009, Roboterclub Aachen e.V.
  * All rights reserved.
- *
+ * 
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *     * Redistributions of source code must retain the above copyright
@@ -13,7 +13,7 @@
  *     * Neither the name of the Roboterclub Aachen e.V. nor the
  *       names of its contributors may be used to endorse or promote products
  *       derived from this software without specific prior written permission.
- *
+ * 
  * THIS SOFTWARE IS PROVIDED BY ROBOTERCLUB AACHEN E.V. ''AS IS'' AND ANY
  * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -24,81 +24,70 @@
  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- * $Id: tipc.cpp 92 2009-10-17 15:54:22Z thundernail $
+ * 
+ * $Id: smart_payload.hpp 77 2009-10-15 18:34:29Z thundernail $
  */
 // ----------------------------------------------------------------------------
 
-#include "tipc.hpp"
+#include "smart_pointer.hpp"
 
-xpcc::tipc::Tipc::Tipc( ) :
-	receiver( ),
-	transmitter( )
+
+xpcc::SmartPointer::SmartPointer() :
+	ptr(new uint8_t[2])
 {
-
+	ptr[0] = 1;
+	ptr[1] = 0;
 }
 
 // ----------------------------------------------------------------------------
 
-xpcc::tipc::Tipc::~Tipc()
+xpcc::SmartPointer::SmartPointer(const SmartPointer& other) :
+	ptr(other.ptr)
 {
-
+	ptr[0]++;
 }
 
 // ----------------------------------------------------------------------------
 
-bool
-xpcc::tipc::Tipc::isPacketAvailable() const
+xpcc::SmartPointer::SmartPointer(uint8_t size) :
+	ptr(new uint8_t[size+2])
 {
-	return this->receiver.hasPacket();
+	ptr[0] = 1;
+	ptr[1] = size;
 }
 
 // ----------------------------------------------------------------------------
-
-const xpcc::Header&
-xpcc::tipc::Tipc::getPacketHeader() const
+		
+xpcc::SmartPointer::~SmartPointer()
 {
-	return this->receiver.frontHeader();
+	if (--ptr[0] == 0) {
+		delete[] ptr;
+	}
 }
 
 // ----------------------------------------------------------------------------
 
 const uint8_t *
-xpcc::tipc::Tipc::getPacketPayload() const
+xpcc::SmartPointer::getPointer() const
 {
-	return this->receiver.frontPayload();
+	if( ptr[1] > 0 ) {
+		return &ptr[2];
+	}
+	else {
+		return 0;
+	}
 }
 
 // ----------------------------------------------------------------------------
 
-uint8_t
-xpcc::tipc::Tipc::getPacketPayloadSize() const
+uint8_t *
+xpcc::SmartPointer::getPointer()
 {
-	return this->receiver.frontPayloadSize();
+	if( ptr[1] > 0 ) {
+		return &ptr[2];
+	}
+	else {
+		return 0;
+	}
 }
 
-// ----------------------------------------------------------------------------
-
-void
-xpcc::tipc::Tipc::dropPacket()
-{
-	this->receiver.popFront();
-}
-
-// ----------------------------------------------------------------------------
-
-void
-xpcc::tipc::Tipc::sendPacket(const xpcc::Header &header, const SmartPayload& payload)
-{
-	this->transmitter.transmitPacket(header, payload);
-}
-
-// ----------------------------------------------------------------------------
-
-void
-xpcc::tipc::Tipc::update()
-{
-	// nothing to do, becaus TipcReceiver is using threads
-}
-
-// ----------------------------------------------------------------------------

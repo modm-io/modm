@@ -31,17 +31,17 @@
 
 
 #include "response_callback.hpp"
-
+/*
 xpcc::ResponseMessage::ResponseMessage(const Header& header, const uint8_t *payload, uint8_t payloadSize):
 header(header),
 payload(payload),
 payloadSize(payloadSize){
 }
-
-xpcc::ResponseMessage::ResponseMessage(const Header& header, SmartPayload payload):
-header(header),
-payload(payload.getPointer()),
-payloadSize(payload.getSize()){
+*/
+xpcc::ResponseMessage::ResponseMessage(const Header& header, const SmartPointer& payload):
+	header(header),
+	payload(payload)
+{
 }
 
 xpcc::ResponseCallback::ResponseCallback() :
@@ -67,7 +67,7 @@ xpcc::ResponseCallback::handleResponse(const ResponseMessage& message){
 void
 xpcc::ResponseCallback::handleResponse(const BackendInterface &backend){
 	if( this->object != 0 ) {
-		ResponseMessage message(backend.getPacketHeader(), backend.getPacketPayload(), backend.getPacketPayloadSize());
+		ResponseMessage message( backend.getPacketHeader(), backend.getPacketPayload() );
 		(this->object->*callbackFunction)(message);
 	}
 }

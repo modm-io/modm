@@ -35,9 +35,8 @@
 #include <sys/socket.h>
 #include <linux/tipc.h>
 #include <boost/shared_array.hpp>
-#include <cstring>
 
-#include "../../../debug/logger/logger.hpp"
+#include "../../debug/logger/logger.hpp"
 #undef  XPCC_LOG_LEVEL
 #define XPCC_LOG_LEVEL xpcc::log::INFO
 
@@ -54,10 +53,11 @@ xpcc::tipc::TransmitterSocket::~TransmitterSocket()
 }
 // -------------------------------------------------------------------------------------------------------
 void 
-xpcc::tipc::TransmitterSocket::transmitPayload(	unsigned int typeId,
-												unsigned int instanceId,
-												char* payloadPointer,
-												size_t length)  
+xpcc::tipc::TransmitterSocket::transmitPayload(
+		unsigned int typeId,
+		unsigned int instanceId,
+		const uint8_t* packet,
+		size_t length)
 {
 	int sendToResult	=	0;
 	
@@ -82,7 +82,7 @@ xpcc::tipc::TransmitterSocket::transmitPayload(	unsigned int typeId,
 
 	// Put things together - first the tipc-header and then the payload
 	memcpy( tipcPacketPointer.get(), &header, sizeof(Header) );
-	memcpy( tipcPacketPointer.get()+sizeof(Header), payloadPointer, length);
+	memcpy( tipcPacketPointer.get()+sizeof(Header), packet, length);
 
 	sendToResult	=	sendto(	this->socketDescriptor_,
 								(void*)tipcPacketPointer.get(),

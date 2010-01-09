@@ -47,7 +47,7 @@ class Receiver : public xpcc::AbstractComponent
 		{
 			XPCC_LOG_INFO << XPCC_FILE_INFO << "has ACTION";
 			XPCC_LOG_INFO << " from:" << (int)message.header.source;
-			XPCC_LOG_INFO << " value:" << *(int*) message.payload;
+			XPCC_LOG_INFO << " value:" << *(int*) message.payload.getPointer();
 			XPCC_LOG_INFO << xpcc::flush;
 		}
 
@@ -56,7 +56,7 @@ class Receiver : public xpcc::AbstractComponent
 		{
 			XPCC_LOG_INFO << XPCC_FILE_INFO << "has EVENT";
 			XPCC_LOG_INFO << " from:" << (int)message.header.source;
-			XPCC_LOG_INFO << " value:" << *(int*) message.payload;
+			XPCC_LOG_INFO << " value:" << *(int*) message.payload.getPointer();
 			XPCC_LOG_INFO << xpcc::flush;
 		}
 };
@@ -78,14 +78,15 @@ main()
 
 	// the connection between messageID and callback-methods
 	// EVENT = 0x01;
-	xpcc::Pair<uint16_t, xpcc::ResponseCallback> event;
-	event.first = 0x01;
-	event.second = xpcc::ResponseCallback(&receiver, &Receiver::eventCallback);
+	xpcc::Pair<uint16_t, xpcc::ResponseCallback> event = {
+			0x01,
+			xpcc::ResponseCallback(&receiver, &Receiver::eventCallback)
+	};
 	// ACTION = 0x10;
-	xpcc::Pair<uint16_t, xpcc::ResponseCallback> action;
-	action.first = 0x10;
-
-	action.second = xpcc::ResponseCallback(&receiver, &Receiver::actionCallback);
+	xpcc::Pair<uint16_t, xpcc::ResponseCallback> action = {
+			0x10,
+			xpcc::ResponseCallback(&receiver, &Receiver::actionCallback)
+	};
 
 	// set the 'list' of connections to the postman
 	xpcc::DefaultPostman postman( event, action );

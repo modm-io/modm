@@ -1,7 +1,7 @@
 
 #target: atmega
-target: atxmega
-#target: pc
+#target: atxmega
+target: pc
 
 atmega:
   device: atmega644

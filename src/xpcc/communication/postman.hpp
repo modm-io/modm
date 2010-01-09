@@ -61,7 +61,7 @@ namespace xpcc{
 		deliverPacket(const BackendInterface& backend) = 0;
 		
 		virtual DeliverInfo
-		deliverPacket(const Header& header, SmartPayload& payload) = 0;
+		deliverPacket(const Header& header, SmartPointer& payload) = 0;
 		
 		virtual DeliverInfo
 		deliverPacket(const Header& header) = 0;

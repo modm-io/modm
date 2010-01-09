@@ -37,8 +37,7 @@
 #include <bitset>
 
 #include "tipc_transmitter_socket.hpp"
-
-#include "../backend_interface.hpp"
+#include <xpcc/data_structure/smart_pointer.hpp>
 
 namespace xpcc {
 	namespace tipc {
@@ -59,7 +58,10 @@ namespace xpcc {
 				~Transmitter();
 		
 				void 
-				transmitPacket(	const xpcc::Header &header, const SmartPayload& payload);
+				transmitRequest( uint8_t destination, const SmartPointer& payload );
+
+				void
+				transmitEvent( uint8_t event, const SmartPointer& payload );
 		
 			private:
 				TransmitterSocket 	tipcTransmitterSocket_;

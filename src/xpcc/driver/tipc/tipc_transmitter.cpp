@@ -32,9 +32,7 @@
 #include "tipc_transmitter.hpp"
 #include "header.hpp"
 
-#include "../../../debug/logger/logger.hpp"
-
-#include <boost/shared_array.hpp>
+#include "../../debug/logger/logger.hpp"
 
 // TODO: IMPORTANT! If the TIPC-Module is not loaded terminate with appropriate
 // error message!!!!
@@ -49,40 +47,24 @@ xpcc::tipc::Transmitter::~Transmitter()
 {
 }
 // -------------------------------------------------------------------------
-// Attention: This method modifies the header information of the packet!!
 void 
-xpcc::tipc::Transmitter::transmitPacket( const xpcc::Header &header, const SmartPayload& payload )
+xpcc::tipc::Transmitter::transmitRequest( uint8_t destination, const SmartPointer& payload )
 {
-	// Speicherplatz fuers XPCC-Packet erstellen
-	boost::shared_array<char> xpccPacket(new char[sizeof(xpcc::Header) + payload.getSize()]);
-	
-	// Payload an die richtige Stelle im Packet kopieren (hinter den Header)
-	// Es könnte auch Packete ohne Payload geben.
-	if ( payload.getSize() > 0 ) {
-		memcpy(	xpccPacket.get() + sizeof(xpcc::Header),
-				payload.getPointer(),
-				payload.getSize());
-	}
-	
-	// Header setzen vor die payload
-	( *(xpcc::Header*) xpccPacket.get() ) = header;
-
-	if ( header.destination != 0 ) {
-		// transmitt a request
-		this->tipcTransmitterSocket_.transmitPayload(	REQUEST_OFFSET + header.destination + TYPE_ID_OFFSET,
-														0,
-														xpccPacket.get(),
-														sizeof(xpcc::Header) + payload.getSize() );
-	}
-	else {
-		// transmitt a request
-		this->tipcTransmitterSocket_.transmitPayload(	EVENT_OFFSET + header.packetIdentifier + TYPE_ID_OFFSET,
-														0,
-														xpccPacket.get(),
-														sizeof(xpcc::Header) + payload.getSize() );
-
-	}
-
+	this->tipcTransmitterSocket_.transmitPayload(
+			REQUEST_OFFSET + destination + TYPE_ID_OFFSET,
+			0,
+			payload.getPointer(),
+			payload.getSize() );
+}
+// -------------------------------------------------------------------------
+void
+xpcc::tipc::Transmitter::transmitEvent( uint8_t event, const SmartPointer& payload )
+{
+	this->tipcTransmitterSocket_.transmitPayload(
+			EVENT_OFFSET + event + TYPE_ID_OFFSET,
+			0,
+			payload.getPointer(),
+			payload.getSize() );
 }
 // -------------------------------------------------------------------------
 

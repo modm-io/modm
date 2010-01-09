@@ -60,7 +60,7 @@ xpcc::DefaultPostman::deliverPacket(const BackendInterface& backend)
 // ----------------------------------------------------------------------------
 
 xpcc::DefaultPostman::DeliverInfo
-xpcc::DefaultPostman::deliverPacket(const Header &header, SmartPayload& payload)
+xpcc::DefaultPostman::deliverPacket(const Header &header, SmartPointer& payload)
 {
 	(void) header;
 	(void) payload;

@@ -68,10 +68,17 @@ namespace xpcc
 	 * 
 	 * @note
 	 * Even if this class provides public attributes it is recommend to use
-	 * the accessor methods, because as soon as C++0x is available the
+	 * the access methods, because as soon as C++0x is available the
 	 * implementation will be changed and the attributes will be made private.
 	 * Until then just ignore that you can access them directly ;-)
 	 * 
+	 * \code
+	 *	xpcc::Pair<int, float> pair = {
+	 * 			1203,
+	 * 			1035.234
+	 * 	};
+	 * \endcode
+	 *
 	 * @see	xpcc::LinearInterpolation
 	 */
 	template<typename T1, typename T2>

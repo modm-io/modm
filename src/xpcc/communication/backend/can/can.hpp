@@ -45,7 +45,7 @@ namespace xpcc
 		~CanInterface();
 		
 		virtual void
-		sendPacket(const Header &header, const SmartPayload& payload);
+		sendPacket(const Header &header, const SmartPointer& payload);
 		
 		virtual bool
 		isPacketAvailable() const {
@@ -57,9 +57,9 @@ namespace xpcc
 			return receivedMessages->header;
 		}
 		
-		virtual const uint8_t *
+		virtual const xpcc::SmartPointer&
 		getPacketPayload() const {
-			return receivedMessages->data;
+			return this->receivedMessages->data;
 		}
 		
 		virtual uint8_t
@@ -110,7 +110,7 @@ namespace xpcc
 		class SendListItem
 		{
 		public:
-			SendListItem(const Header& header, const SmartPayload& payload) :
+			SendListItem(const Header& header, const SmartPointer& payload) :
 				next(0), header(header), payload(payload),
 				fragmentIndex(0) {
 			}
@@ -118,7 +118,7 @@ namespace xpcc
 			SendListItem *next;
 			
 			Header header;
-			SmartPayload payload;
+			SmartPointer payload;
 			
 			uint8_t fragmentIndex;
 		
@@ -140,7 +140,7 @@ namespace xpcc
 			ReceiveListItem *next;
 			
 			Header header;
-			uint8_t *data;
+			SmartPointer data;
 			uint8_t size;
 			
 			uint8_t receivedFragments;

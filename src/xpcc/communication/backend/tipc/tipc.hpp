@@ -33,9 +33,10 @@
 
 
 #include "../backend_interface.hpp"
-#include "header.hpp"
-#include "tipc_receiver.hpp"
-#include "tipc_transmitter.hpp"
+#include <xpcc/driver/tipc/header.hpp>
+#include <xpcc/driver/tipc/tipc_receiver.hpp>
+#include <xpcc/driver/tipc/tipc_transmitter.hpp>
+#include <xpcc/data_structure/smart_pointer.hpp>
 
 namespace xpcc {
 	namespace tipc {
@@ -75,7 +76,7 @@ namespace xpcc {
 				virtual const xpcc::Header&
 				getPacketHeader() const;
 
-				virtual const uint8_t *
+				virtual const xpcc::SmartPointer&
 				getPacketPayload() const;
 
 				virtual uint8_t
@@ -91,7 +92,7 @@ namespace xpcc {
 				//!
 				//! @return	\b true if the packet could be send, \b false otherwise.
 				virtual void
-				sendPacket(const xpcc::Header &header, const SmartPayload& payload = SmartPayload());
+				sendPacket(const xpcc::Header &header, const SmartPointer& payload = SmartPointer());
 
 			private :
 				Receiver	receiver;

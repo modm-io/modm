@@ -13,7 +13,7 @@ xpcc::CanInterface::~CanInterface() {
 }
 
 void
-xpcc::CanInterface::sendPacket(const Header &header, const SmartPayload& payload)
+xpcc::CanInterface::sendPacket(const Header &header, const SmartPointer& payload)
 {
 	if (0)
 	{

@@ -58,12 +58,12 @@ xpcc::tipc::Tipc::isPacketAvailable() const
 const xpcc::Header&
 xpcc::tipc::Tipc::getPacketHeader() const
 {
-	return this->receiver.frontHeader();
+	return *(xpcc::Header*)this->receiver.frontPayload().getPointer();
 }
 
 // ----------------------------------------------------------------------------
 
-const uint8_t *
+const xpcc::SmartPointer&
 xpcc::tipc::Tipc::getPacketPayload() const
 {
 	return this->receiver.frontPayload();
@@ -74,7 +74,7 @@ xpcc::tipc::Tipc::getPacketPayload() const
 uint8_t
 xpcc::tipc::Tipc::getPacketPayloadSize() const
 {
-	return this->receiver.frontPayloadSize();
+	return this->receiver.frontPayload().getSize();
 }
 
 // ----------------------------------------------------------------------------
@@ -88,9 +88,28 @@ xpcc::tipc::Tipc::dropPacket()
 // ----------------------------------------------------------------------------
 
 void
-xpcc::tipc::Tipc::sendPacket(const xpcc::Header &header, const SmartPayload& payload)
+xpcc::tipc::Tipc::sendPacket(const xpcc::Header &header, const SmartPointer& payload)
 {
-	this->transmitter.transmitPacket(header, payload);
+	SmartPointer combinedPayload( sizeof(xpcc::Header) + payload.getSize() );
+
+	memcpy(	combinedPayload.getPointer(), &header, sizeof(xpcc::Header) );
+
+	// place payload behind the header
+	if ( payload.getSize() > 0 ) {
+		memcpy(	combinedPayload.getPointer() + sizeof(xpcc::Header),
+				payload.getPointer(),
+				payload.getSize());
+	}
+
+	if ( header.destination != 0 ) {
+		// transmit a REQUENST
+		this->transmitter.transmitRequest( header.destination, combinedPayload );;
+	}
+	else {
+		// transmit an EVENT
+		this->transmitter.transmitEvent( header.packetIdentifier, combinedPayload );
+
+	}
 }
 
 // ----------------------------------------------------------------------------
@@ -98,7 +117,7 @@ xpcc::tipc::Tipc::sendPacket(const xpcc::Header &header, const SmartPayload& pay
 void
 xpcc::tipc::Tipc::update()
 {
-	// nothing to do, becaus TipcReceiver is using threads
+	// nothing to do, because TipcReceiver is using threads
 }
 
 // ----------------------------------------------------------------------------

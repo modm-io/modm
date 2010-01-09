@@ -46,12 +46,11 @@ namespace xpcc
 	{
 	public:
 
-		ResponseMessage(const Header& header, const uint8_t *payload, uint8_t payloadSize);
-		ResponseMessage(const Header& header, SmartPayload payload);
+		/*ResponseMessage(const Header& header, const uint8_t *payload, uint8_t payloadSize);*/
+		ResponseMessage(const Header& header, const SmartPointer& payload);
 		
 		const Header& header;
-		const uint8_t * const payload;
-		const uint8_t payloadSize;
+		const SmartPointer payload;
 	};
 	
 	/**

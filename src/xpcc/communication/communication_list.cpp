@@ -39,7 +39,7 @@ last(&dummyFirst){
 
 }
 
-xpcc::communicationList::Entry::Entry(uint8_t typeInfo, const Header& header, SmartPayload &payload):
+xpcc::communicationList::Entry::Entry(uint8_t typeInfo, const Header& header, SmartPointer &payload):
 	typeInfo(typeInfo),
 	next(0),
 	header(header),
@@ -53,7 +53,7 @@ xpcc::communicationList::Entry::Entry(uint8_t typeInfo, const Header& header) :
 	typeInfo(typeInfo), 
 	next(0), 
 	header(header), 
-	payload(SmartPayload()),
+	payload(SmartPointer()),
 	time(InternalClock::now()),
 	tries(0){
 	
@@ -77,11 +77,11 @@ xpcc::communicationList::EntryDefault::EntryDefault(const Header& header):
 Entry(DEFAULT, header){
 }
 
-xpcc::communicationList::EntryDefault::EntryDefault(const Header& header, SmartPayload& payload):
+xpcc::communicationList::EntryDefault::EntryDefault(const Header& header, SmartPointer& payload):
 Entry(DEFAULT, header, payload){
 }
 
-xpcc::communicationList::EntryWithCallback::EntryWithCallback(const Header& header, SmartPayload& payload, ResponseCallback& responseCallback):
+xpcc::communicationList::EntryWithCallback::EntryWithCallback(const Header& header, SmartPointer& payload, ResponseCallback& responseCallback):
 Entry(CALLBACK, header, payload),
 responseCallback(responseCallback){
 }
@@ -194,7 +194,7 @@ xpcc::communicationList::List::handleWaitingMessages(Postman &postman, BackendIn
 			case Entry::WANT_TO_BE_SENT:
 				if (actual->header.destination == 0){// event
 					postman.deliverPacket(actual->header);
-					backend.sendPacket(actual->header,SmartPayload());
+					backend.sendPacket(actual->header,SmartPointer());
 					this->removeNext(e);
 					delete actual;
 				}
@@ -279,7 +279,7 @@ xpcc::communicationList::List::handleWaitingMessages(Postman &postman, BackendIn
 }
 
 void
-xpcc::communicationList::List::addEvent(const Header& header, SmartPayload& smartPayload){
+xpcc::communicationList::List::addEvent(const Header& header, SmartPointer& smartPayload){
 	Entry *e = new EntryDefault(header, smartPayload);
 	e->state = Entry::WANT_TO_BE_SENT;
 
@@ -287,7 +287,7 @@ xpcc::communicationList::List::addEvent(const Header& header, SmartPayload& smar
 }
 
 void
-xpcc::communicationList::List::addResponse(const Header& header, SmartPayload& smartPayload){
+xpcc::communicationList::List::addResponse(const Header& header, SmartPointer& smartPayload){
 	Entry *e = new EntryDefault(header, smartPayload);
 	e->state = Entry::WANT_TO_BE_SENT;
 
@@ -305,7 +305,7 @@ xpcc::communicationList::List::addResponse(const Header& header, SmartPayload& s
 
 void
 xpcc::communicationList::List::addActionCall(const Header& header){
-	SmartPayload p;
+	SmartPointer p;
 	Entry *e = new EntryDefault(header, p);
 	e->state = Entry::WANT_TO_BE_SENT;
 
@@ -313,7 +313,7 @@ xpcc::communicationList::List::addActionCall(const Header& header){
 }
 
 void
-xpcc::communicationList::List::addActionCall(const Header& header, SmartPayload& smartPayload){
+xpcc::communicationList::List::addActionCall(const Header& header, SmartPointer& smartPayload){
 	Entry *e = new EntryDefault(header, smartPayload);
 	e->state = Entry::WANT_TO_BE_SENT;
 	
@@ -321,7 +321,7 @@ xpcc::communicationList::List::addActionCall(const Header& header, SmartPayload&
 }
 
 void
-xpcc::communicationList::List::addActionCall(const Header& header, SmartPayload& smartPayload, ResponseCallback& responseCallback){
+xpcc::communicationList::List::addActionCall(const Header& header, SmartPointer& smartPayload, ResponseCallback& responseCallback){
 	Entry *e = new EntryWithCallback(header, smartPayload, responseCallback);
 	e->state = Entry::WANT_TO_BE_SENT;
 

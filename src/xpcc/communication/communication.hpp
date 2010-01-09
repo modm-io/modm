@@ -114,7 +114,7 @@ namespace xpcc
 		communicationList::List responseManager;
 		
 		void
-		waitForAcknowledge(const Header &header, const SmartPayload& payload);
+		waitForAcknowledge(const Header &header, const SmartPointer& payload);
 		
 		
 	};

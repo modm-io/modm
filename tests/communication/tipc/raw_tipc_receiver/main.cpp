@@ -30,7 +30,7 @@
 // ----------------------------------------------------------------------------
 
 
-#include <xpcc/communication/backend/tipc/tipc.hpp>
+#include <xpcc/driver/tipc/tipc_receiver.hpp>
 
 #include <xpcc/debug/logger/imp/std.hpp>
 // set the Loglevel
@@ -49,13 +49,10 @@ main()
 
 	while(1) {
 		if( receiver.hasPacket() ) {
-			const xpcc::Header& header =  receiver.frontHeader();
-			const uint8_t* payload = receiver.frontPayload();
+			const xpcc::SmartPointer payload( receiver.frontPayload() );
 
 			XPCC_LOG_INFO << XPCC_FILE_INFO << "has ";
-			XPCC_LOG_INFO << ((header.destination != 0) ? "ACTION" : "EVENT");
-			XPCC_LOG_INFO << " from:" << (int)header.source;
-			XPCC_LOG_INFO << " value:" << *(int*) payload;
+			XPCC_LOG_INFO << " value:" << *(int*) payload.getPointer();
 			XPCC_LOG_INFO << xpcc::flush;
 
 			receiver.popFront();

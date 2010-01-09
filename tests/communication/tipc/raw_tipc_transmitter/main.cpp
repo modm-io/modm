@@ -29,7 +29,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/communication/backend/tipc/tipc.hpp>
+//#include <xpcc/communication/backend/tipc/tipc.hpp>
+#include <xpcc/driver/tipc/tipc_transmitter.hpp>
 
 #include <xpcc/debug/logger/imp/std.hpp>
 // set the Loglevel
@@ -43,17 +44,21 @@ main()
 
 	xpcc::tipc::Transmitter transmitter;
 
-	xpcc::Header actionHeader( xpcc::Header::REQUEST, false, 0x10, 0x20, 0x01 );	// ACTION
-	xpcc::Header eventHeader( xpcc::Header::REQUEST, false, 0x00, 0x20, 0x01 );	// ACTION
-
-	int data(0);
+	int data1(0);
+	int data2(0);
 
 	while(1) {
-		xpcc::SmartPayload payload(&data);
-		xpcc::log::info << data << xpcc::flush;
-		transmitter.transmitPacket(actionHeader, payload);
-		transmitter.transmitPacket(eventHeader, payload);
-		data++;
+		xpcc::log::info << "data1=" << data1 << ", data2=" << data2 << xpcc::flush;
+
+		xpcc::SmartPointer payload1(&data1);
+		transmitter.transmitRequest(10, payload1);
+
+		xpcc::SmartPointer payload2(&data2);
+		transmitter.transmitEvent(1, payload2);
+
+		data1++;
+		data2--;
+
 		sleep(1);
 	}
 

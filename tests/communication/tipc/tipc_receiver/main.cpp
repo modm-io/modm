@@ -50,12 +50,12 @@ main()
 	while(1) {
 		if( tipc.isPacketAvailable() ) {
 			const xpcc::Header& header =  tipc.getPacketHeader();
-			const uint8_t* payload = tipc.getPacketPayload();
+			const xpcc::SmartPointer payload = tipc.getPacketPayload();
 
 			XPCC_LOG_INFO << XPCC_FILE_INFO << "has ";
 			XPCC_LOG_INFO << ((header.destination != 0) ? "ACTION" : "EVENT");
 			XPCC_LOG_INFO << " from:" << (int)header.source;
-			XPCC_LOG_INFO << " value:" << *(int*) payload;
+			XPCC_LOG_INFO << " value:" << *(int*) payload.getPointer();
 			XPCC_LOG_INFO << xpcc::flush;
 
 			if( header.destination != 0 ) {

@@ -72,7 +72,7 @@ namespace communicationList{
 		 *
 		 * @see CommunicationList
 		 */
-		Entry(uint8_t typeInfo, const Header& header, SmartPayload& payload);
+		Entry(uint8_t typeInfo, const Header& header, SmartPointer& payload);
 		Entry(uint8_t typeInfo, const Header& header);
 		
 		/**
@@ -105,7 +105,7 @@ namespace communicationList{
 		
 		// todo timeout
 		Header header;
-		SmartPayload payload;
+		SmartPointer payload;
 		State state;
 		Timestamp time;
 		uint8_t tries;
@@ -115,13 +115,13 @@ namespace communicationList{
 	
 	public:
 		EntryDefault(const Header& header);
-		EntryDefault(const Header& header, SmartPayload& payload);
+		EntryDefault(const Header& header, SmartPointer& payload);
 	};
 
 	class EntryWithCallback:public Entry{
 
 	public:
-		EntryWithCallback(const Header& header, SmartPayload& payload, ResponseCallback& callback);
+		EntryWithCallback(const Header& header, SmartPointer& payload, ResponseCallback& callback);
 		EntryWithCallback(const Header& header, ResponseCallback& callback);
 		
 		ResponseCallback responseCallback;
@@ -149,19 +149,19 @@ namespace communicationList{
 		List();
 		
 		void
-		addEvent(const Header& header, SmartPayload& smartPayload);
+		addEvent(const Header& header, SmartPointer& smartPayload);
 		
 		void
-		addResponse(const Header& header, SmartPayload& smartPayload);
+		addResponse(const Header& header, SmartPointer& smartPayload);
 		
 		void
 		addActionCall(const Header& header);
 		
 		void
-		addActionCall(const Header& header, SmartPayload& smartPayload);
+		addActionCall(const Header& header, SmartPointer& smartPayload);
 		
 		void
-		addActionCall(const Header& header, SmartPayload& smartPayload, ResponseCallback& responseCallback);
+		addActionCall(const Header& header, SmartPointer& smartPayload, ResponseCallback& responseCallback);
 		
 		void
 		addActionCall(const Header& header, ResponseCallback& responseCallback);

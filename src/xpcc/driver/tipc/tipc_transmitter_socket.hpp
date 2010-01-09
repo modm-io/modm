@@ -32,6 +32,7 @@
 #define XPCC__TIPC_TRANSMITTER_SOCKET_H_
  
 #include <cstring>
+#include <stdint.h>
 
 namespace xpcc {
 	namespace tipc {
@@ -51,7 +52,7 @@ namespace xpcc {
 				void 
 				transmitPayload(	unsigned int typeId,
 									unsigned int instanceId,
-									char* packet,
+									const uint8_t* packet,
 									size_t length);
 		
 			private:

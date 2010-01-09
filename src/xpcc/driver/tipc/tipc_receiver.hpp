@@ -31,16 +31,14 @@
 #ifndef XPCC_TIPC_RECEIVER_H_
 #define XPCC_TIPC_RECEIVER_H_
  
-
-#include "../backend_interface.hpp"
 #include "tipc_receiver_socket.hpp"
 
 #include <queue>
 
 #include <boost/thread/mutex.hpp>
-#include <boost/shared_array.hpp>
 #include <boost/thread/thread.hpp>
 #include <boost/scoped_ptr.hpp>
+#include <xpcc/data_structure/smart_pointer.hpp>
 
 namespace xpcc {
 	namespace tipc {
@@ -48,7 +46,7 @@ namespace xpcc {
 		/**
 		 * @brief		Receive Packets over the TIPC and store them.
 		 * 
-		 * In a seperate thread the packets are taken from the TIPC and saved local.
+		 * In a separate thread the packets are taken from the TIPC and saved local.
 		 *  
 		 * @ingroup		tipc
 		 * @version		$Id: tipc_receiver.hpp 91 2009-10-17 15:53:04Z thundernail $
@@ -68,37 +66,18 @@ namespace xpcc {
 
 				bool
 				hasPacket() const;
-		
-				const ::xpcc::Header&
-			 	frontHeader() const;
 
-				unsigned int
-				frontPayloadSize() const;
-			 	
-				const uint8_t*
+				const xpcc::SmartPointer&
 				frontPayload() const;
 				
 				void 
 				popFront();
 				
 			private:
-				typedef boost::shared_array<uint8_t>	SharedArr;
+				typedef xpcc::SmartPointer				Payload;
 				typedef boost::mutex					Mutex;
 				typedef boost::mutex::scoped_lock		MutexGuard;
 				typedef	boost::thread::thread			Thread;
-				
-				struct PacketQueueSummary {
-					//! @param	xpcc::Header&	header of the packet
-					//! @param	SharedArr&		char array of the payload
-					PacketQueueSummary(
-							const xpcc::Header&,
-							const uint8_t* payload,
-							unsigned int size);
-
-					xpcc::Header	header;
-					unsigned int	size;
-					SharedArr		payload;
-				};
 				
 				bool 
 				isAlive();
@@ -110,7 +89,7 @@ namespace xpcc {
 				update();
 				
 				ReceiverSocket						tipcReceiverSocket_;
-				std::queue<PacketQueueSummary>		packetQueue_;
+				std::queue<Payload>					packetQueue_;
 				
 				boost::scoped_ptr<Thread>			receiverThread_;
 				mutable Mutex						receiverSocketLock_;

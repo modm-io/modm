@@ -52,7 +52,7 @@ main()
 
 	while(1) {
 		data++;
-		xpcc::SmartPayload payload(&data);
+		xpcc::SmartPointer payload(&data);
 		xpcc::log::info << data << xpcc::flush;
 		tipc.sendPacket(actionHeader, payload);
 		tipc.sendPacket(eventHeader, payload);

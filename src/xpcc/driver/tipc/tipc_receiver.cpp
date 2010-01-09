@@ -34,7 +34,7 @@
 
 #include <boost/bind.hpp>
 
-#include "../../../debug/logger/logger.hpp"
+#include "../../debug/logger/logger.hpp"
 #undef  XPCC_LOG_LEVEL
 #define XPCC_LOG_LEVEL xpcc::log::INFO
 
@@ -56,15 +56,6 @@ xpcc::tipc::Receiver::~Receiver()
 {
 	this->isAlive_ = false;
 	this->receiverThread_->join();
-}
-// -------------------------------------------------------------------------
-const ::xpcc::Header&
-xpcc::tipc::Receiver::frontHeader( ) const
-{
-	// Set the mutex guard for the packetQueue
-	MutexGuard packetQueueGuard( this->packetQueueLock_);
-
-	return this->packetQueue_.front().header;
 }
 // -------------------------------------------------------------------------
 void
@@ -117,48 +108,33 @@ xpcc::tipc::Receiver::update()
 		XPCC_LOG_DEBUG << XPCC_FILE_INFO << "Header available." << xpcc::flush;
 
 		// Try to allocate memory for the packet
-		SharedArr tipcPayloadPtr ( new uint8_t[tipcHeader.size] );
+		Payload payload ( tipcHeader.size );
 
 		// Get the payload by passing a void pointer by reference and the length
 		// of the payload to be read from the socket.
 		this->tipcReceiverSocket_.receivePayload(
-				tipcPayloadPtr.get(),
+				payload.getPointer(),
 				tipcHeader.size);
-
-		// put the payload together with the header into a container
-		PacketQueueSummary packetQueueSummary(
-				*((xpcc::Header*) tipcPayloadPtr.get()), 		// the header stands on the beginning of the packet
-				tipcPayloadPtr.get() + sizeof(xpcc::Header),	// the payload is behind the header
-				tipcHeader.size - sizeof(xpcc::Header) );		// size of the payload is the packet size without the size of the header
 
 		// Set the mutex guard for the packetQueue
 		MutexGuard packetQueueGuard( this->packetQueueLock_);
 
 		// add the packet to the queue
-		this->packetQueue_.push( packetQueueSummary );
+		this->packetQueue_.push( payload );
 
 		// Clean the TIPC socket! ( That means removing the current data from the queue)
 		this->tipcReceiverSocket_.popPayload();
 	}
 }
 // -------------------------------------------------------------------------
-unsigned int
-xpcc::tipc::Receiver::frontPayloadSize() const
-{
-	// Set the mutex guard for the packetQueue
-	MutexGuard packetQueueGuard( this->packetQueueLock_);
-
-	return this->packetQueue_.front().size;
-}
-// -------------------------------------------------------------------------
-const uint8_t*
+const xpcc::SmartPointer&
 xpcc::tipc::Receiver::frontPayload() const
 {
 	// Set the mutex guard for the packetQueue
 	MutexGuard packetQueueGuard( this->packetQueueLock_);
 
 	if( !this->packetQueue_.empty() ) {
-		return this->packetQueue_.front().payload.get();
+		return this->packetQueue_.front();
 	}
 	else {
 		// No packet was available
@@ -199,19 +175,6 @@ xpcc::tipc::Receiver::addReceiverId(uint8_t id)
 	this->tipcReceiverSocket_.registerOnPacket(	REQUEST_OFFSET + id + TYPE_ID_OFFSET,
 												0x00,
 												0x00);
-}
-
-// -----------------------------------------------------------------------------
-
-xpcc::tipc::Receiver::PacketQueueSummary::PacketQueueSummary(
-		const xpcc::Header& header,
-		const uint8_t* data,
-		unsigned int size) :
-	header( header ),
-	size( size ),
-	payload( new uint8_t[size] )
-{
-	memcpy(payload.get(), data, size);
 }
 
 // -----------------------------------------------------------------------------
