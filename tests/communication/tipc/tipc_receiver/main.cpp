@@ -40,7 +40,7 @@
 int
 main()
 {
-	xpcc::log::info << "########## XPCC TIPC RAW Test ##########" << xpcc::flush;
+	xpcc::log::info << "########## XPCC TIPC RECEIVER Test ##########" << xpcc::flush;
 
 	xpcc::tipc::Tipc tipc;
 

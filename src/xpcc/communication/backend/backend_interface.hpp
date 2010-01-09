@@ -108,7 +108,7 @@ namespace xpcc
 		
 		//! Send a Message. // soll denn der header kopiert werden?
 		virtual void
-		sendPacket( const Header &header, const SmartPointer& payload = SmartPointer() ) = 0;
+		sendPacket( const Header &header, SmartPointer payload = SmartPointer() ) = 0;
 		
 		
 		//! Check if a new packet was received by the backend
@@ -119,7 +119,7 @@ namespace xpcc
 		virtual const Header&
 		getPacketHeader() const = 0;
 		
-		virtual const SmartPointer&
+		virtual SmartPointer
 		getPacketPayload() const = 0;
 		
 		virtual uint8_t

@@ -45,7 +45,7 @@ namespace xpcc
 		~CanInterface();
 		
 		virtual void
-		sendPacket(const Header &header, const SmartPointer& payload);
+		sendPacket(const Header &header, SmartPointer payload);
 		
 		virtual bool
 		isPacketAvailable() const {
@@ -57,7 +57,7 @@ namespace xpcc
 			return receivedMessages->header;
 		}
 		
-		virtual const xpcc::SmartPointer&
+		virtual xpcc::SmartPointer
 		getPacketPayload() const {
 			return this->receivedMessages->data;
 		}

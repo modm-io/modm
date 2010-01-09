@@ -107,7 +107,7 @@ xpcc::tipc::ReceiverSocket::receiveHeader( Header & tipcHeader )
 		return true;
 	}
 	else if ( errno == EWOULDBLOCK ) {
-		XPCC_LOG_DEBUG << __FILE__ << __FUNCTION__ << " no data in buffer" << xpcc::flush;
+//		XPCC_LOG_DEBUG << __FILE__ << __FUNCTION__ << " no data in buffer" << xpcc::flush;
 		// no data in the buffer
 	}
 	else if ( errno == 9 ) {
@@ -148,6 +148,12 @@ xpcc::tipc::ReceiverSocket::receivePayload(uint8_t* payloadPointer, size_t paylo
 		// Copy the payload-part of the packet to it's destination!
 		memcpy(payloadPointer, packetPointer.get()+sizeof(Header), payloadLength);
 		
+/*		XPCC_LOG_DEBUG << __FILE__ << __FUNCTION__;
+		for(unsigned int i=0; i<payloadLength; i++) {
+			XPCC_LOG_DEBUG << " " << (int)(*(payloadPointer+i));
+		}
+		XPCC_LOG_DEBUG << xpcc::flush;
+*/
 		return true;
 	}
 	else if ( errno == EWOULDBLOCK ) {

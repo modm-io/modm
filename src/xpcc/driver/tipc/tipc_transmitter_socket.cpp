@@ -91,8 +91,14 @@ xpcc::tipc::TransmitterSocket::transmitPayload(
 								(struct sockaddr*)&tipcToAddresse,
 								(size_t)sizeof(tipcToAddresse));
 
-	XPCC_LOG_DEBUG << __FILE__ << __FUNCTION__ << "tid=" << (int)typeId << " iid=" << (int)instanceId  << xpcc::flush;
-	
+/*	XPCC_LOG_DEBUG << __FILE__ << __FUNCTION__
+			<< " tid=" << (int)typeId
+			<< " iid=" << (int)instanceId;
+	for(unsigned int i=0; i<length; i++) {
+		XPCC_LOG_DEBUG << " " << (int)(*(packet+i));
+	}
+	XPCC_LOG_DEBUG << xpcc::flush;
+*/
 	// Check if the sending failed
 	if (sendToResult < 0) {
 		XPCC_LOG_ERROR << __FILE__ << __FUNCTION__ << "on transmit" << xpcc::flush;
