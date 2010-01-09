@@ -29,7 +29,6 @@
  */
 // ----------------------------------------------------------------------------
 
-//#include <xpcc/communication/backend/tipc/tipc.hpp>
 #include <xpcc/driver/tipc/tipc_transmitter.hpp>
 
 #include <xpcc/debug/logger/imp/std.hpp>
@@ -51,10 +50,10 @@ main()
 		xpcc::log::info << "data1=" << data1 << ", data2=" << data2 << xpcc::flush;
 
 		xpcc::SmartPointer payload1(&data1);
-		transmitter.transmitRequest(10, payload1);
+		transmitter.transmitRequest(0x10, payload1);
 
 		xpcc::SmartPointer payload2(&data2);
-		transmitter.transmitEvent(1, payload2);
+		transmitter.transmitEvent(0x01, payload2);
 
 		data1++;
 		data2--;
