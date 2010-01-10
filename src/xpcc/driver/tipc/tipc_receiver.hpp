@@ -74,7 +74,7 @@ namespace xpcc {
 				popFront();
 				
 			private:
-				typedef xpcc::SmartPointer				Payload;
+				typedef xpcc::SmartPointerVolatile		Payload;
 				typedef boost::mutex					Mutex;
 				typedef boost::mutex::scoped_lock		MutexGuard;
 				typedef	boost::thread::thread			Thread;

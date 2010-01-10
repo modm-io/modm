@@ -37,6 +37,16 @@
 
 namespace xpcc
 {
+	class SmartPointerVolatile;
+
+	/**
+	 * \ingroup data_structure
+	 * \class 	SmartPointerVolatile
+	 * \brief 	This container saves a copy of the given data on the heap. It
+	 * 			provides the functionality of a shared pointer (pointer object
+	 * 			records when it is copied - when the last copy is destroyed the
+	 * 			memory is released.
+	 */
 	class SmartPointer
 	{
 	public:
@@ -56,29 +66,58 @@ namespace xpcc
 
 		SmartPointer(const SmartPointer& other);
 		
+		SmartPointer(const SmartPointerVolatile& other);
+
 		/// Allocates memory from the given size
-		/// @param size the amount of memory to be allocated, has to be smaller than 253
+		/// @param size the amount of memory to be allocated, has to be smaller than 252
 		SmartPointer(uint8_t size);
 
 		~SmartPointer();
-		
-		uint8_t *
-		getPointer();
 
-		const uint8_t *
-		getPointer() const;
+		inline const uint8_t *
+		getPointer() const
+		{
+			return &ptr[2];
+		}
 		
 		inline uint8_t
 		getSize() const {
 			return ptr[1];
 		}
 		
-	private:
+	protected:
 		SmartPointer&
 		operator=(const SmartPointer& other);
 		
 		uint8_t * const ptr;
 	};
+
+	/**
+	 * \ingroup data_structure
+	 * \class 	SmartPointerVolatile
+	 * \brief 	With this class a \b SmartPointer can be created, off that the
+	 * 			memory is writable.
+	 *
+	 * Use the \b SmartPointerVolatile to allocate writable memory and then
+	 * typecast with the copyconstructor to \b SmartPointer to get an object with
+	 * write protected data.
+	 */
+	class SmartPointerVolatile : public SmartPointer
+	{
+		public:
+			/// Allocates memory from the given size
+			/// @param size the amount of memory to be allocated, has to be smaller than 252
+			SmartPointerVolatile(uint8_t size);
+
+			SmartPointerVolatile(const SmartPointerVolatile& other);
+
+			inline uint8_t *
+			getPointer()
+			{
+				return &ptr[2];
+			}
+	};
+
 }
 
 #endif	// XPCC_SMART_POINTER_H

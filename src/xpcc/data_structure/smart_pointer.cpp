@@ -33,10 +33,11 @@
 
 
 xpcc::SmartPointer::SmartPointer() :
-	ptr(new uint8_t[2])
+	ptr(new uint8_t[3])	// with the third byte a getPointer() does return a valid address
 {
 	ptr[0] = 1;
 	ptr[1] = 0;
+
 }
 
 // ----------------------------------------------------------------------------
@@ -49,8 +50,16 @@ xpcc::SmartPointer::SmartPointer(const SmartPointer& other) :
 
 // ----------------------------------------------------------------------------
 
+xpcc::SmartPointer::SmartPointer(const SmartPointerVolatile& other) :
+	ptr(other.ptr)
+{
+	ptr[0]++;
+}
+
+// ----------------------------------------------------------------------------
+
 xpcc::SmartPointer::SmartPointer(uint8_t size) :
-	ptr(new uint8_t[size+2])
+	ptr(new uint8_t[size+3]) // with the third byte a getPointer() does return a valid address even when size == 0
 {
 	ptr[0] = 1;
 	ptr[1] = size;
@@ -65,29 +74,19 @@ xpcc::SmartPointer::~SmartPointer()
 	}
 }
 
+
 // ----------------------------------------------------------------------------
 
-const uint8_t *
-xpcc::SmartPointer::getPointer() const
+// ----------------------------------------------------------------------------
+
+xpcc::SmartPointerVolatile::SmartPointerVolatile(uint8_t size) :
+	SmartPointer( size )
 {
-	if( ptr[1] > 0 ) {
-		return &ptr[2];
-	}
-	else {
-		return 0;
-	}
 }
 
 // ----------------------------------------------------------------------------
 
-uint8_t *
-xpcc::SmartPointer::getPointer()
+xpcc::SmartPointerVolatile::SmartPointerVolatile(const SmartPointerVolatile& other) :
+	SmartPointer( other )
 {
-	if( ptr[1] > 0 ) {
-		return &ptr[2];
-	}
-	else {
-		return 0;
-	}
 }
-
