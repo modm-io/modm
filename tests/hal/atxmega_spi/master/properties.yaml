@@ -1,0 +1,5 @@
+
+target: atxmega
+
+project:
+  executable: atxmega_spi_master

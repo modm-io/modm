@@ -1,0 +1,6 @@
+
+target: atxmega
+#  device: atxmega128a1
+
+project:
+  executable: atxmega_spi_slave
