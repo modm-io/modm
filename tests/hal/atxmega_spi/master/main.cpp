@@ -228,15 +228,15 @@ main()
 		// check if answer is eaqual to sent payload
 		bool b = true;
 		uint8_t * fin = (uint8_t*)(&dmaPayload + 1);
-		for (uint8_t *p = (uint8_t*)&dmaPayload, *ap = (uint8_t*)&dmaAnswer; (p < fin) && b; p++, ap++)
+		for (uint8_t *p = ((uint8_t*)(&dmaPayload)) + 1, *ap = ((uint8_t*)&dmaAnswer) + 1; (p < fin) && b; p++, ap++)
 			b = *p == *ap;
 		
 		display.setPosition(1, 0);
 		if (b){
-			stream << (uint8_t)value << " OK   ";
+			stream << (uint8_t)value << " " << (uint8_t)dmaAnswer.i << " OK   ";
 		}
 		else{
-			stream << (uint8_t)value << " --   ";
+			stream << (uint8_t)value << " " << (uint8_t)dmaAnswer.i << " --   ";
 		}
 		if(Button0::get())
 			sendData();

@@ -44,6 +44,7 @@ CREATE_INPUT_PIN(EncoderB, C, 1);
 CREATE_INPUT_PIN(EncoderButton, C, 2);
 
 CREATE_INPUT_PIN(SS, C, 4);
+CREATE_OUTPUT_PIN(MISO, C, 6);
 
 Debounce keys(0x07);
 Debounce encoder;
@@ -56,7 +57,8 @@ struct DmaPayload{
 	bool b;
 };
 
-volatile DmaPayload dmaPayload;
+volatile DmaPayload dmaPayloadIn;
+volatile DmaPayload dmaPayloadOut;
 
 CREATE_SPI_MODULE(mySpi, SPIC);
 
@@ -66,61 +68,61 @@ void configure_spi_test(){
 }
 
 void configure_dma_test(){
-	DMA.CTRL = DMA_ENABLE_bm | DMA_PRIMODE_RR0123_gc;
+	DMA.CTRL = DMA_ENABLE_bm | DMA_PRIMODE_CH0123_gc;
 
-	//DMA.STATUS == DMA_CH0BUSY_bm; true if buisy
-	//DMA.INTFLAGS == DMA_CH0ERRIF_bm | DMA_CH0TRNIF_bm; finish flags
+	//DMA.STATUS == DMA_CH1BUSY_bm; true if buisy
+	//DMA.INTFLAGS == DMA_CH1ERRIF_bm | DMA_CH1TRNIF_bm; finish flags
 	
 
 //-------------------------------------
 // channel configuration
 	
-//	DMA.CH0.CTRLB |   DMA_CH_CHBUSY_bm // busy flag
+//	DMA.CH1.CTRLB |   DMA_CH_CHBUSY_bm // busy flag
 //					| DMA_CH_CHPEND_bm  // chanel pending
 //					| DMA_CH_ERRIF_bm // error interrupt flag // not autocleared after interrupt
 //					| DMA_CH_TRNIF_bm // Transaction complete flag // not autocleared after interrupt
 
-	DMA.CH0.CTRLB =   DMA_CH_ERRINTLVL_OFF_gc // error interrupt enable
+	DMA.CH1.CTRLB =   DMA_CH_ERRINTLVL_OFF_gc // error interrupt enable
 					| DMA_CH_TRNINTLVL_OFF_gc // transaction complete interrupt enable
 //					| DMA_CH_TRNINTLVL_MED_gc // transaction complete interrupt enable
 					;
 					
-	DMA.CH0.ADDRCTRL = DMA_CH_SRCRELOAD_TRANSACTION_gc  // source is reloaded with initial value
+	DMA.CH1.ADDRCTRL = DMA_CH_SRCRELOAD_TRANSACTION_gc  // source is reloaded with initial value
 					| DMA_CH_SRCDIR_FIXED_gc			// mode of changing source
 					| DMA_CH_DESTRELOAD_TRANSACTION_gc
 					| DMA_CH_DESTDIR_INC_gc
 					;
-	DMA.CH0.TRIGSRC = DMA_CH_TRIGSRC_SPIC_gc; // trigger source select
+	DMA.CH1.TRIGSRC = DMA_CH_TRIGSRC_SPIC_gc; // trigger source select
 	
-	DMA.CH0.TRFCNT = sizeof(DmaPayload);  // block size(16bit), is automatically decremented after each byte was send and restored finaly
-	DMA.CH0.REPCNT = 0;   // times a block transfer is performed, or 0 if unlimited, 
+	DMA.CH1.TRFCNT = sizeof(DmaPayload);  // block size(16bit), is automatically decremented after each byte was send and restored finaly
+	DMA.CH1.REPCNT = 0;   // times a block transfer is performed, or 0 if unlimited, 
 							// is automatically decremented after each block was sent, 
 							// if repeat in dma.ch.ctrla is set channel will be automatically disabled 
 							// as this register reaches 0
 	
-//	DMA.CH0.SRCADDR(0,1,2) = // 24bit source address
-//	DMA.CH0.DESTADDR(0,1,2) = 0; // 24bit destination address
+//	DMA.CH1.SRCADDR(0,1,2) = // 24bit source address
+//	DMA.CH1.DESTADDR(0,1,2) = 0; // 24bit destination address
 //  or
-//	DMA_CH0_SRCADDR(0,1,2) = // 24bit source address
-//	DMA_CH0_DESTADDR(0,1,2) = 0; // 24bit destination address
+//	DMA_CH1_SRCADDR(0,1,2) = // 24bit source address
+//	DMA_CH1_DESTADDR(0,1,2) = 0; // 24bit destination address
 	
-//	DMA.CH0.SRCADDR0 = (register8_t)((uint8_t)(&SPIC.DATA));
-//	DMA.CH0.SRCADDR1 = ((&SPIC_DATA)>>(8*1))&(0xff);
-//	DMA.CH0.SRCADDR2 = ((&SPIC_DATA)>>(8*2))&(0xff);
+//	DMA.CH1.SRCADDR0 = (register8_t)((uint8_t)(&SPIC.DATA));
+//	DMA.CH1.SRCADDR1 = ((&SPIC_DATA)>>(8*1))&(0xff);
+//	DMA.CH1.SRCADDR2 = ((&SPIC_DATA)>>(8*2))&(0xff);
 	
-//	DmaPayload* p = (DmaPayload*)DMA_CH0_DESTADDR0; 
-//	DMA_CH0_DESTADDR(0,1,2) = &dmaPayload; // 24bit destination address
+//	DmaPayload* p = (DmaPayload*)DMA_CH1_DESTADDR0; 
+//	DMA_CH1_DESTADDR(0,1,2) = &dmaPayload; // 24bit destination address
 	
-	DMA_CH0_DESTADDR0 = (((uint16_t)&dmaPayload) >> 0) & 0xff;
-	DMA_CH0_DESTADDR1 = (((uint16_t)&dmaPayload) >> 8) & 0xff;
-	DMA_CH0_DESTADDR2 = 0;
+	DMA_CH1_DESTADDR0 = (((uint16_t)&dmaPayloadIn) >> 0) & 0xff;
+	DMA_CH1_DESTADDR1 = (((uint16_t)&dmaPayloadIn) >> 8) & 0xff;
+	DMA_CH1_DESTADDR2 = 0;
 
-	DMA.CH0.SRCADDR0 = (((uint16_t)&mySpi::getModuleBase().DATA) >> 0) & 0xff;
-	DMA.CH0.SRCADDR1 = (((uint16_t)&mySpi::getModuleBase().DATA) >> 8) & 0xff;
-	DMA.CH0.SRCADDR2 = 0;
+	DMA.CH1.SRCADDR0 = (((uint16_t)&mySpi::getModuleBase().DATA) >> 0) & 0xff;
+	DMA.CH1.SRCADDR1 = (((uint16_t)&mySpi::getModuleBase().DATA) >> 8) & 0xff;
+	DMA.CH1.SRCADDR2 = 0;
 
 	
-	DMA.CH0.CTRLA = DMA_CH_ENABLE_bm // autocleared on transaction fin
+	DMA.CH1.CTRLA = DMA_CH_ENABLE_bm // autocleared on transaction fin
 					| DMA_CH_REPEAT_bm   // autocleared at last reppetieion
 //					| DMA_CH_TRFREQ_bm   // software tranfair request, autocleared at start of transfair
 					| DMA_CH_SINGLE_bm
@@ -128,43 +130,44 @@ void configure_dma_test(){
 					;
 }
 
-void configure_dma_test_ch_1(){
+void configure_dma_test_ch_0(){
 	//-------------------------------------
 	// channel configuration
 		
-	//	DMA.CH1.CTRLB |   DMA_CH_CHBUSY_bm // busy flag
+	//	DMA.CH0.CTRLB |   DMA_CH_CHBUSY_bm // busy flag
 	//					| DMA_CH_CHPEND_bm  // chanel pending
 	//					| DMA_CH_ERRIF_bm // error interrupt flag // not autocleared after interrupt
 	//					| DMA_CH_TRNIF_bm // Transaction complete flag // not autocleared after interrupt
 
-		DMA.CH1.CTRLB =   DMA_CH_ERRINTLVL_OFF_gc // error interrupt enable
-						| DMA_CH_TRNINTLVL_MED_gc // transaction complete interrupt enable
+		DMA.CH0.CTRLB =   DMA_CH_ERRINTLVL_OFF_gc // error interrupt enable
+						| DMA_CH_TRNINTLVL_OFF_gc // transaction complete interrupt enable
 						;
 						
-		DMA.CH1.ADDRCTRL = DMA_CH_SRCRELOAD_TRANSACTION_gc  // source is reloaded with initial value
+		DMA.CH0.ADDRCTRL = DMA_CH_SRCRELOAD_TRANSACTION_gc  // source is reloaded with initial value
 						| DMA_CH_SRCDIR_INC_gc			// mode of changing source
 						| DMA_CH_DESTRELOAD_NONE_gc
 						| DMA_CH_DESTDIR_FIXED_gc
 						;
-		DMA.CH1.TRIGSRC = DMA_CH_TRIGSRC_SPIC_gc; // trigger source select
+		DMA.CH0.TRIGSRC = DMA_CH_TRIGSRC_SPIC_gc; // trigger source select
 		
-		DMA.CH1.TRFCNT = sizeof(DmaPayload);  // block size(16bit), is automatically decremented after each byte was send and restored finaly
-		DMA.CH1.REPCNT = 0;   // times a block transfer is performed, or 0 if unlimited, 
+		DMA.CH0.TRFCNT = sizeof(DmaPayload);  // block size(16bit), is automatically decremented after each byte was send and restored finaly
+		DMA.CH0.REPCNT = 0;   // times a block transfer is performed, or 0 if unlimited, 
 								// is automatically decremented after each block was sent, 
 								// if repeat in dma.ch.ctrla is set channel will be automatically disabled 
 								// as this register reaches 0
 		
-		DMA_CH1_SRCADDR0 = (((uint16_t)&dmaPayload) >> 0) & 0xff;
-		DMA_CH1_SRCADDR1 = (((uint16_t)&dmaPayload) >> 8) & 0xff;
-		DMA_CH1_SRCADDR2 = 0;
+		// the first byte is skipped, so the first byte which arrives master is random 
+		DMA_CH0_SRCADDR0 = (((uint16_t)(((uint8_t*)&dmaPayloadOut) + 1)) >> 0) & 0xff;
+		DMA_CH0_SRCADDR1 = (((uint16_t)(((uint8_t*)&dmaPayloadOut) + 1)) >> 8) & 0xff;
+		DMA_CH0_SRCADDR2 = 0;
 
-		DMA.CH1.DESTADDR0 = (((uint16_t)&mySpi::getModuleBase().DATA) >> 0) & 0xff;
-		DMA.CH1.DESTADDR1 = (((uint16_t)&mySpi::getModuleBase().DATA) >> 8) & 0xff;
-		DMA.CH1.DESTADDR2 = 0;
+		DMA.CH0.DESTADDR0 = (((uint16_t)&mySpi::getModuleBase().DATA) >> 0) & 0xff;
+		DMA.CH0.DESTADDR1 = (((uint16_t)&mySpi::getModuleBase().DATA) >> 8) & 0xff;
+		DMA.CH0.DESTADDR2 = 0;
 
 		
-		DMA.CH1.CTRLA = DMA_CH_ENABLE_bm // autocleared on transaction fin
-	//					| DMA_CH_REPEAT_bm   // autocleared at last reppetieion
+		DMA.CH0.CTRLA = DMA_CH_ENABLE_bm // autocleared on transaction fin
+						| DMA_CH_REPEAT_bm   // autocleared at last reppetieion
 	//					| DMA_CH_TRFREQ_bm   // software tranfair request, autocleared at start of transfair
 						| DMA_CH_SINGLE_bm
 						| DMA_CH_BURSTLEN_1BYTE_gc
@@ -241,6 +244,7 @@ main()
 	
 	SS::configureInputSense(::xpcc::gpio::RISING);
 	SS::configureInterrupt0(::xpcc::gpio::INT0LVL_MED);
+	MISO::output();
 	
 	
 	Led6::set();
@@ -249,7 +253,7 @@ main()
 	
 	configure_spi_test();
 	configure_dma_test();
-//	configure_dma_test_ch_1();
+	configure_dma_test_ch_0();
 	
 	// enable medium interrupts
 	PMIC.CTRL |= PMIC_MEDLVLEX_bm;
@@ -270,9 +274,12 @@ main()
 		
 //		keys.update(PORTB.IN);
 		
+
 		if (keys.getPress(Debounce::KEY0) || keys.getRepeat(Debounce::KEY0)) {
 			Led0::toggle();
+			dmaPayloadOut.i++;
 		}
+		
 		if (keys.getPress(Debounce::KEY1) || keys.getRepeat(Debounce::KEY1)) {
 
 		}
@@ -295,11 +302,10 @@ main()
 		if (encoder.getPress(Debounce::KEY2)) {
 //			Led5::toggle();
 		}
-		
-		timer.CCB = dmaPayload.i*10;
+		timer.CCB = dmaPayloadIn.i*10;
 		// Led0::set(dmaPayload.b);
-		Led6::set(dmaPayload.b);
 		
+		Led6::set(dmaPayloadIn.b);
 		
 //		timer.CCB = 90*10;
 	}
@@ -311,13 +317,13 @@ ISR(SPIC_INT_vect){
 //	timer.CCB = SPIC.DATA*10;
 }
 
-ISR(DMA_CH0_vect){
-	Led1::toggle();
-	DMA.CH0.CTRLB |= DMA_CH_TRNIF_bm; // clear the flag. necessary if interrupt is enabled.
+ISR(DMA_CH1_vect){
+	Led1::set();
+	DMA.CH1.CTRLB |= DMA_CH_TRNIF_bm; // clear the flag. necessary if interrupt is enabled.
 }
 
-ISR(DMA_CH1_vect){
-//	DMA.CH1.CTRLB |= DMA_CH_TRNIF_bm; // clear the flag. maybe necessary if interrupt is enabled.
+ISR(DMA_CH0_vect){
+//	DMA.CH0.CTRLB |= DMA_CH_TRNIF_bm; // clear the flag. maybe necessary if interrupt is enabled.
 }
 
 ISR(TCD0_OVF_vect){
@@ -341,16 +347,74 @@ ISR(TCD0_CCB_vect){
 }
 
 ISR(PORTC_INT0_vect){
-//	static bool errorCondition = 1;
-	uint8_t state = DMA_CH0_CTRLB;
+	static bool errorCondition = 0;
+	if (errorCondition){
+		if(!(DMA_CH1_CTRLA & DMA_CH_ENABLE_bm) && !(DMA_CH0_CTRLA & DMA_CH_ENABLE_bm)){
+			DMA_CH1_TRFCNT = sizeof(DmaPayload);
+			
+			DMA_CH1_DESTADDR0 = (((uint16_t)&dmaPayloadIn) >> 0) & 0xff;
+			DMA_CH1_DESTADDR1 = (((uint16_t)&dmaPayloadIn) >> 8) & 0xff;
+			DMA_CH1_DESTADDR2 = 0;
+			
+//			DMA.CH1.CTRLA = DMA_CH_ENABLE_bm // autocleared on transaction fin
+//							| DMA_CH_REPEAT_bm   // autocleared at last reppetieion
+//		//					| DMA_CH_TRFREQ_bm   // software tranfair request, autocleared at start of transfair
+//							| DMA_CH_SINGLE_bm
+//							| DMA_CH_BURSTLEN_1BYTE_gc
+//							;
+			
+			
+			
+			DMA.CH0.TRFCNT = sizeof(DmaPayload);
+			
+			DMA_CH0_SRCADDR0 = (((uint16_t)(((uint8_t*)&dmaPayloadOut) + 1)) >> 0) & 0xff;
+			DMA_CH0_SRCADDR1 = (((uint16_t)(((uint8_t*)&dmaPayloadOut) + 1)) >> 8) & 0xff;
+			DMA_CH0_SRCADDR2 = 0;
+
+			DMA.CH0.CTRLA |= DMA_CH_ENABLE_bm; // autocleared on transaction fin
+			DMA.CH1.CTRLA |= DMA_CH_ENABLE_bm; // autocleared on transaction fin
+			
+
+			errorCondition = 0;
+		}
+		else{
+//			DMA_CH1_CTRLA = 0;
+			DMA_CH0_CTRLA &= ~DMA_CH_ENABLE_bm;
+			DMA_CH1_CTRLA &= ~DMA_CH_ENABLE_bm;
+		}
+		return;
+	}
+//	uint8_t counter = DMA_CH1_TRFCNT;
+	uint8_t state = DMA_CH1_CTRLB;
+
+	
 	if (state & DMA_CH_CHBUSY_bm){
+//	if (counter == 0){
+		errorCondition = 1;
 		Led0::set();
 	}
 	else{
 		Led0::reset();
 	}
+/*	
+	if (counter == sizeof(DmaPayload)){
+		Led1::set();
+	}
+	else{
+		errorCondition = 1;
+		Led1::reset();
+	}
+*/
+/*	
+	if (counter == sizeof(DmaPayload) && state & DMA_CH_CHBUSY_bm){
+		Led7::set();
+	}
+	else{
+		Led7::reset();
+	}
+*/
 //	if (errorCondition){
-//		DMA_CH0_CTRLA |= DMA_CH_ENABLE_bm;
+//		DMA_CH1_CTRLA |= DMA_CH_ENABLE_bm;
 //		errorCondition = 0;
 //	}
 //	else{
