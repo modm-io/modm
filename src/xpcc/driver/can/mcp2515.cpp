@@ -32,6 +32,8 @@
 
 #include "mcp2515.hpp"
 
+#include "defines.h"
+
 namespace xpcc
 {
 	namespace mcp2515

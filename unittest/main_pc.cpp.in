@@ -21,7 +21,7 @@ main(void)
 	unittest::Controller::instance().setReporter(reporter);
 	
 	// run tests
-	${tests}
+${tests}
 	
 	unittest::Controller::instance().getReporter().printSummary();
 	

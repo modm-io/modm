@@ -42,7 +42,7 @@ main(void)
 	LedGreen::set();
 	
 	// run tests
-	${tests}
+${tests}
 	
 	unittest::Controller::instance().getReporter().printSummary();
 	

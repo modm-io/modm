@@ -32,6 +32,8 @@
 
 #include "dog_m16x.hpp"
 
+#include "defines.h"
+
 namespace xpcc
 {
 	namespace dog_m16x

@@ -1,0 +1,108 @@
+#!/usr/bin/env python
+# 
+# Copyright (c) 2009, Roboterclub Aachen e.V.
+# All rights reserved.
+# 
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+# 
+#     * Redistributions of source code must retain the above copyright
+#       notice, this list of conditions and the following disclaimer.
+#     * Redistributions in binary form must reproduce the above copyright
+#       notice, this list of conditions and the following disclaimer in the
+#       documentation and/or other materials provided with the distribution.
+#     * Neither the name of the Roboterclub Aachen e.V. nor the
+#       names of its contributors may be used to endorse or promote products
+#       derived from this software without specific prior written permission.
+# 
+# THIS SOFTWARE IS PROVIDED BY ROBOTERCLUB AACHEN E.V. ''AS IS'' AND ANY
+# EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+# DISCLAIMED. IN NO EVENT SHALL ROBOTERCLUB AACHEN E.V. BE LIABLE FOR ANY
+# DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+# (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+# ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+# THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+# 
+# $Id$
+
+import os
+import ConfigParser
+
+try:
+	config = ConfigParser.RawConfigParser()
+	config.read(ARGUMENTS.get('config'))
+except TypeError:
+	print "You need to specify a configuration file via 'scons config=path/to/file'!"
+	Exit(1)
+
+# create a build environment
+architecture = config.get('target', 'architecture')
+if architecture == 'atmega' or architecture == 'atxmega':
+	device = config.get('target', 'device')
+	clock = config.get('target', 'clock')
+	env = Environment(
+			ARCHITECTURE = architecture + '/' + device,
+			AVR_DEVICE = device,
+			AVR_CLOCK = clock,
+			tools = ['avr', 'doxygen', 'rca'],
+			toolpath = ['../misc/python/scons/'],
+			LIBS=[''],
+			LIBPATH=[])
+elif architecture == 'pc':
+	env = Environment(
+			ARCHITECTURE = architecture,
+			tools = ['pc', 'doxygen', 'rca'],
+			toolpath = ['../misc/python/scons/'],
+			LIBS=['boost_thread-mt'],
+			LIBPATH=['/usr/lib/'])
+else:
+	print "Unknown architecture '%s'!" % architecture
+	Exit(1)
+
+project_name = config.get('general', 'name')
+buildpath = '../build/library/%s' % project_name
+
+scanner = env.CreateFileScanner()
+scanner.scan('.')
+
+# -----------------------------------------------------------------------------
+# generate 'defines.h'
+
+#defines = scanner.get_defines()
+defines = {}
+for item in config.items('defines'):
+	defines[item[0]] = item[1]
+
+env.GenerateConfig(target = os.path.join(buildpath, 'defines.h'),
+					source = None,
+					DEFINES = defines)
+
+# -----------------------------------------------------------------------------
+# create the library
+
+objects = []
+for file in scanner.get_source_files():
+	# get filename without extensition
+	outfile = os.path.splitext(os.path.join(buildpath, file))[0]
+	
+	object = env.Object(source = file,
+						target = outfile,
+						CPPPATH = ['.', buildpath])
+	objects.append(object)
+
+library = env.Library(target = os.path.join(buildpath, 'robot'), source = objects)
+
+# -----------------------------------------------------------------------------
+# add additional command-line targets
+
+env.Alias('lib', library)
+env.Alias('build', 'lib')
+
+# add target to create the doxygen documentation
+env.Doxygen('../doc/doxyfile')
+env.Alias('doc', 'apidoc/html')
+
+env.Default('build')

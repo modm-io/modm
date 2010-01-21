@@ -1,3 +1,11 @@
+// coding: utf-8
+// ----------------------------------------------------------------------------
+/**
+ * 
+ */
+// ----------------------------------------------------------------------------
+
+#include <avr/wdt.h>
 
 #include <xpcc/hal/time/delay.hpp>
 #include <xpcc/hal/peripheral/gpio.hpp>
@@ -9,6 +17,7 @@
 #include <xpcc/hal/time/internal_clock.hpp>
 #include <xpcc/workflow/time/timeout.hpp>
 
+// ----------------------------------------------------------------------------
 using namespace xpcc;
 
 #if defined(__AVR_ATmega644__)
@@ -30,13 +39,13 @@ using namespace xpcc;
 
 FLASH(uint8_t filter[]) = 
 {
-	MCP2515_FILTER(200),	// Filter 0
-	MCP2515_FILTER(200),	// Filter 1
+	MCP2515_FILTER(100),	// Filter 0
+	MCP2515_FILTER(100),	// Filter 1
 	
-	MCP2515_FILTER(200),	// Filter 2
-	MCP2515_FILTER(200),	// Filter 3
-	MCP2515_FILTER(200),	// Filter 4
-	MCP2515_FILTER(200),	// Filter 5
+	MCP2515_FILTER(100),	// Filter 2
+	MCP2515_FILTER(100),	// Filter 3
+	MCP2515_FILTER(100),	// Filter 4
+	MCP2515_FILTER(100),	// Filter 5
 	
 	MCP2515_FILTER(0x7ff),	// Mask 0
 	MCP2515_FILTER(0x7ff),	// Mask 1
@@ -47,7 +56,25 @@ Mcp2515 <Spi, Cs, Int> can;
 Can::Message defaultMessage;
 Debounce buttons;
 
-int main(void) __attribute__((OS_main));
+// ----------------------------------------------------------------------------
+uint8_t mcusr_mirror __attribute__ ((section (".noinit")));
+
+void
+get_mcusr(void)	__attribute__((naked)) \
+				__attribute__((section(".init3")));
+
+void
+get_mcusr(void)
+{
+	mcusr_mirror = MCUSR;
+	MCUSR = 0;
+	wdt_disable();
+}
+
+// ----------------------------------------------------------------------------
+int
+main(void) __attribute__((OS_main));
+
 int
 main(void)
 {
@@ -102,7 +129,7 @@ main(void)
 	DDRD = 0;
 	PORTD = 0xff;
 	
-	defaultMessage.identifier = 100;
+	defaultMessage.identifier = 200;
 	defaultMessage.length = 8;
 	
 	// inverse blink light
@@ -116,30 +143,20 @@ main(void)
 	}
 	PORTC = 0;
 	
-	bool buttonsActive = false;
+	// configuration finished, enabled watchdog
+	wdt_enable(WDTO_120MS);
+	
 	Timeout<> timeout;
 	while (1)
 	{
 		delay_ms(10);
+		InternalClock::increment(10);
 		
 		buttons.update(PIND);
-		InternalClock::access() += 10;
 		
-		uint8_t state = buttons.getState(0xff);
-		if (state != 0)
+		if (timeout.isExpired())
 		{
-			if (!buttonsActive) {
-				timeout.restart(0);
-			}
-			buttonsActive = true;
-		}
-		else {
-			buttonsActive = false;
-		}
-		
-		if (buttonsActive && timeout.isExpired())
-		{
-			defaultMessage.data[0] = state;
+			defaultMessage.data[0] = buttons.getState(0xff);
 			can.sendMessage(defaultMessage);
 			
 			timeout.restart(50);
@@ -155,5 +172,7 @@ main(void)
 				PORTC = (PORTC & ~0x3f) | (message.data[0] & 0x3f);
 			}
 		}
+		
+		wdt_reset(); 
 	}
 }

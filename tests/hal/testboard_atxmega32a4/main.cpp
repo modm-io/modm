@@ -66,6 +66,7 @@ main()
 	Led6::set();
 	Led7::reset();
 	
+	// give the DOG-M display some time for startup
 	delay_ms(100);
 	
 	display.initialize();

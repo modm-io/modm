@@ -45,7 +45,7 @@ namespace xpcc
 	 * This class is implemented using 'gettimeofday()' from <sys/time.h> for
 	 * any Unix-OS. 
 	 * 
-	 * For the AVRs targets the user has to use the access() method to
+	 * For the AVRs targets the user has to use the increment() method to
 	 * generate a suiteable timebase, preferably by incrementing the time
 	 * value inside a timer interrupt function.
 	 * 
@@ -53,7 +53,7 @@ namespace xpcc
 	 * @code
 	 * ISR(TIMER)
 	 * {
-	 *     InternalClock::access()++;
+	 *     InternalClock::increment();
 	 * }
 	 * @endcode
 	 */ 
@@ -66,10 +66,10 @@ namespace xpcc
 		
 #if !defined(__unix__)
 		/// @brief	Set the current time
-		static inline uint16_t&
-		access()
+		static inline void
+		increment(uint16_t inc = 1)
 		{
-			return time;
+			time += inc;
 		}
 		
 	private:
