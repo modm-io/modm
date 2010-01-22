@@ -93,7 +93,8 @@ namespace xpcc
 		}
 	};
 	
-#if __AVR_HAVE_LPMX__ && 1		// FIXME!!!
+#if __AVR_HAVE_LPMX__ && 0
+	// FIXME find a working version for this case
 	template<typename T>
 	struct FlashReader<T, 3>
 	{
@@ -129,6 +130,22 @@ namespace xpcc
 			
 			return reinterpret_cast<T&>(result);*/
 			
+			/*uint16_t addr = (uint16_t)(p);
+			struct foo {
+				uint8_t a;
+				uint16_t b;
+			} result;
+			
+			__asm__ (
+				"lpm %A0, Z+"   "\n\t"
+				"lpm %B0, Z+"   "\n\t"
+				"lpm %C0, Z"    "\n\t"
+				: "=r" (result), "=z" (addr)
+				: "1" (addr)
+			);
+			
+			return reinterpret_cast<T&>(result);*/
+			
 			/*uint16_t addr = (uint16_t) p;
 			
 			char retval[3];
@@ -152,7 +169,7 @@ namespace xpcc
 				  "=r" (convert.in[1]),
 				  "=r" (convert.in[2]),
 				  "=z" (addr16)
-				: "1" (addr16)
+				: "3" (addr16)
 			);
 			
 			return convert.out;

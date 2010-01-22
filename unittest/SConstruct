@@ -31,59 +31,31 @@
 import os
 import ConfigParser
 
-config = ConfigParser.RawConfigParser()
-config.read('unittest.cfg')
+pre = Environment(tools = ['xpcc'], toolpath = ['../misc/python/scons'])
+builder = pre.EnviromentBuilder('project.cfg')
 
-# create a build environment
-architecture = config.get('target', 'architecture')
-if architecture == 'atmega' or architecture == 'atxmega':
-	device = config.get('target', 'device')
-	clock = config.get('target', 'clock')
-	env = Environment(
-			ARCHITECTURE = architecture + '/' + device,
-			AVR_DEVICE = device,
-			AVR_CLOCK = clock,
-			tools = ['avr', 'doxygen', 'rca', 'unittest'],
-			toolpath = ['../misc/python/scons/'],
-			LIBS=[''],
-			LIBPATH=[])
-elif architecture == 'pc':
-	env = Environment(
-			ARCHITECTURE = architecture,
-			tools = ['pc', 'doxygen', 'rca', 'unittest'],
-			toolpath = ['../misc/python/scons/'],
-			LIBS=['boost_thread-mt'],
-			LIBPATH=['/usr/lib/'])
-else:
-	print "Unknown architecture '%s'!" % architecture
-	Exit(1)
-
-project_name = config.get('general', 'name')
 rootpath = '../'
-buildpath = os.path.join(rootpath, 'build/%s' % project_name)
+buildpath = os.path.join(rootpath, 'build/%s' % builder.get_name())
 libpath = os.path.join(rootpath, 'src')
 
-scanner = env.CreateFileScanner()
-scanner.scan('.')
-
+env = builder.get_build_environment()
 env.Append(CPPPATH = [libpath, buildpath])
 env.Append(LIBS = ['robot'])
-env.Append(LIBPATH = [os.path.join(rootpath, 'build/library/%s' % project_name)])
+env.Append(LIBPATH = [os.path.join(rootpath, 'build/library/%s' % builder.get_name())])
 
 # -----------------------------------------------------------------------------
-library = env.Command(os.path.join(rootpath, 'build/library/%s/librobot.a' % project_name), [], "@scons -C ../src config=../unittest/unittest.cfg")
+library = env.Command(os.path.join(rootpath, 'build/library/%s/librobot.a' % builder.get_name()), [], "@scons -C ../src config=../unittest/project.cfg")
 env.Alias('lib', library)
 
 # -----------------------------------------------------------------------------
-defines = scanner.get_defines()
-for item in config.items('defines'):
-	defines[item[0]] = item[1]
-
 env.GenerateConfig(target = os.path.join(buildpath, 'defines.h'),
 					source = None,
-					DEFINES = defines)
+					DEFINES = builder.get_defines())
 
 # -----------------------------------------------------------------------------
+scanner = builder.get_file_scanner()
+scanner.scan('.')
+
 objects = []
 for file in scanner.get_source_files():
 	# get filename without extensition
@@ -98,7 +70,7 @@ runner = env.UnittestRunner(source = ['main_pc.cpp.in'] + scanner.get_header_fil
 							target = os.path.join(buildpath, 'runner.cpp'))
 objects.append(env.Object(runner))
 
-program = env.Program(target = os.path.join(buildpath, project_name), source = objects)
+program = env.Program(target = os.path.join(buildpath, builder.get_name()), source = objects)
 
 # -----------------------------------------------------------------------------
 # add additional command-line targets

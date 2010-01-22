@@ -117,9 +117,9 @@ xpcc::DogM16x<SPI, CS, RS>::writeCommand(uint8_t command)
 	// check if the command is 'clear display' oder 'return home', these
 	// commands take a bit longer until they are finished.
 	if ((command & 0xfc) == 0) {
-		_delay_ms(1.2);
+		delay_ms(1.2);
 	}
 	else {
-		_delay_us(27);
+		delay_us(27);
 	}
 }

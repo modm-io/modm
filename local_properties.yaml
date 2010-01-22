@@ -1,0 +1,34 @@
+
+target:
+  architecture: atxmega
+#  architecture: atmega
+#  architecture: pc
+  device: atxmega32a4
+  clock: 2000000
+#  device: atxmega128a1
+#  clock: 32000000
+#  device: atmega644
+#  clock: 14745600
+#  device: atmega8
+#  clock: 1000000
+  
+#target: atxmega
+#target: pc
+
+program:
+#    programmer: stk500
+#    port: /dev/ttyUSB0
+    programmer: avrispmkII
+    port: usb
+
+#scons target=testboard_xmega32 build
+#scons target=testboard_xmega32 symbols
+
+#scons build=testboard_xmega32
+
+#scons --target=testboard_xmega32 build
+#scons --t testboard_xmega32 build
+
+#scons build
+
+#scons -t unittest build program arch=xmega device=atxmega32a4 clock=1000000

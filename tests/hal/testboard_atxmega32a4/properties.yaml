@@ -1,5 +1,12 @@
-
-target: atxmega
-
+  
 project:
-  executable: testboard_xmega32
+  name: testboard_xmega32
+  target:
+    architecture: atxmega
+    device: atxmega32a4
+    clock: 2000000
+
+# normalerweise in local_properties.yaml eingestellt
+program:
+  port: usb
+  programmer: avrispmkII

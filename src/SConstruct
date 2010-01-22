@@ -28,75 +28,30 @@
 # 
 # $Id$
 
-import os
-import ConfigParser
+pre = Environment(tools = ['xpcc'], toolpath = ['../misc/python/scons'])
 
-try:
-	config = ConfigParser.RawConfigParser()
-	config.read(ARGUMENTS.get('config'))
-except TypeError:
-	print "You need to specify a configuration file via 'scons config=path/to/file'!"
-	Exit(1)
+builder = pre.EnviromentBuilder(ARGUMENTS.get('config'))
+builder.set_buildpath('../build/library/%s' % builder.project_name)
 
-# create a build environment
-architecture = config.get('target', 'architecture')
-if architecture == 'atmega' or architecture == 'atxmega':
-	device = config.get('target', 'device')
-	clock = config.get('target', 'clock')
-	env = Environment(
-			ARCHITECTURE = architecture + '/' + device,
-			AVR_DEVICE = device,
-			AVR_CLOCK = clock,
-			tools = ['avr', 'doxygen', 'rca'],
-			toolpath = ['../misc/python/scons/'],
-			LIBS=[''],
-			LIBPATH=[])
-elif architecture == 'pc':
-	env = Environment(
-			ARCHITECTURE = architecture,
-			tools = ['pc', 'doxygen', 'rca'],
-			toolpath = ['../misc/python/scons/'],
-			LIBS=['boost_thread-mt'],
-			LIBPATH=['/usr/lib/'])
-else:
-	print "Unknown architecture '%s'!" % architecture
-	Exit(1)
+env = builder.generate_build_environment()
+env.Append(CPPPATH = ['.'])
 
-project_name = config.get('general', 'name')
-buildpath = '../build/library/%s' % project_name
-
-scanner = env.CreateFileScanner()
-scanner.scan('.')
-
-# -----------------------------------------------------------------------------
 # generate 'defines.h'
-
-#defines = scanner.get_defines()
-defines = {}
-for item in config.items('defines'):
-	defines[item[0]] = item[1]
-
-env.GenerateConfig(target = os.path.join(buildpath, 'defines.h'),
+env.GenerateConfig(target = builder.buildpath('defines.h'),
 					source = None,
-					DEFINES = defines)
+					DEFINES = builder.defines)
 
-# -----------------------------------------------------------------------------
-# create the library
+files = builder.find_files('.')
 
 objects = []
-for file in scanner.get_source_files():
-	# get filename without extensition
-	outfile = os.path.splitext(os.path.join(buildpath, file))[0]
-	
+for file in files.sources:
 	object = env.Object(source = file,
-						target = outfile,
-						CPPPATH = ['.', buildpath])
+						target = builder.buildpath(file, strip_extension=True))
 	objects.append(object)
 
-library = env.Library(target = os.path.join(buildpath, 'robot'), source = objects)
-
-# -----------------------------------------------------------------------------
-# add additional command-line targets
+# create the library
+library = env.Library(target = builder.buildpath('robot'),
+					  source = objects)
 
 env.Alias('lib', library)
 env.Alias('build', 'lib')
