@@ -33,169 +33,111 @@
 import sys
 sys.path.append('misc/python')
 
-from scons.parser import Parser, ParserException
-
-TOOLPATH = 'misc/python/scons/'
-
-# -----------------------------------------------------------------------------
+from scons.build_properties import PropertyParser, PropertyException
 
 def PhonyTargets(env = None, **kw):
 	if not env:
 		env = DefaultEnvironment()
-	for target, action in kw.items():
+	for target,action in kw.items():
 		env.AlwaysBuild(env.Alias(target, [], action))
 
 # -----------------------------------------------------------------------------
-# STEP 1: collect information
-# 
-# Read values form the commandline into variables
+# create a new commandline-option to specify a property-file
+
+AddOption('--properties',
+			dest='properties',
+			default='properties.yaml',
+			metavar='FILE',
+			help='configuration file')
+
 # -----------------------------------------------------------------------------
+# parse the global property-file
 
-options = {}
-options['propertyFile'] = ARGUMENTS.get("properties", "local_properties.yaml")
-options['project'] = ARGUMENTS.get("project", "*")
+verbose = ARGUMENTS.get('verbose') == '1'
+target = ARGUMENTS.get('target', None)
 
-try:
-	options['verbose'] = int(ARGUMENTS.get("verbose", "0"))
-except ValueError:
-	print "Error: Please specifiy a numerical value for 'verbose', '%s' is not allowed" % ARGUMENTS.get("verbose")
+parser = PropertyParser(GetOption('properties'), target, verbose)
+
+# -----------------------------------------------------------------------------
+# create a build-environment for the specific target
+
+build = parser.getGlobalProperties()
+if build.target == 'atmega' or build.target == 'atxmega':
+	env = Environment(
+			ARCHITECTURE = 'avr',
+			AVRDUDE = build.avr.avrdude,
+			AVR_DEVICE = build.avr.device,
+			AVR_CLOCK = build.avr.clock,
+			tools = ['avr', 'avrdude', 'doxygen', 'template'],
+			toolpath = ['misc/python/scons/'],
+			LIBS=[''],
+			LIBPATH=[])
+	
+	# set values for avrdude (only if available)
+	env['AVRDUDE_PROGRAMMER'] = build.avr.avrdude.get('programmer', 'stk500')
+	env['AVRDUDE_PORT'] = build.avr.avrdude.get('port', '/dev/ttyUSB0')
+	
+elif build.target == 'pc':
+	env = Environment(
+			ARCHITECTURE = 'pc',
+			tools = ['pc', 'doxygen', 'template'],
+			toolpath = ['misc/python/scons/'],
+			LIBS=['boost_thread-mt'],
+			LIBPATH=['/usr/lib/'])
+
+else:
+	print "Unknown build target '%s'!" % build.target
 	Exit(1)
 
-options['program'] = "avrdude"
-if ARGUMENTS.get("program"):
-	options['program'] = ARGUMENTS.get("program")
-	BUILD_TARGETS.append("program")
+# -----------------------------------------------------------------------------
+# finally build the library from the src-directory
 
-# Some properties can be set via the commandline, collect them now
-options['properties'] = {
-	"target": {},
-}
+projects = parser.parseDirectory('src/', 'library')
+sources = projects[0].sources
 
-if ARGUMENTS.get("architecture"):
-	options['properties']["target"]["architecture"] = ARGUMENTS.get("architecture")
-
-if ARGUMENTS.get("device"):
-	options['properties']["target"]["device"] = ARGUMENTS.get("device")
-
-if ARGUMENTS.get("clock"):
-	options['properties']["target"]["clock"] = ARGUMENTS.get("clock")
+library = SConscript('src/SConscript',
+			src='src',
+			variant_dir='build/lib',
+			exports=['env', 'sources'], 
+			duplicate=False)
+lib = env.Alias('lib', 'build/lib')
 
 # -----------------------------------------------------------------------------
-# STEP 2: Add the documentation build command
-# -----------------------------------------------------------------------------
+# build the tests
 
-env = Environment(tools = ['doxygen'], toolpath = [ TOOLPATH ])
+projects = parser.parseDirectory('tests/', 'tests')
+projects = projects[1:]
+
+SConscript('tests/SConscript',
+			src='tests',
+			variant_dir='build/tests',
+			exports=['env', 'projects', 'library'], 
+			duplicate=False)
+tests = env.Alias('tests', 'build/tests')
+
+# -----------------------------------------------------------------------------
+# build the unit tests
+
+projects = parser.parseDirectory('unittest/', 'unittest')
+sources = projects[0].sources
+header = projects[0].header
+globals = parser.getGlobalProperties()
+
+SConscript('unittest/SConscript',
+			src='unittest',
+			variant_dir='build/unittest',
+			exports=['env', 'sources', 'header', 'globals', 'library'])
+unittest = env.Alias('unittest', 'build/unittest')
+
+# -----------------------------------------------------------------------------
+# create doxygen documentation
+
 env.Doxygen('doc/doxyfile')
 env.Alias('doc', 'apidoc/html')
 
-env.Default('build')
-
 # -----------------------------------------------------------------------------
-# STEP 3: Find the matching projects
-# -----------------------------------------------------------------------------
-
-projectList = []	# List of projects which should be build later
-try:
-	parser = Parser(configuration = options["properties"],
-					configFile = options["propertyFile"],
-					verbose = options["verbose"])
-	
-	projects = parser.parseDirectory("unittest")[1:]
-	projects += parser.parseDirectory("tests")[1:]
-	
-	for project in projects:
-		# TODO build a selection based on regular expressions
-		if project.name == options["project"] or options["project"] == "*":
-			projectList.append(project)
-	
-except ParserException, e:
-	print e
-	Exit(1)
-
-# -----------------------------------------------------------------------------
-# STEP 3: Add all the files which could be build to SCons
-# 
-# Nothing is build right now, we are just creating a list of possible build
-# targets. What really to build is decided later. Using this way single source
-# files can be accessed individually by typing 'scons foo.o'. This will only
-# build the file 'foo.o'.
-# -----------------------------------------------------------------------------
-
-for project in projectList:
-	# create a build-environment
-	if project.get('architecture') == 'atmega' or \
-	   project.get('architecture') == 'atxmega':
-		env = Environment(
-				ARCHITECTURE = 'avr',
-				AVR_DEVICE = project.get('device'),
-				AVR_CLOCK = project.get('clock'),
-				tools = ['avr', 'avrdude', 'template'],
-				toolpath = ['misc/python/scons/'],
-				LIBS=[''],
-				LIBPATH=[],
-				CPPPATH='library/')
-		#env['AVRDUDE_PROGRAMMER'] = build.avr.avrdude.get('programmer', 'stk500')
-		#env['AVRDUDE_PORT'] = build.avr.avrdude.get('port', '/dev/ttyUSB0')
-	elif project.get('architecture') == 'pc':
-		env = Environment(
-				ARCHITECTURE = 'pc',
-				tools = ['pc', 'template'],
-				toolpath = ['misc/python/scons/'],
-				LIBS=['boost_thread-mt'],
-				LIBPATH=['/usr/lib/'],
-				CPPPATH='library/')
-	else:
-		print "Error: Unknown architecture '%s'" % project.get('architecture')
-		Exit(1)
-	
-	# add the library for this project
-	# TODO
-	#parser = Parser(configuration = options["properties"],
-	#				configFile = options["propertyFile"],
-	#				verbose = options["verbose"])
-	
-"""	library = parser.parseDirectory("library")[0]
-	
-	# build a object file form each source file
-	objects = []
-	for file in library.sources:
-		file.update(env)
-		object = env.Object(file.name,
-							CPPDEFINES=file.defines)
-		objects.append(object)
-	
-	# link them all together to create the library
-	libraryTarget = env.Library(target='robot', source=objects)
-	
-	# add the project itself
-	env.Append(LIBS = 'robot')
-	env.Append(LIBPATH = 'build/library/%s' % project.name)
-	
-	objects = []
-	for file in project.sources:
-		object = env.Object(target = TODO
-							source = file.name,
-							CPPDEFINES = file.defines)
-		objects.append(object)
-	
-	programTarget = env.Program(target = project.name,
-								source = objects,
-								LIBS = project.libs,
-								LIBPATH = project.libpath,
-								CPPPATH = project.includes)
-	
-	if env['ARCHITECTURE'] == 'avr':
-		env.Hex(programTarget)
-		env.Listing(programTarget)
-		env.Size(programTarget)
-"""
-# -----------------------------------------------------------------------------
-# STEP 4: Find out what to do and select the things to build
-# -----------------------------------------------------------------------------
-
-"""
-
 # transmit the hex file to an AVR
+
 programFile = ARGUMENTS.get('program', None)
 if programFile:
 	if env['ARCHITECTURE'] != 'avr':
@@ -211,7 +153,9 @@ if programFile:
 	# build our dummy target
 	BUILD_TARGETS.append("program_target")
 
+# -----------------------------------------------------------------------------
 # show the size of a file
+
 fileSize = ARGUMENTS.get('size', None)
 if fileSize:
 	# make sure that that the file we want to program is build
@@ -223,7 +167,9 @@ if fileSize:
 	# build our dummy target
 	BUILD_TARGETS.append("size_target")
 
+# -----------------------------------------------------------------------------
 # show the symbols in a object-file
+
 symbolsFile = ARGUMENTS.get('symbols', None)
 if symbolsFile:
 	# make sure that that the file we want to program is build
@@ -235,9 +181,13 @@ if symbolsFile:
 	# build our dummy target
 	BUILD_TARGETS.append("symbols_target")
 
+# -----------------------------------------------------------------------------
 # set fusebits (currently only atmega, not the atxmega!)
+
 if build.target == 'atmega':
 	PhonyTargets(env, fuse = env.ProgramFuses())
 
+# -----------------------------------------------------------------------------
+
 env.Alias('all', [lib, tests, unittest])
-"""
+env.Default('lib')
