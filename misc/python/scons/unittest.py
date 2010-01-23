@@ -121,7 +121,7 @@ def unittest_action(target, source, env):
 		str += "}"
 		
 		tests_cases.append(str)
-
+	
 	substitutions = {
 		'includes': '\n'.join(includes),
 		'names': 'namespace\n{\n\t%s\n}' % '\n\t'.join(name_strings),
@@ -136,7 +136,6 @@ def unittest_action(target, source, env):
 def unittest_emitter(target, source, env):
 	header = [source[0]]
 	for file in source[1:]:
-		#print dir(file)
 		if file.name.endswith('_test.hpp'):
 			header.append(file)
 	

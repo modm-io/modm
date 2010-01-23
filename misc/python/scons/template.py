@@ -45,6 +45,10 @@ def replace_action(target, source, env):
 	open(target, 'w').write(output)
 	return 0
 
+def replace_emitter(target, source, env):
+	Depends(target, SCons.Node.Python.Value(env['SUBSTITUTIONS']))
+	return target, source
+
 def replace_string(target, source, env):
 	return "Create: '%s' from '%s'" % (str(target[0]), str(source[0]))
 
@@ -53,6 +57,7 @@ def generate(env, **kw):
 	
 	builder = env.Builder(
 		action = env.Action(replace_action, replace_string),
+		emitter = replace_emitter,
 		src_suffix = '.in',
 		single_source = True
 	)

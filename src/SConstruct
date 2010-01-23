@@ -29,19 +29,11 @@
 # $Id$
 
 pre = Environment(tools = ['xpcc'], toolpath = ['../misc/python/scons'])
-
 builder = pre.EnviromentBuilder(ARGUMENTS.get('config'))
-builder.set_buildpath('../build/library/%s' % builder.project_name)
 
-env = builder.generate_build_environment()
-env.Append(CPPPATH = ['.'])
+env = builder.generate_build_environment(library = True)
 
-# generate 'defines.h'
-env.GenerateConfig(target = builder.buildpath('defines.h'),
-					source = None,
-					DEFINES = builder.defines)
-
-files = builder.find_files('.')
+files = env.FindFiles(path = '.')
 
 objects = []
 for file in files.sources:

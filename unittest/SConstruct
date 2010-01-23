@@ -28,55 +28,33 @@
 # 
 # $Id$
 
-import os
-import ConfigParser
-
 pre = Environment(tools = ['xpcc'], toolpath = ['../misc/python/scons'])
 builder = pre.EnviromentBuilder('project.cfg')
 
-rootpath = '../'
-buildpath = os.path.join(rootpath, 'build/%s' % builder.get_name())
-libpath = os.path.join(rootpath, 'src')
+env = builder.generate_build_environment()
 
-env = builder.get_build_environment()
-env.Append(CPPPATH = [libpath, buildpath])
-env.Append(LIBS = ['robot'])
-env.Append(LIBPATH = [os.path.join(rootpath, 'build/library/%s' % builder.get_name())])
-
-# -----------------------------------------------------------------------------
-library = env.Command(os.path.join(rootpath, 'build/library/%s/librobot.a' % builder.get_name()), [], "@scons -C ../src config=../unittest/project.cfg")
-env.Alias('lib', library)
-
-# -----------------------------------------------------------------------------
-env.GenerateConfig(target = os.path.join(buildpath, 'defines.h'),
-					source = None,
-					DEFINES = builder.get_defines())
-
-# -----------------------------------------------------------------------------
-scanner = builder.get_file_scanner()
-scanner.scan('.')
+files = env.FindFiles(path = '.')
 
 objects = []
-for file in scanner.get_source_files():
-	# get filename without extensition
-	outfile = os.path.splitext(os.path.join(buildpath, file))[0]
-	
+for file in files.sources:
 	object = env.Object(source = file,
-						target = outfile)
+						target = builder.buildpath(file, strip_extension=True))
 	objects.append(object)
 
-# create the file which runs all the tests
-runner = env.UnittestRunner(source = ['main_pc.cpp.in'] + scanner.get_header_files(),
-							target = os.path.join(buildpath, 'runner.cpp'))
+# create the file which later runs all the tests
+runner = env.UnittestRunner(source = ['main_pc.cpp.in'] + files.header,
+							target = builder.buildpath('runner.cpp'))
 objects.append(env.Object(runner))
 
-program = env.Program(target = os.path.join(buildpath, builder.get_name()), source = objects)
+# create program
+program = env.Program(target = builder.buildpath(builder.project_name), source = objects)
 
-# -----------------------------------------------------------------------------
-# add additional command-line targets
+# append the xpcc-library
+library = env.xpccLibrary()
 
-env.Alias('run', env.Command('thisfileshouldnotexist', program, '@../build/unittest/unittest'))
-
+env.Alias('lib', library)
+env.Alias('run', env.Run(program))
 env.Alias('build', program)
 
-env.Default('build')
+env.Alias('all', 'build')
+env.Default('all')
