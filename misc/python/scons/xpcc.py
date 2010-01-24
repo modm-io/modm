@@ -140,7 +140,7 @@ def generate_environment(env, config, buildpath = None, rootpath = None):
 				Exit(1)
 			
 			buildpath = os.path.join(rootpath, 'build/$name')
-		
+	
 	path_substitutions = {
 		'name': project_name,
 		'arch': architecture,
@@ -183,16 +183,16 @@ def xpcc_library(env):
 	env.Append(LIBPATH = [buildpath])
 	
 	file = os.path.join(buildpath, 'librobot.a')
-	action = "@scons -C %s config=%s" % (include_path, env['XPCC_CONFIG_FILE'])
+	action = "@scons -C %s -Q config=%s" % (include_path, env['XPCC_CONFIG_FILE'])
 	if ARGUMENTS.get('verbose') == '1':
 		action += ' verbose=1'
 	library = env.Command(file, [], action)
 	
-	Depends(library, SCons.Node.Python.Value(env['XPCC_CONFIG']))
-	AlwaysBuild(library)
+	env.Depends(library, SCons.Node.Python.Value(env['XPCC_CONFIG']))
+	env.AlwaysBuild(library)
 	
 	# remove the build directory when the library should be cleaned
-	Clean(library, buildpath)
+	env.Clean(library, buildpath)
 	# TODO remove this with a call of 'scons -c' perhaps via GetOption("clean") 
 	
 	return library

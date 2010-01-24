@@ -25,16 +25,13 @@
  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- * $Id$
  */
 // ----------------------------------------------------------------------------
 /*
  * WARNING: This file is generated automatically, do not edit!
- * Please modify the corresponding *.tmpl file instead and re-run the
- * script 'generate.py'.
+ * Please modify the corresponding *.in file instead and rebuild this file. 
  *
- * Generated 26 Nov 2009, 23:32:57
+ * Generated 25 Jan 2010, 00:10:23
  */
 // ----------------------------------------------------------------------------
 

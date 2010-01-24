@@ -51,9 +51,18 @@ for path, directories, files in os.walk('tests'):
 		env.Alias('update', file)
 
 if 'template' in BUILD_TARGETS:
-	import jinja2
+	path = 'src/xpcc/hal/peripheral/avr/mega/uart'
+	for id in range(0, 4):
+		file = env.Template(target = os.path.join(path, 'uart%i.hpp' % id),
+							source = os.path.join(path, 'uart.hpp.in'),
+							SUBSTITUTIONS = { 'id': id })
+		env.Alias('template', file)
+		
+		file = env.Template(target = os.path.join(path, 'uart%i.cpp' % id),
+							source = os.path.join(path, 'uart.cpp.in'),
+							SUBSTITUTIONS = { 'id': id })
+		env.Alias('template', file)
 	
-	# TODO regnerate the templates
 
 # add target to create the doxygen documentation
 env.Doxygen('doc/doxyfile')

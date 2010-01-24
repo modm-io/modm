@@ -28,7 +28,9 @@
 # 
 # $Id$
 
+import os
 import string
+import time
 from SCons.Script import *
 
 # -----------------------------------------------------------------------------
@@ -49,31 +51,52 @@ def simple_template_emitter(target, source, env):
 	return target, source
 
 def simple_template_string(target, source, env):
-	return "Create: '%s' from '%s'" % (str(target[0]), str(source[0]))
+	return "Template: '%s' to '%s'" % (str(source[0]), str(target[0]))
 
 # -----------------------------------------------------------------------------
 def template_action(target, source, env):
-	import jinja2
+	try:
+		import jinja2
+	except ImportError:
+		print "To use this functionality you need to install the jinja2 template engine"
+		Exit(1)
 	
-	pass
+	globals = {
+		'time': time.strftime("%d %b %Y, %H:%M:%S", time.localtime())
+	}
+	
+	path, filename = os.path.split(source[0].path)
+	loader = jinja2.Environment(loader = jinja2.FileSystemLoader(path))
+	template = loader.get_template(filename, globals=globals)
+	
+	output = template.render(env['SUBSTITUTIONS'])
+	open(target[0].path, 'w').write(output)
 
 def template_emitter(target, source, env):
 	Depends(target, SCons.Node.Python.Value(env['SUBSTITUTIONS']))
 	return target, source
 
 def template_string(target, source, env):
-	return "Create: '%s' from '%s'" % (str(target[0]), str(source[0]))
+	return "Template: '%s' to '%s'" % (str(source[0]), str(target[0]))
 
 # -----------------------------------------------------------------------------
 def generate(env, **kw):
-	builder = env.Builder(
-		action = env.Action(simple_template_action, simple_template_string),
-		emitter = simple_template_emitter,
-		src_suffix = '.in',
-		single_source = True
-	)
-	
-	env['BUILDERS']['SimpleTemplate'] = builder
+	env.Append(
+		BUILDERS = {
+		'SimpleTemplate': env.Builder(
+			action = env.Action(simple_template_action, simple_template_string),
+			emitter = simple_template_emitter,
+			src_suffix = '.in',
+			single_source = True
+		),
+		
+		'Template':  env.Builder(
+			action = env.Action(template_action, template_string),
+			emitter = template_emitter,
+			src_suffix = '.in',
+			single_source = True
+		),
+	})
 
 def exists(env):
 	return True
