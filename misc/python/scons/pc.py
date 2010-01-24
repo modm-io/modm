@@ -40,6 +40,9 @@ def generate(env, **kw):
 	env.Tool('ar')
 	env.Tool('as')
 	
+	env['NM'] = "nm"
+	env['SIZE'] = "du -s -h"
+		
 	# build messages
 	if ARGUMENTS.get('verbose') != '1':
 		env['CCCOMSTR'] = "Compiling C: $TARGET"
@@ -49,6 +52,9 @@ def generate(env, **kw):
 		env['LINKCOMSTR'] = "Linking: $TARGET"
 		env['RANLIBCOMSTR'] = "Indexing: $TARGET"
 		env['ARCOMSTR'] = "Create Library: $TARGET"
+		
+		env['SIZECOMSTR'] = "Size after:"
+		env['SYMBOLSCOMSTR'] = "Show symbols for '$SOURCE':"
 	
 	# flags for C and C++
 	env['CCFLAGS'] = ' '.join([

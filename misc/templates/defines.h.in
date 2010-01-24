@@ -1,0 +1,9 @@
+// WARNING: This file is generated automatically, do not edit!
+// ----------------------------------------------------------------------------
+
+#ifndef DEFINES_H
+#define	DEFINES_H
+
+${defines}
+
+#endif

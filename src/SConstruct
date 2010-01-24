@@ -29,20 +29,19 @@
 # $Id$
 
 pre = Environment(tools = ['xpcc'], toolpath = ['../misc/python/scons'])
-builder = pre.EnviromentBuilder(ARGUMENTS.get('config'))
-
-env = builder.generate_build_environment(library = True)
+env = pre.GenerateEnvironment(config = ARGUMENTS.get('config'),
+							buildpath = '../build/library/$name')
 
 files = env.FindFiles(path = '.')
 
 objects = []
 for file in files.sources:
 	object = env.Object(source = file,
-						target = builder.buildpath(file, strip_extension=True))
+						target = env.Buildpath(file, strip_extension=True))
 	objects.append(object)
 
 # create the library
-library = env.Library(target = builder.buildpath('robot'),
+library = env.Library(target = env.Buildpath('robot'),
 					  source = objects)
 
 env.Alias('lib', library)
@@ -52,4 +51,5 @@ env.Alias('build', 'lib')
 env.Doxygen('../doc/doxyfile')
 env.Alias('doc', 'apidoc/html')
 
-env.Default('build')
+env.Alias('all', ['lib', 'doc'])
+env.Default('lib')

@@ -28,7 +28,7 @@
 # 
 # $Id$
 
-from string import Template
+import string
 
 from SCons.Script import *
 
@@ -37,10 +37,10 @@ def replace_action(target, source, env):
 	if not env.has_key('SUBSTITUTIONS'):
 		raise SCons.Errors.UserError, "'Template' requires SUBSTITUTIONS to be set."
 	
-	source = str(source[0])
-	target = str(target[0])
+	source = source[0].abspath
+	target = target[0].abspath
 	
-	output = Template(open(source, 'r').read()).safe_substitute(env['SUBSTITUTIONS'])
+	output = string.Template(open(source, 'r').read()).safe_substitute(env['SUBSTITUTIONS'])
 	
 	open(target, 'w').write(output)
 	return 0

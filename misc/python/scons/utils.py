@@ -5,7 +5,6 @@
 # 
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
-# 
 #     * Redistributions of source code must retain the above copyright
 #       notice, this list of conditions and the following disclaimer.
 #     * Redistributions in binary form must reproduce the above copyright
@@ -26,23 +25,39 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # 
-# $Id: SConscript 88 2009-10-16 23:07:26Z dergraaf $
+# $Id$
 
-Import('env')
-Import('sources')
+from SCons.Script import *
 
-env = env.Clone()
-env.Append(CPPPATH = '#src')
+# -----------------------------------------------------------------------------
+def show_size(env, source, alias='__size'):
+	action = Action("$SIZE %s" % source[0].path, 
+					cmdstr="$SIZECOMSTR")
+	return env.AlwaysBuild(env.Alias(alias, source, action))
 
-# build a object file form each source file
-objects = []
-for file in sources:
-	file.update(env)
-	object = env.Object(file.name,
-						CPPDEFINES=file.defines)
-	objects.append(object)
+def list_symbols(env, source, alias='__symbols'):
+	action = Action("$NM %s -S -C --size-sort -td" % source[0].path, 
+					cmdstr="$SYMBOLSCOMSTR")
+	return env.AlwaysBuild(env.Alias(alias, source, action))
 
-# link them all together to create the library
-library = env.Library(target='robot', source=objects)
+def run_program(env, program):
+	return env.Command('thisfileshouldnotexist', program, '@' + program[0].abspath)
 
-Return('library')
+def phony_target(env, **kw):
+	for target, action in kw.items():
+		env.AlwaysBuild(env.Alias(target, [], action))
+
+# -----------------------------------------------------------------------------
+def generate(env, **kw):
+	if ARGUMENTS.get('verbose') != '1':
+		env['SIZECOMSTR'] = "Size after:"
+		env['SYMBOLSCOMSTR'] = "Show symbols for '$SOURCE':"
+	
+	env.AddMethod(show_size, 'Size')
+	env.AddMethod(list_symbols, 'Symbols')
+	
+	env.AddMethod(run_program, 'Run')
+	env.AddMethod(phony_target, 'Phony')
+
+def exists(env):
+	return True

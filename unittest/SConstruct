@@ -29,32 +29,36 @@
 # $Id$
 
 pre = Environment(tools = ['xpcc'], toolpath = ['../misc/python/scons'])
-builder = pre.EnviromentBuilder('project.cfg')
-
-env = builder.generate_build_environment()
+env = pre.GenerateEnvironment(config = 'project.cfg')
 
 files = env.FindFiles(path = '.')
 
 objects = []
 for file in files.sources:
-	object = env.Object(source = file,
-						target = builder.buildpath(file, strip_extension=True))
+	object = env.Object(target = env.Buildpath(file, strip_extension=True),
+						source = file)
 	objects.append(object)
 
-# create the file which later runs all the tests
-runner = env.UnittestRunner(source = ['main_pc.cpp.in'] + files.header,
-							target = builder.buildpath('runner.cpp'))
+config = env['XPCC_CONFIG']
+
+# create a file which later runs all the tests
+template = 'runner_%s.cpp.in' % config['target.architecture']
+runner = env.UnittestRunner(target = env.Buildpath('runner.cpp'),
+							source = [template] + files.header)
 objects.append(env.Object(runner))
 
-# create program
-program = env.Program(target = builder.buildpath(builder.project_name), source = objects)
+# build the program
+program = env.Program(target = env.Buildpath(config['general.name']),
+					  source = objects)
 
-# append the xpcc-library
-library = env.xpccLibrary()
+# build the xpcc library
+library = env.XpccLibrary()
 
 env.Alias('lib', library)
 env.Alias('run', env.Run(program))
 env.Alias('build', program)
+env.Alias('size', env.Size(program))
+env.Alias('symbols', env.Symbols(program))
 
-env.Alias('all', 'build')
+env.Alias('all', ['build', 'size'])
 env.Default('all')

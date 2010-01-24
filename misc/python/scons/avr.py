@@ -42,16 +42,6 @@ from SCons.Script import *
 # elf -> lss		ok
 
 # -----------------------------------------------------------------------------
-
-def show_size(env, source):
-	return [Action("$SIZE --mcu=$AVR_DEVICE --format=avr $SOURCE", 
-					cmdstr="$SIZECOMSTR")]
-
-def list_symbols(env, source):
-	return [Action("avr-nm $SOURCE -S -C --size-sort -td",
-					cmdstr="$SYMBOLSCOMSTR")]
-
-# -----------------------------------------------------------------------------
 def generate(env, **kw):
 	env.Append(ENV = {'PATH' : os.environ['PATH']})
 	env.Tool('gcc')
@@ -71,7 +61,7 @@ def generate(env, **kw):
 	env['AR'] = "avr-ar"
 	env['NM'] = "avr-nm"
 	env['RANLIB'] = "avr-ranlib"
-	env['SIZE'] = "avr-size"
+	env['SIZE'] = "avr-size --mcu=$AVR_DEVICE --format=avr"
 	
 	# build messages
 	if ARGUMENTS.get('verbose') != '1':
@@ -146,17 +136,17 @@ def generate(env, **kw):
 		clock += 'ul'
 	env.Append(CPPDEFINES = {'F_CPU' : clock})
 	
-	env.AddMethod(show_size, 'Size')
-	env.AddMethod(list_symbols, 'Symbols')
+	builder_hex = Builder(
+		action = Action("$OBJCOPY -O ihex -R .eeprom $SOURCE $TARGET",
+						cmdstr = "$HEXCOMSTR"), 
+		suffix = ".hex", 
+		src_suffix = ".elf")
 	
-	builder_hex = Builder(action=Action("$OBJCOPY -O ihex -R .eeprom $SOURCE $TARGET",
-											cmdstr="$HEXCOMSTR"), 
-								suffix=".hex", 
-								src_suffix=".elf")
-	builder_listing = Builder(action=Action("$OBJDUMP -h -S $SOURCE > $TARGET", 
-												cmdstr="$LSSCOMSTR"), 
-								suffix=".lss", 
-								src_suffix=".elf")
+	builder_listing = Builder(
+		action = Action("$OBJDUMP -h -S $SOURCE > $TARGET",
+						cmdstr = "$LSSCOMSTR"), 
+		suffix = ".lss", 
+		src_suffix = ".elf")
 	
 	env.Append(BUILDERS = {
 		'Hex': builder_hex,

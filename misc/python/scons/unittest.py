@@ -128,7 +128,8 @@ def unittest_action(target, source, env):
 		'tests': '\n'.join(tests_cases),
 	}
 	
-	output = string.Template(open(template.abspath, 'r').read()).safe_substitute(substitutions)
+	input = open(template.abspath, 'r').read()
+	output = string.Template(input).safe_substitute(substitutions)
 	open(target[0].abspath, 'w').write(output)
 	
 	return 0
@@ -138,7 +139,6 @@ def unittest_emitter(target, source, env):
 	for file in source[1:]:
 		if file.name.endswith('_test.hpp'):
 			header.append(file)
-	
 	return target, header
 
 # -----------------------------------------------------------------------------

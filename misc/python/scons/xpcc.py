@@ -29,6 +29,7 @@
 
 import os
 import re
+import string
 import ConfigParser
 
 from SCons.Script import *
@@ -82,7 +83,7 @@ class FileScanner:
 			
 			for file in files:
 				extension = os.path.splitext(file)[1]
-				filename = os.path.join(path, file)
+				filename = os.path.relpath(os.path.join(path, file))
 				
 				if extension in ['.cpp', '.c', '.S']:
 					self.sources.append(filename)
@@ -90,86 +91,81 @@ class FileScanner:
 					self.header.append(filename)
 
 # -----------------------------------------------------------------------------
-class EnviromentBuilder:
+def generate_environment(env, config, buildpath = None):
+	try:
+		parser = ConfigParser.RawConfigParser()
+		parser.read(config)
+	except TypeError:
+		print "You need to specify a configuration file via 'scons config=path/to/file'!"
+		Exit(1)
 	
-	def __init__(self, enviroment, config_file):
-		try:
-			self.config = ConfigParser.RawConfigParser()
-			self.config.read(config_file)
-		except TypeError:
-			print "You need to specify a configuration file via 'scons config=path/to/file'!"
-			Exit(1)
-		
-		self.config_file = config_file
-		self.project_name = self.config.get('general', 'name')
-		self.toolpath = enviroment['toolpath']
-		
-		# extract the rootpath from the toolpath
-		self.rootpath = os.path.normpath(self.toolpath[0])
-		self.rootpath = os.path.normpath(self.rootpath[:-len('misc/python/scons')])
-		
-		# Create a build environment
-		self.architecture = self.config.get('target', 'architecture')
-		
-		self.defines = {}
-		for item in self.config.items('defines'):
-			self.defines[item[0]] = item[1]
+	# Create a build environment
+	architecture = parser.get('target', 'architecture')
+	if architecture == 'atmega' or architecture == 'atxmega':
+		device = parser.get('target', 'device')
+		clock = parser.get('target', 'clock')
+		new = Environment(
+				ARCHITECTURE = architecture + '/' + device,
+				AVR_DEVICE = device,
+				AVR_CLOCK = clock,
+				tools = ['avr', 'doxygen', 'template', 'unittest', 'xpcc', 'utils'],
+				toolpath = env['toolpath'],
+				LIBS = [''],
+				LIBPATH = [])
+	elif architecture == 'pc':
+		device = 'pc'
+		clock = ''
+		new = Environment(
+				ARCHITECTURE = architecture,
+				tools = ['pc', 'doxygen', 'template', 'unittest', 'xpcc', 'utils'],
+				toolpath = env['toolpath'],
+				LIBS = ['boost_thread-mt'],
+				LIBPATH = ['/usr/lib/'])
+	else:
+		print "Unknown architecture '%s'!" % architecture
+		Exit(1)
 	
-	def generate_build_environment(self, library=False):
-		if library:
-			self._buildpath = os.path.join(self.rootpath, 'build/library/%s' % self.project_name)
-		else:
-			self._buildpath = os.path.join(self.rootpath, 'build/%s' % self.project_name)
-		
-		if self.architecture == 'atmega' or self.architecture == 'atxmega':
-			self.device = self.config.get('target', 'device')
-			self.clock = self.config.get('target', 'clock')
-			self.env = Environment(
-					ARCHITECTURE = architecture + '/' + device,
-					AVR_DEVICE = self.device,
-					AVR_CLOCK = self.clock,
-					tools = ['avr', 'doxygen', 'unittest', 'xpcc'],
-					toolpath = self.toolpath,
-					LIBS=[''],
-					LIBPATH=[],
-					CPPPATH=[self._buildpath, '.'])
-		elif self.architecture == 'pc':
-			self.env = Environment(
-					ARCHITECTURE = self.architecture,
-					tools = ['pc', 'doxygen', 'unittest', 'xpcc'],
-					toolpath = self.toolpath,
-					LIBS = ['boost_thread-mt'],
-					LIBPATH = ['/usr/lib/'],
-					CPPPATH = [self._buildpath, '.'])
-		else:
-			print "Unknown architecture '%s'!" % architecture
-			Exit(1)
-		
-		self.env['XPCC_ROOTPATH'] = self.rootpath
-		self.env['XPCC_PROJECT_NAME'] = self.project_name
-		self.env['XPCC_CONFIG_FILE'] = os.path.abspath(self.config_file)
-		
-		self.env.GenerateConfig(target = self.buildpath('defines.h'),
-								source = None,
-								DEFINES = self.defines)
-		
-		return self.env
+	# extract the rootpath from the toolpath
+	rootpath = os.path.normpath(env['toolpath'][0])
+	rootpath = os.path.normpath(rootpath[:-len('misc/python/scons')])
 	
-	def buildpath(self, path, strip_extension=False):
-		""" Relocate path from source directory to the build directory
-		"""
-		if strip_extension:
-			path = os.path.splitext(path)[0]
-		
-		return os.path.join(self._buildpath, path)
-
-# -----------------------------------------------------------------------------
-def generate_enviroment_builder(env, config_file):
-	return EnviromentBuilder(env, config_file)
+	project_name = parser.get('general', 'name')
+	
+	if not buildpath:
+		buildpath = parser.get('general', 'buildpath')
+	path_substitutions = {
+		'name': project_name,
+		'arch': architecture,
+		'device': device
+	}
+	buildpath = string.Template(buildpath).safe_substitute(path_substitutions)
+	
+	new['XPCC_ROOTPATH'] = rootpath
+	new['XPCC_BUILDPATH'] = buildpath
+	new['XPCC_CONFIG_FILE'] = os.path.abspath(config)
+	new.Append(CPPPATH = [buildpath, '.'])
+	
+	cnf = {}
+	for section in parser.sections():
+		for option in parser.options(section):
+			key = '%s.%s' % (section, option)
+			cnf[key] = parser.get(section, option)
+	new['XPCC_CONFIG'] = cnf
+	
+	# create 'defines.h'
+	substitutions = {
+		'defines': '\n'.join(["#define %s %s" % (item[0].upper(), item[1]) for item in parser.items('defines')]),
+		'name': project_name
+	}
+	new.Template(target = new.Buildpath('defines.h'),
+				source = os.path.join(rootpath, 'misc/templates/defines.h.in'),
+				SUBSTITUTIONS = substitutions)
+	
+	return new
 
 def xpcc_library(env):
 	include_path = os.path.join(env['XPCC_ROOTPATH'], 'src')
-	buildpath = os.path.join(env['XPCC_ROOTPATH'], 'build/library/%s' % env['XPCC_PROJECT_NAME'])
+	buildpath = os.path.join(env['XPCC_ROOTPATH'], 'build/library/%s' % env['XPCC_CONFIG']['general.name'])
 	
 	env.Append(CPPPATH = [include_path])
 	env.Append(LIBS = ['robot'])
@@ -177,48 +173,58 @@ def xpcc_library(env):
 	
 	file = os.path.join(buildpath, 'librobot.a')
 	action = "@scons -C %s config=%s" % (include_path, env['XPCC_CONFIG_FILE'])
+	if ARGUMENTS.get('verbose') == '1':
+		action += ' verbose=1'
 	library = env.Command(file, [], action)
+	
+	Depends(library, SCons.Node.Python.Value(env['XPCC_CONFIG']))
 	
 	# remove the build directory when the library should be cleaned
 	Clean(library, buildpath)
-	
 	# TODO remove this with a call of 'scons -c' perhaps via GetOption("clean") 
 	
 	return library
-
-def run_program(env, program):
-	return env.Command('thisfileshouldnotexist', program, '@' + program[0].abspath)
-
-def phony_target(env, **kw):
-	for target, action in kw.items():
-		env.AlwaysBuild(env.Alias(target, [], action))
 
 def find_files(env, path):
 	scanner = FileScanner(env)
 	scanner.scan(path)
 	return scanner
 
+def buildpath(env, path, strip_extension=False):
+	""" Relocate path from source directory to build directory
+	"""
+	if strip_extension:
+		path = os.path.splitext(path)[0]
+	
+	path = os.path.relpath(path)
+	if os.path.isabs(path) or path.startswith('..'):
+		# if the file is not in a subpath of the current directory
+		# build it in the root directory of the build path
+		path = os.path.basename(path)
+	
+	return os.path.join(env['XPCC_BUILDPATH'], path)
+
 # -----------------------------------------------------------------------------
-config_template = """#ifndef DEFINES_H
+config_template = """\
+// WARNING: This file is generated automatically, do not edit!
+// ----------------------------------------------------------------------------
+
+#ifndef DEFINES_H
 #define	DEFINES_H
 
-%(defines)s
+${defines}
 
 #endif
 """
 
 def configuration_action(target, source, env):
-	substitutions = {
-		'defines': '\n'.join(["#define %s %s" % (key.upper(), value) for key, value in env['DEFINES'].iteritems()])
-	}
 	
-	if not source:
-		input = config_template
-	else:
-		input = open(source[0].abspath).read()
+	
+	input = config_template if (not source) else open(source[0].abspath).read()
+	output = string.Template(input).safe_substitute(substitutions)
 	
 	# create file
-	open(target[0].abspath, 'w').write(input % substitutions)
+	open(target[0].abspath, 'w').write(output)
 	return 0
 
 def configuration_emitter(target, source, env):
@@ -227,11 +233,10 @@ def configuration_emitter(target, source, env):
 
 # -----------------------------------------------------------------------------
 def generate(env, **kw):
-	env.AddMethod(generate_enviroment_builder, 'EnviromentBuilder')
-	env.AddMethod(xpcc_library, 'xpccLibrary')
-	env.AddMethod(run_program, 'Run')
-	env.AddMethod(phony_target, 'Phony')
+	env.AddMethod(generate_environment, 'GenerateEnvironment')
+	env.AddMethod(xpcc_library, 'XpccLibrary')
 	env.AddMethod(find_files, 'FindFiles')
+	env.AddMethod(buildpath, 'Buildpath')
 	
 	env.Append(BUILDERS = {
 		'GenerateConfig': Builder(
