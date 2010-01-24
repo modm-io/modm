@@ -32,6 +32,11 @@
 
 #include "communication_list.hpp"
 
+#include <xpcc/debug/logger/logger.hpp>
+// set the Loglevel
+#undef  XPCC_LOG_LEVEL
+#define XPCC_LOG_LEVEL xpcc::log::DEBUG
+
 xpcc::communicationList::List::List():
 dummyFirst(Header()),
 first(&dummyFirst),
@@ -94,12 +99,12 @@ responseCallback(responseCallback){
 void
 xpcc::communicationList::List::append(Entry *next)
 {
-	last->next = next;
+	this->last->next = next;
 	
-	while(next->next)// find tail of next
+	while( next->next != 0 )// find tail of next
 		next = next->next;
 
-	last = next;
+	this->last = next;
 }
 
 void
@@ -188,13 +193,14 @@ xpcc::communicationList::List::handlePacket(const BackendInterface &backend){
 
 void
 xpcc::communicationList::List::handleWaitingMessages(Postman &postman, BackendInterface &backend){
+//	XPCC_LOG_DEBUG << __FILE__ << ' ' << __FUNCTION__ << xpcc::flush;
 	Entry *e = first;// first is always a dummy entry
 	while(Entry *actual = e->next){
 		switch(actual->state){
 			case Entry::WANT_TO_BE_SENT:
 				if (actual->header.destination == 0){// event
-					postman.deliverPacket(actual->header);
-					backend.sendPacket(actual->header,SmartPointer());
+					postman.deliverPacket(actual->header, actual->payload);
+					backend.sendPacket(actual->header, actual->payload);
 					this->removeNext(e);
 					delete actual;
 				}
@@ -317,7 +323,7 @@ xpcc::communicationList::List::addActionCall(const Header& header, SmartPointer&
 	Entry *e = new EntryDefault(header, smartPayload);
 	e->state = Entry::WANT_TO_BE_SENT;
 	
-	append(e);
+	this->append(e);
 }
 
 void

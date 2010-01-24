@@ -29,47 +29,57 @@
  */
 // ----------------------------------------------------------------------------
 
+#ifndef	XPCC_STL_POSTMAN_HPP
+#define	XPCC_STL_POSTMAN_HPP
 
-#include "response_callback.hpp"
-/*
-xpcc::ResponseMessage::ResponseMessage(const Header& header, const uint8_t *payload, uint8_t payloadSize):
-header(header),
-payload(payload),
-payloadSize(payloadSize){
-}
-*/
-xpcc::ResponseMessage::ResponseMessage(const Header& header, const SmartPointer& payload):
-	header(header),
-	payload(payload)
-{
-}
+/**
+ * @defgroup 	communication Communication
+ * @brief 		Default Postman can be used if no other more efficient
+ * 				Postman is avalible.
+ *
+ * DESC DESC
+ *
+ * @version		$Id$
+ */
 
-xpcc::ResponseCallback::ResponseCallback() :
-	object( 0 ),
-	callbackFunction ( 0 )
-{
-}
+#include "../postman.hpp"
+#include "../../response_callback.hpp"
 
-xpcc::ResponseCallback::ResponseCallback(AbstractComponent *object, CallbackFunction callbackFunction) :
-	object( object ),
-	callbackFunction ( callbackFunction )
+#include <map>
+
+namespace xpcc
 {
-	
-}
+	class StlPostman : public Postman
+	{
+	public:
+		typedef ::std::multimap<uint16_t, ResponseCallback> EventMap;
+		typedef ::std::map<uint16_t, ResponseCallback > CallbackMap; ///< packetIdentifier -> callback
+		typedef ::std::map<uint16_t, CallbackMap > RequestMap; ///< destination -> callbackMap
+
+		StlPostman();
+
+		StlPostman(const EventMap& eventMap, const RequestMap& requenstMap);
 		
-void
-xpcc::ResponseCallback::handleResponse(const ResponseMessage& message) const
-{
-	if( this->object != 0 ) {
-		(this->object->*callbackFunction)(message);
-	}
+		~StlPostman();
+		
+		virtual DeliverInfo
+		deliverPacket(const BackendInterface& interface);
+		
+		virtual DeliverInfo
+		deliverPacket(const Header &header, SmartPointer& payload);
+				
+		virtual DeliverInfo
+		deliverPacket(const Header &header);
+		
+		virtual bool
+		isComponentAvaliable(const Header& header) const;
+
+	private:
+		EventMap eventMap;
+		RequestMap requenstMap;
+	};
 }
 
-void
-xpcc::ResponseCallback::handleResponse(const BackendInterface &backend) const
-{
-	if( this->object != 0 ) {
-		ResponseMessage message( backend.getPacketHeader(), backend.getPacketPayload() );
-		(this->object->*callbackFunction)(message);
-	}
-}
+
+
+#endif	// XPCC_STL_POSTMAN_HPP

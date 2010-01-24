@@ -133,7 +133,7 @@ namespace xpcc
 		{
 		public:
 			ReceiveListItem(const Header& header) :
-				next(0), header(header), data(0), size(0),
+				next(0), header(header), size(0),
 				receivedFragments(0) {
 			}
 			

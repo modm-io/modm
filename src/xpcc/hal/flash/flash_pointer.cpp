@@ -5,7 +5,6 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -26,74 +25,17 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id$
+ * $Id: logger.cpp 136 2009-11-24 21:20:55Z thundernail $
  */
 // ----------------------------------------------------------------------------
-
-#include "reporter.hpp"
-
-namespace
-{
-	FLASH_STRING(invaildName) = "invalid";
-	
-	FLASH_STRING(failHeader) = "FAIL: ";
-	FLASH_STRING(failColon) = " : ";
-	
-	FLASH_STRING(reportPassed) = "\nPassed ";
-	FLASH_STRING(reportFailed) = "\nFailed ";
-	FLASH_STRING(reportOf) = " of ";
-	FLASH_STRING(reportTests) = " tests\n";
-	FLASH_STRING(reportOk) = "OK!\n";
-	FLASH_STRING(reportFail) = "FAIL!\n";
-}
-
-unittest::Reporter::Reporter(xpcc::IODevice* device) :
-	outputStream(device), testName(xpcc::toFlashPointer(invaildName)),
-	testsPassed(0), testsFailed(0)
-{
-}
-
-void
-unittest::Reporter::nextTestSuite(xpcc::FlashPointer<char> name)
-{
-	testName = name;
-}
-
-void
-unittest::Reporter::reportPass()
-{
-	testsPassed++;
-}
+#include "flash_pointer.hpp"
 
 xpcc::IOStream&
-unittest::Reporter::reportFailure(unsigned int lineNumber)
+operator << ( xpcc::IOStream& os, xpcc::FlashPointer<char> ptr)
 {
-	testsFailed++;
-	outputStream << xpcc::toFlashPointer(failHeader)
-				 << testName
-				 << ':'
-				 << lineNumber
-				 << xpcc::toFlashPointer(failColon);
-	return outputStream;
-}
-
-void
-unittest::Reporter::printSummary()
-{
-	if (testsFailed == 0) {
-		outputStream << xpcc::toFlashPointer(reportPassed)
-					 << testsPassed
-					 << xpcc::toFlashPointer(reportTests)
-					 << xpcc::toFlashPointer(reportOk)
-					 << xpcc::endl;
+	char c;
+	while ((c = *ptr++)) {
+		os << c;
 	}
-	else {
-		outputStream << xpcc::toFlashPointer(reportFailed)
-					 << testsFailed
-					 << xpcc::toFlashPointer(reportOf)
-					 << (testsFailed + testsPassed)
-					 << xpcc::toFlashPointer(reportTests)
-					 << xpcc::toFlashPointer(reportFail)
-					 << xpcc::endl;
-	}
-}
+	return os;
+};

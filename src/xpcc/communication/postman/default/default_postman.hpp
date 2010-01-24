@@ -25,7 +25,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * 
- * $Id: default_postman.hpp 77 2009-10-15 18:34:29Z thundernail $
+ * $Id$
  */
 // ----------------------------------------------------------------------------
 
@@ -39,13 +39,13 @@
  *
  * DESC DESC
  *
- * @version		$Id: default_postman.hpp 77 2009-10-15 18:34:29Z thundernail $
+ * @version		$Id$
  */
 
-#include "postman.hpp"
-#include "response_callback.hpp"
+#include "../postman.hpp"
+#include "../../response_callback.hpp"
 
-#include "../data_structure/pair.hpp"
+#include <xpcc/data_structure/pair.hpp>
 
 namespace xpcc
 {

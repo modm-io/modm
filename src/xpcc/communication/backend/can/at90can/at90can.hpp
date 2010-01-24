@@ -32,7 +32,7 @@
 #ifndef	XPCC_BACKEND_AT90CAN_H
 #define	XPCC_BACKEND_AT90CAN_H
 
-#include "../backend_interface.h"
+#include "../../backend_interface.hpp"
 
 namespace xpcc
 {

@@ -40,7 +40,7 @@ main()
 	std::cout << "XPCC IOStream Test" << std::endl;
 	
 	xpcc::StdIODevice device;
-	xpcc::IOStream stream(device);
+	xpcc::IOStream stream( &device );
 	
 	stream << static_cast<uint8_t>(0xff) << static_cast<int16_t>(3) << xpcc::endl;
 	stream << 10 << xpcc::endl;

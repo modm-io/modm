@@ -34,7 +34,7 @@
 	#error	"Don't include this file directly, use 'io/iostream.hpp' instead!"
 #endif
 
-#include <stdio.h>
+#include <stdio.h>		// snprintf()
 #include <stdlib.h>
 
 #include <xpcc/math/utils.hpp>
@@ -44,43 +44,21 @@
 // ----------------------------------------------------------------------------
 
 template<typename T>
-inline xpcc::IOStream&
-xpcc::IOStream::operator<< ( const T& v )
-{
-	// typedef (T.is_integer) ? IntegerWriter<T> : ObjectWriter<T>
-	typedef typename xpcc::tm::Select <
-			::xpcc::ArithmeticTraits<T>::isFloat,
-				FloatWriter<T>,
-				StringWriter >::Result NotIntegerWriter;
-	
-    typedef typename xpcc::tm::Select <
-			::xpcc::ArithmeticTraits<T>::isInteger,
-				IntegerWriter<T>,
-				NotIntegerWriter >::Result Writer;
-	
-    Writer()(*this, v);
-	
-	return *this;
-}
-
-// ----------------------------------------------------------------------------
-
-template<typename T>
-xpcc::IOStream&
+void
 xpcc::IOStream::putInteger( T value )
 {
 	char str[ArithmeticTraits<T>::decimalDigits + 1]; // +1 for '\0'
-	
+
 	snprintf(str, sizeof(str), "%d", value);
-	
+
 	this->device->put(str);
-	return *this;
 }
+
 
 // ----------------------------------------------------------------------------
 
 template<typename T>
-xpcc::IOStream&
+void
 xpcc::IOStream::putFloat( const T& value )
 {
 	// hard coded for 2.22507e-308
@@ -93,5 +71,4 @@ xpcc::IOStream::putFloat( const T& value )
 #endif
 	
 	this->device->put(str);
-	return *this;
 }

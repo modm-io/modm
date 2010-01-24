@@ -25,85 +25,96 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id$
+ * $Id: default_postman.cpp 77 2009-10-15 18:34:29Z thundernail $
  */
 // ----------------------------------------------------------------------------
 
-#include "communication.hpp"
+#include "postman.hpp"
 
-#include <xpcc/debug/logger/logger.hpp>
-// set the Loglevel
-#undef  XPCC_LOG_LEVEL
-#define XPCC_LOG_LEVEL xpcc::log::DEBUG
-
-xpcc::Communication::Communication(
-		BackendInterface *backend,
-		Postman* postman) :
-	backend(backend),
-	postman(postman),
-	responseManager()
+xpcc::StlPostman::StlPostman()
 {
 
 }
 
 // ----------------------------------------------------------------------------
-xpcc::Communication::~Communication()
+
+xpcc::StlPostman::StlPostman(const EventMap& eventMap, const RequestMap& requenstMap) :
+	eventMap ( eventMap ),
+	requenstMap ( requenstMap )
+{
+
+}
+
+// ----------------------------------------------------------------------------
+
+xpcc::StlPostman::~StlPostman()
 {
 }
 
 // ----------------------------------------------------------------------------
-void
-xpcc::Communication::update(){
-	//Check if a new packet was received by the backend
-	while( this->backend->isPacketAvailable() )
-	{
-		//switch(postman->deliverPacket(backend))){
-		//	case NO_ACTION: // send error message
-		//		break;
-		//	case OK:
-		//	case NO_COMPONENT:
-		//	case NO_EVENT:
-		//}
-		const Header& header( this->backend->getPacketHeader() );
-		
-		if ( header.type == Header::REQUEST && !header.isAcknowledge ){
-			if ( postman->deliverPacket( *backend ) == Postman::OK ) {
-				if ( header.destination != 0 ) {
-					// transmit ACK (is not an EVENT)
-					Header ackHeader(
-							header.type,
-							true,
-							header.source,
-							header.destination,
-							header.packetIdentifier);
-					this->backend->sendPacket( ackHeader );
-				}
+xpcc::StlPostman::DeliverInfo
+xpcc::StlPostman::deliverPacket(const BackendInterface& backend)
+{
+	const xpcc::Header &header = backend.getPacketHeader();
+
+	if( header.destination == 0 ) {
+		// EVENT
+		EventMap::const_iterator lowerBound( this->eventMap.lower_bound( header.packetIdentifier) );
+		EventMap::const_iterator upperBound( this->eventMap.upper_bound( header.packetIdentifier) );
+		if( lowerBound != upperBound ) {
+			do {
+				lowerBound->second.handleResponse( backend );
+				lowerBound++;
+			} while( lowerBound != upperBound );
+			return OK;
+		}
+		return NO_EVENT;
+	}
+	else {
+		// REQUEST
+		RequestMap::const_iterator iterDestination( this->requenstMap.find( header.destination ) );
+		if( iterDestination != this->requenstMap.end() ) {
+			CallbackMap::const_iterator iterCallback( iterDestination->second.find( header.packetIdentifier ) );
+			if( iterCallback != iterDestination->second.end() ) {
+				iterCallback->second.handleResponse( backend );
+				return OK;
+			}
+			else {
+				return NO_ACTION;
 			}
 		}
-		else{
-			responseManager.handlePacket( *backend );
+		else {
+			return NO_COMPONENT;
 		}
-				
-		backend->dropPacket();
 	}
-	
-	// check somehow if there are packets to send
-	responseManager.handleWaitingMessages(*postman, *backend);
-
 }
 
 // ----------------------------------------------------------------------------
-uint8_t
-xpcc::Communication::getCurrentComponent() const
+
+xpcc::StlPostman::DeliverInfo
+xpcc::StlPostman::deliverPacket(const Header &header, SmartPointer& payload)
 {
-	return this->currentComponent;
+	(void) header;
+	(void) payload;
+	// TODO ???
+	return NOT_IMPLEMENTED_YET_ERROR;
 }
-		
+
 // ----------------------------------------------------------------------------
 
-void
-xpcc::Communication::setCurrentComponent(uint8_t id)
+xpcc::StlPostman::DeliverInfo
+xpcc::StlPostman::deliverPacket(const Header &header)
 {
-	this->currentComponent = id;
+	(void) header;
+	// TODO ???
+	return NOT_IMPLEMENTED_YET_ERROR;
 }
 
+// ----------------------------------------------------------------------------
+
+bool
+xpcc::StlPostman::isComponentAvaliable(const Header& header) const
+{
+	RequestMap::const_iterator iterDestination( this->requenstMap.find( header.destination ) );
+	return ( iterDestination != this->requenstMap.end() );
+}

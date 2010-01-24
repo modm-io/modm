@@ -63,7 +63,7 @@ namespace xpcc
 		class Logger : public ::xpcc::IOStream
 		{
 			public:
-				Logger(::xpcc::IODevice& device) :
+				Logger(::xpcc::IODevice* device) :
 					IOStream(device)
 				{
 				}
@@ -72,7 +72,7 @@ namespace xpcc
 				inline Logger&
 				operator << (const T& msg)
 				{
-					this->xpcc::IOStream::operator <<(msg);
+					*(xpcc::IOStream*)this << msg;
 					return *this;
 				}
 

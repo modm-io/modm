@@ -25,7 +25,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: tipc.hpp 92 2009-10-17 15:54:22Z thundernail $
+ * $Id$
  */
 // ----------------------------------------------------------------------------
 #ifndef XPCC_TIPC_H_
@@ -46,7 +46,7 @@ namespace xpcc {
 		 * @brief	Class that connects the communication to the tipc.
 		 *
 		 * @ingroup	tipc
-		 * @version	$Id: tipc.hpp 92 2009-10-17 15:54:22Z thundernail $
+		 * @version	$Id$
 		 * @author	Martin Rosekeit <martin.rosekeit@rwth-aachen.de>
 		 */
 		class Tipc : public BackendInterface

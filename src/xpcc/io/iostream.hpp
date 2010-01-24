@@ -34,9 +34,10 @@
 #define XPCC__IOSTREAM_HPP
 
 #include <stdint.h>
-#include <xpcc/hal/flash/flash_pointer.hpp>
 
 #include "iodevice.hpp"
+
+//#include <iostream>
 
 namespace xpcc
 {
@@ -60,7 +61,7 @@ namespace xpcc
 		///	MyIODevice device;
 		///	IOStream stream( device );
 		/// @endcode
-		IOStream(IODevice& device);
+		IOStream(IODevice* device);
 
 		inline IOStream&
 		put(char c)
@@ -73,13 +74,104 @@ namespace xpcc
 		flush()
 		{
 			this->device->flush();
+			this->mode = ASCII;
 			return *this;
 		}
 		
-		template<typename T>
+		/// set the output mode to HEX style for \t char and \t char*
 		inline IOStream&
-		operator << ( const T& c );
-		
+		hex()
+		{
+			this->mode = HEX;
+			return *this;
+		}
+
+		/// set the output mode to ASCII style for \t char and \t char*
+		inline IOStream&
+		ascii()
+		{
+			this->mode = ASCII;
+			return *this;
+		}
+
+		inline IOStream&
+		operator << ( const unsigned char& v )
+		{
+			if( this->mode == ASCII ) {
+				this->putInteger( static_cast<unsigned short>( v ) );
+			}
+			else {
+				this->putHex( v );
+			}
+			return *this;
+		}
+
+		inline IOStream&
+		operator << ( const char& v )
+		{
+			if( this->mode == ASCII ) {
+				this->device->put(v);
+			}
+			else {
+				this->putHex( v );
+			}
+			return *this;
+		}
+
+		inline IOStream&
+		operator << ( const unsigned short& v )
+		{
+			this->putInteger( v );
+			return *this;
+		}
+
+		inline IOStream&
+		operator << ( const short& v )
+		{
+			this->putInteger( v );
+			return *this;
+		}
+
+		inline IOStream&
+		operator << ( const unsigned int& v )
+		{
+			this->putInteger(v);
+			return *this;
+		}
+
+		inline IOStream&
+		operator << ( const int& v )
+		{
+			this->putInteger(v);
+			return *this;
+		}
+
+		inline IOStream&
+		operator << ( const float& v )
+		{
+			this->putFloat(v);
+			return *this;
+		}
+
+		inline IOStream&
+		operator << ( const double& v )
+		{
+			this->putFloat(v);
+			return *this;
+		}
+
+		inline IOStream&
+		operator << ( const char* v )
+		{
+			if( this->mode == ASCII ) {
+				this->device->put( v );
+			}
+			else {
+				this->putHex( v );
+			}
+			return *this;
+		}
+
 		inline IOStream&
 		operator << ( IOStream& (*function)(IOStream&) )
 		{
@@ -87,103 +179,59 @@ namespace xpcc
 		}
 
 	protected :
-		friend struct StringWriter;
-
-		template <typename T>
-		friend struct IntegerWriter;
-
-		template <typename T>
-		friend struct FloatWriter;
-		
-		IOStream&
-		putInteger(int8_t value);
-		
-		IOStream&
-		putInteger(uint8_t value);
-		
-		IOStream&
+		void
 		putInteger(int16_t value);
 		
-		IOStream&
+		void
 		putInteger(uint16_t value);
 		
 #ifdef __AVR__
 		// uses the optimized non standard function 'ltoa()' which is
 		// not always available. For the general case snprintf() is
 		// used.
-		IOStream&
+		void
 		putInteger(int32_t value);
 		
-		IOStream&
+		void
 		putInteger(uint32_t value);
 #endif
 		
 		// default version which is used when all the others don't match
 		template<typename T>
-		IOStream&
+		void
 		putInteger( T value );
-		
+
+		void
+		putHex( const char*  s );
+
+		void
+		putHex( char value );
+
 		template<typename T>
-		IOStream&
+		void
 		putFloat( const T& value );
 
 	private :
+		typedef enum {
+			ASCII,
+			HEX
+		} Mode;
+
 		IOStream(const IOStream& );
 
 		IOStream&
 		operator =(const IOStream& );
-
-		IODevice* const	device;
 		
-		struct StringWriter
-		{
-			inline void
-			operator()(IOStream& os, const char* s) const
-			{
-				os.device->put( s );
-			}
+		IODevice* const	device;
 
-			inline void
-			operator()(IOStream& os, char c) const
-			{
-				os.device->put( c );
-			}
-			
-			inline void
-			operator()(IOStream& os, FlashPointer<char> str) const
-			{
-				char c;
-				while ((c = *str++)) {
-					os.device->put(c);
-				}
-			}
-		};
-
-		template <typename T>
-		struct IntegerWriter
-		{
-			inline void
-			operator()(IOStream& os, const T& v) const
-			{
-				os.putInteger(v);
-			}
-		};
-
-		template <typename T>
-		struct FloatWriter
-		{
-			inline void
-			operator()(IOStream& os, const T& v) const
-			{
-				os.putFloat(v);
-			}
-		};
+		Mode mode;
 	};
 	
 	/**
 	 * @brief  Flushes the output stream.
 	 *
 	 * This manipulator simply calls the stream's flush() member function.
+	 * @ingroup io
 	*/
 	inline IOStream&
 	flush(IOStream& ios)
@@ -194,17 +242,37 @@ namespace xpcc
 	/**
 	 * @brief  Write a newline and flush the stream.
 	 *
-	 * This manipulator is often mistakenly used when a simple newline is
-	 * desired, leading to poor buffering performance.
-	 * See http://gcc.gnu.org/onlinedocs/libstdc++/manual/bk01pt11ch25s02.html 
-	 * for more on this subject.
+	 * @ingroup io
 	 */
 	inline IOStream&
 	endl(IOStream& ios)
 	{
 		return flush(ios.put('\n'));
 	}
+
+	/**
+	 * @brief  set the output mode to HEX style for \t char and \t char*
+	 *
+	 * @ingroup io
+	 */
+	inline IOStream&
+	hex(IOStream& ios)
+	{
+		return ios.hex();
+	}
+
+	/**
+	 * @brief  set the output mode to ASCII style for \t char and \t char*
+	 *
+	 * @ingroup io
+	 */
+	inline IOStream&
+	ascii(IOStream& ios)
+	{
+		return ios.ascii();
+	}
 };
+
 
 #include "iostream_impl.hpp"
 

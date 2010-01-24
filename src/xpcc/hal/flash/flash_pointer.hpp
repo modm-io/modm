@@ -34,6 +34,8 @@
 #define	XPCC__FLASH_HPP
 
 #include <xpcc/utils/misc.hpp>
+#include <xpcc/utils/typet.hpp>
+#include <xpcc/io/iostream.hpp>
 #include "flash_reader.hpp"
 
 namespace xpcc
@@ -134,6 +136,10 @@ namespace xpcc
 		}
 	
 	private:
+		template <typename U>
+		friend IOStream&
+		operator << ( IOStream&, const FlashPointer<U>&);
+
 		const T* address;
 	};
 	
@@ -142,12 +148,39 @@ namespace xpcc
 	 * @brief	
 	 */
 	template<typename T>
-	ALWAYS_INLINE
-	FlashPointer<T>
+	ALWAYS_INLINE FlashPointer<T>
 	toFlashPointer(const T* ptr)
 	{
 		return FlashPointer<T>(ptr);
-	}
-}
+	};
+};
+
+// -----------------------------------------------------------------------------
+// IMPLEMENTATION
+// -----------------------------------------------------------------------------
+
+/**
+ * Streamoperator - the template version is not implemented yet!!
+ * \ingroup hal
+ */
+template<typename T>
+xpcc::IOStream&
+operator << ( xpcc::IOStream& os, xpcc::FlashPointer<T> ptr)
+{
+	ptr.XPCC_NOT_IMPLEMENTED_YET_streamoperator_of_not_char_type;
+	// Not implemented YET
+	// problem:
+	//  Is ptr a pointer of an array?
+	//  How many elements has the array?
+
+	return os;
+};
+
+/**
+ * Streamoperator - specialisation with \b char for the template.
+ * \ingroup hal
+ */
+xpcc::IOStream&
+operator << ( xpcc::IOStream& os, xpcc::FlashPointer<char> ptr);
 
 #endif	// XPCC__FLASH_HPP

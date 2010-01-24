@@ -35,6 +35,8 @@
 #include <string.h>		// for memcpy
 #include <stdint.h>
 
+#include <xpcc/io/iostream.hpp>
+
 namespace xpcc
 {
 	class SmartPointerVolatile;
@@ -68,10 +70,6 @@ namespace xpcc
 		
 		SmartPointer(const SmartPointerVolatile& other);
 
-		/// Allocates memory from the given size
-		/// @param size the amount of memory to be allocated, has to be smaller than 252
-		SmartPointer(uint8_t size);
-
 		~SmartPointer();
 
 		inline const uint8_t *
@@ -86,11 +84,24 @@ namespace xpcc
 		}
 		
 	protected:
+		friend IOStream&
+		operator <<( IOStream&, const SmartPointer&);
+
+		/// Allocates memory from the given size
+		/// @param size the amount of memory to be allocated, has to be smaller than 252
+		SmartPointer(unsigned char size);
+
 		SmartPointer&
 		operator=(const SmartPointer& other);
 		
 		uint8_t * const ptr;
 	};
+
+	/**
+	 * \ingroup data_structure
+	 */
+	xpcc::IOStream&
+	operator <<( xpcc::IOStream& s, const xpcc::SmartPointer& sPtr);
 
 	/**
 	 * \ingroup data_structure
@@ -107,7 +118,7 @@ namespace xpcc
 		public:
 			/// Allocates memory from the given size
 			/// @param size the amount of memory to be allocated, has to be smaller than 252
-			SmartPointerVolatile(uint8_t size);
+			SmartPointerVolatile(unsigned char size);
 
 			SmartPointerVolatile(const SmartPointerVolatile& other);
 
@@ -116,8 +127,17 @@ namespace xpcc
 			{
 				return &ptr[2];
 			}
+
+		protected :
+			friend IOStream&
+			operator <<( IOStream&, const SmartPointerVolatile&);
 	};
 
-}
+	/**
+	 * \ingroup data_structure
+	 */
+	xpcc::IOStream&
+	operator <<( xpcc::IOStream& s, const xpcc::SmartPointerVolatile& sPtr);
+};
 
 #endif	// XPCC_SMART_POINTER_H

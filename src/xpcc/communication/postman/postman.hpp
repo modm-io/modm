@@ -25,7 +25,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * 
- * $Id: postman.hpp 77 2009-10-15 18:34:29Z thundernail $
+ * $Id$
  */
 // ----------------------------------------------------------------------------
 
@@ -38,10 +38,10 @@
  *
  * DESC DESC
  *
- * @version		$Id: postman.hpp 77 2009-10-15 18:34:29Z thundernail $
+ * @version		$Id$
  */
 
-#include "backend/backend_interface.hpp"
+#include "../backend/backend_interface.hpp"
 
 namespace xpcc{
 	class Postman

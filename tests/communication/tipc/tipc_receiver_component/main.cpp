@@ -31,7 +31,7 @@
 
 
 #include <xpcc/communication/communication.hpp>
-#include <xpcc/communication/default_postman.hpp>
+#include <xpcc/communication/postman/stl/postman.hpp>
 #include <xpcc/communication/backend/tipc/tipc.hpp>
 
 #include <xpcc/debug/logger/imp/std.hpp>
@@ -76,20 +76,21 @@ main()
 	tipc.addReceiverId(0x10);
 	tipc.addEventId(0x01);
 
+
 	// the connection between messageID and callback-methods
 	// EVENT = 0x01;
-	xpcc::Pair<uint16_t, xpcc::ResponseCallback> event = {
-			0x01,
-			xpcc::ResponseCallback(&receiver, &Receiver::eventCallback)
-	};
+	xpcc::StlPostman::EventMap eventMap;
+	eventMap.insert( xpcc::StlPostman::EventMap::value_type( 0x01, xpcc::ResponseCallback(&receiver, &Receiver::eventCallback) ) );
+
 	// ACTION = 0x10;
-	xpcc::Pair<uint16_t, xpcc::ResponseCallback> action = {
-			0x10,
-			xpcc::ResponseCallback(&receiver, &Receiver::actionCallback)
-	};
+	xpcc::StlPostman::CallbackMap receiverCallbackMap;
+	receiverCallbackMap[0x20] = xpcc::ResponseCallback(&receiver, &Receiver::actionCallback);
+
+	xpcc::StlPostman::RequestMap componentMap;
+	componentMap[0x10] = receiverCallbackMap;
 
 	// set the 'list' of connections to the postman
-	xpcc::DefaultPostman postman( event, action );
+	xpcc::StlPostman postman( eventMap, componentMap );
 
 	// connect the 'hardware' to the postman
 	xpcc::Communication com(&tipc, &postman);
@@ -105,26 +106,3 @@ main()
 
 	xpcc::log::info << "########## XPCC TIPC COMPONENT Test Receiver END ##########" << xpcc::flush;
 }
-
-/*
- 		if( tipc.isPacketAvailable() ) {
-			const xpcc::Header& header =  tipc.getPacketHeader();
-			const uint8_t* payload = tipc.getPacketPayload();
-
-			XPCC_LOG_INFO << XPCC_FILE_INFO << "has ";
-			XPCC_LOG_INFO << ((header.destination != 0) ? "ACTION" : "EVENT");
-			XPCC_LOG_INFO << " from:" << (int)header.source;
-			XPCC_LOG_INFO << " value:" << *(int*) payload;
-			XPCC_LOG_INFO << xpcc::flush;
-
-			if( header.destination != 0 ) {
-				xpcc::Header ackHeader( xpcc::Header::REQUEST, true, header.source, header.destination, 0x01 );
-				tipc.sendPacket(ackHeader);
-			}
-
-			tipc.dropPacket();
-		}
-		else {
-			XPCC_LOG_DEBUG << XPCC_FILE_INFO << "has no packet" << xpcc::flush;
-		}
- */

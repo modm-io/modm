@@ -30,37 +30,23 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/hal/flash/flash_pointer.hpp>
-
 #include "iostream.hpp"
 
-namespace
+#include <xpcc/hal/flash/flash_pointer.hpp>
+
+FLASH(uint16_t base[]) = { 10, 100, 1000, 10000 };
+
+
+// ----------------------------------------------------------------------------
+xpcc::IOStream::IOStream( IODevice* device ) :
+	device( device ),
+	mode ( ASCII )
 {
-	FLASH(uint16_t base[]) = { 10, 100, 1000, 10000 };
 }
 
 // ----------------------------------------------------------------------------
-xpcc::IOStream::IOStream( IODevice& device ) :
-	device( &device )
-{
-}
 
-// ----------------------------------------------------------------------------
-xpcc::IOStream&
-xpcc::IOStream::putInteger(int8_t value)
-{
-	return this->putInteger(static_cast<int16_t>(value));
-}
-
-// ----------------------------------------------------------------------------
-xpcc::IOStream&
-xpcc::IOStream::putInteger(uint8_t value)
-{
-	return this->putInteger(static_cast<uint16_t>(value));
-}
-
-// ----------------------------------------------------------------------------
-xpcc::IOStream&
+void
 xpcc::IOStream::putInteger(int16_t value)
 {
 	FlashPointer<uint16_t> basePtr = xpcc::toFlashPointer(base);
@@ -86,17 +72,15 @@ xpcc::IOStream::putInteger(int16_t value)
 	} while (i);
 	
 	this->device->put(static_cast<char>(value) + '0');
-	
-	return *this;
 }
 
 // ----------------------------------------------------------------------------
-xpcc::IOStream&
+void
 xpcc::IOStream::putInteger(uint16_t value)
 {
-	FlashPointer<uint16_t> basePtr = xpcc::toFlashPointer(base);
-	
 	bool zero = true;
+	FlashPointer<uint16_t> basePtr = xpcc::toFlashPointer(base);
+
 	uint8_t i = 4;
 	do {
 		i--;
@@ -112,13 +96,10 @@ xpcc::IOStream::putInteger(uint16_t value)
 	} while (i);
 	
 	this->device->put(static_cast<char>(value) + '0');
-	
-	return *this;
 }
 
 // ----------------------------------------------------------------------------
 #ifdef __AVR__
-
 	xpcc::IOStream&
 	xpcc::IOStream::putInteger(int32_t value)
 	{
@@ -142,3 +123,42 @@ xpcc::IOStream::putInteger(uint16_t value)
 	}
 
 #endif
+
+// ----------------------------------------------------------------------------
+
+void
+xpcc::IOStream::putHex( const char* s )
+{
+	while ( s != '\0' ) {
+		this->putHex( *s );
+		s++;
+	}
+}
+
+// ----------------------------------------------------------------------------
+
+void
+xpcc::IOStream::putHex( char value )
+{
+	char nibble = (value >> 4);
+	char hex;
+
+	if ( nibble > 9 ) {
+		hex = nibble+'A'-10;
+	}
+	else {
+		hex = nibble+'0';
+	}
+
+	this->device->put(hex);
+
+	nibble = (value & 0xF);
+	if ( nibble > 9 ) {
+		hex = nibble+'A'-10;
+	}
+	else {
+		hex = nibble+'0';
+	}
+
+	this->device->put(hex);
+}

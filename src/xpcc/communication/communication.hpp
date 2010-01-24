@@ -34,7 +34,7 @@
 
 #include "backend/backend_interface.hpp"
 #include "abstract_component.hpp"
-#include "postman.hpp"
+#include "postman/postman.hpp"
 #include "communication_list.hpp"
 
 //template<typename T>
@@ -63,6 +63,11 @@
 //getData(p);
 //if(getData(p));
 
+#include <xpcc/debug/logger/logger.hpp>
+// set the Loglevel
+#undef  XPCC_LOG_LEVEL
+#define XPCC_LOG_LEVEL xpcc::log::DEBUG
+
 
 namespace xpcc
 {
@@ -72,7 +77,8 @@ namespace xpcc
 	class Communication
 	{
 	public:
-		Communication(BackendInterface *backend,
+		Communication(
+				BackendInterface *backend,
 				Postman* postman);
 		
 		~Communication();
@@ -118,6 +124,88 @@ namespace xpcc
 		
 		
 	};
+}
+
+// -----------------------------------------------------------------------------
+// IMPLEMENTATION
+// -----------------------------------------------------------------------------
+
+// ----------------------------------------------------------------------------
+template<typename T>
+void
+xpcc::Communication::callAction(uint8_t receiver, uint8_t actionIdentifier, const T& data)
+{
+	Header header(	Header::REQUEST,
+					false,
+					receiver,
+					currentComponent,
+					actionIdentifier);
+	SmartPointer payload(&data);
+
+	this->responseManager.addActionCall(header, payload);
+}
+
+// ----------------------------------------------------------------------------
+template<typename T>
+void
+xpcc::Communication::callAction(uint8_t receiver, uint8_t actionIdentifier, const T& data, ResponseCallback& responseCallback)
+{
+	Header header(	Header::REQUEST,
+					false,
+					receiver,
+					currentComponent,
+					actionIdentifier);
+
+	SmartPointer payload(&data);
+
+	this->responseManager.addActionCall(header, payload, responseCallback);
+}
+
+// ----------------------------------------------------------------------------
+template<typename T>
+void
+xpcc::Communication::sendResponse(const ResponseHandle& handle, const T& data)
+{
+	Header header(	Header::RESPONSE,
+					false,
+					handle.source,
+					currentComponent,
+					handle.packetIdentifier);
+
+	SmartPointer payload(&data);
+
+	this->responseManager.addResponse(header, payload);
+}
+
+// ----------------------------------------------------------------------------
+template<typename T>
+void
+xpcc::Communication::sendNegativeResponse(const ResponseHandle& handle, const T& data)
+{
+	Header header(	Header::NEGATIVE_RESPONSE,
+					false,
+					handle.source,
+					currentComponent,
+					handle.packetIdentifier);
+
+	SmartPointer payload(&data);
+
+	this->responseManager.addResponse(header, payload);
+}
+
+// ----------------------------------------------------------------------------
+template<typename T>
+void
+xpcc::Communication::publishEvent(uint8_t eventIdentifier, const T& data)
+{
+	Header header(	Header::REQUEST,
+					false,
+					0,
+					currentComponent,
+					eventIdentifier);
+	SmartPointer payload(&data);// no metadata is sent with Events
+
+	this->responseManager.addEvent(header, payload);
 }
 
 #endif // XPCC_COMMUNICATION_HPP

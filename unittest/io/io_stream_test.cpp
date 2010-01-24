@@ -81,7 +81,7 @@ void
 IoStreamTest::setUp()
 {
 	device.clear();
-	stream = new xpcc::IOStream(device);
+	stream = new xpcc::IOStream(&device);
 }
 
 void

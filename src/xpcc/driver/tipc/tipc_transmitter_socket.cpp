@@ -33,8 +33,9 @@
 #include "header.hpp"
 
 #include <sys/socket.h>
+#include <unistd.h> // close()
 #include <linux/tipc.h>
-#include <boost/shared_array.hpp>
+#include <xpcc/data_structure/smart_pointer.hpp>
 
 #include "../../debug/logger/logger.hpp"
 #undef  XPCC_LOG_LEVEL
@@ -78,30 +79,28 @@ xpcc::tipc::TransmitterSocket::transmitPayload(
 	header.size = length;
 
 	// Allocate memory for whole packet (header plus payload)
-	boost::shared_array<char> tipcPacketPointer ( new char[ sizeof(Header) + length ] );
+	xpcc::SmartPointerVolatile tipcPacketPointer ( sizeof(Header) + length );
 
 	// Put things together - first the tipc-header and then the payload
-	memcpy( tipcPacketPointer.get(), &header, sizeof(Header) );
-	memcpy( tipcPacketPointer.get()+sizeof(Header), packet, length);
+	memcpy( tipcPacketPointer.getPointer(), &header, sizeof(Header) );
+	memcpy( tipcPacketPointer.getPointer()+sizeof(Header), packet, length);
 
 	sendToResult	=	sendto(	this->socketDescriptor_,
-								(void*)tipcPacketPointer.get(),
+								(void*)tipcPacketPointer.getPointer(),
 								length + sizeof(Header),
 								0,
 								(struct sockaddr*)&tipcToAddresse,
 								(size_t)sizeof(tipcToAddresse));
 
-/*	XPCC_LOG_DEBUG << __FILE__ << __FUNCTION__
-			<< " tid=" << (int)typeId
-			<< " iid=" << (int)instanceId;
-	for(unsigned int i=0; i<length; i++) {
-		XPCC_LOG_DEBUG << " " << (int)(*(packet+i));
-	}
-	XPCC_LOG_DEBUG << xpcc::flush;
-*/
+//	XPCC_LOG_DEBUG << XPCC_FILE_INFO << __FUNCTION__ << "()"
+//			<< " tid=" << (int)typeId
+//			<< " iid=" << (int)instanceId
+//			<< " value=" << tipcPacketPointer;
+//	XPCC_LOG_DEBUG << xpcc::flush;
+
 	// Check if the sending failed
 	if (sendToResult < 0) {
-		XPCC_LOG_ERROR << __FILE__ << __FUNCTION__ << "on transmit" << xpcc::flush;
+		XPCC_LOG_ERROR << XPCC_FILE_INFO << __FUNCTION__ << "on transmit" << xpcc::flush;
 
 		// Throw an exception because a connection error cannot be handled here.
 		// Just closing and opening the socket again is not suitable because one

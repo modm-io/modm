@@ -34,6 +34,7 @@
 #define	UNITTEST__REPORTER_HPP
 
 #include <xpcc/io/iostream.hpp>
+#include <xpcc/hal/flash/flash_pointer.hpp>
 
 namespace unittest
 {
@@ -48,7 +49,7 @@ namespace unittest
 		/// @brief	Constructor
 		///
 		/// @param	device	IODevice used for printing
-		Reporter(xpcc::IODevice& device);
+		Reporter(xpcc::IODevice* device);
 		
 		/// @brief	Switch to the next test suite
 		/// 

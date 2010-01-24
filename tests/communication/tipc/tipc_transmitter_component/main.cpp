@@ -30,6 +30,8 @@
 // ----------------------------------------------------------------------------
 
 
+#include <xpcc/communication/communication.hpp>
+#include <xpcc/communication/postman/stl/postman.hpp>
 #include <xpcc/communication/backend/tipc/tipc.hpp>
 
 #include <xpcc/debug/logger/imp/std.hpp>
@@ -42,32 +44,38 @@ main()
 {
 	xpcc::log::info << "########## XPCC TIPC COMPONENT Test TRANSMIT ##########" << xpcc::flush;
 
+	// the hardware, that transfers the messages
 	xpcc::tipc::Tipc tipc;
-	tipc.addReceiverId(0x20);
+
+	// set the filters of the hardware
+	tipc.addReceiverId(0x11);
+
+	// set the 'list' of connections to the postman
+	xpcc::StlPostman postman;
+
+	// connect the 'hardware' to the postman
+	xpcc::Communication com(&tipc, &postman);
+	com.setCurrentComponent(0x11);
 
 	xpcc::Header actionHeader( xpcc::Header::REQUEST, false, 0x10, 0x20, 0x01 );	// ACTION
 	xpcc::Header eventHeader( xpcc::Header::REQUEST, false, 0x00, 0x20, 0x01 );	// ACTION
 
 	int data(0);
 
+	xpcc::IOStream stream( &xpcc::log::device );
+
 	while(1) {
 		data++;
+
+		com.update();
+
 		xpcc::SmartPointer payload(&data);
-		xpcc::log::info << data << xpcc::flush;
-		tipc.sendPacket(actionHeader, payload);
-		tipc.sendPacket(eventHeader, payload);
+		XPCC_LOG_INFO << XPCC_FILE_INFO << "data   =" << data << xpcc::flush;
+		XPCC_LOG_INFO << XPCC_FILE_INFO << "payload=" << payload << xpcc::flush;
 
-		if ( tipc.isPacketAvailable() ) {
-			const xpcc::Header& header =  tipc.getPacketHeader();
 
-			XPCC_LOG_INFO << XPCC_FILE_INFO << "has";
-			XPCC_LOG_INFO << ((header.destination != 0) ? " ACTION" : " EVENT");
-			XPCC_LOG_INFO << ((header.isAcknowledge) ? " ACK" : "");
-			XPCC_LOG_INFO << " from:" << (int)header.source;
-			XPCC_LOG_INFO << xpcc::flush;
-
-			tipc.dropPacket();
-		}
+		com.callAction(0x10, 0x20, data);
+		com.publishEvent(0x01, data);
 
 		sleep(1);
 	}

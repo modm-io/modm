@@ -31,6 +31,7 @@
 #ifndef XPCC_LOG_STYLE_PREFIX__HPP
 #define XPCC_LOG_STYLE_PREFIX__HPP
 
+#include <cstring>
 #include "../style.hpp"
 #include <xpcc/utils/typet.hpp>
 
