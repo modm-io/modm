@@ -34,11 +34,6 @@ import ConfigParser
 
 env = Environment(tools = ['template', 'doxygen'], toolpath = ['misc/python/scons'])
 
-warning = """\
-# 
-# WARNING: This file is generated automatically, do not edit!
-"""
-
 parser = ConfigParser.RawConfigParser()
 for path, directories, files in os.walk('tests'):
 	# exclude the SVN-directories
@@ -49,13 +44,17 @@ for path, directories, files in os.walk('tests'):
 		parser.read(os.path.join(path, 'project.cfg'))
 		
 		rootpath = '/'.join(['..' for x in range(len(path.split('/')))])
-		file = env.Template(target = os.path.join(path, 'SConstruct'),
-							source = 'misc/templates/SConstruct.in',
-							SUBSTITUTIONS = {'rootpath': rootpath,
-											 'warning': warning })
+		file = env.SimpleTemplate(target = os.path.join(path, 'SConstruct'),
+								  source = 'misc/templates/SConstruct.in',
+								  SUBSTITUTIONS = {'rootpath': rootpath })
 		
 		env.Alias('update', file)
-		
+
+if 'template' in BUILD_TARGETS:
+	import jinja2
+	
+	# TODO regnerate the templates
+
 # add target to create the doxygen documentation
 env.Doxygen('doc/doxyfile')
 env.Alias('doc', 'apidoc/html')

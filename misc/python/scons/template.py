@@ -29,13 +29,12 @@
 # $Id$
 
 import string
-
 from SCons.Script import *
 
 # -----------------------------------------------------------------------------
-def replace_action(target, source, env):
+def simple_template_action(target, source, env):
 	if not env.has_key('SUBSTITUTIONS'):
-		raise SCons.Errors.UserError, "'Template' requires SUBSTITUTIONS to be set."
+		raise SCons.Errors.UserError, "'SimpleTemplate' requires SUBSTITUTIONS to be set."
 	
 	source = source[0].abspath
 	target = target[0].abspath
@@ -45,24 +44,36 @@ def replace_action(target, source, env):
 	open(target, 'w').write(output)
 	return 0
 
-def replace_emitter(target, source, env):
+def simple_template_emitter(target, source, env):
 	Depends(target, SCons.Node.Python.Value(env['SUBSTITUTIONS']))
 	return target, source
 
-def replace_string(target, source, env):
+def simple_template_string(target, source, env):
+	return "Create: '%s' from '%s'" % (str(target[0]), str(source[0]))
+
+# -----------------------------------------------------------------------------
+def template_action(target, source, env):
+	import jinja2
+	
+	pass
+
+def template_emitter(target, source, env):
+	Depends(target, SCons.Node.Python.Value(env['SUBSTITUTIONS']))
+	return target, source
+
+def template_string(target, source, env):
 	return "Create: '%s' from '%s'" % (str(target[0]), str(source[0]))
 
 # -----------------------------------------------------------------------------
 def generate(env, **kw):
-	
 	builder = env.Builder(
-		action = env.Action(replace_action, replace_string),
-		emitter = replace_emitter,
+		action = env.Action(simple_template_action, simple_template_string),
+		emitter = simple_template_emitter,
 		src_suffix = '.in',
 		single_source = True
 	)
 	
-	env['BUILDERS']['Template'] = builder
+	env['BUILDERS']['SimpleTemplate'] = builder
 
 def exists(env):
 	return True

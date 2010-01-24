@@ -189,6 +189,7 @@ def xpcc_library(env):
 	library = env.Command(file, [], action)
 	
 	Depends(library, SCons.Node.Python.Value(env['XPCC_CONFIG']))
+	AlwaysBuild(library)
 	
 	# remove the build directory when the library should be cleaned
 	Clean(library, buildpath)
