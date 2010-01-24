@@ -1,5 +1,0 @@
-
-target: all
-
-project:
-  executable: test_data_structures

@@ -1,6 +1,0 @@
-
-target: pc
-
-project:
-  executable: test_io_std
-

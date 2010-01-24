@@ -1,6 +1,0 @@
-# Properties for 'communication/tipc'
-
-target: pc
-
-project:
-  executable: tipc_receiver_component

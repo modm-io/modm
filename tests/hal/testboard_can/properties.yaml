@@ -1,5 +1,0 @@
-
-target: atmega
-
-project:
-  executable: handsteuerung_v003

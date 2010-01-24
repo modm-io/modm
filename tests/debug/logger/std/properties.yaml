@@ -1,7 +1,0 @@
-# Properties for 'debug/logger'
-
-target: pc
-
-
-project:
-  executable: test_logger_std

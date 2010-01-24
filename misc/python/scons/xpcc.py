@@ -91,7 +91,7 @@ class FileScanner:
 					self.header.append(filename)
 
 # -----------------------------------------------------------------------------
-def generate_environment(env, config, buildpath = None):
+def generate_environment(env, config, buildpath = None, rootpath = None):
 	try:
 		parser = ConfigParser.RawConfigParser()
 		parser.read(config)
@@ -126,13 +126,21 @@ def generate_environment(env, config, buildpath = None):
 		Exit(1)
 	
 	# extract the rootpath from the toolpath
-	rootpath = os.path.normpath(env['toolpath'][0])
-	rootpath = os.path.normpath(rootpath[:-len('misc/python/scons')])
+	xpcc_rootpath = os.path.normpath(env['toolpath'][0])
+	xpcc_rootpath = os.path.normpath(xpcc_rootpath[:-len('misc/python/scons')])
 	
 	project_name = parser.get('general', 'name')
 	
-	if not buildpath:
-		buildpath = parser.get('general', 'buildpath')
+	if buildpath is None:
+		try:
+			buildpath = parser.get('general', 'buildpath')
+		except ConfigParser.NoOptionError:
+			if rootpath is None:
+				print "Don't know where to build the files! Please specify either 'rootpath' or 'buildpath'"
+				Exit(1)
+			
+			buildpath = os.path.join(rootpath, 'build/$name')
+		
 	path_substitutions = {
 		'name': project_name,
 		'arch': architecture,
@@ -140,7 +148,7 @@ def generate_environment(env, config, buildpath = None):
 	}
 	buildpath = string.Template(buildpath).safe_substitute(path_substitutions)
 	
-	new['XPCC_ROOTPATH'] = rootpath
+	new['XPCC_ROOTPATH'] = xpcc_rootpath
 	new['XPCC_BUILDPATH'] = buildpath
 	new['XPCC_CONFIG_FILE'] = os.path.abspath(config)
 	new.Append(CPPPATH = [buildpath, '.'])
@@ -152,14 +160,17 @@ def generate_environment(env, config, buildpath = None):
 			cnf[key] = parser.get(section, option)
 	new['XPCC_CONFIG'] = cnf
 	
-	# create 'defines.h'
-	substitutions = {
-		'defines': '\n'.join(["#define %s %s" % (item[0].upper(), item[1]) for item in parser.items('defines')]),
-		'name': project_name
-	}
-	new.Template(target = new.Buildpath('defines.h'),
-				source = os.path.join(rootpath, 'misc/templates/defines.h.in'),
-				SUBSTITUTIONS = substitutions)
+	try:
+		# create 'defines.h'
+		substitutions = {
+			'defines': '\n'.join(["#define %s %s" % (item[0].upper(), item[1]) for item in parser.items('defines')]),
+			'name': project_name
+		}
+		new.Template(target = new.Buildpath('defines.h'),
+					source = os.path.join(xpcc_rootpath, 'misc/templates/defines.h.in'),
+					SUBSTITUTIONS = substitutions)
+	except ConfigParser.NoSectionError:
+		pass
 	
 	return new
 
@@ -205,46 +216,11 @@ def buildpath(env, path, strip_extension=False):
 	return os.path.join(env['XPCC_BUILDPATH'], path)
 
 # -----------------------------------------------------------------------------
-config_template = """\
-// WARNING: This file is generated automatically, do not edit!
-// ----------------------------------------------------------------------------
-
-#ifndef DEFINES_H
-#define	DEFINES_H
-
-${defines}
-
-#endif
-"""
-
-def configuration_action(target, source, env):
-	
-	
-	input = config_template if (not source) else open(source[0].abspath).read()
-	output = string.Template(input).safe_substitute(substitutions)
-	
-	# create file
-	open(target[0].abspath, 'w').write(output)
-	return 0
-
-def configuration_emitter(target, source, env):
-	Depends(target, SCons.Node.Python.Value(env['DEFINES']))
-	return target, source
-
-# -----------------------------------------------------------------------------
 def generate(env, **kw):
 	env.AddMethod(generate_environment, 'GenerateEnvironment')
 	env.AddMethod(xpcc_library, 'XpccLibrary')
 	env.AddMethod(find_files, 'FindFiles')
 	env.AddMethod(buildpath, 'Buildpath')
-	
-	env.Append(BUILDERS = {
-		'GenerateConfig': Builder(
-				action = SCons.Action.Action(configuration_action, "Generate: $TARGET"),
-				suffix = '.h',
-				emitter = configuration_emitter,
-				target_factory = env.fs.File)
-	})
 
 def exists(env):
 	return True

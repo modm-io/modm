@@ -27,8 +27,8 @@
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # 
 # $Id$
-
-rootpath = '..'
+${warning}
+rootpath = "${rootpath}"
 
 pre = Environment(tools = ['xpcc'], toolpath = [rootpath + '/misc/python/scons'])
 env = pre.GenerateEnvironment(config = 'project.cfg', 
@@ -43,12 +43,6 @@ for file in files.sources:
 	objects.append(object)
 
 config = env['XPCC_CONFIG']
-
-# create a file which later runs all the tests
-template = 'runner_%s.cpp.in' % config['target.architecture']
-runner = env.UnittestRunner(target = env.Buildpath('runner.cpp'),
-							source = [template] + files.header)
-objects.append(env.Object(runner))
 
 # build the program
 program = env.Program(target = env.Buildpath(config['general.name']),
