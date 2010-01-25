@@ -30,7 +30,7 @@
 
 pre = Environment(tools = ['xpcc'], toolpath = ['../misc/python/scons'])
 env = pre.GenerateEnvironment(config = ARGUMENTS.get('config'),
-							buildpath = '../build/library/$id')
+							buildpath = '../build/library/${library_name}')
 
 files = env.FindFiles(path = '.')
 

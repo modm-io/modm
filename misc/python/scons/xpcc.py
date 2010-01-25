@@ -142,19 +142,19 @@ def generate_environment(env, config, buildpath = None, rootpath = None):
 			buildpath = os.path.join(rootpath, 'build/$name')
 	
 	try:
-		xpcc_identifier = parser.get('general', 'xpcc_id')
-	except ConfigParser.NoSectionError:
-		xpcc_identifier = project_name
+		xpcc_library_name = parser.get('general', 'library_name')
+	except ConfigParser.NoOptionError:
+		xpcc_library_name = project_name
 	
 	path_substitutions = {
 		'name': project_name,
-		'id': xpcc_identifier,
+		'library_name': xpcc_library_name,
 		'arch': architecture,
 		'device': device
 	}
 	buildpath = string.Template(buildpath).safe_substitute(path_substitutions)
 	
-	new['XPCC_IDENTIFIER'] = xpcc_identifier
+	new['XPCC_LIBRARY_NAME'] = xpcc_library_name
 	new['XPCC_ROOTPATH'] = xpcc_rootpath
 	new['XPCC_BUILDPATH'] = buildpath
 	new['XPCC_CONFIG_FILE'] = os.path.abspath(config)
@@ -183,7 +183,7 @@ def generate_environment(env, config, buildpath = None, rootpath = None):
 
 def xpcc_library(env):
 	include_path = os.path.join(env['XPCC_ROOTPATH'], 'src')
-	buildpath = os.path.join(env['XPCC_ROOTPATH'], 'build/library/%s' % env['XPCC_IDENTIFIER'])
+	buildpath = os.path.join(env['XPCC_ROOTPATH'], 'build/library/%s' % env['XPCC_LIBRARY_NAME'])
 	
 	env.Append(CPPPATH = [include_path])
 	env.Append(LIBS = ['robot'])

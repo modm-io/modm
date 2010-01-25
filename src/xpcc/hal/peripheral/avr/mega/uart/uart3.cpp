@@ -30,8 +30,6 @@
 /*
  * WARNING: This file is generated automatically, do not edit!
  * Please modify the corresponding *.in file instead and rebuild this file. 
- *
- * Generated 25 Jan 2010, 00:10:23
  */
 // ----------------------------------------------------------------------------
 
