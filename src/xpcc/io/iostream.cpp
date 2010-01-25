@@ -129,7 +129,7 @@ xpcc::IOStream::putInteger(uint16_t value)
 void
 xpcc::IOStream::putHex( const char* s )
 {
-	while ( s != '\0' ) {
+	while ( *s != '\0' ) {
 		this->putHex( *s );
 		s++;
 	}

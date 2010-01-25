@@ -76,6 +76,15 @@ public:
 	void
 	testFloat4();
 
+	void
+	testHex1();
+
+	void
+	testHex2();
+
+	void
+	testHex3();
+
 private:
 	xpcc::IOStream *stream;
 };

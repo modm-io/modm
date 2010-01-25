@@ -32,6 +32,8 @@
 
 #include "io_stream_test.hpp"
 
+#include <iostream>
+
 // ----------------------------------------------------------------------------
 // simple IODevice which stores all data in a memory buffer
 // used for testing the output of an IOStream
@@ -213,4 +215,43 @@ IoStreamTest::testFloat4()
 	
 	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 0, 12);
 	TEST_ASSERT_EQUALS(device.bytesWritten, 12);
+}
+
+void
+IoStreamTest::testHex1()
+{
+	char string[] = "10";
+
+	char c = 0x10;
+
+	(*stream) << xpcc::hex << c;
+
+	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 0, 2);
+	TEST_ASSERT_EQUALS(device.bytesWritten, 2);
+}
+
+void
+IoStreamTest::testHex2()
+{
+	char string[] = "48616C6C6F04";
+
+	char s[] = "Hallo";
+
+	(*stream) << xpcc::hex << s;
+
+	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 0, 10);
+	TEST_ASSERT_EQUALS(device.bytesWritten, 10);
+}
+
+void
+IoStreamTest::testHex3()
+{
+	char string[] = "123456";
+
+	int i = 123456;
+
+	(*stream) << xpcc::hex << i;
+
+	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 0, 6);
+	TEST_ASSERT_EQUALS(device.bytesWritten, 6);
 }
