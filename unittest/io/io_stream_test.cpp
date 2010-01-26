@@ -32,8 +32,6 @@
 
 #include "io_stream_test.hpp"
 
-#include <iostream>
-
 // ----------------------------------------------------------------------------
 // simple IODevice which stores all data in a memory buffer
 // used for testing the output of an IOStream
