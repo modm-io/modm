@@ -173,7 +173,7 @@ def generate_environment(env, config, buildpath = None, rootpath = None):
 			'defines': '\n'.join(["#define %s %s" % (item[0].upper(), item[1]) for item in parser.items('defines')]),
 			'name': project_name
 		}
-		new.Template(target = new.Buildpath('defines.h'),
+		new.SimpleTemplate(target = new.Buildpath('defines.h'),
 					source = os.path.join(xpcc_rootpath, 'misc/templates/defines.h.in'),
 					SUBSTITUTIONS = substitutions)
 	except ConfigParser.NoSectionError:
