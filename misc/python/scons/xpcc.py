@@ -96,7 +96,7 @@ def generate_environment(env, config, buildpath = None, rootpath = None):
 		parser = ConfigParser.RawConfigParser()
 		parser.read(config)
 	except TypeError:
-		print "You need to specify a configuration file via 'scons config=path/to/file'!"
+		print "You need to specify a configuration file via 'scons config=path/to/file.cfg'!"
 		Exit(1)
 	
 	# Create a build environment
@@ -182,25 +182,21 @@ def generate_environment(env, config, buildpath = None, rootpath = None):
 	return new
 
 def xpcc_library(env):
-	include_path = os.path.join(env['XPCC_ROOTPATH'], 'src')
-	buildpath = os.path.join(env['XPCC_ROOTPATH'], 'build/library/%s' % env['XPCC_LIBRARY_NAME'])
+	# set new buildpath for the library, path musst be relativ to the
+	# SConscript directory!
+	old_buildpath = env['XPCC_BUILDPATH']
+	env['XPCC_BUILDPATH'] = '../build/library/%s' % env['XPCC_LIBRARY_NAME']
 	
-	env.Append(CPPPATH = [include_path])
+	# build library
+	library = env.SConscript(os.path.join(env['XPCC_ROOTPATH'], 'src', 'SConscript'),
+							 exports = 'env')
+	
+	# restore old buildpath
+	env['XPCC_BUILDPATH'] = old_buildpath
+	
+	env.Append(CPPPATH = os.path.join(env['XPCC_ROOTPATH'], 'src'))
 	env.Append(LIBS = ['robot'])
-	env.Append(LIBPATH = [buildpath])
-	
-	file = os.path.join(buildpath, 'librobot.a')
-	action = "@scons -C %s -Q config=%s" % (include_path, env['XPCC_CONFIG_FILE'])
-	if ARGUMENTS.get('verbose') == '1':
-		action += ' verbose=1'
-	library = env.Command(file, [], action)
-	
-	env.Depends(library, SCons.Node.Python.Value(env['XPCC_CONFIG']))
-	env.AlwaysBuild(library)
-	
-	# remove the build directory when the library should be cleaned
-	env.Clean(library, buildpath)
-	# TODO remove this with a call of 'scons -c' perhaps via GetOption("clean") 
+	env.Append(LIBPATH = os.path.join(env['XPCC_ROOTPATH'], 'build/library/%s' % env['XPCC_LIBRARY_NAME']))
 	
 	return library
 

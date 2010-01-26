@@ -34,6 +34,7 @@ import ConfigParser
 
 env = Environment(tools = ['template', 'doxygen'], toolpath = ['misc/python/scons'])
 
+# regenerate SConstruct files for the tests
 parser = ConfigParser.RawConfigParser()
 for path, directories, files in os.walk('tests'):
 	# exclude the SVN-directories
@@ -43,6 +44,8 @@ for path, directories, files in os.walk('tests'):
 	if 'project.cfg' in files:
 		parser.read(os.path.join(path, 'project.cfg'))
 		
+		# TODO parser regenerate
+		
 		rootpath = '/'.join(['..' for x in range(len(path.split('/')))])
 		file = env.SimpleTemplate(target = os.path.join(path, 'SConstruct'),
 								  source = 'misc/templates/SConstruct.in',
@@ -50,22 +53,22 @@ for path, directories, files in os.walk('tests'):
 		
 		env.Alias('update', file)
 
-if 'template' in BUILD_TARGETS:
-	path = 'src/xpcc/hal/peripheral/avr/mega/uart'
-	for id in range(0, 4):
-		file = env.Template(target = os.path.join(path, 'uart%i.hpp' % id),
-							source = os.path.join(path, 'uart.hpp.in'),
-							SUBSTITUTIONS = { 'id': id })
-		env.Alias('template', file)
-		
-		file = env.Template(target = os.path.join(path, 'uart%i.cpp' % id),
-							source = os.path.join(path, 'uart.cpp.in'),
-							SUBSTITUTIONS = { 'id': id })
-		env.Alias('template', file)
+# update all template files
+path = 'src/xpcc/hal/peripheral/avr/mega/uart'
+for id in range(0, 4):
+	file = env.Template(target = os.path.join(path, 'uart%i.hpp' % id),
+						source = os.path.join(path, 'uart.hpp.in'),
+						SUBSTITUTIONS = { 'id': id })
+	env.Alias('template', file)
 	
+	file = env.Template(target = os.path.join(path, 'uart%i.cpp' % id),
+						source = os.path.join(path, 'uart.cpp.in'),
+						SUBSTITUTIONS = { 'id': id })
+	env.Alias('template', file)
 
 # add target to create the doxygen documentation
 env.Doxygen('doc/doxyfile')
 env.Alias('doc', 'apidoc/html')
 
+env.Alias('all', ['update', 'template'])
 env.Default('update')

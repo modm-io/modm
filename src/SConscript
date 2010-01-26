@@ -28,9 +28,7 @@
 # 
 # $Id$
 
-pre = Environment(tools = ['xpcc'], toolpath = ['../misc/python/scons'])
-env = pre.GenerateEnvironment(config = ARGUMENTS.get('config'),
-							buildpath = '../build/library/${library_name}')
+Import('env')
 
 files = env.FindFiles(path = '.')
 
@@ -44,12 +42,4 @@ for file in files.sources:
 library = env.Library(target = env.Buildpath('robot'),
 					  source = objects)
 
-env.Alias('lib', library)
-env.Alias('build', 'lib')
-
-# add target to create the doxygen documentation
-env.Doxygen('../doc/doxyfile')
-env.Alias('doc', 'apidoc/html')
-
-env.Alias('all', ['lib', 'doc'])
-env.Default('lib')
+Return('library')
