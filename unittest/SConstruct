@@ -58,10 +58,14 @@ program = env.Program(target = env.Buildpath(config['general.name']),
 library = env.XpccLibrary()
 
 env.Alias('lib', library)
-env.Alias('run', env.Run(program))
 env.Alias('build', program)
 env.Alias('size', env.Size(program))
 env.Alias('symbols', env.Symbols(program))
 
-env.Alias('all', ['build', 'size'])
+if env['ARCHITECTURE'] == 'pc':
+	env.Alias('run', env.Run(program))
+	env.Alias('all', ['build'])
+else:
+	env.Alias('all', ['build', 'size'])
+
 env.Default('all')
