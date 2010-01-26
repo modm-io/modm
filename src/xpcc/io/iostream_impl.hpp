@@ -45,20 +45,6 @@
 
 template<typename T>
 void
-xpcc::IOStream::putInteger( T value )
-{
-	char str[ArithmeticTraits<T>::decimalDigits + 1]; // +1 for '\0'
-
-	snprintf(str, sizeof(str), "%d", value);
-
-	this->device->put(str);
-}
-
-
-// ----------------------------------------------------------------------------
-
-template<typename T>
-void
 xpcc::IOStream::putFloat( const T& value )
 {
 	// hard coded for 2.22507e-308

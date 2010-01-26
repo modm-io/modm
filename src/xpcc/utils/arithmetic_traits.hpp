@@ -73,8 +73,6 @@ namespace xpcc
 	template<typename T>
 	struct ArithmeticTraits
 	{
-		static const bool isInteger = false;
-		static const bool isFloat = false;
 	};
 
 	// -------------------------------------------------------------------------
@@ -82,17 +80,13 @@ namespace xpcc
 	template<>
 	struct ArithmeticTraits<char>
 	{
-		typedef short DoubleType;
-		typedef char SignedType;
+		typedef int16_t DoubleType;
+		typedef signed char SignedType;
 		typedef unsigned char UnsignedType;
 
 		static const char minValue = -0x80;
 		static const char maxValue =  0x7F;
 		static const unsigned char decimalDigits = 4; // inc sign
-
-		static const bool isInteger = true;
-		static const bool isFloat = false;
-		static const bool isSigned = true;
 	};
 
 	// -------------------------------------------------------------------------
@@ -100,8 +94,8 @@ namespace xpcc
 	template<>
 	struct ArithmeticTraits<signed char>
 	{
-		typedef short DoubleType;
-		typedef char SignedType;
+		typedef int16_t DoubleType;
+		typedef signed char SignedType;
 		typedef unsigned char UnsignedType;
 
 		static const char minValue = -0x80;
@@ -115,11 +109,11 @@ namespace xpcc
 
 	// -------------------------------------------------------------------------
 	template<>
-	struct ArithmeticTraits<uint8_t>
+	struct ArithmeticTraits<unsigned char>
 	{
 		typedef uint16_t DoubleType;
-		typedef int8_t SignedType;
-		typedef uint8_t UnsignedType;
+		typedef signed char SignedType;
+		typedef unsigned char UnsignedType;
 
 		static const uint8_t minValue = 0;
 		static const uint8_t maxValue = 0xff;
@@ -205,7 +199,7 @@ namespace xpcc
 		static const bool isFloat = false;
 		static const bool isSigned = false;
 	};
-	
+
 	// -------------------------------------------------------------------------
 
 	template<>

@@ -119,28 +119,28 @@ namespace xpcc
 		}
 
 		inline IOStream&
-		operator << ( const unsigned short& v )
+		operator << ( const uint16_t& v )
 		{
 			this->putInteger( v );
 			return *this;
 		}
 
 		inline IOStream&
-		operator << ( const short& v )
+		operator << ( const int16_t& v )
 		{
 			this->putInteger( v );
 			return *this;
 		}
 
 		inline IOStream&
-		operator << ( const unsigned int& v )
+		operator << ( const uint32_t& v )
 		{
 			this->putInteger(v);
 			return *this;
 		}
 
 		inline IOStream&
-		operator << ( const int& v )
+		operator << ( const int32_t& v )
 		{
 			this->putInteger(v);
 			return *this;
@@ -185,21 +185,11 @@ namespace xpcc
 		void
 		putInteger(uint16_t value);
 		
-#ifdef __AVR__
-		// uses the optimized non standard function 'ltoa()' which is
-		// not always available. For the general case snprintf() is
-		// used.
 		void
 		putInteger(int32_t value);
 		
 		void
 		putInteger(uint32_t value);
-#endif
-		
-		// default version which is used when all the others don't match
-		template<typename T>
-		void
-		putInteger( T value );
 
 		void
 		putHex( const char*  s );

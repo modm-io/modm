@@ -99,30 +99,47 @@ xpcc::IOStream::putInteger(uint16_t value)
 }
 
 // ----------------------------------------------------------------------------
+void
+xpcc::IOStream::putInteger(int32_t value)
+{
 #ifdef __AVR__
-	xpcc::IOStream&
-	xpcc::IOStream::putInteger(int32_t value)
-	{
-		// -2,147,483,648 to 2,147,483,647
-		char buffer[12];
-		
-		this->device->put(ltoa(value, buffer, 10));
-		
-		return *this;
-	}
-	
-	xpcc::IOStream&
-	xpcc::IOStream::putInteger(uint32_t value)
-	{
-		// 0 to 4,294,967,295
-		char buffer[11];
-		
-		this->device->put(ultoa(value, buffer, 10));
-		
-		return *this;
-	}
+	// uses the optimized non standard function 'ltoa()' which is
+	// not always available. For the general case snprintf() is
+	// used.
 
+	// -2,147,483,648 to 2,147,483,647
+	char buffer[12];
+
+	this->device->put(ltoa(value, buffer, 10));
+#else
+	char str[ArithmeticTraits<int32_t>::decimalDigits + 1]; // +1 for '\0'
+
+	snprintf(str, sizeof(str), "%d", value);
+
+	this->device->put(str);
 #endif
+}
+	
+void
+xpcc::IOStream::putInteger(uint32_t value)
+{
+#ifdef __AVR__
+	// uses the optimized non standard function 'ltoa()' which is
+	// not always available. For the general case snprintf() is
+	// used.
+
+	// 0 to 4,294,967,295
+	char buffer[11];
+		
+	this->device->put(ultoa(value, buffer, 10));
+#else
+	char str[ArithmeticTraits<uint32_t>::decimalDigits + 1]; // +1 for '\0'
+
+	snprintf(str, sizeof(str), "%d", value);
+
+	this->device->put(str);
+#endif
+}
 
 // ----------------------------------------------------------------------------
 
