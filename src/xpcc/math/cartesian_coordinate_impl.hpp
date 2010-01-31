@@ -147,20 +147,6 @@ namespace xpcc
 		return *this;
 	}
 	
-	template<>
-	CartesianCoordinate<float>&
-	CartesianCoordinate<float>::rotate(const Angle& phi)
-	{
-		float c = cos(phi).toFloat();
-		float s = sin(phi).toFloat();
-		
-		float tx = (c * this->x - s * this->y);
-		this->y =  (s * this->x + c * this->y);
-		this->x = tx;
-		
-		return *this;
-	}
-
 	// ------------------------------------------------------------------------
 	template<typename T>
 	PolarCoordinate<T>

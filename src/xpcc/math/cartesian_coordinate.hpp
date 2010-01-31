@@ -80,10 +80,10 @@ namespace xpcc
 		getAngle() const;
 		
 		/// @brief	Normalize length
-		CartesianCoordinate&
+		CartesianCoordinate<T>&
 		normalize(const T& length);
 		
-		CartesianCoordinate&
+		CartesianCoordinate<T>&
 		rotate(const Angle& phi);
 		
 		/// @brief	Transform to polar coordiante system
@@ -121,6 +121,10 @@ namespace xpcc
 		T x;
 		T y;
 	};
+
+	template<>
+	CartesianCoordinate<float>&
+	CartesianCoordinate<float>::rotate(const Angle& phi);
 }
 
 #include "cartesian_coordinate_impl.hpp"
