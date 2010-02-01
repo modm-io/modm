@@ -206,7 +206,8 @@ namespace xpcc
 		uint8_t pressState;
 		uint8_t releaseState;
 		uint8_t repeatState;
-		
+	
+	private:
 		uint8_t ct0;
 		uint8_t ct1;
 	};

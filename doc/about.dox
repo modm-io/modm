@@ -1,0 +1,42 @@
+// coding: utf-8
+// $Id$
+/*!
+
+\page about About this library
+
+The main target of this library are small 8-bit AVR mircocontrollers, but it
+should also be able to generate code for standard x86 PCs. This has partly historical
+reasons but gives also a lot advantages. Especially testing and debugging is
+much easier when you can run your Code native on your PC and don't have to
+reprogram a microcontroller every time.
+This technique has its limits of course, but for things like generic algorithms
+it works very well.
+
+An other advantage is that we can run nearly the same code on both sides when
+the PC communicates with the microcontroller which reduces the efford for
+developing the code.
+
+While a PC has a lot of computational power it is somewhat limited on a
+microcontroller. Therefore the most optimizations target the 8-bit
+microcontrollers and accept possible sligthly worse code for the PC.
+
+\section goals Optimizations goals
+
+- Ease of use
+- Speed
+- Size
+
+The main goal of nearly optimizations is speed and on second place
+speed. Therefore this library is heavily template based. Templates offer the
+possibly of generating nearly optimal code for various occasions with the
+drawback of increased code size.
+For our main target the AVRs this is acceptable because devices with big flash
+memory are available. So, if you want the smallest possible code size this
+isn't the right library for you, but if you wan't easy development with fast
+execution you're welcome :)
+
+\section people The people behind this library
+
+\image html logo_rca.png
+
+*/

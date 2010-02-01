@@ -1,0 +1,29 @@
+// coding: utf-8
+// $Id$
+/*!
+
+\mainpage Cross Platform Component Communication
+\image html logo_xpcc.png
+
+This is a packet orientated communication library, enabling transparent
+communication between components on PCs and Microcontrollers. It provides an
+interface to communicate via CAN, TCP/IP or TIPC.
+
+The primary part of the project is the \ref communication "Communication" module
+that provides the interface to exchange messages between components.
+
+To develop and use this module the need for a logger module accrued that is not
+only able to write to the console but could also be used on microcontrollers.
+So the \ref logger "Logger" module was created.
+
+Also there is a lack of standard C++-librarys like the STL for small
+microconrollers, so we created a reduced version adapted to the needs of
+microcontrollers. The container are located in the section \ref data_structure.
+
+This documentation is devided into the following sections:
+
+- \subpage getting_started How to use this library
+- \subpage about Some detailed explanation about the goals and design decisions
+- \subpage build_system Using SCons
+- \subpage coding_conventions Guidelines on how to write and format your code
+ */

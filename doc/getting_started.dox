@@ -1,0 +1,20 @@
+// coding: utf-8
+// $Id$
+/*!
+\page getting_started Getting Started
+
+To get started go to the root folder an run <tt>$ scons update</tt>. Then go to the 
+unittest folder and run <tt>$ scons</tt>. Now the library and all the unittests shoulb
+be build.
+
+If you're compiling for the pc just use <tt>$ scons run</tt> to build 
+and run the unittests. You should get a output like:
+
+\verbatim
+Passed 437 tests
+OK!
+\endverbatim
+
+Looks like everything is running just fine ;-)
+
+*/

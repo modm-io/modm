@@ -3,7 +3,6 @@
 You need to build the xpcc:
  * gcc (for the target platform (x86, avr, ...)
  * scons (the Python builder)
- * python-yaml (Konfiguration files)
  
  To build you have to run scons in the trunk-Folder.
  The resulting files will be placed in the trunk/build folder

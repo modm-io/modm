@@ -13,7 +13,9 @@ communicate via CAN, TCP/IP or TIPC.
 = 1. How to build the API-documentation =
 
 You need Doxygen (http://www.doxygen.nl/).
-Go to the src folder and invoke doxygen with
-	xpcc/trunk/src$ doxygen ../doc/doxyfile
-The documentation will be wrote to xpcc/trunk/doc/apidoc/html/
+Go to the root folder and invoke doxygen with
+
+	xpcc/trunk$ doxygen doc/doxyfile
+
+The documentation will be written to xpcc/trunk/doc/apidoc/html/
 Start the index.html with your favourite browser.
