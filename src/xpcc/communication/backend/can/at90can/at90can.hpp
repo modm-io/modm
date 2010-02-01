@@ -36,6 +36,13 @@
 
 namespace xpcc
 {
+	/**
+	 * @class	At90Can
+	 * @brief	...
+	 *
+	 * @ingroup	can
+	 * @version	$Id: tipc.hpp 92 2009-10-17 15:54:22Z thundernail $
+	 */
 	class At90Can : public BackendInterface
 	{
 	public:

@@ -36,6 +36,15 @@
 
 namespace xpcc
 {
+
+
+	/**
+	 * @class	CanInterface
+	 * @brief	...
+	 *
+	 * @ingroup	can
+	 * @version	$Id: tipc.hpp 92 2009-10-17 15:54:22Z thundernail $
+	 */
 	class CanInterface : public BackendInterface
 	{
 	public:

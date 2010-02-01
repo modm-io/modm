@@ -36,6 +36,13 @@
 
 namespace xpcc
 {
+	/**
+	 * @class	Mcp2515
+	 * @brief	...
+	 *
+	 * @ingroup	can
+	 * @version	$Id: tipc.hpp 92 2009-10-17 15:54:22Z thundernail $
+	 */
 	class Mcp2515 : public CanInterface
 	{
 	public:
