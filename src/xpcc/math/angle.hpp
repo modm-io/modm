@@ -100,10 +100,21 @@ namespace xpcc
 			
 			friend inline bool
 			operator <=(const Angle &a, const Angle &b);
-		
+
+			friend inline IOStream&
+			operator <<(IOStream &os, const Angle &a);
+
 		private:
+
 			float value;
 	};
+
+	/**
+	 * \ingroup	math
+	 * \brief	Stream operator to \b xpcc::Angle
+	 */
+	inline IOStream&
+	operator <<(IOStream &os, const Angle &a);
 }
 
 // ----------------------------------------------------------------------------
@@ -172,10 +183,10 @@ namespace xpcc
 	}
 }
 
-inline xpcc::IOStream&
-operator <<(xpcc::IOStream& stream, xpcc::Angle& angle) {
-	stream << angle.toFloat();
-	return stream;
+xpcc::IOStream&
+xpcc::operator <<(xpcc::IOStream &os, const xpcc::Angle &a) {
+	os << a.toFloat();
+	return os;
 }
 
 // ----------------------------------------------------------------------------	

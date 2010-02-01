@@ -216,3 +216,16 @@ namespace xpcc
 		return (a.x != b.x) || (a.y != b.y);
 	}
 }
+
+
+
+// ----------------------------------------------------------------------------
+
+template <typename T>
+xpcc::IOStream&
+xpcc::operator <<( xpcc::IOStream& s, const xpcc::CartesianCoordinate<T>& c)
+{
+	s << "x=" << c.x << ", y=" << c.y;
+
+	return s;
+}

@@ -35,6 +35,7 @@
 
 #include <math.h>
 #include <stdint.h>
+#include <xpcc/io/iostream.hpp>
 
 #include "angle.hpp"
 #include "polar_coordinate.hpp"
@@ -116,6 +117,10 @@ namespace xpcc
 		template<typename U>
 		friend bool
 		operator != (const CartesianCoordinate<U> &a, const CartesianCoordinate<U> &b);
+
+		template<typename U>
+		friend IOStream&
+		operator <<( IOStream& s, const CartesianCoordinate<U>& c);
 	
 	private:
 		T x;
@@ -125,6 +130,12 @@ namespace xpcc
 	template<>
 	CartesianCoordinate<float>&
 	CartesianCoordinate<float>::rotate(const Angle& phi);
+
+	/// \ingroup	math
+	/// \brief		Stream operator to \b xpcc::CartesianCoordinate<U>
+	template<typename U>
+	IOStream&
+	operator <<( IOStream& s, const CartesianCoordinate<U>& c);
 }
 
 #include "cartesian_coordinate_impl.hpp"

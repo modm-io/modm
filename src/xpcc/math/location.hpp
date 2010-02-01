@@ -33,6 +33,8 @@
 #ifndef	XPCC__LOCATION_HPP
 #define	XPCC__LOCATION_HPP
 
+#include <xpcc/io/iostream.hpp>
+
 #include "angle.hpp"
 #include "position.hpp"
 
@@ -43,21 +45,76 @@ namespace xpcc
 	 * 
 	 * \ingroup	math
 	 */
+	template <typename T>
 	class Location
 	{
 	public:
+		typedef CartesianCoordinate<T> Position;
+
 		/// \brief	Add a position increment
 		void
 		update(Location& diff);
 		
 		/// \brief	Add a increment only in x-direction
 		void
-		update(int16_t x, Angle& phi);
+		update(T x, Angle& phi);
 		
 		// Attributes
 		Position position;
 		Angle phi;
+
+		template <typename U>
+		friend IOStream&
+		operator <<( IOStream&, const Location<U>&);
 	};
+
+	/**
+	 * \brief	Stream operator to \b xpcc::Location<T>
+	 *
+	 * \ingroup	math
+	 */
+	template<typename T>
+	IOStream&
+	operator<<(IOStream& os, const Location<T>& l);
 }
+
+// -----------------------------------------------------------------------------
+// IMPLEMENTATION
+// -----------------------------------------------------------------------------
+
+template <typename T>
+void
+xpcc::Location<T>::update(Location<T>& diff)
+{
+	position += diff.position.rotate(phi);
+	phi += diff.phi;
+	phi.normalize();
+}
+
+// ----------------------------------------------------------------------------
+
+template <typename T>
+void
+xpcc::Location<T>::update(T x, xpcc::Angle& phi)
+{
+	position += Position(x * cos(this->phi).toFloat(),
+						 x * sin(this->phi).toFloat());
+
+	this->phi += phi;
+	this->phi.normalize();
+}
+
+// ----------------------------------------------------------------------------
+
+template<class T>
+xpcc::IOStream&
+xpcc::operator<<(xpcc::IOStream& os, const xpcc::Location<T>& l)
+{
+	os << "position=( " << l.position << " )";
+	os << "\nphi     =" << l.phi;
+
+	return os;
+}
+
 
 #endif	// XPCC__LOCATION_HPP

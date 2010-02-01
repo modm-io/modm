@@ -32,22 +32,4 @@
 
 #include "location.hpp"
 
-// ----------------------------------------------------------------------------
-void
-xpcc::Location::update(Location& diff)
-{
-	position += diff.position.rotate(phi);
-	phi += diff.phi;
-	phi.normalize();
-}
 
-// ----------------------------------------------------------------------------
-void
-xpcc::Location::update(int16_t x, Angle& phi)
-{
-	position += Position(x * cos(this->phi).toFloat(),
-						 x * sin(this->phi).toFloat());
-	
-	this->phi += phi;
-	this->phi.normalize();
-}
