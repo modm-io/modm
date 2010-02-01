@@ -41,12 +41,12 @@ namespace xpcc
 	namespace log
 	{
 		/**
-		 * @class 	Prefix
-		 * @brief 	Add a prefix to the logmessage
+		 * \class 	Prefix
+		 * \brief 	Add a prefix to the logmessage
 		 *
-		 * @ingroup logger
-		 * @version	$Id$
-		 * @author	Martin Rosekeit <martin.rosekeit@rwth-aachen.de>
+		 * \ingroup logger
+		 * \version	$Id$
+		 * \author	Martin Rosekeit <martin.rosekeit@rwth-aachen.de>
 		 */
 		template <typename T, typename STYLE = DefaultStyle>
 		class Prefix : public Style<STYLE>

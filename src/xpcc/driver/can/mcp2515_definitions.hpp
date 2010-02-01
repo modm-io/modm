@@ -34,7 +34,7 @@
 // TODO: Put these values in enums or declare them as real constants
 
 /** \name	SPI Kommandos */
-/*@{*/
+/*\{*/
 #define SPI_RESET		0xC0
 #define	SPI_READ		0x03
 #define	SPI_READ_RX		0x90
@@ -44,14 +44,14 @@
 #define SPI_READ_STATUS	0xA0
 #define	SPI_RX_STATUS	0xB0
 #define	SPI_BIT_MODIFY	0x05
-/*@}*/
+/*\}*/
 
 /** \name	Adressen der Register des MCP2515
  *
  * Die Redundanten Adressen von z.B. dem Register CANSTAT 
  * (0x0E, 0x1E, 0x2E, ...) wurden dabei nicht mit aufgelistet.
  */
-/*@{*/
+/*\{*/
 #define RXF0SIDH	0x00
 #define RXF0SIDL	0x01
 #define RXF0EID8	0x02
@@ -173,10 +173,10 @@
 #define RXB1D5		0x7B
 #define RXB1D6		0x7C
 #define RXB1D7		0x7D
-/*@}*/
+/*\}*/
 
 /** \name	Bitdefinition der verschiedenen Register */
-/*@{*/
+/*\{*/
 
 /** \brief	Bitdefinition von BFPCTRL */
 #define B1BFS		5
@@ -307,5 +307,5 @@
 #define	DLC1		1
 #define DLC0		0
 
-/*@}*/
+/*\}*/
 #endif	// MCP2515_DEFINITIONS_HPP

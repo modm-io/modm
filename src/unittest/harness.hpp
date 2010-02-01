@@ -39,38 +39,38 @@
 
 #ifdef __DOXYGEN__
 
-/// @ingroup	unittest
-/// @brief		Verify (expr) is true 
+/// \ingroup	unittest
+/// \brief		Verify (expr) is true 
 #define	TEST_ASSERT_TRUE(expr)
 
-/// @ingroup	unittest
-/// @brief		Verify (expr) is false 
+/// \ingroup	unittest
+/// \brief		Verify (expr) is false 
 #define	TEST_ASSERT_FALSE(expr)
 
-/// @ingroup	unittest
-/// @brief		Verify (x==y)
+/// \ingroup	unittest
+/// \brief		Verify (x==y)
 #define	TEST_ASSERT_EQUALS(x, y)
 
-/// @ingroup	unittest
-/// @brief		Verify (x==y) for floating pointer values
+/// \ingroup	unittest
+/// \brief		Verify (x==y) for floating pointer values
 #define	TEST_ASSERT_EQUALS_FLOAT(x, y)
 
-/// @ingroup	unittest
-/// @brief		Verify (x==y) up to d
+/// \ingroup	unittest
+/// \brief		Verify (x==y) up to d
 ///
 /// This macro verifies two values are equal up to a delta
 #define	TEST_ASSERT_EQUALS_DELTA(x, y, d)
 
-/// @ingroup	unittest
-/// @brief		Verify (lower <= value <= upper)
+/// \ingroup	unittest
+/// \brief		Verify (lower <= value <= upper)
 #define	TEST_ASSERT_EQUALS_RANGE(value, lower, upper)
 
-/// @ingroup	unittest
-/// @brief		Check if the arrays contains the same data
+/// \ingroup	unittest
+/// \brief		Check if the arrays contains the same data
 #define	TEST_ASSERT_EQUALS_ARRAY(array1, array2, start, count)
 
-/// @ingroup	unittest
-/// @brief		Fail unconditionally  
+/// \ingroup	unittest
+/// \brief		Fail unconditionally  
 #define	TEST_FAIL(msg)
 
 #else // !__DOXYGEN__

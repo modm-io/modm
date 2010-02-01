@@ -42,25 +42,25 @@
 namespace xpcc
 {
 	/**
-	 * @brief 	This Formats all primary typs into a string stream for
+	 * \brief 	This Formats all primary typs into a string stream for
 	 * 			output or it reads values from a input and converts them to
 	 * 			a given type;
 	 *
-	 * @ingroup io
-	 * @version	$Id: iostream.hpp 84 2009-10-16 19:15:12Z thundernail $
-	 * @author	Martin Rosekeit <martin.rosekeit@rwth-aachen.de>
+	 * \ingroup io
+	 * \version	$Id: iostream.hpp 84 2009-10-16 19:15:12Z thundernail $
+	 * \author	Martin Rosekeit <martin.rosekeit@rwth-aachen.de>
 	 */
 	class IOStream
 	{
 	public :
-		/// @brief	Constructor
+		/// \brief	Constructor
 		/// 
-		/// @param	device	device to write the stream to
+		/// \param	device	device to write the stream to
 		/// 
-		/// @code
+		/// \code
 		///	MyIODevice device;
 		///	IOStream stream( device );
-		/// @endcode
+		/// \endcode
 		IOStream(IODevice* device);
 
 		inline IOStream&
@@ -218,10 +218,10 @@ namespace xpcc
 	};
 	
 	/**
-	 * @brief  Flushes the output stream.
+	 * \brief  Flushes the output stream.
 	 *
 	 * This manipulator simply calls the stream's flush() member function.
-	 * @ingroup io
+	 * \ingroup io
 	*/
 	inline IOStream&
 	flush(IOStream& ios)
@@ -230,9 +230,9 @@ namespace xpcc
 	}
 	
 	/**
-	 * @brief  Write a newline and flush the stream.
+	 * \brief  Write a newline and flush the stream.
 	 *
-	 * @ingroup io
+	 * \ingroup io
 	 */
 	inline IOStream&
 	endl(IOStream& ios)
@@ -241,9 +241,9 @@ namespace xpcc
 	}
 
 	/**
-	 * @brief  set the output mode to HEX style for \b char and \b char*
+	 * \brief  set the output mode to HEX style for \b char and \b char*
 	 *
-	 * @ingroup io
+	 * \ingroup io
 	 */
 	inline IOStream&
 	hex(IOStream& ios)
@@ -252,9 +252,9 @@ namespace xpcc
 	}
 
 	/**
-	 * @brief  set the output mode to ASCII style for \b char and \b char*
+	 * \brief  set the output mode to ASCII style for \b char and \b char*
 	 *
-	 * @ingroup io
+	 * \ingroup io
 	 */
 	inline IOStream&
 	ascii(IOStream& ios)

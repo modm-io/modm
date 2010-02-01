@@ -41,22 +41,22 @@
 namespace xpcc
 {
 	/**
-	 * @ingroup	logger
-	 * @brief	Logger
+	 * \ingroup	logger
+	 * \brief	Logger
 	 */
 	namespace log
 	{
 		/**
-		 * @ingroup logger
-		 * @brief 	Interface to the Logger.
+		 * \ingroup logger
+		 * \brief 	Interface to the Logger.
 		 *
 		 * This class provides an interface to the logger. The Logger is an
 		 * IOStream  singleton. It is used by the
 		 * macro defined below. This class overloads the << operator so that it is
 		 * possible to write different message types to the logger.
 		 *
-		 * @since 	04 December 2006
-		 * @author	Christofer Hedbrand,
+		 * \since 	04 December 2006
+		 * \author	Christofer Hedbrand,
 		 * 			Carsten Schmidt,
 		 * 			Martin Rosekeit <martin.rosekeit@rwth-aachen.de>
 		 */
@@ -84,15 +84,15 @@ namespace xpcc
 		};
 
 		/**
-		 * @ingroup logger
-		 * @name	Output streams
+		 * \ingroup logger
+		 * \name	Output streams
 		 */
-		//@{
+		//\{
 		extern Logger debug;	//!< log device to take messages on DEBUG level
 		extern Logger info;		//!< log device to take messages on INFO level
 		extern Logger warning;	//!< log device to take messages on WARNING level
 		extern Logger error;	//!< log device to take messages on ERROR level
-		//@}
+		//\}
 	}
 }
 

@@ -41,25 +41,25 @@
 namespace xpcc
 {
 	/**
-	 * @ingroup	workflow
-	 * @brief	%Scheduler
+	 * \ingroup	workflow
+	 * \brief	%Scheduler
 	 * 
 	 * If the schedule() method is call from a timer interrupt, this scheduler
 	 * is a priority based preemtive scheduler, meaning that always the task
 	 * with the highest priority is executed. It will only change tasks if a
 	 * task with a higher priority becomes ready or the current task ends.
 	 * 
-	 * @image	html	scheduler.png
+	 * \image	html	scheduler.png
 	 * 
 	 * 
-	 * @todo	Check that this implementation works from inside an interrupt
+	 * \todo	Check that this implementation works from inside an interrupt
 	 */
 	class Scheduler
 	{
 	public:
 		typedef uint8_t Priority;
 		
-		/// @brief	%Scheduler task
+		/// \brief	%Scheduler task
 		class Task
 		{
 		public:
@@ -70,13 +70,13 @@ namespace xpcc
 	public:
 		Scheduler();
 		
-		/// @brief	
+		/// \brief	
 		void
 		scheduleTask(Task& task,
 					 uint16_t period,
 					 Priority priority = 127);
 		
-		/// @todo	implement this function
+		/// \todo	implement this function
 		bool
 		removeTask(const Task& task);
 		

@@ -38,7 +38,7 @@
 namespace xpcc
 {
 	/**
-	 * @brief	Internal timer
+	 * \brief	Internal timer
 	 * 
 	 * This class is implemented using 'gettimeofday()' from <sys/time.h> for
 	 * any Unix-OS. 
@@ -48,24 +48,24 @@ namespace xpcc
 	 * value inside a timer interrupt function.
 	 * 
 	 * Example:
-	 * @code
+	 * \code
 	 * ISR(TIMER)
 	 * {
 	 *     InternalClock::increment();
 	 * }
-	 * @endcode
+	 * \endcode
 	 * 
-	 * @ingroup	hal
+	 * \ingroup	hal
 	 */ 
 	class InternalClock
 	{
 	public:
-		/// @brief	Get the current time
+		/// \brief	Get the current time
 		static Timestamp
 		now();
 		
 #if !defined(__unix__)
-		/// @brief	Set the current time
+		/// \brief	Set the current time
 		static inline void
 		increment(uint16_t inc = 1)
 		{

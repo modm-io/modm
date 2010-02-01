@@ -3,9 +3,9 @@
 // $Id$
 
 /*!
-@ingroup	math
-@defgroup	interpolation	Interpolation
-@brief		Interpolation methods
+\ingroup	math
+\defgroup	interpolation	Interpolation
+\brief		Interpolation methods
 
 
 */

@@ -36,10 +36,10 @@
 namespace xpcc
 {
 	/**
-	 * @brief	Ramp
+	 * \brief	Ramp
 	 * 
-	 * @todo	documentation
-	 * @ingroup	filter
+	 * \todo	documentation
+	 * \ingroup	filter
 	 */
 	template<typename T>
 	class Ramp

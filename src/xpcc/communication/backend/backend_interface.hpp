@@ -39,12 +39,12 @@
 namespace xpcc
 {
 	/**
-	 * @ingroup		communication
-	 * @brief 		The header of the communication.
+	 * \ingroup		communication
+	 * \brief 		The header of the communication.
 	 *
 	 *
-	 * @version		$Id: backend_interface.hpp 90 2009-10-17 15:51:00Z thundernail $
-	 * @author		Martin Rosekeit, Fabian Greif
+	 * \version		$Id: backend_interface.hpp 90 2009-10-17 15:51:00Z thundernail $
+	 * \author		Martin Rosekeit, Fabian Greif
 	 */
 	struct Header
 	{
@@ -88,14 +88,14 @@ namespace xpcc
 	};
 	
 	/**
-	 * @ingroup		communication
-	 * @brief 		The BackendInterface provides a common interface for using
+	 * \ingroup		communication
+	 * \brief 		The BackendInterface provides a common interface for using
 	 * 				different hardware modules to transmit messages.
 	 *
 	 * All backends have to implement the this interface.
 	 *
-	 * @version		$Id: backend_interface.hpp 90 2009-10-17 15:51:00Z thundernail $
-	 * @author		Martin Rosekeit, Fabian Greif
+	 * \version		$Id: backend_interface.hpp 90 2009-10-17 15:51:00Z thundernail $
+	 * \author		Martin Rosekeit, Fabian Greif
 	 */
 	class BackendInterface
 	{

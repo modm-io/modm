@@ -34,16 +34,16 @@
 #define	XPCC__FLASH_READER_HPP
 
 #ifdef	__DOXYGEN__
-/// @ingroup	hal
-/// @brief		Define a flash variable
+/// \ingroup	hal
+/// \brief		Define a flash variable
 #define	FLASH(var)
 
-/// @ingroup	hal
-/// @brief		Define a flash string
+/// \ingroup	hal
+/// \brief		Define a flash string
 #define	FLASH_STRING(s)
 
-/// @ingroup	hal
-/// @brief		Declare a flash string
+/// \ingroup	hal
+/// \brief		Declare a flash string
 #define	EXTERN_FLASH_STRING(s)
 
 #else

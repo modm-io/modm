@@ -11,35 +11,35 @@
 #include "macros.hpp"
 
 /**
- * @ingroup		utils
- * @defgroup	tm	Template Metaprogramming
+ * \ingroup		utils
+ * \defgroup	tm	Template Metaprogramming
  */
 
 namespace xpcc
 {
 	/**
-	 * @brief	Template metaprogramming tools
+	 * \brief	Template metaprogramming tools
 	 * 
-	 * @ingroup	tm
+	 * \ingroup	tm
 	 */
 	namespace tm
 	{
-		/// @ingroup	tm
-		/// @brief	An empty type useful as a placeholder.
+		/// \ingroup	tm
+		/// \brief	An empty type useful as a placeholder.
 		class NullType
 		{
 		};
 		
-		/// @ingroup	tm
-		/// @brief	Converts an integer to a type.
+		/// \ingroup	tm
+		/// \brief	Converts an integer to a type.
 		template <int v> struct Int2Type { enum { value = v }; };
 
-		/// @ingroup	tm
-		/// @brief	Converts an type to a unique empty type.
+		/// \ingroup	tm
+		/// \brief	Converts an type to a unique empty type.
 		template <typename T> struct Type2Type { typedef T OriginalType; };
 		
-		/// @ingroup	tm
-		/// @brief	Selects type Result = flag ? T : U
+		/// \ingroup	tm
+		/// \brief	Selects type Result = flag ? T : U
 		template <bool flag, typename T, typename U>
 		struct Select
 		{
@@ -52,8 +52,8 @@ namespace xpcc
 			typedef U Result;
 		};
 		
-		/// @ingroup	tm
-		/// @brief	IsSameType<T,U>::value is true when T=U
+		/// \ingroup	tm
+		/// \brief	IsSameType<T,U>::value is true when T=U
 		template <typename T, typename U>
 		struct IsSameType
 		{
@@ -70,8 +70,8 @@ namespace xpcc
 			};
 		};
 		
-		/// @ingroup	tm
-		/// @brief Checks for conversion possibilities between T and U
+		/// \ingroup	tm
+		/// \brief Checks for conversion possibilities between T and U
 		/// 
 		/// Conversion<T,U>::exists is true if T is convertible to U
 		/// Conversion<T,U>::exists2Way is true if U is also convertible to T
@@ -138,8 +138,8 @@ namespace xpcc
 		{
 		};
 		
-		/// @ingroup	tm
-		/// @brief		Static assert support
+		/// \ingroup	tm
+		/// \brief		Static assert support
 		///
 		/// Inspired by the BOOST_STATIC_ASSERT macro.
 		#define	STATIC_ASSERT(cond) \

@@ -40,12 +40,12 @@
 namespace xpcc {
 	namespace tipc {
 		/**
-		 * @class		ReceiverSocket
-		 * @brief		Provide the handling of the socket interface from TIPC.
+		 * \class		ReceiverSocket
+		 * \brief		Provide the handling of the socket interface from TIPC.
 		 * 
-		 * @ingroup		tipc
-		 * @version		$Id: tipc_receiver_socket.hpp 91 2009-10-17 15:53:04Z thundernail $
-		 * @author		Carsten Schmitt < >
+		 * \ingroup		tipc
+		 * \version		$Id: tipc_receiver_socket.hpp 91 2009-10-17 15:53:04Z thundernail $
+		 * \author		Carsten Schmitt < >
 		 */
 		class ReceiverSocket {
 			public:	

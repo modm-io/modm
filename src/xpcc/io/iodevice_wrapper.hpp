@@ -40,13 +40,13 @@
 namespace xpcc
 {
 	/**
-	 * @brief		Wrapper to use any peripheral device that supports static
+	 * \brief		Wrapper to use any peripheral device that supports static
 	 * 				put() and get() as an IODevice
 	 * 
-	 * @tparam		T	Peripheral which should be wrapped
+	 * \tparam		T	Peripheral which should be wrapped
 	 * 
 	 * Example:
-	 * @code
+	 * \code
 	 * // configure a UART
 	 * xpcc::BufferedUart0 uart(9600);
 	 * 
@@ -59,17 +59,17 @@ namespace xpcc
 	 * // or create a IOStream and use the stream to print something
 	 * xpcc::IOStream stream(device);
 	 * stream << " World!";
-	 * @endcode
+	 * \endcode
 	 * 
-	 * @ingroup		io
+	 * \ingroup		io
 	 */
 	template<typename T>
 	class IODeviceWrapper : public IODevice
 	{
 	public:
-		/// @brief	Constructor
+		/// \brief	Constructor
 		///
-		/// @param	device	configured object
+		/// \param	device	configured object
 		IODeviceWrapper(const T& device)
 		{
 			// get rid of the warning about an unused paramter

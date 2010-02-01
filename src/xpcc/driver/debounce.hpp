@@ -39,7 +39,7 @@
 namespace xpcc
 {
 	/**
-	 * @brief	Debouncing signals
+	 * \brief	Debouncing signals
 	 * 
 	 * This class is able to debounce eight keys at the same time. The
 	 * keys have to low-active. If this isn't the case invert their signal
@@ -55,12 +55,12 @@ namespace xpcc
 	 * This implementation is based on the C debounce functions written
 	 * by Peter Dannegger (see http://www.mikrocontroller.net/topic/48465).
 	 * 
-	 * @ingroup	driver
+	 * \ingroup	driver
 	 */
 	class Debounce
 	{
 	public:
-		/** @brief	
+		/** \brief	
 		 *
 		 * Provided for convenience only.
 		 */
@@ -76,27 +76,27 @@ namespace xpcc
 		} Keys;
 		
 	public:
-		/** @brief	Constructor
+		/** \brief	Constructor
 		 *
-		 * @param	mask	TODO
-		 * @param	start	TODO
-		 * @param	next	TODO
+		 * \param	mask	TODO
+		 * \param	start	TODO
+		 * \param	next	TODO
 		 */
 		Debounce(uint8_t mask = 0, uint8_t start = 50, uint8_t next = 20);
 		
-		/// @brief	Get the current (debounced) state of a key
+		/// \brief	Get the current (debounced) state of a key
 		uint8_t
 		getState(uint8_t mask);
 		
-		/// @brief	check if a key has been released
+		/// \brief	check if a key has been released
 		uint8_t
 		getRelease(uint8_t mask);
 		
-		/** @brief	 check if a key has been pressed
+		/** \brief	 check if a key has been pressed
 		 * 
 		 * Each pressed key is reported only once.
 		 * 
-		 * @code
+		 * \code
 		 * xpcc::Debounce keys;
 		 * ...
 		 * while (1) {
@@ -105,19 +105,19 @@ namespace xpcc
 		 * 		// do something
 		 * 	}
 		 * }
-		 * @endcode
+		 * \endcode
 		 */
 		uint8_t
 		getPress(uint8_t mask);
 	
-		/** @brief	Check if a key has been pressed long enough such that the
+		/** \brief	Check if a key has been pressed long enough such that the
 		 *			key repeat functionality kicks in.
 		 *
 		 * After a small setup delay the key is reported beeing pressed
 		 * subsequent calls to this function. This simulates the user
 		 * repeatedly pressing and releasing the key.
 		 * 
-		 * @code
+		 * \code
 		 * xpcc::Debounce keys(Debounce::KEY0);
 		 * ...
 		 * while (1) {
@@ -128,16 +128,16 @@ namespace xpcc
 		 * 		// do something
 		 * 	}
 		 * }
-		 * @endcode
+		 * \endcode
 		 * 
-		 * @see	getPress()
+		 * \see	getPress()
 		 */
 		uint8_t
 		getRepeat(uint8_t mask);
 		
-		/** @brief	Get keys which were pressed short
+		/** \brief	Get keys which were pressed short
 		 * 
-		 * @code
+		 * \code
 		 * xpcc::Debounce keys(Debounce::KEY0);
 		 * ...
 		 * while (1) {
@@ -149,28 +149,28 @@ namespace xpcc
 		 * 		// do something different
 		 * 	}
 		 * }
-		 * @endcode
+		 * \endcode
 		 * 
-		 * @warning	Use this function only in combination with
+		 * \warning	Use this function only in combination with
 		 *				getLongPress(), otherwise it won't work correctly!
 		 * 
-		 * @see	getShortPress()
+		 * \see	getShortPress()
 		 */
 		uint8_t
 		getShortPress(uint8_t mask);
 		
-		/** @brief	Get keys which were pressed long
+		/** \brief	Get keys which were pressed long
 		 *
-		 * @see	getShortPress()
+		 * \see	getShortPress()
 		 */
 		uint8_t
 		getLongPress(uint8_t mask);
 		
-		/** @brief	Update internal state
+		/** \brief	Update internal state
 		 *
 		 * Call this function periodically.
 		 * 
-		 * @param	input	input signals
+		 * \param	input	input signals
 		 */
 		ALWAYS_INLINE void
 		update(uint8_t input)

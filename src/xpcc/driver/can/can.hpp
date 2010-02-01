@@ -38,12 +38,12 @@
 namespace xpcc
 {
 	/**
-	 * @ingroup	driver
+	 * \ingroup	driver
 	 */
 	class Can
 	{
 	public:
-		/** @brief	supported bitrates */
+		/** \brief	supported bitrates */
 		typedef enum {
 			BITRATE_10_KBPS	= 0,
 			BITRATE_20_KBPS	= 1,
@@ -55,14 +55,14 @@ namespace xpcc
 			BITRATE_1_MBPS = 7,
 		} Bitrate;
 		
-		/** @brief	*/
+		/** \brief	*/
 		typedef enum {
 			NORMAL,
 			LISTEN_ONLY,
 			LOOPBACK,
 		} Mode;
 		
-		/** @brief	Representation of a CAN message */
+		/** \brief	Representation of a CAN message */
 		struct Message
 		{
 			Message(const uint32_t& identifier = 0, uint8_t length = 0) :

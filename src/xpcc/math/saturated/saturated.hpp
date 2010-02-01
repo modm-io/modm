@@ -38,16 +38,16 @@
 namespace xpcc
 {
 	/**
-	 * @ingroup	math
-	 * @brief	Saturated arithmetics
+	 * \ingroup	math
+	 * \brief	Saturated arithmetics
 	 *  
-	 * @see http://www.mikrocontroller.net/articles/AVR_Arithmetik/Saturierung
+	 * \see http://www.mikrocontroller.net/articles/AVR_Arithmetik/Saturierung
 	 * 
-	 * @author	Fabian Greif <fabian.greif@rwth-aachen.de>
+	 * \author	Fabian Greif <fabian.greif@rwth-aachen.de>
 	 *  
-	 * @todo	extend implementation (multiplication etc.)
-	 * @todo	add 16-bit datetype assembler implementations for AVRs
-	 * @todo	documentation
+	 * \todo	extend implementation (multiplication etc.)
+	 * \todo	add 16-bit datetype assembler implementations for AVRs
+	 * \todo	documentation
 	 */
 	template<typename T>
 	class Saturated
@@ -111,12 +111,12 @@ namespace xpcc
 	
 	// ------------------------------------------------------------------------
 	
-	/// @brief	Invert value
+	/// \brief	Invert value
 	template<typename U>
 	Saturated<U>
 	operator - (const Saturated<U>& x);
 	
-	/// @brief	Calculate the absolute value
+	/// \brief	Calculate the absolute value
 	template<typename U>
 	Saturated<U>
 	abs(const Saturated<U>& x);

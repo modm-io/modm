@@ -3,8 +3,8 @@
 // $Id$
 
 /*!
-@ingroup	hal
-@defgroup	avr		AVR specifiy functions
+\ingroup	hal
+\defgroup	avr		AVR specifiy functions
 
 
 */
@@ -12,8 +12,8 @@
 namespace xpcc
 {
 	/**
-	 * @ingroup	avr
-	 * @brief	AVR specifiy functions
+	 * \ingroup	avr
+	 * \brief	AVR specifiy functions
 	 */
 	namespace avr
 	{

@@ -38,40 +38,40 @@
 
 namespace unittest
 {
-	/// @ingroup	unittest
-	/// @brief		%Reporter
+	/// \ingroup	unittest
+	/// \brief		%Reporter
 	///
 	/// Used to generate the visible output.
 	///
 	class Reporter
 	{
 	public:
-		/// @brief	Constructor
+		/// \brief	Constructor
 		///
-		/// @param	device	IODevice used for printing
+		/// \param	device	IODevice used for printing
 		Reporter(xpcc::IODevice* device);
 		
-		/// @brief	Switch to the next test suite
+		/// \brief	Switch to the next test suite
 		/// 
-		/// @param	name	Name of the test suite
+		/// \param	name	Name of the test suite
 		void
 		nextTestSuite(xpcc::FlashPointer<char> name);
 		
-		/// @brief	Report a passed test
+		/// \brief	Report a passed test
 		/// 
 		/// Doesn't generate any output, but increments the number of
 		/// passed tests
 		void
 		reportPass();
 		
-		/// @brief	Reported a failed test
+		/// \brief	Reported a failed test
 		///
 		/// Generates a basic failure message, the returned stream can then
 		/// be used to write some more specific information about the failure.
 		xpcc::IOStream&
 		reportFailure(unsigned int lineNumber);
 		
-		/// @brief	Writes a summary of all the tests
+		/// \brief	Writes a summary of all the tests
 		/// 
 		/// Basically the total number of failed and passed tests and then 
 		/// 'OK' if there was no failure or 'FAIL' otherwise.

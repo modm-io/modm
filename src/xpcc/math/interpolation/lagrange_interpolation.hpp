@@ -39,10 +39,10 @@
 namespace xpcc
 {
 	/**
-	 * @ingroup	interpolation
-	 * @brief	Lagrange Interpolation
+	 * \ingroup	interpolation
+	 * \brief	Lagrange Interpolation
 	 * 
-	 * @todo	needs documentation
+	 * \todo	needs documentation
 	 */
 	template<typename T>
 	class LagrangeInterpolation

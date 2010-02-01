@@ -34,8 +34,8 @@
 #define	XPCC__MACROS_HPP
 
 /**
- * @ingroup	utils
- * @brief	Force inlining
+ * \ingroup	utils
+ * \brief	Force inlining
  * 
  * Macro to force inlining on function if needed. Compiling with -Os  does not
  * always inline them when declared only \c inline.
@@ -45,14 +45,14 @@
 #ifdef __DOXYGEN__
 
 	/**
-	 * @ingroup	utils
-	 * @brief	Convert the argument into a C-String
+	 * \ingroup	utils
+	 * \brief	Convert the argument into a C-String
 	 */
 	#define	STRINGIFY(s)	#s
 
 	/**
-	 * @ingroup	utils
-	 * @brief	Concatenate the two arguments
+	 * \ingroup	utils
+	 * \brief	Concatenate the two arguments
 	 */
 	#define	CONCAT(a,b)		a ## b
 

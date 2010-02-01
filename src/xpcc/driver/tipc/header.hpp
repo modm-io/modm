@@ -37,21 +37,21 @@
 namespace xpcc {
 	namespace tipc {
 		//!	the first 64 ids (types) are used by tipc itself
-		//! @ingroup tipc
+		//! \ingroup tipc
 		const unsigned int TYPE_ID_OFFSET = 64;
 		
-		//! @ingroup tipc
+		//! \ingroup tipc
 		const unsigned int EVENT_OFFSET   = 0x10000;
 		
-		//! @ingroup tipc
+		//! \ingroup tipc
 		const unsigned int REQUEST_OFFSET = 0x20000;
 
 
 		/**
-		 * @brief		The header, that are send over the tipc.
+		 * \brief		The header, that are send over the tipc.
 		 *
-		 * @ingroup		tipc
-		 * @version		$Id: header.hpp 91 2009-10-17 15:53:04Z thundernail $
+		 * \ingroup		tipc
+		 * \version		$Id: header.hpp 91 2009-10-17 15:53:04Z thundernail $
 		 */
 		struct Header {
 			size_t size;

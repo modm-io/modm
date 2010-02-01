@@ -41,11 +41,11 @@
 namespace xpcc
 {
 	/**
-	 * @brief		UART0
+	 * \brief		UART0
 	 * 
 	 * This implementation uses a ringbuffer.
 	 *
-	 * @ingroup		hal
+	 * \ingroup		hal
 	 */
 	class Uart0
 	{
@@ -56,14 +56,14 @@ namespace xpcc
 		}
 		
 		/**
-		 * @brief	Set baud rate
+		 * \brief	Set baud rate
 		 *
 		 * If this function is called with a constant value as parameter,
 		 * all the calculation is done by the compiler, so no 32-bit
 		 * arithmetic is needed at run-time!
 		 *
-		 * @param	baudrate	desired baud rate
-		 * @param	u2x			enabled double speed mode
+		 * \param	baudrate	desired baud rate
+		 * \param	u2x			enabled double speed mode
 		 */
 		static inline void
 		setBaudrate(uint32_t baudrate, bool u2x = false)

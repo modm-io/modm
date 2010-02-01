@@ -38,13 +38,13 @@
 namespace xpcc
 {
 	/**
-	 * @ingroup	hal
-	 * @brief	General purpose input and/or output pins
+	 * \ingroup	hal
+	 * \brief	General purpose input and/or output pins
 	 */
 	namespace gpio
 	{
 		/**
-		 * @brief	Dummy implementation of an I/O pin
+		 * \brief	Dummy implementation of an I/O pin
 		 * 
 		 */
 		class Unused

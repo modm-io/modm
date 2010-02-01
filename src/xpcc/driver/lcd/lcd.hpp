@@ -39,8 +39,8 @@
 namespace xpcc
 {
 	/**
-	 * @ingroup	driver
-	 * @brief	Base class for alphanumeric LCDs (liquid crystal display)
+	 * \ingroup	driver
+	 * \brief	Base class for alphanumeric LCDs (liquid crystal display)
 	 * 
 	 * 
 	 * 
@@ -67,14 +67,14 @@ namespace xpcc
 		} Command;
 		
 	public:
-		/// @brief	Constructor
+		/// \brief	Constructor
 		Lcd();
 		
-		/// @brief	Initialize the display
+		/// \brief	Initialize the display
 		virtual void
 		initialize() = 0;
 		
-		/// @brief	Write a character
+		/// \brief	Write a character
 		/// 
 		/// This method provides an automatic wrap-round if the output reaches
 		/// the end of the current line or a newline character is detected.
@@ -86,11 +86,11 @@ namespace xpcc
 		// import the other versions of put() from IODevice
 		using IODevice::put;
 		
-		/// @brief	Write a raw character at cursor position
+		/// \brief	Write a raw character at cursor position
 		/// 
 		/// Unlike put() no further processing will occur.
 		/// 
-		/// @see	put()
+		/// \see	put()
 		virtual void
 		putRaw(char c) = 0;
 		
@@ -101,14 +101,14 @@ namespace xpcc
 		//virtual void
 		//command(Command command) = 0;
 		
-		/// @brief	Set cursor to specified position
+		/// \brief	Set cursor to specified position
 		/// 
-		/// @param	line	vertical position
-		/// @param	column	horizontal position
+		/// \param	line	vertical position
+		/// \param	column	horizontal position
 		virtual void
 		setPosition(uint8_t line, uint8_t column) = 0;
 		
-		/// @brief	Read a character
+		/// \brief	Read a character
 		///
 		/// Because a LCD is a read-only device this method will always return
 		/// \c false.

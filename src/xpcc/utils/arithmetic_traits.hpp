@@ -38,38 +38,38 @@
 namespace xpcc
 {
 	/**
-	 * @ingroup		utils
-	 * @defgroup	arithmetic_trais	Arithmetic Traits
-	 * @brief		Traits to give numbers more information then they have by
+	 * \ingroup		utils
+	 * \defgroup	arithmetic_trais	Arithmetic Traits
+	 * \brief		Traits to give numbers more information then they have by
 	 * 				default in C++
 	 *
-	 * @section provides	Values provided by these traits
+	 * \section provides	Values provided by these traits
 	 *
-	 * @li @c	DoubleType	Type that can holds the doubled length of data.
+	 * \li \c	DoubleType	Type that can holds the doubled length of data.
 	 * 						May be used to hold the result of a multiplication.
-	 * @li @c	SignedType	Signed type for the given type. It applies 
+	 * \li \c	SignedType	Signed type for the given type. It applies 
 	 * 						<i>T == SignedType</i> if T is already signed.
-	 * @li @c	UnsignedType	Some as SignedType only for unsigned types
-	 * @li @c	minValue	smallest value.
-	 * @li @c	maxValue	biggest value
-	 * @li @c	isSigned	is this a signed or unsigned type
-	 * @li @c	isInteger	is this an integer type
-	 * @li @c	isFloat		is this a floatingpoint type (float, double)
-	 * @li @c	decimalDigits	count of digits to display this type in decimal
+	 * \li \c	UnsignedType	Some as SignedType only for unsigned types
+	 * \li \c	minValue	smallest value.
+	 * \li \c	maxValue	biggest value
+	 * \li \c	isSigned	is this a signed or unsigned type
+	 * \li \c	isInteger	is this an integer type
+	 * \li \c	isFloat		is this a floatingpoint type (float, double)
+	 * \li \c	decimalDigits	count of digits to display this type in decimal
 	 * 
-	 * @section usage	Usage
-	 * @code
+	 * \section usage	Usage
+	 * \code
 	 * typedef typename xpcc::ArithmeticTraits<T>::DoubleType T_DOUBLE;
 	 *
 	 * T min = xpcc::ArithmeticTraits<T>::minValue;
 	 * T max = xpcc::ArithmeticTraits<T>::maxValue;
-	 * @endcode
+	 * \endcode
 	 * 
-	 * @version	$Id: arithmetic_traits.hpp 83 2009-10-15 19:58:57Z dergraaf $
-	 * @author	Martin Rosekeit <martin.rosekeit@rwth-aachen.de>
+	 * \version	$Id: arithmetic_traits.hpp 83 2009-10-15 19:58:57Z dergraaf $
+	 * \author	Martin Rosekeit <martin.rosekeit@rwth-aachen.de>
 	 */
 	// -------------------------------------------------------------------------
-	/*@{*/
+	/*\{*/
 	template<typename T>
 	struct ArithmeticTraits
 	{
@@ -255,7 +255,7 @@ namespace xpcc
 	};
 
 #endif
-	/*@}*/
+	/*\}*/
 }
 
 #endif	// XPCC__ARITHMETIC_TRAITS_HPP

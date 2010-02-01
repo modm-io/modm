@@ -33,12 +33,12 @@
 #define	XPCC_POSTMAN_HPP
 
 /**
- * @defgroup 	communication Communication
- * @brief 		Postman delivers messages to the Components.
+ * \defgroup 	communication Communication
+ * \brief 		Postman delivers messages to the Components.
  *
  * DESC DESC
  *
- * @version		$Id$
+ * \version		$Id$
  */
 
 #include "../backend/backend_interface.hpp"

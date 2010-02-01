@@ -41,22 +41,22 @@
 namespace xpcc
 {
 	/**
-	 * @brief	Driver for DOG-M162
+	 * \brief	Driver for DOG-M162
 	 * 
-	 * @todo	documentation
-	 * @todo	make this class adaptable to other voltages and line counts!
+	 * \todo	documentation
+	 * \todo	make this class adaptable to other voltages and line counts!
 	 * 
-	 * @ingroup	driver
-	 * @see		Lcd
+	 * \ingroup	driver
+	 * \see		Lcd
 	 */
 	template <typename SPI, typename CS, typename RS>
 	class DogM16x : public Lcd
 	{
 	public:
-		/// @brief	Constructor
+		/// \brief	Constructor
 		DogM16x();
 		
-		/// @brief	Initialize the display
+		/// \brief	Initialize the display
 		/// 
 		/// The display needs some time to initalize after startup. You have
 		/// to wait at least 50 ms until calling this method.

@@ -37,12 +37,12 @@
 namespace xpcc {
 	namespace tipc {
 		/**
-		 * @class		TransmitterSocket
-		 * @brief		Proviede the handling of the socket interface from TIPC.
+		 * \class		TransmitterSocket
+		 * \brief		Proviede the handling of the socket interface from TIPC.
 		 * 
-		 * @ingroup		tipc
-		 * @version		$Id: tipc_transmitter_socket.hpp 82 2009-10-15 19:17:28Z thundernail $
-		 * @author		Carsten Schmitt < >
+		 * \ingroup		tipc
+		 * \version		$Id: tipc_transmitter_socket.hpp 82 2009-10-15 19:17:28Z thundernail $
+		 * \author		Carsten Schmitt < >
 		 */
 		class TransmitterSocket {
 			public:	

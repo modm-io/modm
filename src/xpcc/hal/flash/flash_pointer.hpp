@@ -41,8 +41,8 @@
 namespace xpcc
 {
 	/**
-	 * @ingroup	hal
-	 * @brief	Pointer to flash memory
+	 * \ingroup	hal
+	 * \brief	Pointer to flash memory
 	 * 
 	 * This template can mostly be used like a regular pointer, but operates
 	 * on the flash memory rather than RAM. It will automatically read the 
@@ -51,7 +51,7 @@ namespace xpcc
 	 * Based on a implementation of Rolf Magnus, see
 	 * http://www.mikrocontroller.net/topic/78610#656695
 	 * 
-	 * @author	Fabian Greif <fabian.greif@rwth-aachen.de>
+	 * \author	Fabian Greif <fabian.greif@rwth-aachen.de>
 	 */
 	template<typename T>
 	class FlashPointer
@@ -144,8 +144,8 @@ namespace xpcc
 	};
 	
 	/**
-	 * @ingroup	hal
-	 * @brief	
+	 * \ingroup	hal
+	 * \brief	
 	 */
 	template<typename T>
 	ALWAYS_INLINE FlashPointer<T>

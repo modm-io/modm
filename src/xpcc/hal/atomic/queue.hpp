@@ -42,12 +42,12 @@ namespace xpcc
 	namespace atomic
 	{
 		/**
-		 * @ingroup	atomic
-		 * @brief	Interrupt save queue
+		 * \ingroup	atomic
+		 * \brief	Interrupt save queue
 		 *
 		 * A maximum size of 254 is allowed
 		 * 
-		 * @todo	This implementation should work but could be improved
+		 * \todo	This implementation should work but could be improved
 		 */
 		template<typename T,
 				 int N>

@@ -38,11 +38,11 @@ namespace xpcc
 {
 	namespace atomic
 	{
-		/// @ingroup	atomic
-		/// @brief		Flag to signal events between interrupts and the 
+		/// \ingroup	atomic
+		/// \brief		Flag to signal events between interrupts and the 
 		///				main-loop
 		///
-		/// @todo	description
+		/// \todo	description
 		class Flag
 		{
 		public:

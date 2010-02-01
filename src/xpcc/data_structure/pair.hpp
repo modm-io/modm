@@ -36,9 +36,9 @@
 namespace xpcc
 {
 	/**
-	 * @ingroup		data_structure
+	 * \ingroup		data_structure
 	 * 
-	 * @brief		Pair<FirstType, SecondType> is a heterogeneous pair
+	 * \brief		Pair<FirstType, SecondType> is a heterogeneous pair
 	 * 
 	 * This class holds one object of type FirstType and one object of type
 	 * SecondType.
@@ -49,7 +49,7 @@ namespace xpcc
 	 * needed for example for the interpolation classes.
 	 * 
 	 * This contraint make a the usage rather unusual. See the example below.
-	 * @code
+	 * \code
 	 * // construction
 	 * Pair<uint8_t, uint16_t> pair = { 12, -12345 };
 	 * 
@@ -63,9 +63,9 @@ namespace xpcc
 	 *     { 2, 30 },
 	 *     { 5, 60 }
 	 * };
-	 * @endcode
+	 * \endcode
 	 * 
-	 * @note
+	 * \note
 	 * Even if this class provides public attributes it is recommend to use
 	 * the access methods, because as soon as C++0x is available the
 	 * implementation will be changed and the attributes will be made private.
@@ -78,7 +78,7 @@ namespace xpcc
 	 * 	};
 	 * \endcode
 	 *
-	 * @see	xpcc::LinearInterpolation
+	 * \see	xpcc::LinearInterpolation
 	 */
 	template<typename T1, typename T2>
 	class Pair

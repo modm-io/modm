@@ -39,12 +39,12 @@
 namespace xpcc
 {
 	/**
-	 * @ingroup	data_structure
-	 * @brief	Double ended queue
+	 * \ingroup	data_structure
+	 * \brief	Double ended queue
 	 * 
 	 * Internally organised as a ring buffer.
 	 * 
-	 * @verbatim
+	 * \verbatim
 	 *              tail --\                 /-- head
 	 *                     |                 |
 	 *           +------+------+---- ----+------+------+
@@ -54,15 +54,15 @@ namespace xpcc
 	 * push_front --/      |                 |      \-- push_back
 	 *                     |                 |
 	 *             front --/                 \-- back
-	 * @endverbatim
+	 * \endverbatim
 	 * 
-	 * @tparam	T	Type of the elements
-	 * @tparam	N	Size of the queue
+	 * \tparam	T	Type of the elements
+	 * \tparam	N	Size of the queue
 	 * 
 	 * Up to a size of 254 small index variables with 8-bits are used, after
 	 * this they are switched to 16-bit.
 	 * 
-	 * @warning		This class don't check if the container is not empty before
+	 * \warning		This class don't check if the container is not empty before
 	 * 				a pop operation. You have to do this by yourself!
 	 */
 	template<typename T,
@@ -92,9 +92,9 @@ namespace xpcc
 		inline Size
 		getMaxSize() const;
 		
-		/// @brief		Clear the container
+		/// \brief		Clear the container
 		///
-		/// @warning	This will discard all the items in the container
+		/// \warning	This will discard all the items in the container
 		void
 		clear();
 		
@@ -127,9 +127,9 @@ namespace xpcc
 	public:
 		friend class const_iterator;
 		
-		/// @brief	Bidirectional const iterator
+		/// \brief	Bidirectional const iterator
 		///
-		/// @todo	check if a simpler implementation is possible
+		/// \todo	check if a simpler implementation is possible
 		class const_iterator
 		{
 			friend class BoundedDeque;

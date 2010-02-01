@@ -36,14 +36,14 @@
 namespace xpcc
 {
 	/**
-	 * @ingroup		utils
-	 * @defgroup	modifier
+	 * \ingroup		utils
+	 * \defgroup	modifier
 	 */
 	namespace modifier
 	{
 		/**
-		 * @ingroup	modifier
-		 * @brief	Add volatile modifier to T
+		 * \ingroup	modifier
+		 * \brief	Add volatile modifier to T
 		 */
 		template<typename T>
 		volatile T&

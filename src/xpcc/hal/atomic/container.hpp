@@ -39,10 +39,10 @@ namespace xpcc
 	namespace atomic
 	{
 		/**
-		 * @brief	Atomic access to objects
+		 * \brief	Atomic access to objects
 		 * 
 		 * Example: 
-		 * @code
+		 * \code
 		 * atomic::Containter<uint32_t> data;
 		 * 
 		 * // interrupt routine
@@ -54,11 +54,11 @@ namespace xpcc
 		 *     uint32_t localData = data.get();
 		 *     ...
 		 * }
-		 * @endcode
+		 * \endcode
 		 * 
-		 * @warning	This class should be used with precaution because the
+		 * \warning	This class should be used with precaution because the
 		 * 			objects are copied for every access.
-		 * @ingroup	atomic
+		 * \ingroup	atomic
 		 */
 		template<typename T>
 		class Container
@@ -93,9 +93,9 @@ namespace xpcc
 				return oldValue;
 			}
 			
-			/// @brief		Get direct access to the object
+			/// \brief		Get direct access to the object
 			///
-			/// @warning	If the object is access throu this function the
+			/// \warning	If the object is access throu this function the
 			///				operations are not atomic!
 			inline volatile T&
 			getObject()

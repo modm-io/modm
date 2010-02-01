@@ -41,11 +41,11 @@ namespace xpcc
 	namespace atomic
 	{
 		/**
-		 * @ingroup	atomic
-		 * @brief		Critical section
+		 * \ingroup	atomic
+		 * \brief		Critical section
 		 *  
 		 * Typical usage:
-		 * @code
+		 * \code
 		 * function()
 		 * {
 		 *     // some code with interrupts enabled
@@ -63,7 +63,7 @@ namespace xpcc
 		 * }
 		 * \endcode
 		 * 
-		 * @warning	Interrupts should be disabled the shortest possible time!
+		 * \warning	Interrupts should be disabled the shortest possible time!
 		 */
 		class Lock
 		{
@@ -79,8 +79,8 @@ namespace xpcc
 		};
 		
 		/**
-		 * @ingroup	atomic
-		 * @brief	Opposite to atomic::Lock
+		 * \ingroup	atomic
+		 * \brief	Opposite to atomic::Lock
 		 * 
 		 * Use this class to create a block of code with interrupts enabled
 		 * inside a locked block.

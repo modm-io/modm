@@ -38,9 +38,9 @@
 namespace xpcc
 {
 	/**
-	 * @brief	Simple 16-bit timestamp
+	 * \brief	Simple 16-bit timestamp
 	 * 
-	 * @ingroup	hal
+	 * \ingroup	hal
 	 */ 
 	class Timestamp
 	{

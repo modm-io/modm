@@ -42,14 +42,14 @@
 namespace xpcc {
 	namespace tipc {
 		/**
-		 * @class		Transmitter
-		 * @brief		Transmit packets over the TIPC.
+		 * \class		Transmitter
+		 * \brief		Transmit packets over the TIPC.
 		 * 
-		 * @todo		exception handling : now it writs only log-messages
+		 * \todo		exception handling : now it writs only log-messages
 		 * 
-		 * @ingroup		tipc
-		 * @version		$Id: tipc_transmitter.hpp 82 2009-10-15 19:17:28Z thundernail $
-		 * @author		Carsten Schmitt < >
+		 * \ingroup		tipc
+		 * \version		$Id: tipc_transmitter.hpp 82 2009-10-15 19:17:28Z thundernail $
+		 * \author		Carsten Schmitt < >
 		 */
 		class Transmitter {
 			public:

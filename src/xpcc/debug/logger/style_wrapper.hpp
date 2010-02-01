@@ -37,11 +37,11 @@
 namespace xpcc {
 	namespace log {
 		/**
-		 * @brief 	Wrapper to use the Style as a IODevice in the Logger
+		 * \brief 	Wrapper to use the Style as a IODevice in the Logger
 		 *
-		 * @ingroup logger
-		 * @version	$Id$
-		 * @author	Martin Rosekeit <martin.rosekeit@rwth-aachen.de>
+		 * \ingroup logger
+		 * \version	$Id$
+		 * \author	Martin Rosekeit <martin.rosekeit@rwth-aachen.de>
 		 */
 		template < typename STYLE >
 		class StyleWrapper : public IODevice {

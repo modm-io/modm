@@ -39,10 +39,10 @@
 namespace xpcc
 {
 	/**
-	 * @ingroup		backend
-	 * @brief 		Accepts Packets with componentIdentifier contaning header.destination
+	 * \ingroup		backend
+	 * \brief 		Accepts Packets with componentIdentifier contaning header.destination
 	 *
-	 * @version		$Id: default_component_filter.hpp 77 2009-10-15 18:34:29Z thundernail $
+	 * \version		$Id: default_component_filter.hpp 77 2009-10-15 18:34:29Z thundernail $
 	 */
 	 
 	class DefaultComponentFilter:Filter

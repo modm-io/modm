@@ -51,8 +51,8 @@ namespace xpcc
 //	SPIC.STATUS | SPI_IF_bm | SPI_WRCOL_bm interrupt flags
 
 /**
- * @ingroup	hal
- * @brief	Create a spi module
+ * \ingroup	hal
+ * \brief	Create a spi module
  */
 #define	CREATE_SPI_MODULE(name, moduleBase) \
 	struct name { \

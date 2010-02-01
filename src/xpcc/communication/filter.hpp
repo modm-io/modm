@@ -38,13 +38,13 @@
 namespace xpcc
 {
 	/**
-	 * @ingroup		backend
-	 * @brief 		Filter is an abstract superclass of classes, which are able
+	 * \ingroup		backend
+	 * \brief 		Filter is an abstract superclass of classes, which are able
 	 * 				to accept and decline Messages. Filters can be passed to
 	 *				Backend in order to filter Packets by destination identifier
 	 *
 	 *
-	 * @version		$Id: filter.hpp 77 2009-10-15 18:34:29Z thundernail $
+	 * \version		$Id: filter.hpp 77 2009-10-15 18:34:29Z thundernail $
 	 */
 	 
 	class Filter

@@ -41,10 +41,10 @@ namespace xpcc
 	namespace log
 	{
 		/**
-		 * @brief 	This is an empty style.
+		 * \brief 	This is an empty style.
 		 *
-		 * @ingroup logger
-		 * @author	Martin Rosekeit <martin.rosekeit@rwth-aachen.de>
+		 * \ingroup logger
+		 * \author	Martin Rosekeit <martin.rosekeit@rwth-aachen.de>
 		 */
 		class DefaultStyle
 		{
@@ -79,8 +79,8 @@ namespace xpcc
 		};
 
 		/**
-		 * @class 	Style
-		 * @brief 	This is the interface to all style-classes of the logger.
+		 * \class 	Style
+		 * \brief 	This is the interface to all style-classes of the logger.
 		 *
 		 * For each log level the logger provides a singleton. Because the
 		 * format the log messages should be presented depends on the system
@@ -91,8 +91,8 @@ namespace xpcc
 		 * the given way and pass it to the next style class or device.
 		 *
 		 *
-		 * @ingroup logger
-		 * @author	Martin Rosekeit <martin.rosekeit@rwth-aachen.de>
+		 * \ingroup logger
+		 * \author	Martin Rosekeit <martin.rosekeit@rwth-aachen.de>
 		 */
 		template < typename STYLE = DefaultStyle >
 		class Style

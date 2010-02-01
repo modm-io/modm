@@ -39,19 +39,19 @@
 namespace xpcc
 {
 	/**
-	 * @brief	Software emulation of a SPI bus master
+	 * \brief	Software emulation of a SPI bus master
 	 * 
 	 * SPI stands for Serial Peripheral Interface Bus.
 	 * 
-	 * @todo	documentation
+	 * \todo	documentation
 	 * 
-	 * @tparam	SCLK		clock pin [output]
-	 * @tparam	MOSI		master out slave in pin [output]
-	 * @tparam	MISO		master in slave out pin [input]
-	 * @tparam	FREQUENCY	requested SPI frequency in Hz
+	 * \tparam	SCLK		clock pin [output]
+	 * \tparam	MOSI		master out slave in pin [output]
+	 * \tparam	MISO		master in slave out pin [input]
+	 * \tparam	FREQUENCY	requested SPI frequency in Hz
 	 * 
-	 * @ingroup	hal
-	 * @see		gpio
+	 * \ingroup	hal
+	 * \see		gpio
 	 */
 	template <typename SCLK,
 			  typename MOSI,

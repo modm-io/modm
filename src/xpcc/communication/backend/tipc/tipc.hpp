@@ -42,12 +42,12 @@ namespace xpcc {
 	namespace tipc {
 
 		/**
-		 * @class	Tipc
-		 * @brief	Class that connects the communication to the tipc.
+		 * \class	Tipc
+		 * \brief	Class that connects the communication to the tipc.
 		 *
-		 * @ingroup	tipc
-		 * @version	$Id$
-		 * @author	Martin Rosekeit <martin.rosekeit@rwth-aachen.de>
+		 * \ingroup	tipc
+		 * \version	$Id$
+		 * \author	Martin Rosekeit <martin.rosekeit@rwth-aachen.de>
 		 */
 		class Tipc : public BackendInterface
 		{
@@ -90,7 +90,7 @@ namespace xpcc {
 
 				//! Send a Message.
 				//!
-				//! @return	\b true if the packet could be send, \b false otherwise.
+				//! \return	\b true if the packet could be send, \b false otherwise.
 				virtual void
 				sendPacket(const xpcc::Header &header, SmartPointer payload = SmartPointer());
 

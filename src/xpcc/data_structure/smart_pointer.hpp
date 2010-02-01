@@ -88,7 +88,7 @@ namespace xpcc
 		operator <<( IOStream&, const SmartPointer&);
 
 		/// Allocates memory from the given size
-		/// @param size the amount of memory to be allocated, has to be smaller than 252
+		/// \param size the amount of memory to be allocated, has to be smaller than 252
 		SmartPointer(unsigned char size);
 
 		SmartPointer&
@@ -117,7 +117,7 @@ namespace xpcc
 	{
 		public:
 			/// Allocates memory from the given size
-			/// @param size the amount of memory to be allocated, has to be smaller than 252
+			/// \param size the amount of memory to be allocated, has to be smaller than 252
 			SmartPointerVolatile(unsigned char size);
 
 			SmartPointerVolatile(const SmartPointerVolatile& other);

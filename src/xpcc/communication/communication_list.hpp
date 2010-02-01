@@ -40,18 +40,18 @@
 #include "../hal/time/internal_clock.hpp"
 
 /**
- * @ingroup 	communication
- * @brief 		Holds information about the response, repeat sending acknowleging for communication.
+ * \ingroup 	communication
+ * \brief 		Holds information about the response, repeat sending acknowleging for communication.
  *
  *
- * @version		$Id$
+ * \version		$Id$
  */
 namespace xpcc{
 namespace communicationList{
 
 	/**
-	 * @ingroup 	communication
-	 * @brief 		CommunicationListEntry holds information about one Message has to be sent. Is superclass of all entries
+	 * \ingroup 	communication
+	 * \brief 		CommunicationListEntry holds information about one Message has to be sent. Is superclass of all entries
 	 */
 	class Entry{
 	
@@ -64,31 +64,31 @@ namespace communicationList{
 		
 	
 		/**
-		 * @brief 		Creates one Entry with given header. this->next is initially set Null
+		 * \brief 		Creates one Entry with given header. this->next is initially set Null
 		 *
 		 * Creates one Entry with given header. this->next is initially set Null.
 		 * The const member this->typeInfo is set to typeInfo and never else changed.
 		 * this->typeInfo replaces runtime information needed by handling of messages.
 		 *
-		 * @see CommunicationList
+		 * \see CommunicationList
 		 */
 		Entry(uint8_t typeInfo, const Header& header, SmartPointer& payload);
 		Entry(uint8_t typeInfo, const Header& header);
 		
 		/**
-		 * @brief 		Checks if one Response or ack fitts to the Message represented by this Entry.
+		 * \brief 		Checks if one Response or ack fitts to the Message represented by this Entry.
 		 */
 		bool
 		headerFits(const Header& header) const;
 		
 		/**
-		 * @brief 		Listhandling, return pointer to the next entry.
+		 * \brief 		Listhandling, return pointer to the next entry.
 		 */
 		const Entry *
 		getNext() const;
 		
 		/**
-		 * @brief 		Communication info, state of sending and retrieving messages and acks.
+		 * \brief 		Communication info, state of sending and retrieving messages and acks.
 		 */
 		typedef enum {
 			WANT_TO_BE_SENT,
@@ -99,7 +99,7 @@ namespace communicationList{
 		const uint8_t typeInfo;
 		
 		/**
-		 * @brief 		Listhandling, holds pointer to the next entry.
+		 * \brief 		Listhandling, holds pointer to the next entry.
 		 */
 		Entry *next;
 		
@@ -128,8 +128,8 @@ namespace communicationList{
 	};
 
 	/**
-	 * @ingroup 	communication
-	 * @brief 		List containts Entries.
+	 * \ingroup 	communication
+	 * \brief 		List containts Entries.
 	 *
 	 * Entries are lineary linked.
 	 * The member this->first points at any time to the dummyFirst.
@@ -141,12 +141,12 @@ namespace communicationList{
 	class List{
 	public:
 		/**
-		 * @brief 		Creates one initially valid list.
+		 * \brief 		Creates one initially valid list.
 		 * 
-		 * @code
+		 * \code
 		 * this->first = &dummyFirst;
 		 * this->last = &dummyFirst;
-		 * @endcode
+		 * \endcode
 		 */
 		List();
 		
@@ -170,14 +170,14 @@ namespace communicationList{
 		
 		
 		/**
-		 * @brief 		Does not handle requests which are not acknowlege.
+		 * \brief 		Does not handle requests which are not acknowlege.
 		 *
 		 */
 		void
 		handlePacket(const BackendInterface &backend);
 		
 		/**
-		 * @brief 		Sending messages which are waiting in the list.
+		 * \brief 		Sending messages which are waiting in the list.
 		 *
 		 */
 		void
@@ -186,42 +186,42 @@ namespace communicationList{
 	private:
 	
 		/**
-		 * @brief 		Appends one ore more entries to this->last. this->last is updated to the tail of next.
+		 * \brief 		Appends one ore more entries to this->last. this->last is updated to the tail of next.
 		 *
 		 */
 		void
 		append(Entry *next);
 		
 		/**
-		 * @brief 		fix->next will be set to next. the old entry of fix->next will be set
+		 * \brief 		fix->next will be set to next. the old entry of fix->next will be set
 		 *				to the tail of next. this->last will be updated to tail of next if 
 		 *				fix->next==Null, which is equivalent to fix==last.
 		 *
-		 * @param fix has to be one element already appended to the list.
-		 * @param next must not be contained by any list. Any element of the next->next chain must not be contained by any list.
+		 * \param fix has to be one element already appended to the list.
+		 * \param next must not be contained by any list. Any element of the next->next chain must not be contained by any list.
 		 */
 		void
 		insertAfter(Entry *fix, Entry *next);
 
 		/**
-		 * @brief 		if (fix->next) then fix->next will be set to fix->next->next. this->last
+		 * \brief 		if (fix->next) then fix->next will be set to fix->next->next. this->last
 		 *				will be set to fix if fix->next was the last element.
 		 *				The removed element is returned
 		 *				if fix was the last element nothing is done and Null is returned.
 		 *				For safety the member next of the returned element is set to Null.
 		 *
-		 * @param fix has to be one element already appended to the list.
+		 * \param fix has to be one element already appended to the list.
 		 */
 		Entry *
 		removeNext(Entry *fix);
 		
 
 		/**
-		 * @brief 		Handles the callbacks to responses comming from Backend, if one Entry
+		 * \brief 		Handles the callbacks to responses comming from Backend, if one Entry
 		 *				is found in the list. Deletes entries and calls the callback function.
 		 *
-		 * @param backend pointer to the BackendInterface in order to retrieve response information.
-		 * @param e entry in the list. e->next has to fit to the packet actually hold in backend.
+		 * \param backend pointer to the BackendInterface in order to retrieve response information.
+		 * \param e entry in the list. e->next has to fit to the packet actually hold in backend.
 		 *
 		 */
 		template<typename C>

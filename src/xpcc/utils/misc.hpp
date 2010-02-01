@@ -39,18 +39,18 @@
 namespace xpcc
 {
 	/**
-	 * @ingroup	utils
-	 * @brief	Usefull stuff
+	 * \ingroup	utils
+	 * \brief	Usefull stuff
 	 */
 	namespace utils
 	{
 		/**
-		 * @ingroup	utils
-		 * @brief	Exchange the two nibbles of a byte
+		 * \ingroup	utils
+		 * \brief	Exchange the two nibbles of a byte
 		 * 
-		 * @verbatim
+		 * \verbatim
 		 * 0xab => 0xba
-		 * @endverbatim
+		 * \endverbatim
 		 */
 		ALWAYS_INLINE uint8_t
 		swap(uint8_t n)
@@ -70,12 +70,12 @@ namespace xpcc
 		}
 		
 		/**
-		 * @ingroup	utils
-		 * @brief	Exchange the two bytes of a 16-bit integer
+		 * \ingroup	utils
+		 * \brief	Exchange the two bytes of a 16-bit integer
 		 * 
-		 * @verbatim
+		 * \verbatim
 		 * 0xabcd => 0xcdab
-		 * @endverbatim
+		 * \endverbatim
 		 */
 		ALWAYS_INLINE uint16_t
 		swap(uint16_t n)
@@ -101,12 +101,12 @@ namespace xpcc
 		}
 		
 		/**
-		 * @ingroup	utils
-		 * @brief	Reverse the bits in a byte
+		 * \ingroup	utils
+		 * \brief	Reverse the bits in a byte
 		 * 
-		 * @verbatim
+		 * \verbatim
 		 * 0b01110100 => 0b00101110
-		 * @endverbatim
+		 * \endverbatim
 		 * 
 		 * 15 cycles on an AVR, without call + return.
 		 */
@@ -114,33 +114,33 @@ namespace xpcc
 		bitReverse(uint8_t n);
 		
 		/**
-		 * @ingroup	utils
-		 * @brief	Reverse the bits in a 16-bit integer
+		 * \ingroup	utils
+		 * \brief	Reverse the bits in a 16-bit integer
 		 */
 		uint16_t
 		bitReverse(uint16_t n);
 		
 		/**
-		 * @ingroup	utils
-		 * @brief	Reverse the bits in a 32-bit integer
+		 * \ingroup	utils
+		 * \brief	Reverse the bits in a 32-bit integer
 		 */
 		uint32_t
 		bitReverse(uint32_t n);
 		
 		/**
-		 * @ingroup	utils
-		 * @brief	Count the number of bit set to 1
+		 * \ingroup	utils
+		 * \brief	Count the number of bit set to 1
 		 * 
 		 * 16 cycles on an AVR, without call + return.
 		 * 
-		 * @see		http://infolab.stanford.edu/~manku/bitReverse/bitReverse.html
+		 * \see		http://infolab.stanford.edu/~manku/bitReverse/bitReverse.html
 		 */
 		uint_fast8_t
 		bitCount(uint8_t n);
 		
 		/**
-		 * @ingroup	utils
-		 * @brief	Count the number of bit set to 1
+		 * \ingroup	utils
+		 * \brief	Count the number of bit set to 1
 		 * 
 		 * 33 cycles on an AVR, without call + return.
 		 */
@@ -148,8 +148,8 @@ namespace xpcc
 		bitCount(uint16_t n);
 		
 		/**
-		 * @ingroup	utils
-		 * @brief	Count the number of bit set to 1
+		 * \ingroup	utils
+		 * \brief	Count the number of bit set to 1
 		 */
 		uint_fast8_t
 		bitCount(uint32_t n);

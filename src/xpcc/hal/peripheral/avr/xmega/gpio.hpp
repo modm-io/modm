@@ -39,12 +39,12 @@
 namespace xpcc
 {
 	/**
-	 * @ingroup	hal
+	 * \ingroup	hal
 	 */
 	namespace gpio
 	{
 		/**
-		 * @ingroup	hal
+		 * \ingroup	hal
 		 */
 		typedef enum
 		{
@@ -53,7 +53,7 @@ namespace xpcc
 		} Mode;
 		
 		/**
-		 * @ingroup	hal
+		 * \ingroup	hal
 		 */
 		typedef enum
 		{
@@ -73,8 +73,8 @@ namespace xpcc
 #define	PORT(x)		(PORT ## x)
 
 /**
- * @ingroup	hal
- * @brief	Create a input/output pin type
+ * \ingroup	hal
+ * \brief	Create a input/output pin type
  */
 #define	CREATE_IO_PIN(name, port, pin) \
 	struct name \
@@ -115,8 +115,8 @@ namespace xpcc
 	}
 
 /**
- * @ingroup	hal
- * @brief	Create a output pin type
+ * \ingroup	hal
+ * \brief	Create a output pin type
  */
 #define	CREATE_OUTPUT_PIN(name, port, pin) \
 	struct name \
@@ -148,8 +148,8 @@ namespace xpcc
 	}
 
 /**
- * @ingroup	hal
- * @brief	Create a input pin type
+ * \ingroup	hal
+ * \brief	Create a input pin type
  */
 #define CREATE_INPUT_PIN(name, port, pin) \
 	struct name \

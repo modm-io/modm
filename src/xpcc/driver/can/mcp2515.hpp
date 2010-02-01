@@ -40,10 +40,10 @@
 #include "can.hpp"
 
 /**
- * @ingroup	    driver
- * @name		Bits des Filters fuer den MCP2515 umformatieren
+ * \ingroup	    driver
+ * \name		Bits des Filters fuer den MCP2515 umformatieren
  * 
- * @code
+ * \code
  * FLASH(uint8_t can_filter[]) =
  * {
  * 		MCP2515_FILTER_EXTENDED(0),	// Filter 0
@@ -57,12 +57,12 @@
  *  	MCP2515_FILTER_EXTENDED(0),	// Mask 0
  * 		MCP2515_FILTER_EXTENDED(0),	// Mask 1
  * };
- * @endcode
+ * \endcode
  * 
  * \warning	Do not use this macro for variables, only for static values
  *			known at compile-time.
  */
-//@{
+//\{
 #if defined(__DOXYGEN__)
 
 	#define	MCP2515_FILTER_EXTENDED(id)
@@ -83,22 +83,22 @@
 			0, \
 			0
 #endif
-//@}
+//\}
 
 namespace xpcc
 {
 	/**
 	 * 
-	 * @brief	Driver for a MPC2515 CAN Controller
+	 * \brief	Driver for a MPC2515 CAN Controller
 	 * 
-	 * @tparam	SPI		TODO
-	 * @tparam	CS		TODO
-	 * @tparam	INT		TODO
+	 * \tparam	SPI		TODO
+	 * \tparam	CS		TODO
+	 * \tparam	INT		TODO
 	 * 
 	 * If you want to activate the internal pullup for the INT pin you
 	 * need to do this by yourself before calling the initialize method!
 	 * 
-	 * @ingroup	driver
+	 * \ingroup	driver
 	 */
 	template < typename SPI,
 			   typename CS,

@@ -41,11 +41,11 @@
 namespace xpcc
 {
 	/**
-	 * @ingroup	interpolation
-	 * @brief	Linear interpolation between two points
+	 * \ingroup	interpolation
+	 * \brief	Linear interpolation between two points
 	 * 
 	 * Example:
-	 * @code
+	 * \code
 	 * typedef xpcc::Pair<int8_t, int16_t> MyPair;
 	 * 
 	 * FLASH(MyPair flashValues[6]) = {
@@ -65,9 +65,9 @@ namespace xpcc
 	 * int16_t b;
 	 * 
 	 * b = value.interpolate(a);
-	 * @endcode
+	 * \endcode
 	 * 
-	 * @todo	needs documentation
+	 * \todo	needs documentation
 	 */
 	template <typename T>
 	class LinearInterpolation

@@ -52,14 +52,14 @@ namespace xpcc
 		} Colour;
 
 		/**
-		 * @class 	StdColour
-		 * @brief 	This style colours the given stream in the color given by the
+		 * \class 	StdColour
+		 * \brief 	This style colours the given stream in the color given by the
 		 * 			template argument.
 		 *
 		 * see webpage http://mathias-kettner.de/lw_farbige_ausgabe_auf_der_konsole.html
 		 *
-		 * @ingroup logger
-		 * @author	Martin Rosekeit <martin.rosekeit@rwth-aachen.de>
+		 * \ingroup logger
+		 * \author	Martin Rosekeit <martin.rosekeit@rwth-aachen.de>
 		 */
 		template <Colour TEXT, Colour BACKGROUND, typename STYLE = DefaultStyle >
 		class StdColour : public Style<STYLE>

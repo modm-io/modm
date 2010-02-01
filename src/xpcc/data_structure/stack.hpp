@@ -39,13 +39,13 @@
 namespace xpcc
 {
 	/**
-	 * @brief		LIFO stack
+	 * \brief		LIFO stack
 	 * 
 	 * Elements are pushed/popped from the "back" of the specific container,
 	 * which is known as the top of the stack.
 	 *  
-	 * @ingroup		data_structure
-	 * @see		Deque()
+	 * \ingroup		data_structure
+	 * \see		Deque()
 	 */
 	template<typename T,
 			 typename Container>
@@ -109,9 +109,9 @@ namespace xpcc
 
 	// ------------------------------------------------------------------------
 	/**
-	 * @brief		Bounded stack
+	 * \brief		Bounded stack
 	 * 
-	 * @ingroup		data_structure
+	 * \ingroup		data_structure
 	 */
 	template<typename T, 
 			 int N,

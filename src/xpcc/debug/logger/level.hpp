@@ -56,7 +56,7 @@ namespace xpcc {
 //!		#define XPCC_LOG_LEVEL xpcc::log::INFO
 //! \endcode
 //!
-//! @ingroup logger
+//! \ingroup logger
 #define XPCC_LOG_LEVEL xpcc::log::DEBUG
 
 #endif // XPCC_LOG_LEVEL

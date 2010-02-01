@@ -39,8 +39,8 @@ namespace xpcc
 {
 
 	/**
-	 * @ingroup		communication
-	 * @brief 		Parameter of the Callbackfunction
+	 * \ingroup		communication
+	 * \brief 		Parameter of the Callbackfunction
 	 */
 	class ResponseMessage// todo, has maybe to be defined somewhere else (other name), for use with requests too
 	{
@@ -54,8 +54,8 @@ namespace xpcc
 	};
 	
 	/**
-	 * @ingroup		communication
-	 * @brief 		Callback type, which has to be passed to communication during
+	 * \ingroup		communication
+	 * \brief 		Callback type, which has to be passed to communication during
 	 *				actioncall in order to be able to receive a response.
 	 *				Is a \b Functor.
 	 */

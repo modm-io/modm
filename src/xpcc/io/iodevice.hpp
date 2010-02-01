@@ -36,10 +36,10 @@
 namespace xpcc
 {
 	/**
-	 * @brief 	Abstract calls of io-devices
+	 * \brief 	Abstract calls of io-devices
 	 *
-	 * @ingroup io
-	 * @author	Martin Rosekeit <martin.rosekeit@rwth-aachen.de>
+	 * \ingroup io
+	 * \author	Martin Rosekeit <martin.rosekeit@rwth-aachen.de>
 	 */
 	class IODevice
 	{

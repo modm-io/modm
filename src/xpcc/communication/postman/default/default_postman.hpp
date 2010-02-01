@@ -33,13 +33,13 @@
 #define	XPCC_DEFAULT_POSTMAN_HPP
 
 /**
- * @defgroup 	communication Communication
- * @brief 		Default Postman can be used if no other more efficient
+ * \defgroup 	communication Communication
+ * \brief 		Default Postman can be used if no other more efficient
  * 				Postman is avalible.
  *
  * DESC DESC
  *
- * @version		$Id$
+ * \version		$Id$
  */
 
 #include "../postman.hpp"

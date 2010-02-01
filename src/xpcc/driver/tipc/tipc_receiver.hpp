@@ -44,13 +44,13 @@ namespace xpcc {
 	namespace tipc {
 
 		/**
-		 * @brief		Receive Packets over the TIPC and store them.
+		 * \brief		Receive Packets over the TIPC and store them.
 		 * 
 		 * In a separate thread the packets are taken from the TIPC and saved local.
 		 *  
-		 * @ingroup		tipc
-		 * @version		$Id: tipc_receiver.hpp 91 2009-10-17 15:53:04Z thundernail $
-		 * @author		Carsten Schmitt < >
+		 * \ingroup		tipc
+		 * \version		$Id: tipc_receiver.hpp 91 2009-10-17 15:53:04Z thundernail $
+		 * \author		Carsten Schmitt < >
 		 */
 		class Receiver {
 			public:
