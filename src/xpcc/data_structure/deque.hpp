@@ -40,7 +40,6 @@ namespace xpcc
 {
 	/**
 	 * @ingroup	data_structure
-	 * @headerfile <xpcc/data_structure/deque.hpp>
 	 * @brief	Double ended queue
 	 * 
 	 * Internally organised as a ring buffer.

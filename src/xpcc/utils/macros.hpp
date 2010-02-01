@@ -5,7 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -25,70 +25,47 @@
  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
-// ----------------------------------------------------------------------------
-/*
- * WARNING: This file is generated automatically, do not edit!
- * Please modify the corresponding *.in file instead and rebuild this file.
+ *
+ * $Id$
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__MEGA_UART1_HPP
-#define XPCC__MEGA_UART1_HPP
+#ifndef	XPCC__MACROS_HPP
+#define	XPCC__MACROS_HPP
 
-#include <stdint.h>
+/**
+ * @ingroup	utils
+ * @brief	Force inlining
+ * 
+ * Macro to force inlining on function if needed. Compiling with -Os  does not
+ * always inline them when declared only \c inline.
+ */
+#define ALWAYS_INLINE  inline __attribute__((always_inline))
 
-namespace xpcc
-{
+#ifdef __DOXYGEN__
+
 	/**
-	 * @brief		UART1
-	 * 
-	 * This implementation uses a ringbuffer.
-	 *
-	 * @ingroup		hal
+	 * @ingroup	utils
+	 * @brief	Convert the argument into a C-String
 	 */
-	class Uart1
-	{
-	public:
-		Uart1(uint32_t baudrate)
-		{
-			this->setBaudrate(baudrate);
-		}
-		
-		/**
-		 * @brief	Set baud rate
-		 *
-		 * If this function is called with a constant value as parameter,
-		 * all the calculation is done by the compiler, so no 32-bit
-		 * arithmetic is needed at run-time!
-		 *
-		 * @param	baudrate	desired baud rate
-		 * @param	u2x			enabled double speed mode
-		 */
-		static inline void
-		setBaudrate(uint32_t baudrate, bool u2x = false)
-		{
-			uint16_t ubrr;
-			if (u2x) {
-				ubrr  = (F_CPU / (baudrate * 8l)) - 1;
-				ubrr |= 0x8000;
-			}
-			else {
-				ubrr = (F_CPU / (baudrate * 16l)) - 1;
-			}
-			setBaudrateRegister(ubrr);
-		}
-		
-		static void
-		put(char data);
-		
-		static bool
-		get(char& c);
-		
-	protected:
-		static void
-		setBaudrateRegister(uint16_t ubrr);
-	};
-}
+	#define	STRINGIFY(s)	#s
 
-#endif // XPCC__MEGA_UART1_HPP
+	/**
+	 * @ingroup	utils
+	 * @brief	Concatenate the two arguments
+	 */
+	#define	CONCAT(a,b)		a ## b
+
+#else // !__DOXYGEN__
+
+	#define	STRINGIFY(s)	STRINGIFY2(s)
+	#define	STRINGIFY2(s)	STRINGIFY3(s)
+	#define	STRINGIFY3(s)	#s
+
+	#define	CONCAT(a,b)		CONCAT2(a,b)
+	#define	CONCAT2(a,b)	CONCAT3(a,b)
+	#define	CONCAT3(a,b)	a ## b
+
+#endif
+
+#endif	// XPCC__MACROS_HPP

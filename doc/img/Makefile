@@ -3,8 +3,8 @@ SRC = logo.pic
 
 # output format
 #FORMAT = eps
-FORMAT = pdf
-#FORMAT = png
+#FORMAT = pdf
+FORMAT = png
 
 OBJECTS = $(SRC:%.pic=%.$(FORMAT))
 

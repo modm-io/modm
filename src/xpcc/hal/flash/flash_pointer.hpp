@@ -33,7 +33,7 @@
 #ifndef	XPCC__FLASH_HPP
 #define	XPCC__FLASH_HPP
 
-#include <xpcc/utils/misc.hpp>
+#include <xpcc/utils/macros.hpp>
 #include <xpcc/utils/typet.hpp>
 #include <xpcc/io/iostream.hpp>
 #include "flash_reader.hpp"

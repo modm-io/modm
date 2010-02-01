@@ -5,6 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
+ * 
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -34,8 +35,10 @@
 #include "../style.hpp"
 #include <xpcc/utils/typet.hpp>
 
-namespace xpcc {
-	namespace log {
+namespace xpcc
+{
+	namespace log
+	{
 		typedef enum {
 			BLACK,
 			RED,
@@ -55,14 +58,12 @@ namespace xpcc {
 		 *
 		 * see webpage http://mathias-kettner.de/lw_farbige_ausgabe_auf_der_konsole.html
 		 *
-		 *
 		 * @ingroup logger
-		 * @version	$Id$
-		 * @since 	01 December 2006
 		 * @author	Martin Rosekeit <martin.rosekeit@rwth-aachen.de>
 		 */
 		template <Colour TEXT, Colour BACKGROUND, typename STYLE = DefaultStyle >
-		class StdColour : public Style<STYLE> {
+		class StdColour : public Style<STYLE>
+		{
 			public:
 				StdColour(STYLE style);
 
@@ -77,7 +78,7 @@ namespace xpcc {
 				void
 				put( char c );
 
-				/// Write a string that terminates with '\0' to the sink.
+				/// Write a string that terminates with \c '\\0' to the sink.
 				void
 				put( const char* s );
 

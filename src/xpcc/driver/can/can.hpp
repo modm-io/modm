@@ -39,7 +39,6 @@ namespace xpcc
 {
 	/**
 	 * @ingroup	driver
-	 * @headerfile	<xpcc/driver/can/can.hpp>
 	 */
 	class Can
 	{

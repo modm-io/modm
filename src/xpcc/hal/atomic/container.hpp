@@ -39,9 +39,7 @@ namespace xpcc
 	namespace atomic
 	{
 		/**
-		 * @ingroup	atomic
 		 * @brief	Atomic access to objects
-		 * @headerfile	<xpcc/hal/atomic/container.hpp>
 		 * 
 		 * Example: 
 		 * @code
@@ -60,6 +58,7 @@ namespace xpcc
 		 * 
 		 * @warning	This class should be used with precaution because the
 		 * 			objects are copied for every access.
+		 * @ingroup	atomic
 		 */
 		template<typename T>
 		class Container

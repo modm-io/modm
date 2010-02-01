@@ -33,7 +33,7 @@
 #ifndef XPCC__GPIO_HPP
 #define XPCC__GPIO_HPP
 
-#include <xpcc/utils/misc.hpp>
+#include <xpcc/utils/macros.hpp>
 
 namespace xpcc
 {
@@ -45,7 +45,6 @@ namespace xpcc
 	{
 		/**
 		 * @brief	Dummy implementation of an I/O pin
-		 * @headerfile	<xpcc/hal/peripheral/gpio.hpp>
 		 * 
 		 */
 		class Unused

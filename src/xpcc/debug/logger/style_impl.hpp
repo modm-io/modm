@@ -25,70 +25,85 @@
  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
-// ----------------------------------------------------------------------------
-/*
- * WARNING: This file is generated automatically, do not edit!
- * Please modify the corresponding *.in file instead and rebuild this file.
+ *
+ * $Id$
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__MEGA_UART1_HPP
-#define XPCC__MEGA_UART1_HPP
+#ifndef XPCC_LOG__STYLE_HPP
+	#error "Don't include this file directly, use 'style.hpp' instead!"
+#endif
 
-#include <stdint.h>
+// -----------------------------------------------------------------------------
 
-namespace xpcc
+template < typename STYLE >
+xpcc::log::Style<STYLE>::Style( STYLE style ) :
+	style( style ),
+	device ( 0 )
 {
-	/**
-	 * @brief		UART1
-	 * 
-	 * This implementation uses a ringbuffer.
-	 *
-	 * @ingroup		hal
-	 */
-	class Uart1
-	{
-	public:
-		Uart1(uint32_t baudrate)
-		{
-			this->setBaudrate(baudrate);
-		}
-		
-		/**
-		 * @brief	Set baud rate
-		 *
-		 * If this function is called with a constant value as parameter,
-		 * all the calculation is done by the compiler, so no 32-bit
-		 * arithmetic is needed at run-time!
-		 *
-		 * @param	baudrate	desired baud rate
-		 * @param	u2x			enabled double speed mode
-		 */
-		static inline void
-		setBaudrate(uint32_t baudrate, bool u2x = false)
-		{
-			uint16_t ubrr;
-			if (u2x) {
-				ubrr  = (F_CPU / (baudrate * 8l)) - 1;
-				ubrr |= 0x8000;
-			}
-			else {
-				ubrr = (F_CPU / (baudrate * 16l)) - 1;
-			}
-			setBaudrateRegister(ubrr);
-		}
-		
-		static void
-		put(char data);
-		
-		static bool
-		get(char& c);
-		
-	protected:
-		static void
-		setBaudrateRegister(uint16_t ubrr);
-	};
 }
 
-#endif // XPCC__MEGA_UART1_HPP
+// -----------------------------------------------------------------------------
+
+template < typename STYLE >
+xpcc::log::Style<STYLE>::Style( IODevice &device) :
+	device ( &device )
+{
+}
+
+// -----------------------------------------------------------------------------
+
+template < typename STYLE >
+xpcc::log::Style<STYLE>::~Style()
+{
+}
+
+// -----------------------------------------------------------------------------
+
+template < typename STYLE >
+void
+xpcc::log::Style<STYLE>::parseArg( int argc, char * argv )
+{
+}
+
+// -----------------------------------------------------------------------------
+
+template < typename STYLE >
+void
+xpcc::log::Style<STYLE>::put( char c )
+{
+	if ( tm::IsSameType<STYLE, DefaultStyle >::value ) {
+		this->device->put( c );
+	}
+	else {
+		this->style.put( c );
+	}
+}
+
+// -----------------------------------------------------------------------------
+
+template < typename STYLE >
+void
+xpcc::log::Style<STYLE>::put( const char* s )
+{
+	if ( tm::IsSameType<STYLE, DefaultStyle>::value ) {
+		this->device->put( s );
+	}
+	else {
+		this->style.put( s );
+	}
+}
+
+// -----------------------------------------------------------------------------
+
+template < typename STYLE >
+void
+xpcc::log::Style<STYLE>::flush()
+{
+	if ( tm::IsSameType<STYLE, DefaultStyle >::value ) {
+		this->device->flush();
+	}
+	else {
+		this->style.flush();
+	}
+}

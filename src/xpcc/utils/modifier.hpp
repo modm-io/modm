@@ -5,7 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -25,70 +25,33 @@
  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
-// ----------------------------------------------------------------------------
-/*
- * WARNING: This file is generated automatically, do not edit!
- * Please modify the corresponding *.in file instead and rebuild this file.
+ *
+ * $Id$
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__MEGA_UART1_HPP
-#define XPCC__MEGA_UART1_HPP
-
-#include <stdint.h>
+#ifndef	XPCC__MODIFIER_HPP
+#define	XPCC__MODIFIER_HPP
 
 namespace xpcc
 {
 	/**
-	 * @brief		UART1
-	 * 
-	 * This implementation uses a ringbuffer.
-	 *
-	 * @ingroup		hal
+	 * @ingroup		utils
+	 * @defgroup	modifier
 	 */
-	class Uart1
+	namespace modifier
 	{
-	public:
-		Uart1(uint32_t baudrate)
-		{
-			this->setBaudrate(baudrate);
-		}
-		
 		/**
-		 * @brief	Set baud rate
-		 *
-		 * If this function is called with a constant value as parameter,
-		 * all the calculation is done by the compiler, so no 32-bit
-		 * arithmetic is needed at run-time!
-		 *
-		 * @param	baudrate	desired baud rate
-		 * @param	u2x			enabled double speed mode
+		 * @ingroup	modifier
+		 * @brief	Add volatile modifier to T
 		 */
-		static inline void
-		setBaudrate(uint32_t baudrate, bool u2x = false)
+		template<typename T>
+		volatile T&
+		asVolatile(T& value)
 		{
-			uint16_t ubrr;
-			if (u2x) {
-				ubrr  = (F_CPU / (baudrate * 8l)) - 1;
-				ubrr |= 0x8000;
-			}
-			else {
-				ubrr = (F_CPU / (baudrate * 16l)) - 1;
-			}
-			setBaudrateRegister(ubrr);
+			return (volatile T&) value;
 		}
-		
-		static void
-		put(char data);
-		
-		static bool
-		get(char& c);
-		
-	protected:
-		static void
-		setBaudrateRegister(uint16_t ubrr);
-	};
+	}
 }
 
-#endif // XPCC__MEGA_UART1_HPP
+#endif	// XPCC__MODIFIER_HPP

@@ -38,8 +38,11 @@
 
 namespace xpcc
 {
-	/// \ingroup	math
-	/// \brief		Location
+	/**
+	 * \brief		Location
+	 * 
+	 * \ingroup	math
+	 */
 	class Location
 	{
 	public:

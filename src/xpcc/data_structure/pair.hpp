@@ -37,7 +37,6 @@ namespace xpcc
 {
 	/**
 	 * @ingroup		data_structure
-	 * @headerfile	<xpcc/data_structure/pair.hpp>
 	 * 
 	 * @brief		Pair<FirstType, SecondType> is a heterogeneous pair
 	 * 

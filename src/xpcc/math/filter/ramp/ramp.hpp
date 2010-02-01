@@ -36,11 +36,10 @@
 namespace xpcc
 {
 	/**
-	 * @ingroup	filter
-	 * @headerfile <xpcc/math/filter/ramp/ramp.hpp>
 	 * @brief	Ramp
 	 * 
 	 * @todo	documentation
+	 * @ingroup	filter
 	 */
 	template<typename T>
 	class Ramp

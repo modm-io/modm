@@ -38,9 +38,7 @@
 namespace xpcc
 {
 	/**
-	 * @ingroup	hal
 	 * @brief	Internal timer
-	 * @headerfile	<xpcc/hal/time/internal_clock.hpp>
 	 * 
 	 * This class is implemented using 'gettimeofday()' from <sys/time.h> for
 	 * any Unix-OS. 
@@ -56,6 +54,8 @@ namespace xpcc
 	 *     InternalClock::increment();
 	 * }
 	 * @endcode
+	 * 
+	 * @ingroup	hal
 	 */ 
 	class InternalClock
 	{

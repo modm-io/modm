@@ -34,7 +34,7 @@
 #define	XPCC_ATOMIC__LOCK_HPP
 
 #include <stdint.h>
-#include <xpcc/utils/misc.hpp>
+#include <xpcc/utils/macros.hpp>
 
 namespace xpcc
 {

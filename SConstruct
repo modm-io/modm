@@ -59,16 +59,16 @@ for id in range(0, 4):
 	file = env.Template(target = os.path.join(path, 'uart%i.hpp' % id),
 						source = os.path.join(path, 'uart.hpp.in'),
 						SUBSTITUTIONS = { 'id': id })
-	env.Alias('template', file)
+	env.Alias('templates', file)
 	
 	file = env.Template(target = os.path.join(path, 'uart%i.cpp' % id),
 						source = os.path.join(path, 'uart.cpp.in'),
 						SUBSTITUTIONS = { 'id': id })
-	env.Alias('template', file)
+	env.Alias('templates', file)
 
 # add target to create the doxygen documentation
 env.Doxygen('doc/doxyfile')
 env.Alias('doc', 'apidoc/html')
 
-env.Alias('all', ['update', 'template'])
+env.Alias('all', ['update', 'templates', 'doc'])
 env.Default('update')

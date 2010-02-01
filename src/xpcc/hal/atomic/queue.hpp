@@ -34,7 +34,8 @@
 #define	XPCC_ATOMIC__QUEUE_HPP
 
 #include <stdint.h>
-#include <xpcc/utils/misc.hpp>
+#include <xpcc/utils/macros.hpp>
+#include <xpcc/utils/modifier.hpp>
 
 namespace xpcc
 {

@@ -38,10 +38,9 @@
 namespace xpcc
 {
 	/**
-	 * @ingroup	hal
 	 * @brief	Simple 16-bit timestamp
-	 * @headerfile	<xpcc/workflow/time/timestamp.hpp>
 	 * 
+	 * @ingroup	hal
 	 */ 
 	class Timestamp
 	{

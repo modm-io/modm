@@ -34,14 +34,11 @@
 #define XPCC__DEBOUNCE_HPP
 
 #include <stdint.h>
-#include <xpcc/utils/misc.hpp>
+#include <xpcc/utils/macros.hpp>
 
 namespace xpcc
 {
 	/**
-	 * @ingroup	driver
-	 * @headerfile	<xpcc/driver/debounce.hpp>
-	 * 
 	 * @brief	Debouncing signals
 	 * 
 	 * This class is able to debounce eight keys at the same time. The
@@ -53,17 +50,20 @@ namespace xpcc
 	 * 
 	 * The detection for long or repreated presses works only correct for
 	 * one key at a time. This constraint only applies to keys listed in the
-	 * @i mask variable.
+	 * \em mask variable.
 	 * 
 	 * This implementation is based on the C debounce functions written
 	 * by Peter Dannegger (see http://www.mikrocontroller.net/topic/48465).
+	 * 
+	 * @ingroup	driver
 	 */
 	class Debounce
 	{
 	public:
-		/// @brief	
-		///
-		/// Provided for convenience only.
+		/** @brief	
+		 *
+		 * Provided for convenience only.
+		 */
 		typedef enum {
 			KEY0 = (1 << 0),
 			KEY1 = (1 << 1),
@@ -76,11 +76,12 @@ namespace xpcc
 		} Keys;
 		
 	public:
-		/// @brief	Constructor
-		///
-		/// @param	mask	TODO
-		/// @param	start	TODO
-		/// @param	next	TODO
+		/** @brief	Constructor
+		 *
+		 * @param	mask	TODO
+		 * @param	start	TODO
+		 * @param	next	TODO
+		 */
 		Debounce(uint8_t mask = 0, uint8_t start = 50, uint8_t next = 20);
 		
 		/// @brief	Get the current (debounced) state of a key
@@ -91,81 +92,86 @@ namespace xpcc
 		uint8_t
 		getRelease(uint8_t mask);
 		
-		/// @brief	 check if a key has been pressed
-		/// 
-		/// Each pressed key is reported only once.
-		/// 
-		/// @code
-		/// xpcc::Debounce keys;
-		/// ...
-		/// while (1) {
-		///		...
-		/// 	if (keys.getPress(Debounce::KEY0)) {
-		/// 		// do something
-		/// 	}
-		/// }
-		/// @endcode
+		/** @brief	 check if a key has been pressed
+		 * 
+		 * Each pressed key is reported only once.
+		 * 
+		 * @code
+		 * xpcc::Debounce keys;
+		 * ...
+		 * while (1) {
+		 *		...
+		 * 	if (keys.getPress(Debounce::KEY0)) {
+		 * 		// do something
+		 * 	}
+		 * }
+		 * @endcode
+		 */
 		uint8_t
 		getPress(uint8_t mask);
 	
-		/// @brief	check if a key has been pressed long enough such that the
-		///			key repeat functionality kicks in.
-		///
-		/// After a small setup delay the key is reported beeing pressed
-		/// subsequent calls to this function. This simulates the user
-		/// repeatedly pressing and releasing the key.
-		/// 
-		/// @code
-		/// xpcc::Debounce keys(Debounce::KEY0);
-		/// ...
-		/// while (1) {
-		///		...
-		/// 	if (keys.getPress(Debounce::KEY0) || 
-		///			keys.getRepeat(Debounce::KEY0))
-		/// 	{
-		/// 		// do something
-		/// 	}
-		/// }
-		/// @endcode
-		/// 
-		/// @see	getPress()
+		/** @brief	Check if a key has been pressed long enough such that the
+		 *			key repeat functionality kicks in.
+		 *
+		 * After a small setup delay the key is reported beeing pressed
+		 * subsequent calls to this function. This simulates the user
+		 * repeatedly pressing and releasing the key.
+		 * 
+		 * @code
+		 * xpcc::Debounce keys(Debounce::KEY0);
+		 * ...
+		 * while (1) {
+		 *		...
+		 * 	if (keys.getPress(Debounce::KEY0) || 
+		 *			keys.getRepeat(Debounce::KEY0))
+		 * 	{
+		 * 		// do something
+		 * 	}
+		 * }
+		 * @endcode
+		 * 
+		 * @see	getPress()
+		 */
 		uint8_t
 		getRepeat(uint8_t mask);
 		
-		/// @brief	Get keys which were pressed short
-		/// 
-		/// @code
-		/// xpcc::Debounce keys(Debounce::KEY0);
-		/// ...
-		/// while (1) {
-		/// 	...
-		/// 	if (keys.getShortPress(Debounce::KEY0)) {
-		/// 		// do something
-		/// 	}
-		/// 	if (keys.getLongPress(Debounce::KEY0)) {
-		/// 		// do something different
-		/// 	}
-		/// }
-		/// @endcode
-		/// 
-		/// @warning	Use this function only in combination with
-		///				getLongPress(), otherwise it won't work correctly!
-		/// 
-		/// @see	getShortPress()
+		/** @brief	Get keys which were pressed short
+		 * 
+		 * @code
+		 * xpcc::Debounce keys(Debounce::KEY0);
+		 * ...
+		 * while (1) {
+		 * 	...
+		 * 	if (keys.getShortPress(Debounce::KEY0)) {
+		 * 		// do something
+		 * 	}
+		 * 	if (keys.getLongPress(Debounce::KEY0)) {
+		 * 		// do something different
+		 * 	}
+		 * }
+		 * @endcode
+		 * 
+		 * @warning	Use this function only in combination with
+		 *				getLongPress(), otherwise it won't work correctly!
+		 * 
+		 * @see	getShortPress()
+		 */
 		uint8_t
 		getShortPress(uint8_t mask);
 		
-		/// @brief	Get keys which were pressed long
-		///
-		/// @see	getShortPress()
+		/** @brief	Get keys which were pressed long
+		 *
+		 * @see	getShortPress()
+		 */
 		uint8_t
 		getLongPress(uint8_t mask);
 		
-		/// @brief	Update internal state
-		///
-		/// Call this function periodically.
-		/// 
-		/// @param	input	input signals
+		/** @brief	Update internal state
+		 *
+		 * Call this function periodically.
+		 * 
+		 * @param	input	input signals
+		 */
 		ALWAYS_INLINE void
 		update(uint8_t input)
 		{

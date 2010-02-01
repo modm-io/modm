@@ -8,7 +8,7 @@
 #ifndef XPCC__TYPET_HPP
 #define XPCC__TYPET_HPP
 
-#include "misc.hpp"
+#include "macros.hpp"
 
 /**
  * @ingroup		utils
@@ -18,10 +18,9 @@
 namespace xpcc
 {
 	/**
-	 * @ingroup	tm
-	 * @headerfile	<xpcc/utils/typet.hpp>
-	 * 
 	 * @brief	Template metaprogramming tools
+	 * 
+	 * @ingroup	tm
 	 */
 	namespace tm
 	{

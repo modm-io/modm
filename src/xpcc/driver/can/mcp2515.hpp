@@ -88,8 +88,6 @@
 namespace xpcc
 {
 	/**
-	 * @ingroup	driver
-	 * @headerfile	<xpcc/driver/can/mcp2515.hpp>
 	 * 
 	 * @brief	Driver for a MPC2515 CAN Controller
 	 * 
@@ -99,6 +97,8 @@ namespace xpcc
 	 * 
 	 * If you want to activate the internal pullup for the INT pin you
 	 * need to do this by yourself before calling the initialize method!
+	 * 
+	 * @ingroup	driver
 	 */
 	template < typename SPI,
 			   typename CS,

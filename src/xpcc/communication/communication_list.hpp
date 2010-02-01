@@ -142,9 +142,11 @@ namespace communicationList{
 	public:
 		/**
 		 * @brief 		Creates one initially valid list.
-		 *
+		 * 
+		 * @code
 		 * this->first = &dummyFirst;
 		 * this->last = &dummyFirst;
+		 * @endcode
 		 */
 		List();
 		

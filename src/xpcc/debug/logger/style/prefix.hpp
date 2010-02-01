@@ -5,6 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
+ * 
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -35,8 +36,10 @@
 #include "../style.hpp"
 #include <xpcc/utils/typet.hpp>
 
-namespace xpcc {
-	namespace log {
+namespace xpcc
+{
+	namespace log
+	{
 		/**
 		 * @class 	Prefix
 		 * @brief 	Add a prefix to the logmessage
@@ -46,27 +49,28 @@ namespace xpcc {
 		 * @author	Martin Rosekeit <martin.rosekeit@rwth-aachen.de>
 		 */
 		template <typename T, typename STYLE = DefaultStyle>
-		class Prefix : public Style<STYLE> {
-			public:
-				Prefix(const T& str, STYLE style);
+		class Prefix : public Style<STYLE>
+		{
+		public:
+			Prefix(const T& str, STYLE style);
 
-				Prefix(const T& str, IODevice &device);
+			Prefix(const T& str, IODevice &device);
 
-				/// Write one char to the sink.
-				void
-				put( char c );
+			/// Write one char to the sink.
+			void
+			put( char c );
 
-				/// Write a string that terminates with '\0' to the sink.
-				void
-				put( const char* s );
+			/// Write a string that terminates with \c '\\0' to the sink.
+			void
+			put( const char* s );
 
-				/// The message is complete and can be written/send/displayed.
-				void
-				flush();
+			/// The message is complete and can be written/send/displayed.
+			void
+			flush();
 
-			private:
-				bool	flushed;
-				T		value;
+		private:
+			bool	flushed;
+			T		value;
 
 		};
 	}
@@ -118,7 +122,5 @@ xpcc::log::Prefix<T, STYLE>::flush()
 	this->flushed = true;
 	this->Style<STYLE>::flush();
 }
-
-// -----------------------------------------------------------------------------
 
 #endif // XPCC_LOG_STYLE_PREFIX__HPP

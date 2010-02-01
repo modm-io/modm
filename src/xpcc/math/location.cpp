@@ -34,7 +34,8 @@
 
 // ----------------------------------------------------------------------------
 void
-xpcc::Location::update(Location& diff) {
+xpcc::Location::update(Location& diff)
+{
 	position += diff.position.rotate(phi);
 	phi += diff.phi;
 	phi.normalize();
@@ -42,8 +43,11 @@ xpcc::Location::update(Location& diff) {
 
 // ----------------------------------------------------------------------------
 void
-xpcc::Location::update(int16_t x, Angle& phi) {
-	position += Position(x * cos(this->phi).toFloat(), x * sin(this->phi).toFloat());
+xpcc::Location::update(int16_t x, Angle& phi)
+{
+	position += Position(x * cos(this->phi).toFloat(),
+						 x * sin(this->phi).toFloat());
+	
 	this->phi += phi;
 	this->phi.normalize();
 }

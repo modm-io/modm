@@ -100,10 +100,10 @@ def generate_environment(env, config, buildpath = None, rootpath = None):
 		Exit(1)
 	
 	# Create a build environment
-	architecture = parser.get('target', 'architecture')
+	architecture = parser.get('build', 'architecture')
 	if architecture == 'atmega' or architecture == 'atxmega':
-		device = parser.get('target', 'device')
-		clock = parser.get('target', 'clock')
+		device = parser.get('build', 'device')
+		clock = parser.get('build', 'clock')
 		new = Environment(
 				ARCHITECTURE = architecture + '/' + device,
 				AVR_DEVICE = device,
@@ -116,7 +116,7 @@ def generate_environment(env, config, buildpath = None, rootpath = None):
 		device = 'pc'
 		clock = ''
 		new = Environment(
-				ARCHITECTURE = architecture,
+				ARCHITECTURE = architecture + '/' + device,
 				tools = ['pc', 'doxygen', 'template', 'unittest', 'xpcc', 'utils'],
 				toolpath = env['toolpath'],
 				LIBS = ['boost_thread-mt'],
@@ -133,7 +133,7 @@ def generate_environment(env, config, buildpath = None, rootpath = None):
 	
 	if buildpath is None:
 		try:
-			buildpath = parser.get('general', 'buildpath')
+			buildpath = parser.get('build', 'buildpath')
 		except ConfigParser.NoOptionError:
 			if rootpath is None:
 				print "Don't know where to build the files! Please specify either 'rootpath' or 'buildpath'"
@@ -142,7 +142,7 @@ def generate_environment(env, config, buildpath = None, rootpath = None):
 			buildpath = os.path.join(rootpath, 'build/$name')
 	
 	try:
-		xpcc_library_name = parser.get('general', 'library_name')
+		xpcc_library_name = parser.get('build', 'library_name')
 	except ConfigParser.NoOptionError:
 		xpcc_library_name = project_name
 	
@@ -219,12 +219,19 @@ def buildpath(env, path, strip_extension=False):
 	
 	return os.path.join(env['XPCC_BUILDPATH'], path)
 
+def require_architecture(env, architecture):
+	if re.match(architecture, env['ARCHITECTURE']):
+		return True
+	else:
+		return False
+
 # -----------------------------------------------------------------------------
 def generate(env, **kw):
 	env.AddMethod(generate_environment, 'GenerateEnvironment')
 	env.AddMethod(xpcc_library, 'XpccLibrary')
 	env.AddMethod(find_files, 'FindFiles')
 	env.AddMethod(buildpath, 'Buildpath')
+	env.AddMethod(require_architecture, 'RequireArchitecture')
 
 def exists(env):
 	return True

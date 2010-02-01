@@ -56,7 +56,7 @@ env.Alias('build', program)
 env.Alias('size', env.Size(program))
 env.Alias('symbols', env.Symbols(program))
 
-if env['ARCHITECTURE'] == 'pc':
+if env.RequireArchitecture('pc'):
 	env.Alias('run', env.Run(program))
 	env.Alias('all', ['build'])
 else:

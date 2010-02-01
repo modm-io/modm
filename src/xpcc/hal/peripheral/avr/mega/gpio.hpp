@@ -34,13 +34,12 @@
 #define XPCC__MEGA_GPIO_HPP
 
 #include <avr/io.h>
-#include <xpcc/utils/misc.hpp>
+#include <xpcc/utils/macros.hpp>
 
 namespace xpcc
 {
 	/**
 	 * @ingroup	hal
-	 * @headerfile	<xpcc/hal/peripheral/avr/mega/gpio.hpp>
 	 */
 	namespace gpio
 	{

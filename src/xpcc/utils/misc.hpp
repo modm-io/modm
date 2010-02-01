@@ -26,7 +26,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: misc.hpp 88 2009-10-16 23:07:26Z dergraaf $
+ * $Id$
  */
 // ----------------------------------------------------------------------------
 
@@ -34,41 +34,7 @@
 #define	XPCC__MISC_HPP
 
 #include <stdint.h>
-
-/**
- * @ingroup	utils
- * @brief	Force inlining
- * 
- * Macro to force inlining on function if needed. Compiling with -Os  does not
- * always inline them when declared only \c inline.
- */
-#define ALWAYS_INLINE  inline __attribute__((always_inline))
-
-#ifdef __DOXYGEN__
-
-	/**
-	 * @ingroup	utils
-	 * @brief	Convert the argument into a C-String
-	 */
-	#define	STRINGIFY(s)	#s
-
-	/**
-	 * @ingroup	utils
-	 * @brief	Concatenate the two arguments
-	 */
-	#define	CONCAT(a,b)		a ## b
-
-#else // !__DOXYGEN__
-
-	#define	STRINGIFY(s)	STRINGIFY2(s)
-	#define	STRINGIFY2(s)	STRINGIFY3(s)
-	#define	STRINGIFY3(s)	#s
-
-	#define	CONCAT(a,b)		CONCAT2(a,b)
-	#define	CONCAT2(a,b)	CONCAT3(a,b)
-	#define	CONCAT3(a,b)	a ## b
-
-#endif
+#include "macros.hpp"
 
 namespace xpcc
 {
@@ -78,17 +44,6 @@ namespace xpcc
 	 */
 	namespace utils
 	{
-		/**
-		 * @ingroup	utils
-		 * @brief	Add volatile modifier to T
-		 */
-		template<typename T>
-		volatile T&
-		asVolatile(T& value)
-		{
-			return (volatile T&) value;
-		}
-		
 		/**
 		 * @ingroup	utils
 		 * @brief	Exchange the two nibbles of a byte

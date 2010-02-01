@@ -36,12 +36,11 @@
 namespace xpcc
 {
 	/**
-	 * @ingroup	filter
-	 * @headerfile <xpcc/math/filter/ramp/s_curve.hpp>
 	 * @brief	Trapezoidal S-Curve Trajectory
 	 * 
 	 * @todo	documentation
 	 * @todo	implementation
+	 * @ingroup	filter
 	 */
 	template<typename T>
 	class SCurve

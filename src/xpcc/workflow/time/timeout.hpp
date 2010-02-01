@@ -40,14 +40,17 @@
 namespace xpcc
 {
 	/**
-	 * @ingroup	workflow
-	 * @brief		Software timer
+	 * \brief		Software timer
 	 *
 	 * Has to be polled to check if it has expired.
 	 * 
-	 * @tparam		T	Used timer
+	 * \tparam	T	Used timer, default is xpcc::InternalClock which has 
+	 * 				a millisecond resolution.	
 	 * 
-	 * @todo	example
+	 * Usage:
+	 * \include	timeout.cpp
+	 * 
+	 * \ingroup	workflow
 	 */
 	template<typename T = ::xpcc::InternalClock>
 	class Timeout
@@ -55,18 +58,29 @@ namespace xpcc
 	public:
 		Timeout(const Timestamp time = 0);
 		
-		/// @brief	Check if the given time has passed.
+		/**
+		 * \brief	Check if the given time has passed.
+		 * 
+		 * If isExpired() changes to \c true, it will keep this value till
+		 * a call of stop() or restart().
+		 */
 		bool
 		isExpired();
 		
-		/// @brief	Stop timer
+		/**
+		 * \brief	Stop the timer
+		 * 
+		 * When the timer is stopped, isExpired() will always return \c false.
+		 */
 		inline void
 		stop()
 		{
 			state = STOPPED;
 		}
 		
-		/// @brief	Set a new timeout time.
+		/**
+		 * \brief	Set a new timeout value.
+		 */
 		void
 		restart(Timestamp time);
 		

@@ -41,14 +41,12 @@
 namespace xpcc
 {
 	/**
-	 * @ingroup	driver
-	 * @headerfile	<xpcc/driver/lcd/dog_m16x.hpp>
-	 * 
 	 * @brief	Driver for DOG-M162
 	 * 
 	 * @todo	documentation
 	 * @todo	make this class adaptable to other voltages and line counts!
 	 * 
+	 * @ingroup	driver
 	 * @see		Lcd
 	 */
 	template <typename SPI, typename CS, typename RS>

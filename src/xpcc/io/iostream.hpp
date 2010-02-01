@@ -78,7 +78,7 @@ namespace xpcc
 			return *this;
 		}
 		
-		/// set the output mode to HEX style for \t char and \t char*
+		/// set the output mode to HEX style for \b char and \b char*
 		inline IOStream&
 		hex()
 		{
@@ -86,7 +86,7 @@ namespace xpcc
 			return *this;
 		}
 
-		/// set the output mode to ASCII style for \t char and \t char*
+		/// set the output mode to ASCII style for \b char and \b char*
 		inline IOStream&
 		ascii()
 		{
@@ -241,7 +241,7 @@ namespace xpcc
 	}
 
 	/**
-	 * @brief  set the output mode to HEX style for \t char and \t char*
+	 * @brief  set the output mode to HEX style for \b char and \b char*
 	 *
 	 * @ingroup io
 	 */
@@ -252,7 +252,7 @@ namespace xpcc
 	}
 
 	/**
-	 * @brief  set the output mode to ASCII style for \t char and \t char*
+	 * @brief  set the output mode to ASCII style for \b char and \b char*
 	 *
 	 * @ingroup io
 	 */

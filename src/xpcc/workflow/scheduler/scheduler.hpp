@@ -34,7 +34,8 @@
 #define XPCC__SCHEDULER_HPP
 
 #include <stdint.h>
-#include <xpcc/utils/misc.hpp>
+#include <xpcc/utils/modifier.hpp>
+#include <xpcc/utils/macros.hpp>
 #include <xpcc/hal/atomic/lock.hpp>		// for Scheduler::scheduleInterrupt()
 
 namespace xpcc

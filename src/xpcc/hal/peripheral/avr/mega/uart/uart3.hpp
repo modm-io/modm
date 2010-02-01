@@ -41,29 +41,30 @@
 namespace xpcc
 {
 	/**
-	 * @ingroup		hal
-	 * @headerfile	<xpcc/hal/peripheral/avr/mega/uart/uart3.hpp>
 	 * @brief		UART3
 	 * 
 	 * This implementation uses a ringbuffer.
+	 *
+	 * @ingroup		hal
 	 */
 	class Uart3
 	{
 	public:
-		/// @todo	check if this works as desired!
 		Uart3(uint32_t baudrate)
 		{
 			this->setBaudrate(baudrate);
 		}
 		
-		/// @brief	Set baud rate
-		///
-		/// If this function is called with a constant value as parameter,
-		/// all the calculation is done by the compiler, so no 32-bit
-		/// arithmetic is needed at run-time!
-		///
-		/// @param	baudrate	desired baud rate
-		/// @param	u2x			enabled double speed mode
+		/**
+		 * @brief	Set baud rate
+		 *
+		 * If this function is called with a constant value as parameter,
+		 * all the calculation is done by the compiler, so no 32-bit
+		 * arithmetic is needed at run-time!
+		 *
+		 * @param	baudrate	desired baud rate
+		 * @param	u2x			enabled double speed mode
+		 */
 		static inline void
 		setBaudrate(uint32_t baudrate, bool u2x = false)
 		{

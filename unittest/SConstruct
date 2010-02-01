@@ -45,7 +45,7 @@ for file in files.sources:
 config = env['XPCC_CONFIG']
 
 # create a file which later runs all the tests
-template = 'runner_%s.cpp.in' % config['target.architecture']
+template = 'runner_%s.cpp.in' % config['build.architecture']
 runner = env.UnittestRunner(target = env.Buildpath('runner.cpp'),
 							source = [template] + files.header)
 objects.append(env.Object(runner))
@@ -62,7 +62,7 @@ env.Alias('build', program)
 env.Alias('size', env.Size(program))
 env.Alias('symbols', env.Symbols(program))
 
-if env['ARCHITECTURE'] == 'pc':
+if env.RequireArchitecture('pc'):
 	env.Alias('run', env.Run(program))
 	env.Alias('all', ['build'])
 else:

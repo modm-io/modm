@@ -5,6 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
+ * 
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -28,50 +29,53 @@
  * $Id$
  */
 // ----------------------------------------------------------------------------
-#ifndef XPCC_LOG_STYLE__HPP
-#define XPCC_LOG_STYLE__HPP
+
+#ifndef XPCC_LOG__STYLE_HPP
+#define XPCC_LOG__STYLE_HPP
 
 #include <xpcc/io/iodevice.hpp>
 #include <xpcc/utils/typet.hpp>
 
-namespace xpcc {
-	namespace log {
+namespace xpcc
+{
+	namespace log
+	{
 		/**
 		 * @brief 	This is an empty style.
 		 *
 		 * @ingroup logger
-		 * @version	$Id$
 		 * @author	Martin Rosekeit <martin.rosekeit@rwth-aachen.de>
 		 */
-		class DefaultStyle {
-			public :
-				/// parse arguments that are given with the start of the program
-				inline void
-				parseArg( int argc, char * argv)
-				{
-					(void) argc;
-					(void) argv;
-				};
+		class DefaultStyle
+		{
+		public :
+			/// parse arguments that are given with the start of the program
+			inline void
+			parseArg( int argc, char * argv)
+			{
+				(void) argc;
+				(void) argv;
+			}
 
-				/// Write one char to the sink.
-				inline void
-				put( char c ) {
-					(void) c;
-				}
+			/// Write one char to the sink.
+			inline void
+			put( char c )
+			{
+				(void) c;
+			}
 
-				/// Write a string that terminates with '\0' to the sink.
-				inline void
-				put( const char* s )
-				{
-					(void) s;
-				}
+			/// Write a string that terminates with \c '\\0' to the sink.
+			inline void
+			put( const char* s )
+			{
+				(void) s;
+			}
 
-				/// The message is complete and can be written/send/displayed.
-				inline void
-				flush()
-				{
-
-				}
+			/// The message is complete and can be written/send/displayed.
+			inline void
+			flush()
+			{
+			}
 		};
 
 		/**
@@ -88,118 +92,44 @@ namespace xpcc {
 		 *
 		 *
 		 * @ingroup logger
-		 * @version	$Id$
-		 * @since 	01 December 2006
 		 * @author	Martin Rosekeit <martin.rosekeit@rwth-aachen.de>
 		 */
 		template < typename STYLE = DefaultStyle >
-		class Style {
-			public:
-				typedef STYLE Type;
+		class Style
+		{
+		public:
+			typedef STYLE Type;
 
-				Style( STYLE style );
+			Style( STYLE style );
 
-				Style( IODevice &device);
+			Style( IODevice &device);
 
-				virtual
-				~Style();
+			virtual
+			~Style();
 
-				/// parse arguments that are given with the start of the program
-				inline void
-				parseArg( int argc, char * argv);
+			/// parse arguments that are given with the start of the program
+			inline void
+			parseArg( int argc, char * argv);
 
-				/// Write one char to the sink.
-				inline void
-				put( char c );
+			/// Write one char to the sink.
+			inline void
+			put( char c );
 
-				/// Write a string that terminates with '\0' to the sink.
-				inline void
-				put( const char* s );
+			/// Write a string that terminates with \c '\\0' to the sink.
+			inline void
+			put( const char* s );
 
-				/// The message is complete and can be written/send/displayed.
-				inline void
-				flush();
+			/// The message is complete and can be written/send/displayed.
+			inline void
+			flush();
 
-			private:
-				STYLE style;
-				IODevice* device;
+		private:
+			STYLE style;
+			IODevice* device;
 		};
 	}
 }
 
-// -----------------------------------------------------------------------------
+#include "style_impl.hpp"
 
-template < typename STYLE >
-xpcc::log::Style<STYLE>::Style( STYLE style ) :
-	style( style ),
-	device ( 0 )
-{
-}
-
-// -----------------------------------------------------------------------------
-
-template < typename STYLE >
-xpcc::log::Style<STYLE>::Style( IODevice &device) :
-	device ( &device )
-{
-}
-
-// -----------------------------------------------------------------------------
-
-template < typename STYLE >
-xpcc::log::Style<STYLE>::~Style()
-{
-}
-
-// -----------------------------------------------------------------------------
-
-template < typename STYLE >
-void
-xpcc::log::Style<STYLE>::parseArg( int argc, char * argv )
-{
-}
-
-// -----------------------------------------------------------------------------
-
-template < typename STYLE >
-void
-xpcc::log::Style<STYLE>::put( char c )
-{
-	if ( tm::IsSameType<STYLE, DefaultStyle >::value ) {
-		this->device->put( c );
-	}
-	else {
-		this->style.put( c );
-	}
-}
-
-// -----------------------------------------------------------------------------
-
-template < typename STYLE >
-void
-xpcc::log::Style<STYLE>::put( const char* s )
-{
-	if ( tm::IsSameType<STYLE, DefaultStyle >::value ) {
-		this->device->put( s );
-	}
-	else {
-		this->style.put( s );
-	}
-}
-
-// -----------------------------------------------------------------------------
-
-template < typename STYLE >
-void
-xpcc::log::Style<STYLE>::flush()
-{
-	if ( tm::IsSameType<STYLE, DefaultStyle >::value ) {
-		this->device->flush( );
-	}
-	else {
-		this->style.flush( );
-	}
-}
-
-
-#endif // XPCC_LOG_STYLE__HPP
+#endif // XPCC_LOG__STYLE_HPP

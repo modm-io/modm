@@ -55,7 +55,7 @@
 #else // !__DOXYGEN__
 
 #include <string.h>
-#include <xpcc/utils/misc.hpp>
+#include <xpcc/utils/macros.hpp>
 
 #define	FLASH(var)				const var
 #define	EXTERN_FLASH(var)		extern const var

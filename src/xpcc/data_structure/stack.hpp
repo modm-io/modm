@@ -39,14 +39,12 @@
 namespace xpcc
 {
 	/**
-	 * @ingroup		data_structure
-	 * @headerfile	<xpcc/data_structure/stack.hpp>
-	 * 
 	 * @brief		LIFO stack
 	 * 
 	 * Elements are pushed/popped from the "back" of the specific container,
 	 * which is known as the top of the stack.
 	 *  
+	 * @ingroup		data_structure
 	 * @see		Deque()
 	 */
 	template<typename T,
@@ -111,10 +109,9 @@ namespace xpcc
 
 	// ------------------------------------------------------------------------
 	/**
-	 * @ingroup		data_structure
-	 * @headerfile	<xpcc/data_structure/stack.hpp>
-	 * 
 	 * @brief		Bounded stack
+	 * 
+	 * @ingroup		data_structure
 	 */
 	template<typename T, 
 			 int N,

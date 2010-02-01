@@ -41,12 +41,12 @@ xpcc::atomic::Queue<T, N>::Queue() :
 template<typename T, int N>
 bool
 xpcc::atomic::Queue<T, N>::isFull() {
-	uint8_t tmphead = xpcc::utils::asVolatile(head) + 1;
+	uint8_t tmphead = xpcc::modifier::asVolatile(head) + 1;
 	if (tmphead >= (N+1)) {
 		tmphead = 0;
 	}
 	
-	if (tmphead == xpcc::utils::asVolatile(tail)) {
+	if (tmphead == xpcc::modifier::asVolatile(tail)) {
 		return true;
 	}
 	return false;
@@ -55,7 +55,7 @@ xpcc::atomic::Queue<T, N>::isFull() {
 template<typename T, int N>
 bool
 xpcc::atomic::Queue<T, N>::isEmpty() {
-	return (xpcc::utils::asVolatile(head) == xpcc::utils::asVolatile(tail));
+	return (xpcc::modifier::asVolatile(head) == xpcc::modifier::asVolatile(tail));
 }
 
 template<typename T, int N>
@@ -77,7 +77,7 @@ xpcc::atomic::Queue<T, N>::push(const T& value) {
 	if (tmphead >= (N+1)) {
 		tmphead = 0;
 	}
-	if (tmphead == xpcc::utils::asVolatile(tail)) {
+	if (tmphead == xpcc::modifier::asVolatile(tail)) {
 		return false;
 	}
 	else {

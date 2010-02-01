@@ -39,9 +39,6 @@
 namespace xpcc
 {
 	/**
-	 * @ingroup	hal
-	 * @headerfile	<xpcc/hal/peripheral/software_spi.hpp>
-	 * 
 	 * @brief	Software emulation of a SPI bus master
 	 * 
 	 * SPI stands for Serial Peripheral Interface Bus.
@@ -53,6 +50,7 @@ namespace xpcc
 	 * @tparam	MISO		master in slave out pin [input]
 	 * @tparam	FREQUENCY	requested SPI frequency in Hz
 	 * 
+	 * @ingroup	hal
 	 * @see		gpio
 	 */
 	template <typename SCLK,

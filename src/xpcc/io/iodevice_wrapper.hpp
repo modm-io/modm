@@ -40,8 +40,6 @@
 namespace xpcc
 {
 	/**
-	 * @ingroup		io
-	 * @headerfile	<xpcc/iodevice_wrapper.hpp>
 	 * @brief		Wrapper to use any peripheral device that supports static
 	 * 				put() and get() as an IODevice
 	 * 
@@ -63,6 +61,7 @@ namespace xpcc
 	 * stream << " World!";
 	 * @endcode
 	 * 
+	 * @ingroup		io
 	 */
 	template<typename T>
 	class IODeviceWrapper : public IODevice
