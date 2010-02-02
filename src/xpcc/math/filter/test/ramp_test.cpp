@@ -5,7 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -30,69 +30,55 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__RAMP_HPP
-	#error	"Don't include this file directly, use 'math/filter/ramp.hpp' instead!"
-#endif
+#include <xpcc/math/filter/ramp.hpp>
 
-// ----------------------------------------------------------------------------
+#include "ramp_test.hpp"
 
-template<typename T>
-xpcc::Ramp<T>::Ramp(const T& positiveIncrement,
-					const T& negativeIncrement,
-					const T& initialValue) : 
-	target(initialValue),
-	value(initialValue),
-	targetReached(true),
-	positiveIncrement(positiveIncrement),
-	negativeIncrement(negativeIncrement)
-{
-}
-
-// ----------------------------------------------------------------------------
-
-template<typename T>
 void
-xpcc::Ramp<T>::setTarget(const T& target)
+RampTest::testRamp()
 {
-	this->target = target;
-	targetReached = false;
-}
-
-// ----------------------------------------------------------------------------
-
-template<typename T>
-void
-xpcc::Ramp<T>::update()
-{
-	if (target > value)
-	{
-		T variation = target - value;
-		if (variation > positiveIncrement) {
-			value += positiveIncrement;
-		}
-		else {
-			value = target;
-			targetReached = true;
-		}
+	xpcc::Ramp<int16_t> ramp(3, 4);
+	
+	TEST_ASSERT_TRUE(ramp.isTargetReached());
+	TEST_ASSERT_EQUALS(ramp.getValue(), 0);
+	
+	ramp.update();
+	TEST_ASSERT_EQUALS(ramp.getValue(), 0);
+	
+	ramp.setTarget(20);
+	TEST_ASSERT_EQUALS(ramp.getValue(), 0);
+	TEST_ASSERT_FALSE(ramp.isTargetReached());
+	
+	for (int i = 0; i < 6; ++i) {
+		ramp.update();
+		TEST_ASSERT_EQUALS(ramp.getValue(), i * 3 + 3);
 	}
-	else
-	{
-		T variation = value - target;
-		if (variation > negativeIncrement) {
-			value -= negativeIncrement;
-		}
-		else {
-			value = target;
-			targetReached = true;
-		}
+	TEST_ASSERT_FALSE(ramp.isTargetReached());
+	
+	ramp.update();
+	TEST_ASSERT_EQUALS(ramp.getValue(), 20);
+	TEST_ASSERT_TRUE(ramp.isTargetReached());
+	
+	ramp.update();
+	TEST_ASSERT_EQUALS(ramp.getValue(), 20);
+	TEST_ASSERT_TRUE(ramp.isTargetReached());
+	
+	ramp.setTarget(-50);
+	TEST_ASSERT_EQUALS(ramp.getValue(), 20);
+	TEST_ASSERT_FALSE(ramp.isTargetReached());
+	
+	for (int i = 0; i < 17; ++i) {
+		ramp.update();
+		TEST_ASSERT_EQUALS(ramp.getValue(), 20 - (i + 1) * 4);
 	}
-}
-
-// ----------------------------------------------------------------------------
-
-template<typename T>
-bool
-xpcc::Ramp<T>::isTargetReached(const T& target) const
-{
-	return targetReached;
+	TEST_ASSERT_FALSE(ramp.isTargetReached());
+	
+	ramp.update();
+	TEST_ASSERT_EQUALS(ramp.getValue(), -50);
+	TEST_ASSERT_TRUE(ramp.isTargetReached());
+	
+	ramp.update();
+	TEST_ASSERT_EQUALS(ramp.getValue(), -50);
+	TEST_ASSERT_TRUE(ramp.isTargetReached());
+	
 }

@@ -39,4 +39,13 @@ execution you're welcome :)
 
 \image html logo_rca.png
 
+During the last five years the Roboterclub Aachen e.V. has developed a
+software library for communication among components that are distributed on
+PCs and Microcontrollers. The primary aim has been the usage of this system
+in autonomous robots for the EUROBOT competition.
+
+This library is the result of this development. The PC and the AVR software
+are merged into a single library to simplifiy and unifiy the software
+development.
+
 */

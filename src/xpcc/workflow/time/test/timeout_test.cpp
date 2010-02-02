@@ -26,42 +26,99 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: utils.hpp 75 2009-10-14 22:48:12Z dergraaf $
+ * $Id$
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC__UTILS_HPP
-#define	XPCC__UTILS_HPP
+#include <xpcc/workflow/time/timeout.hpp>
 
-#include <stdint.h>
+#include "timeout_test.hpp"
 
-namespace xpcc
+// ----------------------------------------------------------------------------
+// dummy implementation to control the time
+
+class DummyClock
 {
-	/**
-	 * \brief	Fast check if a float variable is positive
-	 *
-	 * Checks only the sign bit for the AVR.
-	 * 
-	 * \ingroup	math
-	 */
-	inline bool
-	isPositive(const float& a)
+public:
+	static xpcc::Timestamp
+	now()
 	{
-#ifdef __AVR__
-		// IEEE 754-1985: the most significant bit is the sign bit
-		// sign = 0 => positive
-		// sign = 1 => negative
-		uint8_t *t = (uint8_t *) &a;
-		if (*(t + 3) & 0x80) {
-			return false;
-		}
-		else {
-			return true;
-		}
-#else
-		return (a > 0.0);
-#endif
+		return time;
 	}
+	
+	static void
+	setTime(uint16_t time)
+	{
+		DummyClock::time = time;
+	}
+	
+private:
+	static uint16_t time;
+};
+
+uint16_t DummyClock::time = 0;
+
+// ----------------------------------------------------------------------------
+
+void
+TimeoutTest::setUp()
+{
+	DummyClock::setTime(0);
 }
 
-#endif	// XPCC__UTILS_HPP
+void
+TimeoutTest::testBasics()
+{
+	xpcc::Timeout<DummyClock> timeout(10);
+	
+	TEST_ASSERT_FALSE(timeout.isExpired());
+	
+	int i;
+	for (i = 0; i < 9; ++i) {
+		DummyClock::setTime(i);
+		TEST_ASSERT_FALSE(timeout.isExpired());
+	}
+	
+	DummyClock::setTime(10);
+	TEST_ASSERT_TRUE(timeout.isExpired());
+	
+	// check if the class holds the state
+	DummyClock::setTime(9);
+	TEST_ASSERT_TRUE(timeout.isExpired());
+}
+
+void
+TimeoutTest::testTimeOverflow()
+{
+	// overflow after 65535
+	DummyClock::setTime(35570);
+	
+	xpcc::Timeout<DummyClock> timeout(30000);
+	
+	TEST_ASSERT_FALSE(timeout.isExpired());
+	
+	DummyClock::setTime(40000);
+	TEST_ASSERT_FALSE(timeout.isExpired());
+	
+	DummyClock::setTime(33);
+	TEST_ASSERT_FALSE(timeout.isExpired());
+	
+	DummyClock::setTime(34);
+	TEST_ASSERT_TRUE(timeout.isExpired());
+}
+
+void
+TimeoutTest::testRestart()
+{
+	xpcc::Timeout<DummyClock> timeout;
+	TEST_ASSERT_TRUE(timeout.isExpired());
+	
+	timeout.restart(42);
+	TEST_ASSERT_FALSE(timeout.isExpired());
+	
+	DummyClock::setTime(10);
+	TEST_ASSERT_FALSE(timeout.isExpired());
+	
+	DummyClock::setTime(600);
+	TEST_ASSERT_TRUE(timeout.isExpired());
+}

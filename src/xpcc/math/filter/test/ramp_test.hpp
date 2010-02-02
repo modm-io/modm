@@ -32,16 +32,9 @@
 
 #include <unittest/testsuite.hpp>
 
-class TimeoutTest : public unittest::TestSuite
+class RampTest : public unittest::TestSuite
 {
 public:
-	virtual void
-	setUp();
-	
-	
 	void
-	testBasics();
-	
-	void
-	testRestart();
+	testRamp();
 };

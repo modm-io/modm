@@ -30,7 +30,8 @@
 
 Import('env')
 
-files = env.FindFiles(path = '.')
+# find all files, except the one located in the 'test' folders
+files = env.FindFiles(path = '.', unittest=False)
 
 objects = []
 for file in files.sources:
@@ -42,4 +43,5 @@ for file in files.sources:
 library = env.Library(target = env.Buildpath('robot'),
 					  source = objects)
 
-Return('library')
+result = (library, files.defines)
+Return('result')

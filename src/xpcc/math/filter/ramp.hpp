@@ -45,6 +45,22 @@ namespace xpcc
 	class Ramp
 	{
 	public:
+		/**
+		 * \brief	Create a ramp generator
+		 * 
+		 * \param	positiveIncrement	Step with for positive direction
+		 * \param	negativeIncrement	Step with for the negative direction.
+		 * 								<B>Need to be positive!</b>
+		 * \param	initialValue
+		 * 
+		 * Example:
+		 * \code
+		 * 
+		 * \endcode
+		 * 
+		 * \warning	Both values for positive- and negative increment needs to
+		 * 			be positive!
+		 */
 		Ramp(const T& positiveIncrement,
 			 const T& negativeIncrement,
 			 const T& initialValue = T());
@@ -52,6 +68,9 @@ namespace xpcc
 		inline void
 		setTarget(const T& target);
 		
+		/**
+		 * \brief	Calculate the next step
+		 */
 		void
 		update();
 		
@@ -62,7 +81,10 @@ namespace xpcc
 		}
 		
 		inline bool
-		isTargetReached() const;
+		isTargetReached() const
+		{
+			return targetReached;
+		}
 	
 	private:
 		T target;

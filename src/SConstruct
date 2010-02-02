@@ -26,15 +26,18 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # 
-# WARNING: This file is generated automatically, do not edit!
+# $Id$
 
-rootpath = "../../.."
+import os
+
+rootpath = '..'
 
 pre = Environment(tools = ['xpcc'], toolpath = [rootpath + '/misc/python/scons'])
-env = pre.GenerateEnvironment(config = 'project.cfg', 
+env = pre.GenerateEnvironment(config = 'unittest.cfg', 
 							  rootpath = rootpath)
 
-files = env.FindFiles(path = '.')
+# find only files located in 'test' folders
+files = env.FindFiles(path = '.', unittest=True)
 
 objects = []
 for file in files.sources:
@@ -44,12 +47,21 @@ for file in files.sources:
 
 config = env['XPCC_CONFIG']
 
+templatePath = os.path.join(rootpath, 'misc/templates/unittest')
+templateFile = 'runner_%s.cpp.in' % config['build.architecture']
+template = os.path.join(templatePath, templateFile)
+
+# create a file which later runs all the tests
+runner = env.UnittestRunner(target = env.Buildpath('runner.cpp'),
+							source = [template] + files.header)
+objects.append(env.Object(runner))
+
 # build the program
 program = env.Program(target = env.Buildpath(config['general.name']),
 					  source = objects)
 
 # build the xpcc library
-library = env.XpccLibrary()
+library, defines = env.XpccLibrary()
 
 env.Alias('lib', library)
 env.Alias('build', program)
@@ -58,7 +70,7 @@ env.Alias('symbols', env.Symbols(program))
 
 if env.RequireArchitecture('pc'):
 	env.Alias('run', env.Run(program))
-	env.Alias('all', ['build'])
+	env.Alias('all', ['build', 'run'])
 else:
 	env.Alias('all', ['build', 'size'])
 

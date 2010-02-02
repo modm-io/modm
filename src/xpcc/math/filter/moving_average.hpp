@@ -5,7 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- *
+ * 
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -26,42 +26,73 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: utils.hpp 75 2009-10-14 22:48:12Z dergraaf $
+ * $Id: moving_average.hpp 76 2009-10-14 23:29:28Z dergraaf $
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC__UTILS_HPP
-#define	XPCC__UTILS_HPP
+#ifndef XPCC__MOVING_AVERAGE_HPP
+#define XPCC__MOVING_AVERAGE_HPP
 
 #include <stdint.h>
 
 namespace xpcc
 {
 	/**
-	 * \brief	Fast check if a float variable is positive
-	 *
-	 * Checks only the sign bit for the AVR.
+	 * \brief	Moving average filter
 	 * 
-	 * \ingroup	math
+	 * Input range: N * input::maxValue < T::maxValue
+	 *
+	 * \tparam	T	Input type
+	 * \tparam	N	Number of samples (maximum 255)
+	 * 
+	 * \ingroup	filter
+	 * \todo	documentation
 	 */
-	inline bool
-	isPositive(const float& a)
+	template<typename T, unsigned int N>
+	class MovingAverage
 	{
-#ifdef __AVR__
-		// IEEE 754-1985: the most significant bit is the sign bit
-		// sign = 0 => positive
-		// sign = 1 => negative
-		uint8_t *t = (uint8_t *) &a;
-		if (*(t + 3) & 0x80) {
-			return false;
+	public:
+		MovingAverage(const T& initialValue = 0);
+		
+		void
+		update(const T& input);
+		
+		const T
+		getValue() const
+		{
+			return (sum / N);
 		}
-		else {
-			return true;
-		}
-#else
-		return (a > 0.0);
-#endif
+	
+	private:
+		uint8_t index;
+		T buffer[N];
+		T sum;
+	};
+}
+
+// ----------------------------------------------------------------------------
+template<typename T, unsigned int N>
+xpcc::MovingAverage<T, N>::MovingAverage(const T& initialValue) :
+	index(0), sum(N * initialValue)
+{
+	for (uint8_t i = 0; i < N; i++) {
+		buffer[i] = initialValue;
 	}
 }
 
-#endif	// XPCC__UTILS_HPP
+// ----------------------------------------------------------------------------
+template<typename T, unsigned int N>
+void
+xpcc::MovingAverage<T, N>::update(const T& input)
+{
+	sum -= buffer[index];
+	sum += input;
+	buffer[index] = input;
+	
+	index++;
+	if (index >= N) {
+		index = 0;
+	}
+}
+
+#endif // XPCC__MOVING_AVERAGE_HPP

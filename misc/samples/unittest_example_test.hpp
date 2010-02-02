@@ -5,7 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -26,70 +26,27 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: moving_average.hpp 76 2009-10-14 23:29:28Z dergraaf $
+ * $Id$
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__MOVING_AVERAGE_HPP
-#define XPCC__MOVING_AVERAGE_HPP
+#include <unittest/testsuite.hpp>
 
-#include <stdint.h>
-
-namespace xpcc
+class TimeoutTest : public unittest::TestSuite
 {
-	/// \ingroup	filter
-	/// \brief	Moving average filter
-	///
-	/// \todo	documentation
-	///
-	/// Input range: N * input::maxValue < T::maxValue
-	///
-	/// \tparam	T
-	/// \tparam	N	Number of samples (maximum 255)
-	template<typename T, unsigned int N>
-	class MovingAverage
-	{
-	public:
-		MovingAverage(const T& initialValue = 0);
-		
-		void
-		update(const T& input);
-		
-		const T
-		getValue() const {
-			return (sum / N);
-		}
+public:
+	virtual void
+	setUp();
 	
-	private:
-		uint8_t index;
-		T buffer[N];
-		T sum;
-	};
-}
-
-// ----------------------------------------------------------------------------
-template<typename T, unsigned int N>
-xpcc::MovingAverage<T, N>::MovingAverage(const T& initialValue) :
-	index(0), sum(N * initialValue)
-{
-	for (uint8_t i = 0; i < N; i++) {
-		buffer[i] = initialValue;
-	}
-}
-
-// ----------------------------------------------------------------------------
-template<typename T, unsigned int N>
-void
-xpcc::MovingAverage<T, N>::update(const T& input)
-{
-	sum -= buffer[index];
-	sum += input;
-	buffer[index] = input;
+	virtual void
+	tearDown();
 	
-	index++;
-	if (index >= N) {
-		index = 0;
-	}
-}
-
-#endif // XPCC__MOVING_AVERAGE_HPP
+	void
+	testBasics();
+	
+	void
+	testTimeOverflow();
+	
+	void
+	testRestart();
+};

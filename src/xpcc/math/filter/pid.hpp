@@ -5,7 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- *
+ * 
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -26,65 +26,100 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id$
+ * $Id: pid.hpp 76 2009-10-14 23:29:28Z dergraaf $
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/workflow/time/timeout.hpp>
+#ifndef XPCC__PID_HPP
+#define XPCC__PID_HPP
 
-#include "timeout_test.hpp"
+#include "../../../utils/arithmetic_traits.hpp"
 
-// ----------------------------------------------------------------------------
-// dummy implementation to control the time
-
-class DummyClock
+namespace xpcc
 {
-public:
-	static xpcc::Timestamp
-	now()
-	{
-		return time;
+	template<typename T>
+	T
+	feedforwardDummy(const T& in) {
+		return in;
 	}
 	
-	static uint16_t time;
-};
-uint16_t DummyClock::time = 0;
-
-// ----------------------------------------------------------------------------
-
-void
-TimeoutTest::setUp()
-{
-	DummyClock::time = 0;
+	/**
+	 * \brief	A proportional-integral-derivative controller (PID controller)
+	 *
+	 * \ingroup	filter
+	 * \todo	check implementation
+	 */
+	template<typename T, unsigned int ScaleFactor = 1>
+	class Pid
+	{
+		typedef typename ArithmeticTraits<T>::DoubleType T_DOUBLE;
+		typedef T (* FeedforwardFunction)(const T&);
+	
+	public:
+		/**
+		 * \brief	Parameter for a PID calculation
+		 */
+		struct Parameter
+		{
+			Parameter(const T& kp = 0, const T& ki = 0, const T& kd = 0,
+					  const T& maxErrorSum = 0, const T& maxOutput = 0) :
+				kp(kp), ki(ki), kd(kd),
+				maxErrorSum(maxErrorSum), maxOutput(maxOutput) {
+			}
+			
+			T kp;		///< proportional gain
+			T ki;		///< integral gain
+			T kd;		///< differentail gain
+			
+			T maxErrorSum;	///< integral will be limited to this value
+			T maxOutput;	///< output will be limited to this value
+		};
+		
+	public:
+		Pid(Parameter& parameter,
+			FeedforwardFunction feedforward = feedforwardDummy<T>);
+		
+		void
+		setParameter(const Parameter& param);
+		
+		/**
+		 * \brief	Reset all values
+		 */
+		void
+		reset();
+		
+		/**
+		 * \brief	Set a new target value
+		 */
+		void
+		setTarget(const T& value)
+		{
+			target = value;
+		}
+		
+		/**
+		 * \brief	Calculate a new output value
+		 */
+		void
+		update(const T& input);
+		
+		const T&
+		getValue() const
+		{
+			return output;
+		}
+	
+	private:
+		Parameter parameter;
+		FeedforwardFunction feedforward;
+		
+		T target;
+		T errorSum;
+		T lastError;
+		T output;
+	};
 }
 
-void
-TimeoutTest::testBasics()
-{
-	xpcc::Timeout<DummyClock> timeout(10);
-	
-	TEST_ASSERT_FALSE(timeout.isExpired());
-	
-	DummyClock::time = 10;
-	TEST_ASSERT_TRUE(timeout.isExpired());
-	
-	// check if the class holds the state
-	DummyClock::time = 9;
-	TEST_ASSERT_TRUE(timeout.isExpired());
-}
+#include "pid_impl.hpp"
 
-void
-TimeoutTest::testRestart()
-{
-	xpcc::Timeout<DummyClock> timeout;
-	TEST_ASSERT_TRUE(timeout.isExpired());
-	
-	timeout.restart(42);
-	TEST_ASSERT_FALSE(timeout.isExpired());
-	
-	DummyClock::time = 10;
-	TEST_ASSERT_FALSE(timeout.isExpired());
-	
-	DummyClock::time = 600;
-	TEST_ASSERT_TRUE(timeout.isExpired());
-}
+#endif // XPCC__PID_HPP

@@ -5,6 +5,7 @@
  * 
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
+ * 
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -31,16 +32,15 @@
 
 #include "smart_pointer.hpp"
 
-
+// ----------------------------------------------------------------------------
+// must allocate at least three bytes, so getPointer() does return
+// a valid address
 xpcc::SmartPointer::SmartPointer() :
-	ptr(new uint8_t[3])	// with the third byte a getPointer() does return a valid address
+	ptr(new uint8_t[3])
 {
 	ptr[0] = 1;
 	ptr[1] = 0;
-
 }
-
-// ----------------------------------------------------------------------------
 
 xpcc::SmartPointer::SmartPointer(const SmartPointer& other) :
 	ptr(other.ptr)
@@ -48,25 +48,21 @@ xpcc::SmartPointer::SmartPointer(const SmartPointer& other) :
 	ptr[0]++;
 }
 
-// ----------------------------------------------------------------------------
-
 xpcc::SmartPointer::SmartPointer(const SmartPointerVolatile& other) :
 	ptr(other.ptr)
 {
 	ptr[0]++;
 }
 
-// ----------------------------------------------------------------------------
-
+// must allocate at least three bytes, so getPointer() does return
+// a valid address
 xpcc::SmartPointer::SmartPointer(uint8_t size) :
-	ptr(new uint8_t[size+3]) // with the third byte a getPointer() does return a valid address even when size == 0
+	ptr(new uint8_t[size + 3])
 {
 	ptr[0] = 1;
 	ptr[1] = size;
 }
 
-// ----------------------------------------------------------------------------
-		
 xpcc::SmartPointer::~SmartPointer()
 {
 	if (--ptr[0] == 0) {
@@ -89,18 +85,13 @@ xpcc::operator <<( xpcc::IOStream& s, const xpcc::SmartPointer& v)
 
 // ----------------------------------------------------------------------------
 
-// ----------------------------------------------------------------------------
-
 xpcc::SmartPointerVolatile::SmartPointerVolatile(unsigned char size) :
-	SmartPointer( size )
+	SmartPointer(size)
 {
 }
 
-// ----------------------------------------------------------------------------
-
 xpcc::SmartPointerVolatile::SmartPointerVolatile(const SmartPointerVolatile& other) :
-
-	SmartPointer( other )
+	SmartPointer(other)
 {
 }
 

@@ -42,19 +42,22 @@ namespace xpcc
 	class SmartPointerVolatile;
 
 	/**
+	 * \brief 	Container which destroyes itself when the last
+	 * 			copy is destroyed.
+	 * 
+	 * This container saves a copy of the given data on the heap. It
+	 * provides the functionality of a shared pointer => pointer object
+	 * records when it is copied - when the last copy is destroyed the
+	 * memory is released.
+	 * 
 	 * \ingroup data_structure
-	 * \class 	SmartPointerVolatile
-	 * \brief 	This container saves a copy of the given data on the heap. It
-	 * 			provides the functionality of a shared pointer (pointer object
-	 * 			records when it is copied - when the last copy is destroyed the
-	 * 			memory is released.
 	 */
 	class SmartPointer
 	{
 	public:
 		// default constructor with empty payload
 		SmartPointer();
-
+		
 		// Must use a pointer to T here, otherwise the compiler can't distinguish
 		// between constructor and copy constructor!
 		template<typename T>
@@ -87,10 +90,14 @@ namespace xpcc
 		friend IOStream&
 		operator <<( IOStream&, const SmartPointer&);
 
-		/// Allocates memory from the given size
-		/// \param size the amount of memory to be allocated, has to be smaller than 252
-		SmartPointer(unsigned char size);
-
+		/**
+		 * \brief	Allocates memory from the given size
+		 * 
+		 * \param	size	the amount of memory to be allocated, has to be
+		 * 					smaller than 252
+		 */
+		SmartPointer(uint8_t size);
+		
 		SmartPointer&
 		operator=(const SmartPointer& other);
 		
@@ -104,22 +111,26 @@ namespace xpcc
 	operator <<( xpcc::IOStream& s, const xpcc::SmartPointer& sPtr);
 
 	/**
-	 * \ingroup data_structure
-	 * \class 	SmartPointerVolatile
 	 * \brief 	With this class a \b SmartPointer can be created, off that the
 	 * 			memory is writable.
 	 *
 	 * Use the \b SmartPointerVolatile to allocate writable memory and then
 	 * typecast with the copyconstructor to \b SmartPointer to get an object with
 	 * write protected data.
+	 * 
+	 * \ingroup data_structure
 	 */
 	class SmartPointerVolatile : public SmartPointer
 	{
 		public:
-			/// Allocates memory from the given size
-			/// \param size the amount of memory to be allocated, has to be smaller than 252
-			SmartPointerVolatile(unsigned char size);
-
+			/**
+			 * \brief	Allocates memory from the given size
+			 * 
+			 * \param	size	the amount of memory to be allocated, has to
+			 * 					be smaller than 252
+			 */
+			SmartPointerVolatile(uint8_t size);
+			
 			SmartPointerVolatile(const SmartPointerVolatile& other);
 
 			inline uint8_t *

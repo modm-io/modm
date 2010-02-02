@@ -5,6 +5,7 @@
 # 
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
+# 
 #     * Redistributions of source code must retain the above copyright
 #       notice, this list of conditions and the following disclaimer.
 #     * Redistributions in binary form must reproduce the above copyright
@@ -37,8 +38,18 @@ from SCons.Script import *
 # -----------------------------------------------------------------------------
 class FileScanner:
 	
-	def __init__(self, env):
+	def __init__(self, env, unittest=None):
+		""" Constructor
+		
+		Keyword arguments:
+		env		 -	SCons environment
+		unittest -	This variable has three states:
+					None => select all files
+					False => exclude files from subfolders named 'test'
+					True => select only files in folders named 'test'
+		"""
 		self.env = env
+		self.unittest = unittest
 	
 	def scan(self, path):
 		""" Scan a directory for source files
@@ -52,6 +63,8 @@ class FileScanner:
 		
 		self.sources = []
 		self.header = []
+		self.testHeader = []
+		self.testSources = []
 		self.defines = {}
 		
 		basepath = path
@@ -86,8 +99,27 @@ class FileScanner:
 				filename = os.path.relpath(os.path.join(path, file))
 				
 				if extension in ['.cpp', '.c', '.S']:
+					# append source files
+					if os.path.normpath(path).endswith(os.sep + 'test'):
+						if self.unittest is True:
+							self.testSources.append(filename)
+						else:
+							continue
+					else:
+						if self.unittest is True:
+							continue
 					self.sources.append(filename)
+				
 				elif extension in ['.h', '.hpp']:
+					# append header files
+					if os.path.normpath(path).endswith(os.sep + 'test'):
+						if self.unittest is True:
+							self.testHeader.append(filename)
+						else:
+							continue
+					else:
+						if self.unittest is True:
+							continue
 					self.header.append(filename)
 
 # -----------------------------------------------------------------------------
@@ -200,8 +232,8 @@ def xpcc_library(env):
 	
 	return library
 
-def find_files(env, path):
-	scanner = FileScanner(env)
+def find_files(env, path, unittest=None):
+	scanner = FileScanner(env, unittest)
 	scanner.scan(path)
 	return scanner
 
@@ -225,6 +257,10 @@ def require_architecture(env, architecture):
 	else:
 		return False
 
+def check_defines(env, defines):
+	# TODO check which defines are missing and which are unused
+	print "not implemented yet"
+
 # -----------------------------------------------------------------------------
 def generate(env, **kw):
 	env.AddMethod(generate_environment, 'GenerateEnvironment')
@@ -232,6 +268,7 @@ def generate(env, **kw):
 	env.AddMethod(find_files, 'FindFiles')
 	env.AddMethod(buildpath, 'Buildpath')
 	env.AddMethod(require_architecture, 'RequireArchitecture')
+	env.AddMethod(check_defines, 'CheckDefines')
 
 def exists(env):
 	return True

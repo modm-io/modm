@@ -36,6 +36,18 @@ amount of errors.
   a priority of keeping the comments up-to-date when the code changes!
 
 
+\section unittest Unittests
+
+- Unittests are simple to write but very powerfull in avoiding long debug
+  sessions, so use them.
+- Don't write examples, write unittests. Both show how a class is intended to 
+  be used, but unittests [TODO aschure] that the code is compileable and works
+  as espected!
+- It is not possible to write unittests for code that diretly interacts with
+  hardware, but for all other code it is!
+- Use clean interfaces and your code will be easy to test \b and to unterstand.
+
+
 \section names Naming Conventions
 
 - All names except namespaces and named constants must be CamelCase.
@@ -91,8 +103,8 @@ floatValue = static_cast<float>(intValue);	// NOT: floatValue = intValue;
   comparisons (==, <, >, !=, <>, <=, >=), etc.
 - Use spaces around arithmetic operators
 
-For everything else see the \ref example section.
-  
+For everything else see the \ref examples section.
+
 \section optimization Optimization
 
 Don't optimise on code level, only do it on structural level! Changing the code 

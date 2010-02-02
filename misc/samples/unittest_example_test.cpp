@@ -26,42 +26,32 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: utils.hpp 75 2009-10-14 22:48:12Z dergraaf $
+ * $Id$
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC__UTILS_HPP
-#define	XPCC__UTILS_HPP
+#include "unittest_example_test.hpp"
 
-#include <stdint.h>
+// ----------------------------------------------------------------------------
 
-namespace xpcc
+void
+UnittestExampleTest::setUp()
 {
-	/**
-	 * \brief	Fast check if a float variable is positive
-	 *
-	 * Checks only the sign bit for the AVR.
-	 * 
-	 * \ingroup	math
-	 */
-	inline bool
-	isPositive(const float& a)
-	{
-#ifdef __AVR__
-		// IEEE 754-1985: the most significant bit is the sign bit
-		// sign = 0 => positive
-		// sign = 1 => negative
-		uint8_t *t = (uint8_t *) &a;
-		if (*(t + 3) & 0x80) {
-			return false;
-		}
-		else {
-			return true;
-		}
-#else
-		return (a > 0.0);
-#endif
-	}
 }
 
-#endif	// XPCC__UTILS_HPP
+void
+UnittestExampleTest::tearDown()
+{
+}
+
+void
+UnittestExampleTest::test1()
+{
+	
+}
+
+void
+UnittestExampleTest::test2()
+{
+	
+}

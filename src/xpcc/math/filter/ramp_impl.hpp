@@ -26,89 +26,65 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: pid.hpp 76 2009-10-14 23:29:28Z dergraaf $
+ * $Id$
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__PID_HPP
-#define XPCC__PID_HPP
+#ifndef XPCC__RAMP_HPP
+	#error	"Don't include this file directly, use 'math/filter/ramp.hpp' instead!"
+#endif
 
-#include "../../../utils/arithmetic_traits.hpp"
+// ----------------------------------------------------------------------------
 
-namespace xpcc
+template<typename T>
+xpcc::Ramp<T>::Ramp(const T& positiveIncrement,
+					const T& negativeIncrement,
+					const T& initialValue) : 
+	target(initialValue),
+	value(initialValue),
+	targetReached(true),
+	positiveIncrement(positiveIncrement),
+	negativeIncrement(negativeIncrement)
 {
-	template<typename T>
-	T
-	feedforwardDummy(const T& in) {
-		return in;
-	}
-	
-	/// \ingroup	filter
-	/// \brief	A proportional-integral-derivative controller (PID controller)
-	///
-	/// \todo	check implementation
-	template<typename T, unsigned int ScaleFactor = 1>
-	class Pid
-	{
-		typedef typename ArithmeticTraits<T>::DoubleType T_DOUBLE;
-		typedef T (* FeedforwardFunction)(const T&);
-	
-	public:
-		struct Parameter
-		{
-			Parameter(const T& kp = 0, const T& ki = 0, const T& kd = 0,
-					  const T& maxErrorSum = 0, const T& maxOutput = 0) :
-				kp(kp), ki(ki), kd(kd),
-				maxErrorSum(maxErrorSum), maxOutput(maxOutput) {
-			}
-			
-			T kp;
-			T ki;
-			T kd;
-			
-			T maxErrorSum;
-			T maxOutput;
-		};
-		
-	public:
-		Pid(Parameter& parameter,
-			FeedforwardFunction feedforward = feedforwardDummy<T>);
-		
-		void
-		setParameter(const Parameter& param);
-		
-		/// \brief	Reset all values
-		void
-		reset();
-		
-		/// \brief	Set a new target value
-		void
-		setTarget(const T& value)
-		{
-			target = value;
-		}
-		
-		/// \brief	Calculate a new output value
-		void
-		update(const T& input);
-		
-		const T&
-		getValue() const
-		{
-			return output;
-		}
-	
-	private:
-		Parameter parameter;
-		FeedforwardFunction feedforward;
-		
-		T target;
-		T errorSum;
-		T lastError;
-		T output;
-	};
 }
 
-#include "pid_impl.hpp"
+// ----------------------------------------------------------------------------
 
-#endif // XPCC__PID_HPP
+template<typename T>
+void
+xpcc::Ramp<T>::setTarget(const T& target)
+{
+	this->target = target;
+	targetReached = false;
+}
+
+// ----------------------------------------------------------------------------
+
+template<typename T>
+void
+xpcc::Ramp<T>::update()
+{
+	if (target > value)
+	{
+		T variation = target - value;
+		if (variation > positiveIncrement) {
+			value += positiveIncrement;
+		}
+		else {
+			value = target;
+			targetReached = true;
+		}
+	}
+	else
+	{
+		T variation = value - target;
+		if (variation > negativeIncrement) {
+			value -= negativeIncrement;
+		}
+		else {
+			value = target;
+			targetReached = true;
+		}
+	}
+}
+
