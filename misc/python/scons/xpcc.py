@@ -192,24 +192,20 @@ def generate_environment(env, config, buildpath = None, rootpath = None):
 	new['XPCC_CONFIG_FILE'] = os.path.abspath(config)
 	new.Append(CPPPATH = [buildpath, '.'])
 	
+	defines = {}
+	try:
+		for item in parser.items('defines'):
+			defines[item[0].upper()] = item[1]
+	except ConfigParser.NoSectionError:
+		pass
+	new['XPCC_DEFINES'] = defines
+	
 	cnf = {}
 	for section in parser.sections():
 		for option in parser.options(section):
 			key = '%s.%s' % (section, option)
 			cnf[key] = parser.get(section, option)
 	new['XPCC_CONFIG'] = cnf
-	
-	try:
-		# create 'defines.h'
-		substitutions = {
-			'defines': '\n'.join(["#define %s %s" % (item[0].upper(), item[1]) for item in parser.items('defines')]),
-			'name': project_name
-		}
-		new.SimpleTemplate(target = new.Buildpath('defines.h'),
-					source = os.path.join(xpcc_rootpath, 'misc/templates/defines.h.in'),
-					SUBSTITUTIONS = substitutions)
-	except ConfigParser.NoSectionError:
-		pass
 	
 	return new
 
@@ -229,6 +225,17 @@ def xpcc_library(env):
 	env.Append(CPPPATH = os.path.join(env['XPCC_ROOTPATH'], 'src'))
 	env.Append(LIBS = ['robot'])
 	env.Append(LIBPATH = os.path.join(env['XPCC_ROOTPATH'], 'build/library/%s' % env['XPCC_LIBRARY_NAME']))
+	
+	# generate 'defines.h'
+	substitutions = {
+		'defines': '\n'.join(["#define %s %s" % (key, value) for key, value in env['XPCC_DEFINES'].iteritems()]),
+		'name': env['XPCC_CONFIG']['general.name']
+	}
+	env.SimpleTemplate(
+		target = env.Buildpath('defines.h'),
+		source = os.path.join(env['XPCC_ROOTPATH'],
+							  'misc/templates/defines.h.in'),
+		SUBSTITUTIONS = substitutions)
 	
 	return library
 

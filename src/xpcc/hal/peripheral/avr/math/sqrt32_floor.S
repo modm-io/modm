@@ -10,7 +10,7 @@
 
 .text
 .global sqrt32_floor
-.type sqrt32_floor, \function
+.type sqrt32_floor, @function
 
 sqrt32_floor:
 	ldi   R19, 0xc0

@@ -245,9 +245,9 @@ void
 IoStreamTest::testHex3()
 {
 	char string[] = "123456";
-
-	int i = 123456;
-
+	
+	int_fast32_t i = 123456;
+	
 	(*stream) << xpcc::hex << i;
 
 	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 0, 6);

@@ -41,7 +41,7 @@ amount of errors.
 - Unittests are simple to write but very powerfull in avoiding long debug
   sessions, so use them.
 - Don't write examples, write unittests. Both show how a class is intended to 
-  be used, but unittests [TODO aschure] that the code is compileable and works
+  be used, but unittests assure that the code is compileable and works
   as espected!
 - It is not possible to write unittests for code that diretly interacts with
   hardware, but for all other code it is!

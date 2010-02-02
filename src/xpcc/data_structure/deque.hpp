@@ -39,21 +39,20 @@
 namespace xpcc
 {
 	/**
-	 * \ingroup	data_structure
 	 * \brief	Double ended queue
 	 * 
 	 * Internally organised as a ring buffer.
 	 * 
 	 * \verbatim
-	 *              tail --\                 /-- head
-	 *                     |                 |
-	 *           +------+------+---- ----+------+------+
-	 *         0 |      | data |   ...   | data |      | N-1
-	 *           +------+------+---- ----+------+------+
-	 *              |      |                 |      |
-	 * push_front --/      |                 |      \-- push_back
-	 *                     |                 |
-	 *             front --/                 \-- back
+	 *             tail --\                 /-- head
+	 *                    |                 |
+	 *          +------+------+---- ----+------+------+
+	 *        0 |      | data |   ...   | data |      | N-1
+	 *          +------+------+---- ----+------+------+
+	 *             |      |                 |      |
+	 * pushFront --/      |                 |      \-- pushBack
+	 *                    |                 |
+	 *            front --/                 \-- back
 	 * \endverbatim
 	 * 
 	 * \tparam	T	Type of the elements
@@ -62,8 +61,9 @@ namespace xpcc
 	 * Up to a size of 254 small index variables with 8-bits are used, after
 	 * this they are switched to 16-bit.
 	 * 
-	 * \warning		This class don't check if the container is not empty before
-	 * 				a pop operation. You have to do this by yourself!
+	 * \warning		This class don't check if the container is empty before
+	 * 				a pop-operation. You have to do this by yourself!
+	 * \ingroup		data_structure
 	 */
 	template<typename T,
 			 int N>

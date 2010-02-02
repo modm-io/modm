@@ -10,7 +10,7 @@
 
 .text
 .global sqrt32_round
-.type sqrt32_round, \function
+.type sqrt32_round, @function
 
 sqrt32_round:
 	ldi   R19, 0xc0
