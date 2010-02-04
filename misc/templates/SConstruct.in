@@ -31,7 +31,7 @@
 rootpath = "${rootpath}"
 
 pre = Environment(tools = ['xpcc'], toolpath = [rootpath + '/misc/python/scons'])
-env = pre.GenerateEnvironment(config = 'project.cfg', 
+env = pre.GenerateEnvironment(configfile = 'project.cfg', 
 							  rootpath = rootpath)
 
 files = env.FindFiles(path = '.')
@@ -42,10 +42,9 @@ for file in files.sources:
 						source = file)
 	objects.append(object)
 
-config = env['XPCC_CONFIG']
-
 # build the program
-program = env.Program(target = env.Buildpath(config['general.name']),
+programName = env['XPCC_CONFIG']['general']['name']
+program = env.Program(target = env.Buildpath(programName),
 					  source = objects)
 
 # build the xpcc library

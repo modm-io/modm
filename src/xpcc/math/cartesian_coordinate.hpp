@@ -47,15 +47,17 @@ namespace xpcc
 	template<typename T>
 	class PolarCoordinate;
 
-	/// \ingroup	math
-	/// \brief		Cartesian coordinate
-	///
-	/// \todo	operators for > < >= <=
+	/**
+	 * \brief		Cartesian coordinate
+	 *
+	 * \ingroup	math
+	 * \todo	operators for > < >= <=
+	 */
 	template<typename T>
 	class CartesianCoordinate
 	{
 	public:
-		CartesianCoordinate(const T& x=0, const T& y=0);
+		CartesianCoordinate(const T& x = T(), const T& y = T());
 		
 		void
 		setX(const T& value);
@@ -72,30 +74,42 @@ namespace xpcc
 		const T&
 		getY() const;
 		
-		/// \brief	Calculate length
+		/**
+		 * \brief	Calculate length
+		 */
 		T
 		getLength() const;
 		
-		/// \brief	Calculate absolute angle
+		/**
+		 * \brief	Calculate the absolute angle
+		 */
 		Angle
 		getAngle() const;
 		
-		/// \brief	Normalize length
-		CartesianCoordinate<T>&
+		/**
+		 * \brief	Normalize length to 1
+		 */
+		CartesianCoordinate&
 		normalize(const T& length);
 		
-		CartesianCoordinate<T>&
+		CartesianCoordinate&
 		rotate(const Angle& phi);
 		
-		/// \brief	Transform to polar coordiante system
+		/**
+		 * \brief	Transform to polar coordiante system
+		 */
 		PolarCoordinate<T>
 		toPolar();
 		
-		CartesianCoordinate &
-		operator+=(const CartesianCoordinate &other);
+		CartesianCoordinate&
+		operator += (const CartesianCoordinate &other);
 		
-		CartesianCoordinate &
-		operator-=(const CartesianCoordinate &other);
+		CartesianCoordinate&
+		operator -= (const CartesianCoordinate &other);
+		
+	private:
+		T x;
+		T y;
 		
 	private:
 		template<typename U>
@@ -120,22 +134,36 @@ namespace xpcc
 
 		template<typename U>
 		friend IOStream&
-		operator <<( IOStream& s, const CartesianCoordinate<U>& c);
-	
-	private:
-		T x;
-		T y;
+		operator <<(IOStream& s, const CartesianCoordinate<U>& c);
 	};
-
-	template<>
-	CartesianCoordinate<float>&
-	CartesianCoordinate<float>::rotate(const Angle& phi);
-
-	/// \ingroup	math
-	/// \brief		Stream operator to \b xpcc::CartesianCoordinate<U>
+	
+	template<typename U>
+	CartesianCoordinate<U>
+	operator - (const CartesianCoordinate<U> &a);
+	
+	template<typename U>
+	CartesianCoordinate<U>
+	operator - (const CartesianCoordinate<U> &a, const CartesianCoordinate<U> &b);
+	
+	template<typename U>
+	CartesianCoordinate<U>
+	operator + (const CartesianCoordinate<U> &a, const CartesianCoordinate<U> &b);
+	
+	template<typename U>
+	bool
+	operator == (const CartesianCoordinate<U> &a, const CartesianCoordinate<U> &b);
+	
+	template<typename U>
+	bool
+	operator != (const CartesianCoordinate<U> &a, const CartesianCoordinate<U> &b);
+	
+	/**
+	 * \brief	Stream operator for \b xpcc::CartesianCoordinate<U>
+	 * \ingroup	math
+	 */
 	template<typename U>
 	IOStream&
-	operator <<( IOStream& s, const CartesianCoordinate<U>& c);
+	operator << (IOStream& s, const CartesianCoordinate<U>& c);
 }
 
 #include "cartesian_coordinate_impl.hpp"

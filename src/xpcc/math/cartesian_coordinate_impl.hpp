@@ -34,198 +34,170 @@
 	#error	"Don't include this file directly use 'math/cartesian_coordinate.hpp' instead!"
 #endif
 
-#if defined(__AVR__) && defined(__AVR_HAVE_MUL__)
-#include <xpcc/hal/peripheral/avr/math/math.hpp>
-#endif
-
-namespace xpcc
+// ----------------------------------------------------------------------------
+template<typename T>
+xpcc::CartesianCoordinate<T>::CartesianCoordinate(const T& x, const T& y) : 
+	x(x), y(y)
 {
-	// ------------------------------------------------------------------------
-	template<typename T>
-	CartesianCoordinate<T>::CartesianCoordinate(const T& x, const T& y) : x(x), y(y)
-	{
-	}
-	
-	// ------------------------------------------------------------------------
-	template<typename T>
-	void
-	CartesianCoordinate<T>::setX(const T& value)
-	{
-		x = value;
-	}
-	
-	// ------------------------------------------------------------------------
-	template<typename T>
-	void
-	CartesianCoordinate<T>::setY(const T& value)
-	{
-		y = value;
-	}
-	
-	// ------------------------------------------------------------------------
-	template<typename T>
-	void
-	CartesianCoordinate<T>::set(const T& x, const T& y)
-	{
-		this->x = x;
-		this->y = y;
-	}
-	
-	// ------------------------------------------------------------------------
-	template<typename T>
-	const T&
-	CartesianCoordinate<T>::getX() const
-	{
-		return x;
-	}
-	
-	// ------------------------------------------------------------------------
-	template<typename T>
-	const T&
-	CartesianCoordinate<T>::getY() const
-	{
-		return y;
-	}
-	
-	// ------------------------------------------------------------------------
-	template<typename T>
-	T
-	CartesianCoordinate<T>::getLength() const
-	{
-		float tx = x;
-		float ty = y;
-		
-		return sqrt(tx*tx + ty*ty);
-	}
-
-#if defined(__AVR__) && defined(__AVR_HAVE_MUL__)
-	template<>
-	int16_t
-	CartesianCoordinate<int16_t>::getLength() const
-	{
-		int32_t t;
-		t = avr::mul32(x, x);
-		t = avr::mac32(t, y, y);
-		
-		return avr::sqrt32_round(t);
-	}
-
-#endif
-
-	// ------------------------------------------------------------------------
-	template<typename T>
-	Angle
-	CartesianCoordinate<T>::getAngle() const
-	{
-		return atan2(y, x);
-	}
-
-	// ------------------------------------------------------------------------
-	template<typename T>
-	CartesianCoordinate<T>&
-	CartesianCoordinate<T>::normalize(const T& length)
-	{
-		x = x / length;
-		y = y / length;
-		
-		return *this;
-	}
-
-	// ------------------------------------------------------------------------
-	template<typename T>
-	CartesianCoordinate<T>&
-	CartesianCoordinate<T>::rotate(const Angle& phi)
-	{
-		float c = cos(phi).toFloat();
-		float s = sin(phi).toFloat();
-		
-		// without rounding the result might be false for T = integer
-		T tx =    round(c * this->x - s * this->y);
-		this->y = round(s * this->x + c * this->y);
-		this->x = tx;
-		
-		return *this;
-	}
-	
-	// ------------------------------------------------------------------------
-	template<typename T>
-	PolarCoordinate<T>
-	CartesianCoordinate<T>::toPolar()
-	{
-		return PolarCoordinate<T>(getLength(), getAngle());
-	}
-
-	// ------------------------------------------------------------------------
-	template<typename T>
-	CartesianCoordinate<T>&
-	CartesianCoordinate<T>::operator += (const CartesianCoordinate &other)
-	{
-		this->x += other.x;
-		this->y += other.y;
-		return *this;
-	}
-
-	// ------------------------------------------------------------------------	
-	template<typename T>
-	CartesianCoordinate<T>&
-	CartesianCoordinate<T>::operator -= (const CartesianCoordinate &other)
-	{
-		this->x -= other.x;
-		this->y -= other.y;
-		return *this;
-	}
-
-	// ------------------------------------------------------------------------
-	template<typename T>
-	CartesianCoordinate<T>
-	operator - (const CartesianCoordinate<T> &a)
-	{
-		return CartesianCoordinate<T>(-a.x, -a.y);
-	}
-
-	// ------------------------------------------------------------------------
-	template<typename T>
-	CartesianCoordinate<T>
-	operator - (const CartesianCoordinate<T> &a, const CartesianCoordinate<T> &b)
-	{
-		return CartesianCoordinate<T>(a.x - b.x, a.y - b.y);
-	}
-
-	// ------------------------------------------------------------------------
-	template<typename T>
-	CartesianCoordinate<T>
-	operator + (const CartesianCoordinate<T> &a, const CartesianCoordinate<T> &b)
-	{
-		return CartesianCoordinate<T>(a.x + b.x, a.y + b.y);
-	}
-
-
-	// ------------------------------------------------------------------------
-	template<typename T>
-	bool
-	operator == (const CartesianCoordinate<T> &a, const CartesianCoordinate<T> &b)
-	{
-		return (a.x == b.x) && (a.y == b.y);
-	}
-
-	// ------------------------------------------------------------------------
-	template<typename T>
-	bool
-	operator != (const CartesianCoordinate<T> &a, const CartesianCoordinate<T> &b)
-	{
-		return (a.x != b.x) || (a.y != b.y);
-	}
 }
 
+// ----------------------------------------------------------------------------
+template<typename T>
+void
+xpcc::CartesianCoordinate<T>::setX(const T& value)
+{
+	x = value;
+}
 
+// ----------------------------------------------------------------------------
+template<typename T>
+void
+xpcc::CartesianCoordinate<T>::setY(const T& value)
+{
+	y = value;
+}
+
+// ----------------------------------------------------------------------------
+template<typename T>
+void
+xpcc::CartesianCoordinate<T>::set(const T& x, const T& y)
+{
+	this->x = x;
+	this->y = y;
+}
+
+// ----------------------------------------------------------------------------
+template<typename T>
+const T&
+xpcc::CartesianCoordinate<T>::getX() const
+{
+	return x;
+}
+
+// ----------------------------------------------------------------------------
+template<typename T>
+const T&
+xpcc::CartesianCoordinate<T>::getY() const
+{
+	return y;
+}
+
+// ----------------------------------------------------------------------------
+template<typename T>
+T
+xpcc::CartesianCoordinate<T>::getLength() const
+{
+	float tx = x;
+	float ty = y;
+	
+	return sqrt(tx*tx + ty*ty);
+}
+
+// ----------------------------------------------------------------------------
+template<typename T>
+xpcc::Angle
+xpcc::CartesianCoordinate<T>::getAngle() const
+{
+	return atan2(y, x);
+}
+
+// ----------------------------------------------------------------------------
+template<typename T>
+xpcc::CartesianCoordinate<T>&
+xpcc::CartesianCoordinate<T>::normalize(const T& length)
+{
+	x = x / length;
+	y = y / length;
+	
+	return *this;
+}
+
+// ----------------------------------------------------------------------------
+template<typename T>
+xpcc::CartesianCoordinate<T>&
+xpcc::CartesianCoordinate<T>::rotate(const Angle& phi)
+{
+	float c = cos(phi).toFloat();
+	float s = sin(phi).toFloat();
+	
+	// without rounding the result might be false for T = integer
+	T tx =    round(c * this->x - s * this->y);
+	this->y = round(s * this->x + c * this->y);
+	this->x = tx;
+	
+	return *this;
+}
+
+// ----------------------------------------------------------------------------
+template<typename T>
+xpcc::PolarCoordinate<T>
+xpcc::CartesianCoordinate<T>::toPolar()
+{
+	return PolarCoordinate<T>(getLength(), getAngle());
+}
+
+// ----------------------------------------------------------------------------
+template<typename T>
+xpcc::CartesianCoordinate<T>&
+xpcc::CartesianCoordinate<T>::operator += (const CartesianCoordinate &other)
+{
+	this->x += other.x;
+	this->y += other.y;
+	return *this;
+}
+
+// ----------------------------------------------------------------------------	
+template<typename T>
+xpcc::CartesianCoordinate<T>&
+xpcc::CartesianCoordinate<T>::operator -= (const CartesianCoordinate &other)
+{
+	this->x -= other.x;
+	this->y -= other.y;
+	return *this;
+}
 
 // ----------------------------------------------------------------------------
 
-template <typename T>
+template<typename U>
+xpcc::CartesianCoordinate<U>
+xpcc::operator - (const CartesianCoordinate<U> &a)
+{
+	return CartesianCoordinate<U>(-a.x, -a.y);
+}
+
+template<typename U>
+xpcc::CartesianCoordinate<U>
+xpcc::operator - (const CartesianCoordinate<U> &a, const CartesianCoordinate<U> &b)
+{
+	return CartesianCoordinate<U>(a.x - b.x, a.y - b.y);
+}
+
+template<typename U>
+xpcc::CartesianCoordinate<U>
+xpcc::operator + (const CartesianCoordinate<U> &a, const CartesianCoordinate<U> &b)
+{
+	return CartesianCoordinate<U>(a.x + b.x, a.y + b.y);
+}
+
+
+template<typename U>
+bool
+xpcc::operator == (const CartesianCoordinate<U> &a, const CartesianCoordinate<U> &b)
+{
+	return (a.x == b.x) && (a.y == b.y);
+}
+
+template<typename U>
+bool
+xpcc::operator != (const CartesianCoordinate<U> &a, const CartesianCoordinate<U> &b)
+{
+	return (a.x != b.x) || (a.y != b.y);
+}
+
+template <typename U>
 xpcc::IOStream&
-xpcc::operator <<( xpcc::IOStream& s, const xpcc::CartesianCoordinate<T>& c)
+xpcc::operator <<( xpcc::IOStream& s, const xpcc::CartesianCoordinate<U>& c)
 {
 	s << "x=" << c.x << ", y=" << c.y;
-
 	return s;
 }

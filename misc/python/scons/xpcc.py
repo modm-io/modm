@@ -36,6 +36,30 @@ import ConfigParser
 from SCons.Script import *
 
 # -----------------------------------------------------------------------------
+class ParserException(Exception):
+	pass
+
+class MyConfigParser(ConfigParser.RawConfigParser):
+	
+	def read(self, filename):
+		return ConfigParser.RawConfigParser.read(self, filename)
+	
+	def get(self, section, option, default=None):
+		try:
+			return ConfigParser.RawConfigParser.get(self, section, option)
+		except ConfigParser.NoOptionError, e:
+			if default is not None:
+				return default
+			else:
+				raise ParserException(e)
+	
+	def items(self, section):
+		try:
+			return ConfigParser.RawConfigParser.items(self, section)
+		except ConfigParser.NoSectionError, e:
+			raise ParserException(e)
+
+# -----------------------------------------------------------------------------
 class FileScanner:
 	
 	def __init__(self, env, unittest=None):
@@ -59,7 +83,7 @@ class FileScanner:
 		header		- list of header files
 		defines		- dictionary with defines needed by the source files
 		"""
-		parser = ConfigParser.RawConfigParser()
+		parser = MyConfigParser()
 		
 		self.sources = []
 		self.header = []
@@ -91,12 +115,12 @@ class FileScanner:
 				try:
 					for item in parser.items('defines'):
 						self.defines[item[0]] = item[1]
-				except ConfigParser.NoSectionError:
+				except ParserException:
 					pass
 			
 			for file in files:
 				extension = os.path.splitext(file)[1]
-				filename = os.path.relpath(os.path.join(path, file))
+				filename = os.path.join(path, file)
 				
 				if extension in ['.cpp', '.c', '.S']:
 					# append source files
@@ -123,19 +147,47 @@ class FileScanner:
 					self.header.append(filename)
 
 # -----------------------------------------------------------------------------
-def generate_environment(env, config, buildpath = None, rootpath = None):
+def generate_environment(env, configfile, rootpath, buildpath = None):
+	""" Creates a new build environment
+	
+	Keyword arguments:
+	configfile	-	Path to the configuration file
+	rootpath	-	Path to the xpcc/trunk directory
+	"""
 	try:
-		parser = ConfigParser.RawConfigParser()
-		parser.read(config)
-	except TypeError:
-		print "You need to specify a configuration file via 'scons config=path/to/file.cfg'!"
+		parser = MyConfigParser()
+		parser.read(configfile)
+		
+		# read configuration
+		architecture = parser.get('build', 'architecture')
+		if architecture == 'pc':
+			device = 'pc'
+			clock = ''
+		else:
+			device = parser.get('build', 'device')
+			clock = parser.get('build', 'clock')
+		
+		project_name = parser.get('general', 'name')
+		library_name = parser.get('build', 'library_name', project_name)
+		
+		if buildpath is None:
+			buildpath = parser.get('build', 'buildpath', os.path.join(rootpath, 'build/$name'))
+		
+		rootpath = os.path.abspath(rootpath)
+		buildpath = os.path.abspath(buildpath)
+	except ParserException, msg:
+		print msg
 		Exit(1)
 	
-	# Create a build environment
-	architecture = parser.get('build', 'architecture')
+	configuration = { 'defines': {} }
+	for section in parser.sections():
+		s = {}
+		for option in parser.options(section):
+			s[option] = parser.get(section, option)
+		configuration[section] = s
+	
+	# Create the build environment
 	if architecture == 'atmega' or architecture == 'atxmega':
-		device = parser.get('build', 'device')
-		clock = parser.get('build', 'clock')
 		new = Environment(
 				ARCHITECTURE = architecture + '/' + device,
 				AVR_DEVICE = device,
@@ -145,8 +197,6 @@ def generate_environment(env, config, buildpath = None, rootpath = None):
 				LIBS = [''],
 				LIBPATH = [])
 	elif architecture == 'pc':
-		device = 'pc'
-		clock = ''
 		new = Environment(
 				ARCHITECTURE = architecture + '/' + device,
 				tools = ['pc', 'doxygen', 'template', 'unittest', 'xpcc', 'utils'],
@@ -157,87 +207,46 @@ def generate_environment(env, config, buildpath = None, rootpath = None):
 		print "Unknown architecture '%s'!" % architecture
 		Exit(1)
 	
-	# extract the rootpath from the toolpath
-	xpcc_rootpath = os.path.normpath(env['toolpath'][0])
-	xpcc_rootpath = os.path.normpath(xpcc_rootpath[:-len('misc/python/scons')])
-	
-	project_name = parser.get('general', 'name')
-	
-	if buildpath is None:
-		try:
-			buildpath = parser.get('build', 'buildpath')
-		except ConfigParser.NoOptionError:
-			if rootpath is None:
-				print "Don't know where to build the files! Please specify either 'rootpath' or 'buildpath'"
-				Exit(1)
-			
-			buildpath = os.path.join(rootpath, 'build/$name')
-	
-	try:
-		xpcc_library_name = parser.get('build', 'library_name')
-	except ConfigParser.NoOptionError:
-		xpcc_library_name = project_name
-	
 	path_substitutions = {
-		'name': project_name,
-		'library_name': xpcc_library_name,
 		'arch': architecture,
-		'device': device
+		'device': device,
+		'name': project_name,
+		'library_name': library_name,
 	}
 	buildpath = string.Template(buildpath).safe_substitute(path_substitutions)
 	
-	new['XPCC_LIBRARY_NAME'] = xpcc_library_name
-	new['XPCC_ROOTPATH'] = xpcc_rootpath
+	new['XPCC_LIBRARY_NAME'] = library_name
+	new['XPCC_ROOTPATH'] = rootpath
 	new['XPCC_BUILDPATH'] = buildpath
-	new['XPCC_CONFIG_FILE'] = os.path.abspath(config)
-	new.Append(CPPPATH = [buildpath, '.'])
-	
-	defines = {}
-	try:
-		for item in parser.items('defines'):
-			defines[item[0].upper()] = item[1]
-	except ConfigParser.NoSectionError:
-		pass
-	new['XPCC_DEFINES'] = defines
-	
-	cnf = {}
-	for section in parser.sections():
-		for option in parser.options(section):
-			key = '%s.%s' % (section, option)
-			cnf[key] = parser.get(section, option)
-	new['XPCC_CONFIG'] = cnf
+	new['XPCC_CONFIG'] = configuration
+	new['XPCC_CONFIG_FILE'] = os.path.abspath(configfile)
 	
 	return new
 
 def xpcc_library(env):
 	# set new buildpath for the library, path musst be relativ to the
 	# SConscript directory!
-	old_buildpath = env['XPCC_BUILDPATH']
-	env['XPCC_BUILDPATH'] = '../build/library/%s' % env['XPCC_LIBRARY_NAME']
+	env.Append(CPPPATH = [os.path.join(env['XPCC_ROOTPATH'], 'src')])
 	
 	# build library
-	library = env.SConscript(os.path.join(env['XPCC_ROOTPATH'], 'src', 'SConscript'),
-							 exports = 'env')
-	
-	# restore old buildpath
-	env['XPCC_BUILDPATH'] = old_buildpath
-	
-	env.Append(CPPPATH = os.path.join(env['XPCC_ROOTPATH'], 'src'))
-	env.Append(LIBS = ['robot'])
-	env.Append(LIBPATH = os.path.join(env['XPCC_ROOTPATH'], 'build/library/%s' % env['XPCC_LIBRARY_NAME']))
+	library, defines = env.SConscript(
+			os.path.join(env['XPCC_ROOTPATH'], 'src', 'SConscript'),
+			exports = 'env')
 	
 	# generate 'defines.h'
 	substitutions = {
-		'defines': '\n'.join(["#define %s %s" % (key, value) for key, value in env['XPCC_DEFINES'].iteritems()]),
-		'name': env['XPCC_CONFIG']['general.name']
+		'defines': '\n'.join(["#define %s %s" % (key.upper(), value) for key, value in env['XPCC_CONFIG']['defines'].iteritems()]),
+		'name': env['XPCC_CONFIG']['general']['name']
 	}
-	env.SimpleTemplate(
-		target = env.Buildpath('defines.h'),
-		source = os.path.join(env['XPCC_ROOTPATH'],
-							  'misc/templates/defines.h.in'),
-		SUBSTITUTIONS = substitutions)
+	file = env.SimpleTemplate(
+			target = env.LibraryBuildpath('defines.h'),
+			source = os.path.join(env['XPCC_ROOTPATH'], 'misc/templates/defines.h.in'),
+			SUBSTITUTIONS = substitutions)
 	
-	return library
+	env.Append(LIBS = ['robot'])
+	env.Append(LIBPATH = [env.LibraryBuildpath('.')])
+	
+	return (library, defines)
 
 def find_files(env, path, unittest=None):
 	scanner = FileScanner(env, unittest)
@@ -258,6 +267,16 @@ def buildpath(env, path, strip_extension=False):
 	
 	return os.path.join(env['XPCC_BUILDPATH'], path)
 
+def library_buildpath(env, path, strip_extension=False):
+	if strip_extension:
+		path = os.path.splitext(path)[0]
+	
+	result = os.path.join(env['XPCC_ROOTPATH'], 'build', 'library',
+						  env['XPCC_LIBRARY_NAME'], path)
+	
+	return os.path.abspath(result)
+
+
 def require_architecture(env, architecture):
 	if re.match(architecture, env['ARCHITECTURE']):
 		return True
@@ -274,6 +293,7 @@ def generate(env, **kw):
 	env.AddMethod(xpcc_library, 'XpccLibrary')
 	env.AddMethod(find_files, 'FindFiles')
 	env.AddMethod(buildpath, 'Buildpath')
+	env.AddMethod(library_buildpath, 'LibraryBuildpath')
 	env.AddMethod(require_architecture, 'RequireArchitecture')
 	env.AddMethod(check_defines, 'CheckDefines')
 

@@ -30,18 +30,40 @@
  */
 // ----------------------------------------------------------------------------
 
+#if defined(__AVR__) && defined(__AVR_HAVE_MUL__)
+	#include <xpcc/hal/peripheral/avr/math/math.hpp>
+#endif
+
 #include "cartesian_coordinate.hpp"
 
-template<>
-xpcc::CartesianCoordinate<float>&
-xpcc::CartesianCoordinate<float>::rotate(const xpcc::Angle& phi)
+// this explicit namespace is needed here, otherwise we get an error about 
+// "specialization of ... in different namespace"
+namespace xpcc
 {
-	float c = cos(phi).toFloat();
-	float s = sin(phi).toFloat();
+	template<>
+	CartesianCoordinate<float>&
+	CartesianCoordinate<float>::rotate(const Angle& phi)
+	{
+		float c = cos(phi).toFloat();
+		float s = sin(phi).toFloat();
 
-	float tx = (c * this->x - s * this->y);
-	this->y =  (s * this->x + c * this->y);
-	this->x = tx;
+		float tx = (c * this->x - s * this->y);
+		this->y =  (s * this->x + c * this->y);
+		this->x = tx;
 
-	return *this;
+		return *this;
+	}
+
+#if defined(__AVR__) && defined(__AVR_HAVE_MUL__)
+	template<>
+	int16_t
+	CartesianCoordinate<int16_t>::getLength() const
+	{
+		int32_t t;
+		t = avr::mul32(x, x);
+		t = avr::mac32(t, y, y);
+		
+		return avr::sqrt32_round(t);
+	}
+#endif
 }

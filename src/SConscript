@@ -30,17 +30,20 @@
 
 Import('env')
 
+env = env.Clone()
+env.Append(CPPPATH = env.LibraryBuildpath('.'))
+
 # find all files, except the one located in the 'test' folders
 files = env.FindFiles(path = '.', unittest=False)
 
 objects = []
 for file in files.sources:
 	object = env.Object(source = file,
-						target = env.Buildpath(file, strip_extension=True))
+						target = env.LibraryBuildpath(file, strip_extension=True))
 	objects.append(object)
 
 # create the library
-library = env.Library(target = env.Buildpath('robot'),
+library = env.Library(target = env.LibraryBuildpath('robot'),
 					  source = objects)
 
 result = (library, files.defines)
