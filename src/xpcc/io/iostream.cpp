@@ -110,7 +110,7 @@ xpcc::IOStream::putInteger(int32_t value)
 #else
 	char buffer[ArithmeticTraits<int32_t>::decimalDigits + 1]; // +1 for '\0'
 
-	snprintf(buffer, sizeof(str), "%d", value);
+	snprintf(buffer, sizeof(buffer), "%d", value);
 
 	this->device->put(buffer);
 #endif

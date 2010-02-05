@@ -67,16 +67,16 @@ namespace xpcc
 		};
 
 		Wrapper< char[10], BLUE, NONE > debugWrapper("Debug:   ", device);
-		Logger debug( &debugWrapper );
+		Logger debug( debugWrapper );
 
 		Wrapper< char[10], GREEN, NONE > debugInfo("Info:    ", device);
-		Logger info( &debugInfo );
+		Logger info( debugInfo );
 
 		Wrapper< char[10], YELLOW, NONE > warningInfo("Warning: ", device);
-		Logger warning( &warningInfo );
+		Logger warning( warningInfo );
 
 		Wrapper< char[10], RED, NONE > errorInfo("Error:   ", device);
-		Logger error( &errorInfo );
+		Logger error( errorInfo );
 
 	}
 }

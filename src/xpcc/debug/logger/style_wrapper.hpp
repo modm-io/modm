@@ -34,8 +34,10 @@
 #include <xpcc/io/iodevice.hpp>
 #include "style.hpp"
 
-namespace xpcc {
-	namespace log {
+namespace xpcc
+{
+	namespace log
+	{
 		/**
 		 * \brief 	Wrapper to use the Style as a IODevice in the Logger
 		 *
@@ -44,7 +46,8 @@ namespace xpcc {
 		 * \author	Martin Rosekeit <martin.rosekeit@rwth-aachen.de>
 		 */
 		template < typename STYLE >
-		class StyleWrapper : public IODevice {
+		class StyleWrapper : public IODevice
+		{
 			public :
 				StyleWrapper( STYLE style );
 

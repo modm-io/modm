@@ -28,12 +28,14 @@
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # 
 # $Id$
+# -----------------------------------------------------------------------------
 
 import os
 import ConfigParser
 
 env = Environment(tools = ['template', 'doxygen'], toolpath = ['misc/python/scons'])
 
+# -----------------------------------------------------------------------------
 # regenerate SConstruct files for the tests
 parser = ConfigParser.RawConfigParser()
 for path, directories, files in os.walk('tests'):
@@ -53,6 +55,7 @@ for path, directories, files in os.walk('tests'):
 		
 		env.Alias('update', file)
 
+# -----------------------------------------------------------------------------
 # update all template files
 path = 'src/xpcc/hal/peripheral/avr/mega/uart'
 for id in range(0, 4):
@@ -66,6 +69,7 @@ for id in range(0, 4):
 						SUBSTITUTIONS = { 'id': id })
 	env.Alias('templates', file)
 
+# -----------------------------------------------------------------------------
 # add target to create the doxygen documentation
 env.Doxygen('doc/doxyfile')
 env.Alias('doc', 'apidoc/html')

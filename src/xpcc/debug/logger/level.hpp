@@ -27,16 +27,20 @@
  *
  * $Id$
  */
-#ifndef XPCC_LOG_LEVEL_HPP_
-#define XPCC_LOG_LEVEL_HPP_
+#ifndef XPCC_LOG__LEVEL_HPP
+#define XPCC_LOG__LEVEL_HPP
 
-namespace xpcc {
-	namespace log {
-		//! Levels to filter messages.
-		//!
-		//! DEBUG < INFO < WARNING < ERROR < FATAL
-		//!
-		//! \ingroup logger
+namespace xpcc
+{
+	namespace log
+	{
+		/**
+		 * \brief	Levels to filter messages.
+		 *
+		 * DEBUG < INFO < WARNING < ERROR < FATAL
+		 *
+		 * \ingroup logger
+		 */
 		typedef enum {
 			DEBUG,
 			INFO,
@@ -48,18 +52,18 @@ namespace xpcc {
 }
 
 #ifndef XPCC_LOG_LEVEL
-//! Define to set the level of the logging to a defined value for each file.
-//!
-//! To change the logging level in one cpp file use \c #undef
-//! \code
-//!		#undef  XPCC_LOG_LEVEL
-//!		#define XPCC_LOG_LEVEL xpcc::log::INFO
-//! \endcode
-//!
-//! \ingroup logger
-#define XPCC_LOG_LEVEL xpcc::log::DEBUG
-
+	/**
+	 * Define to set the level of the logging to a defined value for each file.
+	 *
+	 * To change the logging level in one cpp file use \c #undef
+	 * \code
+	 *		#undef  XPCC_LOG_LEVEL
+	 *		#define XPCC_LOG_LEVEL xpcc::log::INFO
+	 * \endcode
+	 *
+	 * \ingroup logger
+	 */
+	#define XPCC_LOG_LEVEL xpcc::log::DEBUG
 #endif // XPCC_LOG_LEVEL
 
-
-#endif /* XPCC_LOG_LEVEL_HPP_ */
+#endif // XPCC_LOG__LEVEL_HPP
