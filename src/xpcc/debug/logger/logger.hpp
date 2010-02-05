@@ -47,7 +47,6 @@ namespace xpcc
 	namespace log
 	{
 		/**
-		 * \ingroup logger
 		 * \brief 	Interface to the Logger.
 		 *
 		 * This class provides an interface to the logger. The Logger is an
@@ -55,6 +54,7 @@ namespace xpcc
 		 * macro defined below. This class overloads the << operator so that it is
 		 * possible to write different message types to the logger.
 		 *
+		 * \ingroup logger
 		 * \since 	04 December 2006
 		 * \author	Christofer Hedbrand,
 		 * 			Carsten Schmidt,
@@ -63,7 +63,7 @@ namespace xpcc
 		class Logger : public ::xpcc::IOStream
 		{
 			public:
-				Logger(::xpcc::IODevice* device) :
+				Logger(::xpcc::IODevice& device) :
 					IOStream(device)
 				{
 				}

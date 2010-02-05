@@ -34,10 +34,9 @@
 #define XPCC__IOSTREAM_HPP
 
 #include <stdint.h>
+#include <xpcc/utils/macros.hpp>
 
 #include "iodevice.hpp"
-
-//#include <iostream>
 
 namespace xpcc
 {
@@ -53,15 +52,17 @@ namespace xpcc
 	class IOStream
 	{
 	public :
-		/// \brief	Constructor
-		/// 
-		/// \param	device	device to write the stream to
-		/// 
-		/// \code
-		///	MyIODevice device;
-		///	IOStream stream( device );
-		/// \endcode
-		IOStream(IODevice* device);
+		/**
+		 * \brief	Constructor
+		 * 
+		 * \param	device	device to write the stream to
+		 * 
+		 * \code
+		 *	MyIODevice device;
+		 *	IOStream stream( device );
+		 * \endcode
+		 */
+		IOStream(IODevice& device);
 
 		inline IOStream&
 		put(char c)
@@ -79,7 +80,7 @@ namespace xpcc
 		}
 		
 		/// set the output mode to HEX style for \b char and \b char*
-		inline IOStream&
+		ALWAYS_INLINE IOStream&
 		hex()
 		{
 			this->mode = HEX;
@@ -87,7 +88,7 @@ namespace xpcc
 		}
 
 		/// set the output mode to ASCII style for \b char and \b char*
-		inline IOStream&
+		ALWAYS_INLINE IOStream&
 		ascii()
 		{
 			this->mode = ASCII;
@@ -118,49 +119,65 @@ namespace xpcc
 			return *this;
 		}
 
-		inline IOStream&
+		ALWAYS_INLINE IOStream&
 		operator << ( const uint16_t& v )
 		{
 			this->putInteger( v );
 			return *this;
 		}
 
-		inline IOStream&
+		ALWAYS_INLINE IOStream&
 		operator << ( const int16_t& v )
 		{
 			this->putInteger( v );
 			return *this;
 		}
 
-		inline IOStream&
+		ALWAYS_INLINE IOStream&
 		operator << ( const uint32_t& v )
 		{
 			this->putInteger(v);
 			return *this;
 		}
 
-		inline IOStream&
+		ALWAYS_INLINE IOStream&
 		operator << ( const int32_t& v )
 		{
 			this->putInteger(v);
 			return *this;
 		}
-
-		inline IOStream&
+		
+#ifndef __AVR__
+		ALWAYS_INLINE IOStream&
+		operator << ( const uint64_t& v )
+		{
+			this->putInteger(v);
+			return *this;
+		}
+		
+		ALWAYS_INLINE IOStream&
+		operator << ( const int64_t& v )
+		{
+			this->putInteger(v);
+			return *this;
+		}
+#endif
+		
+		ALWAYS_INLINE IOStream&
 		operator << ( const float& v )
 		{
 			this->putFloat(v);
 			return *this;
 		}
 
-		inline IOStream&
+		ALWAYS_INLINE IOStream&
 		operator << ( const double& v )
 		{
 			this->putFloat(v);
 			return *this;
 		}
 
-		inline IOStream&
+		ALWAYS_INLINE IOStream&
 		operator << ( const char* v )
 		{
 			if( this->mode == ASCII ) {
@@ -172,10 +189,10 @@ namespace xpcc
 			return *this;
 		}
 
-		inline IOStream&
+		ALWAYS_INLINE IOStream&
 		operator << ( IOStream& (*function)(IOStream&) )
 		{
-			return function( *this );
+			return function(*this);
 		}
 
 	protected :
@@ -190,7 +207,13 @@ namespace xpcc
 		
 		void
 		putInteger(uint32_t value);
-
+		
+		void
+		putInteger(int64_t value);
+		
+		void
+		putInteger(uint64_t value);
+		
 		void
 		putHex( const char*  s );
 

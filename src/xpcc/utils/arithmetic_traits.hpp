@@ -53,8 +53,6 @@ namespace xpcc
 	 * \li \c	minValue	smallest value.
 	 * \li \c	maxValue	biggest value
 	 * \li \c	isSigned	is this a signed or unsigned type
-	 * \li \c	isInteger	is this an integer type
-	 * \li \c	isFloat		is this a floatingpoint type (float, double)
 	 * \li \c	decimalDigits	count of digits to display this type in decimal
 	 * 
 	 * \section usage	Usage
@@ -83,9 +81,7 @@ namespace xpcc
 		typedef int16_t DoubleType;
 		typedef signed char SignedType;
 		typedef unsigned char UnsignedType;
-
-		static const char minValue = -0x80;
-		static const char maxValue =  0x7F;
+		
 		static const unsigned char decimalDigits = 4; // inc sign
 	};
 
@@ -95,15 +91,13 @@ namespace xpcc
 	struct ArithmeticTraits<signed char>
 	{
 		typedef int16_t DoubleType;
-		typedef signed char SignedType;
-		typedef unsigned char UnsignedType;
+		typedef int8_t SignedType;
+		typedef uint8_t UnsignedType;
 
-		static const char minValue = -0x80;
-		static const char maxValue =  0x7F;
+		static const char minValue = -127 - 1;
+		static const char maxValue =  127;
 		static const unsigned char decimalDigits = 4; // inc sign
-
-		static const bool isInteger = true;
-		static const bool isFloat = false;
+		
 		static const bool isSigned = true;
 	};
 
@@ -112,15 +106,13 @@ namespace xpcc
 	struct ArithmeticTraits<unsigned char>
 	{
 		typedef uint16_t DoubleType;
-		typedef signed char SignedType;
-		typedef unsigned char UnsignedType;
+		typedef int8_t SignedType;
+		typedef uint8_t UnsignedType;
 
 		static const uint8_t minValue = 0;
-		static const uint8_t maxValue = 0xff;
+		static const uint8_t maxValue = 255;
 		static const uint8_t decimalDigits = 3;
 
-		static const bool isInteger = true;
-		static const bool isFloat = false;
 		static const bool isSigned = false;
 	};
 
@@ -132,12 +124,10 @@ namespace xpcc
 		typedef int16_t SignedType;
 		typedef uint16_t UnsignedType;
 
-		static const int16_t minValue = -0x8000;
-		static const int16_t maxValue =  0x7FFF;
+		static const int16_t minValue = -32767 - 1;
+		static const int16_t maxValue =  32767;
 		static const uint8_t decimalDigits = 6; // inc. sign
 
-		static const bool isInteger = true;
-		static const bool isFloat = false;
 		static const bool isSigned = true;
 	};
 
@@ -150,11 +140,9 @@ namespace xpcc
 		typedef uint16_t UnsignedType;
 
 		static const uint16_t minValue = 0;
-		static const uint16_t maxValue = 0xFFFF;
+		static const uint16_t maxValue = 65535;
 		static const uint8_t decimalDigits = 6;
-	
-		static const bool isInteger = true;
-		static const bool isFloat = false;
+
 		static const bool isSigned = false;
 	};
 	
@@ -170,12 +158,10 @@ namespace xpcc
 		typedef int32_t SignedType;
 		typedef uint32_t UnsignedType;
 
-		static const int32_t minValue = -0x80000000;
-		static const int32_t maxValue =  0x7FFFFFFF;
+		static const int32_t minValue = -2147483647L - 1;
+		static const int32_t maxValue =  2147483647L;
 		static const uint8_t decimalDigits = 11; // inc. sign
-	
-		static const bool isInteger = true;
-		static const bool isFloat = false;
+
 		static const bool isSigned = true;
 	};
 	
@@ -192,14 +178,42 @@ namespace xpcc
 		typedef uint32_t UnsignedType;
 
 		static const uint32_t minValue = 0;
-		static const uint32_t maxValue = 0xFFFFFFFF;
+		static const uint32_t maxValue = 4294967295UL;
 		static const uint8_t decimalDigits = 10;
 
-		static const bool isInteger = true;
-		static const bool isFloat = false;
 		static const bool isSigned = false;
 	};
+	
+	// -------------------------------------------------------------------------
+	template<>
+	struct ArithmeticTraits<int64_t>
+	{
+		typedef double DoubleType;
+		typedef int64_t SignedType;
+		typedef uint64_t UnsignedType;
 
+		static const int64_t minValue = -9223372036854775807LL - 1;
+		static const int64_t maxValue =  9223372036854775807LL;
+		static const uint8_t decimalDigits = 20; // inc. sign
+
+		static const bool isSigned = true;
+	};
+	
+	// -------------------------------------------------------------------------
+	template<>
+	struct ArithmeticTraits<uint64_t>
+	{
+		typedef double DoubleType;
+		typedef int64_t SignedType;
+		typedef uint64_t UnsignedType;
+
+		static const uint64_t minValue = 0;
+		static const uint64_t maxValue = 18446744073709551615ULL;
+		static const uint8_t decimalDigits = 20;
+		
+		static const bool isSigned = false;
+	};
+	
 	// -------------------------------------------------------------------------
 
 	template<>
@@ -211,9 +225,7 @@ namespace xpcc
 
 		static const float minValue = -3.40282e+38;
 		static const float maxValue = 3.40282e+38;
-	
-		static const bool isInteger = false;
-		static const bool isFloat = true;
+		
 		static const bool isSigned = true;
 	};
 
@@ -231,9 +243,7 @@ namespace xpcc
 
 		static const double minValue = -3.40282e+38;
 		static const double maxValue = 3.40282e+38;
-	
-		static const bool isInteger = false;
-		static const bool isFloat = true;
+		
 		static const bool isSigned = true;
 	};
 
@@ -248,9 +258,7 @@ namespace xpcc
 
 		static const double minValue = 2.22507e-308;
 		static const double maxValue = 1.79769e+308;
-
-		static const bool isInteger = false;
-		static const bool isFloat = true;
+		
 		static const bool isSigned = true;
 	};
 

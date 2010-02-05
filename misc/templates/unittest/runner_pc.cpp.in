@@ -17,7 +17,7 @@ main(void)
 	// initialize output device
 	xpcc::StdIODevice device;
 	
-	unittest::Reporter reporter(&device);
+	unittest::Reporter reporter(device);
 	unittest::Controller::instance().setReporter(reporter);
 	
 	// run tests

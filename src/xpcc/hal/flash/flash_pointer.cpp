@@ -25,17 +25,17 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: logger.cpp 136 2009-11-24 21:20:55Z thundernail $
+ * $Id$
  */
 // ----------------------------------------------------------------------------
 #include "flash_pointer.hpp"
 
 xpcc::IOStream&
-operator << ( xpcc::IOStream& os, xpcc::FlashPointer<char> ptr)
+operator << (xpcc::IOStream& os, xpcc::FlashPointer<char> ptr)
 {
 	char c;
 	while ((c = *ptr++)) {
 		os << c;
 	}
 	return os;
-};
+}

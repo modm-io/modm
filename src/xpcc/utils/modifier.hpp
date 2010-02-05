@@ -33,8 +33,15 @@
 #ifndef	XPCC__MODIFIER_HPP
 #define	XPCC__MODIFIER_HPP
 
+#include <xpcc/utils/macros.hpp>
+#include <xpcc/hal/flash/flash_pointer.hpp>
+
 namespace xpcc
 {
+	// forward declaration
+	template<typename T>
+	class FlashPointer;
+	
 	/**
 	 * \ingroup		utils
 	 * \defgroup	modifier
@@ -42,14 +49,25 @@ namespace xpcc
 	namespace modifier
 	{
 		/**
-		 * \ingroup	modifier
 		 * \brief	Add volatile modifier to T
+		 * \ingroup	modifier
 		 */
 		template<typename T>
-		volatile T&
+		ALWAYS_INLINE volatile T&
 		asVolatile(T& value)
 		{
 			return (volatile T&) value;
+		}
+		
+		/**
+		 * \brief	Convert a normal pointer to a FlashPointer
+		 * \ingroup	modifier
+		 */
+		template<typename T>
+		ALWAYS_INLINE ::xpcc::FlashPointer<T>
+		flash(const T* ptr)
+		{
+			return ::xpcc::FlashPointer<T>(ptr);
 		}
 	}
 }

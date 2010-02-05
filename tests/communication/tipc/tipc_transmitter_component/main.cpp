@@ -62,7 +62,7 @@ main()
 
 	int data(0);
 
-	xpcc::IOStream stream( &xpcc::log::device );
+	xpcc::IOStream stream(xpcc::log::device );
 
 	while(1) {
 		data++;

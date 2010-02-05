@@ -1,9 +1,5 @@
 // coding: utf-8
 // ----------------------------------------------------------------------------
-/**
- * 
- */
-// ----------------------------------------------------------------------------
 
 #include <avr/wdt.h>
 
@@ -20,22 +16,8 @@
 // ----------------------------------------------------------------------------
 using namespace xpcc;
 
-#if defined(__AVR_ATmega644__)
-
-	CREATE_OUTPUT_PIN(LedGreen, B, 0);
-	CREATE_OUTPUT_PIN(LedRed, B, 1);
-	
-	CREATE_OUTPUT_PIN(Cs, B, 4);
-	CREATE_INPUT_PIN(Int, B, 2);
-
-#elif defined(__AVR_ATmega8__)
-
-	CREATE_OUTPUT_PIN(Cs, B, 2);
-	CREATE_INPUT_PIN(Int, B, 1);
-
-#else
-	#error "ERROR"
-#endif
+CREATE_OUTPUT_PIN(Cs, B, 2);
+CREATE_INPUT_PIN(Int, B, 1);
 
 FLASH(uint8_t filter[]) = 
 {
@@ -93,20 +75,8 @@ main(void)
 		delay_ms(50);
 	}
 	
-	#if defined(__AVR_ATmega644__)
-	
-		// TODO move spi initialisation to Spi class!
-		DDRB = (1 << PB7) | (1 << PB5) | (1 << PB4);
-		PORTB = (1 << PB6) | (1 << PB2);
-	
-	#elif defined(__AVR_ATmega8__)
-	
-		DDRB = (1 << PB5) | (1 << PB3) | (1 << PB2);
-		PORTB = (1 << PB4) | (1 << PB1);
-	
-	#else
-		#error "ERROR"
-	#endif
+	DDRB = (1 << PB5) | (1 << PB3) | (1 << PB2);
+	PORTB = (1 << PB4) | (1 << PB1);
 	
 	Spi::initialize(Spi::MODE_0, Spi::PRESCALER_4);
 	
@@ -123,7 +93,7 @@ main(void)
 			"ret"		"\n"
 		);
 	}
-	can.setFilter(xpcc::toFlashPointer(filter));
+	can.setFilter(xpcc::modifier::flash(filter));
 	
 	// configure input pins
 	DDRD = 0;
@@ -143,7 +113,7 @@ main(void)
 	}
 	PORTC = 0;
 	
-	// configuration finished, enabled watchdog
+	// configuration finished, enable watchdog
 	wdt_enable(WDTO_120MS);
 	
 	Timeout<> timeout;

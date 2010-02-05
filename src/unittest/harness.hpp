@@ -98,14 +98,14 @@ namespace unittest
 		TEST_REPORTER__.reportPass(); \
 	} else { \
 		TEST_REPORTER__.reportFailure(__LINE__) \
-			<< xpcc::toFlashPointer(unittest::stringNotTrue); \
+			<< xpcc::modifier::flash(unittest::stringNotTrue); \
 		TEST_RETURN__; \
 	}
 
 #define	TEST_ASSERT_FALSE(expr)	\
 	if (expr) { \
 		TEST_REPORTER__.reportFailure(__LINE__) \
-			<< xpcc::toFlashPointer(unittest::stringNotFalse); \
+			<< xpcc::modifier::flash(unittest::stringNotFalse); \
 		TEST_RETURN__; \
 	} else { \
 		TEST_REPORTER__.reportPass(); \
@@ -116,7 +116,7 @@ namespace unittest
 		TEST_REPORTER__.reportPass(); \
 	} else { \
 		TEST_REPORTER__.reportFailure(__LINE__) \
-			<< x << xpcc::toFlashPointer(unittest::stringEqual) << y << '\n'; \
+			<< x << xpcc::modifier::flash(unittest::stringEqual) << y << '\n'; \
 		TEST_RETURN__; \
 	}
 
@@ -128,7 +128,7 @@ namespace unittest
 		TEST_REPORTER__.reportPass(); \
 	} else { \
 		TEST_REPORTER__.reportFailure(__LINE__) \
-			<< x << xpcc::toFlashPointer(unittest::stringEqual) << y << '\n'; \
+			<< x << xpcc::modifier::flash(unittest::stringEqual) << y << '\n'; \
 		TEST_RETURN__; \
 	}
 
@@ -137,7 +137,7 @@ namespace unittest
 		TEST_REPORTER__.reportPass(); \
 	} else { \
 		TEST_REPORTER__.reportFailure(__LINE__) \
-			<< value << xpcc::toFlashPointer(unittest::stringNotInRange) \
+			<< value << xpcc::modifier::flash(unittest::stringNotInRange) \
 			<< '[' << lower << ',' << upper << ']' << '\n'; \
 		TEST_RETURN__; \
 	}

@@ -19,7 +19,7 @@ main(void)
 	
 	device.put("Unittests (" __DATE__ ", " __TIME__")\n");
 	
-	unittest::Reporter reporter(&device);
+	unittest::Reporter reporter(device);
 	unittest::Controller::instance().setReporter(reporter);
 	
 	// run tests

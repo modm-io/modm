@@ -57,7 +57,7 @@ namespace xpcc
 	 *     { 220, 20000 }
 	 * };
 	 * 
-	 * xpcc::LinearInterpolation<MyPair> value(xpcc::toFlashPointer(flashValues), 6);
+	 * xpcc::LinearInterpolation<MyPair> value(xpcc::modifier::flash(flashValues), 6);
 	 * 
 	 * ...
 	 * 

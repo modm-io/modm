@@ -33,48 +33,62 @@
 #ifndef	UNITTEST__REPORTER_HPP
 #define	UNITTEST__REPORTER_HPP
 
+#include <stdint.h>
+
 #include <xpcc/io/iostream.hpp>
 #include <xpcc/hal/flash/flash_pointer.hpp>
 
 namespace unittest
 {
-	/// \ingroup	unittest
-	/// \brief		%Reporter
-	///
-	/// Used to generate the visible output.
-	///
+	/**
+	 * \brief	%Reporter
+	 *
+	 * Used to generate the visible output.
+	 *
+	 * \ingroup	unittest
+	 */
 	class Reporter
 	{
 	public:
-		/// \brief	Constructor
-		///
-		/// \param	device	IODevice used for printing
-		Reporter(xpcc::IODevice* device);
+		/**
+		 * \brief	Constructor
+		 *
+		 * \param	device	IODevice used for printing
+		 */
+		Reporter(xpcc::IODevice& device);
 		
-		/// \brief	Switch to the next test suite
-		/// 
-		/// \param	name	Name of the test suite
+		/**
+		 * \brief	Switch to the next test suite
+		 * 
+		 * \param	name	Name of the test suite
+		 */
 		void
 		nextTestSuite(xpcc::FlashPointer<char> name);
 		
-		/// \brief	Report a passed test
-		/// 
-		/// Doesn't generate any output, but increments the number of
-		/// passed tests
+		/**
+		 * \brief	Report a passed test
+		 * 
+		 * Doesn't generate any output, but increments the number of
+		 * passed tests
+		 */
 		void
 		reportPass();
 		
-		/// \brief	Reported a failed test
-		///
-		/// Generates a basic failure message, the returned stream can then
-		/// be used to write some more specific information about the failure.
+		/**
+		 * \brief	Reported a failed test
+		 *
+		 * Generates a basic failure message, the returned stream can then
+		 * be used to write some more specific information about the failure.
+		 */
 		xpcc::IOStream&
 		reportFailure(unsigned int lineNumber);
 		
-		/// \brief	Writes a summary of all the tests
-		/// 
-		/// Basically the total number of failed and passed tests and then 
-		/// 'OK' if there was no failure or 'FAIL' otherwise.
+		/**
+		 * \brief	Writes a summary of all the tests
+		 * 
+		 * Basically the total number of failed and passed tests and then 
+		 * 'OK' if there was no failure or 'FAIL' otherwise.
+		 */
 		void
 		printSummary();
 		
@@ -82,8 +96,8 @@ namespace unittest
 		xpcc::IOStream outputStream;
 		xpcc::FlashPointer<char> testName;
 		
-		int testsPassed;
-		int testsFailed;
+		int_fast16_t testsPassed;
+		int_fast16_t testsFailed;
 	};
 }
 

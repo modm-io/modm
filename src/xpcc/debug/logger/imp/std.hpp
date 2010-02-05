@@ -31,13 +31,13 @@
 
 // the default style creates globals objects, so it can only one time be included
 #ifdef XPCC_LOG_STYLE_DEFAULT__HPP
-#error Second includition of a default log style
+	#error "Second includition of a default log style"
 #else
 #define XPCC_LOG_STYLE_DEFAULT__HPP
 
 #ifdef __AVR__
-// this version is to use on PC only
-#error not to use on AVRs
+	// this version is to use on PC only
+	#error "not to use on AVRs"
 #else
 
 #include "../logger.hpp"
@@ -47,14 +47,17 @@
 
 #include <xpcc/io/backplane/std/std_iodevice.hpp>
 
-namespace xpcc {
-	namespace log {
+namespace xpcc
+{
+	namespace log
+	{
 		xpcc::StdIODevice device;
 
 		template < typename T, Colour TEXT, Colour BACKGROUND >
-		class Wrapper : public StyleWrapper< Prefix< T, StdColour<TEXT, BACKGROUND > > > {
+		class Wrapper : public StyleWrapper< Prefix< T, StdColour<TEXT, BACKGROUND > > >
+		{
 			public:
-				Wrapper(const T& str, ::xpcc::IODevice &device) :
+				Wrapper(const T& str, ::xpcc::IODevice& device) :
 					StyleWrapper< Prefix< T, StdColour<TEXT, BACKGROUND > > > (
 							Prefix< T, StdColour<TEXT, BACKGROUND > >(
 									str,
@@ -78,8 +81,6 @@ namespace xpcc {
 	}
 }
 
-
-// -----------------------------------------------------------------------------
 #endif // __AVR__
 
 #endif // XPCC_LOG_STYLE_DEFAULT__HPP

@@ -81,7 +81,7 @@ void
 IoStreamTest::setUp()
 {
 	device.clear();
-	stream = new xpcc::IOStream(&device);
+	stream = new xpcc::IOStream(device);
 }
 
 void
@@ -109,7 +109,7 @@ IoStreamTest::testFlashString()
 {
 	char string[] = "abc";
 	
-	(*stream) << xpcc::toFlashPointer(flashString);
+	(*stream) << xpcc::modifier::flash(flashString);
 	
 	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 0, 3);
 	TEST_ASSERT_EQUALS(device.bytesWritten, 3);

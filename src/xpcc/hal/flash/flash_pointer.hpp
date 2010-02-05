@@ -26,7 +26,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: flash_pointer.hpp 71 2009-10-12 21:43:00Z dergraaf $
+ * $Id$
  */
 // ----------------------------------------------------------------------------
 
@@ -34,8 +34,10 @@
 #define	XPCC__FLASH_HPP
 
 #include <xpcc/utils/macros.hpp>
+#include <xpcc/utils/modifier.hpp>
 #include <xpcc/utils/typet.hpp>
 #include <xpcc/io/iostream.hpp>
+
 #include "flash_reader.hpp"
 
 namespace xpcc
@@ -58,24 +60,29 @@ namespace xpcc
 	{
 	public:
 		ALWAYS_INLINE
-		explicit FlashPointer(const T* address = 0) : address(address) {
+		explicit FlashPointer(const T* address = 0) :
+			address(address)
+		{
 		}
 		
 		template <typename U>
 		ALWAYS_INLINE
-		explicit FlashPointer(const FlashPointer<U>& rhs)
-		: address((T*)rhs.address) {
+		explicit FlashPointer(const FlashPointer<U>& rhs) :
+			address((T*) rhs.address)
+		{
 		}
 		
 		ALWAYS_INLINE
 		const T
-		operator *() const {
+		operator *() const
+		{
 			return FlashReader<T, sizeof(T)>::read(address);
 		}
 		
 		ALWAYS_INLINE
 		const T
-		operator [](size_t index) const {
+		operator [](size_t index) const
+		{
 			return FlashReader<T, sizeof(T)>::read(address + index);
 		}
 		
@@ -131,27 +138,18 @@ namespace xpcc
 		
 		ALWAYS_INLINE
 		const T*
-		getPointer() const {
+		getPointer() const
+		{
 			return address;
 		}
+	
+	private:
+		const T* address;
 	
 	private:
 		template <typename U>
 		friend IOStream&
 		operator << ( IOStream&, const FlashPointer<U>&);
-
-		const T* address;
-	};
-	
-	/**
-	 * \ingroup	hal
-	 * \brief	
-	 */
-	template<typename T>
-	ALWAYS_INLINE FlashPointer<T>
-	toFlashPointer(const T* ptr)
-	{
-		return FlashPointer<T>(ptr);
 	};
 };
 
@@ -160,7 +158,9 @@ namespace xpcc
 // -----------------------------------------------------------------------------
 
 /**
- * Streamoperator - the template version is not implemented yet!!
+ * \brief	Streamoperator
+ * 
+ * \warning	Not implemented yet!!
  * \ingroup hal
  */
 template<typename T>
@@ -177,7 +177,7 @@ operator << ( xpcc::IOStream& os, xpcc::FlashPointer<T> ptr)
 };
 
 /**
- * Streamoperator - specialisation with \b char for the template.
+ * \brief	Streamoperator - specialization for \c char
  * \ingroup hal
  */
 xpcc::IOStream&

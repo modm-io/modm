@@ -49,7 +49,7 @@ FLASH(MyPair flashValues[6]) =
 void 
 LinearInterpolationTest::testInterpolation()
 {
-	xpcc::LinearInterpolation<MyPair> value(xpcc::toFlashPointer(flashValues), 6);
+	xpcc::LinearInterpolation<MyPair> value(xpcc::modifier::flash(flashValues), 6);
 	
 	TEST_ASSERT_EQUALS(value.interpolate(  0),  -200);
 	TEST_ASSERT_EQUALS(value.interpolate( 10),  -200);

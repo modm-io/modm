@@ -38,18 +38,17 @@ FLASH(uint16_t base[]) = { 10, 100, 1000, 10000 };
 
 
 // ----------------------------------------------------------------------------
-xpcc::IOStream::IOStream( IODevice* device ) :
-	device( device ),
-	mode ( ASCII )
+xpcc::IOStream::IOStream(IODevice& device) :
+	device(&device),
+	mode(ASCII)
 {
 }
 
 // ----------------------------------------------------------------------------
-
 void
 xpcc::IOStream::putInteger(int16_t value)
 {
-	FlashPointer<uint16_t> basePtr = xpcc::toFlashPointer(base);
+	FlashPointer<uint16_t> basePtr = xpcc::modifier::flash(base);
 	
 	if (value < 0) {
 		value = -value;
@@ -79,7 +78,7 @@ void
 xpcc::IOStream::putInteger(uint16_t value)
 {
 	bool zero = true;
-	FlashPointer<uint16_t> basePtr = xpcc::toFlashPointer(base);
+	FlashPointer<uint16_t> basePtr = xpcc::modifier::flash(base);
 
 	uint8_t i = 4;
 	do {
@@ -106,17 +105,14 @@ xpcc::IOStream::putInteger(int32_t value)
 	// uses the optimized non standard function 'ltoa()' which is
 	// not always available. For the general case snprintf() is
 	// used.
-
-	// -2,147,483,648 to 2,147,483,647
-	char buffer[12];
-
+	char buffer[ArithmeticTraits<int32_t>::decimalDigits + 1]; // +1 for '\0'
 	this->device->put(ltoa(value, buffer, 10));
 #else
-	char str[ArithmeticTraits<int32_t>::decimalDigits + 1]; // +1 for '\0'
+	char buffer[ArithmeticTraits<int32_t>::decimalDigits + 1]; // +1 for '\0'
 
-	snprintf(str, sizeof(str), "%d", value);
+	snprintf(buffer, sizeof(str), "%d", value);
 
-	this->device->put(str);
+	this->device->put(buffer);
 #endif
 }
 	
@@ -127,22 +123,38 @@ xpcc::IOStream::putInteger(uint32_t value)
 	// uses the optimized non standard function 'ltoa()' which is
 	// not always available. For the general case snprintf() is
 	// used.
-
-	// 0 to 4,294,967,295
-	char buffer[11];
-		
+	char buffer[ArithmeticTraits<uint32_t>::decimalDigits + 1]; // +1 for '\0'		
 	this->device->put(ultoa(value, buffer, 10));
 #else
-	char str[ArithmeticTraits<uint32_t>::decimalDigits + 1]; // +1 for '\0'
+	char buffer[ArithmeticTraits<uint32_t>::decimalDigits + 1]; // +1 for '\0'
 
-	snprintf(str, sizeof(str), "%d", value);
+	snprintf(buffer, sizeof(buffer), "%u", value);
 
-	this->device->put(str);
+	this->device->put(buffer);
 #endif
 }
 
-// ----------------------------------------------------------------------------
+#ifndef __AVR__
+void
+xpcc::IOStream::putInteger(int64_t value)
+{
+	char buffer[ArithmeticTraits<int64_t>::decimalDigits + 1]; // +1 for '\0'
+	
+	snprintf(buffer, sizeof(buffer), "%ld", value);
+	this->device->put(buffer);
+}
 
+void
+xpcc::IOStream::putInteger(uint64_t value)
+{
+	char buffer[ArithmeticTraits<uint64_t>::decimalDigits + 1]; // +1 for '\0'
+	
+	snprintf(buffer, sizeof(buffer), "%lu", value);
+	this->device->put(buffer);
+}
+#endif
+
+// ----------------------------------------------------------------------------
 void
 xpcc::IOStream::putHex( const char* s )
 {
@@ -153,29 +165,26 @@ xpcc::IOStream::putHex( const char* s )
 }
 
 // ----------------------------------------------------------------------------
-
 void
 xpcc::IOStream::putHex( char value )
 {
 	char nibble = (value >> 4);
 	char hex;
 
-	if ( nibble > 9 ) {
-		hex = nibble+'A'-10;
+	if (nibble > 9) {
+		hex = nibble + 'A' - 10;
 	}
 	else {
-		hex = nibble+'0';
+		hex = nibble + '0';
 	}
-
 	this->device->put(hex);
 
 	nibble = (value & 0xF);
-	if ( nibble > 9 ) {
-		hex = nibble+'A'-10;
+	if (nibble > 9) {
+		hex = nibble + 'A' - 10;
 	}
 	else {
-		hex = nibble+'0';
+		hex = nibble + '0';
 	}
-
 	this->device->put(hex);
 }

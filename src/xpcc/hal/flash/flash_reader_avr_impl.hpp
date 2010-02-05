@@ -26,15 +26,13 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: flash_reader_avr.hpp 71 2009-10-12 21:43:00Z dergraaf $
+ * $Id$
  */
 // ----------------------------------------------------------------------------
 
 #ifndef	XPCC__FLASH_READER_HPP
-
-#error	"Don't include this file directly, use \"flash_reader.hpp\" instead!"
-
-#else
+	#error	"Don't include this file directly, use 'flash_reader.hpp' instead!"
+#endif
 
 #include <string.h>
 #include <avr/pgmspace.h>
@@ -197,5 +195,3 @@ namespace xpcc
 		}
 	};
 }
-
-#endif	// XPCC__FLASH_READER_HPP
