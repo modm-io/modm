@@ -35,37 +35,102 @@
 #endif
 
 // ----------------------------------------------------------------------------
-
 template <typename T>
 xpcc::List<T>::List() : 
 	first(0), last(0)
 {
 }
 
+// ----------------------------------------------------------------------------
 template <typename T>
 void
-xpcc::List<T>::prepend(Item *item)
+xpcc::List<T>::prepend(Node *node)
 {
 	if (first == 0) {
-		first = item;
-		last = item;
+		first = node;
+		last = node;
 	}
 	else {
-		item->next = first;
-		first = item;
+		node->next = first;
+		first = node;
 	}
 }
 
 template <typename T>
 void
-xpcc::List<T>::append(Item *item)
+xpcc::List<T>::append(Node *node)
 {
 	if (first == 0) {
-		first = item;
-		last = item;
+		first = node;
+		last = node;
 	}
 	else {
-		last->next = item;
-		last = item;
+		last->next = node;
+		last = node;
 	}
+}
+
+template <typename T>
+void
+xpcc::List<T>::insertAfter(Node *current, Node *newNode)
+{
+	newNode->next = current->next;
+	current->next = newNode;
+}
+
+template <typename T>
+bool
+xpcc::List<T>::remove(Node *node)
+{
+	if (node == first)
+	{
+		first = node->next;
+		if (first == 0) {
+			// list is now empty
+			last = 0;
+		}
+		
+		node->next = 0;
+		return true;
+	}
+	
+	Node *c = first;
+	do {
+		if (c->next == node) {
+			c->next = node->next;
+			
+			if (c->next == 0) {
+				last = c;
+			}
+			
+			node->next = 0;
+			return true;
+		}
+	}
+	while ((c = c->next));
+	
+	return false;
+}
+
+template <typename T>
+typename xpcc::List<T>::Node*
+xpcc::List<T>::at(int index) const
+{
+	Node *node = first;
+	for (int i = 0; i < index; i++)
+	{
+		if (node == 0) {
+			break;
+		}
+		node = node->next;
+	}
+	return node;
+}
+
+// ----------------------------------------------------------------------------
+template <typename T>
+bool
+xpcc::List<T>::isEmpty() const
+{
+	return (first == 0);
 }

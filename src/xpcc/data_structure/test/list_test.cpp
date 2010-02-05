@@ -37,9 +37,44 @@
 void
 ListTest::testList()
 {
-	xpcc::List<uint16_t> list;
+	typedef xpcc::List<uint16_t> MyList;
 	
-	xpcc::List<uint16_t>::Item item1(80);
+	MyList list;
 	
-	list.append(&item1);
+	MyList::Node node1(1);
+	MyList::Node node2(2);
+	MyList::Node node3(3);
+	
+	TEST_ASSERT_TRUE(list.isEmpty());
+	
+	list.append(&node2);
+	
+	TEST_ASSERT_FALSE(list.isEmpty());
+	TEST_ASSERT_EQUALS(list.at(0)->getValue(), 2);
+	
+	list.prepend(&node1);
+	
+	TEST_ASSERT_EQUALS(list.at(0)->getValue(), 1);
+	
+	list.insertAfter(&node2, &node3);
+	
+	TEST_ASSERT_EQUALS(list.at(0)->getValue(), 1);
+	TEST_ASSERT_EQUALS(list.at(1)->getValue(), 2);
+	TEST_ASSERT_EQUALS(list.at(2)->getValue(), 3);
+	
+	MyList::Node *node = list.at(5);
+	TEST_ASSERT_TRUE(node == 0);
+	
+	list.remove(&node2);
+	
+	TEST_ASSERT_EQUALS(list.at(0)->getValue(), 1);
+	TEST_ASSERT_EQUALS(list.at(1)->getValue(), 3);
+	
+	list.remove(&node3);
+	
+	TEST_ASSERT_EQUALS(list.at(0)->getValue(), 1);
+	
+	list.remove(&node1);
+	
+	TEST_ASSERT_TRUE(list.isEmpty());
 }

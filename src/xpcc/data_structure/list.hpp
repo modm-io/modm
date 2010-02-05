@@ -36,24 +36,28 @@
 namespace xpcc
 {
 	/**
-	 * \brief	Singly-linked list
+	 * \brief	Single-linked list
 	 * 
 	 * \tparam	T	type of list entries
 	 * 
+	 * \warning	The node passed to the functions must allways be valid
+	 * 			List::Node object
 	 * \ingroup	data_structure
+	 * 
+	 * \todo	This implementation needs an iterator interface!
 	 */
 	template <typename T>
 	class List
 	{
 	public:
 		/**
-		 * \brief	Item of the list
+		 * \brief	One item of the list
 		 */
-		struct Item
+		struct Node
 		{
 			friend class List;
 			
-			Item(const T& value = T()) :
+			Node(const T& value = T()) :
 				next(0), value(value)
 			{
 			}
@@ -65,28 +69,49 @@ namespace xpcc
 			}
 			
 		private:
-			Item *next;
+			Node *next;
 			T value;
 		};
 		
 	public:
 		List();
 		
+		
+		/// Insert in front
 		void
-		prepend(Item *item);
+		prepend(Node *node);
 		
+		/// Insert at the end of the list
 		void
-		append(Item *item);
+		append(Node *node);
 		
+		/// Insert node after a given node
 		void
-		insertAfter(Item *first, Item *item);
+		insertAfter(Node *current, Node *newNode);
 		
-		Item *
-		remove(Item *item);
+		/// remove an node form the list
+		bool
+		remove(Node *node);
 		
+		
+		/// check if there are any nodes in the list
+		bool
+		isEmpty() const;
+		
+		
+		/**
+		 * \brief	Access the node at position \a index
+		 * 
+		 * \warning	The implementation has to iterate throu the list
+		 * 			until it reaches the desired position. Therefore an
+		 * 			access via iterator is prefered.
+		 */
+		Node*
+		at(int index) const;
+	
 	private:
-		Item *first;
-		Item *last;
+		Node *first;
+		Node *last;
 	};
 }
 
