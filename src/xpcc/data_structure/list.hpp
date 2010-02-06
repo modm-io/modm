@@ -33,6 +33,8 @@
 #ifndef	XPCC__LIST_HPP
 #define	XPCC__LIST_HPP
 
+#include <stdint.h>
+
 namespace xpcc
 {
 	/**
@@ -55,11 +57,21 @@ namespace xpcc
 		 */
 		struct Node
 		{
-			friend class List;
-			
-			Node(const T& value = T()) :
-				next(0), value(value)
+			Node(const T& initalValue = T()) :
+				next(0), value(initalValue)
 			{
+			}
+			
+			void
+			setValue(const T& newValue)
+			{
+				this->value = newValue;
+			}
+			
+			const T&
+			getValue() const
+			{
+				return value;
 			}
 			
 			T&
@@ -71,6 +83,52 @@ namespace xpcc
 		private:
 			Node *next;
 			T value;
+		
+		private:
+			friend class List;
+		};
+		
+		/**
+		 * \brief	Efficient way of creating a pool of nodes
+		 * 
+		 * Creates an array of nodes.
+		 * 
+		 * \code
+		 * typedef xpcc::List<uint16_t> MyList;
+		 * 
+		 * MyList::NodeFactory<3> *factory = new MyList::NodeFactory<3>();
+		 * MyList list;
+		 * 
+		 * list.append(factory->getNode(1));
+		 * list.append(factory->getNode(-1123));
+		 * \endcode
+		 * 
+		 * \todo perhaps this class should become an allocator for the list class?
+		 */
+		template<int N>
+		class NodeFactory
+		{
+		public:
+			NodeFactory();
+			
+			Node *
+			getNode();
+			
+			Node *
+			getNode(const T& value);
+			
+			void
+			freeNode(Node *node);
+			
+			bool
+			isEmpty() const;
+			
+		private:
+			Node pool[N];
+			Node *first;
+		
+		private:
+			friend class Node;
 		};
 		
 	public:
@@ -87,12 +145,33 @@ namespace xpcc
 		
 		/// Insert node after a given node
 		void
-		insertAfter(Node *current, Node *newNode);
+		insertAfter(Node *previous, Node *newNode);
 		
-		/// remove an node form the list
-		bool
+		/**
+		 * \brief	Remove an node form the list
+		 * 
+		 * This method has to iterate through the list to find the predecessor
+		 * of the node to be removed.
+		 * 
+		 * Therefore removeAfter() and removeFirst() should be prefered.
+		 */
+		Node*
 		remove(Node *node);
 		
+		/**
+		 * \brief	Remove the node after the given node
+		 */
+		Node*
+		removeAfter(Node *previous);
+		
+		/**
+		 * Remove the first entry
+		 * 
+		 * \warning	The method doesn't check if there is a first entry. This
+		 * 			have to be done by a call to isEmpty() before.
+		 */
+		Node*
+		removeFirst();
 		
 		/// check if there are any nodes in the list
 		bool
@@ -102,7 +181,7 @@ namespace xpcc
 		/**
 		 * \brief	Access the node at position \a index
 		 * 
-		 * \warning	The implementation has to iterate throu the list
+		 * \warning	The implementation has to iterate through the list
 		 * 			until it reaches the desired position. Therefore an
 		 * 			access via iterator is prefered.
 		 */
@@ -116,5 +195,6 @@ namespace xpcc
 }
 
 #include "list_impl.hpp"
+#include "list_factory_impl.hpp"
 
 #endif	// XPCC__LIST_HPP

@@ -32,20 +32,9 @@
 
 #include <unittest/testsuite.hpp>
 
-class ListTest : public unittest::TestSuite
+class ListFactoryTest : public unittest::TestSuite
 {
 public:
 	void
-	testAppendAndAt();
-	
-	void
-	testPrepend();
-	
-	void
-	testInsertAfter();
-	
-	void
-	testRemoveAndEmpty();
-	
-	// TODO test removeAfter and removeFirst
+	testFactory();
 };

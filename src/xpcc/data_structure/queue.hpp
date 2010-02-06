@@ -37,7 +37,6 @@
 namespace xpcc
 {
 	/**
-	 * \ingroup	data_structure
 	 * \brief	FIFO queue
 	 * 
 	 * Elements are pushed into the "back" of the specific container and popped 
@@ -47,6 +46,7 @@ namespace xpcc
 	 * \tparam	Container	container
 	 * 
 	 * \see		Deque()
+	 * \ingroup	data_structure
 	 */
 	template<typename T,
 			 typename Container>
@@ -80,28 +80,28 @@ namespace xpcc
 			return c.getMaxSize();
 		}
 		
-		/// \brief	Access next element
+		/// Access first element
 		T&
 		front()
 		{
 			return c.front();
 		}
 		
-		/// \brief	Access next element
+		/// Access first element
 		const T&
 		front() const
 		{
 			return c.front();
 		}
 		
-		/// \brief	Access last element
+		/// Access last element
 		T&
 		back()
 		{
 			return c.back();
 		}
 		
-		/// \brief	Access last element
+		/// Access last element
 		const T&
 		back() const
 		{
@@ -127,8 +127,8 @@ namespace xpcc
 
 	// ------------------------------------------------------------------------
 	/**
-	 * \ingroup	data_structure
 	 * \brief	Bounded queue
+	 * \ingroup	data_structure
 	 */
 	template<typename T, 
 			 int N,

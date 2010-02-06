@@ -32,100 +32,28 @@
 
 #include <xpcc/data_structure/list.hpp>
 
-#include "list_test.hpp"
+#include "list_factory_test.hpp"
 
 typedef xpcc::List<uint16_t> MyList;
 
 void
-ListTest::testAppendAndAt()
+ListFactoryTest::testFactory()
 {
+	MyList::NodeFactory<3> *factory = new MyList::NodeFactory<3>();
+	
+	TEST_ASSERT_FALSE(factory->isEmpty());
+	
 	MyList list;
 	
-	MyList::Node node1(1);
-	MyList::Node node2(2);
-	MyList::Node node3(3);
+	list.append(factory->getNode(1));
+	list.append(factory->getNode(2));
+	list.append(factory->getNode(3));
 	
-	list.append(&node1);
-	list.append(&node2);
-	list.append(&node3);
+	TEST_ASSERT_TRUE(factory->isEmpty());
 	
 	TEST_ASSERT_EQUALS(list.at(0)->getValue(), 1);
 	TEST_ASSERT_EQUALS(list.at(1)->getValue(), 2);
 	TEST_ASSERT_EQUALS(list.at(2)->getValue(), 3);
 	
-	MyList::Node *node = list.at(5);
-	TEST_ASSERT_TRUE(node == 0);
+	delete factory;
 }
-
-void
-ListTest::testPrepend()
-{
-	MyList list;
-	
-	MyList::Node node1(1);
-	MyList::Node node2(2);
-	MyList::Node node3(3);
-	
-	list.prepend(&node3);
-	list.prepend(&node2);
-	list.prepend(&node1);
-	
-	TEST_ASSERT_EQUALS(list.at(0)->getValue(), 1);
-	TEST_ASSERT_EQUALS(list.at(1)->getValue(), 2);
-	TEST_ASSERT_EQUALS(list.at(2)->getValue(), 3);
-}
-
-void
-ListTest::testInsertAfter()
-{
-	MyList list;
-	
-	MyList::Node node1(1);
-	MyList::Node node2(2);
-	MyList::Node node3(3);
-	MyList::Node node4(4);
-	
-	list.append(&node1);
-	
-	list.insertAfter(&node1, &node4);
-	list.insertAfter(&node1, &node2);
-	list.insertAfter(&node2, &node3);
-	
-	TEST_ASSERT_EQUALS(list.at(0)->getValue(), 1);
-	TEST_ASSERT_EQUALS(list.at(1)->getValue(), 2);
-	TEST_ASSERT_EQUALS(list.at(2)->getValue(), 3);
-	TEST_ASSERT_EQUALS(list.at(3)->getValue(), 4);
-}
-
-void
-ListTest::testRemoveAndEmpty()
-{
-	MyList list;
-	
-	MyList::Node node1(1);
-	MyList::Node node2(2);
-	MyList::Node node3(3);
-	
-	TEST_ASSERT_TRUE(list.isEmpty());
-	
-	list.append(&node1);
-	list.append(&node2);
-	list.append(&node3);
-	
-	TEST_ASSERT_FALSE(list.isEmpty());
-	
-	list.remove(&node2);
-	
-	TEST_ASSERT_EQUALS(list.at(0)->getValue(), 1);
-	TEST_ASSERT_EQUALS(list.at(1)->getValue(), 3);
-	
-	list.remove(&node3);
-	
-	TEST_ASSERT_EQUALS(list.at(0)->getValue(), 1);
-	TEST_ASSERT_FALSE(list.isEmpty());
-	
-	list.remove(&node1);
-	
-	TEST_ASSERT_TRUE(list.isEmpty());
-}
-

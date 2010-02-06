@@ -92,9 +92,11 @@ namespace xpcc
 		inline Size
 		getMaxSize() const;
 		
-		/// \brief		Clear the container
-		///
-		/// \warning	This will discard all the items in the container
+		/**
+		 * \brief	Clear the container
+		 *
+		 * \warning	This will discard all the items in the container
+		 */
 		void
 		clear();
 		
@@ -127,9 +129,11 @@ namespace xpcc
 	public:
 		friend class const_iterator;
 		
-		/// \brief	Bidirectional const iterator
-		///
-		/// \todo	check if a simpler implementation is possible
+		/**
+		 * \brief	Bidirectional const iterator
+		 *
+		 * \todo	check if a simpler implementation is possible
+		 */
 		class const_iterator
 		{
 			friend class BoundedDeque;

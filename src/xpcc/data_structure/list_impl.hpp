@@ -72,14 +72,14 @@ xpcc::List<T>::append(Node *node)
 
 template <typename T>
 void
-xpcc::List<T>::insertAfter(Node *current, Node *newNode)
+xpcc::List<T>::insertAfter(Node *previous, Node *newNode)
 {
-	newNode->next = current->next;
-	current->next = newNode;
+	newNode->next = previous->next;
+	previous->next = newNode;
 }
 
 template <typename T>
-bool
+typename xpcc::List<T>::Node*
 xpcc::List<T>::remove(Node *node)
 {
 	if (node == first)
@@ -91,7 +91,7 @@ xpcc::List<T>::remove(Node *node)
 		}
 		
 		node->next = 0;
-		return true;
+		return node;
 	}
 	
 	Node *c = first;
@@ -104,12 +104,45 @@ xpcc::List<T>::remove(Node *node)
 			}
 			
 			node->next = 0;
-			return true;
+			return node;
 		}
 	}
 	while ((c = c->next));
 	
-	return false;
+	return 0;
+}
+
+template <typename T>
+typename xpcc::List<T>::Node*
+xpcc::List<T>::removeAfter(Node *previous)
+{
+	Node *node = previous->next;
+	if (node == 0) {
+		return 0;
+	}
+	previous->next = node->next;
+	node->next = 0;
+	
+	if (node == last) {
+		last = previous;
+	}
+	return node;
+}
+
+template <typename T>
+typename xpcc::List<T>::Node*
+xpcc::List<T>::removeFirst()
+{
+	Node *node = first;
+	first = first->next;
+	if (first == 0) {
+		// list is now empty
+		last = 0;
+	}
+	else {	
+		node->next = 0;
+	}
+	return node;
 }
 
 template <typename T>
