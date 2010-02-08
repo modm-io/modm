@@ -5,6 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
+ * 
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -28,25 +29,25 @@
  * $Id$
  */
 // ----------------------------------------------------------------------------
-#ifndef XPCC_TIPC_H_
-#define XPCC_TIPC_H_
 
+#ifndef XPCC__TIPC_H
+#define XPCC__TIPC_H
 
-#include "../backend_interface.hpp"
 #include <xpcc/driver/tipc/header.hpp>
 #include <xpcc/driver/tipc/tipc_receiver.hpp>
 #include <xpcc/driver/tipc/tipc_transmitter.hpp>
 #include <xpcc/data_structure/smart_pointer.hpp>
 
-namespace xpcc {
-	namespace tipc {
+#include "../backend_interface.hpp"
 
+namespace xpcc
+{
+	namespace tipc
+	{
 		/**
-		 * \class	Tipc
 		 * \brief	Class that connects the communication to the tipc.
 		 *
 		 * \ingroup	tipc
-		 * \version	$Id$
 		 * \author	Martin Rosekeit <martin.rosekeit@rwth-aachen.de>
 		 */
 		class Tipc : public BackendInterface
@@ -68,11 +69,11 @@ namespace xpcc {
 					this->receiver.addReceiverId(id);
 				}
 
-				//! Check if a new packet was received by the backend
+				/// Check if a new packet was received by the backend
 				virtual bool
 				isPacketAvailable() const;
 
-				//! Access the packet.
+				/// Access the packet.
 				virtual const xpcc::Header&
 				getPacketHeader() const;
 
@@ -87,12 +88,15 @@ namespace xpcc {
 
 				virtual void
 				update();
-
-				//! Send a Message.
-				//!
-				//! \return	\b true if the packet could be send, \b false otherwise.
+				
+				/**
+				 * Send a Message.
+				 *
+				 * \return	\b true if the packet could be send, \b false otherwise.
+				 */
 				virtual void
-				sendPacket(const xpcc::Header &header, SmartPointer payload = SmartPointer());
+				sendPacket(const xpcc::Header &header,
+						   SmartPointer payload = SmartPointer());
 
 			private :
 				Receiver	receiver;
@@ -101,4 +105,4 @@ namespace xpcc {
 	};
 };
  
-#endif /*XPCC_TIPC_H_*/
+#endif	// XPCC__TIPC_H

@@ -30,14 +30,14 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC_COMMUNICATION_LIST_HPP
-#define	XPCC_COMMUNICATION_LIST_HPP
+#ifndef	XPCC__COMMUNICATION_LIST_HPP
+#define	XPCC__COMMUNICATION_LIST_HPP
 
+#include <xpcc/hal/time/internal_clock.hpp>
 
 #include "backend/backend_interface.hpp"
 #include "postman/postman.hpp"
 #include "response_callback.hpp"
-#include "../hal/time/internal_clock.hpp"
 
 /**
  * \ingroup 	communication
@@ -236,4 +236,4 @@ namespace communicationList{
 }
 }
 
-#endif // XPCC_COMMUNICATION_LIST_HPP
+#endif // XPCC__COMMUNICATION_LIST_HPP

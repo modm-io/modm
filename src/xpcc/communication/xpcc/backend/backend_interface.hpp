@@ -5,6 +5,7 @@
  * 
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
+ * 
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -29,8 +30,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC_BACKEND_INTERFACE_H
-#define	XPCC_BACKEND_INTERFACE_H
+#ifndef	XPCC__BACKEND_INTERFACE_HPP
+#define	XPCC__BACKEND_INTERFACE_HPP
 
 #include <stdint.h>
 
@@ -39,11 +40,9 @@
 namespace xpcc
 {
 	/**
-	 * \ingroup		communication
 	 * \brief 		The header of the communication.
 	 *
-	 *
-	 * \version		$Id: backend_interface.hpp 90 2009-10-17 15:51:00Z thundernail $
+	 * \ingroup		communication
 	 * \author		Martin Rosekeit, Fabian Greif
 	 */
 	struct Header
@@ -88,13 +87,12 @@ namespace xpcc
 	};
 	
 	/**
-	 * \ingroup		communication
 	 * \brief 		The BackendInterface provides a common interface for using
 	 * 				different hardware modules to transmit messages.
 	 *
 	 * All backends have to implement the this interface.
 	 *
-	 * \version		$Id: backend_interface.hpp 90 2009-10-17 15:51:00Z thundernail $
+	 * \ingroup		communication
 	 * \author		Martin Rosekeit, Fabian Greif
 	 */
 	class BackendInterface
@@ -106,16 +104,16 @@ namespace xpcc
 		virtual void
 		update() = 0;
 		
-		//! Send a Message. // soll denn der header kopiert werden?
+		/// Send a Message. // soll denn der header kopiert werden?
 		virtual void
 		sendPacket( const Header &header, SmartPointer payload = SmartPointer() ) = 0;
 		
 		
-		//! Check if a new packet was received by the backend
+		/// Check if a new packet was received by the backend
 		virtual bool
 		isPacketAvailable() const = 0;
 		
-		//! Access the packet.
+		/// Access the packet.
 		virtual const Header&
 		getPacketHeader() const = 0;
 		
@@ -130,4 +128,4 @@ namespace xpcc
 	};
 }
 
-#endif	// XPCC_BACKEND_INTERFACE_H
+#endif	// XPCC__BACKEND_INTERFACE_HPP
