@@ -51,6 +51,16 @@ namespace xpcc
 	public:
 		typedef CartesianCoordinate<T> Position;
 
+		Location();
+
+		Location(const Position& position, const Angle& phi);
+
+		Location(const Position& position, float phi);
+
+		Location(const T& x, const T& y, const Angle& phi);
+
+		Location(const T& x, const T& y, float phi);
+
 		/// \brief	Add a position increment
 		void
 		update(Location& diff);
@@ -82,6 +92,51 @@ namespace xpcc
 // IMPLEMENTATION
 // -----------------------------------------------------------------------------
 
+template <typename T>
+xpcc::Location<T>::Location() :
+	position(0, 0),
+	phi(0)
+{
+
+}
+
+// -----------------------------------------------------------------------------
+template <typename T>
+xpcc::Location<T>::Location(const Position& position, const Angle& phi) :
+	position(position),
+	phi(phi)
+{
+
+}
+
+// -----------------------------------------------------------------------------
+template <typename T>
+xpcc::Location<T>::Location(const Position& position, float phi) :
+	position(position),
+	phi(phi)
+{
+
+}
+
+// -----------------------------------------------------------------------------
+template <typename T>
+xpcc::Location<T>::Location(const T& x, const T& y, const Angle& phi) :
+	position(x, y),
+	phi(phi)
+{
+
+}
+
+// -----------------------------------------------------------------------------
+template <typename T>
+xpcc::Location<T>::Location(const T& x, const T& y, float phi) :
+	position(x, y),
+	phi(phi)
+{
+
+}
+
+// -----------------------------------------------------------------------------
 template <typename T>
 void
 xpcc::Location<T>::update(Location<T>& diff)
