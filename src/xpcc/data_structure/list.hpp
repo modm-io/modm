@@ -43,10 +43,11 @@ namespace xpcc
 	 * \tparam	T	type of list entries
 	 * 
 	 * \warning	The node passed to the functions must allways be valid
-	 * 			List::Node object
-	 * \ingroup	data_structure
-	 * 
+	 * 			List::Node object 	 
 	 * \todo	This implementation needs an iterator interface!
+	 *
+	 * \author	Fabian Greif
+	 * \ingroup	data_structure
 	 */
 	template <typename T>
 	class List

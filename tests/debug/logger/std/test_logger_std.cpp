@@ -5,6 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
+ *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -37,13 +38,13 @@
 
 #else
 
-#include <xpcc/io/backplane/std/std_iodevice.hpp>
+#include <xpcc/architecture/pc/terminal.hpp>
 #include <xpcc/debug/logger/logger.hpp>
 #include <xpcc/debug/logger/style_wrapper.hpp>
 #include <xpcc/debug/logger/style/std_colour.hpp>
 #include <xpcc/debug/logger/style/prefix.hpp>
 
-xpcc::StdIODevice device;
+xpcc::pc::Terminal device;
 
 xpcc::log::Prefix< char[8] > prefix("DEBUG: ", device);
 xpcc::log::StdColour<xpcc::log::BLUE, xpcc::log::NONE, xpcc::log::Prefix< char[8] > > style( prefix );

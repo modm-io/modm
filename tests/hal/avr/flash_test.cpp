@@ -1,5 +1,5 @@
 
-#include <xpcc/hal/flash/flash_pointer.hpp>
+#include <xpcc/architecture/general/flash/flash_pointer.hpp>
 
 //extern const int a PROGMEM;
 //const int a = 12;

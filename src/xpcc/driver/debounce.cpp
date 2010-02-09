@@ -30,7 +30,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/hal/atomic/lock.hpp>
+#include <xpcc/architecture/general/atomic/lock.hpp>
 
 #include "debounce.hpp"
 

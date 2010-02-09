@@ -37,8 +37,12 @@
 
 namespace unittest
 {
-	/// \ingroup	unittest
-	/// \brief		Base class for every test suite
+	/**
+	 * \brief	Base class for every test suite
+	 * 
+	 * \author	Fabian Greif
+	 * \ingroup	unittest
+	 */
 	class TestSuite
 	{
 	public:

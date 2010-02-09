@@ -34,15 +34,12 @@
 #define XPCC__LCD_HPP
 
 #include <stdint.h>
-#include <xpcc/io/iodevice.hpp>
+#include <xpcc/communication/io/iodevice.hpp>
 
 namespace xpcc
 {
 	/**
-	 * \ingroup	driver
 	 * \brief	Base class for alphanumeric LCDs (liquid crystal display)
-	 * 
-	 * 
 	 * 
 	 * <h3>About this implementation:</h3> 
 	 * 
@@ -53,6 +50,9 @@ namespace xpcc
 	 * 
 	 * Therefore creating this class with static methods and using a wrapper
 	 * class to create a IODevice seems unnecessary complicated.
+	 * 
+	 * \author	Fabian Greif
+	 * \ingroup	driver
 	 */
 	class Lcd : public IODevice
 	{
@@ -74,23 +74,27 @@ namespace xpcc
 		virtual void
 		initialize() = 0;
 		
-		/// \brief	Write a character
-		/// 
-		/// This method provides an automatic wrap-round if the output reaches
-		/// the end of the current line or a newline character is detected.
-		/// 
-		/// Use putRaw() if this behavior is not wanted.
+		/**
+		 * \brief	Write a character
+		 * 
+		 * This method provides an automatic wrap-round if the output reaches
+		 * the end of the current line or a newline character is detected.
+		 * 
+		 * Use putRaw() if this behavior is not wanted.
+		 */
 		virtual void
 		put(char c);
 		
 		// import the other versions of put() from IODevice
 		using IODevice::put;
 		
-		/// \brief	Write a raw character at cursor position
-		/// 
-		/// Unlike put() no further processing will occur.
-		/// 
-		/// \see	put()
+		/**
+		 * \brief	Write a raw character at cursor position
+		 * 
+		 * Unlike put() no further processing will occur.
+		 * 
+		 * \see	put()
+		 */
 		virtual void
 		putRaw(char c) = 0;
 		
@@ -101,17 +105,21 @@ namespace xpcc
 		//virtual void
 		//command(Command command) = 0;
 		
-		/// \brief	Set cursor to specified position
-		/// 
-		/// \param	line	vertical position
-		/// \param	column	horizontal position
+		/**
+		 * \brief	Set cursor to specified position
+		 * 
+		 * \param	line	vertical position
+		 * \param	column	horizontal position
+		 */
 		virtual void
 		setPosition(uint8_t line, uint8_t column) = 0;
 		
-		/// \brief	Read a character
-		///
-		/// Because a LCD is a read-only device this method will always return
-		/// \c false.
+		/**
+		 * \brief	Read a character
+		 *
+		 * Because a LCD is a read-only device this method will always return
+		 * \c false.
+		 */
 		virtual bool
 		get(char&)
 		{

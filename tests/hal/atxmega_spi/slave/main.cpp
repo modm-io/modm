@@ -1,15 +1,15 @@
 #include <avr/interrupt.h>
 
-#include <xpcc/hal/peripheral/gpio.hpp>
-#include <xpcc/hal/peripheral/software_spi.hpp>
-#include <xpcc/hal/time/delay.hpp>
-#include <xpcc/hal/peripheral/avr/xmega/spi.hpp>
+#include <xpcc/architecture/gpio.hpp>
+#include <xpcc/architecture/software_spi.hpp>
+#include <xpcc/architecture/general/time/delay.hpp>
+#include <xpcc/architecture/avr/xmega/spi.hpp>
 
 #include <xpcc/driver/lcd/dog_m16x.hpp>
 #include <xpcc/driver/debounce.hpp>
 
-#include <xpcc/io/iostream.hpp>
-#include <xpcc/io/iodevice_wrapper.hpp>
+#include <xpcc/communication/io/iostream.hpp>
+#include <xpcc/communication/io/iodevice_wrapper.hpp>
 
 #include <xpcc/utils/misc.hpp>
 

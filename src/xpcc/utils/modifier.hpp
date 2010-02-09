@@ -34,7 +34,7 @@
 #define	XPCC__MODIFIER_HPP
 
 #include <xpcc/utils/macros.hpp>
-#include <xpcc/hal/flash/flash_pointer.hpp>
+#include <xpcc/architecture/general/flash/flash_pointer.hpp>
 
 namespace xpcc
 {

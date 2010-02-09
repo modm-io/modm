@@ -5,6 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
+ * 
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -28,10 +29,9 @@
  * $Id: tipc_receiver.hpp 91 2009-10-17 15:53:04Z thundernail $
  */
 // ----------------------------------------------------------------------------
-#ifndef XPCC_TIPC_RECEIVER_H_
-#define XPCC_TIPC_RECEIVER_H_
- 
-#include "tipc_receiver_socket.hpp"
+
+#ifndef XPCC_TIPC__RECEIVER_HPP
+#define XPCC_TIPC__RECEIVER_HPP
 
 #include <queue>
 
@@ -40,64 +40,67 @@
 #include <boost/scoped_ptr.hpp>
 #include <xpcc/data_structure/smart_pointer.hpp>
 
-namespace xpcc {
-	namespace tipc {
+#include "tipc_receiver_socket.hpp"
 
+namespace xpcc
+{
+	namespace tipc
+	{
 		/**
 		 * \brief		Receive Packets over the TIPC and store them.
 		 * 
 		 * In a separate thread the packets are taken from the TIPC and saved local.
 		 *  
 		 * \ingroup		tipc
-		 * \version		$Id: tipc_receiver.hpp 91 2009-10-17 15:53:04Z thundernail $
 		 * \author		Carsten Schmitt < >
 		 */
-		class Receiver {
-			public:
-				Receiver();
+		class Receiver
+		{
+		public:
+			Receiver();
 
-			 	~Receiver();
+			~Receiver();
 
-				void
-				addEventId(uint8_t id);
+			void
+			addEventId(uint8_t id);
 
-				void
-				addReceiverId(uint8_t id);
+			void
+			addReceiverId(uint8_t id);
 
-				bool
-				hasPacket() const;
+			bool
+			hasPacket() const;
 
-				const xpcc::SmartPointer&
-				frontPayload() const;
-				
-				void 
-				popFront();
-				
-			private:
-				typedef xpcc::SmartPointerVolatile		Payload;
-				typedef boost::mutex					Mutex;
-				typedef boost::mutex::scoped_lock		MutexGuard;
-				typedef	boost::thread::thread			Thread;
-				
-				bool 
-				isAlive();
-		
-				void* 
-				runReceiver();
-				
-				void 
-				update();
-				
-				ReceiverSocket						tipcReceiverSocket_;
-				std::queue<Payload>					packetQueue_;
-				
-				boost::scoped_ptr<Thread>			receiverThread_;
-				mutable Mutex						receiverSocketLock_;
-				mutable Mutex						packetQueueLock_;
-				
-				bool								isAlive_;
+			const xpcc::SmartPointer&
+			frontPayload() const;
+			
+			void 
+			popFront();
+			
+		private:
+			typedef xpcc::SmartPointerVolatile		Payload;
+			typedef boost::mutex					Mutex;
+			typedef boost::mutex::scoped_lock		MutexGuard;
+			typedef	boost::thread::thread			Thread;
+			
+			bool 
+			isAlive();
+	
+			void* 
+			runReceiver();
+			
+			void 
+			update();
+			
+			ReceiverSocket						tipcReceiverSocket_;
+			std::queue<Payload>					packetQueue_;
+			
+			boost::scoped_ptr<Thread>			receiverThread_;
+			mutable Mutex						receiverSocketLock_;
+			mutable Mutex						packetQueueLock_;
+			
+			bool								isAlive_;
 		};
-	};
-};
+	}
+}
 
-#endif // XPCC_TIPC_RECEIVER_H_
+#endif // XPCC_TIPC__RECEIVER_HPP

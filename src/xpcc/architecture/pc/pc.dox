@@ -1,0 +1,21 @@
+// coding: utf-8
+// 
+// $Id$
+
+/*!
+\ingroup	architecture
+\defgroup	pc		PC specifiy functions
+
+
+*/
+
+namespace xpcc
+{
+	/**
+	 * \brief	PC specifiy functions
+	 * \ingroup	pc
+	 */
+	namespace avr
+	{
+	}
+}

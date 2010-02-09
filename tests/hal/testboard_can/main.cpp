@@ -3,14 +3,13 @@
 
 #include <avr/wdt.h>
 
-#include <xpcc/hal/time/delay.hpp>
-#include <xpcc/hal/peripheral/gpio.hpp>
-#include <xpcc/hal/peripheral/avr/mega/spi/spi.hpp>
+#include <xpcc/architecture/general/time/delay.hpp>
+#include <xpcc/architecture/general/gpio.hpp>
+#include <xpcc/architecture/atmega/spi/spi.hpp>
 
 #include <xpcc/driver/can/mcp2515.hpp>
 #include <xpcc/driver/debounce.hpp>
 
-#include <xpcc/hal/time/internal_clock.hpp>
 #include <xpcc/workflow/time/timeout.hpp>
 
 // ----------------------------------------------------------------------------
@@ -120,7 +119,7 @@ main(void)
 	while (1)
 	{
 		delay_ms(10);
-		InternalClock::increment(10);
+		Clock::increment(10);
 		
 		buttons.update(PIND);
 		

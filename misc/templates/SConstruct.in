@@ -44,11 +44,11 @@ for file in files.sources:
 
 # build the program
 programName = env['XPCC_CONFIG']['general']['name']
-program = env.Program(target = env.Buildpath(programName),
+program = env.Program(target = programName,
 					  source = objects)
 
 # build the xpcc library
-library, library_defines = env.XpccLibrary()
+library = env.XpccLibrary()
 
 env.Alias('lib', library)
 env.Alias('build', program)
@@ -59,6 +59,12 @@ if env.RequireArchitecture('pc'):
 	env.Alias('run', env.Run(program))
 	env.Alias('all', ['build'])
 else:
+	hexfile = env.Hex(program)
+	env.Alias('program', env.Avrdude(hexfile))
+	
+	env.Alias('build', hexfile)
+	env.Alias('build', env.Listing(program))
+	env.Alias('fuse', env.AvrdudeFuses())
 	env.Alias('all', ['build', 'size'])
 
 env.Default('all')

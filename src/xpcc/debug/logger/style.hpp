@@ -33,7 +33,7 @@
 #ifndef XPCC_LOG__STYLE_HPP
 #define XPCC_LOG__STYLE_HPP
 
-#include <xpcc/io/iodevice.hpp>
+#include <xpcc/communication/io/iodevice.hpp>
 #include <xpcc/utils/typet.hpp>
 
 namespace xpcc

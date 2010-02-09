@@ -187,7 +187,7 @@ def generate(env):
 
 	import SCons.Builder
 	doxyfile_builder = SCons.Builder.Builder(
-		action = "cd ${SOURCE.dir}  &&  ${DOXYGEN} ${SOURCE.file}",
+		action = "@cd ${SOURCE.dir} && ${DOXYGEN} ${SOURCE.file}",
 		emitter = DoxyEmitter,
 		target_factory = env.fs.Entry,
 		single_source = True,

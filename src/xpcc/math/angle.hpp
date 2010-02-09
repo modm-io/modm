@@ -34,7 +34,7 @@
 #define	XPCC__ANGLE_HPP
 
 #include <math.h>
-#include <xpcc/io/iostream.hpp>
+#include <xpcc/communication/io/iostream.hpp>
 
 namespace xpcc
 {

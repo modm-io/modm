@@ -39,43 +39,60 @@
 
 #ifdef __DOXYGEN__
 
-/// \ingroup	unittest
-/// \brief		Verify (expr) is true 
+/**
+ * \brief		Verify (expr) is true 
+ * \ingroup	unittest
+ */
 #define	TEST_ASSERT_TRUE(expr)
 
-/// \ingroup	unittest
-/// \brief		Verify (expr) is false 
+/**
+ * \brief		Verify (expr) is false 
+ * \ingroup	unittest
+ */
 #define	TEST_ASSERT_FALSE(expr)
 
-/// \ingroup	unittest
-/// \brief		Verify (x==y)
+/**
+ * \brief		Verify (x==y)
+ * \ingroup	unittest
+ */
 #define	TEST_ASSERT_EQUALS(x, y)
 
-/// \ingroup	unittest
-/// \brief		Verify (x==y) for floating pointer values
+/**
+ * \brief		Verify (x==y) for floating pointer values
+ * \ingroup	unittest
+ */
 #define	TEST_ASSERT_EQUALS_FLOAT(x, y)
 
-/// \ingroup	unittest
-/// \brief		Verify (x==y) up to d
-///
-/// This macro verifies two values are equal up to a delta
+/**
+ * \brief		Verify (x==y) up to d
+ *
+ * This macro verifies two values are equal up to a delta
+ * 
+ * \ingroup	unittest
+ */
 #define	TEST_ASSERT_EQUALS_DELTA(x, y, d)
 
-/// \ingroup	unittest
-/// \brief		Verify (lower <= value <= upper)
+/**
+ * \brief		Verify (lower <= value <= upper)
+ * \ingroup	unittest
+ */
 #define	TEST_ASSERT_EQUALS_RANGE(value, lower, upper)
 
-/// \ingroup	unittest
-/// \brief		Check if the arrays contains the same data
+/**
+ * \brief		Check if the arrays contains the same data
+ * \ingroup	unittest
+ */
 #define	TEST_ASSERT_EQUALS_ARRAY(array1, array2, start, count)
 
-/// \ingroup	unittest
-/// \brief		Fail unconditionally  
+/**
+ * \brief		Fail unconditionally  
+ * \ingroup	unittest
+ */
 #define	TEST_FAIL(msg)
 
 #else // !__DOXYGEN__
 
-#include <xpcc/hal/flash/flash_pointer.hpp>
+#include <xpcc/architecture/general/flash/flash_pointer.hpp>
 
 namespace unittest
 {

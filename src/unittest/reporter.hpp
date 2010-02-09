@@ -35,8 +35,8 @@
 
 #include <stdint.h>
 
-#include <xpcc/io/iostream.hpp>
-#include <xpcc/hal/flash/flash_pointer.hpp>
+#include <xpcc/communication/io/iostream.hpp>
+#include <xpcc/architecture/general/flash/flash_pointer.hpp>
 
 namespace unittest
 {
@@ -44,7 +44,8 @@ namespace unittest
 	 * \brief	%Reporter
 	 *
 	 * Used to generate the visible output.
-	 *
+	 * 
+	 * \author	Fabian Greif
 	 * \ingroup	unittest
 	 */
 	class Reporter

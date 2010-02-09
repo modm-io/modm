@@ -30,13 +30,15 @@
  */
 // ----------------------------------------------------------------------------
 
+#include <xpcc/architecture/general/time/clock.hpp>
+#include <xpcc/debug/logger/logger.hpp>
 
 #include "communication_list.hpp"
 
-#include <xpcc/debug/logger/logger.hpp>
 // set the Loglevel
 #undef  XPCC_LOG_LEVEL
 #define XPCC_LOG_LEVEL xpcc::log::DEBUG
+
 
 xpcc::communicationList::List::List():
 dummyFirst(Header()),
@@ -50,7 +52,7 @@ xpcc::communicationList::Entry::Entry(uint8_t typeInfo, const Header& header, Sm
 	next(0),
 	header(header),
 	payload(payload),
-	time(InternalClock::now()),
+	time(Clock::now()),
 	tries(0){
 
 }
@@ -60,7 +62,7 @@ xpcc::communicationList::Entry::Entry(uint8_t typeInfo, const Header& header) :
 	next(0), 
 	header(header), 
 	payload(SmartPointer()),
-	time(InternalClock::now()),
+	time(Clock::now()),
 	tries(0){
 	
 }
@@ -213,7 +215,7 @@ xpcc::communicationList::List::handleWaitingMessages(Postman &postman, BackendIn
 							// todo handle postman errors?
 							if (actual->typeInfo == Entry::CALLBACK){
 								actual->state = Entry::WAIT_FOR_RESPONSE;
-								actual->time = InternalClock::now();
+								actual->time = Clock::now();
 								e = actual;
 							}
 							else{
@@ -255,7 +257,7 @@ xpcc::communicationList::List::handleWaitingMessages(Postman &postman, BackendIn
 					else {// destination not on board, message has to be sent out to backend
 						backend.sendPacket(actual->header, actual->payload);
 						actual->state = Entry::WAIT_FOR_ACK;
-						actual->time = InternalClock::now();
+						actual->time = Clock::now();
 						e = actual;
 					}
 				}
@@ -264,7 +266,7 @@ xpcc::communicationList::List::handleWaitingMessages(Postman &postman, BackendIn
 			case Entry::WAIT_FOR_ACK:
 			{
 				Timestamp a = actual->time;
-				Timestamp n = InternalClock::now();
+				Timestamp n = Clock::now();
 				Timestamp diff = n - a;
 				Timestamp cp(100);
 				if (diff > cp && actual->tries > 2){

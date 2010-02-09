@@ -28,30 +28,29 @@
 # 
 # $Id$
 
-import os
-
 from SCons.Script import *
 
 # -----------------------------------------------------------------------------
+def avrdude_flash(env, source, alias='avrdude_program'):
+	action = Action("avrdude -p $AVR_DEVICE -c $AVRDUDE_PROGRAMMER -P $AVRDUDE_PORT -U flash:w:$SOURCE", 
+					cmdstr="$AVRDUDE_COMSTR")
+	return env.AlwaysBuild(env.Alias(alias, source, action))
 
-def avrdude_flash(env, source):
-	return [Action("avrdude -p $AVR_DEVICE -c $AVRDUDE_PROGRAMMER -P $AVRDUDE_PORT -U flash:w:$SOURCE", 
-					cmdstr="$FLASHCOMSTR")]
-
-def avrdude_fuse(env):
-	return [Action("avrdude -p $AVR_DEVICE -c $AVRDUDE_PROGRAMMER -P $AVRDUDE_PORT -u -U efuse:w:0xff:m", 
-					cmdstr="$FUSECOMSTR")]
+def avrdude_fuse(env, alias='avrdude_fuse'):
+	# TODO
+	action = Action("avrdude -p $AVR_DEVICE -c $AVRDUDE_PROGRAMMER -P $AVRDUDE_PORT -u -U efuse:w:0xff:m", 
+					cmdstr="$AVRDUDE_FUSECOMSTR")
+	return env.AlwaysBuild(env.Alias(alias, [], action))
 
 # -----------------------------------------------------------------------------
-
 def generate(env, **kw):
 	# build messages
-	#if ARGUMENTS.get('verbose') != '1':
-	#	env['FLASHCOMSTR'] = "Program: $SOURCE"
-	#	env['FUSECOMSTR'] = "Set Fuses"
+	if ARGUMENTS.get('verbose') != '1':
+		env['AVRDUDE_COMSTR'] = "avrdude: program $SOURCE"
+		env['AVRDUDE_FUSECOMSTR'] = "avrdude: set fuse bytes"
 	
-	env.AddMethod(avrdude_flash, 'ProgramFlash')
-	env.AddMethod(avrdude_fuse, 'ProgramFuses')
+	env.AddMethod(avrdude_flash, 'Avrdude')
+	env.AddMethod(avrdude_fuse, 'AvrdudeFuses')
 
 def exists(env):
 	return env.Detect('avr-gcc')

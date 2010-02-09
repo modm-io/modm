@@ -53,9 +53,9 @@ xpcc::Pid<T, ScaleFactor>::reset()
 
 template<typename T, unsigned int ScaleFactor>
 void
-xpcc::Pid<T, ScaleFactor>::setParameter(const Parameter& param)
+xpcc::Pid<T, ScaleFactor>::setParameter(const Parameter& parameter)
 {
-	parameter = param;
+	this->parameter = parameter;
 }
 
 template<typename T, unsigned int ScaleFactor>

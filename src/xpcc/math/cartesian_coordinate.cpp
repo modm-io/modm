@@ -31,7 +31,7 @@
 // ----------------------------------------------------------------------------
 
 #if defined(__AVR__) && defined(__AVR_HAVE_MUL__)
-	#include <xpcc/hal/peripheral/avr/math/math.hpp>
+	#include <xpcc/architecture/avr/math/math.hpp>
 #endif
 
 #include "cartesian_coordinate.hpp"

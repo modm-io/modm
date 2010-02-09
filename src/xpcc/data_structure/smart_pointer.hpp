@@ -35,7 +35,7 @@
 #include <string.h>		// for memcpy
 #include <stdint.h>
 
-#include <xpcc/io/iostream.hpp>
+#include <xpcc/communication/io/iostream.hpp>
 
 namespace xpcc
 {

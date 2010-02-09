@@ -40,6 +40,7 @@ namespace xpcc
 	/**
 	 * \brief	Simple 16-bit timestamp
 	 * 
+	 * \author	Fabian Greif
 	 * \ingroup	hal
 	 */ 
 	class Timestamp

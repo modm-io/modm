@@ -5,6 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
+ * 
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -39,13 +40,15 @@
 namespace xpcc
 {
 	/**
-	 * \brief		LIFO stack
+	 * \brief	LIFO stack
 	 * 
 	 * Elements are pushed/popped from the "back" of the specific container,
 	 * which is known as the top of the stack.
-	 *  
-	 * \ingroup		data_structure
+	 * 
 	 * \see		Deque()
+	 * 
+	 * \author	Fabian Greif 
+	 * \ingroup		data_structure
 	 */
 	template<typename T,
 			 typename Container>

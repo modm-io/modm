@@ -33,7 +33,7 @@
 #ifndef	XPCC__LOCATION_HPP
 #define	XPCC__LOCATION_HPP
 
-#include <xpcc/io/iostream.hpp>
+#include <xpcc/communication/io/iostream.hpp>
 
 #include "angle.hpp"
 #include "position.hpp"

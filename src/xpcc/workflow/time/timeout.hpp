@@ -33,7 +33,7 @@
 #ifndef XPCC__TIMEOUT_HPP
 #define XPCC__TIMEOUT_HPP
 
-#include <xpcc/hal/time/internal_clock.hpp>
+#include <xpcc/architecture/general/time/clock.hpp>
 
 #include "timestamp.hpp"
 
@@ -44,15 +44,16 @@ namespace xpcc
 	 *
 	 * Has to be polled to check if it has expired.
 	 * 
-	 * \tparam	T	Used timer, default is xpcc::InternalClock which has 
-	 * 				a millisecond resolution.	
+	 * \tparam	T	Used timer, default is xpcc::Clock which has 
+	 * 				a millisecond resolution.
 	 * 
 	 * Usage:
 	 * \include	timeout.cpp
 	 * 
+	 * \author	Fabian Greif
 	 * \ingroup	workflow
 	 */
-	template<typename T = ::xpcc::InternalClock>
+	template<typename T = ::xpcc::Clock>
 	class Timeout
 	{
 	public:

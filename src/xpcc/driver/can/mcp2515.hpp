@@ -34,13 +34,12 @@
 #define XPCC__MCP2515_HPP
 
 #include <stdint.h>
-#include <xpcc/hal/flash/flash_pointer.hpp>
-#include <xpcc/hal/time/delay.hpp>
+#include <xpcc/architecture/general/flash/flash_pointer.hpp>
+#include <xpcc/architecture/general/time/delay.hpp>
 
 #include "can.hpp"
 
 /**
- * \ingroup	    driver
  * \name		Bits des Filters fuer den MCP2515 umformatieren
  * 
  * \code
@@ -61,6 +60,7 @@
  * 
  * \warning	Do not use this macro for variables, only for static values
  *			known at compile-time.
+ * \ingroup	    driver
  */
 //\{
 #if defined(__DOXYGEN__)
@@ -98,6 +98,7 @@ namespace xpcc
 	 * If you want to activate the internal pullup for the INT pin you
 	 * need to do this by yourself before calling the initialize method!
 	 * 
+	 * \author	Fabian Greif
 	 * \ingroup	driver
 	 */
 	template < typename SPI,

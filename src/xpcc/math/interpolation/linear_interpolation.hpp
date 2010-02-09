@@ -36,7 +36,7 @@
 #include <stdint.h>
 
 #include <xpcc/data_structure/pair.hpp>
-#include <xpcc/hal/flash/flash_pointer.hpp>
+#include <xpcc/architecture/general/flash/flash_pointer.hpp>
 
 namespace xpcc
 {

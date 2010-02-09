@@ -47,7 +47,8 @@ class MyConfigParser(ConfigParser.RawConfigParser):
 	def get(self, section, option, default=None):
 		try:
 			return ConfigParser.RawConfigParser.get(self, section, option)
-		except ConfigParser.NoOptionError, e:
+		except (ConfigParser.NoOptionError,
+				ConfigParser.NoSectionError), e:
 			if default is not None:
 				return default
 			else:
@@ -56,7 +57,8 @@ class MyConfigParser(ConfigParser.RawConfigParser):
 	def items(self, section):
 		try:
 			return ConfigParser.RawConfigParser.items(self, section)
-		except ConfigParser.NoSectionError, e:
+		except (ConfigParser.NoOptionError,
+				ConfigParser.NoSectionError), e:
 			raise ParserException(e)
 
 # -----------------------------------------------------------------------------
@@ -68,9 +70,9 @@ class FileScanner:
 		Keyword arguments:
 		env		 -	SCons environment
 		unittest -	This variable has three states:
-					None => select all files
+					None  => select all files
 					False => exclude files from subfolders named 'test'
-					True => select only files in folders named 'test'
+					True  => select only files in folders named 'test'
 		"""
 		self.env = env
 		self.unittest = unittest
@@ -192,14 +194,30 @@ def generate_environment(env, configfile, rootpath, buildpath = None):
 				ARCHITECTURE = architecture + '/' + device,
 				AVR_DEVICE = device,
 				AVR_CLOCK = clock,
-				tools = ['avr', 'doxygen', 'template', 'unittest', 'xpcc', 'utils'],
+				tools = [
+					'avr',
+					'avrdude',
+					'doxygen',
+					'template',
+					'unittest',
+					'xpcc',
+					'utils'],
 				toolpath = env['toolpath'],
 				LIBS = [''],
 				LIBPATH = [])
+		
+		new['AVRDUDE_PROGRAMMER'] = parser.get('avrdude', 'programmer', 'stk500')
+		new['AVRDUDE_PORT'] = parser.get('avrdude', 'port', '/dev/ttyUSB0')
 	elif architecture == 'pc':
 		new = Environment(
 				ARCHITECTURE = architecture + '/' + device,
-				tools = ['pc', 'doxygen', 'template', 'unittest', 'xpcc', 'utils'],
+				tools = [
+					'pc',
+					'doxygen',
+					'template',
+					'unittest',
+					'xpcc',
+					'utils'],
 				toolpath = env['toolpath'],
 				LIBS = ['boost_thread-mt'],
 				LIBPATH = ['/usr/lib/'])
@@ -233,20 +251,25 @@ def xpcc_library(env):
 			os.path.join(env['XPCC_ROOTPATH'], 'src', 'SConscript'),
 			exports = 'env')
 	
-	# generate 'defines.h'
+	env['XPCC_LIBRARY_DEFINES'] = defines.copy()
+	defines.update(env['XPCC_CONFIG']['defines'])
+	
+	# generate 'config.h'
 	substitutions = {
-		'defines': '\n'.join(["#define %s %s" % (key.upper(), value) for key, value in env['XPCC_CONFIG']['defines'].iteritems()]),
+		'defines': '\n'.join(["#define %s %s" % (key.upper(), value) \
+				for key, value in defines.iteritems()]),
 		'name': env['XPCC_CONFIG']['general']['name']
 	}
 	file = env.SimpleTemplate(
-			target = env.LibraryBuildpath('defines.h'),
-			source = os.path.join(env['XPCC_ROOTPATH'], 'misc/templates/defines.h.in'),
+			target = env.LibraryBuildpath('config.h'),
+			source = os.path.join(env['XPCC_ROOTPATH'], 
+								  'misc/templates/config.h.in'),
 			SUBSTITUTIONS = substitutions)
 	
 	env.Append(LIBS = ['robot'])
 	env.Append(LIBPATH = [env.LibraryBuildpath('.')])
 	
-	return (library, defines)
+	return library
 
 def find_files(env, path, unittest=None):
 	scanner = FileScanner(env, unittest)
@@ -283,9 +306,32 @@ def require_architecture(env, architecture):
 	else:
 		return False
 
-def check_defines(env, defines):
-	# TODO check which defines are missing and which are unused
-	print "not implemented yet"
+def check_defines(env):
+	# FIXME
+	#env.Alias('config', env.ShowConfiguration())
+	
+	projectConfig = env['XPCC_CONFIG']['defines'].keys()
+	keys = env['XPCC_LIBRARY_DEFINES'].keys()
+	keys.sort()
+	
+	print ""
+	print "Defines:"
+	for key in keys:
+		default = env['XPCC_LIBRARY_DEFINES'][key]
+		if key in projectConfig:
+			value = env['XPCC_CONFIG']['defines'][key]
+			projectConfig.remove(key)
+			if value != default:
+				print "  %s => %s (default: %s)" % (key.upper(), value, default)
+				continue
+		
+		print "  %s => %s" % (key.upper(), default)
+	
+	if projectConfig:
+		print "\nUnused Defines:"
+		for key in projectConfig:
+			print "  %s => %s" % (key.upper(), env['XPCC_CONFIG']['defines'][key])
+	print ""
 
 # -----------------------------------------------------------------------------
 def generate(env, **kw):
@@ -295,7 +341,7 @@ def generate(env, **kw):
 	env.AddMethod(buildpath, 'Buildpath')
 	env.AddMethod(library_buildpath, 'LibraryBuildpath')
 	env.AddMethod(require_architecture, 'RequireArchitecture')
-	env.AddMethod(check_defines, 'CheckDefines')
+	env.AddMethod(check_defines, 'ShowConfiguration')
 
 def exists(env):
 	return True

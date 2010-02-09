@@ -34,7 +34,7 @@
 #define	XPCC__LAGRANGE_INTERPOLATION_HPP
 
 #include <stdint.h>
-#include <xpcc/hal/flash/flash_pointer.hpp>
+#include <xpcc/architecture/general/flash/flash_pointer.hpp>
 
 namespace xpcc
 {

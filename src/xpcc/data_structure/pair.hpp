@@ -36,8 +36,6 @@
 namespace xpcc
 {
 	/**
-	 * \ingroup		data_structure
-	 * 
 	 * \brief		Pair<FirstType, SecondType> is a heterogeneous pair
 	 * 
 	 * This class holds one object of type FirstType and one object of type
@@ -79,6 +77,9 @@ namespace xpcc
 	 * \endcode
 	 *
 	 * \see	xpcc::LinearInterpolation
+	 * 
+	 * \author	Fabian Greif
+	 * \ingroup		data_structure
 	 */
 	template<typename T1, typename T2>
 	class Pair

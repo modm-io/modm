@@ -5,6 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
+ *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -31,15 +32,15 @@
 
 #include <iostream>
 
-#include <xpcc/io/iostream.hpp>
-#include <xpcc/io/backplane/std/std_iodevice.hpp>
+#include <xpcc/communication/io/iostream.hpp>
+#include <xpcc/architecture/pc/terminal.hpp>
 
 int
 main()
 {
 	std::cout << "XPCC IOStream Test" << std::endl;
 	
-	xpcc::StdIODevice device;
+	xpcc::pc::Terminal device;
 	xpcc::IOStream stream(device);
 	
 	stream << static_cast<uint8_t>(0xff) << static_cast<int16_t>(3) << xpcc::endl;

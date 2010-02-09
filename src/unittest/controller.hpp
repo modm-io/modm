@@ -33,42 +33,47 @@
 #ifndef	UNITTEST__CONTROLLER_HPP
 #define	UNITTEST__CONTROLLER_HPP
 
-#include <xpcc/io/iostream.hpp>
-#include <xpcc/hal/flash/flash_pointer.hpp>
+#include <xpcc/communication/io/iostream.hpp>
+#include <xpcc/architecture/general/flash/flash_pointer.hpp>
 
 #include "reporter.hpp"
 
 namespace unittest
 {
-	/// \ingroup	unittest
-	/// \brief		%Controller singleton
-	///
-	/// Used to forward information from the test suites to the reporters.
-	/// All macros form 'harness.hpp' use this class to determine the
-	/// active reporter.
-	/// 
+	/**
+	 * \brief	%Controller singleton
+	 *
+	 * Used to forward information from the test suites to the reporters.
+	 * All macros form 'harness.hpp' use this class to determine the
+	 * active reporter.
+	 *
+	 * \author	Fabian Greif 
+	 * \ingroup	unittest
+	 */
 	class Controller
 	{
 	public:
-		/// \brief	Get instance
+		/// Get instance
 		static inline Controller&
 		instance() {
 			static Controller controller;
 			return controller;
 		}
 		
-		/// \brief	Set a new reporter
+		/// Set a new reporter
 		void
 		setReporter(Reporter& reporter);
 		
-		/// \brief	Get currently active reporter
+		/// Get currently active reporter
 		Reporter&
 		getReporter() const;
 		
-		/// \brief	Switch to the next test suite
-		///
-		/// \param	name	Name of the test suite, used by the reporter
-		///					to generate messages
+		/**
+		 * \brief	Switch to the next test suite
+		 *
+		 * \param	name	Name of the test suite, used by the reporter
+		 *					to generate messages
+		 */
 		void
 		nextTestSuite(xpcc::FlashPointer<char> name) const;
 	

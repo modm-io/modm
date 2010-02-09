@@ -1,0 +1,16 @@
+/*!
+\ingroup	architecture
+\defgroup	atomic	Atomic operations and container
+
+*/
+
+namespace xpcc
+{
+	/**
+	 * \ingroup	atomic
+	 * \brief	Atomic operations and container
+	 */
+	namespace atomic
+	{
+	}
+}

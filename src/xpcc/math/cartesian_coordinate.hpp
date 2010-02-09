@@ -35,7 +35,7 @@
 
 #include <math.h>
 #include <stdint.h>
-#include <xpcc/io/iostream.hpp>
+#include <xpcc/communication/io/iostream.hpp>
 
 #include "angle.hpp"
 #include "polar_coordinate.hpp"

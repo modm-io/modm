@@ -33,10 +33,15 @@
 #ifndef XPCC__PID_HPP
 #define XPCC__PID_HPP
 
-#include "../../../utils/arithmetic_traits.hpp"
+#include <xpcc/utils/arithmetic_traits.hpp>
 
 namespace xpcc
 {
+	/**
+	 * \brief	Dummy implementation for a feedforward function
+	 * 
+	 * \internal
+	 */
 	template<typename T>
 	T
 	feedforwardDummy(const T& in) {
@@ -46,8 +51,11 @@ namespace xpcc
 	/**
 	 * \brief	A proportional-integral-derivative controller (PID controller)
 	 *
-	 * \ingroup	filter
 	 * \todo	check implementation
+	 * \todo	use the faster avr::mul and avr::mac functions
+	 * 
+	 * \author	Fabian Greif
+	 * \ingroup	filter
 	 */
 	template<typename T, unsigned int ScaleFactor = 1>
 	class Pid
@@ -80,7 +88,7 @@ namespace xpcc
 			FeedforwardFunction feedforward = feedforwardDummy<T>);
 		
 		void
-		setParameter(const Parameter& param);
+		setParameter(const Parameter& parameter);
 		
 		/**
 		 * \brief	Reset all values

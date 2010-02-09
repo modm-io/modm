@@ -32,7 +32,7 @@
 
 #include "dog_m16x.hpp"
 
-#include "defines.h"
+#include "config.h"
 
 namespace xpcc
 {

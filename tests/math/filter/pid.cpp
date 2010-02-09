@@ -1,6 +1,6 @@
 
 #include <stdint.h>
-#include <xpcc/math/filter/pid/pid.hpp>
+#include <xpcc/math/filter/pid.hpp>
 
 using namespace xpcc;
 

@@ -5,6 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
+ *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -45,13 +46,13 @@
 #include "../style/prefix.hpp"
 #include "../style/std_colour.hpp"
 
-#include <xpcc/io/backplane/std/std_iodevice.hpp>
+#include <xpcc/architecture/pc/terminal.hpp>
 
 namespace xpcc
 {
 	namespace log
 	{
-		xpcc::StdIODevice device;
+		xpcc::pc::Terminal device;
 
 		template < typename T, Colour TEXT, Colour BACKGROUND >
 		class Wrapper : public StyleWrapper< Prefix< T, StdColour<TEXT, BACKGROUND > > >

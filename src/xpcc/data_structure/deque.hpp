@@ -61,8 +61,10 @@ namespace xpcc
 	 * Up to a size of 254 small index variables with 8-bits are used, after
 	 * this they are switched to 16-bit.
 	 * 
-	 * \warning		This class don't check if the container is empty before
-	 * 				a pop-operation. You have to do this by yourself!
+	 * \warning	This class don't check if the container is empty before
+	 * 			a pop-operation. You have to do this by yourself!
+	 * 
+	 * \author	Fabian Greif
 	 * \ingroup		data_structure
 	 */
 	template<typename T,

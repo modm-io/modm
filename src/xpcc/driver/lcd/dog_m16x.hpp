@@ -35,8 +35,8 @@
 
 #include <xpcc/driver/lcd/lcd.hpp>
 
-#include <xpcc/hal/flash/flash_pointer.hpp>
-#include <xpcc/hal/time/delay.hpp>
+#include <xpcc/architecture/general/flash/flash_pointer.hpp>
+#include <xpcc/architecture/general/time/delay.hpp>
 
 namespace xpcc
 {
@@ -46,20 +46,24 @@ namespace xpcc
 	 * \todo	documentation
 	 * \todo	make this class adaptable to other voltages and line counts!
 	 * 
-	 * \ingroup	driver
 	 * \see		Lcd
+	 * 
+	 * \author	Fabian Greif
+	 * \ingroup	driver
 	 */
 	template <typename SPI, typename CS, typename RS>
 	class DogM16x : public Lcd
 	{
 	public:
-		/// \brief	Constructor
+		/// Constructor
 		DogM16x();
 		
-		/// \brief	Initialize the display
-		/// 
-		/// The display needs some time to initalize after startup. You have
-		/// to wait at least 50 ms until calling this method.
+		/**
+		 * \brief	Initialize the display
+		 * 
+		 * The display needs some time to initalize after startup. You have
+		 * to wait at least 50 ms until calling this method.
+		 */
 		virtual void
 		initialize();
 		

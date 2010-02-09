@@ -61,7 +61,7 @@ program = env.Program(target = env.Buildpath(config['general']['name']),
 					  source = objects)
 
 # build the xpcc library
-library, defines = env.XpccLibrary()
+library = env.XpccLibrary()
 
 env.Alias('lib', library)
 env.Alias('build', program)

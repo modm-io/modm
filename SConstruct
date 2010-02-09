@@ -57,7 +57,7 @@ for path, directories, files in os.walk('tests'):
 
 # -----------------------------------------------------------------------------
 # update all template files
-path = 'src/xpcc/hal/peripheral/avr/mega/uart'
+path = 'src/xpcc/architecture/atmega/uart'
 for id in range(0, 4):
 	file = env.Template(target = os.path.join(path, 'uart%i.hpp' % id),
 						source = os.path.join(path, 'uart.hpp.in'),

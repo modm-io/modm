@@ -5,7 +5,7 @@
 #include <unittest/reporter.hpp>
 #include <unittest/controller.hpp>
 
-#include <xpcc/hal/peripheral/avr/xmega/uart/uartc0.hpp>
+#include <xpcc/architecture/atxmega/uart/uartc0.hpp>
 
 ${includes}
 

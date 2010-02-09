@@ -1,0 +1,21 @@
+// coding: utf-8
+// 
+// $Id$
+
+/*!
+\ingroup	architecture
+\defgroup	avr		AVR specifiy functions
+
+
+*/
+
+namespace xpcc
+{
+	/**
+	 * \brief	AVR specifiy functions
+	 * \ingroup	avr
+	 */
+	namespace avr
+	{
+	}
+}

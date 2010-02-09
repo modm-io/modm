@@ -2,9 +2,9 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 
-#include <xpcc/hal/peripheral/avr/mega/uart/buffered_uart0.hpp>
-#include <xpcc/io/iodevice_wrapper.hpp>
-#include <xpcc/io/iostream.hpp>
+#include <xpcc/architecture/avr/mega/uart/buffered_uart0.hpp>
+#include <xpcc/communication/io/iodevice_wrapper.hpp>
+#include <xpcc/communication/io/iostream.hpp>
 
 int main(void)
 {

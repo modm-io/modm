@@ -34,9 +34,10 @@
 #define XPCC__SCHEDULER_HPP
 
 #include <stdint.h>
+
 #include <xpcc/utils/modifier.hpp>
 #include <xpcc/utils/macros.hpp>
-#include <xpcc/hal/atomic/lock.hpp>		// for Scheduler::scheduleInterrupt()
+#include <xpcc/architecture/general/atomic/lock.hpp>		// for Scheduler::scheduleInterrupt()
 
 namespace xpcc
 {
@@ -51,7 +52,7 @@ namespace xpcc
 	 * 
 	 * \image	html	scheduler.png
 	 * 
-	 * 
+	 * \author	Fabian Greif
 	 * \todo	Check that this implementation works from inside an interrupt
 	 */
 	class Scheduler
@@ -59,7 +60,9 @@ namespace xpcc
 	public:
 		typedef uint8_t Priority;
 		
-		/// \brief	%Scheduler task
+		/**
+		 * \brief	%Scheduler task
+		 */
 		class Task
 		{
 		public:
@@ -70,7 +73,6 @@ namespace xpcc
 	public:
 		Scheduler();
 		
-		/// \brief	
 		void
 		scheduleTask(Task& task,
 					 uint16_t period,
