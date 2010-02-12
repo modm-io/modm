@@ -98,7 +98,7 @@ IoStreamTest::testString()
 	
 	(*stream) << string;
 	
-	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 0, 3);
+	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 3);
 	TEST_ASSERT_EQUALS(device.bytesWritten, 3);
 }
 
@@ -111,7 +111,7 @@ IoStreamTest::testFlashString()
 	
 	(*stream) << xpcc::modifier::flash(flashString);
 	
-	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 0, 3);
+	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 3);
 	TEST_ASSERT_EQUALS(device.bytesWritten, 3);
 }
 
@@ -122,7 +122,7 @@ IoStreamTest::testByte()
 	
 	(*stream) << 244;
 	
-	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 0, 3);
+	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 3);
 	TEST_ASSERT_EQUALS(device.bytesWritten, 3);
 }
 
@@ -133,7 +133,7 @@ IoStreamTest::testByteSigned()
 	
 	(*stream) << -123;
 	
-	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 0, 4);
+	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 4);
 	TEST_ASSERT_EQUALS(device.bytesWritten, 4);
 }
 
@@ -144,7 +144,7 @@ IoStreamTest::testShort()
 	
 	(*stream) << 62412;
 	
-	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 0, 5);
+	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 5);
 	TEST_ASSERT_EQUALS(device.bytesWritten, 5);
 }
 
@@ -156,7 +156,7 @@ IoStreamTest::testShortSigned()
 	
 	(*stream) << -12345;
 	
-	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 0, 6);
+	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 6);
 	TEST_ASSERT_EQUALS(device.bytesWritten, 6);
 }
 
@@ -167,7 +167,7 @@ IoStreamTest::testInteger()
 	
 	(*stream) << 12345678;
 	
-	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 0, 8);
+	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 8);
 	TEST_ASSERT_EQUALS(device.bytesWritten, 8);
 }
 
@@ -178,7 +178,7 @@ IoStreamTest::testFloat()
 	
 	(*stream) << 1.23f;
 	
-	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 0, 11);
+	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 11);
 	TEST_ASSERT_EQUALS(device.bytesWritten, 11);
 }
 
@@ -189,7 +189,7 @@ IoStreamTest::testFloat2()
 	
 	(*stream) << 457.0f;
 	
-	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 0, 11);
+	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 11);
 	TEST_ASSERT_EQUALS(device.bytesWritten, 11);
 }
 
@@ -200,7 +200,7 @@ IoStreamTest::testFloat3()
 	
 	(*stream) << -51231400.0f;
 	
-	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 0, 12);
+	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 12);
 	TEST_ASSERT_EQUALS(device.bytesWritten, 12);
 }
 
@@ -211,7 +211,7 @@ IoStreamTest::testFloat4()
 	
 	(*stream) << -0.0007234f;
 	
-	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 0, 12);
+	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 12);
 	TEST_ASSERT_EQUALS(device.bytesWritten, 12);
 }
 
@@ -224,7 +224,7 @@ IoStreamTest::testHex1()
 
 	(*stream) << xpcc::hex << c;
 
-	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 0, 2);
+	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 2);
 	TEST_ASSERT_EQUALS(device.bytesWritten, 2);
 }
 
@@ -237,7 +237,7 @@ IoStreamTest::testHex2()
 
 	(*stream) << xpcc::hex << s;
 
-	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 0, 10);
+	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 10);
 	TEST_ASSERT_EQUALS(device.bytesWritten, 10);
 }
 
@@ -250,6 +250,6 @@ IoStreamTest::testHex3()
 	
 	(*stream) << xpcc::hex << i;
 
-	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 0, 6);
+	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 6);
 	TEST_ASSERT_EQUALS(device.bytesWritten, 6);
 }

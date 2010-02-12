@@ -63,23 +63,23 @@ AngleTest::testNormalize()
 	
 	angle = 0.3 * M_PI;
 	angle.normalize();
-	TEST_ASSERT_EQUALS_FLOAT(angle, 0.3 * M_PI);
+	TEST_ASSERT_EQUALS_FLOAT(angle.toFloat(), 0.3 * M_PI);
 	
 	angle = -0.6 * M_PI;
 	angle.normalize();
-	TEST_ASSERT_EQUALS_FLOAT(angle, -0.6 * M_PI);
+	TEST_ASSERT_EQUALS_FLOAT(angle.toFloat(), -0.6 * M_PI);
 	
 	angle = 2.9 * M_PI;
 	angle.normalize();
-	TEST_ASSERT_EQUALS_FLOAT(angle, 0.9 * M_PI);
+	TEST_ASSERT_EQUALS_FLOAT(angle.toFloat(), 0.9 * M_PI);
 	
 	angle = -2.9 * M_PI;
 	angle.normalize();
-	TEST_ASSERT_EQUALS_FLOAT(angle, -0.9 * M_PI);
+	TEST_ASSERT_EQUALS_FLOAT(angle.toFloat(), -0.9 * M_PI);
 	
 	angle = 1.5 * M_PI;
 	angle.normalize();
-	TEST_ASSERT_EQUALS_FLOAT(angle, -0.5 * M_PI);
+	TEST_ASSERT_EQUALS_FLOAT(angle.toFloat(), -0.5 * M_PI);
 }
 
 void
@@ -89,15 +89,15 @@ AngleTest::testReverse()
 	
 	angle = -0.5 * M_PI;
 	angle.reverse();
-	TEST_ASSERT_EQUALS_FLOAT(angle, 0.5 * M_PI);
+	TEST_ASSERT_EQUALS_FLOAT(angle.toFloat(), 0.5 * M_PI);
 	
 	angle = -0.9 * M_PI;
 	angle.reverse();
-	TEST_ASSERT_EQUALS_FLOAT(angle, 0.1 * M_PI);
+	TEST_ASSERT_EQUALS_FLOAT(angle.toFloat(), 0.1 * M_PI);
 	
 	angle = 0.7 * M_PI;
 	angle.reverse();
-	TEST_ASSERT_EQUALS_FLOAT(angle, -0.3 * M_PI);
+	TEST_ASSERT_EQUALS_FLOAT(angle.toFloat(), -0.3 * M_PI);
 }
 
 void

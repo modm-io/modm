@@ -34,7 +34,7 @@
 
 #include "list_factory_test.hpp"
 
-typedef xpcc::List<uint16_t> MyList;
+typedef xpcc::List<int16_t> MyList;
 
 void
 ListFactoryTest::testFactory()

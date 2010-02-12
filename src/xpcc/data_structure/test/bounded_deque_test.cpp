@@ -37,7 +37,7 @@
 void
 BoundedDequeTest::testForward()
 {
-	xpcc::BoundedDeque<uint16_t, 3> deque;
+	xpcc::BoundedDeque<int16_t, 3> deque;
 	
 	TEST_ASSERT_TRUE(deque.isEmpty());
 	TEST_ASSERT_EQUALS(deque.getMaxSize(), 3);
@@ -87,7 +87,7 @@ BoundedDequeTest::testForward()
 void
 BoundedDequeTest::testBackward()
 {
-	xpcc::BoundedDeque<uint16_t, 3> deque;
+	xpcc::BoundedDeque<int16_t, 3> deque;
 	
 	TEST_ASSERT_TRUE(deque.pushFront(1));
 	TEST_ASSERT_TRUE(deque.pushFront(2));
@@ -121,7 +121,7 @@ BoundedDequeTest::testBackward()
 void
 BoundedDequeTest::testBoth()
 {
-	xpcc::BoundedDeque<uint16_t, 3> deque;
+	xpcc::BoundedDeque<int16_t, 3> deque;
 	
 	TEST_ASSERT_EQUALS(deque.getSize(), 0);
 	
@@ -159,7 +159,7 @@ BoundedDequeTest::testBoth()
 void
 BoundedDequeTest::testClear()
 {
-	xpcc::BoundedDeque<uint16_t, 3> deque;
+	xpcc::BoundedDeque<int16_t, 3> deque;
 	
 	deque.pushFront(12);
 	deque.pushFront(11);
@@ -202,14 +202,14 @@ BoundedDequeTest::testClear()
 void
 BoundedDequeTest::testConstIterator()
 {
-	xpcc::BoundedDeque<uint16_t, 5> deque;
+	xpcc::BoundedDeque<int16_t, 5> deque;
 	
 	deque.pushBack(3);
 	deque.pushBack(4);
 	deque.pushFront(2);
 	deque.pushFront(1);
 	
-	xpcc::BoundedDeque<uint16_t, 5>::const_iterator it;
+	xpcc::BoundedDeque<int16_t, 5>::const_iterator it;
 	it = deque.begin();
 	
 	TEST_ASSERT_TRUE(it != deque.end());

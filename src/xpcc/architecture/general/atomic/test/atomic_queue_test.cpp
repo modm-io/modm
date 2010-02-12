@@ -37,7 +37,7 @@
 void
 AtomicQueueTest::testQueue()
 {
-	xpcc::atomic::Queue<uint16_t, 3> queue;
+	xpcc::atomic::Queue<int16_t, 3> queue;
 	
 	TEST_ASSERT_TRUE(queue.isEmpty());
 	TEST_ASSERT_EQUALS(queue.getMaxSize(), 3);

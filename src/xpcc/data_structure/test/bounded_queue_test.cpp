@@ -37,7 +37,7 @@
 void
 BoundedQueueTest::testQueue()
 {
-	xpcc::BoundedQueue<uint16_t, 5> queue;
+	xpcc::BoundedQueue<int16_t, 5> queue;
 	
 	TEST_ASSERT_TRUE(queue.isEmpty());
 	

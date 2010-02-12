@@ -37,43 +37,43 @@
 void
 MathTest::testSqrt()
 {
-	TEST_ASSERT_EQUALS(xpcc::avr::sqrt32_round(0), 0);
-	TEST_ASSERT_EQUALS(xpcc::avr::sqrt32_round(1), 1);
-	TEST_ASSERT_EQUALS(xpcc::avr::sqrt32_round(10), 3);
-	TEST_ASSERT_EQUALS(xpcc::avr::sqrt32_round(100), 10);
-	TEST_ASSERT_EQUALS(xpcc::avr::sqrt32_round(1000), 32);
-	TEST_ASSERT_EQUALS(xpcc::avr::sqrt32_round(10000), 100);
-	TEST_ASSERT_EQUALS(xpcc::avr::sqrt32_round(100000), 316);
-	TEST_ASSERT_EQUALS(xpcc::avr::sqrt32_round(123456), 351);
-	TEST_ASSERT_EQUALS(xpcc::avr::sqrt32_round(452613), 673);
-	TEST_ASSERT_EQUALS(xpcc::avr::sqrt32_round(1000000), 1000);
-	TEST_ASSERT_EQUALS(xpcc::avr::sqrt32_round(10000000), 3162);
-	TEST_ASSERT_EQUALS(xpcc::avr::sqrt32_floor(4000000000UL), 63245);
-	TEST_ASSERT_EQUALS(xpcc::avr::sqrt32_round(4294800000UL), 65535);
+	TEST_ASSERT_EQUALS(xpcc::avr::sqrt32_round(0), 0U);
+	TEST_ASSERT_EQUALS(xpcc::avr::sqrt32_round(1), 1U);
+	TEST_ASSERT_EQUALS(xpcc::avr::sqrt32_round(10), 3U);
+	TEST_ASSERT_EQUALS(xpcc::avr::sqrt32_round(100), 10U);
+	TEST_ASSERT_EQUALS(xpcc::avr::sqrt32_round(1000), 32U);
+	TEST_ASSERT_EQUALS(xpcc::avr::sqrt32_round(10000), 100U);
+	TEST_ASSERT_EQUALS(xpcc::avr::sqrt32_round(100000), 316U);
+	TEST_ASSERT_EQUALS(xpcc::avr::sqrt32_round(123456), 351U);
+	TEST_ASSERT_EQUALS(xpcc::avr::sqrt32_round(452613), 673U);
+	TEST_ASSERT_EQUALS(xpcc::avr::sqrt32_round(1000000), 1000U);
+	TEST_ASSERT_EQUALS(xpcc::avr::sqrt32_round(10000000), 3162U);
+	TEST_ASSERT_EQUALS(xpcc::avr::sqrt32_floor(4000000000UL), 63245U);
+	TEST_ASSERT_EQUALS(xpcc::avr::sqrt32_round(4294800000UL), 65535U);
 	
-	TEST_ASSERT_EQUALS(xpcc::avr::sqrt32_floor(0), 0);
-	TEST_ASSERT_EQUALS(xpcc::avr::sqrt32_floor(1), 1);
-	TEST_ASSERT_EQUALS(xpcc::avr::sqrt32_floor(10), 3);
-	TEST_ASSERT_EQUALS(xpcc::avr::sqrt32_floor(100), 10);
-	TEST_ASSERT_EQUALS(xpcc::avr::sqrt32_floor(1000), 31);
-	TEST_ASSERT_EQUALS(xpcc::avr::sqrt32_floor(10000), 100);
-	TEST_ASSERT_EQUALS(xpcc::avr::sqrt32_floor(100000), 316);
-	TEST_ASSERT_EQUALS(xpcc::avr::sqrt32_floor(123456), 351);
-	TEST_ASSERT_EQUALS(xpcc::avr::sqrt32_floor(452613), 672);
-	TEST_ASSERT_EQUALS(xpcc::avr::sqrt32_floor(1000000), 1000);
-	TEST_ASSERT_EQUALS(xpcc::avr::sqrt32_floor(10000000), 3162);
-	TEST_ASSERT_EQUALS(xpcc::avr::sqrt32_floor(4000000000UL), 63245);
-	TEST_ASSERT_EQUALS(xpcc::avr::sqrt32_floor(4294967295UL), 65535);
+	TEST_ASSERT_EQUALS(xpcc::avr::sqrt32_floor(0), 0U);
+	TEST_ASSERT_EQUALS(xpcc::avr::sqrt32_floor(1), 1U);
+	TEST_ASSERT_EQUALS(xpcc::avr::sqrt32_floor(10), 3U);
+	TEST_ASSERT_EQUALS(xpcc::avr::sqrt32_floor(100), 10U);
+	TEST_ASSERT_EQUALS(xpcc::avr::sqrt32_floor(1000), 31U);
+	TEST_ASSERT_EQUALS(xpcc::avr::sqrt32_floor(10000), 100U);
+	TEST_ASSERT_EQUALS(xpcc::avr::sqrt32_floor(100000), 316U);
+	TEST_ASSERT_EQUALS(xpcc::avr::sqrt32_floor(123456), 351U);
+	TEST_ASSERT_EQUALS(xpcc::avr::sqrt32_floor(452613), 672U);
+	TEST_ASSERT_EQUALS(xpcc::avr::sqrt32_floor(1000000), 1000U);
+	TEST_ASSERT_EQUALS(xpcc::avr::sqrt32_floor(10000000), 3162U);
+	TEST_ASSERT_EQUALS(xpcc::avr::sqrt32_floor(4000000000UL), 63245U);
+	TEST_ASSERT_EQUALS(xpcc::avr::sqrt32_floor(4294967295UL), 65535U);
 }
 
 void
 MathTest::testMultiplication()
 {
-	TEST_ASSERT_EQUALS(xpcc::avr::mul32((uint16_t) 1, (uint16_t) 1), 1);
-	TEST_ASSERT_EQUALS(xpcc::avr::mul32((uint16_t) 10, (uint16_t) 10), 100);
-	TEST_ASSERT_EQUALS(xpcc::avr::mul32((uint16_t) 100, (uint16_t) 100), 10000);
-	TEST_ASSERT_EQUALS(xpcc::avr::mul32((uint16_t) 1000, (uint16_t) 1000), 1000000);
-	TEST_ASSERT_EQUALS(xpcc::avr::mul32((uint16_t) 10000, (uint16_t) 10000), 100000000);
+	TEST_ASSERT_EQUALS(xpcc::avr::mul32((uint16_t) 1, (uint16_t) 1), 1U);
+	TEST_ASSERT_EQUALS(xpcc::avr::mul32((uint16_t) 10, (uint16_t) 10), 100U);
+	TEST_ASSERT_EQUALS(xpcc::avr::mul32((uint16_t) 100, (uint16_t) 100), 10000U);
+	TEST_ASSERT_EQUALS(xpcc::avr::mul32((uint16_t) 1000, (uint16_t) 1000), 1000000U);
+	TEST_ASSERT_EQUALS(xpcc::avr::mul32((uint16_t) 10000, (uint16_t) 10000), 100000000U);
 	TEST_ASSERT_EQUALS(xpcc::avr::mul32((uint16_t) 60000, (uint16_t) 60000), 3600000000UL);
 	
 	TEST_ASSERT_EQUALS(xpcc::avr::mul32((int16_t) 1, (int16_t) 1), 1);

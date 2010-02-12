@@ -62,18 +62,18 @@ CartesianTest::testLengthAndAngle()
 	
 	TEST_ASSERT_EQUALS(coord.getLength(), 141);
 	angle = coord.getAngle();
-	TEST_ASSERT_EQUALS_FLOAT(angle, M_PI / 4);
+	TEST_ASSERT_EQUALS_FLOAT(angle.toFloat(), M_PI / 4);
 	
 	coord.set(-100, -100);
 	
 	TEST_ASSERT_EQUALS(coord.getLength(), 141);
 	angle = coord.getAngle();
-	TEST_ASSERT_EQUALS_FLOAT(angle, - 3* M_PI / 4);
+	TEST_ASSERT_EQUALS_FLOAT(angle.toFloat(), - 3* M_PI / 4);
 	
 	coord.set(0, 100);
 	TEST_ASSERT_EQUALS(coord.getLength(), 100);
 	angle = coord.getAngle();
-	TEST_ASSERT_EQUALS_FLOAT(angle, M_PI / 2);
+	TEST_ASSERT_EQUALS_FLOAT(angle.toFloat(), M_PI / 2);
 	
 }
 

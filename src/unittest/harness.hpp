@@ -40,31 +40,36 @@
 #ifdef __DOXYGEN__
 
 /**
- * \brief		Verify (expr) is true 
+ * \brief	Verify (expr) is true
+ * 
  * \ingroup	unittest
  */
 #define	TEST_ASSERT_TRUE(expr)
 
 /**
- * \brief		Verify (expr) is false 
+ * \brief	Verify (expr) is false
+ * 
  * \ingroup	unittest
  */
 #define	TEST_ASSERT_FALSE(expr)
 
 /**
- * \brief		Verify (x==y)
+ * \brief	Verify (x==y)
+ * 
+ * Shortcut with extended output message for `TEST_ASSERT_TRUE(x == y);`
+ * 
  * \ingroup	unittest
  */
 #define	TEST_ASSERT_EQUALS(x, y)
 
 /**
- * \brief		Verify (x==y) for floating pointer values
+ * \brief	Verify (x==y) for floating point values
  * \ingroup	unittest
  */
 #define	TEST_ASSERT_EQUALS_FLOAT(x, y)
 
 /**
- * \brief		Verify (x==y) up to d
+ * \brief	Verify (x==y) up to d
  *
  * This macro verifies two values are equal up to a delta
  * 
@@ -73,19 +78,22 @@
 #define	TEST_ASSERT_EQUALS_DELTA(x, y, d)
 
 /**
- * \brief		Verify (lower <= value <= upper)
+ * \brief	Verify (lower <= value <= upper)
  * \ingroup	unittest
  */
 #define	TEST_ASSERT_EQUALS_RANGE(value, lower, upper)
 
 /**
- * \brief		Check if the arrays contains the same data
+ * \brief	Check if the arrays contains the same data
+ * 
+ * count is optional.
+ * 
  * \ingroup	unittest
  */
 #define	TEST_ASSERT_EQUALS_ARRAY(array1, array2, start, count)
 
 /**
- * \brief		Fail unconditionally  
+ * \brief	Fail unconditionally  
  * \ingroup	unittest
  */
 #define	TEST_FAIL(msg)
@@ -102,98 +110,137 @@ namespace unittest
 	EXTERN_FLASH_STRING(stringNotFalse);
 }
 
-#ifdef	TEST_RETURN_ON_FAIL
+// TODO implement this
+/*#ifdef	TEST_RETURN_ON_FAIL
 	#define	TEST_RETURN__	return
 #else
 	#define	TEST_RETURN__	
-#endif
+#endif*/
 
 #define	TEST_REPORTER__		unittest::Controller::instance().getReporter()
 
-#define	TEST_ASSERT_TRUE(expr)	\
-	if (expr) { \
-		TEST_REPORTER__.reportPass(); \
-	} else { \
-		TEST_REPORTER__.reportFailure(__LINE__) \
-			<< xpcc::modifier::flash(unittest::stringNotTrue); \
-		TEST_RETURN__; \
+namespace unittest
+{
+	// ------------------------------------------------------------------------
+	bool
+	checkExpression(bool expr, unsigned int line);
+	
+	// ------------------------------------------------------------------------
+	bool
+	checkEqual(const float& a, const float& b, unsigned int line);
+	
+	// ------------------------------------------------------------------------
+	template <typename A, typename B>
+	bool
+	checkEqual(const A& a, const B& b, unsigned int line)
+	{
+		if (a == b)
+		{
+			TEST_REPORTER__.reportPass();
+			return true;
+		}
+		else {
+			TEST_REPORTER__.reportFailure(line)
+				<< a << xpcc::modifier::flash(unittest::stringEqual) << b << '\n';
+			return false;
+		}
 	}
+	
+	template <typename A, typename B, typename D>
+	bool
+	checkEqualDelta(const A& a, const B& b, const D& delta, unsigned int line)
+	{
+		if (((a + delta) >= b) and ((a - delta) <= b))
+		{
+			TEST_REPORTER__.reportPass();
+			return true;
+		}
+		else {
+			TEST_REPORTER__.reportFailure(line)
+				<< a << xpcc::modifier::flash(unittest::stringEqual) << b << '\n';
+			return false;
+		}
+	}
+	
+	template <typename T, typename B>
+	bool
+	checkRange(const T& value, const B& lower, const B& upper, unsigned int line)
+	{
+		if ((value >= lower) && (value <= upper))
+		{
+			TEST_REPORTER__.reportPass();
+			return true;
+		}
+		else {
+			TEST_REPORTER__.reportFailure(line)
+				<< value << xpcc::modifier::flash(unittest::stringNotInRange)
+				<< '[' << lower << ',' << upper << ']' << '\n';
+			return false;
+		}
+	}
+	
+	// ------------------------------------------------------------------------
+	template <typename T>
+	inline void
+	printArray(xpcc::IOStream& stream, unsigned int start, unsigned int count, const T& array)
+	{
+		stream << '[';
+		for (unsigned int i = start; i < (start + count); ++i) {
+			stream << array[i];
+			if (i != start + count - 1) {
+				stream << ',' << ' ';
+			}
+		}
+		stream << ']' << '\n';
+	}
+	
+	template <typename A, typename B>
+	bool
+	checkArray(const A& a, const B& b, unsigned int line, unsigned int count, unsigned int start = 0)
+	{
+		for (unsigned int i = start; i < (start + count); ++i)
+		{
+			if (a[i] != b[i])
+			{
+				xpcc::IOStream& stream = TEST_REPORTER__.reportFailure(line);
+				
+				stream << '\n';
+				
+				printArray(stream, start, count, a);
+				printArray(stream, start, count, b);
+				return false;
+			}
+		}
+		
+		TEST_REPORTER__.reportPass();
+		return true;
+	}
+}
+
+#define	TEST_ASSERT_TRUE(expr)	\
+	::unittest::checkExpression(expr, __LINE__)
 
 #define	TEST_ASSERT_FALSE(expr)	\
-	if (expr) { \
-		TEST_REPORTER__.reportFailure(__LINE__) \
-			<< xpcc::modifier::flash(unittest::stringNotFalse); \
-		TEST_RETURN__; \
-	} else { \
-		TEST_REPORTER__.reportPass(); \
-	}
+	::unittest::checkExpression(!static_cast<bool>(expr), __LINE__)
 
 #define	TEST_ASSERT_EQUALS(x, y) \
-	if (x == y) { \
-		TEST_REPORTER__.reportPass(); \
-	} else { \
-		TEST_REPORTER__.reportFailure(__LINE__) \
-			<< x << xpcc::modifier::flash(unittest::stringEqual) << y << '\n'; \
-		TEST_RETURN__; \
-	}
+	::unittest::checkEqual(x, y, __LINE__)
 
 #define	TEST_ASSERT_EQUALS_FLOAT(x, y) \
-	TEST_ASSERT_EQUALS_DELTA(x, y, TEST_FLOAT_EPISLON)
+	::unittest::checkEqual(static_cast<float>(x), static_cast<float>(y), __LINE__)
 
 #define	TEST_ASSERT_EQUALS_DELTA(x, y, d) \
-	if ((((x) + d) >= y) && (((x) - d) <= y)) { \
-		TEST_REPORTER__.reportPass(); \
-	} else { \
-		TEST_REPORTER__.reportFailure(__LINE__) \
-			<< x << xpcc::modifier::flash(unittest::stringEqual) << y << '\n'; \
-		TEST_RETURN__; \
-	}
+	::unittest::checkEqualDelta(x, y, d, __LINE__)
 
 #define	TEST_ASSERT_EQUALS_RANGE(value, lower, upper) \
-	if ((value >= lower) && (value <= upper)) { \
-		TEST_REPORTER__.reportPass(); \
-	} else { \
-		TEST_REPORTER__.reportFailure(__LINE__) \
-			<< value << xpcc::modifier::flash(unittest::stringNotInRange) \
-			<< '[' << lower << ',' << upper << ']' << '\n'; \
-		TEST_RETURN__; \
-	}
+	::unittest::checkRange(value, lower, upper, __LINE__)
 
-// FIXME replace with template functions!
-#define	TEST_ASSERT_EQUALS_ARRAY(array1, array2, start, count) \
-	do { \
-		unsigned int i; \
-		bool failure = false; \
-		for (i = start; i < (start + count); i++) { \
-			if (array1[i] != array2[i]) { \
-				failure = true; \
-				break; \
-			} \
-		} \
-		if (failure) { \
-			xpcc::IOStream& stream = TEST_REPORTER__.reportFailure(__LINE__); \
-			stream << '\n'; \
-			stream << "["; \
-			for (unsigned int k = start; k < (start + count); k++) { \
-				stream << array1[k] << ", "; \
-			} \
-			stream << "]\n"; \
-			\
-			stream << "["; \
-			for (unsigned int k = start; k < (start + count); k++) { \
-				stream << array2[k] << ", "; \
-			} \
-			stream << "]\n"; \
-			TEST_RETURN__; \
-		} else { \
-			TEST_REPORTER__.reportPass(); \
-		} \
-	} while (0)
+#define	TEST_ASSERT_EQUALS_ARRAY(x, y, ...) \
+	::unittest::checkArray(x, y, __LINE__, __VA_ARGS__)
 
 #define	TEST_FAIL(msg) \
 	do {	TEST_REPORTER__.reportFailure(__LINE__) \
 			<< msg << '\n'; \
-		TEST_RETURN__; \
 	} while (0)
 
 #endif	// __DOXYGEN__

@@ -39,15 +39,15 @@ using namespace xpcc;
 void
 BitOperationTest::testSwap()
 {
-	TEST_ASSERT_EQUALS(utils::swap((uint8_t) 0xab), 0xba);
-	TEST_ASSERT_EQUALS(utils::swap((uint8_t) 0x18), 0x81);
-	TEST_ASSERT_EQUALS(utils::swap((uint8_t) 0x0f), 0xf0);
-	TEST_ASSERT_EQUALS(utils::swap((uint8_t) 0x73), 0x37);
+	TEST_ASSERT_EQUALS(utils::swap(static_cast<uint8_t>(0xab)), 0xbaU);
+	TEST_ASSERT_EQUALS(utils::swap(static_cast<uint8_t>(0x18)), 0x81U);
+	TEST_ASSERT_EQUALS(utils::swap(static_cast<uint8_t>(0x0f)), 0xf0U);
+	TEST_ASSERT_EQUALS(utils::swap(static_cast<uint8_t>(0x73)), 0x37U);
 	
-	TEST_ASSERT_EQUALS(utils::swap((uint16_t) 0xab45), 0x45ab);
-	TEST_ASSERT_EQUALS(utils::swap((uint16_t) 0x18ab), 0xab18);
-	TEST_ASSERT_EQUALS(utils::swap((uint16_t) 0x0f26), 0x260f);
-	TEST_ASSERT_EQUALS(utils::swap((uint16_t) 0x73f7), 0xf773);
+	TEST_ASSERT_EQUALS(utils::swap(static_cast<uint16_t>(0xab45)), 0x45abU);
+	TEST_ASSERT_EQUALS(utils::swap(static_cast<uint16_t>(0x18ab)), 0xab18U);
+	TEST_ASSERT_EQUALS(utils::swap(static_cast<uint16_t>(0x0f26)), 0x260fU);
+	TEST_ASSERT_EQUALS(utils::swap(static_cast<uint16_t>(0x73f7)), 0xf773U);
 }
 
 void
@@ -60,9 +60,9 @@ BitOperationTest::testReverse8bit()
 	}
 	
 	// test some random values
-	TEST_ASSERT_EQUALS(utils::bitReverse((uint8_t) 0xa3), 0xc5);
-	TEST_ASSERT_EQUALS(utils::bitReverse((uint8_t) 0x0f), 0xf0);
-	TEST_ASSERT_EQUALS(utils::bitReverse((uint8_t) 0xc1), 0x83);
+	TEST_ASSERT_EQUALS(utils::bitReverse(static_cast<uint8_t>(0xa3)), 0xc5U);
+	TEST_ASSERT_EQUALS(utils::bitReverse(static_cast<uint8_t>(0x0f)), 0xf0U);
+	TEST_ASSERT_EQUALS(utils::bitReverse(static_cast<uint8_t>(0xc1)), 0x83U);
 }
 
 void
@@ -75,9 +75,9 @@ BitOperationTest::testReverse16bit()
 	}
 	
 	// test some random values
-	TEST_ASSERT_EQUALS(utils::bitReverse((uint16_t) 0xa302), 0x40c5);
-	TEST_ASSERT_EQUALS(utils::bitReverse((uint16_t) 0x00f0), 0x0f00);
-	TEST_ASSERT_EQUALS(utils::bitReverse((uint16_t) 0xc176), 0x6e83);
+	TEST_ASSERT_EQUALS(utils::bitReverse(static_cast<uint16_t>(0xa302)), 0x40c5U);
+	TEST_ASSERT_EQUALS(utils::bitReverse(static_cast<uint16_t>(0x00f0)), 0x0f00U);
+	TEST_ASSERT_EQUALS(utils::bitReverse(static_cast<uint16_t>(0xc176)), 0x6e83U);
 }
 
 void
@@ -90,10 +90,10 @@ BitOperationTest::testReverse32bit()
 	}
 	
 	// test some random values
-	TEST_ASSERT_EQUALS(utils::bitReverse((uint32_t) 0xa3010ff0), 0x0ff080c5);
-	TEST_ASSERT_EQUALS(utils::bitReverse((uint32_t) 0xa3010ff0), 0x0ff080c5);
-	TEST_ASSERT_EQUALS(utils::bitReverse((uint32_t) 0x0f0c1760), 0x06e830f0);
-	TEST_ASSERT_EQUALS(utils::bitReverse((uint32_t) 0xc1040aaa), 0x55502083);
+	TEST_ASSERT_EQUALS(utils::bitReverse(static_cast<uint32_t>(0xa3010ff0)), 0x0ff080c5U);
+	TEST_ASSERT_EQUALS(utils::bitReverse(static_cast<uint32_t>(0xa3010ff0)), 0x0ff080c5U);
+	TEST_ASSERT_EQUALS(utils::bitReverse(static_cast<uint32_t>(0x0f0c1760)), 0x06e830f0U);
+	TEST_ASSERT_EQUALS(utils::bitReverse(static_cast<uint32_t>(0xc1040aaa)), 0x55502083U);
 }
 
 // ----------------------------------------------------------------------------
@@ -110,13 +110,13 @@ BitOperationTest::testCount8bit()
 		k |= 1;
 	}
 	
-	TEST_ASSERT_EQUALS(utils::bitCount((uint8_t) 0x00), 0);
-	TEST_ASSERT_EQUALS(utils::bitCount((uint8_t) 0x3c), 4);
-	TEST_ASSERT_EQUALS(utils::bitCount((uint8_t) 0x80), 1);
-	TEST_ASSERT_EQUALS(utils::bitCount((uint8_t) 0x07), 3);
-	TEST_ASSERT_EQUALS(utils::bitCount((uint8_t) 0xaa), 4);
-	TEST_ASSERT_EQUALS(utils::bitCount((uint8_t) 0x55), 4);
-	TEST_ASSERT_EQUALS(utils::bitCount((uint8_t) 0xff), 8);
+	TEST_ASSERT_EQUALS(utils::bitCount(static_cast<uint8_t>(0x00)), 0U);
+	TEST_ASSERT_EQUALS(utils::bitCount(static_cast<uint8_t>(0x3c)), 4U);
+	TEST_ASSERT_EQUALS(utils::bitCount(static_cast<uint8_t>(0x80)), 1U);
+	TEST_ASSERT_EQUALS(utils::bitCount(static_cast<uint8_t>(0x07)), 3U);
+	TEST_ASSERT_EQUALS(utils::bitCount(static_cast<uint8_t>(0xaa)), 4U);
+	TEST_ASSERT_EQUALS(utils::bitCount(static_cast<uint8_t>(0x55)), 4U);
+	TEST_ASSERT_EQUALS(utils::bitCount(static_cast<uint8_t>(0xff)), 8U);
 }
 
 void
@@ -131,13 +131,13 @@ BitOperationTest::testCount16bit()
 		k |= 1;
 	}
 	
-	TEST_ASSERT_EQUALS(utils::bitCount((uint16_t) 0x0000), 0);
-	TEST_ASSERT_EQUALS(utils::bitCount((uint16_t) 0x3c00), 4);
-	TEST_ASSERT_EQUALS(utils::bitCount((uint16_t) 0x0080), 1);
-	TEST_ASSERT_EQUALS(utils::bitCount((uint16_t) 0xaaaa), 8);
-	TEST_ASSERT_EQUALS(utils::bitCount((uint16_t) 0x5555), 8);
-	TEST_ASSERT_EQUALS(utils::bitCount((uint16_t) 0xf307), 9);
-	TEST_ASSERT_EQUALS(utils::bitCount((uint16_t) 0xffff), 16);
+	TEST_ASSERT_EQUALS(utils::bitCount(static_cast<uint16_t>(0x0000)), 0U);
+	TEST_ASSERT_EQUALS(utils::bitCount(static_cast<uint16_t>(0x3c00)), 4U);
+	TEST_ASSERT_EQUALS(utils::bitCount(static_cast<uint16_t>(0x0080)), 1U);
+	TEST_ASSERT_EQUALS(utils::bitCount(static_cast<uint16_t>(0xaaaa)), 8U);
+	TEST_ASSERT_EQUALS(utils::bitCount(static_cast<uint16_t>(0x5555)), 8U);
+	TEST_ASSERT_EQUALS(utils::bitCount(static_cast<uint16_t>(0xf307)), 9U);
+	TEST_ASSERT_EQUALS(utils::bitCount(static_cast<uint16_t>(0xffff)), 16U);
 }
 
 void
@@ -152,10 +152,10 @@ BitOperationTest::testCount32bit()
 		k |= 1;
 	}
 	
-	TEST_ASSERT_EQUALS(utils::bitCount((uint32_t) 0x00000000), 0);
-	TEST_ASSERT_EQUALS(utils::bitCount((uint32_t) 0x00003c00), 4);
-	TEST_ASSERT_EQUALS(utils::bitCount((uint32_t) 0x0560f307), 13);
-	TEST_ASSERT_EQUALS(utils::bitCount((uint32_t) 0xaaaaaaaa), 16);
-	TEST_ASSERT_EQUALS(utils::bitCount((uint32_t) 0x55555555), 16);
-	TEST_ASSERT_EQUALS(utils::bitCount((uint32_t) 0xffffffff), 32);
+	TEST_ASSERT_EQUALS(utils::bitCount(static_cast<uint32_t>(0x00000000)), 0U);
+	TEST_ASSERT_EQUALS(utils::bitCount(static_cast<uint32_t>(0x00003c00)), 4U);
+	TEST_ASSERT_EQUALS(utils::bitCount(static_cast<uint32_t>(0x0560f307)), 13U);
+	TEST_ASSERT_EQUALS(utils::bitCount(static_cast<uint32_t>(0xaaaaaaaa)), 16U);
+	TEST_ASSERT_EQUALS(utils::bitCount(static_cast<uint32_t>(0x55555555)), 16U);
+	TEST_ASSERT_EQUALS(utils::bitCount(static_cast<uint32_t>(0xffffffff)), 32U);
 }

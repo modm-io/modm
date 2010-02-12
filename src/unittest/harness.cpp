@@ -37,6 +37,32 @@ namespace unittest
 	FLASH_STRING(stringEqual) = " == ";
 	FLASH_STRING(stringNotInRange) = " not in range ";
 	FLASH_STRING(stringNotTrue) = "true == false\n";
-	FLASH_STRING(stringNotFalse) = "false == true\n";
 }
 
+bool
+unittest::checkExpression(bool expr, unsigned int line)
+{
+	if (expr) {
+		TEST_REPORTER__.reportPass();
+		return true;
+	} else {
+		TEST_REPORTER__.reportFailure(line)
+			<< xpcc::modifier::flash(unittest::stringNotTrue);
+		return false;
+	}
+}
+
+bool
+unittest::checkEqual(const float& a, const float& b, unsigned int line)
+{
+	if (((a + TEST_FLOAT_EPISLON) >= b) and ((a - TEST_FLOAT_EPISLON) <= b))
+	{
+		TEST_REPORTER__.reportPass();
+		return true;
+	}
+	else {
+		TEST_REPORTER__.reportFailure(line)
+			<< a << xpcc::modifier::flash(unittest::stringEqual) << b << '\n';
+		return false;
+	}
+}

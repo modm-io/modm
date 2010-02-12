@@ -105,7 +105,6 @@ namespace xpcc
 			operator <<(IOStream &os, const Angle &a);
 
 		private:
-
 			float value;
 	};
 
