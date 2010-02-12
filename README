@@ -1,21 +1,36 @@
 XPCC - Cross Platform Component Communication
+=============================================
 
 Packet orientated communication library, enabling transparent communication 
 between components on PCs and microcontrollers. It provides an interface to 
 communicate via CAN, TCP/IP or TIPC.
 
---------------------------------------------------------------------------------
-= INDEX =
+Structure
+---------
 
- 1. How to build the API-documentation 
- 
---------------------------------------------------------------------------------
-= 1. How to build the API-documentation =
+ - build
 
-You need Doxygen (http://www.doxygen.nl/).
-Go to the root folder and invoke doxygen with
+Temporary folder
+   
+ - doc
 
-	xpcc/trunk$ doxygen doc/doxyfile
+Documentation
 
-The documentation will be written to xpcc/trunk/doc/apidoc/html/
-Start the index.html with your favourite browser.
+ - examples
+   
+ - misc
+
+SCons tools etc.
+
+ - src
+
+Source for the xpcc library
+
+ - system
+
+System builder, used to generate files for the system architecture from 
+XML-files.
+
+ - tests
+   
+

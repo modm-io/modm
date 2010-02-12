@@ -1,3 +1,5 @@
+Things that need to be done
+===========================
 
- * Replace the TEST_ASSERT_EQUALS_ARRAY implementation in 'src/unittest/harness.hpp'
+ - Replace the TEST_ASSERT_EQUALS_ARRAY implementation in 'src/unittest/harness.hpp'
    with a template function
