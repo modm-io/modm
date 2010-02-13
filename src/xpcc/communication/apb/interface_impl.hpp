@@ -2,7 +2,7 @@
 // ----------------------------------------------------------------------------
 /* Copyright (c) 2009, Roboterclub Aachen e.V.
  * All rights reserved.
- *
+ * 
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  * 
@@ -14,7 +14,7 @@
  *     * Neither the name of the Roboterclub Aachen e.V. nor the
  *       names of its contributors may be used to endorse or promote products
  *       derived from this software without specific prior written permission.
- *
+ * 
  * THIS SOFTWARE IS PROVIDED BY ROBOTERCLUB AACHEN E.V. ''AS IS'' AND ANY
  * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -25,88 +25,133 @@
  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
+ * 
  * $Id$
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__DOG_M16X_HPP
-	#error	"Don't include this file directly, use 'dog_m16x.hpp' instead!"
+#ifndef	XPCC_APB__INTERFACE_HPP
+	#error	"Don't include this file directly, use 'interface.hpp' instead!"
 #endif
 
-// ----------------------------------------------------------------------------
+#ifdef __AVR__
+	#include <util/crc16.h>
+#endif
 
-namespace xpcc {
-	namespace dog_m16x {
-		EXTERN_FLASH(uint8_t configuration[10]);
-	}
-}
+#define	XPCC_APB__SYNC_BYTE		0x54
 
 // ----------------------------------------------------------------------------
 
-template <typename SPI, typename CS, typename RS>
-xpcc::DogM16x<SPI, CS, RS>::DogM16x() :
-	Lcd()
-{
-}
+template <typename DEVICE> uint8_t xpcc::apb::Interface<DEVICE>::lengthOfReceivedMessage = 0;
+template <typename DEVICE> typename xpcc::apb::Interface<DEVICE>::State \
+	xpcc::apb::Interface<DEVICE>::state = SYNC;
 
 // ----------------------------------------------------------------------------
 
-template <typename SPI, typename CS, typename RS>
+template <typename DEVICE>
 void
-xpcc::DogM16x<SPI, CS, RS>::initialize()
+xpcc::apb::Interface<DEVICE>::initialize()
 {
-	SPI::initialize();
-	CS::setOutput();
-	RS::setOutput();
+	DEVICE::setBaudrate(38400U);
+	state = SYNC;
+}
+
+// ----------------------------------------------------------------------------
+
+template <typename DEVICE>
+void
+xpcc::apb::Interface<DEVICE>::sendMessage(const uint8_t *data, uint8_t size)
+{
+	DEVICE::write(XPCC_APB__SYNC_BYTE);
 	
-	FlashPointer<uint8_t> cfgPtr(dog_m16x::configuration);
-	for (uint8_t i = 0; i < 10; ++i)
+}
+
+// ----------------------------------------------------------------------------
+
+template <typename DEVICE>
+uint8_t
+xpcc::apb::Interface<DEVICE>::checkForMessage()
+{
+	return lengthOfReceivedMessage;
+}
+
+template <typename DEVICE>
+const uint8_t&
+xpcc::apb::Interface<DEVICE>::getData()
+{
+	return buffer;
+}
+
+template <typename DEVICE>
+void
+xpcc::apb::Interface<DEVICE>::dropMessage()
+{
+	lengthOfReceivedMessage = 0;
+}
+
+// ----------------------------------------------------------------------------
+
+template <typename DEVICE>
+void
+xpcc::apb::Interface<DEVICE>::update()
+{
+	uint8_t byte;
+	while (DEVICE::read(byte))
 	{
-		writeCommand(cfgPtr[i]);
+		switch (state)
+		{
+			case SYNC:
+				if (byte == XPCC_APB__SYNC_BYTE) {
+					state = HEADER;
+				}
+				break;
+			
+			case HEADER:
+				length = (byte & 0x1f) + 1;
+				position = 0;
+				crc = 0;
+				state = DATA;
+				break;
+			
+			case DATA:
+				buffer[position] = byte;
+				crc = crcUpdate(crc, byte);
+				
+				position += 1;
+				if (position >= length) {
+					state = SYNC;
+					if (crc == 0) {
+						lengthOfReceivedMessage = length - 1;
+					}
+				}
+				break;
+			
+			default:
+				state = SYNC;
+				break;
+		}
 	}
-}
-
-template <typename SPI, typename CS, typename RS>
-void
-xpcc::DogM16x<SPI, CS, RS>::putRaw(char c)
-{
-	RS::set();
-	
-	CS::reset();
-	SPI::put(c);
-	CS::set();
-}
-
-template <typename SPI, typename CS, typename RS>
-void
-xpcc::DogM16x<SPI, CS, RS>::setPosition(uint8_t line, uint8_t column)
-{
-	this->column = column;
-	this->line = line;
-	
-	column += 0x40 * line;
-	writeCommand(0x80 | column);
 }
 
 // ----------------------------------------------------------------------------
 
-template <typename SPI, typename CS, typename RS>
-void
-xpcc::DogM16x<SPI, CS, RS>::writeCommand(uint8_t command)
+template <typename DEVICE>
+uint8_t
+xpcc::apb::Interface<DEVICE>::crcUpdate(uint8_t crc, uint8_t data)
 {
-	RS::reset();
-	
-	CS::reset();
-	SPI::put(command);
-	CS::set();
-	
-	// check if the command is 'clear display' oder 'return home', these
-	// commands take a bit longer until they are finished.
-	if ((command & 0xfc) == 0) {
-		delay_ms(1.2);
+#ifdef __AVR__
+	return _crc_ibutton_update(crc, data);
+#else
+	crc = crc ^ data;
+	for (uint_fast8_t i = 0; i < 8; ++i)
+	{
+		if (crc & 0x01) {
+			crc = (crc >> 1) ^ 0x8C;
+		}
+		else {
+			crc >>= 1;
+		}
 	}
-	else {
-		delay_us(27);
-	}
+	return crc;
+#endif
 }

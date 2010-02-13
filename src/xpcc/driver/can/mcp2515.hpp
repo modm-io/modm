@@ -91,9 +91,9 @@ namespace xpcc
 	 * 
 	 * \brief	Driver for a MPC2515 CAN Controller
 	 * 
-	 * \tparam	SPI		TODO
-	 * \tparam	CS		TODO
-	 * \tparam	INT		TODO
+	 * \tparam	SPI		SPI interface
+	 * \tparam	CS		Chip select pin
+	 * \tparam	INT		Interrupt pin
 	 * 
 	 * If you want to activate the internal pullup for the INT pin you
 	 * need to do this by yourself before calling the initialize method!

@@ -82,9 +82,6 @@ namespace xpcc
 	
 	protected:
 		void
-		writeData(uint8_t data);
-		
-		void
 		writeCommand(uint8_t command);
 	};
 }

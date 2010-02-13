@@ -30,57 +30,70 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__DOG_M16X_HPP
-	#error	"Don't include this file directly, use 'dog_m16x.hpp' instead!"
+#ifndef XPCC__HD44780_HPP
+	#error	"Don't include this file directly, use 'hd44780.hpp' instead!"
 #endif
 
 // ----------------------------------------------------------------------------
 
-namespace xpcc {
-	namespace dog_m16x {
-		EXTERN_FLASH(uint8_t configuration[10]);
-	}
-}
-
-// ----------------------------------------------------------------------------
-
-template <typename SPI, typename CS, typename RS>
-xpcc::DogM16x<SPI, CS, RS>::DogM16x() :
+template <typename E, typename RW, typename RS, typename DATA>
+xpcc::Hd447800<E, RW, RS, DATA>::Hd447800() : 
 	Lcd()
 {
 }
 
 // ----------------------------------------------------------------------------
 
-template <typename SPI, typename CS, typename RS>
+template <typename E, typename RW, typename RS, typename DATA>
 void
-xpcc::DogM16x<SPI, CS, RS>::initialize()
+xpcc::Hd447800<E, RW, RS, DATA>::initialize()
 {
-	SPI::initialize();
-	CS::setOutput();
+	E::setOutput();
+	RW::setOutput();
 	RS::setOutput();
+	DATA::setOutput();
 	
-	FlashPointer<uint8_t> cfgPtr(dog_m16x::configuration);
-	for (uint8_t i = 0; i < 10; ++i)
-	{
-		writeCommand(cfgPtr[i]);
-	}
+	E::reset();
+	RS::reset();
+	delay_ms(15);
+	
+	writeNibble(0x03);
+	delay_ms(5);
+	
+	writeNibble(0x03);
+	delay_us(100);
+	
+	writeNibble(0x03);
+	delay_us(100);
+	
+	writeNibble(0x02);
+	delay_us(100);
+	
+	writeCommand(0x28);		// 2 lines 5*7
+	writeCommand(0x08);		// display off
+	writeCommand(0x01);		// display clear
+	writeCommand(0x06);		// cursor increment
+	writeCommand(0x0C);		// on, no cursor, no blink
 }
 
-template <typename SPI, typename CS, typename RS>
+template <typename E, typename RW, typename RS, typename DATA>
 void
-xpcc::DogM16x<SPI, CS, RS>::putRaw(char c)
+xpcc::Hd447800<E, RW, RS, DATA>::putRaw(char c)
 {
+	waitBusy();
+	
+	DATA::setOutput();
+	RW::reset();
 	RS::set();
 	
-	CS::reset();
-	SPI::put(c);
-	CS::set();
+	uint8_t data = c;
+	writeNibble(data >> 4);
+	writeNibble(data);
 }
 
-template <typename SPI, typename CS, typename RS>
+template <typename E, typename RW, typename RS, typename DATA>
 void
-xpcc::DogM16x<SPI, CS, RS>::setPosition(uint8_t line, uint8_t column)
+xpcc::Hd447800<E, RW, RS, DATA>::setPosition(uint8_t line, uint8_t column)
 {
 	this->column = column;
 	this->line = line;
@@ -91,22 +104,64 @@ xpcc::DogM16x<SPI, CS, RS>::setPosition(uint8_t line, uint8_t column)
 
 // ----------------------------------------------------------------------------
 
-template <typename SPI, typename CS, typename RS>
+template <typename E, typename RW, typename RS, typename DATA>
 void
-xpcc::DogM16x<SPI, CS, RS>::writeCommand(uint8_t command)
+xpcc::Hd447800<E, RW, RS, DATA>::writeNibble(uint8_t data)
 {
+	DATA::write(data);
+	
+	E::set();
+	delay_us(1);
+	E::reset();
+}
+
+template <typename E, typename RW, typename RS, typename DATA>
+uint8_t
+xpcc::Hd447800<E, RW, RS, DATA>::readByte()
+{
+	uint8_t data;
+	
+	DATA::setInput();
+	RS::reset();
+	RW::set();
+	
+	E::set();
+	delay_us(1);
+	data = DATA::read();
+	E::reset();
+	
+	data <<= 4;
+	
+	E::set();
+	delay_us(1);
+	data |= DATA::read();
+	E::reset();
+	
+	return data;
+}
+
+template <typename E, typename RW, typename RS, typename DATA>
+void
+xpcc::Hd447800<E, RW, RS, DATA>::waitBusy()
+{
+	while (readByte() & 0x80) {
+		// wait until busy flag is reseted
+	}
+	
+	// the address counter is updated 4 us after the busy flag is reseted
+	delay_us(2);
+}
+
+template <typename E, typename RW, typename RS, typename DATA>
+void
+xpcc::Hd447800<E, RW, RS, DATA>::writeCommand(uint8_t command)
+{
+	waitBusy();
+	
+	DATA::setOutput();
+	RW::reset();
 	RS::reset();
 	
-	CS::reset();
-	SPI::put(command);
-	CS::set();
-	
-	// check if the command is 'clear display' oder 'return home', these
-	// commands take a bit longer until they are finished.
-	if ((command & 0xfc) == 0) {
-		delay_ms(1.2);
-	}
-	else {
-		delay_us(27);
-	}
+	writeNibble(command >> 4);
+	writeNibble(command);
 }

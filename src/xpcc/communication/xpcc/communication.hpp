@@ -30,8 +30,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC_COMMUNICATION_HPP
-#define	XPCC_COMMUNICATION_HPP
+#ifndef	XPCC__COMMUNICATION_HPP
+#define	XPCC__COMMUNICATION_HPP
 
 #include "backend/backend_interface.hpp"
 #include "abstract_component.hpp"
@@ -209,4 +209,4 @@ xpcc::Communication::publishEvent(uint8_t eventIdentifier, const T& data)
 	this->responseManager.addEvent(header, payload);
 }
 
-#endif // XPCC_COMMUNICATION_HPP
+#endif // XPCC__COMMUNICATION_HPP

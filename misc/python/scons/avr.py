@@ -123,7 +123,7 @@ def generate(env, **kw):
 	
 	env['LINKFLAGS'] = " ".join([
 		"-mmcu=$AVR_DEVICE", 
-		"-Wl,-Map=${TARGET.base}.map,--cref", 
+#		"-Wl,-Map=${TARGET.base}.map,--cref", 
 		"-Wl,--relax", 
 		"-Wl,--gc-sections",
 #		"-Wl,-u,vfprintf -lprintf_flt"		# enable float support for vfprinft

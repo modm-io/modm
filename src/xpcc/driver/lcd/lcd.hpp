@@ -67,10 +67,10 @@ namespace xpcc
 		} Command;
 		
 	public:
-		/// \brief	Constructor
+		/// Constructor
 		Lcd();
 		
-		/// \brief	Initialize the display
+		/// Initialize the display
 		virtual void
 		initialize() = 0;
 		

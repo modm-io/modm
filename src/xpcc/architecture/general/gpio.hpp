@@ -33,30 +33,48 @@
 #ifndef XPCC__GPIO_HPP
 #define XPCC__GPIO_HPP
 
+#include <stdint.h>
+
 #include <xpcc/utils/macros.hpp>
+
+/**
+ * \ingroup		architecture
+ * \defgroup	gpio	General purpose input and/or output pins
+ */
 
 namespace xpcc
 {
 	/**
-	 * \ingroup	architecture
+	 * \ingroup	gpio
 	 * \brief	General purpose input and/or output pins
 	 */
 	namespace gpio
 	{
 		/**
+		 * \ingroup	gpio
+		 */
+		typedef enum
+		{
+			INPUT,
+			OUTPUT,
+		} Mode;
+		
+		/**
 		 * \brief	Dummy implementation of an I/O pin
 		 * 
+		 * \ingroup	gpio
+		 * \author	Fabian Greif
 		 */
 		class Unused
 		{
 		public:
 			ALWAYS_INLINE static void
-			output()
+			setOutput()
 			{
 			}
 			
 			ALWAYS_INLINE static void
-			input()
+			setInput()
 			{
 			}
 			
@@ -66,20 +84,91 @@ namespace xpcc
 			}
 			
 			ALWAYS_INLINE static void
-			set(bool status)
-			{
-				(void) status;
-			}
-		
-			ALWAYS_INLINE static void
 			reset()
 			{
 			}
 			
+			ALWAYS_INLINE static void
+			toggle()
+			{
+			}
+			
 			ALWAYS_INLINE static bool
-			get()
+			read()
 			{
 				return false;
+			}
+			
+			ALWAYS_INLINE static void
+			write(bool status)
+			{
+				(void) status;
+			}
+		};
+		
+		/**
+		 * \brief	Generic implementation of a Nibble composed of four
+		 * 			independent pins.
+		 * 
+		 * Generally speaking the CREATE_LOW/HIGH_NIBBLE macros should be
+		 * prefered because they are faster and require less code.
+		 * 
+		 * \see		CREATE_LOW_NIBBLE(), CREATE_HIGH_NIBBLE()
+		 * \ingroup	gpio
+		 * \author	Fabian Greif
+		 */
+		template <typename D3, typename D2, typename D1, typename D0>
+		class Nibble
+		{
+			ALWAYS_INLINE static void
+			setOutput()
+			{
+				D3::setOutput();
+				D2::setOutput();
+				D1::setOutput();
+				D0::setOutput();
+			}
+			
+			ALWAYS_INLINE static void
+			setInput()
+			{
+				D3::setInput();
+				D2::setInput();
+				D1::setInput();
+				D0::setInput();
+			}
+			
+			/**
+			 * \brief	Read data
+			 * 
+			 * Only the lower four bits are used, the higher will always
+			 * be zero.
+			 */
+			static uint8_t
+			read()
+			{
+				uint8_t value = 0;
+				
+				if (D3::read()) { value |= 0x08; }
+				if (D2::read()) { value |= 0x04; }
+				if (D1::read()) { value |= 0x02; }
+				if (D0::read()) { value |= 0x01; }
+				
+				return value;
+			}
+			
+			/**
+			 * \brief	Write data
+			 * 
+			 * Only the lower four bits are used.
+			 */
+			static void
+			write(uint8_t data)
+			{
+				if (data & 0x08) { D3::set(); } else { D3::reset(); }
+				if (data & 0x04) { D2::set(); } else { D2::reset(); }
+				if (data & 0x02) { D1::set(); } else { D1::reset(); }
+				if (data & 0x01) { D0::set(); } else { D0::reset(); }
 			}
 		};
 	}

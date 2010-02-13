@@ -30,31 +30,72 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__IOSTREAM_HPP
-	#error	"Don't include this file directly, use 'iostream.hpp' instead!"
-#endif
+#ifndef XPCC__HD44780_HPP
+#define XPCC__HD44780_HPP
 
-#include <stdio.h>		// snprintf()
-#include <stdlib.h>
+#include <xpcc/driver/lcd/lcd.hpp>
+#include <xpcc/architecture/general/time/delay.hpp>
 
-#include <xpcc/math/utils.hpp>
-#include <xpcc/utils/arithmetic_traits.hpp>
-#include <xpcc/utils/typet.hpp>
-
-// ----------------------------------------------------------------------------
-
-template<typename T>
-void
-xpcc::IOStream::putFloat( const T& value )
+namespace xpcc
 {
-	// hard coded for 2.22507e-308
-	char str[13 + 1]; // +1 for '\0'
+	/**
+	 * \brief	Driver for HD447800 compatible displays
+	 * 
+	 * An HD44780 Character LCD is a de facto industry standard liquid crystal
+	 * display (LCD) display device. These screens come in common
+	 * configurations of 8x1, which is one row of eight characters, 16x2, and
+	 * 20x4, among others.
+	 * 
+	 * This driver uses the 4-Bit mode with read back. Therefore you need to
+	 * connect all there control pins (RW, RS, E) and the high nibble of the
+	 * data lines.
+	 * 
+	 * \tparam	DATA	needs to be a Nibble. See Nibble() for more details.
+	 * 
+	 * \see		Lcd
+	 * \see		http://en.wikipedia.org/wiki/HD44780_Character_LCD
+	 * 
+	 * \author	Fabian Greif
+	 * \ingroup	driver
+	 */
+	template <typename E, typename RW, typename RS, typename DATA>
+	class Hd447800 : public Lcd
+	{
+	public:
+		/// Constructor
+		Hd447800();
+		
+		/**
+		 * \brief	Initialize the display
+		 * 
+		 * The display needs some time to initalize after startup. You have
+		 * to wait at least 50 ms until calling this method.
+		 */
+		virtual void
+		initialize();
+		
+		virtual void
+		putRaw(char c);
+		
+		virtual void
+		setPosition(uint8_t line, uint8_t column);
 	
-#ifdef __AVR__
-	dtostre(value, str, 5, 0);
-#else
-	snprintf(str, sizeof(str), "%.5e", value);
-#endif
-	
-	this->device->put(str);
+	protected:
+		void
+		writeNibble(uint8_t data);
+		
+		uint8_t
+		readByte();
+		
+		/// Wait unitl the busy flag is reseted
+		void
+		waitBusy();
+		
+		void
+		writeCommand(uint8_t command);
+	};
 }
+
+#include "hd44780_impl.hpp"
+
+#endif // XPCC__HD44780_HPP

@@ -25,36 +25,17 @@
  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
+ * 
  * $Id$
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__IOSTREAM_HPP
-	#error	"Don't include this file directly, use 'iostream.hpp' instead!"
-#endif
+#ifndef XPCC__ATMEGA_UART_HPP
+#define XPCC__ATMEGA_UART_HPP
 
-#include <stdio.h>		// snprintf()
-#include <stdlib.h>
+#include "uart0.hpp"
+#include "uart1.hpp"
+#include "uart2.hpp"
+#include "uart3.hpp"
 
-#include <xpcc/math/utils.hpp>
-#include <xpcc/utils/arithmetic_traits.hpp>
-#include <xpcc/utils/typet.hpp>
-
-// ----------------------------------------------------------------------------
-
-template<typename T>
-void
-xpcc::IOStream::putFloat( const T& value )
-{
-	// hard coded for 2.22507e-308
-	char str[13 + 1]; // +1 for '\0'
-	
-#ifdef __AVR__
-	dtostre(value, str, 5, 0);
-#else
-	snprintf(str, sizeof(str), "%.5e", value);
-#endif
-	
-	this->device->put(str);
-}
+#endif // XPCC__ATMEGA_UART_HPP

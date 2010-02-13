@@ -15,7 +15,7 @@ namespace xpcc
 	 * \brief	PC specifiy functions
 	 * \ingroup	pc
 	 */
-	namespace avr
+	namespace pc
 	{
 	}
 }

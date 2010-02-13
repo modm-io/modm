@@ -2,7 +2,7 @@
 // ----------------------------------------------------------------------------
 /* Copyright (c) 2009, Roboterclub Aachen e.V.
  * All rights reserved.
- *
+ * 
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  * 
@@ -14,7 +14,7 @@
  *     * Neither the name of the Roboterclub Aachen e.V. nor the
  *       names of its contributors may be used to endorse or promote products
  *       derived from this software without specific prior written permission.
- *
+ * 
  * THIS SOFTWARE IS PROVIDED BY ROBOTERCLUB AACHEN E.V. ''AS IS'' AND ANY
  * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -25,36 +25,17 @@
  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
+ * 
  * $Id$
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__IOSTREAM_HPP
-	#error	"Don't include this file directly, use 'iostream.hpp' instead!"
+#ifndef	XPCC_APB__MASTER_HPP
+	#error	"Don't include this file directly, use 'master.hpp' instead!"
 #endif
 
-#include <stdio.h>		// snprintf()
-#include <stdlib.h>
-
-#include <xpcc/math/utils.hpp>
-#include <xpcc/utils/arithmetic_traits.hpp>
-#include <xpcc/utils/typet.hpp>
-
-// ----------------------------------------------------------------------------
-
-template<typename T>
+template <typename DEVICE>
 void
-xpcc::IOStream::putFloat( const T& value )
+xpcc::apb::Master<DEVICE>::initialize()
 {
-	// hard coded for 2.22507e-308
-	char str[13 + 1]; // +1 for '\0'
-	
-#ifdef __AVR__
-	dtostre(value, str, 5, 0);
-#else
-	snprintf(str, sizeof(str), "%.5e", value);
-#endif
-	
-	this->device->put(str);
 }

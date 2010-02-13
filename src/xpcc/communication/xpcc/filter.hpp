@@ -29,8 +29,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC_FILTER_INTERFACE_H
-#define	XPCC_FILTER_INTERFACE_H
+#ifndef	XPCC__FILTER_HPP
+#define	XPCC__FILTER_HPP
 
 #include <stdint.h>
 #include "backend/backend_interface.hpp"
@@ -59,4 +59,4 @@ namespace xpcc
 
 }
 
-#endif	// XPCC_FILTER_INTERFACE_H
+#endif	// XPCC__FILTER_HPP

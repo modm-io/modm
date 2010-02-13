@@ -80,7 +80,7 @@ namespace xpcc
 			return *this;
 		}
 		
-		/// set the output mode to HEX style for \b char and \b char*
+		/// set the output mode to HEX style for \c char and \c char*
 		ALWAYS_INLINE IOStream&
 		hex()
 		{
@@ -88,7 +88,7 @@ namespace xpcc
 			return *this;
 		}
 
-		/// set the output mode to ASCII style for \b char and \b char*
+		/// set the output mode to ASCII style for \c char and \c char*
 		ALWAYS_INLINE IOStream&
 		ascii()
 		{
@@ -100,7 +100,7 @@ namespace xpcc
 		operator << ( const unsigned char& v )
 		{
 			if( this->mode == ASCII ) {
-				this->putInteger( static_cast<unsigned short>( v ) );
+				this->putInteger( static_cast<uint16_t>( v ) );
 			}
 			else {
 				this->putHex( v );

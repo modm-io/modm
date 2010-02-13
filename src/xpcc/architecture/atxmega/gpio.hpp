@@ -30,31 +30,18 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__XMEGA_GPIO_HPP
-#define XPCC__XMEGA_GPIO_HPP
+#ifndef XPCC__ATXMEGA_GPIO_HPP
+#define XPCC__ATXMEGA_GPIO_HPP
 
 #include <avr/io.h>
+
 #include <xpcc/utils/macros.hpp>
+#include <xpcc/architecture/general/gpio.hpp>
 
 namespace xpcc
 {
-	/**
-	 * \ingroup	architecture
-	 */
 	namespace gpio
 	{
-		/**
-		 * \ingroup	architecture
-		 */
-		typedef enum
-		{
-			INPUT,
-			OUTPUT,
-		} Mode;
-		
-		/**
-		 * \ingroup	architecture
-		 */
 		typedef enum
 		{
 			NORMAL = PORT_OPC_TOTEM_gc,
@@ -69,38 +56,36 @@ namespace xpcc
 	}
 }
 
-// some helper macros
-#define	PORT(x)		(PORT ## x)
-
 /**
- * \ingroup	architecture
  * \brief	Create a input/output pin type
+ * 
+ * \ingroup	gpio
  */
 #define	CREATE_IO_PIN(name, port, pin) \
 	struct name \
 	{ \
-		inline name() { this->input() } \
-		\
 		ALWAYS_INLINE static void \
 		configure(::xpcc::gpio::Mode mode, \
 				  ::xpcc::gpio::Configuration config = ::xpcc::gpio::NORMAL, \
 				  bool invert = false) \
 		{ \
 			if (mode == ::xpcc::gpio::INPUT) { \
-				input(); \
+				setInput(); \
 			} \
 			else { \
-				output(); \
+				setOutput(); \
 			} \
 			PORT ## port ## _PIN ## pin ## CTRL = config | ((invert) ? PORT_INVEN_bm : 0); \
 		} \
 		\
-		ALWAYS_INLINE static void output() { PORT ## port ## _DIRSET = (1 << pin); } \
-		ALWAYS_INLINE static void input() { PORT ## port ## _DIRCLR = (1 << pin); } \
+		ALWAYS_INLINE static void setOutput() { PORT ## port ## _DIRSET = (1 << pin); } \
+		ALWAYS_INLINE static void setInput() { PORT ## port ## _DIRCLR = (1 << pin); } \
 		ALWAYS_INLINE static void set() { PORT ## port ## _OUTSET = (1 << pin); } \
+		ALWAYS_INLINE static void reset() { PORT ## port ## _OUTCLR = (1 << pin); } \
+		ALWAYS_INLINE static void toggle() { PORT ## port ## _OUTTGL = (1 << pin); } \
 		\
 		ALWAYS_INLINE static void \
-		set(bool status) { \
+		write(bool status) { \
 			if (status) { \
 				set(); \
 			} \
@@ -109,32 +94,31 @@ namespace xpcc
 			} \
 		} \
 		\
-		ALWAYS_INLINE static void reset() { PORT ## port ## _OUTCLR = (1 << pin); } \
-		ALWAYS_INLINE static void toggle() { PORT ## port ## _OUTTGL = (1 << pin); } \
-		ALWAYS_INLINE static bool get() { return (PORT ## port ## _IN & (1 << pin)); } \
+		ALWAYS_INLINE static bool read() { return (PORT ## port ## _IN & (1 << pin)); } \
 	}
 
 /**
- * \ingroup	architecture
  * \brief	Create a output pin type
+ * 
+ * \ingroup	gpio
  */
 #define	CREATE_OUTPUT_PIN(name, port, pin) \
 	struct name \
 	{ \
-		inline name() { this->output(); } \
-		\
 		ALWAYS_INLINE static void \
 		configure(::xpcc::gpio::Configuration config = ::xpcc::gpio::NORMAL, \
 				  bool invert = false) { \
-			output(); \
+			setOutput(); \
 			PORT ## port ## _PIN ## pin ## CTRL = config | ((invert) ? PORT_INVEN_bm : 0); \
 		} \
 		\
-		ALWAYS_INLINE static void output() { PORT ## port ## _DIRSET = (1 << pin); } \
+		ALWAYS_INLINE static void setOutput() { PORT ## port ## _DIRSET = (1 << pin); } \
 		ALWAYS_INLINE static void set() { PORT ## port ## _OUTSET = (1 << pin); } \
+		ALWAYS_INLINE static void reset() { PORT ## port ## _OUTCLR = (1 << pin); } \
+		ALWAYS_INLINE static void toggle() { PORT ## port ## _OUTTGL = (1 << pin); } \
 		\
 		ALWAYS_INLINE static void \
-		set(bool status) { \
+		write(bool status) { \
 			if (status) { \
 				set(); \
 			} \
@@ -142,30 +126,29 @@ namespace xpcc
 				reset(); \
 			} \
 		} \
-		\
-		ALWAYS_INLINE static void reset() { PORT ## port ## _OUTCLR = (1 << pin); } \
-		ALWAYS_INLINE static void toggle() { PORT ## port ## _OUTTGL = (1 << pin); } \
 	}
 
 /**
- * \ingroup	architecture
  * \brief	Create a input pin type
+ * 
+ * \ingroup	gpio
  */
 #define CREATE_INPUT_PIN(name, port, pin) \
 	struct name \
 	{ \
-		inline name() { this->input(); } \
-		\
 		ALWAYS_INLINE static void \
 		configure(::xpcc::gpio::Configuration config = ::xpcc::gpio::NORMAL, \
 				  bool invert = false) { \
-			input(); \
+			setInput(); \
 			PORT ## port ## _PIN ## pin ## CTRL = config | ((invert) ? PORT_INVEN_bm : 0); \
 		} \
 		\
-		ALWAYS_INLINE static void input() { PORT ## port ## _DIRCLR = (1 << pin); } \
-		ALWAYS_INLINE static bool get() { return (PORT ## port ## _IN & (1 << pin)); } \
+		ALWAYS_INLINE static void setInput() { PORT ## port ## _DIRCLR = (1 << pin); } \
+		ALWAYS_INLINE static bool read() { return (PORT ## port ## _IN & (1 << pin)); } \
 	}
 
+// FIXME
+//#define CREATE_LOW_NIBBLE(name, port)
+//#define CREATE_HIGH_NIBBLE(name, port)
 
-#endif // XPCC__XMEGA_GPIO_HPP
+#endif // XPCC__ATXMEGA_GPIO_HPP

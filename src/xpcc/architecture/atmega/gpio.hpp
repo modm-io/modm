@@ -30,31 +30,19 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__MEGA_GPIO_HPP
-#define XPCC__MEGA_GPIO_HPP
+#ifndef XPCC__ATMEGA_GPIO_HPP
+#define XPCC__ATMEGA_GPIO_HPP
 
 #include <avr/io.h>
+
 #include <xpcc/utils/macros.hpp>
+#include <xpcc/utils/misc.hpp>
+#include <xpcc/architecture/general/gpio.hpp>
 
 namespace xpcc
 {
-	/**
-	 * \ingroup	architecture
-	 */
 	namespace gpio
 	{
-		/**
-		 * \ingroup	architecture
-		 */
-		typedef enum
-		{
-			INPUT,
-			OUTPUT,
-		} Mode;
-		
-		/**
-		 * \ingroup	architecture
-		 */
 		typedef enum
 		{
 			NORMAL = 0,
@@ -64,30 +52,19 @@ namespace xpcc
 }
 
 /**
- * \ingroup	architecture
  * \brief	Create a input/output pin type
+ * \ingroup	gpio
  */
 #define	CREATE_IO_PIN(name, port, pin) \
 	struct name { \
-		name() { this->input() } \
-		ALWAYS_INLINE static void output() { DDR ## port |= (1 << pin); } \
-		ALWAYS_INLINE static void input() { DDR ## port &= ~(1 << pin); } \
+		ALWAYS_INLINE static void setOutput() { DDR ## port |= (1 << pin); } \
+		ALWAYS_INLINE static void setInput() { DDR ## port &= ~(1 << pin); } \
 		ALWAYS_INLINE static void set() { PORT ## port |= (1 << pin); } \
 		ALWAYS_INLINE static void reset() { PORT ## port &= ~(1 << pin); } \
-		ALWAYS_INLINE static bool get() { return (PIN ## port & (1 << pin)); } \
-	}
-
-/**
- * \ingroup	architecture
- * \brief	Create a output pin type
- */
-#define	CREATE_OUTPUT_PIN(name, port, pin) \
-	struct name { \
-		name() { this->output(); } \
-		ALWAYS_INLINE static void output() { DDR ## port |= (1 << pin); } \
+		ALWAYS_INLINE static bool read() { return (PIN ## port & (1 << pin)); } \
 		\
 		ALWAYS_INLINE static void \
-		set(bool status) { \
+		write(bool status) { \
 			if (status) { \
 				set(); \
 			} \
@@ -95,23 +72,39 @@ namespace xpcc
 				reset(); \
 			} \
 		} \
-		\
-		ALWAYS_INLINE static void set() { PORT ## port |= (1 << pin); } \
-		ALWAYS_INLINE static void reset() { PORT ## port &= ~(1 << pin); } \
-		ALWAYS_INLINE static void toggle() { PORT ## port ^= (1 << pin); } \
 	}
 
 /**
- * \ingroup	architecture
+ * \brief	Create a output pin type
+ * \ingroup	gpio
+ */
+#define	CREATE_OUTPUT_PIN(name, port, pin) \
+	struct name { \
+		ALWAYS_INLINE static void setOutput() { DDR ## port |= (1 << pin); } \
+		ALWAYS_INLINE static void set() { PORT ## port |= (1 << pin); } \
+		ALWAYS_INLINE static void reset() { PORT ## port &= ~(1 << pin); } \
+		ALWAYS_INLINE static void toggle() { PORT ## port ^= (1 << pin); } \
+		\
+		ALWAYS_INLINE static void \
+		write(bool status) { \
+			if (status) { \
+				set(); \
+			} \
+			else { \
+				reset(); \
+			} \
+		} \
+	}
+
+/**
  * \brief	Create a input type
+ * \ingroup	gpio
  */
 #define CREATE_INPUT_PIN(name, port, pin) \
 	struct name { \
-		name() { this->input(); } \
-		\
 		ALWAYS_INLINE static void \
 		configure(::xpcc::gpio::Configuration config = ::xpcc::gpio::NORMAL) { \
-			input(); \
+			setInput(); \
 			if (config == ::xpcc::gpio::PULLUP) { \
 				PORT ## port |= (1 << pin); \
 			} \
@@ -120,8 +113,54 @@ namespace xpcc
 			} \
 		} \
 		\
-		ALWAYS_INLINE static void input() { DDR ## port &= ~(1 << pin); } \
-		ALWAYS_INLINE static bool get() { return (PIN ## port & (1 << pin)); } \
+		ALWAYS_INLINE static void setInput() { DDR ## port &= ~(1 << pin); } \
+		ALWAYS_INLINE static bool read() { return (PIN ## port & (1 << pin)); } \
 	}
 
-#endif // XPCC__MEGA_GPIO_HPP
+/**
+ * \brief	Connect the lower four bits to a nibble
+ * 
+ * \see		xpcc::gpio::Nibble()
+ * \ingroup	gpio
+ */
+#define CREATE_LOW_NIBBLE(name, port) \
+	struct name { \
+		ALWAYS_INLINE static void setOutput() { \
+			DDR ## port |= 0x0f; \
+		} \
+		ALWAYS_INLINE static void setInput() { \
+			DDR ## port &= ~0x0f; \
+		} \
+		ALWAYS_INLINE static uint8_t read() { \
+			return (PIN ## port & 0x0f); \
+		} \
+		ALWAYS_INLINE static void write(uint8_t data) { \
+			PORT ## port = (data & 0x0f) | (PORT ## port & 0xf0); \
+		} \
+	}
+
+/**
+ * \brief	Connect the higher four bits to a nibble
+ * 
+ * \see		xpcc::gpio::Nibble()
+ * \ingroup	gpio
+ */
+#define CREATE_HIGH_NIBBLE(name, port) \
+	struct name { \
+		ALWAYS_INLINE static void setOutput() { \
+			DDR ## port |= 0xf0; \
+		} \
+		ALWAYS_INLINE static void setInput() { \
+			DDR ## port &= ~0xf0; \
+		} \
+		ALWAYS_INLINE static uint8_t read() { \
+			uint8_t data = PIN ## port; \
+			return (data >> 4); \
+		} \
+		ALWAYS_INLINE static void write(uint8_t data) { \
+			data = ::xpcc::utils::swap(data); \
+			PORT ## port = (data & 0xf0) | (PORT ## port & 0x0f); \
+		} \
+	}
+
+#endif // XPCC__ATMEGA_GPIO_HPP
