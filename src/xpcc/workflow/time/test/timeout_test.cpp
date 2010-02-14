@@ -88,6 +88,13 @@ TimeoutTest::testBasics()
 }
 
 void
+TimeoutTest::testDefaultConstructor()
+{
+	xpcc::Timeout<DummyClock> timeout;
+	TEST_ASSERT_TRUE(timeout.isExpired());
+}
+
+void
 TimeoutTest::testTimeOverflow()
 {
 	// overflow after 65535

@@ -38,13 +38,20 @@
 	#include <util/crc16.h>
 #endif
 
-#define	XPCC_APB__SYNC_BYTE		0x54
-
 // ----------------------------------------------------------------------------
 
-template <typename DEVICE> uint8_t xpcc::apb::Interface<DEVICE>::lengthOfReceivedMessage = 0;
+template <typename DEVICE> const uint8_t xpcc::apb::Interface<DEVICE>::syncByte = 0x54;
+template <typename DEVICE> const uint8_t xpcc::apb::Interface<DEVICE>::crcInitialValue = 0x00;
+
 template <typename DEVICE> typename xpcc::apb::Interface<DEVICE>::State \
 	xpcc::apb::Interface<DEVICE>::state = SYNC;
+
+template <typename DEVICE> uint8_t xpcc::apb::Interface<DEVICE>::buffer[32];
+template <typename DEVICE> uint8_t xpcc::apb::Interface<DEVICE>::crc;
+template <typename DEVICE> uint8_t xpcc::apb::Interface<DEVICE>::position;
+template <typename DEVICE> uint8_t xpcc::apb::Interface<DEVICE>::length;
+template <typename DEVICE> uint8_t xpcc::apb::Interface<DEVICE>::lengthOfReceivedMessage = 0;
+
 
 // ----------------------------------------------------------------------------
 
@@ -60,23 +67,42 @@ xpcc::apb::Interface<DEVICE>::initialize()
 
 template <typename DEVICE>
 void
-xpcc::apb::Interface<DEVICE>::sendMessage(const uint8_t *data, uint8_t size)
+xpcc::apb::Interface<DEVICE>::sendMessage(Header header, const uint8_t *data, uint8_t size)
 {
-	DEVICE::write(XPCC_APB__SYNC_BYTE);
+	size &= 0x1f;
 	
+	DEVICE::write(syncByte);
+	DEVICE::write((static_cast<uint8_t>(header) & 0xe0) | size);
+	
+	uint8_t crc = crcInitialValue;
+	for (uint_fast8_t i = 0; i < size; ++i)
+	{
+		crc = crcUpdate(crc, *data);
+		DEVICE::write(*data);
+		data++;
+	}
+	
+	DEVICE::write(crc);
 }
 
 // ----------------------------------------------------------------------------
 
 template <typename DEVICE>
+bool
+xpcc::apb::Interface<DEVICE>::isMessageAvailable()
+{
+	return (lengthOfReceivedMessage > 0);
+}
+
+template <typename DEVICE>
 uint8_t
-xpcc::apb::Interface<DEVICE>::checkForMessage()
+xpcc::apb::Interface<DEVICE>::getLength()
 {
 	return lengthOfReceivedMessage;
 }
 
 template <typename DEVICE>
-const uint8_t&
+const uint8_t*
 xpcc::apb::Interface<DEVICE>::getData()
 {
 	return buffer;
@@ -95,13 +121,13 @@ template <typename DEVICE>
 void
 xpcc::apb::Interface<DEVICE>::update()
 {
-	uint8_t byte;
+	char byte;
 	while (DEVICE::read(byte))
 	{
 		switch (state)
 		{
 			case SYNC:
-				if (byte == XPCC_APB__SYNC_BYTE) {
+				if (byte == syncByte) {
 					state = HEADER;
 				}
 				break;
@@ -109,7 +135,7 @@ xpcc::apb::Interface<DEVICE>::update()
 			case HEADER:
 				length = (byte & 0x1f) + 1;
 				position = 0;
-				crc = 0;
+				crc = crcInitialValue;
 				state = DATA;
 				break;
 			

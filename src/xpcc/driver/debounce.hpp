@@ -48,6 +48,9 @@ namespace xpcc
 	 * The update() method needs to be called periodically for example
 	 * every 10ms. Preferred in a timer interrupt function.
 	 * 
+	 * Example:
+	 * \include debounce.cpp
+	 * 
 	 * The detection for long or repreated presses works only correct for
 	 * one key at a time. This constraint only applies to keys listed in the
 	 * \em mask variable.

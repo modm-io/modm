@@ -44,11 +44,14 @@ namespace xpcc
 	 *
 	 * Has to be polled to check if it has expired.
 	 * 
-	 * \tparam	T	Used timer, default is xpcc::Clock which has 
+	 * \tparam	T	Used timer, default is xpcc::Clock() which has 
 	 * 				a millisecond resolution.
 	 * 
 	 * Usage:
 	 * \include	timeout.cpp
+	 * 
+	 * Complete example for the ATMega644:
+	 * \include timeout_atmega644.cpp
 	 * 
 	 * \author	Fabian Greif
 	 * \ingroup	workflow
@@ -57,13 +60,18 @@ namespace xpcc
 	class Timeout
 	{
 	public:
-		Timeout(const Timestamp time = 0);
+		Timeout();
+		
+		/**
+		 * \brief	Create and start the timeout
+		 */
+		Timeout(const Timestamp time);
 		
 		/**
 		 * \brief	Check if the given time has passed.
 		 * 
 		 * If isExpired() changes to \c true, it will keep this value till
-		 * a call of stop() or restart().
+		 * a call of restart().
 		 */
 		bool
 		isExpired();
@@ -71,13 +79,10 @@ namespace xpcc
 		/**
 		 * \brief	Stop the timer
 		 * 
-		 * When the timer is stopped, isExpired() will always return \c false.
+		 * Sets isExpired() to true.
 		 */
 		inline void
-		stop()
-		{
-			state = STOPPED;
-		}
+		stop();
 		
 		/**
 		 * \brief	Set a new timeout value.
@@ -89,7 +94,6 @@ namespace xpcc
 		Timestamp endTime;
 		enum {
 			ACTIVE,
-			STOPPED,
 			EXPIRED
 		} state;
 	};

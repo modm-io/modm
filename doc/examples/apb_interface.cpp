@@ -1,14 +1,20 @@
-typedef xpcc::apb::Interface <...> PeripheralInterface;
+typedef xpcc::apb::Interface <...> interface;
 
 while (1)
 {
-	uint8_t length = PeripheralInterface::checkForMessage();
-	if (length > 0)
+	if (interface.isMessageAvailable())
 	{
-		// ... do something usefull with the data ...
+		const uint8_t *data = interface.getData();
 		
-		PeripheralInterface::dropMessage();
+		// do something ... for example print the received message
+		stream << xpcc::hex;
+		for (uint_fast8_t i = 0; i < interface.getLength(); ++i) {
+			stream << *data++;
+		}
+		stream << xpcc::endl;
+		
+		interface.dropMessage();
 	}
 	
-	PeripheralInterface::update();
+	interface.update();
 }

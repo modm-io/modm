@@ -35,6 +35,12 @@
 #endif
 
 template<typename T>
+xpcc::Timeout<T>::Timeout() :
+	endTime(0), state(EXPIRED)
+{
+}
+
+template<typename T>
 xpcc::Timeout<T>::Timeout(const Timestamp time) :
 	endTime(T::now() + time), state(ACTIVE)
 {
@@ -49,15 +55,22 @@ xpcc::Timeout<T>::isExpired()
 		if (T::now() >= endTime)
 		{
 			state = EXPIRED;
-			return true;
+		}
+		else {
+			return false;
 		}
 	}
-	else if (state == EXPIRED) {
-		return true;
-	}
 	
-	return false;
+	return true;
 }
+
+template<typename T>
+void
+xpcc::Timeout<T>::stop()
+{
+	state = EXPIRED;
+}
+
 
 template<typename T>
 void

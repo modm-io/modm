@@ -43,6 +43,9 @@ public:
 	testBasics();
 	
 	void
+	testDefaultConstructor();
+	
+	void
 	testTimeOverflow();
 	
 	void
