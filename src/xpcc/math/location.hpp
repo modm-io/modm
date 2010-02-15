@@ -45,7 +45,7 @@ namespace xpcc
 	 * 
 	 * \ingroup	math
 	 */
-	template <typename T>
+	template <typename T = int16_t>
 	class Location
 	{
 	public:
