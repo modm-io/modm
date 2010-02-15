@@ -86,6 +86,22 @@ namespace xpcc
 			return ptr[1];
 		}
 		
+		/// Get the value that are stored in the pointer casted to the given type.
+		/// The method checks only the size but not the typ of the stored data
+		/// \return true if the type fit
+		template<typename T>
+		bool
+		get(T& value) const
+		{
+			if( sizeof(T) == ptr[1] ) {
+				value = *(T*)&ptr[2];
+				return true;
+			}
+			else {
+				return false;
+			}
+		}
+
 	protected:
 		friend IOStream&
 		operator <<( IOStream&, const SmartPointer&);
