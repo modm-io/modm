@@ -25,7 +25,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * 
- * $Id: default_component_filter.hpp 77 2009-10-15 18:34:29Z thundernail $
+ * $Id$
  */
 // ----------------------------------------------------------------------------
 
@@ -42,7 +42,7 @@ namespace xpcc
 	 * \ingroup		backend
 	 * \brief 		Accepts Packets with componentIdentifier contaning header.destination
 	 *
-	 * \version		$Id: default_component_filter.hpp 77 2009-10-15 18:34:29Z thundernail $
+	 * \version		$Id$
 	 */
 	 
 	class DefaultComponentFilter:Filter

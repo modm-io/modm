@@ -25,7 +25,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: tipc_transmitter_socket.cpp 86 2009-10-16 19:21:39Z thundernail $
+ * $Id$
  */
 // ----------------------------------------------------------------------------
 

@@ -26,7 +26,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: queue_impl.hpp 68 2009-10-09 20:32:17Z dergraaf $
+ * $Id$
  */
 // ----------------------------------------------------------------------------
 

@@ -25,7 +25,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: flag.hpp 94 2009-10-19 18:44:57Z dergraaf $
+ * $Id$
  */
 // ----------------------------------------------------------------------------
 

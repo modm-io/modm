@@ -26,7 +26,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: utils.hpp 75 2009-10-14 22:48:12Z dergraaf $
+ * $Id$
  */
 // ----------------------------------------------------------------------------
 

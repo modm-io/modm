@@ -26,7 +26,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: iodevice.hpp 61 2009-09-26 18:50:57Z dergraaf $
+ * $Id$
  */
 // ----------------------------------------------------------------------------
 

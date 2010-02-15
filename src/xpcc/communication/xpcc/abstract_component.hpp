@@ -25,7 +25,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * 
- * $Id: abstract_component.h 13 2009-09-09 07:38:03Z dergraaf $
+ * $Id$
  */
 // ----------------------------------------------------------------------------
 

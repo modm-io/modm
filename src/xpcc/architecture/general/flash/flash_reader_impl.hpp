@@ -26,7 +26,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: flash_reader_avr_impl.hpp 184 2010-02-05 12:55:21Z dergraaf $
+ * $Id$
  */
 // ----------------------------------------------------------------------------
 

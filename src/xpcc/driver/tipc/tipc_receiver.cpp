@@ -25,7 +25,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: tipc_receiver.cpp 91 2009-10-17 15:53:04Z thundernail $
+ * $Id$
  */
 // ----------------------------------------------------------------------------
 

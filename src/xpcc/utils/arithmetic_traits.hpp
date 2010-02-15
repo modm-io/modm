@@ -26,7 +26,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: arithmetic_traits.hpp 83 2009-10-15 19:58:57Z dergraaf $
+ * $Id$
  */
 // ----------------------------------------------------------------------------
 
@@ -63,7 +63,7 @@ namespace xpcc
 	 * T max = xpcc::ArithmeticTraits<T>::maxValue;
 	 * \endcode
 	 * 
-	 * \version	$Id: arithmetic_traits.hpp 83 2009-10-15 19:58:57Z dergraaf $
+	 * \version	$Id$
 	 * \author	Martin Rosekeit <martin.rosekeit@rwth-aachen.de>
 	 */
 	// -------------------------------------------------------------------------

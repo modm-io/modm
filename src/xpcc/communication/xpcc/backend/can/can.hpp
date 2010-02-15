@@ -25,7 +25,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * 
- * $Id: can.hpp 54 2009-09-24 07:55:10Z dergraaf $
+ * $Id$
  */
 // ----------------------------------------------------------------------------
 
@@ -43,7 +43,7 @@ namespace xpcc
 	 * @brief	...
 	 *
 	 * @ingroup	can
-	 * @version	$Id: tipc.hpp 92 2009-10-17 15:54:22Z thundernail $
+	 * @version	$Id$
 	 */
 	class CanInterface : public BackendInterface
 	{

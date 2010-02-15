@@ -26,7 +26,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: iostream.cpp 64 2009-09-27 15:19:16Z thundernail $
+ * $Id$
  */
 // ----------------------------------------------------------------------------
 

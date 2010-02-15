@@ -25,7 +25,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: tipc_transmitter_socket.hpp 82 2009-10-15 19:17:28Z thundernail $
+ * $Id$
  */
 // ----------------------------------------------------------------------------
 #ifndef XPCC__TIPC_TRANSMITTER_SOCKET_H_
@@ -41,7 +41,7 @@ namespace xpcc {
 		 * \brief		Proviede the handling of the socket interface from TIPC.
 		 * 
 		 * \ingroup		tipc
-		 * \version		$Id: tipc_transmitter_socket.hpp 82 2009-10-15 19:17:28Z thundernail $
+		 * \version		$Id$
 		 * \author		Carsten Schmitt < >
 		 */
 		class TransmitterSocket {

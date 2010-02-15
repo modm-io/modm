@@ -26,7 +26,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: scheduler.hpp 95 2009-10-19 21:39:26Z dergraaf $
+ * $Id$
  */
 // ----------------------------------------------------------------------------
 

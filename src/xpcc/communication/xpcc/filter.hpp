@@ -25,7 +25,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * 
- * $Id: filter.hpp 77 2009-10-15 18:34:29Z thundernail $
+ * $Id$
  */
 // ----------------------------------------------------------------------------
 
@@ -44,7 +44,7 @@ namespace xpcc
 	 *				Backend in order to filter Packets by destination identifier
 	 *
 	 *
-	 * \version		$Id: filter.hpp 77 2009-10-15 18:34:29Z thundernail $
+	 * \version		$Id$
 	 */
 	 
 	class Filter

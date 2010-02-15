@@ -26,7 +26,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * 
- * $Id: backend_interface.hpp 90 2009-10-17 15:51:00Z thundernail $
+ * $Id$
  */
 // ----------------------------------------------------------------------------
 

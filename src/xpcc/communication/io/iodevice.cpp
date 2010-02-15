@@ -25,7 +25,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: iodevice.cpp 55 2009-09-24 17:15:53Z dergraaf $
+ * $Id$
  */
 // ----------------------------------------------------------------------------
 

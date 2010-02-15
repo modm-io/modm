@@ -26,7 +26,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * 
- * $Id: communication.hpp 76 2009-10-14 23:29:28Z dergraaf $
+ * $Id$
  */
 // ----------------------------------------------------------------------------
 

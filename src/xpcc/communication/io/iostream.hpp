@@ -26,7 +26,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: iostream.hpp 84 2009-10-16 19:15:12Z thundernail $
+ * $Id$
  */
 // ----------------------------------------------------------------------------
 
@@ -47,7 +47,7 @@ namespace xpcc
 	 * 			a given type;
 	 *
 	 * \ingroup io
-	 * \version	$Id: iostream.hpp 84 2009-10-16 19:15:12Z thundernail $
+	 * \version	$Id$
 	 * \author	Martin Rosekeit <martin.rosekeit@rwth-aachen.de>
 	 */
 	class IOStream
