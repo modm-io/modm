@@ -31,6 +31,10 @@
 
 #include "tipc.hpp"
 
+#include <xpcc/debug/logger/logger.hpp>
+#undef  XPCC_LOG_LEVEL
+#define XPCC_LOG_LEVEL xpcc::log::WARNING
+
 xpcc::tipc::Tipc::Tipc( ) :
 	receiver( ),
 	transmitter( )
@@ -66,7 +70,7 @@ xpcc::tipc::Tipc::getPacketHeader() const
 xpcc::SmartPointer
 xpcc::tipc::Tipc::getPacketPayload() const
 {
-	SmartPointerVolatile payload( this->receiver.frontPayload().getSize() );
+	SmartPointerVolatile payload( this->receiver.frontPayload().getSize() - sizeof(xpcc::Header) );
 	if( payload.getSize() > 0 ) {
 		memcpy(
 				payload.getPointer(),
@@ -97,6 +101,11 @@ xpcc::tipc::Tipc::dropPacket()
 void
 xpcc::tipc::Tipc::sendPacket(const xpcc::Header &header, SmartPointer payload)
 {
+//	XPCC_LOG_DEBUG << XPCC_FILE_INFO
+//			<< " payload size=" << payload.getSize()
+//			<< " payload=" << payload
+//			<< xpcc::flush;
+
 	SmartPointerVolatile combinedPayload( sizeof(xpcc::Header) + payload.getSize() );
 
 	memcpy(	combinedPayload.getPointer(), &header, sizeof(xpcc::Header) );
