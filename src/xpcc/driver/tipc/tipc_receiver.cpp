@@ -36,7 +36,7 @@
 
 #include "../../debug/logger/logger.hpp"
 #undef  XPCC_LOG_LEVEL
-#define XPCC_LOG_LEVEL xpcc::log::INFO
+#define XPCC_LOG_LEVEL xpcc::log::WARNING
 
 
 // -------------------------------------------------------------------------------------------------------
@@ -90,7 +90,7 @@ xpcc::tipc::Receiver::runReceiver()
 		usleep(1000);
 	}
 
-	XPCC_LOG_INFO << __FILE__ << __FUNCTION__ << "Thread terminates." << xpcc::flush;
+	XPCC_LOG_INFO << XPCC_FILE_INFO << "Thread terminates." << xpcc::flush;
 
 	return 0;
 }

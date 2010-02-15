@@ -39,7 +39,7 @@
 
 #include "../../debug/logger/logger.hpp"
 #undef  XPCC_LOG_LEVEL
-#define XPCC_LOG_LEVEL xpcc::log::INFO
+#define XPCC_LOG_LEVEL xpcc::log::WARNING
 
 // -------------------------------------------------------------------------------------------------------
 xpcc::tipc::TransmitterSocket::TransmitterSocket() :
@@ -92,7 +92,7 @@ xpcc::tipc::TransmitterSocket::transmitPayload(
 								(struct sockaddr*)&tipcToAddresse,
 								(size_t)sizeof(tipcToAddresse));
 
-//	XPCC_LOG_DEBUG << XPCC_FILE_INFO << __FUNCTION__ << "()"
+//	XPCC_LOG_DEBUG << XPCC_FILE_INFO
 //			<< " tid=" << (int)typeId
 //			<< " iid=" << (int)instanceId
 //			<< " value=" << tipcPacketPointer;

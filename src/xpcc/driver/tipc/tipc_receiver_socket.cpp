@@ -40,7 +40,7 @@
 
 #include "../../debug/logger/logger.hpp"
 #undef  XPCC_LOG_LEVEL
-#define XPCC_LOG_LEVEL xpcc::log::INFO
+#define XPCC_LOG_LEVEL xpcc::log::WARNING
 
 // -------------------------------------------------------------------------------------------------------
 xpcc::tipc::ReceiverSocket::ReceiverSocket() :
@@ -70,7 +70,7 @@ xpcc::tipc::ReceiverSocket::registerOnPacket(	unsigned int typeId,
 	fromAddress.addr.nameseq.upper	=	upperInstance;
 	fromAddress.scope				=	TIPC_CLUSTER_SCOPE;	// Scope of puplisching is cluster (node < cluster < zone)
 
-	XPCC_LOG_INFO << __FILE__ << __FUNCTION__ << "(typeId, lowerBound, upperBound) = (" << typeId << ", " << lowerInstance << ", " << upperInstance << ")" << xpcc::flush;
+	XPCC_LOG_INFO << XPCC_FILE_INFO << "(typeId, lowerBound, upperBound) = (" << typeId << ", " << lowerInstance << ", " << upperInstance << ")" << xpcc::flush;
 
 	// Binding means registering to a specific packet
 	result = 	bind (	this->socketDescriptor_, 
@@ -80,7 +80,7 @@ xpcc::tipc::ReceiverSocket::registerOnPacket(	unsigned int typeId,
 	// If there was an error binding the socket throw an exception because this case
 	// cannot be handled here.
 	if (0 != result) {
-		XPCC_LOG_ERROR << __FILE__ << __FUNCTION__ << "Port {" << typeId << ", " << lowerInstance << ", " << upperInstance << "}  could not be created." << xpcc::flush;
+		XPCC_LOG_ERROR << XPCC_FILE_INFO << "Port {" << typeId << ", " << lowerInstance << ", " << upperInstance << "}  could not be created." << xpcc::flush;
 		// TODO: Throw an exception!!
 	}
 }
@@ -112,14 +112,14 @@ xpcc::tipc::ReceiverSocket::receiveHeader( Header & tipcHeader )
 	}
 	else if ( errno == 9 ) {
 		xpcc::log::error
-				<< __FUNCTION__
-				<< " Bad file descriptor"
+				<< XPCC_FILE_INFO
+				<< "Bad file descriptor"
 				<< xpcc::flush;
 	}
 	else {
 		xpcc::log::error
-				<< __FUNCTION__
-				<< " Sorry: unknown Error while receiving data. errno=" << errno
+				<< XPCC_FILE_INFO
+				<< "Sorry: unknown Error while receiving data. errno=" << errno
 				<< xpcc::flush;
 		// TODO: Error handling??!!
 	}
@@ -158,20 +158,20 @@ xpcc::tipc::ReceiverSocket::receivePayload(uint8_t* payloadPointer, size_t paylo
 	}
 	else if ( errno == EWOULDBLOCK ) {
 		xpcc::log::debug
-				<< __FUNCTION__
-				<< " no data in buffer"
+				<< XPCC_FILE_INFO
+				<< "no data in buffer"
 				<< xpcc::flush;
 		// no data in the buffer
 	}
 	else if ( errno == 9 ) {
 		xpcc::log::error
-				<< __FUNCTION__
-				<< " Bad file descriptor"
+				<< XPCC_FILE_INFO
+				<< "Bad file descriptor"
 				<< xpcc::flush;
 	}
 	else {
 		xpcc::log::error
-				<< __FUNCTION__
+				<< XPCC_FILE_INFO
 				<< xpcc::flush;
 		// TODO: Error handling??!!
 	}
@@ -198,20 +198,20 @@ xpcc::tipc::ReceiverSocket::popPayload()
 	}
 	else if ( errno == EWOULDBLOCK ) {
 		xpcc::log::debug
-				<< __FUNCTION__
+				<< XPCC_FILE_INFO
 				<< "no data in buffer"
 				<< xpcc::flush;
 		// no data in the buffer
 	}
 	else if ( errno == 9 ) {
 		xpcc::log::error
-				<< __FUNCTION__
+				<< XPCC_FILE_INFO
 				<< " Bad file descriptor"
 				<< xpcc::flush;
 	}
 	else {
 		xpcc::log::error
-				<< __FUNCTION__
+				<< XPCC_FILE_INFO
 				<< xpcc::flush;
 		// TODO: Error handling??!!
 	}

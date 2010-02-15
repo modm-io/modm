@@ -91,8 +91,6 @@ namespace xpcc
 				
 				/**
 				 * Send a Message.
-				 *
-				 * \return	\b true if the packet could be send, \b false otherwise.
 				 */
 				virtual void
 				sendPacket(const xpcc::Header &header,
