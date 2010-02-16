@@ -282,7 +282,7 @@ def buildpath(env, path, strip_extension=False):
 	if strip_extension:
 		path = os.path.splitext(path)[0]
 	
-	path = os.path.relpath(path)
+	#path = os.path.relpath(path)
 	if os.path.isabs(path) or path.startswith('..'):
 		# if the file is not in a subpath of the current directory
 		# build it in the root directory of the build path
