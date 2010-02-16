@@ -88,7 +88,7 @@ xpcc::log::StyleWrapper<STYLE>::StyleWrapper( STYLE style ) :
 // -----------------------------------------------------------------------------
 
 template < typename STYLE >
-xpcc::log::StyleWrapper<STYLE>::~Style()
+xpcc::log::StyleWrapper<STYLE>::~StyleWrapper()
 {
 }
 
