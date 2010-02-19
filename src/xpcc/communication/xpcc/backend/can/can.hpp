@@ -66,7 +66,7 @@ namespace xpcc
 			return receivedMessages->header;
 		}
 		
-		virtual xpcc::SmartPointer
+		virtual const xpcc::SmartPointer
 		getPacketPayload() const {
 			return this->receivedMessages->data;
 		}
@@ -83,9 +83,11 @@ namespace xpcc
 		update() = 0;
 	
 	protected:
-		//! \brief	Try to send a CAN message
-		//!
-		//! \return	\b true if the message could be send, \b false otherwise
+		/**
+		 *  \brief	Try to send a CAN message
+		 *
+		 * \return	\b true if the message could be send, \b false otherwise
+		 */
 		virtual bool
 		sendCanMessage(const Header &header, const uint8_t *data, uint8_t size) = 0;
 		
@@ -99,10 +101,12 @@ namespace xpcc
 		virtual uint32_t
 		getCanIdentifier() = 0;
 		
-		//! \brief	Read message data
-		//!
-		//! \param[out]	data
-		//! \return		size
+		/**
+		 *  \brief	Read message data
+		 *
+		 * \param[out]	data
+		 * \return		size
+		 */
 		virtual uint8_t
 		getCanData(uint8_t *data) = 0;
 	

@@ -144,8 +144,8 @@ xpcc::communicationList::List::removeNext(Entry *fix)
 }
 
 void
-xpcc::communicationList::List::handlePacket(const BackendInterface &backend){
-	const Header& header = backend.getPacketHeader();
+xpcc::communicationList::List::handlePacket(const Header& header, const SmartPointer& payload)
+{
 	Entry *e = first;// first is always a dummy entry
 	while(Entry *actual = e->next){// !!! be carefull!! it must not happen, that more than one entry fits to the header
 		switch(actual->typeInfo){
@@ -181,7 +181,7 @@ xpcc::communicationList::List::handlePacket(const BackendInterface &backend){
 					EntryWithCallback *c = (EntryWithCallback *)this->removeNext(e);
 					
 					if(!header.isAcknowledge){
-						c->responseCallback.handleResponse(backend);
+						c->responseCallback.handleResponse(header, payload);
 					}
 					// else cannot happen, since responses with callbacks are not possible
 					
@@ -208,10 +208,12 @@ xpcc::communicationList::List::handleWaitingMessages(Postman &postman, BackendIn
 					delete actual;
 				}
 				else{// action or response
-					if(postman.isComponentAvaliable(actual->header)){
+					if(postman.isComponentAvaliable(actual->header))
+					{
 						// to one component on board inner component
-						if (actual->header.type == Header::REQUEST){
-							postman.deliverPacket(actual->header); // todo payload?
+						if (actual->header.type == Header::REQUEST)
+						{
+							postman.deliverPacket(actual->header, actual->payload);
 							// todo handle postman errors?
 							if (actual->typeInfo == Entry::CALLBACK){
 								actual->state = Entry::WAIT_FOR_RESPONSE;
@@ -242,8 +244,7 @@ xpcc::communicationList::List::handleWaitingMessages(Postman &postman, BackendIn
 									this->removeNext(tmp);
 									
 									if(s->typeInfo == Entry::CALLBACK){
-										ResponseMessage message(actual->header, actual->payload);
-										((EntryWithCallback*)s)->responseCallback.handleResponse(message);
+										((EntryWithCallback*)s)->responseCallback.handleResponse(actual->header, actual->payload);
 									}
 									
 									delete s;

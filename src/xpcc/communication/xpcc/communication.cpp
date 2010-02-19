@@ -65,9 +65,11 @@ xpcc::Communication::update(){
 		//	case NO_EVENT:
 		//}
 		const Header& header( this->backend->getPacketHeader() );
+		const SmartPointer payload( this->backend->getPacketPayload() );
 		
-		if ( header.type == Header::REQUEST && !header.isAcknowledge ){
-			if ( postman->deliverPacket( *backend ) == Postman::OK ) {
+		if ( header.type == Header::REQUEST && !header.isAcknowledge )
+		{
+			if ( postman->deliverPacket( header, payload ) == Postman::OK ) {
 				if ( header.destination != 0 ) {
 					// transmit ACK (is not an EVENT)
 					Header ackHeader(
@@ -81,9 +83,9 @@ xpcc::Communication::update(){
 			}
 		}
 		else{
-			responseManager.handlePacket( *backend );
+			responseManager.handlePacket( header, payload );
 		}
-				
+		
 		backend->dropPacket();
 	}
 	

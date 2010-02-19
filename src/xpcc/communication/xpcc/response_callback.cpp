@@ -31,45 +31,9 @@
 
 
 #include "response_callback.hpp"
-/*
-xpcc::ResponseMessage::ResponseMessage(const Header& header, const uint8_t *payload, uint8_t payloadSize):
-header(header),
-payload(payload),
-payloadSize(payloadSize){
-}
-*/
-xpcc::ResponseMessage::ResponseMessage(const Header& header, const SmartPointer& payload):
-	header(header),
-	payload(payload)
-{
-}
 
 xpcc::ResponseCallback::ResponseCallback() :
-	object( 0 ),
+	component( 0 ),
 	callbackFunction ( 0 )
 {
-}
-
-xpcc::ResponseCallback::ResponseCallback(AbstractComponent *object, CallbackFunction callbackFunction) :
-	object( object ),
-	callbackFunction ( callbackFunction )
-{
-	
-}
-		
-void
-xpcc::ResponseCallback::handleResponse(const ResponseMessage& message) const
-{
-	if( this->object != 0 ) {
-		(this->object->*callbackFunction)(message);
-	}
-}
-
-void
-xpcc::ResponseCallback::handleResponse(const BackendInterface &backend) const
-{
-	if( this->object != 0 ) {
-		ResponseMessage message( backend.getPacketHeader(), backend.getPacketPayload() );
-		(this->object->*callbackFunction)(message);
-	}
 }

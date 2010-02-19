@@ -52,18 +52,17 @@ xpcc::StlPostman::~StlPostman()
 }
 
 // ----------------------------------------------------------------------------
-xpcc::StlPostman::DeliverInfo
-xpcc::StlPostman::deliverPacket(const BackendInterface& backend)
-{
-	const xpcc::Header &header = backend.getPacketHeader();
 
+xpcc::StlPostman::DeliverInfo
+xpcc::StlPostman::deliverPacket(const Header &header, const SmartPointer& payload)
+{
 	if( header.destination == 0 ) {
 		// EVENT
 		EventMap::const_iterator lowerBound( this->eventMap.lower_bound( header.packetIdentifier) );
 		EventMap::const_iterator upperBound( this->eventMap.upper_bound( header.packetIdentifier) );
 		if( lowerBound != upperBound ) {
 			do {
-				lowerBound->second.handleResponse( backend );
+				lowerBound->second.handleResponse(header, payload);
 				lowerBound++;
 			} while( lowerBound != upperBound );
 			return OK;
@@ -76,7 +75,7 @@ xpcc::StlPostman::deliverPacket(const BackendInterface& backend)
 		if( iterDestination != this->requenstMap.end() ) {
 			CallbackMap::const_iterator iterCallback( iterDestination->second.find( header.packetIdentifier ) );
 			if( iterCallback != iterDestination->second.end() ) {
-				iterCallback->second.handleResponse( backend );
+				iterCallback->second.handleResponse(header, payload);
 				return OK;
 			}
 			else {
@@ -87,27 +86,6 @@ xpcc::StlPostman::deliverPacket(const BackendInterface& backend)
 			return NO_COMPONENT;
 		}
 	}
-}
-
-// ----------------------------------------------------------------------------
-
-xpcc::StlPostman::DeliverInfo
-xpcc::StlPostman::deliverPacket(const Header &header, SmartPointer& payload)
-{
-	(void) header;
-	(void) payload;
-	// TODO ???
-	return NOT_IMPLEMENTED_YET_ERROR;
-}
-
-// ----------------------------------------------------------------------------
-
-xpcc::StlPostman::DeliverInfo
-xpcc::StlPostman::deliverPacket(const Header &header)
-{
-	(void) header;
-	// TODO ???
-	return NOT_IMPLEMENTED_YET_ERROR;
 }
 
 // ----------------------------------------------------------------------------

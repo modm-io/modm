@@ -30,71 +30,20 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC__POLAR_COORDINATE_HPP
-#define	XPCC__POLAR_COORDINATE_HPP
+#include <unittest/testsuite.hpp>
 
-#include <math.h>
-
-#include "angle.hpp"
-#include "cartesian_coordinate.hpp"
-
-namespace xpcc
+class PositionTest : public unittest::TestSuite
 {
-	// forward declaration, needed because of circular reference 
-	// with class CartesianCoordinate
-	template<typename T>
-	class CartesianCoordinate;
-
-	/// \ingroup	math
-	///	\brief		Polar coordinates
-	template<typename T>
-	class PolarCoordinate
-	{
-	public:
-		PolarCoordinate(const T r=0, const Angle& theta=Angle(0.0));
-		
-		/// \brief	Calculate length
-		T
-		getLength() const;
-		
-		/// \brief	Calculate absolute angle
-		Angle&
-		getAngle() const;
-		
-		/// \brief	Normalize length to 1
-		void
-		normalize();
-		
-		void
-		scale(float a);
-		
-		/// \brief	Transform to cartesian coordinate system
-		CartesianCoordinate<T>
-		toCartesian();
-		
-		operator CartesianCoordinate<T>() {
-			return this->cartesian();
-		}
+public:
+	void
+	testConstructor();
 	
-	private:
-		template<typename U>
-		friend PolarCoordinate<U>
-		operator - (const PolarCoordinate<U> &a);
-		
-		template<typename U>
-		friend bool
-		operator == (const PolarCoordinate<U> &a, const PolarCoordinate<U> &b);
-
-		template<typename U>
-		friend bool
-		operator != (const PolarCoordinate<U> &a, const PolarCoordinate<U> &b);
+	void
+	testLengthAndAngle();
 	
-	private:
-		T r;			//!< radius
-		Angle theta;	//!< azimuth
-	};
-}
-
-#include "polar_coordinate_impl.hpp"
-
-#endif	// XPCC__POLAR_COORDINATE_HPP
+	void
+	testRotation();
+	
+	void
+	testArithmetics();
+};

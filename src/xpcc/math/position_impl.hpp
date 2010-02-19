@@ -30,13 +30,19 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC__CARTESIAN_COORDINATE_HPP
-	#error	"Don't include this file directly use 'math/cartesian_coordinate.hpp' instead!"
+#ifndef	XPCC__POSITION_HPP
+	#error	"Don't include this file directly use 'math/position.hpp' instead!"
 #endif
 
 // ----------------------------------------------------------------------------
 template<typename T>
-xpcc::CartesianCoordinate<T>::CartesianCoordinate(const T& x, const T& y) : 
+xpcc::Position<T>::Position() :
+	x(), y()
+{
+}
+
+template<typename T>
+xpcc::Position<T>::Position(const T& x, const T& y) : 
 	x(x), y(y)
 {
 }
@@ -44,7 +50,7 @@ xpcc::CartesianCoordinate<T>::CartesianCoordinate(const T& x, const T& y) :
 // ----------------------------------------------------------------------------
 template<typename T>
 void
-xpcc::CartesianCoordinate<T>::setX(const T& value)
+xpcc::Position<T>::setX(const T& value)
 {
 	x = value;
 }
@@ -52,7 +58,7 @@ xpcc::CartesianCoordinate<T>::setX(const T& value)
 // ----------------------------------------------------------------------------
 template<typename T>
 void
-xpcc::CartesianCoordinate<T>::setY(const T& value)
+xpcc::Position<T>::setY(const T& value)
 {
 	y = value;
 }
@@ -60,7 +66,7 @@ xpcc::CartesianCoordinate<T>::setY(const T& value)
 // ----------------------------------------------------------------------------
 template<typename T>
 void
-xpcc::CartesianCoordinate<T>::set(const T& x, const T& y)
+xpcc::Position<T>::set(const T& x, const T& y)
 {
 	this->x = x;
 	this->y = y;
@@ -69,7 +75,7 @@ xpcc::CartesianCoordinate<T>::set(const T& x, const T& y)
 // ----------------------------------------------------------------------------
 template<typename T>
 const T&
-xpcc::CartesianCoordinate<T>::getX() const
+xpcc::Position<T>::getX() const
 {
 	return x;
 }
@@ -77,7 +83,7 @@ xpcc::CartesianCoordinate<T>::getX() const
 // ----------------------------------------------------------------------------
 template<typename T>
 const T&
-xpcc::CartesianCoordinate<T>::getY() const
+xpcc::Position<T>::getY() const
 {
 	return y;
 }
@@ -85,7 +91,7 @@ xpcc::CartesianCoordinate<T>::getY() const
 // ----------------------------------------------------------------------------
 template<typename T>
 T
-xpcc::CartesianCoordinate<T>::getLength() const
+xpcc::Position<T>::getLength() const
 {
 	float tx = x;
 	float ty = y;
@@ -96,15 +102,15 @@ xpcc::CartesianCoordinate<T>::getLength() const
 // ----------------------------------------------------------------------------
 template<typename T>
 xpcc::Angle
-xpcc::CartesianCoordinate<T>::getAngle() const
+xpcc::Position<T>::getAngle() const
 {
 	return atan2(y, x);
 }
 
 // ----------------------------------------------------------------------------
 template<typename T>
-xpcc::CartesianCoordinate<T>&
-xpcc::CartesianCoordinate<T>::normalize(const T& length)
+xpcc::Position<T>&
+xpcc::Position<T>::normalize(const T& length)
 {
 	x = x / length;
 	y = y / length;
@@ -114,8 +120,8 @@ xpcc::CartesianCoordinate<T>::normalize(const T& length)
 
 // ----------------------------------------------------------------------------
 template<typename T>
-xpcc::CartesianCoordinate<T>&
-xpcc::CartesianCoordinate<T>::rotate(const Angle& phi)
+xpcc::Position<T>&
+xpcc::Position<T>::rotate(const Angle& phi)
 {
 	float c = cos(phi).toFloat();
 	float s = sin(phi).toFloat();
@@ -130,16 +136,8 @@ xpcc::CartesianCoordinate<T>::rotate(const Angle& phi)
 
 // ----------------------------------------------------------------------------
 template<typename T>
-xpcc::PolarCoordinate<T>
-xpcc::CartesianCoordinate<T>::toPolar()
-{
-	return PolarCoordinate<T>(getLength(), getAngle());
-}
-
-// ----------------------------------------------------------------------------
-template<typename T>
-xpcc::CartesianCoordinate<T>&
-xpcc::CartesianCoordinate<T>::operator += (const CartesianCoordinate &other)
+xpcc::Position<T>&
+xpcc::Position<T>::operator += (const Position &other)
 {
 	this->x += other.x;
 	this->y += other.y;
@@ -148,8 +146,8 @@ xpcc::CartesianCoordinate<T>::operator += (const CartesianCoordinate &other)
 
 // ----------------------------------------------------------------------------	
 template<typename T>
-xpcc::CartesianCoordinate<T>&
-xpcc::CartesianCoordinate<T>::operator -= (const CartesianCoordinate &other)
+xpcc::Position<T>&
+xpcc::Position<T>::operator -= (const Position &other)
 {
 	this->x -= other.x;
 	this->y -= other.y;
@@ -159,44 +157,44 @@ xpcc::CartesianCoordinate<T>::operator -= (const CartesianCoordinate &other)
 // ----------------------------------------------------------------------------
 
 template<typename U>
-xpcc::CartesianCoordinate<U>
-xpcc::operator - (const CartesianCoordinate<U> &a)
+xpcc::Position<U>
+xpcc::operator - (const Position<U> &a)
 {
-	return CartesianCoordinate<U>(-a.x, -a.y);
+	return Position<U>(-a.x, -a.y);
 }
 
 template<typename U>
-xpcc::CartesianCoordinate<U>
-xpcc::operator - (const CartesianCoordinate<U> &a, const CartesianCoordinate<U> &b)
+xpcc::Position<U>
+xpcc::operator - (const Position<U> &a, const Position<U> &b)
 {
-	return CartesianCoordinate<U>(a.x - b.x, a.y - b.y);
+	return Position<U>(a.x - b.x, a.y - b.y);
 }
 
 template<typename U>
-xpcc::CartesianCoordinate<U>
-xpcc::operator + (const CartesianCoordinate<U> &a, const CartesianCoordinate<U> &b)
+xpcc::Position<U>
+xpcc::operator + (const Position<U> &a, const Position<U> &b)
 {
-	return CartesianCoordinate<U>(a.x + b.x, a.y + b.y);
+	return Position<U>(a.x + b.x, a.y + b.y);
 }
 
 
 template<typename U>
 bool
-xpcc::operator == (const CartesianCoordinate<U> &a, const CartesianCoordinate<U> &b)
+xpcc::operator == (const Position<U> &a, const Position<U> &b)
 {
 	return (a.x == b.x) && (a.y == b.y);
 }
 
 template<typename U>
 bool
-xpcc::operator != (const CartesianCoordinate<U> &a, const CartesianCoordinate<U> &b)
+xpcc::operator != (const Position<U> &a, const Position<U> &b)
 {
 	return (a.x != b.x) || (a.y != b.y);
 }
 
 template <typename U>
 xpcc::IOStream&
-xpcc::operator <<( xpcc::IOStream& s, const xpcc::CartesianCoordinate<U>& c)
+xpcc::operator <<( xpcc::IOStream& s, const xpcc::Position<U>& c)
 {
 	s << "x=" << c.x << ", y=" << c.y;
 	return s;

@@ -43,7 +43,8 @@
 
 #include "../backend/backend_interface.hpp"
 
-namespace xpcc{
+namespace xpcc
+{
 	class Postman
 	{
 	public:
@@ -58,17 +59,11 @@ namespace xpcc{
 		} DeliverInfo;
 		
 		virtual DeliverInfo
-		deliverPacket(const BackendInterface& backend) = 0;
-		
-		virtual DeliverInfo
-		deliverPacket(const Header& header, SmartPointer& payload) = 0;
-		
-		virtual DeliverInfo
-		deliverPacket(const Header& header) = 0;
+		deliverPacket(const Header& header, const SmartPointer& payload) = 0;
 		
 		virtual bool
 		isComponentAvaliable(const Header& header) const = 0;
-		
 	};
 }
+
 #endif // XPCC_POSTMAN_HPP

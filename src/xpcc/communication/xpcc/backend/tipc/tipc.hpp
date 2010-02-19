@@ -74,10 +74,10 @@ namespace xpcc
 				isPacketAvailable() const;
 
 				/// Access the packet.
-				virtual const xpcc::Header&
+				virtual const ::xpcc::Header&
 				getPacketHeader() const;
 
-				virtual xpcc::SmartPointer
+				virtual const ::xpcc::SmartPointer
 				getPacketPayload() const;
 
 				virtual uint8_t
@@ -93,7 +93,7 @@ namespace xpcc
 				 * Send a Message.
 				 */
 				virtual void
-				sendPacket(const xpcc::Header &header,
+				sendPacket(const ::xpcc::Header &header,
 						   SmartPointer payload = SmartPointer());
 
 			private :

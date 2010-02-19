@@ -77,7 +77,8 @@ def filter_constructor(type):
 				init = "0"
 			else:
 				init = item_type + "()"
-			parameter.append("%s %s = %s" % (item_type, item_name, init))
+			#parameter.append("%s %s = %s" % (item_type, item_name, init))
+			parameter.append("%s %s" % (item_type, item_name))
 	return "%s(%s)" % (typename, ', '.join(parameter))
 
 

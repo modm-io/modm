@@ -67,7 +67,7 @@ xpcc::tipc::Tipc::getPacketHeader() const
 
 // ----------------------------------------------------------------------------
 
-xpcc::SmartPointer
+const xpcc::SmartPointer
 xpcc::tipc::Tipc::getPacketPayload() const
 {
 	SmartPointerVolatile payload( this->receiver.frontPayload().getSize() - sizeof(xpcc::Header) );

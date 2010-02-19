@@ -49,7 +49,7 @@ namespace xpcc
 	class Location
 	{
 	public:
-		typedef CartesianCoordinate<T> Position;
+		typedef ::xpcc::Position<T> Position;
 
 		Location();
 
@@ -94,10 +94,8 @@ namespace xpcc
 
 template <typename T>
 xpcc::Location<T>::Location() :
-	position(0, 0),
-	phi(0)
+	position(), phi()
 {
-
 }
 
 // -----------------------------------------------------------------------------
@@ -106,7 +104,6 @@ xpcc::Location<T>::Location(const Position& position, const Angle& phi) :
 	position(position),
 	phi(phi)
 {
-
 }
 
 // -----------------------------------------------------------------------------

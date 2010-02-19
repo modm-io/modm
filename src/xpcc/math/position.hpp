@@ -33,17 +33,129 @@
 #ifndef	XPCC__POSITION_HPP
 #define	XPCC__POSITION_HPP
 
+#include <math.h>
 #include <stdint.h>
+#include <xpcc/communication/io/iostream.hpp>
 
-#include "cartesian_coordinate.hpp"
+#include "angle.hpp"
 
 namespace xpcc
 {
-	/// \ingroup	math
-	typedef CartesianCoordinate<int16_t> Position;
+	/**
+	 * \brief		Cartesian coordinate
+	 *
+	 * \ingroup	math
+	 * \todo	operators for > < >= <=
+	 */
+	template<typename T = int16_t>
+	class Position
+	{
+	public:
+		Position();
+		
+		Position(const T& x, const T& y);
+		
+		void
+		setX(const T& value);
+		
+		void
+		setY(const T& value);
+		
+		void
+		set(const T& x, const T& y);
+		
+		const T&
+		getX() const;
+		
+		const T&
+		getY() const;
+		
+		/**
+		 * \brief	Calculate length
+		 */
+		T
+		getLength() const;
+		
+		/**
+		 * \brief	Calculate the absolute angle
+		 */
+		Angle
+		getAngle() const;
+		
+		/**
+		 * \brief	Normalize length to \a length
+		 */
+		Position&
+		normalize(const T& length);
+		
+		Position&
+		rotate(const Angle& phi);
+		
+		Position&
+		operator += (const Position &other);
+		
+		Position&
+		operator -= (const Position &other);
+		
+	private:
+		T x;
+		T y;
+		
+	private:
+		template<typename U>
+		friend Position<U>
+		operator - (const Position<U> &a);
+		
+		template<typename U>
+		friend Position<U>
+		operator - (const Position<U> &a, const Position<U> &b);
+		
+		template<typename U>
+		friend Position<U>
+		operator + (const Position<U> &a, const Position<U> &b);
+		
+		template<typename U>
+		friend bool
+		operator == (const Position<U> &a, const Position<U> &b);
+		
+		template<typename U>
+		friend bool
+		operator != (const Position<U> &a, const Position<U> &b);
+
+		template<typename U>
+		friend IOStream&
+		operator <<(IOStream& s, const Position<U>& c);
+	};
 	
-	/// \ingroup	math
-	typedef PolarCoordinate<int16_t> PositionPolar;
+	template<typename U>
+	Position<U>
+	operator - (const Position<U> &a);
+	
+	template<typename U>
+	Position<U>
+	operator - (const Position<U> &a, const Position<U> &b);
+	
+	template<typename U>
+	Position<U>
+	operator + (const Position<U> &a, const Position<U> &b);
+	
+	template<typename U>
+	bool
+	operator == (const Position<U> &a, const Position<U> &b);
+	
+	template<typename U>
+	bool
+	operator != (const Position<U> &a, const Position<U> &b);
+	
+	/**
+	 * \brief	Stream operator for \b xpcc::Position<U>
+	 * \ingroup	math
+	 */
+	template<typename U>
+	IOStream&
+	operator << (IOStream& s, const Position<U>& c);
 }
+
+#include "position_impl.hpp"
 
 #endif	// XPCC__POSITION_HPP

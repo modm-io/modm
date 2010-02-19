@@ -174,7 +174,7 @@ namespace communicationList{
 		 *
 		 */
 		void
-		handlePacket(const BackendInterface &backend);
+		handlePacket(const Header& header, const SmartPointer& payload);
 		
 		/**
 		 * \brief 		Sending messages which are waiting in the list.

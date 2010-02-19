@@ -37,51 +37,45 @@
 
 namespace xpcc
 {
-
 	/**
-	 * \ingroup		communication
-	 * \brief 		Parameter of the Callbackfunction
-	 */
-	class ResponseMessage// todo, has maybe to be defined somewhere else (other name), for use with requests too
-	{
-	public:
-
-		/*ResponseMessage(const Header& header, const uint8_t *payload, uint8_t payloadSize);*/
-		ResponseMessage(const Header& header, const SmartPointer& payload);
-		
-		const Header& header;
-		const SmartPointer payload;
-	};
-	
-	/**
-	 * \ingroup		communication
 	 * \brief 		Callback type, which has to be passed to communication during
 	 *				actioncall in order to be able to receive a response.
-	 *				Is a \b Functor.
+	 * 
+	 * Is a \b Functor.
+	 * 
+	 * \ingroup		communication
 	 */
 	class ResponseCallback
 	{
 	public:
-		typedef void (AbstractComponent::*CallbackFunction)(const ResponseMessage& message);
+		typedef void (AbstractComponent::*CallbackFunction)(const Header& header, const SmartPointer& payload);
 
+	public:
 		ResponseCallback();
-
+		
+		/**
+		 * \param	component	Pointer to a component object
+		 * \param	function	Pointer to a function of the component object
+		 * 
+		 * The function will be called when a response is received.
+		 */
 		template <class C>
-		ResponseCallback(C *object, void(C::*callbackFunction)(const ResponseMessage& message) ) :
-			object ( object ),
-			callbackFunction ( reinterpret_cast<CallbackFunction>(callbackFunction) )
+		ResponseCallback(C *component, void (C::*function)(const Header& header, const SmartPointer& payload) ) :
+			component( component ),
+			callbackFunction( reinterpret_cast<CallbackFunction>(function) )
 		{
 		}
-
-		ResponseCallback(AbstractComponent *object, CallbackFunction callbackFunction);
 		
-		void
-		handleResponse(const BackendInterface &backend) const;
+		inline void
+		handleResponse(const Header& header, const SmartPointer& payload) const
+		{
+			if (component != 0) {
+				(this->component->*callbackFunction)(header, payload);
+			}
+		}
 		
-		void
-		handleResponse(const ResponseMessage& message) const;
-		
-		AbstractComponent *object;
+	private:
+		AbstractComponent *component;
 		CallbackFunction callbackFunction;
 	};
 	

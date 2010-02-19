@@ -63,13 +63,7 @@ namespace xpcc
 		~StlPostman();
 		
 		virtual DeliverInfo
-		deliverPacket(const BackendInterface& interface);
-		
-		virtual DeliverInfo
-		deliverPacket(const Header &header, SmartPointer& payload);
-				
-		virtual DeliverInfo
-		deliverPacket(const Header &header);
+		deliverPacket(const Header &header, const SmartPointer& payload);
 		
 		virtual bool
 		isComponentAvaliable(const Header& header) const;

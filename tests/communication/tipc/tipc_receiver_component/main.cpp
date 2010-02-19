@@ -43,20 +43,20 @@ class Receiver : public xpcc::AbstractComponent
 {
 	public:
 		void
-		actionCallback(const xpcc::ResponseMessage& message)
+		actionCallback(const xpcc::Header& header, const xpcc::SmartPointer& payload)
 		{
 			XPCC_LOG_INFO << XPCC_FILE_INFO << "has ACTION";
-			XPCC_LOG_INFO << " from:" << (int)message.header.source;
-			XPCC_LOG_INFO << " value:" << *(int*) message.payload.getPointer();
+			XPCC_LOG_INFO << " from:" << (int)header.source;
+			XPCC_LOG_INFO << " value:" << *(int*) payload.getPointer();
 			XPCC_LOG_INFO << xpcc::flush;
 		}
 
 		void
-		eventCallback(const xpcc::ResponseMessage& message)
+		eventCallback(const xpcc::Header& header, const xpcc::SmartPointer& payload)
 		{
 			XPCC_LOG_INFO << XPCC_FILE_INFO << "has EVENT";
-			XPCC_LOG_INFO << " from:" << (int)message.header.source;
-			XPCC_LOG_INFO << " value:" << *(int*) message.payload.getPointer();
+			XPCC_LOG_INFO << " from:" << (int)header.source;
+			XPCC_LOG_INFO << " value:" << *(int*) payload.getPointer();
 			XPCC_LOG_INFO << xpcc::flush;
 		}
 };

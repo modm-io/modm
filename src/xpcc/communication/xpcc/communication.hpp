@@ -83,7 +83,7 @@ namespace xpcc
 				Postman* postman);
 		
 		~Communication();
-				
+		
 		void
 		update();
 		
@@ -94,6 +94,7 @@ namespace xpcc
 		void
 		setCurrentComponent(uint8_t id);
 		
+		
 		template<typename T>
 		void
 		callAction(uint8_t receiver, uint8_t actionIdentifier, const T& data);
@@ -102,6 +103,7 @@ namespace xpcc
 		void
 		callAction(uint8_t receiver, uint8_t actionIdentifier, const T& data, ResponseCallback& responseCallback);
 		
+		
 		template<typename T>
 		void
 		sendResponse(const ResponseHandle& handle, const T& data);
@@ -109,6 +111,7 @@ namespace xpcc
 		template<typename T>
 		void
 		sendNegativeResponse(const ResponseHandle& handle, const T& data);
+		
 		
 		template<typename T>
 		void

@@ -31,14 +31,14 @@
 // ----------------------------------------------------------------------------
 
 #include <math.h>
-#include <xpcc/math/cartesian_coordinate.hpp>
+#include <xpcc/math/position.hpp>
 
-#include "cartesian_test.hpp"
+#include "position_test.hpp"
 
 void
-CartesianTest::testConstructor()
+PositionTest::testConstructor()
 {
-	xpcc::CartesianCoordinate<int16_t> coord;
+	xpcc::Position<int16_t> coord;
 	
 	TEST_ASSERT_EQUALS(coord.getX(), 0);
 	TEST_ASSERT_EQUALS(coord.getY(), 0);
@@ -55,10 +55,10 @@ CartesianTest::testConstructor()
 }
 
 void
-CartesianTest::testLengthAndAngle()
+PositionTest::testLengthAndAngle()
 {
 	xpcc::Angle angle;
-	xpcc::CartesianCoordinate<int16_t> coord(100, 100);
+	xpcc::Position<int16_t> coord(100, 100);
 	
 	TEST_ASSERT_EQUALS(coord.getLength(), 141);
 	angle = coord.getAngle();
@@ -78,9 +78,9 @@ CartesianTest::testLengthAndAngle()
 }
 
 void
-CartesianTest::testRotation()
+PositionTest::testRotation()
 {
-	xpcc::CartesianCoordinate<int16_t> coord(100, 100);
+	xpcc::Position<int16_t> coord(100, 100);
 	
 	coord.rotate(M_PI / 2);
 	
@@ -94,11 +94,11 @@ CartesianTest::testRotation()
 }
 
 void
-CartesianTest::testArithmetics()
+PositionTest::testArithmetics()
 {
-	xpcc::CartesianCoordinate<int16_t> x(100, 100);
-	xpcc::CartesianCoordinate<int16_t> y(100, 100);
-	xpcc::CartesianCoordinate<int16_t> z;
+	xpcc::Position<int16_t> x(100, 100);
+	xpcc::Position<int16_t> y(100, 100);
+	xpcc::Position<int16_t> z;
 	
 	x += y;
 	

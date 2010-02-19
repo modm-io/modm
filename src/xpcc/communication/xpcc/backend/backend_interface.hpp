@@ -117,7 +117,7 @@ namespace xpcc
 		virtual const Header&
 		getPacketHeader() const = 0;
 		
-		virtual SmartPointer
+		virtual const SmartPointer
 		getPacketPayload() const = 0;
 		
 		virtual uint8_t
