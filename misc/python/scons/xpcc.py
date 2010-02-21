@@ -78,7 +78,7 @@ class FileScanner:
 		self.unittest = unittest
 	
 	def scan(self, path):
-		""" Scan a directory for source files
+		""" Scan directories for source files
 		
 		Provides the following attributes to collect the results:
 		sources		- list of source files
@@ -93,60 +93,62 @@ class FileScanner:
 		self.testSources = []
 		self.defines = {}
 		
-		basepath = path
-		for path, directories, files in os.walk(basepath):
-			# exclude the SVN-directories
-			if '.svn' in directories:
-				directories.remove('.svn')
-			
-			if 'build.cfg' in files:
-				parser.read(os.path.join(path, 'build.cfg'))
+		pathlist = path
+		
+		for basepath in pathlist:
+			for path, directories, files in os.walk(basepath):
+				# exclude the SVN-directories
+				if '.svn' in directories:
+					directories.remove('.svn')
 				
-				try:
-					target = parser.get('build', 'target')
-					if not re.match(target, self.env['ARCHITECTURE']):
-						# if the this directory should be excluded, remove all the
-						# subdirectories from the list to exclude them as well
-						tempDirectories = directories[:]
-						for d in tempDirectories:
-							directories.remove(d)
-						continue
-				except ConfigParser.NoSectionError:
-					pass
+				if 'build.cfg' in files:
+					parser.read(os.path.join(path, 'build.cfg'))
+					
+					try:
+						target = parser.get('build', 'target')
+						if not re.match(target, self.env['ARCHITECTURE']):
+							# if the this directory should be excluded, remove all the
+							# subdirectories from the list to exclude them as well
+							tempDirectories = directories[:]
+							for d in tempDirectories:
+								directories.remove(d)
+							continue
+					except ConfigParser.NoSectionError:
+						pass
+					
+					try:
+						for item in parser.items('defines'):
+							self.defines[item[0]] = item[1]
+					except ParserException:
+						pass
 				
-				try:
-					for item in parser.items('defines'):
-						self.defines[item[0]] = item[1]
-				except ParserException:
-					pass
-			
-			for file in files:
-				extension = os.path.splitext(file)[1]
-				filename = os.path.join(path, file)
-				
-				if extension in ['.cpp', '.c', '.S']:
-					# append source files
-					if os.path.normpath(path).endswith(os.sep + 'test'):
-						if self.unittest is True:
-							self.testSources.append(filename)
+				for file in files:
+					extension = os.path.splitext(file)[1]
+					filename = os.path.join(path, file)
+					
+					if extension in ['.cpp', '.c', '.S']:
+						# append source files
+						if os.path.normpath(path).endswith(os.sep + 'test'):
+							if self.unittest is True:
+								self.testSources.append(filename)
+							else:
+								continue
 						else:
-							continue
-					else:
-						if self.unittest is True:
-							continue
-					self.sources.append(filename)
-				
-				elif extension in ['.h', '.hpp']:
-					# append header files
-					if os.path.normpath(path).endswith(os.sep + 'test'):
-						if self.unittest is True:
-							self.testHeader.append(filename)
+							if self.unittest is True:
+								continue
+						self.sources.append(filename)
+					
+					elif extension in ['.h', '.hpp']:
+						# append header files
+						if os.path.normpath(path).endswith(os.sep + 'test'):
+							if self.unittest is True:
+								self.testHeader.append(filename)
+							else:
+								continue
 						else:
-							continue
-					else:
-						if self.unittest is True:
-							continue
-					self.header.append(filename)
+							if self.unittest is True:
+								continue
+						self.header.append(filename)
 
 # -----------------------------------------------------------------------------
 def generate_environment(env, configfile, rootpath, buildpath = None):
