@@ -83,11 +83,17 @@ namespace xpcc
 		getAngle() const;
 		
 		/**
-		 * \brief	Normalize length to \a length
+		 * \brief	Normalise length to 1
 		 */
 		Position&
-		normalize(const T& length);
-		
+		normalize();
+
+		/**
+		 * \brief	Scale the length by \p factor
+		 */
+		Position&
+		scale(const T& factor);
+
 		Position&
 		rotate(const Angle& phi);
 		
@@ -97,6 +103,9 @@ namespace xpcc
 		Position&
 		operator -= (const Position &other);
 		
+		template<typename U>
+		operator U();
+
 	private:
 		T x;
 		T y;

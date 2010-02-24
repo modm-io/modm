@@ -110,11 +110,23 @@ xpcc::Position<T>::getAngle() const
 // ----------------------------------------------------------------------------
 template<typename T>
 xpcc::Position<T>&
-xpcc::Position<T>::normalize(const T& length)
+xpcc::Position<T>::normalize()
 {
-	x = x / length;
-	y = y / length;
+	T length = this->getLength();
+	this->x = this->x / length;
+	this->y = this->y / length;
 	
+	return *this;
+}
+
+// ----------------------------------------------------------------------------
+template<typename T>
+xpcc::Position<T>&
+xpcc::Position<T>::scale(const T& factor)
+{
+	this->x = this->x * factor;
+	this->y = this->y * factor;
+
 	return *this;
 }
 
@@ -152,6 +164,13 @@ xpcc::Position<T>::operator -= (const Position &other)
 	this->x -= other.x;
 	this->y -= other.y;
 	return *this;
+}
+
+// ----------------------------------------------------------------------------
+template<typename T> template<typename U>
+xpcc::Position<T>::operator U()
+{
+	return U(this->x, this->y);
 }
 
 // ----------------------------------------------------------------------------
