@@ -5,6 +5,7 @@
  * 
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
+ * 
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -61,7 +62,7 @@ namespace xpcc
 		// Must use a pointer to T here, otherwise the compiler can't distinguish
 		// between constructor and copy constructor!
 		template<typename T>
-		SmartPointer(const T *data)
+		explicit SmartPointer(const T *data)
 		: ptr(new uint8_t[sizeof(T) + 2])
 		{
 			ptr[0] = 1;

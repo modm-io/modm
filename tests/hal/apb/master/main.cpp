@@ -34,8 +34,7 @@ xpcc::Hd447800 <lcd::E, lcd::RW, lcd::RS, lcd::Data> display;
 xpcc::apb::Interface <xpcc::BufferedUart0> interface;
 
 // ----------------------------------------------------------------------------
-ISR(TIMER2_COMPA_vect)
-{
+ISR(TIMER2_COMPA_vect) {
 	xpcc::Clock::increment();
 }
 
@@ -60,7 +59,7 @@ main()
 	xpcc::IOStream stream(display);
 	stream << "Hallo Welt!\n";
 	
-	interface.initialize();
+	//interface.initialize();
 	
 	TCCR2A = (1 << WGM21);
 	TCCR2B = (1 << CS22);
@@ -71,16 +70,12 @@ main()
 	
 	LedRed::reset();
 	
-	uint8_t data[4] = { 0xab, 0xcd, 0xef, 0x64 };
-	interface.sendMessage(xpcc::apb::Interface<xpcc::BufferedUart0>::ACK, data, 4);
-	
-	xpcc::Timeout<> timeout(200);
+	xpcc::Timeout<> timeout;
 	while (1)
 	{
 		if (timeout.isExpired()) {
 			timeout.restart(50);
 			
-			//LedGreen::toggle();
 			uint8_t data = 0xaa;
 			interface.sendMessage(xpcc::apb::Interface<xpcc::BufferedUart0>::ACK, &data, 1);
 		}
@@ -89,16 +84,11 @@ main()
 		if (interface.isMessageAvailable())
 		{
 			const uint8_t *data = interface.getData();
-			if ((interface.getLength() == 2) && (data[0] == 0xaa)) {
-				LedRed::set(data[1] & 0x2);
-				LedGreen::set(data[1] & 0x1);
+			if ((interface.getLength() == 2) && (data[0] == 0xaa))
+			{
+				LedRed::write(data[1] & 0x2);
+				LedGreen::write(data[1] & 0x1);
 			}
-			/*stream << xpcc::hex;
-			
-			for (uint8_t i = 0; i < interface.getLength(); ++i) {
-				stream << *data++;
-			}
-			stream << xpcc::endl;*/
 			interface.dropMessage();
 		}
 	}

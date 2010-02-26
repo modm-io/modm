@@ -110,32 +110,35 @@ namespace xpcc
 		 * \brief	Generic implementation of a Nibble composed of four
 		 * 			independent pins.
 		 * 
-		 * Generally speaking the CREATE_LOW/HIGH_NIBBLE macros should be
+		 * Generally speaking the GPIO__NIBBLE_LOW/HIGH macros should be
 		 * prefered because they are faster and require less code.
 		 * 
-		 * \see		CREATE_LOW_NIBBLE(), CREATE_HIGH_NIBBLE()
+		 * \see		GPIO__NIBBLE_LOW(), GPIO__NIBBLE_HIGH()
 		 * \ingroup	gpio
 		 * \author	Fabian Greif
 		 */
-		template <typename D3, typename D2, typename D1, typename D0>
+		template <typename T3 = Unused,
+				  typename T2 = Unused,
+				  typename T1 = Unused,
+				  typename T0 = Unused>
 		class Nibble
 		{
 			ALWAYS_INLINE static void
 			setOutput()
 			{
-				D3::setOutput();
-				D2::setOutput();
-				D1::setOutput();
-				D0::setOutput();
+				T3::setOutput();
+				T2::setOutput();
+				T1::setOutput();
+				T0::setOutput();
 			}
 			
 			ALWAYS_INLINE static void
 			setInput()
 			{
-				D3::setInput();
-				D2::setInput();
-				D1::setInput();
-				D0::setInput();
+				T3::setInput();
+				T2::setInput();
+				T1::setInput();
+				T0::setInput();
 			}
 			
 			/**
@@ -149,10 +152,10 @@ namespace xpcc
 			{
 				uint8_t value = 0;
 				
-				if (D3::read()) { value |= 0x08; }
-				if (D2::read()) { value |= 0x04; }
-				if (D1::read()) { value |= 0x02; }
-				if (D0::read()) { value |= 0x01; }
+				if (T3::read()) { value |= 0x08; }
+				if (T2::read()) { value |= 0x04; }
+				if (T1::read()) { value |= 0x02; }
+				if (T0::read()) { value |= 0x01; }
 				
 				return value;
 			}
@@ -165,10 +168,81 @@ namespace xpcc
 			static void
 			write(uint8_t data)
 			{
-				if (data & 0x08) { D3::set(); } else { D3::reset(); }
-				if (data & 0x04) { D2::set(); } else { D2::reset(); }
-				if (data & 0x02) { D1::set(); } else { D1::reset(); }
-				if (data & 0x01) { D0::set(); } else { D0::reset(); }
+				if (data & 0x08) { T3::set(); } else { T3::reset(); }
+				if (data & 0x04) { T2::set(); } else { T2::reset(); }
+				if (data & 0x02) { T1::set(); } else { T1::reset(); }
+				if (data & 0x01) { T0::set(); } else { T0::reset(); }
+			}
+		};
+		
+		/**
+		 * 
+		 */
+		template <typename T7 = Unused,
+				  typename T6 = Unused,
+				  typename T5 = Unused,
+				  typename T4 = Unused,
+				  typename T3 = Unused,
+				  typename T2 = Unused,
+				  typename T1 = Unused,
+				  typename T0 = Unused>
+		class Port
+		{
+			ALWAYS_INLINE static void
+			setOutput()
+			{
+				T7::setOutput();
+				T6::setOutput();
+				T5::setOutput();
+				T4::setOutput();
+				T3::setOutput();
+				T2::setOutput();
+				T1::setOutput();
+				T0::setOutput();
+			}
+			
+			ALWAYS_INLINE static void
+			setInput()
+			{
+				T7::setInput();
+				T6::setInput();
+				T5::setInput();
+				T4::setInput();
+				T3::setInput();
+				T2::setInput();
+				T1::setInput();
+				T0::setInput();
+			}
+			
+			
+			static uint8_t
+			read()
+			{
+				uint8_t value = 0;
+				
+				if (T7::read()) { value |= 0x80; }
+				if (T6::read()) { value |= 0x40; }
+				if (T5::read()) { value |= 0x20; }
+				if (T4::read()) { value |= 0x10; }
+				if (T3::read()) { value |= 0x08; }
+				if (T2::read()) { value |= 0x04; }
+				if (T1::read()) { value |= 0x02; }
+				if (T0::read()) { value |= 0x01; }
+				
+				return value;
+			}
+			
+			static void
+			write(uint8_t data)
+			{
+				if (data & 0x80) { T7::set(); } else { T7::reset(); }
+				if (data & 0x40) { T6::set(); } else { T6::reset(); }
+				if (data & 0x20) { T5::set(); } else { T5::reset(); }
+				if (data & 0x10) { T4::set(); } else { T4::reset(); }
+				if (data & 0x08) { T3::set(); } else { T3::reset(); }
+				if (data & 0x04) { T2::set(); } else { T2::reset(); }
+				if (data & 0x02) { T1::set(); } else { T1::reset(); }
+				if (data & 0x01) { T0::set(); } else { T0::reset(); }
 			}
 		};
 	}

@@ -31,7 +31,7 @@
 # -----------------------------------------------------------------------------
 
 import os
-import builder
+import builder_base
 
 BUILTIN = [	'int8_t', 'int16_t', 'int32_t',
 			'uint8_t', 'uint16_t', 'uint32_t',
@@ -83,7 +83,7 @@ def filter_constructor(type):
 
 
 # -----------------------------------------------------------------------------
-class TypeBuilder(builder.Builder):
+class TypeBuilder(builder_base.Builder):
 	
 	VERSION = "$Id$"
 	
@@ -104,7 +104,6 @@ class TypeBuilder(builder.Builder):
 		substitutions = {
 			'components': self.tree.components,
 			'actions': self.tree.components.actions,
-			'attributes': self.tree.components.attributes,
 			'events': self.tree.components.events,
 			'types': self.tree.types
 		}

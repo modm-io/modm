@@ -31,9 +31,9 @@
 # -----------------------------------------------------------------------------
 
 import os
-import builder
+import builder_base
 
-class JavaBuilder(builder.Builder):
+class JavaBuilder(builder_base.Builder):
 	
 	VERSION = "$Id$"
 	

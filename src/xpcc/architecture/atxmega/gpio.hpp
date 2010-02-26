@@ -61,7 +61,7 @@ namespace xpcc
  * 
  * \ingroup	gpio
  */
-#define	CREATE_IO_PIN(name, port, pin) \
+#define	GPIO__IO(name, port, pin) \
 	struct name \
 	{ \
 		ALWAYS_INLINE static void \
@@ -102,7 +102,7 @@ namespace xpcc
  * 
  * \ingroup	gpio
  */
-#define	CREATE_OUTPUT_PIN(name, port, pin) \
+#define	GPIO__OUTPUT(name, port, pin) \
 	struct name \
 	{ \
 		ALWAYS_INLINE static void \
@@ -133,7 +133,7 @@ namespace xpcc
  * 
  * \ingroup	gpio
  */
-#define CREATE_INPUT_PIN(name, port, pin) \
+#define GPIO__INPUT(name, port, pin) \
 	struct name \
 	{ \
 		ALWAYS_INLINE static void \
@@ -148,7 +148,7 @@ namespace xpcc
 	}
 
 // FIXME
-//#define CREATE_LOW_NIBBLE(name, port)
-//#define CREATE_HIGH_NIBBLE(name, port)
+//#define GPIO__NIBBLE_LOW(name, port)
+//#define GPIO__NIBBLE_HIGH(name, port)
 
 #endif // XPCC__ATXMEGA_GPIO_HPP

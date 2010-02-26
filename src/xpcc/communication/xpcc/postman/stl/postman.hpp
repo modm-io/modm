@@ -43,7 +43,7 @@
  */
 
 #include "../postman.hpp"
-#include "../../response_callback.hpp"
+#include "../../callback.hpp"
 
 #include <map>
 
@@ -52,8 +52,8 @@ namespace xpcc
 	class StlPostman : public Postman
 	{
 	public:
-		typedef ::std::multimap<uint16_t, ResponseCallback> EventMap;
-		typedef ::std::map<uint16_t, ResponseCallback > CallbackMap; ///< packetIdentifier -> callback
+		typedef ::std::multimap<uint16_t, Callback> EventMap;
+		typedef ::std::map<uint16_t, Callback > CallbackMap; ///< packetIdentifier -> callback
 		typedef ::std::map<uint16_t, CallbackMap > RequestMap; ///< destination -> callbackMap
 
 		StlPostman();

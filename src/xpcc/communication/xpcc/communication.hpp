@@ -101,7 +101,7 @@ namespace xpcc
 		
 		template<typename T>
 		void
-		callAction(uint8_t receiver, uint8_t actionIdentifier, const T& data, ResponseCallback& responseCallback);
+		callAction(uint8_t receiver, uint8_t actionIdentifier, const T& data, Callback& responseCallback);
 		
 		
 		template<typename T>
@@ -152,7 +152,7 @@ xpcc::Communication::callAction(uint8_t receiver, uint8_t actionIdentifier, cons
 // ----------------------------------------------------------------------------
 template<typename T>
 void
-xpcc::Communication::callAction(uint8_t receiver, uint8_t actionIdentifier, const T& data, ResponseCallback& responseCallback)
+xpcc::Communication::callAction(uint8_t receiver, uint8_t actionIdentifier, const T& data, Callback& responseCallback)
 {
 	Header header(	Header::REQUEST,
 					false,

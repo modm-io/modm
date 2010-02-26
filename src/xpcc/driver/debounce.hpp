@@ -68,15 +68,15 @@ namespace xpcc
 		 * Provided for convenience only.
 		 */
 		typedef enum {
-			KEY0 = (1 << 0),
-			KEY1 = (1 << 1),
-			KEY2 = (1 << 2),
-			KEY3 = (1 << 3),
-			KEY4 = (1 << 4),
-			KEY5 = (1 << 5),
-			KEY6 = (1 << 6),
-			KEY7 = (1 << 7)
-		} Keys;
+			BUTTON0 = (1 << 0),
+			BUTTON1 = (1 << 1),
+			BUTTON2 = (1 << 2),
+			BUTTON3 = (1 << 3),
+			BUTTON4 = (1 << 4),
+			BUTTON5 = (1 << 5),
+			BUTTON6 = (1 << 6),
+			BUTTON7 = (1 << 7)
+		} Buttons;
 		
 	public:
 		/** \brief	Constructor

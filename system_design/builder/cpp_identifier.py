@@ -30,37 +30,30 @@
 # $Id$
 # -----------------------------------------------------------------------------
 
-import optparse
+import os
+import builder_base
 
-from builders.builder import BuilderException
-import builders.java
-import builders.types
-import builders.identifier
-
-__VERSION__ = "$Rev$"
+class IdentifierBuilder(builder_base.Builder):
+	
+	VERSION = "$Id$"
+	
+	def generate(self):
+		# check the commandline options
+		if not self.options.outpath:
+			raise builder.BuilderException("You need to provide an output path!")
+		
+		template = self.template('templates/identifier.tpl')
+		
+		substitutions = {
+			'components': self.tree.components,
+			'actions': self.tree.components.actions,
+			'attributes': self.tree.components.attributes,
+			'events': self.tree.components.events
+		}
+		
+		file = os.path.join(self.options.outpath, 'robot_identifier.hpp')
+		self.write(file, template.render(substitutions))
 
 # -----------------------------------------------------------------------------
 if __name__ == '__main__':
-	optparser = optparse.OptionParser(
-			usage   = "%prog [options] XML_FILE",
-			version = "%prog version: " + __VERSION__ )
-	
-	optparser.add_option(
-			"-t", "--type",
-			dest = "type",
-			help = "Type of files to build")
-	
-	(options, args) = optparser.parse_args()
-	
-	try:
-		if options.type == 'java':
-			builders.types.TypeBuilder().generate()
-		elif options.type == 'types':
-			builders.identifier.IdentifierBuilder().generate()
-		elif options.type == 'identifier':
-			builders.java.JavaBuilder().generate()
-		else:
-			raise BuilderException("Don't know how to build files of type '%s'" % options.type)
-	except BuilderException, e:
-		print "Error:", e
-		exit(1)
+	IdentifierBuilder().generate()

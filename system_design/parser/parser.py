@@ -60,7 +60,6 @@ class ComponentDict(structure.helper.SingleAssignDict):
 		structure.helper.SingleAssignDict.__init__(self, name)
 		
 		self.actions = structure.helper.SortedDict()
-		self.attributes = structure.helper.SortedDict()
 		self.events = structure.helper.SortedDict()
 	
 	def __update_list(self, toplist, list, name):
@@ -75,7 +74,6 @@ class ComponentDict(structure.helper.SingleAssignDict):
 	def update_index(self):
 		for component in self.values():
 			self.__update_list(component.actions, self.actions, "action")
-			self.__update_list(component.attributes, self.attributes, "attribute")
 			self.__update_list(component.events, self.events, "event")
 	
 	def iter(self, abstract=False, reference=False):
@@ -164,7 +162,6 @@ class Parser:
 		# now check for duplicate identifiers
 		self.__check_identifier(self.components.iter(abstract=False), "component")
 		self.__check_identifier(self.components.actions, "action")
-		self.__check_identifier(self.components.attributes, "attributes")
 		self.__check_identifier(self.components.events, "events")
 	
 	def _parse(self, tree):
@@ -215,22 +212,22 @@ class Parser:
 					component.abstract = False
 					self.components[component.name] = component
 				else:
-#					if component.id:
-#						sys.stderr.write(
-#							"Warning ('%s' > '%s'): the id and all "
-#							"other data specified here will be discarded!\n"
-#							% (board.name, component.name)
-#						)
-#					board._components[i] = self.components[component.name]
+					if component.id:
+						sys.stderr.write(
+							"Warning ('%s' > '%s'): the id and all "
+							"other data specified here will be discarded!\n"
+							% (board.name, component.name)
+						)
+					board._components[i] = self.components[component.name]
 					
 					# FIXME die auskommentierte Variante ist besser, dafür muss
 					# aber die XML Datei angepasst werden. Diese hier
 					# entspricht dem bisherigen Verhalten
-					component.extend(self.components[component.name])
-					component.abstract = False
-					self.components.replace(component.name, component)
-					
-					board.components.replace(component.name, self.components[component.name])
+					#component.extend(self.components[component.name])
+					#component.abstract = False
+					#self.components.replace(component.name, component)
+					#
+					#board.components.replace(component.name, self.components[component.name])
 		
 		# update the type level
 		self.__create_type_hierarchy()
@@ -355,31 +352,4 @@ class Parser:
 
 # -----------------------------------------------------------------------------
 if __name__ == '__main__':
-	
-#	import time
-#	starttime = time.time()
-	
-	parser = Parser("../../../../../roboter-09/software/defines/test.xml")
-	parser.parse()
-	
-#	elapsed = time.time() - starttime
-#	print "%i ms" % int(elapsed * 1000)
-	
-#	pprint.pprint(parser._types)
-	
-#	print parser.boards["Kransteuerung"]
-#	print parser.boards["PC"]
-	
-#	parser.components.update_index()
-#	for action in parser.components.actions.iter(None):
-#		print action
-#	for board in parser.boards.iter(None):
-#		print board.name
-#	for type in parser.types:#
-#		print type
-#		print ""
-	for component in parser.components:
-		print "%02x: %s" % (component.id, component.name)
-	
-	#pprint.pprint(parser.components["component"])
-	#pprint.pprint(parser.boards["AVR Virtual"]["components"][0])
+	pass

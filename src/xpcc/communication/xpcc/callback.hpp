@@ -5,6 +5,7 @@
  * 
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
+ * 
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -29,10 +30,10 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC_RESPONSE_CALLBACK_HPP
-#define	XPCC_RESPONSE_CALLBACK_HPP
+#ifndef	XPCC__CALLBACK_HPP
+#define	XPCC__CALLBACK_HPP
 
-#include "backend/backend_interface.hpp"
+#include <xpcc/data_structure/smart_pointer.hpp>
 #include "abstract_component.hpp"
 
 namespace xpcc
@@ -45,13 +46,13 @@ namespace xpcc
 	 * 
 	 * \ingroup		communication
 	 */
-	class ResponseCallback
+	class Callback
 	{
 	public:
-		typedef void (AbstractComponent::*CallbackFunction)(const Header& header, const SmartPointer& payload);
+		typedef void (AbstractComponent::*Function)(const uint8_t *type);
 
 	public:
-		ResponseCallback();
+		Callback();
 		
 		/**
 		 * \param	component	Pointer to a component object
@@ -59,26 +60,26 @@ namespace xpcc
 		 * 
 		 * The function will be called when a response is received.
 		 */
-		template <class C>
-		ResponseCallback(C *component, void (C::*function)(const Header& header, const SmartPointer& payload) ) :
-			component( component ),
-			callbackFunction( reinterpret_cast<CallbackFunction>(function) )
+		template <typename C, typename P>
+		Callback(C *component, void (C::*function)(const P* packet) ) :
+			component(component),
+			function(reinterpret_cast<Function>(function))
+			// TODO save packet size?
 		{
 		}
 		
 		inline void
-		handleResponse(const Header& header, const SmartPointer& payload) const
+		call(const SmartPointer &payload) const
 		{
 			if (component != 0) {
-				(this->component->*callbackFunction)(header, payload);
+				(component->*function)(payload.getPointer());
 			}
 		}
 		
 	private:
 		AbstractComponent *component;
-		CallbackFunction callbackFunction;
+		Function function;
 	};
-	
 }
 
-#endif // XPCC_RESPONSE_CALLBACK_HPP
+#endif // XPCC__CALLBACK_HPP

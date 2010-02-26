@@ -5,6 +5,7 @@
  * 
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
+ * 
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -29,11 +30,9 @@
  */
 // ----------------------------------------------------------------------------
 
+#include "callback.hpp"
 
-#include "response_callback.hpp"
-
-xpcc::ResponseCallback::ResponseCallback() :
-	component( 0 ),
-	callbackFunction ( 0 )
+xpcc::Callback::Callback() :
+	component(0)
 {
 }

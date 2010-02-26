@@ -3,13 +3,13 @@
 #include <xpcc/driver/debounce.hpp>
 #include <xpcc/architecture/general/gpio.hpp>
 
-CREATE_OUTPUT_PIN(Led, B, 0);
+GPIO__OUTPUT(Led, B, 0);
 
-static xpcc::Debounce keys;
+static xpcc::Debounce buttons;
 
 ISR(TIMER2_COMPA_vect)
 {
-	keys.update(PINB);
+	buttons.update(PINB);
 }
 
 int
@@ -31,7 +31,7 @@ main()
 	
 	while (1)
 	{
-		if (keys.getPress(1 << PB3))
+		if (buttons.getPress(1 << PB3))
 		{
 			Led::toggle();
 		}

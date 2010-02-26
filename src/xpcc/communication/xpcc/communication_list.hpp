@@ -37,7 +37,7 @@
 
 #include "backend/backend_interface.hpp"
 #include "postman/postman.hpp"
-#include "response_callback.hpp"
+#include "callback.hpp"
 
 /**
  * \ingroup 	communication
@@ -121,10 +121,10 @@ namespace communicationList{
 	class EntryWithCallback:public Entry{
 
 	public:
-		EntryWithCallback(const Header& header, SmartPointer& payload, ResponseCallback& callback);
-		EntryWithCallback(const Header& header, ResponseCallback& callback);
+		EntryWithCallback(const Header& header, SmartPointer& payload, Callback& callback);
+		EntryWithCallback(const Header& header, Callback& callback);
 		
-		ResponseCallback responseCallback;
+		Callback responseCallback;
 	};
 
 	/**
@@ -163,10 +163,10 @@ namespace communicationList{
 		addActionCall(const Header& header, SmartPointer& smartPayload);
 		
 		void
-		addActionCall(const Header& header, SmartPointer& smartPayload, ResponseCallback& responseCallback);
+		addActionCall(const Header& header, SmartPointer& smartPayload, Callback& responseCallback);
 		
 		void
-		addActionCall(const Header& header, ResponseCallback& responseCallback);
+		addActionCall(const Header& header, Callback& responseCallback);
 		
 		
 		/**
@@ -226,7 +226,7 @@ namespace communicationList{
 		 */
 		template<typename C>
 		void
-		handleResponseOfNextOfEWithCallback(const BackendInterface &backend, Entry *e);
+		callOfNextOfEWithCallback(const BackendInterface &backend, Entry *e);
 
 		EntryDefault dummyFirst;
 		Entry *first;

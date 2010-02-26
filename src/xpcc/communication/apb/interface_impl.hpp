@@ -52,7 +52,6 @@ template <typename DEVICE> uint8_t xpcc::apb::Interface<DEVICE>::position;
 template <typename DEVICE> uint8_t xpcc::apb::Interface<DEVICE>::length;
 template <typename DEVICE> uint8_t xpcc::apb::Interface<DEVICE>::lengthOfReceivedMessage = 0;
 
-
 // ----------------------------------------------------------------------------
 
 template <typename DEVICE>

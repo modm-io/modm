@@ -5,6 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
+ * 
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -33,7 +34,6 @@
 
 xpcc::StlPostman::StlPostman()
 {
-
 }
 
 // ----------------------------------------------------------------------------
@@ -42,7 +42,6 @@ xpcc::StlPostman::StlPostman(const EventMap& eventMap, const RequestMap& requens
 	eventMap ( eventMap ),
 	requenstMap ( requenstMap )
 {
-
 }
 
 // ----------------------------------------------------------------------------
@@ -56,15 +55,16 @@ xpcc::StlPostman::~StlPostman()
 xpcc::StlPostman::DeliverInfo
 xpcc::StlPostman::deliverPacket(const Header &header, const SmartPointer& payload)
 {
-	if( header.destination == 0 ) {
+	if ( header.destination == 0 ) {
 		// EVENT
 		EventMap::const_iterator lowerBound( this->eventMap.lower_bound( header.packetIdentifier) );
 		EventMap::const_iterator upperBound( this->eventMap.upper_bound( header.packetIdentifier) );
-		if( lowerBound != upperBound ) {
+		if ( lowerBound != upperBound ) {
 			do {
-				lowerBound->second.handleResponse(header, payload);
+				lowerBound->second.call(payload);
 				lowerBound++;
-			} while( lowerBound != upperBound );
+			}
+			while (lowerBound != upperBound);
 			return OK;
 		}
 		return NO_EVENT;
@@ -75,7 +75,7 @@ xpcc::StlPostman::deliverPacket(const Header &header, const SmartPointer& payloa
 		if( iterDestination != this->requenstMap.end() ) {
 			CallbackMap::const_iterator iterCallback( iterDestination->second.find( header.packetIdentifier ) );
 			if( iterCallback != iterDestination->second.end() ) {
-				iterCallback->second.handleResponse(header, payload);
+				iterCallback->second.call(payload);
 				return OK;
 			}
 			else {

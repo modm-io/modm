@@ -3,7 +3,7 @@
 
 import helper
 from exception import ParserError
-from component_element import Action, Attribute, Event
+from component_element import Action, Event
 
 class Component(object):
 	"""
@@ -21,7 +21,6 @@ class Component(object):
 		self.abstract = True
 		
 		self.actions = helper.SingleAssignDict("action")
-		self.attributes = helper.SingleAssignDict("attribute")
 		self.events = helper.SingleAssignDict("event")
 	
 	def check(self):
@@ -43,7 +42,6 @@ class Component(object):
 		
 		# update actions, attributes and events
 		self.__extend(top.actions, self.actions)
-		self.__extend(top.attributes, self.attributes)
 		self.__extend(top.events, self.events)
 	
 	def __extend(self, toplist, list):
@@ -60,7 +58,6 @@ class Component(object):
 	def add(self, element):
 		list = {
 			"action": self.actions, 
-			"attribute": self.attributes,
 			"event": self.events
 		}[element.get_type()]
 		list[element.name] = element
@@ -74,7 +71,6 @@ class Component(object):
 		
 		# parse functions, attributes and events
 		self.__parse_element('action', node, Action)
-		self.__parse_element('attribute', node, Attribute)
 		self.__parse_element('event', node, Event)
 		
 		self.implementation = helper.xml_read_implementation(node)
@@ -97,12 +93,6 @@ class Component(object):
 		/================================================\
 		|               Stage Object [ee]                |
 		|------------------------------------------------|
-		| +[00] object_type : Component Type             |
-		| +[01] object_name : char[] = component         |
-		| +[02] compile_date : char[]                    |
-		| +[03] awake_status : Component Status          |
-		| +[04] debug_mode_status : Component Debug Mode |
-		|------------------------------------------------|
 		| +[00] ping()                                   |
 		| +[01] reset()                                  |
 		| +[03] save_configuration()                     |
@@ -112,15 +102,14 @@ class Component(object):
 		\================================================/
 		
 		The numbers in the square brackets shows the identifier (in
-		hexadecimal). First block shows the attributes, the second
-		the actions and the last one the events.
+		hexadecimal). First block shows the actions and the second the events.
 		
 		"""
 		name = "%s [%02x]" % (self.name, self.id)
 		max_length = len(name)
 		
 		elements = [[], [], []]
-		for i, iterator in enumerate([self.attributes, self.actions, self.events]):
+		for i, iterator in enumerate([self.actions, self.events]):
 			for element in iterator.iter(reference=None):
 				string = "+%s" % element
 				max_length = max(max_length, len(string))

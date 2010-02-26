@@ -89,12 +89,12 @@ xpcc::communicationList::EntryDefault::EntryDefault(const Header& header, SmartP
 Entry(DEFAULT, header, payload){
 }
 
-xpcc::communicationList::EntryWithCallback::EntryWithCallback(const Header& header, SmartPointer& payload, ResponseCallback& responseCallback):
+xpcc::communicationList::EntryWithCallback::EntryWithCallback(const Header& header, SmartPointer& payload, Callback& responseCallback):
 Entry(CALLBACK, header, payload),
 responseCallback(responseCallback){
 }
 
-xpcc::communicationList::EntryWithCallback::EntryWithCallback(const Header& header, ResponseCallback& responseCallback):
+xpcc::communicationList::EntryWithCallback::EntryWithCallback(const Header& header, Callback& responseCallback):
 Entry(CALLBACK, header),
 responseCallback(responseCallback){
 }
@@ -181,7 +181,7 @@ xpcc::communicationList::List::handlePacket(const Header& header, const SmartPoi
 					EntryWithCallback *c = (EntryWithCallback *)this->removeNext(e);
 					
 					if(!header.isAcknowledge){
-						c->responseCallback.handleResponse(header, payload);
+						c->responseCallback.call(payload);
 					}
 					// else cannot happen, since responses with callbacks are not possible
 					
@@ -244,7 +244,7 @@ xpcc::communicationList::List::handleWaitingMessages(Postman &postman, BackendIn
 									this->removeNext(tmp);
 									
 									if(s->typeInfo == Entry::CALLBACK){
-										((EntryWithCallback*)s)->responseCallback.handleResponse(actual->header, actual->payload);
+										((EntryWithCallback*)s)->responseCallback.call(actual->payload);
 									}
 									
 									delete s;
@@ -331,7 +331,7 @@ xpcc::communicationList::List::addActionCall(const Header& header, SmartPointer&
 }
 
 void
-xpcc::communicationList::List::addActionCall(const Header& header, SmartPointer& smartPayload, ResponseCallback& responseCallback){
+xpcc::communicationList::List::addActionCall(const Header& header, SmartPointer& smartPayload, Callback& responseCallback){
 	Entry *e = new EntryWithCallback(header, smartPayload, responseCallback);
 	e->state = Entry::WANT_TO_BE_SENT;
 
@@ -339,7 +339,7 @@ xpcc::communicationList::List::addActionCall(const Header& header, SmartPointer&
 }
 
 void
-xpcc::communicationList::List::addActionCall(const Header& header, ResponseCallback& responseCallback){
+xpcc::communicationList::List::addActionCall(const Header& header, Callback& responseCallback){
 	Entry *e = new EntryWithCallback(header, responseCallback);
 	e->state = Entry::WANT_TO_BE_SENT;
 	

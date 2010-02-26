@@ -55,7 +55,7 @@ namespace xpcc
  * \brief	Create a input/output pin type
  * \ingroup	gpio
  */
-#define	CREATE_IO_PIN(name, port, pin) \
+#define	GPIO__IO(name, port, pin) \
 	struct name { \
 		ALWAYS_INLINE static void setOutput() { DDR ## port |= (1 << pin); } \
 		ALWAYS_INLINE static void setInput() { DDR ## port &= ~(1 << pin); } \
@@ -78,7 +78,7 @@ namespace xpcc
  * \brief	Create a output pin type
  * \ingroup	gpio
  */
-#define	CREATE_OUTPUT_PIN(name, port, pin) \
+#define	GPIO__OUTPUT(name, port, pin) \
 	struct name { \
 		ALWAYS_INLINE static void setOutput() { DDR ## port |= (1 << pin); } \
 		ALWAYS_INLINE static void set() { PORT ## port |= (1 << pin); } \
@@ -100,7 +100,7 @@ namespace xpcc
  * \brief	Create a input type
  * \ingroup	gpio
  */
-#define CREATE_INPUT_PIN(name, port, pin) \
+#define GPIO__INPUT(name, port, pin) \
 	struct name { \
 		ALWAYS_INLINE static void \
 		configure(::xpcc::gpio::Configuration config = ::xpcc::gpio::NORMAL) { \
@@ -123,7 +123,7 @@ namespace xpcc
  * \see		xpcc::gpio::Nibble()
  * \ingroup	gpio
  */
-#define CREATE_LOW_NIBBLE(name, port) \
+#define GPIO__NIBBLE_LOW(name, port) \
 	struct name { \
 		ALWAYS_INLINE static void setOutput() { \
 			DDR ## port |= 0x0f; \
@@ -145,7 +145,7 @@ namespace xpcc
  * \see		xpcc::gpio::Nibble()
  * \ingroup	gpio
  */
-#define CREATE_HIGH_NIBBLE(name, port) \
+#define GPIO__NIBBLE_HIGH(name, port) \
 	struct name { \
 		ALWAYS_INLINE static void setOutput() { \
 			DDR ## port |= 0xf0; \

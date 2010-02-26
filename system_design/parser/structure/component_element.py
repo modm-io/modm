@@ -62,45 +62,6 @@ class Action(ComponentElement):
 										ret_type)
 
 
-class Attribute(ComponentElement):
-	
-	def __init__(self, name, reference=False):
-		ComponentElement.__init__(self, name, reference)
-		
-		self.desc = None
-		self.id = -1
-		self.variable = None
-		self.size = None
-		self.type = None
-		
-		self.readonly = False
-		self.default_value = None
-	
-	def get_type(self):
-		return "attribute"
-	
-	def _from_xml(self, node):
-		ComponentElement._from_xml(self, node)
-		
-		self.size = node.get('size') 
-		self.type =  node.get('type')
-		self.default_value = node.get('defaultValue')
-		
-		self.readonly = node.get('readonly')
-	
-	def __cmp__(self, other):
-		return cmp(self.id, other.id) or cmp(self.name, other.name)
-	
-	def __str__(self):
-		default_value = ""
-		if self.default_value:
-			default_value = " = %s" % self.default_value
-		return "[%02x] %s : %s%s" % (	self.id,
-										self.name.replace(" ", "_"),
-										self.type, 
-										default_value)
-
-
 class Event(ComponentElement):
 	
 	def __init__(self, name, reference=False):
