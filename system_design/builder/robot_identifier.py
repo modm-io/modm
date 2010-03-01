@@ -42,16 +42,15 @@ class IdentifierBuilder(builder_base.Builder):
 		if not self.options.outpath:
 			raise builder.BuilderException("You need to provide an output path!")
 		
-		template = self.template('templates/identifier.tpl')
+		template = self.template('templates/robot_identifier.tpl')
 		
 		substitutions = {
 			'components': self.tree.components,
 			'actions': self.tree.components.actions,
-			'attributes': self.tree.components.attributes,
 			'events': self.tree.components.events
 		}
 		
-		file = os.path.join(self.options.outpath, 'robot_identifier.hpp')
+		file = os.path.join(self.options.outpath, 'identifier.hpp')
 		self.write(file, template.render(substitutions))
 
 # -----------------------------------------------------------------------------

@@ -57,39 +57,66 @@ def filter_subtype(value):
 	else:
 		return "%s %s" % (type, variable)
 
-def filter_constructor(type):
-	typename = filter_type(type.name)
-	parameter = []
-	for item in type.iter():
-		item_type = filter_type(item.type.name)
-		item_name = filter_variable(item.name)
-		
-		if item.type.is_array:
-			if item_type == 'char':
-				parameter.append('char *%s = ""' % item_name)
-			else:
+def filter_constructor(classtype, default=True):
+	if default:
+		return "%s()" % filter_type(classtype.name)
+	else:
+		parameter = []
+		for item in classtype.iter():
+			if item.type.is_array:
 				raise builder.BuilderException("Array handling is incomplete " \
 						"right now! Could not generate code for %s" % item)
-		else:
-			if item_type in ['float']:
-				init = "0.0"
-			elif item_type in BUILTIN:
-				init = "0"
 			else:
-				init = item_type + "()"
-			#parameter.append("%s %s = %s" % (item_type, item_name, init))
-			parameter.append("%s %s" % (item_type, item_name))
-	return "%s(%s)" % (typename, ', '.join(parameter))
+				type = filter_type(item.type.name)
+				name = filter_variable(item.name)
+				
+				parameter.append("%s %s" % (type, name))
+		
+		return "%s(%s)" % (filter_type(classtype.name), ", ".join(parameter))
 
+def filter_initialization_list(classtype, default=True):
+	initList = []
+	for item in classtype.iter():
+		if item.type.is_array:
+			raise builder.BuilderException("Array handling is incomplete " \
+					"right now! Could not generate code for %s" % item)
+		else:
+			type = filter_type(item.type.name)
+			name = filter_variable(item.name)
+			
+			if default:
+				initList.append("%s()" % name)
+			else:
+				initList.append("%s(%s)" % (name, name))
+	
+	return ", ".join(initList)
 
 # -----------------------------------------------------------------------------
 class TypeBuilder(builder_base.Builder):
 	
 	VERSION = "$Id$"
 	
+	def setup(self, optparser):
+		optparser.add_option(
+				"--source_path",
+				dest = "source_path",
+				default = None,
+				help = "Output path for the source file")
+		optparser.add_option(
+				"--header_path",
+				dest = "header_path",
+				default = None,
+				help = "Output path for the header file")
+	
 	def generate(self):
 		# check the commandline options
-		if not self.options.outpath:
+		if self.options.outpath:
+			source_path = self.options.outpath
+			header_path = self.options.outpath
+		elif self.options.source_path and self.options.header_path:
+			source_path = self.options.source_path
+			header_path = self.options.header_path
+		else:
 			raise builder.BuilderException("You need to provide an output path!")
 		
 		filter = {
@@ -97,9 +124,11 @@ class TypeBuilder(builder_base.Builder):
 			'cpp.type': filter_type,
 			'cpp.subtype': filter_subtype,
 			'cpp.constructor': filter_constructor,
+			'cpp.initialization_list': filter_initialization_list
 		}
 		
-		template = self.template('templates/types_header.tpl', filter=filter)
+		template_header = self.template('templates/robot_packets.hpp.tpl', filter=filter)
+		template_source = self.template('templates/robot_packets.cpp.tpl', filter=filter)
 		
 		substitutions = {
 			'components': self.tree.components,
@@ -108,8 +137,11 @@ class TypeBuilder(builder_base.Builder):
 			'types': self.tree.types
 		}
 		
-		file = os.path.join(self.options.outpath, 'robot_packets.hpp')
-		self.write(file, template.render(substitutions))
+		file = os.path.join(header_path, 'packets.hpp')
+		self.write(file, template_header.render(substitutions))
+		
+		file = os.path.join(source_path, 'packets.cpp')
+		self.write(file, template_source.render(substitutions))
 
 # -----------------------------------------------------------------------------
 if __name__ == '__main__':

@@ -28,7 +28,7 @@ class Component(object):
 		helper.check_name_notation(self, self.name)
 		
 		# check the action, attributes and events
-		for list in [self.actions, self.attributes, self.events]:
+		for list in [self.actions, self.events]:
 			for element in list:
 				element.check()
 	

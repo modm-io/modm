@@ -31,35 +31,9 @@
 import os
 import re
 import string
-import ConfigParser
+import xpcc_configparser as configparser
 
 from SCons.Script import *
-
-# -----------------------------------------------------------------------------
-class ParserException(Exception):
-	pass
-
-class MyConfigParser(ConfigParser.RawConfigParser):
-	
-	def read(self, filename):
-		return ConfigParser.RawConfigParser.read(self, filename)
-	
-	def get(self, section, option, default=None):
-		try:
-			return ConfigParser.RawConfigParser.get(self, section, option)
-		except (ConfigParser.NoOptionError,
-				ConfigParser.NoSectionError), e:
-			if default is not None:
-				return default
-			else:
-				raise ParserException(e)
-	
-	def items(self, section):
-		try:
-			return ConfigParser.RawConfigParser.items(self, section)
-		except (ConfigParser.NoOptionError,
-				ConfigParser.NoSectionError), e:
-			raise ParserException(e)
 
 # -----------------------------------------------------------------------------
 class FileScanner:
@@ -85,7 +59,7 @@ class FileScanner:
 		header		- list of header files
 		defines		- dictionary with defines needed by the source files
 		"""
-		parser = MyConfigParser()
+		parser = configparser.XpccConfigParser()
 		
 		self.sources = []
 		self.header = []
@@ -93,7 +67,10 @@ class FileScanner:
 		self.testSources = []
 		self.defines = {}
 		
-		pathlist = path
+		if not isinstance(path, list):
+			pathlist = [path,]
+		else:
+			pathlist = path
 		
 		for basepath in pathlist:
 			for path, directories, files in os.walk(basepath):
@@ -113,13 +90,13 @@ class FileScanner:
 							for d in tempDirectories:
 								directories.remove(d)
 							continue
-					except ConfigParser.NoSectionError:
+					except configparser.ParserException:
 						pass
 					
 					try:
 						for item in parser.items('defines'):
 							self.defines[item[0]] = item[1]
-					except ParserException:
+					except configparser.ParserException:
 						pass
 				
 				for file in files:
@@ -151,133 +128,6 @@ class FileScanner:
 						self.header.append(filename)
 
 # -----------------------------------------------------------------------------
-def generate_environment(env, configfile, rootpath, buildpath = None):
-	""" Creates a new build environment
-	
-	Keyword arguments:
-	configfile	-	Path to the configuration file
-	rootpath	-	Path to the xpcc/trunk directory
-	"""
-	try:
-		parser = MyConfigParser()
-		parser.read(configfile)
-		
-		# read configuration
-		architecture = parser.get('build', 'architecture')
-		if architecture == 'pc':
-			device = 'pc'
-			clock = ''
-		else:
-			device = parser.get('build', 'device')
-			clock = parser.get('build', 'clock')
-		
-		project_name = parser.get('general', 'name')
-		library_name = parser.get('build', 'library_name', project_name)
-		
-		if buildpath is None:
-			buildpath = parser.get('build', 'buildpath', os.path.join(rootpath, 'build/$name'))
-		
-		rootpath = os.path.abspath(rootpath)
-		buildpath = os.path.abspath(buildpath)
-	except ParserException, msg:
-		print msg
-		Exit(1)
-	
-	configuration = { 'defines': {} }
-	for section in parser.sections():
-		s = {}
-		for option in parser.options(section):
-			s[option] = parser.get(section, option)
-		configuration[section] = s
-	
-	# Create the build environment
-	if architecture == 'atmega' or architecture == 'atxmega':
-		new = Environment(
-				ARCHITECTURE = architecture + '/' + device,
-				AVR_DEVICE = device,
-				AVR_CLOCK = clock,
-				tools = [
-					'avr',
-					'avrdude',
-					'doxygen',
-					'template',
-					'unittest',
-					'xpcc',
-					'utils'],
-				toolpath = env['toolpath'],
-				LIBS = [''],
-				LIBPATH = [])
-		
-		new['AVRDUDE_PROGRAMMER'] = parser.get('avrdude', 'programmer', 'stk500')
-		new['AVRDUDE_PORT'] = parser.get('avrdude', 'port', '/dev/ttyUSB0')
-	elif architecture == 'pc':
-		new = Environment(
-				ARCHITECTURE = architecture + '/' + device,
-				tools = [
-					'pc',
-					'doxygen',
-					'template',
-					'unittest',
-					'xpcc',
-					'utils'],
-				toolpath = env['toolpath'],
-				LIBS = ['boost_thread-mt'],
-				LIBPATH = ['/usr/lib/'])
-	else:
-		print "Unknown architecture '%s'!" % architecture
-		Exit(1)
-	
-	path_substitutions = {
-		'arch': architecture,
-		'device': device,
-		'name': project_name,
-		'library_name': library_name,
-	}
-	buildpath = string.Template(buildpath).safe_substitute(path_substitutions)
-	
-	new['XPCC_LIBRARY_NAME'] = library_name
-	new['XPCC_ROOTPATH'] = rootpath
-	new['XPCC_BUILDPATH'] = buildpath
-	new['XPCC_CONFIG'] = configuration
-	new['XPCC_CONFIG_FILE'] = os.path.abspath(configfile)
-	
-	return new
-
-def xpcc_library(env):
-	# set new buildpath for the library, path musst be relativ to the
-	# SConscript directory!
-	env.Append(CPPPATH = [os.path.join(env['XPCC_ROOTPATH'], 'src')])
-	
-	# build library
-	library, defines = env.SConscript(
-			os.path.join(env['XPCC_ROOTPATH'], 'src', 'SConscript'),
-			exports = 'env')
-	
-	env['XPCC_LIBRARY_DEFINES'] = defines.copy()
-	defines.update(env['XPCC_CONFIG']['defines'])
-	
-	# generate 'config.h'
-	substitutions = {
-		'defines': '\n'.join(["#define %s %s" % (key.upper(), value) \
-				for key, value in defines.iteritems()]),
-		'name': env['XPCC_CONFIG']['general']['name']
-	}
-	file = env.SimpleTemplate(
-			target = env.LibraryBuildpath('config.h'),
-			source = os.path.join(env['XPCC_ROOTPATH'], 
-								  'misc/templates/config.h.in'),
-			SUBSTITUTIONS = substitutions)
-	
-	env.Append(LIBS = ['robot'])
-	env.Append(LIBPATH = [env.LibraryBuildpath('.')])
-	
-	return library
-
-def find_files(env, path, unittest=None):
-	scanner = FileScanner(env, unittest)
-	scanner.scan(path)
-	return scanner
-
 def buildpath(env, path, strip_extension=False):
 	""" Relocate path from source directory to build directory
 	"""
@@ -301,6 +151,10 @@ def library_buildpath(env, path, strip_extension=False):
 	
 	return os.path.abspath(result)
 
+def find_files(env, path, unittest=None):
+	scanner = FileScanner(env, unittest)
+	scanner.scan(path)
+	return scanner
 
 def require_architecture(env, architecture):
 	if re.match(architecture, env['ARCHITECTURE']):
@@ -335,15 +189,92 @@ def check_defines(env):
 			print "  %s => %s" % (key.upper(), env['XPCC_CONFIG']['defines'][key])
 	print ""
 
+def xpcc_library(env):
+	# set new buildpath for the library, path musst be relativ to the
+	# SConscript directory!
+	env.Append(CPPPATH = [os.path.join(env['XPCC_ROOTPATH'], 'src')])
+	
+	# build library
+	library, defines = env.SConscript(
+			os.path.join(env['XPCC_ROOTPATH'], 'src', 'SConscript'),
+			exports = 'env')
+	
+	env['XPCC_LIBRARY_DEFINES'] = defines.copy()
+	defines.update(env['XPCC_CONFIG']['defines'])
+	
+	# generate 'config.h'
+	substitutions = {
+		'defines': '\n'.join(["#define %s %s" % (key.upper(), value) \
+				for key, value in defines.iteritems()]),
+		'name': env['XPCC_CONFIG']['general']['name']
+	}
+	file = env.SimpleTemplate(
+			target = env.LibraryBuildpath('config.h'),
+			source = os.path.join(env['XPCC_ROOTPATH'], 
+								  'misc/templates/config.h.in'),
+			SUBSTITUTIONS = substitutions)
+	
+	env.Append(LIBS = ['robot'])
+	env.Append(LIBPATH = [env.LibraryBuildpath('.')])
+	
+	return library
+
+def xpcc_generics(env, xmlfile):
+	env.Append(CPPPATH = [os.path.dirname(xmlfile)])
+	
+	files  = env.XpccPackets(xmlfile)
+	files += env.XpccIdentifier(xmlfile)
+	
+	return files
+
 # -----------------------------------------------------------------------------
 def generate(env, **kw):
-	env.AddMethod(generate_environment, 'GenerateEnvironment')
-	env.AddMethod(xpcc_library, 'XpccLibrary')
-	env.AddMethod(find_files, 'FindFiles')
 	env.AddMethod(buildpath, 'Buildpath')
 	env.AddMethod(library_buildpath, 'LibraryBuildpath')
+	env.AddMethod(find_files, 'FindFiles')
 	env.AddMethod(require_architecture, 'RequireArchitecture')
 	env.AddMethod(check_defines, 'ShowConfiguration')
+	env.AddMethod(xpcc_library, 'XpccLibrary')
+	env.AddMethod(xpcc_generics, 'XpccGenerics')
+	
+	builder_packets = Builder(
+		action = SCons.Action.Action(
+			"python ${XPCC_SYSTEM_BUILDER}/robot_packets.py " \
+				"--source_path ${TARGETS[0].dir} " \
+				"--header_path ${TARGETS[1].dir} " \
+				"$SOURCE",
+			"Generate packets from: $SOURCE"),
+		emitter = \
+			lambda target, source, env:
+				([os.path.join(env['XPCC_BUILDPATH'], "robot/packets.cpp"),
+				  os.path.join(str(source[0].dir), "robot/packets.hpp")],
+				source),
+		single_source = True,
+		target_factory = env.fs.Entry,
+		src_suffix = '.xml',
+	)
+	
+	def emitter_identifier(target, source, env):
+		return [os.path.join(str(source[0].dir), "robot/identifier.hpp")], source
+	
+	builder_identifier = Builder(
+		action = SCons.Action.Action(
+			"python ${XPCC_SYSTEM_BUILDER}/robot_identifier.py " \
+				"--outpath ${TARGET.dir} " \
+				"$SOURCE",
+			"Generate identifier from: $SOURCE"),
+		emitter = emitter_identifier,
+		single_source = True,
+		target_factory = env.fs.Entry,
+		src_suffix = '.xml',
+	)
+	
+	env.Append(
+		BUILDERS = {
+			'XpccPackets': builder_packets,
+			'XpccIdentifier': builder_identifier
+		}
+	)
 
 def exists(env):
 	return True

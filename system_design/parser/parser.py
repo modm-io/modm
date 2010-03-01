@@ -97,7 +97,7 @@ class Parser:
 	
 	self.modify_time		- time of the last change of the xml-file
 	"""
-	def __init__(self, xml_file, reference=False, use_reference=True):
+	def __init__(self, xml_file, reference=False, use_reference=False):
 		"""
 		Parse the xml-file and save the tree for further evaulation.
 		
@@ -218,16 +218,10 @@ class Parser:
 							"other data specified here will be discarded!\n"
 							% (board.name, component.name)
 						)
-					board._components[i] = self.components[component.name]
+					componentDefinition = self.components[component.name]
+					componentDefinition.abstract = False
 					
-					# FIXME die auskommentierte Variante ist besser, dafür muss
-					# aber die XML Datei angepasst werden. Diese hier
-					# entspricht dem bisherigen Verhalten
-					#component.extend(self.components[component.name])
-					#component.abstract = False
-					#self.components.replace(component.name, component)
-					#
-					#board.components.replace(component.name, self.components[component.name])
+					board.components.replace(component.name, componentDefinition)
 		
 		# update the type level
 		self.__create_type_hierarchy()

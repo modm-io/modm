@@ -2,7 +2,8 @@
 
 rootpath = "${rootpath}"
 
-pre = Environment(tools = ['xpcc'], toolpath = [rootpath + '/misc/python/scons'])
+pre = Environment(tools = ['xpcc_loader'],
+				  toolpath = [rootpath + '/misc/python/scons'])
 env = pre.GenerateEnvironment(configfile = 'project.cfg', 
 							  rootpath = rootpath)
 

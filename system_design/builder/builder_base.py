@@ -79,6 +79,7 @@ class Builder(object):
 		optparser.add_option(
 				"-o", "--outpath",
 				dest = "outpath",
+				default = None,
 				help = "Output path")
 		
 		self.setup(optparser)
@@ -167,6 +168,10 @@ class Builder(object):
 		
 		path = os.path.dirname(filename)
 		name = os.path.basename(filename)
+		
+		if not os.path.isabs(filename):
+			relpath = os.path.dirname(os.path.abspath(__file__))
+			path = os.path.join(relpath, path)
 		
 		environment = jinja2.Environment(loader = jinja2.FileSystemLoader(path))
 		environment.filters['xpcc.wordwrap'] = filter_wordwrap

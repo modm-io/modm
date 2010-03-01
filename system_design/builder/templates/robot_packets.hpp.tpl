@@ -2,8 +2,6 @@
 /*
  * WARNING: This file is generated automatically, do not edit!
  * Please modify the corresponding XML file instead.
- *
- * Generated {{ time }}
  */
 // ----------------------------------------------------------------------------
 
@@ -14,7 +12,7 @@
 
 namespace robot
 {
-	namespace type
+	namespace packet
 	{
 {%- for type in types %}
 		{% if type.desc %}/** {{ type.desc | xpcc.wordwrap(68) | xpcc.indent(2) }} */{% endif %}
@@ -28,10 +26,11 @@ namespace robot
 	{% elif type.is_struct %}
 		struct {{ type.name | cpp.type }}
 		{
-			{{ type.name | cpp.type }}();
-			
 			{{ type | cpp.constructor }};
-			{% for element in type.iter() %}
+			
+			{{ type | cpp.constructor(default=False) }};
+			
+			{%- for element in type.iter() %}
 			{{ element | cpp.subtype }};
 			{%- endfor %}
 		} __attribute__((packed));
@@ -39,7 +38,7 @@ namespace robot
 		typedef {{ type.type.name | cpp.type }} {{ type.name | cpp.type }};
 	{% endif %}
 {%- endfor -%}
-	} // namespace type
+	} // namespace packet
 } // namespace robot
 
 #endif	// ROBOT__PACKETS_HPP

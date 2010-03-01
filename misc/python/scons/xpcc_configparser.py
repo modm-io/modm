@@ -28,50 +28,30 @@
 # 
 # $Id$
 
-import os
+import ConfigParser
 
-rootpath = '..'
+class ParserException(Exception):
+	pass
 
-pre = Environment(tools = ['xpcc_loader'], toolpath = [rootpath + '/misc/python/scons'])
-env = pre.GenerateEnvironment(configfile = 'unittest.cfg',
-							  rootpath = rootpath)
 
-# find only files located in 'test' folders
-files = env.FindFiles(path = '.', unittest=True)
-
-objects = []
-for file in files.sources:
-	object = env.Object(target = env.Buildpath(file, strip_extension=True),
-						source = file)
-	objects.append(object)
-
-config = env['XPCC_CONFIG']
-
-templatePath = os.path.join(rootpath, 'misc/templates/unittest')
-templateFile = 'runner_%s.cpp.in' % config['build']['architecture']
-template = os.path.join(templatePath, templateFile)
-
-# create a file which later runs all the tests
-runner = env.UnittestRunner(target = env.Buildpath('runner.cpp'),
-							source = [template] + files.header)
-objects.append(env.Object(runner))
-
-# build the program
-program = env.Program(target = env.Buildpath(config['general']['name']),
-					  source = objects)
-
-# build the xpcc library
-library = env.XpccLibrary()
-
-env.Alias('lib', library)
-env.Alias('build', program)
-env.Alias('size', env.Size(program))
-env.Alias('symbols', env.Symbols(program))
-
-if env.RequireArchitecture('pc'):
-	env.Alias('run', env.Run(program))
-	env.Alias('all', ['build', 'run'])
-else:
-	env.Alias('all', ['build', 'size'])
-
-env.Default('all')
+class XpccConfigParser(ConfigParser.RawConfigParser):
+	
+	def read(self, filename):
+		return ConfigParser.RawConfigParser.read(self, filename)
+	
+	def get(self, section, option, default=None):
+		try:
+			return ConfigParser.RawConfigParser.get(self, section, option)
+		except (ConfigParser.NoOptionError,
+				ConfigParser.NoSectionError), e:
+			if default is not None:
+				return default
+			else:
+				raise ParserException(e)
+	
+	def items(self, section):
+		try:
+			return ConfigParser.RawConfigParser.items(self, section)
+		except (ConfigParser.NoOptionError,
+				ConfigParser.NoSectionError), e:
+			raise ParserException(e)

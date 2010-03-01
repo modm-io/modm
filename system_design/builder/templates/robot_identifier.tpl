@@ -2,8 +2,6 @@
 /*
  * WARNING: This file is generated automatically, do not edit!
  * Please modify the corresponding XML file instead.
- *
- * Generated {{ time }}
  */
 // ----------------------------------------------------------------------------
 
@@ -31,17 +29,7 @@ namespace robot
 		{%- endfor %}
 		};
 	}
-	
-	namespace attribute
-	{
-		enum Identifier
-		{
-		{%- for item in attributes %}
-			{{ item.name | upper | replace(' ', '_') }} = {{ item.id }},
-		{%- endfor %}
-		};
-	}
-	
+		
 	namespace event
 	{
 		enum Identifier
