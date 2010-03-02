@@ -34,21 +34,44 @@
 #define XPCC__PID_IMPL_HPP
 
 template<typename T, unsigned int ScaleFactor>
-xpcc::Pid<T, ScaleFactor>::Pid(Parameter& parameter,
-							   FeedforwardFunction feedforward) :
+xpcc::Pid<T, ScaleFactor>::Parameter::Parameter(
+		const T& kp, const T& ki, const T& kd,
+		const T& maxErrorSum, const T& maxOutput) :
+	kp(kp), ki(ki), kd(kd),
+	maxErrorSum(maxErrorSum), maxOutput(maxOutput)
+{
+}
+
+// -----------------------------------------------------------------------------
+template<typename T, unsigned int ScaleFactor>
+xpcc::Pid<T, ScaleFactor>::Pid(
+		const T& kp, const T& ki, const T& kd,
+		const T& maxErrorSum, const T& maxOutput,
+		FeedforwardFunction feedforward ) :
+	parameter( kp, ki, kd, maxErrorSum, maxOutput),
+	feedforward(feedforward)
+{
+	this->reset();
+}
+
+// -----------------------------------------------------------------------------
+template<typename T, unsigned int ScaleFactor>
+xpcc::Pid<T, ScaleFactor>::Pid(
+		Parameter& parameter,
+		FeedforwardFunction feedforward) :
 	parameter(parameter), feedforward(feedforward)
 {
-	reset();
+	this->reset();
 }
 
 template<typename T, unsigned int ScaleFactor>
 void
 xpcc::Pid<T, ScaleFactor>::reset()
 {
-	target = 0;
-	errorSum = 0;
-	lastError = 0;
-	output = 0;
+	this->target = 0;
+	this->errorSum = 0;
+	this->lastError = 0;
+	this->output = 0;
 }
 
 template<typename T, unsigned int ScaleFactor>
@@ -62,35 +85,35 @@ template<typename T, unsigned int ScaleFactor>
 void
 xpcc::Pid<T, ScaleFactor>::update(const T& input)
 {
-	T error = target - input;
+	T error = this->target - input;
 	
 	T_DOUBLE tmp;
-	tmp  = feedforward(input);
-	tmp += parameter.kp * error;
-	tmp += parameter.ki * (errorSum + error);	// TODO
-	tmp += parameter.kd * (error - lastError);
+	tmp  = this->feedforward(this->target);
+	tmp += this->parameter.kp * error;
+	tmp += this->parameter.ki * (errorSum + error);	// TODO
+	tmp += this->parameter.kd * (error - lastError);
 	
 	tmp = tmp / ScaleFactor;
 	
-	if (tmp > parameter.maxOutput) {
-		output = parameter.maxOutput;
+	if (tmp > this->parameter.maxOutput) {
+		this->output = this->parameter.maxOutput;
 	}
-	else if (tmp < -parameter.maxOutput) {
-		output = -parameter.maxOutput;
+	else if (tmp < -this->parameter.maxOutput) {
+		this->output = -this->parameter.maxOutput;
 	}
 	else {
-		output = tmp;
+		this->output = tmp;
 		
-		errorSum += error;
-		if (errorSum > parameter.maxErrorSum) {
-			errorSum = parameter.maxErrorSum;
+		this->errorSum += error;
+		if (this->errorSum > this->parameter.maxErrorSum) {
+			this->errorSum = this->parameter.maxErrorSum;
 		}
-		else if (errorSum < -parameter.maxErrorSum) {
-			errorSum = -parameter.maxErrorSum;
+		else if (this->errorSum < -this->parameter.maxErrorSum) {
+			this->errorSum = -this->parameter.maxErrorSum;
 		}
 	}
 	
-	lastError = error;
+	this->lastError = error;
 }
 
 #endif // XPCC__PID_IMPL_HPP

@@ -40,16 +40,30 @@ namespace xpcc
 	/**
 	 * \brief	Dummy implementation for a feedforward function
 	 * 
+	 * Does not add any value to the calculation.
+	 *
 	 * \internal
 	 */
 	template<typename T>
 	T
-	feedforwardDummy(const T& in) {
-		return in;
+	feedforwardDummy(const T& target) {
+		(void) target;
+		return 0;
 	}
 	
 	/**
 	 * \brief	A proportional-integral-derivative controller (PID controller)
+	 *
+	 * The PID controller is one of the basic controlling algorithm.
+	 *
+	 * The \p maxErrorSum is to be used, to limit the internal integrator and so
+	 * provide an anti wind up.
+	 *
+	 * With the template parameter \ScaleFactor this class provides an
+	 * fix point capability with integer types.
+	 *
+	 * The \p feedforward can be used as hook to call a external function
+	 * (call back) to calculate a forward value.
 	 *
 	 * \todo	check implementation
 	 * \todo	use the faster avr::mul and avr::mac functions
@@ -64,16 +78,15 @@ namespace xpcc
 		typedef T (* FeedforwardFunction)(const T&);
 	
 	public:
+		typedef T ValueType;
+
 		/**
 		 * \brief	Parameter for a PID calculation
 		 */
 		struct Parameter
 		{
 			Parameter(const T& kp = 0, const T& ki = 0, const T& kd = 0,
-					  const T& maxErrorSum = 0, const T& maxOutput = 0) :
-				kp(kp), ki(ki), kd(kd),
-				maxErrorSum(maxErrorSum), maxOutput(maxOutput) {
-			}
+					  const T& maxErrorSum = 0, const T& maxOutput = 0);
 			
 			T kp;		///< proportional gain
 			T ki;		///< integral gain
@@ -84,9 +97,31 @@ namespace xpcc
 		};
 		
 	public:
+		/**
+		 * \param	kp	proportional gain
+		 * \param	ki	integral gain
+		 * \param	kd	differentail gain
+		 * \param	maxErrorSum	integral will be limited to this value
+		 * \param	maxOutput	output will be limited to this value
+		 * \param	feedforward	callback function to calculate a forward value
+		 **/
+		Pid(const T& kp = 0, const T& ki = 0, const T& kd = 0,
+				const T& maxErrorSum = 0, const T& maxOutput = 0,
+				FeedforwardFunction feedforward = feedforwardDummy<T>);
+
+
+		/**
+		 * \param	parameter	list of parameters to the controller
+		 * \param	feedforward	callback function to calculate a forward value
+		 **/
 		Pid(Parameter& parameter,
-			FeedforwardFunction feedforward = feedforwardDummy<T>);
+				FeedforwardFunction feedforward = feedforwardDummy<T>);
 		
+		/**
+		 * Reset the parameters of the controller.
+		 *
+		 * \param	parameter	list of parameters to the controller
+		 **/
 		void
 		setParameter(const Parameter& parameter);
 		
@@ -107,11 +142,17 @@ namespace xpcc
 		
 		/**
 		 * \brief	Calculate a new output value
+		 *
+		 * \param	input	The actual measured value, will be compared to the
+		 * 					target value.
 		 */
 		void
 		update(const T& input);
 		
-		const T&
+		/**
+		 * \brief	Returns the calculated actuating variable.
+		 */
+		inline const T&
 		getValue() const
 		{
 			return output;
