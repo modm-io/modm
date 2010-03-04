@@ -87,11 +87,19 @@ xpcc::Pid<T, ScaleFactor>::update(const T& input)
 {
 	T error = this->target - input;
 	
+	this->errorSum += error;
+	if (this->errorSum > this->parameter.maxErrorSum) {
+		this->errorSum = this->parameter.maxErrorSum;
+	}
+	else if (this->errorSum < -this->parameter.maxErrorSum) {
+		this->errorSum = -this->parameter.maxErrorSum;
+	}
+
 	T_DOUBLE tmp;
 	tmp  = this->feedforward(this->target);
 	tmp += this->parameter.kp * error;
-	tmp += this->parameter.ki * (errorSum + error);	// TODO
-	tmp += this->parameter.kd * (error - lastError);
+	tmp += this->parameter.ki * (this->errorSum);
+	tmp += this->parameter.kd * (error - this->lastError);
 	
 	tmp = tmp / ScaleFactor;
 	
@@ -103,14 +111,6 @@ xpcc::Pid<T, ScaleFactor>::update(const T& input)
 	}
 	else {
 		this->output = tmp;
-		
-		this->errorSum += error;
-		if (this->errorSum > this->parameter.maxErrorSum) {
-			this->errorSum = this->parameter.maxErrorSum;
-		}
-		else if (this->errorSum < -this->parameter.maxErrorSum) {
-			this->errorSum = -this->parameter.maxErrorSum;
-		}
 	}
 	
 	this->lastError = error;

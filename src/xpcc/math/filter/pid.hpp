@@ -139,6 +139,15 @@ namespace xpcc
 		{
 			target = value;
 		}
+
+		/**
+		 * \brief	Returns the actual taget value
+		 */
+		inline const T&
+		getTarget() const
+		{
+			return this->target;
+		}
 		
 		/**
 		 * \brief	Calculate a new output value
@@ -157,7 +166,7 @@ namespace xpcc
 		{
 			return output;
 		}
-	
+
 	private:
 		Parameter parameter;
 		FeedforwardFunction feedforward;
