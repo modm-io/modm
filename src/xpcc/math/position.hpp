@@ -91,8 +91,9 @@ namespace xpcc
 		/**
 		 * \brief	Scale the length by \p factor
 		 */
+		template<typename U>
 		Position&
-		scale(const T& factor);
+		scale(const U& factor);
 
 		Position&
 		rotate(const Angle& phi);
@@ -107,7 +108,7 @@ namespace xpcc
 		 * \brief	Convert between Position-objects with different base-types
 		 */
 		template<typename U>
-		operator Position<U>();
+		operator Position<U>() const;
 	
 	private:
 		T x;
@@ -137,6 +138,10 @@ namespace xpcc
 		template<typename U>
 		friend IOStream&
 		operator <<(IOStream& s, const Position<U>& c);
+
+		template<typename U, typename V>
+		friend U
+		scalar(const Position<U> &a, const Position<V> &b);
 	};
 	
 	template<typename U>
@@ -166,6 +171,14 @@ namespace xpcc
 	template<typename U>
 	IOStream&
 	operator << (IOStream& s, const Position<U>& c);
+
+	/**
+	 * \brief	Calculates the scalar product of two vectors
+	 * \ingroup	math
+	 */
+	template<typename U, typename V>
+	U
+	scalar(const Position<U> &a, const Position<V> &b);
 }
 
 #include "position_impl.hpp"

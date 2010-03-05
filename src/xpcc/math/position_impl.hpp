@@ -120,9 +120,9 @@ xpcc::Position<T>::normalize()
 }
 
 // ----------------------------------------------------------------------------
-template<typename T>
+template<typename T>template<typename U>
 xpcc::Position<T>&
-xpcc::Position<T>::scale(const T& factor)
+xpcc::Position<T>::scale(const U& factor)
 {
 	this->x = this->x * factor;
 	this->y = this->y * factor;
@@ -168,7 +168,7 @@ xpcc::Position<T>::operator -= (const Position &other)
 
 // ----------------------------------------------------------------------------
 template<typename T> template<typename U>
-xpcc::Position<T>::operator Position<U>()
+xpcc::Position<T>::operator Position<U>() const
 {
 	return Position<U>(this->x, this->y);
 }
@@ -217,4 +217,11 @@ xpcc::operator <<( xpcc::IOStream& s, const xpcc::Position<U>& c)
 {
 	s << "x=" << c.x << ", y=" << c.y;
 	return s;
+}
+
+template<typename U, typename V>
+U
+xpcc::scalar(const xpcc::Position<U> &a, const xpcc::Position<V> &b)
+{
+	return ( a.x*b.x + a.y*b.y );
 }
