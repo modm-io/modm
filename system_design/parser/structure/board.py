@@ -34,7 +34,7 @@ class Board:
 		self.src_dir = helper.xml_read_value(node, 'source')
 		self.bootloader = bootloader
 		
-		self.implementation = helper.xml_read_implementation(node)
+		self.extended = helper.xml_read_extended(node)
 		
 		for subnode in node.findall('component'):
 			subcomponent = component.Component(

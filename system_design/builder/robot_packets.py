@@ -133,7 +133,7 @@ class TypeBuilder(builder_base.Builder):
 		substitutions = {
 			'components': self.tree.components,
 			'actions': self.tree.components.actions,
-			'events': self.tree.components.events,
+			'events': self.tree.events,
 			'types': self.tree.types
 		}
 		

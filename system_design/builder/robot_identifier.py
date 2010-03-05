@@ -47,7 +47,7 @@ class IdentifierBuilder(builder_base.Builder):
 		substitutions = {
 			'components': self.tree.components,
 			'actions': self.tree.components.actions,
-			'events': self.tree.components.events
+			'events': self.tree.events
 		}
 		
 		file = os.path.join(self.options.outpath, 'identifier.hpp')

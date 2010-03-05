@@ -5,6 +5,11 @@ import helper
 from exception import ParserError
 from component_element import Action, Event
 
+class EventContainer:
+	def __init__(self):
+		self.publish = helper.SingleAssignDict("event::publish")
+		self.subscribe = helper.SingleAssignDict("event::subscribe")
+
 class Component(object):
 	"""
 	Representation of a component.
@@ -21,14 +26,14 @@ class Component(object):
 		self.abstract = True
 		
 		self.actions = helper.SingleAssignDict("action")
-		self.events = helper.SingleAssignDict("event")
+		self.events = EventContainer()
 	
 	def check(self):
 		# check own values
 		helper.check_name_notation(self, self.name)
 		
 		# check the action, attributes and events
-		for list in [self.actions, self.events]:
+		for list in [self.actions, self.events.publish, self.events.subscribe]:
 			for element in list:
 				element.check()
 	
@@ -40,9 +45,10 @@ class Component(object):
 		self.id = self.id or top.id
 		self.group = self.group or top.group
 		
-		# update actions, attributes and events
+		# update actions and events
 		self.__extend(top.actions, self.actions)
-		self.__extend(top.events, self.events)
+		self.__extend(top.events.publish, self.events.publish)
+		self.__extend(top.events.subscribe, self.events.subscribe)
 	
 	def __extend(self, toplist, list):
 		for element in toplist.iter(reference=None):
@@ -55,13 +61,6 @@ class Component(object):
 				# no element found, inherit the full top element
 				list[element.name] = element
 	
-	def add(self, element):
-		list = {
-			"action": self.actions, 
-			"event": self.events
-		}[element.get_type()]
-		list[element.name] = element
-	
 	def _from_xml(self, node):
 		self.desc = helper.xml_read_description(node)
 		self.id = helper.xml_read_identifier(node)
@@ -69,18 +68,43 @@ class Component(object):
 		self.extends = node.get('extends')
 		self.group = node.get('group')
 		
-		# parse functions, attributes and events
-		self.__parse_element('action', node, Action)
-		self.__parse_element('event', node, Event)
+		# parse functions and events
+		self.__parse_actions(node)
+		self.__parse_events(node)
 		
-		self.implementation = helper.xml_read_implementation(node)
+		self.implementation = helper.xml_read_extended(node)
 	
-	def __parse_element(self, name, node, elemtype):
-		for subnode in node.findall(name):
-			element = elemtype(	name = subnode.get('name'), 
-									reference = self.reference)
+	def __parse_actions(self, node):
+		node = node.find('actions')
+		if node == None:
+			return
+		
+		for subnode in node.findall('action'):
+			element = Action(name = subnode.get('name'), 
+							reference = self.reference)
 			element._from_xml(subnode)
-			self.add(element)
+			self.actions[element.name] = element
+	
+	def __parse_events(self, node):
+		# parse events
+		node = node.find('events')
+		if node == None:
+			return
+		
+		publishNode = node.find('publish')
+		if publishNode:
+			self.__parse_event(publishNode, self.events.publish)
+		
+		subscribeNode = node.find('subscribe')
+		if subscribeNode:
+			self.__parse_event(subscribeNode, self.events.subscribe)
+	
+	def __parse_event(self, node, list):
+		for subnode in node.findall('event'):
+			element = Event(name = subnode.get('name'), 
+							reference = self.reference)
+			element._from_xml(subnode)
+			list[element.name] = element
 	
 	def __cmp__(self, other):
 		return cmp(self.id, other.id) or cmp(self.name, other.name)
@@ -93,12 +117,17 @@ class Component(object):
 		/================================================\
 		|               Stage Object [ee]                |
 		|------------------------------------------------|
+		| actions:                                       |
 		| +[00] ping()                                   |
 		| +[01] reset()                                  |
 		| +[03] save_configuration()                     |
 		|------------------------------------------------|
+		| publish:                                       |
 		| +[02] error : Error Payload                    |
 		| +[0f] debug_message : char[]                   |
+		|------------------------------------------------|
+		| subscribe:                                     |
+		| +[02] error : Error Payload                    |
 		\================================================/
 		
 		The numbers in the square brackets shows the identifier (in
@@ -108,8 +137,11 @@ class Component(object):
 		name = "%s [%02x]" % (self.name, self.id)
 		max_length = len(name)
 		
-		elements = [[], [], []]
-		for i, iterator in enumerate([self.actions, self.events]):
+		elements = [["actions:"], ["publish:"], ["subscribe:"]]
+		for element in elements:
+			max_length = max(max_length, len(element[0]))
+		
+		for i, iterator in enumerate([self.actions, self.events.publish, self.events.subscribe]):
 			for element in iterator.iter(reference=None):
 				string = "+%s" % element
 				max_length = max(max_length, len(string))

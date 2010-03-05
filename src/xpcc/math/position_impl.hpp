@@ -168,9 +168,9 @@ xpcc::Position<T>::operator -= (const Position &other)
 
 // ----------------------------------------------------------------------------
 template<typename T> template<typename U>
-xpcc::Position<T>::operator U()
+xpcc::Position<T>::operator Position<U>()
 {
-	return U(this->x, this->y);
+	return Position<U>(this->x, this->y);
 }
 
 // ----------------------------------------------------------------------------

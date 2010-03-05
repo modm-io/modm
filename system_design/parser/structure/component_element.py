@@ -9,10 +9,7 @@ class ComponentElement(object):
 		self.name = name
 		self.reference = reference
 		
-		self.implementation = {}
-	
-	def get_type(self):
-		return None
+		self.extended = {}
 	
 	def check(self):
 		helper.check_name_notation(self, self.name)
@@ -27,7 +24,7 @@ class ComponentElement(object):
 		self.desc = helper.xml_read_description(node)
 		self.id = helper.xml_read_identifier(node)
 		
-		self.implementation = helper.xml_read_implementation(node)
+		self.extended = helper.xml_read_extended(node)
 
 
 class Action(ComponentElement):
@@ -40,9 +37,6 @@ class Action(ComponentElement):
 		self.function = None
 		self.param_type = None
 		self.ret_type = None
-	
-	def get_type(self):
-		return "action"
 	
 	def _from_xml(self, node):
 		ComponentElement._from_xml(self, node)
@@ -57,7 +51,7 @@ class Action(ComponentElement):
 		param_type = self.param_type or ""
 		ret_type = (" : %s" % self.ret_type) if (self.ret_type) else ""
 		return "[%02x] %s(%s)%s" % (	self.id,
-										self.name.replace(" ", "_"),
+										self.name.replace(" ", ""),
 										param_type,
 										ret_type)
 
@@ -66,25 +60,12 @@ class Event(ComponentElement):
 	
 	def __init__(self, name, reference=False):
 		ComponentElement.__init__(self, name, reference)
-		
-		self.desc = None
-		self.id = -1
-		self.type = None
-		self.rate = None
-	
-	def get_type(self):
-		return "event"
 	
 	def _from_xml(self, node):
-		ComponentElement._from_xml(self, node)
-		
-		self.type = node.get('type')
-		self.rate = node.get('rate')
+		pass
 	
 	def __cmp__(self, other):
-		return cmp(self.id, other.id) or cmp(self.name, other.name)
+		return cmp(self.name, other.name)
 	
 	def __str__(self):
-		return "[%02x] %s : %s" % (	self.id,
-										self.name.replace(" ", "_"),
-										self.type) 
+		return "Event %s" % self.name.replace(" ", "_") 

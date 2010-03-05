@@ -62,13 +62,16 @@ class Builder(object):
 	self.tree.components.actions			--	all actions
 	self.tree.components["driver"].actions	--	only actions form the
 												component 'driver'
+	self.tree.components.publish
+	self.tree.components.subscribe
 	self.tree.boards
 	self.tree.boards["PC"].components		--	only components form the
 												board 'PC'
 	self.tree.types
+	self.tree.events
+	self.tree.events
 	
-	
-	You have to specify a VERSION variable.
+	You have to specify a VERSION attribute.
 	
 	"""
 	def __init__(self):

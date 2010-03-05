@@ -39,16 +39,16 @@ def xml_read_identifier(node):
 	except TypeError:
 		return None
 
-def xml_read_implementation(top):
+def xml_read_extended(top):
 	"""
-	Parse the an implementation-tag (if existing)
+	Parse the an 'extended' tag (if existing)
 	"""
-	node = top.find('implementation')
+	node = top.find('extended')
 	if node:
-		implementation = node.attrib
+		extended = node.attrib
 		for subnode in node.getchildren():
-			implementation[subnode.tag] = subnode.get('value') or subnode.text
-		return implementation
+			extended[subnode.tag] = subnode.get('value') or subnode.text
+		return extended
 	else:
 		return {}
 

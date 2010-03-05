@@ -3,11 +3,13 @@
 
 import xml.etree.ElementTree as et
 import xml
+import lxml.etree		# for validating
 import copy
 import os
 import sys
 
 import structure.type
+import structure.event
 import structure.component
 import structure.board
 import structure.helper
@@ -54,27 +56,34 @@ class ComponentIterator:
 		except IndexError:
 			raise StopIteration()
 
+
 class ComponentDict(structure.helper.SingleAssignDict):
 	
 	def __init__(self,  name):
 		structure.helper.SingleAssignDict.__init__(self, name)
 		
 		self.actions = structure.helper.SortedDict()
-		self.events = structure.helper.SortedDict()
+		self.events = structure.component.EventContainer()
 	
 	def __update_list(self, toplist, list, name):
+		"""
+		
+		name	--	Is only used for error signaling
+		"""
 		for element in toplist.iter(reference=None):
 			if element.name in list:
 				other = list[element.name]
 				if element.id != other.id:
-					raise ParserError("%s '%s' defined twice with "
+					raise ParserError("%s '%s' defined twice with " \
 						"different identifiers!" % (name, element.name))
 			list[element.name] = element
 	
 	def update_index(self):
 		for component in self.values():
 			self.__update_list(component.actions, self.actions, "action")
-			self.__update_list(component.events, self.events, "event")
+			
+			self.__update_list(component.events.publish, self.events.publish, "event::publish")
+			self.__update_list(component.events.subscribe, self.events.subscribe, "event::subscribe")
 	
 	def iter(self, abstract=False, reference=False):
 		"""
@@ -97,32 +106,42 @@ class Parser:
 	
 	self.modify_time		- time of the last change of the xml-file
 	"""
-	def __init__(self, xml_file, reference=False, use_reference=False):
+	def __init__(self, xmlfile, reference=False, use_reference=False, validate=True):
 		"""
 		Parse the xml-file and save the tree for further evaulation.
 		
 		Keyword arguments:
-		xml_file		--	file to parse
+		xmlfile		--	file to parse
 		reference		--	xml-file should only be used as a reference
 							and not included in the output.
 		use_reference	--	use the reference-mechanism, if set False
 							the reference-tags will be ignored and
 							everything included in the output.
+		validate	--	validate the input file against the embedded DTD file
 		
 		"""
-		self.filename = xml_file
+		self.filename = xmlfile
 		self.reference = reference and use_reference
 		self.use_reference = use_reference
+		self.validate = validate
 		try:
 			# read the time of the last change
-			self.modify_time = os.stat(xml_file).st_mtime
+			self.modify_time = os.stat(xmlfile).st_mtime
 			
 			# parse the xml-file
-			self.xml = et.parse(xml_file).getroot()
+			self.xml = et.parse(xmlfile).getroot()
 		except OSError, e:
 			raise ParserError(e)
 		except xml.parsers.expat.ExpatError, e:
 			raise ParserError(e)
+		
+		if validate:
+			# validate against the embedded DTD file
+			try:
+				parser = lxml.etree.XMLParser(dtd_validation=True)
+				tree = lxml.etree.parse(xmlfile, parser)
+			except lxml.etree.XMLSyntaxError, e:
+				raise ParserError(xmlfile + ": " + str(e))
 	
 	def parse(self):
 		"""
@@ -138,11 +157,12 @@ class Parser:
 		for builtin in BUILTIN:
 			self.types[builtin.name] = builtin
 		
+		self.events = structure.helper.SingleAssignDict("event")
 		self.boards = structure.helper.SingleAssignDict("board")
 		self.components = ComponentDict("component")
 		
 		# create an empty parse tree
-		tree = [self.types, self.boards, self.components]
+		tree = [self.types, self.events, self.boards, self.components]
 		
 		# start the evaluating of the xml tree
 		self._parse(tree)
@@ -158,11 +178,13 @@ class Parser:
 			component.check()
 		for board in self.boards.iter(None):
 			board.check()
+		for event in self.events.iter(None):
+			event.check()
 		
 		# now check for duplicate identifiers
 		self.__check_identifier(self.components.iter(abstract=False), "component")
 		self.__check_identifier(self.components.actions, "action")
-		self.__check_identifier(self.components.events, "events")
+		self.__check_identifier(self.events, "events")
 	
 	def _parse(self, tree):
 		"""
@@ -172,8 +194,6 @@ class Parser:
 		tree	--	result of the evaluation so far
 		
 		"""
-		self.types, self.boards, self.components = tree
-		
 		# search for include and reference nodes and parse
 		# the specified files first
 		for node in self.xml.findall('include'):
@@ -181,7 +201,7 @@ class Parser:
 			if not os.path.isabs(filename):
 				filename = os.path.dirname(os.path.abspath(self.filename)) + '/' + filename
 			
-			p = Parser(filename, reference=self.reference)
+			p = Parser(filename, reference=self.reference, validate=self.validate)
 			tree = p._parse(tree)
 			
 			self.modify_time = max(self.modify_time, p.modify_time)
@@ -191,10 +211,12 @@ class Parser:
 			if not os.path.isabs(filename):
 				filename = os.path.dirname(os.path.abspath(self.filename)) + '/' + filename
 			
-			p = Parser(filename, reference=True and self.use_reference)
+			p = Parser(filename, reference=True and self.use_reference, validate=self.validate)
 			tree = p._parse(tree)
 			
 			self.modify_time = max(self.modify_time, p.modify_time)
+		
+		self.types, self.events, self.boards, self.components = tree
 		
 		# evaluate the xml-tree
 		self.__parse_xml('struct', structure.type.Struct, self.types)
@@ -203,6 +225,7 @@ class Parser:
 		
 		self.__parse_xml('component', structure.component.Component, self.components)
 		self.__parse_xml('board', structure.board.Board, self.boards)
+		self.__parse_xml('event', structure.event.Event, self.events)
 		
 		# add all the component definitions form the boards to
 		# the global component list
@@ -229,7 +252,16 @@ class Parser:
 		# resolve the component inheritance structure
 		self.__resolve_component_dependencies()
 		
-		return [self.types, self.boards, self.components]
+		# replace the placeholders in the component with references to
+		# the real events
+		for board in self.boards.itervalues():
+			for component in board.components:
+				for event in component.events.publish:
+					component.events.publish.replace(event.name, self.events[event.name])
+				for event in component.events.subscribe:
+					component.events.subscribe.replace(event.name, self.events[event.name])
+		
+		return [self.types, self.events, self.boards, self.components]
 	
 	def __parse_xml(self, name, elemtype, list):
 		for node in self.xml.findall(name):
@@ -346,4 +378,21 @@ class Parser:
 
 # -----------------------------------------------------------------------------
 if __name__ == '__main__':
-	pass
+	
+	try:
+		parser = Parser("../../../../../roboter-10/software/defines/robot.xml", validate=True)
+		parser.parse()
+	except ParserError, e:
+		print "Error:", e
+		sys.exit(1)
+	
+	print "Components:"
+	for component in parser.components.iter():
+		print component
+		print ""
+	print ""
+	
+	print "Events:"
+	for event in parser.events.iter():
+		print event
+	print ""

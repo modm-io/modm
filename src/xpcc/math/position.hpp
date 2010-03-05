@@ -42,7 +42,7 @@
 namespace xpcc
 {
 	/**
-	 * \brief		Cartesian coordinate
+	 * \brief		2D Position
 	 *
 	 * \ingroup	math
 	 * \todo	operators for > < >= <=
@@ -103,9 +103,12 @@ namespace xpcc
 		Position&
 		operator -= (const Position &other);
 		
+		/**
+		 * \brief	Convert between Position-objects with different base-types
+		 */
 		template<typename U>
-		operator U();
-
+		operator Position<U>();
+	
 	private:
 		T x;
 		T y;

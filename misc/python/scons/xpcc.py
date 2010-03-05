@@ -254,16 +254,14 @@ def generate(env, **kw):
 		src_suffix = '.xml',
 	)
 	
-	def emitter_identifier(target, source, env):
-		return [os.path.join(str(source[0].dir), "robot/identifier.hpp")], source
-	
 	builder_identifier = Builder(
 		action = SCons.Action.Action(
 			"python ${XPCC_SYSTEM_BUILDER}/robot_identifier.py " \
 				"--outpath ${TARGET.dir} " \
 				"$SOURCE",
 			"Generate identifier from: $SOURCE"),
-		emitter = emitter_identifier,
+		emitter = lambda target, source, env:
+			([os.path.join(str(source[0].dir), "robot/identifier.hpp")], source),
 		single_source = True,
 		target_factory = env.fs.Entry,
 		src_suffix = '.xml',
