@@ -40,6 +40,13 @@ on the websites of the respective projects:
 
 - http://www.python.org/download/
 - http://www.scons.org/download.php
+- http://sourceforge.net/projects/pywin32/
+
+- http://pypi.python.org/pypi/setuptools
+- http://codespeak.net/lxml/installation.html
+It is easy to install lxml with setuptools
+Type <tt>easy_install lxml==xxx</tt> into the cmd window.
+Replace xxx with the last version which provides windows binaries.
 
 - http://www.stack.nl/~dimitri/doxygen/download.html#latestsrc
 - http://www.graphviz.org/Download_windows.php
