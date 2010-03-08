@@ -83,7 +83,13 @@ class Builder(object):
 				"-o", "--outpath",
 				dest = "outpath",
 				default = None,
-				help = "Output path")
+				help = "Output path [optional]")
+		
+		optparser.add_option(
+				"-t", "--template_path",
+				dest = "templatePath",
+				default = None,
+				help = "Template path [optional]")
 		
 		self.setup(optparser)
 		
@@ -103,6 +109,11 @@ class Builder(object):
 		self.globals = {
 			'time': time.strftime("%d %b %Y, %H:%M:%S", time.localtime()),
 		}
+		
+		if self.options.templatePath == None:
+			self.templatePath = "templates/"
+		else:
+			self.templatePath = self.options.templatePath
 	
 	def generate(self):
 		""" Generate the requested files """

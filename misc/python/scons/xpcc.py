@@ -35,8 +35,14 @@ import xpcc_configparser as configparser
 
 from SCons.Script import *
 
+def listify(node):
+	return [node,] if (not isinstance(node, list)) else node
+
 # -----------------------------------------------------------------------------
 class FileScanner:
+	
+	HEADER = ['.h', '.hpp']
+	SOURCE = ['.cpp', '.c', '.S']
 	
 	def __init__(self, env, unittest=None):
 		""" Constructor
@@ -67,10 +73,7 @@ class FileScanner:
 		self.testSources = []
 		self.defines = {}
 		
-		if not isinstance(path, list):
-			pathlist = [path,]
-		else:
-			pathlist = path
+		pathlist = listify(path)
 		
 		for basepath in pathlist:
 			for path, directories, files in os.walk(basepath):
@@ -103,7 +106,7 @@ class FileScanner:
 					extension = os.path.splitext(file)[1]
 					filename = os.path.join(path, file)
 					
-					if extension in ['.cpp', '.c', '.S']:
+					if extension in self.SOURCE:
 						# append source files
 						if os.path.normpath(path).endswith(os.sep + 'test'):
 							if self.unittest is True:
@@ -115,7 +118,7 @@ class FileScanner:
 								continue
 						self.sources.append(filename)
 					
-					elif extension in ['.h', '.hpp']:
+					elif extension in self.HEADER:
 						# append header files
 						if os.path.normpath(path).endswith(os.sep + 'test'):
 							if self.unittest is True:
@@ -126,6 +129,17 @@ class FileScanner:
 							if self.unittest is True:
 								continue
 						self.header.append(filename)
+		
+	def append(self, files):
+		for file in listify(files):
+			filename = str(file)
+			extension = os.path.splitext(filename)[1]
+			
+			if extension in self.SOURCE:
+				self.sources.append(filename)
+			elif extension in self.HEADER:
+				self.header.append(filename)
+
 
 # -----------------------------------------------------------------------------
 def buildpath(env, path, strip_extension=False):
@@ -222,10 +236,10 @@ def xpcc_library(env):
 def xpcc_generics(env, xmlfile):
 	env.Append(CPPPATH = [os.path.dirname(xmlfile)])
 	
-	files  = env.XpccPackets(xmlfile)
-	files += env.XpccIdentifier(xmlfile)
+	source  = env.SystemCppPackets(xmlfile)
+	source += env.SystemCppIdentifier(xmlfile)
 	
-	return files
+	return source
 
 # -----------------------------------------------------------------------------
 def generate(env, **kw):
@@ -236,43 +250,6 @@ def generate(env, **kw):
 	env.AddMethod(check_defines, 'ShowConfiguration')
 	env.AddMethod(xpcc_library, 'XpccLibrary')
 	env.AddMethod(xpcc_generics, 'XpccGenerics')
-	
-	builder_packets = Builder(
-		action = SCons.Action.Action(
-			"python ${XPCC_SYSTEM_BUILDER}/robot_packets.py " \
-				"--source_path ${TARGETS[0].dir} " \
-				"--header_path ${TARGETS[1].dir} " \
-				"$SOURCE",
-			"Generate packets from: $SOURCE"),
-		emitter = \
-			lambda target, source, env:
-				([os.path.join(env['XPCC_BUILDPATH'], "robot/packets.cpp"),
-				  os.path.join(str(source[0].dir), "robot/packets.hpp")],
-				source),
-		single_source = True,
-		target_factory = env.fs.Entry,
-		src_suffix = '.xml',
-	)
-	
-	builder_identifier = Builder(
-		action = SCons.Action.Action(
-			"python ${XPCC_SYSTEM_BUILDER}/robot_identifier.py " \
-				"--outpath ${TARGET.dir} " \
-				"$SOURCE",
-			"Generate identifier from: $SOURCE"),
-		emitter = lambda target, source, env:
-			([os.path.join(str(source[0].dir), "robot/identifier.hpp")], source),
-		single_source = True,
-		target_factory = env.fs.Entry,
-		src_suffix = '.xml',
-	)
-	
-	env.Append(
-		BUILDERS = {
-			'XpccPackets': builder_packets,
-			'XpccIdentifier': builder_identifier
-		}
-	)
 
 def exists(env):
 	return True

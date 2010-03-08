@@ -16,7 +16,7 @@ class Component(object):
 	"""
 	def __init__(self, name, reference=False):
 		self.name = name
-		self.desc = None
+		self.description = None
 		
 		self.id = None
 		self.extends = None
@@ -41,7 +41,7 @@ class Component(object):
 		self.extends = top.extends
 		
 		# update the attributes if they are not None
-		self.desc = self.desc or top.desc
+		self.description = self.description or top.description
 		self.id = self.id or top.id
 		self.group = self.group or top.group
 		
@@ -62,7 +62,7 @@ class Component(object):
 				list[element.name] = element
 	
 	def _from_xml(self, node):
-		self.desc = helper.xml_read_description(node)
+		self.description = helper.xml_read_description(node)
 		self.id = helper.xml_read_identifier(node)
 		
 		self.extends = node.get('extends')

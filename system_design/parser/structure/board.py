@@ -11,7 +11,7 @@ class Board:
 	"""
 	def __init__(self, name, reference=False):
 		self.name = name
-		self.desc = None
+		self.description = None
 		self.src_dir = None
 		self.bootloader = None
 		
@@ -30,7 +30,7 @@ class Board:
 		if bootloader != None:
 			bootloader = bootloader.attrib
 		
-		self.desc = helper.xml_read_description(node), 
+		self.description = helper.xml_read_description(node), 
 		self.src_dir = helper.xml_read_value(node, 'source')
 		self.bootloader = bootloader
 		

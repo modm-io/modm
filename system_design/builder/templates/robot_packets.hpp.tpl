@@ -14,28 +14,28 @@ namespace robot
 {
 	namespace packet
 	{
-{%- for type in types %}
-		{% if type.desc %}/** {{ type.desc | xpcc.wordwrap(68) | xpcc.indent(2) }} */{% endif %}
-	{%- if type.is_enum %}
-		enum {{ type.name | cpp.type }}
+{%- for packet in packets %}
+		{% if packet.description %}/** {{ packet.description | xpcc.wordwrap(68) | xpcc.indent(2) }} */{% endif %}
+	{%- if packet.isEnum %}
+		enum {{ packet.name | typeName }}
 		{
-			{%- for element in type.iter() %}
-			{{ element.name }} = {{ element.value }},{% if element.desc %}	///< {{ element.desc }}{% endif %}
+			{%- for element in packet.iter() %}
+			{{ element.name | enumElement }} = {{ element.value }},{% if element.description %}	///< {{ element.description }}{% endif %}
 			{%- endfor %}
 		};
-	{% elif type.is_struct %}
-		struct {{ type.name | cpp.type }}
+	{% elif packet.isStruct %}
+		struct {{ packet.name | typeName }}
 		{
-			{{ type | cpp.constructor }};
+			{{ packet | generateConstructor }};
 			
-			{{ type | cpp.constructor(default=False) }};
+			{{ packet | generateConstructor(default=False) }};
 			
-			{%- for element in type.iter() %}
-			{{ element | cpp.subtype }};
+			{%- for element in packet.iter() %}
+			{{ element | subtype }};
 			{%- endfor %}
 		} __attribute__((packed));
-	{% elif type.is_typedef %}
-		typedef {{ type.type.name | cpp.type }} {{ type.name | cpp.type }};
+	{% elif packet.isTypedef %}
+		typedef {{ packet.type.name | typeName }} {{ packet.name | typeName }};
 	{% endif %}
 {%- endfor -%}
 	} // namespace packet

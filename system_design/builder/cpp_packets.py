@@ -32,57 +32,44 @@
 
 import os
 import builder_base
-
-BUILTIN = [	'int8_t', 'int16_t', 'int32_t',
-			'uint8_t', 'uint16_t', 'uint32_t',
-			'char', 'float' ]
+import filter.cpp as filter
 
 # -----------------------------------------------------------------------------
-def filter_type(value):
-	if value in BUILTIN:
-		return value
-	return value.title().replace(' ', '')
-
-def filter_variable(value):
-	value = value.title().replace(' ', '')
-	value = value[0].lower() + value[1:]
-	return value
-
 def filter_subtype(value):
 	""" value needs to be parser.structure.SubType """
-	type = filter_type(value.type.name)
-	variable = filter_variable(value.name)
-	if value.type.is_array:
+	type = filter.typeName(value.type.name)
+	variable = filter.variableName(value.name)
+	if value.type.isArray:
 		return "%s %s[%s]" % (type, variable, value.type.count)
 	else:
 		return "%s %s" % (type, variable)
 
 def filter_constructor(classtype, default=True):
 	if default:
-		return "%s()" % filter_type(classtype.name)
+		return "%s()" % filter.typeName(classtype.name)
 	else:
 		parameter = []
 		for item in classtype.iter():
-			if item.type.is_array:
+			if item.type.isArray:
 				raise builder.BuilderException("Array handling is incomplete " \
 						"right now! Could not generate code for %s" % item)
 			else:
-				type = filter_type(item.type.name)
-				name = filter_variable(item.name)
+				type = filter.typeName(item.type.name)
+				name = filter.variableName(item.name)
 				
 				parameter.append("%s %s" % (type, name))
 		
-		return "%s(%s)" % (filter_type(classtype.name), ", ".join(parameter))
+		return "%s(%s)" % (filter.typeName(classtype.name), ", ".join(parameter))
 
 def filter_initialization_list(classtype, default=True):
 	initList = []
 	for item in classtype.iter():
-		if item.type.is_array:
+		if item.type.isArray:
 			raise builder.BuilderException("Array handling is incomplete " \
 					"right now! Could not generate code for %s" % item)
 		else:
-			type = filter_type(item.type.name)
-			name = filter_variable(item.name)
+			type = filter.typeName(item.type.name)
+			name = filter.variableName(item.name)
 			
 			if default:
 				initList.append("%s()" % name)
@@ -119,29 +106,30 @@ class TypeBuilder(builder_base.Builder):
 		else:
 			raise builder.BuilderException("You need to provide an output path!")
 		
-		filter = {
-			'cpp.variable': filter_variable,
-			'cpp.type': filter_type,
-			'cpp.subtype': filter_subtype,
-			'cpp.constructor': filter_constructor,
-			'cpp.initialization_list': filter_initialization_list
+		cppFilter = {
+			'enumElement': filter.enumElement,
+			'variableName': filter.variableName,
+			'typeName': filter.typeName,
+			'subtype': filter_subtype,
+			'generateConstructor': filter_constructor,
+			'generateInitializationList': filter_initialization_list
 		}
 		
-		template_header = self.template('templates/robot_packets.hpp.tpl', filter=filter)
-		template_source = self.template('templates/robot_packets.cpp.tpl', filter=filter)
+		template_header = self.template('templates/robot_packets.hpp.tpl', filter=cppFilter)
+		template_source = self.template('templates/robot_packets.cpp.tpl', filter=cppFilter)
 		
 		substitutions = {
 			'components': self.tree.components,
 			'actions': self.tree.components.actions,
 			'events': self.tree.events,
-			'types': self.tree.types
+			'packets': self.tree.types
 		}
 		
 		file = os.path.join(header_path, 'packets.hpp')
-		self.write(file, template_header.render(substitutions))
+		self.write(file, template_header.render(substitutions) + "\n")
 		
 		file = os.path.join(source_path, 'packets.cpp')
-		self.write(file, template_source.render(substitutions))
+		self.write(file, template_source.render(substitutions) + "\n")
 
 # -----------------------------------------------------------------------------
 if __name__ == '__main__':

@@ -12,7 +12,7 @@ class Event:
 		self.name = name
 		
 		self.id = -1
-		self.desc = None
+		self.description = None
 		self.type = None
 		self.rate = None
 		
@@ -24,7 +24,7 @@ class Event:
 	def _from_xml(self, node):
 		self.id = helper.xml_read_identifier(node)
 		
-		self.desc = helper.xml_read_description(node), 
+		self.description = helper.xml_read_description(node), 
 		self.extended = helper.xml_read_extended(node)
 		
 		self.type = node.get('type')

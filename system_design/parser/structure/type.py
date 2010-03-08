@@ -20,26 +20,27 @@ class SubType:
 	type = SubType("uint8_t")
 	=> .raw = "uint8_t"
 	   .name = "uint8_t"
-	   .is_array = False
+	   .isArray = False
 	   .count = 1
 	
 	type = SubType("char[8])
 	=> .raw = "char[8]"
 	   .name = "char"
-	   .is_array = True
+	   .isArray = True
 	   .count = 8
 	
 	"""
 	def __init__(self, value):
 		self.raw = value
 		if value.endswith(']'):
-			self.is_array = True
+			self.isArray = True
 			self.name, number = value.split('[')
 			self.count = number[:-1]
 		else:
-			self.is_array = False
+			self.isArray = False
 			self.count = 1
 			self.name = value
+		self.size = None
 	
 	def __str__(self):
 		return self.raw
@@ -52,10 +53,10 @@ class BaseType(object):
 	name		--	Type name. Must be unique.
 	reference	--	True if the type is only used as reference for other
 					types and should not be included in the output.
-	desc		--	Description of the type
-	is_enum		--	True if the type is an enum type
-	is_struct	--	analog
-	is_typedef	--	analog
+	description		--	Description of the type
+	isEnum		--	True if the type is an enum type
+	isStruct	--	analog
+	isTypedef	--	analog
 	_checked	--	Flag that indicates that the level is set correctly
 	level		--	hierarchy level. Built-in types have level -1, the level
 					of a type is the highest level of a subtype plus one.
@@ -64,14 +65,15 @@ class BaseType(object):
 		self.name = self._check_name(name)
 		self.reference = reference
 		
-		self.desc = None
-		self.is_enum = False
-		self.is_struct = False
-		self.is_typedef = False
+		self.description = None
+		self.isEnum = False
+		self.isStruct = False
+		self.isTypedef = False
 		
 		# used to determine the hierachy level later
 		self._checked = False
 		self.level = -1
+		self.size = None
 	
 	def check(self):
 		""" Check if the hierachy level could be determined. """
@@ -113,12 +115,13 @@ class BaseType(object):
 
 class BuiltIn(BaseType):
 	""" Built-in types are available by default. """
-	def __init__(self, name):
+	def __init__(self, name, size):
 		# the build-in types are always only for reference
-		BaseType.__init__(self, name, True)
+		BaseType.__init__(self, name, reference=True)
 		
 		self._checked = True
 		self.level = -1
+		self.size = size
 	
 	def _check_name(self, name):
 		return name
@@ -134,13 +137,13 @@ class Enum(BaseType):
 		
 		The name of the element has to be all upper case with underscores
 		"""
-		def __init__(self, name, desc=None, value=None): 
+		def __init__(self, name, description=None, value=None): 
 			self.name = self._check_name(name)
-			self.desc = desc
+			self.description = description
 			self.value = value
 		
 		def _from_xml(self, node):
-			self.desc = helper.xml_read_description(node)
+			self.description = helper.xml_read_description(node)
 		
 		def _check_name(self, name):
 			for c in name:
@@ -157,11 +160,12 @@ class Enum(BaseType):
 		self.last_value = 0
 		self._elements = []
 		
-		self.is_enum = True
+		self.isEnum = True
 		
 		# an enum don't depend on other types
 		self._checked = True
 		self.level = 0
+		self.size = 1		# FIXME calculate actual size depending on the value for the enum elements
 	
 	def add(self, element):
 		""" Add an element to the enum.
@@ -186,7 +190,7 @@ class Enum(BaseType):
 			yield element
 	
 	def _from_xml(self, node):
-		self.desc = helper.xml_read_description(node)
+		self.description = helper.xml_read_description(node)
 		
 		for elem in node.findall('element'):
 			value = elem.get('value')
@@ -202,7 +206,8 @@ class Enum(BaseType):
 	
 	def __str__(self):
 		ref = "R" if (self.reference) else ""
-		str = "%s (enum, %i%s)\n" % (self.name,  self.level, ref)
+		str = "%s (enum|%i, %i%s)\n" % \
+			(self.name, self.size, self.level, ref)
 		for element in self.iter():
 			str += "+ %s\n" % element
 		return str[:-1]
@@ -215,7 +220,7 @@ class Struct(BaseType):
 		def __init__(self, name):
 			self.name = name
 			
-			self.desc = None
+			self.description = None
 			self.type = None
 			self.unit = None
 			
@@ -224,7 +229,7 @@ class Struct(BaseType):
 			self.level = -1
 		
 		def _from_xml(self,  node):
-			self.desc = helper.xml_read_description(node)
+			self.description = helper.xml_read_description(node)
 			self.type = SubType(node.get('type'))
 			self.unit = node.get('unit')
 		
@@ -234,7 +239,7 @@ class Struct(BaseType):
 	def __init__(self, name, reference=False):
 		BaseType.__init__(self, name, reference)
 		
-		self.is_struct = True
+		self.isStruct = True
 		self.elements = []
 	
 	def add(self, element):
@@ -246,7 +251,7 @@ class Struct(BaseType):
 			yield element
 	
 	def _from_xml(self, node):
-		self.desc = helper.xml_read_description(node)
+		self.description = helper.xml_read_description(node)
 		for elem in node.findall('element'):
 			element = self.Element(elem.get('name'))
 			element._from_xml(elem)
@@ -255,7 +260,8 @@ class Struct(BaseType):
 	
 	def __str__(self):
 		ref = "R" if (self.reference) else ""
-		str = "%s (struct, %i%s)\n" % (self.name, self.level, ref)
+		str = "%s (struct|%i, %i%s)\n" % \
+			(self.name, self.size, self.level, ref)
 		for element in self.iter():
 			str += "+ %s\n" % element
 		return str[:-1]
@@ -269,16 +275,17 @@ class Typedef(BaseType):
 		self.type = None
 		self.unit = None
 		
-		self.is_typedef = True
+		self.isTypedef = True
 	
 	def _from_xml(self,  node):
-		self.desc = helper.xml_read_description(node)
+		self.description = helper.xml_read_description(node)
 		self.type = SubType(node.get('type'))
 		self.unit = node.get('unit')
 	
 	def __str__(self):
 		ref = "R" if (self.reference) else ""
-		return "%s (typedef, %i%s)\n=> %s" % (self.name, self.level, ref, self.type)
+		return "%s (typedef|%i, %i%s)\n=> %s" % \
+			(self.name, self.size, self.level, ref, self.type)
 
 # -----------------------------------------------------------------------------
 if __name__ == '__main__':

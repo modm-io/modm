@@ -128,5 +128,8 @@ class SingleAssignDict(SortedDict):
 		else:
 			raise ParserError("%s \"%s\" defined twice! Check the xml-file!" % (self.name.capitalize(),  key))
 	
+	def remove(self, key):
+		SortedDict.pop(self, key)
+	
 	def replace(self, key, item):
 		SortedDict.__setitem__(self, key, item)

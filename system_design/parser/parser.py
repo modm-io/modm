@@ -16,14 +16,14 @@ import structure.helper
 
 # buildin types. All the other types have to be compounded of these types
 BUILTIN = [
-	structure.type.BuiltIn("int8_t"),
-	structure.type.BuiltIn("int16_t"),
-	structure.type.BuiltIn("int32_t"),
-	structure.type.BuiltIn("uint8_t"),
-	structure.type.BuiltIn("uint16_t"),
-	structure.type.BuiltIn("uint32_t"),
-	structure.type.BuiltIn("float"),
-	structure.type.BuiltIn("char")
+	structure.type.BuiltIn("int8_t", size = 1),
+	structure.type.BuiltIn("int16_t", size = 2),
+	structure.type.BuiltIn("int32_t", size = 4),
+	structure.type.BuiltIn("uint8_t", size = 1),
+	structure.type.BuiltIn("uint16_t", size = 2),
+	structure.type.BuiltIn("uint32_t", size = 4),
+	structure.type.BuiltIn("float", size = 4),
+	structure.type.BuiltIn("char", size = 1)
 ]
 
 __version__ = "$Id$"
@@ -270,12 +270,13 @@ class Parser:
 			element._from_xml(node)
 			list[element.name] = element
 	
-	def __check_type(self, element):
+	def __check_type_and_size(self, element):
 		try:
 			type = self.types[element.type.name]
 			if type._checked:
 				element._checked = True
 				element.level = type.level + 1
+				element.size = type.size
 				return True
 			else:
 				return False
@@ -296,14 +297,14 @@ class Parser:
 		"""
 		Determine the hierarchy of the types
 		
-		Level 0 types depend only on built-in types (e.g. enum is 
-		always level 0), level 1 types depends only on built-in types
-		and level 0 types and so on.
+		Level-0 types depend only on built-in types (e.g. enum is 
+		always level-0), level-1 types depends only on built-in types
+		and level-0 types and so on.
 		
 		Updates the 'level' and '_checked' attributes of each type on
 		the self.types list.
 		
-		Raises a ParserError exception if a loop in the definition
+		Raises a ParserError exception if a loop in the type definition
 		is detected.
 		
 		"""
@@ -316,24 +317,28 @@ class Parser:
 					continue
 				
 				finished = False
-				if element.is_typedef:
-					if self.__check_type(element):
+				if element.isTypedef:
+					if self.__check_type_and_size(element):
 						changed = True
-				elif element.is_struct:
+				elif element.isStruct:
 					checked = True
 					level = -1
+					sizeSum = 0
 					# check all the subelements of the struct
 					# the level of the struct could not be determined
 					# before all subelements have their level 
 					for subelement in element.iter():
-						if subelement._checked or self.__check_type(subelement):
+						if subelement._checked or self.__check_type_and_size(subelement):
 							level = max(level, subelement.level)
+							sizeSum += subelement.size
 						else:
 							checked = False
+							break
 					
 					if checked:
 						element._checked = True
 						element.level = level
+						element.size = sizeSum
 						changed = True
 				
 			if finished:
@@ -378,7 +383,6 @@ class Parser:
 
 # -----------------------------------------------------------------------------
 if __name__ == '__main__':
-	
 	try:
 		parser = Parser("../../../../../roboter-10/software/defines/robot.xml", validate=True)
 		parser.parse()
@@ -386,13 +390,18 @@ if __name__ == '__main__':
 		print "Error:", e
 		sys.exit(1)
 	
-	print "Components:"
-	for component in parser.components.iter():
-		print component
-		print ""
-	print ""
+#	print "Components:"
+#	for component in parser.components.iter():
+#		print component
+#		print ""
+#	print ""
 	
-	print "Events:"
-	for event in parser.events.iter():
-		print event
-	print ""
+#	print "Events:"
+#	for event in parser.events.iter():
+#		print event
+#	print ""
+	
+	print "Types:"
+	for packet in parser.types.iter():
+		print packet
+		print ""

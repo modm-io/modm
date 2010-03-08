@@ -7,15 +7,15 @@
 
 #include <robot/packets.hpp>
 
-{% for type in types -%}
-{%- if type.is_struct -%}
-robot::packet::{{ type.name | cpp.type }}::{{ type | cpp.constructor(True) }} :
-	{{ type | cpp.initialization_list(True) }}
+{% for packet in packets -%}
+{%- if packet.isStruct -%}
+robot::packet::{{ packet.name | typeName }}::{{ packet | generateConstructor }} :
+	{{ packet | generateInitializationList }}
 {
 }
 
-robot::packet::{{ type.name | cpp.type }}::{{ type | cpp.constructor(False) }} :
-	{{ type | cpp.initialization_list(False) }}
+robot::packet::{{ packet.name | typeName }}::{{ packet | generateConstructor(default=False) }} :
+	{{ packet | generateInitializationList(default=False) }}
 {
 }
 {% endif %}

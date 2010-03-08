@@ -21,7 +21,7 @@ class ComponentElement(object):
 				self.__dict__[key] = top.__dict__[key]
 	
 	def _from_xml(self, node):
-		self.desc = helper.xml_read_description(node)
+		self.description = helper.xml_read_description(node)
 		self.id = helper.xml_read_identifier(node)
 		
 		self.extended = helper.xml_read_extended(node)
@@ -32,7 +32,7 @@ class Action(ComponentElement):
 	def __init__(self, name, reference=False):
 		ComponentElement.__init__(self, name, reference)
 		
-		self.desc = None
+		self.description = None
 		self.id = -1
 		self.function = None
 		self.param_type = None

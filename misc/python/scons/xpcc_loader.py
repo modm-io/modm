@@ -90,20 +90,23 @@ def generate_environment(env, configfile, rootpath, buildpath = None):
 		'XPCC_SYSTEM_BUILDER': os.path.join(rootpath, 'system_design', 'builder')
 	}
 	
+	# tools which are used independent of the architecture
+	tools = [
+		'doxygen',
+		'template',
+		'unittest',
+		'xpcc',
+		'utils',
+		'system_design'
+	]
+	
 	# Create the build environment
 	if architecture == 'atmega' or architecture == 'atxmega':
 		new = Environment(
 				ARCHITECTURE = architecture + '/' + device,
 				AVR_DEVICE = device,
 				AVR_CLOCK = clock,
-				tools = [
-					'avr',
-					'avrdude',
-					'doxygen',
-					'template',
-					'unittest',
-					'xpcc',
-					'utils'],
+				tools = ['avr', 'avrdude'] + tools,
 				toolpath = env['toolpath'],
 				LIBS = [''],
 				LIBPATH = [],
@@ -114,13 +117,7 @@ def generate_environment(env, configfile, rootpath, buildpath = None):
 	elif architecture == 'pc':
 		new = Environment(
 				ARCHITECTURE = architecture + '/' + device,
-				tools = [
-					'pc',
-					'doxygen',
-					'template',
-					'unittest',
-					'xpcc',
-					'utils'],
+				tools = ['pc'] + tools,
 				toolpath = env['toolpath'],
 				LIBS = ['boost_thread-mt'],
 				LIBPATH = ['/usr/lib/'],

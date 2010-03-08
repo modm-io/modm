@@ -30,29 +30,20 @@
 # $Id$
 # -----------------------------------------------------------------------------
 
-import os
-import builder_base
-
-class IdentifierBuilder(builder_base.Builder):
-	
-	VERSION = "$Id$"
-	
-	def generate(self):
-		# check the commandline options
-		if not self.options.outpath:
-			raise builder.BuilderException("You need to provide an output path!")
-		
-		template = self.template('templates/robot_identifier.tpl')
-		
-		substitutions = {
-			'components': self.tree.components,
-			'actions': self.tree.components.actions,
-			'events': self.tree.events
-		}
-		
-		file = os.path.join(self.options.outpath, 'identifier.hpp')
-		self.write(file, template.render(substitutions))
+BUILTIN = [	'int8_t', 'int16_t', 'int32_t',
+			'uint8_t', 'uint16_t', 'uint32_t',
+			'char', 'float' ]
 
 # -----------------------------------------------------------------------------
-if __name__ == '__main__':
-	IdentifierBuilder().generate()
+def typeName(value):
+	if value in BUILTIN:
+		return value
+	return value.title().replace(' ', '')
+
+def variableName(value):
+	value = value.title().replace(' ', '')
+	value = value[0].lower() + value[1:]
+	return value
+
+def enumElement(value):
+	return value.upper().replace(' ', '_')
