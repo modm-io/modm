@@ -47,6 +47,9 @@ template <typename DEVICE> typename xpcc::apb::Interface<DEVICE>::State \
 	xpcc::apb::Interface<DEVICE>::state = SYNC;
 
 template <typename DEVICE> uint8_t xpcc::apb::Interface<DEVICE>::buffer[32];
+template <typename DEVICE> typename xpcc::apb::Interface<DEVICE>::Header \
+	xpcc::apb::Interface<DEVICE>::header;
+template <typename DEVICE> uint8_t xpcc::apb::Interface<DEVICE>::command;
 template <typename DEVICE> uint8_t xpcc::apb::Interface<DEVICE>::crc;
 template <typename DEVICE> uint8_t xpcc::apb::Interface<DEVICE>::position;
 template <typename DEVICE> uint8_t xpcc::apb::Interface<DEVICE>::length;
@@ -66,15 +69,15 @@ xpcc::apb::Interface<DEVICE>::initialize()
 
 template <typename DEVICE>
 void
-xpcc::apb::Interface<DEVICE>::sendMessage(Header header, const uint8_t *data, uint8_t size)
+xpcc::apb::Interface<DEVICE>::sendMessage(Header header, uint8_t command, const uint8_t *data, uint8_t size)
 {
-	size &= 0x1f;
-	
 	DEVICE::write(syncByte);
-	DEVICE::write((static_cast<uint8_t>(header) & 0xe0) | size);
+	DEVICE::write((static_cast<uint8_t>(header) & 0xe0) | (size & 0x1f));
 	
-	uint8_t crc = crcInitialValue;
-	for (uint_fast8_t i = 0; i < size; ++i)
+	uint8_t crc = crcUpdate(crcInitialValue, command);
+	DEVICE::write(command);
+	
+	for (uint_fast8_t i = 0; i < (size & 0x1f); ++i)
 	{
 		crc = crcUpdate(crc, *data);
 		DEVICE::write(*data);
@@ -98,6 +101,13 @@ uint8_t
 xpcc::apb::Interface<DEVICE>::getLength()
 {
 	return lengthOfReceivedMessage;
+}
+
+template <typename DEVICE>
+uint8_t
+xpcc::apb::Interface<DEVICE>::getCommand()
+{
+	return command;
 }
 
 template <typename DEVICE>
@@ -132,9 +142,15 @@ xpcc::apb::Interface<DEVICE>::update()
 				break;
 			
 			case HEADER:
-				length = (byte & 0x1f) + 1;
+				length = (byte & 0x1f) + 1;		// +1 for the crc byte
+				header = static_cast<Header>(byte & 0xe0);
+				state = COMMAND;
+				break;
+			
+			case COMMAND:
+				command = byte;
+				crc = crcUpdate(crcInitialValue, byte);
 				position = 0;
-				crc = crcInitialValue;
 				state = DATA;
 				break;
 			

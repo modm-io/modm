@@ -45,6 +45,7 @@ namespace xpcc
 		 * Example:
 		 * \include apb_interface.cpp
 		 * 
+		 * \ingroup	apb
 		 * \author	Fabian Greif
 		 */
 		template <typename DEVICE>
@@ -65,8 +66,16 @@ namespace xpcc
 			static void
 			initialize();
 			
+			/**
+			 * \brief	Send a message
+			 * 
+			 * \param	header	header flags
+			 * \param	command	command bytes
+			 * \param	*data	data field
+			 * \param	size	size of the data field
+			 */
 			static void
-			sendMessage(Header header, const uint8_t *data, uint8_t size);
+			sendMessage(Header header, uint8_t command, const uint8_t *data, uint8_t size);
 			
 			/**
 			 * \brief	Check if a message was received
@@ -82,6 +91,9 @@ namespace xpcc
 			 */
 			static inline uint8_t
 			getLength();
+			
+			static inline uint8_t
+			getCommand();
 			
 			/**
 			 * \brief	Access the data of a received message
@@ -117,10 +129,13 @@ namespace xpcc
 			typedef enum {
 				SYNC,
 				HEADER,
+				COMMAND,
 				DATA
 			} State;
 			
 			static uint8_t buffer[32];
+			static Header header;
+			static uint8_t command;
 			static uint8_t crc;
 			static uint8_t position;
 			static uint8_t length;

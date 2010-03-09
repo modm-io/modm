@@ -1,4 +1,4 @@
-typedef xpcc::apb::Interface <...> interface;
+xpcc::apb::Interface <...> interface;
 
 while (1)
 {
