@@ -29,7 +29,7 @@
 # $Id$
 
 import os
-import xpcc_configparser as configparser
+import configparser
 
 from SCons.Script import *
 
@@ -66,7 +66,7 @@ def generate_environment(env, configfile, rootpath, buildpath = None):
 		print msg
 		Exit(1)
 	
-	configuration = { 'defines': {} }
+	configuration = { 'defines': {}, 'environment': {} }
 	for section in parser.sections():
 		s = {}
 		for option in parser.options(section):
@@ -96,6 +96,7 @@ def generate_environment(env, configfile, rootpath, buildpath = None):
 		'template',
 		'unittest',
 		'xpcc',
+		'configparser',
 		'utils',
 		'system_design'
 	]
@@ -114,6 +115,7 @@ def generate_environment(env, configfile, rootpath, buildpath = None):
 		
 		new['AVRDUDE_PROGRAMMER'] = parser.get('avrdude', 'programmer', 'stk500')
 		new['AVRDUDE_PORT'] = parser.get('avrdude', 'port', '/dev/ttyUSB0')
+		new['AVR_FUSEBITS'] = []
 	elif architecture == 'pc':
 		new = Environment(
 				ARCHITECTURE = architecture + '/' + device,
@@ -125,6 +127,17 @@ def generate_environment(env, configfile, rootpath, buildpath = None):
 	else:
 		print "Unknown architecture '%s'!" % architecture
 		Exit(1)
+	
+	if 'fusebits' in configuration:
+		for key, value in configuration['fusebits'].items():
+			if key not in ['lfuse', 'hfuse', 'efuse']:
+				print "Unknown fusebit '%s'! Allowed values are 'lfuse', 'hfuse' and 'efuse'!" % key
+				Exit(1)
+			new.Append(AVR_FUSEBITS = {key: value} )
+	
+	# append all values from environment section to the real environment
+	for key, value in configuration['environment'].iteritems():
+		new.Append(**{ key.upper(): " " + value } )
 	
 	return new
 

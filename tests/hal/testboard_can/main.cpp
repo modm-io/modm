@@ -15,8 +15,8 @@
 // ----------------------------------------------------------------------------
 using namespace xpcc;
 
-CREATE_OUTPUT_PIN(Cs, B, 2);
-CREATE_INPUT_PIN(Int, B, 1);
+GPIO__OUTPUT(Cs, B, 2);
+GPIO__INPUT(Int, B, 1);
 
 FLASH(uint8_t filter[]) = 
 {

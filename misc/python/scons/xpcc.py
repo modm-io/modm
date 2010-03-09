@@ -31,7 +31,7 @@
 import os
 import re
 import string
-import xpcc_configparser as configparser
+import configparser
 
 from SCons.Script import *
 

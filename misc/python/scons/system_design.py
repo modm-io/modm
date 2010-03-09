@@ -39,7 +39,7 @@ def generate(env, **kw):
 				"--source_path ${TARGETS[0].dir} " \
 				"--header_path ${TARGETS[1].dir} " \
 				"$SOURCE",
-			"Generate packets from: $SOURCE"),
+			cmdstr="$SYSTEM_CPP_PACKETS_COMSTR"),
 		emitter = \
 			lambda target, source, env:
 				([os.path.join(env['XPCC_BUILDPATH'], "robot/packets.cpp"),
@@ -47,7 +47,7 @@ def generate(env, **kw):
 				source),
 		single_source = True,
 		target_factory = env.fs.Entry,
-		src_suffix = '.xml',
+		src_suffix = ".xml",
 	)
 	
 	builder_identifier = SCons.Script.Builder(
@@ -55,13 +55,17 @@ def generate(env, **kw):
 			"python ${XPCC_SYSTEM_BUILDER}/cpp_identifier.py " \
 				"--outpath ${TARGET.dir} " \
 				"$SOURCE",
-			"Generate identifier from: $SOURCE"),
+			cmdstr="$SYSTEM_CPP_IDENTIFIER_COMSTR"),
 		emitter = lambda target, source, env:
 			([os.path.join(str(source[0].dir), "robot/identifier.hpp")], source),
 		single_source = True,
 		target_factory = env.fs.Entry,
-		src_suffix = '.xml',
+		src_suffix = ".xml",
 	)
+	
+	if SCons.Script.ARGUMENTS.get('verbose') != '1':
+		env['SYSTEM_CPP_PACKETS_COMSTR'] = "Generate packets from: $SOURCE"
+		env['SYSTEM_CPP_IDENTIFIER_COMSTR'] = "Generate identifier from: $SOURCE"
 	
 	env.Append(
 		BUILDERS = {

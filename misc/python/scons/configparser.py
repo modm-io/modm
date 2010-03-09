@@ -33,7 +33,6 @@ import ConfigParser
 class ParserException(Exception):
 	pass
 
-
 class XpccConfigParser(ConfigParser.RawConfigParser):
 	
 	def read(self, filename):
@@ -44,7 +43,18 @@ class XpccConfigParser(ConfigParser.RawConfigParser):
 			return ConfigParser.RawConfigParser.get(self, section, option)
 		except (ConfigParser.NoOptionError,
 				ConfigParser.NoSectionError), e:
-			if default is not None:
+			if default != None:
+				return default
+			else:
+				raise ParserException(e)
+	
+	def getboolean(self, section, option, default=None):
+		try:
+			return ConfigParser.RawConfigParser.getboolean(self, section, option)
+		except (ConfigParser.NoOptionError,
+				ConfigParser.NoSectionError,
+				ParserException), e:
+			if default != None:
 				return default
 			else:
 				raise ParserException(e)
@@ -55,3 +65,14 @@ class XpccConfigParser(ConfigParser.RawConfigParser):
 		except (ConfigParser.NoOptionError,
 				ConfigParser.NoSectionError), e:
 			raise ParserException(e)
+
+# -----------------------------------------------------------------------------
+def generate_configparser(env):
+	return XpccConfigParser()
+
+# -----------------------------------------------------------------------------
+def generate(env, **kw):
+	env.AddMethod(generate_configparser, 'ConfigParser')
+
+def exists(env):
+	return True

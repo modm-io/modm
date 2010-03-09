@@ -127,6 +127,8 @@ architecture = pc
 
 \b name need to unique and will be the name of the executeable.
 
+The full documentation is has its own page: \subpage project_cfg.
+
 \todo Extend this documentation
 
 \section usage Usage of the build system

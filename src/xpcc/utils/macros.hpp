@@ -68,4 +68,7 @@
 
 #endif
 
+#define	MAIN_FUNCTION	int main(void) __attribute__((OS_main)); \
+						int main(void)
+
 #endif	// XPCC__MACROS_HPP

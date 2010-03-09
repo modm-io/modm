@@ -31,6 +31,7 @@
 import os
 import string
 import time
+import re
 from SCons.Script import *
 
 # -----------------------------------------------------------------------------
@@ -46,15 +47,11 @@ def simple_template_action(target, source, env):
 	open(target, 'w').write(output)
 	return 0
 
-def simple_template_emitter(target, source, env):
-	Depends(target, SCons.Node.Python.Value(env['SUBSTITUTIONS']))
-	return target, source
-
-def simple_template_string(target, source, env):
-	return "Template: '%s' to '%s'" % (str(source[0]), str(target[0]))
-
 # -----------------------------------------------------------------------------
 def template_action(target, source, env):
+	if not env.has_key('SUBSTITUTIONS'):
+		raise SCons.Errors.UserError, "'Template' requires SUBSTITUTIONS to be set."
+	
 	try:
 		import jinja2
 	except ImportError:
@@ -62,7 +59,8 @@ def template_action(target, source, env):
 		Exit(1)
 	
 	globals = {
-		'time': time.strftime("%d %b %Y, %H:%M:%S", time.localtime())
+		'time': time.strftime("%d %b %Y, %H:%M:%S", time.localtime()),
+		'match': re.match,
 	}
 	
 	path, filename = os.path.split(source[0].path)
@@ -84,8 +82,8 @@ def generate(env, **kw):
 	env.Append(
 		BUILDERS = {
 		'SimpleTemplate': env.Builder(
-			action = env.Action(simple_template_action, simple_template_string),
-			emitter = simple_template_emitter,
+			action = env.Action(simple_template_action, template_string),
+			emitter = template_emitter,
 			src_suffix = '.in',
 			single_source = True
 		),

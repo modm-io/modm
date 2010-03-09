@@ -31,13 +31,12 @@
 # -----------------------------------------------------------------------------
 
 import os
-import ConfigParser
 
-env = Environment(tools = ['template', 'doxygen'], toolpath = ['misc/python/scons'])
+env = Environment(tools = ['template', 'doxygen', 'configparser'], toolpath = ['misc/python/scons'])
 
 # -----------------------------------------------------------------------------
 # regenerate SConstruct files for the tests
-parser = ConfigParser.RawConfigParser()
+parser = env.ConfigParser()
 for path, directories, files in os.walk('tests'):
 	# exclude the SVN-directories
 	if '.svn' in directories:
@@ -46,9 +45,7 @@ for path, directories, files in os.walk('tests'):
 	if 'project.cfg' in files:
 		parser.read(os.path.join(path, 'project.cfg'))
 		
-		# TODO parser regenerate
-		
-		rootpath = '/'.join(['..' for x in range(len(path.split('/')))])
+		rootpath = os.sep.join(['..' for x in range(len(path.split(os.sep)))])
 		file = env.SimpleTemplate(target = os.path.join(path, 'SConstruct'),
 								  source = 'misc/templates/SConstruct.in',
 								  SUBSTITUTIONS = {'rootpath': rootpath })

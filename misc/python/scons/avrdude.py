@@ -37,8 +37,12 @@ def avrdude_flash(env, source, alias='avrdude_program'):
 	return env.AlwaysBuild(env.Alias(alias, source, action))
 
 def avrdude_fuse(env, alias='avrdude_fuse'):
-	# TODO
-	action = Action("avrdude -p $AVR_DEVICE -c $AVRDUDE_PROGRAMMER -P $AVRDUDE_PORT -u -U efuse:w:0xff:m", 
+	fusebits = []
+	for fusebit in env['AVR_FUSEBITS']:
+		key, value = fusebit.items()[0]
+		fusebits.append("-U %s:w:0x%02x:m" % (key, int(value, 0)))
+	
+	action = Action("avrdude -p $AVR_DEVICE -c $AVRDUDE_PROGRAMMER -P $AVRDUDE_PORT -u %s" % " ".join(fusebits), 
 					cmdstr="$AVRDUDE_FUSECOMSTR")
 	return env.AlwaysBuild(env.Alias(alias, [], action))
 
@@ -47,10 +51,10 @@ def generate(env, **kw):
 	# build messages
 	if ARGUMENTS.get('verbose') != '1':
 		env['AVRDUDE_COMSTR'] = "avrdude: program $SOURCE"
-		env['AVRDUDE_FUSECOMSTR'] = "avrdude: set fuse bytes"
+		env['AVRDUDE_FUSECOMSTR'] = "avrdude: set fusebits"
 	
 	env.AddMethod(avrdude_flash, 'Avrdude')
 	env.AddMethod(avrdude_fuse, 'AvrdudeFuses')
 
 def exists(env):
-	return env.Detect('avr-gcc')
+	return env.Detect('avrdude')
