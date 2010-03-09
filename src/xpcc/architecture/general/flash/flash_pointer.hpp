@@ -30,8 +30,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC__FLASH_HPP
-#define	XPCC__FLASH_HPP
+#ifndef	XPCC__FLASH_POINTER_HPP
+#define	XPCC__FLASH_POINTER_HPP
 
 #include <xpcc/utils/macros.hpp>
 #include <xpcc/utils/modifier.hpp>
@@ -183,4 +183,4 @@ operator << ( xpcc::IOStream& os, xpcc::FlashPointer<T> ptr)
 xpcc::IOStream&
 operator << ( xpcc::IOStream& os, xpcc::FlashPointer<char> ptr);
 
-#endif	// XPCC__FLASH_HPP
+#endif	// XPCC__FLASH_POINTER_HPP

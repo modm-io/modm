@@ -33,6 +33,8 @@
 #ifndef	XPCC__FLASH_READER_HPP
 #define	XPCC__FLASH_READER_HPP
 
+#include <xpcc/utils/macros.hpp>
+
 #ifdef	__DOXYGEN__
 	/** 
 	 * \brief	Define a flash variable

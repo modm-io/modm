@@ -82,7 +82,7 @@ def generate(env, **kw):
 	env['CFLAGS'] = " ".join([
 		"-std=gnu99",
 		"-Wstrict-prototypes",
-		"-fpack-struct", 		# TODO
+		"-fpack-struct",
 	])
 	
 	# flags for C and C++
@@ -104,6 +104,7 @@ def generate(env, **kw):
 	# C++ flags
 	env['CXXFILESUFFIX'] = ".cpp"
 	env['CXXFLAGS'] = " ".join([
+#		"-save-temps",		# save preprocessed files
 		"-std=gnu++98",
 		"-fno-exceptions", 
 		"-fno-rtti",

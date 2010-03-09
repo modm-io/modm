@@ -34,25 +34,26 @@
 #define	XPCC__MACROS_HPP
 
 /**
- * \ingroup	utils
  * \brief	Force inlining
  * 
  * Macro to force inlining on function if needed. Compiling with -Os  does not
  * always inline them when declared only \c inline.
+ * 
+ * \ingroup	utils
  */
 #define ALWAYS_INLINE  inline __attribute__((always_inline))
 
 #ifdef __DOXYGEN__
 
 	/**
-	 * \ingroup	utils
 	 * \brief	Convert the argument into a C-String
+	 * \ingroup	utils
 	 */
 	#define	STRINGIFY(s)	#s
 
 	/**
-	 * \ingroup	utils
 	 * \brief	Concatenate the two arguments
+	 * \ingroup	utils
 	 */
 	#define	CONCAT(a,b)		a ## b
 
@@ -68,6 +69,14 @@
 
 #endif
 
+/**
+ * \brief	Main function definition for microcontroller projects
+ * 
+ * Inhibits some stack operations at the beginning of main for avr-gcc. May
+ * save up a few bytes of dynamically allocated RAM.
+ * 
+ * \ingroup	utils
+ */
 #define	MAIN_FUNCTION	int main(void) __attribute__((OS_main)); \
 						int main(void)
 
