@@ -42,6 +42,7 @@
 #include "uart_defines.h"
 #include "config.h"
 
+#ifdef ATMEGA_HAS_UART0
 
 #include "uart0.hpp"
 
@@ -215,4 +216,4 @@ xpcc::BufferedUart0::read(char *buffer, uint8_t n)
 	return n;
 }
 
-
+#endif

@@ -1,0 +1,24 @@
+// coding: utf-8
+// $Id$
+/*!
+
+\page project_cfg	project.cfg
+
+ - general
+   - name
+   - regenerate_sconstruct = yes|no
+ - build
+   - architecture = pc|atmega|atxmega
+   - device
+   - clock
+   - library_name
+ - environment
+ - program
+   - tool = avrdude
+   - port
+ - fusebits
+   - lfuse
+   - hfuse
+   - efuse
+
+ */

@@ -36,6 +36,8 @@
 #include <avr/io.h>
 #include <stdint.h>
 
+#if !defined(__AVR_ATtiny44__)		// TODO
+
 namespace xpcc
 {
 	class Spi
@@ -67,5 +69,7 @@ namespace xpcc
 		put(uint8_t data);
 	};
 }
+
+#endif
 
 #endif // XPCC__MEGA_SPI_HPP

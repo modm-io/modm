@@ -41,8 +41,8 @@ namespace xpcc
 	/**
 	 * \brief	Debouncing signals
 	 * 
-	 * This class is able to debounce eight keys at the same time. The
-	 * keys have to low-active. If this isn't the case invert their signal
+	 * This class is able to debounce eight buttons at the same time. The
+	 * buttons have to low-active. If this isn't the case invert their signal
 	 * before passing it to the update() method.
 	 * 
 	 * The update() method needs to be called periodically for example
@@ -52,7 +52,7 @@ namespace xpcc
 	 * \include debounce.cpp
 	 * 
 	 * The detection for long or repreated presses works only correct for
-	 * one key at a time. This constraint only applies to keys listed in the
+	 * one key at a time. This constraint only applies to buttons listed in the
 	 * \em mask variable.
 	 * 
 	 * This implementation is based on the C debounce functions written
@@ -100,11 +100,11 @@ namespace xpcc
 		 * Each pressed key is reported only once.
 		 * 
 		 * \code
-		 * xpcc::Debounce keys;
+		 * xpcc::Debounce buttons;
 		 * ...
 		 * while (1) {
 		 *		...
-		 * 	if (keys.getPress(Debounce::KEY0)) {
+		 * 	if (buttons.getPress(Debounce::BUTTON0)) {
 		 * 		// do something
 		 * 	}
 		 * }
@@ -121,12 +121,12 @@ namespace xpcc
 		 * repeatedly pressing and releasing the key.
 		 * 
 		 * \code
-		 * xpcc::Debounce keys(Debounce::KEY0);
+		 * xpcc::Debounce buttons(Debounce::BUTTON0);
 		 * ...
 		 * while (1) {
 		 *		...
-		 * 	if (keys.getPress(Debounce::KEY0) || 
-		 *			keys.getRepeat(Debounce::KEY0))
+		 * 	if (buttons.getPress(Debounce::BUTTON0) || 
+		 *			buttons.getRepeat(Debounce::BUTTON0))
 		 * 	{
 		 * 		// do something
 		 * 	}
@@ -138,17 +138,17 @@ namespace xpcc
 		uint8_t
 		getRepeat(uint8_t mask);
 		
-		/** \brief	Get keys which were pressed short
+		/** \brief	Get buttons which were pressed short
 		 * 
 		 * \code
-		 * xpcc::Debounce keys(Debounce::KEY0);
+		 * xpcc::Debounce buttons(Debounce::BUTTON0);
 		 * ...
 		 * while (1) {
 		 * 	...
-		 * 	if (keys.getShortPress(Debounce::KEY0)) {
+		 * 	if (buttons.getShortPress(Debounce::BUTTON0)) {
 		 * 		// do something
 		 * 	}
-		 * 	if (keys.getLongPress(Debounce::KEY0)) {
+		 * 	if (buttons.getLongPress(Debounce::BUTTON0)) {
 		 * 		// do something different
 		 * 	}
 		 * }
@@ -162,7 +162,7 @@ namespace xpcc
 		uint8_t
 		getShortPress(uint8_t mask);
 		
-		/** \brief	Get keys which were pressed long
+		/** \brief	Get buttons which were pressed long
 		 *
 		 * \see	getShortPress()
 		 */

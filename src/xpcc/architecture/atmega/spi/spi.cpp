@@ -32,6 +32,8 @@
 
 #include "spi.hpp"
 
+#if !defined(__AVR_ATtiny44__)		// TODO
+
 void
 xpcc::Spi::initialize(Mode mode, Prescaler prescaler)
 {
@@ -50,3 +52,5 @@ xpcc::Spi::put(uint8_t data)
 	}
 	return SPDR;
 }
+
+#endif

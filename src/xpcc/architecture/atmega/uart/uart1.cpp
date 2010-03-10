@@ -42,7 +42,8 @@
 #include "uart_defines.h"
 #include "config.h"
 
-#ifdef ATMEGA_USART1
+#ifdef ATMEGA_HAS_UART1
+
 #include "uart1.hpp"
 
 static xpcc::atomic::Queue<char, UART1_RX_BUFFER_SIZE> rxBuffer;

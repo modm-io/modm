@@ -10,6 +10,8 @@
 		defined(__AVR_ATmega32__) || defined(__AVR_ATmega8515__) ||\
 		defined(__AVR_ATmega8535__) || defined(__AVR_ATmega323__)
 	// ATmega with one USART
+	#define	ATMEGA_HAS_UART0
+	
 	#define ATMEGA_USART
 	#define UART0_RECEIVE_INTERRUPT   SIG_UART_RECV
 	#define UART0_TRANSMIT_INTERRUPT  SIG_UART_DATA
@@ -20,6 +22,8 @@
 
 #elif defined(__AVR_ATmega163__) 
 	// ATmega163 with one UART
+	#define	ATMEGA_HAS_UART0
+	
 	#define ATMEGA_UART
 	#define UART0_RECEIVE_INTERRUPT   SIG_UART_RECV
 	#define UART0_TRANSMIT_INTERRUPT  SIG_UART_DATA
@@ -30,6 +34,9 @@
 
 #elif defined(__AVR_ATmega162__)
 	// ATmega with two USART
+	#define	ATMEGA_HAS_UART0
+	#define	ATMEGA_HAS_UART1
+	
 	#define ATMEGA_USART0
 	#define UART0_RECEIVE_INTERRUPT   SIG_USART0_RECV
 	#define UART0_TRANSMIT_INTERRUPT  SIG_USART0_DATA
@@ -49,6 +56,9 @@
 #elif	defined(__AVR_ATmega64__) || defined(__AVR_ATmega128__) ||\
 		defined(__AVR_AT90CAN128__)
 	// ATmega with two USART
+	#define	ATMEGA_HAS_UART0
+	#define	ATMEGA_HAS_UART1
+	
 	#define ATMEGA_USART0
 	#define UART0_TRANSMIT_INTERRUPT  SIG_UART0_DATA
 	#define UART0_RECEIVE_INTERRUPT   SIG_UART0_RECV
@@ -67,6 +77,9 @@
 
 #elif	defined(__AVR_ATmega1281__) || defined(__AVR_ATmega2561__)
 	// ATmega with two USART
+	#define	ATMEGA_HAS_UART0
+	#define	ATMEGA_HAS_UART1
+	
 	#define ATMEGA_USART0
 	#define UART0_RECEIVE_INTERRUPT		USART0_RX_vect
 	#define UART0_TRANSMIT_INTERRUPT	USART0_UDRE_vect
@@ -86,6 +99,11 @@
 #elif	defined(__AVR_ATmega640__) || defined(__AVR_ATmega1280__) ||\
 		defined(__AVR_ATmega2560__)
 	// ATmega with four USART
+	#define	ATMEGA_HAS_UART0
+	#define	ATMEGA_HAS_UART1
+	#define	ATMEGA_HAS_UART2
+	#define	ATMEGA_HAS_UART3
+	
 	#define ATMEGA_USART0
 	#define UART0_RECEIVE_INTERRUPT		USART0_RX_vect
 	#define UART0_TRANSMIT_INTERRUPT	USART0_UDRE_vect
@@ -124,6 +142,8 @@
 
 #elif defined(__AVR_ATmega169__) 
 	// ATmega with one USART
+	#define	ATMEGA_HAS_UART0
+	
 	#define ATMEGA_USART
 	#define UART0_RECEIVE_INTERRUPT   SIG_USART_RECV
 	#define UART0_TRANSMIT_INTERRUPT  SIG_USART_DATA
@@ -134,6 +154,8 @@
 
 #elif defined(__AVR_ATmega48__) || defined(__AVR_ATmega88__) || \
 	  defined(__AVR_ATmega168__)
+	#define	ATMEGA_HAS_UART0
+	
 	#define ATMEGA_USART0
 	#define UART0_RECEIVE_INTERRUPT   SIG_USART_RECV
 	#define UART0_TRANSMIT_INTERRUPT  SIG_USART_DATA
@@ -143,6 +165,8 @@
 	#define UART0_UDRIE    UDRIE0
 
 #elif defined(__AVR_ATtiny2313__)
+	#define	ATMEGA_HAS_UART0
+	
 	#define ATMEGA_USART
 	#define UART0_RECEIVE_INTERRUPT   SIG_USART0_RX 
 	#define UART0_TRANSMIT_INTERRUPT  SIG_USART0_UDRE
@@ -151,7 +175,12 @@
 	#define UART0_DATA     UDR
 	#define UART0_UDRIE    UDRIE
 
+#elif defined(__AVR_ATtiny44__)
+	
+
 #elif defined(__AVR_ATmega644__)
+	#define	ATMEGA_HAS_UART0
+	
 	#define ATMEGA_USART0
 	#define UART0_RECEIVE_INTERRUPT   USART0_RX_vect
 	#define UART0_TRANSMIT_INTERRUPT  USART0_UDRE_vect
