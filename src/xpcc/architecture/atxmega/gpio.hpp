@@ -52,7 +52,44 @@ namespace xpcc
 			WIREDAND = PORT_OPC_WIREDAND_gc,
 			WIREDORPULL = PORT_OPC_WIREDORPULL_gc,
 			WIREDANDPULL = PORT_OPC_WIREDANDPULL_gc,
-		} Configuration;
+		} Configuration; // PINnCTRL
+		
+		typedef enum
+		{
+			BOTHEDGES = PORT_ISC_BOTHEDGES_gc,
+			RISING = PORT_ISC_RISING_gc,  
+			FALLING = PORT_ISC_FALLING_gc, 
+			LEVEL = PORT_ISC_LEVEL_gc,  
+			INPUT_DISABLE = PORT_ISC_INPUT_DISABLE_gc,
+		} InputSense; // PINnCTRL
+		
+		/**
+		 * 
+		 * Be Carefull: There are only two Interrupts for a Port,
+		 * so it is not possible to select different
+		 * Interruptlevels for different Pins of one Port on the same Interrupt_x.
+		 * Previous level settings will be overridden and be affected to all
+		 * Pins on this Port for which interrupt_x has been enabled.
+		 * 
+		 * Switching level of interrupt_x off will not disable the interrupt, but
+		 * clear the corresponding bit in the interrupt_x_mask.
+		 * 
+		 */
+		typedef enum
+		{
+			INT0LVL_OFF = PORT_INT0LVL_OFF_gc,
+			INT0LVL_LO = PORT_INT0LVL_LO_gc,
+			INT0LVL_MED = PORT_INT0LVL_MED_gc,
+			INT0LVL_HI = PORT_INT0LVL_HI_gc,
+		} InterruptLevel0;
+		
+		typedef enum
+		{
+			INT1LVL_OFF = PORT_INT1LVL_OFF_gc,
+			INT1LVL_LO = PORT_INT1LVL_LO_gc,
+			INT1LVL_MED = PORT_INT1LVL_MED_gc,
+			INT1LVL_HI = PORT_INT1LVL_HI_gc,
+		} InterruptLevel1;
 	}
 }
 
@@ -95,6 +132,8 @@ namespace xpcc
 		} \
 		\
 		ALWAYS_INLINE static bool read() { return (PORT ## port ## _IN & (1 << pin)); } \
+		ALWAYS_INLINE static PORT_t& getPort() { return PORT ## port;} \
+		ALWAYS_INLINE static uint8_t getMask() { return (1 << pin);} \
 	}
 
 /**
@@ -126,6 +165,8 @@ namespace xpcc
 				reset(); \
 			} \
 		} \
+		ALWAYS_INLINE static PORT_t& getPort() { return PORT ## port;} \
+		ALWAYS_INLINE static uint8_t getMask() { return (1 << pin);} \
 	}
 
 /**
@@ -145,6 +186,37 @@ namespace xpcc
 		\
 		ALWAYS_INLINE static void setInput() { PORT ## port ## _DIRCLR = (1 << pin); } \
 		ALWAYS_INLINE static bool read() { return (PORT ## port ## _IN & (1 << pin)); } \
+		ALWAYS_INLINE static void \
+		configureInputSense(::xpcc::gpio::InputSense inputSense){\
+			PORT ## port ## _PIN ## pin ## CTRL = (PORT ## port ## _PIN ## pin ## CTRL & ~PORT_ISC_gm) | inputSense; \
+		}\
+		\
+		ALWAYS_INLINE static void \
+		configureInterrupt0(::xpcc::gpio::InterruptLevel0 interruptLevel) { \
+			if (interruptLevel){\
+				PORT ## port ## _INT0MASK |= getMask();\
+				PORT ## port ## _INTCTRL = (PORT ## port ## _INTCTRL & ~PORT_INT0LVL_gm) | (interruptLevel & PORT_INT0LVL_gm);\
+			}\
+			else{\
+				PORT ## port ## _INT0MASK &= ~getMask();\
+			}\
+		} \
+		\
+		ALWAYS_INLINE static void \
+		configureInterrupt1(::xpcc::gpio::InterruptLevel1 interruptLevel) { \
+			if (interruptLevel){\
+				PORT ## port ## _INT1MASK |= getMask();\
+				PORT ## port ## _INTCTRL = (PORT ## port ## _INTCTRL & ~PORT_INT1LVL_gm) | (interruptLevel & PORT_INT1LVL_gm);\
+			}\
+			else{\
+				PORT ## port ## _INT1MASK &= ~getMask();\
+			}\
+		} \
+		\
+		ALWAYS_INLINE static PORT_t& getPort() { return PORT ## port;} \
+		ALWAYS_INLINE static uint8_t getMask() { return (1 << pin);} \
+		ALWAYS_INLINE static uint16_t getInterrupt0Vector() { return PORT ## port ## _INT0_vect_num;} \
+		ALWAYS_INLINE static uint16_t getInterrupt1Vector() { return PORT ## port ## _INT1_vect_num;} \
 	}
 
 // FIXME

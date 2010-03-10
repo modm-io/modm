@@ -68,9 +68,9 @@ namespace xpcc
 		inline static void
 		initialize()
 		{
-			SCLK::output();
-			MOSI::output();
-			MISO::input();
+			SCLK::setOutput();
+			MOSI::setOutput();
+			MISO::setInput();
 		}
 		
 		static uint8_t
@@ -92,7 +92,7 @@ namespace xpcc
 				SCLK::set();
 				delay_us(delay);
 				
-				if (MISO::get()) {
+				if (MISO::read()) {
 					in |= 1;
 				}
 				out <<= 1;
