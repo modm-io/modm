@@ -35,10 +35,10 @@ import SCons
 def generate(env, **kw):
 	builder_packets = SCons.Script.Builder(
 		action = SCons.Action.Action(
-			"python ${XPCC_SYSTEM_BUILDER}/cpp_packets.py " \
-				"--source_path ${TARGETS[0].dir} " \
-				"--header_path ${TARGETS[1].dir} " \
-				"$SOURCE",
+			'python "${XPCC_SYSTEM_BUILDER}/cpp_packets.py" ' \
+				'--source_path ${TARGETS[0].dir} ' \
+				'--header_path ${TARGETS[1].dir} ' \
+				'$SOURCE',
 			cmdstr="$SYSTEM_CPP_PACKETS_COMSTR"),
 		emitter = \
 			lambda target, source, env:
@@ -52,9 +52,9 @@ def generate(env, **kw):
 	
 	builder_identifier = SCons.Script.Builder(
 		action = SCons.Action.Action(
-			"python ${XPCC_SYSTEM_BUILDER}/cpp_identifier.py " \
-				"--outpath ${TARGET.dir} " \
-				"$SOURCE",
+			'python "${XPCC_SYSTEM_BUILDER}/cpp_identifier.py" ' \
+				'--outpath ${TARGET.dir} ' \
+				'$SOURCE',
 			cmdstr="$SYSTEM_CPP_IDENTIFIER_COMSTR"),
 		emitter = lambda target, source, env:
 			([os.path.join(str(source[0].dir), "robot/identifier.hpp")], source),

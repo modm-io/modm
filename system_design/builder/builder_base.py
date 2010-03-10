@@ -38,8 +38,8 @@ import jinja2		# template engine
 import textwrap
 from optparse import OptionParser
 
-sys.path = [os.path.dirname(__file__) + '/..'] + sys.path
-from parser.parser import Parser
+sys.path = [os.path.join(os.path.dirname(__file__), '..')] + sys.path
+from xmlparser.parser import Parser
 
 
 class BuilderException(Exception):
