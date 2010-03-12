@@ -109,3 +109,29 @@ xpcc::Communication::setCurrentComponent(uint8_t id)
 	this->currentComponent = id;
 }
 
+// ----------------------------------------------------------------------------
+void
+xpcc::Communication::callAction(uint8_t receiver, uint8_t actionIdentifier)
+{
+	Header header(	Header::REQUEST,
+					false,
+					receiver,
+					currentComponent,
+					actionIdentifier);
+
+	this->responseManager.addActionCall(header);
+}
+
+// ----------------------------------------------------------------------------
+void
+xpcc::Communication::callAction(uint8_t receiver, uint8_t actionIdentifier, Callback& responseCallback)
+{
+	Header header(	Header::REQUEST,
+					false,
+					receiver,
+					currentComponent,
+					actionIdentifier);
+
+	this->responseManager.addActionCall(header, responseCallback);
+}
+

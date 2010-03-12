@@ -94,11 +94,16 @@ namespace xpcc
 		void
 		setCurrentComponent(uint8_t id);
 		
+		void
+		callAction(uint8_t receiver, uint8_t actionIdentifier);
 		
 		template<typename T>
 		void
 		callAction(uint8_t receiver, uint8_t actionIdentifier, const T& data);
 		
+		void
+		callAction(uint8_t receiver, uint8_t actionIdentifier, Callback& responseCallback);
+
 		template<typename T>
 		void
 		callAction(uint8_t receiver, uint8_t actionIdentifier, const T& data, Callback& responseCallback);
