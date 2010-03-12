@@ -67,6 +67,20 @@ for id in range(0, 4):
 	env.Alias('templates', file)
 
 # -----------------------------------------------------------------------------
+# update more template files
+path = 'src/xpcc/architecture/atxmega/uart'
+for id in ['D0', 'D1', 'C0', 'C1']:
+	file = env.Template(target = os.path.join(path, 'uart%s.hpp' % id),
+						source = os.path.join(path, 'uart.hpp.in'),
+						SUBSTITUTIONS = { 'id': id })
+	env.Alias('templates', file)
+	
+	file = env.Template(target = os.path.join(path, 'uart%s.cpp' % id),
+						source = os.path.join(path, 'uart.cpp.in'),
+						SUBSTITUTIONS = { 'id': id })
+	env.Alias('templates', file)
+
+# -----------------------------------------------------------------------------
 # add target to create the doxygen documentation
 env.Doxygen('doc/doxyfile')
 env.Alias('doc', 'apidoc/html')

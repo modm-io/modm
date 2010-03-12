@@ -34,29 +34,55 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 
-#include "uart_{{ id }}.hpp"
+#include "uart{{ id }}.hpp"
 
-#ifdef USART{{ id }}
+// TODO:
+//#ifdef USART{{ id }}
 
 // ----------------------------------------------------------------------------
 void
 xpcc::Uart{{ id }}::setBaudrateRegister(uint16_t ubrr)
 {
+	// set baud rate
+	if (ubrr & 0x8000) {
+		USART{{ id }}_CTRLB = USART_CLK2X_bm;  //Enable 2x speed 
+		ubrr &= ~0x8000;
+	}
+	else {
+		USARTD1_CTRLB = 0;
+	}
+	USART{{ id }}_BAUDCTRLB   = (uint8_t) (ubrr >> 8);
+	USART{{ id }}_BAUDCTRLA   = (uint8_t)  ubrr;
+	
+	// this line would enable receive complete interrupt
+	// USART{{ id }}_CTRLA = USART_RXCINTLVL_MED_gc;
+	
+	// setting the frame size to 8 bit
+	USART{{ id }}_CTRLC = USART_CHSIZE_8BIT_gc;
+	// enable both, receiver and transmitter
+	USART{{ id }}_CTRLB |= USART_RXEN_bm|USART_TXEN_bm;
 }
 
 // ----------------------------------------------------------------------------
 void
 xpcc::Uart{{ id }}::put(char c)
 {
-	
+	while(!(USART{{ id }}_STATUS & USART_DREIF_bm))
+		;
+	USART{{ id }}_DATA = c;
 }
 
 // ----------------------------------------------------------------------------
 bool
 xpcc::Uart{{ id }}::get(char& c)
 {
+	if (USART{{ id }}_STATUS & USART_RXCIF_bm){
+		// USART_RXCIF_bm is cleared reading DATA
+		c = USART{{ id }}_DATA;
+		return true;
+	}
 	return false;
 }
 
-#endif // USART{{ id }}
+//#endif // USART{{ id }}
 
