@@ -129,11 +129,22 @@ def generate_environment(env, configfile, rootpath, buildpath = None):
 		Exit(1)
 	
 	if 'fusebits' in configuration:
-		for key, value in configuration['fusebits'].items():
-			if key not in ['lfuse', 'hfuse', 'efuse']:
-				print "Unknown fusebit '%s'! Allowed values are 'lfuse', 'hfuse' and 'efuse'!" % key
-				Exit(1)
-			new.Append(AVR_FUSEBITS = {key: value} )
+		if architecture == 'atmega':
+			fuses = ['lfuse', 'hfuse', 'efuse']
+			for key, value in configuration['fusebits'].items():
+				if key not in fuses:
+					print "Unknown fusebit '%s'! Allowed values are '%s'!" % (key, "', '".join(fuses))
+					Exit(1)
+				new.Append(AVR_FUSEBITS = {key: value} )
+		elif architecture == 'atxmega':
+			fuses = ['fuse0', 'fuse1', 'fuse2', 'fuse4', 'fuse5']
+			for key, value in configuration['fusebits'].items():
+				if key not in fuses:
+					print "Unknown fusebit '%s'! Allowed values are '%s'!" % (key, "', '".join(fuses))
+					Exit(1)
+				new.Append(AVR_FUSEBITS = {key: value} )
+		else:
+			print "Ignoring 'fusebit' section in project configuration."
 	
 	# append all values from environment section to the real environment
 	for key, value in configuration['environment'].iteritems():
