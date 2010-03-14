@@ -34,7 +34,7 @@
 #define	UNITTEST__CONTROLLER_HPP
 
 #include <xpcc/communication/io/iostream.hpp>
-#include <xpcc/architecture/general/flash/flash_pointer.hpp>
+#include <xpcc/architecture/general/accessor/flash.hpp>
 
 #include "reporter.hpp"
 
@@ -75,7 +75,7 @@ namespace unittest
 		 *					to generate messages
 		 */
 		void
-		nextTestSuite(xpcc::FlashPointer<char> name) const;
+		nextTestSuite(xpcc::accessor::Flash<char> name) const;
 	
 	private:
 		Controller();

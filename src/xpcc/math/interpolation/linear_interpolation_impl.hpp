@@ -36,18 +36,20 @@
 
 // ----------------------------------------------------------------------------
 
-template<typename T>
-xpcc::LinearInterpolation<T>::LinearInterpolation(FlashPointer<T> points,
-												  uint8_t numPoints):
+template <typename T,
+		  template <typename> class Accessor>
+xpcc::LinearInterpolation<T, Accessor>::LinearInterpolation(
+		Accessor<T> points, uint8_t numPoints) :
 	points(points), numPoints(numPoints)
 {
 }
 	
 // ----------------------------------------------------------------------------
 
-template<typename T>
-typename xpcc::LinearInterpolation<T>::OutputType
-xpcc::LinearInterpolation<T>::interpolate(const InputType& value) const
+template <typename T,
+		  template <typename> class Accessor>
+typename xpcc::LinearInterpolation<T, Accessor>::OutputType
+xpcc::LinearInterpolation<T, Accessor>::interpolate(const InputType& value) const
 {
 	T current(points[0]);
 	

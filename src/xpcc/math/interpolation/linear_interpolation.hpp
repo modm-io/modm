@@ -36,7 +36,7 @@
 #include <stdint.h>
 
 #include <xpcc/data_structure/pair.hpp>
-#include <xpcc/architecture/general/flash/flash_pointer.hpp>
+#include <xpcc/architecture/general/accessor.hpp>
 
 namespace xpcc
 {
@@ -57,7 +57,7 @@ namespace xpcc
 	 *     { 220, 20000 }
 	 * };
 	 * 
-	 * xpcc::LinearInterpolation<MyPair> value(xpcc::modifier::flash(flashValues), 6);
+	 * xpcc::LinearInterpolation<MyPair> value(xpcc::modifier::asFlash(flashValues), 6);
 	 * 
 	 * ...
 	 * 
@@ -69,7 +69,8 @@ namespace xpcc
 	 * 
 	 * \todo	needs documentation
 	 */
-	template <typename T>
+	template <typename T,
+			  template <typename> class Accessor = ::xpcc::accessor::Ram>
 	class LinearInterpolation
 	{
 	public:
@@ -77,13 +78,13 @@ namespace xpcc
 		typedef typename T::SecondType OutputType;
 	
 	public:
-		LinearInterpolation(FlashPointer<T> points, uint8_t numPoints);
+		LinearInterpolation(Accessor<T> points, uint8_t numPoints);
 		
 		OutputType 
 		interpolate(const InputType& value) const;
 		
 	private:
-		const FlashPointer<T> points;
+		const accessor::Flash<T> points;
 		const uint8_t numPoints; 
 	};
 }

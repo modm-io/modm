@@ -34,7 +34,7 @@
 #define	XPCC__LAGRANGE_INTERPOLATION_HPP
 
 #include <stdint.h>
-#include <xpcc/architecture/general/flash/flash_pointer.hpp>
+#include <xpcc/architecture/general/accessor/flash.hpp>
 
 namespace xpcc
 {
@@ -48,13 +48,13 @@ namespace xpcc
 	class LagrangeInterpolation
 	{
 	public:
-		LagrangeInterpolation(FlashPointer<T> points, uint8_t numPoints);
+		LagrangeInterpolation(accessor::Flash<T> points, uint8_t numPoints);
 		
 		T 
 		interpolate(const T& value) const;
 		
 	private:
-		FlashPointer<T> points;
+		accessor::Flash<T> points;
 		uint8_t numPoints; 
 	};
 }

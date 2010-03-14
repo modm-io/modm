@@ -30,128 +30,131 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC__FLASH_POINTER_HPP
-#define	XPCC__FLASH_POINTER_HPP
+#ifndef	XPCC_ACCESSOR__FLASH_HPP
+#define	XPCC_ACCESSOR__FLASH_HPP
 
 #include <xpcc/utils/macros.hpp>
 #include <xpcc/utils/modifier.hpp>
-#include <xpcc/utils/typet.hpp>
+
 #include <xpcc/communication/io/iostream.hpp>
 
 #include "flash_reader.hpp"
 
 namespace xpcc
 {
-	/**
-	 * \ingroup	architecture
-	 * \brief	Pointer to flash memory
-	 * 
-	 * This template can mostly be used like a regular pointer, but operates
-	 * on the flash memory rather than RAM. It will automatically read the 
-	 * data from flash when dereferenced.
-	 * 
-	 * Based on a implementation of Rolf Magnus, see
-	 * http://www.mikrocontroller.net/topic/78610#656695
-	 * 
-	 * \author	Fabian Greif <fabian.greif@rwth-aachen.de>
-	 */
-	template<typename T>
-	class FlashPointer
+	namespace accessor
 	{
-	public:
-		ALWAYS_INLINE
-		explicit FlashPointer(const T* address = 0) :
-			address(address)
+		/**
+		 * \brief	Pointer to flash memory
+		 * 
+		 * This template can mostly be used like a regular pointer, but operates
+		 * on the flash memory rather than RAM. It will automatically read the 
+		 * data from flash when dereferenced.
+		 * 
+		 * Based on a implementation of Rolf Magnus, see
+		 * http://www.mikrocontroller.net/topic/78610#656695
+		 * 
+		 * \ingroup	architecture
+		 * \author	Fabian Greif <fabian.greif@rwth-aachen.de>
+		 */
+		template<typename T>
+		class Flash
 		{
-		}
-		
-		template <typename U>
-		ALWAYS_INLINE
-		explicit FlashPointer(const FlashPointer<U>& rhs) :
-			address((T*) rhs.address)
-		{
-		}
-		
-		ALWAYS_INLINE
-		const T
-		operator *() const
-		{
-			return FlashReader<T, sizeof(T)>::read(address);
-		}
-		
-		ALWAYS_INLINE
-		const T
-		operator [](size_t index) const
-		{
-			return FlashReader<T, sizeof(T)>::read(address + index);
-		}
-		
-		ALWAYS_INLINE
-		FlashPointer&
-		operator++()
-		{
-			*this += 1;
-			return *this;
-		}
+		public:
+			ALWAYS_INLINE
+			explicit Flash(const T* address = 0) :
+				address(address)
+			{
+			}
+			
+			template <typename U>
+			ALWAYS_INLINE
+			explicit Flash(const Flash<U>& rhs) :
+				address((T*) rhs.address)
+			{
+			}
+			
+			ALWAYS_INLINE
+			const T
+			operator *() const
+			{
+				return FlashReader<T, sizeof(T)>::read(address);
+			}
+			
+			ALWAYS_INLINE
+			const T
+			operator [](size_t index) const
+			{
+				return FlashReader<T, sizeof(T)>::read(address + index);
+			}
+			
+			ALWAYS_INLINE
+			Flash&
+			operator++()
+			{
+				*this += 1;
+				return *this;
+			}
 
-		ALWAYS_INLINE
-		FlashPointer
-		operator++(int)
-		{
-			FlashPointer ret = *this;
-			++*this;
-			return ret;
-		}
+			ALWAYS_INLINE
+			Flash
+			operator++(int)
+			{
+				Flash ret = *this;
+				++*this;
+				return ret;
+			}
 
-		ALWAYS_INLINE
-		FlashPointer&
-		operator--()
-		{
-			*this -= 1;
-			return *this;
-		}
+			ALWAYS_INLINE
+			Flash&
+			operator--()
+			{
+				*this -= 1;
+				return *this;
+			}
 
-		ALWAYS_INLINE
-		FlashPointer&
-		operator--(int)
-		{
-			FlashPointer ret = *this;
-			--*this;
-			return ret;
-		}
+			ALWAYS_INLINE
+			Flash&
+			operator--(int)
+			{
+				Flash ret = *this;
+				--*this;
+				return ret;
+			}
+			
+			ALWAYS_INLINE
+			Flash&
+			operator+=(size_t rhs)
+			{
+				address += rhs;
+				return *this;
+			}
+			
+			ALWAYS_INLINE
+			Flash&
+			operator-=(size_t rhs)
+			{
+				address -= rhs;
+				return *this;
+			}
+			
+			ALWAYS_INLINE
+			const T*
+			getPointer() const
+			{
+				return address;
+			}
 		
-		ALWAYS_INLINE
-		FlashPointer&
-		operator+=(size_t rhs)
-		{
-			address += rhs;
-			return *this;
-		}
+		private:
+			const T* address;
 		
-		ALWAYS_INLINE
-		FlashPointer&
-		operator-=(size_t rhs)
-		{
-			address -= rhs;
-			return *this;
-		}
-		
-		ALWAYS_INLINE
-		const T*
-		getPointer() const
-		{
-			return address;
-		}
-	
-	private:
-		const T* address;
-	
-	private:
-		template <typename U>
-		friend IOStream&
-		operator << ( IOStream&, const FlashPointer<U>&);
-	};
-};
+		private:
+			template <typename U>
+			friend IOStream&
+			operator << ( IOStream&, const Flash<U>&);
+		};
+	}
+}
 
 // -----------------------------------------------------------------------------
 // IMPLEMENTATION
@@ -165,7 +168,7 @@ namespace xpcc
  */
 template<typename T>
 xpcc::IOStream&
-operator << ( xpcc::IOStream& os, xpcc::FlashPointer<T> ptr)
+operator << (xpcc::IOStream& os, xpcc::accessor::Flash<T> ptr)
 {
 	ptr.XPCC_NOT_IMPLEMENTED_YET_streamoperator_of_not_char_type;
 	// Not implemented YET
@@ -181,6 +184,6 @@ operator << ( xpcc::IOStream& os, xpcc::FlashPointer<T> ptr)
  * \ingroup architecture
  */
 xpcc::IOStream&
-operator << ( xpcc::IOStream& os, xpcc::FlashPointer<char> ptr);
+operator << (xpcc::IOStream& os, xpcc::accessor::Flash<char> ptr);
 
-#endif	// XPCC__FLASH_POINTER_HPP
+#endif	// XPCC_ACCESSOR__FLASH_HPP

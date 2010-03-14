@@ -30,27 +30,67 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/architecture/general/flash/flash_pointer.hpp>
+#ifndef	XPCC__FLASH_READER_HPP
+#define	XPCC__FLASH_READER_HPP
 
-#include "flash_test.hpp"
+#include <xpcc/utils/macros.hpp>
 
-FLASH(int intValue) = 12345;
+#ifdef	__DOXYGEN__
 
-void
-FlashTest::testIntegerAccess()
-{
-	xpcc::FlashPointer<int> intPointer(&intValue);
+	/** 
+	 * \brief	Define a flash variable
+	 * \ingroup	architecture
+	 */
+	#define	FLASH(var)
+
+	/**
+	 * \brief	Define a flash string
+	 * \ingroup	architecture
+	 */
+	#define	FLASH_STRING(s)
+
+	/**
+	 * \brief	Declare a flash string
+	 * \ingroup	architecture
+	 */
+	#define	EXTERN_FLASH_STRING(s)
+
+#else // !__DOXYGEN__
+
+	#ifdef	__AVR__
 	
-	TEST_ASSERT_EQUALS(*intPointer, 12345);
-}	
-
-FLASH_STRING(stringValue) = "Hallo Welt!";
-
-void
-FlashTest::testStringAccess()
-{
-	char string[] = "Hallo Welt!";
-	xpcc::FlashPointer<char> stringPointer(stringValue);
+		#include "flash_reader_avr_impl.hpp"
 	
-	TEST_ASSERT_EQUALS_ARRAY(stringPointer, string, sizeof(string));
-}
+	#else
+	
+		#include <string.h>
+		#include <xpcc/utils/macros.hpp>
+
+		// A simple implementation for all targets that don't have a
+		// strikt separation between Flash and RAM like the AVRs does.
+		
+		#define	FLASH(var)				const var
+		#define	EXTERN_FLASH(var)		extern const var
+
+		#define	FLASH_STRING(s)			const char s[]
+		#define	EXTERN_FLASH_STRING(s)	extern const char s[]
+
+		namespace xpcc
+		{
+			template<typename T, size_t size>
+			struct FlashReader
+			{
+				ALWAYS_INLINE
+				static T
+				read(const T* p)
+				{
+					return *p;
+				}
+			};
+		}
+		
+	#endif
+
+#endif
+
+#endif	// XPCC__FLASH_READER_HPP

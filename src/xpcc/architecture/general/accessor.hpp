@@ -30,62 +30,10 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__DOG_M16X_HPP
-#define XPCC__DOG_M16X_HPP
+#ifndef XPCC__ACCESSOR_HPP
+#define XPCC__ACCESSOR_HPP
 
-#include <xpcc/driver/lcd/lcd.hpp>
+#include "accessor/ram.hpp"
+#include "accessor/flash.hpp"
 
-#include <xpcc/architecture/general/accessor/flash.hpp>
-#include <xpcc/architecture/general/time/delay.hpp>
-
-namespace xpcc
-{
-	/**
-	 * \brief	Driver for DOG-M162
-	 * 
-	 * \todo	documentation
-	 * \todo	make this class adaptable to other voltages and line counts!
-	 * 
-	 * \see		Lcd
-	 * 
-	 * \author	Fabian Greif
-	 * \ingroup	driver
-	 */
-	template <typename SPI, typename CS, typename RS>
-	class DogM16x : public Lcd
-	{
-	public:
-		/// Constructor
-		DogM16x();
-		
-		/**
-		 * \brief	Initialize the display
-		 * 
-		 * The display needs some time to initalize after startup. You have
-		 * to wait at least 50 ms until calling this method.
-		 */
-		virtual void
-		initialize();
-		
-		virtual void
-		putRaw(char c);
-		
-		//virtual void
-		//command(Command command);
-		
-		virtual void
-		setPosition(uint8_t line, uint8_t column);
-		
-		// TODO
-		//void
-		//setContrast();
-	
-	protected:
-		void
-		writeCommand(uint8_t command);
-	};
-}
-
-#include "dog_m16x_impl.hpp"
-
-#endif // XPCC__DOG_M16X_HPP
+#endif // XPCC__ACCESSOR_HPP

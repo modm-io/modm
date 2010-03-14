@@ -32,7 +32,7 @@
 
 #include "iostream.hpp"
 
-#include <xpcc/architecture/general/flash/flash_pointer.hpp>
+#include <xpcc/architecture/general/accessor/flash.hpp>
 
 FLASH(uint16_t base[]) = { 10, 100, 1000, 10000 };
 
@@ -48,7 +48,7 @@ xpcc::IOStream::IOStream(IODevice& device) :
 void
 xpcc::IOStream::putInteger(int16_t value)
 {
-	FlashPointer<uint16_t> basePtr = xpcc::modifier::flash(base);
+	accessor::Flash<uint16_t> basePtr = xpcc::modifier::asFlash(base);
 	
 	if (value < 0) {
 		value = -value;
@@ -78,7 +78,7 @@ void
 xpcc::IOStream::putInteger(uint16_t value)
 {
 	bool zero = true;
-	FlashPointer<uint16_t> basePtr = xpcc::modifier::flash(base);
+	accessor::Flash<uint16_t> basePtr = xpcc::modifier::asFlash(base);
 
 	uint8_t i = 4;
 	do {

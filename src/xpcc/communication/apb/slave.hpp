@@ -2,7 +2,7 @@
 // ----------------------------------------------------------------------------
 /* Copyright (c) 2009, Roboterclub Aachen e.V.
  * All rights reserved.
- *
+ * 
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  * 
@@ -14,7 +14,7 @@
  *     * Neither the name of the Roboterclub Aachen e.V. nor the
  *       names of its contributors may be used to endorse or promote products
  *       derived from this software without specific prior written permission.
- *
+ * 
  * THIS SOFTWARE IS PROVIDED BY ROBOTERCLUB AACHEN E.V. ''AS IS'' AND ANY
  * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -25,67 +25,78 @@
  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
+ * 
  * $Id$
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__DOG_M16X_HPP
-#define XPCC__DOG_M16X_HPP
-
-#include <xpcc/driver/lcd/lcd.hpp>
+#ifndef	XPCC_APB__SLAVE_HPP
+#define	XPCC_APB__SLAVE_HPP
 
 #include <xpcc/architecture/general/accessor/flash.hpp>
-#include <xpcc/architecture/general/time/delay.hpp>
+
+#include "interface.hpp"
 
 namespace xpcc
 {
-	/**
-	 * \brief	Driver for DOG-M162
-	 * 
-	 * \todo	documentation
-	 * \todo	make this class adaptable to other voltages and line counts!
-	 * 
-	 * \see		Lcd
-	 * 
-	 * \author	Fabian Greif
-	 * \ingroup	driver
-	 */
-	template <typename SPI, typename CS, typename RS>
-	class DogM16x : public Lcd
+	namespace apb
 	{
-	public:
-		/// Constructor
-		DogM16x();
-		
 		/**
-		 * \brief	Initialize the display
+		 * \brief	APB Slave
 		 * 
-		 * The display needs some time to initalize after startup. You have
-		 * to wait at least 50 ms until calling this method.
+		 * \todo	documentation
+		 * 
+		 * \ingroup	apb
+		 * \author	Fabian Greif
 		 */
-		virtual void
-		initialize();
-		
-		virtual void
-		putRaw(char c);
-		
-		//virtual void
-		//command(Command command);
-		
-		virtual void
-		setPosition(uint8_t line, uint8_t column);
-		
-		// TODO
-		//void
-		//setContrast();
-	
-	protected:
-		void
-		writeCommand(uint8_t command);
-	};
+		template <typename INTERFACE>
+		class Slave
+		{
+		public:
+			typedef typename INTERFACE::ErrorCode ErrorCode;
+			
+			struct Action
+			{
+				typedef void (*Callback)(Slave<INTERFACE>& slave, const uint8_t *payload);
+				
+				uint8_t command;
+				uint8_t payloadLength;
+				Callback function;
+			};
+			
+		public:
+			/**
+			 * \brief	Initialize the slave
+			 * 
+			 * \param	address		Own address
+			 * \param	actionList	List of all action callbacks, need to be
+			 * 						stored in flash-memory
+			 * \param	actionCount	Number of entries in \a actionList
+			 */
+			Slave(uint8_t address, xpcc::accessor::Flash<Action> actionList, uint8_t actionCount);
+			
+			void
+			sendErrorResponse(uint8_t errorCode = INTERFACE::GENERAL_ERROR);
+			
+			void
+			sendResponse();
+			
+			void
+			sendResponse(const uint8_t *payload, uint8_t payloadLength);
+			
+			void
+			update();
+			
+		private:
+			uint8_t ownAddress;
+			xpcc::accessor::Flash<Action> actionList;
+			uint8_t actionCount;
+			
+			uint8_t currentCommand;
+		};
+	}
 }
 
-#include "dog_m16x_impl.hpp"
+#include "slave_impl.hpp"
 
-#endif // XPCC__DOG_M16X_HPP
+#endif	// XPCC_APB__SLAVE_HPP

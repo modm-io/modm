@@ -40,16 +40,16 @@
 
 // ----------------------------------------------------------------------------
 
+template <typename DEVICE> const uint8_t xpcc::apb::Interface<DEVICE>::masterAddress = 0;
+
 template <typename DEVICE> const uint8_t xpcc::apb::Interface<DEVICE>::syncByte = 0x54;
 template <typename DEVICE> const uint8_t xpcc::apb::Interface<DEVICE>::crcInitialValue = 0x00;
+template <typename DEVICE> const uint8_t xpcc::apb::Interface<DEVICE>::maxPayloadLength = 32;
 
 template <typename DEVICE> typename xpcc::apb::Interface<DEVICE>::State \
 	xpcc::apb::Interface<DEVICE>::state = SYNC;
 
-template <typename DEVICE> uint8_t xpcc::apb::Interface<DEVICE>::buffer[32];
-template <typename DEVICE> typename xpcc::apb::Interface<DEVICE>::Header \
-	xpcc::apb::Interface<DEVICE>::header;
-template <typename DEVICE> uint8_t xpcc::apb::Interface<DEVICE>::command;
+template <typename DEVICE> uint8_t xpcc::apb::Interface<DEVICE>::buffer[32+3];
 template <typename DEVICE> uint8_t xpcc::apb::Interface<DEVICE>::crc;
 template <typename DEVICE> uint8_t xpcc::apb::Interface<DEVICE>::position;
 template <typename DEVICE> uint8_t xpcc::apb::Interface<DEVICE>::length;
@@ -69,15 +69,19 @@ xpcc::apb::Interface<DEVICE>::initialize()
 
 template <typename DEVICE>
 void
-xpcc::apb::Interface<DEVICE>::sendMessage(Header header, uint8_t command, const uint8_t *data, uint8_t size)
+xpcc::apb::Interface<DEVICE>::sendMessage(uint8_t header, uint8_t command, const uint8_t *data, uint8_t size)
 {
+	uint8_t crc;
+	
 	DEVICE::write(syncByte);
-	DEVICE::write((static_cast<uint8_t>(header) & 0xe0) | (size & 0x1f));
-	
-	uint8_t crc = crcUpdate(crcInitialValue, command);
+	DEVICE::write(size);
+	crc = crcUpdate(crcInitialValue, size);
+	DEVICE::write(header);
+	crc = crcUpdate(crc, header);
 	DEVICE::write(command);
+	crc = crcUpdate(crc, command);
 	
-	for (uint_fast8_t i = 0; i < (size & 0x1f); ++i)
+	for (uint_fast8_t i = 0; i < size; ++i)
 	{
 		crc = crcUpdate(crc, *data);
 		DEVICE::write(*data);
@@ -93,28 +97,42 @@ template <typename DEVICE>
 bool
 xpcc::apb::Interface<DEVICE>::isMessageAvailable()
 {
-	return (lengthOfReceivedMessage > 0);
+	return (lengthOfReceivedMessage != 0);
 }
 
 template <typename DEVICE>
 uint8_t
-xpcc::apb::Interface<DEVICE>::getLength()
+xpcc::apb::Interface<DEVICE>::getAddress()
 {
-	return lengthOfReceivedMessage;
+	return (buffer[0] & 0x1f);
 }
 
 template <typename DEVICE>
 uint8_t
 xpcc::apb::Interface<DEVICE>::getCommand()
 {
-	return command;
+	return (buffer[1] & 0x7f);
+}
+
+template <typename DEVICE>
+bool
+xpcc::apb::Interface<DEVICE>::isAcknowledge()
+{
+	return (buffer[1] & 0x80) ? true : false;
 }
 
 template <typename DEVICE>
 const uint8_t*
-xpcc::apb::Interface<DEVICE>::getData()
+xpcc::apb::Interface<DEVICE>::getPayload()
 {
-	return buffer;
+	return &buffer[2];
+}
+
+template <typename DEVICE>
+uint8_t
+xpcc::apb::Interface<DEVICE>::getPayloadLength()
+{
+	return (lengthOfReceivedMessage - 3);
 }
 
 template <typename DEVICE>
@@ -137,21 +155,20 @@ xpcc::apb::Interface<DEVICE>::update()
 		{
 			case SYNC:
 				if (byte == syncByte) {
-					state = HEADER;
+					state = LENGTH;
 				}
 				break;
 			
-			case HEADER:
-				length = (byte & 0x1f) + 1;		// +1 for the crc byte
-				header = static_cast<Header>(byte & 0xe0);
-				state = COMMAND;
-				break;
-			
-			case COMMAND:
-				command = byte;
-				crc = crcUpdate(crcInitialValue, byte);
-				position = 0;
-				state = DATA;
+			case LENGTH:
+				if (byte > maxPayloadLength) {
+					state = SYNC;
+				}
+				else {
+					length = byte + 3;		// +3 for header, command and crc byte
+					position = 0;
+					crc = crcUpdate(crcInitialValue, byte);
+					state = DATA;
+				}
 				break;
 			
 			case DATA:
@@ -162,7 +179,7 @@ xpcc::apb::Interface<DEVICE>::update()
 				if (position >= length) {
 					state = SYNC;
 					if (crc == 0) {
-						lengthOfReceivedMessage = length - 1;
+						lengthOfReceivedMessage = length;
 					}
 				}
 				break;

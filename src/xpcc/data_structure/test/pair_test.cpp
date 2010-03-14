@@ -31,7 +31,7 @@
 // ----------------------------------------------------------------------------
 
 #include <xpcc/data_structure/pair.hpp>
-#include <xpcc/architecture/general/flash/flash_pointer.hpp>
+#include <xpcc/architecture/general/accessor/flash.hpp>
 
 #include "pair_test.hpp"
 
@@ -47,7 +47,7 @@ FLASH(myPair values[]) = {
 void
 PairTest::testPair()
 {
-	xpcc::FlashPointer<myPair> ptr(values);
+	xpcc::accessor::Flash<myPair> ptr(values);
 	
 	TEST_ASSERT_EQUALS(ptr[1].getFirst(), 5);
 	TEST_ASSERT_EQUALS(ptr[1].getSecond(), 30);

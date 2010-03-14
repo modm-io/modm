@@ -36,7 +36,7 @@
 #include <stdint.h>
 
 #include <xpcc/communication/io/iostream.hpp>
-#include <xpcc/architecture/general/flash/flash_pointer.hpp>
+#include <xpcc/architecture/general/accessor/flash.hpp>
 
 namespace unittest
 {
@@ -64,7 +64,7 @@ namespace unittest
 		 * \param	name	Name of the test suite
 		 */
 		void
-		nextTestSuite(xpcc::FlashPointer<char> name);
+		nextTestSuite(xpcc::accessor::Flash<char> name);
 		
 		/**
 		 * \brief	Report a passed test
@@ -95,7 +95,7 @@ namespace unittest
 		
 	private:
 		xpcc::IOStream outputStream;
-		xpcc::FlashPointer<char> testName;
+		xpcc::accessor::Flash<char> testName;
 		
 		int_fast16_t testsPassed;
 		int_fast16_t testsFailed;

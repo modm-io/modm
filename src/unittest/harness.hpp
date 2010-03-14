@@ -100,7 +100,7 @@
 
 #else // !__DOXYGEN__
 
-#include <xpcc/architecture/general/flash/flash_pointer.hpp>
+#include <xpcc/architecture/general/accessor/flash.hpp>
 
 namespace unittest
 {
@@ -141,7 +141,7 @@ namespace unittest
 		}
 		else {
 			TEST_REPORTER__.reportFailure(line)
-				<< a << xpcc::modifier::flash(unittest::stringEqual) << b << '\n';
+				<< a << xpcc::modifier::asFlash(unittest::stringEqual) << b << '\n';
 			return false;
 		}
 	}
@@ -157,7 +157,7 @@ namespace unittest
 		}
 		else {
 			TEST_REPORTER__.reportFailure(line)
-				<< a << xpcc::modifier::flash(unittest::stringEqual) << b << '\n';
+				<< a << xpcc::modifier::asFlash(unittest::stringEqual) << b << '\n';
 			return false;
 		}
 	}
@@ -173,7 +173,7 @@ namespace unittest
 		}
 		else {
 			TEST_REPORTER__.reportFailure(line)
-				<< value << xpcc::modifier::flash(unittest::stringNotInRange)
+				<< value << xpcc::modifier::asFlash(unittest::stringNotInRange)
 				<< '[' << lower << ',' << upper << ']' << '\n';
 			return false;
 		}

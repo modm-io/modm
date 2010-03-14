@@ -60,7 +60,7 @@ xpcc::DogM16x<SPI, CS, RS>::initialize()
 	CS::setOutput();
 	RS::setOutput();
 	
-	FlashPointer<uint8_t> cfgPtr(dog_m16x::configuration);
+	accessor::Flash<uint8_t> cfgPtr(dog_m16x::configuration);
 	for (uint8_t i = 0; i < 10; ++i)
 	{
 		writeCommand(cfgPtr[i]);

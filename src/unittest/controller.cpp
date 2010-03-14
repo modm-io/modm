@@ -50,7 +50,7 @@ unittest::Controller::getReporter() const
 }
 
 void
-unittest::Controller::nextTestSuite(xpcc::FlashPointer<char> name) const
+unittest::Controller::nextTestSuite(xpcc::accessor::Flash<char> name) const
 {
 	reporter->nextTestSuite(name);
 }

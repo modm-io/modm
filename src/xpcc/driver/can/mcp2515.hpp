@@ -34,7 +34,7 @@
 #define XPCC__MCP2515_HPP
 
 #include <stdint.h>
-#include <xpcc/architecture/general/flash/flash_pointer.hpp>
+#include <xpcc/architecture/general/accessor/flash.hpp>
 #include <xpcc/architecture/general/time/delay.hpp>
 
 #include "can.hpp"
@@ -111,7 +111,7 @@ namespace xpcc
 		initialize(Can::Bitrate bitrate);
 		
 		static void
-		setFilter(FlashPointer<uint8_t> filter);
+		setFilter(accessor::Flash<uint8_t> filter);
 		
 		static void
 		setMode(Can::Mode mode);

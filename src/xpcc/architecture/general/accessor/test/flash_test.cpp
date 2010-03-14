@@ -30,35 +30,27 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC__FLASH_READER_HPP
-#define	XPCC__FLASH_READER_HPP
+#include <xpcc/architecture/general/accessor/flash.hpp>
 
-#include <xpcc/utils/macros.hpp>
+#include "flash_test.hpp"
 
-#ifdef	__DOXYGEN__
-	/** 
-	 * \brief	Define a flash variable
-	 * \ingroup	architecture
-	 */
-	#define	FLASH(var)
+FLASH(int intValue) = 12345;
 
-	/**
-	 * \brief	Define a flash string
-	 * \ingroup	architecture
-	 */
-	#define	FLASH_STRING(s)
+void
+FlashTest::testIntegerAccess()
+{
+	xpcc::accessor::Flash<int> intPointer(&intValue);
+	
+	TEST_ASSERT_EQUALS(*intPointer, 12345);
+}	
 
-	/**
-	 * \brief	Declare a flash string
-	 * \ingroup	architecture
-	 */
-	#define	EXTERN_FLASH_STRING(s)
-#else // !__DOXYGEN__
-	#ifdef	__AVR__
-		#include "flash_reader_avr_impl.hpp"
-	#else
-		#include "flash_reader_impl.hpp"
-	#endif
-#endif
+FLASH_STRING(stringValue) = "Hallo Welt!";
 
-#endif	// XPCC__FLASH_READER_HPP
+void
+FlashTest::testStringAccess()
+{
+	char string[] = "Hallo Welt!";
+	xpcc::accessor::Flash<char> stringPointer(stringValue);
+	
+	TEST_ASSERT_EQUALS_ARRAY(stringPointer, string, sizeof(string));
+}

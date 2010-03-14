@@ -55,8 +55,16 @@ namespace xpcc
 			typedef enum {
 				ACK = 0x80,
 				NACK = 0x00
-			} Header;
-		
+			} Flags;
+			
+			typedef enum {
+				GENERAL_ERROR = 0,
+				NO_ACTION,
+				WRONG_PAYLOAD_SIZE
+			} ErrorCode;
+			
+			static const uint8_t masterAddress;
+			
 		public:
 			/**
 			 * \brief	Initialize the interface
@@ -69,13 +77,13 @@ namespace xpcc
 			/**
 			 * \brief	Send a message
 			 * 
-			 * \param	header	header flags
+			 * \param	address	header flags and receiver address
 			 * \param	command	command bytes
-			 * \param	*data	data field
-			 * \param	size	size of the data field
+			 * \param	*payload		data field
+			 * \param	payloadLength	size of the data field
 			 */
 			static void
-			sendMessage(Header header, uint8_t command, const uint8_t *data, uint8_t size);
+			sendMessage(uint8_t address, uint8_t command, const uint8_t *payload, uint8_t payloadLength);
 			
 			/**
 			 * \brief	Check if a message was received
@@ -85,24 +93,30 @@ namespace xpcc
 			static inline bool
 			isMessageAvailable();
 			
+			static inline uint8_t
+			getAddress();
+			
+			static inline uint8_t
+			getCommand();
+			
+			static inline bool
+			isAcknowledge();
+			
+			/**
+			 * \brief	Access the data of a received message
+			 * 
+			 * Data access is only valid after isMessageAvailable() returns
+			 * \c true and before any call of dropMessage() or update()
+			 */
+			static inline const uint8_t *
+			getPayload();
+			
 			/**
 			 * \return	Size of the received message. Zero if no message
 			 * 			is available at the moment.
 			 */
 			static inline uint8_t
-			getLength();
-			
-			static inline uint8_t
-			getCommand();
-			
-			/**
-			 * \brief	Access the data of a received message
-			 * 
-			 * Data access is only valid after checkForMessage() returns
-			 * not zero and before any call of dropMessage() and update()
-			 */
-			static inline const uint8_t *
-			getData();
+			getPayloadLength();
 			
 			/**
 			 * \brief	End procession of the current message
@@ -125,17 +139,15 @@ namespace xpcc
 		private:
 			static const uint8_t syncByte;
 			static const uint8_t crcInitialValue;
+			static const uint8_t maxPayloadLength;
 			
 			typedef enum {
 				SYNC,
-				HEADER,
-				COMMAND,
+				LENGTH,
 				DATA
 			} State;
 			
-			static uint8_t buffer[32];
-			static Header header;
-			static uint8_t command;
+			static uint8_t buffer[32+3];
 			static uint8_t crc;
 			static uint8_t position;
 			static uint8_t length;

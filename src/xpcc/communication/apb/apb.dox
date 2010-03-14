@@ -16,19 +16,17 @@ standard 0-3,3V levels are used.
 
 \section protocol Protocol
 
-TBD
-
 Features:
- - Baudrate is 38400 Baud.	TODO
- - Maximum payload length is 31 byte.
+ - Baudrate is 115200 Baud.
+ - Maximum payload length is 32 byte.
  - CRC8 (1-Wire)
 
 \subsection structure	Structure
 
 \verbatim
-+------+--------+--------------+-----+
-| SYNC | Header | ... DATA ... | CRC |
-+------+--------+--------------+-----+
++------+--------+--------+---------+--------------+-----+
+| SYNC | Length | Header | Command | ... DATA ... | CRC |
++------+--------+--------+---------+--------------+-----+
 \endverbatim
 
 \subsubsection header Header
@@ -36,9 +34,11 @@ Features:
 \verbatim
      Bit:    7   6   5   4   3   2   1   0
            +---+---+---+---+---+---+---+---+
-Function:  |    Res.   |       Length      |
+Function:  |   Flags   |      Address      |
            +---+---+---+---+---+---+---+---+
 \endverbatim
+
+
 
 
 */

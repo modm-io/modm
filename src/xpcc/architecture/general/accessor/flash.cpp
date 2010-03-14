@@ -5,7 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- *
+ * 
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -30,36 +30,14 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC__FLASH_READER_HPP
-	#error	"Don't include this file directly, use 'flash_reader.hpp' instead!"
-#endif
+#include "flash.hpp"
 
-#include <string.h>
-#include <xpcc/utils/macros.hpp>
-
-// A simple implementation for all targets that don't have a
-// strikt separation between Flash and RAM like the AVRs does.
-// 
-// For this targets a simple memcpy() call is sufficient.
-
-#define	FLASH(var)				const var
-#define	EXTERN_FLASH(var)		extern const var
-
-#define	FLASH_STRING(s)			const char s[]
-#define	EXTERN_FLASH_STRING(s)	extern const char s[]
-
-namespace xpcc
+xpcc::IOStream&
+operator << (xpcc::IOStream& os, xpcc::accessor::Flash<char> ptr)
 {
-	template<typename T, size_t size>
-	struct FlashReader
-	{
-		ALWAYS_INLINE
-		static T
-		read(const void* p)
-		{
-			T retval;
-			memcpy(reinterpret_cast<void *>(&retval), p, size);
-			return retval;
-		}
-	};
+	char c;
+	while ((c = *ptr++)) {
+		os << c;
+	}
+	return os;
 }

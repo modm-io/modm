@@ -60,7 +60,7 @@ xpcc::Mcp2515<SPI, CS, INT>::initialize(Can::Bitrate bitrate)
 	SPI::put(SPI_WRITE);
 	SPI::put(CNF3);
 	
-	FlashPointer<uint8_t> cfgPtr(mcp2515::configuration);
+	accessor::Flash<uint8_t> cfgPtr(mcp2515::configuration);
 	for (uint8_t i = 0; i < 3; ++i)
 	{
 		SPI::put(cfgPtr[bitrate * 3 + i]);	// load CNF1..3
@@ -91,7 +91,7 @@ xpcc::Mcp2515<SPI, CS, INT>::initialize(Can::Bitrate bitrate)
 
 template <typename SPI, typename CS, typename INT>
 void
-xpcc::Mcp2515<SPI, CS, INT>::setFilter(FlashPointer<uint8_t> filter)
+xpcc::Mcp2515<SPI, CS, INT>::setFilter(accessor::Flash<uint8_t> filter)
 {
 	// change to configuration mode
 	bitModify(CANCTRL, 0xe0, (1<<REQOP2));

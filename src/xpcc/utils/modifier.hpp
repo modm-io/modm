@@ -34,17 +34,20 @@
 #define	XPCC__MODIFIER_HPP
 
 #include <xpcc/utils/macros.hpp>
-#include <xpcc/architecture/general/flash/flash_pointer.hpp>
+#include <xpcc/architecture/general/accessor/flash.hpp>
 
 namespace xpcc
 {
-	// forward declaration
-	template<typename T>
-	class FlashPointer;
+	namespace accessor
+	{
+		// forward declaration
+		template<typename T>
+		class Flash;
+	}
 	
 	/**
-	 * \ingroup		utils
 	 * \defgroup	modifier
+	 * \ingroup		utils
 	 */
 	namespace modifier
 	{
@@ -60,14 +63,14 @@ namespace xpcc
 		}
 		
 		/**
-		 * \brief	Convert a normal pointer to a FlashPointer
+		 * \brief	Convert a normal pointer to a accessor::Flash
 		 * \ingroup	modifier
 		 */
 		template<typename T>
-		ALWAYS_INLINE ::xpcc::FlashPointer<T>
-		flash(const T* ptr)
+		ALWAYS_INLINE ::xpcc::accessor::Flash<T>
+		asFlash(const T* ptr)
 		{
-			return ::xpcc::FlashPointer<T>(ptr);
+			return ::xpcc::accessor::Flash<T>(ptr);
 		}
 	}
 }

@@ -30,9 +30,10 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__FLASH_HPP
-#define XPCC__FLASH_HPP
+#ifndef XPCC__TIME_HPP
+#define XPCC__TIME_HPP
 
-#include "flash/flash_pointer.hpp"
+#include "time/clock.hpp"
+#include "time/delay.hpp"
 
-#endif // XPCC__FLASH_HPP
+#endif // XPCC__TIME_HPP

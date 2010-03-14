@@ -48,13 +48,13 @@ namespace
 }
 
 unittest::Reporter::Reporter(xpcc::IODevice& device) :
-	outputStream(device), testName(xpcc::modifier::flash(invaildName)),
+	outputStream(device), testName(xpcc::modifier::asFlash(invaildName)),
 	testsPassed(0), testsFailed(0)
 {
 }
 
 void
-unittest::Reporter::nextTestSuite(xpcc::FlashPointer<char> name)
+unittest::Reporter::nextTestSuite(xpcc::accessor::Flash<char> name)
 {
 	testName = name;
 }
@@ -69,11 +69,11 @@ xpcc::IOStream&
 unittest::Reporter::reportFailure(unsigned int lineNumber)
 {
 	testsFailed++;
-	outputStream << xpcc::modifier::flash(failHeader)
+	outputStream << xpcc::modifier::asFlash(failHeader)
 				 << testName
 				 << ':'
 				 << lineNumber
-				 << xpcc::modifier::flash(failColon);
+				 << xpcc::modifier::asFlash(failColon);
 	return outputStream;
 }
 
@@ -81,19 +81,19 @@ void
 unittest::Reporter::printSummary()
 {
 	if (testsFailed == 0) {
-		outputStream << xpcc::modifier::flash(reportPassed)
+		outputStream << xpcc::modifier::asFlash(reportPassed)
 					 << testsPassed
-					 << xpcc::modifier::flash(reportTests)
-					 << xpcc::modifier::flash(reportOk)
+					 << xpcc::modifier::asFlash(reportTests)
+					 << xpcc::modifier::asFlash(reportOk)
 					 << xpcc::endl;
 	}
 	else {
-		outputStream << xpcc::modifier::flash(reportFailed)
+		outputStream << xpcc::modifier::asFlash(reportFailed)
 					 << testsFailed
-					 << xpcc::modifier::flash(reportOf)
+					 << xpcc::modifier::asFlash(reportOf)
 					 << (testsFailed + testsPassed)
-					 << xpcc::modifier::flash(reportTests)
-					 << xpcc::modifier::flash(reportFail)
+					 << xpcc::modifier::asFlash(reportTests)
+					 << xpcc::modifier::asFlash(reportFail)
 					 << xpcc::endl;
 	}
 }

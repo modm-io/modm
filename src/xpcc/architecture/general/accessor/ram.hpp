@@ -5,6 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
+ *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -28,14 +29,115 @@
  * $Id$
  */
 // ----------------------------------------------------------------------------
-#include "flash_pointer.hpp"
 
-xpcc::IOStream&
-operator << (xpcc::IOStream& os, xpcc::FlashPointer<char> ptr)
+#ifndef	XPCC_ACCESSOR__RAM_HPP
+#define	XPCC_ACCESSOR__RAM_HPP
+
+#include <string.h>			// for size_t
+#include <xpcc/utils/macros.hpp>
+
+namespace xpcc
 {
-	char c;
-	while ((c = *ptr++)) {
-		os << c;
+	namespace accessor
+	{
+		/**
+		 * \brief	Pointer to RAM
+		 * 
+		 * \ingroup	architecture
+		 * \author	Fabian Greif <fabian.greif@rwth-aachen.de>
+		 */
+		template<typename T>
+		class Ram
+		{
+		public:
+			ALWAYS_INLINE
+			Ram(const T* address = 0) :
+				address(address)
+			{
+			}
+			
+			template <typename U>
+			ALWAYS_INLINE
+			explicit Ram(const Ram<U>& rhs) :
+				address((T*) rhs.address)
+			{
+			}
+			
+			ALWAYS_INLINE
+			const T
+			operator *() const
+			{
+				return *address;
+			}
+			
+			ALWAYS_INLINE
+			const T
+			operator [](size_t index) const
+			{
+				return *(address + index);
+			}
+			
+			ALWAYS_INLINE
+			Ram&
+			operator ++ ()
+			{
+				*this += 1;
+				return *this;
+			}
+
+			ALWAYS_INLINE
+			Ram
+			operator ++ (int)
+			{
+				Ram ret = *this;
+				++*this;
+				return ret;
+			}
+
+			ALWAYS_INLINE
+			Ram&
+			operator -- ()
+			{
+				*this -= 1;
+				return *this;
+			}
+
+			ALWAYS_INLINE
+			Ram&
+			operator -- (int)
+			{
+				Ram ret = *this;
+				--*this;
+				return ret;
+			}
+			
+			ALWAYS_INLINE
+			Ram&
+			operator += (size_t rhs)
+			{
+				address += rhs;
+				return *this;
+			}
+			
+			ALWAYS_INLINE
+			Ram&
+			operator -= (size_t rhs)
+			{
+				address -= rhs;
+				return *this;
+			}
+			
+			ALWAYS_INLINE
+			const T*
+			getPointer() const
+			{
+				return address;
+			}
+		
+		private:
+			const T* address;
+		};
 	}
-	return os;
 }
+
+#endif	// XPCC_ACCESSOR__RAM_HPP
