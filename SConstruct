@@ -36,6 +36,7 @@ env = Environment(tools = ['template', 'doxygen', 'configparser'], toolpath = ['
 
 # -----------------------------------------------------------------------------
 # regenerate SConstruct files for the tests
+
 parser = env.ConfigParser()
 for path, directories, files in os.walk('tests'):
 	# exclude the SVN-directories
@@ -54,6 +55,7 @@ for path, directories, files in os.walk('tests'):
 
 # -----------------------------------------------------------------------------
 # update all template files
+
 path = 'src/xpcc/architecture/atmega/uart'
 for id in range(0, 4):
 	file = env.Template(target = os.path.join(path, 'uart%i.hpp' % id),
@@ -66,22 +68,28 @@ for id in range(0, 4):
 						SUBSTITUTIONS = { 'id': id })
 	env.Alias('templates', file)
 
-# -----------------------------------------------------------------------------
-# update more template files
 path = 'src/xpcc/architecture/atxmega/uart'
-for id in ['D0', 'D1', 'C0', 'C1']:
-	file = env.Template(target = os.path.join(path, 'uart%s.hpp' % id),
-						source = os.path.join(path, 'uart.hpp.in'),
-						SUBSTITUTIONS = { 'id': id })
-	env.Alias('templates', file)
-	
-	file = env.Template(target = os.path.join(path, 'uart%s.cpp' % id),
-						source = os.path.join(path, 'uart.cpp.in'),
-						SUBSTITUTIONS = { 'id': id })
-	env.Alias('templates', file)
+for port in ['C', 'D', 'E', 'F']:
+	for number in [0, 1]:
+		id = "%s%i" % (port, number)
+		substitutions = {
+			'id': id,
+			'number': int(number),
+		}
+		
+		file = env.Template(target = os.path.join(path, 'uart%s.hpp' % id.lower()),
+							source = os.path.join(path, 'uart.hpp.in'),
+							SUBSTITUTIONS = substitutions)
+		env.Alias('templates', file)
+		
+		file = env.Template(target = os.path.join(path, 'uart%s.cpp' % id.lower()),
+							source = os.path.join(path, 'uart.cpp.in'),
+							SUBSTITUTIONS = substitutions)
+		env.Alias('templates', file)
 
 # -----------------------------------------------------------------------------
 # add target to create the doxygen documentation
+
 env.Doxygen('doc/doxyfile')
 env.Alias('doc', 'apidoc/html')
 

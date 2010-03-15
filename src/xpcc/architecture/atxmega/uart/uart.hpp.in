@@ -25,8 +25,6 @@
  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- * $Id: uart.hpp.tmpl -1   $
  */
 // ----------------------------------------------------------------------------
 {{ generation_block }}
@@ -78,10 +76,18 @@ namespace xpcc
 		}
 		
 		static void
-		put(char data);
+		write(char data);
+		
+		/**
+		 * \brief	Write a string
+		 * 
+		 * The string musst end with '\0'.
+		 */
+		static void
+		write(const char *string);
 		
 		static bool
-		get(char& c);
+		read(char& c);
 		
 	protected:
 		static void

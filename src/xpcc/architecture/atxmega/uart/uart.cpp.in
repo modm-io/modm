@@ -25,8 +25,6 @@
  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- * $Id: uart.cpp.tmpl -1   $
  */
 // ----------------------------------------------------------------------------
 {{ generation_block }}
@@ -34,55 +32,77 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 
-#include "uart{{ id }}.hpp"
+#include <xpcc/architecture/general/gpio.hpp>
 
-// TODO:
-//#ifdef USART{{ id }}
+#include "uart{{ id.lower() }}.hpp"
+
+#ifdef USART{{ id }}
+
+namespace {
+	GPIO__INPUT(RXD, {{ id[0] }}, {{ number * 4 + 2 }});
+	GPIO__OUTPUT(TXD, {{ id[0] }}, {{ number * 4 + 3 }});
+}
 
 // ----------------------------------------------------------------------------
 void
 xpcc::Uart{{ id }}::setBaudrateRegister(uint16_t ubrr)
 {
+	TXD::set();
+	TXD::setOutput();
+	
+	RXD::setInput();
+	
 	// set baud rate
 	if (ubrr & 0x8000) {
 		USART{{ id }}_CTRLB = USART_CLK2X_bm;  //Enable 2x speed 
 		ubrr &= ~0x8000;
 	}
 	else {
-		USARTD1_CTRLB = 0;
+		USART{{ id }}_CTRLB = 0;
 	}
-	USART{{ id }}_BAUDCTRLB   = (uint8_t) (ubrr >> 8);
-	USART{{ id }}_BAUDCTRLA   = (uint8_t)  ubrr;
+	USART{{ id }}_BAUDCTRLB = (uint8_t) (ubrr >> 8);
+	USART{{ id }}_BAUDCTRLA = (uint8_t)  ubrr;
 	
 	// this line would enable receive complete interrupt
 	// USART{{ id }}_CTRLA = USART_RXCINTLVL_MED_gc;
 	
 	// setting the frame size to 8 bit
 	USART{{ id }}_CTRLC = USART_CHSIZE_8BIT_gc;
+	
 	// enable both, receiver and transmitter
-	USART{{ id }}_CTRLB |= USART_RXEN_bm|USART_TXEN_bm;
+	USART{{ id }}_CTRLB |= USART_RXEN_bm | USART_TXEN_bm;
 }
 
 // ----------------------------------------------------------------------------
 void
-xpcc::Uart{{ id }}::put(char c)
+xpcc::Uart{{ id }}::write(char c)
 {
 	while(!(USART{{ id }}_STATUS & USART_DREIF_bm))
 		;
+	
 	USART{{ id }}_DATA = c;
 }
 
 // ----------------------------------------------------------------------------
-bool
-xpcc::Uart{{ id }}::get(char& c)
+void
+xpcc::Uart{{ id }}::write(const char *s)
 {
-	if (USART{{ id }}_STATUS & USART_RXCIF_bm){
-		// USART_RXCIF_bm is cleared reading DATA
+	char c;
+	while ((c = *s++)) {
+		Uart{{ id }}::write(c);
+	}
+}
+
+// ----------------------------------------------------------------------------
+bool
+xpcc::Uart{{ id }}::read(char& c)
+{
+	if (USART{{ id }}_STATUS & USART_RXCIF_bm) {
+		// USART_RXCIF_bm is cleared by reading DATA
 		c = USART{{ id }}_DATA;
 		return true;
 	}
 	return false;
 }
 
-//#endif // USART{{ id }}
-
+#endif // USART{{ id }}
