@@ -60,10 +60,10 @@ xpcc::DogM16x<SPI, CS, RS>::initialize()
 	CS::setOutput();
 	RS::setOutput();
 	
-	accessor::Flash<uint8_t> cfgPtr(dog_m16x::configuration);
+	accessor::Flash<uint8_t> config(dog_m16x::configuration);
 	for (uint8_t i = 0; i < 10; ++i)
 	{
-		writeCommand(cfgPtr[i]);
+		writeCommand(config[i]);
 	}
 }
 
@@ -71,11 +71,11 @@ template <typename SPI, typename CS, typename RS>
 void
 xpcc::DogM16x<SPI, CS, RS>::putRaw(char c)
 {
-	RS::set();
+	RS::high();
 	
-	CS::reset();
-	SPI::put(c);
-	CS::set();
+	CS::low();
+	SPI::write(c);
+	CS::high();
 }
 
 template <typename SPI, typename CS, typename RS>
@@ -95,11 +95,11 @@ template <typename SPI, typename CS, typename RS>
 void
 xpcc::DogM16x<SPI, CS, RS>::writeCommand(uint8_t command)
 {
-	RS::reset();
+	RS::low();
 	
-	CS::reset();
-	SPI::put(command);
-	CS::set();
+	CS::low();
+	SPI::write(command);
+	CS::high();
 	
 	// check if the command is 'clear display' oder 'return home', these
 	// commands take a bit longer until they are finished.

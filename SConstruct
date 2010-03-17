@@ -61,12 +61,12 @@ for id in range(0, 4):
 	file = env.Template(target = os.path.join(path, 'uart%i.hpp' % id),
 						source = os.path.join(path, 'uart.hpp.in'),
 						SUBSTITUTIONS = { 'id': id })
-	env.Alias('templates', file)
+	env.Alias('template', file)
 	
 	file = env.Template(target = os.path.join(path, 'uart%i.cpp' % id),
 						source = os.path.join(path, 'uart.cpp.in'),
 						SUBSTITUTIONS = { 'id': id })
-	env.Alias('templates', file)
+	env.Alias('template', file)
 
 path = 'src/xpcc/architecture/atxmega/uart'
 for port in ['C', 'D', 'E', 'F']:
@@ -77,15 +77,39 @@ for port in ['C', 'D', 'E', 'F']:
 			'number': int(number),
 		}
 		
-		file = env.Template(target = os.path.join(path, 'uart%s.hpp' % id.lower()),
+		# simple UART
+		file = env.Template(target = os.path.join(path, 'uart_%s.hpp' % id.lower()),
 							source = os.path.join(path, 'uart.hpp.in'),
 							SUBSTITUTIONS = substitutions)
-		env.Alias('templates', file)
+		env.Alias('template', file)
 		
-		file = env.Template(target = os.path.join(path, 'uart%s.cpp' % id.lower()),
+		file = env.Template(target = os.path.join(path, 'uart_%s.cpp' % id.lower()),
 							source = os.path.join(path, 'uart.cpp.in'),
 							SUBSTITUTIONS = substitutions)
-		env.Alias('templates', file)
+		env.Alias('template', file)
+		
+		# buffered UART
+		file = env.Template(target = os.path.join(path, 'buffered_uart_%s.hpp' % id.lower()),
+							source = os.path.join(path, 'buffered_uart.hpp.in'),
+							SUBSTITUTIONS = substitutions)
+		env.Alias('template', file)
+		
+		file = env.Template(target = os.path.join(path, 'buffered_uart_%s.cpp' % id.lower()),
+							source = os.path.join(path, 'buffered_uart.cpp.in'),
+							SUBSTITUTIONS = substitutions)
+		env.Alias('template', file)
+		
+		# UART in SPI master mode
+		file = env.Template(target = os.path.join(path, 'spi_%s.hpp' % id.lower()),
+							source = os.path.join(path, 'spi.hpp.in'),
+							SUBSTITUTIONS = substitutions)
+		env.Alias('template', file)
+		
+		file = env.Template(target = os.path.join(path, 'spi_%s.cpp' % id.lower()),
+							source = os.path.join(path, 'spi.cpp.in'),
+							SUBSTITUTIONS = substitutions)
+		env.Alias('template', file)
+		
 
 # -----------------------------------------------------------------------------
 # add target to create the doxygen documentation
@@ -94,4 +118,5 @@ env.Doxygen('doc/doxyfile')
 env.Alias('doc', 'apidoc/html')
 
 env.Alias('all', ['update', 'templates', 'doc'])
+env.Alias('templates', 'template')
 env.Default('update')

@@ -223,7 +223,7 @@ def xpcc_library(env):
 		'name': env['XPCC_CONFIG']['general']['name']
 	}
 	file = env.SimpleTemplate(
-			target = env.LibraryBuildpath('config.h'),
+			target = env.LibraryBuildpath('xpcc_config.h'),
 			source = os.path.join(env['XPCC_ROOTPATH'], 
 								  'misc/templates/config.h.in'),
 			SUBSTITUTIONS = substitutions)

@@ -1,7 +1,7 @@
 #include <avr/interrupt.h>
 
 #include <xpcc/architecture/gpio.hpp>
-#include <xpcc/architecture/software_spi.hpp>
+#include <xpcc/driver/software_spi.hpp>
 #include <xpcc/architecture/general/time/delay.hpp>
 #include <xpcc/architecture/avr/xmega/spi.hpp>
 
@@ -84,10 +84,10 @@ void sendData(){
 	dmaPayload.i = value;
 	uint8_t * fin = (uint8_t*)(&dmaPayload + 1);
 	
-	SlaveCs::reset();
+	SlaveCs::low();
 	for (uint8_t *p = (uint8_t*)&dmaPayload, *ap = (uint8_t*)&dmaAnswer; p < fin; p++, ap++)
 		*ap = spi.put(*p);
-	SlaveCs::set();
+	SlaveCs::high();
 	Led5::toggle();
 }
 
@@ -145,7 +145,7 @@ main()
 	Led7::output();
 	
 	SlaveCs::output();
-	SlaveCs::reset();
+	SlaveCs::low();
 	
 	
 	Button0::configure(gpio::PULLUP);
@@ -155,8 +155,8 @@ main()
 	
 	EncoderButton::configure(gpio::PULLUP);
 	
-	Led6::set();
-	Led7::reset();
+	Led6::high();
+	Led7::low();
 	
 	delay_ms(100);
 	
@@ -167,7 +167,7 @@ main()
 	stream << "Hello World ;-)\n";
 	stream << "\x19" " = ";
 	
-	Led7::set();
+	Led7::high();
 	delay_ms(100);
 	
 	// enable medium interrupts
@@ -175,14 +175,14 @@ main()
 	
 	configureTimer(timer);
 
-	Led7::reset();
+	Led7::low();
 	delay_ms(100);
 	
 	// enable global interrupts
 	sei();
-	Led7::set();
+	Led7::high();
 	delay_ms(100);
-	Led7::reset();
+	Led7::low();
 	
 	while (1)
 	{
@@ -211,11 +211,11 @@ main()
 			sendData();
 		}
 		
-		Led6::set(EncoderA::get());
-		Led7::set(EncoderB::get());
+		Led6::high(EncoderA::get());
+		Led7::high(EncoderB::get());
 		
 		dmaPayload.b = EncoderButton::get();
-		Led5::set(EncoderButton::get());
+		Led5::high(EncoderButton::get());
 		// encoder button
 //		if (encoder.getPress(Debounce::KEY2)) {
 //			Led5::toggle();
@@ -253,8 +253,8 @@ ISR(DMA_CH0_vect){
 }
 
 ISR(TCD0_OVF_vect){
-	Led3::reset();
-	Led4::reset();
+	Led3::low();
+	Led4::low();
 	
 	static uint8_t i = 0;
 	if (i++ == 20){
@@ -265,9 +265,9 @@ ISR(TCD0_OVF_vect){
 }
 
 ISR(TCD0_CCA_vect){
-	Led4::set();
+	Led4::high();
 }
 
 ISR(TCD0_CCB_vect){
-	Led3::set();
+	Led3::high();
 }

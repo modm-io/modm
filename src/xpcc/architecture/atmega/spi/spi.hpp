@@ -66,7 +66,7 @@ namespace xpcc
 		initialize(Mode mode, Prescaler prescaler);
 		
 		static uint8_t
-		put(uint8_t data);
+		write(uint8_t data);
 	};
 }
 

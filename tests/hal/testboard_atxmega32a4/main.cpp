@@ -1,6 +1,6 @@
 
 #include <xpcc/architecture/general/gpio.hpp>
-#include <xpcc/architecture/general/software_spi.hpp>
+#include <xpcc/driver/software_spi.hpp>
 #include <xpcc/architecture/general/time/delay.hpp>
 
 #include <xpcc/driver/lcd/dog_m16x.hpp>
@@ -63,8 +63,8 @@ main()
 	
 	EncoderButton::configure(gpio::PULLUP);
 	
-	Led6::set();
-	Led7::reset();
+	Led6::high();
+	Led7::low();
 	
 	// give the DOG-M display some time for startup
 	delay_ms(100);
@@ -102,8 +102,8 @@ main()
 			Led0::toggle();
 		}
 		
-		Led6::set(EncoderA::get());
-		Led7::set(EncoderB::get());
+		Led6::high(EncoderA::get());
+		Led7::high(EncoderB::get());
 		
 		// encoder button
 		if (encoder.getPress(Debounce::KEY2)) {

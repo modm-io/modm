@@ -13,7 +13,7 @@ ISR(TIMER2_COMPA_vect) {
 int main(void)
 {
 	Led::setOutput();
-	Led::reset();
+	Led::low();
 	
 	// timer initialization
 	// compare-match-interrupt every 1 ms at 14.7456 MHz

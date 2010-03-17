@@ -74,22 +74,22 @@ namespace xpcc
 		}
 		
 		static uint8_t
-		put(uint8_t out)
+		write(uint8_t out)
 		{
 			uint8_t in = 0;
 			
-			SCLK::reset();
+			SCLK::low();
 			for (uint8_t i = 0; i < 8; ++i)
 			{
 				in <<= 1;
 				if (out & 0x80) {
-					MOSI::set();
+					MOSI::high();
 				}
 				else {
-					MOSI::reset();
+					MOSI::low();
 				}
 				
-				SCLK::set();
+				SCLK::high();
 				delay_us(delay);
 				
 				if (MISO::read()) {
@@ -97,7 +97,7 @@ namespace xpcc
 				}
 				out <<= 1;
 				
-				SCLK::reset();
+				SCLK::low();
 				delay_us(delay);
 			}
 			

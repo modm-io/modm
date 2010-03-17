@@ -66,7 +66,7 @@ xpcc::Pid<T, ScaleFactor>::Pid(
 
 template<typename T, unsigned int ScaleFactor>
 void
-xpcc::Pid<T, ScaleFactor>::reset()
+xpcc::Pid<T, ScaleFactor>::low()
 {
 	this->target = 0;
 	this->errorSum = 0;

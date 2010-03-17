@@ -29,8 +29,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC_ABSTRACT_COMPONENT_H
-#define	XPCC_ABSTRACT_COMPONENT_H
+#ifndef	XPCC__ABSTRACT_COMPONENT_HPP
+#define	XPCC__ABSTRACT_COMPONENT_HPP
 
 namespace xpcc
 {
@@ -45,4 +45,4 @@ namespace xpcc
 	};
 }
 
-#endif // XPCC_ABSTRACT_COMPONENT_H
+#endif // XPCC__ABSTRACT_COMPONENT_HPP

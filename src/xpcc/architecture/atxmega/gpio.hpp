@@ -117,17 +117,17 @@ namespace xpcc
 		\
 		ALWAYS_INLINE static void setOutput() { PORT ## port ## _DIRSET = (1 << pin); } \
 		ALWAYS_INLINE static void setInput() { PORT ## port ## _DIRCLR = (1 << pin); } \
-		ALWAYS_INLINE static void set() { PORT ## port ## _OUTSET = (1 << pin); } \
-		ALWAYS_INLINE static void reset() { PORT ## port ## _OUTCLR = (1 << pin); } \
+		ALWAYS_INLINE static void high() { PORT ## port ## _OUTSET = (1 << pin); } \
+		ALWAYS_INLINE static void low() { PORT ## port ## _OUTCLR = (1 << pin); } \
 		ALWAYS_INLINE static void toggle() { PORT ## port ## _OUTTGL = (1 << pin); } \
 		\
 		ALWAYS_INLINE static void \
 		write(bool status) { \
 			if (status) { \
-				set(); \
+				high(); \
 			} \
 			else { \
-				reset(); \
+				low(); \
 			} \
 		} \
 		\
@@ -152,17 +152,17 @@ namespace xpcc
 		} \
 		\
 		ALWAYS_INLINE static void setOutput() { PORT ## port ## _DIRSET = (1 << pin); } \
-		ALWAYS_INLINE static void set() { PORT ## port ## _OUTSET = (1 << pin); } \
-		ALWAYS_INLINE static void reset() { PORT ## port ## _OUTCLR = (1 << pin); } \
+		ALWAYS_INLINE static void high() { PORT ## port ## _OUTSET = (1 << pin); } \
+		ALWAYS_INLINE static void low() { PORT ## port ## _OUTCLR = (1 << pin); } \
 		ALWAYS_INLINE static void toggle() { PORT ## port ## _OUTTGL = (1 << pin); } \
 		\
 		ALWAYS_INLINE static void \
 		write(bool status) { \
 			if (status) { \
-				set(); \
+				high(); \
 			} \
 			else { \
-				reset(); \
+				low(); \
 			} \
 		} \
 		ALWAYS_INLINE static PORT_t& getPort() { return PORT ## port;} \

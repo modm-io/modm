@@ -32,7 +32,7 @@
 
 #include "spi.hpp"
 
-#if !defined(__AVR_ATtiny44__)		// TODO
+#ifdef SPDR
 
 void
 xpcc::Spi::initialize(Mode mode, Prescaler prescaler)
@@ -44,7 +44,7 @@ xpcc::Spi::initialize(Mode mode, Prescaler prescaler)
 }
 
 uint8_t
-xpcc::Spi::put(uint8_t data)
+xpcc::Spi::write(uint8_t data)
 {
 	SPDR = data;
 	while (!(SPSR & (1 << SPIF))) {

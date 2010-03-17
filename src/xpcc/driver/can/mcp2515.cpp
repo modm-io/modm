@@ -32,7 +32,7 @@
 
 #include "mcp2515.hpp"
 
-#include "config.h"
+#include "xpcc_config.h"
 
 namespace xpcc
 {

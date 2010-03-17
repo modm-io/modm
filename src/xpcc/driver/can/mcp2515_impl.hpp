@@ -48,15 +48,15 @@ xpcc::Mcp2515<SPI, CS, INT>::initialize(Can::Bitrate bitrate)
 {
 	// software reset for the mcp2515, after this he is back in the
 	// configuration mode
-	CS::reset();
+	CS::low();
 	SPI::put(SPI_RESET);
 	delay_ms(1);
-	CS::set();
+	CS::high();
 	
 	// wait a bit to give the mcp2515 some time to restart
 	delay_ms(30);
 	
-	CS::reset();
+	CS::low();
 	SPI::put(SPI_WRITE);
 	SPI::put(CNF3);
 	
@@ -66,7 +66,7 @@ xpcc::Mcp2515<SPI, CS, INT>::initialize(Can::Bitrate bitrate)
 		SPI::put(cfgPtr[bitrate * 3 + i]);	// load CNF1..3
 	}
 	SPI::put((1 << RX1IE) | (1 << RX0IE));		// enable interrupts
-	CS::set();
+	CS::high();
 	
 	writeRegister(TXRTSCTRL, 0);	// set TXnRTS pins as inputs
 	writeRegister(BFPCTRL, 0);		// disable RXnBF pins (high impedance state)
@@ -104,7 +104,7 @@ xpcc::Mcp2515<SPI, CS, INT>::setFilter(accessor::Flash<uint8_t> filter)
 	uint8_t i, j;
 	for (i = 0; i < 0x30; i += 0x10)
 	{
-		CS::reset();
+		CS::low();
 		SPI::put(SPI_WRITE);
 		SPI::put(i);
 		
@@ -115,7 +115,7 @@ xpcc::Mcp2515<SPI, CS, INT>::setFilter(accessor::Flash<uint8_t> filter)
 			
 			SPI::put(*filter++);
 		}
-		CS::set();
+		CS::high();
 	}
 	
 	bitModify(CANCTRL, 0xe0, 0);
@@ -171,7 +171,7 @@ xpcc::Mcp2515<SPI, CS, INT>::getMessage(Can::Message& message)
 		return false;				// Error: no message available
 	}
 	
-	CS::reset();
+	CS::low();
 	SPI::put(addr);
 	
 	message.flags.extended = readIdentifier(message.identifier);
@@ -181,7 +181,7 @@ xpcc::Mcp2515<SPI, CS, INT>::getMessage(Can::Message& message)
 	for (uint8_t i = 0; i < message.length; ++i) {
 		message.data[i] = SPI::put(0xff);
 	}
-	CS::set();
+	CS::high();
 	
 	// clear interrupt flag
 	if (status & (1 << 6)) {
@@ -238,7 +238,7 @@ xpcc::Mcp2515<SPI, CS, INT>::sendMessage(const Can::Message& message)
 		return 0;
 	}
 	
-	CS::reset();
+	CS::low();
 	SPI::put(SPI_WRITE_TX | address);
 	writeIdentifier(message.identifier, message.flags.extended);
 	
@@ -256,15 +256,15 @@ xpcc::Mcp2515<SPI, CS, INT>::sendMessage(const Can::Message& message)
 			SPI::put(message.data[i]);
 		}
 	}
-	CS::set();
+	CS::high();
 	
 	delay_us(1);
 	
 	// send message via RTS command
-	CS::reset();
+	CS::low();
 	address = (address == 0) ? 1 : address;	// 0 2 4 => 1 2 4
 	SPI::put(SPI_RTS | address);
-	CS::set();
+	CS::high();
 	
 	return address;
 }
@@ -275,13 +275,13 @@ template <typename SPI, typename CS, typename INT>
 void
 xpcc::Mcp2515<SPI, CS, INT>::writeRegister(uint8_t address, uint8_t data)
 {
-	CS::reset();
+	CS::low();
 	
 	SPI::put(SPI_WRITE);
 	SPI::put(address);
 	SPI::put(data);
 	
-	CS::set();
+	CS::high();
 }
 
 template <typename SPI, typename CS, typename INT>
@@ -290,13 +290,13 @@ xpcc::Mcp2515<SPI, CS, INT>::readRegister(uint8_t address)
 {
 	uint8_t data;
 	
-	CS::reset();
+	CS::low();
 	
 	SPI::put(SPI_READ);
 	SPI::put(address);
 	data = SPI::put(0xff);
 	
-	CS::set();
+	CS::high();
 	
 	return data;
 }
@@ -305,14 +305,14 @@ template <typename SPI, typename CS, typename INT>
 void
 xpcc::Mcp2515<SPI, CS, INT>::bitModify(uint8_t address, uint8_t mask, uint8_t data)
 {
-	CS::reset();
+	CS::low();
 	
 	SPI::put(SPI_BIT_MODIFY);
 	SPI::put(address);
 	SPI::put(mask);
 	SPI::put(data);
 	
-	CS::set();
+	CS::high();
 }
 
 template <typename SPI, typename CS, typename INT>
@@ -321,12 +321,12 @@ xpcc::Mcp2515<SPI, CS, INT>::readStatus(uint8_t type)
 {
 	uint8_t data;
 	
-	CS::reset();
+	CS::low();
 	
 	SPI::put(type);
 	data = SPI::put(0xff);
 	
-	CS::set();
+	CS::high();
 	
 	return data;
 }

@@ -1,7 +1,7 @@
 #include <avr/interrupt.h>
 
 #include <xpcc/architecture/gpio.hpp>
-#include <xpcc/architecture/software_spi.hpp>
+#include <xpcc/driver/software_spi.hpp>
 #include <xpcc/architecture/general/time/delay.hpp>
 #include <xpcc/architecture/avr/xmega/spi.hpp>
 
@@ -247,8 +247,8 @@ main()
 	MISO::output();
 	
 	
-	Led6::set();
-	Led7::reset();
+	Led6::high();
+	Led7::low();
 	delay_ms(100);
 	
 	configure_spi_test();
@@ -262,9 +262,9 @@ main()
 
 	// enable global interrupts
 	sei();
-	Led7::set();
+	Led7::high();
 	delay_ms(100);
-	Led7::reset();
+	Led7::low();
 	
 	while (1)
 	{
@@ -295,17 +295,17 @@ main()
 
 		}
 		
-//		Led6::set(EncoderA::get());
-//		Led7::set(EncoderB::get());
+//		Led6::high(EncoderA::get());
+//		Led7::high(EncoderB::get());
 		
 		// encoder button
 		if (encoder.getPress(Debounce::KEY2)) {
 //			Led5::toggle();
 		}
 		timer.CCB = dmaPayloadIn.i*10;
-		// Led0::set(dmaPayload.b);
+		// Led0::high(dmaPayload.b);
 		
-		Led6::set(dmaPayloadIn.b);
+		Led6::high(dmaPayloadIn.b);
 		
 //		timer.CCB = 90*10;
 	}
@@ -318,7 +318,7 @@ ISR(SPIC_INT_vect){
 }
 
 ISR(DMA_CH1_vect){
-	Led1::set();
+	Led1::high();
 	DMA.CH1.CTRLB |= DMA_CH_TRNIF_bm; // clear the flag. necessary if interrupt is enabled.
 }
 
@@ -327,8 +327,8 @@ ISR(DMA_CH0_vect){
 }
 
 ISR(TCD0_OVF_vect){
-//	Led6::reset();
-//	Led7::reset();
+//	Led6::low();
+//	Led7::low();
 	
 	static uint8_t i = 0;
 	if (i++ == 20){
@@ -339,11 +339,11 @@ ISR(TCD0_OVF_vect){
 }
 
 ISR(TCD0_CCA_vect){
-//	Led6::set();
+//	Led6::high();
 }
 
 ISR(TCD0_CCB_vect){
-//	Led7::set();
+//	Led7::high();
 }
 
 ISR(PORTC_INT0_vect){
@@ -391,26 +391,26 @@ ISR(PORTC_INT0_vect){
 	if (state & DMA_CH_CHBUSY_bm){
 //	if (counter == 0){
 		errorCondition = 1;
-		Led0::set();
+		Led0::high();
 	}
 	else{
-		Led0::reset();
+		Led0::low();
 	}
 /*	
 	if (counter == sizeof(DmaPayload)){
-		Led1::set();
+		Led1::high();
 	}
 	else{
 		errorCondition = 1;
-		Led1::reset();
+		Led1::low();
 	}
 */
 /*	
 	if (counter == sizeof(DmaPayload) && state & DMA_CH_CHBUSY_bm){
-		Led7::set();
+		Led7::high();
 	}
 	else{
-		Led7::reset();
+		Led7::low();
 	}
 */
 //	if (errorCondition){

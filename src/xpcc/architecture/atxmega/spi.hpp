@@ -69,7 +69,7 @@ namespace xpcc
 		ALWAYS_INLINE static bool isInterrupt() { bool flag = moduleBase.STATUS & SPI_IF_bm; moduleBase.STATUS |= SPI_IF_bm; return flag; } \
 		\
 		static uint8_t \
-		put(uint8_t data) { \
+		write(uint8_t data) { \
 			moduleBase.STATUS &= SPI_IF_bm; \
 			moduleBase.DATA = data; \
 			while (! (moduleBase.STATUS & SPI_IF_bm)); \
