@@ -34,7 +34,7 @@ import configparser
 from SCons.Script import *
 
 # -----------------------------------------------------------------------------
-def generate_environment(env, configfile, rootpath, buildpath = None):
+def generate_environment(env, rootpath, configfile='project.cfg', buildpath=None):
 	""" Creates a new build environment
 	
 	Keyword arguments:

@@ -243,16 +243,19 @@ def xpcc_generics(env, xmlfile):
 
 def generate_defines(env, filename='defines.h'):
 	defines = env['XPCC_CONFIG']['defines']
-	substitutions = {
-		'defines': '\n'.join(["#define %s %s" % (key.upper(), value) \
-				for key, value in defines.iteritems()])
-	}
-	file = env.SimpleTemplate(
-			target = filename,
-			source = os.path.join(env['XPCC_ROOTPATH'], 
-								  'misc/templates/defines.h.in'),
-			SUBSTITUTIONS = substitutions)
-	return file
+	if defines:
+		substitutions = {
+			'defines': '\n'.join(["#define %s %s" % (key.upper(), value) \
+					for key, value in defines.iteritems()])
+		}
+		file = env.SimpleTemplate(
+				target = filename,
+				source = os.path.join(env['XPCC_ROOTPATH'], 
+									  'misc/templates/defines.h.in'),
+				SUBSTITUTIONS = substitutions)
+		return file
+	else:
+		return None
 
 # -----------------------------------------------------------------------------
 def generate(env, **kw):
