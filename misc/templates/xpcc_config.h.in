@@ -1,9 +1,10 @@
 // WARNING: This file is generated automatically, do not edit!
 // ----------------------------------------------------------------------------
 
-#ifndef DEFINES_H
-#define	DEFINES_H
+#ifndef XPCC_CONFIG_H
+#define	XPCC_CONFIG_H
 
 ${defines}
 
-#endif
+#endif	// XPCC_CONFIG_H
+

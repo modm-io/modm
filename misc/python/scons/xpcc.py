@@ -216,7 +216,7 @@ def xpcc_library(env):
 	env['XPCC_LIBRARY_DEFINES'] = defines.copy()
 	defines.update(env['XPCC_CONFIG']['defines'])
 	
-	# generate 'config.h'
+	# generate 'xpcc_config.h'
 	substitutions = {
 		'defines': '\n'.join(["#define %s %s" % (key.upper(), value) \
 				for key, value in defines.iteritems()]),
@@ -225,7 +225,7 @@ def xpcc_library(env):
 	file = env.SimpleTemplate(
 			target = env.LibraryBuildpath('xpcc_config.h'),
 			source = os.path.join(env['XPCC_ROOTPATH'], 
-								  'misc/templates/config.h.in'),
+								  'misc/templates/xpcc_config.h.in'),
 			SUBSTITUTIONS = substitutions)
 	
 	env.Append(LIBS = ['robot'])
@@ -241,6 +241,19 @@ def xpcc_generics(env, xmlfile):
 	
 	return source
 
+def generate_defines(env, filename='defines.h'):
+	defines = env['XPCC_CONFIG']['defines']
+	substitutions = {
+		'defines': '\n'.join(["#define %s %s" % (key.upper(), value) \
+				for key, value in defines.iteritems()])
+	}
+	file = env.SimpleTemplate(
+			target = filename,
+			source = os.path.join(env['XPCC_ROOTPATH'], 
+								  'misc/templates/defines.h.in'),
+			SUBSTITUTIONS = substitutions)
+	return file
+
 # -----------------------------------------------------------------------------
 def generate(env, **kw):
 	env.AddMethod(buildpath, 'Buildpath')
@@ -250,6 +263,7 @@ def generate(env, **kw):
 	env.AddMethod(check_defines, 'ShowConfiguration')
 	env.AddMethod(xpcc_library, 'XpccLibrary')
 	env.AddMethod(xpcc_generics, 'XpccGenerics')
+	env.AddMethod(generate_defines, 'Defines')
 
 def exists(env):
 	return True

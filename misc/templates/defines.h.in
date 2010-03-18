@@ -1,0 +1,12 @@
+// ----------------------------------------------------------------------------
+//  WARNING: This file is generated automatically, do not edit!
+//           Modify the corresponding 'project.cfg' instead.
+// ----------------------------------------------------------------------------
+
+#ifndef DEFINES_H
+#define	DEFINES_H
+
+${defines}
+
+#endif	// DEFINES_H
+
