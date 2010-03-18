@@ -100,7 +100,7 @@ namespace xpcc
 			}
 			
 			ALWAYS_INLINE static void
-			write(bool status)
+			set(bool status)
 			{
 				(void) status;
 			}

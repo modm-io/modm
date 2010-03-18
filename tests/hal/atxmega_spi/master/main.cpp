@@ -211,11 +211,11 @@ main()
 			sendData();
 		}
 		
-		Led6::high(EncoderA::get());
-		Led7::high(EncoderB::get());
+		Led6::set(EncoderA::get());
+		Led7::set(EncoderB::get());
 		
 		dmaPayload.b = EncoderButton::get();
-		Led5::high(EncoderButton::get());
+		Led5::set(EncoderButton::get());
 		// encoder button
 //		if (encoder.getPress(Debounce::KEY2)) {
 //			Led5::toggle();

@@ -122,7 +122,7 @@ namespace xpcc
 		ALWAYS_INLINE static void toggle() { PORT ## port ## _OUTTGL = (1 << pin); } \
 		\
 		ALWAYS_INLINE static void \
-		write(bool status) { \
+		set(bool status) { \
 			if (status) { \
 				high(); \
 			} \
@@ -157,7 +157,7 @@ namespace xpcc
 		ALWAYS_INLINE static void toggle() { PORT ## port ## _OUTTGL = (1 << pin); } \
 		\
 		ALWAYS_INLINE static void \
-		write(bool status) { \
+		set(bool status) { \
 			if (status) { \
 				high(); \
 			} \

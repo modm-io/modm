@@ -64,7 +64,7 @@ namespace xpcc
 		ALWAYS_INLINE static bool read() { return (PIN ## port & (1 << pin)); } \
 		\
 		ALWAYS_INLINE static void \
-		write(bool status) { \
+		set(bool status) { \
 			if (status) { \
 				high(); \
 			} \
@@ -86,7 +86,7 @@ namespace xpcc
 		ALWAYS_INLINE static void toggle() { PORT ## port ^= (1 << pin); } \
 		\
 		ALWAYS_INLINE static void \
-		write(bool status) { \
+		set(bool status) { \
 			if (status) { \
 				high(); \
 			} \

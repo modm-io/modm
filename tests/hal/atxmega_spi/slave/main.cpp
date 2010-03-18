@@ -295,17 +295,17 @@ main()
 
 		}
 		
-//		Led6::high(EncoderA::get());
-//		Led7::high(EncoderB::get());
+//		Led6::set(EncoderA::get());
+//		Led7::set(EncoderB::get());
 		
 		// encoder button
 		if (encoder.getPress(Debounce::KEY2)) {
 //			Led5::toggle();
 		}
 		timer.CCB = dmaPayloadIn.i*10;
-		// Led0::high(dmaPayload.b);
+		// Led0::set(dmaPayload.b);
 		
-		Led6::high(dmaPayloadIn.b);
+		Led6::set(dmaPayloadIn.b);
 		
 //		timer.CCB = 90*10;
 	}
