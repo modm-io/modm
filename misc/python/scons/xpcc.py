@@ -234,7 +234,7 @@ def xpcc_library(env):
 	return library
 
 def xpcc_generics(env, xmlfile):
-	env.Append(CPPPATH = [os.path.dirname(xmlfile)])
+	env.Append(CPPPATH = [os.path.join(os.path.dirname(xmlfile), "..")])
 	
 	source  = env.SystemCppPackets(xmlfile)
 	source += env.SystemCppIdentifier(xmlfile)

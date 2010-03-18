@@ -43,7 +43,7 @@ def generate(env, **kw):
 		emitter = \
 			lambda target, source, env:
 				([os.path.join(env['XPCC_BUILDPATH'], "robot/packets.cpp"),
-				  os.path.join(str(source[0].dir), "robot/packets.hpp")],
+				  os.path.join(str(source[0].dir), "../robot/packets.hpp")],
 				source),
 		single_source = True,
 		target_factory = env.fs.Entry,
@@ -57,7 +57,7 @@ def generate(env, **kw):
 				'$SOURCE',
 			cmdstr="$SYSTEM_CPP_IDENTIFIER_COMSTR"),
 		emitter = lambda target, source, env:
-			([os.path.join(str(source[0].dir), "robot/identifier.hpp")], source),
+			([os.path.join(str(source[0].dir), "../robot/identifier.hpp")], source),
 		single_source = True,
 		target_factory = env.fs.Entry,
 		src_suffix = ".xml",

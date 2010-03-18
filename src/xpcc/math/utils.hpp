@@ -62,6 +62,31 @@ namespace xpcc
 		return (a > 0.0);
 #endif
 	}
+	
+	/**
+	 * \brief	Compile time exponentiation
+	 * 
+	 * Calculates B raised to the power of N, B and N must be compile-time
+	 * constants.
+	 * 
+	 * \tparam	B	Base
+	 * \tparam	N	Exponent
+	 * 
+	 * \ingroup	math
+	 */
+	template <int B, int N>
+	class Pow
+	{
+		enum { value = B * Pow<B, N - 1>::value };
+	};
+	
+	// specialization for B^0 which is always 1
+	// used to end the recursion in Pow<>
+	template <int B>
+	class Pow<B, 0>
+	{
+		enum { value = 1 };
+	};
 }
 
 #endif	// XPCC__UTILS_HPP
