@@ -123,10 +123,18 @@ namespace xpcc
 		friend Position<U>
 		operator - (const Position<U> &a, const Position<U> &b);
 		
+		template<typename U, typename V>
+		friend Position<U>
+		operator - (const Position<U> &a, const Position<V> &b);
+
 		template<typename U>
 		friend Position<U>
 		operator + (const Position<U> &a, const Position<U> &b);
 		
+		template<typename U, typename V>
+		friend Position<U>
+		operator + (const Position<U> &a, const Position<V> &b);
+
 		template<typename U>
 		friend bool
 		operator == (const Position<U> &a, const Position<U> &b);
@@ -152,10 +160,18 @@ namespace xpcc
 	Position<U>
 	operator - (const Position<U> &a, const Position<U> &b);
 	
+	template<typename U, typename V>
+	Position<U>
+	operator - (const Position<U> &a, const Position<V> &b);
+
 	template<typename U>
 	Position<U>
 	operator + (const Position<U> &a, const Position<U> &b);
 	
+	template<typename U, typename V>
+	Position<U>
+	operator + (const Position<U> &a, const Position<V> &b);
+
 	template<typename U>
 	bool
 	operator == (const Position<U> &a, const Position<U> &b);

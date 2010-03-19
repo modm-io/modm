@@ -189,6 +189,13 @@ xpcc::operator - (const Position<U> &a, const Position<U> &b)
 	return Position<U>(a.x - b.x, a.y - b.y);
 }
 
+template<typename U, typename V>
+xpcc::Position<U>
+xpcc::operator - (const Position<U> &a, const Position<V> &b)
+{
+	return Position<U>(a.x - b.x, a.y - b.y);
+}
+
 template<typename U>
 xpcc::Position<U>
 xpcc::operator + (const Position<U> &a, const Position<U> &b)
@@ -196,6 +203,12 @@ xpcc::operator + (const Position<U> &a, const Position<U> &b)
 	return Position<U>(a.x + b.x, a.y + b.y);
 }
 
+template<typename U,typename V>
+xpcc::Position<U>
+xpcc::operator + (const Position<U> &a, const Position<V> &b)
+{
+	return Position<U>(a.x + b.x, a.y + b.y);
+}
 
 template<typename U>
 bool
