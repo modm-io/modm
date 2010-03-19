@@ -57,7 +57,7 @@ class FileScanner:
 		self.env = env
 		self.unittest = unittest
 	
-	def scan(self, path):
+	def scan(self, path, ignore=None):
 		""" Scan directories for source files
 		
 		Provides the following attributes to collect the results:
@@ -66,6 +66,8 @@ class FileScanner:
 		defines		- dictionary with defines needed by the source files
 		"""
 		parser = configparser.XpccConfigParser()
+		
+		ignoreList = listify(ignore)
 		
 		self.sources = []
 		self.header = []
@@ -103,6 +105,8 @@ class FileScanner:
 						pass
 				
 				for file in files:
+					if file in ignoreList:
+						continue
 					extension = os.path.splitext(file)[1]
 					filename = os.path.join(path, file)
 					
@@ -165,9 +169,9 @@ def library_buildpath(env, path, strip_extension=False):
 	
 	return os.path.abspath(result)
 
-def find_files(env, path, unittest=None):
+def find_files(env, path, unittest=None, ignore=None):
 	scanner = FileScanner(env, unittest)
-	scanner.scan(path)
+	scanner.scan(path=path, ignore=ignore)
 	return scanner
 
 def require_architecture(env, architecture):
