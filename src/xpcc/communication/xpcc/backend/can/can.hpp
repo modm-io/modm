@@ -36,15 +36,30 @@
 
 namespace xpcc
 {
-
-
 	/**
-	 * @class	CanInterface
-	 * @brief	...
+	 * \brief	The CAN interface to the XPCC communication
 	 *
-	 * @ingroup	can
-	 * @version	$Id$
+	 * \subsection can_interface_definition The Needed Interface
+	 * The interface of the per template parameter given driver has to
+	 * provide the following static methods.
+	 * \code
+	 *	static inline bool
+	 *	isMessageAvailable();
+	 *
+	 *	static bool
+	 *	getMessage(Can::Message& message);
+	 *
+	 *	static bool
+	 *	canSend();
+	 *
+	 *	static bool
+	 *	sendMessage(const Can::Message& message);
+	 * \endcode
+	 *
+	 * \ingroup	communication
+	 * \version	$Id$
 	 */
+	template<typename C>
 	class CanInterface : public BackendInterface
 	{
 	public:
@@ -171,5 +186,7 @@ namespace xpcc
 		ReceiveListItem *receivedMessages;
 	};
 }
+
+#include "can_impl.hpp"
 
 #endif	// XPCC_CAN_HPP
