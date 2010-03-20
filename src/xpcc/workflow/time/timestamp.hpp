@@ -34,6 +34,7 @@
 #define	XPCC__TIMESTAMP_HPP
 
 #include <stdint.h>
+#include <xpcc/communication/io/iostream.hpp>
 
 namespace xpcc
 {
@@ -100,8 +101,18 @@ namespace xpcc
 		}
 	
 	private:
+		friend IOStream&
+		operator <<( IOStream&, const Timestamp& );
+
 		uint16_t time;
 	};
+
+	inline IOStream&
+	operator<<( IOStream& os, const Timestamp& t)
+	{
+		os << t.time << 's';
+		return os;
+	}
 }
 
 #endif	// XPCC__TIMESTAMP_HPP
