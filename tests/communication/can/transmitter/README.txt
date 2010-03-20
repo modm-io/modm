@@ -1,11 +1,4 @@
-Steuerprogramm für 'drive'.
-Über die Komandiozeile können Kommandos an eine laufende Instanz von 'drive' gesendet werden. 
+= Test to transmit CAN messages using the XPCC Connector=
 
-= Platform =
-PC (mit GTK+).
-
-= Kompilieren =
-scons all
-
-= Starten =
-control --help
+ * one 2 bytes messag
+ * one 15 bytes message
