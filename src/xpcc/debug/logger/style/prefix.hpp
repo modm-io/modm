@@ -32,7 +32,7 @@
 #ifndef XPCC_LOG_STYLE_PREFIX__HPP
 #define XPCC_LOG_STYLE_PREFIX__HPP
 
-#include <cstring>
+#include <string.h>
 #include "../style.hpp"
 #include <xpcc/utils/typet.hpp>
 
@@ -42,7 +42,13 @@ namespace xpcc
 	{
 		/**
 		 * \class 	Prefix
-		 * \brief 	Add a prefix to the logmessage
+		 * \brief 	Add a prefix to the log message
+		 *
+		 * \code
+		 *	xpcc::log::StyleWrapper< xpcc::log::Prefix< char[9] > > loggerDevicePrefix (
+		 * 			xpcc::log::Prefix< char[9] > ( "Prefix: ", loggerDevice ) );
+		 * 	xpcc::log::Logger loggerPrefix( loggerDevicePrefix );
+		 * \endcode
 		 *
 		 * \ingroup logger
 		 * \version	$Id$
