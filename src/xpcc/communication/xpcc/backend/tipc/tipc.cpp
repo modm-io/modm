@@ -35,7 +35,7 @@
 #undef  XPCC_LOG_LEVEL
 #define XPCC_LOG_LEVEL xpcc::log::WARNING
 
-xpcc::tipc::Tipc::Tipc( ) :
+xpcc::TipcConnector::TipcConnector( ) :
 	receiver( ),
 	transmitter( )
 {
@@ -44,7 +44,7 @@ xpcc::tipc::Tipc::Tipc( ) :
 
 // ----------------------------------------------------------------------------
 
-xpcc::tipc::Tipc::~Tipc()
+xpcc::TipcConnector::~TipcConnector()
 {
 
 }
@@ -52,7 +52,7 @@ xpcc::tipc::Tipc::~Tipc()
 // ----------------------------------------------------------------------------
 
 bool
-xpcc::tipc::Tipc::isPacketAvailable() const
+xpcc::TipcConnector::isPacketAvailable() const
 {
 	return this->receiver.hasPacket();
 }
@@ -60,7 +60,7 @@ xpcc::tipc::Tipc::isPacketAvailable() const
 // ----------------------------------------------------------------------------
 
 const xpcc::Header&
-xpcc::tipc::Tipc::getPacketHeader() const
+xpcc::TipcConnector::getPacketHeader() const
 {
 	return *(xpcc::Header*)this->receiver.frontPayload().getPointer();
 }
@@ -68,7 +68,7 @@ xpcc::tipc::Tipc::getPacketHeader() const
 // ----------------------------------------------------------------------------
 
 const xpcc::SmartPointer
-xpcc::tipc::Tipc::getPacketPayload() const
+xpcc::TipcConnector::getPacketPayload() const
 {
 	SmartPointerVolatile payload( this->receiver.frontPayload().getSize() - sizeof(xpcc::Header) );
 	if( payload.getSize() > 0 ) {
@@ -83,7 +83,7 @@ xpcc::tipc::Tipc::getPacketPayload() const
 // ----------------------------------------------------------------------------
 
 uint8_t
-xpcc::tipc::Tipc::getPacketPayloadSize() const
+xpcc::TipcConnector::getPacketPayloadSize() const
 {
 	return this->receiver.frontPayload().getSize();
 }
@@ -91,7 +91,7 @@ xpcc::tipc::Tipc::getPacketPayloadSize() const
 // ----------------------------------------------------------------------------
 
 void
-xpcc::tipc::Tipc::dropPacket()
+xpcc::TipcConnector::dropPacket()
 {
 	this->receiver.popFront();
 }
@@ -99,7 +99,7 @@ xpcc::tipc::Tipc::dropPacket()
 // ----------------------------------------------------------------------------
 
 void
-xpcc::tipc::Tipc::sendPacket(const xpcc::Header &header, SmartPointer payload)
+xpcc::TipcConnector::sendPacket(const xpcc::Header &header, SmartPointer payload)
 {
 //	XPCC_LOG_DEBUG << XPCC_FILE_INFO
 //			<< " payload size=" << payload.getSize()
@@ -131,7 +131,7 @@ xpcc::tipc::Tipc::sendPacket(const xpcc::Header &header, SmartPointer payload)
 // ----------------------------------------------------------------------------
 
 void
-xpcc::tipc::Tipc::update()
+xpcc::TipcConnector::update()
 {
 	// nothing to do, because TipcReceiver is using threads
 }

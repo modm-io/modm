@@ -42,64 +42,63 @@
 
 namespace xpcc
 {
-	namespace tipc
+	/**
+	 * \brief	Class that connects the communication to the tipc.
+	 *
+	 * \see tipc
+	 *
+	 * \ingroup	backend
+	 * \author	Martin Rosekeit <martin.rosekeit@rwth-aachen.de>
+	 */
+	class TipcConnector : public BackendInterface
 	{
-		/**
-		 * \brief	Class that connects the communication to the tipc.
-		 *
-		 * \ingroup	tipc
-		 * \author	Martin Rosekeit <martin.rosekeit@rwth-aachen.de>
-		 */
-		class Tipc : public BackendInterface
-		{
-			public :
-				Tipc();
+		public :
+			TipcConnector();
 
-				~Tipc();
+			~TipcConnector();
 
-				inline void
-				addEventId(uint8_t id)
-				{
-					this->receiver.addEventId(id);
-				}
+			inline void
+			addEventId(uint8_t id)
+			{
+				this->receiver.addEventId(id);
+			}
 
-				inline void
-				addReceiverId(uint8_t id)
-				{
-					this->receiver.addReceiverId(id);
-				}
+			inline void
+			addReceiverId(uint8_t id)
+			{
+				this->receiver.addReceiverId(id);
+			}
 
-				/// Check if a new packet was received by the backend
-				virtual bool
-				isPacketAvailable() const;
+			/// Check if a new packet was received by the backend
+			virtual bool
+			isPacketAvailable() const;
 
-				/// Access the packet.
-				virtual const ::xpcc::Header&
-				getPacketHeader() const;
+			/// Access the packet.
+			virtual const ::xpcc::Header&
+			getPacketHeader() const;
 
-				virtual const ::xpcc::SmartPointer
-				getPacketPayload() const;
+			virtual const ::xpcc::SmartPointer
+			getPacketPayload() const;
 
-				virtual uint8_t
-				getPacketPayloadSize() const;
+			virtual uint8_t
+			getPacketPayloadSize() const;
 
-				virtual void
-				dropPacket();
+			virtual void
+			dropPacket();
 
-				virtual void
-				update();
-				
-				/**
-				 * Send a Message.
-				 */
-				virtual void
-				sendPacket(const ::xpcc::Header &header,
-						   SmartPointer payload = SmartPointer());
+			virtual void
+			update();
 
-			private :
-				Receiver	receiver;
-				Transmitter	transmitter;
-		};
+			/**
+			 * Send a Message.
+			 */
+			virtual void
+			sendPacket(const ::xpcc::Header &header,
+					   SmartPointer payload = SmartPointer());
+
+		private :
+			::xpcc::tipc::Receiver		receiver;
+			::xpcc::tipc::Transmitter	transmitter;
 	};
 };
  
