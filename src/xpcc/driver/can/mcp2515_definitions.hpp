@@ -32,6 +32,8 @@
 #define	MCP2515_DEFINITIONS_HPP
 
 // TODO: Put these values in enums or declare them as real constants
+/** \ingroupe can */
+/*\{*/
 
 /** \name	SPI Kommandos */
 /*\{*/
@@ -307,5 +309,6 @@
 #define	DLC1		1
 #define DLC0		0
 
+/*\}*/
 /*\}*/
 #endif	// MCP2515_DEFINITIONS_HPP

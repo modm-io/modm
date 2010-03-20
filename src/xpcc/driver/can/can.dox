@@ -3,7 +3,7 @@
 // $Id$
 
 /**
-\ingroup	backend
+\ingroup	driver
 \defgroup 	can (CAN) Controller Area Network
 \brief 		Interface to the CAN-Commucication BUS.
  

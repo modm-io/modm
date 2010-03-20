@@ -41,7 +41,7 @@ namespace xpcc
 	 * \brief	Base class for CAN drivers
 	 * 
 	 * \author	Fabian Greif
-	 * \ingroup	driver
+	 * \ingroup	can
 	 */
 	class Can
 	{
