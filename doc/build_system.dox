@@ -48,6 +48,14 @@ It is easy to install lxml with setuptools
 Type <tt>easy_install lxml==xxx</tt> into the cmd window.
 Replace xxx with the last version which provides windows binaries.
 
+It is also possible to install other python modules with easy_install
+- <tt>easy_install scons</tt> (If during exexuting of Scons python does not find Sconsmodule use windows installer instead of easy_install to install Scons)
+- <tt>easy_install jinja2</tt>
+
+To program with AVRISP mkII you can use AVR Studio or install libusb to program using the XPCC system (AVR Dude)
+http://www.libusb.org/
+
+Optional
 - http://www.stack.nl/~dimitri/doxygen/download.html#latestsrc
 - http://www.graphviz.org/Download_windows.php
 
