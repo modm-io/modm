@@ -99,7 +99,7 @@ namespace xpcc
 	 * need to do this by yourself before calling the initialize method!
 	 * 
 	 * \author	Fabian Greif
-	 * \ingroup	driver
+	 * \ingroup	can
 	 */
 	template < typename SPI,
 			   typename CS,
@@ -123,9 +123,19 @@ namespace xpcc
 		static bool
 		getMessage(Can::Message& message);
 		
-		static bool
+		/*
+		 * The CAN controller has a free slot to send a new message.
+		 *
+		 * \return true if a slot is available, false otherwise
+		 */
+		static inline bool
 		canSend();
 		
+		/*
+		 * Send a message over the CAN.
+		 *
+		 * \return true if the message was send, false otherwise
+		 */
 		static bool
 		sendMessage(const Can::Message& message);
 		

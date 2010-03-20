@@ -49,7 +49,7 @@ xpcc::Mcp2515<SPI, CS, INT>::initialize(Can::Bitrate bitrate)
 	// software reset for the mcp2515, after this he is back in the
 	// configuration mode
 	CS::low();
-	SPI::put(SPI_RESET);
+	SPI::write(SPI_RESET);
 	delay_ms(1);
 	CS::high();
 	
@@ -57,20 +57,20 @@ xpcc::Mcp2515<SPI, CS, INT>::initialize(Can::Bitrate bitrate)
 	delay_ms(30);
 	
 	CS::low();
-	SPI::put(SPI_WRITE);
-	SPI::put(CNF3);
+	SPI::write(SPI_WRITE);
+	SPI::write(CNF3);
 	
 	accessor::Flash<uint8_t> cfgPtr(mcp2515::configuration);
 	for (uint8_t i = 0; i < 3; ++i)
 	{
-		SPI::put(cfgPtr[bitrate * 3 + i]);	// load CNF1..3
+		SPI::write(cfgPtr[bitrate * 3 + i]);	// load CNF1..3
 	}
-	SPI::put((1 << RX1IE) | (1 << RX0IE));		// enable interrupts
+	SPI::write((1 << RX1IE) | (1 << RX0IE));		// enable interrupts
 	CS::high();
 	
-	writeRegister(TXRTSCTRL, 0);	// set TXnRTS pins as inputs
+	writeRegister(TXRTSCTRL, 0);	// set TXnRTS pins as inwrites
 	writeRegister(BFPCTRL, 0);		// disable RXnBF pins (high impedance state)
-	
+
 	// check if we could read back some of the values
 	if (readRegister(CNF2) != cfgPtr[bitrate * 3 + 1])
 	{
@@ -105,15 +105,15 @@ xpcc::Mcp2515<SPI, CS, INT>::setFilter(accessor::Flash<uint8_t> filter)
 	for (i = 0; i < 0x30; i += 0x10)
 	{
 		CS::low();
-		SPI::put(SPI_WRITE);
-		SPI::put(i);
+		SPI::write(SPI_WRITE);
+		SPI::write(i);
 		
 		for (j = 0; j < 12; j++) 
 		{
 			if (i == 0x20 && j >= 0x08)
 				break;
 			
-			SPI::put(*filter++);
+			SPI::write(*filter++);
 		}
 		CS::high();
 	}
@@ -172,14 +172,14 @@ xpcc::Mcp2515<SPI, CS, INT>::getMessage(Can::Message& message)
 	}
 	
 	CS::low();
-	SPI::put(addr);
+	SPI::write(addr);
 	
 	message.flags.extended = readIdentifier(message.identifier);
 	message.flags.rtr = (status & (1 << 3)) ? true : false;
-	message.length = SPI::put(0xff) & 0x0f;
+	message.length = SPI::write(0xff) & 0x0f;
 	
 	for (uint8_t i = 0; i < message.length; ++i) {
-		message.data[i] = SPI::put(0xff);
+		message.data[i] = SPI::write(0xff);
 	}
 	CS::high();
 	
@@ -239,21 +239,21 @@ xpcc::Mcp2515<SPI, CS, INT>::sendMessage(const Can::Message& message)
 	}
 	
 	CS::low();
-	SPI::put(SPI_WRITE_TX | address);
+	SPI::write(SPI_WRITE_TX | address);
 	writeIdentifier(message.identifier, message.flags.extended);
 	
 	// if the message is a rtr-frame, is has a length but no attached data
 	if (message.flags.rtr)
 	{
-		SPI::put((1 << RTR) | message.length);
+		SPI::write((1 << RTR) | message.length);
 	}
 	else
 	{
-		SPI::put(message.length);
+		SPI::write(message.length);
 		
 		for (uint8_t i = 0; i < message.length; ++i)
 		{
-			SPI::put(message.data[i]);
+			SPI::write(message.data[i]);
 		}
 	}
 	CS::high();
@@ -263,7 +263,7 @@ xpcc::Mcp2515<SPI, CS, INT>::sendMessage(const Can::Message& message)
 	// send message via RTS command
 	CS::low();
 	address = (address == 0) ? 1 : address;	// 0 2 4 => 1 2 4
-	SPI::put(SPI_RTS | address);
+	SPI::write(SPI_RTS | address);
 	CS::high();
 	
 	return address;
@@ -277,9 +277,9 @@ xpcc::Mcp2515<SPI, CS, INT>::writeRegister(uint8_t address, uint8_t data)
 {
 	CS::low();
 	
-	SPI::put(SPI_WRITE);
-	SPI::put(address);
-	SPI::put(data);
+	SPI::write(SPI_WRITE);
+	SPI::write(address);
+	SPI::write(data);
 	
 	CS::high();
 }
@@ -292,9 +292,9 @@ xpcc::Mcp2515<SPI, CS, INT>::readRegister(uint8_t address)
 	
 	CS::low();
 	
-	SPI::put(SPI_READ);
-	SPI::put(address);
-	data = SPI::put(0xff);
+	SPI::write(SPI_READ);
+	SPI::write(address);
+	data = SPI::write(0xff);
 	
 	CS::high();
 	
@@ -307,10 +307,10 @@ xpcc::Mcp2515<SPI, CS, INT>::bitModify(uint8_t address, uint8_t mask, uint8_t da
 {
 	CS::low();
 	
-	SPI::put(SPI_BIT_MODIFY);
-	SPI::put(address);
-	SPI::put(mask);
-	SPI::put(data);
+	SPI::write(SPI_BIT_MODIFY);
+	SPI::write(address);
+	SPI::write(mask);
+	SPI::write(data);
 	
 	CS::high();
 }
@@ -323,8 +323,8 @@ xpcc::Mcp2515<SPI, CS, INT>::readStatus(uint8_t type)
 	
 	CS::low();
 	
-	SPI::put(type);
-	data = SPI::put(0xff);
+	SPI::write(type);
+	data = SPI::write(0xff);
 	
 	CS::high();
 	
@@ -344,23 +344,23 @@ xpcc::Mcp2515<SPI, CS, INT>::writeIdentifier(const uint32_t& identifier,
 	{
 		uint8_t tmp;
 		
-		SPI::put(*((uint16_t *) ptr + 1) >> 5);
+		SPI::write(*((uint16_t *) ptr + 1) >> 5);
 		
 		// calculate the next values
 		tmp  = (*((uint8_t *) ptr + 2) << 3) & 0xe0;
 		tmp |= (1 << IDE);
 		tmp |= (*((uint8_t *) ptr + 2)) & 0x03;
 		
-		SPI::put(tmp);
-		SPI::put(*((uint8_t *) ptr + 1));
-		SPI::put(*((uint8_t *) ptr));
+		SPI::write(tmp);
+		SPI::write(*((uint8_t *) ptr + 1));
+		SPI::write(*((uint8_t *) ptr));
 	}
 	else
 	{
-		SPI::put(*((uint16_t *) ptr) >> 3);
-		SPI::put(*((uint8_t *) ptr) << 5);
-		SPI::put(0);
-		SPI::put(0);
+		SPI::write(*((uint16_t *) ptr) >> 3);
+		SPI::write(*((uint8_t *) ptr) << 5);
+		SPI::write(0);
+		SPI::write(0);
 	}
 }
 
@@ -370,30 +370,30 @@ xpcc::Mcp2515<SPI, CS, INT>::readIdentifier(uint32_t& identifier)
 {
 	uint32_t *ptr = &identifier;
 	
-	uint8_t first = SPI::put(0xff);
-	uint8_t tmp   = SPI::put(0xff);
+	uint8_t first = SPI::write(0xff);
+	uint8_t tmp   = SPI::write(0xff);
 	
 	if (tmp & (1 << IDE))
 	{
 		*((uint16_t *) ptr + 1)  = (uint16_t) first << 5;
-		*((uint8_t *)  ptr + 1)  = SPI::put(0xff);
+		*((uint8_t *)  ptr + 1)  = SPI::write(0xff);
 		
 		*((uint8_t *)  ptr + 2) |= (tmp >> 3) & 0x1C;
 		*((uint8_t *)  ptr + 2) |=  tmp & 0x03;
 		
-		*((uint8_t *)  ptr)      = SPI::put(0xff);
+		*((uint8_t *)  ptr)      = SPI::write(0xff);
 		
 		return true;
 	}
 	else {
-		SPI::put(0xff);
+		SPI::write(0xff);
 		
 		*((uint8_t *)  ptr + 3) = 0;
 		*((uint8_t *)  ptr + 2) = 0;
 		
 		*((uint16_t *) ptr) = (uint16_t) first << 3;
 		
-		SPI::put(0xff);
+		SPI::write(0xff);
 		
 		*((uint8_t *) ptr) |= tmp >> 5;
 		

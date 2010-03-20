@@ -29,28 +29,37 @@
  * $Id$
  */
 // ----------------------------------------------------------------------------
-#ifndef XPCC_CAN_HPP
+#ifndef XPCC_CAN_CONNECTOR_HPP
 	#error	"Don't include this file directly, use 'can.hpp' instead!"
 #endif
 
-#ifndef	XPCC_CAN_IMPL_HPP
-#define	XPCC_CAN_IMPL_HPP
-
 #include "can.hpp"
+#include <xpcc/driver/can/can.hpp>
+
+#include <xpcc/architecture/general/time/delay.hpp>
+#include <xpcc/debug/logger/logger.hpp>
+
+// set the Loglevel
+#undef  XPCC_LOG_LEVEL
+#define XPCC_LOG_LEVEL xpcc::log::DEBUG
+
 template<typename C>
-xpcc::CanInterface::CanInterface() :
+xpcc::CanConnector<C>::CanConnector() :
 sendList(0), receivingMessages(0), receivedMessages(0) {
 	
 }
+
+// -----------------------------------------------------------------------------
 template<typename C>
-xpcc::CanInterface::~CanInterface()
+xpcc::CanConnector<C>::~CanConnector()
 {
 
 }
 
+// -----------------------------------------------------------------------------
 template<typename C>
 void
-xpcc::CanInterface::sendPacket(const Header &header, SmartPointer payload)
+xpcc::CanConnector<C>::sendPacket(const Header &header, SmartPointer payload)
 {
 	if (0)
 	{
@@ -62,11 +71,13 @@ xpcc::CanInterface::sendPacket(const Header &header, SmartPointer payload)
 		SendListItem *message = new SendListItem(header, payload);
 		
 		// append message to the list of pending messages
-		if (sendList == 0) {
-			sendList = message;
+		if (this->sendList == 0) {
+			// empty list => first element
+			this->sendList = message;
 		}
 		else {
-			SendListItem *node = sendList;
+			// find the last element in the list and append
+			SendListItem *node = this->sendList;
 			while (node->next != 0) {
 				node = node->next;
 			}
@@ -75,32 +86,77 @@ xpcc::CanInterface::sendPacket(const Header &header, SmartPointer payload)
 	}
 }
 
+// -----------------------------------------------------------------------------
 template<typename C>
 void
-xpcc::CanInterface::dropPacket()
+xpcc::CanConnector<C>::dropPacket()
 {
 	ReceiveListItem *temp = receivedMessages;
 	receivedMessages = receivedMessages->next;
 	delete temp;
 }
 
+// -----------------------------------------------------------------------------
 template<typename C>
 void
-xpcc::CanInterface::update() {
-	checkAndReceiveMessages();
-	sendWaitingMessages();
+xpcc::CanConnector<C>::update() {
+	this->checkAndReceiveMessages();
+	this->sendWaitingMessages();
+}
+
+// -----------------------------------------------------------------------------
+// protected
+// -----------------------------------------------------------------------------
+template<typename C>
+bool
+xpcc::CanConnector<C>::sendCanMessage(const Header &header, const uint8_t *data, uint8_t size)
+{
+	xpcc::Can::Message message(
+			0,
+			size);
+
+	switch ( header.type ) {
+		case xpcc::Header::REQUEST :
+			message.identifier = 0;
+			break;
+		case xpcc::Header::RESPONSE :
+			message.identifier = 1;
+			break;
+		case xpcc::Header::NEGATIVE_RESPONSE :
+			message.identifier = 2;
+			break;
+	}
+	message.identifier = message.identifier << 1;
+
+	if( header.isAcknowledge ) {
+		message.identifier += 1;
+	}
+	message.identifier = message.identifier << 1;
+
+	// todo counter
+	message.identifier = message.identifier << 8;
+
+	message.identifier += header.destination;
+	message.identifier = message.identifier << 8;
+	message.identifier += header.source;
+	message.identifier = message.identifier << 8;
+	message.identifier += header.packetIdentifier;
+
+	memcpy(message.data, data, size);
+
+	return C::sendMessage( message );
 }
 
 template<typename C>
 void
-xpcc::CanInterface::sendWaitingMessages()
+xpcc::CanConnector<C>::sendWaitingMessages()
 {
-	if (sendList == 0) {
+	if (this->sendList == 0) {
 		// no message in the queue
 		return;
 	}
 	
-	uint8_t size = sendList->payload.getSize();
+	uint8_t size = this->sendList->payload.getSize();
 	bool sendFinished = true;
 	
 	if (size > 8)
@@ -108,18 +164,20 @@ xpcc::CanInterface::sendWaitingMessages()
 		// fragmented message
 		uint8_t data[8];
 		
-		data[0] = sendList->fragmentIndex;
-		data[1] = size;
+		data[0] = this->sendList->fragmentIndex;
+		data[1] = size; // complete message
 		
-		if (size > 6) {
-			size = 6;
+		uint8_t offset = this->sendList->fragmentIndex * 6;
+		uint8_t sizeFragment = size - offset;
+		if (sizeFragment > 6) {
+			sizeFragment = 6;
 			sendFinished = false;
 		}
-		
-		memcpy(data + 2, sendList->payload.getPointer(), size);
-		
-		if (sendCanMessage(sendList->header, data, size)) {
-			sendList->fragmentIndex++;
+
+		memcpy(data + 2, this->sendList->payload.getPointer()+offset, sizeFragment);
+
+		if (sendCanMessage(this->sendList->header, data, sizeFragment)) {
+			this->sendList->fragmentIndex++;
 		}
 		else {
 			sendFinished = false;
@@ -127,7 +185,7 @@ xpcc::CanInterface::sendWaitingMessages()
 	}
 	else
 	{
-		if (!sendCanMessage(sendList->header, sendList->payload.getPointer(), size)) {
+		if (!this->sendCanMessage(this->sendList->header, this->sendList->payload.getPointer(), size)) {
 			sendFinished = false;
 		}
 	}
@@ -137,14 +195,44 @@ xpcc::CanInterface::sendWaitingMessages()
 		// message was the last fragment
 		// => remove it from the list
 		SendListItem *node = sendList;
-		sendList = sendList->next;
+		this->sendList = this->sendList->next;
 		delete node;
 	}
 }
 
 template<typename C>
+bool
+xpcc::CanConnector<C>::isCanMessageAvailable() const
+{
+	return false;
+}
+
+template<typename C>
+bool
+xpcc::CanConnector<C>::retrieveCanMessage()
+{
+	return false;
+}
+
+template<typename C>
+uint32_t
+xpcc::CanConnector<C>::getCanIdentifier()
+{
+	return 0;
+}
+
+template<typename C>
+uint8_t
+xpcc::CanConnector<C>::getCanData(uint8_t *data)
+{
+	(void) data;
+
+	return 0;
+}
+
+template<typename C>
 void
-xpcc::CanInterface::checkAndReceiveMessages()
+xpcc::CanConnector<C>::checkAndReceiveMessages()
 {
 	while (isCanMessageAvailable())
 	{
@@ -156,7 +244,7 @@ xpcc::CanInterface::checkAndReceiveMessages()
 
 template<typename C>
 void
-xpcc::CanInterface::readMessage()
+xpcc::CanConnector<C>::readMessage()
 
 {
 	//uint32_t identifier = getCanIdentifier();
@@ -179,5 +267,3 @@ xpcc::CanInterface::readMessage()
 		*/
 	}
 }
-
-#endif /* XPCC_CAN_IMPL_HPP */

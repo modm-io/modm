@@ -29,17 +29,17 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC_CAN_HPP
-#define	XPCC_CAN_HPP
+#ifndef	XPCC_CAN_CONNECTOR_HPP
+#define	XPCC_CAN_CONNECTOR_HPP
 
 #include "../backend_interface.hpp"
 
 namespace xpcc
 {
 	/**
-	 * \brief	The CAN interface to the XPCC communication
+	 * \brief	The CAN connector to the XPCC communication
 	 *
-	 * \subsection can_interface_definition The Needed Interface
+	 * \section can_interface_definition The Needed Interface
 	 * The interface of the per template parameter given driver has to
 	 * provide the following static methods.
 	 * \code
@@ -49,24 +49,42 @@ namespace xpcc
 	 *	static bool
 	 *	getMessage(Can::Message& message);
 	 *
+	 * 	/// The CAN controller has a free slot to send a new message.
+	 *	/// \return true if a slot is available, false otherwise
 	 *	static bool
 	 *	canSend();
 	 *
+	 *	/// Send a message over the CAN.
+	 *	/// \return true if the message was send, false otherwise
 	 *	static bool
 	 *	sendMessage(const Can::Message& message);
 	 * \endcode
 	 *
-	 * \ingroup	communication
+	 * \section can_interface_packed_definition Definition of the Structure in the CAN Message
+	 * \image html xpcc_can_identifier.png
+	 * Changes in the highest 4 bits:
+	 * - 2 bit: Action [0], Response [1], Neg. Response [2], not used [3]
+     * - 1 bit: Request [0], Acknowledge [1] (NACK implicit in the payload)
+     * - 1 bit: Message Counter active [1] / not active [1]
+     *
+     * An EVENT is send with the DestinationID 0x00.
+	 *
+	 * \see can
+	 *
+	 * \todo message counter
+	 * \todo timeout
+	 *
+	 * \ingroup	backend
 	 * \version	$Id$
 	 */
 	template<typename C>
-	class CanInterface : public BackendInterface
+	class CanConnector : public BackendInterface
 	{
 	public:
-		CanInterface();
+		CanConnector();
 		
 		virtual
-		~CanInterface();
+		~CanConnector();
 		
 		virtual void
 		sendPacket(const Header &header, SmartPointer payload);
@@ -95,7 +113,7 @@ namespace xpcc
 		dropPacket();
 		
 		virtual void
-		update() = 0;
+		update();
 	
 	protected:
 		/**
@@ -103,18 +121,20 @@ namespace xpcc
 		 *
 		 * \return	\b true if the message could be send, \b false otherwise
 		 */
-		virtual bool
-		sendCanMessage(const Header &header, const uint8_t *data, uint8_t size) = 0;
+		bool
+		sendCanMessage(const Header &header, const uint8_t *data, uint8_t size);
+
+		void
+		sendWaitingMessages();
 		
+		bool
+		isCanMessageAvailable() const;
 		
-		virtual bool
-		isCanMessageAvailable() const = 0;
+		bool
+		retrieveCanMessage();
 		
-		virtual bool
-		retrieveCanMessage() = 0;
-		
-		virtual uint32_t
-		getCanIdentifier() = 0;
+		uint32_t
+		getCanIdentifier();
 		
 		/**
 		 *  \brief	Read message data
@@ -122,12 +142,8 @@ namespace xpcc
 		 * \param[out]	data
 		 * \return		size
 		 */
-		virtual uint8_t
-		getCanData(uint8_t *data) = 0;
-	
-	private:
-		void
-		sendWaitingMessages();
+		uint8_t
+		getCanData(uint8_t *data);
 		
 		void
 		checkAndReceiveMessages();
@@ -172,7 +188,6 @@ namespace xpcc
 			uint8_t size;
 			
 			uint8_t receivedFragments;
-			// TODO timeout
 		
 		private:
 			ReceiveListItem(const ReceiveListItem& other);
@@ -189,4 +204,4 @@ namespace xpcc
 
 #include "can_impl.hpp"
 
-#endif	// XPCC_CAN_HPP
+#endif	// XPCC_CAN_CONNECTOR_HPP
