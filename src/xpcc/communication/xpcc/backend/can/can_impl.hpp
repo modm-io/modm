@@ -39,6 +39,8 @@
 #include <xpcc/architecture/general/time/delay.hpp>
 #include <xpcc/debug/logger/logger.hpp>
 
+#define XPCC_CAN_USE_COUNTER 0
+
 // set the Loglevel
 #undef  XPCC_LOG_LEVEL
 #define XPCC_LOG_LEVEL xpcc::log::DEBUG
@@ -61,12 +63,18 @@ template<typename C>
 void
 xpcc::CanConnector<C>::sendPacket(const Header &header, SmartPointer payload)
 {
-	if (0)
+	bool sendSuccessfull = false;
+
+#if XPCC_CAN_USE_COUNTER
+	if ( payload.getSize() <= 7 && C::canSend()  )
+#else
+	if ( payload.getSize() <= 8 && C::canSend()  )
+#endif
 	{
-		// TODO: check if the send buffer is empty, so that we can send the
-		// message directly without putting it to the list
+		sendSuccessfull = this->sendCanMessage(	header, payload.getPointer(), payload.getSize() );
 	}
-	else
+
+	if( !sendSuccessfull )
 	{
 		SendListItem *message = new SendListItem(header, payload);
 		
@@ -134,6 +142,9 @@ xpcc::CanConnector<C>::sendCanMessage(const Header &header, const uint8_t *data,
 	message.identifier = message.identifier << 1;
 
 	// todo counter
+#if XPCC_CAN_USE_COUNTER
+#error "use of counter is not implemented yet"
+#endif
 	message.identifier = message.identifier << 8;
 
 	message.identifier += header.destination;
@@ -141,6 +152,8 @@ xpcc::CanConnector<C>::sendCanMessage(const Header &header, const uint8_t *data,
 	message.identifier += header.source;
 	message.identifier = message.identifier << 8;
 	message.identifier += header.packetIdentifier;
+
+	message.flags.extended = true;
 
 	memcpy(message.data, data, size);
 
