@@ -93,6 +93,7 @@ namespace xpcc
 		virtual inline void
 		flush()
 		{
+			T::write('\n');
 		}
 		
 		virtual inline bool
