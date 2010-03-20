@@ -42,7 +42,7 @@ main()
 {
 	xpcc::log::info << "########## XPCC TIPC RAW Test TRANSMIT ##########" << xpcc::flush;
 
-	xpcc::tipc::Tipc tipc;
+	xpcc::TipcConnector tipc;
 	tipc.addReceiverId(0x20);
 
 	xpcc::Header actionHeader( xpcc::Header::REQUEST, false, 0x10, 0x20, 0x01 );	// ACTION

@@ -45,7 +45,7 @@ main()
 	xpcc::log::info << "########## XPCC TIPC COMPONENT Test TRANSMIT ##########" << xpcc::flush;
 
 	// the hardware, that transfers the messages
-	xpcc::tipc::Tipc tipc;
+	xpcc::TipcConnector tipc;
 
 	// set the filters of the hardware
 	tipc.addReceiverId(0x11);

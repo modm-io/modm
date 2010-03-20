@@ -43,7 +43,7 @@ main()
 {
 	xpcc::log::info << "########## XPCC TIPC RECEIVER Test ##########" << xpcc::flush;
 
-	xpcc::tipc::Tipc tipc;
+	xpcc::TipcConnector tipc;
 
 	tipc.addReceiverId(0x10);
 	tipc.addEventId(0x01);

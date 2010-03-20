@@ -43,34 +43,37 @@ class Receiver : public xpcc::AbstractComponent
 {
 	public:
 		void
-		actionCallback(const xpcc::Header& header, const xpcc::SmartPointer& payload)
+		actionCallback( const int* payload )
 		{
 			XPCC_LOG_INFO << XPCC_FILE_INFO << "has ACTION";
-			XPCC_LOG_INFO << " from:" << (int)header.source;
-			XPCC_LOG_INFO << " value:" << *(int*) payload.getPointer();
+			XPCC_LOG_INFO << " from: TODO";
+			XPCC_LOG_INFO << " value:" << *payload;
 			XPCC_LOG_INFO << xpcc::flush;
 		}
 
 		void
-		eventCallback(const xpcc::Header& header, const xpcc::SmartPointer& payload)
+		eventCallback( const int* payload )
 		{
 			XPCC_LOG_INFO << XPCC_FILE_INFO << "has EVENT";
-			XPCC_LOG_INFO << " from:" << (int)header.source;
-			XPCC_LOG_INFO << " value:" << *(int*) payload.getPointer();
+			XPCC_LOG_INFO << " from: TODO";
+			XPCC_LOG_INFO << " value:" << *payload;
 			XPCC_LOG_INFO << xpcc::flush;
 		}
+	
+	private:
+		xpcc::TipcConnector tipc;
 };
 
 int
 main()
 {
 	xpcc::log::info << "########## XPCC TIPC COMPONENT Test Receiver ##########" << xpcc::flush;
-
+	
 	// the component, that receives the messages
 	Receiver receiver;
 
 	// the hardware, that transfers the messages
-	xpcc::tipc::Tipc tipc;
+	xpcc::TipcConnector tipc;
 
 	// set the filters of the hardware
 	tipc.addReceiverId(0x10);
@@ -80,11 +83,11 @@ main()
 	// the connection between messageID and callback-methods
 	// EVENT = 0x01;
 	xpcc::StlPostman::EventMap eventMap;
-	eventMap.insert( xpcc::StlPostman::EventMap::value_type( 0x01, xpcc::ResponseCallback(&receiver, &Receiver::eventCallback) ) );
+	eventMap.insert( xpcc::StlPostman::EventMap::value_type( 0x01, xpcc::Callback(&receiver, &Receiver::eventCallback) ) );
 
 	// ACTION = 0x10;
 	xpcc::StlPostman::CallbackMap receiverCallbackMap;
-	receiverCallbackMap[0x20] = xpcc::ResponseCallback(&receiver, &Receiver::actionCallback);
+	receiverCallbackMap[0x20] = xpcc::Callback(&receiver, &Receiver::actionCallback);
 
 	xpcc::StlPostman::RequestMap componentMap;
 	componentMap[0x10] = receiverCallbackMap;
