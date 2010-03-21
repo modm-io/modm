@@ -34,6 +34,8 @@
 
 #include "../backend_interface.hpp"
 
+#include <xpcc/data_structure/list.hpp>
+
 namespace xpcc
 {
 	/**
@@ -62,6 +64,7 @@ namespace xpcc
 	 *
 	 * \section can_interface_packed_definition Definition of the Structure in the CAN Message
 	 * \image html xpcc_can_identifier.png
+	 *
 	 * Changes in the highest 4 bits:
 	 * - 2 bit: Action [0], Response [1], Neg. Response [2], not used [3]
      * - 1 bit: Request [0], Acknowledge [1] (NACK implicit in the payload)
@@ -91,22 +94,22 @@ namespace xpcc
 		
 		virtual bool
 		isPacketAvailable() const {
-			return (receivedMessages != 0);
+			return !this->receivedMessages.isEmpty();
 		}
 		
 		virtual const Header&
 		getPacketHeader() const {
-			return receivedMessages->header;
+			return this->receivedMessages.front()->getValue()->header;
 		}
 		
 		virtual const xpcc::SmartPointer
 		getPacketPayload() const {
-			return this->receivedMessages->data;
+			return this->receivedMessages.front()->getValue()->data;
 		}
 		
 		virtual uint8_t
 		getPacketPayloadSize() const {
-			return receivedMessages->size;
+			return this->receivedMessages.front()->getValue()->size;
 		}
 		
 		virtual void
@@ -122,7 +125,7 @@ namespace xpcc
 		 * \return	\b true if the message could be send, \b false otherwise
 		 */
 		bool
-		sendCanMessage(const Header &header, const uint8_t *data, uint8_t size);
+		sendCanMessage(const Header &header, const uint8_t *data, uint8_t size, bool fragmentated);
 
 		void
 		sendWaitingMessages();
@@ -148,18 +151,13 @@ namespace xpcc
 		void
 		checkAndReceiveMessages();
 		
-		void
-		readMessage();
-		
 		class SendListItem
 		{
 		public:
 			SendListItem(const Header& header, const SmartPointer& payload) :
-				next(0), header(header), payload(payload),
+				header(header), payload(payload),
 				fragmentIndex(0) {
 			}
-			
-			SendListItem *next;
 			
 			Header header;
 			SmartPointer payload;
@@ -176,15 +174,13 @@ namespace xpcc
 		class ReceiveListItem
 		{
 		public:
-			ReceiveListItem(const Header& header) :
-				next(0), header(header), size(0),
+			ReceiveListItem(uint8_t size, const Header& header ) :
+				header(header), data(size), size(0),
 				receivedFragments(0) {
 			}
 			
-			ReceiveListItem *next;
-			
 			Header header;
-			SmartPointer data;
+			SmartPointerVolatile data;
 			uint8_t size;
 			
 			uint8_t receivedFragments;
@@ -196,9 +192,12 @@ namespace xpcc
 			operator=(const ReceiveListItem& other);
 		};
 		
-		SendListItem *sendList;
-		ReceiveListItem *receivingMessages;
-		ReceiveListItem *receivedMessages;
+		typedef typename xpcc::List< SendListItem* > SendList;
+		typedef typename xpcc::List< ReceiveListItem* > ReceiveList;
+
+		SendList sendList;
+		ReceiveList receivingMessages;
+		ReceiveList receivedMessages;
 	};
 }
 
