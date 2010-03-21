@@ -160,6 +160,20 @@ xpcc::List<T>::at(int index) const
 	return node;
 }
 
+template <typename T>
+typename xpcc::List<T>::Node*
+xpcc::List<T>::front() const
+{
+	return this->first;
+}
+
+
+template <typename T>
+typename xpcc::List<T>::Node*
+xpcc::List<T>::back() const
+{
+	return this->last;
+}
 // ----------------------------------------------------------------------------
 template <typename T>
 bool

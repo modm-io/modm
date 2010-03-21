@@ -69,18 +69,24 @@ namespace xpcc
 				this->value = newValue;
 			}
 			
-			const T&
+			inline const T&
 			getValue() const
 			{
 				return value;
 			}
 			
-			T&
+			inline T&
 			getValue()
 			{
 				return value;
 			}
 			
+			inline Node*
+			operator ++ () const
+			{
+				return this->next;
+			}
+
 		private:
 			Node *next;
 			T value;
@@ -139,11 +145,11 @@ namespace xpcc
 		/// Insert in front
 		void
 		prepend(Node *node);
-		
+
 		/// Insert at the end of the list
 		void
 		append(Node *node);
-		
+
 		/// Insert node after a given node
 		void
 		insertAfter(Node *previous, Node *newNode);
@@ -175,7 +181,7 @@ namespace xpcc
 		removeFirst();
 		
 		/// check if there are any nodes in the list
-		bool
+		inline bool
 		isEmpty() const;
 		
 		
@@ -188,6 +194,18 @@ namespace xpcc
 		 */
 		Node*
 		at(int index) const;
+
+		/**
+		 * \return the first node in the list
+		 */
+		inline Node*
+		front() const;
+
+		/**
+		 * \return the last node in the list
+		 */
+		inline Node*
+		back() const;
 	
 	private:
 		Node *first;
