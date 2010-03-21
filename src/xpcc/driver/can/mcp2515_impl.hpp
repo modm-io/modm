@@ -149,7 +149,7 @@ template <typename SPI, typename CS, typename INT>
 bool
 xpcc::Mcp2515<SPI, CS, INT>::isMessageAvailable()
 {
-	return !INT::get();
+	return !INT::read();
 }
 
 // ----------------------------------------------------------------------------
