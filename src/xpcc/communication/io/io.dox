@@ -3,8 +3,10 @@
 // $Id: io.dox 76 2009-10-14 23:29:28Z dergraaf $
 
 /*!
+\ingroup communication
 \defgroup io IO-Classes
-\brief A Modul of IOStream and IODevices
+
+\brief A modul of IOStream and IODevices
 
 
 

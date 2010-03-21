@@ -55,27 +55,46 @@ namespace xpcc
 
 		Location(const Position& position, const Angle& phi);
 
-		Location(const Position& position, float phi);
+		//Location(const Position& position, float phi);
 
 		Location(const T& x, const T& y, const Angle& phi);
 
-		Location(const T& x, const T& y, float phi);
+		//Location(const T& x, const T& y, float phi);
 
-		/// \brief	Add a position increment
+		/// Add a position increment
 		void
 		update(Location& diff);
 		
-		/// \brief	Add a increment only in x-direction
+		/// Add a increment only in x-direction
 		void
 		update(T x, Angle& phi);
 		
-		// Attributes
-		Position position;
-		Angle phi;
-
+		const Position&
+		getPosition() const;
+		
+		void
+		setPosition(const Position& position);
+		
+		void
+		setPosition(const T& x, const T& y);
+		
+		const Angle&
+		getAngle() const;
+		
+		void
+		setAngle(const Angle& phi);
+		
+		/// Convert between Location-objects with different base-types
+		template<typename U>
+		operator Location<U>() const;
+		
+	private:
 		template <typename U>
 		friend IOStream&
 		operator <<( IOStream&, const Location<U>&);
+		
+		Position position;
+		Angle phi;
 	};
 
 	/**
@@ -88,85 +107,6 @@ namespace xpcc
 	operator<<(IOStream& os, const Location<T>& l);
 }
 
-// -----------------------------------------------------------------------------
-// IMPLEMENTATION
-// -----------------------------------------------------------------------------
-
-template <typename T>
-xpcc::Location<T>::Location() :
-	position(), phi()
-{
-}
-
-// -----------------------------------------------------------------------------
-template <typename T>
-xpcc::Location<T>::Location(const Position& position, const Angle& phi) :
-	position(position),
-	phi(phi)
-{
-}
-
-// -----------------------------------------------------------------------------
-template <typename T>
-xpcc::Location<T>::Location(const Position& position, float phi) :
-	position(position),
-	phi(phi)
-{
-
-}
-
-// -----------------------------------------------------------------------------
-template <typename T>
-xpcc::Location<T>::Location(const T& x, const T& y, const Angle& phi) :
-	position(x, y),
-	phi(phi)
-{
-
-}
-
-// -----------------------------------------------------------------------------
-template <typename T>
-xpcc::Location<T>::Location(const T& x, const T& y, float phi) :
-	position(x, y),
-	phi(phi)
-{
-
-}
-
-// -----------------------------------------------------------------------------
-template <typename T>
-void
-xpcc::Location<T>::update(Location<T>& diff)
-{
-	position += diff.position.rotate(phi);
-	phi += diff.phi;
-	phi.normalize();
-}
-
-// ----------------------------------------------------------------------------
-
-template <typename T>
-void
-xpcc::Location<T>::update(T x, xpcc::Angle& phi)
-{
-	position += Position(x * cos(this->phi).toFloat(),
-						 x * sin(this->phi).toFloat());
-
-	this->phi += phi;
-	this->phi.normalize();
-}
-
-// ----------------------------------------------------------------------------
-
-template<class T>
-xpcc::IOStream&
-xpcc::operator<<(xpcc::IOStream& os, const xpcc::Location<T>& l)
-{
-	os << "position=( " << l.position << " )";
-	os << "\nphi     =" << l.phi;
-
-	return os;
-}
-
+#include "location_impl.hpp"
 
 #endif	// XPCC__LOCATION_HPP

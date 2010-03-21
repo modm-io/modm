@@ -31,7 +31,7 @@
 // ----------------------------------------------------------------------------
 
 #ifndef	XPCC__POSITION_HPP
-	#error	"Don't include this file directly use 'math/position.hpp' instead!"
+	#error	"Don't include this file directly, use 'math/position.hpp' instead!"
 #endif
 
 // ----------------------------------------------------------------------------
