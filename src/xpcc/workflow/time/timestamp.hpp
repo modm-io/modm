@@ -110,7 +110,7 @@ namespace xpcc
 	inline IOStream&
 	operator<<( IOStream& os, const Timestamp& t)
 	{
-		os << t.time << 's';
+		os << t.time;
 		return os;
 	}
 }
