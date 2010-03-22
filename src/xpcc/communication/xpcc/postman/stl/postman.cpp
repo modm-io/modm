@@ -38,7 +38,7 @@ xpcc::StlPostman::StlPostman()
 
 // ----------------------------------------------------------------------------
 
-xpcc::StlPostman::StlPostman(const EventMap& eventMap, const RequestMap& requenstMap) :
+xpcc::StlPostman::StlPostman(const EventMap* eventMap, const RequestMap* requenstMap) :
 	eventMap ( eventMap ),
 	requenstMap ( requenstMap )
 {
@@ -57,8 +57,8 @@ xpcc::StlPostman::deliverPacket(const Header &header, const SmartPointer& payloa
 {
 	if ( header.destination == 0 ) {
 		// EVENT
-		EventMap::const_iterator lowerBound( this->eventMap.lower_bound( header.packetIdentifier) );
-		EventMap::const_iterator upperBound( this->eventMap.upper_bound( header.packetIdentifier) );
+		EventMap::const_iterator lowerBound( this->eventMap->lower_bound( header.packetIdentifier) );
+		EventMap::const_iterator upperBound( this->eventMap->upper_bound( header.packetIdentifier) );
 		if ( lowerBound != upperBound ) {
 			do {
 				lowerBound->second.call(payload);
@@ -71,8 +71,8 @@ xpcc::StlPostman::deliverPacket(const Header &header, const SmartPointer& payloa
 	}
 	else {
 		// REQUEST
-		RequestMap::const_iterator iterDestination( this->requenstMap.find( header.destination ) );
-		if( iterDestination != this->requenstMap.end() ) {
+		RequestMap::const_iterator iterDestination( this->requenstMap->find( header.destination ) );
+		if( iterDestination != this->requenstMap->end() ) {
 			CallbackMap::const_iterator iterCallback( iterDestination->second.find( header.packetIdentifier ) );
 			if( iterCallback != iterDestination->second.end() ) {
 				iterCallback->second.call(payload);
@@ -93,6 +93,6 @@ xpcc::StlPostman::deliverPacket(const Header &header, const SmartPointer& payloa
 bool
 xpcc::StlPostman::isComponentAvaliable(const Header& header) const
 {
-	RequestMap::const_iterator iterDestination( this->requenstMap.find( header.destination ) );
-	return ( iterDestination != this->requenstMap.end() );
+	RequestMap::const_iterator iterDestination( this->requenstMap->find( header.destination ) );
+	return ( iterDestination != this->requenstMap->end() );
 }

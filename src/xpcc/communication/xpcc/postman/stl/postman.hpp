@@ -58,7 +58,7 @@ namespace xpcc
 
 		StlPostman();
 
-		StlPostman(const EventMap& eventMap, const RequestMap& requenstMap);
+		StlPostman(const EventMap *eventMap, const RequestMap *requenstMap);
 		
 		~StlPostman();
 		
@@ -69,8 +69,8 @@ namespace xpcc
 		isComponentAvaliable(const Header& header) const;
 
 	private:
-		EventMap eventMap;
-		RequestMap requenstMap;
+		const EventMap *eventMap;
+		const RequestMap *requenstMap;
 	};
 }
 
