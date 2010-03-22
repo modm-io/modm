@@ -78,12 +78,23 @@ namespace xpcc
 	class Communication
 	{
 	public:
+		/*
+		 * If the Postman is not set via this constructur, use the setPostman()
+		 * methode.
+		 * \notice The postman has to be set before a message can be delivered!
+		 */
 		Communication(
 				BackendInterface *backend,
-				Postman* postman);
+				Postman* postman = 0);
 		
 		~Communication();
 		
+		/*
+		 * \notice The postman has to be set before a message can be delivered!
+		 */
+		void
+		setPostman( Postman* const postman );
+
 		void
 		update();
 		
@@ -124,7 +135,7 @@ namespace xpcc
 		
 	private:
 		BackendInterface * const backend;
-		Postman * const postman;
+		Postman * postman;
 		uint8_t currentComponent;
 		communicationList::List responseManager;
 		

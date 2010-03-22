@@ -53,45 +53,63 @@ xpcc::Communication::~Communication()
 
 // ----------------------------------------------------------------------------
 void
+xpcc::Communication::setPostman( xpcc::Postman* postman )
+{
+	this->postman = postman;
+}
+
+// ----------------------------------------------------------------------------
+void
 xpcc::Communication::update(){
-	//Check if a new packet was received by the backend
-	while( this->backend->isPacketAvailable() )
-	{
-		//switch(postman->deliverPacket(backend))){
-		//	case NO_ACTION: // send error message
-		//		break;
-		//	case OK:
-		//	case NO_COMPONENT:
-		//	case NO_EVENT:
-		//}
-		const Header& header( this->backend->getPacketHeader() );
-		const SmartPointer payload( this->backend->getPacketPayload() );
-		
-		if ( header.type == Header::REQUEST && !header.isAcknowledge )
+	if ( this->postman != 0 ) {
+
+		//Check if a new packet was received by the backend
+		while( this->backend->isPacketAvailable() )
 		{
-			if ( postman->deliverPacket( header, payload ) == Postman::OK ) {
-				if ( header.destination != 0 ) {
-					// transmit ACK (is not an EVENT)
-					Header ackHeader(
-							header.type,
-							true,
-							header.source,
-							header.destination,
-							header.packetIdentifier);
-					this->backend->sendPacket( ackHeader );
+			//switch(postman->deliverPacket(backend))){
+			//	case NO_ACTION: // send error message
+			//		break;
+			//	case OK:
+			//	case NO_COMPONENT:
+			//	case NO_EVENT:
+			//}
+			const Header& header( this->backend->getPacketHeader() );
+			const SmartPointer payload( this->backend->getPacketPayload() );
+
+			if ( header.type == Header::REQUEST && !header.isAcknowledge )
+			{
+				if ( postman->deliverPacket( header, payload ) == Postman::OK ) {
+					if ( header.destination != 0 ) {
+						// transmit ACK (is not an EVENT)
+						Header ackHeader(
+								header.type,
+								true,
+								header.source,
+								header.destination,
+								header.packetIdentifier);
+						this->backend->sendPacket( ackHeader );
+					}
 				}
 			}
-		}
-		else{
-			responseManager.handlePacket( header, payload );
-		}
-		
-		backend->dropPacket();
-	}
-	
-	// check somehow if there are packets to send
-	responseManager.handleWaitingMessages(*postman, *backend);
+			else{
+				this->responseManager.handlePacket( header, payload );
+			}
 
+			this->backend->dropPacket();
+		}
+
+		// check somehow if there are packets to send
+		this->responseManager.handleWaitingMessages(*postman, *backend);
+	}
+	else {
+		XPCC_LOG_ERROR
+				<< XPCC_FILE_INFO
+				<< "No postman set!"
+				<< xpcc::flush;
+		while( this->backend->isPacketAvailable() ) {
+			this->backend->dropPacket();
+		}
+	}
 }
 
 // ----------------------------------------------------------------------------
