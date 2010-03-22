@@ -89,6 +89,19 @@ namespace xpcc
 		
 		/**
 		 * Get the value that are stored in the pointer casted to the given type.
+		 * \note This method has no checking mechanism, use get(T) to have at least some.
+		 *
+		 * \return the stored value converted to T
+		 */
+		template<typename T>
+		const T&
+		get() const
+		{
+			return *(T*)&ptr[2];
+		}
+
+		/**
+		 * Get the value that are stored in the pointer casted to the given type.
 		 * The method checks only the size but not the typ of the stored data
 		 * 
 		 * \return true if the type fit
