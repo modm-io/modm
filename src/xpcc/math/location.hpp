@@ -69,7 +69,7 @@ namespace xpcc
 		void
 		update(T x, Angle& phi);
 		
-		const Position&
+		inline const Position&
 		getPosition() const;
 		
 		void
@@ -78,7 +78,7 @@ namespace xpcc
 		void
 		setPosition(const T& x, const T& y);
 		
-		const Angle&
+		inline const Angle&
 		getAngle() const;
 		
 		void
