@@ -23,14 +23,14 @@ For Ubuntu (and other Debian based Linux-Distributions) just type the
 following in a terminal and you're good to go:
 
 \verbatim
-$ sudo aptitude install python scons
+$ sudo aptitude install python scons python-jinja2 python-lxml
 \endverbatim
 
 To generate the documentation and regenerate the template files you also need
 the following packets:
 
 \verbatim
-$ sudo aptitude install doxygen graphviz python-jinja2
+$ sudo aptitude install doxygen graphviz
 \endverbatim
 
 \subsubsection windows Windows

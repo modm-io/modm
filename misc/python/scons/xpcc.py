@@ -117,6 +117,8 @@ class FileScanner:
 								self.testSources.append(filename)
 							else:
 								continue
+						elif os.path.normpath(path).endswith(os.sep + 'examples'):
+							continue	# TODO
 						else:
 							if self.unittest is True:
 								continue
@@ -129,6 +131,8 @@ class FileScanner:
 								self.testHeader.append(filename)
 							else:
 								continue
+						elif os.path.normpath(path).endswith(os.sep + 'examples'):
+							continue	# TODO
 						else:
 							if self.unittest is True:
 								continue

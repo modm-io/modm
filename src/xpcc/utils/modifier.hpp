@@ -53,6 +53,9 @@ namespace xpcc
 	{
 		/**
 		 * \brief	Add volatile modifier to T
+		 * 
+		 * DEPRECATED: use xpcc::accessor::asVolatile() instead
+		 * 
 		 * \ingroup	modifier
 		 */
 		template<typename T>
@@ -64,6 +67,9 @@ namespace xpcc
 		
 		/**
 		 * \brief	Convert a normal pointer to a accessor::Flash
+		 * 
+		 * DEPRECATED: use xpcc::accessor::asVolatile() instead
+		 * 
 		 * \ingroup	modifier
 		 */
 		template<typename T>

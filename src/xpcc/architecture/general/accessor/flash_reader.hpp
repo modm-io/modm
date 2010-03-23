@@ -39,19 +39,19 @@
 
 	/** 
 	 * \brief	Define a flash variable
-	 * \ingroup	architecture
+	 * \ingroup	accessor
 	 */
 	#define	FLASH(var)
 
 	/**
 	 * \brief	Define a flash string
-	 * \ingroup	architecture
+	 * \ingroup	accessor
 	 */
 	#define	FLASH_STRING(s)
 
 	/**
 	 * \brief	Declare a flash string
-	 * \ingroup	architecture
+	 * \ingroup	accessor
 	 */
 	#define	EXTERN_FLASH_STRING(s)
 

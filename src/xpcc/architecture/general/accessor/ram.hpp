@@ -43,7 +43,7 @@ namespace xpcc
 		/**
 		 * \brief	Pointer to RAM
 		 * 
-		 * \ingroup	architecture
+		 * \ingroup	accessor
 		 * \author	Fabian Greif <fabian.greif@rwth-aachen.de>
 		 */
 		template<typename T>

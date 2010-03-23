@@ -36,4 +36,28 @@
 #include "accessor/ram.hpp"
 #include "accessor/flash.hpp"
 
+namespace xpcc
+{
+	/**
+	 * \defgroup	accessor	Accessor classes
+	 * \ingroup		architecture
+	 * 
+	 * \author	Fabian Greif <fabian.greif@rwth-aachen.de>
+	 */
+	namespace accessor
+	{
+		/**
+		 * \brief	Add volatile modifier to T
+		 * 
+		 * \ingroup	accessor
+		 */
+		template<typename T>
+		ALWAYS_INLINE volatile T&
+		asVolatile(T& value)
+		{
+			return (volatile T&) value;
+		}
+	}
+}
+
 #endif // XPCC__ACCESSOR_HPP

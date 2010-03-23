@@ -54,7 +54,7 @@ namespace xpcc
 		 * Based on a implementation of Rolf Magnus, see
 		 * http://www.mikrocontroller.net/topic/78610#656695
 		 * 
-		 * \ingroup	architecture
+		 * \ingroup	accessor
 		 * \author	Fabian Greif <fabian.greif@rwth-aachen.de>
 		 */
 		template<typename T>
@@ -153,6 +153,18 @@ namespace xpcc
 			friend IOStream&
 			operator << ( IOStream&, const Flash<U>&);
 		};
+		
+		/**
+		 * \brief	Convert a normal pointer to a accessor::Flash
+		 * 
+		 * \ingroup	accessor
+		 */
+		template<typename T>
+		ALWAYS_INLINE ::xpcc::accessor::Flash<T>
+		asFlash(const T* ptr)
+		{
+			return ::xpcc::accessor::Flash<T>(ptr);
+		}
 	}
 }
 
@@ -164,7 +176,7 @@ namespace xpcc
  * \brief	Streamoperator
  * 
  * \warning	Not implemented yet!!
- * \ingroup architecture
+ * \ingroup accessor
  */
 template<typename T>
 xpcc::IOStream&
@@ -181,7 +193,7 @@ operator << (xpcc::IOStream& os, xpcc::accessor::Flash<T> ptr)
 
 /**
  * \brief	Streamoperator - specialization for \c char
- * \ingroup architecture
+ * \ingroup accessor
  */
 xpcc::IOStream&
 operator << (xpcc::IOStream& os, xpcc::accessor::Flash<char> ptr);
