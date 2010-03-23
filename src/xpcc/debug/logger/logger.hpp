@@ -37,6 +37,9 @@
 #include <xpcc/communication/io/iostream.hpp>
 
 #include "level.hpp"
+#include "style.hpp"
+#include "style_wrapper.hpp"
+#include "style/prefix.hpp"
 
 namespace xpcc
 {

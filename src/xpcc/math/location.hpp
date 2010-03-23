@@ -50,17 +50,13 @@ namespace xpcc
 	{
 	public:
 		typedef ::xpcc::Position<T> Position;
-
+		
 		Location();
-
+		
 		Location(const Position& position, const Angle& phi);
-
-		//Location(const Position& position, float phi);
-
+		
 		Location(const T& x, const T& y, const Angle& phi);
-
-		//Location(const T& x, const T& y, float phi);
-
+		
 		/// Add a position increment
 		void
 		update(Location& diff);

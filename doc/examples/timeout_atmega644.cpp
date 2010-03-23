@@ -3,7 +3,7 @@
 #include <xpcc/workflow/time/timeout.hpp>
 
 // create a output device for the led
-CREATE_OUTPUT_PIN(Led, B, 0);
+GPIP__OUTPUT(Led, B, 0);
 
 // timer interrupt routine
 ISR(TIMER2_COMPA_vect) {

@@ -46,26 +46,12 @@ xpcc::Location<T>::Location(const Position& position, const Angle& phi) :
 {
 }
 
-/*template <typename T>
-xpcc::Location<T>::Location(const Position& position, float phi) :
-	position(position),
-	phi(phi)
-{
-}*/
-
 template <typename T>
 xpcc::Location<T>::Location(const T& x, const T& y, const Angle& phi) :
 	position(x, y),
 	phi(phi)
 {
 }
-
-/*template <typename T>
-xpcc::Location<T>::Location(const T& x, const T& y, float phi) :
-	position(x, y),
-	phi(phi)
-{
-}*/
 
 // -----------------------------------------------------------------------------
 template <typename T>
@@ -134,10 +120,8 @@ xpcc::Location<T>::operator Location<U>() const
 // ----------------------------------------------------------------------------
 template<class T>
 xpcc::IOStream&
-xpcc::operator<<(xpcc::IOStream& os, const xpcc::Location<T>& l)
+xpcc::operator << (xpcc::IOStream& os, const xpcc::Location<T>& location)
 {
-	os << "position=( " << l.position << " )";
-	os << "\nphi     =" << l.phi;
-
+	os << location.position << ", phi=" << location.phi;
 	return os;
 }
