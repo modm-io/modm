@@ -67,7 +67,7 @@ systems.
 
 To be able to compile files you need to install the following packets:
 \verbatim
-$ sudo aptitude install gcc build-essential tipcutils
+$ sudo aptitude install gcc build-essential tipcutils libboost-thread-dev
 \endverbatim
 
 \todo check packet list for completeness!
