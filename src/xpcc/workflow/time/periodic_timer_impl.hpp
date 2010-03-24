@@ -5,7 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -30,77 +30,49 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__IODEVICE_WRAPPER_HPP
-#define XPCC__IODEVICE_WRAPPER_HPP
+#ifndef	XPCC__TIMEOUT_HPP
+	#error	"Don't include this file directly, use 'periodic_timer.hpp' instead!"
+#endif
 
-#include <stdint.h>
-
-#include "iodevice.hpp"
-
-namespace xpcc
+template<typename T>
+xpcc::PeriodicTimer<T>::PeriodicTimer(const Timestamp interval) :
+	timer(interval), interval(interval), isRunning_(true)
 {
-	/**
-	 * \brief		Wrapper to use any peripheral device that supports static
-	 * 				put() and get() as an IODevice
-	 * 
-	 * \tparam		T	Peripheral which should be wrapped
-	 * 
-	 * Example:
-	 * \code
-	 * // configure a UART
-	 * xpcc::BufferedUart0 uart(9600);
-	 * 
-	 * // wrap it in a IODevice
-	 * xpcc::IODeviceWrapper<xpcc::BufferedUart0> device(uart);
-	 * 
-	 * // use this device to print a message
-	 * device.put("Hello");
-	 * 
-	 * // or create a IOStream and use the stream to print something
-	 * xpcc::IOStream stream(device);
-	 * stream << " World!";
-	 * \endcode
-	 * 
-	 * \ingroup		io
-	 */
-	template<typename T>
-	class IODeviceWrapper : public IODevice
-	{
-	public:
-		/**
-		 * \brief	Constructor
-		 *
-		 * \param	device	configured object
-		 */
-		IODeviceWrapper(const T& device)
-		{
-			// get rid of the warning about an unused paramter
-			(void) device;
-		}
-		
-		virtual inline void
-		put(char c)
-		{
-			T::write(c);
-		}
-		
-		virtual inline void
-		put(const char *s)
-		{
-			T::write(s);
-		}
-		
-		virtual inline void
-		flush()
-		{
-		}
-		
-		virtual inline bool
-		get(char& c)
-		{
-			return T::read(c);
-		}
-	};
 }
 
-#endif // XPCC__IODEVICE_WRAPPER_HPP
+template<typename T>
+void
+xpcc::PeriodicTimer<T>::stop()
+{
+	timer.stop();
+	isRunning_ = false;
+}
+
+template<typename T>
+bool
+xpcc::PeriodicTimer<T>::isRunning() const
+{
+	return isRunning_;
+}
+
+template<typename T>
+void
+xpcc::PeriodicTimer<T>::restart(const Timestamp interval)
+{
+	timer.restart(interval);
+	this->interval = interval;
+	this->isRunning_ = true;
+}
+
+template<typename T>
+bool
+xpcc::PeriodicTimer<T>::check()
+{
+	if (isRunning_ and timer.isExpired()) {
+		timer.restart(interval);
+		return true;
+	}
+	else {
+		return false;
+	}
+}

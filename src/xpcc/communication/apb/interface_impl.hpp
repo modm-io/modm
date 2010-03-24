@@ -38,6 +38,9 @@
 	#include <util/crc16.h>
 #endif
 
+#include <xpcc/architecture/general/gpio.hpp>
+GPIO__OUTPUT(LedRed2, D, 6);
+
 // ----------------------------------------------------------------------------
 
 template <typename DEVICE> const uint8_t xpcc::apb::Interface<DEVICE>::masterAddress = 0;
@@ -61,7 +64,7 @@ template <typename DEVICE>
 void
 xpcc::apb::Interface<DEVICE>::initialize()
 {
-	DEVICE::setBaudrate(38400U);
+	DEVICE::setBaudrate(115200UL);
 	state = SYNC;
 }
 

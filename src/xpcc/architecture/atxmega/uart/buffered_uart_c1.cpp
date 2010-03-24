@@ -92,22 +92,22 @@ xpcc::BufferedUartC1::setBaudrateRegister(uint16_t ubrr, bool doubleSpeed)
 	
 	// set baud rate
 	if (doubleSpeed) {
-		USARTC1_CTRLB = USART_CLK2X_bm;
+		USARTC1.CTRLB = USART_CLK2X_bm;
 	}
 	else {
-		USARTC1_CTRLB = 0;
+		USARTC1.CTRLB = 0;
 	}
-	USARTC1_BAUDCTRLB = static_cast<uint8_t>(ubrr >> 8);
-	USARTC1_BAUDCTRLA = static_cast<uint8_t>(ubrr);
+	USARTC1.BAUDCTRLB = static_cast<uint8_t>(ubrr >> 8);
+	USARTC1.BAUDCTRLA = static_cast<uint8_t>(ubrr);
 	
 	// enable receive complete interrupt
-	USARTC1_CTRLA = USART_RXCINTLVL_MED_gc;
+	USARTC1.CTRLA = USART_RXCINTLVL_MED_gc;
 	
 	// setting the frame size to 8 bit
-	USARTC1_CTRLC = USART_CHSIZE_8BIT_gc;
+	USARTC1.CTRLC = USART_CHSIZE_8BIT_gc;
 	
 	// enable both, receiver and transmitter
-	USARTC1_CTRLB |= USART_RXEN_bm | USART_TXEN_bm;
+	USARTC1.CTRLB |= USART_RXEN_bm | USART_TXEN_bm;
 }
 
 // ----------------------------------------------------------------------------

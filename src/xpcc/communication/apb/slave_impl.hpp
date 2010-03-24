@@ -42,6 +42,7 @@ xpcc::apb::Slave<INTERFACE>::Slave(uint8_t address,
 		uint8_t actionCount) : 
 	ownAddress(address), actionList(actionList), actionCount(actionCount)
 {
+	INTERFACE::initialize();
 }
 
 // ----------------------------------------------------------------------------

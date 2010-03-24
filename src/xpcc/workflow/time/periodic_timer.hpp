@@ -5,7 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -30,77 +30,73 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__IODEVICE_WRAPPER_HPP
-#define XPCC__IODEVICE_WRAPPER_HPP
+#ifndef XPCC__PERIODIC_TIMER_HPP
+#define XPCC__PERIODIC_TIMER_HPP
 
-#include <stdint.h>
-
-#include "iodevice.hpp"
+#include <xpcc/workflow/time/timeout.hpp>
 
 namespace xpcc
 {
 	/**
-	 * \brief		Wrapper to use any peripheral device that supports static
-	 * 				put() and get() as an IODevice
+	 * \brief		Software timer
 	 * 
-	 * \tparam		T	Peripheral which should be wrapped
+	 * \tparam	T	Used timer, default is xpcc::Clock() which should have
+	 * 				a millisecond resolution.
 	 * 
-	 * Example:
-	 * \code
-	 * // configure a UART
-	 * xpcc::BufferedUart0 uart(9600);
-	 * 
-	 * // wrap it in a IODevice
-	 * xpcc::IODeviceWrapper<xpcc::BufferedUart0> device(uart);
-	 * 
-	 * // use this device to print a message
-	 * device.put("Hello");
-	 * 
-	 * // or create a IOStream and use the stream to print something
-	 * xpcc::IOStream stream(device);
-	 * stream << " World!";
-	 * \endcode
-	 * 
-	 * \ingroup		io
+	 * \author	Fabian Greif
+	 * \ingroup	workflow
 	 */
-	template<typename T>
-	class IODeviceWrapper : public IODevice
+	template<typename T = ::xpcc::Clock>
+	class PeriodicTimer
 	{
 	public:
 		/**
-		 * \brief	Constructor
-		 *
-		 * \param	device	configured object
+		 * \brief	Create and start the timer
 		 */
-		IODeviceWrapper(const T& device)
-		{
-			// get rid of the warning about an unused paramter
-			(void) device;
-		}
+		PeriodicTimer(const Timestamp interval);
 		
-		virtual inline void
-		put(char c)
-		{
-			T::write(c);
-		}
+		/// Stop the timer
+		inline void
+		stop();
 		
-		virtual inline void
-		put(const char *s)
-		{
-			T::write(s);
-		}
+		/// Check if the timer is running
+		inline bool
+		isRunning() const;
 		
-		virtual inline void
-		flush()
-		{
-		}
+		/// Set a new interval
+		void
+		restart(const Timestamp interval);
 		
-		virtual inline bool
-		get(char& c)
-		{
-			return T::read(c);
-		}
+		/**
+		 * \brief	Check if a new period has started
+		 * 
+		 * This function can be used to easily write sections that are
+		 * excuted at defined periods:
+		 * \code
+		 * xpcc::PeriodicTimer<> timer(50);
+		 * while (1)
+		 * {
+		 *     if (timer.check()) {
+		 *         // will be executed every 50 ms
+		 *     }
+		 * }
+		 * \endcode
+		 * 
+		 * \return	\c true if entering a new period, \c false otherwise
+		 * 
+		 * \todo	Find a better name for this function
+		 */
+		bool
+		check();
+		
+	private:
+		Timeout<T> timer;
+		
+		Timestamp interval;
+		bool isRunning_;
 	};
 }
 
-#endif // XPCC__IODEVICE_WRAPPER_HPP
+#include "periodic_timer_impl.hpp"
+
+#endif // XPCC__PERIODIC_TIMER_HPP

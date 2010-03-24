@@ -117,6 +117,7 @@ for port in ['C', 'D', 'E', 'F']:
 env.Doxygen('doc/doxyfile')
 env.Alias('doc', 'apidoc/html')
 
-env.Alias('all', ['update', 'templates', 'doc'])
 env.Alias('templates', 'template')
-env.Default('update')
+env.Alias('all', ['update', 'templates'])
+
+env.Default('all')

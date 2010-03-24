@@ -92,22 +92,22 @@ xpcc::BufferedUart{{ id }}::setBaudrateRegister(uint16_t ubrr, bool doubleSpeed)
 	
 	// set baud rate
 	if (doubleSpeed) {
-		USART{{ id }}_CTRLB = USART_CLK2X_bm;
+		USART{{ id }}.CTRLB = USART_CLK2X_bm;
 	}
 	else {
-		USART{{ id }}_CTRLB = 0;
+		USART{{ id }}.CTRLB = 0;
 	}
-	USART{{ id }}_BAUDCTRLB = static_cast<uint8_t>(ubrr >> 8);
-	USART{{ id }}_BAUDCTRLA = static_cast<uint8_t>(ubrr);
+	USART{{ id }}.BAUDCTRLB = static_cast<uint8_t>(ubrr >> 8);
+	USART{{ id }}.BAUDCTRLA = static_cast<uint8_t>(ubrr);
 	
 	// enable receive complete interrupt
-	USART{{ id }}_CTRLA = USART_RXCINTLVL_MED_gc;
+	USART{{ id }}.CTRLA = USART_RXCINTLVL_MED_gc;
 	
 	// setting the frame size to 8 bit
-	USART{{ id }}_CTRLC = USART_CHSIZE_8BIT_gc;
+	USART{{ id }}.CTRLC = USART_CHSIZE_8BIT_gc;
 	
 	// enable both, receiver and transmitter
-	USART{{ id }}_CTRLB |= USART_RXEN_bm | USART_TXEN_bm;
+	USART{{ id }}.CTRLB |= USART_RXEN_bm | USART_TXEN_bm;
 }
 
 // ----------------------------------------------------------------------------
