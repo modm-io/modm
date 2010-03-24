@@ -31,7 +31,7 @@
 import os
 import re
 import string
-import configparser
+import xpcc_configparser
 
 from SCons.Script import *
 
@@ -65,7 +65,7 @@ class FileScanner:
 		header		- list of header files
 		defines		- dictionary with defines needed by the source files
 		"""
-		parser = configparser.XpccConfigParser()
+		parser = xpcc_configparser.XpccConfigParser()
 		
 		ignoreList = listify(ignore)
 		
@@ -95,13 +95,13 @@ class FileScanner:
 							for d in tempDirectories:
 								directories.remove(d)
 							continue
-					except configparser.ParserException:
+					except xpcc_configparser.ParserException:
 						pass
 					
 					try:
 						for item in parser.items('defines'):
 							self.defines[item[0]] = item[1]
-					except configparser.ParserException:
+					except xpcc_configparser.ParserException:
 						pass
 				
 				for file in files:

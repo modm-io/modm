@@ -29,7 +29,7 @@
 # $Id$
 
 import os
-import configparser
+import xpcc_configparser
 
 from SCons.Script import *
 
@@ -42,7 +42,7 @@ def generate_environment(env, rootpath, configfile='project.cfg', buildpath=None
 	rootpath	-	Path to the xpcc/trunk directory
 	"""
 	try:
-		parser = configparser.XpccConfigParser()
+		parser = xpcc_configparser.XpccConfigParser()
 		parser.read(configfile)
 		
 		# read configuration
@@ -62,7 +62,7 @@ def generate_environment(env, rootpath, configfile='project.cfg', buildpath=None
 		
 		rootpath = os.path.abspath(rootpath)
 		buildpath = os.path.abspath(buildpath)
-	except configparser.ParserException, msg:
+	except xpcc_configparser.ParserException, msg:
 		print msg
 		Exit(1)
 	
@@ -96,7 +96,7 @@ def generate_environment(env, rootpath, configfile='project.cfg', buildpath=None
 		'template',
 		'unittest',
 		'xpcc',
-		'configparser',
+		'xpcc_configparser',
 		'utils',
 		'system_design'
 	]
