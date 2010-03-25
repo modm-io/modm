@@ -63,7 +63,7 @@ def generate_environment(env, rootpath, configfile='project.cfg', buildpath=None
 		rootpath = os.path.abspath(rootpath)
 		buildpath = os.path.abspath(buildpath)
 	except xpcc_configparser.ParserException, msg:
-		print msg
+		print "Parsing file 'project.cfg': " + msg
 		Exit(1)
 	
 	configuration = { 'defines': {}, 'environment': {} }
