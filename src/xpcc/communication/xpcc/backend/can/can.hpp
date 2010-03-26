@@ -175,7 +175,7 @@ namespace xpcc
 		{
 		public:
 			ReceiveListItem(uint8_t size, const Header& header ) :
-				header(header), data(size), size(0),
+				header(header), data(size), size(size),
 				receivedFragments(0) {
 			}
 			

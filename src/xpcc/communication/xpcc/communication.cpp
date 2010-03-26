@@ -62,7 +62,7 @@ xpcc::Communication::setPostman( xpcc::Postman* postman )
 void
 xpcc::Communication::update(){
 	if ( this->postman != 0 ) {
-
+		this->backend->update();
 		//Check if a new packet was received by the backend
 		while( this->backend->isPacketAvailable() )
 		{

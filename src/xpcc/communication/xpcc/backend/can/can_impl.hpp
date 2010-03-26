@@ -253,9 +253,9 @@ xpcc::CanConnector<C>::retrieveCanMessage()
 		if( canMessage.identifier & 0x01 ) {
 			header.isAcknowledge = true;
 		}
-		canMessage.identifier = canMessage.identifier << 1;
+		canMessage.identifier = canMessage.identifier >> 1;
 
-		switch (canMessage.identifier && 0x02 ) {
+		switch (canMessage.identifier & 0x03 ) {
 			case 0:
 				header.type = xpcc::Header::REQUEST;
 				break;
