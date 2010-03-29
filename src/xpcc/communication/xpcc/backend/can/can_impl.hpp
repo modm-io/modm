@@ -69,7 +69,8 @@ xpcc::CanConnector<C>::sendPacket(const Header &header, SmartPointer payload)
 #if XPCC_CAN_USE_COUNTER
 	if ( payload.getSize() <= 7 && C::canSend()  )
 #else
-	if ( payload.getSize() <= 8 && C::canSend()  )
+	if ( payload.getSize() <= 7 && C::canSend()  )
+//	if ( payload.getSize() <= 8 && C::canSend()  )
 #endif
 	{
 		sendSuccessfull = this->sendCanMessage(	header, payload.getPointer(), payload.getSize(), false );
@@ -116,7 +117,6 @@ xpcc::CanConnector<C>::sendCanMessage(const Header &header, const uint8_t *data,
 	xpcc::Can::Message message(
 			0,
 			size+1);
-
 	switch ( header.type ) {
 		case xpcc::Header::REQUEST :
 			message.identifier = 0;
@@ -128,7 +128,7 @@ xpcc::CanConnector<C>::sendCanMessage(const Header &header, const uint8_t *data,
 			message.identifier = 2;
 			break;
 	}
-	message.identifier = message.identifier << 1;
+	message.identifier = message.identifier << 2;
 
 	if( header.isAcknowledge ) {
 		message.identifier |= 1;
@@ -152,11 +152,11 @@ xpcc::CanConnector<C>::sendCanMessage(const Header &header, const uint8_t *data,
 	message.identifier = message.identifier << 8;
 	message.identifier |= header.packetIdentifier;
 
-	message.flags.extended = true;
-
 	message.data[0] = messageCounter;
-	memcpy(message.data+1, data, size);
+	memcpy(message.data + 1, data, size);
 
+	message.flags.extended = true;
+//	message.flags.rtr = false;
 	return C::sendMessage( message );
 }
 
@@ -187,8 +187,11 @@ xpcc::CanConnector<C>::sendWaitingMessages()
 			sizeFragment = 5;
 			sendFinished = false;
 		}
+		// else sizeFragment is 5 or smaller, i.a. the last fragment is to be
+		// sent.
+		// So sendFinished
 
-		memcpy(data + 2, message->payload.getPointer()+offset, sizeFragment);
+		memcpy(data + 2, message->payload.getPointer() + offset, sizeFragment);
 
 		if (sendCanMessage(message->header, data, sizeFragment+2, true)) {
 			message->fragmentIndex++;
