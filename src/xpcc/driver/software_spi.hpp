@@ -88,7 +88,8 @@ namespace xpcc
 				else {
 					MOSI::low();
 				}
-				
+				delay_us(delay);
+
 				SCLK::high();
 				delay_us(delay);
 				
@@ -98,7 +99,6 @@ namespace xpcc
 				out <<= 1;
 				
 				SCLK::low();
-				delay_us(delay);
 			}
 			
 			return in;
