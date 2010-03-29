@@ -66,7 +66,7 @@ xpcc::PeriodicTimer<T>::restart(const Timestamp interval)
 
 template<typename T>
 bool
-xpcc::PeriodicTimer<T>::check()
+xpcc::PeriodicTimer<T>::isExpired()
 {
 	if (isRunning_ and timer.isExpired()) {
 		timer.restart(interval);

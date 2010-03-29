@@ -76,7 +76,7 @@ namespace xpcc
 		 * xpcc::PeriodicTimer<> timer(50);
 		 * while (1)
 		 * {
-		 *     if (timer.check()) {
+		 *     if (timer.isExpired()) {
 		 *         // will be executed every 50 ms
 		 *     }
 		 * }
@@ -87,7 +87,7 @@ namespace xpcc
 		 * \todo	Find a better name for this function
 		 */
 		bool
-		check();
+		isExpired();
 		
 	private:
 		Timeout<T> timer;
