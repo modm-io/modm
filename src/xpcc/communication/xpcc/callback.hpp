@@ -53,21 +53,25 @@ namespace xpcc
 
 	public:
 		Callback();
-		
+
+
 		/**
+		 * Set the method that will be called when a response is received.
+		 *
 		 * \param	component	Pointer to a component object
 		 * \param	function	Pointer to a function of the component object
-		 * 
-		 * The function will be called when a response is received.
 		 */
 		template <typename C, typename P>
-		Callback(C *component, void (C::*function)(const P* packet) ) :
-			component(component),
-			function(reinterpret_cast<Function>(function))
-			// TODO save packet size?
+		inline void
+		init( C *component, void (C::*function)(const P* packet)  )
 		{
+			this->component = static_cast<AbstractComponent>( component );
+			this->function = reinterpret_cast<Function>(function);
+			this->packetSize = sizeof( P );
 		}
 		
+
+		/// \todo control packet size?
 		inline void
 		call(const SmartPointer &payload) const
 		{
@@ -76,10 +80,12 @@ namespace xpcc
 			}
 		}
 		
-	private:
+	protected:
 		AbstractComponent *component;
 		Function function;
+		uint8_t packetSize;
 	};
+
 }
 
 #endif // XPCC__CALLBACK_HPP

@@ -33,6 +33,7 @@
 #include "callback.hpp"
 
 xpcc::Callback::Callback() :
-	component(0)
+	component(0),
+	packetSize(0)
 {
 }
