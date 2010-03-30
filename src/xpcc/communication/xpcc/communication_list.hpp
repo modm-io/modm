@@ -149,10 +149,16 @@ namespace communicationList{
 		 * \endcode
 		 */
 		List();
+
+		void
+		addEvent(const Header& header);
 		
 		void
 		addEvent(const Header& header, SmartPointer& smartPayload);
-		
+
+		void
+		addResponse(const Header& header);
+
 		void
 		addResponse(const Header& header, SmartPointer& smartPayload);
 		

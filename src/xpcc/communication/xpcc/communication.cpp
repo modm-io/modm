@@ -109,7 +109,6 @@ xpcc::Communication::update(){
 
 			this->backend->dropPacket();
 		}
-
 		// check somehow if there are packets to send
 		this->responseManager.handleWaitingMessages(*postman, *backend);
 	}
@@ -165,3 +164,15 @@ xpcc::Communication::callAction(uint8_t receiver, uint8_t actionIdentifier, Call
 	this->responseManager.addActionCall(header, responseCallback);
 }
 
+// ----------------------------------------------------------------------------
+void
+xpcc::Communication::sendResponse(const ResponseHandle& handle)
+{
+	Header header(	Header::RESPONSE,
+					false,
+					handle.source,
+					currentComponent,
+					handle.packetIdentifier);
+
+	this->responseManager.addResponse(header);
+}

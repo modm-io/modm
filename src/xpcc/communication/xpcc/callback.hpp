@@ -35,6 +35,7 @@
 
 #include <xpcc/data_structure/smart_pointer.hpp>
 #include "abstract_component.hpp"
+#include "backend/backend_interface.hpp"
 
 namespace xpcc
 {
@@ -49,7 +50,7 @@ namespace xpcc
 	class Callback
 	{
 	public:
-		typedef void (AbstractComponent::*Function)(const uint8_t *type);
+		typedef void (AbstractComponent::*Function)(const Header& header, const uint8_t *type);
 
 	public:
 		Callback();
@@ -63,7 +64,7 @@ namespace xpcc
 		 */
 		template <typename C, typename P>
 		inline void
-		init( C *component, void (C::*function)(const P* packet)  )
+		init( C *component, void (C::*function)(const Header& header, const P* packet)  )
 		{
 			this->component = static_cast<AbstractComponent*>( component );
 			this->function = reinterpret_cast<Function>(function);
@@ -73,10 +74,10 @@ namespace xpcc
 
 		/// \todo control packet size?
 		inline void
-		call(const SmartPointer &payload) const
+		call(const Header& header, const SmartPointer &payload) const
 		{
 			if (component != 0) {
-				(component->*function)(payload.getPointer());
+				(component->*function)(header, payload.getPointer());
 			}
 		}
 		

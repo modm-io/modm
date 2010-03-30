@@ -120,6 +120,9 @@ namespace xpcc
 		callAction(uint8_t receiver, uint8_t actionIdentifier, const T& data, Callback& responseCallback);
 		
 		
+		void
+		sendResponse(const ResponseHandle& handle);
+
 		template<typename T>
 		void
 		sendResponse(const ResponseHandle& handle, const T& data);
