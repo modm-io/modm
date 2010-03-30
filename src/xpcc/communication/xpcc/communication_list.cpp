@@ -280,6 +280,7 @@ xpcc::communicationList::List::handleWaitingMessages(Postman &postman, BackendIn
 				break;
 			}
 			default: // WAIT_FOR_RESPONSE think about if it has to be deleted, actually responses stay in the queue for ever if no response comes
+				e = actual;
 				break; // no action
 		}
 	

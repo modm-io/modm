@@ -93,6 +93,18 @@ xpcc::Communication::update(){
 			}
 			else{
 				this->responseManager.handlePacket( header, payload );
+				if (!header.isAcknowledge){
+					if ( header.destination != 0 ) {
+						// transmit ACK (is not an EVENT)
+						Header ackHeader(
+								header.type,
+								true,
+								header.source,
+								header.destination,
+								header.packetIdentifier);
+						this->backend->sendPacket( ackHeader );
+					}
+				}
 			}
 
 			this->backend->dropPacket();
