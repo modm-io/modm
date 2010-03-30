@@ -70,12 +70,13 @@ main()
 		com.update();
 
 		xpcc::SmartPointer payload(&data);
-		XPCC_LOG_INFO << XPCC_FILE_INFO << "data   =" << data << xpcc::flush;
-		XPCC_LOG_INFO << XPCC_FILE_INFO << "payload=" << payload << xpcc::flush;
+		XPCC_LOG_INFO << XPCC_FILE_INFO << "data   =" << data << xpcc::endl;
+		XPCC_LOG_INFO << XPCC_FILE_INFO << "payload=" << payload << xpcc::endl;
 
 
 		com.callAction(0x10, 0x20, data);
 		com.publishEvent(0x01, data);
+
 
 		sleep(1);
 	}

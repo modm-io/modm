@@ -39,30 +39,33 @@
 #undef  XPCC_LOG_LEVEL
 #define XPCC_LOG_LEVEL xpcc::log::DEBUG
 
+xpcc::Communication* com;
+
 class Receiver : public xpcc::AbstractComponent
 {
 	public:
 		void
-		actionCallback( const int* payload )
+		actionCallback( const xpcc::ResponseHandle& handle, const int* payload )
 		{
 			XPCC_LOG_INFO << XPCC_FILE_INFO << "has ACTION";
 			XPCC_LOG_INFO << " from: TODO";
 			XPCC_LOG_INFO << " value:" << *payload;
-			XPCC_LOG_INFO << xpcc::flush;
+			XPCC_LOG_INFO << xpcc::endl;
+			
+			com->sendResponse( handle, *payload); 
 		}
 
 		void
-		eventCallback( const int* payload )
+		eventCallback( const xpcc::ResponseHandle& handle, const int* payload )
 		{
 			XPCC_LOG_INFO << XPCC_FILE_INFO << "has EVENT";
 			XPCC_LOG_INFO << " from: TODO";
 			XPCC_LOG_INFO << " value:" << *payload;
-			XPCC_LOG_INFO << xpcc::flush;
+			XPCC_LOG_INFO << xpcc::endl;
 		}
-	
-	private:
-		xpcc::TipcConnector tipc;
 };
+
+
 
 int
 main()
@@ -83,29 +86,35 @@ main()
 	// the connection between messageID and callback-methods
 	// EVENT = 0x01;
 	xpcc::StlPostman::EventMap eventMap;
-	eventMap.insert( xpcc::StlPostman::EventMap::value_type( 0x01, xpcc::Callback(&receiver, &Receiver::eventCallback) ) );
+	xpcc::Callback eventCallback;
+	eventCallback.init(&receiver, &Receiver::eventCallback);
+	eventMap.insert( xpcc::StlPostman::EventMap::value_type( 0x01, eventCallback ) );
 
 	// ACTION = 0x10;
 	xpcc::StlPostman::CallbackMap receiverCallbackMap;
-	receiverCallbackMap[0x20] = xpcc::Callback(&receiver, &Receiver::actionCallback);
+	xpcc::Callback actionCallback;
+	actionCallback.init(&receiver, &Receiver::actionCallback);
+	receiverCallbackMap[0x20] = actionCallback;
 
 	xpcc::StlPostman::RequestMap componentMap;
 	componentMap[0x10] = receiverCallbackMap;
 
 	// set the 'list' of connections to the postman
-	xpcc::StlPostman postman( eventMap, componentMap );
+	xpcc::StlPostman postman( &eventMap, &componentMap );
 
 	// connect the 'hardware' to the postman
-	xpcc::Communication com(&tipc, &postman);
+	com = new xpcc::Communication(&tipc, &postman);
 
 
 
 	while(1) {
 		// run the communication
-		com.update();
+		com->update();
 
 		usleep(100000);
 	}
 
 	xpcc::log::info << "########## XPCC TIPC COMPONENT Test Receiver END ##########" << xpcc::flush;
+	
+	delete com;
 }
