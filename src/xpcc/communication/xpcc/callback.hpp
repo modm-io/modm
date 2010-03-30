@@ -65,7 +65,7 @@ namespace xpcc
 		inline void
 		init( C *component, void (C::*function)(const P* packet)  )
 		{
-			this->component = static_cast<AbstractComponent>( component );
+			this->component = static_cast<AbstractComponent*>( component );
 			this->function = reinterpret_cast<Function>(function);
 			this->packetSize = sizeof( P );
 		}
