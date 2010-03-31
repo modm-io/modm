@@ -44,7 +44,7 @@
 
 // set the Loglevel
 #undef  XPCC_LOG_LEVEL
-#define XPCC_LOG_LEVEL xpcc::log::DEBUG
+#define XPCC_LOG_LEVEL xpcc::log::INFO
 
 template<typename C>
 xpcc::CanConnector<C>::CanConnector()
@@ -272,7 +272,10 @@ xpcc::CanConnector<C>::retrieveCanMessage()
 				// unknown type
 				return false;
 		}
-
+		
+//		if (header.destination == 0x12)
+//			XPCC_LOG_INFO << "H" << xpcc::endl;
+//
 		if( fragmentated ) {
 			// find existing container otherwise create a new one
 			const uint8_t& messageSize = canMessage.data[2];
@@ -321,7 +324,7 @@ xpcc::CanConnector<C>::retrieveCanMessage()
 						break;
 					}
 
-					++(*node);
+					node = ++(*node);
 				}
 			}
 			if( node == 0 ) {

@@ -33,7 +33,7 @@
 #ifndef	XPCC__COMMUNICATION_LIST_HPP
 #define	XPCC__COMMUNICATION_LIST_HPP
 
-#include <xpcc/workflow/time/timestamp.hpp>
+#include <xpcc/workflow/time/timeout.hpp>
 
 #include "backend/backend_interface.hpp"
 #include "postman/postman.hpp"
@@ -47,6 +47,7 @@
  * \version		$Id$
  */
 namespace xpcc{
+class Communication;
 namespace communicationList{
 
 	/**
@@ -107,7 +108,7 @@ namespace communicationList{
 		Header header;
 		SmartPointer payload;
 		State state;
-		Timestamp time;
+		Timeout<> time;
 		uint8_t tries;
 	};
 
@@ -148,7 +149,7 @@ namespace communicationList{
 		 * this->last = &dummyFirst;
 		 * \endcode
 		 */
-		List();
+		List(xpcc::Communication *communication);
 
 		void
 		addEvent(const Header& header);
@@ -234,6 +235,7 @@ namespace communicationList{
 		void
 		callOfNextOfEWithCallback(const BackendInterface &backend, Entry *e);
 
+		xpcc::Communication *communication;
 		EntryDefault dummyFirst;
 		Entry *first;
 		Entry *last;
@@ -241,5 +243,7 @@ namespace communicationList{
 	};
 }
 }
+// the forwarddeclaration of Communication must be defined here
+#include "communication.hpp"
 
 #endif // XPCC__COMMUNICATION_LIST_HPP

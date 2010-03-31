@@ -30,7 +30,6 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/architecture/general/time/clock.hpp>
 #include <xpcc/debug/logger/logger.hpp>
 
 #include "communication_list.hpp"
@@ -40,10 +39,12 @@
 #define XPCC_LOG_LEVEL xpcc::log::DEBUG
 
 
-xpcc::communicationList::List::List():
+xpcc::communicationList::List::List(xpcc::Communication *communication):
+communication(communication),
 dummyFirst(Header()),
 first(&dummyFirst),
-last(&dummyFirst){
+last(&dummyFirst)
+{
 
 }
 
@@ -52,7 +53,7 @@ xpcc::communicationList::Entry::Entry(uint8_t typeInfo, const Header& header, Sm
 	next(0),
 	header(header),
 	payload(payload),
-	time(Clock::now()),
+	time(),
 	tries(0){
 
 }
@@ -62,7 +63,7 @@ xpcc::communicationList::Entry::Entry(uint8_t typeInfo, const Header& header) :
 	next(0), 
 	header(header), 
 	payload(SmartPointer()),
-	time(Clock::now()),
+	time(),
 	tries(0){
 	
 }
@@ -156,6 +157,7 @@ xpcc::communicationList::List::handlePacket(const Header& header, const SmartPoi
 				}
 				// entry e->next has to be removed
 				
+//				XPCC_LOG_INFO << "Communication Remove default" << xpcc::endl;
 				this->removeNext(e);
 				delete actual;
 				
@@ -197,9 +199,13 @@ xpcc::communicationList::List::handlePacket(const Header& header, const SmartPoi
 void
 xpcc::communicationList::List::handleWaitingMessages(Postman &postman, BackendInterface &backend){
 	Entry *e = first;// first is always a dummy entry
+	uint8_t listSize = 0;
 	while(Entry *actual = e->next){
+		listSize++;
+		
 		switch(actual->state){
 			case Entry::WANT_TO_BE_SENT:
+//				XPCC_LOG_INFO << "Communication WTBS" << xpcc::endl;
 				if (actual->header.destination == 0){// event
 					postman.deliverPacket(actual->header, actual->payload);
 					backend.sendPacket(actual->header, actual->payload);
@@ -208,15 +214,19 @@ xpcc::communicationList::List::handleWaitingMessages(Postman &postman, BackendIn
 				}
 				else{// action or response
 					if(postman.isComponentAvaliable(actual->header))
-					{
-						// to one component on board inner component
+					{// to one component on board inner component
+						
+						// send message also out, so it is possible to log communication extern
+						backend.sendPacket(actual->header, actual->payload);
+						
 						if (actual->header.type == Header::REQUEST)
 						{
+							communication->setCurrentComponent(actual->header.destination);
 							postman.deliverPacket(actual->header, actual->payload);
 							// todo handle postman errors?
 							if (actual->typeInfo == Entry::CALLBACK){
 								actual->state = Entry::WAIT_FOR_RESPONSE;
-								actual->time = Clock::now();
+								actual->time.restart(100); // TODO timer for RESPOMSES not handeled yet
 								e = actual;
 							}
 							else{
@@ -257,7 +267,7 @@ xpcc::communicationList::List::handleWaitingMessages(Postman &postman, BackendIn
 					else {// destination not on board, message has to be sent out to backend
 						backend.sendPacket(actual->header, actual->payload);
 						actual->state = Entry::WAIT_FOR_ACK;
-						actual->time = Clock::now();
+						actual->time.restart(100);
 						e = actual;
 					}
 				}
@@ -265,15 +275,21 @@ xpcc::communicationList::List::handleWaitingMessages(Postman &postman, BackendIn
 				break;
 			case Entry::WAIT_FOR_ACK:
 			{
-				Timestamp a = actual->time;
-				Timestamp n = Clock::now();
-				Timestamp diff = n - a;
-				Timestamp cp(100);
-				if (diff > cp && actual->tries > 2){
-					this->removeNext(e);
-					delete actual;
+//				XPCC_LOG_INFO << "Communication WTFA" << xpcc::endl;
+				if (actual->time.isExpired()){
+					if (actual->tries >= 2){
+						this->removeNext(e);
+						// TODO do sth to notify the user
+						delete actual;
+					}
+					else {
+						actual->tries++;
+						backend.sendPacket(actual->header, actual->payload);
+						actual->time.restart(100);
+						e = actual;
+					}
 				}
-				else {
+				else{
 					e = actual;
 				}
 				break;
@@ -284,8 +300,8 @@ xpcc::communicationList::List::handleWaitingMessages(Postman &postman, BackendIn
 		}
 	
 	}
-	
-
+//	if (listSize > 0)
+//		XPCC_LOG_INFO << "Communication = " << listSize << xpcc::endl;
 }
 
 void

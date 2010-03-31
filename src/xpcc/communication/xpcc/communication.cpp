@@ -35,14 +35,14 @@
 #include <xpcc/debug/logger/logger.hpp>
 // set the Loglevel
 #undef  XPCC_LOG_LEVEL
-#define XPCC_LOG_LEVEL xpcc::log::DEBUG
+#define XPCC_LOG_LEVEL xpcc::log::INFO
 
 xpcc::Communication::Communication(
 		BackendInterface *backend,
 		Postman* postman) :
 	backend(backend),
 	postman(postman),
-	responseManager()
+	responseManager(this)
 {
 }
 
@@ -76,6 +76,9 @@ xpcc::Communication::update(){
 			const Header& header( this->backend->getPacketHeader() );
 			const SmartPointer payload( this->backend->getPacketPayload() );
 
+//			if (header.destination == 0x12)
+//				XPCC_LOG_INFO << "_" << xpcc::endl;
+//			
 			if ( header.type == Header::REQUEST && !header.isAcknowledge )
 			{
 				if ( postman->deliverPacket( header, payload ) == Postman::OK ) {
@@ -95,14 +98,16 @@ xpcc::Communication::update(){
 				this->responseManager.handlePacket( header, payload );
 				if (!header.isAcknowledge){
 					if ( header.destination != 0 ) {
-						// transmit ACK (is not an EVENT)
-						Header ackHeader(
-								header.type,
-								true,
-								header.source,
-								header.destination,
-								header.packetIdentifier);
-						this->backend->sendPacket( ackHeader );
+						if (postman->isComponentAvaliable(header)){
+							// transmit ACK (is not an EVENT)
+							Header ackHeader(
+									header.type,
+									true,
+									header.source,
+									header.destination,
+									header.packetIdentifier);
+							this->backend->sendPacket( ackHeader );
+						}
 					}
 				}
 			}
