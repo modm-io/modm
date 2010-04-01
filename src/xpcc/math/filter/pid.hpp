@@ -35,6 +35,11 @@
 
 #include <xpcc/utils/arithmetic_traits.hpp>
 
+#include <xpcc/debug/logger/logger.hpp>
+// set the Loglevel
+#undef  XPCC_LOG_LEVEL
+#define XPCC_LOG_LEVEL xpcc::log::DEBUG
+
 namespace xpcc
 {
 	/**
@@ -85,15 +90,36 @@ namespace xpcc
 		 */
 		struct Parameter
 		{
-			Parameter(const T& kp = 0, const T& ki = 0, const T& kd = 0,
+			Parameter(const float& kp = 0, const float& ki = 0, const float& kd = 0,
 					  const T& maxErrorSum = 0, const T& maxOutput = 0);
 			
-			T kp;		///< proportional gain
-			T ki;		///< integral gain
-			T kd;		///< differentail gain
+			inline void
+			setKp(float kp){
+				this->kp = kp*ScaleFactor;
+			}
+			inline void
+			setKi(float ki){
+				this->ki = ki*ScaleFactor;
+			}
+			inline void
+			setKd(float kd){
+				this->kd = kd*ScaleFactor;
+			}
+			inline void
+			setMaxErrorSum(float maxErrorSum){
+				this->maxErrorSum = maxErrorSum*ScaleFactor;
+			}
+			
+			
+		private:
+			T kp;		///< proportional gain multiplied with ScaleFactor
+			T ki;		///< integral gain multiplied with ScaleFactor
+			T kd;		///< differentail gain multiplied with ScaleFactor
 			
 			T maxErrorSum;	///< integral will be limited to this value
 			T maxOutput;	///< output will be limited to this value
+			
+			friend class Pid;
 		};
 		
 	public:
@@ -105,10 +131,9 @@ namespace xpcc
 		 * \param	maxOutput	output will be limited to this value
 		 * \param	feedforward	callback function to calculate a forward value
 		 **/
-		Pid(const T& kp = 0, const T& ki = 0, const T& kd = 0,
+		Pid(const float& kp = 0, const float& ki = 0, const float& kd = 0,
 				const T& maxErrorSum = 0, const T& maxOutput = 0,
 				FeedforwardFunction feedforward = feedforwardDummy<T>);
-
 
 		/**
 		 * \param	parameter	list of parameters to the controller
@@ -132,24 +157,6 @@ namespace xpcc
 		reset();
 		
 		/**
-		 * \brief	Set a new target value
-		 */
-		void
-		setTarget(const T& value)
-		{
-			target = value;
-		}
-
-		/**
-		 * \brief	Returns the actual taget value
-		 */
-		inline const T&
-		getTarget() const
-		{
-			return this->target;
-		}
-		
-		/**
 		 * \brief	Calculate a new output value
 		 *
 		 * \param	input	The actual measured value, will be compared to the
@@ -167,11 +174,10 @@ namespace xpcc
 			return output;
 		}
 
-	private:
+//	private:
 		Parameter parameter;
 		FeedforwardFunction feedforward;
 		
-		T target;
 		T errorSum;
 		T lastError;
 		T output;

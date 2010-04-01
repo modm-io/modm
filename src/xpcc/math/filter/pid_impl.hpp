@@ -35,9 +35,9 @@
 
 template<typename T, unsigned int ScaleFactor>
 xpcc::Pid<T, ScaleFactor>::Parameter::Parameter(
-		const T& kp, const T& ki, const T& kd,
+		const float& kp, const float& ki, const float& kd,
 		const T& maxErrorSum, const T& maxOutput) :
-	kp(kp), ki(ki), kd(kd),
+	kp(kp*ScaleFactor), ki(ki*ScaleFactor), kd(kd*ScaleFactor),
 	maxErrorSum(maxErrorSum), maxOutput(maxOutput)
 {
 }
@@ -45,7 +45,7 @@ xpcc::Pid<T, ScaleFactor>::Parameter::Parameter(
 // -----------------------------------------------------------------------------
 template<typename T, unsigned int ScaleFactor>
 xpcc::Pid<T, ScaleFactor>::Pid(
-		const T& kp, const T& ki, const T& kd,
+		const float& kp, const float& ki, const float& kd,
 		const T& maxErrorSum, const T& maxOutput,
 		FeedforwardFunction feedforward ) :
 	parameter( kp, ki, kd, maxErrorSum, maxOutput),
@@ -68,7 +68,7 @@ template<typename T, unsigned int ScaleFactor>
 void
 xpcc::Pid<T, ScaleFactor>::reset()
 {
-	this->target = 0;
+//	this->target = 0;
 	this->errorSum = 0;
 	this->lastError = 0;
 	this->output = 0;
@@ -83,9 +83,9 @@ xpcc::Pid<T, ScaleFactor>::setParameter(const Parameter& parameter)
 
 template<typename T, unsigned int ScaleFactor>
 void
-xpcc::Pid<T, ScaleFactor>::update(const T& input)
+xpcc::Pid<T, ScaleFactor>::update(const T& error)
 {
-	T error = this->target - input;
+//	T error = this->target - input;
 	
 	this->errorSum += error;
 	if (this->errorSum > this->parameter.maxErrorSum) {
@@ -95,11 +95,11 @@ xpcc::Pid<T, ScaleFactor>::update(const T& input)
 		this->errorSum = -this->parameter.maxErrorSum;
 	}
 
-	T_DOUBLE tmp;
-	tmp  = this->feedforward(this->target);
-	tmp += this->parameter.kp * error;
-	tmp += this->parameter.ki * (this->errorSum);
-	tmp += this->parameter.kd * (error - this->lastError);
+	T_DOUBLE tmp = 0;
+//	tmp  = this->feedforward(this->target); // eigentlich 
+	tmp += static_cast<T_DOUBLE>(this->parameter.kp) * error;
+	tmp += static_cast<T_DOUBLE>(this->parameter.ki) * (this->errorSum);
+	tmp += static_cast<T_DOUBLE>(this->parameter.kd) * (error - this->lastError);
 	
 	tmp = tmp / ScaleFactor;
 	
