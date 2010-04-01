@@ -186,11 +186,8 @@ namespace xpcc
 			i &= ct0 & ct1;				// cound until roll over?
 			
 			state ^= i;					// then toggle debounced state
-			pressState |= state & i;		// 0->1: key press detected
-			releaseState &= ~(state & i);	// 1->0: key press detected
-			
-			releaseState |= ~state & i;		// 0->1: key release detected
-			pressState &= ~(~state & i);	// 1->0: key press detected
+			pressState |= state & i;	// 0->1: key press detected
+			releaseState |= ~state & i;	// 0->1: key release detected
 			
 			if ((state & repeatMask) == 0) {
 				repeatCounter = repeatStart;
