@@ -114,8 +114,11 @@ xpcc::BufferedUart{{ id }}::setBaudrateRegister(uint16_t ubrr, bool doubleSpeed)
 void
 xpcc::BufferedUart{{ id }}::write(char c)
 {
-	while (!txBuffer.push(c)) {
+	uint16_t i(0);		
+	while ( !txBuffer.push(c) && (i < 1000) ) {
+		++i;
 		// wait for a free slot in the buffer
+		// but do not wait infinity
 	}
 	
 	// disable interrupts
