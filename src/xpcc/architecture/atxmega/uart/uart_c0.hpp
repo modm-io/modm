@@ -38,9 +38,6 @@ namespace xpcc
 {
 	/**
 	 * \brief		UARTC0
-	 * 
-	 * This implementation uses a ringbuffer.
-	 *
 	 * \ingroup		architecture
 	 */
 	class UartC0
@@ -81,7 +78,7 @@ namespace xpcc
 		/**
 		 * \brief	Write a string
 		 * 
-		 * The string musst end with '\0'.
+		 * The string musst end with '\\0'.
 		 */
 		static void
 		write(const char *string);
@@ -92,6 +89,101 @@ namespace xpcc
 	protected:
 		static void
 		setBaudrateRegister(uint16_t ubrr);
+	};
+	
+	// ------------------------------------------------------------------------
+	/**
+	 * \brief	Buffered Uart
+	 * 
+	 * This implementation uses a ringbuffer.
+	 *
+	 * \ingroup		architecture
+	 */
+	class BufferedUartC0
+	{
+	public:
+		BufferedUartC0(uint32_t baudrate)
+		{
+			this->setBaudrate(baudrate);
+		}
+		
+		/**
+		 * \brief	Set baud rate
+		 *
+		 * If this function is called with a constant value as parameter,
+		 * all the calculation is done by the compiler, so no 32-bit
+		 * arithmetic is needed at run-time!
+		 *
+		 * \param	baudrate	desired baud rate
+		 * \param	doubleSpeed	enabled double speed mode
+		 */
+		static inline void
+		setBaudrate(uint32_t baudrate, bool doubleSpeed = false)
+		{
+			uint16_t ubrr;
+			if (doubleSpeed) {
+				ubrr  = (F_CPU / (baudrate * 8l)) - 1;
+			}
+			else {
+				ubrr = (F_CPU / (baudrate * 16l)) - 1;
+			}
+			setBaudrateRegister(ubrr, doubleSpeed);
+		}
+		
+		static inline void
+		setFractionalBaudrate(uint16_t bsel, int8_t bscale)
+		{
+			uint16_t ubrr = (bsel & 0x0fff) | ((bscale & 0x0f) << 12);
+			setBaudrateRegister(ubrr, false);
+		}
+		
+		static void
+		write(char data);
+		
+		/**
+		 * \brief	Write a string
+		 * 
+		 * The string musst end with '\\0'.
+		 */
+		static void
+		write(const char *string);
+		
+		static bool
+		read(char& c);
+		
+		/**
+		 * \brief	Read a block of bytes
+		 * 
+		 * \param	*buffer	Pointer to a buffer big enough to storage \a n bytes
+		 * \param	n	Number of bytes to be read
+		 * 
+		 * \return	Number of bytes which could be read, maximal \a n
+		 */
+		static uint8_t
+		read(char *buffer, uint8_t n);
+		
+	protected:
+		static void
+		setBaudrateRegister(uint16_t ubrr, bool doubleSpeed);
+	};
+	
+	// ------------------------------------------------------------------------
+	/**
+	 * \brief		UARTC0 in SPI master mode
+	 * \ingroup		architecture
+	 */
+	class UartSpiC0
+	{
+	public:
+		UartSpiC0() {
+			this->initialize();
+		}
+		
+		static void
+		initialize();
+		
+		static uint8_t
+		write(uint8_t data);
 	};
 }
 

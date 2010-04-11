@@ -32,8 +32,10 @@ import os
 
 rootpath = '..'
 
+configfile = ARGUMENTS.get('config') if (ARGUMENTS.get('config')) else 'unittest.cfg'
+
 pre = Environment(tools = ['xpcc_loader'], toolpath = [rootpath + '/misc/python/scons'])
-env = pre.GenerateEnvironment(configfile = 'unittest.cfg',
+env = pre.GenerateEnvironment(configfile = configfile,
 							  rootpath = rootpath)
 
 # find only files located in 'test' folders

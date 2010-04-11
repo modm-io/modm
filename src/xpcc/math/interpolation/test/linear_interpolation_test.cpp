@@ -30,7 +30,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/math/interpolation/linear_interpolation.hpp>
+#include <xpcc/math/interpolation/linear.hpp>
 
 #include "linear_interpolation_test.hpp"
 
@@ -49,7 +49,7 @@ FLASH(MyPair flashValues[6]) =
 void 
 LinearInterpolationTest::testInterpolation()
 {
-	xpcc::LinearInterpolation<MyPair, xpcc::accessor::Flash> \
+	xpcc::interpolation::Linear<MyPair, xpcc::accessor::Flash> \
 		value(xpcc::modifier::asFlash(flashValues), 6);
 	
 	TEST_ASSERT_EQUALS(value.interpolate(  0),  -200);

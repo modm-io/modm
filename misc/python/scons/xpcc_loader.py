@@ -116,6 +116,10 @@ def generate_environment(env, rootpath, configfile='project.cfg', buildpath=None
 		new['AVRDUDE_PROGRAMMER'] = parser.get('avrdude', 'programmer', 'stk500')
 		new['AVRDUDE_PORT'] = parser.get('avrdude', 'port', '/dev/ttyUSB0')
 		new['AVR_FUSEBITS'] = []
+		
+		# path to the headers of a very small and incomplete libstdc++
+		# implementation
+		new.Append(CPPPATH = os.path.join(new['XPCC_ROOTPATH'], 'src', 'stdc++'))
 	elif architecture == 'pc':
 		new = Environment(
 				ARCHITECTURE = architecture + '/' + device,

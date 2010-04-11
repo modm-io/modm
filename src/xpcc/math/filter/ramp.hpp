@@ -38,6 +38,10 @@ namespace xpcc
 	/**
 	 * \brief	Ramp
 	 * 
+	 * 
+	 * Example:
+	 * \todo	example
+	 * 
 	 * \todo	documentation
 	 * \ingroup	filter
 	 */
@@ -48,15 +52,10 @@ namespace xpcc
 		/**
 		 * \brief	Create a ramp generator
 		 * 
-		 * \param	positiveIncrement	Step with for positive direction
-		 * \param	negativeIncrement	Step with for the negative direction.
-		 * 								<B>Need to be positive!</b>
-		 * \param	initialValue
-		 * 
-		 * Example:
-		 * \code
-		 * 
-		 * \endcode
+		 * \param	positiveIncrement	Stepwith for positive direction
+		 * \param	negativeIncrement	Stepwith for the negative direction.
+		 * 								<b>Needs to be positive!</b>
+		 * \param	initialValue		Starting value
 		 * 
 		 * \warning	Both values for positive- and negative increment needs to
 		 * 			be positive!

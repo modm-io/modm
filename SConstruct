@@ -88,25 +88,13 @@ for port in ['C', 'D', 'E', 'F']:
 							SUBSTITUTIONS = substitutions)
 		env.Alias('template', file)
 		
-		# buffered UART
-		file = env.Template(target = os.path.join(path, 'buffered_uart_%s.hpp' % id.lower()),
-							source = os.path.join(path, 'buffered_uart.hpp.in'),
+		file = env.Template(target = os.path.join(path, 'uart_buffered_%s.cpp' % id.lower()),
+							source = os.path.join(path, 'uart_buffered.cpp.in'),
 							SUBSTITUTIONS = substitutions)
 		env.Alias('template', file)
 		
-		file = env.Template(target = os.path.join(path, 'buffered_uart_%s.cpp' % id.lower()),
-							source = os.path.join(path, 'buffered_uart.cpp.in'),
-							SUBSTITUTIONS = substitutions)
-		env.Alias('template', file)
-		
-		# UART in SPI master mode
-		file = env.Template(target = os.path.join(path, 'spi_%s.hpp' % id.lower()),
-							source = os.path.join(path, 'spi.hpp.in'),
-							SUBSTITUTIONS = substitutions)
-		env.Alias('template', file)
-		
-		file = env.Template(target = os.path.join(path, 'spi_%s.cpp' % id.lower()),
-							source = os.path.join(path, 'spi.cpp.in'),
+		file = env.Template(target = os.path.join(path, 'uart_spi_%s.cpp' % id.lower()),
+							source = os.path.join(path, 'uart_spi.cpp.in'),
 							SUBSTITUTIONS = substitutions)
 		env.Alias('template', file)
 		

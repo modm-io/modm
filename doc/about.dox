@@ -4,30 +4,45 @@
 
 \page about About this library
 
-The main target of this library are small 8-bit AVR mircocontrollers, but it
+The main target of this library are small 8-bit AVR mircocontrollers. But it
 should also be able to generate code for standard x86 PCs. This has partly historical
-reasons but gives also a lot advantages. Especially testing and debugging is
+reasons but gives also a lot of advantages. Especially testing and debugging is
 much easier when you can run your Code native on your PC and don't have to
-reprogram a microcontroller every time.
-This technique has its limits of course, but for things like generic algorithms
-it works very well.
+reprogram and debug a microcontroller every time.
+This technique has its limits of course, but works very well for things like
+generic and therefore platform independend algorithms.
 
 An other advantage is that we can run nearly the same code on both sides when
 the PC communicates with the microcontroller which reduces the efford for
 developing the code.
 
-While a PC has a lot of computational power it is somewhat limited on a
-microcontroller. Therefore the most optimizations target the 8-bit
-microcontrollers and accept possible sligthly worse code for the PC.
+While a PC has a lot of computational power it is somewhat limited on
+microcontrollers. Therefore the most optimizations target the 8-bit
+microcontrollers and accept possible sligthly worse code for the x86 targets.
+
+\section techniques	Main ideas and techinques used here
+
+\todo	describe the template system used
+
+Hardware components are implemented as template classes with static methods and
+[parametriert] via template parameters. Even if this don't see obvious at the
+first time it allows the generation of very flexible but also fast code.
+
+Functions calls are direct without the need of a vtable lookup needed for
+virtual methods, which means fast access and low RAM and Flash consumption.
+
+The drawbacks are acceptable: Increased codesize if a driver is used many times
+and no possibly of reconfigering on runtime.
+
+\todo explain in more detail.
 
 \section goals Optimizations goals
 
 - Ease of use
 - Speed
-- Size
 
-The main goal of nearly optimizations is speed and on second place
-speed. Therefore this library is heavily template based. Templates offer the
+The main goal of nearly every optimizations is speed. Therefore
+this library is heavily template based. Templates offer the
 possibly of generating nearly optimal code for various occasions with the
 drawback of increased code size.
 For our main target the AVRs this is acceptable because devices with big flash

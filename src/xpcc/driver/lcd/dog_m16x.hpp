@@ -48,6 +48,7 @@ namespace xpcc
 	 * 
 	 * \see		Lcd
 	 * 
+	 * \deprecated	use xpcc::St7036 instead
 	 * \author	Fabian Greif
 	 * \ingroup	driver
 	 */

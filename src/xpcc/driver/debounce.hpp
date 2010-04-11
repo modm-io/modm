@@ -48,9 +48,6 @@ namespace xpcc
 	 * The update() method needs to be called periodically for example
 	 * every 10ms. Preferred in a timer interrupt function.
 	 * 
-	 * Example:
-	 * \include debounce.cpp
-	 * 
 	 * The detection for long or repreated presses works only correct for
 	 * one key at a time. This constraint only applies to buttons listed in the
 	 * \em mask variable.
@@ -58,6 +55,7 @@ namespace xpcc
 	 * This implementation is based on the C debounce functions written
 	 * by Peter Dannegger (see http://www.mikrocontroller.net/topic/48465).
 	 * 
+	 * \deprecated	This class is deprecated, use Buttons() instead.
 	 * \ingroup	driver
 	 */
 	class Debounce

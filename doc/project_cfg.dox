@@ -4,6 +4,8 @@
 
 \page project_cfg	project.cfg
 
+Useable options:
+
  - general
    - name
    - regenerate_sconstruct = yes|no

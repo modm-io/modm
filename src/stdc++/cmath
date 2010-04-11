@@ -1,0 +1,110 @@
+// coding: utf-8
+// ----------------------------------------------------------------------------
+/* Copyright (c) 2009, Roboterclub Aachen e.V.
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ *     * Redistributions of source code must retain the above copyright
+ *       notice, this list of conditions and the following disclaimer.
+ *     * Redistributions in binary form must reproduce the above copyright
+ *       notice, this list of conditions and the following disclaimer in the
+ *       documentation and/or other materials provided with the distribution.
+ *     * Neither the name of the Roboterclub Aachen e.V. nor the
+ *       names of its contributors may be used to endorse or promote products
+ *       derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY ROBOTERCLUB AACHEN E.V. ''AS IS'' AND ANY
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL ROBOTERCLUB AACHEN E.V. BE LIABLE FOR ANY
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+ * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * $Id$
+ */
+// ----------------------------------------------------------------------------
+/**
+ * @file cmath
+ * This is a Standard C++ Library file.  You should @c #include this file
+ * in your programs, rather than any of the "*.h" implementation files.
+ *
+ * This is the C++ version of the Standard C Library header @c math.h,
+ * and its contents are (mostly) the same as that header, but are all
+ * contained in the namespace @c std (except for names which are defined
+ * as macros in C).
+ */
+
+//
+// ISO C++ 14882: 26.5  C library
+//
+
+#pragma GCC system_header
+
+#include "internal/algorithm_base.hpp"
+
+#include <math.h>
+
+#ifndef STDCPP_CMATH
+#define STDCPP_CMATH
+
+/*// Get rid of those macros defined in <math.h>
+#undef M_E
+#undef M_LOG2E
+#undef M_LOG10E
+#undef M_LN2
+#undef M_LN10
+#undef M_PI
+#undef M_PI_2
+#undef M_PI_4
+#undef M_1_PI
+#undef M_2_PI
+#undef M_2_SQRTPI
+#undef M_SQRT2
+#undef M_SQRT1_2
+#undef NAN
+#undef INFINITY*/
+
+namespace std
+{
+	using ::cos;
+	using ::fabs;
+	using ::fmod;
+	using ::modf;
+	using ::sin;
+	using ::sqrt;
+	using ::tan;
+	using ::floor;
+	using ::ceil;
+	using ::frexp;
+	using ::ldexp;
+	using ::cosh;
+	using ::sinh;
+	using ::atan;
+	using ::atan2;
+	using ::log;
+	using ::log10;
+	using ::pow;
+	using ::isnan;
+	using ::isinf;
+	using ::square;
+	using ::copysign;
+	using ::fdim;
+	using ::fma;
+	using ::fmax;
+	using ::fmin;
+	using ::signbit;
+	using ::trunc;
+	using ::isfinite;
+	using ::hypot;
+	using ::round;
+	using ::lround;
+	using ::lrint;
+}	// namespace std
+
+#endif	// STDCPP_CMATH

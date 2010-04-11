@@ -9,3 +9,13 @@
 
 
 */
+
+namespace xpcc
+{
+	/**
+	 * \ingroup	interpolation
+	 */
+	namespace interpolation
+	{
+	}
+}

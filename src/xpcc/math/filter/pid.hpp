@@ -64,10 +64,10 @@ namespace xpcc
 	 * The \p maxErrorSum is to be used, to limit the internal integrator and so
 	 * provide an anti wind up.
 	 *
-	 * With the template parameter \ScaleFactor this class provides an
+	 * With the template parameter \c ScaleFactor this class provides an
 	 * fix point capability with integer types.
 	 *
-	 * The \p feedforward can be used as hook to call a external function
+	 * The \c feedforward can be used as hook to call a external function
 	 * (call back) to calculate a forward value.
 	 *
 	 * \todo	check implementation
@@ -79,7 +79,7 @@ namespace xpcc
 	template<typename T, unsigned int ScaleFactor = 1>
 	class Pid
 	{
-		typedef typename ArithmeticTraits<T>::DoubleType T_DOUBLE;
+		typedef typename ArithmeticTraits<T>::DoubleType DoubleType;
 		typedef T (* FeedforwardFunction)(const T&);
 	
 	public:
@@ -95,19 +95,19 @@ namespace xpcc
 			
 			inline void
 			setKp(float kp){
-				this->kp = kp*ScaleFactor;
+				this->kp = kp * ScaleFactor;
 			}
 			inline void
 			setKi(float ki){
-				this->ki = ki*ScaleFactor;
+				this->ki = ki * ScaleFactor;
 			}
 			inline void
 			setKd(float kd){
-				this->kd = kd*ScaleFactor;
+				this->kd = kd * ScaleFactor;
 			}
 			inline void
 			setMaxErrorSum(float maxErrorSum){
-				this->maxErrorSum = maxErrorSum*ScaleFactor;
+				this->maxErrorSum = maxErrorSum * ScaleFactor;
 			}
 			
 			
@@ -132,15 +132,15 @@ namespace xpcc
 		 * \param	feedforward	callback function to calculate a forward value
 		 **/
 		Pid(const float& kp = 0, const float& ki = 0, const float& kd = 0,
-				const T& maxErrorSum = 0, const T& maxOutput = 0,
-				FeedforwardFunction feedforward = feedforwardDummy<T>);
+			const T& maxErrorSum = 0, const T& maxOutput = 0,
+			FeedforwardFunction feedforward = feedforwardDummy<T>);
 
 		/**
 		 * \param	parameter	list of parameters to the controller
 		 * \param	feedforward	callback function to calculate a forward value
 		 **/
 		Pid(Parameter& parameter,
-				FeedforwardFunction feedforward = feedforwardDummy<T>);
+			FeedforwardFunction feedforward = feedforwardDummy<T>);
 		
 		/**
 		 * Reset the parameters of the controller.

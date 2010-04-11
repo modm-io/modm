@@ -5,14 +5,14 @@
 /*!
 \page build_system Build system
 
-In this project we use SCons (a Python-based build tool) instead of tradional
-aproach with Make. The main reason for this decision was that it was a 
-nightmare to create Makefiles which work on Linux and Windows and support 
+In this project we use SCons (a Python-based build tool) instead of the tradional
+aproach using Make. The main reason for this decision was that it is a 
+nightmare to create Makefiles which works on Linux and Windows and support 
 different configurations.
 
 The availability of the full power of the Python language in the 
-SConstruct-files  (the equivalent to Makefiles) allowed us to create a easy
-extensible and flexible system. Especially the debugging is much easier that
+SConstruct-files (the equivalent to Makefiles) allowed us to create a easy
+extensible and flexible system. Especially debugging is much easier that
 way.
 
 \section requirements Requirements
@@ -26,8 +26,7 @@ following in a terminal and you're good to go:
 $ sudo aptitude install python scons python-jinja2 python-lxml
 \endverbatim
 
-To generate the documentation and regenerate the template files you also need
-the following packets:
+To generate the documentation you also need the following packets:
 
 \verbatim
 $ sudo aptitude install doxygen graphviz
@@ -35,8 +34,8 @@ $ sudo aptitude install doxygen graphviz
 
 \subsubsection windows Windows
 
-Windows users have to install all the tools by hand. How to do that is explaind
-on the websites of the respective projects:
+Windows users have to install all tools by hand unfortually. How to do that is
+explaind on the websites of the respective projects:
 
 - http://www.python.org/download/
 - http://www.scons.org/download.php
@@ -44,18 +43,24 @@ on the websites of the respective projects:
 
 - http://pypi.python.org/pypi/setuptools
 - http://codespeak.net/lxml/installation.html
-It is easy to install lxml with setuptools
-Type <tt>easy_install lxml==xxx</tt> into the cmd window.
-Replace xxx with the last version which provides windows binaries.
 
-It is also possible to install other python modules with easy_install
-- <tt>easy_install scons</tt> (If during exexuting of Scons python does not find Sconsmodule use windows installer instead of easy_install to install Scons)
+The install \c lxml with \c setuptools type <tt>easy_install lxml==xxx</tt>
+into the cmd window. Replace xxx with the last version which provides windows
+binaries.
+
+It is also possible to install the python modules with easy_install
+- <tt>easy_install scons</tt> (If during exexuting of Scons python does not
+  find Sconsmodule use the windows installer instead of easy_install to install Scons)
 - <tt>easy_install jinja2</tt>
 
-To program with AVRISP mkII you can use AVR Studio or install libusb to program using the XPCC system (AVR Dude)
-http://www.libusb.org/
+To program with AVRISP mkII you can use AVR Studio or install libusb to
+program using the XPCC system (avrdude)
 
-Optional
+- http://www.libusb.org/
+
+\todo	Which driver is need, usb filter?
+
+Optional and only needed to regenerate this documentation:
 - http://www.stack.nl/~dimitri/doxygen/download.html#latestsrc
 - http://www.graphviz.org/Download_windows.php
 
@@ -74,8 +79,9 @@ $ sudo aptitude install gcc build-essential tipcutils libboost-thread-dev
 
 \subsection compile_avr	Compiling for AVRs
 
-\todo add description
 \subsubsection Linux
+
+\todo add description
 
 \subsubsection Windows
 
@@ -141,10 +147,10 @@ The full documentation is has its own page: \subpage project_cfg.
 
 \section usage Usage of the build system
 
-Run \b scons \b update to regenerate the SConstruct files for the tests folder,
-\b scons \b doc will create the doxygen documentation.
+Run <tt>scons update</tt> to regenerate the SConstruct files for the tests folder,
+<tt>scons doc</tt> will create the doxygen documentation.
 
-With \b scons \b templates you can regenerate the template files, but usally
+With <tt>scons templates</tt> you can regenerate the template files, but usally
 you don't need to do that. 
 
 \section optimisation Optimisations

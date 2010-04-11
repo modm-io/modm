@@ -1,11 +1,12 @@
 // WARNING: This file is generated automatically, do not edit!
-// Please modify the corresponding 'main_pc.cpp.in' file instead.
+// Please modify the corresponding 'main_atxmega.cpp.in' file instead.
 // ----------------------------------------------------------------------------
+
+#include <avr/interrupt.h>
+#include <xpcc/architecture/atxmega/uart/buffered_uart_e0.hpp>
 
 #include <unittest/reporter.hpp>
 #include <unittest/controller.hpp>
-
-#include <xpcc/architecture/atxmega/uart/uartc0.hpp>
 
 ${includes}
 
@@ -15,7 +16,10 @@ int
 main(void)
 {
 	// initialize output device
-	xpcc::IODevice device;
+	xpcc::BufferedUartE0 uart(115200);
+	xpcc::IODeviceWrapper<xpcc::BufferedUartE0> device(uart);
+	
+	sei();
 	
 	device.put("Unittests (" __DATE__ ", " __TIME__")\n");
 	
@@ -27,5 +31,7 @@ ${tests}
 	
 	unittest::Controller::instance().getReporter().printSummary();
 	
-	return 0;
+	while (1)
+	{
+	}
 }

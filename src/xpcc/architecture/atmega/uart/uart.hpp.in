@@ -88,7 +88,7 @@ namespace xpcc
 		/**
 		 * \brief	Write a string
 		 * 
-		 * The string musst end with '\0'.
+		 * The string musst end with \c '\\0'.
 		 */
 		static void
 		write(const char *string);

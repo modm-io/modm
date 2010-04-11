@@ -5,14 +5,14 @@
 
 To get started go to the root folder an run <tt>$ scons update</tt>. Then go to the 
 src folder and run <tt>$ scons</tt>. Now the library and all the unittests shoulb
-get build. If you're compiling for the pc there should get a output like:
+get build. If everything is set up correctly you should get a output like:
 
 \verbatim
-Passed 437 tests
+Passed 520 tests
 OK!
 \endverbatim
 
 Looks like everything is running just fine ;-)
 
-For every other target the program will only be build but not executed.
+\todo	extend this section
 */

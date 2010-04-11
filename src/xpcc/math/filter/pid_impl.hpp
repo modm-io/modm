@@ -37,7 +37,7 @@ template<typename T, unsigned int ScaleFactor>
 xpcc::Pid<T, ScaleFactor>::Parameter::Parameter(
 		const float& kp, const float& ki, const float& kd,
 		const T& maxErrorSum, const T& maxOutput) :
-	kp(kp*ScaleFactor), ki(ki*ScaleFactor), kd(kd*ScaleFactor),
+	kp(kp * ScaleFactor), ki(ki * ScaleFactor), kd(kd * ScaleFactor),
 	maxErrorSum(maxErrorSum), maxOutput(maxOutput)
 {
 }
@@ -94,12 +94,12 @@ xpcc::Pid<T, ScaleFactor>::update(const T& error)
 	else if (this->errorSum < -this->parameter.maxErrorSum) {
 		this->errorSum = -this->parameter.maxErrorSum;
 	}
-
-	T_DOUBLE tmp = 0;
+	
+	DoubleType tmp = 0;
 //	tmp  = this->feedforward(this->target); // eigentlich 
-	tmp += static_cast<T_DOUBLE>(this->parameter.kp) * error;
-	tmp += static_cast<T_DOUBLE>(this->parameter.ki) * (this->errorSum);
-	tmp += static_cast<T_DOUBLE>(this->parameter.kd) * (error - this->lastError);
+	tmp += static_cast<DoubleType>(this->parameter.kp) * error;
+	tmp += static_cast<DoubleType>(this->parameter.ki) * (this->errorSum);
+	tmp += static_cast<DoubleType>(this->parameter.kd) * (error - this->lastError);
 	
 	tmp = tmp / ScaleFactor;
 	

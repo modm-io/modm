@@ -30,7 +30,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/math/interpolation/lagrange_interpolation.hpp>
+#include <xpcc/math/interpolation/lagrange.hpp>
 
 #include "lagrange_interpolation_test.hpp"
 

@@ -5,12 +5,12 @@
 /*!
 \defgroup logger Logger
 \brief Log messages to specified destiny.
+
+\todo		description needs an update.
+\warning	This description is outdated!
  
 The \ref xpcc::log::Logger "Logger" using the \ref xpcc::IOStream "IOStream" to
-read messages and write them to a given \ref xpcc::log::Device "Device" .
-The Logger use the \ref xpcc::log::Singleton "Singleton" as a server to send the 
-messages to a Device that can be set global in the main-file. Also in the Singleton
-is a filter for \ref xpcc::log::Level "Level".
+read messages and write them to a given "Device" .
 
 Write a log message with streams:
 \code
