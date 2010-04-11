@@ -32,7 +32,7 @@
 
 import os
 
-env = Environment(tools = ['template', 'doxygen', 'configparser'], toolpath = ['misc/python/scons'])
+env = Environment(tools = ['template', 'doxygen', 'xpcc_configparser'], toolpath = ['misc/python/scons'])
 
 # -----------------------------------------------------------------------------
 # regenerate SConstruct files for the tests
