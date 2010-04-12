@@ -38,6 +38,10 @@ namespace xpcc
 	/**
 	 * \brief	Ramp
 	 * 
+	 * The output value is incremented or decremented at every call to update
+	 * until target has been reached by positiveIncrement or negativeIncrement.
+	 * 
+	 * The final value is always set to target after several calls to update.
 	 * 
 	 * Example:
 	 * \todo	example

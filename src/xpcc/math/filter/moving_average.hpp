@@ -41,10 +41,15 @@ namespace xpcc
 	/**
 	 * \brief	Moving average filter
 	 * 
+	 * Calculates the average of N newest values, i.a. the sum of the last N
+	 * values have been passed to update(...), devided by N. If less than N
+	 * values have been passed to the filter, the division factor is still N,
+	 * so missing values are assumed to be zero.
+	 *
 	 * This implementation stores the current sum of all values in the buffer
 	 * and updates this value with every call of update() by subtracting
 	 * the overwritten buffer index and adding the new one.
-	 * That way the internal sum if always up to date and the getValue()
+	 * That way the internal sum is always up to date and the getValue()
 	 * method consists of only one division.
 	 * 
 	 * \warning	Input range is limited by the following equation
