@@ -54,7 +54,7 @@ xpcc::apb::Slave<INTERFACE>::sendErrorResponse(uint8_t errorCode)
 	uint8_t error = errorCode;
 	
 	INTERFACE::sendMessage(
-			INTERFACE::masterAddress,
+			ownAddress,
 			currentCommand | INTERFACE::NACK,
 			&error,
 			1);
@@ -65,7 +65,7 @@ void
 xpcc::apb::Slave<INTERFACE>::sendResponse(const uint8_t *payload, uint8_t payloadLength)
 {
 	INTERFACE::sendMessage(
-			INTERFACE::masterAddress,
+			ownAddress,
 			currentCommand | INTERFACE::ACK,
 			payload,
 			payloadLength);
@@ -76,7 +76,7 @@ void
 xpcc::apb::Slave<INTERFACE>::sendResponse()
 {
 	INTERFACE::sendMessage(
-			INTERFACE::masterAddress,
+			ownAddress,
 			currentCommand | INTERFACE::ACK,
 			NULL,
 			0);

@@ -31,7 +31,7 @@
 // ----------------------------------------------------------------------------
 
 #if defined(__AVR__) && defined(__AVR_HAVE_MUL__)
-	#include <xpcc/architecture/avr/math/math.hpp>
+	#include <xpcc/architecture/avr/math.hpp>
 #endif
 
 #include "position.hpp"

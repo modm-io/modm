@@ -222,18 +222,20 @@ def xpcc_library(env):
 			exports = 'env')
 	
 	env['XPCC_LIBRARY_DEFINES'] = defines.copy()
-	defines.update(env['XPCC_CONFIG']['defines'])
+	for key in defines.iterkeys():
+		if key in env['XPCC_CONFIG']['defines']:
+			env['XPCC_LIBRARY_DEFINES'][key] = env['XPCC_CONFIG']['defines'][key]
 	
 	# generate 'xpcc_config.h'
 	substitutions = {
 		'defines': '\n'.join(["#define %s %s" % (key.upper(), value) \
-				for key, value in defines.iteritems()]),
+				for key, value in env['XPCC_LIBRARY_DEFINES'].iteritems()]),
 		'name': env['XPCC_CONFIG']['general']['name']
 	}
 	file = env.SimpleTemplate(
-			target = env.LibraryBuildpath('xpcc_config.h'),
+			target = env.LibraryBuildpath('xpcc_config.hpp'),
 			source = os.path.join(env['XPCC_ROOTPATH'], 
-								  'misc/templates/xpcc_config.h.in'),
+								  'misc/templates/xpcc_config.hpp.in'),
 			SUBSTITUTIONS = substitutions)
 	
 	env.Append(LIBS = ['robot'])
@@ -249,7 +251,7 @@ def xpcc_generics(env, xmlfile):
 	
 	return source
 
-def generate_defines(env, filename='defines.h'):
+def generate_defines(env, filename='defines.hpp'):
 	defines = env['XPCC_CONFIG']['defines']
 	if defines:
 		substitutions = {
@@ -259,7 +261,7 @@ def generate_defines(env, filename='defines.h'):
 		file = env.SimpleTemplate(
 				target = filename,
 				source = os.path.join(env['XPCC_ROOTPATH'], 
-									  'misc/templates/defines.h.in'),
+									  'misc/templates/defines.hpp.in'),
 				SUBSTITUTIONS = substitutions)
 		return file
 	else:

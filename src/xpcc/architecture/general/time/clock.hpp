@@ -33,7 +33,7 @@
 #ifndef	XPCC__CLOCK_HPP
 #define	XPCC__CLOCK_HPP
 
-#include <xpcc/workflow/time/timestamp.hpp>
+#include <xpcc/workflow/timestamp.hpp>
 
 namespace xpcc
 {

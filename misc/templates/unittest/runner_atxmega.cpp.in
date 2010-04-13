@@ -3,7 +3,7 @@
 // ----------------------------------------------------------------------------
 
 #include <avr/interrupt.h>
-#include <xpcc/architecture/atxmega/uart/buffered_uart_e0.hpp>
+#include <xpcc/architecture/atxmega/uart/uart_e0.hpp>
 
 #include <unittest/reporter.hpp>
 #include <unittest/controller.hpp>

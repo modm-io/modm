@@ -38,7 +38,7 @@
 #include <xpcc/architecture/general/gpio.hpp>
 
 #include "uart_c0.hpp"
-#include "xpcc_config.h"
+#include "xpcc_config.hpp"
 
 #ifdef USARTC0
 

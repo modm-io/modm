@@ -30,7 +30,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/workflow/time/timestamp.hpp>
+#include <xpcc/workflow/timestamp.hpp>
 
 #include "timestamp_test.hpp"
 

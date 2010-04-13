@@ -40,7 +40,7 @@
 #include <xpcc/architecture/general/atomic/lock.hpp>
 
 #include "uart_defines.h"
-#include "xpcc_config.h"
+#include "xpcc_config.hpp"
 
 #ifdef ATMEGA_HAS_UART0
 

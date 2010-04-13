@@ -32,7 +32,7 @@
 
 #include "st7036.hpp"
 
-#include "xpcc_config.h"
+#include "xpcc_config.hpp"
 
 namespace xpcc
 {

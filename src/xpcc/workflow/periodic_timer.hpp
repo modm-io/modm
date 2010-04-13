@@ -30,102 +30,73 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/workflow/time/timeout.hpp>
+#ifndef XPCC__PERIODIC_TIMER_HPP
+#define XPCC__PERIODIC_TIMER_HPP
 
-#include "timeout_test.hpp"
+#include <xpcc/workflow/timeout.hpp>
 
-// ----------------------------------------------------------------------------
-// dummy implementation to control the time
-
-class DummyClock
+namespace xpcc
 {
-public:
-	static xpcc::Timestamp
-	now()
+	/**
+	 * \brief		Software timer
+	 * 
+	 * \tparam	T	Used timer, default is xpcc::Clock() which should have
+	 * 				a millisecond resolution.
+	 * 
+	 * \author	Fabian Greif
+	 * \ingroup	workflow
+	 */
+	template<typename T = ::xpcc::Clock>
+	class PeriodicTimer
 	{
-		return time;
-	}
-	
-	static void
-	setTime(uint16_t time)
-	{
-		DummyClock::time = time;
-	}
-	
-private:
-	static uint16_t time;
-};
-
-uint16_t DummyClock::time = 0;
-
-// ----------------------------------------------------------------------------
-
-void
-TimeoutTest::setUp()
-{
-	DummyClock::setTime(0);
+	public:
+		/**
+		 * \brief	Create and start the timer
+		 */
+		PeriodicTimer(const Timestamp interval);
+		
+		/// Stop the timer
+		inline void
+		stop();
+		
+		/// Check if the timer is running
+		inline bool
+		isRunning() const;
+		
+		/// Set a new interval
+		void
+		restart(const Timestamp interval);
+		
+		/**
+		 * \brief	Check if a new period has started
+		 * 
+		 * This function can be used to easily write sections that are
+		 * excuted at defined periods:
+		 * \code
+		 * xpcc::PeriodicTimer<> timer(50);
+		 * while (1)
+		 * {
+		 *     if (timer.isExpired()) {
+		 *         // will be executed every 50 ms
+		 *     }
+		 * }
+		 * \endcode
+		 * 
+		 * \return	\c true if entering a new period, \c false otherwise
+		 * 
+		 * \todo	Find a better name for this function
+		 */
+		bool
+		isExpired();
+		
+	private:
+		Timeout<T> timer;
+		
+		Timestamp interval;
+		bool isRunning_;
+	};
 }
 
-void
-TimeoutTest::testBasics()
-{
-	xpcc::Timeout<DummyClock> timeout(10);
-	
-	TEST_ASSERT_FALSE(timeout.isExpired());
-	
-	int i;
-	for (i = 0; i < 9; ++i) {
-		DummyClock::setTime(i);
-		TEST_ASSERT_FALSE(timeout.isExpired());
-	}
-	
-	DummyClock::setTime(10);
-	TEST_ASSERT_TRUE(timeout.isExpired());
-	
-	// check if the class holds the state
-	DummyClock::setTime(9);
-	TEST_ASSERT_TRUE(timeout.isExpired());
-}
+#include "periodic_timer_impl.hpp"
 
-void
-TimeoutTest::testDefaultConstructor()
-{
-	xpcc::Timeout<DummyClock> timeout;
-	TEST_ASSERT_TRUE(timeout.isExpired());
-}
-
-void
-TimeoutTest::testTimeOverflow()
-{
-	// overflow after 65535
-	DummyClock::setTime(35570);
-	
-	xpcc::Timeout<DummyClock> timeout(30000);
-	
-	TEST_ASSERT_FALSE(timeout.isExpired());
-	
-	DummyClock::setTime(40000);
-	TEST_ASSERT_FALSE(timeout.isExpired());
-	
-	DummyClock::setTime(33);
-	TEST_ASSERT_FALSE(timeout.isExpired());
-	
-	DummyClock::setTime(34);
-	TEST_ASSERT_TRUE(timeout.isExpired());
-}
-
-void
-TimeoutTest::testRestart()
-{
-	xpcc::Timeout<DummyClock> timeout;
-	TEST_ASSERT_TRUE(timeout.isExpired());
-	
-	timeout.restart(42);
-	TEST_ASSERT_FALSE(timeout.isExpired());
-	
-	DummyClock::setTime(10);
-	TEST_ASSERT_FALSE(timeout.isExpired());
-	
-	DummyClock::setTime(600);
-	TEST_ASSERT_TRUE(timeout.isExpired());
-}
+#endif // XPCC__PERIODIC_TIMER_HPP

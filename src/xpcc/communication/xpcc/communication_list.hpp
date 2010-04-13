@@ -33,7 +33,7 @@
 #ifndef	XPCC__COMMUNICATION_LIST_HPP
 #define	XPCC__COMMUNICATION_LIST_HPP
 
-#include <xpcc/workflow/time/timeout.hpp>
+#include <xpcc/workflow/timeout.hpp>
 
 #include "backend/backend_interface.hpp"
 #include "postman/postman.hpp"
