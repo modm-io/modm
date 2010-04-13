@@ -22,17 +22,14 @@ public class Packets
 		 * 			of the class
 		 */
 		byte[] getBytes();
+		
+		/** Convert attributes of the class to a byte buffer */
+		abstract ByteBuffer toBuffer(ByteBuffer buffer);
 	}
 	
 	/** Base class for all struct types */
 	public static abstract class Struct implements Packet
 	{
-		/** Read attributes from a byte buffer */
-		abstract ByteBuffer fromBuffer(ByteBuffer buf);
-		
-		/** Convert attributes of the class to a byte buffer */
-		abstract ByteBuffer toBuffer(ByteBuffer buffer);
-		
 		abstract public int getSize();
 		
 		// TODO benutze ByteBuffer.wrap(byte[] array) um einen Konstruktor
@@ -52,8 +49,12 @@ public class Packets
 	
 	{% for primitive in primitives %}
 	public static final class {{ primitive.name }} implements Packet
-	{
+	{// primitives
 		public {{ primitive.javaType }} value;
+		
+		public {{ primitive.name }}({{ primitive.javaType }} value){
+			this.value = value;
+		}
 		
 		public final int getSize() {
 			return {{ primitive.size }};
@@ -63,11 +64,27 @@ public class Packets
 			ByteBuffer buffer = ByteBuffer.allocate({{ primitive.size }});
 			buffer.order(ByteOrder.LITTLE_ENDIAN);
 			
-			{% if primitive.equivalent == "boolean" -%}
-			return buffer.put((byte) ((value == true) ? 1 : 0)).array();
-			{%- else -%}
-			return buffer.put{{ primitive.accessor }}(({{ primitive.equivalent }}) value).array();
-			{%- endif %}
+			return toBuffer(buffer).array();
+		}
+		
+		public ByteBuffer toBuffer(ByteBuffer buffer){
+			return {{ primitive | toBufferMethod("value") }};
+		}
+		
+		public static {{ primitive.javaType }} fromBuffer(ByteBuffer buffer){
+			return {{ primitive | fromBufferMethod }};
+		}
+		
+		public static {{ primitive.javaType }} fromBuffer(byte[] bytes){
+			ByteBuffer buffer = ByteBuffer.wrap(bytes)
+							.asReadOnlyBuffer()
+							.order(ByteOrder.LITTLE_ENDIAN);
+			return fromBuffer(buffer);
+		}
+		
+		@Override
+		public String toString(){
+			return "" + value;
 		}
 	}
 	{% endfor %}
@@ -81,68 +98,135 @@ public class Packets
 	{% if packet.description %}/** {{ packet.description | xpcc.wordwrap(72) | xpcc.indent(1) }} */{% endif %}
 	{%- if packet.isStruct %}
 	public static final class {{ packet.name | typeName }} extends Struct
-	{
+	{// packet.isStruct
 		{%- for element in packet.iter() %}
 		public {{ element.type.name | typeName }} {{ element.name | variableName }};
 		{%- endfor %}
 		
+		{{ packet.name | typeName }} (ByteBuffer buffer) {
+			{%- for element in packet.iter() %}
+			{{ element.name | variableName }} = {{ element.type.name | typeObjectName }}.fromBuffer(buffer);
+			{%- endfor %}
+		}
+		
+		public {{ packet.name | typeName }} () {
+		}
+		
 		public final int getSize() {
 			return {{ packet.size }};
 		}
 		
-		ByteBuffer fromBuffer(ByteBuffer buffer) {
+		public static {{ packet.name | typeName }} fromBuffer(ByteBuffer buffer) {
+			return new {{ packet.name | typeName }}(buffer);
+		}
+		
+		public static {{ packet.name | typeName }} fromBuffer(byte[] bytes) {
+			ByteBuffer buffer = ByteBuffer.wrap(bytes)
+							.asReadOnlyBuffer()
+							.order(ByteOrder.LITTLE_ENDIAN);
+			return fromBuffer(buffer);
+		}
+		
+		public ByteBuffer toBuffer(ByteBuffer buffer) {
 			{%- for element in packet.iter() %}
-			{{ element | fromBufferMethod }}
+			{{ element | toBufferMethodStructAccess }};
 			{%- endfor %}
 			
 			return buffer;
 		}
 		
-		ByteBuffer toBuffer(ByteBuffer buffer) {
+		@Override
+		public String toString(){
+			StringBuffer buff = new StringBuffer();
+			buff.append("(");
 			{%- for element in packet.iter() %}
-			{{ element | toBufferMethod }}
+			buff.append({{ element.name | variableName }}{% if loop.last %}+")"{% else %}+" "{% endif %});
 			{%- endfor %}
-			
-			return buffer;
+			return buff.toString();
 		}
 	}
 	{%- elif packet.isEnum %}
 	public enum {{ packet.name | typeName }} implements Packet
-	{
+	{// packet.isEnum
 	{%- for element in packet.iter() %}
 		{{ element.name | enumElement }}({{ element.value }}){% if loop.last %};{% else %},{% endif %}
 	{%- endfor %}
-		
-		public final int getSize() {
-			return {{ packet.size }};
-		}
-		
 		public final int value;
+		
 		private {{ packet.name | typeName }}(int value) {
 			this.value = value;
 		}
 		
+		@Override
+		public final int getSize() {
+			return {{ packet.size }};
+		}
+		
+		@Override
 		public byte[] getBytes() {
 			return new byte[] { (byte) value };
+		}
+		
+		public static {{ packet.name | typeName }} fromValue(int value) {
+			value = value&0xff;
+			for({{ packet.name | typeName }} i : {{ packet.name | typeName }}.values()){
+				if (i.value == value)
+					return i;
+			}
+			throw new RuntimeException("Enumeration value " + value + " does not exist.");
+		}
+		
+		public static {{ packet.name | typeName }} fromBuffer(byte[] bytes) {
+			ByteBuffer buffer = ByteBuffer.wrap(bytes)
+							.asReadOnlyBuffer()
+							.order(ByteOrder.LITTLE_ENDIAN);
+			return fromBuffer(buffer);
+		}
+		
+		public static {{ packet.name | typeName }} fromBuffer(ByteBuffer buffer) {
+			return fromValue(buffer.get()&0xff);
+		}
+		
+		public ByteBuffer toBuffer(ByteBuffer buffer) {
+			buffer.put((byte)value);
+			return buffer;
 		}
 	}
 	{%- elif packet.isTypedef %}
 	public static final class {{ packet.name | typeName }} extends Struct
-	{
+	{// packet.isTypedef
 		public {{ packet.type.name | typeName }} value;
+		
+		public {{ packet.name | typeName }}(){
+		}
+		
+		public {{ packet.name | typeName }}({{ packet.type.name | typeName }} value){
+			this.value = value;
+		}
 		
 		public final int getSize() {
 			return {{ packet.size }};
 		}
 		
-		ByteBuffer fromBuffer(ByteBuffer buffer) {
-			{{ packet | fromBufferMethod("value") }}
-			return buffer;
+		public static {{ packet.name | typeName }} fromBuffer(ByteBuffer buffer) {
+			return new {{ packet.name | typeName }}({{ packet.type.name | typeObjectName }}.fromBuffer(buffer));
 		}
 		
-		ByteBuffer toBuffer(ByteBuffer buffer) {
-			{{ packet | toBufferMethod("value") }}
-			return buffer;
+		public static {{ packet.name | typeName }} fromBuffer(byte[] bytes) {
+			ByteBuffer buffer = ByteBuffer.wrap(bytes)
+							.asReadOnlyBuffer()
+							.order(ByteOrder.LITTLE_ENDIAN);
+			return fromBuffer(buffer);
+		}
+		
+		@Override
+		public ByteBuffer toBuffer(ByteBuffer buffer) {
+			return {{ packet | toBufferMethodStructAccess("value") }};
+		}
+		
+		@Override
+		public String toString(){
+			return "" + value;
 		}
 	}
 	{%- endif %}

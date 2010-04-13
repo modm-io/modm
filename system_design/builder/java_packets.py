@@ -35,18 +35,23 @@ import builder_base
 import filter.java as filter
 
 # -----------------------------------------------------------------------------
-def fromBufferMethod(element, name=None):
+def fromBufferMethod(element):
 	type = str(element.type)
-	if name == None:
-		name = filter.variableName(element.name)
 	if type in filter.PRIMITIVES:
 		if type == "Bool":
-			return "%s = (buffer.get() != 0) ? true : false;" % name
+			return "(buffer.get() != 0)"
+		elif (type == "char"):
+			return "((char)buffer.get())"
 		else:
-			return "%s = buffer.get%s();" % (name, 
-					filter.PRIMITIVES[type].accessor)
+			if (filter.PRIMITIVES[type].mask == None):
+				return "buffer.get%s()" % ( filter.PRIMITIVES[type].accessor)
+			else:
+				return "(buffer.get%s()&%s)" % (
+						filter.PRIMITIVES[type].accessor,
+						filter.PRIMITIVES[type].mask,)
+			
 	else:
-		return "%s.fromBuffer(buffer);" % name
+		return "%s.fromBuffer(buffer)" % (filter.typeName(type))
 
 def toBufferMethod(element, name=None):
 	type = str(element.type)
@@ -54,14 +59,25 @@ def toBufferMethod(element, name=None):
 		name = filter.variableName(element.name)
 	if type in filter.PRIMITIVES:
 		if type == "Bool":
-			return "buffer.put((byte) ((%s == true) ? 1 : 0));" % name
+			return "buffer.put((byte) (%s ? 1 : 0))" % name
 		else:
-			return "buffer.put%s((%s) %s);" % \
+			return "buffer.put%s((%s) %s)" % \
 						(filter.PRIMITIVES[type].accessor,
 						 filter.PRIMITIVES[type].equivalent,
 						 name)
 	else:
-		return "%s.toBuffer(buffer);" % name
+		return "%s.toBuffer(buffer)" % name
+
+def toBufferMethodStructAccess(element, name=None):
+	type = str(element.type)
+	if name == None:
+		name = filter.variableName(element.name)
+	if type in filter.PRIMITIVES:
+		return "new %s(%s).toBuffer(buffer)" % \
+						(filter.PRIMITIVES[type].name,
+						 name)
+	else:
+		return "%s.toBuffer(buffer)" % name
 
 # -----------------------------------------------------------------------------
 class JavaPacketsBuilder(builder_base.Builder):
@@ -76,9 +92,11 @@ class JavaPacketsBuilder(builder_base.Builder):
 		javaFilter = {
 			'enumElement': filter.enumElement,
 			'typeName': filter.typeName,
+			'typeObjectName': filter.typeObjectName,
 			'variableName': filter.variableName,
 			'fromBufferMethod': fromBufferMethod,
 			'toBufferMethod': toBufferMethod,
+			'toBufferMethodStructAccess': toBufferMethodStructAccess,
 		}
 		template = self.template('templates/java_packets.tpl',
 								filter = javaFilter)

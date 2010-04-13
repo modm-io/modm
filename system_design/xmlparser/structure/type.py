@@ -92,7 +92,7 @@ class BaseType(object):
 			if c.isalpha():
 				if c.isupper():
 					if last_low:
-						raise ParserError(self, "Don't use CamelCase here!")
+						raise ParserError(self, "Don't use CamelCase here! (%s)" % name)
 				else:
 					last_low = True
 			elif c.isdigit():
@@ -148,7 +148,7 @@ class Enum(BaseType):
 		def _check_name(self, name):
 			for c in name:
 				if not ((c.isalpha() and c.isupper()) or c.isdigit() or c == "_"):
-					raise ParserError(self, "error in name notation")
+					raise ParserError(self, "Attribute name of element in enum has to be UPPER_UNDERSCORE_STYLE (found: '%s')" % name)
 			return name
 		
 		def __str__(self):

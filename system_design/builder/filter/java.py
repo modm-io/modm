@@ -31,12 +31,14 @@
 # -----------------------------------------------------------------------------
 
 class Primitive:
-	def __init__(self, javaType, name, size, equivalent, accessor):
+	def __init__(self, type, javaType, name, size, equivalent, accessor, mask):
+		self.type = type
 		self.javaType = javaType
 		self.name = name
 		self.size = size
 		self.equivalent = equivalent
 		self.accessor = accessor
+		self.mask = mask
 	
 	def __cmp__(self, other):
 		if isinstance(other, str):
@@ -45,21 +47,27 @@ class Primitive:
 			return cmp(self.name, other.name)
 
 PRIMITIVES = {
-	"int8_t":	Primitive("int",	"Int8",		1,	"byte",		""),
-	"int16_t":	Primitive("int",	"Int16",	2,	"short",	"Short"),
-	"int32_t":	Primitive("int",	"Int32",	4,	"int",		"Int"),
-	"uint8_t":	Primitive("int",	"Uint8",	1,	"byte",		""),
-	"uint16_t":	Primitive("int",	"Uint16",	2,	"short",	"Short"),
-	"uint32_t":	Primitive("int",	"Uint32",	4,	"int",		"Int"),
-	"float": 	Primitive("float",	"Float",	4,	"float",	"Float"),
-	"char":		Primitive("char",	"Char",		1,	"byte",		""),
-	"Bool":		Primitive("boolean","Bool", 	1,	"boolean",	""),
+	"int8_t":	Primitive("int8_t", 	"int",		"Int8",		1,	"byte",		"", 	None),
+	"int16_t":	Primitive("int16_t", 	"int",		"Int16",	2,	"short",	"Short",None),
+	"int32_t":	Primitive("int32_t", 	"int",		"Int32",	4,	"int",		"Int",	None),
+	"uint8_t":	Primitive("uint8_t", 	"int",		"Uint8",	1,	"byte",		"",		"0xFF"),
+	"uint16_t":	Primitive("uint16_t", 	"int",		"Uint16",	2,	"short",	"Short","0xFFFF"),
+	"uint32_t":	Primitive("uint32_t", 	"long",		"Uint32",	4,	"int",		"Int",	"0xFFFFFFFFl"),
+	"float": 	Primitive("float", 		"float",	"Float",	4,	"float",	"Float",None),
+	"char":		Primitive("char", 		"char",		"Char",		1,	"byte",		"",		None),
+	"Bool":		Primitive("Bool",		"boolean",	"Bool", 	1,	"boolean",	"",		None),
 }
 
 # -----------------------------------------------------------------------------
 def typeName(name):
 	if name in PRIMITIVES:
 		return PRIMITIVES[name].javaType
+	else:
+		return name.title().replace(' ', '')
+
+def typeObjectName(name):
+	if name in PRIMITIVES:
+		return PRIMITIVES[name].name
 	else:
 		return name.title().replace(' ', '')
 
