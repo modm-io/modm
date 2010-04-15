@@ -44,7 +44,7 @@
 		struct timeval now;
 		gettimeofday(&now, 0);
 		
-		return Timestamp(now.tv_usec / 1000);
+		return Timestamp( now.tv_sec*1000 + now.tv_usec/1000 );
 	}
 
 #elif defined(__AVR__)
