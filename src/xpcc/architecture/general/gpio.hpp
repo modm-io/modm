@@ -255,7 +255,10 @@ namespace xpcc
 		#include <xpcc/architecture/atmega/gpio.hpp>
 	#endif
 #else
-	#error "No definitions for this target available!"
+//#elif defined(__PC__) // todo
+	#include  <xpcc/architecture/pc/gpio.hpp>
+//#else
+//	#error "No GPIO definitions for this target available!"
 #endif
 
 #endif // XPCC__GPIO_HPP
