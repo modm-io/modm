@@ -71,6 +71,24 @@ namespace xpcc
 			this->packetSize = sizeof( P );
 		}
 		
+		/**
+		 * Set the method that will be called when a response is received.
+		 *
+		 * This specialisation is to be used in case of no payload. The second
+		 * parameter of the method has to be a void*.
+		 *
+		 * \param	component	Pointer to a component object
+		 * \param	function	Pointer to a function of the component object
+		 */
+		template <typename C>
+		inline void
+		init( C *component, void (C::*function)(const Header& header, const void* packet)  )
+		{
+			this->component = static_cast<AbstractComponent*>( component );
+			this->function = reinterpret_cast<Function>(function);
+			this->packetSize = 0;
+		}
+
 
 		/// \todo control packet size?
 		inline void
