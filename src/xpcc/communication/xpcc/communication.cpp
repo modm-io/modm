@@ -176,7 +176,7 @@ xpcc::Communication::sendResponse(const ResponseHandle& handle)
 	Header header(	Header::RESPONSE,
 					false,
 					handle.source,
-					currentComponent,
+					handle.destination,
 					handle.packetIdentifier);
 
 	this->responseManager.addResponse(header);
