@@ -50,7 +50,7 @@ xpcc::pc::Terminal::put(const char* s)
 void
 xpcc::pc::Terminal::flush()
 {
-	std::cout << std::endl;
+	std::cout << std::flush;
 }
 
 bool
