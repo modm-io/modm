@@ -128,7 +128,7 @@ xpcc::CanConnector<C>::sendCanMessage(const Header &header, const uint8_t *data,
 			message.identifier = 2;
 			break;
 	}
-	message.identifier = message.identifier << 2;
+	message.identifier = message.identifier << 1;
 
 	if( header.isAcknowledge ) {
 		message.identifier |= 1;
