@@ -3,6 +3,16 @@
 
 import helper
 
+class EventContainer:
+	def __init__(self):
+		self.publish = helper.SingleAssignDict("event::publish")
+		self.subscribe = helper.SingleAssignDict("event::subscribe")
+	
+	def update(self, other):
+		self.publish.update(other.publish)
+		self.subscribe.update(other.subscribe)
+
+
 class ComponentElement(object):
 	
 	def __init__(self, name, reference=False):
@@ -34,26 +44,25 @@ class Action(ComponentElement):
 		
 		self.description = None
 		self.id = -1
-		self.function = None
-		self.param_type = None
-		self.ret_type = None
+		self.parameterType = None
+		self.returnType = None
 	
 	def _from_xml(self, node):
 		ComponentElement._from_xml(self, node)
 		
-		self.param_type = node.get('parameterType')
-		self.ret_type = node.get('returnType')
+		self.parameterType = node.get('parameterType')
+		self.returnType = node.get('returnType')
 	
 	def __cmp__(self, other):
 		return cmp(self.id, other.id) or cmp(self.name, other.name)
 	
 	def __str__(self):
-		param_type = self.param_type or ""
-		ret_type = (" : %s" % self.ret_type) if (self.ret_type) else ""
+		parameterType = self.parameterType or ""
+		returnType = (" : %s" % self.returnType) if (self.returnType) else ""
 		return "[%02x] %s(%s)%s" % (	self.id,
 										self.name.replace(" ", ""),
-										param_type,
-										ret_type)
+										parameterType,
+										returnType)
 
 
 class Event(ComponentElement):

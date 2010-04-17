@@ -105,6 +105,18 @@ namespace std
 	using ::round;
 	using ::lround;
 	using ::lrint;
-}	// namespace std
+	
+	inline float
+	abs(const float& x)
+	{
+		return ::fabs(x);
+	}
+	
+	inline double
+	abs(const double& x)
+	{
+		return ::fabs(x);
+	}
+}
 
 #endif	// STDCPP_CMATH

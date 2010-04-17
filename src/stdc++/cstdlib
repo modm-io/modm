@@ -89,17 +89,13 @@ namespace std
 	using ::ldiv_t;
 
 	using ::abort;
-	using ::abs;
-	using ::atexit;
 	using ::atof;
 	using ::atoi;
-	using ::atol;
 	using ::bsearch;
 	using ::calloc;
 	using ::div;
 	using ::exit;
 	using ::free;
-	using ::getenv;
 	using ::labs;
 	using ::ldiv;
 	using ::malloc;
@@ -110,13 +106,24 @@ namespace std
 	using ::strtod;
 	using ::strtol;
 	using ::strtoul;
-	using ::system;
 
+	inline int
+	abs(int i)
+	{
+		return ::abs(i);
+	}
+	
 	inline long
-	abs(long __i) { return labs(__i); }
-
+	abs(long i)
+	{
+		return labs(i);
+	}
+	
 	inline ldiv_t
-	div(long __i, long __j) { return ldiv(__i, __j); }
+	div(long i, long j)
+	{
+		return ldiv(i, j);
+	}
 }
 
 #undef _Exit
@@ -127,15 +134,5 @@ namespace std
 #undef strtoull
 #undef strtof
 #undef strtold
-
-namespace std
-{
-	using ::abs;
-	using ::atoll;
-	using ::strtof;
-	using ::strtoll;
-	using ::strtoull;
-	using ::strtold;
-}
 
 #endif	// STDCPP_CSTDLIB

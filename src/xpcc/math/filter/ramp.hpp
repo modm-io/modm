@@ -39,7 +39,7 @@ namespace xpcc
 	 * \brief	Ramp
 	 * 
 	 * The output value is incremented or decremented at every call to update
-	 * until target has been reached by positiveIncrement or negativeIncrement.
+	 * until target has been reached by increment or decrement.
 	 * 
 	 * The final value is always set to target after several calls to update.
 	 * 
@@ -56,31 +56,35 @@ namespace xpcc
 		/**
 		 * \brief	Create a ramp generator
 		 * 
-		 * \param	positiveIncrement	Stepwith for positive direction
-		 * \param	negativeIncrement	Stepwith for the negative direction.
-		 * 								<b>Needs to be positive!</b>
-		 * \param	initialValue		Starting value
+		 * \param	increment		Stepwith for positive direction
+		 * \param	decrement		Stepwith for the negative direction.
+		 * 							<b>Needs to be positive!</b>
+		 * \param	initialValue	Starting value
 		 * 
-		 * \warning	Both values for positive- and negative increment needs to
+		 * \warning	Both values for increment and decrement needs to
 		 * 			be positive!
 		 */
-		Ramp(const T& positiveIncrement,
-			 const T& negativeIncrement,
+		Ramp(const T& increment,
+			 const T& decrement,
 			 const T& initialValue = T());
 		
 		inline void
 		setTarget(const T& target);
 		
-		/**
-		 * \brief	Calculate the next step
-		 */
+		/// Calculate the next step
 		void
 		update();
 		
 		inline const T&
 		getValue() const
 		{
-			return value;
+			return this->value;
+		}
+		
+		inline void
+		setValue(const T& value)
+		{
+			this->value = value;
 		}
 		
 		inline bool
@@ -94,8 +98,8 @@ namespace xpcc
 		T value;
 		bool targetReached;
 		
-		T positiveIncrement;
-		T negativeIncrement;
+		T increment;
+		T decrement;
 	};
 }
 

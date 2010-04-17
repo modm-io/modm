@@ -246,8 +246,15 @@ def xpcc_library(env):
 def xpcc_generics(env, xmlfile):
 	env.Append(CPPPATH = [os.path.join(os.path.dirname(xmlfile), "..")])
 	
-	source  = env.SystemCppPackets(xmlfile)
-	source += env.SystemCppIdentifier(xmlfile)
+	files  = env.SystemCppPackets(xmlfile)
+	files += env.SystemCppIdentifier(xmlfile)
+	if 'communication' in env['XPCC_CONFIG']:
+		files += env.SystemCppPostman(target='postman.hpp', source=xmlfile, container=env['XPCC_CONFIG']['communication']['container'])
+	
+	source = []
+	for file in files:
+		if file.name.endswith('.cpp'):
+			source.append(file)
 	
 	return source
 

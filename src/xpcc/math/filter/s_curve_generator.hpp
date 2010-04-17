@@ -38,6 +38,8 @@ namespace xpcc
 	/**
 	 * \brief	Trapezoidal S-Curve Trajectory
 	 * 
+	 * open-loop control
+	 * 
 	 * \todo	documentation
 	 * \todo	implementation
 	 * \ingroup	filter
@@ -46,7 +48,7 @@ namespace xpcc
 	class SCurveGenerator
 	{
 	public:
-		SCurveGenerator();
+		SCurveGenerator(const T& initialValue);
 		
 		inline void
 		setTarget(const T& target);

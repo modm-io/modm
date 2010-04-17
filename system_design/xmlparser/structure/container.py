@@ -3,27 +3,31 @@
 
 import helper
 import component
+from component_element import EventContainer
 
-class Board:
-	"""
-	Representation of a board which contains some components.
-	
+class Container:
+	""" Representation of a container which bundles some components.
 	"""
 	def __init__(self, name, reference=False):
 		self.name = name
 		self.description = None
-		self.src_dir = None
 		self.bootloader = None
 		
 		self.reference = reference
 		self.components = helper.SingleAssignDict("component")
+		self.events = EventContainer()
 	
 	def check(self):
 		helper.check_name_notation(self, self.name)
 	
 	def add(self, component):
-		""" Append an component to the board """
+		""" Append an component to the container """
 		self.components[component.name] = component
+	
+	def updateEvents(self):
+		#for component in self.components:
+		#	self.events.update(component.events)
+		pass
 	
 	def _from_xml(self, node):
 		bootloader = node.find('bootloader')
@@ -31,7 +35,6 @@ class Board:
 			bootloader = bootloader.attrib
 		
 		self.description = helper.xml_read_description(node), 
-		self.src_dir = helper.xml_read_value(node, 'source')
 		self.bootloader = bootloader
 		
 		self.extended = helper.xml_read_extended(node)
@@ -48,13 +51,13 @@ class Board:
 		return cmp(self.name.lower(), other.name.lower())
 	
 	def __str__(self):
-		str = "board: %s\n" % self.name
+		str = "container: %s\n" % self.name
 		for component in self.components:
 			str += "- %s\n" % '\n'.join(["  " + line for line in component.__str__().split('\n')])[2:]
 		return str[:-1]
 
 # -----------------------------------------------------------------------------
 if __name__ == '__main__':
-	board = Board("board")
+	container = Container("container")
 	
-	print board
+	print container

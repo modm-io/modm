@@ -100,6 +100,7 @@ xpcc::MovingAverage<T, N>::MovingAverage(const T& initialValue) :
 }
 
 // ----------------------------------------------------------------------------
+// TODO implementierung für float anpassen
 template<typename T, unsigned int N>
 void
 xpcc::MovingAverage<T, N>::update(const T& input)

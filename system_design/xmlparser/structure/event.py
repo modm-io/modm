@@ -5,7 +5,7 @@ import helper
 
 class Event:
 	"""
-	Representation of a board which contains some components.
+	Representation of a container which contains some components.
 	
 	"""
 	def __init__(self, name, reference=False):

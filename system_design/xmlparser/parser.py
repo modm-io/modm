@@ -11,7 +11,7 @@ import sys
 import structure.type
 import structure.event
 import structure.component
-import structure.board
+import structure.container
 import structure.helper
 
 # buildin types. All the other types have to be compounded of these types
@@ -63,7 +63,7 @@ class ComponentDict(structure.helper.SingleAssignDict):
 		structure.helper.SingleAssignDict.__init__(self, name)
 		
 		self.actions = structure.helper.SortedDict()
-		self.events = structure.component.EventContainer()
+		self.subscriptions = {}
 	
 	def __update_list(self, toplist, list, name):
 		"""
@@ -78,12 +78,16 @@ class ComponentDict(structure.helper.SingleAssignDict):
 						"different identifiers!" % (name, element.name))
 			list[element.name] = element
 	
-	def update_index(self):
+	def updateIndex(self):
 		for component in self.values():
 			self.__update_list(component.actions, self.actions, "action")
 			
-			self.__update_list(component.events.publish, self.events.publish, "event::publish")
-			self.__update_list(component.events.subscribe, self.events.subscribe, "event::subscribe")
+			for event in component.events.subscribe:
+				# append new events to the list
+				key = event.name
+				componentList = self.subscriptions.get(key, [])
+				componentList.append(component)
+				self.subscriptions[key] = componentList
 	
 	def iter(self, abstract=False, reference=False):
 		"""
@@ -91,7 +95,7 @@ class ComponentDict(structure.helper.SingleAssignDict):
 		
 		Keywords arguments:
 		abstract	--	Handling of abstract components (components
-						that are not used in any board). For None it
+						that are not used in any container). For None it
 						will iterate over all components, for False
 						(default value) only over the not-abstract and for
 						True accordingly only over the abstract.
@@ -141,7 +145,7 @@ class Parser:
 				parser = lxml.etree.XMLParser(dtd_validation=True)
 				tree = lxml.etree.parse(xmlfile, parser)
 			except lxml.etree.XMLSyntaxError, e:
-				raise ParserError(xmlfile + ": " + str(e))
+				raise ParserError('Validation error: "' + xmlfile + '": ' + str(e))
 	
 	def parse(self):
 		"""
@@ -158,26 +162,26 @@ class Parser:
 			self.types[builtin.name] = builtin
 		
 		self.events = structure.helper.SingleAssignDict("event")
-		self.boards = structure.helper.SingleAssignDict("board")
+		self.container = structure.helper.SingleAssignDict("container")
 		self.components = ComponentDict("component")
 		
 		# create an empty parse tree
-		tree = [self.types, self.events, self.boards, self.components]
+		tree = [self.types, self.events, self.container, self.components]
 		
 		# start the evaluating of the xml tree
 		self._parse(tree)
 		
 		# create a iterator for all actions, attributes and events
 		# off all components
-		self.components.update_index()
+		self.components.updateIndex()
 		
-		# check the parsed types, components and boards
+		# check the parsed types, components and containers
 		for type in self.types.iter(None):
 			type.check()
 		for component in self.components.iter(None, None):
 			component.check()
-		for board in self.boards.iter(None):
-			board.check()
+		for container in self.container.iter(None):
+			container.check()
 		for event in self.events.iter(None):
 			event.check()
 		
@@ -216,7 +220,7 @@ class Parser:
 			
 			self.modify_time = max(self.modify_time, p.modify_time)
 		
-		self.types, self.events, self.boards, self.components = tree
+		self.types, self.events, self.container, self.components = tree
 		
 		# evaluate the xml-tree
 		self.__parse_xml('struct', structure.type.Struct, self.types)
@@ -224,27 +228,23 @@ class Parser:
 		self.__parse_xml('enum', structure.type.Enum, self.types)
 		
 		self.__parse_xml('component', structure.component.Component, self.components)
-		self.__parse_xml('board', structure.board.Board, self.boards)
+		self.__parse_xml('container', structure.container.Container, self.container)
 		self.__parse_xml('event', structure.event.Event, self.events)
 		
-		# add all the component definitions form the boards to
+		# add all the component definitions form the containers to
 		# the global component list
-		for board in self.boards.itervalues():
-			for component in board.components:
+		for container in self.container.itervalues():
+			for component in container.components:
 				if component.extends:
 					component.abstract = False
 					self.components[component.name] = component
 				else:
-					if component.id:
-						sys.stderr.write(
-							"Warning ('%s' > '%s'): the id and all "
-							"other data specified here will be discarded!\n"
-							% (board.name, component.name)
-						)
 					componentDefinition = self.components[component.name]
 					componentDefinition.abstract = False
 					
-					board.components.replace(component.name, componentDefinition)
+					container.components.replace(component.name, componentDefinition)
+			
+			container.updateEvents()
 		
 		# update the type level
 		self.__create_type_hierarchy()
@@ -254,18 +254,18 @@ class Parser:
 		
 		# replace the placeholders in the component with references to
 		# the real events
-		for board in self.boards.itervalues():
-			for component in board.components:
+		for container in self.container.itervalues():
+			for component in container.components:
 				for event in component.events.publish:
 					component.events.publish.replace(event.name, self.events[event.name])
 				for event in component.events.subscribe:
 					component.events.subscribe.replace(event.name, self.events[event.name])
 		
-		return [self.types, self.events, self.boards, self.components]
+		return [self.types, self.events, self.container, self.components]
 	
-	def __parse_xml(self, name, elemtype, list):
+	def __parse_xml(self, name, type, list):
 		for node in self.xml.findall(name):
-			element = elemtype(	name = node.get('name'), 
+			element = type(	name = node.get('name'), 
 									reference = self.reference)
 			element._from_xml(node)
 			list[element.name] = element

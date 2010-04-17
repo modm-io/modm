@@ -126,10 +126,21 @@ class SingleAssignDict(SortedDict):
 		if not self.has_key(key):
 			SortedDict.__setitem__(self, key, item)
 		else:
-			raise ParserError("%s \"%s\" defined twice! Check the xml-file!" % (self.name.capitalize(),  key))
+			raise ParserError(self, "%s \"%s\" defined twice! Check the xml-file!" % (self.name.capitalize(),  key))
 	
 	def remove(self, key):
 		SortedDict.pop(self, key)
 	
 	def replace(self, key, item):
 		SortedDict.__setitem__(self, key, item)
+	
+	def update(self, other):
+		for element in other.iter(reference=None):
+			try:
+				# try to update an already existing element
+				# from this component with the values from the
+				# toplevel component
+				SortedDict.__getitem__(self, element.name).update(element)
+			except KeyError:
+				# no element found, inherit the full top element
+				SortedDict.__setitem__(self, element.name, element)

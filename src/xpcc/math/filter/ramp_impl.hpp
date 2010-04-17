@@ -37,14 +37,14 @@
 // ----------------------------------------------------------------------------
 
 template<typename T>
-xpcc::Ramp<T>::Ramp(const T& positiveIncrement,
-					const T& negativeIncrement,
+xpcc::Ramp<T>::Ramp(const T& increment,
+					const T& decrement,
 					const T& initialValue) : 
 	target(initialValue),
 	value(initialValue),
 	targetReached(true),
-	positiveIncrement(positiveIncrement),
-	negativeIncrement(negativeIncrement)
+	increment(increment),
+	decrement(decrement)
 {
 }
 
@@ -67,8 +67,8 @@ xpcc::Ramp<T>::update()
 	if (target > value)
 	{
 		T variation = target - value;
-		if (variation > positiveIncrement) {
-			value += positiveIncrement;
+		if (variation > increment) {
+			value += increment;
 		}
 		else {
 			value = target;
@@ -78,8 +78,8 @@ xpcc::Ramp<T>::update()
 	else
 	{
 		T variation = value - target;
-		if (variation > negativeIncrement) {
-			value -= negativeIncrement;
+		if (variation > decrement) {
+			value -= decrement;
 		}
 		else {
 			value = target;

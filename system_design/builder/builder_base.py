@@ -39,7 +39,7 @@ import textwrap
 from optparse import OptionParser
 
 sys.path = [os.path.join(os.path.dirname(__file__), '..')] + sys.path
-from xmlparser.parser import Parser
+from xmlparser.parser import Parser, ParserError
 
 
 class BuilderException(Exception):
@@ -60,15 +60,15 @@ class Builder(object):
 	To access the elements from the xml tree use for example:
 	self.tree.components
 	self.tree.components.actions			--	all actions
+	self.tree.components.subscriptions		--	all actions
 	self.tree.components["driver"].actions	--	only actions form the
 												component 'driver'
-	self.tree.components.publish
-	self.tree.components.subscribe
-	self.tree.boards
-	self.tree.boards["PC"].components		--	only components form the
-												board 'PC'
+	self.tree.components["driver"].events.publish
+	self.tree.components["driver"].events.subscribe
+	self.tree.container
+	self.tree.container["PC"].components	--	only components form the
+												container 'PC'
 	self.tree.types
-	self.tree.events
 	self.tree.events
 	
 	You have to specify a VERSION attribute.
@@ -102,8 +102,12 @@ class Builder(object):
 		self.xmlfile = args[0]
 		self.xmlpath = os.path.dirname(os.path.abspath(self.xmlfile))
 		
-		parser = Parser(self.xmlfile)
-		parser.parse()
+		try:
+			parser = Parser(self.xmlfile)
+			parser.parse()
+		except ParserError, msg:
+			print msg
+			sys.exit(1)
 		
 		self.tree = parser
 		self.globals = {

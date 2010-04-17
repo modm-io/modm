@@ -36,8 +36,8 @@
 
 // ----------------------------------------------------------------------------
 template<typename T>
-xpcc::SCurveGenerator<T>::SCurveGenerator() :
-	target(), value(), targetReached(false)
+xpcc::SCurveGenerator<T>::SCurveGenerator(const T& initialValue) :
+	target(), value(initialValue), targetReached(false)
 {
 }
 

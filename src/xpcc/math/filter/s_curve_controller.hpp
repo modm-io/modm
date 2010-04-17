@@ -41,6 +41,8 @@ namespace xpcc
 	/**
 	 * \brief	S-Curve trajectory generation with feedback
 	 * 
+	 * closed-loop
+	 * 
 	 * \todo	documentation
 	 * 
 	 * \author	Fabian Greif <fabian.greif@rwth-aachen.de>

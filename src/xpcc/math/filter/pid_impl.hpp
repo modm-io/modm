@@ -37,8 +37,11 @@ template<typename T, unsigned int ScaleFactor>
 xpcc::Pid<T, ScaleFactor>::Parameter::Parameter(
 		const float& kp, const float& ki, const float& kd,
 		const T& maxErrorSum, const T& maxOutput) :
-	kp(kp * ScaleFactor), ki(ki * ScaleFactor), kd(kd * ScaleFactor),
-	maxErrorSum(maxErrorSum), maxOutput(maxOutput)
+	kp(static_cast<T>(kp * ScaleFactor)),
+	ki(static_cast<T>(ki * ScaleFactor)),
+	kd(static_cast<T>(kd * ScaleFactor)),
+	maxErrorSum(static_cast<T>(maxErrorSum * ScaleFactor)),
+	maxOutput(maxOutput)
 {
 }
 
@@ -46,10 +49,8 @@ xpcc::Pid<T, ScaleFactor>::Parameter::Parameter(
 template<typename T, unsigned int ScaleFactor>
 xpcc::Pid<T, ScaleFactor>::Pid(
 		const float& kp, const float& ki, const float& kd,
-		const T& maxErrorSum, const T& maxOutput,
-		FeedforwardFunction feedforward ) :
-	parameter( kp, ki, kd, maxErrorSum, maxOutput),
-	feedforward(feedforward)
+		const T& maxErrorSum, const T& maxOutput) :
+	parameter(kp, ki, kd, maxErrorSum, maxOutput)
 {
 	this->reset();
 }
@@ -57,9 +58,8 @@ xpcc::Pid<T, ScaleFactor>::Pid(
 // -----------------------------------------------------------------------------
 template<typename T, unsigned int ScaleFactor>
 xpcc::Pid<T, ScaleFactor>::Pid(
-		Parameter& parameter,
-		FeedforwardFunction feedforward) :
-	parameter(parameter), feedforward(feedforward)
+		Parameter& parameter) :
+	parameter(parameter)
 {
 	this->reset();
 }
@@ -68,7 +68,6 @@ template<typename T, unsigned int ScaleFactor>
 void
 xpcc::Pid<T, ScaleFactor>::reset()
 {
-//	this->target = 0;
 	this->errorSum = 0;
 	this->lastError = 0;
 	this->output = 0;
@@ -83,37 +82,43 @@ xpcc::Pid<T, ScaleFactor>::setParameter(const Parameter& parameter)
 
 template<typename T, unsigned int ScaleFactor>
 void
-xpcc::Pid<T, ScaleFactor>::update(const T& error)
+xpcc::Pid<T, ScaleFactor>::update(const T& input, bool externalLimitation)
 {
-//	T error = this->target - input;
+	bool limitation = externalLimitation;
 	
-	this->errorSum += error;
-	if (this->errorSum > this->parameter.maxErrorSum) {
-		this->errorSum = this->parameter.maxErrorSum;
+	T tempErrorSum = errorSum + input;
+	if (tempErrorSum > this->parameter.maxErrorSum) {
+		tempErrorSum = this->parameter.maxErrorSum;
 	}
-	else if (this->errorSum < -this->parameter.maxErrorSum) {
-		this->errorSum = -this->parameter.maxErrorSum;
+	else if (tempErrorSum < -this->parameter.maxErrorSum) {
+		tempErrorSum = -this->parameter.maxErrorSum;
 	}
 	
 	DoubleType tmp = 0;
-//	tmp  = this->feedforward(this->target); // eigentlich 
-	tmp += static_cast<DoubleType>(this->parameter.kp) * error;
-	tmp += static_cast<DoubleType>(this->parameter.ki) * (this->errorSum);
-	tmp += static_cast<DoubleType>(this->parameter.kd) * (error - this->lastError);
+	tmp += static_cast<DoubleType>(this->parameter.kp) * input;
+	tmp += static_cast<DoubleType>(this->parameter.ki) * (tempErrorSum);
+	tmp += static_cast<DoubleType>(this->parameter.kd) * (input - this->lastError);
 	
 	tmp = tmp / ScaleFactor;
 	
 	if (tmp > this->parameter.maxOutput) {
 		this->output = this->parameter.maxOutput;
+		limitation = true;
 	}
 	else if (tmp < -this->parameter.maxOutput) {
 		this->output = -this->parameter.maxOutput;
+		limitation = true;
 	}
 	else {
 		this->output = tmp;
 	}
 	
-	this->lastError = error;
+	if (not limitation or (std::abs(tempErrorSum) < std::abs(this->errorSum)))
+	{
+		this->errorSum = tempErrorSum;
+	}
+	
+	this->lastError = input;
 }
 
 #endif // XPCC__PID_IMPL_HPP

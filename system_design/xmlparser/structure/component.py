@@ -3,12 +3,7 @@
 
 import helper
 from exception import ParserError
-from component_element import Action, Event
-
-class EventContainer:
-	def __init__(self):
-		self.publish = helper.SingleAssignDict("event::publish")
-		self.subscribe = helper.SingleAssignDict("event::subscribe")
+from component_element import Action, Event, EventContainer
 
 class Component(object):
 	"""
@@ -46,20 +41,8 @@ class Component(object):
 		self.group = self.group or top.group
 		
 		# update actions and events
-		self.__extend(top.actions, self.actions)
-		self.__extend(top.events.publish, self.events.publish)
-		self.__extend(top.events.subscribe, self.events.subscribe)
-	
-	def __extend(self, toplist, list):
-		for element in toplist.iter(reference=None):
-			try:
-				# try to update an already existing element
-				# from this component with the values from the
-				# toplevel component
-				list[element.name].update(element)
-			except KeyError:
-				# no element found, inherit the full top element
-				list[element.name] = element
+		self.actions.update(top.actions)
+		self.events.update(top.events)
 	
 	def _from_xml(self, node):
 		self.description = helper.xml_read_description(node)
@@ -87,15 +70,15 @@ class Component(object):
 	
 	def __parse_events(self, node):
 		# parse events
-		node = node.find('events')
-		if node == None:
+		eventsNode = node.find('events')
+		if eventsNode == None:
 			return
 		
-		publishNode = node.find('publish')
+		publishNode = eventsNode.find('publish')
 		if publishNode:
 			self.__parse_event(publishNode, self.events.publish)
 		
-		subscribeNode = node.find('subscribe')
+		subscribeNode = eventsNode.find('subscribe')
 		if subscribeNode:
 			self.__parse_event(subscribeNode, self.events.subscribe)
 	
@@ -175,7 +158,7 @@ if __name__ == '__main__':
 	
 	print component
 	
-	action_top = Action("action", ret_type="ret_type")
+	action_top = Action("action", returnType="returnType")
 	
 	action = Action("action")
 	action.update(action_top)

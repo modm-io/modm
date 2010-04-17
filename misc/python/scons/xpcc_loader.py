@@ -48,7 +48,7 @@ def generate_environment(env, rootpath, configfile='project.cfg', buildpath=None
 		# read configuration
 		architecture = parser.get('build', 'architecture')
 		if architecture == 'pc':
-			device = 'pc'
+			device = parser.get('build', 'device', 'unix')
 			clock = ''
 		else:
 			device = parser.get('build', 'device')

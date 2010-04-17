@@ -33,29 +33,13 @@
 #ifndef XPCC__PID_HPP
 #define XPCC__PID_HPP
 
-#include <xpcc/utils/arithmetic_traits.hpp>
+#include <cstdlib>
+#include <cmath>
 
-#include <xpcc/debug/logger/logger.hpp>
-// set the Loglevel
-#undef  XPCC_LOG_LEVEL
-#define XPCC_LOG_LEVEL xpcc::log::DEBUG
+#include <xpcc/utils/arithmetic_traits.hpp>
 
 namespace xpcc
 {
-	/**
-	 * \brief	Dummy implementation for a feedforward function
-	 * 
-	 * Does not add any value to the calculation.
-	 *
-	 * \internal
-	 */
-	template<typename T>
-	T
-	feedforwardDummy(const T& target) {
-		(void) target;
-		return 0;
-	}
-	
 	/**
 	 * \brief	A proportional-integral-derivative controller (PID controller)
 	 *
@@ -66,10 +50,7 @@ namespace xpcc
 	 *
 	 * With the template parameter \c ScaleFactor this class provides an
 	 * fix point capability with integer types.
-	 *
-	 * The \c feedforward can be used as hook to call a external function
-	 * (call back) to calculate a forward value.
-	 *
+	 * 
 	 * \todo	check implementation
 	 * \todo	use the faster avr::mul and avr::mac functions
 	 * 
@@ -80,8 +61,7 @@ namespace xpcc
 	class Pid
 	{
 		typedef typename ArithmeticTraits<T>::DoubleType DoubleType;
-		typedef T (* FeedforwardFunction)(const T&);
-	
+		
 	public:
 		typedef T ValueType;
 
@@ -90,26 +70,30 @@ namespace xpcc
 		 */
 		struct Parameter
 		{
+			/// \todo	description why we use float here!
+			/// \todo	calculate maxErrorSum from the parameters
 			Parameter(const float& kp = 0, const float& ki = 0, const float& kd = 0,
 					  const T& maxErrorSum = 0, const T& maxOutput = 0);
 			
 			inline void
-			setKp(float kp){
-				this->kp = kp * ScaleFactor;
-			}
-			inline void
-			setKi(float ki){
-				this->ki = ki * ScaleFactor;
-			}
-			inline void
-			setKd(float kd){
-				this->kd = kd * ScaleFactor;
-			}
-			inline void
-			setMaxErrorSum(float maxErrorSum){
-				this->maxErrorSum = maxErrorSum * ScaleFactor;
+			setKp(float kp) {
+				this->kp = static_cast<T>(kp * ScaleFactor);
 			}
 			
+			inline void
+			setKi(float ki) {
+				this->ki = static_cast<T>(ki * ScaleFactor);
+			}
+			
+			inline void
+			setKd(float kd) {
+				this->kd = static_cast<T>(kd * ScaleFactor);
+			}
+			
+			inline void
+			setMaxErrorSum(float maxErrorSum) {
+				this->maxErrorSum = static_cast<T>(maxErrorSum * ScaleFactor);
+			}
 			
 		private:
 			T kp;		///< proportional gain multiplied with ScaleFactor
@@ -129,18 +113,14 @@ namespace xpcc
 		 * \param	kd	differentail gain
 		 * \param	maxErrorSum	integral will be limited to this value
 		 * \param	maxOutput	output will be limited to this value
-		 * \param	feedforward	callback function to calculate a forward value
 		 **/
 		Pid(const float& kp = 0, const float& ki = 0, const float& kd = 0,
-			const T& maxErrorSum = 0, const T& maxOutput = 0,
-			FeedforwardFunction feedforward = feedforwardDummy<T>);
-
+			const T& maxErrorSum = 0, const T& maxOutput = 0);
+		
 		/**
 		 * \param	parameter	list of parameters to the controller
-		 * \param	feedforward	callback function to calculate a forward value
 		 **/
-		Pid(Parameter& parameter,
-			FeedforwardFunction feedforward = feedforwardDummy<T>);
+		Pid(Parameter& parameter);
 		
 		/**
 		 * Reset the parameters of the controller.
@@ -158,12 +138,12 @@ namespace xpcc
 		
 		/**
 		 * \brief	Calculate a new output value
-		 *
-		 * \param	input	The actual measured value, will be compared to the
-		 * 					target value.
+		 * 
+		 * \param	input					TODO
+		 * \param	externalLimitition		TODO
 		 */
 		void
-		update(const T& input);
+		update(const T& input, bool externalLimitation = false);
 		
 		/**
 		 * \brief	Returns the calculated actuating variable.
@@ -174,9 +154,8 @@ namespace xpcc
 			return output;
 		}
 
-//	private:
+	private:
 		Parameter parameter;
-		FeedforwardFunction feedforward;
 		
 		T errorSum;
 		T lastError;
