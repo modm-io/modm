@@ -30,6 +30,7 @@
 
 import os
 import xpcc_configparser
+import platform
 
 from SCons.Script import *
 
@@ -48,7 +49,11 @@ def generate_environment(env, rootpath, configfile='project.cfg', buildpath=None
 		# read configuration
 		architecture = parser.get('build', 'architecture')
 		if architecture == 'pc':
-			device = parser.get('build', 'device', 'unix')
+			device = {
+				'Darwin':'darwin',
+				'Linux':'linux',
+				'win32':'windows' }[platform.system()]
+#			device = parser.get('build', 'device', 'unix')
 			clock = ''
 		else:
 			device = parser.get('build', 'device')
@@ -121,12 +126,18 @@ def generate_environment(env, rootpath, configfile='project.cfg', buildpath=None
 		# implementation
 		new.Append(CPPPATH = os.path.join(new['XPCC_ROOTPATH'], 'src', 'stdc++'))
 	elif architecture == 'pc':
+		if device == 'linux':
+			libs = ['boost_thread-mt']
+			libpath = ['/usr/lib/']
+		else:
+			libs = []
+			libpath = []
 		new = Environment(
 				ARCHITECTURE = architecture + '/' + device,
 				tools = ['pc'] + tools,
 				toolpath = env['toolpath'],
-				LIBS = ['boost_thread-mt'],
-				LIBPATH = ['/usr/lib/'],
+				LIBS = libs,
+				LIBPATH = libpath,
 				**options)
 	else:
 		print "Unknown architecture '%s'!" % architecture

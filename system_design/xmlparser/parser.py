@@ -3,7 +3,6 @@
 
 import xml.etree.ElementTree as et
 import xml
-import lxml.etree		# for validating
 import copy
 import os
 import sys
@@ -110,7 +109,7 @@ class Parser:
 	
 	self.modify_time		- time of the last change of the xml-file
 	"""
-	def __init__(self, xmlfile, reference=False, use_reference=False, validate=True):
+	def __init__(self, xmlfile, reference=False, use_reference=False, validate=False):
 		"""
 		Parse the xml-file and save the tree for further evaulation.
 		
@@ -140,6 +139,8 @@ class Parser:
 			raise ParserError(e)
 		
 		if validate:
+			import lxml.etree		# for validating
+			
 			# validate against the embedded DTD file
 			try:
 				parser = lxml.etree.XMLParser(dtd_validation=True)
