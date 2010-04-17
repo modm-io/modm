@@ -226,7 +226,7 @@ def xpcc_library(env):
 		if key in env['XPCC_CONFIG']['defines']:
 			env['XPCC_LIBRARY_DEFINES'][key] = env['XPCC_CONFIG']['defines'][key]
 	
-	# generate 'xpcc_config.h'
+	# generate 'xpcc_config.hpp'
 	substitutions = {
 		'defines': '\n'.join(["#define %s %s" % (key.upper(), value) \
 				for key, value in env['XPCC_LIBRARY_DEFINES'].iteritems()]),
