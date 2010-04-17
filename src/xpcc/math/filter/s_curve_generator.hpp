@@ -48,7 +48,7 @@ namespace xpcc
 	class SCurveGenerator
 	{
 	public:
-		SCurveGenerator(const T& initialValue);
+		SCurveGenerator(const T& initialValue = T());
 		
 		inline void
 		setTarget(const T& target);

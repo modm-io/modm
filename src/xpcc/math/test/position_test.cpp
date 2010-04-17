@@ -80,16 +80,16 @@ PositionTest::testLengthAndAngle()
 void
 PositionTest::testRotation()
 {
-	xpcc::Position<int16_t> coord(100, 100);
+	xpcc::Position<int16_t> coord(100, 200);
 	
 	coord.rotate(M_PI / 2);
 	
-	TEST_ASSERT_EQUALS(coord.getX(), -100);
+	TEST_ASSERT_EQUALS(coord.getX(), -200);
 	TEST_ASSERT_EQUALS(coord.getY(), 100);
 	
 	coord.rotate(-M_PI);
 	
-	TEST_ASSERT_EQUALS(coord.getX(), 100);
+	TEST_ASSERT_EQUALS(coord.getX(), 200);
 	TEST_ASSERT_EQUALS(coord.getY(), -100);
 }
 

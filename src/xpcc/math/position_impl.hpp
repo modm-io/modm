@@ -120,7 +120,8 @@ xpcc::Position<T>::normalize()
 }
 
 // ----------------------------------------------------------------------------
-template<typename T>template<typename U>
+template<typename T>
+template<typename U>
 xpcc::Position<T>&
 xpcc::Position<T>::scale(const U& factor)
 {
