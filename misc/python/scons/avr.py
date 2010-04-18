@@ -34,7 +34,7 @@ from SCons.Script import *
 
 # c -> o			build-in
 # cpp -> o			build-in
-# S -> o			?
+# S -> o			ok
 # o -> a			build-in
 # o -> elf			ok
 # elf -> hex		ok

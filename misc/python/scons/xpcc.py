@@ -31,123 +31,10 @@
 import os
 import re
 import string
+import utils.files
 import xpcc_configparser
 
 from SCons.Script import *
-
-def listify(node):
-	return [node,] if (not isinstance(node, list)) else node
-
-# -----------------------------------------------------------------------------
-class FileScanner:
-	
-	HEADER = ['.h', '.hpp']
-	SOURCE = ['.cpp', '.c', '.S']
-	
-	def __init__(self, env, unittest=None):
-		""" Constructor
-		
-		Keyword arguments:
-		env		 -	SCons environment
-		unittest -	This variable has three states:
-					None  => select all files
-					False => exclude files from subfolders named 'test'
-					True  => select only files in folders named 'test'
-		"""
-		self.env = env
-		self.unittest = unittest
-	
-	def scan(self, path, ignore=None):
-		""" Scan directories for source files
-		
-		Provides the following attributes to collect the results:
-		sources		- list of source files
-		header		- list of header files
-		defines		- dictionary with defines needed by the source files
-		"""
-		parser = xpcc_configparser.XpccConfigParser()
-		
-		ignoreList = listify(ignore)
-		
-		self.sources = []
-		self.header = []
-		self.testHeader = []
-		self.testSources = []
-		self.defines = {}
-		
-		pathlist = listify(path)
-		
-		for basepath in pathlist:
-			for path, directories, files in os.walk(basepath):
-				# exclude the SVN-directories
-				if '.svn' in directories:
-					directories.remove('.svn')
-				
-				if 'build.cfg' in files:
-					parser.read(os.path.join(path, 'build.cfg'))
-					
-					try:
-						target = parser.get('build', 'target')
-						if not re.match(target, self.env['ARCHITECTURE']):
-							# if the this directory should be excluded, remove all the
-							# subdirectories from the list to exclude them as well
-							tempDirectories = directories[:]
-							for d in tempDirectories:
-								directories.remove(d)
-							continue
-					except xpcc_configparser.ParserException:
-						pass
-					
-					try:
-						for item in parser.items('defines'):
-							self.defines[item[0]] = item[1]
-					except xpcc_configparser.ParserException:
-						pass
-				
-				for file in files:
-					if file in ignoreList:
-						continue
-					extension = os.path.splitext(file)[1]
-					filename = os.path.join(path, file)
-					
-					if extension in self.SOURCE:
-						# append source files
-						if os.path.normpath(path).endswith(os.sep + 'test'):
-							if self.unittest is True:
-								self.testSources.append(filename)
-							else:
-								continue
-						elif os.path.normpath(path).endswith(os.sep + 'examples'):
-							continue	# TODO
-						else:
-							if self.unittest is True:
-								continue
-						self.sources.append(filename)
-					
-					elif extension in self.HEADER:
-						# append header files
-						if os.path.normpath(path).endswith(os.sep + 'test'):
-							if self.unittest is True:
-								self.testHeader.append(filename)
-							else:
-								continue
-						elif os.path.normpath(path).endswith(os.sep + 'examples'):
-							continue	# TODO
-						else:
-							if self.unittest is True:
-								continue
-						self.header.append(filename)
-		
-	def append(self, files):
-		for file in listify(files):
-			filename = str(file)
-			extension = os.path.splitext(filename)[1]
-			
-			if extension in self.SOURCE:
-				self.sources.append(filename)
-			elif extension in self.HEADER:
-				self.header.append(filename)
-
 
 # -----------------------------------------------------------------------------
 def buildpath(env, path, strip_extension=False):
@@ -156,7 +43,6 @@ def buildpath(env, path, strip_extension=False):
 	if strip_extension:
 		path = os.path.splitext(path)[0]
 	
-	#path = os.path.relpath(path)
 	if os.path.isabs(path) or path.startswith('..'):
 		# if the file is not in a subpath of the current directory
 		# build it in the root directory of the build path
@@ -174,7 +60,7 @@ def library_buildpath(env, path, strip_extension=False):
 	return os.path.abspath(result)
 
 def find_files(env, path, unittest=None, ignore=None):
-	scanner = FileScanner(env, unittest)
+	scanner = utils.files.Scanner(env, unittest)
 	scanner.scan(path=path, ignore=ignore)
 	return scanner
 
@@ -243,7 +129,7 @@ def xpcc_library(env):
 	
 	return library
 
-def xpcc_generics(env, xmlfile):
+def xpcc_header(env, xmlfile):
 	env.Append(CPPPATH = [os.path.join(os.path.dirname(xmlfile), "..")])
 	
 	files  = env.SystemCppPackets(xmlfile)
@@ -282,7 +168,8 @@ def generate(env, **kw):
 	env.AddMethod(require_architecture, 'RequireArchitecture')
 	env.AddMethod(check_defines, 'ShowConfiguration')
 	env.AddMethod(xpcc_library, 'XpccLibrary')
-	env.AddMethod(xpcc_generics, 'XpccGenerics')
+	#env.AddMethod(xpcc_header, 'XpccCommunicationHeader')
+	env.AddMethod(xpcc_header, 'XpccGenerics')
 	env.AddMethod(generate_defines, 'Defines')
 
 def exists(env):

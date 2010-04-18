@@ -29,8 +29,8 @@
 # $Id$
 
 import os
-import xpcc_configparser
 import platform
+import utils.configuration
 
 from SCons.Script import *
 
@@ -39,21 +39,21 @@ def generate_environment(env, rootpath, configfile='project.cfg', buildpath=None
 	""" Creates a new build environment
 	
 	Keyword arguments:
-	configfile	-	Path to the configuration file
-	rootpath	-	Path to the xpcc/trunk directory
+	configfile	 - Path to the configuration file
+	rootpath	 - Path to the xpcc/trunk directory
 	"""
 	try:
-		parser = xpcc_configparser.XpccConfigParser()
+		parser = utils.configuration.Parser()
 		parser.read(configfile)
 		
 		# read configuration
 		architecture = parser.get('build', 'architecture')
 		if architecture == 'pc':
-			device = {
+			defaultDevice = {
 				'Darwin':'darwin',
 				'Linux':'linux',
 				'win32':'windows' }[platform.system()]
-#			device = parser.get('build', 'device', 'unix')
+			device = parser.get('build', 'device', defaultDevice)
 			clock = ''
 		else:
 			device = parser.get('build', 'device')
@@ -67,8 +67,8 @@ def generate_environment(env, rootpath, configfile='project.cfg', buildpath=None
 		
 		rootpath = os.path.abspath(rootpath)
 		buildpath = os.path.abspath(buildpath)
-	except xpcc_configparser.ParserException, msg:
-		print "Parsing file 'project.cfg': " + msg
+	except utils.configuration.ParserException, msg:
+		print "Parsing file configuration file: " + str(msg)
 		Exit(1)
 	
 	configuration = { 'defines': {}, 'environment': {} }
@@ -102,7 +102,7 @@ def generate_environment(env, rootpath, configfile='project.cfg', buildpath=None
 		'unittest',
 		'xpcc',
 		'xpcc_configparser',
-		'utils',
+		'helper',
 		'system_design'
 	]
 	
