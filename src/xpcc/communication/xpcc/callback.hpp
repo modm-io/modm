@@ -34,11 +34,13 @@
 #define	XPCC__CALLBACK_HPP
 
 #include <xpcc/data_structure/smart_pointer.hpp>
-#include "abstract_component.hpp"
 #include "backend/backend_interface.hpp"
 
 namespace xpcc
 {
+	// forward declaration
+	class AbstractComponent;
+	
 	/**
 	 * \brief 		Callback type, which has to be passed to communication during
 	 *				actioncall in order to be able to receive a response.
@@ -54,8 +56,7 @@ namespace xpcc
 
 	public:
 		Callback();
-
-
+		
 		/**
 		 * Set the method that will be called when a response is received.
 		 *

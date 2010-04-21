@@ -11,9 +11,13 @@
 #include "component_{{ component.name | camelcase }}/{{ component.name | camelcase }}.hpp"
 {%- endfor %}
 
-{% for component in container.components -%}
-extern component::{{ component.name | CamelCase }}	component::{{ component.name | camelCase }};
-{% endfor %}
+namespace component
+{
+	{% for component in container.components -%}
+	extern {{ component.name | CamelCase }}	{{ component.name | camelCase }};
+	{% endfor %}
+}
+
 // ----------------------------------------------------------------------------
 xpcc::Postman::DeliverInfo
 Postman::deliverPacket(const xpcc::Header& header, const xpcc::SmartPointer& payload)

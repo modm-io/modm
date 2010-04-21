@@ -40,6 +40,7 @@ from SCons.Script import *
 def buildpath(env, path, strip_extension=False):
 	""" Relocate path from source directory to build directory
 	"""
+	path = str(path)
 	if strip_extension:
 		path = os.path.splitext(path)[0]
 	

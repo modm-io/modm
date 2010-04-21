@@ -47,22 +47,13 @@ xpcc::Communication::Communication(
 }
 
 // ----------------------------------------------------------------------------
-xpcc::Communication::~Communication()
-{
-}
-
-// ----------------------------------------------------------------------------
 void
-xpcc::Communication::setPostman( xpcc::Postman* postman )
+xpcc::Communication::update()
 {
-	this->postman = postman;
-}
-
-// ----------------------------------------------------------------------------
-void
-xpcc::Communication::update(){
-	if ( this->postman != 0 ) {
+	if ( this->postman != 0 )
+	{
 		this->backend->update();
+		
 		//Check if a new packet was received by the backend
 		while( this->backend->isPacketAvailable() )
 		{
@@ -134,8 +125,6 @@ xpcc::Communication::getCurrentComponent() const
 {
 	return this->currentComponent;
 }
-		
-// ----------------------------------------------------------------------------
 
 void
 xpcc::Communication::setCurrentComponent(uint8_t id)
@@ -181,3 +170,17 @@ xpcc::Communication::sendResponse(const ResponseHandle& handle)
 
 	this->responseManager.addResponse(header);
 }
+
+// ----------------------------------------------------------------------------
+void
+xpcc::Communication::sendNegativeResponse(const ResponseHandle& handle)
+{
+	Header header(	Header::NEGATIVE_RESPONSE,
+					false,
+					handle.source,
+					handle.destination,
+					handle.packetIdentifier);
+
+	this->responseManager.addResponse(header);
+}
+

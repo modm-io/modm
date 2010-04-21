@@ -38,63 +38,21 @@
 #include "postman/postman.hpp"
 #include "communication_list.hpp"
 
-//template<typename T>
-//const T*
-//getData() {
-//	return static_cast<const T*>(data);
-//};
-
-//Position& p = getData<Position>();
-
-
-
-//template<typename T>
-//bool
-//getData(T& data) {
-//	if (size != sizeof(T)) {
-//		return false;
-//	}
-//	else {
-//		memcpy((void *) T, data, sizeof(T));
-//		return true;
-//	}
-//};
-
-//Position p;
-//getData(p);
-//if(getData(p));
-
-#include <xpcc/debug/logger/logger.hpp>
-// set the Loglevel
-#undef  XPCC_LOG_LEVEL
-#define XPCC_LOG_LEVEL xpcc::log::DEBUG
-
-
 namespace xpcc
 {
 	typedef Header ResponseHandle;
 	
-	/// \ingroup	communication
+	/**
+	 * \todo	Documentation
+	 * \ingroup	communication
+	 */
 	class Communication
 	{
 	public:
-		/*
-		 * If the Postman is not set via this constructur, use the setPostman()
-		 * methode.
-		 * \notice The postman has to be set before a message can be delivered!
-		 */
 		Communication(
 				BackendInterface *backend,
-				Postman* postman = 0);
+				Postman* postman);
 		
-		~Communication();
-		
-		/*
-		 * \notice The postman has to be set before a message can be delivered!
-		 */
-		void
-		setPostman( Postman* const postman );
-
 		void
 		update();
 		
@@ -104,6 +62,7 @@ namespace xpcc
 		
 		void
 		setCurrentComponent(uint8_t id);
+		
 		
 		void
 		callAction(uint8_t receiver, uint8_t actionIdentifier);
@@ -131,6 +90,8 @@ namespace xpcc
 		void
 		sendNegativeResponse(const ResponseHandle& handle, const T& data);
 		
+		void
+		sendNegativeResponse(const ResponseHandle& handle);
 		
 		template<typename T>
 		void
@@ -144,8 +105,6 @@ namespace xpcc
 		
 		void
 		waitForAcknowledge(const Header &header, const SmartPointer& payload);
-		
-		
 	};
 }
 
@@ -192,7 +151,7 @@ xpcc::Communication::sendResponse(const ResponseHandle& handle, const T& data)
 	Header header(	Header::RESPONSE,
 					false,
 					handle.source,
-					currentComponent,
+					handle.destination,
 					handle.packetIdentifier);
 
 	SmartPointer payload(&data);
@@ -208,7 +167,7 @@ xpcc::Communication::sendNegativeResponse(const ResponseHandle& handle, const T&
 	Header header(	Header::NEGATIVE_RESPONSE,
 					false,
 					handle.source,
-					currentComponent,
+					handle.destination,
 					handle.packetIdentifier);
 
 	SmartPointer payload(&data);

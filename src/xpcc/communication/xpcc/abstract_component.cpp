@@ -29,34 +29,18 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC__ABSTRACT_COMPONENT_HPP
-#define	XPCC__ABSTRACT_COMPONENT_HPP
+#include "abstract_component.hpp"
 
-#include <stdint.h>
-
-#include "communication.hpp"
-
-namespace xpcc
+xpcc::AbstractComponent::AbstractComponent(
+		const uint8_t ownIdentifier,
+		Communication *communication) : 
+	componentIdentifier(ownIdentifier), communication(communication)
 {
-	// forward declaration
-	class Communication;
-	
-	class AbstractComponent
-	{
-	public:
-		AbstractComponent(const uint8_t ownIdentifier, Communication *communication);
-		
-		/// Sets the current component and calls work()
-		void
-		update();
-		
-	protected:
-		virtual void
-		work() = 0;
-		
-		uint8_t componentIdentifier;
-		Communication *communication;
-	};
 }
 
-#endif // XPCC__ABSTRACT_COMPONENT_HPP
+void
+xpcc::AbstractComponent::update()
+{
+	this->communication->setCurrentComponent(this->componentIdentifier);
+	this->work();
+}
