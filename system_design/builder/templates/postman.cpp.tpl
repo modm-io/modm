@@ -8,7 +8,7 @@
 #include "postman.hpp"
 
 {%- for component in container.components %}
-#include "{{ component.name | camelcase }}/{{ component.name | camelcase }}.hpp"
+#include "component_{{ component.name | camelcase }}/{{ component.name | camelcase }}.hpp"
 {%- endfor %}
 
 {% for component in container.components -%}

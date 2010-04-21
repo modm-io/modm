@@ -129,7 +129,7 @@ def xpcc_library(env):
 	
 	return library
 
-def xpcc_header(env, xmlfile):
+def xpcc_communication_header(env, xmlfile):
 	env.Append(CPPPATH = [os.path.join(os.path.dirname(xmlfile), "..")])
 	
 	files  = env.SystemCppPackets(xmlfile)
@@ -168,8 +168,7 @@ def generate(env, **kw):
 	env.AddMethod(require_architecture, 'RequireArchitecture')
 	env.AddMethod(check_defines, 'ShowConfiguration')
 	env.AddMethod(xpcc_library, 'XpccLibrary')
-	#env.AddMethod(xpcc_header, 'XpccCommunicationHeader')
-	env.AddMethod(xpcc_header, 'XpccGenerics')
+	env.AddMethod(xpcc_communication_header, 'XpccCommunicationHeader')
 	env.AddMethod(generate_defines, 'Defines')
 
 def exists(env):

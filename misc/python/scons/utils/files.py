@@ -87,15 +87,16 @@ class Scanner:
 					
 					extension = os.path.splitext(file)[1]
 					filename = os.path.join(path, file)
+					path = os.path.normpath(path)
 					
 					if extension in self.SOURCE:
 						# append source files
-						if os.path.normpath(path).endswith(os.sep + 'test'):
+						if path.endswith(os.sep + 'test'):
 							if self.unittest is True:
 								self.testSources.append(filename)
 							else:
 								continue
-						elif os.path.normpath(path).endswith(os.sep + 'examples'):
+						elif path.endswith(os.sep + 'examples'):
 							continue	# TODO
 						else:
 							if self.unittest is True:
@@ -104,12 +105,12 @@ class Scanner:
 					
 					elif extension in self.HEADER:
 						# append header files
-						if os.path.normpath(path).endswith(os.sep + 'test'):
+						if path.endswith(os.sep + 'test'):
 							if self.unittest is True:
 								self.testHeader.append(filename)
 							else:
 								continue
-						elif os.path.normpath(path).endswith(os.sep + 'examples'):
+						elif path.endswith(os.sep + 'examples'):
 							continue	# TODO
 						else:
 							if self.unittest is True:
@@ -127,7 +128,7 @@ class Scanner:
 				self.header.append(filename)
 	
 	def _samefile(self, src, dst):
-		# Macintosh, Unix.
+		# Macintosh, Unix
 		if hasattr(os.path,'samefile'):
 			try:
 				return os.path.samefile(src, dst)
