@@ -34,6 +34,7 @@
 #define XPCC__ARITHMETIC_TRAITS_HPP
 
 #include <stdint.h>
+#include <xpcc/utils/macros.hpp>
 
 namespace xpcc
 {
@@ -50,8 +51,8 @@ namespace xpcc
 	 * \li \c	SignedType	Signed type for the given type. It applies 
 	 * 						<i>T == SignedType</i> if T is already signed.
 	 * \li \c	UnsignedType	Some as SignedType only for unsigned types
-	 * \li \c	minValue	smallest value.
-	 * \li \c	maxValue	biggest value
+	 * \li \c	min()		smallest value.
+	 * \li \c	max()		biggest value
 	 * \li \c	isSigned	is this a signed or unsigned type
 	 * \li \c	decimalDigits	count of digits to display this type in decimal
 	 * 
@@ -59,8 +60,8 @@ namespace xpcc
 	 * \code
 	 * typedef typename xpcc::ArithmeticTraits<T>::DoubleType T_DOUBLE;
 	 *
-	 * T min = xpcc::ArithmeticTraits<T>::minValue;
-	 * T max = xpcc::ArithmeticTraits<T>::maxValue;
+	 * T min = xpcc::ArithmeticTraits<T>::min();
+	 * T max = xpcc::ArithmeticTraits<T>::max();
 	 * \endcode
 	 * 
 	 * \version	$Id$
@@ -72,7 +73,7 @@ namespace xpcc
 	struct ArithmeticTraits
 	{
 	};
-
+	
 	// -------------------------------------------------------------------------
 
 	template<>
@@ -94,11 +95,20 @@ namespace xpcc
 		typedef int8_t SignedType;
 		typedef uint8_t UnsignedType;
 
-		static const char minValue = -127 - 1;
-		static const char maxValue =  127;
 		static const unsigned char decimalDigits = 4; // inc sign
-		
 		static const bool isSigned = true;
+		
+		static ALWAYS_INLINE signed char
+		min()
+		{
+			return -127 - 1;
+		}
+		
+		static ALWAYS_INLINE signed char
+		max()
+		{
+			return 127;
+		}
 	};
 
 	// -------------------------------------------------------------------------
@@ -109,11 +119,20 @@ namespace xpcc
 		typedef int8_t SignedType;
 		typedef uint8_t UnsignedType;
 
-		static const uint8_t minValue = 0;
-		static const uint8_t maxValue = 255;
 		static const uint8_t decimalDigits = 3;
-
 		static const bool isSigned = false;
+		
+		static ALWAYS_INLINE unsigned char
+		min()
+		{
+			return 0;
+		}
+		
+		static ALWAYS_INLINE unsigned char
+		max()
+		{
+			return 255;
+		}
 	};
 
 	// -------------------------------------------------------------------------
@@ -124,11 +143,20 @@ namespace xpcc
 		typedef int16_t SignedType;
 		typedef uint16_t UnsignedType;
 
-		static const int16_t minValue = -32767 - 1;
-		static const int16_t maxValue =  32767;
 		static const uint8_t decimalDigits = 6; // inc. sign
-
 		static const bool isSigned = true;
+		
+		static ALWAYS_INLINE int16_t
+		min()
+		{
+			return -32767 - 1;
+		}
+		
+		static ALWAYS_INLINE int16_t
+		max()
+		{
+			return 32767;
+		}
 	};
 
 	// -------------------------------------------------------------------------
@@ -138,12 +166,21 @@ namespace xpcc
 		typedef uint32_t DoubleType;
 		typedef int16_t SignedType;
 		typedef uint16_t UnsignedType;
-
-		static const uint16_t minValue = 0;
-		static const uint16_t maxValue = 65535;
+		
 		static const uint8_t decimalDigits = 6;
-
 		static const bool isSigned = false;
+		
+		static ALWAYS_INLINE uint16_t
+		min()
+		{
+			return 0;
+		}
+		
+		static ALWAYS_INLINE uint16_t
+		max()
+		{
+			return 65535;
+		}
 	};
 	
 	// -------------------------------------------------------------------------
@@ -158,11 +195,20 @@ namespace xpcc
 		typedef int32_t SignedType;
 		typedef uint32_t UnsignedType;
 
-		static const int32_t minValue = -2147483647L - 1;
-		static const int32_t maxValue =  2147483647L;
 		static const uint8_t decimalDigits = 11; // inc. sign
-
 		static const bool isSigned = true;
+		
+		static ALWAYS_INLINE int32_t
+		min()
+		{
+			return -2147483647L - 1;
+		}
+		
+		static ALWAYS_INLINE int32_t
+		max()
+		{
+			return 2147483647L;
+		}
 	};
 	
 	// -------------------------------------------------------------------------
@@ -177,11 +223,20 @@ namespace xpcc
 		typedef int32_t SignedType;
 		typedef uint32_t UnsignedType;
 
-		static const uint32_t minValue = 0;
-		static const uint32_t maxValue = 4294967295UL;
 		static const uint8_t decimalDigits = 10;
-
 		static const bool isSigned = false;
+		
+		static ALWAYS_INLINE uint32_t
+		min()
+		{
+			return 0;
+		}
+		
+		static ALWAYS_INLINE uint32_t
+		max()
+		{
+			return 4294967295UL;
+		}
 	};
 	
 	// -------------------------------------------------------------------------
@@ -192,11 +247,20 @@ namespace xpcc
 		typedef int64_t SignedType;
 		typedef uint64_t UnsignedType;
 
-		static const int64_t minValue = -9223372036854775807LL - 1;
-		static const int64_t maxValue =  9223372036854775807LL;
 		static const uint8_t decimalDigits = 20; // inc. sign
-
 		static const bool isSigned = true;
+		
+		static ALWAYS_INLINE int64_t
+		min()
+		{
+			return -9223372036854775807LL - 1;
+		}
+		
+		static ALWAYS_INLINE uint64_t
+		max()
+		{
+			return 9223372036854775807LL;
+		}
 	};
 	
 	// -------------------------------------------------------------------------
@@ -207,11 +271,20 @@ namespace xpcc
 		typedef int64_t SignedType;
 		typedef uint64_t UnsignedType;
 
-		static const uint64_t minValue = 0;
-		static const uint64_t maxValue = 18446744073709551615ULL;
 		static const uint8_t decimalDigits = 20;
-		
 		static const bool isSigned = false;
+		
+		static ALWAYS_INLINE uint64_t
+		min()
+		{
+			return 0;
+		}
+		
+		static ALWAYS_INLINE uint64_t
+		max()
+		{
+			return 18446744073709551615ULL;
+		}
 	};
 	
 	// -------------------------------------------------------------------------
@@ -222,11 +295,20 @@ namespace xpcc
 		typedef float DoubleType;
 		typedef float SignedType;
 		typedef float UnsignedType;
-
-		static const float minValue = -3.40282e+38;
-		static const float maxValue = 3.40282e+38;
 		
 		static const bool isSigned = true;
+		
+		static ALWAYS_INLINE float
+		min()
+		{
+			return -3.40282e+38;
+		}
+		
+		static ALWAYS_INLINE float
+		max()
+		{
+			return 3.40282e+38;
+		}
 	};
 
 	// -------------------------------------------------------------------------
@@ -240,11 +322,20 @@ namespace xpcc
 		typedef double DoubleType;
 		typedef double SignedType;
 		typedef double UnsignedType;
-
-		static const double minValue = -3.40282e+38;
-		static const double maxValue = 3.40282e+38;
 		
 		static const bool isSigned = true;
+		
+		static ALWAYS_INLINE double
+		min()
+		{
+			return -3.40282e+38;
+		}
+		
+		static ALWAYS_INLINE double
+		max()
+		{
+			return 3.40282e+38;
+		}
 	};
 
 #else
@@ -255,11 +346,20 @@ namespace xpcc
 		typedef double DoubleType;
 		typedef double SignedType;
 		typedef double UnsignedType;
-
-		static const double minValue = 2.22507e-308;
-		static const double maxValue = 1.79769e+308;
 		
 		static const bool isSigned = true;
+		
+		static ALWAYS_INLINE double
+		min()
+		{
+			return 2.22507e-308;
+		}
+		
+		static ALWAYS_INLINE double
+		max()
+		{
+			return 1.79769e+308;
+		}
 	};
 
 #endif

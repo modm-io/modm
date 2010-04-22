@@ -58,11 +58,11 @@ namespace xpcc
 	void
 	Saturated<T>::setValue(DoubleType in)
 	{
-		if (in > ArithmeticTraits<T>::maxValue) {
-			value = ArithmeticTraits<T>::maxValue;
+		if (in > ArithmeticTraits<T>::max()) {
+			value = ArithmeticTraits<T>::max();
 		}
-		else if (in < ArithmeticTraits<T>::minValue) {
-			value = ArithmeticTraits<T>::minValue;
+		else if (in < ArithmeticTraits<T>::min()) {
+			value = ArithmeticTraits<T>::min();
 		}
 		else {
 			value = static_cast<T>(in);
