@@ -83,7 +83,7 @@ namespace xpcc
 		 */
 		template <typename C>
 		inline void
-		init( C *component, void (C::*function)(const Header& header, const void* packet)  )
+		init( C *component, void (C::*function)(const Header& header)  )
 		{
 			this->component = static_cast<AbstractComponent*>( component );
 			this->function = reinterpret_cast<Function>(function);
