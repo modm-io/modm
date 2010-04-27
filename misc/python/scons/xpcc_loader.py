@@ -165,6 +165,17 @@ def generate_environment(env, rootpath, configfile='project.cfg', buildpath=None
 	for key, value in configuration['environment'].iteritems():
 		new.Append(**{ key.upper(): " " + value } )
 	
+	# exclude the buildpath from the FileScanner
+	filename = os.path.join(new['XPCC_BUILDPATH'], 'build.cfg')
+	dir = os.path.dirname(filename)
+	
+	if not os.path.exists(dir):
+		os.makedirs(dir)
+	
+	file = open(filename, 'w')
+	file.write("""[build]\ntarget = None""")
+	file.close()
+	
 	return new
 
 # -----------------------------------------------------------------------------

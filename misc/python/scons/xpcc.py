@@ -49,16 +49,18 @@ def buildpath(env, path, strip_extension=False):
 		# build it in the root directory of the build path
 		path = os.path.basename(path)
 	
-	return os.path.join(env['XPCC_BUILDPATH'], path)
+	return os.path.abspath(os.path.join(env['XPCC_BUILDPATH'], path))
 
 def library_buildpath(env, path, strip_extension=False):
 	if strip_extension:
 		path = os.path.splitext(path)[0]
 	
-	result = os.path.join(env['XPCC_ROOTPATH'], 'build', 'library',
-						  env['XPCC_LIBRARY_NAME'], path)
+	if os.path.isabs(path) or path.startswith('..'):
+		# if the file is not in a subpath of the current directory
+		# build it in the root directory of the build path
+		path = os.path.basename(path)
 	
-	return os.path.abspath(result)
+	return os.path.abspath(os.path.join(env['XPCC_BUILDPATH_LIBRARY'], path))
 
 def find_files(env, path, unittest=None, ignore=None):
 	scanner = utils.files.Scanner(env, unittest)
@@ -98,12 +100,30 @@ def check_defines(env):
 			print "  %s => %s" % (key.upper(), env['XPCC_CONFIG']['defines'][key])
 	print ""
 
-def xpcc_library(env):
+def xpcc_library(env, buildpath=None):
 	# set new buildpath for the library, path musst be relativ to the
 	# SConscript directory!
 	env.Append(CPPPATH = [os.path.join(env['XPCC_ROOTPATH'], 'src')])
 	
-	# build library
+	# set a new buildpath for the library
+	if buildpath is None:
+		env['XPCC_BUILDPATH_LIBRARY'] = os.path.abspath(os.path.join(
+				env['XPCC_ROOTPATH'], 'build', 'library', env['XPCC_LIBRARY_NAME']))
+	else:
+		env['XPCC_BUILDPATH_LIBRARY'] = os.path.abspath(buildpath)
+	
+	# exclude the buildpath from the FileScanner
+	filename = os.path.join(env['XPCC_BUILDPATH_LIBRARY'], 'build.cfg')
+	dir = os.path.dirname(filename)
+	
+	if not os.path.exists(dir):
+		os.makedirs(dir)
+	
+	file = open(filename, 'w')
+	file.write("""[build]\ntarget = None""")
+	file.close()
+	
+	# build the library
 	library, defines = env.SConscript(
 			os.path.join(env['XPCC_ROOTPATH'], 'src', 'SConscript'),
 			exports = 'env')
@@ -126,7 +146,7 @@ def xpcc_library(env):
 			SUBSTITUTIONS = substitutions)
 	
 	env.Append(LIBS = ['robot'])
-	env.Append(LIBPATH = [env.LibraryBuildpath('.')])
+	env.Append(LIBPATH = [ env['XPCC_BUILDPATH_LIBRARY'] ])
 	
 	return library
 

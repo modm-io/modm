@@ -109,7 +109,7 @@ class Parser:
 	
 	self.modify_time		- time of the last change of the xml-file
 	"""
-	def __init__(self, xmlfile, reference=False, use_reference=False, validate=False):
+	def __init__(self, xmlfile, reference=False, use_reference=False, validate=True):
 		"""
 		Parse the xml-file and save the tree for further evaulation.
 		
@@ -139,15 +139,18 @@ class Parser:
 			raise ParserError(e)
 		
 		if validate:
-			import lxml.etree		# for validating
-			
-			# validate against the embedded DTD file
 			try:
-				parser = lxml.etree.XMLParser(dtd_validation=True)
-				tree = lxml.etree.parse(xmlfile, parser)
-			except lxml.etree.XMLSyntaxError, e:
-				raise ParserError('Validation error: "' + xmlfile + '": ' + str(e))
-	
+				import lxml.etree		# for validating
+				
+				# validate against the embedded DTD file
+				try:
+					parser = lxml.etree.XMLParser(dtd_validation=True)
+					tree = lxml.etree.parse(xmlfile, parser)
+				except lxml.etree.XMLSyntaxError, e:
+					raise ParserError('Validation error: "' + xmlfile + '": ' + str(e))
+			except ImportError, e:
+				print "Warning: couldn't load 'lxml' module. No validation done!"
+		
 	def parse(self):
 		"""
 		Evaluate the parsed xml-tree
@@ -287,11 +290,22 @@ class Parser:
 	def __check_identifier(self, list, type):
 		""" Check for duplicate identifiers """
 		tmp = {}
+		errorId = None
 		for element in list:
 			if element.id in tmp:
-				raise ParserError("Duplicate identifier in %s '%s' and '%s'!" % (type, tmp[element.id].name, element.name))
+				errorId = element.id
+				msg = "Duplicate identifier in %s '%s' and '%s'!" % \
+						(type, tmp[element.id].name, element.name)
 			else:
 				tmp[element.id] = element
+		
+		if errorId is not None:
+			nextId = errorId
+			while True:
+				nextId = nextId + 1
+				if nextId not in tmp:
+					break
+			raise ParserError(msg + " Next available identifier: '0x%02x'." % nextId)
 		del tmp
 	
 	def __create_type_hierarchy(self):

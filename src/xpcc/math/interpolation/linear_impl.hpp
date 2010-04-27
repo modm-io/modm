@@ -71,7 +71,12 @@ xpcc::interpolation::Linear<T, Accessor>::interpolate(const InputType& value) co
 			OutputType x1_out = last.getSecond();
 			OutputType x2_out = current.getSecond();
 			
-			return ((value - x1_in) * (x2_out - x1_out)) / (x2_in - x1_in) + x1_out;
+			InputType a = value - x1_in;		// >0
+			WideType b = static_cast<OutputSignedType>(x2_out) - 
+						 static_cast<OutputSignedType>(x1_out);
+			InputType c = x2_in - x1_in;		// >0
+			
+			return static_cast<OutputType>(((a * b) / c) + x1_out);
 		}
 		
 		last = current;

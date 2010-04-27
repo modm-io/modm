@@ -35,6 +35,7 @@
 
 #include <stdint.h>
 
+#include <xpcc/utils/arithmetic_traits.hpp>
 #include <xpcc/data_structure/pair.hpp>
 #include <xpcc/architecture/general/accessor.hpp>
 
@@ -78,7 +79,10 @@ namespace xpcc
 		public:
 			typedef typename T::FirstType InputType;
 			typedef typename T::SecondType OutputType;
-
+			
+			typedef typename ArithmeticTraits< OutputType >::SignedType OutputSignedType;
+			typedef typename ArithmeticTraits< OutputSignedType >::DoubleType WideType;
+			
 		public:
 			Linear(Accessor<T> points, uint8_t numPoints);
 			
