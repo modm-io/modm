@@ -47,6 +47,20 @@
 		return Timestamp( now.tv_sec*1000 + now.tv_usec/1000 );
 	}
 
+#elif defined(_WIN32)
+
+	#include <windows.h>
+
+	xpcc::Timestamp
+	xpcc::Clock::now()
+	{
+		SYSTEMTIME now;
+		GetSystemTime(&now);
+		
+		return Timestamp( now.wMilliseconds + now.wSecond*1000 + now.wMinute*1000*60 );
+	}
+
+	
 #elif defined(__AVR__)
 
 	uint16_t xpcc::Clock::time = 0;

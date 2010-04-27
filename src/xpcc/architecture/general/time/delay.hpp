@@ -33,19 +33,24 @@
 #ifndef	XPCC__DELAY_HPP
 #define	XPCC__DELAY_HPP
 
-#ifdef __AVR__
+#if defined(__AVR__)
 	
 	#include <util/delay.h>
 	
 	#define	delay_us(us)	_delay_us(us)
 	#define	delay_ms(ms)	_delay_ms(ms)
 
-#elif __unix__
+#elif defined(__unix__)
 
 	#include <unistd.h>
 	
 	#define	delay_us(us)	usleep(us)
 	#define	delay_ms(ms)	usleep(ms*1000)
+	
+#elif defined(_WIN32)
+	// FIXME implement this functions
+	#define	delay_us(us)	
+	#define	delay_ms(ms)	
 	
 #else
 	#error "Unknown architecture, please add some specific delay functions!"

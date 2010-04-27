@@ -41,7 +41,11 @@
  * 
  * \ingroup	utils
  */
-#define ALWAYS_INLINE  inline __attribute__((always_inline))
+#ifdef __GNUC__
+	#define ALWAYS_INLINE  inline __attribute__((always_inline))
+#else
+	#include <xpcc/architecture/pc/windows.hpp>
+#endif
 
 #ifdef __DOXYGEN__
 

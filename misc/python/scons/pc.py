@@ -28,49 +28,55 @@
 # $Id$
 
 import os
+import platform
 
 from SCons.Script import *
 
 # -----------------------------------------------------------------------------
 def generate(env, **kw):
-	env.Append(ENV = {'PATH' : os.environ['PATH']})
-	env.Tool('gcc')
-	env.Tool('g++')
-	env.Tool('gnulink')
-	env.Tool('ar')
-	env.Tool('as')
-	
-	env['NM'] = "nm"
-	env['SIZE'] = "du -s -h"
+	if platform.system() == 'Windows':
+		env.Append(ENV = {'PATH' : os.environ['PATH']})
+		env.Tool('default')
 		
-	# build messages
-	if ARGUMENTS.get('verbose') != '1':
-		env['CCCOMSTR'] = "Compiling C: $TARGET"
-		env['CXXCOMSTR'] = "Compiling C++: $TARGET"
-		env['ASCOMSTR'] = "Assembling: $TARGET"
-		env['ASPPCOMSTR'] = "Assembling: $TARGET"
-		env['LINKCOMSTR'] = "Linking: $TARGET"
-		env['RANLIBCOMSTR'] = "Indexing: $TARGET"
-		env['ARCOMSTR'] = "Create Library: $TARGET"
+	else:
+		env.Append(ENV = {'PATH' : os.environ['PATH']})
+		env.Tool('gcc')
+		env.Tool('g++')
+		env.Tool('gnulink')
+		env.Tool('ar')
+		env.Tool('as')
+	
+		env['NM'] = "nm"
+		env['SIZE'] = "du -s -h"
 		
-		env['SIZECOMSTR'] = "Size after:"
-		env['SYMBOLSCOMSTR'] = "Show symbols for '$SOURCE':"
-	
-	# flags for C and C++
-	env['CCFLAGS'] = ' '.join([
-		"-funsigned-char",
-		"-funsigned-bitfields", 
-		"-Wall",
-		"-Wextra",
-		"-Wundef", 
-	])
-	
-	# C++ flags
-	env['CXXFLAGS'] = ' '.join([
-		"-std=gnu++98",
-#		"-Weffc++",
-		"-Woverloaded-virtual",
-	])
+		# build messages
+		if ARGUMENTS.get('verbose') != '1':
+			env['CCCOMSTR'] = "Compiling C: $TARGET"
+			env['CXXCOMSTR'] = "Compiling C++: $TARGET"
+			env['ASCOMSTR'] = "Assembling: $TARGET"
+			env['ASPPCOMSTR'] = "Assembling: $TARGET"
+			env['LINKCOMSTR'] = "Linking: $TARGET"
+			env['RANLIBCOMSTR'] = "Indexing: $TARGET"
+			env['ARCOMSTR'] = "Create Library: $TARGET"
+			
+			env['SIZECOMSTR'] = "Size after:"
+			env['SYMBOLSCOMSTR'] = "Show symbols for '$SOURCE':"
+		
+		# flags for C and C++
+		env['CCFLAGS'] = ' '.join([
+			"-funsigned-char",
+			"-funsigned-bitfields", 
+			"-Wall",
+			"-Wextra",
+			"-Wundef", 
+		])
+		
+		# C++ flags
+		env['CXXFLAGS'] = ' '.join([
+			"-std=gnu++98",
+	#		"-Weffc++",
+			"-Woverloaded-virtual",
+		])
 
 def exists(env):
 	return env.Detect('g++')

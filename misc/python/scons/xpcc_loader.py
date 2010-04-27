@@ -49,11 +49,14 @@ def generate_environment(env, rootpath, configfile='project.cfg', buildpath=None
 		# read configuration
 		architecture = parser.get('build', 'architecture')
 		if architecture == 'pc':
-			defaultDevice = {
-				'Darwin':'darwin',
-				'Linux':'linux',
-				'win32':'windows' }[platform.system()]
-			device = parser.get('build', 'device', defaultDevice)
+			try:
+				defaultDevice = {
+					'Darwin':'darwin',
+					'Linux':'linux',
+					'Windows':'windows' }[platform.system()]
+				device = parser.get('build', 'device', defaultDevice)
+			except KeyError, msg:
+				print "Error: unknown platform: '%s' " % msg
 			clock = ''
 		else:
 			device = parser.get('build', 'device')

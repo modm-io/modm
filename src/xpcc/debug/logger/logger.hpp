@@ -75,6 +75,8 @@ namespace xpcc
 				inline Logger&
 				operator << (const T& msg)
 				{
+					(void) msg;
+					// next line can be left out to shurely deactivate logger
 					*(xpcc::IOStream*)this << msg;
 					return *this;
 				}

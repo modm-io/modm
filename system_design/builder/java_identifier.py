@@ -45,6 +45,7 @@ class JavaBuilder(builder_base.Builder):
 		
 		javaFilter = {
 			'enumElement': filter.enumElement,
+			'typeObjectName': filter.typeObjectName,
 		}
 		
 		template = self.template('templates/java_identifier.tpl', filter=javaFilter)

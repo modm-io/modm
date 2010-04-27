@@ -6,6 +6,10 @@
 
 package rca10.robot;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.nio.ByteBuffer;
+
 public class Identifier
 {
 	public static enum Component
@@ -35,12 +39,39 @@ public class Identifier
 	public static enum Event
 	{
 	{%- for element in events.iter() %}
-		{{ element.name | enumElement }}({{ element.id }}){% if loop.last %};{% else %},{% endif %}
+		{{ element.name | enumElement }}({{ element.id }}, Packets.{{ element.type | typeObjectName }}.class){% if loop.last %};{% else %},{% endif %}
 	{%- endfor %}
 
 		public final int id;
-		private Event(int id) {
+		public final Class<?> eventType;
+		private Event(int id, Class<?> eventType) {
 			this.id = id;
+			this.eventType = eventType;
+		}
+		
+		@SuppressWarnings("unchecked")
+		public <T extends Packets.Packet> T getPayload(byte[] payload){
+			try {
+				Method fromBuffer = eventType.getMethod("fromBuffer", ByteBuffer.class);
+				Object p = fromBuffer.invoke(null, payload);
+				return (T)p;
+			}
+			catch (SecurityException e) {
+				e.printStackTrace();
+			}
+			catch (NoSuchMethodException e) {
+				e.printStackTrace();
+			}
+			catch (IllegalArgumentException e) {
+				e.printStackTrace();
+			}
+			catch (IllegalAccessException e) {
+				e.printStackTrace();
+			}
+			catch (InvocationTargetException e) {
+				e.printStackTrace();
+			}
+			return null;
 		}
 	}
 }
