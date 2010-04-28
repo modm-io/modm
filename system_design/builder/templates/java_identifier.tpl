@@ -8,7 +8,6 @@ package rca10.robot;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.nio.ByteBuffer;
 
 public class Identifier
 {
@@ -52,7 +51,7 @@ public class Identifier
 		@SuppressWarnings("unchecked")
 		public <T extends Packets.Packet> T getPayload(byte[] payload){
 			try {
-				Method fromBuffer = eventType.getMethod("fromBuffer", ByteBuffer.class);
+				Method fromBuffer = eventType.getMethod("fromBuffer", byte[].class);
 				Object p = fromBuffer.invoke(null, payload);
 				return (T)p;
 			}
