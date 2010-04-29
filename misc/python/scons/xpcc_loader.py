@@ -141,6 +141,7 @@ def generate_environment(env, rootpath, configfile='project.cfg', buildpath=None
 				toolpath = env['toolpath'],
 				LIBS = libs,
 				LIBPATH = libpath,
+				ENV = os.environ,
 				**options)
 	else:
 		print "Unknown architecture '%s'!" % architecture

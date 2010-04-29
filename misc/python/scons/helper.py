@@ -41,7 +41,7 @@ def list_symbols(env, source, alias='__symbols'):
 	return env.AlwaysBuild(env.Alias(alias, source, action))
 
 def run_program(env, program):
-	return env.Command('thisfileshouldnotexist', program, '@' + program[0].abspath)
+	return env.Command('thisfileshouldnotexist', program, '@"%s"' % program[0].abspath)
 
 def phony_target(env, **kw):
 	for target, action in kw.items():
