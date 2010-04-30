@@ -22,7 +22,7 @@ namespace robot
 			{%- for element in packet.iter() %}
 			{{ element.name | enumElement }} = {{ element.value }},{% if element.description %}	///< {{ element.description }}{% endif %}
 			{%- endfor %}
-		};
+		} __attribute__((packed));
 	{% elif packet.isStruct %}
 		struct {{ packet.name | typeName }}
 		{
