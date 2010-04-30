@@ -45,6 +45,9 @@ namespace xpcc
 	/**
 	 * \brief	Class that connects the communication to the tipc.
 	 *
+	 * Messages that are received by the same connector, that has transmitted
+	 * them, will be ignored.
+	 *
 	 * \see tipc
 	 *
 	 * \ingroup	backend
@@ -97,8 +100,8 @@ namespace xpcc
 					   SmartPointer payload = SmartPointer());
 
 		private :
-			::xpcc::tipc::Receiver		receiver;
 			::xpcc::tipc::Transmitter	transmitter;
+			::xpcc::tipc::Receiver		receiver;
 	};
 };
  
