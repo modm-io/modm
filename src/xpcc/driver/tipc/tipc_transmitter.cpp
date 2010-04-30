@@ -67,4 +67,10 @@ xpcc::tipc::Transmitter::transmitEvent( uint8_t event, const SmartPointer& paylo
 			payload.getSize() );
 }
 // -------------------------------------------------------------------------
+uint32_t
+xpcc::tipc::Transmitter::getPortId()
+{
+	return this->tipcTransmitterSocket_.getPortId();
+}
+// -----------------------------------------------------------------------------
 

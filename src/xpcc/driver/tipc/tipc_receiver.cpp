@@ -40,8 +40,9 @@
 
 
 // -------------------------------------------------------------------------------------------------------
-xpcc::tipc::Receiver::Receiver() :
+xpcc::tipc::Receiver::Receiver( uint32_t ignoreTipcPortId ) :
 	tipcReceiverSocket_	(),
+	ignoreTipcPortId_	( ignoreTipcPortId ),
 	packetQueue_		(),
 	receiverThread_		(),
 	receiverSocketLock_	(),
@@ -100,28 +101,33 @@ void
 xpcc::tipc::Receiver::update()
 {
 	xpcc::tipc::Header tipcHeader;
+	uint32_t tipcPortId;
 	// Set the mutex guard for the receiver socket
 	MutexGuard receiverSocketGuard( this->receiverSocketLock_ );
 
 	// Get the TIPC header (typeId and instanceRange) - call by reference
-	while( this->tipcReceiverSocket_.receiveHeader( tipcHeader ) ) {
-		XPCC_LOG_DEBUG << XPCC_FILE_INFO << "Header available." << xpcc::flush;
+	while( this->tipcReceiverSocket_.receiveHeader( tipcPortId, tipcHeader ) ) {
 
-		// Try to allocate memory for the packet
-		Payload payload ( tipcHeader.size );
+		// ignore messages, that are send by the port, that shoud be ignored
+		if( tipcPortId != this->ignoreTipcPortId_ ) {
 
-		// Get the payload by passing a void pointer by reference and the length
-		// of the payload to be read from the socket.
-		this->tipcReceiverSocket_.receivePayload(
-				payload.getPointer(),
-				tipcHeader.size);
+			XPCC_LOG_DEBUG << XPCC_FILE_INFO << "Header available." << xpcc::flush;
 
-		// Set the mutex guard for the packetQueue
-		MutexGuard packetQueueGuard( this->packetQueueLock_);
+			// Try to allocate memory for the packet
+			Payload payload ( tipcHeader.size );
 
-		// add the packet to the queue
-		this->packetQueue_.push( payload );
+			// Get the payload by passing a void pointer by reference and the length
+			// of the payload to be read from the socket.
+			this->tipcReceiverSocket_.receivePayload(
+					payload.getPointer(),
+					tipcHeader.size);
 
+			// Set the mutex guard for the packetQueue
+			MutexGuard packetQueueGuard( this->packetQueueLock_);
+
+			// add the packet to the queue
+			this->packetQueue_.push( payload );
+		}
 		// Clean the TIPC socket! ( That means removing the current data from the queue)
 		this->tipcReceiverSocket_.popPayload();
 	}

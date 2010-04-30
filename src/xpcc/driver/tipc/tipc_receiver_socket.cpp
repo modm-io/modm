@@ -38,6 +38,8 @@
 
 #include <boost/scoped_array.hpp>
 
+#include <iostream>
+
 #include "../../debug/logger/logger.hpp"
 #undef  XPCC_LOG_LEVEL
 #define XPCC_LOG_LEVEL xpcc::log::WARNING
@@ -88,22 +90,29 @@ xpcc::tipc::ReceiverSocket::registerOnPacket(	unsigned int typeId,
 // This method gets the header of the current TIPC data in the queue. 
 // It returns the true if a header was available - otherwise false.
 bool 
-xpcc::tipc::ReceiverSocket::receiveHeader( Header & tipcHeader )
+xpcc::tipc::ReceiverSocket::receiveHeader(
+		uint32_t& transmitterPort,
+		Header& tipcHeader )
 {	
-//	sockaddr_tipc fromAddress;
-//	socklen_t addressLength = sizeof( struct sockaddr_tipc );
+	sockaddr_tipc fromAddress;
+	socklen_t addressLength = sizeof( struct sockaddr_tipc );
 	Header localTipcHeader;
   	int result = 0;
 	
 	// First receive the tipc-header
-	result = recv(	this->socketDescriptor_,
-					&localTipcHeader,
-					sizeof(Header),
-					MSG_PEEK | MSG_DONTWAIT);	// Do not delete data from TIPC and do not wait for data
-	
+	result = recvfrom(
+			this->socketDescriptor_,
+			&localTipcHeader,
+			sizeof(Header),
+			MSG_PEEK | MSG_DONTWAIT,
+	        (sockaddr*) &fromAddress,
+	        &addressLength);
+
 	if( result > 0) {
 		// Make a copy of the received data
+		transmitterPort = fromAddress.addr.id.ref;
 		tipcHeader = localTipcHeader;
+
 		return true;
 	}
 	else if ( errno == EWOULDBLOCK ) {

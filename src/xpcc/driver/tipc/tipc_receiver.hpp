@@ -57,7 +57,12 @@ namespace xpcc
 		class Receiver
 		{
 		public:
-			Receiver();
+			/**
+			 * \param ignoreTipcPortId from this port all messages will be ignored
+			 *
+			 * \see TransmitterSocket::getPortId
+			 */
+			Receiver( uint32_t ignoreTipcPortId );
 
 			~Receiver();
 
@@ -92,6 +97,8 @@ namespace xpcc
 			update();
 			
 			ReceiverSocket						tipcReceiverSocket_;
+			uint32_t							ignoreTipcPortId_;	// the port ID from that all messages will be ignored
+
 			std::queue<Payload>					packetQueue_;
 			
 			boost::scoped_ptr<Thread>			receiverThread_;

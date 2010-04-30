@@ -62,6 +62,9 @@ namespace xpcc {
 
 				void
 				transmitEvent( uint8_t event, const SmartPointer& payload );
+
+				uint32_t
+				getPortId();
 		
 			private:
 				TransmitterSocket 	tipcTransmitterSocket_;

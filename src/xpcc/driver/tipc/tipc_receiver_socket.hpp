@@ -57,12 +57,19 @@ namespace xpcc {
 									unsigned int lowerInstance,
 									unsigned int upperInstance);
 		
+				/**
+				 * \param transmitterPortId the id of the tipc port, that transmitted the message is returned
+				 * \param tipcHeader the tipc header is returned
+				 */
 				bool 
-				receiveHeader(	tipc::Header & tipcHeader );
+				receiveHeader(
+						uint32_t & transmitterPortId,
+						tipc::Header & tipcHeader );
 				
 				bool 
-				receivePayload(	uint8_t* payloadPointer,
-								size_t payloadLength);
+				receivePayload(
+						uint8_t* payloadPointer,
+						size_t payloadLength);
 				
 				bool 
 				popPayload();

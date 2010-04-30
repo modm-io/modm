@@ -54,6 +54,20 @@ namespace xpcc {
 									unsigned int instanceId,
 									const uint8_t* packet,
 									size_t length);
+
+				/*
+				 * \brief Returns the ref part of the tipc port id.
+				 *
+				 * 1.3.2 Port Identifier \n
+				 * Each port in a TIPC network has a unique "port identifier" or "port ID",
+				 * which is typically denoted as <Z.C.N:ref>.  The port ID is assigned
+				 * automatically by TIPC when the port is created, and consists of the 32-bit
+				 * network address of the port's node and a 32-bit reference value.  The
+				 * reference value is guaranteed to be unique on a per-node basis and will not
+				 * be reused for a long time once the port ceases to exist.
+				 */
+				uint32_t
+				getPortId();
 		
 			private:
 				const int socketDescriptor_;

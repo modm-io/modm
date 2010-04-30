@@ -37,22 +37,27 @@
 #include <linux/tipc.h>
 #include <xpcc/data_structure/smart_pointer.hpp>
 
+#include <iostream>
+
 #include "../../debug/logger/logger.hpp"
 #undef  XPCC_LOG_LEVEL
 #define XPCC_LOG_LEVEL xpcc::log::WARNING
 
-// -------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 xpcc::tipc::TransmitterSocket::TransmitterSocket() :
 	socketDescriptor_ ( socket (AF_TIPC, SOCK_RDM,0) )
 {
 }
-// -------------------------------------------------------------------------------------------------------
+
+// -----------------------------------------------------------------------------
 xpcc::tipc::TransmitterSocket::~TransmitterSocket()
 {
 	// Close the socket
 	close( this->socketDescriptor_ );
 }
 // -------------------------------------------------------------------------------------------------------
+
+// -----------------------------------------------------------------------------
 void 
 xpcc::tipc::TransmitterSocket::transmitPayload(
 		unsigned int typeId,
@@ -111,3 +116,31 @@ xpcc::tipc::TransmitterSocket::transmitPayload(
 	}
 }
 // -------------------------------------------------------------------------------------------------------
+
+// -----------------------------------------------------------------------------
+uint32_t
+xpcc::tipc::TransmitterSocket::getPortId()
+{
+	/**
+	 * int getsockname(int sockfd, struct sockaddr *localaddr, socklen_t *addrlen)
+	 *
+	 * Gets the port ID of the socket.
+	 * Comments:
+	 * - The use of "name" in getsockname() can be confusing, as the routine does
+	 * not actually return the TIPC names or name sequences that have been bound to
+	 * the socket.
+	 */
+
+	struct sockaddr_tipc addr;
+	socklen_t sz = sizeof(addr);
+
+	if ( getsockname( this->socketDescriptor_, (struct sockaddr *)&addr, &sz) < 0 ) {
+		XPCC_LOG_ERROR
+				<< XPCC_FILE_INFO
+				<< "Failed to get sock address"
+				<< xpcc::endl;
+		return 0;
+	}
+
+	return addr.addr.id.ref;
+}
