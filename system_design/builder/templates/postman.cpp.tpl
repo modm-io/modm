@@ -54,9 +54,9 @@ Postman::deliverPacket(const xpcc::Header& header, const xpcc::SmartPointer& pay
 				case robot::event::{{ eventName | CAMELCASE }}:
 	{%- for component in eventSubscriptions[eventName] %}
 		{%- if events[eventName].type != None %}
-					component::{{ component.name | camelCase }}.event{{ eventName | CamelCase }}(handle, &payload.get<robot::packet::{{ events[eventName].type | CamelCase }}>());
+					component::{{ component.name | camelCase }}.event{{ eventName | CamelCase }}(header, &payload.get<robot::packet::{{ events[eventName].type | CamelCase }}>());
 		{%- else %}
-					component::{{ component.name | camelCase }}.event{{ eventName | CamelCase }}(handle);
+					component::{{ component.name | camelCase }}.event{{ eventName | CamelCase }}(header);
 		{%- endif %}
 	{%- endfor %}
 					break;
