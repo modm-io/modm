@@ -25,9 +25,8 @@ class Container:
 		self.components[component.name] = component
 	
 	def updateEvents(self):
-		#for component in self.components:
-		#	self.events.update(component.events)
-		pass
+		for component in self.components:
+			self.events.update(component.events)
 	
 	def _from_xml(self, node):
 		bootloader = node.find('bootloader')

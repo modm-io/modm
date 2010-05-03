@@ -50,13 +50,13 @@ Postman::deliverPacket(const xpcc::Header& header, const xpcc::SmartPointer& pay
 		case 0:
 			switch (header.packetIdentifier)
 			{
-{%- for eventName in eventSubscriptions %}
-				case robot::event::{{ eventName | CAMELCASE }}:
-	{%- for component in eventSubscriptions[eventName] %}
-		{%- if events[eventName].type != None %}
-					component::{{ component.name | camelCase }}.event{{ eventName | CamelCase }}(header, &payload.get<robot::packet::{{ events[eventName].type | CamelCase }}>());
+{%- for event in container.events.subscribe %}
+				case robot::event::{{ event.name | CAMELCASE }}:
+	{%- for component in eventSubscriptions[event.name] %}
+		{%- if events[event.name].type != None %}
+					component::{{ component.name | camelCase }}.event{{ event.name | CamelCase }}(header, &payload.get<robot::packet::{{ events[event.name].type | CamelCase }}>());
 		{%- else %}
-					component::{{ component.name | camelCase }}.event{{ eventName | CamelCase }}(header);
+					component::{{ component.name | camelCase }}.event{{ event.name | CamelCase }}(header);
 		{%- endif %}
 	{%- endfor %}
 					break;

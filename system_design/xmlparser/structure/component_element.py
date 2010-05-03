@@ -11,6 +11,9 @@ class EventContainer:
 	def update(self, other):
 		self.publish.update(other.publish)
 		self.subscribe.update(other.subscribe)
+	
+	def __str__(self):
+		return "event::publish\n%s\nevent::subscribe\n%s" % (str(self.publish), str(self.subscribe))
 
 
 class ComponentElement(object):
