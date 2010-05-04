@@ -62,7 +62,7 @@ namespace xpcc
 	 * 
 	 * \ingroup	filter
 	 */
-	template<typename T, unsigned int N>
+	template<typename T, int N>
 	class MovingAverage
 	{
 	private:
@@ -90,18 +90,18 @@ namespace xpcc
 }
 
 // ----------------------------------------------------------------------------
-template<typename T, unsigned int N>
+template<typename T, int N>
 xpcc::MovingAverage<T, N>::MovingAverage(const T& initialValue) :
 	index(0), sum(N * initialValue)
 {
-	for (uint8_t i = 0; i < N; ++i) {
+	for (Index i = 0; i < N; ++i) {
 		buffer[i] = initialValue;
 	}
 }
 
 // ----------------------------------------------------------------------------
 // TODO implementierung für float anpassen
-template<typename T, unsigned int N>
+template<typename T, int N>
 void
 xpcc::MovingAverage<T, N>::update(const T& input)
 {
@@ -116,7 +116,7 @@ xpcc::MovingAverage<T, N>::update(const T& input)
 	}
 }
 
-template<typename T, unsigned int N>
+template<typename T, int N>
 const T
 xpcc::MovingAverage<T, N>::getValue() const
 {

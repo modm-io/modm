@@ -39,19 +39,15 @@
 #include "postman/postman.hpp"
 #include "callback.hpp"
 
-/**
- * \ingroup 	communication
- * \brief 		Holds information about the response, repeat sending acknowleging for communication.
- *
- *
- * \version		$Id$
- */
 namespace xpcc
 {
 	// forward declaration
 	class Communication;
 	class Callback;
 	
+	/**
+	 * \brief 		Holds information about the response, repeat sending acknowleging for communication.
+	 */
 	namespace communicationList
 	{
 		/**

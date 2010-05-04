@@ -24,22 +24,22 @@ namespace xpcc
 	 */
 	namespace tm
 	{
-		/// \ingroup	tm
 		/// \brief	An empty type useful as a placeholder.
+		/// \ingroup	tm
 		class NullType
 		{
 		};
 		
-		/// \ingroup	tm
 		/// \brief	Converts an integer to a type.
+		/// \ingroup	tm
 		template <int v> struct Int2Type { enum { value = v }; };
 
-		/// \ingroup	tm
 		/// \brief	Converts an type to a unique empty type.
+		/// \ingroup	tm
 		template <typename T> struct Type2Type { typedef T OriginalType; };
 		
-		/// \ingroup	tm
 		/// \brief	Selects type Result = flag ? T : U
+		/// \ingroup	tm
 		template <bool flag, typename T, typename U>
 		struct Select
 		{
@@ -138,10 +138,13 @@ namespace xpcc
 		{
 		};
 		
-		/// \ingroup	tm
-		/// \brief		Static assert support
-		///
-		/// Inspired by the BOOST_STATIC_ASSERT macro.
+		/**
+		 * \brief		Static assert support
+		 *
+		 * Inspired by the BOOST_STATIC_ASSERT macro.
+		 * 
+		 * \ingroup	tm
+		 */
 		#define	STATIC_ASSERT(cond) \
 			typedef ::xpcc::tm::static_assert_test<\
 				sizeof(::xpcc::tm::STATIC_ASSERTION_FAILURE< (bool) (cond) >) >\

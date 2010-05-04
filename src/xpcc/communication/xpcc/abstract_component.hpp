@@ -5,6 +5,7 @@
  * 
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
+ * 
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -33,7 +34,6 @@
 #define	XPCC__ABSTRACT_COMPONENT_HPP
 
 #include <stdint.h>
-
 #include "communication.hpp"
 
 namespace xpcc
@@ -41,20 +41,43 @@ namespace xpcc
 	// forward declaration
 	class Communication;
 	
+	/**
+	 * \brief	Abstract base class for a component
+	 * 
+	 * \ingroup	communication
+	 */
 	class AbstractComponent
 	{
 	public:
-		AbstractComponent(const uint8_t ownIdentifier, Communication *communication);
+		/**
+		 * \brief	Constructor
+		 * 
+		 * \param	ownIdentifier	Identifier of the component, must be unique
+		 * 							within the network.
+		 * \param	communication	Communication class use to send messages
+		 */
+		AbstractComponent(const uint8_t ownIdentifier,
+				Communication *communication);
 		
-		/// Sets the current component and calls work()
+		/**
+		 * \brief	Update the internal state of this component.
+		 * 
+		 * Sets the current component and calls work()
+		 */
 		void
 		update();
 		
 	protected:
+		/**
+		 * \brief	Functionallity of the component
+		 * 
+		 * You should never call this method directly. This is done by
+		 * a call of update().
+		 */
 		virtual void
 		work() = 0;
 		
-		uint8_t componentIdentifier;
+		uint8_t componentIdentifier;		///< own identifier
 		Communication *communication;
 	};
 }

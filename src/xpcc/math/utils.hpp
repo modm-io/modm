@@ -69,6 +69,10 @@ namespace xpcc
 	 * Calculates B raised to the power of N, B and N must be compile-time
 	 * constants.
 	 * 
+	 * \code
+	 * int value = xpcc::Pow<10, 2>::value;
+	 * \endcode
+	 * 
 	 * \tparam	B	Base
 	 * \tparam	N	Exponent
 	 * 

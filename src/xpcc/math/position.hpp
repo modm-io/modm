@@ -42,8 +42,11 @@
 namespace xpcc
 {
 	/**
-	 * \brief		2D Position
-	 *
+	 * \brief	2D Position
+	 * 
+	 * \todo	proposition: rename this class to Point due to its wider use
+	 * 			as general coordinate representation
+	 * 
 	 * \ingroup	math
 	 * \todo	operators for > < >= <=
 	 */

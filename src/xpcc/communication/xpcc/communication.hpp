@@ -57,6 +57,9 @@ namespace xpcc
 		update();
 		
 		
+		// [proposition -> dergraaf]: Make these private and
+		// let Communication/Postman/AbstractCommponent set the correct 
+		// id by itself. The user should not worry about this!
 		uint8_t
 		getCurrentComponent() const;
 		
@@ -64,6 +67,8 @@ namespace xpcc
 		setCurrentComponent(uint8_t id);
 		
 		
+		// [proposition -> dergraaf]: make these private, and AbstractComponent
+		// a friend. Perhaps give AbstractComponent some proxy methods?
 		void
 		callAction(uint8_t receiver, uint8_t actionIdentifier);
 		
@@ -78,7 +83,14 @@ namespace xpcc
 		void
 		callAction(uint8_t receiver, uint8_t actionIdentifier, const T& data, Callback& responseCallback);
 		
+		template<typename T>
+		void
+		publishEvent(uint8_t eventIdentifier, const T& data);
 		
+		
+		// [proposition -> dergraaf]: Make these methods only available in the correct
+		// circumstances (action call). Perhaps move them methods to the ResponseHandle
+		// class?
 		void
 		sendResponse(const ResponseHandle& handle);
 
@@ -92,10 +104,6 @@ namespace xpcc
 		
 		void
 		sendNegativeResponse(const ResponseHandle& handle);
-		
-		template<typename T>
-		void
-		publishEvent(uint8_t eventIdentifier, const T& data);
 		
 	private:
 		BackendInterface * const backend;

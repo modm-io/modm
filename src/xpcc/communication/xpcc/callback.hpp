@@ -90,8 +90,9 @@ namespace xpcc
 			this->packetSize = 0;
 		}
 
-
-		/// \todo control packet size?
+		// [proposition -> dergraaf]: make this method private and Communication
+		// a friend
+		/// \todo check packet size?
 		inline void
 		call(const Header& header, const SmartPointer &payload) const
 		{
