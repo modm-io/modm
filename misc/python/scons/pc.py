@@ -69,6 +69,7 @@ def generate(env, **kw):
 			"-Wall",
 			"-Wextra",
 			"-Wundef", 
+			"-ggdb",
 		])
 		
 		# C++ flags
