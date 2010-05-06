@@ -209,6 +209,9 @@ xpcc::communicationList::List::handleWaitingMessages(Postman &postman, BackendIn
 				if (actual->header.destination == 0){// event
 					postman.deliverPacket(actual->header, actual->payload);
 					backend.sendPacket(actual->header, actual->payload);
+					while( e->next != actual ) {
+						e = e->next;
+					}
 					this->removeNext(e);
 					delete actual;
 				}
@@ -230,6 +233,9 @@ xpcc::communicationList::List::handleWaitingMessages(Postman &postman, BackendIn
 								e = actual;
 							}
 							else{
+								while( e->next != actual ) {
+									e = e->next;
+								}
 								this->removeNext(e);
 								delete actual;
 							}
