@@ -87,6 +87,9 @@ namespace xpcc
 		void
 		publishEvent(uint8_t eventIdentifier, const T& data);
 		
+		void
+		publishEvent(uint8_t eventIdentifier);
+
 		
 		// [proposition -> dergraaf]: Make these methods only available in the correct
 		// circumstances (action call). Perhaps move them methods to the ResponseHandle

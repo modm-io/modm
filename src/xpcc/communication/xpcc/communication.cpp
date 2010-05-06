@@ -158,6 +158,20 @@ xpcc::Communication::callAction(uint8_t receiver, uint8_t actionIdentifier, Call
 	this->responseManager.addActionCall(header, responseCallback);
 }
 
+
+// ----------------------------------------------------------------------------
+void
+xpcc::Communication::publishEvent(uint8_t eventIdentifier)
+{
+	Header header(	Header::REQUEST,
+					false,
+					0,
+					this->currentComponent,
+					eventIdentifier);
+
+	this->responseManager.addEvent(header);
+}
+
 // ----------------------------------------------------------------------------
 void
 xpcc::Communication::sendResponse(const ResponseHandle& handle)
