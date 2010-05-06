@@ -52,6 +52,12 @@ namespace xpcc
 		{
 		}
 		
+		inline uint16_t
+		getTime() const
+		{
+			return this->time;
+		}
+
 		inline Timestamp
 		operator + (const Timestamp& other) const
 		{
