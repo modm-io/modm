@@ -38,7 +38,11 @@ public class Identifier
 	public static enum Event
 	{
 	{%- for element in events.iter() %}
+		{% if element.type == None %}
+		{{ element.name | enumElement }}({{ element.id }}, null){% if loop.last %};{% else %},{% endif %}
+		{% else %}
 		{{ element.name | enumElement }}({{ element.id }}, Packets.{{ element.type | typeObjectName }}.class){% if loop.last %};{% else %},{% endif %}
+		{% endif %}
 	{%- endfor %}
 
 		public final int id;
@@ -50,6 +54,8 @@ public class Identifier
 		
 		@SuppressWarnings("unchecked")
 		public <T extends Packets.Packet> T getPayload(byte[] payload){
+			if (eventType == null)
+				return null;
 			try {
 				Method fromBuffer = eventType.getMethod("fromBuffer", byte[].class);
 				Object p = fromBuffer.invoke(null, payload);
