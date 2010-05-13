@@ -60,16 +60,12 @@ namespace xpcc
 	 * This implementation is based on the C functions written
 	 * by Peter Dannegger (see http://www.mikrocontroller.net/topic/48465).
 	 * 
-	 * \tparam	TIMEOUT		Timeout for the repeat operation
-	 * \tparam	INTERVAL	Repeat interval
 	 * \tparam	T			Container type (\c uint8_t for eight buttons or
 	 * 							\c uint16_t for up to 16 buttons)
 	 * 
 	 * \ingroup	driver
 	 */
-	template <uint16_t TIMEOUT = 50,
-			  uint16_t INTERVAL = 20,
-			  typename T = uint8_t>
+	template <typename T = uint8_t>
 	class ButtonGroup
 	{
 	public:
@@ -96,9 +92,11 @@ namespace xpcc
 	public:
 		/** \brief	Constructor
 		 *
-		 * \param	mask	Repeat mask, only if buttons mentioned here
+		 * \param	mask		Repeat mask, only if buttons mentioned here
+		 * \param	timeout		Timeout for the repeat operation
+		 * \param	interval	Repeat interval
 		 */
-		ButtonGroup(T mask = 0x00);
+		ButtonGroup(T mask, uint16_t timeout = 50, uint16_t interval = 20);
 		
 		/// Get the current (debounced) state of a key
 		T
@@ -113,7 +111,7 @@ namespace xpcc
 		 * Each pressed key is reported only once.
 		 * 
 		 * \code
-		 * xpcc::ButtonGroup buttons;
+		 * xpcc::ButtonGroup<> buttons;
 		 * ...
 		 * while (1) {
 		 *		...
@@ -134,7 +132,7 @@ namespace xpcc
 		 * repeatedly pressing and releasing the key.
 		 * 
 		 * \code
-		 * xpcc::ButtonGroup buttons(xpcc::ButtonGroup::BUTTON0);
+		 * xpcc::ButtonGroup<> buttons(xpcc::ButtonGroup::BUTTON0);
 		 * ...
 		 * while (1) {
 		 *		...
@@ -154,7 +152,7 @@ namespace xpcc
 		/** \brief	Get buttons which were pressed short
 		 * 
 		 * \code
-		 * xpcc::ButtonGroup buttons(xpcc::ButtonGroup::BUTTON0);
+		 * xpcc::ButtonGroup<> buttons(xpcc::ButtonGroup::BUTTON0);
 		 * ...
 		 * while (1) {
 		 * 	...
@@ -201,15 +199,17 @@ namespace xpcc
 			releaseState |= ~state & i;	// 0->1: key release detected
 			
 			if ((state & repeatMask) == 0) {
-				repeatCounter = TIMEOUT;
+				repeatCounter = timeout;
 			}
 			if (--repeatCounter == 0) {
-				repeatCounter = INTERVAL;
+				repeatCounter = interval;
 				repeatState |= state & repeatMask;
 			}
 		}
 		
 	protected:
+		const uint16_t timeout;
+		const uint16_t interval;
 		const T repeatMask;
 		uint16_t repeatCounter;
 		

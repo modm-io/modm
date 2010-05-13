@@ -34,54 +34,74 @@
 
 #include "median_test.hpp"
 
-void
-MedianTest::testMedian3()
+namespace
 {
-	xpcc::filter::Median<uint8_t, 3> filter(5);
+	struct TestData
+	{
+		uint8_t inputValue;
+		uint8_t median3;
+		uint8_t median5;
+		uint8_t median7;
+		uint8_t median9;
+	};
 	
-	TEST_ASSERT_EQUALS(filter.getValue(), 5);
-	
-	filter.update(8);
-	TEST_ASSERT_EQUALS(filter.getValue(), 5);
-	
-	filter.update(8);
-	TEST_ASSERT_EQUALS(filter.getValue(), 8);
-	
-	filter.update(7);
-	TEST_ASSERT_EQUALS(filter.getValue(), 8);
-	
-	filter.update(5);
-	TEST_ASSERT_EQUALS(filter.getValue(), 7);
-	
-	filter.update(3);
-	TEST_ASSERT_EQUALS(filter.getValue(), 5);
+	static const TestData testData[] =
+	{
+		{ 5,	5, 5, 5, 5 },
+		{ 100,	5, 5, 5, 5 },
+		{ 100,	100, 5, 5, 5 },
+		{ 100,	100, 100, 5, 5 },
+		{ 100,	100, 100, 100, 5 },
+		{ 100,	100, 100, 100, 100 },
+		{ 100,	100, 100, 100, 100 },
+		{ 200,	100, 100, 100, 100 },
+		{ 200,	200, 100, 100, 100 },
+		{ 100,	200, 100, 100, 100 },
+		{ 100,	100, 100, 100, 100 },
+		{ 200,	100, 200, 100, 100 },
+		{ 200,	200, 200, 200, 100 },
+		{ 200,	200, 200, 200, 200 },
+		{ 200,	200, 200, 200, 200 },
+		{ 200,	200, 200, 200, 200 },
+		{ 10,	200, 200, 200, 200 },
+		{ 20,	20, 200, 200, 200 },
+		{ 10,	10, 20, 200, 200 },
+		{ 20,	20, 20, 20, 200 },
+		{ 10,	10, 10, 20, 20 },
+		{ 10,	10, 10, 10, 20 },
+		{ 10,	10, 10, 10, 10 },
+		{ 10,	10, 10, 10, 10 },
+	};
 }
 
 void
-MedianTest::testMedian5()
+MedianTest::testMedian()
 {
-	xpcc::filter::Median<uint8_t, 5> filter(5);
+	xpcc::filter::Median<uint8_t, 3> filter3(5);
+	xpcc::filter::Median<uint8_t, 5> filter5(5);
+	xpcc::filter::Median<uint8_t, 7> filter7(5);
+	xpcc::filter::Median<uint8_t, 9> filter9(5);
 	
-	TEST_ASSERT_EQUALS(filter.getValue(), 5);
+	TEST_ASSERT_EQUALS(filter3.getValue(), 5);
+	TEST_ASSERT_EQUALS(filter5.getValue(), 5);
+	TEST_ASSERT_EQUALS(filter7.getValue(), 5);
+	TEST_ASSERT_EQUALS(filter9.getValue(), 5);
 	
-	filter.update(8);
-	TEST_ASSERT_EQUALS(filter.getValue(), 5);
-	
-	filter.update(8);
-	TEST_ASSERT_EQUALS(filter.getValue(), 5);
-	
-	filter.update(7);
-	TEST_ASSERT_EQUALS(filter.getValue(), 7);
-	
-	filter.update(5);
-	TEST_ASSERT_EQUALS(filter.getValue(), 7);
-	
-	filter.update(3);
-	TEST_ASSERT_EQUALS(filter.getValue(), 7);
-	
-	filter.update(3);
-	TEST_ASSERT_EQUALS(filter.getValue(), 5);
-	
-	filter.update(3);
-	TEST_ASSERT_EQUALS(filter.getValue(), 3);
+	for (unsigned int i = 0; i < (sizeof(testData) / sizeof(TestData)); ++i)
+	{
+		filter3.append(testData[i].inputValue);
+		filter5.append(testData[i].inputValue);
+		filter7.append(testData[i].inputValue);
+		filter9.append(testData[i].inputValue);
+		
+		filter3.update();
+		filter5.update();
+		filter7.update();
+		filter9.update();
+		
+		TEST_ASSERT_EQUALS(filter3.getValue(), testData[i].median3);
+		TEST_ASSERT_EQUALS(filter5.getValue(), testData[i].median5);
+		TEST_ASSERT_EQUALS(filter7.getValue(), testData[i].median7);
+		TEST_ASSERT_EQUALS(filter9.getValue(), testData[i].median9);
+	}
 }

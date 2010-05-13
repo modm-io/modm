@@ -34,27 +34,27 @@
 	#error	"Don't include this file directly, use 'button_group.hpp' instead!"
 #endif
 
-template <uint16_t TIMEOUT, uint16_t INTERVAL, typename T>
-xpcc::ButtonGroup<TIMEOUT, INTERVAL, T>::ButtonGroup(T mask) :
-	repeatMask(mask), repeatCounter(TIMEOUT),
+template <typename T>
+xpcc::ButtonGroup<T>::ButtonGroup(T mask, uint16_t timeout, uint16_t interval) :
+	timeout(timeout), interval(interval), repeatMask(mask), repeatCounter(timeout),
 	state(), pressState(), releaseState(), repeatState(), ct0(), ct1()
 {
 }
 
 // ----------------------------------------------------------------------------
 
-template <uint16_t TIMEOUT, uint16_t INTERVAL, typename T>
+template <typename T>
 T
-xpcc::ButtonGroup<TIMEOUT, INTERVAL, T>::getState(T mask) const
+xpcc::ButtonGroup<T>::getState(T mask) const
 {
 	atomic::Lock lock;
 	
 	return mask & state;
 }
 
-template <uint16_t TIMEOUT, uint16_t INTERVAL, typename T>
+template <typename T>
 T
-xpcc::ButtonGroup<TIMEOUT, INTERVAL, T>::isReleased(T mask)
+xpcc::ButtonGroup<T>::isReleased(T mask)
 {
 	atomic::Lock lock;
 	
@@ -64,9 +64,9 @@ xpcc::ButtonGroup<TIMEOUT, INTERVAL, T>::isReleased(T mask)
 	return mask;
 }
 
-template <uint16_t TIMEOUT, uint16_t INTERVAL, typename T>
+template <typename T>
 T
-xpcc::ButtonGroup<TIMEOUT, INTERVAL, T>::isPressed(T mask)
+xpcc::ButtonGroup<T>::isPressed(T mask)
 {
 	atomic::Lock lock;
 	
@@ -78,9 +78,9 @@ xpcc::ButtonGroup<TIMEOUT, INTERVAL, T>::isPressed(T mask)
 
 // ----------------------------------------------------------------------------
 
-template <uint16_t TIMEOUT, uint16_t INTERVAL, typename T>
+template <typename T>
 T
-xpcc::ButtonGroup<TIMEOUT, INTERVAL, T>::isRepeated(T mask)
+xpcc::ButtonGroup<T>::isRepeated(T mask)
 {
 	atomic::Lock lock;
 	
@@ -90,9 +90,9 @@ xpcc::ButtonGroup<TIMEOUT, INTERVAL, T>::isRepeated(T mask)
 	return mask;
 }
 
-template <uint16_t TIMEOUT, uint16_t INTERVAL, typename T>
+template <typename T>
 T
-xpcc::ButtonGroup<TIMEOUT, INTERVAL, T>::isPressedShort(T mask)
+xpcc::ButtonGroup<T>::isPressedShort(T mask)
 {
 	atomic::Lock lock;
 	
@@ -105,9 +105,9 @@ xpcc::ButtonGroup<TIMEOUT, INTERVAL, T>::isPressedShort(T mask)
 	return mask;
 }
 
-template <uint16_t TIMEOUT, uint16_t INTERVAL, typename T>
+template <typename T>
 T
-xpcc::ButtonGroup<TIMEOUT, INTERVAL, T>::isPressedLong(T mask)
+xpcc::ButtonGroup<T>::isPressedLong(T mask)
 {
 	atomic::Lock lock;
 	

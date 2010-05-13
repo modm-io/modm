@@ -44,7 +44,10 @@ namespace xpcc
 			Median(const T& initialValue = 0);
 			
 			void
-			update(const T& input);
+			append(const T& input);
+			
+			void
+			update();
 			
 			const T
 			getValue() const;
@@ -70,22 +73,29 @@ xpcc::filter::Median<T, 5>::Median(const T& initialValue) :
 
 template <typename T>
 void
-xpcc::filter::Median<T, 5>::update(const T& input)
+xpcc::filter::Median<T, 5>::append(const T& input)
 {
 	this->buffer[index] = input;
 	if (++index >= 5) {
 		index = 0;
 	}
+}
+
+template <typename T>
+void
+xpcc::filter::Median<T, 5>::update()
+{
+	// for small sample sizes it is the fastest way to just copy the
+	// buffer and sort it afterwards
+	memcpy((void *) sorted, (const void * const) buffer, sizeof(sorted));
 	
-	memcpy((void *) sorted, (const void *) this->buffer, sizeof(sorted));
-	
-	XPCC_MEDIAN__SORT(sorted[0],sorted[1]);
-	XPCC_MEDIAN__SORT(sorted[3],sorted[4]);
-	XPCC_MEDIAN__SORT(sorted[0],sorted[3]);
-	XPCC_MEDIAN__SORT(sorted[1],sorted[4]);
-	XPCC_MEDIAN__SORT(sorted[1],sorted[2]);
-	XPCC_MEDIAN__SORT(sorted[2],sorted[3]);
-	XPCC_MEDIAN__SORT(sorted[1],sorted[2]);
+	XPCC_MEDIAN__SORT(sorted[0], sorted[1]);
+	XPCC_MEDIAN__SORT(sorted[3], sorted[4]);
+	XPCC_MEDIAN__SORT(sorted[0], sorted[3]);
+	XPCC_MEDIAN__SORT(sorted[1], sorted[4]);
+	XPCC_MEDIAN__SORT(sorted[1], sorted[2]);
+	XPCC_MEDIAN__SORT(sorted[2], sorted[3]);
+	XPCC_MEDIAN__SORT(sorted[1], sorted[2]);
 }
 
 template <typename T>

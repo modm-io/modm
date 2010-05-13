@@ -44,7 +44,10 @@ namespace xpcc
 			Median(const T& initialValue = 0);
 			
 			void
-			update(const T& input);
+			append(const T& input);
+			
+			void
+			update();
 			
 			const T
 			getValue() const;
@@ -70,15 +73,28 @@ xpcc::filter::Median<T, 9>::Median(const T& initialValue) :
 
 template <typename T>
 void
-xpcc::filter::Median<T, 9>::update(const T& input)
+xpcc::filter::Median<T, 9>::append(const T& input)
 {
+	// Remove the old value from the sorted set and replace it with the
+	// new input. This way the array remains mostly sorted.
+	T valueToRemove = this->buffer[index];
+	for (uint_fast8_t i = 0; i < 9; ++i) {
+		if (this->sorted[i] == valueToRemove) {
+			this->sorted[i] = input;
+			break;
+		}
+	}
+	
 	this->buffer[index] = input;
 	if (++index >= 9) {
 		index = 0;
 	}
-	
-	memcpy((void *) sorted, (const void *) this->buffer, sizeof(sorted));
-	
+}
+
+template <typename T>
+void
+xpcc::filter::Median<T, 9>::update()
+{
 	XPCC_MEDIAN__SORT(sorted[1], sorted[2]);
 	XPCC_MEDIAN__SORT(sorted[4], sorted[5]);
 	XPCC_MEDIAN__SORT(sorted[7], sorted[8]);
@@ -104,5 +120,5 @@ template <typename T>
 const T
 xpcc::filter::Median<T, 9>::getValue() const
 {
-	return sorted[3];
+	return sorted[4];
 }

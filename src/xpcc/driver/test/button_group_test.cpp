@@ -37,7 +37,7 @@
 void
 ButtonGroupTest::testButtons()
 {
-	xpcc::ButtonGroup<> buttons;
+	xpcc::ButtonGroup<> buttons(0);
 	
 	TEST_ASSERT_FALSE(buttons.isPressed(0x01));
 	

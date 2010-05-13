@@ -5,7 +5,7 @@
 
 GPIO__OUTPUT(Led, B, 0);
 
-static xpcc::ButtonGroup buttons;
+static xpcc::ButtonGroup<> buttons(xpcc::ButtonGroup::NONE);
 
 ISR(TIMER2_COMPA_vect)
 {

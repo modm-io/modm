@@ -36,8 +36,5 @@ class MedianTest : public unittest::TestSuite
 {
 public:
 	void
-	testMedian3();
-	
-	void
-	testMedian5();
+	testMedian();
 };
