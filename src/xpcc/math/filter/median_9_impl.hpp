@@ -30,21 +30,79 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__MEDIAN_HPP
-	#error	"Don't include this file directly, use 'median.hpp' instead!"
-#endif
+#include <string.h>
 
 // ----------------------------------------------------------------------------
-#define XPCC_MEDIAN__SORT(a,b) { if (a > b) { XPCC_MEDIAN__SWAP(a, b); } }
-#define XPCC_MEDIAN__SWAP(a,b) { T temp = a; a = b; b = temp; }
+namespace xpcc
+{
+	namespace filter
+	{
+		template <typename T>
+		class Median<T, 9>
+		{
+		public:
+			Median(const T& initialValue = 0);
+			
+			void
+			update(const T& input);
+			
+			const T
+			getValue() const;
+		
+		private:
+			uint_fast8_t index;
+			T buffer[9];
+			T sorted[9];
+		};
+	}
+}
 
-#include "median_3_impl.hpp"
-#include "median_5_impl.hpp"
-#include "median_7_impl.hpp"
-#include "median_9_impl.hpp"
-
-#undef XPCC_MEDIAN__SORT
-#undef XPCC_MEDIAN__SWAP
 // ----------------------------------------------------------------------------
+template <typename T>
+xpcc::filter::Median<T, 9>::Median(const T& initialValue) :
+	index(0)
+{
+	for (uint_fast8_t i = 0; i < 9; ++i) {
+		buffer[i] = initialValue;
+		sorted[i] = initialValue;
+	}
+}
 
-// TODO General implementation
+template <typename T>
+void
+xpcc::filter::Median<T, 9>::update(const T& input)
+{
+	this->buffer[index] = input;
+	if (++index >= 9) {
+		index = 0;
+	}
+	
+	memcpy((void *) sorted, (const void *) this->buffer, sizeof(sorted));
+	
+	XPCC_MEDIAN__SORT(sorted[1], sorted[2]);
+	XPCC_MEDIAN__SORT(sorted[4], sorted[5]);
+	XPCC_MEDIAN__SORT(sorted[7], sorted[8]);
+	XPCC_MEDIAN__SORT(sorted[0], sorted[1]);
+	XPCC_MEDIAN__SORT(sorted[3], sorted[4]);
+	XPCC_MEDIAN__SORT(sorted[6], sorted[7]);
+	XPCC_MEDIAN__SORT(sorted[1], sorted[2]);
+	XPCC_MEDIAN__SORT(sorted[4], sorted[5]);
+	XPCC_MEDIAN__SORT(sorted[7], sorted[8]);
+	XPCC_MEDIAN__SORT(sorted[0], sorted[3]);
+	XPCC_MEDIAN__SORT(sorted[5], sorted[8]);
+	XPCC_MEDIAN__SORT(sorted[4], sorted[7]);
+	XPCC_MEDIAN__SORT(sorted[3], sorted[6]);
+	XPCC_MEDIAN__SORT(sorted[1], sorted[4]);
+	XPCC_MEDIAN__SORT(sorted[2], sorted[5]);
+	XPCC_MEDIAN__SORT(sorted[4], sorted[7]);
+	XPCC_MEDIAN__SORT(sorted[4], sorted[2]);
+	XPCC_MEDIAN__SORT(sorted[6], sorted[4]);
+	XPCC_MEDIAN__SORT(sorted[4], sorted[2]);
+}
+
+template <typename T>
+const T
+xpcc::filter::Median<T, 9>::getValue() const
+{
+	return sorted[3];
+}

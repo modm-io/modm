@@ -50,7 +50,7 @@ namespace xpcc
 			getValue() const;
 		
 		private:
-			uint8_t index;
+			uint_fast8_t index;
 			T buffer[5];
 			T sorted[5];
 		};
