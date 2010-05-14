@@ -60,7 +60,7 @@ class Builder(object):
 	To access the elements from the xml tree use for example:
 	self.tree.components
 	self.tree.components.actions			--	all actions
-	self.tree.components.subscriptions		--	all actions
+	self.tree.components.subscriptions		--	all events
 	self.tree.components["driver"].actions	--	only actions form the
 												component 'driver'
 	self.tree.components["driver"].events.publish

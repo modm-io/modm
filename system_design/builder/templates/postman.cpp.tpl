@@ -52,7 +52,7 @@ Postman::deliverPacket(const xpcc::Header& header, const xpcc::SmartPointer& pay
 			{
 {%- for event in container.events.subscribe %}
 				case robot::event::{{ event.name | CAMELCASE }}:
-	{%- for component in eventSubscriptions[event.name] %}
+	{%- for component in events[event.name] %}
 		{%- if events[event.name].type != None %}
 					component::{{ component.name | camelCase }}.event{{ event.name | CamelCase }}(header, &payload.get<robot::packet::{{ events[event.name].type | CamelCase }}>());
 		{%- else %}

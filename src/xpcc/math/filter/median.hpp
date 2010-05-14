@@ -30,8 +30,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__MEDIAN_HPP
-#define XPCC__MEDIAN_HPP
+#ifndef XPCC_FILTER__MEDIAN_HPP
+#define XPCC_FILTER__MEDIAN_HPP
 
 #include <stdint.h>
 
@@ -98,4 +98,4 @@ namespace xpcc
 
 #include "median_impl.hpp"
 
-#endif // XPCC__MEDIAN_HPP
+#endif // XPCC_FILTER__MEDIAN_HPP

@@ -101,7 +101,7 @@ def generate(env, **kw):
 	builder_postman = SCons.Script.Builder(
 		action = SCons.Action.Action(
 			'python "${XPCC_SYSTEM_BUILDER}/cpp_postman.py" ' \
-				'--container ${container} ' \
+				'--container "${container}" ' \
 				'--outpath ${TARGET.dir} ' \
 				'$SOURCE',
 			cmdstr="$SYSTEM_CPP_POSTMAN_COMSTR"),

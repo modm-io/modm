@@ -30,8 +30,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__DEBOUNCE_HPP
-#define XPCC__DEBOUNCE_HPP
+#ifndef XPCC_FILTER__DEBOUNCE_HPP
+#define XPCC_FILTER__DEBOUNCE_HPP
 
 #include <stdint.h>
 
@@ -48,9 +48,17 @@ namespace xpcc
 		class Debounce
 		{
 		public:
+			/**
+			 * \brief	Constructor
+			 * 
+			 * \param	maxValue	maximal value of the sum
+			 * \param	lowerBound	lower bound for the schmitt-trigger
+			 * \param	lowerBound	upper bound for the schmitt-trigger. If
+			 * 						set to zero, the value of maxValue is used.
+			 */
 			Debounce(const T& maxValue,
-					 const T& lowerBound,
-					 const T& upperBound);
+					 const T& lowerBound = 0,
+					 const T& upperBound = 0);
 			
 			void
 			update(bool input);
@@ -59,14 +67,14 @@ namespace xpcc
 			getValue() const;
 			
 			void
-			reset();
+			reset(const bool state);
 			
 		private:
-			T maxValue;
+			const T maxValue;
 			T sum;
 			
-			T lowerBound;
-			T upperBound;
+			const T lowerBound;
+			const T upperBound;
 			bool state;
 		};
 	}
@@ -74,4 +82,4 @@ namespace xpcc
 
 #include "debounce_impl.hpp"
 
-#endif // XPCC__DEBOUNCE_HPP
+#endif // XPCC_FILTER__DEBOUNCE_HPP

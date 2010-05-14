@@ -34,53 +34,42 @@
 
 #include "debounce_test.hpp"
 
+namespace
+{
+	struct TestData
+	{
+		bool input;
+		bool output;
+	};
+	
+	static const TestData testData[] =
+	{
+		{ true, false },
+		{ true, true },
+		{ true, true },
+		{ false, true },
+		{ false, true },
+		{ false, true },
+		{ false, false },
+		{ false, false },
+		{ false, false },
+		{ true, false },
+		{ true, false },
+		{ true, false },
+		{ true, true },
+	};
+}
+
 void
 DebounceTest::testDebounce()
 {
-	xpcc::filter::Debounce<> filter(10, 3, 6);
+	xpcc::filter::Debounce<> filter(4);
 	
 	TEST_ASSERT_FALSE(filter.getValue());
 	
-	filter.update(true);
-	TEST_ASSERT_TRUE(filter.getValue());
-	
-	filter.update(true);
-	TEST_ASSERT_TRUE(filter.getValue());
-	
-	filter.update(true);
-	TEST_ASSERT_TRUE(filter.getValue());
-	
-	filter.update(true);
-	filter.update(true);
-	filter.update(true);
-	filter.update(true);
-	TEST_ASSERT_TRUE(filter.getValue());
-	
-	filter.update(false);
-	filter.update(false);
-	filter.update(false);
-	filter.update(false);
-	filter.update(false);
-	filter.update(false);
-	TEST_ASSERT_TRUE(filter.getValue());
-	
-	filter.update(false);
-	TEST_ASSERT_FALSE(filter.getValue());
-	
-	filter.update(false);
-	filter.update(false);
-	filter.update(false);
-	filter.update(false);
-	filter.update(false);
-	TEST_ASSERT_FALSE(filter.getValue());
-	
-	filter.update(true);
-	filter.update(true);
-	filter.update(true);
-	filter.update(true);
-	filter.update(true);
-	TEST_ASSERT_FALSE(filter.getValue());
-	
-	filter.update(true);
-	TEST_ASSERT_TRUE(filter.getValue());
+	for (unsigned int i = 0; i < (sizeof(testData) / sizeof(TestData)); ++i)
+	{
+		filter.update(testData[i].input);
+		TEST_ASSERT_EQUALS(testData[i].output, filter.getValue());
+	}
 }

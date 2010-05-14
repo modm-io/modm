@@ -30,7 +30,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__MEDIAN_HPP
+#ifndef XPCC_FILTER__MEDIAN_HPP
 	#error	"Don't include this file directly, use 'median.hpp' instead!"
 #endif
 
