@@ -67,22 +67,13 @@ class PostmanBuilder(builder_base.Builder):
 		templateHeader = self.template('templates/postman.hpp.tpl', filter=cppFilter)
 		templateSource = self.template('templates/postman.cpp.tpl', filter=cppFilter)
 		
-		container = self.tree.container[self.options.container]
-		events = {}
-		for eventName, componentList in self.tree.components.subscriptions.iteritems():
-			list = []
-			for component in componentList:
-				if component in container.components:
-					list.append(component)
-			events[eventName] = list
-		
 		substitutions = {
 			'components': self.tree.components,
 			'actions': self.tree.components.actions,
 			'events': self.tree.events,
 			'packets': self.tree.types,
-			'container': container,
-			'events': events
+			'container': self.tree.container[self.options.container],
+			'eventSubscriptions': self.tree.container[self.options.container].subscriptions,
 		}
 		
 		file = os.path.join(self.options.outpath, 'postman.hpp')

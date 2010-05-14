@@ -16,6 +16,7 @@ class Container:
 		self.reference = reference
 		self.components = helper.SingleAssignDict("component")
 		self.events = EventContainer()
+		self.subscriptions = {}
 	
 	def check(self):
 		helper.check_name_notation(self, self.name)
@@ -27,6 +28,13 @@ class Container:
 	def updateEvents(self):
 		for component in self.components:
 			self.events.update(component.events)
+			
+			for event in component.events.subscribe:
+				# append new events to the list
+				key = event.name
+				componentList = self.subscriptions.get(key, [])
+				componentList.append(component)
+				self.subscriptions[key] = componentList
 	
 	def _from_xml(self, node):
 		bootloader = node.find('bootloader')
