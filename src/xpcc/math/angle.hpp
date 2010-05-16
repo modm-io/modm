@@ -57,12 +57,14 @@ namespace xpcc
 			reverse();
 			
 			float
-			toFloat() const {
+			toFloat() const
+			{
 				return this->value;
 			}
 			
 			Angle&
-			operator =(const float& angle) {
+			operator =(const float& angle)
+			{
 				this->value = angle;
 				return *this;
 			}
@@ -103,7 +105,19 @@ namespace xpcc
 
 			friend inline IOStream&
 			operator <<(IOStream &os, const Angle &a);
-
+			
+			static inline float
+			toRadian(float angle)
+			{
+				return angle * M_PI / 180.0;
+			}
+			
+			static inline float
+			toDegree(float angle)
+			{
+				return angle * 180.0 / M_PI;
+			}
+			
 		private:
 			float value;
 	};
