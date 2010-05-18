@@ -30,14 +30,14 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__RAMP_HPP
-	#error	"Don't include this file directly, use 'math/filter/ramp.hpp' instead!"
+#ifndef XPCC_FILTER__RAMP_HPP
+	#error	"Don't include this file directly, use 'ramp.hpp' instead!"
 #endif
 
 // ----------------------------------------------------------------------------
 
 template<typename T>
-xpcc::Ramp<T>::Ramp(const T& increment,
+xpcc::filter::Ramp<T>::Ramp(const T& increment,
 					const T& decrement,
 					const T& initialValue) : 
 	target(initialValue),
@@ -49,20 +49,18 @@ xpcc::Ramp<T>::Ramp(const T& increment,
 }
 
 // ----------------------------------------------------------------------------
-
 template<typename T>
 void
-xpcc::Ramp<T>::setTarget(const T& target)
+xpcc::filter::Ramp<T>::setTarget(const T& target)
 {
 	this->target = target;
 	targetReached = false;
 }
 
 // ----------------------------------------------------------------------------
-
 template<typename T>
 void
-xpcc::Ramp<T>::update()
+xpcc::filter::Ramp<T>::update()
 {
 	if (target > value)
 	{
@@ -88,3 +86,26 @@ xpcc::Ramp<T>::update()
 	}
 }
 
+// ----------------------------------------------------------------------------
+template<typename T>
+void
+xpcc::filter::Ramp<T>::reset(const T& value)
+{
+	this->value = value;
+}
+
+// ----------------------------------------------------------------------------
+template<typename T>
+const T&
+xpcc::filter::Ramp<T>::getValue() const
+{
+	return this->value;
+}
+
+// ----------------------------------------------------------------------------
+template<typename T>
+bool
+xpcc::filter::Ramp<T>::isTargetReached() const
+{
+	return targetReached;
+}

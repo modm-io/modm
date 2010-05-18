@@ -30,79 +30,73 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__RAMP_HPP
-#define XPCC__RAMP_HPP
+#ifndef XPCC_FILTER__RAMP_HPP
+#define XPCC_FILTER__RAMP_HPP
 
 namespace xpcc
 {
-	/**
-	 * \brief	Ramp
-	 * 
-	 * The output value is incremented or decremented at every call to update
-	 * until target has been reached by increment or decrement.
-	 * 
-	 * The final value is always set to target after several calls to update.
-	 * 
-	 * Example:
-	 * \todo	example
-	 * 
-	 * \todo	documentation
-	 * \ingroup	filter
-	 */
-	template<typename T>
-	class Ramp
+	namespace filter
 	{
-	public:
 		/**
-		 * \brief	Create a ramp generator
+		 * \brief	Ramp
 		 * 
-		 * \param	increment		Stepwith for positive direction
-		 * \param	decrement		Stepwith for the negative direction.
-		 * 							<b>Needs to be positive!</b>
-		 * \param	initialValue	Starting value
+		 * The output value is incremented or decremented at every call to update
+		 * until target has been reached by increment or decrement.
 		 * 
-		 * \warning	Both values for increment and decrement needs to
-		 * 			be positive!
+		 * The final value is always set to target after several calls to update.
+		 * 
+		 * Example:
+		 * \todo	example
+		 * 
+		 * \todo	documentation
+		 * \ingroup	filter
 		 */
-		Ramp(const T& increment,
-			 const T& decrement,
-			 const T& initialValue = T());
-		
-		inline void
-		setTarget(const T& target);
-		
-		/// Calculate the next step
-		void
-		update();
-		
-		inline const T&
-		getValue() const
+		template<typename T>
+		class Ramp
 		{
-			return this->value;
-		}
+		public:
+			/**
+			 * \brief	Create a ramp generator
+			 * 
+			 * \param	increment		Stepwith for positive direction
+			 * \param	decrement		Stepwith for the negative direction.
+			 * 							<b>Needs to be positive!</b>
+			 * \param	initialValue	Starting value
+			 * 
+			 * \warning	Both values for increment and decrement needs to
+			 * 			be positive!
+			 */
+			Ramp(const T& increment,
+				 const T& decrement,
+				 const T& initialValue = T());
+			
+			inline void
+			setTarget(const T& target);
+			
+			/// Calculate the next step
+			void
+			update();
+			
+			inline void
+			reset(const T& value = T());
+			
+			inline const T&
+			getValue() const;
+			
+			inline bool
+			isTargetReached() const;
 		
-		inline void
-		setValue(const T& value)
-		{
-			this->value = value;
-		}
-		
-		inline bool
-		isTargetReached() const
-		{
-			return targetReached;
-		}
-	
-	private:
-		T target;
-		T value;
-		bool targetReached;
-		
-		T increment;
-		T decrement;
-	};
+		private:
+			T target;
+			T value;
+			bool targetReached;
+			
+			T increment;
+			T decrement;
+		};
+	}
 }
 
 #include "ramp_impl.hpp"
 
-#endif // XPCC__RAMP_HPP
+#endif // XPCC_FILTER__RAMP_HPP
