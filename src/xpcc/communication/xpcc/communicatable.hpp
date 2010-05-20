@@ -30,65 +30,19 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC__ABSTRACT_COMPONENT_HPP
-#define	XPCC__ABSTRACT_COMPONENT_HPP
-
-#include <stdint.h>
-#include "communication.hpp"
-#include "communicatable.hpp"
+#ifndef	XPCC__COMMUNICATABLE_HPP
+#define	XPCC__COMMUNICATABLE_HPP
 
 namespace xpcc
 {
-	// forward declaration
-	class Communication;
-	class CommunicatableTask;
-	
 	/**
-	 * \brief	Abstract base class for a component
+	 * \brief	Interface 
 	 * 
 	 * \ingroup	communication
 	 */
-	class AbstractComponent : public Communicatable
+	class Communicatable
 	{
-		friend class CommunicatableTask;
-	public:
-		/**
-		 * \brief	Constructor
-		 * 
-		 * \param	ownIdentifier	Identifier of the component, must be unique
-		 * 							within the network.
-		 * \param	communication	Communication class use to send messages
-		 */
-		AbstractComponent(const uint8_t ownIdentifier,
-				Communication *communication);
-		
-		/**
-		 * \brief	Update the internal state of this component.
-		 * 
-		 * Sets the current component and calls work()
-		 */
-		void
-		update();
-		
-	protected:
-		/**
-		 * \brief	Functionallity of the component
-		 * 
-		 * You should never call this method directly. This is done by
-		 * a call of update().
-		 */
-		virtual void
-		work() = 0;
-		
-		inline void
-		setCurrentComponent()
-		{
-			this->communication->setCurrentComponent(this->componentIdentifier);
-		}
-		
-		const uint8_t componentIdentifier;		///< own identifier
-		Communication *communication;
 	};
 }
 
-#endif // XPCC__ABSTRACT_COMPONENT_HPP
+#endif // XPCC__COMMUNICATABLE_HPP

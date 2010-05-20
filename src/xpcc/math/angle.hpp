@@ -45,7 +45,9 @@ namespace xpcc
 	class Angle
 	{
 		public:
-			Angle(float value = 0.0) : value(value) {
+			Angle(float value = 0.0) : 
+				value(value)
+			{
 			}
 			
 			/// \brief	Limit angle to +-Pi
@@ -56,13 +58,13 @@ namespace xpcc
 			void
 			reverse();
 			
-			float
+			inline float
 			toFloat() const
 			{
 				return this->value;
 			}
 			
-			Angle&
+			inline Angle&
 			operator =(const float& angle)
 			{
 				this->value = angle;
@@ -134,13 +136,15 @@ namespace xpcc
 // inline operator functions
 
 inline xpcc::Angle&
-xpcc::Angle::operator+=(const Angle &other) {
+xpcc::Angle::operator+=(const Angle &other)
+{
 	this->value += other.value;
 	return *this;
 }
 
 inline xpcc::Angle&
-xpcc::Angle::operator-=(const Angle &other) {
+xpcc::Angle::operator-=(const Angle &other)
+{
 	this->value -= other.value;
 	return *this;
 }
@@ -205,24 +209,33 @@ xpcc::operator <<(xpcc::IOStream &os, const xpcc::Angle &a) {
 // ----------------------------------------------------------------------------	
 // overloaded global functions
 
-/// \ingroup	math
-/// \brief		Calculate cosinus of an angle
+/**
+ * \brief		Calculate cosinus of an angle
+ * \ingroup		math
+ */
 inline xpcc::Angle
-cos(const xpcc::Angle& angle) {
+cos(const xpcc::Angle& angle)
+{
 	return cos(angle.toFloat());
 }
 
-/// \ingroup	math
-/// \brief		Calculate sinus of an angle
+/**
+ * \brief		Calculate sinus of an angle
+ * \ingroup		math
+ */
 inline xpcc::Angle
-sin(const xpcc::Angle& angle) {
+sin(const xpcc::Angle& angle)
+{
 	return sin(angle.toFloat());
 }
 
-/// \ingroup	math
-/// \brief		Calculate tangens of an angle
+/**
+ * \brief		Calculate tangens of an angle
+ * \ingroup		math
+ */
 inline xpcc::Angle
-tan(const xpcc::Angle& angle) {
+tan(const xpcc::Angle& angle)
+{
 	return tan(angle.toFloat());
 }
 

@@ -63,7 +63,6 @@ namespace xpcc
 				CALLBACK,
 			} TypeInfo;
 			
-		
 			/**
 			 * \brief 		Creates one Entry with given header. this->next is initially set Null
 			 *
@@ -139,7 +138,8 @@ namespace xpcc
 		 * this->last->next == Null is at anytime true.
 		 *
 		 */
-		class List{
+		class List
+		{
 		public:
 			/**
 			 * \brief 		Creates one initially valid list.
@@ -239,7 +239,6 @@ namespace xpcc
 			EntryDefault dummyFirst;
 			Entry *first;
 			Entry *last;
-			
 		};
 	}
 }

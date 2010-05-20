@@ -35,11 +35,17 @@
 
 #include <xpcc/data_structure/smart_pointer.hpp>
 #include "backend/backend_interface.hpp"
+#include "communicatable.hpp"
 
 namespace xpcc
 {
 	// forward declaration
 	class AbstractComponent;
+	namespace communicationList
+	{
+		class Entry;
+		class List;
+	}
 	
 	/**
 	 * \brief 		Callback type, which has to be passed to communication during
@@ -51,9 +57,12 @@ namespace xpcc
 	 */
 	class Callback
 	{
+		friend class communicationList::Entry;
+		friend class communicationList::List;
+		
 	public:
-		typedef void (AbstractComponent::*Function)(const Header& header, const uint8_t *type);
-
+		typedef void (Communicatable::*Function)(const Header& header, const uint8_t *type);
+		
 	public:
 		Callback();
 		
@@ -65,9 +74,9 @@ namespace xpcc
 		 */
 		template <typename C, typename P>
 		inline void
-		init( C *component, void (C::*function)(const Header& header, const P* packet)  )
+		init( C *component, void (C::*function)(const Header& header, const P* packet) )
 		{
-			this->component = static_cast<AbstractComponent*>( component );
+			this->component = static_cast<Communicatable *>( component );
 			this->function = reinterpret_cast<Function>(function);
 			this->packetSize = sizeof( P );
 		}
@@ -83,15 +92,14 @@ namespace xpcc
 		 */
 		template <typename C>
 		inline void
-		init( C *component, void (C::*function)(const Header& header)  )
+		init( C *component, void (C::*function)(const Header& header) )
 		{
-			this->component = static_cast<AbstractComponent*>( component );
+			this->component = static_cast<Communicatable *>( component );
 			this->function = reinterpret_cast<Function>(function);
 			this->packetSize = 0;
 		}
-
-		// [proposition -> dergraaf]: make this method private and Communication
-		// a friend
+		
+	protected:
 		/// \todo check packet size?
 		inline void
 		call(const Header& header, const SmartPointer &payload) const
@@ -99,10 +107,11 @@ namespace xpcc
 			if (component != 0) {
 				(component->*function)(header, payload.getPointer());
 			}
+			// TODO spezieller Aufruf für packetgröße = 0, funktioniert zwar
+			// auch ohne ist aber extrem unschön!
 		}
 		
-	protected:
-		AbstractComponent *component;
+		Communicatable *component;
 		Function function;
 		uint8_t packetSize;
 	};

@@ -39,23 +39,20 @@
 #define XPCC_LOG_LEVEL xpcc::log::DEBUG
 
 
-xpcc::communicationList::List::List(xpcc::Communication *communication):
-communication(communication),
-dummyFirst(Header()),
-first(&dummyFirst),
-last(&dummyFirst)
+xpcc::communicationList::List::List(xpcc::Communication *communication) :
+	communication(communication), dummyFirst(Header()),
+	first(&dummyFirst), last(&dummyFirst)
 {
-
 }
 
-xpcc::communicationList::Entry::Entry(uint8_t typeInfo, const Header& header, SmartPointer &payload):
+xpcc::communicationList::Entry::Entry(uint8_t typeInfo, const Header& header, SmartPointer &payload) :
 	typeInfo(typeInfo),
 	next(0),
 	header(header),
 	payload(payload),
 	time(),
-	tries(0){
-
+	tries(0)
+{
 }
 
 xpcc::communicationList::Entry::Entry(uint8_t typeInfo, const Header& header) :
@@ -64,8 +61,8 @@ xpcc::communicationList::Entry::Entry(uint8_t typeInfo, const Header& header) :
 	header(header), 
 	payload(SmartPointer()),
 	time(),
-	tries(0){
-	
+	tries(0)
+{
 }
 
 const xpcc::communicationList::Entry *

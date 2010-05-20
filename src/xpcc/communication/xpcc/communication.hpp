@@ -34,7 +34,6 @@
 #define	XPCC__COMMUNICATION_HPP
 
 #include "backend/backend_interface.hpp"
-#include "abstract_component.hpp"
 #include "postman/postman.hpp"
 #include "communication_list.hpp"
 
