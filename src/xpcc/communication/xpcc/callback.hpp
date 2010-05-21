@@ -46,6 +46,8 @@ namespace xpcc
 		class Entry;
 		class List;
 	}
+	class Postman;
+	class StlPostman;
 	
 	/**
 	 * \brief 		Callback type, which has to be passed to communication during
@@ -59,6 +61,8 @@ namespace xpcc
 	{
 		friend class communicationList::Entry;
 		friend class communicationList::List;
+		friend class Postman;
+		friend class StlPostman;
 		
 	public:
 		typedef void (Communicatable::*Function)(const Header& header, const uint8_t *type);
