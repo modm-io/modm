@@ -37,7 +37,7 @@
 void
 RampTest::testRamp()
 {
-	xpcc::Ramp<int16_t> ramp(3, 4);
+	xpcc::filter::Ramp<int16_t> ramp(3, 4);
 	
 	TEST_ASSERT_TRUE(ramp.isTargetReached());
 	TEST_ASSERT_EQUALS(ramp.getValue(), 0);
