@@ -35,7 +35,6 @@
 #endif
 
 // ----------------------------------------------------------------------------
-
 template<typename T>
 xpcc::SCurveController<T>::Parameter::Parameter(
 		const T& targetArea, const T& kp, const T& increment, const T& decreaseFactor,
@@ -63,6 +62,23 @@ xpcc::SCurveController<T>::setTarget(const T& primary)
 	targetReached = false;
 }
 
+// ----------------------------------------------------------------------------
+template<typename T>
+inline void
+xpcc::SCurveController<T>::setSecondaryMaximum( const T& secondary )
+{
+	this->parameter.secondaryMaximum = secondary;
+}
+
+// ----------------------------------------------------------------------------
+template<typename T>
+inline void
+xpcc::SCurveController<T>::setSecondaryMinimim( const T& secondary )
+{
+	this->parameter.secondaryMinimum = secondary;
+}
+
+// ----------------------------------------------------------------------------
 template<typename T>
 bool
 xpcc::SCurveController<T>::isTargetReached() const
@@ -77,7 +93,7 @@ void
 xpcc::SCurveController<T>::update(const T& primary, const T& secondary)
 {
 	T error = target - primary;
-	
+
 	// adjust sign to be always positive
 	bool invert = false;
 	T currentValue = secondary;
@@ -101,6 +117,7 @@ xpcc::SCurveController<T>::update(const T& primary, const T& secondary)
 	}
 	
 	output = std::min(outputIncrement, outputDecrement);
+	// TODO smoth breaking if the secondaryMaximum has changed to a lower value
 	output = std::min(output, parameter.secondaryMaximum);
 	
 	if (output < parameter.secondaryMinimum) {

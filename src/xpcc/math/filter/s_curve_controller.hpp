@@ -80,6 +80,12 @@ namespace xpcc
 		inline void
 		setTarget(const T& primary);
 		
+		inline void
+		setSecondaryMaximum( const T& secondary );
+
+		inline void
+		setSecondaryMinimim( const T& secondary );
+
 		inline bool
 		isTargetReached() const;
 		
@@ -89,7 +95,7 @@ namespace xpcc
 		inline const T&
 		getValue() const;
 		
-	private:
+	public:
 		T target;
 		T output;
 		bool targetReached;
