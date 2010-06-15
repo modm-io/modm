@@ -167,8 +167,8 @@ def generate_environment(env, rootpath, configfile='project.cfg', buildpath=None
 	
 	# append all values from environment section to the real environment
 	for key, value in configuration['environment'].iteritems():
-		new.Append(**{ key.upper(): " " + value } )
-	
+		new.Append(**{ key.upper(): value } )
+		
 	# exclude the buildpath from the FileScanner
 	filename = os.path.join(new['XPCC_BUILDPATH'], 'build.cfg')
 	dir = os.path.dirname(filename)
