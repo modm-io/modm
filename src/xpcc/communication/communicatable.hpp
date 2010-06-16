@@ -2,7 +2,7 @@
 // ----------------------------------------------------------------------------
 /* Copyright (c) 2009, Roboterclub Aachen e.V.
  * All rights reserved.
- *
+ * 
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  * 
@@ -14,7 +14,7 @@
  *     * Neither the name of the Roboterclub Aachen e.V. nor the
  *       names of its contributors may be used to endorse or promote products
  *       derived from this software without specific prior written permission.
- *
+ * 
  * THIS SOFTWARE IS PROVIDED BY ROBOTERCLUB AACHEN E.V. ''AS IS'' AND ANY
  * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -25,56 +25,24 @@
  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
+ * 
  * $Id$
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC__COMMUNICATABLE_TASK_HPP
-#define	XPCC__COMMUNICATABLE_TASK_HPP
-
-#include <xpcc/communication/communicatable.hpp>
-#include <xpcc/communication/abstract_component.hpp>
-#include <xpcc/communication/communication.hpp>
-#include "task.hpp"
+#ifndef	XPCC__COMMUNICATABLE_HPP
+#define	XPCC__COMMUNICATABLE_HPP
 
 namespace xpcc
 {
 	/**
-	 * \brief	A statemachine able to communicate via xpcc
+	 * \brief	Interface
 	 * 
-	 * Needs to be part of a xpcc::AbstractComponent
-	 * 
-	 * \see		xpcc::Task
-	 * 
-	 * \ingroup	workflow
-	 * \author	Fabian Greif
+	 * \ingroup	communication
 	 */
-	class CommunicatableTask : public Task, public Communicatable
+	class Communicatable
 	{
-	public:
-		// [proposition -> dergraaf]: make the constructor private and 
-		// AbstractComponent a friend
-		CommunicatableTask(AbstractComponent *parent) :
-			parent(parent)
-		{
-		}
-		
-	protected:
-		inline void
-		setCurrentComponent()
-		{
-			this->parent->setCurrentComponent();
-		}
-		
-		inline xpcc::Communication*
-		getCommunication()
-		{
-			return parent->communication;
-		}
-		
-		AbstractComponent *parent;
 	};
 }
 
-#endif	// XPCC__COMMUNICATABLE_TASK_HPP
+#endif // XPCC__COMMUNICATABLE_HPP

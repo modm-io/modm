@@ -34,7 +34,7 @@
 #define XPCC__LCD_HPP
 
 #include <stdint.h>
-#include <xpcc/communication/io/iodevice.hpp>
+#include <xpcc/io/iodevice.hpp>
 
 namespace xpcc
 {

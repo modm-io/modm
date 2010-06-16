@@ -5,7 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -30,51 +30,53 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC__COMMUNICATABLE_TASK_HPP
-#define	XPCC__COMMUNICATABLE_TASK_HPP
+#ifndef XPCC__POLYGON_HPP
+#define XPCC__POLYGON_HPP
 
-#include <xpcc/communication/communicatable.hpp>
-#include <xpcc/communication/abstract_component.hpp>
-#include <xpcc/communication/communication.hpp>
-#include "task.hpp"
+#include <xpcc/container/vector.hpp>
+#include <xpcc/math/point.hpp>
 
 namespace xpcc
 {
 	/**
-	 * \brief	A statemachine able to communicate via xpcc
-	 * 
-	 * Needs to be part of a xpcc::AbstractComponent
-	 * 
-	 * \see		xpcc::Task
-	 * 
-	 * \ingroup	workflow
+	 * \brief	Polygon
+	 *
+	 * The Polygon class provides a vector of points.
+	 *
 	 * \author	Fabian Greif
+	 * \ingroup	math
 	 */
-	class CommunicatableTask : public Task, public Communicatable
+	template <typename T>
+	class Polygon
 	{
 	public:
-		// [proposition -> dergraaf]: make the constructor private and 
-		// AbstractComponent a friend
-		CommunicatableTask(AbstractComponent *parent) :
-			parent(parent)
+		typedef size_t SizeType;
+		typedef Point<T> Point;
+
+	public:
+		/**
+		 * \brief	Constructs a polygon capable of holding n points
+		 */
+		Polygon(SizeType n);
+
+		void
+		append(const Point& point);
+
+		inline Point&
+		operator [](SizeType index)
 		{
+			return buffer[index];
 		}
-		
-	protected:
-		inline void
-		setCurrentComponent()
+
+		inline const Point&
+		operator [](SizeType index) const
 		{
-			this->parent->setCurrentComponent();
+			return buffer[index];
 		}
-		
-		inline xpcc::Communication*
-		getCommunication()
-		{
-			return parent->communication;
-		}
-		
-		AbstractComponent *parent;
+
+	private:
+		xpcc::Vector<T> buffer;
 	};
 }
 
-#endif	// XPCC__COMMUNICATABLE_TASK_HPP
+#endif // XPCC__POLYGON_HPP

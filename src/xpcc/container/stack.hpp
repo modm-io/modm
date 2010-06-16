@@ -30,51 +30,98 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC__COMMUNICATABLE_TASK_HPP
-#define	XPCC__COMMUNICATABLE_TASK_HPP
+#ifndef	XPCC__STACK_HPP
+#define	XPCC__STACK_HPP
 
-#include <xpcc/communication/communicatable.hpp>
-#include <xpcc/communication/abstract_component.hpp>
-#include <xpcc/communication/communication.hpp>
-#include "task.hpp"
+#include <stdint.h>
+
+#include "deque.hpp"
 
 namespace xpcc
 {
 	/**
-	 * \brief	A statemachine able to communicate via xpcc
+	 * \brief	LIFO stack
 	 * 
-	 * Needs to be part of a xpcc::AbstractComponent
+	 * Elements are pushed/popped from the "back" of the specific container,
+	 * which is known as the top of the stack.
 	 * 
-	 * \see		xpcc::Task
+	 * \see		Deque()
 	 * 
-	 * \ingroup	workflow
-	 * \author	Fabian Greif
+	 * \author	Fabian Greif 
+	 * \ingroup		container
 	 */
-	class CommunicatableTask : public Task, public Communicatable
+	template<typename T,
+			 typename Container>
+	class Stack
 	{
 	public:
-		// [proposition -> dergraaf]: make the constructor private and 
-		// AbstractComponent a friend
-		CommunicatableTask(AbstractComponent *parent) :
-			parent(parent)
+		typedef typename Container::Size Size;
+		
+	public:
+		bool
+		isEmpty()
 		{
+			return c.isEmpty();
 		}
 		
+		bool
+		isFull()
+		{
+			return c.isFull();
+		}
+		
+		Size
+		getSize()
+		{
+			return c.getSize();
+		}
+		
+		Size
+		getMaxSize()
+		{
+			return c.getMaxSize();
+		}
+		
+		T&
+		get()
+		{
+			return c.back();
+		}
+		
+		const T&
+		get() const
+		{
+			return c.back();
+		}
+		
+		bool
+		push(const T& value)
+		{
+			return c.pushBack(value);
+		}
+		
+		void
+		pop()
+		{
+			c.popBack();
+		}
+	
 	protected:
-		inline void
-		setCurrentComponent()
-		{
-			this->parent->setCurrentComponent();
-		}
-		
-		inline xpcc::Communication*
-		getCommunication()
-		{
-			return parent->communication;
-		}
-		
-		AbstractComponent *parent;
+		Container c;
+	};
+
+	// ------------------------------------------------------------------------
+	/**
+	 * \brief		Bounded stack
+	 * 
+	 * \ingroup		container
+	 */
+	template<typename T, 
+			 int N,
+			 typename Container=BoundedDeque<T, N> >
+	class BoundedStack : public Stack<T, Container>
+	{
 	};
 }
 
-#endif	// XPCC__COMMUNICATABLE_TASK_HPP
+#endif	// XPCC__STACK_HPP

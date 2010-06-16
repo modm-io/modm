@@ -38,7 +38,7 @@
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/thread.hpp>
 #include <boost/scoped_ptr.hpp>
-#include <xpcc/data_structure/smart_pointer.hpp>
+#include <xpcc/container/smart_pointer.hpp>
 
 #include "tipc_receiver_socket.hpp"
 

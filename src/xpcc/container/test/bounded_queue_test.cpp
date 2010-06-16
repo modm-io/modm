@@ -5,7 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -30,51 +30,52 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC__COMMUNICATABLE_TASK_HPP
-#define	XPCC__COMMUNICATABLE_TASK_HPP
+#include <xpcc/container/queue.hpp>
 
-#include <xpcc/communication/communicatable.hpp>
-#include <xpcc/communication/abstract_component.hpp>
-#include <xpcc/communication/communication.hpp>
-#include "task.hpp"
+#include "bounded_queue_test.hpp"
 
-namespace xpcc
+void
+BoundedQueueTest::testQueue()
 {
-	/**
-	 * \brief	A statemachine able to communicate via xpcc
-	 * 
-	 * Needs to be part of a xpcc::AbstractComponent
-	 * 
-	 * \see		xpcc::Task
-	 * 
-	 * \ingroup	workflow
-	 * \author	Fabian Greif
-	 */
-	class CommunicatableTask : public Task, public Communicatable
-	{
-	public:
-		// [proposition -> dergraaf]: make the constructor private and 
-		// AbstractComponent a friend
-		CommunicatableTask(AbstractComponent *parent) :
-			parent(parent)
-		{
-		}
-		
-	protected:
-		inline void
-		setCurrentComponent()
-		{
-			this->parent->setCurrentComponent();
-		}
-		
-		inline xpcc::Communication*
-		getCommunication()
-		{
-			return parent->communication;
-		}
-		
-		AbstractComponent *parent;
-	};
+	xpcc::BoundedQueue<int16_t, 5> queue;
+	
+	TEST_ASSERT_TRUE(queue.isEmpty());
+	
+	TEST_ASSERT_EQUALS(queue.getMaxSize(), 5);
+	
+	TEST_ASSERT_TRUE(queue.push(1));
+	TEST_ASSERT_TRUE(queue.push(2));
+	TEST_ASSERT_TRUE(queue.push(3));
+	TEST_ASSERT_TRUE(queue.push(4));
+	TEST_ASSERT_TRUE(queue.push(5));
+	
+	TEST_ASSERT_FALSE(queue.push(6));
+	TEST_ASSERT_TRUE(queue.isFull());
+	
+	TEST_ASSERT_EQUALS(queue.front(), 1);
+	queue.pop();
+	
+	TEST_ASSERT_EQUALS(queue.front(), 2);
+	queue.pop();
+	
+	TEST_ASSERT_TRUE(queue.push(6));
+	TEST_ASSERT_TRUE(queue.push(7));
+	TEST_ASSERT_TRUE(queue.isFull());
+	
+	TEST_ASSERT_EQUALS(queue.front(), 3);
+	queue.pop();
+	
+	TEST_ASSERT_EQUALS(queue.front(), 4);
+	queue.pop();
+	
+	TEST_ASSERT_EQUALS(queue.front(), 5);
+	queue.pop();
+	
+	TEST_ASSERT_EQUALS(queue.front(), 6);
+	queue.pop();
+	
+	TEST_ASSERT_EQUALS(queue.front(), 7);
+	queue.pop();
+	
+	TEST_ASSERT_TRUE(queue.isEmpty());
 }
-
-#endif	// XPCC__COMMUNICATABLE_TASK_HPP

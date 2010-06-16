@@ -37,7 +37,7 @@
 #include <bitset>
 
 #include "tipc_transmitter_socket.hpp"
-#include <xpcc/data_structure/smart_pointer.hpp>
+#include <xpcc/container/smart_pointer.hpp>
 
 namespace xpcc {
 	namespace tipc {

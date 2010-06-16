@@ -35,7 +35,7 @@
 #include <sys/socket.h>
 #include <unistd.h> // close()
 #include <linux/tipc.h>
-#include <xpcc/data_structure/smart_pointer.hpp>
+#include <xpcc/container/smart_pointer.hpp>
 
 #include <iostream>
 

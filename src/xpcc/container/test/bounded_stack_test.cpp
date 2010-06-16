@@ -5,7 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -30,51 +30,43 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC__COMMUNICATABLE_TASK_HPP
-#define	XPCC__COMMUNICATABLE_TASK_HPP
+#include <xpcc/container/stack.hpp>
 
-#include <xpcc/communication/communicatable.hpp>
-#include <xpcc/communication/abstract_component.hpp>
-#include <xpcc/communication/communication.hpp>
-#include "task.hpp"
+#include "bounded_stack_test.hpp"
 
-namespace xpcc
+void
+BoundedStackTest::testStack()
 {
-	/**
-	 * \brief	A statemachine able to communicate via xpcc
-	 * 
-	 * Needs to be part of a xpcc::AbstractComponent
-	 * 
-	 * \see		xpcc::Task
-	 * 
-	 * \ingroup	workflow
-	 * \author	Fabian Greif
-	 */
-	class CommunicatableTask : public Task, public Communicatable
-	{
-	public:
-		// [proposition -> dergraaf]: make the constructor private and 
-		// AbstractComponent a friend
-		CommunicatableTask(AbstractComponent *parent) :
-			parent(parent)
-		{
-		}
-		
-	protected:
-		inline void
-		setCurrentComponent()
-		{
-			this->parent->setCurrentComponent();
-		}
-		
-		inline xpcc::Communication*
-		getCommunication()
-		{
-			return parent->communication;
-		}
-		
-		AbstractComponent *parent;
-	};
+	xpcc::BoundedStack<int16_t, 3> stack;
+	
+	TEST_ASSERT_TRUE(stack.isEmpty());
+	TEST_ASSERT_EQUALS(stack.getMaxSize(), 3);
+	
+	TEST_ASSERT_TRUE(stack.push(1));
+	TEST_ASSERT_TRUE(stack.push(2));
+	TEST_ASSERT_TRUE(stack.push(3));
+	
+	TEST_ASSERT_FALSE(stack.push(4));
+	TEST_ASSERT_TRUE(stack.isFull());
+	
+	TEST_ASSERT_EQUALS(stack.get(), 3);
+	stack.pop();
+	
+	TEST_ASSERT_EQUALS(stack.get(), 2);
+	stack.pop();
+	
+	TEST_ASSERT_TRUE(stack.push(4));
+	TEST_ASSERT_TRUE(stack.push(5));
+	TEST_ASSERT_TRUE(stack.isFull());
+	
+	TEST_ASSERT_EQUALS(stack.get(), 5);
+	stack.pop();
+	
+	TEST_ASSERT_EQUALS(stack.get(), 4);
+	stack.pop();
+	
+	TEST_ASSERT_EQUALS(stack.get(), 1);
+	stack.pop();
+	
+	TEST_ASSERT_TRUE(stack.isEmpty());
 }
-
-#endif	// XPCC__COMMUNICATABLE_TASK_HPP

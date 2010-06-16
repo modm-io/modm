@@ -33,7 +33,7 @@
 #ifndef XPCC_PC__TERMINAL_HPP
 #define XPCC_PC__TERMINAL_HPP
 
-#include <xpcc/communication/io/iodevice.hpp>
+#include <xpcc/io/iodevice.hpp>
 
 namespace xpcc
 {

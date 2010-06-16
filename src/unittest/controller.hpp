@@ -33,7 +33,7 @@
 #ifndef	UNITTEST__CONTROLLER_HPP
 #define	UNITTEST__CONTROLLER_HPP
 
-#include <xpcc/communication/io/iostream.hpp>
+#include <xpcc/io/iostream.hpp>
 #include <xpcc/architecture/general/accessor/flash.hpp>
 
 #include "reporter.hpp"

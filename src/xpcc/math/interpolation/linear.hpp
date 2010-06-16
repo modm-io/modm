@@ -36,7 +36,7 @@
 #include <stdint.h>
 
 #include <xpcc/utils/arithmetic_traits.hpp>
-#include <xpcc/data_structure/pair.hpp>
+#include <xpcc/container/pair.hpp>
 #include <xpcc/architecture/general/accessor.hpp>
 
 namespace xpcc

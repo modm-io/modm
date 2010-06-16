@@ -37,7 +37,7 @@
 #include <xpcc/debug/logger/style_wrapper.hpp>
 #include <xpcc/debug/logger/style/prefix.hpp>
 #include <xpcc/architecture/atmega/uart/uart0.hpp>
-#include <xpcc/communication/io/iodevice_wrapper.hpp>
+#include <xpcc/io/iodevice_wrapper.hpp>
 
 // set the Loglevel
 #undef  XPCC_LOG_LEVEL
@@ -63,7 +63,7 @@ xpcc::log::StyleWrapper< xpcc::log::Prefix< char[10] > > loggerDeviceError (
 xpcc::log::Logger xpcc::log::error( loggerDeviceError );
 
 // COMMUNICATION ###############################################################
-#include <xpcc/communication/xpcc/backend/can/can.hpp>
+#include <xpcc/communication/backend/can/can.hpp>
 #include <xpcc/driver/can/mcp2515.hpp>
 #include <xpcc/driver/software_spi.hpp>
 

@@ -32,7 +32,7 @@
 
 #include <iostream>
 
-#include <xpcc/communication/io/iostream.hpp>
+#include <xpcc/io/iostream.hpp>
 #include <xpcc/architecture/pc/terminal.hpp>
 
 int

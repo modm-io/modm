@@ -5,7 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -30,51 +30,33 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC__COMMUNICATABLE_TASK_HPP
-#define	XPCC__COMMUNICATABLE_TASK_HPP
+#include <xpcc/container/pair.hpp>
+#include <xpcc/architecture/general/accessor/flash.hpp>
 
-#include <xpcc/communication/communicatable.hpp>
-#include <xpcc/communication/abstract_component.hpp>
-#include <xpcc/communication/communication.hpp>
-#include "task.hpp"
+#include "pair_test.hpp"
 
-namespace xpcc
+// check if Pair could be stored inside the Flash memory
+typedef xpcc::Pair<uint8_t, int16_t> myPair;
+
+FLASH(myPair values[]) = {
+	{ 1, 3 },
+	{ 5, 30 },
+	{ 27, 100 }
+};
+
+void
+PairTest::testPair()
 {
-	/**
-	 * \brief	A statemachine able to communicate via xpcc
-	 * 
-	 * Needs to be part of a xpcc::AbstractComponent
-	 * 
-	 * \see		xpcc::Task
-	 * 
-	 * \ingroup	workflow
-	 * \author	Fabian Greif
-	 */
-	class CommunicatableTask : public Task, public Communicatable
-	{
-	public:
-		// [proposition -> dergraaf]: make the constructor private and 
-		// AbstractComponent a friend
-		CommunicatableTask(AbstractComponent *parent) :
-			parent(parent)
-		{
-		}
-		
-	protected:
-		inline void
-		setCurrentComponent()
-		{
-			this->parent->setCurrentComponent();
-		}
-		
-		inline xpcc::Communication*
-		getCommunication()
-		{
-			return parent->communication;
-		}
-		
-		AbstractComponent *parent;
-	};
+	xpcc::accessor::Flash<myPair> ptr(values);
+	
+	TEST_ASSERT_EQUALS(ptr[1].getFirst(), 5);
+	TEST_ASSERT_EQUALS(ptr[1].getSecond(), 30);
+	
+	TEST_ASSERT_EQUALS(ptr[2].getFirst(), 27);
+	TEST_ASSERT_EQUALS(ptr[2].getSecond(), 100);
+	
+	xpcc::Pair<int16_t, int16_t> pair = { 124, -1523 };
+	
+	TEST_ASSERT_EQUALS(pair.getFirst(), 124);
+	TEST_ASSERT_EQUALS(pair.getSecond(), -1523);
 }
-
-#endif	// XPCC__COMMUNICATABLE_TASK_HPP

@@ -30,9 +30,9 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/communication/xpcc/communication.hpp>
-#include <xpcc/communication/xpcc/postman/stl/postman.hpp>
-#include <xpcc/communication/xpcc/backend/tipc/tipc.hpp>
+#include <xpcc/communication/communication.hpp>
+#include <xpcc/communication/postman/stl/postman.hpp>
+#include <xpcc/communication/backend/tipc/tipc.hpp>
 
 #include <xpcc/debug/logger/imp/std.hpp>
 // set the Loglevel

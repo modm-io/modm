@@ -5,7 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -30,51 +30,30 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC__COMMUNICATABLE_TASK_HPP
-#define	XPCC__COMMUNICATABLE_TASK_HPP
+#include <xpcc/container/list.hpp>
 
-#include <xpcc/communication/communicatable.hpp>
-#include <xpcc/communication/abstract_component.hpp>
-#include <xpcc/communication/communication.hpp>
-#include "task.hpp"
+#include "list_factory_test.hpp"
 
-namespace xpcc
+typedef xpcc::List<int16_t> MyList;
+
+void
+ListFactoryTest::testFactory()
 {
-	/**
-	 * \brief	A statemachine able to communicate via xpcc
-	 * 
-	 * Needs to be part of a xpcc::AbstractComponent
-	 * 
-	 * \see		xpcc::Task
-	 * 
-	 * \ingroup	workflow
-	 * \author	Fabian Greif
-	 */
-	class CommunicatableTask : public Task, public Communicatable
-	{
-	public:
-		// [proposition -> dergraaf]: make the constructor private and 
-		// AbstractComponent a friend
-		CommunicatableTask(AbstractComponent *parent) :
-			parent(parent)
-		{
-		}
-		
-	protected:
-		inline void
-		setCurrentComponent()
-		{
-			this->parent->setCurrentComponent();
-		}
-		
-		inline xpcc::Communication*
-		getCommunication()
-		{
-			return parent->communication;
-		}
-		
-		AbstractComponent *parent;
-	};
+	MyList::NodeFactory<3> *factory = new MyList::NodeFactory<3>();
+	
+	TEST_ASSERT_FALSE(factory->isEmpty());
+	
+	MyList list;
+	
+	list.append(factory->getNode(1));
+	list.append(factory->getNode(2));
+	list.append(factory->getNode(3));
+	
+	TEST_ASSERT_TRUE(factory->isEmpty());
+	
+	TEST_ASSERT_EQUALS(list.at(0)->getValue(), 1);
+	TEST_ASSERT_EQUALS(list.at(1)->getValue(), 2);
+	TEST_ASSERT_EQUALS(list.at(2)->getValue(), 3);
+	
+	delete factory;
 }
-
-#endif	// XPCC__COMMUNICATABLE_TASK_HPP

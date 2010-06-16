@@ -3,7 +3,7 @@
 
 #include <avr/interrupt.h>
 
-#include <xpcc/communication/io/iostream.hpp>
+#include <xpcc/io/iostream.hpp>
 #include <xpcc/communication/apb/interface.hpp>
 
 #include <xpcc/architecture/general/time/delay.hpp>

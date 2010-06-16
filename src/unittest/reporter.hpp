@@ -35,7 +35,7 @@
 
 #include <stdint.h>
 
-#include <xpcc/communication/io/iostream.hpp>
+#include <xpcc/io/iostream.hpp>
 #include <xpcc/architecture/general/accessor/flash.hpp>
 
 namespace unittest

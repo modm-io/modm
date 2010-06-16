@@ -34,7 +34,7 @@
 #define	XPCC__TIMESTAMP_HPP
 
 #include <stdint.h>
-#include <xpcc/communication/io/iostream.hpp>
+#include <xpcc/io/iostream.hpp>
 
 namespace xpcc
 {

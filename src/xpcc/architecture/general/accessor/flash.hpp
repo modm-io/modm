@@ -36,7 +36,7 @@
 #include <xpcc/utils/macros.hpp>
 #include <xpcc/utils/modifier.hpp>
 
-#include <xpcc/communication/io/iostream.hpp>
+#include <xpcc/io/iostream.hpp>
 
 #include "flash_reader.hpp"
 

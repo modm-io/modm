@@ -30,51 +30,79 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC__COMMUNICATABLE_TASK_HPP
-#define	XPCC__COMMUNICATABLE_TASK_HPP
+#ifndef XPCC__TIPC_H
+#define XPCC__TIPC_H
 
-#include <xpcc/communication/communicatable.hpp>
-#include <xpcc/communication/abstract_component.hpp>
-#include <xpcc/communication/communication.hpp>
-#include "task.hpp"
+#include <xpcc/driver/tipc/header.hpp>
+#include <xpcc/driver/tipc/tipc_receiver.hpp>
+#include <xpcc/driver/tipc/tipc_transmitter.hpp>
+#include <xpcc/container/smart_pointer.hpp>
+
+#include "../backend_interface.hpp"
 
 namespace xpcc
 {
 	/**
-	 * \brief	A statemachine able to communicate via xpcc
-	 * 
-	 * Needs to be part of a xpcc::AbstractComponent
-	 * 
-	 * \see		xpcc::Task
-	 * 
-	 * \ingroup	workflow
-	 * \author	Fabian Greif
+	 * \brief	Class that connects the communication to the tipc.
+	 *
+	 * Messages that are received by the same connector, that has transmitted
+	 * them, will be ignored.
+	 *
+	 * \see tipc
+	 *
+	 * \ingroup	backend
+	 * \author	Martin Rosekeit <martin.rosekeit@rwth-aachen.de>
 	 */
-	class CommunicatableTask : public Task, public Communicatable
+	class TipcConnector : public BackendInterface
 	{
-	public:
-		// [proposition -> dergraaf]: make the constructor private and 
-		// AbstractComponent a friend
-		CommunicatableTask(AbstractComponent *parent) :
-			parent(parent)
-		{
-		}
-		
-	protected:
-		inline void
-		setCurrentComponent()
-		{
-			this->parent->setCurrentComponent();
-		}
-		
-		inline xpcc::Communication*
-		getCommunication()
-		{
-			return parent->communication;
-		}
-		
-		AbstractComponent *parent;
-	};
-}
+		public :
+			TipcConnector();
 
-#endif	// XPCC__COMMUNICATABLE_TASK_HPP
+			~TipcConnector();
+
+			inline void
+			addEventId(uint8_t id)
+			{
+				this->receiver.addEventId(id);
+			}
+
+			inline void
+			addReceiverId(uint8_t id)
+			{
+				this->receiver.addReceiverId(id);
+			}
+
+			/// Check if a new packet was received by the backend
+			virtual bool
+			isPacketAvailable() const;
+
+			/// Access the packet.
+			virtual const ::xpcc::Header&
+			getPacketHeader() const;
+
+			virtual const ::xpcc::SmartPointer
+			getPacketPayload() const;
+
+			virtual uint8_t
+			getPacketPayloadSize() const;
+
+			virtual void
+			dropPacket();
+
+			virtual void
+			update();
+
+			/**
+			 * Send a Message.
+			 */
+			virtual void
+			sendPacket(const ::xpcc::Header &header,
+					   SmartPointer payload = SmartPointer());
+
+		private :
+			::xpcc::tipc::Transmitter	transmitter;
+			::xpcc::tipc::Receiver		receiver;
+	};
+};
+ 
+#endif	// XPCC__TIPC_H

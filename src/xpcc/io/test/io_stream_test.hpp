@@ -5,7 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -30,51 +30,61 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC__COMMUNICATABLE_TASK_HPP
-#define	XPCC__COMMUNICATABLE_TASK_HPP
+#include <unittest/testsuite.hpp>
+#include <xpcc/io/iostream.hpp>
 
-#include <xpcc/communication/communicatable.hpp>
-#include <xpcc/communication/abstract_component.hpp>
-#include <xpcc/communication/communication.hpp>
-#include "task.hpp"
-
-namespace xpcc
+class IoStreamTest : public unittest::TestSuite
 {
-	/**
-	 * \brief	A statemachine able to communicate via xpcc
-	 * 
-	 * Needs to be part of a xpcc::AbstractComponent
-	 * 
-	 * \see		xpcc::Task
-	 * 
-	 * \ingroup	workflow
-	 * \author	Fabian Greif
-	 */
-	class CommunicatableTask : public Task, public Communicatable
-	{
-	public:
-		// [proposition -> dergraaf]: make the constructor private and 
-		// AbstractComponent a friend
-		CommunicatableTask(AbstractComponent *parent) :
-			parent(parent)
-		{
-		}
-		
-	protected:
-		inline void
-		setCurrentComponent()
-		{
-			this->parent->setCurrentComponent();
-		}
-		
-		inline xpcc::Communication*
-		getCommunication()
-		{
-			return parent->communication;
-		}
-		
-		AbstractComponent *parent;
-	};
-}
+public:
+	virtual void
+	setUp();
+	
+	virtual void
+	tearDown();
+	
+	
+	void
+	testString();
+	
+	void
+	testFlashString();
+	
+	void
+	testByte();
+	
+	void
+	testByteSigned();
+	
+	void
+	testShort();
+	
+	void
+	testShortSigned();
+	
+	void
+	testInteger();
+	
+	void
+	testFloat();
+	
+	void
+	testFloat2();
+	
+	void
+	testFloat3();
+	
+	void
+	testFloat4();
 
-#endif	// XPCC__COMMUNICATABLE_TASK_HPP
+	void
+	testHex1();
+
+	void
+	testHex2();
+
+	void
+	testHex3();
+
+private:
+	xpcc::IOStream *stream;
+};

@@ -8,8 +8,8 @@
 #include <xpcc/driver/lcd/dog_m16x.hpp>
 #include <xpcc/driver/debounce.hpp>
 
-#include <xpcc/communication/io/iostream.hpp>
-#include <xpcc/communication/io/iodevice_wrapper.hpp>
+#include <xpcc/io/iostream.hpp>
+#include <xpcc/io/iodevice_wrapper.hpp>
 
 #include <xpcc/utils/misc.hpp>
 

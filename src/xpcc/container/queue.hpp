@@ -30,51 +30,116 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC__COMMUNICATABLE_TASK_HPP
-#define	XPCC__COMMUNICATABLE_TASK_HPP
+#ifndef	XPCC_QUEUE_HPP
+#define	XPCC_QUEUE_HPP
 
-#include <xpcc/communication/communicatable.hpp>
-#include <xpcc/communication/abstract_component.hpp>
-#include <xpcc/communication/communication.hpp>
-#include "task.hpp"
+#include "deque.hpp"
 
 namespace xpcc
 {
 	/**
-	 * \brief	A statemachine able to communicate via xpcc
+	 * \brief	FIFO queue
 	 * 
-	 * Needs to be part of a xpcc::AbstractComponent
+	 * Elements are pushed into the "back" of the specific container and popped 
+	 * from its "front".
 	 * 
-	 * \see		xpcc::Task
+	 * \tparam	T			type
+	 * \tparam	Container	container
 	 * 
-	 * \ingroup	workflow
+	 * \see		Deque()
+	 * 
 	 * \author	Fabian Greif
+	 * \ingroup	container
 	 */
-	class CommunicatableTask : public Task, public Communicatable
+	template<typename T,
+			 typename Container>
+	class Queue
 	{
 	public:
-		// [proposition -> dergraaf]: make the constructor private and 
-		// AbstractComponent a friend
-		CommunicatableTask(AbstractComponent *parent) :
-			parent(parent)
+		typedef typename Container::Size Size;
+		
+	public:
+		bool
+		isEmpty()
 		{
+			return c.isEmpty();
 		}
 		
+		bool
+		isFull()
+		{
+			return c.isFull();
+		}
+		
+		Size
+		getSize()
+		{
+			return c.getSize();
+		}
+		
+		Size
+		getMaxSize()
+		{
+			return c.getMaxSize();
+		}
+		
+		/// Access first element
+		T&
+		front()
+		{
+			return c.front();
+		}
+		
+		/// Access first element
+		const T&
+		front() const
+		{
+			return c.front();
+		}
+		
+		/// Access last element
+		T&
+		back()
+		{
+			return c.back();
+		}
+		
+		/// Access last element
+		const T&
+		back() const
+		{
+			return c.back();
+		}
+		
+		bool
+		push(const T& value)
+		{
+			return c.pushBack(value);
+		}
+		
+		void
+		pop()
+		{
+			c.popFront();
+		}
+
 	protected:
-		inline void
-		setCurrentComponent()
-		{
-			this->parent->setCurrentComponent();
-		}
-		
-		inline xpcc::Communication*
-		getCommunication()
-		{
-			return parent->communication;
-		}
-		
-		AbstractComponent *parent;
+		Container c;
 	};
+
+
+	// ------------------------------------------------------------------------
+	/**
+	 * \brief	Bounded queue
+	 * \ingroup	container
+	 */
+	template<typename T, 
+			 int N,
+			 typename Container=BoundedDeque<T, N> >
+	class BoundedQueue : public Queue<T, Container>
+	{
+	};
+
 }
 
-#endif	// XPCC__COMMUNICATABLE_TASK_HPP
+#endif	// XPCC_QUEUE_HPP
