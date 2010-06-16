@@ -30,20 +30,40 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <unittest/testsuite.hpp>
+#if defined(__AVR__) && defined(__AVR_HAVE_MUL__)
+	#include <xpcc/architecture/avr/math.hpp>
+#endif
 
-class PositionTest : public unittest::TestSuite
+#include "point.hpp"
+
+// this explicit namespace is needed here, otherwise we get an error about 
+// "specialization of ... in different namespace"
+namespace xpcc
 {
-public:
-	void
-	testConstructor();
-	
-	void
-	testLengthAndAngle();
-	
-	void
-	testRotation();
-	
-	void
-	testArithmetics();
-};
+	template<>
+	Point<float>&
+	Point<float>::rotate(const Angle& phi)
+	{
+		float c = cos(phi).toFloat();
+		float s = sin(phi).toFloat();
+
+		float tx = (c * this->x - s * this->y);
+		this->y =  (s * this->x + c * this->y);
+		this->x = tx;
+
+		return *this;
+	}
+
+#if defined(__AVR__) && defined(__AVR_HAVE_MUL__)
+	template<>
+	int16_t
+	Point<int16_t>::getLength() const
+	{
+		int32_t t;
+		t = avr::mul32(x, x);
+		t = avr::mac32(t, y, y);
+		
+		return avr::sqrt32_round(t);
+	}
+#endif
+}

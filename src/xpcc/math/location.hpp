@@ -36,7 +36,7 @@
 #include <xpcc/communication/io/iostream.hpp>
 
 #include "angle.hpp"
-#include "position.hpp"
+#include "point.hpp"
 
 namespace xpcc
 {
@@ -49,11 +49,11 @@ namespace xpcc
 	class Location
 	{
 	public:
-		typedef ::xpcc::Position<T> Position;
+		typedef ::xpcc::Point<T> Point;
 		
 		Location();
 		
-		Location(const Position& position, const Angle& phi);
+		Location(const Point& point, const Angle& phi);
 		
 		Location(const T& x, const T& y, const Angle& phi);
 		
@@ -65,14 +65,14 @@ namespace xpcc
 		void
 		update(T x, Angle& phi);
 		
-		inline const Position&
-		getPosition() const;
+		inline const Point&
+		getPoint() const;
 		
 		void
-		setPosition(const Position& position);
+		setPoint(const Point& point);
 		
 		void
-		setPosition(const T& x, const T& y);
+		setPoint(const T& x, const T& y);
 		
 		inline const Angle&
 		getAngle() const;
@@ -89,7 +89,7 @@ namespace xpcc
 		friend IOStream&
 		operator <<( IOStream&, const Location<U>&);
 		
-		Position position;
+		Point point;
 		Angle phi;
 	};
 

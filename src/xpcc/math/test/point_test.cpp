@@ -31,14 +31,14 @@
 // ----------------------------------------------------------------------------
 
 #include <math.h>
-#include <xpcc/math/position.hpp>
+#include <xpcc/math/point.hpp>
 
-#include "position_test.hpp"
+#include "point_test.hpp"
 
 void
-PositionTest::testConstructor()
+PointTest::testConstructor()
 {
-	xpcc::Position<int16_t> coord;
+	xpcc::Point<int16_t> coord;
 	
 	TEST_ASSERT_EQUALS(coord.getX(), 0);
 	TEST_ASSERT_EQUALS(coord.getY(), 0);
@@ -55,10 +55,10 @@ PositionTest::testConstructor()
 }
 
 void
-PositionTest::testLengthAndAngle()
+PointTest::testLengthAndAngle()
 {
 	xpcc::Angle angle;
-	xpcc::Position<int16_t> coord(100, 100);
+	xpcc::Point<int16_t> coord(100, 100);
 	
 	TEST_ASSERT_EQUALS(coord.getLength(), 141);
 	angle = coord.getAngle();
@@ -78,9 +78,9 @@ PositionTest::testLengthAndAngle()
 }
 
 void
-PositionTest::testRotation()
+PointTest::testRotation()
 {
-	xpcc::Position<int16_t> coord(100, 200);
+	xpcc::Point<int16_t> coord(100, 200);
 	
 	coord.rotate(M_PI / 2);
 	
@@ -94,11 +94,11 @@ PositionTest::testRotation()
 }
 
 void
-PositionTest::testArithmetics()
+PointTest::testArithmetics()
 {
-	xpcc::Position<int16_t> x(100, 100);
-	xpcc::Position<int16_t> y(100, 100);
-	xpcc::Position<int16_t> z;
+	xpcc::Point<int16_t> x(100, 100);
+	xpcc::Point<int16_t> y(100, 100);
+	xpcc::Point<int16_t> z;
 	
 	x += y;
 	

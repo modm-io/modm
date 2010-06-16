@@ -30,8 +30,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC__POSITION_HPP
-#define	XPCC__POSITION_HPP
+#ifndef	XPCC__POINT_HPP
+#define	XPCC__POINT_HPP
 
 #include <math.h>
 #include <stdint.h>
@@ -42,21 +42,18 @@
 namespace xpcc
 {
 	/**
-	 * \brief	2D Position
-	 * 
-	 * \todo	proposition: rename this class to Point due to its wider use
-	 * 			as general coordinate representation
+	 * \brief	2D Point
 	 * 
 	 * \ingroup	math
 	 * \todo	operators for > < >= <=
 	 */
 	template<typename T = int16_t>
-	class Position
+	class Point
 	{
 	public:
-		Position();
+		Point();
 		
-		Position(const T& x, const T& y);
+		Point(const T& x, const T& y);
 		
 		void
 		setX(const T& value);
@@ -88,30 +85,30 @@ namespace xpcc
 		/**
 		 * \brief	Normalise length to 1
 		 */
-		Position&
+		Point&
 		normalize();
 
 		/**
 		 * \brief	Scale the length by \p factor
 		 */
 		template<typename U>
-		Position&
+		Point&
 		scale(const U& factor);
 
-		Position&
+		Point&
 		rotate(const Angle& phi);
 		
-		Position&
-		operator += (const Position &other);
+		Point&
+		operator += (const Point &other);
 		
-		Position&
-		operator -= (const Position &other);
+		Point&
+		operator -= (const Point &other);
 		
 		/**
-		 * \brief	Convert between Position-objects with different base-types
+		 * \brief	Convert between Point-objects with different base-types
 		 */
 		template<typename U>
-		operator Position<U>() const;
+		operator Point<U>() const;
 	
 	private:
 		T x;
@@ -119,77 +116,77 @@ namespace xpcc
 		
 	private:
 		template<typename U>
-		friend Position<U>
-		operator - (const Position<U> &a);
+		friend Point<U>
+		operator - (const Point<U> &a);
 		
 		template<typename U>
-		friend Position<U>
-		operator - (const Position<U> &a, const Position<U> &b);
+		friend Point<U>
+		operator - (const Point<U> &a, const Point<U> &b);
 		
 		template<typename U, typename V>
-		friend Position<U>
-		operator - (const Position<U> &a, const Position<V> &b);
+		friend Point<U>
+		operator - (const Point<U> &a, const Point<V> &b);
 
 		template<typename U>
-		friend Position<U>
-		operator + (const Position<U> &a, const Position<U> &b);
+		friend Point<U>
+		operator + (const Point<U> &a, const Point<U> &b);
 		
 		template<typename U, typename V>
-		friend Position<U>
-		operator + (const Position<U> &a, const Position<V> &b);
+		friend Point<U>
+		operator + (const Point<U> &a, const Point<V> &b);
 
 		template<typename U>
 		friend bool
-		operator == (const Position<U> &a, const Position<U> &b);
+		operator == (const Point<U> &a, const Point<U> &b);
 		
 		template<typename U>
 		friend bool
-		operator != (const Position<U> &a, const Position<U> &b);
+		operator != (const Point<U> &a, const Point<U> &b);
 
 		template<typename U>
 		friend IOStream&
-		operator <<(IOStream& s, const Position<U>& c);
+		operator <<(IOStream& s, const Point<U>& c);
 
 		template<typename U, typename V>
 		friend U
-		scalar(const Position<U> &a, const Position<V> &b);
+		scalar(const Point<U> &a, const Point<V> &b);
 	};
 	
 	template<typename U>
-	Position<U>
-	operator - (const Position<U> &a);
+	Point<U>
+	operator - (const Point<U> &a);
 	
 	template<typename U>
-	Position<U>
-	operator - (const Position<U> &a, const Position<U> &b);
+	Point<U>
+	operator - (const Point<U> &a, const Point<U> &b);
 	
 	template<typename U, typename V>
-	Position<U>
-	operator - (const Position<U> &a, const Position<V> &b);
+	Point<U>
+	operator - (const Point<U> &a, const Point<V> &b);
 
 	template<typename U>
-	Position<U>
-	operator + (const Position<U> &a, const Position<U> &b);
+	Point<U>
+	operator + (const Point<U> &a, const Point<U> &b);
 	
 	template<typename U, typename V>
-	Position<U>
-	operator + (const Position<U> &a, const Position<V> &b);
+	Point<U>
+	operator + (const Point<U> &a, const Point<V> &b);
 
 	template<typename U>
 	bool
-	operator == (const Position<U> &a, const Position<U> &b);
+	operator == (const Point<U> &a, const Point<U> &b);
 	
 	template<typename U>
 	bool
-	operator != (const Position<U> &a, const Position<U> &b);
+	operator != (const Point<U> &a, const Point<U> &b);
 	
 	/**
-	 * \brief	Stream operator for \b xpcc::Position<U>
+	 * \brief	Stream operator for \b xpcc::Point<U>
 	 * \ingroup	math
 	 */
 	template<typename U>
 	IOStream&
-	operator << (IOStream& s, const Position<U>& c);
+	operator << (IOStream& s, const Point<U>& c);
 
 	/**
 	 * \brief	Calculates the scalar product of two vectors
@@ -197,9 +194,9 @@ namespace xpcc
 	 */
 	template<typename U, typename V>
 	U
-	scalar(const Position<U> &a, const Position<V> &b);
+	scalar(const Point<U> &a, const Point<V> &b);
 }
 
-#include "position_impl.hpp"
+#include "point_impl.hpp"
 
-#endif	// XPCC__POSITION_HPP
+#endif	// XPCC__POINT_HPP

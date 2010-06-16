@@ -35,20 +35,20 @@
 // -----------------------------------------------------------------------------
 template <typename T>
 xpcc::Location<T>::Location() :
-	position(), phi()
+	point(), phi()
 {
 }
 
 template <typename T>
-xpcc::Location<T>::Location(const Position& position, const Angle& phi) :
-	position(position),
+xpcc::Location<T>::Location(const Point& point, const Angle& phi) :
+	point(point),
 	phi(phi)
 {
 }
 
 template <typename T>
 xpcc::Location<T>::Location(const T& x, const T& y, const Angle& phi) :
-	position(x, y),
+	point(x, y),
 	phi(phi)
 {
 }
@@ -58,7 +58,7 @@ template <typename T>
 void
 xpcc::Location<T>::update(Location<T>& diff)
 {
-	position += diff.position.rotate(phi);
+	point += diff.point.rotate(phi);
 	phi += diff.phi;
 	phi.normalize();
 }
@@ -67,7 +67,7 @@ template <typename T>
 void
 xpcc::Location<T>::update(T x, xpcc::Angle& phi)
 {
-	position += Position(x * cos(this->phi).toFloat(),
+	point += Point(x * cos(this->phi).toFloat(),
 						 x * sin(this->phi).toFloat());
 
 	this->phi += phi;
@@ -76,24 +76,24 @@ xpcc::Location<T>::update(T x, xpcc::Angle& phi)
 
 
 template <typename T>
-const typename xpcc::Location<T>::Position&
-xpcc::Location<T>::getPosition() const
+const typename xpcc::Location<T>::Point&
+xpcc::Location<T>::getPoint() const
 {
-	return this->position;
+	return this->point;
 }
 
 template <typename T>
 void
-xpcc::Location<T>::setPosition(const Position& position)
+xpcc::Location<T>::setPoint(const Point& point)
 {
-	this->position = position;
+	this->point = point;
 }
 
 template <typename T>
 void
-xpcc::Location<T>::setPosition(const T& x, const T& y)
+xpcc::Location<T>::setPoint(const T& x, const T& y)
 {
-	this->position.set(x, y);
+	this->point.set(x, y);
 }
 
 template <typename T>
@@ -114,7 +114,7 @@ xpcc::Location<T>::setAngle(const Angle& phi)
 template<typename T> template<typename U>
 xpcc::Location<T>::operator Location<U>() const
 {
-	return Location<U>(this->position, this->phi);
+	return Location<U>(this->point, this->phi);
 }
 
 // ----------------------------------------------------------------------------
@@ -122,6 +122,6 @@ template<class T>
 xpcc::IOStream&
 xpcc::operator << (xpcc::IOStream& os, const xpcc::Location<T>& location)
 {
-	os << location.position << ", phi=" << location.phi;
+	os << location.point << ", phi=" << location.phi;
 	return os;
 }

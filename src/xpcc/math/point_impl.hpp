@@ -30,19 +30,19 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC__POSITION_HPP
-	#error	"Don't include this file directly, use 'math/position.hpp' instead!"
+#ifndef	XPCC__POINT_HPP
+	#error	"Don't include this file directly, use 'math/point.hpp' instead!"
 #endif
 
 // ----------------------------------------------------------------------------
 template<typename T>
-xpcc::Position<T>::Position() :
+xpcc::Point<T>::Point() :
 	x(), y()
 {
 }
 
 template<typename T>
-xpcc::Position<T>::Position(const T& x, const T& y) : 
+xpcc::Point<T>::Point(const T& x, const T& y) : 
 	x(x), y(y)
 {
 }
@@ -50,7 +50,7 @@ xpcc::Position<T>::Position(const T& x, const T& y) :
 // ----------------------------------------------------------------------------
 template<typename T>
 void
-xpcc::Position<T>::setX(const T& value)
+xpcc::Point<T>::setX(const T& value)
 {
 	x = value;
 }
@@ -58,7 +58,7 @@ xpcc::Position<T>::setX(const T& value)
 // ----------------------------------------------------------------------------
 template<typename T>
 void
-xpcc::Position<T>::setY(const T& value)
+xpcc::Point<T>::setY(const T& value)
 {
 	y = value;
 }
@@ -66,7 +66,7 @@ xpcc::Position<T>::setY(const T& value)
 // ----------------------------------------------------------------------------
 template<typename T>
 void
-xpcc::Position<T>::set(const T& x, const T& y)
+xpcc::Point<T>::set(const T& x, const T& y)
 {
 	this->x = x;
 	this->y = y;
@@ -75,7 +75,7 @@ xpcc::Position<T>::set(const T& x, const T& y)
 // ----------------------------------------------------------------------------
 template<typename T>
 const T&
-xpcc::Position<T>::getX() const
+xpcc::Point<T>::getX() const
 {
 	return x;
 }
@@ -83,7 +83,7 @@ xpcc::Position<T>::getX() const
 // ----------------------------------------------------------------------------
 template<typename T>
 const T&
-xpcc::Position<T>::getY() const
+xpcc::Point<T>::getY() const
 {
 	return y;
 }
@@ -91,7 +91,7 @@ xpcc::Position<T>::getY() const
 // ----------------------------------------------------------------------------
 template<typename T>
 T
-xpcc::Position<T>::getLength() const
+xpcc::Point<T>::getLength() const
 {
 	float tx = x;
 	float ty = y;
@@ -102,15 +102,15 @@ xpcc::Position<T>::getLength() const
 // ----------------------------------------------------------------------------
 template<typename T>
 xpcc::Angle
-xpcc::Position<T>::getAngle() const
+xpcc::Point<T>::getAngle() const
 {
 	return atan2(y, x);
 }
 
 // ----------------------------------------------------------------------------
 template<typename T>
-xpcc::Position<T>&
-xpcc::Position<T>::normalize()
+xpcc::Point<T>&
+xpcc::Point<T>::normalize()
 {
 	T length = this->getLength();
 	this->x = this->x / length;
@@ -122,8 +122,8 @@ xpcc::Position<T>::normalize()
 // ----------------------------------------------------------------------------
 template<typename T>
 template<typename U>
-xpcc::Position<T>&
-xpcc::Position<T>::scale(const U& factor)
+xpcc::Point<T>&
+xpcc::Point<T>::scale(const U& factor)
 {
 	this->x = this->x * factor;
 	this->y = this->y * factor;
@@ -133,8 +133,8 @@ xpcc::Position<T>::scale(const U& factor)
 
 // ----------------------------------------------------------------------------
 template<typename T>
-xpcc::Position<T>&
-xpcc::Position<T>::rotate(const Angle& phi)
+xpcc::Point<T>&
+xpcc::Point<T>::rotate(const Angle& phi)
 {
 	float c = cos(phi).toFloat();
 	float s = sin(phi).toFloat();
@@ -149,8 +149,8 @@ xpcc::Position<T>::rotate(const Angle& phi)
 
 // ----------------------------------------------------------------------------
 template<typename T>
-xpcc::Position<T>&
-xpcc::Position<T>::operator += (const Position &other)
+xpcc::Point<T>&
+xpcc::Point<T>::operator += (const Point &other)
 {
 	this->x += other.x;
 	this->y += other.y;
@@ -159,8 +159,8 @@ xpcc::Position<T>::operator += (const Position &other)
 
 // ----------------------------------------------------------------------------	
 template<typename T>
-xpcc::Position<T>&
-xpcc::Position<T>::operator -= (const Position &other)
+xpcc::Point<T>&
+xpcc::Point<T>::operator -= (const Point &other)
 {
 	this->x -= other.x;
 	this->y -= other.y;
@@ -169,65 +169,65 @@ xpcc::Position<T>::operator -= (const Position &other)
 
 // ----------------------------------------------------------------------------
 template<typename T> template<typename U>
-xpcc::Position<T>::operator Position<U>() const
+xpcc::Point<T>::operator Point<U>() const
 {
-	return Position<U>(this->x, this->y);
+	return Point<U>(this->x, this->y);
 }
 
 // ----------------------------------------------------------------------------
 
 template<typename U>
-xpcc::Position<U>
-xpcc::operator - (const Position<U> &a)
+xpcc::Point<U>
+xpcc::operator - (const Point<U> &a)
 {
-	return Position<U>(-a.x, -a.y);
+	return Point<U>(-a.x, -a.y);
 }
 
 template<typename U>
-xpcc::Position<U>
-xpcc::operator - (const Position<U> &a, const Position<U> &b)
+xpcc::Point<U>
+xpcc::operator - (const Point<U> &a, const Point<U> &b)
 {
-	return Position<U>(a.x - b.x, a.y - b.y);
+	return Point<U>(a.x - b.x, a.y - b.y);
 }
 
 template<typename U, typename V>
-xpcc::Position<U>
-xpcc::operator - (const Position<U> &a, const Position<V> &b)
+xpcc::Point<U>
+xpcc::operator - (const Point<U> &a, const Point<V> &b)
 {
-	return Position<U>(a.x - b.x, a.y - b.y);
+	return Point<U>(a.x - b.x, a.y - b.y);
 }
 
 template<typename U>
-xpcc::Position<U>
-xpcc::operator + (const Position<U> &a, const Position<U> &b)
+xpcc::Point<U>
+xpcc::operator + (const Point<U> &a, const Point<U> &b)
 {
-	return Position<U>(a.x + b.x, a.y + b.y);
+	return Point<U>(a.x + b.x, a.y + b.y);
 }
 
 template<typename U,typename V>
-xpcc::Position<U>
-xpcc::operator + (const Position<U> &a, const Position<V> &b)
+xpcc::Point<U>
+xpcc::operator + (const Point<U> &a, const Point<V> &b)
 {
-	return Position<U>(a.x + b.x, a.y + b.y);
+	return Point<U>(a.x + b.x, a.y + b.y);
 }
 
 template<typename U>
 bool
-xpcc::operator == (const Position<U> &a, const Position<U> &b)
+xpcc::operator == (const Point<U> &a, const Point<U> &b)
 {
 	return (a.x == b.x) && (a.y == b.y);
 }
 
 template<typename U>
 bool
-xpcc::operator != (const Position<U> &a, const Position<U> &b)
+xpcc::operator != (const Point<U> &a, const Point<U> &b)
 {
 	return (a.x != b.x) || (a.y != b.y);
 }
 
 template <typename U>
 xpcc::IOStream&
-xpcc::operator <<( xpcc::IOStream& s, const xpcc::Position<U>& c)
+xpcc::operator <<( xpcc::IOStream& s, const xpcc::Point<U>& c)
 {
 	s << "x=" << c.x << ", y=" << c.y;
 	return s;
@@ -235,7 +235,7 @@ xpcc::operator <<( xpcc::IOStream& s, const xpcc::Position<U>& c)
 
 template<typename U, typename V>
 U
-xpcc::scalar(const xpcc::Position<U> &a, const xpcc::Position<V> &b)
+xpcc::scalar(const xpcc::Point<U> &a, const xpcc::Point<V> &b)
 {
 	return ( a.x*b.x + a.y*b.y );
 }
