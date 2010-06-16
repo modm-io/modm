@@ -47,27 +47,30 @@ namespace xpcc
 	 */
 	struct Header
 	{
-		typedef enum {
+		enum Type
+		{
 			REQUEST,
 			RESPONSE,
 			NEGATIVE_RESPONSE,
-		} Type;
+		};
 
 		Header() :
 			type( REQUEST ),
-			isAcknowledge ( false ),
-			destination ( 0 ),
-			source ( 0 ),
-			packetIdentifier ( 0 )
-		{};
+			isAcknowledge( false ),
+			destination( 0 ),
+			source( 0 ),
+			packetIdentifier( 0 )
+		{
+		}
 
 		Header(Type type, bool isAck, uint8_t dest, uint8_t source, uint8_t id) :
 			type( type ),
-			isAcknowledge ( isAck ),
-			destination ( dest ),
-			source ( source ),
-			packetIdentifier ( id )
-		{};
+			isAcknowledge( isAck ),
+			destination( dest ),
+			source( source ),
+			packetIdentifier( id )
+		{
+		}
 		
 		Type type;
 		bool isAcknowledge;
@@ -77,7 +80,8 @@ namespace xpcc
 		uint8_t packetIdentifier;
 		
 		bool
-		operator==(const Header& other) {
+		operator == (const Header& other)
+		{
 			return ((type == other.type) &&
 					(isAcknowledge == other.isAcknowledge) &&
 					(destination == other.destination) &&

@@ -29,34 +29,27 @@
  * $Id$
  */
 // ----------------------------------------------------------------------------
-#ifndef XPCC_CAN_CONNECTOR_HPP
+
+#ifndef XPCC__CAN_CONNECTOR_HPP
 	#error	"Don't include this file directly, use 'can.hpp' instead!"
 #endif
 
 #include "can.hpp"
 #include <xpcc/driver/can/can.hpp>
 
-#include <xpcc/architecture/general/time/delay.hpp>
-#include <xpcc/debug/logger/logger.hpp>
+//#include <xpcc/debug/logger/logger.hpp>
 #include <xpcc/utils/misc.hpp>
 
 #define XPCC_CAN_USE_COUNTER 0
 
 // set the Loglevel
-#undef  XPCC_LOG_LEVEL
-#define XPCC_LOG_LEVEL xpcc::log::INFO
-
-template<typename C>
-xpcc::CanConnector<C>::CanConnector()
-{
-	
-}
+//#undef  XPCC_LOG_LEVEL
+//#define XPCC_LOG_LEVEL xpcc::log::INFO
 
 // -----------------------------------------------------------------------------
 template<typename C>
 xpcc::CanConnector<C>::~CanConnector()
 {
-
 }
 
 // -----------------------------------------------------------------------------
@@ -81,7 +74,6 @@ xpcc::CanConnector<C>::sendPacket(const Header &header, SmartPointer payload)
 		SendListItem* message = new SendListItem(header, payload);
 
 		this->sendList.append( new typename SendList::Node( message ) );
-
 	}
 }
 

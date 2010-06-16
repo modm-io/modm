@@ -29,8 +29,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC_CAN_CONNECTOR_HPP
-#define	XPCC_CAN_CONNECTOR_HPP
+#ifndef	XPCC__CAN_CONNECTOR_HPP
+#define	XPCC__CAN_CONNECTOR_HPP
 
 #include "../backend_interface.hpp"
 
@@ -80,12 +80,10 @@ namespace xpcc
 	 * \ingroup	backend
 	 * \version	$Id$
 	 */
-	template<typename C>
+	template <typename C>
 	class CanConnector : public BackendInterface
 	{
 	public:
-		CanConnector();
-		
 		virtual
 		~CanConnector();
 		
@@ -93,22 +91,26 @@ namespace xpcc
 		sendPacket(const Header &header, SmartPointer payload);
 		
 		virtual bool
-		isPacketAvailable() const {
+		isPacketAvailable() const
+		{
 			return !this->receivedMessages.isEmpty();
 		}
 		
 		virtual const Header&
-		getPacketHeader() const {
+		getPacketHeader() const
+		{
 			return this->receivedMessages.front()->getValue()->header;
 		}
 		
 		virtual const xpcc::SmartPointer
-		getPacketPayload() const {
+		getPacketPayload() const
+		{
 			return this->receivedMessages.front()->getValue()->data;
 		}
 		
 		virtual uint8_t
-		getPacketPayloadSize() const {
+		getPacketPayloadSize() const
+		{
 			return this->receivedMessages.front()->getValue()->size;
 		}
 		
@@ -156,7 +158,8 @@ namespace xpcc
 		public:
 			SendListItem(const Header& header, const SmartPointer& payload) :
 				header(header), payload(payload),
-				fragmentIndex(0) {
+				fragmentIndex(0)
+			{
 			}
 			
 			Header header;
@@ -168,7 +171,7 @@ namespace xpcc
 			SendListItem(const SendListItem& other);
 			
 			SendListItem&
-			operator=(const SendListItem& other);
+			operator = (const SendListItem& other);
 		};
 		
 		class ReceiveListItem
@@ -176,7 +179,8 @@ namespace xpcc
 		public:
 			ReceiveListItem(uint8_t size, const Header& header ) :
 				header(header), data(size), size(size),
-				receivedFragments(0) {
+				receivedFragments(0)
+			{
 			}
 			
 			Header header;
@@ -189,7 +193,7 @@ namespace xpcc
 			ReceiveListItem(const ReceiveListItem& other);
 			
 			ReceiveListItem&
-			operator=(const ReceiveListItem& other);
+			operator = (const ReceiveListItem& other);
 		};
 		
 		typedef typename xpcc::List< SendListItem* > SendList;
@@ -203,4 +207,4 @@ namespace xpcc
 
 #include "can_impl.hpp"
 
-#endif	// XPCC_CAN_CONNECTOR_HPP
+#endif	// XPCC__CAN_CONNECTOR_HPP

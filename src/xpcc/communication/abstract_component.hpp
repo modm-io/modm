@@ -64,30 +64,36 @@ namespace xpcc
 		
 		/**
 		 * \brief	Update the internal state of this component.
-		 * 
-		 * Sets the current component and calls work()
-		 */
-		void
-		update();
-		
-	protected:
-		/**
-		 * \brief	Functionallity of the component
-		 * 
-		 * You should never call this method directly. This is done by
-		 * a call of update().
 		 */
 		virtual void
-		work() = 0;
+		update() = 0;
 		
-		inline void
-		setCurrentComponent()
-		{
-			this->communication->setCurrentComponent(this->componentIdentifier);
-		}
+	protected:
+		void
+		callAction(uint8_t receiver, uint8_t actionIdentifier);
 		
-		const uint8_t componentIdentifier;		///< own identifier
-		Communication *communication;
+		template<typename T>
+		void
+		callAction(uint8_t receiver, uint8_t actionIdentifier, const T& data);
+		
+		void
+		callAction(uint8_t receiver, uint8_t actionIdentifier, Callback& responseCallback);
+
+		template<typename T>
+		void
+		callAction(uint8_t receiver, uint8_t actionIdentifier, const T& data, Callback& responseCallback);
+		
+		template<typename T>
+		void
+		publishEvent(uint8_t eventIdentifier, const T& data);
+		
+		void
+		publishEvent(uint8_t eventIdentifier);
+		
+	// TODO make these private
+	protected:
+		const uint8_t ownIdentifier;
+		Communication * const communication;
 	};
 }
 

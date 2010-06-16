@@ -55,41 +55,6 @@ namespace xpcc
 		void
 		update();
 		
-		
-		// [proposition -> dergraaf]: Make these private and
-		// let Communication/Postman/AbstractCommponent set the correct 
-		// id by itself. The user should not worry about this!
-		uint8_t
-		getCurrentComponent() const;
-		
-		void
-		setCurrentComponent(uint8_t id);
-		
-		
-		// [proposition -> dergraaf]: make these private, and AbstractComponent
-		// a friend. Perhaps give AbstractComponent some proxy methods?
-		void
-		callAction(uint8_t receiver, uint8_t actionIdentifier);
-		
-		template<typename T>
-		void
-		callAction(uint8_t receiver, uint8_t actionIdentifier, const T& data);
-		
-		void
-		callAction(uint8_t receiver, uint8_t actionIdentifier, Callback& responseCallback);
-
-		template<typename T>
-		void
-		callAction(uint8_t receiver, uint8_t actionIdentifier, const T& data, Callback& responseCallback);
-		
-		template<typename T>
-		void
-		publishEvent(uint8_t eventIdentifier, const T& data);
-		
-		void
-		publishEvent(uint8_t eventIdentifier);
-
-		
 		// [proposition -> dergraaf]: Make these methods only available in the correct
 		// circumstances (action call). Perhaps move them methods to the ResponseHandle
 		// class?
@@ -110,48 +75,19 @@ namespace xpcc
 	private:
 		BackendInterface * const backend;
 		Postman * postman;
-		uint8_t currentComponent;
 		communicationList::List responseManager;
 		
 		void
 		waitForAcknowledge(const Header &header, const SmartPointer& payload);
+	
+	private:
+		friend class AbstractComponent;
 	};
 }
 
 // -----------------------------------------------------------------------------
 // IMPLEMENTATION
 // -----------------------------------------------------------------------------
-
-// ----------------------------------------------------------------------------
-template<typename T>
-void
-xpcc::Communication::callAction(uint8_t receiver, uint8_t actionIdentifier, const T& data)
-{
-	Header header(	Header::REQUEST,
-					false,
-					receiver,
-					currentComponent,
-					actionIdentifier);
-	SmartPointer payload(&data);
-
-	this->responseManager.addActionCall(header, payload);
-}
-
-// ----------------------------------------------------------------------------
-template<typename T>
-void
-xpcc::Communication::callAction(uint8_t receiver, uint8_t actionIdentifier, const T& data, Callback& responseCallback)
-{
-	Header header(	Header::REQUEST,
-					false,
-					receiver,
-					currentComponent,
-					actionIdentifier);
-
-	SmartPointer payload(&data);
-
-	this->responseManager.addActionCall(header, payload, responseCallback);
-}
 
 // ----------------------------------------------------------------------------
 template<typename T>
@@ -183,21 +119,6 @@ xpcc::Communication::sendNegativeResponse(const ResponseHandle& handle, const T&
 	SmartPointer payload(&data);
 
 	this->responseManager.addResponse(header, payload);
-}
-
-// ----------------------------------------------------------------------------
-template<typename T>
-void
-xpcc::Communication::publishEvent(uint8_t eventIdentifier, const T& data)
-{
-	Header header(	Header::REQUEST,
-					false,
-					0,
-					currentComponent,
-					eventIdentifier);
-	SmartPointer payload(&data);// no metadata is sent with Events
-
-	this->responseManager.addEvent(header, payload);
 }
 
 #endif // XPCC__COMMUNICATION_HPP

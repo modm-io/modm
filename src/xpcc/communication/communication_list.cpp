@@ -221,7 +221,6 @@ xpcc::communicationList::List::handleWaitingMessages(Postman &postman, BackendIn
 						
 						if (actual->header.type == Header::REQUEST)
 						{
-							communication->setCurrentComponent(actual->header.destination);
 							postman.deliverPacket(actual->header, actual->payload);
 							// todo handle postman errors?
 							if (actual->typeInfo == Entry::CALLBACK){

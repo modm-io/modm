@@ -50,12 +50,12 @@ xpcc::Communication::Communication(
 void
 xpcc::Communication::update()
 {
-	if ( this->postman != 0 )
+	if (this->postman != 0)
 	{
 		this->backend->update();
 		
 		//Check if a new packet was received by the backend
-		while( this->backend->isPacketAvailable() )
+		while (this->backend->isPacketAvailable())
 		{
 			//switch(postman->deliverPacket(backend))){
 			//	case NO_ACTION: // send error message
@@ -64,8 +64,8 @@ xpcc::Communication::update()
 			//	case NO_COMPONENT:
 			//	case NO_EVENT:
 			//}
-			const Header& header( this->backend->getPacketHeader() );
-			const SmartPointer payload( this->backend->getPacketPayload() );
+			const Header& header(this->backend->getPacketHeader());
+			const SmartPointer payload(this->backend->getPacketPayload());
 
 //			if (header.destination == 0x12)
 //				XPCC_LOG_INFO << "_" << xpcc::endl;
@@ -85,7 +85,8 @@ xpcc::Communication::update()
 					}
 				}
 			}
-			else{
+			else
+			{
 				this->responseManager.handlePacket( header, payload );
 				if (!header.isAcknowledge){
 					if ( header.destination != 0 ) {
@@ -117,59 +118,6 @@ xpcc::Communication::update()
 			this->backend->dropPacket();
 		}
 	}
-}
-
-// ----------------------------------------------------------------------------
-uint8_t
-xpcc::Communication::getCurrentComponent() const
-{
-	return this->currentComponent;
-}
-
-void
-xpcc::Communication::setCurrentComponent(uint8_t id)
-{
-	this->currentComponent = id;
-}
-
-// ----------------------------------------------------------------------------
-void
-xpcc::Communication::callAction(uint8_t receiver, uint8_t actionIdentifier)
-{
-	Header header(	Header::REQUEST,
-					false,
-					receiver,
-					currentComponent,
-					actionIdentifier);
-
-	this->responseManager.addActionCall(header);
-}
-
-// ----------------------------------------------------------------------------
-void
-xpcc::Communication::callAction(uint8_t receiver, uint8_t actionIdentifier, Callback& responseCallback)
-{
-	Header header(	Header::REQUEST,
-					false,
-					receiver,
-					currentComponent,
-					actionIdentifier);
-
-	this->responseManager.addActionCall(header, responseCallback);
-}
-
-
-// ----------------------------------------------------------------------------
-void
-xpcc::Communication::publishEvent(uint8_t eventIdentifier)
-{
-	Header header(	Header::REQUEST,
-					false,
-					0,
-					this->currentComponent,
-					eventIdentifier);
-
-	this->responseManager.addEvent(header);
 }
 
 // ----------------------------------------------------------------------------

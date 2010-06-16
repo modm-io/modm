@@ -131,7 +131,7 @@ namespace xpcc
 		 * \ingroup 	communication
 		 * \brief 		List containts Entries.
 		 *
-		 * Entries are lineary linked.
+		 * Entries are linear linked.
 		 * The member this->first points at any time to the dummyFirst.
 		 * The member this->last points at any time to the last entry of the list, or to
 		 * the dummyEntry if no entries in the list.

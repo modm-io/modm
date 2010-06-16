@@ -2,7 +2,7 @@
 // ----------------------------------------------------------------------------
 /* Copyright (c) 2009, Roboterclub Aachen e.V.
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *     * Redistributions of source code must retain the above copyright
@@ -13,7 +13,7 @@
  *     * Neither the name of the Roboterclub Aachen e.V. nor the
  *       names of its contributors may be used to endorse or promote products
  *       derived from this software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY ROBOTERCLUB AACHEN E.V. ''AS IS'' AND ANY
  * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -24,23 +24,35 @@
  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  * $Id$
  */
 // ----------------------------------------------------------------------------
 
-#include "abstract_component.hpp"
+#ifndef	XPCC__ABSTRACT_COMPONENT_HPP
+	#error	"Don't include this file directly, use 'abstract_component.hpp' instead"
+#endif
 
-xpcc::AbstractComponent::AbstractComponent(
-		const uint8_t ownIdentifier,
-		Communication *communication) : 
-	ownIdentifier(ownIdentifier), communication(communication)
-{
-}
 
 // ----------------------------------------------------------------------------
+template<typename T>
 void
-xpcc::AbstractComponent::callAction(uint8_t receiver, uint8_t actionIdentifier)
+xpcc::AbstractComponent::callAction(uint8_t receiver, uint8_t actionIdentifier, const T& data)
+{
+	Header header(Header::REQUEST,
+			false,
+			receiver,
+			this->ownIdentifier,
+			actionIdentifier);
+	
+	SmartPointer payload(&data);
+
+	this->communication->responseManager.addActionCall(header, payload);
+}
+
+template<typename T>
+void
+xpcc::AbstractComponent::callAction(uint8_t receiver, uint8_t actionIdentifier, const T& data, Callback& responseCallback)
 {
 	Header header(Header::REQUEST,
 			false,
@@ -48,31 +60,23 @@ xpcc::AbstractComponent::callAction(uint8_t receiver, uint8_t actionIdentifier)
 			this->ownIdentifier,
 			actionIdentifier);
 
-	this->communication->responseManager.addActionCall(header);
+	SmartPointer payload(&data);
+
+	this->communication->responseManager.addActionCall(header, payload, responseCallback);
 }
-
-void
-xpcc::AbstractComponent::callAction(uint8_t receiver, uint8_t actionIdentifier, Callback& responseCallback)
-{
-	Header header(Header::REQUEST,
-			false,
-			receiver,
-			this->ownIdentifier,
-			actionIdentifier);
-
-	this->communication->responseManager.addActionCall(header, responseCallback);
-}
-
 
 // ----------------------------------------------------------------------------
+template<typename T>
 void
-xpcc::AbstractComponent::publishEvent(uint8_t eventIdentifier)
+xpcc::AbstractComponent::publishEvent(uint8_t eventIdentifier, const T& data)
 {
 	Header header(Header::REQUEST,
 			false,
 			0,
 			this->ownIdentifier,
 			eventIdentifier);
+	
+	SmartPointer payload(&data);	// no metadata is sent with Events
 
-	this->communication->responseManager.addEvent(header);
+	this->communication->responseManager.addEvent(header, payload);
 }
