@@ -31,7 +31,7 @@
 // ----------------------------------------------------------------------------
 
 #ifndef	XPCC__POINT_HPP
-	#error	"Don't include this file directly, use 'math/point.hpp' instead!"
+	#error	"Don't include this file directly, use 'point.hpp' instead!"
 #endif
 
 // ----------------------------------------------------------------------------
@@ -52,7 +52,7 @@ template<typename T>
 void
 xpcc::Point<T>::setX(const T& value)
 {
-	x = value;
+	this->x = value;
 }
 
 // ----------------------------------------------------------------------------
@@ -60,7 +60,7 @@ template<typename T>
 void
 xpcc::Point<T>::setY(const T& value)
 {
-	y = value;
+	this->y = value;
 }
 
 // ----------------------------------------------------------------------------
@@ -77,7 +77,7 @@ template<typename T>
 const T&
 xpcc::Point<T>::getX() const
 {
-	return x;
+	return this->x;
 }
 
 // ----------------------------------------------------------------------------
@@ -85,7 +85,7 @@ template<typename T>
 const T&
 xpcc::Point<T>::getY() const
 {
-	return y;
+	return this->y;
 }
 
 // ----------------------------------------------------------------------------
@@ -93,10 +93,18 @@ template<typename T>
 T
 xpcc::Point<T>::getLength() const
 {
-	float tx = x;
-	float ty = y;
+	float tx = this->x;
+	float ty = this->y;
 	
-	return sqrt(tx*tx + ty*ty);
+	return std::sqrt(tx*tx + ty*ty);
+}
+
+// ----------------------------------------------------------------------------
+template<typename T>
+T
+xpcc::Point<T>::getManhattanLength() const
+{
+	return (std::abs(this->x) + std::abs(this->y));
 }
 
 // ----------------------------------------------------------------------------
@@ -104,7 +112,7 @@ template<typename T>
 xpcc::Angle
 xpcc::Point<T>::getAngle() const
 {
-	return atan2(y, x);
+	return std::atan2(y, x);
 }
 
 // ----------------------------------------------------------------------------
@@ -113,6 +121,7 @@ xpcc::Point<T>&
 xpcc::Point<T>::normalize()
 {
 	T length = this->getLength();
+	
 	this->x = this->x / length;
 	this->y = this->y / length;
 	
@@ -215,27 +224,29 @@ template<typename U>
 bool
 xpcc::operator == (const Point<U> &a, const Point<U> &b)
 {
-	return (a.x == b.x) && (a.y == b.y);
+	return ((a.x == b.x) && (a.y == b.y));
 }
 
 template<typename U>
 bool
 xpcc::operator != (const Point<U> &a, const Point<U> &b)
 {
-	return (a.x != b.x) || (a.y != b.y);
+	return ((a.x != b.x) || (a.y != b.y));
 }
 
+// ----------------------------------------------------------------------------
+template<typename U, typename V>
+U
+xpcc::scalar(const xpcc::Point<U> &a, const xpcc::Point<V> &b)
+{
+	return (a.x * b.x + a.y * b.y);
+}
+
+// ----------------------------------------------------------------------------
 template <typename U>
 xpcc::IOStream&
 xpcc::operator <<( xpcc::IOStream& s, const xpcc::Point<U>& c)
 {
 	s << "x=" << c.x << ", y=" << c.y;
 	return s;
-}
-
-template<typename U, typename V>
-U
-xpcc::scalar(const xpcc::Point<U> &a, const xpcc::Point<V> &b)
-{
-	return ( a.x*b.x + a.y*b.y );
 }

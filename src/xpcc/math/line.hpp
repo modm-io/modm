@@ -30,55 +30,85 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__POLYGON_HPP
-#define XPCC__POLYGON_HPP
+#ifndef XPCC__LINE_HPP
+#define XPCC__LINE_HPP
 
-#include <xpcc/container/vector.hpp>
-#include <xpcc/math/point.hpp>
+#include "point.hpp"
 
 namespace xpcc
 {
 	/**
-	 * \brief	Polygon
-	 *
-	 * The Polygon class provides a vector of points.
-	 *
+	 * \brief	Line
+	 * 
 	 * \author	Fabian Greif
 	 * \ingroup	math
 	 */
 	template <typename T>
-	class Polygon
+	class Line
 	{
-	public:
-		typedef size_t SizeType;
 		typedef Point<T> Point;
-
 	public:
-		/**
-		 * \brief	Constructs a polygon capable of holding n points
-		 */
-		Polygon(SizeType n);
-
+		Line();
+		
+		Line(const Point& start, const Point& end);
+		
 		void
-		append(const Point& point);
-
-		inline Point&
-		operator [](SizeType index)
+		setStartPoint(const Point& point)
 		{
-			return buffer[index];
+			this->start = point;
 		}
-
+		
+		const Point&
+		getStartPoint() const
+		{
+			return this->start;
+		}
+		
+		void
+		setEndPoint(const Point& point)
+		{
+			this->end = point;
+		}
+		
 		inline const Point&
-		operator [](SizeType index) const
+		getEndPoint() const
 		{
-			return buffer[index];
+			return this->end;
 		}
-
+		
+		inline void
+		setPoints(const Point& start, const Point& end)
+		{
+			this->start = start;
+			this->end = end;
+		}
+		
+		T
+		getLength() const;
+		
+	protected:
+		Point start;
+		Point end;
+		
 	private:
-		xpcc::Vector<T> buffer;
+		template<typename U>
+		friend bool
+		operator == (const Line<U> &a, const Line<U> &b);
+		
+		template<typename U>
+		friend bool
+		operator != (const Line<U> &a, const Line<U> &b);
 	};
+	
+	template<typename U>
+	bool
+	operator == (const Line<U> &a, const Line<U> &b);
+	
+	template<typename U>
+	bool
+	operator != (const Line<U> &a, const Line<U> &b);
 }
 
-#include "polygon_impl.hpp"
+#include "line_impl.hpp"
 
-#endif // XPCC__POLYGON_HPP
+#endif // XPCC__LINE_HPP

@@ -33,8 +33,9 @@
 #ifndef	XPCC__POINT_HPP
 #define	XPCC__POINT_HPP
 
-#include <math.h>
+#include <cmath>
 #include <stdint.h>
+
 #include <xpcc/io/iostream.hpp>
 
 #include "angle.hpp"
@@ -44,46 +45,72 @@ namespace xpcc
 	/**
 	 * \brief	2D Point
 	 * 
+	 * A point is specified by a x coordinate and an y coordinate which can
+	 * be accessed using the getX() and getY() functions.
+	 * 
+	 * A Point object can also be used as a vector: Addition and subtraction
+	 * are defined as for vectors (each component is added separately).
+	 * 
 	 * \ingroup	math
-	 * \todo	operators for > < >= <=
 	 */
 	template<typename T = int16_t>
 	class Point
 	{
 	public:
+		/**
+		 * \brief	Default-Constructor
+		 * 
+		 * Creates a Point with coordinates (0, 0).
+		 */
 		Point();
 		
 		Point(const T& x, const T& y);
 		
-		void
+		inline void
 		setX(const T& value);
 		
-		void
+		inline void
 		setY(const T& value);
 		
-		void
+		inline void
 		set(const T& x, const T& y);
 		
-		const T&
+		inline const T&
 		getX() const;
 		
-		const T&
+		inline const T&
 		getY() const;
 		
 		/**
 		 * \brief	Calculate length
+		 * 
+		 * Length of the vector from the origin to the point.
 		 */
 		T
 		getLength() const;
 		
 		/**
+		 * \brief	Calculate Manhattan length
+		 * 
+		 * Returns the sum of the absolute values of x and y, traditionally
+		 * known as the "Manhattan length" of the vector from the origin to
+		 * the point.
+		 * 
+		 * \see		http://en.wikipedia.org/wiki/Taxicab_geometry
+		 */
+		T
+		getManhattanLength() const;
+		
+		/**
 		 * \brief	Calculate the absolute angle
+		 * 
+		 * Absolute angle of the vector from the origin to the point.
 		 */
 		Angle
 		getAngle() const;
 		
 		/**
-		 * \brief	Normalise length to 1
+		 * \brief	Normalize length to 1
 		 */
 		Point&
 		normalize();
@@ -146,7 +173,7 @@ namespace xpcc
 		template<typename U>
 		friend IOStream&
 		operator <<(IOStream& s, const Point<U>& c);
-
+		
 		template<typename U, typename V>
 		friend U
 		scalar(const Point<U> &a, const Point<V> &b);
@@ -181,20 +208,20 @@ namespace xpcc
 	operator != (const Point<U> &a, const Point<U> &b);
 	
 	/**
-	 * \brief	Stream operator for \b xpcc::Point<U>
-	 * \ingroup	math
-	 */
-	template<typename U>
-	IOStream&
-	operator << (IOStream& s, const Point<U>& c);
-
-	/**
 	 * \brief	Calculates the scalar product of two vectors
 	 * \ingroup	math
 	 */
 	template<typename U, typename V>
 	U
 	scalar(const Point<U> &a, const Point<V> &b);
+	
+	/**
+	 * \brief	Stream operator for \b xpcc::Point<U>
+	 * \ingroup	math
+	 */
+	template<typename U>
+	IOStream&
+	operator << (IOStream& s, const Point<U>& c);
 }
 
 #include "point_impl.hpp"

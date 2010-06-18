@@ -30,55 +30,19 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__POLYGON_HPP
-#define XPCC__POLYGON_HPP
+#ifndef XPCC__CIRCLE_HPP
+	#error	"Don't include this file directly, use 'circle.hpp' instead!"
+#endif
 
-#include <xpcc/container/vector.hpp>
-#include <xpcc/math/point.hpp>
-
-namespace xpcc
+// ----------------------------------------------------------------------------
+template <typename T>
+xpcc::Circle<T>::Circle() :
+	center(), radius(0)
 {
-	/**
-	 * \brief	Polygon
-	 *
-	 * The Polygon class provides a vector of points.
-	 *
-	 * \author	Fabian Greif
-	 * \ingroup	math
-	 */
-	template <typename T>
-	class Polygon
-	{
-	public:
-		typedef size_t SizeType;
-		typedef Point<T> Point;
-
-	public:
-		/**
-		 * \brief	Constructs a polygon capable of holding n points
-		 */
-		Polygon(SizeType n);
-
-		void
-		append(const Point& point);
-
-		inline Point&
-		operator [](SizeType index)
-		{
-			return buffer[index];
-		}
-
-		inline const Point&
-		operator [](SizeType index) const
-		{
-			return buffer[index];
-		}
-
-	private:
-		xpcc::Vector<T> buffer;
-	};
 }
 
-#include "polygon_impl.hpp"
-
-#endif // XPCC__POLYGON_HPP
+template <typename T>
+xpcc::Circle<T>::Circle(const Point& center, T radius) :
+	center(center), radius(radius)
+{
+}
