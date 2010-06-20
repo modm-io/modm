@@ -5,7 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -30,31 +30,43 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__ALLOCATOR_HPP
-#define XPCC__ALLOCATOR_HPP
+#ifndef XPCC__LINE_SEGMENT_HPP
+	#error	"Don't include this file directly, use 'line.hpp' instead!"
+#endif
 
-#include "allocator/dynamic.hpp"
-#include "allocator/static.hpp"
-#include "allocator/block.hpp"
-
-namespace xpcc
+// ----------------------------------------------------------------------------
+template<typename T>
+xpcc::LineSegment<T>::LineSegment() :
+	start(), end()
 {
-	/**
-	 * \ingroup	utils
-	 * \defgroup allocator
-	 * 
-	 * \brief	Memory allocators
-	 * 
-	 * \author	Fabian Greif
-	 */
-	namespace allocator
-	{
-	}
-	
-	// TODO see
-	// /usr/include/c++/4.4/ext/new_allocator.h
-	// /usr/include/c++/4.4/ext/malloc_allocator.h
-	// /usr/include/c++/4.4/bits/stl_list.h
 }
 
-#endif // XPCC__ALLOCATOR_HPP
+template<typename T>
+xpcc::LineSegment<T>::LineSegment(const Point& start, const Point& end) :
+	start(start), end(end)
+{
+}
+
+template<typename T>
+T
+xpcc::LineSegment<T>::getLength() const
+{
+	Point t = this->end - this->start;
+	return t.getLength();
+}
+
+template<typename U>
+bool
+operator == (const LineSegment<U> &a, const LineSegment<U> &b)
+{
+	return ((a.start == b.start) &&
+			(a.end == b.end));
+}
+
+template<typename U>
+bool
+operator != (const LineSegment<U> &a, const LineSegment<U> &b)
+{
+	return ((a.start != b.start) ||
+			(a.end != b.end));
+}

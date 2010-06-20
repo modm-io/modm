@@ -70,7 +70,7 @@ xpcc::TipcConnector::getPacketHeader() const
 const xpcc::SmartPointer
 xpcc::TipcConnector::getPacketPayload() const
 {
-	SmartPointerVolatile payload( this->receiver.frontPayload().getSize() - sizeof(xpcc::Header) );
+	SmartPointer payload( this->receiver.frontPayload().getSize() - sizeof(xpcc::Header) );
 	if( payload.getSize() > 0 ) {
 		memcpy(
 				payload.getPointer(),
@@ -106,7 +106,7 @@ xpcc::TipcConnector::sendPacket(const xpcc::Header &header, SmartPointer payload
 //			<< " payload=" << payload
 //			<< xpcc::flush;
 
-	SmartPointerVolatile combinedPayload( sizeof(xpcc::Header) + payload.getSize() );
+	SmartPointer combinedPayload( sizeof(xpcc::Header) + payload.getSize() );
 
 	memcpy(	combinedPayload.getPointer(), &header, sizeof(xpcc::Header) );
 

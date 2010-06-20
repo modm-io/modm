@@ -5,7 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -30,31 +30,29 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__ALLOCATOR_HPP
-#define XPCC__ALLOCATOR_HPP
+#include <unittest/testsuite.hpp>
 
-#include "allocator/dynamic.hpp"
-#include "allocator/static.hpp"
-#include "allocator/block.hpp"
-
-namespace xpcc
+class DynamicArrayTest : public unittest::TestSuite
 {
-	/**
-	 * \ingroup	utils
-	 * \defgroup allocator
-	 * 
-	 * \brief	Memory allocators
-	 * 
-	 * \author	Fabian Greif
-	 */
-	namespace allocator
-	{
-	}
-	
-	// TODO see
-	// /usr/include/c++/4.4/ext/new_allocator.h
-	// /usr/include/c++/4.4/ext/malloc_allocator.h
-	// /usr/include/c++/4.4/bits/stl_list.h
-}
+public:
+	void
+	testDefaultConstrutor();
 
-#endif // XPCC__ALLOCATOR_HPP
+	void
+	testAllocationConstructor();
+
+	void
+	testSequenceConstructor();
+
+	void
+	testCopyConstructor();
+
+	void
+	testReserve();
+
+	void
+	testAppend();
+
+	void
+	testRemove();
+};

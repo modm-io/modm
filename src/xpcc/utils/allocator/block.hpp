@@ -33,13 +33,14 @@
 #ifndef XPCC_ALLOCATOR__BLOCK_HPP
 #define XPCC_ALLOCATOR__BLOCK_HPP
 
-#include <cstddef>
+#include "allocator_base.hpp"
 
 namespace xpcc
 {
 	namespace allocator
 	{
 		/**
+		 * \brief	Block allocator
 		 * 
 		 * Allocates a big block of memory and then distribute small pieces of
 		 * it. The memory is not released until the destruction of the
@@ -48,12 +49,12 @@ namespace xpcc
 		 * 
 		 * This technique is known as "memory pool".
 		 * 
-		 * \author	Fabian Greif <fabian.greif@rwth-aachen.de
 		 * \ingroup	allocator
+		 * \author	Fabian Greif
 		 */
 		template <typename T,
 				  size_t BLOCKSIZE>
-		class Block
+		class Block : public AllocatorBase<T>
 		{
 		public:
 			template <typename U>
@@ -63,6 +64,19 @@ namespace xpcc
 			};
 		
 		public:
+			Block()
+			{
+			}
+			
+			Block(const Block&)
+			{
+			}
+			
+			template <typename U>
+			Block(const Block<U, BLOCKSIZE>&)
+			{
+			}
+			
 			T*
 			allocate();
 			

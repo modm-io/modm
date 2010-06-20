@@ -33,23 +33,23 @@
 #ifndef XPCC_ALLOCATOR__DYNAMIC_HPP
 #define XPCC_ALLOCATOR__DYNAMIC_HPP
 
-#include <cstddef>
+#include "allocator_base.hpp"
 
 namespace xpcc
 {
 	namespace allocator
 	{
 		/**
-		 * \brief	Dynamic allocation of memory
+		 * \brief	Dynamic memory allocator
 		 * 
 		 * Wrapper for the underlaying memory management. No additional
 		 * management is done.
 		 * 
 		 * \ingroup	allocator
-		 * \author	Fabian Greif <fabian.greif@rwth-aachen.de
+		 * \author	Fabian Greif
 		 */
 		template <typename T>
-		class Dynamic
+		class Dynamic : public AllocatorBase<T>
 		{
 		public:
 			template <typename U>
@@ -59,6 +59,19 @@ namespace xpcc
 			};
 			
 		public:
+			Dynamic()
+			{
+			}
+			
+			Dynamic(const Dynamic&)
+			{
+			}
+			
+			template <typename U>
+			Dynamic(const Dynamic<U>&)
+			{
+			}
+			
 			T*
 			allocate(size_t n)
 			{
@@ -67,18 +80,6 @@ namespace xpcc
 			
 			void
 			deallocate(T*);
-			
-			void
-			construct(T* p, const T& value)
-			{
-				::new((void *) p) T(value);
-			}
-			
-			void
-			destroy(T* p)
-			{
-				p->~T();
-			}
 		};
 	}
 }

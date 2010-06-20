@@ -45,7 +45,9 @@ namespace xpcc
 	 * \warning	The node passed to the functions must allways be valid
 	 * 			List::Node object 	 
 	 * \todo	This implementation needs an iterator interface!
-	 *
+	 * 
+	 * \deprecated	Use xpcc::LinkedList instead
+	 * 
 	 * \author	Fabian Greif
 	 * \ingroup	container
 	 */

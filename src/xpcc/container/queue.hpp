@@ -135,7 +135,7 @@ namespace xpcc
 	 */
 	template<typename T, 
 			 int N,
-			 typename Container=BoundedDeque<T, N> >
+			 typename Container = BoundedDeque<T, N> >
 	class BoundedQueue : public Queue<T, Container>
 	{
 	};

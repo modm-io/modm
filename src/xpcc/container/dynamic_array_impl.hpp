@@ -30,60 +30,60 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__VECTOR_HPP
+#ifndef XPCC__DYNAMIC_ARRAY_HPP
 	#error	"Don't include this file directly, use 'vector.hpp' instead"
 #endif
 
 // ----------------------------------------------------------------------------
 template <typename T>
-xpcc::Vector<T>::Vector() :
-	size(0), remainingCapacity(0), buffer(0)
+xpcc::DynamicArray<T>::DynamicArray() :
+	size(0), capacity(0), values(0)
 {
 }
 
 template <typename T>
-xpcc::Vector<T>::Vector(SizeType n) :
-	size(0), remainingCapacity(n), buffer(new T[n])
+xpcc::DynamicArray<T>::DynamicArray(SizeType n) :
+	size(0), capacity(n), values(new T[n])
 {
 }
 
 template <typename T>
-xpcc::Vector<T>::Vector(SizeType n, const T& value) :
-	size(n), remainingCapacity(0), buffer(new T[n])
+xpcc::DynamicArray<T>::DynamicArray(SizeType n, const T& value) :
+	size(n), capacity(n), values(new T[n])
 {
 	for (SizeType i = 0; i < n; ++i) {
-		this->buffer[i] = value;
+		this->values[i] = value;
 	}
 }
 
 template <typename T>
-xpcc::Vector<T>::Vector(const Vector& other) :
-	size(other.size), remainingCapacity(other.remainingCapacity),
-	buffer(new T[other.size + other.remainingCapacity])
+xpcc::DynamicArray<T>::DynamicArray(const DynamicArray& other) :
+	size(other.size), capacity(other.capacity),
+	values(new T[other.capacity])
 {
 	for (SizeType i = 0; i < this->size; ++i) {
-		this->buffer[i] = other.buffer[i];
+		this->values[i] = other.values[i];
 	}
 }
 
 template <typename T>
-xpcc::Vector<T>::~Vector()
+xpcc::DynamicArray<T>::~DynamicArray()
 {
-	delete[] buffer;
+	delete[] this->values;
 }
 
 template <typename T>
-xpcc::Vector<T>&
-xpcc::Vector<T>::operator = (const Vector& other)
+xpcc::DynamicArray<T>&
+xpcc::DynamicArray<T>::operator = (const DynamicArray& other)
 {
-	delete[] buffer;
+	delete[] this->values;
 
 	this->size = other.size;
-	this->remainingCapacity = other.remainingCapacity;
-	this->buffer = new T[this->size + this->remainingCapacity];
+	this->capacity = other.capacity;
+	this->values = new T[this->capacity];
 
 	for (SizeType i = 0; i < this->size; ++i) {
-		this->buffer[i] = other.buffer[i];
+		this->values[i] = other.values[i];
 	}
 	return *this;
 }
@@ -91,9 +91,9 @@ xpcc::Vector<T>::operator = (const Vector& other)
 // ----------------------------------------------------------------------------
 template <typename T>
 void
-xpcc::Vector<T>::reserve(SizeType n)
+xpcc::DynamicArray<T>::reserve(SizeType n)
 {
-	if (n <= (this->remainingCapacity)) {
+	if (n <= (this->capacity - this->size)) {
 		// capacity is already big enough, nothing to do.
 		return;
 	}
@@ -102,26 +102,12 @@ xpcc::Vector<T>::reserve(SizeType n)
 	this->relocate(this->size + n);
 }
 
-template <typename T>
-T&
-xpcc::Vector<T>::operator [](SizeType index)
-{
-	return this->buffer[index];
-}
-
-template <typename T>
-const T&
-xpcc::Vector<T>::operator [](SizeType index) const
-{
-	return this->buffer[index];
-}
-
 // ----------------------------------------------------------------------------
 template <typename T>
 void
-xpcc::Vector<T>::append(const T& value)
+xpcc::DynamicArray<T>::append(const T& value)
 {
-	if (this->remainingCapacity == 0)
+	if (this->capacity == this->size)
 	{
 		// allocate new memory if no more space is left
 		SizeType n = this->size + (this->size + 1) / 2;
@@ -131,32 +117,33 @@ xpcc::Vector<T>::append(const T& value)
 		this->relocate(n);
 	}
 
-	this->buffer[this->size] = value;
+	this->values[this->size] = value;
 	++this->size;
-}
-
-template <typename T>
-void
-xpcc::Vector<T>::removeLast()
-{
-	--this->size;
-
-	// call destructor
-	this->buffer[this->size].~T();
 }
 
 // ----------------------------------------------------------------------------
 template <typename T>
 void
-xpcc::Vector<T>::relocate(SizeType n)
+xpcc::DynamicArray<T>::removeLast()
 {
-	this->remainingCapacity = n - this->size;
+	--this->size;
 
+	// call destructor
+	this->values[this->size].~T();
+}
+
+// ----------------------------------------------------------------------------
+template <typename T>
+void
+xpcc::DynamicArray<T>::relocate(SizeType n)
+{
+	this->capacity = n;
+	
 	T* newBuffer = new T[n];
 	for (SizeType i = 0; i < this->size; ++i) {
-		newBuffer[i] = this->buffer[i];
+		newBuffer[i] = this->values[i];
 	}
-	delete[] this->buffer;
-
-	this->buffer = newBuffer;
+	delete[] this->values;
+	
+	this->values = newBuffer;
 }

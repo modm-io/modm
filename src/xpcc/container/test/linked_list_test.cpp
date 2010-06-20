@@ -5,7 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -30,31 +30,14 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__ALLOCATOR_HPP
-#define XPCC__ALLOCATOR_HPP
+#include <xpcc/container/linked_list.hpp>
 
-#include "allocator/dynamic.hpp"
-#include "allocator/static.hpp"
-#include "allocator/block.hpp"
+#include "linked_list_test.hpp"
 
-namespace xpcc
+typedef xpcc::LinkedList<int16_t> Container;
+
+void
+LinkedListTest::testConstructor()
 {
-	/**
-	 * \ingroup	utils
-	 * \defgroup allocator
-	 * 
-	 * \brief	Memory allocators
-	 * 
-	 * \author	Fabian Greif
-	 */
-	namespace allocator
-	{
-	}
-	
-	// TODO see
-	// /usr/include/c++/4.4/ext/new_allocator.h
-	// /usr/include/c++/4.4/ext/malloc_allocator.h
-	// /usr/include/c++/4.4/bits/stl_list.h
+	Container list;
 }
-
-#endif // XPCC__ALLOCATOR_HPP

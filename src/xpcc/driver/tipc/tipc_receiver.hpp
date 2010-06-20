@@ -38,6 +38,7 @@
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/thread.hpp>
 #include <boost/scoped_ptr.hpp>
+
 #include <xpcc/container/smart_pointer.hpp>
 
 #include "tipc_receiver_socket.hpp"
@@ -82,10 +83,10 @@ namespace xpcc
 			popFront();
 			
 		private:
-			typedef xpcc::SmartPointerVolatile		Payload;
-			typedef boost::mutex					Mutex;
-			typedef boost::mutex::scoped_lock		MutexGuard;
-			typedef	boost::thread::thread			Thread;
+			typedef xpcc::SmartPointer			Payload;
+			typedef boost::mutex				Mutex;
+			typedef boost::mutex::scoped_lock	MutexGuard;
+			typedef	boost::thread::thread		Thread;
 			
 			bool 
 			isAlive();

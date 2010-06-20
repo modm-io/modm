@@ -33,33 +33,46 @@
 #ifndef XPCC_ALLOCATOR__STATIC_HPP
 #define XPCC_ALLOCATOR__STATIC_HPP
 
-#include <cstddef>
+#include "allocator_base.hpp"
 
 namespace xpcc
 {
 	namespace allocator
 	{
 		/**
-		 * \brief	Static allocation
+		 * \brief	Static memory allocator
 		 * 
 		 * Allocates a big static block and distributes pieces of it during
 		 * run-time. No reallocation is done when no more pieces are available.
 		 * 
-		 * \author	Fabian Greif <fabian.greif@rwth-aachen.de
 		 * \ingroup	allocator
+		 * \author	Fabian Greif
 		 */
 		template <typename T,
-				  size_t SIZE>
-		class Static
+				  size_t N>
+		class Static : public AllocatorBase<T>
 		{
 		public:
 			template <typename U>
 			struct rebind
 			{
-				typedef Static<U, SIZE> other;
+				typedef Static<U, N> other;
 			};
 			
 		public:
+			Static()
+			{
+			}
+			
+			Static(const Static&)
+			{
+			}
+			
+			template <typename U>
+			Static(const Static<U, N>&)
+			{
+			}
+			
 			T*
 			allocate(size_t other);
 			

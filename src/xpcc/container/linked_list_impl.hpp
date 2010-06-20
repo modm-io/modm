@@ -2,7 +2,7 @@
 // ----------------------------------------------------------------------------
 /* Copyright (c) 2009, Roboterclub Aachen e.V.
  * All rights reserved.
- *
+ * 
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  * 
@@ -14,7 +14,7 @@
  *     * Neither the name of the Roboterclub Aachen e.V. nor the
  *       names of its contributors may be used to endorse or promote products
  *       derived from this software without specific prior written permission.
- *
+ * 
  * THIS SOFTWARE IS PROVIDED BY ROBOTERCLUB AACHEN E.V. ''AS IS'' AND ANY
  * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -25,36 +25,22 @@
  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
+ * 
  * $Id$
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__ALLOCATOR_HPP
-#define XPCC__ALLOCATOR_HPP
+#ifndef	XPCC__LINKED_LIST_HPP
+	#error	"Don't include this file directly, use 'linked_list.hpp' instead"
+#endif
 
-#include "allocator/dynamic.hpp"
-#include "allocator/static.hpp"
-#include "allocator/block.hpp"
-
-namespace xpcc
+// ----------------------------------------------------------------------------
+template <typename T, typename Allocator>
+xpcc::LinkedList<T, Allocator>::LinkedList(const Allocator& /*allocator*/)
 {
-	/**
-	 * \ingroup	utils
-	 * \defgroup allocator
-	 * 
-	 * \brief	Memory allocators
-	 * 
-	 * \author	Fabian Greif
-	 */
-	namespace allocator
-	{
-	}
-	
-	// TODO see
-	// /usr/include/c++/4.4/ext/new_allocator.h
-	// /usr/include/c++/4.4/ext/malloc_allocator.h
-	// /usr/include/c++/4.4/bits/stl_list.h
 }
 
-#endif // XPCC__ALLOCATOR_HPP
+template <typename T, typename Allocator>
+xpcc::LinkedList<T, Allocator>::~LinkedList()
+{
+}

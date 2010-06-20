@@ -30,27 +30,27 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__LINE_HPP
-#define XPCC__LINE_HPP
+#ifndef XPCC__LINE_SEGMENT_HPP
+#define XPCC__LINE_SEGMENT_HPP
 
 #include "point.hpp"
 
 namespace xpcc
 {
 	/**
-	 * \brief	Line
+	 * \brief	LineSegmentSegment
 	 * 
 	 * \author	Fabian Greif
 	 * \ingroup	math
 	 */
 	template <typename T>
-	class Line
+	class LineSegment
 	{
 		typedef Point<T> Point;
 	public:
-		Line();
+		LineSegment();
 		
-		Line(const Point& start, const Point& end);
+		LineSegment(const Point& start, const Point& end);
 		
 		void
 		setStartPoint(const Point& point)
@@ -93,22 +93,22 @@ namespace xpcc
 	private:
 		template<typename U>
 		friend bool
-		operator == (const Line<U> &a, const Line<U> &b);
+		operator == (const LineSegment<U> &a, const LineSegment<U> &b);
 		
 		template<typename U>
 		friend bool
-		operator != (const Line<U> &a, const Line<U> &b);
+		operator != (const LineSegment<U> &a, const LineSegment<U> &b);
 	};
 	
 	template<typename U>
 	bool
-	operator == (const Line<U> &a, const Line<U> &b);
+	operator == (const LineSegment<U> &a, const LineSegment<U> &b);
 	
 	template<typename U>
 	bool
-	operator != (const Line<U> &a, const Line<U> &b);
+	operator != (const LineSegment<U> &a, const LineSegment<U> &b);
 }
 
-#include "line_impl.hpp"
+#include "line_segment_impl.hpp"
 
-#endif // XPCC__LINE_HPP
+#endif // XPCC__LINE_SEGMENT_HPP

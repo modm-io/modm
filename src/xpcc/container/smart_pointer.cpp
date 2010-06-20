@@ -48,12 +48,6 @@ xpcc::SmartPointer::SmartPointer(const SmartPointer& other) :
 	ptr[0]++;
 }
 
-xpcc::SmartPointer::SmartPointer(const SmartPointerVolatile& other) :
-	ptr(other.ptr)
-{
-	ptr[0]++;
-}
-
 // must allocate at least three bytes, so getPointer() does return
 // a valid address
 xpcc::SmartPointer::SmartPointer(uint8_t size) :
@@ -74,31 +68,6 @@ xpcc::SmartPointer::~SmartPointer()
 
 xpcc::IOStream&
 xpcc::operator <<( xpcc::IOStream& s, const xpcc::SmartPointer& v)
-{
-	s << "0x" << xpcc::hex;
-	for(uint8_t i=2; i < v.ptr[1]+2; i++ ) {
-		s << v.ptr[i];
-	}
-	s << xpcc::ascii;
-	return s;
-}
-
-// ----------------------------------------------------------------------------
-
-xpcc::SmartPointerVolatile::SmartPointerVolatile(unsigned char size) :
-	SmartPointer(size)
-{
-}
-
-xpcc::SmartPointerVolatile::SmartPointerVolatile(const SmartPointerVolatile& other) :
-	SmartPointer(other)
-{
-}
-
-// ----------------------------------------------------------------------------
-
-xpcc::IOStream&
-xpcc::operator <<( xpcc::IOStream& s, const xpcc::SmartPointerVolatile& v)
 {
 	s << "0x" << xpcc::hex;
 	for(uint8_t i=2; i < v.ptr[1]+2; i++ ) {

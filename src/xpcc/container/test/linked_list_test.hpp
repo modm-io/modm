@@ -32,27 +32,9 @@
 
 #include <unittest/testsuite.hpp>
 
-class VectorTest : public unittest::TestSuite
+class LinkedListTest : public unittest::TestSuite
 {
 public:
 	void
-	testDefaultConstrutor();
-
-	void
-	testAllocationConstructor();
-
-	void
-	testSequenceConstructor();
-
-	void
-	testCopyConstructor();
-
-	void
-	testReserve();
-
-	void
-	testAppend();
-
-	void
-	testRemove();
+	testConstructor();
 };

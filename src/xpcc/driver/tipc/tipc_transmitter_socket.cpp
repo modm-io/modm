@@ -84,7 +84,7 @@ xpcc::tipc::TransmitterSocket::transmitPayload(
 	header.size = length;
 
 	// Allocate memory for whole packet (header plus payload)
-	xpcc::SmartPointerVolatile tipcPacketPointer ( sizeof(Header) + length );
+	xpcc::SmartPointer tipcPacketPointer ( sizeof(Header) + length );
 
 	// Put things together - first the tipc-header and then the payload
 	memcpy( tipcPacketPointer.getPointer(), &header, sizeof(Header) );

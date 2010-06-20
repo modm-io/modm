@@ -56,8 +56,16 @@ namespace xpcc
 	class SmartPointer
 	{
 	public:
-		// default constructor with empty payload
+		/// default constructor with empty payload
 		SmartPointer();
+		
+		/**
+		 * \brief	Allocates memory from the given size
+		 * 
+		 * \param	size	the amount of memory to be allocated, has to be
+		 * 					smaller than 252
+		 */
+		SmartPointer(uint8_t size);
 		
 		// Must use a pointer to T here, otherwise the compiler can't distinguish
 		// between constructor and copy constructor!
@@ -71,8 +79,6 @@ namespace xpcc
 		}
 
 		SmartPointer(const SmartPointer& other);
-		
-		SmartPointer(const SmartPointerVolatile& other);
 
 		~SmartPointer();
 
@@ -82,8 +88,15 @@ namespace xpcc
 			return &ptr[2];
 		}
 		
+		inline uint8_t *
+		getPointer()
+		{
+			return &ptr[2];
+		}
+		
 		inline uint8_t
-		getSize() const {
+		getSize() const
+		{
 			return ptr[1];
 		}
 		
@@ -122,17 +135,9 @@ namespace xpcc
 	protected:
 		friend IOStream&
 		operator <<( IOStream&, const SmartPointer&);
-
-		/**
-		 * \brief	Allocates memory from the given size
-		 * 
-		 * \param	size	the amount of memory to be allocated, has to be
-		 * 					smaller than 252
-		 */
-		SmartPointer(uint8_t size);
 		
 		SmartPointer&
-		operator=(const SmartPointer& other);
+		operator = (const SmartPointer& other);
 		
 		uint8_t * const ptr;
 	};
@@ -142,46 +147,6 @@ namespace xpcc
 	 */
 	xpcc::IOStream&
 	operator <<( xpcc::IOStream& s, const xpcc::SmartPointer& sPtr);
-
-	/**
-	 * \brief 	With this class a \b SmartPointer can be created, off that the
-	 * 			memory is writable.
-	 *
-	 * Use the \b SmartPointerVolatile to allocate writable memory and then
-	 * typecast with the copyconstructor to \b SmartPointer to get an object with
-	 * write protected data.
-	 * 
-	 * \ingroup container
-	 */
-	class SmartPointerVolatile : public SmartPointer
-	{
-		public:
-			/**
-			 * \brief	Allocates memory from the given size
-			 * 
-			 * \param	size	the amount of memory to be allocated, has to
-			 * 					be smaller than 252
-			 */
-			SmartPointerVolatile(uint8_t size);
-			
-			SmartPointerVolatile(const SmartPointerVolatile& other);
-
-			inline uint8_t *
-			getPointer()
-			{
-				return &ptr[2];
-			}
-
-		protected :
-			friend IOStream&
-			operator <<( IOStream&, const SmartPointerVolatile&);
-	};
-
-	/**
-	 * \ingroup container
-	 */
-	xpcc::IOStream&
-	operator <<( xpcc::IOStream& s, const xpcc::SmartPointerVolatile& sPtr);
 };
 
 #endif	// XPCC_SMART_POINTER_H

@@ -30,36 +30,36 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__VECTOR_HPP
-#define XPCC__VECTOR_HPP
+#ifndef XPCC__DYNAMIC_ARRAY_HPP
+#define XPCC__DYNAMIC_ARRAY_HPP
 
 #include <stddef.h>
 
 namespace xpcc
 {
 	/**
-	 * \brief	Vector
-	 *
-	 * Vectors are a kind of sequence containers. As such, their elements are
-	 * ordered following a strict linear sequence.
-	 *
-	 * Vector containers are implemented as dynamic arrays; Just as regular
-	 * arrays, vector containers have their elements stored in contiguous
-	 * storage locations, which means that their elements can be accessed not
-	 * only using iterators but also using offsets on regular pointers to
-	 * elements.
-	 *
+	 * \brief	Dynamic Arrays
+	 * 
+	 * Dynamic Arrays are a kind of sequence containers. As such, their
+	 * elements are ordered following a strict linear sequence.
+	 * 
+	 * Just as regular arrays, dynamic arrays containers have their elements
+	 * stored in contiguous storage locations, which means that their elements
+	 * can be accessed not only using iterators but also using offsets on
+	 * regular pointers to elements.
+	 * 
 	 * Reallocations may be a costly operation in terms of performance, since
-	 * they generally involve the entire storage space used by the vector to
-	 * be copied to a new location. Therefore, whenever large increases in
-	 * size are planned for a vector, it is recommended to explicitly indicate
-	 * a capacity for the vector using member function Vector::reserve().
-	 *
+	 * they generally involve the entire storage space used by the
+	 * dynamic array to be copied to a new location. Therefore, whenever large
+	 * increases in size are planned for a dynamic array, it is recommended to
+	 * explicitly indicate a capacity for the dynamic array using member
+	 * function DynamicArray::reserve().
+	 * 
 	 * \author	Fabian Greif <fabian.greif@rwth-aachen.de>
 	 * \ingroup	container
 	 */
 	template <typename T>
-	class Vector
+	class DynamicArray
 	{
 	public:
 		typedef size_t SizeType;
@@ -67,39 +67,40 @@ namespace xpcc
 		/**
 		 * \brief	Default constructor
 		 *
-		 * Constructs an empty vector, with no content and a size of zero.
+		 * Constructs an empty dynamic array, with no content and a
+		 * size of zero.
 		 */
-		Vector();
+		DynamicArray();
 
 		/**
 		 * \brief	Allocation Constructor
 		 *
-		 * Construct a vector of given size.
+		 * Construct a dynamic array of given size.
 		 */
-		Vector(SizeType n);
+		DynamicArray(SizeType n);
 
 		/**
 		 * \brief	Repetitive sequence constructor
 		 *
-		 * Construct a vector of given size.
+		 * Construct a dynamic array of given size.
 		 *
-		 * Initializes the vector with its content set to a repetition,
-		 * n times, of copies of value.
+		 * Initializes the dynamic array with its content set to a
+		 * repetition, n times, of copies of value.
 		 */
-		Vector(SizeType n, const T& value);
+		DynamicArray(SizeType n, const T& value);
 
-		Vector(const Vector& other);
+		DynamicArray(const DynamicArray& other);
 
-		~Vector();
+		~DynamicArray();
 
-		Vector&
-		operator = (const Vector& other);
+		DynamicArray&
+		operator = (const DynamicArray& other);
 
 		/**
-		 * \brief	Test whether vector is empty
+		 * \brief	Test whether dynamic array is empty
 		 *
-		 * Returns whether the vector container is empty, i.e. whether its
-		 * size is 0.
+		 * Returns whether the dynamic array container is empty, i.e. whether
+		 * its size is 0.
 		 */
 		inline bool
 		isEmpty() const
@@ -110,7 +111,7 @@ namespace xpcc
 		/**
 		 * \brief	Return size
 		 *
-		 * Returns the number of elements in the vector container.
+		 * Returns the number of elements in the container.
 		 */
 		inline SizeType
 		getSize() const
@@ -121,33 +122,33 @@ namespace xpcc
 		/**
 		 * \brief	Return size of allocated storage
 		 *
-		 * Returns the size of the allocated storage space in the vector
+		 * Returns the size of the allocated storage space in the dynamic array
 		 * object.
 		 *
-		 * Notice that, in vectors, the capacity is not necessarily equal to
-		 * the number of elements that conform the underlying vector content
-		 * (this can be obtained with member Vector::getSize()), but the
-		 * capacity of the actual allocated space, which is either equal or
-		 * greater than the content size.
+		 * Notice that, in dynamic arrays, the capacity is not necessarily
+		 * equal to the number of elements that conform the underlying
+		 * dynamic array content (this can be obtained with member
+		 * DynamicArray::getSize()), but the capacity of the actual allocated
+		 * space, which is either equal or greater than the content size.
 		 *
 		 * \see	getSize()
 		 */
 		inline SizeType
 		getCapacity() const
 		{
-			return (this->size + this->remainingCapacity);
+			return (this->capacity);
 		}
 
 		/**
 		 * \brief	Request a change in capacity
 		 *
 		 * Requests that the capacity of the allocated storage space for the
-		 * elements of the vector container be at least enough to hold n more
-		 * elements.
+		 * elements of the dynamic array container be at least enough to
+		 * hold n more elements.
 		 *
-		 * This informs the vector of a planned increase in size, although
-		 * notice that the parameter n informs of a minimum, so the resulting
-		 * capacity may be any capacity equal or larger than this.
+		 * This informs the dynamic array of a planned increase in size,
+		 * although notice that the parameter n informs of a minimum, so the
+		 * resulting capacity may be any capacity equal or larger than this.
 		 *
 		 * \see	getCapacity()
 		 */
@@ -157,33 +158,39 @@ namespace xpcc
 		/**
 		 * \brief	Access element
 		 *
-		 * Returns a reference to the element at position n in the vector
-		 * container.
+		 * Returns a reference to the element at position n in the
+		 * dynamic array container.
 		 */
 		inline T&
-		operator [](SizeType index);
+		operator [](SizeType index)
+		{
+			return this->values[index];
+		}
 
 		/**
 		 * \brief	Access element
 		 *
-		 * Returns a reference to the element at position n in the vector
-		 * container.
+		 * Returns a reference to the element at position n in the
+		 * dynamic array container.
 		 */
 		inline const T&
-		operator [](SizeType index) const;
+		operator [](SizeType index) const
+		{
+			return this->values[index];
+		}
 
 		/**
 		 * \brief	Add element at the end
 		 *
-		 * Adds a new element at the end of the vector, after its current last
-		 * element. The content of this new element is initialized to a
-		 * copy of x.
+		 * Adds a new element at the end of the dynamic array, after its
+		 * current last element. The content of this new element is
+		 * initialized to a copy of \p value.
 		 *
-		 * This effectively increases the vector size by one, which causes a
-		 * reallocation of the internal allocated storage if the vector size
-		 * was equal to the vector capacity before the call. Reallocations
-		 * invalidate all previously obtained iterators, references and
-		 * pointers.
+		 * This effectively increases the dynamic array size by one, which
+		 * causes a reallocation of the internal allocated storage if the
+		 * dynamic array size was equal to the dynamic array capacity before
+		 * the call. Reallocations invalidate all previously obtained
+		 * iterators, references and pointers.
 		 */
 		void
 		append(const T& value);
@@ -191,9 +198,9 @@ namespace xpcc
 		/**
 		 * \brief	Delete last element
 		 *
-		 * Removes the last element in the vector, effectively reducing the
-		 * vector size by one and invalidating all iterators and references
-		 * to it.
+		 * Removes the last element in the dynamic array, effectively reducing
+		 * the dynamic array size by one and invalidating all iterators and
+		 * references to it.
 		 *
 		 * This calls the removed element's destructor.
 		 */
@@ -207,25 +214,25 @@ namespace xpcc
 		inline const T&
 		first() const
 		{
-			return this->buffer[0];
+			return this->values[0];
 		}
 
 		inline T&
 		first()
 		{
-			return this->buffer[0];
+			return this->values[0];
 		}
 
 		inline const T&
 		last() const
 		{
-			return this->buffer[this->size - 1];
+			return this->values[this->size - 1];
 		}
 
 		inline T&
 		last()
 		{
-			return this->buffer[this->size - 1];
+			return this->values[this->size - 1];
 		}
 
 	private:
@@ -237,11 +244,11 @@ namespace xpcc
 		relocate(SizeType n);
 
 		SizeType size;
-		SizeType remainingCapacity;
-		T* buffer;
+		SizeType capacity;
+		T* values;
 	};
 }
 
-#include "vector_impl.hpp"
+#include "dynamic_array_impl.hpp"
 
-#endif // XPCC__VECTOR_HPP
+#endif // XPCC__DYNAMIC_ARRAY_HPP

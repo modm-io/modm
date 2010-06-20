@@ -2,10 +2,10 @@
 // ----------------------------------------------------------------------------
 /* Copyright (c) 2009, Roboterclub Aachen e.V.
  * All rights reserved.
- *
+ * 
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- *
+ * 
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -14,7 +14,7 @@
  *     * Neither the name of the Roboterclub Aachen e.V. nor the
  *       names of its contributors may be used to endorse or promote products
  *       derived from this software without specific prior written permission.
- *
+ * 
  * THIS SOFTWARE IS PROVIDED BY ROBOTERCLUB AACHEN E.V. ''AS IS'' AND ANY
  * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -25,48 +25,79 @@
  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
+ * 
  * $Id$
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__LINE_HPP
-	#error	"Don't include this file directly, use 'line.hpp' instead!"
-#endif
+#ifndef	XPCC__DOUBLY_LINKED_LIST_HPP
+#define	XPCC__DOUBLY_LINKED_LIST_HPP
 
-// ----------------------------------------------------------------------------
-template<typename T>
-xpcc::Line<T>::Line() :
-	start(), end()
+#include <stdint.h>
+
+namespace xpcc
 {
+	/**
+	 * \brief	doubly-linked list
+	 * 
+	 * 
+	 * \todo	implementation
+	 * 
+	 * \tparam	T	type of list entries
+	 * 
+	 * \author	Fabian Greif
+	 * \ingroup	container
+	 */
+	template <typename T>
+	class DoublyLinkedList
+	{
+	public:
+		DoublyLinkedList();
+		
+		/// check if there are any nodes in the list
+		inline bool
+		isEmpty() const;
+		
+		/// Insert in front
+		void
+		prepend(const T& value);
+
+		/// Insert at the end of the list
+		void
+		append(const T& value);
+		
+		/// Remove the first entry
+		void
+		removeFirst();
+		
+		void
+		removeLast();
+		
+		/**
+		 * \return the first node in the list
+		 */
+		inline const T&
+		first() const;
+
+		/**
+		 * \return the last node in the list
+		 */
+		inline const T&
+		last() const;
+		
+		/**
+		 * \brief	Access the node at position \a index
+		 * 
+		 * \warning	The implementation has to iterate through the list
+		 * 			until it reaches the desired position. Therefore an
+		 * 			access via iterator is prefered.
+		 */
+		const T&
+		at(int index) const;
+		
+	private:
+		
+	};
 }
 
-template<typename T>
-xpcc::Line<T>::Line(const Point& start, const Point& end) :
-	start(start), end(end)
-{
-}
-
-template<typename T>
-T
-xpcc::Line<T>::getLength() const
-{
-	Point t = this->end - this->start;
-	return t.getLength();
-}
-
-template<typename U>
-bool
-operator == (const Line<U> &a, const Line<U> &b)
-{
-	return ((a.start == b.start) &&
-			(a.end == b.end));
-}
-
-template<typename U>
-bool
-operator != (const Line<U> &a, const Line<U> &b)
-{
-	return ((a.start != b.start) ||
-			(a.end != b.end));
-}
+#endif	// XPCC__DOUBLY_LINKED_LIST_HPP

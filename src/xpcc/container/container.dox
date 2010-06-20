@@ -1,0 +1,45 @@
+// coding: utf-8
+// 
+// $Id$
+
+/*!
+\defgroup	container	Containers
+\brief 		Common data structures (list, queue etc.)
+
+A container is a holder object that stores a collection other objects
+(its elements). They are implemented as class templates, which allows a great
+flexibility in the types supported as elements.
+
+Many containers have several member functions in common, and share
+functionalities. The decision of which type of container to use for a specific
+need does not generally depend only on the functionality offered by the
+container, but also on the efficiency of some of its members (complexity).
+This is especially true for sequence containers, which offer different
+trade-offs in complexity between inserting/removing elements and accessing
+them.
+
+xpcc::Stack and xpcc::Queue are implemented as container adaptors. Container
+adaptors are not full container classes, but classes that provide a specific interface
+relying on an object of one of the container classes (such as xpcc::BoundedDeque or
+xpcc::LinkedList) to handle the elements. The underlying container is encapsulated
+in such a way that its elements are accessed by the members of the container
+class independently of the underlying container class used.
+
+Sequence containers:
+ - xpcc::DynamicArray
+ - xpcc::LinkedList
+ - xpcc::DoublyLinkedList
+
+ - xpcc::BoundedDeque
+ - xpcc::BoundedStack
+ - xpcc::BoundedQueue
+
+Container adaptors:
+ - xpcc::Queue
+ - xpcc::Stack
+
+Other:
+ - xpcc::SmartPointer
+ - xpcc::Pair
+
+*/
