@@ -30,40 +30,85 @@
  */
 // ----------------------------------------------------------------------------
 
-#if defined(__AVR__) && defined(__AVR_HAVE_MUL__)
-	#include <xpcc/architecture/avr/math.hpp>
-#endif
+#ifndef XPCC__LINE_SEGMENT_2D_HPP
+#define XPCC__LINE_SEGMENT_2D_HPP
 
-#include "point.hpp"
+#include "vector_2d.hpp"
 
-// this explicit namespace is needed here, otherwise we get an error about 
-// "specialization of ... in different namespace"
 namespace xpcc
 {
-	template<>
-	Point<float>&
-	Point<float>::rotate(const Angle& phi)
+	/**
+	 * \brief	Line segment
+	 * 
+	 * \author	Fabian Greif
+	 * \ingroup	math
+	 */
+	template <typename T>
+	class LineSegment2D
 	{
-		float c = cos(phi).toFloat();
-		float s = sin(phi).toFloat();
-
-		float tx = (c * this->x - s * this->y);
-		this->y =  (s * this->x + c * this->y);
-		this->x = tx;
-
-		return *this;
-	}
-
-#if defined(__AVR__) && defined(__AVR_HAVE_MUL__)
-	template<>
-	int16_t
-	Point<int16_t>::getLength() const
-	{
-		int32_t t;
-		t = avr::mul32(x, x);
-		t = avr::mac32(t, y, y);
+		typedef Vector2D<T> Point;
+	public:
+		LineSegment2D();
 		
-		return avr::sqrt32_round(t);
-	}
-#endif
+		LineSegment2D(const Point& start, const Point& end);
+		
+		void
+		setStartPoint(const Point& point)
+		{
+			this->start = point;
+		}
+		
+		const Point&
+		getStartPoint() const
+		{
+			return this->start;
+		}
+		
+		void
+		setEndPoint(const Point& point)
+		{
+			this->end = point;
+		}
+		
+		inline const Point&
+		getEndPoint() const
+		{
+			return this->end;
+		}
+		
+		inline void
+		setPoints(const Point& start, const Point& end)
+		{
+			this->start = start;
+			this->end = end;
+		}
+		
+		T
+		getLength() const;
+		
+	protected:
+		Point start;
+		Point end;
+		
+	private:
+		template<typename U>
+		friend bool
+		operator == (const LineSegment2D<U> &a, const LineSegment2D<U> &b);
+		
+		template<typename U>
+		friend bool
+		operator != (const LineSegment2D<U> &a, const LineSegment2D<U> &b);
+	};
+	
+	template<typename U>
+	bool
+	operator == (const LineSegment2D<U> &a, const LineSegment2D<U> &b);
+	
+	template<typename U>
+	bool
+	operator != (const LineSegment2D<U> &a, const LineSegment2D<U> &b);
 }
+
+#include "line_segment_2d_impl.hpp"
+
+#endif // XPCC__LINE_SEGMENT_2D_HPP

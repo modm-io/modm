@@ -30,82 +30,85 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/math/angle.hpp>
+#ifndef	XPCC__LOCATION_2D_HPP
+#define	XPCC__LOCATION_2D_HPP
 
-#include "angle_test.hpp"
+#include <cmath>
 
-void
-AngleTest::testConstructor()
+#include <xpcc/io/iostream.hpp>
+
+#include "angle.hpp"
+#include "vector_2d.hpp"
+
+namespace xpcc
 {
-	xpcc::Angle angle;
-	TEST_ASSERT_EQUALS(angle, 0);
-	
-	xpcc::Angle angle2(1.2);
-	TEST_ASSERT_EQUALS(angle2, 1.2);
+	/**
+	 * \brief	Location
+	 * 
+	 * \ingroup	math
+	 */
+	template <typename T = int16_t>
+	class Location2D
+	{
+	public:
+		typedef ::xpcc::Vector2D<T> Point;
+		
+		Location2D();
+		
+		Location2D(const Point& point, const float& phi);
+		
+		Location2D(const T& x, const T& y, const float& phi);
+		
+		/// Add a position increment
+		void
+		update(Location2D& diff);
+		
+		/**
+		 * \brief	Add a increment only in x-direction
+		 * 
+		 * \todo	usefull description what this function does
+		 */
+		void
+		update(T x, float phi);
+		
+		inline const Point&
+		getPoint() const;
+		
+		void
+		setPoint(const Point& point);
+		
+		void
+		setPoint(const T& x, const T& y);
+		
+		inline const float
+		getAngle() const;
+		
+		void
+		setAngle(const float& phi);
+		
+		/// Convert between Location-objects with different base-types
+		template<typename U>
+		operator Location2D<U>() const;
+		
+	private:
+		template <typename U>
+		friend IOStream&
+		operator <<( IOStream&, const Location2D<U>&);
+		
+		Point point;
+		float phi;
+	};
+
+	/**
+	 * \brief	Stream operator to \b xpcc::Location<T>
+	 *
+	 * \ingroup	math
+	 */
+	template<typename T>
+	IOStream&
+	operator<<(IOStream& os, const Location2D<T>& l);
 }
 
-void
-AngleTest::testAssignment()
-{
-	xpcc::Angle angle;
-	
-	angle = 0.7 * M_PI;
-	TEST_ASSERT_EQUALS(angle, 0.7 * M_PI);
-	
-	angle = -0.4 * M_PI;
-	TEST_ASSERT_EQUALS(angle, -0.4 * M_PI);
-}
+#include "location_2d_impl.hpp"
 
-void
-AngleTest::testNormalize()
-{
-	xpcc::Angle angle;
-	
-	angle = 0.3 * M_PI;
-	angle.normalize();
-	TEST_ASSERT_EQUALS_FLOAT(angle.toFloat(), 0.3 * M_PI);
-	
-	angle = -0.6 * M_PI;
-	angle.normalize();
-	TEST_ASSERT_EQUALS_FLOAT(angle.toFloat(), -0.6 * M_PI);
-	
-	angle = 2.9 * M_PI;
-	angle.normalize();
-	TEST_ASSERT_EQUALS_FLOAT(angle.toFloat(), 0.9 * M_PI);
-	
-	angle = -2.9 * M_PI;
-	angle.normalize();
-	TEST_ASSERT_EQUALS_FLOAT(angle.toFloat(), -0.9 * M_PI);
-	
-	angle = 1.5 * M_PI;
-	angle.normalize();
-	TEST_ASSERT_EQUALS_FLOAT(angle.toFloat(), -0.5 * M_PI);
-}
-
-void
-AngleTest::testReverse()
-{
-	xpcc::Angle angle;
-	
-	angle = -0.5 * M_PI;
-	angle.reverse();
-	TEST_ASSERT_EQUALS_FLOAT(angle.toFloat(), 0.5 * M_PI);
-	
-	angle = -0.9 * M_PI;
-	angle.reverse();
-	TEST_ASSERT_EQUALS_FLOAT(angle.toFloat(), 0.1 * M_PI);
-	
-	angle = 0.7 * M_PI;
-	angle.reverse();
-	TEST_ASSERT_EQUALS_FLOAT(angle.toFloat(), -0.3 * M_PI);
-}
-
-void
-AngleTest::testGlobalFunctions()
-{
-	xpcc::Angle angle;
-	
-	//cos();
-	//sin();
-	//tan();
-}
+#endif	// XPCC__LOCATION_2D_HPP

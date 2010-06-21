@@ -26,41 +26,18 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id$
+ * $Id: angle_test.hpp -1   $
  */
 // ----------------------------------------------------------------------------
 
-#include <math.h>
+#include <unittest/testsuite.hpp>
 
-#include "angle.hpp"
-#include "utils.hpp"
-
-// ----------------------------------------------------------------------------
-void
-xpcc::Angle::normalize()
+class AngleTest : public unittest::TestSuite
 {
-	if (isPositive(value))
-	{
-		while (value > M_PI) {
-			value -= 2 * M_PI;
-		}
-	}
-	else {
-		while (value < -M_PI) {
-			value += 2 * M_PI;
-		}
-	}
-}
-
-// ----------------------------------------------------------------------------
-void
-xpcc::Angle::reverse()
-{
-	if (isPositive(value))
-	{
-		value -= M_PI;
-	}
-	else {
-		value += M_PI;
-	}
-}
+public:
+	void
+	testNormalize();
+	
+	void
+	testReverse();
+};

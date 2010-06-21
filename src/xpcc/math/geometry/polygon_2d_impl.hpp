@@ -5,7 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -30,98 +30,36 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC__STACK_HPP
-#define	XPCC__STACK_HPP
+#ifndef XPCC__POLYGON_2D_HPP
+	#error	"Don't include this file directly, use 'polygon_2d.hpp' instead!"
+#endif
 
-#include <stdint.h>
-
-#include "deque.hpp"
-
-namespace xpcc
+// ----------------------------------------------------------------------------
+template <typename T>
+xpcc::Polygon2D<T>::Polygon2D(SizeType n) :
+	buffer(n)
 {
-	/**
-	 * \brief	LIFO stack
-	 * 
-	 * Elements are pushed/popped from the "back" of the specific container,
-	 * which is known as the top of the stack.
-	 * 
-	 * \see		Deque()
-	 * 
-	 * \author	Fabian Greif 
-	 * \ingroup		container
-	 */
-	template<typename T,
-			 typename Container>
-	class Stack
-	{
-	public:
-		typedef typename Container::Size Size;
-		
-	public:
-		bool
-		isEmpty()
-		{
-			return c.isEmpty();
-		}
-		
-		bool
-		isFull()
-		{
-			return c.isFull();
-		}
-		
-		Size
-		getSize()
-		{
-			return c.getSize();
-		}
-		
-		Size
-		getMaxSize()
-		{
-			return c.getMaxSize();
-		}
-		
-		T&
-		get()
-		{
-			return c.back();
-		}
-		
-		const T&
-		get() const
-		{
-			return c.back();
-		}
-		
-		bool
-		push(const T& value)
-		{
-			return c.pushBack(value);
-		}
-		
-		void
-		pop()
-		{
-			c.popBack();
-		}
-	
-	protected:
-		Container c;
-	};
-
-	// ------------------------------------------------------------------------
-	/**
-	 * \brief		Bounded stack
-	 * 
-	 * \ingroup		container
-	 */
-	template<typename T, 
-			 int N,
-			 typename Container = BoundedDeque<T, N> >
-	class BoundedStack : public Stack<T, Container>
-	{
-	};
 }
 
-#endif	// XPCC__STACK_HPP
+// ----------------------------------------------------------------------------
+template <typename T>
+void
+xpcc::Polygon2D<T>::append(const Point& point)
+{
+	buffer.append(point);
+}
+
+// ----------------------------------------------------------------------------
+template <typename T>
+xpcc::Vector2D<T>&
+xpcc::Polygon2D<T>::operator [](SizeType index)
+{
+	return buffer[index];
+}
+
+template <typename T>
+const xpcc::Vector2D<T>&
+xpcc::Polygon2D<T>::operator [](SizeType index) const
+{
+	return buffer[index];
+}

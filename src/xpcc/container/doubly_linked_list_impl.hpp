@@ -2,7 +2,7 @@
 // ----------------------------------------------------------------------------
 /* Copyright (c) 2009, Roboterclub Aachen e.V.
  * All rights reserved.
- *
+ * 
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  * 
@@ -14,7 +14,7 @@
  *     * Neither the name of the Roboterclub Aachen e.V. nor the
  *       names of its contributors may be used to endorse or promote products
  *       derived from this software without specific prior written permission.
- *
+ * 
  * THIS SOFTWARE IS PROVIDED BY ROBOTERCLUB AACHEN E.V. ''AS IS'' AND ANY
  * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -25,103 +25,24 @@
  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
+ * 
  * $Id$
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC__STACK_HPP
-#define	XPCC__STACK_HPP
+#ifndef	XPCC__DOUBLY_LINKED_LIST_HPP
+	#error	"Don't include this file directly, use 'doubly_linked_list.hpp' instead"
+#endif
 
-#include <stdint.h>
-
-#include "deque.hpp"
-
-namespace xpcc
+// ----------------------------------------------------------------------------
+template <typename T>
+xpcc::DoublyLinkedList<T>::DoublyLinkedList()
 {
-	/**
-	 * \brief	LIFO stack
-	 * 
-	 * Elements are pushed/popped from the "back" of the specific container,
-	 * which is known as the top of the stack.
-	 * 
-	 * \see		Deque()
-	 * 
-	 * \author	Fabian Greif 
-	 * \ingroup		container
-	 */
-	template<typename T,
-			 typename Container>
-	class Stack
-	{
-	public:
-		typedef typename Container::Size Size;
-		
-	public:
-		bool
-		isEmpty()
-		{
-			return c.isEmpty();
-		}
-		
-		bool
-		isFull()
-		{
-			return c.isFull();
-		}
-		
-		Size
-		getSize()
-		{
-			return c.getSize();
-		}
-		
-		Size
-		getMaxSize()
-		{
-			return c.getMaxSize();
-		}
-		
-		T&
-		get()
-		{
-			return c.back();
-		}
-		
-		const T&
-		get() const
-		{
-			return c.back();
-		}
-		
-		bool
-		push(const T& value)
-		{
-			return c.pushBack(value);
-		}
-		
-		void
-		pop()
-		{
-			c.popBack();
-		}
-	
-	protected:
-		Container c;
-	};
-
-	// ------------------------------------------------------------------------
-	/**
-	 * \brief		Bounded stack
-	 * 
-	 * \ingroup		container
-	 */
-	template<typename T, 
-			 int N,
-			 typename Container = BoundedDeque<T, N> >
-	class BoundedStack : public Stack<T, Container>
-	{
-	};
 }
 
-#endif	// XPCC__STACK_HPP
+template <typename T>
+xpcc::DoublyLinkedList<T>::~DoublyLinkedList()
+{
+}
+
+// ----------------------------------------------------------------------------

@@ -78,6 +78,9 @@ namespace xpcc
 			
 			void
 			deallocate(T*);
+			
+		private:
+			T memory[N];
 		};
 	}
 }

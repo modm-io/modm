@@ -30,56 +30,55 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__CIRCLE_HPP
-#define XPCC__CIRCLE_HPP
+#ifndef XPCC__POLYGON_2D_HPP
+#define XPCC__POLYGON_2D_HPP
+
+#include <xpcc/container/dynamic_array.hpp>
+#include "vector_2d.hpp"
 
 namespace xpcc
 {
 	/**
-	 * \brief	Circle
-	 * 
+	 * \brief	Polygon
+	 *
+	 * The Polygon class provides a vector of points.
+	 *
 	 * \author	Fabian Greif
 	 * \ingroup	math
 	 */
 	template <typename T>
-	class Circle
+	class Polygon2D
 	{
-		typedef Point<T> Point;
 	public:
-		Circle();
-		
-		Circle(const Point& center, T radius);
-		
+		typedef size_t SizeType;
+		typedef Vector2D<T> Point;
+
+	public:
+		/**
+		 * \brief	Constructs a polygon capable of holding n points
+		 */
+		Polygon2D(SizeType n);
+
+		void
+		append(const Point& point);
+
+		inline Point&
+		operator [](SizeType index)
+		{
+			return buffer[index];
+		}
+
 		inline const Point&
-		getCenter() const
+		operator [](SizeType index) const
 		{
-			return this->center;
+			return buffer[index];
 		}
-		
-		inline void
-		setCenter(const Point& point)
-		{
-			this->center = point;
-		}
-		
-		inline T
-		getRadius() const
-		{
-			return this->radius;
-		}
-		
-		inline void
-		setRadius(T radius)
-		{
-			this->radius = radius;
-		}
-		
+
 	private:
-		Point center;
-		T radius;
+		xpcc::DynamicArray<T> buffer;
 	};
 }
 
-#include "circle_impl.hpp"
+#include "polygon_2d_impl.hpp"
 
-#endif // XPCC__CIRCLE_HPP
+#endif // XPCC__POLYGON_2D_HPP

@@ -30,19 +30,44 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__CIRCLE_HPP
-	#error	"Don't include this file directly, use 'circle.hpp' instead!"
-#endif
+#ifndef	XPCC__ANGLE_HPP
+#define	XPCC__ANGLE_HPP
 
-// ----------------------------------------------------------------------------
-template <typename T>
-xpcc::Circle<T>::Circle() :
-	center(), radius(0)
+#include <cmath>
+
+namespace xpcc
 {
+	/**
+	 * \ingroup	math
+	 */
+	class Angle
+	{
+	public:
+		/// \brief	Limit angle to +-Pi
+		static float
+		normalize(float angle);
+		
+		/**
+		 * \brief	reverse the angle
+		 * 
+		 * If the angle is normalized, it stays that way
+		 */
+		static float
+		reverse(float angle);
+		
+		
+		static inline float
+		toRadian(float angle)
+		{
+			return angle * M_PI / 180.0;
+		}
+		
+		static inline float
+		toDegree(float angle)
+		{
+			return angle * 180.0 / M_PI;
+		}
+	};
 }
 
-template <typename T>
-xpcc::Circle<T>::Circle(const Point& center, T radius) :
-	center(center), radius(radius)
-{
-}
+#endif	// XPCC__ANGLE_HPP

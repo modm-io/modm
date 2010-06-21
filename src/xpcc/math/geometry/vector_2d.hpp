@@ -38,8 +38,6 @@
 
 #include <xpcc/io/iostream.hpp>
 
-#include "angle.hpp"
-
 namespace xpcc
 {
 	/**
@@ -54,7 +52,7 @@ namespace xpcc
 	 * \ingroup	math
 	 */
 	template<typename T = int16_t>
-	class Point
+	class Vector2D
 	{
 	public:
 		/**
@@ -62,9 +60,9 @@ namespace xpcc
 		 * 
 		 * Creates a Point with coordinates (0, 0).
 		 */
-		Point();
+		Vector2D();
 		
-		Point(const T& x, const T& y);
+		Vector2D(const T& x, const T& y);
 		
 		inline void
 		setX(const T& value);
@@ -106,36 +104,36 @@ namespace xpcc
 		 * 
 		 * Absolute angle of the vector from the origin to the point.
 		 */
-		Angle
+		float
 		getAngle() const;
 		
 		/**
 		 * \brief	Normalize length to 1
 		 */
-		Point&
+		Vector2D&
 		normalize();
 
 		/**
 		 * \brief	Scale the length by \p factor
 		 */
 		template<typename U>
-		Point&
+		Vector2D&
 		scale(const U& factor);
 
-		Point&
-		rotate(const Angle& phi);
+		Vector2D&
+		rotate(const float phi);
 		
-		Point&
-		operator += (const Point &other);
+		Vector2D&
+		operator += (const Vector2D &other);
 		
-		Point&
-		operator -= (const Point &other);
+		Vector2D&
+		operator -= (const Vector2D &other);
 		
 		/**
 		 * \brief	Convert between Point-objects with different base-types
 		 */
 		template<typename U>
-		operator Point<U>() const;
+		operator Vector2D<U>() const;
 	
 	private:
 		T x;
@@ -143,69 +141,69 @@ namespace xpcc
 		
 	private:
 		template<typename U>
-		friend Point<U>
-		operator - (const Point<U> &a);
+		friend Vector2D<U>
+		operator - (const Vector2D<U> &a);
 		
 		template<typename U>
-		friend Point<U>
-		operator - (const Point<U> &a, const Point<U> &b);
+		friend Vector2D<U>
+		operator - (const Vector2D<U> &a, const Vector2D<U> &b);
 		
 		template<typename U, typename V>
-		friend Point<U>
-		operator - (const Point<U> &a, const Point<V> &b);
+		friend Vector2D<U>
+		operator - (const Vector2D<U> &a, const Vector2D<V> &b);
 
 		template<typename U>
-		friend Point<U>
-		operator + (const Point<U> &a, const Point<U> &b);
+		friend Vector2D<U>
+		operator + (const Vector2D<U> &a, const Vector2D<U> &b);
 		
 		template<typename U, typename V>
-		friend Point<U>
-		operator + (const Point<U> &a, const Point<V> &b);
+		friend Vector2D<U>
+		operator + (const Vector2D<U> &a, const Vector2D<V> &b);
 
 		template<typename U>
 		friend bool
-		operator == (const Point<U> &a, const Point<U> &b);
+		operator == (const Vector2D<U> &a, const Vector2D<U> &b);
 		
 		template<typename U>
 		friend bool
-		operator != (const Point<U> &a, const Point<U> &b);
+		operator != (const Vector2D<U> &a, const Vector2D<U> &b);
 
 		template<typename U>
 		friend IOStream&
-		operator <<(IOStream& s, const Point<U>& c);
+		operator <<(IOStream& s, const Vector2D<U>& c);
 		
 		template<typename U, typename V>
 		friend U
-		scalar(const Point<U> &a, const Point<V> &b);
+		scalar(const Vector2D<U> &a, const Vector2D<V> &b);
 	};
 	
 	template<typename U>
-	Point<U>
-	operator - (const Point<U> &a);
+	Vector2D<U>
+	operator - (const Vector2D<U> &a);
 	
 	template<typename U>
-	Point<U>
-	operator - (const Point<U> &a, const Point<U> &b);
+	Vector2D<U>
+	operator - (const Vector2D<U> &a, const Vector2D<U> &b);
 	
 	template<typename U, typename V>
-	Point<U>
-	operator - (const Point<U> &a, const Point<V> &b);
+	Vector2D<U>
+	operator - (const Vector2D<U> &a, const Vector2D<V> &b);
 
 	template<typename U>
-	Point<U>
-	operator + (const Point<U> &a, const Point<U> &b);
+	Vector2D<U>
+	operator + (const Vector2D<U> &a, const Vector2D<U> &b);
 	
 	template<typename U, typename V>
-	Point<U>
-	operator + (const Point<U> &a, const Point<V> &b);
+	Vector2D<U>
+	operator + (const Vector2D<U> &a, const Vector2D<V> &b);
 
 	template<typename U>
 	bool
-	operator == (const Point<U> &a, const Point<U> &b);
+	operator == (const Vector2D<U> &a, const Vector2D<U> &b);
 	
 	template<typename U>
 	bool
-	operator != (const Point<U> &a, const Point<U> &b);
+	operator != (const Vector2D<U> &a, const Vector2D<U> &b);
 	
 	/**
 	 * \brief	Calculates the scalar product of two vectors
@@ -213,7 +211,7 @@ namespace xpcc
 	 */
 	template<typename U, typename V>
 	U
-	scalar(const Point<U> &a, const Point<V> &b);
+	scalar(const Vector2D<U> &a, const Vector2D<V> &b);
 	
 	/**
 	 * \brief	Stream operator for \b xpcc::Point<U>
@@ -221,9 +219,9 @@ namespace xpcc
 	 */
 	template<typename U>
 	IOStream&
-	operator << (IOStream& s, const Point<U>& c);
+	operator << (IOStream& s, const Vector2D<U>& c);
 }
 
-#include "point_impl.hpp"
+#include "vector_2d_impl.hpp"
 
 #endif	// XPCC__POINT_HPP

@@ -33,6 +33,7 @@
 #ifndef	XPCC__UTILS_HPP
 #define	XPCC__UTILS_HPP
 
+#include <cmath>
 #include <stdint.h>
 
 namespace xpcc

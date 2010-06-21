@@ -78,7 +78,7 @@ namespace xpcc
 	 *
 	 * \see	xpcc::LinearInterpolation
 	 * 
-	 * \author	Fabian Greif
+	 * \author		Fabian Greif
 	 * \ingroup		container
 	 */
 	template<typename T1, typename T2>

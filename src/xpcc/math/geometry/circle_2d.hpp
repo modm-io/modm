@@ -30,20 +30,58 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <unittest/testsuite.hpp>
+#ifndef XPCC__CIRCLE_2D_HPP
+#define XPCC__CIRCLE_2D_HPP
 
-class PointTest : public unittest::TestSuite
+#include "vector_2d.hpp"
+
+namespace xpcc
 {
-public:
-	void
-	testConstructor();
-	
-	void
-	testLengthAndAngle();
-	
-	void
-	testRotation();
-	
-	void
-	testArithmetics();
-};
+	/**
+	 * \brief	Circle
+	 * 
+	 * \author	Fabian Greif
+	 * \ingroup	math
+	 */
+	template <typename T>
+	class Circle2D
+	{
+		typedef Vector2D<T> Point;
+	public:
+		Circle2D();
+		
+		Circle2D(const Point& center, T radius);
+		
+		inline const Point&
+		getCenter() const
+		{
+			return this->center;
+		}
+		
+		inline void
+		setCenter(const Point& point)
+		{
+			this->center = point;
+		}
+		
+		inline T
+		getRadius() const
+		{
+			return this->radius;
+		}
+		
+		inline void
+		setRadius(T radius)
+		{
+			this->radius = radius;
+		}
+		
+	private:
+		Point center;
+		T radius;
+	};
+}
+
+#include "circle_2d_impl.hpp"
+
+#endif // XPCC__CIRCLE_2D_HPP

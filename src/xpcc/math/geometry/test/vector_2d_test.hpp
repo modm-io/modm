@@ -26,47 +26,24 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id$
+ * $Id: vector_2d_test.hpp -1   $
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__LINE_SEGMENT_HPP
-	#error	"Don't include this file directly, use 'line.hpp' instead!"
-#endif
+#include <unittest/testsuite.hpp>
 
-// ----------------------------------------------------------------------------
-template<typename T>
-xpcc::LineSegment<T>::LineSegment() :
-	start(), end()
+class Vector2DTest : public unittest::TestSuite
 {
-}
-
-template<typename T>
-xpcc::LineSegment<T>::LineSegment(const Point& start, const Point& end) :
-	start(start), end(end)
-{
-}
-
-template<typename T>
-T
-xpcc::LineSegment<T>::getLength() const
-{
-	Point t = this->end - this->start;
-	return t.getLength();
-}
-
-template<typename U>
-bool
-operator == (const LineSegment<U> &a, const LineSegment<U> &b)
-{
-	return ((a.start == b.start) &&
-			(a.end == b.end));
-}
-
-template<typename U>
-bool
-operator != (const LineSegment<U> &a, const LineSegment<U> &b)
-{
-	return ((a.start != b.start) ||
-			(a.end != b.end));
-}
+public:
+	void
+	testConstructor();
+	
+	void
+	testLengthAndAngle();
+	
+	void
+	testRotation();
+	
+	void
+	testArithmetics();
+};

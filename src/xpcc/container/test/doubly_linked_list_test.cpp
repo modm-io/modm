@@ -30,79 +30,14 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC__LOCATION_HPP
-#define	XPCC__LOCATION_HPP
+#include <xpcc/container/doubly_linked_list.hpp>
 
-#include <xpcc/io/iostream.hpp>
+#include "doubly_linked_list_test.hpp"
 
-#include "angle.hpp"
-#include "point.hpp"
+typedef xpcc::DoublyLinkedList<int16_t> Container;
 
-namespace xpcc
+void
+DoublyLinkedListTest::testConstructor()
 {
-	/**
-	 * \brief		Location
-	 * 
-	 * \ingroup	math
-	 */
-	template <typename T = int16_t>
-	class Location
-	{
-	public:
-		typedef ::xpcc::Point<T> Point;
-		
-		Location();
-		
-		Location(const Point& point, const Angle& phi);
-		
-		Location(const T& x, const T& y, const Angle& phi);
-		
-		/// Add a position increment
-		void
-		update(Location& diff);
-		
-		/// Add a increment only in x-direction
-		void
-		update(T x, Angle& phi);
-		
-		inline const Point&
-		getPoint() const;
-		
-		void
-		setPoint(const Point& point);
-		
-		void
-		setPoint(const T& x, const T& y);
-		
-		inline const Angle&
-		getAngle() const;
-		
-		void
-		setAngle(const Angle& phi);
-		
-		/// Convert between Location-objects with different base-types
-		template<typename U>
-		operator Location<U>() const;
-		
-	private:
-		template <typename U>
-		friend IOStream&
-		operator <<( IOStream&, const Location<U>&);
-		
-		Point point;
-		Angle phi;
-	};
-
-	/**
-	 * \brief	Stream operator to \b xpcc::Location<T>
-	 *
-	 * \ingroup	math
-	 */
-	template<typename T>
-	IOStream&
-	operator<<(IOStream& os, const Location<T>& l);
+	Container list;
 }
-
-#include "location_impl.hpp"
-
-#endif	// XPCC__LOCATION_HPP

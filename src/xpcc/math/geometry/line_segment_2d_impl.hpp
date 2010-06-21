@@ -30,23 +30,43 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <unittest/testsuite.hpp>
+#ifndef XPCC__LINE_SEGMENT_HPP
+	#error	"Don't include this file directly, use 'line.hpp' instead!"
+#endif
 
-class AngleTest : public unittest::TestSuite
+// ----------------------------------------------------------------------------
+template<typename T>
+xpcc::LineSegment2D<T>::LineSegment2D() :
+	start(), end()
 {
-public:
-	void
-	testConstructor();
-	
-	void
-	testAssignment();
-	
-	void
-	testNormalize();
-	
-	void
-	testReverse();
-	
-	void
-	testGlobalFunctions();
-};
+}
+
+template<typename T>
+xpcc::LineSegment2D<T>::LineSegment2D(const Point& start, const Point& end) :
+	start(start), end(end)
+{
+}
+
+template<typename T>
+T
+xpcc::LineSegment2D<T>::getLength() const
+{
+	Point t = this->end - this->start;
+	return t.getLength();
+}
+
+template<typename U>
+bool
+operator == (const LineSegment2D<U> &a, const LineSegment2D<U> &b)
+{
+	return ((a.start == b.start) &&
+			(a.end == b.end));
+}
+
+template<typename U>
+bool
+operator != (const LineSegment2D<U> &a, const LineSegment2D<U> &b)
+{
+	return ((a.start != b.start) ||
+			(a.end != b.end));
+}

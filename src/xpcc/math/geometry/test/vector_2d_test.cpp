@@ -26,19 +26,19 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id$
+ * $Id: vector_2d_test.cpp -1   $
  */
 // ----------------------------------------------------------------------------
 
 #include <math.h>
-#include <xpcc/math/point.hpp>
+#include <xpcc/math/geometry/vector_2d.hpp>
 
-#include "point_test.hpp"
+#include "vector_2d_test.hpp"
 
 void
-PointTest::testConstructor()
+Vector2DTest::testConstructor()
 {
-	xpcc::Point<int16_t> coord;
+	xpcc::Vector2D<int16_t> coord;
 	
 	TEST_ASSERT_EQUALS(coord.getX(), 0);
 	TEST_ASSERT_EQUALS(coord.getY(), 0);
@@ -55,32 +55,32 @@ PointTest::testConstructor()
 }
 
 void
-PointTest::testLengthAndAngle()
+Vector2DTest::testLengthAndAngle()
 {
-	xpcc::Angle angle;
-	xpcc::Point<int16_t> coord(100, 100);
+	float angle;
+	xpcc::Vector2D<int16_t> coord(100, 100);
 	
 	TEST_ASSERT_EQUALS(coord.getLength(), 141);
 	angle = coord.getAngle();
-	TEST_ASSERT_EQUALS_FLOAT(angle.toFloat(), M_PI / 4);
+	TEST_ASSERT_EQUALS_FLOAT(angle, M_PI / 4);
 	
 	coord.set(-100, -100);
 	
 	TEST_ASSERT_EQUALS(coord.getLength(), 141);
 	angle = coord.getAngle();
-	TEST_ASSERT_EQUALS_FLOAT(angle.toFloat(), - 3* M_PI / 4);
+	TEST_ASSERT_EQUALS_FLOAT(angle, - 3* M_PI / 4);
 	
 	coord.set(0, 100);
 	TEST_ASSERT_EQUALS(coord.getLength(), 100);
 	angle = coord.getAngle();
-	TEST_ASSERT_EQUALS_FLOAT(angle.toFloat(), M_PI / 2);
+	TEST_ASSERT_EQUALS_FLOAT(angle, M_PI / 2);
 	
 }
 
 void
-PointTest::testRotation()
+Vector2DTest::testRotation()
 {
-	xpcc::Point<int16_t> coord(100, 200);
+	xpcc::Vector2D<int16_t> coord(100, 200);
 	
 	coord.rotate(M_PI / 2);
 	
@@ -94,11 +94,11 @@ PointTest::testRotation()
 }
 
 void
-PointTest::testArithmetics()
+Vector2DTest::testArithmetics()
 {
-	xpcc::Point<int16_t> x(100, 100);
-	xpcc::Point<int16_t> y(100, 100);
-	xpcc::Point<int16_t> z;
+	xpcc::Vector2D<int16_t> x(100, 100);
+	xpcc::Vector2D<int16_t> y(100, 100);
+	xpcc::Vector2D<int16_t> z;
 	
 	x += y;
 	

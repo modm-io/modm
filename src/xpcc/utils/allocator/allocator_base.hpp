@@ -30,98 +30,64 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC__STACK_HPP
-#define	XPCC__STACK_HPP
+#ifndef XPCC_ALLOCATOR__ALLOCATOR_BASE_HPP
+#define XPCC_ALLOCATOR__ALLOCATOR_BASE_HPP
 
-#include <stdint.h>
-
-#include "deque.hpp"
+#include <cstddef>
 
 namespace xpcc
 {
-	/**
-	 * \brief	LIFO stack
-	 * 
-	 * Elements are pushed/popped from the "back" of the specific container,
-	 * which is known as the top of the stack.
-	 * 
-	 * \see		Deque()
-	 * 
-	 * \author	Fabian Greif 
-	 * \ingroup		container
-	 */
-	template<typename T,
-			 typename Container>
-	class Stack
+	namespace allocator
 	{
-	public:
-		typedef typename Container::Size Size;
-		
-	public:
-		bool
-		isEmpty()
+		/**
+		 * \brief	Base class for all allocator types
+		 * 
+		 * \internal
+		 * 
+		 * \ingroup	allocator
+		 * \author	Fabian Greif
+		 */
+		template <typename T>
+		class AllocatorBase
 		{
-			return c.isEmpty();
-		}
-		
-		bool
-		isFull()
-		{
-			return c.isFull();
-		}
-		
-		Size
-		getSize()
-		{
-			return c.getSize();
-		}
-		
-		Size
-		getMaxSize()
-		{
-			return c.getMaxSize();
-		}
-		
-		T&
-		get()
-		{
-			return c.back();
-		}
-		
-		const T&
-		get() const
-		{
-			return c.back();
-		}
-		
-		bool
-		push(const T& value)
-		{
-			return c.pushBack(value);
-		}
-		
-		void
-		pop()
-		{
-			c.popBack();
-		}
-	
-	protected:
-		Container c;
-	};
-
-	// ------------------------------------------------------------------------
-	/**
-	 * \brief		Bounded stack
-	 * 
-	 * \ingroup		container
-	 */
-	template<typename T, 
-			 int N,
-			 typename Container = BoundedDeque<T, N> >
-	class BoundedStack : public Stack<T, Container>
-	{
-	};
+		public:
+			/**
+			 * \brief	Construct an object
+			 * 
+			 * Constructs an object of type T (the template parameter) on the
+			 * location pointed by p using its copy constructor to initialize
+			 * its value to \p value.
+			 * 
+			 * Notice that this does not allocate space for the element, it
+			 * should already be available at p.
+			 */
+			void
+			construct(T* p, const T& value)
+			{
+				// placement new
+				::new((void *) p) T(value);
+			}
+			
+			/**
+			 * \brief	Destroy an object
+			 * 
+			 * Destroys the object of type T (the template parameter) pointed
+			 * by p.
+			 * 
+			 * Notice that this does not deallocate space for the element.
+			 */
+			void
+			destroy(T* p)
+			{
+				p->~T();
+			}
+			
+		protected:
+			AllocatorBase()
+			{
+			}
+		};
+	}
 }
 
-#endif	// XPCC__STACK_HPP
+#endif // XPCC_ALLOCATOR__ALLOCATOR_BASE_HPP

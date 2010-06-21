@@ -30,85 +30,40 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__LINE_SEGMENT_HPP
-#define XPCC__LINE_SEGMENT_HPP
+#if defined(__AVR__) && defined(__AVR_HAVE_MUL__)
+	#include <xpcc/architecture/avr/math.hpp>
+#endif
 
-#include "point.hpp"
+#include "vector_2d.hpp"
 
+// this explicit namespace is needed here, otherwise we get an error about 
+// "specialization of ... in different namespace"
 namespace xpcc
 {
-	/**
-	 * \brief	LineSegmentSegment
-	 * 
-	 * \author	Fabian Greif
-	 * \ingroup	math
-	 */
-	template <typename T>
-	class LineSegment
+	template<>
+	Vector2D<float>&
+	Vector2D<float>::rotate(const float phi)
 	{
-		typedef Point<T> Point;
-	public:
-		LineSegment();
+		float c = cos(phi);
+		float s = sin(phi);
+
+		float tx = (c * this->x - s * this->y);
+		this->y =  (s * this->x + c * this->y);
+		this->x = tx;
+
+		return *this;
+	}
+
+#if defined(__AVR__) && defined(__AVR_HAVE_MUL__)
+	template<>
+	int16_t
+	Vector2D<int16_t>::getLength() const
+	{
+		int32_t t;
+		t = avr::mul32(x, x);
+		t = avr::mac32(t, y, y);
 		
-		LineSegment(const Point& start, const Point& end);
-		
-		void
-		setStartPoint(const Point& point)
-		{
-			this->start = point;
-		}
-		
-		const Point&
-		getStartPoint() const
-		{
-			return this->start;
-		}
-		
-		void
-		setEndPoint(const Point& point)
-		{
-			this->end = point;
-		}
-		
-		inline const Point&
-		getEndPoint() const
-		{
-			return this->end;
-		}
-		
-		inline void
-		setPoints(const Point& start, const Point& end)
-		{
-			this->start = start;
-			this->end = end;
-		}
-		
-		T
-		getLength() const;
-		
-	protected:
-		Point start;
-		Point end;
-		
-	private:
-		template<typename U>
-		friend bool
-		operator == (const LineSegment<U> &a, const LineSegment<U> &b);
-		
-		template<typename U>
-		friend bool
-		operator != (const LineSegment<U> &a, const LineSegment<U> &b);
-	};
-	
-	template<typename U>
-	bool
-	operator == (const LineSegment<U> &a, const LineSegment<U> &b);
-	
-	template<typename U>
-	bool
-	operator != (const LineSegment<U> &a, const LineSegment<U> &b);
+		return avr::sqrt32_round(t);
+	}
+#endif
 }
-
-#include "line_segment_impl.hpp"
-
-#endif // XPCC__LINE_SEGMENT_HPP

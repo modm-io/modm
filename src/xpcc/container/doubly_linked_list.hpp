@@ -54,6 +54,8 @@ namespace xpcc
 	public:
 		DoublyLinkedList();
 		
+		~DoublyLinkedList();
+		
 		/// check if there are any nodes in the list
 		inline bool
 		isEmpty() const;
@@ -68,36 +70,50 @@ namespace xpcc
 		
 		/// Remove the first entry
 		void
-		removeFirst();
+		removeFront();
 		
 		void
-		removeLast();
+		removeBack();
 		
 		/**
 		 * \return the first node in the list
 		 */
 		inline const T&
-		first() const;
+		front() const;
 
 		/**
 		 * \return the last node in the list
 		 */
 		inline const T&
-		last() const;
+		back() const;
 		
 		/**
 		 * \brief	Access the node at position \a index
 		 * 
 		 * \warning	The implementation has to iterate through the list
 		 * 			until it reaches the desired position. Therefore an
-		 * 			access via iterator is prefered.
+		 * 			access via iterator is preferred.
 		 */
 		const T&
 		at(int index) const;
 		
-	private:
+	protected:
+		struct Node
+		{
+			T data;
+			Node *previous;
+			Node *next;
+		};
 		
+		
+	private:
+		DoublyLinkedList(const DoublyLinkedList& other);
+		
+		DoublyLinkedList&
+		operator = (const DoublyLinkedList& other);
 	};
 }
+
+#include "doubly_linked_list_impl.hpp"
 
 #endif	// XPCC__DOUBLY_LINKED_LIST_HPP

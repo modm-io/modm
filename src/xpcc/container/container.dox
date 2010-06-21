@@ -29,17 +29,45 @@ Sequence containers:
  - xpcc::DynamicArray
  - xpcc::LinkedList
  - xpcc::DoublyLinkedList
-
  - xpcc::BoundedDeque
- - xpcc::BoundedStack
- - xpcc::BoundedQueue
 
 Container adaptors:
  - xpcc::Queue
  - xpcc::Stack
+ 
+ - xpcc::BoundedStack
+ - xpcc::BoundedQueue
 
 Other:
  - xpcc::SmartPointer
  - xpcc::Pair
 
+<h3>Generic Interface</h3>
+
+All implementation share a common set of function. Not every container implement
+every one of it, only a subset which is sufficient for the container.
+
+ - append
+ - prepend
+ - (insert)
+ - removeFront
+ - removeBack
+ - (remove)
+ - getFront
+ - getBack
+ 
+ - push
+ - pop
+ - get
+
+ - at
+ - operator []
+ 
+ - clear
+ 
+ - isEmpty
+ - isFull
+ - getSize
+ - getMaxSize
+ - getCapacity 
 */

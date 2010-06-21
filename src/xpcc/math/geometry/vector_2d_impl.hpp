@@ -36,13 +36,13 @@
 
 // ----------------------------------------------------------------------------
 template<typename T>
-xpcc::Point<T>::Point() :
+xpcc::Vector2D<T>::Vector2D() :
 	x(), y()
 {
 }
 
 template<typename T>
-xpcc::Point<T>::Point(const T& x, const T& y) : 
+xpcc::Vector2D<T>::Vector2D(const T& x, const T& y) : 
 	x(x), y(y)
 {
 }
@@ -50,7 +50,7 @@ xpcc::Point<T>::Point(const T& x, const T& y) :
 // ----------------------------------------------------------------------------
 template<typename T>
 void
-xpcc::Point<T>::setX(const T& value)
+xpcc::Vector2D<T>::setX(const T& value)
 {
 	this->x = value;
 }
@@ -58,7 +58,7 @@ xpcc::Point<T>::setX(const T& value)
 // ----------------------------------------------------------------------------
 template<typename T>
 void
-xpcc::Point<T>::setY(const T& value)
+xpcc::Vector2D<T>::setY(const T& value)
 {
 	this->y = value;
 }
@@ -66,7 +66,7 @@ xpcc::Point<T>::setY(const T& value)
 // ----------------------------------------------------------------------------
 template<typename T>
 void
-xpcc::Point<T>::set(const T& x, const T& y)
+xpcc::Vector2D<T>::set(const T& x, const T& y)
 {
 	this->x = x;
 	this->y = y;
@@ -75,7 +75,7 @@ xpcc::Point<T>::set(const T& x, const T& y)
 // ----------------------------------------------------------------------------
 template<typename T>
 const T&
-xpcc::Point<T>::getX() const
+xpcc::Vector2D<T>::getX() const
 {
 	return this->x;
 }
@@ -83,7 +83,7 @@ xpcc::Point<T>::getX() const
 // ----------------------------------------------------------------------------
 template<typename T>
 const T&
-xpcc::Point<T>::getY() const
+xpcc::Vector2D<T>::getY() const
 {
 	return this->y;
 }
@@ -91,7 +91,7 @@ xpcc::Point<T>::getY() const
 // ----------------------------------------------------------------------------
 template<typename T>
 T
-xpcc::Point<T>::getLength() const
+xpcc::Vector2D<T>::getLength() const
 {
 	float tx = this->x;
 	float ty = this->y;
@@ -102,23 +102,23 @@ xpcc::Point<T>::getLength() const
 // ----------------------------------------------------------------------------
 template<typename T>
 T
-xpcc::Point<T>::getManhattanLength() const
+xpcc::Vector2D<T>::getManhattanLength() const
 {
 	return (std::abs(this->x) + std::abs(this->y));
 }
 
 // ----------------------------------------------------------------------------
 template<typename T>
-xpcc::Angle
-xpcc::Point<T>::getAngle() const
+float
+xpcc::Vector2D<T>::getAngle() const
 {
 	return std::atan2(y, x);
 }
 
 // ----------------------------------------------------------------------------
 template<typename T>
-xpcc::Point<T>&
-xpcc::Point<T>::normalize()
+xpcc::Vector2D<T>&
+xpcc::Vector2D<T>::normalize()
 {
 	T length = this->getLength();
 	
@@ -131,8 +131,8 @@ xpcc::Point<T>::normalize()
 // ----------------------------------------------------------------------------
 template<typename T>
 template<typename U>
-xpcc::Point<T>&
-xpcc::Point<T>::scale(const U& factor)
+xpcc::Vector2D<T>&
+xpcc::Vector2D<T>::scale(const U& factor)
 {
 	this->x = this->x * factor;
 	this->y = this->y * factor;
@@ -142,11 +142,11 @@ xpcc::Point<T>::scale(const U& factor)
 
 // ----------------------------------------------------------------------------
 template<typename T>
-xpcc::Point<T>&
-xpcc::Point<T>::rotate(const Angle& phi)
+xpcc::Vector2D<T>&
+xpcc::Vector2D<T>::rotate(const float phi)
 {
-	float c = cos(phi).toFloat();
-	float s = sin(phi).toFloat();
+	float c = cos(phi);
+	float s = sin(phi);
 	
 	// without rounding the result might be false for T = integer
 	T tx =    round(c * this->x - s * this->y);
@@ -158,8 +158,8 @@ xpcc::Point<T>::rotate(const Angle& phi)
 
 // ----------------------------------------------------------------------------
 template<typename T>
-xpcc::Point<T>&
-xpcc::Point<T>::operator += (const Point &other)
+xpcc::Vector2D<T>&
+xpcc::Vector2D<T>::operator += (const Vector2D &other)
 {
 	this->x += other.x;
 	this->y += other.y;
@@ -168,8 +168,8 @@ xpcc::Point<T>::operator += (const Point &other)
 
 // ----------------------------------------------------------------------------	
 template<typename T>
-xpcc::Point<T>&
-xpcc::Point<T>::operator -= (const Point &other)
+xpcc::Vector2D<T>&
+xpcc::Vector2D<T>::operator -= (const Vector2D &other)
 {
 	this->x -= other.x;
 	this->y -= other.y;
@@ -178,58 +178,58 @@ xpcc::Point<T>::operator -= (const Point &other)
 
 // ----------------------------------------------------------------------------
 template<typename T> template<typename U>
-xpcc::Point<T>::operator Point<U>() const
+xpcc::Vector2D<T>::operator Vector2D<U>() const
 {
-	return Point<U>(this->x, this->y);
+	return Vector2D<U>(this->x, this->y);
 }
 
 // ----------------------------------------------------------------------------
 
 template<typename U>
-xpcc::Point<U>
-xpcc::operator - (const Point<U> &a)
+xpcc::Vector2D<U>
+xpcc::operator - (const Vector2D<U> &a)
 {
-	return Point<U>(-a.x, -a.y);
+	return Vector2D<U>(-a.x, -a.y);
 }
 
 template<typename U>
-xpcc::Point<U>
-xpcc::operator - (const Point<U> &a, const Point<U> &b)
+xpcc::Vector2D<U>
+xpcc::operator - (const Vector2D<U> &a, const Vector2D<U> &b)
 {
-	return Point<U>(a.x - b.x, a.y - b.y);
+	return Vector2D<U>(a.x - b.x, a.y - b.y);
 }
 
 template<typename U, typename V>
-xpcc::Point<U>
-xpcc::operator - (const Point<U> &a, const Point<V> &b)
+xpcc::Vector2D<U>
+xpcc::operator - (const Vector2D<U> &a, const Vector2D<V> &b)
 {
-	return Point<U>(a.x - b.x, a.y - b.y);
+	return Vector2D<U>(a.x - b.x, a.y - b.y);
 }
 
 template<typename U>
-xpcc::Point<U>
-xpcc::operator + (const Point<U> &a, const Point<U> &b)
+xpcc::Vector2D<U>
+xpcc::operator + (const Vector2D<U> &a, const Vector2D<U> &b)
 {
-	return Point<U>(a.x + b.x, a.y + b.y);
+	return Vector2D<U>(a.x + b.x, a.y + b.y);
 }
 
 template<typename U,typename V>
-xpcc::Point<U>
-xpcc::operator + (const Point<U> &a, const Point<V> &b)
+xpcc::Vector2D<U>
+xpcc::operator + (const Vector2D<U> &a, const Vector2D<V> &b)
 {
-	return Point<U>(a.x + b.x, a.y + b.y);
+	return Vector2D<U>(a.x + b.x, a.y + b.y);
 }
 
 template<typename U>
 bool
-xpcc::operator == (const Point<U> &a, const Point<U> &b)
+xpcc::operator == (const Vector2D<U> &a, const Vector2D<U> &b)
 {
 	return ((a.x == b.x) && (a.y == b.y));
 }
 
 template<typename U>
 bool
-xpcc::operator != (const Point<U> &a, const Point<U> &b)
+xpcc::operator != (const Vector2D<U> &a, const Vector2D<U> &b)
 {
 	return ((a.x != b.x) || (a.y != b.y));
 }
@@ -237,7 +237,7 @@ xpcc::operator != (const Point<U> &a, const Point<U> &b)
 // ----------------------------------------------------------------------------
 template<typename U, typename V>
 U
-xpcc::scalar(const xpcc::Point<U> &a, const xpcc::Point<V> &b)
+xpcc::scalar(const xpcc::Vector2D<U> &a, const xpcc::Vector2D<V> &b)
 {
 	return (a.x * b.x + a.y * b.y);
 }
@@ -245,7 +245,7 @@ xpcc::scalar(const xpcc::Point<U> &a, const xpcc::Point<V> &b)
 // ----------------------------------------------------------------------------
 template <typename U>
 xpcc::IOStream&
-xpcc::operator <<( xpcc::IOStream& s, const xpcc::Point<U>& c)
+xpcc::operator <<( xpcc::IOStream& s, const xpcc::Vector2D<U>& c)
 {
 	s << "x=" << c.x << ", y=" << c.y;
 	return s;

@@ -25,103 +25,45 @@
  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * $Id$
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC__LOCATION_HPP
-	#error	"Don't include this file directly use 'location.hpp' instead!"
-#endif
+#include <xpcc/math/utils.hpp>
 
-// -----------------------------------------------------------------------------
-template <typename T>
-xpcc::Location<T>::Location() :
-	point(), phi()
+#include "angle.hpp"
+
+// ----------------------------------------------------------------------------
+float
+xpcc::Angle::normalize(float angle)
 {
-}
-
-template <typename T>
-xpcc::Location<T>::Location(const Point& point, const Angle& phi) :
-	point(point),
-	phi(phi)
-{
-}
-
-template <typename T>
-xpcc::Location<T>::Location(const T& x, const T& y, const Angle& phi) :
-	point(x, y),
-	phi(phi)
-{
-}
-
-// -----------------------------------------------------------------------------
-template <typename T>
-void
-xpcc::Location<T>::update(Location<T>& diff)
-{
-	point += diff.point.rotate(phi);
-	phi += diff.phi;
-	phi.normalize();
-}
-
-template <typename T>
-void
-xpcc::Location<T>::update(T x, xpcc::Angle& phi)
-{
-	point += Point(x * cos(this->phi).toFloat(),
-						 x * sin(this->phi).toFloat());
-
-	this->phi += phi;
-	this->phi.normalize();
-}
-
-
-template <typename T>
-const typename xpcc::Location<T>::Point&
-xpcc::Location<T>::getPoint() const
-{
-	return this->point;
-}
-
-template <typename T>
-void
-xpcc::Location<T>::setPoint(const Point& point)
-{
-	this->point = point;
-}
-
-template <typename T>
-void
-xpcc::Location<T>::setPoint(const T& x, const T& y)
-{
-	this->point.set(x, y);
-}
-
-template <typename T>
-const xpcc::Angle&
-xpcc::Location<T>::getAngle() const
-{
-	return this->phi;
-}
-
-template <typename T>
-void
-xpcc::Location<T>::setAngle(const Angle& phi)
-{
-	this->phi = phi;
+	if (isPositive(angle))
+	{
+		while (angle > M_PI) {
+			angle -= 2 * M_PI;
+		}
+	}
+	else {
+		while (angle < -M_PI) {
+			angle += 2 * M_PI;
+		}
+	}
+	
+	return angle;
 }
 
 // ----------------------------------------------------------------------------
-template<typename T> template<typename U>
-xpcc::Location<T>::operator Location<U>() const
+float
+xpcc::Angle::reverse(float angle)
 {
-	return Location<U>(this->point, this->phi);
-}
-
-// ----------------------------------------------------------------------------
-template<class T>
-xpcc::IOStream&
-xpcc::operator << (xpcc::IOStream& os, const xpcc::Location<T>& location)
-{
-	os << location.point << ", phi=" << location.phi;
-	return os;
+	if (isPositive(angle))
+	{
+		angle -= M_PI;
+	}
+	else {
+		angle += M_PI;
+	}
+	
+	return angle;
 }

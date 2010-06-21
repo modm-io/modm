@@ -5,7 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -26,102 +26,28 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id$
+ * $Id: angle_test.cpp -1   $
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC__STACK_HPP
-#define	XPCC__STACK_HPP
+#include <xpcc/math/geometry/angle.hpp>
 
-#include <stdint.h>
+#include "angle_test.hpp"
 
-#include "deque.hpp"
-
-namespace xpcc
+void
+AngleTest::testNormalize()
 {
-	/**
-	 * \brief	LIFO stack
-	 * 
-	 * Elements are pushed/popped from the "back" of the specific container,
-	 * which is known as the top of the stack.
-	 * 
-	 * \see		Deque()
-	 * 
-	 * \author	Fabian Greif 
-	 * \ingroup		container
-	 */
-	template<typename T,
-			 typename Container>
-	class Stack
-	{
-	public:
-		typedef typename Container::Size Size;
-		
-	public:
-		bool
-		isEmpty()
-		{
-			return c.isEmpty();
-		}
-		
-		bool
-		isFull()
-		{
-			return c.isFull();
-		}
-		
-		Size
-		getSize()
-		{
-			return c.getSize();
-		}
-		
-		Size
-		getMaxSize()
-		{
-			return c.getMaxSize();
-		}
-		
-		T&
-		get()
-		{
-			return c.back();
-		}
-		
-		const T&
-		get() const
-		{
-			return c.back();
-		}
-		
-		bool
-		push(const T& value)
-		{
-			return c.pushBack(value);
-		}
-		
-		void
-		pop()
-		{
-			c.popBack();
-		}
-	
-	protected:
-		Container c;
-	};
-
-	// ------------------------------------------------------------------------
-	/**
-	 * \brief		Bounded stack
-	 * 
-	 * \ingroup		container
-	 */
-	template<typename T, 
-			 int N,
-			 typename Container = BoundedDeque<T, N> >
-	class BoundedStack : public Stack<T, Container>
-	{
-	};
+	TEST_ASSERT_EQUALS_FLOAT(xpcc::Angle::normalize( 0.3 * M_PI),  0.3 * M_PI);
+	TEST_ASSERT_EQUALS_FLOAT(xpcc::Angle::normalize(-0.6 * M_PI), -0.6 * M_PI);
+	TEST_ASSERT_EQUALS_FLOAT(xpcc::Angle::normalize( 2.9 * M_PI),  0.9 * M_PI);
+	TEST_ASSERT_EQUALS_FLOAT(xpcc::Angle::normalize(-2.9 * M_PI), -0.9 * M_PI);
+	TEST_ASSERT_EQUALS_FLOAT(xpcc::Angle::normalize( 1.5 * M_PI), -0.5 * M_PI);
 }
 
-#endif	// XPCC__STACK_HPP
+void
+AngleTest::testReverse()
+{
+	TEST_ASSERT_EQUALS_FLOAT(xpcc::Angle::reverse(-0.5 * M_PI),  0.5 * M_PI);
+	TEST_ASSERT_EQUALS_FLOAT(xpcc::Angle::reverse(-0.9 * M_PI),  0.1 * M_PI);
+	TEST_ASSERT_EQUALS_FLOAT(xpcc::Angle::reverse( 0.7 * M_PI), -0.3 * M_PI);
+}

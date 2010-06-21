@@ -41,7 +41,7 @@ namespace xpcc
 	/**
 	 * \brief	Double ended queue
 	 * 
-	 * Internally organised as a ring buffer.
+	 * Internally organized as a ring buffer.
 	 * 
 	 * \verbatim
 	 *             tail --\                 /-- head
@@ -64,7 +64,7 @@ namespace xpcc
 	 * \warning	This class don't check if the container is empty before
 	 * 			a pop-operation. You have to do this by yourself!
 	 * 
-	 * \author	Fabian Greif
+	 * \author		Fabian Greif
 	 * \ingroup		container
 	 */
 	template<typename T,
@@ -129,8 +129,6 @@ namespace xpcc
 		popFront();
 	
 	public:
-		friend class const_iterator;
-		
 		/**
 		 * \brief	Bidirectional const iterator
 		 *
@@ -139,6 +137,7 @@ namespace xpcc
 		class const_iterator
 		{
 			friend class BoundedDeque;
+			
 		public:
 			const_iterator();
 			const_iterator(const const_iterator& other);
@@ -152,6 +151,8 @@ namespace xpcc
 			const T* operator -> () const;
 		
 		private:
+			const_iterator(Index index, const BoundedDeque * parent);
+			
 			Index index;
 			const BoundedDeque * parent;
 			
@@ -165,6 +166,8 @@ namespace xpcc
 		end() const;
 		
 	private:
+		friend class const_iterator;
+		
 		Index head;
 		Index tail;
 		Size size;

@@ -59,65 +59,65 @@ namespace xpcc
 		typedef typename Container::Size Size;
 		
 	public:
-		bool
+		inline bool
 		isEmpty()
 		{
 			return c.isEmpty();
 		}
 		
-		bool
+		inline bool
 		isFull()
 		{
 			return c.isFull();
 		}
 		
-		Size
+		inline Size
 		getSize()
 		{
 			return c.getSize();
 		}
 		
-		Size
+		inline Size
 		getMaxSize()
 		{
 			return c.getMaxSize();
 		}
 		
 		/// Access first element
-		T&
+		inline T&
 		front()
 		{
 			return c.front();
 		}
 		
 		/// Access first element
-		const T&
+		inline const T&
 		front() const
 		{
 			return c.front();
 		}
 		
 		/// Access last element
-		T&
+		inline T&
 		back()
 		{
 			return c.back();
 		}
 		
 		/// Access last element
-		const T&
+		inline const T&
 		back() const
 		{
 			return c.back();
 		}
 		
-		bool
+		inline bool
 		push(const T& value)
 		{
 			return c.pushBack(value);
 		}
 		
-		void
+		inline void
 		pop()
 		{
 			c.popFront();

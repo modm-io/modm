@@ -25,41 +25,101 @@
  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- * $Id$
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__POLYGON_HPP
-	#error	"Don't include this file directly, use 'polygon.hpp' instead!"
+#ifndef	XPCC__LOCATION_2D_HPP
+	#error	"Don't include this file directly use 'location.hpp' instead!"
 #endif
 
-// ----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 template <typename T>
-xpcc::Polygon<T>::Polygon(SizeType n) :
-	buffer(n)
+xpcc::Location2D<T>::Location2D() :
+	point(), phi()
 {
 }
 
-// ----------------------------------------------------------------------------
+template <typename T>
+xpcc::Location2D<T>::Location2D(const Point& point, const float& phi) :
+	point(point),
+	phi(phi)
+{
+}
+
+template <typename T>
+xpcc::Location2D<T>::Location2D(const T& x, const T& y, const float& phi) :
+	point(x, y),
+	phi(phi)
+{
+}
+
+// -----------------------------------------------------------------------------
 template <typename T>
 void
-xpcc::Polygon<T>::append(const Point& point)
+xpcc::Location2D<T>::update(Location2D<T>& diff)
 {
-	buffer.append(point);
+	this->point += diff.point.rotate(phi);
+	this->phi = Angle::normalize(this->phi + diff.phi);
+}
+
+template <typename T>
+void
+xpcc::Location2D<T>::update(T x, float phi)
+{
+	point += Point(x * std::cos(this->phi),
+				   x * std::sin(this->phi));
+
+	this->phi = Angle::normalize(this->phi + phi);
+}
+
+
+template <typename T>
+const typename xpcc::Location2D<T>::Point&
+xpcc::Location2D<T>::getPoint() const
+{
+	return this->point;
+}
+
+template <typename T>
+void
+xpcc::Location2D<T>::setPoint(const Point& point)
+{
+	this->point = point;
+}
+
+template <typename T>
+void
+xpcc::Location2D<T>::setPoint(const T& x, const T& y)
+{
+	this->point.set(x, y);
+}
+
+template <typename T>
+const float
+xpcc::Location2D<T>::getAngle() const
+{
+	return this->phi;
+}
+
+template <typename T>
+void
+xpcc::Location2D<T>::setAngle(const float& phi)
+{
+	this->phi = phi;
 }
 
 // ----------------------------------------------------------------------------
-template <typename T>
-xpcc::Point<T>&
-xpcc::Polygon<T>::operator [](SizeType index)
+template<typename T> template<typename U>
+xpcc::Location2D<T>::operator Location2D<U>() const
 {
-	return buffer[index];
+	return Location2D<U>(this->point, this->phi);
 }
 
-template <typename T>
-const xpcc::Point<T>&
-xpcc::Polygon<T>::operator [](SizeType index) const
+// ----------------------------------------------------------------------------
+template<class T>
+xpcc::IOStream&
+xpcc::operator << (xpcc::IOStream& os, const xpcc::Location2D<T>& location)
 {
-	return buffer[index];
+	os << location.point << ", phi=" << location.phi;
+	return os;
 }
