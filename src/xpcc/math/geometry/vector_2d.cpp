@@ -65,5 +65,15 @@ namespace xpcc
 		
 		return avr::sqrt32_round(t);
 	}
+	
+	template<>
+	int16_t
+	Vector2D<int16_t>::getLengthSquared() const
+	{
+		int32_t t;
+		t = avr::mul32(x, x);
+		t = avr::mac32(t, y, y);
+		return t;
+	}
 #endif
 }

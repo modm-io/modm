@@ -102,6 +102,14 @@ xpcc::Vector2D<T>::getLength() const
 // ----------------------------------------------------------------------------
 template<typename T>
 T
+xpcc::Vector2D<T>::getLengthSquared() const
+{
+	return (x*x + y*y);
+}
+
+// ----------------------------------------------------------------------------
+template<typename T>
+T
 xpcc::Vector2D<T>::getManhattanLength() const
 {
 	return (std::abs(this->x) + std::abs(this->y));

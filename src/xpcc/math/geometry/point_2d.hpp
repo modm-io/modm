@@ -30,8 +30,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC__POINT_HPP
-#define	XPCC__POINT_HPP
+#ifndef	XPCC__POINT_2D_HPP
+#define	XPCC__POINT_2D_HPP
 
 #include <cmath>
 #include <stdint.h>
@@ -43,16 +43,15 @@ namespace xpcc
 	/**
 	 * \brief	2D Point
 	 * 
+	 * 
+	 * 
 	 * A point is specified by a x coordinate and an y coordinate which can
 	 * be accessed using the getX() and getY() functions.
-	 * 
-	 * A Point object can also be used as a vector: Addition and subtraction
-	 * are defined as for vectors (each component is added separately).
 	 * 
 	 * \ingroup	math
 	 */
 	template<typename T = int16_t>
-	class Vector2D
+	class Point2D
 	{
 	public:
 		/**
@@ -60,9 +59,9 @@ namespace xpcc
 		 * 
 		 * Creates a Point with coordinates (0, 0).
 		 */
-		Vector2D();
+		Point2D();
 		
-		Vector2D(const T& x, const T& y);
+		Point2D(const T& x, const T& y);
 		
 		inline void
 		setX(const T& value);
@@ -80,94 +79,16 @@ namespace xpcc
 		getY() const;
 		
 		/**
-		 * \brief	Calculate length
-		 * 
-		 * Length of the vector from the origin to the point.
-		 */
-		T
-		getLength() const;
-		
-		/**
-		 * \brief	Calculate squared length of the vector
-		 * 
-		 * \return	squared length (x*x + y*y)
-		 */
-		T
-		getLengthSquared() const;
-		
-		/**
-		 * \brief	Calculate Manhattan length
-		 * 
-		 * Returns the sum of the absolute values of x and y, traditionally
-		 * known as the "Manhattan length" of the vector from the origin to
-		 * the point.
-		 * 
-		 * \see		http://en.wikipedia.org/wiki/Taxicab_geometry
-		 */
-		T
-		getManhattanLength() const;
-		
-		/**
-		 * \brief	Calculate the absolute angle
-		 * 
-		 * Absolute angle of the vector from the origin to the point.
-		 */
-		float
-		getAngle() const;
-		
-		/**
-		 * \brief	Normalize length to 1
-		 */
-		Vector2D&
-		normalize();
-
-		/**
-		 * \brief	Scale the length by \p factor
-		 */
-		template<typename U>
-		Vector2D&
-		scale(const U& factor);
-
-		Vector2D&
-		rotate(const float phi);
-		
-		Vector2D&
-		operator += (const Vector2D &other);
-		
-		Vector2D&
-		operator -= (const Vector2D &other);
-		
-		/**
 		 * \brief	Convert between Point-objects with different base-types
 		 */
 		template<typename U>
-		operator Vector2D<U>() const;
+		operator Point2D<U>() const;
 	
 	private:
 		T x;
 		T y;
 		
 	private:
-		template<typename U>
-		friend Vector2D<U>
-		operator - (const Vector2D<U> &a);
-		
-		template<typename U>
-		friend Vector2D<U>
-		operator - (const Vector2D<U> &a, const Vector2D<U> &b);
-		
-		template<typename U, typename V>
-		friend Vector2D<U>
-		operator - (const Vector2D<U> &a, const Vector2D<V> &b);
-
-		template<typename U>
-		friend Vector2D<U>
-		operator + (const Vector2D<U> &a, const Vector2D<U> &b);
-		
-		template<typename U, typename V>
-		friend Vector2D<U>
-		operator + (const Vector2D<U> &a, const Vector2D<V> &b);
-
 		template<typename U>
 		friend bool
 		operator == (const Vector2D<U> &a, const Vector2D<U> &b);
@@ -179,57 +100,25 @@ namespace xpcc
 		template<typename U>
 		friend IOStream&
 		operator <<(IOStream& s, const Vector2D<U>& c);
-		
-		template<typename U, typename V>
-		friend U
-		scalar(const Vector2D<U> &a, const Vector2D<V> &b);
 	};
 	
 	template<typename U>
-	Vector2D<U>
-	operator - (const Vector2D<U> &a);
-	
-	template<typename U>
-	Vector2D<U>
-	operator - (const Vector2D<U> &a, const Vector2D<U> &b);
-	
-	template<typename U, typename V>
-	Vector2D<U>
-	operator - (const Vector2D<U> &a, const Vector2D<V> &b);
-
-	template<typename U>
-	Vector2D<U>
-	operator + (const Vector2D<U> &a, const Vector2D<U> &b);
-	
-	template<typename U, typename V>
-	Vector2D<U>
-	operator + (const Vector2D<U> &a, const Vector2D<V> &b);
-
-	template<typename U>
 	bool
-	operator == (const Vector2D<U> &a, const Vector2D<U> &b);
+	operator == (const Point2D<U> &a, const Point2D<U> &b);
 	
 	template<typename U>
 	bool
-	operator != (const Vector2D<U> &a, const Vector2D<U> &b);
+	operator != (const Point2D<U> &a, const Point2D<U> &b);
 	
 	/**
-	 * \brief	Calculates the scalar product of two vectors
-	 * \ingroup	math
-	 */
-	template<typename U, typename V>
-	U
-	scalar(const Vector2D<U> &a, const Vector2D<V> &b);
-	
-	/**
-	 * \brief	Stream operator for \b xpcc::Point<U>
+	 * \brief	Stream operator for \b xpcc::Point2D<U>
 	 * \ingroup	math
 	 */
 	template<typename U>
 	IOStream&
-	operator << (IOStream& s, const Vector2D<U>& c);
+	operator << (IOStream& s, const Point2D<U>& c);
 }
 
-#include "vector_2d_impl.hpp"
+#include "point_2d_impl.hpp"
 
-#endif	// XPCC__POINT_HPP
+#endif	// XPCC__POINT_2D_HPP
