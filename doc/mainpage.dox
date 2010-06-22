@@ -14,7 +14,7 @@ The second part is a universal but a bit robotic orientated C++ library. Because
 standard C++ libraries like the STL are not available for small
 microcontrollers we created a reduced version of it, adapted to the specific 
 needs of microcontrollers.
-For example if you need some generic containers take a look at our \ref data_structure
+For example if you need some generic containers take a look at our \ref container
 section.
 
 This documentation is devided into the following sections:

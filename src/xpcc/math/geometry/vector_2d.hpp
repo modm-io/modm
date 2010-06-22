@@ -30,8 +30,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC__POINT_HPP
-#define	XPCC__POINT_HPP
+#ifndef	XPCC__VECTOR_2D_HPP
+#define	XPCC__VECTOR_2D_HPP
 
 #include <cmath>
 #include <stdint.h>
@@ -40,16 +40,14 @@
 
 namespace xpcc
 {
+	// forward declaration
+	template <typename T>
+	class Point2D;
+	
 	/**
-	 * \brief	2D Point
+	 * \brief	2D Vector
 	 * 
-	 * A point is specified by a x coordinate and an y coordinate which can
-	 * be accessed using the getX() and getY() functions.
-	 * 
-	 * A Point object can also be used as a vector: Addition and subtraction
-	 * are defined as for vectors (each component is added separately).
-	 * 
-	 * \ingroup	math
+	 * \ingroup	geometry
 	 */
 	template<typename T = int16_t>
 	class Vector2D
@@ -58,11 +56,16 @@ namespace xpcc
 		/**
 		 * \brief	Default-Constructor
 		 * 
-		 * Creates a Point with coordinates (0, 0).
+		 * Creates a Vector with coordinates (0, 0).
 		 */
 		Vector2D();
 		
 		Vector2D(const T& x, const T& y);
+		
+		/**
+		 * \brief	Construct the vector AB
+		 */
+		Vector2D(const Point2D<T>& A, const Point2D<T>& B);
 		
 		inline void
 		setX(const T& value);
@@ -96,18 +99,6 @@ namespace xpcc
 		getLengthSquared() const;
 		
 		/**
-		 * \brief	Calculate Manhattan length
-		 * 
-		 * Returns the sum of the absolute values of x and y, traditionally
-		 * known as the "Manhattan length" of the vector from the origin to
-		 * the point.
-		 * 
-		 * \see		http://en.wikipedia.org/wiki/Taxicab_geometry
-		 */
-		T
-		getManhattanLength() const;
-		
-		/**
 		 * \brief	Calculate the absolute angle
 		 * 
 		 * Absolute angle of the vector from the origin to the point.
@@ -131,6 +122,7 @@ namespace xpcc
 		Vector2D&
 		rotate(const float phi);
 		
+		
 		Vector2D&
 		operator += (const Vector2D &other);
 		
@@ -148,6 +140,15 @@ namespace xpcc
 		T y;
 		
 	private:
+		template<typename U, typename V>
+		friend U
+		scalar(const Vector2D<U> &a, const Vector2D<V> &b);
+		
+		template<typename U>
+		friend IOStream&
+		operator <<(IOStream& s, const Vector2D<U>& c);
+		
+		
 		template<typename U>
 		friend Vector2D<U>
 		operator - (const Vector2D<U> &a);
@@ -175,17 +176,27 @@ namespace xpcc
 		template<typename U>
 		friend bool
 		operator != (const Vector2D<U> &a, const Vector2D<U> &b);
-
-		template<typename U>
-		friend IOStream&
-		operator <<(IOStream& s, const Vector2D<U>& c);
-		
-		template<typename U, typename V>
-		friend U
-		scalar(const Vector2D<U> &a, const Vector2D<V> &b);
 	};
 	
+	// ------------------------------------------------------------------------
+	/**
+	 * \brief	Calculates the scalar product of two vectors
+	 * \ingroup	geometry
+	 */
+	template<typename U, typename V>
+	U
+	scalar(const Vector2D<U> &a, const Vector2D<V> &b);
+	
+	/**
+	 * \brief	Stream operator for \b xpcc::Point<U>
+	 * \ingroup	geometry
+	 */
 	template<typename U>
+	IOStream&
+	operator << (IOStream& s, const Vector2D<U>& c);
+	
+	// ------------------------------------------------------------------------
+		template<typename U>
 	Vector2D<U>
 	operator - (const Vector2D<U> &a);
 	
@@ -212,24 +223,8 @@ namespace xpcc
 	template<typename U>
 	bool
 	operator != (const Vector2D<U> &a, const Vector2D<U> &b);
-	
-	/**
-	 * \brief	Calculates the scalar product of two vectors
-	 * \ingroup	math
-	 */
-	template<typename U, typename V>
-	U
-	scalar(const Vector2D<U> &a, const Vector2D<V> &b);
-	
-	/**
-	 * \brief	Stream operator for \b xpcc::Point<U>
-	 * \ingroup	math
-	 */
-	template<typename U>
-	IOStream&
-	operator << (IOStream& s, const Vector2D<U>& c);
 }
 
 #include "vector_2d_impl.hpp"
 
-#endif	// XPCC__POINT_HPP
+#endif	// XPCC__VECTOR_2D_HPP

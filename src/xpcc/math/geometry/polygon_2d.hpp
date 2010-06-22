@@ -44,7 +44,7 @@ namespace xpcc
 	 * The Polygon class provides a vector of points.
 	 *
 	 * \author	Fabian Greif
-	 * \ingroup	math
+	 * \ingroup	geometry
 	 */
 	template <typename T>
 	class Polygon2D

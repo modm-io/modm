@@ -88,6 +88,17 @@ xpcc::Point2D<T>::getY() const
 	return this->y;
 }
 
+
+
+// ----------------------------------------------------------------------------
+template<typename T>
+typename xpcc::Point2D<T>::WideType
+xpcc::Point2D<T>::getDistanceTo(const Point<T>& other)
+{
+	return Vector2D(*this, other).getLength();
+}
+
+
 // ----------------------------------------------------------------------------
 template<typename T> template<typename U>
 xpcc::Point2D<T>::operator Point2D<U>() const
@@ -113,7 +124,7 @@ xpcc::operator != (const Point2D<U> &a, const Point2D<U> &b)
 // ----------------------------------------------------------------------------
 template <typename U>
 xpcc::IOStream&
-xpcc::operator <<( xpcc::IOStream& s, const xpcc::Point2D<U>& c)
+xpcc::operator << ( xpcc::IOStream& s, const xpcc::Point2D<U>& c)
 {
 	s << "x=" << c.x << ", y=" << c.y;
 	return s;

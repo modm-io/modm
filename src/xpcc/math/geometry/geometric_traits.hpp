@@ -30,56 +30,76 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC__ANGLE_HPP
-#define	XPCC__ANGLE_HPP
+#ifndef GEOMETRIC_TRAITS_HPP
+#define GEOMETRIC_TRAITS_HPP
 
-#include <cmath>
+#include <stdint.h>
 
 namespace xpcc
 {
 	/**
-	 * \brief	Collection of functions for handling of angles
+	 * \brief	Traits for all geometric classes
 	 * 
-	 * Angles are always represented by float values in the range
-	 * from -Pi to Pi.
 	 * 
 	 * \ingroup	geometry
+	 * \author	Fabian Greif
 	 */
-	class Angle
+	template <typename T>
+	struct GeometricTraits
 	{
-	public:
-		typedef float Type;
-		
-		/// \brief	Limit angle to +-Pi
-		static float
-		normalize(float angle);
-		
-		/**
-		 * \brief	Reverse the angle
-		 * 
-		 * Reverse the angle and keep it normalize to [-Pi,Pi).
-		 * 
-		 * Equivalent to:
-		 * \code
-		 * float angle = xpcc::Angle::normalize(angle + M_PI);
-		 * \endcode
-		 */
-		static float
-		reverse(float angle);
-		
-		
-		static inline float
-		toRadian(float angle)
-		{
-			return angle * M_PI / 180.0;
-		}
-		
-		static inline float
-		toDegree(float angle)
-		{
-			return angle * 180.0 / M_PI;
-		}
+		static const bool isValidType = false;
 	};
+	
+	template <>
+	struct GeometricTraits<int8_t>
+	{
+		static const bool isValidType = true;
+		
+		typedef float FloatType;
+		typedef int16_t WideType;
+	};
+	
+	template <>
+	struct GeometricTraits<int16_t>
+	{
+		static const bool isValidType = true;
+		
+		typedef float FloatType;
+		typedef int32_t WideType;
+	};
+	
+	template <>
+	struct GeometricTraits<int32_t>
+	{
+		static const bool isValidType = true;
+		
+		typedef float FloatType;
+		
+		// Usually the range of a int32_t is big enough so that no
+		// conversion to int64_t is required. This exception is made because
+		// 64-bit operations are very, very slow on an AVR.
+		typedef int32_t WideType;
+	};
+	
+	template <>
+	struct GeometricTraits<float>
+	{
+		static const bool isValidType = true;
+		
+		typedef float FloatType;
+		typedef float WideType;
+	};
+	
+#ifndef __AVR__
+	template <>
+	struct GeometricTraits<double>
+	{
+		static const bool isValidType = true;
+		
+		typedef double FloatType;
+		typedef double WideType;
+	};
+#endif
 }
 
-#endif	// XPCC__ANGLE_HPP
+#endif // GEOMETRIC_TRAITS_HPP

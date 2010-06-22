@@ -41,7 +41,7 @@ namespace xpcc
 	 * \brief	Line segment
 	 * 
 	 * \author	Fabian Greif
-	 * \ingroup	math
+	 * \ingroup	geometry
 	 */
 	template <typename T>
 	class LineSegment2D

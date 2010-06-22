@@ -45,7 +45,7 @@ namespace xpcc
 	/**
 	 * \brief	Location
 	 * 
-	 * \ingroup	math
+	 * \ingroup	geometry
 	 */
 	template <typename T = int16_t>
 	class Location2D
@@ -102,7 +102,7 @@ namespace xpcc
 	/**
 	 * \brief	Stream operator to \b xpcc::Location<T>
 	 *
-	 * \ingroup	math
+	 * \ingroup	geometry
 	 */
 	template<typename T>
 	IOStream&

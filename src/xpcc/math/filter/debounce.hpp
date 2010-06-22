@@ -53,7 +53,7 @@ namespace xpcc
 			 * 
 			 * \param	maxValue	maximal value of the sum
 			 * \param	lowerBound	lower bound for the schmitt-trigger
-			 * \param	lowerBound	upper bound for the schmitt-trigger. If
+			 * \param	upperBound	upper bound for the schmitt-trigger. If
 			 * 						set to zero, the value of maxValue is used.
 			 */
 			Debounce(const T& maxValue,

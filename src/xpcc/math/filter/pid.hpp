@@ -140,7 +140,7 @@ namespace xpcc
 		 * \brief	Calculate a new output value
 		 * 
 		 * \param	input					TODO
-		 * \param	externalLimitition		TODO
+		 * \param	externalLimitation		TODO
 		 */
 		void
 		update(const T& input, bool externalLimitation = false);

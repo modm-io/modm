@@ -54,11 +54,11 @@ namespace xpcc
 #ifndef XPCC_LOG_LEVEL
 	/**
 	 * Define to set the level of the logging to a defined value for each file.
-	 *
-	 * To change the logging level in one cpp file use \c #undef
+	 * 
+	 * To change the logging level in one cpp file use \c \#undef
 	 * \code
-	 *		#undef  XPCC_LOG_LEVEL
-	 *		#define XPCC_LOG_LEVEL xpcc::log::INFO
+	 * #undef  XPCC_LOG_LEVEL
+	 * #define XPCC_LOG_LEVEL xpcc::log::INFO
 	 * \endcode
 	 *
 	 * \ingroup logger

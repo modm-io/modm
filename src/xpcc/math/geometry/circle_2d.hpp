@@ -41,7 +41,7 @@ namespace xpcc
 	 * \brief	Circle
 	 * 
 	 * \author	Fabian Greif
-	 * \ingroup	math
+	 * \ingroup	geometry
 	 */
 	template <typename T>
 	class Circle2D

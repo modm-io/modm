@@ -38,21 +38,30 @@
 
 #include <xpcc/io/iostream.hpp>
 
+#include "geometric_traits.hpp"
+
 namespace xpcc
 {
+	// forward declaration
+	template <typename T>
+	class Vector2D;
+	
 	/**
 	 * \brief	2D Point
-	 * 
-	 * 
 	 * 
 	 * A point is specified by a x coordinate and an y coordinate which can
 	 * be accessed using the getX() and getY() functions.
 	 * 
-	 * \ingroup	math
+	 * \ingroup	geometry
 	 */
 	template<typename T = int16_t>
 	class Point2D
 	{
+		friend class Vector2D<T>;
+	public:
+		typedef typename GeometricTraits<T>::WideType WideType;
+		typedef typename GeometricTraits<T>::FloatType FloatType;
+		
 	public:
 		/**
 		 * \brief	Default-Constructor
@@ -78,12 +87,17 @@ namespace xpcc
 		inline const T&
 		getY() const;
 		
+		
+		WideType
+		getDistanceTo(const Point<T>& other);
+		
+		
 		/**
 		 * \brief	Convert between Point-objects with different base-types
 		 */
 		template<typename U>
 		operator Point2D<U>() const;
-	
+		
 	private:
 		T x;
 		T y;
@@ -112,7 +126,7 @@ namespace xpcc
 	
 	/**
 	 * \brief	Stream operator for \b xpcc::Point2D<U>
-	 * \ingroup	math
+	 * \ingroup	geometry
 	 */
 	template<typename U>
 	IOStream&

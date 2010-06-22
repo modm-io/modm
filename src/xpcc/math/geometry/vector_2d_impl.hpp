@@ -30,7 +30,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC__POINT_HPP
+#ifndef	XPCC__VECTOR_2D_HPP
 	#error	"Don't include this file directly, use 'point.hpp' instead!"
 #endif
 
@@ -44,6 +44,12 @@ xpcc::Vector2D<T>::Vector2D() :
 template<typename T>
 xpcc::Vector2D<T>::Vector2D(const T& x, const T& y) : 
 	x(x), y(y)
+{
+}
+
+template<typename T>
+xpcc::Vector2D<T>::Vector2D(const Point2D<T>& A, const Point2D<T>& B) :
+	x(B.x - A.x), y(B.y - A.y)
 {
 }
 
@@ -105,14 +111,6 @@ T
 xpcc::Vector2D<T>::getLengthSquared() const
 {
 	return (x*x + y*y);
-}
-
-// ----------------------------------------------------------------------------
-template<typename T>
-T
-xpcc::Vector2D<T>::getManhattanLength() const
-{
-	return (std::abs(this->x) + std::abs(this->y));
 }
 
 // ----------------------------------------------------------------------------
