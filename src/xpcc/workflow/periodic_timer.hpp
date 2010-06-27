@@ -40,6 +40,8 @@ namespace xpcc
 	/**
 	 * \brief		Software timer
 	 * 
+	 * \warning	Never use this timer when a precise timebase is needed!
+	 * 
 	 * \tparam	T	Used timer, default is xpcc::Clock() which should have
 	 * 				a millisecond resolution.
 	 * 
@@ -71,20 +73,19 @@ namespace xpcc
 		 * \brief	Check if a new period has started
 		 * 
 		 * This function can be used to easily write sections that are
-		 * excuted at defined periods:
+		 * executed at defined periods.
+		 * 
 		 * \code
 		 * xpcc::PeriodicTimer<> timer(50);
 		 * while (1)
 		 * {
 		 *     if (timer.isExpired()) {
-		 *         // will be executed every 50 ms
+		 *         // will be executed approximately every 50 ms
 		 *     }
 		 * }
 		 * \endcode
 		 * 
 		 * \return	\c true if entering a new period, \c false otherwise
-		 * 
-		 * \todo	Find a better name for this function
 		 */
 		bool
 		isExpired();

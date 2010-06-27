@@ -34,14 +34,14 @@
 #define	XPCC_AVR__ALLOCATOR_HPP
 
 #include <stdint.h>
-#include <stdlib.h>		// for size_t
+#include <cstddef>
 
 namespace xpcc
 {
 	namespace avr
 	{	
 		void *
-		allocateMemory(size_t requestedSize);
+		allocateMemory(std::size_t requestedSize);
 		
 		void
 		freeMemory(void *ptr);

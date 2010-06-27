@@ -105,6 +105,17 @@ xpcc::DynamicArray<T>::reserve(SizeType n)
 // ----------------------------------------------------------------------------
 template <typename T>
 void
+xpcc::DynamicArray<T>::clear()
+{
+	delete[] this->values;
+	
+	this->size = 0;
+	this->capacity = 0;
+}
+
+// ----------------------------------------------------------------------------
+template <typename T>
+void
 xpcc::DynamicArray<T>::append(const T& value)
 {
 	if (this->capacity == this->size)
@@ -124,7 +135,7 @@ xpcc::DynamicArray<T>::append(const T& value)
 // ----------------------------------------------------------------------------
 template <typename T>
 void
-xpcc::DynamicArray<T>::removeLast()
+xpcc::DynamicArray<T>::removeBack()
 {
 	--this->size;
 

@@ -34,7 +34,7 @@
 	#error	"Don't include this file directly, use 'flash_reader.hpp' instead!"
 #endif
 
-#include <string.h>
+#include <cstddef>
 #include <avr/pgmspace.h>
 
 #define	FLASH(var)				extern const var PROGMEM; const var
@@ -44,7 +44,7 @@
 
 namespace xpcc
 {
-	template<typename T, size_t size>
+	template<typename T, std::size_t size>
 	struct FlashReader
 	{
 		ALWAYS_INLINE

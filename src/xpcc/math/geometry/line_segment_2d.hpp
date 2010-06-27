@@ -33,7 +33,8 @@
 #ifndef XPCC__LINE_SEGMENT_2D_HPP
 #define XPCC__LINE_SEGMENT_2D_HPP
 
-#include "vector_2d.hpp"
+#include "point_2d.hpp"
+#include "line_2d.hpp"
 
 namespace xpcc
 {
@@ -44,51 +45,53 @@ namespace xpcc
 	 * \ingroup	geometry
 	 */
 	template <typename T>
-	class LineSegment2D
+	class LineSegment2D : protected Line2D<T>
 	{
-		typedef Vector2D<T> Point;
 	public:
 		LineSegment2D();
 		
-		LineSegment2D(const Point& start, const Point& end);
+		LineSegment2D(const Point2D<T>& start, const Point2D<T>& end);
 		
 		void
-		setStartPoint(const Point& point)
+		setStartPoint(const Point2D<T>& point)
 		{
 			this->start = point;
 		}
 		
-		const Point&
+		const Point2D<T>&
 		getStartPoint() const
 		{
 			return this->start;
 		}
 		
 		void
-		setEndPoint(const Point& point)
+		setEndPoint(const Point2D<T>& point)
 		{
 			this->end = point;
 		}
 		
-		inline const Point&
+		inline const Point2D<T>&
 		getEndPoint() const
 		{
 			return this->end;
 		}
 		
 		inline void
-		setPoints(const Point& start, const Point& end)
+		setPoints(const Point2D<T>& start, const Point2D<T>& end)
 		{
 			this->start = start;
 			this->end = end;
 		}
 		
+		/**
+		 * \brief	Length of the line segment
+		 */
 		T
 		getLength() const;
 		
-	protected:
-		Point start;
-		Point end;
+		/// Shortest distance to a point
+		const T
+		getDistanceTo(const Point2D<T>& point) const;
 		
 	private:
 		template<typename U>

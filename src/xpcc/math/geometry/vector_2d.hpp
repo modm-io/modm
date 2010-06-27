@@ -34,9 +34,9 @@
 #define	XPCC__VECTOR_2D_HPP
 
 #include <cmath>
-#include <stdint.h>
-
 #include <xpcc/io/iostream.hpp>
+
+#include "geometric_traits.hpp"
 
 namespace xpcc
 {
@@ -44,6 +44,7 @@ namespace xpcc
 	template <typename T>
 	class Point2D;
 	
+	// ------------------------------------------------------------------------
 	/**
 	 * \brief	2D Vector
 	 * 
@@ -52,6 +53,12 @@ namespace xpcc
 	template<typename T = int16_t>
 	class Vector2D
 	{
+		friend class Point2D<T>;
+		
+	public:
+		typedef typename GeometricTraits<T>::WideType WideType;
+		typedef typename GeometricTraits<T>::FloatType FloatType;
+		
 	public:
 		/**
 		 * \brief	Default-Constructor
@@ -76,6 +83,7 @@ namespace xpcc
 		inline void
 		set(const T& x, const T& y);
 		
+		
 		inline const T&
 		getX() const;
 		
@@ -95,7 +103,7 @@ namespace xpcc
 		 * 
 		 * \return	squared length (x*x + y*y)
 		 */
-		T
+		WideType
 		getLengthSquared() const;
 		
 		/**
@@ -133,17 +141,26 @@ namespace xpcc
 		 * \brief	Convert between Point-objects with different base-types
 		 */
 		template<typename U>
-		operator Vector2D<U>() const;
+		Vector2D<U>
+		convert() const;
+		
+		Point2D<T>
+		toPoint() const;
+		
+	public:
+		/**
+		 * \brief	Calculate the dot-product
+		 * 
+		 * Also known as the scalar product.
+		 */
+		static WideType
+		dotProduct(const Vector2D<T>& a, const Vector2D<T>& b);
 	
 	private:
 		T x;
 		T y;
 		
 	private:
-		template<typename U, typename V>
-		friend U
-		scalar(const Vector2D<U> &a, const Vector2D<V> &b);
-		
 		template<typename U>
 		friend IOStream&
 		operator <<(IOStream& s, const Vector2D<U>& c);
@@ -156,18 +173,10 @@ namespace xpcc
 		template<typename U>
 		friend Vector2D<U>
 		operator - (const Vector2D<U> &a, const Vector2D<U> &b);
-		
-		template<typename U, typename V>
-		friend Vector2D<U>
-		operator - (const Vector2D<U> &a, const Vector2D<V> &b);
 
 		template<typename U>
 		friend Vector2D<U>
 		operator + (const Vector2D<U> &a, const Vector2D<U> &b);
-		
-		template<typename U, typename V>
-		friend Vector2D<U>
-		operator + (const Vector2D<U> &a, const Vector2D<V> &b);
 
 		template<typename U>
 		friend bool
@@ -179,14 +188,8 @@ namespace xpcc
 	};
 	
 	// ------------------------------------------------------------------------
-	/**
-	 * \brief	Calculates the scalar product of two vectors
-	 * \ingroup	geometry
-	 */
-	template<typename U, typename V>
-	U
-	scalar(const Vector2D<U> &a, const Vector2D<V> &b);
-	
+	// Global functions
+	// ------------------------------------------------------------------------
 	/**
 	 * \brief	Stream operator for \b xpcc::Point<U>
 	 * \ingroup	geometry
@@ -196,25 +199,19 @@ namespace xpcc
 	operator << (IOStream& s, const Vector2D<U>& c);
 	
 	// ------------------------------------------------------------------------
-		template<typename U>
+	// Global Operators
+	// ------------------------------------------------------------------------
+	template<typename U>
 	Vector2D<U>
 	operator - (const Vector2D<U> &a);
 	
 	template<typename U>
 	Vector2D<U>
 	operator - (const Vector2D<U> &a, const Vector2D<U> &b);
-	
-	template<typename U, typename V>
-	Vector2D<U>
-	operator - (const Vector2D<U> &a, const Vector2D<V> &b);
 
 	template<typename U>
 	Vector2D<U>
 	operator + (const Vector2D<U> &a, const Vector2D<U> &b);
-	
-	template<typename U, typename V>
-	Vector2D<U>
-	operator + (const Vector2D<U> &a, const Vector2D<V> &b);
 
 	template<typename U>
 	bool
@@ -223,8 +220,61 @@ namespace xpcc
 	template<typename U>
 	bool
 	operator != (const Vector2D<U> &a, const Vector2D<U> &b);
+	
+	// ------------------------------------------------------------------------
+	// Declaration of specialized methods
+	// ------------------------------------------------------------------------
+	template<>
+	Vector2D<float>&
+	Vector2D<float>::rotate(const float phi);
+	
+	template<>
+	float
+	Vector2D<float>::getLength() const;
+	
+	template<>
+	double
+	Vector2D<double>::getLength() const;
+	
+#if defined(__AVR__) && defined(__AVR_HAVE_MUL__)
+	template<>
+	int16_t
+	Vector2D<int16_t>::getLength() const;
+	
+	template<>
+	int32_t
+	Vector2D<int16_t>::getLengthSquared() const;
+	
+	template<>
+	int32_t
+	Vector2D<int16_t>::dot(const xpcc::Vector2D<int16_t>& a,
+						   const xpcc::Vector2D<int16_t>& b);
+#endif
+	
+	template<> template<typename U>
+	Vector2D<U>
+	Vector2D<float>::convert() const
+	{
+		return Vector2D<U>(round(this->x), round(this->y));
+	}
+	
+	template<> template<typename U>
+	Vector2D<U>
+	Vector2D<double>::convert() const
+	{
+		return Vector2D<U>(round(this->x), round(this->y));
+	}
+	
+	template<> template<>
+	Vector2D<double>
+	Vector2D<float>::convert() const;
+	
+	template<> template<>
+	Vector2D<float>
+	Vector2D<double>::convert() const;
 }
 
+#include "point_2d.hpp"
 #include "vector_2d_impl.hpp"
 
 #endif	// XPCC__VECTOR_2D_HPP

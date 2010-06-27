@@ -30,7 +30,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <string.h>
+#include <cstring>
 
 // ----------------------------------------------------------------------------
 namespace xpcc
@@ -87,7 +87,7 @@ xpcc::filter::Median<T, 3>::update()
 {
 	// for small sample sizes it is the fastest way to just copy the
 	// buffer and sort it afterwards
-	memcpy((void *) sorted, (const void * const) buffer, sizeof(sorted));
+	std::memcpy((void *) sorted, (const void * const) buffer, sizeof(sorted));
 	
 	XPCC_MEDIAN__SORT(sorted[0], sorted[1]);
 	XPCC_MEDIAN__SORT(sorted[1], sorted[2]);

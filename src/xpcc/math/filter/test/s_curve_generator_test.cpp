@@ -35,7 +35,7 @@
 #include "s_curve_generator_test.hpp"
 
 void
-SCurveGeneratorTest::testCreation()
+SCurveGeneratorTest::testConstructor()
 {
 	xpcc::SCurveGenerator<int16_t> generator;
 	
@@ -44,4 +44,6 @@ SCurveGeneratorTest::testCreation()
 	TEST_ASSERT_FALSE(generator.isTargetReached());
 	
 	generator.update();
+	
+	TEST_FAIL("TODO");
 }

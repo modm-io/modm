@@ -32,17 +32,17 @@
 
 #include "scheduler.hpp"
 
-using namespace xpcc;
-
-Scheduler::Scheduler() :
+// ----------------------------------------------------------------------------
+xpcc::Scheduler::Scheduler() :
 	taskList(0), readyList(0), currentPriority(0)
 {
 }
 
+// ----------------------------------------------------------------------------
 void
-Scheduler::scheduleTask(Task& task,
-						uint16_t period,
-						Priority priority)
+xpcc::Scheduler::scheduleTask(Task& task,
+		uint16_t period,
+		Priority priority)
 {
 	TaskListItem *item = new TaskListItem(task, period, priority);
 	
@@ -55,14 +55,16 @@ Scheduler::scheduleTask(Task& task,
 	}
 }
 
-bool
-Scheduler::removeTask(const Task& /*task*/)
+// ----------------------------------------------------------------------------
+/*bool
+xpcc::Scheduler::removeTask(const Task& task)
 {
-	return false;
 }
+*/
 
+// ----------------------------------------------------------------------------
 void
-Scheduler::schedule()
+xpcc::Scheduler::schedule()
 {
-	scheduleInterupt();
+	this->scheduleInterupt();
 }

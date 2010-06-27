@@ -88,22 +88,83 @@ xpcc::Point2D<T>::getY() const
 	return this->y;
 }
 
-
-
 // ----------------------------------------------------------------------------
 template<typename T>
 typename xpcc::Point2D<T>::WideType
-xpcc::Point2D<T>::getDistanceTo(const Point<T>& other)
+xpcc::Point2D<T>::getDistanceTo(const Point2D<T>& other)
 {
-	return Vector2D(*this, other).getLength();
+	return Vector2D<T>(*this, other).getLength();
 }
 
+// ----------------------------------------------------------------------------
+template<typename T>
+void
+xpcc::Point2D<T>::translate(const Vector2D<T>& vector)
+{
+	this->x += vector.x;
+	this->y += vector.y;
+}
+
+// ----------------------------------------------------------------------------
+template<typename T>
+int_fast8_t
+xpcc::Point2D<T>::ccw(const Point2D<T>& a, const Point2D<T>& b,
+		const Point2D<T>& c)
+{
+	WideType dx1 = b.x - a.x;
+	WideType dx2 = c.x - a.x;
+	WideType dy1 = b.y - a.y;
+	WideType dy2 = c.y - a.y;
+	
+	WideType d1 = dx1 * dy2;
+	WideType d2 = dy1 * dx2;
+	
+	if (d1 > d2) {
+		return 1;
+	}
+	else if (d1 < d2) {
+		return -1;
+	}
+	else
+	{
+		if ((dx1 * dx2 < 0) || (dy1 * dy2 < 0)) {
+			return -1;
+		}
+		else
+		{
+			if ((dx1 * dx1 + dy1 * dy1) >= (dx2 * dx2 + dy2 * dy2)) {
+				return 0;
+			}
+			else {
+				return 1;
+			}
+		}
+	}
+}
 
 // ----------------------------------------------------------------------------
 template<typename T> template<typename U>
-xpcc::Point2D<T>::operator Point2D<U>() const
+xpcc::Point2D<U>
+xpcc::Point2D<T>::convert() const
 {
 	return Point2D<U>(this->x, this->y);
+}
+
+// ----------------------------------------------------------------------------
+template<typename T>
+xpcc::Vector2D<T>
+xpcc::Point2D<T>::toVector() const
+{
+	return Vector2D<T>(this->x, this->y);
+}
+
+// ----------------------------------------------------------------------------
+template <typename U>
+xpcc::IOStream&
+xpcc::operator << (xpcc::IOStream& s, const xpcc::Point2D<U>& c)
+{
+	s << "x=" << c.x << ", y=" << c.y;
+	return s;
 }
 
 // ----------------------------------------------------------------------------
@@ -119,13 +180,4 @@ bool
 xpcc::operator != (const Point2D<U> &a, const Point2D<U> &b)
 {
 	return ((a.x != b.x) || (a.y != b.y));
-}
-
-// ----------------------------------------------------------------------------
-template <typename U>
-xpcc::IOStream&
-xpcc::operator << ( xpcc::IOStream& s, const xpcc::Point2D<U>& c)
-{
-	s << "x=" << c.x << ", y=" << c.y;
-	return s;
 }

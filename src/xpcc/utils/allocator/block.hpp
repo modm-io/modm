@@ -53,7 +53,7 @@ namespace xpcc
 		 * \author	Fabian Greif
 		 */
 		template <typename T,
-				  size_t BLOCKSIZE>
+				  std::size_t BLOCKSIZE>
 		class Block : public AllocatorBase<T>
 		{
 		public:

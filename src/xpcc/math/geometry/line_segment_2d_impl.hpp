@@ -30,20 +30,20 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__LINE_SEGMENT_HPP
-	#error	"Don't include this file directly, use 'line.hpp' instead!"
+#ifndef XPCC__LINE_SEGMENT_2D_HPP
+	#error	"Don't include this file directly, use 'line_segment_2d.hpp' instead!"
 #endif
 
 // ----------------------------------------------------------------------------
 template<typename T>
 xpcc::LineSegment2D<T>::LineSegment2D() :
-	start(), end()
+	Line2D<T>()
 {
 }
 
 template<typename T>
-xpcc::LineSegment2D<T>::LineSegment2D(const Point& start, const Point& end) :
-	start(start), end(end)
+xpcc::LineSegment2D<T>::LineSegment2D(const Point2D<T>& start, const Point2D<T>& end) :
+	Line2D<T>(start, Vector2D<T>(start, end))
 {
 }
 
@@ -51,13 +51,41 @@ template<typename T>
 T
 xpcc::LineSegment2D<T>::getLength() const
 {
-	Point t = this->end - this->start;
-	return t.getLength();
+	return this->vector.getLength();
 }
 
+// ----------------------------------------------------------------------------
+template<typename T>
+const T
+xpcc::LineSegment2D<T>::getDistanceTo(const Point2D<T>& point) const
+{
+	// vector from the base point of the line to the new point
+	Vector2D<T> w(this->point, point);
+	
+	float c1 = Vector2D<T>::dot(w, this->vector);
+	if (c1 <= 0) {
+		return w.getLength();
+	}
+	
+	float c2 = Vector2D<T>::dot(this->vector, this->vector);
+	if (c2 <= c1) {
+		// TODO
+		//Vector2D<T> p();
+		//return p.getLength();
+	}
+	
+	float d = c1 / c2;
+	
+	Vector2D<T> p(this->point);
+	p.scale(d);
+	
+	return p.getLength();
+}
+
+// ----------------------------------------------------------------------------
 template<typename U>
 bool
-operator == (const LineSegment2D<U> &a, const LineSegment2D<U> &b)
+xpcc::operator == (const LineSegment2D<U> &a, const LineSegment2D<U> &b)
 {
 	return ((a.start == b.start) &&
 			(a.end == b.end));
@@ -65,7 +93,7 @@ operator == (const LineSegment2D<U> &a, const LineSegment2D<U> &b)
 
 template<typename U>
 bool
-operator != (const LineSegment2D<U> &a, const LineSegment2D<U> &b)
+xpcc::operator != (const LineSegment2D<U> &a, const LineSegment2D<U> &b)
 {
 	return ((a.start != b.start) ||
 			(a.end != b.end));

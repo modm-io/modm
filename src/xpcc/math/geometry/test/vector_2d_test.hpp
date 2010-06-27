@@ -39,11 +39,35 @@ public:
 	testConstructor();
 	
 	void
-	testLengthAndAngle();
+	testLength();
 	
 	void
-	testRotation();
+	testLengthFloat();
+	
+	void
+	testAngle();
+	
+	void
+	testNormalize();
+	
+	void
+	testScale();
+	
+	void
+	testRotate();
+	
+	void
+	testRotateFloat();
+	
+	void
+	testConversion();
 	
 	void
 	testArithmetics();
+	
+	void
+	testComparision();
+	
+	void
+	testDotProduct();
 };

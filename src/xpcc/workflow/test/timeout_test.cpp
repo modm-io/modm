@@ -37,29 +37,31 @@
 // ----------------------------------------------------------------------------
 // dummy implementation to control the time
 
-class DummyClock
+namespace
 {
-public:
-	static xpcc::Timestamp
-	now()
+	class DummyClock
 	{
-		return time;
-	}
+	public:
+		static xpcc::Timestamp
+		now()
+		{
+			return time;
+		}
+		
+		static void
+		setTime(uint16_t time)
+		{
+			DummyClock::time = time;
+		}
+		
+	private:
+		static uint16_t time;
+	};
 	
-	static void
-	setTime(uint16_t time)
-	{
-		DummyClock::time = time;
-	}
-	
-private:
-	static uint16_t time;
-};
-
-uint16_t DummyClock::time = 0;
+	uint16_t DummyClock::time = 0;
+}
 
 // ----------------------------------------------------------------------------
-
 void
 TimeoutTest::setUp()
 {

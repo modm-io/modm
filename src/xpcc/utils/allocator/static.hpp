@@ -49,7 +49,7 @@ namespace xpcc
 		 * \author	Fabian Greif
 		 */
 		template <typename T,
-				  size_t N>
+				  std::size_t N>
 		class Static : public AllocatorBase<T>
 		{
 		public:
@@ -74,7 +74,7 @@ namespace xpcc
 			}
 			
 			T*
-			allocate(size_t other);
+			allocate(std::size_t other);
 			
 			void
 			deallocate(T*);

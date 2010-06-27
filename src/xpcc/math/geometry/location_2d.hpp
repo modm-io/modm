@@ -38,7 +38,7 @@
 #include <xpcc/io/iostream.hpp>
 
 #include "angle.hpp"
-#include "vector_2d.hpp"
+#include "point_2d.hpp"
 
 namespace xpcc
 {
@@ -51,7 +51,7 @@ namespace xpcc
 	class Location2D
 	{
 	public:
-		typedef ::xpcc::Vector2D<T> Point;
+		typedef ::xpcc::Point2D<T> Point;
 		
 		Location2D();
 		
@@ -80,7 +80,7 @@ namespace xpcc
 		void
 		setPoint(const T& x, const T& y);
 		
-		inline const float
+		inline float
 		getAngle() const;
 		
 		void

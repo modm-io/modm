@@ -66,9 +66,10 @@ template <typename T>
 void
 xpcc::Location2D<T>::update(T x, float phi)
 {
-	point += Point(x * std::cos(this->phi),
-				   x * std::sin(this->phi));
-
+	Vector2D<T> vector(x * std::cos(this->phi),
+					   x * std::sin(this->phi));
+	point.translate(vector);
+	
 	this->phi = Angle::normalize(this->phi + phi);
 }
 
@@ -95,7 +96,7 @@ xpcc::Location2D<T>::setPoint(const T& x, const T& y)
 }
 
 template <typename T>
-const float
+float
 xpcc::Location2D<T>::getAngle() const
 {
 	return this->phi;

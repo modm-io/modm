@@ -33,6 +33,7 @@
 #ifndef	XPCC__STACK_HPP
 #define	XPCC__STACK_HPP
 
+#include <cstddef>
 #include <stdint.h>
 
 #include "deque.hpp"
@@ -44,6 +45,8 @@ namespace xpcc
 	 * 
 	 * Elements are pushed/popped from the "back" of the specific container,
 	 * which is known as the top of the stack.
+	 * 
+	 * getFront(), removeFront(), prepend()
 	 * 
 	 * \see		Deque()
 	 * 
@@ -85,25 +88,25 @@ namespace xpcc
 		T&
 		get()
 		{
-			return c.back();
+			return c.getFront();
 		}
 		
 		const T&
 		get() const
 		{
-			return c.back();
+			return c.getFront();
 		}
 		
 		bool
 		push(const T& value)
 		{
-			return c.pushBack(value);
+			return c.prepend(value);
 		}
 		
 		void
 		pop()
 		{
-			c.popBack();
+			c.removeFront();
 		}
 	
 	protected:
@@ -117,7 +120,7 @@ namespace xpcc
 	 * \ingroup		container
 	 */
 	template<typename T, 
-			 int N,
+			 std::size_t N,
 			 typename Container = BoundedDeque<T, N> >
 	class BoundedStack : public Stack<T, Container>
 	{

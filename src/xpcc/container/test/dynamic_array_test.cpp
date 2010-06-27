@@ -127,12 +127,12 @@ DynamicArrayTest::testRemove()
 	TEST_ASSERT_FALSE(array.isEmpty());
 	TEST_ASSERT_EQUALS(array.getSize(), 2U);
 
-	array.removeLast();
+	array.removeBack();
 
 	TEST_ASSERT_FALSE(array.isEmpty());
 	TEST_ASSERT_EQUALS(array.getSize(), 1U);
 
-	array.removeLast();
+	array.removeBack();
 
 	TEST_ASSERT_TRUE(array.isEmpty());
 	TEST_ASSERT_EQUALS(array.getSize(), 0U);

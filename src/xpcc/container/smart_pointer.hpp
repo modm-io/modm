@@ -33,7 +33,7 @@
 #ifndef	XPCC_SMART_POINTER_H
 #define	XPCC_SMART_POINTER_H
 
-#include <string.h>		// for memcpy
+#include <cstring>		// for std::memcpy
 #include <stdint.h>
 
 #include <xpcc/io/iostream.hpp>
@@ -75,7 +75,7 @@ namespace xpcc
 		{
 			ptr[0] = 1;
 			ptr[1] = sizeof(T);
-			memcpy(ptr + 2, data, sizeof(T));
+			std::memcpy(ptr + 2, data, sizeof(T));
 		}
 
 		SmartPointer(const SmartPointer& other);
@@ -107,10 +107,10 @@ namespace xpcc
 		 * \return the stored value converted to T
 		 */
 		template<typename T>
-		const T&
+		inline const T&
 		get() const
 		{
-			return *(T*)&ptr[2];
+			return *((T*) &ptr[2]);
 		}
 
 		/**
@@ -123,8 +123,9 @@ namespace xpcc
 		bool
 		get(T& value) const
 		{
-			if( sizeof(T) == ptr[1] ) {
-				value = *(T*)&ptr[2];
+			if (sizeof(T) == ptr[1])
+			{
+				value = *((T *) &ptr[2]);
 				return true;
 			}
 			else {
@@ -133,13 +134,14 @@ namespace xpcc
 		}
 
 	protected:
+		uint8_t * const ptr;
+		
+	protected:
 		friend IOStream&
 		operator <<( IOStream&, const SmartPointer&);
 		
 		SmartPointer&
 		operator = (const SmartPointer& other);
-		
-		uint8_t * const ptr;
 	};
 
 	/**

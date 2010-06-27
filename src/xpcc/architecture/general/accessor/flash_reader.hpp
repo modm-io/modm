@@ -63,7 +63,7 @@
 	
 	#else
 	
-		#include <string.h>
+		#include <cstring>
 		#include <xpcc/utils/macros.hpp>
 
 		// A simple implementation for all targets that don't have a
@@ -77,7 +77,7 @@
 
 		namespace xpcc
 		{
-			template<typename T, size_t size>
+			template<typename T, std::size_t size>
 			struct FlashReader
 			{
 				ALWAYS_INLINE

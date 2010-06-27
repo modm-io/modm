@@ -35,7 +35,7 @@
 #include "s_curve_controller_test.hpp"
 
 void
-SCurveControllerTest::testCreation()
+SCurveControllerTest::testConstructor()
 {
 	xpcc::SCurveController<int16_t>::Parameter parameter;
 	
@@ -50,5 +50,5 @@ SCurveControllerTest::testCreation()
 	TEST_ASSERT_EQUALS(controller.getValue(), 0);
 	TEST_ASSERT_TRUE(controller.isTargetReached());
 	
-	// TODO
+	TEST_FAIL("TODO");
 }

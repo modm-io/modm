@@ -36,7 +36,7 @@ class SCurveControllerTest : public unittest::TestSuite
 {
 public:
 	void
-	testCreation();
+	testConstructor();
 	
 	// FIXME implement more tests
 };

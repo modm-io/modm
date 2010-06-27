@@ -16,21 +16,25 @@ extern "C"
 	__extension__ typedef int __guard __attribute__((mode (__DI__)));
 	
 	int
-	__cxa_guard_acquire(__guard *g) {
+	__cxa_guard_acquire(__guard *g)
+	{
 		return !*(char *)(g);
 	}
 	
 	void
-	__cxa_guard_release (__guard *g) {
+	__cxa_guard_release (__guard *g)
+	{
 		*(char *)g = 1;
 	}
 	
 	void
-	__cxa_guard_abort (__guard *) {
+	__cxa_guard_abort (__guard *)
+	{
 	}
 	
 	int
-	__cxa_atexit (void (* destructor)(void *), void *object, void *dso_handle) {
+	__cxa_atexit (void (* destructor)(void *), void *object, void *dso_handle)
+	{
 		// TODO!
 		// http://sourceware.org/ml/ecos-discuss/2005-02/msg00056.html
 		// http://lists.debian.org/debian-gcc/2003/07/msg00057.html

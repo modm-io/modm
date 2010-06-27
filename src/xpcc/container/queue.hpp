@@ -30,8 +30,10 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC_QUEUE_HPP
-#define	XPCC_QUEUE_HPP
+#ifndef	XPCC__QUEUE_HPP
+#define	XPCC__QUEUE_HPP
+
+#include <cstddef>
 
 #include "deque.hpp"
 
@@ -40,8 +42,7 @@ namespace xpcc
 	/**
 	 * \brief	FIFO queue
 	 * 
-	 * Elements are pushed into the "back" of the specific container and popped 
-	 * from its "front".
+	 * getFront(), removeFront(), append()
 	 * 
 	 * \tparam	T			type
 	 * \tparam	Container	container
@@ -85,42 +86,28 @@ namespace xpcc
 		
 		/// Access first element
 		inline T&
-		front()
+		get()
 		{
-			return c.front();
+			return c.getFront();
 		}
 		
 		/// Access first element
 		inline const T&
-		front() const
+		get() const
 		{
-			return c.front();
-		}
-		
-		/// Access last element
-		inline T&
-		back()
-		{
-			return c.back();
-		}
-		
-		/// Access last element
-		inline const T&
-		back() const
-		{
-			return c.back();
+			return c.getFront();
 		}
 		
 		inline bool
 		push(const T& value)
 		{
-			return c.pushBack(value);
+			return c.append(value);
 		}
 		
 		inline void
 		pop()
 		{
-			c.popFront();
+			c.removeFront();
 		}
 
 	protected:
@@ -134,7 +121,7 @@ namespace xpcc
 	 * \ingroup	container
 	 */
 	template<typename T, 
-			 int N,
+			 std::size_t N,
 			 typename Container = BoundedDeque<T, N> >
 	class BoundedQueue : public Queue<T, Container>
 	{
@@ -142,4 +129,4 @@ namespace xpcc
 
 }
 
-#endif	// XPCC_QUEUE_HPP
+#endif	// XPCC__QUEUE_HPP

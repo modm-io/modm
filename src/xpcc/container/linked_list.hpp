@@ -85,7 +85,7 @@ namespace xpcc
 		 * \return the last node in the list
 		 */
 		inline const T&
-		getLack() const;
+		getBack() const;
 		
 		/**
 		 * \brief	Access the node at position \a index

@@ -33,6 +33,8 @@
 #ifndef	XPCC__DEQUE_HPP
 #define	XPCC__DEQUE_HPP
 
+#include <cstddef>
+
 #include <stdint.h>
 #include <xpcc/utils/typet.hpp>
 
@@ -44,15 +46,15 @@ namespace xpcc
 	 * Internally organized as a ring buffer.
 	 * 
 	 * \verbatim
-	 *             tail --\                 /-- head
-	 *                    |                 |
-	 *          +------+------+---- ----+------+------+
-	 *        0 |      | data |   ...   | data |      | N-1
-	 *          +------+------+---- ----+------+------+
-	 *             |      |                 |      |
-	 * pushFront --/      |                 |      \-- pushBack
-	 *                    |                 |
-	 *            front --/                 \-- back
+	 *           tail --\                 /-- head
+	 *                  |                 |
+	 *        +------+------+---- ----+------+------+
+	 *      0 |      | data |   ...   | data |      | N-1
+	 *        +------+------+---- ----+------+------+
+	 *           |      |                 |      |
+	 * prepend --/      |                 |      \-- append
+	 *                  |                 |
+	 *       getFront --/                 \-- getBack
 	 * \endverbatim
 	 * 
 	 * \tparam	T	Type of the elements
@@ -68,7 +70,7 @@ namespace xpcc
 	 * \ingroup		container
 	 */
 	template<typename T,
-			 int N>
+			 std::size_t N>
 	class BoundedDeque
 	{
 	public:
@@ -104,29 +106,29 @@ namespace xpcc
 		
 		
 		inline T&
-		front();
+		getFront();
 		
 		inline const T&
-		front() const;
+		getFront() const;
 		
 		inline T&
-		back();
+		getBack();
 		
 		inline const T&
-		back() const;
+		getBack() const;
 		
 		
 		bool
-		pushBack(const T& value);
+		append(const T& value);
 		
 		bool
-		pushFront(const T& value);
+		prepend(const T& value);
 		
 		void
-		popBack();
+		removeBack();
 		
 		void
-		popFront();
+		removeFront();
 	
 	public:
 		/**

@@ -33,7 +33,7 @@
 #ifndef	XPCC_ACCESSOR__RAM_HPP
 #define	XPCC_ACCESSOR__RAM_HPP
 
-#include <string.h>			// for size_t
+#include <cstddef>
 #include <xpcc/utils/macros.hpp>
 
 namespace xpcc
@@ -72,7 +72,7 @@ namespace xpcc
 			
 			ALWAYS_INLINE
 			const T
-			operator [](size_t index) const
+			operator [](std::size_t index) const
 			{
 				return *(address + index);
 			}
@@ -113,7 +113,7 @@ namespace xpcc
 			
 			ALWAYS_INLINE
 			Ram&
-			operator += (size_t rhs)
+			operator += (std::size_t rhs)
 			{
 				address += rhs;
 				return *this;
@@ -121,7 +121,7 @@ namespace xpcc
 			
 			ALWAYS_INLINE
 			Ram&
-			operator -= (size_t rhs)
+			operator -= (std::size_t rhs)
 			{
 				address -= rhs;
 				return *this;

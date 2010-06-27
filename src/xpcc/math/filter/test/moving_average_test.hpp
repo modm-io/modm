@@ -36,5 +36,5 @@ class MovingAverageTest : public unittest::TestSuite
 {
 public:
 	void
-	testFilter();
+	testConstructor();
 };

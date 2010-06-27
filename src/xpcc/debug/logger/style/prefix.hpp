@@ -32,7 +32,8 @@
 #ifndef XPCC_LOG_STYLE_PREFIX__HPP
 #define XPCC_LOG_STYLE_PREFIX__HPP
 
-#include <string.h>
+#include <cstring>
+
 #include "../style.hpp"
 #include <xpcc/utils/typet.hpp>
 
@@ -87,7 +88,7 @@ xpcc::log::Prefix<T, STYLE>::Prefix( const T& str, STYLE style ) :
 	Style<STYLE> ( style ),
 	flushed ( true )
 {
-	memcpy( &this->value, &str, sizeof(T) );
+	std::memcpy( &this->value, &str, sizeof(T) );
 }
 
 template <typename T, typename STYLE>
@@ -95,7 +96,7 @@ xpcc::log::Prefix<T, STYLE>::Prefix( const T& str, IODevice &device ) :
 	Style<STYLE> ( device ),
 	flushed ( true )
 {
-	memcpy( &this->value, &str, sizeof(T) );
+	std::memcpy( &this->value, &str, sizeof(T) );
 }
 
 template <typename T, typename STYLE>

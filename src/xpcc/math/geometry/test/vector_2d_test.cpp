@@ -30,7 +30,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <math.h>
+#include <cmath>
+#include <xpcc/math/geometry/angle.hpp>
 #include <xpcc/math/geometry/vector_2d.hpp>
 
 #include "vector_2d_test.hpp"
@@ -38,59 +39,158 @@
 void
 Vector2DTest::testConstructor()
 {
-	xpcc::Vector2D<int16_t> coord;
+	xpcc::Vector2D<int16_t> a;
 	
-	TEST_ASSERT_EQUALS(coord.getX(), 0);
-	TEST_ASSERT_EQUALS(coord.getY(), 0);
+	TEST_ASSERT_EQUALS(a.getX(), 0);
+	TEST_ASSERT_EQUALS(a.getY(), 0);
 	
-	coord.setX(100);
-	TEST_ASSERT_EQUALS(coord.getX(), 100);
+	a.setX(100);
+	TEST_ASSERT_EQUALS(a.getX(), 100);
 	
-	coord.setY(100);
-	TEST_ASSERT_EQUALS(coord.getY(), 100);
+	a.setY(100);
+	TEST_ASSERT_EQUALS(a.getY(), 100);
 	
-	coord.set(10, -30);
-	TEST_ASSERT_EQUALS(coord.getX(), 10);
-	TEST_ASSERT_EQUALS(coord.getY(), -30);
+	a.set(10, -30);
+	TEST_ASSERT_EQUALS(a.getX(), 10);
+	TEST_ASSERT_EQUALS(a.getY(), -30);
+	
+	
+	xpcc::Vector2D<int16_t> b(-20, -10);
+	
+	TEST_ASSERT_EQUALS(b.getX(), -20);
+	TEST_ASSERT_EQUALS(b.getY(), -10);
 }
 
 void
-Vector2DTest::testLengthAndAngle()
+Vector2DTest::testLength()
 {
-	float angle;
-	xpcc::Vector2D<int16_t> coord(100, 100);
+	xpcc::Vector2D<int16_t> a;
 	
-	TEST_ASSERT_EQUALS(coord.getLength(), 141);
-	angle = coord.getAngle();
-	TEST_ASSERT_EQUALS_FLOAT(angle, M_PI / 4);
+	a.set(100, 100);
+	TEST_ASSERT_EQUALS(a.getLength(), 141);
+	TEST_ASSERT_EQUALS(a.getLengthSquared(), 20000);
 	
-	coord.set(-100, -100);
+	a.set(-100, -100);
+	TEST_ASSERT_EQUALS(a.getLength(), 141);
+	TEST_ASSERT_EQUALS(a.getLengthSquared(), 20000);
 	
-	TEST_ASSERT_EQUALS(coord.getLength(), 141);
-	angle = coord.getAngle();
-	TEST_ASSERT_EQUALS_FLOAT(angle, - 3* M_PI / 4);
+	a.set(0, 100);
+	TEST_ASSERT_EQUALS(a.getLength(), 100);
+	TEST_ASSERT_EQUALS(a.getLengthSquared(), 10000);
 	
-	coord.set(0, 100);
-	TEST_ASSERT_EQUALS(coord.getLength(), 100);
-	angle = coord.getAngle();
-	TEST_ASSERT_EQUALS_FLOAT(angle, M_PI / 2);
-	
+	a.set(-20, 300);
+	TEST_ASSERT_EQUALS(a.getLength(), 301);
+	TEST_ASSERT_EQUALS(a.getLengthSquared(), 90400);
 }
 
 void
-Vector2DTest::testRotation()
+Vector2DTest::testLengthFloat()
 {
-	xpcc::Vector2D<int16_t> coord(100, 200);
+	xpcc::Vector2D<float> a;
 	
-	coord.rotate(M_PI / 2);
+	a.set(100, 100);
+	TEST_ASSERT_EQUALS_FLOAT(a.getLength(), 141.4213562f);
+	TEST_ASSERT_EQUALS_FLOAT(a.getLengthSquared(), 20000);
 	
-	TEST_ASSERT_EQUALS(coord.getX(), -200);
-	TEST_ASSERT_EQUALS(coord.getY(), 100);
+	a.set(-20, 300);
+	TEST_ASSERT_EQUALS_FLOAT(a.getLength(), 300.6659276f);
+	TEST_ASSERT_EQUALS_FLOAT(a.getLengthSquared(), 90400);
+}
+
+void
+Vector2DTest::testAngle()
+{
+	xpcc::Vector2D<int16_t> a;
 	
-	coord.rotate(-M_PI);
+	a.set(100, 100);
+	TEST_ASSERT_EQUALS_FLOAT(a.getAngle(), M_PI / 4);
 	
-	TEST_ASSERT_EQUALS(coord.getX(), 200);
-	TEST_ASSERT_EQUALS(coord.getY(), -100);
+	a.set(-100, -100);
+	TEST_ASSERT_EQUALS_FLOAT(a.getAngle(), - 3* M_PI / 4);
+	
+	a.set(0, 100);
+	TEST_ASSERT_EQUALS_FLOAT(a.getAngle(), M_PI / 2);
+}
+
+void
+Vector2DTest::testNormalize()
+{
+	xpcc::Vector2D<float> a(100, 100);
+	
+	TEST_ASSERT_EQUALS_FLOAT(a.getAngle(), M_PI / 4);
+	
+	a.normalize();
+	
+	TEST_ASSERT_EQUALS_FLOAT(a.getLength(), 1.f);
+	TEST_ASSERT_EQUALS_FLOAT(a.getAngle(), M_PI / 4);
+}
+
+void
+Vector2DTest::testScale()
+{
+	xpcc::Vector2D<int16_t> a(100, 200);
+	
+	a.scale(0.15f);
+	
+	TEST_ASSERT_EQUALS(a.getX(), 15);
+	TEST_ASSERT_EQUALS(a.getY(), 30);
+	
+	a.scale(static_cast<int16_t>(7));
+	
+	TEST_ASSERT_EQUALS(a.getX(), 105);
+	TEST_ASSERT_EQUALS(a.getY(), 210);
+}
+
+void
+Vector2DTest::testRotate()
+{
+	xpcc::Vector2D<int16_t> a(100, 200);
+	
+	a.rotate(M_PI / 2);
+	
+	TEST_ASSERT_EQUALS(a.getX(), -200);
+	TEST_ASSERT_EQUALS(a.getY(), 100);
+	
+	a.rotate(-M_PI);
+	
+	TEST_ASSERT_EQUALS(a.getX(), 200);
+	TEST_ASSERT_EQUALS(a.getY(), -100);
+	
+	a.set(100, 100);
+	a.rotate(xpcc::Angle::toRadian(20));
+	
+	TEST_ASSERT_EQUALS(a.getX(), 60);
+	TEST_ASSERT_EQUALS(a.getY(), 128);
+}
+
+void
+Vector2DTest::testRotateFloat()
+{
+	xpcc::Vector2D<float> a(100, 100);
+	
+	a.rotate(xpcc::Angle::toRadian(20));
+	
+	TEST_ASSERT_EQUALS_FLOAT(a.getX(), 59.76724775f);
+	TEST_ASSERT_EQUALS_FLOAT(a.getY(), 128.1712764f);
+}
+
+void
+Vector2DTest::testConversion()
+{
+	xpcc::Vector2D<float> a(12.763f, -13.3123f);
+	
+	TEST_ASSERT_EQUALS(a.getX(), 12.763f);
+	TEST_ASSERT_EQUALS(a.getY(), -13.3123f);
+	
+	xpcc::Vector2D<int16_t> b = a.convert<int16_t>();
+	
+	TEST_ASSERT_EQUALS(b.getX(), 13);
+	TEST_ASSERT_EQUALS(b.getY(), -13);
+	
+	xpcc::Point2D<int16_t> c = b.toPoint();
+	
+	TEST_ASSERT_EQUALS(c.getX(), 13);
+	TEST_ASSERT_EQUALS(c.getY(), -13);
 }
 
 void
@@ -139,5 +239,38 @@ Vector2DTest::testArithmetics()
 	
 	TEST_ASSERT_EQUALS(y.getX(), 10);
 	TEST_ASSERT_EQUALS(y.getY(), 30);
+	
+	z = -y;
+	
+	TEST_ASSERT_EQUALS(y.getX(), 10);
+	TEST_ASSERT_EQUALS(y.getY(), 30);
+	
+	TEST_ASSERT_EQUALS(z.getX(), -10);
+	TEST_ASSERT_EQUALS(z.getY(), -30);
 }
 
+void
+Vector2DTest::testComparision()
+{
+	xpcc::Vector2D<int16_t> a(10, 10);	
+	xpcc::Vector2D<int16_t> b(10, -10);
+	xpcc::Vector2D<int16_t> c(10, 10);
+	
+	TEST_ASSERT_TRUE(a != b);
+	TEST_ASSERT_FALSE(a == b);
+	
+	TEST_ASSERT_TRUE(a == c);
+	TEST_ASSERT_FALSE(a != c);
+}
+
+void
+Vector2DTest::testDotProduct()
+{
+	xpcc::Vector2D<int16_t> a(1000, 1000);	
+	xpcc::Vector2D<int16_t> b(1000, 0);
+	xpcc::Vector2D<int16_t> c(1000, -1000);
+	
+	TEST_ASSERT_EQUALS(xpcc::Vector2D<int16_t>::dotProduct(a, b), 1000000);
+	TEST_ASSERT_EQUALS(xpcc::Vector2D<int16_t>::dotProduct(a, c), 0);
+	TEST_ASSERT_EQUALS(xpcc::Vector2D<int16_t>::dotProduct(b, c), 1000000);
+}

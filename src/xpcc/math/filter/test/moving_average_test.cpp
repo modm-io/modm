@@ -35,10 +35,9 @@
 #include "moving_average_test.hpp"
 
 void
-MovingAverageTest::testFilter()
+MovingAverageTest::testConstructor()
 {
 	xpcc::MovingAverage<int16_t, 4> filter(0);
 	
-	
-	// FIXME write some tests
+	TEST_FAIL("TODO");
 }

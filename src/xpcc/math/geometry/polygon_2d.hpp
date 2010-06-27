@@ -34,7 +34,7 @@
 #define XPCC__POLYGON_2D_HPP
 
 #include <xpcc/container/dynamic_array.hpp>
-#include "vector_2d.hpp"
+#include "point_2d.hpp"
 
 namespace xpcc
 {
@@ -50,8 +50,7 @@ namespace xpcc
 	class Polygon2D
 	{
 	public:
-		typedef size_t SizeType;
-		typedef Vector2D<T> Point;
+		typedef std::size_t SizeType;
 
 	public:
 		/**
@@ -60,19 +59,13 @@ namespace xpcc
 		Polygon2D(SizeType n);
 
 		void
-		append(const Point& point);
+		append(const Point2D<T>& point);
 
-		inline Point&
-		operator [](SizeType index)
-		{
-			return buffer[index];
-		}
+		inline Point2D<T>&
+		operator [](SizeType index);
 
-		inline const Point&
-		operator [](SizeType index) const
-		{
-			return buffer[index];
-		}
+		inline const Point2D<T>&
+		operator [](SizeType index) const;
 
 	private:
 		xpcc::DynamicArray<T> buffer;

@@ -46,6 +46,7 @@ namespace xpcc
 	template <typename T>
 	class Vector2D;
 	
+	// ------------------------------------------------------------------------
 	/**
 	 * \brief	2D Point
 	 * 
@@ -89,14 +90,32 @@ namespace xpcc
 		
 		
 		WideType
-		getDistanceTo(const Point<T>& other);
+		getDistanceTo(const Point2D<T>& other);
 		
+		/**
+		 * \brief	Move the point in x and y direction
+		 */
+		void
+		translate(const Vector2D<T>& vector);
+		
+		/**
+		 * \brief	Check if three points are in a counter-clock wise direction
+		 * 
+		 * \returns	1 if counter-clock wise, -1 if clock wise and 0 if \p c is
+		 * 			between \p a and \p b.
+		 */
+		static int_fast8_t
+		ccw(const Point2D<T>& a, const Point2D<T>& b, const Point2D<T>& c);
 		
 		/**
 		 * \brief	Convert between Point-objects with different base-types
 		 */
 		template<typename U>
-		operator Point2D<U>() const;
+		Point2D<U>
+		convert() const;
+		
+		Vector2D<T>
+		toVector() const;
 		
 	private:
 		T x;
@@ -104,18 +123,32 @@ namespace xpcc
 		
 	private:
 		template<typename U>
-		friend bool
-		operator == (const Vector2D<U> &a, const Vector2D<U> &b);
+		friend IOStream&
+		operator <<(IOStream& s, const Point2D<U>& c);
 		
 		template<typename U>
 		friend bool
-		operator != (const Vector2D<U> &a, const Vector2D<U> &b);
-
+		operator == (const Point2D<U> &a, const Point2D<U> &b);
+		
 		template<typename U>
-		friend IOStream&
-		operator <<(IOStream& s, const Vector2D<U>& c);
+		friend bool
+		operator != (const Point2D<U> &a, const Point2D<U> &b);
 	};
 	
+	// ------------------------------------------------------------------------
+	// Global functions
+	// ------------------------------------------------------------------------
+	/**
+	 * \brief	Stream operator for \b xpcc::Point2D<U>
+	 * \ingroup	geometry
+	 */
+	template<typename U>
+	IOStream&
+	operator << (IOStream& s, const Point2D<U>& c);
+	
+	// ------------------------------------------------------------------------
+	// Global Operators
+	// ------------------------------------------------------------------------
 	template<typename U>
 	bool
 	operator == (const Point2D<U> &a, const Point2D<U> &b);
@@ -124,15 +157,33 @@ namespace xpcc
 	bool
 	operator != (const Point2D<U> &a, const Point2D<U> &b);
 	
-	/**
-	 * \brief	Stream operator for \b xpcc::Point2D<U>
-	 * \ingroup	geometry
-	 */
-	template<typename U>
-	IOStream&
-	operator << (IOStream& s, const Point2D<U>& c);
+	// ------------------------------------------------------------------------
+	// Declaration of specialized methods
+	// ------------------------------------------------------------------------
+	template<> template<typename U>
+	Point2D<U>
+	Point2D<float>::convert() const
+	{
+		return Point2D<U>(round(this->x), round(this->y));
+	}
+	
+	template<> template<typename U>
+	Point2D<U>
+	Point2D<double>::convert() const
+	{
+		return Point2D<U>(round(this->x), round(this->y));
+	}
+	
+	template<> template<>
+	Point2D<double>
+	Point2D<float>::convert() const;
+	
+	template<> template<>
+	Point2D<float>
+	Point2D<double>::convert() const;
 }
 
+#include "vector_2d.hpp"
 #include "point_2d_impl.hpp"
 
 #endif	// XPCC__POINT_2D_HPP

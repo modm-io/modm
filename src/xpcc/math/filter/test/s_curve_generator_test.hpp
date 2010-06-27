@@ -36,7 +36,7 @@ class SCurveGeneratorTest : public unittest::TestSuite
 {
 public:
 	void
-	testCreation();
+	testConstructor();
 	
 	// TODO implement more tests
 };

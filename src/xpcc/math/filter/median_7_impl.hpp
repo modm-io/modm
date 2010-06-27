@@ -30,9 +30,6 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <string.h>
-
-// ----------------------------------------------------------------------------
 namespace xpcc
 {
 	namespace filter
@@ -78,7 +75,8 @@ xpcc::filter::Median<T, 7>::append(const T& input)
 	// Remove the old value from the sorted set and replace it with the
 	// new input. This way the array remains mostly sorted.
 	T valueToRemove = this->buffer[index];
-	for (uint_fast8_t i = 0; i < 7; ++i) {
+	for (uint_fast8_t i = 0; i < 7; ++i)
+	{
 		if (this->sorted[i] == valueToRemove) {
 			this->sorted[i] = input;
 			break;

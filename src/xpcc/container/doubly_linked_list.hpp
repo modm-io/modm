@@ -79,13 +79,13 @@ namespace xpcc
 		 * \return the first node in the list
 		 */
 		inline const T&
-		front() const;
+		getFront() const;
 
 		/**
 		 * \return the last node in the list
 		 */
 		inline const T&
-		back() const;
+		getBack() const;
 		
 		/**
 		 * \brief	Access the node at position \a index

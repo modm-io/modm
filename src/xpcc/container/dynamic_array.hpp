@@ -33,7 +33,7 @@
 #ifndef XPCC__DYNAMIC_ARRAY_HPP
 #define XPCC__DYNAMIC_ARRAY_HPP
 
-#include <stddef.h>
+#include <cstddef>
 
 namespace xpcc
 {
@@ -62,7 +62,7 @@ namespace xpcc
 	class DynamicArray
 	{
 	public:
-		typedef size_t SizeType;
+		typedef std::size_t SizeType;
 	public:
 		/**
 		 * \brief	Default constructor
@@ -73,7 +73,7 @@ namespace xpcc
 		DynamicArray();
 
 		/**
-		 * \brief	Allocation Constructor
+		 * \brief	Allocation constructor
 		 *
 		 * Construct a dynamic array of given size.
 		 */
@@ -88,11 +88,11 @@ namespace xpcc
 		 * repetition, n times, of copies of value.
 		 */
 		DynamicArray(SizeType n, const T& value);
-
+		
 		DynamicArray(const DynamicArray& other);
-
+		
 		~DynamicArray();
-
+		
 		DynamicArray&
 		operator = (const DynamicArray& other);
 
@@ -154,6 +154,17 @@ namespace xpcc
 		 */
 		void
 		reserve(SizeType n);
+		
+		/**
+		 * \brief	Remove all elements
+		 * 
+		 * Frees all allocated memory and sets the capacity of the container
+		 * to zero.
+		 * 
+		 * \warning	This will discard all the items in the container
+		 */
+		void
+		clear();
 
 		/**
 		 * \brief	Access element
@@ -205,32 +216,32 @@ namespace xpcc
 		 * This calls the removed element's destructor.
 		 */
 		void
-		removeLast();
+		removeBack();
 
 		// TODO insert implementation
 		//void
 		//insert(...);
 
 		inline const T&
-		first() const
+		getFront() const
 		{
 			return this->values[0];
 		}
 
 		inline T&
-		first()
+		getFront()
 		{
 			return this->values[0];
 		}
 
 		inline const T&
-		last() const
+		getBack() const
 		{
 			return this->values[this->size - 1];
 		}
 
 		inline T&
-		last()
+		getBack()
 		{
 			return this->values[this->size - 1];
 		}
@@ -238,7 +249,7 @@ namespace xpcc
 	private:
 		/*
 		 * Allocate a new buffer of size n and copy the elements from the
-		 * old buffer to the new buffer
+		 * old buffer to the new buffer.
 		 */
 		void
 		relocate(SizeType n);

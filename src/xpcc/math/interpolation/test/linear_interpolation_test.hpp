@@ -36,6 +36,5 @@ struct LinearInterpolationTest : public unittest::TestSuite
 {
 	void
 	testInterpolation();
-	
 };
 

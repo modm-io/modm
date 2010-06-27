@@ -74,8 +74,9 @@ static uint8_t *freeHint;		// TODO implement freeHint usefull ;-)
 static uint8_t *currentHeapEnd;
 
 // ----------------------------------------------------------------------------
-// This function is called before every constructor and main()
-void initializeMemory(void)
+// This function is called before the constructors and the main()
+void
+initializeMemory(void)
 {
 	*heapStart = 0;		// dummy byte
 	 heapStart++;
@@ -93,7 +94,7 @@ void initializeMemory(void)
  * TODO description
  */
 void *
-xpcc::avr::allocateMemory(size_t requestedSize)
+xpcc::avr::allocateMemory(std::size_t requestedSize)
 {
 	if (requestedSize == 0 ||
 		requestedSize > MAX_BLOCK_PARTS * BLOCK_SIZE)
@@ -224,7 +225,7 @@ xpcc::avr::freeMemory(void *ptr)
 
 #include <iostream>
 #include <time.h>
-#include <string.h>
+#include <cstring>
 
 void
 printMemoryLayout(void)

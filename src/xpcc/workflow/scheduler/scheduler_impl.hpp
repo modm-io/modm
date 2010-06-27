@@ -34,23 +34,25 @@
 	#error	"Don't include this file directly, use 'scheduler.hpp' instead!"
 #endif
 
+/* item is element of two lists (schedule list and ready list).
+ * ready list is order by its priority.
+ * 
+ * ALGORITHM:
+ * ----------------------------------------------------------------------------
+ * foreach item
+ *     decrement
+ *     if time = 0
+ *         reload time
+ *         set as ready
+ * 
+ * foreach item is ready (ordered by priority)
+ *     run item
+ *     mark as waiting
+ * ----------------------------------------------------------------------------
+ */
 inline void
 xpcc::Scheduler::scheduleInterupt()
 {
-	/* item is element of two lists (schedule list and ready list)
-	   ready list is order after priority
-	
-	foreach item
-		decrement
-		if time = 0
-			reload time
-			set as ready
-	
-	foreach item is ready orderd per priority
-		run item
-		mark as waiting
-	*/
-	
 	if (taskList == 0) {
 		// nothing to schedule right now
 		return;

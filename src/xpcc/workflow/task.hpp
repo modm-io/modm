@@ -36,20 +36,22 @@
 namespace xpcc
 {
 	/**
-	 * \brief	Statemachine
+	 * \brief	Interface for a state-machine
 	 * 
 	 * Every task must provide a start() method which resets the internal state
-	 * and starts execution. It is not decleared here because the task may need
+	 * and starts execution. It is not declared here because the task may need
 	 * some specific information which should be passed as a parameter.
-	 *
+	 * 
 	 * \ingroup	workflow
 	 * \author	Fabian Greif
 	 */
 	class Task
 	{
 	public:
-		//void
-		//start();
+#ifdef __DOXYGEN__
+		void
+		start(...);
+#endif
 		
 		virtual bool
 		isFinished() = 0;

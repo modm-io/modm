@@ -32,22 +32,26 @@
 #include "../ram/allocator.hpp"
 
 void *
-operator new(size_t size) {
+operator new(size_t size)
+{
 	return xpcc::avr::allocateMemory(size);
 }
 
 void *
-operator new[](size_t size) {
+operator new[](size_t size)
+{
 	return xpcc::avr::allocateMemory(size);
 }
 
 void
-operator delete(void* ptr) {
+operator delete(void* ptr)
+{
 	xpcc::avr::freeMemory(ptr);
 }
 
 void
-operator delete[](void* ptr) {
+operator delete[](void* ptr)
+{
 	xpcc::avr::freeMemory(ptr);
 }
 

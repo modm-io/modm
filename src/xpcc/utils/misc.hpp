@@ -33,6 +33,7 @@
 #ifndef	XPCC__MISC_HPP
 #define	XPCC__MISC_HPP
 
+#include <cstddef>
 #include <stdint.h>
 #include "macros.hpp"
 
@@ -135,7 +136,7 @@ namespace xpcc
 		 * 
 		 * \see		http://infolab.stanford.edu/~manku/bitReverse/bitReverse.html
 		 */
-		uint_fast8_t
+		std::size_t
 		bitCount(uint8_t n);
 		
 		/**
@@ -144,14 +145,14 @@ namespace xpcc
 		 * 
 		 * 33 cycles on an AVR, without call + return.
 		 */
-		uint_fast8_t
+		std::size_t
 		bitCount(uint16_t n);
 		
 		/**
 		 * \ingroup	utils
 		 * \brief	Count the number of bit set to 1
 		 */
-		uint_fast8_t
+		std::size_t
 		bitCount(uint32_t n);
 	}
 }

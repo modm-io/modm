@@ -6,13 +6,22 @@
 
 \section intro	Introduction
 
-The asynchronous peripheral bus is a master/slave system in multi-drop
-configuration. Meaning it does not allow multiple drivers but only multiple
-receivers.
+The APB (Asynchronous Peripheral Bus) is a simple master-slave bus system. One
+master can communicate with up to 32 slaves. The slaves are only allowed to
+transmit after a direct request by the master.
+
+It is primarly used to access simple sensors and actuators.
+
+\section electric	Electrical characteristics
 
 Between different boards it uses EIA-422 electrical signaling characteristics
-with two differential line pairs (full duplex operation). Within a single board
-standard 0-3,3V levels are used.
+with two differential line pairs (full duplex operation) in a multi-drop
+configuration. Meaning it does not allow multiple drivers but only
+multiple receivers. Within a single board normal digital levels are used 
+(either 0-3,3V or 0-5V). The idle state of a UART transmission line is high, 
+standard TTL-AND gatters have to be used for bundling.
+
+\todo Schematic
 
 \section protocol Protocol
 
@@ -29,16 +38,29 @@ Features:
 +------+--------+--------+---------+--------------+-----+
 \endverbatim
 
-\subsubsection header Header
-
 \verbatim
-     Bit:    7   6   5   4   3   2   1   0
-           +---+---+---+---+---+---+---+---+
-Function:  |   Flags   |      Address      |
-           +---+---+---+---+---+---+---+---+
+  7   6   5   4   3   2   1   0
++---+---+---+---+---+---+---+---+
+|   Flags   |      Address      |
++---+---+---+---+---+---+---+---+
 \endverbatim
 
-
-
+\code
+uint8_t
+crcUpdate(uint8_t crc, uint8_t data)
+{
+	crc = crc ^ data;
+	for (uint_fast8_t i = 0; i < 8; ++i)
+	{
+		if (crc & 0x01) {
+			crc = (crc >> 1) ^ 0x8C;
+		}
+		else {
+			crc >>= 1;
+		}
+	}
+	return crc;
+}
+\endcode
 
 */

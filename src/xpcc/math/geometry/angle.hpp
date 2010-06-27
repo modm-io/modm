@@ -50,14 +50,19 @@ namespace xpcc
 	public:
 		typedef float Type;
 		
-		/// \brief	Limit angle to +-Pi
+		/**
+		 * \brief	Normalize angle
+		 * 
+		 * Normalize the given angle to [-Pi,Pi] by repeatedly
+		 * adding/subtracting 2*Pi.
+		 */
 		static float
 		normalize(float angle);
 		
 		/**
 		 * \brief	Reverse the angle
 		 * 
-		 * Reverse the angle and keep it normalize to [-Pi,Pi).
+		 * Reverse the angle and keep it normalized to [-Pi,Pi].
 		 * 
 		 * Equivalent to:
 		 * \code
@@ -71,13 +76,13 @@ namespace xpcc
 		static inline float
 		toRadian(float angle)
 		{
-			return angle * M_PI / 180.0;
+			return (angle * M_PI) / 180.0;
 		}
 		
 		static inline float
 		toDegree(float angle)
 		{
-			return angle * 180.0 / M_PI;
+			return (angle * 180.0) / M_PI;
 		}
 	};
 }

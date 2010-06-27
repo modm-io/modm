@@ -56,9 +56,9 @@ every one of it, only a subset which is sufficient for the container.
  - getFront
  - getBack
  
- - push
- - pop
- - get
+ - push (only Stack and Queue)
+ - pop (only Stack and Queue)
+ - get (only Stack and Queue)
 
  - at
  - operator []

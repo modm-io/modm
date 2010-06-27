@@ -32,6 +32,7 @@
 
 #include "misc.hpp"
 
+// ----------------------------------------------------------------------------
 uint8_t
 xpcc::utils::bitReverse(uint8_t n)
 {
@@ -63,7 +64,9 @@ xpcc::utils::bitReverse(uint32_t n)
 	return n;
 }
 
-uint_fast8_t
+
+// ----------------------------------------------------------------------------
+std::size_t
 xpcc::utils::bitCount(uint8_t n)
 {
 	n = ((uint8_t) (n >> 1) & 0x55) + (n & 0x55);
@@ -73,14 +76,14 @@ xpcc::utils::bitCount(uint8_t n)
 	return n;
 }
 
-uint_fast8_t
+std::size_t
 xpcc::utils::bitCount(uint16_t n)
 {
 	return (bitCount((uint8_t) (n)) +
 			bitCount((uint8_t) (n >> 8)));
 }
 
-uint_fast8_t
+std::size_t
 xpcc::utils::bitCount(uint32_t n)
 {
 	n = ((n >> 1) & 0x55555555) + (n & 0x55555555);

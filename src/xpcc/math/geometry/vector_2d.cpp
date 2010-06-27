@@ -44,8 +44,8 @@ namespace xpcc
 	Vector2D<float>&
 	Vector2D<float>::rotate(const float phi)
 	{
-		float c = cos(phi);
-		float s = sin(phi);
+		float c = std::cos(phi);
+		float s = std::sin(phi);
 
 		float tx = (c * this->x - s * this->y);
 		this->y =  (s * this->x + c * this->y);
@@ -53,7 +53,25 @@ namespace xpcc
 
 		return *this;
 	}
-
+	
+	// ------------------------------------------------------------------------
+	template<>
+	float
+	Vector2D<float>::getLength() const
+	{
+		return std::sqrt(this->x * this->x +
+						 this->y * this->y);
+	}
+	
+	template<>
+	double
+	Vector2D<double>::getLength() const
+	{
+		return std::sqrt(this->x * this->x +
+						 this->y * this->y);
+	}
+	
+	// ------------------------------------------------------------------------
 #if defined(__AVR__) && defined(__AVR_HAVE_MUL__)
 	template<>
 	int16_t
@@ -67,13 +85,31 @@ namespace xpcc
 	}
 	
 	template<>
-	int16_t
+	int32_t
 	Vector2D<int16_t>::getLengthSquared() const
 	{
 		int32_t t;
+		
 		t = avr::mul32(x, x);
 		t = avr::mac32(t, y, y);
+		
 		return t;
 	}
 #endif
+	
+	template<>
+	template<>
+	Vector2D<double>
+	Vector2D<float>::convert() const
+	{
+		return Vector2D<double>(this->x, this->y);
+	}
+	
+	template<>
+	template<>
+	Vector2D<float>
+	Vector2D<double>::convert() const
+	{
+		return Vector2D<float>(this->x, this->y);
+	}
 }

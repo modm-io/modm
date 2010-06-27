@@ -35,7 +35,7 @@
 
 #include <xpcc/communication/communicatable.hpp>
 #include <xpcc/communication/abstract_component.hpp>
-#include <xpcc/communication/communication.hpp>
+
 #include "task.hpp"
 
 namespace xpcc
@@ -61,18 +61,6 @@ namespace xpcc
 		}
 		
 	protected:
-		inline void
-		setCurrentComponent()
-		{
-			this->parent->setCurrentComponent();
-		}
-		
-		inline xpcc::Communication*
-		getCommunication()
-		{
-			return parent->communication;
-		}
-		
 		AbstractComponent *parent;
 	};
 }

@@ -35,12 +35,18 @@
 #include "ramp_test.hpp"
 
 void
-RampTest::testRamp()
+RampTest::testConstructor()
 {
 	xpcc::filter::Ramp<int16_t> ramp(3, 4);
 	
 	TEST_ASSERT_TRUE(ramp.isTargetReached());
 	TEST_ASSERT_EQUALS(ramp.getValue(), 0);
+}
+
+void
+RampTest::testRamp()
+{
+	xpcc::filter::Ramp<int16_t> ramp(3, 4);
 	
 	ramp.update();
 	TEST_ASSERT_EQUALS(ramp.getValue(), 0);
