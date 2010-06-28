@@ -33,6 +33,8 @@
 #ifndef XPCC__LINE_SEGMENT_2D_HPP
 #define XPCC__LINE_SEGMENT_2D_HPP
 
+#include "geometric_traits.hpp"
+
 #include "point_2d.hpp"
 #include "line_2d.hpp"
 
@@ -45,37 +47,33 @@ namespace xpcc
 	 * \ingroup	geometry
 	 */
 	template <typename T>
-	class LineSegment2D : protected Line2D<T>
+	class LineSegment2D
 	{
+	public:
+		typedef typename GeometricTraits<T>::WideType WideType;
+		typedef typename GeometricTraits<T>::FloatType FloatType;
+		
 	public:
 		LineSegment2D();
 		
 		LineSegment2D(const Point2D<T>& start, const Point2D<T>& end);
 		
 		
-		/**
-		 * \brief	Set the starting point of the line segment
-		 * 
-		 * Prefer setPoints() over this method because it is faster.
-		 */
-		void
+		/// Set the starting point of the line segment
+		inline void
 		setStartPoint(const Point2D<T>& point);
 		
 		inline const Point2D<T>&
 		getStartPoint() const;
 		
-		/**
-		 * \brief	Set the end point of the line segment
-		 * 
-		 * Prefer setPoints() over this method because it is faster.
-		 */
-		void
+		/// Set the end point of the line segment
+		inline void
 		setEndPoint(const Point2D<T>& point);
 		
-		Point2D<T>
+		inline const Point2D<T>&
 		getEndPoint() const;
 		
-		void
+		inline void
 		setPoints(const Point2D<T>& start, const Point2D<T>& end);
 		
 		/**
@@ -87,6 +85,10 @@ namespace xpcc
 		/// Shortest distance to a point
 		const T
 		getDistanceTo(const Point2D<T>& point) const;
+		
+	protected:
+		xpcc::Point2D<T> start;
+		xpcc::Point2D<T> end;
 		
 	private:
 		template<typename U>

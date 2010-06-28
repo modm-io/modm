@@ -45,6 +45,9 @@ public:
 	testAccessor();
 	
 	void
+	testComparision();
+	
+	void
 	testLength();
 	
 	void

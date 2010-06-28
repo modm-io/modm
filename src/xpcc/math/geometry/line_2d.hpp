@@ -36,6 +36,8 @@
 #include "point_2d.hpp"
 #include "vector_2d.hpp"
 
+#include "geometric_traits.hpp"
+
 namespace xpcc
 {
 	/**
@@ -47,6 +49,10 @@ namespace xpcc
 	template <typename T>
 	class Line2D
 	{
+	public:
+		typedef typename GeometricTraits<T>::WideType WideType;
+		typedef typename GeometricTraits<T>::FloatType FloatType;
+		
 	public:
 		Line2D();
 		

@@ -83,10 +83,10 @@ xpcc::Line2D<T>::getDistanceTo(const Point2D<T>& point) const
 	// vector from the base point of the line to the new point
 	Vector2D<T> startToPoint(this->point, point);
 	
-	float c1 = Vector2D<T>::dotProduct(startToPoint, this->directionVector);
-	float c2 = this->directionVector.getLengthSquared();
+	FloatType c1 = Vector2D<T>::dotProduct(startToPoint, this->directionVector);
+	FloatType c2 = this->directionVector.getLengthSquared();
 	
-	float d = c1 / c2;
+	FloatType d = c1 / c2;
 	
 	// calculate the closest point
 	Vector2D<T> closestPoint(this->directionVector);

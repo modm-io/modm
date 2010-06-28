@@ -78,6 +78,28 @@ LineSegment2DTest::testAccessor()
 }
 
 void
+LineSegment2DTest::testComparision()
+{
+	xpcc::LineSegment2D<int16_t> a(
+			xpcc::Point2D<int16_t>(12, 34),
+			xpcc::Point2D<int16_t>(56, 78));
+	
+	xpcc::LineSegment2D<int16_t> b(
+			xpcc::Point2D<int16_t>(12, 34),
+			xpcc::Point2D<int16_t>(0, 0));
+	
+	xpcc::LineSegment2D<int16_t> c(
+			xpcc::Point2D<int16_t>(12, 34),
+			xpcc::Point2D<int16_t>(56, 78));
+	
+	TEST_ASSERT_FALSE(a == b);
+	TEST_ASSERT_TRUE(a != b);
+	
+	TEST_ASSERT_TRUE(a == c);
+	TEST_ASSERT_FALSE(a != c);
+}
+
+void
 LineSegment2DTest::testLength()
 {
 	xpcc::LineSegment2D<int16_t> line(
