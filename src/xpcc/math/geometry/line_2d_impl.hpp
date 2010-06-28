@@ -35,33 +35,66 @@
 #endif
 
 // ----------------------------------------------------------------------------
-template<typename T>
+template <typename T>
 xpcc::Line2D<T>::Line2D() :
-	point(), vector()
+	point(), directionVector()
 {
 }
 
-template<typename T>
+template <typename T>
 xpcc::Line2D<T>::Line2D(const Point2D<T>& point, const Vector2D<T>& vector) :
-	point(point), vector(vector)
+	point(point), directionVector(vector)
 {
 }
 
 // ----------------------------------------------------------------------------
-template<typename T>
-const T
+template <typename T>
+inline void
+xpcc::Line2D<T>::setPoint(const Point2D<T>& point)
+{
+	this->point = point;
+}
+
+template <typename T>
+inline const xpcc::Point2D<T>&
+xpcc::Line2D<T>::getPoint() const
+{
+	return this->point;
+}
+
+template <typename T>
+inline void
+xpcc::Line2D<T>::setDirectionVector(const Vector2D<T>& vector)
+{
+	this->directionVector = vector;
+}
+
+template <typename T>
+inline const xpcc::Vector2D<T>&
+xpcc::Line2D<T>::getDirectionVector() const
+{
+	return this->directionVector;
+}
+// ----------------------------------------------------------------------------
+template <typename T>
+T
 xpcc::Line2D<T>::getDistanceTo(const Point2D<T>& point) const
 {
 	// vector from the base point of the line to the new point
-	Vector2D<T> w(this->point, point);
+	Vector2D<T> startToPoint(this->point, point);
 	
-	float c1 = Vector2D<T>::dot(w, this->vector);
-	float c2 = Vector2D<T>::dot(this->vector, this->vector);
+	float c1 = Vector2D<T>::dotProduct(startToPoint, this->directionVector);
+	float c2 = this->directionVector.getLengthSquared();
 	
 	float d = c1 / c2;
 	
-	Vector2D<T> p(this->point);
-	p.scale(d);
+	// calculate the closest point
+	Vector2D<T> closestPoint(this->directionVector);
+	closestPoint.scale(d);
+	closestPoint += this->point.toVector();
 	
-	return p.getLength();
+	// return the length of the vector from the closest point on the line
+	// to the given point
+	Vector2D<T> closestPointToPoint = point.toVector() - closestPoint;
+	return closestPointToPoint.getLength();
 }

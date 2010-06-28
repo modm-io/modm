@@ -43,7 +43,11 @@
 namespace xpcc
 {
 	/**
-	 * \brief	Location
+	 * \brief	Location in a 2D coordinate system
+	 * 
+	 * This class is primarily used to describe the location of a robot
+	 * on the field. The robot has a position (x- and y-coordinate) and a
+	 * orientation (absolute angle).
 	 * 
 	 * \ingroup	geometry
 	 */
@@ -51,52 +55,50 @@ namespace xpcc
 	class Location2D
 	{
 	public:
-		typedef ::xpcc::Point2D<T> Point;
-		
 		Location2D();
 		
-		Location2D(const Point& point, const float& phi);
+		Location2D(const Point2D<T>& position, const float& orientation);
 		
-		Location2D(const T& x, const T& y, const float& phi);
+		inline const Point2D<T>&
+		getPosition() const;
+		
+		void
+		setPosition(const Point2D<T>& point);
+		
+		void
+		setPosition(const T& x, const T& y);
+		
+		inline float
+		getOrientation() const;
+		
+		void
+		setOrientation(const float& phi);
 		
 		/// Add a position increment
 		void
-		update(Location2D& diff);
+		move(Location2D& diff);
 		
 		/**
 		 * \brief	Add a increment only in x-direction
 		 * 
-		 * \todo	usefull description what this function does
+		 * \todo	useful description what this function does
 		 */
 		void
-		update(T x, float phi);
+		move(T x, float phi);
 		
-		inline const Point&
-		getPoint() const;
-		
-		void
-		setPoint(const Point& point);
-		
-		void
-		setPoint(const T& x, const T& y);
-		
-		inline float
-		getAngle() const;
-		
-		void
-		setAngle(const float& phi);
 		
 		/// Convert between Location-objects with different base-types
-		template<typename U>
-		operator Location2D<U>() const;
+		template <typename U>
+		Location2D<U>
+		convert() const;
 		
 	private:
 		template <typename U>
 		friend IOStream&
 		operator <<( IOStream&, const Location2D<U>&);
 		
-		Point point;
-		float phi;
+		Point2D<T> position;
+		float orientation;
 	};
 
 	/**

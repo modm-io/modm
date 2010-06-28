@@ -34,10 +34,61 @@
 
 #include "moving_average_test.hpp"
 
+namespace
+{
+	struct TestData
+	{
+		typedef int16_t Type;
+		
+		Type input;
+		Type output;
+	};
+	
+	static const TestData data[] =
+	{
+		{ 10,	2 },
+		{ 10,	5 },
+		{ 10,	7 },
+		{ 10,	10 },
+		{ -10,	5 },
+		{ -10,	0 },
+		{ 5,	-2 },
+		{ 5,	-3 },
+		{ 5,	1 },
+		{ 5,	5 },
+		{ 100,	28 },
+		{ 100,	52 },
+		{ 200,	101 },
+		{ 200,	150 },
+		{ 200,	175 },
+		{ 200,	200 },
+	};
+}
+
+void
+MovingAverageTest::testDefaultConstructor()
+{
+	xpcc::MovingAverage<int16_t, 4> filter;
+	
+	TEST_ASSERT_EQUALS(filter.getValue(), 0);
+}
+
 void
 MovingAverageTest::testConstructor()
 {
-	xpcc::MovingAverage<int16_t, 4> filter(0);
+	xpcc::MovingAverage<int16_t, 4> filter(20);
 	
-	TEST_FAIL("TODO");
+	TEST_ASSERT_EQUALS(filter.getValue(), 20);
+}
+
+void
+MovingAverageTest::testAverage()
+{
+	xpcc::MovingAverage<TestData::Type, 4> filter;
+	
+	for (uint_fast8_t i = 0; i < (sizeof(data) / sizeof(TestData)); ++i)
+	{
+		filter.update(data[i].input);
+		TEST_ASSERT_EQUALS(filter.getValue(), data[i].output);
+	}
 }

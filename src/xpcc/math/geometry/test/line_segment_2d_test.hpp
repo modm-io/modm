@@ -36,5 +36,20 @@ class LineSegment2DTest : public unittest::TestSuite
 {
 public:
 	void
+	testDefaultConstructor();
+	
+	void
 	testConstructor();
+	
+	void
+	testAccessor();
+	
+	void
+	testLength();
+	
+	void
+	testLengthFloat();
+	
+	void
+	testDistanceToPoint();
 };

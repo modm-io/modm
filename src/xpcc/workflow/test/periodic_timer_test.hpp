@@ -41,4 +41,10 @@ public:
 	
 	void
 	testConstructor();
+	
+	void
+	testTimer();
+	
+	void
+	testRestart();
 };

@@ -35,7 +35,27 @@
 #include "circle_2d_test.hpp"
 
 void
+Circle2DTest::testDefaultConstructor()
+{
+	xpcc::Circle2D<int16_t> circle;
+	
+	TEST_ASSERT_EQUALS(circle.getRadius(), 0);
+	TEST_ASSERT_EQUALS(circle.getCenter(), xpcc::Point2D<int16_t>(0, 0));
+}
+
+void
 Circle2DTest::testConstructor()
 {
-	TEST_FAIL("TODO");
+	xpcc::Circle2D<int16_t> circle(
+			xpcc::Point2D<int16_t>(-10, -20),
+			45);
+	
+	TEST_ASSERT_EQUALS(circle.getRadius(), 45);
+	TEST_ASSERT_EQUALS(circle.getCenter(), xpcc::Point2D<int16_t>(-10, -20));
+	
+	circle.setCenter(xpcc::Point2D<int16_t>(20, 30));
+	circle.setRadius(70);
+	
+	TEST_ASSERT_EQUALS(circle.getRadius(), 70);
+	TEST_ASSERT_EQUALS(circle.getCenter(), xpcc::Point2D<int16_t>(20, 30));
 }

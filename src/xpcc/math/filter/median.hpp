@@ -42,11 +42,11 @@ namespace xpcc
 		/**
 		 * \brief	Median filter
 		 * 
-		 * Calculates the median of a input set. Usefull for eleminating spikes
+		 * Calculates the median of a input set. Useful for eliminating spikes
 		 * from the input. Adds a group delay of N/2 ticks for the signal.
 		 * 
 		 * Implementation are available for N = 3, 5, 7 and 9. To find
-		 * the median the signal values are partly sorted, but only as much
+		 * the median the signal values will be partly sorted, but only as much
 		 * as needed to find the median.
 		 * 
 		 * \code

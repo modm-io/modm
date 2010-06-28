@@ -37,4 +37,7 @@ class Polygon2DTest : public unittest::TestSuite
 public:
 	void
 	testConstructor();
+	
+	void
+	testAppendAndAccess();
 };

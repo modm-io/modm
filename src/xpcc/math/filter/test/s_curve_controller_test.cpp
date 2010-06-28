@@ -50,5 +50,5 @@ SCurveControllerTest::testConstructor()
 	TEST_ASSERT_EQUALS(controller.getValue(), 0);
 	TEST_ASSERT_TRUE(controller.isTargetReached());
 	
-	TEST_FAIL("TODO");
+	// FIXME some useful tests are needed here
 }

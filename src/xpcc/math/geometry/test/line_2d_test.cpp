@@ -35,7 +35,59 @@
 #include "line_2d_test.hpp"
 
 void
+Line2DTest::testDefaultConstructor()
+{
+	xpcc::Line2D<int16_t> line;
+	
+	TEST_ASSERT_EQUALS(line.getPoint(), xpcc::Point2D<int16_t>(0, 0));
+	TEST_ASSERT_EQUALS(line.getDirectionVector(), xpcc::Vector2D<int16_t>(0, 0));
+}
+
+void
 Line2DTest::testConstructor()
 {
-	TEST_FAIL("TODO");
+	xpcc::Line2D<int16_t> line(
+			xpcc::Point2D<int16_t>(-20, -60),
+			xpcc::Vector2D<int16_t>(90, 80));
+	
+	TEST_ASSERT_EQUALS(line.getPoint(), xpcc::Point2D<int16_t>(-20, -60));
+	TEST_ASSERT_EQUALS(line.getDirectionVector(), xpcc::Vector2D<int16_t>(90, 80));
+}
+
+void
+Line2DTest::testAccessors()
+{
+	xpcc::Line2D<int16_t> line;
+	
+	line.setPoint(xpcc::Point2D<int16_t>(40, 780));
+	line.setDirectionVector(xpcc::Vector2D<int16_t>(-50, 16));
+	
+	TEST_ASSERT_EQUALS(line.getPoint(), xpcc::Point2D<int16_t>(40, 780));
+	TEST_ASSERT_EQUALS(line.getDirectionVector(), xpcc::Vector2D<int16_t>(-50, 16));
+}
+
+void
+Line2DTest::testDistanceToPoint()
+{
+	xpcc::Line2D<int16_t> line(
+			xpcc::Point2D<int16_t>(-20, -60),
+			xpcc::Vector2D<int16_t>(10, 10));
+	
+	int16_t distance = line.getDistanceTo(xpcc::Point2D<int16_t>(10, 30));
+	
+	// closest point is (40, 0) => sqrt(30^2 + 30^2) = 42.4264..
+	TEST_ASSERT_EQUALS(distance, 42);
+	
+	TEST_ASSERT_EQUALS(line.getPoint(), xpcc::Point2D<int16_t>(-20, -60));
+	TEST_ASSERT_EQUALS(line.getDirectionVector(), xpcc::Vector2D<int16_t>(10, 10));
+	
+	int16_t distance2 = line.getDistanceTo(xpcc::Point2D<int16_t>(-50, -50));
+	
+	// closest point is (-30, -70) => sqrt(20^2 + 20^2) = 28.28427..
+	TEST_ASSERT_EQUALS(distance2, 28);
+	
+	int16_t distance3 = line.getDistanceTo(xpcc::Point2D<int16_t>(70, -70));
+	
+	// closest point is (20, -20) => sqrt(50^2 + 50^2) = 70.7106..
+	TEST_ASSERT_EQUALS(distance3, 71);
 }

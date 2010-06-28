@@ -36,5 +36,11 @@ class MovingAverageTest : public unittest::TestSuite
 {
 public:
 	void
+	testDefaultConstructor();
+	
+	void
 	testConstructor();
+	
+	void
+	testAverage();
 };

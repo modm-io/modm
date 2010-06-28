@@ -33,7 +33,7 @@
 #ifndef XPCC__CIRCLE_2D_HPP
 #define XPCC__CIRCLE_2D_HPP
 
-#include "vector_2d.hpp"
+#include "point_2d.hpp"
 
 namespace xpcc
 {
@@ -46,38 +46,25 @@ namespace xpcc
 	template <typename T>
 	class Circle2D
 	{
-		typedef Vector2D<T> Point;
 	public:
 		Circle2D();
 		
-		Circle2D(const Point& center, T radius);
+		Circle2D(const Point2D<T>& center, T radius);
 		
-		inline const Point&
-		getCenter() const
-		{
-			return this->center;
-		}
+		inline const Point2D<T>&
+		getCenter() const;
 		
 		inline void
-		setCenter(const Point& point)
-		{
-			this->center = point;
-		}
+		setCenter(const Point2D<T>& point);
 		
 		inline T
-		getRadius() const
-		{
-			return this->radius;
-		}
+		getRadius() const;
 		
 		inline void
-		setRadius(T radius)
-		{
-			this->radius = radius;
-		}
+		setRadius(T radius);
 		
 	private:
-		Point center;
+		Point2D<T> center;
 		T radius;
 	};
 }

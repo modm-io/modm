@@ -50,39 +50,35 @@ namespace xpcc
 	public:
 		Line2D();
 		
+		/**
+		 * \brief	Construct a line
+		 * 
+		 * \param	point	any point on the line
+		 * \param	vector	direction vector, the length doesn't matter
+		 */
 		Line2D(const Point2D<T>& point, const Vector2D<T>& vector);
 		
-		void
-		setPoint(const Point2D<T>& point)
-		{
-			this->start = point;
-		}
 		
-		const Point2D<T>&
-		getPoint() const
-		{
-			return this->start;
-		}
+		inline void
+		setPoint(const Point2D<T>& point);
 		
-		void
-		setVector(const Vector2D<T>& vector)
-		{
-			this->vector = vector;
-		}
+		inline const Point2D<T>&
+		getPoint() const;
+		
+		inline void
+		setDirectionVector(const Vector2D<T>& vector);
 		
 		inline const Vector2D<T>&
-		getVector() const
-		{
-			return this->vector;
-		}
+		getDirectionVector() const;
+		
 		
 		/// Shortest distance to a point
-		const T
+		T
 		getDistanceTo(const Point2D<T>& point) const;
 		
 	protected:
 		Point2D<T> point;
-		Vector2D<T> vector;
+		Vector2D<T> directionVector;
 	};
 }
 

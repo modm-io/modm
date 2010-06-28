@@ -33,6 +33,7 @@
 #ifndef XPCC__MOVING_AVERAGE_HPP
 #define XPCC__MOVING_AVERAGE_HPP
 
+#include <cstddef>
 #include <stdint.h>
 #include <xpcc/utils/typet.hpp>
 
@@ -62,7 +63,7 @@ namespace xpcc
 	 * 
 	 * \ingroup	filter
 	 */
-	template<typename T, int N>
+	template<typename T, std::size_t N>
 	class MovingAverage
 	{
 	private:
@@ -90,7 +91,7 @@ namespace xpcc
 }
 
 // ----------------------------------------------------------------------------
-template<typename T, int N>
+template<typename T, std::size_t N>
 xpcc::MovingAverage<T, N>::MovingAverage(const T& initialValue) :
 	index(0), sum(N * initialValue)
 {
@@ -101,7 +102,7 @@ xpcc::MovingAverage<T, N>::MovingAverage(const T& initialValue) :
 
 // ----------------------------------------------------------------------------
 // TODO implementierung für float anpassen
-template<typename T, int N>
+template<typename T, std::size_t N>
 void
 xpcc::MovingAverage<T, N>::update(const T& input)
 {
@@ -116,7 +117,7 @@ xpcc::MovingAverage<T, N>::update(const T& input)
 	}
 }
 
-template<typename T, int N>
+template<typename T, std::size_t N>
 const T
 xpcc::MovingAverage<T, N>::getValue() const
 {

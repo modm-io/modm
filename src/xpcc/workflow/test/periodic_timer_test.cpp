@@ -72,5 +72,56 @@ PeriodicTimerTest::setUp()
 void
 PeriodicTimerTest::testConstructor()
 {
-	TEST_FAIL("TODO");
+	xpcc::PeriodicTimer<DummyClock> timer(10);
+	
+	TEST_ASSERT_TRUE(timer.isRunning());
+	TEST_ASSERT_FALSE(timer.isExpired());
+}
+
+void
+PeriodicTimerTest::testTimer()
+{
+	xpcc::PeriodicTimer<DummyClock> timer(10);
+	
+	TEST_ASSERT_FALSE(timer.isExpired());
+	
+	int i;
+	for (i = 0; i < 9; ++i) {
+		DummyClock::setTime(i);
+		TEST_ASSERT_FALSE(timer.isExpired());
+	}
+	
+	DummyClock::setTime(10);
+	TEST_ASSERT_TRUE(timer.isExpired());
+	TEST_ASSERT_FALSE(timer.isExpired());
+	
+	DummyClock::setTime(20);
+	TEST_ASSERT_TRUE(timer.isExpired());
+	TEST_ASSERT_FALSE(timer.isExpired());
+	
+	DummyClock::setTime(100);
+	TEST_ASSERT_TRUE(timer.isExpired());
+	TEST_ASSERT_FALSE(timer.isExpired());
+}
+
+void
+PeriodicTimerTest::testRestart()
+{
+	xpcc::PeriodicTimer<DummyClock> timer(10);
+	
+	TEST_ASSERT_TRUE(timer.isRunning());
+	TEST_ASSERT_FALSE(timer.isExpired());
+	
+	timer.stop();
+	
+	TEST_ASSERT_FALSE(timer.isRunning());
+	
+	timer.restart(5);
+	
+	TEST_ASSERT_TRUE(timer.isRunning());
+	TEST_ASSERT_FALSE(timer.isExpired());
+	
+	DummyClock::setTime(5);
+	TEST_ASSERT_TRUE(timer.isExpired());
+	TEST_ASSERT_FALSE(timer.isExpired());
 }

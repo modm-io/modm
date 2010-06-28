@@ -35,7 +35,67 @@
 #include "location_2d_test.hpp"
 
 void
+Location2DTest::testDefaultConstructor()
+{
+	xpcc::Location2D<int16_t> location;
+	
+	TEST_ASSERT_EQUALS(location.getPosition(), xpcc::Point2D<int16_t>(0, 0));
+	TEST_ASSERT_EQUALS_FLOAT(location.getOrientation(), 0.f);
+}
+
+void
 Location2DTest::testConstructor()
 {
-	TEST_FAIL("TODO");
+	xpcc::Location2D<int16_t> location(
+			xpcc::Point2D<int16_t>(10, 20),
+			M_PI);
+	
+	TEST_ASSERT_EQUALS(location.getPosition(), xpcc::Point2D<int16_t>(10, 20));
+	TEST_ASSERT_EQUALS_FLOAT(location.getOrientation(), M_PI);
+}
+
+void
+Location2DTest::testAccessors()
+{
+	xpcc::Location2D<int16_t> location;
+	
+	location.setPosition(xpcc::Point2D<int16_t>(30, 40));
+	
+	TEST_ASSERT_EQUALS(location.getPosition(), xpcc::Point2D<int16_t>(30, 40));
+	
+	location.setPosition(50, 60);
+	
+	TEST_ASSERT_EQUALS(location.getPosition(), xpcc::Point2D<int16_t>(50, 60));
+	
+	location.setOrientation(M_PI / 2);
+	
+	TEST_ASSERT_EQUALS_FLOAT(location.getOrientation(), M_PI / 2);
+}
+
+void
+Location2DTest::testMove()
+{
+	xpcc::Location2D<int16_t> location(
+			xpcc::Point2D<int16_t>(-10, 20),
+			M_PI);
+	
+	xpcc::Location2D<int16_t> movement(
+			xpcc::Point2D<int16_t>(10, 10),
+			M_PI / 2);
+	
+	location.move(movement);
+	
+	TEST_ASSERT_EQUALS(location.getPosition(), xpcc::Point2D<int16_t>(-20, 10));
+	TEST_ASSERT_EQUALS_FLOAT(location.getOrientation(), -M_PI / 2);
+	
+	location.move(30, M_PI / 2);
+	
+	TEST_ASSERT_EQUALS(location.getPosition(), xpcc::Point2D<int16_t>(-20, -20));
+	TEST_ASSERT_EQUALS_FLOAT(location.getOrientation(), 0.f);
+}
+
+void
+Location2DTest::testConvert()
+{
+	
 }

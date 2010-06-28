@@ -36,5 +36,8 @@ class Circle2DTest : public unittest::TestSuite
 {
 public:
 	void
+	testDefaultConstructor();
+	
+	void
 	testConstructor();
 };

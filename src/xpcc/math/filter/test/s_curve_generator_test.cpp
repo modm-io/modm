@@ -45,5 +45,5 @@ SCurveGeneratorTest::testConstructor()
 	
 	generator.update();
 	
-	TEST_FAIL("TODO");
+	// FIXME some useful tests are needed here
 }

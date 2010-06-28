@@ -37,8 +37,16 @@
 // ----------------------------------------------------------------------------
 template <typename T>
 xpcc::Polygon2D<T>::Polygon2D(SizeType n) :
-	buffer(n)
+	points(n)
 {
+}
+
+// ----------------------------------------------------------------------------
+template <typename T>
+typename xpcc::Polygon2D<T>::SizeType
+xpcc::Polygon2D<T>::getNumberOfPoints() const
+{
+	return points.getSize();
 }
 
 // ----------------------------------------------------------------------------
@@ -46,7 +54,7 @@ template <typename T>
 void
 xpcc::Polygon2D<T>::append(const Point2D<T>& point)
 {
-	buffer.append(point);
+	points.append(point);
 }
 
 // ----------------------------------------------------------------------------
@@ -54,12 +62,12 @@ template <typename T>
 xpcc::Point2D<T>&
 xpcc::Polygon2D<T>::operator [](SizeType index)
 {
-	return buffer[index];
+	return points[index];
 }
 
 template <typename T>
 const xpcc::Point2D<T>&
 xpcc::Polygon2D<T>::operator [](SizeType index) const
 {
-	return buffer[index];
+	return points[index];
 }

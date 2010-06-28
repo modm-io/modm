@@ -57,8 +57,12 @@ namespace xpcc
 		 * \brief	Constructs a polygon capable of holding n points
 		 */
 		Polygon2D(SizeType n);
-
-		void
+		
+		inline SizeType
+		getNumberOfPoints() const;
+		
+		
+		inline void
 		append(const Point2D<T>& point);
 
 		inline Point2D<T>&
@@ -68,7 +72,7 @@ namespace xpcc
 		operator [](SizeType index) const;
 
 	private:
-		xpcc::DynamicArray<T> buffer;
+		xpcc::DynamicArray< Point2D<T> > points;
 	};
 }
 

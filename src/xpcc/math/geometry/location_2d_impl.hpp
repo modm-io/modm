@@ -35,85 +35,83 @@
 // -----------------------------------------------------------------------------
 template <typename T>
 xpcc::Location2D<T>::Location2D() :
-	point(), phi()
+	position(), orientation()
 {
 }
 
 template <typename T>
-xpcc::Location2D<T>::Location2D(const Point& point, const float& phi) :
-	point(point),
-	phi(phi)
+xpcc::Location2D<T>::Location2D(const Point2D<T>& position,
+		const float& orientation) :
+	position(position),
+	orientation(orientation)
 {
 }
 
+// ----------------------------------------------------------------------------
 template <typename T>
-xpcc::Location2D<T>::Location2D(const T& x, const T& y, const float& phi) :
-	point(x, y),
-	phi(phi)
+const xpcc::Point2D<T>&
+xpcc::Location2D<T>::getPosition() const
 {
+	return this->position;
+}
+
+template <typename T>
+void
+xpcc::Location2D<T>::setPosition(const Point2D<T>& point)
+{
+	this->position = point;
+}
+
+template <typename T>
+void
+xpcc::Location2D<T>::setPosition(const T& x, const T& y)
+{
+	this->position.set(x, y);
+}
+
+template <typename T>
+float
+xpcc::Location2D<T>::getOrientation() const
+{
+	return this->orientation;
+}
+
+template <typename T>
+void
+xpcc::Location2D<T>::setOrientation(const float& orientation)
+{
+	this->orientation = orientation;
 }
 
 // -----------------------------------------------------------------------------
 template <typename T>
 void
-xpcc::Location2D<T>::update(Location2D<T>& diff)
+xpcc::Location2D<T>::move(Location2D<T>& diff)
 {
-	this->point += diff.point.rotate(phi);
-	this->phi = Angle::normalize(this->phi + diff.phi);
-}
-
-template <typename T>
-void
-xpcc::Location2D<T>::update(T x, float phi)
-{
-	Vector2D<T> vector(x * std::cos(this->phi),
-					   x * std::sin(this->phi));
-	point.translate(vector);
+	Vector2D<T> movement = diff.position.toVector();
+	movement.rotate(this->orientation);
 	
-	this->phi = Angle::normalize(this->phi + phi);
-}
-
-
-template <typename T>
-const typename xpcc::Location2D<T>::Point&
-xpcc::Location2D<T>::getPoint() const
-{
-	return this->point;
+	this->position.translate(movement);
+	this->orientation = Angle::normalize(this->orientation + diff.orientation);
 }
 
 template <typename T>
 void
-xpcc::Location2D<T>::setPoint(const Point& point)
+xpcc::Location2D<T>::move(T x, float phi)
 {
-	this->point = point;
-}
-
-template <typename T>
-void
-xpcc::Location2D<T>::setPoint(const T& x, const T& y)
-{
-	this->point.set(x, y);
-}
-
-template <typename T>
-float
-xpcc::Location2D<T>::getAngle() const
-{
-	return this->phi;
-}
-
-template <typename T>
-void
-xpcc::Location2D<T>::setAngle(const float& phi)
-{
-	this->phi = phi;
+	Vector2D<T> vector(x * std::cos(this->orientation),
+					   x * std::sin(this->orientation));
+	position.translate(vector);
+	
+	this->orientation = Angle::normalize(this->orientation + phi);
 }
 
 // ----------------------------------------------------------------------------
 template<typename T> template<typename U>
-xpcc::Location2D<T>::operator Location2D<U>() const
+xpcc::Location2D<U>
+xpcc::Location2D<T>::convert() const
 {
-	return Location2D<U>(this->point, this->phi);
+	return Location2D<U>(this->position.convert<U>(), this->phi);
 }
 
 // ----------------------------------------------------------------------------
@@ -121,6 +119,6 @@ template<class T>
 xpcc::IOStream&
 xpcc::operator << (xpcc::IOStream& os, const xpcc::Location2D<T>& location)
 {
-	os << location.point << ", phi=" << location.phi;
+	os << location.position << ", phi=" << location.orientation;
 	return os;
 }

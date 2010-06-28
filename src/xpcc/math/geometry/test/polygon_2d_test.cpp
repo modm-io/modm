@@ -37,5 +37,28 @@
 void
 Polygon2DTest::testConstructor()
 {
-	TEST_FAIL("TODO");
+	xpcc::Polygon2D<int16_t> polygon(5);
+	
+	TEST_ASSERT_EQUALS(polygon.getNumberOfPoints(), 0U);
+}
+
+void
+Polygon2DTest::testAppendAndAccess()
+{
+	xpcc::Polygon2D<int16_t> polygon(5);
+	
+	polygon.append(xpcc::Point2D<int16_t>(10, 20));
+	
+	TEST_ASSERT_EQUALS(polygon.getNumberOfPoints(), 1U);
+	TEST_ASSERT_EQUALS(polygon[0], xpcc::Point2D<int16_t>(10, 20));
+	
+	polygon.append(xpcc::Point2D<int16_t>(30, 40));
+	
+	TEST_ASSERT_EQUALS(polygon.getNumberOfPoints(), 2U);
+	TEST_ASSERT_EQUALS(polygon[0], xpcc::Point2D<int16_t>(10, 20));
+	TEST_ASSERT_EQUALS(polygon[1], xpcc::Point2D<int16_t>(30, 40));
+	
+	polygon[0] = xpcc::Point2D<int16_t>(50, 60);
+	
+	TEST_ASSERT_EQUALS(polygon[0], xpcc::Point2D<int16_t>(50, 60));
 }

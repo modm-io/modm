@@ -52,36 +52,31 @@ namespace xpcc
 		
 		LineSegment2D(const Point2D<T>& start, const Point2D<T>& end);
 		
-		void
-		setStartPoint(const Point2D<T>& point)
-		{
-			this->start = point;
-		}
 		
-		const Point2D<T>&
-		getStartPoint() const
-		{
-			return this->start;
-		}
-		
+		/**
+		 * \brief	Set the starting point of the line segment
+		 * 
+		 * Prefer setPoints() over this method because it is faster.
+		 */
 		void
-		setEndPoint(const Point2D<T>& point)
-		{
-			this->end = point;
-		}
+		setStartPoint(const Point2D<T>& point);
 		
 		inline const Point2D<T>&
-		getEndPoint() const
-		{
-			return this->end;
-		}
+		getStartPoint() const;
 		
-		inline void
-		setPoints(const Point2D<T>& start, const Point2D<T>& end)
-		{
-			this->start = start;
-			this->end = end;
-		}
+		/**
+		 * \brief	Set the end point of the line segment
+		 * 
+		 * Prefer setPoints() over this method because it is faster.
+		 */
+		void
+		setEndPoint(const Point2D<T>& point);
+		
+		Point2D<T>
+		getEndPoint() const;
+		
+		void
+		setPoints(const Point2D<T>& start, const Point2D<T>& end);
 		
 		/**
 		 * \brief	Length of the line segment
