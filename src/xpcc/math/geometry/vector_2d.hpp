@@ -128,7 +128,7 @@ namespace xpcc
 		scale(const U& factor);
 
 		Vector2D&
-		rotate(const float phi);
+		rotate(float phi);
 		
 		
 		Vector2D&

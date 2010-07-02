@@ -122,3 +122,9 @@ Point2DTest::testComparision()
 	TEST_ASSERT_TRUE(a == c);
 	TEST_ASSERT_FALSE(a != c);
 }
+
+void
+Point2DTest::testCCW()
+{
+	TEST_FAIL("TODO");
+}

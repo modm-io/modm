@@ -55,4 +55,7 @@ public:
 	
 	void
 	testDistanceToPoint();
+	
+	void
+	testIntersectsLineSegment();
 };

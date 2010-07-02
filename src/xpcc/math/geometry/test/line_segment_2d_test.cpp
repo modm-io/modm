@@ -152,3 +152,51 @@ LineSegment2DTest::testDistanceToPoint()
 	// closest point is (50, 10) => sqrt(50^2 + 10^2) = 50.9901951..
 	TEST_ASSERT_EQUALS(distance3, 51);
 }
+
+void
+LineSegment2DTest::testIntersectsLineSegment()
+{
+	xpcc::LineSegment2D<int16_t> line1(
+			xpcc::Point2D<int16_t>(-20, -60),
+			xpcc::Point2D<int16_t>(50, 10));
+	
+	xpcc::LineSegment2D<int16_t> line2(
+			xpcc::Point2D<int16_t>(0, 0),
+			xpcc::Point2D<int16_t>(90, 30));
+	
+	xpcc::LineSegment2D<int16_t> line3(
+			xpcc::Point2D<int16_t>(10, -60),
+			xpcc::Point2D<int16_t>(40, -30));
+	
+	xpcc::LineSegment2D<int16_t> line4(
+			xpcc::Point2D<int16_t>(50, 10),
+			xpcc::Point2D<int16_t>(50, 50));
+	
+	xpcc::LineSegment2D<int16_t> line5(
+			xpcc::Point2D<int16_t>(10, 30),
+			xpcc::Point2D<int16_t>(70, -30));
+	
+	xpcc::LineSegment2D<int16_t> line6(
+			xpcc::Point2D<int16_t>(30, -40),
+			xpcc::Point2D<int16_t>(60, 50));
+	
+	TEST_ASSERT_FALSE(line1.intersects(line2));
+	TEST_ASSERT_FALSE(line1.intersects(line3));
+	TEST_ASSERT_TRUE(line1.intersects(line4));
+	TEST_ASSERT_TRUE(line1.intersects(line5));
+	TEST_ASSERT_TRUE(line1.intersects(line6));
+	
+	TEST_ASSERT_FALSE(line2.intersects(line3));
+	TEST_ASSERT_TRUE(line2.intersects(line4));
+	TEST_ASSERT_TRUE(line2.intersects(line5));
+	TEST_ASSERT_TRUE(line2.intersects(line6));
+	
+	TEST_ASSERT_FALSE(line3.intersects(line4));
+	TEST_ASSERT_FALSE(line3.intersects(line5));
+	TEST_ASSERT_TRUE(line3.intersects(line6));
+	
+	TEST_ASSERT_FALSE(line4.intersects(line5));
+	TEST_ASSERT_TRUE(line4.intersects(line6));
+	
+	TEST_ASSERT_TRUE(line5.intersects(line6));
+}

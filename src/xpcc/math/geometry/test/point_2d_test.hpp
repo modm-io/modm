@@ -52,4 +52,7 @@ public:
 	
 	void
 	testComparision();
+	
+	void
+	testCCW();
 };

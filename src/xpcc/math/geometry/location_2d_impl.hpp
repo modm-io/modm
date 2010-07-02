@@ -99,8 +99,8 @@ template <typename T>
 void
 xpcc::Location2D<T>::move(T x, float phi)
 {
-	Vector2D<T> vector(x * std::cos(this->orientation),
-					   x * std::sin(this->orientation));
+	Vector2D<T> vector(round(x * std::cos(this->orientation)),
+					   round(x * std::sin(this->orientation)));
 	position.translate(vector);
 	
 	this->orientation = Angle::normalize(this->orientation + phi);

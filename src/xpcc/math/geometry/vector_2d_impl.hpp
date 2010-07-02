@@ -152,7 +152,7 @@ xpcc::Vector2D<T>::scale(const U& factor)
 // ----------------------------------------------------------------------------
 template<typename T>
 xpcc::Vector2D<T>&
-xpcc::Vector2D<T>::rotate(const float phi)
+xpcc::Vector2D<T>::rotate(float phi)
 {
 	float c = std::cos(phi);
 	float s = std::sin(phi);

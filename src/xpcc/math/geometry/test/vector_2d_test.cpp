@@ -161,6 +161,12 @@ Vector2DTest::testRotate()
 	
 	TEST_ASSERT_EQUALS(a.getX(), 60);
 	TEST_ASSERT_EQUALS(a.getY(), 128);
+	
+	a.set(20, 10);
+	a.rotate(-M_PI / 2);
+	
+	TEST_ASSERT_EQUALS(a.getX(), 10);
+	TEST_ASSERT_EQUALS(a.getY(), -20);
 }
 
 void

@@ -100,7 +100,10 @@ namespace xpcc
 		Point2D<T> position;
 		float orientation;
 	};
-
+	
+	// ------------------------------------------------------------------------
+	// Global functions
+	// ------------------------------------------------------------------------
 	/**
 	 * \brief	Stream operator to \b xpcc::Location<T>
 	 *
@@ -109,6 +112,13 @@ namespace xpcc
 	template<typename T>
 	IOStream&
 	operator<<(IOStream& os, const Location2D<T>& l);
+	
+	// ------------------------------------------------------------------------
+	// Declaration of specialized methods
+	// ------------------------------------------------------------------------
+	template <>
+	void
+	Location2D<float>::move(float x, float phi);
 }
 
 #include "location_2d_impl.hpp"

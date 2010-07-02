@@ -132,6 +132,17 @@ xpcc::LineSegment2D<T>::getDistanceTo(const Point2D<T>& point) const
 }
 
 // ----------------------------------------------------------------------------
+template<typename T>
+bool
+xpcc::LineSegment2D<T>::intersects(const LineSegment2D<T>& other)
+{
+	return (((Point2D<T>::ccw(this->start, this->end, other.start) *
+			  Point2D<T>::ccw(this->start, this->end, other.end)) <= 0) &&
+			((Point2D<T>::ccw(other.start, other.end, this->start) *
+			  Point2D<T>::ccw(other.start, other.end, this->start)) <= 0));
+}
+
+// ----------------------------------------------------------------------------
 template<typename U>
 bool
 xpcc::operator == (const LineSegment2D<U> &a, const LineSegment2D<U> &b)

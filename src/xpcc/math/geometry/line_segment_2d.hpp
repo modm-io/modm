@@ -86,6 +86,10 @@ namespace xpcc
 		const T
 		getDistanceTo(const Point2D<T>& point) const;
 		
+		/// Check if two line segments intersect
+		bool
+		intersects(const LineSegment2D<T>& other);
+		
 	protected:
 		xpcc::Point2D<T> start;
 		xpcc::Point2D<T> end;
