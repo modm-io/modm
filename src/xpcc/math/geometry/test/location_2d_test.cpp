@@ -97,5 +97,12 @@ Location2DTest::testMove()
 void
 Location2DTest::testConvert()
 {
-	TEST_FAIL("TODO");
+	xpcc::Location2D<float> a(
+			xpcc::Point2D<float>(-10.65, 20.31),
+			M_PI);
+	
+	xpcc::Location2D<int16_t> b = a.convert<int16_t>();
+	
+	TEST_ASSERT_EQUALS(b.getX(), -11);
+	TEST_ASSERT_EQUALS(b.getY(), 20);
 }

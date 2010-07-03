@@ -30,6 +30,7 @@
  */
 // ----------------------------------------------------------------------------
 
+#include <unittest/types/counter_type.hpp>
 #include <xpcc/container/dynamic_array.hpp>
 
 #include "dynamic_array_test.hpp"
@@ -136,4 +137,58 @@ DynamicArrayTest::testRemove()
 
 	TEST_ASSERT_TRUE(array.isEmpty());
 	TEST_ASSERT_EQUALS(array.getSize(), 0U);
+}
+
+void
+DynamicArrayTest::testClear()
+{
+	unittest::CounterType::reset();
+	
+	xpcc::DynamicArray<unittest::CounterType> array(5);
+	
+	TEST_ASSERT_EQUALS(unittest::CounterType::numberOfDefaultConstructorCalls, 5U);
+	
+	unittest::CounterType::reset();
+	unittest::CounterType data;
+	
+	array.append(data);
+	array.append(data);
+	array.append(data);
+	
+	TEST_ASSERT_EQUALS(unittest::CounterType::numberOfAssignments +
+			unittest::CounterType::numberOfCopyConstructorCalls, 3U);
+	TEST_ASSERT_EQUALS(unittest::CounterType::numberOfDefaultConstructorCalls, 1U);
+	TEST_ASSERT_EQUALS(unittest::CounterType::numberOfDestructorCalls, 0U);
+	
+	array.clear();
+	
+	TEST_ASSERT_EQUALS(unittest::CounterType::numberOfDestructorCalls, 5U);
+	
+	TEST_ASSERT_EQUALS(array.getSize(), 0U);
+	TEST_ASSERT_EQUALS(array.getCapacity(), 0U);
+}
+
+void
+DynamicArrayTest::testRemoveAll()
+{
+	xpcc::DynamicArray<unittest::CounterType> array(5);
+	
+	unittest::CounterType::reset();
+	unittest::CounterType data;
+	
+	array.append(data);
+	array.append(data);
+	array.append(data);
+	
+	TEST_ASSERT_EQUALS(unittest::CounterType::numberOfAssignments +
+			unittest::CounterType::numberOfCopyConstructorCalls, 3U);
+	TEST_ASSERT_EQUALS(unittest::CounterType::numberOfDefaultConstructorCalls, 1U);
+	TEST_ASSERT_EQUALS(unittest::CounterType::numberOfDestructorCalls, 0U);
+	
+	array.removeAll();
+	
+	TEST_ASSERT_EQUALS(unittest::CounterType::numberOfDestructorCalls, 3U);
+	
+	TEST_ASSERT_EQUALS(array.getSize(), 0U);
+	TEST_ASSERT_EQUALS(array.getCapacity(), 5U);
 }

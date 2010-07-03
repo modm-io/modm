@@ -5,7 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -30,30 +30,24 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__IOSTREAM_HPP
-	#error	"Don't include this file directly, use 'iostream.hpp' instead!"
+#ifndef	XPCC_MATH__OPERATOR_HPP
+	#error	"Don't include this file directly, use 'operator.hpp' instead!"
 #endif
 
-#include <stdio.h>		// snprintf()
-#include <stdlib.h>
-
-#include <xpcc/utils/arithmetic_traits.hpp>
-#include <xpcc/utils/typet.hpp>
-
-// ----------------------------------------------------------------------------
-
-template<typename T>
-void
-xpcc::IOStream::putFloat( const T& value )
+inline uint32_t
+xpcc::math::mul32(uint16_t a, uint16_t b)
 {
-	// hard coded for 2.22507e-308
-	char str[13 + 1]; // +1 for '\0'
-	
-#ifdef __AVR__
-	dtostre(value, str, 5, 0);
-#else
-	snprintf(str, sizeof(str), "%.5e", value);
-#endif
-	
-	this->device->put(str);
+	return static_cast<uint32_t>(a) * static_cast<uint32_t>(b);
+}
+
+inline int32_t
+xpcc::math::mul32(int16_t a, int16_t b)
+{
+	return static_cast<int32_t>(a) * static_cast<int32_t>(b);
+}
+
+inline int32_t
+xpcc::math::mac32(int32_t result, int16_t a, int16_t b)
+{
+	return result + static_cast<int32_t>(a) * static_cast<int32_t>(b);
 }

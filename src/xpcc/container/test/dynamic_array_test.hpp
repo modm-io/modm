@@ -55,4 +55,10 @@ public:
 
 	void
 	testRemove();
+	
+	void
+	testClear();
+	
+	void
+	testRemoveAll();
 };

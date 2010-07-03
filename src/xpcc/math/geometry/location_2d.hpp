@@ -62,6 +62,12 @@ namespace xpcc
 		inline const Point2D<T>&
 		getPosition() const;
 		
+		inline const T&
+		getX() const;
+		
+		inline const T&
+		getY() const;
+		
 		void
 		setPosition(const Point2D<T>& point);
 		

@@ -56,6 +56,20 @@ xpcc::Location2D<T>::getPosition() const
 }
 
 template <typename T>
+inline const T&
+xpcc::Location2D<T>::getX() const
+{
+	return this->position.x;
+}
+
+template <typename T>
+inline const T&
+xpcc::Location2D<T>::getY() const
+{
+	return this->position.y;
+}
+
+template <typename T>
 void
 xpcc::Location2D<T>::setPosition(const Point2D<T>& point)
 {
@@ -111,7 +125,7 @@ template<typename T> template<typename U>
 xpcc::Location2D<U>
 xpcc::Location2D<T>::convert() const
 {
-	return Location2D<U>(this->position.convert<U>(), this->phi);
+	return Location2D<U>(this->position.convert<U>(), this->orientation);
 }
 
 // ----------------------------------------------------------------------------

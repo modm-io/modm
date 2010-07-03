@@ -107,10 +107,23 @@ template <typename T>
 void
 xpcc::DynamicArray<T>::clear()
 {
+	// TODO ruf dies die destructoren der elemente auf?
 	delete[] this->values;
+	this->values = 0;
 	
 	this->size = 0;
 	this->capacity = 0;
+}
+
+// ----------------------------------------------------------------------------
+template <typename T>
+void
+xpcc::DynamicArray<T>::removeAll()
+{
+	for (SizeType i = 0; i < this->size; ++i) {
+		this->values[i].~T();
+	}
+	this->size = 0;
 }
 
 // ----------------------------------------------------------------------------

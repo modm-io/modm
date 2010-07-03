@@ -106,7 +106,7 @@ xpcc::LineSegment2D<T>::getDistanceTo(const Point2D<T>& point) const
 	FloatType c1 = Vector2D<T>::dotProduct(startToPoint, directionVector);
 	if (c1 <= 0)
 	{
-		// point to before the start point => calculate distance to start point
+		// point is before the start point => calculate distance to start point
 		return startToPoint.getLength();
 	}
 	
@@ -139,7 +139,7 @@ xpcc::LineSegment2D<T>::intersects(const LineSegment2D<T>& other)
 	return (((Point2D<T>::ccw(this->start, this->end, other.start) *
 			  Point2D<T>::ccw(this->start, this->end, other.end)) <= 0) &&
 			((Point2D<T>::ccw(other.start, other.end, this->start) *
-			  Point2D<T>::ccw(other.start, other.end, this->start)) <= 0));
+			  Point2D<T>::ccw(other.start, other.end, this->end)) <= 0));
 }
 
 // ----------------------------------------------------------------------------

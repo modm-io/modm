@@ -55,6 +55,9 @@ namespace xpcc
 	 * explicitly indicate a capacity for the dynamic array using member
 	 * function DynamicArray::reserve().
 	 * 
+	 * \todo	check if all the copy-constructors and destructors of T are
+	 * 			called correctly.
+	 * 
 	 * \author	Fabian Greif <fabian.greif@rwth-aachen.de>
 	 * \ingroup	container
 	 */
@@ -136,7 +139,7 @@ namespace xpcc
 		inline SizeType
 		getCapacity() const
 		{
-			return (this->capacity);
+			return this->capacity;
 		}
 
 		/**
@@ -156,7 +159,7 @@ namespace xpcc
 		reserve(SizeType n);
 		
 		/**
-		 * \brief	Remove all elements
+		 * \brief	Remove all elements and set capacity to zero
 		 * 
 		 * Frees all allocated memory and sets the capacity of the container
 		 * to zero.
@@ -165,7 +168,15 @@ namespace xpcc
 		 */
 		void
 		clear();
-
+		
+		/**
+		 * \brief	Remove all elements
+		 * 
+		 * Keeps the capacity at its current level.
+		 */
+		void
+		removeAll();
+		
 		/**
 		 * \brief	Access element
 		 *

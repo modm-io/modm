@@ -5,7 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -30,30 +30,64 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__IOSTREAM_HPP
-	#error	"Don't include this file directly, use 'iostream.hpp' instead!"
-#endif
-
-#include <stdio.h>		// snprintf()
-#include <stdlib.h>
-
-#include <xpcc/utils/arithmetic_traits.hpp>
-#include <xpcc/utils/typet.hpp>
+#include "bit_operation.hpp"
 
 // ----------------------------------------------------------------------------
-
-template<typename T>
-void
-xpcc::IOStream::putFloat( const T& value )
+uint8_t
+xpcc::math::bitReverse(uint8_t n)
 {
-	// hard coded for 2.22507e-308
-	char str[13 + 1]; // +1 for '\0'
+	n = ((uint8_t) (n >> 1) & 0x55) | ((uint8_t) (n << 1) & 0xaa);
+	n = ((uint8_t) (n >> 2) & 0x33) | ((uint8_t) (n << 2) & 0xcc);
 	
-#ifdef __AVR__
-	dtostre(value, str, 5, 0);
-#else
-	snprintf(str, sizeof(str), "%.5e", value);
-#endif
+	return swap(n);
+}
+
+uint16_t
+xpcc::math::bitReverse(uint16_t n)
+{
+	n = ((n >>  1) & 0x5555) | ((n <<  1) & 0xaaaa);
+	n = ((n >>  2) & 0x3333) | ((n <<  2) & 0xcccc);
+	n = ((n >>  4) & 0x0f0f) | ((n <<  4) & 0xf0f0);
 	
-	this->device->put(str);
+	return swap(n);
+}
+
+uint32_t
+xpcc::math::bitReverse(uint32_t n)
+{
+	n = ((n >>  1) & 0x55555555) | ((n <<  1) & 0xaaaaaaaa);
+	n = ((n >>  2) & 0x33333333) | ((n <<  2) & 0xcccccccc);
+	n = ((n >>  4) & 0x0f0f0f0f) | ((n <<  4) & 0xf0f0f0f0);
+	n = ((n >>  8) & 0x00ff00ff) | ((n <<  8) & 0xff00ff00);
+	n = ((n >> 16) & 0x0000ffff) | ((n << 16) & 0xffff0000);
+	
+	return n;
+}
+
+// ----------------------------------------------------------------------------
+std::size_t
+xpcc::math::bitCount(uint8_t n)
+{
+	n = ((uint8_t) (n >> 1) & 0x55) + (n & 0x55);
+	n = ((uint8_t) (n >> 2) & 0x33) + (n & 0x33);
+	n = ((uint8_t) (n >> 4) + n) & 0xf;
+	
+	return n;
+}
+
+std::size_t
+xpcc::math::bitCount(uint16_t n)
+{
+	return (bitCount((uint8_t) (n)) +
+			bitCount((uint8_t) (n >> 8)));
+}
+
+std::size_t
+xpcc::math::bitCount(uint32_t n)
+{
+	n = ((n >> 1) & 0x55555555) + (n & 0x55555555);
+	n = ((n >> 2) & 0x33333333) + (n & 0x33333333);
+	n = ((n >> 4) & 0x0f0f0f0f) + (n & 0x0f0f0f0f);
+	
+	return n % 255;
 }

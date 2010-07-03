@@ -5,7 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- *
+ * 
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -30,65 +30,17 @@
  */
 // ----------------------------------------------------------------------------
 
-#include "misc.hpp"
+#include <unittest/testsuite.hpp>
 
-// ----------------------------------------------------------------------------
-uint8_t
-xpcc::utils::bitReverse(uint8_t n)
+class OperatorTest : public unittest::TestSuite
 {
-	n = ((uint8_t) (n >> 1) & 0x55) | ((uint8_t) (n << 1) & 0xaa);
-	n = ((uint8_t) (n >> 2) & 0x33) | ((uint8_t) (n << 2) & 0xcc);
+public:
+	void
+	testSqrt();
 	
-	return swap(n);
-}
-
-uint16_t
-xpcc::utils::bitReverse(uint16_t n)
-{
-	n = ((n >>  1) & 0x5555) | ((n <<  1) & 0xaaaa);
-	n = ((n >>  2) & 0x3333) | ((n <<  2) & 0xcccc);
-	n = ((n >>  4) & 0x0f0f) | ((n <<  4) & 0xf0f0);
+	void
+	testMultiplication();
 	
-	return swap(n);
-}
-
-uint32_t
-xpcc::utils::bitReverse(uint32_t n)
-{
-	n = ((n >>  1) & 0x55555555) | ((n <<  1) & 0xaaaaaaaa);
-	n = ((n >>  2) & 0x33333333) | ((n <<  2) & 0xcccccccc);
-	n = ((n >>  4) & 0x0f0f0f0f) | ((n <<  4) & 0xf0f0f0f0);
-	n = ((n >>  8) & 0x00ff00ff) | ((n <<  8) & 0xff00ff00);
-	n = ((n >> 16) & 0x0000ffff) | ((n << 16) & 0xffff0000);
-	
-	return n;
-}
-
-
-// ----------------------------------------------------------------------------
-std::size_t
-xpcc::utils::bitCount(uint8_t n)
-{
-	n = ((uint8_t) (n >> 1) & 0x55) + (n & 0x55);
-	n = ((uint8_t) (n >> 2) & 0x33) + (n & 0x33);
-	n = ((uint8_t) (n >> 4) + n) & 0xf;
-	
-	return n;
-}
-
-std::size_t
-xpcc::utils::bitCount(uint16_t n)
-{
-	return (bitCount((uint8_t) (n)) +
-			bitCount((uint8_t) (n >> 8)));
-}
-
-std::size_t
-xpcc::utils::bitCount(uint32_t n)
-{
-	n = ((n >> 1) & 0x55555555) + (n & 0x55555555);
-	n = ((n >> 2) & 0x33333333) + (n & 0x33333333);
-	n = ((n >> 4) & 0x0f0f0f0f) + (n & 0x0f0f0f0f);
-	
-	return n % 255;
-}
+	void
+	testMultiplyAccumulate();
+};

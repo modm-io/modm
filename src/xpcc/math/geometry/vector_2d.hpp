@@ -191,7 +191,7 @@ namespace xpcc
 	// Global functions
 	// ------------------------------------------------------------------------
 	/**
-	 * \brief	Stream operator for \b xpcc::Point<U>
+	 * \brief	Stream operator for \b xpcc::Vector2D<U>
 	 * \ingroup	geometry
 	 */
 	template<typename U>

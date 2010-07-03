@@ -30,68 +30,39 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC__UTILS_HPP
-#define	XPCC__UTILS_HPP
+#ifndef UNITTEST__COUNTER_TYPE_HPP
+#define UNITTEST__COUNTER_TYPE_HPP
 
-#include <cmath>
 #include <stdint.h>
 
-namespace xpcc
+namespace unittest
 {
 	/**
-	 * \brief	Fast check if a float variable is positive
-	 *
-	 * Checks only the sign bit for the AVR.
+	 * \brief	Data type to count the number of constructor etc. calls
 	 * 
-	 * \ingroup	math
+	 * \ingroup	unittest
 	 */
-	inline bool
-	isPositive(const float& a)
+	class CounterType
 	{
-#ifdef __AVR__
-		// IEEE 754-1985: the most significant bit is the sign bit
-		// sign = 0 => positive
-		// sign = 1 => negative
-		uint8_t *t = (uint8_t *) &a;
-		if (*(t + 3) & 0x80) {
-			return false;
-		}
-		else {
-			return true;
-		}
-#else
-		return (a > 0.0);
-#endif
-	}
-	
-	/**
-	 * \brief	Compile time exponentiation
-	 * 
-	 * Calculates B raised to the power of N, B and N must be compile-time
-	 * constants.
-	 * 
-	 * \code
-	 * int value = xpcc::Pow<10, 2>::value;
-	 * \endcode
-	 * 
-	 * \tparam	B	Base
-	 * \tparam	N	Exponent
-	 * 
-	 * \ingroup	math
-	 */
-	template <int B, int N>
-	class Pow
-	{
-		enum { value = B * Pow<B, N - 1>::value };
-	};
-	
-	// specialization for B^0 which is always 1
-	// used to end the recursion in Pow<>
-	template <int B>
-	class Pow<B, 0>
-	{
-		enum { value = 1 };
+	public:
+		CounterType();
+		
+		CounterType(const CounterType& other);
+		
+		~CounterType();
+		
+		CounterType&
+		operator = (const CounterType& other);
+		
+		static void
+		reset();
+		
+		static uint_fast16_t numberOfDefaultConstructorCalls;
+		static uint_fast16_t numberOfCopyConstructorCalls;
+		static uint_fast16_t numberOfAssignments;
+		static uint_fast16_t numberOfDestructorCalls;
+		static uint_fast16_t numberOfReallocs;
 	};
 }
 
-#endif	// XPCC__UTILS_HPP
+#endif // UNITTEST__COUNTER_TYPE_HPP

@@ -112,8 +112,8 @@ xpcc::Point2D<T>::ccw(const Point2D<T>& a, const Point2D<T>& b,
 		const Point2D<T>& c)
 {
 	WideType dx1 = b.x - a.x;
-	WideType dx2 = c.x - a.x;
 	WideType dy1 = b.y - a.y;
+	WideType dx2 = c.x - a.x;
 	WideType dy2 = c.y - a.y;
 	
 	WideType d1 = dx1 * dy2;

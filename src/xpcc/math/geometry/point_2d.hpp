@@ -46,6 +46,9 @@ namespace xpcc
 	template <typename T>
 	class Vector2D;
 	
+	template <typename T>
+	class Location2D;
+	
 	// ------------------------------------------------------------------------
 	/**
 	 * \brief	2D Point
@@ -59,6 +62,8 @@ namespace xpcc
 	class Point2D
 	{
 		friend class Vector2D<T>;
+		friend class Location2D<T>;
+		
 	public:
 		typedef typename GeometricTraits<T>::WideType WideType;
 		typedef typename GeometricTraits<T>::FloatType FloatType;
@@ -101,6 +106,9 @@ namespace xpcc
 		/**
 		 * \brief	Check if three points are in a counter-clock wise direction
 		 * 
+		 * Check if we move counter clock wise if we move from the first point
+		 * to the second and the third.
+		 * 
 		 * \returns	1 if counter-clock wise, -1 if clock wise and 0 if \p c is
 		 * 			between \p a and \p b.
 		 */
@@ -117,11 +125,11 @@ namespace xpcc
 		Vector2D<T>
 		toVector() const;
 		
-	private:
+	protected:
 		T x;
 		T y;
 		
-	private:
+	protected:
 		template<typename U>
 		friend IOStream&
 		operator <<(IOStream& s, const Point2D<U>& c);
@@ -184,6 +192,8 @@ namespace xpcc
 }
 
 #include "vector_2d.hpp"
+#include "location_2d.hpp"
+
 #include "point_2d_impl.hpp"
 
 #endif	// XPCC__POINT_2D_HPP

@@ -30,9 +30,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#if defined(__AVR__) && defined(__AVR_HAVE_MUL__)
-	#include <xpcc/architecture/avr/math.hpp>
-#endif
+#include <xpcc/math/utils/operator.hpp>
 
 #include "vector_2d.hpp"
 
@@ -72,16 +70,15 @@ namespace xpcc
 	}
 	
 	// ------------------------------------------------------------------------
-#if defined(__AVR__) && defined(__AVR_HAVE_MUL__)
 	template<>
 	int16_t
 	Vector2D<int16_t>::getLength() const
 	{
 		int32_t t;
-		t = avr::mul32(x, x);
-		t = avr::mac32(t, y, y);
+		t = math::mul32(x, x);
+		t = math::mac32(t, y, y);
 		
-		return avr::sqrt32_round(t);
+		return math::sqrt32(t);
 	}
 	
 	template<>
@@ -90,13 +87,13 @@ namespace xpcc
 	{
 		int32_t t;
 		
-		t = avr::mul32(x, x);
-		t = avr::mac32(t, y, y);
+		t = math::mul32(x, x);
+		t = math::mac32(t, y, y);
 		
 		return t;
 	}
-#endif
 	
+	// ------------------------------------------------------------------------
 	template<>
 	template<>
 	Vector2D<double>

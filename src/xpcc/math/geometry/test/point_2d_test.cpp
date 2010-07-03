@@ -126,5 +126,22 @@ Point2DTest::testComparision()
 void
 Point2DTest::testCCW()
 {
-	TEST_FAIL("TODO");
+	xpcc::Point2D<int16_t> a(0, 0);	
+	xpcc::Point2D<int16_t> b(30, 30);
+	xpcc::Point2D<int16_t> c(40, 40);
+	xpcc::Point2D<int16_t> d(0, 40);
+	
+	TEST_ASSERT_EQUALS(xpcc::Point2D<int16_t>::ccw(a, b, d), 1);
+	TEST_ASSERT_EQUALS(xpcc::Point2D<int16_t>::ccw(b, d, a), 1);
+	TEST_ASSERT_EQUALS(xpcc::Point2D<int16_t>::ccw(b, a, d), -1);
+	TEST_ASSERT_EQUALS(xpcc::Point2D<int16_t>::ccw(a, d, b), -1);
+	
+	// three points in a strait row
+	TEST_ASSERT_EQUALS(xpcc::Point2D<int16_t>::ccw(a, b, c), 1);
+	
+	// last point between the two other
+	TEST_ASSERT_EQUALS(xpcc::Point2D<int16_t>::ccw(a, c, b), 0);
+	
+	// last point before the first
+	TEST_ASSERT_EQUALS(xpcc::Point2D<int16_t>::ccw(b, c, a), -1);
 }

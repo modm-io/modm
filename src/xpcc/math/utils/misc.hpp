@@ -5,7 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -30,30 +30,75 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__IOSTREAM_HPP
-	#error	"Don't include this file directly, use 'iostream.hpp' instead!"
-#endif
+#ifndef	XPCC_MATH__UTILS_HPP
+#define	XPCC_MATH__UTILS_HPP
 
-#include <stdio.h>		// snprintf()
-#include <stdlib.h>
+#include <cstddef>
+#include <cmath>
+#include <stdint.h>
 
-#include <xpcc/utils/arithmetic_traits.hpp>
-#include <xpcc/utils/typet.hpp>
+#include <xpcc/utils/macros.hpp>
 
-// ----------------------------------------------------------------------------
-
-template<typename T>
-void
-xpcc::IOStream::putFloat( const T& value )
+namespace xpcc
 {
-	// hard coded for 2.22507e-308
-	char str[13 + 1]; // +1 for '\0'
-	
+	namespace math
+	{
+		/**
+		 * \brief	Fast check if a float variable is positive
+		 *
+		 * Checks only the sign bit for the AVR.
+		 * 
+		 * \ingroup	math
+		 */
+		inline bool
+		isPositive(const float& a)
+		{
 #ifdef __AVR__
-	dtostre(value, str, 5, 0);
+			// IEEE 754-1985: the most significant bit is the sign bit
+			// sign = 0 => positive
+			// sign = 1 => negative
+			uint8_t *t = (uint8_t *) &a;
+			if (*(t + 3) & 0x80) {
+				return false;
+			}
+			else {
+				return true;
+			}
 #else
-	snprintf(str, sizeof(str), "%.5e", value);
+			return (a > 0.0);
 #endif
-	
-	this->device->put(str);
+		}
+		
+		// --------------------------------------------------------------------
+		/**
+		 * \brief	Compile time exponentiation
+		 * 
+		 * Calculates B raised to the power of N, B and N must be compile-time
+		 * constants.
+		 * 
+		 * \code
+		 * int value = xpcc::Pow<10, 2>::value;
+		 * \endcode
+		 * 
+		 * \tparam	B	Base
+		 * \tparam	N	Exponent
+		 * 
+		 * \ingroup	math
+		 */
+		template <int B, int N>
+		class Pow
+		{
+			enum { value = B * Pow<B, N - 1>::value };
+		};
+		
+		// specialization for B^0 which is always 1
+		// used to end the recursion in Pow<>
+		template <int B>
+		class Pow<B, 0>
+		{
+			enum { value = 1 };
+		};
+	}
 }
+
+#endif	// XPCC_MATH__UTILS_HPP

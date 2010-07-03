@@ -9,10 +9,10 @@
 ;------------------------------------------------------------------------------
 
 .text
-.global sqrt32_round
-.type sqrt32_round, @function
+.global sqrt32
+.type sqrt32, @function
 
-sqrt32_round:
+sqrt32:
 	ldi   R19, 0xc0
 	clr   R18          ; rotation mask in R19:R18
 	ldi   R27, 0x40
@@ -55,4 +55,4 @@ sqrt32_round:
 	mov   R24, R26
 	ret
  
-.size sqrt32_round, .-sqrt32_round
+.size sqrt32, .-sqrt32

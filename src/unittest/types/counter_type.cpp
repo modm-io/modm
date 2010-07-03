@@ -5,7 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -30,17 +30,46 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <unittest/testsuite.hpp>
+#include "counter_type.hpp"
 
-class MathTest : public unittest::TestSuite
+uint_fast16_t unittest::CounterType::numberOfDefaultConstructorCalls = 0;
+uint_fast16_t unittest::CounterType::numberOfCopyConstructorCalls = 0;
+uint_fast16_t unittest::CounterType::numberOfAssignments = 0;
+uint_fast16_t unittest::CounterType::numberOfDestructorCalls = 0;
+uint_fast16_t unittest::CounterType::numberOfReallocs = 0;
+
+unittest::CounterType::CounterType()
 {
-public:
-	void
-	testSqrt();
+	++numberOfDefaultConstructorCalls;
+}
+
+unittest::CounterType::CounterType(const CounterType&)
+{
+	++numberOfCopyConstructorCalls;
+}
+
+unittest::CounterType::~CounterType()
+{
+	++numberOfDestructorCalls;
+	if (numberOfDestructorCalls == (numberOfCopyConstructorCalls - numberOfDefaultConstructorCalls)) {
+		++numberOfReallocs;
+	}
+}
+
+unittest::CounterType&
+unittest::CounterType::operator = (const CounterType&)
+{
+	++numberOfAssignments;
 	
-	void
-	testMultiplication();
-	
-	void
-	testMultiplyAccumulate();
-};
+	return *this;
+}
+
+void
+unittest::CounterType::reset()
+{
+	numberOfDefaultConstructorCalls = 0;
+	numberOfCopyConstructorCalls = 0;
+	numberOfAssignments = 0;
+	numberOfDestructorCalls = 0;
+	numberOfReallocs = 0;
+}

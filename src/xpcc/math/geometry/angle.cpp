@@ -30,7 +30,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/math/utils.hpp>
+#include <xpcc/math/utils/misc.hpp>
 
 #include "angle.hpp"
 
@@ -38,7 +38,7 @@
 float
 xpcc::Angle::normalize(float angle)
 {
-	if (isPositive(angle))
+	if (math::isPositive(angle))
 	{
 		while (angle > M_PI) {
 			angle -= 2 * M_PI;
@@ -57,7 +57,7 @@ xpcc::Angle::normalize(float angle)
 float
 xpcc::Angle::reverse(float angle)
 {
-	if (isPositive(angle))
+	if (math::isPositive(angle))
 	{
 		angle -= M_PI;
 	}

@@ -30,28 +30,27 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC__MISC_HPP
-#define	XPCC__MISC_HPP
+#ifndef	XPCC_MATH__BIT_OPERATION_HPP
+#define	XPCC_MATH__BIT_OPERATION_HPP
 
 #include <cstddef>
+#include <cmath>
 #include <stdint.h>
-#include "macros.hpp"
+
+#include <xpcc/utils/macros.hpp>
 
 namespace xpcc
 {
-	/**
-	 * \ingroup	utils
-	 * \brief	Usefull stuff
-	 */
-	namespace utils
+	namespace math
 	{
 		/**
-		 * \ingroup	utils
 		 * \brief	Exchange the two nibbles of a byte
 		 * 
-		 * \verbatim
+		 * \code
 		 * 0xab => 0xba
-		 * \endverbatim
+		 * \endcode
+		 * 
+		 * \ingroup	math
 		 */
 		ALWAYS_INLINE uint8_t
 		swap(uint8_t n)
@@ -71,12 +70,13 @@ namespace xpcc
 		}
 		
 		/**
-		 * \ingroup	utils
 		 * \brief	Exchange the two bytes of a 16-bit integer
 		 * 
-		 * \verbatim
+		 * \code
 		 * 0xabcd => 0xcdab
-		 * \endverbatim
+		 * \endcode
+		 * 
+		 * \ingroup	math
 		 */
 		ALWAYS_INLINE uint16_t
 		swap(uint16_t n)
@@ -101,60 +101,67 @@ namespace xpcc
 #endif
 		}
 		
+		// --------------------------------------------------------------------
 		/**
-		 * \ingroup	utils
 		 * \brief	Reverse the bits in a byte
 		 * 
-		 * \verbatim
+		 * \code
 		 * 0b01110100 => 0b00101110
-		 * \endverbatim
+		 * \endcode
 		 * 
-		 * 15 cycles on an AVR, without call + return.
+		 * 15 clock cycles on an AVR, without call + return.
+		 * 
+		 * \ingroup	math
 		 */
 		uint8_t
 		bitReverse(uint8_t n);
 		
 		/**
-		 * \ingroup	utils
 		 * \brief	Reverse the bits in a 16-bit integer
+		 * 
+		 * \ingroup	math
 		 */
 		uint16_t
 		bitReverse(uint16_t n);
 		
 		/**
-		 * \ingroup	utils
 		 * \brief	Reverse the bits in a 32-bit integer
+		 * 
+		 * \ingroup	math
 		 */
 		uint32_t
 		bitReverse(uint32_t n);
 		
+		// --------------------------------------------------------------------
 		/**
-		 * \ingroup	utils
 		 * \brief	Count the number of bit set to 1
 		 * 
-		 * 16 cycles on an AVR, without call + return.
+		 * 16 clock cycles on an AVR, without call + return.
 		 * 
 		 * \see		http://infolab.stanford.edu/~manku/bitReverse/bitReverse.html
+		 * \ingroup	math
 		 */
 		std::size_t
 		bitCount(uint8_t n);
 		
 		/**
-		 * \ingroup	utils
 		 * \brief	Count the number of bit set to 1
 		 * 
-		 * 33 cycles on an AVR, without call + return.
+		 * 33 clock cycles on an AVR, without call + return.
+		 * 
+		 * \ingroup	math
 		 */
 		std::size_t
 		bitCount(uint16_t n);
 		
 		/**
-		 * \ingroup	utils
 		 * \brief	Count the number of bit set to 1
+		 * 
+		 * \ingroup	math
 		 */
 		std::size_t
 		bitCount(uint32_t n);
 	}
 }
 
-#endif	// XPCC__MISC_HPP
+#endif	// XPCC_MATH__BIT_OPERATION_HPP
