@@ -40,4 +40,7 @@ public:
 	
 	void
 	testConstructor();
+	
+	void
+	testIntersectionCircle();
 };

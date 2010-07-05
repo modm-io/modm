@@ -58,4 +58,10 @@ public:
 	
 	void
 	testIntersectsLineSegment();
+	
+	void
+	testIntersectionPointsLineSegment();
+	
+	void
+	testIntersectionPointsCircle();
 };

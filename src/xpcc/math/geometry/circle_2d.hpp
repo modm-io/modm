@@ -33,10 +33,21 @@
 #ifndef XPCC__CIRCLE_2D_HPP
 #define XPCC__CIRCLE_2D_HPP
 
-#include "point_2d.hpp"
+#include <cmath>
+#include "geometric_traits.hpp"
+
+#include "vector_2d.hpp"
+#include "point_set_2d.hpp"
 
 namespace xpcc
 {
+	// forward declaration
+	template <typename T>
+	class Line2D;
+	
+	template <typename T>
+	class LineSegment2D;
+	
 	/**
 	 * \brief	Circle
 	 * 
@@ -46,16 +57,19 @@ namespace xpcc
 	template <typename T>
 	class Circle2D
 	{
+		typedef typename GeometricTraits<T>::WideType WideType;
+		typedef typename GeometricTraits<T>::FloatType FloatType;
+		
 	public:
 		Circle2D();
 		
-		Circle2D(const Point2D<T>& center, T radius);
+		Circle2D(const Vector2D<T>& center, T radius);
 		
-		inline const Point2D<T>&
+		inline const Vector2D<T>&
 		getCenter() const;
 		
 		inline void
-		setCenter(const Point2D<T>& point);
+		setCenter(const Vector2D<T>& point);
 		
 		inline T
 		getRadius() const;
@@ -63,11 +77,40 @@ namespace xpcc
 		inline void
 		setRadius(T radius);
 		
-	private:
-		Point2D<T> center;
+		/**
+		 * \brief	Calculate intersection points
+		 * 
+		 * \param[in]	other	Other Circle
+		 * \param[out]	intersectionPoint	Intersection points
+		 * 
+		 * \see		http://local.wasp.uwa.edu.au/~pbourke/geometry/2circle/
+		 */
+		bool
+		intersect(const Circle2D& other, PointSet2D<T>& intersectionPoints) const;
+		
+		/**
+		 * \brief	Calculate intersection points
+		 * 
+		 * \param[in]	other	Other line
+		 * \param[out]	intersectionPoint	Intersection point
+		 * 
+		 * \see		Line2D::intersect()
+		 */
+		bool
+		intersect(const Line2D<T>& line, PointSet2D<T>& intersectionPoints) const;
+		
+	protected:
+		Vector2D<T> center;
 		T radius;
+		
+	protected:
+		friend class Line2D<T>;
+		friend class LineSegment2D<T>;
 	};
 }
+
+#include "line_2d.hpp"
+#include "line_segment_2d.hpp"
 
 #include "circle_2d_impl.hpp"
 

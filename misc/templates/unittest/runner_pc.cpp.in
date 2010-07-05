@@ -5,7 +5,26 @@
 #include <unittest/reporter.hpp>
 #include <unittest/controller.hpp>
 
+#include <xpcc/debug/logger.hpp>
 #include <xpcc/architecture/pc/terminal.hpp>
+
+xpcc::pc::Terminal outputDevice;
+
+xpcc::log::StyleWrapper< xpcc::log::Prefix< char[10] > > loggerDeviceDebug( \
+		xpcc::log::Prefix< char[10] >("Debug  : ", outputDevice ));
+xpcc::log::Logger xpcc::log::debug( loggerDeviceDebug );
+
+xpcc::log::StyleWrapper< xpcc::log::Prefix< char[10] > > loggerDeviceInfo( \
+		xpcc::log::Prefix< char[10] >("Info   : ", outputDevice ));
+xpcc::log::Logger xpcc::log::info( loggerDeviceInfo );
+
+xpcc::log::StyleWrapper< xpcc::log::Prefix< char[10] > > loggerDeviceWarning( \
+		xpcc::log::Prefix< char[10] >("Warning: ", outputDevice ));
+xpcc::log::Logger xpcc::log::warning(loggerDeviceWarning);
+
+xpcc::log::StyleWrapper< xpcc::log::Prefix< char[10] > > loggerDeviceError( \
+		xpcc::log::Prefix< char[10] >("Error  : ", outputDevice ));
+xpcc::log::Logger xpcc::log::error(loggerDeviceError);
 
 ${includes}
 
@@ -14,10 +33,7 @@ ${names}
 int
 main(void)
 {
-	// initialize output device
-	xpcc::pc::Terminal device;
-	
-	unittest::Reporter reporter(device);
+	unittest::Reporter reporter(outputDevice);
 	unittest::Controller::instance().setReporter(reporter);
 	
 	// run tests

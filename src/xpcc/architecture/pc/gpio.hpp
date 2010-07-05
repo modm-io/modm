@@ -78,7 +78,6 @@ namespace xpcc
 		} \
 		\
 		ALWAYS_INLINE static bool read() { return false; } \
-		ALWAYS_INLINE static uint8_t getMask() { return 0;} \
 	}
 
 /**
@@ -105,7 +104,6 @@ namespace xpcc
 		set(bool status) { \
 			(void) status; \
 		} \
-		ALWAYS_INLINE static uint8_t getMask() { return 0; } \
 	}
 
 /**
@@ -125,24 +123,6 @@ namespace xpcc
 		\
 		ALWAYS_INLINE static void setInput() { } \
 		ALWAYS_INLINE static bool read() { } \
-		ALWAYS_INLINE static void \
-		configureInputSense(::xpcc::gpio::InputSense inputSense){\
-			(void) inputSense; \
-		}\
-		\
-		ALWAYS_INLINE static void \
-		configureInterrupt0(::xpcc::gpio::InterruptLevel0 interruptLevel) { \
-			(void)interruptLevel; \
-		} \
-		\
-		ALWAYS_INLINE static void \
-		configureInterrupt1(::xpcc::gpio::InterruptLevel1 interruptLevel) { \
-			(void)interruptLevel; \
-		} \
-		\
-		ALWAYS_INLINE static uint8_t getMask() { return 0;} \
-		ALWAYS_INLINE static uint16_t getInterrupt0Vector() { return 0;} \
-		ALWAYS_INLINE static uint16_t getInterrupt1Vector() { return 0;} \
 	}
 
-#endif // XPCC__ATXMEGA_GPIO_HPP
+#endif // XPCC__PC_GPIO_HPP

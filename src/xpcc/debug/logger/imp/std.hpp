@@ -39,7 +39,7 @@
 #ifdef __AVR__
 	// this version is to use on PC only
 	#error "not to use on AVRs"
-#else
+#endif
 
 #include "../logger.hpp"
 #include "../style_wrapper.hpp"
@@ -78,10 +78,7 @@ namespace xpcc
 
 		Wrapper< char[10], RED, NONE > errorInfo("Error:   ", device);
 		Logger error( errorInfo );
-
 	}
 }
-
-#endif // __AVR__
 
 #endif // XPCC_LOG_STYLE_DEFAULT__HPP

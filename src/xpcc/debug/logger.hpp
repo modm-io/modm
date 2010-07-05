@@ -30,32 +30,5 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__WINDOWS_HPP
-#define XPCC__WINDOWS_HPP
-
-#ifdef _WIN32
-	#include <ciso646>
-	#include <stdarg.h>
-	#include <stdio.h>
-	#include <math.h>
-	
-	#define ALWAYS_INLINE  inline
-	
-	#ifndef M_PI
-	#define M_PI 3.14159265358979323846
-	#endif
-	
-	inline int
-	snprintf(char *buffer, int buff_size, const char *format, ...)
-	{
-		va_list ap;
-		
-		va_start(ap, format);
-		int result = vsnprintf(buffer, buff_size, format, ap);
-		va_end(ap);
-		
-		return result;
-	};
-#endif
-
-#endif // XPCC__WINDOWS_HPP
+#include "logger/logger.hpp"
+#include "logger/style.hpp"

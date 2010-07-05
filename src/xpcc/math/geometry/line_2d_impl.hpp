@@ -42,21 +42,21 @@ xpcc::Line2D<T>::Line2D() :
 }
 
 template <typename T>
-xpcc::Line2D<T>::Line2D(const Point2D<T>& point, const Vector2D<T>& vector) :
-	point(point), directionVector(vector)
+xpcc::Line2D<T>::Line2D(const Vector2D<T>& point, const Vector2D<T>& directionVector) :
+	point(point), directionVector(directionVector)
 {
 }
 
 // ----------------------------------------------------------------------------
 template <typename T>
 inline void
-xpcc::Line2D<T>::setPoint(const Point2D<T>& point)
+xpcc::Line2D<T>::setPoint(const Vector2D<T>& point)
 {
 	this->point = point;
 }
 
 template <typename T>
-inline const xpcc::Point2D<T>&
+inline const xpcc::Vector2D<T>&
 xpcc::Line2D<T>::getPoint() const
 {
 	return this->point;
@@ -75,26 +75,91 @@ xpcc::Line2D<T>::getDirectionVector() const
 {
 	return this->directionVector;
 }
+
+template <typename T>
+inline void
+xpcc::Line2D<T>::set(const Vector2D<T>& point, const Vector2D<T>& directionVector)
+{
+	this->point = point;
+	this->directionVector = directionVector;
+}
+
 // ----------------------------------------------------------------------------
 template <typename T>
 T
-xpcc::Line2D<T>::getDistanceTo(const Point2D<T>& point) const
+xpcc::Line2D<T>::getDistanceTo(const Vector2D<T>& point) const
 {
 	// vector from the base point of the line to the new point
 	Vector2D<T> startToPoint(this->point, point);
 	
-	FloatType c1 = Vector2D<T>::dotProduct(startToPoint, this->directionVector);
+	FloatType c1 = startToPoint.dot(this->directionVector);
 	FloatType c2 = this->directionVector.getLengthSquared();
 	
 	FloatType d = c1 / c2;
 	
 	// calculate the closest point
-	Vector2D<T> closestPoint(this->directionVector);
-	closestPoint.scale(d);
-	closestPoint += this->point.toVector();
+	Vector2D<T> closestPoint = this->point + d * this->directionVector;
 	
 	// return the length of the vector from the closest point on the line
 	// to the given point
-	Vector2D<T> closestPointToPoint = point.toVector() - closestPoint;
-	return closestPointToPoint.getLength();
+	return Vector2D<T>(closestPoint, point).getLength();
+}
+
+// ----------------------------------------------------------------------------
+template <typename T>
+bool
+xpcc::Line2D<T>::intersect(const Line2D& other, PointSet2D<T>& points) const
+{
+	xpcc::Vector2D<T> connectionVector(other.point, this->point);
+	
+	WideType d = this->directionVector.cross(other.directionVector);
+	if (d)
+	{
+		FloatType t1 = static_cast<FloatType>(other.directionVector.cross(connectionVector)) /
+					   static_cast<FloatType>(d);
+		
+		points.append(this->point + this->directionVector * t1);
+		return true;
+	}
+	return false;
+}
+
+// ----------------------------------------------------------------------------
+template <typename T>
+bool
+xpcc::Line2D<T>::intersect(const Circle2D<T>& circle, PointSet2D<T>& intersectionPoints) const
+{
+	// vector from the center of the circle to line start
+	xpcc::Vector2D<T> circleToLine(circle.center, this->point);
+	
+	WideType a = 2 * this->directionVector.dot(this->directionVector);
+	WideType b = 2 * circleToLine.dot(this->directionVector);
+	WideType c = circleToLine.dot(circleToLine) - 
+			static_cast<WideType>(circle.radius) * static_cast<WideType>(circle.radius);
+	
+	WideType discriminant = (b * b - 2 * a * c);
+	
+	if (discriminant < 0)
+	{
+		// no intersections
+		return false;
+	}
+	else
+	{
+		FloatType e = std::sqrt(discriminant);
+		
+		FloatType t1 = static_cast<FloatType>(-b - e) / static_cast<FloatType>(a);
+		intersectionPoints.append(this->point + this->directionVector * t1);
+		
+		if (discriminant == 0) {
+			// the line is a tangent to the circle intersecting
+			// it at only one point
+			return true;
+		}
+		
+		FloatType t2 = static_cast<FloatType>(-b + e) / static_cast<FloatType>(a);
+		intersectionPoints.append(this->point + this->directionVector * t2);
+		
+		return true;
+	}
 }

@@ -33,13 +33,17 @@
 #ifndef XPCC__LINE_2D_HPP
 #define XPCC__LINE_2D_HPP
 
-#include "point_2d.hpp"
 #include "vector_2d.hpp"
+#include "point_set_2d.hpp"
 
 #include "geometric_traits.hpp"
 
 namespace xpcc
 {
+	// forward declaration
+	template <typename T>
+	class Circle2D;
+	
 	/**
 	 * \brief	Line
 	 * 
@@ -54,21 +58,24 @@ namespace xpcc
 		typedef typename GeometricTraits<T>::FloatType FloatType;
 		
 	public:
+		/**
+		 * \brief	Default-Constructor
+		 */
 		Line2D();
 		
 		/**
 		 * \brief	Construct a line
 		 * 
-		 * \param	point	any point on the line
-		 * \param	vector	direction vector, the length doesn't matter
+		 * \param	point			a point on the line
+		 * \param	directionVector	direction vector, the length doesn't matter
 		 */
-		Line2D(const Point2D<T>& point, const Vector2D<T>& vector);
+		Line2D(const Vector2D<T>& point, const Vector2D<T>& directionVector);
 		
 		
 		inline void
-		setPoint(const Point2D<T>& point);
+		setPoint(const Vector2D<T>& point);
 		
-		inline const Point2D<T>&
+		inline const Vector2D<T>&
 		getPoint() const;
 		
 		inline void
@@ -77,16 +84,40 @@ namespace xpcc
 		inline const Vector2D<T>&
 		getDirectionVector() const;
 		
+		inline void
+		set(const Vector2D<T>& point, const Vector2D<T>& directionVector);
 		
 		/// Shortest distance to a point
 		T
-		getDistanceTo(const Point2D<T>& point) const;
+		getDistanceTo(const Vector2D<T>& point) const;
+		
+		/**
+		 * \brief	Calculate intersection points
+		 * 
+		 * \param[in]	other	Other line
+		 * \param[out]	intersectionPoint	Intersection point
+		 */
+		bool
+		intersect(const Line2D& other, PointSet2D<T>& intersectionPoint) const;
+		
+		/**
+		 * \brief	Calculate intersection points
+		 * 
+		 * \param[in]	circle	A circle
+		 * \param[out]	intersectionPoint	Intersection points
+		 * 
+		 * \see		http://local.wasp.uwa.edu.au/~pbourke/geometry/sphereline/
+		 */
+		bool
+		intersect(const Circle2D<T>& circle, PointSet2D<T>& intersectionPoints) const;
 		
 	protected:
-		Point2D<T> point;
+		Vector2D<T> point;
 		Vector2D<T> directionVector;
 	};
 }
+
+#include "circle_2d.hpp"
 
 #include "line_2d_impl.hpp"
 

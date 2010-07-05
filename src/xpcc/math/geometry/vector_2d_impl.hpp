@@ -48,7 +48,7 @@ xpcc::Vector2D<T>::Vector2D(const T& x, const T& y) :
 }
 
 template<typename T>
-xpcc::Vector2D<T>::Vector2D(const Point2D<T>& A, const Point2D<T>& B) :
+xpcc::Vector2D<T>::Vector2D(const Vector2D<T>& A, const Vector2D<T>& B) :
 	x(B.x - A.x), y(B.y - A.y)
 {
 }
@@ -121,7 +121,7 @@ template<typename T>
 float
 xpcc::Vector2D<T>::getAngle() const
 {
-	return std::atan2(y, x);
+	return std::atan2(this->y, this->x);
 }
 
 // ----------------------------------------------------------------------------
@@ -145,7 +145,7 @@ xpcc::Vector2D<T>::scale(const U& factor)
 {
 	this->x = this->x * factor;
 	this->y = this->y * factor;
-
+	
 	return *this;
 }
 
@@ -168,21 +168,75 @@ xpcc::Vector2D<T>::rotate(float phi)
 // ----------------------------------------------------------------------------
 template<typename T>
 xpcc::Vector2D<T>&
-xpcc::Vector2D<T>::operator += (const Vector2D &other)
+xpcc::Vector2D<T>::translate(const Vector2D<T>& vector)
 {
-	this->x += other.x;
-	this->y += other.y;
+	this->x += vector.x;
+	this->y += vector.y;
+	
 	return *this;
 }
 
-// ----------------------------------------------------------------------------	
+// ----------------------------------------------------------------------------
 template<typename T>
-xpcc::Vector2D<T>&
-xpcc::Vector2D<T>::operator -= (const Vector2D &other)
+typename xpcc::Vector2D<T>::WideType
+xpcc::Vector2D<T>::getDistanceTo(const Vector2D<T>& other) const
 {
-	this->x -= other.x;
-	this->y -= other.y;
-	return *this;
+	return Vector2D<T>(*this, other).getLength();
+}
+
+// ----------------------------------------------------------------------------
+template<typename T>
+int_fast8_t
+xpcc::Vector2D<T>::ccw(const Vector2D<T>& a, const Vector2D<T>& b,
+		const Vector2D<T>& c)
+{
+	WideType dx1 = b.x - a.x;
+	WideType dy1 = b.y - a.y;
+	WideType dx2 = c.x - a.x;
+	WideType dy2 = c.y - a.y;
+	
+	WideType d1 = dx1 * dy2;
+	WideType d2 = dy1 * dx2;
+	
+	if (d1 > d2) {
+		return 1;
+	}
+	else if (d1 < d2) {
+		return -1;
+	}
+	else
+	{
+		if ((dx1 * dx2 < 0) || (dy1 * dy2 < 0)) {
+			return -1;
+		}
+		else
+		{
+			if ((dx1 * dx1 + dy1 * dy1) >= (dx2 * dx2 + dy2 * dy2)) {
+				return 0;
+			}
+			else {
+				return 1;
+			}
+		}
+	}
+}
+
+// ----------------------------------------------------------------------------
+template<typename T>
+typename xpcc::Vector2D<T>::WideType
+xpcc::Vector2D<T>::dot(const xpcc::Vector2D<T>& other) const
+{
+	return (static_cast<WideType>(this->x) * static_cast<WideType>(other.x) +
+			static_cast<WideType>(this->y) * static_cast<WideType>(other.y));
+}
+
+// ----------------------------------------------------------------------------
+template<typename T>
+typename xpcc::Vector2D<T>::WideType
+xpcc::Vector2D<T>::cross(const xpcc::Vector2D<T>& other) const
+{
+	return (static_cast<WideType>(this->x) * static_cast<WideType>(other.y) -
+			static_cast<WideType>(this->y) * static_cast<WideType>(other.x));
 }
 
 // ----------------------------------------------------------------------------
@@ -190,26 +244,91 @@ template<typename T> template<typename U>
 xpcc::Vector2D<U>
 xpcc::Vector2D<T>::convert() const
 {
-	return Vector2D<U>(this->x, this->y);
-}
-
-template<typename T>
-xpcc::Point2D<T>
-xpcc::Vector2D<T>::toPoint() const
-{
-	return Point2D<T>(this->x, this->y);
+	return Vector2D<U>(static_cast<U>(this->x), static_cast<U>(this->y));
 }
 
 // ----------------------------------------------------------------------------
 template<typename T>
-typename xpcc::Vector2D<T>::WideType
-xpcc::Vector2D<T>::dotProduct(const xpcc::Vector2D<T>& a,
-		const xpcc::Vector2D<T>& b)
+xpcc::Vector2D<T>
+xpcc::Vector2D<T>::toOrthogonalVector() const
 {
-	return (static_cast<WideType>(a.x) * static_cast<WideType>(b.x) +
-			static_cast<WideType>(a.y) * static_cast<WideType>(b.y));
+	return Vector2D<T>(this->y, -this->x);
 }
 
+// ----------------------------------------------------------------------------
+template<typename T>
+xpcc::Vector2D<T>
+xpcc::Vector2D<T>::operator - () const
+{
+	return Vector2D(-this->x, -this->y);
+}
+
+template<typename T>
+xpcc::Vector2D<T>
+xpcc::Vector2D<T>::operator - (const Vector2D &other) const
+{
+	return Vector2D<T>(this->x - other.x, this->y - other.y);
+}
+
+template<typename T>
+xpcc::Vector2D<T>
+xpcc::Vector2D<T>::operator + (const Vector2D &other) const
+{
+	return Vector2D<T>(this->x + other.x, this->y + other.y);
+}
+
+template<typename T>
+xpcc::Vector2D<T>&
+xpcc::Vector2D<T>::operator += (const Vector2D &other)
+{
+	this->x += other.x;
+	this->y += other.y;
+	
+	return *this;
+}
+
+template<typename T>
+xpcc::Vector2D<T>&
+xpcc::Vector2D<T>::operator -= (const Vector2D &other)
+{
+	this->x -= other.x;
+	this->y -= other.y;
+	
+	return *this;
+}
+
+// ----------------------------------------------------------------------------
+template<typename T>
+xpcc::Vector2D<T>
+xpcc::Vector2D<T>::operator * (float scale) const
+{
+	return Vector2D<T>(round(this->x * scale), round(this->y * scale));
+}
+
+template<typename T>
+xpcc::Vector2D<T>
+xpcc::Vector2D<T>::operator / (float scale) const
+{
+	return Vector2D<T>(round(this->x / scale), round(this->y / scale));
+}
+
+// ----------------------------------------------------------------------------	
+template<typename T>
+bool
+xpcc::Vector2D<T>::operator == (const Vector2D &other) const
+{
+	return ((this->x == other.x) && (this->y == other.y));
+}
+
+template<typename T>
+bool
+xpcc::Vector2D<T>::operator != (const Vector2D &other) const
+{
+	return ((this->x != other.x) || (this->y != other.y));
+}
+
+// ----------------------------------------------------------------------------
+// Global functions
 // ----------------------------------------------------------------------------
 template <typename U>
 xpcc::IOStream&
@@ -222,36 +341,16 @@ xpcc::operator << (xpcc::IOStream& s, const xpcc::Vector2D<U>& c)
 // ----------------------------------------------------------------------------
 template<typename U>
 xpcc::Vector2D<U>
-xpcc::operator - (const Vector2D<U> &a)
+xpcc::operator * (float scale, const Vector2D<U> &vector)
 {
-	return Vector2D<U>(-a.x, -a.y);
+	// invoke member function
+	return vector * scale;
 }
 
 template<typename U>
 xpcc::Vector2D<U>
-xpcc::operator - (const Vector2D<U> &a, const Vector2D<U> &b)
+xpcc::operator / (float scale, const Vector2D<U> &vector)
 {
-	return Vector2D<U>(a.x - b.x, a.y - b.y);
-}
-
-template<typename U>
-xpcc::Vector2D<U>
-xpcc::operator + (const Vector2D<U> &a, const Vector2D<U> &b)
-{
-	return Vector2D<U>(a.x + b.x, a.y + b.y);
-}
-
-
-template<typename U>
-bool
-xpcc::operator == (const Vector2D<U> &a, const Vector2D<U> &b)
-{
-	return ((a.x == b.x) && (a.y == b.y));
-}
-
-template<typename U>
-bool
-xpcc::operator != (const Vector2D<U> &a, const Vector2D<U> &b)
-{
-	return ((a.x != b.x) || (a.y != b.y));
+	// invoke member function
+	return vector / scale;
 }

@@ -30,102 +30,57 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__LINE_SEGMENT_2D_HPP
-#define XPCC__LINE_SEGMENT_2D_HPP
+#ifndef XPCC__POINT_SET_2D_HPP
+#define XPCC__POINT_SET_2D_HPP
 
-#include "geometric_traits.hpp"
-
+#include <xpcc/container/dynamic_array.hpp>
 #include "vector_2d.hpp"
-#include "line_2d.hpp"
 
 namespace xpcc
 {
-	// forward declaration
-	template <typename T>
-	class Circle2D;
-	
 	/**
-	 * \brief	Line segment
-	 * 
+	 * \brief	Point set
+	 *
 	 * \author	Fabian Greif
 	 * \ingroup	geometry
 	 */
 	template <typename T>
-	class LineSegment2D
+	class PointSet2D
 	{
 	public:
-		typedef typename GeometricTraits<T>::WideType WideType;
-		typedef typename GeometricTraits<T>::FloatType FloatType;
-		
+		typedef std::size_t SizeType;
+
 	public:
-		LineSegment2D();
+		/**
+		 * \brief	Constructs a set capable of holding n points (default = 2)
+		 */
+		PointSet2D(SizeType n = 2);
 		
-		LineSegment2D(const Vector2D<T>& start, const Vector2D<T>& end);
+		inline SizeType
+		getNumberOfPoints() const;
 		
 		
-		/// Set the starting point of the line segment
 		inline void
-		setStartPoint(const Vector2D<T>& point);
-		
+		append(const Vector2D<T>& point);
+
+		inline Vector2D<T>&
+		operator [](SizeType index);
+
 		inline const Vector2D<T>&
-		getStartPoint() const;
+		operator [](SizeType index) const;
 		
-		/// Set the end point of the line segment
+		
+		/**
+		 * \brief	Remove all points
+		 */
 		inline void
-		setEndPoint(const Vector2D<T>& point);
-		
-		inline const Vector2D<T>&
-		getEndPoint() const;
-		
-		inline void
-		set(const Vector2D<T>& start, const Vector2D<T>& end);
-		
-		/**
-		 * \brief	Length of the line segment
-		 */
-		T
-		getLength() const;
-		
-		/// Shortest distance to a point
-		const T
-		getDistanceTo(const Vector2D<T>& point) const;
-		
-		/**
-		 * \brief	Check if two line segments intersect
-		 * 
-		 * Uses Vector2D::ccw() to check if any intersection exists.
-		 */
-		bool
-		intersects(const LineSegment2D& other);
-		
-		/**
-		 * \brief	Calculate the intersection point
-		 */
-		bool
-		intersect(const LineSegment2D& other, PointSet2D<T>& intersectionPoints) const;
-		
-		/**
-		 * \brief	Calculate the intersection points between a circle and a line segment
-		 * 
-		 * \see		http://local.wasp.uwa.edu.au/~pbourke/geometry/sphereline/
-		 */
-		bool
-		intersect(const Circle2D<T>& circle, PointSet2D<T>& intersectionPoints) const;
-		
-		bool
-		operator == (const LineSegment2D &other) const;
-		
-		bool
-		operator != (const LineSegment2D &other) const;
+		removeAll();
 		
 	protected:
-		xpcc::Vector2D<T> startPoint;
-		xpcc::Vector2D<T> endPoint;
+		xpcc::DynamicArray< Vector2D<T> > points;
 	};
 }
 
-#include "circle_2d.hpp"
+#include "point_set_2d_impl.hpp"
 
-#include "line_segment_2d_impl.hpp"
-
-#endif // XPCC__LINE_SEGMENT_2D_HPP
+#endif // XPCC__POINT_SET_2D_HPP

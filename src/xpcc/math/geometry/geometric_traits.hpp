@@ -33,6 +33,10 @@
 #ifndef GEOMETRIC_TRAITS_HPP
 #define GEOMETRIC_TRAITS_HPP
 
+#include <xpcc/debug/logger/logger.hpp>		// TODO only for debugging
+#undef  XPCC_LOG_LEVEL
+#define XPCC_LOG_LEVEL xpcc::log::DEBUG
+
 #include <stdint.h>
 
 namespace xpcc

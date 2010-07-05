@@ -40,7 +40,7 @@ xpcc::Location2D<T>::Location2D() :
 }
 
 template <typename T>
-xpcc::Location2D<T>::Location2D(const Point2D<T>& position,
+xpcc::Location2D<T>::Location2D(const Vector2D<T>& position,
 		const float& orientation) :
 	position(position),
 	orientation(orientation)
@@ -49,7 +49,7 @@ xpcc::Location2D<T>::Location2D(const Point2D<T>& position,
 
 // ----------------------------------------------------------------------------
 template <typename T>
-const xpcc::Point2D<T>&
+const xpcc::Vector2D<T>&
 xpcc::Location2D<T>::getPosition() const
 {
 	return this->position;
@@ -71,7 +71,7 @@ xpcc::Location2D<T>::getY() const
 
 template <typename T>
 void
-xpcc::Location2D<T>::setPosition(const Point2D<T>& point)
+xpcc::Location2D<T>::setPosition(const Vector2D<T>& point)
 {
 	this->position = point;
 }
@@ -100,9 +100,9 @@ xpcc::Location2D<T>::setOrientation(const float& orientation)
 // -----------------------------------------------------------------------------
 template <typename T>
 void
-xpcc::Location2D<T>::move(Location2D<T>& diff)
+xpcc::Location2D<T>::move(const Location2D<T>& diff)
 {
-	Vector2D<T> movement = diff.position.toVector();
+	Vector2D<T> movement = diff.position;
 	movement.rotate(this->orientation);
 	
 	this->position.translate(movement);

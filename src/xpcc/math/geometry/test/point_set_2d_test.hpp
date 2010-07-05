@@ -32,27 +32,12 @@
 
 #include <unittest/testsuite.hpp>
 
-class Point2DTest : public unittest::TestSuite
+class PointSet2DTest : public unittest::TestSuite
 {
 public:
-	void
-	testDefaultConstructor();
-	
 	void
 	testConstructor();
 	
 	void
-	testDistance();
-	
-	void
-	testTranslate();
-	
-	void
-	testConversion();
-	
-	void
-	testComparision();
-	
-	void
-	testCCW();
+	testAppendAndAccess();
 };

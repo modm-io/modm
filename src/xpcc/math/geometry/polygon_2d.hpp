@@ -33,46 +33,28 @@
 #ifndef XPCC__POLYGON_2D_HPP
 #define XPCC__POLYGON_2D_HPP
 
-#include <xpcc/container/dynamic_array.hpp>
-#include "point_2d.hpp"
+#include "point_set_2d.hpp"
 
 namespace xpcc
 {
 	/**
 	 * \brief	Polygon
 	 *
-	 * The Polygon class provides a vector of points.
+	 * The Polygon class provides a vector of points. The polygon is
+	 * implicit closed, meaning the first and the last point are connected.
 	 *
 	 * \author	Fabian Greif
 	 * \ingroup	geometry
 	 */
 	template <typename T>
-	class Polygon2D
+	class Polygon2D : public PointSet2D<T>
 	{
-	public:
 		typedef std::size_t SizeType;
-
 	public:
 		/**
 		 * \brief	Constructs a polygon capable of holding n points
 		 */
 		Polygon2D(SizeType n);
-		
-		inline SizeType
-		getNumberOfPoints() const;
-		
-		
-		inline void
-		append(const Point2D<T>& point);
-
-		inline Point2D<T>&
-		operator [](SizeType index);
-
-		inline const Point2D<T>&
-		operator [](SizeType index) const;
-
-	private:
-		xpcc::DynamicArray< Point2D<T> > points;
 	};
 }
 

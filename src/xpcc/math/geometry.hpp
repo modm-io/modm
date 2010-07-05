@@ -30,13 +30,23 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__POLYGON_2D_HPP
-	#error	"Don't include this file directly, use 'polygon_2d.hpp' instead!"
-#endif
+#ifndef	XPCC__GEOMETRY_HPP
+#define	XPCC__GEOMETRY_HPP
 
-// ----------------------------------------------------------------------------
-template <typename T>
-xpcc::Polygon2D<T>::Polygon2D(SizeType n) :
-	PointSet2D<T>(n)
-{
-}
+/**
+ * \ingroup		math
+ * \defgroup	geometry Geometry
+ * \brief 		Geometric classes and operations
+ * 
+ * 
+ */
+#include <xpcc/math/geometry/angle.hpp>
+#include <xpcc/math/geometry/circle_2d.hpp>
+#include <xpcc/math/geometry/line_2d.hpp>
+#include <xpcc/math/geometry/line_segment_2d.hpp>
+#include <xpcc/math/geometry/location_2d.hpp>
+#include <xpcc/math/geometry/point_set_2d.hpp>
+#include <xpcc/math/geometry/polygon_2d.hpp>
+#include <xpcc/math/geometry/vector_2d.hpp>
+
+#endif	// XPCC__GEOMETRY_HPP

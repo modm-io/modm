@@ -38,7 +38,7 @@
 #include <xpcc/io/iostream.hpp>
 
 #include "angle.hpp"
-#include "point_2d.hpp"
+#include "vector_2d.hpp"
 
 namespace xpcc
 {
@@ -57,9 +57,9 @@ namespace xpcc
 	public:
 		Location2D();
 		
-		Location2D(const Point2D<T>& position, const float& orientation);
+		Location2D(const Vector2D<T>& position, const float& orientation);
 		
-		inline const Point2D<T>&
+		inline const Vector2D<T>&
 		getPosition() const;
 		
 		inline const T&
@@ -69,7 +69,7 @@ namespace xpcc
 		getY() const;
 		
 		void
-		setPosition(const Point2D<T>& point);
+		setPosition(const Vector2D<T>& point);
 		
 		void
 		setPosition(const T& x, const T& y);
@@ -82,7 +82,7 @@ namespace xpcc
 		
 		/// Add a position increment
 		void
-		move(Location2D& diff);
+		move(const Location2D& diff);
 		
 		/**
 		 * \brief	Add a increment only in x-direction
@@ -103,7 +103,7 @@ namespace xpcc
 		friend IOStream&
 		operator <<( IOStream&, const Location2D<U>&);
 		
-		Point2D<T> position;
+		Vector2D<T> position;
 		float orientation;
 	};
 	

@@ -57,6 +57,9 @@ public:
 	testRotate();
 	
 	void
+	testTranslate();
+	
+	void
 	testRotateFloat();
 	
 	void
@@ -70,4 +73,13 @@ public:
 	
 	void
 	testDotProduct();
+	
+	void
+	testCrossProduct();
+	
+	void
+	testDistance();
+	
+	void
+	testCCW();
 };

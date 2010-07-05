@@ -30,25 +30,35 @@
  */
 // ----------------------------------------------------------------------------
 
-#include "point_2d.hpp"
+#include <xpcc/math/geometry/polygon_2d.hpp>
 
-// this explicit namespace is needed here, otherwise we get an error about 
-// "specialization of ... in different namespace"
-namespace xpcc
+#include "polygon_2d_test.hpp"
+
+void
+Polygon2DTest::testConstructor()
 {
-	template<>
-	template<>
-	Point2D<double>
-	Point2D<float>::convert() const
-	{
-		return Point2D<double>(this->x, this->y);
-	}
+	xpcc::Polygon2D<int16_t> polygon(5);
 	
-	template<>
-	template<>
-	Point2D<float>
-	Point2D<double>::convert() const
-	{
-		return Point2D<float>(this->x, this->y);
-	}
+	TEST_ASSERT_EQUALS(polygon.getNumberOfPoints(), 0U);
+}
+
+void
+Polygon2DTest::testAppendAndAccess()
+{
+	xpcc::Polygon2D<int16_t> polygon(5);
+	
+	polygon.append(xpcc::Vector2D<int16_t>(10, 20));
+	
+	TEST_ASSERT_EQUALS(polygon.getNumberOfPoints(), 1U);
+	TEST_ASSERT_EQUALS(polygon[0], xpcc::Vector2D<int16_t>(10, 20));
+	
+	polygon.append(xpcc::Vector2D<int16_t>(30, 40));
+	
+	TEST_ASSERT_EQUALS(polygon.getNumberOfPoints(), 2U);
+	TEST_ASSERT_EQUALS(polygon[0], xpcc::Vector2D<int16_t>(10, 20));
+	TEST_ASSERT_EQUALS(polygon[1], xpcc::Vector2D<int16_t>(30, 40));
+	
+	polygon[0] = xpcc::Vector2D<int16_t>(50, 60);
+	
+	TEST_ASSERT_EQUALS(polygon[0], xpcc::Vector2D<int16_t>(50, 60));
 }

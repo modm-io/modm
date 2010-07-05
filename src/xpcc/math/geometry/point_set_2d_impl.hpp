@@ -30,13 +30,52 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__POLYGON_2D_HPP
-	#error	"Don't include this file directly, use 'polygon_2d.hpp' instead!"
+#ifndef XPCC__POINT_SET_2D_HPP
+	#error	"Don't include this file directly, use 'point_set_2d.hpp' instead!"
 #endif
 
 // ----------------------------------------------------------------------------
 template <typename T>
-xpcc::Polygon2D<T>::Polygon2D(SizeType n) :
-	PointSet2D<T>(n)
+xpcc::PointSet2D<T>::PointSet2D(SizeType n) :
+	points(n)
 {
+}
+
+// ----------------------------------------------------------------------------
+template <typename T>
+typename xpcc::PointSet2D<T>::SizeType
+xpcc::PointSet2D<T>::getNumberOfPoints() const
+{
+	return points.getSize();
+}
+
+// ----------------------------------------------------------------------------
+template <typename T>
+void
+xpcc::PointSet2D<T>::append(const Vector2D<T>& point)
+{
+	points.append(point);
+}
+
+// ----------------------------------------------------------------------------
+template <typename T>
+xpcc::Vector2D<T>&
+xpcc::PointSet2D<T>::operator [](SizeType index)
+{
+	return points[index];
+}
+
+template <typename T>
+const xpcc::Vector2D<T>&
+xpcc::PointSet2D<T>::operator [](SizeType index) const
+{
+	return points[index];
+}
+
+// ----------------------------------------------------------------------------
+template <typename T>
+void
+xpcc::PointSet2D<T>::removeAll()
+{
+	points.removeAll();
 }

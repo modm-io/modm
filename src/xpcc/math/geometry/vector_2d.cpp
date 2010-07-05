@@ -75,8 +75,9 @@ namespace xpcc
 	Vector2D<int16_t>::getLength() const
 	{
 		int32_t t;
-		t = math::mul32(x, x);
-		t = math::mac32(t, y, y);
+		
+		t = math::mul32(this->x, this->x);
+		t = math::mac32(t,this-> y, this->y);
 		
 		return math::sqrt32(t);
 	}
@@ -87,8 +88,20 @@ namespace xpcc
 	{
 		int32_t t;
 		
-		t = math::mul32(x, x);
-		t = math::mac32(t, y, y);
+		t = math::mul32(this->x, this->x);
+		t = math::mac32(t,this-> y, this->y);
+		
+		return t;
+	}
+	
+	template<>
+	int32_t
+	Vector2D<int16_t>::dot(const xpcc::Vector2D<int16_t>& other) const
+	{
+		int32_t t;
+		
+		t = math::mul32(this->x, other.x);
+		t = math::mac32(t,this->y, other.y);
 		
 		return t;
 	}

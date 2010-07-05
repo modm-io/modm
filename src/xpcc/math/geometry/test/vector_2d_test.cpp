@@ -181,6 +181,18 @@ Vector2DTest::testRotateFloat()
 }
 
 void
+Vector2DTest::testTranslate()
+{
+	xpcc::Vector2D<int16_t> a(10, 10);
+	xpcc::Vector2D<int16_t> b(20, -20);
+	
+	a.translate(b);
+	
+	TEST_ASSERT_EQUALS(a.getX(), 30);
+	TEST_ASSERT_EQUALS(a.getY(), -10);
+}
+
+void
 Vector2DTest::testConversion()
 {
 	xpcc::Vector2D<float> a(12.763f, -13.3123f);
@@ -192,11 +204,6 @@ Vector2DTest::testConversion()
 	
 	TEST_ASSERT_EQUALS(b.getX(), 13);
 	TEST_ASSERT_EQUALS(b.getY(), -13);
-	
-	xpcc::Point2D<int16_t> c = b.toPoint();
-	
-	TEST_ASSERT_EQUALS(c.getX(), 13);
-	TEST_ASSERT_EQUALS(c.getY(), -13);
 }
 
 void
@@ -276,7 +283,49 @@ Vector2DTest::testDotProduct()
 	xpcc::Vector2D<int16_t> b(1000, 0);
 	xpcc::Vector2D<int16_t> c(1000, -1000);
 	
-	TEST_ASSERT_EQUALS(xpcc::Vector2D<int16_t>::dotProduct(a, b), 1000000);
-	TEST_ASSERT_EQUALS(xpcc::Vector2D<int16_t>::dotProduct(a, c), 0);
-	TEST_ASSERT_EQUALS(xpcc::Vector2D<int16_t>::dotProduct(b, c), 1000000);
+	TEST_ASSERT_EQUALS(a.dot(b), 1000000);
+	TEST_ASSERT_EQUALS(a.dot(c), 0);
+	TEST_ASSERT_EQUALS(b.dot(c), 1000000);
+}
+
+void
+Vector2DTest::testCrossProduct()
+{
+	// TODO
+}
+
+void
+Vector2DTest::testDistance()
+{
+	xpcc::Vector2D<int16_t> a(10, 10);
+	xpcc::Vector2D<int16_t> b(20, 20);
+	
+	TEST_ASSERT_EQUALS(a.getDistanceTo(b), 14);
+	
+	xpcc::Vector2D<int16_t> c(40, 20);
+	
+	TEST_ASSERT_EQUALS(a.getDistanceTo(c), 32);
+}
+
+void
+Vector2DTest::testCCW()
+{
+	xpcc::Vector2D<int16_t> a(0, 0);	
+	xpcc::Vector2D<int16_t> b(30, 30);
+	xpcc::Vector2D<int16_t> c(40, 40);
+	xpcc::Vector2D<int16_t> d(0, 40);
+	
+	TEST_ASSERT_EQUALS(xpcc::Vector2D<int16_t>::ccw(a, b, d), 1);
+	TEST_ASSERT_EQUALS(xpcc::Vector2D<int16_t>::ccw(b, d, a), 1);
+	TEST_ASSERT_EQUALS(xpcc::Vector2D<int16_t>::ccw(b, a, d), -1);
+	TEST_ASSERT_EQUALS(xpcc::Vector2D<int16_t>::ccw(a, d, b), -1);
+	
+	// three points in a strait row
+	TEST_ASSERT_EQUALS(xpcc::Vector2D<int16_t>::ccw(a, b, c), 1);
+	
+	// last point between the two other
+	TEST_ASSERT_EQUALS(xpcc::Vector2D<int16_t>::ccw(a, c, b), 0);
+	
+	// last point before the first
+	TEST_ASSERT_EQUALS(xpcc::Vector2D<int16_t>::ccw(b, c, a), -1);
 }

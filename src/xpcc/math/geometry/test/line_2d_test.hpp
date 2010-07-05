@@ -46,4 +46,10 @@ public:
 	
 	void
 	testDistanceToPoint();
+	
+	void
+	testIntersectionPointsLine();
+	
+	void
+	testIntersectionPointsCircle();
 };
