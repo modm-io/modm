@@ -54,7 +54,22 @@ template <typename T>
 bool
 xpcc::Polygon2D<T>::intersects(const Polygon2D& other) const
 {
-	// TODO
+	SizeType n = this->points.getSize();
+	SizeType m = other.points.getSize();
+	
+	for (SizeType i = 0; i < n; ++i)
+	{
+		for (SizeType k = 0; k < m; ++k)
+		{
+			LineSegment2D<T> lineSegmentOwn(this->points[i], this->points[(i + 1) % n]);
+			LineSegment2D<T> lineSegmentOther(other.points[k], other.points[(k + 1) % m]);
+			
+			if (lineSegmentOwn.intersects(lineSegmentOther)) {
+				return true;
+			}
+		}
+	}
+	
 	return false;
 }
 
@@ -63,24 +78,55 @@ template <typename T>
 bool
 xpcc::Polygon2D<T>::intersects(const Circle2D<T>& circle) const
 {
-	// TODO
+	SizeType n = this->points.getSize();
+	for (SizeType i = 0; i < n; ++i)
+	{
+		LineSegment2D<T> segment(this->points[i], this->points[(i + 1) % n]);
+		
+		T distance = segment.getDistanceTo(circle.getCenter());
+		
+		if (distance <= circle.getRadius()) {
+			return true;
+		}
+	}
+	
 	return false;
 }
 
 // ----------------------------------------------------------------------------
 template <typename T>
 bool
-xpcc::Polygon2D<T>::intersects(const LineSegment2D<T>& line) const
+xpcc::Polygon2D<T>::intersects(const LineSegment2D<T>& segment) const
 {
-	// TODO
+	SizeType n = this->points.getSize();
+	for (SizeType i = 0; i < n; ++i)
+	{
+		LineSegment2D<T> ownSegment(this->points[i], this->points[(i + 1) % n]);
+		
+		if (segment.intersects(ownSegment)) {
+			return true;
+		}
+	}
+	
 	return false;
 }
 
 // ----------------------------------------------------------------------------
 template <typename T>
 bool
-xpcc::Polygon2D<T>::intersect(const LineSegment2D<T>& line, PointSet2D<T>& intersectionPoints) const
+xpcc::Polygon2D<T>::intersect(const LineSegment2D<T>& segment, PointSet2D<T>& intersectionPoints) const
 {
-	// TODO
-	return false;
+	bool intersectionFound = false;
+	
+	SizeType n = this->points.getSize();
+	for (SizeType i = 0; i < n; ++i)
+	{
+		LineSegment2D<T> ownSegment(this->points[i], this->points[(i + 1) % n]);
+		
+		if (segment.intersect(ownSegment, intersectionPoints)) {
+			intersectionFound = true;
+		}
+	}
+	
+	return intersectionFound;
 }

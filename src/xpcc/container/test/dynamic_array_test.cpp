@@ -30,7 +30,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <unittest/types/counter_type.hpp>
+#include <unittest/type/counter_type.hpp>
 #include <xpcc/container/dynamic_array.hpp>
 
 #include "dynamic_array_test.hpp"

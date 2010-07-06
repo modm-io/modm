@@ -67,7 +67,11 @@ namespace xpcc
 		Polygon2D&
 		operator << (const Vector2D<T>& point);
 		
-		/// Check if a intersection exists
+		/**
+		 * \brief	Check if a intersection exists
+		 * 
+		 * \todo	Used currently a brute force approach, needs to be optimized
+		 */
 		bool
 		intersects(const Polygon2D& other) const;
 		
@@ -77,13 +81,13 @@ namespace xpcc
 		
 		/// Check if a intersection exists
 		bool
-		intersects(const LineSegment2D<T>& line) const;
+		intersects(const LineSegment2D<T>& segment) const;
 		
 		/**
 		 * \brief	Calculate the intersection point
 		 */
 		bool
-		intersect(const LineSegment2D<T>& line, PointSet2D<T>& intersectionPoints) const;
+		intersect(const LineSegment2D<T>& segment, PointSet2D<T>& intersectionPoints) const;
 	};
 }
 

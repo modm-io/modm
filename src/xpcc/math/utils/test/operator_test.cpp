@@ -60,7 +60,7 @@ OperatorTest::testMultiplication()
 	TEST_ASSERT_EQUALS(xpcc::math::mul32((uint16_t) 100, (uint16_t) 100), 10000U);
 	TEST_ASSERT_EQUALS(xpcc::math::mul32((uint16_t) 1000, (uint16_t) 1000), 1000000U);
 	TEST_ASSERT_EQUALS(xpcc::math::mul32((uint16_t) 10000, (uint16_t) 10000), 100000000U);
-	TEST_ASSERT_EQUALS(xpcc::math::mul32((uint16_t) 60000, (uint16_t) 60000), 3600000000UL);
+	TEST_ASSERT_EQUALS(xpcc::math::mul32((uint16_t) 60000, (uint16_t) 60000), 3600000000U);
 	
 	TEST_ASSERT_EQUALS(xpcc::math::mul32((int16_t) 1, (int16_t) 1), 1);
 	TEST_ASSERT_EQUALS(xpcc::math::mul32((int16_t) 10, (int16_t) 10), 100);

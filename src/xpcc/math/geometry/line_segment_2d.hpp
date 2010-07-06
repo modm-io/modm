@@ -36,13 +36,16 @@
 #include "geometric_traits.hpp"
 
 #include "vector_2d.hpp"
-#include "line_2d.hpp"
+#include "point_set_2d.hpp"
 
 namespace xpcc
 {
 	// forward declaration
 	template <typename T>
 	class Circle2D;
+	
+	template <typename T>
+	class Polygon2D;
 	
 	/**
 	 * \brief	Line segment
@@ -96,7 +99,11 @@ namespace xpcc
 		 * Uses Vector2D::ccw() to check if any intersection exists.
 		 */
 		bool
-		intersects(const LineSegment2D& other);
+		intersects(const LineSegment2D& other) const;
+		
+		/// Check if a intersection exists
+		bool
+		intersects(const Polygon2D<T>& polygon) const;
 		
 		/**
 		 * \brief	Calculate the intersection point
@@ -113,6 +120,9 @@ namespace xpcc
 		intersect(const Circle2D<T>& circle, PointSet2D<T>& intersectionPoints) const;
 		
 		bool
+		intersect(const Polygon2D<T>& polygon, PointSet2D<T>& intersectionPoints) const;
+		
+		bool
 		operator == (const LineSegment2D &other) const;
 		
 		bool
@@ -125,6 +135,7 @@ namespace xpcc
 }
 
 #include "circle_2d.hpp"
+#include "polygon_2d.hpp"
 
 #include "line_segment_2d_impl.hpp"
 

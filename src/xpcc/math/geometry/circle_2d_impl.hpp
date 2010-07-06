@@ -77,6 +77,14 @@ xpcc::Circle2D<T>::setRadius(T radius)
 }
 
 // ----------------------------------------------------------------------------
+template<typename T>
+bool
+xpcc::Circle2D<T>::intersects(const Polygon2D<T>& polygon) const
+{
+	return polygon.intersects(*this);
+}
+
+// ----------------------------------------------------------------------------
 template <typename T>
 bool
 xpcc::Circle2D<T>::intersect(const Circle2D& other, PointSet2D<T>& intersectionPoints) const

@@ -132,12 +132,20 @@ xpcc::LineSegment2D<T>::getDistanceTo(const Vector2D<T>& point) const
 // ----------------------------------------------------------------------------
 template<typename T>
 bool
-xpcc::LineSegment2D<T>::intersects(const LineSegment2D<T>& other)
+xpcc::LineSegment2D<T>::intersects(const LineSegment2D<T>& other) const
 {
 	return (((Vector2D<T>::ccw(this->startPoint, this->endPoint, other.startPoint) *
 			  Vector2D<T>::ccw(this->startPoint, this->endPoint, other.endPoint)) <= 0) &&
 			((Vector2D<T>::ccw(other.startPoint, other.endPoint, this->startPoint) *
 			  Vector2D<T>::ccw(other.startPoint, other.endPoint, this->endPoint)) <= 0));
+}
+
+// ----------------------------------------------------------------------------
+template<typename T>
+bool
+xpcc::LineSegment2D<T>::intersects(const Polygon2D<T>& polygon) const
+{
+	return polygon.intersects(*this);
 }
 
 // ----------------------------------------------------------------------------
@@ -220,6 +228,16 @@ xpcc::LineSegment2D<T>::intersect(const Circle2D<T>& circle,
 		}
 		return result;
 	}
+}
+
+// ----------------------------------------------------------------------------
+template <typename T>
+bool
+xpcc::LineSegment2D<T>::intersect(const Polygon2D<T>& polygon,
+		PointSet2D<T>& intersectionPoints) const
+{
+	// invoke intersection method of the polygon
+	return polygon.intersect(*this, intersectionPoints);
 }
 
 // ----------------------------------------------------------------------------

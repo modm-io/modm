@@ -48,6 +48,9 @@ namespace xpcc
 	template <typename T>
 	class LineSegment2D;
 	
+	template <typename T>
+	class Polygon2D;
+	
 	/**
 	 * \brief	Circle
 	 * 
@@ -76,6 +79,10 @@ namespace xpcc
 		
 		inline void
 		setRadius(T radius);
+		
+		/// Check if a intersection exists
+		bool
+		intersects(const Polygon2D<T>& polygon) const;
 		
 		/**
 		 * \brief	Calculate intersection points
@@ -111,6 +118,7 @@ namespace xpcc
 
 #include "line_2d.hpp"
 #include "line_segment_2d.hpp"
+#include "polygon_2d.hpp"
 
 #include "circle_2d_impl.hpp"
 
