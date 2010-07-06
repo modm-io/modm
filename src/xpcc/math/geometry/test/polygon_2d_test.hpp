@@ -40,4 +40,19 @@ public:
 	
 	void
 	testAppendAndAccess();
+	
+	void
+	testShiftOperator();
+	
+	void
+	testIntersectionPolygon();
+	
+	void
+	testIntersectionCircle();
+	
+	void
+	testIntersectionLineSegment();
+	
+	void
+	testIntersectionPointsLineSegment();
 };

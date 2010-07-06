@@ -40,3 +40,47 @@ xpcc::Polygon2D<T>::Polygon2D(SizeType n) :
 	PointSet2D<T>(n)
 {
 }
+
+template <typename T>
+xpcc::Polygon2D<T>&
+xpcc::Polygon2D<T>::operator << (const Vector2D<T>& point)
+{
+	this->append(point);
+	return *this;
+}
+
+// ----------------------------------------------------------------------------
+template <typename T>
+bool
+xpcc::Polygon2D<T>::intersects(const Polygon2D& other) const
+{
+	// TODO
+	return false;
+}
+
+// ----------------------------------------------------------------------------
+template <typename T>
+bool
+xpcc::Polygon2D<T>::intersects(const Circle2D<T>& circle) const
+{
+	// TODO
+	return false;
+}
+
+// ----------------------------------------------------------------------------
+template <typename T>
+bool
+xpcc::Polygon2D<T>::intersects(const LineSegment2D<T>& line) const
+{
+	// TODO
+	return false;
+}
+
+// ----------------------------------------------------------------------------
+template <typename T>
+bool
+xpcc::Polygon2D<T>::intersect(const LineSegment2D<T>& line, PointSet2D<T>& intersectionPoints) const
+{
+	// TODO
+	return false;
+}

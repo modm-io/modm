@@ -40,7 +40,14 @@ namespace xpcc
 {
 	/**
 	 * \brief	Point set
-	 *
+	 * 
+	 * Collection of points, represented by their corresponding vectors.
+	 * Used for example to hold the result of a intersection-operation.
+	 * 
+	 * Based on the xpcc::DynamicArray class, therefore grows automatically
+	 * if more space than currently allocated is needed. But because this
+	 * is an expensive operation it should be avoid if possible.
+	 * 
 	 * \author	Fabian Greif
 	 * \ingroup	geometry
 	 */
@@ -56,6 +63,7 @@ namespace xpcc
 		 */
 		PointSet2D(SizeType n = 2);
 		
+		/// Numer of points contained in the set
 		inline SizeType
 		getNumberOfPoints() const;
 		
@@ -68,7 +76,6 @@ namespace xpcc
 
 		inline const Vector2D<T>&
 		operator [](SizeType index) const;
-		
 		
 		/**
 		 * \brief	Remove all points

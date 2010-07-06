@@ -47,7 +47,10 @@ namespace xpcc
 	/**
 	 * \brief	2D Vector
 	 * 
-	 * \section	point_vector	Point - vector duality
+	 * Basic data type of all geometric operations. Used to represent vectors
+	 * as well as particular points in the coordinate system.
+	 * 
+	 * \subsection	point_vector	Point vs. vector
 	 * 
 	 * In geometry, it is often convenient to use vector arithmetic to
 	 * represent points.
@@ -60,8 +63,9 @@ namespace xpcc
 	 * which is the endpoint of the vector when its starting point is the
 	 * origin.
 	 * 
-	 * Therefore a haven't defined a Point2D-class, but only a Vector2D class.
+	 * Therefore there isn't a Point2D-class, but only a Vector2D class.
 	 * 
+	 * \author	Fabian Greif
 	 * \ingroup	geometry
 	 */
 	template<typename T = int16_t>
@@ -119,7 +123,7 @@ namespace xpcc
 		 * \brief	Calculate squared length of the vector
 		 * 
 		 * This method is considerably faster than getLength() because it
-		 * doesn't a to calculate the square root.
+		 * doesn't need to calculate the square root.
 		 * 
 		 * \return	squared length (x*x + y*y)
 		 */
@@ -140,7 +144,7 @@ namespace xpcc
 		 * \brief	Normalize length to 1
 		 * 
 		 * \warning	This method is only useful if T is a floating point type.
-		 * 			For integer types the result will be wrong!
+		 * 			For integer types the result might be wrong!
 		 */
 		Vector2D&
 		normalize();
@@ -192,9 +196,24 @@ namespace xpcc
 		/**
 		 * \brief	Calculate the cross-product
 		 * 
+		 * In 2D there is no clear definition of this operation. 
+		 * 
+		 * This implementation is the most common one and will return the
+		 * magnitude of the vector that would result from a regular 
+		 * 3D cross product of the input vectors, taking their Z values
+		 * implicitly as 0 (i.e. treating the 2D space as a plane in the 3D space).
+		 * The 3D cross product will be perpendicular to that plane, and thus
+		 * have 0 X & Y components (thus the scalar returned is the Z value of
+		 * the 3D cross product vector).
+		 * 
 		 * \code
 		 * this.x * other.y - this.y * other.x
 		 * \endcode
+		 * 
+		 * Other implementations take no arguments and returns a vector
+		 * perpendicular to the input vector. This can be reached with the
+		 * toOrthogonalVector() method, which returns a perpendicular copy
+		 * of the vector.
 		 */
 		WideType
 		cross(const Vector2D<T>& other) const;
@@ -207,7 +226,7 @@ namespace xpcc
 		convert() const;
 		
 		/**
-		 * \brief	Returns a orthogonal copy of the vector
+		 * \brief	Returns a perpendicular copy of the vector
 		 * 
 		 * \return	(y, -x)
 		 */
@@ -230,17 +249,9 @@ namespace xpcc
 		Vector2D&
 		operator -= (const Vector2D &other);
 		
-		/**
-		 * \brief	Scalar multiplication
-		 * 
-		 * \todo	specialization for T = float or double
-		 */
 		Vector2D
 		operator * (float scale) const;
 		
-		/**
-		 * \todo	specialization for T = float or double
-		 */
 		Vector2D
 		operator / (float scale) const;
 		
@@ -290,20 +301,6 @@ namespace xpcc
 	// ------------------------------------------------------------------------
 	// Declaration of specialized methods
 	// ------------------------------------------------------------------------
-	
-	template<>
-	Vector2D<float>&
-	Vector2D<float>::rotate(const float phi);
-	
-	template<>
-	float
-	Vector2D<float>::getLength() const;
-	
-	template<>
-	double
-	Vector2D<double>::getLength() const;
-	
-	
 	template<>
 	int16_t
 	Vector2D<int16_t>::getLength() const;

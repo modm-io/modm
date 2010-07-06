@@ -47,7 +47,7 @@ namespace xpcc
 	 * 
 	 * This class is primarily used to describe the location of a robot
 	 * on the field. The robot has a position (x- and y-coordinate) and a
-	 * orientation (absolute angle).
+	 * orientation (absolute angle in the range (-pi, pi)).
 	 * 
 	 * \ingroup	geometry
 	 */
@@ -122,9 +122,6 @@ namespace xpcc
 	// ------------------------------------------------------------------------
 	// Declaration of specialized methods
 	// ------------------------------------------------------------------------
-	template <>
-	void
-	Location2D<float>::move(float x, float phi);
 }
 
 #include "location_2d_impl.hpp"

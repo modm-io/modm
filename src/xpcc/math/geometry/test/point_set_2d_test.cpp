@@ -30,35 +30,35 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/math/geometry/polygon_2d.hpp>
+#include <xpcc/math/geometry/point_set_2d.hpp>
 
-#include "polygon_2d_test.hpp"
+#include "point_set_2d_test.hpp"
 
 void
-Polygon2DTest::testConstructor()
+PointSet2DTest::testConstructor()
 {
-	xpcc::Polygon2D<int16_t> polygon(5);
+	xpcc::PointSet2D<int16_t> set(5);
 	
-	TEST_ASSERT_EQUALS(polygon.getNumberOfPoints(), 0U);
+	TEST_ASSERT_EQUALS(set.getNumberOfPoints(), 0U);
 }
 
 void
-Polygon2DTest::testAppendAndAccess()
+PointSet2DTest::testAppendAndAccess()
 {
-	xpcc::Polygon2D<int16_t> polygon(5);
+	xpcc::PointSet2D<int16_t> set(5);
 	
-	polygon.append(xpcc::Vector2D<int16_t>(10, 20));
+	set.append(xpcc::Vector2D<int16_t>(10, 20));
 	
-	TEST_ASSERT_EQUALS(polygon.getNumberOfPoints(), 1U);
-	TEST_ASSERT_EQUALS(polygon[0], xpcc::Vector2D<int16_t>(10, 20));
+	TEST_ASSERT_EQUALS(set.getNumberOfPoints(), 1U);
+	TEST_ASSERT_EQUALS(set[0], xpcc::Vector2D<int16_t>(10, 20));
 	
-	polygon.append(xpcc::Vector2D<int16_t>(30, 40));
+	set.append(xpcc::Vector2D<int16_t>(30, 40));
 	
-	TEST_ASSERT_EQUALS(polygon.getNumberOfPoints(), 2U);
-	TEST_ASSERT_EQUALS(polygon[0], xpcc::Vector2D<int16_t>(10, 20));
-	TEST_ASSERT_EQUALS(polygon[1], xpcc::Vector2D<int16_t>(30, 40));
+	TEST_ASSERT_EQUALS(set.getNumberOfPoints(), 2U);
+	TEST_ASSERT_EQUALS(set[0], xpcc::Vector2D<int16_t>(10, 20));
+	TEST_ASSERT_EQUALS(set[1], xpcc::Vector2D<int16_t>(30, 40));
 	
-	polygon[0] = xpcc::Vector2D<int16_t>(50, 60);
+	set[0] = xpcc::Vector2D<int16_t>(50, 60);
 	
-	TEST_ASSERT_EQUALS(polygon[0], xpcc::Vector2D<int16_t>(50, 60));
+	TEST_ASSERT_EQUALS(set[0], xpcc::Vector2D<int16_t>(50, 60));
 }

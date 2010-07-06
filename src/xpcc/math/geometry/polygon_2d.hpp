@@ -37,6 +37,13 @@
 
 namespace xpcc
 {
+	// forward declaration
+	template <typename T>
+	class Circle2D;
+	
+	template <typename T>
+	class LineSegment2D;
+	
 	/**
 	 * \brief	Polygon
 	 *
@@ -55,8 +62,33 @@ namespace xpcc
 		 * \brief	Constructs a polygon capable of holding n points
 		 */
 		Polygon2D(SizeType n);
+		
+		/// append a point to the polygon
+		Polygon2D&
+		operator << (const Vector2D<T>& point);
+		
+		/// Check if a intersection exists
+		bool
+		intersects(const Polygon2D& other) const;
+		
+		/// Check if a intersection exists
+		bool
+		intersects(const Circle2D<T>& circle) const;
+		
+		/// Check if a intersection exists
+		bool
+		intersects(const LineSegment2D<T>& line) const;
+		
+		/**
+		 * \brief	Calculate the intersection point
+		 */
+		bool
+		intersect(const LineSegment2D<T>& line, PointSet2D<T>& intersectionPoints) const;
 	};
 }
+
+#include "circle_2d.hpp"
+#include "line_segment_2d.hpp"
 
 #include "polygon_2d_impl.hpp"
 

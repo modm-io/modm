@@ -39,38 +39,6 @@
 namespace xpcc
 {
 	template<>
-	Vector2D<float>&
-	Vector2D<float>::rotate(const float phi)
-	{
-		float c = std::cos(phi);
-		float s = std::sin(phi);
-
-		float tx = (c * this->x - s * this->y);
-		this->y =  (s * this->x + c * this->y);
-		this->x = tx;
-
-		return *this;
-	}
-	
-	// ------------------------------------------------------------------------
-	template<>
-	float
-	Vector2D<float>::getLength() const
-	{
-		return std::sqrt(this->x * this->x +
-						 this->y * this->y);
-	}
-	
-	template<>
-	double
-	Vector2D<double>::getLength() const
-	{
-		return std::sqrt(this->x * this->x +
-						 this->y * this->y);
-	}
-	
-	// ------------------------------------------------------------------------
-	template<>
 	int16_t
 	Vector2D<int16_t>::getLength() const
 	{

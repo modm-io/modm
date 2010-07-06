@@ -30,13 +30,10 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef GEOMETRIC_TRAITS_HPP
-#define GEOMETRIC_TRAITS_HPP
+#ifndef XPCC__GEOMETRIC_TRAITS_HPP
+#define XPCC__GEOMETRIC_TRAITS_HPP
 
-#include <xpcc/debug/logger/logger.hpp>		// TODO only for debugging
-#undef  XPCC_LOG_LEVEL
-#define XPCC_LOG_LEVEL xpcc::log::DEBUG
-
+#include <cmath>
 #include <stdint.h>
 
 namespace xpcc
@@ -52,6 +49,19 @@ namespace xpcc
 	struct GeometricTraits
 	{
 		static const bool isValidType = false;
+		
+		/**
+		 * \brief	Round if converting from a floating point base to
+		 * 			a integer base.
+		 * 
+		 * For T = \c float and \c double this method is specialized to return
+		 * the result directly without any rounding.
+		 */
+		static inline T
+		round(float value)
+		{
+			return ::round(value);
+		}
 	};
 	
 	template <>
@@ -61,6 +71,12 @@ namespace xpcc
 		
 		typedef float FloatType;
 		typedef int16_t WideType;
+		
+		static inline int8_t
+		round(float value)
+		{
+			return ::round(value);
+		}
 	};
 	
 	template <>
@@ -70,6 +86,12 @@ namespace xpcc
 		
 		typedef float FloatType;
 		typedef int32_t WideType;
+		
+		static inline int16_t
+		round(float value)
+		{
+			return ::round(value);
+		}
 	};
 	
 	template <>
@@ -83,6 +105,12 @@ namespace xpcc
 		// conversion to int64_t is required. This exception is made because
 		// 64-bit operations are very, very slow on an AVR.
 		typedef int32_t WideType;
+		
+		static inline int32_t
+		round(float value)
+		{
+			return ::round(value);
+		}
 	};
 	
 	template <>
@@ -92,9 +120,14 @@ namespace xpcc
 		
 		typedef float FloatType;
 		typedef float WideType;
+		
+		static inline float
+		round(float value)
+		{
+			return value;
+		}
 	};
 	
-#ifndef __AVR__
 	template <>
 	struct GeometricTraits<double>
 	{
@@ -102,8 +135,13 @@ namespace xpcc
 		
 		typedef double FloatType;
 		typedef double WideType;
+		
+		static inline double
+		round(double value)
+		{
+			return value;
+		}
 	};
-#endif
 }
 
-#endif // GEOMETRIC_TRAITS_HPP
+#endif // XPCC__GEOMETRIC_TRAITS_HPP

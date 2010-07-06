@@ -102,7 +102,7 @@ xpcc::Vector2D<T>::getLength() const
 	float tx = this->x;
 	float ty = this->y;
 	
-	return round(std::sqrt(tx*tx + ty*ty));
+	return GeometricTraits<T>::round(std::sqrt(tx*tx + ty*ty));
 }
 
 // ----------------------------------------------------------------------------
@@ -158,8 +158,8 @@ xpcc::Vector2D<T>::rotate(float phi)
 	float s = std::sin(phi);
 	
 	// without rounding the result might be false for T = integer
-	T tx =    round(c * this->x - s * this->y);
-	this->y = round(s * this->x + c * this->y);
+	T tx =    GeometricTraits<T>::round(c * this->x - s * this->y);
+	this->y = GeometricTraits<T>::round(s * this->x + c * this->y);
 	this->x = tx;
 	
 	return *this;
@@ -302,14 +302,16 @@ template<typename T>
 xpcc::Vector2D<T>
 xpcc::Vector2D<T>::operator * (float scale) const
 {
-	return Vector2D<T>(round(this->x * scale), round(this->y * scale));
+	return Vector2D<T>(GeometricTraits<T>::round(this->x * scale),
+					   GeometricTraits<T>::round(this->y * scale));
 }
 
 template<typename T>
 xpcc::Vector2D<T>
 xpcc::Vector2D<T>::operator / (float scale) const
 {
-	return Vector2D<T>(round(this->x / scale), round(this->y / scale));
+	return Vector2D<T>(GeometricTraits<T>::round(this->x / scale),
+					   GeometricTraits<T>::round(this->y / scale));
 }
 
 // ----------------------------------------------------------------------------	

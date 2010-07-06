@@ -30,35 +30,115 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/math/geometry/point_set_2d.hpp>
+#include <xpcc/math/geometry/polygon_2d.hpp>
 
-#include "point_set_2d_test.hpp"
+#include "polygon_2d_test.hpp"
 
 void
-PointSet2DTest::testConstructor()
+Polygon2DTest::testConstructor()
 {
-	xpcc::PointSet2D<int16_t> set(5);
+	xpcc::Polygon2D<int16_t> polygon(5);
 	
-	TEST_ASSERT_EQUALS(set.getNumberOfPoints(), 0U);
+	TEST_ASSERT_EQUALS(polygon.getNumberOfPoints(), 0U);
 }
 
 void
-PointSet2DTest::testAppendAndAccess()
+Polygon2DTest::testAppendAndAccess()
 {
-	xpcc::PointSet2D<int16_t> set(5);
+	xpcc::Polygon2D<int16_t> polygon(5);
 	
-	set.append(xpcc::Vector2D<int16_t>(10, 20));
+	polygon.append(xpcc::Vector2D<int16_t>(10, 20));
 	
-	TEST_ASSERT_EQUALS(set.getNumberOfPoints(), 1U);
-	TEST_ASSERT_EQUALS(set[0], xpcc::Vector2D<int16_t>(10, 20));
+	TEST_ASSERT_EQUALS(polygon.getNumberOfPoints(), 1U);
+	TEST_ASSERT_EQUALS(polygon[0], xpcc::Vector2D<int16_t>(10, 20));
 	
-	set.append(xpcc::Vector2D<int16_t>(30, 40));
+	polygon.append(xpcc::Vector2D<int16_t>(30, 40));
 	
-	TEST_ASSERT_EQUALS(set.getNumberOfPoints(), 2U);
-	TEST_ASSERT_EQUALS(set[0], xpcc::Vector2D<int16_t>(10, 20));
-	TEST_ASSERT_EQUALS(set[1], xpcc::Vector2D<int16_t>(30, 40));
+	TEST_ASSERT_EQUALS(polygon.getNumberOfPoints(), 2U);
+	TEST_ASSERT_EQUALS(polygon[0], xpcc::Vector2D<int16_t>(10, 20));
+	TEST_ASSERT_EQUALS(polygon[1], xpcc::Vector2D<int16_t>(30, 40));
 	
-	set[0] = xpcc::Vector2D<int16_t>(50, 60);
+	polygon[0] = xpcc::Vector2D<int16_t>(50, 60);
 	
-	TEST_ASSERT_EQUALS(set[0], xpcc::Vector2D<int16_t>(50, 60));
+	TEST_ASSERT_EQUALS(polygon[0], xpcc::Vector2D<int16_t>(50, 60));
+}
+
+void
+Polygon2DTest::testShiftOperator()
+{
+	xpcc::Polygon2D<int16_t> polygon(2);
+	
+	polygon << xpcc::Vector2D<int16_t>(10, 20);
+	
+	TEST_ASSERT_EQUALS(polygon.getNumberOfPoints(), 1U);
+	TEST_ASSERT_EQUALS(polygon[0], xpcc::Vector2D<int16_t>(10, 20));
+	
+	polygon << xpcc::Vector2D<int16_t>(30, 40);
+	
+	TEST_ASSERT_EQUALS(polygon.getNumberOfPoints(), 2U);
+	TEST_ASSERT_EQUALS(polygon[0], xpcc::Vector2D<int16_t>(10, 20));
+	TEST_ASSERT_EQUALS(polygon[1], xpcc::Vector2D<int16_t>(30, 40));
+	
+	polygon << xpcc::Vector2D<int16_t>(50, 60) << xpcc::Vector2D<int16_t>(70, 80);
+	
+	TEST_ASSERT_EQUALS(polygon.getNumberOfPoints(), 4U);
+	TEST_ASSERT_EQUALS(polygon[0], xpcc::Vector2D<int16_t>(10, 20));
+	TEST_ASSERT_EQUALS(polygon[1], xpcc::Vector2D<int16_t>(30, 40));
+	TEST_ASSERT_EQUALS(polygon[2], xpcc::Vector2D<int16_t>(50, 60));
+	TEST_ASSERT_EQUALS(polygon[3], xpcc::Vector2D<int16_t>(70, 80));
+}
+
+void
+Polygon2DTest::testIntersectionPolygon()
+{
+	xpcc::Polygon2D<int16_t> polygon1(5);
+	polygon1 << xpcc::Vector2D<int16_t>(0, 0)
+			 << xpcc::Vector2D<int16_t>(10, 30)
+			 << xpcc::Vector2D<int16_t>(50, 30)
+			 << xpcc::Vector2D<int16_t>(30, 0)
+			 << xpcc::Vector2D<int16_t>(60, -20);
+	
+	xpcc::Polygon2D<int16_t> polygon2(3);
+	polygon2 << xpcc::Vector2D<int16_t>(40, 0)
+			 << xpcc::Vector2D<int16_t>(70, 30)
+			 << xpcc::Vector2D<int16_t>(80, -10);
+	
+	xpcc::Polygon2D<int16_t> polygon3(3);
+	polygon3 << xpcc::Vector2D<int16_t>(50, 0)
+			 << xpcc::Vector2D<int16_t>(20, -30)
+			 << xpcc::Vector2D<int16_t>(60, -20);
+	
+	xpcc::Polygon2D<int16_t> polygon4(5);
+	polygon4 << xpcc::Vector2D<int16_t>(20, -60)
+			 << xpcc::Vector2D<int16_t>(50, -30)
+			 << xpcc::Vector2D<int16_t>(30, -40)
+			 << xpcc::Vector2D<int16_t>(30, -10)
+			 << xpcc::Vector2D<int16_t>(-10, -10);
+	
+	TEST_ASSERT_FALSE(polygon1.intersects(polygon2));
+	TEST_ASSERT_TRUE(polygon1.intersects(polygon3));
+	TEST_ASSERT_TRUE(polygon1.intersects(polygon4));
+	
+	TEST_ASSERT_TRUE(polygon2.intersects(polygon3));
+	TEST_ASSERT_FALSE(polygon2.intersects(polygon4));
+	
+	TEST_ASSERT_TRUE(polygon3.intersects(polygon4));
+}
+
+void
+Polygon2DTest::testIntersectionCircle()
+{
+	TEST_FAIL("TODO");
+}
+
+void
+Polygon2DTest::testIntersectionLineSegment()
+{
+	TEST_FAIL("TODO");
+}
+
+void
+Polygon2DTest::testIntersectionPointsLineSegment()
+{
+	TEST_FAIL("TODO");
 }
