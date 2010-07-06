@@ -225,15 +225,15 @@ LineSegment2DTest::testIntersectionPointsLineSegment()
 	xpcc::PointSet2D<int16_t> points;
 	
 	// line1 - line2
-	TEST_ASSERT_FALSE(line1.intersect(line2, points));
+	TEST_ASSERT_FALSE(line1.getIntersections(line2, points));
 	TEST_ASSERT_EQUALS(points.getNumberOfPoints(), 0U);
 	
 	// line1 - line3
-	TEST_ASSERT_FALSE(line1.intersect(line3, points));
+	TEST_ASSERT_FALSE(line1.getIntersections(line3, points));
 	TEST_ASSERT_EQUALS(points.getNumberOfPoints(), 0U);
 	
 	// line1 - line4
-	TEST_ASSERT_TRUE(line1.intersect(line4, points));
+	TEST_ASSERT_TRUE(line1.getIntersections(line4, points));
 	TEST_ASSERT_EQUALS(points.getNumberOfPoints(), 1U);
 	
 	TEST_ASSERT_EQUALS(points[0].getX(), 50);
@@ -242,7 +242,7 @@ LineSegment2DTest::testIntersectionPointsLineSegment()
 	points.removeAll();
 	
 	// line1 - line5
-	TEST_ASSERT_TRUE(line1.intersect(line5, points));
+	TEST_ASSERT_TRUE(line1.getIntersections(line5, points));
 	TEST_ASSERT_EQUALS(points.getNumberOfPoints(), 1U);
 	
 	TEST_ASSERT_EQUALS(points[0].getX(), 40);
@@ -251,11 +251,11 @@ LineSegment2DTest::testIntersectionPointsLineSegment()
 	points.removeAll();
 	
 	// line2 - line3
-	TEST_ASSERT_FALSE(line2.intersect(line3, points));
+	TEST_ASSERT_FALSE(line2.getIntersections(line3, points));
 	TEST_ASSERT_EQUALS(points.getNumberOfPoints(), 0U);
 	
 	// line2 - line4
-	TEST_ASSERT_TRUE(line2.intersect(line4, points));
+	TEST_ASSERT_TRUE(line2.getIntersections(line4, points));
 	TEST_ASSERT_EQUALS(points.getNumberOfPoints(), 1U);
 	
 	TEST_ASSERT_EQUALS(points[0].getX(), 50);
@@ -264,7 +264,7 @@ LineSegment2DTest::testIntersectionPointsLineSegment()
 	points.removeAll();
 	
 	// line2 - line5
-	TEST_ASSERT_TRUE(line2.intersect(line5, points));
+	TEST_ASSERT_TRUE(line2.getIntersections(line5, points));
 	TEST_ASSERT_EQUALS(points.getNumberOfPoints(), 1U);
 	
 	TEST_ASSERT_EQUALS(points[0].getX(), 30);
@@ -273,15 +273,15 @@ LineSegment2DTest::testIntersectionPointsLineSegment()
 	points.removeAll();
 	
 	// line3 - line4
-	TEST_ASSERT_FALSE(line3.intersect(line4, points));
+	TEST_ASSERT_FALSE(line3.getIntersections(line4, points));
 	TEST_ASSERT_EQUALS(points.getNumberOfPoints(), 0U);
 	
 	// line3 - line5
-	TEST_ASSERT_FALSE(line3.intersect(line5, points));
+	TEST_ASSERT_FALSE(line3.getIntersections(line5, points));
 	TEST_ASSERT_EQUALS(points.getNumberOfPoints(), 0U);
 	
 	// line4 - line5
-	TEST_ASSERT_FALSE(line4.intersect(line5, points));
+	TEST_ASSERT_FALSE(line4.getIntersections(line5, points));
 	TEST_ASSERT_EQUALS(points.getNumberOfPoints(), 0U);
 }
 
@@ -299,7 +299,7 @@ LineSegment2DTest::testIntersectionPointsCircle()
 	xpcc::PointSet2D<int16_t> points;
 	
 	// line is contained inside the circle
-	TEST_ASSERT_FALSE(line.intersect(circle, points));
+	TEST_ASSERT_FALSE(line.getIntersections(circle, points));
 	TEST_ASSERT_EQUALS(points.getNumberOfPoints(), 0U);
 	
 	points.removeAll();
@@ -308,7 +308,7 @@ LineSegment2DTest::testIntersectionPointsCircle()
 	line.set(xpcc::Vector2D<int16_t>(-30, -30),
 			xpcc::Vector2D<int16_t>(10, 10));
 	
-	TEST_ASSERT_TRUE(line.intersect(circle, points));
+	TEST_ASSERT_TRUE(line.getIntersections(circle, points));
 	TEST_ASSERT_EQUALS(points.getNumberOfPoints(), 1U);
 	
 	TEST_ASSERT_EQUALS(points[0].getX(), -14);
@@ -320,7 +320,7 @@ LineSegment2DTest::testIntersectionPointsCircle()
 	line.set(xpcc::Vector2D<int16_t>(-10, -10),
 			xpcc::Vector2D<int16_t>(30, 30));
 	
-	TEST_ASSERT_TRUE(line.intersect(circle, points));
+	TEST_ASSERT_TRUE(line.getIntersections(circle, points));
 	TEST_ASSERT_EQUALS(points.getNumberOfPoints(), 1U);
 	
 	TEST_ASSERT_EQUALS(points[0].getX(), 14);
@@ -332,7 +332,7 @@ LineSegment2DTest::testIntersectionPointsCircle()
 	line.set(xpcc::Vector2D<int16_t>(30, -30),
 			xpcc::Vector2D<int16_t>(-30, 30));
 	
-	TEST_ASSERT_TRUE(line.intersect(circle, points));
+	TEST_ASSERT_TRUE(line.getIntersections(circle, points));
 	TEST_ASSERT_EQUALS(points.getNumberOfPoints(), 2U);
 	
 	TEST_ASSERT_EQUALS(points[0].getX(), 14);
@@ -347,7 +347,7 @@ LineSegment2DTest::testIntersectionPointsCircle()
 	line.set(xpcc::Vector2D<int16_t>(20, 0),
 			xpcc::Vector2D<int16_t>(20, 30));
 	
-	TEST_ASSERT_TRUE(line.intersect(circle, points));
+	TEST_ASSERT_TRUE(line.getIntersections(circle, points));
 	TEST_ASSERT_EQUALS(points.getNumberOfPoints(), 1U);
 	
 	TEST_ASSERT_EQUALS(points[0].getX(), 20);
@@ -359,7 +359,7 @@ LineSegment2DTest::testIntersectionPointsCircle()
 	line.set(xpcc::Vector2D<int16_t>(20, 20),
 			xpcc::Vector2D<int16_t>(30, 30));
 	
-	TEST_ASSERT_FALSE(line.intersect(circle, points));
+	TEST_ASSERT_FALSE(line.getIntersections(circle, points));
 	TEST_ASSERT_EQUALS(points.getNumberOfPoints(), 0U);
 	
 	points.removeAll();

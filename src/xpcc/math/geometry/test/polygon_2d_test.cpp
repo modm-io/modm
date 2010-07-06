@@ -236,21 +236,21 @@ Polygon2DTest::testIntersectionPointsLineSegment()
 	// 1. outside the polygon
 	xpcc::LineSegment2D<int16_t> line(xpcc::Vector2D<int16_t>(-20, 50),
 									  xpcc::Vector2D<int16_t>(0, 30));
-	TEST_ASSERT_FALSE(polygon.intersect(line, points));
+	TEST_ASSERT_FALSE(polygon.getIntersections(line, points));
 	
 	TEST_ASSERT_EQUALS(points.getNumberOfPoints(), 0U);
 	
 	// 2. line contained inside the polygon
 	line = xpcc::LineSegment2D<int16_t>(xpcc::Vector2D<int16_t>(-20, 50),
 										xpcc::Vector2D<int16_t>(0, 30));
-	TEST_ASSERT_FALSE(polygon.intersect(line, points));
+	TEST_ASSERT_FALSE(polygon.getIntersections(line, points));
 	
 	TEST_ASSERT_EQUALS(points.getNumberOfPoints(), 0U);
 	
 	// 3.
 	line = xpcc::LineSegment2D<int16_t>(xpcc::Vector2D<int16_t>(20, 0),
 										xpcc::Vector2D<int16_t>(10, -30));
-	TEST_ASSERT_TRUE(polygon.intersect(line, points));
+	TEST_ASSERT_TRUE(polygon.getIntersections(line, points));
 	TEST_ASSERT_EQUALS(points.getNumberOfPoints(), 1U);
 	
 	TEST_ASSERT_EQUALS(points[0].getX(), 18);
@@ -261,7 +261,7 @@ Polygon2DTest::testIntersectionPointsLineSegment()
 	// 4. intersection at (30, -10)
 	line = xpcc::LineSegment2D<int16_t>(xpcc::Vector2D<int16_t>(30, -10),
 										xpcc::Vector2D<int16_t>(30, -30));
-	TEST_ASSERT_TRUE(polygon.intersect(line, points));
+	TEST_ASSERT_TRUE(polygon.getIntersections(line, points));
 	TEST_ASSERT_EQUALS(points.getNumberOfPoints(), 1U);
 	
 	TEST_ASSERT_EQUALS(points[0].getX(),  30);
@@ -272,7 +272,7 @@ Polygon2DTest::testIntersectionPointsLineSegment()
 	// 5.
 	line = xpcc::LineSegment2D<int16_t>(xpcc::Vector2D<int16_t>(50, -40),
 										xpcc::Vector2D<int16_t>(30, 40));
-	TEST_ASSERT_TRUE(polygon.intersect(line, points));
+	TEST_ASSERT_TRUE(polygon.getIntersections(line, points));
 	TEST_ASSERT_EQUALS(points.getNumberOfPoints(), 4U);
 	
 	TEST_ASSERT_EQUALS(points[0].getX(), 32);
@@ -292,7 +292,7 @@ Polygon2DTest::testIntersectionPointsLineSegment()
 	// 6.
 	line = xpcc::LineSegment2D<int16_t>(xpcc::Vector2D<int16_t>(40, -10),
 										xpcc::Vector2D<int16_t>(30, 40));
-	TEST_ASSERT_TRUE(polygon.intersect(line, points));
+	TEST_ASSERT_TRUE(polygon.getIntersections(line, points));
 	TEST_ASSERT_EQUALS(points.getNumberOfPoints(), 3U);
 	
 	TEST_ASSERT_EQUALS(points[0].getX(), 32);
@@ -309,7 +309,7 @@ Polygon2DTest::testIntersectionPointsLineSegment()
 	// 7.
 	line = xpcc::LineSegment2D<int16_t>(xpcc::Vector2D<int16_t>(50, 30),
 										xpcc::Vector2D<int16_t>(60, 10));
-	TEST_ASSERT_TRUE(polygon.intersect(line, points));
+	TEST_ASSERT_TRUE(polygon.getIntersections(line, points));
 	TEST_ASSERT_EQUALS(points.getNumberOfPoints(), 2U);
 	
 	TEST_ASSERT_EQUALS(points[0].getX(), 50);

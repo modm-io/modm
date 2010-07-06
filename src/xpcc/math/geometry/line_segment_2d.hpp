@@ -109,18 +109,21 @@ namespace xpcc
 		 * \brief	Calculate the intersection point
 		 */
 		bool
-		intersect(const LineSegment2D& other, PointSet2D<T>& intersectionPoints) const;
+		getIntersections(const LineSegment2D& other,
+				PointSet2D<T>& intersectionPoints) const;
 		
 		/**
-		 * \brief	Calculate the intersection points between a circle and a line segment
+		 * \brief	Calculate the intersection point(s)
 		 * 
 		 * \see		http://local.wasp.uwa.edu.au/~pbourke/geometry/sphereline/
 		 */
 		bool
-		intersect(const Circle2D<T>& circle, PointSet2D<T>& intersectionPoints) const;
+		getIntersections(const Circle2D<T>& circle,
+				PointSet2D<T>& intersectionPoints) const;
 		
 		bool
-		intersect(const Polygon2D<T>& polygon, PointSet2D<T>& intersectionPoints) const;
+		getIntersections(const Polygon2D<T>& polygon,
+				PointSet2D<T>& intersectionPoints) const;
 		
 		bool
 		operator == (const LineSegment2D &other) const;

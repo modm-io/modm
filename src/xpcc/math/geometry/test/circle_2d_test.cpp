@@ -74,7 +74,7 @@ Circle2DTest::testIntersectionCircle()
 	xpcc::PointSet2D<int16_t> points;
 	
 	// circle touch each other with one point
-	TEST_ASSERT_TRUE(circle1.intersect(circle2, points));
+	TEST_ASSERT_TRUE(circle1.getIntersections(circle2, points));
 	TEST_ASSERT_EQUALS(points.getNumberOfPoints(), 1U);
 	
 	TEST_ASSERT_EQUALS(points[0].getX(), 10);
@@ -84,13 +84,13 @@ Circle2DTest::testIntersectionCircle()
 	
 	// no intersection
 	circle2.setRadius(10);
-	TEST_ASSERT_FALSE(circle1.intersect(circle2, points));
+	TEST_ASSERT_FALSE(circle1.getIntersections(circle2, points));
 	TEST_ASSERT_EQUALS(points.getNumberOfPoints(), 0U);
 	
 	// 2 intersection points
 	circle1.setRadius(30);
 	circle2.setRadius(30);
-	TEST_ASSERT_TRUE(circle1.intersect(circle2, points));
+	TEST_ASSERT_TRUE(circle1.getIntersections(circle2, points));
 	TEST_ASSERT_EQUALS(points.getNumberOfPoints(), 2U);
 	
 	TEST_ASSERT_EQUALS(points[0].getX(), 15);
@@ -104,6 +104,6 @@ Circle2DTest::testIntersectionCircle()
 	// circle 1 is contained inside circle 2
 	circle1.setRadius(10);
 	circle2.setCenter(xpcc::Vector2D<int16_t>(0, 0));
-	TEST_ASSERT_FALSE(circle1.intersect(circle2, points));
+	TEST_ASSERT_FALSE(circle1.getIntersections(circle2, points));
 	TEST_ASSERT_EQUALS(points.getNumberOfPoints(), 0U);
 }

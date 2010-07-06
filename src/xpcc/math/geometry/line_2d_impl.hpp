@@ -108,7 +108,7 @@ xpcc::Line2D<T>::getDistanceTo(const Vector2D<T>& point) const
 // ----------------------------------------------------------------------------
 template <typename T>
 bool
-xpcc::Line2D<T>::intersect(const Line2D& other, PointSet2D<T>& points) const
+xpcc::Line2D<T>::getIntersections(const Line2D& other, PointSet2D<T>& points) const
 {
 	xpcc::Vector2D<T> connectionVector(other.point, this->point);
 	
@@ -127,7 +127,7 @@ xpcc::Line2D<T>::intersect(const Line2D& other, PointSet2D<T>& points) const
 // ----------------------------------------------------------------------------
 template <typename T>
 bool
-xpcc::Line2D<T>::intersect(const Circle2D<T>& circle, PointSet2D<T>& intersectionPoints) const
+xpcc::Line2D<T>::getIntersections(const Circle2D<T>& circle, PointSet2D<T>& intersectionPoints) const
 {
 	// vector from the center of the circle to line start
 	xpcc::Vector2D<T> circleToLine(circle.center, this->point);

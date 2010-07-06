@@ -186,43 +186,6 @@ xpcc::Vector2D<T>::getDistanceTo(const Vector2D<T>& other) const
 
 // ----------------------------------------------------------------------------
 template<typename T>
-int_fast8_t
-xpcc::Vector2D<T>::ccw(const Vector2D<T>& a, const Vector2D<T>& b,
-		const Vector2D<T>& c)
-{
-	WideType dx1 = b.x - a.x;
-	WideType dy1 = b.y - a.y;
-	WideType dx2 = c.x - a.x;
-	WideType dy2 = c.y - a.y;
-	
-	WideType d1 = dx1 * dy2;
-	WideType d2 = dy1 * dx2;
-	
-	if (d1 > d2) {
-		return 1;
-	}
-	else if (d1 < d2) {
-		return -1;
-	}
-	else
-	{
-		if ((dx1 * dx2 < 0) || (dy1 * dy2 < 0)) {
-			return -1;
-		}
-		else
-		{
-			if ((dx1 * dx1 + dy1 * dy1) >= (dx2 * dx2 + dy2 * dy2)) {
-				return 0;
-			}
-			else {
-				return 1;
-			}
-		}
-	}
-}
-
-// ----------------------------------------------------------------------------
-template<typename T>
 typename xpcc::Vector2D<T>::WideType
 xpcc::Vector2D<T>::dot(const xpcc::Vector2D<T>& other) const
 {
@@ -327,6 +290,43 @@ bool
 xpcc::Vector2D<T>::operator != (const Vector2D &other) const
 {
 	return ((this->x != other.x) || (this->y != other.y));
+}
+
+// ----------------------------------------------------------------------------
+template<typename T>
+int_fast8_t
+xpcc::Vector2D<T>::ccw(const Vector2D<T>& a, const Vector2D<T>& b,
+		const Vector2D<T>& c)
+{
+	WideType dx1 = b.x - a.x;
+	WideType dy1 = b.y - a.y;
+	WideType dx2 = c.x - a.x;
+	WideType dy2 = c.y - a.y;
+	
+	WideType d1 = dx1 * dy2;
+	WideType d2 = dy1 * dx2;
+	
+	if (d1 > d2) {
+		return 1;
+	}
+	else if (d1 < d2) {
+		return -1;
+	}
+	else
+	{
+		if ((dx1 * dx2 < 0) || (dy1 * dy2 < 0)) {
+			return -1;
+		}
+		else
+		{
+			if ((dx1 * dx1 + dy1 * dy1) >= (dx2 * dx2 + dy2 * dy2)) {
+				return 0;
+			}
+			else {
+				return 1;
+			}
+		}
+	}
 }
 
 // ----------------------------------------------------------------------------

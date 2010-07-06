@@ -1,7 +1,7 @@
 // $Id$
 /**
 
-\ingroup	communication
+\ingroup	driver
 \defgroup	apb		Asynchronous Peripheral Bus
 
 \section intro	Introduction

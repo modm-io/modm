@@ -87,7 +87,7 @@ xpcc::Circle2D<T>::intersects(const Polygon2D<T>& polygon) const
 // ----------------------------------------------------------------------------
 template <typename T>
 bool
-xpcc::Circle2D<T>::intersect(const Circle2D& other, PointSet2D<T>& intersectionPoints) const
+xpcc::Circle2D<T>::getIntersections(const Circle2D& other, PointSet2D<T>& intersectionPoints) const
 {
 	Vector2D<T> circleToCircle(this->center, other.center);
 	WideType distanceSquared = circleToCircle.getLengthSquared();
@@ -144,7 +144,7 @@ xpcc::Circle2D<T>::intersect(const Circle2D& other, PointSet2D<T>& intersectionP
 // ----------------------------------------------------------------------------
 template <typename T>
 bool
-xpcc::Circle2D<T>::intersect(const Line2D<T>& line, PointSet2D<T>& intersectionPoints) const
+xpcc::Circle2D<T>::getIntersections(const Line2D<T>& line, PointSet2D<T>& intersectionPoints) const
 {
-	return line.intersect(*this, intersectionPoints);
+	return line.getIntersections(*this, intersectionPoints);
 }

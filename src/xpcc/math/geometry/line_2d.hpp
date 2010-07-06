@@ -92,16 +92,17 @@ namespace xpcc
 		getDistanceTo(const Vector2D<T>& point) const;
 		
 		/**
-		 * \brief	Calculate intersection points
+		 * \brief	Calculate intersection point(s)
 		 * 
 		 * \param[in]	other	Other line
 		 * \param[out]	intersectionPoint	Intersection point
 		 */
 		bool
-		intersect(const Line2D& other, PointSet2D<T>& intersectionPoint) const;
+		getIntersections(const Line2D& other,
+				PointSet2D<T>& intersectionPoint) const;
 		
 		/**
-		 * \brief	Calculate intersection points
+		 * \brief	Calculate intersection point(s)
 		 * 
 		 * \param[in]	circle	A circle
 		 * \param[out]	intersectionPoint	Intersection points
@@ -109,7 +110,8 @@ namespace xpcc
 		 * \see		http://local.wasp.uwa.edu.au/~pbourke/geometry/sphereline/
 		 */
 		bool
-		intersect(const Circle2D<T>& circle, PointSet2D<T>& intersectionPoints) const;
+		getIntersections(const Circle2D<T>& circle,
+				PointSet2D<T>& intersectionPoints) const;
 		
 	protected:
 		Vector2D<T> point;

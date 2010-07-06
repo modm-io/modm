@@ -85,7 +85,7 @@ namespace xpcc
 		intersects(const Polygon2D<T>& polygon) const;
 		
 		/**
-		 * \brief	Calculate intersection points
+		 * \brief	Calculate intersection point(s)
 		 * 
 		 * \param[in]	other	Other Circle
 		 * \param[out]	intersectionPoint	Intersection points
@@ -93,10 +93,11 @@ namespace xpcc
 		 * \see		http://local.wasp.uwa.edu.au/~pbourke/geometry/2circle/
 		 */
 		bool
-		intersect(const Circle2D& other, PointSet2D<T>& intersectionPoints) const;
+		getIntersections(const Circle2D& other,
+				PointSet2D<T>& intersectionPoints) const;
 		
 		/**
-		 * \brief	Calculate intersection points
+		 * \brief	Calculate intersection point(s)
 		 * 
 		 * \param[in]	other	Other line
 		 * \param[out]	intersectionPoint	Intersection point
@@ -104,7 +105,8 @@ namespace xpcc
 		 * \see		Line2D::intersect()
 		 */
 		bool
-		intersect(const Line2D<T>& line, PointSet2D<T>& intersectionPoints) const;
+		getIntersections(const Line2D<T>& line,
+				PointSet2D<T>& intersectionPoints) const;
 		
 	protected:
 		Vector2D<T> center;

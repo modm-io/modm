@@ -151,7 +151,7 @@ xpcc::LineSegment2D<T>::intersects(const Polygon2D<T>& polygon) const
 // ----------------------------------------------------------------------------
 template <typename T>
 bool
-xpcc::LineSegment2D<T>::intersect(const LineSegment2D& other,
+xpcc::LineSegment2D<T>::getIntersections(const LineSegment2D& other,
 		PointSet2D<T>& intersectionPoints) const
 {
 	xpcc::Vector2D<T> ownDirectionVector(this->startPoint, this->endPoint);
@@ -182,7 +182,7 @@ xpcc::LineSegment2D<T>::intersect(const LineSegment2D& other,
 // ----------------------------------------------------------------------------
 template <typename T>
 bool
-xpcc::LineSegment2D<T>::intersect(const Circle2D<T>& circle,
+xpcc::LineSegment2D<T>::getIntersections(const Circle2D<T>& circle,
 		PointSet2D<T>& intersectionPoints) const
 {
 	// Direction vector of line, from start to end
@@ -233,11 +233,11 @@ xpcc::LineSegment2D<T>::intersect(const Circle2D<T>& circle,
 // ----------------------------------------------------------------------------
 template <typename T>
 bool
-xpcc::LineSegment2D<T>::intersect(const Polygon2D<T>& polygon,
+xpcc::LineSegment2D<T>::getIntersections(const Polygon2D<T>& polygon,
 		PointSet2D<T>& intersectionPoints) const
 {
 	// invoke intersection method of the polygon
-	return polygon.intersect(*this, intersectionPoints);
+	return polygon.getIntersections(*this, intersectionPoints);
 }
 
 // ----------------------------------------------------------------------------

@@ -88,7 +88,7 @@ namespace xpcc
 		Vector2D(const T& x, const T& y);
 		
 		/**
-		 * \brief	Construct the vector AB
+		 * \brief	Construct the vector from A to B
 		 * 
 		 * Same as
 		 * \code
@@ -170,18 +170,6 @@ namespace xpcc
 		getDistanceTo(const Vector2D<T>& other) const;
 		
 		/**
-		 * \brief	Check if three points are in a counter-clock wise direction
-		 * 
-		 * Check if we move counter-clock wise if we move from the first point
-		 * to the second and the third.
-		 * 
-		 * \returns	1 if counter-clock wise, -1 if clock wise and 0 if \p c is
-		 * 			between \p a and \p b.
-		 */
-		static int_fast8_t
-		ccw(const Vector2D<T>& a, const Vector2D<T>& b, const Vector2D<T>& c);
-		
-		/**
 		 * \brief	Calculate the dot-product
 		 * 
 		 * Also known as the scalar product.
@@ -260,6 +248,18 @@ namespace xpcc
 		
 		bool
 		operator != (const Vector2D &other) const;
+		
+		/**
+		 * \brief	Check if three points are in a counter-clock wise direction
+		 * 
+		 * Check if we move counter-clock wise if we move from the first point
+		 * to the second and the third.
+		 * 
+		 * \returns	1 if counter-clock wise, -1 if clock wise and 0 if \p c is
+		 * 			between \p a and \p b.
+		 */
+		static int_fast8_t
+		ccw(const Vector2D<T>& a, const Vector2D<T>& b, const Vector2D<T>& c);
 		
 	protected:
 		T x;

@@ -70,7 +70,8 @@ namespace xpcc
 		/**
 		 * \brief	Check if a intersection exists
 		 * 
-		 * \todo	Used currently a brute force approach, needs to be optimized
+		 * \todo	Currently a brute force approach is used here,
+		 * 			needs to be optimized
 		 */
 		bool
 		intersects(const Polygon2D& other) const;
@@ -84,10 +85,11 @@ namespace xpcc
 		intersects(const LineSegment2D<T>& segment) const;
 		
 		/**
-		 * \brief	Calculate the intersection point
+		 * \brief	Calculate the intersection point(s)
 		 */
 		bool
-		intersect(const LineSegment2D<T>& segment, PointSet2D<T>& intersectionPoints) const;
+		getIntersections(const LineSegment2D<T>& segment,
+				PointSet2D<T>& intersectionPoints) const;
 	};
 }
 
