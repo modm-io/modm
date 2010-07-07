@@ -77,6 +77,19 @@ LineSegment2DTest::testAccessor()
 }
 
 void
+LineSegment2DTest::testTranslation()
+{
+	xpcc::LineSegment2D<int16_t> line(
+			xpcc::Vector2D<int16_t>(12, 34),
+			xpcc::Vector2D<int16_t>(56, 78));
+	
+	line.translate(xpcc::Vector2D<int16_t>(10, 20));
+	
+	TEST_ASSERT_EQUALS(line.getStartPoint(), xpcc::Vector2D<int16_t>(22, 54));
+	TEST_ASSERT_EQUALS(line.getEndPoint(), xpcc::Vector2D<int16_t>(66, 98));
+}
+
+void
 LineSegment2DTest::testComparision()
 {
 	xpcc::LineSegment2D<int16_t> a(

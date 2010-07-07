@@ -83,6 +83,9 @@ namespace xpcc
 		inline void
 		set(const Vector2D<T>& start, const Vector2D<T>& end);
 		
+		void
+		translate(const Vector2D<T>& vector);
+		
 		/**
 		 * \brief	Length of the line segment
 		 */

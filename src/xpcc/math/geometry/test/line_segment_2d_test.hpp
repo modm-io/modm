@@ -45,6 +45,9 @@ public:
 	testAccessor();
 	
 	void
+	testTranslation();
+	
+	void
 	testComparision();
 	
 	void

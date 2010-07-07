@@ -87,7 +87,21 @@ namespace xpcc
 		/**
 		 * \brief	Add a increment only in x-direction
 		 * 
-		 * \todo	useful description what this function does
+		 * Our robots mostly use a differential drive with two driven wheels
+		 * side by side, allowing the robot to move only in the drive direction
+		 * (x-direction in the local coordinate system of the robot) and
+		 * rotate. A movement perpendicular to the drive direction is
+		 * impossible with a external force.
+		 * 
+		 * To estimate the position of the robot over time, we use odometry.
+		 * Therefore it is necessary to add a lot small increments of
+		 * movement over time.
+		 * Because the y-component will always be zero, we created this
+		 * method, which avoids unnecessary computations for the y-component
+		 * and is therefore faster the the universal move-method.
+		 * 
+		 * \param	x		movement in x-direction
+		 * \param	phi		rotation
 		 */
 		void
 		move(T x, float phi);
@@ -112,12 +126,12 @@ namespace xpcc
 	// ------------------------------------------------------------------------
 	/**
 	 * \brief	Stream operator to \b xpcc::Location<T>
-	 *
+	 * 
 	 * \ingroup	geometry
 	 */
 	template<typename T>
 	IOStream&
-	operator<<(IOStream& os, const Location2D<T>& l);
+	operator << (IOStream& os, const Location2D<T>& l);
 	
 	// ------------------------------------------------------------------------
 	// Declaration of specialized methods

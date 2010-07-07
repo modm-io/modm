@@ -86,6 +86,15 @@ xpcc::LineSegment2D<T>::set(const Vector2D<T>& start, const Vector2D<T>& end)
 
 // ----------------------------------------------------------------------------
 template<typename T>
+void
+xpcc::LineSegment2D<T>::translate(const Vector2D<T>& vector)
+{
+	this->startPoint.translate(vector);
+	this->endPoint.translate(vector);
+}
+
+// ----------------------------------------------------------------------------
+template<typename T>
 T
 xpcc::LineSegment2D<T>::getLength() const
 {
