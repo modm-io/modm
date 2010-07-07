@@ -108,6 +108,10 @@ namespace xpcc
 		getIntersections(const Line2D<T>& line,
 				PointSet2D<T>& intersectionPoints) const;
 		
+		bool
+		getIntersections(const LineSegment2D<T>& line,
+				PointSet2D<T>& intersectionPoints) const;
+		
 	protected:
 		Vector2D<T> center;
 		T radius;

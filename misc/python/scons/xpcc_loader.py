@@ -31,6 +31,7 @@
 import os
 import platform
 import utils.configuration
+import utils.files
 
 from SCons.Script import *
 
@@ -167,6 +168,8 @@ def generate_environment(env, rootpath, configfile='project.cfg', buildpath=None
 	
 	# append all values from environment section to the real environment
 	for key, value in configuration['environment'].iteritems():
+		if key.upper() == "CPPPATH":
+			value = value.split(':')
 		new.Append(**{ key.upper(): value } )
 		
 	# exclude the buildpath from the FileScanner

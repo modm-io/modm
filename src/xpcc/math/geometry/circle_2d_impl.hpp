@@ -148,3 +148,11 @@ xpcc::Circle2D<T>::getIntersections(const Line2D<T>& line, PointSet2D<T>& inters
 {
 	return line.getIntersections(*this, intersectionPoints);
 }
+
+// ----------------------------------------------------------------------------
+template <typename T>
+bool
+xpcc::Circle2D<T>::getIntersections(const LineSegment2D<T>& line, PointSet2D<T>& intersectionPoints) const
+{
+	return line.getIntersections(*this, intersectionPoints);
+}
