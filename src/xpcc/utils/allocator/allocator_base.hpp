@@ -34,6 +34,7 @@
 #define XPCC_ALLOCATOR__ALLOCATOR_BASE_HPP
 
 #include <cstddef>
+#include <new>		// needed for placement new
 
 namespace xpcc
 {
@@ -61,7 +62,7 @@ namespace xpcc
 			 * Notice that this does not allocate space for the element, it
 			 * should already be available at p.
 			 */
-			void
+			static inline void
 			construct(T* p, const T& value)
 			{
 				// placement new
@@ -76,7 +77,7 @@ namespace xpcc
 			 * 
 			 * Notice that this does not deallocate space for the element.
 			 */
-			void
+			static inline void
 			destroy(T* p)
 			{
 				p->~T();

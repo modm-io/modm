@@ -30,39 +30,22 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef UNITTEST__COUNTER_TYPE_HPP
-#define UNITTEST__COUNTER_TYPE_HPP
+#ifndef CAN_CONNECTOR_TEST_HPP
+#define CAN_CONNECTOR_TEST_HPP
 
-#include <stdint.h>
+#include <unittest/testsuite.hpp>
 
-namespace unittest
+class CanConnectorTest : public unittest::TestSuite
 {
-	/**
-	 * \brief	Data type to count the number of constructor etc. calls
-	 * 
-	 * \ingroup	unittest
-	 */
-	class CounterType
-	{
-	public:
-		CounterType();
-		
-		CounterType(const CounterType& other);
-		
-		~CounterType();
-		
-		CounterType&
-		operator = (const CounterType& other);
-		
-		static void
-		reset();
-		
-		static uint_fast16_t numberOfDefaultConstructorCalls;
-		static uint_fast16_t numberOfCopyConstructorCalls;
-		static uint_fast16_t numberOfAssignments;
-		static uint_fast16_t numberOfDestructorCalls;
-		static uint_fast16_t numberOfReallocs;
-	};
-}
+public:
+	void
+	testConstruction();
+	
+	void
+	testConversionToIdentifier();
+	
+	void
+	testConversionToHeader();
+};
 
-#endif // UNITTEST__COUNTER_TYPE_HPP
+#endif

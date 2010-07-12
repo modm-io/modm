@@ -42,7 +42,7 @@ namespace xpcc
 		/**
 		 * \brief	Dynamic memory allocator
 		 * 
-		 * Wrapper for the underlaying memory management. No additional
+		 * Wrapper for the underlying memory management. No additional
 		 * management is done.
 		 * 
 		 * \ingroup	allocator
@@ -75,11 +75,19 @@ namespace xpcc
 			T*
 			allocate(size_t n)
 			{
+				// allocate the memory without calling the constructor
+				// of the associated data-type.
 				return static_cast<T*>(::operator new(n * sizeof(T)));
 			}
 			
 			void
-			deallocate(T*);
+			deallocate(T* p)
+			{
+				// it is important to use this form here, otherwise the
+				// destructor of p will be called which is unwanted here.
+				// The destructor can be called with the destroy()-method.
+				::operator delete(p);
+			}
 		};
 	}
 }

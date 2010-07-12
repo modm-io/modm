@@ -30,38 +30,42 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <unittest/testsuite.hpp>
+#ifndef UNITTEST__COUNT_TYPE_HPP
+#define UNITTEST__COUNT_TYPE_HPP
 
-class DynamicArrayTest : public unittest::TestSuite
+#include <cstddef>
+#include <stdint.h>
+
+namespace unittest
 {
-public:
-	void
-	setUp();
-	
-	void
-	testDefaultConstrutor();
+	/**
+	 * \brief	Data type to count the number of constructor etc. calls
+	 * 
+	 * \ingroup	unittest
+	 */
+	class CountType
+	{
+	public:
+		CountType();
+		
+		CountType(const CountType& other);
+		
+		~CountType();
+		
+		CountType&
+		operator = (const CountType& other);
+		
+		static void
+		reset();
+		
+		static std::size_t numberOfDefaultConstructorCalls;
+		static std::size_t numberOfCopyConstructorCalls;
+		static std::size_t numberOfAssignments;
+		static std::size_t numberOfDestructorCalls;
+		static std::size_t numberOfReallocs;
+		
+		static std::size_t numberOfOperations;
+	};
+}
 
-	void
-	testAllocationConstructor();
-
-	void
-	testSequenceConstructor();
-
-	void
-	testCopyConstructor();
-
-	void
-	testReserve();
-
-	void
-	testAppend();
-
-	void
-	testRemove();
-	
-	void
-	testClear();
-	
-	void
-	testRemoveAll();
-};
+#endif // UNITTEST__COUNT_TYPE_HPP

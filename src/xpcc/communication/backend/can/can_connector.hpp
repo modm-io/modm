@@ -5,6 +5,7 @@
  * 
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
+ * 
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -42,27 +43,30 @@ namespace xpcc
 	 * \brief	The CAN connector to the XPCC communication
 	 *
 	 * \section can_interface_definition The Needed Interface
+	 * 
 	 * The interface of the per template parameter given driver has to
 	 * provide the following static methods.
+	 * 
 	 * \code
-	 *	static inline bool
-	 *	isMessageAvailable();
+	 * static bool
+	 * isMessageAvailable();
 	 *
-	 *	static bool
-	 *	getMessage(Can::Message& message);
+	 * static bool
+	 * getMessage(Can::Message& message);
 	 *
-	 * 	/// The CAN controller has a free slot to send a new message.
-	 *	/// \return true if a slot is available, false otherwise
-	 *	static bool
-	 *	canSend();
+	 * /// The CAN controller has a free slot to send a new message.
+	 * /// \return true if a slot is available, false otherwise
+	 * static bool
+	 * canSend();
 	 *
-	 *	/// Send a message over the CAN.
-	 *	/// \return true if the message was send, false otherwise
-	 *	static bool
-	 *	sendMessage(const Can::Message& message);
+	 * /// Send a message over the CAN.
+	 * /// \return true if the message was send, false otherwise
+	 * static bool
+	 * sendMessage(const Can::Message& message);
 	 * \endcode
 	 *
-	 * \section can_interface_packed_definition Definition of the Structure in the CAN Message
+	 * \section structure Definition of the structure of a CAN message
+	 * 
 	 * \image html xpcc_can_identifier.png
 	 *
 	 * Changes in the highest 4 bits:
@@ -70,15 +74,12 @@ namespace xpcc
      * - 1 bit: Request [0], Acknowledge [1] (NACK implicit in the payload)
      * - 1 bit: Message Counter active [1] / not active [1]
      *
-     * An EVENT is send with the DestinationID 0x00.
-	 *
-	 * \see can
-	 *
-	 * \todo message counter
+     * Every event is send with the destination identifier \c 0x00.
+	 * 
+	 * \todo message counter for fragmented messages
 	 * \todo timeout
 	 *
 	 * \ingroup	backend
-	 * \version	$Id$
 	 */
 	template <typename C>
 	class CanConnector : public BackendInterface
@@ -126,29 +127,34 @@ namespace xpcc
 		 *
 		 * \return	\b true if the message could be send, \b false otherwise
 		 */
-		bool
-		sendCanMessage(const Header &header, const uint8_t *data, uint8_t size, bool fragmentated);
-
+		static bool
+		sendCanMessage(
+				const Header &header,
+				const uint8_t *data,
+				uint8_t size,
+				bool fragmentated);
+		
+		/// Convert a packet header to a can identifier
+		static uint32_t
+		convertToIdentifier(const Header & header, bool fragmentated);
+		
+		/**
+		 * \brief	Convert a can identifier to a packet header
+		 * 
+		 * \param[in]	identifier	29-bit CAN identifier
+		 * \param[out]	header		Packet header
+		 * 
+		 * \return	\c true if the message is part of a fragmented packet,
+		 * 			\c false otherwise.
+		 */
+		static bool
+		convertToHeader(const uint32_t & identifier, Header & header);
+		
 		void
 		sendWaitingMessages();
 		
 		bool
-		isCanMessageAvailable() const;
-		
-		bool
 		retrieveCanMessage();
-		
-		uint32_t
-		getCanIdentifier();
-		
-		/**
-		 *  \brief	Read message data
-		 *
-		 * \param[out]	data
-		 * \return		size
-		 */
-		uint8_t
-		getCanData(uint8_t *data);
 		
 		void
 		checkAndReceiveMessages();
@@ -177,14 +183,14 @@ namespace xpcc
 		class ReceiveListItem
 		{
 		public:
-			ReceiveListItem(uint8_t size, const Header& header ) :
+			ReceiveListItem(uint8_t size, const Header& header) :
 				header(header), data(size), size(size),
 				receivedFragments(0)
 			{
 			}
 			
 			Header header;
-			SmartPointerVolatile data;
+			SmartPointer data;
 			uint8_t size;
 			
 			uint8_t receivedFragments;
@@ -205,6 +211,6 @@ namespace xpcc
 	};
 }
 
-#include "can_impl.hpp"
+#include "can_connector_impl.hpp"
 
 #endif	// XPCC__CAN_CONNECTOR_HPP

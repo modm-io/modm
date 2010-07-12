@@ -35,61 +35,19 @@
 
 #include <stdint.h>
 
-#include <xpcc/container/smart_pointer.hpp>
+#include "header.hpp"
+
+/**
+ * \ingroup		communication
+ * \defgroup 	backend Backend
+ * \brief 		The backend provides connection to different hardware modules to
+ * 				transmit the communication.
+ *
+ * All backend-implementations have to implement xpcc::BackendInterface.
+ */
 
 namespace xpcc
 {
-	/**
-	 * \brief 		The header of the communication.
-	 *
-	 * \ingroup		communication
-	 * \author		Martin Rosekeit, Fabian Greif
-	 */
-	struct Header
-	{
-		enum Type
-		{
-			REQUEST,
-			RESPONSE,
-			NEGATIVE_RESPONSE,
-		};
-
-		Header() :
-			type( REQUEST ),
-			isAcknowledge( false ),
-			destination( 0 ),
-			source( 0 ),
-			packetIdentifier( 0 )
-		{
-		}
-
-		Header(Type type, bool isAck, uint8_t dest, uint8_t source, uint8_t id) :
-			type( type ),
-			isAcknowledge( isAck ),
-			destination( dest ),
-			source( source ),
-			packetIdentifier( id )
-		{
-		}
-		
-		Type type;
-		bool isAcknowledge;
-		
-		uint8_t destination;
-		uint8_t source;
-		uint8_t packetIdentifier;
-		
-		bool
-		operator == (const Header& other)
-		{
-			return ((type == other.type) &&
-					(isAcknowledge == other.isAcknowledge) &&
-					(destination == other.destination) &&
-					(source == other.source) &&
-					(packetIdentifier == other.packetIdentifier));
-		}
-	};
-	
 	/**
 	 * \brief 		The BackendInterface provides a common interface for using
 	 * 				different hardware modules to transmit messages.
@@ -103,15 +61,17 @@ namespace xpcc
 	{
 	public:
 		virtual
-		~BackendInterface() {};
+		~BackendInterface()
+		{
+		}
 
 		virtual void
 		update() = 0;
 		
-		/// Send a Message. // soll denn der header kopiert werden?
+		/// Send a Message.
 		virtual void
-		sendPacket( const Header &header, SmartPointer payload = SmartPointer() ) = 0;
-		
+		sendPacket(const Header &header,
+				SmartPointer payload = SmartPointer()) = 0;
 		
 		/// Check if a new packet was received by the backend
 		virtual bool

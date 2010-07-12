@@ -2,10 +2,10 @@
 // ----------------------------------------------------------------------------
 /* Copyright (c) 2009, Roboterclub Aachen e.V.
  * All rights reserved.
- *
+ * 
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- *
+ * 
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -14,7 +14,7 @@
  *     * Neither the name of the Roboterclub Aachen e.V. nor the
  *       names of its contributors may be used to endorse or promote products
  *       derived from this software without specific prior written permission.
- *
+ * 
  * THIS SOFTWARE IS PROVIDED BY ROBOTERCLUB AACHEN E.V. ''AS IS'' AND ANY
  * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -25,43 +25,70 @@
  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
+ * 
  * $Id$
  */
 // ----------------------------------------------------------------------------
 
-#include <unittest/testsuite.hpp>
+#ifndef	XPCC__HEADER_HPP
+#define	XPCC__HEADER_HPP
 
-class DynamicArrayTest : public unittest::TestSuite
+#include <stdint.h>
+
+#include <xpcc/container/smart_pointer.hpp>
+
+namespace xpcc
 {
-public:
-	void
-	setUp();
+	/**
+	 * \brief 		Header of a packet
+	 * 
+	 * \ingroup		backend
+	 * \author		Martin Rosekeit, Fabian Greif
+	 */
+	struct Header
+	{
+		enum Type
+		{
+			REQUEST,
+			RESPONSE,
+			NEGATIVE_RESPONSE,
+		};
+
+		Header() :
+			type( REQUEST ),
+			isAcknowledge( false ),
+			destination( 0 ),
+			source( 0 ),
+			packetIdentifier( 0 )
+		{
+		}
+
+		Header(Type type, bool isAck, uint8_t dest, uint8_t source, uint8_t id) :
+			type( type ),
+			isAcknowledge( isAck ),
+			destination( dest ),
+			source( source ),
+			packetIdentifier( id )
+		{
+		}
+		
+		Type type;
+		bool isAcknowledge;
+		
+		uint8_t destination;
+		uint8_t source;
+		uint8_t packetIdentifier;
+		
+		bool
+		operator == (const Header& other) const;
+	};
 	
-	void
-	testDefaultConstrutor();
+	/**
+	 * \brief	Stream operator for a packet header
+	 * \ingroup	backend
+	 */
+	IOStream&
+	operator << (IOStream& s, const Header& header);
+}
 
-	void
-	testAllocationConstructor();
-
-	void
-	testSequenceConstructor();
-
-	void
-	testCopyConstructor();
-
-	void
-	testReserve();
-
-	void
-	testAppend();
-
-	void
-	testRemove();
-	
-	void
-	testClear();
-	
-	void
-	testRemoveAll();
-};
+#endif	// XPCC__HEADER_HPP

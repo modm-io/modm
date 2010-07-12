@@ -87,28 +87,23 @@ namespace xpcc
 		inline const T&
 		getBack() const;
 		
-		/**
-		 * \brief	Access the node at position \a index
-		 * 
-		 * \warning	The implementation has to iterate through the list
-		 * 			until it reaches the desired position. Therefore an
-		 * 			access via iterator is preferred.
-		 */
-		const T&
-		at(int index) const;
-		
 	protected:
 		struct Node
 		{
-			T data;
+			T value;
 			Node *next;
 		};
 		
 		// The stored instance is not actually of type Allocator. Instead we
 		// rebind the type to Allocator<Node<T>>. Node<T> is not the same
-		// size as T (it's a pointer larger), and specializations on T may go
-		// unused because List<T> is being bound instead.
+		// size as T (it's one pointer larger), and specializations on T may go
+		// unused because Node<T> is being bound instead.
 		typedef typename Allocator::template rebind< Node >::other NodeAllocator;
+		
+		NodeAllocator nodeAllocator;
+		
+		Node *front;
+		Node *back;
 		
 	private:
 		LinkedList(const LinkedList& other);

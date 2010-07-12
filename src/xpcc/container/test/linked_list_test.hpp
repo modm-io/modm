@@ -36,5 +36,29 @@ class LinkedListTest : public unittest::TestSuite
 {
 public:
 	void
+	setUp();
+	
+	void
 	testConstructor();
+	
+	void
+	testAppend();
+	
+	void
+	testAppendCount();
+	
+	void
+	testPrepend();
+	
+	void
+	testPrependCount();
+	
+	void
+	testRemoveFront();
+	
+	void
+	testRemoveFrontCount();
+	
+	void
+	testDestructor();
 };

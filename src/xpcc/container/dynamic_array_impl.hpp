@@ -35,63 +35,74 @@
 #endif
 
 // ----------------------------------------------------------------------------
-template <typename T>
-xpcc::DynamicArray<T>::DynamicArray() :
+template <typename T, typename Allocator>
+xpcc::DynamicArray<T, Allocator>::DynamicArray(const Allocator& allocator) :
+	allocator(allocator),
 	size(0), capacity(0), values(0)
 {
 }
 
-template <typename T>
-xpcc::DynamicArray<T>::DynamicArray(SizeType n) :
-	size(0), capacity(n), values(new T[n])
+template <typename T, typename Allocator>
+xpcc::DynamicArray<T, Allocator>::DynamicArray(SizeType n, const Allocator& allocator) :
+	allocator(allocator), size(0), capacity(n)
 {
+	this->values = this->allocator.allocate(n);
 }
 
-template <typename T>
-xpcc::DynamicArray<T>::DynamicArray(SizeType n, const T& value) :
-	size(n), capacity(n), values(new T[n])
+template <typename T, typename Allocator>
+xpcc::DynamicArray<T, Allocator>::DynamicArray(SizeType n, const T& value, const Allocator& allocator) :
+	allocator(allocator), size(n), capacity(n)
 {
+	this->values = this->allocator.allocate(n);
 	for (SizeType i = 0; i < n; ++i) {
-		this->values[i] = value;
+		allocator.construct(&this->values[i], value);
 	}
 }
 
-template <typename T>
-xpcc::DynamicArray<T>::DynamicArray(const DynamicArray& other) :
-	size(other.size), capacity(other.capacity),
-	values(new T[other.capacity])
+template <typename T, typename Allocator>
+xpcc::DynamicArray<T, Allocator>::DynamicArray(const DynamicArray& other) :
+	allocator(other.allocator),
+	size(other.size), capacity(other.capacity)
+{
+	this->values = allocator.allocate(other.capacity);
+	for (SizeType i = 0; i < this->size; ++i) {
+		this->allocator.construct(&this->values[i], other.values[i]);
+	}
+}
+
+template <typename T, typename Allocator>
+xpcc::DynamicArray<T, Allocator>::~DynamicArray()
 {
 	for (SizeType i = 0; i < this->size; ++i) {
-		this->values[i] = other.values[i];
+		this->allocator.destroy(&this->values[i]);
 	}
+	this->allocator.deallocate(this->values);
 }
 
-template <typename T>
-xpcc::DynamicArray<T>::~DynamicArray()
+template <typename T, typename Allocator>
+xpcc::DynamicArray<T, Allocator>&
+xpcc::DynamicArray<T, Allocator>::operator = (const DynamicArray& other)
 {
-	delete[] this->values;
-}
-
-template <typename T>
-xpcc::DynamicArray<T>&
-xpcc::DynamicArray<T>::operator = (const DynamicArray& other)
-{
-	delete[] this->values;
-
+	for (SizeType i = 0; i < this->size; ++i) {
+		this->allocator.destroy(&this->values[i]);
+	}
+	this->allocator.deallocate(this->values);
+	
+	this->allocator = other.allocator;
 	this->size = other.size;
 	this->capacity = other.capacity;
-	this->values = new T[this->capacity];
+	this->values = this->allocator.allocate(this->capacity);
 
 	for (SizeType i = 0; i < this->size; ++i) {
-		this->values[i] = other.values[i];
+		this->allocator.construct(&this->values[i], other.values[i]);
 	}
 	return *this;
 }
 
 // ----------------------------------------------------------------------------
-template <typename T>
+template <typename T, typename Allocator>
 void
-xpcc::DynamicArray<T>::reserve(SizeType n)
+xpcc::DynamicArray<T, Allocator>::reserve(SizeType n)
 {
 	if (n <= (this->capacity - this->size)) {
 		// capacity is already big enough, nothing to do.
@@ -103,12 +114,14 @@ xpcc::DynamicArray<T>::reserve(SizeType n)
 }
 
 // ----------------------------------------------------------------------------
-template <typename T>
+template <typename T, typename Allocator>
 void
-xpcc::DynamicArray<T>::clear()
+xpcc::DynamicArray<T, Allocator>::clear()
 {
-	// TODO ruf dies die destructoren der elemente auf?
-	delete[] this->values;
+	for (SizeType i = 0; i < this->size; ++i) {
+		this->allocator.destroy(&this->values[i]);
+	}
+	this->allocator.deallocate(this->values);
 	this->values = 0;
 	
 	this->size = 0;
@@ -116,20 +129,20 @@ xpcc::DynamicArray<T>::clear()
 }
 
 // ----------------------------------------------------------------------------
-template <typename T>
+template <typename T, typename Allocator>
 void
-xpcc::DynamicArray<T>::removeAll()
+xpcc::DynamicArray<T, Allocator>::removeAll()
 {
 	for (SizeType i = 0; i < this->size; ++i) {
-		this->values[i].~T();
+		this->allocator.destroy(&this->values[i]);
 	}
 	this->size = 0;
 }
 
 // ----------------------------------------------------------------------------
-template <typename T>
+template <typename T, typename Allocator>
 void
-xpcc::DynamicArray<T>::append(const T& value)
+xpcc::DynamicArray<T, Allocator>::append(const T& value)
 {
 	if (this->capacity == this->size)
 	{
@@ -140,34 +153,35 @@ xpcc::DynamicArray<T>::append(const T& value)
 		}
 		this->relocate(n);
 	}
-
-	this->values[this->size] = value;
+	
+	this->allocator.construct(&this->values[this->size], value);
 	++this->size;
 }
 
 // ----------------------------------------------------------------------------
-template <typename T>
+template <typename T, typename Allocator>
 void
-xpcc::DynamicArray<T>::removeBack()
+xpcc::DynamicArray<T, Allocator>::removeBack()
 {
 	--this->size;
 
 	// call destructor
-	this->values[this->size].~T();
+	this->allocator.destroy(&this->values[this->size]);
 }
 
 // ----------------------------------------------------------------------------
-template <typename T>
+template <typename T, typename Allocator>
 void
-xpcc::DynamicArray<T>::relocate(SizeType n)
+xpcc::DynamicArray<T, Allocator>::relocate(SizeType n)
 {
 	this->capacity = n;
 	
-	T* newBuffer = new T[n];
+	T* newBuffer = allocator.allocate(n);
 	for (SizeType i = 0; i < this->size; ++i) {
-		newBuffer[i] = this->values[i];
+		this->allocator.construct(&newBuffer[i], this->values[i]);
+		this->allocator.destroy(&this->values[i]);
 	}
-	delete[] this->values;
+	this->allocator.deallocate(this->values);
 	
 	this->values = newBuffer;
 }

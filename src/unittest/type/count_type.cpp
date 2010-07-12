@@ -30,46 +30,54 @@
  */
 // ----------------------------------------------------------------------------
 
-#include "counter_type.hpp"
+#include "count_type.hpp"
 
-uint_fast16_t unittest::CounterType::numberOfDefaultConstructorCalls = 0;
-uint_fast16_t unittest::CounterType::numberOfCopyConstructorCalls = 0;
-uint_fast16_t unittest::CounterType::numberOfAssignments = 0;
-uint_fast16_t unittest::CounterType::numberOfDestructorCalls = 0;
-uint_fast16_t unittest::CounterType::numberOfReallocs = 0;
+std::size_t unittest::CountType::numberOfDefaultConstructorCalls = 0;
+std::size_t unittest::CountType::numberOfCopyConstructorCalls = 0;
+std::size_t unittest::CountType::numberOfAssignments = 0;
+std::size_t unittest::CountType::numberOfDestructorCalls = 0;
+std::size_t unittest::CountType::numberOfReallocs = 0;
 
-unittest::CounterType::CounterType()
+std::size_t unittest::CountType::numberOfOperations = 0;
+
+unittest::CountType::CountType()
 {
 	++numberOfDefaultConstructorCalls;
+	++numberOfOperations;
 }
 
-unittest::CounterType::CounterType(const CounterType&)
+unittest::CountType::CountType(const CountType&)
 {
 	++numberOfCopyConstructorCalls;
+	++numberOfOperations;
 }
 
-unittest::CounterType::~CounterType()
+unittest::CountType::~CountType()
 {
 	++numberOfDestructorCalls;
 	if (numberOfDestructorCalls == (numberOfCopyConstructorCalls - numberOfDefaultConstructorCalls)) {
 		++numberOfReallocs;
 	}
+	++numberOfOperations;
 }
 
-unittest::CounterType&
-unittest::CounterType::operator = (const CounterType&)
+unittest::CountType&
+unittest::CountType::operator = (const CountType&)
 {
 	++numberOfAssignments;
+	++numberOfOperations;
 	
 	return *this;
 }
 
 void
-unittest::CounterType::reset()
+unittest::CountType::reset()
 {
 	numberOfDefaultConstructorCalls = 0;
 	numberOfCopyConstructorCalls = 0;
 	numberOfAssignments = 0;
 	numberOfDestructorCalls = 0;
 	numberOfReallocs = 0;
+	
+	numberOfOperations = 0;
 }

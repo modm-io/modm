@@ -36,11 +36,101 @@
 
 // ----------------------------------------------------------------------------
 template <typename T, typename Allocator>
-xpcc::LinkedList<T, Allocator>::LinkedList(const Allocator& /*allocator*/)
+xpcc::LinkedList<T, Allocator>::LinkedList(const Allocator& allocator) :
+	nodeAllocator(allocator), front(0), back(0)
 {
 }
 
 template <typename T, typename Allocator>
 xpcc::LinkedList<T, Allocator>::~LinkedList()
 {
+	while (this->front != 0) {
+		Node *next = this->front->next;
+		
+		Allocator::destroy(&this->front->value);
+		this->nodeAllocator.deallocate(this->front);
+		this->front = next;
+	}
+}
+
+template <typename T, typename Allocator>
+bool
+xpcc::LinkedList<T, Allocator>::isEmpty() const
+{
+	return (this->front == 0);
+}
+
+// ----------------------------------------------------------------------------
+template <typename T, typename Allocator>
+void
+xpcc::LinkedList<T, Allocator>::prepend(const T& value)
+{
+	// allocate memory for the new node and copy the value into it
+	Node *node = this->nodeAllocator.allocate(1);
+	Allocator::construct(&node->value, value);
+	
+	// hook the node into the list
+	node->next = this->front;
+	this->front = node;
+	if (this->back == 0) {
+		// first entry in the list
+		this->back = node;
+	}
+}
+
+template <typename T, typename Allocator>
+void
+xpcc::LinkedList<T, Allocator>::append(const T& value)
+{
+	// allocate memory for the new node and copy the value into it
+	Node *node = this->nodeAllocator.allocate(1);
+	Allocator::construct(&node->value, value);
+	
+	// hook the node into the list
+	node->next = 0;
+	if (this->back == 0)
+	{
+		// first entry in the list
+		this->back = node;
+		this->front = node;
+	}
+	else {
+		this->back->next = node;
+		this->back = node;
+	}
+}
+
+// ----------------------------------------------------------------------------
+template <typename T, typename Allocator>
+void
+xpcc::LinkedList<T, Allocator>::removeFront()
+{
+	// remove node from the list
+	Node *tmp = this->front;
+	
+	if (this->front == this->back)
+	{
+		// last entry in the list
+		this->back = 0;
+	}
+	this->front = this->front->next;
+	
+	// call destructor and free memory
+	Allocator::destroy(&tmp->value);
+	this->nodeAllocator.deallocate(tmp);
+}
+
+// ----------------------------------------------------------------------------
+template <typename T, typename Allocator>
+inline const T&
+xpcc::LinkedList<T, Allocator>::getFront() const
+{
+	return this->front->value;
+}
+
+template <typename T, typename Allocator>
+inline const T&
+xpcc::LinkedList<T, Allocator>::getBack() const
+{
+	return this->back->value;
 }

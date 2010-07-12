@@ -31,16 +31,6 @@
 #ifndef XPCC_BACKEND_H_
 #define XPCC_BACKEND_H_
 
-/**
- * \ingroup		communication
- * \defgroup 	backend Backend
- * \brief 		The backend provides connection to different hardware modules to
- * 				transmit the communication.
- *
- * All backends have to implement the xpcc::BackendInterface.
- *
- * \version		$Id: backend.dox 53 2009-09-23 16:20:07Z dergraaf $
- * \author		Martin Rosekeit, Fabian Greif
- */
+
 
 #endif /* XPCC_BACKEND_H_ */

@@ -34,6 +34,7 @@
 #define XPCC__DYNAMIC_ARRAY_HPP
 
 #include <cstddef>
+#include <xpcc/utils/allocator.hpp>
 
 namespace xpcc
 {
@@ -55,13 +56,10 @@ namespace xpcc
 	 * explicitly indicate a capacity for the dynamic array using member
 	 * function DynamicArray::reserve().
 	 * 
-	 * \todo	check if all the copy-constructors and destructors of T are
-	 * 			called correctly.
-	 * 
 	 * \author	Fabian Greif <fabian.greif@rwth-aachen.de>
 	 * \ingroup	container
 	 */
-	template <typename T>
+	template <typename T, typename Allocator = allocator::Dynamic<T> >
 	class DynamicArray
 	{
 	public:
@@ -73,14 +71,14 @@ namespace xpcc
 		 * Constructs an empty dynamic array, with no content and a
 		 * size of zero.
 		 */
-		DynamicArray();
+		DynamicArray(const Allocator& allocator = Allocator());
 
 		/**
 		 * \brief	Allocation constructor
 		 *
 		 * Construct a dynamic array of given size.
 		 */
-		DynamicArray(SizeType n);
+		DynamicArray(SizeType n, const Allocator& allocator = Allocator());
 
 		/**
 		 * \brief	Repetitive sequence constructor
@@ -90,7 +88,7 @@ namespace xpcc
 		 * Initializes the dynamic array with its content set to a
 		 * repetition, n times, of copies of value.
 		 */
-		DynamicArray(SizeType n, const T& value);
+		DynamicArray(SizeType n, const T& value, const Allocator& allocator = Allocator());
 		
 		DynamicArray(const DynamicArray& other);
 		
@@ -264,7 +262,9 @@ namespace xpcc
 		 */
 		void
 		relocate(SizeType n);
-
+		
+		Allocator allocator;
+		
 		SizeType size;
 		SizeType capacity;
 		T* values;

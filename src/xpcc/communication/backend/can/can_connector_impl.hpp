@@ -34,17 +34,10 @@
 	#error	"Don't include this file directly, use 'can.hpp' instead!"
 #endif
 
-#include "can.hpp"
+#include <xpcc/math/utils/bit_operation.hpp>
 #include <xpcc/driver/can/can.hpp>
 
-//#include <xpcc/debug/logger/logger.hpp>
-#include <xpcc/utils/misc.hpp>
-
-#define XPCC_CAN_USE_COUNTER 0
-
-// set the Loglevel
-//#undef  XPCC_LOG_LEVEL
-//#define XPCC_LOG_LEVEL xpcc::log::INFO
+#include <xpcc/debug/logger.hpp>
 
 // -----------------------------------------------------------------------------
 template<typename C>
@@ -58,22 +51,17 @@ void
 xpcc::CanConnector<C>::sendPacket(const Header &header, SmartPointer payload)
 {
 	bool sendSuccessfull = false;
-
-#if XPCC_CAN_USE_COUNTER
-	if ( payload.getSize() <= 7 && C::canSend()  )
-#else
-	if ( payload.getSize() <= 7 && C::canSend()  )
-//	if ( payload.getSize() <= 8 && C::canSend()  )
-#endif
-	{
-		sendSuccessfull = this->sendCanMessage(	header, payload.getPointer(), payload.getSize(), false );
+	if (payload.getSize() <= 8 && C::canSend()) {
+		// try to send the message directly
+		sendSuccessfull = this->sendCanMessage(
+				header, payload.getPointer(), payload.getSize(), false);
 	}
 
-	if( !sendSuccessfull )
+	if (!sendSuccessfull)
 	{
+		// append the message to the list of waiting messages
 		SendListItem* message = new SendListItem(header, payload);
-
-		this->sendList.append( new typename SendList::Node( message ) );
+		this->sendList.append( new typename SendList::Node(message) );
 	}
 }
 
@@ -91,64 +79,115 @@ xpcc::CanConnector<C>::dropPacket()
 // -----------------------------------------------------------------------------
 template<typename C>
 void
-xpcc::CanConnector<C>::update() {
+xpcc::CanConnector<C>::update()
+{
 	this->checkAndReceiveMessages();
 	this->sendWaitingMessages();
 }
 
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 // protected
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
+template<typename C>
+uint32_t
+xpcc::CanConnector<C>::convertToIdentifier(const Header & header, bool fragmentated)
+{
+	uint32_t identifier;
+	
+	switch (header.type){
+		case xpcc::Header::REQUEST:
+			identifier = 0;
+			break;
+		case xpcc::Header::RESPONSE:
+			identifier = 1;
+			break;
+		case xpcc::Header::NEGATIVE_RESPONSE:
+			identifier = 2;
+			break;
+	}
+	identifier = identifier << 1;
+	if (header.isAcknowledge){
+		identifier |= 1;
+	}
+	identifier = identifier << 1;
+	// Message counter
+	identifier = identifier << 1;
+	
+	if (fragmentated){
+		identifier |= 1;
+	}
+	identifier = identifier << 8;
+	identifier |= header.destination;
+	identifier = identifier << 8;
+	identifier |= header.source;
+	identifier = identifier << 8;
+	identifier |= header.packetIdentifier;
+	
+	return identifier;
+}
+
 template<typename C>
 bool
-xpcc::CanConnector<C>::sendCanMessage(const Header &header, const uint8_t *data, uint8_t size, bool fragmentated)
+xpcc::CanConnector<C>::convertToHeader(
+		const uint32_t & identifier_, xpcc::Header & header)
 {
-	static uint8_t messageCounter(0);
-	messageCounter++;
+	uint32_t identifier = identifier_;
+	
+	header.packetIdentifier = 0x000000FF & identifier;
+	identifier	= identifier >> 8;
+	header.source 			= 0x000000FF & identifier;
+	identifier	= identifier >> 8;
+	header.destination 		= 0x000000FF & identifier;
+	identifier 	= identifier >> 8;
 
-	xpcc::Can::Message message(
-			0,
-			size+1);
-	switch ( header.type ) {
-		case xpcc::Header::REQUEST :
-			message.identifier = 0;
-			break;
-		case xpcc::Header::RESPONSE :
-			message.identifier = 1;
-			break;
-		case xpcc::Header::NEGATIVE_RESPONSE :
-			message.identifier = 2;
-			break;
+	bool isFragment = false;
+	if (identifier & 0x01) {
+		isFragment = true;
 	}
-	message.identifier = message.identifier << 1;
-
-	if( header.isAcknowledge ) {
-		message.identifier |= 1;
-	}
-	message.identifier = message.identifier << 1;
+	identifier = identifier >> 1;
 
 	// todo counter
-#if XPCC_CAN_USE_COUNTER
-#error "use of counter is not implemented yet"
-#endif
-	message.identifier = message.identifier << 1;
+	identifier = identifier >> 1;
 
-	if( fragmentated ) {
-		message.identifier |= 1;
+	if( identifier & 0x01 ) {
+		header.isAcknowledge = true;
 	}
-	message.identifier = message.identifier << 8;
+	else {
+		header.isAcknowledge = false;
+	}
+	identifier = identifier >> 1;
 
-	message.identifier |= header.destination;
-	message.identifier = message.identifier << 8;
-	message.identifier |= header.source;
-	message.identifier = message.identifier << 8;
-	message.identifier |= header.packetIdentifier;
+	switch (identifier & 0x03)
+	{
+		case 0:
+			header.type = xpcc::Header::REQUEST;
+			break;
+		case 1:
+			header.type = xpcc::Header::RESPONSE;
+			break;
+		case 2:
+			header.type = xpcc::Header::NEGATIVE_RESPONSE;
+			break;
+		default:
+			// unknown type
+			//return false;
+			XPCC_LOG_ERROR << "Unknown Type" << xpcc::flush;
+	}
+	
+	return isFragment;
+}
 
-	message.data[0] = messageCounter;
-	memcpy(message.data + 1, data, size);
-
-	message.flags.extended = true;
-//	message.flags.rtr = false;
+template<typename C>
+bool
+xpcc::CanConnector<C>::sendCanMessage(const Header &header,
+		const uint8_t *data, uint8_t size, bool fragmentated)
+{
+	xpcc::Can::Message message(
+			convertToIdentifier(header, fragmentated),
+			size);
+	
+	memcpy(message.data, data, size);
+	
 	return C::sendMessage( message );
 }
 
@@ -156,7 +195,7 @@ template<typename C>
 void
 xpcc::CanConnector<C>::sendWaitingMessages()
 {
-	if ( this->sendList.isEmpty() ) {
+	if (this->sendList.isEmpty()) {
 		// no message in the queue
 		return;
 	}
@@ -165,21 +204,21 @@ xpcc::CanConnector<C>::sendWaitingMessages()
 	uint8_t size = message->payload.getSize();
 	bool sendFinished = true;
 	
-	if (size > 7)
+	if (size > 8)
 	{
 		// fragmented message
-		uint8_t data[7];
+		uint8_t data[8];
 		
 		data[0] = message->fragmentIndex;
 		data[1] = size; // complete message
 		
-		uint8_t offset = message->fragmentIndex * 5;
+		uint8_t offset = message->fragmentIndex * 6;
 		uint8_t sizeFragment = size - offset;
-		if (sizeFragment > 5) {
-			sizeFragment = 5;
+		if (sizeFragment > 6) {
+			sizeFragment = 6;
 			sendFinished = false;
 		}
-		// else sizeFragment is 5 or smaller, i.a. the last fragment is to be
+		// else sizeFragment is 6 or smaller, i.a. the last fragment is to be
 		// sent.
 		// So sendFinished
 
@@ -194,7 +233,11 @@ xpcc::CanConnector<C>::sendWaitingMessages()
 	}
 	else
 	{
-		if (!this->sendCanMessage(message->header, message->payload.getPointer(), size, false)) {
+		if (!this->sendCanMessage(
+				message->header,
+				message->payload.getPointer(),
+				size,
+				false)) {
 			sendFinished = false;
 		}
 	}
@@ -212,77 +255,31 @@ xpcc::CanConnector<C>::sendWaitingMessages()
 
 template<typename C>
 bool
-xpcc::CanConnector<C>::isCanMessageAvailable() const
-{
-	return C::isMessageAvailable();
-}
-
-template<typename C>
-bool
 xpcc::CanConnector<C>::retrieveCanMessage()
 {
 	Can::Message canMessage;
 
-	if( C::getMessage(canMessage) ) {
-
+	if (C::getMessage(canMessage))
+	{
 		xpcc::Header header;
-		header.packetIdentifier = 0x000000FF & canMessage.identifier;
-		canMessage.identifier	= canMessage.identifier >> 8;
-		header.source 			= 0x000000FF & canMessage.identifier;
-		canMessage.identifier	= canMessage.identifier >> 8;
-		header.destination 		= 0x000000FF & canMessage.identifier;
-		canMessage.identifier 	= canMessage.identifier >> 8;
-
-		bool fragmentated( false );
-		if ( canMessage.identifier & 0x01 ) {
-			fragmentated = true;
-		}
-		canMessage.identifier = canMessage.identifier >> 1;
-
-		// todo counter
-#if XPCC_CAN_USE_COUNTER
-#error "use of counter is not implemented yet"
-#endif
-		canMessage.identifier = canMessage.identifier >> 1;
-
-		if( canMessage.identifier & 0x01 ) {
-			header.isAcknowledge = true;
-		}
-		canMessage.identifier = canMessage.identifier >> 1;
-
-		switch (canMessage.identifier & 0x03 ) {
-			case 0:
-				header.type = xpcc::Header::REQUEST;
-				break;
-			case 1:
-				header.type = xpcc::Header::RESPONSE;
-				break;
-			case 2:
-				header.type = xpcc::Header::NEGATIVE_RESPONSE;
-				break;
-			default:
-				// unknown type
-				return false;
-		}
+		bool isFragment = convertToHeader(canMessage.identifier, header);
 		
-//		if (header.destination == 0x12)
-//			XPCC_LOG_INFO << "H" << xpcc::endl;
-//
-		if( fragmentated ) {
+		if (isFragment)
+		{
 			// find existing container otherwise create a new one
 			const uint8_t& messageSize = canMessage.data[2];
 			const uint8_t& fragmentId = canMessage.data[1];
 
 			// calculate the number of messages need to send message_size-bytes
-			div_t n = div(messageSize, 5);
+			div_t n = div(messageSize, 6);
 			uint8_t numberOfFragments = (n.rem > 0) ? n.quot + 1 : n.quot;
 			// TODO: number_of_message = (current_message.size - 1) / 5 + 1;
 
-			if (canMessage.length < 4 || messageSize > 40 || fragmentId >= numberOfFragments)
+			if (canMessage.length < 4 || messageSize > 48 || fragmentId >= numberOfFragments)
 			{
 				// illegal format: fragmented messages need to have at least 3 byte payload,
-				// 				   the maxium size is 48 Bytes and the fragment number should
-				//				   not be heigher than the number of fragments.
+				// 				   the maximum size is 48 Bytes and the fragment number should
+				//				   not be higher than the number of fragments.
 				return false;
 			}
 
@@ -319,8 +316,8 @@ xpcc::CanConnector<C>::retrieveCanMessage()
 					node = ++(*node);
 				}
 			}
-			if( node == 0 ) {
-				//xpcc::log::debug << "new container" << xpcc::flush;
+			if (node == 0)
+			{
 				ReceiveListItem* message = new ReceiveListItem( messageSize, header );
 				node = new typename ReceiveList::Node( message );
 				this->receivingMessages.append( node );
@@ -330,7 +327,7 @@ xpcc::CanConnector<C>::retrieveCanMessage()
 			if (currentFragment & node->getValue()->receivedFragments)
 			{
 				// error: received fragment twice -> most likely a new message -> delete the old one
-				xpcc::log::warning << "lost fragment" << xpcc::flush;
+				XPCC_LOG_WARNING << "lost fragment" << xpcc::flush;
 				node->getValue()->receivedFragments = 0;
 			}
 
@@ -338,7 +335,7 @@ xpcc::CanConnector<C>::retrieveCanMessage()
 			node->getValue()->receivedFragments |= currentFragment;
 
 			// test if this was the last segment, otherwise we have to wait for more messages
-			if ( xpcc::utils::bitCount( node->getValue()->receivedFragments ) == numberOfFragments )
+			if ( xpcc::math::bitCount( node->getValue()->receivedFragments ) == numberOfFragments )
 			{
 				this->receivedMessages.append( node );
 				this->receivingMessages.remove( node );
@@ -357,26 +354,10 @@ xpcc::CanConnector<C>::retrieveCanMessage()
 }
 
 template<typename C>
-uint32_t
-xpcc::CanConnector<C>::getCanIdentifier()
-{
-	return 0;
-}
-
-template<typename C>
-uint8_t
-xpcc::CanConnector<C>::getCanData(uint8_t *data)
-{
-	(void) data;
-
-	return 0;
-}
-
-template<typename C>
 void
 xpcc::CanConnector<C>::checkAndReceiveMessages()
 {
-	while ( this->isCanMessageAvailable() )
+	while (C::isMessageAvailable())
 	{
 		this->retrieveCanMessage();
 	}

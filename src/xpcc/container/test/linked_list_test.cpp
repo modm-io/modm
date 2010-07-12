@@ -30,14 +30,183 @@
  */
 // ----------------------------------------------------------------------------
 
+#include <unittest/type/count_type.hpp>
 #include <xpcc/container/linked_list.hpp>
 
 #include "linked_list_test.hpp"
 
-typedef xpcc::LinkedList<int16_t> Container;
+void
+LinkedListTest::setUp()
+{
+	// reset CounterType before every test
+	unittest::CountType::reset();
+}
 
 void
 LinkedListTest::testConstructor()
 {
-	Container list;
+	xpcc::LinkedList< unittest::CountType > list;
+	
+	TEST_ASSERT_TRUE(list.isEmpty());
+	TEST_ASSERT_EQUALS(unittest::CountType::numberOfDefaultConstructorCalls, 0U);
+}
+
+void
+LinkedListTest::testAppend()
+{
+	xpcc::LinkedList<int16_t> list;
+	
+	list.append(1);
+	
+	TEST_ASSERT_FALSE(list.isEmpty());
+	TEST_ASSERT_EQUALS(list.getFront(), 1);
+	TEST_ASSERT_EQUALS(list.getBack(), 1);
+	
+	list.append(2);
+	
+	TEST_ASSERT_EQUALS(list.getFront(), 1);
+	TEST_ASSERT_EQUALS(list.getBack(), 2);
+	
+	list.append(3);
+	
+	TEST_ASSERT_EQUALS(list.getFront(), 1);
+	TEST_ASSERT_EQUALS(list.getBack(), 3);
+}
+
+void
+LinkedListTest::testAppendCount()
+{
+	xpcc::LinkedList< unittest::CountType > list;
+	
+	TEST_ASSERT_EQUALS(unittest::CountType::numberOfDefaultConstructorCalls, 0U);
+	TEST_ASSERT_EQUALS(unittest::CountType::numberOfCopyConstructorCalls, 0U);
+	
+	unittest::CountType data;
+	
+	TEST_ASSERT_EQUALS(unittest::CountType::numberOfDefaultConstructorCalls, 1U);
+	TEST_ASSERT_EQUALS(unittest::CountType::numberOfCopyConstructorCalls, 0U);
+	
+	list.append(data);
+	
+	TEST_ASSERT_EQUALS(unittest::CountType::numberOfDefaultConstructorCalls, 1U);
+	TEST_ASSERT_EQUALS(unittest::CountType::numberOfCopyConstructorCalls, 1U);
+	
+	list.append(data);
+	
+	TEST_ASSERT_EQUALS(unittest::CountType::numberOfDefaultConstructorCalls, 1U);
+	TEST_ASSERT_EQUALS(unittest::CountType::numberOfCopyConstructorCalls, 2U);
+}
+
+void
+LinkedListTest::testPrepend()
+{
+	xpcc::LinkedList<int16_t> list;
+	
+	list.prepend(1);
+	
+	TEST_ASSERT_FALSE(list.isEmpty());
+	TEST_ASSERT_EQUALS(list.getFront(), 1);
+	TEST_ASSERT_EQUALS(list.getBack(), 1);
+	
+	list.prepend(2);
+	
+	TEST_ASSERT_EQUALS(list.getFront(), 2);
+	TEST_ASSERT_EQUALS(list.getBack(), 1);
+	
+	list.prepend(3);
+	
+	TEST_ASSERT_EQUALS(list.getFront(), 3);
+	TEST_ASSERT_EQUALS(list.getBack(), 1);
+}
+
+void
+LinkedListTest::testPrependCount()
+{
+	xpcc::LinkedList< unittest::CountType > list;
+	
+	TEST_ASSERT_EQUALS(unittest::CountType::numberOfDefaultConstructorCalls, 0U);
+	TEST_ASSERT_EQUALS(unittest::CountType::numberOfCopyConstructorCalls, 0U);
+	
+	unittest::CountType data;
+	
+	TEST_ASSERT_EQUALS(unittest::CountType::numberOfDefaultConstructorCalls, 1U);
+	TEST_ASSERT_EQUALS(unittest::CountType::numberOfCopyConstructorCalls, 0U);
+	
+	list.prepend(data);
+	
+	TEST_ASSERT_EQUALS(unittest::CountType::numberOfDefaultConstructorCalls, 1U);
+	TEST_ASSERT_EQUALS(unittest::CountType::numberOfCopyConstructorCalls, 1U);
+	
+	list.prepend(data);
+	
+	TEST_ASSERT_EQUALS(unittest::CountType::numberOfDefaultConstructorCalls, 1U);
+	TEST_ASSERT_EQUALS(unittest::CountType::numberOfCopyConstructorCalls, 2U);
+}
+
+void
+LinkedListTest::testRemoveFront()
+{
+	xpcc::LinkedList<int16_t> list;
+	
+	list.append(1);
+	list.append(2);
+	list.append(3);
+	
+	TEST_ASSERT_EQUALS(list.getFront(), 1);
+	
+	list.removeFront();
+	
+	TEST_ASSERT_EQUALS(list.getFront(), 2);
+	
+	list.removeFront();
+	
+	TEST_ASSERT_EQUALS(list.getFront(), 3);
+	TEST_ASSERT_FALSE(list.isEmpty());
+	
+	list.removeFront();
+	
+	TEST_ASSERT_TRUE(list.isEmpty());
+}
+
+void
+LinkedListTest::testRemoveFrontCount()
+{
+	unittest::CountType data;
+	
+	xpcc::LinkedList< unittest::CountType > list;
+	list.append(data);
+	list.append(data);
+	
+	unittest::CountType::reset();
+	
+	list.removeFront();
+	
+	TEST_ASSERT_EQUALS(unittest::CountType::numberOfDefaultConstructorCalls, 0U);
+	TEST_ASSERT_EQUALS(unittest::CountType::numberOfCopyConstructorCalls, 0U);
+	TEST_ASSERT_EQUALS(unittest::CountType::numberOfDestructorCalls, 1U);
+}
+
+void
+LinkedListTest::testDestructor()
+{
+	unittest::CountType data;
+	
+	xpcc::LinkedList< unittest::CountType >* list = new xpcc::LinkedList< unittest::CountType >;
+	
+	list->append(data);
+	list->append(data);
+	list->append(data);
+	
+	TEST_ASSERT_EQUALS(unittest::CountType::numberOfDefaultConstructorCalls, 1U);
+	TEST_ASSERT_EQUALS(unittest::CountType::numberOfCopyConstructorCalls, 3U);
+	TEST_ASSERT_EQUALS(unittest::CountType::numberOfDestructorCalls, 0U);
+	
+	unittest::CountType::reset();
+	
+	// call destructor
+	delete list;
+	
+	TEST_ASSERT_EQUALS(unittest::CountType::numberOfDefaultConstructorCalls, 0U);
+	TEST_ASSERT_EQUALS(unittest::CountType::numberOfCopyConstructorCalls, 0U);
+	TEST_ASSERT_EQUALS(unittest::CountType::numberOfDestructorCalls, 3U);
 }

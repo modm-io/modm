@@ -30,12 +30,18 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <unittest/type/counter_type.hpp>
+#include <unittest/type/count_type.hpp>
 #include <xpcc/container/dynamic_array.hpp>
 
 #include "dynamic_array_test.hpp"
 
 typedef xpcc::DynamicArray<int16_t> Container;
+
+void
+DynamicArrayTest::setUp()
+{
+	unittest::CountType::reset();
+}
 
 void
 DynamicArrayTest::testDefaultConstrutor()
@@ -142,27 +148,31 @@ DynamicArrayTest::testRemove()
 void
 DynamicArrayTest::testClear()
 {
-	unittest::CounterType::reset();
+	xpcc::DynamicArray<unittest::CountType> array(5);
 	
-	xpcc::DynamicArray<unittest::CounterType> array(5);
+	TEST_ASSERT_EQUALS(unittest::CountType::numberOfDefaultConstructorCalls, 0U);
+	TEST_ASSERT_EQUALS(unittest::CountType::numberOfOperations, 0U);
 	
-	TEST_ASSERT_EQUALS(unittest::CounterType::numberOfDefaultConstructorCalls, 5U);
+	unittest::CountType::reset();
 	
-	unittest::CounterType::reset();
-	unittest::CounterType data;
+	unittest::CountType data;
+	
+	TEST_ASSERT_EQUALS(unittest::CountType::numberOfDefaultConstructorCalls, 1U);
+	TEST_ASSERT_EQUALS(unittest::CountType::numberOfOperations, 1U);
+	
+	unittest::CountType::reset();
 	
 	array.append(data);
 	array.append(data);
 	array.append(data);
 	
-	TEST_ASSERT_EQUALS(unittest::CounterType::numberOfAssignments +
-			unittest::CounterType::numberOfCopyConstructorCalls, 3U);
-	TEST_ASSERT_EQUALS(unittest::CounterType::numberOfDefaultConstructorCalls, 1U);
-	TEST_ASSERT_EQUALS(unittest::CounterType::numberOfDestructorCalls, 0U);
+	TEST_ASSERT_EQUALS(unittest::CountType::numberOfCopyConstructorCalls, 3U);
+	TEST_ASSERT_EQUALS(unittest::CountType::numberOfOperations, 3U);
 	
 	array.clear();
 	
-	TEST_ASSERT_EQUALS(unittest::CounterType::numberOfDestructorCalls, 5U);
+	TEST_ASSERT_EQUALS(unittest::CountType::numberOfDestructorCalls, 3U);
+	TEST_ASSERT_EQUALS(unittest::CountType::numberOfOperations, 6U);
 	
 	TEST_ASSERT_EQUALS(array.getSize(), 0U);
 	TEST_ASSERT_EQUALS(array.getCapacity(), 0U);
@@ -171,23 +181,24 @@ DynamicArrayTest::testClear()
 void
 DynamicArrayTest::testRemoveAll()
 {
-	xpcc::DynamicArray<unittest::CounterType> array(5);
+	xpcc::DynamicArray<unittest::CountType> array(5);
 	
-	unittest::CounterType::reset();
-	unittest::CounterType data;
+	unittest::CountType data;
 	
 	array.append(data);
 	array.append(data);
 	array.append(data);
 	
-	TEST_ASSERT_EQUALS(unittest::CounterType::numberOfAssignments +
-			unittest::CounterType::numberOfCopyConstructorCalls, 3U);
-	TEST_ASSERT_EQUALS(unittest::CounterType::numberOfDefaultConstructorCalls, 1U);
-	TEST_ASSERT_EQUALS(unittest::CounterType::numberOfDestructorCalls, 0U);
+	TEST_ASSERT_EQUALS(unittest::CountType::numberOfCopyConstructorCalls, 3U);
+	TEST_ASSERT_EQUALS(unittest::CountType::numberOfDefaultConstructorCalls, 1U);
+	TEST_ASSERT_EQUALS(unittest::CountType::numberOfOperations, 4U);
+	
+	unittest::CountType::reset();
 	
 	array.removeAll();
 	
-	TEST_ASSERT_EQUALS(unittest::CounterType::numberOfDestructorCalls, 3U);
+	TEST_ASSERT_EQUALS(unittest::CountType::numberOfDestructorCalls, 3U);
+	TEST_ASSERT_EQUALS(unittest::CountType::numberOfOperations, 3U);
 	
 	TEST_ASSERT_EQUALS(array.getSize(), 0U);
 	TEST_ASSERT_EQUALS(array.getCapacity(), 5U);

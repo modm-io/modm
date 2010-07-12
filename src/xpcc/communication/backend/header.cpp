@@ -2,10 +2,10 @@
 // ----------------------------------------------------------------------------
 /* Copyright (c) 2009, Roboterclub Aachen e.V.
  * All rights reserved.
- *
+ * 
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- *
+ * 
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -14,7 +14,7 @@
  *     * Neither the name of the Roboterclub Aachen e.V. nor the
  *       names of its contributors may be used to endorse or promote products
  *       derived from this software without specific prior written permission.
- *
+ * 
  * THIS SOFTWARE IS PROVIDED BY ROBOTERCLUB AACHEN E.V. ''AS IS'' AND ANY
  * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -25,43 +25,33 @@
  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
+ * 
  * $Id$
  */
 // ----------------------------------------------------------------------------
 
-#include <unittest/testsuite.hpp>
+#include "header.hpp"
 
-class DynamicArrayTest : public unittest::TestSuite
+// ----------------------------------------------------------------------------
+bool
+xpcc::Header::operator == (const Header& other) const
 {
-public:
-	void
-	setUp();
+	return ((this->type == other.type) &&
+			(this->isAcknowledge == other.isAcknowledge) &&
+			(this->destination == other.destination) &&
+			(this->source == other.source) &&
+			(this->packetIdentifier == other.packetIdentifier));
+}
+
+// ----------------------------------------------------------------------------
+xpcc::IOStream&
+xpcc::operator << (IOStream& s, const Header& header)
+{
+	s	<< "(t=" << header.type
+		<< ",a=" << header.isAcknowledge
+		<< ",d=" << xpcc::hex << header.destination << xpcc::ascii
+		<< ",s=" << xpcc::hex << header.source << xpcc::ascii
+		<< ",i=" << xpcc::hex << header.packetIdentifier << xpcc::ascii << ")";
 	
-	void
-	testDefaultConstrutor();
-
-	void
-	testAllocationConstructor();
-
-	void
-	testSequenceConstructor();
-
-	void
-	testCopyConstructor();
-
-	void
-	testReserve();
-
-	void
-	testAppend();
-
-	void
-	testRemove();
-	
-	void
-	testClear();
-	
-	void
-	testRemoveAll();
-};
+	return s;
+}
