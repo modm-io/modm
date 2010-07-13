@@ -61,4 +61,16 @@ public:
 	
 	void
 	testDestructor();
+	
+	void
+	testConstIterator();
+	
+	void
+	testConstIteratorAccess();
+	
+	void
+	testIterator();
+	
+	void
+	testIteratorAccess();
 };

@@ -34,25 +34,23 @@
 #define	XPCC__DOUBLY_LINKED_LIST_HPP
 
 #include <stdint.h>
+#include <xpcc/utils/allocator.hpp>
 
 namespace xpcc
 {
 	/**
 	 * \brief	doubly-linked list
 	 * 
-	 * 
-	 * \todo	implementation
-	 * 
 	 * \tparam	T	type of list entries
 	 * 
 	 * \author	Fabian Greif
 	 * \ingroup	container
 	 */
-	template <typename T>
+	template <typename T, typename Allocator = allocator::Dynamic<T> >
 	class DoublyLinkedList
 	{
 	public:
-		DoublyLinkedList();
+		DoublyLinkedList(const Allocator& allocator = Allocator());
 		
 		~DoublyLinkedList();
 		
@@ -87,26 +85,131 @@ namespace xpcc
 		inline const T&
 		getBack() const;
 		
-		/**
-		 * \brief	Access the node at position \a index
-		 * 
-		 * \warning	The implementation has to iterate through the list
-		 * 			until it reaches the desired position. Therefore an
-		 * 			access via iterator is preferred.
-		 */
-		const T&
-		at(int index) const;
-		
 	protected:
 		struct Node
 		{
-			T data;
+			T value;
+			
 			Node *previous;
 			Node *next;
 		};
 		
+		// The stored instance is not actually of type Allocator. Instead we
+		// rebind the type to Allocator<Node<T>>. Node<T> is not the same
+		// size as T (it's one pointer larger), and specializations on T may go
+		// unused because Node<T> is being bound instead.
+		typedef typename Allocator::template rebind< Node >::other NodeAllocator;
+		
+		NodeAllocator nodeAllocator;
+		
+		Node *front;
+		Node *back;
+		
+	public:
+		/**
+		 * \brief	Forward iterator
+		 * 
+		 * \todo	decrement operator doesn't work correctly
+		 */
+		class iterator
+		{
+			friend class DoublyLinkedList;
+			friend class const_iterator;
+			
+		public:
+			/// Default constructor
+			iterator();
+			iterator(const iterator& other);
+			
+			iterator& operator = (const iterator& other);
+			iterator& operator ++ ();
+			iterator& operator -- ();
+			bool operator == (const iterator& other) const;
+			bool operator != (const iterator& other) const;
+			T& operator * ();
+			T* operator -> ();
+		
+		private:
+			iterator(Node* node);
+			
+			Node* node;
+		};
+		
+		/**
+		 * \brief	forward const iterator
+		 * 
+		 * \todo	decrement operator doesn't work correctly
+		 */
+		class const_iterator
+		{
+			friend class DoublyLinkedList;
+			
+		public:
+			/// Default constructor
+			const_iterator();
+			
+			/**
+			 * \brief	Copy construtor
+			 * 
+			 * Used to convert a normal iterator to a const iterator.
+			 * The other way is not possible.
+			 */
+			const_iterator(const iterator& other);
+			
+			/**
+			 * \brief	Copy construtor
+			 */
+			const_iterator(const const_iterator& other);
+			
+			const_iterator& operator = (const const_iterator& other);
+			const_iterator& operator ++ ();
+			const_iterator& operator -- ();
+			bool operator == (const const_iterator& other) const;
+			bool operator != (const const_iterator& other) const;
+			const T& operator * () const;
+			const T* operator -> () const;
+		
+		private:
+			const_iterator(const Node* node);
+			
+			const Node* node;
+		};
+		
+		/**
+		 * Returns a read/write iterator that points to the first element in      the
+		 * list.  Iteration is done in ordinary element order.
+		 */
+		iterator
+		begin();
+		
+		/**
+		 * Returns a read-only (constant) iterator that points to the
+		 * first element in the list.  Iteration is done in ordinary
+		 * element order.
+		 */
+		const_iterator
+		begin() const;
+		
+		/**
+		 * Returns a read/write iterator that points one past the last
+		 * element in the list. Iteration is done in ordinary element
+		 * order.
+		 */
+		iterator
+		end();
+		
+		/**
+		 * Returns a read-only (constant) iterator that points one past
+		 * the last element in the list.  Iteration is done in ordinary
+		 * element order.
+		 */
+		const_iterator
+		end() const;
 		
 	private:
+		friend class const_iterator;
+		friend class iterator;		
+		
 		DoublyLinkedList(const DoublyLinkedList& other);
 		
 		DoublyLinkedList&
@@ -115,5 +218,6 @@ namespace xpcc
 }
 
 #include "doubly_linked_list_impl.hpp"
+#include "doubly_linked_list_iterator_impl.hpp"
 
 #endif	// XPCC__DOUBLY_LINKED_LIST_HPP

@@ -44,12 +44,13 @@ xpcc::LinkedList<T, Allocator>::LinkedList(const Allocator& allocator) :
 template <typename T, typename Allocator>
 xpcc::LinkedList<T, Allocator>::~LinkedList()
 {
-	while (this->front != 0) {
-		Node *next = this->front->next;
+	while (this->front != 0)
+	{
+		Node *node = this->front;
+		this->front = this->front->next;
 		
-		Allocator::destroy(&this->front->value);
-		this->nodeAllocator.deallocate(this->front);
-		this->front = next;
+		Allocator::destroy(&node->value);
+		this->nodeAllocator.deallocate(node);
 	}
 }
 
@@ -72,6 +73,7 @@ xpcc::LinkedList<T, Allocator>::prepend(const T& value)
 	// hook the node into the list
 	node->next = this->front;
 	this->front = node;
+	
 	if (this->back == 0) {
 		// first entry in the list
 		this->back = node;
@@ -88,16 +90,15 @@ xpcc::LinkedList<T, Allocator>::append(const T& value)
 	
 	// hook the node into the list
 	node->next = 0;
-	if (this->back == 0)
+	if (this->front == 0)
 	{
 		// first entry in the list
-		this->back = node;
 		this->front = node;
 	}
 	else {
 		this->back->next = node;
-		this->back = node;
 	}
+	this->back = node;
 }
 
 // ----------------------------------------------------------------------------
@@ -106,18 +107,21 @@ void
 xpcc::LinkedList<T, Allocator>::removeFront()
 {
 	// remove node from the list
-	Node *tmp = this->front;
+	Node *node = this->front;
 	
-	if (this->front == this->back)
+	if (this->front->next == 0)
 	{
 		// last entry in the list
 		this->back = 0;
+		this->front = 0;
 	}
-	this->front = this->front->next;
+	else {
+		this->front = this->front->next;
+	}
 	
 	// call destructor and free memory
-	Allocator::destroy(&tmp->value);
-	this->nodeAllocator.deallocate(tmp);
+	Allocator::destroy(&node->value);
+	this->nodeAllocator.deallocate(node);
 }
 
 // ----------------------------------------------------------------------------

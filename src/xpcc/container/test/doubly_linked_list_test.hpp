@@ -36,5 +36,49 @@ class DoublyLinkedListTest : public unittest::TestSuite
 {
 public:
 	void
+	setUp();
+	
+	void
 	testConstructor();
+	
+	void
+	testAppend();
+	
+	void
+	testAppendCount();
+	
+	void
+	testPrepend();
+	
+	void
+	testPrependCount();
+	
+	void
+	testRemoveFront();
+	
+	void
+	testRemoveFrontCount();
+	
+	void
+	testRemoveBack();
+	
+	void
+	testRemoveBackCount();
+	
+	void
+	testDestructor();
+	
+	void
+	testConstIterator();
+	
+	void
+	testConstIteratorAccess();
+	
+	void
+	testIterator();
+	
+	void
+	testIteratorAccess();
+	
+	// TODO test decrement operator for iterators 
 };

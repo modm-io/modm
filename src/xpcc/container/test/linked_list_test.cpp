@@ -210,3 +210,127 @@ LinkedListTest::testDestructor()
 	TEST_ASSERT_EQUALS(unittest::CountType::numberOfCopyConstructorCalls, 0U);
 	TEST_ASSERT_EQUALS(unittest::CountType::numberOfDestructorCalls, 3U);
 }
+
+namespace
+{
+	class IteratorTestClass
+	{
+	public:
+		IteratorTestClass(uint8_t a, int16_t b) :
+			a(a), b(b)
+		{
+		}
+		
+		uint8_t a;
+		int16_t b;
+	};
+}
+
+void
+LinkedListTest::testConstIterator()
+{
+	xpcc::LinkedList<int16_t> writableList;
+	const xpcc::LinkedList<int16_t>& list = writableList;
+	
+	TEST_ASSERT_TRUE(list.begin() == list.end());
+	TEST_ASSERT_FALSE(list.begin() != list.end());
+	
+	writableList.append(1);
+	
+	TEST_ASSERT_FALSE(list.begin() == list.end());
+	TEST_ASSERT_TRUE(list.begin() != list.end());
+	
+	writableList.append(2);
+	writableList.append(3);
+	
+	uint8_t i;
+	xpcc::LinkedList<int16_t>::const_iterator it;
+	
+	it = list.begin();
+	TEST_ASSERT_TRUE(it == list.begin());
+	TEST_ASSERT_TRUE(it != list.end());
+	
+	++it;
+	++it;
+	
+	TEST_ASSERT_TRUE(it != list.begin());
+	TEST_ASSERT_TRUE(it != list.end());
+	
+	++it;
+	
+	TEST_ASSERT_TRUE(it != list.begin());
+	TEST_ASSERT_TRUE(it == list.end());
+	
+	for (it = list.begin(), i = 1; it != list.end(); ++it, ++i) {
+		TEST_ASSERT_EQUALS((*it), i); 
+	}
+}
+
+void
+LinkedListTest::testConstIteratorAccess()
+{
+	xpcc::LinkedList<IteratorTestClass> list;
+	list.append(IteratorTestClass(12, -1532));
+	
+	xpcc::LinkedList<IteratorTestClass>::const_iterator it = list.begin();
+	
+	TEST_ASSERT_EQUALS(it->a, 12);
+	TEST_ASSERT_EQUALS(it->b, -1532);
+}
+
+void
+LinkedListTest::testIterator()
+{
+	xpcc::LinkedList<int16_t> list;
+	
+	TEST_ASSERT_TRUE(list.begin() == list.end());
+	TEST_ASSERT_FALSE(list.begin() != list.end());
+	
+	list.append(1);
+	
+	TEST_ASSERT_FALSE(list.begin() == list.end());
+	TEST_ASSERT_TRUE(list.begin() != list.end());
+	
+	list.append(2);
+	list.append(3);
+	
+	uint8_t i;
+	xpcc::LinkedList<int16_t>::iterator it;
+	
+	it = list.begin();
+	TEST_ASSERT_TRUE(it == list.begin());
+	TEST_ASSERT_TRUE(it != list.end());
+	
+	++it;
+	++it;
+	
+	TEST_ASSERT_TRUE(it != list.begin());
+	TEST_ASSERT_TRUE(it != list.end());
+	
+	++it;
+	
+	TEST_ASSERT_TRUE(it != list.begin());
+	TEST_ASSERT_TRUE(it == list.end());
+	
+	for (it = list.begin(), i = 1; it != list.end(); ++it, ++i) {
+		TEST_ASSERT_EQUALS((*it), i); 
+	}
+}
+
+void
+LinkedListTest::testIteratorAccess()
+{
+	xpcc::LinkedList<IteratorTestClass> list;
+	list.append(IteratorTestClass(12, -1532));
+	
+	xpcc::LinkedList<IteratorTestClass>::iterator it = list.begin();
+	
+	TEST_ASSERT_EQUALS(it->a, 12);
+	TEST_ASSERT_EQUALS(it->b, -1532);
+	
+	it->a = 66;
+	TEST_ASSERT_EQUALS(it->a, 66);
+	
+	(*it).b = 22312;
+	TEST_ASSERT_EQUALS(it->b, 22312);
+}

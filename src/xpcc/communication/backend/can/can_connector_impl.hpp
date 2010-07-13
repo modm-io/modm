@@ -50,14 +50,14 @@ template<typename C>
 void
 xpcc::CanConnector<C>::sendPacket(const Header &header, SmartPointer payload)
 {
-	bool sendSuccessfull = false;
+	bool successfull = false;
 	if (payload.getSize() <= 8 && C::canSend()) {
 		// try to send the message directly
-		sendSuccessfull = this->sendCanMessage(
+		successfull = this->sendCanMessage(
 				header, payload.getPointer(), payload.getSize(), false);
 	}
 
-	if (!sendSuccessfull)
+	if (!successfull)
 	{
 		// append the message to the list of waiting messages
 		SendListItem* message = new SendListItem(header, payload);

@@ -35,14 +35,166 @@
 #endif
 
 // ----------------------------------------------------------------------------
-template <typename T>
-xpcc::DoublyLinkedList<T>::DoublyLinkedList()
+template <typename T, typename Allocator>
+xpcc::DoublyLinkedList<T, Allocator>::DoublyLinkedList(const Allocator& allocator) :
+	nodeAllocator(allocator), front(0), back(0)
 {
 }
 
-template <typename T>
-xpcc::DoublyLinkedList<T>::~DoublyLinkedList()
+template <typename T, typename Allocator>
+xpcc::DoublyLinkedList<T, Allocator>::~DoublyLinkedList()
 {
+	while (this->front != 0)
+	{
+		Node *node = this->front;
+		this->front = this->front->next;
+		
+		Allocator::destroy(&node->value);
+		this->nodeAllocator.deallocate(node);
+	}
+}
+
+template <typename T, typename Allocator>
+bool
+xpcc::DoublyLinkedList<T, Allocator>::isEmpty() const
+{
+	return (this->front == 0);
 }
 
 // ----------------------------------------------------------------------------
+template <typename T, typename Allocator>
+void
+xpcc::DoublyLinkedList<T, Allocator>::prepend(const T& value)
+{
+	// allocate memory for the new node and copy the value into it
+	Node *node = this->nodeAllocator.allocate(1);
+	Allocator::construct(&node->value, value);
+	
+	// hook the node into the list
+	node->next = this->front;
+	node->previous = 0;
+	
+	if (this->front == 0)
+	{
+		// node it the first entry
+		this->back = node;
+	}
+	else {
+		this->front->previous = node;
+	}
+	this->front = node;
+}
+
+template <typename T, typename Allocator>
+void
+xpcc::DoublyLinkedList<T, Allocator>::append(const T& value)
+{
+	// allocate memory for the new node and copy the value into it
+	Node *node = this->nodeAllocator.allocate(1);
+	Allocator::construct(&node->value, value);
+	
+	// hook the node into the list
+	node->next = 0;
+	node->previous = this->back;
+	
+	if (this->back == 0)
+	{
+		// first entry in the list
+		this->front = node;
+	}
+	else {
+		this->back->next = node;
+	}
+	this->back = node;
+}
+
+// ----------------------------------------------------------------------------
+template <typename T, typename Allocator>
+void
+xpcc::DoublyLinkedList<T, Allocator>::removeFront()
+{
+	// remove node from the list
+	Node *node = this->front;
+	
+	if (this->front->next == 0)
+	{
+		// last entry in the list
+		this->front = 0;
+		this->back = 0;
+	}
+	else {
+		this->front = this->front->next;
+		this->front->previous = 0;
+	}
+	
+	// call destructor and free memory
+	Allocator::destroy(&node->value);
+	this->nodeAllocator.deallocate(node);
+}
+
+template <typename T, typename Allocator>
+void
+xpcc::DoublyLinkedList<T, Allocator>::removeBack()
+{
+	// remove node from the list
+	Node *node = this->back;
+	
+	if (this->back->previous == 0)
+	{
+		// last entry in the list
+		this->front = 0;
+		this->back = 0;
+	}
+	else {
+		this->back = this->back->previous;
+		this->back->next = 0;
+	}
+	
+	// call destructor and free memory
+	Allocator::destroy(&node->value);
+	this->nodeAllocator.deallocate(node);
+}
+
+// ----------------------------------------------------------------------------
+template <typename T, typename Allocator>
+inline const T&
+xpcc::DoublyLinkedList<T, Allocator>::getFront() const
+{
+	return this->front->value;
+}
+
+template <typename T, typename Allocator>
+inline const T&
+xpcc::DoublyLinkedList<T, Allocator>::getBack() const
+{
+	return this->back->value;
+}
+
+// ----------------------------------------------------------------------------
+template <typename T, typename Allocator>
+typename xpcc::DoublyLinkedList<T, Allocator>::iterator 
+xpcc::DoublyLinkedList<T, Allocator>::begin()
+{
+	return iterator(this->front);
+}
+
+template <typename T, typename Allocator>
+typename xpcc::DoublyLinkedList<T, Allocator>::iterator
+xpcc::DoublyLinkedList<T, Allocator>::end()
+{
+	return iterator(0);
+}
+
+template <typename T, typename Allocator>
+typename xpcc::DoublyLinkedList<T, Allocator>::const_iterator 
+xpcc::DoublyLinkedList<T, Allocator>::begin() const
+{
+	return const_iterator(this->front);
+}
+
+template <typename T, typename Allocator>
+typename xpcc::DoublyLinkedList<T, Allocator>::const_iterator
+xpcc::DoublyLinkedList<T, Allocator>::end() const
+{
+	return const_iterator(0);
+}

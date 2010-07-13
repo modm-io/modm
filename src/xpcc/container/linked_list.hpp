@@ -105,7 +105,105 @@ namespace xpcc
 		Node *front;
 		Node *back;
 		
+	public:
+		/**
+		 * \brief	Forward iterator
+		 */
+		class iterator
+		{
+			friend class LinkedList;
+			friend class const_iterator;
+			
+		public:
+			/// Default constructor
+			iterator();
+			iterator(const iterator& other);
+			
+			iterator& operator = (const iterator& other);
+			iterator& operator ++ ();
+			bool operator == (const iterator& other) const;
+			bool operator != (const iterator& other) const;
+			T& operator * ();
+			T* operator -> ();
+		
+		private:
+			iterator(Node* node);
+			
+			Node* node;
+		};
+		
+		/**
+		 * \brief	forward const iterator
+		 */
+		class const_iterator
+		{
+			friend class LinkedList;
+			
+		public:
+			/// Default constructor
+			const_iterator();
+			
+			/**
+			 * \brief	Copy construtor
+			 * 
+			 * Used to convert a normal iterator to a const iterator.
+			 * The other way is not possible.
+			 */
+			const_iterator(const iterator& other);
+			
+			/**
+			 * \brief	Copy construtor
+			 */
+			const_iterator(const const_iterator& other);
+			
+			const_iterator& operator = (const const_iterator& other);
+			const_iterator& operator ++ ();
+			bool operator == (const const_iterator& other) const;
+			bool operator != (const const_iterator& other) const;
+			const T& operator * () const;
+			const T* operator -> () const;
+		
+		private:
+			const_iterator(const Node* node);
+			
+			const Node* node;
+		};
+
+		/**
+		 * Returns a read/write iterator that points to the first element in      the
+		 * list.  Iteration is done in ordinary element order.
+		 */
+		iterator
+		begin();
+		
+		/**
+		 * Returns a read-only (constant) iterator that points to the
+		 * first element in the list.  Iteration is done in ordinary
+		 * element order.
+		 */
+		const_iterator
+		begin() const;
+		
+		/**
+		 * Returns a read/write iterator that points one past the last
+		 * element in the list. Iteration is done in ordinary element
+		 * order.
+		 */
+		iterator
+		end();
+		
+		/**
+		 * Returns a read-only (constant) iterator that points one past
+		 * the last element in the list.  Iteration is done in ordinary
+		 * element order.
+		 */
+		const_iterator
+		end() const;
+		
 	private:
+		friend class const_iterator;
+		friend class iterator;		
+		
 		LinkedList(const LinkedList& other);
 		
 		LinkedList&
@@ -114,5 +212,6 @@ namespace xpcc
 }
 
 #include "linked_list_impl.hpp"
+#include "linked_list_iterator_impl.hpp"
 
 #endif	// XPCC__LINKED_LIST_HPP
