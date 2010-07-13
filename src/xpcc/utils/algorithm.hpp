@@ -29,74 +29,23 @@
  * $Id$
  */
 // ----------------------------------------------------------------------------
-/** @file cstring
- *
- * This is a Standard C++ Library file.  You should @c #include this file
- * in your programs, rather than any of the "*.h" implementation files.
- *
- * This is the C++ version of the Standard C Library header @c string.h,
- * and its contents are (mostly) the same as that header, but are all
- * contained in the namespace @c std (except for names which are defined
- * as macros in C).
- */
 
-//
-// ISO C++ 14882: 20.4.6  C library
-//
+#ifndef XPCC__ALGORITHM_HPP
+#define XPCC__ALGORITHM_HPP
 
-#pragma GCC system_header
-
-#include <cstddef>
-#include <string.h>
-
-#ifndef STDCPP_CSTRING
-#define	STDCPP_CSTRING
-
-// Get rid of those macros defined in <string.h> in lieu of real functions.
-#undef memchr
-#undef memcmp
-#undef memcpy
-#undef memmove
-#undef memset
-#undef strcat
-#undef strchr
-#undef strcmp
-#undef strcoll
-#undef strcpy
-#undef strcspn
-#undef strerror
-#undef strlen
-#undef strncat
-#undef strncmp
-#undef strncpy
-#undef strpbrk
-#undef strrchr
-#undef strspn
-#undef strstr
-#undef strtok
-#undef strxfrm
-
-namespace std
+namespace xpcc
 {
-	using ::memchr;
-	using ::memcmp;
-	using ::memcpy;
-	using ::memmove;
-	using ::memset;
-	using ::strcat;
-	using ::strcmp;
-	using ::strcpy;
-	using ::strcspn;
-	using ::strlen;
-	using ::strncat;
-	using ::strncmp;
-	using ::strncpy;
-	using ::strspn;
-	using ::strtok;
-	using ::strchr;
-	using ::strpbrk;
-	using ::strrchr;
-	using ::strstr;
+	template<class InputIterator, class T>
+	InputIterator
+	find (InputIterator first, InputIterator last, const T& value)
+	{
+		for ( ; first != last; ++first) {
+			if (*first == value) {
+				break;
+			}
+		}
+		return first;
+	}
 }
 
-#endif	// STDCPP_CSTRING
+#endif	// XPCC__ALGORITHM_HPP

@@ -14,17 +14,17 @@ ${includes}
 
 ${names}
 
-CREATE_OUTPUT_PIN(LedGreen, B, 0);
-CREATE_OUTPUT_PIN(LedRed, B, 1);
+GPIO__OUTPUT(LedGreen, B, 0);
+GPIO__OUTPUT(LedRed, B, 1);
 
 int
 main(void)
 {
-	LedGreen::output();
-	LedRed::output();
+	LedGreen::setOutput();
+	LedRed::setOutput();
 	
-	LedGreen::reset();
-	LedRed::set();
+	LedGreen::low();
+	LedRed::high();
 	
 	// initialize output device
 	xpcc::BufferedUart0 uart(115200);
@@ -37,14 +37,14 @@ main(void)
 	unittest::Reporter reporter(device);
 	unittest::Controller::instance().setReporter(reporter);
 	
-	LedGreen::set();
+	LedGreen::high();
 	
 	// run tests
 ${tests}
 	
 	unittest::Controller::instance().getReporter().printSummary();
 	
-	LedRed::reset();
+	LedRed::low();
 	
 	while (1)
 	{

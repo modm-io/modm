@@ -255,8 +255,12 @@ namespace xpcc
 		 * Check if we move counter-clock wise if we move from the first point
 		 * to the second and the third.
 		 * 
-		 * \returns	1 if counter-clock wise, -1 if clock wise and 0 if \p c is
-		 * 			between \p a and \p b.
+		 * If all three points are in a line there are three possibilities:
+		 *  1) strait line: third point behind the second (returns 1)
+		 *  2) last point between the other two (returns 0)
+		 *  3) third point before the first one (returns -1)
+		 * 
+		 * This definition is useful for inclusion or intersection testing. 
 		 */
 		static int_fast8_t
 		ccw(const Vector2D<T>& a, const Vector2D<T>& b, const Vector2D<T>& c);

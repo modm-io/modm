@@ -36,7 +36,7 @@
 #include <avr/io.h>
 
 #include <xpcc/utils/macros.hpp>
-#include <xpcc/utils/misc.hpp>
+#include <xpcc/math/utils/misc.hpp>
 #include <xpcc/architecture/general/gpio.hpp>
 
 namespace xpcc
@@ -158,7 +158,7 @@ namespace xpcc
 			return (data >> 4); \
 		} \
 		ALWAYS_INLINE static void write(uint8_t data) { \
-			data = ::xpcc::utils::swap(data); \
+			data = ::xpcc::math::swap(data); \
 			PORT ## port = (data & 0xf0) | (PORT ## port & 0x0f); \
 		} \
 	}

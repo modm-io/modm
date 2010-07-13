@@ -291,7 +291,13 @@ Vector2DTest::testDotProduct()
 void
 Vector2DTest::testCrossProduct()
 {
-	// TODO
+	xpcc::Vector2D<int16_t> a(10, 20);	
+	xpcc::Vector2D<int16_t> b(10, 0);
+	xpcc::Vector2D<int16_t> c(15, -30);
+	
+	TEST_ASSERT_EQUALS(a.cross(b), -200);
+	TEST_ASSERT_EQUALS(a.cross(c), -600);
+	TEST_ASSERT_EQUALS(b.cross(c), -300);
 }
 
 void

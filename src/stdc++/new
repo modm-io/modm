@@ -29,74 +29,67 @@
  * $Id$
  */
 // ----------------------------------------------------------------------------
-/** @file cstring
+/** @file new
+ *  This is a Standard C++ Library header.
  *
- * This is a Standard C++ Library file.  You should @c #include this file
- * in your programs, rather than any of the "*.h" implementation files.
- *
- * This is the C++ version of the Standard C Library header @c string.h,
- * and its contents are (mostly) the same as that header, but are all
- * contained in the namespace @c std (except for names which are defined
- * as macros in C).
+ *  The header @c new defines several functions to manage dynamic memory and
+ *  handling memory allocation errors; see
+ *  http://gcc.gnu.org/onlinedocs/libstdc++/18_support/howto.html#4 for more.
  */
 
-//
-// ISO C++ 14882: 20.4.6  C library
-//
-
-#pragma GCC system_header
+#ifndef NEW
+#define NEW
 
 #include <cstddef>
-#include <string.h>
 
-#ifndef STDCPP_CSTRING
-#define	STDCPP_CSTRING
-
-// Get rid of those macros defined in <string.h> in lieu of real functions.
-#undef memchr
-#undef memcmp
-#undef memcpy
-#undef memmove
-#undef memset
-#undef strcat
-#undef strchr
-#undef strcmp
-#undef strcoll
-#undef strcpy
-#undef strcspn
-#undef strerror
-#undef strlen
-#undef strncat
-#undef strncmp
-#undef strncpy
-#undef strpbrk
-#undef strrchr
-#undef strspn
-#undef strstr
-#undef strtok
-#undef strxfrm
-
-namespace std
+extern "C++"
 {
-	using ::memchr;
-	using ::memcmp;
-	using ::memcpy;
-	using ::memmove;
-	using ::memset;
-	using ::strcat;
-	using ::strcmp;
-	using ::strcpy;
-	using ::strcspn;
-	using ::strlen;
-	using ::strncat;
-	using ::strncmp;
-	using ::strncpy;
-	using ::strspn;
-	using ::strtok;
-	using ::strchr;
-	using ::strpbrk;
-	using ::strrchr;
-	using ::strstr;
-}
+	//@{
+	/**
+	 * These are replaceable signatures:
+	 * 
+	 *  - single new and delete (no arguments, return @c NULL on error)
+	 *  - array new and delete (same)
+	 *
+	 * Placement new and delete signatures (take a memory address argument,
+	 * does nothing) may not be replaced by a user's program.
+	*/
+	void*
+	operator new(std::size_t);
+	
+	void*
+	operator new[](std::size_t);
+	
+	void
+	operator delete(void*);
+	
+	void
+	operator delete[](void*);
 
-#endif	// STDCPP_CSTRING
+	// Default placement versions of operator new.
+	inline void*
+	operator new(std::size_t, void* __p)
+	{
+		return __p;
+	}
+	
+	inline void*
+	operator new[](std::size_t, void* __p)
+	{
+		return __p;
+	}
+	
+	// Default placement versions of operator delete.
+	inline void
+	operator delete(void*, void*)
+	{
+	}
+	
+	inline void
+	operator delete[](void*, void*)
+	{
+	}
+	//@}
+} // extern "C++"
+
+#endif

@@ -80,12 +80,18 @@ namespace xpcc
 		 */
 		inline const T&
 		getFront() const;
+		
+		inline T&
+		getFront();
 
 		/**
 		 * \return the last node in the list
 		 */
 		inline const T&
 		getBack() const;
+		
+		inline T&
+		getBack();
 		
 	protected:
 		struct Node
@@ -199,6 +205,16 @@ namespace xpcc
 		 */
 		const_iterator
 		end() const;
+		
+		/**
+		 * \brief	Erase element
+		 * 
+		 * Removes a single element from the list container.
+		 * This effectively reduces the list size by one, calling the element's
+		 * destructor before.
+		 */
+		iterator
+		erase(const iterator& position);
 		
 	private:
 		friend class const_iterator;

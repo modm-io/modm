@@ -40,18 +40,18 @@
 #include <xpcc/debug/logger.hpp>
 
 // -----------------------------------------------------------------------------
-template<typename C>
-xpcc::CanConnector<C>::~CanConnector()
+template<typename Driver>
+xpcc::CanConnector<Driver>::~CanConnector()
 {
 }
 
 // -----------------------------------------------------------------------------
-template<typename C>
+template<typename Driver>
 void
-xpcc::CanConnector<C>::sendPacket(const Header &header, SmartPointer payload)
+xpcc::CanConnector<Driver>::sendPacket(const Header &header, SmartPointer payload)
 {
 	bool successfull = false;
-	if (payload.getSize() <= 8 && C::canSend()) {
+	if (payload.getSize() <= 8 && Driver::canSend()) {
 		// try to send the message directly
 		successfull = this->sendCanMessage(
 				header, payload.getPointer(), payload.getSize(), false);
@@ -60,26 +60,22 @@ xpcc::CanConnector<C>::sendPacket(const Header &header, SmartPointer payload)
 	if (!successfull)
 	{
 		// append the message to the list of waiting messages
-		SendListItem* message = new SendListItem(header, payload);
-		this->sendList.append( new typename SendList::Node(message) );
+		this->sendList.append(SendListItem(header, payload));
 	}
 }
 
 // -----------------------------------------------------------------------------
-template<typename C>
+template<typename Driver>
 void
-xpcc::CanConnector<C>::dropPacket()
+xpcc::CanConnector<Driver>::dropPacket()
 {
-	typename ReceiveList::Node *temp = this->receivedMessages.front();
-	this->receivedMessages.remove( temp );
-	delete temp->getValue();
-	delete temp;
+	this->receivedMessages.removeFront();
 }
 
 // -----------------------------------------------------------------------------
-template<typename C>
+template<typename Driver>
 void
-xpcc::CanConnector<C>::update()
+xpcc::CanConnector<Driver>::update()
 {
 	this->checkAndReceiveMessages();
 	this->sendWaitingMessages();
@@ -88,9 +84,9 @@ xpcc::CanConnector<C>::update()
 // ----------------------------------------------------------------------------
 // protected
 // ----------------------------------------------------------------------------
-template<typename C>
+template<typename Driver>
 uint32_t
-xpcc::CanConnector<C>::convertToIdentifier(const Header & header, bool fragmentated)
+xpcc::CanConnector<Driver>::convertToIdentifier(const Header & header, bool fragmentated)
 {
 	uint32_t identifier;
 	
@@ -104,6 +100,8 @@ xpcc::CanConnector<C>::convertToIdentifier(const Header & header, bool fragmenta
 		case xpcc::Header::NEGATIVE_RESPONSE:
 			identifier = 2;
 			break;
+		default:
+			identifier = 0;
 	}
 	identifier = identifier << 1;
 	if (header.isAcknowledge){
@@ -126,9 +124,9 @@ xpcc::CanConnector<C>::convertToIdentifier(const Header & header, bool fragmenta
 	return identifier;
 }
 
-template<typename C>
+template<typename Driver>
 bool
-xpcc::CanConnector<C>::convertToHeader(
+xpcc::CanConnector<Driver>::convertToHeader(
 		const uint32_t & identifier_, xpcc::Header & header)
 {
 	uint32_t identifier = identifier_;
@@ -170,16 +168,16 @@ xpcc::CanConnector<C>::convertToHeader(
 			break;
 		default:
 			// unknown type
-			//return false;
-			XPCC_LOG_ERROR << "Unknown Type" << xpcc::flush;
+			//XPCC_LOG_ERROR << "Unknown Type" << xpcc::flush;
+			header.type = xpcc::Header::REQUEST;
 	}
 	
 	return isFragment;
 }
 
-template<typename C>
+template<typename Driver>
 bool
-xpcc::CanConnector<C>::sendCanMessage(const Header &header,
+xpcc::CanConnector<Driver>::sendCanMessage(const Header &header,
 		const uint8_t *data, uint8_t size, bool fragmentated)
 {
 	xpcc::Can::Message message(
@@ -188,20 +186,20 @@ xpcc::CanConnector<C>::sendCanMessage(const Header &header,
 	
 	memcpy(message.data, data, size);
 	
-	return C::sendMessage( message );
+	return Driver::sendMessage( message );
 }
 
-template<typename C>
+template<typename Driver>
 void
-xpcc::CanConnector<C>::sendWaitingMessages()
+xpcc::CanConnector<Driver>::sendWaitingMessages()
 {
 	if (this->sendList.isEmpty()) {
 		// no message in the queue
 		return;
 	}
 	
-	SendListItem* message = this->sendList.front()->getValue();
-	uint8_t size = message->payload.getSize();
+	SendListItem& message = this->sendList.getFront();
+	uint8_t size = message.payload.getSize();
 	bool sendFinished = true;
 	
 	if (size > 8)
@@ -209,10 +207,10 @@ xpcc::CanConnector<C>::sendWaitingMessages()
 		// fragmented message
 		uint8_t data[8];
 		
-		data[0] = message->fragmentIndex;
+		data[0] = message.fragmentIndex;
 		data[1] = size; // complete message
 		
-		uint8_t offset = message->fragmentIndex * 6;
+		uint8_t offset = message.fragmentIndex * 6;
 		uint8_t sizeFragment = size - offset;
 		if (sizeFragment > 6) {
 			sizeFragment = 6;
@@ -222,10 +220,10 @@ xpcc::CanConnector<C>::sendWaitingMessages()
 		// sent.
 		// So sendFinished
 
-		memcpy(data + 2, message->payload.getPointer() + offset, sizeFragment);
+		memcpy(data + 2, message.payload.getPointer() + offset, sizeFragment);
 
-		if (sendCanMessage(message->header, data, sizeFragment+2, true)) {
-			message->fragmentIndex++;
+		if (sendCanMessage(message.header, data, sizeFragment+2, true)) {
+			message.fragmentIndex++;
 		}
 		else {
 			sendFinished = false;
@@ -234,8 +232,8 @@ xpcc::CanConnector<C>::sendWaitingMessages()
 	else
 	{
 		if (!this->sendCanMessage(
-				message->header,
-				message->payload.getPointer(),
+				message.header,
+				message.payload.getPointer(),
 				size,
 				false)) {
 			sendFinished = false;
@@ -246,20 +244,16 @@ xpcc::CanConnector<C>::sendWaitingMessages()
 	{
 		// message was the last fragment
 		// => remove it from the list
-		typename SendList::Node *temp = this->sendList.front();
-		this->sendList.remove( temp );
-		delete temp->getValue();
-		delete temp;
+		this->sendList.removeFront();
 	}
 }
 
-template<typename C>
+template<typename Driver>
 bool
-xpcc::CanConnector<C>::retrieveCanMessage()
+xpcc::CanConnector<Driver>::retrieveCanMessage()
 {
 	Can::Message canMessage;
-
-	if (C::getMessage(canMessage))
+	if (Driver::getMessage(canMessage))
 	{
 		xpcc::Header header;
 		bool isFragment = convertToHeader(canMessage.identifier, header);
@@ -267,15 +261,14 @@ xpcc::CanConnector<C>::retrieveCanMessage()
 		if (isFragment)
 		{
 			// find existing container otherwise create a new one
-			const uint8_t& messageSize = canMessage.data[2];
-			const uint8_t& fragmentId = canMessage.data[1];
-
+			const uint8_t fragmentIndex = canMessage.data[0];
+			const uint8_t messageSize = canMessage.data[1];
+			
 			// calculate the number of messages need to send message_size-bytes
 			div_t n = div(messageSize, 6);
 			uint8_t numberOfFragments = (n.rem > 0) ? n.quot + 1 : n.quot;
-			// TODO: number_of_message = (current_message.size - 1) / 5 + 1;
-
-			if (canMessage.length < 4 || messageSize > 48 || fragmentId >= numberOfFragments)
+			
+			if (canMessage.length < 4 || messageSize > 48 || fragmentIndex >= numberOfFragments)
 			{
 				// illegal format: fragmented messages need to have at least 3 byte payload,
 				// 				   the maximum size is 48 Bytes and the fragment number should
@@ -285,8 +278,8 @@ xpcc::CanConnector<C>::retrieveCanMessage()
 
 			// check the length of the fragment (all fragments except the last one
 			// need to have a payload-length of 6 bytes + 2 byte fragment information)
-			uint8_t offset = fragmentId * 5;
-			if (fragmentId + 1 == numberOfFragments)
+			uint8_t offset = fragmentIndex * 6;
+			if (fragmentIndex + 1 == numberOfFragments)
 			{
 				// this one is the last fragment
 				if (messageSize - offset != canMessage.length - 3)
@@ -300,51 +293,49 @@ xpcc::CanConnector<C>::retrieveCanMessage()
 				// illegal format
 				return false;
 			}
-
+			
+			// Check if other parts of this message are already in the
+			// list of receiving messages.
+			typename ReceiveList::iterator message = xpcc::find(this->receivingMessages.begin(),
+					this->receivingMessages.end(), header);
+			
+			if (message == this->receivingMessages.end()) {
+				// message not found => first part of this message,
+				// append it to the list
+				this->receivingMessages.prepend(ReceiveListItem(messageSize, header));
+				message = this->receivingMessages.begin();
+			}
+			
 			// create a marker for the currently received fragment
-			uint8_t currentFragment = (1 << fragmentId);
-
-			typename ReceiveList::Node* node(0);
-			if ( !this->receivingMessages.isEmpty() ) {
-				// find the last element in the list and append
-				node = this->receivingMessages.front();
-				while (node != 0) {
-					if( node->getValue()->header == header ) {
-						break;
-					}
-
-					node = ++(*node);
-				}
-			}
-			if (node == 0)
-			{
-				ReceiveListItem* message = new ReceiveListItem( messageSize, header );
-				node = new typename ReceiveList::Node( message );
-				this->receivingMessages.append( node );
-			}
-
+			uint8_t currentFragment = (1 << fragmentIndex);
+			
 			// test if the fragment was already received
-			if (currentFragment & node->getValue()->receivedFragments)
+			if (currentFragment & message->receivedFragments)
 			{
 				// error: received fragment twice -> most likely a new message -> delete the old one
-				XPCC_LOG_WARNING << "lost fragment" << xpcc::flush;
-				node->getValue()->receivedFragments = 0;
+				//XPCC_LOG_WARNING << "lost fragment" << xpcc::flush;
+				message->receivedFragments = 0;
 			}
-
-			memcpy( node->getValue()->data.getPointer()+offset, canMessage.data+3, canMessage.length-3 );
-			node->getValue()->receivedFragments |= currentFragment;
-
+			message->receivedFragments |= currentFragment;
+			
+			std::memcpy(message->payload.getPointer() + offset,
+					canMessage.data + 2,
+					canMessage.length - 2);
+			
 			// test if this was the last segment, otherwise we have to wait for more messages
-			if ( xpcc::math::bitCount( node->getValue()->receivedFragments ) == numberOfFragments )
+			if (xpcc::math::bitCount(message->receivedFragments) == numberOfFragments)
 			{
-				this->receivedMessages.append( node );
-				this->receivingMessages.remove( node );
+				this->receivedMessages.append(*message);
+				this->receivingMessages.erase(message);
 			}
 		}
 		else {
-			ReceiveListItem* message = new ReceiveListItem( canMessage.length-1, header );
-			memcpy( message->data.getPointer(), canMessage.data+1, canMessage.length-1 );
-			this->receivedMessages.append( new typename ReceiveList::Node( message ) );
+			this->receivedMessages.append(ReceiveListItem(canMessage.length, header));
+			
+			// copy payload
+			std::memcpy(this->receivedMessages.getBack().payload.getPointer(),
+					canMessage.data,
+					canMessage.length);
 		}
 
 		return true;
@@ -353,11 +344,11 @@ xpcc::CanConnector<C>::retrieveCanMessage()
 	return false;
 }
 
-template<typename C>
+template<typename Driver>
 void
-xpcc::CanConnector<C>::checkAndReceiveMessages()
+xpcc::CanConnector<Driver>::checkAndReceiveMessages()
 {
-	while (C::isMessageAvailable())
+	while (Driver::isMessageAvailable())
 	{
 		this->retrieveCanMessage();
 	}

@@ -133,8 +133,31 @@ xpcc::LinkedList<T, Allocator>::getFront() const
 }
 
 template <typename T, typename Allocator>
+inline T&
+xpcc::LinkedList<T, Allocator>::getFront()
+{
+	return this->front->value;
+}
+
+template <typename T, typename Allocator>
 inline const T&
 xpcc::LinkedList<T, Allocator>::getBack() const
 {
 	return this->back->value;
+}
+
+template <typename T, typename Allocator>
+inline T&
+xpcc::LinkedList<T, Allocator>::getBack()
+{
+	return this->back->value;
+}
+
+// ----------------------------------------------------------------------------
+template <typename T, typename Allocator>
+typename xpcc::LinkedList<T, Allocator>::iterator
+xpcc::LinkedList<T, Allocator>::erase(const iterator& position)
+{
+	// FIXME
+	return position;
 }

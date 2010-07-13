@@ -33,9 +33,10 @@
 #ifndef	XPCC__CAN_CONNECTOR_HPP
 #define	XPCC__CAN_CONNECTOR_HPP
 
-#include "../backend_interface.hpp"
+#include <xpcc/utils/algorithm.hpp>
+#include <xpcc/container/linked_list.hpp>
 
-#include <xpcc/container/list.hpp>
+#include "../backend_interface.hpp"
 
 namespace xpcc
 {
@@ -81,7 +82,7 @@ namespace xpcc
 	 *
 	 * \ingroup	backend
 	 */
-	template <typename C>
+	template <typename Driver>
 	class CanConnector : public BackendInterface
 	{
 	public:
@@ -100,19 +101,19 @@ namespace xpcc
 		virtual const Header&
 		getPacketHeader() const
 		{
-			return this->receivedMessages.front()->getValue()->header;
+			return this->receivedMessages.getFront().header;
 		}
 		
 		virtual const xpcc::SmartPointer
 		getPacketPayload() const
 		{
-			return this->receivedMessages.front()->getValue()->data;
+			return this->receivedMessages.getFront().payload;
 		}
 		
 		virtual uint8_t
 		getPacketPayloadSize() const
 		{
-			return this->receivedMessages.front()->getValue()->size;
+			return this->receivedMessages.getFront().payload.getSize();
 		}
 		
 		virtual void
@@ -123,7 +124,7 @@ namespace xpcc
 	
 	protected:
 		/**
-		 *  \brief	Try to send a CAN message
+		 *  \brief	Try to send a CAN message via CAN Driver
 		 *
 		 * \return	\b true if the message could be send, \b false otherwise
 		 */
@@ -168,13 +169,19 @@ namespace xpcc
 			{
 			}
 			
+			SendListItem(const SendListItem& other) :
+				header(other.header), payload(other.payload),
+				fragmentIndex(other.fragmentIndex)
+			{
+			}
+			
 			Header header;
 			SmartPointer payload;
 			
 			uint8_t fragmentIndex;
-		
+			
 		private:
-			SendListItem(const SendListItem& other);
+			;
 			
 			SendListItem&
 			operator = (const SendListItem& other);
@@ -184,27 +191,36 @@ namespace xpcc
 		{
 		public:
 			ReceiveListItem(uint8_t size, const Header& header) :
-				header(header), data(size), size(size),
+				header(header), payload(size),
 				receivedFragments(0)
 			{
 			}
 			
+			ReceiveListItem(const ReceiveListItem& other) :
+				header(other.header), payload(other.payload),
+				receivedFragments(other.receivedFragments)
+			{
+			}
+			
 			Header header;
-			SmartPointer data;
-			uint8_t size;
+			SmartPointer payload;
 			
 			uint8_t receivedFragments;
-		
-		private:
-			ReceiveListItem(const ReceiveListItem& other);
 			
+			bool
+			operator == (const Header& header)
+			{
+				return (this->header == header);
+			}
+			
+		private:
 			ReceiveListItem&
 			operator = (const ReceiveListItem& other);
 		};
 		
-		typedef typename xpcc::List< SendListItem* > SendList;
-		typedef typename xpcc::List< ReceiveListItem* > ReceiveList;
-
+		typedef xpcc::LinkedList<SendListItem> SendList;
+		typedef xpcc::LinkedList<ReceiveListItem> ReceiveList;
+		
 		SendList sendList;
 		ReceiveList receivingMessages;
 		ReceiveList receivedMessages;
