@@ -78,19 +78,19 @@ namespace xpcc
 		{
 			uint8_t in = 0;
 			
-			SCLK::low();
+			SCLK::reset();
 			for (uint8_t i = 0; i < 8; ++i)
 			{
 				in <<= 1;
 				if (out & 0x80) {
-					MOSI::high();
+					MOSI::set();
 				}
 				else {
-					MOSI::low();
+					MOSI::reset();
 				}
 				delay_us(delay);
 
-				SCLK::high();
+				SCLK::set();
 				delay_us(delay);
 				
 				if (MISO::read()) {
@@ -98,7 +98,7 @@ namespace xpcc
 				}
 				out <<= 1;
 				
-				SCLK::low();
+				SCLK::reset();
 			}
 			
 			return in;

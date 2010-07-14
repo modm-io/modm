@@ -79,12 +79,12 @@ namespace xpcc
 			}
 			
 			ALWAYS_INLINE static void
-			high()
+			set()
 			{
 			}
 			
 			ALWAYS_INLINE static void
-			low()
+			reset()
 			{
 			}
 			
@@ -168,10 +168,10 @@ namespace xpcc
 			static void
 			write(uint8_t data)
 			{
-				if (data & 0x08) { T3::high(); } else { T3::low(); }
-				if (data & 0x04) { T2::high(); } else { T2::low(); }
-				if (data & 0x02) { T1::high(); } else { T1::low(); }
-				if (data & 0x01) { T0::high(); } else { T0::low(); }
+				if (data & 0x08) { T3::set(); } else { T3::reset(); }
+				if (data & 0x04) { T2::set(); } else { T2::reset(); }
+				if (data & 0x02) { T1::set(); } else { T1::reset(); }
+				if (data & 0x01) { T0::set(); } else { T0::reset(); }
 			}
 		};
 		
@@ -235,14 +235,14 @@ namespace xpcc
 			static void
 			write(uint8_t data)
 			{
-				if (data & 0x80) { T7::high(); } else { T7::low(); }
-				if (data & 0x40) { T6::high(); } else { T6::low(); }
-				if (data & 0x20) { T5::high(); } else { T5::low(); }
-				if (data & 0x10) { T4::high(); } else { T4::low(); }
-				if (data & 0x08) { T3::high(); } else { T3::low(); }
-				if (data & 0x04) { T2::high(); } else { T2::low(); }
-				if (data & 0x02) { T1::high(); } else { T1::low(); }
-				if (data & 0x01) { T0::high(); } else { T0::low(); }
+				if (data & 0x80) { T7::set(); } else { T7::reset(); }
+				if (data & 0x40) { T6::set(); } else { T6::reset(); }
+				if (data & 0x20) { T5::set(); } else { T5::reset(); }
+				if (data & 0x10) { T4::set(); } else { T4::reset(); }
+				if (data & 0x08) { T3::set(); } else { T3::reset(); }
+				if (data & 0x04) { T2::set(); } else { T2::reset(); }
+				if (data & 0x02) { T1::set(); } else { T1::reset(); }
+				if (data & 0x01) { T0::set(); } else { T0::reset(); }
 			}
 		};
 	}

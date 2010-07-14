@@ -214,7 +214,7 @@ namespace xpcc
 		 * destructor before.
 		 */
 		iterator
-		erase(const iterator& position);
+		remove(const iterator& position);
 		
 	private:
 		friend class const_iterator;

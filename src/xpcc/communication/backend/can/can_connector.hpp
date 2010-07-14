@@ -93,28 +93,16 @@ namespace xpcc
 		sendPacket(const Header &header, SmartPointer payload);
 		
 		virtual bool
-		isPacketAvailable() const
-		{
-			return !this->receivedMessages.isEmpty();
-		}
+		isPacketAvailable() const;
 		
 		virtual const Header&
-		getPacketHeader() const
-		{
-			return this->receivedMessages.getFront().header;
-		}
+		getPacketHeader() const;
 		
 		virtual const xpcc::SmartPointer
-		getPacketPayload() const
-		{
-			return this->receivedMessages.getFront().payload;
-		}
+		getPacketPayload() const;
 		
 		virtual uint8_t
-		getPacketPayloadSize() const
-		{
-			return this->receivedMessages.getFront().payload.getSize();
-		}
+		getPacketPayloadSize() const;
 		
 		virtual void
 		dropPacket();
@@ -129,7 +117,7 @@ namespace xpcc
 		 * \return	\b true if the message could be send, \b false otherwise
 		 */
 		static bool
-		sendCanMessage(
+		sendMessage(
 				const Header &header,
 				const uint8_t *data,
 				uint8_t size,
@@ -151,15 +139,21 @@ namespace xpcc
 		static bool
 		convertToHeader(const uint32_t & identifier, Header & header);
 		
+		/// Calculate the number of fragments needed to send a message
+		/// with a length of \p messageSize.
+		static inline uint8_t
+		getNumberOfFragments(uint8_t messageSize);
+		
 		void
 		sendWaitingMessages();
 		
 		bool
-		retrieveCanMessage();
+		retrieveMessage();
 		
 		void
 		checkAndReceiveMessages();
 		
+	protected:
 		class SendListItem
 		{
 		public:

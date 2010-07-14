@@ -59,17 +59,17 @@ namespace xpcc
 	struct name { \
 		ALWAYS_INLINE static void setOutput() { DDR ## port |= (1 << pin); } \
 		ALWAYS_INLINE static void setInput() { DDR ## port &= ~(1 << pin); } \
-		ALWAYS_INLINE static void high() { PORT ## port |= (1 << pin); } \
-		ALWAYS_INLINE static void low() { PORT ## port &= ~(1 << pin); } \
+		ALWAYS_INLINE static void set() { PORT ## port |= (1 << pin); } \
+		ALWAYS_INLINE static void reset() { PORT ## port &= ~(1 << pin); } \
 		ALWAYS_INLINE static bool read() { return (PIN ## port & (1 << pin)); } \
 		\
 		ALWAYS_INLINE static void \
 		set(bool status) { \
 			if (status) { \
-				high(); \
+				set(); \
 			} \
 			else { \
-				low(); \
+				reset(); \
 			} \
 		} \
 	}
@@ -81,17 +81,17 @@ namespace xpcc
 #define	GPIO__OUTPUT(name, port, pin) \
 	struct name { \
 		ALWAYS_INLINE static void setOutput() { DDR ## port |= (1 << pin); } \
-		ALWAYS_INLINE static void high() { PORT ## port |= (1 << pin); } \
-		ALWAYS_INLINE static void low() { PORT ## port &= ~(1 << pin); } \
+		ALWAYS_INLINE static void set() { PORT ## port |= (1 << pin); } \
+		ALWAYS_INLINE static void reset() { PORT ## port &= ~(1 << pin); } \
 		ALWAYS_INLINE static void toggle() { PORT ## port ^= (1 << pin); } \
 		\
 		ALWAYS_INLINE static void \
 		set(bool status) { \
 			if (status) { \
-				high(); \
+				set(); \
 			} \
 			else { \
-				low(); \
+				reset(); \
 			} \
 		} \
 	}

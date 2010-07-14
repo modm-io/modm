@@ -82,7 +82,7 @@ ISR(USARTE1_DRE_vect)
 void
 xpcc::BufferedUartE1::setBaudrateRegister(uint16_t ubrr, bool doubleSpeed)
 {
-	TXD::high();
+	TXD::set();
 	TXD::setOutput();
 	
 	RXD::setInput();

@@ -47,7 +47,7 @@ namespace {
 void
 xpcc::UartE0::setBaudrateRegister(uint16_t ubrr)
 {
-	TXD::high();
+	TXD::set();
 	TXD::setOutput();
 	
 	RXD::setInput();

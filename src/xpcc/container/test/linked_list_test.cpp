@@ -334,3 +334,47 @@ LinkedListTest::testIteratorAccess()
 	(*it).b = 22312;
 	TEST_ASSERT_EQUALS(it->b, 22312);
 }
+
+void
+LinkedListTest::testRemove()
+{
+	xpcc::LinkedList<int16_t> list;
+	xpcc::LinkedList<int16_t>::iterator it = list.begin();
+	list.remove(it);
+	
+	TEST_ASSERT_TRUE(it == list.end());
+	
+	list.append(1);
+	list.append(2);
+	list.append(3);
+	
+	// [1, 2, 3]
+	it = list.begin();
+	it = list.remove(it);
+	TEST_ASSERT_EQUALS(*it, 2);
+	TEST_ASSERT_EQUALS(list.getFront(), 2);
+	
+	++it;
+	++it;
+	
+	TEST_ASSERT_TRUE(it == list.end());	
+	
+	list.append(4);
+	
+	// [2, 3, 4]
+	it = list.begin();
+	++it;
+	it = list.remove(it);
+	TEST_ASSERT_EQUALS(*it, 4);
+	TEST_ASSERT_EQUALS(list.getFront(), 2);
+	TEST_ASSERT_EQUALS(list.getBack(), 4);
+	
+	// [2, 4]
+	it = list.begin();
+	++it;
+	it = list.remove(it);
+	TEST_ASSERT_TRUE(it == list.end());
+	
+	TEST_ASSERT_EQUALS(list.getFront(), 2);
+	TEST_ASSERT_EQUALS(list.getBack(), 2);
+}

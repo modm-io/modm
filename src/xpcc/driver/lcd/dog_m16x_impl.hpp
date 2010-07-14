@@ -71,11 +71,11 @@ template <typename SPI, typename CS, typename RS>
 void
 xpcc::DogM16x<SPI, CS, RS>::putRaw(char c)
 {
-	RS::high();
+	RS::set();
 	
-	CS::low();
+	CS::reset();
 	SPI::write(c);
-	CS::high();
+	CS::set();
 }
 
 template <typename SPI, typename CS, typename RS>
@@ -95,11 +95,11 @@ template <typename SPI, typename CS, typename RS>
 void
 xpcc::DogM16x<SPI, CS, RS>::writeCommand(uint8_t command)
 {
-	RS::low();
+	RS::reset();
 	
-	CS::low();
+	CS::reset();
 	SPI::write(command);
-	CS::high();
+	CS::set();
 	
 	// check if the command is 'clear display' oder 'return home', these
 	// commands take a bit longer until they are finished.

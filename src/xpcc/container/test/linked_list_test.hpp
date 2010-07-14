@@ -73,4 +73,7 @@ public:
 	
 	void
 	testIteratorAccess();
+	
+	void
+	testRemove();
 };

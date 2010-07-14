@@ -68,8 +68,8 @@ namespace xpcc
 		\
 		ALWAYS_INLINE static void setOutput() { } \
 		ALWAYS_INLINE static void setInput() { } \
-		ALWAYS_INLINE static void high() { } \
-		ALWAYS_INLINE static void low() { } \
+		ALWAYS_INLINE static void set() { } \
+		ALWAYS_INLINE static void reset() { } \
 		ALWAYS_INLINE static void toggle() { } \
 		\
 		ALWAYS_INLINE static void \
@@ -96,8 +96,8 @@ namespace xpcc
 		} \
 		\
 		ALWAYS_INLINE static void setOutput() { } \
-		ALWAYS_INLINE static void high() { } \
-		ALWAYS_INLINE static void low() { } \
+		ALWAYS_INLINE static void set() { } \
+		ALWAYS_INLINE static void reset() { } \
 		ALWAYS_INLINE static void toggle() { } \
 		\
 		ALWAYS_INLINE static void \

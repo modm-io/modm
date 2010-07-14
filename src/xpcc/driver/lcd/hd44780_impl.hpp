@@ -53,8 +53,8 @@ xpcc::Hd447800<E, RW, RS, DATA>::initialize()
 	RS::setOutput();
 	DATA::setOutput();
 	
-	E::low();
-	RS::low();
+	E::reset();
+	RS::reset();
 	delay_ms(15);
 	
 	writeNibble(0x03);
@@ -83,8 +83,8 @@ xpcc::Hd447800<E, RW, RS, DATA>::putRaw(char c)
 	waitBusy();
 	
 	DATA::setOutput();
-	RW::low();
-	RS::high();
+	RW::reset();
+	RS::set();
 	
 	uint8_t data = c;
 	writeNibble(data >> 4);
@@ -110,9 +110,9 @@ xpcc::Hd447800<E, RW, RS, DATA>::writeNibble(uint8_t data)
 {
 	DATA::write(data);
 	
-	E::high();
+	E::set();
 	delay_us(1);
-	E::low();
+	E::reset();
 }
 
 template <typename E, typename RW, typename RS, typename DATA>
@@ -122,20 +122,20 @@ xpcc::Hd447800<E, RW, RS, DATA>::readByte()
 	uint8_t data;
 	
 	DATA::setInput();
-	RS::low();
-	RW::high();
+	RS::reset();
+	RW::set();
 	
-	E::high();
+	E::set();
 	delay_us(1);
 	data = DATA::read();
-	E::low();
+	E::reset();
 	
 	data <<= 4;
 	
-	E::high();
+	E::set();
 	delay_us(1);
 	data |= DATA::read();
-	E::low();
+	E::reset();
 	
 	return data;
 }
@@ -159,8 +159,8 @@ xpcc::Hd447800<E, RW, RS, DATA>::writeCommand(uint8_t command)
 	waitBusy();
 	
 	DATA::setOutput();
-	RW::low();
-	RS::low();
+	RW::reset();
+	RS::reset();
 	
 	writeNibble(command >> 4);
 	writeNibble(command);

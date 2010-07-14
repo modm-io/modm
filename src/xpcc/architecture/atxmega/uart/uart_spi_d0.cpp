@@ -47,13 +47,13 @@ namespace {
 void
 xpcc::UartSpiD0::initialize()
 {
-	TXD::high();
+	TXD::set();
 	TXD::setOutput();
 	
 	RXD::setInput();
 	
 	XCK::setOutput();
-	XCK::low();
+	XCK::reset();
 	
 	// TODO set bitrate
 	// BSEL = f_cpu / (2 * f_baud) - 1

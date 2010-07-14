@@ -218,25 +218,25 @@ namespace unittest
 }
 
 #define	TEST_ASSERT_TRUE(expr)	\
-	::unittest::checkExpression(expr, __LINE__)
+	::unittest::checkExpression((expr), __LINE__)
 
 #define	TEST_ASSERT_FALSE(expr)	\
 	::unittest::checkExpression(!static_cast<bool>(expr), __LINE__)
 
 #define	TEST_ASSERT_EQUALS(x, y) \
-	::unittest::checkEqual(x, y, __LINE__)
+	::unittest::checkEqual((x), (y), __LINE__)
 
 #define	TEST_ASSERT_EQUALS_FLOAT(x, y) \
 	::unittest::checkEqual(static_cast<float>(x), static_cast<float>(y), __LINE__)
 
 #define	TEST_ASSERT_EQUALS_DELTA(x, y, d) \
-	::unittest::checkEqualDelta(x, y, d, __LINE__)
+	::unittest::checkEqualDelta((x), (y), (d), __LINE__)
 
 #define	TEST_ASSERT_EQUALS_RANGE(value, lower, upper) \
-	::unittest::checkRange(value, lower, upper, __LINE__)
+	::unittest::checkRange((value), (lower), (upper), __LINE__)
 
 #define	TEST_ASSERT_EQUALS_ARRAY(x, y, ...) \
-	::unittest::checkArray(x, y, __LINE__, __VA_ARGS__)
+	::unittest::checkArray((x), (y), __LINE__, __VA_ARGS__)
 
 #define	TEST_FAIL(msg) \
 	do {	TEST_REPORTER__.reportFailure(__LINE__) \
