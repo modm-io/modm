@@ -58,8 +58,8 @@ namespace xpcc
 	 * /// The CAN controller has a free slot to send a new message.
 	 * /// \return true if a slot is available, false otherwise
 	 * static bool
-	 * canSend();
-	 *
+	 * isReadyToSend();
+	 * 
 	 * /// Send a message over the CAN.
 	 * /// \return true if the message was send, false otherwise
 	 * static bool

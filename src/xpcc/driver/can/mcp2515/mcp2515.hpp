@@ -40,7 +40,7 @@
 #include "can.hpp"
 
 /**
- * \name		Bits des Filters fuer den MCP2515 umformatieren
+ * \name	Restructure filter and mask bits for the MCP2515
  * 
  * \code
  * FLASH(uint8_t can_filter[]) =
@@ -89,13 +89,13 @@ namespace xpcc
 {
 	/**
 	 * 
-	 * \brief	Driver for a MPC2515 CAN Controller
+	 * \brief	Driver for the MPC2515 CAN controller
 	 * 
 	 * \tparam	SPI		SPI interface
 	 * \tparam	CS		Chip select pin
 	 * \tparam	INT		Interrupt pin
 	 * 
-	 * If you want to activate the internal pullup for the INT pin you
+	 * If you want to activate the internal pull-up for the INT pin you
 	 * need to do this by yourself before calling the initialize method!
 	 * 
 	 * \author	Fabian Greif
@@ -129,7 +129,7 @@ namespace xpcc
 		 * \return true if a slot is available, false otherwise
 		 */
 		static inline bool
-		canSend();
+		isReadyToSend();
 		
 		/*
 		 * Send a message over the CAN.

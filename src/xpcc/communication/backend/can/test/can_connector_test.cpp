@@ -54,7 +54,7 @@ namespace
 		}
 		
 		static bool
-		canSend()
+		isReadyToSend()
 		{
 			return true;
 		}

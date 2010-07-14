@@ -198,7 +198,7 @@ xpcc::Mcp2515<SPI, CS, INT>::getMessage(Can::Message& message)
 
 template <typename SPI, typename CS, typename INT>
 bool
-xpcc::Mcp2515<SPI, CS, INT>::canSend()
+xpcc::Mcp2515<SPI, CS, INT>::isReadyToSend()
 {
 	if ((readStatus(SPI_READ_STATUS) & 0x54) == 0x54) {
 		return false;		// all buffers used

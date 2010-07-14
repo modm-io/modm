@@ -39,19 +39,19 @@
 
 #include <xpcc/debug/logger.hpp>
 
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 template<typename Driver>
 xpcc::CanConnector<Driver>::~CanConnector()
 {
 }
 
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 template<typename Driver>
 void
 xpcc::CanConnector<Driver>::sendPacket(const Header &header, SmartPointer payload)
 {
 	bool successfull = false;
-	if (payload.getSize() <= 8 && Driver::canSend()) {
+	if (payload.getSize() <= 8 && Driver::isReadyToSend()) {
 		// try to send the message directly
 		successfull = this->sendCanMessage(
 				header, payload.getPointer(), payload.getSize(), false);
@@ -64,7 +64,7 @@ xpcc::CanConnector<Driver>::sendPacket(const Header &header, SmartPointer payloa
 	}
 }
 
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 template<typename Driver>
 void
 xpcc::CanConnector<Driver>::dropPacket()
@@ -72,7 +72,7 @@ xpcc::CanConnector<Driver>::dropPacket()
 	this->receivedMessages.removeFront();
 }
 
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 template<typename Driver>
 void
 xpcc::CanConnector<Driver>::update()
@@ -337,11 +337,12 @@ xpcc::CanConnector<Driver>::retrieveCanMessage()
 					canMessage.data,
 					canMessage.length);
 		}
-
+		
 		return true;
 	}
-	// todo Save values
-	return false;
+	else {
+		return false;
+	}
 }
 
 template<typename Driver>
@@ -353,4 +354,3 @@ xpcc::CanConnector<Driver>::checkAndReceiveMessages()
 		this->retrieveCanMessage();
 	}
 }
-

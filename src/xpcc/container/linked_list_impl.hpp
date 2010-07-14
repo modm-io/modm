@@ -108,7 +108,6 @@ xpcc::LinkedList<T, Allocator>::removeFront()
 {
 	// remove node from the list
 	Node *node = this->front;
-	
 	if (this->front->next == 0)
 	{
 		// last entry in the list
@@ -156,8 +155,31 @@ xpcc::LinkedList<T, Allocator>::getBack()
 // ----------------------------------------------------------------------------
 template <typename T, typename Allocator>
 typename xpcc::LinkedList<T, Allocator>::iterator
-xpcc::LinkedList<T, Allocator>::erase(const iterator& position)
+xpcc::LinkedList<T, Allocator>::erase(const iterator& iter)
 {
-	// FIXME
-	return position;
+	if (this->isEmpty()) {
+		return iter;
+	}
+	else if (iter.node == this->front)
+	{
+		this->removeFront();
+		return iterator(this->front);
+	}
+	
+	Node *node = this->front;
+	while (node->next != 0)
+	{
+		if (node->next == iter.node) {
+			node->next = node->next->next;
+			
+			// call destructor and free memory
+			Allocator::destroy(&iter.node->value);
+			this->nodeAllocator.deallocate(iter.node);
+			
+			// return iterator on the next position
+			return iterator(node->next);
+		}
+	}
+	
+	return iter;
 }

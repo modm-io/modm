@@ -75,7 +75,13 @@ namespace xpcc
 			
 			uint32_t identifier;
 			uint8_t data[8];
-			struct {
+			struct Flags
+			{
+				Flags() :
+					rtr(0), extended(1)
+				{
+				}
+				
 				bool rtr : 1;
 				bool extended : 1;
 			} flags;
