@@ -25,7 +25,7 @@ namespace xpcc
 		 * \return true if a slot is available, false otherwise
 		 */
 		static inline bool
-		canSend()
+		isReadyToSend()
 		{
 			return true;
 		}

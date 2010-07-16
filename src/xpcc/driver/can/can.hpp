@@ -38,16 +38,14 @@
 namespace xpcc
 {
 	/**
-	 * \brief	Base class for CAN drivers
-	 * 
 	 * \author	Fabian Greif
 	 * \ingroup	can
 	 */
-	class Can
+	namespace can
 	{
-	public:
 		/** \brief	supported bitrates */
-		typedef enum {
+		enum Bitrate
+		{
 			BITRATE_10_KBPS	= 0,
 			BITRATE_20_KBPS	= 1,
 			BITRATE_50_KBPS	= 2,
@@ -56,14 +54,14 @@ namespace xpcc
 			BITRATE_250_KBPS = 5,
 			BITRATE_500_KBPS = 6,
 			BITRATE_1_MBPS = 7,
-		} Bitrate;
+		};
 		
-		/** \brief	*/
-		typedef enum {
+		enum Mode
+		{
 			NORMAL,
 			LISTEN_ONLY,
 			LOOPBACK,
-		} Mode;
+		};
 		
 		/** \brief	Representation of a CAN message */
 		struct Message
@@ -87,7 +85,7 @@ namespace xpcc
 			} flags;
 			uint8_t length;
 		};
-	};
+	}
 }
 
 #endif // XPCC__CAN_HPP

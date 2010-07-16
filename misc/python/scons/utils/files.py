@@ -58,17 +58,13 @@ class Scanner:
 				if 'build.cfg' in files:
 					parser.read(os.path.join(path, 'build.cfg'))
 					
-					try:
-						target = parser.get('build', 'target')
-						if not re.match(target, self.env['ARCHITECTURE']):
-							# if the this directory should be excluded, remove all the
-							# subdirectories from the list to exclude them as well
-							tempDirectories = directories[:]
-							for d in tempDirectories:
-								directories.remove(d)
-							continue
-					except configuration.ParserException:
-						pass
+					if self._excludeDirectory(parser):
+						# if the this directory should be excluded, remove all the
+						# subdirectories from the list to exclude them as well
+						tempDirectories = directories[:]
+						for d in tempDirectories:
+							directories.remove(d)
+						continue
 					
 					try:
 						for item in parser.items('defines'):
@@ -127,6 +123,15 @@ class Scanner:
 			elif extension in self.HEADER:
 				self.header.append(filename)
 	
+	def _excludeDirectory(self, parser):
+		try:
+			target = parser.get('build', 'target')
+			if not re.match(target, self.env['ARCHITECTURE']):
+				return True
+		except configuration.ParserException:
+			pass
+		return False
+	
 	def _samefile(self, src, dst):
 		# Macintosh, Unix
 		if hasattr(os.path,'samefile'):
@@ -138,3 +143,15 @@ class Scanner:
 		# All other platforms: check for same pathname.
 		return (os.path.normcase(os.path.abspath(src)) ==
 				os.path.normcase(os.path.abspath(dst)))
+
+# -----------------------------------------------------------------------------
+def excludeFromScanner(path, filename='build.cfg'):
+	filename = os.path.join(path, filename)
+	dir = os.path.dirname(filename)
+	
+	if not os.path.exists(dir):
+		os.makedirs(dir)
+	
+	file = open(filename, 'w')
+	file.write("""[build]\ntarget = None""")
+	file.close()

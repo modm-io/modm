@@ -27,45 +27,89 @@
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # 
 # $Id$
+# -----------------------------------------------------------------------------
+#
+# DESCRIPTION
+#
+# This SConstruct file has to responsibilities: run the unittests or build
+# the xpcc-library.
+#
+# COMMANDLINE ARGUMENTS
+# 
+# The default is to run the unittests for the PC with the configuration from
+# the file 'unittest.cfg'.
+# 
+# To achieve the same behaviour you can also run:
+# 
+#	$ scons run config=unittest.cfg
+# 
+# config=file
+#   Load a different configuration file. The path to 'file' must be relativ
+#   to the current directory or an absolute path.
+#   To build the unittests for an ATxmega use for example:
+#   
+#     $ scons config=unitttest_atxmega.cfg
+#   
+#   Another example is when you don't want to change the original
+#   configuration files when building the library
+#
+# build
+#   Build the unittests without running them.
+# 
+# run
+#   Run the unittests. This argument is only available when compiling for
+#   the PC target.
+#
+# template=file
+#   Use a different template to create the runner file.
+# 
+# library
+#   Build only the library without running the tests. The result is a file
+#   named 'libxpcc.a' located in this directory. If no other configuration
+#   file is specified the file called 'library.cfg' will be used.
+#
+# size
+#   Print the size of the program. This is especially useful for any AVR target
+#   because it shows the relative space used by the program.
+# 
+# symbols
+#   Print a list of symbols in the object files together with their size.
+#   Useful to check what occupy which amount of space.
 
 import os
 
+# check which configuration-file to load
+if 'library' in BUILD_TARGETS:
+	defaultConfigfile = 'library.cfg'
+else:
+	defaultConfigfile = 'unittest.cfg'
+
+configfile = ARGUMENTS.get('config')
+if not configfile:
+	configfile = defaultConfigfile
+
+# create the build environment
 rootpath = '..'
-
-configfile = ARGUMENTS.get('config') if (ARGUMENTS.get('config')) else 'unittest.cfg'
-
 pre = Environment(tools = ['xpcc_loader'], toolpath = [rootpath + '/misc/python/scons'])
-env = pre.GenerateEnvironment(configfile = configfile,
-							  rootpath = rootpath)
+env = pre.GenerateEnvironment(configfile = configfile)
 
 # find only files located in 'test' folders
 files = env.FindFiles(path = '.', unittest=True)
 
-objects = []
-for file in files.sources:
-	object = env.Object(target = env.Buildpath(file, strip_extension=True),
-						source = file)
-	objects.append(object)
-
-config = env['XPCC_CONFIG']
-
-templatePath = os.path.join(rootpath, 'misc/templates/unittest')
-templateFile = 'runner_%s.cpp.in' % config['build']['architecture']
-template = os.path.join(templatePath, templateFile)
-
-# create a file which later runs all the tests
+# declare a file which later runs all the tests
+template = ARGUMENTS.get('template')
+if not template:
+	template = env['XPCC_CONFIG']['build']['template']
 runner = env.UnittestRunner(target = env.Buildpath('runner.cpp'),
 							source = [template] + files.header)
-objects.append(env.Object(runner))
 
 # build the program
-program = env.Program(target = env.Buildpath(config['general']['name']),
-					  source = objects)
+program = env.Program(target = 'executable',
+					  source = [runner] + files.sources)
 
 # build the xpcc library
-library = env.XpccLibrary()
+xpccLibrary = env.XpccLibrary()
 
-env.Alias('lib', library)
 env.Alias('build', program)
 env.Alias('size', env.Size(program))
 env.Alias('symbols', env.Symbols(program))
@@ -75,5 +119,7 @@ if env.RequireArchitecture('pc'):
 	env.Alias('all', ['build', 'run'])
 else:
 	env.Alias('all', ['build', 'size'])
+	env.Alias('copy', Command('libxpcc.a', xpccLibrary, Copy("$TARGET", "$SOURCE")))
+	env.Alias('library', [xpccLibrary, 'copy'])
 
 env.Default('all')

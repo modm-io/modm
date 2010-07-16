@@ -37,7 +37,7 @@ import xpcc_configparser
 from SCons.Script import *
 
 # -----------------------------------------------------------------------------
-def buildpath(env, path, strip_extension=False):
+def buildpath(env, path, strip_extension=True):
 	""" Relocate path from source directory to build directory
 	"""
 	path = str(path)
@@ -45,22 +45,13 @@ def buildpath(env, path, strip_extension=False):
 		path = os.path.splitext(path)[0]
 	
 	if os.path.isabs(path) or path.startswith('..'):
-		# if the file is not in a subpath of the current directory
-		# build it in the root directory of the build path
-		path = os.path.basename(path)
+		path = os.path.relpath(path, env['XPCC_BASEPATH'])
+		if path.startswith('..'):
+			# if the file is not in a subpath of the current directory
+			# build it in the root directory of the build path
+			path = os.path.basename(path)
 	
 	return os.path.abspath(os.path.join(env['XPCC_BUILDPATH'], path))
-
-def library_buildpath(env, path, strip_extension=False):
-	if strip_extension:
-		path = os.path.splitext(path)[0]
-	
-	if os.path.isabs(path) or path.startswith('..'):
-		# if the file is not in a subpath of the current directory
-		# build it in the root directory of the build path
-		path = os.path.basename(path)
-	
-	return os.path.abspath(os.path.join(env['XPCC_BUILDPATH_LIBRARY'], path))
 
 def find_files(env, path, unittest=None, ignore=None):
 	scanner = utils.files.Scanner(env, unittest)
@@ -101,32 +92,26 @@ def check_defines(env):
 	print ""
 
 def xpcc_library(env, buildpath=None):
-	# set new buildpath for the library, path musst be relativ to the
-	# SConscript directory!
-	env.Append(CPPPATH = [os.path.join(env['XPCC_ROOTPATH'], 'src')])
+	env.Append(CPPPATH = env['XPCC_LIBRARY_PATH'])
+	
+	envBackup = env
 	
 	# set a new buildpath for the library
 	if buildpath is None:
-		env['XPCC_BUILDPATH_LIBRARY'] = os.path.abspath(os.path.join(
-				env['XPCC_ROOTPATH'], 'build', 'library', env['XPCC_LIBRARY_NAME']))
-	else:
-		env['XPCC_BUILDPATH_LIBRARY'] = os.path.abspath(buildpath)
+		buildpath = os.path.join(env['XPCC_BUILDPATH'], 'libxpcc')
+	env['XPCC_BUILDPATH'] = os.path.abspath(buildpath)
+	env['XPCC_BASEPATH'] = env['XPCC_LIBRARY_PATH']
 	
 	# exclude the buildpath from the FileScanner
-	filename = os.path.join(env['XPCC_BUILDPATH_LIBRARY'], 'build.cfg')
-	dir = os.path.dirname(filename)
-	
-	if not os.path.exists(dir):
-		os.makedirs(dir)
-	
-	file = open(filename, 'w')
-	file.write("""[build]\ntarget = None""")
-	file.close()
+	utils.files.excludeFromScanner(env['XPCC_BUILDPATH'])
 	
 	# build the library
 	library, defines = env.SConscript(
 			os.path.join(env['XPCC_ROOTPATH'], 'src', 'SConscript'),
 			exports = 'env')
+	
+	# restore original environment
+	env = envBackup
 	
 	env['XPCC_LIBRARY_DEFINES'] = defines.copy()
 	for key in defines.iterkeys():
@@ -140,13 +125,13 @@ def xpcc_library(env, buildpath=None):
 		'name': env['XPCC_CONFIG']['general']['name']
 	}
 	file = env.SimpleTemplate(
-			target = env.LibraryBuildpath('xpcc_config.hpp'),
+			target = os.path.join(env['XPCC_BUILDPATH'], 'xpcc_config.hpp'),
 			source = os.path.join(env['XPCC_ROOTPATH'], 
 								  'misc/templates/xpcc_config.hpp.in'),
 			SUBSTITUTIONS = substitutions)
 	
-	env.Append(LIBS = ['robot'])
-	env.Append(LIBPATH = [ env['XPCC_BUILDPATH_LIBRARY'] ])
+	env.Append(LIBS = ['xpcc'])
+	env.Append(LIBPATH = [env['XPCC_BUILDPATH']])
 	
 	return library
 
@@ -156,7 +141,9 @@ def xpcc_communication_header(env, xmlfile):
 	files  = env.SystemCppPackets(xmlfile)
 	files += env.SystemCppIdentifier(xmlfile)
 	if 'communication' in env['XPCC_CONFIG']:
-		files += env.SystemCppPostman(target='postman.hpp', source=xmlfile, container=env['XPCC_CONFIG']['communication']['container'])
+		files += env.SystemCppPostman(target='postman.hpp',
+				source=xmlfile,
+				container=env['XPCC_CONFIG']['communication']['container'])
 	
 	source = []
 	for file in files:
@@ -184,7 +171,7 @@ def generate_defines(env, filename='defines.hpp'):
 # -----------------------------------------------------------------------------
 def generate(env, **kw):
 	env.AddMethod(buildpath, 'Buildpath')
-	env.AddMethod(library_buildpath, 'LibraryBuildpath')
+	#env.AddMethod(library_buildpath, 'LibraryBuildpath')
 	env.AddMethod(find_files, 'FindFiles')
 	env.AddMethod(require_architecture, 'RequireArchitecture')
 	env.AddMethod(check_defines, 'ShowConfiguration')

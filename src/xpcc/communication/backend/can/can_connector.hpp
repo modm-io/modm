@@ -33,7 +33,6 @@
 #ifndef	XPCC__CAN_CONNECTOR_HPP
 #define	XPCC__CAN_CONNECTOR_HPP
 
-#include <xpcc/utils/algorithm.hpp>
 #include <xpcc/container/linked_list.hpp>
 
 #include "../backend_interface.hpp"
@@ -53,7 +52,7 @@ namespace xpcc
 	 * isMessageAvailable();
 	 *
 	 * static bool
-	 * getMessage(Can::Message& message);
+	 * getMessage(can::Message& message);
 	 *
 	 * /// The CAN controller has a free slot to send a new message.
 	 * /// \return true if a slot is available, false otherwise
@@ -63,7 +62,7 @@ namespace xpcc
 	 * /// Send a message over the CAN.
 	 * /// \return true if the message was send, false otherwise
 	 * static bool
-	 * sendMessage(const Can::Message& message);
+	 * sendMessage(const can::Message& message);
 	 * \endcode
 	 *
 	 * \section structure Definition of the structure of a CAN message

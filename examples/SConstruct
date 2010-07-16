@@ -28,18 +28,36 @@
 # 
 # $Id$
 
-Import('env')
+rootpath = '..'
 
-# the buildpath of the library should only be used when building
-# the library. Therefore a copy is made, so that the original environment
-# remains untouched
-env = env.Clone()
-env.Append(CPPPATH = env['XPCC_BUILDPATH'])
+pre = Environment(tools = ['xpcc_loader'], toolpath = [rootpath + '/misc/python/scons'])
+env = pre.GenerateEnvironment(buildpath = 'build')
 
-# find all files, except the one located in the 'test' folders
-scan = env.FindFiles(path = '.', unittest=False)
+# choose the example file
+example = ARGUMENTS.get('example')
+if not example:
+	example = '0_gpio.cpp'
 
-library = env.Library(target = 'xpcc', source = scan.sources)
+# build the program
+program = env.Program(target = 'example', source = example)
 
-result = (library, scan.defines)
-Return('result')
+# build the xpcc library
+env.XpccLibrary()
+
+env.Alias('size', env.Size(program))
+env.Alias('symbols', env.Symbols(program))
+
+if env.RequireArchitecture('pc'):
+	env.Alias('build', program)
+	env.Alias('run', env.Run(program))
+	
+	env.Alias('all', ['build', 'run'])
+else:
+	hexfile = env.Hex(program)
+	env.Alias('program', env.Avrdude(hexfile))
+	
+	env.Alias('build', [hexfile, env.Listing(program)])
+	env.Alias('fuse', env.AvrdudeFuses())
+	env.Alias('all', ['build', 'size'])
+
+env.Default('all')

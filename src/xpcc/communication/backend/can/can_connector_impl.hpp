@@ -118,7 +118,8 @@ xpcc::CanConnector<Driver>::convertToIdentifier(const Header & header, bool frag
 {
 	uint32_t identifier;
 	
-	switch (header.type){
+	switch (header.type)
+	{
 		case xpcc::Header::REQUEST:
 			identifier = 0;
 			break;
@@ -131,6 +132,7 @@ xpcc::CanConnector<Driver>::convertToIdentifier(const Header & header, bool frag
 		default:
 			identifier = 0;
 	}
+	
 	identifier = identifier << 1;
 	if (header.isAcknowledge){
 		identifier |= 1;
@@ -155,43 +157,32 @@ xpcc::CanConnector<Driver>::convertToIdentifier(const Header & header, bool frag
 template<typename Driver>
 bool
 xpcc::CanConnector<Driver>::convertToHeader(
-		const uint32_t & identifier_, xpcc::Header & header)
+		const uint32_t & identifier, xpcc::Header & header)
 {
-	uint32_t identifier = identifier_;
+	const uint8_t *ptr = reinterpret_cast<const uint8_t *>(&identifier);
 	
-	header.packetIdentifier = 0x000000FF & identifier;
-	identifier	= identifier >> 8;
-	header.source 			= 0x000000FF & identifier;
-	identifier	= identifier >> 8;
-	header.destination 		= 0x000000FF & identifier;
-	identifier 	= identifier >> 8;
-
-	bool isFragment = false;
-	if (identifier & 0x01) {
-		isFragment = true;
-	}
-	identifier = identifier >> 1;
-
-	// todo counter
-	identifier = identifier >> 1;
-
-	if( identifier & 0x01 ) {
+	header.packetIdentifier = ptr[0];
+	header.source 			= ptr[1];
+	header.destination		= ptr[2];
+	
+	uint8_t flags = ptr[3];
+	
+	if (flags & 0x04) {
 		header.isAcknowledge = true;
 	}
 	else {
 		header.isAcknowledge = false;
 	}
-	identifier = identifier >> 1;
-
-	switch (identifier & 0x03)
+	
+	switch (flags & 0x18)
 	{
-		case 0:
+		case 0x00:
 			header.type = xpcc::Header::REQUEST;
 			break;
-		case 1:
+		case 0x08:
 			header.type = xpcc::Header::RESPONSE;
 			break;
-		case 2:
+		case 0x10:
 			header.type = xpcc::Header::NEGATIVE_RESPONSE;
 			break;
 		default:
@@ -200,7 +191,8 @@ xpcc::CanConnector<Driver>::convertToHeader(
 			header.type = xpcc::Header::REQUEST;
 	}
 	
-	return isFragment;
+	// check if the message is a fragment
+	return ((flags & 0x01) == 0x01);
 }
 
 template<typename Driver>
@@ -216,7 +208,7 @@ bool
 xpcc::CanConnector<Driver>::sendMessage(const Header &header,
 		const uint8_t *data, uint8_t size, bool fragmentated)
 {
-	xpcc::Can::Message message(
+	xpcc::can::Message message(
 			convertToIdentifier(header, fragmentated),
 			size);
 	
@@ -288,7 +280,7 @@ template<typename Driver>
 bool
 xpcc::CanConnector<Driver>::retrieveMessage()
 {
-	Can::Message message;
+	can::Message message;
 	if (Driver::getMessage(message))
 	{
 		xpcc::Header header;
@@ -337,8 +329,12 @@ xpcc::CanConnector<Driver>::retrieveMessage()
 			
 			// Check if other parts of this message are already in the
 			// list of receiving messages.
-			typename ReceiveList::iterator packet = xpcc::find(this->receivingMessages.begin(),
-					this->receivingMessages.end(), header);
+			typename ReceiveList::iterator packet = this->receivingMessages.begin();
+			for ( ; packet != this->receivingMessages.end(); ++packet) {
+				if (packet->header == header) {
+					break;
+				}
+			}
 			
 			if (packet == this->receivingMessages.end()) {
 				// message not found => first part of this message,
@@ -347,10 +343,9 @@ xpcc::CanConnector<Driver>::retrieveMessage()
 				packet = this->receivingMessages.begin();
 			}
 			
-			// create a marker for the currently received fragment
-			uint8_t currentFragment = (1 << fragmentIndex);
-			
+			// create a marker for the currently received fragment and
 			// test if the fragment was already received
+			const uint8_t currentFragment = (1 << fragmentIndex);
 			if (currentFragment & packet->receivedFragments)
 			{
 				// error: received fragment twice -> most likely a new message -> delete the old one

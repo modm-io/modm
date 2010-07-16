@@ -47,7 +47,7 @@ namespace
 		}
 		
 		static bool
-		getMessage(xpcc::Can::Message& message)
+		getMessage(xpcc::can::Message& message)
 		{
 			message = FakeCanDriver::message;
 			return true;
@@ -60,16 +60,16 @@ namespace
 		}
 		
 		static bool
-		sendMessage(const xpcc::Can::Message& message)
+		sendMessage(const xpcc::can::Message& message)
 		{
 			FakeCanDriver::message = message;
 			return true;
 		}
 		
-		static xpcc::Can::Message message;
+		static xpcc::can::Message message;
 	};
 	
-	xpcc::Can::Message FakeCanDriver::message;
+	xpcc::can::Message FakeCanDriver::message;
 	
 	class TestConnector : public xpcc::CanConnector<FakeCanDriver>
 	{
@@ -91,49 +91,40 @@ void
 CanConnectorTest::testConversionToIdentifier()
 {
 	TestConnector connector;
-	
 	xpcc::Header header;
+	
+	header = xpcc::Header(xpcc::Header::REQUEST, false, 0, 0, 0);
 	TEST_ASSERT_EQUALS(connector.convertToIdentifier(header, false), 0x00000000U);
-	
-	header.type = xpcc::Header::RESPONSE;
+	header = xpcc::Header(xpcc::Header::RESPONSE, false, 0, 0, 0);
 	TEST_ASSERT_EQUALS(connector.convertToIdentifier(header, false), 0x08000000U);
-	
-	header.type = xpcc::Header::NEGATIVE_RESPONSE;
+	header = xpcc::Header(xpcc::Header::NEGATIVE_RESPONSE, false, 0, 0, 0);
 	TEST_ASSERT_EQUALS(connector.convertToIdentifier(header, false), 0x10000000U);
 	
-	header.type = xpcc::Header::REQUEST;
-	TEST_ASSERT_EQUALS(connector.convertToIdentifier(header, false), 0x00000000U);
-	
-	header.isAcknowledge = true;
-	TEST_ASSERT_EQUALS(connector.convertToIdentifier(header, false), 0x04000000U);	
-	
-	header.isAcknowledge = false;
-	
+	header = xpcc::Header(xpcc::Header::REQUEST, false, 0, 0, 0);
 	TEST_ASSERT_EQUALS(connector.convertToIdentifier(header, true),  0x01000000U);
 	
-	header.destination = 0xff;
+	header = xpcc::Header(xpcc::Header::REQUEST, true, 0, 0, 0);
+	TEST_ASSERT_EQUALS(connector.convertToIdentifier(header, false), 0x04000000U);	
+	
+	header = xpcc::Header(xpcc::Header::REQUEST, false, 0xff, 0, 0);
 	TEST_ASSERT_EQUALS(connector.convertToIdentifier(header, false),  0x00ff0000U);
-	header.destination = 0xcc;
+	header = xpcc::Header(xpcc::Header::REQUEST, false, 0xcc, 0, 0);
 	TEST_ASSERT_EQUALS(connector.convertToIdentifier(header, false),  0x00cc0000U);
-	header.destination = 0x0a;
+	header = xpcc::Header(xpcc::Header::REQUEST, false, 0x0a, 0, 0);
 	TEST_ASSERT_EQUALS(connector.convertToIdentifier(header, false),  0x000a0000U);
 	
-	header.destination = 0;
-	
-	header.source = 0xff;
+	header = xpcc::Header(xpcc::Header::REQUEST, false, 0, 0xff, 0);
 	TEST_ASSERT_EQUALS(connector.convertToIdentifier(header, false),  0x0000ff00U);
-	header.source = 0xcc;
+	header = xpcc::Header(xpcc::Header::REQUEST, false, 0, 0xcc, 0);
 	TEST_ASSERT_EQUALS(connector.convertToIdentifier(header, false),  0x0000cc00U);
-	header.source = 0x0a;
+	header = xpcc::Header(xpcc::Header::REQUEST, false, 0, 0x0a, 0);
 	TEST_ASSERT_EQUALS(connector.convertToIdentifier(header, false),  0x00000a00U);
 	
-	header.source = 0;
-	
-	header.packetIdentifier = 0xff;
+	header = xpcc::Header(xpcc::Header::REQUEST, false, 0, 0, 0xff);
 	TEST_ASSERT_EQUALS(connector.convertToIdentifier(header, false),  0x000000ffU);
-	header.packetIdentifier = 0xcc;
+	header = xpcc::Header(xpcc::Header::REQUEST, false, 0, 0, 0xcc);
 	TEST_ASSERT_EQUALS(connector.convertToIdentifier(header, false),  0x000000ccU);
-	header.packetIdentifier = 0x0a;
+	header = xpcc::Header(xpcc::Header::REQUEST, false, 0, 0, 0x0a);
 	TEST_ASSERT_EQUALS(connector.convertToIdentifier(header, false),  0x0000000aU);
 }
 

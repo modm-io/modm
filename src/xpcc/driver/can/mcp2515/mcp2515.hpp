@@ -37,7 +37,7 @@
 #include <xpcc/architecture/general/accessor/flash.hpp>
 #include <xpcc/architecture/general/time/delay.hpp>
 
-#include "can.hpp"
+#include "../can.hpp"
 
 /**
  * \name	Restructure filter and mask bits for the MCP2515
@@ -108,20 +108,20 @@ namespace xpcc
 	{
 	public:
 		static bool
-		initialize(Can::Bitrate bitrate);
+		initialize(can::Bitrate bitrate);
 		
 		static void
 		setFilter(accessor::Flash<uint8_t> filter);
 		
 		static void
-		setMode(Can::Mode mode);
+		setMode(can::Mode mode);
 		
 		
 		static inline bool
 		isMessageAvailable();
 		
 		static bool
-		getMessage(Can::Message& message);
+		getMessage(can::Message& message);
 		
 		/*
 		 * The CAN controller has a free slot to send a new message.
@@ -137,7 +137,7 @@ namespace xpcc
 		 * \return true if the message was send, false otherwise
 		 */
 		static bool
-		sendMessage(const Can::Message& message);
+		sendMessage(const can::Message& message);
 		
 	protected:
 		static void

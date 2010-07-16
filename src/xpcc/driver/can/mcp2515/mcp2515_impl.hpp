@@ -44,7 +44,7 @@ namespace xpcc {
 
 template <typename SPI, typename CS, typename INT>
 bool
-xpcc::Mcp2515<SPI, CS, INT>::initialize(Can::Bitrate bitrate)
+xpcc::Mcp2515<SPI, CS, INT>::initialize(can::Bitrate bitrate)
 {
 	// software reset for the mcp2515, after this he is back in the
 	// configuration mode
@@ -125,14 +125,14 @@ xpcc::Mcp2515<SPI, CS, INT>::setFilter(accessor::Flash<uint8_t> filter)
 
 template <typename SPI, typename CS, typename INT>
 void
-xpcc::Mcp2515<SPI, CS, INT>::setMode(Can::Mode mode)
+xpcc::Mcp2515<SPI, CS, INT>::setMode(can::Mode mode)
 {
 	uint8_t reg = 0;
 	
-	if (mode == Can::LISTEN_ONLY) {
+	if (mode == can::LISTEN_ONLY) {
 		reg = (1<<REQOP1)|(1<<REQOP0);
 	}
-	else if (mode == Can::LOOPBACK) {
+	else if (mode == can::LOOPBACK) {
 		reg = (1<<REQOP1);
 	}
 		
@@ -156,7 +156,7 @@ xpcc::Mcp2515<SPI, CS, INT>::isMessageAvailable()
 
 template <typename SPI, typename CS, typename INT>
 bool
-xpcc::Mcp2515<SPI, CS, INT>::getMessage(Can::Message& message)
+xpcc::Mcp2515<SPI, CS, INT>::getMessage(can::Message& message)
 {
 	uint8_t addr;
 	uint8_t status = readStatus(SPI_RX_STATUS);
@@ -212,7 +212,7 @@ xpcc::Mcp2515<SPI, CS, INT>::isReadyToSend()
 
 template <typename SPI, typename CS, typename INT>
 bool
-xpcc::Mcp2515<SPI, CS, INT>::sendMessage(const Can::Message& message)
+xpcc::Mcp2515<SPI, CS, INT>::sendMessage(const can::Message& message)
 {
 	uint8_t status = readStatus(SPI_READ_STATUS);
 	

@@ -34,15 +34,30 @@ import utils.configuration
 import utils.files
 
 from SCons.Script import *
+import SCons.Defaults
+import SCons.Node
 
 # -----------------------------------------------------------------------------
-def generate_environment(env, rootpath, configfile='project.cfg', buildpath=None):
+def generate_environment(env, rootpath=None, configfile='project.cfg', buildpath=None):
 	""" Creates a new build environment
 	
 	Keyword arguments:
 	configfile	 - Path to the configuration file
 	rootpath	 - Path to the xpcc/trunk directory
 	"""
+	if rootpath is None:
+		# try to detect the rootpath
+		sitepath = os.path.join('misc', 'python', 'scons')
+		for path in env['toolpath']:
+			path = os.path.normpath(path)
+			if path.endswith(sitepath):
+				rootpath = path[:-len(sitepath) - 1]
+				break
+		
+		if rootpath is None:
+			print "Could not detect the path to the xpcc-library. Use " \
+				  "'GenerateEnvironment(rootpath=...)' to set it."
+			env.Exit(1)
 	try:
 		parser = utils.configuration.Parser()
 		parser.read(configfile)
@@ -92,7 +107,9 @@ def generate_environment(env, rootpath, configfile='project.cfg', buildpath=None
 	
 	options = {
 		'XPCC_LIBRARY_NAME': library_name,
-		'XPCC_ROOTPATH': rootpath,
+		'XPCC_ROOTPATH': rootpath,		# xpcc rootpath
+		'XPCC_BASEPATH': os.curdir,		# path of the current project
+		'XPCC_LIBRARY_PATH': os.path.join(rootpath, 'src'),
 		'XPCC_BUILDPATH': buildpath,
 		'XPCC_CONFIG': configuration,
 		'XPCC_CONFIG_FILE': os.path.abspath(configfile),
@@ -142,6 +159,7 @@ def generate_environment(env, rootpath, configfile='project.cfg', buildpath=None
 				toolpath = env['toolpath'],
 				LIBS = libs,
 				LIBPATH = libpath,
+				CPPPATH = [],
 				ENV = os.environ,
 				**options)
 	else:
@@ -173,15 +191,24 @@ def generate_environment(env, rootpath, configfile='project.cfg', buildpath=None
 		new.Append(**{ key.upper(): value } )
 		
 	# exclude the buildpath from the FileScanner
-	filename = os.path.join(new['XPCC_BUILDPATH'], 'build.cfg')
-	dir = os.path.dirname(filename)
+	utils.files.excludeFromScanner(new['XPCC_BUILDPATH'])
 	
-	if not os.path.exists(dir):
-		os.makedirs(dir)
+	# These emitter ist used to build every not in place but in a
+	# seperate build-directory.
+	def defaultEmitter(target, source, env):
+		targets = []
+		for file in target:
+			# relocate the output to the buildpath
+			filename = env.Buildpath(file.path, strip_extension=False)
+			targets.append(filename)
+		return targets, source
 	
-	file = open(filename, 'w')
-	file.write("""[build]\ntarget = None""")
-	file.close()
+	new['BUILDERS']['Object'].add_emitter('.cpp', defaultEmitter)
+	new['BUILDERS']['Object'].add_emitter('.c', defaultEmitter)
+	new['BUILDERS']['Object'].add_emitter('.S', defaultEmitter)
+	
+	new['LIBEMITTER'] = defaultEmitter
+	new['PROGEMITTER'] = defaultEmitter
 	
 	return new
 
@@ -190,4 +217,5 @@ def generate(env, **kw):
 	env.AddMethod(generate_environment, 'GenerateEnvironment')
 
 def exists(env):
+	EnsurePythonVersion(2, 6)
 	return True

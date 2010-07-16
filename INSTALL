@@ -1,11 +1,11 @@
 INSTALL - xpcc
 ==============
 
-You need to build the xpcc:
+You need to build the xpcc-library:
 
  * gcc (for the target platform (x86, avr, ...)
- * scons (a Python build tool)
- 
-To build you have to run scons in the trunk-Folder. The resulting files will
-be placed in the trunk/build folder
+ * SCons (a Python build tool)
+ * Python (to run SCons)
 
+For more information visit the online documentation:
+http://xpcc.sourceforge.net/api/
