@@ -1,8 +1,8 @@
 // coding: utf-8
 // $Id$
-/*!
 
-\page about About this library
+/*!
+\page design_decisions 5a. Design decisions
 
 The main target of this library are small 8-bit AVR mircocontrollers. But it
 should also be able to generate code for standard x86 PCs. This has partly historical
@@ -22,17 +22,17 @@ microcontrollers and accept possible sligthly worse code for the x86 targets.
 
 \section techniques	Main ideas and techinques used here
 
-\todo	describe the template system used
-
 Hardware components are implemented as template classes with static methods and
-[parametriert] via template parameters. Even if this don't see obvious at the
+parameterised via template parameters. Even if this don't see obvious at the
 first time it allows the generation of very flexible but also fast code.
 
-Functions calls are direct without the need of a vtable lookup needed for
-virtual methods, which means fast access and low RAM and Flash consumption.
+With this technique functions calls are direct calls without the need of a
+vtable lookup like for virtual methods. This leads to fast access and low RAM
+and Flash consumption.
 
-The drawbacks are acceptable: Increased codesize if a driver is used many times
-and no possibly of reconfigering on runtime.
+There are two acceptable drawbacks:
+1. Increased codesize if a driver is used many times with different parameters.
+2. No possibly of reconfiguring on runtime.
 
 \todo explain in more detail.
 
@@ -49,18 +49,5 @@ For our main target the AVRs this is acceptable because devices with big flash
 memory are available. So, if you want the smallest possible code size this
 isn't the right library for you, but if you wan't easy development with fast
 execution you're welcome :)
-
-\section people The people behind this library
-
-\image html logo_rca.png
-
-During the last five years the Roboterclub Aachen e.V. has developed a
-software library for communication among components that are distributed on
-PCs and Microcontrollers. The primary aim has been the usage of this system
-in autonomous robots for the EUROBOT competition.
-
-This library is the result of this development. The PC and the AVR software
-are merged into a single library to simplifiy and unifiy the software
-development.
 
 */

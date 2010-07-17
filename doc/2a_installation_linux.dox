@@ -1,0 +1,44 @@
+// coding: utf-8
+// $Id$
+
+/*!
+\page installation_linux 2a. Installation on Linux systems
+
+\section installation Installation
+
+For Ubuntu (and other Debian based Linux-Distributions) just type the 
+following in a terminal and you're good to go:
+
+\verbatim
+$ sudo aptitude install python scons python-jinja2 python-lxml doxygen graphviz
+\endverbatim
+
+\subsection pc PC
+
+To compile programs for x86 systems you need the following packets:
+\verbatim
+$ sudo aptitude install gcc build-essential tipcutils libboost-thread-dev
+\endverbatim
+
+\subsection avr AVR
+
+Some linux distributions offer the AVR toolchain already integrated, but
+the supplied tools are usually not quite up to date.
+
+There some alternatives to get a recent toolchain:
+- <a href="http://avr-libc.nongnu.org/user-manual/install_tools.html">Build the tools by hand</a>
+- <a href="http://www.avrfreaks.net/index.php?name=PNphpBB2&file=viewtopic&t=95328&start=0">Build-Script on avrfreaks.net</a> (with ready-to-use Debian/Ubuntu packages)
+- ...
+
+\section optimisation Optimisations
+
+To use more than one CPU you might want to add the following to the
+'.bashrc' file (adjust the '4' to the number of CPUs in your system):
+
+\verbatim
+export SCONSFLAGS="-Q -j4"
+\endverbatim
+
+For more information on the parameter this read the chapter about
+\ref build_system "SCons".
+*/

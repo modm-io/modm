@@ -1,0 +1,42 @@
+// coding: utf-8
+// $Id$
+
+/*!
+\page why_use_xpcc 1. Why should i use this library?
+
+\section reasons Some good reasons
+
+\subsection documentation Full documentation
+
+Full documentation for every part of the library is available online.
+
+\subsection reliability Reliability
+
+Nearly all classes have corresponding unit-tests in place. Unit testing cannot
+catch every error in the program, but they can ensure a specific behaviour is
+present and that a bug, once found, does not appear again.
+
+A second advantage is that the tests provides a sort of embedded documentation
+of the system. You can learn about how to use a class by looking at its
+unit tests.
+
+Read more about this in our \ref unittests "developer section".
+
+\section people The people behind this library
+
+\image html rca_2010.jpg
+
+During the last years we, the Roboterclub Aachen e.V., have developed a
+software library for communication among components that are distributed on
+PCs and Microcontrollers. The primary aim has been the usage of this system
+in autonomous robots for the <a href="http://www.eurobot.org/eng/">EUROBOT
+competition</a>.
+
+This library was successfully used in our robot 
+<a href="http://www.roboterclub.rwth-aachen.de/cms/index.php?option=com_content&task=view&id=165&Itemid=114">"Insitor"</a>
+with which we won the <a href="http://www.roboterclub.rwth-aachen.de/cms/index.php?option=com_content&task=view&id=169&Itemid=118">vize world champion</a> title in 2010.
+
+This library is the result of this development. The PC and the AVR software
+have merged together into a single library to simplifiy and unifiy the software
+development.
+*/

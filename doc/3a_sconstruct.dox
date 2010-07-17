@@ -1,0 +1,12 @@
+// coding: utf-8
+// $Id$
+
+/*!
+\page sconstruct 3a. SConstruct files
+
+Get help about the command-line arguments:
+\verbatim
+scons -h
+\endverbatim
+
+ */

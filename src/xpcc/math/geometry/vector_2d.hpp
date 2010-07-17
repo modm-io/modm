@@ -50,7 +50,7 @@ namespace xpcc
 	 * Basic data type of all geometric operations. Used to represent vectors
 	 * as well as particular points in the coordinate system.
 	 * 
-	 * \subsection	point_vector	Point vs. vector
+	 * \section	point_vector	Point vs. vector
 	 * 
 	 * In geometry, it is often convenient to use vector arithmetic to
 	 * represent points.

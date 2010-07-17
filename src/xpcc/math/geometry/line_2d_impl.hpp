@@ -108,7 +108,8 @@ xpcc::Line2D<T>::getDistanceTo(const Vector2D<T>& point) const
 // ----------------------------------------------------------------------------
 template <typename T>
 bool
-xpcc::Line2D<T>::getIntersections(const Line2D& other, PointSet2D<T>& points) const
+xpcc::Line2D<T>::getIntersections(const Line2D& other,
+		PointSet2D<T>& intersections) const
 {
 	xpcc::Vector2D<T> connectionVector(other.point, this->point);
 	
@@ -118,7 +119,7 @@ xpcc::Line2D<T>::getIntersections(const Line2D& other, PointSet2D<T>& points) co
 		FloatType t1 = static_cast<FloatType>(other.directionVector.cross(connectionVector)) /
 					   static_cast<FloatType>(d);
 		
-		points.append(this->point + this->directionVector * t1);
+		intersections.append(this->point + this->directionVector * t1);
 		return true;
 	}
 	return false;
@@ -127,7 +128,8 @@ xpcc::Line2D<T>::getIntersections(const Line2D& other, PointSet2D<T>& points) co
 // ----------------------------------------------------------------------------
 template <typename T>
 bool
-xpcc::Line2D<T>::getIntersections(const Circle2D<T>& circle, PointSet2D<T>& intersectionPoints) const
+xpcc::Line2D<T>::getIntersections(const Circle2D<T>& circle,
+		PointSet2D<T>& intersections) const
 {
 	// vector from the center of the circle to line start
 	xpcc::Vector2D<T> circleToLine(circle.center, this->point);
@@ -149,7 +151,7 @@ xpcc::Line2D<T>::getIntersections(const Circle2D<T>& circle, PointSet2D<T>& inte
 		FloatType e = std::sqrt(discriminant);
 		
 		FloatType t1 = static_cast<FloatType>(-b - e) / static_cast<FloatType>(a);
-		intersectionPoints.append(this->point + this->directionVector * t1);
+		intersections.append(this->point + this->directionVector * t1);
 		
 		if (discriminant == 0) {
 			// the line is a tangent to the circle intersecting
@@ -158,7 +160,7 @@ xpcc::Line2D<T>::getIntersections(const Circle2D<T>& circle, PointSet2D<T>& inte
 		}
 		
 		FloatType t2 = static_cast<FloatType>(-b + e) / static_cast<FloatType>(a);
-		intersectionPoints.append(this->point + this->directionVector * t2);
+		intersections.append(this->point + this->directionVector * t2);
 		
 		return true;
 	}

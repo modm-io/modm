@@ -87,7 +87,8 @@ xpcc::Circle2D<T>::intersects(const Polygon2D<T>& polygon) const
 // ----------------------------------------------------------------------------
 template <typename T>
 bool
-xpcc::Circle2D<T>::getIntersections(const Circle2D& other, PointSet2D<T>& intersectionPoints) const
+xpcc::Circle2D<T>::getIntersections(const Circle2D& other,
+		PointSet2D<T>& intersections) const
 {
 	Vector2D<T> circleToCircle(this->center, other.center);
 	WideType distanceSquared = circleToCircle.getLengthSquared();
@@ -110,7 +111,7 @@ xpcc::Circle2D<T>::getIntersections(const Circle2D& other, PointSet2D<T>& inters
 		// calculate the intersection point
 		float scale = static_cast<float>(this->radius) / static_cast<float>(this->radius + other.radius);
 		
-		intersectionPoints.append(this->center + scale * circleToCircle);
+		intersections.append(this->center + scale * circleToCircle);
 		return true;
 	}
 	
@@ -135,8 +136,8 @@ xpcc::Circle2D<T>::getIntersections(const Circle2D& other, PointSet2D<T>& inters
 	r = r.toOrthogonalVector();
 	
 	// Determine the absolute intersection points
-	intersectionPoints.append(c + r);
-	intersectionPoints.append(c - r);
+	intersections.append(c + r);
+	intersections.append(c - r);
 	
 	return true;
 }
@@ -144,15 +145,17 @@ xpcc::Circle2D<T>::getIntersections(const Circle2D& other, PointSet2D<T>& inters
 // ----------------------------------------------------------------------------
 template <typename T>
 bool
-xpcc::Circle2D<T>::getIntersections(const Line2D<T>& line, PointSet2D<T>& intersectionPoints) const
+xpcc::Circle2D<T>::getIntersections(const Line2D<T>& line,
+		PointSet2D<T>& intersections) const
 {
-	return line.getIntersections(*this, intersectionPoints);
+	return line.getIntersections(*this, intersections);
 }
 
 // ----------------------------------------------------------------------------
 template <typename T>
 bool
-xpcc::Circle2D<T>::getIntersections(const LineSegment2D<T>& line, PointSet2D<T>& intersectionPoints) const
+xpcc::Circle2D<T>::getIntersections(const LineSegment2D<T>& line,
+		PointSet2D<T>& intersections) const
 {
-	return line.getIntersections(*this, intersectionPoints);
+	return line.getIntersections(*this, intersections);
 }

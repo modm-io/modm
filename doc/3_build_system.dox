@@ -1,0 +1,28 @@
+// coding: utf-8
+// $Id$
+
+/*!
+\page build_system 3. Build system
+
+XPCC uses SCons (a Python-based build tool) instead of the tradional
+aproach with Make. Chosen for its cross-platform capabilities and extendebility
+SCons has proven to be a worthy replacement.
+
+It is Open Source software using Python scripts as configuration files. The
+SConstruct files are the equivalent of Makefiles, they define the targets
+that SCons will create during the build process.
+
+For a more detailed introduction, go to http://www.scons.org/
+
+The SConstruct files and the project/build configuration have their own
+documentation on the following pages:
+- \subpage sconstruct "SConstruct files"
+- \subpage configuration_files
+
+\section usage Usage of the build system
+
+Run <tt>scons doc</tt> to recreate this doxygen documentation.
+
+With <tt>scons templates</tt> you can regenerate the template files, but usally
+you don't need to do that. 
+*/

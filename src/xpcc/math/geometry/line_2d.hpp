@@ -95,23 +95,23 @@ namespace xpcc
 		 * \brief	Calculate intersection point(s)
 		 * 
 		 * \param[in]	other	Other line
-		 * \param[out]	intersectionPoint	Intersection point
+		 * \param[out]	intersections	Intersection point
 		 */
 		bool
 		getIntersections(const Line2D& other,
-				PointSet2D<T>& intersectionPoint) const;
+				PointSet2D<T>& intersections) const;
 		
 		/**
 		 * \brief	Calculate intersection point(s)
 		 * 
 		 * \param[in]	circle	A circle
-		 * \param[out]	intersectionPoint	Intersection points
+		 * \param[out]	intersections	Intersection points
 		 * 
 		 * \see		http://local.wasp.uwa.edu.au/~pbourke/geometry/sphereline/
 		 */
 		bool
 		getIntersections(const Circle2D<T>& circle,
-				PointSet2D<T>& intersectionPoints) const;
+				PointSet2D<T>& intersections) const;
 		
 	protected:
 		Vector2D<T> point;

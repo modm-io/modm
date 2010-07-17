@@ -65,9 +65,6 @@ def require_architecture(env, architecture):
 		return False
 
 def check_defines(env):
-	# FIXME
-	#env.Alias('config', env.ShowConfiguration())
-	
 	projectConfig = env['XPCC_CONFIG']['defines'].keys()
 	keys = env['XPCC_LIBRARY_DEFINES'].keys()
 	keys.sort()
@@ -94,7 +91,7 @@ def check_defines(env):
 def xpcc_library(env, buildpath=None):
 	env.Append(CPPPATH = env['XPCC_LIBRARY_PATH'])
 	
-	envBackup = env
+	backup = env['XPCC_BUILDPATH'], env['XPCC_BASEPATH']
 	
 	# set a new buildpath for the library
 	if buildpath is None:
@@ -110,15 +107,18 @@ def xpcc_library(env, buildpath=None):
 			os.path.join(env['XPCC_ROOTPATH'], 'src', 'SConscript'),
 			exports = 'env')
 	
-	# restore original environment
-	env = envBackup
+	env.Append(LIBS = ['xpcc'])
+	env.Append(LIBPATH = [env['XPCC_BUILDPATH']])
 	
+	# restore original environment
+	env['XPCC_BUILDPATH'], env['XPCC_BASEPATH'] = backup
+	
+	# generate 'xpcc_config.hpp'
 	env['XPCC_LIBRARY_DEFINES'] = defines.copy()
 	for key in defines.iterkeys():
 		if key in env['XPCC_CONFIG']['defines']:
 			env['XPCC_LIBRARY_DEFINES'][key] = env['XPCC_CONFIG']['defines'][key]
 	
-	# generate 'xpcc_config.hpp'
 	substitutions = {
 		'defines': '\n'.join(["#define %s %s" % (key.upper(), value) \
 				for key, value in env['XPCC_LIBRARY_DEFINES'].iteritems()]),
@@ -130,13 +130,11 @@ def xpcc_library(env, buildpath=None):
 								  'misc/templates/xpcc_config.hpp.in'),
 			SUBSTITUTIONS = substitutions)
 	
-	env.Append(LIBS = ['xpcc'])
-	env.Append(LIBPATH = [env['XPCC_BUILDPATH']])
-	
 	return library
 
 def xpcc_communication_header(env, xmlfile):
-	env.Append(CPPPATH = [os.path.join(os.path.dirname(xmlfile), "..")])
+	# TODO
+	env.Append(CPPPATH = os.path.join(os.path.dirname(xmlfile), ".."))
 	
 	files  = env.SystemCppPackets(xmlfile)
 	files += env.SystemCppIdentifier(xmlfile)

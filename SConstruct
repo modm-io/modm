@@ -29,15 +29,39 @@
 # 
 # $Id$
 # -----------------------------------------------------------------------------
+Help("""
+DESCRIPTION
+
+   This SConstruct file is used to generate the doxygen documentation and some
+   other files.
+
+COMMANDLINE ARGUMENTS
+   
+   The default behaviour is to do everything:
+   
+      $ scons doxygen templates update unittest
+
+doc
+doxygen
+   Generate the doxygen documentation.
+
+templates
+   Regenerate some C++ driver classes from templates.
+
+update
+   Update the SConstruct files for the projects the tests folder.
+
+unittest
+   Run the unittests
+""")
 
 import os
 
-env = Environment(tools = ['template', 'doxygen', 'xpcc_configparser'],
-				  toolpath = ['misc/python/scons'])
+env = Environment(
+		toolpath = ['misc/python/scons'],
+		tools = ['template', 'doxygen', 'xpcc_configparser', 'helper'])
 
-# -----------------------------------------------------------------------------
 # regenerate SConstruct files for the tests
-
 parser = env.ConfigParser()
 for path, directories, files in os.walk('tests'):
 	# exclude the SVN-directories
@@ -54,22 +78,24 @@ for path, directories, files in os.walk('tests'):
 		
 		env.Alias('update', file)
 
-# -----------------------------------------------------------------------------
 # update all template files
+class Generator:
+	def __init__(self, env, basepath):
+		self.env = env
+		self.basepath = basepath
+	def template(self, target, source, substitutions):
+		self.env.Alias('templates',
+			self.env.Template(
+				target = os.path.join(self.basepath, target),
+				source = os.path.join(self.basepath, source),
+				SUBSTITUTIONS = substitutions))
 
-path = 'src/xpcc/architecture/atmega/uart'
+generator = Generator(env, 'src/xpcc/architecture/atmega/uart')
 for id in range(0, 4):
-	file = env.Template(target = os.path.join(path, 'uart%i.hpp' % id),
-						source = os.path.join(path, 'uart.hpp.in'),
-						SUBSTITUTIONS = { 'id': id })
-	env.Alias('template', file)
-	
-	file = env.Template(target = os.path.join(path, 'uart%i.cpp' % id),
-						source = os.path.join(path, 'uart.cpp.in'),
-						SUBSTITUTIONS = { 'id': id })
-	env.Alias('template', file)
+	generator.template('uart%i.hpp' % id, 'uart.hpp.in', { 'id': id })
+	generator.template('uart%i.cpp' % id, 'uart.cpp.in', { 'id': id })
 
-path = 'src/xpcc/architecture/atxmega/uart'
+generator = Generator(env, 'src/xpcc/architecture/atxmega/uart')
 for port in ['C', 'D', 'E', 'F']:
 	for number in [0, 1]:
 		id = "%s%i" % (port, number)
@@ -77,36 +103,18 @@ for port in ['C', 'D', 'E', 'F']:
 			'id': id,
 			'number': int(number),
 		}
+		id = id.lower()
 		
-		# simple UART
-		file = env.Template(target = os.path.join(path, 'uart_%s.hpp' % id.lower()),
-							source = os.path.join(path, 'uart.hpp.in'),
-							SUBSTITUTIONS = substitutions)
-		env.Alias('template', file)
-		
-		file = env.Template(target = os.path.join(path, 'uart_%s.cpp' % id.lower()),
-							source = os.path.join(path, 'uart.cpp.in'),
-							SUBSTITUTIONS = substitutions)
-		env.Alias('template', file)
-		
-		file = env.Template(target = os.path.join(path, 'uart_buffered_%s.cpp' % id.lower()),
-							source = os.path.join(path, 'uart_buffered.cpp.in'),
-							SUBSTITUTIONS = substitutions)
-		env.Alias('template', file)
-		
-		file = env.Template(target = os.path.join(path, 'uart_spi_%s.cpp' % id.lower()),
-							source = os.path.join(path, 'uart_spi.cpp.in'),
-							SUBSTITUTIONS = substitutions)
-		env.Alias('template', file)
-		
-
-# -----------------------------------------------------------------------------
-# add target to create the doxygen documentation
+		generator.template('uart_%s.hpp' % id, 'uart.hpp.in', substitutions)
+		generator.template('uart_%s.cpp' % id, 'uart.cpp.in', substitutions)
+		generator.template('uart_buffered_%s.cpp' % id, 'uart_buffered.cpp.in', substitutions)
+		generator.template('uart_spi_%s.cpp' % id, 'uart_spi.cpp.in', substitutions)
 
 env.Doxygen('doc/doxyfile')
-env.Alias('doc', 'apidoc/html')
+env.Alias('doxygen', 'apidoc/html')
+env.Alias('doc', 'doxygen')
 
-env.Alias('templates', 'template')
-env.Alias('all', ['update', 'templates'])
+env.Phony(unittest='@scons -Q -C src/')
 
+env.Alias('all', ['doc', 'update', 'templates', 'unittest'])
 env.Default('all')

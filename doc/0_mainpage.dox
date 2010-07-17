@@ -1,33 +1,54 @@
 // coding: utf-8
 // $Id$
-/*!
 
+/*!
 \mainpage Cross Platform Component Communication
 \image html logo_xpcc.png
 
 The XPCC project consists of two main parts: First part is the XPCC communication
-module, a packet orientated communication library, enabling transparent
-communication between components on PCs and Microcontrollers. It provides an
-interface to communicate via CAN, TCP/IP or TIPC.
+module, a packet orientated communication protocol, enabling transparent
+communication between components on different platforms (from PCs to small
+8-bit microcontrollers). It provides an interface to communicate via CAN,
+TCP/IP or TIPC.
 
 The second part is a universal but a bit robotic orientated C++ library. Because
 standard C++ libraries like the STL are not available for small
 microcontrollers we created a reduced version of it, adapted to the specific 
-needs of microcontrollers.
-For example if you need some generic containers take a look at our \ref container
-section.
+needs of microcontrollers. For example a set of generic containers is
+described in the \ref container section.
 
-This documentation is devided into the following sections:
+This manual is divided in the following sections:
+- \subpage why_use_xpcc
+- \subpage installation
+  - \ref installation_linux
+  - \ref installation_windows
+- \subpage build_system
+  - \ref configuration_files
+  - \ref sconstruct
+- \subpage getting_started
+  - \ref project_sconstruct
+  - \ref project_makefile
+- \subpage developer
+  - \ref design_decisions
+  - \ref coding_conventions
+  - \ref unittests
 
-- \subpage getting_started How to use this library
-  - \subpage build_system Using SCons
-- \subpage about Some detailed explanation about our goals and design decisions
-- \subpage coding_conventions Guidelines on how to write and format your code
+\section contribute How can I contribute?
 
-\section help How can I contribute?
+Use the library and give us some feedback. Thats the easiest way for you and
+the best way for us to see if something is unclear or missing.
 
-Use the library and give us some feedback.
+FIXME: contact details
 
-If you need a specific feature just drop us a mail and we will look into it. But
-don't expect a quick response, we are always busy building robots ;-)
+If you need a specific feature just drop us a mail and we will look into it.
+But don't expect a quick response, we are always busy building robots ;-)
+
+If you want to change the library be sure to read the 
+\ref developer "developer section", to familiarize yourself with the coding
+convention, design decisions etc.
+The Source Code is free avilable, so feel free to adapt it to your needs. The
+only thing we ask you to do is to contribute your changes back. That way
+everybody can profit from it.
+
+Have fun!
  */

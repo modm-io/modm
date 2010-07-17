@@ -1,0 +1,56 @@
+// coding: utf-8
+// $Id$
+/*!
+\page installation_windows 2b. Installation on Windows
+
+Windows users have to install all tools by hand unfortually. How to do that is
+explaind on the websites of the respective projects:
+
+- http://www.python.org/download/
+
+Python 2.6.x is required. The Code currently doesn't work with Python 3.x.
+
+- http://sourceforge.net/projects/pywin32/
+
+- http://www.scons.org/download.php
+- http://winavr.sourceforge.net
+
+- http://pypi.python.org/pypi/setuptools
+- http://codespeak.net/lxml/installation.html
+
+To install \c lxml with \c setuptools type <tt>easy_install lxml==xxx</tt>
+into the cmd window. Replace xxx with the last version which provides windows
+binaries (at the moment of this writing it is \c 2.2.4).
+
+It is also possible to install the other python modules with easy_install
+- <tt>easy_install scons</tt> (If during executing of Scons Python does not
+  find Sconsmodule use the Windows installer instead of easy_install to install Scons)
+- <tt>easy_install jinja2</tt>
+
+To program with AVRISP mkII you can use AVR Studio or install libusb to
+program using the XPCC system (avrdude)
+
+- <a href="http://www.atmel.com/dyn/products/tools_card.asp?tool_id=2725">AVR Studio 4</a>
+- http://www.libusb.org/
+
+\todo	Which driver is need, usb filter?
+
+Optional and only needed to regenerate this documentation:
+- http://www.stack.nl/~dimitri/doxygen/download.html#latestsrc
+- http://www.graphviz.org/Download_windows.php
+
+\section optimisation Optimisations
+
+To use more than one CPU you can change/create the 'SCONSFLAGS' Variable in the
+'System Properties' window. Fill it with the following value:
+
+\verbatim
+-Q -j4
+\endverbatim
+
+Adjust this \c -j paramter to the number of CPUs in your system, this example
+is for four cores.
+
+For more information on the parameter this read the chapter about
+\ref build_system "SCons".
+*/
