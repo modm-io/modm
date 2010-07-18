@@ -23,8 +23,8 @@ main(void)
 	LedGreen::setOutput();
 	LedRed::setOutput();
 	
-	LedGreen::low();
-	LedRed::high();
+	LedGreen::reset();
+	LedRed::set();
 	
 	// initialize output device
 	xpcc::BufferedUart0 uart(115200);
@@ -37,14 +37,14 @@ main(void)
 	unittest::Reporter reporter(device);
 	unittest::Controller::instance().setReporter(reporter);
 	
-	LedGreen::high();
+	LedGreen::set();
 	
 	// run tests
 ${tests}
 	
 	unittest::Controller::instance().getReporter().printSummary();
 	
-	LedRed::low();
+	LedRed::reset();
 	
 	while (1)
 	{

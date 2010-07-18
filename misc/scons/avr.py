@@ -27,19 +27,50 @@
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # 
 # $Id$
+# -----------------------------------------------------------------------------
+# 
+# DESCRIPTION
+# 
+# This is a tool compile programs for the AVR microcontrollers from Atmel.
+# The 'avr-gcc' is used as compiler.
+# 
+# EXAMPLE
+# 
+# A simple SConstruct file to compile a file named 'main.c' for an ATmega644
+# can look as follows:
+# 
+#    env = Environment(tools = ['avr'],
+#             AVR_DEVICE = 'atmega644',
+#             AVR_CLOCK = 16000000)
+#    
+#    program = env.Program('main.c')
+#    
+#    env.Hex(program)
+#    env.Listing(program)
+#
+# BUILDERS
+# 
+# The following builders are available:
+# 
+# Object()      .c   -> .o
+# Object()      .cpp -> .o
+# Object()      .S   -> .o
+# Library()     .o   -> .a
+# Program()     .o   -> .elf
+# Hex()         .elf -> .hex
+#               .elf -> .eep
+# Listing()     .elf -> .lss
+#
+# The 'Program' builder will automatically call the 'Object' builder so
+# it's no need to use it explicitly. Just call 'Program' with all your
+# source files.
+#
+# TODO
+# 
+# - Make the optimization level adjustable
 
 import os
-
 from SCons.Script import *
-
-# c -> o			build-in
-# cpp -> o			build-in
-# S -> o			ok
-# o -> a			build-in
-# o -> elf			ok
-# elf -> hex		ok
-# elf -> eep		?
-# elf -> lss		ok
 
 # -----------------------------------------------------------------------------
 def generate(env, **kw):
@@ -52,7 +83,7 @@ def generate(env, **kw):
 	
 	env['PROGSUFFIX'] = ".elf"
 	
-	# used tools
+	# used programs
 	env['CC'] = "avr-gcc"
 	env['CXX'] = "avr-g++"
 	env['AS'] = "avr-as"

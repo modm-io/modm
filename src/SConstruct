@@ -90,9 +90,10 @@ if not configfile:
 	configfile = defaultConfigfile
 
 # create the build environment
-rootpath = '..'
-pre = Environment(tools = ['xpcc_loader'], toolpath = [rootpath + '/misc/python/scons'])
-env = pre.GenerateEnvironment(configfile = configfile)
+env = Environment(
+		tools = ['xpcc'],
+		toolpath = ['../misc/scons'],
+		configfile = configfile)
 
 # find only files located in 'test' folders
 files = env.FindFiles(path = '.', unittest=True)
@@ -115,7 +116,7 @@ env.Alias('build', program)
 env.Alias('size', env.Size(program))
 env.Alias('symbols', env.Symbols(program))
 
-if env.RequireArchitecture('pc'):
+if env.CheckArchitecture('pc'):
 	env.Alias('run', env.Run(program))
 	env.Alias('all', ['build', 'run'])
 else:

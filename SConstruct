@@ -58,8 +58,8 @@ unittest
 import os
 
 env = Environment(
-		toolpath = ['misc/python/scons'],
-		tools = ['template', 'doxygen', 'xpcc_configparser', 'helper'])
+		toolpath = ['misc/scons'],
+		tools = ['template', 'doxygen', 'configfile', 'helper'])
 
 # regenerate SConstruct files for the tests
 parser = env.ConfigParser()

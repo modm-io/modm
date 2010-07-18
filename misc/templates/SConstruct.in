@@ -1,43 +1,30 @@
 # WARNING: This file is generated automatically, do not edit!
 
 rootpath = "${rootpath}"
-
-pre = Environment(tools = ['xpcc_loader'],
-				  toolpath = [rootpath + '/misc/python/scons'])
-env = pre.GenerateEnvironment(configfile = 'project.cfg', 
-							  rootpath = rootpath)
+pre = Environment(tools = ['xpcc'],
+				  toolpath = [rootpath + '/misc/scons'],
+				  configfile = 'project.cfg')
 
 files = env.FindFiles(path = '.')
-
-objects = []
-for file in files.sources:
-	object = env.Object(target = env.Buildpath(file, strip_extension=True),
-						source = file)
-	objects.append(object)
-
-# build the program
-programName = env['XPCC_CONFIG']['general']['name']
-program = env.Program(target = programName,
-					  source = objects)
+program = env.Program(target = env['XPCC_CONFIG']['general']['name'],
+					  source = files.sources)
 
 # build the xpcc library
-library = env.XpccLibrary()
+env.XpccLibrary()
 
-env.Alias('lib', library)
 env.Alias('build', program)
 env.Alias('size', env.Size(program))
 env.Alias('symbols', env.Symbols(program))
 
-if env.RequireArchitecture('pc'):
+if env.CheckArchitecture('pc'):
 	env.Alias('run', env.Run(program))
 	env.Alias('all', ['build'])
 else:
 	hexfile = env.Hex(program)
 	env.Alias('program', env.Avrdude(hexfile))
-	
-	env.Alias('build', hexfile)
-	env.Alias('build', env.Listing(program))
 	env.Alias('fuse', env.AvrdudeFuses())
+	
+	env.Alias('build', [hexfile, env.Listing(program)])
 	env.Alias('all', ['build', 'size'])
 
 env.Default('all')
