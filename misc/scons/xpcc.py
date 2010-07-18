@@ -220,7 +220,7 @@ def generate(env, **kw):
 		
 		buildpath = env.get('buildpath')
 		if buildpath is None:
-			buildpath = parser.get('build', 'buildpath', os.path.join(rootpath, 'build/$name'))
+			buildpath = parser.get('build', 'buildpath', os.path.join(os.curdir, 'build/'))
 		buildpath = os.path.abspath(buildpath)
 		
 		# exclude the buildpath from the FileScanner
