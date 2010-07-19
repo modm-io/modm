@@ -59,7 +59,8 @@ import os
 
 env = Environment(
 		toolpath = ['misc/scons'],
-		tools = ['template', 'doxygen', 'configfile', 'helper'])
+		tools = ['template', 'doxygen', 'configfile', 'helper'],
+		ENV = os.environ)
 
 # regenerate SConstruct files for the tests
 parser = env.ConfigParser()
@@ -114,6 +115,7 @@ env.Doxygen('doc/doxyfile')
 env.Alias('doxygen', 'apidoc/html')
 env.Alias('doc', 'doxygen')
 
+env.Phony(show='@firefox doc/apidoc/html/index.html &')
 env.Phony(unittest='@scons -Q -C src/')
 
 env.Alias('all', ['doc', 'update', 'templates', 'unittest'])

@@ -30,8 +30,7 @@
 
 rootpath = '..'
 
-pre = Environment(tools = ['xpcc_loader'], toolpath = [rootpath + '/misc/python/scons'])
-env = pre.GenerateEnvironment(buildpath = 'build')
+env = Environment(tools = ['xpcc'], toolpath = [rootpath + '/misc/scons'])
 
 # choose the example file
 example = ARGUMENTS.get('example')
@@ -47,7 +46,7 @@ env.XpccLibrary()
 env.Alias('size', env.Size(program))
 env.Alias('symbols', env.Symbols(program))
 
-if env.RequireArchitecture('pc'):
+if env.CheckArchitecture('pc'):
 	env.Alias('build', program)
 	env.Alias('run', env.Run(program))
 	

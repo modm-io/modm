@@ -23,8 +23,8 @@ This manual is divided in the following sections:
   - \ref installation_linux
   - \ref installation_windows
 - \subpage build_system
-  - \ref configuration_files
   - \ref sconstruct
+  - \ref configuration_files
 - \subpage getting_started
   - \ref project_sconstruct
   - \ref project_makefile
@@ -32,6 +32,24 @@ This manual is divided in the following sections:
   - \ref design_decisions
   - \ref coding_conventions
   - \ref unittests
+
+\section people The people behind this library
+
+\image html rca_2010.jpg
+
+During the last years we, the Roboterclub Aachen e.V., have developed a
+software library for communication among components that are distributed on
+PCs and Microcontrollers. The primary aim has been the usage of this system
+in autonomous robots for the <a href="http://www.eurobot.org/eng/">EUROBOT
+competition</a>.
+
+This library is the result of this development. The PC and the AVR software
+have merged together into a single library to simplifiy and unifiy the software
+development.
+
+This library was successfully used in our robot 
+<a href="http://www.roboterclub.rwth-aachen.de/cms/index.php?option=com_content&task=view&id=165&Itemid=114">"Insitor"</a>
+with which we won the <a href="http://www.roboterclub.rwth-aachen.de/cms/index.php?option=com_content&task=view&id=169&Itemid=118">vize world champion</a> title in 2010.
 
 \section contribute How can I contribute?
 
