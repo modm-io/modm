@@ -36,10 +36,9 @@ DESCRIPTION
    other files.
 
 COMMANDLINE ARGUMENTS
-   
-   The default behaviour is to do everything:
-   
-      $ scons doxygen templates update unittest
+
+all
+   Build everythin (this is the default).
 
 doc
 doxygen

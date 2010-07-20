@@ -4,6 +4,28 @@
 /*!
 \page project_makefile 4b. Create a project using Make
 
+Don't do it. SCons is superior ... ;-)
 
+Take a look a http://www.scons.org/ for good arguments for using it. But if we
+can't convince you for whatever reasons, here is how to use the library in an
+other project which doesn't use SCons.
+
+\section build_library Build the library
+
+For this step you need SCons nonetheless. Go to \c src folder and adjust
+the \c library.cfg file to your needs. Then type:
+
+\verbatim
+$ scons library
+\endverbatim
+
+This should create a file called \e libxpcc.a. Copy this file to your project.
+
+\section makefile Adjust your Makefile
+
+Let's assume you're creating an AVR project und use the standard Makefile
+created by MFile.
+
+TODO ...
 
 */

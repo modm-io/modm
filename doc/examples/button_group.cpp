@@ -16,7 +16,7 @@ int
 main()
 {
 	Led::setOutput();
-	Led::low();
+	Led::reset();
 	
 	TCCR2A = (1 << WGM21);
 	TCCR2B = (1 << CS22);

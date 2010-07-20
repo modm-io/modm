@@ -2,7 +2,7 @@
 // $Id$
 
 /*!
-\page configuration_files	3b. Configuration files
+\page configuration_files	3d. Configuration files
 
 \section organization Organization of the source
 \subsection project_files The 'project.cfg' and 'build.cfg' files
@@ -54,10 +54,6 @@ name = raw_tipc_transmitter
 [build]
 architecture = pc
 \endverbatim
-
-\b name need to unique and will be the name of the executeable.
-
-The full documentation is has its own page: \subpage project_cfg.
 
 \section project_cfg	project.cfg
 

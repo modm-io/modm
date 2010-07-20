@@ -1,0 +1,16 @@
+// coding: utf-8
+// $Id$
+
+/*!
+\page sconstruct_template 3c. Universal SConstruct template
+
+Here's a universal useable SConstruct file to compile code for AVRs or a
+PC. Just copy copy the following block to a file called \e SConstruct, adjust
+the \e xpccpath variable to point to the rootpath of your xpcc folder (make
+sure it doesn't end with an slash) and create a \e project.cfg file.
+
+\include SConstruct
+
+Now go to your project folder, type \c scons and every C++, C or Assembly file
+in your folder should be compiled into a subfolder called \e build/.
+ */

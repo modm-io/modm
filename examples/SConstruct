@@ -43,6 +43,8 @@ program = env.Program(target = 'example', source = example)
 # build the xpcc library
 env.XpccLibrary()
 
+env.Defines()
+
 env.Alias('size', env.Size(program))
 env.Alias('symbols', env.Symbols(program))
 

@@ -93,7 +93,8 @@ if not configfile:
 env = Environment(
 		tools = ['xpcc'],
 		toolpath = ['../misc/scons'],
-		configfile = configfile)
+		configfile = configfile,
+		buildpath = '../build/unittest/')
 
 # find only files located in 'test' folders
 files = env.FindFiles(path = '.', unittest=True)
