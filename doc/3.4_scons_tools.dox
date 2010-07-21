@@ -1,0 +1,65 @@
+// coding: utf-8
+// $Id$
+
+/*!
+\page scons_tools	3.4 SCons Tools
+
+In order make building our code with SCons as easy as possible we have created
+some tools which add special behaviour to SCons.
+
+\verbatim
+env = Environment(tools = ['xpcc'], toolpath = ['../../xpcc/misc/scons'])
+\endverbatim
+
+This will load the following tools:
+- \subpage tool_xpcc "xpcc"
+- \subpage tool_configfile "configfile"
+- \subpage tool_helper "helper"
+- \subpage tool_unittest "unittest"
+- \subpage tool_template "template"
+
+- \subpage tool_avr "avr"
+- \subpage tool_avrdude "avrdude"
+
+The last two tools will only be loaded when the given architecture is
+\e atmega oder \e atxmega.
+
+\section scons_tools_provides Provided builders and methods
+
+- \ref tool_xpcc_library "XpccLibrary()"
+- \ref tool_xpcc_defines "Defines()"
+- \ref tool_xpcc_show "ShowConfiguration()"
+
+- \ref tool_xpcc_communication "XpccCommunication()"
+
+- \ref tool_xpcc_path "Buildpath(path)"
+- \ref tool_xpcc_check "CheckArchitecture(string)"
+
+- \ref tool_configfile_find "FindFiles(path)"
+
+- \ref tool_configfile_parser "ConfigParser()"
+
+- \ref tool_helper_size "Size(program)"
+- \ref tool_helper_symbols "Symbols(program)"
+- \ref tool_helper_run "Run(program)"
+- \ref tool_helper_phony "Phony(command)"
+
+- \ref tool_unittest_runner "UnittestRunner(target, source, template)"
+
+- \ref tool_template_template "Template(target, source, substitutions)"
+- \ref tool_template_jinja2 "Jinja2Template(target, source, substitutions)"
+
+- \ref tool_avr_hex "Hex(target, [source])"
+- \ref tool_avr_listing "Listing(program)"
+
+- \ref tool_avrdude_program "Avrdude(hexfile)"
+- \ref tool_avrdude_fuses "AvrdudeFuses()"
+
+\section scons_tools_builtin Built-in builders
+
+- Program()
+- Object()
+- Library()
+
+For a complete list see the <a href="http://www.scons.org/doc/2.0.0.final.0/HTML/scons-user/index.html" target="_blank">SCons documentation</a>.
+*/

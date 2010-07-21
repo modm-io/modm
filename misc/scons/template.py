@@ -35,22 +35,22 @@ import re
 from SCons.Script import *
 
 # -----------------------------------------------------------------------------
-def simple_template_action(target, source, env):
-	if not env.has_key('SUBSTITUTIONS'):
-		raise SCons.Errors.UserError, "'SimpleTemplate' requires SUBSTITUTIONS to be set."
+def template_action(target, source, env):
+	if not env.has_key('substitutions'):
+		raise SCons.Errors.UserError, "Use 'Template(..., substitutions = ...)'"
 	
 	source = source[0].abspath
 	target = target[0].abspath
 	
-	output = string.Template(open(source, 'r').read()).safe_substitute(env['SUBSTITUTIONS'])
+	output = string.Template(open(source, 'r').read()).safe_substitute(env['substitutions'])
 	
 	open(target, 'w').write(output)
 	return 0
 
 # -----------------------------------------------------------------------------
-def template_action(target, source, env):
-	if not env.has_key('SUBSTITUTIONS'):
-		raise SCons.Errors.UserError, "'Template' requires SUBSTITUTIONS to be set."
+def jinja2_template_action(target, source, env):
+	if not env.has_key('substitutions'):
+		raise SCons.Errors.UserError, "Use 'Jinja2Template(..., substitutions = ...)'"
 	
 	try:
 		import jinja2
@@ -67,11 +67,11 @@ def template_action(target, source, env):
 	loader = jinja2.Environment(loader = jinja2.FileSystemLoader(path))
 	template = loader.get_template(filename, globals=globals)
 	
-	output = template.render(env['SUBSTITUTIONS'])
+	output = template.render(env['substitutions'])
 	open(target[0].path, 'w').write(output)
 
 def template_emitter(target, source, env):
-	Depends(target, SCons.Node.Python.Value(env['SUBSTITUTIONS']))
+	Depends(target, SCons.Node.Python.Value(env['substitutions']))
 	return target, source
 
 def template_string(target, source, env):
@@ -81,15 +81,15 @@ def template_string(target, source, env):
 def generate(env, **kw):
 	env.Append(
 		BUILDERS = {
-		'SimpleTemplate': env.Builder(
-			action = env.Action(simple_template_action, template_string),
+		'Template': env.Builder(
+			action = env.Action(template_action, template_string),
 			emitter = template_emitter,
 			src_suffix = '.in',
 			single_source = True
 		),
 		
-		'Template':  env.Builder(
-			action = env.Action(template_action, template_string),
+		'Jinja2Template':  env.Builder(
+			action = env.Action(jinja2_template_action, template_string),
 			emitter = template_emitter,
 			src_suffix = '.in',
 			single_source = True

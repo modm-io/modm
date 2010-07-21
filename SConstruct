@@ -72,9 +72,9 @@ for path, directories, files in os.walk('tests'):
 		parser.read(os.path.join(path, 'project.cfg'))
 		
 		rootpath = os.sep.join(['..' for x in range(len(path.split(os.sep)))])
-		file = env.SimpleTemplate(target = os.path.join(path, 'SConstruct'),
-								  source = 'misc/templates/SConstruct.in',
-								  SUBSTITUTIONS = {'rootpath': rootpath })
+		file = env.Template(target = os.path.join(path, 'SConstruct'),
+							source = 'misc/templates/SConstruct.in',
+							substitutions = {'rootpath': rootpath })
 		
 		env.Alias('update', file)
 
@@ -85,10 +85,10 @@ class Generator:
 		self.basepath = basepath
 	def template(self, target, source, substitutions):
 		self.env.Alias('templates',
-			self.env.Template(
+			self.env.Jinja2Template(
 				target = os.path.join(self.basepath, target),
 				source = os.path.join(self.basepath, source),
-				SUBSTITUTIONS = substitutions))
+				substitutions = substitutions))
 
 generator = Generator(env, 'src/xpcc/architecture/atmega/uart')
 for id in range(0, 4):

@@ -5,7 +5,7 @@
 \page build_system 3. Build system
 
 XPCC uses SCons (a Python-based build tool) instead of the tradional
-aproach with Make. Chosen for its cross-platform capabilities and extendebility
+approach with Make. Chosen for its cross-platform capabilities and extendebility
 SCons has proven to be a worthy replacement.
 
 \section what What is SCons?
@@ -14,14 +14,14 @@ It is Open Source software using Python scripts as configuration files. The
 SConstruct files are the equivalent of Makefiles, they define the targets
 that SCons will create during the build process.
 
-For a more detailed introduction, go to http://www.scons.org/
+For more information go to the official website: http://www.scons.org/
 
 The SConstruct files and the project/build configuration have their own
 documentation on the following pages:
 - \subpage sconstruct "SConstruct files: An introduction"
 - \subpage sconstruct_advanced "SConstruct files: Advanced topics"
 - \subpage sconstruct_template "Universal SConstruct template"
-- \subpage xpcc_tool "The 'xpcc' tool"
+- \subpage scons_tools "SCons Tools"
 - \subpage configuration_files "Configuration files"
 
 \section usage Usage of the build system
@@ -49,7 +49,7 @@ Get help about the command-line targets:
 scons -h
 \endverbatim
 
-These options have been programmed into the SConstruct and support files
+These help messages have been programmed into the SConstruct files
 for XPCC. They are not written or supported by the SCons developers.
 To see the options that are written and supported by the SCons developers
 you need to issue the command
@@ -80,7 +80,7 @@ Compiling C++: build/xpcc/math/saturated/test/saturated_test.o
 \endverbatim
 
 To enable the complete output the parameter \c verbose is available. The
-following will print the exact commands beeing executed:
+following will print the exact commands being executed:
 \verbatim
 scons verbose=1
 \endverbatim
@@ -98,6 +98,8 @@ g++ -o build/xpcc/math/geometry/test/line_2d_test.o -c -std=gnu++98 -Woverloaded
 g++ -o build/xpcc/math/saturated/test/saturated_test.o -c -std=gnu++98 -Woverloaded-virtual -funsigned-char -funsigned-bitfields -Wall -Wextra -Wundef -ggdb -I. xpcc/math/saturated/test/saturated_test.cpp
 ...
 \endverbatim
-Which is far less readable ;-)
+
+This is far less readable but can show if something is wrong with the invoking
+of the compiler etc.
 
 */

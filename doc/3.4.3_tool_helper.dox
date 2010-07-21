@@ -1,0 +1,26 @@
+// coding: utf-8
+// $Id$
+
+/*!
+\page tool_helper 	3.4.3 Tool: helper
+
+\section tool_helper_provides Provided builders and methods
+
+\subsection tool_helper_size Size(program)
+
+Show the size of a program.
+
+\subsection tool_helper_symbols Symbols(program)
+
+Call \c nm to get an overview which symbol in the object files occupies how
+much space.
+
+\subsection tool_helper_run Run(program)
+
+Execute the file. This will only work for PC executables.
+
+\subsection tool_helper_phony Phony(command)
+
+Create a phony target. Phony targets are always rebuild, without looking
+if it is really needed
+*/

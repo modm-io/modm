@@ -2,7 +2,7 @@
 // $Id$
 
 /*!
-\page project_makefile 4b. Create a project using Make
+\page project_makefile 4.2 Create a project using Make
 
 Don't do it. SCons is superior ... ;-)
 

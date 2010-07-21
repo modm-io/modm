@@ -1,8 +1,8 @@
 // coding: utf-8
-// $Id: 3a_sconstruct.dox 356 2010-07-17 19:38:10Z dergraaf $
+// $Id$
 
 /*!
-\page sconstruct_advanced 3b. SConstruct files: Advanced topics
+\page sconstruct_advanced 3.2 SConstruct files: Advanced topics
 
 One important thing to remember about SConstruct files is that they are
 declarative, rather than strictly imperative. This means that the order in
@@ -52,26 +52,28 @@ env.Default('all')
 
 \section description Detailed description 
 
-Let's get throu this step by step:
+Let's get through this step by step:
 
 \verbatim
 env = Environment(tools = ['xpcc'], toolpath = ['../../xpcc/misc/scons'])
 \endverbatim
 
-Create an environment and load the \ref xpcc_tool "xpcc tool". This checks
+Create an environment and load the \ref scons_tools "xpcc tool". This checks
 the configuration file and finds the \e build section with an \e architecture
 entry. Form the value (here \e 'atmega') it determines that we want to compile
-code for and AVR and loads the complete AVR toolchain among the !xpcc
+code for and AVR and loads the complete AVR toolchain among the XPCC
 specific tools.
 
 Therefore things like \e Hex or \e Avrdude are available. This might not be
 true if we specifiy another architecture.
 
+Read more about this on the page about our \ref scons_tools "SCons tools".
+
 \verbatim
 files = env.FindFiles(path = '.')
 \endverbatim
 
-This 
+See \ref tool_configfile_find "FindFiles()".
 
 \verbatim
 program = env.Program(target = env['XPCC_CONFIG']['general']['name'], source = files.sources)
@@ -83,11 +85,11 @@ the subfolders.
 The name of the executable is determined here by the value in of the \e name
 entry in the section \e general of our configuration file. For this example it
 is \b example.
-Therefore the resulting file will be called 'example.elf'. Elf is the 
+Therefore the resulting file will be called \c example.elf. Elf is the 
 standard file-ending for AVR executeables and is added automatically by SCons.
-If the program would be a Windows executable it would be named 'example.exe'.
+If the program would be a Windows executable the name would be \c example.exe.
 
-You can see another important feature of the \ref xpcc_tool "xpcc tool" here:
+You can see another important feature of the \ref scons_tools "xpcc tool" here:
 Everything from the configuration file is accessible throu the Python dict
 in \e env['XPCC_CONFIG']. For example <tt>print env['XPCC_CONFIG']['build']['device']</tt>
 will output \e atmega644.
@@ -97,8 +99,8 @@ env.XpccLibrary()
 \endverbatim
 
 This tells SCons two things:
-1. You want to use the xpcc library in your program (link to \e libxpcc.a)
-2. How to build the library
+-# You want to use the XPCC library in your program (link to \e libxpcc.a)
+-# How to build the library
 
 As said in the beginning: SConstruct are declarative. So it doesn't matter
 where you put this line. It can be before or after the Program() builder.
@@ -107,7 +109,7 @@ where you put this line. It can be before or after the Program() builder.
 env.Defines()
 \endverbatim
 
-Advise SCons to create a file called 'defines.hpp' with the values form the
+Advise SCons to create a file called \c defines.hpp with the values form the
 section 'defines' form our configuration file.
 
 SCons will create this file only when you need it or request it explicitly.
@@ -127,7 +129,7 @@ how much space.
 hexfile = env.Hex(program)
 \endverbatim
 
-The result of the \e Program() builder is a file called \e example.elf, but
+The result of the \e Program() builder is a file called \c example.elf, but
 most programming tools for the AVRs need a Hex-file instead of an Elf-file.
 
 With this builder we tell SCons to build a Hex-file from our Elf-file.

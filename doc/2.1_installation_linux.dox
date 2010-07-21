@@ -2,9 +2,9 @@
 // $Id$
 
 /*!
-\page installation_linux 2a. Installation on Linux systems
+\page installation_linux 2.1 Installation on Linux systems
 
-\section installation Installation
+\section linux_installation Installation
 
 For Ubuntu (and other Debian based Linux-Distributions) just type the 
 following in a terminal and you're good to go:
@@ -23,16 +23,22 @@ $ sudo aptitude install gcc build-essential tipcutils libboost-thread-dev
 \subsection avr AVR
 
 Some linux distributions offer the AVR toolchain already integrated, but
-the supplied tools are usually not quite up to date.
+the supplied tools are sometimes not quite up to date.
 
 There some alternatives to get a recent toolchain:
 - <a href="http://avr-libc.nongnu.org/user-manual/install_tools.html">Build the tools by hand</a>
-- <a href="http://www.avrfreaks.net/index.php?name=PNphpBB2&file=viewtopic&t=95328&start=0">Build-Script on avrfreaks.net</a> (with ready-to-use Debian/Ubuntu packages)
+- <a href="http://www.avrfreaks.net/index.php?name=PNphpBB2&file=viewtopic&t=95328&start=0">Build-Script on avrfreaks.net</a>
+  (with ready-to-use Debian/Ubuntu packages)
 - ...
+
+If you're lucky and your distribution offers recent packages the following might do:
+\verbatim
+$ sudo aptitude gcc-avr binutils-avr avr-libc avrdude
+\endverbatim
 
 \section optimisation Optimisations
 
-To use more than one CPU you might want to add the following to the
+To use more than one CPU you might want to add the following to the end of your
 '.bashrc' file (adjust the '4' to the number of CPUs in your system):
 
 \verbatim

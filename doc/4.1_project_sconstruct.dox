@@ -2,7 +2,7 @@
 // $Id$
 
 /*!
-\page project_sconstruct 4a. Create a project using SCons
+\page project_sconstruct 4.1 Create a project using SCons
 
 Two set up the project you need to create two files: \c SConstruct and
 \c project.cfg.

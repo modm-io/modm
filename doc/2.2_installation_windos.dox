@@ -1,7 +1,7 @@
 // coding: utf-8
 // $Id$
 /*!
-\page installation_windows 2b. Installation on Windows
+\page installation_windows 2.2 Installation on Windows
 
 Windows users have to install all tools by hand unfortually. How to do that is
 explaind on the websites of the respective projects:
@@ -38,6 +38,8 @@ program using the XPCC system (avrdude)
 Optional and only needed to regenerate this documentation:
 - http://www.stack.nl/~dimitri/doxygen/download.html#latestsrc
 - http://www.graphviz.org/Download_windows.php
+
+\subpage configure_programmers_notepad "Configure Programmers Notepad".
 
 \section optimisation Optimisations
 

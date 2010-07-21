@@ -30,8 +30,8 @@
 
 from SCons.Script import *
 
-import re
 import os
+import re
 import string
 import datetime
 
@@ -76,10 +76,12 @@ class FunctionScanner:
 
 # -----------------------------------------------------------------------------
 def unittest_action(target, source, env):
-	template = source[0]
-	header = source[1:]
+	if not env.has_key('template'):
+		raise SCons.Errors.UserError, "Use 'UnittestRunner(..., template = ...)'"
 	
-	#print dir(template)
+	template = env['template']
+	header = source
+	
 	tests = {}
 	for file in header:
 		# io_stream_test.hpp -> io_stream_test
@@ -128,15 +130,15 @@ def unittest_action(target, source, env):
 		'tests': '\n'.join(tests_cases),
 	}
 	
-	input = open(template.abspath, 'r').read()
+	input = open(os.path.abspath(template), 'r').read()
 	output = string.Template(input).safe_substitute(substitutions)
 	open(target[0].abspath, 'w').write(output)
 	
 	return 0
 	
 def unittest_emitter(target, source, env):
-	header = [source[0]]
-	for file in source[1:]:
+	header = []
+	for file in source:
 		if file.name.endswith('_test.hpp'):
 			header.append(file)
 	return target, header

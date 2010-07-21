@@ -1,5 +1,5 @@
 // WARNING: This file is generated automatically, do not edit!
-// Please modify the corresponding 'main_atxmega.cpp.in' file instead.
+// Please modify the corresponding 'runner_atxmega.cpp.in' file instead.
 // ----------------------------------------------------------------------------
 
 #include <avr/interrupt.h>

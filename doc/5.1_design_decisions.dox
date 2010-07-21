@@ -2,7 +2,7 @@
 // $Id$
 
 /*!
-\page design_decisions 5a. Design decisions
+\page design_decisions 5.1 Design decisions
 
 The main target of this library are small 8-bit AVR mircocontrollers. But it
 should also be able to generate code for standard x86 PCs. This has partly historical

@@ -85,26 +85,21 @@ if 'library' in BUILD_TARGETS:
 else:
 	defaultConfigfile = 'unittest.cfg'
 
-configfile = ARGUMENTS.get('config')
-if not configfile:
-	configfile = defaultConfigfile
-
 # create the build environment
 env = Environment(
 		tools = ['xpcc'],
 		toolpath = ['../misc/scons'],
-		configfile = configfile,
+		configfile = ARGUMENTS.get('config', defaultConfigfile),
 		buildpath = '../build/unittest/')
 
 # find only files located in 'test' folders
 files = env.FindFiles(path = '.', unittest=True)
 
 # declare a file which later runs all the tests
-template = ARGUMENTS.get('template')
-if not template:
-	template = env['XPCC_CONFIG']['build']['template']
+template = ARGUMENTS.get('template', env['XPCC_CONFIG']['build']['template'])
 runner = env.UnittestRunner(target = env.Buildpath('runner.cpp'),
-							source = [template] + files.header)
+							source = files.header,
+							template = template)
 
 # build the program
 program = env.Program(target = 'executable',

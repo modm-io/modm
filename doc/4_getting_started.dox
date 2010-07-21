@@ -4,8 +4,8 @@
 /*!
 \page getting_started 4. Getting started: How to use this library
 
-TODO examples folder
-
 - \subpage project_sconstruct
 - \subpage project_makefile
+
+TODO examples folder
 */

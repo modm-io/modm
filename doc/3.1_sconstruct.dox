@@ -2,7 +2,7 @@
 // $Id$
 
 /*!
-\page sconstruct 3a. SConstruct files: An introduction
+\page sconstruct 3.1 SConstruct files: An introduction
 
 The SConstruct files are the equivalent of Makefiles, they define the targets
 that SCons will create during the build process.
@@ -67,8 +67,8 @@ default where to find this tool we have to specifiy its toolpath, this is
 path where SCons will look for a file called 'xpcc.py'. Make sure that this
 path points to the /misc/scons subfolder of the XPCC project folder. 
 
-A more detailed description can be found at the page:
-\ref xpcc_tool "The xpcc tool".
+A more detailed description can be found at the page about our
+\ref scons_tools "SCons tools".
 
 \subsection creating Creating a Program
 

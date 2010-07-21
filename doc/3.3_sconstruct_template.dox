@@ -2,7 +2,7 @@
 // $Id$
 
 /*!
-\page sconstruct_template 3c. Universal SConstruct template
+\page sconstruct_template 3.3 Universal SConstruct template
 
 Here's a universal useable SConstruct file to compile code for AVRs or a
 PC. Just copy copy the following block to a file called \e SConstruct, adjust

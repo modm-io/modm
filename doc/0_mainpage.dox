@@ -22,8 +22,12 @@ This manual is divided in the following sections:
 - \subpage installation
   - \ref installation_linux
   - \ref installation_windows
+    - \ref configure_programmers_notepad
 - \subpage build_system
   - \ref sconstruct
+  - \ref sconstruct_advanced
+  - \ref sconstruct_template
+  - \ref scons_tools
   - \ref configuration_files
 - \subpage getting_started
   - \ref project_sconstruct
@@ -40,26 +44,27 @@ This manual is divided in the following sections:
 During the last years we, the Roboterclub Aachen e.V., have developed a
 software library for communication among components that are distributed on
 PCs and Microcontrollers. The primary aim has been the usage of this system
-in autonomous robots for the <a href="http://www.eurobot.org/eng/">EUROBOT
-competition</a>.
+in autonomous robots for the <a href="http://www.eurobot.org/eng/" target="_blank">
+EUROBOT competition</a>.
 
 This library is the result of this development. The PC and the AVR software
 have merged together into a single library to simplifiy and unifiy the software
 development.
 
 This library was successfully used in our robot 
-<a href="http://www.roboterclub.rwth-aachen.de/cms/index.php?option=com_content&task=view&id=165&Itemid=114">"Insitor"</a>
-with which we won the <a href="http://www.roboterclub.rwth-aachen.de/cms/index.php?option=com_content&task=view&id=169&Itemid=118">vize world champion</a> title in 2010.
+<a href="http://www.roboterclub.rwth-aachen.de/cms/index.php?option=com_content&task=view&id=165&Itemid=114" target="_blank">
+Insitor</a> with which we won the
+<a href="http://www.roboterclub.rwth-aachen.de/cms/index.php?option=com_content&task=view&id=169&Itemid=118" target="_blank">
+vize world champion</a> title in 2010.
 
 \section contribute How can I contribute?
 
-Use the library and give us some feedback. Thats the easiest way for you and
+Use the library and give us some feedback. That's the easiest way for you and
 the best way for us to see if something is unclear or missing.
 
-FIXME: contact details
-
-If you need a specific feature just drop us a mail and we will look into it.
-But don't expect a quick response, we are always busy building robots ;-)
+If you need a specific feature just drop us a <a href="mailto:roboterclub@rwth-aachen.de">mail</a>
+and we will look into it. But don't expect a quick response, we are always
+busy building robots ;-)
 
 If you want to change the library be sure to read the 
 \ref developer "developer section", to familiarize yourself with the coding

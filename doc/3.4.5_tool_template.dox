@@ -1,0 +1,16 @@
+// coding: utf-8
+// $Id$
+
+/*!
+\page tool_template 	3.4.3 Tool: template
+
+\section tool_template_provides Provided builders and methods
+
+\subsection tool_template_template Template(target, source, substitutions)
+
+
+
+\subsection tool_template_jinja2 Jinja2Template(target, source, substitutions)
+
+
+*/

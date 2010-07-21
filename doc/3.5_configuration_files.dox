@@ -2,7 +2,7 @@
 // $Id$
 
 /*!
-\page configuration_files	3d. Configuration files
+\page configuration_files	3.5 Configuration files
 
 \section organization Organization of the source
 \subsection project_files The 'project.cfg' and 'build.cfg' files

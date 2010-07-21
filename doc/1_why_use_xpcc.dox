@@ -4,11 +4,13 @@
 /*!
 \page why_use_xpcc 1. Why should i use this library?
 
+\image html rca_insitor.jpg
+
 \section reasons Some good reasons
 
 \subsection opensource Open-Source
 
-It's Open-Source, the complete source code is available. We choose a very
+It's Open-Source, the complete source code is available. We chose a very
 moderate licence, the BSD-licence. Therefore you are free to do nearly
 everything you like with the code.
 

@@ -125,7 +125,7 @@ def xpcc_library(env, buildpath=None):
 				for key, value in env['XPCC_LIBRARY_DEFINES'].iteritems()]),
 		'name': env['XPCC_CONFIG']['general']['name']
 	}
-	file = env.SimpleTemplate(
+	file = env.Template(
 			target = os.path.join(env['XPCC_BUILDPATH'], 'xpcc_config.hpp'),
 			source = os.path.join(env['XPCC_ROOTPATH'], 
 								  'misc/templates/xpcc_config.hpp.in'),
@@ -190,12 +190,12 @@ def generate(env, **kw):
 		
 		if rootpath is None:
 			print "Could not detect the path to the xpcc-library. Use " \
-				  "'GenerateEnvironment(rootpath=...)' to set it."
+				  "'Environment(rootpath=...)' to set it."
 			env.Exit(1)
 	rootpath = os.path.abspath(rootpath)
 	
 	# load the configuration file
-	configfile = env.get('configfile', 'project.cfg')
+	configfile = ARGUMENTS.get('config', env.get('configfile', 'project.cfg'))
 	try:
 		parser = configparser.Parser()
 		parser.read(configfile)
@@ -247,7 +247,6 @@ def generate(env, **kw):
 	env['XPCC_SYSTEM_BUILDER'] = os.path.join(rootpath, 'system_design', 'builder')
 	
 	# tools which are used independent of the architecture
-	env.Tool('doxygen')
 	env.Tool('template')
 	env.Tool('unittest')
 	env.Tool('configfile')
@@ -335,7 +334,7 @@ def generate(env, **kw):
 	env.AddMethod(check_architecture, 'CheckArchitecture')
 	env.AddMethod(check_defines, 'ShowConfiguration')
 	env.AddMethod(xpcc_library, 'XpccLibrary')
-	env.AddMethod(xpcc_communication_header, 'XpccCommunicationHeader')
+	env.AddMethod(xpcc_communication_header, 'XpccCommunication')
 	env.AddMethod(generate_defines, 'Defines')
 
 def exists(env):
