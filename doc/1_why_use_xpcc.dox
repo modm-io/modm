@@ -6,19 +6,33 @@
 
 \image html rca_insitor.jpg
 
-\section reasons Some good reasons
+Some good reasons for using this library:
 
-\subsection opensource Open-Source
+\section opensource Open-Source
 
-It's Open-Source, the complete source code is available. We chose a very
-moderate licence, the BSD-licence. Therefore you are free to do nearly
+It's Open-Source, the complete source code is available. With the BSD-licence
+we chose a very moderate licence. Therefore you are free to do nearly
 everything you like with the code.
 
-\subsection documentation Full documentation
+\section cpluspluss It's C++!
 
-Full documentation for every part of the library is available online.
+Some people think that C++ automatically brings a lot of bloat in form of
+code size. But that's not entirely true.
 
-\subsection reliability Reliability
+If you use the expensive features like virtual functions and copy constructors
+careless you get code that's slower and bigger that it need to be. But if you
+use classes and templates in a sensible way you get fast and small software
+that is easier to extended than the C counterpart.
+
+Learn more about this on the page about \ref programming_techniques 
+"software design descisions".
+
+\section documentation Documentation
+
+Full documentation for every part of the library is available online. It's not
+perfect, but we're working on it.
+
+\section reliability Reliability
 
 A lot classes have corresponding unit-tests in place. Unit testing cannot
 catch every error in the program, but they can ensure a specific behaviour is

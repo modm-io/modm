@@ -33,9 +33,10 @@
 #ifndef	XPCC_ATOMIC__QUEUE_HPP
 #define	XPCC_ATOMIC__QUEUE_HPP
 
+#include <cstddef>
 #include <stdint.h>
 #include <xpcc/utils/macros.hpp>
-#include <xpcc/utils/modifier.hpp>
+#include <xpcc/architecture/general/accessor.hpp>
 
 namespace xpcc
 {
@@ -50,7 +51,7 @@ namespace xpcc
 		 * \todo	This implementation should work but could be improved
 		 */
 		template<typename T,
-				 int N>
+				 std::size_t N>
 		class Queue
 		{
 		public:

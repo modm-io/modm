@@ -61,13 +61,13 @@ The given call is:
   - IntegerWriter::operator()(IOStream& os, const T& v) (with T=int) is inline
 \code
  	if( xpcc::DEBUGL >= xpcc::LoggerMessageForwarder<xpcc::DEBUG>::level ) {
- 		xpcc::IOStream::putInteger( 100 );
+ 		xpcc::IOStream::writeInteger( 100 );
  	}
 \endcode
-- IOStream::putInteger() will create the formated string and calls snprintf() to do this
+- IOStream::writeInteger() will create the formated string and calls snprintf() to do this
 - the resulting string is send to the device via the Logger: call of
-  Logger::put(const char*) (using vTable)
-- direct call of ConsoleOutputWriter::put(const char*) (using vTable)
+  Logger::write(const char*) (using vTable)
+- direct call of ConsoleOutputWriter::write(const char*) (using vTable)
 - using of the std::cout ...
 
 In sum there are 3 nested method calls with two of them using vTables) plus

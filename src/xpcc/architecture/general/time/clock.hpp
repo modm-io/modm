@@ -40,7 +40,7 @@ namespace xpcc
 	/**
 	 * \brief	Internal timer
 	 * 
-	 * This class is implemented using 'gettimeofday()' from <sys/time.h> for
+	 * This class is implemented using \c gettimeofday() from <sys/time.h> for
 	 * any Unix-OS. 
 	 * 
 	 * For the AVRs targets the user has to use the increment() method to
@@ -51,7 +51,7 @@ namespace xpcc
 	 * \code
 	 * ISR(TIMER)
 	 * {
-	 *     Clock::increment();
+	 *     xpcc::Clock::increment();
 	 * }
 	 * \endcode
 	 * 
@@ -60,16 +60,20 @@ namespace xpcc
 	class Clock
 	{
 	public:
-		/// \brief	Get the current time
+		/**
+		 * \brief	Get the current time
+		 * 
+		 * Provides an atomic access to the current time
+		 */
 		static Timestamp
 		now();
 		
 #if !defined(__unix__)
 		/// \brief	Set the current time
 		static inline void
-		increment(uint16_t inc = 1)
+		increment(uint16_t step = 1)
 		{
-			time += inc;
+			time += step;
 		}
 		
 	private:

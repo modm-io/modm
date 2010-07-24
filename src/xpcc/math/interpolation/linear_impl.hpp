@@ -39,8 +39,8 @@
 template <typename T,
 		  template <typename> class Accessor>
 xpcc::interpolation::Linear<T, Accessor>::Linear(
-		Accessor<T> points, uint8_t numPoints) :
-	points(points), numPoints(numPoints)
+		Accessor<T> supportingPoints, uint8_t numberOfPoints) :
+	supportingPoints(supportingPoints), numberOfPoints(numberOfPoints)
 {
 }
 	
@@ -51,7 +51,7 @@ template <typename T,
 typename xpcc::interpolation::Linear<T, Accessor>::OutputType
 xpcc::interpolation::Linear<T, Accessor>::interpolate(const InputType& value) const
 {
-	T current(points[0]);
+	T current(this->supportingPoints[0]);
 	
 	if (value <= current.getFirst()) {
 		return current.getSecond();
@@ -59,9 +59,9 @@ xpcc::interpolation::Linear<T, Accessor>::interpolate(const InputType& value) co
 	
 	T last(current);
 	uint8_t i;
-	for (i = 1; i < numPoints; ++i)
+	for (i = 1; i < this->numberOfPoints; ++i)
 	{
-		current = points[i];
+		current = this->supportingPoints[i];
 		
 		if (value <= current.getFirst())
 		{

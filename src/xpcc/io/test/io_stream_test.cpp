@@ -43,23 +43,23 @@ public:
 		bytesWritten(0) {}
 	
 	virtual void
-	put(char c)
+	write(char c)
 	{
 		buffer[bytesWritten] = c;
 		bytesWritten++;
 	}
 	
-	using xpcc::IODevice::put;
+	using xpcc::IODevice::write;
 	
 	virtual void
 	flush()
 	{
 		// TODO
-		put('\b');
+		write('\b');
 	}
 	
 	virtual bool
-	get(char& /*c*/)
+	read(char& /*c*/)
 	{
 		return false;
 	}
@@ -109,7 +109,7 @@ IoStreamTest::testFlashString()
 {
 	char string[] = "abc";
 	
-	(*stream) << xpcc::modifier::asFlash(flashString);
+	(*stream) << xpcc::accessor::asFlash(flashString);
 	
 	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 3);
 	TEST_ASSERT_EQUALS(device.bytesWritten, 3);

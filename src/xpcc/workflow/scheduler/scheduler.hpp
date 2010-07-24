@@ -35,7 +35,7 @@
 
 #include <stdint.h>
 
-#include <xpcc/utils/modifier.hpp>
+#include <xpcc/architecture/general/accessor.hpp>
 #include <xpcc/utils/macros.hpp>
 #include <xpcc/architecture/general/atomic/lock.hpp>		// for Scheduler::scheduleInterrupt()
 

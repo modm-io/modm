@@ -65,11 +65,11 @@ namespace xpcc
 
 			/// Write one char to the sink.
 			void
-			put( char c );
+			write( char c );
 
 			/// Write a string that terminates with \c '\\0' to the sink.
 			void
-			put( const char* s );
+			write( const char* s );
 
 			/// The message is complete and can be written/send/displayed.
 			void
@@ -101,24 +101,24 @@ xpcc::log::Prefix<T, STYLE>::Prefix( const T& str, IODevice &device ) :
 
 template <typename T, typename STYLE>
 void
-xpcc::log::Prefix<T, STYLE>::put( char c )
+xpcc::log::Prefix<T, STYLE>::write( char c )
 {
 	if( this->flushed ) {
 		this->flushed = false;
-		this->Style<STYLE>::put( this->value );
+		this->Style<STYLE>::write( this->value );
 	}
-	this->Style<STYLE>::put( c );
+	this->Style<STYLE>::write( c );
 }
 
 template <typename T, typename STYLE>
 void
-xpcc::log::Prefix<T, STYLE>::put( const char* s )
+xpcc::log::Prefix<T, STYLE>::write( const char* s )
 {
 	if( this->flushed ) {
 		this->flushed = false;
-		this->Style<STYLE>::put( this->value );
+		this->Style<STYLE>::write( this->value );
 	}
-	this->Style<STYLE>::put( s );
+	this->Style<STYLE>::write( s );
 }
 
 

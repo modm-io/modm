@@ -33,6 +33,8 @@
 #ifndef XPCC__ATXMEGA_GPIO_HPP
 #define XPCC__ATXMEGA_GPIO_HPP
 
+#ifndef __DOXYGEN__
+
 #include <avr/io.h>
 
 #include <xpcc/utils/macros.hpp>
@@ -65,7 +67,7 @@ namespace xpcc
 		
 		/**
 		 * 
-		 * Be Carefull: There are only two Interrupts for a Port,
+		 * Be careful: There are only two Interrupts for a Port,
 		 * so it is not possible to select different
 		 * Interruptlevels for different Pins of one Port on the same Interrupt_x.
 		 * Previous level settings will be overridden and be affected to all
@@ -223,4 +225,5 @@ namespace xpcc
 //#define GPIO__NIBBLE_LOW(name, port)
 //#define GPIO__NIBBLE_HIGH(name, port)
 
-#endif // XPCC__ATXMEGA_GPIO_HPP
+#endif	// !__DOXYGEN__
+#endif	// XPCC__ATXMEGA_GPIO_HPP

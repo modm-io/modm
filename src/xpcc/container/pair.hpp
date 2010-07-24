@@ -42,41 +42,40 @@ namespace xpcc
 	 * SecondType.
 	 * 
 	 * It provides only the default constructors and public variables to enable
-	 * usage as POD (plain old data) object. Only with this [EIGENSCHAFT] it
-	 * is possible to storage objects of this type in flash-memory which is
-	 * needed for example for the interpolation classes.
+	 * usage as POD (plain old data) object. Only with this characteristic it
+	 * is possible to storage objects of this type inside the flash-memory
+	 * which is desirable for example for the interpolation classes.
 	 * 
-	 * This contraint make a the usage rather unusual. See the example below.
+	 * \see	xpcc::interpolation::Linear
+	 * 
+	 * This constraint make a the usage rather unusual. See this example:
 	 * \code
 	 * // construction
-	 * Pair<uint8_t, uint16_t> pair = { 12, -12345 };
+	 * xpcc::Pair<uint8_t, uint16_t> pair = { 12, -12345 };
 	 * 
-	 * // this typedef is neccesary to be able to use
+	 * // this typedef is necessary to be able to use
 	 * // the type inside the FLASH macro
-	 * typedef Pair<int8_t, int8_t> MyPair;
+	 * typedef xpcc::Pair<int8_t, int8_t> MyPair;
 	 * 
 	 * // put some values into the flash memory
-	 * FLASH(MyPair pairs[3]) = {
+	 * FLASH(MyPair pairs[3]) =
+	 * {
 	 *     { 0, 10 },
 	 *     { 2, 30 },
 	 *     { 5, 60 }
 	 * };
 	 * \endcode
 	 * 
-	 * \note
-	 * Even if this class provides public attributes it is recommend to use
-	 * the access methods, because as soon as C++0x is available the
-	 * implementation will be changed and the attributes will be made private.
-	 * Until then just ignore that you can access them directly ;-)
-	 * 
+	 * As this class has no constructor you need to use the following syntax
+	 * to initialize an instance of this class: 
 	 * \code
-	 *	xpcc::Pair<int, float> pair = {
-	 * 			1203,
-	 * 			1035.234
-	 * 	};
+	 *	xpcc::Pair<int, float> pair = { 1203, 1035.234 };
 	 * \endcode
-	 *
-	 * \see	xpcc::LinearInterpolation
+	 * 
+	 * \note	Even if this class provides public attributes it is recommend to use
+	 * 			the access methods, because as soon as C++0x is available the
+	 * 			implementation will be changed and the attributes will be made private.
+	 * 			Until then just ignore that you can access them directly ;-)
 	 * 
 	 * \author		Fabian Greif
 	 * \ingroup		container

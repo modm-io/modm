@@ -40,18 +40,24 @@
 
 namespace xpcc
 {
+	/**
+	 * \brief	SPI master module
+	 * \ingroup	atmega
+	 */
 	class Spi
 	{
 	public:
-		typedef enum {
+		enum Mode
+		{
 			MODE_0 = 0,				//!< SCK normal, sample on rising edge
 			MODE_1 = (1 << CPHA),	//!< SCK normal, sample on falling edge
 			MODE_2 = (1 << CPOL),	//!< SCK inverted, sample on falling edge
 			MODE_3 = (1 << CPOL) | (1 << CPHA),	
 									//!< SCK inverted, sample on rising edge
-		} Mode;
+		};
 		
-		typedef enum {
+		enum Prescaler
+		{
 			PRESCALER_2 = 0x80 | 0,
 			PRESCALER_4 = 0,
 			PRESCALER_8 = 0x80 | (1 << SPR0),
@@ -59,9 +65,15 @@ namespace xpcc
 			PRESCALER_32 = 0x80 | (1 << SPR1),
 			PRESCALER_64 = (1 << SPR1),
 			PRESCALER_128 = (1 << SPR1) | (1 << SPR0),
-		} Prescaler;
-	
+		};
+		
 	public:
+		/**
+		 * \brief	Initialize SPI module
+		 * 
+		 * \warning	This won't set the directions for the I/O pins. You have
+		 * 			to do this by yourself.
+		 */
 		static void
 		initialize(Mode mode, Prescaler prescaler);
 		

@@ -2,7 +2,7 @@
 // $Id$
 
 /*!
-\page sconstruct 3.1 SConstruct files: An introduction
+\page sconstruct 3.2 SConstruct files: An introduction
 
 The SConstruct files are the equivalent of Makefiles, they define the targets
 that SCons will create during the build process.

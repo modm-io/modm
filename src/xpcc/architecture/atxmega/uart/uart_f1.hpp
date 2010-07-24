@@ -38,7 +38,7 @@ namespace xpcc
 {
 	/**
 	 * \brief		UARTF1
-	 * \ingroup		architecture
+	 * \ingroup		atxmega
 	 */
 	class UartF1
 	{
@@ -96,8 +96,8 @@ namespace xpcc
 	 * \brief	Buffered Uart
 	 * 
 	 * This implementation uses a ringbuffer.
-	 *
-	 * \ingroup		architecture
+	 * 
+	 * \ingroup	atxmega
 	 */
 	class BufferedUartF1
 	{
@@ -170,7 +170,7 @@ namespace xpcc
 	// ------------------------------------------------------------------------
 	/**
 	 * \brief		UARTF1 in SPI master mode
-	 * \ingroup		architecture
+	 * \ingroup		atxmega
 	 */
 	class UartSpiF1
 	{

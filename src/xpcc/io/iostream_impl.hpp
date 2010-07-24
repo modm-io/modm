@@ -44,7 +44,7 @@
 
 template<typename T>
 void
-xpcc::IOStream::putFloat( const T& value )
+xpcc::IOStream::writeFloat( const T& value )
 {
 	// hard coded for 2.22507e-308
 	char str[13 + 1]; // +1 for '\0'
@@ -55,5 +55,5 @@ xpcc::IOStream::putFloat( const T& value )
 	snprintf(str, sizeof(str), "%.5e", value);
 #endif
 	
-	this->device->put(str);
+	this->device->write(str);
 }

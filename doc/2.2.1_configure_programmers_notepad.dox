@@ -8,8 +8,8 @@ If you start programming AVR microcontrollers on Windows you probally use
 AVR Studio or Programmers Notepade (which is bundled with WinAVR) for the
 first steps.
 
-AVR Studio is no good choise for programming in C++ as we do with XPCC because
-it lacks the support for C++.
+AVR Studio is no good choise for programming in C++ (as we do with XPCC) because
+it lacks the support for it.
 
 Programmers Notepade on the other hand is a very simple but very useful editor.
 The version that ships with WinAVR have some pre-installed scheme tools.

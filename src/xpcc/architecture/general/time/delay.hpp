@@ -33,27 +33,87 @@
 #ifndef	XPCC__DELAY_HPP
 #define	XPCC__DELAY_HPP
 
+#ifdef __DOXYGEN__
+
+namespace xpcc
+{
+	/**
+	 * \brief	Delay us microseconds
+	 * \ingroup	architecture
+	 */
+	void
+	delay_us(float us);
+	
+	/**
+	 * \brief	Delay ms milliseconds
+	 * \ingroup	architecture
+	 */
+	void
+	delay_ms(float ms);
+}
+
+#else // !__DOXYGEN__
+
 #if defined(__AVR__)
 	
 	#include <util/delay.h>
+	#include <xpcc/utils/macros.hpp>
 	
-	#define	delay_us(us)	_delay_us(us)
-	#define	delay_ms(ms)	_delay_ms(ms)
+	namespace xpcc
+	{
+		ALWAYS_INLINE void
+		delay_us(float us)
+		{
+			_delay_us(us);
+		}
+		
+		ALWAYS_INLINE void
+		delay_ms(float ms)
+		{
+			_delay_ms(ms);
+		}
+	}
 
 #elif defined(__unix__)
 
 	#include <unistd.h>
+	#include <xpcc/utils/macros.hpp>
 	
-	#define	delay_us(us)	usleep(us)
-	#define	delay_ms(ms)	usleep(ms*1000)
+	namespace xpcc
+	{
+		ALWAYS_INLINE void
+		delay_us(int ms)
+		{
+			usleep(us);
+		}
+		
+		ALWAYS_INLINE void
+		delay_ms(int ms)
+		{
+			usleep(ms*1000);
+		}
+	}
 	
 #elif defined(_WIN32)
-	// FIXME implement this functions
-	#define	delay_us(us)	
-	#define	delay_ms(ms)	
+	#include <xpcc/utils/macros.hpp>
+	
+	namespace xpcc
+	{
+		// FIXME implement this functions
+		ALWAYS_INLINE void
+		delay_us(int ms)
+		{
+		}
+		
+		ALWAYS_INLINE void
+		delay_ms(int ms)
+		{
+		}
+	}
 	
 #else
 	#error "Unknown architecture, please add some specific delay functions!"
 #endif
 
+#endif	// !__DOXYGEN__
 #endif	// XPCC__DELAY_HPP

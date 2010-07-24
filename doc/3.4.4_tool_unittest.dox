@@ -8,6 +8,13 @@
 
 \subsection tool_unittest_runner UnittestRunner(target, source, template)
 
+- \c target Name of the output-file. The filename extension will be \c .cpp
+  as it will be a C++ source file.
+- \c source Header files. Only header files which end with the suffix \c _test.hpp
+  will be considered as files containing test classes.
+- \c template Simple template file.
 
+TODO template synatx, header files
 
+See \ref tool_configfile_find "FindFiles()".
 */

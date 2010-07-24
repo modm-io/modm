@@ -30,10 +30,20 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__WINDOWS_HPP
-#define XPCC__WINDOWS_HPP
+#ifndef XPCC_PC__WINDOWS_HPP
+#define XPCC_PC__WINDOWS_HPP
+
+/**
+ * \file	windows.hpp
+ * 
+ * Provides some defines and functions which are missing in a default
+ * windows environment.
+ * 
+ * \ingroup	pc
+ */
 
 #ifdef _WIN32
+
 	#include <ciso646>
 	#include <stdarg.h>
 	#include <stdio.h>
@@ -56,6 +66,7 @@
 		
 		return result;
 	};
+	
 #endif
 
-#endif // XPCC__WINDOWS_HPP
+#endif // XPCC_PC__WINDOWS_HPP

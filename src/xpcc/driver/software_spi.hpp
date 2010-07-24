@@ -45,64 +45,28 @@ namespace xpcc
 	 * 
 	 * \todo	documentation
 	 * 
-	 * \tparam	SCLK		clock pin [output]
+	 * \tparam	CLK			clock pin [output]
 	 * \tparam	MOSI		master out slave in pin [output]
 	 * \tparam	MISO		master in slave out pin [input]
 	 * \tparam	FREQUENCY	requested SPI frequency in Hz
 	 * 
-	 * \ingroup	architecture
+	 * \ingroup	driver
 	 * \see		gpio
 	 */
-	template <typename SCLK,
+	template <typename CLK,
 			  typename MOSI,
 			  typename MISO,
 			  int32_t FREQUENCY = 1000000>
 	class SoftwareSpi
 	{
 	public:
-		SoftwareSpi()
-		{
-			initialize();
-		}
+		SoftwareSpi();
 		
-		inline static void
-		initialize()
-		{
-			SCLK::setOutput();
-			MOSI::setOutput();
-			MISO::setInput();
-		}
+		static void
+		initialize();
 		
 		static uint8_t
-		write(uint8_t out)
-		{
-			uint8_t in = 0;
-			
-			SCLK::reset();
-			for (uint8_t i = 0; i < 8; ++i)
-			{
-				in <<= 1;
-				if (out & 0x80) {
-					MOSI::set();
-				}
-				else {
-					MOSI::reset();
-				}
-				delay_us(delay);
-
-				SCLK::set();
-				delay_us(delay);
-				
-				if (MISO::read()) {
-					in |= 1;
-				}
-				out <<= 1;
-				
-				SCLK::reset();
-			}
-			
-			return in;
-		}
+		write(uint8_t output);
 		
 	private:
 		// calculate the delay in microseconds needed to achieve the
@@ -110,5 +74,7 @@ namespace xpcc
 		static const float delay = (1000000.0 / FREQUENCY) / 2.0;
 	};
 }
+
+#include "software_spi_impl.hpp"
 
 #endif // XPCC__SOFTWARE_SPI_HPP

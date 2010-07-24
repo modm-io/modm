@@ -55,19 +55,19 @@ xpcc::Hd447800<E, RW, RS, DATA>::initialize()
 	
 	E::reset();
 	RS::reset();
-	delay_ms(15);
+	xpcc::delay_ms(15);
 	
 	writeNibble(0x03);
-	delay_ms(5);
+	xpcc::delay_ms(5);
 	
 	writeNibble(0x03);
-	delay_us(100);
+	xpcc::delay_us(100);
 	
 	writeNibble(0x03);
-	delay_us(100);
+	xpcc::delay_us(100);
 	
 	writeNibble(0x02);
-	delay_us(100);
+	xpcc::delay_us(100);
 	
 	writeCommand(0x28);		// 2 lines 5*7
 	writeCommand(0x08);		// display off
@@ -78,7 +78,7 @@ xpcc::Hd447800<E, RW, RS, DATA>::initialize()
 
 template <typename E, typename RW, typename RS, typename DATA>
 void
-xpcc::Hd447800<E, RW, RS, DATA>::putRaw(char c)
+xpcc::Hd447800<E, RW, RS, DATA>::writeRaw(char c)
 {
 	waitBusy();
 	
@@ -111,7 +111,7 @@ xpcc::Hd447800<E, RW, RS, DATA>::writeNibble(uint8_t data)
 	DATA::write(data);
 	
 	E::set();
-	delay_us(1);
+	xpcc::delay_us(1);
 	E::reset();
 }
 
@@ -126,14 +126,14 @@ xpcc::Hd447800<E, RW, RS, DATA>::readByte()
 	RW::set();
 	
 	E::set();
-	delay_us(1);
+	xpcc::delay_us(1);
 	data = DATA::read();
 	E::reset();
 	
 	data <<= 4;
 	
 	E::set();
-	delay_us(1);
+	xpcc::delay_us(1);
 	data |= DATA::read();
 	E::reset();
 	
@@ -149,7 +149,7 @@ xpcc::Hd447800<E, RW, RS, DATA>::waitBusy()
 	}
 	
 	// the address counter is updated 4 us after the busy flag is reseted
-	delay_us(2);
+	xpcc::delay_us(2);
 }
 
 template <typename E, typename RW, typename RS, typename DATA>

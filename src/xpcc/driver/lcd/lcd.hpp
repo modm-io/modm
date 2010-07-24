@@ -80,30 +80,29 @@ namespace xpcc
 		 * This method provides an automatic wrap-round if the output reaches
 		 * the end of the current line or a newline character is detected.
 		 * 
-		 * Use putRaw() if this behavior is not wanted.
+		 * Use writeRaw() if this behavior is not wanted.
 		 */
 		virtual void
-		put(char c);
+		write(char c);
 		
-		// import the other versions of put() from IODevice
-		using IODevice::put;
+		// import the other versions of write() from IODevice
+		using IODevice::write;
 		
 		/**
 		 * \brief	Write a raw character at cursor position
 		 * 
-		 * Unlike put() no further processing will occur.
+		 * Unlike write() no further processing will occur.
 		 * 
-		 * \see	put()
+		 * \see	write()
 		 */
 		virtual void
-		putRaw(char c) = 0;
+		writeRaw(char c) = 0;
 		
 		virtual void
 		flush();
 		
-		// TODO we need a better name here!
-		//virtual void
-		//command(Command command) = 0;
+		virtual void
+		command(Command command) = 0;
 		
 		/**
 		 * \brief	Set cursor to specified position
@@ -121,7 +120,7 @@ namespace xpcc
 		 * \c false.
 		 */
 		virtual bool
-		get(char&)
+		read(char&)
 		{
 			return false;
 		}

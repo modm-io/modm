@@ -4,9 +4,11 @@
 /*!
 \page installation 2. Install the build environment
 
-The PC Software is currently Linux only, because it uses the TIPC kernel module
-for interprocess communication which is only available for Unix-like operating
-systems.
+This is split in two sections because the procedure differs quite a lot. Linux
+users have the easy part here as most distributions offers ready-to-use packages
+for all programs needed.
+On Windows you will have to install all programs by hand from the corresponding
+websites.
 
 - \subpage installation_linux "Installation on Linux"
 - \subpage installation_windows "Installation on Windows"

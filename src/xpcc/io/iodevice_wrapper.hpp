@@ -54,7 +54,7 @@ namespace xpcc
 	 * xpcc::IODeviceWrapper<xpcc::BufferedUart0> device(uart);
 	 * 
 	 * // use this device to print a message
-	 * device.put("Hello");
+	 * device.write("Hello");
 	 * 
 	 * // or create a IOStream and use the stream to print something
 	 * xpcc::IOStream stream(device);
@@ -79,13 +79,13 @@ namespace xpcc
 		}
 		
 		virtual inline void
-		put(char c)
+		write(char c)
 		{
 			T::write(c);
 		}
 		
 		virtual inline void
-		put(const char *s)
+		write(const char *s)
 		{
 			T::write(s);
 		}
@@ -96,7 +96,7 @@ namespace xpcc
 		}
 		
 		virtual inline bool
-		get(char& c)
+		read(char& c)
 		{
 			return T::read(c);
 		}

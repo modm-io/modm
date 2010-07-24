@@ -9,12 +9,40 @@ all necessary other tools.
 
 \section tool_xpcc_provides Provided builders and methods
 
-\subsection tool_xpcc_library XpccLibrary()
+\subsection tool_xpcc_library XpccLibrary([buildpath])
+
+This tells SCons a few things:
+-# You want to use the XPCC library in your program (link to \e libxpcc.a)
+-# How to build the library
+-# Where to find the header files of the library
+
+When your \e SConstruct file contains this Command you'll be able to use
+everything form the XPCC library.
+
+TODO Options
+
 \subsection tool_xpcc_defines Defines()
+
+Advise SCons to create a file called \c defines.hpp with the values form the
+section 'defines' form our configuration file.
+
+SCons will create this file only when you need it or request it explicitly.
+Unless your code contains a line like <tt>\#include "defines.hpp"</tt> it won't
+be created.
+
 \subsection tool_xpcc_show ShowConfiguration()
+
+TODO
 
 \subsection tool_xpcc_communication XpccCommunication()
 
-\subsection tool_xpcc_path Buildpath(path)
+TODO
+
+\subsection tool_xpcc_path Buildpath(file)
+
+Relocate the path to \c file to the buildpath. If the path is a subfolder of
+the current folder this relative folder structure will be preserved. Otherwise
+the file will be located to the root-folder of the buildpath.
+
 \subsection tool_xpcc_check CheckArchitecture(string)
 */

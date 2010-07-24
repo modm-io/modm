@@ -44,7 +44,7 @@ namespace xpcc
 		 * \brief	Pointer to RAM
 		 * 
 		 * \ingroup	accessor
-		 * \author	Fabian Greif <fabian.greif@rwth-aachen.de>
+		 * \author	Fabian Greif
 		 */
 		template<typename T>
 		class Ram

@@ -93,7 +93,7 @@ xpcc::Scheduler::scheduleInterupt()
 	while ((item = item->nextTask) != 0);
 	
 	// how execute the tasks which are ready
-	while (((item = xpcc::modifier::asVolatile(readyList)) != 0) &&
+	while (((item = xpcc::accessor::asVolatile(readyList)) != 0) &&
 			(item->priority > currentPriority))
 	{
 		item->state = TaskListItem::RUNNING;

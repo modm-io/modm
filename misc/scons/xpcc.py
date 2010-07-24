@@ -129,7 +129,7 @@ def xpcc_library(env, buildpath=None):
 			target = os.path.join(env['XPCC_BUILDPATH'], 'xpcc_config.hpp'),
 			source = os.path.join(env['XPCC_ROOTPATH'], 
 								  'misc/templates/xpcc_config.hpp.in'),
-			SUBSTITUTIONS = substitutions)
+			substitutions = substitutions)
 	
 	env.Append(LIBS = ['xpcc'])
 	env.Append(LIBPATH = [env['XPCC_BUILDPATH']])
@@ -164,11 +164,11 @@ def generate_defines(env, filename='defines.hpp'):
 			'defines': '\n'.join(["#define %s %s" % (key.upper(), value) \
 					for key, value in defines.iteritems()])
 		}
-		file = env.SimpleTemplate(
+		file = env.Template(
 				target = filename,
 				source = os.path.join(env['XPCC_ROOTPATH'], 
 									  'misc/templates/defines.hpp.in'),
-				SUBSTITUTIONS = substitutions)
+				substitutions = substitutions)
 		return file
 	else:
 		return None

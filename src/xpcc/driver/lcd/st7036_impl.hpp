@@ -69,7 +69,7 @@ xpcc::St7036<SPI, CS, RS>::initialize()
 
 template <typename SPI, typename CS, typename RS>
 void
-xpcc::St7036<SPI, CS, RS>::putRaw(char c)
+xpcc::St7036<SPI, CS, RS>::writeRaw(char c)
 {
 	RS::set();
 	
@@ -104,9 +104,9 @@ xpcc::St7036<SPI, CS, RS>::writeCommand(uint8_t command)
 	// check if the command is 'clear display' oder 'return home', these
 	// commands take a bit longer until they are finished.
 	if ((command & 0xfc) == 0) {
-		delay_ms(1.2);
+		xpcc::delay_ms(1.2);
 	}
 	else {
-		delay_us(27);
+		xpcc::delay_us(27);
 	}
 }

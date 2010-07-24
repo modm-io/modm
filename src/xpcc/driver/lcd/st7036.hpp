@@ -68,7 +68,7 @@ namespace xpcc
 		initialize();
 		
 		virtual void
-		putRaw(char c);
+		writeRaw(char c);
 		
 		//virtual void
 		//command(Command command);

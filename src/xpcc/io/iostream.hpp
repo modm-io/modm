@@ -47,7 +47,6 @@ namespace xpcc
 	 * 			a given type;
 	 *
 	 * \ingroup io
-	 * \version	$Id$
 	 * \author	Martin Rosekeit <martin.rosekeit@rwth-aachen.de>
 	 */
 	class IOStream
@@ -66,9 +65,9 @@ namespace xpcc
 		IOStream(IODevice& device);
 
 		inline IOStream&
-		put(char c)
+		write(char c)
 		{
-			this->device->put(c);
+			this->device->write(c);
 			return *this;
 		}
 		
@@ -100,10 +99,10 @@ namespace xpcc
 		operator << ( const unsigned char& v )
 		{
 			if( this->mode == ASCII ) {
-				this->putInteger( static_cast<uint16_t>( v ) );
+				this->writeInteger( static_cast<uint16_t>( v ) );
 			}
 			else {
-				this->putHex( v );
+				this->writeHex( v );
 			}
 			return *this;
 		}
@@ -112,10 +111,10 @@ namespace xpcc
 		operator << ( const char& v )
 		{
 			if( this->mode == ASCII ) {
-				this->device->put(v);
+				this->device->write(v);
 			}
 			else {
-				this->putHex( v );
+				this->writeHex( v );
 			}
 			return *this;
 		}
@@ -123,28 +122,28 @@ namespace xpcc
 		ALWAYS_INLINE IOStream&
 		operator << ( const uint16_t& v )
 		{
-			this->putInteger( v );
+			this->writeInteger( v );
 			return *this;
 		}
 
 		ALWAYS_INLINE IOStream&
 		operator << ( const int16_t& v )
 		{
-			this->putInteger( v );
+			this->writeInteger( v );
 			return *this;
 		}
 
 		ALWAYS_INLINE IOStream&
 		operator << ( const uint32_t& v )
 		{
-			this->putInteger(v);
+			this->writeInteger(v);
 			return *this;
 		}
 
 		ALWAYS_INLINE IOStream&
 		operator << ( const int32_t& v )
 		{
-			this->putInteger(v);
+			this->writeInteger(v);
 			return *this;
 		}
 		
@@ -152,14 +151,14 @@ namespace xpcc
 		ALWAYS_INLINE IOStream&
 		operator << ( const uint64_t& v )
 		{
-			this->putInteger(v);
+			this->writeInteger(v);
 			return *this;
 		}
 		
 		ALWAYS_INLINE IOStream&
 		operator << ( const int64_t& v )
 		{
-			this->putInteger(v);
+			this->writeInteger(v);
 			return *this;
 		}
 #endif
@@ -167,14 +166,14 @@ namespace xpcc
 		ALWAYS_INLINE IOStream&
 		operator << ( const float& v )
 		{
-			this->putFloat(v);
+			this->writeFloat(v);
 			return *this;
 		}
 
 		ALWAYS_INLINE IOStream&
 		operator << ( const double& v )
 		{
-			this->putFloat(v);
+			this->writeFloat(v);
 			return *this;
 		}
 
@@ -182,10 +181,10 @@ namespace xpcc
 		operator << ( const char* v )
 		{
 			if( this->mode == ASCII ) {
-				this->device->put( v );
+				this->device->write( v );
 			}
 			else {
-				this->putHex( v );
+				this->writeHex( v );
 			}
 			return *this;
 		}
@@ -198,32 +197,32 @@ namespace xpcc
 
 	protected :
 		void
-		putInteger(int16_t value);
+		writeInteger(int16_t value);
 		
 		void
-		putInteger(uint16_t value);
+		writeInteger(uint16_t value);
 		
 		void
-		putInteger(int32_t value);
+		writeInteger(int32_t value);
 		
 		void
-		putInteger(uint32_t value);
+		writeInteger(uint32_t value);
 		
 		void
-		putInteger(int64_t value);
+		writeInteger(int64_t value);
 		
 		void
-		putInteger(uint64_t value);
+		writeInteger(uint64_t value);
 		
 		void
-		putHex( const char*  s );
+		writeHex( const char*  s );
 
 		void
-		putHex( char value );
+		writeHex( char value );
 
 		template<typename T>
 		void
-		putFloat( const T& value );
+		writeFloat( const T& value );
 
 	private :
 		typedef enum {
@@ -261,7 +260,7 @@ namespace xpcc
 	inline IOStream&
 	endl(IOStream& ios)
 	{
-		return flush(ios.put('\n'));
+		return flush(ios.write('\n'));
 	}
 
 	/**

@@ -39,8 +39,6 @@ xpcc::Spi::initialize(Mode mode, Prescaler prescaler)
 {
 	SPCR = (1 << SPE) | (1 << MSTR) | (prescaler & ~0x80) | mode;
 	SPSR = (prescaler & 0x80) ? (1 << SPI2X) : 0;
-	
-	// TODO set hardware pins
 }
 
 uint8_t

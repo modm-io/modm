@@ -38,7 +38,7 @@ xpcc::Lcd::Lcd() :
 }
 
 void
-xpcc::Lcd::put(char c)
+xpcc::Lcd::write(char c)
 {
 	if (c == '\n')
 	{
@@ -47,13 +47,13 @@ xpcc::Lcd::put(char c)
 			line = 0;
 		}
 		column = 0;
-		setPosition(line, column);
+		this->setPosition(line, column);
 	}
 	else {
 		if (column >= 16) {
-			this->put('\n');
+			this->write('\n');
 		}
-		this->putRaw(c);
+		this->writeRaw(c);
 		column++;
 	}
 }

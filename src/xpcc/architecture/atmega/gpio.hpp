@@ -33,6 +33,8 @@
 #ifndef XPCC__ATMEGA_GPIO_HPP
 #define XPCC__ATMEGA_GPIO_HPP
 
+#ifndef __DOXYGEN__
+
 #include <avr/io.h>
 
 #include <xpcc/utils/macros.hpp>
@@ -43,11 +45,11 @@ namespace xpcc
 {
 	namespace gpio
 	{
-		typedef enum
+		enum Configuration
 		{
 			NORMAL = 0,
 			PULLUP = 1,
-		} Configuration;
+		};
 	}
 }
 
@@ -57,10 +59,28 @@ namespace xpcc
  */
 #define	GPIO__IO(name, port, pin) \
 	struct name { \
+		ALWAYS_INLINE static void \
+		configure(::xpcc::gpio::Mode mode, \
+				  ::xpcc::gpio::Configuration config = ::xpcc::gpio::NORMAL) \
+		{ \
+			if (mode == ::xpcc::gpio::INPUT) { \
+				setInput(); \
+				if (config == ::xpcc::gpio::PULLUP) { \
+					PORT ## port |= (1 << pin); \
+				} \
+				else { \
+					PORT ## port &= ~(1 << pin); \
+				} \
+			} \
+			else { \
+				setOutput(); \
+			} \
+		} \
 		ALWAYS_INLINE static void setOutput() { DDR ## port |= (1 << pin); } \
 		ALWAYS_INLINE static void setInput() { DDR ## port &= ~(1 << pin); } \
 		ALWAYS_INLINE static void set() { PORT ## port |= (1 << pin); } \
 		ALWAYS_INLINE static void reset() { PORT ## port &= ~(1 << pin); } \
+		ALWAYS_INLINE static void toggle() { PORT ## port ^= (1 << pin); } \
 		ALWAYS_INLINE static bool read() { return (PIN ## port & (1 << pin)); } \
 		\
 		ALWAYS_INLINE static void \
@@ -163,4 +183,5 @@ namespace xpcc
 		} \
 	}
 
-#endif // XPCC__ATMEGA_GPIO_HPP
+#endif	// !__DOXYGEN__
+#endif	// XPCC__ATMEGA_GPIO_HPP

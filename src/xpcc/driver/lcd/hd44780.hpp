@@ -75,7 +75,7 @@ namespace xpcc
 		initialize();
 		
 		virtual void
-		putRaw(char c);
+		writeRaw(char c);
 		
 		virtual void
 		setPosition(uint8_t line, uint8_t column);

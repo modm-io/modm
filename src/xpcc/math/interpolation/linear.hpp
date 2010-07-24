@@ -44,13 +44,17 @@ namespace xpcc
 	namespace interpolation
 	{
 		/**
-		 * \brief	Linear interpolation between two points
+		 * \brief	Linear interpolation between supporting points
 		 * 
 		 * Example:
 		 * \code
-		 * typedef xpcc::Pair<int8_t, int16_t> MyPair;
+		 * // Definition for the supporting points. The first type is the
+		 * // input type, the second the output type
+		 * typedef xpcc::Pair<int8_t, int16_t> Point;
 		 * 
-		 * FLASH(MyPair flashValues[6]) = {
+		 * // Create a array of supporting points describing the curve.
+		 * Point supportingPoints[6] =
+		 * {
 		 *     { 30, -200 },
 		 *     { 50, 0 },
 		 *     { 90, 50 },
@@ -59,7 +63,8 @@ namespace xpcc
 		 *     { 220, 20000 }
 		 * };
 		 * 
-		 * xpcc::interpolation::Linear<MyPair, xpcc::accessor::Flash> value(xpcc::accessor::asFlash(flashValues), 6);
+		 * xpcc::interpolation::Linear<Point>
+		 *         supportingPoints, 6);
 		 * 
 		 * ...
 		 * 
@@ -69,7 +74,35 @@ namespace xpcc
 		 * b = value.interpolate(a);
 		 * \endcode
 		 * 
-		 * \todo	needs documentation
+		 * Example with supporting points read from Flash-memory:
+		 * \code
+		 * typedef xpcc::Pair<int8_t, int16_t> Point;
+		 * FLASH(Point supportingPoints[6]) =
+		 * {
+		 *     { 30, -200 },
+		 *     { 50, 0 },
+		 *     { 90, 50 },
+		 *     { 150, 2050 },
+		 *     { 200, 3000 },
+		 *     { 220, 20000 }
+		 * };
+		 * 
+		 * xpcc::interpolation::Linear<Point, xpcc::accessor::Flash>
+		 *         value(xpcc::accessor::asFlash(supportingPoints), 6);
+		 * 
+		 * ...
+		 * 
+		 * int8_t a = 20;
+		 * int16_t b;
+		 * 
+		 * b = value.interpolate(a);
+		 * \endcode
+		 * 
+		 * \tparam	T			Any specialization of xpcc::Pair<>
+		 * \tparam	Accessor	Accessor method. Can be xpcc::accessor::Ram,
+		 * 						xpcc::accessor::Flash or any self defined
+		 * 						accessor class.
+		 * 
 		 * \ingroup	interpolation
 		 */
 		template <typename T,
@@ -84,14 +117,26 @@ namespace xpcc
 			typedef typename ArithmeticTraits< OutputSignedType >::DoubleType WideType;
 			
 		public:
-			Linear(Accessor<T> points, uint8_t numPoints);
+			/**
+			 * 
+			 * \param supportingPoints	Supporting points of the curve. Needs
+			 * 							to be an Array of xpcc::Pair<>.
+			 * \param numberOfPoints	length of \p supportingPoints
+			 */
+			Linear(Accessor<T> supportingPoints, uint8_t numberOfPoints);
 			
+			/**
+			 * \brief	Perform a linear interpolation
+			 * 
+			 * \param 	value	input value
+			 * \return	interpolated value
+			 */
 			OutputType 
 			interpolate(const InputType& value) const;
 			
 		private:
-			const accessor::Flash<T> points;
-			const uint8_t numPoints; 
+			const accessor::Flash<T> supportingPoints;
+			const uint8_t numberOfPoints; 
 		};
 	}
 }

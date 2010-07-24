@@ -70,13 +70,13 @@ xpcc::log::Style<STYLE>::parseArg( int argc, char * argv )
 
 template < typename STYLE >
 void
-xpcc::log::Style<STYLE>::put( char c )
+xpcc::log::Style<STYLE>::write( char c )
 {
 	if ( tm::IsSameType<STYLE, DefaultStyle >::value ) {
-		this->device->put( c );
+		this->device->write( c );
 	}
 	else {
-		this->style.put( c );
+		this->style.write( c );
 	}
 }
 
@@ -84,13 +84,13 @@ xpcc::log::Style<STYLE>::put( char c )
 
 template < typename STYLE >
 void
-xpcc::log::Style<STYLE>::put( const char* s )
+xpcc::log::Style<STYLE>::write( const char* s )
 {
 	if ( tm::IsSameType<STYLE, DefaultStyle>::value ) {
-		this->device->put( s );
+		this->device->write( s );
 	}
 	else {
-		this->style.put( s );
+		this->style.write( s );
 	}
 }
 

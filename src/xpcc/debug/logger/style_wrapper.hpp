@@ -54,16 +54,16 @@ namespace xpcc
 				~StyleWrapper();
 
 				virtual void
-				put(char c);
+				write(char c);
 
 				virtual void
-				put(const char* str);
+				write(const char* str);
 
 				virtual void
 				flush();
 
 				virtual bool
-				get(char&);
+				read(char&);
 
 			private :
 				StyleWrapper( const StyleWrapper& );
@@ -95,18 +95,18 @@ xpcc::log::StyleWrapper<STYLE>::~StyleWrapper()
 
 template < typename STYLE >
 void
-xpcc::log::StyleWrapper<STYLE>::put( char c )
+xpcc::log::StyleWrapper<STYLE>::write( char c )
 {
-	this->style.put( c );
+	this->style.write( c );
 }
 
 // -----------------------------------------------------------------------------
 
 template < typename STYLE >
 void
-xpcc::log::StyleWrapper<STYLE>::put( const char* s )
+xpcc::log::StyleWrapper<STYLE>::write( const char* s )
 {
-	this->style.put( s );
+	this->style.write( s );
 }
 
 // -----------------------------------------------------------------------------
@@ -122,7 +122,7 @@ xpcc::log::StyleWrapper<STYLE>::flush()
 
 template < typename STYLE >
 bool
-xpcc::log::StyleWrapper<STYLE>::get(char& c)
+xpcc::log::StyleWrapper<STYLE>::read(char& c)
 {
 	(void) c;
 	return false;

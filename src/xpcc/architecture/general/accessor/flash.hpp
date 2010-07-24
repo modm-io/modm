@@ -34,8 +34,6 @@
 #define	XPCC_ACCESSOR__FLASH_HPP
 
 #include <xpcc/utils/macros.hpp>
-#include <xpcc/utils/modifier.hpp>
-
 #include <xpcc/io/iostream.hpp>
 
 #include "flash_reader.hpp"
@@ -55,7 +53,7 @@ namespace xpcc
 		 * http://www.mikrocontroller.net/topic/78610#656695
 		 * 
 		 * \ingroup	accessor
-		 * \author	Fabian Greif <fabian.greif@rwth-aachen.de>
+		 * \author	Fabian Greif
 		 */
 		template<typename T>
 		class Flash

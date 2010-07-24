@@ -45,7 +45,7 @@ namespace xpcc
 	 * 
 	 * This implementation uses a ringbuffer.
 	 *
-	 * \ingroup		architecture
+	 * \ingroup		atmega
 	 */
 	class BufferedUart3
 	{

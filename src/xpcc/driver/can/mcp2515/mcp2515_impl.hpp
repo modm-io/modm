@@ -50,11 +50,11 @@ xpcc::Mcp2515<SPI, CS, INT>::initialize(can::Bitrate bitrate)
 	// configuration mode
 	CS::reset();
 	SPI::write(SPI_RESET);
-	delay_ms(1);
+	xpcc::delay_ms(1);
 	CS::set();
 	
 	// wait a bit to give the mcp2515 some time to restart
-	delay_ms(30);
+	xpcc::delay_ms(30);
 	
 	CS::reset();
 	SPI::write(SPI_WRITE);
@@ -258,7 +258,7 @@ xpcc::Mcp2515<SPI, CS, INT>::sendMessage(const can::Message& message)
 	}
 	CS::set();
 	
-	delay_us(1);
+	xpcc::delay_us(1);
 	
 	// send message via RTS command
 	CS::reset();

@@ -4,8 +4,11 @@
 /*!
 \page getting_started 4. Getting started: How to use this library
 
+Take a look at the \e examples folder in the root directory of XPCC. There is
+a collection of simple examples which show how to use certain parts of the
+library. They can be a good starting point for your project. Just copy
+and modify them as needed.
+
 - \subpage project_sconstruct
 - \subpage project_makefile
-
-TODO examples folder
 */

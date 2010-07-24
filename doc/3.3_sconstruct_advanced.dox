@@ -2,7 +2,7 @@
 // $Id$
 
 /*!
-\page sconstruct_advanced 3.2 SConstruct files: Advanced topics
+\page sconstruct_advanced 3.3 SConstruct files: Advanced topics
 
 One important thing to remember about SConstruct files is that they are
 declarative, rather than strictly imperative. This means that the order in
@@ -172,10 +172,4 @@ env.Default('all')
 
 Set the default target to \e all. This target will be build when nothing
 else is specifiy via the commandline.
-
-\section template Template
-
-You don't have to create your SConstruct file by hand every time you create a
-new project. Just use our \ref sconstruct_template "SConstruct template" which
-should be fit for nearly all projects.
  */

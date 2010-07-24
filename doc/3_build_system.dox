@@ -18,9 +18,9 @@ For more information go to the official website: http://www.scons.org/
 
 The SConstruct files and the project/build configuration have their own
 documentation on the following pages:
+- \subpage sconstruct_template "Universal SConstruct template"
 - \subpage sconstruct "SConstruct files: An introduction"
 - \subpage sconstruct_advanced "SConstruct files: Advanced topics"
-- \subpage sconstruct_template "Universal SConstruct template"
 - \subpage scons_tools "SCons Tools"
 - \subpage configuration_files "Configuration files"
 

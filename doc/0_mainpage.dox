@@ -24,9 +24,9 @@ This manual is divided in the following sections:
   - \ref installation_windows
     - \ref configure_programmers_notepad
 - \subpage build_system
+  - \ref sconstruct_template
   - \ref sconstruct
   - \ref sconstruct_advanced
-  - \ref sconstruct_template
   - \ref scons_tools
   - \ref configuration_files
 - \subpage getting_started

@@ -48,16 +48,16 @@ namespace xpcc
 		{
 		public :
 			virtual void
-			put(char c);
+			write(char c);
 			
 			virtual void
-			put(const char* s);
+			write(const char* s);
 			
 			virtual void
 			flush();
 			
 			virtual bool
-			get(char& value);
+			read(char& value);
 		};
 	}
 }

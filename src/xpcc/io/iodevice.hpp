@@ -44,25 +44,29 @@ namespace xpcc
 	class IODevice
 	{
 	public :
-		IODevice();
+		IODevice()
+		{
+		}
 
 		virtual
-		~IODevice();
+		~IODevice()
+		{
+		}
 		
 		///	Write a single character
 		virtual void
-		put(char c) = 0;
+		write(char c) = 0;
 		
 		/// Write a C-string
 		virtual void
-		put(const char* str);
+		write(const char* str);
 
 		virtual void
 		flush() = 0;
 		
 		/// Read a single character
 		virtual bool
-		get(char& c) = 0;
+		read(char& c) = 0;
 
 	private :
 		IODevice(const IODevice&);

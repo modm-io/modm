@@ -44,6 +44,7 @@ doc
 doxygen
    Generate the doxygen documentation.
 
+template
 templates
    Regenerate some C++ driver classes from templates.
 
@@ -84,7 +85,7 @@ class Generator:
 		self.env = env
 		self.basepath = basepath
 	def template(self, target, source, substitutions):
-		self.env.Alias('templates',
+		self.env.Alias('template',
 			self.env.Jinja2Template(
 				target = os.path.join(self.basepath, target),
 				source = os.path.join(self.basepath, source),
@@ -109,6 +110,8 @@ for port in ['C', 'D', 'E', 'F']:
 		generator.template('uart_%s.cpp' % id, 'uart.cpp.in', substitutions)
 		generator.template('uart_buffered_%s.cpp' % id, 'uart_buffered.cpp.in', substitutions)
 		generator.template('uart_spi_%s.cpp' % id, 'uart_spi.cpp.in', substitutions)
+
+env.Alias('templates', 'template')
 
 env.Doxygen('doc/doxyfile')
 env.Alias('doxygen', 'apidoc/html')

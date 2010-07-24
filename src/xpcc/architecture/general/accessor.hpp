@@ -42,7 +42,7 @@ namespace xpcc
 	 * \defgroup	accessor	Accessor classes
 	 * \ingroup		architecture
 	 * 
-	 * \author	Fabian Greif <fabian.greif@rwth-aachen.de>
+	 * \author	Fabian Greif
 	 */
 	namespace accessor
 	{

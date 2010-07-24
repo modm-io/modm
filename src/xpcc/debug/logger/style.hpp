@@ -59,14 +59,14 @@ namespace xpcc
 
 			/// Write one char to the sink.
 			inline void
-			put( char c )
+			write( char c )
 			{
 				(void) c;
 			}
 
 			/// Write a string that terminates with \c '\\0' to the sink.
 			inline void
-			put( const char* s )
+			write( const char* s )
 			{
 				(void) s;
 			}
@@ -113,11 +113,11 @@ namespace xpcc
 
 			/// Write one char to the sink.
 			inline void
-			put( char c );
+			write( char c );
 
 			/// Write a string that terminates with \c '\\0' to the sink.
 			inline void
-			put( const char* s );
+			write( const char* s );
 
 			/// The message is complete and can be written/send/displayed.
 			inline void

@@ -36,13 +36,13 @@
 
 // ----------------------------------------------------------------------------
 void
-xpcc::pc::Terminal::put(char c)
+xpcc::pc::Terminal::write(char c)
 {
 	std::cout << c;
 }
 
 void
-xpcc::pc::Terminal::put(const char* s)
+xpcc::pc::Terminal::write(const char* s)
 {
 	std::cout << s;
 }
@@ -54,7 +54,7 @@ xpcc::pc::Terminal::flush()
 }
 
 bool
-xpcc::pc::Terminal::get(char& value)
+xpcc::pc::Terminal::read(char& value)
 {
 	return std::cin.get(value);
 }

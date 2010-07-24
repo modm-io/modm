@@ -141,7 +141,7 @@ namespace unittest
 		}
 		else {
 			TEST_REPORTER__.reportFailure(line)
-				<< a << xpcc::modifier::asFlash(unittest::stringEqual) << b << '\n';
+				<< a << xpcc::accessor::asFlash(unittest::stringEqual) << b << '\n';
 			return false;
 		}
 	}
@@ -157,7 +157,7 @@ namespace unittest
 		}
 		else {
 			TEST_REPORTER__.reportFailure(line)
-				<< a << xpcc::modifier::asFlash(unittest::stringEqual) << b << '\n';
+				<< a << xpcc::accessor::asFlash(unittest::stringEqual) << b << '\n';
 			return false;
 		}
 	}
@@ -173,7 +173,7 @@ namespace unittest
 		}
 		else {
 			TEST_REPORTER__.reportFailure(line)
-				<< value << xpcc::modifier::asFlash(unittest::stringNotInRange)
+				<< value << xpcc::accessor::asFlash(unittest::stringNotInRange)
 				<< '[' << lower << ',' << upper << ']' << '\n';
 			return false;
 		}

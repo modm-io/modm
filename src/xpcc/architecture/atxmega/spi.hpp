@@ -36,10 +36,6 @@
 #include <avr/io.h>
 #include <stdint.h>
 
-namespace xpcc
-{
-
-
 //SPIC.CTRL = SPI_CLK2X_bm // double speed
 //			| SPI_ENABLE_bm
 //				| SPI_DORD_bm  // lsb first
@@ -51,10 +47,11 @@ namespace xpcc
 //	SPIC.STATUS | SPI_IF_bm | SPI_WRCOL_bm interrupt flags
 
 /**
- * \ingroup	architecture
  * \brief	Create a spi module
  * 
  * initialize method configures module in slave mode_0
+ * 
+ * \ingroup	atxmega
  */
 #define	CREATE_SPI_MODULE(name, moduleBase) \
 	struct name { \
@@ -95,8 +92,8 @@ namespace xpcc
 	};
 
 /**
- * \ingroup	architecture
  * \brief	Create a spi module in master mode
+ * \ingroup	atxmega
  */
 #define	CREATE_SPI_MASTER_MODULE(name, moduleBase, prescaler) \
 	struct name { \
@@ -139,5 +136,4 @@ namespace xpcc
 		} \
 	};
 
-}
 #endif // XPCC__XMEGA_SPI_HPP

@@ -26,16 +26,19 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: gpio.hpp 229 2010-03-18 02:30:56Z dergraaf $
+ * $Id$
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__PC_GPIO_HPP
-#define XPCC__PC_GPIO_HPP
+#ifndef XPCC__GPIO_DUMMY_HPP
+#define XPCC__GPIO_DUMMY_HPP
+
+#ifndef __DOXYGEN__
 
 #include <xpcc/utils/macros.hpp>
 #include <xpcc/architecture/general/gpio.hpp>
 
+// ----------------------------------------------------------------------------
 namespace xpcc
 {
 	namespace gpio
@@ -47,13 +50,7 @@ namespace xpcc
 	};
 };
 
-/**
- * \brief	Create a input/output pin type
- * 
- * Dummy to compile µC-Code on PC.
- *
- * \ingroup	gpio
- */
+// ----------------------------------------------------------------------------
 #define	GPIO__IO(name, port, pin) \
 	struct name \
 	{ \
@@ -66,25 +63,17 @@ namespace xpcc
 			(void) invert; \
 		} \
 		\
-		ALWAYS_INLINE static void setOutput() { } \
-		ALWAYS_INLINE static void setInput() { } \
-		ALWAYS_INLINE static void set() { } \
-		ALWAYS_INLINE static void reset() { } \
-		ALWAYS_INLINE static void toggle() { } \
-		\
-		ALWAYS_INLINE static void \
-		set(bool status) { \
-			(void) status; \
-		} \
+		ALWAYS_INLINE static void setOutput() {} \
+		ALWAYS_INLINE static void setInput() {} \
+		ALWAYS_INLINE static void set() {} \
+		ALWAYS_INLINE static void set(bool) {} \
+		ALWAYS_INLINE static void reset() {} \
+		ALWAYS_INLINE static void toggle() {} \
 		\
 		ALWAYS_INLINE static bool read() { return false; } \
 	}
 
-/**
- * \brief	Create a output pin type
- * 
- * \ingroup	gpio
- */
+// ----------------------------------------------------------------------------
 #define	GPIO__OUTPUT(name, port, pin) \
 	struct name \
 	{ \
@@ -95,22 +84,14 @@ namespace xpcc
 			(void) invert; \
 		} \
 		\
-		ALWAYS_INLINE static void setOutput() { } \
-		ALWAYS_INLINE static void set() { } \
-		ALWAYS_INLINE static void reset() { } \
-		ALWAYS_INLINE static void toggle() { } \
-		\
-		ALWAYS_INLINE static void \
-		set(bool status) { \
-			(void) status; \
-		} \
+		ALWAYS_INLINE static void setOutput() {} \
+		ALWAYS_INLINE static void set() {} \
+		ALWAYS_INLINE static void set(bool) {} \
+		ALWAYS_INLINE static void reset() {} \
+		ALWAYS_INLINE static void toggle() {} \
 	}
 
-/**
- * \brief	Create a input pin type
- * 
- * \ingroup	gpio
- */
+// ----------------------------------------------------------------------------
 #define GPIO__INPUT(name, port, pin) \
 	struct name \
 	{ \
@@ -121,8 +102,9 @@ namespace xpcc
 			(void) invert; \
 		} \
 		\
-		ALWAYS_INLINE static void setInput() { } \
-		ALWAYS_INLINE static bool read() { } \
+		ALWAYS_INLINE static void setInput() {} \
+		ALWAYS_INLINE static bool read() {} \
 	}
 
-#endif // XPCC__PC_GPIO_HPP
+#endif	// !__DOXYGEN__
+#endif	// XPCC__GPIO_DUMMY_HPP

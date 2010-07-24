@@ -47,7 +47,7 @@ unittest::checkExpression(bool expr, unsigned int line)
 		return true;
 	} else {
 		TEST_REPORTER__.reportFailure(line)
-			<< xpcc::modifier::asFlash(unittest::stringNotTrue);
+			<< xpcc::accessor::asFlash(unittest::stringNotTrue);
 		return false;
 	}
 }
@@ -62,7 +62,7 @@ unittest::checkEqual(const float& a, const float& b, unsigned int line)
 	}
 	else {
 		TEST_REPORTER__.reportFailure(line)
-			<< a << xpcc::modifier::asFlash(unittest::stringEqual) << b << '\n';
+			<< a << xpcc::accessor::asFlash(unittest::stringEqual) << b << '\n';
 		return false;
 	}
 }

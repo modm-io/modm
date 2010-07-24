@@ -76,11 +76,11 @@ namespace xpcc
 
 				/// Write one char to the sink.
 				void
-				put( char c );
+				write( char c );
 
 				/// Write a string that terminates with \c '\\0' to the sink.
 				void
-				put( const char* s );
+				write( const char* s );
 
 				/// The message is complete and can be written/send/displayed.
 				void
@@ -133,22 +133,22 @@ xpcc::log::StdColour<TEXT, BACKGROUND, STYLE>::parseArg( int argc, char * argv )
 
 template <xpcc::log::Colour TEXT, xpcc::log::Colour BACKGROUND, typename STYLE>
 void
-xpcc::log::StdColour<TEXT, BACKGROUND, STYLE>::put( char c )
+xpcc::log::StdColour<TEXT, BACKGROUND, STYLE>::write( char c )
 {
-	this->Style<STYLE>::put(this->getTextColour());
-	this->Style<STYLE>::put(this->getBackgroundColour());
-	this->Style<STYLE>::put(c);
+	this->Style<STYLE>::write(this->getTextColour());
+	this->Style<STYLE>::write(this->getBackgroundColour());
+	this->Style<STYLE>::write(c);
 }
 
 // -----------------------------------------------------------------------------
 
 template <xpcc::log::Colour TEXT, xpcc::log::Colour BACKGROUND, typename STYLE>
 void
-xpcc::log::StdColour<TEXT, BACKGROUND, STYLE>::put( const char* s )
+xpcc::log::StdColour<TEXT, BACKGROUND, STYLE>::write( const char* s )
 {
-	this->Style<STYLE>::put(this->getTextColour());
-	this->Style<STYLE>::put(this->getBackgroundColour());
-	this->Style<STYLE>::put(s);
+	this->Style<STYLE>::write(this->getTextColour());
+	this->Style<STYLE>::write(this->getBackgroundColour());
+	this->Style<STYLE>::write(s);
 }
 
 // -----------------------------------------------------------------------------
@@ -157,7 +157,7 @@ template <xpcc::log::Colour TEXT, xpcc::log::Colour BACKGROUND, typename STYLE>
 void
 xpcc::log::StdColour<TEXT, BACKGROUND, STYLE>::flush()
 {
-	this->Style<STYLE>::put("\033[0m");
+	this->Style<STYLE>::write("\033[0m");
 	this->Style<STYLE>::flush();
 }
 

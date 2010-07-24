@@ -33,68 +33,72 @@
 #ifndef	XPCC_ATOMIC__QUEUE_IMPL_HPP
 #define	XPCC_ATOMIC__QUEUE_IMPL_HPP
 
-template<typename T, int N>
+template<typename T, std::size_t N>
 xpcc::atomic::Queue<T, N>::Queue() :
-	head(0), tail(0) {
+	head(0), tail(0)
+{
 }
 
-template<typename T, int N>
+template<typename T, std::size_t N>
 bool
-xpcc::atomic::Queue<T, N>::isFull() {
-	uint8_t tmphead = xpcc::modifier::asVolatile(head) + 1;
+xpcc::atomic::Queue<T, N>::isFull()
+{
+	uint8_t tmphead = xpcc::accessor::asVolatile(this->head) + 1;
 	if (tmphead >= (N+1)) {
 		tmphead = 0;
 	}
 	
-	if (tmphead == xpcc::modifier::asVolatile(tail)) {
-		return true;
-	}
-	return false;
+	return (tmphead == xpcc::accessor::asVolatile(this->tail));
 }
 
-template<typename T, int N>
+template<typename T, std::size_t N>
 bool
-xpcc::atomic::Queue<T, N>::isEmpty() {
-	return (xpcc::modifier::asVolatile(head) == xpcc::modifier::asVolatile(tail));
+xpcc::atomic::Queue<T, N>::isEmpty()
+{
+	return (xpcc::accessor::asVolatile(this->head) == xpcc::accessor::asVolatile(this->tail));
 }
 
-template<typename T, int N>
+template<typename T, std::size_t N>
 uint8_t
-xpcc::atomic::Queue<T, N>::getMaxSize() {
+xpcc::atomic::Queue<T, N>::getMaxSize()
+{
 	return N;
 }
 
-template<typename T, int N>
+template<typename T, std::size_t N>
 const T&
-xpcc::atomic::Queue<T, N>::get() const {
-	return buffer[tail];
+xpcc::atomic::Queue<T, N>::get() const
+{
+	return this->buffer[this->tail];
 }
 
-template<typename T, int N>
+template<typename T, std::size_t N>
 bool
-xpcc::atomic::Queue<T, N>::push(const T& value) {
-	uint8_t tmphead = head + 1;
+xpcc::atomic::Queue<T, N>::push(const T& value)
+{
+	uint8_t tmphead = this->head + 1;
 	if (tmphead >= (N+1)) {
 		tmphead = 0;
 	}
-	if (tmphead == xpcc::modifier::asVolatile(tail)) {
+	if (tmphead == xpcc::accessor::asVolatile(this->tail)) {
 		return false;
 	}
 	else {
-		buffer[head] = value;
-		head = tmphead;
+		this->buffer[this->head] = value;
+		this->head = tmphead;
 		return true;
 	}
 }
 
-template<typename T, int N>
+template<typename T, std::size_t N>
 void
-xpcc::atomic::Queue<T, N>::pop() {
-	uint8_t tmptail = tail + 1;
+xpcc::atomic::Queue<T, N>::pop()
+{
+	uint8_t tmptail = this->tail + 1;
 	if (tmptail >= (N+1)) {
 		tmptail = 0;
 	}
-	tail = tmptail;
+	this->tail = tmptail;
 }
 
 #endif	// XPCC_ATOMIC__QUEUE_IMPL_HPP

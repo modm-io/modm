@@ -6,7 +6,7 @@
 
 \section tool_configfile_provides Provided builders and methods
 
-\subsection tool_configfile_find FindFiles(path)
+\subsection tool_configfile_find FindFiles(path [, unittest])
 
 Search for every useable source file in this folder and its subfolders. While
 iterating through the folders it looks for configuration files called \c build.cfg.
@@ -14,6 +14,8 @@ If finds one it checks if this folder is supposed to be build for the current
 architecture. If not the folder and its subfolders are excluded from the search.
 
 More about this in the page about \ref configuration_files "configuration files".
+
+TODO unittest
 
 \subsection tool_configfile_parser ConfigParser()
 

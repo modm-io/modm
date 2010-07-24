@@ -31,21 +31,12 @@
 
 #include "iodevice.hpp"
 
-xpcc::IODevice::IODevice()
-{
-}
-
-// ----------------------------------------------------------------------------
-xpcc::IODevice::~IODevice()
-{
-}
-
 // ----------------------------------------------------------------------------
 void
-xpcc::IODevice::put(const char* str)
+xpcc::IODevice::write(const char* str)
 {
 	char c;
 	while ((c = *str++)) {
-		this->put(c);
+		this->write(c);
 	}
 }
