@@ -83,4 +83,3 @@ xpcc::log::Prefix<T, STYLE>::flush()
 	this->Style<STYLE>::flush();
 }
 
-#endif // XPCC_LOG__PREFIX_HPP

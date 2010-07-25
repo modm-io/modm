@@ -10,7 +10,7 @@ For Ubuntu (and other Debian based Linux-Distributions) just type the
 following in a terminal and you're good to go:
 
 \verbatim
-$ sudo aptitude install python scons python-jinja2 python-lxml doxygen graphviz
+$ sudo aptitude install python scons python-jinja2 python-lxml doxygen graphviz subversion
 \endverbatim
 
 \subsection pc PC

@@ -14,6 +14,7 @@ Python 2.6.x is required. The Code currently doesn't work with Python 3.x.
 
 - http://www.scons.org/download.php
 - http://winavr.sourceforge.net
+- http://tortoisesvn.net/downloads
 
 - http://pypi.python.org/pypi/setuptools
 - http://codespeak.net/lxml/installation.html
