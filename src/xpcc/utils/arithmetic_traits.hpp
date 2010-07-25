@@ -46,19 +46,20 @@ namespace xpcc
 	 *
 	 * \section provides	Values provided by these traits
 	 *
-	 * \li \c	DoubleType	Type that can holds the doubled length of data.
+	 * - \c	WideType		Type that can holds the doubled length of data.
 	 * 						May be used to hold the result of a multiplication.
-	 * \li \c	SignedType	Signed type for the given type. It applies 
+	 * - \c	SignedType		Signed type for the given type. It applies 
 	 * 						<i>T == SignedType</i> if T is already signed.
-	 * \li \c	UnsignedType	Some as SignedType only for unsigned types
-	 * \li \c	min()		smallest value.
-	 * \li \c	max()		biggest value
-	 * \li \c	isSigned	is this a signed or unsigned type
-	 * \li \c	decimalDigits	count of digits to display this type in decimal
+	 * - \c	UnsignedType	Some as SignedType only for unsigned types
+	 * - \c	min()			smallest value.
+	 * - \c	max()			biggest value
+	 * - \c	isSigned		is this a signed or unsigned type
+	 * - \c	isFloatingPoint	is this a floating point type
+	 * - \c	decimalDigits	count of digits to display this type in decimal
 	 * 
 	 * \section usage	Usage
 	 * \code
-	 * typedef typename xpcc::ArithmeticTraits<T>::DoubleType T_DOUBLE;
+	 * typedef typename xpcc::ArithmeticTraits<T>::WideType T_DOUBLE;
 	 *
 	 * T min = xpcc::ArithmeticTraits<T>::min();
 	 * T max = xpcc::ArithmeticTraits<T>::max();
@@ -79,11 +80,12 @@ namespace xpcc
 	template<>
 	struct ArithmeticTraits<char>
 	{
-		typedef int16_t DoubleType;
+		typedef int16_t WideType;
 		typedef signed char SignedType;
 		typedef unsigned char UnsignedType;
 		
 		static const unsigned char decimalDigits = 4; // inc sign
+		static const bool isFloatingPoint = false;
 	};
 
 	// ------------------------------------------------------------------------
@@ -91,12 +93,13 @@ namespace xpcc
 	template<>
 	struct ArithmeticTraits<signed char>
 	{
-		typedef int16_t DoubleType;
+		typedef int16_t WideType;
 		typedef int8_t SignedType;
 		typedef uint8_t UnsignedType;
 
 		static const unsigned char decimalDigits = 4; // inc sign
 		static const bool isSigned = true;
+		static const bool isFloatingPoint = false;
 		
 		static ALWAYS_INLINE signed char
 		min()
@@ -115,12 +118,13 @@ namespace xpcc
 	template<>
 	struct ArithmeticTraits<unsigned char>
 	{
-		typedef uint16_t DoubleType;
+		typedef uint16_t WideType;
 		typedef int8_t SignedType;
 		typedef uint8_t UnsignedType;
 
 		static const uint8_t decimalDigits = 3;
 		static const bool isSigned = false;
+		static const bool isFloatingPoint = false;
 		
 		static ALWAYS_INLINE unsigned char
 		min()
@@ -139,12 +143,13 @@ namespace xpcc
 	template<>
 	struct ArithmeticTraits<int16_t>
 	{
-		typedef int32_t DoubleType;
+		typedef int32_t WideType;
 		typedef int16_t SignedType;
 		typedef uint16_t UnsignedType;
 
 		static const uint8_t decimalDigits = 6; // inc. sign
 		static const bool isSigned = true;
+		static const bool isFloatingPoint = false;
 		
 		static ALWAYS_INLINE int16_t
 		min()
@@ -163,12 +168,13 @@ namespace xpcc
 	template<>
 	struct ArithmeticTraits<uint16_t>
 	{
-		typedef uint32_t DoubleType;
+		typedef uint32_t WideType;
 		typedef int16_t SignedType;
 		typedef uint16_t UnsignedType;
 		
 		static const uint8_t decimalDigits = 6;
 		static const bool isSigned = false;
+		static const bool isFloatingPoint = false;
 		
 		static ALWAYS_INLINE uint16_t
 		min()
@@ -188,15 +194,16 @@ namespace xpcc
 	struct ArithmeticTraits<int32_t>
 	{
 #ifdef __AVR__
-		typedef float DoubleType; // int64_t is on AVRs only a int32_t
+		typedef float WideType; // int64_t is on AVRs only a int32_t
 #else
-		typedef int64_t DoubleType;
+		typedef int64_t WideType;
 #endif
 		typedef int32_t SignedType;
 		typedef uint32_t UnsignedType;
 
 		static const uint8_t decimalDigits = 11; // inc. sign
 		static const bool isSigned = true;
+		static const bool isFloatingPoint = false;
 		
 		static ALWAYS_INLINE int32_t
 		min()
@@ -216,15 +223,16 @@ namespace xpcc
 	struct ArithmeticTraits<uint32_t>
 	{
 #ifdef __AVR__
-		typedef float DoubleType; // int64_t is on AVRs only a int32_t
+		typedef float WideType; // int64_t is on AVRs only a int32_t
 #else
-		typedef uint64_t DoubleType;
+		typedef uint64_t WideType;
 #endif
 		typedef int32_t SignedType;
 		typedef uint32_t UnsignedType;
 
 		static const uint8_t decimalDigits = 10;
 		static const bool isSigned = false;
+		static const bool isFloatingPoint = false;
 		
 		static ALWAYS_INLINE uint32_t
 		min()
@@ -243,12 +251,13 @@ namespace xpcc
 	template<>
 	struct ArithmeticTraits<int64_t>
 	{
-		typedef double DoubleType;
+		typedef double WideType;
 		typedef int64_t SignedType;
 		typedef uint64_t UnsignedType;
 
 		static const uint8_t decimalDigits = 20; // inc. sign
 		static const bool isSigned = true;
+		static const bool isFloatingPoint = false;
 		
 		static ALWAYS_INLINE int64_t
 		min()
@@ -267,12 +276,13 @@ namespace xpcc
 	template<>
 	struct ArithmeticTraits<uint64_t>
 	{
-		typedef double DoubleType;
+		typedef double WideType;
 		typedef int64_t SignedType;
 		typedef uint64_t UnsignedType;
 
 		static const uint8_t decimalDigits = 20;
 		static const bool isSigned = false;
+		static const bool isFloatingPoint = false;
 		
 		static ALWAYS_INLINE uint64_t
 		min()
@@ -292,11 +302,12 @@ namespace xpcc
 	template<>
 	struct ArithmeticTraits<float>
 	{
-		typedef float DoubleType;
+		typedef float WideType;
 		typedef float SignedType;
 		typedef float UnsignedType;
 		
 		static const bool isSigned = true;
+		static const bool isFloatingPoint = true;
 		
 		static ALWAYS_INLINE float
 		min()
@@ -319,11 +330,12 @@ namespace xpcc
 	template<>
 	struct ArithmeticTraits<double>
 	{
-		typedef double DoubleType;
+		typedef double WideType;
 		typedef double SignedType;
 		typedef double UnsignedType;
 		
 		static const bool isSigned = true;
+		static const bool isFloatingPoint = true;
 		
 		static ALWAYS_INLINE double
 		min()
@@ -343,11 +355,12 @@ namespace xpcc
 	template<>
 	struct ArithmeticTraits<double>
 	{
-		typedef double DoubleType;
+		typedef double WideType;
 		typedef double SignedType;
 		typedef double UnsignedType;
 		
 		static const bool isSigned = true;
+		static const bool isFloatingPoint = true;
 		
 		static ALWAYS_INLINE double
 		min()

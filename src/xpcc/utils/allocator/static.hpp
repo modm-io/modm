@@ -73,6 +73,7 @@ namespace xpcc
 			{
 			}
 			
+			// TODO
 			T*
 			allocate(std::size_t other);
 			

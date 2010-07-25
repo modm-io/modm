@@ -51,17 +51,13 @@ namespace xpcc
 	{
 		/**
 		 * \brief 	Interface to the Logger.
-		 *
-		 * This class provides an interface to the logger. The Logger is an
-		 * IOStream  singleton. It is used by the
-		 * macro defined below. This class overloads the << operator so that it is
-		 * possible to write different message types to the logger.
-		 *
+		 * 
+		 * It is used by the macros defined below. This class overloads
+		 * the shift-operator so that it is possible to write different
+		 * message types to the logger.
+		 * 
 		 * \ingroup logger
-		 * \since 	04 December 2006
-		 * \author	Christofer Hedbrand,
-		 * 			Carsten Schmidt,
-		 * 			Martin Rosekeit <martin.rosekeit@rwth-aachen.de>
+		 * \author	Martin Rosekeit <martin.rosekeit@rwth-aachen.de>
 		 */
 		class Logger : public ::xpcc::IOStream
 		{
@@ -75,9 +71,7 @@ namespace xpcc
 				inline Logger&
 				operator << (const T& msg)
 				{
-					(void) msg;
-					// next line can be left out to shurely deactivate logger
-					*(xpcc::IOStream*)this << msg;
+					*(xpcc::IOStream *) this << msg;
 					return *this;
 				}
 
@@ -89,8 +83,13 @@ namespace xpcc
 		};
 
 		/**
-		 * \ingroup logger
 		 * \name	Output streams
+		 * 
+		 * Don't use this instances directly! Prefer an access through the
+		 * XPCC_LOG_DEBUG, XPCC_LOG_INFO, XPCC_LOG_WARNING and
+		 * XPCC_LOG_ERROR macros.
+		 * 
+		 * \ingroup logger
 		 */
 		//\{
 		extern Logger debug;	//!< log device to take messages on DEBUG level
@@ -101,21 +100,75 @@ namespace xpcc
 	}
 }
 
+/**
+ * \brief	Output stream for debug messages
+ * \ingroup logger
+ */
 #define XPCC_LOG_DEBUG \
-	if ( XPCC_LOG_LEVEL <= xpcc::log::DEBUG )	\
+	if (XPCC_LOG_LEVEL <= xpcc::log::DEBUG)	\
 		xpcc::log::debug
 
+/**
+ * \brief	Output stream for info messages
+ * \ingroup logger
+ */
 #define XPCC_LOG_INFO \
-	if ( XPCC_LOG_LEVEL <= xpcc::log::INFO )	\
+	if (XPCC_LOG_LEVEL <= xpcc::log::INFO)	\
 		xpcc::log::info
 
+/**
+ * \brief	Output stream for warnings
+ * \ingroup logger
+ */
 #define XPCC_LOG_WARNING \
-	if ( XPCC_LOG_LEVEL <= xpcc::log::WARNING )	\
+	if (XPCC_LOG_LEVEL <= xpcc::log::WARNING)	\
 		xpcc::log::warning
 
+/**
+ * \brief	Output stream for error messages
+ * \ingroup logger
+ */
 #define XPCC_LOG_ERROR \
-	if ( XPCC_LOG_LEVEL <= xpcc::log::ERROR )	\
+	if (XPCC_LOG_LEVEL <= xpcc::log::ERROR)	\
 		xpcc::log::error
+
+#ifdef __DOXYGEN__
+
+/**
+ * \brief	Filename of the current file
+ * 
+ * In contrast to \c __FILE__ the path to the file is omitted (if this feature
+ * is available, otherwise this macro will resolve to \c __FILE__).
+ * 
+ * \ingroup	logger
+ */
+#define FILENAME
+
+/**
+ * \brief	String containing the filename and the current line
+ * 
+ * Will generate something like:
+ * \code
+ * "file.cpp (123) >> "
+ * \endcode
+ * 
+ * This can be very useful the track the origin of log-messages:
+ * \code
+ * XPCC_LOG_DEBUG   << XPCC_FILE_INFO
+ *                  << "... something has happened ..."
+ *                  << xpcc::endl;
+ * \endcode
+ * 
+ * This will result into:
+ * \code
+ * file.cpp (123) >> ... something has happened ...
+ * \endcode
+ * 
+ * \ingroup	logger
+ */
+#define	XPCC_FILE_INFO
+
+#else	// !__DOXYGEN__
 
 #ifndef	BASENAME
 	#define	FILENAME	__FILE__
@@ -125,4 +178,5 @@ namespace xpcc
 
 #define	XPCC_FILE_INFO		FILENAME "(" STRINGIFY(__LINE__) ") >> "
 
+#endif	// __DOXYGEN__
 #endif // XPCC__LOGGER_HPP

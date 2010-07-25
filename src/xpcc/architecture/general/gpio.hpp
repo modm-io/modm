@@ -254,8 +254,8 @@ namespace xpcc
 		 * \brief	Generic implementation of a Nibble composed of four
 		 * 			independent pins.
 		 * 
-		 * When possible the GPIO__NIBBLE_LOW/HIGH macros should be
-		 * preferred as they are faster and require less code.
+		 * When possible preferred the GPIO__NIBBLE_LOW() or GPIO__NIBBLE_HIGH()
+		 * macros over this class as they are much faster and require less code.
 		 * 
 		 * \see		GPIO__NIBBLE_LOW(), GPIO__NIBBLE_HIGH()
 		 * \ingroup	gpio
@@ -419,8 +419,8 @@ namespace xpcc
 		 */
 		enum Configuration
 		{
-			NORMAL,
-			PULLUP		//!< enable the internal pullup resistor
+			NORMAL,		//!< standard operation (floating input, external signal needed!)
+			PULLUP		//!< enable the internal pull-up resistor
 		};
 	}
 }
@@ -445,6 +445,7 @@ namespace xpcc
  *     static inline void
  *     setInput();
  *     
+ *     // set output to high level
  *     static inline void
  *     set();
  *     
@@ -452,16 +453,25 @@ namespace xpcc
  *     static inline void
  *     set(bool value);
  *     
+ *     // set output to low level
  *     static inline void
  *     reset();
  *     
+ *     // toggle output
  *     static inline void
  *     toggle();
  *     
+ *     // read input
  *     static inline bool
  *     read();
  * }
  * \endcode
+ * 
+ * read() must not be called when configured as output, set(), reset() and
+ * toggle() should not be called when configured as input!
+ * 
+ * You should always prefer GPIO__OUTPUT() and GPIO__INPUT() over this class when
+ * the wrapped pin as a distinct direction.
  * 
  * \ingroup	gpio
  */
@@ -492,6 +502,9 @@ namespace xpcc
  * }
  * \endcode
  * 
+ * Even if the wrapped pin can only be used as output it isn't configured that
+ * way from the beginning. So remember to call \b setOutput() at startup!
+ * 
  * \ingroup	gpio
  */
 #define GPIO__OUTPUT(name, port, pin)
@@ -514,6 +527,9 @@ namespace xpcc
  *     read();
  * }
  * \endcode
+ * 
+ * Even if the wrapped pin can only be used as input it isn't configured that
+ * way from the beginning. So remember to call \b setInput() at startup!
  * 
  * \ingroup	gpio
  */

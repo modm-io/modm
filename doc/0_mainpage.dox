@@ -5,14 +5,16 @@
 \mainpage Cross Platform Component Communication
 \image html logo_xpcc.png
 
-The XPCC project consists of two main parts: First part is the XPCC communication
-module, a packet orientated communication protocol, enabling transparent
-communication between components on different platforms (from PCs to small
-8-bit microcontrollers). It provides an interface to communicate via CAN,
-TCP/IP or TIPC.
+The XPCC project consists of two main parts:
 
-The second part is a universal but a bit robotic orientated C++ library. Because
-standard C++ libraries like the STL are not available for small
+- First part is the XPCC communication
+  module, a packet orientated communication protocol, enabling transparent
+  communication between components on different platforms (from PCs to small
+  8-bit microcontrollers). It provides an interface to communicate via CAN,
+  TCP/IP or TIPC.
+- The second part is a universal but a bit robotic orientated C++ library.
+
+Because standard C++ libraries like the STL are not available for small
 microcontrollers we created a reduced version of it, adapted to the specific 
 needs of microcontrollers. For example a set of generic containers is
 described in the \ref container section.

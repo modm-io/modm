@@ -80,7 +80,7 @@ namespace xpcc
 					 uint16_t period,
 					 Priority priority = 127);
 		
-		/// \todo	implement this function
+		// TODO	Implement this function
 		/*bool
 		removeTask(const Task& task);*/
 		

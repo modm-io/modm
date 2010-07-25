@@ -50,11 +50,6 @@ namespace xpcc
 	namespace allocator
 	{
 	}
-	
-	// TODO see
-	// /usr/include/c++/4.4/ext/new_allocator.h
-	// /usr/include/c++/4.4/ext/malloc_allocator.h
-	// /usr/include/c++/4.4/bits/stl_list.h
 }
 
 #endif // XPCC__ALLOCATOR_HPP

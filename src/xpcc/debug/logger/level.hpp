@@ -35,32 +35,34 @@ namespace xpcc
 	namespace log
 	{
 		/**
-		 * \brief	Levels to filter messages.
+		 * \brief	Log levels
 		 *
-		 * DEBUG < INFO < WARNING < ERROR < FATAL
+		 * DEBUG < INFO < WARNING < ERROR
 		 *
 		 * \ingroup logger
 		 */
-		typedef enum {
+		enum Level
+		{
 			DEBUG,
 			INFO,
 			WARNING,
-			ERROR,
-			FATAL
-		} Level;
-	};
+			ERROR
+		};
+	}
 }
 
 #ifndef XPCC_LOG_LEVEL
 	/**
-	 * Define to set the level of the logging to a defined value for each file.
+	 * \brief	Default log level
 	 * 
-	 * To change the logging level in one cpp file use \c \#undef
+	 * Define to set the level of the logging to a defined value for each file.
+	 * To change the logging level in a source file use \c \#undef
+	 * 
 	 * \code
 	 * #undef  XPCC_LOG_LEVEL
 	 * #define XPCC_LOG_LEVEL xpcc::log::INFO
 	 * \endcode
-	 *
+	 * 
 	 * \ingroup logger
 	 */
 	#define XPCC_LOG_LEVEL xpcc::log::DEBUG

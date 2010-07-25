@@ -56,7 +56,7 @@ namespace xpcc
 	
 	template<typename T>
 	void
-	Saturated<T>::setValue(DoubleType in)
+	Saturated<T>::setValue(WideType in)
 	{
 		if (in > ArithmeticTraits<T>::max()) {
 			value = ArithmeticTraits<T>::max();
@@ -73,8 +73,8 @@ namespace xpcc
 	Saturated<T>&
 	Saturated<T>::operator += (const Saturated& other)
 	{
-		DoubleType temp = static_cast<DoubleType>(this->value) +
-						  static_cast<DoubleType>(other.value);
+		WideType temp = static_cast<WideType>(this->value) +
+						static_cast<WideType>(other.value);
 		setValue(temp);
 		
 		return *this;
@@ -84,8 +84,8 @@ namespace xpcc
 	Saturated<T>&
 	Saturated<T>::operator -= (const Saturated& other)
 	{
-		DoubleType temp = static_cast<DoubleType>(value) -
-						  static_cast<DoubleType>(other.value);
+		WideType temp = static_cast<WideType>(value) -
+						static_cast<WideType>(other.value);
 		setValue(temp);
 		
 		return *this;
@@ -108,9 +108,9 @@ namespace xpcc
 	Saturated<U>
 	operator - (const Saturated<U>& x)
 	{
-		typedef typename ArithmeticTraits<U>::DoubleType DoubleType;
+		typedef typename ArithmeticTraits<U>::WideType WideType;
 		
-		DoubleType temp = - static_cast<DoubleType>(x.value);
+		WideType temp = - static_cast<WideType>(x.value);
 		
 		Saturated<U> result;
 		result.setValue(temp);

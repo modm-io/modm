@@ -38,45 +38,82 @@ namespace xpcc
 {
 	namespace atomic
 	{
-		/// \ingroup	atomic
-		/// \brief		Flag to signal events between interrupts and the 
-		///				main-loop
-		///
-		/// \todo	description
+		/**
+		 * \brief		Flag to signal events between interrupts and the 
+		 *				main-loop
+		 * 
+		 * This class is quite handy when exchanging flags between a interrupt
+		 * routine and the main-loop. 
+		 * 
+		 * \code
+		 * xpcc::atomic::Flag isrFlag;
+		 * 
+		 * ISR() {
+		 *     ...
+		 *     isrFlag.set();
+		 * }
+		 * 
+		 * function() {
+		 *     bool flag = isrFlag.testAndSet(false);
+		 *     ...
+		 * }
+		 * \endcode
+		 * 
+		 * \ingroup	atomic
+		 * \author	Fabian Greif
+		 */
 		class Flag
 		{
 		public:
-			Flag(bool state = false) : state(state) { }
+			Flag(bool state = false);
 			
+			Flag(const Flag& other);
+			
+			Flag&
+			operator = (const Flag& other);
+			
+			/**
+			 * \brief	Check state of the flag
+			 */
 			inline bool
-			isSet() {
-				return state;
+			test() const
+			{
+				return this->state;
 			}
 			
+			/**
+			 * \brief	Set flag
+			 */
 			inline void
-			set() {
-				state = true;
+			set()
+			{
+				this->state = true;
 			}
 			
+			/**
+			 * \brief	Clear flag
+			 */
 			inline void
-			reset() {
-				state = false;
+			reset()
+			{
+				this->state = false;
 			}
 			
+			/**
+			 * \brief	Sets the flag to a new value and returns the old one
+			 */
 			inline bool
-			testAndSet(bool newState) {
+			testAndSet(bool value)
+			{
 				Lock lock;
-				bool oldValue = state;
-				state = newState;
+				
+				bool oldValue = this->state;
+				this->state = value;
+				
 				return oldValue;
 			}
 		
 		private:
-			Flag(const Flag&);			// TODO
-			
-			Flag&
-			operator=(const Flag&);		// TODO
-			
 			volatile bool state;
 		};
 	}

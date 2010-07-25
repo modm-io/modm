@@ -29,13 +29,13 @@
  * $Id$
  */
 // ----------------------------------------------------------------------------
-#ifndef XPCC_LOG_STYLE_PREFIX__HPP
-#define XPCC_LOG_STYLE_PREFIX__HPP
+#ifndef XPCC_LOG__PREFIX_HPP
+#define XPCC_LOG__PREFIX_HPP
 
 #include <cstring>
 
 #include "../style.hpp"
-#include <xpcc/utils/typet.hpp>
+#include <xpcc/utils/template_metaprogramming.hpp>
 
 namespace xpcc
 {
@@ -52,7 +52,6 @@ namespace xpcc
 		 * \endcode
 		 *
 		 * \ingroup logger
-		 * \version	$Id$
 		 * \author	Martin Rosekeit <martin.rosekeit@rwth-aachen.de>
 		 */
 		template <typename T, typename STYLE = DefaultStyle>
@@ -83,51 +82,6 @@ namespace xpcc
 	}
 }
 
-template <typename T, typename STYLE>
-xpcc::log::Prefix<T, STYLE>::Prefix( const T& str, STYLE style ) :
-	Style<STYLE> ( style ),
-	flushed ( true )
-{
-	std::memcpy( &this->value, &str, sizeof(T) );
-}
+#include "prefix_impl.hpp"
 
-template <typename T, typename STYLE>
-xpcc::log::Prefix<T, STYLE>::Prefix( const T& str, IODevice &device ) :
-	Style<STYLE> ( device ),
-	flushed ( true )
-{
-	std::memcpy( &this->value, &str, sizeof(T) );
-}
-
-template <typename T, typename STYLE>
-void
-xpcc::log::Prefix<T, STYLE>::write( char c )
-{
-	if( this->flushed ) {
-		this->flushed = false;
-		this->Style<STYLE>::write( this->value );
-	}
-	this->Style<STYLE>::write( c );
-}
-
-template <typename T, typename STYLE>
-void
-xpcc::log::Prefix<T, STYLE>::write( const char* s )
-{
-	if( this->flushed ) {
-		this->flushed = false;
-		this->Style<STYLE>::write( this->value );
-	}
-	this->Style<STYLE>::write( s );
-}
-
-
-template <typename T, typename STYLE>
-void
-xpcc::log::Prefix<T, STYLE>::flush()
-{
-	this->flushed = true;
-	this->Style<STYLE>::flush();
-}
-
-#endif // XPCC_LOG_STYLE_PREFIX__HPP
+#endif // XPCC_LOG__PREFIX_HPP

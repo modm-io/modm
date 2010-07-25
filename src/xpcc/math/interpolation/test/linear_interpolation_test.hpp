@@ -35,6 +35,9 @@
 struct LinearInterpolationTest : public unittest::TestSuite
 {
 	void
-	testInterpolation();
+	testInterpolationRam();
+	
+	void
+	testInterpolationFlash();
 };
 

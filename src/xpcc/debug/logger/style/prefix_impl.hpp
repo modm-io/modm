@@ -30,30 +30,57 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__IOSTREAM_HPP
-	#error	"Don't include this file directly, use 'iostream.hpp' instead!"
+#ifndef XPCC_LOG__PREFIX_HPP
+	#error "Don't include this file directly, use 'prefix.hpp' instead!"
 #endif
-
-#include <stdio.h>		// snprintf()
-#include <stdlib.h>
-
-#include <xpcc/utils/arithmetic_traits.hpp>
-#include <xpcc/utils/template_metaprogramming.hpp>
 
 // ----------------------------------------------------------------------------
-
-template<typename T>
-void
-xpcc::IOStream::writeFloat( const T& value )
+template <typename T, typename STYLE>
+xpcc::log::Prefix<T, STYLE>::Prefix( const T& str, STYLE style ) :
+	Style<STYLE> ( style ),
+	flushed ( true )
 {
-	// hard coded for 2.22507e-308
-	char str[13 + 1]; // +1 for '\0'
-	
-#ifdef __AVR__
-	dtostre(value, str, 5, 0);
-#else
-	snprintf(str, sizeof(str), "%.5e", value);
-#endif
-	
-	this->device->write(str);
+	std::memcpy( &this->value, &str, sizeof(T) );
 }
+
+template <typename T, typename STYLE>
+xpcc::log::Prefix<T, STYLE>::Prefix( const T& str, IODevice &device ) :
+	Style<STYLE> ( device ),
+	flushed ( true )
+{
+	std::memcpy( &this->value, &str, sizeof(T) );
+}
+
+// ----------------------------------------------------------------------------
+template <typename T, typename STYLE>
+void
+xpcc::log::Prefix<T, STYLE>::write( char c )
+{
+	if( this->flushed ) {
+		this->flushed = false;
+		this->Style<STYLE>::write( this->value );
+	}
+	this->Style<STYLE>::write( c );
+}
+
+template <typename T, typename STYLE>
+void
+xpcc::log::Prefix<T, STYLE>::write( const char* s )
+{
+	if( this->flushed ) {
+		this->flushed = false;
+		this->Style<STYLE>::write( this->value );
+	}
+	this->Style<STYLE>::write( s );
+}
+
+// ----------------------------------------------------------------------------
+template <typename T, typename STYLE>
+void
+xpcc::log::Prefix<T, STYLE>::flush()
+{
+	this->flushed = true;
+	this->Style<STYLE>::flush();
+}
+
+#endif // XPCC_LOG__PREFIX_HPP

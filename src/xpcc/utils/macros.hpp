@@ -36,7 +36,7 @@
 /**
  * \brief	Force inlining
  * 
- * Macro to force inlining on function if needed. Compiling with -Os  does not
+ * Macro to force inlining on functions if needed. Compiling with -Os  does not
  * always inline them when declared only \c inline.
  * 
  * \ingroup	utils
@@ -77,7 +77,22 @@
  * \brief	Main function definition for microcontroller projects
  * 
  * Inhibits some stack operations at the beginning of main for avr-gcc. May
- * save up a few bytes of dynamically allocated RAM.
+ * save up a few bytes of stack memory.
+ * 
+ * Typical structure of an microcontroller program:
+ * \code
+ * #include <avr/io.h>
+ * 
+ * MAIN_FUNCTION
+ * {
+ *    ...
+ *    
+ *    while (1)
+ *    {
+ *        ...
+ *    }
+ * }
+ * \endcode
  * 
  * \ingroup	utils
  */

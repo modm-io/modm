@@ -134,18 +134,17 @@ namespace xpcc
 		
 		// --------------------------------------------------------------------
 		/**
-		 * \brief	Count the number of bit set to 1
+		 * \brief	Count the number of bits set
 		 * 
 		 * 16 clock cycles on an AVR, without call + return.
 		 * 
-		 * \see		http://infolab.stanford.edu/~manku/bitReverse/bitReverse.html
 		 * \ingroup	math
 		 */
 		std::size_t
 		bitCount(uint8_t n);
 		
 		/**
-		 * \brief	Count the number of bit set to 1
+		 * \brief	Count the number of bits set
 		 * 
 		 * 33 clock cycles on an AVR, without call + return.
 		 * 
@@ -155,7 +154,7 @@ namespace xpcc
 		bitCount(uint16_t n);
 		
 		/**
-		 * \brief	Count the number of bit set to 1
+		 * \brief	Count the number of bits set
 		 * 
 		 * \ingroup	math
 		 */

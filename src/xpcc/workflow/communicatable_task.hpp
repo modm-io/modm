@@ -41,7 +41,7 @@
 namespace xpcc
 {
 	/**
-	 * \brief	A statemachine able to communicate via xpcc
+	 * \brief	A state-machine able to communicate via xpcc
 	 * 
 	 * Needs to be part of a xpcc::AbstractComponent
 	 * 
@@ -50,11 +50,10 @@ namespace xpcc
 	 * \ingroup	workflow
 	 * \author	Fabian Greif
 	 */
-	class CommunicatableTask : public Task, public Communicatable
+	class CommunicatableTask : public Task,
+							   public Communicatable
 	{
 	public:
-		// [proposition -> dergraaf]: make the constructor private and 
-		// AbstractComponent a friend
 		CommunicatableTask(AbstractComponent *parent) :
 			parent(parent)
 		{

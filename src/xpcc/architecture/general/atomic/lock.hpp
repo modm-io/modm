@@ -68,9 +68,19 @@ namespace xpcc
 		class Lock
 		{
 		public:
+			/**
+			 * \brief	Constructor
+			 * 
+			 * Disables interrupts.
+			 */
 			ALWAYS_INLINE
 			Lock();
 			
+			/**
+			 * \brief	Destructor
+			 * 
+			 * Restore the interrupt settings.
+			 */
 			ALWAYS_INLINE
 			~Lock();
 		
@@ -85,14 +95,25 @@ namespace xpcc
 		 * Use this class to create a block of code with interrupts enabled
 		 * inside a locked block.
 		 * 
-		 * Most of the time you won't need this class.
+		 * Most of the time you won't need this class. But on some rare
+		 * times it is useful. The xpcc::Scheduler is an example for that.
 		 */
 		class Unlock
 		{
 		public:
+			/**
+			 * \brief	Constructor
+			 * 
+			 * Enable interrupts
+			 */
 			ALWAYS_INLINE
 			Unlock();
 			
+			/**
+			 * \brief	Destructor
+			 * 
+			 * Restore the interrupt settings.
+			 */
 			ALWAYS_INLINE
 			~Unlock();
 		

@@ -1,9 +1,8 @@
 // coding: utf-8
-// 
 // $Id: utils.dox 94 2009-10-19 18:44:57Z dergraaf $
 
-/*!
+/**
 \defgroup 	utils Utilities
-\brief 		Some utils
+\brief 		Some Utilities
 
 */

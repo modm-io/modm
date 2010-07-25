@@ -46,8 +46,10 @@ namespace xpcc
 		 * Square root calculation based on a implementation by Ruud v Gessel.
 		 * The maximum execution time is 310 clock cycles (inclusive CALL+RET)
 		 * 
-		 * \see		http://www.mikrocontroller.net/articles/AVR_Arithmetik#avr-gcc_Implementierung_.2832_Bit.29
-		 * \see		http://members.chello.nl/j.beentjes3/Ruud/sqrt32avr.htm
+		 * \see		<a href="http://www.mikrocontroller.net/articles/AVR_Arithmetik#avr-gcc_Implementierung_.2832_Bit.29" target="_blank">
+		 * 			Article on microcontroller.net</a>
+		 * \see		<a href="http://members.chello.nl/j.beentjes3/Ruud/sqrt32avr.htm" target="_blank">
+		 * 			Original implementation</a>
 		 * 
 		 * \ingroup	math
 		 */
@@ -76,9 +78,9 @@ namespace xpcc
 		 * \brief	Signed multiply accumulate of two 16bits numbers with
 		 * 			a 32bits result
 		 * 
-		 * \verbatim
+		 * \code
 		 * result += a * b;
-		 * \endverbatim
+		 * \endcode
 		 * 
 		 * \see		AVR201
 		 * \ingroup	math

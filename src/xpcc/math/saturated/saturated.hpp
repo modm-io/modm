@@ -53,7 +53,7 @@ namespace xpcc
 	class Saturated
 	{
 		typedef typename ArithmeticTraits<T>::SignedType SignedType;
-		typedef typename ArithmeticTraits<SignedType>::DoubleType DoubleType;
+		typedef typename ArithmeticTraits<SignedType>::WideType WideType;
 		
 	public:
 		Saturated();
@@ -104,7 +104,7 @@ namespace xpcc
 	
 	private:
 		void
-		setValue(DoubleType value);
+		setValue(WideType value);
 		
 		T value;
 	};

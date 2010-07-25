@@ -29,17 +29,19 @@
  * $Id$
  */
 // ----------------------------------------------------------------------------
-#ifndef XPCC_LOG_STYLE_STD_COLOUR__HPP
-#define XPCC_LOG_STYLE_STD_COLOUR__HPP
+
+#ifndef XPCC_LOG__STD_COLOUR_HPP
+#define XPCC_LOG__STD_COLOUR_HPP
 
 #include "../style.hpp"
-#include <xpcc/utils/typet.hpp>
+#include <xpcc/utils/template_metaprogramming.hpp>
 
 namespace xpcc
 {
 	namespace log
 	{
-		typedef enum {
+		enum Colour
+		{
 			BLACK,
 			RED,
 			GREEN,
@@ -49,14 +51,14 @@ namespace xpcc
 			TURQUOISE,
 			WHITE,
 			NONE
-		} Colour;
+		};
 
 		/**
 		 * \class 	StdColour
 		 * \brief 	This style colours the given stream in the color given by the
 		 * 			template argument.
 		 *
-		 * see webpage http://mathias-kettner.de/lw_farbige_ausgabe_auf_der_konsole.html
+		 * \see http://mathias-kettner.de/lw_farbige_ausgabe_auf_der_konsole.html
 		 *
 		 * \ingroup logger
 		 * \author	Martin Rosekeit <martin.rosekeit@rwth-aachen.de>
@@ -64,173 +66,38 @@ namespace xpcc
 		template <Colour TEXT, Colour BACKGROUND, typename STYLE = DefaultStyle >
 		class StdColour : public Style<STYLE>
 		{
-			public:
-				StdColour(STYLE style);
+		public:
+			StdColour(STYLE style);
 
-				StdColour(IODevice &device);
+			StdColour(IODevice &device);
 
-				inline void
-				parseArg( int argc, char * argv);
+			inline void
+			parseArg( int argc, char * argv);
 
-				~StdColour();
+			~StdColour();
 
-				/// Write one char to the sink.
-				void
-				write( char c );
+			/// Write one char to the sink.
+			void
+			write( char c );
 
-				/// Write a string that terminates with \c '\\0' to the sink.
-				void
-				write( const char* s );
+			/// Write a string that terminates with \c '\\0' to the sink.
+			void
+			write( const char* s );
 
-				/// The message is complete and can be written/send/displayed.
-				void
-				flush();
+			/// The message is complete and can be written/send/displayed.
+			void
+			flush();
 
-			private:
-				inline const char*
-				getTextColour();
+		private:
+			inline const char*
+			getTextColour();
 
-				inline const char*
-				getBackgroundColour();
+			inline const char*
+			getBackgroundColour();
 		};
 	}
 }
 
-// -----------------------------------------------------------------------------
-// -----------------------------------------------------------------------------
+#include "std_colour_impl.hpp"
 
-template <xpcc::log::Colour TEXT, xpcc::log::Colour BACKGROUND, typename STYLE>
-xpcc::log::StdColour<TEXT, BACKGROUND, STYLE>::StdColour( STYLE style ) :
-	Style<STYLE> ( style )
-{
-}
-
-// -----------------------------------------------------------------------------
-
-template <xpcc::log::Colour TEXT, xpcc::log::Colour BACKGROUND, typename STYLE>
-xpcc::log::StdColour<TEXT, BACKGROUND, STYLE>::StdColour(IODevice &device) :
-	Style<STYLE> ( device )
-{
-}
-
-// -----------------------------------------------------------------------------
-
-template <xpcc::log::Colour TEXT, xpcc::log::Colour BACKGROUND, typename STYLE>
-xpcc::log::StdColour<TEXT, BACKGROUND, STYLE>::~StdColour()
-{
-}
-
-// ----------------------------------------------------------------------------
-
-template <xpcc::log::Colour TEXT, xpcc::log::Colour BACKGROUND, typename STYLE>
-void
-xpcc::log::StdColour<TEXT, BACKGROUND, STYLE>::parseArg( int argc, char * argv )
-{
-	this->Style<STYLE>::parseArg( argc, argv );
-}
-
-// -----------------------------------------------------------------------------
-
-template <xpcc::log::Colour TEXT, xpcc::log::Colour BACKGROUND, typename STYLE>
-void
-xpcc::log::StdColour<TEXT, BACKGROUND, STYLE>::write( char c )
-{
-	this->Style<STYLE>::write(this->getTextColour());
-	this->Style<STYLE>::write(this->getBackgroundColour());
-	this->Style<STYLE>::write(c);
-}
-
-// -----------------------------------------------------------------------------
-
-template <xpcc::log::Colour TEXT, xpcc::log::Colour BACKGROUND, typename STYLE>
-void
-xpcc::log::StdColour<TEXT, BACKGROUND, STYLE>::write( const char* s )
-{
-	this->Style<STYLE>::write(this->getTextColour());
-	this->Style<STYLE>::write(this->getBackgroundColour());
-	this->Style<STYLE>::write(s);
-}
-
-// -----------------------------------------------------------------------------
-
-template <xpcc::log::Colour TEXT, xpcc::log::Colour BACKGROUND, typename STYLE>
-void
-xpcc::log::StdColour<TEXT, BACKGROUND, STYLE>::flush()
-{
-	this->Style<STYLE>::write("\033[0m");
-	this->Style<STYLE>::flush();
-}
-
-// -----------------------------------------------------------------------------
-
-template <xpcc::log::Colour TEXT, xpcc::log::Colour BACKGROUND, typename STYLE>
-const char*
-xpcc::log::StdColour<TEXT, BACKGROUND, STYLE>::getTextColour()
-{
-	switch( TEXT ) {
-		case BLACK:
-			return "\033[30m";
-			break;
-		case RED:
-			return "\033[31m";
-			break;
-		case GREEN:
-			return "\033[32m";
-			break;
-		case YELLOW:
-			return "\033[33m";
-			break;
-		case BLUE:
-			return "\033[34m";
-			break;
-		case MAGENTA:
-			return "\033[35m";
-			break;
-		case TURQUOISE:
-			return "\033[36m";
-			break;
-		case WHITE:
-			return "\033[37m";
-			break;
-		default:
-			return "";
-	}
-}
-
-// -----------------------------------------------------------------------------
-
-template <xpcc::log::Colour TEXT, xpcc::log::Colour BACKGROUND, typename STYLE>
-const char*
-xpcc::log::StdColour<TEXT, BACKGROUND, STYLE>::getBackgroundColour()
-{
-	switch( BACKGROUND ) {
-		case BLACK:
-			return "\033[40m";
-			break;
-		case RED:
-			return "\033[41m";
-			break;
-		case GREEN:
-			return "\033[42m";
-			break;
-		case YELLOW:
-			return "\033[43m";
-			break;
-		case BLUE:
-			return "\033[44m";
-			break;
-		case MAGENTA:
-			return "\033[45m";
-			break;
-		case TURQUOISE:
-			return "\033[46m";
-			break;
-		case WHITE:
-			return "\033[47m";
-			break;
-		default:
-			return "";
-	}
-}
-
-#endif // XPCC_LOG_STYLE_STD_COLOUR__HPP
+#endif // XPCC_LOG__STD_COLOUR_HPP

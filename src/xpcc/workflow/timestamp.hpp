@@ -42,7 +42,7 @@ namespace xpcc
 	 * \brief	Simple 16-bit timestamp
 	 * 
 	 * \author	Fabian Greif
-	 * \ingroup	hal
+	 * \ingroup	workflow
 	 */ 
 	class Timestamp
 	{
@@ -107,16 +107,14 @@ namespace xpcc
 		}
 	
 	private:
-		friend IOStream&
-		operator <<( IOStream&, const Timestamp& );
-
 		uint16_t time;
 	};
-
+	
+	// ------------------------------------------------------------------------
 	inline IOStream&
-	operator<<( IOStream& os, const Timestamp& t)
+	operator << ( IOStream& os, const Timestamp& t)
 	{
-		os << t.time;
+		os << t.getTime();
 		return os;
 	}
 }

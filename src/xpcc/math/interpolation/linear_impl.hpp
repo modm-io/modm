@@ -35,7 +35,6 @@
 #endif
 
 // ----------------------------------------------------------------------------
-
 template <typename T,
 		  template <typename> class Accessor>
 xpcc::interpolation::Linear<T, Accessor>::Linear(
@@ -45,7 +44,6 @@ xpcc::interpolation::Linear<T, Accessor>::Linear(
 }
 	
 // ----------------------------------------------------------------------------
-
 template <typename T,
 		  template <typename> class Accessor>
 typename xpcc::interpolation::Linear<T, Accessor>::OutputType

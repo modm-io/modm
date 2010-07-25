@@ -31,15 +31,17 @@
 // ----------------------------------------------------------------------------
 
 // the default style creates globals objects, so it can only one time be included
-#ifdef XPCC_LOG_STYLE_DEFAULT__HPP
-	#error "Second includition of a default log style"
+#ifdef XPCC_LOG__STYLE_DEFAULT_HPP
+	#error "Second inclusion of a default log style"
 #else
-#define XPCC_LOG_STYLE_DEFAULT__HPP
+#define XPCC_LOG__STYLE_DEFAULT_HPP
 
 #ifdef __AVR__
 	// this version is to use on PC only
-	#error "not to use on AVRs"
+	#error "You can't use this style AVRs"
 #endif
+
+#ifndef __DOXYGEN__
 
 #include "../logger.hpp"
 #include "../style_wrapper.hpp"
@@ -81,4 +83,5 @@ namespace xpcc
 	}
 }
 
-#endif // XPCC_LOG_STYLE_DEFAULT__HPP
+#endif	// !__DOXYGEN__
+#endif	// XPCC_LOG__STYLE_DEFAULT_HPP

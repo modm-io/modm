@@ -5,7 +5,6 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -30,30 +29,21 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__IOSTREAM_HPP
-	#error	"Don't include this file directly, use 'iostream.hpp' instead!"
-#endif
+#include "flag.hpp"
 
-#include <stdio.h>		// snprintf()
-#include <stdlib.h>
-
-#include <xpcc/utils/arithmetic_traits.hpp>
-#include <xpcc/utils/template_metaprogramming.hpp>
-
-// ----------------------------------------------------------------------------
-
-template<typename T>
-void
-xpcc::IOStream::writeFloat( const T& value )
+xpcc::atomic::Flag::Flag(bool state) : 
+	state(state)
 {
-	// hard coded for 2.22507e-308
-	char str[13 + 1]; // +1 for '\0'
-	
-#ifdef __AVR__
-	dtostre(value, str, 5, 0);
-#else
-	snprintf(str, sizeof(str), "%.5e", value);
-#endif
-	
-	this->device->write(str);
+}
+
+xpcc::atomic::Flag::Flag(const Flag& other) :
+	state(other.state)
+{
+}
+
+xpcc::atomic::Flag&
+xpcc::atomic::Flag::operator = (const Flag& other)
+{
+	this->state = other.state;
+	return *this;
 }

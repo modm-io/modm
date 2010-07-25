@@ -36,7 +36,7 @@
 #include <cstddef>
 
 #include <stdint.h>
-#include <xpcc/utils/typet.hpp>
+#include <xpcc/utils/template_metaprogramming.hpp>
 
 namespace xpcc
 {

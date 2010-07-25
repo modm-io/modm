@@ -34,7 +34,7 @@
 #define XPCC_LOG__STYLE_HPP
 
 #include <xpcc/io/iodevice.hpp>
-#include <xpcc/utils/typet.hpp>
+#include <xpcc/utils/template_metaprogramming.hpp>
 
 namespace xpcc
 {

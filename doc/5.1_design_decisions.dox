@@ -31,8 +31,8 @@ vtable lookup like for virtual methods. This leads to fast access and low RAM
 and Flash consumption.
 
 There are two acceptable drawbacks:
-1. Increased codesize if a driver is used many times with different parameters.
-2. No possibly of reconfiguring on runtime.
+-# Increased codesize if a driver is used many times with different parameters.
+-# No possibly of reconfiguring on runtime.
 
 \todo explain in more detail.
 

@@ -35,31 +35,34 @@
 #endif
 
 // ----------------------------------------------------------------------------
-
-template<typename T>
-xpcc::interpolation::Lagrange<T>::Lagrange(accessor::Flash<T> points,
-											uint8_t numPoints):
-	points(points), numPoints(numPoints)
+template <typename T,
+		  template <typename> class Accessor>
+xpcc::interpolation::Lagrange<T, Accessor>::Lagrange(
+		Accessor<T> supportingPoints, uint8_t numberOfPoints) :
+	supportingPoints(supportingPoints), numberOfPoints(numberOfPoints)
 {
 }
 
 // ----------------------------------------------------------------------------
 
-template<typename T>
-T
-xpcc::interpolation::Lagrange<T>::interpolate(const T& value) const
-{	
-	T ret = 0;
-	for (uint8_t i = 0; i < this->numPoints; ++i)
+template <typename T,
+		  template <typename> class Accessor>
+typename xpcc::interpolation::Lagrange<T, Accessor>::OutputType
+xpcc::interpolation::Lagrange<T, Accessor>::interpolate(const InputType& value) const
+{
+	OutputType ret = 0;
+	for (uint8_t i = 0; i < this->numberOfPoints; ++i)
 	{
-		T li = 1;
-		for (uint8_t j = 0; j < this->numPoints; ++j)
+		OutputType li = 1;
+		for (uint8_t j = 0; j < this->numberOfPoints; ++j)
 		{
 			if (i != j) {
-				li *= (value - points[2 * j]) / (points[2 * i] - points[2 * j]);
+				li *= static_cast<OutputType>(value - this->supportingPoints[j].getFirst()) / 
+					  static_cast<OutputType>(this->supportingPoints[i].getFirst() - 
+							  this->supportingPoints[j].getFirst());
 			}
 		}
-		ret += li * points[2*i+1];
+		ret += li * this->supportingPoints[i].getSecond();
 	}
 	
 	return ret;

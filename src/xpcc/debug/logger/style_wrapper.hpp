@@ -47,31 +47,31 @@ namespace xpcc
 		template < typename STYLE >
 		class StyleWrapper : public IODevice
 		{
-			public :
-				StyleWrapper( STYLE style );
+		public :
+			StyleWrapper( STYLE style );
 
-				virtual
-				~StyleWrapper();
+			virtual
+			~StyleWrapper();
 
-				virtual void
-				write(char c);
+			virtual void
+			write(char c);
 
-				virtual void
-				write(const char* str);
+			virtual void
+			write(const char* str);
 
-				virtual void
-				flush();
+			virtual void
+			flush();
 
-				virtual bool
-				read(char&);
+			virtual bool
+			read(char&);
 
-			private :
-				StyleWrapper( const StyleWrapper& );
+		private :
+			StyleWrapper( const StyleWrapper& );
 
-				StyleWrapper&
-				operator=( const StyleWrapper& );
+			StyleWrapper&
+			operator=( const StyleWrapper& );
 
-				STYLE style;
+			STYLE style;
 		};
 	}
 }

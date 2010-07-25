@@ -34,6 +34,27 @@
 
 #include "linear_interpolation_test.hpp"
 
+void
+LinearInterpolationTest::testInterpolationRam()
+{
+	typedef xpcc::Pair<int16_t, uint16_t> Point;
+	
+	Point points[3] =
+	{
+		{ -10, 50 },
+		{  50, 10 },
+		{ 100,  0 }
+	};
+	
+	xpcc::interpolation::Linear<Point> value(points, 3);
+	
+	TEST_ASSERT_EQUALS(value.interpolate(-20), 50);
+	TEST_ASSERT_EQUALS(value.interpolate( 10), 37);
+	TEST_ASSERT_EQUALS(value.interpolate( 30), 24);
+	TEST_ASSERT_EQUALS(value.interpolate( 50), 10);
+	TEST_ASSERT_EQUALS(value.interpolate(150),  0);
+}
+
 typedef xpcc::Pair<uint8_t, int16_t> MyPair;
 
 FLASH(MyPair flashValues[6]) =
@@ -47,7 +68,7 @@ FLASH(MyPair flashValues[6]) =
 };
 
 void 
-LinearInterpolationTest::testInterpolation()
+LinearInterpolationTest::testInterpolationFlash()
 {
 	xpcc::interpolation::Linear<MyPair, xpcc::accessor::Flash> \
 		value(xpcc::accessor::asFlash(flashValues), 6);

@@ -34,7 +34,12 @@
 #define	XPCC_INTERPOLATION__LAGRANGE_HPP
 
 #include <stdint.h>
+
+#include <xpcc/utils/arithmetic_traits.hpp>
+#include <xpcc/container/pair.hpp>
 #include <xpcc/architecture/general/accessor.hpp>
+
+#include <xpcc/utils/template_metaprogramming.hpp>
 
 namespace xpcc
 {
@@ -43,21 +48,74 @@ namespace xpcc
 		/**
 		 * \brief	Lagrange Interpolation
 		 * 
-		 * \todo	needs documentation
+		 * Example:
+		 * \code
+		 * typedef xpcc::Pair<float, float> Point;
+		 * 
+		 * // interpolate x^2 over the range of 1 <= x <= 3
+		 * Point points[3] =
+		 * {
+		 *     { 1, 1 },
+		 *     { 2, 4 },
+		 *     { 3, 9 }
+		 * };
+		 * 
+		 * xpcc::interpolation::Lagrange<Point> value(points, 3);
+		 * 
+		 * ...
+		 * float output = value.interpolate(1.5f);
+		 * // output => 2.25;
+		 * \endcode
+		 * 
+		 * \see http://en.wikipedia.org/wiki/Lagrange_interpolation
+		 * 
+		 * \warning	Only floating points types are allowed as second type of
+		 * 			xpcc::Pair because the calculation will deliver wrong
+		 * 			results otherwise!
+		 * 
+		 * \tparam	T	Any specialization of xpcc::Pair<> with a floating
+		 * 				point type as second template argument.
+		 * \tparam	Accessor	Accessor class. Can be xpcc::accessor::Ram,
+		 * 						xpcc::accessor::Flash or any self defined
+		 * 						accessor class.
+		 * 						Default is xpcc::accessor::Ram.
+		 * 
 		 * \ingroup	interpolation
 		 */
-		template<typename T>
+		template <typename T,
+				  template <typename> class Accessor = ::xpcc::accessor::Ram>
 		class Lagrange
 		{
 		public:
-			Lagrange(accessor::Flash<T> points, uint8_t numPoints);
+			typedef typename T::FirstType InputType;
+			typedef typename T::SecondType OutputType;
 			
-			T
-			interpolate(const T& value) const;
+			// WARNING:
+			// Only floating points types are allowed as second type of xpcc::Pair
+			// because the calculation will deliver wrong results otherwise!
+			XPCC__STATIC_ASSERT(xpcc::ArithmeticTraits<OutputType>::isFloatingPoint);
+		public:
+			/**
+			 * \brief	Constructor
+			 * 
+			 * \param	supportingPoints	Supporting points of the curve.
+			 * 								Needs to be an Array of xpcc::Pair<>.
+			 * \param	numberOfPoints		length of \p supportingPoints
+			 */
+			Lagrange(Accessor<T> supportingPoints, uint8_t numberOfPoints);
+			
+			/**
+			 * \brief	Perform a Lagrange-interpolation
+			 * 
+			 * \param 	value	input value
+			 * \return	interpolated value
+			 */
+			OutputType 
+			interpolate(const InputType& value) const;
 			
 		private:
-			accessor::Flash<T> points;
-			uint8_t numPoints; 
+			const Accessor<T> supportingPoints;
+			const uint8_t numberOfPoints; 
 		};
 	}
 }

@@ -50,7 +50,7 @@ namespace xpcc
 	 * // configure a UART
 	 * xpcc::BufferedUart0 uart(9600);
 	 * 
-	 * // wrap it in a IODevice
+	 * // wrap it into an IODevice
 	 * xpcc::IODeviceWrapper<xpcc::BufferedUart0> device(uart);
 	 * 
 	 * // use this device to print a message

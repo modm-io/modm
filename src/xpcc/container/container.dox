@@ -42,6 +42,19 @@ Other:
  - xpcc::SmartPointer
  - xpcc::Pair
 
+Two special containers worth mentioning hide in \ref atomic "atomic" section:
+ - xpcc::atomic::Queue
+ - xpcc::atomic::Container
+
+The first is a simple, interrupt-save queue (but only for the AVRs).
+Whenever you need an  to exchange data between a interrupt routine and
+the normal program consider using this queue.
+
+The atomic container wraps objects and provides atomic access to
+them. This comes in handy when simple objects are accessed by an interrupt
+and the main program. The container provides secure access without much work
+in this case.
+
 <h3>Generic Interface</h3>
 
 All implementation share a common set of function. Not every container implement
