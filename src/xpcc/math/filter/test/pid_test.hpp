@@ -30,76 +30,13 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC__MACROS_HPP
-#define	XPCC__MACROS_HPP
+#include <unittest/testsuite.hpp>
 
-/**
- * \brief	Force inlining
- * 
- * Macro to force inlining on functions if needed. Compiling with -Os  does not
- * always inline them when declared only \c inline.
- * 
- * \ingroup	utils
- */
-#ifdef __GNUC__
-	#define ALWAYS_INLINE  inline __attribute__((always_inline))
-	#define ATTRIBUTE_UNUSED __attribute__((unused))
-#else
-	#include <xpcc/architecture/pc/windows.hpp>
-	
-	#define ATTRIBUTE_UNUSED
-#endif
-
-#ifdef __DOXYGEN__
-
-	/**
-	 * \brief	Convert the argument into a C-String
-	 * \ingroup	utils
-	 */
-	#define	STRINGIFY(s)	#s
-
-	/**
-	 * \brief	Concatenate the two arguments
-	 * \ingroup	utils
-	 */
-	#define	CONCAT(a,b)		a ## b
-
-#else // !__DOXYGEN__
-
-	#define	STRINGIFY(s)	STRINGIFY2(s)
-	#define	STRINGIFY2(s)	STRINGIFY3(s)
-	#define	STRINGIFY3(s)	#s
-
-	#define	CONCAT(a,b)		CONCAT2(a,b)
-	#define	CONCAT2(a,b)	CONCAT3(a,b)
-	#define	CONCAT3(a,b)	a ## b
-
-#endif
-
-/**
- * \brief	Main function definition for microcontroller projects
- * 
- * Inhibits some stack operations at the beginning of main for avr-gcc. May
- * save up a few bytes of stack memory.
- * 
- * Typical structure of an microcontroller program:
- * \code
- * #include <avr/io.h>
- * 
- * MAIN_FUNCTION
- * {
- *    ...
- *    
- *    while (1)
- *    {
- *        ...
- *    }
- * }
- * \endcode
- * 
- * \ingroup	utils
- */
-#define	MAIN_FUNCTION	int main(void) __attribute__((OS_main)); \
-						int main(void)
-
-#endif	// XPCC__MACROS_HPP
+class PidTest : public unittest::TestSuite
+{
+public:
+	// this test doesn't check the behavior but only that the class
+	// can be created and compiles without errors
+	void
+	testCreation();
+};

@@ -94,10 +94,10 @@ xpcc::Pid<T, ScaleFactor>::update(const T& input, bool externalLimitation)
 		tempErrorSum = -this->parameter.maxErrorSum;
 	}
 	
-	DoubleType tmp = 0;
-	tmp += static_cast<DoubleType>(this->parameter.kp) * input;
-	tmp += static_cast<DoubleType>(this->parameter.ki) * (tempErrorSum);
-	tmp += static_cast<DoubleType>(this->parameter.kd) * (input - this->lastError);
+	WideType tmp = 0;
+	tmp += static_cast<WideType>(this->parameter.kp) * input;
+	tmp += static_cast<WideType>(this->parameter.ki) * (tempErrorSum);
+	tmp += static_cast<WideType>(this->parameter.kd) * (input - this->lastError);
 	
 	tmp = tmp / ScaleFactor;
 	

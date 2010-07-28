@@ -51,7 +51,6 @@ namespace xpcc
 	 * With the template parameter \c ScaleFactor this class provides an
 	 * fix point capability with integer types.
 	 * 
-	 * \todo	check implementation
 	 * \todo	use the faster avr::mul and avr::mac functions
 	 * 
 	 * \author	Fabian Greif
@@ -60,7 +59,7 @@ namespace xpcc
 	template<typename T, unsigned int ScaleFactor = 1>
 	class Pid
 	{
-		typedef typename ArithmeticTraits<T>::DoubleType DoubleType;
+		typedef typename ArithmeticTraits<T>::WideType WideType;
 		
 	public:
 		typedef T ValueType;
@@ -96,9 +95,9 @@ namespace xpcc
 			}
 			
 		private:
-			T kp;		///< proportional gain multiplied with ScaleFactor
-			T ki;		///< integral gain multiplied with ScaleFactor
-			T kd;		///< differentail gain multiplied with ScaleFactor
+			T kp;		///< Proportional gain multiplied with ScaleFactor
+			T ki;		///< Integral gain multiplied with ScaleFactor
+			T kd;		///< Differential gain multiplied with ScaleFactor
 			
 			T maxErrorSum;	///< integral will be limited to this value
 			T maxOutput;	///< output will be limited to this value
@@ -110,7 +109,7 @@ namespace xpcc
 		/**
 		 * \param	kp	proportional gain
 		 * \param	ki	integral gain
-		 * \param	kd	differentail gain
+		 * \param	kd	differential gain
 		 * \param	maxErrorSum	integral will be limited to this value
 		 * \param	maxOutput	output will be limited to this value
 		 **/
