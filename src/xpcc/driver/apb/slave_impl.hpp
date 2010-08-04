@@ -43,60 +43,13 @@ xpcc::apb::Response::send(const T& payload)
 	transmitter->send(true, reinterpret_cast<const void *>(&payload), sizeof(T));
 }
 
+// ----------------------------------------------------------------------------
 inline void
 xpcc::apb::Action::call(Response& response, const void *payload)
 {
 	// redirect call to the actual object
 	(object->*function)(response, payload);
 }
-
-// ----------------------------------------------------------------------------
-/*
-template <typename Interface>
-void
-xpcc::apb::Slave<Interface>::sendErrorResponse(uint8_t errorCode)
-{
-	uint8_t error = errorCode;
-	
-	Interface::sendMessage(
-			ownAddress,
-			false,
-			currentCommand,
-			&error,
-			1);
-}
-
-template <typename Interface>
-void
-xpcc::apb::Slave<Interface>::sendResponse(
-		const uint8_t *payload, uint8_t payloadLength)
-{
-	Interface::sendMessage(
-			ownAddress,
-			true,
-			currentCommand,
-			payload, payloadLength);
-}
-
-template <typename Interface> template <typename T>
-void
-xpcc::apb::Slave<Interface>::sendResponse(const T& payload)
-{
-	sendResponse(
-			reinterpret_cast<const uint8_t *>(&payload),
-			sizeof(T));
-}
-
-template <typename Interface>
-void
-xpcc::apb::Slave<Interface>::sendResponse()
-{
-	Interface::sendMessage(
-			ownAddress,
-			true,
-			currentCommand,
-			NULL, 0);
-}*/
 
 // ----------------------------------------------------------------------------
 template <typename Interface>
@@ -125,7 +78,7 @@ xpcc::apb::Slave<Interface>::update()
 			for (uint8_t i = 0; i < actionCount; ++i, ++list)
 			{
 				Action action(*list);
-				if (currentCommand == action.command)
+				if (this->currentCommand == action.command)
 				{
 					if (Interface::getPayloadLength() == action.payloadLength)
 					{
@@ -133,18 +86,18 @@ xpcc::apb::Slave<Interface>::update()
 						action.call(this->response, Interface::getPayload());
 						
 						if (!this->response.triggered) {
-							this->response.error(Interface::GENERAL_ERROR);
+							this->response.error(ERROR__NO_RESPONSE);
 						}
 					}
 					else {
-						this->response.error(Interface::WRONG_PAYLOAD_LENGTH);
+						this->response.error(ERROR__WRONG_PAYLOAD_LENGTH);
 					}
 					break;
 				}
 			}
 			
 			if (!this->response.triggered) {
-				this->response.error(Interface::NO_ACTION);
+				this->response.error(ERROR__NO_ACTION);
 			}
 		}
 		Interface::dropMessage();

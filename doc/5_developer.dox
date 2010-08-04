@@ -7,4 +7,5 @@
 - \subpage design_decisions
 - \subpage coding_conventions
 - \subpage unittests
+- \subpage license
 */

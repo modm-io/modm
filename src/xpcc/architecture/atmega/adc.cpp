@@ -44,7 +44,7 @@ xpcc::Adc::initialize(Reference referenceVoltage, Prescaler prescaler)
 
 // ----------------------------------------------------------------------------
 uint16_t
-xpcc::Adc::convert(uint8_t channel)
+xpcc::Adc::readChannel(uint8_t channel)
 {
 	if (channel > 8)
 		return 0;

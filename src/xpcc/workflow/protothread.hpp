@@ -137,8 +137,10 @@ namespace xpcc
 		 * \brief	Stop the protothread from running.
 		 * 
 		 * Happens automatically at PT_END.
-		 * Note: this differs from the Dunkels' original protothread behaviour
-		 * (his restart automatically, which is usually not what you want).
+		 * 
+		 * \note	This differs from the Dunkels' original protothread
+		 * 			behavior (his restart automatically, which is usually not
+		 * 			what you want).
 		 */
 		inline void
 		stop()
@@ -198,8 +200,8 @@ namespace xpcc
 	 * The main difference between this class and the ProtothreadLight is
 	 * that the run() method is declared virtual here.
 	 * 
-	 * Therefore it is possible to create a group of Protothread and access
-	 * the throught a pointer to their base class.
+	 * Therefore it is possible to create a group of Protothreads and access
+	 * the through a pointer to their base class.
 	 * 
 	 * \ingroup	protothread
 	 */
@@ -314,7 +316,7 @@ namespace xpcc
 				return true; \
     } while (0)
 
-#define PT_WAIT_THREAD(child) PT_WAIT_UNTIL(!(child).run())
+#define PT_WAIT_THREAD(child) 	PT_WAIT_UNTIL(!(child).run())
 
 #define PT_SPAWN(child) \
     do { \

@@ -33,6 +33,7 @@
 #ifndef	XPCC_APB__INTERFACE_HPP
 #define	XPCC_APB__INTERFACE_HPP
 
+#include <cstddef>
 #include <stdint.h>
 #include <xpcc/utils/macros.hpp>
 
@@ -41,35 +42,75 @@ namespace xpcc
 	namespace apb
 	{
 		/**
-		 * \internal
+		 * \brief	Error code
+		 * 
+		 * Error codes below 0x20 are reserved for the system. Every other
+		 * code may be used by user.
+		 * 
+		 * \ingroup	apb
 		 */
-		class Base
+		enum Error
 		{
-		public:
-			enum Error
-			{
-				GENERAL_ERROR = 0,
-				NO_ACTION,
-				WRONG_PAYLOAD_LENGTH
-			};
+			/**
+			 * \brief	Universal error code
+			 * 
+			 * Use this code if you're not sure what error to signal. If
+			 * the user should react to the error code, create a specific
+			 * one for the given problem.
+			 */
+			ERROR__GENERAL_ERROR = 0x00,
+			ERROR__NO_ACTION = 0x01, 		///< No corresponding action found for this command
 			
-			static const uint8_t masterAddress = 0;
-			static const uint8_t maxPayloadLength = 32;
+			/**
+			 * \brief	Unexpected payload length
+			 * 
+			 * The payload length of the received message differs from the
+			 * expected length for the given command.
+			 */
+			ERROR__WRONG_PAYLOAD_LENGTH = 0x02,
 			
-		protected:
-			Base()
-			{
-			}
-			
-			static const uint8_t syncByte = 0x54;
-			static const uint8_t crcInitialValue = 0x00;
-			
-			static uint8_t
-			crcUpdate(uint8_t crc, uint8_t data);
+			/**
+			 * \brief	No response given by the user
+			 * 
+			 * This error code is generated when no response method is called
+			 * by the user during an action callback.
+			 */
+			ERROR__NO_RESPONSE = 0x03,
 		};
 		
 		/**
-		 * \brief	APB Interface
+		 * \brief	Maximum length for the payload
+		 * \ingroup	apb
+		 */
+		const uint8_t maxPayloadLength = 32;
+		
+		/**
+		 * \internal
+		 * \brief	Universal base class for the APB interface
+		 * \ingroup	apb
+		 */
+		const uint8_t syncByte = 0x54;
+		
+		/**
+		 * \internal
+		 * \brief	Initial value for the CRC8 calculation
+		 * \ingroup	apb
+		 */
+		const uint8_t crcInitialValue = 0x00;
+		
+		/**
+		 * \internal
+		 * \brief	Universal base class for the APB interface
+		 * 
+		 * \see		<a href="http://www.maxim-ic.com/app-notes/index.mvp/id/27" target="_blank">
+		 * 			Understanding and Using Cyclic Redundancy Checks with Maxim iButton Products</a>
+		 * \ingroup	apb
+		 */
+		uint8_t
+		crcUpdate(uint8_t crc, uint8_t data);
+		
+		/**
+		 * \brief	APB interface
 		 * 
 		 * Example:
 		 * \include apb_interface.cpp
@@ -78,7 +119,7 @@ namespace xpcc
 		 * \author	Fabian Greif
 		 */
 		template <typename Device>
-		class Interface : public Base
+		class Interface
 		{
 		public:
 			/**
@@ -92,7 +133,7 @@ namespace xpcc
 			/**
 			 * \brief	Send a message
 			 * 
-			 * \param	header			header flags and receiver address
+			 * \param	address			receiver address
 			 * \param	acknowledge		\c true if message is an acknowledge,
 			 * 							\c false otherwise
 			 * \param	command			command byte

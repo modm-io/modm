@@ -33,7 +33,7 @@
 #include "interface.hpp"
 
 uint8_t
-xpcc::apb::Base::crcUpdate(uint8_t crc, uint8_t data)
+xpcc::apb::crcUpdate(uint8_t crc, uint8_t data)
 {
 #ifdef __AVR__
 	return _crc_ibutton_update(crc, data);

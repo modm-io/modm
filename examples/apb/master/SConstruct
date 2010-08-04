@@ -28,17 +28,15 @@
 # 
 # $Id$
 
-rootpath = '../..'
+rootpath = '../../..'
 
-env = Environment(tools = ['xpcc'], toolpath = [rootpath + '/misc/scons'], buildpath = '../build')
+env = Environment(tools = ['xpcc'], toolpath = [rootpath + '/misc/scons'], buildpath = '../../build')
 
-# choose the example file
-example = ARGUMENTS.get('example')
-if not example:
-	example = '0_slave.cpp'
+# find all source files
+files = env.FindFiles('.')
 
 # build the program
-program = env.Program(target = env['XPCC_CONFIG']['general']['name'], source = example)
+program = env.Program(target = env['XPCC_CONFIG']['general']['name'], source = files.sources)
 
 # build the xpcc library
 env.XpccLibrary()

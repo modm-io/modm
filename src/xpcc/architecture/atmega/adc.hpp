@@ -47,7 +47,7 @@ namespace xpcc
 	 * main()
 	 * {
 	 *     xpcc::Adc::initialize(
-	 *             xpcc::Adc::INTERNAL_2V56,
+	 *             xpcc::Adc::REFERENCE_INTERNAL_2V56,
 	 *             xpcc::Adc::PRESCALER_8);
 	 *     
 	 *     ...
@@ -76,10 +76,10 @@ namespace xpcc
 	public:
 		enum Reference
 		{
-			AREF = 0,
-			AVCC = 0x40,
-			INTERNAL_1V1 = 0x80,
-			INTERNAL_2V56 = 0xc0
+			REFERENCE_AREF = 0,
+			REFERENCE_AVCC = 0x40,
+			REFERENCE_INTERNAL_1V1 = 0x80,
+			REFERENCE_INTERNAL_2V56 = 0xc0
 		};
 		
 		enum Prescaler
@@ -109,7 +109,7 @@ namespace xpcc
 		 * This time increases with a lower frequency.
 		 */
 		static uint16_t
-		convert(uint8_t channel);
+		readChannel(uint8_t channel);
 		
 		/// Start a new conversion
 		static void

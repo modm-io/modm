@@ -38,6 +38,7 @@ This manual is divided in the following sections:
   - \ref design_decisions
   - \ref coding_conventions
   - \ref unittests
+  - \ref license
 
 \section people The people behind this library
 
