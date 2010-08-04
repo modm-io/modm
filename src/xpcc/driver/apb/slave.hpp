@@ -33,6 +33,7 @@
 #ifndef	XPCC_APB__SLAVE_HPP
 #define	XPCC_APB__SLAVE_HPP
 
+#include <cstddef>
 #include <xpcc/architecture/general/accessor/flash.hpp>
 
 #include "interface.hpp"
@@ -42,6 +43,79 @@ namespace xpcc
 	namespace apb
 	{
 		/**
+		 * \internal
+		 */
+		class Transmitter
+		{
+		public:
+			virtual void
+			send(bool acknowledge, const void *payload, uint8_t payloadLength) = 0;
+		};
+		
+		/**
+		 * \brief	Response object for an action call
+		 * 
+		 * \ingroup	apb
+		 */
+		class Response
+		{
+			template <typename I>
+			friend class Slave;
+			
+		public:
+			void
+			error(uint8_t errorCode = Base::GENERAL_ERROR);
+			
+			void
+			send();
+			
+			void
+			send(const void *payload, std::size_t length);
+			
+			template <typename T>
+			ALWAYS_INLINE void
+			send(const T& payload);
+			
+		protected:
+			Response(Transmitter *parent);
+			
+			Response(const Response&);
+			
+			Response&
+			operator = (const Response&);
+			
+			bool triggered;
+			Transmitter *transmitter;
+		};
+		
+		/**
+		 * \brief	Base-class for every object which should be used inside
+		 * 			a callback
+		 * 
+		 * \ingroup	apb
+		 */
+		struct Callable
+		{
+		};
+		
+		/**
+		 * \brief	Possible Action
+		 * \ingroup	apb
+		 */
+		struct Action
+		{
+			typedef void (Callable::*Callback)(Response& response, const void *payload);
+			
+			inline void
+			call(Response& response, const void *payload);
+			
+			uint8_t command;
+			uint8_t payloadLength;		//!< Payload length in bytes
+			Callable *object;
+			Callback function;			//!< Method callActionback
+		};
+		
+		/**
 		 * \brief	APB Slave
 		 * 
 		 * \todo	documentation
@@ -49,21 +123,9 @@ namespace xpcc
 		 * \ingroup	apb
 		 * \author	Fabian Greif
 		 */
-		template <typename INTERFACE>
-		class Slave
+		template <typename Interface>
+		class Slave : protected Transmitter
 		{
-		public:
-			typedef typename INTERFACE::ErrorCode ErrorCode;
-			
-			struct Action
-			{
-				typedef void (*Callback)(Slave<INTERFACE>& slave, const uint8_t *payload);
-				
-				uint8_t command;
-				uint8_t payloadLength;
-				Callback function;
-			};
-			
 		public:
 			/**
 			 * \brief	Initialize the slave
@@ -76,26 +138,41 @@ namespace xpcc
 			Slave(uint8_t address, xpcc::accessor::Flash<Action> actionList, uint8_t actionCount);
 			
 			void
-			sendErrorResponse(uint8_t errorCode = INTERFACE::GENERAL_ERROR);
-			
-			void
-			sendResponse();
-			
-			void
-			sendResponse(const uint8_t *payload, uint8_t payloadLength);
-			
-			void
 			update();
 			
-		private:
+		protected:
+			void
+			send(bool acknowledge, const void *payload, uint8_t payloadLength);
+			
 			uint8_t ownAddress;
 			xpcc::accessor::Flash<Action> actionList;
 			uint8_t actionCount;
 			
 			uint8_t currentCommand;
+			Response response;
 		};
 	}
 }
+
+#ifdef __DOXYGEN__
+	/**
+	 * \brief	Define a apb::Action
+	 * 
+	 * \param	command		Command byte
+	 * \param	object		
+	 * \param	function	Member function of object
+	 * \param	length		Parameter size in bytes
+	 * 
+	 * \ingroup	apb
+	 */
+	#define	APB__ACTION(command, object, function, length)
+#else
+	#define	APB__ACTION(command, object, function, length)		\
+		{	command, \
+			length, \
+			static_cast<xpcc::apb::Callable *>(&object), \
+			reinterpret_cast<xpcc::apb::Action::Callback>(&function) }
+#endif	// __DOXYGEN__
 
 #include "slave_impl.hpp"
 

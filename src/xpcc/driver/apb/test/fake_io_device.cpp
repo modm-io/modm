@@ -5,7 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -30,18 +30,54 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_APB__SERVO_HPP
-#define XPCC_APB__SERVO_HPP
+#include <cstring>
+#include "fake_io_device.hpp"
 
-#include "../interface.hpp"
+uint8_t FakeIODevice::sendBuffer[40];
+uint8_t FakeIODevice::bytesSend = 0;
 
-namespace xpcc
+uint8_t FakeIODevice::receiveBuffer[40];
+uint8_t FakeIODevice::receivePosition = 0;
+uint8_t FakeIODevice::bytesReceived = 0;
+
+void
+FakeIODevice::setBaudrate(uint32_t)
 {
-	namespace apb
-	{
-		
-		
+}
+
+void
+FakeIODevice::write(char data)
+{
+	sendBuffer[bytesSend++] = data;
+}
+
+bool
+FakeIODevice::read(char& byte)
+{
+	if (receivePosition >= bytesReceived) {
+		return false;
+	}
+	else {
+		byte = receiveBuffer[receivePosition++];
+		return true;
 	}
 }
 
-#endif	// XPCC_APB__SERVO_HPP
+
+void
+FakeIODevice::reset()
+{
+	bytesReceived = 0;
+	receivePosition = 0;
+	bytesSend = 0;
+}
+
+void
+FakeIODevice::moveSendToReceiveBuffer()
+{
+	std::memcpy(receiveBuffer, sendBuffer, bytesSend);
+	bytesReceived = bytesSend;
+	receivePosition = 0;
+	
+	bytesSend = 0;
+}

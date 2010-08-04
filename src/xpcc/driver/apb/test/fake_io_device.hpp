@@ -5,7 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -30,18 +30,36 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_APB__SERVO_HPP
-#define XPCC_APB__SERVO_HPP
+#ifndef FAKE_IO_DEVICE_HPP
+#define FAKE_IO_DEVICE_HPP 
 
-#include "../interface.hpp"
+#include <stdint.h>
 
-namespace xpcc
+class FakeIODevice
 {
-	namespace apb
-	{
-		
-		
-	}
-}
+public:
+	static void
+	setBaudrate(uint32_t);
+	
+	static void
+	write(char data);
+	
+	static bool
+	read(char& byte);
+	
+	static void
+	reset();
+	
+	
+	static void
+	moveSendToReceiveBuffer();
+	
+	static uint8_t sendBuffer[40];
+	static uint8_t bytesSend;
+	
+	static uint8_t receiveBuffer[40];
+	static uint8_t receivePosition;
+	static uint8_t bytesReceived;
+};
 
-#endif	// XPCC_APB__SERVO_HPP
+#endif	// FAKE_IO_DEVICE_HPP

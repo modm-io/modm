@@ -86,11 +86,11 @@
 /**
  * \brief	Check if the arrays contains the same data
  * 
- * count is optional.
+ * start is optional (default = 0).
  * 
  * \ingroup	unittest
  */
-#define	TEST_ASSERT_EQUALS_ARRAY(array1, array2, start, count)
+#define	TEST_ASSERT_EQUALS_ARRAY(array1, array2, count, start)
 
 /**
  * \brief	Fail unconditionally  

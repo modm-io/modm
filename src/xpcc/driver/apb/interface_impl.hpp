@@ -38,121 +38,140 @@
 	#include <util/crc16.h>
 #endif
 
-#include <xpcc/architecture/general/gpio.hpp>
-GPIO__OUTPUT(LedRed2, D, 6);
+// ----------------------------------------------------------------------------
+template <typename Device> typename xpcc::apb::Interface<Device>::State \
+	xpcc::apb::Interface<Device>::state = SYNC;
+
+template <typename Device> uint8_t xpcc::apb::Interface<Device>::buffer[maxPayloadLength + 3];
+template <typename Device> uint8_t xpcc::apb::Interface<Device>::crc;
+template <typename Device> uint8_t xpcc::apb::Interface<Device>::position;
+template <typename Device> uint8_t xpcc::apb::Interface<Device>::length;
+template <typename Device> uint8_t xpcc::apb::Interface<Device>::lengthOfReceivedMessage = 0;
 
 // ----------------------------------------------------------------------------
 
-template <typename DEVICE> const uint8_t xpcc::apb::Interface<DEVICE>::masterAddress = 0;
-
-template <typename DEVICE> const uint8_t xpcc::apb::Interface<DEVICE>::syncByte = 0x54;
-template <typename DEVICE> const uint8_t xpcc::apb::Interface<DEVICE>::crcInitialValue = 0x00;
-template <typename DEVICE> const uint8_t xpcc::apb::Interface<DEVICE>::maxPayloadLength = 32;
-
-template <typename DEVICE> typename xpcc::apb::Interface<DEVICE>::State \
-	xpcc::apb::Interface<DEVICE>::state = SYNC;
-
-template <typename DEVICE> uint8_t xpcc::apb::Interface<DEVICE>::buffer[32+3];
-template <typename DEVICE> uint8_t xpcc::apb::Interface<DEVICE>::crc;
-template <typename DEVICE> uint8_t xpcc::apb::Interface<DEVICE>::position;
-template <typename DEVICE> uint8_t xpcc::apb::Interface<DEVICE>::length;
-template <typename DEVICE> uint8_t xpcc::apb::Interface<DEVICE>::lengthOfReceivedMessage = 0;
-
-// ----------------------------------------------------------------------------
-
-template <typename DEVICE>
+template <typename Device>
 void
-xpcc::apb::Interface<DEVICE>::initialize()
+xpcc::apb::Interface<Device>::initialize()
 {
-	DEVICE::setBaudrate(115200UL);
+	Device::setBaudrate(115200UL);
 	state = SYNC;
 }
 
 // ----------------------------------------------------------------------------
 
-template <typename DEVICE>
+template <typename Device>
 void
-xpcc::apb::Interface<DEVICE>::sendMessage(uint8_t header, uint8_t command, const uint8_t *data, uint8_t size)
+xpcc::apb::Interface<Device>::sendMessage(uint8_t address, bool acknowledge, 
+		uint8_t command,
+		const void *payload, uint8_t payloadLength)
 {
 	uint8_t crc;
+	if (acknowledge) {
+		address |= ACK;
+	}
+	else {
+		address |= NACK;
+	};
 	
-	DEVICE::write(syncByte);
-	DEVICE::write(size);
-	crc = crcUpdate(crcInitialValue, size);
-	DEVICE::write(header);
-	crc = crcUpdate(crc, header);
-	DEVICE::write(command);
+	Device::write(syncByte);
+	Device::write(payloadLength);
+	crc = crcUpdate(crcInitialValue, payloadLength);
+	Device::write(address);
+	crc = crcUpdate(crc, address);
+	Device::write(command);
 	crc = crcUpdate(crc, command);
 	
-	for (uint_fast8_t i = 0; i < size; ++i)
+	const uint8_t *ptr = static_cast<const uint8_t *>(payload);
+	for (uint_fast8_t i = 0; i < payloadLength; ++i)
 	{
-		crc = crcUpdate(crc, *data);
-		DEVICE::write(*data);
-		data++;
+		crc = crcUpdate(crc, *ptr);
+		Device::write(*ptr);
+		ptr++;
 	}
 	
-	DEVICE::write(crc);
+	Device::write(crc);
+}
+
+template <typename Device> template <typename T>
+void
+xpcc::apb::Interface<Device>::sendMessage(uint8_t address, bool acknowledge,
+		uint8_t command,
+		const T& payload)
+{
+	sendMessage(address, acknowledge,
+			command,
+			reinterpret_cast<const void *>(&payload), sizeof(T));
+}
+
+template <typename Device>
+void
+xpcc::apb::Interface<Device>::sendMessage(uint8_t address, bool acknowledge, uint8_t command)
+{
+	sendMessage(address, acknowledge,
+			command,
+			0, 0);
 }
 
 // ----------------------------------------------------------------------------
 
-template <typename DEVICE>
+template <typename Device>
 bool
-xpcc::apb::Interface<DEVICE>::isMessageAvailable()
+xpcc::apb::Interface<Device>::isMessageAvailable()
 {
 	return (lengthOfReceivedMessage != 0);
 }
 
-template <typename DEVICE>
+template <typename Device>
 uint8_t
-xpcc::apb::Interface<DEVICE>::getAddress()
+xpcc::apb::Interface<Device>::getAddress()
 {
-	return (buffer[0] & 0x1f);
+	return (buffer[0] & 0x7f);
 }
 
-template <typename DEVICE>
+template <typename Device>
 uint8_t
-xpcc::apb::Interface<DEVICE>::getCommand()
+xpcc::apb::Interface<Device>::getCommand()
 {
-	return (buffer[1] & 0x7f);
+	return buffer[1];
 }
 
-template <typename DEVICE>
+template <typename Device>
 bool
-xpcc::apb::Interface<DEVICE>::isAcknowledge()
+xpcc::apb::Interface<Device>::isAcknowledge()
 {
-	return (buffer[1] & 0x80) ? true : false;
+	return (buffer[0] & 0x80) ? true : false;
 }
 
-template <typename DEVICE>
+template <typename Device>
 const uint8_t*
-xpcc::apb::Interface<DEVICE>::getPayload()
+xpcc::apb::Interface<Device>::getPayload()
 {
 	return &buffer[2];
 }
 
-template <typename DEVICE>
+template <typename Device>
 uint8_t
-xpcc::apb::Interface<DEVICE>::getPayloadLength()
+xpcc::apb::Interface<Device>::getPayloadLength()
 {
 	return (lengthOfReceivedMessage - 3);
 }
 
-template <typename DEVICE>
+template <typename Device>
 void
-xpcc::apb::Interface<DEVICE>::dropMessage()
+xpcc::apb::Interface<Device>::dropMessage()
 {
 	lengthOfReceivedMessage = 0;
 }
 
 // ----------------------------------------------------------------------------
 
-template <typename DEVICE>
+template <typename Device>
 void
-xpcc::apb::Interface<DEVICE>::update()
+xpcc::apb::Interface<Device>::update()
 {
 	char byte;
-	while (DEVICE::read(byte))
+	while (Device::read(byte))
 	{
 		switch (state)
 		{
@@ -192,27 +211,4 @@ xpcc::apb::Interface<DEVICE>::update()
 				break;
 		}
 	}
-}
-
-// ----------------------------------------------------------------------------
-
-template <typename DEVICE>
-uint8_t
-xpcc::apb::Interface<DEVICE>::crcUpdate(uint8_t crc, uint8_t data)
-{
-#ifdef __AVR__
-	return _crc_ibutton_update(crc, data);
-#else
-	crc = crc ^ data;
-	for (uint_fast8_t i = 0; i < 8; ++i)
-	{
-		if (crc & 0x01) {
-			crc = (crc >> 1) ^ 0x8C;
-		}
-		else {
-			crc >>= 1;
-		}
-	}
-	return crc;
-#endif
 }

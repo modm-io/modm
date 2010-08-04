@@ -2,7 +2,7 @@
 // ----------------------------------------------------------------------------
 /* Copyright (c) 2009, Roboterclub Aachen e.V.
  * All rights reserved.
- *
+ * 
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  * 
@@ -14,7 +14,7 @@
  *     * Neither the name of the Roboterclub Aachen e.V. nor the
  *       names of its contributors may be used to endorse or promote products
  *       derived from this software without specific prior written permission.
- *
+ * 
  * THIS SOFTWARE IS PROVIDED BY ROBOTERCLUB AACHEN E.V. ''AS IS'' AND ANY
  * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -25,23 +25,30 @@
  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
+ * 
  * $Id$
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_APB__SERVO_HPP
-#define XPCC_APB__SERVO_HPP
+#include "interface.hpp"
 
-#include "../interface.hpp"
-
-namespace xpcc
+uint8_t
+xpcc::apb::Base::crcUpdate(uint8_t crc, uint8_t data)
 {
-	namespace apb
+#ifdef __AVR__
+	return _crc_ibutton_update(crc, data);
+#else
+	crc = crc ^ data;
+	for (uint_fast8_t i = 0; i < 8; ++i)
 	{
-		
-		
+		if (crc & 0x01) {
+			crc = (crc >> 1) ^ 0x8C;
+		}
+		else {
+			crc >>= 1;
+		}
 	}
+	return crc;
+#endif
 }
 
-#endif	// XPCC_APB__SERVO_HPP

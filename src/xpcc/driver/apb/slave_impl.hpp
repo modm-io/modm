@@ -35,93 +35,127 @@
 #endif
 
 // ----------------------------------------------------------------------------
-
-template <typename INTERFACE>
-xpcc::apb::Slave<INTERFACE>::Slave(uint8_t address,
-		xpcc::accessor::Flash<Action> actionList,
-		uint8_t actionCount) : 
-	ownAddress(address), actionList(actionList), actionCount(actionCount)
+template <typename T>
+void
+xpcc::apb::Response::send(const T& payload)
 {
-	INTERFACE::initialize();
+	triggered = true;
+	transmitter->send(true, reinterpret_cast<const void *>(&payload), sizeof(T));
+}
+
+inline void
+xpcc::apb::Action::call(Response& response, const void *payload)
+{
+	// redirect call to the actual object
+	(object->*function)(response, payload);
 }
 
 // ----------------------------------------------------------------------------
-
-template <typename INTERFACE>
+/*
+template <typename Interface>
 void
-xpcc::apb::Slave<INTERFACE>::sendErrorResponse(uint8_t errorCode)
+xpcc::apb::Slave<Interface>::sendErrorResponse(uint8_t errorCode)
 {
 	uint8_t error = errorCode;
 	
-	INTERFACE::sendMessage(
+	Interface::sendMessage(
 			ownAddress,
-			currentCommand | INTERFACE::NACK,
+			false,
+			currentCommand,
 			&error,
 			1);
 }
 
-template <typename INTERFACE>
+template <typename Interface>
 void
-xpcc::apb::Slave<INTERFACE>::sendResponse(const uint8_t *payload, uint8_t payloadLength)
+xpcc::apb::Slave<Interface>::sendResponse(
+		const uint8_t *payload, uint8_t payloadLength)
 {
-	INTERFACE::sendMessage(
+	Interface::sendMessage(
 			ownAddress,
-			currentCommand | INTERFACE::ACK,
-			payload,
-			payloadLength);
+			true,
+			currentCommand,
+			payload, payloadLength);
 }
 
-template <typename INTERFACE>
+template <typename Interface> template <typename T>
 void
-xpcc::apb::Slave<INTERFACE>::sendResponse()
+xpcc::apb::Slave<Interface>::sendResponse(const T& payload)
 {
-	INTERFACE::sendMessage(
-			ownAddress,
-			currentCommand | INTERFACE::ACK,
-			NULL,
-			0);
+	sendResponse(
+			reinterpret_cast<const uint8_t *>(&payload),
+			sizeof(T));
 }
+
+template <typename Interface>
+void
+xpcc::apb::Slave<Interface>::sendResponse()
+{
+	Interface::sendMessage(
+			ownAddress,
+			true,
+			currentCommand,
+			NULL, 0);
+}*/
 
 // ----------------------------------------------------------------------------
-
-template <typename INTERFACE>
-void
-xpcc::apb::Slave<INTERFACE>::update()
+template <typename Interface>
+xpcc::apb::Slave<Interface>::Slave(uint8_t address,
+		xpcc::accessor::Flash<Action> actionList,
+		uint8_t actionCount) : 
+	ownAddress(address), actionList(actionList), actionCount(actionCount),
+	response(this)
 {
-	INTERFACE::update();
-	if (INTERFACE::isMessageAvailable())
+	Interface::initialize();
+}			
+
+template <typename Interface>
+void
+xpcc::apb::Slave<Interface>::update()
+{
+	Interface::update();
+	if (Interface::isMessageAvailable())
 	{
-		if (INTERFACE::getAddress() == this->ownAddress)
+		if (Interface::getAddress() == this->ownAddress)
 		{
-			bool found = false;
-			currentCommand = INTERFACE::getCommand();
+			this->response.triggered = false;
+			this->currentCommand = Interface::getCommand();
 			
 			xpcc::accessor::Flash<Action> list = actionList;
-			for (uint8_t i = 0; i < actionCount; ++i)
+			for (uint8_t i = 0; i < actionCount; ++i, ++list)
 			{
 				Action action(*list);
-				
 				if (currentCommand == action.command)
 				{
-					found = true;
-					
-					if (INTERFACE::getPayloadLength() == action.payloadLength)
+					if (Interface::getPayloadLength() == action.payloadLength)
 					{
 						// execute callback function
-						(*action.function)(*this, INTERFACE::getPayload());
+						action.call(this->response, Interface::getPayload());
+						
+						if (!this->response.triggered) {
+							this->response.error(Interface::GENERAL_ERROR);
+						}
 					}
 					else {
-						this->sendErrorResponse(INTERFACE::WRONG_PAYLOAD_SIZE);
+						this->response.error(Interface::WRONG_PAYLOAD_LENGTH);
 					}
 					break;
 				}
-				++list;
 			}
 			
-			if (!found) {
-				this->sendErrorResponse(INTERFACE::NO_ACTION);
+			if (!this->response.triggered) {
+				this->response.error(Interface::NO_ACTION);
 			}
 		}
-		INTERFACE::dropMessage();
+		Interface::dropMessage();
 	}
+}
+
+template <typename Interface>
+void
+xpcc::apb::Slave<Interface>::send(bool acknowledge,
+			const void *payload, uint8_t payloadLength)
+{
+	Interface::sendMessage(this->ownAddress, acknowledge, this->currentCommand,
+			payload, payloadLength);
 }

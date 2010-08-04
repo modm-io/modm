@@ -30,18 +30,59 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_APB__SERVO_HPP
-#define XPCC_APB__SERVO_HPP
+#include <avr/io.h>
 
-#include "../interface.hpp"
+#include "adc.hpp"
 
-namespace xpcc
+// ----------------------------------------------------------------------------
+void
+xpcc::Adc::initialize(Reference referenceVoltage, Prescaler prescaler)
 {
-	namespace apb
-	{
-		
-		
-	}
+	ADMUX = referenceVoltage & 0xc0;
+	ADCSRA = (1 << ADEN) | (prescaler & 0x07);
 }
 
-#endif	// XPCC_APB__SERVO_HPP
+// ----------------------------------------------------------------------------
+uint16_t
+xpcc::Adc::convert(uint8_t channel)
+{
+	if (channel > 8)
+		return 0;
+	
+	startConversion(channel);
+	
+	while (!isFinished()) {
+		// wait until the conversion is finished
+	}
+	
+	return getValue();
+}
+
+// ----------------------------------------------------------------------------
+void
+xpcc::Adc::startConversion(uint8_t channel)
+{
+	if (channel > 8)
+		return;
+	
+	// select channel
+	ADMUX = (ADMUX & 0xe0) | channel;
+	
+	// clear interrupt flag
+	ADCSRA |= (1 << ADIF);
+	
+	// start conversion
+	ADCSRA |= (1 << ADSC);
+}
+
+bool
+xpcc::Adc::isFinished()
+{
+	return (ADCSRA & (1 << ADIF));
+}
+
+uint16_t
+xpcc::Adc::getValue()
+{
+	return ADC;
+}

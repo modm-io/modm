@@ -5,7 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -30,18 +30,43 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_APB__SERVO_HPP
-#define XPCC_APB__SERVO_HPP
+#include <unittest/testsuite.hpp>
 
-#include "../interface.hpp"
+#include <xpcc/driver/apb/slave.hpp>
+#include "fake_io_device.hpp"
 
-namespace xpcc
+class SlaveTest : public unittest::TestSuite
 {
-	namespace apb
-	{
-		
-		
-	}
-}
-
-#endif	// XPCC_APB__SERVO_HPP
+public:
+	virtual void
+	setUp();
+	
+	virtual void
+	tearDown();
+	
+	
+	void
+	testEmptyMethod();
+	
+	void
+	testResponseMethod();
+	
+	void
+	testErrorResponse();
+	
+	void
+	testParameterMethod();
+	
+	void
+	testWrongParameterSize();
+	
+	void
+	testNoMethod();
+	
+	
+protected:
+	typedef xpcc::apb::Interface< FakeIODevice > TestingInterface;
+	typedef xpcc::apb::Slave< TestingInterface > TestingSlave;
+	
+	TestingSlave *slave;
+};

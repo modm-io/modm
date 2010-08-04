@@ -34,11 +34,40 @@
 #define	XPCC_APB__INTERFACE_HPP
 
 #include <stdint.h>
+#include <xpcc/utils/macros.hpp>
 
 namespace xpcc
 {
 	namespace apb
 	{
+		/**
+		 * \internal
+		 */
+		class Base
+		{
+		public:
+			enum Error
+			{
+				GENERAL_ERROR = 0,
+				NO_ACTION,
+				WRONG_PAYLOAD_LENGTH
+			};
+			
+			static const uint8_t masterAddress = 0;
+			static const uint8_t maxPayloadLength = 32;
+			
+		protected:
+			Base()
+			{
+			}
+			
+			static const uint8_t syncByte = 0x54;
+			static const uint8_t crcInitialValue = 0x00;
+			
+			static uint8_t
+			crcUpdate(uint8_t crc, uint8_t data);
+		};
+		
 		/**
 		 * \brief	APB Interface
 		 * 
@@ -48,23 +77,9 @@ namespace xpcc
 		 * \ingroup	apb
 		 * \author	Fabian Greif
 		 */
-		template <typename DEVICE>
-		class Interface
+		template <typename Device>
+		class Interface : public Base
 		{
-		public:
-			typedef enum {
-				ACK = 0x80,
-				NACK = 0x00
-			} Flags;
-			
-			typedef enum {
-				GENERAL_ERROR = 0,
-				NO_ACTION,
-				WRONG_PAYLOAD_SIZE
-			} ErrorCode;
-			
-			static const uint8_t masterAddress;
-			
 		public:
 			/**
 			 * \brief	Initialize the interface
@@ -77,13 +92,30 @@ namespace xpcc
 			/**
 			 * \brief	Send a message
 			 * 
-			 * \param	address	header flags and receiver address
-			 * \param	command	command bytes
+			 * \param	header			header flags and receiver address
+			 * \param	acknowledge		\c true if message is an acknowledge,
+			 * 							\c false otherwise
+			 * \param	command			command byte
 			 * \param	*payload		data field
 			 * \param	payloadLength	size of the data field
 			 */
 			static void
-			sendMessage(uint8_t address, uint8_t command, const uint8_t *payload, uint8_t payloadLength);
+			sendMessage(uint8_t address, bool acknowledge, uint8_t command,
+					const void *payload, uint8_t payloadLength);
+			
+			/**
+			 * \brief	Send a message
+			 */
+			template <typename T>
+			static void ALWAYS_INLINE
+			sendMessage(uint8_t address, bool acknowledge, uint8_t command,
+					const T& payload);
+			
+			/**
+			 * \brief	Send a empty message
+			 */
+			static void
+			sendMessage(uint8_t address, bool acknowledge, uint8_t command);
 			
 			/**
 			 * \brief	Check if a message was received
@@ -133,21 +165,20 @@ namespace xpcc
 			update();
 			
 		private:
-			static uint8_t
-			crcUpdate(uint8_t crc, uint8_t data);
-			
-		private:
-			static const uint8_t syncByte;
-			static const uint8_t crcInitialValue;
-			static const uint8_t maxPayloadLength;
-			
-			typedef enum {
+			enum State
+			{
 				SYNC,
 				LENGTH,
 				DATA
-			} State;
+			};
 			
-			static uint8_t buffer[32+3];
+			enum Flags
+			{
+				ACK = 0x80,
+				NACK = 0x00
+			};
+			
+			static uint8_t buffer[maxPayloadLength + 3];
 			static uint8_t crc;
 			static uint8_t position;
 			static uint8_t length;

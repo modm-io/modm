@@ -5,7 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -30,18 +30,59 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_APB__SERVO_HPP
-#define XPCC_APB__SERVO_HPP
+#include <xpcc/driver/apb/interface.hpp>
+#include "fake_io_device.hpp"
+#include "interface_test.hpp"
 
-#include "../interface.hpp"
+typedef xpcc::apb::Interface<FakeIODevice> TestingInterface;
 
-namespace xpcc
+void
+InterfaceTest::setUp()
 {
-	namespace apb
-	{
-		
-		
-	}
+	// set up everything
+	TestingInterface::initialize();
+	FakeIODevice::reset();
 }
 
-#endif	// XPCC_APB__SERVO_HPP
+// ----------------------------------------------------------------------------
+void
+InterfaceTest::testSend()
+{
+	TestingInterface interface;
+	
+	uint32_t data = 0xdeadbeef;
+	interface.sendMessage(0x12, false, 0x34, data);
+	
+	uint8_t testMessage[9] = {
+		0x54, 4, 0x12, 0x34, 0xef, 0xbe, 0xad, 0xde, 238
+	};
+	
+	TEST_ASSERT_EQUALS(FakeIODevice::bytesSend, 9);
+	TEST_ASSERT_EQUALS_ARRAY(FakeIODevice::sendBuffer, testMessage, 9);
+}
+
+void
+InterfaceTest::testReceive()
+{
+	TestingInterface interface;
+	
+	// write a new message into the FakeIODevice
+	uint32_t data = 0xdeadbeef;
+	interface.sendMessage(0x12, false, 0x34, data);
+	
+	FakeIODevice::moveSendToReceiveBuffer();
+	
+	// ... and try to receive it again
+	interface.update();
+	
+	TEST_ASSERT_TRUE(interface.isMessageAvailable());
+	
+	TEST_ASSERT_FALSE(interface.isAcknowledge());
+	TEST_ASSERT_EQUALS(interface.getAddress(), 0x12);
+	TEST_ASSERT_EQUALS(interface.getCommand(), 0x34);
+	TEST_ASSERT_EQUALS(interface.getPayloadLength(), 4);
+	TEST_ASSERT_EQUALS_ARRAY(
+			interface.getPayload(),
+			reinterpret_cast<uint8_t *>(&data),
+			4);
+}

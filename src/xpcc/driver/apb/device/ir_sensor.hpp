@@ -33,7 +33,7 @@
 #ifndef XPCC_APB__IR_SENSOR_HPP
 #define XPCC_APB__IR_SENSOR_HPP
 
-#include <xpcc/communication/apb/interface.hpp>
+#include "../interface.hpp"
 
 namespace xpcc
 {

@@ -5,7 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -30,18 +30,17 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_APB__SERVO_HPP
-#define XPCC_APB__SERVO_HPP
+#include <unittest/testsuite.hpp>
 
-#include "../interface.hpp"
-
-namespace xpcc
+class InterfaceTest : public unittest::TestSuite
 {
-	namespace apb
-	{
-		
-		
-	}
-}
-
-#endif	// XPCC_APB__SERVO_HPP
+public:
+	virtual void
+	setUp();
+	
+	void
+	testSend();
+	
+	void
+	testReceive();
+};

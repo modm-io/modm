@@ -74,7 +74,7 @@ namespace xpcc
 		/**
 		 * Set the method that will be called when a response is received.
 		 *
-		 * This specialisation is to be used in case of no payload. The second
+		 * This specialization is to be used in case of no payload. The second
 		 * parameter of the method has to be a void*.
 		 *
 		 * \param	component	Pointer to a component object
