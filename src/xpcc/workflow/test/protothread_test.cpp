@@ -38,7 +38,7 @@
 class TestingEmptyThread : public xpcc::Protothread
 {
 public:
-	virtual bool
+	bool
 	run()
 	{
 		PT_BEGIN();
@@ -72,7 +72,7 @@ public:
 	{
 	}
 	
-	virtual bool
+	bool
 	run()
 	{
 		PT_BEGIN();
@@ -99,7 +99,7 @@ public:
 	{
 	}
 	
-	virtual bool
+	bool
 	run()
 	{
 		PT_BEGIN();

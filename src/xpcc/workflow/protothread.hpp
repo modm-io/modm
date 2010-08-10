@@ -67,10 +67,10 @@ namespace xpcc
 	 * 
 	 * GPIO__OUTPUT(LED, B, 0);
 	 * 
-	 * class BlinkingLight : public xpcc::ProtothreadLight
+	 * class BlinkingLight : public xpcc::Protothread
 	 * {
 	 * public:
-	 *     virtual bool
+	 *     bool
 	 *     run()
 	 *     {
 	 *         PT_BEGIN();
@@ -114,14 +114,14 @@ namespace xpcc
 	 * 
 	 * \ingroup	protothread
 	 */
-	class ProtothreadLight
+	class Protothread
 	{
 	public:
 		/**
 		 * \brief	Construct a new protothread that will start from the
 		 * 			beginning of its run() function.
 		 */
-		ProtothreadLight() :
+		Protothread() :
 			ptState(0)
 		{
 		}
@@ -165,17 +165,15 @@ namespace xpcc
 		 * \brief	Run the protothread
 		 * 
 		 * Run next part of protothread or return immediately if it's still
-		 * waiting. Return true if protothread is still running, false if it
-		 * has finished.
+		 * waiting. Returns \c true if protothread is still running, \c false
+		 * if it has finished.
 		 * 
 		 * Implement this method in your Protothread subclass.
 		 * 
 		 * \warning	This is method is not virtual, therefore you cannot access
 		 * 			it through a Pointer to this class, but only directly from
 		 * 			the subclass! This was done on purpose to keep the memory
-		 * 			footprint low. \n
-		 * 			If you don't wont this behavior use the
-		 * 			xpcc::Protothread class.
+		 * 			footprint low.
 		 */
 		bool
 		run();
@@ -192,33 +190,6 @@ namespace xpcc
 		// Stores the protothread's position (by storing the line number of
 		// the last PT_WAIT, which is then switched on at the next Run).
 		State ptState;
-	};
-	
-	/**
-	 * \brief	A lightweight, stackless thread
-	 * 
-	 * The main difference between this class and the ProtothreadLight is
-	 * that the run() method is declared virtual here.
-	 * 
-	 * Therefore it is possible to create a group of Protothreads and access
-	 * the through a pointer to their base class.
-	 * 
-	 * \ingroup	protothread
-	 */
-	class Protothread : public ProtothreadLight
-	{
-	public:
-		/**
-		 * \brief	Run the protothread
-		 * 
-		 * Run next part of protothread or return immediately if it's still
-		 * waiting. Return true if protothread is still running, false if it
-		 * has finished.
-		 * 
-		 * Implement this method in your Protothread subclass.
-		 */
-		virtual bool
-		run() = 0;
 	};
 }
 
