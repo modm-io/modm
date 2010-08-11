@@ -43,8 +43,11 @@ namespace xpcc
 	/**
 	 * \brief		UART3
 	 * 
+	 * Example:
+	 * \include uart/basic/main.cpp
+	 *  
 	 * This implementation uses a ringbuffer.
-	 *
+	 * 
 	 * \ingroup		atmega
 	 */
 	class BufferedUart3

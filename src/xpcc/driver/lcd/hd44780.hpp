@@ -50,7 +50,13 @@ namespace xpcc
 	 * connect all there control pins (RW, RS, E) and the high nibble of the
 	 * data lines.
 	 * 
-	 * \tparam	DATA	needs to be a Nibble. See Nibble() for more details.
+	 * Example:
+	 * \include lcd/hd44780/main.cpp
+	 * 
+	 * \tparam	E		Enable Pin
+	 * \tparam	RW		Read/Write-Select Pin
+	 * \tparam	RS		Command/Data-Select Pin
+	 * \tparam	DATA	Needs to be a Nibble. See Nibble() for more details.
 	 * 
 	 * \see		Lcd
 	 * \see		http://en.wikipedia.org/wiki/HD44780_Character_LCD
@@ -59,17 +65,17 @@ namespace xpcc
 	 * \ingroup	driver
 	 */
 	template <typename E, typename RW, typename RS, typename DATA>
-	class Hd447800 : public Lcd
+	class Hd44780 : public Lcd
 	{
 	public:
 		/// Constructor
-		Hd447800();
+		Hd44780();
 		
 		/**
 		 * \brief	Initialize the display
 		 * 
-		 * The display needs some time to initalize after startup. You have
-		 * to wait at least 50 ms until calling this method.
+		 * The display needs some time to initialize after startup. You have
+		 * to wait at least 50 ms after startup before calling this method.
 		 */
 		virtual void
 		initialize();
@@ -79,7 +85,10 @@ namespace xpcc
 		
 		virtual void
 		setPosition(uint8_t line, uint8_t column);
-	
+		
+		virtual void
+		command(Command command);
+		
 	protected:
 		void
 		writeNibble(uint8_t data);

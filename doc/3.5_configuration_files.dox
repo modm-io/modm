@@ -38,7 +38,7 @@ PC (Linux)    => pc/linux
 PC (Mac OS)   => pc/darwin
 \endverbatim
 
-To match any AVR use \b 'atmega|atxmega', for PC only target 'pc'.
+To match any AVR use \c 'atmega|atxmega', for PC only target \c 'pc'.
 
 \subsubsection project_cfg project.cfg
 
@@ -76,4 +76,5 @@ architecture = pc
    - hfuse
    - efuse
 
+See section \ref project_sconstruct for complete examples.
  */

@@ -51,7 +51,7 @@ namespace xpcc
 	 * every 10ms. Preferred in a timer interrupt function.
 	 * 
 	 * Example:
-	 * \include button_group.cpp
+	 * \include gpio/button_group/main.cpp
 	 * 
 	 * The detection for long or repreated presses works only correct for
 	 * one key at a time. This constraint only applies to buttons listed in the
@@ -73,10 +73,11 @@ namespace xpcc
 		 * 
 		 * Provided for convenience only.
 		 * 
-		 * Normally it is best to define your own meaningfull names for
+		 * Normally it is best to define your own meaningful names for
 		 * the buttons.
 		 */
-		typedef enum {
+		enum Identifier
+		{
 			NONE = 0x00,
 			BUTTON0 = 0x01,
 			BUTTON1 = 0x02,
@@ -87,7 +88,7 @@ namespace xpcc
 			BUTTON6 = 0x40,
 			BUTTON7 = 0x80,
 			ALL = 0xFF,
-		} Identifier;
+		};
 		
 	public:
 		/** \brief	Constructor

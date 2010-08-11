@@ -13,6 +13,6 @@ main(void)
 	while (1)
 	{
 		LED::toggle();
-		xpcc::delay_ms(1.5);
+		xpcc::delay_ms(200);
 	}
 }

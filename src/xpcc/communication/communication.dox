@@ -7,11 +7,3 @@
 \brief 		Interface to the Communication.
 
 */
-
-/**
- * \ingroup 	communication
- * \version		$Id: communication_list.hpp 297 2010-04-21 17:36:10Z dergraaf $
- */
-namespace xpcc
-{
-}

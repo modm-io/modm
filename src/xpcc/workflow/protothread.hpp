@@ -45,6 +45,7 @@
 #define XPCC__PROTOTHREAD_HPP
 
 #include <stdint.h>
+#include <xpcc/utils/macros.hpp>
 
 /**
  * \ingroup		workflow

@@ -262,34 +262,36 @@ def generate(env, **kw):
 		env['LIBPATH'] = []
 		
 		env.Tool('avr')
-		env.Tool('avrdude')
 		
-		env['AVRDUDE_PROGRAMMER'] = parser.get('avrdude', 'programmer', 'stk500')
-		env['AVRDUDE_PORT'] = parser.get('avrdude', 'port', '/dev/ttyUSB0')
-		env['AVR_FUSEBITS'] = []
+		if parser.has_section('avrdude'):
+			env.Tool('avrdude')
+			env['AVRDUDE_PROGRAMMER'] = parser.get('avrdude', 'programmer')
+			env['AVRDUDE_PORT'] = parser.get('avrdude', 'port')
+			env['AVR_FUSEBITS'] = []
+			
+			if 'fusebits' in configuration:
+				if architecture == 'atmega':
+					fuses = ['lfuse', 'hfuse', 'efuse']
+					for key, value in configuration['fusebits'].items():
+						if key not in fuses:
+							print "Unknown fusebit '%s'! Allowed values are '%s'!" % \
+									(key, "', '".join(fuses))
+							Exit(1)
+						env.Append(AVR_FUSEBITS = {key: value} )
+				elif architecture == 'atxmega':
+					fuses = ['fuse0', 'fuse1', 'fuse2', 'fuse4', 'fuse5']
+					for key, value in configuration['fusebits'].items():
+						if key not in fuses:
+							print "Unknown fusebit '%s'! Allowed values are '%s'!" % \
+									(key, "', '".join(fuses))
+							Exit(1)
+						env.Append(AVR_FUSEBITS = {key: value} )
+				else:
+					print "Ignoring 'fusebit' section in project configuration."
 		
 		# path to the headers of a very small and incomplete libstdc++ implementation
 		env.Append(CPPPATH = [os.path.join(rootpath, 'src', 'stdc++')])
 		
-		if 'fusebits' in configuration:
-			if architecture == 'atmega':
-				fuses = ['lfuse', 'hfuse', 'efuse']
-				for key, value in configuration['fusebits'].items():
-					if key not in fuses:
-						print "Unknown fusebit '%s'! Allowed values are '%s'!" % \
-								(key, "', '".join(fuses))
-						Exit(1)
-					env.Append(AVR_FUSEBITS = {key: value} )
-			elif architecture == 'atxmega':
-				fuses = ['fuse0', 'fuse1', 'fuse2', 'fuse4', 'fuse5']
-				for key, value in configuration['fusebits'].items():
-					if key not in fuses:
-						print "Unknown fusebit '%s'! Allowed values are '%s'!" % \
-								(key, "', '".join(fuses))
-						Exit(1)
-					env.Append(AVR_FUSEBITS = {key: value} )
-			else:
-				print "Ignoring 'fusebit' section in project configuration."
 	elif architecture == 'pc':
 		if device == 'linux':
 			libs = ['boost_thread-mt']

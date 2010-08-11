@@ -25,17 +25,12 @@
  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  * $Id$
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__ATMEGA_UART_HPP
-#define XPCC__ATMEGA_UART_HPP
+#include "lcd/lcd.hpp"
+#include "lcd/hd44780.hpp"
+#include "lcd/st7036.hpp"
 
-#include "uart0.hpp"
-#include "uart1.hpp"
-#include "uart2.hpp"
-#include "uart3.hpp"
-
-#endif // XPCC__ATMEGA_UART_HPP

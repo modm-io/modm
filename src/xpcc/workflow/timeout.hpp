@@ -51,7 +51,7 @@ namespace xpcc
 	 * \include	timeout.cpp
 	 * 
 	 * Complete example for the ATMega644:
-	 * \include timeout_atmega644.cpp
+	 * \include timeout/main.cpp
 	 * 
 	 * \author	Fabian Greif
 	 * \ingroup	workflow

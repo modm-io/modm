@@ -2,7 +2,7 @@
 // ----------------------------------------------------------------------------
 /* Copyright (c) 2009, Roboterclub Aachen e.V.
  * All rights reserved.
- *
+ * 
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  * 
@@ -14,7 +14,7 @@
  *     * Neither the name of the Roboterclub Aachen e.V. nor the
  *       names of its contributors may be used to endorse or promote products
  *       derived from this software without specific prior written permission.
- *
+ * 
  * THIS SOFTWARE IS PROVIDED BY ROBOTERCLUB AACHEN E.V. ''AS IS'' AND ANY
  * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -25,98 +25,58 @@
  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
-// ----------------------------------------------------------------------------
-/*
- * WARNING: This file is generated automatically, do not edit!
- * Please modify the corresponding *.in file instead and rebuild this file.
+ * 
+ * $Id$
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__MEGA_UART2_HPP
-#define XPCC__MEGA_UART2_HPP
+#ifndef XPCC_APB__MASTER_HPP
+#define XPCC_APB__MASTER_HPP
 
 #include <stdint.h>
+#include "interface.hpp"
 
 namespace xpcc
 {
-	/**
-	 * \brief		UART2
-	 * 
-	 * Example:
-	 * \include uart/basic/main.cpp
-	 *  
-	 * This implementation uses a ringbuffer.
-	 * 
-	 * \ingroup		atmega
-	 */
-	class BufferedUart2
+	namespace apb
 	{
-	public:
-		BufferedUart2(uint32_t baudrate)
+		template <typename Interface>
+		class Master
 		{
-			this->setBaudrate(baudrate);
-		}
-		
-		/**
-		 * \brief	Set baudrate
-		 *
-		 * If this function is called with a constant value as parameter
-		 * all the calculation is done by the compiler. This way no 32-bit
-		 * arithmetic is needed at run-time!
-		 *
-		 * \param	baudrate	desired baud rate
-		 * \param	u2x			enabled double speed mode
-		 */
-		static inline void
-		setBaudrate(uint32_t baudrate, bool u2x = false)
-		{
-			uint16_t ubrr;
-			if (u2x) {
-				ubrr  = (F_CPU / (baudrate * 8l)) - 1;
-				ubrr |= 0x8000;
-			}
-			else {
-				ubrr = (F_CPU / (baudrate * 16l)) - 1;
-			}
-			setBaudrateRegister(ubrr);
-		}
-		
-		/**
-		 * \brief	Send a single byte
-		 */
-		static void
-		write(char data);
-		
-		/**
-		 * \brief	Write a string
-		 * 
-		 * The string musst end with \c '\\0'.
-		 */
-		static void
-		write(const char *string);
-		
-		/**
-		 * \brief	Read a single byte
-		 */
-		static bool
-		read(char& c);
-		
-		/**
-		 * \brief	Read a block of bytes
-		 * 
-		 * \param	*buffer	Pointer to a buffer big enough to storage \a n bytes
-		 * \param	n	Number of bytes to be read
-		 * 
-		 * \return	Number of bytes which could be read, maximal \a n
-		 */
-		static uint8_t
-		read(char *buffer, uint8_t n);
-		
-	protected:
-		static void
-		setBaudrateRegister(uint16_t ubrr);
-	};
+		public:
+			Master();
+			
+			template <typename T>
+			void
+			query(uint8_t slaveAddress, uint8_t command,
+					const T& payload, uint8_t responseLength);
+			
+			void
+			query(uint8_t slaveAddress, uint8_t command, uint8_t responseLength);
+			
+			bool
+			isQueryCompleted() const;
+			
+			bool
+			isSuccess() const;
+			
+			uint8_t
+			getErrorCode() const;
+			
+			template <typename T>
+			const T&
+			getResponse() const;
+			
+			const void *
+			getResponse() const;
+			
+			void
+			update();
+			
+		protected:
+			
+		};
+	}
 }
 
-#endif // XPCC__MEGA_UART2_HPP
+#endif	// XPCC_APB__MASTER_HPP

@@ -107,9 +107,9 @@
  * }
  * \endcode
  * 
- * This will generate optimal code. As all methods are \c static and \c inline
- * no function call is generated but the call is mapped directly to 'sbi'
- * assembly instructions!
+ * This will generate nearly optimal code. As all methods are \c static and
+ * \c inline no function call is generated but the call is mapped directly
+ * to the \c sbi assembler instruction!
  * 
  * The generated code for the example above (ATmega8):
  * \verbatim

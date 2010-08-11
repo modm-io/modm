@@ -38,7 +38,7 @@
 #include <avr/io.h>
 
 #include <xpcc/utils/macros.hpp>
-#include <xpcc/math/utils/misc.hpp>
+#include <xpcc/math/utils/bit_operation.hpp>
 #include <xpcc/architecture/general/gpio.hpp>
 
 namespace xpcc

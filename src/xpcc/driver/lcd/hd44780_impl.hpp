@@ -37,7 +37,7 @@
 // ----------------------------------------------------------------------------
 
 template <typename E, typename RW, typename RS, typename DATA>
-xpcc::Hd447800<E, RW, RS, DATA>::Hd447800() : 
+xpcc::Hd44780<E, RW, RS, DATA>::Hd44780() : 
 	Lcd()
 {
 }
@@ -46,7 +46,7 @@ xpcc::Hd447800<E, RW, RS, DATA>::Hd447800() :
 
 template <typename E, typename RW, typename RS, typename DATA>
 void
-xpcc::Hd447800<E, RW, RS, DATA>::initialize()
+xpcc::Hd44780<E, RW, RS, DATA>::initialize()
 {
 	E::setOutput();
 	RW::setOutput();
@@ -78,7 +78,7 @@ xpcc::Hd447800<E, RW, RS, DATA>::initialize()
 
 template <typename E, typename RW, typename RS, typename DATA>
 void
-xpcc::Hd447800<E, RW, RS, DATA>::writeRaw(char c)
+xpcc::Hd44780<E, RW, RS, DATA>::writeRaw(char c)
 {
 	waitBusy();
 	
@@ -93,7 +93,7 @@ xpcc::Hd447800<E, RW, RS, DATA>::writeRaw(char c)
 
 template <typename E, typename RW, typename RS, typename DATA>
 void
-xpcc::Hd447800<E, RW, RS, DATA>::setPosition(uint8_t line, uint8_t column)
+xpcc::Hd44780<E, RW, RS, DATA>::setPosition(uint8_t line, uint8_t column)
 {
 	this->column = column;
 	this->line = line;
@@ -102,11 +102,17 @@ xpcc::Hd447800<E, RW, RS, DATA>::setPosition(uint8_t line, uint8_t column)
 	writeCommand(0x80 | column);
 }
 
-// ----------------------------------------------------------------------------
-
 template <typename E, typename RW, typename RS, typename DATA>
 void
-xpcc::Hd447800<E, RW, RS, DATA>::writeNibble(uint8_t data)
+xpcc::Hd44780<E, RW, RS, DATA>::command(Command command)
+{
+	writeCommand(command);
+}
+
+// ----------------------------------------------------------------------------
+template <typename E, typename RW, typename RS, typename DATA>
+void
+xpcc::Hd44780<E, RW, RS, DATA>::writeNibble(uint8_t data)
 {
 	DATA::write(data);
 	
@@ -117,7 +123,7 @@ xpcc::Hd447800<E, RW, RS, DATA>::writeNibble(uint8_t data)
 
 template <typename E, typename RW, typename RS, typename DATA>
 uint8_t
-xpcc::Hd447800<E, RW, RS, DATA>::readByte()
+xpcc::Hd44780<E, RW, RS, DATA>::readByte()
 {
 	uint8_t data;
 	
@@ -142,7 +148,7 @@ xpcc::Hd447800<E, RW, RS, DATA>::readByte()
 
 template <typename E, typename RW, typename RS, typename DATA>
 void
-xpcc::Hd447800<E, RW, RS, DATA>::waitBusy()
+xpcc::Hd44780<E, RW, RS, DATA>::waitBusy()
 {
 	while (readByte() & 0x80) {
 		// wait until busy flag is reseted
@@ -154,7 +160,7 @@ xpcc::Hd447800<E, RW, RS, DATA>::waitBusy()
 
 template <typename E, typename RW, typename RS, typename DATA>
 void
-xpcc::Hd447800<E, RW, RS, DATA>::writeCommand(uint8_t command)
+xpcc::Hd44780<E, RW, RS, DATA>::writeCommand(uint8_t command)
 {
 	waitBusy();
 	

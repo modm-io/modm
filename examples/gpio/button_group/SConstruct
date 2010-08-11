@@ -28,35 +28,36 @@
 # 
 # $Id$
 
-from SCons.Script import *
+rootpath = '../../..'
 
-# -----------------------------------------------------------------------------
-def avrdude_flash(env, source, alias='avrdude_program'):
-	action = Action("avrdude -p $AVR_DEVICE -c $AVRDUDE_PROGRAMMER -P $AVRDUDE_PORT -U flash:w:$SOURCE", 
-					cmdstr="$AVRDUDE_COMSTR")
-	return env.AlwaysBuild(env.Alias(alias, source, action))
+env = Environment(tools = ['xpcc'], toolpath = [rootpath + '/misc/scons'],
+				buildpath = '../../build')
 
-def avrdude_fuse(env, alias='avrdude_fuse'):
-	fusebits = []
-	for fusebit in env['AVR_FUSEBITS']:
-		key, value = fusebit.items()[0]
-		fusebits.append("-U %s:w:0x%02x:m" % (key, int(value, 0)))
+# find all source files
+files = env.FindFiles('.')
+
+# build the program
+program = env.Program(target = env['XPCC_CONFIG']['general']['name'], source = files.sources)
+
+# build the xpcc library
+env.XpccLibrary()
+
+env.Defines()
+
+env.Alias('size', env.Size(program))
+env.Alias('symbols', env.Symbols(program))
+
+if env.CheckArchitecture('pc'):
+	env.Alias('build', program)
+	env.Alias('run', env.Run(program))
 	
-	action = Action("avrdude -p $AVR_DEVICE -c $AVRDUDE_PROGRAMMER -P $AVRDUDE_PORT -u %s" % " ".join(fusebits), 
-					cmdstr="$AVRDUDE_FUSECOMSTR")
-	return env.AlwaysBuild(env.Alias(alias, [], action))
-
-# -----------------------------------------------------------------------------
-def generate(env, **kw):
-	# build messages
-	if ARGUMENTS.get('verbose') != '1':
-		env['AVRDUDE_COMSTR'] = "avrdude: program $SOURCE"
-		env['AVRDUDE_FUSECOMSTR'] = "avrdude: set fusebits"
+	env.Alias('all', ['build', 'run'])
+else:
+	hexfile = env.Hex(program)
+	env.Alias('program', env.Avrdude(hexfile))
 	
-	env['AVRDUDE'] = 'avrdude'
-	
-	env.AddMethod(avrdude_flash, 'Avrdude')
-	env.AddMethod(avrdude_fuse, 'AvrdudeFuses')
+	env.Alias('build', [hexfile, env.Listing(program)])
+	env.Alias('fuse', env.AvrdudeFuses())
+	env.Alias('all', ['build', 'size'])
 
-def exists(env):
-	return env.Detect('avrdude')
+env.Default('all')

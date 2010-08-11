@@ -2,7 +2,7 @@
 /**
 
 \ingroup	driver
-\defgroup	apb		Asynchronous Peripheral Bus
+\defgroup	apb		(APB) Asynchronous Peripheral Bus
 
 \section apb_intro	Introduction
 

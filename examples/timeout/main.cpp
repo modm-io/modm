@@ -1,16 +1,19 @@
 #include <avr/interrupt.h>
+
 #include <xpcc/architecture/general/gpio.hpp>
-#include <xpcc/workflow/time/timeout.hpp>
+#include <xpcc/workflow/timeout.hpp>
 
 // create a output device for the led
-GPIP__OUTPUT(Led, B, 0);
+GPIO__OUTPUT(Led, B, 0);
 
 // timer interrupt routine
-ISR(TIMER2_COMPA_vect) {
+ISR(TIMER2_COMPA_vect)
+{
 	xpcc::Clock::increment();
 }
 
-int main(void)
+int
+main()
 {
 	Led::setOutput();
 	Led::reset();
@@ -28,9 +31,9 @@ int main(void)
 	xpcc::Timeout<> timeout(200);
 	while (1)
 	{
-		if (timeout.isExpired()) {
+		if (timeout.isExpired())
+		{
 			timeout.restart(200);
-			
 			Led::toggle();
 		}
 	}

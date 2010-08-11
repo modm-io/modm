@@ -1,12 +1,13 @@
 #include <avr/interrupt.h>
 
-#include <xpcc/driver/button_group.hpp>
 #include <xpcc/architecture/general/gpio.hpp>
+#include <xpcc/driver/button_group.hpp>
+
+static xpcc::ButtonGroup<> buttons(0);
 
 GPIO__OUTPUT(Led, B, 0);
 
-static xpcc::ButtonGroup<> buttons(xpcc::ButtonGroup::NONE);
-
+// Timer interrupt used to query the button status
 ISR(TIMER2_COMPA_vect)
 {
 	buttons.update(PINB & (1 << PB3));
