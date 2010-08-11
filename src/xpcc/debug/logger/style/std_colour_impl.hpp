@@ -163,5 +163,3 @@ xpcc::log::StdColour<TEXT, BACKGROUND, STYLE>::getBackgroundColour()
 			return "";
 	}
 }
-
-#endif // XPCC_LOG__STD_COLOUR_HPP

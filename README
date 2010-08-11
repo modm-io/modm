@@ -5,32 +5,31 @@ Packet orientated communication library, enabling transparent communication
 between components on PCs and microcontrollers. It provides an interface to 
 communicate via CAN, TCP/IP or TIPC.
 
-Structure
----------
+Folder structure
+----------------
 
- - build
+build
+   Temporary folder, build files created when building the unit tests etc.
+   go in here.
 
-Temporary folder
-   
- - doc
+doc
+   Documentation, mainly the doxygen documentation
 
-Documentation
+examples
+   Example project that shows the usage of the xpcc library.
 
- - examples
-   
- - misc
+misc
+   SCons tools, templates etc.
 
-SCons tools etc.
+src
+   Source files for the xpcc library
 
- - src
+tools
+   Supporting tools for the usage of the library.
 
-Source for the xpcc library
+   For example the communication builder, used to generate header files for the
+   communication architecture from XML-files.
 
- - system
-
-System builder, used to generate files for the system architecture from 
-XML-files.
-
- - tests
-   
+tests
+   Test programs, used during the development of the library.
 
