@@ -92,10 +92,11 @@ namespace xpcc
 		 * 
 		 * Same as
 		 * \code
-		 * vector = -A + B
+		 * vector = B - A
 		 * \endcode
 		 */
-		Vector2D(const Vector2D<T>& A, const Vector2D<T>& B);
+		static inline Vector2D<T>
+		displacement(const Vector2D<T>& A, const Vector2D<T>& B);
 		
 		inline void
 		setX(const T& value);

@@ -90,7 +90,7 @@ bool
 xpcc::Circle2D<T>::getIntersections(const Circle2D& other,
 		PointSet2D<T>& intersections) const
 {
-	Vector2D<T> circleToCircle(this->center, other.center);
+	Vector2D<T> circleToCircle = Vector2D<T>::displacement(this->center, other.center);
 	WideType distanceSquared = circleToCircle.getLengthSquared();
 	
 	if (distanceSquared == 0 and (this->radius == other.radius))

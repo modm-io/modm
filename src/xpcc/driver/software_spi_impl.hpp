@@ -34,49 +34,49 @@
 	#error	"Don't include this file directly, use 'software_spi.hpp' instead!"
 #endif
 
-template <typename CLK, typename MOSI, typename MISO, int32_t FREQUENCY>
-xpcc::SoftwareSpi<CLK, MOSI, MISO, FREQUENCY>::SoftwareSpi()
+template <typename Clk, typename Mosi, typename Miso, int32_t Frequency>
+xpcc::SoftwareSpi<Clk, Mosi, Miso, Frequency>::SoftwareSpi()
 {
 	initialize();
 }
 
-template <typename CLK, typename MOSI, typename MISO, int32_t FREQUENCY>
+template <typename Clk, typename Mosi, typename Miso, int32_t Frequency>
 void
-xpcc::SoftwareSpi<CLK, MOSI, MISO, FREQUENCY>::initialize()
+xpcc::SoftwareSpi<Clk, Mosi, Miso, Frequency>::initialize()
 {
-	SCLK::setOutput();
-	MOSI::setOutput();
-	MISO::setInput();
+	Clk::setOutput();
+	Mosi::setOutput();
+	Miso::setInput();
 }
 
-template <typename CLK, typename MOSI, typename MISO, int32_t FREQUENCY>
+template <typename Clk, typename Mosi, typename Miso, int32_t Frequency>
 uint8_t
-xpcc::SoftwareSpi<CLK, MOSI, MISO, FREQUENCY>::write(uint8_t output)
+xpcc::SoftwareSpi<Clk, Mosi, Miso, Frequency>::write(uint8_t output)
 {
 	uint8_t input = 0;
 	
-	CLK::reset();
+	Clk::reset();
 	for (uint8_t i = 0; i < 8; ++i)
 	{
 		input <<= 1;
 		if (output & 0x80) {
-			MOSI::set();
+			Mosi::set();
 		}
 		else {
-			MOSI::reset();
+			Mosi::reset();
 		}
 		xpcc::delay_us(delay);
 		
-		CLK::set();
+		Clk::set();
 		xpcc::delay_us(delay);
 		
-		if (MISO::read()) {
+		if (Miso::read()) {
 			input |= 1;
 		}
 		output <<= 1;
 		
-		CLK::reset();
+		Clk::reset();
 	}
 	
-	return in;
+	return input;
 }

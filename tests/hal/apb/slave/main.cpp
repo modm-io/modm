@@ -44,10 +44,10 @@ int
 main()
 {
 	LedGreen::setOutput();
-	LedGreen::low();
+	LedGreen::reset();
 	
 	LedRed::setOutput();
-	LedRed::high();
+	LedRed::set();
 	
 	TCCR2A = (1 << WGM21);
 	TCCR2B = (1 << CS22);
@@ -62,7 +62,7 @@ main()
 	
 	sei();
 	
-	LedRed::low();
+	LedRed::reset();
 	
 	uint8_t status = 0;
 	xpcc::Timeout<> timeout(200);

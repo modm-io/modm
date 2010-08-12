@@ -47,6 +47,13 @@ xpcc::Location2D<T>::Location2D(const Vector2D<T>& position,
 {
 }
 
+template <typename T>
+xpcc::Location2D<T>::Location2D(const T& x, const T& y, const float& orientation) :
+	position(x, y),
+	orientation(orientation)
+{
+}
+
 // ----------------------------------------------------------------------------
 template <typename T>
 const xpcc::Vector2D<T>&

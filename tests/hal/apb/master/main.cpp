@@ -46,13 +46,13 @@ int
 main()
 {
 	LedGreen::setOutput();
-	LedGreen::low();
+	LedGreen::reset();
 	
 	LedRed::setOutput();
-	LedRed::high();
+	LedRed::set();
 	
 	lcd::Backlight::setOutput();
-	lcd::Backlight::low();
+	lcd::Backlight::reset();
 	
 	display.initialize();
 	
@@ -68,7 +68,7 @@ main()
 	
 	sei();
 	
-	LedRed::low();
+	LedRed::reset();
 	
 	xpcc::Timeout<> timeout;
 	while (1)

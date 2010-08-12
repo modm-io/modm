@@ -299,6 +299,9 @@ def generate(env, **kw):
 		else:
 			libs = []
 			libpath = []
+		
+		env['CXXCOM'] = []
+		env['LINKCOM'] = []
 		env['LIBS'] = libs
 		env['LIBPATH'] = libpath
 		env['CPPPATH'] = []
@@ -311,6 +314,9 @@ def generate(env, **kw):
 	
 	# append all values from environment section to the real environment
 	for key, value in configuration['environment'].iteritems():
+		if key.endswith('*'):
+			key = key[:-1]
+			value = " " + value
 		if key.upper() == "CPPPATH":
 			value = value.split(':')
 		env.Append(**{ key.upper(): value } )

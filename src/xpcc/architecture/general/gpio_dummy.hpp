@@ -103,7 +103,7 @@ namespace xpcc
 		} \
 		\
 		ALWAYS_INLINE static void setInput() {} \
-		ALWAYS_INLINE static bool read() {} \
+		ALWAYS_INLINE static bool read() { return false; } \
 	}
 
 #endif	// !__DOXYGEN__

@@ -47,10 +47,12 @@ xpcc::Vector2D<T>::Vector2D(const T& x, const T& y) :
 {
 }
 
+// ----------------------------------------------------------------------------
 template<typename T>
-xpcc::Vector2D<T>::Vector2D(const Vector2D<T>& A, const Vector2D<T>& B) :
-	x(B.x - A.x), y(B.y - A.y)
+inline xpcc::Vector2D<T>
+xpcc::Vector2D<T>::displacement(const Vector2D<T>& A, const Vector2D<T>& B)
 {
+	return Vector2D<T>(B.x - A.x, B.y - A.y);
 }
 
 // ----------------------------------------------------------------------------
@@ -181,7 +183,7 @@ template<typename T>
 typename xpcc::Vector2D<T>::WideType
 xpcc::Vector2D<T>::getDistanceTo(const Vector2D<T>& other) const
 {
-	return Vector2D<T>(*this, other).getLength();
+	return displacement(*this, other).getLength();
 }
 
 // ----------------------------------------------------------------------------

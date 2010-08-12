@@ -82,7 +82,7 @@ namespace xpcc
 	namespace xpcc
 	{
 		ALWAYS_INLINE void
-		delay_us(int ms)
+		delay_us(int us)
 		{
 			usleep(us);
 		}
@@ -101,12 +101,12 @@ namespace xpcc
 	{
 		// FIXME implement this functions
 		void
-		delay_us(int ms)
+		delay_us(int /*us*/)
 		{
 		}
 		
 		void
-		delay_ms(int ms)
+		delay_ms(int /*ms*/)
 		{
 		}
 	}

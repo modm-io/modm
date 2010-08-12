@@ -97,4 +97,6 @@ namespace xpcc
 	};
 }
 
+#include "abstract_component_impl.hpp"
+
 #endif // XPCC__ABSTRACT_COMPONENT_HPP

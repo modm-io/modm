@@ -98,7 +98,7 @@ template<typename T>
 T
 xpcc::LineSegment2D<T>::getLength() const
 {
-	Vector2D<T> directionVector(this->startPoint, this->endPoint);
+	Vector2D<T> directionVector = Vector2D<T>::displacement(this->startPoint, this->endPoint);
 	
 	return directionVector.getLength();
 }
@@ -109,8 +109,8 @@ const T
 xpcc::LineSegment2D<T>::getDistanceTo(const Vector2D<T>& point) const
 {
 	// vector from the base point of the line to the new point
-	Vector2D<T> startToPoint(this->startPoint, point);
-	Vector2D<T> directionVector(this->startPoint, this->endPoint);
+	Vector2D<T> startToPoint = Vector2D<T>::displacement(this->startPoint, point);
+	Vector2D<T> directionVector = Vector2D<T>::displacement(this->startPoint, this->endPoint);
 	
 	FloatType c1 = startToPoint.dot(directionVector);
 	if (c1 <= 0)
@@ -123,7 +123,7 @@ xpcc::LineSegment2D<T>::getDistanceTo(const Vector2D<T>& point) const
 	if (c2 <= c1)
 	{
 		// point is after the end point => calculate distance to end point
-		Vector2D<T> endToPoint(this->endPoint, point);
+		Vector2D<T> endToPoint = Vector2D<T>::displacement(this->endPoint, point);
 		return endToPoint.getLength();
 	}
 	
@@ -163,9 +163,9 @@ bool
 xpcc::LineSegment2D<T>::getIntersections(const LineSegment2D& other,
 		PointSet2D<T>& intersectionPoints) const
 {
-	xpcc::Vector2D<T> ownDirectionVector(this->startPoint, this->endPoint);
-	xpcc::Vector2D<T> otherDirectionVector(other.startPoint, other.endPoint);
-	xpcc::Vector2D<T> connectionVector(other.startPoint, this->startPoint);
+	xpcc::Vector2D<T> ownDirectionVector = Vector2D<T>::displacement(this->startPoint, this->endPoint);
+	xpcc::Vector2D<T> otherDirectionVector = Vector2D<T>::displacement(other.startPoint, other.endPoint);
+	xpcc::Vector2D<T> connectionVector = Vector2D<T>::displacement(other.startPoint, this->startPoint);
 	
 	WideType d = ownDirectionVector.cross(otherDirectionVector);
 	if (d)
@@ -195,10 +195,10 @@ xpcc::LineSegment2D<T>::getIntersections(const Circle2D<T>& circle,
 		PointSet2D<T>& intersectionPoints) const
 {
 	// Direction vector of line, from start to end
-	xpcc::Vector2D<T> directionVector(this->startPoint, this->endPoint);
+	xpcc::Vector2D<T> directionVector = Vector2D<T>::displacement(this->startPoint, this->endPoint);
 	
 	// vector from the center of the circle to line start
-	xpcc::Vector2D<T> circleToLine(circle.center, this->startPoint);
+	xpcc::Vector2D<T> circleToLine = Vector2D<T>::displacement(circle.center, this->startPoint);
 	
 	WideType a = directionVector.dot(directionVector);
 	WideType b = 2 * circleToLine.dot(directionVector);

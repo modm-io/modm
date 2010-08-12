@@ -247,8 +247,8 @@ main()
 	MISO::output();
 	
 	
-	Led6::high();
-	Led7::low();
+	Led6::set();
+	Led7::reset();
 	delay_ms(100);
 	
 	configure_spi_test();
@@ -262,9 +262,9 @@ main()
 
 	// enable global interrupts
 	sei();
-	Led7::high();
+	Led7::set();
 	delay_ms(100);
-	Led7::low();
+	Led7::reset();
 	
 	while (1)
 	{
@@ -318,7 +318,7 @@ ISR(SPIC_INT_vect){
 }
 
 ISR(DMA_CH1_vect){
-	Led1::high();
+	Led1::set();
 	DMA.CH1.CTRLB |= DMA_CH_TRNIF_bm; // clear the flag. necessary if interrupt is enabled.
 }
 
@@ -327,8 +327,8 @@ ISR(DMA_CH0_vect){
 }
 
 ISR(TCD0_OVF_vect){
-//	Led6::low();
-//	Led7::low();
+//	Led6::reset();
+//	Led7::reset();
 	
 	static uint8_t i = 0;
 	if (i++ == 20){
@@ -339,11 +339,11 @@ ISR(TCD0_OVF_vect){
 }
 
 ISR(TCD0_CCA_vect){
-//	Led6::high();
+//	Led6::set();
 }
 
 ISR(TCD0_CCB_vect){
-//	Led7::high();
+//	Led7::set();
 }
 
 ISR(PORTC_INT0_vect){
@@ -391,26 +391,26 @@ ISR(PORTC_INT0_vect){
 	if (state & DMA_CH_CHBUSY_bm){
 //	if (counter == 0){
 		errorCondition = 1;
-		Led0::high();
+		Led0::set();
 	}
 	else{
-		Led0::low();
+		Led0::reset();
 	}
 /*	
 	if (counter == sizeof(DmaPayload)){
-		Led1::high();
+		Led1::set();
 	}
 	else{
 		errorCondition = 1;
-		Led1::low();
+		Led1::reset();
 	}
 */
 /*	
 	if (counter == sizeof(DmaPayload) && state & DMA_CH_CHBUSY_bm){
-		Led7::high();
+		Led7::set();
 	}
 	else{
-		Led7::low();
+		Led7::reset();
 	}
 */
 //	if (errorCondition){

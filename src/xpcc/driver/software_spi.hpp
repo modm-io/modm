@@ -45,18 +45,18 @@ namespace xpcc
 	 * 
 	 * \todo	documentation
 	 * 
-	 * \tparam	CLK			clock pin [output]
-	 * \tparam	MOSI		master out slave in pin [output]
-	 * \tparam	MISO		master in slave out pin [input]
-	 * \tparam	FREQUENCY	requested SPI frequency in Hz
+	 * \tparam	Clk			clock pin [output]
+	 * \tparam	Mosi		master out slave in pin [output]
+	 * \tparam	Miso		master in slave out pin [input]
+	 * \tparam	Frequency	requested SPI frequency in Hz
 	 * 
 	 * \ingroup	driver
 	 * \see		gpio
 	 */
-	template <typename CLK,
-			  typename MOSI,
-			  typename MISO,
-			  int32_t FREQUENCY = 1000000>
+	template< typename Clk,
+			  typename Mosi,
+			  typename Miso,
+			  int32_t Frequency = 1000000 >
 	class SoftwareSpi
 	{
 	public:
@@ -71,7 +71,7 @@ namespace xpcc
 	private:
 		// calculate the delay in microseconds needed to achieve the
 		// requested SPI frequency
-		static const float delay = (1000000.0 / FREQUENCY) / 2.0;
+		static const float delay = (1000000.0 / Frequency) / 2.0;
 	};
 }
 

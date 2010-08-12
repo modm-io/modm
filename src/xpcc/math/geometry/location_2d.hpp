@@ -59,6 +59,8 @@ namespace xpcc
 		
 		Location2D(const Vector2D<T>& position, const float& orientation);
 		
+		Location2D(const T& x, const T& y, const float& orientation);
+		
 		inline const Vector2D<T>&
 		getPosition() const;
 		

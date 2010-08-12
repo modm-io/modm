@@ -84,10 +84,10 @@ void sendData(){
 	dmaPayload.i = value;
 	uint8_t * fin = (uint8_t*)(&dmaPayload + 1);
 	
-	SlaveCs::low();
+	SlaveCs::reset();
 	for (uint8_t *p = (uint8_t*)&dmaPayload, *ap = (uint8_t*)&dmaAnswer; p < fin; p++, ap++)
 		*ap = spi.put(*p);
-	SlaveCs::high();
+	SlaveCs::set();
 	Led5::toggle();
 }
 
@@ -145,7 +145,7 @@ main()
 	Led7::output();
 	
 	SlaveCs::output();
-	SlaveCs::low();
+	SlaveCs::reset();
 	
 	
 	Button0::configure(gpio::PULLUP);
@@ -155,8 +155,8 @@ main()
 	
 	EncoderButton::configure(gpio::PULLUP);
 	
-	Led6::high();
-	Led7::low();
+	Led6::set();
+	Led7::reset();
 	
 	delay_ms(100);
 	
@@ -167,7 +167,7 @@ main()
 	stream << "Hello World ;-)\n";
 	stream << "\x19" " = ";
 	
-	Led7::high();
+	Led7::set();
 	delay_ms(100);
 	
 	// enable medium interrupts
@@ -175,14 +175,14 @@ main()
 	
 	configureTimer(timer);
 
-	Led7::low();
+	Led7::reset();
 	delay_ms(100);
 	
 	// enable global interrupts
 	sei();
-	Led7::high();
+	Led7::set();
 	delay_ms(100);
-	Led7::low();
+	Led7::reset();
 	
 	while (1)
 	{
@@ -253,8 +253,8 @@ ISR(DMA_CH0_vect){
 }
 
 ISR(TCD0_OVF_vect){
-	Led3::low();
-	Led4::low();
+	Led3::reset();
+	Led4::reset();
 	
 	static uint8_t i = 0;
 	if (i++ == 20){
@@ -265,9 +265,9 @@ ISR(TCD0_OVF_vect){
 }
 
 ISR(TCD0_CCA_vect){
-	Led4::high();
+	Led4::set();
 }
 
 ISR(TCD0_CCB_vect){
-	Led3::high();
+	Led3::set();
 }

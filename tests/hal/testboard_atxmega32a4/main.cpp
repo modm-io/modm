@@ -63,8 +63,8 @@ main()
 	
 	EncoderButton::configure(gpio::PULLUP);
 	
-	Led6::high();
-	Led7::low();
+	Led6::set();
+	Led7::reset();
 	
 	// give the DOG-M display some time for startup
 	delay_ms(100);
@@ -102,8 +102,8 @@ main()
 			Led0::toggle();
 		}
 		
-		Led6::high(EncoderA::get());
-		Led7::high(EncoderB::get());
+		Led6::set(EncoderA::get());
+		Led7::set(EncoderB::get());
 		
 		// encoder button
 		if (encoder.getPress(Debounce::KEY2)) {

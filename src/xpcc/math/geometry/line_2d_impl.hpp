@@ -90,7 +90,7 @@ T
 xpcc::Line2D<T>::getDistanceTo(const Vector2D<T>& point) const
 {
 	// vector from the base point of the line to the new point
-	Vector2D<T> startToPoint(this->point, point);
+	Vector2D<T> startToPoint = Vector2D<T>::displacement(this->point, point);
 	
 	FloatType c1 = startToPoint.dot(this->directionVector);
 	FloatType c2 = this->directionVector.getLengthSquared();
@@ -102,7 +102,7 @@ xpcc::Line2D<T>::getDistanceTo(const Vector2D<T>& point) const
 	
 	// return the length of the vector from the closest point on the line
 	// to the given point
-	return Vector2D<T>(closestPoint, point).getLength();
+	return Vector2D<T>::displacement(closestPoint, point).getLength();
 }
 
 // ----------------------------------------------------------------------------
@@ -111,7 +111,7 @@ bool
 xpcc::Line2D<T>::getIntersections(const Line2D& other,
 		PointSet2D<T>& intersections) const
 {
-	xpcc::Vector2D<T> connectionVector(other.point, this->point);
+	xpcc::Vector2D<T> connectionVector = Vector2D<T>::displacement(other.point, this->point);
 	
 	WideType d = this->directionVector.cross(other.directionVector);
 	if (d)
@@ -132,7 +132,7 @@ xpcc::Line2D<T>::getIntersections(const Circle2D<T>& circle,
 		PointSet2D<T>& intersections) const
 {
 	// vector from the center of the circle to line start
-	xpcc::Vector2D<T> circleToLine(circle.center, this->point);
+	xpcc::Vector2D<T> circleToLine = Vector2D<T>::displacement(circle.center, this->point);
 	
 	WideType a = 2 * this->directionVector.dot(this->directionVector);
 	WideType b = 2 * circleToLine.dot(this->directionVector);
