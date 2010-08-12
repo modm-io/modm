@@ -30,10 +30,12 @@
  */
 // ----------------------------------------------------------------------------
 
-#include "operator.hpp"
+#include "../operator.hpp"
+#include <xpcc/utils/macros.hpp>
+
 
 extern "C" uint16_t
 xpcc::math::sqrt32(uint32_t input)
 {
-	return round(std::sqrt(input));
+	return round(std::sqrt(static_cast<double>(input)));
 }

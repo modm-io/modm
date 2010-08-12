@@ -67,6 +67,12 @@
 		return result;
 	};
 	
+	inline double
+	round(double f)
+	{
+		return floor(f + 0.5);
+	};
+	
 #endif
 
 #endif // XPCC_PC__WINDOWS_HPP
