@@ -5,7 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -30,21 +30,11 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_FILTER__MEDIAN_HPP
-	#error	"Don't include this file directly, use 'median.hpp' instead!"
-#endif
+#ifndef XPCC_MATH__UTILS_HPP
+#define XPCC_MATH__UTILS_HPP
 
-// ----------------------------------------------------------------------------
-#define XPCC_MEDIAN__SORT(a,b) do { if (a > b) { XPCC_MEDIAN__SWAP(a, b); } } while (0);
-#define XPCC_MEDIAN__SWAP(a,b) do { T temp = a; a = b; b = temp; } while (0);
+#include "utils/misc.hpp"
+#include "utils/bit_operation.hpp"
+#include "utils/operator.hpp"
 
-#include "median_3_impl.hpp"
-#include "median_5_impl.hpp"
-#include "median_7_impl.hpp"
-#include "median_9_impl.hpp"
-
-#undef XPCC_MEDIAN__SORT
-#undef XPCC_MEDIAN__SWAP
-
-// ----------------------------------------------------------------------------
-// TODO General implementation
+#endif // XPCC_MATH__UTILS_HPP

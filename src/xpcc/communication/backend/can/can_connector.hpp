@@ -174,8 +174,6 @@ namespace xpcc
 			uint8_t fragmentIndex;
 			
 		private:
-			;
-			
 			SendListItem&
 			operator = (const SendListItem& other);
 		};
@@ -195,16 +193,16 @@ namespace xpcc
 			{
 			}
 			
-			Header header;
-			SmartPointer payload;
-			
-			uint8_t receivedFragments;
-			
 			bool
 			operator == (const Header& header)
 			{
 				return (this->header == header);
 			}
+			
+			Header header;
+			SmartPointer payload;
+			
+			uint8_t receivedFragments;
 			
 		private:
 			ReceiveListItem&

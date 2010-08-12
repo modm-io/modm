@@ -28,8 +28,8 @@
  * $Id$
  */
 // ----------------------------------------------------------------------------
-#ifndef XPCC__TIPC_TRANSMITTER_H_
-#define XPCC__TIPC_TRANSMITTER_H_
+#ifndef XPCC__TIPC_TRANSMITTER_HPP
+#define XPCC__TIPC_TRANSMITTER_HPP
  
 // STD exceptions... 
 //#include <stdexcept>
@@ -39,8 +39,10 @@
 #include "tipc_transmitter_socket.hpp"
 #include <xpcc/container/smart_pointer.hpp>
 
-namespace xpcc {
-	namespace tipc {
+namespace xpcc
+{
+	namespace tipc
+	{
 		/**
 		 * \class		Transmitter
 		 * \brief		Transmit packets over the TIPC.
@@ -51,24 +53,25 @@ namespace xpcc {
 		 * \version		$Id$
 		 * \author		Carsten Schmitt < >
 		 */
-		class Transmitter {
-			public:
-				Transmitter();
+		class Transmitter
+		{
+		public:
+			Transmitter();
 
-				~Transmitter();
-		
-				void 
-				transmitRequest( uint8_t destination, const SmartPointer& payload );
+			~Transmitter();
+	
+			void 
+			transmitRequest( uint8_t destination, const SmartPointer& payload );
 
-				void
-				transmitEvent( uint8_t event, const SmartPointer& payload );
+			void
+			transmitEvent( uint8_t event, const SmartPointer& payload );
 
-				uint32_t
-				getPortId();
-		
-			private:
-				TransmitterSocket 	tipcTransmitterSocket_;
+			uint32_t
+			getPortId();
+	
+		private:
+			TransmitterSocket 	tipcTransmitterSocket_;
 		};
 	}
 }
-#endif // TIPC_TRANSMITTER_H_
+#endif // XPCC__TIPC_TRANSMITTER_HPP

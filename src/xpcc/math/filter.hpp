@@ -29,22 +29,17 @@
  * $Id$
  */
 // ----------------------------------------------------------------------------
+/**
+ * \ingroup		math
+ * \defgroup	filter	Filter
+ * \brief		Some filter
+ *
+ */
 
-#ifndef XPCC_FILTER__MEDIAN_HPP
-	#error	"Don't include this file directly, use 'median.hpp' instead!"
-#endif
-
-// ----------------------------------------------------------------------------
-#define XPCC_MEDIAN__SORT(a,b) do { if (a > b) { XPCC_MEDIAN__SWAP(a, b); } } while (0);
-#define XPCC_MEDIAN__SWAP(a,b) do { T temp = a; a = b; b = temp; } while (0);
-
-#include "median_3_impl.hpp"
-#include "median_5_impl.hpp"
-#include "median_7_impl.hpp"
-#include "median_9_impl.hpp"
-
-#undef XPCC_MEDIAN__SORT
-#undef XPCC_MEDIAN__SWAP
-
-// ----------------------------------------------------------------------------
-// TODO General implementation
+#include "filter/debounce.hpp"
+#include "filter/median.hpp"
+#include "filter/moving_average.hpp"
+#include "filter/pid.hpp"
+#include "filter/ramp.hpp"
+#include "filter/s_curve_controller.hpp"
+#include "filter/s_curve_generator.hpp"

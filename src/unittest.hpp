@@ -29,22 +29,15 @@
  * $Id$
  */
 // ----------------------------------------------------------------------------
+/**
+ * \defgroup unittest Unit tests
+ * \brief	Perform a unit test
+ *
+ */
 
-#ifndef XPCC_FILTER__MEDIAN_HPP
-	#error	"Don't include this file directly, use 'median.hpp' instead!"
-#endif
+#include "unittest/testsuite.hpp"
+#include "unittest/harness.hpp"
+#include "unittest/controller.hpp"
+#include "unittest/reporter.hpp"
 
-// ----------------------------------------------------------------------------
-#define XPCC_MEDIAN__SORT(a,b) do { if (a > b) { XPCC_MEDIAN__SWAP(a, b); } } while (0);
-#define XPCC_MEDIAN__SWAP(a,b) do { T temp = a; a = b; b = temp; } while (0);
-
-#include "median_3_impl.hpp"
-#include "median_5_impl.hpp"
-#include "median_7_impl.hpp"
-#include "median_9_impl.hpp"
-
-#undef XPCC_MEDIAN__SORT
-#undef XPCC_MEDIAN__SWAP
-
-// ----------------------------------------------------------------------------
-// TODO General implementation
+#include "unittest/type/count_type.hpp"

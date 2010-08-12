@@ -29,24 +29,23 @@
  * $Id$
  */
 // ----------------------------------------------------------------------------
-
-#ifndef	XPCC__GEOMETRY_HPP
-#define	XPCC__GEOMETRY_HPP
-
 /**
  * \ingroup		math
  * \defgroup	geometry Geometry
  * \brief 		Geometric classes and operations
  * 
- * 
  */
-#include <xpcc/math/geometry/angle.hpp>
-#include <xpcc/math/geometry/circle_2d.hpp>
-#include <xpcc/math/geometry/line_2d.hpp>
-#include <xpcc/math/geometry/line_segment_2d.hpp>
-#include <xpcc/math/geometry/location_2d.hpp>
-#include <xpcc/math/geometry/point_set_2d.hpp>
-#include <xpcc/math/geometry/polygon_2d.hpp>
-#include <xpcc/math/geometry/vector_2d.hpp>
+
+#ifndef	XPCC__GEOMETRY_HPP
+#define	XPCC__GEOMETRY_HPP
+
+#include "geometry/angle.hpp"
+#include "geometry/circle_2d.hpp"
+#include "geometry/line_2d.hpp"
+#include "geometry/line_segment_2d.hpp"
+#include "geometry/location_2d.hpp"
+#include "geometry/point_set_2d.hpp"
+#include "geometry/polygon_2d.hpp"
+#include "geometry/vector_2d.hpp"
 
 #endif	// XPCC__GEOMETRY_HPP

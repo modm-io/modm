@@ -33,7 +33,8 @@
 #include "logger/logger.hpp"
 #include "logger/style.hpp"
 
-/*!
+/**
+\ingroup	debug
 \defgroup	logger Logger
 \brief 		Log messages to specified destiny.
  

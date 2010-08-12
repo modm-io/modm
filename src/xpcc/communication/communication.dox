@@ -1,9 +1,0 @@
-// coding: utf-8
-// 
-// $Id: communication.dox 76 2009-10-14 23:29:28Z dergraaf $
-
-/*!
-\defgroup 	communication Communication
-\brief 		Interface to the Communication.
-
-*/
