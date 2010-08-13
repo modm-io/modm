@@ -54,7 +54,7 @@ namespace xpcc
 		{
 		public :
 
-			SerialPort(std::string deviceName, unsigned int bautRate);
+			SerialPort(boost::asio::io_service& io_service, std::string deviceName, unsigned int bautRate);
 
 			virtual void
 			write(char c);
@@ -90,8 +90,8 @@ namespace xpcc
 			static const int max_read_length = 1;
 			ReadState readState;
 
-			boost::asio::io_service  io_service;
-			boost::asio::serial_port* serialPort;
+			boost::asio::serial_port serialPort;
+			boost::asio::io_service& io_service;
 
 			std::queue<char> writeBuffer;
 

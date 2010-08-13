@@ -1,15 +1,14 @@
 #include "serial_port.hpp"
 #include <iostream>
 
-xpcc::pc::SerialPort::SerialPort(std::string deviceName, unsigned int baudRate) {
-	this->serialPort = new boost::asio::serial_port(this->io_service,
-			deviceName);
+xpcc::pc::SerialPort::SerialPort(boost::asio::io_service& io_service, std::string deviceName, unsigned int baudRate):
+	serialPort(io_service, deviceName), io_service(io_service){
 	boost::asio::serial_port_base::baud_rate baud(baudRate);
-	if (!this->serialPort->is_open()) {
+	if (!this->serialPort.is_open()) {
 		std::cerr << "Failed to open serial port" << deviceName << "\n";
 		return;
 	}
-	this->serialPort->set_option(baud);
+	this->serialPort.set_option(baud);
 	this->readState = xpcc::pc::SerialPort::NOT_READING;
 }
 
@@ -22,8 +21,9 @@ xpcc::pc::SerialPort::write(char c)
 void
 xpcc::pc::SerialPort::write(const char* s)
 {
+	const char c = *s;
 	this->io_service.post(
-			boost::bind(&xpcc::pc::SerialPort::do_write, this, &s));
+			boost::bind(&xpcc::pc::SerialPort::do_write, this, c));
 }
 
 void
@@ -35,10 +35,10 @@ xpcc::pc::SerialPort::flush()
 bool
 xpcc::pc::SerialPort::read(char& value)
 {
-	if(this->readState = xpcc::pc::SerialPort::NOT_READING)
+	if(this->readState == xpcc::pc::SerialPort::NOT_READING)
 	{
 		this->readState = xpcc::pc::SerialPort::READING;
-		this->serialPort->async_read_some(boost::asio::buffer(&value, xpcc::pc::SerialPort::max_read_length),
+		this->serialPort.async_read_some(boost::asio::buffer(&value, xpcc::pc::SerialPort::max_read_length),
 				boost::bind(&xpcc::pc::SerialPort::read_complete, this,
 						boost::asio::placeholders::error,
 						boost::asio::placeholders::bytes_transferred));
@@ -66,7 +66,7 @@ xpcc::pc::SerialPort::readFinished()
 bool
 xpcc::pc::SerialPort::isOpen()
 {
-	return this->serialPort->is_open();
+	return this->serialPort.is_open();
 }
 
 void
@@ -87,7 +87,7 @@ xpcc::pc::SerialPort::do_close(const boost::system::error_code& error)
 	else
 		std::cout << "Error: Connection did not succeed.\n";
 
-	this->serialPort->close();
+	this->serialPort.close();
 }
 
 void
