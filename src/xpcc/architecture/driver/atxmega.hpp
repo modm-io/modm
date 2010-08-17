@@ -33,3 +33,7 @@
  * \ingroup		avr
  * \defgroup	atxmega		ATxmega specifiy functions
  */
+
+#include "atxmega/uart.hpp"
+#include "atxmega/spi.hpp"
+#include "atxmega/gpio.hpp"

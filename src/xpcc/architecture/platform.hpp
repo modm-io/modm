@@ -31,8 +31,9 @@
 // ----------------------------------------------------------------------------
 /**
  * \ingroup 	architecture
- * \defgroup	platform	Select built-in functions and macros for the active platform
+ * \defgroup	platform	Platform
  * 
+ * Select built-in functions and macros for the active platform
  */
 
 #include "platform/detect.hpp"

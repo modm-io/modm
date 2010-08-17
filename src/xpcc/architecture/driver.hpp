@@ -29,10 +29,6 @@
  * $Id$
  */
 // ----------------------------------------------------------------------------
-/**
- * \ingroup 	architecture
- * \defgroup	driver	Driver for internal peripherals
- */
 
 #include "platform.hpp"
 

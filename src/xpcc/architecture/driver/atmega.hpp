@@ -34,4 +34,7 @@
  * \defgroup	atmega		ATmega specifiy functions
  */
 
-
+#include "atmega/adc.hpp"
+#include "atmega/uart.hpp"
+#include "atmega/spi.hpp"
+#include "atmega/gpio.hpp"

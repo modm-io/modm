@@ -30,7 +30,7 @@
  */
 // ----------------------------------------------------------------------------
 /**
- * \ingroup	architecture
+ * \ingroup		architecture
  * \defgroup	pc		PC specifiy functions
  * 
  */

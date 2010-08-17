@@ -30,7 +30,60 @@
  */
 // ----------------------------------------------------------------------------
 
-// TODO Doxygen documentation
+#ifdef __DOXYGEN__
+
+/**
+ * \brief	Compiler description
+ * \ingroup	platform
+ */
+#define	XPCC__COMPILER_STRING
+
+/**
+ * \brief	Possible compilers
+ * \ingroup	platform
+ */
+//@{
+#define	XPCC__COMPILER_GCC
+#define	XPCC__COMPILER_MSVC
+//@}
+
+/**
+ * \brief	Operating system description
+ * \ingroup	platform
+ */
+#define	XPCC__OS_STRING
+
+/**
+ * \brief	Possible operating systems
+ * \ingroup	platform
+ */
+//@{
+#define	XPCC__OS_UNIX
+#define	XPCC__OS_LINUX
+#define	XPCC__OS_OSX
+#define	XPCC__OS_WIN32
+#define	XPCC__OS_WIN64
+//@}
+
+/**
+ * \brief	CPU description
+ * \ingroup	platform
+ */
+#define	XPCC__CPU_STRING
+
+/**
+ * \brief	Possible CPU definitions
+ * \ingroup	platform
+ */
+//@{
+#define	XPCC__CPU_AVR
+#define	XPCC__CPU_ATXMEGA
+#define	XPCC__CPU_ATMEGA
+#define	XPCC__CPU_X86
+#define	XPCC__CPU_X86_64
+//@}
+
+#else //!__DOXYGEN__
 
 // ----------------------------------------------------------------------------
 // Determine compilation environment
@@ -54,8 +107,8 @@
 // Determine target operating system
 
 #if defined linux || defined __linux__
-#	define XPCC__OS_STRING 			"Linux"
 #	define XPCC__OS_LINUX 1 
+#	define XPCC__OS_STRING 			"Linux"
 #endif
 
 #if (defined __MWERKS__ && defined __powerc && !defined macintosh) || defined __APPLE_CC__ || defined macosx
@@ -110,3 +163,5 @@
 #	error "Couldn't determine target CPU!"
 #	define XPCC__CPU_STRING 		"Unknown"
 #endif
+
+#endif	// !__DOXYGEN__
