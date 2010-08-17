@@ -25,4 +25,3 @@ namespace xpcc
 #include "atomic/queue.hpp"
 
 #endif	// XPCC__ATOMIC_HPP
-

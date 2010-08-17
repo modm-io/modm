@@ -78,21 +78,26 @@ namespace xpcc
 		template <typename T, typename U>
 		class Conversion
 		{
-			typedef char UT;
-			typedef int TT;
-			static UT Test(U);
-			static TT Test(...);
-			static T MakeT(void);
-		public:
 #ifdef __DOXYGEN__
+		public:
 			enum {
 				exists = false,
 				existsBothWays = false,
 				isSameType = false
 			};
 #else
+			// Only works if sizeof(char) != sizeof(int)
+			typedef char ConversionPossible;
+			typedef int ConversionNotPossible;
+			
+			static ConversionPossible Test(U);
+			static ConversionNotPossible Test(...);
+			
+			static T CreateT(void);
+			
+		public:
 			enum {
-				exists = (sizeof(UT) == sizeof(Test(MakeT()))),
+				exists = (sizeof(ConversionPossible) == sizeof(Test(CreateT()))),
 				existsBothWays = exists && Conversion<U, T>::exists,
 				isSameType = false
 			};
@@ -233,6 +238,7 @@ namespace xpcc
 		 *     }
 		 * };
 		 * 
+		 * // Usage:
 		 * FloatingPointTraits::max<float>();
 		 * FloatingPointTraits::max<double>();
 		 * \endcode

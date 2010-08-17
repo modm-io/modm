@@ -31,7 +31,6 @@
 // ----------------------------------------------------------------------------
 
 #include "../operator.hpp"
-#include <xpcc/utils/macros.hpp>
 
 
 extern "C" uint16_t
