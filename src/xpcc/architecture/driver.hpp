@@ -41,3 +41,8 @@
 #elif defined XPCC__CPU_ATXMEGA
 #	include "driver/atxmega.hpp"
 #endif
+
+#include "driver/atomic.hpp"
+#include "driver/accessor.hpp"
+#include "driver/gpio.hpp"
+#include "driver/time.hpp"
