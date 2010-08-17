@@ -35,8 +35,8 @@
 
 #include <xpcc/driver/lcd/lcd.hpp>
 
-#include <xpcc/architecture/general/accessor/flash.hpp>
-#include <xpcc/architecture/general/time/delay.hpp>
+#include <xpcc/architecture/driver/accessor/flash.hpp>
+#include <xpcc/architecture/driver/time/delay.hpp>
 
 namespace xpcc
 {

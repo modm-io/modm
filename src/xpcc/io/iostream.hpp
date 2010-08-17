@@ -33,8 +33,7 @@
 #ifndef XPCC__IOSTREAM_HPP
 #define XPCC__IOSTREAM_HPP
 
-#include <stdint.h>
-#include <xpcc/utils/macros.hpp>
+#include <xpcc/architecture/platform.hpp>
 
 #include "iodevice.hpp"
 #include "iodevice_wrapper.hpp"

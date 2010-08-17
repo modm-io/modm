@@ -33,7 +33,7 @@
 #ifndef XPCC__TIMEOUT_HPP
 #define XPCC__TIMEOUT_HPP
 
-#include <xpcc/architecture/general/time/clock.hpp>
+#include <xpcc/architecture/driver/time/clock.hpp>
 
 #include "timestamp.hpp"
 

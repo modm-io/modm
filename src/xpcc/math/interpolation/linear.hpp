@@ -37,7 +37,7 @@
 
 #include <xpcc/utils/arithmetic_traits.hpp>
 #include <xpcc/container/pair.hpp>
-#include <xpcc/architecture/general/accessor.hpp>
+#include <xpcc/architecture/driver/accessor.hpp>
 
 namespace xpcc
 {

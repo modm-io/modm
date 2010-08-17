@@ -294,7 +294,7 @@ def generate(env, **kw):
 		
 	elif architecture == 'pc':
 		if device == 'linux':
-			libs = ['boost_thread-mt']
+			libs = ['boost_thread-mt', 'boost_system']
 			libpath = ['/usr/lib/']
 		else:
 			libs = []

@@ -35,7 +35,7 @@
  * 
  */
 
-#include "utils/macros.hpp"
+#include "architecture/platform.hpp"
 #include "utils/algorithm.hpp"
 #include "utils/allocator.hpp"
 #include "utils/arithmetic_traits.hpp"

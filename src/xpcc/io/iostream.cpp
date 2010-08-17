@@ -32,7 +32,7 @@
 
 #include "iostream.hpp"
 
-#include <xpcc/architecture/general/accessor/flash.hpp>
+#include <xpcc/architecture/driver/accessor/flash.hpp>
 
 FLASH(uint16_t base[]) = { 10, 100, 1000, 10000 };
 

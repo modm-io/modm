@@ -48,11 +48,11 @@ LinearInterpolationTest::testInterpolationRam()
 	
 	xpcc::interpolation::Linear<Point> value(points, 3);
 	
-	TEST_ASSERT_EQUALS(value.interpolate(-20), 50);
-	TEST_ASSERT_EQUALS(value.interpolate( 10), 37);
-	TEST_ASSERT_EQUALS(value.interpolate( 30), 24);
-	TEST_ASSERT_EQUALS(value.interpolate( 50), 10);
-	TEST_ASSERT_EQUALS(value.interpolate(150),  0);
+	TEST_ASSERT_EQUALS(value.interpolate(-20), 50U);
+	TEST_ASSERT_EQUALS(value.interpolate( 10), 37U);
+	TEST_ASSERT_EQUALS(value.interpolate( 30), 24U);
+	TEST_ASSERT_EQUALS(value.interpolate( 50), 10U);
+	TEST_ASSERT_EQUALS(value.interpolate(150),  0U);
 }
 
 typedef xpcc::Pair<uint8_t, int16_t> MyPair;

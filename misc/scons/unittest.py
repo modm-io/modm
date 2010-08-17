@@ -137,6 +137,10 @@ def unittest_action(target, source, env):
 	return 0
 	
 def unittest_emitter(target, source, env):
+	try:
+		Depends(target, SCons.Node.Python.Value(env['ARCHITECTURE']))
+	except KeyError:
+		pass
 	header = []
 	for file in source:
 		if file.name.endswith('_test.hpp'):

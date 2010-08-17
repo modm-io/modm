@@ -33,7 +33,7 @@
 #ifndef XPCC__LOGGER_HPP
 #define XPCC__LOGGER_HPP
 
-#include <xpcc/utils/macros.hpp>
+#include <xpcc/architecture/platform.hpp>
 #include <xpcc/io/iostream.hpp>
 
 #include "level.hpp"

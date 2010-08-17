@@ -17,7 +17,7 @@ $ sudo aptitude install python scons python-jinja2 python-lxml doxygen graphviz 
 
 To compile programs for x86 systems you need the following packets:
 \verbatim
-$ sudo aptitude install gcc build-essential tipcutils libboost-thread-dev
+$ sudo aptitude install gcc build-essential tipcutils libboost-thread-dev libboost-system-dev libasio-dev
 \endverbatim
 
 \subsection avr AVR

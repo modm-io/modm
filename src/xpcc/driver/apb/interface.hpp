@@ -35,7 +35,7 @@
 
 #include <cstddef>
 #include <stdint.h>
-#include <xpcc/utils/macros.hpp>
+#include <xpcc/architecture/platform.hpp>
 
 namespace xpcc
 {

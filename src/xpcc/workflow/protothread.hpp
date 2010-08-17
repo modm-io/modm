@@ -45,7 +45,7 @@
 #define XPCC__PROTOTHREAD_HPP
 
 #include <stdint.h>
-#include <xpcc/utils/macros.hpp>
+#include <xpcc/architecture/platform.hpp>
 
 /**
  * \ingroup		workflow
@@ -62,7 +62,7 @@ namespace xpcc
 	 * 
 	 * Example:
 	 * \code
-	 * #include <xpcc/architecture/general/gpio.hpp>
+	 * #include <xpcc/architecture/driver/gpio.hpp>
 	 * #include <xpcc/workflow/protothread.hpp>
 	 * #include <xpcc/workflow/timeout.hpp>
 	 * 

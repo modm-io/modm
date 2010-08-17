@@ -35,9 +35,9 @@
 
 #include <stdint.h>
 
-#include <xpcc/architecture/general/accessor.hpp>
-#include <xpcc/utils/macros.hpp>
-#include <xpcc/architecture/general/atomic/lock.hpp>		// for Scheduler::scheduleInterrupt()
+#include <xpcc/architecture/driver/accessor.hpp>
+#include <xpcc/architecture/platform.hpp>
+#include <xpcc/architecture/driver/atomic/lock.hpp>		// for Scheduler::scheduleInterrupt()
 
 namespace xpcc
 {

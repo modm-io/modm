@@ -2,8 +2,8 @@
 // Please modify the corresponding 'runner_atxmega.cpp.in' file instead.
 // ----------------------------------------------------------------------------
 
-#include <avr/interrupt.h>
-#include <xpcc/architecture/atxmega/uart/uart_e0.hpp>
+#include <xpcc/architecture/platform.hpp>
+#include <xpcc/architecture/driver/atxmega/uart.hpp>
 
 #include <unittest/reporter.hpp>
 #include <unittest/controller.hpp>

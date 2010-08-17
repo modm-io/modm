@@ -100,7 +100,7 @@
 
 #else // !__DOXYGEN__
 
-#include <xpcc/architecture/general/accessor/flash.hpp>
+#include <xpcc/architecture/driver/accessor/flash.hpp>
 
 namespace unittest
 {

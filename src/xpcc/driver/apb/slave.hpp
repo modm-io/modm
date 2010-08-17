@@ -34,7 +34,7 @@
 #define	XPCC_APB__SLAVE_HPP
 
 #include <cstddef>
-#include <xpcc/architecture/general/accessor/flash.hpp>
+#include <xpcc/architecture/driver/accessor/flash.hpp>
 
 #include "interface.hpp"
 

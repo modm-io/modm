@@ -2,13 +2,12 @@
 // Please modify the corresponding 'runner_atmega.cpp.in' file instead.
 // ----------------------------------------------------------------------------
 
-#include <avr/interrupt.h>
-
 #include <unittest/reporter.hpp>
 #include <unittest/controller.hpp>
 
-#include <xpcc/architecture/atmega/uart/uart0.hpp>
-#include <xpcc/architecture/general/gpio.hpp>
+#include <xpcc/architecture/platform.hpp>
+#include <xpcc/architecture/driver/atmega/uart.hpp>
+#include <xpcc/architecture/driver/gpio.hpp>
 
 ${includes}
 

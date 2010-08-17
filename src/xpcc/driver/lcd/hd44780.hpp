@@ -34,7 +34,7 @@
 #define XPCC__HD44780_HPP
 
 #include <xpcc/driver/lcd/lcd.hpp>
-#include <xpcc/architecture/general/time/delay.hpp>
+#include <xpcc/architecture/driver/time/delay.hpp>
 
 namespace xpcc
 {

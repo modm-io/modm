@@ -31,7 +31,7 @@
 // ----------------------------------------------------------------------------
 
 #include <xpcc/container/pair.hpp>
-#include <xpcc/architecture/general/accessor/flash.hpp>
+#include <xpcc/architecture/driver/accessor/flash.hpp>
 
 #include "pair_test.hpp"
 

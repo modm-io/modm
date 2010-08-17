@@ -1,14 +1,10 @@
-// This file is part of the uSTL library, an STL implementation.
-//
-// Copyright (c) 2007-2009 by Mike Sharov <msharov@users.sourceforge.net>
-//
 // This implementation is adapted from the Loki library, distributed under
 // the MIT license with Copyright (c) 2001 by Andrei Alexandrescu.
 
 #ifndef XPCC_TM__TEMPLATE_METAPROGRAMMING_HPP
 #define XPCC_TM__TEMPLATE_METAPROGRAMMING_HPP
 
-#include "macros.hpp"
+#include <xpcc/architecture/platform.hpp>
 
 /**
  * \ingroup		utils
@@ -83,10 +79,10 @@ namespace xpcc
 		class Conversion
 		{
 			typedef char UT;
-			typedef short TT;
-			static UT Test (U);
-			static TT Test (...);
-			static T MakeT (void);
+			typedef int TT;
+			static UT Test(U);
+			static TT Test(...);
+			static T MakeT(void);
 		public:
 #ifdef __DOXYGEN__
 			enum {
@@ -209,6 +205,60 @@ namespace xpcc
 				value = SuperSubclass<T,U>::value &&
 					   !Conversion<const volatile T*, const volatile U*>::isSameType
 			};
+		};
+		
+		// --------------------------------------------------------------------
+		/**
+		 * \brief	These templates are a set of tools to allow a function
+		 * 			template or a class template specialization to include or
+		 * 			exclude itself from a set of matching functions or specializations
+		 * 			based on properties of its template arguments.
+		 * 
+		 * Example:
+		 * \code
+		 * struct FloatingPointTraits
+		 * {
+		 *     template <typename T>
+		 *     static typename tm::EnableIfCondition<sizeof(T) == 4, T>::type
+		 *     max()
+		 *     {
+		 *         return 3.40282e+38;
+		 *     }
+		 *     
+		 *     template <typename T>
+		 *     static typename tm::EnableIfCondition<sizeof(T) == 8, T>::type
+		 *     max()
+		 *     {
+		 *         return 1.79769e+308;
+		 *     }
+		 * };
+		 * 
+		 * FloatingPointTraits::max<float>();
+		 * FloatingPointTraits::max<double>();
+		 * \endcode
+		 * 
+		 * \ingroup	tm
+		 */
+		template <bool B, class T = void>
+		struct EnableIfCondition
+		{
+			typedef T type;
+		};
+		
+		/**
+		 * \internal
+		 */
+		template <class T>
+		struct EnableIfCondition<false, T>
+		{
+		};
+		
+		/**
+		 * \ingroup	tm
+		 */
+		template <class Conditional, class T = void>
+		struct EnableIf : public EnableIfCondition< Conditional::value, T >
+		{
 		};
 		
 		// --------------------------------------------------------------------

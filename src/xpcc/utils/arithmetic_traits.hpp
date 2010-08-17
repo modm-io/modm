@@ -33,8 +33,8 @@
 #ifndef XPCC__ARITHMETIC_TRAITS_HPP
 #define XPCC__ARITHMETIC_TRAITS_HPP
 
-#include <stdint.h>
-#include <xpcc/utils/macros.hpp>
+#include <xpcc/architecture/platform.hpp>
+#include <xpcc/utils/template_metaprogramming.hpp>
 
 namespace xpcc
 {
@@ -298,7 +298,6 @@ namespace xpcc
 	};
 	
 	// ------------------------------------------------------------------------
-
 	template<>
 	struct ArithmeticTraits<float>
 	{
@@ -312,21 +311,23 @@ namespace xpcc
 		static ALWAYS_INLINE float
 		min()
 		{
-			return -3.40282e+38;
+			return __FLT_MIN__;
 		}
 		
 		static ALWAYS_INLINE float
 		max()
 		{
-			return 3.40282e+38;
+			return __FLT_MAX__;
+		}
+		
+		static ALWAYS_INLINE float
+		epsilon()
+		{
+			return __FLT_EPSILON__;
 		}
 	};
-
+	
 	// ------------------------------------------------------------------------
-
-#ifdef __AVR__
-	// the AVRs don't know a dedicated double type, double is implemented
-	// with sizeof(double) == sizeof(float).
 	template<>
 	struct ArithmeticTraits<double>
 	{
@@ -340,42 +341,21 @@ namespace xpcc
 		static ALWAYS_INLINE double
 		min()
 		{
-			return -3.40282e+38;
+			return __DBL_MIN__;
 		}
 		
 		static ALWAYS_INLINE double
 		max()
 		{
-			return 3.40282e+38;
-		}
-	};
-
-#else
-
-	template<>
-	struct ArithmeticTraits<double>
-	{
-		typedef double WideType;
-		typedef double SignedType;
-		typedef double UnsignedType;
-		
-		static const bool isSigned = true;
-		static const bool isFloatingPoint = true;
-		
-		static ALWAYS_INLINE double
-		min()
-		{
-			return 2.22507e-308;
+			return __DBL_MAX__;
 		}
 		
 		static ALWAYS_INLINE double
-		max()
+		epsilon()
 		{
-			return 1.79769e+308;
+			return __DBL_EPSILON__;
 		}
 	};
-
-#endif
 	/*\}*/
 }
 
