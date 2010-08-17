@@ -39,6 +39,12 @@
 
 namespace xpcc
 {
+	class CanConnectorBase
+	{
+	protected:
+		static uint8_t messageCounter;
+	};
+	
 	/**
 	 * \brief	The CAN connector to the XPCC communication
 	 *
@@ -82,7 +88,7 @@ namespace xpcc
 	 * \ingroup	backend
 	 */
 	template <typename Driver>
-	class CanConnector : public BackendInterface
+	class CanConnector : public CanConnectorBase, public BackendInterface
 	{
 	public:
 		virtual
@@ -181,15 +187,17 @@ namespace xpcc
 		class ReceiveListItem
 		{
 		public:
-			ReceiveListItem(uint8_t size, const Header& header) :
+			ReceiveListItem(uint8_t size, const Header& header, uint8_t messageCounter = 0) :
 				header(header), payload(size),
-				receivedFragments(0)
+				receivedFragments(0),
+				messageCounter(messageCounter)
 			{
 			}
 			
 			ReceiveListItem(const ReceiveListItem& other) :
 				header(other.header), payload(other.payload),
-				receivedFragments(other.receivedFragments)
+				receivedFragments(other.receivedFragments),
+				messageCounter(messageCounter)
 			{
 			}
 			
@@ -203,6 +211,7 @@ namespace xpcc
 			SmartPointer payload;
 			
 			uint8_t receivedFragments;
+			const uint8_t messageCounter;
 			
 		private:
 			ReceiveListItem&

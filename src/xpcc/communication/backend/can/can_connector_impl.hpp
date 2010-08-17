@@ -229,15 +229,15 @@ xpcc::CanConnector<Driver>::sendWaitingMessages()
 	SendListItem& message = this->sendList.getFront();
 	uint8_t messageSize = message.payload.getSize();
 	
-	bool sendFinished = true;
 	if (messageSize > 8)
 	{
 		// fragmented message
 		uint8_t data[8];
 		
-		data[0] = message.fragmentIndex;
+		data[0] = message.fragmentIndex | (this->messageCounter & 0xf0);
 		data[1] = messageSize; 	// size of the complete message
 		
+		bool sendFinished = true;
 		uint8_t offset = message.fragmentIndex * 6;
 		uint8_t fragmentSize = messageSize - offset;
 		if (fragmentSize > 6)
@@ -250,29 +250,25 @@ xpcc::CanConnector<Driver>::sendWaitingMessages()
 
 		memcpy(data + 2, message.payload.getPointer() + offset, fragmentSize);
 		
-		if (sendMessage(message.header, data, fragmentSize + 2, true)) {
+		if (sendMessage(message.header, data, fragmentSize + 2, true))
+		{
 			message.fragmentIndex++;
-		}
-		else {
-			sendFinished = false;
+			if (sendFinished)
+			{
+				// message was the last fragment
+				// => remove it from the list
+				this->sendList.removeFront();
+				this->messageCounter += 0x10;
+			}
 		}
 	}
 	else
 	{
-		if (!this->sendMessage(
-				message.header,
-				message.payload.getPointer(),
-				messageSize,
-				false)) {
-			sendFinished = false;
+		if (this->sendMessage(message.header, message.payload.getPointer(),
+				messageSize, false))
+		{
+			this->sendList.removeFront();
 		}
-	}
-	
-	if (sendFinished)
-	{
-		// message was the last fragment
-		// => remove it from the list
-		this->sendList.removeFront();
 	}
 }
 
@@ -295,7 +291,8 @@ xpcc::CanConnector<Driver>::retrieveMessage()
 		else
 		{
 			// find existing container otherwise create a new one
-			const uint8_t fragmentIndex = message.data[0];
+			const uint8_t fragmentIndex = message.data[0] & 0x0f;
+			const uint8_t messageCounter = message.data[0] & 0xf0;
 			const uint8_t messageSize = message.data[1];
 			
 			// calculate the number of messages need to send messageSize-bytes
@@ -331,7 +328,9 @@ xpcc::CanConnector<Driver>::retrieveMessage()
 			// list of receiving messages.
 			typename ReceiveList::iterator packet = this->receivingMessages.begin();
 			for ( ; packet != this->receivingMessages.end(); ++packet) {
-				if (packet->header == header) {
+				if (packet->header == header &&
+					packet->messageCounter == messageCounter)
+				{
 					break;
 				}
 			}
@@ -339,7 +338,7 @@ xpcc::CanConnector<Driver>::retrieveMessage()
 			if (packet == this->receivingMessages.end()) {
 				// message not found => first part of this message,
 				// prepend it to the list
-				this->receivingMessages.prepend(ReceiveListItem(messageSize, header));
+				this->receivingMessages.prepend(ReceiveListItem(messageSize, header, messageCounter));
 				packet = this->receivingMessages.begin();
 			}
 			
