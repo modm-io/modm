@@ -33,6 +33,8 @@
 #ifndef XPCC__CAN_USB_HPP
 #define XPCC__CAN_USB_HPP
 
+#include <asio.hpp>
+
 namespace xpcc
 {
 	/**
@@ -44,7 +46,7 @@ namespace xpcc
 	 */
 	class CanUsb
 	{
-	pbulic:
+	public:
 		CanUsb();
 		
 		~CanUsb();
@@ -58,14 +60,17 @@ namespace xpcc
 		static inline bool
 		isMessageAvailable();
 		
+		/*
 		static bool
 		getMessage(Can::Message& message);
+		*/
 		
 		/*
 		 * The CAN controller has a free slot to send a new message.
 		 *
 		 * \return true if a slot is available, false otherwise
 		 */
+
 		static inline bool
 		isReadyToSend()
 		{
@@ -77,8 +82,21 @@ namespace xpcc
 		 *
 		 * \return true if the message was send, false otherwise
 		 */
+
+		/*
 		static bool
-		sendMessage(const Can::Message& message);	
+		sendMessage(const Can::Message& message);
+		*/
+
+
+	private:
+
+		/*
+		boost::asio::io_service*  io_service;
+		boost::asio::serial_port_base::baud_rate baud_rate;
+		boost::asio::serialPort serialPort;
+		*/
+
 	};
 }
 

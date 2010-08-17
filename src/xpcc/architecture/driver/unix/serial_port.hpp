@@ -37,6 +37,8 @@
 #include <queue>
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
+#include <boost/thread/mutex.hpp>
+#include <boost/thread.hpp>
 
 #include <xpcc/io/iodevice.hpp>
 
@@ -54,7 +56,9 @@ namespace xpcc
 		{
 		public :
 
-			SerialPort(boost::asio::io_service& io_service, std::string deviceName, unsigned int bautRate);
+			SerialPort( std::string deviceName, unsigned int bautRate);
+
+			~SerialPort();
 
 			virtual void
 			write(char c);
@@ -77,34 +81,41 @@ namespace xpcc
 			virtual void
 			close();
 
-			virtual bool
-			readFinished();
 
 		private:
+			typedef boost::mutex				Mutex;
+			typedef boost::mutex::scoped_lock	MutexGuard;
 
-			enum ReadState{
-				READING,
-				NOT_READING
-			};
+			bool shutdown;
 
-			static const int max_read_length = 1;
-			ReadState readState;
+			Mutex queueLock;
 
-			boost::asio::serial_port serialPort;
-			boost::asio::io_service& io_service;
-
+			char tmpRead;
 			std::queue<char> writeBuffer;
+			std::queue<char> readBuffer;
 
-	        void do_close(const boost::system::error_code& error);
+			boost::asio::io_service 			io_service;
+			boost::asio::serial_port serialPort;
+			boost::thread* thread;
 
-	        void do_write(const char c);
 
-	        void write_start(void);
+			void
+			readStart();
 
-	        void write_complete(const boost::system::error_code& error);
+	        void
+	        doClose(const boost::system::error_code& error);
 
-	        void read_complete(const boost::system::error_code& error, size_t bytes_transferred);
+	        void
+	        doWrite(const char c);
 
+	        void
+	        writeStart(void);
+
+	        void
+	        writeComplete(const boost::system::error_code& error);
+
+			void
+			readComplete(const boost::system::error_code& error, size_t bytes_transferred);
 		};
 	}
 }
