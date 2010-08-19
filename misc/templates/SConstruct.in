@@ -1,16 +1,21 @@
 # WARNING: This file is generated automatically, do not edit!
 
 rootpath = "${rootpath}"
-pre = Environment(tools = ['xpcc'],
-				  toolpath = [rootpath + '/misc/scons'],
-				  configfile = 'project.cfg')
 
+env = Environment(tools = ['xpcc'],
+				  toolpath = [rootpath + '/misc/scons'])
+
+# find all source files
 files = env.FindFiles(path = '.')
+
+# build the program
 program = env.Program(target = env['XPCC_CONFIG']['general']['name'],
 					  source = files.sources)
 
 # build the xpcc library
 env.XpccLibrary()
+
+env.Defines()
 
 env.Alias('build', program)
 env.Alias('size', env.Size(program))

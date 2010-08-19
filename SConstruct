@@ -91,12 +91,12 @@ class Generator:
 				source = os.path.join(self.basepath, source),
 				substitutions = substitutions))
 
-generator = Generator(env, 'src/xpcc/architecture/atmega/uart')
+generator = Generator(env, 'src/xpcc/architecture/driver/atmega/uart')
 for id in range(0, 4):
 	generator.template('uart%i.hpp' % id, 'uart.hpp.in', { 'id': id })
 	generator.template('uart%i.cpp' % id, 'uart.cpp.in', { 'id': id })
 
-generator = Generator(env, 'src/xpcc/architecture/atxmega/uart')
+generator = Generator(env, 'src/xpcc/architecture/driver/atxmega/uart')
 for port in ['C', 'D', 'E', 'F']:
 	for number in [0, 1]:
 		id = "%s%i" % (port, number)
