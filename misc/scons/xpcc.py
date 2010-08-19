@@ -190,7 +190,7 @@ def generate(env, **kw):
 		
 		if rootpath is None:
 			print "Could not detect the path to the xpcc-library. Use " \
-				  "'Environment(rootpath=...)' to set it."
+				  "'Environment(rootpath=...)' to set the path to the root folder of xpcc."
 			env.Exit(1)
 	rootpath = os.path.abspath(rootpath)
 	
@@ -255,7 +255,7 @@ def generate(env, **kw):
 	
 	# architecture specific settings and tools
 	env['ARCHITECTURE'] = architecture + '/' + device
-	if architecture == 'atmega' or architecture == 'atxmega':
+	if architecture == 'avr':
 		env['AVR_DEVICE'] = device
 		env['AVR_CLOCK'] = clock
 		env['LIBS'] = ['']

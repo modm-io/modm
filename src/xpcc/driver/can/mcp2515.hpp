@@ -34,10 +34,10 @@
 #define XPCC__MCP2515_HPP
 
 #include <stdint.h>
-#include <xpcc/architecture/driver/accessor/flash.hpp>
-#include <xpcc/architecture/driver/time/delay.hpp>
+#include <xpcc/architecture/driver/accessor.hpp>
+#include <xpcc/architecture/driver/time.hpp>
 
-#include "../can.hpp"
+#include "message.hpp"
 
 /**
  * \name	Restructure filter and mask bits for the MCP2515
@@ -60,7 +60,7 @@
  * 
  * \warning	Do not use this macro for variables, only for static values
  *			known at compile-time.
- * \ingroup	    driver
+ * \ingroup	can
  */
 //\{
 #if defined(__DOXYGEN__)
@@ -157,9 +157,14 @@ namespace xpcc
 		
 		static inline bool
 		readIdentifier(uint32_t& identifier);
+		
+	protected:
+		static SPI spi;
+		static CS chipSelect;
+		static INT interruptPin;
 	};
 }
 
-#include "mcp2515_impl.hpp"
+#include "mcp2515/mcp2515_impl.hpp"
 
 #endif // XPCC__MCP2515_HPP

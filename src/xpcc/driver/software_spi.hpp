@@ -34,14 +34,12 @@
 #define XPCC__SOFTWARE_SPI_HPP
 
 #include <stdint.h>
-#include <xpcc/architecture/driver/time/delay.hpp>
+#include <xpcc/architecture/driver/time.hpp>
 
 namespace xpcc
 {
 	/**
-	 * \brief	Software emulation of a SPI bus master
-	 * 
-	 * SPI stands for Serial Peripheral Interface Bus.
+	 * \brief	Software emulation of a SPI (Serial Peripheral Interface bus) master
 	 * 
 	 * \todo	documentation
 	 * 
@@ -60,18 +58,20 @@ namespace xpcc
 	class SoftwareSpi
 	{
 	public:
-		SoftwareSpi();
-		
 		static void
 		initialize();
 		
 		static uint8_t
 		write(uint8_t output);
 		
-	private:
+	protected:
 		// calculate the delay in microseconds needed to achieve the
 		// requested SPI frequency
 		static const float delay = (1000000.0 / Frequency) / 2.0;
+		
+		static Clk clk;
+		static Mosi mosi;
+		static Miso miso;
 	};
 }
 

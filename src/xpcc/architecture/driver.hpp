@@ -40,6 +40,8 @@
 #	include "driver/atmega.hpp"
 #elif defined XPCC__CPU_ATXMEGA
 #	include "driver/atxmega.hpp"
+#elif defined XPCC__CPU_ATTINY
+#	include "driver/attiny.hpp"
 #endif
 
 #include "driver/atomic.hpp"

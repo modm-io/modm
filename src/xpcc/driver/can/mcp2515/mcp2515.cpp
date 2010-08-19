@@ -30,8 +30,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include "mcp2515.hpp"
-
+#include "../mcp2515.hpp"
 #include "xpcc_config.hpp"
 
 namespace xpcc

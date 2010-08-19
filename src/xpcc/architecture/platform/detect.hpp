@@ -79,6 +79,7 @@
 #define	XPCC__CPU_AVR
 #define	XPCC__CPU_ATXMEGA
 #define	XPCC__CPU_ATMEGA
+#define	XPCC__CPU_ATTINY
 #define	XPCC__CPU_X86
 #define	XPCC__CPU_X86_64
 //@}
@@ -139,14 +140,20 @@
 // Determine 
 
 #if defined __AVR__
-#	define	XPCC__CPU_AVR 1
-#	if defined __AVR_XMEGA__
-#		define XPCC__CPU_ATXMEGA 1
-#		define XPCC__CPU_STRING		"Atmel XMEGA"
-#	else
-#		define XPCC__CPU_ATMEGA 1
-#		define XPCC__CPU_STRING		"Atmel megaAVR"
-#	endif
+	#define	XPCC__CPU_AVR 1
+	#if defined __AVR_XMEGA__
+		#define XPCC__CPU_ATXMEGA 1
+		#define XPCC__CPU_STRING		"Atmel XMEGA"
+	#else
+		// see http://www.nongnu.org/avr-libc/user-manual/using__tools.html
+		#if __AVR_ARCH__ == 2 || __AVR_ARCH__ == 25 || __AVR_ARCH__ == 1
+			#define XPCC__CPU_ATTINY 1
+			#define XPCC__CPU_STRING	"Atmel tinyAVR"
+		#else
+			#define XPCC__CPU_ATMEGA 1
+			#define XPCC__CPU_STRING	"Atmel megaAVR"
+		#endif
+	#endif
 #endif
 
 #if defined __X86__ || defined __i386__ || defined i386 || defined _M_IX86 || defined __386__ || defined __x86_64__ || defined _M_X64

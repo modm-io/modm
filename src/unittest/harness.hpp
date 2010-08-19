@@ -196,9 +196,9 @@ namespace unittest
 	
 	template <typename A, typename B>
 	bool
-	checkArray(const A& a, const B& b, unsigned int line, unsigned int count, unsigned int start = 0)
+	checkArray(const A& a, const B& b, unsigned int line, std::size_t count, std::size_t start = 0)
 	{
-		for (unsigned int i = start; i < (start + count); ++i)
+		for (std::size_t i = start; i < (start + count); ++i)
 		{
 			if (a[i] != b[i])
 			{

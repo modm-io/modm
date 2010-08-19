@@ -26,62 +26,76 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: software_spi.hpp 354 2010-07-14 10:21:50Z dergraaf $
+ * $Id$
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__SOFTWARE_SPI_HPP
-	#error	"Don't include this file directly, use 'software_spi.hpp' instead!"
-#endif
+#ifndef XPCC__CAN_USB_HPP
+#define XPCC__CAN_USB_HPP
 
-// ----------------------------------------------------------------------------
-template <typename Clk, typename Mosi, typename Miso, int32_t Frequency>
-Clk xpcc::SoftwareSpi<Clk, Mosi, Miso, Frequency>::clk;
-
-template <typename Clk, typename Mosi, typename Miso, int32_t Frequency>
-Mosi xpcc::SoftwareSpi<Clk, Mosi, Miso, Frequency>::mosi;
-
-template <typename Clk, typename Mosi, typename Miso, int32_t Frequency>
-Miso xpcc::SoftwareSpi<Clk, Mosi, Miso, Frequency>::miso;
-
-// ----------------------------------------------------------------------------
-template <typename Clk, typename Mosi, typename Miso, int32_t Frequency>
-void
-xpcc::SoftwareSpi<Clk, Mosi, Miso, Frequency>::initialize()
+namespace xpcc
 {
-	clk.setOutput();
-	mosi.setOutput();
-	miso.setInput();
-}
-
-template <typename Clk, typename Mosi, typename Miso, int32_t Frequency>
-uint8_t
-xpcc::SoftwareSpi<Clk, Mosi, Miso, Frequency>::write(uint8_t output)
-{
-	uint8_t input = 0;
-	
-	clk.reset();
-	for (uint8_t i = 0; i < 8; ++i)
+	/**
+	 * \brief	Driver for a CAN232 or CANUSB adapter
+	 * 
+	 * \see		http://www.canusb.com/
+	 * \see		http://www.can232.com/
+	 * \ingroup	can
+	 */
+	class CanUsb
 	{
-		input <<= 1;
-		if (output & 0x80) {
-			mosi.set();
-		}
-		else {
-			mosi.reset();
-		}
-		xpcc::delay_us(delay);
+	public:
+		CanUsb();
 		
-		clk.set();
-		xpcc::delay_us(delay);
+		~CanUsb();
 		
-		if (miso.read()) {
-			input |= 1;
+		static bool
+		open();
+		
+		static bool
+		close();
+		
+		static inline bool
+		isMessageAvailable();
+		
+		/*
+		static bool
+		getMessage(Can::Message& message);
+		*/
+		
+		/*
+		 * The CAN controller has a free slot to send a new message.
+		 *
+		 * \return true if a slot is available, false otherwise
+		 */
+
+		static inline bool
+		isReadyToSend()
+		{
+			return true;
 		}
-		output <<= 1;
 		
-		clk.reset();
-	}
-	
-	return input;
+		/*
+		 * Send a message over the CAN.
+		 *
+		 * \return true if the message was send, false otherwise
+		 */
+
+		/*
+		static bool
+		sendMessage(const Can::Message& message);
+		*/
+
+
+	private:
+
+		/*
+		boost::asio::io_service*  io_service;
+		boost::asio::serial_port_base::baud_rate baud_rate;
+		boost::asio::serialPort serialPort;
+		*/
+
+	};
 }
+
+#endif // XPCC__CAN_USB_HPP

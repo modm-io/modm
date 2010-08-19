@@ -5,7 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -29,63 +29,9 @@
  * $Id$
  */
 // ----------------------------------------------------------------------------
+/**
+ * \ingroup		avr
+ * \defgroup	attiny		tinyAVR specific functions
+ */
 
-#ifndef XPCC__CAN_HPP
-#define XPCC__CAN_HPP
-
-#include <stdint.h>
-
-namespace xpcc
-{
-	/**
-	 * \author	Fabian Greif
-	 * \ingroup	can
-	 */
-	namespace can
-	{
-		/** \brief	supported bitrates */
-		enum Bitrate
-		{
-			BITRATE_10_KBPS	= 0,
-			BITRATE_20_KBPS	= 1,
-			BITRATE_50_KBPS	= 2,
-			BITRATE_100_KBPS = 3,
-			BITRATE_125_KBPS = 4,
-			BITRATE_250_KBPS = 5,
-			BITRATE_500_KBPS = 6,
-			BITRATE_1_MBPS = 7,
-		};
-		
-		enum Mode
-		{
-			NORMAL,
-			LISTEN_ONLY,
-			LOOPBACK,
-		};
-		
-		/** \brief	Representation of a CAN message */
-		struct Message
-		{
-			Message(const uint32_t& identifier = 0, uint8_t length = 0) :
-				identifier(identifier), data(), flags(), length(length)
-			{
-			}
-			
-			uint32_t identifier;
-			uint8_t data[8];
-			struct Flags
-			{
-				Flags() :
-					rtr(0), extended(1)
-				{
-				}
-				
-				bool rtr : 1;
-				bool extended : 1;
-			} flags;
-			uint8_t length;
-		};
-	}
-}
-
-#endif // XPCC__CAN_HPP
+#include "atmega/gpio.hpp"

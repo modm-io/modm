@@ -83,7 +83,13 @@ import os
 if 'library' in BUILD_TARGETS:
 	defaultConfigfile = 'library.cfg'
 else:
-	defaultConfigfile = 'unittest.cfg'
+	target = ARGUMENTS.get('target')
+	if target == 'atmega':
+		defaultConfigfile = 'unittest_atmega.cfg'
+	elif target == 'atxmega':
+		defaultConfigfile = 'unittest_atxmega.cfg'
+	else:
+		defaultConfigfile = 'unittest.cfg'
 
 # create the build environment
 env = Environment(

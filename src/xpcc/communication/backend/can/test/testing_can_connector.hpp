@@ -5,7 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -30,74 +30,23 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__CAN_USB_HPP
-#define XPCC__CAN_USB_HPP
+#ifndef TESTING_CAN_CONNECTOR_HPP
+#define TESTING_CAN_CONNECTOR_HPP
 
-#include <asio.hpp>
+#include <xpcc/communication/backend/can/can_connector.hpp>
+#include "fake_can_driver.hpp"
 
-namespace xpcc
+class TestingCanConnector : public xpcc::CanConnector<FakeCanDriver>
 {
-	/**
-	 * \brief	Driver for a CAN232 or CANUSB adapter
-	 * 
-	 * \see		http://www.canusb.com/
-	 * \see		http://www.can232.com/
-	 * \ingroup	can
-	 */
-	class CanUsb
+public:
+	// expose internal variables for testing
+	inline FakeCanDriver*
+	getCanDriver()
 	{
-	public:
-		CanUsb();
-		
-		~CanUsb();
-		
-		static bool
-		open();
-		
-		static bool
-		close();
-		
-		static inline bool
-		isMessageAvailable();
-		
-		/*
-		static bool
-		getMessage(Can::Message& message);
-		*/
-		
-		/*
-		 * The CAN controller has a free slot to send a new message.
-		 *
-		 * \return true if a slot is available, false otherwise
-		 */
+		return &this->canDriver;
+	}
+	
+	using xpcc::CanConnector<FakeCanDriver>::messageCounter;
+};
 
-		static inline bool
-		isReadyToSend()
-		{
-			return true;
-		}
-		
-		/*
-		 * Send a message over the CAN.
-		 *
-		 * \return true if the message was send, false otherwise
-		 */
-
-		/*
-		static bool
-		sendMessage(const Can::Message& message);
-		*/
-
-
-	private:
-
-		/*
-		boost::asio::io_service*  io_service;
-		boost::asio::serial_port_base::baud_rate baud_rate;
-		boost::asio::serialPort serialPort;
-		*/
-
-	};
-}
-
-#endif // XPCC__CAN_USB_HPP
+#endif	// TESTING_CAN_CONNECTOR_HPP

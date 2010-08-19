@@ -26,62 +26,23 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: software_spi.hpp 354 2010-07-14 10:21:50Z dergraaf $
+ * $Id$
  */
 // ----------------------------------------------------------------------------
+/**
+ * \ingroup		driver
+ * \defgroup 	can (CAN) Controller Area Network
+ * \brief 		Interface to the CAN-Communication BUS.
+ * 
+ * Controller–area network (CAN or CAN-bus) is a vehicle bus standard designed 
+ * to allow microcontrollers and devices to communicate with each other within 
+ * a vehicle without a host computer.
+ * 
+ * CAN is a message based protocol, designed specifically for automotive 
+ * applications but now also used in other areas such as industrial automation 
+ * and medical equipment.
+ */
 
-#ifndef XPCC__SOFTWARE_SPI_HPP
-	#error	"Don't include this file directly, use 'software_spi.hpp' instead!"
-#endif
-
-// ----------------------------------------------------------------------------
-template <typename Clk, typename Mosi, typename Miso, int32_t Frequency>
-Clk xpcc::SoftwareSpi<Clk, Mosi, Miso, Frequency>::clk;
-
-template <typename Clk, typename Mosi, typename Miso, int32_t Frequency>
-Mosi xpcc::SoftwareSpi<Clk, Mosi, Miso, Frequency>::mosi;
-
-template <typename Clk, typename Mosi, typename Miso, int32_t Frequency>
-Miso xpcc::SoftwareSpi<Clk, Mosi, Miso, Frequency>::miso;
-
-// ----------------------------------------------------------------------------
-template <typename Clk, typename Mosi, typename Miso, int32_t Frequency>
-void
-xpcc::SoftwareSpi<Clk, Mosi, Miso, Frequency>::initialize()
-{
-	clk.setOutput();
-	mosi.setOutput();
-	miso.setInput();
-}
-
-template <typename Clk, typename Mosi, typename Miso, int32_t Frequency>
-uint8_t
-xpcc::SoftwareSpi<Clk, Mosi, Miso, Frequency>::write(uint8_t output)
-{
-	uint8_t input = 0;
-	
-	clk.reset();
-	for (uint8_t i = 0; i < 8; ++i)
-	{
-		input <<= 1;
-		if (output & 0x80) {
-			mosi.set();
-		}
-		else {
-			mosi.reset();
-		}
-		xpcc::delay_us(delay);
-		
-		clk.set();
-		xpcc::delay_us(delay);
-		
-		if (miso.read()) {
-			input |= 1;
-		}
-		output <<= 1;
-		
-		clk.reset();
-	}
-	
-	return input;
-}
+#include "can/message.hpp"
+#include "can/mcp2515.hpp"
+#include "can/canusb.hpp"

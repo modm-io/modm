@@ -41,6 +41,30 @@ namespace xpcc
 {
 	class CanConnectorBase
 	{
+	public:
+		/// Convert a packet header to a can identifier
+		static uint32_t
+		convertToIdentifier(const Header & header, bool fragmentated);
+		
+		/**
+		 * \brief	Convert a can identifier to a packet header
+		 * 
+		 * \param[in]	identifier	29-bit CAN identifier
+		 * \param[out]	header		Packet header
+		 * 
+		 * \return	\c true if the message is part of a fragmented packet,
+		 * 			\c false otherwise.
+		 */
+		static bool
+		convertToHeader(const uint32_t & identifier, Header & header);
+		
+		/**
+		 * \brief	Calculate the number of fragments needed to send a message
+		 * 			with a length of \p messageSize.
+		 */
+		static uint8_t
+		getNumberOfFragments(uint8_t messageSize);
+		
 	protected:
 		static uint8_t messageCounter;
 	};
@@ -82,13 +106,12 @@ namespace xpcc
      *
      * Every event is send with the destination identifier \c 0x00.
 	 * 
-	 * \todo message counter for fragmented messages
 	 * \todo timeout
 	 *
 	 * \ingroup	backend
 	 */
 	template <typename Driver>
-	class CanConnector : public CanConnectorBase, public BackendInterface
+	class CanConnector : protected CanConnectorBase, public BackendInterface
 	{
 	public:
 		virtual
@@ -117,37 +140,14 @@ namespace xpcc
 	
 	protected:
 		/**
-		 *  \brief	Try to send a CAN message via CAN Driver
-		 *
+		 * \brief	Try to send a CAN message via CAN Driver
+		 * 
 		 * \return	\b true if the message could be send, \b false otherwise
 		 */
-		static bool
-		sendMessage(
-				const Header &header,
-				const uint8_t *data,
-				uint8_t size,
+		bool
+		sendMessage(const Header &header,
+				const uint8_t *data, uint8_t size,
 				bool fragmentated);
-		
-		/// Convert a packet header to a can identifier
-		static uint32_t
-		convertToIdentifier(const Header & header, bool fragmentated);
-		
-		/**
-		 * \brief	Convert a can identifier to a packet header
-		 * 
-		 * \param[in]	identifier	29-bit CAN identifier
-		 * \param[out]	header		Packet header
-		 * 
-		 * \return	\c true if the message is part of a fragmented packet,
-		 * 			\c false otherwise.
-		 */
-		static bool
-		convertToHeader(const uint32_t & identifier, Header & header);
-		
-		/// Calculate the number of fragments needed to send a message
-		/// with a length of \p messageSize.
-		static inline uint8_t
-		getNumberOfFragments(uint8_t messageSize);
 		
 		void
 		sendWaitingMessages();
@@ -201,12 +201,6 @@ namespace xpcc
 			{
 			}
 			
-			bool
-			operator == (const Header& header)
-			{
-				return (this->header == header);
-			}
-			
 			Header header;
 			SmartPointer payload;
 			
@@ -221,9 +215,12 @@ namespace xpcc
 		typedef xpcc::LinkedList<SendListItem> SendList;
 		typedef xpcc::LinkedList<ReceiveListItem> ReceiveList;
 		
+	protected:
 		SendList sendList;
 		ReceiveList receivingMessages;
 		ReceiveList receivedMessages;
+		
+		Driver canDriver;
 	};
 }
 

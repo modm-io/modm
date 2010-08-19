@@ -5,7 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -26,62 +26,23 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: software_spi.hpp 354 2010-07-14 10:21:50Z dergraaf $
+ * $Id$
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__SOFTWARE_SPI_HPP
-	#error	"Don't include this file directly, use 'software_spi.hpp' instead!"
-#endif
+#ifndef CAN_CONNECTOR_BASE_TEST_HPP
+#define CAN_CONNECTOR_BASE_TEST_HPP
 
-// ----------------------------------------------------------------------------
-template <typename Clk, typename Mosi, typename Miso, int32_t Frequency>
-Clk xpcc::SoftwareSpi<Clk, Mosi, Miso, Frequency>::clk;
+#include <unittest/testsuite.hpp>
 
-template <typename Clk, typename Mosi, typename Miso, int32_t Frequency>
-Mosi xpcc::SoftwareSpi<Clk, Mosi, Miso, Frequency>::mosi;
-
-template <typename Clk, typename Mosi, typename Miso, int32_t Frequency>
-Miso xpcc::SoftwareSpi<Clk, Mosi, Miso, Frequency>::miso;
-
-// ----------------------------------------------------------------------------
-template <typename Clk, typename Mosi, typename Miso, int32_t Frequency>
-void
-xpcc::SoftwareSpi<Clk, Mosi, Miso, Frequency>::initialize()
+class CanConnectorBaseTest : public unittest::TestSuite
 {
-	clk.setOutput();
-	mosi.setOutput();
-	miso.setInput();
-}
+public:
+	void
+	testConversionToIdentifier();
+	
+	void
+	testConversionToHeader();
+};
 
-template <typename Clk, typename Mosi, typename Miso, int32_t Frequency>
-uint8_t
-xpcc::SoftwareSpi<Clk, Mosi, Miso, Frequency>::write(uint8_t output)
-{
-	uint8_t input = 0;
-	
-	clk.reset();
-	for (uint8_t i = 0; i < 8; ++i)
-	{
-		input <<= 1;
-		if (output & 0x80) {
-			mosi.set();
-		}
-		else {
-			mosi.reset();
-		}
-		xpcc::delay_us(delay);
-		
-		clk.set();
-		xpcc::delay_us(delay);
-		
-		if (miso.read()) {
-			input |= 1;
-		}
-		output <<= 1;
-		
-		clk.reset();
-	}
-	
-	return input;
-}
+#endif // CAN_CONNECTOR_BASE_TEST_HPP

@@ -63,6 +63,15 @@ namespace xpcc
 		inline bool
 		isEmpty() const;
 		
+		/**
+		 * \brief	Get number of elements
+		 * 
+		 * \warning	This method is slow because it has to iterate through
+		 * 			all elements.
+		 */
+		std::size_t
+		getSize() const;
+		
 		/// Insert in front
 		void
 		prepend(const T& value);
@@ -92,6 +101,12 @@ namespace xpcc
 		
 		inline T&
 		getBack();
+		
+		/**
+		 * \brief	Remove all elements form the list
+		 */
+		void
+		removeAll();
 		
 	protected:
 		struct Node

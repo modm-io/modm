@@ -35,17 +35,53 @@
 
 #include <unittest/testsuite.hpp>
 
+#include "testing_can_connector.hpp"
+
 class CanConnectorTest : public unittest::TestSuite
 {
 public:
-	void
-	testConstruction();
+	virtual void
+	setUp();
+	
+	virtual void
+	tearDown();
+	
+public:
+	CanConnectorTest();
 	
 	void
-	testConversionToIdentifier();
+	testSendShortMessageDirect();
 	
 	void
-	testConversionToHeader();
+	testSendShortMessage();
+	
+	void
+	testSendFragmentedMessage();
+	
+	void
+	testReceiveShortMessage();
+	
+	void
+	testReceiveFragmentedMessage();
+	
+private:
+	void
+	checkShortMessage(const xpcc::can::Message& message) const;
+	
+	void
+	checkFragmentedMessage(const xpcc::can::Message& message,
+			uint8_t fragmentId) const;
+	
+	TestingCanConnector *connector;
+	FakeCanDriver *driver;
+	
+	xpcc::Header xpccHeader;
+	uint32_t normalIdentifier;
+	uint32_t fragmentedIdentifier;
+	uint8_t messageCounter;
+	
+	uint8_t shortPayload[8];
+	uint8_t fragmentedPayload[20];
 };
 
 #endif

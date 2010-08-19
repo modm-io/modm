@@ -62,7 +62,7 @@ namespace xpcc
 	 * 
 	 * Example:
 	 * \code
-	 * #include <xpcc/architecture/driver/gpio.hpp>
+	 * #include <xpcc/architecture/driver.hpp>
 	 * #include <xpcc/workflow/protothread.hpp>
 	 * #include <xpcc/workflow/timeout.hpp>
 	 * 

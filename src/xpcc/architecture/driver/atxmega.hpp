@@ -31,7 +31,7 @@
 // ----------------------------------------------------------------------------
 /**
  * \ingroup		avr
- * \defgroup	atxmega		ATxmega specifiy functions
+ * \defgroup	atxmega		XMEGA specific functions
  */
 
 #include "atxmega/uart.hpp"

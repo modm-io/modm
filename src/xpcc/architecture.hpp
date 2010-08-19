@@ -37,7 +37,7 @@
 #ifndef XPCC__ARCHITECTURE_HPP
 #define XPCC__ARCHITECTURE_HPP
 
-#include "architecture/intrinsic.hpp"
+#include "architecture/platform.hpp"
 #include "architecture/driver.hpp"
 
 #endif	// XPCC__ARCHITECTURE_HPP

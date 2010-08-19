@@ -61,6 +61,17 @@ xpcc::LinkedList<T, Allocator>::isEmpty() const
 	return (this->front == 0);
 }
 
+template <typename T, typename Allocator>
+std::size_t
+xpcc::LinkedList<T, Allocator>::getSize() const
+{
+	std::size_t count = 0;
+	for (const_iterator it = this->begin(); it != this->end(); ++it) {
+		count++; 
+	}
+	return count;
+}
+
 // ----------------------------------------------------------------------------
 template <typename T, typename Allocator>
 void
@@ -150,6 +161,16 @@ inline T&
 xpcc::LinkedList<T, Allocator>::getBack()
 {
 	return this->back->value;
+}
+
+// ----------------------------------------------------------------------------
+template <typename T, typename Allocator>
+void
+xpcc::LinkedList<T, Allocator>::removeAll()
+{
+	while (!this->isEmpty()) {
+		this->removeFront();
+	}
 }
 
 // ----------------------------------------------------------------------------

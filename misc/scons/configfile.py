@@ -190,11 +190,18 @@ class Scanner:
 	def _excludeDirectory(self, parser):
 		try:
 			target = parser.get('build', 'target')
-			if not re.match(target, self.env['ARCHITECTURE']):
-				return True
+			if target.startswith('!'):
+				target = target[1:]
+				invert = True
+			else:
+				invert = False
+			
+			if not re.search(target, self.env['ARCHITECTURE']):
+				return True ^ invert
+			else:
+				return False ^ invert
 		except ParserException:
-			pass
-		return False
+			return False
 	
 	def _samefile(self, src, dst):
 		# Macintosh, Unix

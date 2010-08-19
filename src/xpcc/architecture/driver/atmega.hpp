@@ -31,7 +31,7 @@
 // ----------------------------------------------------------------------------
 /**
  * \ingroup		avr
- * \defgroup	atmega		ATmega specifiy functions
+ * \defgroup	atmega		megaAVR specific functions
  */
 
 #include "atmega/adc.hpp"

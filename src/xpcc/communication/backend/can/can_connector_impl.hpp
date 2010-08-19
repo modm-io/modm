@@ -31,11 +31,11 @@
 // ----------------------------------------------------------------------------
 
 #ifndef XPCC__CAN_CONNECTOR_HPP
-	#error	"Don't include this file directly, use 'can.hpp' instead!"
+	#error	"Don't include this file directly, use 'can_connector.hpp' instead!"
 #endif
 
 #include <xpcc/math/utils/bit_operation.hpp>
-#include <xpcc/driver/can/can.hpp>
+#include <xpcc/driver/can/message.hpp>
 
 // ----------------------------------------------------------------------------
 template<typename Driver>
@@ -78,12 +78,12 @@ void
 xpcc::CanConnector<Driver>::sendPacket(const Header &header, SmartPointer payload)
 {
 	bool successfull = false;
-	if (payload.getSize() <= 8 && Driver::isReadyToSend()) {
+	if (payload.getSize() <= 8 && this->canDriver.isReadyToSend()) {
 		// try to send the message directly
 		successfull = this->sendMessage(
 				header, payload.getPointer(), payload.getSize(), false);
 	}
-
+	
 	if (!successfull)
 	{
 		// append the message to the list of waiting messages
@@ -113,97 +113,6 @@ xpcc::CanConnector<Driver>::update()
 // ----------------------------------------------------------------------------
 
 template<typename Driver>
-uint32_t
-xpcc::CanConnector<Driver>::convertToIdentifier(const Header & header, bool fragmentated)
-{
-	uint32_t identifier;
-	
-	switch (header.type)
-	{
-		case xpcc::Header::REQUEST:
-			identifier = 0;
-			break;
-		case xpcc::Header::RESPONSE:
-			identifier = 1;
-			break;
-		case xpcc::Header::NEGATIVE_RESPONSE:
-			identifier = 2;
-			break;
-		default:
-			identifier = 0;
-	}
-	
-	identifier = identifier << 1;
-	if (header.isAcknowledge){
-		identifier |= 1;
-	}
-	identifier = identifier << 1;
-	// Message counter
-	identifier = identifier << 1;
-	
-	if (fragmentated){
-		identifier |= 1;
-	}
-	identifier = identifier << 8;
-	identifier |= header.destination;
-	identifier = identifier << 8;
-	identifier |= header.source;
-	identifier = identifier << 8;
-	identifier |= header.packetIdentifier;
-	
-	return identifier;
-}
-
-template<typename Driver>
-bool
-xpcc::CanConnector<Driver>::convertToHeader(
-		const uint32_t & identifier, xpcc::Header & header)
-{
-	const uint8_t *ptr = reinterpret_cast<const uint8_t *>(&identifier);
-	
-	header.packetIdentifier = ptr[0];
-	header.source 			= ptr[1];
-	header.destination		= ptr[2];
-	
-	uint8_t flags = ptr[3];
-	
-	if (flags & 0x04) {
-		header.isAcknowledge = true;
-	}
-	else {
-		header.isAcknowledge = false;
-	}
-	
-	switch (flags & 0x18)
-	{
-		case 0x00:
-			header.type = xpcc::Header::REQUEST;
-			break;
-		case 0x08:
-			header.type = xpcc::Header::RESPONSE;
-			break;
-		case 0x10:
-			header.type = xpcc::Header::NEGATIVE_RESPONSE;
-			break;
-		default:
-			// unknown type
-			//XPCC_LOG_ERROR << "Unknown Type" << xpcc::flush;
-			header.type = xpcc::Header::REQUEST;
-	}
-	
-	// check if the message is a fragment
-	return ((flags & 0x01) == 0x01);
-}
-
-template<typename Driver>
-inline uint8_t
-xpcc::CanConnector<Driver>::getNumberOfFragments(uint8_t messageSize)
-{
-	div_t n = div(messageSize, 6);
-	return (n.rem > 0) ? n.quot + 1 : n.quot;
-}
-
-template<typename Driver>
 bool
 xpcc::CanConnector<Driver>::sendMessage(const Header &header,
 		const uint8_t *data, uint8_t size, bool fragmentated)
@@ -214,7 +123,7 @@ xpcc::CanConnector<Driver>::sendMessage(const Header &header,
 	
 	memcpy(message.data, data, size);
 	
-	return Driver::sendMessage( message );
+	return this->canDriver.sendMessage( message );
 }
 
 template<typename Driver>
@@ -277,7 +186,7 @@ bool
 xpcc::CanConnector<Driver>::retrieveMessage()
 {
 	can::Message message;
-	if (Driver::getMessage(message))
+	if (this->canDriver.getMessage(message))
 	{
 		xpcc::Header header;
 		bool isFragment = convertToHeader(message.identifier, header);
@@ -286,7 +195,8 @@ xpcc::CanConnector<Driver>::retrieveMessage()
 		{
 			this->receivedMessages.append(ReceiveListItem(message.length, header));
 			std::memcpy(this->receivedMessages.getBack().payload.getPointer(),
-					message.data, message.length);
+					message.data,
+					message.length);
 		}
 		else
 		{
@@ -298,16 +208,19 @@ xpcc::CanConnector<Driver>::retrieveMessage()
 			// calculate the number of messages need to send messageSize-bytes
 			uint8_t numberOfFragments = this->getNumberOfFragments(messageSize);
 			
-			if (message.length < 4 || messageSize > 48 || fragmentIndex >= numberOfFragments)
+			if (message.length < 4 || messageSize > 48 ||
+					fragmentIndex >= numberOfFragments)
 			{
-				// illegal format: fragmented messages need to have at least 3 byte payload,
-				// 				   the maximum size is 48 Bytes and the fragment number should
-				//				   not be higher than the number of fragments.
+				// illegal format:
+				//   fragmented messages need to have at least 3 byte payload,
+				// 	 the maximum size is 48 Bytes and the fragment number
+				//	 should not be higher than the number of fragments.
 				return false;
 			}
 
-			// check the length of the fragment (all fragments except the last one
-			// need to have a payload-length of 6 bytes + 2 byte fragment information)
+			// check the length of the fragment (all fragments except the
+			// last one need to have a payload-length of 6 bytes + 2 byte
+			// fragment information)
 			uint8_t offset = fragmentIndex * 6;
 			if (fragmentIndex + 1 == numberOfFragments)
 			{
@@ -357,7 +270,8 @@ xpcc::CanConnector<Driver>::retrieveMessage()
 					message.data + 2,
 					message.length - 2);
 			
-			// test if this was the last segment, otherwise we have to wait for more messages
+			// test if this was the last segment, otherwise we have to wait
+			// for more messages
 			if (xpcc::math::bitCount(packet->receivedFragments) == numberOfFragments)
 			{
 				this->receivedMessages.append(*packet);
@@ -376,7 +290,7 @@ template<typename Driver>
 void
 xpcc::CanConnector<Driver>::checkAndReceiveMessages()
 {
-	while (Driver::isMessageAvailable()) {
+	while (this->canDriver.isMessageAvailable()) {
 		this->retrieveMessage();
 	}
 }

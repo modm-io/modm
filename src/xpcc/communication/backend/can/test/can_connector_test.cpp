@@ -30,159 +30,163 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/communication/backend/can/can_connector.hpp>
-
 #include "can_connector_test.hpp"
 
 // ----------------------------------------------------------------------------
-namespace
+CanConnectorTest::CanConnectorTest() :
+	xpccHeader(xpcc::Header::REQUEST, false, 0, 0, 0),
+	normalIdentifier(0x00000000),
+	fragmentedIdentifier(0x01000000)
 {
-	class FakeCanDriver
-	{
-	public:
-		static inline bool
-		isMessageAvailable()
-		{
-			return true;
-		}
-		
-		static bool
-		getMessage(xpcc::can::Message& message)
-		{
-			message = FakeCanDriver::message;
-			return true;
-		}
-		
-		static bool
-		isReadyToSend()
-		{
-			return true;
-		}
-		
-		static bool
-		sendMessage(const xpcc::can::Message& message)
-		{
-			FakeCanDriver::message = message;
-			return true;
-		}
-		
-		static xpcc::can::Message message;
-	};
+	for (uint8_t i = 0; i < sizeof(shortPayload); ++i) {
+		shortPayload[i] = i;
+	}
 	
-	xpcc::can::Message FakeCanDriver::message;
-	
-	class TestConnector : public xpcc::CanConnector<FakeCanDriver>
-	{
-	public:
-		// make the protected methods public for testing
-		using xpcc::CanConnector<FakeCanDriver>::convertToIdentifier;
-		using xpcc::CanConnector<FakeCanDriver>::convertToHeader;
-	};
+	for (uint8_t i = 0; i < sizeof(fragmentedPayload); ++i) {
+		fragmentedPayload[i] = i * 2;
+	}
 }
 
 // ----------------------------------------------------------------------------
 void
-CanConnectorTest::testConstruction()
+CanConnectorTest::setUp()
 {
-	TestConnector connector;
+	this->connector = new TestingCanConnector();
+	this->driver = this->connector->getCanDriver();
 }
 
 void
-CanConnectorTest::testConversionToIdentifier()
+CanConnectorTest::tearDown()
 {
-	TestConnector connector;
-	xpcc::Header header;
-	
-	header = xpcc::Header(xpcc::Header::REQUEST, false, 0, 0, 0);
-	TEST_ASSERT_EQUALS(connector.convertToIdentifier(header, false), 0x00000000U);
-	header = xpcc::Header(xpcc::Header::RESPONSE, false, 0, 0, 0);
-	TEST_ASSERT_EQUALS(connector.convertToIdentifier(header, false), 0x08000000U);
-	header = xpcc::Header(xpcc::Header::NEGATIVE_RESPONSE, false, 0, 0, 0);
-	TEST_ASSERT_EQUALS(connector.convertToIdentifier(header, false), 0x10000000U);
-	
-	header = xpcc::Header(xpcc::Header::REQUEST, false, 0, 0, 0);
-	TEST_ASSERT_EQUALS(connector.convertToIdentifier(header, true),  0x01000000U);
-	
-	header = xpcc::Header(xpcc::Header::REQUEST, true, 0, 0, 0);
-	TEST_ASSERT_EQUALS(connector.convertToIdentifier(header, false), 0x04000000U);	
-	
-	header = xpcc::Header(xpcc::Header::REQUEST, false, 0xff, 0, 0);
-	TEST_ASSERT_EQUALS(connector.convertToIdentifier(header, false),  0x00ff0000U);
-	header = xpcc::Header(xpcc::Header::REQUEST, false, 0xcc, 0, 0);
-	TEST_ASSERT_EQUALS(connector.convertToIdentifier(header, false),  0x00cc0000U);
-	header = xpcc::Header(xpcc::Header::REQUEST, false, 0x0a, 0, 0);
-	TEST_ASSERT_EQUALS(connector.convertToIdentifier(header, false),  0x000a0000U);
-	
-	header = xpcc::Header(xpcc::Header::REQUEST, false, 0, 0xff, 0);
-	TEST_ASSERT_EQUALS(connector.convertToIdentifier(header, false),  0x0000ff00U);
-	header = xpcc::Header(xpcc::Header::REQUEST, false, 0, 0xcc, 0);
-	TEST_ASSERT_EQUALS(connector.convertToIdentifier(header, false),  0x0000cc00U);
-	header = xpcc::Header(xpcc::Header::REQUEST, false, 0, 0x0a, 0);
-	TEST_ASSERT_EQUALS(connector.convertToIdentifier(header, false),  0x00000a00U);
-	
-	header = xpcc::Header(xpcc::Header::REQUEST, false, 0, 0, 0xff);
-	TEST_ASSERT_EQUALS(connector.convertToIdentifier(header, false),  0x000000ffU);
-	header = xpcc::Header(xpcc::Header::REQUEST, false, 0, 0, 0xcc);
-	TEST_ASSERT_EQUALS(connector.convertToIdentifier(header, false),  0x000000ccU);
-	header = xpcc::Header(xpcc::Header::REQUEST, false, 0, 0, 0x0a);
-	TEST_ASSERT_EQUALS(connector.convertToIdentifier(header, false),  0x0000000aU);
+	delete this->connector;
+}
+
+// ----------------------------------------------------------------------------
+void
+CanConnectorTest::checkShortMessage(const xpcc::can::Message& message) const
+{
+	TEST_ASSERT_EQUALS(message.identifier, normalIdentifier);
+	TEST_ASSERT_EQUALS(message.length, sizeof(shortPayload));
+	TEST_ASSERT_EQUALS_ARRAY(message.data, shortPayload, sizeof(shortPayload));
 }
 
 void
-CanConnectorTest::testConversionToHeader()
+CanConnectorTest::testSendShortMessageDirect()
 {
-	TestConnector connector;
+	driver->sendSlots = 1;
 	
-	uint32_t identifier;
-	xpcc::Header header;
+	xpcc::SmartPointer payload(&shortPayload);
+	connector->sendPacket(xpccHeader, payload);
 	
-	identifier = 0x00000000;
-	TEST_ASSERT_FALSE(connector.convertToHeader(identifier, header));
-	TEST_ASSERT_EQUALS(header, xpcc::Header(xpcc::Header::REQUEST, false, 0, 0, 0));
+	// short messages might be send directly without any call to update
+	TEST_ASSERT_EQUALS(driver->sendList.getSize(), 1U);
+	checkShortMessage(driver->sendList.getFront());
+}
+
+void
+CanConnectorTest::testSendShortMessage()
+{
+	xpcc::SmartPointer payload(&shortPayload);
+	connector->sendPacket(xpccHeader, payload);
 	
-	identifier = 0x08000000;
-	TEST_ASSERT_FALSE(connector.convertToHeader(identifier, header));
-	TEST_ASSERT_EQUALS(header, xpcc::Header(xpcc::Header::RESPONSE, false, 0, 0, 0));
+	TEST_ASSERT_EQUALS(driver->sendList.getSize(), 0U);
 	
-	identifier = 0x10000000;
-	TEST_ASSERT_FALSE(connector.convertToHeader(identifier, header));
-	TEST_ASSERT_EQUALS(header, xpcc::Header(xpcc::Header::NEGATIVE_RESPONSE, false, 0, 0, 0));
+	driver->sendSlots = 1;
+	connector->update();
 	
-	identifier = 0x04000000;
-	TEST_ASSERT_FALSE(connector.convertToHeader(identifier, header));
-	TEST_ASSERT_EQUALS(header, xpcc::Header(xpcc::Header::REQUEST, true, 0, 0, 0));
+	TEST_ASSERT_EQUALS(driver->sendList.getSize(), 1U);
+	checkShortMessage(driver->sendList.getFront());
+}
+
+void
+CanConnectorTest::checkFragmentedMessage(const xpcc::can::Message& message,
+		uint8_t fragmentId) const
+{
+	uint8_t offset = fragmentId * 6;
+	uint8_t payloadLength = sizeof(fragmentedPayload) - offset;
+	if (payloadLength > 6) {
+		payloadLength = 6;
+	}
 	
-	identifier = 0x01000000;
-	TEST_ASSERT_TRUE(connector.convertToHeader(identifier, header));
-	TEST_ASSERT_EQUALS(header, xpcc::Header(xpcc::Header::REQUEST, false, 0, 0, 0));
+	TEST_ASSERT_EQUALS(message.identifier, fragmentedIdentifier);
+	TEST_ASSERT_EQUALS(message.length, payloadLength + 2);
 	
-	identifier = 0x00ff0000;
-	TEST_ASSERT_FALSE(connector.convertToHeader(identifier, header));
-	TEST_ASSERT_EQUALS(header, xpcc::Header(xpcc::Header::REQUEST, false, 0xff, 0, 0));
-	identifier = 0x00cc0000;
-	TEST_ASSERT_FALSE(connector.convertToHeader(identifier, header));
-	TEST_ASSERT_EQUALS(header, xpcc::Header(xpcc::Header::REQUEST, false, 0xcc, 0, 0));
-	identifier = 0x000a0000;
-	TEST_ASSERT_FALSE(connector.convertToHeader(identifier, header));
-	TEST_ASSERT_EQUALS(header, xpcc::Header(xpcc::Header::REQUEST, false, 0x0a, 0, 0));
+	TEST_ASSERT_EQUALS(message.data[0], fragmentId | messageCounter);
+	TEST_ASSERT_EQUALS(message.data[1], sizeof(fragmentedPayload));
+	TEST_ASSERT_EQUALS_ARRAY(&message.data[2],
+			&fragmentedPayload[offset], payloadLength);
+}
+
+void
+CanConnectorTest::testSendFragmentedMessage()
+{
+	driver->sendSlots = 2;
+	this->messageCounter = connector->messageCounter = 0x30;
 	
-	identifier = 0x0000ff00;
-	TEST_ASSERT_FALSE(connector.convertToHeader(identifier, header));
-	TEST_ASSERT_EQUALS(header, xpcc::Header(xpcc::Header::REQUEST, false, 0, 0xff, 0));
-	identifier = 0x0000cc00;
-	TEST_ASSERT_FALSE(connector.convertToHeader(identifier, header));
-	TEST_ASSERT_EQUALS(header, xpcc::Header(xpcc::Header::REQUEST, false, 0, 0xcc, 0));
-	identifier = 0x00000a00;
-	TEST_ASSERT_FALSE(connector.convertToHeader(identifier, header));
-	TEST_ASSERT_EQUALS(header, xpcc::Header(xpcc::Header::REQUEST, false, 0, 0x0a, 0));
+	xpcc::SmartPointer payload(&fragmentedPayload);
+	connector->sendPacket(xpccHeader, payload);
 	
-	identifier = 0x000000ff;
-	TEST_ASSERT_FALSE(connector.convertToHeader(identifier, header));
-	TEST_ASSERT_EQUALS(header, xpcc::Header(xpcc::Header::REQUEST, false, 0, 0, 0xff));
-	identifier = 0x000000cc;
-	TEST_ASSERT_FALSE(connector.convertToHeader(identifier, header));
-	TEST_ASSERT_EQUALS(header, xpcc::Header(xpcc::Header::REQUEST, false, 0, 0, 0xcc));
-	identifier = 0x0000000a;
-	TEST_ASSERT_FALSE(connector.convertToHeader(identifier, header));
-	TEST_ASSERT_EQUALS(header, xpcc::Header(xpcc::Header::REQUEST, false, 0, 0, 0x0a));
+	// fragmented messages aren't send directly but queued
+	TEST_ASSERT_EQUALS(driver->sendList.getSize(), 0U);
+	
+	// with two send slots two message should be send
+	connector->update();
+	TEST_ASSERT_EQUALS(driver->sendList.getSize(), 1U);
+	connector->update();
+	TEST_ASSERT_EQUALS(driver->sendList.getSize(), 2U);
+	
+	checkFragmentedMessage(driver->sendList.getFront(), 0);
+	driver->sendList.removeFront();
+	
+	checkFragmentedMessage(driver->sendList.getFront(), 1);
+	driver->sendList.removeFront();
+	
+	driver->sendSlots = 1;
+	connector->update();
+	connector->update();
+	TEST_ASSERT_EQUALS(driver->sendList.getSize(), 1U);
+	
+	checkFragmentedMessage(driver->sendList.getFront(), 2);
+	driver->sendList.removeFront();
+	
+	driver->sendSlots = 1;
+	connector->update();
+	TEST_ASSERT_EQUALS(driver->sendList.getSize(), 1U);
+	
+	checkFragmentedMessage(driver->sendList.getFront(), 3);
+	driver->sendList.removeFront();
+	
+	TEST_ASSERT_EQUALS(connector->messageCounter, 0x40);
+}
+
+void
+CanConnectorTest::testReceiveShortMessage()
+{
+	TEST_ASSERT_FALSE(connector->isPacketAvailable());
+	
+	// create a new can message
+	xpcc::can::Message message(normalIdentifier, 8);
+	memcpy(&message.data, shortPayload, 8);
+	
+	// let it be received by the connector
+	driver->receiveList.append(message);
+	connector->update();
+	
+	TEST_ASSERT_TRUE(connector->isPacketAvailable());
+	
+	TEST_ASSERT_EQUALS(connector->getPacketHeader(), xpccHeader);
+	TEST_ASSERT_EQUALS(connector->getPacketPayloadSize(), 8U);
+	TEST_ASSERT_EQUALS_ARRAY(
+			connector->getPacketPayload().getPointer(),
+			shortPayload,
+			8);
+	connector->dropPacket();
+	
+	TEST_ASSERT_FALSE(connector->isPacketAvailable());
+}
+
+void
+CanConnectorTest::testReceiveFragmentedMessage()
+{
+	
 }

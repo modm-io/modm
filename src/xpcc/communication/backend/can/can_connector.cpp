@@ -33,3 +33,95 @@
 #include "can_connector.hpp"
 
 uint8_t xpcc::CanConnectorBase::messageCounter = 0;
+
+// ----------------------------------------------------------------------------
+uint32_t
+xpcc::CanConnectorBase::convertToIdentifier(const Header & header,
+		bool fragmentated)
+{
+	uint32_t identifier;
+	
+	switch (header.type)
+	{
+		case xpcc::Header::REQUEST:
+			identifier = 0;
+			break;
+		case xpcc::Header::RESPONSE:
+			identifier = 1;
+			break;
+		case xpcc::Header::NEGATIVE_RESPONSE:
+			identifier = 2;
+			break;
+		default:
+			identifier = 0;
+	}
+	
+	identifier = identifier << 1;
+	if (header.isAcknowledge){
+		identifier |= 1;
+	}
+	identifier = identifier << 1;
+	// Message counter
+	identifier = identifier << 1;
+	
+	if (fragmentated){
+		identifier |= 1;
+	}
+	identifier = identifier << 8;
+	identifier |= header.destination;
+	identifier = identifier << 8;
+	identifier |= header.source;
+	identifier = identifier << 8;
+	identifier |= header.packetIdentifier;
+	
+	return identifier;
+}
+
+// ----------------------------------------------------------------------------
+bool
+xpcc::CanConnectorBase::convertToHeader(const uint32_t & identifier,
+		xpcc::Header & header)
+{
+	const uint8_t *ptr = reinterpret_cast<const uint8_t *>(&identifier);
+	
+	header.packetIdentifier = ptr[0];
+	header.source 			= ptr[1];
+	header.destination		= ptr[2];
+	
+	uint8_t flags = ptr[3];
+	
+	if (flags & 0x04) {
+		header.isAcknowledge = true;
+	}
+	else {
+		header.isAcknowledge = false;
+	}
+	
+	switch (flags & 0x18)
+	{
+		case 0x00:
+			header.type = xpcc::Header::REQUEST;
+			break;
+		case 0x08:
+			header.type = xpcc::Header::RESPONSE;
+			break;
+		case 0x10:
+			header.type = xpcc::Header::NEGATIVE_RESPONSE;
+			break;
+		default:
+			// unknown type
+			//XPCC_LOG_ERROR << "Unknown Type" << xpcc::flush;
+			header.type = xpcc::Header::REQUEST;
+	}
+	
+	// check if the message is a fragment
+	return ((flags & 0x01) == 0x01);
+}
+
+// ----------------------------------------------------------------------------
+uint8_t
+xpcc::CanConnectorBase::getNumberOfFragments(uint8_t messageSize)
+{
+	div_t n = div(messageSize, 6);
+	return (n.rem > 0) ? n.quot + 1 : n.quot;
+}

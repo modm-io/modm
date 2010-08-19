@@ -336,6 +336,31 @@ LinkedListTest::testIteratorAccess()
 }
 
 void
+LinkedListTest::testSize()
+{
+	xpcc::LinkedList<int16_t> list;
+	TEST_ASSERT_EQUALS(list.getSize(), 0U);
+	
+	list.append(1);
+	TEST_ASSERT_EQUALS(list.getSize(), 1U);
+	
+	list.append(2);
+	TEST_ASSERT_EQUALS(list.getSize(), 2U);
+	
+	list.prepend(3);
+	TEST_ASSERT_EQUALS(list.getSize(), 3U);
+	
+	list.removeFront();
+	TEST_ASSERT_EQUALS(list.getSize(), 2U);
+	
+	list.removeFront();
+	TEST_ASSERT_EQUALS(list.getSize(), 1U);
+	
+	list.prepend(4);
+	TEST_ASSERT_EQUALS(list.getSize(), 2U);
+}
+
+void
 LinkedListTest::testRemove()
 {
 	xpcc::LinkedList<int16_t> list;
