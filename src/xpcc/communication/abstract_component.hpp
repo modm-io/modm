@@ -72,26 +72,25 @@ namespace xpcc
 		void
 		callAction(uint8_t receiver, uint8_t actionIdentifier);
 		
+		void
+		callAction(uint8_t receiver, uint8_t actionIdentifier, Callback& responseCallback);
+		
 		template<typename T>
 		void
 		callAction(uint8_t receiver, uint8_t actionIdentifier, const T& data);
 		
-		void
-		callAction(uint8_t receiver, uint8_t actionIdentifier, Callback& responseCallback);
-
 		template<typename T>
 		void
 		callAction(uint8_t receiver, uint8_t actionIdentifier, const T& data, Callback& responseCallback);
+		
+		void
+		publishEvent(uint8_t eventIdentifier);
 		
 		template<typename T>
 		void
 		publishEvent(uint8_t eventIdentifier, const T& data);
 		
-		void
-		publishEvent(uint8_t eventIdentifier);
-		
-	// TODO make these private
-	protected:
+	private:
 		const uint8_t ownIdentifier;
 		Dispatcher * const communication;
 	};
