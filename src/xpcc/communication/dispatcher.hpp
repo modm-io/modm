@@ -30,8 +30,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC__COMMUNICATION_HPP
-#define	XPCC__COMMUNICATION_HPP
+#ifndef	XPCC__DISPATCHER_HPP
+#define	XPCC__DISPATCHER_HPP
 
 #include "backend/backend_interface.hpp"
 #include "postman/postman.hpp"
@@ -45,12 +45,10 @@ namespace xpcc
 	 * \todo	Documentation
 	 * \ingroup	communication
 	 */
-	class Communication
+	class Dispatcher
 	{
 	public:
-		Communication(
-				BackendInterface *backend,
-				Postman* postman);
+		Dispatcher(BackendInterface *backend, Postman* postman);
 		
 		void
 		update();
@@ -92,7 +90,7 @@ namespace xpcc
 // ----------------------------------------------------------------------------
 template<typename T>
 void
-xpcc::Communication::sendResponse(const ResponseHandle& handle, const T& data)
+xpcc::Dispatcher::sendResponse(const ResponseHandle& handle, const T& data)
 {
 	Header header(	Header::RESPONSE,
 					false,
@@ -108,7 +106,7 @@ xpcc::Communication::sendResponse(const ResponseHandle& handle, const T& data)
 // ----------------------------------------------------------------------------
 template<typename T>
 void
-xpcc::Communication::sendNegativeResponse(const ResponseHandle& handle, const T& data)
+xpcc::Dispatcher::sendNegativeResponse(const ResponseHandle& handle, const T& data)
 {
 	Header header(	Header::NEGATIVE_RESPONSE,
 					false,
@@ -121,4 +119,4 @@ xpcc::Communication::sendNegativeResponse(const ResponseHandle& handle, const T&
 	this->responseManager.addResponse(header, payload);
 }
 
-#endif // XPCC__COMMUNICATION_HPP
+#endif // XPCC__DISPATCHER_HPP

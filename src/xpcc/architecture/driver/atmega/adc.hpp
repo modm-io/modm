@@ -52,7 +52,7 @@ namespace xpcc
 	 *     
 	 *     ...
 	 *     // read channel 2
-	 *     uint16_t value = xpcc::Adc::convert(2);
+	 *     uint16_t value = xpcc::Adc::readChannel(2);
 	 *     ...
 	 * }
 	 * \endcode
@@ -119,7 +119,7 @@ namespace xpcc
 		static bool
 		isFinished();
 		
-		/// Read the converte analog value
+		/// Read the converted analog value
 		static uint16_t
 		getValue();
 	};

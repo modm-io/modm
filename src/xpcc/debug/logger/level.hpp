@@ -63,6 +63,8 @@ namespace xpcc
 	 * #define XPCC_LOG_LEVEL xpcc::log::INFO
 	 * \endcode
 	 * 
+	 * DEBUG < INFO < WARNING < ERROR
+	 * 
 	 * \ingroup logger
 	 */
 	#define XPCC_LOG_LEVEL xpcc::log::DEBUG

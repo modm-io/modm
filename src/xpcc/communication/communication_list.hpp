@@ -42,7 +42,7 @@
 namespace xpcc
 {
 	// forward declaration
-	class Communication;
+	class Dispatcher;
 	class Callback;
 	
 	/**
@@ -149,7 +149,7 @@ namespace xpcc
 			 * this->last = &dummyFirst;
 			 * \endcode
 			 */
-			List(xpcc::Communication *communication);
+			List(xpcc::Dispatcher *communication);
 
 			void
 			addEvent(const Header& header);
@@ -235,14 +235,14 @@ namespace xpcc
 			void
 			callOfNextOfEWithCallback(const BackendInterface &backend, Entry *e);
 
-			xpcc::Communication *communication;
+			xpcc::Dispatcher *communication;
 			EntryDefault dummyFirst;
 			Entry *first;
 			Entry *last;
 		};
 	}
 }
-// the forwarddeclaration of Communication must be defined here
-#include "communication.hpp"
+// the forward declaration of Communication must be defined here
+#include "dispatcher.hpp"
 
 #endif // XPCC__COMMUNICATION_LIST_HPP

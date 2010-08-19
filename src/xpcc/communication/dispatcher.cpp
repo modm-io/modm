@@ -30,14 +30,14 @@
  */
 // ----------------------------------------------------------------------------
 
-#include "communication.hpp"
+#include "dispatcher.hpp"
 
 #include <xpcc/debug/logger/logger.hpp>
 // set the Loglevel
 #undef  XPCC_LOG_LEVEL
 #define XPCC_LOG_LEVEL xpcc::log::INFO
 
-xpcc::Communication::Communication(
+xpcc::Dispatcher::Dispatcher(
 		BackendInterface *backend,
 		Postman* postman) :
 	backend(backend),
@@ -48,7 +48,7 @@ xpcc::Communication::Communication(
 
 // ----------------------------------------------------------------------------
 void
-xpcc::Communication::update()
+xpcc::Dispatcher::update()
 {
 	if (this->postman != 0)
 	{
@@ -122,7 +122,7 @@ xpcc::Communication::update()
 
 // ----------------------------------------------------------------------------
 void
-xpcc::Communication::sendResponse(const ResponseHandle& handle)
+xpcc::Dispatcher::sendResponse(const ResponseHandle& handle)
 {
 	Header header(	Header::RESPONSE,
 					false,
@@ -135,7 +135,7 @@ xpcc::Communication::sendResponse(const ResponseHandle& handle)
 
 // ----------------------------------------------------------------------------
 void
-xpcc::Communication::sendNegativeResponse(const ResponseHandle& handle)
+xpcc::Dispatcher::sendNegativeResponse(const ResponseHandle& handle)
 {
 	Header header(	Header::NEGATIVE_RESPONSE,
 					false,

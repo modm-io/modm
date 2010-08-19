@@ -202,7 +202,7 @@ xpcc::CanConnector<Driver>::retrieveMessage()
 		{
 			// find existing container otherwise create a new one
 			const uint8_t fragmentIndex = message.data[0] & 0x0f;
-			const uint8_t messageCounter = message.data[0] & 0xf0;
+			const uint8_t counter = message.data[0] & 0xf0;
 			const uint8_t messageSize = message.data[1];
 			
 			// calculate the number of messages need to send messageSize-bytes
@@ -225,7 +225,7 @@ xpcc::CanConnector<Driver>::retrieveMessage()
 			if (fragmentIndex + 1 == numberOfFragments)
 			{
 				// this one is the last fragment
-				if (messageSize - offset != message.length - 3)
+				if (messageSize - offset != message.length - 2)
 				{
 					// illegal format
 					return false;
@@ -239,20 +239,21 @@ xpcc::CanConnector<Driver>::retrieveMessage()
 			
 			// Check if other parts of this message are already in the
 			// list of receiving messages.
-			typename ReceiveList::iterator packet = this->receivingMessages.begin();
-			for ( ; packet != this->receivingMessages.end(); ++packet) {
+			typename ReceiveList::iterator packet = this->pendingMessages.begin();
+			for ( ; packet != this->pendingMessages.end(); ++packet)
+			{
 				if (packet->header == header &&
-					packet->messageCounter == messageCounter)
+					packet->counter == counter)
 				{
 					break;
 				}
 			}
 			
-			if (packet == this->receivingMessages.end()) {
+			if (packet == this->pendingMessages.end()) {
 				// message not found => first part of this message,
 				// prepend it to the list
-				this->receivingMessages.prepend(ReceiveListItem(messageSize, header, messageCounter));
-				packet = this->receivingMessages.begin();
+				this->pendingMessages.prepend(ReceiveListItem(messageSize, header, counter));
+				packet = this->pendingMessages.begin();
 			}
 			
 			// create a marker for the currently received fragment and
@@ -275,7 +276,7 @@ xpcc::CanConnector<Driver>::retrieveMessage()
 			if (xpcc::math::bitCount(packet->receivedFragments) == numberOfFragments)
 			{
 				this->receivedMessages.append(*packet);
-				this->receivingMessages.remove(packet);
+				this->pendingMessages.remove(packet);
 			}
 		}
 		

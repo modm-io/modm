@@ -30,8 +30,8 @@
 // ----------------------------------------------------------------------------
 
 #include "tipc.hpp"
+#include <xpcc/debug/logger.hpp>
 
-#include <xpcc/debug/logger/logger.hpp>
 #undef  XPCC_LOG_LEVEL
 #define XPCC_LOG_LEVEL xpcc::log::WARNING
 
@@ -39,18 +39,14 @@ xpcc::TipcConnector::TipcConnector( ) :
 	transmitter( ),
 	receiver( this->transmitter.getPortId() )
 {
-
 }
 
 // ----------------------------------------------------------------------------
-
 xpcc::TipcConnector::~TipcConnector()
 {
-
 }
 
 // ----------------------------------------------------------------------------
-
 bool
 xpcc::TipcConnector::isPacketAvailable() const
 {
@@ -58,7 +54,6 @@ xpcc::TipcConnector::isPacketAvailable() const
 }
 
 // ----------------------------------------------------------------------------
-
 const xpcc::Header&
 xpcc::TipcConnector::getPacketHeader() const
 {
@@ -97,7 +92,6 @@ xpcc::TipcConnector::dropPacket()
 }
 
 // ----------------------------------------------------------------------------
-
 void
 xpcc::TipcConnector::sendPacket(const xpcc::Header &header, SmartPointer payload)
 {
@@ -105,7 +99,7 @@ xpcc::TipcConnector::sendPacket(const xpcc::Header &header, SmartPointer payload
 //			<< " payload size=" << payload.getSize()
 //			<< " payload=" << payload
 //			<< xpcc::flush;
-
+	
 	SmartPointer combinedPayload( sizeof(xpcc::Header) + payload.getSize() );
 
 	memcpy(	combinedPayload.getPointer(), &header, sizeof(xpcc::Header) );
@@ -124,16 +118,12 @@ xpcc::TipcConnector::sendPacket(const xpcc::Header &header, SmartPointer payload
 	else {
 		// transmit an EVENT
 		this->transmitter.transmitEvent( header.packetIdentifier, combinedPayload );
-
 	}
 }
 
 // ----------------------------------------------------------------------------
-
 void
 xpcc::TipcConnector::update()
 {
 	// nothing to do, because TipcReceiver is using threads
 }
-
-// ----------------------------------------------------------------------------

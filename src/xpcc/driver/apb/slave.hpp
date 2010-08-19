@@ -144,42 +144,6 @@ namespace xpcc
 		/**
 		 * \brief	Possible Action
 		 * 
-		 * Example:
-		 * \code
-		 * class Sensor : public xpcc::apb::Callable
-		 * {
-		 * public:
-		 *     void
-		 *     sendValue(xpcc::apb::Response& response)
-		 *     {
-		 *         response.send(this->value);
-		 *     }
-		 *     
-		 *     void
-		 *     doSomething(xpcc::apb::Response& response, const uint32_t* parameter)
-		 *     {
-		 *         // ... do something usefull ...
-		 *         
-		 *         response.send();
-		 *     }
-		 *     
-		 *     // ...
-		 *     
-		 * private:
-		 *     int8_t value;
-		 * };
-		 * 
-		 * Sensor sensor;
-		 * 
-		 * FLASH(xpcc::apb::Action actionList[]) =
-		 * {
-		 *     APB__ACTION(0x57, sensor, Sensor::sendValue,   0),
-		 *     APB__ACTION(0x03, sensor, Sensor::doSomething, sizeof(uint32_t)),
-		 * };
-		 * \endcode
-		 * 
-		 * A complete example is available in the \c example/apb folder.
-		 * 
 		 * \see		APB__ACTION()
 		 * \ingroup	apb
 		 */
@@ -272,6 +236,42 @@ namespace xpcc
 #ifdef __DOXYGEN__
 	/**
 	 * \brief	Define a apb::Action
+	 * 
+	 * Example:
+	 * \code
+	 * class Sensor : public xpcc::apb::Callable
+	 * {
+	 * public:
+	 *     void
+	 *     sendValue(xpcc::apb::Response& response)
+	 *     {
+	 *         response.send(this->value);
+	 *     }
+	 *     
+	 *     void
+	 *     doSomething(xpcc::apb::Response& response, const uint32_t* parameter)
+	 *     {
+	 *         // ... do something usefull ...
+	 *         
+	 *         response.send();
+	 *     }
+	 *     
+	 *     // ...
+	 *     
+	 * private:
+	 *     int8_t value;
+	 * };
+	 * 
+	 * Sensor sensor;
+	 * 
+	 * FLASH(xpcc::apb::Action actionList[]) =
+	 * {
+	 *     APB__ACTION(0x57, sensor, Sensor::sendValue,   0),
+	 *     APB__ACTION(0x03, sensor, Sensor::doSomething, sizeof(uint32_t)),
+	 * };
+	 * \endcode
+	 * 
+	 * A complete example is available in the \c example/apb folder.
 	 * 
 	 * \param	command		Command byte
 	 * \param	object		

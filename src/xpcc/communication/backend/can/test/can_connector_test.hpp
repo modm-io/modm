@@ -39,6 +39,17 @@
 
 class CanConnectorTest : public unittest::TestSuite
 {
+	void
+	checkShortMessage(const xpcc::can::Message& message) const;
+	
+	void
+	checkFragmentedMessage(const xpcc::can::Message& message,
+			uint8_t fragmentId) const;
+	
+	void
+	createMessage(xpcc::can::Message& message,
+			uint8_t fragmentId) const;
+	
 public:
 	virtual void
 	setUp();
@@ -64,14 +75,9 @@ public:
 	void
 	testReceiveFragmentedMessage();
 	
+	// TODO test message with wrong formats
+	
 private:
-	void
-	checkShortMessage(const xpcc::can::Message& message) const;
-	
-	void
-	checkFragmentedMessage(const xpcc::can::Message& message,
-			uint8_t fragmentId) const;
-	
 	TestingCanConnector *connector;
 	FakeCanDriver *driver;
 	
@@ -81,7 +87,7 @@ private:
 	uint8_t messageCounter;
 	
 	uint8_t shortPayload[8];
-	uint8_t fragmentedPayload[20];
+	uint8_t fragmentedPayload[14];
 };
 
 #endif

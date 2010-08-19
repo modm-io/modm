@@ -34,7 +34,6 @@
 #define	XPCC__CAN_CONNECTOR_HPP
 
 #include <xpcc/container/linked_list.hpp>
-
 #include "../backend_interface.hpp"
 
 namespace xpcc
@@ -101,10 +100,10 @@ namespace xpcc
 	 *
 	 * Changes in the highest 4 bits:
 	 * - 2 bit: Action [0], Response [1], Neg. Response [2], not used [3]
-     * - 1 bit: Request [0], Acknowledge [1] (NACK implicit in the payload)
-     * - 1 bit: Message Counter active [1] / not active [1]
-     *
-     * Every event is send with the destination identifier \c 0x00.
+	 * - 1 bit: Request [0], Acknowledge [1] (NACK implicit in the payload)
+	 * - 1 bit: Message Counter active [1] / not active [1]
+	 *
+	 * Every event is send with the destination identifier \c 0x00.
 	 * 
 	 * \todo timeout
 	 *
@@ -190,14 +189,14 @@ namespace xpcc
 			ReceiveListItem(uint8_t size, const Header& header, uint8_t messageCounter = 0) :
 				header(header), payload(size),
 				receivedFragments(0),
-				messageCounter(messageCounter)
+				counter(messageCounter)
 			{
 			}
 			
 			ReceiveListItem(const ReceiveListItem& other) :
 				header(other.header), payload(other.payload),
 				receivedFragments(other.receivedFragments),
-				messageCounter(messageCounter)
+				counter(other.counter)
 			{
 			}
 			
@@ -205,7 +204,7 @@ namespace xpcc
 			SmartPointer payload;
 			
 			uint8_t receivedFragments;
-			const uint8_t messageCounter;
+			const uint8_t counter;
 			
 		private:
 			ReceiveListItem&
@@ -217,7 +216,7 @@ namespace xpcc
 		
 	protected:
 		SendList sendList;
-		ReceiveList receivingMessages;
+		ReceiveList pendingMessages;
 		ReceiveList receivedMessages;
 		
 		Driver canDriver;

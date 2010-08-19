@@ -37,4 +37,4 @@
 
 #include "communication/abstract_component.hpp"
 #include "communication/communicatable.hpp"
-#include "communication/communication.hpp"
+#include "communication/dispatcher.hpp"

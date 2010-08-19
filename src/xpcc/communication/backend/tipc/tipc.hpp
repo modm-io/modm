@@ -30,8 +30,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__TIPC_H
-#define XPCC__TIPC_H
+#ifndef XPCC__TIPC_HPP
+#define XPCC__TIPC_HPP
 
 #include <xpcc/driver/tipc/header.hpp>
 #include <xpcc/driver/tipc/tipc_receiver.hpp>
@@ -77,10 +77,10 @@ namespace xpcc
 			isPacketAvailable() const;
 
 			/// Access the packet.
-			virtual const ::xpcc::Header&
+			virtual const Header&
 			getPacketHeader() const;
 
-			virtual const ::xpcc::SmartPointer
+			virtual const SmartPointer
 			getPacketPayload() const;
 
 			virtual uint8_t
@@ -96,7 +96,7 @@ namespace xpcc
 			 * Send a Message.
 			 */
 			virtual void
-			sendPacket(const ::xpcc::Header &header,
+			sendPacket(const Header &header,
 					   SmartPointer payload = SmartPointer());
 
 		private :
@@ -105,4 +105,4 @@ namespace xpcc
 	};
 };
  
-#endif	// XPCC__TIPC_H
+#endif	// XPCC__TIPC_HPP

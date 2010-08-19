@@ -34,13 +34,13 @@
 #define	XPCC__ABSTRACT_COMPONENT_HPP
 
 #include <stdint.h>
-#include "communication.hpp"
+#include "dispatcher.hpp"
 #include "communicatable.hpp"
 
 namespace xpcc
 {
 	// forward declaration
-	class Communication;
+	class Dispatcher;
 	class CommunicatableTask;
 	
 	/**
@@ -60,7 +60,7 @@ namespace xpcc
 		 * \param	communication	Communication class use to send messages
 		 */
 		AbstractComponent(const uint8_t ownIdentifier,
-				Communication *communication);
+				Dispatcher *communication);
 		
 		/**
 		 * \brief	Update the internal state of this component.
@@ -93,7 +93,7 @@ namespace xpcc
 	// TODO make these private
 	protected:
 		const uint8_t ownIdentifier;
-		Communication * const communication;
+		Dispatcher * const communication;
 	};
 }
 

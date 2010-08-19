@@ -39,7 +39,7 @@
 #define XPCC_LOG_LEVEL xpcc::log::DEBUG
 
 
-xpcc::communicationList::List::List(xpcc::Communication *communication) :
+xpcc::communicationList::List::List(xpcc::Dispatcher *communication) :
 	communication(communication), dummyFirst(Header()),
 	first(&dummyFirst), last(&dummyFirst)
 {

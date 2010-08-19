@@ -33,7 +33,7 @@
 
 xpcc::AbstractComponent::AbstractComponent(
 		const uint8_t ownIdentifier,
-		Communication *communication) : 
+		Dispatcher *communication) : 
 	ownIdentifier(ownIdentifier), communication(communication)
 {
 }
