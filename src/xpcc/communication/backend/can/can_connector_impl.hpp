@@ -65,29 +65,26 @@ xpcc::CanConnector<Driver>::getPacketPayload() const
 	return this->receivedMessages.getFront().payload;
 }
 
-template<typename Driver>
-uint8_t
-xpcc::CanConnector<Driver>::getPacketPayloadSize() const
-{
-	return this->receivedMessages.getFront().payload.getSize();
-}
-
 // ----------------------------------------------------------------------------
 template<typename Driver>
 void
 xpcc::CanConnector<Driver>::sendPacket(const Header &header, SmartPointer payload)
 {
 	bool successfull = false;
-	if (payload.getSize() <= 8 && this->canDriver.isReadyToSend()) {
+	bool fragmented = (payload.getSize() > 8);
+	
+	uint32_t identifier = convertToIdentifier(header, fragmented);
+	if (!fragmented && this->canDriver.isReadyToSend())
+	{
 		// try to send the message directly
-		successfull = this->sendMessage(
-				header, payload.getPointer(), payload.getSize(), false);
+		successfull = this->sendMessage(identifier,
+				payload.getPointer(), payload.getSize());
 	}
 	
 	if (!successfull)
 	{
 		// append the message to the list of waiting messages
-		this->sendList.append(SendListItem(header, payload));
+		this->sendList.append(SendListItem(identifier, payload));
 	}
 }
 
@@ -114,16 +111,15 @@ xpcc::CanConnector<Driver>::update()
 
 template<typename Driver>
 bool
-xpcc::CanConnector<Driver>::sendMessage(const Header &header,
-		const uint8_t *data, uint8_t size, bool fragmentated)
+xpcc::CanConnector<Driver>::sendMessage(const uint32_t & identifier,
+		const uint8_t *data, uint8_t size)
 {
-	xpcc::can::Message message(
-			convertToIdentifier(header, fragmentated),
-			size);
+	xpcc::can::Message message(identifier, size);
 	
-	memcpy(message.data, data, size);
+	// copy payload data
+	std::memcpy(message.data, data, size);
 	
-	return this->canDriver.sendMessage( message );
+	return this->canDriver.sendMessage(message);
 }
 
 template<typename Driver>
@@ -136,8 +132,8 @@ xpcc::CanConnector<Driver>::sendWaitingMessages()
 	}
 	
 	SendListItem& message = this->sendList.getFront();
-	uint8_t messageSize = message.payload.getSize();
 	
+	uint8_t messageSize = message.payload.getSize();
 	if (messageSize > 8)
 	{
 		// fragmented message
@@ -159,7 +155,7 @@ xpcc::CanConnector<Driver>::sendWaitingMessages()
 
 		memcpy(data + 2, message.payload.getPointer() + offset, fragmentSize);
 		
-		if (sendMessage(message.header, data, fragmentSize + 2, true))
+		if (sendMessage(message.identifier, data, fragmentSize + 2))
 		{
 			message.fragmentIndex++;
 			if (sendFinished)
@@ -173,8 +169,8 @@ xpcc::CanConnector<Driver>::sendWaitingMessages()
 	}
 	else
 	{
-		if (this->sendMessage(message.header, message.payload.getPointer(),
-				messageSize, false))
+		if (this->sendMessage(message.identifier, message.payload.getPointer(),
+				messageSize))
 		{
 			this->sendList.removeFront();
 		}

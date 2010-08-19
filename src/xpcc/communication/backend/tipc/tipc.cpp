@@ -61,7 +61,6 @@ xpcc::TipcConnector::getPacketHeader() const
 }
 
 // ----------------------------------------------------------------------------
-
 const xpcc::SmartPointer
 xpcc::TipcConnector::getPacketPayload() const
 {
@@ -76,15 +75,6 @@ xpcc::TipcConnector::getPacketPayload() const
 }
 
 // ----------------------------------------------------------------------------
-
-uint8_t
-xpcc::TipcConnector::getPacketPayloadSize() const
-{
-	return this->receiver.frontPayload().getSize();
-}
-
-// ----------------------------------------------------------------------------
-
 void
 xpcc::TipcConnector::dropPacket()
 {

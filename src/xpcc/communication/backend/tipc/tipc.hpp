@@ -82,10 +82,7 @@ namespace xpcc
 
 			virtual const SmartPointer
 			getPacketPayload() const;
-
-			virtual uint8_t
-			getPacketPayloadSize() const;
-
+			
 			virtual void
 			dropPacket();
 

@@ -57,6 +57,13 @@ namespace xpcc
 		static bool
 		convertToHeader(const uint32_t & identifier, Header & header);
 		
+		static inline bool
+		isFragment(const uint32_t & identifier)
+		{
+			const uint8_t *ptr = reinterpret_cast<const uint8_t *>(&identifier);
+			return (ptr[3] & 0x01);
+		}
+		
 		/**
 		 * \brief	Calculate the number of fragments needed to send a message
 		 * 			with a length of \p messageSize.
@@ -119,6 +126,7 @@ namespace xpcc
 		virtual void
 		sendPacket(const Header &header, SmartPointer payload);
 		
+		
 		virtual bool
 		isPacketAvailable() const;
 		
@@ -128,11 +136,9 @@ namespace xpcc
 		virtual const xpcc::SmartPointer
 		getPacketPayload() const;
 		
-		virtual uint8_t
-		getPacketPayloadSize() const;
-		
 		virtual void
 		dropPacket();
+		
 		
 		virtual void
 		update();
@@ -144,9 +150,8 @@ namespace xpcc
 		 * \return	\b true if the message could be send, \b false otherwise
 		 */
 		bool
-		sendMessage(const Header &header,
-				const uint8_t *data, uint8_t size,
-				bool fragmentated);
+		sendMessage(const uint32_t & identifier,
+				const uint8_t *data, uint8_t size);
 		
 		void
 		sendWaitingMessages();
@@ -161,19 +166,19 @@ namespace xpcc
 		class SendListItem
 		{
 		public:
-			SendListItem(const Header& header, const SmartPointer& payload) :
-				header(header), payload(payload),
+			SendListItem(const uint32_t & identifier, const SmartPointer& payload) :
+				identifier(identifier), payload(payload),
 				fragmentIndex(0)
 			{
 			}
 			
 			SendListItem(const SendListItem& other) :
-				header(other.header), payload(other.payload),
+				identifier(other.identifier), payload(other.payload),
 				fragmentIndex(other.fragmentIndex)
 			{
 			}
 			
-			Header header;
+			uint32_t identifier;
 			SmartPointer payload;
 			
 			uint8_t fragmentIndex;

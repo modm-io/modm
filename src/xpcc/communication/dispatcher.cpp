@@ -66,10 +66,7 @@ xpcc::Dispatcher::update()
 			//}
 			const Header& header(this->backend->getPacketHeader());
 			const SmartPointer payload(this->backend->getPacketPayload());
-
-//			if (header.destination == 0x12)
-//				XPCC_LOG_INFO << "_" << xpcc::endl;
-//			
+			
 			if ( header.type == Header::REQUEST && !header.isAcknowledge )
 			{
 				if ( postman->deliverPacket( header, payload ) == Postman::OK ) {

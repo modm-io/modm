@@ -190,7 +190,7 @@ CanConnectorTest::testReceiveShortMessage()
 	TEST_ASSERT_TRUE(connector->isPacketAvailable());
 	
 	TEST_ASSERT_EQUALS(connector->getPacketHeader(), xpccHeader);
-	TEST_ASSERT_EQUALS(connector->getPacketPayloadSize(), 8U);
+	TEST_ASSERT_EQUALS(connector->getPacketPayload().getSize(), 8U);
 	TEST_ASSERT_EQUALS_ARRAY(
 			connector->getPacketPayload().getPointer(),
 			shortPayload,

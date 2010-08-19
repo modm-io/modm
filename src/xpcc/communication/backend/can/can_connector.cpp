@@ -116,7 +116,7 @@ xpcc::CanConnectorBase::convertToHeader(const uint32_t & identifier,
 	}
 	
 	// check if the message is a fragment
-	return ((flags & 0x01) == 0x01);
+	return isFragment(identifier);
 }
 
 // ----------------------------------------------------------------------------

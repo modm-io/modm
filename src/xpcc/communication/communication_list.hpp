@@ -242,7 +242,7 @@ namespace xpcc
 		};
 	}
 }
-// the forward declaration of Communication must be defined here
+// the forward declaration of Dispatcher must be defined here
 #include "dispatcher.hpp"
 
 #endif // XPCC__COMMUNICATION_LIST_HPP
