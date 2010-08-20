@@ -216,10 +216,13 @@ namespace xpcc
 			operator = (const ReceiveListItem& other);
 		};
 		
+		typedef xpcc::LinkedList< SendListItem > SendList;
+		typedef xpcc::LinkedList< ReceiveListItem > ReceiveList;
+		
 	protected:
-		xpcc::LinkedList< SendListItem > sendList;
-		xpcc::LinkedList< ReceiveListItem > pendingMessages;
-		xpcc::LinkedList< ReceiveListItem > receivedMessages;
+		SendList sendList;
+		ReceiveList pendingMessages;
+		ReceiveList receivedMessages;
 		
 		Driver canDriver;
 	};

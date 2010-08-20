@@ -41,16 +41,23 @@ CanConnectorTest::checkShortMessage(const xpcc::can::Message& message) const
 	TEST_ASSERT_EQUALS_ARRAY(message.data, shortPayload, sizeof(shortPayload));
 }
 
+uint8_t
+CanConnectorTest::getPayloadLength(uint8_t offset) const
+{
+    uint8_t payloadLength = sizeof (fragmentedPayload) - offset;
+    if (payloadLength > 6) {
+        payloadLength = 6;
+    }
+    return payloadLength;
+}
+
 void
 CanConnectorTest::checkFragmentedMessage(const xpcc::can::Message& message,
 		uint8_t fragmentId) const
 {
 	uint8_t offset = fragmentId * 6;
-	uint8_t payloadLength = sizeof(fragmentedPayload) - offset;
-	if (payloadLength > 6) {
-		payloadLength = 6;
-	}
-	
+	uint8_t payloadLength = getPayloadLength(offset);
+    
 	TEST_ASSERT_EQUALS(message.identifier, fragmentedIdentifier);
 	TEST_ASSERT_EQUALS(message.length, payloadLength + 2);
 	
@@ -65,10 +72,7 @@ CanConnectorTest::createMessage(xpcc::can::Message& message,
 		uint8_t fragmentId) const
 {
 	uint8_t offset = fragmentId * 6;
-	uint8_t payloadLength = sizeof(fragmentedPayload) - offset;
-	if (payloadLength > 6) {
-		payloadLength = 6;
-	}
+	uint8_t payloadLength = getPayloadLength(offset);
 	
 	message.identifier = fragmentedIdentifier;
 	message.length = payloadLength + 2;
