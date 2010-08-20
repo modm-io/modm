@@ -28,13 +28,31 @@
 # 
 # $Id$
 
+import platform
 from SCons.Script import *
 
 # -----------------------------------------------------------------------------
 def avrdude_flash(env, source, alias='avrdude_program'):
-	action = Action("avrdude -p $AVR_DEVICE -c $AVRDUDE_PROGRAMMER -P $AVRDUDE_PORT -U flash:w:$SOURCE", 
-					cmdstr="$AVRDUDE_COMSTR")
-	return env.AlwaysBuild(env.Alias(alias, source, action))
+	if platform.system() == "Windows":
+		# avrdude on Windows has problems with absolute path names.
+		# The leading drive letter plus colon backslash (e.g. "c:\path") 
+		# gets confused with the colon used as argument seperator.
+		# 
+		# To avoid this problem we try to use relative path names if
+		# possible.
+		
+		filename = str(source[0])
+		if os.path.isabs(filename):
+			filename = os.path.relpath(filename)
+		filename = filename.replace("\\", "/")
+		
+		action = Action('avrdude -p $AVR_DEVICE -c $AVRDUDE_PROGRAMMER -P $AVRDUDE_PORT -U flash:w:"%s"' % filename, 
+						cmdstr="$AVRDUDE_COMSTR")
+		return env.AlwaysBuild(env.Alias(alias, source, action))
+	else:
+		action = Action("avrdude -p $AVR_DEVICE -c $AVRDUDE_PROGRAMMER -P $AVRDUDE_PORT -U flash:w:$SOURCE", 
+						cmdstr="$AVRDUDE_COMSTR")
+		return env.AlwaysBuild(env.Alias(alias, source, action))
 
 def avrdude_fuse(env, alias='avrdude_fuse'):
 	fusebits = []
