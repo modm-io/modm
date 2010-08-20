@@ -270,7 +270,7 @@ def generate(env, **kw):
 			env['AVR_FUSEBITS'] = []
 			
 			if 'fusebits' in configuration:
-				if architecture == 'atmega':
+				if device.startswith('atmega') or device.startswith('attiny'):
 					fuses = ['lfuse', 'hfuse', 'efuse']
 					for key, value in configuration['fusebits'].items():
 						if key not in fuses:
@@ -278,7 +278,7 @@ def generate(env, **kw):
 									(key, "', '".join(fuses))
 							Exit(1)
 						env.Append(AVR_FUSEBITS = {key: value} )
-				elif architecture == 'atxmega':
+				elif device.startswith('atxmega'):
 					fuses = ['fuse0', 'fuse1', 'fuse2', 'fuse4', 'fuse5']
 					for key, value in configuration['fusebits'].items():
 						if key not in fuses:

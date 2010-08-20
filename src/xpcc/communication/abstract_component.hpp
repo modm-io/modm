@@ -90,7 +90,7 @@ namespace xpcc
 		void
 		publishEvent(uint8_t eventIdentifier, const T& data);
 		
-	private:
+	protected:	// TODO: make these private
 		const uint8_t ownIdentifier;
 		Dispatcher * const communication;
 	};

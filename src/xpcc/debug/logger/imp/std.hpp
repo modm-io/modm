@@ -48,7 +48,7 @@
 #include "../style/prefix.hpp"
 #include "../style/std_colour.hpp"
 
-#include <xpcc/architecture/pc/terminal.hpp>
+#include <xpcc/architecture/driver/unix/terminal.hpp>
 
 namespace xpcc
 {
