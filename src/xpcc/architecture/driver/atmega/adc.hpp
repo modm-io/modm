@@ -38,8 +38,10 @@ namespace xpcc
 	/**
 	 * \brief	Analog/Digital-converter
 	 * 
-	 * ADC clock frequency should be between 50 and 200 kHz.
+	 * ADC clock frequency should be between 50 and 200 kHz for maximum
+	 * resolution. If less than 10-bits are needed the frequency can be higher.
 	 * 
+	 * Synchronous mode (waits until the ADC is finished):
 	 * \code
 	 * #include <xpcc/architecture/atmega/adc.hpp>
 	 * 
@@ -48,7 +50,7 @@ namespace xpcc
 	 * {
 	 *     xpcc::Adc::initialize(
 	 *             xpcc::Adc::REFERENCE_INTERNAL_2V56,
-	 *             xpcc::Adc::PRESCALER_8);
+	 *             xpcc::Adc::PRESCALER_64);
 	 *     
 	 *     ...
 	 *     // read channel 2
@@ -57,16 +59,20 @@ namespace xpcc
 	 * }
 	 * \endcode
 	 * 
+	 * Asynchronous mode:
 	 * \code
 	 * // start a new conversion on channel 3
 	 * xpcc::Adc::startConversion(3);
 	 * 
+	 * // do something usefull while waiting for the result 
 	 * while (!xpcc::Adc::isFinished())
 	 *     ;
 	 * 
 	 * // read the converted value
 	 * uint16_t value = xpcc::Adc::getValue();
 	 * \endcode
+	 * 
+	 * For a detailed example see the \c adc folder in the examples folder.
 	 * 
 	 * \author	Fabian Greif
 	 * \ingroup	atmega
@@ -77,7 +83,7 @@ namespace xpcc
 		enum Reference
 		{
 			REFERENCE_AREF = 0,
-			REFERENCE_AVCC = 0x40,
+			REFERENCE_INTERNAL_AVCC = 0x40,
 			REFERENCE_INTERNAL_1V1 = 0x80,
 			REFERENCE_INTERNAL_2V56 = 0xc0
 		};
