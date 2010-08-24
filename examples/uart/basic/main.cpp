@@ -1,6 +1,6 @@
 
-#include <avr/interrupt.h>
-#include <xpcc/architecture/atmega/uart.hpp>
+#include <xpcc/architecture/platform.hpp>
+#include <xpcc/architecture/driver/atmega/uart.hpp>
 
 // Create a new UART object and configure it to a baudrate of 115200
 xpcc::BufferedUart0 uart(115200);

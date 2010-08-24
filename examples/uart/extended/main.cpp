@@ -1,6 +1,6 @@
 
-#include <avr/interrupt.h>
-#include <xpcc/architecture/atmega/uart.hpp>
+#include <xpcc/architecture/platform.hpp>
+#include <xpcc/architecture/driver/atmega/uart.hpp>
 
 #include <xpcc/io/iostream.hpp>
 

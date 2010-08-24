@@ -114,7 +114,7 @@ SlaveTest::setUp()
 	FakeIODevice::reset();
 	testingObject.reset();
 	
-	slave = new TestingSlave(0x7f,
+	slave = new TestingSlave(0x3f,
 					xpcc::accessor::asFlash(actionList),
 					sizeof(actionList) / sizeof(xpcc::apb::Action));
 }
@@ -129,7 +129,7 @@ SlaveTest::tearDown()
 void
 SlaveTest::testEmptyMethod()
 {
-	TestingInterface::sendMessage(0x7f, false, 0x01);
+	TestingInterface::sendMessage(0x3f, xpcc::apb::REQUEST, 0x01);
 	FakeIODevice::moveSendToReceiveBuffer();
 	
 	slave->update();
@@ -140,8 +140,9 @@ SlaveTest::testEmptyMethod()
 	TestingInterface::update();
 	
 	TEST_ASSERT_TRUE(TestingInterface::isMessageAvailable());
+	TEST_ASSERT_TRUE(TestingInterface::isResponse());
 	TEST_ASSERT_FALSE(TestingInterface::isAcknowledge());
-	TEST_ASSERT_EQUALS(TestingInterface::getAddress(), 0x7f);
+	TEST_ASSERT_EQUALS(TestingInterface::getAddress(), 0x3f);
 	TEST_ASSERT_EQUALS(TestingInterface::getCommand(), 0x01);
 	TEST_ASSERT_EQUALS(TestingInterface::getPayloadLength(), 1);
 }
@@ -149,7 +150,7 @@ SlaveTest::testEmptyMethod()
 void
 SlaveTest::testResponseMethod()
 {
-	TestingInterface::sendMessage(0x7f, false, 0x02);
+	TestingInterface::sendMessage(0x3f, xpcc::apb::REQUEST, 0x02);
 	FakeIODevice::moveSendToReceiveBuffer();
 	
 	slave->update();
@@ -161,8 +162,9 @@ SlaveTest::testResponseMethod()
 	TestingInterface::update();
 	
 	TEST_ASSERT_TRUE(TestingInterface::isMessageAvailable());
+	TEST_ASSERT_TRUE(TestingInterface::isResponse());
 	TEST_ASSERT_TRUE(TestingInterface::isAcknowledge());
-	TEST_ASSERT_EQUALS(TestingInterface::getAddress(), 0x7f);
+	TEST_ASSERT_EQUALS(TestingInterface::getAddress(), 0x3f);
 	TEST_ASSERT_EQUALS(TestingInterface::getCommand(), 0x02);
 	TEST_ASSERT_EQUALS(TestingInterface::getPayloadLength(), 2);
 	
@@ -174,7 +176,7 @@ SlaveTest::testResponseMethod()
 void
 SlaveTest::testErrorResponse()
 {
-	TestingInterface::sendMessage(0x7f, false, 0x03);
+	TestingInterface::sendMessage(0x3f, xpcc::apb::REQUEST, 0x03);
 	FakeIODevice::moveSendToReceiveBuffer();
 	
 	slave->update();
@@ -186,8 +188,9 @@ SlaveTest::testErrorResponse()
 	TestingInterface::update();
 	
 	TEST_ASSERT_TRUE(TestingInterface::isMessageAvailable());
+	TEST_ASSERT_TRUE(TestingInterface::isResponse());
 	TEST_ASSERT_FALSE(TestingInterface::isAcknowledge());
-	TEST_ASSERT_EQUALS(TestingInterface::getAddress(), 0x7f);
+	TEST_ASSERT_EQUALS(TestingInterface::getAddress(), 0x3f);
 	TEST_ASSERT_EQUALS(TestingInterface::getCommand(), 0x03);
 	TEST_ASSERT_EQUALS(TestingInterface::getPayloadLength(), 1);
 }
@@ -197,7 +200,7 @@ SlaveTest::testParameterMethod()
 {
 	uint16_t value = 0x9876;
 	
-	TestingInterface::sendMessage(0x7f, false, 0x04, value);
+	TestingInterface::sendMessage(0x3f, xpcc::apb::REQUEST, 0x04, value);
 	FakeIODevice::moveSendToReceiveBuffer();
 	
 	slave->update();
@@ -210,8 +213,9 @@ SlaveTest::testParameterMethod()
 	TestingInterface::update();
 	
 	TEST_ASSERT_TRUE(TestingInterface::isMessageAvailable());
+	TEST_ASSERT_TRUE(TestingInterface::isResponse());
 	TEST_ASSERT_TRUE(TestingInterface::isAcknowledge());
-	TEST_ASSERT_EQUALS(TestingInterface::getAddress(), 0x7f);
+	TEST_ASSERT_EQUALS(TestingInterface::getAddress(), 0x3f);
 	TEST_ASSERT_EQUALS(TestingInterface::getCommand(), 0x04);
 	TEST_ASSERT_EQUALS(TestingInterface::getPayloadLength(), 4);
 	
@@ -224,7 +228,7 @@ SlaveTest::testWrongParameterSize()
 {
 	uint32_t value = 0xbaab;
 	
-	TestingInterface::sendMessage(0x7f, false, 0x04, value);
+	TestingInterface::sendMessage(0x3f, xpcc::apb::REQUEST, 0x04, value);
 	FakeIODevice::moveSendToReceiveBuffer();
 	
 	slave->update();
@@ -236,8 +240,9 @@ SlaveTest::testWrongParameterSize()
 	TestingInterface::update();
 	
 	TEST_ASSERT_TRUE(TestingInterface::isMessageAvailable());
+	TEST_ASSERT_TRUE(TestingInterface::isResponse());
 	TEST_ASSERT_FALSE(TestingInterface::isAcknowledge());
-	TEST_ASSERT_EQUALS(TestingInterface::getAddress(), 0x7f);
+	TEST_ASSERT_EQUALS(TestingInterface::getAddress(), 0x3f);
 	TEST_ASSERT_EQUALS(TestingInterface::getCommand(), 0x04);
 	TEST_ASSERT_EQUALS(TestingInterface::getPayloadLength(), 1);
 }
@@ -245,7 +250,7 @@ SlaveTest::testWrongParameterSize()
 void
 SlaveTest::testNoMethod()
 {
-	TestingInterface::sendMessage(0x7f, false, 0x05);
+	TestingInterface::sendMessage(0x3f, xpcc::apb::REQUEST, 0x05);
 	FakeIODevice::moveSendToReceiveBuffer();
 	
 	slave->update();
@@ -258,8 +263,9 @@ SlaveTest::testNoMethod()
 	
 	TEST_ASSERT_TRUE(TestingInterface::isMessageAvailable());
 	
+	TEST_ASSERT_TRUE(TestingInterface::isResponse());
 	TEST_ASSERT_FALSE(TestingInterface::isAcknowledge());
-	TEST_ASSERT_EQUALS(TestingInterface::getAddress(), 0x7f);
+	TEST_ASSERT_EQUALS(TestingInterface::getAddress(), 0x3f);
 	TEST_ASSERT_EQUALS(TestingInterface::getCommand(), 0x05);
 	TEST_ASSERT_EQUALS(TestingInterface::getPayloadLength(), 1);
 }

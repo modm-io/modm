@@ -39,8 +39,20 @@ public:
 	setUp();
 	
 	void
-	testSend();
+	testSendRequest();
+	
+	void
+	testSendAck();
+	
+	void
+	testSendNack();
 	
 	void
 	testReceive();
+	
+	void
+	testReceiveAck();
+	
+	void
+	testReceiveNack();
 };

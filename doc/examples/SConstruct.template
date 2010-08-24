@@ -1,13 +1,18 @@
+# path to the xpcc root directory
+xpccpath = '${rootpath}'
 
-xpccpath = '..'
 env = Environment(tools = ['xpcc'], toolpath = [xpccpath + '/misc/scons'])
 
-files = env.FindFiles(path = '.')
+# find all source files
+files = env.FindFiles('.')
 
+# build the program
 program = env.Program(target = env['XPCC_CONFIG']['general']['name'], source = files.sources)
 
+# build the xpcc library
 env.XpccLibrary()
 
+# create a file called 'defines.hpp' with all preprocessor defines if necessary
 env.Defines()
 
 env.Alias('size', env.Size(program))
@@ -27,3 +32,4 @@ else:
 	env.Alias('all', ['build', 'size'])
 
 env.Default('all')
+

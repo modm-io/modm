@@ -1,5 +1,5 @@
-#include <xpcc/architecture/general/gpio.hpp>
-#include <xpcc/architecture/general/time.hpp>
+#include <xpcc/architecture/driver/gpio.hpp>
+#include <xpcc/architecture/driver/time.hpp>
 
 #include <xpcc/driver/lcd.hpp>
 #include <xpcc/io/iostream.hpp>

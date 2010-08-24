@@ -1,6 +1,6 @@
 
 // this header will include the right header for our architecture
-#include <xpcc/architecture/general/gpio.hpp>
+#include <xpcc/architecture/driver/gpio.hpp>
 
 // create a wrapper for a output pin
 GPIO__OUTPUT(LED, B, 0);

@@ -62,23 +62,17 @@ xpcc::apb::Interface<Device>::initialize()
 
 template <typename Device>
 void
-xpcc::apb::Interface<Device>::sendMessage(uint8_t address, bool acknowledge, 
+xpcc::apb::Interface<Device>::sendMessage(uint8_t address, Flags flags, 
 		uint8_t command,
 		const void *payload, uint8_t payloadLength)
 {
 	uint8_t crc;
-	if (acknowledge) {
-		address |= ACK;
-	}
-	else {
-		address |= NACK;
-	};
 	
 	Device::write(syncByte);
 	Device::write(payloadLength);
 	crc = crcUpdate(crcInitialValue, payloadLength);
-	Device::write(address);
-	crc = crcUpdate(crc, address);
+	Device::write(address | flags);
+	crc = crcUpdate(crc, address | flags);
 	Device::write(command);
 	crc = crcUpdate(crc, command);
 	
@@ -95,20 +89,20 @@ xpcc::apb::Interface<Device>::sendMessage(uint8_t address, bool acknowledge,
 
 template <typename Device> template <typename T>
 void
-xpcc::apb::Interface<Device>::sendMessage(uint8_t address, bool acknowledge,
+xpcc::apb::Interface<Device>::sendMessage(uint8_t address, Flags flags,
 		uint8_t command,
 		const T& payload)
 {
-	sendMessage(address, acknowledge,
+	sendMessage(address, flags,
 			command,
 			reinterpret_cast<const void *>(&payload), sizeof(T));
 }
 
 template <typename Device>
 void
-xpcc::apb::Interface<Device>::sendMessage(uint8_t address, bool acknowledge, uint8_t command)
+xpcc::apb::Interface<Device>::sendMessage(uint8_t address, Flags flags, uint8_t command)
 {
-	sendMessage(address, acknowledge,
+	sendMessage(address, flags,
 			command,
 			0, 0);
 }
@@ -126,7 +120,7 @@ template <typename Device>
 uint8_t
 xpcc::apb::Interface<Device>::getAddress()
 {
-	return (buffer[0] & 0x7f);
+	return (buffer[0] & 0x3f);
 }
 
 template <typename Device>
@@ -138,9 +132,16 @@ xpcc::apb::Interface<Device>::getCommand()
 
 template <typename Device>
 bool
-xpcc::apb::Interface<Device>::isAcknowledge()
+xpcc::apb::Interface<Device>::isResponse()
 {
 	return (buffer[0] & 0x80) ? true : false;
+}
+
+template <typename Device>
+bool
+xpcc::apb::Interface<Device>::isAcknowledge()
+{
+	return (buffer[0] & 0x40) ? true : false;
 }
 
 template <typename Device>

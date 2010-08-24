@@ -1,6 +1,6 @@
-#include <avr/interrupt.h>
+#include <xpcc/architecture/platform.hpp>
 
-#include <xpcc/architecture/general/gpio.hpp>
+#include <xpcc/architecture/driver/gpio.hpp>
 #include <xpcc/driver/button_group.hpp>
 
 static xpcc::ButtonGroup<> buttons(0);

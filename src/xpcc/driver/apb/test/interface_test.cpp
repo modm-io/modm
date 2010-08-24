@@ -46,12 +46,12 @@ InterfaceTest::setUp()
 
 // ----------------------------------------------------------------------------
 void
-InterfaceTest::testSend()
+InterfaceTest::testSendRequest()
 {
 	TestingInterface interface;
 	
 	uint32_t data = 0xdeadbeef;
-	interface.sendMessage(0x12, false, 0x34, data);
+	interface.sendMessage(0x12, xpcc::apb::REQUEST, 0x34, data);
 	
 	uint8_t testMessage[9] = {
 		0x54, 4, 0x12, 0x34, 0xef, 0xbe, 0xad, 0xde, 238
@@ -62,13 +62,59 @@ InterfaceTest::testSend()
 }
 
 void
+InterfaceTest::testSendAck()
+{
+	TestingInterface interface;
+	
+	uint16_t data = 0xbaaa;
+	interface.sendMessage(0x3f, xpcc::apb::ACK, 0x56, data);
+	
+	uint8_t testMessage[7] = {
+		0x54, 2, 0x3f | 0xc0, 0x56, 0xaa, 0xba, 135
+	};
+	
+	TEST_ASSERT_EQUALS(FakeIODevice::bytesSend, 7);
+	TEST_ASSERT_EQUALS_ARRAY(FakeIODevice::sendBuffer, testMessage, 7);
+}
+
+struct Data
+{
+	int16_t a;
+	uint8_t b;
+	uint32_t c;
+} __attribute__((packed));
+
+void
+InterfaceTest::testSendNack()
+{
+	TestingInterface interface;
+	
+	Data data =
+	{
+		-1,
+		12,
+		0x12345678
+	};
+	
+	interface.sendMessage(0x06, xpcc::apb::NACK, 0x78, data);
+	
+	uint8_t testMessage[12] = {
+		0x54, 7, 0x06 | 0x80, 0x78, 0xff, 0xff, 12, 0x78, 0x56, 0x34, 0x12, 193
+	};
+	
+	TEST_ASSERT_EQUALS(FakeIODevice::bytesSend, 12);
+	TEST_ASSERT_EQUALS_ARRAY(FakeIODevice::sendBuffer, testMessage, 12);
+}
+
+// ----------------------------------------------------------------------------
+void
 InterfaceTest::testReceive()
 {
 	TestingInterface interface;
 	
 	// write a new message into the FakeIODevice
 	uint32_t data = 0xdeadbeef;
-	interface.sendMessage(0x12, false, 0x34, data);
+	interface.sendMessage(0x12, xpcc::apb::REQUEST, 0x34, data);
 	
 	FakeIODevice::moveSendToReceiveBuffer();
 	
@@ -77,6 +123,63 @@ InterfaceTest::testReceive()
 	
 	TEST_ASSERT_TRUE(interface.isMessageAvailable());
 	
+	TEST_ASSERT_FALSE(interface.isResponse());
+	TEST_ASSERT_FALSE(interface.isAcknowledge());
+	TEST_ASSERT_EQUALS(interface.getAddress(), 0x12);
+	TEST_ASSERT_EQUALS(interface.getCommand(), 0x34);
+	TEST_ASSERT_EQUALS(interface.getPayloadLength(), 4);
+	TEST_ASSERT_EQUALS_ARRAY(
+			interface.getPayload(),
+			reinterpret_cast<uint8_t *>(&data),
+			4);
+}
+
+// ----------------------------------------------------------------------------
+void
+InterfaceTest::testReceiveAck()
+{
+	TestingInterface interface;
+	
+	// write a new message into the FakeIODevice
+	uint32_t data = 0xdeadbeef;
+	interface.sendMessage(0x12, xpcc::apb::ACK, 0x34, data);
+	
+	FakeIODevice::moveSendToReceiveBuffer();
+	
+	// ... and try to receive it again
+	interface.update();
+	
+	TEST_ASSERT_TRUE(interface.isMessageAvailable());
+	
+	TEST_ASSERT_TRUE(interface.isResponse());
+	TEST_ASSERT_TRUE(interface.isAcknowledge());
+	TEST_ASSERT_EQUALS(interface.getAddress(), 0x12);
+	TEST_ASSERT_EQUALS(interface.getCommand(), 0x34);
+	TEST_ASSERT_EQUALS(interface.getPayloadLength(), 4);
+	TEST_ASSERT_EQUALS_ARRAY(
+			interface.getPayload(),
+			reinterpret_cast<uint8_t *>(&data),
+			4);
+}
+
+// ----------------------------------------------------------------------------
+void
+InterfaceTest::testReceiveNack()
+{
+	TestingInterface interface;
+	
+	// write a new message into the FakeIODevice
+	uint32_t data = 0xdeadbeef;
+	interface.sendMessage(0x12, xpcc::apb::NACK, 0x34, data);
+	
+	FakeIODevice::moveSendToReceiveBuffer();
+	
+	// ... and try to receive it again
+	interface.update();
+	
+	TEST_ASSERT_TRUE(interface.isMessageAvailable());
+	
+	TEST_ASSERT_TRUE(interface.isResponse());
 	TEST_ASSERT_FALSE(interface.isAcknowledge());
 	TEST_ASSERT_EQUALS(interface.getAddress(), 0x12);
 	TEST_ASSERT_EQUALS(interface.getCommand(), 0x34);

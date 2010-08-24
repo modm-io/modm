@@ -215,12 +215,18 @@ def generate(env, **kw):
 			device = parser.get('build', 'device')
 			clock = parser.get('build', 'clock')
 		
-		project_name = parser.get('general', 'name')
-		library_name = parser.get('build', 'library_name', project_name)
+		projectName = parser.get('general', 'name')
 		
 		buildpath = env.get('buildpath')
 		if buildpath is None:
 			buildpath = parser.get('build', 'buildpath', os.path.join(os.curdir, 'build/'))
+		
+		buildpath = string.Template(buildpath).safe_substitute({
+					'arch': architecture,
+					'device': device,
+					'name': projectName,
+					'xpccpath': rootpath
+				})
 		buildpath = os.path.abspath(buildpath)
 		
 		# exclude the buildpath from the FileScanner
@@ -237,7 +243,6 @@ def generate(env, **kw):
 		configuration[section] = s
 	
 	
-	env['XPCC_LIBRARY_NAME'] = library_name
 	env['XPCC_ROOTPATH'] = rootpath			# xpcc rootpath
 	env['XPCC_BASEPATH'] = os.curdir		# path of the current project
 	env['XPCC_LIBRARY_PATH'] = os.path.join(rootpath, 'src')

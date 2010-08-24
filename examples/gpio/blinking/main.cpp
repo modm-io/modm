@@ -1,6 +1,6 @@
 
-#include <xpcc/architecture/general/gpio.hpp>
-#include <xpcc/architecture/general/time.hpp>
+#include <xpcc/architecture/driver/gpio.hpp>
+#include <xpcc/architecture/driver/time.hpp>
 
 GPIO__OUTPUT(LED, B, 0);
 

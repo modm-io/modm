@@ -79,6 +79,17 @@ namespace xpcc
 		};
 		
 		/**
+		 * \brief	Flags
+		 * \ingroup	apb
+		 */
+		enum Flags
+		{
+			REQUEST = 0x00,
+			ACK = 0xc0,
+			NACK = 0x80
+		};
+		
+		/**
 		 * \brief	Maximum length for the payload
 		 * \ingroup	apb
 		 */
@@ -134,14 +145,13 @@ namespace xpcc
 			 * \brief	Send a message
 			 * 
 			 * \param	address			receiver address
-			 * \param	acknowledge		\c true if message is an acknowledge,
-			 * 							\c false otherwise
+			 * \param	flags			see xpcc::apb::Flags
 			 * \param	command			command byte
 			 * \param	*payload		data field
 			 * \param	payloadLength	size of the data field
 			 */
 			static void
-			sendMessage(uint8_t address, bool acknowledge, uint8_t command,
+			sendMessage(uint8_t address, Flags flags, uint8_t command,
 					const void *payload, uint8_t payloadLength);
 			
 			/**
@@ -149,14 +159,14 @@ namespace xpcc
 			 */
 			template <typename T>
 			static void ALWAYS_INLINE
-			sendMessage(uint8_t address, bool acknowledge, uint8_t command,
+			sendMessage(uint8_t address, Flags flags, uint8_t command,
 					const T& payload);
 			
 			/**
 			 * \brief	Send a empty message
 			 */
-			static void
-			sendMessage(uint8_t address, bool acknowledge, uint8_t command);
+			static void ALWAYS_INLINE
+			sendMessage(uint8_t address, Flags flags, uint8_t command);
 			
 			/**
 			 * \brief	Check if a message was received
@@ -171,6 +181,9 @@ namespace xpcc
 			
 			static inline uint8_t
 			getCommand();
+			
+			static inline bool
+			isResponse();
 			
 			static inline bool
 			isAcknowledge();
@@ -211,12 +224,6 @@ namespace xpcc
 				SYNC,
 				LENGTH,
 				DATA
-			};
-			
-			enum Flags
-			{
-				ACK = 0x80,
-				NACK = 0x00
 			};
 			
 			static uint8_t buffer[maxPayloadLength + 3];

@@ -5,12 +5,10 @@
  * from extern.
  */
 
-#include <avr/interrupt.h>
+#include <xpcc/architecture/platform.hpp>
+#include <xpcc/architecture/driver/atmega.hpp>
 
-#include <xpcc/architecture/atmega/uart/uart0.hpp>
 #include <xpcc/driver/apb/slave.hpp>
-
-#include <xpcc/architecture/atmega/adc.hpp>
 
 // ----------------------------------------------------------------------------
 // wrapper class for the A/D converter

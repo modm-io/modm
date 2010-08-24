@@ -53,6 +53,9 @@ update
 
 unittest
    Run the unittests
+   
+check
+   Check that the examples and tests are compiling.
 """)
 
 import os
@@ -62,22 +65,26 @@ env = Environment(
 		tools = ['template', 'doxygen', 'configfile', 'helper'],
 		ENV = os.environ)
 
-# regenerate SConstruct files for the tests
-parser = env.ConfigParser()
-for path, directories, files in os.walk('tests'):
-	# exclude the SVN-directories
-	if '.svn' in directories:
-		directories.remove('.svn')
-	
-	if 'project.cfg' in files:
-		parser.read(os.path.join(path, 'project.cfg'))
-		
-		rootpath = os.sep.join(['..' for x in range(len(path.split(os.sep)))])
-		file = env.Template(target = os.path.join(path, 'SConstruct'),
-							source = 'misc/templates/SConstruct.in',
-							substitutions = {'rootpath': rootpath })
-		
-		env.Alias('update', file)
+def generateSConstruct(top):
+	parser = env.ConfigParser()
+	for dir in top:
+		for path, directories, files in os.walk(dir):
+			# exclude the SVN-directories
+			if '.svn' in directories:
+				directories.remove('.svn')
+			
+			if 'project.cfg' in files:
+				parser.read(os.path.join(path, 'project.cfg'))
+				
+				rootpath = os.sep.join(['..' for x in range(len(path.split(os.sep)))])
+				file = env.Template(target = os.path.join(path, 'SConstruct'),
+									source = 'misc/templates/SConstruct.in',
+									substitutions = {'rootpath': rootpath })
+				
+				env.Alias('update', file)
+
+# regenerate SConstruct files for the tests and examples
+generateSConstruct(['tests', 'examples'])
 
 # update all template files
 class Generator:
@@ -110,6 +117,26 @@ for port in ['C', 'D', 'E', 'F']:
 		generator.template('uart_%s.cpp' % id, 'uart.cpp.in', substitutions)
 		generator.template('uart_buffered_%s.cpp' % id, 'uart_buffered.cpp.in', substitutions)
 		generator.template('uart_spi_%s.cpp' % id, 'uart_spi.cpp.in', substitutions)
+
+if 'check' in BUILD_TARGETS:
+	result = []
+	everythingOk = True
+	for path, directories, files in os.walk('examples'):
+		# exclude the SVN-directories
+		if '.svn' in directories:
+			directories.remove('.svn')
+	
+		if 'SConstruct' in files:
+			exitStatus = os.system("scons -Q -C %s" % path)
+			result.append("check: %s -> %s" % (path, "Ok" if exitStatus == 0 else "FAIL!"))
+			
+			if exitStatus != 0:
+				everythingOk = False
+	
+	print '\n'.join(result)
+	print "\nOK!" if everythingOk else "\nFAIL!"
+
+env.Alias('check', None)
 
 env.Alias('templates', 'template')
 

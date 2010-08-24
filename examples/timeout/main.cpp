@@ -1,6 +1,6 @@
-#include <avr/interrupt.h>
+#include <xpcc/architecture/platform.hpp>
 
-#include <xpcc/architecture/general/gpio.hpp>
+#include <xpcc/architecture/driver/gpio.hpp>
 #include <xpcc/workflow/timeout.hpp>
 
 // create a output device for the led

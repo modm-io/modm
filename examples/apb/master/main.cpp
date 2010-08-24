@@ -1,7 +1,7 @@
 
-#include <avr/interrupt.h>
+#include <xpcc/architecture/platform.hpp>
+#include <xpcc/architecture/driver/atmega/uart.hpp>
 
-#include <xpcc/architecture/atmega/uart/uart0.hpp>
 #include <xpcc/driver/apb/interface.hpp>
 
 MAIN_FUNCTION

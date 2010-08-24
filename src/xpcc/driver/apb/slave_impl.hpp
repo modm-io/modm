@@ -69,7 +69,8 @@ xpcc::apb::Slave<Interface>::update()
 	Interface::update();
 	if (Interface::isMessageAvailable())
 	{
-		if (Interface::getAddress() == this->ownAddress)
+		if (Interface::getAddress() == this->ownAddress &&
+				!Interface::isResponse())
 		{
 			this->response.triggered = false;
 			this->currentCommand = Interface::getCommand();
@@ -109,6 +110,7 @@ void
 xpcc::apb::Slave<Interface>::send(bool acknowledge,
 			const void *payload, uint8_t payloadLength)
 {
-	Interface::sendMessage(this->ownAddress, acknowledge, this->currentCommand,
+	Flags flags = (acknowledge) ? xpcc::apb::ACK : xpcc::apb::NACK;
+	Interface::sendMessage(this->ownAddress, flags, this->currentCommand,
 			payload, payloadLength);
 }
