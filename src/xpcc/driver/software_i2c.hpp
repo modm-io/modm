@@ -30,41 +30,119 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__SOFTWARE_SPI_HPP
-#define XPCC__SOFTWARE_SPI_HPP
+#ifndef XPCC__SOFTWARE_I2C_HPP
+#define XPCC__SOFTWARE_I2C_HPP
 
 #include <stdint.h>
 #include <xpcc/architecture/driver/time.hpp>
 
+#include "i2c.hpp"
+
 namespace xpcc
 {
 	/**
-	 * \brief	Software emulation of a SPI (Serial Peripheral Interface bus) master
+	 * \brief	Software emulation of a I2C master implementation
 	 * 
-	 * \todo	documentation
+	 * Example 1:
+	 * \code
+	 * GPIO__IO(Scl, C, 0);
+	 * GPIO__IO(Sda, C, 1);
 	 * 
-	 * \tparam	Clk			clock pin [output]
-	 * \tparam	Mosi		master out slave in pin [output]
-	 * \tparam	Miso		master in slave out pin [input]
-	 * \tparam	Frequency	requested SPI frequency in Hz
+	 * xpcc::SoftwareI2C<Scl, Sda> i2c;
+	 * 
+	 * i2c.initialize();
+	 * 
+	 * // start an SRF08 ranging in cm
+	 * if (i2c.start(0xE0 | xpcc::i2c::WRITE))
+	 * {
+	 *     i2c.write(0x00);
+	 *     i2c.write(0x51);
+	 * }
+	 * i2c.stop();
+	 * \endcode
+	 * 
+	 * Example 2:
+	 * \code
+	 * GPIO__IO(Scl, C, 0);
+	 * GPIO__IO(Sda, C, 1);
+	 * 
+	 * xpcc::SoftwareI2C<Scl, Sda> i2c;
+	 * 
+	 * i2c.initialize();
+	 * 
+	 * // read the result from a SRF08
+	 * if (i2c.start(0xE0 | xpcc::i2c::WRITE))
+	 * {
+	 *     i2c.write(0x01);
+	 *     
+	 *     i2c.repeatedStart(0xE0 | xpcc::i2c::WRITE);
+	 *     i2c.read(true);
+	 *     i2c.read(true);
+	 *     i2c.read(false);
+	 * }
+	 * i2c.stop();
+	 * \endcode
+	 * 
+	 * \tparam	Scl		IO-Pin
+	 * \tparam	Sda		IO-Pin
 	 * 
 	 * \ingroup	driver
 	 * \see		gpio
 	 */
-	template< typename Clk,
-			  typename Mosi,
-			  typename Miso,
+	template< typename Scl,
+			  typename Sda,
 			  int32_t Frequency = 1000000 >
-	class SoftwareSpi
+	class SoftwareI2C
 	{
 	public:
 		static void
 		initialize();
 		
+		/**
+		 * \brief	Generate a start condition
+		 * 
+		 * \param	address		Address of the device
+		 * \return	\c true if the slave with the given address is present,
+		 * 			\c false otherwise
+		 */
+		static bool
+		start(uint8_t address);
+		
+		/**
+		 * \brief	Generate a repeated start condition
+		 * 
+		 * \param	address		Address of the device
+		 * \return	\c true if the slave with the given address is present,
+		 * 			\c false otherwise
+		 * \see		start()
+		 */
+		static bool
+		repeatedStart(uint8_t address);
+		
+		/**
+		 * \brief	Write one byte
+		 * 
+		 * \return	\c true if the slave signals an acknowledge,
+		 * 			\c false otherwise
+		 */
+		static bool
+		write(uint8_t data);
+		
+		/// Read one byte
 		static uint8_t
-		write(uint8_t output);
+		read(bool ack);
+		
+		/// Generate a stop condition
+		static void
+		stop();
 		
 	protected:
+		static inline bool
+		readBit();
+		
+		static inline void
+		writeBit(bool bit);
+		
 		static inline void
 		delay();
 		
@@ -72,12 +150,11 @@ namespace xpcc
 		// requested SPI frequency
 		static const float delayTime = (1000000.0 / Frequency) / 2.0;
 		
-		static Clk clk;
-		static Mosi mosi;
-		static Miso miso;
+		static Scl scl;
+		static Sda sda;
 	};
 }
 
-#include "software_spi_impl.hpp"
+#include "software_i2c_impl.hpp"
 
-#endif // XPCC__SOFTWARE_SPI_HPP
+#endif // XPCC__SOFTWARE_I2C_HPP

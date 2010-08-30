@@ -101,7 +101,8 @@ class Generator:
 generator = Generator(env, 'src/xpcc/architecture/driver/atmega/uart')
 for id in range(0, 4):
 	generator.template('uart%i.hpp' % id, 'uart.hpp.in', { 'id': id })
-	generator.template('uart%i.cpp' % id, 'uart.cpp.in', { 'id': id })
+	generator.template('uart%i_rx.cpp' % id, 'uart_rx.cpp.in', { 'id': id })
+	generator.template('uart%i_tx.cpp' % id, 'uart_tx.cpp.in', { 'id': id })
 
 generator = Generator(env, 'src/xpcc/architecture/driver/atxmega/uart')
 for port in ['C', 'D', 'E', 'F']:

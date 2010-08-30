@@ -2,7 +2,7 @@
 // ----------------------------------------------------------------------------
 /* Copyright (c) 2009, Roboterclub Aachen e.V.
  * All rights reserved.
- *
+ * 
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  * 
@@ -14,7 +14,7 @@
  *     * Neither the name of the Roboterclub Aachen e.V. nor the
  *       names of its contributors may be used to endorse or promote products
  *       derived from this software without specific prior written permission.
- *
+ * 
  * THIS SOFTWARE IS PROVIDED BY ROBOTERCLUB AACHEN E.V. ''AS IS'' AND ANY
  * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -42,84 +42,33 @@
 #include "uart_defines.h"
 #include "xpcc_config.hpp"
 
-#ifdef ATMEGA_HAS_UART1
+#ifdef ATMEGA_HAS_UART3
 
-#include "uart1.hpp"
+#include "uart3.hpp"
 
-static xpcc::atomic::Queue<char, UART1_RX_BUFFER_SIZE> rxBuffer;
-static xpcc::atomic::Queue<char, UART1_TX_BUFFER_SIZE> txBuffer;
-
-// ----------------------------------------------------------------------------
-// called when the UART has received a character
-
-ISR(UART1_RECEIVE_INTERRUPT)
-{
-	uint8_t data = UART1_DATA;
-	
-	// read UART status register and UART data register
-	//uint8_t usr  = UART1_STATUS;
-	
-//	uint8_t last_rx_error;
-//#if defined(ATMEGA_USART)
-//	last_rx_error = usr & ((1 << FE) | (1 << DOR));
-//#elif defined(ATMEGA_USART1)
-//	last_rx_error = usr & ((1 << FE1) | (1 << DOR1));
-//#elif defined (ATMEGA_UART)
-//	last_rx_error = usr & ((1 << FE) | (1 << DOR));
-//#endif
-	
-	// TODO Fehlerbehandlung
-	rxBuffer.push(data);
-}
+static xpcc::atomic::Queue<char, UART3_TX_BUFFER_SIZE> txBuffer;
 
 // ----------------------------------------------------------------------------
 // called when the UART is ready to transmit the next byte
-
-ISR(UART1_TRANSMIT_INTERRUPT)
+// 
+ISR(UART3_TRANSMIT_INTERRUPT)
 {
 	if (txBuffer.isEmpty())
 	{
 		// transmission finished, disable UDRE interrupt
-		UART1_CONTROL &= ~(1 << UART1_UDRIE);
+		UART3_CONTROL &= ~(1 << UART3_UDRIE);
 	}
 	else {
 		// get one byte from buffer and write it to the UART buffer
 		// which starts the transmission
-		UART1_DATA = txBuffer.get();
+		UART3_DATA = txBuffer.get();
 		txBuffer.pop();
 	}
 }
 
 // ----------------------------------------------------------------------------
 void
-xpcc::BufferedUart1::setBaudrateRegister(uint16_t ubrr)
-{
-
-	// Set baud rate
-	if (ubrr & 0x8000) {
-		UART0_STATUS = (1 << U2X0);  //Enable 2x speed 
-		ubrr &= ~0x8000;
-	}
-	else {
-		UART0_STATUS = 0;
-	}
-	UBRR0H = (uint8_t) (ubrr >> 8);
-	UBRR0L = (uint8_t)  ubrr;
-
-	// Enable USART receiver and transmitter and receive complete interrupt
-	UART0_CONTROL = (1 << RXCIE0) | (1 << RXEN0) | (1 << TXEN0);
-	
-	// Set frame format: asynchronous, 8data, no parity, 1stop bit
-	#ifdef URSEL0
-	UCSR0C = (1 << URSEL0) | (3 << UCSZ00);
-	#else
-	UCSR0C = (3 << UCSZ00);
-	#endif
-}
-
-// ----------------------------------------------------------------------------
-void
-xpcc::BufferedUart1::write(char c)
+xpcc::BufferedUart3::write(char c)
 {
 	while (!txBuffer.push(c)) {
 		// wait for a free slot in the buffer
@@ -128,50 +77,17 @@ xpcc::BufferedUart1::write(char c)
 	atomic::Lock lock;
 	
 	// enable UDRE interrupt
-	UART1_CONTROL |= (1 << UART1_UDRIE);
+	UART3_CONTROL |= (1 << UART3_UDRIE);
 }
 
 // ----------------------------------------------------------------------------
 void
-xpcc::BufferedUart1::write(const char *s)
+xpcc::BufferedUart3::write(const char *s)
 {
 	char c;
 	while ((c = *s++)) {
-		BufferedUart1::write(c);
+		BufferedUart3::write(c);
 	}
-}
-
-// ----------------------------------------------------------------------------
-bool
-xpcc::BufferedUart1::read(char& c)
-{
-	if (rxBuffer.isEmpty()) {
-		return false;
-	}
-	else {
-		c = rxBuffer.get();
-		rxBuffer.pop();
-		
-		return true;
-	}
-}
-
-// ----------------------------------------------------------------------------
-uint8_t
-xpcc::BufferedUart1::read(char *buffer, uint8_t n)
-{
-	for (uint8_t i = 0; i < n; ++i)
-	{
-		if (rxBuffer.isEmpty()) {
-			return n;
-		}
-		else {
-			*buffer++ = rxBuffer.get();
-			rxBuffer.pop();
-		}
-	}
-	
-	return n;
 }
 
 #endif

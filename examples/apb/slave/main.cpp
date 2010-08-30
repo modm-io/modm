@@ -19,7 +19,7 @@ public:
 	{
 		// initialize the analog to digital converter
 		xpcc::Adc::initialize(
-				xpcc::Adc::REFERENCE_AVCC, xpcc::Adc::PRESCALER_8);
+				xpcc::Adc::REFERENCE_INTERNAL_AVCC, xpcc::Adc::PRESCALER_64);
 	}
     
 	void

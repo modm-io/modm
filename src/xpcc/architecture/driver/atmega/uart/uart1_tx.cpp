@@ -2,7 +2,7 @@
 // ----------------------------------------------------------------------------
 /* Copyright (c) 2009, Roboterclub Aachen e.V.
  * All rights reserved.
- *
+ * 
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  * 
@@ -14,7 +14,7 @@
  *     * Neither the name of the Roboterclub Aachen e.V. nor the
  *       names of its contributors may be used to endorse or promote products
  *       derived from this software without specific prior written permission.
- *
+ * 
  * THIS SOFTWARE IS PROVIDED BY ROBOTERCLUB AACHEN E.V. ''AS IS'' AND ANY
  * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -25,59 +25,69 @@
  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- * $Id$
+ */
+// ----------------------------------------------------------------------------
+/*
+ * WARNING: This file is generated automatically, do not edit!
+ * Please modify the corresponding *.in file instead and rebuild this file. 
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__SOFTWARE_SPI_HPP
-#define XPCC__SOFTWARE_SPI_HPP
+#include <avr/io.h>
+#include <avr/interrupt.h>
 
-#include <stdint.h>
-#include <xpcc/architecture/driver/time.hpp>
+#include <xpcc/architecture/driver/atomic/queue.hpp>
+#include <xpcc/architecture/driver/atomic/lock.hpp>
 
-namespace xpcc
+#include "uart_defines.h"
+#include "xpcc_config.hpp"
+
+#ifdef ATMEGA_HAS_UART1
+
+#include "uart1.hpp"
+
+static xpcc::atomic::Queue<char, UART1_TX_BUFFER_SIZE> txBuffer;
+
+// ----------------------------------------------------------------------------
+// called when the UART is ready to transmit the next byte
+// 
+ISR(UART1_TRANSMIT_INTERRUPT)
 {
-	/**
-	 * \brief	Software emulation of a SPI (Serial Peripheral Interface bus) master
-	 * 
-	 * \todo	documentation
-	 * 
-	 * \tparam	Clk			clock pin [output]
-	 * \tparam	Mosi		master out slave in pin [output]
-	 * \tparam	Miso		master in slave out pin [input]
-	 * \tparam	Frequency	requested SPI frequency in Hz
-	 * 
-	 * \ingroup	driver
-	 * \see		gpio
-	 */
-	template< typename Clk,
-			  typename Mosi,
-			  typename Miso,
-			  int32_t Frequency = 1000000 >
-	class SoftwareSpi
+	if (txBuffer.isEmpty())
 	{
-	public:
-		static void
-		initialize();
-		
-		static uint8_t
-		write(uint8_t output);
-		
-	protected:
-		static inline void
-		delay();
-		
-		// calculate the delay in microseconds needed to achieve the
-		// requested SPI frequency
-		static const float delayTime = (1000000.0 / Frequency) / 2.0;
-		
-		static Clk clk;
-		static Mosi mosi;
-		static Miso miso;
-	};
+		// transmission finished, disable UDRE interrupt
+		UART1_CONTROL &= ~(1 << UART1_UDRIE);
+	}
+	else {
+		// get one byte from buffer and write it to the UART buffer
+		// which starts the transmission
+		UART1_DATA = txBuffer.get();
+		txBuffer.pop();
+	}
 }
 
-#include "software_spi_impl.hpp"
+// ----------------------------------------------------------------------------
+void
+xpcc::BufferedUart1::write(char c)
+{
+	while (!txBuffer.push(c)) {
+		// wait for a free slot in the buffer
+	}
+	
+	atomic::Lock lock;
+	
+	// enable UDRE interrupt
+	UART1_CONTROL |= (1 << UART1_UDRIE);
+}
 
-#endif // XPCC__SOFTWARE_SPI_HPP
+// ----------------------------------------------------------------------------
+void
+xpcc::BufferedUart1::write(const char *s)
+{
+	char c;
+	while ((c = *s++)) {
+		BufferedUart1::write(c);
+	}
+}
+
+#endif

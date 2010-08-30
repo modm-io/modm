@@ -70,10 +70,10 @@ xpcc::SoftwareSpi<Clk, Mosi, Miso, Frequency>::write(uint8_t output)
 		else {
 			mosi.reset();
 		}
-		xpcc::delay_us(delay);
+		delay();
 		
 		clk.set();
-		xpcc::delay_us(delay);
+		delay();
 		
 		if (miso.read()) {
 			input |= 1;
@@ -84,4 +84,11 @@ xpcc::SoftwareSpi<Clk, Mosi, Miso, Frequency>::write(uint8_t output)
 	}
 	
 	return input;
+}
+
+template <typename Clk, typename Mosi, typename Miso, int32_t Frequency>
+void
+xpcc::SoftwareSpi<Clk, Mosi, Miso, Frequency>::delay()
+{
+	xpcc::delay_us(delayTime);
 }

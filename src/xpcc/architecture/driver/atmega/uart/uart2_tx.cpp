@@ -2,7 +2,7 @@
 // ----------------------------------------------------------------------------
 /* Copyright (c) 2009, Roboterclub Aachen e.V.
  * All rights reserved.
- *
+ * 
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  * 
@@ -14,7 +14,7 @@
  *     * Neither the name of the Roboterclub Aachen e.V. nor the
  *       names of its contributors may be used to endorse or promote products
  *       derived from this software without specific prior written permission.
- *
+ * 
  * THIS SOFTWARE IS PROVIDED BY ROBOTERCLUB AACHEN E.V. ''AS IS'' AND ANY
  * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -46,35 +46,11 @@
 
 #include "uart2.hpp"
 
-static xpcc::atomic::Queue<char, UART2_RX_BUFFER_SIZE> rxBuffer;
 static xpcc::atomic::Queue<char, UART2_TX_BUFFER_SIZE> txBuffer;
 
 // ----------------------------------------------------------------------------
-// called when the UART has received a character
-
-ISR(UART2_RECEIVE_INTERRUPT)
-{
-	uint8_t data = UART2_DATA;
-	
-	// read UART status register and UART data register
-	//uint8_t usr  = UART2_STATUS;
-	
-//	uint8_t last_rx_error;
-//#if defined(ATMEGA_USART)
-//	last_rx_error = usr & ((1 << FE) | (1 << DOR));
-//#elif defined(ATMEGA_USART2)
-//	last_rx_error = usr & ((1 << FE2) | (1 << DOR2));
-//#elif defined (ATMEGA_UART)
-//	last_rx_error = usr & ((1 << FE) | (1 << DOR));
-//#endif
-	
-	// TODO Fehlerbehandlung
-	rxBuffer.push(data);
-}
-
-// ----------------------------------------------------------------------------
 // called when the UART is ready to transmit the next byte
-
+// 
 ISR(UART2_TRANSMIT_INTERRUPT)
 {
 	if (txBuffer.isEmpty())
@@ -88,33 +64,6 @@ ISR(UART2_TRANSMIT_INTERRUPT)
 		UART2_DATA = txBuffer.get();
 		txBuffer.pop();
 	}
-}
-
-// ----------------------------------------------------------------------------
-void
-xpcc::BufferedUart2::setBaudrateRegister(uint16_t ubrr)
-{
-
-	// Set baud rate
-	if (ubrr & 0x8000) {
-		UART0_STATUS = (1 << U2X0);  //Enable 2x speed 
-		ubrr &= ~0x8000;
-	}
-	else {
-		UART0_STATUS = 0;
-	}
-	UBRR0H = (uint8_t) (ubrr >> 8);
-	UBRR0L = (uint8_t)  ubrr;
-
-	// Enable USART receiver and transmitter and receive complete interrupt
-	UART0_CONTROL = (1 << RXCIE0) | (1 << RXEN0) | (1 << TXEN0);
-	
-	// Set frame format: asynchronous, 8data, no parity, 1stop bit
-	#ifdef URSEL0
-	UCSR0C = (1 << URSEL0) | (3 << UCSZ00);
-	#else
-	UCSR0C = (3 << UCSZ00);
-	#endif
 }
 
 // ----------------------------------------------------------------------------
@@ -139,39 +88,6 @@ xpcc::BufferedUart2::write(const char *s)
 	while ((c = *s++)) {
 		BufferedUart2::write(c);
 	}
-}
-
-// ----------------------------------------------------------------------------
-bool
-xpcc::BufferedUart2::read(char& c)
-{
-	if (rxBuffer.isEmpty()) {
-		return false;
-	}
-	else {
-		c = rxBuffer.get();
-		rxBuffer.pop();
-		
-		return true;
-	}
-}
-
-// ----------------------------------------------------------------------------
-uint8_t
-xpcc::BufferedUart2::read(char *buffer, uint8_t n)
-{
-	for (uint8_t i = 0; i < n; ++i)
-	{
-		if (rxBuffer.isEmpty()) {
-			return n;
-		}
-		else {
-			*buffer++ = rxBuffer.get();
-			rxBuffer.pop();
-		}
-	}
-	
-	return n;
 }
 
 #endif

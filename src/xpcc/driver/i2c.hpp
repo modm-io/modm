@@ -29,55 +29,37 @@
  * $Id$
  */
 // ----------------------------------------------------------------------------
+/**
+ * \ingroup		driver
+ * \defgroup	i2c		(I2C) Inter-Integrated Circuit
+ * 
+ * I2C is a synchronous protocol that allows a master device to initiate
+ * communication with a slave device. Data is exchanged between these devices.
+ * It was invented by Philips to attach low-speed peripherals to a motherboard,
+ * embedded system or other devices.
+ * 
+ * \see	<a href="http://en.wikipedia.org/wiki/I2c" target="_blank">http://en.wikipedia.org/wiki/I2c</a>
+ */
 
-#ifndef XPCC__SOFTWARE_SPI_HPP
-#define XPCC__SOFTWARE_SPI_HPP
+#ifndef XPCC__I2C_HPP
+#define XPCC__I2C_HPP
 
-#include <stdint.h>
-#include <xpcc/architecture/driver/time.hpp>
+#include <xpcc/architecture/platform.hpp>
 
 namespace xpcc
 {
 	/**
-	 * \brief	Software emulation of a SPI (Serial Peripheral Interface bus) master
-	 * 
-	 * \todo	documentation
-	 * 
-	 * \tparam	Clk			clock pin [output]
-	 * \tparam	Mosi		master out slave in pin [output]
-	 * \tparam	Miso		master in slave out pin [input]
-	 * \tparam	Frequency	requested SPI frequency in Hz
-	 * 
-	 * \ingroup	driver
-	 * \see		gpio
+	 * \brief	I2C Driver
+	 * \ingroup	i2c
 	 */
-	template< typename Clk,
-			  typename Mosi,
-			  typename Miso,
-			  int32_t Frequency = 1000000 >
-	class SoftwareSpi
+	namespace i2c
 	{
-	public:
-		static void
-		initialize();
+		static const bool ACK = true;
+		static const bool NACK = false;
 		
-		static uint8_t
-		write(uint8_t output);
-		
-	protected:
-		static inline void
-		delay();
-		
-		// calculate the delay in microseconds needed to achieve the
-		// requested SPI frequency
-		static const float delayTime = (1000000.0 / Frequency) / 2.0;
-		
-		static Clk clk;
-		static Mosi mosi;
-		static Miso miso;
-	};
+		static const uint8_t WRITE = 0x01;
+		static const uint8_t READ = 0x00;
+	}
 }
 
-#include "software_spi_impl.hpp"
-
-#endif // XPCC__SOFTWARE_SPI_HPP
+#endif // XPCC__I2C_HPP

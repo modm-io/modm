@@ -1,7 +1,9 @@
-# path to the xpcc root directory. No slash at the end!
-xpccpath = '../../..'
+# WARNING: This file is generated automatically, do not edit!
 
-env = Environment(tools = ['xpcc'], toolpath = [xpccpath + '/misc/scons'])
+# path to the xpcc root directory
+rootpath = '../..'
+
+env = Environment(tools = ['xpcc'], toolpath = [rootpath + '/misc/scons'])
 
 # find all source files
 files = env.FindFiles('.')
@@ -32,4 +34,3 @@ else:
 	env.Alias('all', ['build', 'size'])
 
 env.Default('all')
-

@@ -4,7 +4,7 @@
 /*!
 \page project_makefile 4.2 Create a project using Make
 
-Don't do it. SCons is superior ... ;-)
+Don't do it. SCons is better ... ;-)
 
 Take a look a http://www.scons.org/ for good arguments for using it. But if we
 can't convince you for whatever reasons, here is how to use the library in an
