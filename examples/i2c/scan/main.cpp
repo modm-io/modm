@@ -1,6 +1,7 @@
 
 #include <xpcc/architecture.hpp>
-#include <xpcc/driver/software_i2c.hpp>
+#include <xpcc/driver/i2c/software_i2c.hpp>
+
 #include <xpcc/io/iostream.hpp>
 
 GPIO__IO(Scl, C, 0);
@@ -21,28 +22,23 @@ main()
 	xpcc::IODeviceWrapper<xpcc::BufferedUart0> device(uart);
 	xpcc::IOStream output(device);
 	
-	output << "Welcome!" << xpcc::endl;
-	
 	// Initialize the I2C interface.
 	i2c.initialize();
 	
+	// Scan the I2C Bus for all available devices
+	output << "Scan for connected I2C devices ..." << xpcc::endl;
+	for (uint8_t i = 0; i < 252; i += 2)
+	{
+		if (i2c.start(i | xpcc::i2c::READ)) {
+			output << "- found device " << xpcc::hex << i << xpcc::endl;
+		}
+		i2c.stop();
+		
+		xpcc::delay_us(5);
+	}
+	output << "finished" << xpcc::endl;
+	
 	while (1)
 	{
-		uint16_t data = 0;
-		
-		i2c.start(0x14 | xpcc::i2c::WRITE);
-		i2c.write(0x00);
-		
-		i2c.repeatedStart(0x14 | xpcc::i2c::READ);
-		data += i2c.read(xpcc::i2c::ACK);
-		data += i2c.read(xpcc::i2c::ACK);
-		data += i2c.read(xpcc::i2c::NACK);
-		i2c.stop();
-		
-		i2c.start(0x16 | xpcc::i2c::WRITE);
-		i2c.write(0x00);
-		i2c.write(0x03);
-		i2c.write(0x61);
-		i2c.stop();
 	}
 }

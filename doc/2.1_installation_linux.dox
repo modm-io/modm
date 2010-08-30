@@ -47,4 +47,35 @@ export SCONSFLAGS="-Q -j4"
 
 For more information on the parameter this read the chapter about
 \ref build_system "SCons".
+
+\section avrdude avrdude and USB programmers
+
+When using Ubuntu avrdude might not detect USB programmers out of the box. The
+problem is that it has not the necessary permission. To allow avrdude to access
+USB programmers do the following:
+
+\verbatim
+gksu gedit /etc/udev/rules.d/80-usbprog.rules
+\endverbatim
+
+Add the following content:
+
+\verbatim
+ATTR{idVendor}=="03eb", ATTR{idProduct}=="2104", GROUP="plugdev", MODE="0660" # AVRISP mkII
+ATTR{idVendor}=="03eb", ATTR{idProduct}=="2107", GROUP="plugdev", MODE="0660" # AVR-Dragon
+ATTR{idVendor}=="03eb", ATTR{idProduct}=="2103", GROUP="plugdev", MODE="0660" # JTAG ICE mkII
+ATTR{idVendor}=="03eb", ATTR{idProduct}=="2106", GROUP="plugdev", MODE="0660" # STK600
+ATTR{idVendor}=="16c0", ATTR{idProduct}=="05dc", GROUP="plugdev", MODE="0660" # USBASP von www.fischl.de
+ATTR{idVendor}=="03eb", ATTR{idProduct}=="2ffa", GROUP="plugdev", MODE="0660" # AT90USB
+ATTR{idVendor}=="10c4", ATTR{idProduct}=="ea60", GROUP="plugdev", MODE="0660" # AVR910
+\endverbatim
+
+Now \c udev has to be restarted:
+
+\verbatim
+sudo /etc/init.d/udev restart
+\endverbatim
+
+If the programmer was connected you have to disconnect and reconnect. After
+this everything should work.
 */

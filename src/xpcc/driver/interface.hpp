@@ -5,7 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- *
+ * 
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -29,15 +29,15 @@
  * $Id$
  */
 // ----------------------------------------------------------------------------
-/**
- * \defgroup 	utils Utilities
- * \brief 		Some Utilities
- * 
- */
 
-#include "architecture/platform.hpp"
+#ifndef XPCC__INTERFACE_HPP
+#define XPCC__INTERFACE_HPP
 
-#include "utils/algorithm.hpp"
-#include "utils/allocator.hpp"
-#include "utils/arithmetic_traits.hpp"
-#include "utils/template_metaprogramming.hpp"
+namespace xpcc
+{
+	class Interface
+	{
+	};
+}
+
+#endif // XPCC__INTERFACE_HPP

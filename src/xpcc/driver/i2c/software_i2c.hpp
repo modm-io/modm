@@ -33,9 +33,7 @@
 #ifndef XPCC__SOFTWARE_I2C_HPP
 #define XPCC__SOFTWARE_I2C_HPP
 
-#include <stdint.h>
 #include <xpcc/architecture/driver/time.hpp>
-
 #include "i2c.hpp"
 
 namespace xpcc
@@ -83,16 +81,17 @@ namespace xpcc
 	 * i2c.stop();
 	 * \endcode
 	 * 
-	 * \tparam	Scl		IO-Pin
-	 * \tparam	Sda		IO-Pin
+	 * \tparam	Scl			any IO-Pin (see GPIO__IO())
+	 * \tparam	Sda			any IO-Pin (see GPIO__IO())
+	 * \tparam	Frequency	default is 100kHz
 	 * 
-	 * \ingroup	driver
+	 * \ingroup	i2c
 	 * \see		gpio
 	 */
 	template< typename Scl,
 			  typename Sda,
-			  int32_t Frequency = 1000000 >
-	class SoftwareI2C
+			  int32_t Frequency = 100000 >
+	class SoftwareI2C : public i2c::SynchronousMaster
 	{
 	public:
 		static void

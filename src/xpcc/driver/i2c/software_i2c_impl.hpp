@@ -161,10 +161,10 @@ void
 xpcc::SoftwareI2C<Scl, Sda, Frequency>::writeBit(bool bit)
 {
 	if (bit) {
-		sda.setOutput();
+		sda.setInput();
 	}
 	else {
-		sda.setInput();
+		sda.setOutput();
 	}
 	
 	scl.setInput();

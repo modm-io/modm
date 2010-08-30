@@ -5,7 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- *
+ * 
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -29,15 +29,45 @@
  * $Id$
  */
 // ----------------------------------------------------------------------------
-/**
- * \defgroup 	utils Utilities
- * \brief 		Some Utilities
- * 
- */
 
-#include "architecture/platform.hpp"
+#ifndef XPCC__I2C_HPP
+#define XPCC__I2C_HPP
 
-#include "utils/algorithm.hpp"
-#include "utils/allocator.hpp"
-#include "utils/arithmetic_traits.hpp"
-#include "utils/template_metaprogramming.hpp"
+#include <xpcc/architecture/platform.hpp>
+#include <xpcc/driver/interface.hpp>
+
+namespace xpcc
+{
+	namespace i2c
+	{
+		static const bool ACK = true;
+		static const bool NACK = false;
+		
+		static const uint8_t WRITE = 0x00;
+		static const uint8_t READ = 0x01;
+		
+		
+		class SynchronousMaster : public Interface
+		{
+			uint8_t
+			read(bool ack);
+			
+			bool
+			write(uint8_t data);
+		};
+		
+		class AsynchronousMaster : public Interface
+		{
+			void
+			read(uint8_t *data, uint8_t bytes);
+			
+			bool
+			write(uint8_t *data, uint8_t bytes);
+			
+			bool
+			isFinished();
+		};
+	}
+}
+
+#endif // XPCC__I2C_HPP

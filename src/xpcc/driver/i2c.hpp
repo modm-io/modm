@@ -41,11 +41,6 @@
  * \see	<a href="http://en.wikipedia.org/wiki/I2c" target="_blank">http://en.wikipedia.org/wiki/I2c</a>
  */
 
-#ifndef XPCC__I2C_HPP
-#define XPCC__I2C_HPP
-
-#include <xpcc/architecture/platform.hpp>
-
 namespace xpcc
 {
 	/**
@@ -54,12 +49,8 @@ namespace xpcc
 	 */
 	namespace i2c
 	{
-		static const bool ACK = true;
-		static const bool NACK = false;
-		
-		static const uint8_t WRITE = 0x01;
-		static const uint8_t READ = 0x00;
 	}
 }
 
-#endif // XPCC__I2C_HPP
+#include "i2c/i2c.hpp"
+#include "i2c/software_i2c.hpp"
