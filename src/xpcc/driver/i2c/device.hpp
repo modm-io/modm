@@ -30,74 +30,44 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_I2C__EEPROM_HPP
-#define XPCC_I2C__EEPROM_HPP
+#ifndef XPCC_I2C__DEVICE_HPP
+#define XPCC_I2C__DEVICE_HPP
 
-#include "device.hpp"
+#include "i2c.hpp"
 
 namespace xpcc
 {
 	namespace i2c
 	{
 		/**
-		 * \brief	I2C Eeprom
+		 * \brief	Base class for all I2C Devices
 		 * 
-		 * Compatible with the 24C256 family and other I2C eeprom with an
-		 * 16-bit address pointer.
 		 * 
 		 * \ingroup	i2c
 		 * \author	Fabian Greif
 		 */
 		template <typename I2C>
-		class Eeprom : public Device<I2C>
+		class Device
 		{
 		public:
-			Eeprom(uint8_t address);
+			Device(uint8_t address);
 			
 			/**
-			 * \brief	Write byte
+			 * \brief	Check if the device is accessable
 			 * 
-			 * \param	address		Address
-			 * \param	data		Data byte
-			 * 
-			 * \return	\c true	if the data could be written,
-			 * 			\c false otherwise
+			 * \return	\c true if the device responds to its address,
+			 * 			\c false otherwise.
 			 */
 			bool
-			writeByte(uint16_t address, uint8_t data) const;
+			isAvailable() const;
 			
-			/**
-			 * \brief	Write block
-			 * 
-			 * \param	address		Address
-			 * \param	data		Data block
-			 * \param	bytes		Number of bytes to be written
-			 * 
-			 * \return	\c true	if the data could be written,
-			 * 			\c false otherwise
-			 */
-			bool
-			write(uint16_t address, const uint8_t *data, uint8_t bytes) const;
-			
-			template <typename T>
-			inline bool
-			write(uint16_t address, const T& data) const;
-			
-			/// Read byte
-			bool
-			readByte(uint16_t address, uint8_t &data) const;
-			
-			/// Read block
-			bool
-			read(uint16_t address, uint8_t *data, uint8_t bytes) const;
-			
-			template <typename T>
-			inline bool
-			read(uint16_t address, T& data) const;
+		protected:
+			const uint8_t deviceAddress;
+			static I2C i2c;
 		};
 	}
 }
 
-#include "eeprom_impl.hpp"
+#include "device_impl.hpp"
 
-#endif // XPCC_I2C__EEPROM_HPP
+#endif // XPCC_I2C__DEVICE_HPP

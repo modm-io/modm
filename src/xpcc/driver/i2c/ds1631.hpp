@@ -30,8 +30,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_I2C__EEPROM_HPP
-#define XPCC_I2C__EEPROM_HPP
+#ifndef XPCC_I2C__DS1631_HPP
+#define XPCC_I2C__DS1631_HPP
 
 #include "device.hpp"
 
@@ -40,64 +40,92 @@ namespace xpcc
 	namespace i2c
 	{
 		/**
-		 * \brief	I2C Eeprom
+		 * \ingroup	i2c
+		 */
+		enum Resolution
+		{
+			RESOLUTION_9BIT = 0x00, 	//!< 9 Bit
+			RESOLUTION_10BIT = 0x04,	//!< 10 Bit
+			RESOLUTION_11BIT = 0x08,	//!< 11 Bit
+			RESOLUTION_12BIT = 0x0c		//!< 12 Bit
+		};
+		
+		/**
+		 * \brief	DS1631
 		 * 
-		 * Compatible with the 24C256 family and other I2C eeprom with an
-		 * 16-bit address pointer.
 		 * 
 		 * \ingroup	i2c
 		 * \author	Fabian Greif
 		 */
 		template <typename I2C>
-		class Eeprom : public Device<I2C>
+		class Ds1631 : public Device<I2C>
 		{
 		public:
-			Eeprom(uint8_t address);
+			/**
+			 * \brief	Constructor
+			 * 
+			 * \param	address		Default address is 0x90.
+			 */
+			Ds1631(uint8_t address);
 			
 			/**
-			 * \brief	Write byte
+			 * \brief	Configure DS1631
 			 * 
-			 * \param	address		Address
-			 * \param	data		Data byte
+			 * \code
+			 * Resolution | Conversion Time
+			 * -----------+----------------
+			 *     9 Bit  |  93.75ms
+			 *    10 Bit  | 187.50ms
+			 *    11 Bit  | 375.00ms
+			 *    12 Bit  | 750.00ms 
+			 * \endcode
 			 * 
-			 * \return	\c true	if the data could be written,
-			 * 			\c false otherwise
+			 * \param resolution		Conversion result resolution
+			 * \param continuousMode	Enable the continuos mode
 			 */
-			bool
-			writeByte(uint16_t address, uint8_t data) const;
+			void
+			configure(Resolution resolution, bool continuousMode);
 			
 			/**
-			 * \brief	Write block
+			 * \brief	Perform a software reset
+			 */
+			void
+			reset();
+			
+			/**
+			 * \brief	Initiates temperature conversions
 			 * 
-			 * \param	address		Address
-			 * \param	data		Data block
-			 * \param	bytes		Number of bytes to be written
-			 * 
-			 * \return	\c true	if the data could be written,
-			 * 			\c false otherwise
+			 * If the part is in one-shot mode, only one conversion is
+			 * performed. In continuous mode, continuous temperature
+			 * conversions are performed until a Stop Convert command is issued.
+			 */
+			void
+			startConversion();
+			
+			/**
+			 * \brief	Stops temperature conversions when the device is in
+			 * 			continuous conversion mode.
+			 */
+			void
+			stopConversion();
+			
+			/**
+			 * \brief	Check if the conversion is done
 			 */
 			bool
-			write(uint16_t address, const uint8_t *data, uint8_t bytes) const;
+			isConversionDone();
 			
-			template <typename T>
-			inline bool
-			write(uint16_t address, const T& data) const;
-			
-			/// Read byte
-			bool
-			readByte(uint16_t address, uint8_t &data) const;
-			
-			/// Read block
-			bool
-			read(uint16_t address, uint8_t *data, uint8_t bytes) const;
-			
-			template <typename T>
-			inline bool
-			read(uint16_t address, T& data) const;
+			/**
+			 * \return	Temperature in degree
+			 * 
+			 * \todo	convert result into a better format 
+			 */
+			uint16_t
+			readTemperature();
 		};
 	}
 }
 
-#include "eeprom_impl.hpp"
+#include "ds1631_impl.hpp"
 
-#endif // XPCC_I2C__EEPROM_HPP
+#endif // XPCC_I2C__DS1631_HPP

@@ -30,8 +30,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_I2C__EEPROM_HPP
-#define XPCC_I2C__EEPROM_HPP
+#ifndef XPCC_I2C__LM75_HPP
+#define XPCC_I2C__LM75_HPP
 
 #include "device.hpp"
 
@@ -40,64 +40,33 @@ namespace xpcc
 	namespace i2c
 	{
 		/**
-		 * \brief	I2C Eeprom
-		 * 
-		 * Compatible with the 24C256 family and other I2C eeprom with an
-		 * 16-bit address pointer.
+		 * \brief	LM75
 		 * 
 		 * \ingroup	i2c
 		 * \author	Fabian Greif
 		 */
 		template <typename I2C>
-		class Eeprom : public Device<I2C>
+		class LM75 : public Device<I2C>
 		{
 		public:
-			Eeprom(uint8_t address);
+			/**
+			 * \brief	Constructor
+			 * 
+			 * \param	address		Default address is 0x90.
+			 */
+			LM75(uint8_t address);
 			
 			/**
-			 * \brief	Write byte
+			 * \return	Temperature in degree
 			 * 
-			 * \param	address		Address
-			 * \param	data		Data byte
-			 * 
-			 * \return	\c true	if the data could be written,
-			 * 			\c false otherwise
+			 * \todo	convert result into a better format 
 			 */
-			bool
-			writeByte(uint16_t address, uint8_t data) const;
-			
-			/**
-			 * \brief	Write block
-			 * 
-			 * \param	address		Address
-			 * \param	data		Data block
-			 * \param	bytes		Number of bytes to be written
-			 * 
-			 * \return	\c true	if the data could be written,
-			 * 			\c false otherwise
-			 */
-			bool
-			write(uint16_t address, const uint8_t *data, uint8_t bytes) const;
-			
-			template <typename T>
-			inline bool
-			write(uint16_t address, const T& data) const;
-			
-			/// Read byte
-			bool
-			readByte(uint16_t address, uint8_t &data) const;
-			
-			/// Read block
-			bool
-			read(uint16_t address, uint8_t *data, uint8_t bytes) const;
-			
-			template <typename T>
-			inline bool
-			read(uint16_t address, T& data) const;
+			uint16_t
+			readTemperature();
 		};
 	}
 }
 
-#include "eeprom_impl.hpp"
+#include "lm75_impl.hpp"
 
-#endif // XPCC_I2C__EEPROM_HPP
+#endif // XPCC_I2C__LM75_HPP

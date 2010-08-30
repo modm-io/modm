@@ -50,12 +50,12 @@ main()
 	// already present
 	output << "Write pattern ... ";
 	uint8_t data = 0xff;
-	if (eeprom.read(0, data))
+	if (eeprom.readByte(0, data))
 	{
 		if (data != 0x00)
 		{
 			uint8_t array[8] = { 0, 1, 2, 3, 4, 5, 6, 7 };
-			if (eeprom.write(0, array, sizeof(array)))
+			if (eeprom.write(0, array, 8))
 			{
 				while (!eeprom.isAvailable()) {
 					// wait until the write operation is finished

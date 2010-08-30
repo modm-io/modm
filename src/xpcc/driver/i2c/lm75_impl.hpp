@@ -30,74 +30,29 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_I2C__EEPROM_HPP
-#define XPCC_I2C__EEPROM_HPP
+#ifndef XPCC_I2C__LM75_HPP
+	#error	"Don't include this file directly, use 'lm75.hpp' instead!"
+#endif
 
-#include "device.hpp"
-
-namespace xpcc
+// ----------------------------------------------------------------------------
+template <typename I2C>
+xpcc::i2c::LM75<I2C>::LM75(uint8_t address) :
+	Device<I2C>(address)
 {
-	namespace i2c
-	{
-		/**
-		 * \brief	I2C Eeprom
-		 * 
-		 * Compatible with the 24C256 family and other I2C eeprom with an
-		 * 16-bit address pointer.
-		 * 
-		 * \ingroup	i2c
-		 * \author	Fabian Greif
-		 */
-		template <typename I2C>
-		class Eeprom : public Device<I2C>
-		{
-		public:
-			Eeprom(uint8_t address);
-			
-			/**
-			 * \brief	Write byte
-			 * 
-			 * \param	address		Address
-			 * \param	data		Data byte
-			 * 
-			 * \return	\c true	if the data could be written,
-			 * 			\c false otherwise
-			 */
-			bool
-			writeByte(uint16_t address, uint8_t data) const;
-			
-			/**
-			 * \brief	Write block
-			 * 
-			 * \param	address		Address
-			 * \param	data		Data block
-			 * \param	bytes		Number of bytes to be written
-			 * 
-			 * \return	\c true	if the data could be written,
-			 * 			\c false otherwise
-			 */
-			bool
-			write(uint16_t address, const uint8_t *data, uint8_t bytes) const;
-			
-			template <typename T>
-			inline bool
-			write(uint16_t address, const T& data) const;
-			
-			/// Read byte
-			bool
-			readByte(uint16_t address, uint8_t &data) const;
-			
-			/// Read block
-			bool
-			read(uint16_t address, uint8_t *data, uint8_t bytes) const;
-			
-			template <typename T>
-			inline bool
-			read(uint16_t address, T& data) const;
-		};
-	}
 }
 
-#include "eeprom_impl.hpp"
-
-#endif // XPCC_I2C__EEPROM_HPP
+// ----------------------------------------------------------------------------
+template <typename I2C>
+uint16_t
+xpcc::i2c::LM75<I2C>::readTemperature()
+{
+	uint16_t temperature = 0;
+	if (this->i2c.start(this->deviceAddress | READ))
+	{
+		temperature  = this->i2c.read(ACK) << 8;
+		temperature |= this->i2c.read(NACK);
+	}
+	this->i2c.stop();
+	
+	return temperature;
+}

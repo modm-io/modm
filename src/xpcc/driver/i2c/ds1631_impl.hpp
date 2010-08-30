@@ -30,112 +30,102 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_I2C__EEPROM_HPP
-	#error	"Don't include this file directly, use 'eeprom.hpp' instead!"
+#ifndef XPCC_I2C__DS1631_HPP
+	#error	"Don't include this file directly, use 'ds1631.hpp' instead!"
 #endif
 
 // ----------------------------------------------------------------------------
 template <typename I2C>
-xpcc::i2c::Eeprom<I2C>::Eeprom(uint8_t address) :
+xpcc::i2c::Ds1631<I2C>::Ds1631(uint8_t address) :
 	Device<I2C>(address)
 {
 }
 
 // ----------------------------------------------------------------------------
 template <typename I2C>
-bool
-xpcc::i2c::Eeprom<I2C>::writeByte(uint16_t address, uint8_t data) const
+void
+xpcc::i2c::Ds1631<I2C>::configure(Resolution resolution, bool continuousMode)
 {
-	bool ack = false;
-	
 	if (this->i2c.start(this->deviceAddress | WRITE))
 	{
-		ack = true;
-		ack &= this->i2c.write(address >> 8);
-		ack &= this->i2c.write(address & 0xff);
-		ack &= this->i2c.write(data);
+		this->i2c.write(0xAC);
+		
+		uint8_t config = resolution;
+		if (!continuousMode) {
+			config |= 0x01;
+		}
+		this->i2c.write(config);
 	}
 	this->i2c.stop();
-	
-	return ack;
 }
 
 template <typename I2C>
-bool
-xpcc::i2c::Eeprom<I2C>::write(uint16_t address, const uint8_t *data, uint8_t bytes) const
+void
+xpcc::i2c::Ds1631<I2C>::reset()
 {
-	bool ack = false;
-	
 	if (this->i2c.start(this->deviceAddress | WRITE))
 	{
-		ack = true;
-		ack &= this->i2c.write(address >> 8);
-		ack &= this->i2c.write(address & 0xff);
-		
-		for (uint8_t i = 0; i < bytes; ++i) {
-			ack &= this->i2c.write(*data++);
-		}
+		this->i2c.write(0x54);
 	}
 	this->i2c.stop();
-	
-	return ack;
-}
-
-template <typename I2C> template <typename T>
-bool
-xpcc::i2c::Eeprom<I2C>::write(uint16_t address, const T& data) const
-{
-	return write(address, static_cast<const uint8_t *>(&data), sizeof(T));
 }
 
 // ----------------------------------------------------------------------------
 template <typename I2C>
-bool
-xpcc::i2c::Eeprom<I2C>::readByte(uint16_t address, uint8_t &data) const
+void
+xpcc::i2c::Ds1631<I2C>::startConversion()
 {
-	bool ack = false;
 	if (this->i2c.start(this->deviceAddress | WRITE))
 	{
-		ack = true;
-		ack &= this->i2c.write(address >> 8);
-		ack &= this->i2c.write(address & 0xff);
-		
-		if (ack && this->i2c.repeatedStart(this->deviceAddress | READ))
-		{
-			data = this->i2c.read(NACK);
-		}
+		this->i2c.write(0x51);
 	}
 	this->i2c.stop();
-	
-	return ack;
+}
+
+template <typename I2C>
+void
+xpcc::i2c::Ds1631<I2C>::stopConversion()
+{
+	if (this->i2c.start(this->deviceAddress | WRITE))
+	{
+		this->i2c.write(0x22);
+	}
+	this->i2c.stop();
 }
 
 template <typename I2C>
 bool
-xpcc::i2c::Eeprom<I2C>::read(uint16_t address, uint8_t *data, uint8_t bytes) const
+xpcc::i2c::Ds1631<I2C>::isConversionDone()
 {
-	bool ack = false;
 	if (this->i2c.start(this->deviceAddress | WRITE))
 	{
-		ack = true;
-		ack &= this->i2c.write(address >> 8);
-		ack &= this->i2c.write(address & 0xff);
+		this->i2c.write(0xAC);
+		this->i2c.repeatedStart(this->deviceAddress | READ);
 		
-		if (ack && this->i2c.repeatedStart(this->deviceAddress | READ))
+		uint8_t config = this->i2c.read(NACK);
+		return (config & 0x80);
+	}
+	this->i2c.stop();
+	
+	return false;
+}
+
+// ----------------------------------------------------------------------------
+template <typename I2C>
+uint16_t
+xpcc::i2c::Ds1631<I2C>::readTemperature()
+{
+	uint16_t temperature = 0;
+	if (this->i2c.start(this->deviceAddress | WRITE))
+	{
+		this->i2c.write(0xAA);
+		if (this->i2c.repeatedStart(this->deviceAddress | READ))
 		{
-			for (uint8_t i = 0; i < bytes; ++i) {
-				*data++ = this->i2c.read(ACK);
-			}
+			temperature  = this->i2c.read(ACK) << 8;
+			temperature |= this->i2c.read(NACK);
 		}
 	}
 	this->i2c.stop();
 	
-	return ack;
-}
-
-template <typename I2C> template <typename T>
-bool
-xpcc::i2c::Eeprom<I2C>::read(uint16_t address, T& data) const
-{
-	return read(address, static_cast<uint8_t *>(&data), sizeof(T));
+	return temperature;
 }
