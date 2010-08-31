@@ -77,6 +77,7 @@ xpcc::SoftwareI2C<Scl, Sda, Frequency>::repeatedStart(uint8_t address)
 	delay();
 	sda.setInput();
 	delay();
+	
 	scl.setInput();
 	delay();
 	sda.setOutput();
@@ -112,6 +113,9 @@ xpcc::SoftwareI2C<Scl, Sda, Frequency>::write(uint8_t data)
 		data <<= 1;
 	}
 	
+	// release sda
+	sda.setInput();
+	
 	// return acknowledge bit
 	return !readBit();
 }
@@ -134,6 +138,9 @@ xpcc::SoftwareI2C<Scl, Sda, Frequency>::read(bool ack)
 	// generate acknowledge bit
 	writeBit(!ack);
 	
+	// release sda
+	sda.setInput();
+	
 	return data;
 }
 
@@ -142,16 +149,16 @@ template <typename Scl, typename Sda, int32_t Frequency>
 bool
 xpcc::SoftwareI2C<Scl, Sda, Frequency>::readBit()
 {
-	scl.setInput();
 	delay();
+	scl.setInput();
 	
+	delay();
 	while (!scl.read())
 		;
 	
 	bool bit = sda.read();
 	
 	scl.setOutput();
-	delay();
 	
 	return bit;
 }
@@ -166,6 +173,7 @@ xpcc::SoftwareI2C<Scl, Sda, Frequency>::writeBit(bool bit)
 	else {
 		sda.setOutput();
 	}
+	delay();
 	
 	scl.setInput();
 	delay();
@@ -174,9 +182,6 @@ xpcc::SoftwareI2C<Scl, Sda, Frequency>::writeBit(bool bit)
 		;
 	
 	scl.setOutput();
-	delay();
-	
-	sda.setInput();
 }
 
 // ----------------------------------------------------------------------------

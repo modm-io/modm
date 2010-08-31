@@ -50,7 +50,7 @@ template <typename I2C>
 bool
 xpcc::i2c::Device<I2C>::isAvailable() const
 {
-	bool ack = this->i2c.start(this->deviceAddress | READ);
+	bool ack = this->i2c.start(this->deviceAddress | WRITE);
 	this->i2c.stop();
 	
 	return ack;

@@ -89,7 +89,7 @@ main()
 			
 			if ((i & 0x07) == 0x07) {
 				// insert a linebreak after eight bytes
-				output << xpcc::flush << xpcc::endl << xpcc::hex;
+				output << xpcc::ascii << xpcc::endl << xpcc::hex;
 			}
 		}
 	}

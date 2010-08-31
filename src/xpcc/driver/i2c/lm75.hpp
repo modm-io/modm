@@ -61,7 +61,7 @@ namespace xpcc
 			 * 
 			 * \todo	convert result into a better format 
 			 */
-			uint16_t
+			int16_t
 			readTemperature();
 		};
 	}

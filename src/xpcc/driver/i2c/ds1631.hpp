@@ -118,9 +118,9 @@ namespace xpcc
 			/**
 			 * \return	Temperature in degree
 			 * 
-			 * \todo	convert result into a better format 
+			 * Output format is Q7.8
 			 */
-			uint16_t
+			int16_t
 			readTemperature();
 		};
 	}

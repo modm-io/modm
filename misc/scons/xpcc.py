@@ -345,7 +345,7 @@ def generate(env, **kw):
 	
 	env.AddMethod(relocate_to_buildpath, 'Buildpath')
 	env.AddMethod(check_architecture, 'CheckArchitecture')
-	env.AddMethod(check_defines, 'ShowConfiguration')
+	env.AddMethod(check_defines, 'ShowDefines')
 	env.AddMethod(xpcc_library, 'XpccLibrary')
 	env.AddMethod(xpcc_communication_header, 'XpccCommunication')
 	env.AddMethod(generate_defines, 'Defines')

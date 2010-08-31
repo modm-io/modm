@@ -43,7 +43,7 @@ xpcc::i2c::LM75<I2C>::LM75(uint8_t address) :
 
 // ----------------------------------------------------------------------------
 template <typename I2C>
-uint16_t
+int16_t
 xpcc::i2c::LM75<I2C>::readTemperature()
 {
 	uint16_t temperature = 0;

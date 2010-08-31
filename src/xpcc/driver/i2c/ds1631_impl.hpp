@@ -48,7 +48,7 @@ xpcc::i2c::Ds1631<I2C>::configure(Resolution resolution, bool continuousMode)
 {
 	if (this->i2c.start(this->deviceAddress | WRITE))
 	{
-		this->i2c.write(0xAC);
+		this->i2c.write(0xac);
 		
 		uint8_t config = resolution;
 		if (!continuousMode) {
@@ -99,11 +99,11 @@ xpcc::i2c::Ds1631<I2C>::isConversionDone()
 {
 	if (this->i2c.start(this->deviceAddress | WRITE))
 	{
-		this->i2c.write(0xAC);
+		this->i2c.write(0xac);
 		this->i2c.repeatedStart(this->deviceAddress | READ);
 		
-		uint8_t config = this->i2c.read(NACK);
-		return (config & 0x80);
+		uint8_t done = this->i2c.read(NACK) & 0x80;
+		return (done == 0x80);
 	}
 	this->i2c.stop();
 	
@@ -112,13 +112,13 @@ xpcc::i2c::Ds1631<I2C>::isConversionDone()
 
 // ----------------------------------------------------------------------------
 template <typename I2C>
-uint16_t
+int16_t
 xpcc::i2c::Ds1631<I2C>::readTemperature()
 {
 	uint16_t temperature = 0;
 	if (this->i2c.start(this->deviceAddress | WRITE))
 	{
-		this->i2c.write(0xAA);
+		this->i2c.write(0xaa);
 		if (this->i2c.repeatedStart(this->deviceAddress | READ))
 		{
 			temperature  = this->i2c.read(ACK) << 8;

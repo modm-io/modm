@@ -224,10 +224,11 @@ namespace xpcc
 		writeFloat( const T& value );
 
 	private :
-		typedef enum {
+		enum Mode
+		{
 			ASCII,
 			HEX
-		} Mode;
+		};
 
 		IOStream(const IOStream& );
 

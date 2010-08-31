@@ -36,7 +36,6 @@
 
 FLASH(uint16_t base[]) = { 10, 100, 1000, 10000 };
 
-
 // ----------------------------------------------------------------------------
 xpcc::IOStream::IOStream(IODevice& device) :
 	device(&device),
@@ -101,17 +100,15 @@ xpcc::IOStream::writeInteger(uint16_t value)
 void
 xpcc::IOStream::writeInteger(int32_t value)
 {
-#ifdef __AVR__
+	char buffer[ArithmeticTraits<int32_t>::decimalDigits + 1]; // +1 for '\0'
+
+	#ifdef __AVR__
 	// uses the optimized non standard function 'ltoa()' which is
 	// not always available. For the general case snprintf() is
 	// used.
-	char buffer[ArithmeticTraits<int32_t>::decimalDigits + 1]; // +1 for '\0'
 	this->device->write(ltoa(value, buffer, 10));
 #else
-	char buffer[ArithmeticTraits<int32_t>::decimalDigits + 1]; // +1 for '\0'
-
 	snprintf(buffer, sizeof(buffer), "%d", value);
-
 	this->device->write(buffer);
 #endif
 }
@@ -119,16 +116,14 @@ xpcc::IOStream::writeInteger(int32_t value)
 void
 xpcc::IOStream::writeInteger(uint32_t value)
 {
+	char buffer[ArithmeticTraits<uint32_t>::decimalDigits + 1]; // +1 for '\0'
+	
 #ifdef __AVR__
-	// uses the optimized non standard function 'ltoa()' which is
+	// uses the optimized non standard function 'ultoa()' which is
 	// not always available.
-	char buffer[ArithmeticTraits<uint32_t>::decimalDigits + 1]; // +1 for '\0'		
 	this->device->write(ultoa(value, buffer, 10));
 #else
-	char buffer[ArithmeticTraits<uint32_t>::decimalDigits + 1]; // +1 for '\0'
-
 	snprintf(buffer, sizeof(buffer), "%u", value);
-
 	this->device->write(buffer);
 #endif
 }
