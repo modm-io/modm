@@ -19,7 +19,7 @@ env.Defines()
 
 env.Alias('size', env.Size(program))
 env.Alias('symbols', env.Symbols(program))
-#env.Alias('show', env.ShowDefines())
+env.Alias('defines', env.ShowDefines())
 
 if env.CheckArchitecture('pc'):
 	env.Alias('build', program)

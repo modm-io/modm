@@ -71,15 +71,15 @@ def check_architecture(env, architecture):
 	else:
 		return False
 
-def check_defines(env):
+def show_defines_action(target, source, env):
 	projectConfig = env['XPCC_CONFIG']['defines'].keys()
 	keys = env['XPCC_LIBRARY_DEFINES'].keys()
 	keys.sort()
 	
 	print ""
-	print "Defines:"
+	print "XPCC:"
 	for key in keys:
-		default = env['XPCC_LIBRARY_DEFINES'][key]
+		default = env['XPCC_LIBRARY_DEFAULT_DEFINES'][key]
 		if key in projectConfig:
 			value = env['XPCC_CONFIG']['defines'][key]
 			projectConfig.remove(key)
@@ -90,10 +90,14 @@ def check_defines(env):
 		print "  %s => %s" % (key.upper(), default)
 	
 	if projectConfig:
-		print "\nUnused Defines:"
+		print "\nOther:"
 		for key in projectConfig:
 			print "  %s => %s" % (key.upper(), env['XPCC_CONFIG']['defines'][key])
 	print ""
+
+def show_defines(env, alias="__show"):
+	action = Action(show_defines_action, cmdstr="Show Defines:")
+	return env.AlwaysBuild(env.Alias(alias, [], action))
 
 def xpcc_library(env, buildpath=None):
 	env.Append(CPPPATH = env['XPCC_LIBRARY_PATH'])
@@ -116,6 +120,7 @@ def xpcc_library(env, buildpath=None):
 	
 	# generate 'xpcc_config.hpp'
 	env['XPCC_LIBRARY_DEFINES'] = defines.copy()
+	env['XPCC_LIBRARY_DEFAULT_DEFINES'] = defines.copy()
 	for key in defines.iterkeys():
 		if key in env['XPCC_CONFIG']['defines']:
 			env['XPCC_LIBRARY_DEFINES'][key] = env['XPCC_CONFIG']['defines'][key]
@@ -345,7 +350,7 @@ def generate(env, **kw):
 	
 	env.AddMethod(relocate_to_buildpath, 'Buildpath')
 	env.AddMethod(check_architecture, 'CheckArchitecture')
-	env.AddMethod(check_defines, 'ShowDefines')
+	env.AddMethod(show_defines, 'ShowDefines')
 	env.AddMethod(xpcc_library, 'XpccLibrary')
 	env.AddMethod(xpcc_communication_header, 'XpccCommunication')
 	env.AddMethod(generate_defines, 'Defines')
