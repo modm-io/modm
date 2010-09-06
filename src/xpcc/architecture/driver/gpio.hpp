@@ -251,6 +251,84 @@ namespace xpcc
 		};
 		
 		/**
+		 * \brief	Invert a pin
+		 * 
+		 * This template can be used the invert the logic level of a normal
+		 * pin template.
+		 * 
+		 * Example:
+		 * \code
+		 * #include <xpcc/architecture/driver/gpio.hpp>
+		 * #include <xpcc/driver/software_spi.hpp>
+		 * 
+		 * namespace pin
+		 * {
+		 *     GPIO__OUTPUT(LED, B, 0);
+		 * }
+		 * 
+		 * typedef xpcc::Invert< pin::LED > LED;
+		 * 
+		 * ...
+		 * LED::reset();
+		 * \endcode
+		 * 
+		 * \ingroup	gpio
+		 */
+		template <typename Pin>
+		class Invert
+		{
+		public:
+			ALWAYS_INLINE static void
+			setOutput()
+			{
+				pin.setOutput();
+			}
+			
+			ALWAYS_INLINE static void
+			setInput()
+			{
+				pin.setInput();
+			}
+			
+			ALWAYS_INLINE static void
+			set()
+			{
+				pin.reset();
+			}
+			
+			ALWAYS_INLINE static void
+			set(bool value)
+			{
+				pin.set(!value);
+			}
+			
+			ALWAYS_INLINE static void
+			reset()
+			{
+				pin.set();
+			}
+			
+			ALWAYS_INLINE static void
+			toggle()
+			{
+				pin.toggle();
+			}
+			
+			/// Returns \c false
+			ALWAYS_INLINE static bool
+			read()
+			{
+				return !pin.read();
+			}
+			
+		protected:
+			static Pin pin;
+		};
+		
+		template <typename Pin>
+		Pin Invert<Pin>::pin;
+		
+		/**
 		 * \brief	Generic implementation of a Nibble composed of four
 		 * 			independent pins.
 		 * 

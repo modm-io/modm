@@ -30,83 +30,64 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__ST7036_HPP
-	#error	"Don't include this file directly, use 'st7036.hpp' instead!"
-#endif
+#ifndef XPCC__ST7565_HPP
+#define XPCC__ST7565_HPP
 
-// ----------------------------------------------------------------------------
+#include <xpcc/architecture/driver/accessor/flash.hpp>
+#include <xpcc/architecture/driver/time/delay.hpp>
 
-namespace xpcc {
-	namespace st7036 {
-		EXTERN_FLASH(uint8_t configuration[10]);
-	}
-}
-
-// ----------------------------------------------------------------------------
-
-template <typename SPI, typename CS, typename RS>
-xpcc::St7036<SPI, CS, RS>::St7036() :
-	Lcd()
+namespace xpcc
 {
-}
-
-// ----------------------------------------------------------------------------
-
-template <typename SPI, typename CS, typename RS>
-void
-xpcc::St7036<SPI, CS, RS>::initialize()
-{
-	SPI::initialize();
-	CS::setOutput();
-	RS::setOutput();
-	
-	accessor::Flash<uint8_t> config(st7036::configuration);
-	for (uint8_t i = 0; i < 10; ++i)
+	/**
+	 * \brief	Driver for ST7565 based LC-displays
+	 * 
+	 * 
+	 * 
+	 * \author	Fabian Greif
+	 * \ingroup	driver
+	 */
+	template <typename SPI, typename CS, typename A0, typename Reset>
+	class St7565
 	{
-		writeCommand(config[i]);
-	}
+	public:
+		/**
+		 * \brief	Initialize the display
+		 * 
+		 * The display needs some time to initalize after startup. You have
+		 * to wait at least 50 ms until calling this method.
+		 */
+		void
+		initialize();
+		
+		/**
+		 * \brief	Update the display with the content of the RAM buffer
+		 */
+		void
+		update();
+		
+		// all these functions work on the RAM buffer, only with a call
+		// of update() the content is transfered to the display
+		void
+		clear();
+		
+		// x = 0..127, y = 0..63
+		void
+		setPixel(uint8_t x, uint8_t y);
+		
+		// x = 0..127, y = 0..63
+		void
+		clearPixel(uint8_t x, uint8_t y);
+		
+	protected:
+		uint8_t buffer[128][8];
+		
+		SPI spi;
+		CS cs;
+		A0 a0;
+		Reset reset;
+	};
 }
 
-template <typename SPI, typename CS, typename RS>
-void
-xpcc::St7036<SPI, CS, RS>::writeRaw(char c)
-{
-	RS::set();
-	
-	CS::reset();
-	SPI::write(c);
-	CS::set();
-}
+#include "st7565_impl.hpp"
 
-template <typename SPI, typename CS, typename RS>
-void
-xpcc::St7036<SPI, CS, RS>::setPosition(uint8_t line, uint8_t column)
-{
-	this->column = column;
-	this->line = line;
-	
-	column += 0x40 * line;
-	writeCommand(0x80 | column);
-}
-
-// ----------------------------------------------------------------------------
-
-template <typename SPI, typename CS, typename RS>
-void
-xpcc::St7036<SPI, CS, RS>::writeCommand(uint8_t command)
-{
-	RS::reset();
-	
-	CS::reset();
-	SPI::write(command);
-	CS::set();
-	
-	// check if the command is 'clear display' oder 'return home', these
-	// commands take a bit longer until they are finished.
-	if ((command & 0xfc) == 0) {
-		xpcc::delay_ms(1.2);
-	}
-	else {
-		xpcc::delay_us(27);
-	}
-}
+#endif // XPCC__ST7565_HPP
