@@ -34,6 +34,8 @@
 	#error	"Don't include this file directly, use 'mcp2515.hpp' instead!"
 #endif
 
+#if !defined(__AVR_AT90CAN128__)
+
 #include "mcp2515_definitions.hpp"
 
 template <typename SPI, typename CS, typename INT>
@@ -409,3 +411,5 @@ xpcc::Mcp2515<SPI, CS, INT>::readIdentifier(uint32_t& identifier)
 		return false;
 	}
 }
+
+#endif	// !__AVR_AT90CAN128__

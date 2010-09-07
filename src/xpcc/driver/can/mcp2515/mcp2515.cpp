@@ -33,6 +33,8 @@
 #include "../mcp2515.hpp"
 #include "xpcc_config.hpp"
 
+#if !defined(__AVR_AT90CAN128__)
+
 namespace xpcc
 {
 	namespace mcp2515
@@ -129,3 +131,5 @@ namespace xpcc
 		};
 	}
 }
+
+#endif	// !__AVR_AT90CAN128__

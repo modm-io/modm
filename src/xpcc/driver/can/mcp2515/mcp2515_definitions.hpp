@@ -311,4 +311,5 @@
 
 /*\}*/
 /*\}*/
+
 #endif	// MCP2515_DEFINITIONS_HPP
