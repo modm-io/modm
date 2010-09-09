@@ -30,70 +30,53 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__ST7565_HPP
-	#error	"Don't include this file directly, use 'st7565.hpp' instead!"
-#endif
+#include "graphic_display.hpp"
 
-#include "st7565_defines.hpp"
-
-// ----------------------------------------------------------------------------
-namespace xpcc
+void
+xpcc::GraphicDisplay::drawLine(uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2)
 {
-	namespace st7565
-	{
-		EXTERN_FLASH(uint8_t configuration[14]);
-	}
+	// TODO: Bresenham
 }
 
-// ----------------------------------------------------------------------------
-template <typename SPI, typename CS, typename A0, typename Reset>
 void
-xpcc::St7565<SPI, CS, A0, Reset>::initialize()
+xpcc::GraphicDisplay::drawHorizontalLine(uint8_t x1, uint8_t y1, uint8_t length)
 {
-	spi.initialize();
-	cs.set();
-	cs.setOutput();
-	
-	a0.setOutput();
-	
-	// reset the controller
-	reset.setOutput();
-	reset.reset();
-	xpcc::delay_ms(50);
-	reset.set();
-	
-	cs.reset();
-	a0.reset();
-	
-	accessor::Flash<uint8_t> config(st7565::configuration);
-	for (uint8_t i = 0; i < sizeof(st7565::configuration); ++i) {
-		spi.write(config[i]);
-	}
-	cs.set();
-	
-	this->clear();
-	this->update();
+	this->drawLine(x1, y1, x1 + length, y1);
 }
 
-// ----------------------------------------------------------------------------
-template <typename SPI, typename CS, typename A0, typename Reset>
 void
-xpcc::St7565<SPI, CS, A0, Reset>::update()
+xpcc::GraphicDisplay::drawVerticalLine(uint8_t x1, uint8_t y1, uint8_t length)
 {
-	cs.reset();
-	for(uint8_t y = 0; y < 8; ++y)
-	{
-		// command mode
-		a0.reset();
-		spi.write(ST7565_PAGE_ADDRESS | y);		// Row select
-		spi.write(ST7565_COL_ADDRESS_MSB);		// Column select high
-		spi.write(ST7565_COL_ADDRESS_LSB | 4);	// Column select low
-		
-		// switch to data mode
-		a0.set();
-		for(uint8_t x = 0; x < 128; ++x) {
-			spi.write(this->buffer[x][y]);
-		}
-	}
-	cs.set();
+	this->drawLine(x1, y1, x1, y1 + length);
+}
+
+void
+xpcc::GraphicDisplay::drawRectangle(uint8_t x, uint8_t y,
+		uint8_t width, uint8_t height)
+{
+	uint8_t x2 = x + width;
+	uint8_t y2 = y + height;
+	
+	this->drawHorizontalLine(x, y,  width);
+	this->drawHorizontalLine(x, y2, width);
+	this->drawVerticalLine(x,  y, height);
+	this->drawVerticalLine(x2, y, height);
+}
+
+void
+xpcc::GraphicDisplay::drawRoundedRectangle(uint8_t x, uint8_t y,
+		uint8_t width, uint8_t height)
+{
+	uint8_t x2 = x + width;
+	uint8_t y2 = y + height;
+	
+	this->drawHorizontalLine(x + 2, y,  width - 4);
+	this->drawHorizontalLine(x + 2, y2, width - 4);
+	this->drawVerticalLine(x,  y + 2, height - 4);
+	this->drawVerticalLine(x2, y + 2, height - 4);
+	
+	this->setPixel(x + 1,  y + 1);
+	this->setPixel(x + 1,  y2 - 1);
+	this->setPixel(x2 - 1, y + 1);
+	this->setPixel(x2 - 1, y2 - 1);
 }

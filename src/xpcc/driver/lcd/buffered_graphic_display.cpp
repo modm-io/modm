@@ -30,70 +30,39 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__ST7565_HPP
-	#error	"Don't include this file directly, use 'st7565.hpp' instead!"
-#endif
+#include "buffered_graphic_display.hpp"
 
-#include "st7565_defines.hpp"
-
-// ----------------------------------------------------------------------------
-namespace xpcc
-{
-	namespace st7565
-	{
-		EXTERN_FLASH(uint8_t configuration[14]);
-	}
-}
-
-// ----------------------------------------------------------------------------
-template <typename SPI, typename CS, typename A0, typename Reset>
 void
-xpcc::St7565<SPI, CS, A0, Reset>::initialize()
+xpcc::BufferedGraphicDisplay::clear()
 {
-	spi.initialize();
-	cs.set();
-	cs.setOutput();
-	
-	a0.setOutput();
-	
-	// reset the controller
-	reset.setOutput();
-	reset.reset();
-	xpcc::delay_ms(50);
-	reset.set();
-	
-	cs.reset();
-	a0.reset();
-	
-	accessor::Flash<uint8_t> config(st7565::configuration);
-	for (uint8_t i = 0; i < sizeof(st7565::configuration); ++i) {
-		spi.write(config[i]);
-	}
-	cs.set();
-	
-	this->clear();
-	this->update();
-}
-
-// ----------------------------------------------------------------------------
-template <typename SPI, typename CS, typename A0, typename Reset>
-void
-xpcc::St7565<SPI, CS, A0, Reset>::update()
-{
-	cs.reset();
-	for(uint8_t y = 0; y < 8; ++y)
-	{
-		// command mode
-		a0.reset();
-		spi.write(ST7565_PAGE_ADDRESS | y);		// Row select
-		spi.write(ST7565_COL_ADDRESS_MSB);		// Column select high
-		spi.write(ST7565_COL_ADDRESS_LSB | 4);	// Column select low
-		
-		// switch to data mode
-		a0.set();
-		for(uint8_t x = 0; x < 128; ++x) {
-			spi.write(this->buffer[x][y]);
+	for (uint8_t i = 0; i < 8; ++i) {
+		for (uint8_t k = 0; k < 128; ++k) {
+			this->buffer[k][i] = 0;
 		}
 	}
-	cs.set();
+}
+
+void
+xpcc::BufferedGraphicDisplay::clear(uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2)
+{
+	uint8_t k;
+	for (uint8_t i = x1; (i < x2) && (i < 128); i++)
+	{
+		for (k = y1; (k < y2) && (k < 64); k++)
+		{
+			clearPixel(i, k);
+		}
+	}
+}
+
+void
+xpcc::BufferedGraphicDisplay::setPixel(uint8_t x, uint8_t y)
+{
+	this->buffer[x][y / 8] |= (1 << (y & 0x07));
+}
+
+void
+xpcc::BufferedGraphicDisplay::clearPixel(uint8_t x, uint8_t y)
+{
+	this->buffer[x][y / 8] &= ~(1 << (y & 0x07));
 }

@@ -30,70 +30,54 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__ST7565_HPP
-	#error	"Don't include this file directly, use 'st7565.hpp' instead!"
-#endif
+#ifndef XPCC__GRAPHIC_DISPLAY_HPP
+#define XPCC__GRAPHIC_DISPLAY_HPP
 
-#include "st7565_defines.hpp"
+#include <stdint.h>
 
-// ----------------------------------------------------------------------------
 namespace xpcc
 {
-	namespace st7565
+	/**
+	 * \brief	Base class for graphical displays 
+	 * 
+	 * \author	Fabian Greif
+	 * \ingroup	lcd
+	 */
+	class GraphicDisplay
 	{
-		EXTERN_FLASH(uint8_t configuration[14]);
-	}
-}
-
-// ----------------------------------------------------------------------------
-template <typename SPI, typename CS, typename A0, typename Reset>
-void
-xpcc::St7565<SPI, CS, A0, Reset>::initialize()
-{
-	spi.initialize();
-	cs.set();
-	cs.setOutput();
-	
-	a0.setOutput();
-	
-	// reset the controller
-	reset.setOutput();
-	reset.reset();
-	xpcc::delay_ms(50);
-	reset.set();
-	
-	cs.reset();
-	a0.reset();
-	
-	accessor::Flash<uint8_t> config(st7565::configuration);
-	for (uint8_t i = 0; i < sizeof(st7565::configuration); ++i) {
-		spi.write(config[i]);
-	}
-	cs.set();
-	
-	this->clear();
-	this->update();
-}
-
-// ----------------------------------------------------------------------------
-template <typename SPI, typename CS, typename A0, typename Reset>
-void
-xpcc::St7565<SPI, CS, A0, Reset>::update()
-{
-	cs.reset();
-	for(uint8_t y = 0; y < 8; ++y)
-	{
-		// command mode
-		a0.reset();
-		spi.write(ST7565_PAGE_ADDRESS | y);		// Row select
-		spi.write(ST7565_COL_ADDRESS_MSB);		// Column select high
-		spi.write(ST7565_COL_ADDRESS_LSB | 4);	// Column select low
-		
-		// switch to data mode
-		a0.set();
-		for(uint8_t x = 0; x < 128; ++x) {
-			spi.write(this->buffer[x][y]);
+	public:
+		virtual
+		~GraphicDisplay()
+		{
 		}
-	}
-	cs.set();
+		
+		virtual void
+		clear() = 0;
+		
+		virtual void
+		clear(uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2) = 0;
+		
+		virtual void
+		setPixel(uint8_t x, uint8_t y) = 0;
+		
+		virtual void
+		clearPixel(uint8_t x, uint8_t y) = 0;
+		
+		virtual void
+		drawLine(uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2);
+		
+		virtual void
+		drawHorizontalLine(uint8_t x1, uint8_t y1, uint8_t length);
+		
+		virtual void
+		drawVerticalLine(uint8_t x1, uint8_t y1, uint8_t length);
+		
+		virtual void
+		drawRectangle(uint8_t x, uint8_t y, uint8_t width, uint8_t height);
+		
+		virtual void
+		drawRoundedRectangle(uint8_t x, uint8_t y, uint8_t width, uint8_t height);
+	};
 }
+
+#endif	// XPCC__GRAPHIC_DISPLAY_HPP

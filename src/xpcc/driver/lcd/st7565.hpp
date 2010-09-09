@@ -36,6 +36,8 @@
 #include <xpcc/architecture/driver/accessor/flash.hpp>
 #include <xpcc/architecture/driver/time/delay.hpp>
 
+#include "buffered_graphic_display.hpp"
+
 namespace xpcc
 {
 	/**
@@ -47,7 +49,7 @@ namespace xpcc
 	 * \ingroup	driver
 	 */
 	template <typename SPI, typename CS, typename A0, typename Reset>
-	class St7565
+	class St7565 : public BufferedGraphicDisplay
 	{
 	public:
 		/**
@@ -62,25 +64,10 @@ namespace xpcc
 		/**
 		 * \brief	Update the display with the content of the RAM buffer
 		 */
-		void
+		virtual void
 		update();
 		
-		// all these functions work on the RAM buffer, only with a call
-		// of update() the content is transfered to the display
-		void
-		clear();
-		
-		// x = 0..127, y = 0..63
-		void
-		setPixel(uint8_t x, uint8_t y);
-		
-		// x = 0..127, y = 0..63
-		void
-		clearPixel(uint8_t x, uint8_t y);
-		
 	protected:
-		uint8_t buffer[128][8];
-		
 		SPI spi;
 		CS cs;
 		A0 a0;

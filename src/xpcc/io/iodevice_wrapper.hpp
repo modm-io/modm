@@ -78,24 +78,24 @@ namespace xpcc
 			(void) device;
 		}
 		
-		virtual inline void
+		virtual void
 		write(char c)
 		{
 			T::write(c);
 		}
 		
-		virtual inline void
+		virtual void
 		write(const char *s)
 		{
 			T::write(s);
 		}
 		
-		virtual inline void
+		virtual void
 		flush()
 		{
 		}
 		
-		virtual inline bool
+		virtual bool
 		read(char& c)
 		{
 			return T::read(c);

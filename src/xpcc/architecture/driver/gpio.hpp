@@ -314,7 +314,6 @@ namespace xpcc
 				pin.toggle();
 			}
 			
-			/// Returns \c false
 			ALWAYS_INLINE static bool
 			read()
 			{
