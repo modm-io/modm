@@ -30,8 +30,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC_MATH__BIT_OPERATION_HPP
-#define	XPCC_MATH__BIT_OPERATION_HPP
+#ifndef	XPCC__BIT_OPERATION_HPP
+#define	XPCC__BIT_OPERATION_HPP
 
 #include <cstddef>
 #include <cmath>
@@ -41,126 +41,136 @@
 
 namespace xpcc
 {
-	namespace math
+	/**
+	 * \brief	Exchange the two nibbles of a byte
+	 * 
+	 * \code
+	 * 0xab => 0xba
+	 * \endcode
+	 * 
+	 * \ingroup	math
+	 */
+	ALWAYS_INLINE uint8_t
+	swap(uint8_t n)
 	{
-		/**
-		 * \brief	Exchange the two nibbles of a byte
-		 * 
-		 * \code
-		 * 0xab => 0xba
-		 * \endcode
-		 * 
-		 * \ingroup	math
-		 */
-		ALWAYS_INLINE uint8_t
-		swap(uint8_t n)
-		{
 #ifdef __AVR__
-			if (__builtin_constant_p(n)) {
-				n = (n << 4) | (n >> 4);
-			}
-			else {
-				asm volatile ("swap %0" : "=r" (n) : "0" (n));
-			}
-			return n;
-#else
+		if (__builtin_constant_p(n)) {
 			n = (n << 4) | (n >> 4);
-			return n;
-#endif
 		}
-		
-		/**
-		 * \brief	Exchange the two bytes of a 16-bit integer
-		 * 
-		 * \code
-		 * 0xabcd => 0xcdab
-		 * \endcode
-		 * 
-		 * \ingroup	math
-		 */
-		ALWAYS_INLINE uint16_t
-		swap(uint16_t n)
-		{
-#ifdef __AVR__
-			if (__builtin_constant_p(n)) {
-				n = (n << 8) | (n >> 8);
-			}
-			else {
-				asm volatile (
-					"eor %A0, %B0"	"\n\t"
-					"eor %B0, %A0"	"\n\t"
-					"eor %A0, %B0"	"\n\t"
-					: "=r" (n)
-					: "0" (n)
-				);
-			}
-			return n;
+		else {
+			asm volatile ("swap %0" : "=r" (n) : "0" (n));
+		}
+		return n;
 #else
-			n = (n << 8) | (n >> 8);
-			return n;
+		n = (n << 4) | (n >> 4);
+		return n;
 #endif
-		}
-		
-		// --------------------------------------------------------------------
-		/**
-		 * \brief	Reverse the bits in a byte
-		 * 
-		 * \code
-		 * 0b01110100 => 0b00101110
-		 * \endcode
-		 * 
-		 * 15 clock cycles on an AVR, without call + return.
-		 * 
-		 * \ingroup	math
-		 */
-		uint8_t
-		bitReverse(uint8_t n);
-		
-		/**
-		 * \brief	Reverse the bits in a 16-bit integer
-		 * 
-		 * \ingroup	math
-		 */
-		uint16_t
-		bitReverse(uint16_t n);
-		
-		/**
-		 * \brief	Reverse the bits in a 32-bit integer
-		 * 
-		 * \ingroup	math
-		 */
-		uint32_t
-		bitReverse(uint32_t n);
-		
-		// --------------------------------------------------------------------
-		/**
-		 * \brief	Count the number of bits set
-		 * 
-		 * 16 clock cycles on an AVR, without call + return.
-		 * 
-		 * \ingroup	math
-		 */
-		std::size_t
-		bitCount(uint8_t n);
-		
-		/**
-		 * \brief	Count the number of bits set
-		 * 
-		 * 33 clock cycles on an AVR, without call + return.
-		 * 
-		 * \ingroup	math
-		 */
-		std::size_t
-		bitCount(uint16_t n);
-		
-		/**
-		 * \brief	Count the number of bits set
-		 * 
-		 * \ingroup	math
-		 */
-		std::size_t
-		bitCount(uint32_t n);
 	}
+	
+	/**
+	 * \brief	Exchange two byte
+	 * 
+	 * \ingroup	math
+	 */
+	ALWAYS_INLINE void
+	swap(uint8_t& a, uint8_t& b)
+	{
+		uint8_t temp = a;
+		a = b;
+		b = temp;
+	}
+	
+	/**
+	 * \brief	Exchange the two bytes of a 16-bit integer
+	 * 
+	 * \code
+	 * 0xabcd => 0xcdab
+	 * \endcode
+	 * 
+	 * \ingroup	math
+	 */
+	ALWAYS_INLINE uint16_t
+	swap(uint16_t n)
+	{
+#ifdef __AVR__
+		if (__builtin_constant_p(n)) {
+			n = (n << 8) | (n >> 8);
+		}
+		else {
+			asm volatile (
+				"eor %A0, %B0"	"\n\t"
+				"eor %B0, %A0"	"\n\t"
+				"eor %A0, %B0"	"\n\t"
+				: "=r" (n)
+				: "0" (n)
+			);
+		}
+		return n;
+#else
+		n = (n << 8) | (n >> 8);
+		return n;
+#endif
+	}
+	
+	// --------------------------------------------------------------------
+	/**
+	 * \brief	Reverse the bits in a byte
+	 * 
+	 * \code
+	 * 0b01110100 => 0b00101110
+	 * \endcode
+	 * 
+	 * 15 clock cycles on an AVR, without call + return.
+	 * 
+	 * \ingroup	math
+	 */
+	uint8_t
+	bitReverse(uint8_t n);
+	
+	/**
+	 * \brief	Reverse the bits in a 16-bit integer
+	 * 
+	 * \ingroup	math
+	 */
+	uint16_t
+	bitReverse(uint16_t n);
+	
+	/**
+	 * \brief	Reverse the bits in a 32-bit integer
+	 * 
+	 * \ingroup	math
+	 */
+	uint32_t
+	bitReverse(uint32_t n);
+	
+	// --------------------------------------------------------------------
+	/**
+	 * \brief	Count the number of bits set
+	 * 
+	 * 16 clock cycles on an AVR, without call + return.
+	 * 
+	 * \ingroup	math
+	 */
+	std::size_t
+	bitCount(uint8_t n);
+	
+	/**
+	 * \brief	Count the number of bits set
+	 * 
+	 * 33 clock cycles on an AVR, without call + return.
+	 * 
+	 * \ingroup	math
+	 */
+	std::size_t
+	bitCount(uint16_t n);
+	
+	/**
+	 * \brief	Count the number of bits set
+	 * 
+	 * \ingroup	math
+	 */
+	std::size_t
+	bitCount(uint32_t n);
 }
 
-#endif	// XPCC_MATH__BIT_OPERATION_HPP
+#endif	// XPCC__BIT_OPERATION_HPP

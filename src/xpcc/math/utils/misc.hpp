@@ -41,64 +41,61 @@
 
 namespace xpcc
 {
-	namespace math
+	/**
+	 * \brief	Fast check if a float variable is positive
+	 *
+	 * Checks only the sign bit for the AVR.
+	 * 
+	 * \ingroup	math
+	 */
+	inline bool
+	isPositive(const float& a)
 	{
-		/**
-		 * \brief	Fast check if a float variable is positive
-		 *
-		 * Checks only the sign bit for the AVR.
-		 * 
-		 * \ingroup	math
-		 */
-		inline bool
-		isPositive(const float& a)
-		{
 #ifdef __AVR__
-			// IEEE 754-1985: the most significant bit is the sign bit
-			// sign = 0 => positive
-			// sign = 1 => negative
-			uint8_t *t = (uint8_t *) &a;
-			if (*(t + 3) & 0x80) {
-				return false;
-			}
-			else {
-				return true;
-			}
-#else
-			return (a > 0.0);
-#endif
+		// IEEE 754-1985: the most significant bit is the sign bit
+		// sign = 0 => positive
+		// sign = 1 => negative
+		uint8_t *t = (uint8_t *) &a;
+		if (*(t + 3) & 0x80) {
+			return false;
 		}
-		
-		// --------------------------------------------------------------------
-		/**
-		 * \brief	Compile time exponentiation
-		 * 
-		 * Calculates B raised to the power of N, B and N must be compile-time
-		 * constants.
-		 * 
-		 * \code
-		 * int value = xpcc::Pow<10, 2>::value;
-		 * \endcode
-		 * 
-		 * \tparam	B	Base
-		 * \tparam	N	Exponent
-		 * 
-		 * \ingroup	math
-		 */
-		template <int B, int N>
-		class Pow
-		{
-			enum { value = B * Pow<B, N - 1>::value };
-		};
-		
-		// specialization for B^0 which is always 1
-		// used to end the recursion in Pow<>
-		template <int B>
-		class Pow<B, 0>
-		{
-			enum { value = 1 };
-		};
+		else {
+			return true;
+		}
+#else
+		return (a > 0.0);
+#endif
 	}
+	
+	// --------------------------------------------------------------------
+	/**
+	 * \brief	Compile time exponentiation
+	 * 
+	 * Calculates B raised to the power of N, B and N must be compile-time
+	 * constants.
+	 * 
+	 * \code
+	 * int value = xpcc::Pow<10, 2>::value;
+	 * \endcode
+	 * 
+	 * \tparam	B	Base
+	 * \tparam	N	Exponent
+	 * 
+	 * \ingroup	math
+	 */
+	template <int B, int N>
+	class Pow
+	{
+		enum { value = B * Pow<B, N - 1>::value };
+	};
+	
+	// specialization for B^0 which is always 1
+	// used to end the recursion in Pow<>
+	template <int B>
+	class Pow<B, 0>
+	{
+		enum { value = 1 };
+	};
 }
 
 #endif	// XPCC_MATH__UTILS_HPP

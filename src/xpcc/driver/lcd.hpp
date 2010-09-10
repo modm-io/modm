@@ -29,6 +29,12 @@
  * $Id$
  */
 // ----------------------------------------------------------------------------
+/**
+ * \defgroup	lcd		LCD
+ * \brief		Liquid crystal display
+ * 
+ * \ingroup		driver
+ */
 
 #include "lcd/lcd.hpp"
 #include "lcd/hd44780.hpp"

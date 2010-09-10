@@ -52,7 +52,7 @@ namespace xpcc
 	 * class to create a IODevice seems unnecessary complicated.
 	 * 
 	 * \author	Fabian Greif
-	 * \ingroup	driver
+	 * \ingroup	lcd
 	 */
 	class Lcd : public IODevice
 	{

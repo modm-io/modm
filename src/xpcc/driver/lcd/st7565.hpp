@@ -46,7 +46,7 @@ namespace xpcc
 	 * 
 	 * 
 	 * \author	Fabian Greif
-	 * \ingroup	driver
+	 * \ingroup	lcd
 	 */
 	template <typename SPI, typename CS, typename A0, typename Reset>
 	class St7565 : public BufferedGraphicDisplay

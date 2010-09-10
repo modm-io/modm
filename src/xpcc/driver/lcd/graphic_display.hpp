@@ -40,7 +40,6 @@ namespace xpcc
 	/**
 	 * \brief	Base class for graphical displays 
 	 * 
-	 * \author	Fabian Greif
 	 * \ingroup	lcd
 	 */
 	class GraphicDisplay
@@ -63,7 +62,19 @@ namespace xpcc
 		virtual void
 		clearPixel(uint8_t x, uint8_t y) = 0;
 		
-		virtual void
+		/**
+		 * \brief	Draw line
+		 * 
+		 * Uses the faster drawHorizontalLine() or drawVerticalLine() if
+		 * possible, otherwise the line is rastered with the bresenham line
+		 * algorithm.
+		 * 
+		 * \param x1	first point
+		 * \param y1	first point
+		 * \param x2	second point
+		 * \param y2	second point
+		 */
+		void
 		drawLine(uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2);
 		
 		virtual void
@@ -72,11 +83,35 @@ namespace xpcc
 		virtual void
 		drawVerticalLine(uint8_t x1, uint8_t y1, uint8_t length);
 		
-		virtual void
+		void
 		drawRectangle(uint8_t x, uint8_t y, uint8_t width, uint8_t height);
 		
-		virtual void
-		drawRoundedRectangle(uint8_t x, uint8_t y, uint8_t width, uint8_t height);
+		void
+		drawRoundedRectangle(uint8_t x, uint8_t y,
+				uint8_t width, uint8_t height,
+				uint8_t radius);
+		
+		/**
+		 * \brief	Draw a cricle
+		 * 
+		 * Uses the midpoint circle algorithm.
+		 * 
+		 * \param cx	x-coordinate of the center
+		 * \param cy	y-coordinate of the center
+		 */
+		void
+		drawCircle(uint8_t cx, uint8_t cy, uint8_t radius);
+		
+		void
+		drawEllipse(uint8_t cx, uint8_t cy, uint8_t rx, uint8_t ry);
+		
+		void
+		fillRectangle(uint8_t x, uint8_t y, uint8_t width, uint8_t height);
+		
+	protected:
+		/// helper method for drawCircle()
+		void
+		drawCircle4(uint8_t cx, uint8_t cy, uint8_t x, uint8_t y);
 	};
 }
 

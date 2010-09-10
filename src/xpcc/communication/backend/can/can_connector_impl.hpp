@@ -269,7 +269,7 @@ xpcc::CanConnector<Driver>::retrieveMessage()
 			
 			// test if this was the last segment, otherwise we have to wait
 			// for more messages
-			if (xpcc::math::bitCount(packet->receivedFragments) == numberOfFragments)
+			if (xpcc::bitCount(packet->receivedFragments) == numberOfFragments)
 			{
 				this->receivedMessages.append(*packet);
 				this->pendingMessages.remove(packet);

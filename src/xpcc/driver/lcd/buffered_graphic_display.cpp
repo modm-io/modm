@@ -45,10 +45,9 @@ xpcc::BufferedGraphicDisplay::clear()
 void
 xpcc::BufferedGraphicDisplay::clear(uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2)
 {
-	uint8_t k;
 	for (uint8_t i = x1; (i < x2) && (i < 128); i++)
 	{
-		for (k = y1; (k < y2) && (k < 64); k++)
+		for (uint8_t k = y1; (k < y2) && (k < 64); k++)
 		{
 			clearPixel(i, k);
 		}

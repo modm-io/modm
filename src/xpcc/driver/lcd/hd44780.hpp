@@ -62,7 +62,7 @@ namespace xpcc
 	 * \see		http://en.wikipedia.org/wiki/HD44780_Character_LCD
 	 * 
 	 * \author	Fabian Greif
-	 * \ingroup	driver
+	 * \ingroup	lcd
 	 */
 	template <typename E, typename RW, typename RS, typename DATA>
 	class Hd44780 : public Lcd

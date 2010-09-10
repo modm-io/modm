@@ -38,7 +38,7 @@
 float
 xpcc::Angle::normalize(float angle)
 {
-	if (math::isPositive(angle))
+	if (isPositive(angle))
 	{
 		while (angle > M_PI) {
 			angle -= 2 * M_PI;
@@ -57,7 +57,7 @@ xpcc::Angle::normalize(float angle)
 float
 xpcc::Angle::reverse(float angle)
 {
-	if (math::isPositive(angle))
+	if (isPositive(angle))
 	{
 		angle -= M_PI;
 	}

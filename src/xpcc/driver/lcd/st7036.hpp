@@ -49,7 +49,7 @@ namespace xpcc
 	 * \see		Lcd
 	 * 
 	 * \author	Fabian Greif
-	 * \ingroup	driver
+	 * \ingroup	lcd
 	 */
 	template <typename SPI, typename CS, typename RS>
 	class St7036 : public Lcd
