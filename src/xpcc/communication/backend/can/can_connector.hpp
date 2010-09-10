@@ -120,6 +120,8 @@ namespace xpcc
 	class CanConnector : protected CanConnectorBase, public BackendInterface
 	{
 	public:
+		CanConnector(Driver *driver);
+		
 		virtual
 		~CanConnector();
 		
@@ -224,7 +226,7 @@ namespace xpcc
 		ReceiveList pendingMessages;
 		ReceiveList receivedMessages;
 		
-		Driver canDriver;
+		Driver *canDriver;
 	};
 }
 

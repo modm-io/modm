@@ -39,6 +39,12 @@
 
 // ----------------------------------------------------------------------------
 template<typename Driver>
+xpcc::CanConnector<Driver>::CanConnector(Driver *driver) :
+	canDriver(driver)
+{
+}
+
+template<typename Driver>
 xpcc::CanConnector<Driver>::~CanConnector()
 {
 }
@@ -74,7 +80,7 @@ xpcc::CanConnector<Driver>::sendPacket(const Header &header, SmartPointer payloa
 	bool fragmented = (payload.getSize() > 8);
 	
 	uint32_t identifier = convertToIdentifier(header, fragmented);
-	if (!fragmented && this->canDriver.isReadyToSend())
+	if (!fragmented && this->canDriver->isReadyToSend())
 	{
 		// try to send the message directly
 		successfull = this->sendMessage(identifier,
@@ -119,7 +125,7 @@ xpcc::CanConnector<Driver>::sendMessage(const uint32_t & identifier,
 	// copy payload data
 	std::memcpy(message.data, data, size);
 	
-	return this->canDriver.sendMessage(message);
+	return this->canDriver->sendMessage(message);
 }
 
 template<typename Driver>
@@ -182,7 +188,7 @@ bool
 xpcc::CanConnector<Driver>::retrieveMessage()
 {
 	can::Message message;
-	if (this->canDriver.getMessage(message))
+	if (this->canDriver->getMessage(message))
 	{
 		xpcc::Header header;
 		bool isFragment = convertToHeader(message.identifier, header);
@@ -287,7 +293,7 @@ template<typename Driver>
 void
 xpcc::CanConnector<Driver>::checkAndReceiveMessages()
 {
-	while (this->canDriver.isMessageAvailable()) {
+	while (this->canDriver->isMessageAvailable()) {
 		this->retrieveMessage();
 	}
 }

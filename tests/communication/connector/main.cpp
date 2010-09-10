@@ -33,7 +33,9 @@ FLASH(uint8_t canFilter[]) =
 	MCP2515_FILTER_EXTENDED(0),	// Mask 1
 };
 
-xpcc::CanConnector<CanDriver> connector;
+CanDriver mcp2515;
+
+xpcc::CanConnector<CanDriver> connector(&mcp2515);
 
 int
 main()
@@ -41,8 +43,6 @@ main()
 	CanSpi::initialize();
 	pin::CS::setOutput();
 	pin::INT::configure(xpcc::gpio::PULLUP);
-	
-	CanDriver mcp2515;
 	
 	mcp2515.initialize(xpcc::can::BITRATE_125_KBPS);
 	mcp2515.setFilter(xpcc::accessor::asFlash(canFilter));
