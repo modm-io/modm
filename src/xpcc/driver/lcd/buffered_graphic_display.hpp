@@ -55,18 +55,33 @@ namespace xpcc
 		clear();
 		
 		virtual void
-		clear(uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2);
+		update() = 0;
 		
+		//virtual void
+		//drawHorizontalLine(uint8_t x1, uint8_t y1, uint8_t length);
+		
+		//virtual void
+		//drawVerticalLine(uint8_t x1, uint8_t y1, uint8_t length);
+		
+		/**
+		 * \brief	Draw an image
+		 * 
+		 * \param x		upper left corner
+		 * \param y		upper left corner
+		 * \param image	image data
+		 * 
+		 * \see	GraphicDisplay::drawImage()
+		 */
+		virtual void
+		drawImage(uint8_t x, uint8_t y, xpcc::accessor::Flash<uint8_t> image);
+		
+	protected:
 		virtual void
 		setPixel(uint8_t x, uint8_t y);
 		
 		virtual void
 		clearPixel(uint8_t x, uint8_t y);
 		
-		virtual void
-		update() = 0;
-		
-	protected:
 		uint8_t buffer[128][8];
 	};
 }

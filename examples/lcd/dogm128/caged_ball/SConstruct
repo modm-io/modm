@@ -1,7 +1,7 @@
 # WARNING: This file is generated automatically, do not edit!
 
 # path to the xpcc root directory
-rootpath = '../../..'
+rootpath = '../../../..'
 
 env = Environment(tools = ['xpcc'], toolpath = [rootpath + '/misc/scons'])
 

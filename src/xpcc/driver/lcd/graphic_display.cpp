@@ -35,6 +35,36 @@
 
 #include "graphic_display.hpp"
 
+// ----------------------------------------------------------------------------
+xpcc::GraphicDisplay::GraphicDisplay() :
+	draw(&xpcc::GraphicDisplay::setPixel)
+{
+}
+
+// ----------------------------------------------------------------------------
+void
+xpcc::GraphicDisplay::setColor(Color color)
+{
+	switch (color)
+	{
+		case BLACK:
+			draw = &xpcc::GraphicDisplay::setPixel;
+			break;
+			
+		case WHITE:
+			draw = &xpcc::GraphicDisplay::clearPixel;
+			break;
+	}
+	this->color = color;
+}
+
+// ----------------------------------------------------------------------------
+void
+xpcc::GraphicDisplay::drawPixel(uint8_t x, uint8_t y)
+{
+	(this->*draw)(x, y);
+}
+
 void
 xpcc::GraphicDisplay::drawLine(uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2)
 {
@@ -84,10 +114,10 @@ xpcc::GraphicDisplay::drawLine(uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2)
 		for (uint8_t x = x1; x < x2; ++x)
 		{
 			if (steep) {
-				this->setPixel(y, x);
+				(this->*draw)(y, x);
 			}
 			else {
-				this->setPixel(x, y);
+				(this->*draw)(x, y);
 			}
 			error = error - deltaY;
 			if (error < 0) {
@@ -102,7 +132,7 @@ void
 xpcc::GraphicDisplay::drawHorizontalLine(uint8_t x, uint8_t y, uint8_t length)
 {
 	for (uint8_t i = x; i < x + length; ++i) {
-		this->setPixel(i, y);
+		(this->*draw)(i, y);
 	}
 }
 
@@ -110,7 +140,7 @@ void
 xpcc::GraphicDisplay::drawVerticalLine(uint8_t x, uint8_t y, uint8_t length)
 {
 	for (uint8_t i = y; i < y + length; ++i) {
-		this->setPixel(x, i);
+		(this->*draw)(x, i);
 	}
 }
 
@@ -141,15 +171,15 @@ xpcc::GraphicDisplay::drawRoundedRectangle(uint8_t x, uint8_t y,
 	
 	while (x1 <= y1)
 	{
-		this->setPixel(x + radius - x1, y + radius - y1);
-		this->setPixel(x + radius - x1, y + height - radius + y1);
-		this->setPixel(x + radius - y1, y + radius - x1);
-		this->setPixel(x + radius - y1, y + height - radius + x1);
+		(this->*draw)(x + radius - x1, y + radius - y1);
+		(this->*draw)(x + radius - x1, y + height - radius + y1);
+		(this->*draw)(x + radius - y1, y + radius - x1);
+		(this->*draw)(x + radius - y1, y + height - radius + x1);
 		
-		this->setPixel(x + width - radius + x1, y + radius - y1);
-		this->setPixel(x + width - radius + x1, y + height - radius + y1);
-		this->setPixel(x + width - radius + y1, y + radius - x1);
-		this->setPixel(x + width - radius + y1, y + height - radius + x1);
+		(this->*draw)(x + width - radius + x1, y + radius - y1);
+		(this->*draw)(x + width - radius + x1, y + height - radius + y1);
+		(this->*draw)(x + width - radius + y1, y + radius - x1);
+		(this->*draw)(x + width - radius + y1, y + height - radius + x1);
 		
 		if (f < 0) {
 			f += (4 * x1 + 6);
@@ -200,10 +230,10 @@ xpcc::GraphicDisplay::drawCircle(uint8_t cx, uint8_t cy, uint8_t radius)
 void
 xpcc::GraphicDisplay::drawCircle4(uint8_t cx, uint8_t cy, uint8_t x, uint8_t y)
 {
-	this->setPixel(cx + x, cy + y);
-	this->setPixel(cx - x, cy - y);
-	if (x != 0) { this->setPixel(cx - x, cy + y); }
-	if (y != 0) { this->setPixel(cx + x, cy - y); }
+	(this->*draw)(cx + x, cy + y);
+	(this->*draw)(cx - x, cy - y);
+	if (x != 0) { (this->*draw)(cx - x, cy + y); }
+	if (y != 0) { (this->*draw)(cx + x, cy - y); }
 }
 
 void
@@ -218,7 +248,7 @@ xpcc::GraphicDisplay::drawEllipse(uint8_t cx, uint8_t cy, uint8_t rx, uint8_t ry
 	int32_t fx = 0;
 	int32_t fy = rx_2 * 2 * ry;
 	
-	int32_t p = (int) (ry_2 - (rx_2 * ry) + (0.25 * rx_2) + 0.5);
+	int32_t p = ry_2 - (rx_2 * ry) + (rx_2 + 2) / 4;
 	
 	drawCircle4(cx, cy, x, y);
 	while (fx < fy)
@@ -237,9 +267,11 @@ xpcc::GraphicDisplay::drawEllipse(uint8_t cx, uint8_t cy, uint8_t rx, uint8_t ry
 		
 		drawCircle4(cx, cy, x, y);
 	}
-
-	p = (int) ((ry_2 * (x + 0.5) * (x + 0.5)) + (rx_2 * (y - 1) * (y - 1)) - (rx_2
-			* ry_2) + 0.5);
+	
+	p = ((ry_2 * (4 * x * x + 4 * x + 1) / 2) + 
+		 2 * (rx_2 * (y - 1) * (y - 1)) -
+		 2 * (rx_2 * ry_2)
+		 + 1) / 2;
 	
 	while (y > 0) {
 		y--;
@@ -258,13 +290,42 @@ xpcc::GraphicDisplay::drawEllipse(uint8_t cx, uint8_t cy, uint8_t rx, uint8_t ry
 	}
 }
 
+// ----------------------------------------------------------------------------
+void
+xpcc::GraphicDisplay::drawImage(uint8_t x, uint8_t y,
+		xpcc::accessor::Flash<uint8_t> image)
+{
+	uint8_t width = image[0];
+	uint8_t height = image[1];
+	uint8_t rows = (height + 7) / 8;
+	
+	for (uint8_t i = 0; i < width; i++)
+	{
+		for (uint8_t k = 0; k < rows; k++)
+		{
+			uint8_t byte = image[2 + i + k * width];
+			for (uint8_t j = 0; j < 8; j++)
+			{
+				if (byte & 0x01) {
+					this->setPixel(x + i, y + k * 8 + j);
+				}
+				else {
+					this->clearPixel(x + i, y + k * 8 + j);
+				}
+				byte >>= 1;
+			}
+		}
+	}
+}
+
+// ----------------------------------------------------------------------------
 void
 xpcc::GraphicDisplay::fillRectangle(uint8_t x, uint8_t y,
 		uint8_t width, uint8_t height)
 {
 	for (uint8_t i = x; (i < x + width) && (i < 128); i++) {
 		for (uint8_t k = y; (k < y + height) && (k < 64); k++) {
-			setPixel(i, k);
+			(this->*draw)(i, k);
 		}
 	}
 }

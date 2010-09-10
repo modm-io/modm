@@ -34,6 +34,7 @@
 #define XPCC__GRAPHIC_DISPLAY_HPP
 
 #include <stdint.h>
+#include <xpcc/architecture/driver/accessor.hpp>
 
 namespace xpcc
 {
@@ -45,6 +46,15 @@ namespace xpcc
 	class GraphicDisplay
 	{
 	public:
+		enum Color
+		{
+			BLACK = 0,
+			WHITE = 1
+		};
+		
+	public:
+		GraphicDisplay();
+		
 		virtual
 		~GraphicDisplay()
 		{
@@ -53,14 +63,17 @@ namespace xpcc
 		virtual void
 		clear() = 0;
 		
-		virtual void
-		clear(uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2) = 0;
+		void
+		setColor(Color color);
 		
-		virtual void
-		setPixel(uint8_t x, uint8_t y) = 0;
+		inline Color
+		getColor() const
+		{
+			return this->color;
+		}
 		
-		virtual void
-		clearPixel(uint8_t x, uint8_t y) = 0;
+		void
+		drawPixel(uint8_t x, uint8_t y);
 		
 		/**
 		 * \brief	Draw line
@@ -92,7 +105,7 @@ namespace xpcc
 				uint8_t radius);
 		
 		/**
-		 * \brief	Draw a cricle
+		 * \brief	Draw a circle
 		 * 
 		 * Uses the midpoint circle algorithm.
 		 * 
@@ -102,8 +115,31 @@ namespace xpcc
 		void
 		drawCircle(uint8_t cx, uint8_t cy, uint8_t radius);
 		
+		/**
+		 * \brief	Draw an ellipse
+		 * 
+		 * Uses a variation of the midpoint algorithm. May be improved through
+		 * simplification of the uses formulas.
+		 * 
+		 * \param cx	x-center
+		 * \param cy	y-center
+		 * \param rx	radius in x-direction
+		 * \param ry	radius in y-direction
+		 */
 		void
 		drawEllipse(uint8_t cx, uint8_t cy, uint8_t rx, uint8_t ry);
+		
+		/**
+		 * \brief	Draw an image
+		 * 
+		 * \param x		upper left corner
+		 * \param y		upper left corner
+		 * \param image	image data
+		 * 
+		 * \see	GraphicDisplay::drawImage()
+		 */
+		virtual void
+		drawImage(uint8_t x, uint8_t y, xpcc::accessor::Flash<uint8_t> image);
 		
 		void
 		fillRectangle(uint8_t x, uint8_t y, uint8_t width, uint8_t height);
@@ -112,6 +148,17 @@ namespace xpcc
 		/// helper method for drawCircle()
 		void
 		drawCircle4(uint8_t cx, uint8_t cy, uint8_t x, uint8_t y);
+		
+		virtual void
+		setPixel(uint8_t x, uint8_t y) = 0;
+		
+		virtual void
+		clearPixel(uint8_t x, uint8_t y) = 0;
+		
+		// callback function for drawing pixels
+		void (GraphicDisplay::*draw)(uint8_t x, uint8_t y);
+		
+		Color color;
 	};
 }
 

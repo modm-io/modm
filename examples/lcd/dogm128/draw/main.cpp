@@ -39,32 +39,23 @@ main()
 	
 	display.initialize();
 	
-	/*
-	display.drawLine(0, 0, 50, 50);
-	
-	display.drawLine(20, 20, 70, 20);
-	display.drawLine(20, 20, 70, 30);
-	
-	display.drawLine(50, 20, 50, 50);
-	display.drawLine(50, 20, 60, 50);
-	
-	display.drawHorizontalLine(10, 10, 50);
+	display.drawHorizontalLine(0, 50, 60);
 	display.drawVerticalLine(20, 20, 30);
 	
 	display.drawRoundedRectangle(80, 10, 20, 20, 3);
 	
-	display.drawLine(30, 0, 10, 50);
-	display.fillRectangle(80, 40, 10, 20);
-	
 	display.drawCircle(105, 25, 20);
-	*/
 	
-	display.drawEllipse(40, 25, 20, 18);
-	
-	display.drawEllipse(105, 25, 10, 25);
-	display.drawEllipse(60, 40, 20, 10);
-	
+	display.drawEllipse(50, 25, 20, 18);
 	display.drawEllipse(63, 31, 63, 31);
+	
+	display.fillRectangle(10, 10, 20, 20);
+	
+	display.setColor(xpcc::GraphicDisplay::WHITE);
+	display.fillRectangle(20, 20, 20, 20);
+	
+	display.setColor(xpcc::GraphicDisplay::BLACK);
+	display.drawLine(0, 0, 127, 63);
 	
 	display.update();
 	

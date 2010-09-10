@@ -30,8 +30,11 @@
  */
 // ----------------------------------------------------------------------------
 
+#include <stdlib.h>
+
 #include "buffered_graphic_display.hpp"
 
+// ----------------------------------------------------------------------------
 void
 xpcc::BufferedGraphicDisplay::clear()
 {
@@ -42,18 +45,36 @@ xpcc::BufferedGraphicDisplay::clear()
 	}
 }
 
+// ----------------------------------------------------------------------------
 void
-xpcc::BufferedGraphicDisplay::clear(uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2)
+xpcc::BufferedGraphicDisplay::drawImage(uint8_t x, uint8_t y,
+		xpcc::accessor::Flash<uint8_t> image)
 {
-	for (uint8_t i = x1; (i < x2) && (i < 128); i++)
+	div_t row = div(y, 8);
+	if (row.rem == 0)
 	{
-		for (uint8_t k = y1; (k < y2) && (k < 64); k++)
+		uint8_t width = image[0];
+		uint8_t height = image[1];
+		
+		uint8_t rows = (height + 7) / 8;
+		
+		if (rows == height / 8)
 		{
-			clearPixel(i, k);
+			for (uint8_t i = 0; i < width; i++)
+			{
+				for (uint8_t k = 0; k < rows; k++)
+				{
+					this->buffer[x + i][k + row.quot] = image[2 + i + k * width];
+				}
+			}
+			return;
 		}
 	}
+	
+	GraphicDisplay::drawImage(x, y, image);
 }
 
+// ----------------------------------------------------------------------------
 void
 xpcc::BufferedGraphicDisplay::setPixel(uint8_t x, uint8_t y)
 {

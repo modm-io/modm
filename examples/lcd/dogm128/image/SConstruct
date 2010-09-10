@@ -1,0 +1,36 @@
+# WARNING: This file is generated automatically, do not edit!
+
+# path to the xpcc root directory
+rootpath = '../../../..'
+
+env = Environment(tools = ['xpcc', 'bitmap'], toolpath = [rootpath + '/misc/scons'])
+
+for image in Glob('img/*.pbm'):
+	env.Alias('bitmaps', env.Bitmap(image))
+
+# find all source files
+files = env.FindFiles('.')
+
+# build the program
+program = env.Program(target = env['XPCC_CONFIG']['general']['name'], source = files.sources)
+
+env.Depends(program, 'bitmaps')
+
+# build the xpcc library
+env.XpccLibrary()
+
+# create a file called 'defines.hpp' with all preprocessor defines if necessary
+env.Defines()
+
+env.Alias('size', env.Size(program))
+env.Alias('symbols', env.Symbols(program))
+env.Alias('defines', env.ShowDefines())
+
+hexfile = env.Hex(program)
+env.Alias('program', env.Avrdude(hexfile))
+
+env.Alias('build', [hexfile, env.Listing(program)])
+env.Alias('fuse', env.AvrdudeFuses())
+env.Alias('all', ['build', 'size'])
+
+env.Default('all')
