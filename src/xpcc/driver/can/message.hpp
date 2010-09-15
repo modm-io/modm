@@ -38,12 +38,14 @@
 namespace xpcc
 {
 	/**
-	 * \author	Fabian Greif
 	 * \ingroup	can
 	 */
 	namespace can
 	{
-		/** \brief	supported bitrates */
+		/**
+		 * \brief	Supported CAN bitrates
+		 * \ingroup	can
+		 */
 		enum Bitrate
 		{
 			BITRATE_10_KBPS	= 0,
@@ -63,7 +65,10 @@ namespace xpcc
 			LOOPBACK,
 		};
 		
-		/** \brief	Representation of a CAN message */
+		/**
+		 * \brief	Representation of a CAN message
+		 * \ingroup	can
+		 */
 		struct Message
 		{
 			Message(const uint32_t& identifier = 0, uint8_t length = 0) :

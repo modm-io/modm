@@ -329,3 +329,34 @@ xpcc::GraphicDisplay::fillRectangle(uint8_t x, uint8_t y,
 		}
 	}
 }
+
+void
+xpcc::GraphicDisplay::fillCircle(uint8_t cx, uint8_t cy, uint8_t radius)
+{
+	int8_t f = 1 - radius;
+	int8_t ddF_x = 0;
+	int8_t ddF_y = -2 * radius;
+	uint8_t x = 0;
+	uint8_t y = radius;
+	
+	this->drawVerticalLine(cx, cy - radius, 2 * radius);
+	this->drawHorizontalLine(cx - radius, cy, 2* radius);
+	
+	while(x < y)
+	{
+		if (f >= 0)
+		{
+			y--;
+			ddF_y += 2;
+			f += ddF_y;
+		}
+		x++;
+		ddF_x += 2;
+		f += ddF_x + 1;
+		
+		this->drawVerticalLine(cx + x, cy - y, 2 * y);
+		this->drawVerticalLine(cx + y, cy - x, 2 * x);
+		this->drawVerticalLine(cx - x, cy - y, 2 * y);
+		this->drawVerticalLine(cx - y, cy - x, 2 * x);
+	}
+}

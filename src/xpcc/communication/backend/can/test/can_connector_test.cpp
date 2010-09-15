@@ -88,14 +88,15 @@ CanConnectorTest::createMessage(xpcc::can::Message& message,
 void
 CanConnectorTest::setUp()
 {
-	this->connector = new TestingCanConnector();
-	this->driver = this->connector->getCanDriver();
+	this->driver = new FakeCanDriver();
+	this->connector = new TestingCanConnector(this->driver);
 }
 
 void
 CanConnectorTest::tearDown()
 {
 	delete this->connector;
+	delete this->driver;
 }
 
 // ----------------------------------------------------------------------------

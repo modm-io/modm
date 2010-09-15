@@ -37,7 +37,13 @@
 #include <xpcc/architecture/driver/accessor.hpp>
 #include <xpcc/architecture/driver/time.hpp>
 
+#include "mcp2515/mcp2515_definitions.hpp"
 #include "message.hpp"
+
+/**
+ * \defgroup	mcp2515	MCP2515
+ * \ingroup		can
+ */
 
 /**
  * \name	Restructure filter and mask bits for the MCP2515
@@ -60,7 +66,7 @@
  * 
  * \warning	Do not use this macro for variables, only for static values
  *			known at compile-time.
- * \ingroup	can
+ * \ingroup	mcp2515
  */
 //\{
 #if defined(__DOXYGEN__)
@@ -140,6 +146,19 @@ namespace xpcc
 		sendMessage(const can::Message& message);
 		
 	protected:
+		enum SpiCommand
+		{
+			RESET = 0xC0,
+			READ = 0x03,
+			READ_RX = 0x90,
+			WRITE = 0x02,
+			WRITE_TX = 0x40,
+			RTS	= 0x80,
+			READ_STATUS = 0xA0,
+			RX_STATUS = 0xB0,
+			BIT_MODIFY = 0x05
+		};
+		
 		static void
 		writeRegister(uint8_t address, uint8_t data);
 		

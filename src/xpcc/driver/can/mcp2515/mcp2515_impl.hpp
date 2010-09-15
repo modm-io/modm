@@ -34,10 +34,9 @@
 	#error	"Don't include this file directly, use 'mcp2515.hpp' instead!"
 #endif
 
-#if !defined(__AVR_AT90CAN128__)
-
 #include "mcp2515_definitions.hpp"
 
+// ----------------------------------------------------------------------------
 template <typename SPI, typename CS, typename INT>
 SPI xpcc::Mcp2515<SPI, CS, INT>::spi;
 
@@ -47,41 +46,53 @@ CS xpcc::Mcp2515<SPI, CS, INT>::chipSelect;
 template <typename SPI, typename CS, typename INT>
 INT xpcc::Mcp2515<SPI, CS, INT>::interruptPin;
 
-namespace xpcc {
-	namespace mcp2515 {
+// ----------------------------------------------------------------------------
+namespace xpcc
+{
+	namespace mcp2515
+	{
 		EXTERN_FLASH(uint8_t configuration[24]);
 	}
 }
 
+// ----------------------------------------------------------------------------
 template <typename SPI, typename CS, typename INT>
 bool
 xpcc::Mcp2515<SPI, CS, INT>::initialize(can::Bitrate bitrate)
 {
-	// software reset for the mcp2515, after this he is back in the
+	using namespace mcp2515;
+	
+	// software reset for the mcp2515, after this the chip is back in the
 	// configuration mode
 	chipSelect.reset();
-	spi.write(SPI_RESET);
+	spi.write(RESET);
 	xpcc::delay_ms(1);
 	chipSelect.set();
 	
-	// wait a bit to give the mcp2515 some time to restart
+	// wait a bit to give the MCP2515 some time to restart
 	xpcc::delay_ms(30);
 	
 	chipSelect.reset();
-	spi.write(SPI_WRITE);
+	spi.write(WRITE);
 	spi.write(CNF3);
 	
 	accessor::Flash<uint8_t> cfgPtr(mcp2515::configuration);
 	for (uint8_t i = 0; i < 3; ++i)
 	{
-		spi.write(cfgPtr[bitrate * 3 + i]);	// load CNF1..3
+		// load CNF1..3
+		spi.write(cfgPtr[bitrate * 3 + i]);
 	}
-	spi.write((1 << RX1IE) | (1 << RX0IE));		// enable interrupts
+	
+	// enable interrupts
+	spi.write(RX1IE | RX0IE);
 	chipSelect.set();
 	
-	writeRegister(TXRTSCTRL, 0);	// set TXnRTS pins as inwrites
-	writeRegister(BFPCTRL, 0);		// disable RXnBF pins (high impedance state)
-
+	// set TXnRTS pins as inwrites
+	writeRegister(TXRTSCTRL, 0);
+	
+	// disable RXnBF pins (high impedance state)
+	writeRegister(BFPCTRL, 0);
+	
 	// check if we could read back some of the values
 	if (readRegister(CNF2) != cfgPtr[bitrate * 3 + 1])
 	{
@@ -92,31 +103,33 @@ xpcc::Mcp2515<SPI, CS, INT>::initialize(can::Bitrate bitrate)
 	// reset device to normal mode and disable the clkout pin and
 	// wait until the new mode is active
 	writeRegister(CANCTRL, 0);
-	while ((readRegister(CANSTAT) & 0xe0) != 0)
-		;
+	while ((readRegister(CANSTAT) &
+			(OPMOD2 | OPMOD1 | OPMOD0)) != 0) {
+	}
 	
 	return true;
 }
 
 // ----------------------------------------------------------------------------
-
 template <typename SPI, typename CS, typename INT>
 void
 xpcc::Mcp2515<SPI, CS, INT>::setFilter(accessor::Flash<uint8_t> filter)
 {
+	using namespace mcp2515;
+	
 	// change to configuration mode
-	bitModify(CANCTRL, 0xe0, (1<<REQOP2));
-	while ((readRegister(CANSTAT) & 0xe0) != (1<<REQOP2))
+	bitModify(CANCTRL, 0xe0, REQOP2);
+	while ((readRegister(CANSTAT) & 0xe0) != REQOP2)
 		;
 	
-	writeRegister(RXB0CTRL, (1<<BUKT));
+	writeRegister(RXB0CTRL, BUKT);
 	writeRegister(RXB1CTRL, 0);
     
 	uint8_t i, j;
 	for (i = 0; i < 0x30; i += 0x10)
 	{
 		chipSelect.reset();
-		spi.write(SPI_WRITE);
+		spi.write(WRITE);
 		spi.write(i);
 		
 		for (j = 0; j < 12; j++) 
@@ -133,29 +146,29 @@ xpcc::Mcp2515<SPI, CS, INT>::setFilter(accessor::Flash<uint8_t> filter)
 }
 
 // ----------------------------------------------------------------------------
-
 template <typename SPI, typename CS, typename INT>
 void
 xpcc::Mcp2515<SPI, CS, INT>::setMode(can::Mode mode)
 {
-	uint8_t reg = 0;
+	using namespace mcp2515;
 	
+	uint8_t reg = 0;
 	if (mode == can::LISTEN_ONLY) {
-		reg = (1<<REQOP1)|(1<<REQOP0);
+		reg = REQOP1 | REQOP0;
 	}
 	else if (mode == can::LOOPBACK) {
-		reg = (1<<REQOP1);
+		reg = REQOP1;
 	}
 		
 	// set the new mode
-	bitModify(CANCTRL, (1<<REQOP2)|(1<<REQOP1)|(1<<REQOP0), reg);
-	while ((readRegister(CANSTAT) & 0xe0) != reg) {
+	bitModify(CANCTRL, REQOP2 | REQOP1 | REQOP0, reg);
+	
+	while ((readRegister(CANSTAT) &	(OPMOD2 | OPMOD1 | OPMOD0)) != reg) {
 		// wait for the new mode to become active
 	}
 }
 
 // ----------------------------------------------------------------------------
-
 template <typename SPI, typename CS, typename INT>
 bool
 xpcc::Mcp2515<SPI, CS, INT>::isMessageAvailable()
@@ -164,29 +177,29 @@ xpcc::Mcp2515<SPI, CS, INT>::isMessageAvailable()
 }
 
 // ----------------------------------------------------------------------------
-
 template <typename SPI, typename CS, typename INT>
 bool
 xpcc::Mcp2515<SPI, CS, INT>::getMessage(can::Message& message)
 {
-	uint8_t addr;
-	uint8_t status = readStatus(SPI_RX_STATUS);
+	using namespace mcp2515;
 	
-	if (status & (1 << 6)) {
-		addr = SPI_READ_RX;			// message in buffer 0
+	uint8_t status = readStatus(RX_STATUS);
+	uint8_t address;
+	if (status & FLAG_RXB0_FULL) {
+		address = READ_RX;			// message in buffer 0
 	}
-	else if (status & (1 << 7)) {
-		addr = SPI_READ_RX | 0x04;	// message in buffer 1
+	else if (status & FLAG_RXB1_FULL) {
+		address = READ_RX | 0x04;	// message in buffer 1 (RXB1SIDH)
 	}
 	else {
 		return false;				// Error: no message available
 	}
 	
 	chipSelect.reset();
-	spi.write(addr);
+	spi.write(address);
 	
 	message.flags.extended = readIdentifier(message.identifier);
-	message.flags.rtr = (status & (1 << 3)) ? true : false;
+	message.flags.rtr = (status & FLAG_RTR) ? true : false;
 	message.length = spi.write(0xff) & 0x0f;
 	
 	for (uint8_t i = 0; i < message.length; ++i) {
@@ -195,11 +208,11 @@ xpcc::Mcp2515<SPI, CS, INT>::getMessage(can::Message& message)
 	chipSelect.set();
 	
 	// clear interrupt flag
-	if (status & (1 << 6)) {
-		bitModify(CANINTF, (1<<RX0IF), 0);
+	if (status & FLAG_RXB0_FULL) {
+		bitModify(CANINTF, RX0IF, 0);
 	}
 	else {
-		bitModify(CANINTF, (1<<RX1IF), 0);
+		bitModify(CANINTF, RX1IF, 0);
 	}
 	
 	return true;
@@ -211,8 +224,13 @@ template <typename SPI, typename CS, typename INT>
 bool
 xpcc::Mcp2515<SPI, CS, INT>::isReadyToSend()
 {
-	if ((readStatus(SPI_READ_STATUS) & 0x54) == 0x54) {
-		return false;		// all buffers used
+	using namespace mcp2515;
+	
+	if ((readStatus(READ_STATUS) & (TXB2CNTRL_TXREQ | TXB1CNTRL_TXREQ | TXB0CNTRL_TXREQ)) ==
+			(TXB2CNTRL_TXREQ | TXB1CNTRL_TXREQ | TXB0CNTRL_TXREQ))
+	{
+		// all buffers currently in use
+		return false;
 	}
 	else {
 		return true;
@@ -225,24 +243,18 @@ template <typename SPI, typename CS, typename INT>
 bool
 xpcc::Mcp2515<SPI, CS, INT>::sendMessage(const can::Message& message)
 {
-	uint8_t status = readStatus(SPI_READ_STATUS);
+	using namespace mcp2515;
 	
-	// statusbyte:
-	//
-	// bit | function
-	// ----+------------------
-	//  2  | TXB0CNTRL.TXREQ
-	//  4  | TXB1CNTRL.TXREQ
-	//  6  | TXB2CNTRL.TXREQ
+	uint8_t status = readStatus(READ_STATUS);
 	uint8_t address;
-	if ((status & (1 << 2)) == 0) {
-		address = 0x00;
+	if ((status & TXB0CNTRL_TXREQ) == 0) {
+		address = 0x00;		// TXB0SIDH
 	}
-	else if ((status & (1 << 4)) == 0) {
-		address = 0x02;
+	else if ((status & TXB1CNTRL_TXREQ) == 0) {
+		address = 0x02;		// TXB1SIDH
 	} 
-	else if ((status & (1 << 6)) == 0) {
-		address = 0x04;
+	else if ((status & TXB2CNTRL_TXREQ) == 0) {
+		address = 0x04;		// TXB2SIDH
 	}
 	else {
 		// all buffer are in use => could not send the message
@@ -250,20 +262,17 @@ xpcc::Mcp2515<SPI, CS, INT>::sendMessage(const can::Message& message)
 	}
 	
 	chipSelect.reset();
-	spi.write(SPI_WRITE_TX | address);
+	spi.write(WRITE_TX | address);
 	writeIdentifier(message.identifier, message.flags.extended);
 	
 	// if the message is a rtr-frame, is has a length but no attached data
-	if (message.flags.rtr)
-	{
-		spi.write((1 << RTR) | message.length);
+	if (message.flags.rtr) {
+		spi.write(MCP2515_RTR | message.length);
 	}
-	else
-	{
+	else {
 		spi.write(message.length);
 		
-		for (uint8_t i = 0; i < message.length; ++i)
-		{
+		for (uint8_t i = 0; i < message.length; ++i) {
 			spi.write(message.data[i]);
 		}
 	}
@@ -274,7 +283,7 @@ xpcc::Mcp2515<SPI, CS, INT>::sendMessage(const can::Message& message)
 	// send message via RTS command
 	chipSelect.reset();
 	address = (address == 0) ? 1 : address;	// 0 2 4 => 1 2 4
-	spi.write(SPI_RTS | address);
+	spi.write(RTS | address);
 	chipSelect.set();
 	
 	return address;
@@ -288,7 +297,7 @@ xpcc::Mcp2515<SPI, CS, INT>::writeRegister(uint8_t address, uint8_t data)
 {
 	chipSelect.reset();
 	
-	spi.write(SPI_WRITE);
+	spi.write(WRITE);
 	spi.write(address);
 	spi.write(data);
 	
@@ -299,13 +308,11 @@ template <typename SPI, typename CS, typename INT>
 uint8_t
 xpcc::Mcp2515<SPI, CS, INT>::readRegister(uint8_t address)
 {
-	uint8_t data;
-	
 	chipSelect.reset();
 	
-	spi.write(SPI_READ);
+	spi.write(READ);
 	spi.write(address);
-	data = spi.write(0xff);
+	uint8_t data = spi.write(0xff);
 	
 	chipSelect.set();
 	
@@ -318,7 +325,7 @@ xpcc::Mcp2515<SPI, CS, INT>::bitModify(uint8_t address, uint8_t mask, uint8_t da
 {
 	chipSelect.reset();
 	
-	spi.write(SPI_BIT_MODIFY);
+	spi.write(BIT_MODIFY);
 	spi.write(address);
 	spi.write(mask);
 	spi.write(data);
@@ -330,12 +337,10 @@ template <typename SPI, typename CS, typename INT>
 uint8_t
 xpcc::Mcp2515<SPI, CS, INT>::readStatus(uint8_t type)
 {
-	uint8_t data;
-	
 	chipSelect.reset();
 	
 	spi.write(type);
-	data = spi.write(0xff);
+	uint8_t data = spi.write(0xff);
 	
 	chipSelect.set();
 	
@@ -349,20 +354,21 @@ void
 xpcc::Mcp2515<SPI, CS, INT>::writeIdentifier(const uint32_t& identifier,
 											 bool isExtendedFrame)
 {
+	using namespace mcp2515;
+	
 	const uint32_t *ptr = &identifier;
 	
 	if (isExtendedFrame)
 	{
-		uint8_t tmp;
-		
 		spi.write(*((uint16_t *) ptr + 1) >> 5);
 		
 		// calculate the next values
-		tmp  = (*((uint8_t *) ptr + 2) << 3) & 0xe0;
-		tmp |= (1 << IDE);
-		tmp |= (*((uint8_t *) ptr + 2)) & 0x03;
+		uint8_t temp;
+		temp  = (*((uint8_t *) ptr + 2) << 3) & 0xe0;
+		temp |= MCP2515_IDE;
+		temp |= (*((uint8_t *) ptr + 2)) & 0x03;
 		
-		spi.write(tmp);
+		spi.write(temp);
 		spi.write(*((uint8_t *) ptr + 1));
 		spi.write(*((uint8_t *) ptr));
 	}
@@ -379,24 +385,27 @@ template <typename SPI, typename CS, typename INT>
 bool
 xpcc::Mcp2515<SPI, CS, INT>::readIdentifier(uint32_t& identifier)
 {
+	using namespace mcp2515;
+	
 	uint32_t *ptr = &identifier;
 	
-	uint8_t first = spi.write(0xff);
-	uint8_t tmp   = spi.write(0xff);
+	uint8_t first  = spi.write(0xff);
+	uint8_t second = spi.write(0xff);
 	
-	if (tmp & (1 << IDE))
+	if (second & MCP2515_IDE)
 	{
 		*((uint16_t *) ptr + 1)  = (uint16_t) first << 5;
 		*((uint8_t *)  ptr + 1)  = spi.write(0xff);
 		
-		*((uint8_t *)  ptr + 2) |= (tmp >> 3) & 0x1C;
-		*((uint8_t *)  ptr + 2) |=  tmp & 0x03;
+		*((uint8_t *)  ptr + 2) |= (second >> 3) & 0x1C;
+		*((uint8_t *)  ptr + 2) |=  second & 0x03;
 		
 		*((uint8_t *)  ptr)      = spi.write(0xff);
 		
 		return true;
 	}
-	else {
+	else
+	{
 		spi.write(0xff);
 		
 		*((uint8_t *)  ptr + 3) = 0;
@@ -406,10 +415,8 @@ xpcc::Mcp2515<SPI, CS, INT>::readIdentifier(uint32_t& identifier)
 		
 		spi.write(0xff);
 		
-		*((uint8_t *) ptr) |= tmp >> 5;
+		*((uint8_t *) ptr) |= second >> 5;
 		
 		return false;
 	}
 }
-
-#endif	// !__AVR_AT90CAN128__

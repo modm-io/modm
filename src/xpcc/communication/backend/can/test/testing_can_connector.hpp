@@ -39,13 +39,9 @@
 class TestingCanConnector : public xpcc::CanConnector<FakeCanDriver>
 {
 public:
-	// expose internal variables for testing
-	inline FakeCanDriver*
-	getCanDriver()
-	{
-		return &this->canDriver;
-	}
+	TestingCanConnector(FakeCanDriver *driver);
 	
+	// expose the internal variable for testing
 	using xpcc::CanConnector<FakeCanDriver>::messageCounter;
 };
 

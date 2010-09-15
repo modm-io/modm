@@ -28,288 +28,413 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	MCP2515_DEFINITIONS_HPP
-#define	MCP2515_DEFINITIONS_HPP
+#ifndef	XPCC_MCP2515__DEFINITIONS_HPP
+#define	XPCC_MCP2515__DEFINITIONS_HPP
 
-// TODO: Put these values in enums or declare them as real constants
-/** \ingroupe can */
-/*\{*/
+namespace xpcc
+{
+	namespace mcp2515
+	{
+		/**
+		 * \brief	Adressen der Register des MCP2515
+		 * 
+		 * Die Redundanten Adressen von z.B. dem Register CANSTAT 
+		 * (0x0E, 0x1E, 0x2E, ...) wurden dabei nicht mit aufgelistet.
+		 * 
+		 * \ingroup	mcp2515
+		 */
+		enum Register
+		{
+			RXF0SIDH = 0x00,
+			RXF0SIDL = 0x01,
+			RXF0EID8 = 0x02,
+			RXF0EID0 = 0x03,
+			RXF1SIDH = 0x04,
+			RXF1SIDL = 0x05,
+			RXF1EID8 = 0x06,
+			RXF1EID0 = 0x07,
+			RXF2SIDH = 0x08,
+			RXF2SIDL = 0x09,
+			RXF2EID8 = 0x0A,
+			RXF2EID0 = 0x0B,
+			BFPCTRL = 0x0C,
+			TXRTSCTRL = 0x0D,
+			CANSTAT = 0x0E,
+			CANCTRL = 0x0F,
+			
+			RXF3SIDH = 0x10,
+			RXF3SIDL = 0x11,
+			RXF3EID8 = 0x12,
+			RXF3EID0 = 0x13,
+			RXF4SIDH = 0x14,
+			RXF4SIDL = 0x15,
+			RXF4EID8 = 0x16,
+			RXF4EID0 = 0x17,
+			RXF5SIDH = 0x18,
+			RXF5SIDL = 0x19,
+			RXF5EID8 = 0x1A,
+			RXF5EID0 = 0x1B,
+			TEC =  0x1C,
+			REC = 0x1D,
+			
+			RXM0SIDH = 0x20,
+			RXM0SIDL = 0x21,
+			RXM0EID8 = 0x22,
+			RXM0EID0 = 0x23,
+			RXM1SIDH = 0x24,
+			RXM1SIDL = 0x25,
+			RXM1EID8 = 0x26,
+			RXM1EID0 = 0x27,
+			CNF3 = 0x28,
+			CNF2 = 0x29,
+			CNF1 = 0x2A,
+			CANINTE = 0x2B,
+			CANINTF = 0x2C,
+			EFLG = 0x2D,
+			
+			TXB0CTRL = 0x30,
+			TXB0SIDH = 0x31,
+			TXB0SIDL = 0x32,
+			TXB0EID8 = 0x33,
+			TXB0EID0 = 0x34,
+			TXB0DLC = 0x35,
+			TXB0D0 = 0x36,
+			TXB0D1 = 0x37,
+			TXB0D2 = 0x38,
+			TXB0D3 = 0x39,
+			TXB0D4 = 0x3A,
+			TXB0D5 = 0x3B,
+			TXB0D6 = 0x3C,
+			TXB0D7 = 0x3D,
+			
+			TXB1CTRL = 0x40,
+			TXB1SIDH = 0x41,
+			TXB1SIDL = 0x42,
+			TXB1EID8 = 0x43,
+			TXB1EID0 = 0x44,
+			TXB1DLC = 0x45,
+			TXB1D0 = 0x46,
+			TXB1D1 = 0x47,
+			TXB1D2 = 0x48,
+			TXB1D3 = 0x49,
+			TXB1D4 = 0x4A,
+			TXB1D5 = 0x4B,
+			TXB1D6 = 0x4C,
+			TXB1D7 = 0x4D,
+			
+			TXB2CTRL = 0x50,
+			TXB2SIDH = 0x51,
+			TXB2SIDL = 0x52,
+			TXB2EID8 = 0x53,
+			TXB2EID0 = 0x54,
+			TXB2DLC = 0x55,
+			TXB2D0 = 0x56,
+			TXB2D1 = 0x57,
+			TXB2D2 = 0x58,
+			TXB2D3 = 0x59,
+			TXB2D4 = 0x5A,
+			TXB2D5 = 0x5B,
+			TXB2D6 = 0x5C,
+			TXB2D7 = 0x5D,
+			
+			RXB0CTRL = 0x60,
+			RXB0SIDH = 0x61,
+			RXB0SIDL = 0x62,
+			RXB0EID8 = 0x63,
+			RXB0EID0 = 0x64,
+			RXB0DLC = 0x65,
+			RXB0D0 = 0x66,
+			RXB0D1 = 0x67,
+			RXB0D2 = 0x68,
+			RXB0D3 = 0x69,
+			RXB0D4 = 0x6A,
+			RXB0D5 = 0x6B,
+			RXB0D6 = 0x6C,
+			RXB0D7 = 0x6D,
+			
+			RXB1CTRL = 0x70,
+			RXB1SIDH = 0x71,
+			RXB1SIDL = 0x72,
+			RXB1EID8 = 0x73,
+			RXB1EID0 = 0x74,
+			RXB1DLC = 0x75,
+			RXB1D0 = 0x76,
+			RXB1D1 = 0x77,
+			RXB1D2 = 0x78,
+			RXB1D3 = 0x79,
+			RXB1D4 = 0x7A,
+			RXB1D5 = 0x7B,
+			RXB1D6 = 0x7C,
+			RXB1D7 = 0x7D
+		};
+		
+		/**
+		 * \brief	Bitdefinition von BFPCTRL
+		 * \ingroup	mcp2515
+		 */
+		enum BFPCTRL
+		{
+			B1BFS = (1 << 5),
+			B0BFS = (1 << 4),
+			B1BFE = (1 << 3),
+			B0BFE = (1 << 2),
+			B1BFM = (1 << 1),
+			B0BFM = (1 << 0)
+		};
+		
+		/**
+		 * \brief	Bitdefinition von TXRTSCTRL
+		 * \ingroup	mcp2515
+		 */
+		enum TXRTSCTRL
+		{
+			B2RTS = (1 << 5),
+			B1RTS = (1 << 4),
+			B0RTS = (1 << 3),
+			B2RTSM = (1 << 2),
+			B1RTSM = (1 << 1),
+			B0RTSM = (1 << 0)
+		};
+		
+		/**
+		 * \brief	Bitdefinition von CANSTAT
+		 * \ingroup	mcp2515
+		 */
+		enum CANSTAT
+		{
+			OPMOD2 = (1 << 7),
+			OPMOD1 = (1 << 6),
+			OPMOD0 = (1 << 5),
+			ICOD2 = (1 << 3),
+			ICOD1 = (1 << 2),
+			ICOD0 = (1 << 1)
+		};
+		
+		/**
+		 * \brief	Bitdefinition von CANCTRL
+		 * \ingroup	mcp2515
+		 */
+		enum CANCTRL
+		{
+			REQOP2 = (1 << 7),
+			REQOP1 = (1 << 6),
+			REQOP0 = (1 << 5),
+			ABAT = (1 << 4),
+			CLKEN = (1 << 2),
+			CLKPRE1 = (1 << 1),
+			CLKPRE0 = (1 << 0)
+		};
+		
+		/**
+		 * \brief	Bitdefinition von CNF3
+		 * \ingroup	mcp2515
+		 */
+		enum CNF3
+		{
+			WAKFIL = (1 << 6),
+			PHSEG22 = (1 << 2),
+			PHSEG21 = (1 << 1),
+			PHSEG20 = (1 << 0)
+		};
+		
+		/**
+		 * \brief	Bitdefinition von CNF2
+		 * \ingroup	mcp2515
+		 */
+		enum CNF2
+		{
+			BTLMODE = (1 << 7),
+			SAM = (1 << 6),
+			PHSEG12 = (1 << 5),
+			PHSEG11 = (1 << 4),
+			PHSEG10 = (1 << 3),
+			PHSEG2 = (1 << 2),
+			PHSEG1 = (1 << 1),
+			PHSEG0 = (1 << 0)
+		};
+		
+		/**
+		 * \brief	Bitdefinition von CNF1
+		 * \ingroup	mcp2515
+		 */
+		enum CNF1
+		{
+			MCP2515_SJW1 = (1 << 7),	// also defined by the AT90CAN
+			MCP2515_SJW0 = (1 << 6),
+			MCP2515_BRP5 = (1 << 5),
+			MCP2515_BRP4 = (1 << 4),
+			MCP2515_BRP3 = (1 << 3),
+			MCP2515_BRP2 = (1 << 2),
+			MCP2515_BRP1 = (1 << 1),
+			MCP2515_BRP0 = (1 << 0)
+		};
+		
+		/**
+		 * \brief	Bitdefinition von CANINTE
+		 * \ingroup	mcp2515
+		 */
+		enum CANINTE
+		{
+			MERRE = (1 << 7),
+			WAKIE = (1 << 6),
+			ERRIE = (1 << 5),
+			TX2IE = (1 << 4),
+			TX1IE = (1 << 3),
+			TX0IE = (1 << 2),
+			RX1IE = (1 << 1),
+			RX0IE = (1 << 0)
+		};
+		
+		/**
+		 * \brief	Bitdefinition von CANINTF
+		 * \ingroup	mcp2515
+		 */
+		enum CANINTF
+		{
+			MERRF = (1 << 7),
+			WAKIF = (1 << 6),
+			ERRIF = (1 << 5),
+			TX2IF = (1 << 4),
+			TX1IF = (1 << 3),
+			TX0IF = (1 << 2),
+			RX1IF = (1 << 1),
+			RX0IF = (1 << 0)
+		};
+		
+		/**
+		 * \brief	Bitdefinition von EFLG
+		 * \ingroup	mcp2515
+		 */
+		enum EFLG
+		{
+			RX1OVR = (1 << 7),
+			RX0OVR = (1 << 6),
+			TXB0 = (1 << 5),
+			TXEP = (1 << 4),
+			RXEP = (1 << 3),
+			TXWAR = (1 << 2),
+			RXWAR = (1 << 1),
+			EWARN = (1 << 0)
+		};
+		
+		/**
+		 * \brief	Bitdefinition von TXBnCTRL (n = 0, 1), 2)
+		 * \ingroup	mcp2515
+		 */
+		enum TXBnCTRL
+		{
+			ABTF = (1 << 6),
+			MLOA = (1 << 5),
+			TXERR = (1 << 4),
+			TXREQ = (1 << 3),
+			TXP1 = (1 << 1),
+			TXP0 = (1 << 0)
+		};
+		
+		/**
+		 * \brief	Bitdefinition von RXB0CTRL
+		 * \ingroup	mcp2515
+		 */
+		enum RXB0CTRL
+		{
+			RXM1 = (1 << 6),
+			RXM0 = (1 << 5),
+			RXRTR = (1 << 3),
+			BUKT = (1 << 2),
+			BUKT1 = (1 << 1),
+			FILHIT0 = (1 << 0)
+		};
+		
+		/**
+		 * \brief	Bitdefinition von TXBnSIDL (n = 0, 1)
+		 * \ingroup	mcp2515
+		 */
+		enum TXBnSIDL
+		{
+			EXIDE = (1 << 3)
+		};
+		
+		/**
+		 * \brief	Bitdefinition von RXB1CTRL
+		 * 
+		 * \see		RXM1, RXM0, RXRTR und FILHIT0 sind schon
+		 * 			für RXB0CTRL definiert
+		 * \ingroup	mcp2515
+		 */
+		enum RXB1CTRL
+		{
+			FILHIT2 = (1 << 2),
+			FILHIT1 = (1 << 1)
+		};
+		
+		/**
+		 * \brief	Bitdefinition von RXBnSIDL (n = 0, 1)
+		 * \ingroup	mcp2515
+		 */
+		enum RXBnSIDL
+		{
+			MCP2515_SRR = (1 << 4),	// also defined by the AT90CAN
+			MCP2515_IDE = (1 << 3)
+		};
+		
+		/**
+		 * \brief	Bitdefinition von RXBnDLC (n = 0, 1)
+		 * 
+		 * \see		TXBnDLC (gleiche Bits)
+		 * \ingroup	mcp2515
+		 */
+		enum RXBnDLC
+		{
+			MCP2515_RTR = (1 << 6),	// also defined by the AT90CAN
+			MCP2515_DLC3 = (1 << 3),
+			MCP2515_DLC2 = (1 << 2),
+			MCP2515_DLC1 = (1 << 1),
+			MCP2515_DLC0 = (1 << 0)
+		};
+		
+		/**
+		 * \brief	Definition of the status register
+		 * \ingroup	mcp2515
+		 */
+		enum Status
+		{
+			CANINTF_TX2IF = (1 << 7),
+			TXB2CNTRL_TXREQ = (1 << 6),
+			CANINTF_TX1IF = (1 << 5),
+			TXB1CNTRL_TXREQ = (1 << 4),
+			CANINTF_TX0IF = (1 << 3),
+			TXB0CNTRL_TXREQ = (1 << 2),
+			CANINTF_RX1IF = (1 << 1),
+			CANINTF_RX0IF = (1 << 0)
+		};
+		
+		/**
+		 * \brief	Definition of the receive status register
+		 * \ingroup	mcp2515
+		 */
+		enum RxStatus
+		{
+			FLAG_RXB1_FULL = (1 << 7),
+			FLAG_RXB0_FULL = (1 << 6),
+			
+			FLAG_EXTENDED = (1 << 4),
+			FLAG_RTR = (1 << 3),
+			
+			TYPE_EXTENDED_REMOTE_FRAME = (1 << 4) | (1 << 3),
+			TYPE_EXTENDED_DATA_FRAME = (1 << 4),
+			TYPE_STANDARD_REMOTE_FRAME = (1 << 3),
+			TYPE_STANDARD_DATA_FRAME = 0,
+					
+			MATCH_RXF1_ROLLOVER_TO_RXB1 = 7,
+			MATCH_RXF0_ROLLOVER_TO_RXB1 = 6,
+			MATCH_RXF5 = 5,
+			MATCH_RXF4 = 4,
+			MATCH_RXF3 = 3,
+			MATCH_RXF2 = 2,
+			MATCH_RXF1 = 1,
+			MATCH_RXF0 = 0,
+		};
+	}
+}
 
-/** \name	SPI Kommandos */
-/*\{*/
-#define SPI_RESET		0xC0
-#define	SPI_READ		0x03
-#define	SPI_READ_RX		0x90
-#define	SPI_WRITE		0x02
-#define	SPI_WRITE_TX	0x40
-#define	SPI_RTS			0x80
-#define SPI_READ_STATUS	0xA0
-#define	SPI_RX_STATUS	0xB0
-#define	SPI_BIT_MODIFY	0x05
-/*\}*/
-
-/** \name	Adressen der Register des MCP2515
- *
- * Die Redundanten Adressen von z.B. dem Register CANSTAT 
- * (0x0E, 0x1E, 0x2E, ...) wurden dabei nicht mit aufgelistet.
- */
-/*\{*/
-#define RXF0SIDH	0x00
-#define RXF0SIDL	0x01
-#define RXF0EID8	0x02
-#define RXF0EID0	0x03
-#define RXF1SIDH	0x04
-#define RXF1SIDL	0x05
-#define RXF1EID8	0x06
-#define RXF1EID0	0x07
-#define RXF2SIDH	0x08
-#define RXF2SIDL	0x09
-#define RXF2EID8	0x0A
-#define RXF2EID0	0x0B
-#define BFPCTRL		0x0C
-#define TXRTSCTRL	0x0D
-#define CANSTAT		0x0E
-#define CANCTRL		0x0F
-
-#define RXF3SIDH	0x10
-#define RXF3SIDL	0x11
-#define RXF3EID8	0x12
-#define RXF3EID0	0x13
-#define RXF4SIDH	0x14
-#define RXF4SIDL	0x15
-#define RXF4EID8	0x16
-#define RXF4EID0	0x17
-#define RXF5SIDH	0x18
-#define RXF5SIDL	0x19
-#define RXF5EID8	0x1A
-#define RXF5EID0	0x1B
-#define TEC			0x1C
-#define REC         0x1D
-
-#define RXM0SIDH	0x20
-#define RXM0SIDL	0x21
-#define RXM0EID8	0x22
-#define RXM0EID0	0x23
-#define RXM1SIDH	0x24
-#define RXM1SIDL	0x25
-#define RXM1EID8	0x26
-#define RXM1EID0	0x27
-#define CNF3		0x28
-#define CNF2		0x29
-#define CNF1		0x2A
-#define CANINTE		0x2B
-#define CANINTF		0x2C
-#define EFLG		0x2D
-
-#define TXB0CTRL	0x30
-#define TXB0SIDH	0x31
-#define TXB0SIDL	0x32
-#define TXB0EID8	0x33
-#define TXB0EID0	0x34
-#define TXB0DLC		0x35
-#define TXB0D0		0x36
-#define TXB0D1		0x37
-#define TXB0D2		0x38
-#define TXB0D3		0x39
-#define TXB0D4		0x3A
-#define TXB0D5		0x3B
-#define TXB0D6		0x3C
-#define TXB0D7		0x3D
-
-#define TXB1CTRL	0x40
-#define TXB1SIDH	0x41
-#define TXB1SIDL	0x42
-#define TXB1EID8	0x43
-#define TXB1EID0	0x44
-#define TXB1DLC		0x45
-#define TXB1D0		0x46
-#define TXB1D1		0x47
-#define TXB1D2		0x48
-#define TXB1D3		0x49
-#define TXB1D4		0x4A
-#define TXB1D5		0x4B
-#define TXB1D6		0x4C
-#define TXB1D7		0x4D
-
-#define TXB2CTRL	0x50
-#define TXB2SIDH	0x51
-#define TXB2SIDL	0x52
-#define TXB2EID8	0x53
-#define TXB2EID0	0x54
-#define TXB2DLC		0x55
-#define TXB2D0		0x56
-#define TXB2D1		0x57
-#define TXB2D2		0x58
-#define TXB2D3		0x59
-#define TXB2D4		0x5A
-#define TXB2D5		0x5B
-#define TXB2D6		0x5C
-#define TXB2D7		0x5D
-
-#define RXB0CTRL	0x60
-#define RXB0SIDH	0x61
-#define RXB0SIDL	0x62
-#define RXB0EID8	0x63
-#define RXB0EID0	0x64
-#define RXB0DLC		0x65
-#define RXB0D0		0x66
-#define RXB0D1		0x67
-#define RXB0D2		0x68
-#define RXB0D3		0x69
-#define RXB0D4		0x6A
-#define RXB0D5		0x6B
-#define RXB0D6		0x6C
-#define RXB0D7		0x6D
-
-#define RXB1CTRL	0x70
-#define RXB1SIDH	0x71
-#define RXB1SIDL	0x72
-#define RXB1EID8	0x73
-#define RXB1EID0	0x74
-#define RXB1DLC		0x75
-#define RXB1D0		0x76
-#define RXB1D1		0x77
-#define RXB1D2		0x78
-#define RXB1D3		0x79
-#define RXB1D4		0x7A
-#define RXB1D5		0x7B
-#define RXB1D6		0x7C
-#define RXB1D7		0x7D
-/*\}*/
-
-/** \name	Bitdefinition der verschiedenen Register */
-/*\{*/
-
-/** \brief	Bitdefinition von BFPCTRL */
-#define B1BFS		5
-#define B0BFS		4
-#define B1BFE		3
-#define B0BFE		2
-#define B1BFM		1
-#define B0BFM		0
-
-/** \brief	Bitdefinition von TXRTSCTRL */
-#define B2RTS		5
-#define B1RTS		4
-#define B0RTS		3
-#define B2RTSM		2
-#define B1RTSM		1
-#define B0RTSM		0
-
-/** \brief	Bitdefinition von CANSTAT */
-#define OPMOD2		7
-#define OPMOD1		6
-#define OPMOD0		5
-#define ICOD2		3
-#define ICOD1		2
-#define ICOD0		1
-
-/** \brief	Bitdefinition von CANCTRL */
-#define REQOP2		7
-#define REQOP1		6
-#define REQOP0		5
-#define ABAT		4
-#define CLKEN		2
-#define CLKPRE1		1
-#define CLKPRE0		0
-
-/** \brief	Bitdefinition von CNF3 */
-#define WAKFIL		6
-#define PHSEG22		2
-#define PHSEG21		1
-#define PHSEG20		0
-
-/** \brief	Bitdefinition von CNF2 */
-#define BTLMODE		7
-#define SAM			6
-#define PHSEG12		5
-#define PHSEG11		4
-#define PHSEG10		3
-#define PHSEG2		2
-#define PHSEG1		1
-#define PHSEG0		0
-
-/** \brief	Bitdefinition von CNF1 */
-#define SJW1		7
-#define SJW0		6
-#define BRP5		5
-#define BRP4		4
-#define BRP3		3
-#define BRP2		2
-#define BRP1		1
-#define BRP0		0
-
-/** \brief	Bitdefinition von CANINTE */
-#define MERRE		7
-#define WAKIE		6
-#define ERRIE		5
-#define TX2IE		4
-#define TX1IE		3
-#define TX0IE		2
-#define RX1IE		1
-#define RX0IE		0
-
-/** \brief	Bitdefinition von CANINTF */
-#define MERRF		7
-#define WAKIF		6
-#define ERRIF		5
-#define TX2IF		4
-#define TX1IF		3
-#define TX0IF		2
-#define RX1IF		1
-#define RX0IF		0
-
-/** \brief	Bitdefinition von EFLG */
-#define RX1OVR		7
-#define RX0OVR		6
-#define TXB0		5
-#define TXEP		4
-#define RXEP		3
-#define TXWAR		2
-#define RXWAR		1
-#define EWARN		0
-
-/** \brief	Bitdefinition von TXBnCTRL (n = 0, 1, 2) */
-#define ABTF		6
-#define MLOA		5
-#define TXERR		4
-#define TXREQ		3
-#define TXP1		1
-#define TXP0		0
-
-/** \brief	Bitdefinition von RXB0CTRL */
-#define RXM1		6
-#define RXM0		5
-#define RXRTR		3
-#define BUKT		2
-#define BUKT1		1
-#define FILHIT0		0
-
-/** \brief	Bitdefinition von TXBnSIDL (n = 0, 1) */
-#define	EXIDE		3
-
-/**
- * \brief	Bitdefinition von RXB1CTRL
- * \see		RXM1, RXM0, RXRTR und FILHIT0 sind schon fuer RXB0CTRL definiert
- */
-#define FILHIT2		2
-#define FILHIT1		1
-
-/** \brief	Bitdefinition von RXBnSIDL (n = 0, 1) */
-#define	SRR			4
-#define	IDE			3
-
-/**
- * \brief	Bitdefinition von RXBnDLC (n = 0, 1)
- * \see		TXBnDLC   (gleiche Bits)
- */
-#define	RTR			6
-#define	DLC3		3
-#define	DLC2		2
-#define	DLC1		1
-#define DLC0		0
-
-/*\}*/
-/*\}*/
-
-#endif	// MCP2515_DEFINITIONS_HPP
+#endif	// XPCC_MCP2515__DEFINITIONS_HPP

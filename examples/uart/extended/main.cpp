@@ -17,6 +17,9 @@ main()
 	xpcc::IODeviceWrapper<xpcc::BufferedUart0> device(uart);
 	xpcc::IOStream stream(device);
 	
+	// Now we can print numbers and other objects to the stream
+	// The following will result in the string "24 is a nice number!\n" with
+	// the number formated as ASCII text.
 	stream << 24 << " is a nice number!" << xpcc::endl;
 	
 	while (1)

@@ -111,6 +111,7 @@ namespace xpcc
 		 * 
 		 * \param cx	x-coordinate of the center
 		 * \param cy	y-coordinate of the center
+		 * \param radius	Radius of the circle
 		 */
 		void
 		drawCircle(uint8_t cx, uint8_t cy, uint8_t radius);
@@ -144,6 +145,9 @@ namespace xpcc
 		void
 		fillRectangle(uint8_t x, uint8_t y, uint8_t width, uint8_t height);
 		
+		void
+		fillCircle(uint8_t cx, uint8_t cy, uint8_t radius);
+		
 	protected:
 		/// helper method for drawCircle()
 		void
@@ -155,6 +159,7 @@ namespace xpcc
 		virtual void
 		clearPixel(uint8_t x, uint8_t y) = 0;
 		
+	protected:
 		// callback function for drawing pixels
 		void (GraphicDisplay::*draw)(uint8_t x, uint8_t y);
 		

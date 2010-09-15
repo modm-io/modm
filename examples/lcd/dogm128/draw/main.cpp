@@ -42,14 +42,15 @@ main()
 	display.drawHorizontalLine(0, 50, 60);
 	display.drawVerticalLine(20, 20, 30);
 	
-	display.drawRoundedRectangle(80, 10, 20, 20, 3);
+	display.drawRoundedRectangle(70, 13, 30, 20, 3);
 	
 	display.drawCircle(105, 25, 20);
 	
-	display.drawEllipse(50, 25, 20, 18);
+	display.drawEllipse(60, 25, 20, 18);
 	display.drawEllipse(63, 31, 63, 31);
 	
 	display.fillRectangle(10, 10, 20, 20);
+	display.fillCircle(45, 40, 20);
 	
 	display.setColor(xpcc::GraphicDisplay::WHITE);
 	display.fillRectangle(20, 20, 20, 20);

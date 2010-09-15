@@ -49,7 +49,7 @@ namespace xpcc
 	 * \ingroup	lcd
 	 */
 	template <typename SPI, typename CS, typename A0, typename Reset>
-	class St7565 : public BufferedGraphicDisplay
+	class St7565 : public BufferedGraphicDisplay<128, 8>
 	{
 	public:
 		/**

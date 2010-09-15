@@ -5,7 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- *
+ * 
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -30,64 +30,73 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef CAN_CONNECTOR_TEST_HPP
-#define CAN_CONNECTOR_TEST_HPP
+#ifndef XPCC__MCP23S17_HPP
+#define XPCC__MCP23S17_HPP
 
-#include <unittest/testsuite.hpp>
+#include <xpcc/architecture/platform.hpp>
+#include <xpcc/architecture/driver/gpio.hpp>
 
-#include "testing_can_connector.hpp"
-
-class CanConnectorTest : public unittest::TestSuite
+namespace xpcc
 {
-	void
-	checkShortMessage(const xpcc::can::Message& message) const;
-	
-	uint8_t
-    getPayloadLength(uint8_t offset) const;
-	
-	void
-	checkFragmentedMessage(const xpcc::can::Message& message,
-			uint8_t fragmentId) const;
-	
-	void
-	createMessage(xpcc::can::Message& message,
-			uint8_t fragmentId) const;
-public:
-    virtual void
-    setUp();
-    
-    virtual void
-    tearDown();
-    
-public:
-    CanConnectorTest();
-    
-    void
-    testSendShortMessageDirect();
-    
-    void
-    testSendShortMessage();
-    
-    void
-    testSendFragmentedMessage();
-    
-    void
-    testReceiveShortMessage();
-    
-    void
-    testReceiveFragmentedMessage();
-    
-private:
-	TestingCanConnector *connector;
-	FakeCanDriver *driver;
-	
-	xpcc::Header xpccHeader;
-	uint32_t normalIdentifier;
-	uint32_t fragmentedIdentifier;
-	uint8_t messageCounter;
-	
-	uint8_t shortPayload[8];
-	uint8_t fragmentedPayload[14];
-};
+	/**
+	 * \brief	16-Bit I/O Expander with Serial Interface
+	 * 
+	 * A2, A1 and A0 need to be tided low.
+	 * 
+	 * GPB is the high byte, GPA the low byte.
+	 * 
+	 * \author	Fabian Greif
+	 * \ingroup	gpio
+	 */
+	template <typename Spi, typename Cs, typename Int>
+	class Mcp23s17
+	{
+	public:
+		void
+		initialize();
+		
+		void
+		configure(uint16_t inputMask, uint16_t pullupMask);
+		
+		//void
+		//configureInterrupt();
+		
+		uint16_t
+		read();
+		
+		void
+		write(uint16_t output);
+		
+	protected:
+		enum RegisterAddress
+		{
+			IODIR = 0x00,		//!< Port direction (1=input, 0=output)
+			IPOL = 0x02,		//!< Invert polarity
+			GPINTEN = 0x04,		//!< Enable interrupt
+			DEFVAL = 0x06,		//!< Compare register for interrupt
+			INTCON = 0x08,
+			IOCON = 0x0A,		//!< Configuration
+			GPPU = 0x0C,		//!< Enable pullups
+			INTF = 0x0E,		//!< Interrupt flag register
+			INTCAP = 0x10,		//!< Interrupt capture register
+			GPIO = 0x12,		//!< Port values
+			OLAT = 0x14			//!< Output latch register
+		};
+		
+		enum RW
+		{
+			WRITE = 0,
+			READ = 1
+		};
+		
+		static const uint8_t deviceAddress = 0x40;
+		
+		static Spi spi;
+		static Cs cs;
+		static Int interrupt;
+	};
+}
 
-#endif
+#include "mcp23s17_impl.hpp"
+
+#endif	// XPCC__MCP23S17_HPP

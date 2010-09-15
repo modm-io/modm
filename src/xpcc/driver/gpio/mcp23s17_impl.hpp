@@ -30,59 +30,90 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <stdlib.h>
-
-#include "buffered_graphic_display.hpp"
-
-// ----------------------------------------------------------------------------
-void
-xpcc::BufferedGraphicDisplay::clear()
-{
-	for (uint8_t i = 0; i < 8; ++i) {
-		for (uint8_t k = 0; k < 128; ++k) {
-			this->buffer[k][i] = 0;
-		}
-	}
-}
+#ifndef XPCC__MCP23S17_HPP
+	#error	"Don't include this file directly, use 'mcp23s17.hpp' instead!"
+#endif
 
 // ----------------------------------------------------------------------------
+template <typename Spi, typename Cs, typename Int>
+Spi xpcc::Mcp23s17<Spi, Cs, Int>::spi;
+
+template <typename Spi, typename Cs, typename Int>
+Cs xpcc::Mcp23s17<Spi, Cs, Int>::cs;
+
+template <typename Spi, typename Cs, typename Int>
+Int xpcc::Mcp23s17<Spi, Cs, Int>::interrupt;
+
+// ----------------------------------------------------------------------------
+template <typename Spi, typename Cs, typename Int>
 void
-xpcc::BufferedGraphicDisplay::drawImage(uint8_t x, uint8_t y,
-		xpcc::accessor::Flash<uint8_t> image)
+xpcc::Mcp23s17<Spi, Cs, Int>::initialize()
 {
-	div_t row = div(y, 8);
-	if (row.rem == 0)
-	{
-		uint8_t width = image[0];
-		uint8_t height = image[1];
-		
-		uint8_t rows = (height + 7) / 8;
-		
-		if (rows == height / 8)
-		{
-			for (uint8_t i = 0; i < width; i++)
-			{
-				for (uint8_t k = 0; k < rows; k++)
-				{
-					this->buffer[x + i][k + row.quot] = image[2 + i + k * width];
-				}
-			}
-			return;
-		}
-	}
+	spi.initialize();
+	cs.set();
+	cs.setOutput();
+	interrupt.setInput();
 	
-	GraphicDisplay::drawImage(x, y, image);
+	xpcc::delay_us(0.1);
+	
+	// Disable address pins (as they are by default) and enable the
+	// open-drain output from the interrupt line. INTA and INTB mirrored.
+	cs.reset();
+	spi.write(deviceAddress | WRITE);
+	spi.write(IOCON);
+	spi.write((1 << 6) | (1 << 2));
+	spi.write((1 << 6) | (1 << 2));
+	cs.set();
 }
+
+template <typename Spi, typename Cs, typename Int>
+void
+xpcc::Mcp23s17<Spi, Cs, Int>::configure(uint16_t inputMask, uint16_t pullupMask)
+{
+	cs.reset();
+	spi.write(deviceAddress | WRITE);
+	spi.write(IODIR);
+	spi.write(inputMask & 0xff);
+	spi.write(inputMask >> 8);
+	cs.set();
+	
+	xpcc::delay_us(0.1);
+	
+	cs.reset();
+	spi.write(deviceAddress | WRITE);
+	spi.write(GPPU);
+	spi.write(pullupMask & 0xff);
+	spi.write(pullupMask >> 8);
+	cs.set();
+}
+
+//void
+//configureInterrupt();
 
 // ----------------------------------------------------------------------------
-void
-xpcc::BufferedGraphicDisplay::setPixel(uint8_t x, uint8_t y)
+template <typename Spi, typename Cs, typename Int>
+uint16_t
+xpcc::Mcp23s17<Spi, Cs, Int>::read()
 {
-	this->buffer[x][y / 8] |= (1 << (y & 0x07));
+	cs.reset();
+	spi.write(deviceAddress | READ);
+	spi.write(GPIO);
+	
+	uint16_t value = spi.write(0x00);
+	value |= spi.write(0x00) << 8;
+	cs.set();
+	
+	return value;
 }
 
+template <typename Spi, typename Cs, typename Int>
 void
-xpcc::BufferedGraphicDisplay::clearPixel(uint8_t x, uint8_t y)
+xpcc::Mcp23s17<Spi, Cs, Int>::write(uint16_t output)
 {
-	this->buffer[x][y / 8] &= ~(1 << (y & 0x07));
+	cs.reset();
+	spi.write(deviceAddress | WRITE);
+	spi.write(GPIO);
+	spi.write(output & 0xff);
+	spi.write(output >> 8);
+	cs.set();
 }

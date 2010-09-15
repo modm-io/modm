@@ -33,6 +33,7 @@
 #ifndef XPCC__BUFFERED_GRAPHIC_DISPLAY_HPP
 #define XPCC__BUFFERED_GRAPHIC_DISPLAY_HPP
 
+#include <stdlib.h>
 #include "graphic_display.hpp"
 
 namespace xpcc
@@ -40,9 +41,13 @@ namespace xpcc
 	/**
 	 * \brief	Base class for graphical displays 
 	 * 
+	 * \tparam	Width	Width of the display.
+	 * \tparam	Rows	Number of rows. The height of the display is Rows * 8.
+	 * 
 	 * \author	Fabian Greif
 	 * \ingroup	lcd
 	 */
+	template <uint8_t Width, uint8_t Rows>
 	class BufferedGraphicDisplay : public GraphicDisplay
 	{
 	public:
@@ -82,8 +87,10 @@ namespace xpcc
 		virtual void
 		clearPixel(uint8_t x, uint8_t y);
 		
-		uint8_t buffer[128][8];
+		uint8_t buffer[Width][Rows];
 	};
 }
+
+#include "buffered_graphic_display_impl.hpp"
 
 #endif	// XPCC__GRAPHIC_DISPLAY_HPP

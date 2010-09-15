@@ -5,7 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- *
+ * 
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -30,64 +30,63 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef CAN_CONNECTOR_TEST_HPP
-#define CAN_CONNECTOR_TEST_HPP
-
-#include <unittest/testsuite.hpp>
-
-#include "testing_can_connector.hpp"
-
-class CanConnectorTest : public unittest::TestSuite
-{
-	void
-	checkShortMessage(const xpcc::can::Message& message) const;
-	
-	uint8_t
-    getPayloadLength(uint8_t offset) const;
-	
-	void
-	checkFragmentedMessage(const xpcc::can::Message& message,
-			uint8_t fragmentId) const;
-	
-	void
-	createMessage(xpcc::can::Message& message,
-			uint8_t fragmentId) const;
-public:
-    virtual void
-    setUp();
-    
-    virtual void
-    tearDown();
-    
-public:
-    CanConnectorTest();
-    
-    void
-    testSendShortMessageDirect();
-    
-    void
-    testSendShortMessage();
-    
-    void
-    testSendFragmentedMessage();
-    
-    void
-    testReceiveShortMessage();
-    
-    void
-    testReceiveFragmentedMessage();
-    
-private:
-	TestingCanConnector *connector;
-	FakeCanDriver *driver;
-	
-	xpcc::Header xpccHeader;
-	uint32_t normalIdentifier;
-	uint32_t fragmentedIdentifier;
-	uint8_t messageCounter;
-	
-	uint8_t shortPayload[8];
-	uint8_t fragmentedPayload[14];
-};
-
+#ifndef XPCC__BUFFERED_GRAPHIC_DISPLAY_HPP
+	#error	"Don't include this file directly, use 'buffered_graphic_display.hpp' instead!"
 #endif
+
+// ----------------------------------------------------------------------------
+template <uint8_t Width, uint8_t Rows>
+void
+xpcc::BufferedGraphicDisplay<Width, Rows>::clear()
+{
+	for (uint8_t i = 0; i < 8; ++i) {
+		for (uint8_t k = 0; k < 128; ++k) {
+			this->buffer[k][i] = 0;
+		}
+	}
+}
+
+// ----------------------------------------------------------------------------
+template <uint8_t Width, uint8_t Rows>
+void
+xpcc::BufferedGraphicDisplay<Width, Rows>::drawImage(uint8_t x, uint8_t y,
+		xpcc::accessor::Flash<uint8_t> image)
+{
+	div_t row = div(y, 8);
+	if (row.rem == 0)
+	{
+		uint8_t width = image[0];
+		uint8_t height = image[1];
+		
+		uint8_t rows = (height + 7) / 8;
+		
+		if (rows == height / 8)
+		{
+			for (uint8_t i = 0; i < width; i++)
+			{
+				for (uint8_t k = 0; k < rows; k++)
+				{
+					this->buffer[x + i][k + row.quot] = image[2 + i + k * width];
+				}
+			}
+			return;
+		}
+	}
+	
+	GraphicDisplay::drawImage(x, y, image);
+}
+
+// ----------------------------------------------------------------------------
+template <uint8_t Width, uint8_t Rows>
+void
+xpcc::BufferedGraphicDisplay<Width, Rows>::setPixel(uint8_t x, uint8_t y)
+{
+	this->buffer[x][y / 8] |= (1 << (y & 0x07));
+}
+
+template <uint8_t Width, uint8_t Rows>
+void
+xpcc::BufferedGraphicDisplay<Width, Rows>::clearPixel(uint8_t x, uint8_t y)
+{
+	this->buffer[x][y / 8] &= ~(1 << (y & 0x07));
+}

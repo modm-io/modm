@@ -5,7 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- *
+ * 
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -29,65 +29,12 @@
  * $Id$
  */
 // ----------------------------------------------------------------------------
+/**
+ * \ingroup		driver
+ * \defgroup	gpio		IO-Expander
+ * 
+ */
 
-#ifndef CAN_CONNECTOR_TEST_HPP
-#define CAN_CONNECTOR_TEST_HPP
+#include "gpio/mcp23s08.hpp"
+#include "gpio/mcp23s17.hpp"
 
-#include <unittest/testsuite.hpp>
-
-#include "testing_can_connector.hpp"
-
-class CanConnectorTest : public unittest::TestSuite
-{
-	void
-	checkShortMessage(const xpcc::can::Message& message) const;
-	
-	uint8_t
-    getPayloadLength(uint8_t offset) const;
-	
-	void
-	checkFragmentedMessage(const xpcc::can::Message& message,
-			uint8_t fragmentId) const;
-	
-	void
-	createMessage(xpcc::can::Message& message,
-			uint8_t fragmentId) const;
-public:
-    virtual void
-    setUp();
-    
-    virtual void
-    tearDown();
-    
-public:
-    CanConnectorTest();
-    
-    void
-    testSendShortMessageDirect();
-    
-    void
-    testSendShortMessage();
-    
-    void
-    testSendFragmentedMessage();
-    
-    void
-    testReceiveShortMessage();
-    
-    void
-    testReceiveFragmentedMessage();
-    
-private:
-	TestingCanConnector *connector;
-	FakeCanDriver *driver;
-	
-	xpcc::Header xpccHeader;
-	uint32_t normalIdentifier;
-	uint32_t fragmentedIdentifier;
-	uint8_t messageCounter;
-	
-	uint8_t shortPayload[8];
-	uint8_t fragmentedPayload[14];
-};
-
-#endif

@@ -41,11 +41,11 @@ xpcc::St7565< lcd::SPI, lcd::CS, lcd::A0, lcd::Reset > display;
 void
 drawCross(uint8_t x, uint8_t y)
 {
-	display.setPixel(x - 1, y - 1);
-	display.setPixel(x - 1, y + 1);
-	display.setPixel(x, y);
-	display.setPixel(x + 1, y - 1);
-	display.setPixel(x + 1, y + 1);
+	display.drawPixel(x - 1, y - 1);
+	display.drawPixel(x - 1, y + 1);
+	display.drawPixel(x, y);
+	display.drawPixel(x + 1, y - 1);
+	display.drawPixel(x + 1, y + 1);
 }
 
 int
@@ -135,11 +135,11 @@ main()
 		
 		if (x >= 0 && y >= 0)
 		{
-			display.setPixel(x, y);
-			display.setPixel(x, y+1);
+			display.drawPixel(x, y);
+			display.drawPixel(x, y+1);
 			
-			display.setPixel(x+1, y);
-			display.setPixel(x+1, y+1);
+			display.drawPixel(x+1, y);
+			display.drawPixel(x+1, y+1);
 		}
 		
 		display.update();

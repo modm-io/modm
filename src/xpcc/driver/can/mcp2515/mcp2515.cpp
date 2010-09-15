@@ -33,8 +33,6 @@
 #include "../mcp2515.hpp"
 #include "xpcc_config.hpp"
 
-#if !defined(__AVR_AT90CAN128__)
-
 namespace xpcc
 {
 	namespace mcp2515
@@ -64,9 +62,9 @@ namespace xpcc
 			0xc3,
 			
 			// 125 kbps
-			(1 << PHSEG21),
-			(1 << BTLMODE) | (1 << PHSEG11),
-			(1 << BRP2) | (1 << BRP1) | (1 << BRP0),
+			PHSEG21,
+			BTLMODE | PHSEG11,
+			MCP2515_BRP2 | MCP2515_BRP1 | MCP2515_BRP0,
 			
 			// 250 kbps
 			0x03,
@@ -79,8 +77,8 @@ namespace xpcc
 			0x80,
 			
 			// 1 Mbps
-			(1 << PHSEG21),
-			(1 << BTLMODE) | (1 << PHSEG11),
+			PHSEG21,
+			BTLMODE | PHSEG11,
 			0,
 
 #elif MCP2515_CLOCK == 20000000
@@ -126,10 +124,8 @@ namespace xpcc
 			0x00,
 
 #else
-	#error "Unknown value for MCP2515 clock frequency, please add the defines in 'mcp2515.cpp'"
+#	error "Unknown value for MCP2515 clock frequency, please add the defines in 'mcp2515.cpp'"
 #endif
 		};
 	}
 }
-
-#endif	// !__AVR_AT90CAN128__
