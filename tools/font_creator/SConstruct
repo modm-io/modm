@@ -1,0 +1,18 @@
+#!/usr/bin/env python
+#
+# $Id$
+
+import os
+
+env = Environment(tools=['javac', 'jar'], ENV = os.environ)
+env.Append(JAVACFLAGS = '-encoding utf-8 -Xlint:deprecation -Xlint:unchecked')
+
+classes = env.Java('classes', 'source')
+jar = env.Jar(target = 'font_creator.jar', source = [classes, 'manifest.txt'])
+
+env.Alias('build', classes)
+env.Alias('jar', jar)
+env.Alias('all', ['build', 'jar'])
+env.Alias('run', env.Command(None, jar, '@java -jar $SOURCE'))
+
+env.Default('all')
