@@ -49,6 +49,7 @@ public class Font {
 		cropBottom = height;
 		for (int i = 0; i < charCount; i++) {
 			FontCharacter c = new FontCharacter(initWidth, height, this);
+			
 			if (importFont != null) {
 				Rectangle rect = c.importChar(importFont, j);
 				if (j != ' ') {
@@ -64,8 +65,7 @@ public class Font {
 
 		if (importFont != null) {
 			for (int i = 0; i < charCount; i++) {
-				((FontCharacter) (chars.get(i))).setSize(-cropTop, -cropBottom,
-						0, 0);
+				chars.get(i).changeSize(-cropTop, -cropBottom, 0, 0);
 			}
 		}
 	}
@@ -139,7 +139,7 @@ public class Font {
 
 	public void insertCharAt(int index) {
 		FontCharacter c = new FontCharacter(width, height, this);
-		c.setSize(-cropTop, -cropBottom, 0, 0);
+		c.changeSize(-cropTop, -cropBottom, 0, 0);
 		chars.add(index, c);
 	}
 

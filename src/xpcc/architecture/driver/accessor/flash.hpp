@@ -137,6 +137,13 @@ namespace xpcc
 			}
 			
 			ALWAYS_INLINE
+			bool
+			isValid() const
+			{
+				return (address != 0);
+			}
+			
+			ALWAYS_INLINE
 			const T*
 			getPointer() const
 			{

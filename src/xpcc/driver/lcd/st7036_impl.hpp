@@ -46,7 +46,7 @@ namespace xpcc {
 
 template <typename SPI, typename CS, typename RS>
 xpcc::St7036<SPI, CS, RS>::St7036() :
-	Lcd()
+	CharacterDisplay()
 {
 }
 

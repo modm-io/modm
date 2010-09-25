@@ -6,6 +6,8 @@
 
 #include <xpcc/driver/gpio.hpp>
 
+#include <xpcc/driver/lcd/font.hpp>
+
 // LCD Backlight
 namespace led
 {
@@ -47,8 +49,15 @@ GPIO__OUTPUT(ENCODER_B, C, 6);
 // UART
 xpcc::BufferedUart0 uart(115200);
 
-int
-main()
+#include <xpcc/debug/logger.hpp>
+
+xpcc::IODeviceWrapper<xpcc::BufferedUart0> loggerDevice(uart);
+xpcc::log::Logger xpcc::log::info(loggerDevice);
+xpcc::log::Logger xpcc::log::debug(loggerDevice);
+xpcc::log::Logger xpcc::log::warning(loggerDevice);
+xpcc::log::Logger xpcc::log::error(loggerDevice);
+
+MAIN_FUNCTION
 {
 	// Enable a yellow backlight
 	led::R::set();
@@ -66,17 +75,26 @@ main()
 	gpio1.initialize();
 	gpio1.configure(0x001f, 0x001f);
 	
-	display.initialize();
-	
-	// some test drawing
-	display.fillRectangle(10, 10, 20, 20);
-	display.fillCircle(45, 40, 20);
-	display.setColor(xpcc::GraphicDisplay::WHITE);
-	display.fillRectangle(20, 20, 20, 20);
-	display.update();
-	
 	// Enable interrupts
 	sei();
+	
+	display.initialize();
+	
+	display.setColor(xpcc::glcd::WHITE);
+	display.setFont(xpcc::accessor::asFlash(xpcc::font::ScriptoNarrow));
+	display.setCursor(xpcc::glcd::Point(0, 0));
+	display.write("Hello World!\n");
+	display.write("ABCDEFGHIJKLMNOPQRSTUVWXYZ\n");
+	display.write("abcdefghijklmnopqrstuvwxyz\n");
+	display.write("0123456789!\"§$%&/()=?`´,;:-<>");
+	
+	display.setFont(xpcc::accessor::asFlash(xpcc::font::AllCaps3x6));
+	display.setCursor(xpcc::glcd::Point(0, 32));
+	display.write("Hello World!\n");
+	display.write("ABCDEFGHIJKLMNOPQRSTUVWXYZ\n");
+	display.write("abcdefghijklmnopqrstuvwxyz\n");
+	display.write("0123456789!\"§$%&/()=?`´,;:-<>");
+	display.update();
 	
 	xpcc::IODeviceWrapper<xpcc::BufferedUart0> device(uart);
 	xpcc::IOStream stream(device);
@@ -85,13 +103,13 @@ main()
 	
 	while (1)
 	{
-		uint8_t input0 = gpio0.read();
+		/*uint8_t input0 = gpio0.read();
 		uint16_t input1 = gpio1.read();
 		
 		stream << xpcc::hex
 				<< input0
 				<< static_cast<uint8_t>(input1 >> 8)
 				<< static_cast<uint8_t>(input1 & 0xff) << xpcc::endl;
-		xpcc::delay_ms(200);
+		xpcc::delay_ms(200);*/
 	}
 }

@@ -26,6 +26,8 @@ namespace lcd
 
 xpcc::St7565< lcd::SPI, lcd::CS, lcd::A0, lcd::Reset > display;
 
+using namespace xpcc::glcd;
+
 int
 main()
 {
@@ -47,7 +49,7 @@ main()
 	while (1)
 	{
 		display.clear();
-		display.drawRectangle(10, 10, 104, 44);
+		display.drawRectangle(Point(10, 10), 104, 44);
 		
 		x += xSpeed;
 		y += ySpeed;
@@ -59,7 +61,7 @@ main()
 			ySpeed = -ySpeed;
 		}
 		
-		display.drawCircle(x, y, radius);
+		display.drawCircle(Point(x, y), radius);
 		display.update();
 		
 		xpcc::delay_ms(50);

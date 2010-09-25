@@ -96,7 +96,8 @@ public class CharEditor extends JComponent implements MouseListener,
 		setPreferredSize(new Dimension(fc.getWidth() * zoom, fc.getHeight()
 				* zoom));
 
-		if (fc.getImage() != null) {
+		if (fc.getImage() != null)
+		{
 			Graphics2D g = (Graphics2D) graphics;
 			int w = fc.getWidth();
 			int h = fc.getHeight();
@@ -108,7 +109,7 @@ public class CharEditor extends JComponent implements MouseListener,
 				yO = (getHeight() - h * zoom) / 2;
 			int x = 0;
 			int y = 0;
-
+			
 			// Pixel
 			Raster imageData = fc.getImage().getData();
 			int[] iArray = null;

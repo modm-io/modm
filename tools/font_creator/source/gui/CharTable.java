@@ -230,7 +230,7 @@ public class CharTable implements KeyListener, MouseListener,
 					int width = Integer.parseInt((String) charTable.getValueAt(
 							row, col));
 					FontCharacter fc = getSelectedCharacter();
-					fc.setSize(0, 0, 0, width - fc.getWidth());
+					fc.changeSize(0, 0, 0, width - fc.getWidth());
 					setSelectedCharacter(fc);
 					parent.editingCharSizeChanged();
 				} catch (NumberFormatException ex) {

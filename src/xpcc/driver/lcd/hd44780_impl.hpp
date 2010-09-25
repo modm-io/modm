@@ -38,7 +38,7 @@
 
 template <typename E, typename RW, typename RS, typename DATA>
 xpcc::Hd44780<E, RW, RS, DATA>::Hd44780() : 
-	Lcd()
+	CharacterDisplay()
 {
 }
 

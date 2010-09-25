@@ -43,7 +43,9 @@ namespace xpcc
 	/**
 	 * \brief	Driver for ST7565 based LC-displays
 	 * 
-	 * 
+	 * Compatible to:
+	 *  - DOGM128
+	 *  - DOGL128
 	 * 
 	 * \author	Fabian Greif
 	 * \ingroup	lcd
@@ -55,7 +57,7 @@ namespace xpcc
 		/**
 		 * \brief	Initialize the display
 		 * 
-		 * The display needs some time to initalize after startup. You have
+		 * The display needs some time to initialize after startup. You have
 		 * to wait at least 50 ms until calling this method.
 		 */
 		void

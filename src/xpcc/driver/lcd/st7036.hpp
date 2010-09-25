@@ -33,10 +33,8 @@
 #ifndef XPCC__ST7036_HPP
 #define XPCC__ST7036_HPP
 
-#include <xpcc/driver/lcd/lcd.hpp>
-
-#include <xpcc/architecture/driver/accessor/flash.hpp>
-#include <xpcc/architecture/driver/time/delay.hpp>
+#include <xpcc/driver/lcd/character_display.hpp>
+#include <xpcc/architecture/driver.hpp>
 
 namespace xpcc
 {
@@ -52,7 +50,7 @@ namespace xpcc
 	 * \ingroup	lcd
 	 */
 	template <typename SPI, typename CS, typename RS>
-	class St7036 : public Lcd
+	class St7036 : public CharacterDisplay
 	{
 	public:
 		/// Constructor

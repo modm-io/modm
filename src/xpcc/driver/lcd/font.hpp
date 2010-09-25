@@ -29,36 +29,13 @@
  * $Id$
  */
 // ----------------------------------------------------------------------------
+/**
+ * \ingroup		lcd
+ * \defgroup	font	Various fonts for graphical displays
+ * 
+ * The fonts are created with the "FontCreator 2.2", see \c tools/font_creator.
+ */
 
-#include "lcd.hpp"
-
-xpcc::Lcd::Lcd() :
-	column(0), line(0)
-{
-}
-
-void
-xpcc::Lcd::write(char c)
-{
-	if (c == '\n')
-	{
-		line++;
-		if (line >= 2) {
-			line = 0;
-		}
-		column = 0;
-		this->setPosition(line, column);
-	}
-	else {
-		if (column >= 16) {
-			this->write('\n');
-		}
-		this->writeRaw(c);
-		column++;
-	}
-}
-
-void
-xpcc::Lcd::flush()
-{
-}
+#include "font/scripto_narrow.hpp"
+#include "font/all_caps_3x6.hpp"
+#include "font/fixed_width_5x8.hpp"

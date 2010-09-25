@@ -30,8 +30,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__LCD_HPP
-#define XPCC__LCD_HPP
+#ifndef XPCC__CHARACTER_DISPLAY_HPP
+#define XPCC__CHARACTER_DISPLAY_HPP
 
 #include <stdint.h>
 #include <xpcc/io/iodevice.hpp>
@@ -39,7 +39,7 @@
 namespace xpcc
 {
 	/**
-	 * \brief	Base class for alphanumeric LCDs (liquid crystal display)
+	 * \brief	Base class for alpha-numeric LCDs (liquid crystal display)
 	 * 
 	 * <h3>About this implementation:</h3> 
 	 * 
@@ -54,21 +54,22 @@ namespace xpcc
 	 * \author	Fabian Greif
 	 * \ingroup	lcd
 	 */
-	class Lcd : public IODevice
+	class CharacterDisplay : public IODevice
 	{
 	public:
 		// TODO: we need to find a suitable subset for all LCDs here!
-		typedef enum {
+		enum Command
+		{
 			CLEAR_DISPLAY,
 			CURSOR_HOME,
 			CURSOR_ON,
 			CURSOR_OFF,
 			CURSOR_BLINK,
-		} Command;
+		};
 		
 	public:
 		/// Constructor
-		Lcd();
+		CharacterDisplay();
 		
 		/// Initialize the display
 		virtual void
@@ -131,4 +132,4 @@ namespace xpcc
 	};
 }
 
-#endif // XPCC__LCD_HPP
+#endif // XPCC__CHARACTER_DISPLAY_HPP

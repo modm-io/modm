@@ -79,6 +79,22 @@ namespace xpcc
 		}
 	};
 	
+	// TODO is this usefull?
+	template <>
+	struct GeometricTraits<uint8_t>
+	{
+		static const bool isValidType = true;
+		
+		typedef float FloatType;
+		typedef int16_t WideType;
+		
+		static inline uint8_t
+		round(float value)
+		{
+			return ::round(value);
+		}
+	};
+	
 	template <>
 	struct GeometricTraits<int16_t>
 	{

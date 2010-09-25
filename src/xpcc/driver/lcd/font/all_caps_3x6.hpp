@@ -30,81 +30,29 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__HD44780_HPP
-#define XPCC__HD44780_HPP
+#ifndef XPCC_FONT__ALL_CAPS_3X6_HPP
+#define	XPCC_FONT__ALL_CAPS_3X6_HPP
 
-#include <xpcc/driver/lcd/character_display.hpp>
-#include <xpcc/architecture/driver.hpp>
+#include <xpcc/architecture/driver/accessor.hpp>
 
 namespace xpcc
 {
-	/**
-	 * \brief	Driver for HD447800 compatible displays
-	 * 
-	 * An HD44780 Character LCD is a de facto industry standard liquid crystal
-	 * display (LCD) display device. These screens come in common
-	 * configurations of 8x1, which is one row of eight characters, 16x2, and
-	 * 20x4, among others.
-	 * 
-	 * This driver uses the 4-Bit mode with read back. Therefore you need to
-	 * connect all there control pins (RW, RS, E) and the high nibble of the
-	 * data lines.
-	 * 
-	 * Example:
-	 * \include lcd/hd44780/main.cpp
-	 * 
-	 * \tparam	E		Enable Pin
-	 * \tparam	RW		Read/Write-Select Pin
-	 * \tparam	RS		Command/Data-Select Pin
-	 * \tparam	DATA	Needs to be a Nibble. See Nibble() for more details.
-	 * 
-	 * \see		Lcd
-	 * \see		http://en.wikipedia.org/wiki/HD44780_Character_LCD
-	 * 
-	 * \author	Fabian Greif
-	 * \ingroup	lcd
-	 */
-	template <typename E, typename RW, typename RS, typename DATA>
-	class Hd44780 : public CharacterDisplay
+	namespace font
 	{
-	public:
-		/// Constructor
-		Hd44780();
-		
 		/**
-		 * \brief	Initialize the display
+		 * \brief	Proportional all caps font (~3x6)
 		 * 
-		 * The display needs some time to initialize after startup. You have
-		 * to wait at least 50 ms after startup before calling this method.
+		 * Font size in bytes  : 368 \n
+		 * Font width          : 3 \n
+		 * Font height         : 6 \n
+		 * Font first char     : 32 \n
+		 * Font last char      : 128 \n
+		 * Font used chars     : 96
+		 * 
+		 * \ingroup	font
 		 */
-		virtual void
-		initialize();
-		
-		virtual void
-		writeRaw(char c);
-		
-		virtual void
-		setPosition(uint8_t line, uint8_t column);
-		
-		virtual void
-		command(Command command);
-		
-	protected:
-		void
-		writeNibble(uint8_t data);
-		
-		uint8_t
-		readByte();
-		
-		/// Wait unitl the busy flag is reseted
-		void
-		waitBusy();
-		
-		void
-		writeCommand(uint8_t command);
-	};
+		EXTERN_FLASH(uint8_t AllCaps3x6[]);
+	}
 }
 
-#include "hd44780_impl.hpp"
-
-#endif // XPCC__HD44780_HPP
+#endif	// XPCC_FONT__ALL_CAPS_3X6_HPP

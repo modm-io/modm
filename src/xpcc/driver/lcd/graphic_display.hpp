@@ -33,25 +33,50 @@
 #ifndef XPCC__GRAPHIC_DISPLAY_HPP
 #define XPCC__GRAPHIC_DISPLAY_HPP
 
-#include <stdint.h>
 #include <xpcc/architecture/driver/accessor.hpp>
+#include <xpcc/math/geometry.hpp>
+#include <xpcc/io/iodevice.hpp>
 
 namespace xpcc
 {
-	/**
-	 * \brief	Base class for graphical displays 
-	 * 
-	 * \ingroup	lcd
-	 */
-	class GraphicDisplay
+	namespace glcd
 	{
-	public:
+		typedef Vector2D<uint8_t> Point;
+		
 		enum Color
 		{
 			BLACK = 0,
 			WHITE = 1
 		};
-		
+	}
+	
+	/**
+	 * \brief	Base class for graphical displays 
+	 * 
+	 * Coordinate System:
+	 * \code
+	 * (0, 0)
+	 *    +---------------------+
+	 *    |  ----> X            |
+	 *    | |                   |
+	 *    | |                   |
+	 *    | V Y                 |
+	 *    |                     |
+	 *    |                     |
+	 *    |                     |
+	 *    +---------------------+
+	 *                e.g. (128, 64)
+	 * \endcode
+	 * 
+	 * The size (width and height) of a graphics primitive always correspond
+	 * to its mathematical model, ignoring the rendered with. As everything
+	 * is drawn one pixel wide, the pixels will be rendered to the right and
+	 * below the mathematically defined points.
+	 * 
+	 * \ingroup	lcd
+	 */
+	class GraphicDisplay : public IODevice
+	{
 	public:
 		GraphicDisplay();
 		
@@ -60,47 +85,67 @@ namespace xpcc
 		{
 		}
 		
+		/// Clear screen
 		virtual void
 		clear() = 0;
 		
 		void
-		setColor(Color color);
+		setColor(glcd::Color color);
 		
-		inline Color
+		inline glcd::Color
 		getColor() const
 		{
 			return this->color;
 		}
 		
-		void
-		drawPixel(uint8_t x, uint8_t y);
+		// TODO Limit the coordinate system to a smaller area
+		//void
+		//setViewport();
+		
+		// TODO Set a clipping area
+		// Everywith drawn outside this area will be discarded.
+		//void
+		//setClippingWindow();
 		
 		/**
-		 * \brief	Draw line
+		 * \brief	Draw a pixel in currently active color
+		 * 
+		 * \param	x	x-position
+		 * \param	y	y-position
+		 */
+		inline void
+		drawPixel(uint8_t x, uint8_t y)
+		{
+			(this->*draw)(x, y);
+		}
+		
+		/**
+		 * \brief	Draw a line
 		 * 
 		 * Uses the faster drawHorizontalLine() or drawVerticalLine() if
 		 * possible, otherwise the line is rastered with the bresenham line
 		 * algorithm.
 		 * 
-		 * \param x1	first point
-		 * \param y1	first point
-		 * \param x2	second point
-		 * \param y2	second point
+		 * \param start	first point
+		 * \param end	second point
 		 */
+		inline void
+		drawLine(glcd::Point start, glcd::Point end)
+		{
+			this->drawLine(start.getX(), start.getY(), end.getX(), end.getY());
+		}
+		
+		/// Draw a line specified by x and y coordinates of both points
 		void
 		drawLine(uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2);
 		
-		virtual void
-		drawHorizontalLine(uint8_t x1, uint8_t y1, uint8_t length);
-		
-		virtual void
-		drawVerticalLine(uint8_t x1, uint8_t y1, uint8_t length);
-		
+		/// Draw a rectangle
 		void
-		drawRectangle(uint8_t x, uint8_t y, uint8_t width, uint8_t height);
+		drawRectangle(glcd::Point upperLeft, uint8_t width, uint8_t height);
 		
+		/// Draw a rectangle with rounded corners
 		void
-		drawRoundedRectangle(uint8_t x, uint8_t y,
+		drawRoundedRectangle(glcd::Point upperLeft,
 				uint8_t width, uint8_t height,
 				uint8_t radius);
 		
@@ -109,12 +154,11 @@ namespace xpcc
 		 * 
 		 * Uses the midpoint circle algorithm.
 		 * 
-		 * \param cx	x-coordinate of the center
-		 * \param cy	y-coordinate of the center
+		 * \param center	Center of the circle
 		 * \param radius	Radius of the circle
 		 */
 		void
-		drawCircle(uint8_t cx, uint8_t cy, uint8_t radius);
+		drawCircle(glcd::Point center, uint8_t radius);
 		
 		/**
 		 * \brief	Draw an ellipse
@@ -122,36 +166,94 @@ namespace xpcc
 		 * Uses a variation of the midpoint algorithm. May be improved through
 		 * simplification of the uses formulas.
 		 * 
-		 * \param cx	x-center
-		 * \param cy	y-center
-		 * \param rx	radius in x-direction
-		 * \param ry	radius in y-direction
+		 * \param center	Center of the ellipse
+		 * \param rx		radius in x-direction
+		 * \param ry		radius in y-direction
 		 */
 		void
-		drawEllipse(uint8_t cx, uint8_t cy, uint8_t rx, uint8_t ry);
+		drawEllipse(glcd::Point center, uint8_t rx, uint8_t ry);
 		
 		/**
 		 * \brief	Draw an image
 		 * 
-		 * \param x		upper left corner
-		 * \param y		upper left corner
-		 * \param image	image data
+		 * The first byte in the image data specifies the with, the second
+		 * byte the height. Afterwards the actual image data.
+		 * 
+		 * \param upperLeft		Upper left corner
+		 * \param image			Image data
 		 * 
 		 * \see	GraphicDisplay::drawImage()
 		 */
+		void
+		drawImage(glcd::Point upperLeft, xpcc::accessor::Flash<uint8_t> image);
+		
+		/**
+		 * \brief	Draw an image
+		 * 
+		 * \p data is the actual image data without any size information.
+		 */
 		virtual void
-		drawImage(uint8_t x, uint8_t y, xpcc::accessor::Flash<uint8_t> image);
+		drawImageRaw(glcd::Point upperLeft,
+				uint8_t width, uint8_t height,
+				xpcc::accessor::Flash<uint8_t> data);
 		
+		/// Fill a rectangle
 		void
-		fillRectangle(uint8_t x, uint8_t y, uint8_t width, uint8_t height);
+		fillRectangle(glcd::Point upperLeft, uint8_t width, uint8_t height);
 		
+		/// Fill a circle
 		void
-		fillCircle(uint8_t cx, uint8_t cy, uint8_t radius);
+		fillCircle(glcd::Point center, uint8_t radius);
+		
+	public:
+		/**
+		 * \brief	Set a new font
+		 * 
+		 * \param	font	Active font
+		 * \see		xpcc::font
+		 */
+		inline void
+		setFont(accessor::Flash<uint8_t> font)
+		{
+			this->font = font;
+		}
+		
+		/**
+		 * \brief	Set the cursor for text drawing
+		 * 
+		 * \param	position	Cursor position
+		 */
+		inline void
+		setCursor(glcd::Point position)
+		{
+			this->cursor = position;
+		}
+		
+		/// Draw a single character
+		virtual void
+		write(char c);
+		
+		/// Draw a C-string
+		using IODevice::write;
+		
+		/// unused
+		virtual void
+		flush();
+		
+		/// unused
+		virtual bool
+		read(char& c);
 		
 	protected:
-		/// helper method for drawCircle()
+		/// helper method for drawCircle() and drawEllipse()
 		void
-		drawCircle4(uint8_t cx, uint8_t cy, uint8_t x, uint8_t y);
+		drawCircle4(glcd::Point center, uint8_t x, uint8_t y);
+		
+		virtual void
+		drawHorizontalLine(glcd::Point start, uint8_t length);
+		
+		virtual void
+		drawVerticalLine(glcd::Point start, uint8_t length);
 		
 		virtual void
 		setPixel(uint8_t x, uint8_t y) = 0;
@@ -163,7 +265,9 @@ namespace xpcc
 		// callback function for drawing pixels
 		void (GraphicDisplay::*draw)(uint8_t x, uint8_t y);
 		
-		Color color;
+		glcd::Color color;
+		xpcc::accessor::Flash<uint8_t> font;
+		glcd::Point cursor;
 	};
 }
 

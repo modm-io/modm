@@ -47,7 +47,7 @@ namespace xpcc
 		IODevice()
 		{
 		}
-
+		
 		virtual
 		~IODevice()
 		{

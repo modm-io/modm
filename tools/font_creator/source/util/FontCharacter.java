@@ -23,10 +23,10 @@ public class FontCharacter {
 	private int width;
 	private int height;
 	private String comment;
-	private Font font;
-
+	private Font font;			// needed to get the color model
+	
 	private BufferedImage image;
-
+	
 	public FontCharacter(int width, int height, Font font) {
 		this.width = width;
 		this.height = height;
@@ -84,19 +84,28 @@ public class FontCharacter {
 	public int getHeight() {
 		return height;
 	}
-
-	public void setSize(int top, int bottom, int left, int right) {
+	
+	/**
+	 * Change the size of the character.
+	 * 
+	 * changeSize(0, 0, 0, 0); will leave the character as it is.
+	 * 
+	 * @param top		Size change at the top of the font
+	 * @param bottom	Size change at the bottom
+	 * @param left		Size change at the left side
+	 * @param right		Size change at the right side
+	 */
+	public void changeSize(int top, int bottom, int left, int right) {
 		width += left + right;
 		height += top + bottom;
 		if (width < 0)
 			width = 0;
 		if (height < 0)
 			height = 0;
-		IndexColorModel cm = font.getEditorColorModel();
-
+		
 		if (width > 0) {
 			BufferedImage img = new BufferedImage(width, height,
-					BufferedImage.TYPE_BYTE_INDEXED, cm);
+					BufferedImage.TYPE_BYTE_INDEXED, font.getEditorColorModel());
 			Graphics2D g = img.createGraphics();
 			g.setColor(Color.WHITE);
 			g.fillRect(0, 0, width, height);
@@ -120,7 +129,7 @@ public class FontCharacter {
 		FontRenderContext frc = g.getFontRenderContext();
 		Rectangle rect = fontType.getStringBounds("" + ascii, frc).getBounds();
 		rect.y = y - rect.height;
-		setSize(0, 0, 0, rect.width - width);
+		changeSize(0, 0, 0, rect.width - width);
 
 		g = image.createGraphics();
 		g.setFont(fontType);
@@ -158,7 +167,7 @@ public class FontCharacter {
 		}
 
 		rect = new Rectangle(0, top, image.getWidth(), bottom);
-		setSize(0, 0, -left, -right);
+		changeSize(0, 0, -left, -right);
 		// System.out.println(""+ascii+" yO="+rect.y+" yU="+(rect.y+rect.height)+" right="+right);
 
 		return rect;

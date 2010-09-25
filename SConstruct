@@ -49,7 +49,7 @@ templates
    Regenerate some C++ driver classes from templates.
 
 update
-   Update the SConstruct files for the projects the tests folder.
+   Update the SConstruct files for the example- and tests-folder.
 
 unittest
    Run the unittests
@@ -66,7 +66,6 @@ env = Environment(
 		ENV = os.environ)
 
 def generateSConstruct(top):
-	parser = env.ConfigParser()
 	for dir in top:
 		for path, directories, files in os.walk(dir):
 			# exclude the SVN-directories
@@ -74,7 +73,12 @@ def generateSConstruct(top):
 				directories.remove('.svn')
 			
 			if 'project.cfg' in files:
+				parser = env.ConfigParser()
 				parser.read(os.path.join(path, 'project.cfg'))
+				
+				if not parser.getboolean('scons', 'regenerate', True):
+					#print "skip '%s'" % path
+					continue
 				
 				rootpath = os.sep.join(['..' for x in range(len(path.split(os.sep)))])
 				file = env.Template(target = os.path.join(path, 'SConstruct'),

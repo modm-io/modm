@@ -26,6 +26,8 @@ namespace lcd
 
 xpcc::St7565< lcd::SPI, lcd::CS, lcd::A0, lcd::Reset > display;
 
+using namespace xpcc::glcd;
+
 int
 main()
 {
@@ -39,24 +41,25 @@ main()
 	
 	display.initialize();
 	
-	display.drawHorizontalLine(0, 50, 60);
-	display.drawVerticalLine(20, 20, 30);
+	display.drawLine(Point(68, 50), Point(90, 50));
+	display.drawLine(Point(78, 45), Point(78, 58));
 	
-	display.drawRoundedRectangle(70, 13, 30, 20, 3);
+	display.drawRoundedRectangle(Point(70, 13), 30, 20, 3);
 	
-	display.drawCircle(105, 25, 20);
+	display.drawCircle(Point(105, 25), 20);
 	
-	display.drawEllipse(60, 25, 20, 18);
-	display.drawEllipse(63, 31, 63, 31);
+	display.drawEllipse(Point(60, 25), 20, 18);
+	display.drawEllipse(Point(63, 31), 63, 31);
 	
-	display.fillRectangle(10, 10, 20, 20);
-	display.fillCircle(45, 40, 20);
+	display.fillRectangle(Point(10, 10), 20, 20);
+	display.fillCircle(Point(45, 40), 23);
 	
-	display.setColor(xpcc::GraphicDisplay::WHITE);
-	display.fillRectangle(20, 20, 20, 20);
+	display.setColor(WHITE);
+	display.fillRectangle(Point(20, 20), 20, 20);
+	display.fillCircle(Point(55, 50), 8);
 	
-	display.setColor(xpcc::GraphicDisplay::BLACK);
-	display.drawLine(0, 0, 127, 63);
+	display.setColor(BLACK);
+	display.drawLine(Point(0, 0), Point(127, 63));
 	
 	display.update();
 	

@@ -39,10 +39,13 @@
 namespace xpcc
 {
 	/**
-	 * \brief	Base class for graphical displays 
+	 * \brief	Base class for graphical displays with a RAM buffer
+	 * 
+	 * Every operation works on the internal RAM buffer, therefore the content
+	 * of the real display is not changed until a call of update().
 	 * 
 	 * \tparam	Width	Width of the display.
-	 * \tparam	Rows	Number of rows. The height of the display is Rows * 8.
+	 * \tparam	Rows	Number of rows. The height of the display is 'Rows * 8'.
 	 * 
 	 * \author	Fabian Greif
 	 * \ingroup	lcd
@@ -56,31 +59,35 @@ namespace xpcc
 		{
 		}
 		
+		/**
+		 * \brief	Clear the complete screen
+		 * 
+		 * Use fillRectangle() to clear certain areas of the screen.
+		 */
 		virtual void
 		clear();
 		
+		/**
+		 * \brief	Transfer the content of the RAM buffer to the real display.
+		 */
 		virtual void
 		update() = 0;
 		
-		//virtual void
-		//drawHorizontalLine(uint8_t x1, uint8_t y1, uint8_t length);
-		
-		//virtual void
-		//drawVerticalLine(uint8_t x1, uint8_t y1, uint8_t length);
-		
-		/**
-		 * \brief	Draw an image
-		 * 
-		 * \param x		upper left corner
-		 * \param y		upper left corner
-		 * \param image	image data
-		 * 
-		 * \see	GraphicDisplay::drawImage()
-		 */
+		// Faster version adapted for the RAM buffer
 		virtual void
-		drawImage(uint8_t x, uint8_t y, xpcc::accessor::Flash<uint8_t> image);
+		drawImageRaw(glcd::Point upperLeft,
+				uint8_t width, uint8_t height,
+				xpcc::accessor::Flash<uint8_t> data);
 		
 	protected:
+		// Faster version adapted for the RAM buffer
+		virtual void
+		drawHorizontalLine(glcd::Point start, uint8_t length);
+		
+		// TODO Faster version adapted for the RAM buffer
+		//virtual void
+		//drawVerticalLine(glcd::Point start, uint8_t length);
+		
 		virtual void
 		setPixel(uint8_t x, uint8_t y);
 		

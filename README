@@ -9,14 +9,14 @@ Folder structure
 ----------------
 
 build
-   Temporary folder, build files created when building the unit tests etc.
-   go in here.
+   Temporary folder, build files created during building the unit tests etc.
+   go in here. Can be deleted to save disk space.
 
 doc
    Documentation, mainly the doxygen documentation
 
 examples
-   Example project that shows the usage of the xpcc library.
+   Example project that shows the usage of parts of the xpcc library.
 
 misc
    SCons tools, templates etc.

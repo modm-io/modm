@@ -33,25 +33,27 @@
 #include <stdlib.h>
 #include <xpcc/math/utils/bit_operation.hpp>
 
+#include "font/fixed_width_5x8.hpp"
 #include "graphic_display.hpp"
 
 // ----------------------------------------------------------------------------
 xpcc::GraphicDisplay::GraphicDisplay() :
-	draw(&xpcc::GraphicDisplay::setPixel)
+	draw(&xpcc::GraphicDisplay::setPixel),
+	font(xpcc::accessor::asFlash(xpcc::font::FixedWidth5x8))
 {
 }
 
 // ----------------------------------------------------------------------------
 void
-xpcc::GraphicDisplay::setColor(Color color)
+xpcc::GraphicDisplay::setColor(glcd::Color color)
 {
 	switch (color)
 	{
-		case BLACK:
+		case glcd::BLACK:
 			draw = &xpcc::GraphicDisplay::setPixel;
 			break;
 			
-		case WHITE:
+		case glcd::WHITE:
 			draw = &xpcc::GraphicDisplay::clearPixel;
 			break;
 	}
@@ -59,12 +61,6 @@ xpcc::GraphicDisplay::setColor(Color color)
 }
 
 // ----------------------------------------------------------------------------
-void
-xpcc::GraphicDisplay::drawPixel(uint8_t x, uint8_t y)
-{
-	(this->*draw)(x, y);
-}
-
 void
 xpcc::GraphicDisplay::drawLine(uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2)
 {
@@ -74,7 +70,7 @@ xpcc::GraphicDisplay::drawLine(uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2)
 		if (y1 > y2) {
 			xpcc::swap(y1, y2);
 		}
-		this->drawVerticalLine(x1, y1, y2 - y1);
+		this->drawVerticalLine(glcd::Point(x1, y1), y2 - y1);
 	}
 	else if (y1 == y2)
 	{	
@@ -82,7 +78,7 @@ xpcc::GraphicDisplay::drawLine(uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2)
 		if (x1 > x2) {
 			xpcc::swap(x1, x2);
 		}
-		this->drawHorizontalLine(x1, y1, x2 - x1);
+		this->drawHorizontalLine(glcd::Point(x1, y1), x2 - x1);
 	}
 	else
 	{
@@ -129,41 +125,44 @@ xpcc::GraphicDisplay::drawLine(uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2)
 }
 
 void
-xpcc::GraphicDisplay::drawHorizontalLine(uint8_t x, uint8_t y, uint8_t length)
+xpcc::GraphicDisplay::drawHorizontalLine(glcd::Point start, uint8_t length)
 {
-	for (uint8_t i = x; i < x + length; ++i) {
-		(this->*draw)(i, y);
+	for (uint8_t i = start.getX(); i < start.getX() + length; ++i) {
+		(this->*draw)(i, start.getY());
 	}
 }
 
 void
-xpcc::GraphicDisplay::drawVerticalLine(uint8_t x, uint8_t y, uint8_t length)
+xpcc::GraphicDisplay::drawVerticalLine(glcd::Point start, uint8_t length)
 {
-	for (uint8_t i = y; i < y + length; ++i) {
-		(this->*draw)(x, i);
+	for (uint8_t i = start.getY(); i < start.getY() + length; ++i) {
+		(this->*draw)(start.getX(), i);
 	}
 }
 
 void
-xpcc::GraphicDisplay::drawRectangle(uint8_t x, uint8_t y,
+xpcc::GraphicDisplay::drawRectangle(glcd::Point upperLeft,
 		uint8_t width, uint8_t height)
 {
-	uint8_t x2 = x + width - 1;
-	uint8_t y2 = y + height - 1;
+	uint8_t x2 = upperLeft.getX() + width;
+	uint8_t y2 = upperLeft.getY() + height;
 	
-	this->drawHorizontalLine(x, y,  width);
-	this->drawHorizontalLine(x, y2, width);
-	this->drawVerticalLine(x,  y, height);
-	this->drawVerticalLine(x2, y, height);
+	this->drawHorizontalLine(upperLeft,  width);
+	this->drawHorizontalLine(glcd::Point(upperLeft.getX(), y2), width);
+	this->drawVerticalLine(upperLeft, height);
+	this->drawVerticalLine(glcd::Point(x2, upperLeft.getY()), height);
 }
 
 void
-xpcc::GraphicDisplay::drawRoundedRectangle(uint8_t x, uint8_t y,
+xpcc::GraphicDisplay::drawRoundedRectangle(glcd::Point upperLeft,
 		uint8_t width, uint8_t height, uint8_t radius)
 {
 	if (radius == 0) {
-		this->drawRectangle(x, y, width, height);
+		this->drawRectangle(upperLeft, width, height);
 	}
+	
+	const uint8_t x = upperLeft.getX();
+	const uint8_t y = upperLeft.getY();
 	
 	int8_t x1 = 0;
 	int8_t y1 = radius;
@@ -191,14 +190,14 @@ xpcc::GraphicDisplay::drawRoundedRectangle(uint8_t x, uint8_t y,
 		x1++;
 	}
 	
-	this->drawHorizontalLine(x + radius, y, width - (2 * radius));
-	this->drawHorizontalLine(x + radius, y + height, width - (2 * radius));
-	this->drawVerticalLine(x, y + radius, height - (2 * radius));
-	this->drawVerticalLine(x + width, y + radius, height - (2 * radius));
+	this->drawHorizontalLine(glcd::Point(x + radius, y), width - (2 * radius));
+	this->drawHorizontalLine(glcd::Point(x + radius, y + height), width - (2 * radius));
+	this->drawVerticalLine(glcd::Point(x, y + radius), height - (2 * radius));
+	this->drawVerticalLine(glcd::Point(x + width, y + radius), height - (2 * radius));
 }
 
 void
-xpcc::GraphicDisplay::drawCircle(uint8_t cx, uint8_t cy, uint8_t radius)
+xpcc::GraphicDisplay::drawCircle(glcd::Point center, uint8_t radius)
 {
 	if (radius == 0) {
 		return;
@@ -210,8 +209,8 @@ xpcc::GraphicDisplay::drawCircle(uint8_t cx, uint8_t cy, uint8_t radius)
 	
 	while (x > y)
 	{
-		this->drawCircle4(cx, cy, x, y);
-		this->drawCircle4(cx, cy, y, x);
+		this->drawCircle4(center, x, y);
+		this->drawCircle4(center, y, x);
 		
 		error += y;
 		++y;
@@ -224,20 +223,27 @@ xpcc::GraphicDisplay::drawCircle(uint8_t cx, uint8_t cy, uint8_t radius)
 			error -= x;
 		}
 	}
-	this->drawCircle4(cx, cy, x, y);
+	this->drawCircle4(center, x, y);
 }
 
 void
-xpcc::GraphicDisplay::drawCircle4(uint8_t cx, uint8_t cy, uint8_t x, uint8_t y)
+xpcc::GraphicDisplay::drawCircle4(glcd::Point center, uint8_t x, uint8_t y)
 {
+	const uint8_t cx = center.getX();
+	const uint8_t cy = center.getY();
+	
 	(this->*draw)(cx + x, cy + y);
 	(this->*draw)(cx - x, cy - y);
-	if (x != 0) { (this->*draw)(cx - x, cy + y); }
-	if (y != 0) { (this->*draw)(cx + x, cy - y); }
+	if (x != 0) {
+		(this->*draw)(cx - x, cy + y);
+	}
+	if (y != 0) {
+		(this->*draw)(cx + x, cy - y);
+	}
 }
 
 void
-xpcc::GraphicDisplay::drawEllipse(uint8_t cx, uint8_t cy, uint8_t rx, uint8_t ry)
+xpcc::GraphicDisplay::drawEllipse(glcd::Point center, uint8_t rx, uint8_t ry)
 {
 	int32_t rx_2 = rx * rx;
 	int32_t ry_2 = ry * ry;
@@ -250,7 +256,7 @@ xpcc::GraphicDisplay::drawEllipse(uint8_t cx, uint8_t cy, uint8_t rx, uint8_t ry
 	
 	int32_t p = ry_2 - (rx_2 * ry) + (rx_2 + 2) / 4;
 	
-	drawCircle4(cx, cy, x, y);
+	drawCircle4(center, x, y);
 	while (fx < fy)
 	{
 		x++;
@@ -265,7 +271,7 @@ xpcc::GraphicDisplay::drawEllipse(uint8_t cx, uint8_t cy, uint8_t rx, uint8_t ry
 			p += (fx + ry_2 - fy);
 		}
 		
-		drawCircle4(cx, cy, x, y);
+		drawCircle4(center, x, y);
 	}
 	
 	p = ((ry_2 * (4 * x * x + 4 * x + 1) / 2) + 
@@ -286,77 +292,47 @@ xpcc::GraphicDisplay::drawEllipse(uint8_t cx, uint8_t cy, uint8_t rx, uint8_t ry
 			p += (fx + rx_2 - fy);
 		}
 		
-		drawCircle4(cx, cy, x, y);
+		drawCircle4(center, x, y);
 	}
 }
 
 // ----------------------------------------------------------------------------
 void
-xpcc::GraphicDisplay::drawImage(uint8_t x, uint8_t y,
+xpcc::GraphicDisplay::drawImage(glcd::Point upperLeft,
 		xpcc::accessor::Flash<uint8_t> image)
 {
 	uint8_t width = image[0];
 	uint8_t height = image[1];
-	uint8_t rows = (height + 7) / 8;
 	
+	drawImageRaw(upperLeft, width, height,
+			xpcc::accessor::Flash<uint8_t>(image.getPointer() + 2));
+}
+
+void
+xpcc::GraphicDisplay::drawImageRaw(glcd::Point upperLeft,
+		uint8_t width, uint8_t height,
+		xpcc::accessor::Flash<uint8_t> data)
+{
+	uint8_t rows = (height + 7) / 8;
 	for (uint8_t i = 0; i < width; i++)
 	{
 		for (uint8_t k = 0; k < rows; k++)
 		{
-			uint8_t byte = image[2 + i + k * width];
-			for (uint8_t j = 0; j < 8; j++)
+			uint8_t byte = data[i + k * width];
+			uint8_t rowHeight = height - k * 8;
+			if (rowHeight > 8) {
+				rowHeight = 8;
+			}
+			for (uint8_t j = 0; j < rowHeight; j++)
 			{
 				if (byte & 0x01) {
-					this->setPixel(x + i, y + k * 8 + j);
+					this->setPixel(upperLeft.getX() + i, upperLeft.getY() + k * 8 + j);
 				}
 				else {
-					this->clearPixel(x + i, y + k * 8 + j);
+					this->clearPixel(upperLeft.getX() + i, upperLeft.getY() + k * 8 + j);
 				}
 				byte >>= 1;
 			}
 		}
-	}
-}
-
-// ----------------------------------------------------------------------------
-void
-xpcc::GraphicDisplay::fillRectangle(uint8_t x, uint8_t y,
-		uint8_t width, uint8_t height)
-{
-	for (uint8_t i = x; (i < x + width) && (i < 128); i++) {
-		for (uint8_t k = y; (k < y + height) && (k < 64); k++) {
-			(this->*draw)(i, k);
-		}
-	}
-}
-
-void
-xpcc::GraphicDisplay::fillCircle(uint8_t cx, uint8_t cy, uint8_t radius)
-{
-	int8_t f = 1 - radius;
-	int8_t ddF_x = 0;
-	int8_t ddF_y = -2 * radius;
-	uint8_t x = 0;
-	uint8_t y = radius;
-	
-	this->drawVerticalLine(cx, cy - radius, 2 * radius);
-	this->drawHorizontalLine(cx - radius, cy, 2* radius);
-	
-	while(x < y)
-	{
-		if (f >= 0)
-		{
-			y--;
-			ddF_y += 2;
-			f += ddF_y;
-		}
-		x++;
-		ddF_x += 2;
-		f += ddF_x + 1;
-		
-		this->drawVerticalLine(cx + x, cy - y, 2 * y);
-		this->drawVerticalLine(cx + y, cy - x, 2 * x);
-		this->drawVerticalLine(cx - x, cy - y, 2 * y);
-		this->drawVerticalLine(cx - y, cy - x, 2 * x);
 	}
 }

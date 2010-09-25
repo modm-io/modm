@@ -49,31 +49,53 @@ xpcc::BufferedGraphicDisplay<Width, Rows>::clear()
 // ----------------------------------------------------------------------------
 template <uint8_t Width, uint8_t Rows>
 void
-xpcc::BufferedGraphicDisplay<Width, Rows>::drawImage(uint8_t x, uint8_t y,
-		xpcc::accessor::Flash<uint8_t> image)
+xpcc::BufferedGraphicDisplay<Width, Rows>::drawHorizontalLine(
+		glcd::Point start,
+		uint8_t length)
 {
-	div_t row = div(y, 8);
-	if (row.rem == 0)
+	const uint8_t row = start.getY() / 8;
+	
+	if (this->color == glcd::BLACK)
 	{
-		uint8_t width = image[0];
-		uint8_t height = image[1];
+		const uint8_t mask = 1 << (start.getY() & 0x07);
+		for (uint8_t i = start.getX(); i < start.getX() + length; ++i) {
+			this->buffer[i][row] |= mask;
+		}
+	}
+	else {
+		const uint8_t mask = ~(1 << (start.getY() & 0x07));
+		for (uint8_t i = start.getX(); i < start.getX() + length; ++i) {
+			this->buffer[i][row] &= mask;
+		}
+	}
+}
+
+// ----------------------------------------------------------------------------
+template <uint8_t Width, uint8_t Rows>
+void
+xpcc::BufferedGraphicDisplay<Width, Rows>::drawImageRaw(glcd::Point upperLeft,
+		uint8_t width, uint8_t height,
+		xpcc::accessor::Flash<uint8_t> data)
+{
+	if ((upperLeft.getY() & 0x07) == 0)
+	{
+		uint8_t row = upperLeft.getY() / 8;
+		uint8_t rowCount = (height + 7) / 8;	// always round up
 		
-		uint8_t rows = (height + 7) / 8;
-		
-		if (rows == height / 8)
+		if ((height & 0x07) == 0)
 		{
 			for (uint8_t i = 0; i < width; i++)
 			{
-				for (uint8_t k = 0; k < rows; k++)
+				for (uint8_t k = 0; k < rowCount; k++)
 				{
-					this->buffer[x + i][k + row.quot] = image[2 + i + k * width];
+					this->buffer[upperLeft.getX() + i][k + row] = data[i + k * width];
 				}
 			}
 			return;
 		}
 	}
 	
-	GraphicDisplay::drawImage(x, y, image);
+	GraphicDisplay::drawImageRaw(upperLeft, width, height, data);
 }
 
 // ----------------------------------------------------------------------------
