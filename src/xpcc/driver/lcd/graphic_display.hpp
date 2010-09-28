@@ -75,6 +75,24 @@ namespace xpcc
 	 * 
 	 * \ingroup	lcd
 	 */
+	/*
+	 * TODO
+	 * 
+	 * setBrush() and setPen() for filling and the border?
+	 * possible Brush/Pen modes:
+	 * - NONE
+	 * - BLACK
+	 * - WHITE
+	 * - INVERT
+	 * 
+	 * Text mode:
+	 * - left adjusted (default)
+	 * - right adjusted
+	 * - centered
+	 * 
+	 * All modes relative to the current viewport. This would make
+	 * drawing a menu system easier.
+	 */
 	class GraphicDisplay : public IODevice
 	{
 	public:
@@ -98,7 +116,11 @@ namespace xpcc
 			return this->color;
 		}
 		
-		// TODO Limit the coordinate system to a smaller area
+		/**
+		 * \brief	Limit the coordinate system to a smaller area
+		 * 
+		 * The default viewport is the complete screen.
+		 */
 		//void
 		//setViewport();
 		
@@ -213,9 +235,9 @@ namespace xpcc
 		 * \see		xpcc::font
 		 */
 		inline void
-		setFont(accessor::Flash<uint8_t> font)
+		setFont(const uint8_t *font)
 		{
-			this->font = font;
+			this->font = xpcc::accessor::asFlash(font);
 		}
 		
 		/**
@@ -260,6 +282,9 @@ namespace xpcc
 		
 		virtual void
 		clearPixel(uint8_t x, uint8_t y) = 0;
+		
+		virtual bool
+		getPixel(uint8_t x, uint8_t y) = 0;
 		
 	protected:
 		// callback function for drawing pixels

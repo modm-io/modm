@@ -29,15 +29,30 @@
  * $Id$
  */
 // ----------------------------------------------------------------------------
-/**
- * \ingroup		lcd
- * \defgroup	font	Various fonts for graphical displays
- * 
- * The fonts are created with the "FontCreator 2.2", see \c tools/font_creator.
- */
 
-#include "font/scripto_narrow.hpp"
-#include "font/all_caps_3x6.hpp"
-#include "font/fixed_width_5x8.hpp"
-#include "font/assertion.hpp"
-#include "font/arcade_classic.hpp"
+#ifndef XPCC_FONT__ARCADE_CLASSIC_HPP
+#define	XPCC_FONT__ARCADE_CLASSIC_HPP
+
+#include <xpcc/architecture/driver/accessor.hpp>
+
+namespace xpcc
+{
+	namespace font
+	{
+		/**
+		 * \brief	Bold fixed width font (7x8)
+		 * 
+		 * Font size in bytes  : 774 \n
+		 * Font width          : 7 \n
+		 * Font height         : 8 \n
+		 * Font first char     : 32 \n
+		 * Font last char      : 128 \n
+		 * Font used chars     : 96
+		 * 
+		 * \ingroup	font
+		 */
+		EXTERN_FLASH(uint8_t ArcadeClassic[]);
+	}
+}
+
+#endif	// XPCC_FONT__ARCADE_CLASSIC_HPP

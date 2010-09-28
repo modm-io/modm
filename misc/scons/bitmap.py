@@ -38,11 +38,14 @@ from SCons.Script import *
 template = """
 #include <xpcc/architecture/driver/accessor.hpp>
 
+namespace bitmap
+{
 FLASH(uint8_t ${name}[]) =
 {
 	${width}, ${height},
 	${array}
 };
+}
 """
 
 # -----------------------------------------------------------------------------

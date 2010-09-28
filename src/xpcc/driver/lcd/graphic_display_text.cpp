@@ -57,9 +57,10 @@ xpcc::GraphicDisplay::write(char c)
 	
 	uint16_t offset = count + 6;
 	uint8_t position = character - first + 6;
+	const uint8_t usedRows = (height + 7) / 8;
 	for (uint8_t i = 6; i < position; i++)
 	{
-		offset += font[i];
+		offset += font[i] * usedRows;
 	}
 	uint8_t width = font[position];
 	

@@ -42,11 +42,14 @@ public class CharEditor extends JComponent implements MouseListener,
 	public static final int TOOL_DRAW_OVAL = 6;
 	public static final int TOOL_FILL_OVAL = 7;
 	public static final int TOOL_EYEDROPPER = 8;
-
+	
 	private int zoom;
 	private int xO = 0;
 	private int yO = 0;
+	
+	@SuppressWarnings("unused")
 	private FontEditor parent;
+	
 	private EditorPopupMenu popup;
 	private BufferedImage drawMask;
 	private Point mouseDown;
@@ -54,7 +57,8 @@ public class CharEditor extends JComponent implements MouseListener,
 
 	private int color;
 	private int tool;
-
+	
+	private BufferedImage buffer;
 	private FontCharacter fc;
 	private MainWindow mainWnd;
 
@@ -92,10 +96,8 @@ public class CharEditor extends JComponent implements MouseListener,
 		repaint();
 	}
 
-	public void paint(Graphics graphics) {
-		setPreferredSize(new Dimension(fc.getWidth() * zoom, fc.getHeight()
-				* zoom));
-
+	public void paint(Graphics graphics)
+	{		
 		if (fc.getImage() != null)
 		{
 			Graphics2D g = (Graphics2D) graphics;
@@ -125,7 +127,7 @@ public class CharEditor extends JComponent implements MouseListener,
 				g.fillRect(x + xO, y + yO, zoom, zoom);
 				x += zoom;
 			}
-
+			
 			// draw Mask
 			if (drawMask != null && drawMask.getWidth() == fc.getWidth()
 					&& drawMask.getHeight() == fc.getHeight()) {
@@ -145,10 +147,10 @@ public class CharEditor extends JComponent implements MouseListener,
 					x += zoom;
 				}
 			}
-
+			
 			// Grid
 			if (zoom > 4) {
-				g.setColor(new Color(150, 150, 150, 180));
+				g.setColor(new Color(150, 150, 150));
 				for (int i = 0; i <= w; i++) {
 					g.drawLine(i * zoom + xO, 0 + yO, i * zoom + xO, h * zoom
 							+ yO);
@@ -182,9 +184,12 @@ public class CharEditor extends JComponent implements MouseListener,
 		int h = fc.getHeight();
 		int x = (e.getX() - xO) / zoom;
 		int y = (e.getY() - yO) / zoom;
-
-		if (e.getButton() == MouseEvent.BUTTON1 && x >= 0 && x < w && y >= 0
-				&& y < h && tool != TOOL_NONE) {
+		
+		if (e.getButton() == MouseEvent.BUTTON1 &&
+				x >= 0 && x < w &&
+				y >= 0 && y < h &&
+				tool != TOOL_NONE)
+		{
 			Graphics g;
 			switch (tool) {
 			case TOOL_FREEHAND:
@@ -437,6 +442,10 @@ public class CharEditor extends JComponent implements MouseListener,
 	}
 
 	public void setZoom(int zoomValue) {
+		this.setPreferredSize(
+				new Dimension(
+						fc.getWidth() * zoom,
+						fc.getHeight() * zoom));
 		zoom = zoomValue;
 	}
 

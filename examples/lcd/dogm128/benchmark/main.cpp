@@ -6,7 +6,10 @@
 #include <xpcc/driver/software_spi.hpp>
 #include <xpcc/workflow.hpp>
 
-EXTERN_FLASH(uint8_t rca_logo_128x64[]);
+namespace bitmap
+{
+	EXTERN_FLASH(uint8_t rca_logo_128x64[]);
+}
 
 namespace led
 {
@@ -68,24 +71,24 @@ introScreen()
 {
 	display.drawImage(
 			Point(0, 0),
-			xpcc::accessor::asFlash(rca_logo_128x64));
+			xpcc::accessor::asFlash(bitmap::rca_logo_128x64));
 	display.update();
 	
 	xpcc::delay_ms(2000);
 	
 	display.clear();
 	
-	display.setFont(xpcc::accessor::asFlash(xpcc::font::ScriptoNarrow));
+	display.setFont(xpcc::font::ScriptoNarrow);
 	display.setCursor(Point(0, 0));
 	displayStream << "ABCDEFGHIJKLMNOPQRSTUVWXYZ!\"§$%&" << xpcc::endl;
 	displayStream << "abcdefghijklmnopqrstuvwxyz012345";
 	
-	display.setFont(xpcc::accessor::asFlash(xpcc::font::AllCaps3x6));
+	display.setFont(xpcc::font::AllCaps3x6);
 	display.setCursor(Point(0, 20));
 	displayStream << "ABCDEFGHIJKLMNOPQRSTUVWXYZ!\"§$%&/()" << xpcc::endl;
 	displayStream << "abcdefghijklmnopqrstuvwxyz01234567";
 	
-	display.setFont(xpcc::accessor::asFlash(xpcc::font::FixedWidth5x8));
+	display.setFont(xpcc::font::FixedWidth5x8);
 	display.setCursor(Point(0, 35));
 	displayStream << "ABCDEFGHIJKLMNOPQRSTU" << xpcc::endl;
 	displayStream << "abcdefghijklmnopqrstu";
@@ -145,7 +148,7 @@ MAIN_FUNCTION
 	
 	introScreen();
 	
-	display.setFont(xpcc::accessor::asFlash(xpcc::font::FixedWidth5x8));
+	display.setFont(xpcc::font::FixedWidth5x8);
 	
 	xpcc::PeriodicTimer<> timer(1000);
 	while (1)

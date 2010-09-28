@@ -112,3 +112,10 @@ xpcc::BufferedGraphicDisplay<Width, Rows>::clearPixel(uint8_t x, uint8_t y)
 {
 	this->buffer[x][y / 8] &= ~(1 << (y & 0x07));
 }
+
+template <uint8_t Width, uint8_t Rows>
+bool
+xpcc::BufferedGraphicDisplay<Width, Rows>::getPixel(uint8_t x, uint8_t y)
+{
+	return (this->buffer[x][y / 8] & (1 << (y & 0x07)));
+}

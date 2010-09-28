@@ -68,8 +68,12 @@ public class Font {
 				chars.get(i).changeSize(-cropTop, -cropBottom, 0, 0);
 			}
 		}
+		else {
+			cropTop = 0;
+			cropBottom = 0;
+		}
 	}
-
+	
 	public Font(SerializableFont sFont) {
 		width = sFont.getWidth();
 		height = sFont.getHeight();
@@ -88,11 +92,11 @@ public class Font {
 			chars.add(c[i].getFontCharacter(this));
 		}
 	}
-
+	
 	public FontCharacter getChar(int index) {
 		return chars.get(index);
 	}
-
+	
 	public FontCharacter[] getAllChars() {
 		FontCharacter[] c = new FontCharacter[chars.size()];
 		for (int i = 0; i < chars.size(); i++) {

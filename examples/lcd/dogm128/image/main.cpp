@@ -135,16 +135,19 @@ FLASH(uint8_t bootscreen[]) =
 	0xc0, 0xc0, 0xc0, 0xe0, 0x60, 0x78, 0x3f, 0x0f,
 };
 
-EXTERN_FLASH(uint8_t image_64x64_0[]);
-EXTERN_FLASH(uint8_t image_64x64_1[]);
-EXTERN_FLASH(uint8_t image_64x64_2[]);
-EXTERN_FLASH(uint8_t image_64x64_3[]);
-EXTERN_FLASH(uint8_t image_64x64_4[]);
-EXTERN_FLASH(uint8_t image_64x64_5[]);
-EXTERN_FLASH(uint8_t image_64x64_6[]);
-EXTERN_FLASH(uint8_t image_64x64_7[]);
-EXTERN_FLASH(uint8_t image_64x64_8[]);
-EXTERN_FLASH(uint8_t image_64x64_9[]);
+namespace bitmap
+{
+	EXTERN_FLASH(uint8_t image_64x64_0[]);
+	EXTERN_FLASH(uint8_t image_64x64_1[]);
+	EXTERN_FLASH(uint8_t image_64x64_2[]);
+	EXTERN_FLASH(uint8_t image_64x64_3[]);
+	EXTERN_FLASH(uint8_t image_64x64_4[]);
+	EXTERN_FLASH(uint8_t image_64x64_5[]);
+	EXTERN_FLASH(uint8_t image_64x64_6[]);
+	EXTERN_FLASH(uint8_t image_64x64_7[]);
+	EXTERN_FLASH(uint8_t image_64x64_8[]);
+	EXTERN_FLASH(uint8_t image_64x64_9[]);
+}
 
 void
 drawNumber(xpcc::glcd::Point cursor, uint8_t number)
@@ -152,34 +155,34 @@ drawNumber(xpcc::glcd::Point cursor, uint8_t number)
 	switch (number)
 	{
 		case 0:
-			display.drawImage(cursor, xpcc::accessor::asFlash(image_64x64_0));
+			display.drawImage(cursor, xpcc::accessor::asFlash(bitmap::image_64x64_0));
 			break;
 		case 1:
-			display.drawImage(cursor, xpcc::accessor::asFlash(image_64x64_1));
+			display.drawImage(cursor, xpcc::accessor::asFlash(bitmap::image_64x64_1));
 			break;
 		case 2:
-			display.drawImage(cursor, xpcc::accessor::asFlash(image_64x64_2));
+			display.drawImage(cursor, xpcc::accessor::asFlash(bitmap::image_64x64_2));
 			break;
 		case 3:
-			display.drawImage(cursor, xpcc::accessor::asFlash(image_64x64_3));
+			display.drawImage(cursor, xpcc::accessor::asFlash(bitmap::image_64x64_3));
 			break;
 		case 4:
-			display.drawImage(cursor, xpcc::accessor::asFlash(image_64x64_4));
+			display.drawImage(cursor, xpcc::accessor::asFlash(bitmap::image_64x64_4));
 			break;
 		case 5:
-			display.drawImage(cursor, xpcc::accessor::asFlash(image_64x64_5));
+			display.drawImage(cursor, xpcc::accessor::asFlash(bitmap::image_64x64_5));
 			break;
 		case 6:
-			display.drawImage(cursor, xpcc::accessor::asFlash(image_64x64_6));
+			display.drawImage(cursor, xpcc::accessor::asFlash(bitmap::image_64x64_6));
 			break;
 		case 7:
-			display.drawImage(cursor, xpcc::accessor::asFlash(image_64x64_7));
+			display.drawImage(cursor, xpcc::accessor::asFlash(bitmap::image_64x64_7));
 			break;
 		case 8:
-			display.drawImage(cursor, xpcc::accessor::asFlash(image_64x64_8));
+			display.drawImage(cursor, xpcc::accessor::asFlash(bitmap::image_64x64_8));
 			break;
 		case 9:
-			display.drawImage(cursor, xpcc::accessor::asFlash(image_64x64_9));
+			display.drawImage(cursor, xpcc::accessor::asFlash(bitmap::image_64x64_9));
 			break;
 	}
 }

@@ -94,6 +94,9 @@ namespace xpcc
 		virtual void
 		clearPixel(uint8_t x, uint8_t y);
 		
+		virtual bool
+		getPixel(uint8_t x, uint8_t y);
+		
 		uint8_t buffer[Width][Rows];
 	};
 }

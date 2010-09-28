@@ -48,8 +48,8 @@ namespace xpcc
 	 * \brief	Polygon
 	 *
 	 * The Polygon class provides a vector of points. The polygon is
-	 * implicit closed, meaning the first and the last point are connected.
-	 *
+	 * implicit closed, which means the first and the last point are connected.
+	 * 
 	 * \author	Fabian Greif
 	 * \ingroup	geometry
 	 */

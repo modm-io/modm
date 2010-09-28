@@ -64,6 +64,8 @@ xpcc::Mcp23s17<Spi, Cs, Int>::initialize()
 	spi.write((1 << 6) | (1 << 2));
 	spi.write((1 << 6) | (1 << 2));
 	cs.set();
+	
+	xpcc::delay_us(0.1);
 }
 
 template <typename Spi, typename Cs, typename Int>
@@ -85,6 +87,8 @@ xpcc::Mcp23s17<Spi, Cs, Int>::configure(uint16_t inputMask, uint16_t pullupMask)
 	spi.write(pullupMask & 0xff);
 	spi.write(pullupMask >> 8);
 	cs.set();
+	
+	xpcc::delay_us(0.1);
 }
 
 //void
@@ -103,6 +107,8 @@ xpcc::Mcp23s17<Spi, Cs, Int>::read()
 	value |= spi.write(0x00) << 8;
 	cs.set();
 	
+	xpcc::delay_us(0.1);
+	
 	return value;
 }
 
@@ -116,4 +122,6 @@ xpcc::Mcp23s17<Spi, Cs, Int>::write(uint16_t output)
 	spi.write(output & 0xff);
 	spi.write(output >> 8);
 	cs.set();
+	
+	xpcc::delay_us(0.1);
 }

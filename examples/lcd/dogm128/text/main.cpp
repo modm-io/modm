@@ -45,20 +45,40 @@ MAIN_FUNCTION
 	
 	display.initialize();
 	
-	display.setColor(xpcc::glcd::WHITE);
-	display.setFont(xpcc::accessor::asFlash(xpcc::font::ScriptoNarrow));
+	display.setFont(xpcc::font::ScriptoNarrow);
 	display.setCursor(xpcc::glcd::Point(0, 0));
 	display.write("Hello World!\n");
 	display.write("ABCDEFGHIJKLMNOPQRSTUVWXYZ\n");
 	display.write("abcdefghijklmnopqrstuvwxyz\n");
 	display.write("0123456789!\"§$%&/()=?`´,;:-<>");
 	
-	display.setFont(xpcc::accessor::asFlash(xpcc::font::AllCaps3x6));
+	display.setFont(xpcc::font::AllCaps3x6);
 	display.setCursor(xpcc::glcd::Point(0, 32));
 	displayStream << "Hello World!" << xpcc::endl;
 	displayStream << "ABCDEFGHIJKLMNOPQRSTUVWXYZ" << xpcc::endl;
 	displayStream << "abcdefghijklmnopqrstuvwxyz" << xpcc::endl;
 	displayStream << 0 << 12 << 345 << 6789 << "!\"§$%&/()=?`´,;:-<>";
+	display.update();
+	
+	xpcc::delay_ms(2000);
+	
+	display.clear();
+	display.setFont(xpcc::font::Assertion);
+	display.setCursor(xpcc::glcd::Point(0, 0));
+	display.write("Hello World!\n");
+	display.write("ABCDEFGHIJKLMNOPQRSTUVWXYZ\n");
+	display.write("abcdefghijklmnopqrstuvwxyz\n");
+	display.write("0123456789!\"§$%&/()=?`´,;:-<>");
+	display.update();
+	
+	xpcc::delay_ms(2000);
+	
+	display.clear();
+	display.setFont(xpcc::font::ArcadeClassic);
+	display.setCursor(xpcc::glcd::Point(0, 0));
+	display.write("Hello World!\n\n");
+	display.write("ABCDEFGHIJKLMNOP\nQRSTUVWXYZ\n");
+	display.write("0123456789!\"§$%&/\n()=?`´,;:-<>");
 	display.update();
 	
 	while (1)

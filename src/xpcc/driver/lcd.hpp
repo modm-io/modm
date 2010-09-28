@@ -36,7 +36,8 @@
  * \ingroup		driver
  */
 
-#include "lcd/character_display.hpp"
 #include "lcd/hd44780.hpp"
 #include "lcd/st7036.hpp"
 
+#include "lcd/st7565.hpp"
+#include "lcd/font.hpp"

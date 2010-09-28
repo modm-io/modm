@@ -29,15 +29,30 @@
  * $Id$
  */
 // ----------------------------------------------------------------------------
-/**
- * \ingroup		lcd
- * \defgroup	font	Various fonts for graphical displays
- * 
- * The fonts are created with the "FontCreator 2.2", see \c tools/font_creator.
- */
 
-#include "font/scripto_narrow.hpp"
-#include "font/all_caps_3x6.hpp"
-#include "font/fixed_width_5x8.hpp"
-#include "font/assertion.hpp"
-#include "font/arcade_classic.hpp"
+#ifndef XPCC_FONT__ASSERTION_HPP
+#define	XPCC_FONT__ASSERTION_HPP
+
+#include <xpcc/architecture/driver/accessor.hpp>
+
+namespace xpcc
+{
+	namespace font
+	{
+		/**
+		 * \brief	(~7x15)
+		 * 
+		 * Font size in bytes  : 1306
+		 * Font width          : 7
+		 * Font height         : 15
+		 * Font first char     : 32
+		 * Font last char      : 128
+		 * Font used chars     : 96
+		 * 
+		 * \ingroup	font
+		 */
+		EXTERN_FLASH(uint8_t Assertion[]);
+	}
+}
+
+#endif	// XPCC_FONT__ASSERTION_HPP
