@@ -33,6 +33,11 @@
 #ifndef XPCC__CAN_USB_HPP
 #define XPCC__CAN_USB_HPP
 
+#include "message.hpp"
+#include "../../architecture/driver/unix/serial_port.hpp"
+#include <string>
+#include <queue>
+
 namespace xpcc
 {
 	/**
@@ -45,23 +50,25 @@ namespace xpcc
 	class CanUsb
 	{
 	public:
-		CanUsb();
+		CanUsb(std::string deviceName, unsigned int baudRate);
 		
 		~CanUsb();
 		
-		static bool
+		bool
 		open();
 		
-		static bool
+		void
 		close();
 		
-		static inline bool
-		isMessageAvailable();
+		inline bool
+		isMessageAvailable(){
+			if(this->readBuffer.empty()) return false;
+			else return true;
+		}
 		
-		/*
-		static bool
-		getMessage(Can::Message& message);
-		*/
+
+		bool
+		getMessage(can::Message& message);
 		
 		/*
 		 * The CAN controller has a free slot to send a new message.
@@ -69,9 +76,10 @@ namespace xpcc
 		 * \return true if a slot is available, false otherwise
 		 */
 
-		static inline bool
+		inline bool
 		isReadyToSend()
 		{
+			// TODO
 			return true;
 		}
 		
@@ -81,19 +89,21 @@ namespace xpcc
 		 * \return true if the message was send, false otherwise
 		 */
 
-		/*
-		static bool
-		sendMessage(const Can::Message& message);
-		*/
+		bool
+		sendMessage(const can::Message& message);
 
+		void update();
 
 	private:
-
-		/*
-		boost::asio::io_service*  io_service;
-		boost::asio::serial_port_base::baud_rate baud_rate;
-		boost::asio::serialPort serialPort;
-		*/
+		typedef boost::mutex				Mutex;
+		typedef boost::mutex::scoped_lock	MutexGuard;
+		Mutex stateLock;
+		Mutex readBufferLock;
+		bool active;
+		xpcc::pc::SerialPort serialPort;
+		std::string tmpRead;
+		std::queue<can::Message> readBuffer;
+		boost::thread* thread;
 
 	};
 }

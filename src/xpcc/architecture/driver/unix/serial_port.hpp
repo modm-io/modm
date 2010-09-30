@@ -49,22 +49,22 @@ namespace xpcc
 		/**
 		 * \brief	Output on Serial Port
 		 *
+		 * Port is closed right after construction.
+		 *
 		 * \ingroup	pc
-		 * TODO: find a better way for reading data
 		 */
 		class SerialPort : IODevice
 		{
 		public :
 
-			SerialPort( std::string deviceName, unsigned int bautRate);
+			SerialPort( std::string deviceName, unsigned int baudRate);
 
 			~SerialPort();
 
-			virtual void
-			write(char c);
+			using IODevice::write;
 
 			virtual void
-			write(const char* s);
+			write(char c);
 
 			virtual void
 			flush();
@@ -81,29 +81,41 @@ namespace xpcc
 			virtual void
 			close();
 
+			void
+			kill();
+
+			void
+			clearReadBuffer();
+
+			void
+			clearWriteBuffer();
 
 		private:
 			typedef boost::mutex				Mutex;
 			typedef boost::mutex::scoped_lock	MutexGuard;
 
 			bool shutdown;
-
-			Mutex queueLock;
+			std::string deviceName;
+			unsigned int baudRate;
+			Mutex readMutex;
+			Mutex writeMutex;
 
 			char tmpRead;
 			std::queue<char> writeBuffer;
 			std::queue<char> readBuffer;
 
-			boost::asio::io_service 			io_service;
-			boost::asio::serial_port serialPort;
-			boost::thread* thread;
-
+			boost::asio::io_service  io_service;
+			boost::asio::serial_port port;
+			boost::thread* 			 thread;
 
 			void
 			readStart();
 
 	        void
 	        doClose(const boost::system::error_code& error);
+
+	        void
+	        doAbort(const boost::system::error_code& error);
 
 	        void
 	        doWrite(const char c);

@@ -120,6 +120,7 @@ namespace xpcc
 	class CanConnector : protected CanConnectorBase, public BackendInterface
 	{
 	public:
+
 		CanConnector(Driver *driver);
 		
 		virtual
@@ -146,6 +147,11 @@ namespace xpcc
 		update();
 	
 	protected:
+		CanConnector(const CanConnector&);
+
+		CanConnector&
+		operator = (const CanConnector&);
+
 		/**
 		 * \brief	Try to send a CAN message via CAN Driver
 		 * 
