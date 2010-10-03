@@ -1,0 +1,12 @@
+// coding: utf-8
+// $Id$
+
+/*!
+\page tool_pc 	3.4.9 Tool: pc
+
+Adds some tools and variables to the Environment needed for pc
+compilation. The tool distinguishes between different systems.
+
+TODO
+
+*/

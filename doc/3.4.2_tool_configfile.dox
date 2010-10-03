@@ -8,17 +8,39 @@
 
 \subsection tool_configfile_find FindFiles(path [, unittest])
 
-Search for every useable source file in this folder and its subfolders. While
-iterating through the folders it looks for configuration files called \c build.cfg.
-If finds one it checks if this folder is supposed to be build for the current
-architecture. If not the folder and its subfolders are excluded from the search.
+Search for every useable source file in this folder and its subfolders (except
+.svn folders).
+If one folder contains the configuration file \c build.cfg, then it and it's
+subfolders are only included into the search if the current architecture
+matches the target-option in this file.
 
 More about this in the page about \ref configuration_files "configuration files".
 
-TODO unittest
+The returned object Provides the following attributes:
+	- sources:	list of source files
+	- header:	list of header files
+	- defines:	dictionary with defines needed by the source files
+
+TODO check if the next paragraph is true
+
+Folders named \c test are special folders. If \c unittest = True
+only test folders are included in the search. If \c unittest = False all folders
+named test are excluded. If \c unittest = None tests are handled like normal
+folders.
 
 \subsection tool_configfile_parser ConfigParser()
 
-Create a configuration parser class.
+Create a configuration parser class. It is the class which is also used internally
+to parse the configuration files. Methods are 
+ - read(filename): call this before using one of the other methods.
+ - get(section, option, default=None): returns the value of \c option in \c section.
+	Returns \c default if \c option not found.
+	Raises \c ParserException if \c option not found and \c default = None.
+ - getboolean(section, option, default=None): like get.
+	TODO: describe the exactly behaviour
+ - items(section): returns all options in \c section
+	Raises \c ParserException if \c section not found.
+
+More about this in the page about \ref configuration_files "configuration files".
 
 */

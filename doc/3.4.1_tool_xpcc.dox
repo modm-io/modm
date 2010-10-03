@@ -19,7 +19,7 @@ This tells SCons a few things:
 When your \e SConstruct file contains this Command you'll be able to use
 everything form the XPCC library.
 
-TODO Options
+TODO complete the list of Options
 
 \subsection tool_xpcc_defines Defines()
 
@@ -45,4 +45,37 @@ the current folder this relative folder structure will be preserved. Otherwise
 the file will be located to the root-folder of the buildpath.
 
 \subsection tool_xpcc_check CheckArchitecture(string)
+
+\section tool_xpcc_construction_variables	Evaluated construction variables
+
+There are several construction variables which may be set in order to modify the
+behaviour of the tool.
+
+TODO: write sth about how to set or modify construction variables of the
+Environment or where to read about it. 
+\verbatim
+#Check if it's right
+#Construction variables can be set while creating environment.
+env = Environment(variable='value', ...)
+#Or also afterwards
+env[variable]=value;
+\endverbatim
+
+
+- 'rootpath': If not specified this tool tries to get the root path from the
+		toolpath. Set this variable to the trunk folder of xpcc project or to
+		equevalent if the toolpath is for any reason not the subfolder
+		'misc/scons' of it.
+- 'configfile': If not specified this tool tries to parse project.cfg and will
+		cause an error on failture. If any other file should be taken instead 
+		set this variable to it's path.
+- 'buildpath': There are two possibilities to modify the folder which is used for
+		output of the build process.
+	- The default behaviour is to take the subfolder named 'build' in the current
+		folder as buildpath.
+	- It may be overriden by the option 'buildpath' in the section 'build' of
+		the configfile.
+	- But if this constuction variable is set, it's value will be taken for the
+		buildpath regardless of the configfile.
+
 */

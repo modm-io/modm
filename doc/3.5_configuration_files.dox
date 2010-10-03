@@ -10,6 +10,9 @@
 These files describe how to build a specific folder. They are simple
 INI-files and can be edited with any editor you like.
 
+The configfiles are parsed with the module ConfigParser of python, but it
+also may change in future, so do't rely on it's specific syntax extensions.
+
 \subsubsection build_cfg build.cfg
 
 These files have two sections: \b build contains all information needed to
@@ -67,7 +70,10 @@ architecture = pc
    - device
    - clock
    - library_name
+   - buildpath
  - environment
+	options defined here will be appent to the scons environment by the xpcc tool
+ - defines
  - program
    - tool = avrdude
    - port
