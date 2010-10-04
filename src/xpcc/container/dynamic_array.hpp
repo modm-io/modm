@@ -76,7 +76,8 @@ namespace xpcc
 		/**
 		 * \brief	Allocation constructor
 		 *
-		 * Construct a dynamic array of given size.
+		 * Construct a dynamic array of given capacity. The array will still
+		 * be empty.
 		 */
 		DynamicArray(SizeType n, const Allocator& allocator = Allocator());
 
@@ -254,7 +255,110 @@ namespace xpcc
 		{
 			return this->values[this->size - 1];
 		}
-
+		
+		public:
+		/**
+		 * \brief	Forward iterator
+		 */
+		class iterator
+		{
+			friend class DynamicArray;
+			friend class const_iterator;
+			
+		public:
+			/// Default constructor
+			iterator();
+			iterator(const iterator& other);
+			
+			iterator& operator = (const iterator& other);
+			iterator& operator ++ ();
+			iterator& operator -- ();
+			bool operator == (const iterator& other) const;
+			bool operator != (const iterator& other) const;
+			T& operator * ();
+			T* operator -> ();
+			
+		private:
+			iterator(DynamicArray* parent, SizeType index);
+			
+			DynamicArray *parent;
+			SizeType index;
+		};
+		
+		/**
+		 * \brief	forward const iterator
+		 */
+		class const_iterator
+		{
+			friend class DynamicArray;
+			
+		public:
+			/// Default constructor
+			const_iterator();
+			
+			/**
+			 * \brief	Copy constructor
+			 * 
+			 * Used to convert a normal iterator to a const iterator.
+			 * The other way is not possible.
+			 */
+			const_iterator(const iterator& other);
+			
+			/**
+			 * \brief	Copy constructor
+			 */
+			const_iterator(const const_iterator& other);
+			
+			const_iterator& operator = (const const_iterator& other);
+			const_iterator& operator ++ ();
+			const_iterator& operator -- ();
+			bool operator == (const const_iterator& other) const;
+			bool operator != (const const_iterator& other) const;
+			const T& operator * () const;
+			const T* operator -> () const;
+		
+		private:
+			const_iterator(const DynamicArray* parent, SizeType index);
+			
+			const DynamicArray *parent;
+			SizeType index;
+		};
+		
+		/**
+		 * Returns a read/write iterator that points to the first element in      the
+		 * list.  Iteration is done in ordinary element order.
+		 */
+		iterator
+		begin();
+		
+		/**
+		 * Returns a read-only (constant) iterator that points to the
+		 * first element in the list.  Iteration is done in ordinary
+		 * element order.
+		 */
+		const_iterator
+		begin() const;
+		
+		/**
+		 * Returns a read/write iterator that points one past the last
+		 * element in the list. Iteration is done in ordinary element
+		 * order.
+		 */
+		iterator
+		end();
+		
+		/**
+		 * Returns a read-only (constant) iterator that points one past
+		 * the last element in the list.  Iteration is done in ordinary
+		 * element order.
+		 */
+		const_iterator
+		end() const;
+		
+	private:
+		friend class const_iterator;
+		friend class iterator;	
+		
 	private:
 		/*
 		 * Allocate a new buffer of size n and copy the elements from the
@@ -272,5 +376,6 @@ namespace xpcc
 }
 
 #include "dynamic_array_impl.hpp"
+#include "dynamic_array_iterator_impl.hpp"
 
 #endif // XPCC__DYNAMIC_ARRAY_HPP

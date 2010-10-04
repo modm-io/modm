@@ -203,3 +203,129 @@ DynamicArrayTest::testRemoveAll()
 	TEST_ASSERT_EQUALS(array.getSize(), 0U);
 	TEST_ASSERT_EQUALS(array.getCapacity(), 5U);
 }
+
+// ----------------------------------------------------------------------------
+
+namespace
+{
+	class IteratorTestClass
+	{
+	public:
+		IteratorTestClass(uint8_t a, int16_t b) :
+			a(a), b(b)
+		{
+		}
+		
+		uint8_t a;
+		int16_t b;
+	};
+}
+
+void
+DynamicArrayTest::testConstIterator()
+{
+	xpcc::DynamicArray<int16_t> writableList(5);
+	const xpcc::DynamicArray<int16_t>& list = writableList;
+	
+	TEST_ASSERT_TRUE(list.begin() == list.end());
+	TEST_ASSERT_FALSE(list.begin() != list.end());
+	
+	writableList.append(1);
+	
+	TEST_ASSERT_FALSE(list.begin() == list.end());
+	TEST_ASSERT_TRUE(list.begin() != list.end());
+	
+	writableList.append(2);
+	writableList.append(3);
+	
+	uint8_t i;
+	xpcc::DynamicArray<int16_t>::const_iterator it;
+	
+	it = list.begin();
+	TEST_ASSERT_TRUE(it == list.begin());
+	TEST_ASSERT_TRUE(it != list.end());
+	
+	++it;
+	++it;
+	
+	TEST_ASSERT_TRUE(it != list.begin());
+	TEST_ASSERT_TRUE(it != list.end());
+	
+	++it;
+	
+	TEST_ASSERT_TRUE(it != list.begin());
+	TEST_ASSERT_TRUE(it == list.end());
+	
+	for (it = list.begin(), i = 1; it != list.end(); ++it, ++i) {
+		TEST_ASSERT_EQUALS((*it), i); 
+	}
+}
+
+void
+DynamicArrayTest::testConstIteratorAccess()
+{
+	xpcc::DynamicArray<IteratorTestClass> list(2);
+	list.append(IteratorTestClass(12, -1532));
+	
+	xpcc::DynamicArray<IteratorTestClass>::const_iterator it = list.begin();
+	
+	TEST_ASSERT_EQUALS(it->a, 12);
+	TEST_ASSERT_EQUALS(it->b, -1532);
+}
+
+void
+DynamicArrayTest::testIterator()
+{
+	xpcc::DynamicArray<int16_t> list(5);
+	
+	TEST_ASSERT_TRUE(list.begin() == list.end());
+	TEST_ASSERT_FALSE(list.begin() != list.end());
+	
+	list.append(1);
+	
+	TEST_ASSERT_FALSE(list.begin() == list.end());
+	TEST_ASSERT_TRUE(list.begin() != list.end());
+	
+	list.append(2);
+	list.append(3);
+	
+	uint8_t i;
+	xpcc::DynamicArray<int16_t>::iterator it;
+	
+	it = list.begin();
+	TEST_ASSERT_TRUE(it == list.begin());
+	TEST_ASSERT_TRUE(it != list.end());
+	
+	++it;
+	++it;
+	
+	TEST_ASSERT_TRUE(it != list.begin());
+	TEST_ASSERT_TRUE(it != list.end());
+	
+	++it;
+	
+	TEST_ASSERT_TRUE(it != list.begin());
+	TEST_ASSERT_TRUE(it == list.end());
+	
+	for (it = list.begin(), i = 1; it != list.end(); ++it, ++i) {
+		TEST_ASSERT_EQUALS((*it), i); 
+	}
+}
+
+void
+DynamicArrayTest::testIteratorAccess()
+{
+	xpcc::DynamicArray<IteratorTestClass> list(2);
+	list.append(IteratorTestClass(12, -1532));
+	
+	xpcc::DynamicArray<IteratorTestClass>::iterator it = list.begin();
+	
+	TEST_ASSERT_EQUALS(it->a, 12);
+	TEST_ASSERT_EQUALS(it->b, -1532);
+	
+	it->a = 66;
+	TEST_ASSERT_EQUALS(it->a, 66);
+	
+	(*it).b = 22312;
+	TEST_ASSERT_EQUALS(it->b, 22312);
+}

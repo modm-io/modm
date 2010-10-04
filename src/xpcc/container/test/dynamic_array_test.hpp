@@ -64,4 +64,19 @@ public:
 	
 	void
 	testRemoveAll();
+	
+	// iterators
+	void
+	testConstIterator();
+	
+	void
+	testConstIteratorAccess();
+	
+	void
+	testIterator();
+	
+	void
+	testIteratorAccess();
+	
+	// TODO test decrement operator for iterators 
 };

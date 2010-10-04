@@ -149,7 +149,7 @@ namespace xpcc
 			const_iterator();
 			
 			/**
-			 * \brief	Copy construtor
+			 * \brief	Copy constructor
 			 * 
 			 * Used to convert a normal iterator to a const iterator.
 			 * The other way is not possible.
@@ -157,7 +157,7 @@ namespace xpcc
 			const_iterator(const iterator& other);
 			
 			/**
-			 * \brief	Copy construtor
+			 * \brief	Copy constructor
 			 */
 			const_iterator(const const_iterator& other);
 			

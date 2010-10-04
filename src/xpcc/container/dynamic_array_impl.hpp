@@ -185,3 +185,32 @@ xpcc::DynamicArray<T, Allocator>::relocate(SizeType n)
 	
 	this->values = newBuffer;
 }
+
+// ----------------------------------------------------------------------------
+template <typename T, typename Allocator>
+typename xpcc::DynamicArray<T, Allocator>::iterator 
+xpcc::DynamicArray<T, Allocator>::begin()
+{
+	return iterator(this, 0);
+}
+
+template <typename T, typename Allocator>
+typename xpcc::DynamicArray<T, Allocator>::iterator
+xpcc::DynamicArray<T, Allocator>::end()
+{
+	return iterator(this, size);
+}
+
+template <typename T, typename Allocator>
+typename xpcc::DynamicArray<T, Allocator>::const_iterator 
+xpcc::DynamicArray<T, Allocator>::begin() const
+{
+	return const_iterator(this, 0);
+}
+
+template <typename T, typename Allocator>
+typename xpcc::DynamicArray<T, Allocator>::const_iterator
+xpcc::DynamicArray<T, Allocator>::end() const
+{
+	return const_iterator(this, size);
+}
