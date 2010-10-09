@@ -110,12 +110,11 @@ namespace unittest
 	EXTERN_FLASH_STRING(stringNotFalse);
 }
 
-// TODO implement this
-/*#ifdef	TEST_RETURN_ON_FAIL
-	#define	TEST_RETURN__	return
+#ifdef	UNITTEST__RETURN_ON_FAIL
+	#define	TEST_RETURN__(x)	do { if (!x) { return; } } while (0)
 #else
-	#define	TEST_RETURN__	
-#endif*/
+	#define	TEST_RETURN__(x)	x
+#endif
 
 #define	TEST_REPORTER__		unittest::Controller::instance().getReporter()
 
@@ -134,8 +133,7 @@ namespace unittest
 	bool
 	checkEqual(const A& a, const B& b, unsigned int line)
 	{
-		if (a == b)
-		{
+		if (a == b) {
 			TEST_REPORTER__.reportPass();
 			return true;
 		}
@@ -218,30 +216,31 @@ namespace unittest
 }
 
 #define	TEST_ASSERT_TRUE(expr)	\
-	::unittest::checkExpression((expr), __LINE__)
+	TEST_RETURN__(::unittest::checkExpression((expr), __LINE__))
 
 #define	TEST_ASSERT_FALSE(expr)	\
-	::unittest::checkExpression(!static_cast<bool>(expr), __LINE__)
+	TEST_RETURN__(::unittest::checkExpression(!static_cast<bool>(expr), __LINE__))
 
 #define	TEST_ASSERT_EQUALS(x, y) \
-	::unittest::checkEqual((x), (y), __LINE__)
+	TEST_RETURN__(::unittest::checkEqual((x), (y), __LINE__))
 
 #define	TEST_ASSERT_EQUALS_FLOAT(x, y) \
-	::unittest::checkEqual(static_cast<float>(x), static_cast<float>(y), __LINE__)
+	TEST_RETURN__(::unittest::checkEqual(static_cast<float>(x), static_cast<float>(y), __LINE__))
 
 #define	TEST_ASSERT_EQUALS_DELTA(x, y, d) \
-	::unittest::checkEqualDelta((x), (y), (d), __LINE__)
+	TEST_RETURN__(::unittest::checkEqualDelta((x), (y), (d), __LINE__))
 
 #define	TEST_ASSERT_EQUALS_RANGE(value, lower, upper) \
-	::unittest::checkRange((value), (lower), (upper), __LINE__)
+	TEST_RETURN__(::unittest::checkRange((value), (lower), (upper), __LINE__))
 
 #define	TEST_ASSERT_EQUALS_ARRAY(x, y, ...) \
-	::unittest::checkArray((x), (y), __LINE__, __VA_ARGS__)
+	TEST_RETURN__(::unittest::checkArray((x), (y), __LINE__, __VA_ARGS__))
 
 #define	TEST_FAIL(msg) \
 	do {	TEST_REPORTER__.reportFailure(__LINE__) \
 			<< msg << '\n'; \
-	} while (0)
+	} while (0); \
+	TEST_RETURN__(false)
 
 #endif	// __DOXYGEN__
 

@@ -30,15 +30,9 @@
  */
 // ----------------------------------------------------------------------------
 
-#include "postman.hpp"
+#include "../dynamic_postman.hpp"
 
-#include <xpcc/debug/logger/logger.hpp>
-// set the Loglevel
-#undef  XPCC_LOG_LEVEL
-#define XPCC_LOG_LEVEL xpcc::log::DEBUG
-
-
-xpcc::StlPostman::StlPostman() :
+xpcc::DynamicPostman::DynamicPostman() :
 	eventMap( 0 ),
 	requenstMap ( 0 )
 {
@@ -46,29 +40,29 @@ xpcc::StlPostman::StlPostman() :
 
 // ----------------------------------------------------------------------------
 
-xpcc::StlPostman::StlPostman(const EventMap* eventMap, const RequestMap* requenstMap) :
-	eventMap ( eventMap ),
-	requenstMap ( requenstMap )
+xpcc::DynamicPostman::DynamicPostman(const EventMap* eventMap, const RequestMap* requenstMap) :
+	eventMap( eventMap ),
+	requenstMap( requenstMap )
 {
 }
 
 // ----------------------------------------------------------------------------
 
-xpcc::StlPostman::~StlPostman()
+xpcc::DynamicPostman::~DynamicPostman()
 {
 }
 
 // ----------------------------------------------------------------------------
 
-xpcc::StlPostman::DeliverInfo
-xpcc::StlPostman::deliverPacket(const Header &header, const SmartPointer& payload)
+xpcc::DynamicPostman::DeliverInfo
+xpcc::DynamicPostman::deliverPacket(const Header &header, const SmartPointer& payload)
 {
-	if ( this->eventMap != 0 ) {
-		if ( header.destination == 0 ) {
+	if (this->eventMap != 0) {
+		if (header.destination == 0) {
 			// EVENT
-			EventMap::const_iterator lowerBound( this->eventMap->lower_bound( header.packetIdentifier) );
-			EventMap::const_iterator upperBound( this->eventMap->upper_bound( header.packetIdentifier) );
-			if ( lowerBound != upperBound ) {
+			EventMap::const_iterator lowerBound(this->eventMap->lower_bound(header.packetIdentifier));
+			EventMap::const_iterator upperBound(this->eventMap->upper_bound(header.packetIdentifier));
+			if (lowerBound != upperBound) {
 				do {
 					lowerBound->second.call(header, payload);
 					lowerBound++;
@@ -81,9 +75,11 @@ xpcc::StlPostman::deliverPacket(const Header &header, const SmartPointer& payloa
 		else {
 			// REQUEST
 			RequestMap::const_iterator iterDestination( this->requenstMap->find( header.destination ) );
-			if( iterDestination != this->requenstMap->end() ) {
+			if (iterDestination != this->requenstMap->end())
+			{
 				CallbackMap::const_iterator iterCallback( iterDestination->second.find( header.packetIdentifier ) );
-				if( iterCallback != iterDestination->second.end() ) {
+				if (iterCallback != iterDestination->second.end())
+				{
 					iterCallback->second.call(header, payload);
 					return OK;
 				}
@@ -104,11 +100,12 @@ xpcc::StlPostman::deliverPacket(const Header &header, const SmartPointer& payloa
 // ----------------------------------------------------------------------------
 
 bool
-xpcc::StlPostman::isComponentAvaliable(const Header& header) const
+xpcc::DynamicPostman::isComponentAvaliable(const Header& header) const
 {
-	if( this->requenstMap != 0 ) {
-		RequestMap::const_iterator iterDestination( this->requenstMap->find( header.destination ) );
-		return ( iterDestination != this->requenstMap->end() );
+	if (this->requenstMap != 0)
+	{
+		RequestMap::const_iterator it(this->requenstMap->find(header.destination));
+		return (it != this->requenstMap->end());
 	}
 	else {
 		return false;

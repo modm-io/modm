@@ -40,8 +40,8 @@
 /**
  * \ingroup		communication
  * \defgroup 	backend Backend
- * \brief 		The backend provides connection to different hardware modules to
- * 				transmit the communication.
+ * \brief 		The backend provides connection to different hardware modules
+ * 				to transmit the communication.
  *
  * All backend-implementations have to implement xpcc::BackendInterface.
  */

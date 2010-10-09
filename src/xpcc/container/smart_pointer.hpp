@@ -43,7 +43,7 @@ namespace xpcc
 	class SmartPointerVolatile;
 
 	/**
-	 * \brief 	Container which destroyes itself when the last
+	 * \brief 	Container which destroys itself when the last
 	 * 			copy is destroyed.
 	 * 
 	 * This container saves a copy of the given data on the heap. It
@@ -104,7 +104,7 @@ namespace xpcc
 		 * Get the value that are stored in the pointer casted to the given type.
 		 * \note This method has no checking mechanism, use get(T) to have at least some.
 		 *
-		 * \return the stored value converted to T
+		 * \return the stored value converted to \p T
 		 */
 		template<typename T>
 		inline const T&
@@ -115,9 +115,9 @@ namespace xpcc
 
 		/**
 		 * Get the value that are stored in the pointer casted to the given type.
-		 * The method checks only the size but not the typ of the stored data
+		 * The method checks only the size but not the type of the stored data
 		 * 
-		 * \return true if the type fit
+		 * \return \c true if the type fit
 		 */
 		template<typename T>
 		bool
@@ -132,7 +132,10 @@ namespace xpcc
 				return false;
 			}
 		}
-
+		
+		bool
+		operator == (const SmartPointer& other);
+		
 	protected:
 		uint8_t * const ptr;
 		

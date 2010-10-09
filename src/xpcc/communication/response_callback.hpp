@@ -30,8 +30,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC__CALLBACK_HPP
-#define	XPCC__CALLBACK_HPP
+#ifndef	XPCC__RESPONSE_CALLBACK_HPP
+#define	XPCC__RESPONSE_CALLBACK_HPP
 
 #include <xpcc/container/smart_pointer.hpp>
 
@@ -48,13 +48,13 @@ namespace xpcc
 	 * 
 	 * \ingroup		communication
 	 */
-	class Callback
+	class ResponseCallback
 	{
 	public:
 		typedef void (Communicatable::*Function)(const Header& header, const uint8_t *type);
 		
 	public:
-		Callback() :
+		ResponseCallback() :
 			component(0),
 			packetSize(0)
 		{
@@ -112,4 +112,4 @@ namespace xpcc
 
 }
 
-#endif // XPCC__CALLBACK_HPP
+#endif // XPCC__RESPONSE_CALLBACK_HPP

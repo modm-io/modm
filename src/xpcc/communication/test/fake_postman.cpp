@@ -2,10 +2,10 @@
 // ----------------------------------------------------------------------------
 /* Copyright (c) 2009, Roboterclub Aachen e.V.
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -14,7 +14,7 @@
  *     * Neither the name of the Roboterclub Aachen e.V. nor the
  *       names of its contributors may be used to endorse or promote products
  *       derived from this software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY ROBOTERCLUB AACHEN E.V. ''AS IS'' AND ANY
  * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -25,26 +25,96 @@
  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  * $Id$
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC__COMMUNICATABLE_HPP
-#define	XPCC__COMMUNICATABLE_HPP
+#include "fake_postman.hpp"
 
-namespace xpcc
+xpcc::Postman::DeliverInfo
+FakePostman::deliverPacket(const xpcc::Header& header,
+			const xpcc::SmartPointer& payload)
 {
-	/**
-	 * \brief	Base class for all classed which need to communicate
-	 * 
-	 * Needed to have a common base class for the callback classes.
-	 * 
-	 * \ingroup	communication
-	 */
-	class Communicatable
+	this->messagesToDeliver.append(Message(header, payload));
+	
+	if (header.type != xpcc::Header::REQUEST)
+		return ERROR;
+	
+	if (header.destination == 0)
 	{
-	};
+		// Event
+		switch (header.packetIdentifier)
+		{
+			case 0x20:
+				component1->eventNoParameter(header);
+				component2->eventNoParameter(header);
+				break;
+				
+			case 0x21:
+				component1->eventUint32(header, &payload.get<uint32_t>());
+				break;
+				
+			default:
+				return NO_EVENT;
+		}
+		
+		return OK;
+	}
+	else if (header.destination == 1)
+	{
+		switch (header.packetIdentifier)
+		{
+			case 0x10:
+				component1->actionNoParameter(header);
+				break;
+			
+			case 0x11:
+				component1->actionUint16(header, &payload.get<uint16_t>());
+				break;
+				
+			case 0x12:
+				component1->actionDirectResponse(header);
+				break;
+				
+			case 0x13:
+				component1->actionDelayedResponse(header);
+				break;
+				
+			case 0x14:
+				component1->actionUint16CallAction(header, &payload.get<uint16_t>());
+				break;
+				
+			default:
+				return NO_ACTION;
+		}
+		
+		return OK;
+	}
+	else if (header.destination == 2)
+	{
+		switch (header.packetIdentifier)
+		{
+			case 0x10:
+				component2->actionNoParameter(header);
+				break;
+			
+			case 0x11:
+				component2->actionUint16(header, &payload.get<uint16_t>());
+				break;
+				
+			default:
+				return NO_ACTION;
+		}
+		
+		return OK;
+	}
+	
+	return NO_COMPONENT;
 }
 
-#endif // XPCC__COMMUNICATABLE_HPP
+bool
+FakePostman::isComponentAvaliable(const xpcc::Header& header) const
+{
+	return (header.destination == 1 || header.destination == 2);
+}

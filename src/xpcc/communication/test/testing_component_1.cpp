@@ -2,10 +2,10 @@
 // ----------------------------------------------------------------------------
 /* Copyright (c) 2009, Roboterclub Aachen e.V.
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -14,7 +14,7 @@
  *     * Neither the name of the Roboterclub Aachen e.V. nor the
  *       names of its contributors may be used to endorse or promote products
  *       derived from this software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY ROBOTERCLUB AACHEN E.V. ''AS IS'' AND ANY
  * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -25,81 +25,87 @@
  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  * $Id$
  */
 // ----------------------------------------------------------------------------
 
-#include "abstract_component.hpp"
+#include "testing_component_1.hpp"
 
-xpcc::AbstractComponent::AbstractComponent(
-		const uint8_t ownIdentifier,
-		Dispatcher *communication) : 
-	ownIdentifier(ownIdentifier), communication(communication)
+TestingComponent1::TestingComponent1(xpcc::Dispatcher *communication,
+		Timeline *timeline) :
+	xpcc::AbstractComponent(1, communication),
+	timeline(timeline),
+	isDelayedResponseActive(false)
 {
 }
 
-// ----------------------------------------------------------------------------
 void
-xpcc::AbstractComponent::callAction(uint8_t receiver, uint8_t actionIdentifier)
+TestingComponent1::update()
 {
-	Header header(Header::REQUEST,
-			false,
-			receiver,
-			this->ownIdentifier,
-			actionIdentifier);
-	
-	this->communication->responseManager.addActionCall(header);
-}
-
-void
-xpcc::AbstractComponent::callAction(uint8_t receiver, uint8_t actionIdentifier, Callback& responseCallback)
-{
-	Header header(Header::REQUEST,
-			false,
-			receiver,
-			this->ownIdentifier,
-			actionIdentifier);
-	
-	this->communication->responseManager.addActionCall(header, responseCallback);
+	if (isDelayedResponseActive) {
+		this->sendResponse(delayedResponseHandle);
+	}
 }
 
 
 // ----------------------------------------------------------------------------
 void
-xpcc::AbstractComponent::publishEvent(uint8_t eventIdentifier)
+TestingComponent1::actionNoParameter(const xpcc::ResponseHandle& handler)
 {
-	Header header(Header::REQUEST,
-			false,
-			0,
-			this->ownIdentifier,
-			eventIdentifier);
-	
-	this->communication->responseManager.addEvent(header);
+	timeline->events.append(
+			Timeline::Event(Timeline::ACTION, 1, 0x10, handler.source));
 }
 
+void
+TestingComponent1::actionUint16(const xpcc::ResponseHandle& handler,
+		const uint16_t *parameter)
+{
+	timeline->events.append(
+			Timeline::Event(Timeline::ACTION, 1, 0x11, handler.source, parameter));
+}
+
+void
+TestingComponent1::actionDirectResponse(const xpcc::ResponseHandle& handler)
+{
+	timeline->events.append(
+			Timeline::Event(Timeline::ACTION, 1, 0x12, handler.source));
+	
+	this->sendResponse(handler);
+}
+
+void
+TestingComponent1::actionDelayedResponse(const xpcc::ResponseHandle& handler)
+{
+	timeline->events.append(
+			Timeline::Event(Timeline::ACTION, 1, 0x13, handler.source));
+	
+	this->delayedResponseHandle = handler;
+	this->isDelayedResponseActive = true;
+}
+
+void
+TestingComponent1::actionUint16CallAction(const xpcc::ResponseHandle& handler,
+			const uint16_t *parameter)
+{
+	timeline->events.append(
+			Timeline::Event(Timeline::ACTION, 1, 0x14, handler.source, parameter));
+	
+	this->callAction(2, 0x11, *parameter);
+}
 
 // ----------------------------------------------------------------------------
 void
-xpcc::AbstractComponent::sendResponse(const ResponseHandle& handle)
+TestingComponent1::eventNoParameter(const xpcc::Header& header)
 {
-	Header header(	Header::RESPONSE,
-					false,
-					handle.source,
-					handle.destination,
-					handle.packetIdentifier);
-
-	this->communication->responseManager.addResponse(header);
+	timeline->events.append(
+			Timeline::Event(Timeline::EVENT, 2, 0x20, header.source));
 }
 
 void
-xpcc::AbstractComponent::sendNegativeResponse(const ResponseHandle& handle)
+TestingComponent1::eventUint32(const xpcc::Header& header,
+		const uint32_t *parameter)
 {
-	Header header(	Header::NEGATIVE_RESPONSE,
-					false,
-					handle.source,
-					handle.destination,
-					handle.packetIdentifier);
-
-	this->communication->responseManager.addResponse(header);
+	timeline->events.append(
+			Timeline::Event(Timeline::EVENT, 1, 0x21, header.source, parameter));
 }

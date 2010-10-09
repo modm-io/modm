@@ -80,3 +80,35 @@ xpcc::AbstractComponent::publishEvent(uint8_t eventIdentifier, const T& data)
 
 	this->communication->responseManager.addEvent(header, payload);
 }
+
+
+// ----------------------------------------------------------------------------
+template<typename T>
+void
+xpcc::AbstractComponent::sendResponse(const ResponseHandle& handle, const T& data)
+{
+	Header header(	Header::RESPONSE,
+					false,
+					handle.source,
+					handle.destination,
+					handle.packetIdentifier);
+	
+	SmartPointer payload(&data);
+	
+	this->communication->responseManager.addResponse(header, payload);
+}
+
+template<typename T>
+void
+xpcc::AbstractComponent::sendNegativeResponse(const ResponseHandle& handle, const T& data)
+{
+	Header header(	Header::NEGATIVE_RESPONSE,
+					false,
+					handle.source,
+					handle.destination,
+					handle.packetIdentifier);
+	
+	SmartPointer payload(&data);
+	
+	this->communication->responseManager.addResponse(header, payload);
+}

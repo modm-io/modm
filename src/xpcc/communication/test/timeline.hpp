@@ -2,10 +2,10 @@
 // ----------------------------------------------------------------------------
 /* Copyright (c) 2009, Roboterclub Aachen e.V.
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -14,7 +14,7 @@
  *     * Neither the name of the Roboterclub Aachen e.V. nor the
  *       names of its contributors may be used to endorse or promote products
  *       derived from this software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY ROBOTERCLUB AACHEN E.V. ''AS IS'' AND ANY
  * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -25,26 +25,62 @@
  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  * $Id$
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC__COMMUNICATABLE_HPP
-#define	XPCC__COMMUNICATABLE_HPP
+#ifndef TIMELINE_HPP
+#define TIMELINE_HPP
 
-namespace xpcc
+#include <xpcc/communication.hpp>
+#include <xpcc/container/linked_list.hpp>
+#include <xpcc/container/smart_pointer.hpp>
+
+class Timeline
 {
-	/**
-	 * \brief	Base class for all classed which need to communicate
-	 * 
-	 * Needed to have a common base class for the callback classes.
-	 * 
-	 * \ingroup	communication
-	 */
-	class Communicatable
+public:
+	enum Type
 	{
+		EVENT,
+		ACTION,
+		RESPONSE
 	};
+	
+	struct Event
+	{
+		Event(Type type, uint8_t component, uint8_t id, uint8_t source);
+		
+		template <typename T>
+		Event(Type type, uint8_t component, uint8_t id, uint8_t source,
+				const T *parameter);
+		
+		Event(const Event& other);
+		
+		Type type;
+		uint8_t component;
+		uint8_t id;
+		uint8_t source;
+		
+		xpcc::SmartPointer payload;
+		
+	private:
+		Event&
+		operator = (const Event& other);
+	};
+	
+	xpcc::LinkedList<Event> events;
+};
+
+template <typename T>
+Timeline::Event::Event(Type type, uint8_t component, uint8_t id, uint8_t source,
+		const T *parameter) :
+	type(type),
+	component(component),
+	id(id),
+	source(source),
+	payload(parameter)
+{
 }
 
-#endif // XPCC__COMMUNICATABLE_HPP
+#endif	// TIMELINE_HPP

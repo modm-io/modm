@@ -174,14 +174,17 @@ namespace xpcc
 		class SendListItem
 		{
 		public:
-			SendListItem(const uint32_t & identifier, const SmartPointer& payload) :
-				identifier(identifier), payload(payload),
+			SendListItem(const uint32_t & identifier,
+					const SmartPointer& payload) :
+				identifier(identifier),
+				payload(payload),
 				fragmentIndex(0)
 			{
 			}
 			
 			SendListItem(const SendListItem& other) :
-				identifier(other.identifier), payload(other.payload),
+				identifier(other.identifier),
+				payload(other.payload),
 				fragmentIndex(other.fragmentIndex)
 			{
 			}
@@ -199,7 +202,8 @@ namespace xpcc
 		class ReceiveListItem
 		{
 		public:
-			ReceiveListItem(uint8_t size, const Header& header, uint8_t messageCounter = 0) :
+			ReceiveListItem(uint8_t size, const Header& header,
+					uint8_t messageCounter = 0) :
 				header(header), payload(size),
 				receivedFragments(0),
 				counter(messageCounter)

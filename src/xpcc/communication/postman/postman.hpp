@@ -37,8 +37,6 @@
  * \brief 		Postman delivers messages to the Components.
  *
  * DESC DESC
- *
- * \version		$Id$
  */
 
 #include "../backend/backend_interface.hpp"
@@ -48,15 +46,17 @@ namespace xpcc
 	class Postman
 	{
 	public:
-		typedef enum {
-			OK,
+		enum DeliverInfo
+		{
+			OK = 0,
+			ERROR,
 			NO_COMPONENT,
 			NO_ACTION,
 			WRONG_ACTION_PARAMETER,
 			NO_EVENT,
 			WRONG_EVENT_PARAMETER,
 			NOT_IMPLEMENTED_YET_ERROR,
-		} DeliverInfo;
+		};
 		
 		virtual DeliverInfo
 		deliverPacket(const Header& header, const SmartPointer& payload) = 0;

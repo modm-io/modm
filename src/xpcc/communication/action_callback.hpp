@@ -30,8 +30,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC__CALLBACK_HPP
-#define	XPCC__CALLBACK_HPP
+#ifndef	XPCC__ACTION_CALLBACK_HPP
+#define	XPCC__ACTION_CALLBACK_HPP
 
 #include <xpcc/container/smart_pointer.hpp>
 
@@ -48,18 +48,12 @@ namespace xpcc
 	 * 
 	 * \ingroup		communication
 	 */
-	class Callback
+	class ActionCallback
 	{
 	public:
-		typedef void (Communicatable::*Function)(const Header& header, const uint8_t *type);
+		typedef void (Communicatable::*Function)(const Header& header, const void *type);
 		
 	public:
-		Callback() :
-			component(0),
-			packetSize(0)
-		{
-		};
-		
 		/**
 		 * Set the method that will be called when a response is received.
 		 *
@@ -67,12 +61,11 @@ namespace xpcc
 		 * \param	function	Pointer to a function of the component object
 		 */
 		template <typename C, typename P>
-		inline void
-		init( C *component, void (C::*function)(const Header& header, const P* packet) )
+		ActionCallback(C *component, void (C::*function)(const Header& header, const P* packet)) : 
+			component(static_cast<Communicatable *>(component)),
+			function(reinterpret_cast<Function>(function)),
+			packetSize(sizeof(P))
 		{
-			this->component = static_cast<Communicatable *>( component );
-			this->function = reinterpret_cast<Function>(function);
-			this->packetSize = sizeof( P );
 		}
 		
 		/**
@@ -85,12 +78,11 @@ namespace xpcc
 		 * \param	function	Pointer to a function of the component object
 		 */
 		template <typename C>
-		inline void
-		init( C *component, void (C::*function)(const Header& header) )
+		ActionCallback(C *component, void (C::*function)(const Header& header)) :
+			component(static_cast<Communicatable *>(component)),
+			function(reinterpret_cast<Function>(function)),
+			packetSize(0)
 		{
-			this->component = static_cast<Communicatable *>( component );
-			this->function = reinterpret_cast<Function>(function);
-			this->packetSize = 0;
 		}
 		
 		/// \todo check packet size?
@@ -109,7 +101,6 @@ namespace xpcc
 		Function function;
 		uint8_t packetSize;
 	};
-
 }
 
-#endif // XPCC__CALLBACK_HPP
+#endif // XPCC__ACTION_CALLBACK_HPP

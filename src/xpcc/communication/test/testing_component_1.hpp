@@ -2,10 +2,10 @@
 // ----------------------------------------------------------------------------
 /* Copyright (c) 2009, Roboterclub Aachen e.V.
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -14,7 +14,7 @@
  *     * Neither the name of the Roboterclub Aachen e.V. nor the
  *       names of its contributors may be used to endorse or promote products
  *       derived from this software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY ROBOTERCLUB AACHEN E.V. ''AS IS'' AND ANY
  * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -25,26 +25,71 @@
  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  * $Id$
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC__COMMUNICATABLE_HPP
-#define	XPCC__COMMUNICATABLE_HPP
+#ifndef	TESTING_COMPONENT_1_HPP
+#define	TESTING_COMPONENT_1_HPP
 
-namespace xpcc
+#include <xpcc/communication/dispatcher.hpp>
+#include <xpcc/communication/abstract_component.hpp>
+
+#include "timeline.hpp"
+
+class TestingComponent1 : public xpcc::AbstractComponent
 {
-	/**
-	 * \brief	Base class for all classed which need to communicate
-	 * 
-	 * Needed to have a common base class for the callback classes.
-	 * 
-	 * \ingroup	communication
-	 */
-	class Communicatable
-	{
-	};
-}
+public:
+	TestingComponent1(xpcc::Dispatcher *communication, Timeline *timeline);
+	
+	virtual void
+	update();
+	
+	// expose protected methods
+	using xpcc::AbstractComponent::callAction;
+	using xpcc::AbstractComponent::publishEvent;
+	
+	// Action id: 0x10
+	void
+	actionNoParameter(const xpcc::ResponseHandle& handler);
+	
+	// Action id: 0x11
+	void
+	actionUint16(const xpcc::ResponseHandle& handler,
+			const uint16_t *parameter);
+	
+	// Action id: 0x12
+	// This method will generate an response
+	void
+	actionDirectResponse(const xpcc::ResponseHandle& handler);
+	
+	// Action id: 0x13
+	// Generates an response the next time update gets called
+	void
+	actionDelayedResponse(const xpcc::ResponseHandle& handler);
+	
+	// Action id: 0x14
+	// This method will call action 0x11 of component 2 when executed
+	void
+	actionUint16CallAction(const xpcc::ResponseHandle& handler,
+			const uint16_t *parameter);
+	
+	
+	
+	// Event id: 0x20
+	void
+	eventNoParameter(const xpcc::Header& header);
+	
+	// Event id: 0x21
+	void
+	eventUint32(const xpcc::Header& header, const uint32_t *parameter);
+	
+private:
+	Timeline *timeline;
+	
+	bool isDelayedResponseActive;
+	xpcc::ResponseHandle delayedResponseHandle;
+};
 
-#endif // XPCC__COMMUNICATABLE_HPP
+#endif

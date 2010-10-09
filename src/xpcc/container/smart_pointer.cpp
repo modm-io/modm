@@ -65,9 +65,15 @@ xpcc::SmartPointer::~SmartPointer()
 }
 
 // ----------------------------------------------------------------------------
+bool
+xpcc::SmartPointer::operator == (const SmartPointer& other)
+{
+	return (this->ptr == other.ptr);
+}
 
+// ----------------------------------------------------------------------------
 xpcc::IOStream&
-xpcc::operator <<( xpcc::IOStream& s, const xpcc::SmartPointer& v)
+xpcc::operator << (xpcc::IOStream& s, const xpcc::SmartPointer& v)
 {
 	s << "0x" << xpcc::hex;
 	for(uint8_t i=2; i < v.ptr[1]+2; i++ ) {

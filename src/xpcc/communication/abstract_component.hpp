@@ -90,7 +90,25 @@ namespace xpcc
 		void
 		publishEvent(uint8_t eventIdentifier, const T& data);
 		
-	protected:	// TODO: make these private
+		
+		// [proposition -> dergraaf]: Make these methods only available in the correct
+		// circumstances (action call). Perhaps move them methods to the ResponseHandle
+		// class?
+		void
+		sendResponse(const ResponseHandle& handle);
+
+		template<typename T>
+		void
+		sendResponse(const ResponseHandle& handle, const T& data);
+		
+		template<typename T>
+		void
+		sendNegativeResponse(const ResponseHandle& handle, const T& data);
+		
+		void
+		sendNegativeResponse(const ResponseHandle& handle);
+		
+	private:
 		const uint8_t ownIdentifier;
 		Dispatcher * const communication;
 	};

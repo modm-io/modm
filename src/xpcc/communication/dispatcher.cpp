@@ -42,7 +42,7 @@ xpcc::Dispatcher::Dispatcher(
 		Postman* postman) :
 	backend(backend),
 	postman(postman),
-	responseManager(this)
+	responseManager(backend, postman)
 {
 }
 
@@ -50,96 +50,62 @@ xpcc::Dispatcher::Dispatcher(
 void
 xpcc::Dispatcher::update()
 {
-	if (this->postman != 0)
+	this->backend->update();
+	
+	//Check if a new packet was received by the backend
+	while (this->backend->isPacketAvailable())
 	{
-		this->backend->update();
+		const Header& header = this->backend->getPacketHeader();
+		const SmartPointer& payload = this->backend->getPacketPayload();
 		
-		//Check if a new packet was received by the backend
-		while (this->backend->isPacketAvailable())
+		if (header.type == Header::REQUEST && !header.isAcknowledge)
 		{
-			//switch(postman->deliverPacket(backend))){
-			//	case NO_ACTION: // send error message
-			//		break;
-			//	case OK:
-			//	case NO_COMPONENT:
-			//	case NO_EVENT:
-			//}
-			const Header& header(this->backend->getPacketHeader());
-			const SmartPointer payload(this->backend->getPacketPayload());
-			
-			if ( header.type == Header::REQUEST && !header.isAcknowledge )
+			this->handleActionCall(header, payload);
+		}
+		else
+		{
+			this->responseManager.handlePacket(header, payload);
+			if (!header.isAcknowledge && header.destination != 0)
 			{
-				if ( postman->deliverPacket( header, payload ) == Postman::OK ) {
-					if ( header.destination != 0 ) {
-						// transmit ACK (is not an EVENT)
-						Header ackHeader(
-								header.type,
-								true,
-								header.source,
-								header.destination,
-								header.packetIdentifier);
-						this->backend->sendPacket( ackHeader );
-					}
+				if (postman->isComponentAvaliable(header)) {
+					this->sendAcknowledge(header);
 				}
 			}
-			else
-			{
-				this->responseManager.handlePacket( header, payload );
-				if (!header.isAcknowledge){
-					if ( header.destination != 0 ) {
-						if (postman->isComponentAvaliable(header)){
-							// transmit ACK (is not an EVENT)
-							Header ackHeader(
-									header.type,
-									true,
-									header.source,
-									header.destination,
-									header.packetIdentifier);
-							this->backend->sendPacket( ackHeader );
-						}
-					}
-				}
-			}
-
-			this->backend->dropPacket();
 		}
-		// check somehow if there are packets to send
-		this->responseManager.handleWaitingMessages(*postman, *backend);
+		
+		this->backend->dropPacket();
 	}
-	else {
-		XPCC_LOG_ERROR
-				<< XPCC_FILE_INFO
-				<< "No postman set!"
-				<< xpcc::flush;
-		while( this->backend->isPacketAvailable() ) {
-			this->backend->dropPacket();
-		}
+	
+	// check if there are packets to send
+	this->responseManager.handleWaitingMessages();
+}
+
+void
+xpcc::Dispatcher::handleActionCall(const Header& header,
+		const SmartPointer& payload)
+{
+	xpcc::Postman::DeliverInfo result =
+			postman->deliverPacket(header, payload);
+	
+	if (result == Postman::OK && header.destination != 0)
+	{
+		// transmit ACK:
+		// Message is not an EVENT and the destination is outside
+		// this board because internal messages aren't received
+		// by the backend
+		this->sendAcknowledge(header);
 	}
+	
+	// TODO Error reporting
 }
 
-// ----------------------------------------------------------------------------
 void
-xpcc::Dispatcher::sendResponse(const ResponseHandle& handle)
+xpcc::Dispatcher::sendAcknowledge(const Header& header)
 {
-	Header header(	Header::RESPONSE,
-					false,
-					handle.source,
-					handle.destination,
-					handle.packetIdentifier);
-
-	this->responseManager.addResponse(header);
+	Header ackHeader(
+			header.type, true,
+			header.source, header.destination,
+			header.packetIdentifier);
+	
+	this->backend->sendPacket(ackHeader);
 }
-
-// ----------------------------------------------------------------------------
-void
-xpcc::Dispatcher::sendNegativeResponse(const ResponseHandle& handle)
-{
-	Header header(	Header::NEGATIVE_RESPONSE,
-					false,
-					handle.source,
-					handle.destination,
-					handle.packetIdentifier);
-
-	this->responseManager.addResponse(header);
-}
-

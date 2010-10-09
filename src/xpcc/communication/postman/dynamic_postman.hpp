@@ -30,10 +30,51 @@
  */
 // ----------------------------------------------------------------------------
 
-#include "callback.hpp"
+#ifndef	XPCC__DYNAMIC_POSTMAN_HPP
+#define	XPCC__DYNAMIC_POSTMAN_HPP
 
-xpcc::Callback::Callback() :
-	component(0),
-	packetSize(0)
+/**
+ * \brief 		Default Postman can be used if no other more efficient
+ * 				Postman is available.
+ *
+ * DESC DESC
+ * 
+ * \ingroup		communication
+ */
+
+#include "postman.hpp"
+#include "../callback.hpp"
+
+#include <map>
+
+namespace xpcc
 {
+	class DynamicPostman : public Postman
+	{
+	public:
+		typedef ::std::multimap<uint16_t, Callback> EventMap;
+		typedef ::std::map<uint16_t, Callback > CallbackMap; ///< packetIdentifier -> callback
+		typedef ::std::map<uint16_t, CallbackMap > RequestMap; ///< destination -> callbackMap
+		
+	public:
+		DynamicPostman();
+
+		DynamicPostman(
+				const EventMap *eventMap,
+				const RequestMap *requenstMap);
+		
+		~DynamicPostman();
+		
+		virtual DeliverInfo
+		deliverPacket(const Header &header, const SmartPointer& payload);
+		
+		virtual bool
+		isComponentAvaliable(const Header& header) const;
+
+	private:
+		const EventMap *eventMap;
+		const RequestMap *requenstMap;
+	};
 }
+
+#endif	// XPCC__DYNAMIC_POSTMAN_HPP

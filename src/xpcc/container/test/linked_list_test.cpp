@@ -190,6 +190,7 @@ void
 LinkedListTest::testDestructor()
 {
 	unittest::CountType data;
+	unittest::CountType::reset();
 	
 	xpcc::LinkedList< unittest::CountType >* list = new xpcc::LinkedList< unittest::CountType >;
 	
@@ -197,7 +198,7 @@ LinkedListTest::testDestructor()
 	list->append(data);
 	list->append(data);
 	
-	TEST_ASSERT_EQUALS(unittest::CountType::numberOfDefaultConstructorCalls, 1U);
+	TEST_ASSERT_EQUALS(unittest::CountType::numberOfDefaultConstructorCalls, 0U);
 	TEST_ASSERT_EQUALS(unittest::CountType::numberOfCopyConstructorCalls, 3U);
 	TEST_ASSERT_EQUALS(unittest::CountType::numberOfDestructorCalls, 0U);
 	

@@ -5,6 +5,7 @@
  * 
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
+ * 
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -29,51 +30,42 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC_STL_POSTMAN_HPP
-#define	XPCC_STL_POSTMAN_HPP
-
-/**
- * \defgroup 	communication Communication
- * \brief 		Default Postman can be used if no other more efficient
- * 				Postman is avalible.
- *
- * DESC DESC
- *
- * \version		$Id$
- */
-
-#include "../postman.hpp"
-#include "../../callback.hpp"
-
-#include <map>
+#ifndef	XPCC__RESPONSE_HPP
+#define	XPCC__RESPONSE_HPP
 
 namespace xpcc
 {
-	class StlPostman : public Postman
+	// forward declaration
+	class Dispatcher;
+	
+	/**
+	 * 
+	 * \ingroup	communication
+	 */
+	class Response
 	{
+		friend class Dispatcher;
 	public:
-		typedef ::std::multimap<uint16_t, Callback> EventMap;
-		typedef ::std::map<uint16_t, Callback > CallbackMap; ///< packetIdentifier -> callback
-		typedef ::std::map<uint16_t, CallbackMap > RequestMap; ///< destination -> callbackMap
-
-		StlPostman();
-
-		StlPostman(const EventMap *eventMap, const RequestMap *requenstMap);
+		Response(const Reponse& other);
 		
-		~StlPostman();
+	public:
+		void
+		sendResponse();
 		
-		virtual DeliverInfo
-		deliverPacket(const Header &header, const SmartPointer& payload);
+		template<typename T>
+		void
+		sendResponse(const T& data);
 		
-		virtual bool
-		isComponentAvaliable(const Header& header) const;
-
-	private:
-		const EventMap *eventMap;
-		const RequestMap *requenstMap;
+		template<typename T>
+		void
+		sendNegativeResponse(const T& data);
+		
+		void
+		sendNegativeResponse();
+		
+	protected:
+		Response();
 	};
 }
 
-
-
-#endif	// XPCC_STL_POSTMAN_HPP
+#endif // XPCC__RESPONSE_HPP

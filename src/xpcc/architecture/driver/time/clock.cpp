@@ -30,13 +30,21 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/architecture/driver/atomic/lock.hpp>
-
 #include "clock.hpp"
+#include "xpcc_config.hpp"
 
-#if defined(__unix__) || defined(__APPLE__)
+#if (XPCC__CLOCK_TESTMODE == 1)
+	
+	uint16_t xpcc::Clock::time = 0;
+	
+	xpcc::Timestamp
+	xpcc::Clock::now()
+	{
+		return Timestamp(time);
+	}
 
-	#include <sys/time.h>
+#elif defined(__unix__) || defined(__APPLE__)
+#	include <sys/time.h>
 
 	xpcc::Timestamp
 	xpcc::Clock::now()
@@ -48,8 +56,7 @@
 	}
 
 #elif defined(_WIN32)
-
-	#include <windows.h>
+#	include <windows.h>
 
 	xpcc::Timestamp
 	xpcc::Clock::now()
@@ -62,7 +69,8 @@
 
 	
 #elif defined(__AVR__)
-
+#	include <xpcc/architecture/driver/atomic/lock.hpp>
+	
 	uint16_t xpcc::Clock::time = 0;
 	
 	xpcc::Timestamp
@@ -78,5 +86,5 @@
 	}
 
 #else
-	#error	"Don't know how to create a Timestamp for this target!"
+#	error	"Don't know how to create a Timestamp for this target!"
 #endif

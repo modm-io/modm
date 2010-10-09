@@ -119,6 +119,7 @@ xpccLibrary = env.XpccLibrary()
 env.Alias('build', program)
 env.Alias('size', env.Size(program))
 env.Alias('symbols', env.Symbols(program))
+env.Alias('defines', env.ShowDefines())
 
 if env.CheckArchitecture('pc'):
 	env.Alias('run', env.Run(program))

@@ -44,11 +44,12 @@ namespace xpcc
 	 * any Unix-OS. 
 	 * 
 	 * For the AVRs targets the user has to use the increment() method to
-	 * generate a suiteable timebase, preferably by incrementing the time
+	 * generate a suitable timebase, preferably by incrementing the time
 	 * value inside a timer interrupt function.
 	 * 
 	 * Example:
 	 * \code
+	 * // Interrupt every 1ms
 	 * ISR(TIMER)
 	 * {
 	 *     xpcc::Clock::increment();
@@ -68,17 +69,17 @@ namespace xpcc
 		static Timestamp
 		now();
 		
-#if !defined(__unix__)
+#if defined(__AVR__)
 		/// \brief	Set the current time
 		static inline void
 		increment(uint16_t step = 1)
 		{
 			time += step;
 		}
-		
-	private:
-		static uint16_t time;
 #endif
+		
+	protected:
+		static uint16_t time;
 	};
 }
 

@@ -35,7 +35,7 @@
 
 #include "backend/backend_interface.hpp"
 #include "postman/postman.hpp"
-#include "communication_list.hpp"
+#include "response_manager.hpp"
 
 namespace xpcc
 {
@@ -53,70 +53,20 @@ namespace xpcc
 		void
 		update();
 		
-		// [proposition -> dergraaf]: Make these methods only available in the correct
-		// circumstances (action call). Perhaps move them methods to the ResponseHandle
-		// class?
-		void
-		sendResponse(const ResponseHandle& handle);
-
-		template<typename T>
-		void
-		sendResponse(const ResponseHandle& handle, const T& data);
-		
-		template<typename T>
-		void
-		sendNegativeResponse(const ResponseHandle& handle, const T& data);
-		
-		void
-		sendNegativeResponse(const ResponseHandle& handle);
-		
 	private:
+		inline void
+		handleActionCall(const Header& header, const SmartPointer& payload);
+		
+		void
+		sendAcknowledge(const Header& header);
+		
 		BackendInterface * const backend;
 		Postman * postman;
-		communicationList::List responseManager;
+		ResponseManager responseManager;
 		
-		void
-		waitForAcknowledge(const Header &header, const SmartPointer& payload);
-	
 	private:
 		friend class AbstractComponent;
 	};
-}
-
-// -----------------------------------------------------------------------------
-// IMPLEMENTATION
-// -----------------------------------------------------------------------------
-
-// ----------------------------------------------------------------------------
-template<typename T>
-void
-xpcc::Dispatcher::sendResponse(const ResponseHandle& handle, const T& data)
-{
-	Header header(	Header::RESPONSE,
-					false,
-					handle.source,
-					handle.destination,
-					handle.packetIdentifier);
-
-	SmartPointer payload(&data);
-
-	this->responseManager.addResponse(header, payload);
-}
-
-// ----------------------------------------------------------------------------
-template<typename T>
-void
-xpcc::Dispatcher::sendNegativeResponse(const ResponseHandle& handle, const T& data)
-{
-	Header header(	Header::NEGATIVE_RESPONSE,
-					false,
-					handle.source,
-					handle.destination,
-					handle.packetIdentifier);
-
-	SmartPointer payload(&data);
-
-	this->responseManager.addResponse(header, payload);
 }
 
 #endif // XPCC__DISPATCHER_HPP
