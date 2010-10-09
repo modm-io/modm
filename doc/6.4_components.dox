@@ -1,0 +1,41 @@
+// coding: utf-8
+// $Id$
+
+/*!
+\page system_design_components	6.4 Components
+
+All components are organized in containers. A container is a physical
+pool of components. Since XPCC is primary designed for a mobile robot platform
+containers group components running on one single microcontroler, so each
+microcontroller or PC get it's own container. Extending this concept a
+container can be defined for each separately running process even on one PC.
+
+The protocol for communication between binaries is not the topic here, assume
+there is one possibility to exchange messages between different processes.
+
+Communication between components internally in one process and in different does not
+differ for components, but it does differ for XPCC. XPCC has to decide if messages
+have to be kept in process and passed to one of the available components or they have
+to be passed out to other processes.
+
+\section postman Postman 
+Postman is the class which has to be pased to XPCC, which provides the Information about
+everything XPCC needs for passing messages to components. There are all freedoms
+in implementing this class so far it supports the required interface.
+
+XPCC propose one postman in the context of system_design, which can be automatically
+generated.
+
+There are several requirements on implementation of components which this postman assumes.
+- Namespace: All components have to be implemented in one namespace called components.
+- Class name: All components must be named in CamelCase exactly like they are named in xml.
+- Actions: For actions implement methods named 'actionCamelCaseStyle'.
+   That means prepend the name of the action by 'action'. These methods actions will
+   be called when one action request is received.
+- Events: For events implement methods named 'eventCamelCaseStyle'. On an
+   event request the corresponding method will be called.
+   
+All actions and subscribed events have to be implemented. Implementation of other methods
+looking like required has no effects on functionality, but we recommend not do do that for
+avoiding confusion.
+*/

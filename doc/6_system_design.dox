@@ -1,0 +1,28 @@
+// coding: utf-8
+// $Id: 5_developer.dox 368 2010-08-04 17:58:58Z dergraaf $
+
+/*!
+\page system_design 6. System Design
+
+System design recommends and works with a special structure for the application.
+Sometimes restrictions are kept strong in order not to make implementation complex
+and sometimes they are kept so, in order to constrain the developer to keep the
+application well structured.
+
+A special structure of software in a project is recomended in order to use more
+features of XPCC.
+TODO: describe samples, possibilities and requirements of System Design.
+
+System design defines not only restrictions for code, but also implements many
+different mechanisms for automatization, code generation and validation.
+
+System design provides:
+- possibilities to describe the system by xml files
+- generating source and header files from xml.
+- ...
+
+- \subpage system_design_parser
+- \subpage system_design_builder
+- \subpage system_design_xml
+- \subpage system_design_components
+*/

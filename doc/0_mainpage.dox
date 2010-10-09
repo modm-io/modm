@@ -39,6 +39,7 @@ This manual is divided in the following sections:
   - \ref coding_conventions
   - \ref unittests
   - \ref license
+- \subpage system_design
 
 \section people The people behind this library
 

@@ -2,7 +2,7 @@
 // $Id$
 
 /*!
-\page tool_template 	3.4.3 Tool: template
+\page tool_template 	3.4.5 Tool: template
 
 \section tool_template_provides Provided builders and methods
 
@@ -11,6 +11,17 @@
 This is just a wrapper for the Python Template strings. \c substitutions needs
 to be Python dictionary with the all the placeholders use in the template
 file as keys. The values need to be simple strings.
+
+\verbatim
+substitutions = {
+	'author' : 'Donald',
+	'date' : today
+}
+target = env.Template(
+		target = 'output/file.hpp'),
+		source = 'input/file.hpp.in'),
+		substitutions = substitutions)
+\endverbatim
 
 See the official documentation for more information: <a href="http://docs.python.org/library/string.html#template-strings" target="_blank">
 Python - Template strings</a>.

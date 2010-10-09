@@ -11,18 +11,26 @@ some tools which add special behaviour to SCons.
 env = Environment(tools = ['xpcc'], toolpath = ['../../xpcc/misc/scons'])
 \endverbatim
 
-This will load the following tools:
-- \subpage tool_xpcc "xpcc"
-- \subpage tool_configfile "configfile"
-- \subpage tool_helper "helper"
-- \subpage tool_unittest "unittest"
-- \subpage tool_template "template"
+Since the tool \c xpcc needs other tools it will load them automatically, so
+the line above will load the following tools:
+- \subpage tool_xpcc
+- \subpage tool_configfile
+- \subpage tool_helper
+- \subpage tool_unittest
+- \subpage tool_template
+- \subpage tool_system_design
 
-- \subpage tool_avr "avr"
-- \subpage tool_avrdude "avrdude"
+If the given architecture is \e atmega or \e atxmega also is loaded:
 
-The last two tools will only be loaded when the given architecture is
-\e atmega oder \e atxmega.
+- \subpage tool_avr
+- \subpage tool_avrdude
+
+If the given architecture is \e pc also is loaded:
+- \subpage tool_pc
+
+This Tool is not loaded, because it is not needed for building code.
+- \subpage tool_doxygen
+
 
 \section scons_tools_provides Provided builders and methods
 
