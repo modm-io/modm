@@ -54,12 +54,6 @@ namespace xpcc
 		typedef void (Communicatable::*Function)(const Header& header, const uint8_t *type);
 		
 	public:
-		ResponseCallback() :
-			component(0),
-			packetSize(0)
-		{
-		};
-		
 		/**
 		 * Set the method that will be called when a response is received.
 		 *
@@ -67,12 +61,11 @@ namespace xpcc
 		 * \param	function	Pointer to a function of the component object
 		 */
 		template <typename C, typename P>
-		inline void
-		init( C *component, void (C::*function)(const Header& header, const P* packet) )
+		ResponseCallback(C *component, void (C::*function)(const Header& header, const P* packet)) : 
+			component(static_cast<Communicatable *>(component)),
+			function(reinterpret_cast<Function>(function)),
+			packetSize(sizeof(P))
 		{
-			this->component = static_cast<Communicatable *>( component );
-			this->function = reinterpret_cast<Function>(function);
-			this->packetSize = sizeof( P );
 		}
 		
 		/**
@@ -85,12 +78,11 @@ namespace xpcc
 		 * \param	function	Pointer to a function of the component object
 		 */
 		template <typename C>
-		inline void
-		init( C *component, void (C::*function)(const Header& header) )
+		ResponseCallback(C *component, void (C::*function)(const Header& header)) :
+			component(static_cast<Communicatable *>(component)),
+			function(reinterpret_cast<Function>(function)),
+			packetSize(0)
 		{
-			this->component = static_cast<Communicatable *>( component );
-			this->function = reinterpret_cast<Function>(function);
-			this->packetSize = 0;
 		}
 		
 		/// \todo check packet size?

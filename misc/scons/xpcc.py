@@ -283,7 +283,7 @@ def generate(env, **kw):
 			env['AVR_FUSEBITS'] = []
 			
 			if 'fusebits' in configuration:
-				if device.startswith('atmega') or device.startswith('attiny'):
+				if device.startswith('atmega') or device.startswith('attiny') or device.startswith('at90can'):
 					fuses = ['lfuse', 'hfuse', 'efuse']
 					for key, value in configuration['fusebits'].items():
 						if key not in fuses:
@@ -300,7 +300,7 @@ def generate(env, **kw):
 							Exit(1)
 						env.Append(AVR_FUSEBITS = {key: value} )
 				else:
-					print "Ignoring 'fusebit' section in project configuration."
+					print "Ignoring 'fusebits' section in project configuration."
 		
 		# path to the headers of a very small and incomplete libstdc++ implementation
 		env.Append(CPPPATH = [os.path.join(rootpath, 'src', 'stdc++')])

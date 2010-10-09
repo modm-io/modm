@@ -1,55 +1,40 @@
 
 #include <xpcc/architecture.hpp>
 
-#include <xpcc/driver/can/mcp2515.hpp>
-#include <xpcc/driver/software_spi.hpp>
+GPIO__OUTPUT(LedGreenPin, B, 5);
+GPIO__OUTPUT(LedYellowPin, B, 6);
+GPIO__OUTPUT(LedRedPin, B, 7);
 
-namespace pin
+typedef xpcc::gpio::Invert<LedGreenPin> LedGreen;
+typedef xpcc::gpio::Invert<LedYellowPin> LedYellow;
+typedef xpcc::gpio::Invert<LedRedPin> LedRed;
+
+void
+init()
 {
-	GPIO__OUTPUT(CS, C, 4);
-	GPIO__INPUT(INT, B, 0);
-
-	GPIO__OUTPUT(SCLK, C, 5);
-	GPIO__OUTPUT(MOSI, C, 7);
-	GPIO__INPUT(MISO, C, 6);
+	LedGreen::reset();
+	LedGreen::setOutput();
+	LedYellow::reset();
+	LedYellow::setOutput();
+	LedRed::reset();
+	LedRed::setOutput();
 }
 
-typedef xpcc::SoftwareSpi<pin::SCLK, pin::MOSI, pin::MISO> CanSpi;
-xpcc::Mcp2515< CanSpi, pin::CS, pin::INT > mcp2515;
+FLASH(uint8_t bla1[30000]) = {};
+FLASH(uint8_t bla2[30000]) = {};
+FLASH(uint8_t bla3[30000]) = {};
 
-FLASH(uint8_t canFilter[]) =
+MAIN_FUNCTION
 {
-	MCP2515_FILTER_EXTENDED(0),	// Filter 0
-	MCP2515_FILTER_EXTENDED(0),	// Filter 1
-
-	MCP2515_FILTER_EXTENDED(0),	// Filter 2
-	MCP2515_FILTER_EXTENDED(0),	// Filter 3
-	MCP2515_FILTER_EXTENDED(0),	// Filter 4
-	MCP2515_FILTER_EXTENDED(0),	// Filter 5
-
-	MCP2515_FILTER_EXTENDED(0),	// Mask 0
-	MCP2515_FILTER_EXTENDED(0),	// Mask 1
-};
-
-int
-main()
-{
-	CanSpi::initialize();
-	pin::CS::setOutput();
-	pin::INT::configure(xpcc::gpio::PULLUP);
+	init();
 	
-	mcp2515.initialize(xpcc::can::BITRATE_125_KBPS);
-	mcp2515.setFilter(xpcc::accessor::asFlash(canFilter));
+	volatile uint8_t a = bla1[0];
+	volatile uint8_t b = bla2[0];
+	volatile uint8_t c = bla3[0];
 	
 	while (1)
 	{
-		if (mcp2515.isMessageAvailable())
-		{
-			xpcc::can::Message message;
-			if (mcp2515.getMessage(message))
-			{
-				// do something
-			}
-		}
+		LedGreen::toggle();
+		xpcc::delay_ms(500);
 	}
 }

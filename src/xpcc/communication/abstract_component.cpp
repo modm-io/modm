@@ -49,11 +49,12 @@ xpcc::AbstractComponent::callAction(uint8_t receiver, uint8_t actionIdentifier)
 			this->ownIdentifier,
 			actionIdentifier);
 	
-	this->communication->responseManager.addActionCall(header);
+	SmartPointer payload;
+	this->communication->addMessage(header, payload);
 }
 
 void
-xpcc::AbstractComponent::callAction(uint8_t receiver, uint8_t actionIdentifier, Callback& responseCallback)
+xpcc::AbstractComponent::callAction(uint8_t receiver, uint8_t actionIdentifier, ResponseCallback& responseCallback)
 {
 	Header header(Header::REQUEST,
 			false,
@@ -61,7 +62,8 @@ xpcc::AbstractComponent::callAction(uint8_t receiver, uint8_t actionIdentifier, 
 			this->ownIdentifier,
 			actionIdentifier);
 	
-	this->communication->responseManager.addActionCall(header, responseCallback);
+	SmartPointer payload;
+	this->communication->addMessage(header, payload, responseCallback);
 }
 
 
@@ -75,7 +77,8 @@ xpcc::AbstractComponent::publishEvent(uint8_t eventIdentifier)
 			this->ownIdentifier,
 			eventIdentifier);
 	
-	this->communication->responseManager.addEvent(header);
+	SmartPointer payload;
+	this->communication->addMessage(header, payload);
 }
 
 
@@ -88,8 +91,9 @@ xpcc::AbstractComponent::sendResponse(const ResponseHandle& handle)
 					handle.source,
 					handle.destination,
 					handle.packetIdentifier);
-
-	this->communication->responseManager.addResponse(header);
+	
+	SmartPointer payload;
+	this->communication->addResponse(header, payload);
 }
 
 void
@@ -100,6 +104,7 @@ xpcc::AbstractComponent::sendNegativeResponse(const ResponseHandle& handle)
 					handle.source,
 					handle.destination,
 					handle.packetIdentifier);
-
-	this->communication->responseManager.addResponse(header);
+	
+	SmartPointer payload;
+	this->communication->addResponse(header, payload);
 }

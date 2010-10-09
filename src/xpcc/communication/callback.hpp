@@ -46,6 +46,7 @@ namespace xpcc
 	 * 
 	 * Is a \b Functor.
 	 * 
+	 * \deprecated	Use ActionCallback or ResponseCallback instead
 	 * \ingroup		communication
 	 */
 	class Callback

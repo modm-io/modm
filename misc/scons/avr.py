@@ -110,14 +110,14 @@ def generate(env, **kw):
 		env['LSSCOMSTR'] = "Creating Extended Listing: $TARGET"
 	
 	# C flags
-	env['CFLAGS'] = " ".join([
+	env['CFLAGS'] = [
 		"-std=gnu99",
 		"-Wstrict-prototypes",
 		"-fpack-struct",
-	])
+	]
 	
 	# flags for C and C++
-	env['CCFLAGS'] = " ".join([
+	env['CCFLAGS'] = [
 		"-mmcu=$AVR_DEVICE", 
 		"-Os",
 		"-gdwarf-2", 
@@ -130,11 +130,10 @@ def generate(env, **kw):
 		"-Wextra",
 		"-Wundef", 
 		"-Wa,-adhlns=${TARGET.base}.lst",
-	])
+	]
 	
 	# C++ flags
-	env['CXXFILESUFFIX'] = ".cpp"
-	env['CXXFLAGS'] = " ".join([
+	env['CXXFLAGS'] = [
 #		"-save-temps",		# save preprocessed files
 		"-std=gnu++98",
 		"-fno-exceptions", 
@@ -145,7 +144,7 @@ def generate(env, **kw):
 #		"-Wnon-virtual-dtor",
 #		"-Weffc++",
 		"-Woverloaded-virtual",
-	])
+	]
 	
 	# Assembler flags
 	if str(Platform()) == "win32":

@@ -224,8 +224,7 @@ DispatcherTest::testInternalActionCallUnit16()
 void
 DispatcherTest::testInternalActionCallDirectResponse()
 {
-	xpcc::Callback callback;
-	callback.init(component2, &TestingComponent2::responseNoParameter);
+	xpcc::ResponseCallback callback(component2, &TestingComponent2::responseNoParameter);
 	component2->callAction(1, 0x12, callback);
 	
 	dispatcher->update();
@@ -253,8 +252,7 @@ DispatcherTest::testInternalActionCallDirectResponse()
 void
 DispatcherTest::testInternalActionCallDelayedResponse()
 {
-	xpcc::Callback callback;
-	callback.init(component2, &TestingComponent2::responseNoParameter);
+	xpcc::ResponseCallback callback(component2, &TestingComponent2::responseNoParameter);
 	component2->callAction(1, 0x13, callback);
 	
 	dispatcher->update();
@@ -323,8 +321,7 @@ DispatcherTest::testInternalActionCallWithRecall()
 void
 DispatcherTest::testInternalActionBackAndForth()
 {
-	xpcc::Callback callback;
-	callback.init(component2, &TestingComponent2::responseCallAction);
+	xpcc::ResponseCallback callback(component2, &TestingComponent2::responseCallAction);
 	
 	component2->callAction(1, 0x12, callback);
 	

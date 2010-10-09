@@ -37,7 +37,8 @@
 // ----------------------------------------------------------------------------
 template<typename T>
 void
-xpcc::AbstractComponent::callAction(uint8_t receiver, uint8_t actionIdentifier, const T& data)
+xpcc::AbstractComponent::callAction(uint8_t receiver,
+		uint8_t actionIdentifier, const T& data)
 {
 	Header header(Header::REQUEST,
 			false,
@@ -46,23 +47,24 @@ xpcc::AbstractComponent::callAction(uint8_t receiver, uint8_t actionIdentifier, 
 			actionIdentifier);
 	
 	SmartPointer payload(&data);
-
-	this->communication->responseManager.addActionCall(header, payload);
+	
+	this->communication->addMessage(header, payload);
 }
 
 template<typename T>
 void
-xpcc::AbstractComponent::callAction(uint8_t receiver, uint8_t actionIdentifier, const T& data, Callback& responseCallback)
+xpcc::AbstractComponent::callAction(uint8_t receiver, uint8_t actionIdentifier,
+		const T& data, ResponseCallback& responseCallback)
 {
 	Header header(Header::REQUEST,
 			false,
 			receiver,
 			this->ownIdentifier,
 			actionIdentifier);
-
+	
 	SmartPointer payload(&data);
-
-	this->communication->responseManager.addActionCall(header, payload, responseCallback);
+	
+	this->communication->addMessage(header, payload, responseCallback);
 }
 
 // ----------------------------------------------------------------------------
@@ -77,15 +79,15 @@ xpcc::AbstractComponent::publishEvent(uint8_t eventIdentifier, const T& data)
 			eventIdentifier);
 	
 	SmartPointer payload(&data);	// no metadata is sent with Events
-
-	this->communication->responseManager.addEvent(header, payload);
+	
+	this->communication->addMessage(header, payload);
 }
-
 
 // ----------------------------------------------------------------------------
 template<typename T>
 void
-xpcc::AbstractComponent::sendResponse(const ResponseHandle& handle, const T& data)
+xpcc::AbstractComponent::sendResponse(
+		const ResponseHandle& handle, const T& data)
 {
 	Header header(	Header::RESPONSE,
 					false,
@@ -95,12 +97,13 @@ xpcc::AbstractComponent::sendResponse(const ResponseHandle& handle, const T& dat
 	
 	SmartPointer payload(&data);
 	
-	this->communication->responseManager.addResponse(header, payload);
+	this->communication->addResponse(header, payload);
 }
 
 template<typename T>
 void
-xpcc::AbstractComponent::sendNegativeResponse(const ResponseHandle& handle, const T& data)
+xpcc::AbstractComponent::sendNegativeResponse(
+		const ResponseHandle& handle, const T& data)
 {
 	Header header(	Header::NEGATIVE_RESPONSE,
 					false,
@@ -110,5 +113,5 @@ xpcc::AbstractComponent::sendNegativeResponse(const ResponseHandle& handle, cons
 	
 	SmartPointer payload(&data);
 	
-	this->communication->responseManager.addResponse(header, payload);
+	this->communication->addResponse(header, payload);
 }

@@ -33,20 +33,31 @@
 #ifndef	XPCC__DISPATCHER_HPP
 #define	XPCC__DISPATCHER_HPP
 
+#include <xpcc/workflow/timeout.hpp>
+
 #include "backend/backend_interface.hpp"
 #include "postman/postman.hpp"
-#include "response_manager.hpp"
+
+#include "response_callback.hpp"
 
 namespace xpcc
 {
 	typedef Header ResponseHandle;
 	
 	/**
+	 * \brief	
+	 * 
 	 * \todo	Documentation
+	 * 
+	 * \author	Georgi Grinshpun
 	 * \ingroup	communication
 	 */
 	class Dispatcher
 	{
+	public:
+		static const uint16_t acknowledgeTimeout = 100;
+		static const uint16_t responseTimeout = 100;
+		
 	public:
 		Dispatcher(BackendInterface *backend, Postman* postman);
 		
@@ -54,15 +65,165 @@ namespace xpcc
 		update();
 		
 	private:
+		/// Does not handle requests which are not acknowledge.
+		void
+		handlePacket(const Header& header, const SmartPointer& payload);
+		
+		/// Sending messages which are waiting in the list.
+		void
+		handleWaitingMessages();
+		
+		/**
+		 * \brief 	This class holds information about a Message being send.
+		 * 			This is the superclass of all entries.
+		 */
+		class Entry
+		{
+		public:
+			enum Type
+			{
+				DEFAULT,
+				CALLBACK,
+			};
+			
+			/**
+			 * \brief 	Communication info, state of sending and
+			 * 			retrieving messages and acks.
+			 */
+			enum State
+			{
+				TRANSMISSION_PENDING,
+				WAIT_FOR_ACK,
+				WAIT_FOR_RESPONSE,
+			};
+			
+		public:
+			/**
+			 * \brief 	Creates one Entry with given header.
+			 * 			this->next is initially set Null
+			 *
+			 * Creates one Entry with given header. this->next is initially
+			 * set Null. The const member this->typeInfo is set to typeInfo
+			 * and never else changed. this->typeInfo replaces runtime
+			 * information needed by handling of messages.
+			 */
+			Entry(Type type, const Header& header, SmartPointer& payload) :
+				type(type), next(0),
+				header(header), payload(payload),
+				time(), tries(0)
+			{
+			}
+			
+			Entry(const Header& header, SmartPointer& payload) :
+				type(DEFAULT), next(0),
+				header(header), payload(payload),
+				time(), tries(0)
+			{
+			}
+			
+			Entry(const Header& header) :
+				type(DEFAULT), next(0),
+				header(header), payload(),
+				time(), tries(0)
+			{
+			}
+			
+			/**
+			 * \brief 	Checks if a Response or Acknowledge fits to the
+			 * 			Message represented by this Entry.
+			 */
+			bool
+			headerFits(const Header& header) const;
+			
+			/**
+			 * \brief 	List-handling, return pointer to the next entry.
+			 */
+			inline const Entry *
+			getNext() const
+			{
+				return next;
+			}
+			
+			const Type type;
+			Entry *next;			///< List-handling, holds pointer to the next entry.
+			const Header header;
+			const SmartPointer payload;
+			State state;
+			Timeout<> time;
+			uint8_t tries;
+		};
+
+		class CallbackEntry : public Entry
+		{
+		public:
+			CallbackEntry(const Header& header,
+					SmartPointer& payload, ResponseCallback& callback) :
+				Entry(CALLBACK, header, payload),
+				callback(callback)
+			{
+			}
+			
+			ResponseCallback callback;
+		};
+		
+		void
+		addMessage(const Header& header, SmartPointer& smartPayload);
+		
+		void
+		addMessage(const Header& header, SmartPointer& smartPayload, ResponseCallback& responseCallback);
+		
+		void
+		addResponse(const Header& header, SmartPointer& smartPayload);
+		
+		
+		/**
+		 * \brief 		Appends one ore more entries to this->last. this->last is updated to the tail of next.
+		 *
+		 */
+		void
+		append(Entry *next);
+		
+		/**
+		 * \brief 		fix->next will be set to next. the old entry of fix->next will be set
+		 *				to the tail of next. this->last will be updated to tail of next if 
+		 *				fix->next==Null, which is equivalent to fix==last.
+		 *
+		 * \param fix has to be one element already appended to the list.
+		 * \param next must not be contained by any list. Any element of the next->next chain must not be contained by any list.
+		 */
+		inline void
+		insertAfter(Entry *fix, Entry *next);
+		
+		/**
+		 * \brief 		if (entry->next) then entry->next will be set to entry->next->next. this->last
+		 *				will be set to entry if entry->next was the last element.
+		 *				The removed element is returned
+		 *				if entry was the last element nothing is done and Null is returned.
+		 *				For safety the member next of the returned element is set to Null.
+		 *
+		 * \param entry has to be one element already appended to the list.
+		 */
+		Entry *
+		removeNextEntryFromList(Entry *entry);
+		
+		Entry *
+		deleteEntry(Entry *entry, Entry *prev);
+		
 		inline void
 		handleActionCall(const Header& header, const SmartPointer& payload);
 		
 		void
 		sendAcknowledge(const Header& header);
 		
+		inline Entry *
+		sendMessageToInnerComponent(Entry *entry, Entry *prev);
+		
 		BackendInterface * const backend;
-		Postman * postman;
-		ResponseManager responseManager;
+		Postman * const postman;
+		
+		Entry dummyFirst;
+		Entry *first;
+		Entry *last;
 		
 	private:
 		friend class AbstractComponent;

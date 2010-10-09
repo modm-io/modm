@@ -39,10 +39,6 @@
 
 namespace xpcc
 {
-	// forward declaration
-	class Dispatcher;
-	class CommunicatableTask;
-	
 	/**
 	 * \brief	Abstract base class for a component
 	 * 
@@ -73,7 +69,7 @@ namespace xpcc
 		callAction(uint8_t receiver, uint8_t actionIdentifier);
 		
 		void
-		callAction(uint8_t receiver, uint8_t actionIdentifier, Callback& responseCallback);
+		callAction(uint8_t receiver, uint8_t actionIdentifier, ResponseCallback& responseCallback);
 		
 		template<typename T>
 		void
@@ -81,7 +77,8 @@ namespace xpcc
 		
 		template<typename T>
 		void
-		callAction(uint8_t receiver, uint8_t actionIdentifier, const T& data, Callback& responseCallback);
+		callAction(uint8_t receiver, uint8_t actionIdentifier, const T& data, ResponseCallback& responseCallback);
+		
 		
 		void
 		publishEvent(uint8_t eventIdentifier);
@@ -96,7 +93,7 @@ namespace xpcc
 		// class?
 		void
 		sendResponse(const ResponseHandle& handle);
-
+		
 		template<typename T>
 		void
 		sendResponse(const ResponseHandle& handle, const T& data);

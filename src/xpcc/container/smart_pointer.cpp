@@ -76,7 +76,7 @@ xpcc::IOStream&
 xpcc::operator << (xpcc::IOStream& s, const xpcc::SmartPointer& v)
 {
 	s << "0x" << xpcc::hex;
-	for(uint8_t i=2; i < v.ptr[1]+2; i++ ) {
+	for (uint8_t i = 2; i < v.ptr[1] + 2; i++) {
 		s << v.ptr[i];
 	}
 	s << xpcc::ascii;
