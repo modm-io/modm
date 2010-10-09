@@ -99,8 +99,6 @@ class Scanner:
 		header		- list of header files
 		defines		- dictionary with defines needed by the source files
 		"""
-		parser = Parser()
-		
 		if ignore is None:
 			ignoreList = []
 		else:
@@ -120,6 +118,7 @@ class Scanner:
 					directories.remove('.svn')
 				
 				if 'build.cfg' in files:
+					parser = Parser()
 					parser.read(os.path.join(path, 'build.cfg'))
 					
 					if self._excludeDirectory(parser):
@@ -190,6 +189,7 @@ class Scanner:
 	def _excludeDirectory(self, parser):
 		try:
 			target = parser.get('build', 'target')
+			
 			if target.startswith('!'):
 				target = target[1:]
 				invert = True

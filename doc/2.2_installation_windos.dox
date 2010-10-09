@@ -17,15 +17,12 @@ Python 2.6.x is required. The Code currently doesn't work with Python 3.x.
 - http://tortoisesvn.net/downloads
 
 - http://pypi.python.org/pypi/setuptools
-- http://codespeak.net/lxml/installation.html
 
 To install \c lxml with \c setuptools type <tt>easy_install lxml==xxx</tt>
 into the cmd window. Replace xxx with the last version which provides windows
-binaries (at the moment of this writing it is \c 2.2.4).
+binaries (at the moment of this writing it is \c 2.2.8).
 
 It is also possible to install the other python modules with easy_install
-- <tt>easy_install scons</tt> (If during executing of Scons Python does not
-  find Sconsmodule use the Windows installer instead of easy_install to install Scons)
 - <tt>easy_install jinja2</tt>
 
 To program with AVRISP mkII you can use AVR Studio or install libusb to

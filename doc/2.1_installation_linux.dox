@@ -33,7 +33,7 @@ There some alternatives to get a recent toolchain:
 
 If you're lucky and your distribution offers recent packages the following might do:
 \verbatim
-$ sudo aptitude gcc-avr binutils-avr avr-libc avrdude
+$ sudo aptitude install gcc-avr binutils-avr avr-libc avrdude
 \endverbatim
 
 \section optimisation Optimisations

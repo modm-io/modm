@@ -180,7 +180,10 @@ def generate_defines(env, filename='defines.hpp'):
 
 # -----------------------------------------------------------------------------
 def generate(env, **kw):
+	# We make sure that the installed version is 2.6 or higher because
+	# features from this version like os.path.relpath() or used.
 	EnsurePythonVersion(2, 6)
+	EnsureSConsVersion(1, 0)
 	
 	# detect the rootpath to the xpcc folder
 	rootpath = env.get('rootpath')

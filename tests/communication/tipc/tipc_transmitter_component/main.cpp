@@ -51,7 +51,7 @@ main()
 	tipc.addReceiverId(0x11);
 
 	// set the 'list' of connections to the postman
-	xpcc::StlPostman postman;
+	xpcc::DynamicPostman postman;
 
 	// connect the 'hardware' to the postman
 	xpcc::Communication com(&tipc, &postman);

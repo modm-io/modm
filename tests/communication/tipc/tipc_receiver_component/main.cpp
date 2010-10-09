@@ -85,22 +85,22 @@ main()
 
 	// the connection between messageID and callback-methods
 	// EVENT = 0x01;
-	xpcc::StlPostman::EventMap eventMap;
+	xpcc::DynamicPostman::EventMap eventMap;
 	xpcc::Callback eventCallback;
 	eventCallback.init(&receiver, &Receiver::eventCallback);
-	eventMap.insert( xpcc::StlPostman::EventMap::value_type( 0x01, eventCallback ) );
+	eventMap.insert( xpcc::DynamicPostman::EventMap::value_type( 0x01, eventCallback ) );
 
 	// ACTION = 0x10;
-	xpcc::StlPostman::CallbackMap receiverCallbackMap;
+	xpcc::DynamicPostman::CallbackMap receiverCallbackMap;
 	xpcc::Callback actionCallback;
 	actionCallback.init(&receiver, &Receiver::actionCallback);
 	receiverCallbackMap[0x20] = actionCallback;
 
-	xpcc::StlPostman::RequestMap componentMap;
+	xpcc::DynamicPostman::RequestMap componentMap;
 	componentMap[0x10] = receiverCallbackMap;
 
 	// set the 'list' of connections to the postman
-	xpcc::StlPostman postman( &eventMap, &componentMap );
+	xpcc::DynamicPostman postman( &eventMap, &componentMap );
 
 	// connect the 'hardware' to the postman
 	com = new xpcc::Communication(&tipc, &postman);

@@ -7,4 +7,18 @@
 More about unit tests:
 - <a href="http://en.wikipedia.org/wiki/Unit_testing">Unit testing at Wikipedia.org</a>
 
+TODO
+
+\section unittest_naming Naming Conventions:
+
+  Testing... (e.g. TestingCanConnector)
+
+Special subclass of the class under test. The subclassing might be used to
+expose protected members or add other access points.
+
+  Fake... (e.g. FakeCanDriver)
+
+Mock-up classes which implement a certain interface but are used only for
+testing.
+
 */
