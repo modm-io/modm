@@ -79,3 +79,32 @@ xpcc::PointSet2D<T>::removeAll()
 {
 	points.removeAll();
 }
+
+// ----------------------------------------------------------------------------
+template <typename T>
+typename xpcc::PointSet2D<T>::iterator 
+xpcc::PointSet2D<T>::begin()
+{
+	return points.begin();
+}
+
+template <typename T>
+typename xpcc::PointSet2D<T>::iterator
+xpcc::PointSet2D<T>::end()
+{
+	return points.end();
+}
+
+template <typename T>
+typename xpcc::PointSet2D<T>::const_iterator 
+xpcc::PointSet2D<T>::begin() const
+{
+	return points.begin();
+}
+
+template <typename T>
+typename xpcc::PointSet2D<T>::const_iterator
+xpcc::PointSet2D<T>::end() const
+{
+	return points.end();
+}

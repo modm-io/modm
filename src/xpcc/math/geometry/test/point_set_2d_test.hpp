@@ -40,4 +40,7 @@ public:
 	
 	void
 	testAppendAndAccess();
+	
+	void
+	testIterator();
 };

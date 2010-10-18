@@ -256,7 +256,7 @@ namespace xpcc
 			return this->values[this->size - 1];
 		}
 		
-		public:
+	public:
 		/**
 		 * \brief	Forward iterator
 		 */
@@ -325,7 +325,7 @@ namespace xpcc
 		};
 		
 		/**
-		 * Returns a read/write iterator that points to the first element in      the
+		 * Returns a read/write iterator that points to the first element in the
 		 * list.  Iteration is done in ordinary element order.
 		 */
 		iterator

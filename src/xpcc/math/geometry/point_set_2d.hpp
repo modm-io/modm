@@ -83,6 +83,22 @@ namespace xpcc
 		inline void
 		removeAll();
 		
+	public:
+		typedef typename xpcc::DynamicArray< Vector2D<T> >::iterator iterator;
+		typedef typename xpcc::DynamicArray< Vector2D<T> >::const_iterator const_iterator;
+		
+		inline iterator
+		begin();
+		
+		inline const_iterator
+		begin() const;
+		
+		inline iterator
+		end();
+		
+		inline const_iterator
+		end() const;
+		
 	protected:
 		xpcc::DynamicArray< Vector2D<T> > points;
 	};
