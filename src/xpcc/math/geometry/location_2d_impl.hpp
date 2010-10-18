@@ -118,6 +118,16 @@ xpcc::Location2D<T>::move(const Location2D<T>& diff)
 
 template <typename T>
 void
+xpcc::Location2D<T>::move(const Vector2D<T>& diff)
+{
+	Vector2D<T> movement(diff);
+	movement.rotate(this->orientation);
+	
+	this->position.translate(movement);
+}
+
+template <typename T>
+void
 xpcc::Location2D<T>::move(T x, float phi)
 {
 	Vector2D<T> vector(GeometricTraits<T>::round(x * std::cos(this->orientation)),
@@ -125,6 +135,18 @@ xpcc::Location2D<T>::move(T x, float phi)
 	position.translate(vector);
 	
 	this->orientation = Angle::normalize(this->orientation + phi);
+}
+
+// ----------------------------------------------------------------------------
+template <typename T>
+xpcc::Vector2D<T>
+xpcc::Location2D<T>::translated(const Vector2D<T>& vector) const
+{
+	Vector2D<T> result(vector);
+	result.rotate(this->orientation);
+	result.translate(this->position);
+	
+	return result;
 }
 
 // ----------------------------------------------------------------------------

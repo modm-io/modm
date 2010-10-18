@@ -86,6 +86,9 @@ namespace xpcc
 		void
 		move(const Location2D& diff);
 		
+		void
+		move(const Vector2D<T>& diff);
+		
 		/**
 		 * \brief	Add a increment only in x-direction
 		 * 
@@ -108,6 +111,9 @@ namespace xpcc
 		void
 		move(T x, float phi);
 		
+		/// TODO
+		Vector2D<T>
+		translated(const Vector2D<T>& vector) const;
 		
 		/// Convert between Location-objects with different base-types
 		template <typename U>

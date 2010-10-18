@@ -316,7 +316,7 @@ Vector2DTest::testDistance()
 void
 Vector2DTest::testCCW()
 {
-	xpcc::Vector2D<int16_t> a(0, 0);	
+	xpcc::Vector2D<int16_t> a(0, 0);
 	xpcc::Vector2D<int16_t> b(30, 30);
 	xpcc::Vector2D<int16_t> c(40, 40);
 	xpcc::Vector2D<int16_t> d(0, 40);
