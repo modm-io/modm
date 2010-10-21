@@ -100,7 +100,7 @@ def show_defines(env, alias="__show"):
 	return env.AlwaysBuild(env.Alias(alias, [], action))
 
 def xpcc_library(env, buildpath=None):
-	env.Append(CPPPATH = env['XPCC_LIBRARY_PATH'])
+	env.AppendUnique(CPPPATH = env['XPCC_LIBRARY_PATH'])
 	
 	backup = env['XPCC_BUILDPATH'], env['XPCC_BASEPATH']
 	
@@ -136,8 +136,8 @@ def xpcc_library(env, buildpath=None):
 								  'misc/templates/xpcc_config.hpp.in'),
 			substitutions = substitutions)
 	
-	env.Append(LIBS = ['xpcc'])
-	env.Append(LIBPATH = [env['XPCC_BUILDPATH']])
+	env.AppendUnique(LIBS = ['xpcc'])
+	env.AppendUnique(LIBPATH = [env['XPCC_BUILDPATH']])
 	
 	# restore original environment
 	env['XPCC_BUILDPATH'], env['XPCC_BASEPATH'] = backup

@@ -152,13 +152,13 @@ def generate(env, **kw):
 	else:
 		env['ASFLAGS'] = "-mmcu=$AVR_DEVICE -x assembler-with-cpp "
 	
-	env['LINKFLAGS'] = " ".join([
+	env['LINKFLAGS'] = [
 		"-mmcu=$AVR_DEVICE", 
 #		"-Wl,-Map=${TARGET.base}.map,--cref", 
 		"-Wl,--relax", 
 		"-Wl,--gc-sections",
 #		"-Wl,-u,vfprintf -lprintf_flt"		# enable float support for vfprinft
-	])
+	]
 	
 	env['LINKCOM'] = "$LINK -o $TARGET $LINKFLAGS $SOURCES -lm $_LIBDIRFLAGS $_LIBFLAGS -lm"
 	
