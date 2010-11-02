@@ -8,7 +8,7 @@ explaind on the websites of the respective projects:
 
 - http://www.python.org/download/
 
-Python 2.6.x is required. The Code currently doesn't work with Python 3.x.
+Python 2.6.x (best 32Bit Version) is required. The Code currently doesn't work with Python 3.x.
 
 - http://sourceforge.net/projects/pywin32/
 
@@ -18,8 +18,17 @@ Python 2.6.x is required. The Code currently doesn't work with Python 3.x.
 
 - http://pypi.python.org/pypi/setuptools
 
-To install \c lxml with \c setuptools type <tt>easy_install lxml==xxx</tt>
-into the cmd window. Replace xxx with the last version which provides windows
+After installing setuptools add the Python-Folder to your System Path:
+Start-> Control Panel -> System -> Advanced
+Then click on Environment Variable, find PATH and click on modify.
+There you have to add the Path to the Python Folder and the Script Folder.
+e.g:
+\c C:\Python26\;C:\Python26\Scripts\ \c
+
+
+
+To install \c lxml with \c setuptools open cmd window and type <tt>easy_install lxml==xxx</tt>
+ Replace xxx with the last version which provides windows
 binaries (at the moment of this writing it is \c 2.2.8).
 
 It is also possible to install the other python modules with easy_install
