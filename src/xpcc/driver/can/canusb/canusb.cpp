@@ -29,23 +29,18 @@ xpcc::CanUsb::~CanUsb()
 
 bool xpcc::CanUsb::open()
 {
-	std::cout<<"in canusb.open()"<<std::endl;
+	
 	if (this->serialPort.open())
 	{
-		std::cout<<"serialPort opened succesful"<<std::endl;
 		this->serialPort.clearWriteBuffer();
 		this->serialPort.clearReadBuffer();
 		this->serialPort.write("C\r");
-		std::cout<<"written successful"<<std::endl;
 		char a;
 		while(!this->serialPort.read(a)){
-			//std::cout<<"waiting for read"<<std::endl;
 		}
 		this->serialPort.write("S4\r");
 		while(!this->serialPort.read(a)){
-			//std::cout<<"waiting for read"<<std::endl;
 		}
-		std::cout<<"read successful"<<std::endl;
 		if( a != '\r') return false;
 		this->serialPort.write("O\r");
 		while(!this->serialPort.read(a));
@@ -53,11 +48,8 @@ bool xpcc::CanUsb::open()
 		{
 			MutexGuard stateGuard( this->stateLock);
 			this->active=true;
-			std::cout<<"active = true"<<std::endl;
 		}
-		std::cout<<"neuer update-thread wird erzeugt"<<std::endl;
 		this->thread = new boost::thread(boost::bind(&xpcc::CanUsb::update, this));
-		std::cout<<"neuer update-thread erzeugt"<<std::endl;
 		return true;
 	}
 	else
@@ -83,11 +75,9 @@ xpcc::CanUsb::getMessage(can::Message& message)
 	{
 		message = this->readBuffer.front();
 		this->readBuffer.pop();
-		//std::cout<<"readbuffer not empty"<<std::endl;
 		return true;
 	}
 	else{
-		//std::cout<<"readbuffer empty"<<std::endl;
 		return false;
 	}
 };

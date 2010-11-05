@@ -195,13 +195,16 @@ xpcc::pc::SerialPort::writeComplete(const boost::system::error_code& error)
 }
 
 void
-xpcc::pc::SerialPort::readComplete(const boost::system::error_code& error, size_t /*bytes_transferred*/)
+xpcc::pc::SerialPort::readComplete(const boost::system::error_code& error, size_t bytes_transferred)
 {
     if (!error)
     {
     	{
 			MutexGuard queueGuard( this->readMutex);
-			this->readBuffer.push(this->tmpRead);
+			for(int i=0; i<bytes_transferred; ++i)
+			{
+				this->readBuffer.push(this->tmpRead[i]);
+			}
     	}
         this->readStart();
     }

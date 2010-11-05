@@ -100,7 +100,7 @@ namespace xpcc
 			Mutex readMutex;
 			Mutex writeMutex;
 
-			char tmpRead;
+			char tmpRead[512];
 			std::queue<char> writeBuffer;
 			std::queue<char> readBuffer;
 
