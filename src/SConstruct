@@ -100,33 +100,38 @@ env = Environment(
 		toolpath = ['../misc/scons'],
 		configfile = ARGUMENTS.get('config', defaultConfigfile))
 
-# find only files located in 'test' folders
-files = env.FindFiles(path = '.', unittest=True)
-
-# declare a file which later runs all the tests
-template = ARGUMENTS.get('template', env['XPCC_CONFIG']['build']['template'])
-runner = env.UnittestRunner(target = env.Buildpath('runner.cpp'),
-							source = files.header,
-							template = template)
-
-# build the program
-program = env.Program(target = 'executable',
-					  source = [runner] + files.sources)
-
 # build the xpcc library
 xpccLibrary = env.XpccLibrary()
 
-env.Alias('build', program)
-env.Alias('size', env.Size(program))
-env.Alias('symbols', env.Symbols(program))
-env.Alias('defines', env.ShowDefines())
-
-if env.CheckArchitecture('pc'):
-	env.Alias('run', env.Run(program))
-	env.Alias('all', ['build', 'run'])
+if 'library' in BUILD_TARGETS:
+	env.Clean('library', 'libxpcc.a')
+	env.Alias('library', [xpccLibrary,
+			Command('libxpcc.a', xpccLibrary, Copy("$TARGET", "$SOURCE"))])
 else:
-	env.Alias('all', ['build', 'size'])
-	env.Alias('copy', Command('libxpcc.a', xpccLibrary, Copy("$TARGET", "$SOURCE")))
-	env.Alias('library', [xpccLibrary, 'copy'])
-
-env.Default('all')
+	# find only files located in 'test' folders
+	files = env.FindFiles(path = '.', unittest=True)
+	
+	# declare a file which later runs all the tests
+	template = ARGUMENTS.get('template', env['XPCC_CONFIG']['build']['template'])
+	runner = env.UnittestRunner(target = env.Buildpath('runner.cpp'),
+								source = files.header,
+								template = template)
+	
+	sources = [runner] + files.sources
+	
+	# build the program
+	program = env.Program(target = 'executable',
+						  source = sources)
+	
+	env.Alias('build', program)
+	env.Alias('size', env.Size(program))
+	env.Alias('symbols', env.Symbols(program))
+	env.Alias('defines', env.ShowDefines())
+	
+	if env.CheckArchitecture('pc'):
+		env.Alias('run', env.Run(program))
+		env.Alias('all', ['build', 'run'])
+	else:
+		env.Alias('all', ['build', 'size'])
+	
+	env.Default('all')
