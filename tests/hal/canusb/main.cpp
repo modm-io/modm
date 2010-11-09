@@ -16,9 +16,9 @@ int main()
 		std::cout<<"FAILED";
 	}
 	*/
-	xpcc::CanUsb usb("/dev/ttyUSB0", 9600);
+	xpcc::CanUsb usb;
 	std::cout<<"canusb created"<<std::endl;
-	usb.open();
+	usb.open("/dev/ttyUSB0", 9600);
 	std::cout<<"canusb opened"<<std::endl;
 	xpcc::CanConnector<xpcc::CanUsb> connector(&usb);
 	std::cout<<"canConnector created"<<std::endl;
@@ -39,7 +39,7 @@ int main()
 	usb.close();
 	std::cout<<"usb cloesed"<<std::endl;
 	
-	if(usb.open())
+	if(usb.open("/dev/ttyUSB0", 9600))
 	{
 		std::cout<<"usb reopened"<<std::endl;
 	}

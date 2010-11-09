@@ -1,10 +1,8 @@
 #include "serial_port.hpp"
 #include <iostream>
 
-xpcc::pc::SerialPort::SerialPort(std::string deviceName, unsigned int baudRate):
+xpcc::pc::SerialPort::SerialPort():
 	shutdown(true),
-	deviceName(deviceName),
-	baudRate(baudRate),
 	port(io_service)
 {
 }
@@ -51,10 +49,12 @@ xpcc::pc::SerialPort::read(char& value)
 }
 
 bool
-xpcc::pc::SerialPort::open()
+xpcc::pc::SerialPort::open(std::string deviceName, unsigned int baudRate)
 {
 	if (!this->isOpen())
 	{
+		this->deviceName=deviceName;
+		this->baudRate=baudRate;
 		std::cout << "open port" << std::endl;
 
 		this->shutdown = false;
@@ -153,7 +153,7 @@ void
 xpcc::pc::SerialPort::doWrite(const char c) {
 	if (!this->shutdown)
 	{
-		std::cout << "put: " << c << std::endl;
+		//std::cout << "put: " << c << std::endl;
 
 		MutexGuard mutex(this->writeMutex);
 		bool idle = this->writeBuffer.empty();
@@ -181,7 +181,7 @@ xpcc::pc::SerialPort::writeComplete(const boost::system::error_code& error)
 		MutexGuard mutex(this->writeMutex);
 		this->writeBuffer.pop();
 		if (!this->writeBuffer.empty()) {
-			std::cout << "restart " << this->writeBuffer.size() << std::endl;
+			//std::cout << "restart " << this->writeBuffer.size() << std::endl;
 			this->writeStart();
 		}
 		else if (this->shutdown) {

@@ -50,12 +50,12 @@ namespace xpcc
 	class CanUsb
 	{
 	public:
-		CanUsb(std::string deviceName, unsigned int baudRate);
+		CanUsb();
 		
 		~CanUsb();
 		
 		bool
-		open();
+		open(std::string deviceName, unsigned int baudRate);
 		
 		void
 		close();
@@ -91,6 +91,12 @@ namespace xpcc
 
 		bool
 		sendMessage(const can::Message& message);
+		
+		bool
+		isOpen()
+		{
+			return this->serialPort.isOpen();
+		}
 
 		void update();
 

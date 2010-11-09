@@ -3,8 +3,8 @@
 #include <xpcc/architecture/driver.hpp>
 #include <iostream>
 
-xpcc::CanUsb::CanUsb(std::string deviceName, unsigned int baudRate):
-active(false),serialPort(deviceName, baudRate)
+xpcc::CanUsb::CanUsb():
+active(false)
 {
 
 }
@@ -27,20 +27,23 @@ xpcc::CanUsb::~CanUsb()
 	}
 }
 
-bool xpcc::CanUsb::open()
+bool xpcc::CanUsb::open(std::string deviceName, unsigned int baudRate)
 {
-	
-	if (this->serialPort.open())
+	//std::cout<<"in canusb.open()"<<std::endl;
+	if (this->serialPort.open(deviceName, baudRate))
 	{
+		//std::cout<<"serialPort opened succesful"<<std::endl;
 		this->serialPort.clearWriteBuffer();
 		this->serialPort.clearReadBuffer();
 		this->serialPort.write("C\r");
+		//std::cout<<"written successful"<<std::endl;
 		char a;
 		while(!this->serialPort.read(a)){
 		}
 		this->serialPort.write("S4\r");
 		while(!this->serialPort.read(a)){
 		}
+		//std::cout<<"read successful"<<std::endl;
 		if( a != '\r') return false;
 		this->serialPort.write("O\r");
 		while(!this->serialPort.read(a));
@@ -48,8 +51,11 @@ bool xpcc::CanUsb::open()
 		{
 			MutexGuard stateGuard( this->stateLock);
 			this->active=true;
+			//std::cout<<"active = true"<<std::endl;
 		}
+		//std::cout<<"neuer update-thread wird erzeugt"<<std::endl;
 		this->thread = new boost::thread(boost::bind(&xpcc::CanUsb::update, this));
+		//std::cout<<"neuer update-thread erzeugt"<<std::endl;
 		return true;
 	}
 	else

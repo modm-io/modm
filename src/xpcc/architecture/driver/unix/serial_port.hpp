@@ -57,7 +57,7 @@ namespace xpcc
 		{
 		public :
 
-			SerialPort( std::string deviceName, unsigned int baudRate);
+			SerialPort();
 
 			~SerialPort();
 
@@ -73,7 +73,7 @@ namespace xpcc
 			read(char& value);
 
 			virtual bool
-			open();
+			open(  std::string deviceName, unsigned int baudRate );
 
 			virtual bool
 			isOpen();
