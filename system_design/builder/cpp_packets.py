@@ -94,6 +94,16 @@ class TypeBuilder(builder_base.Builder):
 				dest = "header_path",
 				default = None,
 				help = "Output path for the header file")
+		optparser.add_option(
+				"--quote_include_path",
+				dest = "quote_include_path",
+				default = None,
+				help = "Include directive for the source file")
+		optparser.add_option(
+				"--system_include_path",
+				dest = "system_include_path",
+				default = None,
+				help = "Include directive for the source file")
 	
 	def generate(self):
 		# check the commandline options
@@ -105,6 +115,14 @@ class TypeBuilder(builder_base.Builder):
 			header_path = self.options.header_path
 		else:
 			raise builder.BuilderException("You need to provide an output path!")
+		
+		if self.options.system_include_path:
+			includeDirective = '<%s>' % os.path.join(self.options.system_include_path, 'packets.hpp')
+		elif self.options.quote_include_path:
+			includeDirective = '"%s"' % os.path.join(self.options.system_include_path, 'packets.hpp')
+		else:
+			includeDirective = '"%s"' % 'packets.hpp'
+			
 		
 		cppFilter = {
 			'enumElement': filter.enumElement,
@@ -122,7 +140,8 @@ class TypeBuilder(builder_base.Builder):
 			'components': self.tree.components,
 			'actions': self.tree.components.actions,
 			'events': self.tree.events,
-			'packets': self.tree.types
+			'packets': self.tree.types,
+			'includeDirective': includeDirective
 		}
 		
 		file = os.path.join(header_path, 'packets.hpp')

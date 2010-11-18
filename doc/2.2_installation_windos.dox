@@ -22,10 +22,11 @@ After installing setuptools add the Python-Folder to your System Path:
 Start-> Control Panel -> System -> Advanced
 Then click on Environment Variable, find PATH and click on modify.
 There you have to add the Path to the Python Folder and the Script Folder.
+
 e.g:
-\c C:\Python26\;C:\Python26\Scripts\ \c
-
-
+\verbatim
+C:\Python26\;C:\Python26\Scripts\
+\endverbatim
 
 To install \c lxml with \c setuptools open cmd window and type <tt>easy_install lxml==xxx</tt>
  Replace xxx with the last version which provides windows

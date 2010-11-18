@@ -15,6 +15,7 @@ class SubType:
 	name	--	type without a possible array definition.
 	count	--	Number of array elements. Defaults to 1 if the type is no
 				array.
+	isArray	--	Subtype is Arraytype
 	
 	Example:
 	type = SubType("uint8_t")
@@ -60,6 +61,7 @@ class BaseType(object):
 	_checked	--	Flag that indicates that the level is set correctly
 	level		--	hierarchy level. Built-in types have level -1, the level
 					of a type is the highest level of a subtype plus one.
+	size		--	Size
 	"""
 	def __init__(self, name, reference=False):
 		self.name = self._check_name(name)
@@ -112,23 +114,26 @@ class BaseType(object):
 		"""
 		return cmp(self.level, other.level) or cmp(self.name, other.name)
 
-
 class BuiltIn(BaseType):
-	""" Built-in types are available by default. """
-	def __init__(self, name, size):
+	""" Built-in types, read from xml. """
+	def __init__(self, name, reference=False):
 		# the build-in types are always only for reference
 		BaseType.__init__(self, name, reference=True)
 		
 		self._checked = True
 		self.level = -1
-		self.size = size
+	
+	def _from_xml(self,  node):
+		self.description = helper.xml_read_description(node)
+		self.size = int(node.get('size'))
 	
 	def _check_name(self, name):
 		return name
 	
 	def __str__(self):
-		return "%s (built-in)" % self.name
-
+		ref = "R" if (self.reference) else ""
+		return "%s (built-in|%i, %i%s)" % \
+			(self.name, self.size, self.level, ref)
 
 class Enum(BaseType):
 	
@@ -137,13 +142,14 @@ class Enum(BaseType):
 		
 		The name of the element has to be all upper case with underscores
 		"""
-		def __init__(self, name, description=None, value=None): 
+		def __init__(self, name): 
 			self.name = self._check_name(name)
-			self.description = description
-			self.value = value
+			self.description = None
+			self.value = None
 		
 		def _from_xml(self, node):
 			self.description = helper.xml_read_description(node)
+			self.value = helper.xml_read_enum_element_value(node);
 		
 		def _check_name(self, name):
 			for c in name:
@@ -172,12 +178,11 @@ class Enum(BaseType):
 		
 		This has to be done in the order the elements should apear later.
 		"""
-		if element.value == None or element.value == '':
+		if element.value == None:
 			element.value = self.last_value
 			self.last_value += 1
 		else:
 			try:
-				element.value = int(str(element.value), 0)
 				self.last_value = element.value + 1
 			except ValueError:
 				pass
@@ -193,14 +198,7 @@ class Enum(BaseType):
 		self.description = helper.xml_read_description(node)
 		
 		for elem in node.findall('element'):
-			value = elem.get('value')
-			if value == None:
-				value = elem.text
-				if value is not None:
-					value = value.strip(' \t\n')
-			
-			element = self.Element(	name = elem.get('name'), 
-									value = value)
+			element = self.Element(name = elem.get('name'))
 			element._from_xml(elem)
 			self.add(element)
 	

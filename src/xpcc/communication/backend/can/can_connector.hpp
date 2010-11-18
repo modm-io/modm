@@ -120,7 +120,6 @@ namespace xpcc
 	class CanConnector : protected CanConnectorBase, public BackendInterface
 	{
 	public:
-
 		CanConnector(Driver *driver);
 		
 		virtual

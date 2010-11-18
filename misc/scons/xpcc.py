@@ -146,7 +146,7 @@ def xpcc_library(env, buildpath=None):
 
 def xpcc_communication_header(env, xmlfile):
 	# TODO
-	env.Append(CPPPATH = os.path.join(os.path.dirname(xmlfile), ".."))
+#	env.Append(CPPPATH = os.path.join(os.path.dirname(xmlfile), ".."))
 	
 	files  = env.SystemCppPackets(xmlfile)
 	files += env.SystemCppIdentifier(xmlfile)
@@ -219,9 +219,13 @@ def generate(env, **kw):
 			except KeyError, msg:
 				print "Error: unknown platform: '%s' " % msg
 			clock = ''
-		else:
+		# TODO what is the allowed architecture?
+		elif architecture == 'atmega' or architecture == 'atxmega' or architecture == 'avr':
 			device = parser.get('build', 'device')
 			clock = parser.get('build', 'clock')
+		else:
+			print "Error: unknown architecture: '%s' " % architecture
+			Exit(1)
 		
 		projectName = parser.get('general', 'name')
 		
@@ -300,7 +304,7 @@ def generate(env, **kw):
 							Exit(1)
 						env.Append(AVR_FUSEBITS = {key: value} )
 				else:
-					print "Ignoring 'fusebits' section in project configuration."
+					print "Ignoring 'fusebit' section in project configuration. Unknown device %s" % device
 		
 		# path to the headers of a very small and incomplete libstdc++ implementation
 		env.Append(CPPPATH = [os.path.join(rootpath, 'src', 'stdc++')])

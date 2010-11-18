@@ -41,10 +41,10 @@ class Container:
 		if bootloader != None:
 			bootloader = bootloader.attrib
 		
-		self.description = helper.xml_read_description(node), 
+		self.description = helper.xml_read_description(node)
 		self.bootloader = bootloader
 		
-		self.extended = helper.xml_read_extended(node)
+#		self.extended = helper.xml_read_extended(node)
 		
 		for subnode in node.findall('component'):
 			subcomponent = component.Component(

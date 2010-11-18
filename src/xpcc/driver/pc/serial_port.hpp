@@ -113,21 +113,21 @@ namespace xpcc
 			void
 			readStart();
 			
-	        void
-	        doClose(const boost::system::error_code& error);
-	        
-	        void
-	        doAbort(const boost::system::error_code& error);
-	        
-	        void
-	        doWrite(const char c);
-	        
-	        void
-	        writeStart(void);
-	        
-	        void
-	        writeComplete(const boost::system::error_code& error);
-	        
+			void
+			doClose(const boost::system::error_code& error);
+			
+			void
+			doAbort(const boost::system::error_code& error);
+			
+			void
+			doWrite(const char c);
+			
+			void
+			writeStart(void);
+			
+			void
+			writeComplete(const boost::system::error_code& error);
+
 			void
 			readComplete(const boost::system::error_code& error,
 					std::size_t bytes_transferred);

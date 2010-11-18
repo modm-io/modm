@@ -50,7 +50,10 @@ class IdentifierBuilder(builder_base.Builder):
 			'events': self.tree.events
 		}
 		
-		file = os.path.join(self.options.outpath, 'identifier.hpp')
+		if os.path.splitext(self.options.outpath)[1] == '':
+			file = os.path.join(self.options.outpath, 'identifier.hpp')
+		else:
+			file = self.options.outpath
 		self.write(file, template.render(substitutions) + "\n")
 
 # -----------------------------------------------------------------------------

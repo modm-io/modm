@@ -43,3 +43,11 @@ snprintf(char *buffer, int buff_size, const char *format, ...)
 	
 	return result;
 }
+
+inline double
+round(double f)
+{
+	return floor(f + 0.5);
+};
+
+

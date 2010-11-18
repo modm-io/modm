@@ -15,7 +15,6 @@ class Component(object):
 		
 		self.id = None
 		self.extends = None
-		self.group = None
 		
 		self.reference = reference
 		self.abstract = True
@@ -38,7 +37,6 @@ class Component(object):
 		# update the attributes if they are not None
 		self.description = self.description or top.description
 		self.id = self.id or top.id
-		self.group = self.group or top.group
 		
 		# update actions and events
 		self.actions.update(top.actions)
@@ -49,14 +47,11 @@ class Component(object):
 		self.id = helper.xml_read_identifier(node)
 		
 		self.extends = node.get('extends')
-		self.group = node.get('group')
 		
 		# parse functions and events
 		self.__parse_actions(node)
 		self.__parse_events(node)
 		
-		self.implementation = helper.xml_read_extended(node)
-	
 	def __parse_actions(self, node):
 		node = node.find('actions')
 		if node == None:

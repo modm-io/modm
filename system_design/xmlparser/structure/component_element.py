@@ -19,10 +19,12 @@ class EventContainer:
 class ComponentElement(object):
 	
 	def __init__(self, name, reference=False):
+		self.id = -1
+		self.description = None
 		self.name = name
 		self.reference = reference
 		
-		self.extended = {}
+#		self.extended = {}
 	
 	def check(self):
 		helper.check_name_notation(self, self.name)
@@ -37,7 +39,7 @@ class ComponentElement(object):
 		self.description = helper.xml_read_description(node)
 		self.id = helper.xml_read_identifier(node)
 		
-		self.extended = helper.xml_read_extended(node)
+#		self.extended = helper.xml_read_extended(node)
 
 
 class Action(ComponentElement):

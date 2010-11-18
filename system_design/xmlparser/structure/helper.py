@@ -13,6 +13,14 @@ def xml_read_value(node, key):
 			pass
 	return value
 
+def xml_read_enum_element_value(node):
+	"""  """
+	value = node.get('value')
+	if value is not None:
+		return int(value, 0)
+	return None
+	
+
 def xml_read_description(node):
 	""" Returns the description-tag with trailing tabs removed """
 	value = node.get('description')
@@ -39,18 +47,18 @@ def xml_read_identifier(node):
 	except TypeError:
 		return None
 
-def xml_read_extended(top):
-	"""
-	Parse the an 'extended' tag (if existing)
-	"""
-	node = top.find('extended')
-	if node:
-		extended = node.attrib
-		for subnode in node.getchildren():
-			extended[subnode.tag] = subnode.get('value') or subnode.text
-		return extended
-	else:
-		return {}
+#def xml_read_extended(top):
+#	"""
+#	Parse the an 'extended' tag (if existing)
+#	"""
+#	node = top.find('extended')
+#	if node:
+#		extended = node.attrib
+#		for subnode in node.getchildren():
+#			extended[subnode.tag] = subnode.get('value') or subnode.text
+#		return extended
+#	else:
+#		return {}
 
 def check_name_notation(self, name):
 	""" Checks if a string comply with some rules for the notation

@@ -23,7 +23,7 @@ During the generate function usually the builder will request a template,
 It also may raise builder.BuilderException at any time for any reason.
 
 \verbatim
-#Example:
+# Example:
 template = self.template('templates/robot_identifier.tpl')
 substitutions = {
 	'components': self.tree.components,
@@ -64,7 +64,7 @@ required don't set outpath.
 If outpath is None both source_path and header_path must be folders. The
 names of files will be 'packets.hpp' and 'packets.cpp'.
 
-The file packets.cpp will have one #include directive.
+The file packets.cpp will have one <tt>#include</tt> directive.
 \verbatim
 	#include "packets.hpp"
 \endverbatim

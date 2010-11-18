@@ -13,23 +13,9 @@ import structure.component
 import structure.container
 import structure.helper
 
-# buildin types. All the other types have to be compounded of these types
-BUILTIN = [
-	structure.type.BuiltIn("int8_t", size = 1),
-	structure.type.BuiltIn("int16_t", size = 2),
-	structure.type.BuiltIn("int32_t", size = 4),
-	structure.type.BuiltIn("uint8_t", size = 1),
-	structure.type.BuiltIn("uint16_t", size = 2),
-	structure.type.BuiltIn("uint32_t", size = 4),
-	structure.type.BuiltIn("float", size = 4),
-	structure.type.BuiltIn("char", size = 1)
-]
+from structure.exception import ParserError
 
 __version__ = "$Id$"
-
-class ParserError(Exception):
-	""" Raised in case of a parser error. """
-	pass
 
 class ComponentIterator:
 	
@@ -73,7 +59,7 @@ class ComponentDict(structure.helper.SingleAssignDict):
 			if element.name in list:
 				other = list[element.name]
 				if element.id != other.id:
-					raise ParserError("%s '%s' defined twice with " \
+					raise ParserError(None, "%s '%s' defined twice with " \
 						"different identifiers!" % (name, element.name))
 			list[element.name] = element
 	
@@ -134,9 +120,9 @@ class Parser:
 			# parse the xml-file
 			self.xml = et.parse(xmlfile).getroot()
 		except OSError, e:
-			raise ParserError(e)
+			raise ParserError(e, 'Error on Reading and Parsing xml file %s' % self.filename)
 		except xml.parsers.expat.ExpatError, e:
-			raise ParserError(e)
+			raise ParserError(e, 'Error on Reading and Parsing xml file %s' % self.filename)
 		
 		if validate:
 			try:
@@ -147,7 +133,7 @@ class Parser:
 					parser = lxml.etree.XMLParser(dtd_validation=True)
 					tree = lxml.etree.parse(xmlfile, parser)
 				except lxml.etree.XMLSyntaxError, e:
-					raise ParserError('Validation error: "' + xmlfile + '": ' + str(e))
+					raise ParserError(None, 'Validation error: "' + xmlfile + '": ' + str(e))
 			except ImportError, e:
 				print "Warning: couldn't load 'lxml' module. No validation done!"
 		
@@ -160,11 +146,6 @@ class Parser:
 		
 		"""
 		self.types = structure.helper.SingleAssignDict("type")
-		# include the built-in types in the type list, needed
-		# to determine the type hierarchy later
-		for builtin in BUILTIN:
-			self.types[builtin.name] = builtin
-		
 		self.events = structure.helper.SingleAssignDict("event")
 		self.container = structure.helper.SingleAssignDict("container")
 		self.components = ComponentDict("component")
@@ -227,26 +208,24 @@ class Parser:
 		self.types, self.events, self.container, self.components = tree
 		
 		# evaluate the xml-tree
+		self.__parse_xml('builtin', structure.type.BuiltIn, self.types)
 		self.__parse_xml('struct', structure.type.Struct, self.types)
 		self.__parse_xml('typedef', structure.type.Typedef, self.types)
 		self.__parse_xml('enum', structure.type.Enum, self.types)
 		
+		self.__parse_xml('event', structure.event.Event, self.events)
 		self.__parse_xml('component', structure.component.Component, self.components)
 		self.__parse_xml('container', structure.container.Container, self.container)
-		self.__parse_xml('event', structure.event.Event, self.events)
 		
-		# add all the component definitions form the containers to
-		# the global component list
+		# set the componentdefinitions from the global component list to
+		# container.
+		# Raise exception if no componentdefinition found
 		for container in self.container.itervalues():
 			for component in container.components:
-				if component.extends:
-					component.abstract = False
-					self.components[component.name] = component
-				else:
-					componentDefinition = self.components[component.name]
-					componentDefinition.abstract = False
-					
-					container.components.replace(component.name, componentDefinition)
+				componentDefinition = self.components[component.name]
+				componentDefinition.abstract = False
+				
+				container.components.replace(component.name, componentDefinition)
 			
 			container.updateEvents()
 		
@@ -268,6 +247,19 @@ class Parser:
 		return [self.types, self.events, self.container, self.components]
 	
 	def __parse_xml(self, name, type, list):
+		"""
+		Searches in serf.xml for entities named name.
+		Creates instance of type from xml for each found and
+		adds the instance to list.
+		list[name] = new instance
+		
+		Keyword arguments:
+		name	--	name of the Entity in xml tree.
+		type	--	Class, which has constructor(name, reference) and
+					method _from_xml(node)
+		list	--	dict[name:type]
+		
+		"""
 		for node in self.xml.findall(name):
 			element = type(	name = node.get('name'), 
 									reference = self.reference)
@@ -284,8 +276,8 @@ class Parser:
 				return True
 			else:
 				return False
-		except KeyError:
-			raise ParserError("could not find type '%s'" % element.type)
+		except KeyError, e:
+			raise ParserError(e, "could not find type '%s'" % element.type)
 	
 	def __check_identifier(self, list, type):
 		""" Check for duplicate identifiers """
@@ -305,7 +297,7 @@ class Parser:
 				nextId = nextId + 1
 				if nextId not in tmp:
 					break
-			raise ParserError(msg + " Next available identifier: '0x%02x'." % nextId)
+			raise ParserError(None, msg + " Next available identifier: '0x%02x'." % nextId)
 		del tmp
 	
 	def __create_type_hierarchy(self):
@@ -371,7 +363,7 @@ class Parser:
 				for element in self.types.itervalues():
 					if not element._checked:
 						types.append(element.name)
-				raise ParserError("Detected loop in type defintion!"
+				raise ParserError(None, "Detected loop in type defintion!"
 									" Check types '%s'!" %
 									"' and '".join(types))
 	
@@ -379,10 +371,11 @@ class Parser:
 		"""
 		Update the components recursive 
 		"""
-		top = self.components[component.extends]
-		if top.extends:
-			self.__update_component(top)
-		component.extend(top)
+		if component.extends:
+			top = self.components[component.extends]
+			if top.extends:
+				self.__update_component(top)
+			component.extend(top)
 	
 	def __resolve_component_dependencies(self):
 		"""
@@ -392,18 +385,20 @@ class Parser:
 		
 		"""
 		for component in self.components.itervalues():
-			if component.extends:
-				self.__update_component(component)
+			self.__update_component(component)
 
 
 # -----------------------------------------------------------------------------
 if __name__ == '__main__':
 	try:
-		parser = Parser("../../../../../roboter-10/software/defines/robot.xml", validate=True)
+		parser = Parser("../../../common/xml/robot.xml", validate=True)
 		parser.parse()
 	except ParserError, e:
 		print "Error:", e
 		sys.exit(1)
+#	except Exception, e:
+#		print "Eee:", e
+#		sys.exit(1)
 	
 #	print "Components:"
 #	for component in parser.components.iter():

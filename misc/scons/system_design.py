@@ -69,11 +69,12 @@ def generate(env, **kw):
 			'python "${XPCC_SYSTEM_BUILDER}/cpp_packets.py" ' \
 				'--source_path ${TARGETS[0].dir} ' \
 				'--header_path ${TARGETS[1].dir} ' \
+				'--system_include_path robot '\
 				'$SOURCE',
 			cmdstr="$SYSTEM_CPP_PACKETS_COMSTR"),
 		emitter = \
 			lambda target, source, env:
-				([os.path.join(env['XPCC_BUILDPATH'], "robot/packets.cpp"),
+				([os.path.join(str(source[0].dir), "../robot/packets.cpp"),
 				  os.path.join(str(source[0].dir), "../robot/packets.hpp")],
 				source),
 		source_scanner = SCons.Script.Scanner(function = xmlScanner,

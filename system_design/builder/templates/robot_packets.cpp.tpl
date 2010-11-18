@@ -5,7 +5,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <robot/packets.hpp>
+#include {{ includeDirective }}
 
 {% for packet in packets -%}
 {%- if packet.isStruct -%}

@@ -24,8 +24,8 @@ class Event:
 	def _from_xml(self, node):
 		self.id = helper.xml_read_identifier(node)
 		
-		self.description = helper.xml_read_description(node), 
-		self.extended = helper.xml_read_extended(node)
+		self.description = helper.xml_read_description(node)
+#		self.extended = helper.xml_read_extended(node)
 		
 		self.type = node.get('type')
 		self.rate = node.get('rate')

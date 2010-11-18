@@ -16,15 +16,21 @@ that SCons will create during the build process.
 
 For more information go to the official website: http://www.scons.org/
 
-The SConstruct files and the project/build configuration have their own
-documentation on the following pages:
+\section usage Usage of the build system
+
+Like a Makefile you need a SConstruct file in jour project, which holds
+description about where to find and how to build the needed sourcefiles.
+Aditionally the buildprocess can be modified by configuration files.
+
+About how to create SConstruct files and the project/build configuration
+read in their own documentation pages:
 - \subpage sconstruct_template "Universal SConstruct template"
 - \subpage sconstruct "SConstruct files: An introduction"
 - \subpage sconstruct_advanced "SConstruct files: Advanced topics"
 - \subpage scons_tools "SCons Tools"
 - \subpage configuration_files "Configuration files"
 
-\section usage Usage of the build system
+To initiate the build process execute scons in the manner described below.
 
 The default command is:
 \verbatim

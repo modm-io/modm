@@ -100,12 +100,12 @@ namespace xpcc
 	namespace xpcc
 	{
 		// FIXME implement this functions
-		void
+		inline void
 		delay_us(int /*us*/)
 		{
 		}
 		
-		void
+		inline void
 		delay_ms(int /*ms*/)
 		{
 		}

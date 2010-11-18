@@ -32,6 +32,10 @@
 
 #include "platform.hpp"
 
+#ifdef XPCC__OS_WIN32
+#	include "driver/windows.hpp"
+#endif
+
 #if defined XPCC__CPU_ATMEGA
 #	include "driver/atmega.hpp"
 #elif defined XPCC__CPU_ATXMEGA

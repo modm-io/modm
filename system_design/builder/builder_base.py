@@ -53,7 +53,7 @@ class Builder(object):
 	Attributes:
 	self.xmlpath	--	path to the xml-file
 	self.xmlfile	--	xml-filename
-	self.tree		--	evaluated xml tree 
+	self.tree		--	evaluated xml tree, instance of Parser
 	self.time		--	string containing the current date and time
 	self.options	--	evaluated commandline arguments (see OptionParser)
 	
