@@ -8,7 +8,7 @@ env = Environment(tools = ['xpcc', 'bitmap'], toolpath = [rootpath + '/misc/scon
 # find all source files
 files = env.FindFiles('.')
 
-# create c-files form the images
+# create cpp-files form the images
 for image in Glob('images/*.pbm'):
 	files.sources.append(env.Bitmap(image))
 

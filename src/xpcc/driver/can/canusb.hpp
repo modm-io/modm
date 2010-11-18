@@ -33,10 +33,12 @@
 #ifndef XPCC__CAN_USB_HPP
 #define XPCC__CAN_USB_HPP
 
-#include "message.hpp"
-#include "../../architecture/driver/unix/serial_port.hpp"
-#include <string>
 #include <queue>
+#include <string>
+
+#include <xpcc/driver/pc/serial_port.hpp>
+
+#include "message.hpp"
 
 namespace xpcc
 {
@@ -61,21 +63,14 @@ namespace xpcc
 		close();
 		
 		inline bool
-		isMessageAvailable(){
-			if(this->readBuffer.empty()) return false;
-			else return true;
+		isMessageAvailable()
+		{
+			return (!this->readBuffer.empty());
 		}
 		
-
 		bool
 		getMessage(can::Message& message);
 		
-		/*
-		 * The CAN controller has a free slot to send a new message.
-		 *
-		 * \return true if a slot is available, false otherwise
-		 */
-
 		inline bool
 		isReadyToSend()
 		{
@@ -88,29 +83,32 @@ namespace xpcc
 		 *
 		 * \return true if the message was send, false otherwise
 		 */
-
 		bool
 		sendMessage(const can::Message& message);
 		
 		bool
 		isOpen()
 		{
-			return this->serialPort.isOpen();
+			return this->serial.isOpen();
 		}
-
-		void update();
+		
+		void
+		update();
 
 	private:
 		typedef boost::mutex				Mutex;
 		typedef boost::mutex::scoped_lock	MutexGuard;
+		
 		Mutex stateLock;
 		Mutex readBufferLock;
 		bool active;
-		xpcc::pc::SerialPort serialPort;
+		
+		xpcc::pc::SerialPort serial;
+		
 		std::string tmpRead;
 		std::queue<can::Message> readBuffer;
+		
 		boost::thread* thread;
-
 	};
 }
 

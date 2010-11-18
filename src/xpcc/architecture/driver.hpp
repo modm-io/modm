@@ -32,10 +32,6 @@
 
 #include "platform.hpp"
 
-#ifdef XPCC__OS_UNIX
-#	include "driver/unix.hpp"
-#endif
-
 #if defined XPCC__CPU_ATMEGA
 #	include "driver/atmega.hpp"
 #elif defined XPCC__CPU_ATXMEGA

@@ -6,12 +6,12 @@
 
 namespace pin
 {
-	GPIO__OUTPUT(CS, C, 4);
-	GPIO__INPUT(INT, B, 0);
+	GPIO__OUTPUT(CS, B, 4);
+	GPIO__INPUT(INT, B, 2);
 
-	GPIO__OUTPUT(SCLK, C, 5);
-	GPIO__OUTPUT(MOSI, C, 7);
-	GPIO__INPUT(MISO, C, 6);
+	GPIO__OUTPUT(SCLK, B, 7);
+	GPIO__OUTPUT(MOSI, B, 5);
+	GPIO__INPUT(MISO, B, 6);
 }
 
 typedef xpcc::SoftwareSpi<pin::SCLK, pin::MOSI, pin::MISO> CanSpi;
@@ -41,6 +41,13 @@ main()
 	mcp2515.initialize(xpcc::can::BITRATE_125_KBPS);
 	mcp2515.setFilter(xpcc::accessor::asFlash(canFilter));
 	
+	xpcc::can::Message message(0x123456);
+	message.length = 2;
+	message.data[0] = 0xab;
+	message.data[1] = 0xcd;
+
+	mcp2515.sendMessage(message);
+
 	while (1)
 	{
 		if (mcp2515.isMessageAvailable())

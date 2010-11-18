@@ -103,11 +103,6 @@ def bitmap_action(target, source, env):
 	output = string.Template(template).safe_substitute(substitutions)
 	open(target[0].path, 'w').write(output)
 
-def bitmap_emitter(target, source, env):
-	#Depends(target, SCons.Node.Python.Value(env['substitutions']))
-	#print target[0], source[0]
-	return target, source
-
 def bitmap_string(target, source, env):
 	return "Create Bitmap: '%s'" % (str(target[0]))
 
@@ -117,7 +112,6 @@ def generate(env, **kw):
 		BUILDERS = {
 			'Bitmap': env.Builder(
 				action = env.Action(bitmap_action, bitmap_string),
-				emitter = bitmap_emitter,
 				suffix = '.cpp',
 				src_suffix = '.pbm',
 				single_source = True),

@@ -6,7 +6,7 @@
 #include <unittest/controller.hpp>
 
 #include <xpcc/debug/logger.hpp>
-#include <xpcc/architecture/driver.hpp>
+#include <xpcc/driver/pc/terminal.hpp>
 
 xpcc::pc::Terminal outputDevice;
 

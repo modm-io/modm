@@ -73,6 +73,22 @@ class Parser(ConfigParser.RawConfigParser):
 			raise ParserException(e)
 
 # -----------------------------------------------------------------------------
+class FileList(list):
+	"""
+	Special list for file object. Checks if a file is already in the list
+	when adding it.
+	"""
+	def append(self, item):
+		if hasattr(item, '__getitem__'):
+			self.extend(item)
+		elif not self.__contains__(item):
+			list.append(self, item)
+	
+	def extend(self, list):
+		for value in list:
+			self.append(value)
+
+# -----------------------------------------------------------------------------
 class Scanner:
 	
 	HEADER = ['.h', '.hpp']
@@ -105,10 +121,8 @@ class Scanner:
 			ignoreList = listify(ignore)
 		pathlist = listify(path)
 		
-		self.sources = []
-		self.header = []
-		self.testHeader = []
-		self.testSources = []
+		self.sources = FileList()
+		self.header = FileList()
 		self.defines = {}
 		
 		for basepath in pathlist:
@@ -135,46 +149,24 @@ class Scanner:
 					except ParserException:
 						pass
 				
-				for file in files:
-					ignore = False
-					for ignoreFile in ignoreList:
-						if self._samefile(os.path.join(path, file), ignoreFile):
-							ignore = True
-							break
-					if ignore:
-						continue
-					
-					extension = os.path.splitext(file)[1]
-					filename = os.path.join(path, file)
-					path = os.path.normpath(path)
-					
-					if extension in self.SOURCE:
-						# append source files
-						if path.endswith(os.sep + 'test'):
-							if self.unittest is True:
-								self.testSources.append(filename)
-							else:
-								continue
-						elif path.endswith(os.sep + 'examples'):
-							continue	# TODO
-						else:
-							if self.unittest is True:
-								continue
-						self.sources.append(filename)
-					
-					elif extension in self.HEADER:
-						# append header files
-						if path.endswith(os.sep + 'test'):
-							if self.unittest is True:
-								self.testHeader.append(filename)
-							else:
-								continue
-						elif path.endswith(os.sep + 'examples'):
-							continue	# TODO
-						else:
-							if self.unittest is True:
-								continue
-						self.header.append(filename)
+				if self.unittest is None or not (self.unittest ^ path.endswith(os.sep + 'test')):
+					# only check this directory for files if all directories
+					# should be check or unittest is active and directory
+					# ends with test.
+					p = path + '/*'
+					for source in self.SOURCE:
+						files = self.env.Glob(p + source)
+						
+						for file in files[:]:
+							for ignoreFile in ignoreList:
+								if self._samefile(str(file), ignoreFile):
+									files.remove(file)
+						
+						self.sources.extend(files)
+						
+					if self.unittest is True:
+						for header in self.HEADER:
+							self.header.extend(self.env.Glob(p + header))
 		
 	def append(self, files):
 		for file in listify(files):
@@ -182,9 +174,9 @@ class Scanner:
 			extension = os.path.splitext(filename)[1]
 			
 			if extension in self.SOURCE:
-				self.sources.append(filename)
+				self.sources.append(file)
 			elif extension in self.HEADER:
-				self.header.append(filename)
+				self.header.append(file)
 	
 	def _excludeDirectory(self, parser):
 		try:

@@ -1,108 +1,127 @@
-#include "../canusb.hpp"
-#include "xpcc/driver/can/canusb/canusb_formater.hpp"
-#include <xpcc/architecture/driver.hpp>
+
 #include <iostream>
+#include <xpcc/architecture/driver.hpp>
 
+#include "../canusb.hpp"
+#include "canusb_formater.hpp"
+
+// ----------------------------------------------------------------------------
 xpcc::CanUsb::CanUsb():
-active(false)
+	active(false)
 {
-
 }
 
 xpcc::CanUsb::~CanUsb()
 {
-	if(this->active)
+	if (this->active)
 	{
 		{
 			MutexGuard stateGuard( this->stateLock);
 			this->active=false;
 		}
+		
 		this->thread->join();
 		delete this->thread;
+		
 		this->thread = 0;
 	}
-	this->serialPort.close();
-	while(this->serialPort.isOpen()){
-		//wait for port to close;
+	
+	this->serial.close();
+	while (this->serial.isOpen()) {
+		// wait for the port to close;
 	}
 }
 
-bool xpcc::CanUsb::open(std::string deviceName, unsigned int baudRate)
-{
-	//std::cout<<"in canusb.open()"<<std::endl;
-	if (this->serialPort.open(deviceName, baudRate))
-	{
-		//std::cout<<"serialPort opened succesful"<<std::endl;
-		this->serialPort.clearWriteBuffer();
-		this->serialPort.clearReadBuffer();
-		this->serialPort.write("C\r");
-		//std::cout<<"written successful"<<std::endl;
-		char a;
-		while(!this->serialPort.read(a)){
-		}
-		this->serialPort.write("S4\r");
-		while(!this->serialPort.read(a)){
-		}
-		//std::cout<<"read successful"<<std::endl;
-		if( a != '\r') return false;
-		this->serialPort.write("O\r");
-		while(!this->serialPort.read(a));
-		if(a != '\r') return false;
-		{
-			MutexGuard stateGuard( this->stateLock);
-			this->active=true;
-			//std::cout<<"active = true"<<std::endl;
-		}
-		//std::cout<<"neuer update-thread wird erzeugt"<<std::endl;
-		this->thread = new boost::thread(boost::bind(&xpcc::CanUsb::update, this));
-		//std::cout<<"neuer update-thread erzeugt"<<std::endl;
-		return true;
-	}
-	else
-		return false;
-};
-
-void xpcc::CanUsb::close()
-{
-	{
-		MutexGuard stateGuard( this->stateLock);
-		this->active=false;
-	}
-	this->thread->join();
-	delete this->thread;
-	this->thread = 0;
-	this->serialPort.close();
-};
-
+// ----------------------------------------------------------------------------
 bool
-xpcc::CanUsb::getMessage(can::Message& message)
+xpcc::CanUsb::open(std::string deviceName, unsigned int baudRate)
 {
-	if(!this->readBuffer.empty())
-	{
-		message = this->readBuffer.front();
-		this->readBuffer.pop();
-		return true;
-	}
-	else{
+	if (!this->serial.open(deviceName, baudRate)) {
 		return false;
 	}
-};
-
-bool
-xpcc::CanUsb::sendMessage(const can::Message& message)
-{	char str[128];
-	xpcc::CanUsbFormater::convertToString(message, str);
-	this->serialPort.write(str);
+	
+	this->serial.clearWriteBuffer();
+	this->serial.clearReadBuffer();
+	
+	this->serial.write("C\r");
+	
+	char a;
+	while(!this->serial.read(a))
+		;
+	this->serial.write("S4\r");
+	while(!this->serial.read(a))
+		;
+	
+	if (a != '\r')
+		return false;
+	
+	this->serial.write("O\r");
+	while(!this->serial.read(a))
+		;
+	
+	if (a != '\r')
+		return false;
+	
+	{
+		MutexGuard stateGuard(this->stateLock);
+		this->active = true;
+	}
+	
+	this->thread = new boost::thread(
+			boost::bind(&xpcc::CanUsb::update, this));
 	return true;
 }
 
 void
+xpcc::CanUsb::close()
+{
+	{
+		MutexGuard stateGuard(this->stateLock);
+		this->active = false;
+	}
+	
+	this->thread->join();
+	delete this->thread;
+	
+	this->thread = 0;
+	
+	this->serial.close();
+}
+
+// ----------------------------------------------------------------------------
+bool
+xpcc::CanUsb::getMessage(can::Message& message)
+{
+	if (!this->readBuffer.empty()) {
+		return false;
+	}
+	
+	message = this->readBuffer.front();
+	this->readBuffer.pop();
+	
+	return true;
+}
+
+// ----------------------------------------------------------------------------
+bool
+xpcc::CanUsb::sendMessage(const can::Message& message)
+{
+	char str[128];
+	
+	xpcc::CanUsbFormater::convertToString(message, str);
+	this->serial.write(str);
+	
+	return true;
+}
+
+// ----------------------------------------------------------------------------
+void
 xpcc::CanUsb::update()
 {
-	while(true)
+	while (true)
 	{
 		char a;
-		if(this->serialPort.read(a)){
+		if(this->serial.read(a)){
 			if(a == 'T' || a == 't' || a == 'r' || a == 'R'){
 				this->tmpRead.clear();
 				this->tmpRead += a;
@@ -117,8 +136,7 @@ xpcc::CanUsb::update()
 				this->readBuffer.push(message);
 			}
 		}
-		if(!this->active) break;
+		if (!this->active)
+			break;
 	}
 }
-
-
