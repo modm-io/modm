@@ -42,6 +42,21 @@ xpcc::Polygon2D<T>::Polygon2D(SizeType n) :
 }
 
 template <typename T>
+xpcc::Polygon2D<T>::Polygon2D(const Polygon2D<T>& other) :
+	PointSet2D<T>(other)
+{
+}
+
+template <typename T>
+xpcc::Polygon2D<T>&
+xpcc::Polygon2D<T>::operator = (const Polygon2D<T>& other)
+{
+	this->points = other.points;
+	return *this;
+}
+
+// ----------------------------------------------------------------------------
+template <typename T>
 xpcc::Polygon2D<T>&
 xpcc::Polygon2D<T>::operator << (const Vector2D<T>& point)
 {

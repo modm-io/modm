@@ -41,6 +41,20 @@ xpcc::PointSet2D<T>::PointSet2D(SizeType n) :
 {
 }
 
+template <typename T>
+xpcc::PointSet2D<T>::PointSet2D(const PointSet2D<T>& other) :
+	points(other.points)
+{
+}
+
+template <typename T>
+xpcc::PointSet2D<T>&
+xpcc::PointSet2D<T>::operator = (const PointSet2D<T>& other)
+{
+	this->points = other.points;
+	return *this;
+}
+
 // ----------------------------------------------------------------------------
 template <typename T>
 typename xpcc::PointSet2D<T>::SizeType

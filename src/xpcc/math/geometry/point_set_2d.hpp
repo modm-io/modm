@@ -63,6 +63,11 @@ namespace xpcc
 		 */
 		PointSet2D(SizeType n = 2);
 		
+		PointSet2D(const PointSet2D& other);
+		
+		PointSet2D&
+		operator = (const PointSet2D& other);
+		
 		/// Number of points contained in the set
 		inline SizeType
 		getNumberOfPoints() const;

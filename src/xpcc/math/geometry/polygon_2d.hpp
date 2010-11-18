@@ -63,6 +63,11 @@ namespace xpcc
 		 */
 		Polygon2D(SizeType n);
 		
+		Polygon2D(const Polygon2D& other);
+		
+		Polygon2D&
+		operator = (const Polygon2D& other);
+		
 		/// append a point to the polygon
 		Polygon2D&
 		operator << (const Vector2D<T>& point);
