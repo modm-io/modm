@@ -1,0 +1,320 @@
+; Copyright (c) 2010, Roboterclub Aachen e.V.
+; All rights reserved.
+;
+; Redistribution and use in source and binary forms, with or without
+; modification, are permitted provided that the following conditions are met:
+;
+;  * Redistributions of source code must retain the above copyright
+;    notice, this list of conditions and the following disclaimer.
+;  * Redistributions in binary form must reproduce the above copyright
+;    notice, this list of conditions and the following disclaimer in the
+;    documentation and/or other materials provided with the distribution.
+;  * Neither the name of the Roboterclub Aachen e.V. nor the
+;    names of its contributors may be used to endorse or promote products
+;    derived from this software without specific prior written permission.
+;
+; THIS SOFTWARE IS PROVIDED BY ROBOTERCLUB AACHEN E.V. ''AS IS'' AND ANY
+; EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+; WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+; DISCLAIMED. IN NO EVENT SHALL ROBOTERCLUB AACHEN E.V. BE LIABLE FOR ANY
+; DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+; (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+; ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+; (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+; THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+;
+; $Id$
+;
+; ----------------------------------------------------------------------------
+
+#include <avr/io.h>
+
+#include "config.h"
+#include "mcp2515_defs.h"
+
+; -----------------------------------------------------------------------------
+
+#define	RESET(x)	_XRS(x)
+#define	SET(x)		_XS(x)
+#define	TOGGLE(x)	_XT(x)
+
+#define	_port2(x)	PORT ## x
+#define	_pin2(x)	PIN ## x
+
+#define	_XRS(x,y)	cbi		_SFR_IO_ADDR(_port2(x)), y
+#define	_XS(x,y)	sbi		_SFR_IO_ADDR(_port2(x)), y
+#define	_XT(x,y)	sbi		_SFR_IO_ADDR(_pin2(x)), y
+
+#define _FUNCTION(A) \
+	.global A $ \
+	.func   A
+#define _ENDFUNC .endfunc
+
+#define _GLOBAL(label, size) .comm label, size
+#define _STATIC(label, size) .lcomm label, size
+
+#define	_DATA_SECTION	.section .bss
+#define	_CODE_SECTION	.section .text
+
+#define	NO_MESSAGE		0x3f
+
+; -----------------------------------------------------------------------------
+
+.equ	Zh,	31
+.equ	Zl,	30
+.equ	Yh,	29
+.equ	Yl,	28
+.equ	Xh,	27
+.equ	Xl, 26
+
+.equ	temp_reg,	0
+
+; -----------------------------------------------------------------------------
+; Variables
+; -----------------------------------------------------------------------------
+	.section .bss
+
+	_GLOBAL( message_number, 1 )
+	_GLOBAL( message_data_counter, 1 )
+	_GLOBAL( message_data_length, 1 )
+	_GLOBAL( message_data, 4 )
+
+	.section .text
+; -----------------------------------------------------------------------------
+; writes one byte per SPI
+
+	_FUNCTION(spi_putc)
+spi_putc_rs:
+	RESET(MCP2515_CS)
+spi_putc:
+	out		_SFR_IO_ADDR(SPDR), 24
+spi_putc_1:
+	in		temp_reg, _SFR_IO_ADDR(SPSR)
+	sbrs	temp_reg, SPIF
+	rjmp	spi_putc_1
+	in		24, _SFR_IO_ADDR(SPDR)
+	clr		25
+	ret
+	_ENDFUNC
+
+; -----------------------------------------------------------------------------
+; adress in r24 and data in r22
+
+	_FUNCTION(mcp2515_write_register)
+mcp2515_write_register:
+	RESET(MCP2515_CS)
+	mov		18,	24
+	ldi		24, SPI_WRITE
+	rcall	spi_putc
+	mov		24, 18
+	rcall	spi_putc
+	mov		24, 22
+	rcall	spi_putc
+	rjmp	cs_ret
+;	SET(MCP2515_CS)
+;	ret
+	_ENDFUNC
+
+; -----------------------------------------------------------------------------
+; type in r24, return status in r24
+
+	_FUNCTION(mcp2515_read_status)
+mcp2515_read_status:
+	;RESET(MCP2515_CS)
+
+	; the value is already in r24
+	rcall	spi_putc_rs
+
+	; write a undefined value => only the return value is interesting
+	rcall	spi_putc
+	rjmp	cs_ret
+
+;	SET(MCP2515_CS)
+;	ret
+	_ENDFUNC
+
+; -----------------------------------------------------------------------------
+; return type of message, 0x3f = no message
+
+	_FUNCTION(mcp2515_get_message)
+
+get_message_ret_:
+	ldi		24, NO_MESSAGE
+	ret
+	
+mcp2515_get_message:
+
+	; read status
+	ldi		24, SPI_RX_STATUS
+	rcall	mcp2515_read_status
+
+	mov		20, 24
+
+	clr		18
+	sbrc	20, 7
+	ldi		18, RXB1DLC
+	sbrc	20, 6
+	ldi		18, RXB0DLC
+
+	tst		18
+	breq	get_message_ret_		; no message avilable
+
+	; check for rtr-frames
+	andi	24, 0x18
+	tst		24
+	brne	get_message_reject
+
+	; read message
+	;RESET(MCP2515_CS)
+	ldi		24, SPI_READ
+	rcall	spi_putc_rs
+
+	mov		24, 18
+	rcall	spi_putc
+
+	; read DLC
+	rcall	spi_putc
+
+	; length must be greater than 4
+	mov		18, 24
+	andi	18, 0x0F
+	subi	18, 4
+
+	cpi		18, 5
+	brge	get_message_reject
+
+	; store length
+	sts		message_data_length, 18
+
+	; first byte is the board-id
+	rcall	spi_putc
+
+	cpi		24, BOOTLOADER_BOARD_ID
+	brne	get_message_reject
+
+	; second byte is the type of the message
+	; (which will be return at the end)
+	rcall	spi_putc
+	mov		19, 24
+
+	; third byte is the message number
+	rcall	spi_putc
+	sts		message_number, 24
+
+	; next one is the counter for multi-data-commands
+	rcall	spi_putc
+	sts		message_data_counter, 24
+
+	; read data
+	ldi		Zh, hi8(message_data)
+	ldi		Zl, lo8(message_data)
+
+read_data_loop:
+	dec		18
+	brlt	read_data_end
+
+	rcall	spi_putc
+	st		Z+, 24
+
+	rjmp	read_data_loop
+read_data_end:
+
+get_message_reject:
+	SET(MCP2515_CS)
+
+	; clear interrupt flag
+	sbrc	20, 7
+	ldi		21, (1<<RX1IF)
+	sbrc	20, 6
+	ldi		21, (1<<RX0IF)
+
+	; Reset interrupt flag (bit-modifiy command)
+	;RESET(MCP2515_CS)
+	ldi		24, SPI_BIT_MODIFY
+	rcall	spi_putc_rs
+	ldi		24, CANINTF
+	rcall	spi_putc
+	mov		24, 21
+	rcall	spi_putc
+	ldi		24, 0x00
+	rcall	spi_putc
+;	SET(MCP2515_CS)
+
+	mov		24, 19
+	rjmp	cs_ret
+;	ret
+
+get_message_ret:
+	ldi		24, NO_MESSAGE
+	ret
+	_ENDFUNC
+
+; -----------------------------------------------------------------------------
+
+	_FUNCTION(mcp2515_send_message)
+mcp2515_send_message:
+	mov		19, 24		; save type-byte
+	
+send_message2:
+	; wait until the send buffer is free
+	ldi		24, SPI_READ_STATUS
+	rcall	mcp2515_read_status
+
+	sbrc	24, 2
+	rjmp	send_message2
+
+	; write message
+	;RESET(MCP2515_CS)
+	ldi		24, SPI_WRITE_TX
+	rcall	spi_putc_rs
+
+	; write identifier
+	ldi		24, 0xff
+	rcall	spi_putc
+	ldi		24, 0xc0
+	rcall	spi_putc
+	rcall	spi_putc
+	rcall	spi_putc
+
+	; write DLC => TODO check length
+	mov		24, 22
+	subi	24, 256-4		; four extra bytes
+	rcall	spi_putc
+
+	; write board-id and type
+	ldi		24, BOOTLOADER_BOARD_ID
+	rcall	spi_putc
+	mov		24, 19
+	rcall	spi_putc
+
+	lds		24, message_number
+	rcall	spi_putc
+	lds		24, message_data_counter
+	rcall	spi_putc
+
+	; write payload-data
+	ldi		Zh, hi8(message_data)
+	ldi		Zl, lo8(message_data)
+write_data_loop:
+	dec		22
+	brlt	write_data_end
+
+	ld		24, Z+
+	rcall	spi_putc
+
+	rjmp	write_data_loop
+write_data_end:
+	SET(MCP2515_CS)
+
+;	nop
+;	nop
+	ldi		24, SPI_RTS | 1
+
+	; send buffer
+	rcall	spi_putc_rs
+cs_ret:
+	SET(MCP2515_CS)
+
+	ret
+	_ENDFUNC
