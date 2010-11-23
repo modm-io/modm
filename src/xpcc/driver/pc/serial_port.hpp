@@ -35,7 +35,6 @@
 
 #include <string>
 #include <queue>
-
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
 #include <boost/thread/mutex.hpp>
@@ -48,106 +47,87 @@ namespace xpcc
 	namespace pc
 	{
 		/**
-		 * \brief	Serial Port Driver
-		 * 
-		 * 
-		 * 
+		 * \brief	Output on Serial Port
+		 *
+		 * Port is closed right after construction.
+		 *
 		 * \ingroup	pc
 		 */
-		class SerialPort : public IODevice
+		class SerialPort : IODevice
 		{
-		public:
-			/**
-			 * \brief	Constructor
-			 * 
-			 * Port is closed right after the construction.
-			 */
+		public :
+
 			SerialPort();
-			
+
 			~SerialPort();
-			
-			/**
-			 * \brief	Open a new device
-			 * 
-			 * \param	deviceName
-			 * \param	baudRate
-			 */
-			virtual bool
-			open(std::string deviceName, unsigned int baudRate);
-			
-			/// Check if the port is open
-			virtual bool
-			isOpen();
-			
-			/**
-			 * \brief	Close a open port and free the resources
-			 */
-			virtual void
-			close();
-			
-			void
-			kill();
-			
-			/// Write a character
+
+			using IODevice::write;
+
 			virtual void
 			write(char c);
-			
-			/// Write a C-String
-			using IODevice::write;
-			
+
 			virtual void
 			flush();
-			
-			/// Read a character
+
 			virtual bool
 			read(char& value);
-			
-			
-			void
-			clearReadBuffer();
-			
-			void
-			clearWriteBuffer();
-			
-		private:
-			void
-			readStart();
-			
-			void
-			doClose(const boost::system::error_code& error);
-			
-			void
-			doAbort(const boost::system::error_code& error);
-			
-			void
-			doWrite(const char c);
-			
-			void
-			writeStart(void);
-			
-			void
-			writeComplete(const boost::system::error_code& error);
+
+			virtual bool
+			open( std::string deviceName, unsigned int baudRate );
+
+			virtual bool
+			isOpen();
+
+			virtual void
+			close();
 
 			void
-			readComplete(const boost::system::error_code& error,
-					std::size_t bytes_transferred);
-			
+			kill();
+
+			void
+			clearReadBuffer();
+
+			void
+			clearWriteBuffer();
+
+		private:
 			typedef boost::mutex				Mutex;
 			typedef boost::mutex::scoped_lock	MutexGuard;
-			
+
 			bool shutdown;
 			std::string deviceName;
 			unsigned int baudRate;
 			Mutex readMutex;
 			Mutex writeMutex;
-			
+
 			char tmpRead[512];
 			std::queue<char> writeBuffer;
 			std::queue<char> readBuffer;
-			
+
 			boost::asio::io_service  io_service;
 			boost::asio::serial_port port;
 			boost::thread* 			 thread;
+
+			void
+			readStart();
+
+	        void
+	        doClose(const boost::system::error_code& error);
+
+	        void
+	        doAbort(const boost::system::error_code& error);
+
+	        void
+	        doWrite(const char c);
+
+	        void
+	        writeStart(void);
+
+	        void
+	        writeComplete(const boost::system::error_code& error);
+
+			void
+			readComplete(const boost::system::error_code& error, size_t bytes_transferred);
 		};
 	}
 }
