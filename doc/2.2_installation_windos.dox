@@ -19,7 +19,9 @@ Python 2.6.x (best 32Bit Version) is required. The Code currently doesn't work w
 - http://pypi.python.org/pypi/setuptools
 
 After installing setuptools add the Python-Folder to your System Path:
+\verbatim
 Start-> Control Panel -> System -> Advanced
+\endverbatim
 Then click on Environment Variable, find PATH and click on modify.
 There you have to add the Path to the Python Folder and the Script Folder.
 

@@ -5,8 +5,8 @@
 \page system_design_builder	6.2 Builder
 
 \section base builder_base.Builder
-Builders are derived from builder_base.Builder. It uses the
-optparse.OptionParser to evaluate the commandline.
+Builders are derived from \c builder_base.Builder. It uses
+\c optparse.OptionParser to evaluate the commandline.
 
 \subsection options Commandline Options
 Default added Options are 
