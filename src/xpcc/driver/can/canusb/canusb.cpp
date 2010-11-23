@@ -30,7 +30,7 @@ xpcc::CanUsb::~CanUsb(
 	}
 }
 
-bool xpcc::CanUsb::open(std::string deviceName, unsigned int baudRate))
+bool xpcc::CanUsb::open(std::string deviceName, unsigned int baudRate)
 {
 	if(this->serialPort.isOpen()) this->serialPort.close();
 	if (this->serialPort.open(deviceName, baudRate))
