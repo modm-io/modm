@@ -51,6 +51,10 @@ xpcc::apb::Action::call(Response& response, const void *payload)
 	(object->*function)(response, payload);
 }
 
+#ifdef XPCC__COMPILER_MSVC
+#	pragma warning(disable:4355)
+#endif
+
 // ----------------------------------------------------------------------------
 template <typename Interface>
 xpcc::apb::Slave<Interface>::Slave(uint8_t address,

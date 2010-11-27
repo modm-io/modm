@@ -46,6 +46,20 @@
 #include <stdarg.h>
 #include <stdio.h>
 #include <math.h>
+#include <stdint.h>
+
+// ----------------------------------------------------------------------------
+// WARNINGS & COMPILER SETTINGS
+
+// Disable warnings about array initialization
+#pragma warning( disable : 4351 )
+
+// Allow pointer to virtual member functions. May generate non-optimal code but works
+// always. See http://msdn.microsoft.com/en-us/library/83cch5a6.aspx
+#pragma pointers_to_members( full_generality, virtual_inheritance )
+
+// ----------------------------------------------------------------------------
+// CONSTANTS
 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
@@ -75,6 +89,9 @@
 #define	__DBL_EPSILON__		2.2204460492503131e-16
 #endif
 
+// ----------------------------------------------------------------------------
+// FUNCTIONS
+
 int
 snprintf(char *buffer, int buff_size, const char *format, ...);
 
@@ -82,6 +99,27 @@ inline double
 round(double f)
 {
 	return floor(f + 0.5);
-};
+}
+
+namespace std
+{
+	uint16_t
+	sqrt(uint16_t x);
+
+	uint16_t
+	sqrt(int16_t x);
+
+	uint16_t
+	sqrt(uint32_t x);
+
+	uint16_t
+	sqrt(int32_t x);
+
+	float
+	atan2(int16_t y, int16_t x);
+
+	float
+	atan2(int32_t y, int32_t x);
+}
 
 #endif // XPCC__WINDOWS_HPP

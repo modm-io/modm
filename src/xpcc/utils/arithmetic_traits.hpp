@@ -55,6 +55,7 @@ namespace xpcc
 	 * - \c	max()			biggest value
 	 * - \c	isSigned		is this a signed or unsigned type
 	 * - \c	isFloatingPoint	is this a floating point type
+	 * - \c	isInteger		is this a integer type
 	 * - \c	decimalDigits	count of digits to display this type in decimal
 	 * 
 	 * \section usage	Usage
@@ -65,8 +66,8 @@ namespace xpcc
 	 * T max = xpcc::ArithmeticTraits<T>::max();
 	 * \endcode
 	 * 
-	 * \version	$Id$
 	 * \author	Martin Rosekeit <martin.rosekeit@rwth-aachen.de>
+	 * \author	Fabian Greif <fabian.greif@rwth-aachen.de>
 	 */
 	// ------------------------------------------------------------------------
 	/*\{*/
@@ -86,6 +87,7 @@ namespace xpcc
 		
 		static const unsigned char decimalDigits = 4; // inc sign
 		static const bool isFloatingPoint = false;
+		static const bool isInteger = true;
 	};
 
 	// ------------------------------------------------------------------------
@@ -100,7 +102,8 @@ namespace xpcc
 		static const unsigned char decimalDigits = 4; // inc sign
 		static const bool isSigned = true;
 		static const bool isFloatingPoint = false;
-		
+		static const bool isInteger = true;
+
 		static ALWAYS_INLINE signed char
 		min()
 		{
@@ -125,6 +128,7 @@ namespace xpcc
 		static const uint8_t decimalDigits = 3;
 		static const bool isSigned = false;
 		static const bool isFloatingPoint = false;
+		static const bool isInteger = true;
 		
 		static ALWAYS_INLINE unsigned char
 		min()
@@ -150,6 +154,7 @@ namespace xpcc
 		static const uint8_t decimalDigits = 6; // inc. sign
 		static const bool isSigned = true;
 		static const bool isFloatingPoint = false;
+		static const bool isInteger = true;
 		
 		static ALWAYS_INLINE int16_t
 		min()
@@ -175,7 +180,8 @@ namespace xpcc
 		static const uint8_t decimalDigits = 6;
 		static const bool isSigned = false;
 		static const bool isFloatingPoint = false;
-		
+		static const bool isInteger = true;
+
 		static ALWAYS_INLINE uint16_t
 		min()
 		{
@@ -204,7 +210,8 @@ namespace xpcc
 		static const uint8_t decimalDigits = 11; // inc. sign
 		static const bool isSigned = true;
 		static const bool isFloatingPoint = false;
-		
+		static const bool isInteger = true;
+
 		static ALWAYS_INLINE int32_t
 		min()
 		{
@@ -233,7 +240,8 @@ namespace xpcc
 		static const uint8_t decimalDigits = 10;
 		static const bool isSigned = false;
 		static const bool isFloatingPoint = false;
-		
+		static const bool isInteger = true;
+
 		static ALWAYS_INLINE uint32_t
 		min()
 		{
@@ -258,7 +266,8 @@ namespace xpcc
 		static const uint8_t decimalDigits = 20; // inc. sign
 		static const bool isSigned = true;
 		static const bool isFloatingPoint = false;
-		
+		static const bool isInteger = true;
+
 		static ALWAYS_INLINE int64_t
 		min()
 		{
@@ -283,7 +292,8 @@ namespace xpcc
 		static const uint8_t decimalDigits = 20;
 		static const bool isSigned = false;
 		static const bool isFloatingPoint = false;
-		
+		static const bool isInteger = true;
+
 		static ALWAYS_INLINE uint64_t
 		min()
 		{
@@ -307,7 +317,8 @@ namespace xpcc
 		
 		static const bool isSigned = true;
 		static const bool isFloatingPoint = true;
-		
+		static const bool isInteger = false;
+
 		static ALWAYS_INLINE float
 		min()
 		{
@@ -337,6 +348,7 @@ namespace xpcc
 		
 		static const bool isSigned = true;
 		static const bool isFloatingPoint = true;
+		static const bool isInteger = false;
 		
 		static ALWAYS_INLINE double
 		min()

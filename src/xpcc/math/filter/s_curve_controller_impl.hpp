@@ -34,6 +34,8 @@
 	#error	"Don't include this file directly, use 's_curve_controller.hpp' instead!"
 #endif
 
+#include <xpcc/architecture/platform.hpp>
+
 // ----------------------------------------------------------------------------
 template<typename T>
 xpcc::SCurveController<T>::Parameter::Parameter(
@@ -59,7 +61,7 @@ void
 xpcc::SCurveController<T>::setTarget(const T& primary)
 {
 	this->target = primary;
-	targetReached = false;
+	this->targetReached = false;
 }
 
 // ----------------------------------------------------------------------------
@@ -83,7 +85,7 @@ template<typename T>
 bool
 xpcc::SCurveController<T>::isTargetReached() const
 {
-	return targetReached;
+	return this->targetReached;
 }
 
 // ----------------------------------------------------------------------------
@@ -92,7 +94,7 @@ template<typename T>
 void
 xpcc::SCurveController<T>::update(const T& primary, const T& secondary)
 {
-	T error = target - primary;
+	T error = this->target - primary;
 
 	// adjust sign to be always positive
 	bool invert = false;
@@ -134,5 +136,5 @@ template<typename T>
 inline const T&
 xpcc::SCurveController<T>::getValue() const
 {
-	return output;
+	return this->output;
 }

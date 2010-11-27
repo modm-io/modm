@@ -38,6 +38,7 @@ def generate(env, **kw):
 		env.Append(ENV = {'PATH' : os.environ['PATH']})
 		env.Tool('default')
 		
+		env.Append(CXXFLAGS = "/EHsc")
 	else:
 		env.Append(ENV = {'PATH' : os.environ['PATH']})
 		env.Tool('gcc')

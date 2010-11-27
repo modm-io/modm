@@ -34,6 +34,7 @@
 #define	XPCC__ANGLE_HPP
 
 #include <cmath>
+#include <xpcc/architecture/platform.hpp>
 
 namespace xpcc
 {

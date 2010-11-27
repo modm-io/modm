@@ -33,6 +33,7 @@
 #ifndef	XPCC__RESPONSE_CALLBACK_HPP
 #define	XPCC__RESPONSE_CALLBACK_HPP
 
+#include <xpcc/architecture/platform.hpp>
 #include <xpcc/container/smart_pointer.hpp>
 
 #include "backend/backend_interface.hpp"
@@ -52,7 +53,7 @@ namespace xpcc
 	{
 	public:
 		typedef void (Communicatable::*Function)(const Header& header, const uint8_t *type);
-		
+
 	public:
 		/**
 		 * Set the method that will be called when a response is received.

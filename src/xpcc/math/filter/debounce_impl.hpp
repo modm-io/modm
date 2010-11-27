@@ -49,17 +49,17 @@ template<typename T>
 void
 xpcc::filter::Debounce<T>::update(bool input)
 {
-	if (input and (sum < maxValue)) {
+	if (input && (sum < maxValue)) {
 		sum++;
 	}
-	else if (!input and (sum > 0)) {
+	else if (!input && (sum > 0)) {
 		sum--;
 	}
 	
-	if (state and (sum <= lowerBound)) {
+	if (state && (sum <= lowerBound)) {
 		state = false;
 	}
-	else if (!state and (sum >= upperBound)) {
+	else if (!state && (sum >= upperBound)) {
 		state = true;
 	}
 }

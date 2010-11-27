@@ -77,12 +77,23 @@ InterfaceTest::testSendAck()
 	TEST_ASSERT_EQUALS_ARRAY(FakeIODevice::sendBuffer, testMessage, 7);
 }
 
-struct Data
-{
-	int16_t a;
-	uint8_t b;
-	uint32_t c;
-} __attribute__((packed));
+#ifdef XPCC__COMPILER_MSVC
+	#pragma pack(push, 1)
+	struct Data
+	{
+		int16_t a;
+		uint8_t b;
+		uint32_t c;
+	};
+	#pragma pack(pop)
+#else
+	struct Data
+	{
+		int16_t a;
+		uint8_t b;
+		uint32_t c;
+	} __attribute__((packed));
+#endif
 
 void
 InterfaceTest::testSendNack()

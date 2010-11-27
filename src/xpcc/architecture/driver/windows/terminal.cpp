@@ -26,62 +26,34 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id$
+ * $Id: terminal.cpp 431 2010-11-18 22:19:16Z dergraaf $
  */
 // ----------------------------------------------------------------------------
 
-#include "../windows.hpp"
-#include <xpcc/math/utils/operator.hpp>
+#include <iostream>
+#include <xpcc/driver/pc/terminal.hpp>
 
 // ----------------------------------------------------------------------------
-int
-snprintf(char *buffer, int buff_size, const char *format, ...)
+void
+xpcc::pc::Terminal::write(char c)
 {
-	va_list ap;
-	
-	va_start(ap, format);
-	int result = vsnprintf(buffer, buff_size, format, ap);
-	va_end(ap);
-	
-	return result;
+	std::cout << c;
 }
 
-// ----------------------------------------------------------------------------
-namespace std
+void
+xpcc::pc::Terminal::write(const char* s)
 {
-	uint16_t
-	sqrt(uint16_t x)
-	{
-		return xpcc::math::sqrt32(x);
-	}
+	std::cout << s;
+}
 
-	uint16_t
-	sqrt(int16_t x)
-	{
-		return xpcc::math::sqrt32(x);
-	}
+void
+xpcc::pc::Terminal::flush()
+{
+	std::cout << std::flush;
+}
 
-	uint16_t
-	sqrt(uint32_t x)
-	{
-		return xpcc::math::sqrt32(x);
-	}
-
-	uint16_t
-	sqrt(int32_t x)
-	{
-		return xpcc::math::sqrt32(x);
-	}
-
-	float
-	atan2(int16_t y, int16_t x)
-	{
-		return std::atan2(static_cast<float>(y), static_cast<float>(x));
-	}
-
-	float
-	atan2(int32_t y, int32_t x)
-	{
-		return std::atan2(static_cast<float>(y), static_cast<float>(x));
-	}
+bool
+xpcc::pc::Terminal::read(char& value)
+{
+	return std::cin.get(value);
 }
