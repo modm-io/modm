@@ -39,7 +39,7 @@ bool xpcc::CanUsb::open(std::string deviceName, unsigned int baudRate)
 		this->serialPort.clearReadBuffer();
 		this->serialPort.write("C\r");
 		char a;
-		xpcc::timeout<> timer;
+		xpcc::Timeout<> timer;
 		timer.restart(500);
 		while(!this->serialPort.read(a)){
 			if(timer.isExpired())

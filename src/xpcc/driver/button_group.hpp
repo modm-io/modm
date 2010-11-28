@@ -57,6 +57,29 @@ namespace xpcc
 	 * one key at a time. This constraint only applies to buttons listed in the
 	 * \em mask variable.
 	 * 
+	 * Mode 1:
+\verbatim
+                 Timeline ---->
+                      __      _________________      __
+getState()       ____/  \____/                 \____/  \____
+isPressed()      ----X-------X----------------------X-------
+isRepeated()     --------------------X--X--X--X-------------
+isReleased()     -------X----------------------X-------X----
+                             |       |__|__|
+                             |_______| \ /
+                                  \    interval
+                                  timeout
+\endverbatim
+	 * 
+	 * Mode 2:
+\verbatim
+                      __      _________________      __
+getState()       ____/  \____/                 \____/  \____
+isPressedShort() -------X------------------------------X----
+isPressedLong()  --------------------X----------------------
+isReleased()     -------X----------------------X-------X----
+\endverbatim
+	 * 
 	 * This implementation is based on the C functions written
 	 * by Peter Dannegger (see http://www.mikrocontroller.net/topic/48465).
 	 * 
@@ -69,7 +92,7 @@ namespace xpcc
 	class ButtonGroup
 	{
 	public:
-		/** \brief	Buttons masks
+		/** \brief	Button masks
 		 * 
 		 * Provided for convenience only.
 		 * 
@@ -176,6 +199,8 @@ namespace xpcc
 		
 		/** \brief	Get buttons which were pressed long
 		 *
+		 * \warning	Use this function only in combination with
+		 *			isPressedShort(), otherwise it won't work correctly!
 		 * \see	isPressedShort()
 		 */
 		T

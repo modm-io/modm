@@ -37,7 +37,7 @@ import configfile as configparser
 from SCons.Script import *
 
 # -----------------------------------------------------------------------------
-def excludeFromScanner(path, filename='build.cfg'):
+def exclude_from_scanner(path, filename='build.cfg'):
 	filename = os.path.join(path, filename)
 	dir = os.path.dirname(filename)
 	
@@ -111,7 +111,7 @@ def xpcc_library(env, buildpath=None):
 	env['XPCC_BASEPATH'] = env['XPCC_LIBRARY_PATH']
 	
 	# exclude the buildpath from the FileScanner
-	excludeFromScanner(env['XPCC_BUILDPATH'])
+	exclude_from_scanner(env['XPCC_BUILDPATH'])
 	
 	# build the library
 	library, defines = env.SConscript(
@@ -145,13 +145,10 @@ def xpcc_library(env, buildpath=None):
 	return library
 
 def xpcc_communication_header(env, xmlfile):
-	# TODO
-#	env.Append(CPPPATH = os.path.join(os.path.dirname(xmlfile), ".."))
-	
 	files  = env.SystemCppPackets(xmlfile)
 	files += env.SystemCppIdentifier(xmlfile)
 	if 'communication' in env['XPCC_CONFIG']:
-		files += env.SystemCppPostman(target='postman.hpp',
+		files += env.SystemCppPostman(target='postman',
 				source=xmlfile,
 				container=env['XPCC_CONFIG']['communication']['container'])
 	
@@ -181,7 +178,7 @@ def generate_defines(env, filename='defines.hpp'):
 # -----------------------------------------------------------------------------
 def generate(env, **kw):
 	# We make sure that the installed version is 2.6 or higher because
-	# features from this version like os.path.relpath() or used.
+	# features from this version like os.path.relpath() are used.
 	EnsurePythonVersion(2, 6)
 	EnsureSConsVersion(1, 0)
 	
@@ -242,7 +239,7 @@ def generate(env, **kw):
 		buildpath = os.path.abspath(buildpath)
 		
 		# exclude the buildpath from the FileScanner
-		excludeFromScanner(buildpath)
+		exclude_from_scanner(buildpath)
 	except configparser.ParserException, msg:
 		print "Error parsing file configuration file '%s':\n%s" % (configfile, str(msg))
 		Exit(1)

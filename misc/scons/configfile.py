@@ -32,6 +32,8 @@ import os
 import re
 import ConfigParser
 
+import SCons.Node
+
 def listify(node):
 	return [node,] if (not isinstance(node, list)) else node
 
@@ -81,12 +83,23 @@ class FileList(list):
 	def append(self, item):
 		if hasattr(item, '__getitem__'):
 			self.extend(item)
-		elif not self.__contains__(item):
+		else:
+			self.__append(item)
+	
+	def __append(self, item):
+		if not isinstance(item, SCons.Node.Node):
+			item = SCons.Node.FS.default_fs.File(str(item))
+		
+		if not self.__contains__(item):
 			list.append(self, item)
 	
-	def extend(self, list):
-		for value in list:
-			self.append(value)
+	def extend(self, l):
+		for item in l:
+			self.__append(item)
+	
+	def __iadd__(self, item):
+		self.append(item)
+		return self
 
 # -----------------------------------------------------------------------------
 class Scanner:

@@ -31,12 +31,13 @@
 import os
 import re
 import SCons
+import SCons.Errors
 
 # TODO make this more robust against whitespace etc.
 includeExpression = re.compile(r'<include>(\S+)</include>', re.M)
 
 # -----------------------------------------------------------------------------
-def findIncludes(file):
+def find_includes(file):
 	files = []
 	for line in open(file).readlines():
 		match = includeExpression.search(line)
@@ -45,15 +46,15 @@ def findIncludes(file):
 			files.append(filename)
 	return files
 
-def xmlScanner(node, env, path, arg=None):
+def xml_include_scanner(node, env, path, arg=None):
 	abspath, targetFilename = os.path.split(node.get_abspath())
 	
 	stack = [targetFilename]
-	dependencies = [ targetFilename ]
+	dependencies = [targetFilename]
 	
 	while stack:
 		nextFile = stack.pop()
-		files = findIncludes(os.path.join(abspath, nextFile))
+		files = find_includes(os.path.join(abspath, nextFile))
 		for file in files:
 			if file not in dependencies:
 				stack.append(file)
@@ -64,72 +65,71 @@ def xmlScanner(node, env, path, arg=None):
 
 # -----------------------------------------------------------------------------
 def generate(env, **kw):
-	builder_packets = SCons.Script.Builder(
-		action = SCons.Action.Action(
-			'python "${XPCC_SYSTEM_BUILDER}/cpp_packets.py" ' \
-				'--source_path ${TARGETS[0].dir} ' \
-				'--header_path ${TARGETS[1].dir} ' \
-				'--system_include_path robot '\
-				'$SOURCE',
-			cmdstr="$SYSTEM_CPP_PACKETS_COMSTR"),
-		emitter = \
-			lambda target, source, env:
-				([os.path.join(str(source[0].dir), "../robot/packets.cpp"),
-				  os.path.join(str(source[0].dir), "../robot/packets.hpp")],
-				source),
-		source_scanner = SCons.Script.Scanner(function = xmlScanner,
-								skeys = ['.xml']),
-		single_source = True,
-		target_factory = env.fs.Entry,
-		src_suffix = ".xml",
-	)
+	env['BUILDERS']['SystemCppPackets'] = \
+		SCons.Script.Builder(
+			action = SCons.Action.Action(
+				'python "${XPCC_SYSTEM_BUILDER}/cpp_packets.py" ' \
+					'--source_path ${TARGETS[0].dir} ' \
+					'--header_path ${TARGETS[1].dir} ' \
+					'--system_include_path robot '\
+					'$SOURCE',
+				cmdstr="$SYSTEM_CPP_PACKETS_COMSTR"),
+			emitter = \
+				lambda target, source, env:
+					([os.path.join(str(source[0].dir), "../robot/packets.cpp"),
+					  os.path.join(str(source[0].dir), "../robot/packets.hpp")],
+					source),
+			source_scanner =
+				SCons.Script.Scanner(
+					function = xml_include_scanner,
+					skeys = ['.xml']),
+			single_source = True,
+			target_factory = env.fs.Entry,
+			src_suffix = ".xml")
 	
-	builder_identifier = SCons.Script.Builder(
-		action = SCons.Action.Action(
-			'python "${XPCC_SYSTEM_BUILDER}/cpp_identifier.py" ' \
-				'--outpath ${TARGET.dir} ' \
-				'$SOURCE',
-			cmdstr="$SYSTEM_CPP_IDENTIFIER_COMSTR"),
-		emitter = lambda target, source, env:
-			([os.path.join(str(source[0].dir), "../robot/identifier.hpp")], source),
-		source_scanner = SCons.Script.Scanner(function = xmlScanner,
-								skeys = ['.xml']),
-		single_source = True,
-		target_factory = env.fs.Entry,
-		src_suffix = ".xml",
-	)
+	env['BUILDERS']['SystemCppIdentifier'] = \
+		SCons.Script.Builder(
+			action = SCons.Action.Action(
+				'python "${XPCC_SYSTEM_BUILDER}/cpp_identifier.py" ' \
+					'--outpath ${TARGET.dir} ' \
+					'$SOURCE',
+				cmdstr="$SYSTEM_CPP_IDENTIFIER_COMSTR"),
+			emitter = lambda target, source, env:
+				([os.path.join(str(source[0].dir), "../robot/identifier.hpp")],
+				 source),
+			source_scanner =
+				SCons.Script.Scanner(
+					function = xml_include_scanner,
+					skeys = ['.xml']),
+			single_source = True,
+			target_factory = env.fs.Entry,
+			src_suffix = ".xml")
 	
-	builder_postman = SCons.Script.Builder(
-		action = SCons.Action.Action(
-			'python "${XPCC_SYSTEM_BUILDER}/cpp_postman.py" ' \
-				'--container "${container}" ' \
-				'--outpath ${TARGET.dir} ' \
-				'$SOURCE',
-			cmdstr="$SYSTEM_CPP_POSTMAN_COMSTR"),
-		emitter = \
-			lambda target, source, env:
-				([os.path.join(str(target[0].dir), "postman.cpp"),
-				  os.path.join(str(target[0].dir), "postman.hpp")],
-				source),
-		source_scanner = SCons.Script.Scanner(function = xmlScanner,
-								skeys = ['.xml']),
-		single_source = True,
-		target_factory = env.fs.Entry,
-		src_suffix = ".xml",
-	)
+	env['BUILDERS']['SystemCppPostman'] = \
+		SCons.Script.Builder(
+			action = SCons.Action.Action(
+				'python "${XPCC_SYSTEM_BUILDER}/cpp_postman.py" ' \
+					'--container "${container}" ' \
+					'--outpath ${TARGET.dir} ' \
+					'$SOURCE',
+				cmdstr="$SYSTEM_CPP_POSTMAN_COMSTR"),
+			emitter = \
+				lambda target, source, env:
+					([os.path.join(str(target[0].dir), "postman.cpp"),
+					  os.path.join(str(target[0].dir), "postman.hpp")],
+					source),
+			source_scanner =
+				SCons.Script.Scanner(
+					function = xml_include_scanner,
+					skeys = ['.xml']),
+			single_source = True,
+			target_factory = env.fs.Entry,
+			src_suffix = ".xml")
 	
 	if SCons.Script.ARGUMENTS.get('verbose') != '1':
 		env['SYSTEM_CPP_PACKETS_COMSTR'] = "Generate packets from: $SOURCE"
 		env['SYSTEM_CPP_IDENTIFIER_COMSTR'] = "Generate identifier from: $SOURCE"
 		env['SYSTEM_CPP_POSTMAN_COMSTR'] = "Generate postman from: $SOURCE"
-	
-	env.Append(
-		BUILDERS = {
-			'SystemCppPackets': builder_packets,
-			'SystemCppIdentifier': builder_identifier,
-			'SystemCppPostman': builder_postman,
-		}
-	)
 
 def exists(env):
 	return True

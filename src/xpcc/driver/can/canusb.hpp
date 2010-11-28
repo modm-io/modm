@@ -89,7 +89,7 @@ namespace xpcc
 		bool
 		isOpen()
 		{
-			return this->serial.isOpen();
+			return this->serialPort.isOpen();
 		}
 		
 		void

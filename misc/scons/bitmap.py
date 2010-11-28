@@ -40,11 +40,11 @@ template = """
 
 namespace bitmap
 {
-FLASH(uint8_t ${name}[]) =
-{
-	${width}, ${height},
-	${array}
-};
+	FLASH(uint8_t ${name}[]) =
+	{
+		${width}, ${height},
+		${array}
+	};
 }
 """
 
@@ -97,7 +97,7 @@ def bitmap_action(target, source, env):
 		'name': os.path.splitext(os.path.basename(str(target[0])))[0],
 		'width': width,
 		'height': height,
-		'array': "\n\t".join(array)
+		'array': "\n\t\t".join(array)
 	}
 	
 	output = string.Template(template).safe_substitute(substitutions)

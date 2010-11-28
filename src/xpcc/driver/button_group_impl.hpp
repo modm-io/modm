@@ -52,6 +52,7 @@ xpcc::ButtonGroup<T>::getState(T mask) const
 	return mask & state;
 }
 
+// ----------------------------------------------------------------------------
 template <typename T>
 T
 xpcc::ButtonGroup<T>::isReleased(T mask)
@@ -64,6 +65,7 @@ xpcc::ButtonGroup<T>::isReleased(T mask)
 	return mask;
 }
 
+// ----------------------------------------------------------------------------
 template <typename T>
 T
 xpcc::ButtonGroup<T>::isPressed(T mask)
@@ -75,8 +77,6 @@ xpcc::ButtonGroup<T>::isPressed(T mask)
 	
 	return mask;
 }
-
-// ----------------------------------------------------------------------------
 
 template <typename T>
 T
@@ -90,6 +90,7 @@ xpcc::ButtonGroup<T>::isRepeated(T mask)
 	return mask;
 }
 
+// ----------------------------------------------------------------------------
 template <typename T>
 T
 xpcc::ButtonGroup<T>::isPressedShort(T mask)
