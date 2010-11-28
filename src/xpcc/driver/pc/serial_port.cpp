@@ -202,7 +202,7 @@ xpcc::pc::SerialPort::readComplete(const boost::system::error_code& error, size_
     {
     	{
 			MutexGuard queueGuard( this->readMutex);
-			for(int i=0; i<bytes_transferred; ++i)
+			for(unsigned int i=0; i<bytes_transferred; ++i)
 			{
 				this->readBuffer.push(this->tmpRead[i]);
 			}

@@ -38,6 +38,7 @@ includeExpression = re.compile(r'<include>(\S+)</include>', re.M)
 
 # -----------------------------------------------------------------------------
 def find_includes(file):
+	""" Find include directives in an XML file """
 	files = []
 	for line in open(file).readlines():
 		match = includeExpression.search(line)
@@ -47,6 +48,7 @@ def find_includes(file):
 	return files
 
 def xml_include_scanner(node, env, path, arg=None):
+	""" Generates the dependencies for the XML files """
 	abspath, targetFilename = os.path.split(node.get_abspath())
 	
 	stack = [targetFilename]
@@ -64,6 +66,39 @@ def xml_include_scanner(node, env, path, arg=None):
 	return dependencies
 
 # -----------------------------------------------------------------------------
+def packet_emitter(target, source, env):
+	try:
+		path = env['path']
+	except KeyError:
+		path = '.'
+	
+	target = [os.path.join(path, "packets.cpp"),
+			  os.path.join(path, "packets.hpp")]
+	
+	return (target, source)
+
+def identifier_emitter(target, source, env):
+	try:
+		path = env['path']
+	except KeyError:
+		path = '.'
+	
+	target = [os.path.join(path, "identifier.hpp")]
+	
+	return (target, source)
+
+def postman_emitter(target, source, env):
+	try:
+		path = env['path']
+	except KeyError:
+		path = '.'
+	
+	target = [os.path.join(path, "postman.cpp"),
+			  os.path.join(path, "postman.hpp")]
+	
+	return (target, source)
+
+# -----------------------------------------------------------------------------
 def generate(env, **kw):
 	env['BUILDERS']['SystemCppPackets'] = \
 		SCons.Script.Builder(
@@ -71,14 +106,9 @@ def generate(env, **kw):
 				'python "${XPCC_SYSTEM_BUILDER}/cpp_packets.py" ' \
 					'--source_path ${TARGETS[0].dir} ' \
 					'--header_path ${TARGETS[1].dir} ' \
-					'--system_include_path robot '\
 					'$SOURCE',
 				cmdstr="$SYSTEM_CPP_PACKETS_COMSTR"),
-			emitter = \
-				lambda target, source, env:
-					([os.path.join(str(source[0].dir), "../robot/packets.cpp"),
-					  os.path.join(str(source[0].dir), "../robot/packets.hpp")],
-					source),
+			emitter = packet_emitter,
 			source_scanner =
 				SCons.Script.Scanner(
 					function = xml_include_scanner,
@@ -94,9 +124,7 @@ def generate(env, **kw):
 					'--outpath ${TARGET.dir} ' \
 					'$SOURCE',
 				cmdstr="$SYSTEM_CPP_IDENTIFIER_COMSTR"),
-			emitter = lambda target, source, env:
-				([os.path.join(str(source[0].dir), "../robot/identifier.hpp")],
-				 source),
+			emitter = identifier_emitter,
 			source_scanner =
 				SCons.Script.Scanner(
 					function = xml_include_scanner,
@@ -113,11 +141,7 @@ def generate(env, **kw):
 					'--outpath ${TARGET.dir} ' \
 					'$SOURCE',
 				cmdstr="$SYSTEM_CPP_POSTMAN_COMSTR"),
-			emitter = \
-				lambda target, source, env:
-					([os.path.join(str(target[0].dir), "postman.cpp"),
-					  os.path.join(str(target[0].dir), "postman.hpp")],
-					source),
+			emitter = postman_emitter,
 			source_scanner =
 				SCons.Script.Scanner(
 					function = xml_include_scanner,

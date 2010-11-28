@@ -40,6 +40,7 @@
  */
 
 #include "../backend/backend_interface.hpp"
+#include "../response.hpp"
 
 namespace xpcc
 {

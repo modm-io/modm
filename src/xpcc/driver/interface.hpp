@@ -35,6 +35,28 @@
 
 namespace xpcc
 {
+	/**
+	 * \brief	Interface class
+	 * 
+	 * This class defines no real functionality but acts as a base class for
+	 * all classes describing the public interface of some hardware drivers.
+	 * 
+	 * As we use template parameters to configure drivers for different pin
+	 * layouts etc. we have no way of describing the interface expected by
+	 * the driver.
+	 * This class and its subclasses should bridge this gap in the
+	 * documentation as they show the expected interface.
+	 * 
+	 * Because they don't have any virtual methods and don't implement any
+	 * of the methods they don't add any overhead to the system.
+	 * 
+	 * The user must implement all given methods and therewith shadowing the
+	 * methods of the base classes. Otherwise the Compiler will try to use
+	 * methods of the base class and this will lead to Linker errors because
+	 * of the missing implementation.
+	 * 
+	 * \ingroup	interface
+	 */
 	class Interface
 	{
 	};

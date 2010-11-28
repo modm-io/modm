@@ -46,7 +46,15 @@ namespace xpcc
 		static const uint8_t WRITE = 0x00;
 		static const uint8_t READ = 0x01;
 		
-		
+		/**
+		 * \brief	Interface of a I2C master
+		 * 
+		 * This class definies the public interface for a synchronous master.
+		 * This means that every transaction is blocking and have to be
+		 * finished before the functions return.
+		 * 
+		 * \ingroup	interface
+		 */
 		class SynchronousMaster : public Interface
 		{
 			uint8_t
@@ -56,6 +64,16 @@ namespace xpcc
 			write(uint8_t data);
 		};
 		
+		/**
+		 * \brief	Interface for a I2C master with asynchronous transfers
+		 * 
+		 * A master with asynchronous transfers operates in the background
+		 * until the operation is finished. This allows the use of DMA etc. and
+		 * enables the program to do other things while the operation is
+		 * going on.
+		 * 
+		 * \ingroup	interface
+		 */
 		class AsynchronousMaster : public Interface
 		{
 			void

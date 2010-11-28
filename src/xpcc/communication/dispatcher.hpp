@@ -39,11 +39,10 @@
 #include "postman/postman.hpp"
 
 #include "response_callback.hpp"
+#include "response.hpp"
 
 namespace xpcc
 {
-	typedef Header ResponseHandle;
-	
 	/**
 	 * \brief	
 	 * 

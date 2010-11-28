@@ -33,8 +33,12 @@
 #ifndef	XPCC__RESPONSE_HPP
 #define	XPCC__RESPONSE_HPP
 
+#include "backend/header.hpp"
+
 namespace xpcc
 {
+	typedef Header ResponseHandle;
+	
 	// forward declaration
 	class Dispatcher;
 	
@@ -46,7 +50,7 @@ namespace xpcc
 	{
 		friend class Dispatcher;
 	public:
-		Response(const Reponse& other);
+		Response(const Response& other);
 		
 	public:
 		void

@@ -5,6 +5,8 @@
  */
 // ----------------------------------------------------------------------------
 
+#include "packets.hpp"
+#include "identifier.hpp"
 #include "postman.hpp"
 
 {%- for component in container.components %}
@@ -15,7 +17,7 @@ namespace component
 {
 	{% for component in container.components -%}
 	extern {{ component.name | CamelCase }}	{{ component.name | camelCase }};
-	{% endfor %}
+	{%- endfor %}
 }
 
 // ----------------------------------------------------------------------------
@@ -23,6 +25,10 @@ xpcc::Postman::DeliverInfo
 Postman::deliverPacket(const xpcc::Header& header, const xpcc::SmartPointer& payload)
 {
 	const xpcc::ResponseHandle& handle(header);
+	
+	// Avoid warnings about unused variables
+	(void) handle;
+	(void) payload;
 	
 	switch (header.destination)
 	{
