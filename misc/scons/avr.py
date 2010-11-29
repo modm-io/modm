@@ -130,6 +130,7 @@ def generate(env, **kw):
 		"-Wextra",
 		"-Wundef", 
 		"-Wa,-adhlns=${TARGET.base}.lst",
+		"-DBASENAME=${SOURCE.file}",
 	]
 	
 	# C++ flags

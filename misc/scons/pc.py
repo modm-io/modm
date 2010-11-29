@@ -71,6 +71,7 @@ def generate(env, **kw):
 			"-Wextra",
 			"-Wundef", 
 			"-ggdb",
+			"-DBASENAME=${SOURCE.file}",
 		])
 		
 		# C++ flags

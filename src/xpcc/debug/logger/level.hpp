@@ -37,7 +37,7 @@ namespace xpcc
 		/**
 		 * \brief	Log levels
 		 *
-		 * DEBUG < INFO < WARNING < ERROR
+		 * DEBUG < INFO < WARNING < ERROR < DISABLE
 		 *
 		 * \ingroup logger
 		 */
@@ -46,7 +46,8 @@ namespace xpcc
 			DEBUG,
 			INFO,
 			WARNING,
-			ERROR
+			ERROR,
+			DISABLE
 		};
 	}
 }

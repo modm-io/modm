@@ -171,9 +171,13 @@ namespace xpcc
 #else	// !__DOXYGEN__
 
 #ifndef	BASENAME
-	#define	FILENAME	__FILE__
+#	ifndef __BASE_FILE__
+#		define FILENAME	__FILE__
+#	else
+#		define FILENAME __BASE_FILE__
+#	endif
 #else
-	#define	FILENAME	STRINGIFY(BASENAME)
+#	define	FILENAME	STRINGIFY(BASENAME)
 #endif
 
 #define	XPCC_FILE_INFO		FILENAME "(" STRINGIFY(__LINE__) ") >> "
