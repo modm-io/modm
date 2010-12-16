@@ -38,7 +38,7 @@
 
 #ifdef __AVR__
 	// this version is to use on PC only
-	#error "You can't use this style AVRs"
+	#error "You can't use this implementation on an AVRs"
 #endif
 
 #ifndef __DOXYGEN__

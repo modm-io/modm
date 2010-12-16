@@ -144,16 +144,16 @@ class Scanner:
 				if '.svn' in directories:
 					directories.remove('.svn')
 				
+				if os.path.normpath(path) in ignoreList:
+					directories = self._excludeDirectories(directories)
+					continue
+				
 				if 'build.cfg' in files:
 					parser = Parser()
 					parser.read(os.path.join(path, 'build.cfg'))
 					
-					if self._excludeDirectory(parser):
-						# if the this directory should be excluded, remove all the
-						# subdirectories from the list to exclude them as well
-						tempDirectories = directories[:]
-						for d in tempDirectories:
-							directories.remove(d)
+					if self._directoryShouldBeExcluded(parser):
+						directories = self._excludeDirectories(directories)
 						continue
 					
 					try:
@@ -191,7 +191,7 @@ class Scanner:
 			elif extension in self.HEADER:
 				self.header.append(file)
 	
-	def _excludeDirectory(self, parser):
+	def _directoryShouldBeExcluded(self, parser):
 		try:
 			target = parser.get('build', 'target')
 			
@@ -207,6 +207,14 @@ class Scanner:
 				return False ^ invert
 		except ParserException:
 			return False
+	
+	def _excludeDirectories(self, directories):
+		# if the this directory should be excluded, remove all the
+		# subdirectories from the list to exclude them as well
+		tempDirectories = directories[:]
+		for d in tempDirectories:
+			directories.remove(d)
+		return directories
 	
 	def _samefile(self, src, dst):
 		# Macintosh, Unix

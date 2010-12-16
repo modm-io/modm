@@ -107,6 +107,7 @@ class Builder(object):
 			parser.parse()
 		except ParserError, msg:
 			print msg
+			print "Error:", msg.elem
 			sys.exit(1)
 		
 		self.tree = parser

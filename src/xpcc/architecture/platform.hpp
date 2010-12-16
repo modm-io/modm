@@ -38,6 +38,8 @@
 
 #include "platform/detect.hpp"
 
+#ifdef __DOXYGEN__
+
 /**
  * \brief	Main function definition for microcontroller projects
  * 
@@ -61,10 +63,7 @@
  * 
  * \ingroup	platform
  */
-#define	MAIN_FUNCTION	int main(void) __attribute__((OS_main)); \
-						int main(void)
-
-#ifdef __DOXYGEN__
+#define	MAIN_FUNCTION
 
 /**
  * \brief	Force inlining
@@ -104,6 +103,13 @@
 #else
 #	define ALWAYS_INLINE  inline
 #	define ATTRIBUTE_UNUSED
+#endif
+
+#ifdef XPCC__CPU_AVR
+#	define	MAIN_FUNCTION	int main(void) __attribute__((OS_main)); \
+							int main(void)
+#else
+#	define	MAIN_FUNCTION	int main(void)
 #endif
 
 #ifdef XPCC__CPU_AVR
