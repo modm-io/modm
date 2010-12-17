@@ -235,14 +235,17 @@ class Parser:
 		# resolve the component inheritance structure
 		self.__resolve_component_dependencies()
 		
-		# replace the placeholders in the component with references to
-		# the real events
-		for container in self.container.itervalues():
-			for component in container.components:
-				for event in component.events.publish:
-					component.events.publish.replace(event.name, self.events[event.name])
-				for event in component.events.subscribe:
-					component.events.subscribe.replace(event.name, self.events[event.name])
+		try:
+			# replace the placeholders in the component with references to
+			# the real events
+			for container in self.container.itervalues():
+				for component in container.components:
+					for event in component.events.publish:
+						component.events.publish.replace(event.name, self.events[event.name])
+					for event in component.events.subscribe:
+						component.events.subscribe.replace(event.name, self.events[event.name])
+		except KeyError, e:
+			raise ParserError(None, "Unknown event %s. Check your XML file!" % e)
 		
 		return [self.types, self.events, self.container, self.components]
 	

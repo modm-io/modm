@@ -105,9 +105,8 @@ class Builder(object):
 		try:
 			parser = Parser(self.xmlfile)
 			parser.parse()
-		except ParserError, msg:
-			print msg
-			print "Error:", msg.elem
+		except ParserError as e:
+			sys.stderr.write("Error: %s\n" % str(e))
 			sys.exit(1)
 		
 		self.tree = parser
@@ -200,3 +199,13 @@ class Builder(object):
 		template = environment.get_template(name, globals=self.globals)
 		
 		return template
+	
+	def run(self):
+		try:
+			self.generate()
+		except BuilderException as e:
+			sys.stderr.write("Error: %s\n" % str(e))
+			sys.exit(1)
+		except Exception as e:
+			sys.stderr.write("Internal Error: %s\n" % str(e))
+			sys.exit(1)

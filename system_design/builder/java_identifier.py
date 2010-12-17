@@ -61,4 +61,4 @@ class JavaBuilder(builder_base.Builder):
 
 # -----------------------------------------------------------------------------
 if __name__ == '__main__':
-	JavaBuilder().generate()
+	JavaBuilder().run()

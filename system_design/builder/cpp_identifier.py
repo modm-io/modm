@@ -40,7 +40,7 @@ class IdentifierBuilder(builder_base.Builder):
 	def generate(self):
 		# check the commandline options
 		if not self.options.outpath:
-			raise builder.BuilderException("You need to provide an output path!")
+			raise builder_base.BuilderException("You need to provide an output path!")
 		
 		template = self.template('templates/robot_identifier.tpl')
 		
@@ -58,4 +58,4 @@ class IdentifierBuilder(builder_base.Builder):
 
 # -----------------------------------------------------------------------------
 if __name__ == '__main__':
-	IdentifierBuilder().generate()
+	IdentifierBuilder().run()

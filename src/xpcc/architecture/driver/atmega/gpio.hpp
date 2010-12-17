@@ -61,11 +61,11 @@ namespace xpcc
 	struct name { \
 		ALWAYS_INLINE static void \
 		configure(::xpcc::gpio::Mode mode, \
-				  ::xpcc::gpio::Configuration config = ::xpcc::gpio::NORMAL) \
+				  ::xpcc::gpio::Configuration constant = ::xpcc::gpio::NORMAL) \
 		{ \
 			if (mode == ::xpcc::gpio::INPUT) { \
 				setInput(); \
-				if (config == ::xpcc::gpio::PULLUP) { \
+				if (constant == ::xpcc::gpio::PULLUP) { \
 					PORT ## port |= (1 << pin); \
 				} \
 				else { \
@@ -123,9 +123,9 @@ namespace xpcc
 #define GPIO__INPUT(name, port, pin) \
 	struct name { \
 		ALWAYS_INLINE static void \
-		configure(::xpcc::gpio::Configuration config = ::xpcc::gpio::NORMAL) { \
+		configure(::xpcc::gpio::Configuration constant = ::xpcc::gpio::NORMAL) { \
 			setInput(); \
-			if (config == ::xpcc::gpio::PULLUP) { \
+			if (constant == ::xpcc::gpio::PULLUP) { \
 				PORT ## port |= (1 << pin); \
 			} \
 			else { \

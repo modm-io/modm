@@ -12,3 +12,10 @@ class ParserError(Exception):
 		"""
 		self.elem = elem
 		Exception.__init__(self, msg)
+		
+	def __str__(self):
+		msg = ""
+		if self.elem is not None:
+			msg += "in %s, " % self.elem
+		msg += Exception.__str__(self)
+		return msg

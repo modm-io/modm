@@ -114,7 +114,7 @@ class TypeBuilder(builder_base.Builder):
 			source_path = self.options.source_path
 			header_path = self.options.header_path
 		else:
-			raise builder.BuilderException("You need to provide an output path!")
+			raise builder_base.BuilderException("You need to provide an output path!")
 		
 		if self.options.system_include_path:
 			includeDirective = '<%s>' % os.path.join(self.options.system_include_path, 'packets.hpp')
@@ -152,4 +152,4 @@ class TypeBuilder(builder_base.Builder):
 
 # -----------------------------------------------------------------------------
 if __name__ == '__main__':
-	TypeBuilder().generate()
+	TypeBuilder().run()

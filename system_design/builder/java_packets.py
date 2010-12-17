@@ -119,4 +119,4 @@ class JavaPacketsBuilder(builder_base.Builder):
 
 # -----------------------------------------------------------------------------
 if __name__ == '__main__':
-	JavaPacketsBuilder().generate()
+	JavaPacketsBuilder().run()

@@ -53,9 +53,9 @@ class PostmanBuilder(builder_base.Builder):
 	def generate(self):
 		# check the commandline options
 		if not self.options.outpath:
-			raise builder.BuilderException("You need to provide an output path!")
+			raise builder_base.BuilderException("You need to provide an output path!")
 		if not self.options.container or self.options.container not in self.tree.container:
-			raise builder.BuilderException("Please specifiy a vaild container!")
+			raise builder_base.BuilderException("Please specifiy a vaild container!")
 		
 		cppFilter = {
 			'camelcase': filter_lower,
@@ -84,4 +84,4 @@ class PostmanBuilder(builder_base.Builder):
 		
 # -----------------------------------------------------------------------------
 if __name__ == '__main__':
-	PostmanBuilder().generate()
+	PostmanBuilder().run()
