@@ -56,10 +56,10 @@ namespace xpcc
 	{ \
 		ALWAYS_INLINE static void \
 		configure(::xpcc::gpio::Mode mode, \
-				  ::xpcc::gpio::Configuration constant = ::xpcc::gpio::NORMAL, \
+				  ::xpcc::gpio::Configuration config = ::xpcc::gpio::NORMAL, \
 				  bool invert = false) \
 		{ \
-			(void) constant; \
+			(void) config; \
 			(void) invert; \
 		} \
 		\
@@ -78,9 +78,9 @@ namespace xpcc
 	struct name \
 	{ \
 		ALWAYS_INLINE static void \
-		configure(::xpcc::gpio::Configuration constant = ::xpcc::gpio::NORMAL, \
+		configure(::xpcc::gpio::Configuration config = ::xpcc::gpio::NORMAL, \
 				  bool invert = false) { \
-			(void) constant; \
+			(void) config; \
 			(void) invert; \
 		} \
 		\
@@ -96,9 +96,9 @@ namespace xpcc
 	struct name \
 	{ \
 		ALWAYS_INLINE static void \
-		configure(::xpcc::gpio::Configuration constant = ::xpcc::gpio::NORMAL, \
+		configure(::xpcc::gpio::Configuration config = ::xpcc::gpio::NORMAL, \
 				  bool invert = false) { \
-			(void) constant; \
+			(void) config; \
 			(void) invert; \
 		} \
 		\

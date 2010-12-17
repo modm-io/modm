@@ -105,7 +105,7 @@ namespace xpcc
 	{ \
 		ALWAYS_INLINE static void \
 		configure(::xpcc::gpio::Mode mode, \
-				  ::xpcc::gpio::Configuration constant = ::xpcc::gpio::NORMAL, \
+				  ::xpcc::gpio::Configuration config = ::xpcc::gpio::NORMAL, \
 				  bool invert = false) \
 		{ \
 			if (mode == ::xpcc::gpio::INPUT) { \
@@ -114,7 +114,7 @@ namespace xpcc
 			else { \
 				setOutput(); \
 			} \
-			PORT ## port ## _PIN ## pin ## CTRL = constant | ((invert) ? PORT_INVEN_bm : 0); \
+			PORT ## port ## _PIN ## pin ## CTRL = config | ((invert) ? PORT_INVEN_bm : 0); \
 		} \
 		\
 		ALWAYS_INLINE static void setOutput() { PORT ## port ## _DIRSET = (1 << pin); } \
@@ -147,10 +147,10 @@ namespace xpcc
 	struct name \
 	{ \
 		ALWAYS_INLINE static void \
-		configure(::xpcc::gpio::Configuration constant = ::xpcc::gpio::NORMAL, \
+		configure(::xpcc::gpio::Configuration config = ::xpcc::gpio::NORMAL, \
 				  bool invert = false) { \
 			setOutput(); \
-			PORT ## port ## _PIN ## pin ## CTRL = constant | ((invert) ? PORT_INVEN_bm : 0); \
+			PORT ## port ## _PIN ## pin ## CTRL = config | ((invert) ? PORT_INVEN_bm : 0); \
 		} \
 		\
 		ALWAYS_INLINE static void setOutput() { PORT ## port ## _DIRSET = (1 << pin); } \
@@ -180,10 +180,10 @@ namespace xpcc
 	struct name \
 	{ \
 		ALWAYS_INLINE static void \
-		configure(::xpcc::gpio::Configuration constant = ::xpcc::gpio::NORMAL, \
+		configure(::xpcc::gpio::Configuration config = ::xpcc::gpio::NORMAL, \
 				  bool invert = false) { \
 			setInput(); \
-			PORT ## port ## _PIN ## pin ## CTRL = constant | ((invert) ? PORT_INVEN_bm : 0); \
+			PORT ## port ## _PIN ## pin ## CTRL = config | ((invert) ? PORT_INVEN_bm : 0); \
 		} \
 		\
 		ALWAYS_INLINE static void setInput() { PORT ## port ## _DIRCLR = (1 << pin); } \
