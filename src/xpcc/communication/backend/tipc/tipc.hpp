@@ -36,6 +36,7 @@
 #include <xpcc/driver/tipc/header.hpp>
 #include <xpcc/driver/tipc/tipc_receiver.hpp>
 #include <xpcc/driver/tipc/tipc_transmitter.hpp>
+
 #include <xpcc/container/smart_pointer.hpp>
 
 #include "../backend_interface.hpp"
@@ -43,62 +44,96 @@
 namespace xpcc
 {
 	/**
-	 * \brief	Class that connects the communication to the tipc.
-	 *
+	 * \brief	Class that connects the communication to the TIPC
+	 * 
 	 * Messages that are received by the same connector, that has transmitted
 	 * them, will be ignored.
-	 *
-	 * \see tipc
-	 *
+	 * 
+	 * \see 	tipc
+	 * 
 	 * \ingroup	backend
 	 * \author	Martin Rosekeit <martin.rosekeit@rwth-aachen.de>
 	 */
 	class TipcConnector : public BackendInterface
 	{
-		public :
-			TipcConnector();
-
-			~TipcConnector();
-
-			inline void
-			addEventId(uint8_t id)
-			{
-				this->receiver.addEventId(id);
-			}
-
-			inline void
-			addReceiverId(uint8_t id)
-			{
-				this->receiver.addReceiverId(id);
-			}
-
-			/// Check if a new packet was received by the backend
-			virtual bool
-			isPacketAvailable() const;
-
-			/// Access the packet.
-			virtual const Header&
-			getPacketHeader() const;
-
-			virtual const SmartPointer
-			getPacketPayload() const;
-			
-			virtual void
-			dropPacket();
-
-			virtual void
-			update();
-
-			/**
-			 * Send a Message.
-			 */
-			virtual void
-			sendPacket(const Header &header,
-					   SmartPointer payload = SmartPointer());
-
-		private :
-			::xpcc::tipc::Transmitter	transmitter;
-			::xpcc::tipc::Receiver		receiver;
+	public :
+		TipcConnector();
+		
+		~TipcConnector();
+		
+		/**
+		 * \brief	Add a new event to receive
+		 * 
+		 * Call this method for every event you want to receive.
+		 * 
+		 * \param	id	Identifier of the event.
+		 */
+		inline void
+		addEventId(uint8_t id)
+		{
+			this->receiver.addEventId(id);
+		}
+		
+		/**
+		 * \brief	Add a new receiver
+		 * 
+		 * You need to call this method for every component implemented in
+		 * this module.
+		 * 
+		 * \param	id	Identifier of the receiving component.
+		 */
+		inline void
+		addReceiverId(uint8_t id)
+		{
+			this->receiver.addReceiverId(id);
+		}
+		
+		/// Check if a new packet was received by the backend
+		virtual bool
+		isPacketAvailable() const;
+		
+		/**
+		 * \brief	Access the packet header
+		 * 
+		 * Only valid if isPacketAvailable() returns \c true.
+		 */
+		virtual const Header&
+		getPacketHeader() const;
+		
+		/**
+		 * \brief	Access the packet payload
+		 * 
+		 * Only valid if isPacketAvailable() returns \c true.
+		 */
+		virtual const SmartPointer
+		getPacketPayload() const;
+		
+		/**
+		 * \brief	Delete the current packet
+		 * 
+		 * Only valid if isPacketAvailable() returns \c true.
+		 */
+		virtual void
+		dropPacket();
+		
+		/**
+		 * \brief	Update method
+		 * 
+		 * Does nothing here as TIPC is implemented with threads.
+		 */
+		virtual void
+		update();
+		
+		/**
+		 * Send a Message.
+		 */
+		virtual void
+		sendPacket(const Header &header,
+				   SmartPointer payload = SmartPointer());
+		
+	private:
+		tipc::Transmitter transmitter;
+		tipc::Receiver receiver;
 	};
 };
  

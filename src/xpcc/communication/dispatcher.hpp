@@ -68,7 +68,7 @@ namespace xpcc
 		void
 		handlePacket(const Header& header, const SmartPointer& payload);
 		
-		/// Sending messages which are waiting in the list.
+		/// Sends messages which are waiting in the list.
 		void
 		handleWaitingMessages();
 		

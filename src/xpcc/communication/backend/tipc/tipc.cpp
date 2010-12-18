@@ -35,9 +35,10 @@
 #undef  XPCC_LOG_LEVEL
 #define XPCC_LOG_LEVEL xpcc::log::WARNING
 
-xpcc::TipcConnector::TipcConnector( ) :
-	transmitter( ),
-	receiver( this->transmitter.getPortId() )
+// ----------------------------------------------------------------------------
+xpcc::TipcConnector::TipcConnector() :
+	transmitter(),
+	receiver(this->transmitter.getPortId())
 {
 }
 
@@ -57,18 +58,18 @@ xpcc::TipcConnector::isPacketAvailable() const
 const xpcc::Header&
 xpcc::TipcConnector::getPacketHeader() const
 {
-	return *(xpcc::Header*)this->receiver.frontPayload().getPointer();
+	return *(xpcc::Header*) this->receiver.getPacket().getPointer();
 }
 
 // ----------------------------------------------------------------------------
 const xpcc::SmartPointer
 xpcc::TipcConnector::getPacketPayload() const
 {
-	SmartPointer payload( this->receiver.frontPayload().getSize() - sizeof(xpcc::Header) );
+	SmartPointer payload( this->receiver.getPacket().getSize() - sizeof(xpcc::Header) );
 	if( payload.getSize() > 0 ) {
 		memcpy(
 				payload.getPointer(),
-				this->receiver.frontPayload().getPointer() + sizeof(xpcc::Header),
+				this->receiver.getPacket().getPointer() + sizeof(xpcc::Header),
 				payload.getSize() );
 	}
 	return payload;
@@ -78,7 +79,7 @@ xpcc::TipcConnector::getPacketPayload() const
 void
 xpcc::TipcConnector::dropPacket()
 {
-	this->receiver.popFront();
+	this->receiver.dropPacket();
 }
 
 // ----------------------------------------------------------------------------

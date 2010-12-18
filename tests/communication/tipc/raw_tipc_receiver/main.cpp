@@ -49,13 +49,13 @@ main()
 
 	while(1) {
 		if( receiver.hasPacket() ) {
-			const xpcc::SmartPointer payload( receiver.frontPayload() );
+			const xpcc::SmartPointer payload( receiver.getPacket() );
 
 			XPCC_LOG_INFO << XPCC_FILE_INFO << "has ";
 			XPCC_LOG_INFO << " value:" << *(int*) payload.getPointer();
 			XPCC_LOG_INFO << xpcc::flush;
 
-			receiver.popFront();
+			receiver.dropPacket();
 		}
 		else {
 			XPCC_LOG_DEBUG << XPCC_FILE_INFO << "has no packet" << xpcc::flush;

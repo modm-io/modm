@@ -40,35 +40,40 @@
 namespace xpcc
 {
 	/**
-	 * \brief 		Header of a packet
+	 * \brief 	Header of a packet
 	 * 
-	 * \ingroup		backend
-	 * \author		Martin Rosekeit, Fabian Greif
+	 * \ingroup	backend
+	 * \author	Martin Rosekeit
+	 * \author	Fabian Greif
 	 */
 	struct Header
 	{
+	public:
 		enum Type
 		{
 			REQUEST,
 			RESPONSE,
 			NEGATIVE_RESPONSE,
 		};
-
+		
+	public:
 		Header() :
-			type( REQUEST ),
-			isAcknowledge( false ),
-			destination( 0 ),
-			source( 0 ),
-			packetIdentifier( 0 )
+			type(REQUEST),
+			isAcknowledge(false),
+			destination(0),
+			source(0),
+			packetIdentifier(0)
 		{
 		}
-
-		Header(Type type, bool isAck, uint8_t dest, uint8_t source, uint8_t id) :
-			type( type ),
-			isAcknowledge( isAck ),
-			destination( dest ),
-			source( source ),
-			packetIdentifier( id )
+		
+		Header(Type type, bool isAcknowledge,
+				uint8_t destination, uint8_t source,
+				uint8_t id) :
+			type(type),
+			isAcknowledge(isAcknowledge),
+			destination(destination),
+			source(source),
+			packetIdentifier(id)
 		{
 		}
 		

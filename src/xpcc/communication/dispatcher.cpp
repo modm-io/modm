@@ -414,5 +414,4 @@ xpcc::Dispatcher::addResponse(const Header& header,
 	// if responses and actions both are appended at the tail of the list.
 	// but now responses are handled in reverse order that's not good
 	// what to do? a separator between responses and requests possible?
-
 }

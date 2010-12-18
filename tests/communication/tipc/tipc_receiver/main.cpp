@@ -34,6 +34,7 @@
 #include <xpcc/communication/backend/tipc/tipc.hpp>
 
 #include <xpcc/debug/logger/imp/std.hpp>
+
 // set the Loglevel
 #undef  XPCC_LOG_LEVEL
 #define XPCC_LOG_LEVEL xpcc::log::DEBUG
@@ -41,37 +42,41 @@
 int
 main()
 {
-	xpcc::log::info << "########## XPCC TIPC RECEIVER Test ##########" << xpcc::flush;
-
+	XPCC_LOG_INFO << "########## XPCC TIPC RECEIVER Test ##########" << xpcc::flush;
+	
 	xpcc::TipcConnector tipc;
-
+	
 	tipc.addReceiverId(0x10);
 	tipc.addEventId(0x01);
-
-	while(1) {
-		if( tipc.isPacketAvailable() ) {
+	
+	while(1)
+	{
+		if (tipc.isPacketAvailable())
+		{
 			const xpcc::Header& header =  tipc.getPacketHeader();
 			const xpcc::SmartPointer payload = tipc.getPacketPayload();
-
-			XPCC_LOG_INFO << XPCC_FILE_INFO << "has ";
-			XPCC_LOG_INFO << ((header.destination != 0) ? "ACTION" : "EVENT");
-			XPCC_LOG_INFO << " from:" << (int)header.source;
-			XPCC_LOG_INFO << " value:" << *(int*) payload.getPointer();
-			XPCC_LOG_INFO << xpcc::flush;
-
-			if( header.destination != 0 ) {
+			
+			XPCC_LOG_INFO
+					<< XPCC_FILE_INFO << "has "
+					<< ((header.destination != 0) ? "ACTION" : "EVENT")
+					<< " from:" << (int)header.source
+					<< " value:" << *(int*) payload.getPointer()
+					<< xpcc::endl;
+			
+			if (header.destination != 0)
+			{
 				xpcc::Header ackHeader( xpcc::Header::REQUEST, true, header.source, header.destination, 0x01 );
 				tipc.sendPacket(ackHeader);
 			}
-
+			
 			tipc.dropPacket();
 		}
 		else {
-			XPCC_LOG_DEBUG << XPCC_FILE_INFO << "has no packet" << xpcc::flush;
+			XPCC_LOG_DEBUG << XPCC_FILE_INFO << "has no packet" << xpcc::endl;
 		}
-
+		
 		usleep(100000);
 	}
-
-	xpcc::log::info << "########## XPCC TIPC RAW Test END ##########" << xpcc::flush;
+	
+	XPCC_LOG_INFO << "########## XPCC TIPC RAW Test END ##########" << xpcc::endl;
 }

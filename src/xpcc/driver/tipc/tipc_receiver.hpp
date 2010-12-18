@@ -48,12 +48,12 @@ namespace xpcc
 	namespace tipc
 	{
 		/**
-		 * \brief		Receive Packets over the TIPC and store them.
+		 * \brief	Receive Packets over the TIPC and store them.
 		 * 
 		 * In a separate thread the packets are taken from the TIPC and saved local.
-		 *  
-		 * \ingroup		tipc
-		 * \author		Carsten Schmitt < >
+		 * 
+		 * \ingroup	tipc
+		 * \author	Carsten Schmitt
 		 */
 		class Receiver
 		{
@@ -63,24 +63,35 @@ namespace xpcc
 			 *
 			 * \see TransmitterSocket::getPortId
 			 */
-			Receiver( uint32_t ignoreTipcPortId );
+			Receiver(uint32_t ignoreTipcPortId);
 
 			~Receiver();
-
+			
 			void
 			addEventId(uint8_t id);
-
+			
 			void
 			addReceiverId(uint8_t id);
-
+			
+			/// Check if a new packet has arrived
 			bool
 			hasPacket() const;
-
-			const xpcc::SmartPointer&
-			frontPayload() const;
 			
+			/**
+			 * \brief	Read the packet
+			 * 
+			 * This is only valid if hasPacket() has returned \c true.
+			 */
+			const xpcc::SmartPointer&
+			getPacket() const;
+			
+			/**
+			 * \brief	Drop the current Packet
+			 * 
+			 * This is only valid if hasPacket() has returned \c true.
+			 */
 			void 
-			popFront();
+			dropPacket();
 			
 		private:
 			typedef xpcc::SmartPointer			Payload;
@@ -97,16 +108,16 @@ namespace xpcc
 			void 
 			update();
 			
-			ReceiverSocket						tipcReceiverSocket_;
-			uint32_t							ignoreTipcPortId_;	// the port ID from that all messages will be ignored
-
-			std::queue<Payload>					packetQueue_;
+			ReceiverSocket tipcReceiverSocket_;
+			uint32_t ignoreTipcPortId_;	// the port ID from that all messages will be ignored
 			
-			boost::scoped_ptr<Thread>			receiverThread_;
-			mutable Mutex						receiverSocketLock_;
-			mutable Mutex						packetQueueLock_;
+			std::queue<Payload>	packetQueue_;
 			
-			bool								isAlive_;
+			boost::scoped_ptr<Thread> receiverThread_;
+			mutable Mutex receiverSocketLock_;
+			mutable Mutex packetQueueLock_;
+			
+			bool isAlive_;
 		};
 	}
 }
