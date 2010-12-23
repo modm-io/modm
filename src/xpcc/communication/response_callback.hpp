@@ -90,9 +90,7 @@ namespace xpcc
 		inline void
 		call(const Header& header, const SmartPointer &payload) const
 		{
-			if (component != 0) {
-				(component->*function)(header, payload.getPointer());
-			}
+			(component->*function)(header, payload.getPointer());
 			// TODO spezieller Aufruf für packetgröße = 0, funktioniert zwar
 			// auch ohne ist aber extrem unschön!
 		}

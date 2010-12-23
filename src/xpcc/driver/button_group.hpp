@@ -116,7 +116,9 @@ isReleased()     -------X----------------------X-------X----
 	public:
 		/** \brief	Constructor
 		 *
-		 * \param	mask		Repeat mask, only if buttons mentioned here
+		 * \param	mask		Repeat mask, only buttons listed here can be used
+		 * 						with the methods isRepeated(), isPressedShort()
+		 * 						and isPressedLong()
 		 * \param	timeout		Timeout for the repeat operation
 		 * \param	interval	Repeat interval
 		 */
@@ -208,7 +210,7 @@ isReleased()     -------X----------------------X-------X----
 		
 		/** \brief	Update internal state
 		 *
-		 * Call this function periodically.
+		 * Call this function periodically every 5 to 10ms
 		 * 
 		 * \param	input	input signals
 		 */
