@@ -64,22 +64,22 @@ def generate(env, **kw):
 			env['SYMBOLSCOMSTR'] = "Show symbols for '$SOURCE':"
 		
 		# flags for C and C++
-		env['CCFLAGS'] = ' '.join([
+		env['CCFLAGS'] = [
 			"-funsigned-char",
 			"-funsigned-bitfields", 
 			"-Wall",
 			"-Wextra",
-			"-Wundef", 
+			"-Wundef",
 			"-ggdb",
 			"-DBASENAME=${SOURCE.file}",
-		])
+		]
 		
 		# C++ flags
-		env['CXXFLAGS'] = ' '.join([
+		env['CXXFLAGS'] = [
 			"-std=gnu++98",
 	#		"-Weffc++",
 			"-Woverloaded-virtual",
-		])
+		]
 
 def exists(env):
 	return env.Detect('g++')
