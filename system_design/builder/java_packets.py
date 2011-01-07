@@ -84,6 +84,13 @@ class JavaPacketsBuilder(builder_base.Builder):
 	
 	VERSION = "$Id$"
 	
+	def setup(self, optparser):
+		optparser.add_option(
+				"--package",
+				dest = "package",
+				default = '',
+				help = "name of package")
+				
 	def generate(self):
 		# check the commandline options
 		if not self.options.outpath:
@@ -110,6 +117,7 @@ class JavaPacketsBuilder(builder_base.Builder):
 		primitives.sort()
 		
 		substitutions = {
+			'package' : self.options.package,
 			'packets': packets,
 			'primitives': primitives,
 		}

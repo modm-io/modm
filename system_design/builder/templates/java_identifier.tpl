@@ -4,7 +4,7 @@
  */
 // ----------------------------------------------------------------------------
 
-package rca10.robot;
+package {{ package }};
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;

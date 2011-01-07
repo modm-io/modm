@@ -4,7 +4,7 @@
  */
 // ----------------------------------------------------------------------------
 
-package rca10.robot;
+package {{ package }};
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;

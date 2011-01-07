@@ -38,6 +38,13 @@ class JavaBuilder(builder_base.Builder):
 	
 	VERSION = "$Id$"
 	
+	def setup(self, optparser):
+		optparser.add_option(
+				"--package",
+				dest = "package",
+				default = '',
+				help = "name of package")
+				
 	def generate(self):
 		# check the commandline options
 		if not self.options.outpath:
@@ -51,6 +58,7 @@ class JavaBuilder(builder_base.Builder):
 		template = self.template('templates/java_identifier.tpl', filter=javaFilter)
 		
 		substitutions = {
+			'package' : self.options.package,
 			'components': self.tree.components,
 			'actions': self.tree.components.actions,
 			'events': self.tree.events,
