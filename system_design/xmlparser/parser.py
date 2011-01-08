@@ -230,6 +230,9 @@ class Parser:
 			container.updateEvents()
 		
 		# update the type level
+		self.__resolve_struct_dependencies()
+		
+		# update the type level
 		self.__create_type_hierarchy()
 		
 		# resolve the component inheritance structure
@@ -390,6 +393,29 @@ class Parser:
 		for component in self.components.itervalues():
 			self.__update_component(component)
 
+	def __update_struct(self, struct):
+		"""
+		Update the components recursive 
+		"""
+		if struct.extends:
+			top = self.types[struct.extends]
+			if not top.isStruct:
+				raise ParserError(None, "Detected struct which is extended from a non struct!"
+					" Check '%s'!" % struct)
+			if top.extends:
+				self.__update_struct(top)
+			struct.extend(top)
+	
+	def __resolve_struct_dependencies(self):
+		"""
+		Resolve the dependencies of the struct definitions
+		and add the inherited members from the superordinate
+		structs.
+		
+		"""
+		for element in self.types.itervalues():
+			if element.isStruct:
+				self.__update_struct(element)
 
 # -----------------------------------------------------------------------------
 if __name__ == '__main__':

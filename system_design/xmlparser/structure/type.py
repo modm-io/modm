@@ -238,10 +238,18 @@ class Struct(BaseType):
 		BaseType.__init__(self, name, reference)
 		
 		self.isStruct = True
+		self.extends = None
 		self.elements = []
 	
 	def add(self, element):
 		self.elements.append(element)
+	
+	def extend(self, struct):
+		self.extends = struct.extends
+		i = 0
+		for e in struct.elements:
+			self.elements.insert(i, e)
+			i = i+1
 	
 	def iter(self):
 		""" Iterate over all sub-elements of the enum """
@@ -250,6 +258,7 @@ class Struct(BaseType):
 	
 	def _from_xml(self, node):
 		self.description = helper.xml_read_description(node)
+		self.extends = node.get('extends')
 		for elem in node.findall('element'):
 			element = self.Element(elem.get('name'))
 			element._from_xml(elem)
@@ -288,9 +297,9 @@ class Typedef(BaseType):
 # -----------------------------------------------------------------------------
 if __name__ == '__main__':
 	enum = Enum("test", "eine Beschreibung")
-	enum.add(EnumElement("test2", value=2))
-	enum.add(EnumElement("test3"))
-	enum.add(EnumElement("test4", value="0x12"))
-	enum.add(EnumElement("test5"))
+	enum.add(Enum.Element("test2", value=2))
+	enum.add(Enum.Element("test3"))
+	enum.add(Enum.Element("test4", value="0x12"))
+	enum.add(Enum.Element("test5"))
 	
 	print enum
