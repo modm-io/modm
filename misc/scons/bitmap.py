@@ -35,7 +35,7 @@ import math
 from SCons.Script import *
 
 # -----------------------------------------------------------------------------
-template = """
+template_source = """
 #include <xpcc/architecture/driver/accessor.hpp>
 
 namespace bitmap
@@ -46,6 +46,30 @@ namespace bitmap
 		${array}
 	};
 }
+
+"""
+
+template_header = """
+#ifndef ${include_guard}
+#define ${include_guard}
+
+#include <xpcc/architecture/driver/accessor.hpp>
+
+namespace bitmap
+{
+	/**
+	 * \\brief	Generated bitmap
+	 * 
+	 * Generated from file "${filename}".
+	 * 
+	 * - Width  : ${width}
+	 * - Height : ${height}
+	 */
+	EXTERN_FLASH(uint8_t ${name}[]);
+}
+
+#endif // ${include_guard}
+
 """
 
 # -----------------------------------------------------------------------------
@@ -93,18 +117,29 @@ def bitmap_action(target, source, env):
 			line.append("0x%02x," % data[y][x])
 		array.append(" ".join(line))
 	
+	basename = os.path.splitext(os.path.basename(str(target[0])))[0]
 	substitutions = {
-		'name': os.path.splitext(os.path.basename(str(target[0])))[0],
+		'name': basename,
+		'filename': str(source[0]),
 		'width': width,
 		'height': height,
-		'array': "\n\t\t".join(array)
+		'array': "\n\t\t".join(array),
+		'include_guard': "BITMAP__" + basename.upper().replace(" ", "_") + "_HPP"
 	}
 	
-	output = string.Template(template).safe_substitute(substitutions)
+	output = string.Template(template_source).safe_substitute(substitutions)
 	open(target[0].path, 'w').write(output)
+		
+	output = string.Template(template_header).safe_substitute(substitutions)
+	open(target[1].path, 'w').write(output)
 
 def bitmap_string(target, source, env):
 	return "Create Bitmap: '%s'" % (str(target[0]))
+
+def bitmap_emitter(target, source, env):
+	header = os.path.splitext(str(target[0]))[0] + ".hpp"
+	target.append(header)
+	return target, source
 
 # -----------------------------------------------------------------------------
 def generate(env, **kw):
@@ -114,6 +149,7 @@ def generate(env, **kw):
 				action = env.Action(bitmap_action, bitmap_string),
 				suffix = '.cpp',
 				src_suffix = '.pbm',
+				emitter = bitmap_emitter,
 				single_source = True),
 	})
 

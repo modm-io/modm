@@ -149,9 +149,9 @@ def generate(env, **kw):
 	
 	# Assembler flags
 	if str(Platform()) == "win32":
-		env['ASFLAGS'] = "-mmcu=$AVR_DEVICE "
+		env['ASFLAGS'] = ["-mmcu=$AVR_DEVICE"]
 	else:
-		env['ASFLAGS'] = "-mmcu=$AVR_DEVICE -x assembler-with-cpp "
+		env['ASFLAGS'] = ["-mmcu=$AVR_DEVICE", "-xassembler-with-cpp"]
 	
 	env['LINKFLAGS'] = [
 		"-mmcu=$AVR_DEVICE", 

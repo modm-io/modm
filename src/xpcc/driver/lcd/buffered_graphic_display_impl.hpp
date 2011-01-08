@@ -35,9 +35,9 @@
 #endif
 
 // ----------------------------------------------------------------------------
-template <uint8_t Width, uint8_t Rows>
+template <uint8_t Width, uint8_t Height>
 void
-xpcc::BufferedGraphicDisplay<Width, Rows>::clear()
+xpcc::BufferedGraphicDisplay<Width, Height>::clear()
 {
 	for (uint8_t i = 0; i < 8; ++i) {
 		for (uint8_t k = 0; k < 128; ++k) {
@@ -47,9 +47,9 @@ xpcc::BufferedGraphicDisplay<Width, Rows>::clear()
 }
 
 // ----------------------------------------------------------------------------
-template <uint8_t Width, uint8_t Rows>
+template <uint8_t Width, uint8_t Height>
 void
-xpcc::BufferedGraphicDisplay<Width, Rows>::drawHorizontalLine(
+xpcc::BufferedGraphicDisplay<Width, Height>::drawHorizontalLine(
 		glcd::Point start,
 		uint8_t length)
 {
@@ -71,9 +71,9 @@ xpcc::BufferedGraphicDisplay<Width, Rows>::drawHorizontalLine(
 }
 
 // ----------------------------------------------------------------------------
-template <uint8_t Width, uint8_t Rows>
+template <uint8_t Width, uint8_t Height>
 void
-xpcc::BufferedGraphicDisplay<Width, Rows>::drawImageRaw(glcd::Point upperLeft,
+xpcc::BufferedGraphicDisplay<Width, Height>::drawImageRaw(glcd::Point upperLeft,
 		uint8_t width, uint8_t height,
 		xpcc::accessor::Flash<uint8_t> data)
 {
@@ -99,23 +99,23 @@ xpcc::BufferedGraphicDisplay<Width, Rows>::drawImageRaw(glcd::Point upperLeft,
 }
 
 // ----------------------------------------------------------------------------
-template <uint8_t Width, uint8_t Rows>
+template <uint8_t Width, uint8_t Height>
 void
-xpcc::BufferedGraphicDisplay<Width, Rows>::setPixel(uint8_t x, uint8_t y)
+xpcc::BufferedGraphicDisplay<Width, Height>::setPixel(uint8_t x, uint8_t y)
 {
 	this->buffer[x][y / 8] |= (1 << (y & 0x07));
 }
 
-template <uint8_t Width, uint8_t Rows>
+template <uint8_t Width, uint8_t Height>
 void
-xpcc::BufferedGraphicDisplay<Width, Rows>::clearPixel(uint8_t x, uint8_t y)
+xpcc::BufferedGraphicDisplay<Width, Height>::clearPixel(uint8_t x, uint8_t y)
 {
 	this->buffer[x][y / 8] &= ~(1 << (y & 0x07));
 }
 
-template <uint8_t Width, uint8_t Rows>
+template <uint8_t Width, uint8_t Height>
 bool
-xpcc::BufferedGraphicDisplay<Width, Rows>::getPixel(uint8_t x, uint8_t y)
+xpcc::BufferedGraphicDisplay<Width, Height>::getPixel(uint8_t x, uint8_t y)
 {
 	return (this->buffer[x][y / 8] & (1 << (y & 0x07)));
 }

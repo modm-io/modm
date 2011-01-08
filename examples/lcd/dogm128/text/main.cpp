@@ -30,7 +30,6 @@ namespace lcd
 typedef xpcc::SoftwareSpi< lcd::Scl, lcd::Mosi, lcd::Miso > SPI;
 
 xpcc::St7565< SPI, lcd::CS, lcd::A0, lcd::Reset > display;
-xpcc::IOStream displayStream(display);
 
 MAIN_FUNCTION
 {
@@ -47,17 +46,17 @@ MAIN_FUNCTION
 	
 	display.setFont(xpcc::font::ScriptoNarrow);
 	display.setCursor(xpcc::glcd::Point(0, 0));
-	display.write("Hello World!\n");
-	display.write("ABCDEFGHIJKLMNOPQRSTUVWXYZ\n");
-	display.write("abcdefghijklmnopqrstuvwxyz\n");
-	display.write("0123456789!\"§$%&/()=?`´,;:-<>");
+	display << "Hello World!\n";
+	display << "ABCDEFGHIJKLMNOPQRSTUVWXYZ\n";
+	display << "abcdefghijklmnopqrstuvwxyz\n";
+	display << "0123456789!\"§$%&/()=?`´,;:-<>";
 	
 	display.setFont(xpcc::font::AllCaps3x6);
 	display.setCursor(xpcc::glcd::Point(0, 32));
-	displayStream << "Hello World!" << xpcc::endl;
-	displayStream << "ABCDEFGHIJKLMNOPQRSTUVWXYZ" << xpcc::endl;
-	displayStream << "abcdefghijklmnopqrstuvwxyz" << xpcc::endl;
-	displayStream << 0 << 12 << 345 << 6789 << "!\"§$%&/()=?`´,;:-<>";
+	display << "Hello World!" << xpcc::endl;
+	display << "ABCDEFGHIJKLMNOPQRSTUVWXYZ" << xpcc::endl;
+	display << "abcdefghijklmnopqrstuvwxyz" << xpcc::endl;
+	display << 0 << 12 << 345 << 6789 << "!\"§$%&/()=?`´,;:-<>";
 	display.update();
 	
 	xpcc::delay_ms(2000);
@@ -65,10 +64,10 @@ MAIN_FUNCTION
 	display.clear();
 	display.setFont(xpcc::font::Assertion);
 	display.setCursor(xpcc::glcd::Point(0, 0));
-	display.write("Hello World!\n");
-	display.write("ABCDEFGHIJKLMNOPQRSTUVWXYZ\n");
-	display.write("abcdefghijklmnopqrstuvwxyz\n");
-	display.write("0123456789!\"§$%&/()=?`´,;:-<>");
+	display << "Hello World!\n";
+	display << "ABCDEFGHIJKLMNOPQRSTUVWXYZ\n";
+	display << "abcdefghijklmnopqrstuvwxyz\n";
+	display << "0123456789!\"§$%&/()=?`´,;:-<>";
 	display.update();
 	
 	xpcc::delay_ms(2000);
@@ -76,9 +75,9 @@ MAIN_FUNCTION
 	display.clear();
 	display.setFont(xpcc::font::ArcadeClassic);
 	display.setCursor(xpcc::glcd::Point(0, 0));
-	display.write("Hello World!\n\n");
-	display.write("ABCDEFGHIJKLMNOP\nQRSTUVWXYZ\n");
-	display.write("0123456789!\"§$%&/\n()=?`´,;:-<>");
+	display << "Hello World!\n\n";
+	display << "ABCDEFGHIJKLMNOP\nQRSTUVWXYZ\n";
+	display << "0123456789!\"§$%&/\n()=?`´,;:-<>";
 	display.update();
 	
 	while (1)

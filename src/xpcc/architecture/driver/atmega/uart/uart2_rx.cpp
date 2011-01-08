@@ -78,23 +78,23 @@ xpcc::BufferedUart2::setBaudrateRegister(uint16_t ubrr)
 
 	// Set baud rate
 	if (ubrr & 0x8000) {
-		UART0_STATUS = (1 << U2X0);  //Enable 2x speed 
+		UART2_STATUS = (1 << U2X2);  //Enable 2x speed 
 		ubrr &= ~0x8000;
 	}
 	else {
-		UART0_STATUS = 0;
+		UART2_STATUS = 0;
 	}
-	UBRR0H = (uint8_t) (ubrr >> 8);
-	UBRR0L = (uint8_t)  ubrr;
+	UBRR2H = (uint8_t) (ubrr >> 8);
+	UBRR2L = (uint8_t)  ubrr;
 
 	// Enable USART receiver and transmitter and receive complete interrupt
-	UART0_CONTROL = (1 << RXCIE0) | (1 << RXEN0) | (1 << TXEN0);
+	UART2_CONTROL = (1 << RXCIE2) | (1 << RXEN2) | (1 << TXEN2);
 	
 	// Set frame format: asynchronous, 8data, no parity, 1stop bit
-	#ifdef URSEL0
-	UCSR0C = (1 << URSEL0) | (3 << UCSZ00);
+	#ifdef URSEL2
+	UCSR2C = (1 << URSEL2) | (3 << UCSZ20);
 	#else
-	UCSR0C = (3 << UCSZ00);
+	UCSR2C = (3 << UCSZ20);
 	#endif
 }
 

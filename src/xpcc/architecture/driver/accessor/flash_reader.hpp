@@ -67,7 +67,7 @@
 		#include <xpcc/architecture/platform.hpp>
 
 		// A simple implementation for all targets that don't have a
-		// strikt separation between Flash and RAM like the AVRs does.
+		// strict separation between Flash and RAM like the AVRs does.
 		
 		#define	FLASH(var)				const var
 		#define	EXTERN_FLASH(var)		extern const var

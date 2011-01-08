@@ -1,0 +1,37 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE rca SYSTEM "rca_builtin.dtd">
+<!-- $Id$ -->
+<rca version="1.0">
+
+<builtin name="int8_t" size="1" />
+<builtin name="int16_t" size="2" />
+<builtin name="int32_t" size="4" />
+<builtin name="uint8_t" size="1" />
+<builtin name="uint16_t" size="2" />
+<builtin name="uint32_t" size="4" />
+<builtin name="float" size="4" />
+<builtin name="char" size="1" />
+
+<typedef name="Bool" type="uint8_t">
+	<description>On x86 systems the bool-type has 4 bytes and on AVRs it has 1 byte.
+		This type is defined to make it posible to send bools from everywhere.</description>
+</typedef>
+
+<struct name="position">
+	<description>Position of the Robot on the Playground.</description>
+	
+	<element name="x" type="int16_t" unit="mm" />
+	<element name="y" type="int16_t" unit="mm" />
+</struct>
+
+<component name="sender">
+	
+</component>
+
+<component name="receiver">
+	<actions>
+		<action></action>
+	</actions>
+</component>
+
+</rca>

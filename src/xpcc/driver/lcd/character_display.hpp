@@ -99,6 +99,7 @@ namespace xpcc
 		virtual void
 		writeRaw(char c) = 0;
 		
+		// does nothing
 		virtual void
 		flush();
 		

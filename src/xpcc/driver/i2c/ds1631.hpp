@@ -51,7 +51,7 @@ namespace xpcc
 		};
 		
 		/**
-		 * \brief	DS1631
+		 * \brief	DS1631 Temperature Sensor
 		 * 
 		 * 
 		 * \ingroup	i2c
@@ -81,7 +81,7 @@ namespace xpcc
 			 * \endcode
 			 * 
 			 * \param resolution		Conversion result resolution
-			 * \param continuousMode	Enable the continuos mode
+			 * \param continuousMode	Enable the continuous mode
 			 */
 			void
 			configure(Resolution resolution, bool continuousMode);
@@ -97,7 +97,8 @@ namespace xpcc
 			 * 
 			 * If the part is in one-shot mode, only one conversion is
 			 * performed. In continuous mode, continuous temperature
-			 * conversions are performed until a Stop Convert command is issued.
+			 * conversions are performed until a Stop Convert command is
+			 * issued.
 			 */
 			void
 			startConversion();

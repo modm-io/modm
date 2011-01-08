@@ -94,7 +94,7 @@ namespace xpcc
 			return *this;
 		}
 
-		inline IOStream&
+		IOStream&
 		operator << ( const unsigned char& v )
 		{
 			if( this->mode == ASCII ) {
@@ -106,7 +106,7 @@ namespace xpcc
 			return *this;
 		}
 
-		inline IOStream&
+		IOStream&
 		operator << ( const char& v )
 		{
 			if( this->mode == ASCII ) {
@@ -176,7 +176,7 @@ namespace xpcc
 			return *this;
 		}
 
-		ALWAYS_INLINE IOStream&
+		IOStream&
 		operator << ( const char* v )
 		{
 			if( this->mode == ASCII ) {

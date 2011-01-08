@@ -35,7 +35,9 @@
 
 #include <xpcc/architecture/driver/accessor.hpp>
 #include <xpcc/math/geometry.hpp>
+
 #include <xpcc/io/iodevice.hpp>
+#include <xpcc/io/iostream.hpp>
 
 namespace xpcc
 {
@@ -93,7 +95,7 @@ namespace xpcc
 	 * All modes relative to the current viewport. This would make
 	 * drawing a menu system easier.
 	 */
-	class GraphicDisplay : public IODevice
+	class GraphicDisplay : public IOStream
 	{
 	public:
 		GraphicDisplay();
@@ -125,7 +127,7 @@ namespace xpcc
 		//setViewport();
 		
 		// TODO Set a clipping area
-		// Everywith drawn outside this area will be discarded.
+		// Everything drawn outside this area will be discarded.
 		//void
 		//setClippingWindow();
 		
@@ -231,6 +233,8 @@ namespace xpcc
 		/**
 		 * \brief	Set a new font
 		 * 
+		 * Default font is xpcc::font::FixedWidth5x8.
+		 * 
 		 * \param	font	Active font
 		 * \see		xpcc::font
 		 */
@@ -251,20 +255,9 @@ namespace xpcc
 			this->cursor = position;
 		}
 		
-		/// Draw a single character
-		virtual void
+		/// Write a single character
+		inline void
 		write(char c);
-		
-		/// Draw a C-string
-		using IODevice::write;
-		
-		/// unused
-		virtual void
-		flush();
-		
-		/// unused
-		virtual bool
-		read(char& c);
 		
 	protected:
 		/// helper method for drawCircle() and drawEllipse()
@@ -287,6 +280,36 @@ namespace xpcc
 		getPixel(uint8_t x, uint8_t y) = 0;
 		
 	protected:
+		// Interface class for the IOStream
+		class Writer : public IODevice
+		{
+		public:
+			Writer(GraphicDisplay *parent) :
+				parent(parent)
+			{
+			}
+			
+			/// Draw a single character
+			virtual void
+			write(char c);
+			
+			using IODevice::write;
+			
+			/// unused
+			virtual void
+			flush();
+			
+			/// unused, returns always \c false
+			virtual bool
+			read(char& c);
+			
+		private:
+			GraphicDisplay *parent;
+		};
+		
+	protected:
+		Writer writer;
+		
 		// callback function for drawing pixels
 		void (GraphicDisplay::*draw)(uint8_t x, uint8_t y);
 		

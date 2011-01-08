@@ -47,17 +47,21 @@ namespace xpcc
 	 *  - DOGM128
 	 *  - DOGL128
 	 * 
+	 * Available defines:
+	 *  - ST7565R_TOPVIEW
+	 *  - ST7565R_INVERTED
+	 * 
 	 * \author	Fabian Greif
 	 * \ingroup	lcd
 	 */
 	template <typename SPI, typename CS, typename A0, typename Reset>
-	class St7565 : public BufferedGraphicDisplay<128, 8>
+	class St7565 : public BufferedGraphicDisplay<128, 64>
 	{
 	public:
 		/**
 		 * \brief	Initialize the display
 		 * 
-		 * The display needs some time to initialize after startup. You have
+		 * The display needs some time to initialize after power-up. You have
 		 * to wait at least 50 ms until calling this method.
 		 */
 		void

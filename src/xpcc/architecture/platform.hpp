@@ -29,6 +29,10 @@
  * $Id$
  */
 // ----------------------------------------------------------------------------
+
+#ifndef XPCC__PLATFORM_HPP
+#define XPCC__PLATFORM_HPP
+
 /**
  * \ingroup 	architecture
  * \defgroup	platform	Platform
@@ -126,3 +130,5 @@
 #endif
 
 #endif	// !__DOXYGEN__
+
+#endif	// XPCC__PLATFORM_HPP

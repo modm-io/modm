@@ -10,7 +10,7 @@ files = env.FindFiles('.')
 
 # create c-files form the images
 for image in Glob('images/*.pbm'):
-	files.sources.append(env.Bitmap(image))
+	files += env.Bitmap(image)
 
 # build the program
 program = env.Program(

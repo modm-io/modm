@@ -183,5 +183,27 @@ namespace xpcc
 		} \
 	}
 
+/**
+ * \brief	Use a full 8-Bit port
+ * 
+ * \see		xpcc::gpio::Port()
+ * \ingroup	gpio
+ */
+#define GPIO__PORT(name, port) \
+	struct name { \
+		ALWAYS_INLINE static void setOutput() { \
+			DDR ## port = 0xff; \
+		} \
+		ALWAYS_INLINE static void setInput() { \
+			DDR ## port = 0; \
+		} \
+		ALWAYS_INLINE static uint8_t read() { \
+			return PIN ## port; \
+		} \
+		ALWAYS_INLINE static void write(uint8_t data) { \
+			PORT ## port = data; \
+		} \
+	}
+
 #endif	// !__DOXYGEN__
 #endif	// XPCC__ATMEGA_GPIO_HPP

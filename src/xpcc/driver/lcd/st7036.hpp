@@ -42,7 +42,10 @@ namespace xpcc
 	 * \brief	Driver for ST7036 based LC-displays
 	 * 
 	 * \todo	documentation
-	 * \todo	make this class adaptable to other voltages and line counts!
+	 * \todo	make this class adaptable to other line counts!
+	 * 
+	 * Available defines:
+	 * - ST7036_VOLTAGE = 3|5
 	 * 
 	 * \see		Lcd
 	 * 
@@ -59,7 +62,7 @@ namespace xpcc
 		/**
 		 * \brief	Initialize the display
 		 * 
-		 * The display needs some time to initalize after startup. You have
+		 * The display needs some time to initialize after startup. You have
 		 * to wait at least 50 ms until calling this method.
 		 */
 		virtual void

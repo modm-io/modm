@@ -56,22 +56,19 @@
  * #include <xpcc/driver/software_spi.hpp>
  * #include <xpcc/driver/lcd/st7036.hpp>
  * 
- * namespace pin
- * {
- *     GPIO__OUTPUT(Clk, D, 7);
- *     GPIO__OUTPUT(Mosi, D, 5);
+ * GPIO__OUTPUT(Clk, D, 7);
+ * GPIO__OUTPUT(Mosi, D, 5);
  *     
- *     GPIO__OUTPUT(LcdCs, D, 4);
- *     GPIO__OUTPUT(LcdRs, D, 0);
- * }
+ * GPIO__OUTPUT(LcdCs, D, 4);
+ * GPIO__OUTPUT(LcdRs, D, 0);
  * 
- * // create a new type for the software SPI for the display 
- * typedef xpcc::SoftwareSpi< pin::Clk, pin::Mosi, xpcc::gpio::Unused > SpiDisplay;
+ * // Create a new type for the software SPI for the display 
+ * typedef xpcc::SoftwareSpi< Clk, Mosi, xpcc::gpio::Unused > SpiInterface;
  * 
- * // create a instance of the ST7036 based display class
- * xpcc::St7036< SpiDisplay,
- *               pin::LcdCs,
- *               pin::LcdRs > display;
+ * // Create a instance of the ST7036 based display class
+ * xpcc::St7036< SpiInterface,
+ *               LcdCs,
+ *               LcdRs > display;
  * 
  * ...
  * display.initialize();
@@ -82,7 +79,7 @@
  * This example can be compiled for every AVR device without any change!
  * 
  * The pins don't need to initialized here because the initialize()
- * method of the display is responsible for that.
+ * method of the display does this for us.
  * 
  * \see xpcc::St7036
  * 
@@ -637,6 +634,7 @@ namespace xpcc
  * }
  * \endcode
  * 
+ * \see		xpcc::gpio::Nibble
  * \ingroup	gpio
  */
 #define GPIO__NIBBLE_LOW(name, port)
@@ -666,9 +664,37 @@ namespace xpcc
  * }
  * \endcode
  * 
+ * \see		xpcc::gpio::Nibble
  * \ingroup	gpio
  */
 #define GPIO__NIBBLE_HIGH(name, port)
+
+/**
+ * \brief	Use a full 8-Bit port
+ * 
+ * Create a new class with the following methods:
+ * \code
+ * class name
+ * {
+ * public:
+ *     static inline void
+ *     setOutput();
+ *     
+ *     static inline void
+ *     setInput();
+ *     
+ *     static inline void
+ *     write(uint8_t data);
+ *     
+ *     static inline uint8_t
+ *     read();
+ * }
+ * \endcode
+ * 
+ * \see		xpcc::gpio::Port()
+ * \ingroup	gpio
+ */
+#define GPIO__PORT(name, port)
 
 #endif	// __DOXYGEN__
 

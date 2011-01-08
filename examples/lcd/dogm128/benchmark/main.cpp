@@ -32,7 +32,6 @@ namespace lcd
 }
 
 xpcc::St7565< lcd::SPI, lcd::CS, lcd::A0, lcd::Reset > display;
-xpcc::IOStream displayStream(display);
 
 using namespace xpcc::glcd;
 
@@ -80,41 +79,41 @@ introScreen()
 	
 	display.setFont(xpcc::font::ScriptoNarrow);
 	display.setCursor(Point(0, 0));
-	displayStream << "ABCDEFGHIJKLMNOPQRSTUVWXYZ!\"§$%&" << xpcc::endl;
-	displayStream << "abcdefghijklmnopqrstuvwxyz012345";
+	display << "ABCDEFGHIJKLMNOPQRSTUVWXYZ!\"§$%&" << xpcc::endl;
+	display << "abcdefghijklmnopqrstuvwxyz012345";
 	
 	display.setFont(xpcc::font::AllCaps3x6);
 	display.setCursor(Point(0, 20));
-	displayStream << "ABCDEFGHIJKLMNOPQRSTUVWXYZ!\"§$%&/()" << xpcc::endl;
-	displayStream << "abcdefghijklmnopqrstuvwxyz01234567";
+	display << "ABCDEFGHIJKLMNOPQRSTUVWXYZ!\"§$%&/()" << xpcc::endl;
+	display << "abcdefghijklmnopqrstuvwxyz01234567";
 	
 	display.setFont(xpcc::font::FixedWidth5x8);
 	display.setCursor(Point(0, 35));
-	displayStream << "ABCDEFGHIJKLMNOPQRSTU" << xpcc::endl;
-	displayStream << "abcdefghijklmnopqrstu";
+	display << "ABCDEFGHIJKLMNOPQRSTU" << xpcc::endl;
+	display << "abcdefghijklmnopqrstu";
 	
 	display.update();
 	
 	xpcc::delay_ms(1000);
 	display.setCursor(Point(40, 55));
 	
-	displayStream << "5 ";
+	display << "5 ";
 	display.update();
 	xpcc::delay_ms(1000);
 	
-	displayStream << "4 ";
+	display << "4 ";
 	display.update();
 	xpcc::delay_ms(1000);
 	
-	displayStream << "3 ";
+	display << "3 ";
 	display.update();
 	xpcc::delay_ms(1000);
 	
-	displayStream << "2 ";
+	display << "2 ";
 	display.update();
 	xpcc::delay_ms(1000);
 	
-	displayStream << "1";
+	display << "1";
 	display.update();
 	xpcc::delay_ms(1000);
 	
@@ -181,7 +180,7 @@ MAIN_FUNCTION
 			
 			display.setColor(WHITE);
 			display.setCursor(Point(25, 40));
-			displayStream << ++iter;
+			display << ++iter;
 			display.update();
 		}
 		
@@ -189,6 +188,6 @@ MAIN_FUNCTION
 		display.clear();
 		display.setCursor(Point(80, 10));
 		display.setColor(WHITE);
-		displayStream << "FPS=" << iter;
+		display << "FPS=" << iter;
 	}
 }

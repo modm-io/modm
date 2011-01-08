@@ -225,5 +225,27 @@ namespace xpcc
 //#define GPIO__NIBBLE_LOW(name, port)
 //#define GPIO__NIBBLE_HIGH(name, port)
 
+/**
+ * \brief	Use a full 8-Bit port
+ * 
+ * \see		xpcc::gpio::Port()
+ * \ingroup	gpio
+ */
+#define GPIO__PORT(name, port) \
+	struct name { \
+		ALWAYS_INLINE static void setOutput() { \
+			PORT ## port ## _DIRSET = 0xff; \
+		} \
+		ALWAYS_INLINE static void setInput() { \
+			PORT ## port ## _DIRCLR = 0xff; \
+		} \
+		ALWAYS_INLINE static uint8_t read() { \
+			return PORT ## port ## _IN; \
+		} \
+		ALWAYS_INLINE static void write(uint8_t data) { \
+			PORT ## port ## _OUT = data; \
+		} \
+	}
+
 #endif	// !__DOXYGEN__
 #endif	// XPCC__ATXMEGA_GPIO_HPP

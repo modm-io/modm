@@ -58,6 +58,14 @@ namespace xpcc
 			BITRATE_1_MBPS = 7,
 		};
 		
+		/**
+		 * \brief	Possible modes of the CAN controller
+		 * 
+		 * NORMAL is the standard operation mode, in LISTEN_ONLY mode it is
+		 * only possible to receive messages and in LOOPBACK mode all messages
+		 * send are not send to the CAN bus but are received immediately by
+		 * the own controller. 
+		 */
 		enum Mode
 		{
 			NORMAL,
@@ -72,7 +80,7 @@ namespace xpcc
 		struct Message
 		{
 			Message(const uint32_t& identifier = 0, uint8_t length = 0) :
-				identifier(identifier), data(), flags(), length(length)
+				identifier(identifier), flags(), length(length)
 			{
 			}
 			

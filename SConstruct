@@ -38,7 +38,7 @@ DESCRIPTION
 COMMANDLINE ARGUMENTS
 
 all
-   Build everythin (this is the default).
+   Build everything (this is the default).
 
 doc
 doxygen
@@ -132,12 +132,13 @@ if 'check' in BUILD_TARGETS:
 			directories.remove('.svn')
 	
 		if 'SConstruct' in files:
-			exitStatus = os.system("scons -Q -C %s" % path)
+			exitStatus = os.system("scons -Q -C %s build" % path)
 			result.append("check: %s -> %s" % (path, "Ok" if exitStatus == 0 else "FAIL!"))
 			
 			if exitStatus != 0:
 				everythingOk = False
 	
+	print "\nRESULTS:\n"
 	print '\n'.join(result)
 	print "\nOK!" if everythingOk else "\nFAIL!"
 

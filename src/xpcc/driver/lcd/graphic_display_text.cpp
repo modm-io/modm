@@ -82,13 +82,20 @@ xpcc::GraphicDisplay::write(char c)
 	}
 }
 
+// ----------------------------------------------------------------------------
 void
-xpcc::GraphicDisplay::flush()
+xpcc::GraphicDisplay::Writer::write(char c)
+{
+	this->parent->write(c);
+}
+
+void
+xpcc::GraphicDisplay::Writer::flush()
 {
 }
 
 bool
-xpcc::GraphicDisplay::read(char&)
+xpcc::GraphicDisplay::Writer::read(char&)
 {
 	return false;
 }

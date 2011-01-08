@@ -59,10 +59,19 @@
  *  	MCP2515_FILTER_EXTENDED(0),	// Filter 4
  *  	MCP2515_FILTER_EXTENDED(0),	// Filter 5
  *  	
- *  	MCP2515_FILTER_EXTENDED(0),	// Mask 0
- * 		MCP2515_FILTER_EXTENDED(0),	// Mask 1
+ *  	MCP2515_MASK_EXTENDED(0),	// Mask 0
+ * 		MCP2515_MASK_EXTENDED(0),	// Mask 1
  * };
  * \endcode
+ * 
+ * Filter 0 and 1 belong to Mask 0 (Group 0) and Filter 2 to 5 to
+ * Mask 1 (Group 1). You can set one group to receive only standard messages
+ * by using MCP2515_FILTER()/MCP2515_MASK() for all parts. Or to receive only
+ * extended frame by using MCP2515_FILTER_EXTENDED() and MCP2515_MASK_EXTENDED().
+ * But you must not mix both possibilities within one group! 
+ * 
+ * You can use one group to receive standard frames and one group to receive
+ * extended frames, but you can't set one group to receive both!
  * 
  * \warning	Do not use this macro for variables, only for static values
  *			known at compile-time.
@@ -74,6 +83,9 @@
 	#define	MCP2515_FILTER_EXTENDED(id)
 	#define	MCP2515_FILTER(id)
 
+	#define	MCP2515_MASK_EXTENDED(id)
+	#define	MCP2515_MASK(id)
+
 #else
 
 	#define MCP2515_FILTER_EXTENDED(id)	\
@@ -84,6 +96,20 @@
 			(uint8_t)  ((uint32_t) (id))
 	
 	#define	MCP2515_FILTER(id) \
+			(uint8_t)((uint32_t) id >> 3), \
+			(uint8_t)((uint32_t) id << 5), \
+			0, \
+			0
+	
+	#define MCP2515_MASK_EXTENDED(id)	\
+			(uint8_t)  ((uint32_t) (id) >> 21), \
+			(uint8_t)((((uint32_t) (id) >> 13) & 0xe0) | (1<<3) | \
+				(((uint32_t) (id) >> 16) & 0x3)), \
+			(uint8_t)  ((uint32_t) (id) >> 8), \
+			(uint8_t)  ((uint32_t) (id))
+	
+	// TODO check this would receive all frames
+	#define	MCP2515_MASK(id) \
 			(uint8_t)((uint32_t) id >> 3), \
 			(uint8_t)((uint32_t) id << 5), \
 			0, \

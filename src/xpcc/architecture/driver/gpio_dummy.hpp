@@ -106,5 +106,23 @@ namespace xpcc
 		ALWAYS_INLINE static bool read() { return false; } \
 	}
 
+/**
+ * \brief	Use a full 8-Bit port
+ * 
+ * \see		xpcc::gpio::Port()
+ * \ingroup	gpio
+ */
+#define GPIO__PORT(name, port) \
+	struct name { \
+		ALWAYS_INLINE static void setOutput() {} \
+		ALWAYS_INLINE static void setInput() {} \
+		ALWAYS_INLINE static uint8_t read() { \
+			return 0; \
+		} \
+		ALWAYS_INLINE static void write(uint8_t data) { \
+			(void) data; \
+		} \
+	}
+
 #endif	// !__DOXYGEN__
 #endif	// XPCC__GPIO_DUMMY_HPP

@@ -45,14 +45,17 @@ namespace xpcc
 	 * of the real display is not changed until a call of update().
 	 * 
 	 * \tparam	Width	Width of the display.
-	 * \tparam	Rows	Number of rows. The height of the display is 'Rows * 8'.
+	 * \tparam	Height	Height of the display. Must be a multiple of 8!
 	 * 
 	 * \author	Fabian Greif
 	 * \ingroup	lcd
 	 */
-	template <uint8_t Width, uint8_t Rows>
+	template <uint8_t Width, uint8_t Height>
 	class BufferedGraphicDisplay : public GraphicDisplay
 	{
+		// Height must be a multiple of 8
+		XPCC__STATIC_ASSERT((Height % 8) == 0);
+		
 	public:
 		virtual
 		~BufferedGraphicDisplay()
@@ -97,7 +100,7 @@ namespace xpcc
 		virtual bool
 		getPixel(uint8_t x, uint8_t y);
 		
-		uint8_t buffer[Width][Rows];
+		uint8_t buffer[Width][Height / 8];
 	};
 }
 

@@ -180,6 +180,10 @@ class Scanner:
 					if self.unittest is True:
 						for header in self.HEADER:
 							self.header.extend(self.env.Glob(p + header))
+	
+	def __iadd__(self, item):
+		self.append(item)
+		return self	
 		
 	def append(self, files):
 		for file in listify(files):
