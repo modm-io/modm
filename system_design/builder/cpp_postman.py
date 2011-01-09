@@ -64,23 +64,24 @@ class PostmanBuilder(builder_base.Builder):
 			'CAMELCASE': filter.enumElement,
 		}
 		
-		templateHeader = self.template('templates/postman.hpp.tpl', filter=cppFilter)
-		templateSource = self.template('templates/postman.cpp.tpl', filter=cppFilter)
+		container = self.tree.container[self.options.container]
+		
+		components = []
+		for component in container.components:
+			components.append(component.flattened())
 		
 		substitutions = {
-			'components': self.tree.components,
-			'actions': self.tree.components.actions,
+			'components': components,
 			'events': self.tree.events,
-			'packets': self.tree.types,
-			'container': self.tree.container[self.options.container],
-			'eventSubscriptions': self.tree.container[self.options.container].subscriptions,
+			'container': container,
+			'eventSubscriptions': container.subscriptions,
 		}
 		
 		file = os.path.join(self.options.outpath, 'postman.hpp')
-		self.write(file, templateHeader.render(substitutions) + "\n")
+		self.write(file, self.template('templates/postman.hpp.tpl', filter=cppFilter).render(substitutions) + "\n")
 		
 		file = os.path.join(self.options.outpath, 'postman.cpp')
-		self.write(file, templateSource.render(substitutions) + "\n")
+		self.write(file, self.template('templates/postman.cpp.tpl', filter=cppFilter).render(substitutions) + "\n")
 		
 # -----------------------------------------------------------------------------
 if __name__ == '__main__':

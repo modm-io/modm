@@ -8,14 +8,14 @@
 #include {{ includeDirective }}
 
 {% for packet in packets -%}
-{%- if packet.isStruct -%}
-robot::packet::{{ packet.name | typeName }}::{{ packet | generateConstructor }} :
-	{{ packet | generateInitializationList }}
+{%- if packet.flattened().isStruct -%}
+robot::packet::{{ packet.flattened().name | typeName }}::{{ packet.flattened() | generateConstructor }} :
+	{{ packet.flattened() | generateInitializationList }}
 {
 }
 
-robot::packet::{{ packet.name | typeName }}::{{ packet | generateConstructor(default=False) }} :
-	{{ packet | generateInitializationList(default=False) }}
+robot::packet::{{ packet.flattened().name | typeName }}::{{ packet.flattened() | generateConstructor(default=False) }} :
+	{{ packet.flattened() | generateInitializationList(default=False) }}
 {
 }
 {% endif %}

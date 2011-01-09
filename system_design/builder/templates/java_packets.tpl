@@ -97,15 +97,15 @@ public class Packets
 	
 	{% if packet.description %}/** {{ packet.description | xpcc.wordwrap(72) | xpcc.indent(1) }} */{% endif %}
 	{%- if packet.isStruct %}
-	public static final class {{ packet.name | typeName }} extends Struct
+	public static final class {{ packet.flattened().name | typeName }} extends Struct
 	{// packet.isStruct
-		{%- for element in packet.iter() %}
-		public {{ element.type.name | typeName }} {{ element.name | variableName }};
+		{%- for element in packet.flattened().iter() %}
+		public {{ element.subtype.name | typeName }} {{ element.name | variableName }};
 		{%- endfor %}
 		
 		{{ packet.name | typeName }} (ByteBuffer buffer) {
-			{%- for element in packet.iter() %}
-			{{ element.name | variableName }} = {{ element.type.name | typeObjectName }}.fromBuffer(buffer);
+			{%- for element in packet.flattened().iter() %}
+			{{ element.name | variableName }} = {{ element.subtype.name | typeObjectName }}.fromBuffer(buffer);
 			{%- endfor %}
 		}
 		
@@ -128,7 +128,7 @@ public class Packets
 		}
 		
 		public ByteBuffer toBuffer(ByteBuffer buffer) {
-			{%- for element in packet.iter() %}
+			{%- for element in packet.flattened().iter() %}
 			{{ element | toBufferMethodStructAccess }};
 			{%- endfor %}
 			
@@ -139,7 +139,7 @@ public class Packets
 		public String toString(){
 			StringBuffer buff = new StringBuffer();
 			buff.append("(");
-			{%- for element in packet.iter() %}
+			{%- for element in packet.flattened().iter() %}
 			buff.append({{ element.name | variableName }}{% if loop.last %}+")"{% else %}+" "{% endif %});
 			{%- endfor %}
 			return buff.toString();
@@ -195,12 +195,12 @@ public class Packets
 	{%- elif packet.isTypedef %}
 	public static final class {{ packet.name | typeName }} extends Struct
 	{// packet.isTypedef
-		public {{ packet.type.name | typeName }} value;
+		public {{ packet.subtype.name | typeName }} value;
 		
 		public {{ packet.name | typeName }}(){
 		}
 		
-		public {{ packet.name | typeName }}({{ packet.type.name | typeName }} value){
+		public {{ packet.name | typeName }}({{ packet.subtype.name | typeName }} value){
 			this.value = value;
 		}
 		
@@ -209,7 +209,7 @@ public class Packets
 		}
 		
 		public static {{ packet.name | typeName }} fromBuffer(ByteBuffer buffer) {
-			return new {{ packet.name | typeName }}({{ packet.type.name | typeObjectName }}.fromBuffer(buffer));
+			return new {{ packet.name | typeName }}({{ packet.subtype.name | typeObjectName }}.fromBuffer(buffer));
 		}
 		
 		public static {{ packet.name | typeName }} fromBuffer(byte[] bytes) {

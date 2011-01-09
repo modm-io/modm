@@ -13,8 +13,8 @@ public class Identifier
 {
 	public static enum Component
 	{
-	{%- for element in components.iter() %}
-		{{ element.name | enumElement }}({{ element.id }}){% if loop.last %};{% else %},{% endif %}
+	{%- for component in components.iter() %}
+		{{ component.flattened().name | enumElement }}({{ component.flattened().id }}){% if loop.last %};{% else %},{% endif %}
 	{%- endfor %}
 
 		public final int id;
@@ -41,7 +41,7 @@ public class Identifier
 		{% if element.type == None %}
 		{{ element.name | enumElement }}({{ element.id }}, null){% if loop.last %};{% else %},{% endif %}
 		{% else %}
-		{{ element.name | enumElement }}({{ element.id }}, Packets.{{ element.type | typeObjectName }}.class){% if loop.last %};{% else %},{% endif %}
+		{{ element.name | enumElement }}({{ element.id }}, Packets.{{ element.type.name | typeObjectName }}.class){% if loop.last %};{% else %},{% endif %}
 		{% endif %}
 	{%- endfor %}
 

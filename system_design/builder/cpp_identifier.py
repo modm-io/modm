@@ -44,8 +44,12 @@ class IdentifierBuilder(builder_base.Builder):
 		
 		template = self.template('templates/robot_identifier.tpl')
 		
+		components = []
+		for component in self.tree.components.iter(abstract=False):
+			components.append(component.flattened())
+		
 		substitutions = {
-			'components': self.tree.components,
+			'components': components,
 			'actions': self.tree.components.actions,
 			'events': self.tree.events
 		}

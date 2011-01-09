@@ -39,7 +39,8 @@ import textwrap
 from optparse import OptionParser
 
 sys.path = [os.path.join(os.path.dirname(__file__), '..')] + sys.path
-from xmlparser.parser import Parser, ParserError
+from xmlparser.parser import Parser
+from xmlparser.parser_exception import ParserException
 
 
 class BuilderException(Exception):
@@ -103,13 +104,13 @@ class Builder(object):
 		self.xmlpath = os.path.dirname(os.path.abspath(self.xmlfile))
 		
 		try:
-			parser = Parser(self.xmlfile)
-			parser.parse()
-		except ParserError as e:
+			parser = Parser()
+			parser.parse(self.xmlfile)
+		except ParserException as e:
 			sys.stderr.write("Error: %s\n" % str(e))
 			sys.exit(1)
 		
-		self.tree = parser
+		self.tree = parser.tree
 		self.globals = {
 			'time': time.strftime("%d %b %Y, %H:%M:%S", time.localtime()),
 		}
@@ -191,7 +192,9 @@ class Builder(object):
 			relpath = os.path.dirname(os.path.abspath(__file__))
 			path = os.path.join(relpath, path)
 		
-		environment = jinja2.Environment(loader = jinja2.FileSystemLoader(path))
+		environment = jinja2.Environment(
+				loader=jinja2.FileSystemLoader(path),
+				extensions=["jinja2.ext.loopcontrols"])
 		environment.filters['xpcc.wordwrap'] = filter_wordwrap
 		environment.filters['xpcc.indent'] = filter_indent
 		if filter:
@@ -206,6 +209,6 @@ class Builder(object):
 		except BuilderException as e:
 			sys.stderr.write("Error: %s\n" % str(e))
 			sys.exit(1)
-		except Exception as e:
-			sys.stderr.write("Internal Error: %s\n" % str(e))
-			sys.exit(1)
+		#except Exception as e:
+		#	sys.stderr.write("Internal Error: %s\n" % str(e))
+		#	sys.exit(1)

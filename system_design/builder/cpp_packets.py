@@ -37,38 +37,38 @@ import filter.cpp as filter
 # -----------------------------------------------------------------------------
 def filter_subtype(value):
 	""" value needs to be parser.structure.SubType """
-	type = filter.typeName(value.type.name)
+	type = filter.typeName(value.subtype.name)
 	variable = filter.variableName(value.name)
-	if value.type.isArray:
-		return "%s %s[%s]" % (type, variable, value.type.count)
+	if value.subtype.isArray:
+		return "%s %s[%s]" % (type, variable, value.subtype.count)
 	else:
 		return "%s %s" % (type, variable)
 
-def filter_constructor(classtype, default=True):
+def filter_constructor(class_, default=True):
 	if default:
-		return "%s()" % filter.typeName(classtype.name)
+		return "%s()" % filter.typeName(class_.name)
 	else:
 		parameter = []
-		for item in classtype.iter():
-			if item.type.isArray:
+		for item in class_.iter():
+			if item.subtype.isArray:
 				raise builder.BuilderException("Array handling is incomplete " \
 						"right now! Could not generate code for %s" % item)
 			else:
-				type = filter.typeName(item.type.name)
+				type = filter.typeName(item.subtype.name)
 				name = filter.variableName(item.name)
 				
 				parameter.append("%s %s" % (type, name))
 		
-		return "%s(%s)" % (filter.typeName(classtype.name), ", ".join(parameter))
+		return "%s(%s)" % (filter.typeName(class_.name), ", ".join(parameter))
 
-def filter_initialization_list(classtype, default=True):
+def filter_initialization_list(class_, default=True):
 	initList = []
-	for item in classtype.iter():
-		if item.type.isArray:
+	for item in class_.iter():
+		if item.subtype.isArray:
 			raise builder.BuilderException("Array handling is incomplete " \
 					"right now! Could not generate code for %s" % item)
 		else:
-			type = filter.typeName(item.type.name)
+			type = filter.typeName(item.subtype.name)
 			name = filter.variableName(item.name)
 			
 			if default:

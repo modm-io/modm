@@ -15,6 +15,7 @@ namespace robot
 	namespace packet
 	{
 {%- for packet in packets %}
+{%- if packet.isBuiltIn %}{% continue %}{% endif %}
 		{% if packet.description %}/** {{ packet.description | xpcc.wordwrap(68) | xpcc.indent(2) }} */{% endif %}
 	{%- if packet.isEnum %}
 		enum {{ packet.name | typeName }}
@@ -26,16 +27,15 @@ namespace robot
 	{% elif packet.isStruct %}
 		struct {{ packet.name | typeName }}
 		{
-			{{ packet | generateConstructor }};
+			{{ packet.flattened() | generateConstructor }};
 			
-			{{ packet | generateConstructor(default=False) }};
-			
-			{%- for element in packet.iter() %}
+			{{ packet.flattened() | generateConstructor(default=False) }};
+			{% for element in packet.flattened().iter() %}
 			{{ element | subtype }};
 			{%- endfor %}
 		} __attribute__((packed));
 	{% elif packet.isTypedef %}
-		typedef {{ packet.type.name | typeName }} {{ packet.name | typeName }};
+		typedef {{ packet.subtype.name | typeName }} {{ packet.name | typeName }};
 	{% endif %}
 {%- endfor -%}
 	} // namespace packet

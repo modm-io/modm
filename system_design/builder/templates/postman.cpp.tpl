@@ -9,13 +9,13 @@
 #include "identifier.hpp"
 #include "postman.hpp"
 
-{%- for component in container.components %}
+{%- for component in components %}
 #include "component_{{ component.name | camelcase }}/{{ component.name | camelcase }}.hpp"
 {%- endfor %}
 
 namespace component
 {
-	{% for component in container.components -%}
+	{% for component in components -%}
 	extern {{ component.name | CamelCase }}	{{ component.name | camelCase }};
 	{%- endfor %}
 }
@@ -32,14 +32,14 @@ Postman::deliverPacket(const xpcc::Header& header, const xpcc::SmartPointer& pay
 	
 	switch (header.destination)
 	{
-{%- for component in container.components %}
+{%- for component in components %}
 		case robot::component::{{ component.name | CAMELCASE }}:
 			switch (header.packetIdentifier)
 			{
 	{%- for action in component.actions %}
 				case robot::action::{{ action.name | CAMELCASE }}:
 		{%- if action.parameterType != None %}
-					component::{{ component.name | camelCase }}.action{{ action.name | CamelCase }}(handle, &payload.get<robot::packet::{{ action.parameterType | CamelCase }}>());
+					component::{{ component.name | camelCase }}.action{{ action.name | CamelCase }}(handle, &payload.get<robot::packet::{{ action.parameterType.name | CamelCase }}>());
 		{%- else %}
 					component::{{ component.name | camelCase }}.action{{ action.name | CamelCase }}(handle);
 		{%- endif %}
@@ -60,7 +60,7 @@ Postman::deliverPacket(const xpcc::Header& header, const xpcc::SmartPointer& pay
 				case robot::event::{{ event.name | CAMELCASE }}:
 	{%- for component in eventSubscriptions[event.name] %}
 		{%- if events[event.name].type != None %}
-					component::{{ component.name | camelCase }}.event{{ event.name | CamelCase }}(header, &payload.get<robot::packet::{{ events[event.name].type | CamelCase }}>());
+					component::{{ component.name | camelCase }}.event{{ event.name | CamelCase }}(header, &payload.get<robot::packet::{{ events[event.name].type.name | CamelCase }}>());
 		{%- else %}
 					component::{{ component.name | camelCase }}.event{{ event.name | CamelCase }}(header);
 		{%- endif %}
@@ -85,7 +85,7 @@ Postman::isComponentAvaliable(const xpcc::Header& header) const
 {
 	switch (header.destination)
 	{
-{%- for component in container.components %}
+{%- for component in components %}
 		case robot::component::{{ component.name | CAMELCASE }}:
 {%- endfor %}
 			return true;

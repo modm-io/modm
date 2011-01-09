@@ -36,7 +36,10 @@ import filter.java as filter
 
 # -----------------------------------------------------------------------------
 def fromBufferMethod(element):
-	type = str(element.type)
+	if isinstance(element, filter.Primitive):
+		type = str(element.type)
+	else:
+		type = str(element.subtype.name)
 	if type in filter.PRIMITIVES:
 		if type == "Bool":
 			return "(buffer.get() != 0)"
@@ -54,7 +57,10 @@ def fromBufferMethod(element):
 		return "%s.fromBuffer(buffer)" % (filter.typeName(type))
 
 def toBufferMethod(element, name=None):
-	type = str(element.type)
+	if isinstance(element, filter.Primitive):
+		type = str(element.type)
+	else:
+		type = str(element.subtype.name)
 	if name == None:
 		name = filter.variableName(element.name)
 	if type in filter.PRIMITIVES:
@@ -69,7 +75,10 @@ def toBufferMethod(element, name=None):
 		return "%s.toBuffer(buffer)" % name
 
 def toBufferMethodStructAccess(element, name=None):
-	type = str(element.type)
+	if isinstance(element, filter.Primitive):
+		type = str(element.type)
+	else:
+		type = str(element.subtype.name)
 	if name == None:
 		name = filter.variableName(element.name)
 	if type in filter.PRIMITIVES:
