@@ -6,10 +6,7 @@
 #include <xpcc/driver/software_spi.hpp>
 #include <xpcc/workflow.hpp>
 
-namespace bitmap
-{
-	EXTERN_FLASH(uint8_t rca_logo_128x64[]);
-}
+#include "images/rca_logo_128x64.hpp"
 
 namespace led
 {

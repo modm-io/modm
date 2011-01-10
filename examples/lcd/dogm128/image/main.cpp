@@ -4,6 +4,17 @@
 #include <xpcc/driver/lcd/st7565.hpp>
 #include <xpcc/driver/software_spi.hpp>
 
+#include "images/image_64x64_0.hpp"
+#include "images/image_64x64_1.hpp"
+#include "images/image_64x64_2.hpp"
+#include "images/image_64x64_3.hpp"
+#include "images/image_64x64_4.hpp"
+#include "images/image_64x64_5.hpp"
+#include "images/image_64x64_6.hpp"
+#include "images/image_64x64_7.hpp"
+#include "images/image_64x64_8.hpp"
+#include "images/image_64x64_9.hpp"
+
 namespace led
 {
 	GPIO__OUTPUT(R, D, 7);
@@ -134,20 +145,6 @@ FLASH(uint8_t bootscreen[]) =
 	0xc8, 0xc4, 0xc4, 0xc2, 0xc2, 0xc1, 0xc1, 0xc0, 0xc0, 0xc0,
 	0xc0, 0xc0, 0xc0, 0xe0, 0x60, 0x78, 0x3f, 0x0f,
 };
-
-namespace bitmap
-{
-	EXTERN_FLASH(uint8_t image_64x64_0[]);
-	EXTERN_FLASH(uint8_t image_64x64_1[]);
-	EXTERN_FLASH(uint8_t image_64x64_2[]);
-	EXTERN_FLASH(uint8_t image_64x64_3[]);
-	EXTERN_FLASH(uint8_t image_64x64_4[]);
-	EXTERN_FLASH(uint8_t image_64x64_5[]);
-	EXTERN_FLASH(uint8_t image_64x64_6[]);
-	EXTERN_FLASH(uint8_t image_64x64_7[]);
-	EXTERN_FLASH(uint8_t image_64x64_8[]);
-	EXTERN_FLASH(uint8_t image_64x64_9[]);
-}
 
 void
 drawNumber(xpcc::glcd::Point cursor, uint8_t number)

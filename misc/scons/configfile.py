@@ -35,7 +35,8 @@ import ConfigParser
 import SCons.Node
 
 def listify(node):
-	return [node,] if (not isinstance(node, list)) else node
+	return [node,] if (not isinstance(node, list) and \
+					   not isinstance(node, SCons.Node.NodeList)) else node
 
 # -----------------------------------------------------------------------------
 class ParserException(Exception):
@@ -189,7 +190,6 @@ class Scanner:
 		for file in listify(files):
 			filename = str(file)
 			extension = os.path.splitext(filename)[1]
-			
 			if extension in self.SOURCE:
 				self.sources.append(file)
 			elif extension in self.HEADER:

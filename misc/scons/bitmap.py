@@ -139,7 +139,7 @@ def bitmap_string(target, source, env):
 def bitmap_emitter(target, source, env):
 	header = os.path.splitext(str(target[0]))[0] + ".hpp"
 	target.append(header)
-	return target, source
+	return (target, source)
 
 # -----------------------------------------------------------------------------
 def generate(env, **kw):

@@ -2,7 +2,6 @@
 #include <xpcc/architecture/driver/time.hpp>
 
 #include <xpcc/driver/lcd.hpp>
-#include <xpcc/io/iostream.hpp>
 
 // define the pins used by the LCD
 namespace lcd
@@ -30,11 +29,8 @@ main()
 	display.initialize();
 	display.setPosition(0, 0);
 	
-	// create a new IOStream that will be used to write to the display
-	xpcc::IOStream stream(display);
-	
 	// write the standard welcome message ;-)
-	stream << "Hello World!\n";
+	display << "Hello World!\n";
 	
 	uint8_t counter = 0;
 	while (1)
@@ -42,7 +38,7 @@ main()
 		// Go to the beginning of the second line of the display and
 		// write the value of 'counter'
 		display.setPosition(1, 0);
-		stream << counter << "   ";
+		display << counter << "   ";
 		
 		counter++;
 		

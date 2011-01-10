@@ -33,7 +33,10 @@
 #include "character_display.hpp"
 
 xpcc::CharacterDisplay::CharacterDisplay() :
-	column(0), line(0)
+	IOStream(writer),
+	writer(this),
+	column(0),
+	line(0)
 {
 }
 
@@ -58,7 +61,20 @@ xpcc::CharacterDisplay::write(char c)
 	}
 }
 
+// ----------------------------------------------------------------------------
 void
-xpcc::CharacterDisplay::flush()
+xpcc::CharacterDisplay::Writer::write(char c)
 {
+	this->parent->write(c);
+}
+
+void
+xpcc::CharacterDisplay::Writer::flush()
+{
+}
+
+bool
+xpcc::CharacterDisplay::Writer::read(char&)
+{
+	return false;
 }

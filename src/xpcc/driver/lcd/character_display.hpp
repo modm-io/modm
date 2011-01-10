@@ -34,7 +34,7 @@
 #define XPCC__CHARACTER_DISPLAY_HPP
 
 #include <stdint.h>
-#include <xpcc/io/iodevice.hpp>
+#include <xpcc/io/iostream.hpp>
 
 namespace xpcc
 {
@@ -54,7 +54,7 @@ namespace xpcc
 	 * \author	Fabian Greif
 	 * \ingroup	lcd
 	 */
-	class CharacterDisplay : public IODevice
+	class CharacterDisplay : public IOStream
 	{
 	public:
 		// TODO: we need to find a suitable subset for all LCDs here!
@@ -83,11 +83,8 @@ namespace xpcc
 		 * 
 		 * Use writeRaw() if this behavior is not wanted.
 		 */
-		virtual void
+		void
 		write(char c);
-		
-		// import the other versions of write() from IODevice
-		using IODevice::write;
 		
 		/**
 		 * \brief	Write a raw character at cursor position
@@ -98,10 +95,6 @@ namespace xpcc
 		 */
 		virtual void
 		writeRaw(char c) = 0;
-		
-		// does nothing
-		virtual void
-		flush();
 		
 		virtual void
 		command(Command command) = 0;
@@ -115,19 +108,37 @@ namespace xpcc
 		virtual void
 		setPosition(uint8_t line, uint8_t column) = 0;
 		
-		/**
-		 * \brief	Read a character
-		 *
-		 * Because a LCD is a read-only device this method will always return
-		 * \c false.
-		 */
-		virtual bool
-		read(char&)
+	protected:
+		// Interface class for the IOStream
+		class Writer : public IODevice
 		{
-			return false;
-		}
+		public:
+			Writer(CharacterDisplay *parent) :
+				parent(parent)
+			{
+			}
+			
+			/// Draw a single character
+			virtual void
+			write(char c);
+			
+			using IODevice::write;
+			
+			/// unused
+			virtual void
+			flush();
+			
+			/// unused, returns always \c false
+			virtual bool
+			read(char& c);
+			
+		private:
+			CharacterDisplay *parent;
+		};
 		
 	protected:
+		Writer writer;
+		
 		uint8_t column;
 		uint8_t line;
 	};

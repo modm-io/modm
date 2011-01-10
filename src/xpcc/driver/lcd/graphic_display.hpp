@@ -256,7 +256,7 @@ namespace xpcc
 		}
 		
 		/// Write a single character
-		inline void
+		void
 		write(char c);
 		
 	protected:
