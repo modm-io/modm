@@ -34,7 +34,7 @@ import os
 import builder_base
 import filter.java as filter
 
-class JavaIdentifierBuilder(builder_base.Builder):
+class JavaGeneratorBuilder(builder_base.Builder):
 	
 	VERSION = "$Id$"
 	
@@ -55,7 +55,7 @@ class JavaIdentifierBuilder(builder_base.Builder):
 			'typeObjectName': filter.typeObjectName,
 		}
 		
-		template = self.template('templates/java_identifier.tpl', filter=javaFilter)
+		template = self.template('templates/java_generator.tpl', filter=javaFilter)
 		
 		substitutions = {
 			'package' : self.options.package,
@@ -64,9 +64,9 @@ class JavaIdentifierBuilder(builder_base.Builder):
 			'events': self.tree.events,
 		}
 		
-		file = os.path.join(self.options.outpath, 'Identifier.java')
+		file = os.path.join(self.options.outpath, 'Generator.java')
 		self.write(file, template.render(substitutions))
 
 # -----------------------------------------------------------------------------
 if __name__ == '__main__':
-	JavaIdentifierBuilder().run()
+	JavaGeneratorBuilder().run()

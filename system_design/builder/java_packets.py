@@ -42,14 +42,17 @@ def fromBufferMethod(element):
 		type = str(element.subtype.name)
 	if type in filter.PRIMITIVES:
 		if type == "Bool":
-			return "(buffer.get() != 0)"
+			return "new Bool(buffer.get() != 0)"
 		elif (type == "char"):
-			return "((char)buffer.get())"
+			return "new Char((char)buffer.get())"
 		else:
 			if (filter.PRIMITIVES[type].mask == None):
-				return "buffer.get%s()" % ( filter.PRIMITIVES[type].accessor)
+				return "new %s(buffer.get%s())" % ( 
+						filter.PRIMITIVES[type].name,
+						filter.PRIMITIVES[type].accessor)
 			else:
-				return "(buffer.get%s()&%s)" % (
+				return "new %s(buffer.get%s()&%s)" % (
+						filter.PRIMITIVES[type].name,
 						filter.PRIMITIVES[type].accessor,
 						filter.PRIMITIVES[type].mask,)
 			

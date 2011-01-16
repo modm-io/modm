@@ -117,7 +117,7 @@ class Enum(BaseType):
 			"""
 			self.name = node.get('name')
 			if not re.match("^[0-9A-Z_]*$", self.name):
-				raise ParserException("%s: Attribute name of element in enum has to be UPPER_UNDERSCORE_STYLE (found: '%s')" % (self, name))
+				raise ParserException("Attribute name of element in enum has to be UPPER_UNDERSCORE_STYLE (found: '%s')" % (self.name))
 			
 			self.description = xml_utils.get_description(node)
 			
@@ -275,8 +275,11 @@ class Struct(BaseType):
 		self.isStruct = True
 		self.elements = []
 		self.extends = None
+		self.extending = []
+		self.typeIdentifier = None
 		
 		self.__flattened = None
+		self.__typeIdentifierName = None
 	
 	def iter(self):
 		""" Iterate over all sub-elements of the enum """
@@ -300,6 +303,12 @@ class Struct(BaseType):
 				self.extends = tree.types[basetype]
 				if not self.extends.isStruct:
 					raise ParserException("Struct '%s' is extended from non struct '%s'!" % (self.name, self.extends.name))
+				if self.extends.extends:
+					raise ParserException("Struct '%s' extends struct '%s'. Structs are only allowed to extend from those Structs, which do not extend anything!" % (self.name, self.extends.name))
+				self.__typeIdentifierName = self.node.get('typeIdentifier')
+				if self.__typeIdentifierName is None:
+					raise ParserException("Struct '%s' is extended, but typeIdentifier is not defined!" % (self.name))
+
 			except KeyError:
 				raise ParserException("Unknown super type '%s' in struct '%s'!" % (basetype, self.name))
 		self.node = None
@@ -328,6 +337,20 @@ class Struct(BaseType):
 			if self.extends.size == 0:
 				raise ParserException("Loop in the definition of '%s' and '%s' detected!" % (self.name, self.extends.name))
 			self.extends.create_hierarchy()
+			typeIdentifierStructElement = self.extends.elements[0]
+			if not typeIdentifierStructElement.subtype.type.isEnum:
+				raise ParserException("Struct '%s' is extended by Struct '%s'. Structs which are extended by other must have an element named 'type' of any enum type as their first element! It is used for type distinguishing at runtime." % (self.extends.name, self.name))
+			if not typeIdentifierStructElement.name == 'type':
+				raise ParserException("Struct '%s' is extended by Struct '%s'. Structs which are extended by other must have an element named 'type' as their first element! It is used for type distinguishing at runtime." % (self.extends.name, self.name))
+			
+			for enumElement in typeIdentifierStructElement.subtype.type.elements:
+				if enumElement.name == self.__typeIdentifierName:
+					self.typeIdentifier = enumElement
+					break
+			if not self.typeIdentifier:
+				raise ParserException("Struct '%s' extends Struct '%s', but it's typeIdentifier '%s' is not member of enum '%s' which is the type of '%s.type'." % (self.name, self.extends.name, self.__typeIdentifierName, typeIdentifierStructElement.subtype.type.name, self.extends.name))
+				
+			self.extends.__addExtending(self)
 			size += self.extends.size
 			self.level = max(self.level, self.extends.level)
 		
@@ -357,6 +380,11 @@ class Struct(BaseType):
 	def __str__(self):
 		return "%s : struct|%i" % (self.name, self.level)
 
+	def __addExtending(self, extending):
+		for struct in self.extending:
+			if struct.typeIdentifier == extending.typeIdentifier:
+				raise ParserException("Duplicate TypeIdentifier '%s' in Struct group extending '%s'. ('%s' and '%s')" % (extending.typeIdentifier.name, self.name, struct.name, extending.name))
+		self.extending.append(extending)
 
 class Typedef(BaseType):
 	

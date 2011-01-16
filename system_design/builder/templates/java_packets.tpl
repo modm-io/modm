@@ -30,11 +30,6 @@ public class Packets
 	/** Base class for all struct types */
 	public static abstract class Struct implements Packet
 	{
-		abstract public int getSize();
-		
-		// TODO benutze ByteBuffer.wrap(byte[] array) um einen Konstruktor
-		// zu bauen der die Werte aus einem Array liest
-		
 		public byte[] getBytes() {
 			ByteBuffer buffer = ByteBuffer.allocate(this.getSize());
 			buffer.order(ByteOrder.LITTLE_ENDIAN);
@@ -56,6 +51,7 @@ public class Packets
 			this.value = value;
 		}
 		
+		@Override
 		public final int getSize() {
 			return {{ primitive.size }};
 		}
@@ -71,11 +67,11 @@ public class Packets
 			return {{ primitive | toBufferMethod("value") }};
 		}
 		
-		public static {{ primitive.javaType }} fromBuffer(ByteBuffer buffer){
+		public static {{ primitive.name | typeObjectName }} fromBuffer(ByteBuffer buffer){
 			return {{ primitive | fromBufferMethod }};
 		}
 		
-		public static {{ primitive.javaType }} fromBuffer(byte[] bytes){
+		public static {{ primitive.name | typeObjectName }} fromBuffer(byte[] bytes){
 			ByteBuffer buffer = ByteBuffer.wrap(bytes)
 							.asReadOnlyBuffer()
 							.order(ByteOrder.LITTLE_ENDIAN);
@@ -97,27 +93,48 @@ public class Packets
 	
 	{% if packet.description %}/** {{ packet.description | xpcc.wordwrap(72) | xpcc.indent(1) }} */{% endif %}
 	{%- if packet.isStruct %}
-	public static final class {{ packet.flattened().name | typeName }} extends Struct
+	public static {% if (not packet.extending) %}final {% endif %}class {{ packet.flattened().name | typeName }} extends {% if packet.extends %}{{ packet.extends.name | typeName }}{% else %} Struct {% endif %}
 	{// packet.isStruct
-		{%- for element in packet.flattened().iter() %}
+		{%- for element in packet.iter() %}
 		public {{ element.subtype.name | typeName }} {{ element.name | variableName }};
 		{%- endfor %}
 		
 		{{ packet.name | typeName }} (ByteBuffer buffer) {
-			{%- for element in packet.flattened().iter() %}
+			{%- if packet.extends %}
+			super(buffer);
+			{%- endif %}
+			{%- for element in packet.iter() %}
+			{%- if ((element.subtype.name| typeObjectName) in primitives) %}
+			{{ element.name | variableName }} = {{ element.subtype.name | typeObjectName }}.fromBuffer(buffer).value;
+			{%- else %}
 			{{ element.name | variableName }} = {{ element.subtype.name | typeObjectName }}.fromBuffer(buffer);
+			{%- endif %}
 			{%- endfor %}
 		}
 		
 		public {{ packet.name | typeName }} () {
 		}
 		
-		public final int getSize() {
+		@Override
+		public {% if (not packet.extending) %} final {% endif %} int getSize() {
 			return {{ packet.size }};
 		}
 		
 		public static {{ packet.name | typeName }} fromBuffer(ByteBuffer buffer) {
+			{% if packet.extending %}
+			{{ packet.elements[0].subtype.name | typeName }} type = {{ packet.elements[0].subtype.name | typeName }}.fromValue(buffer.get());
+			buffer.rewind();
+			switch(type){
+			{%- for child in packet.extending %}
+				case {{ child.typeIdentifier.name | enumElement }}:
+					return new {{ child.flattened().name | typeName }}(buffer);
+			{%- endfor %}
+				default:
+					throw new RuntimeException("No extending type from struct '{{ packet.flattened().name | typeName }}' for TypeIdentifier " + type + " defined.");
+			}
+			{% else %}
 			return new {{ packet.name | typeName }}(buffer);
+			{% endif %}
 		}
 		
 		public static {{ packet.name | typeName }} fromBuffer(byte[] bytes) {
@@ -139,6 +156,7 @@ public class Packets
 		public String toString(){
 			StringBuffer buff = new StringBuffer();
 			buff.append("(");
+			{% if packet.extends %}buff.append(super.toString());{% endif %}
 			{%- for element in packet.flattened().iter() %}
 			buff.append({{ element.name | variableName }}{% if loop.last %}+")"{% else %}+" "{% endif %});
 			{%- endfor %}
@@ -168,12 +186,15 @@ public class Packets
 		}
 		
 		public static {{ packet.name | typeName }} fromValue(int value) {
-			value = value&0xff;
-			for({{ packet.name | typeName }} i : {{ packet.name | typeName }}.values()){
-				if (i.value == value)
-					return i;
+			switch (value){
+			{%- for element in packet.iter() %}
+				case {{ element.value }}:
+					return {{ element.name | enumElement }};
+			{%- endfor %}
+				default:
+					throw new RuntimeException("Enumeration value " + value + " does not exist.");
 			}
-			throw new RuntimeException("Enumeration value " + value + " does not exist.");
+
 		}
 		
 		public static {{ packet.name | typeName }} fromBuffer(byte[] bytes) {
@@ -204,12 +225,13 @@ public class Packets
 			this.value = value;
 		}
 		
+		@Override
 		public final int getSize() {
 			return {{ packet.size }};
 		}
 		
 		public static {{ packet.name | typeName }} fromBuffer(ByteBuffer buffer) {
-			return new {{ packet.name | typeName }}({{ packet.subtype.name | typeObjectName }}.fromBuffer(buffer));
+			return new {{ packet.name | typeName }}({{ packet.subtype.name | typeObjectName }}.fromBuffer(buffer).value);
 		}
 		
 		public static {{ packet.name | typeName }} fromBuffer(byte[] bytes) {

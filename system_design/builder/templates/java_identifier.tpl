@@ -21,6 +21,17 @@ public class Identifier
 		private Component(int id) {
 			this.id = id;
 		}
+
+		public static Component get(int id){
+			switch (id){
+			{%- for component in components.iter() %}
+				case {{ component.flattened().id }}:
+					return {{ component.flattened().name | enumElement }};
+			{%- endfor %}
+				default:
+					return null;
+			}
+		}
 	}
 	
 	public static enum Action
@@ -33,16 +44,27 @@ public class Identifier
 		private Action(int id) {
 			this.id = id;
 		}
+
+		public static Action get(int id){
+			switch (id){
+			{%- for element in actions.iter() %}
+				case {{ element.id }}:
+					return {{ element.name | enumElement }};
+			{%- endfor %}
+				default:
+					return null;
+			}
+		}
 	}
 	
 	public static enum Event
 	{
 	{%- for element in events.iter() %}
-		{% if element.type == None %}
+		{%- if element.type == None %}
 		{{ element.name | enumElement }}({{ element.id }}, null){% if loop.last %};{% else %},{% endif %}
-		{% else %}
+		{%- else %}
 		{{ element.name | enumElement }}({{ element.id }}, Packets.{{ element.type.name | typeObjectName }}.class){% if loop.last %};{% else %},{% endif %}
-		{% endif %}
+		{%- endif %}
 	{%- endfor %}
 
 		public final int id;
@@ -77,6 +99,17 @@ public class Identifier
 				e.printStackTrace();
 			}
 			return null;
+		}
+
+		public static Event get(int id){
+			switch (id){
+			{%- for element in events.iter() %}
+				case {{ element.id }}:
+					return {{ element.name | enumElement }};
+			{%- endfor %}
+				default:
+					return null;
+			}
 		}
 	}
 }
