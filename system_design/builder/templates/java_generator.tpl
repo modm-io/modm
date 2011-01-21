@@ -11,7 +11,9 @@ import {{ package }}.Identifier.Event;
 import xpcc.Header;
 
 public class Generator {
-	static Packets.Packet generate(Header header, byte[] payload){
+	public static Packets.Packet generate(Header header, byte[] payload){
+		if (header.isAcknowledge)
+			return null;
 		switch (header.type){
 			case REQUEST:
 				if (header.destination == Identifier.Component.BROADCAST.id){

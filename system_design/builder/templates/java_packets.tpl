@@ -156,8 +156,10 @@ public class Packets
 		public String toString(){
 			StringBuffer buff = new StringBuffer();
 			buff.append("(");
-			{% if packet.extends %}buff.append(super.toString());{% endif %}
-			{%- for element in packet.flattened().iter() %}
+			{%- if packet.extends %}
+			buff.append(super.toString());
+			{%- endif %}
+			{%- for element in packet.iter() %}
 			buff.append({{ element.name | variableName }}{% if loop.last %}+")"{% else %}+" "{% endif %});
 			{%- endfor %}
 			return buff.toString();
