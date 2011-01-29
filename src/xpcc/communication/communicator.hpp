@@ -30,46 +30,84 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC__RESPONSE_HPP
-#define	XPCC__RESPONSE_HPP
+#ifndef	XPCC__COMMUNICATOR_HPP
+#define	XPCC__COMMUNICATOR_HPP
 
-#include "backend/header.hpp"
+#include <stdint.h>
+#include "dispatcher.hpp"
+#include "communicatable.hpp"
 
 namespace xpcc
 {
-	typedef Header ResponseHandle;
-	
-	// forward declaration
-	class Dispatcher;
-	
 	/**
+	 * \brief	A adapter class which can be obtained from a AbstractComponent.
+	 * Use it to enable communication for a group of classes. The component
+	 * id will be taken from AbstractComponent.
 	 * 
+	 * This class is just a forwarder to the Dispatcher like AbstractComponent
+	 * it also does.
+	 *
 	 * \ingroup	communication
 	 */
-	class Response
+	class Communicator : public Communicatable
 	{
-		friend class Dispatcher;
 	public:
-		Response(const Response& other);
+		/**
+		 * \brief	Constructor
+		 * 
+		 * \param	ownIdentifier	Identifier of the component, must be unique
+		 * 							within the network.
+		 * \param	communication	Communication class use to send messages
+		 */
+		Communicator(const uint8_t ownIdentifier,
+				Dispatcher *communication);
 		
-	public:
 		void
-		sendResponse();
+		callAction(uint8_t receiver, uint8_t actionIdentifier);
+		
+		void
+		callAction(uint8_t receiver, uint8_t actionIdentifier, ResponseCallback& responseCallback);
 		
 		template<typename T>
 		void
-		sendResponse(const T& data);
+		callAction(uint8_t receiver, uint8_t actionIdentifier, const T& data);
 		
 		template<typename T>
 		void
-		sendNegativeResponse(const T& data);
+		callAction(uint8_t receiver, uint8_t actionIdentifier, const T& data, ResponseCallback& responseCallback);
+		
 		
 		void
-		sendNegativeResponse();
+		publishEvent(uint8_t eventIdentifier);
 		
-	protected:
-		Response();
+		template<typename T>
+		void
+		publishEvent(uint8_t eventIdentifier, const T& data);
+		
+		
+		// [proposition -> dergraaf]: Make these methods only available in the correct
+		// circumstances (action call). Perhaps move them methods to the ResponseHandle
+		// class?
+		void
+		sendResponse(const ResponseHandle& handle);
+		
+		template<typename T>
+		void
+		sendResponse(const ResponseHandle& handle, const T& data);
+		
+		template<typename T>
+		void
+		sendNegativeResponse(const ResponseHandle& handle, const T& data);
+		
+		void
+		sendNegativeResponse(const ResponseHandle& handle);
+		
+	private:
+		const uint8_t ownIdentifier;
+		Dispatcher * const communication;
 	};
 }
 
-#endif // XPCC__RESPONSE_HPP
+#include "communicator_impl.hpp"
+
+#endif // XPCC__COMMUNICATOR_HPP

@@ -29,49 +29,89 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC__ABSTRACT_COMPONENT_HPP
-	#error	"Don't include this file directly, use 'abstract_component.hpp' instead"
+#ifndef	XPCC__COMMUNICATOR_HPP
+	#error	"Don't include this file directly, use 'communicator.hpp' instead"
 #endif
 
 
 // ----------------------------------------------------------------------------
 template<typename T>
 void
-xpcc::AbstractComponent::callAction(uint8_t receiver,
+xpcc::Communicator::callAction(uint8_t receiver,
 		uint8_t actionIdentifier, const T& data)
 {
-	this->communicator.callAction(receiver, actionIdentifier, data);
+	Header header(Header::REQUEST,
+			false,
+			receiver,
+			this->ownIdentifier,
+			actionIdentifier);
+	
+	SmartPointer payload(&data);
+	
+	this->communication->addMessage(header, payload);
 }
 
 template<typename T>
 void
-xpcc::AbstractComponent::callAction(uint8_t receiver, uint8_t actionIdentifier,
+xpcc::Communicator::callAction(uint8_t receiver, uint8_t actionIdentifier,
 		const T& data, ResponseCallback& responseCallback)
 {
-	this->communicator.callAction(receiver, actionIdentifier, data, responseCallback);
+	Header header(Header::REQUEST,
+			false,
+			receiver,
+			this->ownIdentifier,
+			actionIdentifier);
+	
+	SmartPointer payload(&data);
+	
+	this->communication->addMessage(header, payload, responseCallback);
 }
 
 // ----------------------------------------------------------------------------
 template<typename T>
 void
-xpcc::AbstractComponent::publishEvent(uint8_t eventIdentifier, const T& data)
+xpcc::Communicator::publishEvent(uint8_t eventIdentifier, const T& data)
 {
-	communicator.publishEvent(eventIdentifier, data);
+	Header header(Header::REQUEST,
+			false,
+			0,
+			this->ownIdentifier,
+			eventIdentifier);
+	
+	SmartPointer payload(&data);	// no metadata is sent with Events
+	
+	this->communication->addMessage(header, payload);
 }
 
 // ----------------------------------------------------------------------------
 template<typename T>
 void
-xpcc::AbstractComponent::sendResponse(
+xpcc::Communicator::sendResponse(
 		const ResponseHandle& handle, const T& data)
 {
-	this->communicator.sendResponse(handle, data);
+	Header header(	Header::RESPONSE,
+					false,
+					handle.source,
+					handle.destination,
+					handle.packetIdentifier);
+	
+	SmartPointer payload(&data);
+	
+	this->communication->addResponse(header, payload);
 }
 
 template<typename T>
 void
-xpcc::AbstractComponent::sendNegativeResponse(
+xpcc::Communicator::sendNegativeResponse(
 		const ResponseHandle& handle, const T& data)
 {
-	this->communicator.sendNegativeResponse(handle, data);
+	Header header(	Header::NEGATIVE_RESPONSE,
+					false,
+					handle.source,
+					handle.destination,
+					handle.packetIdentifier);
+	
+	SmartPointer payload(&data);
+	
+	this->communication->addResponse(header, payload);
 }

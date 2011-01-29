@@ -34,7 +34,7 @@
 #define	XPCC__COMMUNICATABLE_TASK_HPP
 
 #include <xpcc/communication/communicatable.hpp>
-#include <xpcc/communication/abstract_component.hpp>
+#include <xpcc/communication/communicator.hpp>
 
 #include "task.hpp"
 
@@ -46,6 +46,8 @@ namespace xpcc
 	 * Needs to be part of a xpcc::AbstractComponent
 	 * 
 	 * \see		xpcc::Task
+	 * \see		xpcc::Communicator
+	 * \see		xpcc::Communicatable
 	 * 
 	 * \ingroup	workflow
 	 * \author	Fabian Greif
@@ -54,13 +56,13 @@ namespace xpcc
 							   public Communicatable
 	{
 	public:
-		CommunicatableTask(AbstractComponent *parent) :
+		CommunicatableTask(Communicator *parent) :
 			parent(parent)
 		{
 		}
 		
 	protected:
-		AbstractComponent *parent;
+		Communicator *parent;
 	};
 }
 

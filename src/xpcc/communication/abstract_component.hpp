@@ -36,12 +36,29 @@
 #include <stdint.h>
 #include "dispatcher.hpp"
 #include "communicatable.hpp"
+#include "communicator.hpp"
 
 namespace xpcc
 {
 	/**
 	 * \brief	Abstract base class for a component
 	 * 
+	 * This class give to components an interface to xpcc communication, but
+	 * effectively it forwards all requests to the internal created Communicator,
+	 * which is bound to this AbstractComponent.
+	 *
+	 * It is a good convention to give to a component which extends
+	 * xpcc::AbstractComponent an update() method which is to be called
+	 * during the main loop.
+	 *
+	 * The programmer is always encouraged to bundle special functionality in
+	 * separate classes called Tasks. These Tasks will usually not be
+	 * complete components but want send messages in the name of a parent
+	 * component. Use xpcc::CommunicatableTask for such type of Tasks.
+	 *
+	 * \see		xpcc::Task
+	 * \see		xpcc::Communicatable
+	 *
 	 * \ingroup	communication
 	 */
 	class AbstractComponent : public Communicatable
@@ -58,59 +75,106 @@ namespace xpcc
 		AbstractComponent(const uint8_t ownIdentifier,
 				Dispatcher *communication);
 		
-		/**
-		 * \brief	Update the internal state of this component.
-		 */
-		virtual void
-		update() = 0;
-		
-	protected:
+#ifdef __DOXYGEN__
 		void
+		update();
+#endif
+
+
+	protected:
+		inline xpcc::Communicator *
+		getCommunicator();
+
+		inline void
 		callAction(uint8_t receiver, uint8_t actionIdentifier);
 		
-		void
+		inline void
 		callAction(uint8_t receiver, uint8_t actionIdentifier, ResponseCallback& responseCallback);
 		
 		template<typename T>
-		void
+		inline void
 		callAction(uint8_t receiver, uint8_t actionIdentifier, const T& data);
 		
 		template<typename T>
-		void
+		inline void
 		callAction(uint8_t receiver, uint8_t actionIdentifier, const T& data, ResponseCallback& responseCallback);
 		
 		
-		void
+		inline void
 		publishEvent(uint8_t eventIdentifier);
 		
 		template<typename T>
-		void
+		inline void
 		publishEvent(uint8_t eventIdentifier, const T& data);
 		
 		
 		// [proposition -> dergraaf]: Make these methods only available in the correct
 		// circumstances (action call). Perhaps move them methods to the ResponseHandle
 		// class?
-		void
+		inline void
 		sendResponse(const ResponseHandle& handle);
 		
 		template<typename T>
-		void
+		inline void
 		sendResponse(const ResponseHandle& handle, const T& data);
 		
 		template<typename T>
-		void
+		inline void
 		sendNegativeResponse(const ResponseHandle& handle, const T& data);
 		
-		void
+		inline void
 		sendNegativeResponse(const ResponseHandle& handle);
 		
 	private:
-		const uint8_t ownIdentifier;
-		Dispatcher * const communication;
+		Communicator communicator;
 	};
 }
 
+// ---------------------------------------------------------------------
+// IMPLEMENTATION
+// ---------------------------------------------------------------------
 #include "abstract_component_impl.hpp"
+
+// ----------------------------------------------------------------------------
+xpcc::Communicator *
+xpcc::AbstractComponent::getCommunicator()
+{
+	return &this->communicator;
+}
+
+// ----------------------------------------------------------------------------
+void
+xpcc::AbstractComponent::callAction(uint8_t receiver, uint8_t actionIdentifier)
+{
+	this->communicator.callAction(receiver, actionIdentifier);
+}
+
+void
+xpcc::AbstractComponent::callAction(uint8_t receiver, uint8_t actionIdentifier, ResponseCallback& responseCallback)
+{
+	this->communicator.callAction(receiver, actionIdentifier, responseCallback);
+}
+
+
+// ----------------------------------------------------------------------------
+void
+xpcc::AbstractComponent::publishEvent(uint8_t eventIdentifier)
+{
+	this->communicator.publishEvent(eventIdentifier);
+}
+
+
+// ----------------------------------------------------------------------------
+void
+xpcc::AbstractComponent::sendResponse(const ResponseHandle& handle)
+{
+	this->communicator.sendResponse(handle);
+}
+
+void
+xpcc::AbstractComponent::sendNegativeResponse(const ResponseHandle& handle)
+{
+	this->communicator.sendNegativeResponse(handle);
+}
 
 #endif // XPCC__ABSTRACT_COMPONENT_HPP

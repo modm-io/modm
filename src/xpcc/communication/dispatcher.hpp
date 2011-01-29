@@ -225,7 +225,7 @@ namespace xpcc
 		Entry *last;
 		
 	private:
-		friend class AbstractComponent;
+		friend class Communicator;
 	};
 }
 
