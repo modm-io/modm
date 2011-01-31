@@ -79,8 +79,7 @@ namespace xpcc
 		void
 		update();
 #endif
-
-
+		
 	protected:
 		inline xpcc::Communicator *
 		getCommunicator();

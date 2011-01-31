@@ -62,7 +62,7 @@ namespace xpcc
 		 */
 		template <typename C, typename P>
 		ActionCallback(C *component, void (C::*function)(const Header& header, const P* packet)) : 
-			component(static_cast<Communicatable *>(component)),
+			component(reinterpret_cast<Communicatable *>(component)),
 			function(reinterpret_cast<Function>(function)),
 			packetSize(sizeof(P))
 		{
@@ -79,7 +79,7 @@ namespace xpcc
 		 */
 		template <typename C>
 		ActionCallback(C *component, void (C::*function)(const Header& header)) :
-			component(static_cast<Communicatable *>(component)),
+			component(reinterpret_cast<Communicatable *>(component)),
 			function(reinterpret_cast<Function>(function)),
 			packetSize(0)
 		{

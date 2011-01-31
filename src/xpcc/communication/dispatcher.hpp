@@ -169,7 +169,8 @@ namespace xpcc
 		addMessage(const Header& header, SmartPointer& smartPayload);
 		
 		void
-		addMessage(const Header& header, SmartPointer& smartPayload, ResponseCallback& responseCallback);
+		addMessage(const Header& header, SmartPointer& smartPayload,
+				ResponseCallback& responseCallback);
 		
 		void
 		addResponse(const Header& header, SmartPointer& smartPayload);

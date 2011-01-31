@@ -32,10 +32,11 @@
 
 #include "communicator.hpp"
 
+// ----------------------------------------------------------------------------
 xpcc::Communicator::Communicator(
 		const uint8_t ownIdentifier,
-		Dispatcher *communication) : 
-	ownIdentifier(ownIdentifier), communication(communication)
+		Dispatcher *dispatcher) : 
+	ownIdentifier(ownIdentifier), dispatcher(dispatcher)
 {
 }
 
@@ -43,68 +44,61 @@ xpcc::Communicator::Communicator(
 void
 xpcc::Communicator::callAction(uint8_t receiver, uint8_t actionIdentifier)
 {
-	Header header(Header::REQUEST,
-			false,
+	Header header(Header::REQUEST, false,
 			receiver,
 			this->ownIdentifier,
 			actionIdentifier);
 	
 	SmartPointer payload;
-	this->communication->addMessage(header, payload);
+	this->dispatcher->addMessage(header, payload);
 }
 
 void
 xpcc::Communicator::callAction(uint8_t receiver, uint8_t actionIdentifier, ResponseCallback& responseCallback)
 {
-	Header header(Header::REQUEST,
-			false,
+	Header header(Header::REQUEST, false,
 			receiver,
 			this->ownIdentifier,
 			actionIdentifier);
 	
 	SmartPointer payload;
-	this->communication->addMessage(header, payload, responseCallback);
+	this->dispatcher->addMessage(header, payload, responseCallback);
 }
-
 
 // ----------------------------------------------------------------------------
 void
 xpcc::Communicator::publishEvent(uint8_t eventIdentifier)
 {
-	Header header(Header::REQUEST,
-			false,
+	Header header(Header::REQUEST, false,
 			0,
 			this->ownIdentifier,
 			eventIdentifier);
 	
 	SmartPointer payload;
-	this->communication->addMessage(header, payload);
+	this->dispatcher->addMessage(header, payload);
 }
-
 
 // ----------------------------------------------------------------------------
 void
 xpcc::Communicator::sendResponse(const ResponseHandle& handle)
 {
-	Header header(	Header::RESPONSE,
-					false,
-					handle.source,
-					handle.destination,
-					handle.packetIdentifier);
+	Header header(Header::RESPONSE, false,
+			handle.source,
+			handle.destination,
+			handle.packetIdentifier);
 	
 	SmartPointer payload;
-	this->communication->addResponse(header, payload);
+	this->dispatcher->addResponse(header, payload);
 }
 
 void
 xpcc::Communicator::sendNegativeResponse(const ResponseHandle& handle)
 {
-	Header header(	Header::NEGATIVE_RESPONSE,
-					false,
-					handle.source,
-					handle.destination,
-					handle.packetIdentifier);
+	Header header(Header::NEGATIVE_RESPONSE, false,
+			handle.source,
+			handle.destination,
+			handle.packetIdentifier);
 	
 	SmartPointer payload;
-	this->communication->addResponse(header, payload);
+	this->dispatcher->addResponse(header, payload);
 }
