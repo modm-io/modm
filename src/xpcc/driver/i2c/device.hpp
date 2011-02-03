@@ -33,7 +33,7 @@
 #ifndef XPCC_I2C__DEVICE_HPP
 #define XPCC_I2C__DEVICE_HPP
 
-#include "i2c.hpp"
+#include "interface.hpp"
 
 namespace xpcc
 {
@@ -42,6 +42,8 @@ namespace xpcc
 		/**
 		 * \brief	Base class for all I2C Devices
 		 * 
+		 * \tparam	I2C		Must be a driver that implements the
+		 * 					xpcc::i2c::SynchronousMaster interface.
 		 * 
 		 * \ingroup	i2c
 		 * \author	Fabian Greif

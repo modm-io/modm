@@ -3,8 +3,9 @@
 #define NIBO_CONFIG_HPP
 
 #include <xpcc/architecture/driver/gpio.hpp>
+#include <xpcc/architecture/driver/atmega/twi_master.hpp>
 
-namespace nibo
+namespace nibo2
 {
 	GPIO__OUTPUT(FloorEnable, F, 6);
 	GPIO__INPUT(Button, D, 4);

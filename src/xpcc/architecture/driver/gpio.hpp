@@ -39,7 +39,7 @@
 
 /**
  * \ingroup		architecture
- * \defgroup	gpio	General purpose input and/or output pins
+ * \defgroup	gpio	(GPIO) General purpose input and/or output pins
  * 
  * These macros/classes are used to create architecture independent
  * definitions for hardware pins which then can be used as template

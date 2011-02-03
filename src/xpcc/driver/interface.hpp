@@ -55,7 +55,7 @@ namespace xpcc
 	 * methods of the base class and this will lead to Linker errors because
 	 * of the missing implementation.
 	 * 
-	 * \ingroup	interface
+	 * \ingroup	driver
 	 */
 	class Interface
 	{

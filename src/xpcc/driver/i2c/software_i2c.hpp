@@ -34,7 +34,7 @@
 #define XPCC__SOFTWARE_I2C_HPP
 
 #include <xpcc/architecture/driver/time.hpp>
-#include "i2c.hpp"
+#include "interface.hpp"
 
 namespace xpcc
 {
@@ -94,44 +94,24 @@ namespace xpcc
 	class SoftwareI2C : public i2c::SynchronousMaster
 	{
 	public:
+		/**
+		 * \brief	Initialize the hardware
+		 */
 		static void
 		initialize();
 		
-		/**
-		 * \brief	Generate a start condition
-		 * 
-		 * \param	address		Address of the device
-		 * \return	\c true if the slave with the given address is present,
-		 * 			\c false otherwise
-		 */
 		static bool
 		start(uint8_t address);
 		
-		/**
-		 * \brief	Generate a repeated start condition
-		 * 
-		 * \param	address		Address of the device
-		 * \return	\c true if the slave with the given address is present,
-		 * 			\c false otherwise
-		 * \see		start()
-		 */
 		static bool
 		repeatedStart(uint8_t address);
 		
-		/**
-		 * \brief	Write one byte
-		 * 
-		 * \return	\c true if the slave signals an acknowledge,
-		 * 			\c false otherwise
-		 */
 		static bool
 		write(uint8_t data);
 		
-		/// Read one byte
 		static uint8_t
 		read(bool ack);
 		
-		/// Generate a stop condition
 		static void
 		stop();
 		

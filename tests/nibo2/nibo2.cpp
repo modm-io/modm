@@ -4,14 +4,18 @@
 
 #include "image/startscreen.hpp"
 
-#include "nibo.hpp"
+#include "nibo2.hpp"
 
 // ----------------------------------------------------------------------------
-nibo::Display Nibo::display;
+nibo2::Display Nibo2::display;
 //xpcc::BufferedUart1 Nibo::uart(38400);
-xpcc::BufferedUart1 Nibo::uart(19200);
+xpcc::BufferedUart1 Nibo2::uart(19200);
+//xpcc::AsynchronousTwiMaster Nibo2::twi;
 
-xpcc::PeriodicTimer<> Nibo::displayTimer(500);
+xpcc::SynchronousTwiMaster Nibo2::twiMaster;
+xpcc::i2c::AsynchronousInterface<xpcc::SynchronousTwiMaster> Nibo2::twi;
+
+xpcc::PeriodicTimer<> Nibo2::displayTimer(500);
 
 // ----------------------------------------------------------------------------
 // used as a timebase, interrupt every 1ms
@@ -22,7 +26,7 @@ ISR(TIMER1_OVF_vect)
 
 // ----------------------------------------------------------------------------
 void
-Nibo::initialize()
+Nibo2::initialize()
 {
 	// Configure LEDs
 	PORTC = 0;
@@ -60,8 +64,8 @@ Nibo::initialize()
 	nibo::Sck::setOutput();
 	nibo::SlaveSelect::set();
 	nibo::SlaveSelect::setOutput();*/
-	nibo::SlaveReset::set();
-	nibo::SlaveReset::setOutput();
+	nibo2::SlaveReset::set();
+	nibo2::SlaveReset::setOutput();
 	
 	// TODO SPI Interrupt etc.
 	
@@ -69,14 +73,14 @@ Nibo::initialize()
 	// Pulling down the SlaveReset line with SlaveSelect high will reset only
 	// the co-processor but not the LCD. Pulling both lines down will reset
 	// both. This needs to be done before the LCD initialization.
-	nibo::SlaveReset::reset();
-	nibo::SlaveSelect::setOutput();
-	nibo::SlaveSelect::reset();
+	nibo2::SlaveReset::reset();
+	nibo2::SlaveSelect::setOutput();
+	nibo2::SlaveSelect::reset();
 	xpcc::delay_ms(100);
 	
-	nibo::SlaveSelect::set();
-	nibo::SlaveSelect::setInput();
-	nibo::SlaveReset::set();
+	nibo2::SlaveSelect::set();
+	nibo2::SlaveSelect::setInput();
+	nibo2::SlaveReset::set();
 	xpcc::delay_ms(50);
 	
 	display.initialize();
@@ -85,13 +89,19 @@ Nibo::initialize()
 	
 	display.update();
 	
+	// Set up TWI to 400kHz => twbr = 12, twps = 0
+	//               100kHz => twbr = 72, twps = 0
+	//Nibo2::twi.initialize(12, 0);
+	//Nibo2::twi.initialize(72, 0);
+	Nibo2::twiMaster.initialize(72, 0);
+	
 	// Enable interrupts
 	sei();
 }
 
 // ----------------------------------------------------------------------------
 void
-Nibo::update()
+Nibo2::update()
 {
 	if (displayTimer.isExpired()) {
 		display.update();
@@ -101,7 +111,7 @@ Nibo::update()
 
 // ----------------------------------------------------------------------------
 void
-Nibo::setStatusLed(Led led, Color color)
+Nibo2::setStatusLed(Led led, Color color)
 {
 	// green
 	if (color & 0x01) {
@@ -122,28 +132,28 @@ Nibo::setStatusLed(Led led, Color color)
 
 // ----------------------------------------------------------------------------
 void
-Nibo::setStatusLedIntensity(uint8_t intensity)
+Nibo2::setStatusLedIntensity(uint8_t intensity)
 {
 	OCR1C = calculateCompareValue(intensity);
 }
 
 // ----------------------------------------------------------------------------
 void
-Nibo::setHeadlights(uint8_t intensity)
+Nibo2::setHeadlights(uint8_t intensity)
 {
 	OCR1A = calculateCompareValue(intensity);
 }
 
 // ----------------------------------------------------------------------------
 void
-Nibo::setDisplayBacklight(uint8_t intensity)
+Nibo2::setDisplayBacklight(uint8_t intensity)
 {
 	OCR1B = calculateCompareValue(intensity);
 }
 
 // ----------------------------------------------------------------------------
 uint16_t
-Nibo::calculateCompareValue(uint8_t intensity)
+Nibo2::calculateCompareValue(uint8_t intensity)
 {
 	uint16_t ocr = (intensity * intensity) / 10;
 	if (ocr > 1000) {

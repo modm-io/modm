@@ -1,14 +1,14 @@
 
-#ifndef NIBO_HPP
-#define NIBO_HPP
+#ifndef NIBO2_HPP
+#define NIBO2_HPP
 
 #include <xpcc/driver/lcd/ks0108.hpp>
 #include <xpcc/architecture/driver/atmega/uart.hpp>
 #include <xpcc/workflow/periodic_timer.hpp>
 
-#include "nibo_config.hpp"
+#include "nibo2_config.hpp"
 
-class Nibo
+class Nibo2
 {
 public:
 	enum Led
@@ -77,15 +77,18 @@ public:
 	setDisplayBacklight(uint8_t intensity);
 	
 public:
-	static nibo::Display display;
+	static nibo2::Display display;
 	static xpcc::BufferedUart1 uart;
 	
+	static xpcc::SynchronousTwiMaster twiMaster;
+	static xpcc::i2c::AsynchronousInterface<xpcc::SynchronousTwiMaster> twi;
+	//static xpcc::AsynchronousTwiMaster twi;
+	
 private:
-	/// TODO
 	static uint16_t
 	calculateCompareValue(uint8_t intensity);
 	
 	static xpcc::PeriodicTimer<> displayTimer;
 };
 
-#endif // NIBO_HPP
+#endif // NIBO2_HPP
