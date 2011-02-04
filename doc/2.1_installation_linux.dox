@@ -50,6 +50,35 @@ For more information on the parameter this read the chapter about
 
 \section avrdude avrdude and USB programmers
 
+If you want to use an Xmega bootloader for your project, you need to compile a patched version of avrdude 5.10.
+Here is a small guide for Ubuntu 10.10:
+
+Install the dependecies:
+\verbatim
+sudo aptitude install byacc flex libusb-dev
+\endverbatim
+
+Get the latest version of the <a href="http://download.savannah.gnu.org/releases/avrdude/">avrdude source</a>.
+Get the <a href="https://savannah.nongnu.org/bugs/download.php?file_id=20392">Xmega bootloader patch</a> (<a href="https://savannah.nongnu.org/bugs/?28744">discussion</a>)
+
+Place the patch file in the extracted avrdude source folder and run:
+\verbatim
+patch -i xmega_boot_rev3.patch
+\endverbatim
+
+Check if avrdude will be compiled with usb support using libusb:
+\verbatim
+./configure | grep usb
+\endverbatim
+
+If it says 'yes', then finish the installation:
+\verbatim
+make && sudo make install
+\endverbatim
+
+Voilá.
+
+
 When using Ubuntu avrdude might not detect USB programmers out of the box. The
 problem is that it has not the necessary permission. To allow avrdude to access
 USB programmers do the following:
