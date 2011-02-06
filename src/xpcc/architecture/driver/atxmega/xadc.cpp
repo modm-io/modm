@@ -30,13 +30,13 @@
 #include "xadc.hpp"
 
 // ----------------------------------------------------------------------------
-xpcc::xAdc::xAdc(ADC_t &module)
+xpcc::XAdc::XAdc(ADC_t &module)
 : module(module)
 {
 }
 
 void
-xpcc::xAdc::initialize(uint8_t reference, ADC_PRESCALER_t prescaler)
+xpcc::XAdc::initialize(uint8_t reference, ADC_PRESCALER_t prescaler)
 {
     module.CTRLA = ADC_ENABLE_bm;
     module.REFCTRL = reference;
@@ -44,105 +44,105 @@ xpcc::xAdc::initialize(uint8_t reference, ADC_PRESCALER_t prescaler)
 }
 
 void
-xpcc::xAdc::setEnable(bool enable)
+xpcc::XAdc::setEnable(bool enable=true)
 {
     module.CTRLA = (module.CTRLA & ~ADC_ENABLE_bm) | (enable?ADC_ENABLE_bm:0);
 }
 
 void
-xpcc::xAdc::flush()
+xpcc::XAdc::flush()
 {
     module.CTRLA |= ADC_FLUSH_bm;
 }
 
 void
-xpcc::xAdc::setDMARequest(ADC_DMASEL_t selection)
+xpcc::XAdc::setDMARequest(ADC_DMASEL_t selection=ADC_DMASEL_OFF_gc)
 {
     module.CTRLA = (module.CTRLA & ~ADC_DMASEL_gm) | selection;
 }
 
 void
-xpcc::xAdc::setConversionMode(bool unsgnd)
+xpcc::XAdc::setConversionMode(bool unsgnd=true)
 {
     module.CTRLB = (module.CTRLB & ~ADC_CONMODE_bm) | (unsgnd?ADC_CONMODE_bm:0);
 }
 
 void
-xpcc::xAdc::setFreeRunningMode(bool enable)
+xpcc::XAdc::setFreeRunningMode(bool enable=true)
 {
     module.CTRLB = (module.CTRLB & ~ADC_FREERUN_bm) | (enable?ADC_FREERUN_bm:0);
 }
 
 void
-xpcc::xAdc::setResolution(ADC_RESOLUTION_t resolution)
+xpcc::XAdc::setResolution(ADC_RESOLUTION_t resolution=ADC_RESOLUTION_12BIT_gc)
 {
     module.CTRLB = (module.CTRLB & ~ADC_RESOLUTION_gm) | resolution;
 }
 
 void
-xpcc::xAdc::setReference(uint8_t reference)
+xpcc::XAdc::setReference(uint8_t reference=ADC_REFSEL_VCC_gc)
 {
     module.REFCTRL = reference;
 }
 
 void
-xpcc::xAdc::setChannelEvent(uint8_t mode)
+xpcc::XAdc::setChannelEvent(uint8_t mode)
 {
     module.EVCTRL = (module.EVCTRL & ~(ADC_EVACT_gm|ADC_EVSEL_gm)) | mode;
 }
 
 void
-xpcc::xAdc::setChannelSweep(ADC_SWEEP_t sweep)
+xpcc::XAdc::setChannelSweep(ADC_SWEEP_t sweep)
 {
     module.EVCTRL = (module.EVCTRL & ~ADC_SWEEP_gm) | sweep;
 }
 
 void
-xpcc::xAdc::setPrescaler(ADC_PRESCALER_t prescaler)
+xpcc::XAdc::setPrescaler(ADC_PRESCALER_t prescaler=ADC_PRESCALER_DIV512_gc)
 {
     module.PRESCALER = (module.PRESCALER & ~ADC_PRESCALER_gm) | prescaler;
 }
 
 
 // ----------------------------------------------------------------------------
-xpcc::xAdcChannel::xAdcChannel(ADC_CH_t &channel)
+xpcc::XAdcChannel::XAdcChannel(ADC_CH_t &channel)
 : channel(channel)
 {
 }
 
 void
-xpcc::xAdcChannel::setInputMode(ADC_CH_INPUTMODE_t mode)
+xpcc::XAdcChannel::setInputMode(ADC_CH_INPUTMODE_t mode=ADC_CH_INPUTMODE_SINGLEENDED_gc)
 {
     channel.CTRL = (channel.CTRL & ~ADC_CH_INPUTMODE_gm) | mode;
 }
 
 void
-xpcc::xAdcChannel::setGainFactor(ADC_CH_GAIN_t mode)
+xpcc::XAdcChannel::setGainFactor(ADC_CH_GAIN_t factor=ADC_CH_GAIN_1X_gc)
 {
-    channel.CTRL = (channel.CTRL & ~ADC_CH_GAINFAC_gm) | mode;
+    channel.CTRL = (channel.CTRL & ~ADC_CH_GAINFAC_gm) | factor;
 }
 
 void
-xpcc::xAdcChannel::startConversion()
+xpcc::XAdcChannel::startConversion()
 {
     channel.INTFLAGS = 0;
     channel.CTRL |= ADC_CH_START_bm;
 }
 
 void
-xpcc::xAdcChannel::setMux(uint8_t selection)
+xpcc::XAdcChannel::setMux(uint8_t selection)
 {
     channel.MUXCTRL = selection;
 }
 
 void
-xpcc::xAdcChannel::enableInterrupt(uint8_t level)
+xpcc::XAdcChannel::enableInterrupt(uint8_t level=ADC_CH_INTLVL_OFF_gc)
 {
     channel.INTCTRL = level;
 }
 
 uint16_t
-xpcc::xAdcChannel::readChannel()
+xpcc::XAdcChannel::read()
 {
     startConversion();
     while (!isFinished())
@@ -151,13 +151,13 @@ xpcc::xAdcChannel::readChannel()
 }
 
 bool
-xpcc::xAdcChannel::isFinished()
+xpcc::XAdcChannel::isFinished()
 {
     return (channel.INTFLAGS & ADC_CH_CHIF_bm);
 }
 
 uint16_t
-xpcc::xAdcChannel::getValue()
+xpcc::XAdcChannel::getValue()
 {
     {
         xpcc::atomic::Lock lock;

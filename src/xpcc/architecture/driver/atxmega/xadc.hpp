@@ -42,31 +42,35 @@ namespace xpcc
 	 * ADC clock frequency should be at around 62kHz for maximum
 	 * resolution. If less than 12 bits are needed the frequency can be higher.
      * A differential input in signed mode increases accuracy by up to 6 bit (!).
-     * \sa http://blog.frankvh.com/2010/01/03/atmel-xmega-adc-problems-solutions/
+     * \sa <a href="http://blog.frankvh.com/2010/01/03/atmel-xmega-adc-problems-solutions/">
+     *                                  Xmega ADC Problems and Solutions</a>
 	 *
      * The Xmega ADC is more complex than the Mega ADC, and each ADC Module has
-     * four ADC Channels which have to a seperate class.
+     * four ADC Channels which have a seperate class.
      * You first have to initialize the ADC Module to use any of the Channels.
      *
 	 * \code
      * #include <xpcc/architecture/driver/atxmega/xadc.hpp>
      *
      * int main {
-     *     xpcc::xAdc adcA(ADCA);
+     *     ...
+     *     xpcc::XAdc adcA(ADCA);
      *
      *     adcA.initialize(ADC_REFSEL_AREFA_gc);    // PortA AVcc
-     *     adcA.setConversionMode(true);            // Signed conversion
+     *     adcA.setConversionMode(true);            // Signed conversion mode
+     *     ...
      * }
      * \endcode
 	 *
      * \sa AVR1300
+     * \sa XAdcChannel
 	 * \author Niklas Hauser
 	 * \ingroup	atxmega
 	 */
-	class xAdc
+	class XAdc
 	{
 	public:
-        xAdc(ADC_t &module);
+        XAdc(ADC_t &module);
         
         void
         initialize(uint8_t reference=ADC_REFSEL_VCC_gc)
@@ -92,7 +96,7 @@ namespace xpcc
         void
         setConversionMode(bool);
         
-        /// Enable free running mode as defined in \c setChannelSweep.
+        /// Enable free running mode as defined in setChannelSweep.
         void
         setFreeRunningMode(bool);
         
@@ -127,26 +131,31 @@ namespace xpcc
      * #include <xpcc/architecture/driver/atxmega/xadc.hpp>
      * 
      * int main {
-     *     xpcc::xAdc adcA(ADCA);
+     *     ...
+     *     xpcc::XAdc adcA(ADCA);
      *
      *     adcA.initialize(ADC_REFSEL_AREFA_gc);    // PortA AVcc
-     *     adcA.setConversionMode(true);            // Signed conversion
+     *     adcA.setConversionMode(true);            // Signed conversion mode
      *
-     *     xpcc::xAdcChannel myChannel(ADCA.CH0);
-     *
+     *     xpcc::XAdcChannel myChannel(ADCA.CH0);   // Channel Zero of ADCA
+     *     // Differential input mode
      *     myChannel.setInputMode(ADC_CH_INPUTMODE_DIFF_gc);
      *     myChannel.setMux(ADC_CH_MUXPOS_PIN4_gc|ADC_CH_MUXNEG_PIN3_gc);
+     *     // The result is always unsigned, so you want to cast it in signed mode
+     *     int16_t result = (int16_t) myChannel.read();
+     *     ...
      * }
      * \endcode
 	 *
      * \sa AVR1300
+     * \sa XAdc
 	 * \author Niklas Hauser
 	 * \ingroup	atxmega
 	 */
-    class xAdcChannel
+    class XAdcChannel
     {
     public:
-        xAdcChannel(ADC_CH_t&);
+        XAdcChannel(ADC_CH_t&);
         
         /// Select between single ended, differential (with gain)
         void
@@ -165,7 +174,7 @@ namespace xpcc
         
         /// Read the value an analog channel
         uint16_t
-		readChannel();
+		read();
         
         /// Start a new conversion
         void
