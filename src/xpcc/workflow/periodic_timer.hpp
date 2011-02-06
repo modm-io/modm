@@ -69,6 +69,10 @@ namespace xpcc
 		void
 		restart(const Timestamp interval);
 		
+		/// Start the timer with the actual interval.
+		void
+		restart();
+
 		/**
 		 * \brief	Check if a new period has started
 		 * 
