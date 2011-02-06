@@ -27,7 +27,7 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 // ----------------------------------------------------------------------------
-#include "adc.hpp"
+#include "xadc.hpp"
 
 // ----------------------------------------------------------------------------
 xpcc::xAdc::xAdc(ADC_t &module)
