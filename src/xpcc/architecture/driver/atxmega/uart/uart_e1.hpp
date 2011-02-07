@@ -38,7 +38,7 @@ namespace xpcc
 {
 	/**
 	 * \brief		UARTE1
-	 * \ingroup		atxmega
+	 * \ingroup		atxmega_uart
 	 */
 	class UartE1
 	{
@@ -97,7 +97,7 @@ namespace xpcc
 	 * 
 	 * This implementation uses a ringbuffer.
 	 * 
-	 * \ingroup	atxmega
+	 * \ingroup	atxmega_uart
 	 */
 	class BufferedUartE1
 	{
@@ -170,12 +170,15 @@ namespace xpcc
 	// ------------------------------------------------------------------------
 	/**
 	 * \brief		UARTE1 in SPI master mode
-	 * \ingroup		atxmega
+	 * 
+	 * \ingroup		atxmega_spi
+	 * \ingroup		atxmega_uart
 	 */
 	class UartSpiE1
 	{
 	public:
-		UartSpiE1() {
+		UartSpiE1()
+		{
 			this->initialize();
 		}
 		

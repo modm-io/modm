@@ -220,7 +220,7 @@ namespace xpcc
 			 * 
 			 * \param	address		7-bit address of the slave device.
 			 * 						LSB must be zero.
-			 * \param[in/out] *data	Buffer for sending/receiving 		
+			 * \param[in,out] *data	Buffer for sending/receiving 		
 			 * \param	writeSize	Number of bytes to write
 			 * \param	readSize	Number of bytes to read afterwards
 			 */

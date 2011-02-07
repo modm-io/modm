@@ -40,11 +40,22 @@ namespace xpcc
 	/**
 	 * \brief		Software timer
 	 * 
+	 * Extra care must be taken when not calling the isExpired() method
+	 * for more than ~30000 ticks (which corresponds to about 30s with the
+	 * default millisecond resolution). Due to an overflow in the implementation
+	 * this might add an additional delay of up to ~30000 ticks in the worst
+	 * case.
+	 * Just call restart() without any parameter before reusing the timer
+	 * to avoid this behaviour.
+	 * 
+	 * This won't happen during normal operation.
+	 * 
 	 * \warning	Never use this timer when a precise timebase is needed!
 	 * 
 	 * \tparam	T	Used timer, default is xpcc::Clock() which should have
 	 * 				a millisecond resolution.
 	 * 
+	 * \see		Timeout
 	 * \author	Fabian Greif
 	 * \ingroup	workflow
 	 */
@@ -65,14 +76,14 @@ namespace xpcc
 		inline bool
 		isRunning() const;
 		
+		/// Restart the current interval.
+		void
+		restart();
+		
 		/// Set a new interval
 		void
 		restart(const Timestamp interval);
 		
-		/// Start the timer with the actual interval.
-		void
-		restart();
-
 		/**
 		 * \brief	Check if a new period has started
 		 * 

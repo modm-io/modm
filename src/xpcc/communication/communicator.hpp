@@ -57,7 +57,7 @@ namespace xpcc
 		 * 
 		 * \param	ownIdentifier	Identifier of the component, must be unique
 		 * 							within the network.
-		 * \param	communication	Communication class use to send messages
+		 * \param	dispatcher		Communication class use to send messages
 		 */
 		Communicator(const uint8_t ownIdentifier,
 				Dispatcher *dispatcher);

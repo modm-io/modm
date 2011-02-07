@@ -44,6 +44,16 @@ namespace xpcc
 	 *
 	 * Has to be polled to check if it has expired.
 	 * 
+	 * Extra care must be taken when not calling the isExpired() method
+	 * for more than ~30000 ticks (which corresponds to about 30s with the
+	 * default millisecond resolution) when the timeout is active. Due to an
+	 * overflow in the implementation this might add an additional delay of
+	 * up to ~30000 ticks in the worst case.
+	 * 
+	 * Call isExpired() at least once every 30000 ticks before the timeout
+	 * value is reached to avoid this behaviour.
+	 * 
+	 * \see		PeriodicTimer
 	 * \tparam	T	Used timer, default is xpcc::Clock() which has 
 	 * 				a millisecond resolution.
 	 * 

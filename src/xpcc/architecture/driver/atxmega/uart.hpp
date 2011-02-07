@@ -30,6 +30,12 @@
  */
 // ----------------------------------------------------------------------------
 
+/**
+ * \ingroup		atxmega
+ * \defgroup	atxmega_uart	ATxmega UART module
+ * 
+ */
+
 #include "uart/uart_c0.hpp"
 #include "uart/uart_c1.hpp"
 #include "uart/uart_d0.hpp"

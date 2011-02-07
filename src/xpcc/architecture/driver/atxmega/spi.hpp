@@ -36,22 +36,21 @@
 #include <avr/io.h>
 #include <stdint.h>
 
-//SPIC.CTRL = SPI_CLK2X_bm // double speed
-//			| SPI_ENABLE_bm
-//				| SPI_DORD_bm  // lsb first
-//				| SPI_MASTER_bm  // master mode
-//				| SPI_MODE_x_gc  // timing / transfair mode slect
-//				| SPI_PRESCALER_DIVxx_gc  // no effect in slave mode
-//			;
-//	SPIC.INTCTRL = SPI_INTLVL_OFF_gc;  // interrupt level configuration
-//	SPIC.STATUS | SPI_IF_bm | SPI_WRCOL_bm interrupt flags
+// ----------------------------------------------------------------------------
+/**
+ * \ingroup		atxmega
+ * \defgroup	atxmega_spi		ATxmega SPI module
+ * 
+ * 
+ */
 
+// ----------------------------------------------------------------------------
 /**
  * \brief	Create a spi module
  * 
  * initialize method configures module in slave mode_0
  * 
- * \ingroup	atxmega
+ * \ingroup	atxmega_spi
  */
 #define	CREATE_SPI_MODULE(name, moduleBase) \
 	struct name { \
@@ -93,7 +92,7 @@
 
 /**
  * \brief	Create a spi module in master mode
- * \ingroup	atxmega
+ * \ingroup	atxmega_spi
  */
 #define	CREATE_SPI_MASTER_MODULE(name, moduleBase, prescaler) \
 	struct name { \
