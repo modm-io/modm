@@ -36,11 +36,89 @@
 #include <avr/io.h>
 #include <stdint.h>
 
+#if __DOXYGEN__
+
 /**
- * \brief	Create a spi module in master mode
+ * SPI Master Module
+ *
+ * This SPI hardware implementation is compatible with both Software SPI as
+ * well as Uart SPI.
+ * The write method is blocking until the SPI Interrupt Flag is set (=> SPI
+ * transfer is complete).
+ * It can be used for higher SPI clock speeds than feaseable with Software SPI.
+ *
+ * \bug Loss of GPIO functionality on Slave Select Pin (Pin 4). This pin must be
+ *      pulled high even when configured as an output, contrary to the manual.
+ *
+ * \code
+ * #include <xpcc/architecture/driver/atxmega/spi.hpp>
+ *
+ * int main {
+ *     ...
+ *     SPI_MASTER(Spi, E, SPI_PRESCALER_DIV64_gc);
+ *
+ *     Spi::initialize();
+ *     uint8_t result = Spi::write(0xf3);   // write a byte
+ *     ...
+ * }
+ * \endcode
+ *
+ * Create a new class with the following methods:
+ * \code
+ * class name
+ * {
+ * public:
+ *     static inline SPI_t
+ *     &getModuleBase();
+ *
+ *     // Enable the SPI module.
+ *     static inline void
+ *     setEnable(bool);
+ *
+ *     static inline void
+ *     setMaster(bool);
+ *
+ *     static inline void
+ *     setPrescaler(SPI_PRESCALER_t);
+ *
+ *     static inline void
+ *     setDoubleSpeed(bool);
+ *
+ *     static inline void
+ *     setDataOrder(bool);
+ *
+ *     static inline void
+ *     setMode(SPI_MODE_t);
+ *
+ *     static inline void
+ *     enableInterrupt(SPI_INTLVL_t);
+ *
+ *     // clears interrupt flag and returns true if it was set
+ *     static inline void
+ *     isInterrupt();
+ *
+ *     // initiates a SPI transfer and returns the received byte
+ *     static inline uint8_t
+ *     write(uint8_t);
+ *
+ *     static inline void
+ *     initialize(SPI_MODE_t mode, SPI_PRESCALER_t _prescaler);
+ *
+ *     static inline void
+ *     initialize(SPI_MODE_t mode = SPI_MODE_0_gc);
+ * };
+ * \endcode
+ *
+ * \sa AVR1309
+ * \sa xpcc::SoftwareSpi
+ * \author Niklas Hauser
  * \ingroup	atxmega
  */
-#define	SPI_MASTER(name, port, prescaler) \
+#define	SPI_MASTER(name, port, prescaler)
+
+#else   // !__DOXYGEN__
+
+#define	SPI_MASTER(name, port, prescaler)\
     struct name { \
         ALWAYS_INLINE static SPI_t &getModuleBase() { return SPI ## port; } \
         ALWAYS_INLINE static void setEnable(bool enable) { SPI ## port ## _CTRL = (SPI ## port ## _CTRL & ~SPI_ENABLE_bm) | (enable?SPI_ENABLE_bm:0); } \
@@ -83,4 +161,5 @@
         } \
     };
 
+#endif  // __DOXYGEN__
 #endif // XPCC__XMEGA_SPI_HPP
