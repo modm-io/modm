@@ -1,6 +1,6 @@
 // coding: utf-8
 // ----------------------------------------------------------------------------
-/* Copyright (c) 2009, Roboterclub Aachen e.V.
+/* Copyright (c) 2011, Roboterclub Aachen e.V.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -25,7 +25,7 @@
  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
+ * 
  * $Id$
  */
 // ----------------------------------------------------------------------------
@@ -36,103 +36,51 @@
 #include <avr/io.h>
 #include <stdint.h>
 
-// ----------------------------------------------------------------------------
-/**
- * \ingroup		atxmega
- * \defgroup	atxmega_spi		ATxmega SPI module
- * 
- * 
- */
-
-// ----------------------------------------------------------------------------
-/**
- * \brief	Create a spi module
- * 
- * initialize method configures module in slave mode_0
- * 
- * \ingroup	atxmega_spi
- */
-#define	CREATE_SPI_MODULE(name, moduleBase) \
-	struct name { \
-		ALWAYS_INLINE static SPI_t &getModuleBase() { return moduleBase; } \
-		ALWAYS_INLINE static void setEnable(bool enable) { moduleBase.CTRL = (moduleBase.CTRL & SPI_ENABLE_bm) | (enable?SPI_ENABLE_bm:0); } \
-		ALWAYS_INLINE static void setMaster(bool master) { moduleBase.CTRL = (moduleBase.CTRL & SPI_MASTER_bm) | (master?SPI_MASTER_bm:0); } \
-		ALWAYS_INLINE static void setPrescaler(SPI_PRESCALER_t prescaler) { moduleBase.CTRL = (moduleBase.CTRL & SPI_PRESCALER_gm) | prescaler; } \
-		ALWAYS_INLINE static void setDoubleSpeed(bool doubleSpeed) { moduleBase.CTRL = (moduleBase.CTRL & SPI_CLK2X_bm) | (doubleSpeed?SPI_CLK2X_bm:0); } \
-		ALWAYS_INLINE static void setDataOrder(bool LSBFirst) { moduleBase.CTRL = (moduleBase.CTRL & SPI_DORD_bm) | (LSBFirst?SPI_DORD_bm:0); } \
-		ALWAYS_INLINE static void setMode(SPI_MODE_t mode) { moduleBase.CTRL = (moduleBase.CTRL & SPI_MODE_gm) | mode; } \
-		ALWAYS_INLINE static void enableInterrupt(SPI_INTLVL_t level) { moduleBase.INTCTRL = (moduleBase.CTRL & SPI_INTLVL_gm) | level; } \
-		ALWAYS_INLINE static bool isInterrupt() { bool flag = moduleBase.STATUS & SPI_IF_bm; moduleBase.STATUS |= SPI_IF_bm; return flag; } \
-		\
-		static uint8_t \
-		write(uint8_t data) { \
-			moduleBase.STATUS &= SPI_IF_bm; \
-			moduleBase.DATA = data; \
-			while (! (moduleBase.STATUS & SPI_IF_bm)); \
-			return moduleBase.DATA; \
-		} \
-		\
-		static void \
-		initialize(SPI_MODE_t mode, SPI_PRESCALER_t prescaler) { \
-			moduleBase.CTRL = SPI_ENABLE_bm \
-							| SPI_CLK2X_bm \
-							| SPI_MASTER_bm \
-							| mode \
-							| prescaler \
-							; \
-		} \
-		\
-		static void \
-		initialize(SPI_MODE_t mode = SPI_MODE_0_gc) { \
-			moduleBase.CTRL = SPI_ENABLE_bm \
-							| mode \
-							; \
-		} \
-	};
-
 /**
  * \brief	Create a spi module in master mode
- * \ingroup	atxmega_spi
+ * \ingroup	atxmega
  */
-#define	CREATE_SPI_MASTER_MODULE(name, moduleBase, prescaler) \
-	struct name { \
-		ALWAYS_INLINE static SPI_t &getModuleBase() { return moduleBase; } \
-		ALWAYS_INLINE static void setEnable(bool enable) { moduleBase.CTRL = (moduleBase.CTRL & SPI_ENABLE_bm) | (enable?SPI_ENABLE_bm:0); } \
-		ALWAYS_INLINE static void setMaster(bool master) { moduleBase.CTRL = (moduleBase.CTRL & SPI_MASTER_bm) | (master?SPI_MASTER_bm:0); } \
-		ALWAYS_INLINE static void setPrescaler(SPI_PRESCALER_t prescaler) { moduleBase.CTRL = (moduleBase.CTRL & SPI_PRESCALER_gm) | prescaler; } \
-		ALWAYS_INLINE static void setDoubleSpeed(bool doubleSpeed) { moduleBase.CTRL = (moduleBase.CTRL & SPI_CLK2X_bm) | (doubleSpeed?SPI_CLK2X_bm:0); } \
-		ALWAYS_INLINE static void setDataOrder(bool LSBFirst) { moduleBase.CTRL = (moduleBase.CTRL & SPI_DORD_bm) | (LSBFirst?SPI_DORD_bm:0); } \
-		ALWAYS_INLINE static void setMode(SPI_MODE_t mode) { moduleBase.CTRL = (moduleBase.CTRL & SPI_MODE_gm) | mode; } \
-		ALWAYS_INLINE static void enableInterrupt(SPI_INTLVL_t level) { moduleBase.INTCTRL = (moduleBase.CTRL & SPI_INTLVL_gm) | level; } \
-		ALWAYS_INLINE static bool isInterrupt() { bool flag = moduleBase.STATUS & SPI_IF_bm; moduleBase.STATUS |= SPI_IF_bm; return flag; } \
-		\
-		static uint8_t \
-		put(uint8_t data) { \
-			moduleBase.STATUS &= SPI_IF_bm; \
-			moduleBase.DATA = data; \
-			while (! (moduleBase.STATUS & SPI_IF_bm)); \
-			return moduleBase.DATA; \
-		} \
-		\
-		static void \
-		initialize(SPI_MODE_t mode, SPI_PRESCALER_t _prescaler) { \
-			moduleBase.CTRL = SPI_ENABLE_bm \
-							| SPI_CLK2X_bm \
-							| SPI_MASTER_bm \
-							| mode \
-							| _prescaler \
-							; \
-		} \
-		\
-		static void \
-		initialize(SPI_MODE_t mode = SPI_MODE_0_gc) { \
-			moduleBase.CTRL = SPI_ENABLE_bm \
-							| SPI_CLK2X_bm \
-							| SPI_MASTER_bm \
-							| mode \
-							| prescaler \
-							; \
-		} \
-	};
+#define	SPI_MASTER(name, port, prescaler) \
+    struct name { \
+        ALWAYS_INLINE static SPI_t &getModuleBase() { return SPI ## port; } \
+        ALWAYS_INLINE static void setEnable(bool enable) { SPI ## port ## _CTRL = (SPI ## port ## _CTRL & ~SPI_ENABLE_bm) | (enable?SPI_ENABLE_bm:0); } \
+        ALWAYS_INLINE static void setMaster(bool master) { SPI ## port ## _CTRL = (SPI ## port ## _CTRL & ~SPI_MASTER_bm) | (master?SPI_MASTER_bm:0); } \
+        ALWAYS_INLINE static void setPrescaler(SPI_PRESCALER_t prescaler) { SPI ## port ## _CTRL = (SPI ## port ## _CTRL & ~SPI_PRESCALER_gm) | prescaler; } \
+        ALWAYS_INLINE static void setDoubleSpeed(bool doubleSpeed) { SPI ## port ## _CTRL = (SPI ## port ## _CTRL & ~SPI_CLK2X_bm) | (doubleSpeed?SPI_CLK2X_bm:0); } \
+        ALWAYS_INLINE static void setDataOrder(bool LSBFirst) { SPI ## port ## _CTRL = (SPI ## port ## _CTRL & ~SPI_DORD_bm) | (LSBFirst?SPI_DORD_bm:0); } \
+        ALWAYS_INLINE static void setMode(SPI_MODE_t mode) { SPI ## port ## _CTRL = (SPI ## port ## _CTRL & ~SPI_MODE_gm) | mode; } \
+        ALWAYS_INLINE static void enableInterrupt(SPI_INTLVL_t level) { SPI ## port ## _INTCTRL = (SPI ## port ## _CTRL & ~SPI_INTLVL_gm) | level; } \
+        ALWAYS_INLINE static bool isInterrupt() { bool flag = SPI ## port ## _STATUS & SPI_IF_bm; SPI ## port ## _DATA; return flag; } \
+        \
+        static uint8_t \
+        write(uint8_t data) { \
+            SPI ## port ## _STATUS; \
+            SPI ## port ## _DATA = data; \
+            while (!(SPI ## port ## _STATUS & SPI_IF_bm)); \
+            return SPI ## port ## _DATA; \
+        } \
+        \
+        static void \
+        initialize(SPI_MODE_t mode, SPI_PRESCALER_t _prescaler) { \
+            PORT ## port ## _DIRSET = (1 << 4); /* Slave Select Pin must remain high */ \
+            PORT ## port ## _DIRSET = (1 << 5); /* MOSI */ \
+            PORT ## port ## _DIRSET = (1 << 7); /* SCK */ \
+            SPI ## port ## _CTRL = SPI_ENABLE_bm \
+                                 | SPI_MASTER_bm \
+                                 | mode \
+                                 | _prescaler; \
+        } \
+        \
+        static void \
+        initialize(SPI_MODE_t mode = SPI_MODE_0_gc) { \
+            PORT ## port ## _DIRSET = (1 << 4); \
+            PORT ## port ## _DIRSET = (1 << 5); \
+            PORT ## port ## _DIRSET = (1 << 7); \
+            SPI ## port ## _CTRL = SPI_ENABLE_bm \
+                                 | SPI_MASTER_bm \
+                                 | mode \
+                                 | prescaler; \
+        } \
+    };
 
 #endif // XPCC__XMEGA_SPI_HPP
