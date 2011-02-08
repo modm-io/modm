@@ -34,7 +34,68 @@
 #include <avr/io.h>
 #include <stdint.h>
 
-#if __DOXYGEN__
+#ifndef __DOXYGEN__
+
+#define	ADC_MODULE(name, module) \
+    struct name { \
+        ALWAYS_INLINE static ADC_t &get() { return module; } \
+        ALWAYS_INLINE static void setEnable(bool enable=true) { \
+            module.CTRLA = (module.CTRLA & ~ADC_ENABLE_bm) | (enable?ADC_ENABLE_bm:0); } \
+        ALWAYS_INLINE static void flush() { module.CTRLA |= ADC_FLUSH_bm; } \
+        ALWAYS_INLINE static void setDMARequest(ADC_DMASEL_t selection=ADC_DMASEL_OFF_gc) { \
+            module.CTRLA = (module.CTRLA & ~ADC_DMASEL_gm) | selection; } \
+        ALWAYS_INLINE static void setConversionMode(bool unsgnd=true) { \
+            module.CTRLB = (module.CTRLB & ~ADC_CONMODE_bm) | (unsgnd?ADC_CONMODE_bm:0); } \
+        ALWAYS_INLINE static void setFreeRunningMode(bool enable=true) { \
+            module.CTRLB = (module.CTRLB & ~ADC_FREERUN_bm) | (enable?ADC_FREERUN_bm:0); } \
+        ALWAYS_INLINE static void setResolution(ADC_RESOLUTION_t resolution=ADC_RESOLUTION_12BIT_gc) { \
+            module.CTRLB = (module.CTRLB & ~ADC_RESOLUTION_gm) | resolution; } \
+        ALWAYS_INLINE static void setReference(uint8_t reference=ADC_REFSEL_VCC_gc) { \
+            module.REFCTRL = reference; } \
+        ALWAYS_INLINE static void setChannelEvent(uint8_t mode) { \
+            module.EVCTRL = (module.EVCTRL & ~(ADC_EVACT_gm|ADC_EVSEL_gm)) | mode; } \
+        ALWAYS_INLINE static void setChannelSweep(ADC_SWEEP_t sweep) { \
+            module.EVCTRL = (module.EVCTRL & ~ADC_SWEEP_gm) | sweep; } \
+        ALWAYS_INLINE static void setPrescaler(ADC_PRESCALER_t prescaler=ADC_PRESCALER_DIV512_gc) { \
+            module.PRESCALER = (module.PRESCALER & ~ADC_PRESCALER_gm) | prescaler; } \
+        \
+        ALWAYS_INLINE static void initialize(uint8_t reference=ADC_REFSEL_VCC_gc) { \
+            module.CTRLA = ADC_ENABLE_bm; \
+            module.REFCTRL = reference; \
+            module.PRESCALER = ADC_PRESCALER_DIV512_gc; } \
+        ALWAYS_INLINE static void initialize(uint8_t reference, ADC_PRESCALER_t prescaler) { \
+            module.CTRLA = ADC_ENABLE_bm; \
+            module.REFCTRL = reference; \
+            module.PRESCALER = prescaler; } \
+    };
+
+#define	ADC_CHANNEL(name, channel) \
+    struct name { \
+        ALWAYS_INLINE static ADC_CH_t &get() { return channel; } \
+        ALWAYS_INLINE static void setInputMode(ADC_CH_INPUTMODE_t mode=ADC_CH_INPUTMODE_SINGLEENDED_gc) { \
+            channel.CTRL = (channel.CTRL & ~ADC_CH_INPUTMODE_gm) | mode; } \
+        ALWAYS_INLINE static void setGainFactor(ADC_CH_GAIN_t factor=ADC_CH_GAIN_1X_gc) { \
+            channel.CTRL = (channel.CTRL & ~ADC_CH_GAINFAC_gm) | factor; } \
+        ALWAYS_INLINE static void setMux(uint8_t selection) { \
+            channel.MUXCTRL = selection; } \
+        ALWAYS_INLINE static void enableInterrupt(uint8_t level=ADC_CH_INTLVL_OFF_gc) { \
+            channel.INTCTRL = level; } \
+        ALWAYS_INLINE static uint16_t read() { \
+            channel.INTFLAGS = 0; \
+            channel.CTRL |= ADC_CH_START_bm; \
+            while(!(channel.INTFLAGS & ADC_CH_CHIF_bm)); \
+            return channel.RES; } \
+        ALWAYS_INLINE static void startConversion() { \
+            channel.INTFLAGS = 0; \
+            channel.CTRL |= ADC_CH_START_bm; } \
+        ALWAYS_INLINE static bool isFinished() { \
+            return (channel.INTFLAGS & ADC_CH_CHIF_bm); } \
+        ALWAYS_INLINE static uint16_t getValue() { \
+            return channel.RES; } \
+    };
+
+#else   // __DOXYGEN__
+
 /**
  * Analog/Digital Converter
  *
@@ -67,7 +128,7 @@
  * {
  * public:
  *     static inline ADC_t
- *     &getModule();
+ *     &get();
  *
  *     static inline void
  *     initialize(uint8_t reference=ADC_REFSEL_VCC_gc)
@@ -152,7 +213,7 @@
  * {
  * public:
  *     static inline ADC_CH_t
- *     &getChannel();
+ *     &get();
  *
  *     // Select between single ended, differential (with gain)
  *     static inline void
@@ -193,66 +254,6 @@
  * \ingroup	atxmega
  */
 #define	ADC_CHANNEL(name, channel)
-
-#else   // !__DOXYGEN__
-
-#define	ADC_MODULE(name, module) \
-    struct name { \
-        ALWAYS_INLINE static ADC_t &getModule() { return module; } \
-        ALWAYS_INLINE static void setEnable(bool enable=true) { \
-            module.CTRLA = (module.CTRLA & ~ADC_ENABLE_bm) | (enable?ADC_ENABLE_bm:0); } \
-        ALWAYS_INLINE static void flush() { module.CTRLA |= ADC_FLUSH_bm; } \
-        ALWAYS_INLINE static void setDMARequest(ADC_DMASEL_t selection=ADC_DMASEL_OFF_gc) { \
-            module.CTRLA = (module.CTRLA & ~ADC_DMASEL_gm) | selection; } \
-        ALWAYS_INLINE static void setConversionMode(bool unsgnd=true) { \
-            module.CTRLB = (module.CTRLB & ~ADC_CONMODE_bm) | (unsgnd?ADC_CONMODE_bm:0); } \
-        ALWAYS_INLINE static void setFreeRunningMode(bool enable=true) { \
-            module.CTRLB = (module.CTRLB & ~ADC_FREERUN_bm) | (enable?ADC_FREERUN_bm:0); } \
-        ALWAYS_INLINE static void setResolution(ADC_RESOLUTION_t resolution=ADC_RESOLUTION_12BIT_gc) { \
-            module.CTRLB = (module.CTRLB & ~ADC_RESOLUTION_gm) | resolution; } \
-        ALWAYS_INLINE static void setReference(uint8_t reference=ADC_REFSEL_VCC_gc) { \
-            module.REFCTRL = reference; } \
-        ALWAYS_INLINE static void setChannelEvent(uint8_t mode) { \
-            module.EVCTRL = (module.EVCTRL & ~(ADC_EVACT_gm|ADC_EVSEL_gm)) | mode; } \
-        ALWAYS_INLINE static void setChannelSweep(ADC_SWEEP_t sweep) { \
-            module.EVCTRL = (module.EVCTRL & ~ADC_SWEEP_gm) | sweep; } \
-        ALWAYS_INLINE static void setPrescaler(ADC_PRESCALER_t prescaler=ADC_PRESCALER_DIV512_gc) { \
-            module.PRESCALER = (module.PRESCALER & ~ADC_PRESCALER_gm) | prescaler; } \
-        \
-        ALWAYS_INLINE static void initialize(uint8_t reference=ADC_REFSEL_VCC_gc) { \
-            module.CTRLA = ADC_ENABLE_bm; \
-            module.REFCTRL = reference; \
-            module.PRESCALER = ADC_PRESCALER_DIV512_gc; } \
-        ALWAYS_INLINE static void initialize(uint8_t reference, ADC_PRESCALER_t prescaler) { \
-            module.CTRLA = ADC_ENABLE_bm; \
-            module.REFCTRL = reference; \
-            module.PRESCALER = prescaler; } \
-    };
-
-#define	ADC_CHANNEL(name, channel) \
-    struct name { \
-        ALWAYS_INLINE static ADC_CH_t &getChannel() { return channel; } \
-        ALWAYS_INLINE static void setInputMode(ADC_CH_INPUTMODE_t mode=ADC_CH_INPUTMODE_SINGLEENDED_gc) { \
-            channel.CTRL = (channel.CTRL & ~ADC_CH_INPUTMODE_gm) | mode; } \
-        ALWAYS_INLINE static void setGainFactor(ADC_CH_GAIN_t factor=ADC_CH_GAIN_1X_gc) { \
-            channel.CTRL = (channel.CTRL & ~ADC_CH_GAINFAC_gm) | factor; } \
-        ALWAYS_INLINE static void setMux(uint8_t selection) { \
-            channel.MUXCTRL = selection; } \
-        ALWAYS_INLINE static void enableInterrupt(uint8_t level=ADC_CH_INTLVL_OFF_gc) { \
-            channel.INTCTRL = level; } \
-        ALWAYS_INLINE static uint16_t read() { \
-            channel.INTFLAGS = 0; \
-            channel.CTRL |= ADC_CH_START_bm; \
-            while(!(channel.INTFLAGS & ADC_CH_CHIF_bm)); \
-            return channel.RES; } \
-        ALWAYS_INLINE static void startConversion() { \
-            channel.INTFLAGS = 0; \
-            channel.CTRL |= ADC_CH_START_bm; } \
-        ALWAYS_INLINE static bool isFinished() { \
-            return (channel.INTFLAGS & ADC_CH_CHIF_bm); } \
-        ALWAYS_INLINE static uint16_t getValue() { \
-            return channel.RES; } \
-    };
 
 #endif  // __DOXYGEN__
 #endif	// XPCC__ATXMEGA_ADC_HPP
