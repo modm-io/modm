@@ -27,6 +27,11 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 // ----------------------------------------------------------------------------
+/*
+ * WARNING: This file is generated automatically, do not edit!
+ * Please modify the corresponding *.in file instead and rebuild this file.
+ */
+// ----------------------------------------------------------------------------
 {{ generation_block }}
 
 #include <avr/io.h>
@@ -34,14 +39,14 @@
 
 #include <xpcc/architecture/driver/gpio.hpp>
 
-#include "uart_{{ id.lower() }}.hpp"
+#include "spi_{{ id.lower() }}.hpp"
 
 #ifdef SPI{{ id }}
 
 namespace
 {
 	GPIO__OUTPUT(SCK, {{ id }}, 7);
-	GPIO__INPUT(MISO, {{ id }}, 6);
+    GPIO__INPUT(MISO, {{ id }}, 6);
 	GPIO__OUTPUT(MOSI, {{ id }}, 5);
 	GPIO__OUTPUT(SS, {{ id }}, 4);
 }
@@ -51,11 +56,10 @@ void
 xpcc::SpiMaster{{ id }}::initialize(SPI_PRESCALER_t prescaler, 
 		bool doubleSpeed, SPI_MODE_t mode)
 {
-	SCK::setOutput();
-	MISO::setInput();
-	MOSI::setOutput();
 	SS::setOutput();
-	SS::set();
+	MOSI::setOutput();
+	SCK::setOutput();
+    MISO::configure(::xpcc::gpio::PULLUP);
 	
 	SPI{{ id }}_CTRL = SPI_ENABLE_bm | SPI_MASTER_bm | mode;
 	
@@ -72,22 +76,6 @@ xpcc::SpiMaster{{ id }}::write(uint8_t data)
 		;
 	
 	return SPI{{ id }}_DATA;
-}
-
-void
-xpcc::SpiMaster{{ id }}::setPrescaler(SPI_PRESCALER_t prescaler, bool doubleSpeed)
-{
-	uint8_t ctrl = SPI{{ id }}_CTRL & ~(SPI_PRESCALER_gm | SPI_CLK2X_bm);
-	
-	if (doubleSpeed) {
-		ctrl |= SPI_CLK2X_bm;
-	}
-	SPI{{ id }}_CTRL = ctrl | prescaler;
-}
-inline static void
-setDoubleSpeed(bool doubleSpeed)
-{
-	SPI{{ id }}_CTRL = (SPI{{ id }}_CTRL & ~SPI_CLK2X_bm) | (doubleSpeed ? SPI_CLK2X_bm : 0);
 }
 
 #endif // SPI{{ id }}

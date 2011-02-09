@@ -27,6 +27,11 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 // ----------------------------------------------------------------------------
+/*
+ * WARNING: This file is generated automatically, do not edit!
+ * Please modify the corresponding *.in file instead and rebuild this file.
+ */
+// ----------------------------------------------------------------------------
 
 
 #include <avr/io.h>
@@ -34,29 +39,31 @@
 
 #include <xpcc/architecture/driver/gpio.hpp>
 
-#include "uart_c.hpp"
+#include "spi_c.hpp"
 
 #ifdef SPIC
 
 namespace
 {
 	GPIO__OUTPUT(SCK, C, 7);
-	GPIO__INPUT(MISO, C, 6);
+    GPIO__INPUT(MISO, C, 6);
 	GPIO__OUTPUT(MOSI, C, 5);
 	GPIO__OUTPUT(SS, C, 4);
 }
 
 // ----------------------------------------------------------------------------
 void
-xpcc::SpiMasterC::initialize(SPI_PRESCALER_t prescaler, SPI_MODE_t mode)
+xpcc::SpiMasterC::initialize(SPI_PRESCALER_t prescaler, 
+		bool doubleSpeed, SPI_MODE_t mode)
 {
-	SCK::setOutput();
-	MISO::setInput();
-	MOSI::setOutput();
 	SS::setOutput();
-	SS::set();
+	MOSI::setOutput();
+	SCK::setOutput();
+    MISO::configure(::xpcc::gpio::PULLUP);
 	
-	SPIC_CTRL = SPI_ENABLE_bm | SPI_MASTER_bm | mode | prescaler;
+	SPIC_CTRL = SPI_ENABLE_bm | SPI_MASTER_bm | mode;
+	
+	setPrescaler(prescaler, doubleSpeed);
 }
 
 uint8_t

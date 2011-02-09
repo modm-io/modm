@@ -27,6 +27,11 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 // ----------------------------------------------------------------------------
+/*
+ * WARNING: This file is generated automatically, do not edit!
+ * Please modify the corresponding *.in file instead and rebuild this file.
+ */
+// ----------------------------------------------------------------------------
 
 
 #ifndef XPCC__XMEGA_SPI_F_HPP
@@ -49,48 +54,46 @@ namespace xpcc
 	{
 	public:
 		static void
-		initialize(SPI_PRESCALER_t prescaler, SPI_MODE_t mode = SPI_MODE_0_gc);
+		initialize(SPI_PRESCALER_t prescaler = SPI_PRESCALER_DIV128_gc,
+				bool doubleSpeed = false,
+				SPI_MODE_t mode = SPI_MODE_0_gc);
 		
+        /// initiates a SPI transfer and returns the received byte
 		static uint8_t
 		write(uint8_t data);
 		
-		ALWAYS_INLINE static SPI_t&
+		inline static SPI_t&
 		getModuleBase()
 		{
 			return SPIF;
 		}
-		
-		ALWAYS_INLINE static void
+        
+		/// Enable the SPI module.
+		inline static void
 		setEnable(bool enable)
 		{
 			SPIF_CTRL = (SPIF_CTRL & ~SPI_ENABLE_bm) | (enable ? SPI_ENABLE_bm : 0);
 		}
 		
-		ALWAYS_INLINE static void
-		setMaster(bool master)
-		{
-			SPIF_CTRL = (SPIF_CTRL & ~SPI_MASTER_bm) | (master ? SPI_MASTER_bm : 0);
-		}
+		inline static void
+		setPrescaler(SPI_PRESCALER_t prescaler, bool doubleSpeed)
+        {
+            SPIF_CTRL = (SPIF_CTRL & ~(SPI_PRESCALER_gm | SPI_CLK2X_bm)) | prescaler | (doubleSpeed ? SPI_CLK2X_bm : 0);
+        }
 		
-		ALWAYS_INLINE static void
-		setPrescaler(SPI_PRESCALER_t prescaler)
-		{
-			SPIF_CTRL = (SPIF_CTRL & ~SPI_PRESCALER_gm) | prescaler;
-		}
-		
-		ALWAYS_INLINE static void
-		setDoubleSpeed(bool doubleSpeed)
-		{
-			SPIF_CTRL = (SPIF_CTRL & ~SPI_CLK2X_bm) | (doubleSpeed ? SPI_CLK2X_bm : 0);
-		}
-		
-		ALWAYS_INLINE static void
+		inline static void
 		setDataOrder(bool LsbFirst)
 		{
 			SPIF_CTRL = (SPIF_CTRL & ~SPI_DORD_bm) | (LsbFirst ? SPI_DORD_bm : 0);
 		}
+        
+        inline static void
+        setDoubleSpeed(bool doubleSpeed)
+        {
+            SPIF_CTRL = (SPIF_CTRL & ~SPI_CLK2X_bm) | (doubleSpeed ? SPI_CLK2X_bm : 0);
+        }
 		
-		ALWAYS_INLINE static void
+		inline static void
 		setMode(SPI_MODE_t mode)
 		{
 			SPIF_CTRL = (SPIF_CTRL & ~SPI_MODE_gm) | mode;
