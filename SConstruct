@@ -123,6 +123,11 @@ for port in ['C', 'D', 'E', 'F']:
 		generator.template('uart_buffered_%s.cpp' % id, 'uart_buffered.cpp.in', substitutions)
 		generator.template('uart_spi_%s.cpp' % id, 'uart_spi.cpp.in', substitutions)
 
+generator = Generator(env, 'src/xpcc/architecture/driver/atxmega/spi')
+for id in ['C', 'D', 'E', 'F']:
+	generator.template('spi_%s.hpp' % id.lower(), 'spi.hpp.in', { 'id': id })
+	generator.template('spi_%s.cpp' % id.lower(), 'spi.cpp.in', { 'id': id })
+
 if 'check' in BUILD_TARGETS:
 	result = []
 	everythingOk = True
