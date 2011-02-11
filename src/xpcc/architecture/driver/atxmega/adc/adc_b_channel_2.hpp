@@ -42,17 +42,20 @@
 #include <xpcc/architecture/platform.hpp>
 #include "adc_b.hpp"
 
+#if defined(ADCB) || defined(__DOXYGEN__)
+
 namespace xpcc
 {
 	/**
 	 * \brief		ADC Channel 2 of Module B
+	 * 
 	 * \ingroup		atxmega_adc
 	 */
 	class AdcChannelB2 : public AdcModuleB
 	{
 	public:
 		inline static ADC_CH_t
-		&getModuleBase()
+		&getChannelBase()
 		{
 			return ADCB.CH2;
 		}
@@ -106,4 +109,5 @@ namespace xpcc
 	};
 }
 
+#endif	// ADCB
 #endif // XPCC__XMEGA_ADCB_CHANNEL2_HPP

@@ -42,17 +42,20 @@
 #include <xpcc/architecture/platform.hpp>
 #include "adc_{{ id.lower() }}.hpp"
 
+#if defined(ADC{{ id }}) || defined(__DOXYGEN__)
+
 namespace xpcc
 {
 	/**
 	 * \brief		ADC Channel {{ ch }} of Module {{ id }}
+	 * 
 	 * \ingroup		atxmega_adc
 	 */
 	class AdcChannel{{ id }}{{ ch }} : public AdcModule{{ id }}
 	{
 	public:
 		inline static ADC_CH_t
-		&getModuleBase()
+		&getChannelBase()
 		{
 			return ADC{{ id }}.CH{{ ch }};
 		}
@@ -106,5 +109,6 @@ namespace xpcc
 	};
 }
 
+#endif	// ADC{{ id }}
 #endif // XPCC__XMEGA_ADC{{ id }}_CHANNEL{{ ch }}_HPP
 

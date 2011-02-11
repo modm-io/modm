@@ -36,6 +36,7 @@
 
 #include "adc_{{ id.lower() }}_channel_{{ ch }}.hpp"
 #include <avr/interrupt.h>
+#include <xpcc/architecture/platform.hpp>
 
 #ifdef ADC{{ id }}
 

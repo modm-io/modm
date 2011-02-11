@@ -25,33 +25,24 @@
  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * 
+ * $Id: spi.hpp 474 2011-02-11 12:40:19Z salkinium $
  */
 // ----------------------------------------------------------------------------
 
-#include "adc/adc_a.hpp"
-#include "adc/adc_b.hpp"
-#include "adc/adc_a_channel_0.hpp"
-#include "adc/adc_a_channel_1.hpp"
-#include "adc/adc_a_channel_2.hpp"
-#include "adc/adc_a_channel_3.hpp"
-#include "adc/adc_b_channel_0.hpp"
-#include "adc/adc_b_channel_1.hpp"
-#include "adc/adc_b_channel_2.hpp"
-#include "adc/adc_b_channel_3.hpp"
-
 /**
  * \ingroup		atxmega
- * \defgroup	atxmega_adc	ATxmega ADC module
+ * \defgroup	atxmega_adc	ATxmega ADC Module
  *
- * \brief Xmega Analog/Digital Converter
- *
+ * Analog/Digital Converter Module
+ * 
  * ADC clock frequency should be at around 62kHz for maximum
  * resolution. If less than 12 bits are needed the frequency can be higher.
  * A differential input in signed mode increases accuracy by up to 6 bit (!).
  * \sa <a href="http://blog.frankvh.com/2010/01/03/atmel-xmega-adc-problems-solutions/">
- *                                  Xmega ADC Problems and Solutions</a>
+ * Xmega ADC Problems and Solutions</a>
  *
- * The Xmega ADC is more complex than the Mega ADC, and each ADC Module has
+ * The Xmega ADC is more complex than of the Mega ADC, and each ADC Module has
  * four ADC Channels which have a seperate class.
  * You first have to initialize the ADC Module to use any of the Channels.
  *
@@ -97,3 +88,14 @@
  * \sa AVR1300
  * \author Niklas Hauser
  */
+
+#include "adc/adc_a.hpp"
+#include "adc/adc_b.hpp"
+#include "adc/adc_a_channel_0.hpp"
+#include "adc/adc_a_channel_1.hpp"
+#include "adc/adc_a_channel_2.hpp"
+#include "adc/adc_a_channel_3.hpp"
+#include "adc/adc_b_channel_0.hpp"
+#include "adc/adc_b_channel_1.hpp"
+#include "adc/adc_b_channel_2.hpp"
+#include "adc/adc_b_channel_3.hpp"

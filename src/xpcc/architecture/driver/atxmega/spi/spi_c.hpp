@@ -39,15 +39,15 @@
 
 #include <avr/io.h>
 #include <stdint.h>
-
 #include <xpcc/architecture/platform.hpp>
+
+#if defined(SPIC) || defined(__DOXYGEN__)
 
 namespace xpcc
 {
 	/**
 	 * \brief		SPI Master for Port C
-	 * 
-	 * 
+	 *
 	 * \ingroup		atxmega_spi
 	 */
 	class SpiMasterC
@@ -101,4 +101,5 @@ namespace xpcc
 	};
 }
 
+#endif // SPIC
 #endif // XPCC__XMEGA_SPI_C_HPP

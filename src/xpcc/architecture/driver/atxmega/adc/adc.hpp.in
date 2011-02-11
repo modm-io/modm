@@ -41,10 +41,13 @@
 #include <stdint.h>
 #include <xpcc/architecture/platform.hpp>
 
+#if defined(ADC{{ id }}) || defined(__DOXYGEN__)
+
 namespace xpcc
 {
 	/**
 	 * \brief		ADC Module {{ id }}
+	 *
 	 * \ingroup		atxmega_adc
 	 */
 	class AdcModule{{ id }}
@@ -124,5 +127,6 @@ namespace xpcc
 	};
 }
 
+#endif // ADC{{ id }}
 #endif // XPCC__XMEGA_ADC_{{ id }}_HPP
 

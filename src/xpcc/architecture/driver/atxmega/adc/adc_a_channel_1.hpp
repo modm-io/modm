@@ -42,17 +42,20 @@
 #include <xpcc/architecture/platform.hpp>
 #include "adc_a.hpp"
 
+#if defined(ADCA) || defined(__DOXYGEN__)
+
 namespace xpcc
 {
 	/**
 	 * \brief		ADC Channel 1 of Module A
+	 * 
 	 * \ingroup		atxmega_adc
 	 */
 	class AdcChannelA1 : public AdcModuleA
 	{
 	public:
 		inline static ADC_CH_t
-		&getModuleBase()
+		&getChannelBase()
 		{
 			return ADCA.CH1;
 		}
@@ -106,4 +109,5 @@ namespace xpcc
 	};
 }
 
+#endif	// ADCA
 #endif // XPCC__XMEGA_ADCA_CHANNEL1_HPP

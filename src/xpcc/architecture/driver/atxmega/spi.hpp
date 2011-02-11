@@ -32,9 +32,9 @@
 
 /**
  * \ingroup		atxmega
- * \defgroup	atxmega_spi	ATxmega SPI module
+ * \defgroup	atxmega_spi	ATxmega SPI Module
  *
- * SPI Master Module
+ * Serial Peripheral Interface Module
  *
  * This SPI hardware implementation is compatible with both Software SPI as
  * well as Uart SPI.

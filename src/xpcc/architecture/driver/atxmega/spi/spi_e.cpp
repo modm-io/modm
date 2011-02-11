@@ -34,12 +34,9 @@
 // ----------------------------------------------------------------------------
 
 
-#include <avr/io.h>
-#include <avr/interrupt.h>
-
-#include <xpcc/architecture/driver/gpio.hpp>
-
 #include "spi_e.hpp"
+#include <avr/interrupt.h>
+#include <xpcc/architecture/driver/gpio.hpp>
 
 #ifdef SPIE
 

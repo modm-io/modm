@@ -36,6 +36,7 @@
 
 #include "adc_a_channel_2.hpp"
 #include <avr/interrupt.h>
+#include <xpcc/architecture/platform.hpp>
 
 #ifdef ADCA
 

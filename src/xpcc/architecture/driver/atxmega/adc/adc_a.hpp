@@ -41,10 +41,13 @@
 #include <stdint.h>
 #include <xpcc/architecture/platform.hpp>
 
+#if defined(ADCA) || defined(__DOXYGEN__)
+
 namespace xpcc
 {
 	/**
 	 * \brief		ADC Module A
+	 *
 	 * \ingroup		atxmega_adc
 	 */
 	class AdcModuleA
@@ -124,4 +127,5 @@ namespace xpcc
 	};
 }
 
+#endif // ADCA
 #endif // XPCC__XMEGA_ADC_A_HPP

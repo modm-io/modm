@@ -39,15 +39,15 @@
 
 #include <avr/io.h>
 #include <stdint.h>
-
 #include <xpcc/architecture/platform.hpp>
+
+#if defined(SPIE) || defined(__DOXYGEN__)
 
 namespace xpcc
 {
 	/**
 	 * \brief		SPI Master for Port E
-	 * 
-	 * 
+	 *
 	 * \ingroup		atxmega_spi
 	 */
 	class SpiMasterE
@@ -101,4 +101,5 @@ namespace xpcc
 	};
 }
 
+#endif // SPIE
 #endif // XPCC__XMEGA_SPI_E_HPP

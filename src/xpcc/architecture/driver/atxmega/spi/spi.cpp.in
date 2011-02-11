@@ -34,12 +34,9 @@
 // ----------------------------------------------------------------------------
 {{ generation_block }}
 
-#include <avr/io.h>
-#include <avr/interrupt.h>
-
-#include <xpcc/architecture/driver/gpio.hpp>
-
 #include "spi_{{ id.lower() }}.hpp"
+#include <avr/interrupt.h>
+#include <xpcc/architecture/driver/gpio.hpp>
 
 #ifdef SPI{{ id }}
 

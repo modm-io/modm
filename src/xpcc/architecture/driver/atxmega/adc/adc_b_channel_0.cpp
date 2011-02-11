@@ -36,6 +36,7 @@
 
 #include "adc_b_channel_0.hpp"
 #include <avr/interrupt.h>
+#include <xpcc/architecture/platform.hpp>
 
 #ifdef ADCB
 

@@ -136,6 +136,14 @@ for port in ['A', 'B']:
 		generator.template('adc_%s_channel_%s.hpp' % (port.lower(), channel), 'adc_channel.hpp.in', { 'id': port, 'ch': channel })
 		generator.template('adc_%s_channel_%s.cpp' % (port.lower(), channel), 'adc_channel.cpp.in', { 'id': port, 'ch': channel })
 
+generator = Generator(env, 'src/xpcc/architecture/driver/atxmega/timer')
+for port in ['C', 'D', 'E', 'F']:
+	generator.template('awex_%s.hpp' % port.lower(), 'awex.hpp.in', { 'id': port })
+	generator.template('hires_%s.hpp' % port.lower(), 'hires.hpp.in', { 'id': port })
+	for channel in [0,1]:
+		generator.template('timer_%s%s.hpp' % (port.lower(), channel), 'timer.hpp.in', { 'id': port, 'ty': channel })
+		generator.template('timer_%s%s.cpp' % (port.lower(), channel), 'timer.cpp.in', { 'id': port, 'ty': channel })
+
 if 'check' in BUILD_TARGETS:
 	result = []
 	everythingOk = True
