@@ -54,7 +54,7 @@ namespace xpcc
 			WIREDAND = PORT_OPC_WIREDAND_gc,
 			WIREDORPULL = PORT_OPC_WIREDORPULL_gc,
 			WIREDANDPULL = PORT_OPC_WIREDANDPULL_gc,
-            INVERTED = PORT_INVEN_bm
+			INVERTED = PORT_INVEN_bm
 		} Configuration; // PINnCTRL
 		
 		typedef enum

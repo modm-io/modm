@@ -41,8 +41,12 @@
  * The write method is blocking until the SPI Interrupt Flag is set (=> SPI
  * transfer is complete).
  * It can be used for higher SPI clock speeds than feasable with Software SPI.
+ *
  * The MISO pin uses a pull-up resistor so that if the SPI slave is accidentally
  * disconnected, the write method does not block, but returns 0x00 or 0xff.
+ * If your SPI slave has a "Data Ready" pin, which triggers a SPI readout, make
+ * sure to use a pullup/pulldown on the input pin, to keep a disconnected slave
+ * from causing contiuous readouts.
  *
  * \code
  * #include <xpcc/architecture/driver/atxmega/spi.hpp>
@@ -56,8 +60,6 @@
  *     ...
  * }
  * \endcode
- *
- * Create a new class with the following methods:
  *
  * \sa AVR1309
  * \sa xpcc::SoftwareSpi

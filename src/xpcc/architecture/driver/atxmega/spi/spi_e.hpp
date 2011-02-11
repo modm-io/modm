@@ -58,7 +58,7 @@ namespace xpcc
 				bool doubleSpeed = false,
 				SPI_MODE_t mode = SPI_MODE_0_gc);
 		
-        /// initiates a SPI transfer and returns the received byte
+		/// initiates a SPI transfer and returns the received byte
 		static uint8_t
 		write(uint8_t data);
 		
@@ -67,7 +67,7 @@ namespace xpcc
 		{
 			return SPIE;
 		}
-        
+		
 		/// Enable the SPI module.
 		inline static void
 		setEnable(bool enable)
@@ -77,21 +77,21 @@ namespace xpcc
 		
 		inline static void
 		setPrescaler(SPI_PRESCALER_t prescaler, bool doubleSpeed)
-        {
-            SPIE_CTRL = (SPIE_CTRL & ~(SPI_PRESCALER_gm | SPI_CLK2X_bm)) | prescaler | (doubleSpeed ? SPI_CLK2X_bm : 0);
-        }
+		{
+			SPIE_CTRL = (SPIE_CTRL & ~(SPI_PRESCALER_gm | SPI_CLK2X_bm)) | prescaler | (doubleSpeed ? SPI_CLK2X_bm : 0);
+		}
 		
 		inline static void
 		setDataOrder(bool LsbFirst)
 		{
 			SPIE_CTRL = (SPIE_CTRL & ~SPI_DORD_bm) | (LsbFirst ? SPI_DORD_bm : 0);
 		}
-        
-        inline static void
-        setDoubleSpeed(bool doubleSpeed)
-        {
-            SPIE_CTRL = (SPIE_CTRL & ~SPI_CLK2X_bm) | (doubleSpeed ? SPI_CLK2X_bm : 0);
-        }
+		
+		inline static void
+		setDoubleSpeed(bool doubleSpeed)
+		{
+			SPIE_CTRL = (SPIE_CTRL & ~SPI_CLK2X_bm) | (doubleSpeed ? SPI_CLK2X_bm : 0);
+		}
 		
 		inline static void
 		setMode(SPI_MODE_t mode)

@@ -35,52 +35,52 @@
 
 #ifndef __DOXYGEN__
 
-#define	TIMER_COUNTER(name, port, type) \
-    struct name { \
-        ALWAYS_INLINE static TC ## type ## _t &get() { return TC ## port ## type; } \
-        ALWAYS_INLINE static void setClockSource(TC_CLKSEL_t selection=TC_CLKSEL_DIV1024_gc) { \
-            TC ## port ## type ## _CTRLA = selection; } \
-        ALWAYS_INLINE static void setWaveformGenerationMode(TC_WGMODE_t mode=TC_WGMODE_NORMAL_gc) { \
-            TC ## port ## type ## _CTRLB = (TC ## port ## type ## _CTRLB & TC ## type ## _WGMODE_gm) | mode; } \
-        ALWAYS_INLINE static void setCCEnable(uint8_t selection) { \
-            TC ## port ## type ## _CTRLB = (TC ## port ## type ## _CTRLB & 0x0f) | selection; } \
-        ALWAYS_INLINE static void setCompareOutputValue(uint8_t selection) { \
-            TC ## port ## type ## _CTRLC = selection; } \
-        ALWAYS_INLINE static void setEventSource(TC_EVSEL_t selection=TC_EVSEL_OFF_gc) { \
-            TC ## port ## type ## _CTRLD = (TC ## port ## type ## _CTRLD & ~TC ## type ## _EVSEL_gm) | selection; } \
-        ALWAYS_INLINE static void setDelayEvent(bool enable=true) { \
-            TC ## port ## type ## _CTRLD = (TC ## port ## type ## _CTRLD & ~TC ## type ## _EVDLY_bm) | (enable?TC ## type ## _EVDLY_bm:0); } \
-        ALWAYS_INLINE static void setEventAction(TC_EVACT_t action=TC_EVACT_OFF_gc) { \
-            TC ## port ## type ## _CTRLD = (TC ## port ## type ## _CTRLD & ~TC ## type ## _EVSEL_gm) | action; } \
-        ALWAYS_INLINE static void setByteMode(bool enable=true) { \
-            TC ## port ## type ## _CTRLE = (TC ## port ## type ## _CTRLE & ~TC ## type ## _BYTEM_bm) | (enable?TC ## type ## _BYTEM_bm:0); } \
-        ALWAYS_INLINE static void setTimerInterruptLevel(uint8_t level) { \
-            TC ## port ## type ## _INTCTRLA = level; } \
-        ALWAYS_INLINE static void setCCInterruptLevel(uint8_t level) { \
-            TC ## port ## type ## _INTCTRLB = level; } \
-        ALWAYS_INLINE static void setTimerCommand(uint8_t command, bool clear=false) { \
-            if (clear) { TC ## port ## type ## _CTRLFCLR = command; } \
-            else { TC ## port ## type ## _CTRLFSET = command; } } \
-        ALWAYS_INLINE static bool isTimerCountingUp() { \
-            return (!(TC ## port ## type ## _CTRLFSET & TC ## type ## _DIR_bm)); } \
-        \
-        struct AWEX { \
-            ALWAYS_INLINE static AWEX_t &get() { return AWEX ## port; } \
-            ALWAYS_INLINE static void setMode(uint8_t mode) { \
-                AWEX ## port ## _CTRL = (AWEX ## port ## _CTRL & ~(AWEX_PGM_bm|AWEX_CWCM_bm)) | mode; } \
-            ALWAYS_INLINE static void setDTIEnable(uint8_t selection) { \
-                AWEX ## port ## _CTRL = (AWEX ## port ## _CTRL & ~(AWEX_DTICCDEN_bm|AWEX_DTICCCEN_bm|AWEX_DTICCBEN_bm|AWEX_DTICCAEN_bm)) | selection; } \
-            ALWAYS_INLINE static void setFaultDetection(uint8_t mode) { \
-                AWEX ## port ## _FDCTRL = mode; } \
-            ALWAYS_INLINE static uint8_t getStatus() { return AWEX ## port ## _STATUS; } \
-            }; \
-        \
-        struct HIRES { \
-            ALWAYS_INLINE static HIRES_t &get() { return HIRES ## port; } \
-            ALWAYS_INLINE static void setEnable(HIRES_HREN_t enable) { \
-                HIRES ## port ## _CTRL = enable; } \
-            }; \
-        };
+#define TIMER_COUNTER(name, port, type) \
+	struct name { \
+		ALWAYS_INLINE static TC ## type ## _t &get() { return TC ## port ## type; } \
+		ALWAYS_INLINE static void setClockSource(TC_CLKSEL_t selection=TC_CLKSEL_DIV1024_gc) { \
+			TC ## port ## type ## _CTRLA = selection; } \
+		ALWAYS_INLINE static void setWaveformGenerationMode(TC_WGMODE_t mode=TC_WGMODE_NORMAL_gc) { \
+			TC ## port ## type ## _CTRLB = (TC ## port ## type ## _CTRLB & TC ## type ## _WGMODE_gm) | mode; } \
+		ALWAYS_INLINE static void setCCEnable(uint8_t selection) { \
+			TC ## port ## type ## _CTRLB = (TC ## port ## type ## _CTRLB & 0x0f) | selection; } \
+		ALWAYS_INLINE static void setCompareOutputValue(uint8_t selection) { \
+			TC ## port ## type ## _CTRLC = selection; } \
+		ALWAYS_INLINE static void setEventSource(TC_EVSEL_t selection=TC_EVSEL_OFF_gc) { \
+			TC ## port ## type ## _CTRLD = (TC ## port ## type ## _CTRLD & ~TC ## type ## _EVSEL_gm) | selection; } \
+		ALWAYS_INLINE static void setDelayEvent(bool enable=true) { \
+			TC ## port ## type ## _CTRLD = (TC ## port ## type ## _CTRLD & ~TC ## type ## _EVDLY_bm) | (enable?TC ## type ## _EVDLY_bm:0); } \
+		ALWAYS_INLINE static void setEventAction(TC_EVACT_t action=TC_EVACT_OFF_gc) { \
+			TC ## port ## type ## _CTRLD = (TC ## port ## type ## _CTRLD & ~TC ## type ## _EVSEL_gm) | action; } \
+		ALWAYS_INLINE static void setByteMode(bool enable=true) { \
+			TC ## port ## type ## _CTRLE = (TC ## port ## type ## _CTRLE & ~TC ## type ## _BYTEM_bm) | (enable?TC ## type ## _BYTEM_bm:0); } \
+		ALWAYS_INLINE static void setTimerInterruptLevel(uint8_t level) { \
+			TC ## port ## type ## _INTCTRLA = level; } \
+		ALWAYS_INLINE static void setCCInterruptLevel(uint8_t level) { \
+			TC ## port ## type ## _INTCTRLB = level; } \
+		ALWAYS_INLINE static void setTimerCommand(uint8_t command, bool clear=false) { \
+			if (clear) { TC ## port ## type ## _CTRLFCLR = command; } \
+			else { TC ## port ## type ## _CTRLFSET = command; } } \
+		ALWAYS_INLINE static bool isTimerCountingUp() { \
+			return (!(TC ## port ## type ## _CTRLFSET & TC ## type ## _DIR_bm)); } \
+		\
+		struct AWEX { \
+			ALWAYS_INLINE static AWEX_t &get() { return AWEX ## port; } \
+			ALWAYS_INLINE static void setMode(uint8_t mode) { \
+				AWEX ## port ## _CTRL = (AWEX ## port ## _CTRL & ~(AWEX_PGM_bm|AWEX_CWCM_bm)) | mode; } \
+			ALWAYS_INLINE static void setDTIEnable(uint8_t selection) { \
+				AWEX ## port ## _CTRL = (AWEX ## port ## _CTRL & ~(AWEX_DTICCDEN_bm|AWEX_DTICCCEN_bm|AWEX_DTICCBEN_bm|AWEX_DTICCAEN_bm)) | selection; } \
+			ALWAYS_INLINE static void setFaultDetection(uint8_t mode) { \
+				AWEX ## port ## _FDCTRL = mode; } \
+			ALWAYS_INLINE static uint8_t getStatus() { return AWEX ## port ## _STATUS; } \
+			}; \
+		\
+		struct HIRES { \
+			ALWAYS_INLINE static HIRES_t &get() { return HIRES ## port; } \
+			ALWAYS_INLINE static void setEnable(HIRES_HREN_t enable) { \
+				HIRES ## port ## _CTRL = enable; } \
+			}; \
+		};
 
 #else   // __DOXYGEN__
 

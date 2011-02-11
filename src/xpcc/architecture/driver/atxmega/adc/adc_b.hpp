@@ -34,48 +34,94 @@
 // ----------------------------------------------------------------------------
 
 
+#ifndef XPCC__XMEGA_ADC_B_HPP
+#define XPCC__XMEGA_ADC_B_HPP
+
 #include <avr/io.h>
-#include <avr/interrupt.h>
+#include <stdint.h>
+#include <xpcc/architecture/platform.hpp>
 
-#include <xpcc/architecture/driver/gpio.hpp>
-
-#include "spi_d.hpp"
-
-#ifdef SPID
-
-namespace
+namespace xpcc
 {
-	GPIO__OUTPUT(SCK, D, 7);
-	GPIO__INPUT(MISO, D, 6);
-	GPIO__OUTPUT(MOSI, D, 5);
-	GPIO__OUTPUT(SS, D, 4);
+	/**
+	 * \brief		ADC Module B
+	 * \ingroup		atxmega_adc
+	 */
+	class AdcModuleB
+	{
+	public:
+		inline static ADC_t
+		&getModuleBase()
+		{
+			return ADCB;
+		}
+		
+		static void
+		initialize(uint8_t reference=ADC_REFSEL_VCC_gc, ADC_PRESCALER_t prescaler=ADC_PRESCALER_DIV512_gc);
+		
+		inline static void
+		setEnable(bool enable=true)
+		{
+			ADCB_CTRLA = (ADCB_CTRLA & ~ADC_ENABLE_bm) | (enable?ADC_ENABLE_bm:0);
+		}
+		
+		/// Flush the ADC pipeline.
+		inline static void
+		flush()
+		{
+			ADCB_CTRLA |= ADC_FLUSH_bm;
+		}
+		
+		inline static void
+		setDMARequest(ADC_DMASEL_t selection=ADC_DMASEL_OFF_gc)
+		{
+			ADCB_CTRLA = (ADCB_CTRLA & ~ADC_DMASEL_gm) | selection;
+		}
+		
+		/// Set signed or unsigned conversion.
+		inline static void
+		setConversionMode(bool unsgnd=true)
+		{
+			ADCB_CTRLB = (ADCB_CTRLB & ~ADC_CONMODE_bm) | (unsgnd?ADC_CONMODE_bm:0);
+		}
+		
+		/// Enable free running mode as defined in setChannelSweep.
+		inline static void
+		setFreeRunningMode(bool enable=true)
+		{
+			ADCB_CTRLB = (ADCB_CTRLB & ~ADC_FREERUN_bm) | (enable?ADC_FREERUN_bm:0);
+		}
+		
+		inline static void
+		setResolution(ADC_RESOLUTION_t resolution=ADC_RESOLUTION_12BIT_gc)
+		{
+			ADCB_CTRLB = (ADCB_CTRLB & ~ADC_RESOLUTION_gm) | resolution;
+		}
+		
+		inline static void
+		setReference(uint8_t reference=ADC_REFSEL_VCC_gc)
+		{
+			ADCB_REFCTRL = reference;
+		}
+		
+		inline static void
+		setChannelEvent(uint8_t mode)
+		{
+			ADCB_EVCTRL = (ADCB_EVCTRL & ~(ADC_EVACT_gm|ADC_EVSEL_gm)) | mode;
+		}
+		
+		inline static void
+		setChannelSweep(ADC_SWEEP_t sweep)
+		{
+			ADCB_EVCTRL = (ADCB_EVCTRL & ~ADC_SWEEP_gm) | sweep;
+		}
+		
+		inline static void
+		setPrescaler(ADC_PRESCALER_t prescaler=ADC_PRESCALER_DIV512_gc)
+		{
+			ADCB_PRESCALER = prescaler;
+		}
+	};
 }
 
-// ----------------------------------------------------------------------------
-void
-xpcc::SpiMasterD::initialize(SPI_PRESCALER_t prescaler, 
-		bool doubleSpeed, SPI_MODE_t mode)
-{
-	SS::setOutput();
-	MOSI::setOutput();
-	SCK::setOutput();
-	MISO::configure(::xpcc::gpio::PULLUP);
-	
-	SPID_CTRL = SPI_ENABLE_bm | SPI_MASTER_bm | mode;
-	
-	setPrescaler(prescaler, doubleSpeed);
-}
-
-uint8_t
-xpcc::SpiMasterD::write(uint8_t data)
-{
-	SPID_STATUS;
-	SPID_DATA = data;
-	
-	while (!(SPID_STATUS & SPI_IF_bm))
-		;
-	
-	return SPID_DATA;
-}
-
-#endif // SPID
+#endif // XPCC__XMEGA_ADC_B_HPP

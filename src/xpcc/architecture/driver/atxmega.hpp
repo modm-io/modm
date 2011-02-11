@@ -37,3 +37,5 @@
 #include "atxmega/uart.hpp"
 #include "atxmega/spi.hpp"
 #include "atxmega/gpio.hpp"
+#include "atxmega/timer.hpp"
+#include "atxmega/adc.hpp"

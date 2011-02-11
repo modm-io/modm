@@ -128,6 +128,14 @@ for id in ['C', 'D', 'E', 'F']:
 	generator.template('spi_%s.hpp' % id.lower(), 'spi.hpp.in', { 'id': id })
 	generator.template('spi_%s.cpp' % id.lower(), 'spi.cpp.in', { 'id': id })
 
+generator = Generator(env, 'src/xpcc/architecture/driver/atxmega/adc')
+for port in ['A', 'B']:
+	generator.template('adc_%s.hpp' % port.lower(), 'adc.hpp.in', { 'id': port })
+	generator.template('adc_%s.cpp' % port.lower(), 'adc.cpp.in', { 'id': port })
+	for channel in [0,1,2,3]:
+		generator.template('adc_%s_channel_%s.hpp' % (port.lower(), channel), 'adc_channel.hpp.in', { 'id': port, 'ch': channel })
+		generator.template('adc_%s_channel_%s.cpp' % (port.lower(), channel), 'adc_channel.cpp.in', { 'id': port, 'ch': channel })
+
 if 'check' in BUILD_TARGETS:
 	result = []
 	everythingOk = True

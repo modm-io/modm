@@ -37,45 +37,17 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 
-#include <xpcc/architecture/driver/gpio.hpp>
+#include "adc_a.hpp"
 
-#include "spi_d.hpp"
-
-#ifdef SPID
-
-namespace
-{
-	GPIO__OUTPUT(SCK, D, 7);
-	GPIO__INPUT(MISO, D, 6);
-	GPIO__OUTPUT(MOSI, D, 5);
-	GPIO__OUTPUT(SS, D, 4);
-}
+#ifdef ADCA
 
 // ----------------------------------------------------------------------------
 void
-xpcc::SpiMasterD::initialize(SPI_PRESCALER_t prescaler, 
-		bool doubleSpeed, SPI_MODE_t mode)
+xpcc::AdcModuleA::initialize(uint8_t reference, ADC_PRESCALER_t prescaler)
 {
-	SS::setOutput();
-	MOSI::setOutput();
-	SCK::setOutput();
-	MISO::configure(::xpcc::gpio::PULLUP);
-	
-	SPID_CTRL = SPI_ENABLE_bm | SPI_MASTER_bm | mode;
-	
-	setPrescaler(prescaler, doubleSpeed);
+	ADCA_CTRLA = ADC_ENABLE_bm;
+	ADCA_REFCTRL = reference;
+	ADCA_PRESCALER = prescaler;
 }
 
-uint8_t
-xpcc::SpiMasterD::write(uint8_t data)
-{
-	SPID_STATUS;
-	SPID_DATA = data;
-	
-	while (!(SPID_STATUS & SPI_IF_bm))
-		;
-	
-	return SPID_DATA;
-}
-
-#endif // SPID
+#endif // ADCA

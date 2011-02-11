@@ -32,50 +32,31 @@
  * Please modify the corresponding *.in file instead and rebuild this file.
  */
 // ----------------------------------------------------------------------------
+{{ generation_block }}
 
-
-#include <avr/io.h>
+#include "adc_{{ id.lower() }}_channel_{{ ch }}.hpp"
 #include <avr/interrupt.h>
 
-#include <xpcc/architecture/driver/gpio.hpp>
-
-#include "spi_d.hpp"
-
-#ifdef SPID
-
-namespace
-{
-	GPIO__OUTPUT(SCK, D, 7);
-	GPIO__INPUT(MISO, D, 6);
-	GPIO__OUTPUT(MOSI, D, 5);
-	GPIO__OUTPUT(SS, D, 4);
-}
+#ifdef ADC{{ id }}
 
 // ----------------------------------------------------------------------------
-void
-xpcc::SpiMasterD::initialize(SPI_PRESCALER_t prescaler, 
-		bool doubleSpeed, SPI_MODE_t mode)
+uint16_t
+xpcc::AdcChannel{{ id }}{{ ch }}::read()
 {
-	SS::setOutput();
-	MOSI::setOutput();
-	SCK::setOutput();
-	MISO::configure(::xpcc::gpio::PULLUP);
+	ADC{{ id }}_CH{{ ch }}_INTFLAGS = 0;
+	ADC{{ id }}_CH{{ ch }}_CTRL |= ADC_CH_START_bm;
 	
-	SPID_CTRL = SPI_ENABLE_bm | SPI_MASTER_bm | mode;
-	
-	setPrescaler(prescaler, doubleSpeed);
-}
-
-uint8_t
-xpcc::SpiMasterD::write(uint8_t data)
-{
-	SPID_STATUS;
-	SPID_DATA = data;
-	
-	while (!(SPID_STATUS & SPI_IF_bm))
+	while(!(ADC{{ id }}_CH{{ ch }}_INTFLAGS & ADC_CH_CHIF_bm))
 		;
 	
-	return SPID_DATA;
+	return ADC{{ id }}_CH{{ ch }}_RES;
 }
 
-#endif // SPID
+void
+xpcc::AdcChannel{{ id }}{{ ch }}::startConversion()
+{
+	ADC{{ id }}_CH{{ ch }}_INTFLAGS = 0;
+	ADC{{ id }}_CH{{ ch }}_CTRL |= ADC_CH_START_bm;
+}
+
+#endif	// ADC{{ id }}

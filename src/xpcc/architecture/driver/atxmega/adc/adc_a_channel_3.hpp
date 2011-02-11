@@ -34,48 +34,76 @@
 // ----------------------------------------------------------------------------
 
 
+#ifndef XPCC__XMEGA_ADCA_CHANNEL3_HPP
+#define XPCC__XMEGA_ADCA_CHANNEL3_HPP
+
 #include <avr/io.h>
-#include <avr/interrupt.h>
+#include <stdint.h>
+#include <xpcc/architecture/platform.hpp>
+#include "adc_a.hpp"
 
-#include <xpcc/architecture/driver/gpio.hpp>
-
-#include "spi_d.hpp"
-
-#ifdef SPID
-
-namespace
+namespace xpcc
 {
-	GPIO__OUTPUT(SCK, D, 7);
-	GPIO__INPUT(MISO, D, 6);
-	GPIO__OUTPUT(MOSI, D, 5);
-	GPIO__OUTPUT(SS, D, 4);
+	/**
+	 * \brief		ADC Channel 3 of Module A
+	 * \ingroup		atxmega_adc
+	 */
+	class AdcChannelA3 : public AdcModuleA
+	{
+	public:
+		inline static ADC_CH_t
+		&getModuleBase()
+		{
+			return ADCA.CH3;
+		}
+		
+		/// Select between single ended, differential (with gain)
+		inline static void
+		setInputMode(ADC_CH_INPUTMODE_t mode=ADC_CH_INPUTMODE_SINGLEENDED_gc)
+		{
+			ADCA_CH3_CTRL = (ADCA_CH3_CTRL & ~ADC_CH_INPUTMODE_gm) | mode;
+		}
+		
+		/// Select a gain factor for the channel
+		inline static void
+		setGainFactor(ADC_CH_GAIN_t factor=ADC_CH_GAIN_1X_gc)
+		{
+			ADCA_CH3_CTRL = (ADCA_CH3_CTRL & ~ADC_CH_GAINFAC_gm) | factor;
+		}
+		
+		/// Select the pos. and neg. input pins for the channel
+		inline static void
+		setMux(uint8_t selection)
+		{
+			ADCA_CH3_MUXCTRL = selection;
+		}
+		
+		inline static void
+		enableInterrupt(uint8_t level=ADC_CH_INTLVL_OFF_gc)
+		{
+			ADCA_CH3_INTCTRL = level;
+		}
+		
+		/// Read the value an analog channel
+		static uint16_t
+		read();
+		
+		static void
+		startConversion();
+		
+		inline static bool
+		isFinished()
+		{
+			return (ADCA_CH3_INTFLAGS & ADC_CH_CHIF_bm);
+		}
+		
+		/// Read the converted analog value
+		inline static uint16_t
+		getValue()
+		{
+			return ADCA_CH3_RES;
+		}
+	};
 }
 
-// ----------------------------------------------------------------------------
-void
-xpcc::SpiMasterD::initialize(SPI_PRESCALER_t prescaler, 
-		bool doubleSpeed, SPI_MODE_t mode)
-{
-	SS::setOutput();
-	MOSI::setOutput();
-	SCK::setOutput();
-	MISO::configure(::xpcc::gpio::PULLUP);
-	
-	SPID_CTRL = SPI_ENABLE_bm | SPI_MASTER_bm | mode;
-	
-	setPrescaler(prescaler, doubleSpeed);
-}
-
-uint8_t
-xpcc::SpiMasterD::write(uint8_t data)
-{
-	SPID_STATUS;
-	SPID_DATA = data;
-	
-	while (!(SPID_STATUS & SPI_IF_bm))
-		;
-	
-	return SPID_DATA;
-}
-
-#endif // SPID
+#endif // XPCC__XMEGA_ADCA_CHANNEL3_HPP

@@ -46,7 +46,7 @@
 namespace
 {
 	GPIO__OUTPUT(SCK, {{ id }}, 7);
-    GPIO__INPUT(MISO, {{ id }}, 6);
+	GPIO__INPUT(MISO, {{ id }}, 6);
 	GPIO__OUTPUT(MOSI, {{ id }}, 5);
 	GPIO__OUTPUT(SS, {{ id }}, 4);
 }
@@ -59,7 +59,7 @@ xpcc::SpiMaster{{ id }}::initialize(SPI_PRESCALER_t prescaler,
 	SS::setOutput();
 	MOSI::setOutput();
 	SCK::setOutput();
-    MISO::configure(::xpcc::gpio::PULLUP);
+	MISO::configure(::xpcc::gpio::PULLUP);
 	
 	SPI{{ id }}_CTRL = SPI_ENABLE_bm | SPI_MASTER_bm | mode;
 	

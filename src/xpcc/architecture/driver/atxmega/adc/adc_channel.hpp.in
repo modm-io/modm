@@ -32,50 +32,79 @@
  * Please modify the corresponding *.in file instead and rebuild this file.
  */
 // ----------------------------------------------------------------------------
+{{ generation_block }}
 
+#ifndef XPCC__XMEGA_ADC{{ id }}_CHANNEL{{ ch }}_HPP
+#define XPCC__XMEGA_ADC{{ id }}_CHANNEL{{ ch }}_HPP
 
 #include <avr/io.h>
-#include <avr/interrupt.h>
+#include <stdint.h>
+#include <xpcc/architecture/platform.hpp>
+#include "adc_{{ id.lower() }}.hpp"
 
-#include <xpcc/architecture/driver/gpio.hpp>
-
-#include "spi_d.hpp"
-
-#ifdef SPID
-
-namespace
+namespace xpcc
 {
-	GPIO__OUTPUT(SCK, D, 7);
-	GPIO__INPUT(MISO, D, 6);
-	GPIO__OUTPUT(MOSI, D, 5);
-	GPIO__OUTPUT(SS, D, 4);
+	/**
+	 * \brief		ADC Channel {{ ch }} of Module {{ id }}
+	 * \ingroup		atxmega_adc
+	 */
+	class AdcChannel{{ id }}{{ ch }} : public AdcModule{{ id }}
+	{
+	public:
+		inline static ADC_CH_t
+		&getModuleBase()
+		{
+			return ADC{{ id }}.CH{{ ch }};
+		}
+		
+		/// Select between single ended, differential (with gain)
+		inline static void
+		setInputMode(ADC_CH_INPUTMODE_t mode=ADC_CH_INPUTMODE_SINGLEENDED_gc)
+		{
+			ADC{{ id }}_CH{{ ch }}_CTRL = (ADC{{ id }}_CH{{ ch }}_CTRL & ~ADC_CH_INPUTMODE_gm) | mode;
+		}
+		
+		/// Select a gain factor for the channel
+		inline static void
+		setGainFactor(ADC_CH_GAIN_t factor=ADC_CH_GAIN_1X_gc)
+		{
+			ADC{{ id }}_CH{{ ch }}_CTRL = (ADC{{ id }}_CH{{ ch }}_CTRL & ~ADC_CH_GAINFAC_gm) | factor;
+		}
+		
+		/// Select the pos. and neg. input pins for the channel
+		inline static void
+		setMux(uint8_t selection)
+		{
+			ADC{{ id }}_CH{{ ch }}_MUXCTRL = selection;
+		}
+		
+		inline static void
+		enableInterrupt(uint8_t level=ADC_CH_INTLVL_OFF_gc)
+		{
+			ADC{{ id }}_CH{{ ch }}_INTCTRL = level;
+		}
+		
+		/// Read the value an analog channel
+		static uint16_t
+		read();
+		
+		static void
+		startConversion();
+		
+		inline static bool
+		isFinished()
+		{
+			return (ADC{{ id }}_CH{{ ch }}_INTFLAGS & ADC_CH_CHIF_bm);
+		}
+		
+		/// Read the converted analog value
+		inline static uint16_t
+		getValue()
+		{
+			return ADC{{ id }}_CH{{ ch }}_RES;
+		}
+	};
 }
 
-// ----------------------------------------------------------------------------
-void
-xpcc::SpiMasterD::initialize(SPI_PRESCALER_t prescaler, 
-		bool doubleSpeed, SPI_MODE_t mode)
-{
-	SS::setOutput();
-	MOSI::setOutput();
-	SCK::setOutput();
-	MISO::configure(::xpcc::gpio::PULLUP);
-	
-	SPID_CTRL = SPI_ENABLE_bm | SPI_MASTER_bm | mode;
-	
-	setPrescaler(prescaler, doubleSpeed);
-}
+#endif // XPCC__XMEGA_ADC{{ id }}_CHANNEL{{ ch }}_HPP
 
-uint8_t
-xpcc::SpiMasterD::write(uint8_t data)
-{
-	SPID_STATUS;
-	SPID_DATA = data;
-	
-	while (!(SPID_STATUS & SPI_IF_bm))
-		;
-	
-	return SPID_DATA;
-}
-
-#endif // SPID

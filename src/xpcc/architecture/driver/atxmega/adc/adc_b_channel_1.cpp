@@ -34,48 +34,29 @@
 // ----------------------------------------------------------------------------
 
 
-#include <avr/io.h>
+#include "adc_b_channel_1.hpp"
 #include <avr/interrupt.h>
 
-#include <xpcc/architecture/driver/gpio.hpp>
-
-#include "spi_d.hpp"
-
-#ifdef SPID
-
-namespace
-{
-	GPIO__OUTPUT(SCK, D, 7);
-	GPIO__INPUT(MISO, D, 6);
-	GPIO__OUTPUT(MOSI, D, 5);
-	GPIO__OUTPUT(SS, D, 4);
-}
+#ifdef ADCB
 
 // ----------------------------------------------------------------------------
-void
-xpcc::SpiMasterD::initialize(SPI_PRESCALER_t prescaler, 
-		bool doubleSpeed, SPI_MODE_t mode)
+uint16_t
+xpcc::AdcChannelB1::read()
 {
-	SS::setOutput();
-	MOSI::setOutput();
-	SCK::setOutput();
-	MISO::configure(::xpcc::gpio::PULLUP);
+	ADCB_CH1_INTFLAGS = 0;
+	ADCB_CH1_CTRL |= ADC_CH_START_bm;
 	
-	SPID_CTRL = SPI_ENABLE_bm | SPI_MASTER_bm | mode;
-	
-	setPrescaler(prescaler, doubleSpeed);
-}
-
-uint8_t
-xpcc::SpiMasterD::write(uint8_t data)
-{
-	SPID_STATUS;
-	SPID_DATA = data;
-	
-	while (!(SPID_STATUS & SPI_IF_bm))
+	while(!(ADCB_CH1_INTFLAGS & ADC_CH_CHIF_bm))
 		;
 	
-	return SPID_DATA;
+	return ADCB_CH1_RES;
 }
 
-#endif // SPID
+void
+xpcc::AdcChannelB1::startConversion()
+{
+	ADCB_CH1_INTFLAGS = 0;
+	ADCB_CH1_CTRL |= ADC_CH_START_bm;
+}
+
+#endif	// ADCB
