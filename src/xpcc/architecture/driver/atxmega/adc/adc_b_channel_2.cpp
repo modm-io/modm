@@ -34,9 +34,10 @@
 // ----------------------------------------------------------------------------
 
 
-#include "adc_b_channel_2.hpp"
 #include <avr/interrupt.h>
 #include <xpcc/architecture/platform.hpp>
+
+#include "adc_b_channel_2.hpp"
 
 #ifdef ADCB
 
@@ -44,15 +45,16 @@
 uint16_t
 xpcc::AdcChannelB2::read()
 {
-	ADCB_CH2_INTFLAGS = 0;
-	ADCB_CH2_CTRL |= ADC_CH_START_bm;
+	startConversion();
 	
-	while(!(ADCB_CH2_INTFLAGS & ADC_CH_CHIF_bm))
-		;
+	while(!isFinished()) {
+		// wait until the conversion is finished
+	}
 	
-	return ADCB_CH2_RES;
+	return getResult();
 }
 
+// ----------------------------------------------------------------------------
 void
 xpcc::AdcChannelB2::startConversion()
 {

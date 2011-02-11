@@ -39,6 +39,7 @@
 
 #include <avr/io.h>
 #include <stdint.h>
+
 #include <xpcc/architecture/platform.hpp>
 #include "adc_a.hpp"
 
@@ -54,8 +55,8 @@ namespace xpcc
 	class AdcChannelA1 : public AdcModuleA
 	{
 	public:
-		inline static ADC_CH_t
-		&getChannelBase()
+		inline static ADC_CH_t&
+		getChannelBase()
 		{
 			return ADCA.CH1;
 		}
@@ -76,18 +77,44 @@ namespace xpcc
 		
 		/// Select the pos. and neg. input pins for the channel
 		inline static void
-		setMux(uint8_t selection)
+		selectInput(uint8_t selection)
 		{
 			ADCA_CH1_MUXCTRL = selection;
 		}
 		
+		/**
+		 * \brief	 Enable Interrupt
+		 * 
+		 * If you enable the ADC channel interrupt you need to provide
+		 * a corresponding interrupt handler function. Otherwise the
+		 * controller will restart on every invocation of the interrupt.
+		 * 
+		 * \code
+		 * ISR(ADCA_CH1_vect)
+		 * {
+		 *     ...
+		 * }
+		 * \endcode
+		 */
 		inline static void
 		enableInterrupt(uint8_t level=ADC_CH_INTLVL_OFF_gc)
 		{
 			ADCA_CH1_INTCTRL = level;
 		}
 		
-		/// Read the value an analog channel
+		/**
+		 * \brief	Read the value off the analog channel
+		 * 
+		 * Blocks until the conversion is done.
+		 * 
+		 * Equivalent to:
+		 * \code
+		 * startConversion();
+		 * while (!isFinished())
+		 *     ;
+		 * getResult();
+		 * \endcode
+		 */
 		static uint16_t
 		read();
 		

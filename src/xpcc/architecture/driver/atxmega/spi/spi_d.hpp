@@ -70,7 +70,7 @@ namespace xpcc
 		
 		/// Enable the SPI module.
 		inline static void
-		setEnable(bool enable)
+		enable(bool enable)
 		{
 			SPID_CTRL = (SPID_CTRL & ~SPI_ENABLE_bm) | (enable ? SPI_ENABLE_bm : 0);
 		}
@@ -85,12 +85,6 @@ namespace xpcc
 		setDataOrder(bool LsbFirst)
 		{
 			SPID_CTRL = (SPID_CTRL & ~SPI_DORD_bm) | (LsbFirst ? SPI_DORD_bm : 0);
-		}
-		
-		inline static void
-		setDoubleSpeed(bool doubleSpeed)
-		{
-			SPID_CTRL = (SPID_CTRL & ~SPI_CLK2X_bm) | (doubleSpeed ? SPI_CLK2X_bm : 0);
 		}
 		
 		inline static void

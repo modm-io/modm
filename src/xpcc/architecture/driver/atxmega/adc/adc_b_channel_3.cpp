@@ -34,9 +34,10 @@
 // ----------------------------------------------------------------------------
 
 
-#include "adc_b_channel_3.hpp"
 #include <avr/interrupt.h>
 #include <xpcc/architecture/platform.hpp>
+
+#include "adc_b_channel_3.hpp"
 
 #ifdef ADCB
 
@@ -44,15 +45,16 @@
 uint16_t
 xpcc::AdcChannelB3::read()
 {
-	ADCB_CH3_INTFLAGS = 0;
-	ADCB_CH3_CTRL |= ADC_CH_START_bm;
+	startConversion();
 	
-	while(!(ADCB_CH3_INTFLAGS & ADC_CH_CHIF_bm))
-		;
+	while(!isFinished()) {
+		// wait until the conversion is finished
+	}
 	
-	return ADCB_CH3_RES;
+	return getResult();
 }
 
+// ----------------------------------------------------------------------------
 void
 xpcc::AdcChannelB3::startConversion()
 {

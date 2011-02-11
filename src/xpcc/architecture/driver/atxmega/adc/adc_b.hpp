@@ -53,19 +53,20 @@ namespace xpcc
 	class AdcModuleB
 	{
 	public:
-		inline static ADC_t
-		&getModuleBase()
+		inline static ADC_t&
+		getModuleBase()
 		{
 			return ADCB;
 		}
 		
 		static void
-		initialize(uint8_t reference=ADC_REFSEL_VCC_gc, ADC_PRESCALER_t prescaler=ADC_PRESCALER_DIV512_gc);
+		initialize(uint8_t reference=ADC_REFSEL_VCC_gc,
+				ADC_PRESCALER_t prescaler=ADC_PRESCALER_DIV512_gc);
 		
 		inline static void
-		setEnable(bool enable=true)
+		enable(bool enable=true)
 		{
-			ADCB_CTRLA = (ADCB_CTRLA & ~ADC_ENABLE_bm) | (enable?ADC_ENABLE_bm:0);
+			ADCB_CTRLA = (ADCB_CTRLA & ~ADC_ENABLE_bm) | (enable ? ADC_ENABLE_bm : 0);
 		}
 		
 		/// Flush the ADC pipeline.

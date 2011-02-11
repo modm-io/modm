@@ -51,19 +51,21 @@
  * \code
  * #include <xpcc/architecture/driver/atxmega/spi.hpp>
  *
- * int main {
+ * int
+ * main(void)
+ * {
  *     ...
- *     xpcc::SpiMasterC Spi;
- *
+ *     typedef xpcc::SpiMasterC Spi;
  *     Spi::initialize(SPI_PRESCALER_DIV64_gc);     // faster clock
+ *     
  *     uint8_t result = Spi::write(0xf3);   // write a byte
  *     ...
  * }
  * \endcode
  *
- * \sa AVR1309
- * \sa xpcc::SoftwareSpi
- * \author Niklas Hauser
+ * \see		AVR1309
+ * \see		xpcc::SoftwareSpi
+ * \author	Niklas Hauser
  */
 
 #include "spi/spi_c.hpp"

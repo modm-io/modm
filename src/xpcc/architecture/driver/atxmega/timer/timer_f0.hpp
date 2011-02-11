@@ -39,6 +39,7 @@
 
 #include <avr/io.h>
 #include <stdint.h>
+
 #include "hires_f.hpp"
 #ifdef AWAXF
 #include "awex_f.hpp"
@@ -60,8 +61,8 @@ namespace xpcc
 #endif // AWAXF
 	{
 	public:
-		inline static TC0_t
-		&getModuleBase()
+		inline static TC0_t&
+		getModuleBase()
 		{
 			return TCF0;
 		}
@@ -114,14 +115,54 @@ namespace xpcc
 			TCF0_CTRLE = (TCF0_CTRLE & ~TC0_BYTEM_bm) | (enable?TC0_BYTEM_bm:0);
 		}
 		
+		/**
+		 * \brief	 Enable Timer Interrupt
+		 * 
+		 * If you enable a Timer interrupt you need to provide
+		 * a corresponding interrupt handler function. Otherwise the
+		 * controller will restart on every invocation of the interrupt.
+		 * 
+		 * Valid interrupts are:
+		 * \code
+		 * TCF0_OVF_vect, TCF0_ERR_vect
+		 * \endcode
+		 * 
+		 * Example:
+		 * \code
+		 * ISR(TCF0_ERR_vect)
+		 * {
+		 *     ....
+		 * }
+		 * \endcode
+		 */
 		inline static void
 		setTimerInterruptLevel(uint8_t level)
 		{
 			TCF0_INTCTRLA = level;
 		}
 		
+		/**
+		 * \brief	 Enable Compare Interrupt
+		 * 
+		 * If you enable a Compare interrupt you need to provide
+		 * a corresponding interrupt handler function. Otherwise the
+		 * controller will restart on every invocation of the interrupt.
+		 * 
+		 * Valid interrupts are:
+		 * \code
+		 * TCF0_CCA_vect, TCF0_CCB_vect, TCF0_CCC_vect, TCF0_CCD_vect
+		 * \endcode
+		 * 
+		 * Example:
+		 * \code
+		 * ISR(TCF0_CCA_vect)
+		 * {
+		 *     ....
+		 * }
+		 * \endcode
+		 */
 		inline static void
-		setCCInterruptLevel(uint8_t level)
+		setCompareInterruptLevel(uint8_t level)
 		{
 			TCF0_INTCTRLB = level;
 		}

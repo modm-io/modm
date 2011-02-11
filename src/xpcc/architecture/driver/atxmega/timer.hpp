@@ -32,35 +32,25 @@
 
 /**
  * \ingroup	atxmega
- * \defgroup atxmega_timer ATxmega TC Module
- *
- * Timer/Counter Module
- *
+ * \defgroup atxmega_timer ATxmega Timer/Counter Module
+ * 
  * TC type 0 has got four Compare/Capture Units, type 1 only two.
  * Be aware that both type 0 and 1 share the same HIRES Extension and, when
  * available for the TC, also the same AWEX Extension!
- *
+ * 
  * The Timer classes extend the HighRes and Waveform classes when available.
  * These classes are meant to configure the TC Module, there is no access to
  * any data registers!
  * Please write your own template for your special TC purposes.
- *
+ * 
  * The Xmega Timer/Counters are very complex hardware.
  * It is highly recommended that you consult the Xmega Manual and write your
  * own template to configure the Timer/Counter and its Extensions.
  *
- * \sa AVR1306
- * \author Niklas Hauser
+ * \see		AVR1306
+ * \author	Niklas Hauser
  */
 
-#include "timer/awex_c.hpp"
-#include "timer/awex_d.hpp"
-#include "timer/awex_e.hpp"
-#include "timer/awex_f.hpp"
-#include "timer/hires_c.hpp"
-#include "timer/hires_d.hpp"
-#include "timer/hires_e.hpp"
-#include "timer/hires_f.hpp"
 #include "timer/timer_c0.hpp"
 #include "timer/timer_c1.hpp"
 #include "timer/timer_d0.hpp"

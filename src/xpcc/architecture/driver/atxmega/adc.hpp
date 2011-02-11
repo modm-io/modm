@@ -32,17 +32,15 @@
 
 /**
  * \ingroup		atxmega
- * \defgroup	atxmega_adc	ATxmega ADC Module
- *
- * Analog/Digital Converter Module
+ * \defgroup	atxmega_adc	ATxmega Analog/Digital Converter Module
  * 
  * ADC clock frequency should be at around 62kHz for maximum
  * resolution. If less than 12 bits are needed the frequency can be higher.
  * A differential input in signed mode increases accuracy by up to 6 bit (!).
- * \sa <a href="http://blog.frankvh.com/2010/01/03/atmel-xmega-adc-problems-solutions/">
- * Xmega ADC Problems and Solutions</a>
+ * \see	<a href="http://blog.frankvh.com/2010/01/03/atmel-xmega-adc-problems-solutions/">
+ * XMEGA ADC Problems and Solutions</a>
  *
- * The Xmega ADC is more complex than of the Mega ADC, and each ADC Module has
+ * The XMEGA ADC is more complex than of the Mega ADC, and each ADC Module has
  * four ADC Channels which have a seperate class.
  * You first have to initialize the ADC Module to use any of the Channels.
  *
@@ -54,34 +52,39 @@
  * \code
  * #include <xpcc/architecture/driver/atxmega/adc.hpp>
  *
- * int main {
- *	...
- *	typedef AdcModuleA adcA;
- *
- *	adcA::initialize(ADC_REFSEL_AREFA_gc);    // PortA AVcc
- *	adcA::setConversionMode(true);            // Signed conversion mode
- *	...
+ * int
+ * main(void)
+ * {
+ *     ...
+ *     typedef AdcModuleA adcA;
+ *     
+ *     adcA::initialize(ADC_REFSEL_AREFA_gc);    // PortA AVcc
+ *     adcA::setConversionMode(true);            // Signed conversion mode
+ *     ...
  * }
  * \endcode
  *
  * The Channels also inherit all the functions of their Module.
- * Here the module is configured by the channel. This is recommended.
+ * Here the module is configured by the channel. This is recommended way.
  * \code
  * #include <xpcc/architecture/driver/atxmega/adc.hpp>
  * 
- * int main {
- *	...
- *	typedef AdcChannelA0 myChannel;
- *
- *	myChannel::initialize(ADC_REFSEL_AREFA_gc);    // PortA AVcc
- *	myChannel::setConversionMode(true);            // Signed conversion mode
- *
- *	// Differential input mode
- *	myChannel::setInputMode(ADC_CH_INPUTMODE_DIFF_gc);
- *	myChannel::setMux(ADC_CH_MUXPOS_PIN4_gc|ADC_CH_MUXNEG_PIN3_gc);
- *	// The result is always unsigned, so you want to cast it in signed mode
- *	int16_t result = (int16_t) myChannel::read();
- *	...
+ * int
+ * main(void)
+ * {
+ *     ...
+ *     typedef AdcChannelA0 myChannel;
+ *     
+ *     myChannel::initialize(ADC_REFSEL_AREFA_gc);    // PortA AVcc
+ *     myChannel::setConversionMode(true);            // Signed conversion mode
+ *     
+ *     // Differential input mode
+ *     myChannel::setInputMode(ADC_CH_INPUTMODE_DIFF_gc);
+ *     myChannel::selectInput(ADC_CH_MUXPOS_PIN4_gc | ADC_CH_MUXNEG_PIN3_gc);
+ *     
+ *     // The result is always unsigned, so you want to cast it in signed mode
+ *     int16_t result = (int16_t) myChannel::read();
+ *     ...
  * }
  * \endcode
  *

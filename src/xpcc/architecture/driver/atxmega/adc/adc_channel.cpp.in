@@ -34,9 +34,10 @@
 // ----------------------------------------------------------------------------
 {{ generation_block }}
 
-#include "adc_{{ id.lower() }}_channel_{{ ch }}.hpp"
 #include <avr/interrupt.h>
 #include <xpcc/architecture/platform.hpp>
+
+#include "adc_{{ id.lower() }}_channel_{{ ch }}.hpp"
 
 #ifdef ADC{{ id }}
 
@@ -44,15 +45,16 @@
 uint16_t
 xpcc::AdcChannel{{ id }}{{ ch }}::read()
 {
-	ADC{{ id }}_CH{{ ch }}_INTFLAGS = 0;
-	ADC{{ id }}_CH{{ ch }}_CTRL |= ADC_CH_START_bm;
+	startConversion();
 	
-	while(!(ADC{{ id }}_CH{{ ch }}_INTFLAGS & ADC_CH_CHIF_bm))
-		;
+	while(!isFinished()) {
+		// wait until the conversion is finished
+	}
 	
-	return ADC{{ id }}_CH{{ ch }}_RES;
+	return getResult();
 }
 
+// ----------------------------------------------------------------------------
 void
 xpcc::AdcChannel{{ id }}{{ ch }}::startConversion()
 {

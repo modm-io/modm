@@ -45,7 +45,8 @@ xpcc::Timer{{ id }}{{ ty }}::setTimerCommand(uint8_t command, bool clear)
 {
 	if (clear) {
 		TC{{ id }}{{ ty }}_CTRLFCLR = command;
-	} else {
+	}
+	else {
 		TC{{ id }}{{ ty }}_CTRLFSET = command;
 	}
 }
@@ -55,7 +56,7 @@ xpcc::Timer{{ id }}{{ ty }}::setMsTimer(uint8_t interval)
 {
 	TC{{ id }}{{ ty }}_CTRLA = TC_CLKSEL_DIV64_gc;
 	TC{{ id }}{{ ty }}_INTCTRLA |= TC_OVFINTLVL_MED_gc;
-	TC{{ id }}{{ ty }}_PER = (interval*32000l)/64l;
+	TC{{ id }}{{ ty }}_PER = (interval * 32000l) / 64l;
 }
 
 #endif	// TC{{ id }}{{ ty }}

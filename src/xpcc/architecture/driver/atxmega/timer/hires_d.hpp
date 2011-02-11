@@ -52,8 +52,8 @@ namespace xpcc
 	class HighResD
 	{
 	public:
-		inline static HIRES_t
-		&getHighResBase()
+		inline static HIRES_t&
+		getHighResBase()
 		{
 			return HIRESD;
 		}

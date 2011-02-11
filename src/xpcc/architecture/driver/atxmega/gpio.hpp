@@ -44,7 +44,7 @@ namespace xpcc
 {
 	namespace gpio
 	{
-		typedef enum
+		enum Configuration
 		{
 			NORMAL = PORT_OPC_TOTEM_gc,
 			BUSKEEPER = PORT_OPC_BUSKEEPER_gc,
@@ -55,19 +55,18 @@ namespace xpcc
 			WIREDORPULL = PORT_OPC_WIREDORPULL_gc,
 			WIREDANDPULL = PORT_OPC_WIREDANDPULL_gc,
 			INVERTED = PORT_INVEN_bm
-		} Configuration; // PINnCTRL
+		}; // PINnCTRL
 		
-		typedef enum
+		enum InputSense
 		{
 			BOTHEDGES = PORT_ISC_BOTHEDGES_gc,
 			RISING = PORT_ISC_RISING_gc,  
 			FALLING = PORT_ISC_FALLING_gc, 
 			LEVEL = PORT_ISC_LEVEL_gc,  
 			INPUT_DISABLE = PORT_ISC_INPUT_DISABLE_gc,
-		} InputSense; // PINnCTRL
+		}; // PINnCTRL
 		
 		/**
-		 * 
 		 * Be careful: There are only two Interrupts for a Port,
 		 * so it is not possible to select different
 		 * Interruptlevels for different Pins of one Port on the same Interrupt_x.
@@ -76,23 +75,22 @@ namespace xpcc
 		 * 
 		 * Switching level of interrupt_x off will not disable the interrupt, but
 		 * clear the corresponding bit in the interrupt_x_mask.
-		 * 
 		 */
-		typedef enum
+		enum InterruptLevel0
 		{
 			INT0LVL_OFF = PORT_INT0LVL_OFF_gc,
 			INT0LVL_LO = PORT_INT0LVL_LO_gc,
 			INT0LVL_MED = PORT_INT0LVL_MED_gc,
 			INT0LVL_HI = PORT_INT0LVL_HI_gc,
-		} InterruptLevel0;
+		};
 		
-		typedef enum
+		enum InterruptLevel1
 		{
 			INT1LVL_OFF = PORT_INT1LVL_OFF_gc,
 			INT1LVL_LO = PORT_INT1LVL_LO_gc,
 			INT1LVL_MED = PORT_INT1LVL_MED_gc,
 			INT1LVL_HI = PORT_INT1LVL_HI_gc,
-		} InterruptLevel1;
+		};
 	}
 }
 

@@ -45,7 +45,8 @@ xpcc::TimerC1::setTimerCommand(uint8_t command, bool clear)
 {
 	if (clear) {
 		TCC1_CTRLFCLR = command;
-	} else {
+	}
+	else {
 		TCC1_CTRLFSET = command;
 	}
 }
@@ -55,7 +56,7 @@ xpcc::TimerC1::setMsTimer(uint8_t interval)
 {
 	TCC1_CTRLA = TC_CLKSEL_DIV64_gc;
 	TCC1_INTCTRLA |= TC_OVFINTLVL_MED_gc;
-	TCC1_PER = (interval*32000l)/64l;
+	TCC1_PER = (interval * 32000l) / 64l;
 }
 
 #endif	// TCC1

@@ -30,15 +30,15 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="1.4"
-     inkscape:cx="150.33738"
+     inkscape:cx="283.00357"
      inkscape:cy="232.66749"
      inkscape:document-units="px"
-     inkscape:current-layer="layer5"
+     inkscape:current-layer="layer1"
      showgrid="false"
      inkscape:window-width="2048"
-     inkscape:window-height="1075"
-     inkscape:window-x="2048"
-     inkscape:window-y="24"
+     inkscape:window-height="1123"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
      inkscape:window-maximized="1" />
   <metadata
      id="metadata3230">
@@ -320,7 +320,7 @@
            height="1161.4286"
            x="50"
            y="-315.71429" /></flowRegion><flowPara
-         id="flowPara4322"></flowPara></flowRoot>    <text
+         id="flowPara4322" /></flowRoot>    <text
        xml:space="preserve"
        style="font-size:28px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#6a6a6a;fill-opacity:1;stroke:none;font-family:Ubuntu;-inkscape-font-specification:Ubuntu Bold"
        x="283.57144"
@@ -487,13 +487,13 @@
     <text
        xml:space="preserve"
        style="font-size:15.32904053px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;display:inline;font-family:Ubuntu;-inkscape-font-specification:Ubuntu"
-       x="198.36925"
-       y="883.388"
+       x="202.36925"
+       y="887.388"
        id="text3935"
        sodipodi:linespacing="125%"><tspan
          sodipodi:role="line"
-         x="198.36925"
-         y="883.388"
+         x="202.36925"
+         y="887.388"
          style="font-size:36px;font-weight:bold;letter-spacing:0px;fill:#000000;-inkscape-font-specification:Ubuntu Bold"
          id="tspan2997">... building robots</tspan></text>
     <flowRoot

@@ -33,15 +33,6 @@
 #ifndef	XPCC__DYNAMIC_POSTMAN_HPP
 #define	XPCC__DYNAMIC_POSTMAN_HPP
 
-/**
- * \brief 		Default Postman can be used if no other more efficient
- * 				Postman is available.
- *
- * DESC DESC
- * 
- * \ingroup		communication
- */
-
 #include "postman.hpp"
 #include "../callback.hpp"
 
@@ -49,6 +40,14 @@
 
 namespace xpcc
 {
+	/**
+	 * \brief 		Default Postman can be used if no other more efficient
+	 * 				Postman is available.
+	 *
+	 * DESC DESC
+	 * 
+	 * \ingroup		communication
+	 */
 	class DynamicPostman : public Postman
 	{
 	public:

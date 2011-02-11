@@ -52,8 +52,8 @@ namespace xpcc
 	class WaveformD
 	{
 	public:
-		inline static AWEX_t
-		&getWaveformBase()
+		inline static AWEX_t&
+		getWaveformBase()
 		{
 			return AWEXD;
 		}
