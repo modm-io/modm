@@ -61,7 +61,7 @@ check
 import os
 
 env = Environment(
-		toolpath = ['misc/scons'],
+		toolpath = ['scons'],
 		tools = ['template', 'doxygen', 'configfile', 'helper'],
 		ENV = os.environ)
 
@@ -82,7 +82,7 @@ def generateSConstruct(top):
 				
 				rootpath = os.sep.join(['..' for x in range(len(path.split(os.sep)))])
 				file = env.Template(target = os.path.join(path, 'SConstruct'),
-									source = 'misc/templates/SConstruct.in',
+									source = 'templates/SConstruct.in',
 									substitutions = {'rootpath': rootpath })
 				
 				env.Alias('update', file)

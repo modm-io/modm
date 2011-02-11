@@ -6,6 +6,7 @@ import copy
 import utils
 import action
 import xml_utils
+from parser_exception import ParserException
 
 class ComponentDictionary(utils.SingleAssignDictionary):
 	
@@ -16,7 +17,7 @@ class ComponentDictionary(utils.SingleAssignDictionary):
 		self.subscriptions = {}
 	
 	def updateIndex(self):
-		""" Update the list of all actions """
+		""" Update the list of all actions and checks for duplicate identifiers """
 		for component in self.values():
 			for element in component.flattened().actions:
 				if element.name in self.actions:
@@ -32,6 +33,16 @@ class ComponentDictionary(utils.SingleAssignDictionary):
 				componentList = self.subscriptions.get(key, [])
 				componentList.append(component)
 				self.subscriptions[key] = componentList
+		
+		# check for duplicate identifiers
+		actionIds = {}
+		for action in self.actions:
+			id = action.id
+			if id in actionIds:
+				raise ParserException("Duplicate Action-Identifier, '0x%02x' is used for '%s' and '%s'!"	% 
+						(id, action.name, actionIds[id].name))
+			else:
+				actionIds[id] = action
 	
 	def __iter__(self):
 		""" Generates an iterator that will iterate over all non abstract components """

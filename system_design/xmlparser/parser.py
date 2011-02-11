@@ -129,6 +129,7 @@ class Parser(object):
 		self._create_type_hierarchy()
 		
 		self._parse_events(xmltree)
+		self._check_events()
 		
 		self._parse_components(xmltree)
 		self._evaluate_components(xmltree)
@@ -184,6 +185,18 @@ class Parser(object):
 		for node in xmltree.findall('container'):
 			element = container.Container(node, self.tree)
 			self.tree.container[element.name] = element
+	
+	def _check_events(self):
+		eventIds = {}
+		for event in self.tree.events:
+			id = event.id
+			if id in eventIds:
+				raise ParserException("Duplicate Event-Identifier, '0x%02x' is used for '%s' and '%s'!"	% 
+						(id, event.name, eventIds[id].name))
+			else:
+				eventIds[id] = event
+	
+	
 
 # -----------------------------------------------------------------------------
 if __name__ == "__main__":

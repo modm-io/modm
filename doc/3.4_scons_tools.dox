@@ -8,7 +8,7 @@ In order make building our code with SCons as easy as possible we have created
 some tools which add special behaviour to SCons.
 
 \verbatim
-env = Environment(tools = ['xpcc'], toolpath = ['../../xpcc/misc/scons'])
+env = Environment(tools = ['xpcc'], toolpath = ['../../xpcc/scons'])
 \endverbatim
 
 Since the tool \c xpcc needs other tools it will load them automatically, so

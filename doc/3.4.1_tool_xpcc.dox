@@ -65,7 +65,7 @@ env[variable]=value;
 - 'rootpath': If not specified this tool tries to get the root path from the
 		toolpath. Set this variable to the trunk folder of xpcc project or to
 		equevalent if the toolpath is for any reason not the subfolder
-		'misc/scons' of it.
+		'scons' of it.
 - 'configfile': If not specified this tool tries to parse project.cfg and will
 		cause an error on failture. If any other file should be taken instead 
 		set this variable to it's path.

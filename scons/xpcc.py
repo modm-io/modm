@@ -133,7 +133,7 @@ def xpcc_library(env, buildpath=None):
 	file = env.Template(
 			target = os.path.join(env['XPCC_BUILDPATH'], 'xpcc_config.hpp'),
 			source = os.path.join(env['XPCC_ROOTPATH'], 
-								  'misc/templates/xpcc_config.hpp.in'),
+								  'templates/xpcc_config.hpp.in'),
 			substitutions = substitutions)
 	
 	env.AppendUnique(LIBS = ['xpcc'])
@@ -171,7 +171,7 @@ def generate_defines(env, filename='defines.hpp'):
 		file = env.Template(
 				target = filename,
 				source = os.path.join(env['XPCC_ROOTPATH'], 
-									  'misc/templates/defines.hpp.in'),
+									  'templates/defines.hpp.in'),
 				substitutions = substitutions)
 		return file
 	else:
@@ -188,7 +188,7 @@ def generate(env, **kw):
 	rootpath = env.get('rootpath')
 	if rootpath is None:
 		# try to detect the rootpath
-		sitepath = os.path.join('misc', 'scons')
+		sitepath = 'scons'
 		for path in env['toolpath']:
 			path = os.path.normpath(path)
 			if path.endswith(sitepath):

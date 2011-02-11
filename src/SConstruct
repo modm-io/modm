@@ -97,7 +97,7 @@ else:
 # create the build environment
 env = Environment(
 		tools = ['xpcc'],
-		toolpath = ['../misc/scons'],
+		toolpath = ['../scons'],
 		configfile = ARGUMENTS.get('config', defaultConfigfile))
 
 # build the xpcc library

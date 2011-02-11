@@ -27,7 +27,7 @@ the associated section: \ref configuration_files "Configuration files")
 Together with this SConstruct file:
 
 \verbatim
-env = Environment(tools = ['xpcc'], toolpath = ['../misc/scons'])
+env = Environment(tools = ['xpcc'], toolpath = ['../scons'])
 
 files = env.FindFiles(path = '.')
 
@@ -55,7 +55,7 @@ env.Default('all')
 Let's get through this step by step:
 
 \verbatim
-env = Environment(tools = ['xpcc'], toolpath = ['../../xpcc/misc/scons'])
+env = Environment(tools = ['xpcc'], toolpath = ['../../xpcc/scons'])
 \endverbatim
 
 Create an environment and load the \ref scons_tools "xpcc tool". This checks

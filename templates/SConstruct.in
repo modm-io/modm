@@ -3,7 +3,7 @@
 # path to the xpcc root directory
 rootpath = '${rootpath}'
 
-env = Environment(tools = ['xpcc'], toolpath = [rootpath + '/misc/scons'])
+env = Environment(tools = ['xpcc'], toolpath = [rootpath + '/scons'])
 
 # find all source files
 files = env.FindFiles('.')
