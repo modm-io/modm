@@ -80,7 +80,7 @@ namespace xpcc
 		}
 
 		inline static void
-		setCCEnable(uint8_t selection)
+		enableCompareCapture(uint8_t selection)
 		{
 			TCF1_CTRLB = (TCF1_CTRLB & 0x0f) | selection;
 		}
