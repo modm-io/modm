@@ -84,24 +84,26 @@ namespace xpcc
 		
 		/// Set signed or unsigned conversion.
 		inline static void
-		setConversionMode(bool unsgnd=true)
+		enableSignedConversion(bool unsgnd=true)
 		{
-			ADCB_CTRLB = (ADCB_CTRLB & ~ADC_CONMODE_bm) | (unsgnd?ADC_CONMODE_bm:0);
+			ADCB_CTRLB = (ADCB_CTRLB & ~ADC_CONMODE_bm) | (unsgnd ? ADC_CONMODE_bm : 0);
 		}
 		
 		/// Enable free running mode as defined in setChannelSweep.
 		inline static void
 		setFreeRunningMode(bool enable=true)
 		{
-			ADCB_CTRLB = (ADCB_CTRLB & ~ADC_FREERUN_bm) | (enable?ADC_FREERUN_bm:0);
+			ADCB_CTRLB = (ADCB_CTRLB & ~ADC_FREERUN_bm) | (enable ? ADC_FREERUN_bm : 0);
 		}
 		
+		/// left/right-adjusted 12-bit result or 8-bit result
 		inline static void
 		setResolution(ADC_RESOLUTION_t resolution=ADC_RESOLUTION_12BIT_gc)
 		{
 			ADCB_CTRLB = (ADCB_CTRLB & ~ADC_RESOLUTION_gm) | resolution;
 		}
 		
+		/// reference voltage, internal 1V, Vcc/1.6 or external AVcc/BVcc
 		inline static void
 		setReference(uint8_t reference=ADC_REFSEL_VCC_gc)
 		{
@@ -111,7 +113,7 @@ namespace xpcc
 		inline static void
 		setChannelEvent(uint8_t mode)
 		{
-			ADCB_EVCTRL = (ADCB_EVCTRL & ~(ADC_EVACT_gm|ADC_EVSEL_gm)) | mode;
+			ADCB_EVCTRL = (ADCB_EVCTRL & ~(ADC_EVACT_gm | ADC_EVSEL_gm)) | mode;
 		}
 		
 		inline static void

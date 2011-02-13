@@ -61,21 +61,21 @@ namespace xpcc
 			return ADCB.CH1;
 		}
 		
-		/// Select between single ended, differential (with gain)
+		/// Select between single ended, differential (w/o gain) conversion mode
 		inline static void
 		setInputMode(ADC_CH_INPUTMODE_t mode=ADC_CH_INPUTMODE_SINGLEENDED_gc)
 		{
 			ADCB_CH1_CTRL = (ADCB_CH1_CTRL & ~ADC_CH_INPUTMODE_gm) | mode;
 		}
 		
-		/// Select a gain factor for the channel
+		/// Select a gain factor for the channel. Gain will decrease resolution. 
 		inline static void
 		setGainFactor(ADC_CH_GAIN_t factor=ADC_CH_GAIN_1X_gc)
 		{
 			ADCB_CH1_CTRL = (ADCB_CH1_CTRL & ~ADC_CH_GAINFAC_gm) | factor;
 		}
 		
-		/// Select the pos. and neg. input pins for the channel
+		/// Select the positive and negative input pins for the channel
 		inline static void
 		selectInput(uint8_t selection)
 		{
@@ -118,20 +118,38 @@ namespace xpcc
 		static uint16_t
 		read();
 		
+		/// Starts one single conversion.
 		static void
 		startConversion();
 		
+		/// \return \c true if the conversion finished.
 		inline static bool
 		isFinished()
 		{
 			return (ADCB_CH1_INTFLAGS & ADC_CH_CHIF_bm);
 		}
 		
-		/// Read the converted analog value
+		/// Read the last converted analog value
 		inline static uint16_t
-		getValue()
+		getResult()
 		{
 			return ADCB_CH1_RES;
+		}
+		
+		/**
+		 * \brief Selects differential input and a signed conversion mode.
+		 * 
+		 * Equivalent to:
+		 * \code
+		 * enableSignedConversion(true);
+		 * setInputMode(ADC_CH_INPUTMODE_DIFF_gc);
+		 * \endcode
+		 */
+		inline static void
+		setSignedDifferentialMode()
+		{
+			enableSignedConversion(true);
+			setInputMode(ADC_CH_INPUTMODE_DIFF_gc);
 		}
 	};
 }

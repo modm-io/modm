@@ -54,10 +54,10 @@ namespace xpcc
 	 *
 	 * \ingroup		atxmega_timer
 	 */
-#ifndef AWAXC
-	class TimerC1 : public HighResC
-#else
+#if defined(AWAXC) || defined(__DOXYGEN__)
 	class TimerC1 : public HighResC, public WaveformC
+#else
+	class TimerC1 : public HighResC
 #endif // AWAXC
 	{
 	public:

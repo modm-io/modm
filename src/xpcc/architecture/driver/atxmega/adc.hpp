@@ -64,7 +64,7 @@
  * }
  * \endcode
  *
- * The Channels also inherit all the functions of their Module.
+ * The Channels also inherit from their Module.
  * Here the module is configured by the channel. This is recommended way.
  * \code
  * #include <xpcc/architecture/driver/atxmega/adc.hpp>
