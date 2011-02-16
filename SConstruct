@@ -143,6 +143,8 @@ for port in ['C', 'D', 'E', 'F']:
 	for channel in [0,1]:
 		generator.template('timer_%s%s.hpp' % (port.lower(), channel), 'timer.hpp.in', { 'id': port, 'ty': channel })
 		generator.template('timer_%s%s.cpp' % (port.lower(), channel), 'timer.cpp.in', { 'id': port, 'ty': channel })
+		generator.template('timer_interrupt_%s%s.hpp' % (port.lower(), channel), 'timer_interrupt.hpp.in', { 'id': port, 'ty': channel })
+		generator.template('timer_interrupt_%s%s.cpp' % (port.lower(), channel), 'timer_interrupt.cpp.in', { 'id': port, 'ty': channel })
 
 if 'check' in BUILD_TARGETS:
 	result = []

@@ -35,28 +35,72 @@
 
 
 #include <avr/interrupt.h>
-#include "timer_e0.hpp"
+#include "timer_interrupt_e0.hpp"
 
 #ifdef TCE0
 
-void
-xpcc::TimerE0::setTimerCommand(uint8_t command, bool clear)
+xpcc::TimerInterruptE0::F xpcc::TimerInterruptE0::overflow=xpcc::dummy;
+xpcc::TimerInterruptE0::F xpcc::TimerInterruptE0::error=xpcc::dummy;
+xpcc::TimerInterruptE0::F xpcc::TimerInterruptE0::cca=xpcc::dummy;
+xpcc::TimerInterruptE0::F xpcc::TimerInterruptE0::ccb=xpcc::dummy;
+xpcc::TimerInterruptE0::F xpcc::TimerInterruptE0::ccc=xpcc::dummy;
+xpcc::TimerInterruptE0::F xpcc::TimerInterruptE0::ccd=xpcc::dummy;
+
+ISR(TCE0_ERR_vect)
 {
-	if (clear) {
-		TCE0_CTRLFCLR = command;
-	}
-	else {
-		TCE0_CTRLFSET = command;
-	}
+	xpcc::TimerInterruptE0::error();
+}
+
+ISR(TCE0_OVF_vect)
+{
+	xpcc::TimerInterruptE0::overflow();
+}
+
+ISR(TCE0_CCA_vect)
+{
+	xpcc::TimerInterruptE0::cca();
+}
+
+ISR(TCE0_CCB_vect)
+{
+	xpcc::TimerInterruptE0::ccb();
+}
+
+ISR(TCE0_CCC_vect)
+{
+	xpcc::TimerInterruptE0::ccc();
+}
+
+ISR(TCE0_CCD_vect)
+{
+	xpcc::TimerInterruptE0::ccd();
 }
 
 // specific configuration combinations
 void
-xpcc::TimerE0::setMsTimer(uint8_t interval)
+xpcc::TimerInterruptE0::setMsTimer(F function, uint8_t interval)
 {
 	setClockSource(TC_CLKSEL_DIV64_gc);
-	setOverflowInterrupt(TC_OVFINTLVL_MED_gc);
+	attachOverflowInterrupt(TC_OVFINTLVL_MED_gc, function);
 	TCE0_PER = (interval * F_CPU) / 64000l;
+}
+
+void
+xpcc::TimerInterruptE0::attachCompareCaptureInterrupt(xpcc::timer::Channel channel, uint8_t level, F function)
+{
+	level <<= 2*channel;
+	if (channel == xpcc::timer::CHANNELA) {
+		attachCompareCaptureAInterrupt(static_cast<TC_CCAINTLVL_t>(level), function);
+	}
+	else if (channel == xpcc::timer::CHANNELB) {
+		attachCompareCaptureBInterrupt(static_cast<TC_CCBINTLVL_t>(level), function);
+	}
+	else if (channel == xpcc::timer::CHANNELC) {
+		attachCompareCaptureCInterrupt(static_cast<TC_CCCINTLVL_t>(level), function);
+	}
+	else {
+		attachCompareCaptureDInterrupt(static_cast<TC_CCDINTLVL_t>(level), function);
+	}
 }
 
 #endif	// TCE0

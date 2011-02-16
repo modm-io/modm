@@ -40,6 +40,7 @@
 #include <avr/io.h>
 #include <stdint.h>
 
+#include "timer.hpp"
 #include "hires_e.hpp"
 #ifdef AWAXE
 #include "awex_e.hpp"
@@ -49,6 +50,7 @@
 
 namespace xpcc
 {
+	typedef void (*F) (void);
 	/**
 	 * \brief		Timer Module E1
 	 *
@@ -67,6 +69,12 @@ namespace xpcc
 			return TCE1;
 		}
 		
+		inline static bool
+		isType0()
+		{
+			return false;
+		}
+		
 		inline static void
 		setClockSource(TC_CLKSEL_t selection=TC_CLKSEL_DIV1024_gc)
 		{
@@ -78,11 +86,11 @@ namespace xpcc
 		{
 			TCE1_CTRLB = (TCE1_CTRLB & TC1_WGMODE_gm) | mode;
 		}
-
+		
 		inline static void
 		enableCompareCapture(uint8_t selection)
 		{
-			TCE1_CTRLB = (TCE1_CTRLB & 0x0f) | selection;
+			TCE1_CTRLB = (TCE1_CTRLB & 0xf0) | selection;
 		}
 
 		inline static void
@@ -106,7 +114,7 @@ namespace xpcc
 		inline static void
 		setEventAction(TC_EVACT_t action=TC_EVACT_OFF_gc)
 		{
-			TCE1_CTRLD = (TCE1_CTRLD & ~TC1_EVSEL_gm) | action;
+			TCE1_CTRLD = (TCE1_CTRLD & ~TC1_EVACT_gm) | action;
 		}
 		
 		inline static void
@@ -115,57 +123,35 @@ namespace xpcc
 			TCE1_CTRLE = (TCE1_CTRLE & ~TC1_BYTEM_bm) | (enable?TC1_BYTEM_bm:0);
 		}
 		
-		/**
-		 * \brief	 Enable Timer Interrupt
-		 * 
-		 * If you enable a Timer interrupt you need to provide
-		 * a corresponding interrupt handler function. Otherwise the
-		 * controller will restart on every invocation of the interrupt.
-		 * 
-		 * Valid interrupts are:
-		 * \code
-		 * TCE1_OVF_vect, TCE1_ERR_vect
-		 * \endcode
-		 * 
-		 * Example:
-		 * \code
-		 * ISR(TCE1_ERR_vect)
-		 * {
-		 *     ....
-		 * }
-		 * \endcode
-		 */
+		/// The TCE1_ERR_vect needs to be handled seperately.
 		inline static void
-		setTimerInterruptLevel(uint8_t level)
+		setErrorInterrupt(TC_ERRINTLVL_t level)
 		{
-			TCE1_INTCTRLA = level;
+			TCE1_INTCTRLA = (TCE1_INTCTRLA & ~TC1_ERRINTLVL_gm) | level;
 		}
 		
-		/**
-		 * \brief	 Enable Compare Interrupt
-		 * 
-		 * If you enable a Compare interrupt you need to provide
-		 * a corresponding interrupt handler function. Otherwise the
-		 * controller will restart on every invocation of the interrupt.
-		 * 
-		 * Valid interrupts are:
-		 * \code
-		 * TCE1_CCA_vect, TCE1_CCB_vect
-		 * \endcode
-		 * 
-		 * Example:
-		 * \code
-		 * ISR(TCE1_CCA_vect)
-		 * {
-		 *     ....
-		 * }
-		 * \endcode
-		 */
+		/// The TCE1_OVF_vect needs to be handled seperately.
 		inline static void
-		setCompareInterruptLevel(uint8_t level)
+		setOverflowInterrupt(TC_OVFINTLVL_t level)
 		{
-			TCE1_INTCTRLB = level;
+			TCE1_INTCTRLA = (TCE1_INTCTRLA & ~TC1_OVFINTLVL_gm) | level;
 		}
+		
+		/// The TCE1_CCA_vect needs to be handled seperately.
+		inline static void
+		setCompareCaptureAInterrupt(TC_CCAINTLVL_t level)
+		{
+			TCE1_INTCTRLB = (TCE1_INTCTRLB & ~TC1_CCAINTLVL_gm) | level;
+		}
+		
+		/// The TCE1_CCB_vect needs to be handled seperately.
+		inline static void
+		setCompareCaptureBInterrupt(TC_CCBINTLVL_t level)
+		{
+			TCE1_INTCTRLB = (TCE1_INTCTRLB & ~TC1_CCBINTLVL_gm) | level;
+		}
+		
+		
 		
 		static void
 		setTimerCommand(uint8_t command, bool clear=false);
@@ -176,14 +162,21 @@ namespace xpcc
 			return (!(TCE1_CTRLFSET & TC1_DIR_bm));
 		}
 		
-		// specific configuration combinations
-		
-		/// Creates a medium level OVL interrupt every x ms. Accuracy not guaranteed!
-		/// \param interval between interrupt, max 131ms at 32MHz, max 2097ms at 2MHz
+		/**
+		 * \brief Enable OVL interrupt in x ms intervals
+		 * 
+		 * Creates a medium level OVL interrupt every x ms.
+		 * Sets the timer prescaler to 64 and calculates the timer period for
+		 * the milliseconds specified. Interrupt handling has to be done 
+		 * manually. Accuracy is not guaranteed!
+		 * The maximum interval is 131ms at 32MHz, and 2097ms at 2MHz.
+		 * 
+		 * \param interval between interrupts in ms
+		 */
 		static void
 		setMsTimer(uint8_t interval=1);
 	};
 }
 
-#endif	// TCE1
+#endif // TCE1
 #endif // XPCC__XMEGA_TIMER_E1_HPP

@@ -39,7 +39,6 @@
 
 #ifdef TC{{ id }}{{ ty }}
 
-// ----------------------------------------------------------------------------
 void
 xpcc::Timer{{ id }}{{ ty }}::setTimerCommand(uint8_t command, bool clear)
 {
@@ -51,12 +50,13 @@ xpcc::Timer{{ id }}{{ ty }}::setTimerCommand(uint8_t command, bool clear)
 	}
 }
 
+// specific configuration combinations
 void
 xpcc::Timer{{ id }}{{ ty }}::setMsTimer(uint8_t interval)
 {
-	TC{{ id }}{{ ty }}_CTRLA = TC_CLKSEL_DIV64_gc;
-	TC{{ id }}{{ ty }}_INTCTRLA |= TC_OVFINTLVL_MED_gc;
-	TC{{ id }}{{ ty }}_PER = (interval * 32000l) / 64l;
+	setClockSource(TC_CLKSEL_DIV64_gc);
+	setOverflowInterrupt(TC_OVFINTLVL_MED_gc);
+	TC{{ id }}{{ ty }}_PER = (interval * F_CPU) / 64000l;
 }
 
 #endif	// TC{{ id }}{{ ty }}

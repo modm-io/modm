@@ -39,7 +39,6 @@
 
 #ifdef TCC1
 
-// ----------------------------------------------------------------------------
 void
 xpcc::TimerC1::setTimerCommand(uint8_t command, bool clear)
 {
@@ -51,12 +50,13 @@ xpcc::TimerC1::setTimerCommand(uint8_t command, bool clear)
 	}
 }
 
+// specific configuration combinations
 void
 xpcc::TimerC1::setMsTimer(uint8_t interval)
 {
-	TCC1_CTRLA = TC_CLKSEL_DIV64_gc;
-	TCC1_INTCTRLA |= TC_OVFINTLVL_MED_gc;
-	TCC1_PER = (interval * 32000l) / 64l;
+	setClockSource(TC_CLKSEL_DIV64_gc);
+	setOverflowInterrupt(TC_OVFINTLVL_MED_gc);
+	TCC1_PER = (interval * F_CPU) / 64000l;
 }
 
 #endif	// TCC1

@@ -25,38 +25,31 @@
  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
-// ----------------------------------------------------------------------------
-/*
- * WARNING: This file is generated automatically, do not edit!
- * Please modify the corresponding *.in file instead and rebuild this file.
+ * 
+ * $Id: spi.hpp 479 2011-02-11 19:52:41Z dergraaf $
  */
 // ----------------------------------------------------------------------------
 
+#ifndef XPCC__TIMER_HPP
+#define XPCC__TIMER_HPP
 
-#include <avr/interrupt.h>
-#include "timer_e0.hpp"
-
-#ifdef TCE0
-
-void
-xpcc::TimerE0::setTimerCommand(uint8_t command, bool clear)
+namespace xpcc
 {
-	if (clear) {
-		TCE0_CTRLFCLR = command;
-	}
-	else {
-		TCE0_CTRLFSET = command;
+	namespace timer
+	{
+		/**
+		 * \brief		Timer/Counter Channel definition
+		 *
+		 * \ingroup		atxmega_timer
+		 */
+		enum Channel
+		{
+			CHANNELA,
+			CHANNELB,
+			CHANNELC,
+			CHANNELD
+		};
 	}
 }
 
-// specific configuration combinations
-void
-xpcc::TimerE0::setMsTimer(uint8_t interval)
-{
-	setClockSource(TC_CLKSEL_DIV64_gc);
-	setOverflowInterrupt(TC_OVFINTLVL_MED_gc);
-	TCE0_PER = (interval * F_CPU) / 64000l;
-}
-
-#endif	// TCE0
+#endif // XPCC__TIMER_HPP

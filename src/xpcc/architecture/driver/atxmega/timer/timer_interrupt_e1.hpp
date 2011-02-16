@@ -34,29 +34,85 @@
 // ----------------------------------------------------------------------------
 
 
-#include <avr/interrupt.h>
-#include "timer_e0.hpp"
+#ifndef XPCC__XMEGA_TIMER_INTERRUPT_E1_HPP
+#define XPCC__XMEGA_TIMER_INTERRUPT_E1_HPP
 
-#ifdef TCE0
+#include <avr/io.h>
+#include <stdint.h>
+#include <xpcc/utils/dummy.hpp>
 
-void
-xpcc::TimerE0::setTimerCommand(uint8_t command, bool clear)
+#include "timer.hpp"
+#include "timer_e1.hpp"
+
+#if defined(TCE1) || defined(__DOXYGEN__)
+
+namespace xpcc
 {
-	if (clear) {
-		TCE0_CTRLFCLR = command;
-	}
-	else {
-		TCE0_CTRLFSET = command;
-	}
+	/**
+	 * \brief		Timer Interrupt Module E1
+	 *
+	 * \ingroup		atxmega_timer
+	 */
+	class TimerInterruptE1 : public TimerE1
+	{
+	public:
+		typedef void (*F) ();
+		
+		inline static void
+		attachErrorInterrupt(TC_ERRINTLVL_t level, F function=xpcc::dummy)
+		{
+			setErrorInterrupt(level);
+			error = function;
+		}
+		
+		inline static void
+		attachOverflowInterrupt(TC_OVFINTLVL_t level, F function=xpcc::dummy)
+		{
+			setOverflowInterrupt(level);
+			overflow = function;
+		}
+		
+		inline static void
+		attachCompareCaptureAInterrupt(TC_CCAINTLVL_t level, F function=xpcc::dummy)
+		{
+			setCompareCaptureAInterrupt(level);
+			cca = function;
+		}
+		
+		inline static void
+		attachCompareCaptureBInterrupt(TC_CCBINTLVL_t level, F function=xpcc::dummy)
+		{
+			setCompareCaptureBInterrupt(level);
+			ccb = function;
+		}
+		
+		
+		/// Checks the Channel and calls the suitable function.
+		/// Make sure to use the interrupt level from Channel A!
+		static void
+		attachCompareCaptureInterrupt(xpcc::timer::Channel channel, uint8_t level, F function=xpcc::dummy);
+		
+		// specific configuration combinations
+		/**
+		 * \brief Enable OVL interrupt in x ms intervals
+		 * 
+		 * Calls the function in the interrupt independently.
+		 * 
+		 * \param function the function to call every x ms
+		 * \param interval between interrupts in ms
+		 */
+		static void
+		setMsTimer(F function=xpcc::dummy, uint8_t interval=1);
+		
+	public:
+		static F overflow;
+		static F error;
+		static F cca;
+		static F ccb;
+		static F ccc;
+		static F ccd;
+	};
 }
 
-// specific configuration combinations
-void
-xpcc::TimerE0::setMsTimer(uint8_t interval)
-{
-	setClockSource(TC_CLKSEL_DIV64_gc);
-	setOverflowInterrupt(TC_OVFINTLVL_MED_gc);
-	TCE0_PER = (interval * F_CPU) / 64000l;
-}
-
-#endif	// TCE0
+#endif // TCE1
+#endif // XPCC__XMEGA_TIMER_INTERRUPT_E1_HPP

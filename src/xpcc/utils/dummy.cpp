@@ -1,6 +1,6 @@
 // coding: utf-8
 // ----------------------------------------------------------------------------
-/* Copyright (c) 2011, Roboterclub Aachen e.V.
+/* Copyright (c) 2009, Roboterclub Aachen e.V.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -25,38 +25,15 @@
  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
-// ----------------------------------------------------------------------------
-/*
- * WARNING: This file is generated automatically, do not edit!
- * Please modify the corresponding *.in file instead and rebuild this file.
+ *
+ * $Id: dummy.cpp 364 2010-07-25 13:23:55Z dergraaf $
  */
 // ----------------------------------------------------------------------------
 
-
-#include <avr/interrupt.h>
-#include "timer_e0.hpp"
-
-#ifdef TCE0
+#include "dummy.hpp"
 
 void
-xpcc::TimerE0::setTimerCommand(uint8_t command, bool clear)
+xpcc::dummy()
 {
-	if (clear) {
-		TCE0_CTRLFCLR = command;
-	}
-	else {
-		TCE0_CTRLFSET = command;
-	}
+	// get coffee
 }
-
-// specific configuration combinations
-void
-xpcc::TimerE0::setMsTimer(uint8_t interval)
-{
-	setClockSource(TC_CLKSEL_DIV64_gc);
-	setOverflowInterrupt(TC_OVFINTLVL_MED_gc);
-	TCE0_PER = (interval * F_CPU) / 64000l;
-}
-
-#endif	// TCE0

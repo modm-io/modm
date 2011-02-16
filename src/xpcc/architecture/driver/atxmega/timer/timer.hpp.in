@@ -40,6 +40,7 @@
 #include <avr/io.h>
 #include <stdint.h>
 
+#include "timer.hpp"
 #include "hires_{{ id.lower() }}.hpp"
 #ifdef AWAX{{ id }}
 #include "awex_{{ id.lower() }}.hpp"
@@ -49,6 +50,7 @@
 
 namespace xpcc
 {
+	typedef void (*F) (void);
 	/**
 	 * \brief		Timer Module {{ id }}{{ ty }}
 	 *
@@ -67,6 +69,16 @@ namespace xpcc
 			return TC{{ id }}{{ ty }};
 		}
 		
+		inline static bool
+		isType0()
+		{
+			{% if ty==0 -%}
+			return true;
+			{%- else -%}
+			return false;
+			{%- endif %}
+		}
+		
 		inline static void
 		setClockSource(TC_CLKSEL_t selection=TC_CLKSEL_DIV1024_gc)
 		{
@@ -78,11 +90,11 @@ namespace xpcc
 		{
 			TC{{ id }}{{ ty }}_CTRLB = (TC{{ id }}{{ ty }}_CTRLB & TC{{ ty }}_WGMODE_gm) | mode;
 		}
-
+		
 		inline static void
 		enableCompareCapture(uint8_t selection)
 		{
-			TC{{ id }}{{ ty }}_CTRLB = (TC{{ id }}{{ ty }}_CTRLB & 0x0f) | selection;
+			TC{{ id }}{{ ty }}_CTRLB = (TC{{ id }}{{ ty }}_CTRLB & 0xf0) | selection;
 		}
 
 		inline static void
@@ -106,7 +118,7 @@ namespace xpcc
 		inline static void
 		setEventAction(TC_EVACT_t action=TC_EVACT_OFF_gc)
 		{
-			TC{{ id }}{{ ty }}_CTRLD = (TC{{ id }}{{ ty }}_CTRLD & ~TC{{ ty }}_EVSEL_gm) | action;
+			TC{{ id }}{{ ty }}_CTRLD = (TC{{ id }}{{ ty }}_CTRLD & ~TC{{ ty }}_EVACT_gm) | action;
 		}
 		
 		inline static void
@@ -115,61 +127,49 @@ namespace xpcc
 			TC{{ id }}{{ ty }}_CTRLE = (TC{{ id }}{{ ty }}_CTRLE & ~TC{{ ty }}_BYTEM_bm) | (enable?TC{{ ty }}_BYTEM_bm:0);
 		}
 		
-		/**
-		 * \brief	 Enable Timer Interrupt
-		 * 
-		 * If you enable a Timer interrupt you need to provide
-		 * a corresponding interrupt handler function. Otherwise the
-		 * controller will restart on every invocation of the interrupt.
-		 * 
-		 * Valid interrupts are:
-		 * \code
-		 * TC{{ id }}{{ ty }}_OVF_vect, TC{{ id }}{{ ty }}_ERR_vect
-		 * \endcode
-		 * 
-		 * Example:
-		 * \code
-		 * ISR(TC{{ id }}{{ ty }}_ERR_vect)
-		 * {
-		 *     ....
-		 * }
-		 * \endcode
-		 */
+		/// The TC{{ id }}{{ ty }}_ERR_vect needs to be handled seperately.
 		inline static void
-		setTimerInterruptLevel(uint8_t level)
+		setErrorInterrupt(TC_ERRINTLVL_t level)
 		{
-			TC{{ id }}{{ ty }}_INTCTRLA = level;
+			TC{{ id }}{{ ty }}_INTCTRLA = (TC{{ id }}{{ ty }}_INTCTRLA & ~TC{{ ty }}_ERRINTLVL_gm) | level;
 		}
 		
-		/**
-		 * \brief	 Enable Compare Interrupt
-		 * 
-		 * If you enable a Compare interrupt you need to provide
-		 * a corresponding interrupt handler function. Otherwise the
-		 * controller will restart on every invocation of the interrupt.
-		 * 
-		 * Valid interrupts are:
-		 * \code
-		 * {% if (ty == 0) -%}
-		   TC{{ id }}0_CCA_vect, TC{{ id }}0_CCB_vect, TC{{ id }}0_CCC_vect, TC{{ id }}0_CCD_vect
-		   {%- else -%}
-		   TC{{ id }}1_CCA_vect, TC{{ id }}1_CCB_vect
-		   {%- endif %}
-		 * \endcode
-		 * 
-		 * Example:
-		 * \code
-		 * ISR(TC{{ id }}{{ ty }}_CCA_vect)
-		 * {
-		 *     ....
-		 * }
-		 * \endcode
-		 */
+		/// The TC{{ id }}{{ ty }}_OVF_vect needs to be handled seperately.
 		inline static void
-		setCompareInterruptLevel(uint8_t level)
+		setOverflowInterrupt(TC_OVFINTLVL_t level)
 		{
-			TC{{ id }}{{ ty }}_INTCTRLB = level;
+			TC{{ id }}{{ ty }}_INTCTRLA = (TC{{ id }}{{ ty }}_INTCTRLA & ~TC{{ ty }}_OVFINTLVL_gm) | level;
 		}
+		
+		/// The TC{{ id }}{{ ty }}_CCA_vect needs to be handled seperately.
+		inline static void
+		setCompareCaptureAInterrupt(TC_CCAINTLVL_t level)
+		{
+			TC{{ id }}{{ ty }}_INTCTRLB = (TC{{ id }}{{ ty }}_INTCTRLB & ~TC{{ ty }}_CCAINTLVL_gm) | level;
+		}
+		
+		/// The TC{{ id }}{{ ty }}_CCB_vect needs to be handled seperately.
+		inline static void
+		setCompareCaptureBInterrupt(TC_CCBINTLVL_t level)
+		{
+			TC{{ id }}{{ ty }}_INTCTRLB = (TC{{ id }}{{ ty }}_INTCTRLB & ~TC{{ ty }}_CCBINTLVL_gm) | level;
+		}
+		
+		{% if (ty == 0) -%}
+		/// The TC{{ id }}{{ ty }}_CCC_vect needs to be handled seperately.
+		inline static void
+		setCompareCaptureCInterrupt(TC_CCCINTLVL_t level)
+		{
+			TC{{ id }}{{ ty }}_INTCTRLB = (TC{{ id }}{{ ty }}_INTCTRLB & ~TC{{ ty }}_CCCINTLVL_gm) | level;
+		}
+		
+		/// The TC{{ id }}{{ ty }}_CCD_vect needs to be handled seperately.
+		inline static void
+		setCompareCaptureDInterrupt(TC_CCDINTLVL_t level)
+		{
+			TC{{ id }}{{ ty }}_INTCTRLB = (TC{{ id }}{{ ty }}_INTCTRLB & ~TC{{ ty }}_CCDINTLVL_gm) | level;
+		}
+		{%- endif %}
 		
 		static void
 		setTimerCommand(uint8_t command, bool clear=false);
@@ -180,14 +180,21 @@ namespace xpcc
 			return (!(TC{{ id }}{{ ty }}_CTRLFSET & TC{{ ty }}_DIR_bm));
 		}
 		
-		// specific configuration combinations
-		
-		/// Creates a medium level OVL interrupt every x ms. Accuracy not guaranteed!
-		/// \param interval between interrupt, max 131ms at 32MHz, max 2097ms at 2MHz
+		/**
+		 * \brief Enable OVL interrupt in x ms intervals
+		 * 
+		 * Creates a medium level OVL interrupt every x ms.
+		 * Sets the timer prescaler to 64 and calculates the timer period for
+		 * the milliseconds specified. Interrupt handling has to be done 
+		 * manually. Accuracy is not guaranteed!
+		 * The maximum interval is 131ms at 32MHz, and 2097ms at 2MHz.
+		 * 
+		 * \param interval between interrupts in ms
+		 */
 		static void
 		setMsTimer(uint8_t interval=1);
 	};
 }
 
-#endif	// TC{{ id }}{{ ty }}
+#endif // TC{{ id }}{{ ty }}
 #endif // XPCC__XMEGA_TIMER_{{ id }}{{ ty }}_HPP

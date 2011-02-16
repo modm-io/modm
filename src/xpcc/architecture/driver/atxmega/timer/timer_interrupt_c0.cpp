@@ -35,28 +35,72 @@
 
 
 #include <avr/interrupt.h>
-#include "timer_e0.hpp"
+#include "timer_interrupt_c0.hpp"
 
-#ifdef TCE0
+#ifdef TCC0
 
-void
-xpcc::TimerE0::setTimerCommand(uint8_t command, bool clear)
+xpcc::TimerInterruptC0::F xpcc::TimerInterruptC0::overflow=xpcc::dummy;
+xpcc::TimerInterruptC0::F xpcc::TimerInterruptC0::error=xpcc::dummy;
+xpcc::TimerInterruptC0::F xpcc::TimerInterruptC0::cca=xpcc::dummy;
+xpcc::TimerInterruptC0::F xpcc::TimerInterruptC0::ccb=xpcc::dummy;
+xpcc::TimerInterruptC0::F xpcc::TimerInterruptC0::ccc=xpcc::dummy;
+xpcc::TimerInterruptC0::F xpcc::TimerInterruptC0::ccd=xpcc::dummy;
+
+ISR(TCC0_ERR_vect)
 {
-	if (clear) {
-		TCE0_CTRLFCLR = command;
-	}
-	else {
-		TCE0_CTRLFSET = command;
-	}
+	xpcc::TimerInterruptC0::error();
+}
+
+ISR(TCC0_OVF_vect)
+{
+	xpcc::TimerInterruptC0::overflow();
+}
+
+ISR(TCC0_CCA_vect)
+{
+	xpcc::TimerInterruptC0::cca();
+}
+
+ISR(TCC0_CCB_vect)
+{
+	xpcc::TimerInterruptC0::ccb();
+}
+
+ISR(TCC0_CCC_vect)
+{
+	xpcc::TimerInterruptC0::ccc();
+}
+
+ISR(TCC0_CCD_vect)
+{
+	xpcc::TimerInterruptC0::ccd();
 }
 
 // specific configuration combinations
 void
-xpcc::TimerE0::setMsTimer(uint8_t interval)
+xpcc::TimerInterruptC0::setMsTimer(F function, uint8_t interval)
 {
 	setClockSource(TC_CLKSEL_DIV64_gc);
-	setOverflowInterrupt(TC_OVFINTLVL_MED_gc);
-	TCE0_PER = (interval * F_CPU) / 64000l;
+	attachOverflowInterrupt(TC_OVFINTLVL_MED_gc, function);
+	TCC0_PER = (interval * F_CPU) / 64000l;
 }
 
-#endif	// TCE0
+void
+xpcc::TimerInterruptC0::attachCompareCaptureInterrupt(xpcc::timer::Channel channel, uint8_t level, F function)
+{
+	level <<= 2*channel;
+	if (channel == xpcc::timer::CHANNELA) {
+		attachCompareCaptureAInterrupt(static_cast<TC_CCAINTLVL_t>(level), function);
+	}
+	else if (channel == xpcc::timer::CHANNELB) {
+		attachCompareCaptureBInterrupt(static_cast<TC_CCBINTLVL_t>(level), function);
+	}
+	else if (channel == xpcc::timer::CHANNELC) {
+		attachCompareCaptureCInterrupt(static_cast<TC_CCCINTLVL_t>(level), function);
+	}
+	else {
+		attachCompareCaptureDInterrupt(static_cast<TC_CCDINTLVL_t>(level), function);
+	}
+}
+
+#endif	// TCC0

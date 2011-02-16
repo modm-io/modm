@@ -35,28 +35,58 @@
 
 
 #include <avr/interrupt.h>
-#include "timer_e0.hpp"
+#include "timer_interrupt_d1.hpp"
 
-#ifdef TCE0
+#ifdef TCD1
 
-void
-xpcc::TimerE0::setTimerCommand(uint8_t command, bool clear)
+xpcc::TimerInterruptD1::F xpcc::TimerInterruptD1::overflow=xpcc::dummy;
+xpcc::TimerInterruptD1::F xpcc::TimerInterruptD1::error=xpcc::dummy;
+xpcc::TimerInterruptD1::F xpcc::TimerInterruptD1::cca=xpcc::dummy;
+xpcc::TimerInterruptD1::F xpcc::TimerInterruptD1::ccb=xpcc::dummy;
+
+
+ISR(TCD1_ERR_vect)
 {
-	if (clear) {
-		TCE0_CTRLFCLR = command;
-	}
-	else {
-		TCE0_CTRLFSET = command;
-	}
+	xpcc::TimerInterruptD1::error();
 }
+
+ISR(TCD1_OVF_vect)
+{
+	xpcc::TimerInterruptD1::overflow();
+}
+
+ISR(TCD1_CCA_vect)
+{
+	xpcc::TimerInterruptD1::cca();
+}
+
+ISR(TCD1_CCB_vect)
+{
+	xpcc::TimerInterruptD1::ccb();
+}
+
+
 
 // specific configuration combinations
 void
-xpcc::TimerE0::setMsTimer(uint8_t interval)
+xpcc::TimerInterruptD1::setMsTimer(F function, uint8_t interval)
 {
 	setClockSource(TC_CLKSEL_DIV64_gc);
-	setOverflowInterrupt(TC_OVFINTLVL_MED_gc);
-	TCE0_PER = (interval * F_CPU) / 64000l;
+	attachOverflowInterrupt(TC_OVFINTLVL_MED_gc, function);
+	TCD1_PER = (interval * F_CPU) / 64000l;
 }
 
-#endif	// TCE0
+void
+xpcc::TimerInterruptD1::attachCompareCaptureInterrupt(xpcc::timer::Channel channel, uint8_t level, F function)
+{
+	level <<= 2*channel;
+	if (channel == xpcc::timer::CHANNELA) {
+		attachCompareCaptureAInterrupt(static_cast<TC_CCAINTLVL_t>(level), function);
+	}
+	else if (channel == xpcc::timer::CHANNELB) {
+		attachCompareCaptureBInterrupt(static_cast<TC_CCBINTLVL_t>(level), function);
+	}
+	
+}
+
+#endif	// TCD1

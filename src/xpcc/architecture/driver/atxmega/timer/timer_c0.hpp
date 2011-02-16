@@ -40,6 +40,7 @@
 #include <avr/io.h>
 #include <stdint.h>
 
+#include "timer.hpp"
 #include "hires_c.hpp"
 #ifdef AWAXC
 #include "awex_c.hpp"
@@ -49,6 +50,7 @@
 
 namespace xpcc
 {
+	typedef void (*F) (void);
 	/**
 	 * \brief		Timer Module C0
 	 *
@@ -67,6 +69,12 @@ namespace xpcc
 			return TCC0;
 		}
 		
+		inline static bool
+		isType0()
+		{
+			return true;
+		}
+		
 		inline static void
 		setClockSource(TC_CLKSEL_t selection=TC_CLKSEL_DIV1024_gc)
 		{
@@ -78,11 +86,11 @@ namespace xpcc
 		{
 			TCC0_CTRLB = (TCC0_CTRLB & TC0_WGMODE_gm) | mode;
 		}
-
+		
 		inline static void
 		enableCompareCapture(uint8_t selection)
 		{
-			TCC0_CTRLB = (TCC0_CTRLB & 0x0f) | selection;
+			TCC0_CTRLB = (TCC0_CTRLB & 0xf0) | selection;
 		}
 
 		inline static void
@@ -106,7 +114,7 @@ namespace xpcc
 		inline static void
 		setEventAction(TC_EVACT_t action=TC_EVACT_OFF_gc)
 		{
-			TCC0_CTRLD = (TCC0_CTRLD & ~TC0_EVSEL_gm) | action;
+			TCC0_CTRLD = (TCC0_CTRLD & ~TC0_EVACT_gm) | action;
 		}
 		
 		inline static void
@@ -115,56 +123,46 @@ namespace xpcc
 			TCC0_CTRLE = (TCC0_CTRLE & ~TC0_BYTEM_bm) | (enable?TC0_BYTEM_bm:0);
 		}
 		
-		/**
-		 * \brief	 Enable Timer Interrupt
-		 * 
-		 * If you enable a Timer interrupt you need to provide
-		 * a corresponding interrupt handler function. Otherwise the
-		 * controller will restart on every invocation of the interrupt.
-		 * 
-		 * Valid interrupts are:
-		 * \code
-		 * TCC0_OVF_vect, TCC0_ERR_vect
-		 * \endcode
-		 * 
-		 * Example:
-		 * \code
-		 * ISR(TCC0_ERR_vect)
-		 * {
-		 *     ....
-		 * }
-		 * \endcode
-		 */
+		/// The TCC0_ERR_vect needs to be handled seperately.
 		inline static void
-		setTimerInterruptLevel(uint8_t level)
+		setErrorInterrupt(TC_ERRINTLVL_t level)
 		{
-			TCC0_INTCTRLA = level;
+			TCC0_INTCTRLA = (TCC0_INTCTRLA & ~TC0_ERRINTLVL_gm) | level;
 		}
 		
-		/**
-		 * \brief	 Enable Compare Interrupt
-		 * 
-		 * If you enable a Compare interrupt you need to provide
-		 * a corresponding interrupt handler function. Otherwise the
-		 * controller will restart on every invocation of the interrupt.
-		 * 
-		 * Valid interrupts are:
-		 * \code
-		 * TCC0_CCA_vect, TCC0_CCB_vect, TCC0_CCC_vect, TCC0_CCD_vect
-		 * \endcode
-		 * 
-		 * Example:
-		 * \code
-		 * ISR(TCC0_CCA_vect)
-		 * {
-		 *     ....
-		 * }
-		 * \endcode
-		 */
+		/// The TCC0_OVF_vect needs to be handled seperately.
 		inline static void
-		setCompareInterruptLevel(uint8_t level)
+		setOverflowInterrupt(TC_OVFINTLVL_t level)
 		{
-			TCC0_INTCTRLB = level;
+			TCC0_INTCTRLA = (TCC0_INTCTRLA & ~TC0_OVFINTLVL_gm) | level;
+		}
+		
+		/// The TCC0_CCA_vect needs to be handled seperately.
+		inline static void
+		setCompareCaptureAInterrupt(TC_CCAINTLVL_t level)
+		{
+			TCC0_INTCTRLB = (TCC0_INTCTRLB & ~TC0_CCAINTLVL_gm) | level;
+		}
+		
+		/// The TCC0_CCB_vect needs to be handled seperately.
+		inline static void
+		setCompareCaptureBInterrupt(TC_CCBINTLVL_t level)
+		{
+			TCC0_INTCTRLB = (TCC0_INTCTRLB & ~TC0_CCBINTLVL_gm) | level;
+		}
+		
+		/// The TCC0_CCC_vect needs to be handled seperately.
+		inline static void
+		setCompareCaptureCInterrupt(TC_CCCINTLVL_t level)
+		{
+			TCC0_INTCTRLB = (TCC0_INTCTRLB & ~TC0_CCCINTLVL_gm) | level;
+		}
+		
+		/// The TCC0_CCD_vect needs to be handled seperately.
+		inline static void
+		setCompareCaptureDInterrupt(TC_CCDINTLVL_t level)
+		{
+			TCC0_INTCTRLB = (TCC0_INTCTRLB & ~TC0_CCDINTLVL_gm) | level;
 		}
 		
 		static void
@@ -176,14 +174,21 @@ namespace xpcc
 			return (!(TCC0_CTRLFSET & TC0_DIR_bm));
 		}
 		
-		// specific configuration combinations
-		
-		/// Creates a medium level OVL interrupt every x ms. Accuracy not guaranteed!
-		/// \param interval between interrupt, max 131ms at 32MHz, max 2097ms at 2MHz
+		/**
+		 * \brief Enable OVL interrupt in x ms intervals
+		 * 
+		 * Creates a medium level OVL interrupt every x ms.
+		 * Sets the timer prescaler to 64 and calculates the timer period for
+		 * the milliseconds specified. Interrupt handling has to be done 
+		 * manually. Accuracy is not guaranteed!
+		 * The maximum interval is 131ms at 32MHz, and 2097ms at 2MHz.
+		 * 
+		 * \param interval between interrupts in ms
+		 */
 		static void
 		setMsTimer(uint8_t interval=1);
 	};
 }
 
-#endif	// TCC0
+#endif // TCC0
 #endif // XPCC__XMEGA_TIMER_C0_HPP
