@@ -66,7 +66,6 @@ ISR(TCC1_CCB_vect)
 }
 
 
-
 // specific configuration combinations
 void
 xpcc::TimerInterruptC1::setMsTimer(F function, uint8_t interval)
@@ -76,17 +75,19 @@ xpcc::TimerInterruptC1::setMsTimer(F function, uint8_t interval)
 	TCC1_PER = (interval * F_CPU) / 64000l;
 }
 
-void
+bool
 xpcc::TimerInterruptC1::attachCompareCaptureInterrupt(xpcc::timer::Channel channel, uint8_t level, F function)
 {
 	level <<= 2*channel;
 	if (channel == xpcc::timer::CHANNELA) {
 		attachCompareCaptureAInterrupt(static_cast<TC_CCAINTLVL_t>(level), function);
+		return true;
 	}
 	else if (channel == xpcc::timer::CHANNELB) {
 		attachCompareCaptureBInterrupt(static_cast<TC_CCBINTLVL_t>(level), function);
+		return true;
 	}
-	
+	return false;
 }
 
 #endif	// TCC1

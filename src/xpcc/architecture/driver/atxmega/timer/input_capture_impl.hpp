@@ -47,15 +47,17 @@ xpcc::InputCapture<TIMER, PIN>::initialize(register8_t& eventChannel,
 	timer.attachCompareCaptureInterrupt(timerChannel, TC_CCAINTLVL_MED_gc, captureData);
 	
 	// Get the Event Channel number from its memory location, 8 - 15
-	uint8_t evChannel = static_cast<uint8_t> ((uint16_t) &eventChannel - 0x0180);
+	uint8_t evChannel = static_cast<uint8_t>
+		(reinterpret_cast<uint16_t>(&eventChannel) - 0x0180);
 	// make sure the event source is not negative and wraps around 3 bits
-	timer.setEventSource(static_cast<TC_EVSEL_t> ((8 + evChannel - timerChannel)%8 + 8));
+	timer.setEventSource(static_cast<TC_EVSEL_t>((8 + evChannel - timerChannel)%8 + 8));
 	
 	// Get the Channel CC register
-	captureRegister = (register16_t*) ((uint16_t) &timer.getModuleBase() + 0x0028 + 2*timerChannel);
+	captureRegister = reinterpret_cast<register16_t*>
+		(reinterpret_cast<uint16_t>(&timer.getModuleBase()) + 0x0028 + 2*timerChannel);
 
 	// tell the timer what to do: Input, Frequency or Pulse-width Capture
-	timer.setEventAction(static_cast<TC_EVACT_t> (action));
+	timer.setEventAction(static_cast<TC_EVACT_t>(action));
 	
 	// Enable the timer module
 	timer.setClockSource(clock);

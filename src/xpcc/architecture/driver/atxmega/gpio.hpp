@@ -136,7 +136,7 @@ namespace xpcc
 		ALWAYS_INLINE static PORT_t& getPort() { return PORT ## port;} \
 		ALWAYS_INLINE static uint8_t getMask() { return (1 << pin);} \
 		ALWAYS_INLINE static uint8_t getEventChannelMuxInput() { \
-			return (((uint16_t) &PORT ## port) - 0x0600)/4 + 0x50 + pin;} \
+			return (reinterpret_cast<uint16_t>(&PORT ## port) - 0x0600)/4 + 0x50 + pin;} \
 	}
 
 /**
@@ -171,7 +171,7 @@ namespace xpcc
 		ALWAYS_INLINE static PORT_t& getPort() { return PORT ## port;} \
 		ALWAYS_INLINE static uint8_t getMask() { return (1 << pin);} \
 		ALWAYS_INLINE static uint8_t getEventChannelMuxInput() { \
-			return (((uint16_t) &PORT ## port) - 0x0600)/4 + 0x50 + pin;} \
+			return (reinterpret_cast<uint16_t>(&PORT ## port) - 0x0600)/4 + 0x50 + pin;} \
 	}
 
 /**
@@ -221,7 +221,7 @@ namespace xpcc
 		ALWAYS_INLINE static PORT_t& getPort() { return PORT ## port;} \
 		ALWAYS_INLINE static uint8_t getMask() { return (1 << pin);} \
 		ALWAYS_INLINE static uint8_t getEventChannelMuxInput() { \
-			return (((uint16_t) &PORT ## port) - 0x0600)/4 + 0x50 + pin;} \
+			return (reinterpret_cast<uint16_t>(&PORT ## port) - 0x0600)/4 + 0x50 + pin;} \
 		ALWAYS_INLINE static uint16_t getInterrupt0Vector() { return PORT ## port ## _INT0_vect_num;} \
 		ALWAYS_INLINE static uint16_t getInterrupt1Vector() { return PORT ## port ## _INT1_vect_num;} \
 	}

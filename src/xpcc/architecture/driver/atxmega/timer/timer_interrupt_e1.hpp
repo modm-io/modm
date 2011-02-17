@@ -87,9 +87,12 @@ namespace xpcc
 		}
 		
 		
-		/// Checks the Channel and calls the suitable function.
-		/// Make sure to use the interrupt level from Channel A!
-		static void
+		/**
+		 * Checks the Channel and calls the suitable function.
+		 * Make sure to use the interrupt level from Channel A!
+		 * \return \c false if you try to access a non-existant Timer Channel
+		 */
+		static bool
 		attachCompareCaptureInterrupt(xpcc::timer::Channel channel, uint8_t level, F function=xpcc::dummy);
 		
 		// specific configuration combinations

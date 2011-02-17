@@ -65,7 +65,6 @@ ISR(TCC0_CCB_vect)
 {
 	xpcc::TimerInterruptC0::ccb();
 }
-
 ISR(TCC0_CCC_vect)
 {
 	xpcc::TimerInterruptC0::ccc();
@@ -85,15 +84,17 @@ xpcc::TimerInterruptC0::setMsTimer(F function, uint8_t interval)
 	TCC0_PER = (interval * F_CPU) / 64000l;
 }
 
-void
+bool
 xpcc::TimerInterruptC0::attachCompareCaptureInterrupt(xpcc::timer::Channel channel, uint8_t level, F function)
 {
 	level <<= 2*channel;
 	if (channel == xpcc::timer::CHANNELA) {
 		attachCompareCaptureAInterrupt(static_cast<TC_CCAINTLVL_t>(level), function);
+		
 	}
 	else if (channel == xpcc::timer::CHANNELB) {
 		attachCompareCaptureBInterrupt(static_cast<TC_CCBINTLVL_t>(level), function);
+		
 	}
 	else if (channel == xpcc::timer::CHANNELC) {
 		attachCompareCaptureCInterrupt(static_cast<TC_CCCINTLVL_t>(level), function);
@@ -101,6 +102,7 @@ xpcc::TimerInterruptC0::attachCompareCaptureInterrupt(xpcc::timer::Channel chann
 	else {
 		attachCompareCaptureDInterrupt(static_cast<TC_CCDINTLVL_t>(level), function);
 	}
+	return true;
 }
 
 #endif	// TCC0

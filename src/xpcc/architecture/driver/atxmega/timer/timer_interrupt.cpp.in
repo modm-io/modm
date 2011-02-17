@@ -67,7 +67,6 @@ ISR(TC{{ id }}{{ ty }}_CCB_vect)
 {
 	xpcc::TimerInterrupt{{ id }}{{ ty }}::ccb();
 }
-
 {% if ty==0 -%}
 ISR(TC{{ id }}0_CCC_vect)
 {
@@ -89,15 +88,17 @@ xpcc::TimerInterrupt{{ id }}{{ ty }}::setMsTimer(F function, uint8_t interval)
 	TC{{ id }}{{ ty }}_PER = (interval * F_CPU) / 64000l;
 }
 
-void
+bool
 xpcc::TimerInterrupt{{ id }}{{ ty }}::attachCompareCaptureInterrupt(xpcc::timer::Channel channel, uint8_t level, F function)
 {
 	level <<= 2*channel;
 	if (channel == xpcc::timer::CHANNELA) {
 		attachCompareCaptureAInterrupt(static_cast<TC_CCAINTLVL_t>(level), function);
+		{% if ty==1 -%}return true;{%- endif %}
 	}
 	else if (channel == xpcc::timer::CHANNELB) {
 		attachCompareCaptureBInterrupt(static_cast<TC_CCBINTLVL_t>(level), function);
+		{% if ty==1 -%}return true;{%- endif %}
 	}
 	{% if ty==0 -%}
 	else if (channel == xpcc::timer::CHANNELC) {
@@ -106,6 +107,9 @@ xpcc::TimerInterrupt{{ id }}{{ ty }}::attachCompareCaptureInterrupt(xpcc::timer:
 	else {
 		attachCompareCaptureDInterrupt(static_cast<TC_CCDINTLVL_t>(level), function);
 	}
+	return true;
+	{%- else -%}
+	return false;
 	{%- endif %}
 }
 
