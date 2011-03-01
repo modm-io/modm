@@ -1,3 +1,4 @@
+
 #include <xpcc/architecture/driver/gpio.hpp>
 #include <xpcc/architecture/driver/time.hpp>
 
@@ -14,7 +15,7 @@ namespace lcd
 }
 
 // create a LCD object
-xpcc::Hd44780< lcd::E, lcd::Rw, lcd::Rs, lcd::Data > display;
+xpcc::Hd44780< lcd::E, lcd::Rw, lcd::Rs, lcd::Data > display(20, 4);
 
 int
 main()
@@ -27,7 +28,7 @@ main()
 	xpcc::delay_ms(50);
 	
 	display.initialize();
-	display.setPosition(0, 0);
+	display.setCursor(0, 0);
 	
 	// write the standard welcome message ;-)
 	display << "Hello World!\n";
@@ -37,7 +38,7 @@ main()
 	{
 		// Go to the beginning of the second line of the display and
 		// write the value of 'counter'
-		display.setPosition(1, 0);
+		display.setCursor(1, 0);
 		display << counter << "   ";
 		
 		counter++;

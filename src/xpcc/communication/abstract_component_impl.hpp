@@ -33,6 +33,33 @@
 	#error	"Don't include this file directly, use 'abstract_component.hpp' instead"
 #endif
 
+// ----------------------------------------------------------------------------
+xpcc::Communicator *
+xpcc::AbstractComponent::getCommunicator()
+{
+	return &this->communicator;
+}
+
+// ----------------------------------------------------------------------------
+void
+xpcc::AbstractComponent::callAction(uint8_t receiver, uint8_t actionIdentifier)
+{
+	this->communicator.callAction(receiver, actionIdentifier);
+}
+
+void
+xpcc::AbstractComponent::callAction(uint8_t receiver, uint8_t actionIdentifier, ResponseCallback& responseCallback)
+{
+	this->communicator.callAction(receiver, actionIdentifier, responseCallback);
+}
+
+
+// ----------------------------------------------------------------------------
+void
+xpcc::AbstractComponent::publishEvent(uint8_t eventIdentifier)
+{
+	this->communicator.publishEvent(eventIdentifier);
+}
 
 // ----------------------------------------------------------------------------
 template<typename T>
@@ -60,18 +87,28 @@ xpcc::AbstractComponent::publishEvent(uint8_t eventIdentifier, const T& data)
 }
 
 // ----------------------------------------------------------------------------
-template<typename T>
 void
-xpcc::AbstractComponent::sendResponse(
-		const ResponseHandle& handle, const T& data)
+xpcc::AbstractComponent::sendResponse(const ResponseHandle& handle)
 {
-	this->communicator.sendResponse(handle, data);
+	this->communicator.sendResponse(handle);
 }
 
 template<typename T>
 void
-xpcc::AbstractComponent::sendNegativeResponse(
-		const ResponseHandle& handle, const T& data)
+xpcc::AbstractComponent::sendResponse(const ResponseHandle& handle, const T& data)
+{
+	this->communicator.sendResponse(handle, data);
+}
+
+void
+xpcc::AbstractComponent::sendNegativeResponse(const ResponseHandle& handle)
+{
+	this->communicator.sendNegativeResponse(handle);
+}
+
+template<typename T>
+void
+xpcc::AbstractComponent::sendNegativeResponse(const ResponseHandle& handle, const T& data)
 {
 	this->communicator.sendNegativeResponse(handle, data);
 }

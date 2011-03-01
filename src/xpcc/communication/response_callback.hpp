@@ -53,7 +53,7 @@ namespace xpcc
 	{
 	public:
 		typedef void (Communicatable::*Function)(const Header& header, const uint8_t *type);
-
+		
 	public:
 		/**
 		 * Set the method that will be called when a response is received.
@@ -64,8 +64,8 @@ namespace xpcc
 		template <typename C, typename P>
 		ResponseCallback(C *component, void (C::*function)(const Header& header, const P* packet)) : 
 			component(reinterpret_cast<Communicatable *>(component)),
-			function(reinterpret_cast<Function>(function)),
-			packetSize(sizeof(P))
+			function(reinterpret_cast<Function>(function))/*,
+			packetSize(sizeof(P))*/
 		{
 		}
 		
@@ -81,8 +81,8 @@ namespace xpcc
 		template <typename C>
 		ResponseCallback(C *component, void (C::*function)(const Header& header)) :
 			component(reinterpret_cast<Communicatable *>(component)),
-			function(reinterpret_cast<Function>(function)),
-			packetSize(0)
+			function(reinterpret_cast<Function>(function))/*,
+			packetSize(0)*/
 		{
 		}
 		
@@ -96,9 +96,9 @@ namespace xpcc
 		}
 		
 	protected:
-		Communicatable *component;
-		Function function;
-		uint8_t packetSize;
+		Communicatable * const component;
+		Function const function;
+		/*uint8_t packetSize;*/
 	};
 
 }

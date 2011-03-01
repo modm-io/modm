@@ -255,6 +255,18 @@ namespace xpcc
 			this->cursor = position;
 		}
 		
+		/**
+		 * \brief	Set the cursor for text drawing
+		 * 
+		 * \param	x	Cursor x-position
+		 * \param	y	Cursor y-position
+		 */
+		inline void
+		setCursor(uint8_t x, uint8_t y)
+		{
+			this->cursor = glcd::Point(x, y);
+		}
+		
 		/// Write a single character
 		void
 		write(char c);

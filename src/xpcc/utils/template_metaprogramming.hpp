@@ -1,27 +1,34 @@
 // This implementation is adapted from the Loki library, distributed under
 // the MIT license with Copyright (c) 2001 by Andrei Alexandrescu.
 
-#ifndef XPCC_TM__TEMPLATE_METAPROGRAMMING_HPP
-#define XPCC_TM__TEMPLATE_METAPROGRAMMING_HPP
+#ifndef XPCC_TMP__TEMPLATE_METAPROGRAMMING_HPP
+#define XPCC_TMP__TEMPLATE_METAPROGRAMMING_HPP
 
 #include <xpcc/architecture/platform.hpp>
 
 /**
  * \ingroup		utils
- * \defgroup	tm	Template Metaprogramming
+ * \defgroup	tmp		Template Metaprogramming
  * 
- * Helper classes for some basic template metaprogramming.
+ * Helper classes for some basic template metaprogramming. Template
+ * metaprogramming is a programming technique in which templates are used by a
+ * compiler to generate temporary source code, which is merged by the compiler
+ * with the rest of the source code and then compiled.
  * 
  * \see		http://en.wikipedia.org/wiki/Template_metaprogramming
  */
 
 namespace xpcc
 {
-	namespace tm
+	/**
+	 * \brief	Template Metaprogramming
+	 * \ingroup	tmp
+	 */
+	namespace tmp
 	{
 		/**
 		 * \brief	An empty type useful as a placeholder.
-		 * \ingroup	tm
+		 * \ingroup	tmp
 		 */
 		class NullType
 		{
@@ -30,7 +37,7 @@ namespace xpcc
 		// --------------------------------------------------------------------
 		/**
 		 * \brief	Selects type Result = (flag == true) ? T : U
-		 * \ingroup	tm
+		 * \ingroup	tmp
 		 */
 		template <bool flag, typename T, typename U>
 		struct Select
@@ -47,7 +54,7 @@ namespace xpcc
 		// --------------------------------------------------------------------
 		/**
 		 * \brief	SameType<T,U>::value is true when T=U
-		 * \ingroup	tm
+		 * \ingroup	tmp
 		 */
 		template <typename T, typename U>
 		struct SameType
@@ -73,7 +80,7 @@ namespace xpcc
 		 * - \c Conversion<T,U>::existsBothWays is \c true if \c U is also convertible to \c T
 		 * - \c Conversion<T,U>::isSameType is \c true if \c U is \c T
 		 *
-		 * \ingroup	tm
+		 * \ingroup	tmp
 		 */
 		template <typename T, typename U>
 		class Conversion
@@ -148,9 +155,10 @@ namespace xpcc
 		/**
 		 * \brief	Check if U is derived from T or if U is T
 		 * 
-		 * \c SuperSubclass<T,U>::value is \c true when \c U is derived from \c T, or when \c U is \c T
+		 * \c SuperSubclass<T,U>::value is \c true when \c U is derived 
+		 * from \c T, or when \c U is \c T.
 		 * 
-		 * \ingroup	tm
+		 * \ingroup	tmp
 		 */
 		template <typename T, typename U>
 		struct SuperSubclass
@@ -201,7 +209,7 @@ namespace xpcc
 		 * 
 		 * \c SuperSubclassStrict<T,U>::value is \c true when \c U is derived from \c T
 		 * 
-		 * \ingroup	tm
+		 * \ingroup	tmp
 		 */
 		template <typename T, typename U>
 		struct SuperSubclassStrict
@@ -243,7 +251,7 @@ namespace xpcc
 		 * FloatingPointTraits::max<double>();
 		 * \endcode
 		 * 
-		 * \ingroup	tm
+		 * \ingroup	tmp
 		 */
 		template <bool B, class T = void>
 		struct EnableIfCondition
@@ -260,7 +268,7 @@ namespace xpcc
 		};
 		
 		/**
-		 * \ingroup	tm
+		 * \ingroup	tmp
 		 */
 		template <class Conditional, class T = void>
 		struct EnableIf : public EnableIfCondition< Conditional::value, T >
@@ -290,18 +298,18 @@ namespace xpcc
 		 * Inspired by the BOOST_STATIC_ASSERT macro.
 		 * 
 		 * \see	http://www.boost.org/doc/libs/1_43_0/doc/html/boost_staticassert.html
-		 * \ingroup	tm
+		 * \ingroup	tmp
 		 */
 #ifdef __DOXYGEN__
 		#define	XPCC__STATIC_ASSERT(condition)
 #else
 		#define	XPCC__STATIC_ASSERT(condition) \
-			typedef ::xpcc::tm::static_assert_test<\
-				sizeof(::xpcc::tm::STATIC_ASSERTION_FAILURE< (bool) (condition) >) >\
+			typedef ::xpcc::tmp::static_assert_test<\
+				sizeof(::xpcc::tmp::STATIC_ASSERTION_FAILURE< (bool) (condition) >) >\
 					CONCAT(static_assert_typedef_, __LINE__)
 #endif
 	}
 }
 
-#endif // XPCC_TM__TEMPLATE_METAPROGRAMMING_HPP
+#endif // XPCC_TMP__TEMPLATE_METAPROGRAMMING_HPP
 

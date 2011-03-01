@@ -1,7 +1,7 @@
 
 #include <xpcc/architecture/driver.hpp>
 
-#include <xpcc/driver/lcd/st7565.hpp>
+#include <xpcc/driver/lcd/ea_dog.hpp>
 #include <xpcc/driver/software_spi.hpp>
 
 #include "images/image_64x64_0.hpp"
@@ -35,7 +35,7 @@ namespace lcd
 	typedef xpcc::SoftwareSpi< Scl, Mosi, xpcc::gpio::Unused, 10000000UL > SPI;
 }
 
-xpcc::St7565< lcd::SPI, lcd::CS, lcd::A0, lcd::Reset > display;
+xpcc::DogM128< lcd::SPI, lcd::CS, lcd::A0, lcd::Reset > display;
 
 FLASH(uint8_t bootscreen[]) =
 {

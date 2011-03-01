@@ -40,8 +40,7 @@ void
 xpcc::Communicator::callAction(uint8_t receiver,
 		uint8_t actionIdentifier, const T& data)
 {
-	Header header(Header::REQUEST,
-			false,
+	Header header(Header::REQUEST, false,
 			receiver,
 			this->ownIdentifier,
 			actionIdentifier);
@@ -51,13 +50,13 @@ xpcc::Communicator::callAction(uint8_t receiver,
 	this->dispatcher->addMessage(header, payload);
 }
 
+// ----------------------------------------------------------------------------
 template<typename T>
 void
 xpcc::Communicator::callAction(uint8_t receiver, uint8_t actionIdentifier,
 		const T& data, ResponseCallback& responseCallback)
 {
-	Header header(Header::REQUEST,
-			false,
+	Header header(Header::REQUEST, false,
 			receiver,
 			this->ownIdentifier,
 			actionIdentifier);
@@ -72,46 +71,38 @@ template<typename T>
 void
 xpcc::Communicator::publishEvent(uint8_t eventIdentifier, const T& data)
 {
-	Header header(Header::REQUEST,
-			false,
+	Header header(Header::REQUEST, false,
 			0,
 			this->ownIdentifier,
 			eventIdentifier);
 	
 	SmartPointer payload(&data);	// no metadata is sent with Events
-	
 	this->dispatcher->addMessage(header, payload);
 }
 
 // ----------------------------------------------------------------------------
 template<typename T>
 void
-xpcc::Communicator::sendResponse(
-		const ResponseHandle& handle, const T& data)
+xpcc::Communicator::sendResponse(const ResponseHandle& handle, const T& data)
 {
-	Header header(	Header::RESPONSE,
-					false,
-					handle.source,
-					handle.destination,
-					handle.packetIdentifier);
+	Header header(Header::RESPONSE, false,
+			handle.destination,
+			this->ownIdentifier,
+			handle.packetIdentifier);
 	
 	SmartPointer payload(&data);
-	
 	this->dispatcher->addResponse(header, payload);
 }
 
 template<typename T>
 void
-xpcc::Communicator::sendNegativeResponse(
-		const ResponseHandle& handle, const T& data)
+xpcc::Communicator::sendNegativeResponse(const ResponseHandle& handle, const T& data)
 {
-	Header header(	Header::NEGATIVE_RESPONSE,
-					false,
-					handle.source,
-					handle.destination,
-					handle.packetIdentifier);
+	Header header(Header::NEGATIVE_RESPONSE, false,
+			handle.destination,
+			this->ownIdentifier,
+			handle.packetIdentifier);
 	
 	SmartPointer payload(&data);
-	
 	this->dispatcher->addResponse(header, payload);
 }

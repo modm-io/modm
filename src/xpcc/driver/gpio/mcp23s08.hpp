@@ -68,17 +68,17 @@ namespace xpcc
 	protected:
 		enum RegisterAddress
 		{
-			IODIR = 0x00,		//!< Port direction (1=input, 0=output)
-			IPOL = 0x01,		//!< Invert polarity
-			GPINTEN = 0x02,		//!< Enable interrupt
-			DEFVAL = 0x03,		//!< Compare register for interrupt
-			INTCON = 0x04,
-			IOCON = 0x05,		//!< Configuration
-			GPPU = 0x06,		//!< Enable pullups
-			INTF = 0x07,		//!< Interrupt flag register
-			INTCAP = 0x08,		//!< Interrupt capture register
-			GPIO = 0x09,		//!< Port values
-			OLAT = 0x0a			//!< Output latch register
+			MCP_IODIR = 0x00,		//!< Port direction (1=input, 0=output)
+			MCP_IPOL = 0x01,		//!< Invert polarity
+			MCP_GPINTEN = 0x02,		//!< Enable interrupt
+			MCP_DEFVAL = 0x03,		//!< Compare register for interrupt
+			MCP_INTCON = 0x04,
+			MCP_IOCON = 0x05,		//!< Configuration
+			MCP_GPPU = 0x06,		//!< Enable pullups
+			MCP_INTF = 0x07,		//!< Interrupt flag register
+			MCP_INTCAP = 0x08,		//!< Interrupt capture register
+			MCP_GPIO = 0x09,		//!< Port values
+			MCP_OLAT = 0x0a			//!< Output latch register
 		};
 		
 		enum RW

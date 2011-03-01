@@ -44,17 +44,17 @@ namespace xpcc {
 
 // ----------------------------------------------------------------------------
 
-template <typename SPI, typename CS, typename RS>
-xpcc::St7036<SPI, CS, RS>::St7036() :
-	CharacterDisplay()
+template <typename SPI, typename CS, typename RS, unsigned int Width, unsigned int Heigth>
+xpcc::St7036<SPI, CS, RS, Width, Heigth>::St7036() :
+	CharacterDisplay(Width, Heigth)
 {
 }
 
 // ----------------------------------------------------------------------------
 
-template <typename SPI, typename CS, typename RS>
+template <typename SPI, typename CS, typename RS, unsigned int Width, unsigned int Heigth>
 void
-xpcc::St7036<SPI, CS, RS>::initialize()
+xpcc::St7036<SPI, CS, RS, Width, Heigth>::initialize()
 {
 	SPI::initialize();
 	CS::setOutput();
@@ -67,9 +67,9 @@ xpcc::St7036<SPI, CS, RS>::initialize()
 	}
 }
 
-template <typename SPI, typename CS, typename RS>
+template <typename SPI, typename CS, typename RS, unsigned int Width, unsigned int Heigth>
 void
-xpcc::St7036<SPI, CS, RS>::writeRaw(char c)
+xpcc::St7036<SPI, CS, RS, Width, Heigth>::writeRaw(char c)
 {
 	RS::set();
 	
@@ -78,9 +78,16 @@ xpcc::St7036<SPI, CS, RS>::writeRaw(char c)
 	CS::set();
 }
 
-template <typename SPI, typename CS, typename RS>
+template <typename SPI, typename CS, typename RS, unsigned int Width, unsigned int Heigth>
 void
-xpcc::St7036<SPI, CS, RS>::setPosition(uint8_t line, uint8_t column)
+xpcc::St7036<SPI, CS, RS, Width, Heigth>::command(Command command)
+{
+	writeCommand(command);
+}
+
+template <typename SPI, typename CS, typename RS, unsigned int Width, unsigned int Heigth>
+void
+xpcc::St7036<SPI, CS, RS, Width, Heigth>::setCursor(uint8_t line, uint8_t column)
 {
 	this->column = column;
 	this->line = line;
@@ -91,9 +98,9 @@ xpcc::St7036<SPI, CS, RS>::setPosition(uint8_t line, uint8_t column)
 
 // ----------------------------------------------------------------------------
 
-template <typename SPI, typename CS, typename RS>
+template <typename SPI, typename CS, typename RS, unsigned int Width, unsigned int Heigth>
 void
-xpcc::St7036<SPI, CS, RS>::writeCommand(uint8_t command)
+xpcc::St7036<SPI, CS, RS, Width, Heigth>::writeCommand(uint8_t command)
 {
 	RS::reset();
 	

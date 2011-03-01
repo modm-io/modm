@@ -1,7 +1,7 @@
 
 #include <xpcc/architecture.hpp>
 
-#include <xpcc/driver/lcd/st7565.hpp>
+#include <xpcc/driver/lcd/ea_dog.hpp>
 #include <xpcc/driver/lcd/font.hpp>
 
 #include <xpcc/driver/software_spi.hpp>
@@ -29,7 +29,7 @@ namespace lcd
 
 typedef xpcc::SoftwareSpi< lcd::Scl, lcd::Mosi, lcd::Miso > SPI;
 
-xpcc::St7565< SPI, lcd::CS, lcd::A0, lcd::Reset > display;
+xpcc::DogM128< SPI, lcd::CS, lcd::A0, lcd::Reset > display;
 
 MAIN_FUNCTION
 {

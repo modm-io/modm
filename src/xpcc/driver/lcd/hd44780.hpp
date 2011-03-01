@@ -69,7 +69,7 @@ namespace xpcc
 	{
 	public:
 		/// Constructor
-		Hd44780();
+		Hd44780(uint8_t width, uint8_t heigth);
 		
 		/**
 		 * \brief	Initialize the display
@@ -84,7 +84,7 @@ namespace xpcc
 		writeRaw(char c);
 		
 		virtual void
-		setPosition(uint8_t line, uint8_t column);
+		setCursor(uint8_t line, uint8_t column);
 		
 		virtual void
 		command(Command command);

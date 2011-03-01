@@ -34,9 +34,11 @@
 #define	XPCC__ABSTRACT_COMPONENT_HPP
 
 #include <stdint.h>
+
 #include "dispatcher.hpp"
 #include "communicatable.hpp"
 #include "communicator.hpp"
+#include "response_handle.hpp"
 
 namespace xpcc
 {
@@ -63,32 +65,45 @@ namespace xpcc
 	 */
 	class AbstractComponent : public Communicatable
 	{
-		friend class CommunicatableTask;
 	public:
 		/**
 		 * \brief	Constructor
 		 * 
 		 * \param	ownIdentifier	Identifier of the component, must be unique
 		 * 							within the network.
-		 * \param	communication	Communication class use to send messages
+		 * \param	communication	Communication class used to send messages
 		 */
 		AbstractComponent(const uint8_t ownIdentifier,
-				Dispatcher *communication);
+				Dispatcher *communication) : 
+			communicator(ownIdentifier, communication)
+		{
+		}
 		
 #ifdef __DOXYGEN__
+		/**
+		 * \brief	Update method
+		 * 
+		 * A component can feature an update method which might be called on
+		 * every cycle of the main loop.
+		 * 
+		 * This method is used in our robot to implement the behaviour of
+		 * the component. All other methods set some flags which are then
+		 * evaluated by a statemachine here.
+		 */
 		void
-		update();
+		update(...);
 #endif
 		
 	protected:
 		inline xpcc::Communicator *
 		getCommunicator();
-
+		
 		inline void
 		callAction(uint8_t receiver, uint8_t actionIdentifier);
 		
 		inline void
-		callAction(uint8_t receiver, uint8_t actionIdentifier, ResponseCallback& responseCallback);
+		callAction(uint8_t receiver, uint8_t actionIdentifier,
+				ResponseCallback& responseCallback);
 		
 		template<typename T>
 		inline void
@@ -96,7 +111,8 @@ namespace xpcc
 		
 		template<typename T>
 		inline void
-		callAction(uint8_t receiver, uint8_t actionIdentifier, const T& data, ResponseCallback& responseCallback);
+		callAction(uint8_t receiver, uint8_t actionIdentifier, const T& data,
+				ResponseCallback& responseCallback);
 		
 		
 		inline void
@@ -107,9 +123,6 @@ namespace xpcc
 		publishEvent(uint8_t eventIdentifier, const T& data);
 		
 		
-		// [proposition -> dergraaf]: Make these methods only available in the correct
-		// circumstances (action call). Perhaps move them methods to the ResponseHandle
-		// class?
 		inline void
 		sendResponse(const ResponseHandle& handle);
 		
@@ -129,51 +142,6 @@ namespace xpcc
 	};
 }
 
-// ---------------------------------------------------------------------
-// IMPLEMENTATION
-// ---------------------------------------------------------------------
 #include "abstract_component_impl.hpp"
-
-// ----------------------------------------------------------------------------
-xpcc::Communicator *
-xpcc::AbstractComponent::getCommunicator()
-{
-	return &this->communicator;
-}
-
-// ----------------------------------------------------------------------------
-void
-xpcc::AbstractComponent::callAction(uint8_t receiver, uint8_t actionIdentifier)
-{
-	this->communicator.callAction(receiver, actionIdentifier);
-}
-
-void
-xpcc::AbstractComponent::callAction(uint8_t receiver, uint8_t actionIdentifier, ResponseCallback& responseCallback)
-{
-	this->communicator.callAction(receiver, actionIdentifier, responseCallback);
-}
-
-
-// ----------------------------------------------------------------------------
-void
-xpcc::AbstractComponent::publishEvent(uint8_t eventIdentifier)
-{
-	this->communicator.publishEvent(eventIdentifier);
-}
-
-
-// ----------------------------------------------------------------------------
-void
-xpcc::AbstractComponent::sendResponse(const ResponseHandle& handle)
-{
-	this->communicator.sendResponse(handle);
-}
-
-void
-xpcc::AbstractComponent::sendNegativeResponse(const ResponseHandle& handle)
-{
-	this->communicator.sendNegativeResponse(handle);
-}
 
 #endif // XPCC__ABSTRACT_COMPONENT_HPP

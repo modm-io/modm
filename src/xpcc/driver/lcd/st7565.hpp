@@ -54,8 +54,8 @@ namespace xpcc
 	 * \author	Fabian Greif
 	 * \ingroup	lcd
 	 */
-	template <typename SPI, typename CS, typename A0, typename Reset>
-	class St7565 : public BufferedGraphicDisplay<128, 64>
+	template <typename SPI, typename CS, typename A0, typename Reset, unsigned int Width, unsigned int Height>
+	class St7565 : public BufferedGraphicDisplay<Width, Height>
 	{
 	public:
 		/**

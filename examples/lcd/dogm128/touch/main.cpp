@@ -1,7 +1,7 @@
 
 #include <xpcc/architecture/driver.hpp>
 
-#include <xpcc/driver/lcd/st7565.hpp>
+#include <xpcc/driver/lcd/ea_dog.hpp>
 #include <xpcc/driver/software_spi.hpp>
 
 #include <xpcc/io/iostream.hpp>
@@ -36,7 +36,7 @@ namespace lcd
 	typedef xpcc::SoftwareSpi< Scl, Mosi, xpcc::gpio::Unused > SPI;
 }
 
-xpcc::St7565< lcd::SPI, lcd::CS, lcd::A0, lcd::Reset > display;
+xpcc::DogM128< lcd::SPI, lcd::CS, lcd::A0, lcd::Reset > display;
 
 void
 drawCross(uint8_t x, uint8_t y)

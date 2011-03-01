@@ -46,9 +46,9 @@ namespace xpcc
 }
 
 // ----------------------------------------------------------------------------
-template <typename SPI, typename CS, typename A0, typename Reset>
+template <typename SPI, typename CS, typename A0, typename Reset, unsigned int Width, unsigned int Height>
 void
-xpcc::St7565<SPI, CS, A0, Reset>::initialize()
+xpcc::St7565<SPI, CS, A0, Reset, Width, Height>::initialize()
 {
 	spi.initialize();
 	cs.set();
@@ -76,12 +76,12 @@ xpcc::St7565<SPI, CS, A0, Reset>::initialize()
 }
 
 // ----------------------------------------------------------------------------
-template <typename SPI, typename CS, typename A0, typename Reset>
+template <typename SPI, typename CS, typename A0, typename Reset, unsigned int Width, unsigned int Height>
 void
-xpcc::St7565<SPI, CS, A0, Reset>::update()
+xpcc::St7565<SPI, CS, A0, Reset, Width, Height>::update()
 {
 	cs.reset();
-	for(uint8_t y = 0; y < 8; ++y)
+	for(uint8_t y = 0; y < (Height / 8); ++y)
 	{
 		// command mode
 		a0.reset();
@@ -91,7 +91,7 @@ xpcc::St7565<SPI, CS, A0, Reset>::update()
 		
 		// switch to data mode
 		a0.set();
-		for(uint8_t x = 0; x < 128; ++x) {
+		for(uint8_t x = 0; x < Width; ++x) {
 			spi.write(this->buffer[x][y]);
 		}
 	}

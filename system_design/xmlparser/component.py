@@ -43,6 +43,17 @@ class ComponentDictionary(utils.SingleAssignDictionary):
 						(id, action.name, actionIds[id].name))
 			else:
 				actionIds[id] = action
+		
+		# check that the component identifier is unique
+		componentIdentifier = {}
+		for component in self.values():
+			id = component.flattened().id
+			
+			if id in componentIdentifier:
+				raise ParserException("Duplicate Component-Identifier, '0x%02x' is used for '%s' and '%s'!"	% 
+						(id, component.name, componentIdentifier[id].name))
+			else:
+				componentIdentifier[id] = component
 	
 	def __iter__(self):
 		""" Generates an iterator that will iterate over all non abstract components """

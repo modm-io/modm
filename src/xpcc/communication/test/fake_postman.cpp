@@ -63,26 +63,27 @@ FakePostman::deliverPacket(const xpcc::Header& header,
 	}
 	else if (header.destination == 1)
 	{
+		xpcc::ResponseHandle response(header);
 		switch (header.packetIdentifier)
 		{
 			case 0x10:
-				component1->actionNoParameter(header);
+				component1->actionNoParameter(response);
 				break;
 			
 			case 0x11:
-				component1->actionUint16(header, &payload.get<uint16_t>());
+				component1->actionUint16(response, &payload.get<uint16_t>());
 				break;
 				
 			case 0x12:
-				component1->actionDirectResponse(header);
+				component1->actionDirectResponse(response);
 				break;
 				
 			case 0x13:
-				component1->actionDelayedResponse(header);
+				component1->actionDelayedResponse(response);
 				break;
 				
 			case 0x14:
-				component1->actionUint16CallAction(header, &payload.get<uint16_t>());
+				component1->actionUint16CallAction(response, &payload.get<uint16_t>());
 				break;
 				
 			default:
@@ -93,14 +94,15 @@ FakePostman::deliverPacket(const xpcc::Header& header,
 	}
 	else if (header.destination == 2)
 	{
+		xpcc::ResponseHandle response(header);
 		switch (header.packetIdentifier)
 		{
 			case 0x10:
-				component2->actionNoParameter(header);
+				component2->actionNoParameter(response);
 				break;
 			
 			case 0x11:
-				component2->actionUint16(header, &payload.get<uint16_t>());
+				component2->actionUint16(response, &payload.get<uint16_t>());
 				break;
 				
 			default:
@@ -114,7 +116,7 @@ FakePostman::deliverPacket(const xpcc::Header& header,
 }
 
 bool
-FakePostman::isComponentAvaliable(const xpcc::Header& header) const
+FakePostman::isComponentAvaliable(uint8_t component) const
 {
-	return (header.destination == 1 || header.destination == 2);
+	return (component == 1 || component == 2);
 }

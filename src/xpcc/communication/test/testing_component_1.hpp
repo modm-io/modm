@@ -33,8 +33,7 @@
 #ifndef	TESTING_COMPONENT_1_HPP
 #define	TESTING_COMPONENT_1_HPP
 
-#include <xpcc/communication/dispatcher.hpp>
-#include <xpcc/communication/abstract_component.hpp>
+#include <xpcc/communication.hpp>
 
 #include "timeline.hpp"
 
@@ -52,27 +51,27 @@ public:
 	
 	// Action id: 0x10
 	void
-	actionNoParameter(const xpcc::ResponseHandle& handler);
+	actionNoParameter(const xpcc::ResponseHandle& handle);
 	
 	// Action id: 0x11
 	void
-	actionUint16(const xpcc::ResponseHandle& handler,
+	actionUint16(const xpcc::ResponseHandle& handle,
 			const uint16_t *parameter);
 	
 	// Action id: 0x12
 	// This method will generate an response
 	void
-	actionDirectResponse(const xpcc::ResponseHandle& handler);
+	actionDirectResponse(const xpcc::ResponseHandle& handle);
 	
 	// Action id: 0x13
 	// Generates an response the next time update gets called
 	void
-	actionDelayedResponse(const xpcc::ResponseHandle& handler);
+	actionDelayedResponse(const xpcc::ResponseHandle& handle);
 	
 	// Action id: 0x14
 	// This method will call action 0x11 of component 2 when executed
 	void
-	actionUint16CallAction(const xpcc::ResponseHandle& handler,
+	actionUint16CallAction(const xpcc::ResponseHandle& handle,
 			const uint16_t *parameter);
 	
 	

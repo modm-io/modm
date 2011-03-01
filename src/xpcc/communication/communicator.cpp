@@ -83,8 +83,8 @@ void
 xpcc::Communicator::sendResponse(const ResponseHandle& handle)
 {
 	Header header(Header::RESPONSE, false,
-			handle.source,
 			handle.destination,
+			this->ownIdentifier,
 			handle.packetIdentifier);
 	
 	SmartPointer payload;
@@ -95,8 +95,8 @@ void
 xpcc::Communicator::sendNegativeResponse(const ResponseHandle& handle)
 {
 	Header header(Header::NEGATIVE_RESPONSE, false,
-			handle.source,
 			handle.destination,
+			this->ownIdentifier,
 			handle.packetIdentifier);
 	
 	SmartPointer payload;

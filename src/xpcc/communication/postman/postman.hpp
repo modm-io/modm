@@ -30,21 +30,21 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC_POSTMAN_HPP
-#define	XPCC_POSTMAN_HPP
-
-/**
- * \defgroup 	communication Communication
- * \brief 		Postman delivers messages to the Components.
- *
- * DESC DESC
- */
+#ifndef	XPCC__POSTMAN_HPP
+#define	XPCC__POSTMAN_HPP
 
 #include "../backend/backend_interface.hpp"
-#include "../response.hpp"
 
 namespace xpcc
 {
+	/**
+	 * \brief	Postman interface
+	 * 
+	 * The Postman class is responsible of delivering messages the the
+	 * components.
+	 * 
+	 * \ingroup	communication
+	 */
 	class Postman
 	{
 	public:
@@ -60,12 +60,20 @@ namespace xpcc
 			NOT_IMPLEMENTED_YET_ERROR,
 		};
 		
+	public:
 		virtual DeliverInfo
 		deliverPacket(const Header& header, const SmartPointer& payload) = 0;
 		
+		/**
+		 * \brief	Check if a component is available on this board
+		 * 
+		 * \param	component	Id of the component
+		 * \return	\c true if the postman is available to delivier messages
+		 * 			to the given component, \c false otherwise.
+		 */
 		virtual bool
-		isComponentAvaliable(const Header& header) const = 0;
+		isComponentAvaliable(uint8_t component) const = 0;
 	};
 }
 
-#endif // XPCC_POSTMAN_HPP
+#endif // XPCC__POSTMAN_HPP

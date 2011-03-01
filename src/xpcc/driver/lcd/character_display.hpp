@@ -57,19 +57,22 @@ namespace xpcc
 	class CharacterDisplay : public IOStream
 	{
 	public:
-		// TODO: we need to find a suitable subset for all LCDs here!
 		enum Command
 		{
-			CLEAR_DISPLAY,
-			CURSOR_HOME,
-			CURSOR_ON,
-			CURSOR_OFF,
-			CURSOR_BLINK,
+			CLEAR_DISPLAY = 0x01,	///< Clear the display content
+			
+			DISPLAY_ON = 0x0C,		///< Enable display
+			DISPLAY_OFF = 0x08,		///< Deactivate display
+			
+			CURSOR_HOME = 0x02,		///< Set cursor to position (0, 0)
+			CURSOR_ON = 0x0E,		///< Display cursor
+			CURSOR_OFF = 0x0C,		///< Hide cursor
+			CURSOR_BLINK = 0x0F		///< Display a blinking cursor
 		};
 		
 	public:
 		/// Constructor
-		CharacterDisplay();
+		CharacterDisplay(uint8_t width, uint8_t height);
 		
 		/// Initialize the display
 		virtual void
@@ -96,6 +99,10 @@ namespace xpcc
 		virtual void
 		writeRaw(char c) = 0;
 		
+		/**
+		 * \brief	Excute a command
+		 * \param	command		Command to execute
+		 */
 		virtual void
 		command(Command command) = 0;
 		
@@ -106,7 +113,7 @@ namespace xpcc
 		 * \param	column	horizontal position
 		 */
 		virtual void
-		setPosition(uint8_t line, uint8_t column) = 0;
+		setCursor(uint8_t line, uint8_t column) = 0;
 		
 	protected:
 		// Interface class for the IOStream
@@ -138,6 +145,9 @@ namespace xpcc
 		
 	protected:
 		Writer writer;
+		
+		uint8_t lineWidth;
+		uint8_t lineCount;
 		
 		uint8_t column;
 		uint8_t line;

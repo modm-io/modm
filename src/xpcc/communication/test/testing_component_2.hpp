@@ -33,8 +33,7 @@
 #ifndef	TESTING_COMPONENT_2_HPP
 #define	TESTING_COMPONENT_2_HPP
 
-#include <xpcc/communication/dispatcher.hpp>
-#include <xpcc/communication/abstract_component.hpp>
+#include <xpcc/communication.hpp>
 
 #include "timeline.hpp"
 
@@ -52,11 +51,11 @@ public:
 	
 	// Action id: 0x10
 	void
-	actionNoParameter(const xpcc::ResponseHandle& handler);
+	actionNoParameter(const xpcc::ResponseHandle& handle);
 	
 	// Action id: 0x11
 	void
-	actionUint16(const xpcc::ResponseHandle& handler,
+	actionUint16(const xpcc::ResponseHandle& handle,
 			const uint16_t *parameter);
 	
 	// Event id: 0x20

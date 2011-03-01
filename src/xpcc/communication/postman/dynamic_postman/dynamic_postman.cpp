@@ -32,33 +32,28 @@
 
 #include "../dynamic_postman.hpp"
 
+// ----------------------------------------------------------------------------
 xpcc::DynamicPostman::DynamicPostman() :
-	eventMap( 0 ),
-	requenstMap ( 0 )
+	eventMap(0),
+	requenstMap(0)
 {
 }
 
 // ----------------------------------------------------------------------------
-
 xpcc::DynamicPostman::DynamicPostman(const EventMap* eventMap, const RequestMap* requenstMap) :
-	eventMap( eventMap ),
-	requenstMap( requenstMap )
+	eventMap(eventMap),
+	requenstMap(requenstMap)
 {
 }
 
 // ----------------------------------------------------------------------------
-
-xpcc::DynamicPostman::~DynamicPostman()
-{
-}
-
-// ----------------------------------------------------------------------------
-
 xpcc::DynamicPostman::DeliverInfo
 xpcc::DynamicPostman::deliverPacket(const Header &header, const SmartPointer& payload)
 {
-	if (this->eventMap != 0) {
-		if (header.destination == 0) {
+	if (this->eventMap != 0)
+	{
+		if (header.destination == 0)
+		{
 			// EVENT
 			EventMap::const_iterator lowerBound(this->eventMap->lower_bound(header.packetIdentifier));
 			EventMap::const_iterator upperBound(this->eventMap->upper_bound(header.packetIdentifier));
@@ -72,15 +67,17 @@ xpcc::DynamicPostman::deliverPacket(const Header &header, const SmartPointer& pa
 			}
 			return NO_EVENT;
 		}
-		else {
+		else
+		{
 			// REQUEST
-			RequestMap::const_iterator iterDestination( this->requenstMap->find( header.destination ) );
+			RequestMap::const_iterator iterDestination(this->requenstMap->find(header.destination));
 			if (iterDestination != this->requenstMap->end())
 			{
-				CallbackMap::const_iterator iterCallback( iterDestination->second.find( header.packetIdentifier ) );
+				CallbackMap::const_iterator iterCallback(iterDestination->second.find(header.packetIdentifier));
 				if (iterCallback != iterDestination->second.end())
 				{
-					iterCallback->second.call(header, payload);
+					ResponseHandle response(header);
+					iterCallback->second.call(response, payload);
 					return OK;
 				}
 				else {
@@ -100,12 +97,10 @@ xpcc::DynamicPostman::deliverPacket(const Header &header, const SmartPointer& pa
 // ----------------------------------------------------------------------------
 
 bool
-xpcc::DynamicPostman::isComponentAvaliable(const Header& header) const
+xpcc::DynamicPostman::isComponentAvaliable(uint8_t component) const
 {
-	if (this->requenstMap != 0)
-	{
-		RequestMap::const_iterator it(this->requenstMap->find(header.destination));
-		return (it != this->requenstMap->end());
+	if (this->requenstMap != 0) {
+		return (this->requenstMap->find(component) != this->requenstMap->end());
 	}
 	else {
 		return false;

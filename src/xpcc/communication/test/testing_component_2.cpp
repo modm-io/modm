@@ -47,18 +47,18 @@ TestingComponent2::update()
 
 // ----------------------------------------------------------------------------
 void
-TestingComponent2::actionNoParameter(const xpcc::ResponseHandle& handler)
+TestingComponent2::actionNoParameter(const xpcc::ResponseHandle& handle)
 {
 	timeline->events.append(
-			Timeline::Event(Timeline::ACTION, 2, 0x10, handler.source));
+			Timeline::Event(Timeline::ACTION, 2, 0x10, handle.getDestination()));
 }
 
 void
-TestingComponent2::actionUint16(const xpcc::ResponseHandle& handler,
+TestingComponent2::actionUint16(const xpcc::ResponseHandle& handle,
 		const uint16_t *parameter)
 {
 	timeline->events.append(
-			Timeline::Event(Timeline::ACTION, 2, 0x11, handler.source,
+			Timeline::Event(Timeline::ACTION, 2, 0x11, handle.getDestination(),
 					parameter));
 }
 

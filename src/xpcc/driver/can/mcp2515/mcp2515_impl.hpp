@@ -199,7 +199,12 @@ xpcc::Mcp2515<SPI, CS, INT>::getMessage(can::Message& message)
 	spi.write(address);
 	
 	message.flags.extended = readIdentifier(message.identifier);
-	message.flags.rtr = (status & FLAG_RTR) ? true : false;
+	if (status & FLAG_RTR) {
+		message.flags.rtr = true;
+	}
+	else {
+		message.flags.rtr = false;
+	}
 	message.length = spi.write(0xff) & 0x0f;
 	
 	for (uint8_t i = 0; i < message.length; ++i) {

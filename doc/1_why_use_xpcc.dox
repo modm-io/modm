@@ -17,10 +17,10 @@ everything you like with the code.
 \section cpluspluss It's C++!
 
 Some people think that C++ automatically brings a lot of bloat in form of
-code size. But that's not entirely true.
+code size. But that's not true.
 
 If you use the expensive features like virtual functions and copy constructors
-careless you get code that's slower and bigger that it need to be. But if you
+careless you get code that's slower and bigger than it needs to be. But if you
 use classes and templates in a sensible way you get fast and small software
 that is easier to extended than the C counterpart.
 

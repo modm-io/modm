@@ -34,10 +34,11 @@
 
 #include "action_callback_test.hpp"
 
-class TestComponent : public xpcc::Communicatable
+class TestComponent : public xpcc::AbstractComponent
 {
 public:
 	TestComponent() :
+		xpcc::AbstractComponent(12, 0),
 		methodWithParameterCalled(false),
 		methodWithoutParameterCalled(false),
 		parameter(0)
@@ -45,13 +46,13 @@ public:
 	}
 	
 	void
-	methodWithoutParameter(const xpcc::Header&)
+	methodWithoutParameter(const xpcc::ResponseHandle&)
 	{
 		methodWithoutParameterCalled = true;
 	}
 	
 	void
-	methodWithParameter(const xpcc::Header&, const uint32_t *parameter)
+	methodWithParameter(const xpcc::ResponseHandle&, const uint32_t *parameter)
 	{
 		methodWithParameterCalled = true;
 		this->parameter = *parameter;
@@ -72,7 +73,7 @@ ActionCallbackTest::testNoParameter()
 	xpcc::Header header;
 	xpcc::SmartPointer payload;
 	
-	callback.call(header, payload);
+	callback.call(xpcc::ResponseHandle(header), payload);
 	
 	TEST_ASSERT_TRUE(component.methodWithoutParameterCalled);
 }
@@ -88,7 +89,7 @@ ActionCallbackTest::testParameter()
 	uint32_t parameter = 0x12345678;
 	xpcc::SmartPointer payload(&parameter);
 	
-	callback.call(header, payload);
+	callback.call(xpcc::ResponseHandle(header), payload);
 	
 	TEST_ASSERT_TRUE(component.methodWithParameterCalled);
 	TEST_ASSERT_EQUALS(component.parameter, parameter);

@@ -72,7 +72,7 @@ template < typename STYLE >
 void
 xpcc::log::Style<STYLE>::write( char c )
 {
-	if ( tm::SameType<STYLE, DefaultStyle >::value ) {
+	if ( tmp::SameType<STYLE, DefaultStyle >::value ) {
 		this->device->write( c );
 	}
 	else {
@@ -86,7 +86,7 @@ template < typename STYLE >
 void
 xpcc::log::Style<STYLE>::write( const char* s )
 {
-	if ( tm::SameType<STYLE, DefaultStyle>::value ) {
+	if ( tmp::SameType<STYLE, DefaultStyle>::value ) {
 		this->device->write( s );
 	}
 	else {
@@ -100,7 +100,7 @@ template < typename STYLE >
 void
 xpcc::log::Style<STYLE>::flush()
 {
-	if ( tm::SameType<STYLE, DefaultStyle >::value ) {
+	if ( tmp::SameType<STYLE, DefaultStyle >::value ) {
 		this->device->flush();
 	}
 	else {

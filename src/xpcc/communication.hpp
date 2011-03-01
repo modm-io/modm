@@ -31,10 +31,10 @@
 // ----------------------------------------------------------------------------
 /**
  * \defgroup 	communication Communication
- * \brief 		Interface to the Communication.
- *
+ * \brief 		XPCC communication system
+ * 
  */
 
-#include "communication/abstract_component.hpp"
 #include "communication/communicatable.hpp"
+#include "communication/abstract_component.hpp"
 #include "communication/dispatcher.hpp"

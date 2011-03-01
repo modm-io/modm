@@ -60,7 +60,7 @@ xpcc::Mcp23s08<Spi, Cs, Int>::initialize()
 	// open-drain output from the interrupt line
 	cs.reset();
 	spi.write(deviceAddress | WRITE);
-	spi.write(IOCON);
+	spi.write(MCP_IOCON);
 	spi.write(1 << 2);
 	cs.set();
 	
@@ -73,7 +73,7 @@ xpcc::Mcp23s08<Spi, Cs, Int>::configure(uint8_t inputMask, uint8_t pullupMask)
 {
 	cs.reset();
 	spi.write(deviceAddress | WRITE);
-	spi.write(IODIR);
+	spi.write(MCP_IODIR);
 	spi.write(inputMask);
 	cs.set();
 	
@@ -81,7 +81,7 @@ xpcc::Mcp23s08<Spi, Cs, Int>::configure(uint8_t inputMask, uint8_t pullupMask)
 	
 	cs.reset();
 	spi.write(deviceAddress | WRITE);
-	spi.write(GPPU);
+	spi.write(MCP_GPPU);
 	spi.write(pullupMask);
 	cs.set();
 	
@@ -98,7 +98,7 @@ xpcc::Mcp23s08<Spi, Cs, Int>::read()
 {
 	cs.reset();
 	spi.write(deviceAddress | READ);
-	spi.write(GPIO);
+	spi.write(MCP_GPIO);
 	
 	uint8_t value = spi.write(0x00);
 	cs.set();
@@ -114,7 +114,7 @@ xpcc::Mcp23s08<Spi, Cs, Int>::write(uint8_t output)
 {
 	cs.reset();
 	spi.write(deviceAddress | WRITE);
-	spi.write(GPIO);
+	spi.write(MCP_GPIO);
 	spi.write(output);
 	cs.set();
 	

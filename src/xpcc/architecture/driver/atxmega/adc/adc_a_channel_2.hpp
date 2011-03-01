@@ -112,7 +112,7 @@ namespace xpcc
 		 * startConversion();
 		 * while (!isFinished())
 		 *     ;
-		 * getResult();
+		 * getValue();
 		 * \endcode
 		 */
 		static uint16_t

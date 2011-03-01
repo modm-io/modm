@@ -75,7 +75,7 @@ namespace xpcc
 	{
 	public:
 		// select the type of the index variables with some template magic :-)
-		typedef typename xpcc::tm::Select< (N >= 255),
+		typedef typename xpcc::tmp::Select< (N >= 255),
 											uint_fast16_t,
 											uint_fast8_t >::Result Index;
 		

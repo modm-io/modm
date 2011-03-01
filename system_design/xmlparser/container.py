@@ -73,6 +73,11 @@ class Container:
 				componentList = self.subscriptions.get(key, [])
 				componentList.append(component)
 				self.subscriptions[key] = componentList
+			
+			# check that every component has an Identifier
+			if component.flattened().id is None:
+				raise ParserException("Undefined identifier for component '%s' in container '%s'" % \
+						(component.flattened().name, self.name))
 		
 		self.indexReady = True
 	

@@ -36,13 +36,14 @@
 #include <xpcc/container/smart_pointer.hpp>
 
 #include "backend/backend_interface.hpp"
-#include "communicatable.hpp"
+#include "abstract_component.hpp"
+#include "response_handle.hpp"
 
 namespace xpcc
 {
 	/**
 	 * \brief 		Callback type, which has to be passed to communication during
-	 *				actioncall in order to be able to receive a response.
+	 *				an action call in order to be able to receive a response.
 	 * 
 	 * Is a \b Functor.
 	 * 
@@ -51,7 +52,7 @@ namespace xpcc
 	class ActionCallback
 	{
 	public:
-		typedef void (Communicatable::*Function)(const Header& header, const void *type);
+		typedef void (AbstractComponent::*Function)(const ResponseHandle& handle, const void *type);
 		
 	public:
 		/**
@@ -61,10 +62,10 @@ namespace xpcc
 		 * \param	function	Pointer to a function of the component object
 		 */
 		template <typename C, typename P>
-		ActionCallback(C *component, void (C::*function)(const Header& header, const P* packet)) : 
-			component(reinterpret_cast<Communicatable *>(component)),
-			function(reinterpret_cast<Function>(function)),
-			packetSize(sizeof(P))
+		ActionCallback(C *component, void (C::*function)(const ResponseHandle& handle, const P* packet)) : 
+			component(reinterpret_cast<AbstractComponent *>(component)),
+			function(reinterpret_cast<Function>(function))/*,
+			packetSize(sizeof(P))*/
 		{
 		}
 		
@@ -78,28 +79,26 @@ namespace xpcc
 		 * \param	function	Pointer to a function of the component object
 		 */
 		template <typename C>
-		ActionCallback(C *component, void (C::*function)(const Header& header)) :
-			component(reinterpret_cast<Communicatable *>(component)),
-			function(reinterpret_cast<Function>(function)),
-			packetSize(0)
+		ActionCallback(C *component, void (C::*function)(const ResponseHandle& handle)) :
+			component(reinterpret_cast<AbstractComponent *>(component)),
+			function(reinterpret_cast<Function>(function))/*,
+			packetSize(0)*/
 		{
 		}
 		
 		/// \todo check packet size?
 		inline void
-		call(const Header& header, const SmartPointer &payload) const
+		call(const ResponseHandle& handle, const SmartPointer &payload) const
 		{
-			if (component != 0) {
-				(component->*function)(header, payload.getPointer());
-			}
+			(component->*function)(handle, payload.getPointer());
 			// TODO spezieller Aufruf für packetgröße = 0, funktioniert zwar
 			// auch ohne ist aber extrem unschön!
 		}
 		
 	protected:
-		Communicatable *component;
-		Function function;
-		uint8_t packetSize;
+		AbstractComponent * const component;
+		Function const function;
+		/*uint8_t packetSize;*/
 	};
 }
 

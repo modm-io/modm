@@ -104,10 +104,10 @@ xpcc::SynchronousTwiMaster::stop()
 
 // ----------------------------------------------------------------------------
 bool
-xpcc::SynchronousTwiMaster::write(uint8_t byte)
+xpcc::SynchronousTwiMaster::write(uint8_t data)
 {
 	// Send data to the previously addressed device
-	TWDR = byte;
+	TWDR = data;
 	TWCR = (1 << TWINT) | (1 << TWEN);
 	
 	while (!(TWCR & (1 << TWINT))) {

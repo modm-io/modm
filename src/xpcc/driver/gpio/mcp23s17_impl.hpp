@@ -60,7 +60,7 @@ xpcc::Mcp23s17<Spi, Cs, Int>::initialize()
 	// open-drain output from the interrupt line. INTA and INTB mirrored.
 	cs.reset();
 	spi.write(deviceAddress | WRITE);
-	spi.write(IOCON);
+	spi.write(MCP_IOCON);
 	spi.write((1 << 6) | (1 << 2));
 	spi.write((1 << 6) | (1 << 2));
 	cs.set();
@@ -74,7 +74,7 @@ xpcc::Mcp23s17<Spi, Cs, Int>::configure(uint16_t inputMask, uint16_t pullupMask)
 {
 	cs.reset();
 	spi.write(deviceAddress | WRITE);
-	spi.write(IODIR);
+	spi.write(MCP_IODIR);
 	spi.write(inputMask & 0xff);
 	spi.write(inputMask >> 8);
 	cs.set();
@@ -83,7 +83,7 @@ xpcc::Mcp23s17<Spi, Cs, Int>::configure(uint16_t inputMask, uint16_t pullupMask)
 	
 	cs.reset();
 	spi.write(deviceAddress | WRITE);
-	spi.write(GPPU);
+	spi.write(MCP_GPPU);
 	spi.write(pullupMask & 0xff);
 	spi.write(pullupMask >> 8);
 	cs.set();
@@ -101,7 +101,7 @@ xpcc::Mcp23s17<Spi, Cs, Int>::read()
 {
 	cs.reset();
 	spi.write(deviceAddress | READ);
-	spi.write(GPIO);
+	spi.write(MCP_GPIO);
 	
 	uint16_t value = spi.write(0x00);
 	value |= spi.write(0x00) << 8;
@@ -118,7 +118,7 @@ xpcc::Mcp23s17<Spi, Cs, Int>::write(uint16_t output)
 {
 	cs.reset();
 	spi.write(deviceAddress | WRITE);
-	spi.write(GPIO);
+	spi.write(MCP_GPIO);
 	spi.write(output & 0xff);
 	spi.write(output >> 8);
 	cs.set();

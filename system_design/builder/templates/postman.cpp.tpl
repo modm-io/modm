@@ -24,24 +24,23 @@ namespace component
 xpcc::Postman::DeliverInfo
 Postman::deliverPacket(const xpcc::Header& header, const xpcc::SmartPointer& payload)
 {
-	const xpcc::ResponseHandle& handle(header);
-	
 	// Avoid warnings about unused variables
-	(void) handle;
 	(void) payload;
 	
 	switch (header.destination)
 	{
 {%- for component in components %}
 		case robot::component::{{ component.name | CAMELCASE }}:
+		{
+			xpcc::ResponseHandle response(header);
 			switch (header.packetIdentifier)
 			{
 	{%- for action in component.actions %}
 				case robot::action::{{ action.name | CAMELCASE }}:
 		{%- if action.parameterType != None %}
-					component::{{ component.name | camelCase }}.action{{ action.name | CamelCase }}(handle, &payload.get<robot::packet::{{ action.parameterType.name | CamelCase }}>());
+					component::{{ component.name | camelCase }}.action{{ action.name | CamelCase }}(response, &payload.get<robot::packet::{{ action.parameterType.name | CamelCase }}>());
 		{%- else %}
-					component::{{ component.name | camelCase }}.action{{ action.name | CamelCase }}(handle);
+					component::{{ component.name | camelCase }}.action{{ action.name | CamelCase }}(response);
 		{%- endif %}
 					return OK;
 	{%- endfor %}
@@ -49,7 +48,8 @@ Postman::deliverPacket(const xpcc::Header& header, const xpcc::SmartPointer& pay
 				default:
 					return NO_ACTION;
 			}
-			break;	
+			break;
+		}
 {% endfor %}
 		
 		// Events
@@ -81,9 +81,9 @@ Postman::deliverPacket(const xpcc::Header& header, const xpcc::SmartPointer& pay
 
 // ----------------------------------------------------------------------------
 bool
-Postman::isComponentAvaliable(const xpcc::Header& header) const
+Postman::isComponentAvaliable(uint8_t component) const
 {
-	switch (header.destination)
+	switch (component)
 	{
 {%- for component in components %}
 		case robot::component::{{ component.name | CAMELCASE }}:

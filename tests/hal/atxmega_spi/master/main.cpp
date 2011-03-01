@@ -231,7 +231,7 @@ main()
 		for (uint8_t *p = ((uint8_t*)(&dmaPayload)) + 1, *ap = ((uint8_t*)&dmaAnswer) + 1; (p < fin) && b; p++, ap++)
 			b = *p == *ap;
 		
-		display.setPosition(1, 0);
+		display.setCursor(1, 0);
 		if (b){
 			stream << (uint8_t)value << " " << (uint8_t)dmaAnswer.i << " OK   ";
 		}

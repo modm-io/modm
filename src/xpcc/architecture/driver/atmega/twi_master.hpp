@@ -108,7 +108,7 @@ namespace xpcc
 		}
 		
 		static bool
-		write(uint8_t byte);
+		write(uint8_t data);
 		
 		static uint8_t
 		read(bool ack);

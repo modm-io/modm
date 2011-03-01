@@ -37,8 +37,8 @@
 // ----------------------------------------------------------------------------
 
 template <typename E, typename RW, typename RS, typename DATA>
-xpcc::Hd44780<E, RW, RS, DATA>::Hd44780() : 
-	CharacterDisplay()
+xpcc::Hd44780<E, RW, RS, DATA>::Hd44780(uint8_t width, uint8_t height) : 
+	CharacterDisplay(width, height)
 {
 }
 
@@ -93,7 +93,7 @@ xpcc::Hd44780<E, RW, RS, DATA>::writeRaw(char c)
 
 template <typename E, typename RW, typename RS, typename DATA>
 void
-xpcc::Hd44780<E, RW, RS, DATA>::setPosition(uint8_t line, uint8_t column)
+xpcc::Hd44780<E, RW, RS, DATA>::setCursor(uint8_t line, uint8_t column)
 {
 	this->column = column;
 	this->line = line;

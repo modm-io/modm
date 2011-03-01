@@ -39,7 +39,6 @@
 #include "postman/postman.hpp"
 
 #include "response_callback.hpp"
-#include "response.hpp"
 
 namespace xpcc
 {
@@ -227,6 +226,7 @@ namespace xpcc
 		
 	private:
 		friend class Communicator;
+		friend class Response;
 	};
 }
 

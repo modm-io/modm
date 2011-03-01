@@ -34,15 +34,19 @@
 #define	XPCC__COMMUNICATOR_HPP
 
 #include <stdint.h>
-#include "dispatcher.hpp"
+
 #include "communicatable.hpp"
+#include "response_callback.hpp"
+#include "response_handle.hpp"
+#include "dispatcher.hpp"
 
 namespace xpcc
 {
 	/**
 	 * \brief	A adapter class which can be obtained from a AbstractComponent.
+	 * 
 	 * Use it to enable communication for a group of classes. The component
-	 * id will be taken from AbstractComponent.
+	 * identifier will be taken from the AbstractComponent.
 	 * 
 	 * This class is just a forwarder to the Dispatcher like AbstractComponent
 	 * it also does.
@@ -51,7 +55,10 @@ namespace xpcc
 	 */
 	class Communicator : public Communicatable
 	{
-	public:
+		friend class Response;
+		friend class AbstractComponent;
+		
+	private:
 		/**
 		 * \brief	Constructor
 		 * 
@@ -62,6 +69,12 @@ namespace xpcc
 		Communicator(const uint8_t ownIdentifier,
 				Dispatcher *dispatcher);
 		
+		Communicator(const Communicator&);
+		
+		Communicator&
+		operator = (const Communicator&);
+		
+	public:
 		void
 		callAction(uint8_t receiver, uint8_t actionIdentifier);
 		
@@ -85,9 +98,6 @@ namespace xpcc
 		publishEvent(uint8_t eventIdentifier, const T& data);
 		
 		
-		// [proposition -> dergraaf]: Make these methods only available in the correct
-		// circumstances (action call). Perhaps move them methods to the ResponseHandle
-		// class?
 		void
 		sendResponse(const ResponseHandle& handle);
 		

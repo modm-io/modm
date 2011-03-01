@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8' ?>
-<!DOCTYPE rca SYSTEM "rca_builtin.dtd">
+<!DOCTYPE rca SYSTEM "communication.dtd">
 <!-- $Id$ -->
 <rca version="1.0">
 
@@ -24,14 +24,20 @@
 	<element name="y" type="int16_t" unit="mm" />
 </struct>
 
-<component name="sender">
+<component name="sender" id="0x01">
 	
 </component>
 
-<component name="receiver">
+<component name="receiver" id="0x02">
 	<actions>
-		<action></action>
+		<action name="set position" id="0x01" parameterType="position" />
+		<action name="get position" id="0x02" returnType="position" />
 	</actions>
 </component>
+
+<container name="basic">
+	<component name="sender" />
+	<component name="receiver" />
+</container>
 
 </rca>

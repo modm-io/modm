@@ -110,7 +110,7 @@ main()
 			Led5::toggle();
 		}
 		
-		display.setPosition(1, 4);
+		display.setCursor(1, 4);
 		stream << value;
 	}
 }

@@ -32,11 +32,11 @@
 
 #include "character_display.hpp"
 
-xpcc::CharacterDisplay::CharacterDisplay() :
+xpcc::CharacterDisplay::CharacterDisplay(uint8_t width, uint8_t height) :
 	IOStream(writer),
 	writer(this),
-	column(0),
-	line(0)
+	lineWidth(width), lineCount(height),
+	column(0), line(0)
 {
 }
 
@@ -46,14 +46,14 @@ xpcc::CharacterDisplay::write(char c)
 	if (c == '\n')
 	{
 		line++;
-		if (line >= 2) {
+		if (line >= lineCount) {
 			line = 0;
 		}
 		column = 0;
-		this->setPosition(line, column);
+		this->setCursor(line, column);
 	}
 	else {
-		if (column >= 16) {
+		if (column >= lineWidth) {
 			this->write('\n');
 		}
 		this->writeRaw(c);

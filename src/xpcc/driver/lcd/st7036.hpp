@@ -41,8 +41,8 @@ namespace xpcc
 	/**
 	 * \brief	Driver for ST7036 based LC-displays
 	 * 
-	 * \todo	documentation
 	 * \todo	make this class adaptable to other line counts!
+	 * \todo	documentation
 	 * 
 	 * Available defines:
 	 * - ST7036_VOLTAGE = 3|5
@@ -52,7 +52,7 @@ namespace xpcc
 	 * \author	Fabian Greif
 	 * \ingroup	lcd
 	 */
-	template <typename SPI, typename CS, typename RS>
+	template <typename SPI, typename CS, typename RS, unsigned int Width, unsigned int Heigth>
 	class St7036 : public CharacterDisplay
 	{
 	public:
@@ -71,11 +71,11 @@ namespace xpcc
 		virtual void
 		writeRaw(char c);
 		
-		//virtual void
-		//command(Command command);
+		virtual void
+		command(Command command);
 		
 		virtual void
-		setPosition(uint8_t line, uint8_t column);
+		setCursor(uint8_t line, uint8_t column);
 		
 		// TODO
 		//void

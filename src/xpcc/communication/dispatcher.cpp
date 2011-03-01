@@ -69,7 +69,7 @@ xpcc::Dispatcher::update()
 			this->handlePacket(header, payload);
 			if (!header.isAcknowledge && header.destination != 0)
 			{
-				if (postman->isComponentAvaliable(header)) {
+				if (postman->isComponentAvaliable(header.destination)) {
 					this->sendAcknowledge(header);
 				}
 			}
@@ -86,8 +86,7 @@ void
 xpcc::Dispatcher::handleActionCall(const Header& header,
 		const SmartPointer& payload)
 {
-	xpcc::Postman::DeliverInfo result =
-			postman->deliverPacket(header, payload);
+	xpcc::Postman::DeliverInfo result = postman->deliverPacket(header, payload);
 	
 	if (result == Postman::OK && header.destination != 0)
 	{
@@ -329,7 +328,7 @@ xpcc::Dispatcher::handleWaitingMessages()
 			else
 			{
 				// action or response
-				if (postman->isComponentAvaliable(entry->header))
+				if (postman->isComponentAvaliable(entry->header.destination))
 				{
 					prev = sendMessageToInnerComponent(entry, prev);
 				}

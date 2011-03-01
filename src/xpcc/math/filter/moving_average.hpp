@@ -67,7 +67,7 @@ namespace xpcc
 	class MovingAverage
 	{
 	private:
-		typedef typename ::xpcc::tm::Select<
+		typedef typename ::xpcc::tmp::Select<
 			(N >= 256),
 			uint_fast16_t,
 			uint_fast8_t >::Result Index;
