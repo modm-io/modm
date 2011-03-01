@@ -26,6 +26,7 @@ class Event(object):
 		if type is None:
 			self.type = None
 		else:
+			# TODO Error check
 			self.type = tree.types[type]
 	
 	def update(self, other):
