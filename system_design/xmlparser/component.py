@@ -49,6 +49,9 @@ class ComponentDictionary(utils.SingleAssignDictionary):
 		for component in self.values():
 			id = component.flattened().id
 			
+			if id is None:
+				continue
+			
 			if id in componentIdentifier:
 				raise ParserException("Duplicate Component-Identifier, '0x%02x' is used for '%s' and '%s'!"	% 
 						(id, component.name, componentIdentifier[id].name))

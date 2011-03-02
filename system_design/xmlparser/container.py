@@ -59,8 +59,10 @@ class Container:
 				raise ParserException("Unknown component '%s' in container '%s'" % (component, self.name))
 	
 	def updateIndex(self):
-		""" Create the lists of all events use by the components
-		in this container """
+		"""
+		Create the lists of all events use by the components in this
+		container. Checks also that every component has an identifier.
+		"""
 		if self.indexReady:
 			return
 		
