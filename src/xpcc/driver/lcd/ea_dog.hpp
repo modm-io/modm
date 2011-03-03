@@ -38,6 +38,12 @@
 
 namespace xpcc
 {
+	namespace st7565
+	{
+		EXTERN_FLASH(uint8_t configuration_dogx128[14]);
+		EXTERN_FLASH(uint8_t configuration_dogm132[14]);
+	}
+	
 	/**
 	 * \brief	EA DOGM132x-5
 	 * 
@@ -47,6 +53,19 @@ namespace xpcc
 	template <typename SPI, typename CS, typename A0, typename Reset>
 	class DogM132 : public St7565<SPI, CS, A0, Reset, 132, 32>
 	{
+	public:
+		/**
+		 * \brief	Initialize the display
+		 * 
+		 * The display needs some time to initialize after power-up. You have
+		 * to wait at least 50 ms until calling this method.
+		 */
+		void
+		initialize()
+		{
+			St7565<SPI, CS, A0, Reset, 132, 32>::initializeDisplay(xpcc::accessor::asFlash(st7565::configuration_dogm132),
+					sizeof(st7565::configuration_dogm132));
+		}
 	};
 	
 	/**
@@ -58,6 +77,19 @@ namespace xpcc
 	template <typename SPI, typename CS, typename A0, typename Reset>
 	class DogM128 : public St7565<SPI, CS, A0, Reset, 128, 64>
 	{
+	public:
+		/**
+		 * \brief	Initialize the display
+		 * 
+		 * The display needs some time to initialize after power-up. You have
+		 * to wait at least 50 ms until calling this method.
+		 */
+		void
+		initialize()
+		{
+			St7565<SPI, CS, A0, Reset, 128, 64>::initializeDisplay(xpcc::accessor::asFlash(st7565::configuration_dogx128),
+					static_cast<uint8_t>(sizeof(st7565::configuration_dogx128)));
+		}
 	};
 	
 	/**
@@ -69,6 +101,19 @@ namespace xpcc
 	template <typename SPI, typename CS, typename A0, typename Reset>
 	class DogL128 : public St7565<SPI, CS, A0, Reset, 128, 64>
 	{
+	public:
+		/**
+		 * \brief	Initialize the display
+		 * 
+		 * The display needs some time to initialize after power-up. You have
+		 * to wait at least 50 ms until calling this method.
+		 */
+		void
+		initialize()
+		{
+			St7565<SPI, CS, A0, Reset, 128, 64>::initializeDisplay(xpcc::accessor::asFlash(st7565::configuration_dogx128),
+					sizeof(st7565::configuration_dogx128));
+		}
 	};
 	
 	// TODO

@@ -30,51 +30,52 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__ST7565_HPP
-#define XPCC__ST7565_HPP
+#include <xpcc/architecture/platform.hpp>
+#include <xpcc/architecture/driver.hpp>
 
-#include <xpcc/architecture/driver/accessor/flash.hpp>
-#include <xpcc/architecture/driver/time/delay.hpp>
-
-#include "buffered_graphic_display.hpp"
+#include "xpcc_config.hpp"
 
 namespace xpcc
 {
-	/**
-	 * \brief	Driver for ST7565 based LC-displays
-	 * 
-	 * Compatible to:
-	 *  - DOGM128
-	 *  - DOGL128
-	 * 
-	 * Available defines:
-	 *  - ST7565R_TOPVIEW
-	 *  - ST7565R_INVERTED
-	 * 
-	 * \author	Fabian Greif
-	 * \ingroup	lcd
-	 */
-	template <typename SPI, typename CS, typename A0, typename Reset, unsigned int Width, unsigned int Height>
-	class St7565 : public BufferedGraphicDisplay<Width, Height>
+	namespace st7565
 	{
-	public:
-		/**
-		 * \brief	Update the display with the content of the RAM buffer
-		 */
-		virtual void
-		update();
-		
-	protected:
-		ALWAYS_INLINE void
-		initializeDisplay(xpcc::accessor::Flash<uint8_t> configuration, uint8_t size);
-		
-		SPI spi;
-		CS cs;
-		A0 a0;
-		Reset reset;
-	};
+		FLASH(uint8_t configuration_dogx128[14]) =
+		{
+			0x40, // Display start line 0
+			
+			// View direction
+#if ST7565R_TOPVIEW == 1
+			0xA0, // ADC normal
+			0xC8, // reverse COM0~COM63
+#else
+			0xA1,
+			0xC0,
+#endif
+			
+			// Normal / Inverted
+#if ST7565R_INVERTED == 1
+			0xA7, // Inverted
+#else
+			0xA6, // Display normal
+#endif
+			
+			// Hardware options
+			0xA2, // Set bias 1/9 (Duty 1/65)
+			0x2F, // Booster, Regulator and Follower on
+			0xF8, // Set internal Booster to 4x
+			0x00,
+			
+			// Contrast options
+			0x27, // Contrast set
+			0x81,
+			0x16,
+			
+			// Indicator options
+			0xAC, // No indicator
+			0x00,
+			
+			// (Init done)
+			0xAF, // Display on
+		};
+	}
 }
-
-#include "st7565_impl.hpp"
-
-#endif // XPCC__ST7565_HPP

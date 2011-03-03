@@ -39,7 +39,7 @@ namespace xpcc
 {
 	namespace st7565
 	{
-		FLASH(uint8_t configuration[14]) =
+		FLASH(uint8_t configuration_dogm132[14]) =
 		{
 			0x40, // Display start line 0
 			
@@ -66,9 +66,9 @@ namespace xpcc
 			0x00,
 			
 			// Contrast options
-			0x27, // Contrast set
+			0x23, // Contrast set
 			0x81,
-			0x16,
+			0x1f,
 			
 			// Indicator options
 			0xAC, // No indicator

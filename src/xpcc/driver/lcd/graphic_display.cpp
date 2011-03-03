@@ -76,7 +76,7 @@ xpcc::GraphicDisplay::drawLine(uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2)
 		this->drawVerticalLine(glcd::Point(x1, y1), y2 - y1);
 	}
 	else if (y1 == y2)
-	{	
+	{
 		// x1|y1 must be the left point
 		if (x1 > x2) {
 			xpcc::swap(x1, x2);

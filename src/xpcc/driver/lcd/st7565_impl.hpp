@@ -35,20 +35,13 @@
 #endif
 
 #include "st7565_defines.hpp"
-
-// ----------------------------------------------------------------------------
-namespace xpcc
-{
-	namespace st7565
-	{
-		EXTERN_FLASH(uint8_t configuration[14]);
-	}
-}
+#include "defines.hpp"
 
 // ----------------------------------------------------------------------------
 template <typename SPI, typename CS, typename A0, typename Reset, unsigned int Width, unsigned int Height>
 void
-xpcc::St7565<SPI, CS, A0, Reset, Width, Height>::initialize()
+xpcc::St7565<SPI, CS, A0, Reset, Width, Height>::initializeDisplay(
+		xpcc::accessor::Flash<uint8_t> configuration, uint8_t size)
 {
 	spi.initialize();
 	cs.set();
@@ -65,9 +58,8 @@ xpcc::St7565<SPI, CS, A0, Reset, Width, Height>::initialize()
 	cs.reset();
 	a0.reset();
 	
-	accessor::Flash<uint8_t> config(st7565::configuration);
-	for (uint8_t i = 0; i < sizeof(st7565::configuration); ++i) {
-		spi.write(config[i]);
+	for (uint8_t i = 0; i < size; ++i) {
+		spi.write(configuration[i]);
 	}
 	cs.set();
 	
@@ -87,7 +79,11 @@ xpcc::St7565<SPI, CS, A0, Reset, Width, Height>::update()
 		a0.reset();
 		spi.write(ST7565_PAGE_ADDRESS | y);		// Row select
 		spi.write(ST7565_COL_ADDRESS_MSB);		// Column select high
+#if ST7565R_TOPVIEW == 1
 		spi.write(ST7565_COL_ADDRESS_LSB | 4);	// Column select low
+#else
+		spi.write(ST7565_COL_ADDRESS_LSB);	// Column select low
+#endif
 		
 		// switch to data mode
 		a0.set();
