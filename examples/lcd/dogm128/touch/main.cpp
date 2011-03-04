@@ -36,7 +36,7 @@ namespace lcd
 	typedef xpcc::SoftwareSpi< Scl, Mosi, xpcc::gpio::Unused > SPI;
 }
 
-xpcc::DogM128< lcd::SPI, lcd::CS, lcd::A0, lcd::Reset > display;
+xpcc::DogM128< lcd::SPI, lcd::CS, lcd::A0, lcd::Reset, true > display;
 
 void
 drawCross(uint8_t x, uint8_t y)

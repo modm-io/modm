@@ -35,12 +35,56 @@
 #endif
 
 #include "st7565_defines.hpp"
-#include "defines.hpp"
 
 // ----------------------------------------------------------------------------
-template <typename SPI, typename CS, typename A0, typename Reset, unsigned int Width, unsigned int Height>
+template <typename SPI, typename CS, typename A0, typename Reset, unsigned int Width, unsigned int Height, bool TopView>
 void
-xpcc::St7565<SPI, CS, A0, Reset, Width, Height>::initializeDisplay(
+xpcc::St7565<SPI, CS, A0, Reset, Width, Height, TopView>::update()
+{
+	cs.reset();
+	for(uint8_t y = 0; y < (Height / 8); ++y)
+	{
+		// command mode
+		a0.reset();
+		spi.write(ST7565_PAGE_ADDRESS | y);		// Row select
+		spi.write(ST7565_COL_ADDRESS_MSB);		// Column select high
+		
+		if (TopView) {
+			spi.write(ST7565_COL_ADDRESS_LSB | 4);	// Column select low
+		}
+		else {
+			spi.write(ST7565_COL_ADDRESS_LSB);	// Column select low
+		}
+		
+		// switch to data mode
+		a0.set();
+		for(uint8_t x = 0; x < Width; ++x) {
+			spi.write(this->buffer[x][y]);
+		}
+	}
+	cs.set();
+}
+
+template <typename SPI, typename CS, typename A0, typename Reset, unsigned int Width, unsigned int Height, bool TopView>
+void
+xpcc::St7565<SPI, CS, A0, Reset, Width, Height, TopView>::setInvert(bool invert)
+{
+	cs.reset();
+	a0.reset();
+	
+	if (invert) {
+		spi.write(ST7565_REVERSE);
+	}
+	else {
+		spi.write(ST7565_NORMAL);
+	}
+	cs.set();
+}
+
+// ----------------------------------------------------------------------------
+template <typename SPI, typename CS, typename A0, typename Reset, unsigned int Width, unsigned int Height, bool TopView>
+void
+xpcc::St7565<SPI, CS, A0, Reset, Width, Height, TopView>::initialize(
 		xpcc::accessor::Flash<uint8_t> configuration, uint8_t size)
 {
 	spi.initialize();
@@ -58,38 +102,22 @@ xpcc::St7565<SPI, CS, A0, Reset, Width, Height>::initializeDisplay(
 	cs.reset();
 	a0.reset();
 	
+	// View direction
+	if (TopView) {
+		spi.write(ST7565_ADC_NORMAL);		// ADC normal
+		spi.write(ST7565_SCAN_DIR_REVERSE);	// reverse COM0~COM63
+	}
+	else {
+		spi.write(ST7565_ADC_REVERSE);
+		spi.write(ST7565_SCAN_DIR_NORMAL);
+	}
+	
 	for (uint8_t i = 0; i < size; ++i) {
 		spi.write(configuration[i]);
 	}
+	
 	cs.set();
 	
 	this->clear();
 	this->update();
-}
-
-// ----------------------------------------------------------------------------
-template <typename SPI, typename CS, typename A0, typename Reset, unsigned int Width, unsigned int Height>
-void
-xpcc::St7565<SPI, CS, A0, Reset, Width, Height>::update()
-{
-	cs.reset();
-	for(uint8_t y = 0; y < (Height / 8); ++y)
-	{
-		// command mode
-		a0.reset();
-		spi.write(ST7565_PAGE_ADDRESS | y);		// Row select
-		spi.write(ST7565_COL_ADDRESS_MSB);		// Column select high
-#if ST7565R_TOPVIEW == 1
-		spi.write(ST7565_COL_ADDRESS_LSB | 4);	// Column select low
-#else
-		spi.write(ST7565_COL_ADDRESS_LSB);	// Column select low
-#endif
-		
-		// switch to data mode
-		a0.set();
-		for(uint8_t x = 0; x < Width; ++x) {
-			spi.write(this->buffer[x][y]);
-		}
-	}
-	cs.set();
 }

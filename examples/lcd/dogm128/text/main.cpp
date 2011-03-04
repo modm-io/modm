@@ -29,7 +29,7 @@ namespace lcd
 
 typedef xpcc::SoftwareSpi< lcd::Scl, lcd::Mosi, lcd::Miso > SPI;
 
-xpcc::DogM128< SPI, lcd::CS, lcd::A0, lcd::Reset > display;
+xpcc::DogM128< SPI, lcd::CS, lcd::A0, lcd::Reset, true > display;
 
 MAIN_FUNCTION
 {

@@ -43,18 +43,11 @@ namespace xpcc
 	/**
 	 * \brief	Driver for ST7565 based LC-displays
 	 * 
-	 * Compatible to:
-	 *  - DOGM128
-	 *  - DOGL128
-	 * 
-	 * Available defines:
-	 *  - ST7565R_TOPVIEW
-	 *  - ST7565R_INVERTED
-	 * 
 	 * \author	Fabian Greif
 	 * \ingroup	lcd
 	 */
-	template <typename SPI, typename CS, typename A0, typename Reset, unsigned int Width, unsigned int Height>
+	template <typename SPI, typename CS, typename A0, typename Reset,
+			  unsigned int Width, unsigned int Height, bool TopView>
 	class St7565 : public BufferedGraphicDisplay<Width, Height>
 	{
 	public:
@@ -64,9 +57,13 @@ namespace xpcc
 		virtual void
 		update();
 		
+		/// Invert the display content
+		void
+		setInvert(bool invert);
+		
 	protected:
 		ALWAYS_INLINE void
-		initializeDisplay(xpcc::accessor::Flash<uint8_t> configuration, uint8_t size);
+		initialize(xpcc::accessor::Flash<uint8_t> configuration, uint8_t size);
 		
 		SPI spi;
 		CS cs;

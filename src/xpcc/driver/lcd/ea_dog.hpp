@@ -50,8 +50,8 @@ namespace xpcc
 	 * \see		<a href="http://www.lcd-module.de/eng/pdf/grafik/dogm132-5e.pdf">Datasheet</a>
 	 * \ingroup	lcd
 	 */
-	template <typename SPI, typename CS, typename A0, typename Reset>
-	class DogM132 : public St7565<SPI, CS, A0, Reset, 132, 32>
+	template <typename SPI, typename CS, typename A0, typename Reset, bool TopView = false>
+	class DogM132 : public St7565<SPI, CS, A0, Reset, 132, 32, TopView>
 	{
 	public:
 		/**
@@ -63,7 +63,8 @@ namespace xpcc
 		void
 		initialize()
 		{
-			St7565<SPI, CS, A0, Reset, 132, 32>::initializeDisplay(xpcc::accessor::asFlash(st7565::configuration_dogm132),
+			St7565<SPI, CS, A0, Reset, 132, 32, TopView>::initialize(
+					xpcc::accessor::asFlash(st7565::configuration_dogm132),
 					sizeof(st7565::configuration_dogm132));
 		}
 	};
@@ -74,8 +75,8 @@ namespace xpcc
 	 * \see		<a href="http://www.lcd-module.de/pdf/grafik/dogm128.pdf">Datasheet</a>
 	 * \ingroup	lcd
 	 */
-	template <typename SPI, typename CS, typename A0, typename Reset>
-	class DogM128 : public St7565<SPI, CS, A0, Reset, 128, 64>
+	template <typename SPI, typename CS, typename A0, typename Reset, bool TopView = false>
+	class DogM128 : public St7565<SPI, CS, A0, Reset, 128, 64, TopView>
 	{
 	public:
 		/**
@@ -87,7 +88,8 @@ namespace xpcc
 		void
 		initialize()
 		{
-			St7565<SPI, CS, A0, Reset, 128, 64>::initializeDisplay(xpcc::accessor::asFlash(st7565::configuration_dogx128),
+			St7565<SPI, CS, A0, Reset, 128, 64, TopView>::initialize(
+					xpcc::accessor::asFlash(st7565::configuration_dogx128),
 					static_cast<uint8_t>(sizeof(st7565::configuration_dogx128)));
 		}
 	};
@@ -98,8 +100,8 @@ namespace xpcc
 	 * \see		<a href="http://www.lcd-module.de/pdf/grafik/dogl128-6.pdf">Datasheet</a>
 	 * \ingroup	lcd
 	 */
-	template <typename SPI, typename CS, typename A0, typename Reset>
-	class DogL128 : public St7565<SPI, CS, A0, Reset, 128, 64>
+	template <typename SPI, typename CS, typename A0, typename Reset, bool TopView = false>
+	class DogL128 : public St7565<SPI, CS, A0, Reset, 128, 64, TopView>
 	{
 	public:
 		/**
@@ -111,7 +113,8 @@ namespace xpcc
 		void
 		initialize()
 		{
-			St7565<SPI, CS, A0, Reset, 128, 64>::initializeDisplay(xpcc::accessor::asFlash(st7565::configuration_dogx128),
+			St7565<SPI, CS, A0, Reset, 128, 64, TopView>::initialize(
+					xpcc::accessor::asFlash(st7565::configuration_dogx128),
 					sizeof(st7565::configuration_dogx128));
 		}
 	};

@@ -33,7 +33,7 @@
 #include <xpcc/architecture/platform.hpp>
 #include <xpcc/architecture/driver.hpp>
 
-#include "xpcc_config.hpp"
+#include "st7565_defines.hpp"
 
 namespace xpcc
 {
@@ -43,39 +43,26 @@ namespace xpcc
 		{
 			0x40, // Display start line 0
 			
-			// View direction
-#if ST7565R_TOPVIEW == 1
-			0xA0, // ADC normal
-			0xC8, // reverse COM0~COM63
-#else
-			0xA1,
-			0xC0,
-#endif
-			
 			// Normal / Inverted
-#if ST7565R_INVERTED == 1
-			0xA7, // Inverted
-#else
-			0xA6, // Display normal
-#endif
+			ST7565_NORMAL,				// Display normal
 			
 			// Hardware options
-			0xA2, // Set bias 1/9 (Duty 1/65)
-			0x2F, // Booster, Regulator and Follower on
-			0xF8, // Set internal Booster to 4x
-			0x00,
+			ST7565_BIAS_1_9,			// Set bias 1/9 (Duty 1/65)
+			ST7565_POWER_WIDE_RANGE,	// Booster, Regulator and Follower on
+			ST7565_BOOSTER_SET,			// Set internal Booster to 4x
+			ST7565_VOLUME_MODE_2,
 			
 			// Contrast options
-			0x27, // Contrast set
-			0x81,
+			0x27,						// Contrast set
+			ST7565_VOLUME_MODE_1,
 			0x16,
 			
 			// Indicator options
-			0xAC, // No indicator
-			0x00,
+			ST7565_INDICATOR_OFF, 		// No indicator
+			ST7565_VOLUME_MODE_2,
 			
 			// (Init done)
-			0xAF, // Display on
+			ST7565_ON, 					// Display on
 		};
 	}
 }

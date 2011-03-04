@@ -35,7 +35,7 @@ namespace lcd
 	typedef xpcc::SoftwareSpi< Scl, Mosi, xpcc::gpio::Unused, 10000000UL > SPI;
 }
 
-xpcc::DogM128< lcd::SPI, lcd::CS, lcd::A0, lcd::Reset > display;
+xpcc::DogM128< lcd::SPI, lcd::CS, lcd::A0, lcd::Reset, true > display;
 
 FLASH(uint8_t bootscreen[]) =
 {
