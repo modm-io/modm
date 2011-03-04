@@ -42,6 +42,8 @@ for line in open("regression.txt"):
 flashFilter = re.compile('\nProgram:\s+(\d+)')
 ramFilter = re.compile('\nData:\s+(\d+)')
 
+newData = []
+
 for path, directories, files in os.walk('../examples'):
 	# exclude the SVN-directories
 	if '.svn' in directories:
@@ -61,6 +63,8 @@ for path, directories, files in os.walk('../examples'):
 				flash = int(flashFilter.search(stdout).group(1))
 				ram = int(ramFilter.search(stdout).group(1))
 				
+				newData.append([path, flash, ram])
+				
 				try:
 					oldFlash, oldRam = results[path]
 					
@@ -68,8 +72,16 @@ for path, directories, files in os.walk('../examples'):
 						print "WARNING: Regression at %s" % path
 						print "  Flash : %i -> %i (%+i)" % (oldFlash, flash, (flash - oldFlash))
 						print "  RAM   : %i -> %i (%+i)" % (oldRam, ram, (ram - oldRam))
+					elif (oldFlash > flash) or (oldRam > ram):
+						print "IMPROVEMENT at %s" % path
+						print "  Flash : %i -> %i (%+i)" % (oldFlash, flash, (flash - oldFlash))
+						print "  RAM   : %i -> %i (%+i)" % (oldRam, ram, (ram - oldRam))
 				except KeyError:
 					print "WARNING: not found"
 			except AttributeError:
 				pass
 
+file = open("regression.new.txt", "w")
+for result in newData:
+	file.write("%s %s %s\n" % (result[0], result[1], result[2]))
+file.close()

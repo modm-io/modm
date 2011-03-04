@@ -127,6 +127,8 @@ def generate(env, **kw):
 		"-ffunction-sections",
 		"-fdata-sections",
 		"-fno-split-wide-types",
+		"-fno-move-loop-invariants",
+		"-fno-tree-loop-optimize",
 		"-Wall",
 		"-Wextra",
 		"-Wundef", 
