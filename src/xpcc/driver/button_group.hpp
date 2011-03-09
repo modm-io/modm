@@ -241,7 +241,7 @@ isReleased()     -------X----------------------X-------X----
 		const T repeatMask;
 		uint16_t repeatCounter;
 		
-		T state;		//!< bebounced and inverted key state:
+		T state;		//!< debounced and inverted key state:
 						//!< bit = 1: key pressed
 		T pressState;
 		T releaseState;

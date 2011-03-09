@@ -39,8 +39,8 @@ template <uint8_t Width, uint8_t Height>
 void
 xpcc::BufferedGraphicDisplay<Width, Height>::clear()
 {
-	for (uint8_t i = 0; i < 8; ++i) {
-		for (uint8_t k = 0; k < 128; ++k) {
+	for (uint8_t i = 0; i < Height / 8; ++i) {
+		for (uint8_t k = 0; k < Width; ++k) {
 			this->buffer[k][i] = 0;
 		}
 	}
