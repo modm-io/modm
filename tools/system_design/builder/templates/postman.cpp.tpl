@@ -5,6 +5,8 @@
  */
 // ----------------------------------------------------------------------------
 
+#include <xpcc/communication.hpp>
+
 #include "packets.hpp"
 #include "identifier.hpp"
 #include "postman.hpp"
@@ -24,15 +26,17 @@ namespace component
 xpcc::Postman::DeliverInfo
 Postman::deliverPacket(const xpcc::Header& header, const xpcc::SmartPointer& payload)
 {
+	xpcc::ResponseHandle response(header);
+	
 	// Avoid warnings about unused variables
 	(void) payload;
+	(void) response;
 	
 	switch (header.destination)
 	{
 {%- for component in components %}
 		case robot::component::{{ component.name | CAMELCASE }}:
 		{
-			xpcc::ResponseHandle response(header);
 			switch (header.packetIdentifier)
 			{
 	{%- for action in component.actions %}
