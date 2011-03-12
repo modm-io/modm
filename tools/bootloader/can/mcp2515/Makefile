@@ -43,10 +43,11 @@
 # MCU name
 #MCU = atmega8
 #MCU = atmega88
-#MCU = atmega168
+MCU = atmega168
+MCU = atmega328p
 #MCU = atmega16
 #MCU = atmega32
-MCU = atmega644
+#MCU = atmega644
 
 # Processor frequency.
 #F_CPU =  4000000
@@ -61,7 +62,7 @@ BOOTLOADER_BOARD_ID = 0xff
 # Startaddress of the bootloader (512 words)
 #     ATMega8/88    => 0x1C00
 #     ATMega16/168  => 0x3C00
-#     ATMega32      => 0x7C00
+#     ATMega32      => 0x7000
 #     ATMega644     => 0xFC00
 ifeq ($(MCU), atmega8)
 BOOTSTART = 0x1C00
@@ -72,6 +73,8 @@ BOOTSTART = 0x3C00
 else ifeq ($(MCU), atmega16)
 BOOTSTART = 0x3C00
 else ifeq ($(MCU), atmega32)
+BOOTSTART = 0x7C00
+else ifeq ($(MCU), atmega328p)
 BOOTSTART = 0x7C00
 else ifeq ($(MCU), atmega644)
 BOOTSTART = 0xFC00
@@ -165,6 +168,7 @@ CFLAGS += -fpack-struct
 CFLAGS += -fshort-enums
 CFLAGS += -Wall
 CFLAGS += -Wstrict-prototypes
+CFLAGS += -fno-inline-small-functions
 #CFLAGS += -Wno-strict-aliasing
 CFLAGS += -mshort-calls
 #CFLAGS += -fno-unit-at-a-time

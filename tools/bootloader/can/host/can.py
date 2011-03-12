@@ -170,6 +170,10 @@ class Usb2Can(SerialInterface, dispatcher.MessageDispatcher):
 	def connect(self, port = None, baud = None, debug = None):
 		SerialInterface.connect(self, port, baud, debug)
 		
+		# initialize serial interface by sending some returns and
+		# trying to close the channel
+		self._sendRaw("\r\r\rC\r")
+		
 		# set bitrate and open the channel
 		self._sendRaw("S4\r")
 		#self._sendRaw("S6\r")

@@ -133,15 +133,23 @@
 	
 #elif defined(__AVR_ATmega168__)
 	// $1C00
-	#define	RWW_PAGES	112
+	#define	RWW_PAGES	120
 	#define	RAMSTART	0x0100
 	#define	SIG_FAMILY	0x94
 	#define	SIG_DEVICE	0x06
 	#define	TIMER_INTERRUPT_FLAG_REGISTER	TIFR1
 	
+#elif defined(__AVR_ATmega328P__)
+	// $3800
+	#define	RWW_PAGES	224
+	#define	RAMSTART	0x0100
+	#define	SIG_FAMILY	0x95
+	#define	SIG_DEVICE	0x0f
+	#define	TIMER_INTERRUPT_FLAG_REGISTER	TIFR1
+	
 #elif defined(__AVR_ATmega16__)	// TODO
 	// $1C00
-	#define	RWW_PAGES	112
+	#define	RWW_PAGES	120
 	#define	RAMSTART	0x0060
 	#define	SIG_FAMILY	0x94
 	#define	SIG_DEVICE	0x03
@@ -225,7 +233,7 @@
 	#define	PORT_SPI	PORTB
 	#define	DDR_SPI		DDRB
 #elif defined(__AVR_ATmega8__)  || defined(__AVR_ATmega48__) || \
-	  defined(__AVR_ATmega88__) || defined(__AVR_ATmega168__)
+	  defined(__AVR_ATmega88__) || defined(__AVR_ATmega168__) || defined(__AVR_ATmega328P__)
 	#define	P_MOSI	B,3
 	#define	P_MISO	B,4
 	#define	P_SCK	B,5

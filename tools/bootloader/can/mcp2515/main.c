@@ -179,15 +179,12 @@ init(void)
 			 : "M" (_SFR_MEM_ADDR(_WD_CONTROL_REG)), \
 			   "r" ((uint8_t) ((1 << _WD_CHANGE_BIT) | (1 << WDE))) \
 			 : "r0");
-	
-	// Enable the Boot-LED
-	BOOT_LED_SET_OUTPUT;
-	BOOT_LED_ON;
 }
 
 // ----------------------------------------------------------------------------
 int
-main(void) __attribute__((naked));
+main(void) __attribute__((naked)) \
+		__attribute__((section(".init9")));
 
 int
 main(void)
@@ -201,7 +198,10 @@ main(void)
 	
 	// Do some additional initialization provided by the user
 	BOOT_INIT;
-
+	
+	BOOT_LED_SET_OUTPUT;
+	BOOT_LED_ON;
+	
 	// Start timer
 	TCNT1 = TIMER_PRELOAD;
 	TCCR1A = 0;
@@ -222,12 +222,12 @@ main(void)
 			if (TIMER_INTERRUPT_FLAG_REGISTER & (1 << TOV1))
 			{
 				BOOT_LED_OFF;
-				
+
 				// timeout => start application
 				boot_jump_to_application();
 			}
 		}
-		
+
 		// stop timer
 		TCCR1B = 0;
 		
