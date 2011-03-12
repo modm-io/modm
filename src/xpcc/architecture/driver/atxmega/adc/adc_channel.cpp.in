@@ -54,12 +54,38 @@ xpcc::AdcChannel{{ id }}{{ ch }}::read()
 	return getResult();
 }
 
-// ----------------------------------------------------------------------------
 void
-xpcc::AdcChannel{{ id }}{{ ch }}::startConversion()
+xpcc::AdcChannel{{ id }}{{ ch }}::setInternalInputMode(ADC_CH_MUXINT_t input)
 {
-	ADC{{ id }}_CH{{ ch }}_INTFLAGS = 0;
-	ADC{{ id }}_CH{{ ch }}_CTRL |= ADC_CH_START_bm;
+	ADC{{ id }}_CH{{ ch }}_CTRL = ADC_CH_INPUTMODE_INTERNAL_gc;
+	ADC{{ id }}_CH{{ ch }}_MUXCTRL = input;
+}
+
+void
+xpcc::AdcChannel{{ id }}{{ ch }}::setSingleEndedMode(ADC_CH_MUXPOS_t input)
+{
+	ADC{{ id }}_CH{{ ch }}_CTRL = ADC_CH_INPUTMODE_SINGLEENDED_gc;
+	ADC{{ id }}_CH{{ ch }}_MUXCTRL = input;
+}
+
+void
+xpcc::AdcChannel{{ id }}{{ ch }}::setDifferentialMode(ADC_CH_MUXPOS_t positiveInput, ADC_CH_MUXNEG_t negativeInput)
+{
+	setSignedConversion(true);
+	
+	ADC{{ id }}_CH{{ ch }}_CTRL = ADC_CH_INPUTMODE_DIFF_gc;
+	ADC{{ id }}_CH{{ ch }}_MUXCTRL = positiveInput | negativeInput;
+}
+
+void
+xpcc::AdcChannel{{ id }}{{ ch }}::setDifferentialGainMode(
+		ADC_CH_MUXPOS_t positiveInput, ADC_CH_MUXNEG_t negativeInput,
+		ADC_CH_GAIN_t gainFactor)
+{
+	setSignedConversion(true);
+	
+	ADC{{ id }}_CH{{ ch }}_CTRL = ADC_CH_INPUTMODE_DIFFWGAIN_gc | gainFactor;
+	ADC{{ id }}_CH{{ ch }}_MUXCTRL = positiveInput | negativeInput;
 }
 
 #endif	// ADC{{ id }}

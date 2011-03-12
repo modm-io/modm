@@ -231,6 +231,8 @@ namespace xpcc
 		 * that sector.
 		 * 
 		 * \param	pageAddress	Page address (upper 11-bits of the 19-bit address)
+		 * \param	buffer		Buffer index (0..1)
+		 * 
 		 * \see		isReady()
 		 */
 		static void
@@ -242,8 +244,8 @@ namespace xpcc
 		 * Takes 30-75ms. Operation is finished when isReady() returns \c true.
 		 * 
 		 * \param 	blockAddress	Block address (upper 11-bits of the 19-bit
-		 * 				address, from these 11-bits the three lower bits
-		 * 				are don't care).
+		 * 					address, from these 11-bits the three lower bits
+		 * 					are don't care).
 		 * \see		isReady()
 		 */
 		static void

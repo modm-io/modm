@@ -5,7 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- *
+ * 
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -14,7 +14,7 @@
  *     * Neither the name of the Roboterclub Aachen e.V. nor the
  *       names of its contributors may be used to endorse or promote products
  *       derived from this software without specific prior written permission.
- *
+ * 
  * THIS SOFTWARE IS PROVIDED BY ROBOTERCLUB AACHEN E.V. ''AS IS'' AND ANY
  * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -34,16 +34,23 @@
  * \ingroup		atxmega
  * \defgroup	atxmega_adc	ATxmega Analog/Digital Converter Module
  * 
+ * The xMEGA family contains one (A4 family) or two (A1,A3 family) 12-bit
+ * SAR (Successive Approximation Result) ADCs connected to PORTA and PORTB. 
+ * 
  * ADC clock frequency should be at around 62kHz for maximum
- * resolution. If less than 12 bits are needed the frequency can be higher.
+ * resolution when measuring internal signals. If less than 12 bits are needed
+ * the frequency can be higher.
+ * 
+ * For external signals the frequency should be between 100kHz and 2MHz.
+ * 
  * A differential input in signed mode increases accuracy by up to 6 bit (!).
  * \see	<a href="http://blog.frankvh.com/2010/01/03/atmel-xmega-adc-problems-solutions/">
  * XMEGA ADC Problems and Solutions</a>
- *
+ * 
  * The XMEGA ADC is more complex than of the Mega ADC, and each ADC Module has
- * four ADC Channels which have a seperate class.
- * You first have to initialize the ADC Module to use any of the Channels.
- *
+ * four ADC Channels which have a separate class. You first have to initialize
+ * the ADC Module to use any of the Channels.
+ * 
  * Select either a single ended or differential input mode. Check the
  * conversion mode bit in the ADC Module for a signed conversion.
  * Then select the negative and/or positive inputs for the channel.
@@ -56,10 +63,8 @@
  * main(void)
  * {
  *     ...
- *     typedef AdcModuleA adcA;
- *     
- *     adcA::initialize(ADC_REFSEL_AREFA_gc);    // PortA AVcc
- *     adcA::setConversionMode(true);            // Signed conversion mode
+ *     AdcModuleA::initialize(ADC_REFSEL_AREFA_gc);
+ *     AdcModuleA::setSignedConversion(true);
  *     ...
  * }
  * \endcode
@@ -75,12 +80,11 @@
  *     ...
  *     typedef AdcChannelA0 myChannel;
  *     
- *     myChannel::initialize(ADC_REFSEL_AREFA_gc);    // PortA AVcc
- *     myChannel::setConversionMode(true);            // Signed conversion mode
+ *     myChannel::initialize(ADC_REFSEL_AREFA_gc);    // PortA AREF
+ *     myChannel::setSignedConversion(true);
  *     
  *     // Differential input mode
- *     myChannel::setInputMode(ADC_CH_INPUTMODE_DIFF_gc);
- *     myChannel::selectInput(ADC_CH_MUXPOS_PIN4_gc | ADC_CH_MUXNEG_PIN3_gc);
+ *     myChannel::setDifferentialMode(ADC_CH_MUXPOS_PIN4_gc, ADC_CH_MUXNEG_PIN3_gc);
  *     
  *     // The result is always unsigned, so you want to cast it in signed mode
  *     int16_t result = (int16_t) myChannel::read();

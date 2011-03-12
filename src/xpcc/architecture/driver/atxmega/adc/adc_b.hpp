@@ -47,20 +47,32 @@ namespace xpcc
 {
 	/**
 	 * \brief		ADC Module B
-	 *
+	 * 
+	 * Each ADC module has four channels with its own MUX selection and result
+	 * register. See AdcChannelB0..3.
+	 * 
 	 * \ingroup		atxmega_adc
 	 */
 	class AdcModuleB
 	{
 	public:
 		inline static ADC_t&
-		getModuleBase()
+		getModuleRegister()
 		{
 			return ADCB;
 		}
 		
+		/**
+		 * \brief	Initialize ADC module
+		 * 
+		 * Enables the module and loads the ADC calibration registers. Default
+		 * is right adjusted 12-bit unsigned conversion mode.
+		 * 
+		 * \see		setReference()
+		 * \see		setPrescaler()
+		 */
 		static void
-		initialize(uint8_t reference=ADC_REFSEL_VCC_gc,
+		initialize(ADC_REFSEL_t reference=ADC_REFSEL_VCC_gc,
 				ADC_PRESCALER_t prescaler=ADC_PRESCALER_DIV512_gc);
 		
 		inline static void
@@ -69,45 +81,59 @@ namespace xpcc
 			ADCB_CTRLA = (ADCB_CTRLA & ~ADC_ENABLE_bm) | (enable ? ADC_ENABLE_bm : 0);
 		}
 		
-		/// Flush the ADC pipeline.
+		/**
+		 * \brief	Set reference voltage
+		 * 
+		 * The ADC has four possible reference voltages:
+		 * - Internal 1V (\c ADC_REFSEL_INT1V_gc)
+		 * - Vcc/1.6 (\c ADC_REFSEL_VCC_gc)
+		 * - AREF on PORTA (\c ADC_REFSEL_AREFA_gc)
+		 * - AREF on PORTB (\c ADC_REFSEL_AREFB_gc)
+		 * - AVCC/2 (only on Xmega D devices)
+		 * 
+		 * The voltage on the AREF pins is limited to 1V < Vref < Vcc - 0.6V.
+		 * For a 3.3V supply voltage this puts the upper limit on Vref to 2.7V.
+		 * 
+		 * In unsigned mode a small offset of 0.05*Vref is subtracted. Therefore
+		 * the measurement of AGND will lead to value of about 200. This also
+		 * limits the input range from AGND to 0.95*Vref.
+		 */
 		inline static void
-		flush()
-		{
-			ADCB_CTRLA |= ADC_FLUSH_bm;
-		}
-		
-		inline static void
-		setDMARequest(ADC_DMASEL_t selection=ADC_DMASEL_OFF_gc)
-		{
-			ADCB_CTRLA = (ADCB_CTRLA & ~ADC_DMASEL_gm) | selection;
-		}
-		
-		/// Set signed or unsigned conversion.
-		inline static void
-		enableSignedConversion(bool unsgnd=true)
-		{
-			ADCB_CTRLB = (ADCB_CTRLB & ~ADC_CONMODE_bm) | (unsgnd ? ADC_CONMODE_bm : 0);
-		}
-		
-		/// Enable free running mode as defined in setChannelSweep.
-		inline static void
-		setFreeRunningMode(bool enable=true)
-		{
-			ADCB_CTRLB = (ADCB_CTRLB & ~ADC_FREERUN_bm) | (enable ? ADC_FREERUN_bm : 0);
-		}
-		
-		/// left/right-adjusted 12-bit result or 8-bit result
-		inline static void
-		setResolution(ADC_RESOLUTION_t resolution=ADC_RESOLUTION_12BIT_gc)
-		{
-			ADCB_CTRLB = (ADCB_CTRLB & ~ADC_RESOLUTION_gm) | resolution;
-		}
-		
-		/// reference voltage, internal 1V, Vcc/1.6 or external AVcc/BVcc
-		inline static void
-		setReference(uint8_t reference=ADC_REFSEL_VCC_gc)
+		setReference(ADC_REFSEL_t reference=ADC_REFSEL_VCC_gc)
 		{
 			ADCB_REFCTRL = reference;
+		}
+		
+		/**
+		 * \brief	Set prescaler
+		 * 
+		 * ADC clock frequency should be at around 62kHz for maximum
+		 * resolution of internal sources.
+		 * 
+		 * For external measurements the frequency should be between 100kHz
+		 * and 2MHz.
+		 */
+		inline static void
+		setPrescaler(ADC_PRESCALER_t prescaler=ADC_PRESCALER_DIV512_gc)
+		{
+			ADCB_PRESCALER = prescaler;
+		}
+		
+		/**
+		 * \brief	Set signed or unsigned conversion.
+		 * 
+		 * Changing the mode will 
+		 */
+		inline static void
+		setSignedConversion(bool signedMode=true)
+		{
+			ADCB_CTRLB = (ADCB_CTRLB & ~ADC_CONMODE_bm) | (signedMode ? ADC_CONMODE_bm : 0);
+		}
+		
+		inline static void
+		setDmaRequest(ADC_DMASEL_t selection=ADC_DMASEL_OFF_gc)
+		{
+			ADCB_CTRLA = (ADCB_CTRLA & ~ADC_DMASEL_gm) | selection;
 		}
 		
 		inline static void
@@ -116,16 +142,66 @@ namespace xpcc
 			ADCB_EVCTRL = (ADCB_EVCTRL & ~(ADC_EVACT_gm | ADC_EVSEL_gm)) | mode;
 		}
 		
+		/**
+		 * \brief	Enable free running mode as defined in setChannelSweep.
+		 *
+		 * \see		setChannelSweep()
+		 */
+		inline static void
+		setFreeRunningMode(bool enable=true)
+		{
+			ADCB_CTRLB = (ADCB_CTRLB & ~ADC_FREERUN_bm) | (enable ? ADC_FREERUN_bm : 0);
+		}
+		
+		/**
+		 * \brief	Configure channel sweep
+		 * 
+		 * Select which channels to include in free-running mode. You can
+		 * choose between channel 0 only, channel 0 and 1, channel 0 to 2 or
+		 * all four channels.
+		 * 
+		 * Care should be taken not to change any involved MUX settings when
+		 * in free-running mode, as this would corrupt conversion results.
+		 * 
+		 * \see		setFreeRunningMode()
+		 */
 		inline static void
 		setChannelSweep(ADC_SWEEP_t sweep)
 		{
 			ADCB_EVCTRL = (ADCB_EVCTRL & ~ADC_SWEEP_gm) | sweep;
 		}
 		
+		/**
+		 * \brief	left/right-adjusted 12-bit result or 8-bit result
+		 * 
+		 * Default is right adjusted 12-bit mode.
+		 */
 		inline static void
-		setPrescaler(ADC_PRESCALER_t prescaler=ADC_PRESCALER_DIV512_gc)
+		setResolution(ADC_RESOLUTION_t resolution=ADC_RESOLUTION_12BIT_gc)
 		{
-			ADCB_PRESCALER = prescaler;
+			ADCB_CTRLB = (ADCB_CTRLB & ~ADC_RESOLUTION_gm) | resolution;
+		}
+		
+		/**
+		 * \brief	Flush the ADC pipeline.
+		 * 
+		 * Starting an ADC conversion may cause an unknown delay between the
+		 * software start or event and the actual conversion start since
+		 * conversion of other higher priority ADC channels may be pending, or
+		 * since the System clock may be much faster than the ADC Clock.
+		 * 
+		 * To start an ADC conversion immediately on an incoming event, it is
+		 * possible to flush the ADC for all measurements, reset the ADC clock
+		 * and start the conversion at the next Peripheral clock cycle, which
+		 * then will also be the next ADC clock cycle.
+		 * 
+		 * If this is done all ongoing conversions in the ADC pipeline will be
+		 * lost.
+		 */
+		inline static void
+		flush()
+		{
+			ADCB_CTRLA |= ADC_FLUSH_bm;
 		}
 	};
 }

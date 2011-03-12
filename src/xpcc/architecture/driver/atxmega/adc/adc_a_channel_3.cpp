@@ -54,12 +54,38 @@ xpcc::AdcChannelA3::read()
 	return getResult();
 }
 
-// ----------------------------------------------------------------------------
 void
-xpcc::AdcChannelA3::startConversion()
+xpcc::AdcChannelA3::setInternalInputMode(ADC_CH_MUXINT_t input)
 {
-	ADCA_CH3_INTFLAGS = 0;
-	ADCA_CH3_CTRL |= ADC_CH_START_bm;
+	ADCA_CH3_CTRL = ADC_CH_INPUTMODE_INTERNAL_gc;
+	ADCA_CH3_MUXCTRL = input;
+}
+
+void
+xpcc::AdcChannelA3::setSingleEndedMode(ADC_CH_MUXPOS_t input)
+{
+	ADCA_CH3_CTRL = ADC_CH_INPUTMODE_SINGLEENDED_gc;
+	ADCA_CH3_MUXCTRL = input;
+}
+
+void
+xpcc::AdcChannelA3::setDifferentialMode(ADC_CH_MUXPOS_t positiveInput, ADC_CH_MUXNEG_t negativeInput)
+{
+	setSignedConversion(true);
+	
+	ADCA_CH3_CTRL = ADC_CH_INPUTMODE_DIFF_gc;
+	ADCA_CH3_MUXCTRL = positiveInput | negativeInput;
+}
+
+void
+xpcc::AdcChannelA3::setDifferentialGainMode(
+		ADC_CH_MUXPOS_t positiveInput, ADC_CH_MUXNEG_t negativeInput,
+		ADC_CH_GAIN_t gainFactor)
+{
+	setSignedConversion(true);
+	
+	ADCA_CH3_CTRL = ADC_CH_INPUTMODE_DIFFWGAIN_gc | gainFactor;
+	ADCA_CH3_MUXCTRL = positiveInput | negativeInput;
 }
 
 #endif	// ADCA

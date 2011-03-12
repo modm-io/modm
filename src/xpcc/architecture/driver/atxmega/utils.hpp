@@ -2,7 +2,7 @@
 // ----------------------------------------------------------------------------
 /* Copyright (c) 2011, Roboterclub Aachen e.V.
  * All rights reserved.
- *
+ * 
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  * 
@@ -14,7 +14,7 @@
  *     * Neither the name of the Roboterclub Aachen e.V. nor the
  *       names of its contributors may be used to endorse or promote products
  *       derived from this software without specific prior written permission.
- *
+ * 
  * THIS SOFTWARE IS PROVIDED BY ROBOTERCLUB AACHEN E.V. ''AS IS'' AND ANY
  * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -25,67 +25,61 @@
  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
-// ----------------------------------------------------------------------------
-/*
- * WARNING: This file is generated automatically, do not edit!
- * Please modify the corresponding *.in file instead and rebuild this file.
+ * 
+ * $Id$
  */
 // ----------------------------------------------------------------------------
 
+#ifndef XPCC_ATXMEGA__UTILS_HPP
+#define	XPCC_ATXMEGA__UTILS_HPP
 
-#include <avr/interrupt.h>
+#include <stddef.h>		// for offsetof()
 #include <xpcc/architecture/platform.hpp>
 
-#include "adc_a_channel_0.hpp"
-
-#ifdef ADCA
-
-// ----------------------------------------------------------------------------
-uint16_t
-xpcc::AdcChannelA0::read()
+namespace xpcc
 {
-	startConversion();
-	
-	while(!isFinished()) {
-		// wait until the conversion is finished
+	namespace atxmega
+	{
+		/**
+		 * \brief	CCP write helper function
+		 * 
+		 * This function is written in assembly because of the time critical
+		 * operation of writing to the registers.
+		 * 
+		 * \param	address	A pointer to the address to write to.
+		 * \param	value	The value to put in to the register.
+		 */
+		ALWAYS_INLINE static void
+		changeProtectedRegister(volatile uint8_t * address, uint8_t value)
+		{
+		#ifdef RAMPZ
+			RAMPZ = 0;
+		#endif
+			
+			asm volatile (
+				"movw r30, %0"		"\n\t"
+				"ldi  r16, 0xD8"	"\n\t"
+				"out  0x34, r16"	"\n\t"
+				"st   Z,  %1"
+					:
+					: "r" (address), "r" (value)
+					: "r16", "r30", "r31"
+			);
+		}
+		
+		/**
+		 * \brief	Read a calibration byte
+		 * 
+		 * Example:
+		 * \code
+		 * ADCA.CALL = readCalibrationByte(offsetof(NVM_PROD_SIGNATURES_t, ADCACAL0));
+		 * \endcode
+		 * 
+		 * \ingroup	atxmega
+		 */
+		uint8_t
+		readCalibrationByte(uint8_t index);		
 	}
-	
-	return getResult();
 }
 
-void
-xpcc::AdcChannelA0::setInternalInputMode(ADC_CH_MUXINT_t input)
-{
-	ADCA_CH0_CTRL = ADC_CH_INPUTMODE_INTERNAL_gc;
-	ADCA_CH0_MUXCTRL = input;
-}
-
-void
-xpcc::AdcChannelA0::setSingleEndedMode(ADC_CH_MUXPOS_t input)
-{
-	ADCA_CH0_CTRL = ADC_CH_INPUTMODE_SINGLEENDED_gc;
-	ADCA_CH0_MUXCTRL = input;
-}
-
-void
-xpcc::AdcChannelA0::setDifferentialMode(ADC_CH_MUXPOS_t positiveInput, ADC_CH_MUXNEG_t negativeInput)
-{
-	setSignedConversion(true);
-	
-	ADCA_CH0_CTRL = ADC_CH_INPUTMODE_DIFF_gc;
-	ADCA_CH0_MUXCTRL = positiveInput | negativeInput;
-}
-
-void
-xpcc::AdcChannelA0::setDifferentialGainMode(
-		ADC_CH_MUXPOS_t positiveInput, ADC_CH_MUXNEG_t negativeInput,
-		ADC_CH_GAIN_t gainFactor)
-{
-	setSignedConversion(true);
-	
-	ADCA_CH0_CTRL = ADC_CH_INPUTMODE_DIFFWGAIN_gc | gainFactor;
-	ADCA_CH0_MUXCTRL = positiveInput | negativeInput;
-}
-
-#endif	// ADCA
+#endif	// XPCC_ATXMEGA__UTILS_HPP

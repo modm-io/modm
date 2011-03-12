@@ -2,7 +2,7 @@
 // ----------------------------------------------------------------------------
 /* Copyright (c) 2011, Roboterclub Aachen e.V.
  * All rights reserved.
- *
+ * 
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  * 
@@ -14,7 +14,7 @@
  *     * Neither the name of the Roboterclub Aachen e.V. nor the
  *       names of its contributors may be used to endorse or promote products
  *       derived from this software without specific prior written permission.
- *
+ * 
  * THIS SOFTWARE IS PROVIDED BY ROBOTERCLUB AACHEN E.V. ''AS IS'' AND ANY
  * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -25,67 +25,25 @@
  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
-// ----------------------------------------------------------------------------
-/*
- * WARNING: This file is generated automatically, do not edit!
- * Please modify the corresponding *.in file instead and rebuild this file.
+ * 
+ * $Id$
  */
 // ----------------------------------------------------------------------------
 
+#include <avr/pgmspace.h>
 
-#include <avr/interrupt.h>
-#include <xpcc/architecture/platform.hpp>
+#include "utils.hpp"
 
-#include "adc_a_channel_0.hpp"
-
-#ifdef ADCA
-
-// ----------------------------------------------------------------------------
-uint16_t
-xpcc::AdcChannelA0::read()
+uint8_t
+xpcc::atxmega::readCalibrationByte(uint8_t index)
 {
-	startConversion();
+	// Load the NVM Command register to read the calibration row.
+	NVM_CMD = NVM_CMD_READ_CALIB_ROW_gc;
 	
-	while(!isFinished()) {
-		// wait until the conversion is finished
-	}
+	uint8_t result = pgm_read_byte(index);
 	
-	return getResult();
-}
-
-void
-xpcc::AdcChannelA0::setInternalInputMode(ADC_CH_MUXINT_t input)
-{
-	ADCA_CH0_CTRL = ADC_CH_INPUTMODE_INTERNAL_gc;
-	ADCA_CH0_MUXCTRL = input;
-}
-
-void
-xpcc::AdcChannelA0::setSingleEndedMode(ADC_CH_MUXPOS_t input)
-{
-	ADCA_CH0_CTRL = ADC_CH_INPUTMODE_SINGLEENDED_gc;
-	ADCA_CH0_MUXCTRL = input;
-}
-
-void
-xpcc::AdcChannelA0::setDifferentialMode(ADC_CH_MUXPOS_t positiveInput, ADC_CH_MUXNEG_t negativeInput)
-{
-	setSignedConversion(true);
+	// Clean up NVM Command register.
+	NVM_CMD = NVM_CMD_NO_OPERATION_gc;
 	
-	ADCA_CH0_CTRL = ADC_CH_INPUTMODE_DIFF_gc;
-	ADCA_CH0_MUXCTRL = positiveInput | negativeInput;
+	return result;
 }
-
-void
-xpcc::AdcChannelA0::setDifferentialGainMode(
-		ADC_CH_MUXPOS_t positiveInput, ADC_CH_MUXNEG_t negativeInput,
-		ADC_CH_GAIN_t gainFactor)
-{
-	setSignedConversion(true);
-	
-	ADCA_CH0_CTRL = ADC_CH_INPUTMODE_DIFFWGAIN_gc | gainFactor;
-	ADCA_CH0_MUXCTRL = positiveInput | negativeInput;
-}
-
-#endif	// ADCA

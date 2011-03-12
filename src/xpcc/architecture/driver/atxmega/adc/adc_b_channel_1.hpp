@@ -50,44 +50,75 @@ namespace xpcc
 	/**
 	 * \brief		ADC Channel 1 of Module B
 	 * 
+	 * \warning	Every channel must either be in unsigned mode (internal or
+	 * 			single-ended conversion) or in signed mode (differential or
+	 * 			differential conversion with gain). It is not possible to
+	 * 			mix these two within one ADC module!
+	 * 
 	 * \ingroup		atxmega_adc
 	 */
 	class AdcChannelB1 : public AdcModuleB
 	{
 	public:
 		inline static ADC_CH_t&
-		getChannelBase()
+		getChannelRegister()
 		{
 			return ADCB.CH1;
 		}
 		
-		/// Select between single ended, differential (w/o gain) conversion mode
-		inline static void
-		setInputMode(ADC_CH_INPUTMODE_t mode=ADC_CH_INPUTMODE_SINGLEENDED_gc)
-		{
-			ADCB_CH1_CTRL = (ADCB_CH1_CTRL & ~ADC_CH_INPUTMODE_gm) | mode;
-		}
+		/**
+		 * \brief	Read internal inputs
+		 * 
+		 * The Xmegas have four internal analog signals that can be selected
+		 * as input and be measured by the ADC: 
+		 * - Temperature sensor (ADC_CH_MUXINT_TEMP_gc)
+		 * - Bandgap voltage (ADC_CH_MUXINT_BANDGAP_gc)
+		 * - VCC scaled (1/10)	(ADC_CH_MUXINT_SCALEDVCC_gc)
+		 * - DAC output (ADC_CH_MUXINT_DAC_gc)
+		 * 
+		 * \param	input	Internal input
+		 */
+		static void
+		setInternalInputMode(ADC_CH_MUXINT_t input);
 		
-		/// Select a gain factor for the channel. Gain will decrease resolution. 
-		inline static void
-		setGainFactor(ADC_CH_GAIN_t factor=ADC_CH_GAIN_1X_gc)
-		{
-			ADCB_CH1_CTRL = (ADCB_CH1_CTRL & ~ADC_CH_GAINFAC_gm) | factor;
-		}
+		/**
+		 * \brief	Set channel to single ended conversion mode
+		 * 
+		 * \param	input	Input pin (e.g. ADC_CH_MUXPOS_PIN0_gc)
+		 */
+		static void
+		setSingleEndedMode(ADC_CH_MUXPOS_t input);
 		
-		/// Select the positive and negative input pins for the channel
-		inline static void
-		selectInput(uint8_t selection)
-		{
-			ADCB_CH1_MUXCTRL = selection;
-		}
+		/**
+		 * \brief	Selects differential input and a signed conversion mode.
+		 * 
+		 * \param	positiveInput	Positive input pin (e.g. ADC_CH_MUXPOS_PIN0_gc)
+		 * \param	negativeInput	Negative input pin (e.g. ADC_CH_MUXNEG_PIN0_gc)
+		 * 
+		 * \warning	This also selects signed conversion mode for the complete ADC module! 
+		 */
+		static void
+		setDifferentialMode(
+				ADC_CH_MUXPOS_t positiveInput, ADC_CH_MUXNEG_t negativeInput);
+		
+		/**
+		 * \brief	Selects differential input and a signed conversion mode.
+		 * 
+		 * Gain will decrease resolution.
+		 * 
+		 * \warning	This also selects signed conversion mode for the complete ADC module!
+		 */
+		static void
+		setDifferentialGainMode(
+				ADC_CH_MUXPOS_t positiveInput, ADC_CH_MUXNEG_t negativeInput,
+				ADC_CH_GAIN_t gainFactor = ADC_CH_GAIN_1X_gc);
 		
 		/**
 		 * \brief	 Enable Interrupt
 		 * 
 		 * If you enable the ADC channel interrupt you need to provide
 		 * a corresponding interrupt handler function. Otherwise the
-		 * controller will restart on every invocation of the interrupt.
+		 * controller might restart on every invocation of the interrupt.
 		 * 
 		 * \code
 		 * ISR(ADCB_CH1_vect)
@@ -97,32 +128,36 @@ namespace xpcc
 		 * \endcode
 		 */
 		inline static void
-		enableInterrupt(uint8_t level=ADC_CH_INTLVL_OFF_gc)
+		enableInterrupt(ADC_CH_INTLVL_t level=ADC_CH_INTLVL_OFF_gc)
 		{
 			ADCB_CH1_INTCTRL = level;
 		}
 		
 		/**
-		 * \brief	Read the value off the analog channel
+		 * \brief	Starts one single conversion.
 		 * 
-		 * Blocks until the conversion is done.
-		 * 
-		 * Equivalent to:
 		 * \code
-		 * startConversion();
-		 * while (!isFinished())
-		 *     ;
-		 * getValue();
+		 * f_adc = f_peripheral / prescaler
+		 * t_propagation = (1 + RES / 2 + GAIN) / f_adc
+		 * 
+		 * RES = 8 or 12
+		 * GAIN = 1 if differential mode mit gain is used, 0 otherwise
 		 * \endcode
 		 */
-		static uint16_t
-		read();
+		static inline void
+		startConversion()
+		{
+			// reset flag
+			ADCB_CH1_INTFLAGS |= ADC_CH_CHIF_bm;
+			
+			// start the new conversion
+			ADCB_CH1_CTRL |= ADC_CH_START_bm;
+		}
 		
-		/// Starts one single conversion.
-		static void
-		startConversion();
-		
-		/// \return \c true if the conversion finished.
+		/**
+		 * \brief	Check if the conversion is finished
+		 * \return \c true if the conversion finished.
+		 */
 		inline static bool
 		isFinished()
 		{
@@ -137,20 +172,20 @@ namespace xpcc
 		}
 		
 		/**
-		 * \brief Selects differential input and a signed conversion mode.
+		 * \brief	Read the value off the analog channel (convenience function)
+		 * 
+		 * Blocks until the conversion is done.
 		 * 
 		 * Equivalent to:
 		 * \code
-		 * enableSignedConversion(true);
-		 * setInputMode(ADC_CH_INPUTMODE_DIFF_gc);
+		 * startConversion();
+		 * while (!isFinished())
+		 *     ;
+		 * getResult();
 		 * \endcode
 		 */
-		inline static void
-		setSignedDifferentialMode()
-		{
-			enableSignedConversion(true);
-			setInputMode(ADC_CH_INPUTMODE_DIFF_gc);
-		}
+		static uint16_t
+		read();
 	};
 }
 

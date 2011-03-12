@@ -38,16 +38,21 @@
 #include <avr/interrupt.h>
 
 #include "adc_{{ id.lower() }}.hpp"
+#include "../utils.hpp"
 
 #ifdef ADC{{ id }}
 
 // ----------------------------------------------------------------------------
 void
-xpcc::AdcModule{{ id }}::initialize(uint8_t reference, ADC_PRESCALER_t prescaler)
+xpcc::AdcModule{{ id }}::initialize(ADC_REFSEL_t reference, ADC_PRESCALER_t prescaler)
 {
-	ADC{{ id }}_CTRLA = ADC_ENABLE_bm;
 	ADC{{ id }}_REFCTRL = reference;
 	ADC{{ id }}_PRESCALER = prescaler;
+	
+	ADC{{ id }}.CALL = atxmega::readCalibrationByte(offsetof(NVM_PROD_SIGNATURES_t, ADC{{ id }}CAL0));
+	ADC{{ id }}.CALH = atxmega::readCalibrationByte(offsetof(NVM_PROD_SIGNATURES_t, ADC{{ id }}CAL1));
+	
+	ADC{{ id }}_CTRLA = ADC_ENABLE_bm;
 }
 
 #endif // ADC{{ id }}

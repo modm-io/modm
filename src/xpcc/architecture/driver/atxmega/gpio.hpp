@@ -226,9 +226,40 @@ namespace xpcc
 		ALWAYS_INLINE static uint16_t getInterrupt1Vector() { return PORT ## port ## _INT1_vect_num;} \
 	}
 
-// FIXME
-//#define GPIO__NIBBLE_LOW(name, port)
-//#define GPIO__NIBBLE_HIGH(name, port)
+#define GPIO__NIBBLE_LOW(name, port) \
+	struct name { \
+		ALWAYS_INLINE static void setOutput() { \
+			PORT ## port ## _DIRSET = 0x0f; \
+		} \
+		ALWAYS_INLINE static void setInput() { \
+			PORT ## port ## _DIRCLR = 0x0f; \
+		} \
+		ALWAYS_INLINE static uint8_t read() { \
+			return PORT ## port ## _IN & 0x0f; \
+		} \
+		ALWAYS_INLINE static void write(uint8_t data) { \
+			PORT ## port ## _OUTSET =   data & 0x0f; \
+			PORT ## port ## _OUTCLR = ~(data & 0x0f); \
+		} \
+	}
+
+#define GPIO__NIBBLE_HIGH(name, port) \
+	struct name { \
+		ALWAYS_INLINE static void setOutput() { \
+			PORT ## port ## _DIRSET = 0xf0; \
+		} \
+		ALWAYS_INLINE static void setInput() { \
+			PORT ## port ## _DIRCLR = 0xf0; \
+		} \
+		ALWAYS_INLINE static uint8_t read() { \
+			return (PORT ## port ## _IN >> 4); \
+		} \
+		ALWAYS_INLINE static void write(uint8_t data) { \
+			data = ::xpcc::math::swap(data); \
+			PORT ## port ## _OUTSET =   data & 0xf0; \
+			PORT ## port ## _OUTCLR = ~(data & 0xf0); \
+		} \
+	}
 
 /**
  * \brief	Use a full 8-Bit port

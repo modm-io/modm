@@ -54,12 +54,38 @@ xpcc::AdcChannelB1::read()
 	return getResult();
 }
 
-// ----------------------------------------------------------------------------
 void
-xpcc::AdcChannelB1::startConversion()
+xpcc::AdcChannelB1::setInternalInputMode(ADC_CH_MUXINT_t input)
 {
-	ADCB_CH1_INTFLAGS = 0;
-	ADCB_CH1_CTRL |= ADC_CH_START_bm;
+	ADCB_CH1_CTRL = ADC_CH_INPUTMODE_INTERNAL_gc;
+	ADCB_CH1_MUXCTRL = input;
+}
+
+void
+xpcc::AdcChannelB1::setSingleEndedMode(ADC_CH_MUXPOS_t input)
+{
+	ADCB_CH1_CTRL = ADC_CH_INPUTMODE_SINGLEENDED_gc;
+	ADCB_CH1_MUXCTRL = input;
+}
+
+void
+xpcc::AdcChannelB1::setDifferentialMode(ADC_CH_MUXPOS_t positiveInput, ADC_CH_MUXNEG_t negativeInput)
+{
+	setSignedConversion(true);
+	
+	ADCB_CH1_CTRL = ADC_CH_INPUTMODE_DIFF_gc;
+	ADCB_CH1_MUXCTRL = positiveInput | negativeInput;
+}
+
+void
+xpcc::AdcChannelB1::setDifferentialGainMode(
+		ADC_CH_MUXPOS_t positiveInput, ADC_CH_MUXNEG_t negativeInput,
+		ADC_CH_GAIN_t gainFactor)
+{
+	setSignedConversion(true);
+	
+	ADCB_CH1_CTRL = ADC_CH_INPUTMODE_DIFFWGAIN_gc | gainFactor;
+	ADCB_CH1_MUXCTRL = positiveInput | negativeInput;
 }
 
 #endif	// ADCB

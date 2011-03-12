@@ -38,16 +38,21 @@
 #include <avr/interrupt.h>
 
 #include "adc_a.hpp"
+#include "../utils.hpp"
 
 #ifdef ADCA
 
 // ----------------------------------------------------------------------------
 void
-xpcc::AdcModuleA::initialize(uint8_t reference, ADC_PRESCALER_t prescaler)
+xpcc::AdcModuleA::initialize(ADC_REFSEL_t reference, ADC_PRESCALER_t prescaler)
 {
-	ADCA_CTRLA = ADC_ENABLE_bm;
 	ADCA_REFCTRL = reference;
 	ADCA_PRESCALER = prescaler;
+	
+	ADCA.CALL = atxmega::readCalibrationByte(offsetof(NVM_PROD_SIGNATURES_t, ADCACAL0));
+	ADCA.CALH = atxmega::readCalibrationByte(offsetof(NVM_PROD_SIGNATURES_t, ADCACAL1));
+	
+	ADCA_CTRLA = ADC_ENABLE_bm;
 }
 
 #endif // ADCA

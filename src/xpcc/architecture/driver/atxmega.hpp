@@ -39,3 +39,4 @@
 #include "atxmega/gpio.hpp"
 #include "atxmega/timer.hpp"
 #include "atxmega/adc.hpp"
+#include "atxmega/utils.hpp"
