@@ -97,9 +97,17 @@
 #define	STRINGIFY2(s)	STRINGIFY3(s)
 #define	STRINGIFY3(s)	#s
 
-#define	CONCAT(a,b)		CONCAT2(a,b)
-#define	CONCAT2(a,b)	CONCAT3(a,b)
-#define	CONCAT3(a,b)	a ## b
+#define	CONCAT(a,b)		CONCAT_(a,b)
+#define	CONCAT_(a,b)	CONCAT__(a,b)
+#define	CONCAT__(a,b)	a ## b
+
+#define	CONCAT3(a,b,c)		CONCAT3_(a,b,c)
+#define	CONCAT3_(a,b,c)		CONCAT3__(a,b,c)
+#define	CONCAT3__(a,b,c)	a ## b ## c
+
+#define	CONCAT4(a,b,c,d)	CONCAT4_(a,b,c,d)
+#define	CONCAT4_(a,b,c,d)	CONCAT4__(a,b,c,d)
+#define	CONCAT4__(a,b,c,d)	a ## b ## c ## d
 
 #ifdef XPCC__COMPILER_GCC
 #	define ALWAYS_INLINE  		inline __attribute__((always_inline))

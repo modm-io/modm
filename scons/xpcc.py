@@ -163,19 +163,16 @@ def xpcc_communication_header(env, xmlfile, path='.'):
 
 def generate_defines(env, filename='defines.hpp'):
 	defines = env['XPCC_CONFIG']['defines']
-	if defines:
-		substitutions = {
-			'defines': '\n'.join(["#define %s %s" % (key.upper(), value) \
-					for key, value in defines.iteritems()])
-		}
-		file = env.Template(
-				target = filename,
-				source = os.path.join(env['XPCC_ROOTPATH'], 
-									  'templates/defines.hpp.in'),
-				substitutions = substitutions)
-		return file
-	else:
-		return None
+	substitutions = {
+		'defines': '\n'.join(["#define %s %s" % (key.upper(), value) \
+				for key, value in defines.iteritems()])
+	}
+	file = env.Template(
+			target = filename,
+			source = os.path.join(env['XPCC_ROOTPATH'], 
+								  'templates/defines.hpp.in'),
+			substitutions = substitutions)
+	return file
 
 # -----------------------------------------------------------------------------
 def generate(env, **kw):

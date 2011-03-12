@@ -29,10 +29,12 @@
 # $Id$
 
 import os
+import sys
 import re
 import ConfigParser
 
 import SCons.Node
+import SCons.Errors
 
 def listify(node):
 	return [node,] if (not isinstance(node, list) and \
@@ -45,7 +47,10 @@ class ParserException(Exception):
 class Parser(ConfigParser.RawConfigParser):
 	
 	def read(self, filename):
-		return ConfigParser.RawConfigParser.read(self, filename)
+		try:
+			return ConfigParser.RawConfigParser.read(self, filename)
+		except ConfigParser.ParsingError as e:
+			raise SCons.Errors.UserError(str(e) + '\n')
 	
 	def get(self, section, option, default=None):
 		try:

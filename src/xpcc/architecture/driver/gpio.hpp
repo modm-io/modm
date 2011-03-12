@@ -709,4 +709,13 @@ namespace xpcc
 	#include  "gpio_dummy.hpp"
 #endif
 
+// TODO documentation
+#define GPIO__IO2(name, id)				GPIO__IO(name, id)
+#define GPIO__OUTPUT2(name, id)			GPIO__OUTPUT(name, id)
+#define GPIO__INPUT2(name, id)			GPIO__INPUT(name, id)
+
+#define GPIO__IO3(name, port, id)		GPIO__IO(name, port, id)
+#define GPIO__OUTPUT3(name, port, id)	GPIO__OUTPUT(name, port, id)
+#define GPIO__INPUT3(name, port, id)	GPIO__INPUT(name, port, id)
+
 #endif // XPCC__GPIO_HPP
