@@ -189,11 +189,11 @@ class Component(object):
 			return
 		
 		nodes = event_node.find('publish')
-		if nodes:
+		if nodes is not None:
 			self.__parse_event(nodes, self.events.publish, tree)
 		
 		nodes = event_node.find('subscribe')
-		if nodes:
+		if nodes is not None:
 			self.__parse_event(nodes, self.events.subscribe, tree)
 	
 	def __parse_event(self, node, list, tree):
