@@ -97,7 +97,7 @@ namespace xpcc
 			typedef xpcc::SmartPointer			Payload;
 			typedef boost::mutex				Mutex;
 			typedef boost::mutex::scoped_lock	MutexGuard;
-			typedef	boost::thread::thread		Thread;
+			typedef	boost::thread				Thread;
 			
 			bool 
 			isAlive();
