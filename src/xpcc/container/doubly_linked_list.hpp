@@ -58,6 +58,10 @@ namespace xpcc
 		inline bool
 		isEmpty() const;
 		
+
+		std::size_t
+		getSize() const;
+
 		/// Insert in front
 		void
 		prepend(const T& value);

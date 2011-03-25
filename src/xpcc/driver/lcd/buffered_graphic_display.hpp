@@ -62,6 +62,18 @@ namespace xpcc
 		{
 		}
 		
+		virtual  inline uint16_t
+		getWidth() const
+		{
+			return Width;
+		}
+
+		virtual inline uint16_t
+		getHeight() const
+		{
+			return Height;
+		}
+
 		/**
 		 * \brief	Clear the complete screen
 		 * 

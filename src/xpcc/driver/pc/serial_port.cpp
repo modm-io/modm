@@ -115,7 +115,7 @@ xpcc::pc::SerialPort::kill()
 				&xpcc::pc::SerialPort::doAbort,
 				this,
 				boost::system::error_code()));
-
+	this->shutdown = true;
 	this->thread->join();
 	delete this->thread;
 	this->io_service.reset();
@@ -124,21 +124,12 @@ xpcc::pc::SerialPort::kill()
 void
 xpcc::pc::SerialPort::doAbort(const boost::system::error_code& error)
 {
-	if (error) {
+
+	if (error)
 		std::cerr << "Error: " << error.message() << std::endl;
-
-		if (error ==  boost::asio::error::operation_aborted)
-			return;
-	}
-
-	std::cerr << "in abort" << std::endl;
-	boost::system::error_code errorCode;
-	this->port.cancel(errorCode);
-	if (errorCode)
-		std::cerr << "Error: " << errorCode.message() << std::endl;
-	this->port.close(errorCode);
-	if (errorCode)
-		std::cerr << "Error: " << errorCode.message() << std::endl;
+	this->port.close();
+	if (error)
+		std::cerr << "Error: " << error.message() << std::endl;
 }
 
 void
@@ -154,7 +145,8 @@ void
 xpcc::pc::SerialPort::doWrite(const char c) {
 	if (!this->shutdown)
 	{
-		std::cout << "put: " << c << std::endl;
+		std::cout<<"get 0x"<< std::hex << (int) c << std::dec 
+		<< "(" << c << ")" << std::endl;
 
 		MutexGuard mutex(this->writeMutex);
 		bool idle = this->writeBuffer.empty();
@@ -204,6 +196,8 @@ xpcc::pc::SerialPort::readComplete(const boost::system::error_code& error, size_
 			MutexGuard queueGuard( this->readMutex);
 			for(unsigned int i=0; i<bytes_transferred; ++i)
 			{
+				std::cout<<"get 0x"<< std::hex << (int) this->tmpRead[i] << std::dec 
+				<< "(" << this->tmpRead[i] << ")" << std::endl;
 				this->readBuffer.push(this->tmpRead[i]);
 			}
     	}

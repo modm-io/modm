@@ -5,9 +5,8 @@
 #include <iostream>
 
 xpcc::CanUsb::CanUsb():
-active(false),serialPort()
+active(false)
 {
-
 }
 
 xpcc::CanUsb::~CanUsb(
@@ -33,34 +32,49 @@ xpcc::CanUsb::~CanUsb(
 bool xpcc::CanUsb::open(std::string deviceName, unsigned int baudRate)
 {
 	if(this->serialPort.isOpen()) this->serialPort.close();
+	while(this->serialPort.isOpen()){
+		//wait for port to close;
+	}
+	
 	if (this->serialPort.open(deviceName, baudRate))
 	{
-		this->serialPort.clearWriteBuffer();
-		this->serialPort.clearReadBuffer();
+		std::cout<<" SerialPort opened in canusb"<<std::endl;
+		std::cout<< "write C" << std::endl;
 		this->serialPort.write("C\r");
 		char a;
 		xpcc::Timeout<> timer;
 		timer.restart(500);
-		while(!this->serialPort.read(a)){
-			if(timer.isExpired())
-			{
-				std::cout<< "Timer expired"<<std::endl;
-				this->serialPort.close();
-				return false;
-			}
-		}
+		while(!timer.isExpired()){}
+
+		this->serialPort.clearWriteBuffer();
+		this->serialPort.clearReadBuffer();
+		
+		std::cout<< "write S4" << std::endl;
 		this->serialPort.write("S4\r");
+		
 		timer.restart(500);
 		while(!this->serialPort.read(a)){
 			if(timer.isExpired())
 			{
 				std::cout<< "Timer expired"<<std::endl;
 				this->serialPort.close();
+				while(this->serialPort.isOpen()){
+					//wait for port to close;
+				}
 				return false;
 			}
 		}
-		if( a != '\r') return false;
+		if( a != '\r')
+		{ 	
+			std::cout<<"Wrong answere on S4: "<< std::hex << (int) a << std::endl;
+			this->serialPort.close();
+			while(this->serialPort.isOpen()){
+			//wait for port to close;
+			}
+			return false;
+		}
 		this->serialPort.write("O\r");
+		std::cout<< "written O" << std::endl;
 		timer.restart(500);
 		while(!this->serialPort.read(a))
 		{
@@ -68,10 +82,21 @@ bool xpcc::CanUsb::open(std::string deviceName, unsigned int baudRate)
 			{
 				std::cout<< "Timer expired"<<std::endl;
 				this->serialPort.close();
+				while(this->serialPort.isOpen()){
+					//wait for port to close;
+				}
 				return false;
 			}
 		}
-		if(a != '\r') return false;
+		if(a != '\r')
+		{
+			std::cout<<"Wrong answere on O: "<< std::hex << (int) a << std::endl;
+			this->serialPort.close();
+			while(this->serialPort.isOpen()){
+				//wait for port to close;
+			}
+			return false;
+		}
 		{
 			MutexGuard stateGuard( this->stateLock);
 			this->active=true;
@@ -80,15 +105,20 @@ bool xpcc::CanUsb::open(std::string deviceName, unsigned int baudRate)
 		return true;
 	}
 	else
+	{	
+		std::cerr << " Could not open Canusb" << std::endl;
 		return false;
-};
+	}
+}
 
 void xpcc::CanUsb::close()
 {
+	this->serialPort.write("C\r");
 	{
 		MutexGuard stateGuard( this->stateLock);
 		this->active=false;
 	}
+	
 	this->thread->join();
 	delete this->thread;
 	this->thread = 0;

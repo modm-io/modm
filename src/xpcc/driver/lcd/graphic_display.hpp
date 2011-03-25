@@ -95,6 +95,7 @@ namespace xpcc
 	 * All modes relative to the current viewport. This would make
 	 * drawing a menu system easier.
 	 */
+
 	class GraphicDisplay : public IOStream
 	{
 	public:
@@ -105,6 +106,14 @@ namespace xpcc
 		{
 		}
 		
+		/// Number of pixel in horizontal direction
+		virtual uint16_t
+		getWidth() const = 0;
+
+		/// Number of pixel in vertical direction
+		virtual uint16_t
+		getHeight() const = 0;
+
 		/// Clear screen
 		virtual void
 		clear() = 0;

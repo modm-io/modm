@@ -55,6 +55,9 @@ namespace xpcc
 	class LinkedList
 	{
 	public:
+		typedef std::size_t Size;
+		
+	public:
 		LinkedList(const Allocator& allocator = Allocator());
 		
 		~LinkedList();
