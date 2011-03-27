@@ -1,9 +1,4 @@
-/*
- * Created on 11.02.2004
- *
- * To change the template for this generated file go to
- * Window&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and Comments
- */
+
 package gui;
 
 import gui.util.FontCreatorMenuBar;
@@ -14,11 +9,11 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
+//import java.io.FileInputStream;
+//import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+//import java.io.ObjectInputStream;
+//import java.io.ObjectOutputStream;
 
 import javax.swing.JDesktopPane;
 import javax.swing.JFileChooser;
@@ -73,7 +68,7 @@ public class MainWindow extends JFrame {
 	}
 
 	private void initFrame() {
-		setTitle("GLCD FontCreator 2.2 (xpcc edition)");
+		setTitle("GLCD FontCreator 3.0");
 		setSize(800, 600);
 		
 		Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
@@ -90,13 +85,17 @@ public class MainWindow extends JFrame {
 		if (retVal == NewFontDialog.APPROVE_OPTION) {
 			Font font = dialog.getNewFont();
 
-			FontEditor editor = new FontEditor(font, this);
-			editor.setLocation(frameCount * 30, frameCount * 30);
-			if (++frameCount == 5)
-				frameCount = 0;
-			desktop.add(editor);
-			editor.setVisible(true);
+			newFontEditor(font);
 		}
+	}
+
+	private void newFontEditor(Font font) {
+		FontEditor editor = new FontEditor(font, this);
+		editor.setLocation(frameCount * 30, frameCount * 30);
+		if (++frameCount == 5)
+			frameCount = 0;
+		desktop.add(editor);
+		editor.setVisible(true);
 	}
 
 	public void saveFont() {
@@ -105,14 +104,16 @@ public class MainWindow extends JFrame {
 			JFileChooser chooser = new JFileChooser(".");
 			int rv = chooser.showSaveDialog(this);
 			if (rv == JFileChooser.APPROVE_OPTION) {
-				File dest = chooser.getSelectedFile();
 				try {
-					ObjectOutputStream out = new ObjectOutputStream(
+					/*ObjectOutputStream out = new ObjectOutputStream(
 							new FileOutputStream(dest));
 					SerializableFont font = new SerializableFont(
 							editor.getEditedFont());
 					out.writeObject(font);
-					out.close();
+					out.close();*/
+					SerializableFont font = new SerializableFont(
+							editor.getEditedFont());
+					font.writeToFile(chooser.getSelectedFile());
 				} catch (IOException e) {
 					System.err.println("IOException: " + e.toString());
 				}
@@ -126,18 +127,14 @@ public class MainWindow extends JFrame {
 		if (rv == JFileChooser.APPROVE_OPTION) {
 			File dest = chooser.getSelectedFile();
 			try {
-				ObjectInputStream in = new ObjectInputStream(
+				/*ObjectInputStream in = new ObjectInputStream(
 						new FileInputStream(dest));
 				SerializableFont sFont = (SerializableFont) in.readObject();
-				in.close();
-				Font font = new Font(sFont);
+				in.close();*/
+				SerializableFont sFont = new SerializableFont(dest);
 				
-				FontEditor editor = new FontEditor(font, this);
-				editor.setLocation(frameCount * 30, frameCount * 30);
-				if (++frameCount == 5)
-					frameCount = 0;
-				desktop.add(editor);
-				editor.setVisible(true);
+				Font font = new Font(sFont);
+				newFontEditor(font);
 			} catch (Exception e) {
 				System.err.println("Excpetion: " + e.toString());
 			}

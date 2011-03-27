@@ -138,7 +138,7 @@ public class FontExport {
 
 			String widthData = "";
 			String fontData = "";
-			FontCharacter[] fc = font.getAllChars();
+			FontCharacter[] fc = font.getAllCharacters();
 			int newline = 1;
 
 			for (int i = 0; i < fc.length; i++) {

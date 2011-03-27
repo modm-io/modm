@@ -58,7 +58,6 @@ public class CharEditor extends JComponent implements MouseListener,
 	private int color;
 	private int tool;
 	
-	private BufferedImage buffer;
 	private FontCharacter fc;
 	private MainWindow mainWnd;
 

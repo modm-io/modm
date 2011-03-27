@@ -17,17 +17,17 @@ public class Font {
 	private int bits;
 	private int height;
 	private int width;
-	private int startIndex;
-	private int charSpace;
-
+	private final int startIndex;
+	private int spacing;
+	
 	private int cropTop;
 	private int cropBottom;
-
+	
 	private Vector<FontCharacter> chars;
 	private String name;
-
+	
 	private IndexColorModel editorColorModel;
-
+	
 	public Font(int width, int initWidth, int height, int startIdx,
 			int charCount, String name, int bits, java.awt.Font importFont) {
 		chars = new Vector<FontCharacter>(charCount);
@@ -35,7 +35,7 @@ public class Font {
 		this.height = height;
 		this.name = name;
 		this.startIndex = startIdx;
-		this.charSpace = 1;
+		this.spacing = 1;
 		this.bits = bits;
 
 		editorColorModel = IndexColorModelUtils.getColorModel(bits);
@@ -43,22 +43,20 @@ public class Font {
 		if (importFont != null) {
 			this.height = height = importFont.getSize() * 2;
 		}
-
-		char j = (char) startIndex;
+		
 		cropTop = height;
 		cropBottom = height;
 		for (int i = 0; i < charCount; i++) {
-			FontCharacter c = new FontCharacter(initWidth, height, this);
+			FontCharacter c = new FontCharacter(initWidth, height, startIndex + i, this);
 			
 			if (importFont != null) {
-				Rectangle rect = c.importChar(importFont, j);
-				if (j != ' ') {
+				Rectangle rect = c.importChar(importFont);
+				if ((char) c.getAsciiIndex() != ' ') {
 					if (cropTop > rect.y)
 						cropTop = rect.y;
 					if (cropBottom > rect.height)
 						cropBottom = rect.height;
 				}
-				j++;
 			}
 			chars.addElement(c);
 		}
@@ -79,7 +77,7 @@ public class Font {
 		height = sFont.getHeight();
 		name = sFont.getName();
 		startIndex = sFont.getStartIndex();
-		charSpace = sFont.getCharSpace();
+		spacing = sFont.getSpacing();
 		bits = sFont.getBits();
 		cropTop = sFont.getCropTop();
 		cropBottom = sFont.getCropBottom();
@@ -89,7 +87,7 @@ public class Font {
 		SerializableFontCharacter[] c = sFont.getChars();
 		chars = new Vector<FontCharacter>(c.length);
 		for (int i = 0; i < c.length; i++) {
-			chars.add(c[i].getFontCharacter(this));
+			chars.add(c[i].getFontCharacter(startIndex + i, this));
 		}
 	}
 	
@@ -97,7 +95,7 @@ public class Font {
 		return chars.get(index);
 	}
 	
-	public FontCharacter[] getAllChars() {
+	public FontCharacter[] getAllCharacters() {
 		FontCharacter[] c = new FontCharacter[chars.size()];
 		for (int i = 0; i < chars.size(); i++) {
 			c[i] = chars.get(i);
@@ -132,31 +130,20 @@ public class Font {
 	public int getStartIndex() {
 		return startIndex;
 	}
-
-	public void setStartIndex(int i) {
-		startIndex = i;
-	}
-
+	
 	public int getCharCount() {
 		return chars.size();
 	}
-
-	public void insertCharAt(int index) {
-		FontCharacter c = new FontCharacter(width, height, this);
-		c.changeSize(-cropTop, -cropBottom, 0, 0);
-		chars.add(index, c);
-	}
-
-	public void removeCharAt(int index) {
-		chars.remove(index);
-	}
-
-	public int getCharSpace() {
-		return charSpace;
+	
+	/**
+	 * Spacing between two characters
+	 */
+	public int getSpacing() {
+		return spacing;
 	}
 
 	public void setCharSpace(int i) {
-		charSpace = i;
+		spacing = i;
 	}
 
 	public IndexColorModel getEditorColorModel() {

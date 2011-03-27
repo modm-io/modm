@@ -1,13 +1,7 @@
-/*
- * Created on 17.03.2004
- *
- * To change the template for this generated file go to
- * Window&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and Comments
- */
+
 package gui;
 
 import java.awt.Color;
-import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.GraphicsEnvironment;
@@ -41,8 +35,6 @@ public class NewFontDialog extends JDialog implements ActionListener,
 
 	private int returnValue;
 
-	private MainWindow gui;
-
 	private JTextField fontNameTxt;
 	private JSpinner fontWidthTxt;
 	private JSpinner fontInitWidthTxt;
@@ -65,8 +57,6 @@ public class NewFontDialog extends JDialog implements ActionListener,
 
 	public NewFontDialog(MainWindow gui) {
 		super(gui, "New Font", true);
-		this.gui = gui;
-
 		initGui();
 		initDialog();
 	}

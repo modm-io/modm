@@ -128,7 +128,7 @@ public class CharTable implements KeyListener, MouseListener,
 		setCharAt(index, fc);
 	}
 
-	public void insertNewCharacter() {
+	/*public void insertNewCharacter() {
 		int index = charTable.getSelectedRow() + 1;
 		font.insertCharAt(index);
 		doRowData();
@@ -138,7 +138,7 @@ public class CharTable implements KeyListener, MouseListener,
 		int index = charTable.getSelectedRow();
 		font.removeCharAt(index);
 		doRowData();
-	}
+	}*/
 
 	/*
 	 * (non-Javadoc)

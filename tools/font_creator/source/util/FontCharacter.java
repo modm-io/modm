@@ -22,14 +22,16 @@ import java.awt.image.Raster;
 public class FontCharacter {
 	private int width;
 	private int height;
+	private int index;			// ascii index of the character
 	private String comment;
 	private Font font;			// needed to get the color model
 	
 	private BufferedImage image;
 	
-	public FontCharacter(int width, int height, Font font) {
+	public FontCharacter(int width, int height, int index, Font font) {
 		this.width = width;
 		this.height = height;
+		this.index = index;
 		this.font = font;
 		this.comment = "";
 		
@@ -121,7 +123,8 @@ public class FontCharacter {
 		}
 	}
 
-	public Rectangle importChar(java.awt.Font fontType, char ascii) {
+	public Rectangle importChar(java.awt.Font fontType) {
+		char ascii = (char) this.getAsciiIndex();
 		int y = (int) (fontType.getSize() * 1.5);
 		Graphics2D g = image.createGraphics();
 		g.setFont(fontType);
@@ -201,5 +204,9 @@ public class FontCharacter {
 	
 	public void setImage(BufferedImage image) {
 		this.image = image;
+	}
+	
+	public int getAsciiIndex() {
+		return index;
 	}
 }

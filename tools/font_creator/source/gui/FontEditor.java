@@ -1,9 +1,4 @@
-/*
- * Created on 17.03.2004
- *
- * To change the template for this generated file go to
- * Window&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and Comments
- */
+
 package gui;
 
 import java.awt.BorderLayout;
@@ -20,6 +15,11 @@ import util.Font;
 import util.ImageTransferHandler;
 
 /**
+ * Font editor window.
+ * 
+ * Consits of a list of all characters (CharTable) and an editor for a
+ * single Character (CharEditor).
+ * 
  * @author Fabian Maximilian Thiele
  */
 public class FontEditor extends JInternalFrame implements InternalFrameListener {
@@ -41,12 +41,11 @@ public class FontEditor extends JInternalFrame implements InternalFrameListener 
 	
 	private void initGUI() {
 		this.setLayout(new BorderLayout());
-
-		ImageTransferHandler handler = new ImageTransferHandler();
+		
 		charEditor = new CharEditor(font.getChar(0), this,
 				font.getEditorColorModel(), mainWindow);
 		charEditor.setChar(font.getChar(0));
-		charEditor.setTransferHandler(handler);
+		charEditor.setTransferHandler(new ImageTransferHandler());
 		editorScrollPane = new JScrollPane(charEditor);
 		editorScrollPane.setPreferredSize(new Dimension(450, 450));
 
@@ -93,80 +92,31 @@ public class FontEditor extends JInternalFrame implements InternalFrameListener 
 		splitPane.setLeftComponent(editorScrollPane);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * javax.swing.event.InternalFrameListener#internalFrameOpened(javax.swing
-	 * .event.InternalFrameEvent)
-	 */
 	public void internalFrameOpened(InternalFrameEvent arg0) {
-	// unused
+		// unused
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * javax.swing.event.InternalFrameListener#internalFrameClosing(javax.swing
-	 * .event.InternalFrameEvent)
-	 */
 	public void internalFrameClosing(InternalFrameEvent arg0) {
-	// unused
+		// unused
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * javax.swing.event.InternalFrameListener#internalFrameClosed(javax.swing
-	 * .event.InternalFrameEvent)
-	 */
 	public void internalFrameClosed(InternalFrameEvent arg0) {
-	// unused
+		// unused
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * javax.swing.event.InternalFrameListener#internalFrameIconified(javax.
-	 * swing.event.InternalFrameEvent)
-	 */
 	public void internalFrameIconified(InternalFrameEvent arg0) {
-	// unused
+		// unused
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * javax.swing.event.InternalFrameListener#internalFrameDeiconified(javax
-	 * .swing.event.InternalFrameEvent)
-	 */
 	public void internalFrameDeiconified(InternalFrameEvent arg0) {
-	// unused
+		// unused
 	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * javax.swing.event.InternalFrameListener#internalFrameActivated(javax.
-	 * swing.event.InternalFrameEvent)
-	 */
+	
 	public void internalFrameActivated(InternalFrameEvent arg0) {
 		mainWindow.selectedEditorChanged(charEditor);
 	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * javax.swing.event.InternalFrameListener#internalFrameDeactivated(javax
-	 * .swing.event.InternalFrameEvent)
-	 */
+	
 	public void internalFrameDeactivated(InternalFrameEvent arg0) {
-	// unused
+		// unused
 	}
 }
