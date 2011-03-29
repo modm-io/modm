@@ -74,7 +74,7 @@ xpcc::LinkedList<T, Allocator>::getSize() const
 
 // ----------------------------------------------------------------------------
 template <typename T, typename Allocator>
-void
+bool
 xpcc::LinkedList<T, Allocator>::prepend(const T& value)
 {
 	// allocate memory for the new node and copy the value into it
@@ -89,6 +89,8 @@ xpcc::LinkedList<T, Allocator>::prepend(const T& value)
 		// first entry in the list
 		this->back = node;
 	}
+	
+	return true;
 }
 
 template <typename T, typename Allocator>

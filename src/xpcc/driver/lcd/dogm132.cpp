@@ -39,7 +39,7 @@ namespace xpcc
 {
 	namespace st7565
 	{
-		FLASH(uint8_t configuration_dogm132[14]) =
+		FLASH(uint8_t configuration_dogm132[12]) =
 		{
 			0x40, // Display start line 0
 			

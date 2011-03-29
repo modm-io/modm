@@ -39,6 +39,8 @@
 #include <xpcc/io/iodevice.hpp>
 #include <xpcc/io/iostream.hpp>
 
+#include "font.hpp"
+
 namespace xpcc
 {
 	namespace glcd
@@ -118,6 +120,12 @@ namespace xpcc
 		virtual void
 		clear() = 0;
 		
+		/**
+		 * \brief	Transfer the content of the RAM buffer to the real display.
+		 */
+		virtual void
+		update() = 0;
+		
 		void
 		setColor(glcd::Color color);
 		
@@ -156,7 +164,7 @@ namespace xpcc
 		 * \brief	Draw a line
 		 * 
 		 * Uses the faster drawHorizontalLine() or drawVerticalLine() if
-		 * possible, otherwise the line is rastered with the bresenham line
+		 * possible, otherwise the line is rastered with the Bresenham line
 		 * algorithm.
 		 * 
 		 * \param start	first point
@@ -171,6 +179,12 @@ namespace xpcc
 		/// Draw a line specified by x and y coordinates of both points
 		void
 		drawLine(uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2);
+		
+		inline void
+		drawRectangle(uint8_t x, uint8_t y, uint8_t width, uint8_t height)
+		{
+			drawRectangle(glcd::Point(x, y), width, height);
+		}
 		
 		/// Draw a rectangle
 		void
@@ -233,6 +247,12 @@ namespace xpcc
 		/// Fill a rectangle
 		void
 		fillRectangle(glcd::Point upperLeft, uint8_t width, uint8_t height);
+		
+		inline void
+		fillRectangle(uint8_t x, uint8_t y, uint8_t width, uint8_t height)
+		{
+			fillRectangle(glcd::Point(x, y), width, height);
+		}
 		
 		/// Fill a circle
 		void

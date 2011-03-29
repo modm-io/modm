@@ -76,7 +76,7 @@ namespace xpcc
 		getSize() const;
 		
 		/// Insert in front
-		void
+		bool
 		prepend(const T& value);
 
 		/// Insert at the end of the list

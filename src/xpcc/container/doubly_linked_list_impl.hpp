@@ -74,7 +74,7 @@ xpcc::DoublyLinkedList<T, Allocator>::getSize() const
 
 // ----------------------------------------------------------------------------
 template <typename T, typename Allocator>
-void
+bool
 xpcc::DoublyLinkedList<T, Allocator>::prepend(const T& value)
 {
 	// allocate memory for the new node and copy the value into it
@@ -94,6 +94,8 @@ xpcc::DoublyLinkedList<T, Allocator>::prepend(const T& value)
 		this->front->previous = node;
 	}
 	this->front = node;
+	
+	return true;
 }
 
 template <typename T, typename Allocator>

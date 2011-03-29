@@ -82,12 +82,6 @@ namespace xpcc
 		virtual void
 		clear();
 		
-		/**
-		 * \brief	Transfer the content of the RAM buffer to the real display.
-		 */
-		virtual void
-		update() = 0;
-		
 		// Faster version adapted for the RAM buffer
 		virtual void
 		drawImageRaw(glcd::Point upperLeft,

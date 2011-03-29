@@ -41,3 +41,4 @@
 #include "font/fixed_width_5x8.hpp"
 #include "font/assertion.hpp"
 #include "font/arcade_classic.hpp"
+#include "font/numbers_14x32.hpp"

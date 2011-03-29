@@ -138,8 +138,9 @@ namespace xpcc
 		/**
 		 * \brief	Calculate a new output value
 		 * 
-		 * \param	input					TODO
-		 * \param	externalLimitation		TODO
+		 * \param	input				Error
+		 * \param	externalLimitation	If true an external limitation is applied,
+		 * 								this disables integral summation.
 		 */
 		void
 		update(const T& input, bool externalLimitation = false);

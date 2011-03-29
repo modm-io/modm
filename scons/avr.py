@@ -164,7 +164,7 @@ def generate(env, **kw):
 #		"-Wl,-u,vfprintf -lprintf_flt"		# enable float support for vfprinft
 	]
 	
-	env['LINKCOM'] = "$LINK -o $TARGET $LINKFLAGS $SOURCES -lm $_LIBDIRFLAGS $_LIBFLAGS -lm"
+	env['LINKCOM'] = "$LINK -o $TARGET $LINKFLAGS -lm -lc -lm $SOURCES -lm $_LIBDIRFLAGS $_LIBFLAGS -lm"
 	
 	clock = str(env['AVR_CLOCK']).lower()
 	if not clock.endswith('ul'):

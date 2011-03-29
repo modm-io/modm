@@ -40,8 +40,8 @@ namespace xpcc
 {
 	namespace st7565
 	{
-		EXTERN_FLASH(uint8_t configuration_dogx128[14]);
-		EXTERN_FLASH(uint8_t configuration_dogm132[14]);
+		EXTERN_FLASH(uint8_t configuration_dogx128[12]);
+		EXTERN_FLASH(uint8_t configuration_dogm132[12]);
 	}
 	
 	/**
@@ -90,7 +90,7 @@ namespace xpcc
 		{
 			St7565<SPI, CS, A0, Reset, 128, 64, TopView>::initialize(
 					xpcc::accessor::asFlash(st7565::configuration_dogx128),
-					static_cast<uint8_t>(sizeof(st7565::configuration_dogx128)));
+					sizeof(st7565::configuration_dogx128));
 		}
 	};
 	
