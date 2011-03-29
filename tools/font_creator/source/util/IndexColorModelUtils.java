@@ -22,12 +22,14 @@ public class IndexColorModelUtils {
 			byte[] g = { (byte) 255, (byte) 0 };
 			byte[] b = { (byte) 255, (byte) 0 };
 			cm = new IndexColorModel(bits, 2, r, g, b);
-		} else if (bits == 2) {
+		}
+		else if (bits == 2) {
 			byte[] r = { (byte) 255, (byte) 0, (byte) 255, (byte) 0 };
 			byte[] g = { (byte) 255, (byte) 0, (byte) 0, (byte) 0 };
 			byte[] b = { (byte) 255, (byte) 0, (byte) 0, (byte) 255 };
 			cm = new IndexColorModel(bits, 4, r, g, b);
-		} else if (bits == 3) {
+		}
+		else if (bits == 3) {
 			byte[] r = { (byte) 255, (byte) 0, (byte) 255, (byte) 0, (byte) 0,
 					(byte) 255, (byte) 255, (byte) 0 };
 			byte[] g = { (byte) 255, (byte) 0, (byte) 0, (byte) 0, (byte) 255,
@@ -35,7 +37,8 @@ public class IndexColorModelUtils {
 			byte[] b = { (byte) 255, (byte) 0, (byte) 0, (byte) 255, (byte) 0,
 					(byte) 0, (byte) 255, (byte) 255 };
 			cm = new IndexColorModel(bits, 8, r, g, b);
-		} else if (bits == 8) {
+		}
+		else if (bits == 8) {
 			byte[] r = new byte[256];
 			byte[] g = new byte[256];
 			byte[] b = new byte[256];
@@ -50,7 +53,8 @@ public class IndexColorModelUtils {
 				b[i] = (byte) blue[i & 0x03];
 			}
 			cm = new IndexColorModel(bits, 256, r, g, b);
-		} else {
+		}
+		else {
 			throw new IllegalArgumentException(
 					"Only 2, 4, 8, or 256 Colors are supported");
 		}

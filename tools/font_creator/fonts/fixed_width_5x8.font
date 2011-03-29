@@ -1,7 +1,8 @@
-#font    : Fixed Width 5x7
-#width   : 5
-#height  : 8
-#spacing : 1
+#font   : Fixed Width 5x8
+#width  : 5
+#height : 8
+#hspace : 1
+#vspace : 0
 
 #char : 32 ' '
 [     ]

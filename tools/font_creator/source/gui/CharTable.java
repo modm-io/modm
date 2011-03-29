@@ -78,7 +78,7 @@ public class CharTable implements KeyListener, MouseListener,
 		tableModel.removeAllRows();
 
 		for (int i = 0, j = font.getStartIndex(); i < font.getCharCount(); i++, j++) {
-			FontCharacter fc = font.getChar(i);
+			FontCharacter fc = font.getCharacter(i);
 
 			String hexVal = (Integer.toHexString(j)).toUpperCase();
 			if (hexVal.length() == 1)
@@ -105,7 +105,7 @@ public class CharTable implements KeyListener, MouseListener,
 	}
 
 	public FontCharacter getCharAt(int index) {
-		FontCharacter cd = (FontCharacter) font.getChar(index);
+		FontCharacter cd = (FontCharacter) font.getCharacter(index);
 		return cd;
 	}
 
@@ -117,7 +117,7 @@ public class CharTable implements KeyListener, MouseListener,
 		int index = charTable.getSelectedRow();
 		FontCharacter fc = null;
 		if (index != -1) {
-			fc = (FontCharacter) font.getChar(index);
+			fc = (FontCharacter) font.getCharacter(index);
 		}
 
 		return fc;

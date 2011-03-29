@@ -1,9 +1,4 @@
-/*
- * Created on 11.02.2004
- *
- * To change the template for this generated file go to
- * Window&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and Comments
- */
+
 package util;
 
 import java.awt.Color;
@@ -43,46 +38,11 @@ public class FontCharacter {
 			g.fillRect(0, 0, width, height);
 		}
 	}
-
-	private boolean isRowEmpty(int row) {
-		if (image != null) {
-			IndexColorModel cm = font.getEditorColorModel();
-			Raster data = image.getData();
-			int[] tmp = null;
-			int[] a = data.getPixels(0, 0, image.getWidth(), image.getHeight(),
-					tmp);
-			int offset = row * image.getWidth();
-			for (int i = offset; i < offset + image.getWidth(); i++) {
-				if (cm.getRed(a[i]) != 255 && cm.getGreen(a[i]) != 255
-						&& cm.getBlue(a[i]) != 255)
-					return false;
-			}
-		}
-		return true;
-	}
-
-	private boolean isColEmpty(int col) {
-		if (image != null) {
-			IndexColorModel cm = font.getEditorColorModel();
-			Raster data = image.getData();
-			int[] tmp = null;
-			int[] a = data.getPixels(0, 0, image.getWidth(), image.getHeight(),
-					tmp);
-			int offset = col;
-			for (int i = offset; i < offset
-					+ (image.getWidth() * (image.getHeight() - 1)); i += image.getWidth()) {
-				if (cm.getRed(a[i]) != 255 && cm.getGreen(a[i]) != 255
-						&& cm.getBlue(a[i]) != 255)
-					return false;
-			}
-		}
-		return true;
-	}
-
+	
 	public int getWidth() {
 		return width;
 	}
-
+	
 	public int getHeight() {
 		return height;
 	}
@@ -171,11 +131,45 @@ public class FontCharacter {
 
 		rect = new Rectangle(0, top, image.getWidth(), bottom);
 		changeSize(0, 0, -left, -right);
-		// System.out.println(""+ascii+" yO="+rect.y+" yU="+(rect.y+rect.height)+" right="+right);
-
+		
 		return rect;
 	}
+	
+	private boolean isRowEmpty(int row) {
+		if (image != null) {
+			IndexColorModel cm = font.getEditorColorModel();
+			Raster data = image.getData();
+			int[] tmp = null;
+			int[] a = data.getPixels(0, 0, image.getWidth(), image.getHeight(),
+					tmp);
+			int offset = row * image.getWidth();
+			for (int i = offset; i < offset + image.getWidth(); i++) {
+				if (cm.getRed(a[i]) != 255 && cm.getGreen(a[i]) != 255
+						&& cm.getBlue(a[i]) != 255)
+					return false;
+			}
+		}
+		return true;
+	}
 
+	private boolean isColEmpty(int col) {
+		if (image != null) {
+			IndexColorModel cm = font.getEditorColorModel();
+			Raster data = image.getData();
+			int[] tmp = null;
+			int[] a = data.getPixels(0, 0, image.getWidth(), image.getHeight(),
+					tmp);
+			int offset = col;
+			for (int i = offset; i < offset
+					+ (image.getWidth() * (image.getHeight() - 1)); i += image.getWidth()) {
+				if (cm.getRed(a[i]) != 255 && cm.getGreen(a[i]) != 255
+						&& cm.getBlue(a[i]) != 255)
+					return false;
+			}
+		}
+		return true;
+	}
+	
 	/**
 	 * Returns the Description of this Character.
 	 * 

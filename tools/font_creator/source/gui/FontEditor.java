@@ -30,10 +30,18 @@ public class FontEditor extends JInternalFrame implements InternalFrameListener 
 	private JSplitPane splitPane;
 	private Font font;
 	private MainWindow mainWindow;
-
-	public FontEditor(Font font, MainWindow mainWindow) {
+	private String filename;
+	
+	/**
+	 * 
+	 * @param font
+	 * @param mainWindow
+	 * @param filename		Filename from which the font was loaded
+	 */
+	public FontEditor(Font font, MainWindow mainWindow, String filename) {
 		this.font = font;
 		this.mainWindow = mainWindow;
+		this.filename = filename;
 		initGUI();
 		initInternalFrame();
 		addInternalFrameListener(this);
@@ -42,9 +50,9 @@ public class FontEditor extends JInternalFrame implements InternalFrameListener 
 	private void initGUI() {
 		this.setLayout(new BorderLayout());
 		
-		charEditor = new CharEditor(font.getChar(0), this,
+		charEditor = new CharEditor(font.getCharacter(0), this,
 				font.getEditorColorModel(), mainWindow);
-		charEditor.setChar(font.getChar(0));
+		charEditor.setChar(font.getCharacter(0));
 		charEditor.setTransferHandler(new ImageTransferHandler());
 		editorScrollPane = new JScrollPane(charEditor);
 		editorScrollPane.setPreferredSize(new Dimension(450, 450));
@@ -76,9 +84,17 @@ public class FontEditor extends JInternalFrame implements InternalFrameListener 
 	public Font getEditedFont() {
 		return font;
 	}
-
+	
+	public String getFilename() {
+		return filename;
+	}
+	
+	public void setFilename(String filename) {
+		this.filename = filename;
+	}
+	
 	public void setEditingChar(int index) {
-		charEditor.setChar(font.getChar(index));
+		charEditor.setChar(font.getCharacter(index));
 		editingCharSizeChanged();
 	}
 

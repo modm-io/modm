@@ -9,11 +9,7 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.io.File;
-//import java.io.FileInputStream;
-//import java.io.FileOutputStream;
 import java.io.IOException;
-//import java.io.ObjectInputStream;
-//import java.io.ObjectOutputStream;
 
 import javax.swing.JDesktopPane;
 import javax.swing.JFileChooser;
@@ -27,7 +23,9 @@ import util.FontExport;
 import util.SerializableFont;
 
 /**
+ * 
  * @author Fabian Maximilian Thiele
+ * @author Fabian Greif
  */
 public class MainWindow extends JFrame {
 	private static final long serialVersionUID = 9045652199181844858L;
@@ -84,13 +82,13 @@ public class MainWindow extends JFrame {
 		int retVal = dialog.showNewFontDialog();
 		if (retVal == NewFontDialog.APPROVE_OPTION) {
 			Font font = dialog.getNewFont();
-
-			newFontEditor(font);
+			
+			newFontEditor(font, "");
 		}
 	}
 
-	private void newFontEditor(Font font) {
-		FontEditor editor = new FontEditor(font, this);
+	private void newFontEditor(Font font, String filename) {
+		FontEditor editor = new FontEditor(font, this, filename);
 		editor.setLocation(frameCount * 30, frameCount * 30);
 		if (++frameCount == 5)
 			frameCount = 0;
@@ -101,19 +99,18 @@ public class MainWindow extends JFrame {
 	public void saveFont() {
 		if (desktop.getSelectedFrame() instanceof FontEditor) {
 			FontEditor editor = (FontEditor) desktop.getSelectedFrame();
+			
 			JFileChooser chooser = new JFileChooser(".");
+			chooser.setSelectedFile(new File(editor.getFilename()));
+			
 			int rv = chooser.showSaveDialog(this);
 			if (rv == JFileChooser.APPROVE_OPTION) {
+				File file = chooser.getSelectedFile();
 				try {
-					/*ObjectOutputStream out = new ObjectOutputStream(
-							new FileOutputStream(dest));
 					SerializableFont font = new SerializableFont(
 							editor.getEditedFont());
-					out.writeObject(font);
-					out.close();*/
-					SerializableFont font = new SerializableFont(
-							editor.getEditedFont());
-					font.writeToFile(chooser.getSelectedFile());
+					font.writeToFile(file);
+					editor.setFilename(file.getAbsolutePath());
 				} catch (IOException e) {
 					System.err.println("IOException: " + e.toString());
 				}
@@ -125,16 +122,12 @@ public class MainWindow extends JFrame {
 		JFileChooser chooser = new JFileChooser(".");
 		int rv = chooser.showOpenDialog(this);
 		if (rv == JFileChooser.APPROVE_OPTION) {
-			File dest = chooser.getSelectedFile();
+			File file = chooser.getSelectedFile();
 			try {
-				/*ObjectInputStream in = new ObjectInputStream(
-						new FileInputStream(dest));
-				SerializableFont sFont = (SerializableFont) in.readObject();
-				in.close();*/
-				SerializableFont sFont = new SerializableFont(dest);
+				SerializableFont sFont = new SerializableFont(file);
 				
 				Font font = new Font(sFont);
-				newFontEditor(font);
+				newFontEditor(font, file.getAbsolutePath());
 			} catch (Exception e) {
 				System.err.println("Excpetion: " + e.toString());
 			}

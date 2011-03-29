@@ -1,7 +1,8 @@
-#font    : All Caps 3x5
-#width   : 3
-#height  : 5
-#spacing : 1
+#font   : All Caps 3x5
+#width  : 3
+#height : 5
+#hspace : 1
+#vspace : 1
 
 #char : 32 ' '
 [   ]

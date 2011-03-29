@@ -303,7 +303,7 @@ public class NewFontDialog extends JDialog implements ActionListener,
 
 				font = new Font(width, initWidth, height, startIdx, charCount,
 						name, bits, importFont);
-				font.setCharSpace(charSpacing);
+				font.setHorizontalSpace(charSpacing);
 
 				dispose();
 			} catch (Exception ex) {

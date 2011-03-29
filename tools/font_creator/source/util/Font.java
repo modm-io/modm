@@ -1,9 +1,4 @@
-/*
- * Created on 11.02.2004
- *
- * To change the template for this generated file go to
- * Window&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and Comments
- */
+
 package util;
 
 import java.awt.Rectangle;
@@ -18,10 +13,8 @@ public class Font {
 	private int height;
 	private int width;
 	private final int startIndex;
-	private int spacing;
-	
-	private int cropTop;
-	private int cropBottom;
+	private int hspace;
+	private int vspace;
 	
 	private Vector<FontCharacter> chars;
 	private String name;
@@ -35,7 +28,8 @@ public class Font {
 		this.height = height;
 		this.name = name;
 		this.startIndex = startIdx;
-		this.spacing = 1;
+		this.hspace = 1;
+		this.vspace = 0;
 		this.bits = bits;
 
 		editorColorModel = IndexColorModelUtils.getColorModel(bits);
@@ -44,8 +38,8 @@ public class Font {
 			this.height = height = importFont.getSize() * 2;
 		}
 		
-		cropTop = height;
-		cropBottom = height;
+		int cropTop = height;
+		int cropBottom = height;
 		for (int i = 0; i < charCount; i++) {
 			FontCharacter c = new FontCharacter(initWidth, height, startIndex + i, this);
 			
@@ -60,11 +54,12 @@ public class Font {
 			}
 			chars.addElement(c);
 		}
-
+		
 		if (importFont != null) {
 			for (int i = 0; i < charCount; i++) {
 				chars.get(i).changeSize(-cropTop, -cropBottom, 0, 0);
 			}
+			this.height = height - cropTop - cropBottom; 
 		}
 		else {
 			cropTop = 0;
@@ -77,13 +72,12 @@ public class Font {
 		height = sFont.getHeight();
 		name = sFont.getName();
 		startIndex = sFont.getStartIndex();
-		spacing = sFont.getSpacing();
+		hspace = sFont.getHorizontalSpace();
+		vspace = sFont.getVerticalSpace();
 		bits = sFont.getBits();
-		cropTop = sFont.getCropTop();
-		cropBottom = sFont.getCropBottom();
-
+		
 		editorColorModel = IndexColorModelUtils.getColorModel(bits);
-
+		
 		SerializableFontCharacter[] c = sFont.getChars();
 		chars = new Vector<FontCharacter>(c.length);
 		for (int i = 0; i < c.length; i++) {
@@ -91,7 +85,7 @@ public class Font {
 		}
 	}
 	
-	public FontCharacter getChar(int index) {
+	public FontCharacter getCharacter(int index) {
 		return chars.get(index);
 	}
 	
@@ -136,16 +130,27 @@ public class Font {
 	}
 	
 	/**
-	 * Spacing between two characters
+	 * Horizontal spacing between two characters
 	 */
-	public int getSpacing() {
-		return spacing;
+	public int getHorizontalSpace() {
+		return hspace;
+	}
+	
+	/**
+	 * Vertical spacing between two characters
+	 */
+	public int getVerticalSpace() {
+		return vspace;
 	}
 
-	public void setCharSpace(int i) {
-		spacing = i;
+	public void setHorizontalSpace(int i) {
+		hspace = i;
 	}
-
+	
+	public void setVerticalSpace(int i) {
+		vspace = i;
+	}
+	
 	public IndexColorModel getEditorColorModel() {
 		return editorColorModel;
 	}
@@ -166,21 +171,5 @@ public class Font {
 		}
 
 		return size;
-	}
-
-	public int getCropBottom() {
-		return cropBottom;
-	}
-
-	public void setCropBottom(int cropBottom) {
-		this.cropBottom = cropBottom;
-	}
-
-	public int getCropTop() {
-		return cropTop;
-	}
-
-	public void setCropTop(int cropTop) {
-		this.cropTop = cropTop;
 	}
 }

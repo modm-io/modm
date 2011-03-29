@@ -1,7 +1,8 @@
-#font    : Assertion
-#width   : 7
-#height  : 15
-#spacing : 1
+#font   : Assertion
+#width  : 7
+#height : 15
+#hspace : 1
+#vspace : 0
 
 #char : 32 ' '
 [       ]
@@ -587,8 +588,8 @@
 [##   ##]
 [##   ##]
 [##   ##]
-[##   ##]
 [###### ]
+[##   ##]
 [##   ##]
 [##   ##]
 [##   ##]

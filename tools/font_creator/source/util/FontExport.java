@@ -1,9 +1,4 @@
-/*
- * Created on 30.03.2004
- *
- * To change the template for this generated file go to
- * Window&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and Comments
- */
+
 package util;
 
 import gui.MainWindow;
@@ -100,8 +95,7 @@ public class FontExport {
 					+ "." + +cal.get(Calendar.YEAR);
 			String size = "" + (getHeaderSize(template, font) + font.getSize());
 			String width = "" + font.getWidth();
-			String height = ""
-					+ (font.getHeight() - font.getCropTop() - font.getCropBottom());
+			String height = "" + font.getHeight();
 			String bits = "" + font.getBits();
 			String firstChar = "" + font.getStartIndex();
 			String lastChar = "" + (font.getStartIndex() + font.getCharCount());
@@ -129,8 +123,7 @@ public class FontExport {
 			template = template.replaceAll("%binWidth", hexStr(font.getWidth(),
 					0));
 			template = template.replaceAll("%binHeight",
-					hexStr(font.getHeight() - font.getCropTop()
-							- font.getCropBottom(), 0));
+					hexStr(font.getHeight(), 0));
 			template = template.replaceAll("%binFirstChar", hexStr(
 					font.getStartIndex(), 0));
 			template = template.replaceAll("%binCharCount", hexStr(
@@ -162,11 +155,6 @@ public class FontExport {
 					for (int j = 0; j < (h + 7) / 8; j++) {
 						for (int k = 0; k < w; k++) {
 							data = 0;
-							// for(int l=0; l<8 && l+j*8<h; l++) {
-							// int p = pixels[w*(j*8)+k+l*w];
-							// data >>= 1;
-							// data |= p<<7;
-							// }
 							for (int m = 0; m < 8 && m + j * 8 < h; m++) {
 								int p = pixels[w * (j * 8) + k + m * w];
 								data |= p << m;

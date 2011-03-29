@@ -17,7 +17,7 @@ import java.util.regex.Matcher;
  * @author Fabian Greif
  */
 public class SerializableFontCharacter implements Serializable {
-	private static final long serialVersionUID = -8336940559779433401L;
+	private static final long serialVersionUID = 20110328L;
 	private int width;
 	private int height;
 	private int asciiIndex;

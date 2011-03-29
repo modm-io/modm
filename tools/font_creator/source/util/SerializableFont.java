@@ -20,14 +20,13 @@ import java.util.ArrayList;
  * @author Fabian Greif
  */
 public class SerializableFont implements Serializable {
-	private static final long serialVersionUID = -1609847421843752630L;
+	private static final long serialVersionUID = 20110327L;
 	private int bits;
 	private int height;
 	private int width;
 	private int startIndex;
-	private int spacing;
-	private int cropTop;
-	private int cropBottom;
+	private int hspace;
+	private int vspace;
 	private String name;
 	private SerializableFontCharacter[] chars;
 
@@ -36,11 +35,10 @@ public class SerializableFont implements Serializable {
 		height = font.getHeight();
 		width = font.getWidth();
 		startIndex = font.getStartIndex();
-		spacing = font.getSpacing();
+		hspace = font.getHorizontalSpace();
+		vspace = font.getVerticalSpace();
 		name = font.getName();
-		cropTop = font.getCropTop();
-		cropBottom = font.getCropBottom();
-
+		
 		FontCharacter[] c = font.getAllCharacters();
 		chars = new SerializableFontCharacter[c.length];
 		for (int i = 0; i < chars.length; i++) {
@@ -53,13 +51,12 @@ public class SerializableFont implements Serializable {
 		
 		// TODO move these values to the font-file
 		bits = 1;
-		cropTop = 0;
-		cropBottom = 0;
 		
 		name = null;
 		width = -1;
 		height = -1;
-		spacing = -1;
+		hspace = -1;
+		vspace = -1;
 		startIndex = -1;
 		int lastIndex = -1;
 		
@@ -83,8 +80,11 @@ public class SerializableFont implements Serializable {
 			else if (key.equals("#height")) {
 				height = Integer.valueOf(value);
 			}
-			else if (key.equals("#spacing")) {
-				spacing = Integer.valueOf(value);
+			else if (key.equals("#hspace")) {
+				hspace = Integer.valueOf(value);
+			}
+			else if (key.equals("#vspace")) {
+				vspace = Integer.valueOf(value);
 			}
 			else if (key.equals("#char")) {
 				String[] t = value.split("'");
@@ -106,7 +106,7 @@ public class SerializableFont implements Serializable {
 			}
 		}
 		
-		if (name == null || width == -1 || height == -1 || spacing == -1) {
+		if (name == null || width == -1 || height == -1 || hspace == -1) {
 			throw new IOException("Not all needed information given!");
 		}
 		
@@ -122,8 +122,12 @@ public class SerializableFont implements Serializable {
 		return chars;
 	}
 
-	public int getSpacing() {
-		return spacing;
+	public int getHorizontalSpace() {
+		return hspace;
+	}
+	
+	public int getVerticalSpace() {
+		return vspace;
 	}
 
 	public int getHeight() {
@@ -141,22 +145,15 @@ public class SerializableFont implements Serializable {
 	public int getWidth() {
 		return width;
 	}
-
-	public int getCropBottom() {
-		return cropBottom;
-	}
-
-	public int getCropTop() {
-		return cropTop;
-	}
-
+	
 	public void writeToFile(File selectedFile) throws IOException {
 		BufferedWriter writer = new BufferedWriter(new FileWriter(selectedFile));
 		
-		writer.write("#font    : " + name + "\n");
-		writer.write("#width   : " + width + "\n");
-		writer.write("#height  : " + height + "\n");
-		writer.write("#spacing : " + spacing + "\n");
+		writer.write("#font   : " + name + "\n");
+		writer.write("#width  : " + width + "\n");
+		writer.write("#height : " + height + "\n");
+		writer.write("#hspace : " + hspace + "\n");
+		writer.write("#vspace : " + vspace + "\n");
 		
 		for (int i = 0; i < chars.length; i++) {
 			chars[i].writeToFile(writer);
