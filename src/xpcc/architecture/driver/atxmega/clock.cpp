@@ -33,13 +33,12 @@
 #include "utils.hpp"
 #include "clock.hpp"
 
-// TODO
-
+// ----------------------------------------------------------------------------
 void
-xpcc::atxmega::enableExternalClock()
+xpcc::atxmega::enableExternalClock(OSC_FRQRANGE_t frequency)
 {
 	// select external clock with 8MHz as clock source
-	OSC.XOSCCTRL = OSC_FRQRANGE_2TO9_gc | OSC_XOSCSEL_EXTCLK_gc;
+	OSC.XOSCCTRL = frequency | OSC_XOSCSEL_EXTCLK_gc;
 	OSC.CTRL |= OSC_XOSCEN_bm;
 	
 	// wait for osc to become ready
@@ -47,6 +46,7 @@ xpcc::atxmega::enableExternalClock()
 		;
 }
 
+// ----------------------------------------------------------------------------
 void
 xpcc::atxmega::enableExternalOscillator(OSC_FRQRANGE_t frequency, OSC_XOSCSEL_t startupTime)
 {
@@ -59,11 +59,12 @@ xpcc::atxmega::enableExternalOscillator(OSC_FRQRANGE_t frequency, OSC_XOSCSEL_t 
 		;
 }
 
+// ----------------------------------------------------------------------------
 void
-xpcc::atxmega::enablePll()
+xpcc::atxmega::enablePll(OSC_PLLSRC_t source, uint8_t factor)
 {
 	// set PLL source to XOSC & factor to x4
-	OSC.PLLCTRL = OSC_PLLSRC_XOSC_gc | (4 << OSC_PLLFAC_gp);
+	OSC.PLLCTRL = source | ((factor & 0x1f) << OSC_PLLFAC_gp);
 	OSC.CTRL |= OSC_PLLEN_bm;		// enable PLL
 	
 	// wait for PLL to become ready
@@ -71,8 +72,17 @@ xpcc::atxmega::enablePll()
 		;
 }
 
+// ----------------------------------------------------------------------------
 void
 xpcc::atxmega::selectSystemClockSource(CLK_SCLKSEL_t source)
 {
 	changeProtectedRegister(&CLK_CTRL, source);
+}
+
+// ----------------------------------------------------------------------------
+void
+xpcc::atxmega::setSystemClockPrescaler(CLK_PSADIV_t prescalerA,
+		CLK_PSBCDIV_t prescalerBC)
+{
+	CLK.PSCTRL = prescalerA | prescalerBC;
 }

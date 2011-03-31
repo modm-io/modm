@@ -37,49 +37,82 @@
 
 namespace xpcc
 {
-	// FIXME
 	namespace atxmega
 	{
+		/**
+		 * \brief	Enable an external clock on XTAL1
+		 * 
+		 * \see		enableExternalOscillator() for values of frequency
+		 */
 		void
-		enableExternalClock();
+		enableExternalClock(
+				OSC_FRQRANGE_t frequency = OSC_FRQRANGE_2TO9_gc);
 		
 		/**
 		 * 
-		 * frequency:
-		 * - OSC_FRQRANGE_04TO2_gc
-		 * - OSC_FRQRANGE_2TO9_gc
-		 * - OSC_FRQRANGE_9TO12_gc
-		 * - OSC_FRQRANGE_12TO16_gc
+		 * Values for \c frequency:
+		 * - \c OSC_FRQRANGE_04TO2_gc for 0.4..2 MHz
+		 * - \c OSC_FRQRANGE_2TO9_gc for 2..9 MHz
+		 * - \c OSC_FRQRANGE_9TO12_gc for 9..12 MHz
+		 * - \c OSC_FRQRANGE_12TO16_gc 12..16 MHz
 		 * 
-		 * startupTime:
-		 * - OSC_XOSCSEL_XTAL_256CLK_gc
-		 * - OSC_XOSCSEL_XTAL_1KCLK_gc
-		 * - OSC_XOSCSEL_XTAL_16KCLK_gc
+		 * Values for \c startupTime:
+		 * - \c OSC_XOSCSEL_XTAL_256CLK_gc
+		 * - \c OSC_XOSCSEL_XTAL_1KCLK_gc
+		 * - \c OSC_XOSCSEL_XTAL_16KCLK_gc
 		 */
 		void
 		enableExternalOscillator(
 				OSC_FRQRANGE_t frequency = OSC_FRQRANGE_12TO16_gc,
 				OSC_XOSCSEL_t startupTime = OSC_XOSCSEL_XTAL_256CLK_gc);
 		
+		/**
+		 * \brief	Enable PLL
+		 * 
+		 * The Phase Locked Loop (PLL) is able to generate a high frequency
+		 * system clock. The source frequency is multiplied by a user selectable
+		 * multiplication factor from 1 to 31.
+		 * 
+		 * The output frequency from the PLL should not exceed 200 MHz.
+		 * The PLL must have a minimum output frequency of 10 MHz.
+		 * 
+		 * Possible values for \c source:
+		 * - \c OSC_PLLSRC_RC2M_gc
+		 * - \c OSC_PLLSRC_RC32M_gc
+		 * - \c OSC_PLLSRC_XOSC_gc
+		 * 
+		 * An external clock must be minimum 0.4 MHz to be used as source clock.
+		 * 
+		 * Make sure that the input source is enabled and stable before
+		 * activating the PLL.
+		 * 
+		 * \param source	Source clock
+		 * \param factor	Multiplication factor
+		 */
 		void
-		enablePll();
-		
+		enablePll(OSC_PLLSRC_t source, uint8_t factor);
 		
 		/**
 		 * \brief	Select a new main clock source
 		 * 
 		 * Possible values:
-		 * - internal 2 MHz  (CLK_SCLKSEL_RC2M_gc)
-		 * - internal 32 MHz (CLK_SCLKSEL_RC32M_gc)
-		 * - internal 32 kHz (CLK_SCLKSEL_RC32K_gc)
-		 * - external clock or oscillator (CLK_SCLKSEL_XOSC_gc)
-		 * - PLL (CLK_SCLKSEL_PLL_gc)
+		 * - internal 2 MHz  (\c CLK_SCLKSEL_RC2M_gc)
+		 * - internal 32 MHz (\c CLK_SCLKSEL_RC32M_gc)
+		 * - internal 32 kHz (\c CLK_SCLKSEL_RC32K_gc)
+		 * - external clock or oscillator (\c CLK_SCLKSEL_XOSC_gc)
+		 * - PLL (\c CLK_SCLKSEL_PLL_gc)
 		 * 
 		 * \warning	Make sure the clock source is stable before
 		 * 			switching to it!
 		 */
 		void
 		selectSystemClockSource(CLK_SCLKSEL_t source);
+		
+		/// TODO documentation
+		void
+		setSystemClockPrescaler(
+				CLK_PSADIV_t prescalerA = CLK_PSADIV_1_gc,
+				CLK_PSBCDIV_t prescalerBC = CLK_PSBCDIV_1_1_gc);
 	}
 }
 
