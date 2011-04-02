@@ -51,6 +51,9 @@ xpcc::apb::Action::call(Response& response, const void *payload)
 	(object->*function)(response, payload);
 }
 
+// Disable warnings for Visual Studio about using 'this' in a base member
+// initializer list.
+// In this case though it is totally safe so it is ok to disable this warning.
 #ifdef XPCC__COMPILER_MSVC
 #	pragma warning(disable:4355)
 #endif
@@ -66,6 +69,7 @@ xpcc::apb::Slave<Interface>::Slave(uint8_t address,
 	Interface::initialize();
 }			
 
+// ----------------------------------------------------------------------------
 template <typename Interface>
 void
 xpcc::apb::Slave<Interface>::update()
@@ -109,12 +113,20 @@ xpcc::apb::Slave<Interface>::update()
 	}
 }
 
+// ----------------------------------------------------------------------------
 template <typename Interface>
 void
 xpcc::apb::Slave<Interface>::send(bool acknowledge,
 			const void *payload, uint8_t payloadLength)
 {
-	Flags flags = (acknowledge) ? xpcc::apb::ACK : xpcc::apb::NACK;
+	Flags flags;
+	if (acknowledge) {
+		flags = xpcc::apb::ACK;
+	}
+	else {
+		flags = xpcc::apb::NACK;
+	}
+	
 	Interface::sendMessage(this->ownAddress, flags, this->currentCommand,
 			payload, payloadLength);
 }

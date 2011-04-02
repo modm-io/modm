@@ -200,10 +200,10 @@ xpcc::apb::Interface<Device>::update()
 				
 				position += 1;
 				if (position >= length) {
-					state = SYNC;
 					if (crc == 0) {
 						lengthOfReceivedMessage = length;
 					}
+					state = SYNC;
 				}
 				break;
 			

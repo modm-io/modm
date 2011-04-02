@@ -42,7 +42,6 @@ xpcc::ButtonGroup<T>::ButtonGroup(T mask, uint16_t timeout, uint16_t interval) :
 }
 
 // ----------------------------------------------------------------------------
-
 template <typename T>
 T
 xpcc::ButtonGroup<T>::getState(T mask) const

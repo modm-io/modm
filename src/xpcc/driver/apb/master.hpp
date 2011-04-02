@@ -1,6 +1,6 @@
 // coding: utf-8
 // ----------------------------------------------------------------------------
-/* Copyright (c) 2009, Roboterclub Aachen e.V.
+/* Copyright (c) 2011, Roboterclub Aachen e.V.
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -34,49 +34,106 @@
 #define XPCC_APB__MASTER_HPP
 
 #include <stdint.h>
+#include <xpcc/workflow/timeout.hpp>
+
 #include "interface.hpp"
 
 namespace xpcc
 {
 	namespace apb
 	{
+		/**
+		 * 
+		 * Requires xpcc::Clock to be implemented.
+		 * 
+		 * \see	xpcc::Clock
+		 */
 		template <typename Interface>
 		class Master
 		{
 		public:
-			Master();
+			static void
+			initialize();
 			
+			/**
+			 * \brief	Start a new query with a payload
+			 * 
+			 * \param slaveAddress	
+			 * \param command		
+			 * \param payload		
+			 * \param responseLength	Expected payload length of the response
+			 */
 			template <typename T>
-			void
+			static void
 			query(uint8_t slaveAddress, uint8_t command,
 					const T& payload, uint8_t responseLength);
 			
-			void
+			/**
+			 * \brief	Start a new query without any payload
+			 * 
+			 */
+			static void
 			query(uint8_t slaveAddress, uint8_t command, uint8_t responseLength);
 			
-			bool
-			isQueryCompleted() const;
+			static bool
+			isQueryCompleted();
 			
-			bool
-			isSuccess() const;
+			/**
+			 * \brief	Check if the last query could be performed successful
+			 * 
+			 * Only valid if isQueryCompleted() returns \c true.
+			 * 
+			 * \return	\c true if the query was successful. Use getResponse() to
+			 * 			access the result.
+			 */
+			static bool
+			isSuccess();
 			
-			uint8_t
-			getErrorCode() const;
+			/**
+			 * \brief	Check error code
+			 * 
+			 * Only valid if isQueryCompleted() returns \c true while
+			 * isSuccess() returns \c false.
+			 * 
+			 * \return	Error code
+			 * \see		xpcc::apb::Error
+			 */
+			static uint8_t
+			getErrorCode();
+			
 			
 			template <typename T>
-			const T&
-			getResponse() const;
+			static inline const T *
+			getResponse();
 			
-			const void *
-			getResponse() const;
+			static inline const void *
+			getResponse();
 			
-			void
+			
+			static void
 			update();
 			
 		protected:
+			enum QueryStatus
+			{
+				IN_PROGRESS,			///< Query in progress
+				SUCCESS,				///< Response sucessfully received
+				ERROR_RESPONSE = 0x40,	///< Error in the received message
+				ERROR_TIMEOUT = 0x41,	///< No message received within the timeout window
+				ERROR_PAYLOAD = 0x42,	///< Wrong payload size
+			};
 			
+			static Interface interface;
+			
+			static QueryStatus queryStatus;
+			static uint8_t expectedResponseLength;
+			static xpcc::Timeout<> timer;
+			
+			static const uint8_t timeout = 10;		///< timeout value in milliseconds
 		};
 	}
 }
+
+#include "master_impl.hpp"
 
 #endif	// XPCC_APB__MASTER_HPP

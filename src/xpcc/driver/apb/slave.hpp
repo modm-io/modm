@@ -106,8 +106,8 @@ namespace xpcc
 			Response&
 			operator = (const Response&);
 			
-			bool triggered;
 			Transmitter *transmitter;
+			bool triggered;				///< is used by abp::Slave to check that a response was send
 		};
 		
 		/**
