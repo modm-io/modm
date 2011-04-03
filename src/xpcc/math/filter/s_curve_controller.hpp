@@ -43,10 +43,17 @@ namespace xpcc
 	 * 
 	 * closed-loop
 	 * 
+	 * \code
+	 * SCurveController<int16_t> controller;
+	 * 
+	 * controller.update(positionTarget - currentPosition, currentSpeed); 
+	 * \endcode
+	 * 
 	 * \todo	documentation
 	 * 
-	 * \author	Fabian Greif <fabian.greif@rwth-aachen.de>
+	 * \author	Fabian Greif
 	 * \author	Georgi Grinshpun
+	 * 
 	 * \ingroup	filter
 	 */
 	template<typename T>
@@ -56,29 +63,29 @@ namespace xpcc
 		/**
 		 * \todo	some helper programs/formular to choose the right
 		 * 			parameter values (e.g. the java tool from the last year)
+		 * 
+		 * \param	increment	=> increment per timestep
+		 * \param	decreaseFactor => decrease per second
 		 */
 		struct Parameter
 		{
 			Parameter(const T& targetArea = T(),
-					const T& kp = T(),
 					const T& increment = T(),
 					const T& decreaseFactor = T(),
+					const T& kp = T(),
 					const T& secondaryMaximum = T(),
 					const T& secondaryMinimum = T());
 			
 			T targetArea;
-			T kp;
 			T increment;
 			T decreaseFactor;
+			T kp;
 			T secondaryMaximum;
 			T secondaryMinimum;
 		};
 		
 	public:
 		SCurveController(const Parameter& parameter);
-		
-		inline void
-		setTarget(const T& primary);
 		
 		inline void
 		setSecondaryMaximum(const T& secondary);
@@ -90,13 +97,13 @@ namespace xpcc
 		isTargetReached() const;
 		
 		void
-		update(const T& primary, const T& secondary);
+		update(T error, const T& secondary);
 		
+		/// setpoint output for the secondary value
 		inline const T&
 		getValue() const;
 		
 	public:
-		T target;
 		T output;
 		bool targetReached;
 		

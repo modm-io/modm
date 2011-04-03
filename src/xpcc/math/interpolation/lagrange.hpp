@@ -70,8 +70,8 @@ namespace xpcc
 		 * \see http://en.wikipedia.org/wiki/Lagrange_interpolation
 		 * 
 		 * \warning	Only floating points types are allowed as second type of
-		 * 			xpcc::Pair because the calculation will deliver wrong
-		 * 			results otherwise!
+		 * 			xpcc::Pair, otherwise the calculation will deliver wrong
+		 * 			results!
 		 * 
 		 * \tparam	T	Any specialization of xpcc::Pair<> with a floating
 		 * 				point type as second template argument.

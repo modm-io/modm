@@ -39,9 +39,9 @@
 // ----------------------------------------------------------------------------
 template<typename T>
 xpcc::SCurveController<T>::Parameter::Parameter(
-		const T& targetArea, const T& kp, const T& increment, const T& decreaseFactor,
+		const T& targetArea, const T& increment, const T& decreaseFactor, const T& kp, 
 		const T& secondaryMaximum, const T& secondaryMinimum) :
-	targetArea(targetArea), kp(kp), increment(increment), decreaseFactor(decreaseFactor),
+	targetArea(targetArea), increment(increment), decreaseFactor(decreaseFactor * 2), kp(kp),
 	secondaryMaximum(secondaryMaximum), secondaryMinimum(secondaryMinimum)
 {
 }			
@@ -50,18 +50,8 @@ xpcc::SCurveController<T>::Parameter::Parameter(
 
 template<typename T>
 xpcc::SCurveController<T>::SCurveController(const Parameter& parameter) :
-	target(), output(), targetReached(false), parameter(parameter)
+	output(), targetReached(false), parameter(parameter)
 {
-}
-
-// ----------------------------------------------------------------------------
-
-template<typename T>
-void
-xpcc::SCurveController<T>::setTarget(const T& primary)
-{
-	this->target = primary;
-	this->targetReached = false;
 }
 
 // ----------------------------------------------------------------------------
@@ -89,13 +79,10 @@ xpcc::SCurveController<T>::isTargetReached() const
 }
 
 // ----------------------------------------------------------------------------
-
 template<typename T>
 void
-xpcc::SCurveController<T>::update(const T& primary, const T& secondary)
+xpcc::SCurveController<T>::update(T error, const T& secondary)
 {
-	T error = this->target - primary;
-
 	// adjust sign to be always positive
 	bool invert = false;
 	T currentValue = secondary;
@@ -114,6 +101,7 @@ xpcc::SCurveController<T>::update(const T& primary, const T& secondary)
 		outputDecrement = error * parameter.kp;
 	}
 	else {
+		targetReached = false;
 		outputDecrement = std::sqrt((error - parameter.targetArea) * \
 									parameter.decreaseFactor);
 	}
@@ -132,6 +120,7 @@ xpcc::SCurveController<T>::update(const T& primary, const T& secondary)
 	}
 }
 
+// ----------------------------------------------------------------------------
 template<typename T>
 inline const T&
 xpcc::SCurveController<T>::getValue() const

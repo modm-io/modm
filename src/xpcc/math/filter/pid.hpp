@@ -51,6 +51,19 @@ namespace xpcc
 	 * With the template parameter \c ScaleFactor this class provides an
 	 * fix point capability with integer types.
 	 * 
+	 * Example for a motor speed control with a 10-bit PWM output.
+	 * \code
+	 * Pid<int16_t, 10> pid(0.4, 0.5, 0, 200, 512);
+	 * 
+	 * ...
+	 * 
+	 * v_target = ... // setpoint
+	 * v_input  = ... // input value 
+	 * 
+	 * pid.update(v_target - v_input);
+	 * pwm = pid.getValue();
+	 * \endcode
+	 * 
 	 * \todo	use the faster avr::mul and avr::mac functions
 	 * 
 	 * \author	Fabian Greif
@@ -114,7 +127,7 @@ namespace xpcc
 		 * \param	maxOutput	output will be limited to this value
 		 **/
 		Pid(const float& kp = 0, const float& ki = 0, const float& kd = 0,
-			const T& maxErrorSum = 0, const T& maxOutput = 0);
+				const T& maxErrorSum = 0, const T& maxOutput = 0);
 		
 		/**
 		 * \param	parameter	list of parameters to the controller

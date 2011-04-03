@@ -35,11 +35,8 @@
 #endif
 
 // ----------------------------------------------------------------------------
-
 template<typename T>
-xpcc::filter::Ramp<T>::Ramp(const T& increment,
-					const T& decrement,
-					const T& initialValue) : 
+xpcc::filter::Ramp<T>::Ramp(const T& increment, const T& decrement, const T& initialValue) : 
 	target(initialValue),
 	value(initialValue),
 	targetReached(true),
@@ -54,7 +51,7 @@ void
 xpcc::filter::Ramp<T>::setTarget(const T& target)
 {
 	this->target = target;
-	targetReached = false;
+	this->targetReached = false;
 }
 
 // ----------------------------------------------------------------------------

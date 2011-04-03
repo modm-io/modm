@@ -41,11 +41,12 @@ SCurveControllerTest::testConstructor()
 	
 	xpcc::SCurveController<int16_t> controller(parameter);
 	
-	controller.setTarget(200);
+	int16_t target = 200;
+	int16_t input = 200;
 	
 	TEST_ASSERT_FALSE(controller.isTargetReached());
 	
-	controller.update(200, 0);
+	controller.update(target - input, 0);
 	
 	TEST_ASSERT_EQUALS(controller.getValue(), 0);
 	TEST_ASSERT_TRUE(controller.isTargetReached());
