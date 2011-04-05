@@ -24,6 +24,17 @@
   <defs
      id="defs3227">
     <linearGradient
+       id="linearGradient3851">
+      <stop
+         style="stop-color:#000000;stop-opacity:1;"
+         offset="0"
+         id="stop3853" />
+      <stop
+         style="stop-color:#000000;stop-opacity:0;"
+         offset="1"
+         id="stop3855" />
+    </linearGradient>
+    <linearGradient
        inkscape:collect="always"
        id="linearGradient5283">
       <stop
@@ -52,6 +63,16 @@
        x2="449.40555"
        y2="788.89722"
        gradientUnits="userSpaceOnUse" />
+    <radialGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient3851"
+       id="radialGradient3857"
+       cx="237.5"
+       cy="200.35715"
+       fx="237.5"
+       fy="200.35715"
+       r="201.07143"
+       gradientUnits="userSpaceOnUse" />
   </defs>
   <sodipodi:namedview
      id="base"
@@ -60,9 +81,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="0.98994949"
-     inkscape:cx="-152.65062"
-     inkscape:cy="323.89149"
+     inkscape:zoom="1.4"
+     inkscape:cx="90.20454"
+     inkscape:cy="269.87062"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -87,7 +108,8 @@
      inkscape:groupmode="layer"
      id="layer2"
      inkscape:label="ball"
-     style="display:inline">
+     style="display:inline"
+     sodipodi:insensitive="true">
     <path
        sodipodi:type="arc"
        style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;display:inline"
@@ -103,10 +125,11 @@
      inkscape:groupmode="layer"
      id="layer5"
      inkscape:label="schrift"
-     style="display:inline">
+     style="display:inline"
+     sodipodi:insensitive="true">
     <text
        xml:space="preserve"
-       style="font-size:28px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#120000;fill-opacity:1;stroke:none;font-family:Ubuntu;-inkscape-font-specification:Ubuntu Bold"
+       style="font-size:28px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#1e0000;fill-opacity:1;stroke:none;font-family:Ubuntu;-inkscape-font-specification:Ubuntu Bold"
        x="171.64975"
        y="55.175819"
        id="text4232"
@@ -117,7 +140,7 @@
          y="55.175819">optimized</tspan></text>
     <text
        xml:space="preserve"
-       style="font-size:28px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#120000;fill-opacity:1;stroke:none;font-family:Ubuntu;-inkscape-font-specification:Ubuntu Bold"
+       style="font-size:28px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#1e0000;fill-opacity:1;stroke:none;font-family:Ubuntu;-inkscape-font-specification:Ubuntu Bold"
        x="215.61101"
        y="89.637505"
        id="text4236"
@@ -128,7 +151,7 @@
          y="89.637505">unit testing</tspan></text>
     <text
        xml:space="preserve"
-       style="font-size:28px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#120000;fill-opacity:1;stroke:none;font-family:Ubuntu;-inkscape-font-specification:Ubuntu Bold"
+       style="font-size:28px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#1e0000;fill-opacity:1;stroke:none;font-family:Ubuntu;-inkscape-font-specification:Ubuntu Bold"
        x="76.300278"
        y="271.14697"
        id="text4240"
@@ -139,7 +162,7 @@
          y="271.14697">transparent</tspan></text>
     <text
        xml:space="preserve"
-       style="font-size:28px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#120000;fill-opacity:1;stroke:none;font-family:Ubuntu;-inkscape-font-specification:Ubuntu Bold"
+       style="font-size:28px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#1e0000;fill-opacity:1;stroke:none;font-family:Ubuntu;-inkscape-font-specification:Ubuntu Bold"
        x="70.73101"
        y="170.73883"
        id="text4244"
@@ -150,7 +173,7 @@
          y="170.73883">usability</tspan></text>
     <text
        xml:space="preserve"
-       style="font-size:28px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#120000;fill-opacity:1;stroke:none;font-family:Ubuntu;-inkscape-font-specification:Ubuntu Bold"
+       style="font-size:28px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#1e0000;fill-opacity:1;stroke:none;font-family:Ubuntu;-inkscape-font-specification:Ubuntu Bold"
        x="119.48682"
        y="96.101234"
        id="text4248"
@@ -161,7 +184,7 @@
          y="96.101234">TIPC</tspan></text>
     <text
        xml:space="preserve"
-       style="font-size:28px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#120000;fill-opacity:1;stroke:none;font-family:Ubuntu;-inkscape-font-specification:Ubuntu Bold"
+       style="font-size:28px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#1e0000;fill-opacity:1;stroke:none;font-family:Ubuntu;-inkscape-font-specification:Ubuntu Bold"
        x="295.60684"
        y="290.30396"
        id="text4252"
@@ -172,7 +195,7 @@
          y="290.30396">events</tspan></text>
     <text
        xml:space="preserve"
-       style="font-size:28px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#120000;fill-opacity:1;stroke:none;font-family:Ubuntu;-inkscape-font-specification:Ubuntu Bold"
+       style="font-size:28px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#1e0000;fill-opacity:1;stroke:none;font-family:Ubuntu;-inkscape-font-specification:Ubuntu Bold"
        x="96.599403"
        y="312.06079"
        id="text4256"
@@ -181,10 +204,10 @@
          id="tspan4258"
          x="96.599403"
          y="312.06079"
-         style="font-size:40px;fill:#120000;fill-opacity:1">communication</tspan></text>
+         style="font-size:40px;fill:#1e0000;fill-opacity:1">communication</tspan></text>
     <text
        xml:space="preserve"
-       style="font-size:28px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#120000;fill-opacity:1;stroke:none;font-family:Ubuntu;-inkscape-font-specification:Ubuntu Bold"
+       style="font-size:28px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#1e0000;fill-opacity:1;stroke:none;font-family:Ubuntu;-inkscape-font-specification:Ubuntu Bold"
        x="64.745735"
        y="234.79277"
        id="text4260"
@@ -193,10 +216,10 @@
          id="tspan4262"
          x="64.745735"
          y="234.79277"
-         style="font-size:40px;fill:#120000;fill-opacity:1">microcontroller</tspan></text>
+         style="font-size:40px;fill:#1e0000;fill-opacity:1">microcontroller</tspan></text>
     <text
        xml:space="preserve"
-       style="font-size:20px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#120000;fill-opacity:1;stroke:none;font-family:Ubuntu;-inkscape-font-specification:Ubuntu Bold"
+       style="font-size:20px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#1e0000;fill-opacity:1;stroke:none;font-family:Ubuntu;-inkscape-font-specification:Ubuntu Bold"
        x="327.33487"
        y="214.70963"
        id="text4264"
@@ -207,7 +230,7 @@
          y="214.70963">atmega</tspan></text>
     <text
        xml:space="preserve"
-       style="font-size:28px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#120000;fill-opacity:1;stroke:none;font-family:Ubuntu;-inkscape-font-specification:Ubuntu Bold"
+       style="font-size:28px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#1e0000;fill-opacity:1;stroke:none;font-family:Ubuntu;-inkscape-font-specification:Ubuntu Bold"
        x="367.2894"
        y="233.94662"
        id="text4268"
@@ -218,7 +241,7 @@
          y="233.94662">x86</tspan></text>
     <text
        xml:space="preserve"
-       style="font-size:36px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#120000;fill-opacity:1;stroke:none;font-family:Ubuntu;-inkscape-font-specification:Ubuntu Bold"
+       style="font-size:36px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#1e0000;fill-opacity:1;stroke:none;font-family:Ubuntu;-inkscape-font-specification:Ubuntu Bold"
        x="265.42743"
        y="336.76935"
        id="text4272"
@@ -227,10 +250,10 @@
          id="tspan4274"
          x="265.42743"
          y="336.76935"
-         style="font-size:36px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#120000;fill-opacity:1;font-family:Ubuntu;-inkscape-font-specification:Ubuntu Bold">robot</tspan></text>
+         style="font-size:36px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#1e0000;fill-opacity:1;font-family:Ubuntu;-inkscape-font-specification:Ubuntu Bold">robot</tspan></text>
     <text
        xml:space="preserve"
-       style="font-size:32px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#120000;fill-opacity:1;stroke:none;font-family:Ubuntu;-inkscape-font-specification:Ubuntu Bold"
+       style="font-size:32px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#1e0000;fill-opacity:1;stroke:none;font-family:Ubuntu;-inkscape-font-specification:Ubuntu Bold"
        x="187.85921"
        y="369.62717"
        id="text4276"
@@ -241,7 +264,7 @@
          y="369.62717">aachen</tspan></text>
     <text
        xml:space="preserve"
-       style="font-size:28px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#120000;fill-opacity:1;stroke:none;font-family:Ubuntu;-inkscape-font-specification:Ubuntu Bold"
+       style="font-size:28px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#1e0000;fill-opacity:1;stroke:none;font-family:Ubuntu;-inkscape-font-specification:Ubuntu Bold"
        x="186.48027"
        y="200.10123"
        id="text4280"
@@ -250,10 +273,10 @@
          id="tspan4282"
          x="186.48027"
          y="200.10123"
-         style="font-size:40px;fill:#120000;fill-opacity:1">eurobot</tspan></text>
+         style="font-size:40px;fill:#1e0000;fill-opacity:1">eurobot</tspan></text>
     <text
        xml:space="preserve"
-       style="font-size:28px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#120000;fill-opacity:1;stroke:none;font-family:Ubuntu;-inkscape-font-specification:Ubuntu Bold"
+       style="font-size:28px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#1e0000;fill-opacity:1;stroke:none;font-family:Ubuntu;-inkscape-font-specification:Ubuntu Bold"
        x="149.29129"
        y="352.18094"
        id="text4284"
@@ -264,7 +287,7 @@
          y="352.18094">roboterclub</tspan></text>
     <text
        xml:space="preserve"
-       style="font-size:28px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#120000;fill-opacity:1;stroke:none;font-family:Ubuntu;-inkscape-font-specification:Ubuntu Bold"
+       style="font-size:28px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#1e0000;fill-opacity:1;stroke:none;font-family:Ubuntu;-inkscape-font-specification:Ubuntu Bold"
        x="64.349304"
        y="211.05818"
        id="text4288"
@@ -275,7 +298,7 @@
          y="211.05818">alogrithms</tspan></text>
     <text
        xml:space="preserve"
-       style="font-size:28px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#120000;fill-opacity:1;stroke:none;font-family:Ubuntu;-inkscape-font-specification:Ubuntu Bold"
+       style="font-size:28px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#1e0000;fill-opacity:1;stroke:none;font-family:Ubuntu;-inkscape-font-specification:Ubuntu Bold"
        x="239.98145"
        y="273.79547"
        id="text4292"
@@ -286,7 +309,7 @@
          y="273.79547">actions</tspan></text>
     <text
        xml:space="preserve"
-       style="font-size:28px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#120000;fill-opacity:1;stroke:none;font-family:Ubuntu;-inkscape-font-specification:Ubuntu Bold"
+       style="font-size:28px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#1e0000;fill-opacity:1;stroke:none;font-family:Ubuntu;-inkscape-font-specification:Ubuntu Bold"
        x="72.643158"
        y="254.20215"
        id="text4296"
@@ -297,7 +320,7 @@
          y="254.20215">artifical</tspan></text>
     <text
        xml:space="preserve"
-       style="font-size:28px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#120000;fill-opacity:1;stroke:none;font-family:Ubuntu;-inkscape-font-specification:Ubuntu Bold"
+       style="font-size:28px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#1e0000;fill-opacity:1;stroke:none;font-family:Ubuntu;-inkscape-font-specification:Ubuntu Bold"
        x="154.75198"
        y="79.653481"
        id="text4300"
@@ -306,10 +329,10 @@
          id="tspan4302"
          x="154.75198"
          y="79.653481"
-         style="font-size:40px;fill:#120000;fill-opacity:1">behaviour</tspan></text>
+         style="font-size:40px;fill:#1e0000;fill-opacity:1">behaviour</tspan></text>
     <text
        xml:space="preserve"
-       style="font-size:28px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#120000;fill-opacity:1;stroke:none;font-family:Ubuntu;-inkscape-font-specification:Ubuntu Bold"
+       style="font-size:28px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#1e0000;fill-opacity:1;stroke:none;font-family:Ubuntu;-inkscape-font-specification:Ubuntu Bold"
        x="84.796654"
        y="289.336"
        id="text4304"
@@ -320,7 +343,7 @@
          y="289.336">cross platform</tspan></text>
     <text
        xml:space="preserve"
-       style="font-size:28px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#120000;fill-opacity:1;stroke:none;font-family:Ubuntu;-inkscape-font-specification:Ubuntu Bold"
+       style="font-size:28px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#1e0000;fill-opacity:1;stroke:none;font-family:Ubuntu;-inkscape-font-specification:Ubuntu Bold"
        x="183.53621"
        y="255.47031"
        id="text4308"
@@ -329,10 +352,10 @@
          id="tspan4310"
          x="183.53621"
          y="255.47031"
-         style="font-size:40px;fill:#120000;fill-opacity:1">components</tspan></text>
+         style="font-size:40px;fill:#1e0000;fill-opacity:1">components</tspan></text>
     <text
        xml:space="preserve"
-       style="font-size:28px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#120000;fill-opacity:1;stroke:none;font-family:Ubuntu;-inkscape-font-specification:Ubuntu Bold"
+       style="font-size:28px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#1e0000;fill-opacity:1;stroke:none;font-family:Ubuntu;-inkscape-font-specification:Ubuntu Bold"
        x="119.69416"
        y="330.9267"
        id="text4312"
@@ -344,16 +367,17 @@
     <flowRoot
        xml:space="preserve"
        id="flowRoot4316"
-       style="font-size:28px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Ubuntu;-inkscape-font-specification:Ubuntu"><flowRegion
+       style="font-size:28px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#1e0000;fill-opacity:1;stroke:none;font-family:Ubuntu;-inkscape-font-specification:Ubuntu"><flowRegion
          id="flowRegion4318"><rect
            id="rect4320"
            width="777.14288"
            height="1161.4286"
            x="50"
-           y="-315.71429" /></flowRegion><flowPara
+           y="-315.71429"
+           style="fill:#1e0000;fill-opacity:1" /></flowRegion><flowPara
          id="flowPara4322" /></flowRoot>    <text
        xml:space="preserve"
-       style="font-size:28px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#120000;fill-opacity:1;stroke:none;font-family:Ubuntu;-inkscape-font-specification:Ubuntu Bold"
+       style="font-size:28px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#1e0000;fill-opacity:1;stroke:none;font-family:Ubuntu;-inkscape-font-specification:Ubuntu Bold"
        x="283.57144"
        y="171.85715"
        id="text4324"
@@ -362,10 +386,10 @@
          id="tspan4326"
          x="283.57144"
          y="171.85715"
-         style="font-size:28px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#120000;fill-opacity:1;font-family:Ubuntu;-inkscape-font-specification:Ubuntu Bold">simplicity</tspan></text>
+         style="font-size:28px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#1e0000;fill-opacity:1;font-family:Ubuntu;-inkscape-font-specification:Ubuntu Bold">simplicity</tspan></text>
     <text
        xml:space="preserve"
-       style="font-size:28px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#120000;fill-opacity:1;stroke:none;font-family:Ubuntu;-inkscape-font-specification:Ubuntu Bold"
+       style="font-size:28px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#1e0000;fill-opacity:1;stroke:none;font-family:Ubuntu;-inkscape-font-specification:Ubuntu Bold"
        x="100.71429"
        y="112.71428"
        id="text4328"
@@ -376,7 +400,7 @@
          y="112.71428">flexibility</tspan></text>
     <text
        xml:space="preserve"
-       style="font-size:28px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#120000;fill-opacity:1;stroke:none;font-family:Ubuntu;-inkscape-font-specification:Ubuntu Bold"
+       style="font-size:28px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#1e0000;fill-opacity:1;stroke:none;font-family:Ubuntu;-inkscape-font-specification:Ubuntu Bold"
        x="90.714272"
        y="130.57143"
        id="text4332"
@@ -387,7 +411,7 @@
          y="130.57143">procedure calls</tspan></text>
     <text
        xml:space="preserve"
-       style="font-size:20px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#120000;fill-opacity:1;stroke:none;font-family:Ubuntu;-inkscape-font-specification:Ubuntu Bold"
+       style="font-size:20px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#1e0000;fill-opacity:1;stroke:none;font-family:Ubuntu;-inkscape-font-specification:Ubuntu Bold"
        x="64.142853"
        y="190.71429"
        id="text4336"
@@ -398,7 +422,7 @@
          y="190.71429">debugging</tspan></text>
     <text
        xml:space="preserve"
-       style="font-size:28px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#120000;fill-opacity:1;stroke:none;font-family:Ubuntu;-inkscape-font-specification:Ubuntu Bold"
+       style="font-size:28px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#1e0000;fill-opacity:1;stroke:none;font-family:Ubuntu;-inkscape-font-specification:Ubuntu Bold"
        x="80.714256"
        y="149.28572"
        id="text4340"
@@ -409,7 +433,7 @@
          y="149.28572">stl container</tspan></text>
     <text
        xml:space="preserve"
-       style="font-size:28px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#120000;fill-opacity:1;stroke:none;font-family:Ubuntu;-inkscape-font-specification:Ubuntu Bold"
+       style="font-size:28px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#1e0000;fill-opacity:1;stroke:none;font-family:Ubuntu;-inkscape-font-specification:Ubuntu Bold"
        x="355.85712"
        y="273.57141"
        id="text4344"
@@ -420,7 +444,7 @@
          y="273.57141">C++</tspan></text>
     <text
        xml:space="preserve"
-       style="font-size:28px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#120000;fill-opacity:1;stroke:none;font-family:Ubuntu;-inkscape-font-specification:Ubuntu"
+       style="font-size:28px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#1e0000;fill-opacity:1;stroke:none;font-family:Ubuntu;-inkscape-font-specification:Ubuntu"
        x="184.85713"
        y="173.57143"
        id="text4348"
@@ -429,10 +453,10 @@
          id="tspan4350"
          x="184.85713"
          y="173.57143"
-         style="font-size:28px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#120000;fill-opacity:1;font-family:Ubuntu;-inkscape-font-specification:Ubuntu Bold">atmega</tspan></text>
+         style="font-size:28px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#1e0000;fill-opacity:1;font-family:Ubuntu;-inkscape-font-specification:Ubuntu Bold">atmega</tspan></text>
     <text
        xml:space="preserve"
-       style="font-size:28px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#120000;fill-opacity:1;stroke:none;font-family:Ubuntu;-inkscape-font-specification:Sans Bold"
+       style="font-size:28px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#1e0000;fill-opacity:1;stroke:none;font-family:Ubuntu;-inkscape-font-specification:Sans Bold"
        x="234.28572"
        y="107.14286"
        id="text4352"
@@ -443,7 +467,7 @@
          y="107.14286">hardware</tspan></text>
     <text
        xml:space="preserve"
-       style="font-size:28px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#120000;fill-opacity:1;stroke:none;font-family:Ubuntu;-inkscape-font-specification:Sans Bold"
+       style="font-size:28px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#1e0000;fill-opacity:1;stroke:none;font-family:Ubuntu;-inkscape-font-specification:Sans Bold"
        x="255"
        y="153"
        id="text4356"
@@ -454,7 +478,7 @@
          y="153">framework</tspan></text>
     <text
        xml:space="preserve"
-       style="font-size:28px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#120000;fill-opacity:1;stroke:none;font-family:Ubuntu;-inkscape-font-specification:Sans Bold"
+       style="font-size:28px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#1e0000;fill-opacity:1;stroke:none;font-family:Ubuntu;-inkscape-font-specification:Sans Bold"
        x="342.57147"
        y="201.42857"
        id="text4360"
@@ -463,10 +487,10 @@
          id="tspan4362"
          x="342.57147"
          y="201.42857"
-         style="font-size:40px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#120000;fill-opacity:1;font-family:Ubuntu;-inkscape-font-specification:Ubuntu Bold">RCA</tspan></text>
+         style="font-size:40px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#1e0000;fill-opacity:1;font-family:Ubuntu;-inkscape-font-specification:Ubuntu Bold">RCA</tspan></text>
     <text
        xml:space="preserve"
-       style="font-size:40px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#120000;fill-opacity:1;stroke:none;font-family:Ubuntu;-inkscape-font-specification:Ubuntu Bold"
+       style="font-size:40px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#1e0000;fill-opacity:1;stroke:none;font-family:Ubuntu;-inkscape-font-specification:Ubuntu Bold"
        x="300"
        y="134.28571"
        id="text4364"
@@ -475,7 +499,7 @@
          id="tspan4366"
          x="300"
          y="134.28571"
-         style="font-size:40px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#120000;fill-opacity:1;font-family:Ubuntu;-inkscape-font-specification:Ubuntu Bold">CAN</tspan></text>
+         style="font-size:40px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#1e0000;fill-opacity:1;font-family:Ubuntu;-inkscape-font-specification:Ubuntu Bold">CAN</tspan></text>
   </g>
   <g
      inkscape:label="logo"
@@ -503,7 +527,7 @@
        d="m 326.15625,689.25 c -8.74006,1.2e-4 -16.73089,1.59262 -23.9375,4.8125 -7.05337,3.06678 -13.03087,7.45178 -17.9375,13.125 -4.90669,5.5201 -8.74002,12.11468 -11.5,19.78125 -2.60668,7.66674 -3.90626,16.08132 -3.90625,25.28125 -10e-6,9.20005 1.23415,17.64588 3.6875,25.3125 2.45332,7.51336 6.12456,14.04252 11.03125,19.5625 5.05997,5.52001 11.19955,9.80834 18.40625,12.875 7.35995,3.06667 15.87119,4.59375 25.53125,4.59375 3.06659,0 6.18617,-0.2275 9.40625,-0.6875 3.37325,-0.30667 6.52408,-0.76167 9.4375,-1.375 2.91324,-0.46 5.5124,-1.01167 7.8125,-1.625 2.2999,-0.76666 4.08573,-1.51458 5.3125,-2.28125 l -3,-17.96875 c -2.60676,1.22669 -6.21259,2.39544 -10.8125,3.46875 -4.60008,1.07335 -9.733,1.59377 -15.40625,1.59375 -7.0534,2e-5 -13.03089,-0.9754 -17.9375,-2.96875 -4.90672,-2.14665 -8.96755,-5.13539 -12.1875,-8.96875 -3.06671,-3.8333 -5.37295,-8.4458 -6.90625,-13.8125 -1.38004,-5.36662 -2.06253,-11.2787 -2.0625,-17.71875 -3e-5,-14.41326 3.1508,-25.36158 9.4375,-32.875 6.43995,-7.51323 15.63369,-11.28115 27.59375,-11.28125 4.75326,10e-5 9.20367,0.4551 13.34375,1.375 4.29324,0.9201 8.02991,2.15427 11.25,3.6875 L 357.65625,695 c -4.90676,-1.99321 -10.03967,-3.45488 -15.40625,-4.375 -5.36675,-0.91988 -10.72716,-1.37488 -16.09375,-1.375 z m 89.40625,8.875 c -8.74006,1.2e-4 -16.73089,1.62387 -23.9375,4.84375 -7.05337,3.06678 -13.03087,7.42053 -17.9375,13.09375 -4.90669,5.5201 -8.74002,12.11468 -11.5,19.78125 -2.60668,7.66674 -3.90626,16.11257 -3.90625,25.3125 -10e-6,9.20005 1.23415,17.64588 3.6875,25.3125 2.45332,7.51336 6.12456,14.01127 11.03125,19.53125 5.05997,5.52001 11.19955,9.80834 18.40625,12.875 7.35995,3.06667 15.87119,4.625 25.53125,4.625 3.06659,0 6.21742,-0.25875 9.4375,-0.71875 3.37325,-0.30667 6.49283,-0.76167 9.40625,-1.375 2.91324,-0.46 5.54365,-0.98042 7.84375,-1.59375 2.2999,-0.76666 4.05448,-1.54583 5.28125,-2.3125 l -3,-17.9375 c -2.60676,1.22669 -6.21259,2.36419 -10.8125,3.4375 -4.60008,1.07335 -9.733,1.62502 -15.40625,1.625 -7.0534,2e-5 -13.03089,-1.00665 -17.9375,-3 -4.90672,-2.14665 -8.96755,-5.13539 -12.1875,-8.96875 -3.06671,-3.8333 -5.37295,-8.41455 -6.90625,-13.78125 -1.38004,-5.36662 -2.06253,-11.2787 -2.0625,-17.71875 -3e-5,-14.41326 3.1508,-25.39283 9.4375,-32.90625 6.43995,-7.51323 15.63369,-11.2499 27.59375,-11.25 4.75326,10e-5 9.20367,0.4551 13.34375,1.375 4.29324,0.9201 8.06116,2.15427 11.28125,3.6875 l 4.8125,-18.1875 c -4.90676,-1.99321 -10.03967,-3.45488 -15.40625,-4.375 -5.36675,-0.91988 -10.72716,-1.37488 -16.09375,-1.375 z m -370.875,16.59375 39.5625,56.8125 c -7.360038,9.81339 -14.799197,20.17588 -22.3125,31.0625 -7.360016,10.73335 -13.727093,21.29209 -19.09375,31.71875 l 22.09375,0 c 1.686639,-3.22 3.734137,-6.89124 6.1875,-11.03125 2.453298,-4.13998 5.083713,-8.3629 7.84375,-12.65625 2.91329,-4.44664 5.902037,-8.80038 8.96875,-13.09375 3.066614,-4.44663 6.055361,-8.60412 8.96875,-12.4375 2.913272,3.83338 5.90202,7.89421 8.96875,12.1875 3.0666,4.29337 6.05534,8.67836 8.96875,13.125 2.91325,4.29335 5.57783,8.51627 8.03125,12.65625 2.45325,4.14001 4.53199,7.87667 6.21875,11.25 l 23.46875,0 c -5.36678,-10.57999 -11.96135,-21.36623 -19.78125,-32.40625 -7.66675,-11.19329 -15.17133,-21.78328 -22.53125,-31.75 l 38.625,-55.4375 -22.78125,0 -28.75,41.875 -28.5,-41.875 -24.15625,0 z m 159.59375,9.15625 c -9.96672,1.2e-4 -18.80213,0.77929 -26.46875,2.3125 -7.51336,1.38012 -13.78377,2.6797 -18.84375,3.90625 l 0,158.46875 21.375,0 0,-47.84375 c 2.60662,1.68667 6.53662,3.44125 11.75,5.28125 5.36661,1.84 11.47494,2.75 18.375,2.75 8.58659,0 16.18783,-1.52708 22.78125,-4.59375 6.74657,-3.06666 12.43114,-7.35499 17.03125,-12.875 4.59989,-5.51998 8.04363,-12.11456 10.34375,-19.78125 2.45321,-7.66662 3.68738,-16.01578 3.6875,-25.0625 -1.2e-4,-9.65993 -1.46179,-18.33326 -4.375,-26 -2.76012,-7.81991 -6.75553,-14.41448 -11.96875,-19.78125 -5.21344,-5.36656 -11.48385,-9.4928 -18.84375,-12.40625 -7.36008,-2.91321 -15.64382,-4.37488 -24.84375,-4.375 z m -0.25,19.09375 c 11.49992,10e-5 20.72492,3.73677 27.625,11.25 6.8999,7.51342 10.34365,18.26549 10.34375,32.21875 -1e-4,6.13339 -0.61718,11.88338 -1.84375,17.25 -1.22677,5.21337 -3.20885,9.79462 -5.96875,13.78125 -2.76009,3.83336 -6.36592,6.91877 -10.8125,9.21875 -4.29341,2.14668 -9.52299,3.21877 -15.65625,3.21875 -5.82673,2e-5 -11.18714,-1.00665 -16.09375,-3 -4.90671,-1.99331 -8.67463,-4.04081 -11.28125,-6.1875 l 0,-75.46875 c 2.14662,-0.61323 5.00454,-1.13365 8.53125,-1.59375 3.67995,-0.4599 8.71619,-0.6874 15.15625,-0.6875 z" />
     <text
        xml:space="preserve"
-       style="font-size:22.18293381000000153px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#a02f00;fill-opacity:1;stroke:#df6f00;stroke-width:2;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;font-family:Ubuntu;-inkscape-font-specification:Ubuntu Bold"
+       style="font-size:22.18293381000000153px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#8c2300;fill-opacity:1;stroke:#b45b00;stroke-width:2;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;font-family:Ubuntu;-inkscape-font-specification:Ubuntu Bold"
        x="38.708046"
        y="834.32544"
        id="text3155"
@@ -512,7 +536,7 @@
          id="tspan3157"
          x="38.708046"
          y="834.32544"
-         style="font-size:230px;font-weight:normal;fill:#a02f00;fill-opacity:1;stroke:#df6f00;stroke-width:2;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;-inkscape-font-specification:Ubuntu"
+         style="font-size:230px;font-weight:normal;fill:#8c2300;fill-opacity:1;stroke:#b45b00;stroke-width:2;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;-inkscape-font-specification:Ubuntu"
          dy="0 11.678452 -34.173401 8.8947268"
          dx="0 -17.199272 -19.982996 -18.398958">xpcc</tspan></text>
     <text
