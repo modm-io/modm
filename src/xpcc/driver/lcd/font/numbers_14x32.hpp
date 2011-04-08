@@ -1,6 +1,6 @@
 // coding: utf-8
 // ----------------------------------------------------------------------------
-/* Copyright (c) 2009, Roboterclub Aachen e.V.
+/* Copyright (c) 2011, Roboterclub Aachen e.V.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -40,14 +40,14 @@ namespace xpcc
 	namespace font
 	{
 		/**
-		 * \brief	Big numbers (14x32)
+		 * \brief	Numbers 14x32
 		 * 
-		 * Font size in bytes  : 576 \n
-		 * Font width          : 14 \n
-		 * Font height         : 32 \n
-		 * Font first char     : 48 \n
-		 * Font last char      : 58 \n
-		 * Font used chars     : 10
+		 * - fixed width     : 14
+		 * - height          : 32
+		 * - first char      : 48
+		 * - last char       : 58
+		 * - number of chars : 10
+		 * - size in bytes   : 576
 		 * 
 		 * \ingroup	font
 		 */
@@ -56,3 +56,4 @@ namespace xpcc
 }
 
 #endif	// XPCC_FONT__NUMBERS_14X32_HPP
+

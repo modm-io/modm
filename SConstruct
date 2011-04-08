@@ -62,7 +62,7 @@ import os
 
 env = Environment(
 		toolpath = ['scons'],
-		tools = ['template', 'doxygen', 'configfile', 'helper'],
+		tools = ['template', 'doxygen', 'configfile', 'helper', 'font', 'bitmap'],
 		ENV = os.environ)
 
 def generateSConstruct(top):
@@ -145,6 +145,11 @@ for port in ['C', 'D', 'E', 'F']:
 		generator.template('timer_%s%s.cpp' % (port.lower(), channel), 'timer.cpp.in', { 'id': port, 'ty': channel })
 		generator.template('timer_interrupt_%s%s.hpp' % (port.lower(), channel), 'timer_interrupt.hpp.in', { 'id': port, 'ty': channel })
 		generator.template('timer_interrupt_%s%s.cpp' % (port.lower(), channel), 'timer_interrupt.cpp.in', { 'id': port, 'ty': channel })
+
+# generate c++ arrays from the font definition files
+fontFiles = env.Glob('src/xpcc/driver/lcd/font/*.font')
+for font in fontFiles:
+	env.Alias('template', env.Font(font))
 
 if 'check' in BUILD_TARGETS:
 	result = []

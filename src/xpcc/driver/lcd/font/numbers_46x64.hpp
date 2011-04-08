@@ -1,6 +1,6 @@
 // coding: utf-8
 // ----------------------------------------------------------------------------
-/* Copyright (c) 2009, Roboterclub Aachen e.V.
+/* Copyright (c) 2011, Roboterclub Aachen e.V.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -30,8 +30,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_FONT__ALL_CAPS_3X6_HPP
-#define	XPCC_FONT__ALL_CAPS_3X6_HPP
+#ifndef XPCC_FONT__NUMBERS_46X64_HPP
+#define	XPCC_FONT__NUMBERS_46X64_HPP
 
 #include <xpcc/architecture/driver/accessor.hpp>
 
@@ -40,19 +40,20 @@ namespace xpcc
 	namespace font
 	{
 		/**
-		 * \brief	Proportional all caps font (~3x6)
+		 * \brief	Numbers 46x64
 		 * 
-		 * Font size in bytes  : 368 \n
-		 * Font width          : 3 \n
-		 * Font height         : 6 \n
-		 * Font first char     : 32 \n
-		 * Font last char      : 128 \n
-		 * Font used chars     : 96
+		 * - fixed width     : 46
+		 * - height          : 64
+		 * - first char      : 48
+		 * - last char       : 58
+		 * - number of chars : 10
+		 * - size in bytes   : 3696
 		 * 
 		 * \ingroup	font
 		 */
-		EXTERN_FLASH(uint8_t AllCaps3x6[]);
+		EXTERN_FLASH(uint8_t Numbers46x64[]);
 	}
 }
 
-#endif	// XPCC_FONT__ALL_CAPS_3X6_HPP
+#endif	// XPCC_FONT__NUMBERS_46X64_HPP
+

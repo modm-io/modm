@@ -1,6 +1,6 @@
 // coding: utf-8
 // ----------------------------------------------------------------------------
-/* Copyright (c) 2009, Roboterclub Aachen e.V.
+/* Copyright (c) 2011, Roboterclub Aachen e.V.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -40,14 +40,14 @@ namespace xpcc
 	namespace font
 	{
 		/**
-		 * \brief	Bold fixed width font (7x8)
+		 * \brief	Arcade Classic
 		 * 
-		 * Font size in bytes  : 774 \n
-		 * Font width          : 7 \n
-		 * Font height         : 8 \n
-		 * Font first char     : 32 \n
-		 * Font last char      : 128 \n
-		 * Font used chars     : 96
+		 * - fixed width     : 7
+		 * - height          : 8
+		 * - first char      : 32
+		 * - last char       : 128
+		 * - number of chars : 96
+		 * - size in bytes   : 774
 		 * 
 		 * \ingroup	font
 		 */
@@ -56,3 +56,4 @@ namespace xpcc
 }
 
 #endif	// XPCC_FONT__ARCADE_CLASSIC_HPP
+

@@ -33,12 +33,15 @@
  * \ingroup		lcd
  * \defgroup	font	Various fonts for graphical displays
  * 
- * The fonts are created with the "FontCreator 2.2", see \c tools/font_creator.
+ * The fonts are created with the "FontCreator 3.0", see \c tools/font_creator.
  */
 
 #include "font/scripto_narrow.hpp"
-#include "font/all_caps_3x6.hpp"
+#include "font/all_caps_3x5.hpp"
 #include "font/fixed_width_5x8.hpp"
 #include "font/assertion.hpp"
 #include "font/arcade_classic.hpp"
+
 #include "font/numbers_14x32.hpp"
+#include "font/numbers_40x56.hpp"
+#include "font/numbers_46x64.hpp"

@@ -51,7 +51,7 @@ MAIN_FUNCTION
 	display << "abcdefghijklmnopqrstuvwxyz\n";
 	display << "0123456789!\"§$%&/()=?`´,;:-<>";
 	
-	display.setFont(xpcc::font::AllCaps3x6);
+	display.setFont(xpcc::font::AllCaps3x5);
 	display.setCursor(xpcc::glcd::Point(0, 32));
 	display << "Hello World!" << xpcc::endl;
 	display << "ABCDEFGHIJKLMNOPQRSTUVWXYZ" << xpcc::endl;

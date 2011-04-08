@@ -1,4 +1,35 @@
-// created with FontCreator 2.2 (xpcc edition)
+// coding: utf-8
+// ----------------------------------------------------------------------------
+/* Copyright (c) 2011, Roboterclub Aachen e.V.
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ * 
+ *     * Redistributions of source code must retain the above copyright
+ *       notice, this list of conditions and the following disclaimer.
+ *     * Redistributions in binary form must reproduce the above copyright
+ *       notice, this list of conditions and the following disclaimer in the
+ *       documentation and/or other materials provided with the distribution.
+ *     * Neither the name of the Roboterclub Aachen e.V. nor the
+ *       names of its contributors may be used to endorse or promote products
+ *       derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY ROBOTERCLUB AACHEN E.V. ''AS IS'' AND ANY
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL ROBOTERCLUB AACHEN E.V. BE LIABLE FOR ANY
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+ * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * $Id$
+ */
+// ----------------------------------------------------------------------------
+// created with FontCreator 3.0
 
 #include <xpcc/architecture/driver/accessor.hpp>
 
@@ -9,24 +40,23 @@ namespace xpcc
 		FLASH(uint8_t ScriptoNarrow[]) =
 		{
 			0x7C, 0x01, // total size of this array
-			3, // font width (may vary)
-			7, // font height
-			0x20, // first char
-			95, // char count
+			3,	// width (may vary)
+			8,	// height
+			32,	// first char
+			95,	// char count
 			
 			// char widths
-			// for each character the separate width in pixels,
-			// characters < 128 have an implicit virtual right empty row
-			0x03, 0x01, 0x03, 0x05, 0x05, 0x06, 0x04, 0x01, 0x02, 0x02, 
-			0x04, 0x03, 0x02, 0x03, 0x02, 0x02, 0x03, 0x02, 0x03, 0x03, 
-			0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x01, 0x02, 0x03, 0x03, 
-			0x03, 0x04, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 
-			0x03, 0x01, 0x03, 0x03, 0x03, 0x04, 0x03, 0x03, 0x03, 0x03, 
-			0x03, 0x03, 0x03, 0x03, 0x03, 0x04, 0x04, 0x03, 0x03, 0x02, 
-			0x02, 0x02, 0x03, 0x03, 0x02, 0x03, 0x03, 0x03, 0x03, 0x03, 
-			0x02, 0x03, 0x03, 0x01, 0x02, 0x03, 0x01, 0x05, 0x03, 0x03, 
-			0x03, 0x03, 0x03, 0x04, 0x03, 0x03, 0x03, 0x05, 0x03, 0x03, 
-			0x04, 0x03, 0x01, 0x03, 0x05, 
+			// for each character the separate width in pixels
+			 3,  1,  3,  5,  5,  6,  4,  1,  2,  2, 
+			 4,  3,  2,  3,  2,  2,  3,  2,  3,  3, 
+			 3,  3,  3,  3,  3,  3,  1,  2,  3,  3, 
+			 3,  4,  3,  3,  3,  3,  3,  3,  3,  3, 
+			 3,  1,  3,  3,  3,  4,  3,  3,  3,  3, 
+			 3,  3,  3,  3,  3,  4,  4,  3,  3,  2, 
+			 2,  2,  3,  3,  2,  3,  3,  3,  3,  3, 
+			 2,  3,  3,  1,  2,  3,  1,  5,  3,  3, 
+			 3,  3,  3,  4,  3,  3,  3,  5,  3,  3, 
+			 4,  3,  1,  3,  5, 
 			
 			// font data
 			// bit field of all characters
@@ -124,7 +154,8 @@ namespace xpcc
 			0x08, 0x36, 0x41, // 123
 			0x33, // 124
 			0x41, 0x36, 0x08, // 125
-			0x08, 0x04, 0x0C, 0x08, 0x04 // 126  
+			0x08, 0x04, 0x0C, 0x08, 0x04, // 126
 		};
 	}
 }
+

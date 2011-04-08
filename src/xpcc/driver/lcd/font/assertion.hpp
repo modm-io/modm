@@ -1,6 +1,6 @@
 // coding: utf-8
 // ----------------------------------------------------------------------------
-/* Copyright (c) 2009, Roboterclub Aachen e.V.
+/* Copyright (c) 2011, Roboterclub Aachen e.V.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -40,14 +40,14 @@ namespace xpcc
 	namespace font
 	{
 		/**
-		 * \brief	(~7x15)
+		 * \brief	Assertion
 		 * 
-		 * Font size in bytes  : 1306
-		 * Font width          : 7
-		 * Font height         : 15
-		 * Font first char     : 32
-		 * Font last char      : 128
-		 * Font used chars     : 96
+		 * - preferred width : 7
+		 * - height          : 15
+		 * - first char      : 32
+		 * - last char       : 128
+		 * - number of chars : 96
+		 * - size in bytes   : 1302
 		 * 
 		 * \ingroup	font
 		 */
@@ -56,3 +56,4 @@ namespace xpcc
 }
 
 #endif	// XPCC_FONT__ASSERTION_HPP
+

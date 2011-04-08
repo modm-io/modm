@@ -1,6 +1,6 @@
 // coding: utf-8
 // ----------------------------------------------------------------------------
-/* Copyright (c) 2009, Roboterclub Aachen e.V.
+/* Copyright (c) 2011, Roboterclub Aachen e.V.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -42,14 +42,12 @@ namespace xpcc
 		/**
 		 * \brief	Scripto Narrow
 		 * 
-		 * Proportional font.
-		 * 
-		 * Font size in bytes  : 381 \n
-		 * Font width          : 5 \n
-		 * Font height         : 7 \n
-		 * Font first char     : 32 \n
-		 * Font last char      : 127 \n
-		 * Font used chars     : 95
+		 * - preferred width : 3
+		 * - height          : 8
+		 * - first char      : 32
+		 * - last char       : 127
+		 * - number of chars : 95
+		 * - size in bytes   : 380
 		 * 
 		 * \ingroup	font
 		 */
@@ -58,3 +56,4 @@ namespace xpcc
 }
 
 #endif	// XPCC_FONT__SCRIPTO_NARROW_HPP
+

@@ -79,7 +79,7 @@ introScreen()
 	display << "ABCDEFGHIJKLMNOPQRSTUVWXYZ!\"§$%&" << xpcc::endl;
 	display << "abcdefghijklmnopqrstuvwxyz012345";
 	
-	display.setFont(xpcc::font::AllCaps3x6);
+	display.setFont(xpcc::font::AllCaps3x5);
 	display.setCursor(Point(0, 20));
 	display << "ABCDEFGHIJKLMNOPQRSTUVWXYZ!\"§$%&/()" << xpcc::endl;
 	display << "abcdefghijklmnopqrstuvwxyz01234567";

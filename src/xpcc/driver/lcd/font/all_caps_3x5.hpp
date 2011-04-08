@@ -1,6 +1,6 @@
 // coding: utf-8
 // ----------------------------------------------------------------------------
-/* Copyright (c) 2009, Roboterclub Aachen e.V.
+/* Copyright (c) 2011, Roboterclub Aachen e.V.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -30,87 +30,30 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__S_CURVE_CONTROLLER_HPP
-#define XPCC__S_CURVE_CONTROLLER_HPP
+#ifndef XPCC_FONT__ALL_CAPS_3X5_HPP
+#define	XPCC_FONT__ALL_CAPS_3X5_HPP
 
-#include <algorithm>
-#include <cmath>
+#include <xpcc/architecture/driver/accessor.hpp>
 
 namespace xpcc
 {
-	/**
-	 * \brief	S-Curve trajectory generation with feedback
-	 * 
-	 * closed-loop
-	 * 
-	 * \code
-	 * SCurveController<int16_t> controller;
-	 * 
-	 * controller.update(positionTarget - currentPosition, currentSpeed); 
-	 * \endcode
-	 * 
-	 * \todo	documentation
-	 * 
-	 * \author	Fabian Greif
-	 * \author	Georgi Grinshpun
-	 * 
-	 * \ingroup	filter
-	 */
-	template<typename T>
-	class SCurveController
+	namespace font
 	{
-	public:
 		/**
-		 * \todo	some helper programs/formular to choose the right
-		 * 			parameter values (e.g. the java tool from the last year)
+		 * \brief	All Caps 3x5
 		 * 
-		 * \param	increment	=> increment per timestep
-		 * \param	decreaseFactor => decrease per second
+		 * - preferred width : 3
+		 * - height          : 5
+		 * - first char      : 32
+		 * - last char       : 128
+		 * - number of chars : 96
+		 * - size in bytes   : 368
+		 * 
+		 * \ingroup	font
 		 */
-		struct Parameter
-		{
-			Parameter(const T& targetArea = T(),
-					const T& increment = T(),
-					const T& decreaseFactor = T(),
-					const T& kp = T(),
-					const T& secondaryMaximum = T(),
-					const T& secondaryMinimum = T());
-			
-			T targetArea;
-			T increment;
-			T decreaseFactor;
-			T kp;
-			T secondaryMaximum;
-			T secondaryMinimum;
-		};
-		
-	public:
-		SCurveController(const Parameter& parameter);
-		
-		inline void
-		setSecondaryMaximum(const T& secondary);
-
-		inline void
-		setSecondaryMinimim(const T& secondary);
-
-		inline bool
-		isTargetReached() const;
-		
-		void
-		update(T error, const T& secondary);
-		
-		/// setpoint output for the secondary value
-		inline const T&
-		getValue() const;
-		
-	private:
-		T output;
-		bool targetReached;
-		
-		Parameter parameter;
-	};
+		EXTERN_FLASH(uint8_t AllCaps3x5[]);
+	}
 }
 
-#include "s_curve_controller_impl.hpp"
+#endif	// XPCC_FONT__ALL_CAPS_3X5_HPP
 
-#endif // XPCC__S_CURVE_CONTROLLER_HPP

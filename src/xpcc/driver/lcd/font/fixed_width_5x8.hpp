@@ -1,6 +1,6 @@
 // coding: utf-8
 // ----------------------------------------------------------------------------
-/* Copyright (c) 2009, Roboterclub Aachen e.V.
+/* Copyright (c) 2011, Roboterclub Aachen e.V.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -30,8 +30,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_FONT__FIXED_WIDTH_5x8_HPP
-#define	XPCC_FONT__FIXED_WIDTH_5x8_HPP
+#ifndef XPCC_FONT__FIXED_WIDTH_5X8_HPP
+#define	XPCC_FONT__FIXED_WIDTH_5X8_HPP
 
 #include <xpcc/architecture/driver/accessor.hpp>
 
@@ -40,14 +40,14 @@ namespace xpcc
 	namespace font
 	{
 		/**
-		 * \brief	Fixed width font (5x8)
+		 * \brief	Fixed Width 5x8
 		 * 
-		 * Font size in bytes  : 582 \n
-		 * Font width          : 5 \n
-		 * Font height         : 8 \n
-		 * Font first char     : 32 \n
-		 * Font last char      : 128 \n
-		 * Font used chars     : 96
+		 * - fixed width     : 5
+		 * - height          : 8
+		 * - first char      : 32
+		 * - last char       : 128
+		 * - number of chars : 96
+		 * - size in bytes   : 582
 		 * 
 		 * \ingroup	font
 		 */
@@ -55,4 +55,5 @@ namespace xpcc
 	}
 }
 
-#endif	// XPCC_FONT__FIXED_WIDTH_5x8_HPP
+#endif	// XPCC_FONT__FIXED_WIDTH_5X8_HPP
+
