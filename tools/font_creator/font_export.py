@@ -107,6 +107,11 @@ namespace xpcc
 """
 
 # -----------------------------------------------------------------------------
+class ParseException(Exception):
+	def __init__(self, msg, line):
+		Exception.__init__(self, msg)
+		self.line = line
+
 class Font:
 	def __init__(self):
 		self.name = None
@@ -116,7 +121,6 @@ class Font:
 		self.first_char = None
 		self.chars = []
 
-# -----------------------------------------------------------------------------
 class Char:
 	def __init__(self, index, height):
 		self.index = index
@@ -127,16 +131,7 @@ class Char:
 		self.rows = int(math.ceil(height / 8.0))
 
 # -----------------------------------------------------------------------------
-if __name__ == '__main__':
-	try:
-		filename = os.sys.argv[1]
-		if not filename.endswith('.font'):
-			raise
-		outfile = os.sys.argv[2]
-	except:
-		print "usage: %s *.font outfile" % os.sys.argv[0]
-		exit(1)
-		
+def read_font_file(filename):
 	char_mode = False
 	char_line_count = 0
 	char_line_index = 0
@@ -150,16 +145,14 @@ if __name__ == '__main__':
 		if char_mode:
 			result = re.match("^\[([ #]+)\]\n", line)
 			if not result:
-				print "Illegal Format in: %s" % line[:-1]
-				exit(1)
+				raise ParseException("Illegal Format in: %s" % line[:-1], line_number)
 			
 			width = len(result.group(1))
 			if char.width is None:
 				char.data = [0] * (char.rows * width)
 			else:
 				if width != char.width:
-					print "Illegal width for char %i" % char.number
-					exit(1)
+					raise ParseException("Illegal width for char %i" % char.number, line_number)
 			char.width = width
 			
 			index = 0
@@ -171,7 +164,7 @@ if __name__ == '__main__':
 					offset = y * char.width
 					char.data[offset + index] |= 1 << (char_line_index % 8)
 				else:
-					print "Illegal character in line: %s" % line
+					raise ParseException("Illegal character in line: %s" % line, line_number)
 				index += 1
 			
 			char_line_index += 1
@@ -201,21 +194,18 @@ if __name__ == '__main__':
 				elif key == "char":
 					charMatch = re.match("^(\d+)([ \t]*.*)", value)
 					if not charMatch:
-						print "Illegal Format in: %s" % line[:-1]
-						exit(1)
+						raise ParseException("Illegal Format in: %s" % line[:-1], line_number)
 					number = int(charMatch.group(1))
 					
 					if font.first_char is None:
 						font.first_char = number
 					else:
 						if number != (char_last_number + 1):
-							print "Error: unexpected character id %i" % number
-							exit(1)
+							raise ParseException("Unexpected character id %i" % number, line_number)
 					char_last_number = number
 					
 					if font.height is None:
-						print "Error: 'height' not set!"
-						exit(1)
+						raise ParseException("'height' not set!")
 					char_mode = True
 					char_line_count = font.height
 					char_line_index = 0
@@ -223,14 +213,31 @@ if __name__ == '__main__':
 					char = Char(number, font.height)
 					font.chars.append(char)
 				else:
-					print "Error: Unknown key '%s'" % key
-					exit(1)
+					raise ParseException("Unknown key '%s'" % key, line_number)
 		elif line[0] in string.whitespace:
 			pass
 		else:
 			# TODO better error message
-			print "Illegal Format in line %i: %s" % (line_number, line[:-1])
-			exit(1)
+			raise ParseException("Illegal Format: %s" % line[:-1], line_number)
+	
+	return font
+
+# -----------------------------------------------------------------------------
+if __name__ == '__main__':
+	try:
+		filename = os.sys.argv[1]
+		if not filename.endswith('.font'):
+			raise
+		outfile = os.sys.argv[2]
+	except:
+		print "usage: %s *.font outfile" % os.sys.argv[0]
+		exit(1)
+	
+	try:
+		font = read_font_file(filename)
+	except ParseException as e:
+		print "Error in line %i: " % e.line, e
+		exit(1)
 	
 	width_histogram = {}
 	char_width = []
