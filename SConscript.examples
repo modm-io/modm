@@ -1,0 +1,81 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+# 
+# Copyright (c) 2011, Roboterclub Aachen e.V.
+# All rights reserved.
+# 
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+# 
+#  * Redistributions of source code must retain the above copyright
+#    notice, this list of conditions and the following disclaimer.
+#  * Redistributions in binary form must reproduce the above copyright
+#    notice, this list of conditions and the following disclaimer in the
+#    documentation and/or other materials provided with the distribution.
+#  * Neither the name of the Roboterclub Aachen e.V. nor the
+#    names of its contributors may be used to endorse or promote products
+#    derived from this software without specific prior written permission.
+# 
+# THIS SOFTWARE IS PROVIDED BY ROBOTERCLUB AACHEN E.V. ''AS IS'' AND ANY
+# EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+# DISCLAIMED. IN NO EVENT SHALL ROBOTERCLUB AACHEN E.V. BE LIABLE FOR ANY
+# DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+# (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+# ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+# THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+# 
+# $Id$
+# -----------------------------------------------------------------------------
+
+import os
+
+Import('env')
+
+# regenerate SConstruct files for the tests and examples
+for dir in ['tests', 'examples']:
+	for path, directories, files in os.walk(dir):
+		# exclude the SVN-directories
+		if '.svn' in directories:
+			directories.remove('.svn')
+		
+		if 'project.cfg' in files:
+			parser = env.ConfigParser()
+			parser.read(os.path.join(path, 'project.cfg'))
+			
+			if not parser.getboolean('scons', 'regenerate', True):
+				if ARGUMENTS.get('verbose') == '1':
+					print "skip '%s'" % path
+				continue
+			
+			rootpath = os.sep.join(['..' for x in range(len(path.split(os.sep)))])
+			file = env.Template(target = os.path.join(path, 'SConstruct'),
+								source = 'templates/SConstruct.in',
+								substitutions = {'rootpath': rootpath })
+			
+			env.Alias('update', file)
+
+# Check that all examples compile without errors. The correct function of the
+# examples is not checked!
+if 'check' in BUILD_TARGETS:
+	result = []
+	everythingOk = True
+	for path, directories, files in os.walk('examples'):
+		# exclude the SVN-directories
+		if '.svn' in directories:
+			directories.remove('.svn')
+	
+		if 'SConstruct' in files:
+			exitStatus = os.system("scons -Q -C %s build" % path)
+			result.append("check: %s -> %s" % (path, "Ok" if exitStatus == 0 else "FAIL!"))
+			
+			if exitStatus != 0:
+				everythingOk = False
+	
+	print "\nRESULTS:\n"
+	print '\n'.join(result)
+	print "\nOK!" if everythingOk else "\nFAIL!"
+
+env.Alias('check', None)

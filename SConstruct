@@ -65,123 +65,40 @@ env = Environment(
 		tools = ['template', 'doxygen', 'configfile', 'helper', 'font', 'bitmap'],
 		ENV = os.environ)
 
-def generateSConstruct(top):
-	for dir in top:
-		for path, directories, files in os.walk(dir):
-			# exclude the SVN-directories
-			if '.svn' in directories:
-				directories.remove('.svn')
-			
-			if 'project.cfg' in files:
-				parser = env.ConfigParser()
-				parser.read(os.path.join(path, 'project.cfg'))
-				
-				if not parser.getboolean('scons', 'regenerate', True):
-					#print "skip '%s'" % path
-					continue
-				
-				rootpath = os.sep.join(['..' for x in range(len(path.split(os.sep)))])
-				file = env.Template(target = os.path.join(path, 'SConstruct'),
-									source = 'templates/SConstruct.in',
-									substitutions = {'rootpath': rootpath })
-				
-				env.Alias('update', file)
-
-# regenerate SConstruct files for the tests and examples
-generateSConstruct(['tests', 'examples'])
-
-# update all template files
 class Generator:
 	def __init__(self, env, basepath):
 		self.env = env
 		self.basepath = basepath
 	def template(self, target, source, substitutions):
 		self.env.Alias('template',
-			self.env.Jinja2Template(
-				target = os.path.join(self.basepath, target),
-				source = os.path.join(self.basepath, source),
-				substitutions = substitutions))
+				self.env.Jinja2Template(
+						target = os.path.join(self.basepath, target),
+						source = os.path.join(self.basepath, source),
+						substitutions = substitutions))
 
-generator = Generator(env, 'src/xpcc/architecture/driver/atmega/uart')
-for id in range(0, 4):
-	generator.template('uart%i.hpp' % id, 'uart.hpp.in', { 'id': id })
-	generator.template('uart%i_rx.cpp' % id, 'uart_rx.cpp.in', { 'id': id })
-	generator.template('uart%i_tx.cpp' % id, 'uart_tx.cpp.in', { 'id': id })
+env['TemplateGenerator'] = Generator
 
-generator = Generator(env, 'src/xpcc/architecture/driver/atxmega/uart')
-for port in ['C', 'D', 'E', 'F']:
-	for number in [0, 1]:
-		id = "%s%i" % (port, number)
-		substitutions = {
-			'id': id,
-			'number': int(number),
-		}
-		id = id.lower()
-		
-		generator.template('uart_%s.hpp' % id, 'uart.hpp.in', substitutions)
-		generator.template('uart_%s.cpp' % id, 'uart.cpp.in', substitutions)
-		generator.template('uart_buffered_%s.cpp' % id, 'uart_buffered.cpp.in', substitutions)
-		generator.template('uart_spi_%s.cpp' % id, 'uart_spi.cpp.in', substitutions)
+# Generate driver classes with static methods for the microcontroller peripherals
+# from template files
+env.SConscript('src/xpcc/architecture/driver/atmega/SConscript.generate',  exports='env')
+env.SConscript('src/xpcc/architecture/driver/atxmega/SConscript.generate', exports='env')
 
-generator = Generator(env, 'src/xpcc/architecture/driver/atxmega/spi')
-for id in ['C', 'D', 'E', 'F']:
-	generator.template('spi_%s.hpp' % id.lower(), 'spi.hpp.in', { 'id': id })
-	generator.template('spi_%s.cpp' % id.lower(), 'spi.cpp.in', { 'id': id })
+# Generate C++ arrays from the font definition files
+env.SConscript('src/xpcc/driver/lcd/font/SConscript.generate', exports='env')
 
-generator = Generator(env, 'src/xpcc/architecture/driver/atxmega/adc')
-for port in ['A', 'B']:
-	generator.template('adc_%s.hpp' % port.lower(), 'adc.hpp.in', { 'id': port })
-	generator.template('adc_%s.cpp' % port.lower(), 'adc.cpp.in', { 'id': port })
-	for channel in [0,1,2,3]:
-		generator.template('adc_%s_channel_%s.hpp' % (port.lower(), channel), 'adc_channel.hpp.in', { 'id': port, 'ch': channel })
-		generator.template('adc_%s_channel_%s.cpp' % (port.lower(), channel), 'adc_channel.cpp.in', { 'id': port, 'ch': channel })
+# Generate C++ arrays from the image files
+env.SConscript('src/xpcc/driver/lcd/image/SConscript.generate', exports='env')
 
-generator = Generator(env, 'src/xpcc/architecture/driver/atxmega/timer')
-for port in ['C', 'D', 'E', 'F']:
-	generator.template('awex_%s.hpp' % port.lower(), 'awex.hpp.in', { 'id': port })
-	generator.template('hires_%s.hpp' % port.lower(), 'hires.hpp.in', { 'id': port })
-	for channel in [0,1]:
-		generator.template('timer_%s%s.hpp' % (port.lower(), channel), 'timer.hpp.in', { 'id': port, 'ty': channel })
-		generator.template('timer_%s%s.cpp' % (port.lower(), channel), 'timer.cpp.in', { 'id': port, 'ty': channel })
-		generator.template('timer_interrupt_%s%s.hpp' % (port.lower(), channel), 'timer_interrupt.hpp.in', { 'id': port, 'ty': channel })
-		generator.template('timer_interrupt_%s%s.cpp' % (port.lower(), channel), 'timer_interrupt.cpp.in', { 'id': port, 'ty': channel })
+# Generate SConstruct files for all projects in the example/ and tests/ folders
+# and provide a 'check' target to compile all examples.
+env.SConscript('SConscript.examples', exports='env')
 
-# Generate c++ arrays from the font definition files
-fontFiles = env.Glob('src/xpcc/driver/lcd/font/*.font')
-for font in fontFiles:
-	env.Alias('template', env.Font(font))
-
-# Generate c++ arrays from the image files
-imageFiles = env.Glob('src/xpcc/driver/lcd/image/*.pbm')
-for image in imageFiles:
-	env.Alias('template', env.Bitmap(image))
-
-if 'check' in BUILD_TARGETS:
-	result = []
-	everythingOk = True
-	for path, directories, files in os.walk('examples'):
-		# exclude the SVN-directories
-		if '.svn' in directories:
-			directories.remove('.svn')
-	
-		if 'SConstruct' in files:
-			exitStatus = os.system("scons -Q -C %s build" % path)
-			result.append("check: %s -> %s" % (path, "Ok" if exitStatus == 0 else "FAIL!"))
-			
-			if exitStatus != 0:
-				everythingOk = False
-	
-	print "\nRESULTS:\n"
-	print '\n'.join(result)
-	print "\nOK!" if everythingOk else "\nFAIL!"
-
-env.Alias('check', None)
-
-env.Alias('templates', 'template')
-
+# Generate the doxygen documentation
 env.Doxygen('doc/doxyfile')
 env.Alias('doxygen', 'apidoc/html')
 env.Alias('doc', 'doxygen')
+
+env.Alias('templates', 'template')
 
 env.Phony(show='@firefox doc/apidoc/html/index.html &')
 env.Phony(unittest='@scons -Q -C src/')
