@@ -39,6 +39,10 @@ snprintf(char *buffer, int buff_size, const char *format, ...)
 {
 	va_list ap;
 	
+	// changes e.g. 1.2340e+002 to 1.2340e+02 so that the output is compatible
+	// to the GCC output.
+	_set_output_format(_TWO_DIGIT_EXPONENT);
+
 	va_start(ap, format);
 	int result = vsnprintf(buffer, buff_size, format, ap);
 	va_end(ap);

@@ -98,7 +98,12 @@ snprintf(char *buffer, int buff_size, const char *format, ...);
 inline double
 round(double f)
 {
-	return floor(f + 0.5);
+	if (f < 0.0) {
+		return ceil(f - 0.5);
+	}
+	else {
+		return floor(f + 0.5);
+	}
 }
 
 namespace std
