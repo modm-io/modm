@@ -71,6 +71,33 @@
 
 import os
 from SCons.Script import *
+import SCons.Subst
+import tempfile
+import os
+
+# -----------------------------------------------------------------------------
+# We use an adapted Version of this class from 'SCons/Platform/__init__.py' for
+# Windows because GCC requires all backslashes inside a paramter file to be escaped.
+class TempFileMungeWindows(object):
+	def __init__(self, cmd):
+		self.cmd = cmd
+	
+	def __call__(self, target, source, env, for_signature):
+		if for_signature:
+			return self.cmd
+		
+		# do the expansion.
+		cmd = env.subst_list(self.cmd, SCons.Subst.SUBST_CMD, target, source)[0]
+		
+		# create a file for the arguments
+		(fd, tmp) = tempfile.mkstemp('.lnk', text=True)
+		native_tmp = SCons.Util.get_native_path(os.path.normpath(tmp))
+		
+		args = list(map(SCons.Subst.quote_spaces, cmd[1:]))
+		output = " ".join(args).replace("\\", "\\\\")
+		os.write(fd, output + "\n")
+		os.close(fd)
+		return [cmd[0], '@' + native_tmp + '\nrm', native_tmp]
 
 # -----------------------------------------------------------------------------
 def generate(env, **kw):
@@ -138,16 +165,16 @@ def generate(env, **kw):
 	
 	# C++ flags
 	env['CXXFLAGS'] = [
-#		"-save-temps",		# save preprocessed files
 		"-std=gnu++98",
 		"-fno-exceptions", 
 		"-fno-rtti",
 		"-fno-threadsafe-statics",
 		"-fuse-cxa-atexit",
 		"-nostdlib",
+		"-Woverloaded-virtual",
 #		"-Wnon-virtual-dtor",
 #		"-Weffc++",
-		"-Woverloaded-virtual",
+#		"-save-temps",		# save preprocessed files
 	]
 	
 	# Assembler flags
@@ -158,13 +185,20 @@ def generate(env, **kw):
 	
 	env['LINKFLAGS'] = [
 		"-mmcu=$AVR_DEVICE", 
-#		"-Wl,-Map=${TARGET.base}.map,--cref", 
 		"-Wl,--relax", 
 		"-Wl,--gc-sections",
+#		"-Wl,-Map=${TARGET.base}.map,--cref", 
 #		"-Wl,-u,vfprintf -lprintf_flt"		# enable float support for vfprinft
 	]
 	
 	env['LINKCOM'] = "$LINK -o $TARGET $LINKFLAGS -lm -lc -lm $SOURCES -lm $_LIBDIRFLAGS $_LIBFLAGS -lm"
+	
+	if str(Platform()) == "win32":
+		# use a tempfile for the arguments, otherwise the command line string might be to long
+		# for windows to handle (maximum length is 2048 characters)
+		env['TEMPFILE'] = TempFileMungeWindows
+		env['LINKCOM'] = "${TEMPFILE('%s')}" % env['LINKCOM']
+		env['ARCOM'] = "${TEMPFILE('%s')}" % env['ARCOM']
 	
 	clock = str(env['AVR_CLOCK']).lower()
 	if not clock.endswith('ul'):
