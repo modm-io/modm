@@ -1,3 +1,9 @@
-Files:
+Files
+=====
+
  - graphml
-    open with yEd http://www.yworks.com/
+   Open with yEd http://www.yworks.com/
+
+ - svg
+   Open with Inkscape.
+

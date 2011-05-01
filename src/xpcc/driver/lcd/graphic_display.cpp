@@ -96,12 +96,12 @@ xpcc::GraphicDisplay::drawLine(uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2)
 			xpcc::swap(y1, y2);
 		}
 		
-		int8_t deltaX = x2 - x1;
-		int8_t deltaY = abs(y2 - y1);
-		int8_t error = deltaX / 2;
+		int16_t deltaX = x2 - x1;
+		int16_t deltaY = abs(y2 - y1);
+		int16_t error = deltaX / 2;
 		
-		int8_t yStep;
-		int8_t y = y1;
+		int16_t yStep;
+		int16_t y = y1;
 		
 		if (y1 < y2) {
 			yStep = 1;
@@ -147,8 +147,8 @@ void
 xpcc::GraphicDisplay::drawRectangle(glcd::Point upperLeft,
 		uint8_t width, uint8_t height)
 {
-	uint8_t x2 = upperLeft.getX() + width;
-	uint8_t y2 = upperLeft.getY() + height;
+	uint16_t x2 = upperLeft.getX() + width;
+	uint16_t y2 = upperLeft.getY() + height;
 	
 	this->drawHorizontalLine(upperLeft,  width);
 	this->drawHorizontalLine(glcd::Point(upperLeft.getX(), y2), width);
@@ -206,9 +206,9 @@ xpcc::GraphicDisplay::drawCircle(glcd::Point center, uint8_t radius)
 		return;
 	}
 	
-	int8_t error = -radius;
-	int8_t x = radius;
-	int8_t y = 0;
+	int16_t error = -radius;
+	int16_t x = radius;
+	int16_t y = 0;
 	
 	while (x > y)
 	{
