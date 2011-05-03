@@ -137,6 +137,11 @@ namespace xpcc
 		inline void
 		sendNegativeResponse(const ResponseHandle& handle);
 		
+		/*inline operator xpcc::Communicator* ()
+		{
+			return &this->communicator;
+		}*/
+		
 	private:
 		Communicator communicator;
 	};

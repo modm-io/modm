@@ -188,6 +188,14 @@ xpcc::Vector2D<T>::getDistanceTo(const Vector2D<T>& other) const
 
 // ----------------------------------------------------------------------------
 template<typename T>
+float
+xpcc::Vector2D<T>::getAngleTo(const Vector2D<T>& other) const
+{
+	return displacement(*this, other).getAngle();
+}
+
+// ----------------------------------------------------------------------------
+template<typename T>
 typename xpcc::Vector2D<T>::WideType
 xpcc::Vector2D<T>::dot(const xpcc::Vector2D<T>& other) const
 {

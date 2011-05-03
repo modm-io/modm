@@ -170,6 +170,9 @@ namespace xpcc
 		WideType
 		getDistanceTo(const Vector2D<T>& other) const;
 		
+		float
+		getAngleTo(const Vector2D<T>& other) const;
+		
 		/**
 		 * \brief	Calculate the dot-product
 		 * 
