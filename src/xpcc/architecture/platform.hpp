@@ -121,7 +121,7 @@
 #	define	MAIN_FUNCTION	int main(void) __attribute__((OS_main)); \
 							int main(void)
 #else
-#	define	MAIN_FUNCTION	int main(void)
+#	define	MAIN_FUNCTION	int main(int argc, char *argv[])
 #endif
 
 #ifdef XPCC__CPU_AVR
