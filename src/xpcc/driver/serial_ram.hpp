@@ -110,7 +110,7 @@ namespace xpcc
 		
 		/**
 		 * \brief	Resume communication
-		 * \see		hold()
+		 * \see		suspend()
 		 */
 		static inline void
 		resume();

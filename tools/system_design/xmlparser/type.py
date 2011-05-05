@@ -302,12 +302,12 @@ class Struct(BaseType):
 			try:
 				self.extends = tree.types[basetype]
 				if not self.extends.isStruct:
-					raise ParserException("Struct '%s' is extended from non struct '%s'!" % (self.name, self.extends.name))
+					raise ParserException("Struct '%s' is derived from non struct '%s'!" % (self.name, self.extends.name))
 				if self.extends.extends:
 					raise ParserException("Struct '%s' extends struct '%s'. Structs are only allowed to extend from those Structs, which do not extend anything!" % (self.name, self.extends.name))
 				self.__typeIdentifierName = self.node.get('typeIdentifier')
 				if self.__typeIdentifierName is None:
-					raise ParserException("Struct '%s' is extended, but typeIdentifier is not defined!" % (self.name))
+					raise ParserException("Struct '%s' does extend '%s', but does not provide the attribute 'typeIdentifier'!" % (self.name, self.extends.name))
 
 			except KeyError:
 				raise ParserException("Unknown super type '%s' in struct '%s'!" % (basetype, self.name))

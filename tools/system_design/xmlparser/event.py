@@ -26,8 +26,10 @@ class Event(object):
 		if type is None:
 			self.type = None
 		else:
-			# TODO Error check
-			self.type = tree.types[type]
+			try:
+				self.type = tree.types[type]
+			except KeyError as e:
+				raise ParserException("Type '%s' is not defined. Used by Event '%s')" % (type, self.name))
 	
 	def update(self, other):
 		""" Update events with the values from another event

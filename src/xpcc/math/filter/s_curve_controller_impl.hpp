@@ -102,7 +102,7 @@ xpcc::SCurveController<T>::update(T error, const T& secondary)
 	}
 	else {
 		targetReached = false;
-		outputDecrement = std::sqrt((error - parameter.targetArea) * \
+		outputDecrement = std::sqrt((error) * \
 									parameter.decreaseFactor);
 	}
 	
