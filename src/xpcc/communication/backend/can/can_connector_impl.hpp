@@ -210,7 +210,7 @@ xpcc::CanConnector<Driver>::retrieveMessage()
 			// calculate the number of messages need to send messageSize-bytes
 			uint8_t numberOfFragments = this->getNumberOfFragments(messageSize);
 			
-			if (message.length < 4 || messageSize > 48 ||
+			if (message.length < 3 || messageSize > 48 ||
 					fragmentIndex >= numberOfFragments)
 			{
 				// illegal format:
