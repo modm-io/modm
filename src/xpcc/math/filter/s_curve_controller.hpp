@@ -74,7 +74,8 @@ namespace xpcc
 					const T& decreaseFactor = T(),
 					const T& kp = T(),
 					const T& secondaryMaximum = T(),
-					const T& secondaryMinimum = T());
+					const T& secondaryMinimum = T(),
+					const T& secondaryTarget = T());
 			
 			T targetArea;
 			T increment;
@@ -82,6 +83,7 @@ namespace xpcc
 			T kp;
 			T secondaryMaximum;
 			T secondaryMinimum;
+			T secondaryTarget;
 		};
 		
 	public:
@@ -92,6 +94,9 @@ namespace xpcc
 
 		inline void
 		setSecondaryMinimim(const T& secondary);
+
+		inline void
+		setSecondaryTarget(const T& secondary);
 
 		inline bool
 		isTargetReached() const;

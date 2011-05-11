@@ -40,9 +40,10 @@
 template<typename T>
 xpcc::SCurveController<T>::Parameter::Parameter(
 		const T& targetArea, const T& increment, const T& decreaseFactor, const T& kp, 
-		const T& secondaryMaximum, const T& secondaryMinimum) :
-	targetArea(targetArea), increment(increment), decreaseFactor(decreaseFactor * 2), kp(kp),
-	secondaryMaximum(secondaryMaximum), secondaryMinimum(secondaryMinimum)
+		const T& secondaryMaximum, const T& secondaryMinimum, const T& secondaryTarget) :
+	targetArea(targetArea), increment(increment), decreaseFactor(decreaseFactor), kp(kp),
+	secondaryMaximum(secondaryMaximum), secondaryMinimum(secondaryMinimum),
+	secondaryTarget(secondaryTarget)
 {
 }			
 
@@ -68,6 +69,14 @@ inline void
 xpcc::SCurveController<T>::setSecondaryMinimim( const T& secondary )
 {
 	this->parameter.secondaryMinimum = secondary;
+}
+
+// ----------------------------------------------------------------------------
+template<typename T>
+inline void
+xpcc::SCurveController<T>::setSecondaryTarget( const T& secondary )
+{
+	this->parameter.secondaryTarget = secondary;
 }
 
 // ----------------------------------------------------------------------------
@@ -102,8 +111,8 @@ xpcc::SCurveController<T>::update(T error, const T& secondary)
 	}
 	else {
 		targetReached = false;
-		outputDecrement = std::sqrt((error) * \
-									parameter.decreaseFactor);
+		outputDecrement = std::sqrt((error) *
+			parameter.decreaseFactor * 2) + parameter.secondaryTarget;
 	}
 	
 	output = std::min(outputIncrement, outputDecrement);
