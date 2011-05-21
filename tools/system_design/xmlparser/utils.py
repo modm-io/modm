@@ -12,7 +12,7 @@ def check_name(name):
 	
 	"""
 	if not re.match("^([A-Z]?[a-z0-9]* )*([A-Z]?[a-z0-9]*)$", name):
-		raise ParserException("Error in name '%s'" % name)
+		raise ParserException("Error in name '%s'. Check Spelling or Case. Allowed are only Names matching '^([A-Z]?[a-z0-9]* )*([A-Z]?[a-z0-9]*)$' " % name)
 
 class SortedDictionary(dict):
 	"""

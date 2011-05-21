@@ -4,6 +4,8 @@
 import utils
 import xml_utils
 
+from parser_exception import ParserException
+
 class Action(object):
 	
 	def __init__(self, node, tree):
@@ -19,7 +21,11 @@ class Action(object):
 	def __get_type(self, node, name, tree):
 		type = node.get(name)
 		if type != None:
-			type = tree.types[type]
+			try:
+				type = tree.types[type]
+			except KeyError as e:
+				raise ParserException("Type '%s' is not defined. Used by Action '%s')" % (type, self.name))
+				
 		return type
 	
 	def __cmp__(self, other):
