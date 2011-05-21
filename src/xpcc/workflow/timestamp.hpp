@@ -41,12 +41,15 @@ namespace xpcc
 	/**
 	 * \brief	Simple 16-bit timestamp
 	 * 
+	 * The timestap is calculated in milliseconds.
+	 *
 	 * \author	Fabian Greif
 	 * \ingroup	workflow
 	 */ 
 	class Timestamp
 	{
 	public:
+		///\param time in ms
 		Timestamp(const uint16_t time = 0) : 
 			time(time)
 		{
