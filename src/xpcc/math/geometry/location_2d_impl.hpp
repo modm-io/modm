@@ -32,6 +32,9 @@
 	#error	"Don't include this file directly use 'location.hpp' instead!"
 #endif
 
+#include <cmath>
+#include <cstdlib>
+
 // -----------------------------------------------------------------------------
 template <typename T>
 xpcc::Location2D<T>::Location2D() :
@@ -155,6 +158,23 @@ xpcc::Location2D<U>
 xpcc::Location2D<T>::convert() const
 {
 	return Location2D<U>(this->position.convert<U>(), this->orientation);
+}
+
+// ----------------------------------------------------------------------------
+template<typename T>
+bool
+xpcc::Location2D<T>::operator == (const Location2D &other) const
+{
+	return ((this->position == other.position) &&
+			(std::abs(this->orientation - other.orientation) < __FLT_EPSILON__));
+}
+
+template<typename T>
+bool
+xpcc::Location2D<T>::operator != (const Location2D &other) const
+{
+	return ((this->position != other.position) ||
+			(std::abs(this->orientation - other.orientation) > __FLT_EPSILON__));
 }
 
 // ----------------------------------------------------------------------------

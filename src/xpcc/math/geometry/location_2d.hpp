@@ -120,6 +120,12 @@ namespace xpcc
 		Location2D<U>
 		convert() const;
 		
+		bool
+		operator == (const Location2D &other) const;
+		
+		bool
+		operator != (const Location2D &other) const;
+		
 	private:
 		template <typename U>
 		friend IOStream&
@@ -144,6 +150,13 @@ namespace xpcc
 	// ------------------------------------------------------------------------
 	// Declaration of specialized methods
 	// ------------------------------------------------------------------------
+	/*template<>
+	bool
+	Location2D<float>::operator == (const Location2D &other) const;
+	
+	template<>
+	bool
+	Location2D<double>::operator == (const Location2D &other) const;*/
 }
 
 #include "location_2d_impl.hpp"

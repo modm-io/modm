@@ -39,8 +39,13 @@ class ComponentDictionary(utils.SingleAssignDictionary):
 		for action in self.actions:
 			id = action.id
 			if id in actionIds:
-				raise ParserException("Duplicate Action-Identifier, '0x%02x' is used for '%s' and '%s'!"	% 
-						(id, action.name, actionIds[id].name))
+				next_id = id
+				while next_id in actionIds:
+					next_id += 1
+				
+				raise ParserException("Duplicate Action-Identifier, '0x%02x' is used for '%s' and '%s'!" \
+						"'0x%02x' might be unused."	% 
+						(id, action.name, actionIds[id].name, next_id))
 			else:
 				actionIds[id] = action
 		
@@ -53,8 +58,13 @@ class ComponentDictionary(utils.SingleAssignDictionary):
 				continue
 			
 			if id in componentIdentifier:
-				raise ParserException("Duplicate Component-Identifier, '0x%02x' is used for '%s' and '%s'!"	% 
-						(id, component.name, componentIdentifier[id].name))
+				next_id = id
+				while next_id in componentIdentifier:
+					next_id += 1
+				
+				raise ParserException("Duplicate Component-Identifier, '0x%02x' is used for '%s' and '%s'! " \
+						"'0x%02x' might be unused."	% 
+						(id, component.name, componentIdentifier[id].name, next_id))
 			else:
 				componentIdentifier[id] = component
 	
