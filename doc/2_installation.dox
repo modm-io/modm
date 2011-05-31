@@ -13,9 +13,4 @@ websites.
 - \subpage installation_linux "Installation on Linux"
 - \subpage installation_windows "Installation on Windows"
 
-\section get_code Get the XPCC code
-
-\verbatim
-svn co https://xpcc.svn.sourceforge.net/svnroot/xpcc/trunk xpcc
-\endverbatim
 */

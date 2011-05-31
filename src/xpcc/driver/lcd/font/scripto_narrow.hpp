@@ -43,7 +43,7 @@ namespace xpcc
 		 * \brief	Scripto Narrow
 		 * 
 		 * - preferred width : 3
-		 * - height          : 8
+		 * - height          : 7
 		 * - first char      : 32
 		 * - last char       : 127
 		 * - number of chars : 95

@@ -1,0 +1,27 @@
+// coding: utf-8
+// $Id$
+
+/*!
+\page get_code 1. Get the Code
+
+Use any SVN client like \b svn or \b TortoiseSVN to download the code from our
+subversion repository. Anonymous read access is enabled.
+
+You can either get the latest version from
+ - https://xpcc.svn.sourceforge.net/svnroot/xpcc/trunk
+
+But be aware, as this is the current development tree, it might change without
+any notice. The documentation is generated from this version.
+
+To get the stable versions look at
+ - https://xpcc.svn.sourceforge.net/svnroot/xpcc/tags
+
+\section linux Linux
+
+-# Pick a directory for the sources.  We will call this directory \c xpcc.
+-# Check out XPCC:
+   \verbatim
+svn co https://xpcc.svn.sourceforge.net/svnroot/xpcc/trunk xpcc
+\endverbatim
+
+*/

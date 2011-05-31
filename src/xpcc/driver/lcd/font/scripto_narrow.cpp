@@ -41,7 +41,7 @@ namespace xpcc
 		{
 			0x7C, 0x01, // total size of this array
 			3,	// width (may vary)
-			8,	// height
+			7,	// height
 			32,	// first char
 			95,	// char count
 			

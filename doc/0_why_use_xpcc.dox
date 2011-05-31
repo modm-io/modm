@@ -2,7 +2,7 @@
 // $Id$
 
 /*!
-\page why_use_xpcc 1. Why should i use this library?
+\page why_use_xpcc 0. Why should i use this library?
 
 \image html rca_insitor.jpg
 
@@ -43,5 +43,10 @@ of the system. You can learn about how to use a class by looking at its
 unit tests.
 
 Read more about this in our \ref unittests "developer section".
+
+\section try_it Just try it out ...
+
+Get the code at https://xpcc.svn.sourceforge.net/svnroot/xpcc/trunk and see
+for yourself.
 
 */

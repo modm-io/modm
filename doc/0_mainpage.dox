@@ -21,6 +21,7 @@ described in the \ref container section.
 
 This manual is divided in the following sections:
 - \subpage why_use_xpcc
+- \subpage get_code
 - \subpage installation
   - \ref installation_linux
   - \ref installation_windows

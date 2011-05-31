@@ -317,7 +317,7 @@ class Struct(BaseType):
 		""" Create hierarchy
 		
 		For this method self.size = 0 is used as sepecial value to detect
-		loop in the definition of types. In normal operation size will never be
+		loops in the definition of types. In normal operation size will never be
 		zero, only during hierarchy creation.
 		"""
 		if self.level is not None:
@@ -339,20 +339,35 @@ class Struct(BaseType):
 			self.extends.create_hierarchy()
 			typeIdentifierStructElement = self.extends.elements[0]
 			if not typeIdentifierStructElement.subtype.type.isEnum:
-				raise ParserException("Struct '%s' is extended by Struct '%s'. Structs which are extended by other must have an element named 'type' of any enum type as their first element! It is used for type distinguishing at runtime." % (self.extends.name, self.name))
+				raise ParserException("Struct '%s' is extended by Struct '%s'. "  \
+					"Structs which are extended by other must have an element named " \
+					"'type' of any enum type as their first element! It is used for " \
+					"type distinguishing at runtime." \
+						% (self.extends.name, self.name))
 			if not typeIdentifierStructElement.name == 'type':
-				raise ParserException("Struct '%s' is extended by Struct '%s'. Structs which are extended by other must have an element named 'type' as their first element! It is used for type distinguishing at runtime." % (self.extends.name, self.name))
+				raise ParserException("Struct '%s' is extended by Struct '%s'. Structs" \
+					"which are extended by other must have an element named 'type' as" \
+					"their first element! It is used for type distinguishing at runtime." \
+						% (self.extends.name, self.name))
 			
 			for enumElement in typeIdentifierStructElement.subtype.type.elements:
 				if enumElement.name == self.__typeIdentifierName:
 					self.typeIdentifier = enumElement
 					break
 			if not self.typeIdentifier:
-				raise ParserException("Struct '%s' extends Struct '%s', but it's typeIdentifier '%s' is not member of enum '%s' which is the type of '%s.type'." % (self.name, self.extends.name, self.__typeIdentifierName, typeIdentifierStructElement.subtype.type.name, self.extends.name))
-				
+				raise ParserException("Struct '%s' extends Struct '%s', but it's " \
+					"typeIdentifier '%s' is not member of enum '%s' which is the " \
+					"type of '%s.type'."
+						% (self.name, self.extends.name, self.__typeIdentifierName,
+							typeIdentifierStructElement.subtype.type.name, self.extends.name))
+			
 			self.extends.__addExtending(self)
 			size += self.extends.size
 			self.level = max(self.level, self.extends.level)
+		
+		if size > 48:
+			raise ParserException("Struct '%s' is with %i Byte too big. The maximum " \
+				"packet size is 48 Byte!" % (self.name, size))
 		
 		self.size = size
 		self.level += 1
