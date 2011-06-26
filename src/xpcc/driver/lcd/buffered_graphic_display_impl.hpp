@@ -39,9 +39,9 @@ template <uint8_t Width, uint8_t Height>
 void
 xpcc::BufferedGraphicDisplay<Width, Height>::clear()
 {
-	for (uint8_t i = 0; i < Height / 8; ++i) {
-		for (uint8_t k = 0; k < Width; ++k) {
-			this->buffer[k][i] = 0;
+	for (uint8_t y = 0; y < Height / 8; ++y) {
+		for (uint8_t x = 0; x < Width; ++x) {
+			this->buffer[x][y] = 0;
 		}
 	}
 }
@@ -53,19 +53,23 @@ xpcc::BufferedGraphicDisplay<Width, Height>::drawHorizontalLine(
 		glcd::Point start,
 		uint8_t length)
 {
-	const uint8_t row = start.getY() / 8;
+	const uint8_t y = start.getY() / 8;
 	
 	if (this->color == glcd::BLACK)
 	{
 		const uint8_t mask = 1 << (start.getY() & 0x07);
-		for (uint8_t i = start.getX(); i < start.getX() + length; ++i) {
-			this->buffer[i][row] |= mask;
+		for (uint8_t x = start.getX(); x < start.getX() + length; ++x) {
+			if( x < Width && y < Height ) {
+				this->buffer[x][y] |= mask;
+			}
 		}
 	}
 	else {
 		const uint8_t mask = ~(1 << (start.getY() & 0x07));
-		for (uint8_t i = start.getX(); i < start.getX() + length; ++i) {
-			this->buffer[i][row] &= mask;
+		for (uint8_t x = start.getX(); x < start.getX() + length; ++x) {
+			if( x < Width && y < Height ) {
+				this->buffer[x][y] &= mask;
+			}
 		}
 	}
 }
@@ -88,7 +92,12 @@ xpcc::BufferedGraphicDisplay<Width, Height>::drawImageRaw(glcd::Point upperLeft,
 			{
 				for (uint8_t k = 0; k < rowCount; k++)
 				{
-					this->buffer[upperLeft.getX() + i][k + row] = data[i + k * width];
+					uint8_t x = upperLeft.getX() + i;
+					uint8_t y = k + row;
+
+					if( x < Width && y < Height ) {
+						this->buffer[x][y] = data[i + k * width];
+					}
 				}
 			}
 			return;
@@ -103,19 +112,28 @@ template <uint8_t Width, uint8_t Height>
 void
 xpcc::BufferedGraphicDisplay<Width, Height>::setPixel(uint8_t x, uint8_t y)
 {
-	this->buffer[x][y / 8] |= (1 << (y & 0x07));
+	if( x < Width && y < Height ) {
+		this->buffer[x][y / 8] |= (1 << (y & 0x07));
+	}
 }
 
 template <uint8_t Width, uint8_t Height>
 void
 xpcc::BufferedGraphicDisplay<Width, Height>::clearPixel(uint8_t x, uint8_t y)
 {
-	this->buffer[x][y / 8] &= ~(1 << (y & 0x07));
+	if( x < Width && y < Height ) {
+		this->buffer[x][y / 8] &= ~(1 << (y & 0x07));
+	}
 }
 
 template <uint8_t Width, uint8_t Height>
 bool
 xpcc::BufferedGraphicDisplay<Width, Height>::getPixel(uint8_t x, uint8_t y)
 {
-	return (this->buffer[x][y / 8] & (1 << (y & 0x07)));
+	if( x < Width && y < Height ) {
+		return (this->buffer[x][y / 8] & (1 << (y & 0x07)));
+	}
+	else {
+		return false;
+	}
 }
