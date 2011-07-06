@@ -40,10 +40,10 @@
 template<typename T>
 xpcc::SCurveController<T>::Parameter::Parameter(
 		const T& targetArea, const T& increment, const T& decreaseFactor, const T& kp, 
-		const T& secondaryMaximum, const T& secondaryMinimum, const T& secondaryTarget) :
+		const T& speedMaximum, const T& speedMinimum, const T& speedTarget) :
 	targetArea(targetArea), increment(increment), decreaseFactor(decreaseFactor), kp(kp),
-	secondaryMaximum(secondaryMaximum), secondaryMinimum(secondaryMinimum),
-	secondaryTarget(secondaryTarget)
+	speedMaximum(speedMaximum), speedMinimum(speedMinimum),
+	speedTarget(speedTarget)
 {
 }			
 
@@ -58,25 +58,25 @@ xpcc::SCurveController<T>::SCurveController(const Parameter& parameter) :
 // ----------------------------------------------------------------------------
 template<typename T>
 inline void
-xpcc::SCurveController<T>::setSecondaryMaximum( const T& secondary )
+xpcc::SCurveController<T>::setSpeedMaximum( const T& speed )
 {
-	this->parameter.secondaryMaximum = secondary;
+	this->parameter.speedMaximum = speed;
 }
 
 // ----------------------------------------------------------------------------
 template<typename T>
 inline void
-xpcc::SCurveController<T>::setSecondaryMinimim( const T& secondary )
+xpcc::SCurveController<T>::setSpeedMinimim( const T& speed )
 {
-	this->parameter.secondaryMinimum = secondary;
+	this->parameter.speedMinimum = speed;
 }
 
 // ----------------------------------------------------------------------------
 template<typename T>
 inline void
-xpcc::SCurveController<T>::setSecondaryTarget( const T& secondary )
+xpcc::SCurveController<T>::setSpeedTarget( const T& speed )
 {
-	this->parameter.secondaryTarget = secondary;
+	this->parameter.speedTarget = speed;
 }
 
 // ----------------------------------------------------------------------------
@@ -90,11 +90,11 @@ xpcc::SCurveController<T>::isTargetReached() const
 // ----------------------------------------------------------------------------
 template<typename T>
 void
-xpcc::SCurveController<T>::update(T error, const T& secondary)
+xpcc::SCurveController<T>::update(T error, const T& speed)
 {
 	// adjust sign to be always positive
 	bool invert = false;
-	T currentValue = secondary;
+	T currentValue = speed;
 	if (error < 0)
 	{
 		invert = true;
@@ -107,20 +107,20 @@ xpcc::SCurveController<T>::update(T error, const T& secondary)
 	if (error <= parameter.targetArea)
 	{
 		targetReached = true;
-		outputDecrement = error * parameter.kp;
+		outputDecrement = error * parameter.kp + parameter.speedTarget;
 	}
 	else {
 		targetReached = false;
 		outputDecrement = std::sqrt((error) *
-			parameter.decreaseFactor * 2) + parameter.secondaryTarget;
+			parameter.decreaseFactor * 2) + parameter.speedTarget;
 	}
 	
 	output = std::min(outputIncrement, outputDecrement);
-	// TODO smoth breaking if the secondaryMaximum has changed to a lower value
-	output = std::min(output, parameter.secondaryMaximum);
+	// TODO smoth breaking if the speedMaximum has changed to a lower value
+	output = std::min(output, parameter.speedMaximum);
 	
-	if (output < parameter.secondaryMinimum) {
-		output = parameter.secondaryMinimum;
+	if (output < parameter.speedMinimum) {
+		output = parameter.speedMinimum;
 	}
 	
 	// revert sign

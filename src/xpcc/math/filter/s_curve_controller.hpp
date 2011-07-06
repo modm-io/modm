@@ -73,38 +73,38 @@ namespace xpcc
 					const T& increment = T(),
 					const T& decreaseFactor = T(),
 					const T& kp = T(),
-					const T& secondaryMaximum = T(),
-					const T& secondaryMinimum = T(),
-					const T& secondaryTarget = T());
+					const T& speedMaximum = T(),
+					const T& speedMinimum = T(),
+					const T& speedTarget = T());
 			
 			T targetArea;
 			T increment;
 			T decreaseFactor;
 			T kp;
-			T secondaryMaximum;
-			T secondaryMinimum;
-			T secondaryTarget;
+			T speedMaximum;
+			T speedMinimum;
+			T speedTarget;
 		};
 		
 	public:
 		SCurveController(const Parameter& parameter);
 		
 		inline void
-		setSecondaryMaximum(const T& secondary);
+		setSpeedMaximum(const T& speed);
 
 		inline void
-		setSecondaryMinimim(const T& secondary);
+		setSpeedMinimim(const T& speed);
 
 		inline void
-		setSecondaryTarget(const T& secondary);
+		setSpeedTarget(const T& speed);
 
 		inline bool
 		isTargetReached() const;
 		
 		void
-		update(T error, const T& secondary);
+		update(T error, const T& speed);
 		
-		/// setpoint output for the secondary value
+		/// setpoint output for the speed value
 		inline const T&
 		getValue() const;
 		
