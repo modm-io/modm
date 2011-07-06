@@ -26,7 +26,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id$
+ * $Id: line_segment_2d_impl.hpp 10693 2011-07-02 05:12:27Z thorsten $
  */
 // ----------------------------------------------------------------------------
 
@@ -136,6 +136,35 @@ xpcc::LineSegment2D<T>::getDistanceTo(const Vector2D<T>& point) const
 	// to the given point
 	Vector2D<T> closestPointToPoint = point - closestPoint;
 	return closestPointToPoint.getLength();
+}
+
+// ----------------------------------------------------------------------------
+template<typename T>
+const xpcc::Vector2D<T>
+xpcc::LineSegment2D<T>::getClosestPointTo(const Vector2D<T>& point) const
+{
+	// vector from the base point of the line to the new point
+	Vector2D<T> startToPoint = point - this->startPoint;
+	Vector2D<T> directionVector = this->endPoint - this->startPoint;
+	
+	FloatType c1 = startToPoint.dot(directionVector);
+	if (c1 <= 0)
+	{
+		// point is before the start point
+		return this->startPoint;
+	}
+	
+	FloatType c2 = directionVector.getLengthSquared();
+	if (c2 <= c1)
+	{
+		// point is after the end point
+		return this->endPoint;
+	}
+	
+	FloatType d = c1 / c2;
+	
+	// calculate the closest point
+	return (this->startPoint + d * directionVector);
 }
 
 // ----------------------------------------------------------------------------

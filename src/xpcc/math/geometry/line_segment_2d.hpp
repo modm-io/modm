@@ -26,7 +26,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id$
+ * $Id: line_segment_2d.hpp 10693 2011-07-02 05:12:27Z thorsten $
  */
 // ----------------------------------------------------------------------------
 
@@ -53,7 +53,7 @@ namespace xpcc
 	 * \author	Fabian Greif
 	 * \ingroup	geometry
 	 */
-	template <typename T>
+	template <typename T = int16_t>
 	class LineSegment2D
 	{
 	public:
@@ -95,6 +95,10 @@ namespace xpcc
 		/// Shortest distance to a point
 		const T
 		getDistanceTo(const Vector2D<T>& point) const;
+		
+		/// Calculate the point on the line segment closes to the given point
+		const Vector2D<T>
+		getClosestPointTo(const Vector2D<T>& point) const;
 		
 		/**
 		 * \brief	Check if two line segments intersect
