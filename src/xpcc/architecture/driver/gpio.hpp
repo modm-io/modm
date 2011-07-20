@@ -340,6 +340,7 @@ namespace xpcc
 				  typename T0 = Unused>
 		class Nibble
 		{
+		public:
 			ALWAYS_INLINE static void
 			setOutput()
 			{
@@ -415,6 +416,7 @@ namespace xpcc
 				  typename T0 = Unused>
 		class Port
 		{
+		public:
 			static void
 			setOutput()
 			{
