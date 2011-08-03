@@ -134,7 +134,7 @@ namespace xpcc
 		/**
 		 * \brief	Initialize hardware
 		 * 
-		 * For a detailed description see SynchronousTwiMaster::initialize().	
+		 * For a detailed description see SynchronousTwiMaster::initialize().
 		 */
 		static void
 		initialize(uint8_t twbr, uint8_t twps);

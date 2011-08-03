@@ -37,13 +37,17 @@ namespace xpcc
 			   typename PIN >
 	class InputCapture
 	{
-	public:
+	public:		
 		/**
 		 * \brief Calculates all the settings to set up the Event System.
 		 * 
 		 * This methods sets up the Event System to route the Pin Interrupt via
 		 * the specified Multiplexer Channel to the Timer Channel and configures
 		 * the Timer into the specified Input Capture Mode.
+		 * Frequency Capture requires a rising edge trigger, Pulse Width Capture
+		 * requires triggering on both edges (rising then falling edge).
+		 * You can invert this by configuring the pin as inverted.
+		 * In these two modes the Input Sense is automatically overwritten.
 		 * 
 		 * If you call this with constants, the compiler does all the
 		 * calculations for the settings, not the Xmega.
@@ -52,13 +56,18 @@ namespace xpcc
 		 * \param clock Timer prescaler
 		 * \param action Input Capture Mode
 		 * \param timerChannel an unused Timer Compare/Capture Channel
+		 * \param pinConfig configuration of the interrupt pin
+		 * \param inputSense trigger sense of the interrupt pin
+		 *			(only available in NORMAL mode)
 		 * \return \c false if Channel C or D is requested of a TC type 1.
 		 */
 		static bool
 		initialize(register8_t& eventChannel=EVSYS_CH0MUX,
 				   TC_CLKSEL_t clock=TC_CLKSEL_DIV1024_gc,
-				   input_capture::Mode action=input_capture::NORMAL,
-				   timer::Channel timerChannel=timer::CHANNELA);
+				   ::xpcc::input_capture::Mode action=input_capture::NORMAL,
+				   ::xpcc::timer::Channel timerChannel=timer::CHANNELA,
+				   ::xpcc::gpio::Configuration pinConfig=::xpcc::gpio::NORMAL,
+				   ::xpcc::gpio::InputSense inputSense=::xpcc::gpio::RISING);
 		
 		inline static bool
 		isDataAvailable();

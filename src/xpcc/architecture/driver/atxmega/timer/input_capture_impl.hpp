@@ -25,17 +25,25 @@ template <typename TIMER, typename PIN>
 bool
 xpcc::InputCapture<TIMER, PIN>::initialize(register8_t& eventChannel,
 										   TC_CLKSEL_t clock,
-										   xpcc::input_capture::Mode action,
-										   xpcc::timer::Channel timerChannel)
+										   ::xpcc::input_capture::Mode action,
+										   ::xpcc::timer::Channel timerChannel,
+										   ::xpcc::gpio::Configuration pinConfig,
+										   ::xpcc::gpio::InputSense inputSense)
 {
 	// first check if we can actually access the timerChannel
 	if (!timer.isType0() && (timerChannel > xpcc::timer::CHANNELB)) {
 		return false;
 	}
 	
-	// Configure the pin to trigger events on both edges
-	pin.configure(::xpcc::gpio::PULLDOWN);
-	pin.configureInputSense(::xpcc::gpio::BOTHEDGES);
+	// configure the pin
+	pin.configure(pinConfig);
+	// override input sense if neccessary
+	if (action == ::xpcc::input_capture::FREQUENCY) {
+		inputSense = ::xpcc::gpio::RISING;
+	} else if (action == ::xpcc::input_capture::PULSEWIDTH) {
+		inputSense = ::xpcc::gpio::BOTHEDGES;
+	}
+	pin.configureInputSense(inputSense);
 	
 	// Get the Event Channel Mux Input Selection from the Pins memory location
 	eventChannel = pin.getEventChannelMuxInput();
