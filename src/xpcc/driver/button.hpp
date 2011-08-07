@@ -41,7 +41,9 @@ namespace xpcc
 	 * \brief	Simple Button
 	 * 
 	 * \todo	Implementation is incomplete
-	 * \author	Fabian Greif <fabian.greif@rwth-aachen.de>
+	 * 
+	 * \ingroup	driver
+	 * \author	Fabian Greif
 	 */
 	template <typename PIN>
 	class Button

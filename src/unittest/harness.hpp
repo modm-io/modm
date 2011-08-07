@@ -104,10 +104,10 @@
 
 namespace unittest
 {
-	EXTERN_FLASH_STRING(stringEqual);
-	EXTERN_FLASH_STRING(stringNotInRange);
-	EXTERN_FLASH_STRING(stringNotTrue);
-	EXTERN_FLASH_STRING(stringNotFalse);
+	EXTERN_FLASH_STORAGE_STRING(stringEqual);
+	EXTERN_FLASH_STORAGE_STRING(stringNotInRange);
+	EXTERN_FLASH_STORAGE_STRING(stringNotTrue);
+	EXTERN_FLASH_STORAGE_STRING(stringNotFalse);
 }
 
 #ifdef	UNITTEST__RETURN_ON_FAIL

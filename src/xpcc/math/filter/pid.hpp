@@ -35,6 +35,7 @@
 
 #include <cstdlib>
 #include <cmath>
+#include <stdint.h>
 
 #include <xpcc/utils/arithmetic_traits.hpp>
 
@@ -166,7 +167,34 @@ namespace xpcc
 		{
 			return output;
 		}
-
+		
+		/**
+		 * \brief	Get last error
+		 * 
+		 * This function is provided for debugging purposes only.
+		 * 
+		 * The differential term is calculated via:
+		 * \code
+		 * Kd * (input - this->lastError);
+		 * \endcode
+		 */
+		inline const T&
+		getLastError() const
+		{
+			return this->lastError;
+		}
+		
+		/**
+		 * \brief	Get integrated error
+		 * 
+		 * This function is provided for debugging purposes only.
+		 */
+		inline const T&
+		getErrorSum() const
+		{
+			return this->errorSum;
+		}
+		
 	private:
 		Parameter parameter;
 		

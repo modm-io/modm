@@ -3,7 +3,7 @@
 
 namespace bitmap
 {
-	EXTERN_FLASH(uint8_t monster[]);
+	EXTERN_FLASH_STORAGE(uint8_t monster[]);
 }
 
 Monster::Monster(xpcc::glcd::Point start,

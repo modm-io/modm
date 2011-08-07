@@ -37,7 +37,7 @@ namespace xpcc
 {
 	namespace font
 	{
-		FLASH(uint8_t ScriptoNarrow[]) =
+		FLASH_STORAGE(uint8_t ScriptoNarrow[]) =
 		{
 			0x7C, 0x01, // total size of this array
 			3,	// width (may vary)

@@ -1,0 +1,40 @@
+// coding: utf-8
+// $Id$
+
+/*!
+\page tool_template 	Tool: template
+
+\section tool_template_provides Provided builders and methods
+
+\subsection tool_template_template Template(target, source, substitutions)
+
+This is just a wrapper for the Python Template strings. \c substitutions needs
+to be Python dictionary with the all the placeholders use in the template
+file as keys. The values need to be simple strings.
+
+\verbatim
+substitutions = {
+	'author' : 'Donald',
+	'date' : today
+}
+target = env.Template(
+		target = 'output/file.hpp'),
+		source = 'input/file.hpp.in'),
+		substitutions = substitutions)
+\endverbatim
+
+See the official documentation for more information: <a href="http://docs.python.org/library/string.html#template-strings" target="_blank">
+Python - Template strings</a>.
+
+\subsection tool_template_jinja2 Jinja2Template(target, source, substitutions)
+
+The Jinja2 template engine allows much more that simple text replacements
+inside the template file. It offers variables, functions, filter, 
+conditional evaluation, loops etc.
+
+As above \c substitutions needs to be Python dictionary. But now the values
+don't need to strings but can be Python objects, lists or dictionaries.
+
+See the official documentation for more information: <a href="http://jinja.pocoo.org/2/documentation/" target="_blank">
+Jinja2 Documentation</a>.
+*/

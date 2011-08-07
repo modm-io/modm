@@ -33,7 +33,7 @@
 #define	UNITTEST__RETURN_ON_FAIL
 #include "dispatcher_test.hpp"
 
-#include <xpcc/architecture/driver/time/test/testing_clock.hpp>
+#include <xpcc/architecture/driver/test/testing_clock.hpp>
 
 // ----------------------------------------------------------------------------
 void

@@ -95,7 +95,7 @@ class FileList(list):
 	def __append(self, item):
 		if not isinstance(item, SCons.Node.Node):
 			item = SCons.Node.FS.default_fs.File(str(item))
-		
+			print dir(item)
 		if not self.__contains__(item):
 			list.append(self, item)
 	

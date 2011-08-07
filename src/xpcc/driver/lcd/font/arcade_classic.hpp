@@ -51,7 +51,7 @@ namespace xpcc
 		 * 
 		 * \ingroup	font
 		 */
-		EXTERN_FLASH(uint8_t ArcadeClassic[]);
+		EXTERN_FLASH_STORAGE(uint8_t ArcadeClassic[]);
 	}
 }
 

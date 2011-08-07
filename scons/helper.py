@@ -30,10 +30,78 @@
 
 from SCons.Script import *
 
+import re
+import subprocess
+
+# -----------------------------------------------------------------------------
+# Output of 'arm-none-eabi-size build/stm32_p103.elf':
+# Size after: None
+#   text	   data	    bss	    dec	    hex	filename None
+#    772	      8	    644	   1424	    590	build/stm32_p103.elf
+# 
+# Try to match the last line to get the size of the regions
+filter = re.compile('^(?P<section>[.]\w+)\s*(?P<size>\d+)\s*(?P<addr>\d+)$')
+
+flashSectionNames = ['.reset', '.fastcode', '.text', '.rodata', '.data']
+ramSectionNames = ['.vectors', '.fastcode', '.data', '.bss', '.noinit']
+
+def size_action(target, source, env):
+	cmd = [env['SIZE'], '-A', str(source[0])]
+	
+	p = subprocess.Popen(cmd, stdout=subprocess.PIPE)
+	stdout, stderr = p.communicate()
+	
+	if stderr is not None:
+		print "Error while running %s" % ' '.join(cmd)
+		Exit(1)
+	
+	flashSize = 0
+	ramSize = 0
+	flashSections = {}
+	ramSections = {}
+	for line in stdout.splitlines():
+		match = filter.match(line)
+		if match:
+			section = match.group('section')
+			if section in flashSectionNames:
+				flashSize += int(match.group('size'))
+				flashSections[section] = 1
+			if section in ramSectionNames:
+				ramSize += int(match.group('size'))
+				ramSections[section] = 1
+	
+	# create lists of the used sections for Flash and RAM
+	flashSections = flashSections.keys()
+	flashSections.sort()
+	ramSections = ramSections.keys()
+	ramSections.sort()
+	
+	flashPercentage = flashSize / float(env['DEVICE_SIZE']['flash']) * 100.0
+	ramPercentage = ramSize / float(env['DEVICE_SIZE']['ram']) * 100.0
+	
+	device = env['ARM_DEVICE']
+	
+	print """Memory Usage
+------------
+Device: %s
+
+Program: %7d bytes (%2.1f%% Full)
+(%s)
+
+Data:    %7d bytes (%2.1f%% Full)
+(%s)
+""" % (device, flashSize, flashPercentage, ' + '.join(flashSections), \
+	ramSize, ramPercentage, ' + '.join(ramSections))
+
 # -----------------------------------------------------------------------------
 def show_size(env, source, alias='__size'):
-	action = Action("$SIZE %s" % source[0].path, 
+	if env.has_key('DEVICE_SIZE'):
+		action = Action(size_action, cmdstr="$SIZECOMSTR")
+	else:
+		# use the raw output of the size tool
+		action = Action("$SIZE %s" % source[0].path, 
 					cmdstr="$SIZECOMSTR")
+	
 	return env.AlwaysBuild(env.Alias(alias, source, action))
 
 def list_symbols(env, source, alias='__symbols'):

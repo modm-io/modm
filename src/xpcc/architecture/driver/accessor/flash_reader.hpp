@@ -33,7 +33,7 @@
 #ifndef	XPCC__FLASH_READER_HPP
 #define	XPCC__FLASH_READER_HPP
 
-#include <xpcc/architecture/platform.hpp>
+#include <xpcc/architecture/utils.hpp>
 
 #ifdef	__DOXYGEN__
 
@@ -41,39 +41,40 @@
 	 * \brief	Define a flash variable
 	 * \ingroup	accessor
 	 */
-	#define	FLASH(var)
+	#define	FLASH_STORAGE(var)
 
 	/**
 	 * \brief	Define a flash string
 	 * \ingroup	accessor
 	 */
-	#define	FLASH_STRING(s)
+	#define	FLASH_STORAGE_STRING(s)
 
 	/**
 	 * \brief	Declare a flash string
 	 * \ingroup	accessor
 	 */
-	#define	EXTERN_FLASH_STRING(s)
+	#define	EXTERN_FLASH_STORAGE_STRING(s)
 
 #else // !__DOXYGEN__
 
-	#ifdef	__AVR__
+	#ifdef XPCC__CPU_AVR
 	
 		#include "flash_reader_avr_impl.hpp"
 	
 	#else
 	
 		#include <cstring>
-		#include <xpcc/architecture/platform.hpp>
-
+		
 		// A simple implementation for all targets that don't have a
 		// strict separation between Flash and RAM like the AVRs does.
 		
-		#define	FLASH(var)				const var
-		#define	EXTERN_FLASH(var)		extern const var
+		// 'const' implies internal linkage in C++ if not explicit declared
+		// as 'extern'.
+		#define	FLASH_STORAGE(var)				extern const var; const var
+		#define	EXTERN_FLASH_STORAGE(var)		extern const var
 
-		#define	FLASH_STRING(s)			const char s[]
-		#define	EXTERN_FLASH_STRING(s)	extern const char s[]
+		#define	FLASH_STORAGE_STRING(s)			extern const char s[]; const char s[]
+		#define	EXTERN_FLASH_STORAGE_STRING(s)	extern const char s[]
 
 		namespace xpcc
 		{

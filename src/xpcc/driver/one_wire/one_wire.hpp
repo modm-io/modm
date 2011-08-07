@@ -33,7 +33,7 @@
 #ifndef XPCC__ONE_WIRE_HPP
 #define XPCC__ONE_WIRE_HPP
 
-#include <xpcc/architecture/platform.hpp>
+#include <xpcc/architecture/utils.hpp>
 #include <xpcc/driver/interface.hpp>
 
 namespace xpcc

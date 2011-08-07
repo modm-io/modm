@@ -34,7 +34,7 @@
 	#error	"Don't include this file directly, use 'serial_ram.hpp' instead!"
 #endif
 
-#include <xpcc/architecture/driver/time/delay.hpp>
+#include <xpcc/architecture/driver/delay.hpp>
 
 template <typename Spi, typename Cs, typename Hold>
 Spi xpcc::SerialRam<Spi, Cs, Hold>::spi;

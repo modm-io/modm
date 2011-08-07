@@ -28,18 +28,31 @@
 # 
 # $Id$
 
+import os
+
 Import('env')
 
 # the buildpath of the library should only be used when building
 # the library. Therefore a copy is made, so that the original environment
 # remains untouched
+envOld = env
 env = env.Clone()
 env.Append(CPPPATH = env['XPCC_BUILDPATH'])
 
 # find all files, except the one located in the 'test' folders
 scan = env.FindFiles(path = '.', unittest=False)
 
-library = env.Library(target = 'xpcc', source = scan.sources)
+sources = scan.sources
+defines = scan.defines
 
-result = (library, scan.defines)
+sources, defines, includes = env.SConscript(
+		os.path.join(env['XPCC_ROOTPATH'], 'ext', 'SConscript'),
+		exports = 'env sources defines')
+
+for path in includes:
+	envOld.AppendUnique(CPPPATH = os.path.join(env['XPCC_ROOTPATH'], path))
+
+library = env.Library(target = 'xpcc', source = sources)
+
+result = (library, defines)
 Return('result')

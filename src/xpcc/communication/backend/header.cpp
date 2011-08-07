@@ -47,7 +47,7 @@ xpcc::Header::operator == (const Header& other) const
 xpcc::IOStream&
 xpcc::operator << (IOStream& s, const Header& header)
 {
-	s	<< "(t=" << header.type
+	s	<< "(t=" << static_cast<int32_t>(header.type)
 		<< ",a=" << header.isAcknowledge
 		<< ",d=" << xpcc::hex << header.destination << xpcc::ascii
 		<< ",s=" << xpcc::hex << header.source << xpcc::ascii

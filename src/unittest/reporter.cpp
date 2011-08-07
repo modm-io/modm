@@ -34,17 +34,17 @@
 
 namespace
 {
-	FLASH_STRING(invaildName) = "invalid";
+	FLASH_STORAGE_STRING(invaildName) = "invalid";
 	
-	FLASH_STRING(failHeader) = "FAIL: ";
-	FLASH_STRING(failColon) = " : ";
+	FLASH_STORAGE_STRING(failHeader) = "FAIL: ";
+	FLASH_STORAGE_STRING(failColon) = " : ";
 	
-	FLASH_STRING(reportPassed) = "\nPassed ";
-	FLASH_STRING(reportFailed) = "\nFailed ";
-	FLASH_STRING(reportOf) = " of ";
-	FLASH_STRING(reportTests) = " tests\n";
-	FLASH_STRING(reportOk) = "OK!\n";
-	FLASH_STRING(reportFail) = "FAIL!\n";
+	FLASH_STORAGE_STRING(reportPassed) = "\nPassed ";
+	FLASH_STORAGE_STRING(reportFailed) = "\nFailed ";
+	FLASH_STORAGE_STRING(reportOf) = " of ";
+	FLASH_STORAGE_STRING(reportTests) = " tests\n";
+	FLASH_STORAGE_STRING(reportOk) = "OK!\n";
+	FLASH_STORAGE_STRING(reportFail) = "FAIL!\n";
 }
 
 unittest::Reporter::Reporter(xpcc::IODevice& device) :

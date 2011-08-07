@@ -58,7 +58,7 @@ namespace xpcc
 	 * typedef xpcc::Pair<int8_t, int8_t> MyPair;
 	 * 
 	 * // put some values into the flash memory
-	 * FLASH(MyPair pairs[3]) =
+	 * FLASH_STORAGE(MyPair pairs[3]) =
 	 * {
 	 *     { 0, 10 },
 	 *     { 2, 30 },

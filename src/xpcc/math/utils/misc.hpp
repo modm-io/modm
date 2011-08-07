@@ -37,7 +37,7 @@
 #include <cmath>
 #include <stdint.h>
 
-#include <xpcc/architecture/platform.hpp>
+#include <xpcc/architecture/utils.hpp>
 
 namespace xpcc
 {

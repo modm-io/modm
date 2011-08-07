@@ -3,7 +3,7 @@
 
 namespace bitmap
 {
-	EXTERN_FLASH(uint8_t rocket[]);
+	EXTERN_FLASH_STORAGE(uint8_t rocket[]);
 }
 
 using namespace xpcc::glcd;

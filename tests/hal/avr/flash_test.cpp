@@ -4,11 +4,11 @@
 //extern const int a PROGMEM;
 //const int a = 12;
 
-FLASH(int foo) = 12;
+FLASH_STORAGE(int foo) = 12;
 
-FLASH_STRING(string) = "Hallo Welt!\n";
+FLASH_STORAGE_STRING(string) = "Hallo Welt!\n";
 
-FLASH(int32_t bla[4]) = {1,2,3,4};
+FLASH_STORAGE(int32_t bla[4]) = {1,2,3,4};
 
 volatile uint8_t out;
 

@@ -1,0 +1,39 @@
+// coding: utf-8
+// $Id$
+
+/*!
+\page tool_openocd Tool: openocd
+
+Interface to OpenOCD 0.4.0 and later.
+
+Example from \c project.cfg:
+\verbatim
+[program]
+tool = openocd
+
+[openocd]
+configfile = openocd.cfg
+commands =
+  flash write_image $SOURCE
+  resume
+  shutdown
+\endverbatim
+
+First the file given by \c configfile is loaded. Then the commands form the
+\c commands section are executed. They needed to be indented by at least a
+single space. $SOURCE will expand to the file given during the call to
+OpenOcd():
+
+SConstruct:
+\verbatim
+program = env.Program(...)
+env.Alias('program', env.OpenOcd(program))
+\endverbatim
+
+\section tool_arm_provides Provided builders and methods
+
+\subsection tool_openocd_program OpenOcd(elf-file)
+
+Program a ELF-file into an ARM7 or Cortex-M0/3 with \c OpenOCD.
+
+*/

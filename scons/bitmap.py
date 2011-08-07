@@ -40,7 +40,7 @@ template_source = """
 
 namespace bitmap
 {
-	FLASH(uint8_t ${name}[]) =
+	FLASH_STORAGE(uint8_t ${name}[]) =
 	{
 		${width}, ${height},
 		${array}
@@ -65,7 +65,7 @@ namespace bitmap
 	 * - Width  : ${width}
 	 * - Height : ${height}
 	 */
-	EXTERN_FLASH(uint8_t ${name}[]);
+	EXTERN_FLASH_STORAGE(uint8_t ${name}[]);
 }
 
 #endif // ${include_guard}

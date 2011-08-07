@@ -35,7 +35,7 @@
 
 #include <stdint.h>
 
-#include <xpcc/architecture/platform.hpp>
+#include <xpcc/architecture/utils.hpp>
 #include <xpcc/architecture/driver/atomic/lock.hpp>
 
 namespace xpcc

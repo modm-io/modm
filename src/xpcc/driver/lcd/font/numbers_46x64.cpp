@@ -37,7 +37,7 @@ namespace xpcc
 {
 	namespace font
 	{
-		FLASH(uint8_t Numbers46x64[]) =
+		FLASH_STORAGE(uint8_t Numbers46x64[]) =
 		{
 			0x70, 0x0E, // total size of this array
 			46,	// width (may vary)

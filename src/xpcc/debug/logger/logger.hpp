@@ -33,7 +33,7 @@
 #ifndef XPCC__LOGGER_HPP
 #define XPCC__LOGGER_HPP
 
-#include <xpcc/architecture/platform.hpp>
+#include <xpcc/architecture/utils.hpp>
 #include <xpcc/io/iostream.hpp>
 
 #include "level.hpp"
@@ -67,8 +67,31 @@ namespace xpcc
 				{
 				}
 				
+				/**
+				 * @brief	Output forwarding
+				 * 
+				 * We must use ALWAYS_INLINE here to prevent the generation of
+				 * specialized functions for every type. Especially for strings
+				 * this might cause a lot of code size bloat.
+				 * 
+				 * Example without ALWAYS_INLINE or only \c inline:
+				 * \code
+				 * $ scons symbols | grep "Logger"
+				 * ...
+				 * 01049436 00000016 W xpcc::log::Logger& xpcc::log::Logger::operator<< <char [12]>(char const (&) [12])
+				 * 01050808 00000016 W xpcc::log::Logger& xpcc::log::Logger::operator<< <char [13]>(char const (&) [13])
+				 * 01050744 00000016 W xpcc::log::Logger& xpcc::log::Logger::operator<< <char [15]>(char const (&) [15])
+				 * 01050792 00000016 W xpcc::log::Logger& xpcc::log::Logger::operator<< <char [16]>(char const (&) [16])
+				 * 01050728 00000016 W xpcc::log::Logger& xpcc::log::Logger::operator<< <char [19]>(char const (&) [19])
+				 * 01050760 00000016 W xpcc::log::Logger& xpcc::log::Logger::operator<< <char [22]>(char const (&) [22])
+				 * 01050712 00000016 W xpcc::log::Logger& xpcc::log::Logger::operator<< <char [26]>(char const (&) [26])
+				 * ...
+				 * \endcode
+				 * 
+				 * With ALWAYS_INLINE all these functions are gone.
+				 */
 				template<typename T>
-				inline Logger&
+				ALWAYS_INLINE Logger&
 				operator << (const T& msg)
 				{
 					*(xpcc::IOStream *) this << msg;
@@ -92,10 +115,10 @@ namespace xpcc
 		 * \ingroup logger
 		 */
 		//\{
-		extern Logger debug;	//!< log device to take messages on DEBUG level
-		extern Logger info;		//!< log device to take messages on INFO level
-		extern Logger warning;	//!< log device to take messages on WARNING level
-		extern Logger error;	//!< log device to take messages on ERROR level
+		extern Logger debug;	///< log device to take messages on DEBUG level
+		extern Logger info;		///< log device to take messages on INFO level
+		extern Logger warning;	///< log device to take messages on WARNING level
+		extern Logger error;	///< log device to take messages on ERROR level
 		//\}
 	}
 }

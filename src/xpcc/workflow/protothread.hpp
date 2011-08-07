@@ -45,7 +45,6 @@
 #define XPCC__PROTOTHREAD_HPP
 
 #include <stdint.h>
-#include <xpcc/architecture/platform.hpp>
 
 /**
  * \ingroup		workflow

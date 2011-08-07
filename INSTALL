@@ -3,7 +3,8 @@ INSTALL - xpcc
 
 You need to build the xpcc-library:
 
- * gcc (for the target platform (x86, avr, ...)
+ * gcc (for the target platform (x86, avr, ...))
+   or an equivalent C++-Compiler
  * SCons (a Python build tool)
  * Python (to run SCons)
 

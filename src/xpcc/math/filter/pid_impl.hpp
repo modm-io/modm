@@ -113,6 +113,9 @@ xpcc::Pid<T, ScaleFactor>::update(const T& input, bool externalLimitation)
 		this->output = tmp;
 	}
 	
+	// If an external limitation (saturation somewhere in the control loop) is
+	// applied the error sum will only be decremented, never incremented.
+	// This is done to help the system to leave the saturated state.
 	if (not limitation or (std::abs(tempErrorSum) < std::abs(this->errorSum)))
 	{
 		this->errorSum = tempErrorSum;

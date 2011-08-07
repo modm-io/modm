@@ -1,10 +1,12 @@
 
 #include <xpcc/architecture.hpp>
+#include <xpcc/architecture/board/cpuboard2/slave.hpp>
+
+typedef xpcc::CpuBoard2Slave<> Board;
 
 MAIN_FUNCTION
 {
-	PORTB.DIR = 0x0f;
-	PORTB.OUT = 0x0a;
+	Board::initialize();
 
 	while (1)
 	{

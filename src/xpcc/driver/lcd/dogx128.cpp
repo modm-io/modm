@@ -30,7 +30,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/architecture/platform.hpp>
+#include <xpcc/architecture/utils.hpp>
 #include <xpcc/architecture/driver.hpp>
 
 #include "st7565_defines.hpp"
@@ -39,7 +39,7 @@ namespace xpcc
 {
 	namespace st7565
 	{
-		FLASH(uint8_t configuration_dogx128[12]) =
+		FLASH_STORAGE(uint8_t configuration_dogx128[12]) =
 		{
 			0x40, // Display start line 0
 			

@@ -14,7 +14,7 @@ namespace bitmap
 	 * - Width  : 16
 	 * - Height : 16
 	 */
-	EXTERN_FLASH(uint8_t home_16x16[]);
+	EXTERN_FLASH_STORAGE(uint8_t home_16x16[]);
 }
 
 #endif // BITMAP__HOME_16X16_HPP

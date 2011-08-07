@@ -30,8 +30,9 @@
  */
 // ----------------------------------------------------------------------------
 /**
- * \defgroup architecture	Architecture specific code
+ * \defgroup architecture	Architecture
  * 
+ * Supported platforms
  */
 
 #ifndef XPCC__ARCHITECTURE_HPP

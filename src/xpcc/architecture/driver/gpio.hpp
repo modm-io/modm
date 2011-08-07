@@ -34,12 +34,11 @@
 #define XPCC__GPIO_HPP
 
 #include <stdint.h>
-
-#include <xpcc/architecture/platform.hpp>
+#include <xpcc/architecture/utils.hpp>
 
 /**
  * \ingroup		architecture
- * \defgroup	gpio	(GPIO) General purpose input and/or output pins
+ * \defgroup	gpio	General purpose input and/or output pins (GPIO)
  * 
  * These macros/classes are used to create architecture independent
  * definitions for hardware pins which then can be used as template
@@ -52,7 +51,7 @@
  * 
  * Example:
  * \code
- * #include <xpcc/architecture/driver/gpio.hpp>
+ * #include <xpcc/architecture/platform.hpp>
  * #include <xpcc/driver/software_spi.hpp>
  * #include <xpcc/driver/lcd/st7036.hpp>
  * 
@@ -85,8 +84,8 @@
  * 
  * Creating a simple flashing light:
  * \code
- * #include <xpcc/architecture/driver/gpio.hpp>
- * #include <xpcc/architecture/driver/time.hpp>
+ * #include <xpcc/architecture/platform.hpp>
+ * #include <xpcc/architecture/driver/delay.hpp>
  * 
  * GPIO__OUTPUT(Led, B, 0);
  * 
@@ -106,7 +105,7 @@
  * 
  * This will generate nearly optimal code. As all methods are \c static and
  * \c inline no function call is generated but the call is mapped directly
- * to the \c sbi assembler instruction!
+ * to a \c sbi assembler instruction!
  * 
  * The generated code for the example above (ATmega8):
  * \verbatim
@@ -152,7 +151,6 @@
  * As you can see, no function call whatsoever is involved!
  * 
  * \see		driver
- * 
  * \author	Fabian Greif
  */
 
@@ -173,6 +171,9 @@ namespace xpcc
 			INPUT,
 			OUTPUT,
 		};
+		
+		static const bool LOW = false;
+		static const bool HIGH = true;
 		
 		/**
 		 * \brief	Dummy implementation of an I/O pin
@@ -211,6 +212,11 @@ namespace xpcc
 		public:
 			ALWAYS_INLINE static void
 			setOutput()
+			{
+			}
+			
+			ALWAYS_INLINE static void
+			setOutput(bool)
 			{
 			}
 			
@@ -279,6 +285,12 @@ namespace xpcc
 			setOutput()
 			{
 				pin.setOutput();
+			}
+			
+			ALWAYS_INLINE static void
+			setOutput(bool value)
+			{
+				pin.setOutput(!value);
 			}
 			
 			ALWAYS_INLINE static void
@@ -495,8 +507,8 @@ namespace xpcc
 		 */
 		enum Configuration
 		{
-			NORMAL,		//!< standard operation (floating input, external signal needed!)
-			PULLUP		//!< enable the internal pull-up resistor
+			NORMAL,		///< standard operation (floating input, external signal needed!)
+			PULLUP		///< enable the internal pull-up resistor
 		};
 	}
 }
@@ -516,6 +528,10 @@ namespace xpcc
  *     // configure pin as output
  *     static inline void
  *     setOutput();
+ *     
+ *     // configure pin as output and set high or low
+ *     static inline void
+ *     setOutput(bool value);
  *     
  *     // configure pin as input
  *     static inline void
@@ -563,6 +579,9 @@ namespace xpcc
  * public:
  *     static inline void
  *     setOutput();
+ *     
+ *     static inline void
+ *     setOutput(bool value);
  *     
  *     static inline void
  *     set();
@@ -699,17 +718,6 @@ namespace xpcc
 #define GPIO__PORT(name, port)
 
 #endif	// __DOXYGEN__
-
-
-#if defined(__AVR__)
-	#if defined(__AVR_XMEGA__)
-		#include "atxmega/gpio.hpp"
-	#else
-		#include "atmega/gpio.hpp"
-	#endif
-#else
-	#include  "gpio_dummy.hpp"
-#endif
 
 // TODO documentation
 #define GPIO__IO2(name, id)				GPIO__IO(name, id)

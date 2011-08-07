@@ -49,21 +49,50 @@ public:
 	void
 	testFlashString();
 	
+	// 8-bit
 	void
-	testByte();
+	testStreamUint8();
 	
 	void
-	testByteSigned();
+	testStreamInt8();
+	
+	// 16-bit
+	void
+	testStreamUint16();
 	
 	void
-	testShort();
+	testStreamUint16_2();
 	
 	void
-	testShortSigned();
+	testStreamInt16();
 	
 	void
-	testInteger();
+	testStreamInt16_2();
 	
+	// 32-bit
+	void
+	testStreamUint32();
+	
+	void
+	testStreamUint32_2();
+	
+	void
+	testStreamInt32();
+	
+	void
+	testStreamInt32_2();
+	
+	void
+	testStreamInt32_3();
+	
+	// 64-bit
+	void
+	testStreamUint64();
+	
+	void
+	testStreamInt64();
+	
+	// float
 	void
 	testFloat();
 	

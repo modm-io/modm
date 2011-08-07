@@ -1,0 +1,17 @@
+// coding: utf-8
+// $Id$
+
+/*!
+\page tool_avr 	Tool: avr
+
+\section tool_avr_provides Provided builders and methods
+
+\subsection tool_avr_hex Hex(target, [source])
+
+Create a Hex-file from an Elf-file.
+
+\subsection tool_avr_listing Listing(program)
+
+Create a listing file (<tt>.lss</tt>).
+
+*/

@@ -88,7 +88,7 @@ namespace
 
 xpcc::CanConnector< mcp2515::Mcp > canConnector;
 
-FLASH(uint8_t can_filter[]) =
+FLASH_STORAGE(uint8_t can_filter[]) =
 {
 	MCP2515_FILTER_EXTENDED(0),	// Filter 0
  	MCP2515_FILTER_EXTENDED(0),	// Filter 1

@@ -35,7 +35,7 @@
 
 #include <cmath>
 #include <stdint.h>
-#include <xpcc/architecture/platform.hpp>
+#include <xpcc/architecture/utils.hpp>
 
 namespace xpcc
 {
@@ -80,7 +80,7 @@ namespace xpcc
 		}
 	};
 	
-	// TODO is this usefull?
+	// TODO is this useful?
 	template <>
 	struct GeometricTraits<uint8_t>
 	{

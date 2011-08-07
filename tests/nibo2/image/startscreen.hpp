@@ -14,7 +14,7 @@ namespace bitmap
 	 * - Width  : 128
 	 * - Height : 64
 	 */
-	EXTERN_FLASH(uint8_t startscreen[]);
+	EXTERN_FLASH_STORAGE(uint8_t startscreen[]);
 }
 
 #endif // BITMAP__STARTSCREEN_HPP

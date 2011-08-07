@@ -5,8 +5,8 @@
 
 namespace bitmap
 {
-	EXTERN_FLASH(uint8_t moon_surface[]);
-	EXTERN_FLASH(uint8_t lunar_lander[]);
+	EXTERN_FLASH_STORAGE(uint8_t moon_surface[]);
+	EXTERN_FLASH_STORAGE(uint8_t lunar_lander[]);
 }
 
 using namespace xpcc::glcd;

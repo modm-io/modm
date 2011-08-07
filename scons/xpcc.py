@@ -56,12 +56,11 @@ def relocate_to_buildpath(env, path, strip_extension=False):
 	if strip_extension:
 		path = os.path.splitext(path)[0]
 	
-	if os.path.isabs(path) or path.startswith('..'):
-		path = os.path.relpath(path, env['XPCC_BASEPATH'])
-		if path.startswith('..'):
-			# if the file is not in a subpath of the current directory
-			# build it in the root directory of the build path
-			path = os.path.basename(path)
+	path = os.path.relpath(path, env['XPCC_BASEPATH'])
+	if path.startswith('..'):
+		# if the file is not in a subpath of the current directory
+		# build it in the root directory of the build path
+		path = os.path.basename(path)
 	
 	return os.path.abspath(os.path.join(env['XPCC_BUILDPATH'], path))
 
@@ -108,7 +107,7 @@ def xpcc_library(env, buildpath=None):
 	if buildpath is None:
 		buildpath = os.path.join(env['XPCC_BUILDPATH'], 'libxpcc')
 	env['XPCC_BUILDPATH'] = os.path.abspath(buildpath)
-	env['XPCC_BASEPATH'] = env['XPCC_LIBRARY_PATH']
+	env['XPCC_BASEPATH'] = env['XPCC_ROOTPATH']
 	
 	# exclude the buildpath from the FileScanner
 	exclude_from_scanner(env['XPCC_BUILDPATH'])
@@ -125,9 +124,12 @@ def xpcc_library(env, buildpath=None):
 		if key in env['XPCC_CONFIG']['defines']:
 			env['XPCC_LIBRARY_DEFINES'][key] = env['XPCC_CONFIG']['defines'][key]
 	
+	define_list = ["#define %s %s" % (key.upper(), value) \
+				for key, value in env['XPCC_LIBRARY_DEFINES'].iteritems()]
+	define_list.sort()
+	
 	substitutions = {
-		'defines': '\n'.join(["#define %s %s" % (key.upper(), value) \
-				for key, value in env['XPCC_LIBRARY_DEFINES'].iteritems()]),
+		'defines': '\n'.join(define_list),
 		'name': env['XPCC_CONFIG']['general']['name']
 	}
 	file = env.Template(
@@ -137,7 +139,7 @@ def xpcc_library(env, buildpath=None):
 			substitutions = substitutions)
 	
 	env.AppendUnique(LIBS = ['xpcc'])
-	env.AppendUnique(LIBPATH = [env['XPCC_BUILDPATH']])
+	env.AppendUnique(LIBPATH = [os.path.join(env['XPCC_BUILDPATH'], 'src')])
 	
 	# restore original environment
 	env['XPCC_BUILDPATH'], env['XPCC_BASEPATH'] = backup
@@ -219,6 +221,9 @@ def generate(env, **kw):
 		elif architecture == 'atmega' or architecture == 'atxmega' or architecture == 'avr':
 			device = parser.get('build', 'device')
 			clock = parser.get('build', 'clock')
+		elif architecture == 'arm7tdmi' or architecture == 'cortex-m0' or architecture == 'cortex-m3':
+			device = parser.get('build', 'device')
+			clock = parser.get('build', 'clock')
 		else:
 			print "Error: unknown architecture: '%s' " % architecture
 			Exit(1)
@@ -265,6 +270,10 @@ def generate(env, **kw):
 	env.Tool('configfile')
 	env.Tool('helper')
 	env.Tool('system_design')
+	
+	env['LIBS'] = ['']
+	env['LIBPATH'] = []
+	env['CPPPATH'] = []
 	
 	# architecture specific settings and tools
 	env['ARCHITECTURE'] = architecture + '/' + device
@@ -317,10 +326,26 @@ def generate(env, **kw):
 		env['LINKCOM'] = []
 		env['LIBS'] = libs
 		env['LIBPATH'] = libpath
-		env['CPPPATH'] = []
 		env['ENV'] = os.environ
 		
 		env.Tool('pc')
+	elif architecture in ['arm7tdmi', 'cortex-m0', 'cortex-m3']:
+		env['ARM_ARCH'] = architecture
+		env['ARM_DEVICE'] = device
+		env['ARM_CLOCK'] = clock
+		
+		env.Tool('arm')
+		
+		# load openocd tool if required
+		if parser.has_section('program'):
+			try:
+				if parser.get('program', 'tool') == 'openocd':
+					env.Tool('openocd')
+					env['OPENOCD_CONFIGFILE'] = parser.get('openocd', 'configfile')
+					env['OPENOCD_COMMANDS'] = parser.get('openocd', 'commands')
+			except configparser.ParserException as e:
+				print "Error in Configuration: %s" % e
+				Exit(1)
 	else:
 		print "Unknown architecture '%s'!" % architecture
 		Exit(1)

@@ -44,6 +44,8 @@ namespace xpcc
 	 * - 2.7-3.6V supply voltage
 	 * 
 	 * \see		<a href="http://ww1.microchip.com/downloads/en/DeviceDoc/22100D.pdf">Datasheet</a>
+	 * 
+	 * \ingroup	driver
 	 * \author	Fabian Greif
 	 */
 	template <typename Spi, typename Cs, typename Hold>

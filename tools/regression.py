@@ -32,7 +32,16 @@
 
 import os
 import re
+import sys
 import subprocess
+
+COLOR_GREEN = ";31"
+COLOR_RED = ";32"
+COLOR_YELLOW = ";33"
+COLOR_DEFAULT = ""
+
+def setColor(color):
+	sys.stdout.write("\033[0%sm" % color)
 
 results = {}
 for line in open("regression.txt"):
@@ -48,7 +57,7 @@ for path, directories, files in os.walk('../examples'):
 	# exclude the SVN-directories
 	if '.svn' in directories:
 		directories.remove('.svn')
-
+	
 	if 'SConstruct' in files:
 		cmd = ['scons', '-C%s' % path, 'size']
 		p = subprocess.Popen(cmd, stdout=subprocess.PIPE)
@@ -56,8 +65,10 @@ for path, directories, files in os.walk('../examples'):
 		
 		print "check: %s" % path
 		if stderr is not None:
+			setColor(COLOR_YELLOW)
 			print "ERROR: Failure when compiling '%s':" % path
 			print stderr
+			setColor(COLOR_DEFAULT)
 		else:
 			try:
 				flash = int(flashFilter.search(stdout).group(1))
@@ -67,18 +78,33 @@ for path, directories, files in os.walk('../examples'):
 				
 				try:
 					oldFlash, oldRam = results[path]
+					divFlash = flash - oldFlash
+					divRam = ram - oldRam
+					percentFlash = 0 if oldFlash == 0 else divFlash * 100.0 / oldFlash
+					precentRam = 0 if oldRam == 0 else divRam * 100.0 / oldRam
 					
 					if (oldFlash < flash) or (oldRam < ram):
+						setColor(COLOR_GREEN)
 						print "WARNING: Regression at %s" % path
-						print "  Flash : %i -> %i (%+i)" % (oldFlash, flash, (flash - oldFlash))
-						print "  RAM   : %i -> %i (%+i)" % (oldRam, ram, (ram - oldRam))
+						if oldFlash != flash:
+							print "  Flash : %i -> %i (%+i => %i%%)" % (oldFlash, flash, divFlash, percentFlash)
+						if oldRam != ram:
+							print "  RAM   : %i -> %i (%+i => %i%%)" % (oldRam, ram, divRam, precentRam)
+						setColor(COLOR_DEFAULT)
 					elif (oldFlash > flash) or (oldRam > ram):
+						setColor(COLOR_RED)
 						print "IMPROVEMENT at %s" % path
-						print "  Flash : %i -> %i (%+i)" % (oldFlash, flash, (flash - oldFlash))
-						print "  RAM   : %i -> %i (%+i)" % (oldRam, ram, (ram - oldRam))
+						if oldFlash != flash:
+							print "  Flash : %i -> %i (%+i => %i%%)" % (oldFlash, flash, divFlash, percentFlash)
+						if oldRam != ram:
+							print "  RAM   : %i -> %i (%+i => %i%%)" % (oldRam, ram, divRam, precentRam)
+						setColor(COLOR_DEFAULT)
 				except KeyError:
-					print "WARNING: not found"
+					print "WARNING: not found in previous version!"
 			except AttributeError:
+				setColor(COLOR_YELLOW)
+				print "WARNING: could not gather results!"
+				setColor(COLOR_DEFAULT)
 				pass
 
 file = open("regression.new.txt", "w")

@@ -46,11 +46,11 @@ def avrdude_flash(env, source, alias='avrdude_program'):
 			filename = os.path.relpath(filename)
 		filename = filename.replace("\\", "/")
 		
-		action = Action('avrdude -p $AVR_DEVICE -c $AVRDUDE_PROGRAMMER -P $AVRDUDE_PORT -U flash:w:"%s"' % filename, 
+		action = Action('$AVRDUDE -p $AVR_DEVICE -c $AVRDUDE_PROGRAMMER -P $AVRDUDE_PORT -U flash:w:"%s"' % filename, 
 						cmdstr="$AVRDUDE_COMSTR")
 		return env.AlwaysBuild(env.Alias(alias, source, action))
 	else:
-		action = Action("avrdude -p $AVR_DEVICE -c $AVRDUDE_PROGRAMMER -P $AVRDUDE_PORT -U flash:w:$SOURCE", 
+		action = Action("$AVRDUDE -p $AVR_DEVICE -c $AVRDUDE_PROGRAMMER -P $AVRDUDE_PORT -U flash:w:$SOURCE", 
 						cmdstr="$AVRDUDE_COMSTR")
 		return env.AlwaysBuild(env.Alias(alias, source, action))
 
@@ -60,7 +60,7 @@ def avrdude_fuse(env, alias='avrdude_fuse'):
 		key, value = fusebit.items()[0]
 		fusebits.append("-U %s:w:0x%02x:m" % (key, int(value, 0)))
 	
-	action = Action("avrdude -p $AVR_DEVICE -c $AVRDUDE_PROGRAMMER -P $AVRDUDE_PORT -u %s" % " ".join(fusebits), 
+	action = Action("$AVRDUDE -p $AVR_DEVICE -c $AVRDUDE_PROGRAMMER -P $AVRDUDE_PORT -u %s" % " ".join(fusebits), 
 					cmdstr="$AVRDUDE_FUSECOMSTR")
 	return env.AlwaysBuild(env.Alias(alias, [], action))
 

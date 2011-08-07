@@ -3,8 +3,8 @@
 
 namespace bitmap
 {
-	EXTERN_FLASH(uint8_t monster_ship[]);
-	EXTERN_FLASH(uint8_t monster_ship_hidden[]);
+	EXTERN_FLASH_STORAGE(uint8_t monster_ship[]);
+	EXTERN_FLASH_STORAGE(uint8_t monster_ship_hidden[]);
 }
 
 MonsterShip::MonsterShip(xpcc::glcd::Point start,

@@ -50,12 +50,12 @@ namespace xpcc
 	{
 	public:
 		///\param time in ms
-		Timestamp(const uint16_t time = 0) : 
+		Timestamp(const uint_fast16_t time = 0) : 
 			time(time)
 		{
 		}
 		
-		inline uint16_t
+		inline uint_fast16_t
 		getTime() const
 		{
 			return this->time;
@@ -110,7 +110,7 @@ namespace xpcc
 		}
 	
 	private:
-		uint16_t time;
+		uint_fast16_t time;
 	};
 	
 	// ------------------------------------------------------------------------

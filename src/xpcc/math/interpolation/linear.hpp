@@ -78,7 +78,7 @@ namespace xpcc
 		 * typedef xpcc::Pair<int8_t, int16_t> Point;
 		 * 
 		 * // Array of supporting points in flash
-		 * FLASH(Point supportingPoints[6]) =
+		 * FLASH_STORAGE(Point supportingPoints[6]) =
 		 * {
 		 *     { 30, -200 },
 		 *     { 50, 0 },

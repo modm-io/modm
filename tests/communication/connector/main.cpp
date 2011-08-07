@@ -19,7 +19,7 @@ namespace pin
 typedef xpcc::SoftwareSpi<pin::SCLK, pin::MOSI, pin::MISO> CanSpi;
 typedef xpcc::Mcp2515< CanSpi, pin::CS, pin::INT > CanDriver;
 
-FLASH(uint8_t canFilter[]) =
+FLASH_STORAGE(uint8_t canFilter[]) =
 {
 	MCP2515_FILTER_EXTENDED(0),	// Filter 0
 	MCP2515_FILTER_EXTENDED(0),	// Filter 1

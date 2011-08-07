@@ -33,8 +33,8 @@
 #ifndef XPCC__SOFTWARE_ONE_WIRE_HPP
 #define XPCC__SOFTWARE_ONE_WIRE_HPP
 
-#include <xpcc/architecture/platform.hpp>
-#include <xpcc/architecture/driver/time.hpp>
+#include <xpcc/architecture/utils.hpp>
+#include <xpcc/architecture/driver/delay.hpp>
 
 namespace xpcc
 {

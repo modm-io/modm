@@ -30,21 +30,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#include "platform.hpp"
-
-#ifdef XPCC__OS_WIN32
-#	include "driver/windows.hpp"
-#endif
-
-#if defined XPCC__CPU_ATMEGA
-#	include "driver/atmega.hpp"
-#elif defined XPCC__CPU_ATXMEGA
-#	include "driver/atxmega.hpp"
-#elif defined XPCC__CPU_ATTINY
-#	include "driver/attiny.hpp"
-#endif
-
 #include "driver/atomic.hpp"
 #include "driver/accessor.hpp"
 #include "driver/gpio.hpp"
-#include "driver/time.hpp"
+#include "driver/delay.hpp"
+#include "driver/clock.hpp"

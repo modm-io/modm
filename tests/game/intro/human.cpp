@@ -3,12 +3,12 @@
 
 namespace bitmap
 {
-	EXTERN_FLASH(uint8_t dancing_man_0[]);
-	EXTERN_FLASH(uint8_t dancing_man_1[]);
-	EXTERN_FLASH(uint8_t dancing_man_1a[]);
-	EXTERN_FLASH(uint8_t dancing_man_2[]);
-	EXTERN_FLASH(uint8_t dancing_man_2a[]);
-	EXTERN_FLASH(uint8_t dancing_man_3[]);
+	EXTERN_FLASH_STORAGE(uint8_t dancing_man_0[]);
+	EXTERN_FLASH_STORAGE(uint8_t dancing_man_1[]);
+	EXTERN_FLASH_STORAGE(uint8_t dancing_man_1a[]);
+	EXTERN_FLASH_STORAGE(uint8_t dancing_man_2[]);
+	EXTERN_FLASH_STORAGE(uint8_t dancing_man_2a[]);
+	EXTERN_FLASH_STORAGE(uint8_t dancing_man_3[]);
 }
 
 Human::Human(xpcc::glcd::Point start,

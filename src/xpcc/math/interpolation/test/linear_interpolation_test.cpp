@@ -57,7 +57,7 @@ LinearInterpolationTest::testInterpolationRam()
 
 typedef xpcc::Pair<uint8_t, int16_t> MyPair;
 
-FLASH(MyPair flashValues[6]) =
+FLASH_STORAGE(MyPair flashValues[6]) =
 {
 	{ 30, -200 },
 	{ 50, 0 },

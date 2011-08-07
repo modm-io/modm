@@ -33,7 +33,7 @@
 #ifndef XPCC__KS0108_HPP
 #define XPCC__KS0108_HPP
 
-#include <xpcc/architecture/driver/time/delay.hpp>
+#include <xpcc/architecture/driver/delay.hpp>
 
 #include "buffered_graphic_display.hpp"
 

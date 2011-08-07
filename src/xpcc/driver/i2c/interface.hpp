@@ -33,7 +33,7 @@
 #ifndef XPCC_I2C__INTERFACE_HPP
 #define XPCC_I2C__INTERFACE_HPP
 
-#include <xpcc/architecture/platform.hpp>
+#include <xpcc/architecture/utils.hpp>
 #include <xpcc/driver/interface.hpp>
 
 #include <cstddef>

@@ -52,7 +52,7 @@ namespace xpcc
 {
 	namespace font
 	{
-		FLASH(uint8_t ${array_name}[]) =
+		FLASH_STORAGE(uint8_t ${array_name}[]) =
 		{
 			${size_low}, ${size_high}, // total size of this array
 			${width},	// width (may vary)
@@ -98,7 +98,7 @@ namespace xpcc
 		 * 
 		 * \\ingroup	font
 		 */
-		EXTERN_FLASH(uint8_t ${array_name}[]);
+		EXTERN_FLASH_STORAGE(uint8_t ${array_name}[]);
 	}
 }
 

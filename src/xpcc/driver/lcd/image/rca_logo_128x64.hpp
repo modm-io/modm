@@ -14,7 +14,7 @@ namespace bitmap
 	 * - Width  : 128
 	 * - Height : 64
 	 */
-	EXTERN_FLASH(uint8_t rca_logo_128x64[]);
+	EXTERN_FLASH_STORAGE(uint8_t rca_logo_128x64[]);
 }
 
 #endif // BITMAP__RCA_LOGO_128X64_HPP

@@ -20,13 +20,18 @@ the line above will load the following tools:
 - \subpage tool_template
 - \subpage tool_system_design
 
-If the given architecture is \e atmega or \e atxmega also is loaded:
+If the given architecture is \e atmega or \e atxmega than the following tools
+are also loaded:
 
 - \subpage tool_avr
 - \subpage tool_avrdude
 
-If the given architecture is \e pc also is loaded:
+If the given architecture is \e pc:
 - \subpage tool_pc
+
+If the given architecture is \e arm7tdmi, \e cortex_m0 or \e cortex_m3:
+- \subpage tool_arm
+- \subpage tool_openocd
 
 This Tool is not loaded, because it is not needed for building code.
 - \subpage tool_doxygen
@@ -62,6 +67,8 @@ This Tool is not loaded, because it is not needed for building code.
 
 - \ref tool_avrdude_program "Avrdude(hexfile)"
 - \ref tool_avrdude_fuses "AvrdudeFuses()"
+
+- \ref tool_openocd_program "OpenOcd(elf-file)"
 
 \section scons_tools_builtin Built-in builders
 

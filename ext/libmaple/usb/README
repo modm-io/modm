@@ -1,0 +1,100 @@
+The USB submodule of libmaple is responsible for:
+
+    Initializing the USB peripheral, scaling the peripheral clocks
+    appropriately, enabling the interrupt channels to USB, defining
+    the USB isr, resetting the USB disc pin (used to tell the host
+    were alive). Additionally, the USB submodule defines the virtual
+    com port USB applications that is available to all user sketches
+    via SerialUSB.print() and others.
+
+To use it:
+
+   [This section is out of date.  Does SerialUSB.begin() do the same
+   thing as the old Usb.init()?]
+
+   SerialUSB.print/ln, available(), read(), write() implement the same
+     interface as Serial1/2/3
+
+
+Current Status:
+
+    Currently, the USB submodule relies on the low level core library
+    provided by ST to access the USB peripheral registers and
+    implement the USB transfer protocol for control endpoint
+    transfers.  The high level virtual com port application is
+    unfortunately hard to untangle from this low level dependence, and
+    when a new USB core library is written (to nix ST dependence)
+    changes will likely have to be made to virtual com application
+    code. Ideally, the new core library should mimic the form of MyUSB
+    (LUFA), since this library (USB for AVR) is growing in popularity
+    and in example applications. Additionally, the USB lib here relies
+    on low level hardware functions that were just ripped out of the
+    bootloader code (for simplicity) but clearly this should be
+    replaced with direct accesses to functions provided elsewhere in
+    libmaple.
+
+    The virtual com port serves two important purposes.
+
+      1) It allows serial data transfers between user sketches an a
+         host computer.
+
+      2) It allows the host machine to issue a system reset by
+         asserting the DTR signal.
+
+    After reset, Maple will run the DFU bootloader for a few seconds,
+    during which the user can begin a DFU upload operation (uploads
+    application binary into RAM/FLASH). Thus, without this virtual com
+    port, it would be necessary to find an alternative means to reset
+    the chip in order to enable the bootloader.
+
+    If you would like to develop your own USB application for whatever
+    reason (uses faster isochronous enpoints for streaming audio, or
+    implements the USB HID or Mass Storage specs for examples) then
+    ensure that you leave some hook for resetting Maple remotely in
+    order to spin up the DFU bootloader.  Please make sure to give
+    yourself a unique vendor/product ID pair in your application, as
+    some operating systems will assign a host-side driver based on
+    these tags.
+
+    It would be possible to build a compound USB device, that
+    implements endpoints for both the virtual COM port as well as some
+    other components (mass storage etc.).  However, this turns out to
+    be a burden from the host driver side, as Windows and *nix handle
+    compound USB devices quite differently.
+
+    Be mindful that enabling the USB peripheral isnt "free." The
+    device must respond to periodic bus activity (every few
+    milliseconds) by servicing an ISR. Therefore, the USB application
+    should be disabled inside of timing critical applications. In
+    order to disconnect the device from the host, the USB_DISC pin can
+    be asserted (on Maple this is GPIO C12). Alternatively, the NVIC
+    can be directly configured to disable the USB LP/HP IRQ's.
+
+    This library should exposed through usb.h; do not include any
+    other files direcly in your application.
+
+    The files inside of usb_lib were provided by ST and are subject to
+    their own license, all other files were written by the LeafLabs
+    team and fall under the MIT license.
+
+Integration with libmaple:
+
+    The current USB lib is ported from the Maple bootloader code,
+    adapted to be a virtual com rather than a DFU device. That means
+    several functions are redefined locally that could have been
+    pulled from elsewhere in libmaple.  Thus, ths USB module doesn't
+    have too many dependencies on libmaple.  It even ensures that
+    clocks are configured correctly for its operation.  However, over
+    time, some libmaple dependencies have crept in.
+
+Todo:
+
+    - write custom low level USB stack to strip out any remaining
+      dependence on ST code
+    - remove dependence on hardware.c, since any functions here really
+      should have their own analogs elsewhere inside libmaple
+    - add a high level USB application library that would allow users
+      to make their own HID/Mass Storage/Audio/Video devices.
+    - implement a SerialUSB.link(SerialX) that forces a passthrough
+      the host computer virtual com to SerialX, and utilizes the
+      line_config commands correctly (sets baud etc)

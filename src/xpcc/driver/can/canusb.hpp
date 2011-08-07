@@ -36,7 +36,8 @@
 #include <queue>
 #include <string>
 
-#include <xpcc/driver/pc/serial_port.hpp>
+// FIXME: remove this dependency!
+#include <xpcc/architecture/platform/x86/linux/serial_port.hpp>
 
 #include "message.hpp"
 

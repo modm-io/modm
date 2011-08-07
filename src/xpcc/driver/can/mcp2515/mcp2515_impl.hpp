@@ -51,7 +51,7 @@ namespace xpcc
 {
 	namespace mcp2515
 	{
-		EXTERN_FLASH(uint8_t configuration[24]);
+		EXTERN_FLASH_STORAGE(uint8_t configuration[24]);
 	}
 }
 

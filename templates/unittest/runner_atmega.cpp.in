@@ -6,8 +6,6 @@
 #include <unittest/controller.hpp>
 
 #include <xpcc/architecture/platform.hpp>
-#include <xpcc/architecture/driver/atmega/uart.hpp>
-#include <xpcc/architecture/driver/gpio.hpp>
 
 ${includes}
 
@@ -26,8 +24,8 @@ main(void)
 	LedRed::set();
 	
 	// initialize output device
-	xpcc::BufferedUart0 uart(115200);
-	xpcc::IODeviceWrapper<xpcc::BufferedUart0> device(uart);
+	xpcc::atmega::BufferedUart0 uart(115200);
+	xpcc::IODeviceWrapper<xpcc::atmega::BufferedUart0> device(uart);
 	
 	sei();
 	

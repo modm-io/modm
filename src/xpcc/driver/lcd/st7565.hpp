@@ -34,7 +34,7 @@
 #define XPCC__ST7565_HPP
 
 #include <xpcc/architecture/driver/accessor/flash.hpp>
-#include <xpcc/architecture/driver/time/delay.hpp>
+#include <xpcc/architecture/driver/delay.hpp>
 
 #include "buffered_graphic_display.hpp"
 

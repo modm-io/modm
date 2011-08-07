@@ -34,8 +34,6 @@
 	#error	"Don't include this file directly, use 's_curve_controller.hpp' instead!"
 #endif
 
-#include <xpcc/architecture/platform.hpp>
-
 // ----------------------------------------------------------------------------
 template<typename T>
 xpcc::SCurveController<T>::Parameter::Parameter(

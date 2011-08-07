@@ -1,0 +1,189 @@
+// coding: utf-8
+// ----------------------------------------------------------------------------
+/* Copyright (c) 2011, Roboterclub Aachen e.V.
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ *     * Redistributions of source code must retain the above copyright
+ *       notice, this list of conditions and the following disclaimer.
+ *     * Redistributions in binary form must reproduce the above copyright
+ *       notice, this list of conditions and the following disclaimer in the
+ *       documentation and/or other materials provided with the distribution.
+ *     * Neither the name of the Roboterclub Aachen e.V. nor the
+ *       names of its contributors may be used to endorse or promote products
+ *       derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY ROBOTERCLUB AACHEN E.V. ''AS IS'' AND ANY
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL ROBOTERCLUB AACHEN E.V. BE LIABLE FOR ANY
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+ * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * $Id$
+ */
+// ----------------------------------------------------------------------------
+/**
+ * @file	swi.S
+ * @brief	Software interrupt handler
+ * 
+ * @author	Fabian Greif
+ * @data	June 2011
+ */
+// ----------------------------------------------------------------------------
+	
+//#include "../registers.h"
+
+#define SWI_IRQ_DIS		0
+#define SWI_IRQ_EN		1
+#define SWI_FIQ_DIS		2
+#define SWI_FIQ_EN		3
+//#define SWI_CLR_VECT	4
+//#define SWI_REG_VECT	5
+
+#define SWI_COUNT		0
+//#define SWI_COUNT		4
+//#define SWI_COUNT		6
+
+// ----------------------------------------------------------------------------
+	.text
+	.arm
+
+	.global _swi_handler
+_swi_handler:
+	// read instruction that was last executed to get the SWI code
+	ldr		ip, [lr, #-4]
+	and		ip, #0xff				// Get swi comment field (lower 8 bit)
+	cmp		ip, #SWI_COUNT			// Check range
+	ldrlo	pc, [pc, ip, lsl #2]	// Jump to service function when code is valid
+	movs	pc, lr					// otherwise return
+	
+/*_swi_table:
+	.word	_irq_disable
+	.word	_irq_enable
+	.word	_fiq_disable
+	.word	_fiq_enable*/
+//	.word	_clear_vector
+//	.word	_register_vector
+
+// ----------------------------------------------------------------------------
+/*_irq_disable:
+	mrs		r0, SPSR
+	orr		r0, r0, #ARM_IRQ_DISABLE
+	msr		SPSR_c, r0
+	movs	pc, lr
+
+_irq_enable:
+	mrs		r0, SPSR
+	bic		r0, r0, #ARM_IRQ_DISABLE
+	msr		SPSR_c, r0
+	movs	pc, lr
+
+_fiq_disable:
+	mrs		r0, SPSR
+	orr		r0, r0, #ARM_FIQ_DISABLE
+	msr		SPSR_c, r0
+	movs	pc, lr
+
+_fiq_enable:
+	mrs		r0, SPSR
+	bic		r0, r0, #ARM_FIQ_DISABLE
+	msr		SPSR_c, r0
+	movs	pc, lr*/
+/*
+_clear_vector:
+	ldr		ip, =LPC_BASE_VIC
+	
+	// Disable all interrupts
+	mvn		r0, #0
+	str		r0, [IP, #VIC_IntEnClear]
+	
+	//Unmask all interrupt levels
+	mov		r0, R0, LSR #16
+	str		r0, [IP, #VIC_SWPriorityMask]
+	
+	// Enable protection
+	mov		r0, #1
+	str		r0, [IP, #VIC_Protection]
+	
+	// Issule EOI command
+	str		r0, [IP, #VIC_VectAddr]
+	
+	movs	PC, LR
+
+_register_vector:
+	// Range check
+	cmp		r0, #32
+	movcss	pc, lr
+	
+	// Set VICVectVectAddr<n> and VICVectPriority<n>
+	ldr		ip, =(LPC_BASE_VIC + VIC_VectAddr0)
+	str		r1, [ip, r0, lsl #2]
+	ldr		IP, =(LPC_BASE_VIC + VIC_VectPriority0)
+	str		r2, [ip, R0, lsl #2]
+	
+	// Set corresponding bit in the VICIntSelect
+	mov		r1, #1
+	mov		r1, r1, lsl r0
+	ldr		ip, =LPC_BASE_VIC
+	ldr		r2, [ip, #VIC_IntSelect]
+	
+	// Enable corresponding interrupt
+	bic		r2, r1
+	cmp		r3, #1
+	orreq	r2, r1
+	str		r2, [ip, #VIC_IntSelect]
+	str		r1, [ip, #VIC_IntEnable]
+	
+	movs	pc, lr
+*/
+// ----------------------------------------------------------------------------
+	.global swi_irq_disable
+	.func	swi_irq_disable
+swi_irq_disable:
+	swi		SWI_IRQ_DIS
+	bx		lr
+	.endfunc
+	
+	.global swi_irq_enable
+	.func	swi_irq_enable
+swi_irq_enable:
+	swi		SWI_IRQ_EN
+	bx		lr
+	.endfunc
+	
+	.global swi_fiq_disable
+	.func	swi_fiq_disable
+swi_fiq_disable:
+	swi		SWI_FIQ_DIS
+	bx		lr
+	.endfunc
+
+	.global swi_fiq_enable
+	.func	swi_fiq_enable
+swi_fiq_enable:
+	swi		SWI_FIQ_EN
+	bx		lr
+	.endfunc
+
+/*	.global swi_clear_vector
+	.func	swi_clear_vector
+swi_clear_vector:
+	swi		SWI_CLR_VECT
+	bx		lr
+	.endfunc
+	
+	.global swi_register_vector
+	.func	swi_register_vector
+swi_register_vector:
+	swi		SWI_REG_VECT
+	bx		lr
+	.endfunc*/
+	
+	.end

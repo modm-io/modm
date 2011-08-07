@@ -45,6 +45,7 @@ namespace xpcc
 		/**
 		 * \internal
 		 * \brief	Interface used to transmit data through a slave object
+		 * 
 		 * \ingroup	apb
 		 */
 		class Transmitter
@@ -56,6 +57,7 @@ namespace xpcc
 		
 		/**
 		 * \brief	Response object for an action call
+		 * 
 		 * \ingroup	apb
 		 */
 		class Response
@@ -166,7 +168,7 @@ namespace xpcc
 		 * \code
 		 * typedef xpcc::apb::Slave< xpcc::apb::Interface< xpcc::BufferedUart0 > > Slave;
 		 * 
-		 * FLASH(xpcc::apb::Action actionList[]) =
+		 * FLASH_STORAGE(xpcc::apb::Action actionList[]) =
 		 * {
 		 *     APB__ACTION(0x57, object, Object::method1,  0),
 		 *     APB__ACTION(0x03, object, Object::method2,  2),
@@ -189,8 +191,8 @@ namespace xpcc
 		 * 
 		 * A complete example is available in the \c example/apb folder.
 		 * 
-		 * \ingroup	apb
 		 * \author	Fabian Greif
+		 * \ingroup	apb
 		 */
 		template <typename Interface>
 		class Slave : protected Transmitter
@@ -264,7 +266,7 @@ namespace xpcc
 	 * 
 	 * Sensor sensor;
 	 * 
-	 * FLASH(xpcc::apb::Action actionList[]) =
+	 * FLASH_STORAGE(xpcc::apb::Action actionList[]) =
 	 * {
 	 *     APB__ACTION(0x57, sensor, Sensor::sendValue,   0),
 	 *     APB__ACTION(0x03, sensor, Sensor::doSomething, sizeof(uint32_t)),

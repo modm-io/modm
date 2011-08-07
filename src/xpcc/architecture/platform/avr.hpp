@@ -29,11 +29,28 @@
  * $Id$
  */
 // ----------------------------------------------------------------------------
-/**
- * \ingroup		architecture
- * \defgroup	avr		AVR specifiy functions
- */
 
+#ifndef XPCC__AVR_HPP
+#define XPCC__AVR_HPP
+
+#include <avr/io.h>
+#include <avr/interrupt.h>
+
+#if defined XPCC__CPU_ATMEGA
+#	include "avr/atmega.hpp"
+#elif defined XPCC__CPU_ATXMEGA
+#	include "avr/atxmega.hpp"
+#elif defined XPCC__CPU_ATTINY
+#	include "avr/attiny.hpp"
+#endif
+
+/**
+ * \ingroup		platform
+ * \defgroup	avr		AVR
+ * 
+ * Tested under Linux with avr-gcc and under Windows with WinAVR (also avr-gcc).
+ * Other compilers might work as well but are untested.
+ */
 namespace xpcc
 {
 	/**
@@ -44,3 +61,5 @@ namespace xpcc
 	{
 	}
 }
+
+#endif	// XPCC__AVR_HPP

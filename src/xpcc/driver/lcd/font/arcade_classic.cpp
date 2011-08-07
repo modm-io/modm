@@ -37,7 +37,7 @@ namespace xpcc
 {
 	namespace font
 	{
-		FLASH(uint8_t ArcadeClassic[]) =
+		FLASH_STORAGE(uint8_t ArcadeClassic[]) =
 		{
 			0x06, 0x03, // total size of this array
 			7,	// width (may vary)

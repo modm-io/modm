@@ -64,9 +64,10 @@ architecture = pc
 
  - general
    - name
-   - regenerate_sconstruct = yes|no
+ - scons
+   - regenerate = yes|no
  - build
-   - architecture = pc|atmega|atxmega
+   - architecture = pc|atmega|atxmega|arm7tdmi
    - device
    - clock
    - library_name

@@ -59,6 +59,8 @@ namespace xpcc
 	 * \endcode
 	 * 
 	 * \see		<a href="http://www.atmel.com/dyn/resources/prod_documents/doc3595.pdf">Datasheet</a>
+	 * 
+	 * \ingroup	driver
 	 * \author	Fabian Greif
 	 */
 	template <typename Spi, typename Cs>

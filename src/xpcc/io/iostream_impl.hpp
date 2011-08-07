@@ -44,7 +44,7 @@
 
 template<typename T>
 void
-xpcc::IOStream::writeFloat( const T& value )
+xpcc::IOStream::writeFloat(const T& value)
 {
 	// hard coded for 2.22507e-308
 	char str[13 + 1]; // +1 for '\0'

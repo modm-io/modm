@@ -38,7 +38,7 @@
 // check if Pair could be stored inside the Flash memory
 typedef xpcc::Pair<uint8_t, int16_t> myPair;
 
-FLASH(myPair values[]) = {
+FLASH_STORAGE(myPair values[]) = {
 	{ 1, 3 },
 	{ 5, 30 },
 	{ 27, 100 }

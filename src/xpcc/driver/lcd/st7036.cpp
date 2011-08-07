@@ -38,7 +38,7 @@ namespace xpcc
 {
 	namespace st7036
 	{
-		FLASH(uint8_t configuration[10]) =
+		FLASH_STORAGE(uint8_t configuration[10]) =
 		{
 #if (ST7036_VOLTAGE == 3)
 

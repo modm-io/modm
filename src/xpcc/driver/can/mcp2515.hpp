@@ -35,7 +35,7 @@
 
 #include <stdint.h>
 #include <xpcc/architecture/driver/accessor.hpp>
-#include <xpcc/architecture/driver/time.hpp>
+#include <xpcc/architecture/driver/delay.hpp>
 
 #include "mcp2515/mcp2515_definitions.hpp"
 #include "message.hpp"
@@ -49,7 +49,7 @@
  * \name	Restructure filter and mask bits for the MCP2515
  * 
  * \code
- * FLASH(uint8_t can_filter[]) =
+ * FLASH_STORAGE(uint8_t can_filter[]) =
  * {
  * 		MCP2515_FILTER_EXTENDED(0),	// Filter 0
  *  	MCP2515_FILTER_EXTENDED(0),	// Filter 1

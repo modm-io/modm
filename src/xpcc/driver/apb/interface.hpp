@@ -35,7 +35,7 @@
 
 #include <cstddef>
 #include <stdint.h>
-#include <xpcc/architecture/platform.hpp>
+#include <xpcc/architecture/utils.hpp>
 
 #include "constants.hpp"
 
@@ -60,8 +60,8 @@ namespace xpcc
 		 * Example:
 		 * \include apb_interface.cpp
 		 * 
-		 * \ingroup	apb
 		 * \author	Fabian Greif
+		 * \ingroup	apb
 		 */
 		template <typename Device>
 		class Interface

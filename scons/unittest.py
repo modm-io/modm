@@ -105,7 +105,7 @@ def unittest_action(target, source, env):
 		
 		instance_name = class_name[0].lower() + class_name[1:]
 		test_name_string = instance_name + 'Name'
-		name_strings.append('FLASH_STRING(%s) = "%s";' % (test_name_string, attr['test_name']))
+		name_strings.append('FLASH_STORAGE_STRING(%s) = "%s";' % (test_name_string, attr['test_name']))
 		
 		str = """\
 	unittest::Controller::instance().nextTestSuite(xpcc::accessor::asFlash(%s));

@@ -1,10 +1,12 @@
 
 #include <xpcc/architecture.hpp>
+#include <xpcc/architecture/board/cpuboard2/master.hpp>
+
+typedef xpcc::CpuBoard2<> Board; 
 
 MAIN_FUNCTION
 {
-	PORTH.DIR = 0xff;
-	PORTH.OUT = 0xaa;
+	Board::initialize();
 
 	while (1)
 	{

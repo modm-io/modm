@@ -34,7 +34,9 @@
 #define	XPCC_MATH__OPERATOR_HPP
 
 #include <cmath>
-#include <xpcc/architecture/platform.hpp>
+#include <stdint.h>
+
+#include <xpcc/architecture/utils.hpp>
 
 namespace xpcc
 {

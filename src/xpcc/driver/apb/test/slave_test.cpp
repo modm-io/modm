@@ -98,7 +98,7 @@ namespace
 	
 	TestingObject testingObject;
 	
-	FLASH(xpcc::apb::Action actionList[]) =
+	FLASH_STORAGE(xpcc::apb::Action actionList[]) =
 	{
 		APB__ACTION(0x01, testingObject, TestingObject::emptyFunction, 0),
 		APB__ACTION(0x02, testingObject, TestingObject::responseFunction, 0),

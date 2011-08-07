@@ -65,7 +65,7 @@ namespace xpcc
 	
 	// (8) ADC select
 	#define ST7565_ADC_NORMAL			0xA0
-	#define ST7565_ADC_REVERSE				0xA1
+	#define ST7565_ADC_REVERSE			0xA1
 	
 	// (9) Display normale/reverse
 	#define ST7565_NORMAL   			0xA6

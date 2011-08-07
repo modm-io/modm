@@ -34,7 +34,7 @@
 #define XPCC__SOFTWARE_SPI_HPP
 
 #include <stdint.h>
-#include <xpcc/architecture/driver/time.hpp>
+#include <xpcc/architecture/driver/delay.hpp>
 
 namespace xpcc
 {

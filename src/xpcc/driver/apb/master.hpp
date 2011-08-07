@@ -47,6 +47,9 @@ namespace xpcc
 		 * Requires xpcc::Clock to be implemented.
 		 * 
 		 * \see	xpcc::Clock
+		 * 
+		 * \author	Fabian Greif
+		 * \ingroup	apb
 		 */
 		template <typename Interface>
 		class Master

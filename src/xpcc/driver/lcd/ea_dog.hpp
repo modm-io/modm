@@ -40,9 +40,35 @@ namespace xpcc
 {
 	namespace st7565
 	{
-		EXTERN_FLASH(uint8_t configuration_dogx128[12]);
-		EXTERN_FLASH(uint8_t configuration_dogm132[12]);
+		EXTERN_FLASH_STORAGE(uint8_t configuration_dogs102[11]);
+		EXTERN_FLASH_STORAGE(uint8_t configuration_dogm132[12]);
+		EXTERN_FLASH_STORAGE(uint8_t configuration_dogx128[12]);
 	}
+	
+	/**
+	 * \brief	EA DOGS102-6
+	 * 
+	 * \see		<a href="http://www.lcd-module.de/eng/pdf/grafik/dogs102-6e.pdf">Datasheet</a>
+	 * \ingroup	lcd
+	 */
+	template <typename SPI, typename CS, typename A0, typename Reset, bool TopView = false>
+	class DogS102 : public St7565<SPI, CS, A0, Reset, 102, 64, TopView>
+	{
+	public:
+		/**
+		 * \brief	Initialize the display
+		 * 
+		 * The display needs some time to initialize after power-up. You have
+		 * to wait at least 50 ms until calling this method.
+		 */
+		void
+		initialize()
+		{
+			St7565<SPI, CS, A0, Reset, 102, 64, TopView>::initialize(
+					xpcc::accessor::asFlash(st7565::configuration_dogs102),
+					sizeof(st7565::configuration_dogs102));
+		}
+	};
 	
 	/**
 	 * \brief	EA DOGM132x-5

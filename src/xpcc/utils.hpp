@@ -35,7 +35,7 @@
  * 
  */
 
-#include "architecture/platform.hpp"
+#include "architecture/utils.hpp"
 
 #include "utils/algorithm.hpp"
 #include "utils/allocator.hpp"

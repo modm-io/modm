@@ -45,8 +45,8 @@ public:
 	virtual void
 	write(char c)
 	{
-		buffer[bytesWritten] = c;
-		bytesWritten++;
+		this->buffer[this->bytesWritten] = c;
+		this->bytesWritten++;
 	}
 	
 	using xpcc::IODevice::write;
@@ -67,7 +67,7 @@ public:
 	void
 	clear()
 	{
-		bytesWritten = 0;
+		this->bytesWritten = 0;
 	}
 	
 	char buffer[20];
@@ -102,7 +102,7 @@ IoStreamTest::testString()
 	TEST_ASSERT_EQUALS(device.bytesWritten, 3);
 }
 
-FLASH_STRING(flashString) = "abc";
+FLASH_STORAGE_STRING(flashString) = "abc";
 
 void
 IoStreamTest::testFlashString()
@@ -115,62 +115,160 @@ IoStreamTest::testFlashString()
 	TEST_ASSERT_EQUALS(device.bytesWritten, 3);
 }
 
+// ----------------------------------------------------------------------------
 void
-IoStreamTest::testByte()
+IoStreamTest::testStreamUint8()
 {
 	char string[] = "244";
 	
-	(*stream) << 244;
+	(*stream) << static_cast<uint8_t>(244);
 	
 	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 3);
 	TEST_ASSERT_EQUALS(device.bytesWritten, 3);
 }
 
 void
-IoStreamTest::testByteSigned()
+IoStreamTest::testStreamInt8()
 {
 	char string[] = "-123";
 	
-	(*stream) << -123;
+	(*stream) << static_cast<int8_t>(-123);
 	
 	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 4);
 	TEST_ASSERT_EQUALS(device.bytesWritten, 4);
 }
 
+// ----------------------------------------------------------------------------
 void
-IoStreamTest::testShort()
+IoStreamTest::testStreamUint16()
 {
 	char string[] = "62412";
 	
-	(*stream) << 62412;
+	(*stream) << static_cast<uint16_t>(62412);
 	
 	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 5);
 	TEST_ASSERT_EQUALS(device.bytesWritten, 5);
 }
 
-
 void
-IoStreamTest::testShortSigned()
+IoStreamTest::testStreamUint16_2()
+{
+	char string[] = "65535";
+	
+	(*stream) << static_cast<uint16_t>(0xffff);
+	
+	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 5);
+	TEST_ASSERT_EQUALS(device.bytesWritten, 5);
+}
+
+// ----------------------------------------------------------------------------
+void
+IoStreamTest::testStreamInt16()
 {
 	char string[] = "-12345";
 	
-	(*stream) << -12345;
+	(*stream) << static_cast<int16_t>(-12345);
 	
 	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 6);
 	TEST_ASSERT_EQUALS(device.bytesWritten, 6);
 }
 
 void
-IoStreamTest::testInteger()
+IoStreamTest::testStreamInt16_2()
 {
-	char string[] = "12345678";
+	char string[] = "-32768";
 	
-	(*stream) << 12345678;
+	(*stream) << static_cast<int16_t>(-32768);
 	
-	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 8);
-	TEST_ASSERT_EQUALS(device.bytesWritten, 8);
+	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 6);
+	TEST_ASSERT_EQUALS(device.bytesWritten, 6);
 }
 
+// ----------------------------------------------------------------------------
+void
+IoStreamTest::testStreamUint32()
+{
+	char string[] = "123";
+	
+	(*stream) << static_cast<uint32_t>(123);
+	
+	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 3);
+	TEST_ASSERT_EQUALS(device.bytesWritten, 3);
+}
+
+void
+IoStreamTest::testStreamUint32_2()
+{
+	char string[] = "4294967295";
+	
+	(*stream) << static_cast<uint32_t>(0xffffffff);
+	
+	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 10);
+	TEST_ASSERT_EQUALS(device.bytesWritten, 10);
+}
+
+// ----------------------------------------------------------------------------
+void
+IoStreamTest::testStreamInt32()
+{
+	char string[] = "-12345678";
+	
+	(*stream) << static_cast<int32_t>(-12345678);
+	
+	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 9);
+	TEST_ASSERT_EQUALS(device.bytesWritten, 9);
+}
+
+void
+IoStreamTest::testStreamInt32_2()
+{
+	char string[] = "-2147483648";
+	
+	(*stream) << static_cast<int32_t>(-2147483648);
+	
+	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 11);
+	TEST_ASSERT_EQUALS(device.bytesWritten, 11);
+}
+
+void
+IoStreamTest::testStreamInt32_3()
+{
+	char string[] = "0";
+	
+	(*stream) << static_cast<int32_t>(0);
+	
+	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 1);
+	TEST_ASSERT_EQUALS(device.bytesWritten, 1);
+}
+
+// ----------------------------------------------------------------------------
+void
+IoStreamTest::testStreamUint64()
+{
+#ifndef __AVR__
+	char string[] = "12345678901234";
+	
+	(*stream) << static_cast<uint64_t>(12345678901234);
+	
+	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 14);
+	TEST_ASSERT_EQUALS(device.bytesWritten, 14);
+#endif
+}
+
+void
+IoStreamTest::testStreamInt64()
+{
+#ifndef __AVR__
+	char string[] = "-12345678901234";
+	
+	(*stream) << static_cast<int64_t>(-12345678901234);
+	
+	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 15);
+	TEST_ASSERT_EQUALS(device.bytesWritten, 15);
+#endif
+}
+
+// ----------------------------------------------------------------------------
 void
 IoStreamTest::testFloat()
 {
@@ -215,6 +313,7 @@ IoStreamTest::testFloat4()
 	TEST_ASSERT_EQUALS(device.bytesWritten, 12);
 }
 
+// ----------------------------------------------------------------------------
 void
 IoStreamTest::testHex1()
 {
@@ -246,7 +345,7 @@ IoStreamTest::testHex3()
 {
 	char string[] = "123456";
 	
-	int_fast32_t i = 123456;
+	int32_t i = 123456;
 	
 	(*stream) << xpcc::hex << i;
 

@@ -1,0 +1,39 @@
+
+ARM/Thumb Interworking
+----------------------
+
+When writing assembly functions, the function symbols need to be marked as such
+using the .type directive. Otherwise no interworking code is generated.
+
+Example:
+
+	.arm
+	.global		_arm_function
+	.func		_arm_function
+	.type		_arm_function, %function
+_arm_function:
+	... ARM Code ...
+	.endfunc
+	
+	.thumb
+	.global		_thumb_function
+	.thumb_func	_thumb_function
+	.type		_thumb_function, %function
+_thumb_function:
+	... Thumb Code ...
+	.endfunc
+
+Without the .type directive a direct call via "bl" is generated when trying
+to call a ARM function from Thumb code. If the functions is correctly marked
+the call to "function" is redirected to a intermediate function called 
+"__function_from_thumb" which looks like this:
+
+__function_from_thumb:
+	bx	pc			// thumb code
+	nop				// thumb code
+	b	function	// ARM code
+
+The first "bl" instruction ensures that the correct return address is stored
+in the "lr" register and then the "bx" instruction switch the mode to ARM.
+The following branch than happens in ARM mode.
+

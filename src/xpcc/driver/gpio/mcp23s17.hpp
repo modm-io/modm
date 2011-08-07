@@ -33,7 +33,7 @@
 #ifndef XPCC__MCP23S17_HPP
 #define XPCC__MCP23S17_HPP
 
-#include <xpcc/architecture/platform.hpp>
+#include <xpcc/architecture/utils.hpp>
 #include <xpcc/architecture/driver/gpio.hpp>
 
 namespace xpcc

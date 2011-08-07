@@ -1,0 +1,37 @@
+// coding: utf-8
+// $Id$
+
+/*!
+\page build_system SCons vs. Make
+
+This page should help to explain why we choose SCons as our main build system.
+
+\c make is the older and far more wide-spread tool to build software. If you do
+some programming, you almost certain have some kind of make installed on your
+Computer.
+
+
+But there is another side to that problem:
+While developing the software for our robot we don't have one big project but
+have to change between different small pojects. We use a about 10 to 30
+microcontrollers within the robot with at least three to four different types.
+So we have to make sure that every time we change to the next project, and
+something was change within the library, everything has to be rebuild for the
+new project as it might use a different microcontroller.
+
+This is a very weak point of make. It can't notize a change in the project
+configuration (and therefore the build parameters) and will rebuild A file
+only baseD on the date of source and object file. Therefore a manual
+'make clean && make all' step is nessesary in that case. This is not only very
+annoying but also very error-prone. In the worst case the build will run
+smoothly but the microcontroller will do weird stuff. In our previous build system
+we used make and ran into this problem quite often.
+
+This then became the main reason why we choose SCons and moved away from Make.
+SCons is capable to track which object file was build with which options and
+to rebuild it when the options change. This makes the manual 'make clean' step
+unnecessary and ensures that every object file is build for the correct
+microcontroller.
+
+
+*/

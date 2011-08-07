@@ -34,7 +34,7 @@
 #define	XPCC_ATOMIC__LOCK_HPP
 
 #include <stdint.h>
-#include <xpcc/architecture/platform.hpp>
+#include <xpcc/architecture/utils.hpp>
 
 namespace xpcc
 {
@@ -85,7 +85,11 @@ namespace xpcc
 			~Lock();
 		
 		private:
+#if defined(XPCC__CPU_AVR)
 			uint8_t sreg;
+#elif defined(XPCC__CPU_ARM)
+			uint32_t cpsr;
+#endif
 		};
 		
 		/**
@@ -118,12 +122,16 @@ namespace xpcc
 			~Unlock();
 		
 		private:
+#if defined(XPCC__CPU_AVR)
 			uint8_t sreg;
+#elif defined(XPCC__CPU_ARM)
+			uint32_t cpsr;
+#endif
 		};
 	}
 }
 
-#ifdef __AVR__
+#ifdef XPCC__CPU_AVR
 
 	#include <avr/interrupt.h>
 
@@ -153,6 +161,33 @@ namespace xpcc
 		__asm__ volatile ("" ::: "memory");
 	}
 
+#elif defined(XPCC__CPU_ARM7TDMI)
+	
+	// These functions are defined in "interrupt.S"
+	extern "C" uint32_t _disable_interrupt(void);
+	extern "C" uint32_t _enable_interrupt(void);
+	extern "C" void _restore_interrupt(uint32_t cpsr);
+	
+	xpcc::atomic::Lock::Lock() :
+		cpsr(_disable_interrupt())
+	{
+	}
+	
+	xpcc::atomic::Lock::~Lock()
+	{
+		_restore_interrupt(cpsr);
+	}
+	
+	xpcc::atomic::Unlock::Unlock() :
+		cpsr(_enable_interrupt())
+	{
+	}
+	
+	xpcc::atomic::Unlock::~Unlock()
+	{
+		_restore_interrupt(cpsr);
+	}
+	
 #else
 
 	// TODO: usefull implementation for any non AVR targets

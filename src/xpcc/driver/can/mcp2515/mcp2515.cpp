@@ -37,7 +37,7 @@ namespace xpcc
 {
 	namespace mcp2515
 	{
-		FLASH(uint8_t configuration[24]) =
+		FLASH_STORAGE(uint8_t configuration[24]) =
 		{
 #if MCP2515_CLOCK == 16000000
 

@@ -35,7 +35,7 @@
 
 #include <cstddef>
 #include <stdint.h>
-#include <xpcc/architecture/platform.hpp>
+#include <xpcc/architecture/utils.hpp>
 #include <xpcc/architecture/driver/accessor.hpp>
 
 namespace xpcc

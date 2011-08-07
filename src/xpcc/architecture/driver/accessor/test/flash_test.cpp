@@ -34,7 +34,7 @@
 
 #include "flash_test.hpp"
 
-FLASH(int intValue) = 12345;
+FLASH_STORAGE(int intValue) = 12345;
 
 void
 FlashTest::testIntegerAccess()
@@ -44,7 +44,7 @@ FlashTest::testIntegerAccess()
 	TEST_ASSERT_EQUALS(*intPointer, 12345);
 }	
 
-FLASH_STRING(stringValue) = "Hallo Welt!";
+FLASH_STORAGE_STRING(stringValue) = "Hallo Welt!";
 
 void
 FlashTest::testStringAccess()

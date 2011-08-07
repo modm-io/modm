@@ -33,7 +33,9 @@
 #ifndef XPCC__ARITHMETIC_TRAITS_HPP
 #define XPCC__ARITHMETIC_TRAITS_HPP
 
-#include <xpcc/architecture/platform.hpp>
+#include <stdint.h>
+
+#include <xpcc/architecture/utils.hpp>
 #include <xpcc/utils/template_metaprogramming.hpp>
 
 namespace xpcc

@@ -33,7 +33,7 @@
 #ifndef XPCC__SOFTWARE_I2C_HPP
 #define XPCC__SOFTWARE_I2C_HPP
 
-#include <xpcc/architecture/driver/time.hpp>
+#include <xpcc/architecture/driver/delay.hpp>
 #include "interface.hpp"
 
 namespace xpcc

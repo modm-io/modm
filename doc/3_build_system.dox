@@ -14,7 +14,9 @@ It is Open Source software using Python scripts as configuration files. The
 SConstruct files are the equivalent of Makefiles, they define the targets
 that SCons will create during the build process.
 
-For more information go to the official website: http://www.scons.org/
+For more details see on SCons see:
+- SCons documentation: http://www.scons.org/documentation.php
+- Good Overview: http://www.humanized.com/presentations/scons/ 
 
 \section usage Usage of the build system
 

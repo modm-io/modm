@@ -38,7 +38,7 @@
 
 namespace xpcc {
 	namespace st7036 {
-		EXTERN_FLASH(uint8_t configuration[10]);
+		EXTERN_FLASH_STORAGE(uint8_t configuration[10]);
 	}
 }
 

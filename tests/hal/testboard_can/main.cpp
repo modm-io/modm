@@ -18,7 +18,7 @@ using namespace xpcc;
 GPIO__OUTPUT(Cs, B, 2);
 GPIO__INPUT(Int, B, 1);
 
-FLASH(uint8_t filter[]) = 
+FLASH_STORAGE(uint8_t filter[]) = 
 {
 	MCP2515_FILTER(100),	// Filter 0
 	MCP2515_FILTER(100),	// Filter 1

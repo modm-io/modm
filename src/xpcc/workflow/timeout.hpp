@@ -33,7 +33,7 @@
 #ifndef XPCC__TIMEOUT_HPP
 #define XPCC__TIMEOUT_HPP
 
-#include <xpcc/architecture/driver/time/clock.hpp>
+#include <xpcc/architecture/driver/clock.hpp>
 
 #include "timestamp.hpp"
 
@@ -101,11 +101,14 @@ namespace xpcc
 		restart(Timestamp time);
 		
 	private:
-		Timestamp endTime;
-		enum {
+		enum State
+		{
 			ACTIVE,
 			EXPIRED
-		} state;
+		};
+		
+		Timestamp endTime;
+		State state;
 	};
 }
 

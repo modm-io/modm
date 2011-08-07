@@ -51,6 +51,8 @@ namespace xpcc
 	 * with Din = 0..4095 and G = 1..2
 	 * 
 	 * \see		<a href="http://ww1.microchip.com/downloads/en/devicedoc/21897a.pdf">Datasheet</a>
+	 * 
+	 * \ingroup	driver
 	 * \author	Fabian Greif
 	 */
 	template <typename Spi, typename Cs, typename Ldac>
