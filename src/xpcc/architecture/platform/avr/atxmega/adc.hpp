@@ -87,7 +87,7 @@
  *     myChannel::setDifferentialMode(ADC_CH_MUXPOS_PIN4_gc, ADC_CH_MUXNEG_PIN3_gc);
  *     
  *     // The result is always unsigned, so you want to cast it in signed mode
- *     int16_t result = (int16_t) myChannel::read();
+ *     int16_t result = static_cast<int16_t>(myChannel::read());
  *     ...
  * }
  * \endcode

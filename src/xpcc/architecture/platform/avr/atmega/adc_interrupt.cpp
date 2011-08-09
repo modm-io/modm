@@ -1,6 +1,6 @@
 // coding: utf-8
 // ----------------------------------------------------------------------------
-/* Copyright (c) 2009, Roboterclub Aachen e.V.
+/* Copyright (c) 2011, Roboterclub Aachen e.V.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -30,65 +30,40 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <avr/io.h>
+#include <avr/interrupt.h>
+#include "adc_interrupt.hpp"
 
-#include "adc.hpp"
+xpcc::AdcInterrupt::F xpcc::AdcInterrupt::conversionComplete=xpcc::dummy;
 
-// ----------------------------------------------------------------------------
 void
-xpcc::atmega::Adc::initialize(Reference referenceVoltage, Prescaler prescaler)
+xpcc::AdcInterrupt::setAutoTriggerSource(uint8_t source)
 {
-	ADMUX = referenceVoltage & 0xc0;
-	ADCSRA = (1 << ADEN) | (prescaler & 0x07);
+	ADCSRB = source;
 }
 
-uint8_t
-xpcc::Adc::getChannel()
-{	
-	return ADMUX & 0x0f;
-}
-
-// ----------------------------------------------------------------------------
-uint16_t
-xpcc::atmega::Adc::readChannel(uint8_t channel)
+void
+xpcc::AdcInterrupt::setAutoTrigger(bool enable)
 {
-	if (channel > 8)
-		return 0;
-	
-	startConversion(channel);
-	
-	while (!isFinished()) {
-		// wait until the conversion is finished
+	if (enable) {
+		ADCSRA |= (1 << ADATE);
 	}
-	
-	return getValue();
+	else {
+		ADCSRA &= ~(1 << ADATE);
+	}
 }
 
-// ----------------------------------------------------------------------------
 void
-xpcc::atmega::Adc::startConversion(uint8_t channel)
+xpcc::AdcInterrupt::setChannel(uint8_t channel)
 {
 	if (channel > 8)
 		return;
 	
 	// select channel
 	ADMUX = (ADMUX & 0xe0) | channel;
-	
-	// clear interrupt flag
-	ADCSRA |= (1 << ADIF);
-	
-	// start conversion
-	ADCSRA |= (1 << ADSC);
 }
 
-bool
-xpcc::atmega::Adc::isFinished()
+ISR(ADC_vect)
 {
-	return (ADCSRA & (1 << ADIF));
+	xpcc::AdcInterrupt::conversionComplete();
 }
 
-uint16_t
-xpcc::atmega::Adc::getValue()
-{
-	return ADC;
-}

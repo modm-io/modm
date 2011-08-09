@@ -119,6 +119,10 @@ namespace xpcc
 			static uint16_t
 			readChannel(uint8_t channel);
 			
+			/// Read the MUX value
+			static uint8_t
+			getChannel();
+			
 			/// Start a new conversion
 			static void
 			startConversion(uint8_t channel);

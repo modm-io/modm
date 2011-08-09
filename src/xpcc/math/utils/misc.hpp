@@ -86,6 +86,7 @@ namespace xpcc
 	template <int B, int N>
 	class Pow
 	{
+	public:
 		enum { value = B * Pow<B, N - 1>::value };
 	};
 	
@@ -94,6 +95,7 @@ namespace xpcc
 	template <int B>
 	class Pow<B, 0>
 	{
+	public:
 		enum { value = 1 };
 	};
 }

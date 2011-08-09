@@ -1,6 +1,6 @@
 // coding: utf-8
 // ----------------------------------------------------------------------------
-/* Copyright (c) 2009, Roboterclub Aachen e.V.
+/* Copyright (c) 2011, Roboterclub Aachen e.V.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -30,65 +30,47 @@
  */
 // ----------------------------------------------------------------------------
 
+
+#ifndef XPCC__ATMEGA_ADC_INTERRUPT_HPP
+#define XPCC__ATMEGA_ADC_INTERRUPT_HPP
+
 #include <avr/io.h>
+#include <stdint.h>
+#include <xpcc/utils/dummy.hpp>
 
 #include "adc.hpp"
 
-// ----------------------------------------------------------------------------
-void
-xpcc::atmega::Adc::initialize(Reference referenceVoltage, Prescaler prescaler)
+namespace xpcc
 {
-	ADMUX = referenceVoltage & 0xc0;
-	ADCSRA = (1 << ADEN) | (prescaler & 0x07);
+	/**
+	 * \brief		ADC Interrupt Module
+	 *
+	 * \author		Niklas Hauser
+	 * \ingroup		atmega
+	 */
+	class AdcInterrupt : public Adc
+	{
+	public:
+		typedef void (*F) ();
+		
+		inline static void
+		setAutoTriggerSource(uint8_t source);
+		
+		inline static void
+		setAutoTrigger(bool enable);
+		
+		inline static void
+		setChannel(uint8_t channel);
+		
+		inline static void
+		attachConversionCompleteInterrupt(F function=xpcc::dummy)
+		{
+			conversionComplete = function;
+		}
+		
+	public:
+		static F conversionComplete;
+	};
 }
 
-uint8_t
-xpcc::Adc::getChannel()
-{	
-	return ADMUX & 0x0f;
-}
-
-// ----------------------------------------------------------------------------
-uint16_t
-xpcc::atmega::Adc::readChannel(uint8_t channel)
-{
-	if (channel > 8)
-		return 0;
-	
-	startConversion(channel);
-	
-	while (!isFinished()) {
-		// wait until the conversion is finished
-	}
-	
-	return getValue();
-}
-
-// ----------------------------------------------------------------------------
-void
-xpcc::atmega::Adc::startConversion(uint8_t channel)
-{
-	if (channel > 8)
-		return;
-	
-	// select channel
-	ADMUX = (ADMUX & 0xe0) | channel;
-	
-	// clear interrupt flag
-	ADCSRA |= (1 << ADIF);
-	
-	// start conversion
-	ADCSRA |= (1 << ADSC);
-}
-
-bool
-xpcc::atmega::Adc::isFinished()
-{
-	return (ADCSRA & (1 << ADIF));
-}
-
-uint16_t
-xpcc::atmega::Adc::getValue()
-{
-	return ADC;
-}
+#endif // XPCC__ATMEGA_ADC_INTERRUPT_HPP
