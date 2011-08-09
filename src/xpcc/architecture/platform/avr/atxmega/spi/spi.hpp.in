@@ -27,11 +27,6 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 // ----------------------------------------------------------------------------
-/*
- * WARNING: This file is generated automatically, do not edit!
- * Please modify the corresponding *.in file instead and rebuild this file.
- */
-// ----------------------------------------------------------------------------
 {{ generation_block }}
 
 #ifndef XPCC_ATXMEGA__SPI_{{ id }}_HPP

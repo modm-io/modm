@@ -10,14 +10,23 @@
 #include <xpcc/driver/lcd/ea_dog.hpp>
 #include <xpcc/driver/lcd/font.hpp>
 
+#include <libmaple/flash.h>
+#include <libmaple/rcc.h>
+#include <libmaple/nvic.h>
+#include <libmaple/systick.h>
+#include <libmaple/gpio.h>
+#include <libmaple/adc.h>
+#include <libmaple/timer.h>
+#include <libmaple/usb/usb.h>
+
 // ----------------------------------------------------------------------------
-/*xpcc::at91::Debug debugUart(115200);
-xpcc::IODeviceWrapper<xpcc::at91::Debug> loggerDevice(debugUart); 
+xpcc::stm32::Usart2 debugUart(115200);
+xpcc::IODeviceWrapper<xpcc::stm32::Usart2> loggerDevice(debugUart); 
 
 xpcc::log::Logger xpcc::log::debug(loggerDevice); 
 xpcc::log::Logger xpcc::log::info(loggerDevice); 
 xpcc::log::Logger xpcc::log::warning(loggerDevice); 
-xpcc::log::Logger xpcc::log::error(loggerDevice);*/
+xpcc::log::Logger xpcc::log::error(loggerDevice);
 
 // ----------------------------------------------------------------------------
 GPIO__OUTPUT(LedStatInverted, C, 12);	// inverted, 0=on, 1=off
@@ -42,17 +51,19 @@ typedef xpcc::gpio::Invert<Button2Inverted> Button2;
 // Graphic LCD
 namespace lcd
 {
-	GPIO__OUTPUT(Sck, A, 5);
-	GPIO__INPUT(Miso, A, 6);
-	GPIO__OUTPUT(Mosi, A, 7);
+	//GPIO__OUTPUT(Sck, A, 5);
+	//GPIO__INPUT(Miso, A, 6);
+	//GPIO__OUTPUT(Mosi, A, 7);
 	
 	GPIO__OUTPUT(CS, C, 1);
 	GPIO__OUTPUT(A0, C, 3);
 	GPIO__OUTPUT(Reset, B, 5);
 }
 
-typedef xpcc::SoftwareSpi< lcd::Sck, lcd::Mosi, lcd::Miso, 1000000UL > SPI;
-xpcc::DogS102< SPI, lcd::CS, lcd::A0, lcd::Reset, false > display;
+//typedef xpcc::SoftwareSpi< lcd::Sck, lcd::Mosi, lcd::Miso, 10000000UL > Spi;
+typedef xpcc::stm32::Spi1 Spi;
+
+xpcc::DogS102< Spi, lcd::CS, lcd::A0, lcd::Reset, false > display;
 
 // GPIO Expander (uses the same SPI as the LCD)
 namespace gpio
@@ -61,14 +72,13 @@ namespace gpio
 	GPIO__INPUT(Int, C, 2);
 }
 
-xpcc::Mcp23s08< SPI, gpio::Cs, gpio::Int > gpioExpander;
+xpcc::Mcp23s08< Spi, gpio::Cs, gpio::Int > gpioExpander;
 
 // ----------------------------------------------------------------------------
 /*void
 pitHandler(void)
 {
 	xpcc::Clock::increment();
-	xpcc::at91::Pit::acknowledgeInterrupt();
 	
 	uint32_t status = 0;
 	if (Button1::read()) {
@@ -97,17 +107,13 @@ pitHandler(void)
 int
 main(void)
 {
-	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);
-	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB, ENABLE);
-	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOC, ENABLE);
-	
 	LedStat::setOutput(xpcc::gpio::HIGH);
 	Led1::setOutput(xpcc::gpio::LOW);
 	Led2::setOutput(xpcc::gpio::LOW);
 	
 	ButtonWakeUp::setInput();
-	Button1Inverted::configure(xpcc::stm32::INPUT, xpcc::stm32::PULLUP);
-	Button2Inverted::configure(xpcc::stm32::INPUT, xpcc::stm32::PULLUP);
+	Button1Inverted::setInput(xpcc::stm32::INPUT, xpcc::stm32::PULLUP);
+	Button2Inverted::setInput(xpcc::stm32::INPUT, xpcc::stm32::PULLUP);
 	
 	display.initialize();
 	
@@ -125,7 +131,7 @@ main(void)
 	gpioExpander.configure(0x7c, 0x7c);
 	gpioExpander.write(LED_GREEN | LCD_BL_GREEN);
 	
-	//XPCC_LOG_DEBUG << "STM32-P103 Board (extended)" << xpcc::endl;
+	XPCC_LOG_DEBUG << "STM32-P103 Board (extended)" << xpcc::endl;
 	
 	LedStat::reset();
 	

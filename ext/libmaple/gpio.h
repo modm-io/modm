@@ -100,19 +100,26 @@ extern gpio_dev* const GPIOG;
 
 /** GPIO port A register map base pointer */
 #define GPIOA_BASE                      ((struct gpio_reg_map*)0x40010800)
+#define GPIOA_BASE_ADDR                 (0x40010800)
 /** GPIO port B register map base pointer */
 #define GPIOB_BASE                      ((struct gpio_reg_map*)0x40010C00)
+#define GPIOB_BASE_ADDR                 (0x40010C00)
 /** GPIO port C register map base pointer */
 #define GPIOC_BASE                      ((struct gpio_reg_map*)0x40011000)
+#define GPIOC_BASE_ADDR                 (0x40011000)
 /** GPIO port D register map base pointer */
 #define GPIOD_BASE                      ((struct gpio_reg_map*)0x40011400)
+#define GPIOD_BASE_ADDR                 (0x40011400)
 #ifdef STM32_HIGH_DENSITY
 /** GPIO port E register map base pointer */
 #define GPIOE_BASE                      ((struct gpio_reg_map*)0x40011800)
+#define GPIOE_BASE_ADDR                 (0x40011800)
 /** GPIO port F register map base pointer */
 #define GPIOF_BASE                      ((struct gpio_reg_map*)0x40011C00)
+#define GPIOF_BASE_ADDR                 (0x40011C00)
 /** GPIO port G register map base pointer */
 #define GPIOG_BASE                      ((struct gpio_reg_map*)0x40012000)
+#define GPIOG_BASE_ADDR                 (0x40012000)
 #endif
 
 /*

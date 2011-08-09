@@ -32,6 +32,8 @@
 #ifndef _FLASH_H_
 #define _FLASH_H_
 
+#include "libmaple_types.h"
+
 #ifdef __cplusplus
 extern "C"{
 #endif

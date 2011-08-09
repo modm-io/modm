@@ -29,10 +29,9 @@
 // ----------------------------------------------------------------------------
 /*
  * WARNING: This file is generated automatically, do not edit!
- * Please modify the corresponding *.in file instead and rebuild this file.
+ * Please modify the corresponding *.in file instead and rebuild this file. 
  */
 // ----------------------------------------------------------------------------
-
 
 #ifndef XPCC_ATXMEGA__TIMER_F1_HPP
 #define XPCC_ATXMEGA__TIMER_F1_HPP

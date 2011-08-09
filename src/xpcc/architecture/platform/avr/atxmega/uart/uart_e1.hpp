@@ -27,7 +27,11 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 // ----------------------------------------------------------------------------
-
+/*
+ * WARNING: This file is generated automatically, do not edit!
+ * Please modify the corresponding *.in file instead and rebuild this file. 
+ */
+// ----------------------------------------------------------------------------
 
 #ifndef XPCC_ATXMEGA__UART_E1_HPP
 #define XPCC_ATXMEGA__UART_E1_HPP

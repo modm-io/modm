@@ -34,6 +34,12 @@ import time
 import re
 from SCons.Script import *
 
+generationBlockString = """/*
+ * WARNING: This file is generated automatically, do not edit!
+ * Please modify the corresponding *.in file instead and rebuild this file. 
+ */
+// ----------------------------------------------------------------------------"""
+
 # -----------------------------------------------------------------------------
 def template_action(target, source, env):
 	if not env.has_key('substitutions'):
@@ -61,6 +67,7 @@ def jinja2_template_action(target, source, env):
 	globals = {
 		'time': time.strftime("%d %b %Y, %H:%M:%S", time.localtime()),
 		'match': re.match,
+		'generation_block': generationBlockString,
 	}
 	
 	path, filename = os.path.split(source[0].path)

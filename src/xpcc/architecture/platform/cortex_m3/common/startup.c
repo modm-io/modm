@@ -35,123 +35,167 @@
 #include "xpcc_config.hpp"
 
 // TODO only for STM32
-#include <stm32f10x.h>
+#include <libmaple/flash.h>
+#include <libmaple/rcc.h>
+#include <libmaple/nvic.h>
+#include <libmaple/gpio.h>
+#include <libmaple/systick.h>
+
+#define SYSTICK_RELOAD_VAL		71999
 
 // ----------------------------------------------------------------------------
 void resetHandler(void);
-void ATTRIBUTE_WEAK nmiHandler(void);
-void ATTRIBUTE_WEAK hardfaultHandler(void);
+void ATTRIBUTE_WEAK __exc_nmi(void);
+void ATTRIBUTE_WEAK __exc_hardfault(void);
 
-void ATTRIBUTE_WEAK MemManage_Handler(void);
-void ATTRIBUTE_WEAK BusFault_Handler(void);
-void ATTRIBUTE_WEAK UsageFault_Handler(void);
-//mthomas void ATTRIBUTE_WEAK MemManage_Handler(void);
-void ATTRIBUTE_WEAK SVC_Handler(void);
-void ATTRIBUTE_WEAK DebugMon_Handler(void);
-void ATTRIBUTE_WEAK PendSV_Handler(void);
-void ATTRIBUTE_WEAK SysTick_Handler(void);
+void ATTRIBUTE_WEAK __exc_memmanage(void);
+void ATTRIBUTE_WEAK __exc_busfault(void);
+void ATTRIBUTE_WEAK __exc_usagefault(void);
+void ATTRIBUTE_WEAK __exc_svc(void);
+void ATTRIBUTE_WEAK __exc_debug_monitor(void);
+void ATTRIBUTE_WEAK __exc_pendsv(void);
+void ATTRIBUTE_WEAK __exc_systick(void);
 
-/* External Interrupts */
-void ATTRIBUTE_WEAK WWDG_IRQHandler(void);
-void ATTRIBUTE_WEAK PVD_IRQHandler(void);
-void ATTRIBUTE_WEAK TAMPER_IRQHandler(void);
-void ATTRIBUTE_WEAK RTC_IRQHandler(void);
-void ATTRIBUTE_WEAK FLASH_IRQHandler(void);
-void ATTRIBUTE_WEAK RCC_IRQHandler(void);
-void ATTRIBUTE_WEAK EXTI0_IRQHandler(void);
-void ATTRIBUTE_WEAK EXTI1_IRQHandler(void);
-void ATTRIBUTE_WEAK EXTI2_IRQHandler(void);
-void ATTRIBUTE_WEAK EXTI3_IRQHandler(void);
-void ATTRIBUTE_WEAK EXTI4_IRQHandler(void);
-void ATTRIBUTE_WEAK DMA1_Channel1_IRQHandler(void);
-void ATTRIBUTE_WEAK DMA1_Channel2_IRQHandler(void);
-void ATTRIBUTE_WEAK DMA1_Channel3_IRQHandler(void);
-void ATTRIBUTE_WEAK DMA1_Channel4_IRQHandler(void);
-void ATTRIBUTE_WEAK DMA1_Channel5_IRQHandler(void);
-void ATTRIBUTE_WEAK DMA1_Channel6_IRQHandler(void);
-void ATTRIBUTE_WEAK DMA1_Channel7_IRQHandler(void);
-void ATTRIBUTE_WEAK ADC1_2_IRQHandler(void);
-void ATTRIBUTE_WEAK USB_HP_CAN1_TX_IRQHandler(void);
-void ATTRIBUTE_WEAK USB_LP_CAN1_RX0_IRQHandler(void);
-void ATTRIBUTE_WEAK CAN1_RX1_IRQHandler(void);
-void ATTRIBUTE_WEAK CAN1_SCE_IRQHandler(void);
-void ATTRIBUTE_WEAK EXTI9_5_IRQHandler(void);
-void ATTRIBUTE_WEAK TIM1_BRK_IRQHandler(void);
-void ATTRIBUTE_WEAK TIM1_UP_IRQHandler(void);
-void ATTRIBUTE_WEAK TIM1_TRG_COM_IRQHandler(void);
-void ATTRIBUTE_WEAK TIM1_CC_IRQHandler(void);
-void ATTRIBUTE_WEAK TIM2_IRQHandler(void);
-void ATTRIBUTE_WEAK TIM3_IRQHandler(void);
-void ATTRIBUTE_WEAK TIM4_IRQHandler(void);
-void ATTRIBUTE_WEAK I2C1_EV_IRQHandler(void);
-void ATTRIBUTE_WEAK I2C1_ER_IRQHandler(void);
-void ATTRIBUTE_WEAK I2C2_EV_IRQHandler(void);
-void ATTRIBUTE_WEAK I2C2_ER_IRQHandler(void);
-void ATTRIBUTE_WEAK SPI1_IRQHandler(void);
-void ATTRIBUTE_WEAK SPI2_IRQHandler(void);
-void ATTRIBUTE_WEAK USART1_IRQHandler(void);
-void ATTRIBUTE_WEAK USART2_IRQHandler(void);
-void ATTRIBUTE_WEAK USART3_IRQHandler(void);
-void ATTRIBUTE_WEAK EXTI15_10_IRQHandler(void);
-void ATTRIBUTE_WEAK RTCAlarm_IRQHandler(void);
-void ATTRIBUTE_WEAK USBWakeUp_IRQHandler(void);
+/* Peripheral interrupts */
+/* Peripheral interrupts */
+void ATTRIBUTE_WEAK __irq_wwdg(void);
+void ATTRIBUTE_WEAK __irq_pvd(void);
+void ATTRIBUTE_WEAK __irq_tamper(void);
+void ATTRIBUTE_WEAK __irq_rtc(void);
+void ATTRIBUTE_WEAK __irq_flash(void);
+void ATTRIBUTE_WEAK __irq_rcc(void);
+void ATTRIBUTE_WEAK __irq_exti0(void);
+void ATTRIBUTE_WEAK __irq_exti1(void);
+void ATTRIBUTE_WEAK __irq_exti2(void);
+void ATTRIBUTE_WEAK __irq_exti3(void);
+void ATTRIBUTE_WEAK __irq_exti4(void);
+void ATTRIBUTE_WEAK __irq_dma1_channel1(void);
+void ATTRIBUTE_WEAK __irq_dma1_channel2(void);
+void ATTRIBUTE_WEAK __irq_dma1_channel3(void);
+void ATTRIBUTE_WEAK __irq_dma1_channel4(void);
+void ATTRIBUTE_WEAK __irq_dma1_channel5(void);
+void ATTRIBUTE_WEAK __irq_dma1_channel6(void);
+void ATTRIBUTE_WEAK __irq_dma1_channel7(void);
+void ATTRIBUTE_WEAK __irq_adc(void);
+void ATTRIBUTE_WEAK __irq_usb_hp_can_tx(void);
+void ATTRIBUTE_WEAK __irq_usb_lp_can_rx0(void);
+void ATTRIBUTE_WEAK __irq_can_rx1(void);
+void ATTRIBUTE_WEAK __irq_can_sce(void);
+void ATTRIBUTE_WEAK __irq_exti9_5(void);
+void ATTRIBUTE_WEAK __irq_tim1_brk(void);
+void ATTRIBUTE_WEAK __irq_tim1_up(void);
+void ATTRIBUTE_WEAK __irq_tim1_trg_com(void);
+void ATTRIBUTE_WEAK __irq_tim1_cc(void);
+void ATTRIBUTE_WEAK __irq_tim2(void);
+void ATTRIBUTE_WEAK __irq_tim3(void);
+void ATTRIBUTE_WEAK __irq_tim4(void);
+void ATTRIBUTE_WEAK __irq_i2c1_ev(void);
+void ATTRIBUTE_WEAK __irq_i2c1_er(void);
+void ATTRIBUTE_WEAK __irq_i2c2_ev(void);
+void ATTRIBUTE_WEAK __irq_i2c2_er(void);
+void ATTRIBUTE_WEAK __irq_spi1(void);
+void ATTRIBUTE_WEAK __irq_spi2(void);
+void ATTRIBUTE_WEAK __irq_usart1(void);
+void ATTRIBUTE_WEAK __irq_usart2(void);
+void ATTRIBUTE_WEAK __irq_usart3(void);
+void ATTRIBUTE_WEAK __irq_exti15_10(void);
+void ATTRIBUTE_WEAK __irq_rtcalarm(void);
+void ATTRIBUTE_WEAK __irq_usbwakeup(void);
+#if defined (STM32_HIGH_DENSITY)
+void ATTRIBUTE_WEAK __irq_tim8_brk(void);
+void ATTRIBUTE_WEAK __irq_tim8_up(void);
+void ATTRIBUTE_WEAK __irq_tim8_trg_com(void);
+void ATTRIBUTE_WEAK __irq_tim8_cc(void);
+void ATTRIBUTE_WEAK __irq_adc3(void);
+void ATTRIBUTE_WEAK __irq_fsmc(void);
+void ATTRIBUTE_WEAK __irq_sdio(void);
+void ATTRIBUTE_WEAK __irq_tim5(void);
+void ATTRIBUTE_WEAK __irq_spi3(void);
+void ATTRIBUTE_WEAK __irq_uart4(void);
+void ATTRIBUTE_WEAK __irq_uart5(void);
+void ATTRIBUTE_WEAK __irq_tim6(void);
+void ATTRIBUTE_WEAK __irq_tim7(void);
+void ATTRIBUTE_WEAK __irq_dma2_channel1(void);
+void ATTRIBUTE_WEAK __irq_dma2_channel2(void);
+void ATTRIBUTE_WEAK __irq_dma2_channel3(void);
+void ATTRIBUTE_WEAK __irq_dma2_channel4_5(void);
+#endif
 
 /*
  * Provide weak aliases for each Exception handler to defaultHandler.
  * As they are weak aliases, any function with the same name will override
  * this definition.
  */
-#pragma weak MMI_Handler = defaultHandler
-#pragma weak MemManage_Handler = defaultHandler
-#pragma weak BusFault_Handler = defaultHandler
-#pragma weak UsageFault_Handler = defaultHandler
-#pragma weak SVC_Handler = defaultHandler
-#pragma weak DebugMon_Handler = defaultHandler
-#pragma weak PendSV_Handler = defaultHandler
-#pragma weak SysTick_Handler = defaultHandler
-#pragma weak WWDG_IRQHandler = defaultHandler
-#pragma weak PVD_IRQHandler = defaultHandler
-#pragma weak TAMPER_IRQHandler = defaultHandler
-#pragma weak RTC_IRQHandler = defaultHandler
-#pragma weak FLASH_IRQHandler = defaultHandler
-#pragma weak RCC_IRQHandler = defaultHandler
-#pragma weak EXTI0_IRQHandler = defaultHandler
-#pragma weak EXTI1_IRQHandler = defaultHandler
-#pragma weak EXTI2_IRQHandler = defaultHandler
-#pragma weak EXTI3_IRQHandler = defaultHandler
-#pragma weak EXTI4_IRQHandler = defaultHandler
-#pragma weak DMA1_Channel1_IRQHandler = defaultHandler
-#pragma weak DMA1_Channel2_IRQHandler = defaultHandler
-#pragma weak DMA1_Channel3_IRQHandler = defaultHandler
-#pragma weak DMA1_Channel4_IRQHandler = defaultHandler
-#pragma weak DMA1_Channel5_IRQHandler = defaultHandler
-#pragma weak DMA1_Channel6_IRQHandler = defaultHandler
-#pragma weak DMA1_Channel7_IRQHandler = defaultHandler
-#pragma weak ADC1_2_IRQHandler = defaultHandler
-#pragma weak USB_HP_CAN1_TX_IRQHandler = defaultHandler
-#pragma weak USB_LP_CAN1_RX0_IRQHandler = defaultHandler
-#pragma weak CAN1_RX1_IRQHandler = defaultHandler
-#pragma weak CAN1_SCE_IRQHandler = defaultHandler
-#pragma weak EXTI9_5_IRQHandler = defaultHandler
-#pragma weak TIM1_BRK_IRQHandler = defaultHandler
-#pragma weak TIM1_UP_IRQHandler = defaultHandler
-#pragma weak TIM1_TRG_COM_IRQHandler = defaultHandler
-#pragma weak TIM1_CC_IRQHandler = defaultHandler
-#pragma weak TIM2_IRQHandler = defaultHandler
-#pragma weak TIM3_IRQHandler = defaultHandler
-#pragma weak TIM4_IRQHandler = defaultHandler
-#pragma weak I2C1_EV_IRQHandler = defaultHandler
-#pragma weak I2C1_ER_IRQHandler = defaultHandler
-#pragma weak I2C2_EV_IRQHandler = defaultHandler
-#pragma weak I2C2_ER_IRQHandler = defaultHandler
-#pragma weak SPI1_IRQHandler = defaultHandler
-#pragma weak SPI2_IRQHandler = defaultHandler
-#pragma weak USART1_IRQHandler = defaultHandler
-#pragma weak USART2_IRQHandler = defaultHandler
-#pragma weak USART3_IRQHandler = defaultHandler
-#pragma weak EXTI15_10_IRQHandler = defaultHandler
-#pragma weak RTCAlarm_IRQHandler = defaultHandler
-#pragma weak USBWakeUp_IRQHandler = defaultHandler
+#pragma weak __exc_nmi = defaultHandler
+#pragma weak __exc_memmanage = defaultHandler
+#pragma weak __exc_busfault = defaultHandler
+#pragma weak __exc_usagefault = defaultHandler
+#pragma weak __exc_svc = defaultHandler
+#pragma weak __exc_debug_monitor = defaultHandler
+#pragma weak __exc_pendsv = defaultHandler
+#pragma weak __exc_systick = defaultHandler
+#pragma weak __irq_wwdg = defaultHandler
+#pragma weak __irq_pvd = defaultHandler
+#pragma weak __irq_tamper = defaultHandler
+#pragma weak __irq_rtc = defaultHandler
+#pragma weak __irq_flash = defaultHandler
+#pragma weak __irq_rcc = defaultHandler
+#pragma weak __irq_exti0 = defaultHandler
+#pragma weak __irq_exti1 = defaultHandler
+#pragma weak __irq_exti2 = defaultHandler
+#pragma weak __irq_exti3 = defaultHandler
+#pragma weak __irq_exti4 = defaultHandler
+#pragma weak __irq_dma1_channel1 = defaultHandler
+#pragma weak __irq_dma1_channel2 = defaultHandler
+#pragma weak __irq_dma1_channel3 = defaultHandler
+#pragma weak __irq_dma1_channel4 = defaultHandler
+#pragma weak __irq_dma1_channel5 = defaultHandler
+#pragma weak __irq_dma1_channel6 = defaultHandler
+#pragma weak __irq_dma1_channel7 = defaultHandler
+#pragma weak __irq_adc = defaultHandler
+#pragma weak __irq_usb_hp_can_tx = defaultHandler
+#pragma weak __irq_usb_lp_can_rx0 = defaultHandler
+#pragma weak __irq_can_rx1 = defaultHandler
+#pragma weak __irq_can_sce = defaultHandler
+#pragma weak __irq_exti9_5 = defaultHandler
+#pragma weak __irq_tim1_brk = defaultHandler
+#pragma weak __irq_tim1_up = defaultHandler
+#pragma weak __irq_tim1_trg_com = defaultHandler
+#pragma weak __irq_tim1_cc = defaultHandler
+#pragma weak __irq_tim2 = defaultHandler
+#pragma weak __irq_tim3 = defaultHandler
+#pragma weak __irq_tim4 = defaultHandler
+#pragma weak __irq_i2c1_ev = defaultHandler
+#pragma weak __irq_i2c1_er = defaultHandler
+#pragma weak __irq_i2c2_ev = defaultHandler
+#pragma weak __irq_i2c2_er = defaultHandler
+#pragma weak __irq_spi1 = defaultHandler
+#pragma weak __irq_spi2 = defaultHandler
+#pragma weak __irq_usart1 = defaultHandler
+#pragma weak __irq_usart2 = defaultHandler
+#pragma weak __irq_usart3 = defaultHandler
+#pragma weak __irq_exti15_10 = defaultHandler
+#pragma weak __irq_rtcalarm = defaultHandler
+#pragma weak __irq_usbwakeup = defaultHandler
+#if defined (STM32_HIGH_DENSITY)
+#pragma weak __irq_tim8_brk = defaultHandler
+#pragma weak __irq_tim8_up = defaultHandler
+#pragma weak __irq_tim8_trg_com = defaultHandler
+#pragma weak __irq_tim8_cc = defaultHandler
+#pragma weak __irq_adc3 = defaultHandler
+#pragma weak __irq_fsmc = defaultHandler
+#pragma weak __irq_sdio = defaultHandler
+#pragma weak __irq_tim5 = defaultHandler
+#pragma weak __irq_spi3 = defaultHandler
+#pragma weak __irq_uart4 = defaultHandler
+#pragma weak __irq_uart5 = defaultHandler
+#pragma weak __irq_tim6 = defaultHandler
+#pragma weak __irq_tim7 = defaultHandler
+#pragma weak __irq_dma2_channel1 = defaultHandler
+#pragma weak __irq_dma2_channel2 = defaultHandler
+#pragma weak __irq_dma2_channel3 = defaultHandler
+#pragma weak __irq_dma2_channel4_5 = defaultHandler
+#endif /* STM32_HIGH_DENSITY */
 
 // ----------------------------------------------------------------------------
 // Interrupt vectors
@@ -167,8 +211,8 @@ __attribute__ ((section(".reset"))) =
 {
 	(FunctionPointer) &__stack_end,			// stack pointer
 	resetHandler,			// code entry point
-	nmiHandler,			// NMI handler
-	hardfaultHandler		// hard fault handler
+	__exc_nmi,				// NMI handler
+	__exc_hardfault,		// hard fault handler
 };
 
 FunctionPointer ramVectors[] __attribute__ ((section(".vectors"))) =
@@ -178,74 +222,84 @@ FunctionPointer flashVectors[] __attribute__ ((section(".reset"))) =
 {
 	(FunctionPointer) &__stack_end,			// stack pointer
 	resetHandler,				// code entry point
-	nmiHandler,					// NMI handler
-	hardfaultHandler,			// hard fault handler
-	MemManage_Handler,          /* MPU Fault Handler */
-    BusFault_Handler,           /* Bus Fault Handler */
-    UsageFault_Handler,         /* Usage Fault Handler */
-    0,                          /* Reserved */
-    0,                          /* Reserved */
-    0,                          /* Reserved */
-    0,                          /* Reserved */
-    SVC_Handler,                /* SVCall Handler */
-    DebugMon_Handler,           /* Debug Monitor Handler */
-    0,                          /* Reserved */
-    PendSV_Handler,             /* PendSV Handler */
-    SysTick_Handler,            /* SysTick Handler */
-
-    /* External Interrupts */
-    WWDG_IRQHandler,            /* Window Watchdog */
-    PVD_IRQHandler,             /* PVD through EXTI Line detect */
-    TAMPER_IRQHandler,          /* Tamper */
-    RTC_IRQHandler,             /* RTC */
-    FLASH_IRQHandler,           /* Flash */
-    RCC_IRQHandler,             /* RCC */
-    EXTI0_IRQHandler,           /* EXTI Line 0 */
-    EXTI1_IRQHandler,           /* EXTI Line 1 */
-    EXTI2_IRQHandler,           /* EXTI Line 2 */
-    EXTI3_IRQHandler,           /* EXTI Line 3 */
-    EXTI4_IRQHandler,           /* EXTI Line 4 */
-    DMA1_Channel1_IRQHandler,   /* DMA1 Channel 1 */
-    DMA1_Channel2_IRQHandler,   /* DMA1 Channel 2 */
-    DMA1_Channel3_IRQHandler,   /* DMA1 Channel 3 */
-    DMA1_Channel4_IRQHandler,   /* DMA1 Channel 4 */
-    DMA1_Channel5_IRQHandler,   /* DMA1 Channel 5 */
-    DMA1_Channel6_IRQHandler,   /* DMA1 Channel 6 */
-    DMA1_Channel7_IRQHandler,   /* DMA1 Channel 7 */
-    ADC1_2_IRQHandler,          /* ADC1 & ADC2 */
-    USB_HP_CAN1_TX_IRQHandler,  /* USB High Priority or CAN1 TX */
-    USB_LP_CAN1_RX0_IRQHandler, /* USB Low  Priority or CAN1 RX0 */
-    CAN1_RX1_IRQHandler,        /* CAN1 RX1 */
-    CAN1_SCE_IRQHandler,        /* CAN1 SCE */
-    EXTI9_5_IRQHandler,         /* EXTI Line 9..5 */
-    TIM1_BRK_IRQHandler,        /* TIM1 Break */
-    TIM1_UP_IRQHandler,         /* TIM1 Update */
-    TIM1_TRG_COM_IRQHandler,    /* TIM1 Trigger and Commutation */
-    TIM1_CC_IRQHandler,         /* TIM1 Capture Compare */
-    TIM2_IRQHandler,            /* TIM2 */
-    TIM3_IRQHandler,            /* TIM3 */
-    TIM4_IRQHandler,            /* TIM4 */
-    I2C1_EV_IRQHandler,         /* I2C1 Event */
-    I2C1_ER_IRQHandler,         /* I2C1 Error */
-    I2C2_EV_IRQHandler,         /* I2C2 Event */
-    I2C2_ER_IRQHandler,         /* I2C2 Error */
-    SPI1_IRQHandler,            /* SPI1 */
-    SPI2_IRQHandler,            /* SPI2 */
-    USART1_IRQHandler,          /* USART1 */
-    USART2_IRQHandler,          /* USART2 */
-    USART3_IRQHandler,          /* USART3 */
-    EXTI15_10_IRQHandler,       /* EXTI Line 15..10 */
-    RTCAlarm_IRQHandler,        /* RTC Alarm through EXTI Line */
-    USBWakeUp_IRQHandler,       /* USB Wakeup from suspend */
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    (FunctionPointer) 0xF108F85F	/* TODO: @0x108. This is for boot in RAM mode for
-										STM32F10x Medium Density devices. */
+	__exc_nmi,					// NMI handler
+	__exc_hardfault,			// hard fault handler
+	__exc_memmanage,          /* MPU Fault Handler */
+	__exc_busfault,           /* Bus Fault Handler */
+	__exc_usagefault,         /* Usage Fault Handler */
+	0,                          /* Reserved */
+	0,                          /* Reserved */
+	0,                          /* Reserved */
+	0,                          /* Reserved */
+	__exc_svc,                /* SVCall Handler */
+	__exc_debug_monitor,           /* Debug Monitor Handler */
+	0,                          /* Reserved */
+	__exc_pendsv,             /* PendSV Handler */
+	__exc_systick,            /* SysTick Handler */
+	/* Peripheral interrupts */
+	__irq_wwdg,            /* Window Watchdog */
+	__irq_pvd,             /* PVD through EXTI Line detect */
+	__irq_tamper,          /* Tamper */
+	__irq_rtc,             /* RTC */
+	__irq_flash,           /* Flash */
+	__irq_rcc,             /* RCC */
+	__irq_exti0,           /* EXTI Line 0 */
+	__irq_exti1,           /* EXTI Line 1 */
+	__irq_exti2,           /* EXTI Line 2 */
+	__irq_exti3,           /* EXTI Line 3 */
+	__irq_exti4,           /* EXTI Line 4 */
+	__irq_dma1_channel1,   /* DMA1 Channel 1 */
+	__irq_dma1_channel2,   /* DMA1 Channel 2 */
+	__irq_dma1_channel3,   /* DMA1 Channel 3 */
+	__irq_dma1_channel4,   /* DMA1 Channel 4 */
+	__irq_dma1_channel5,   /* DMA1 Channel 5 */
+	__irq_dma1_channel6,   /* DMA1 Channel 6 */
+	__irq_dma1_channel7,   /* DMA1 Channel 7 */
+	__irq_adc,          /* ADC1 & ADC2 */
+	__irq_usb_hp_can_tx,  /* USB High Priority or CAN1 TX */
+	__irq_usb_lp_can_rx0, /* USB Low  Priority or CAN1 RX0 */
+	__irq_can_rx1,        /* CAN1 RX1 */
+	__irq_can_sce,        /* CAN1 SCE */
+	__irq_exti9_5,         /* EXTI Line 9..5 */
+	__irq_tim1_brk,        /* TIM1 Break */
+	__irq_tim1_up,         /* TIM1 Update */
+	__irq_tim1_trg_com,    /* TIM1 Trigger and Commutation */
+	__irq_tim1_cc,         /* TIM1 Capture Compare */
+	__irq_tim2,            /* TIM2 */
+	__irq_tim3,            /* TIM3 */
+	__irq_tim4,            /* TIM4 */
+	__irq_i2c1_ev,         /* I2C1 Event */
+	__irq_i2c1_er,         /* I2C1 Error */
+	__irq_i2c2_ev,         /* I2C2 Event */
+	__irq_i2c2_er,         /* I2C2 Error */
+	__irq_spi1,            /* SPI1 */
+	__irq_spi2,            /* SPI2 */
+	__irq_usart1,          /* USART1 */
+	__irq_usart2,          /* USART2 */
+	__irq_usart3,          /* USART3 */
+	__irq_exti15_10,       /* EXTI Line 15..10 */
+	__irq_rtcalarm,        /* RTC Alarm through EXTI Line */
+	__irq_usbwakeup,       /* USB Wakeup from suspend */
+#if defined (STM32_HIGH_DENSITY)
+	__irq_tim8_brk,
+	__irq_tim8_brk
+	__irq_tim8_up
+	__irq_tim8_trg_com
+	__irq_tim8_cc
+	__irq_adc3
+	__irq_fsmc
+	__irq_sdio
+	__irq_tim5
+	__irq_spi3
+	__irq_uart4
+	__irq_uart5
+	__irq_tim6
+	__irq_tim7
+	__irq_dma2_channel1
+	__irq_dma2_channel2
+	__irq_dma2_channel3
+	__irq_dma2_channel4_5
+#endif
 };
 
 // ----------------------------------------------------------------------------
@@ -268,6 +322,8 @@ main(void);
 // calls CTORS of static objects
 void
 __libc_init_array(void);
+
+extern void exit (int) __attribute__ ((noreturn, weak));
 
 // ----------------------------------------------------------------------------
 void
@@ -301,14 +357,36 @@ resetHandler(void)
 		*(dest++) = 0;
 	}
 	
+	// TODO only for STM32
+	// setup flash
+	flash_enable_prefetch();
+	flash_set_latency(FLASH_WAIT_STATE_2);
+	
+	// setup clocks
+	rcc_clk_init(RCC_CLKSRC_PLL, RCC_PLLSRC_HSE, RCC_PLLMUL_9);
+	rcc_set_prescaler(RCC_PRESCALER_AHB, RCC_AHB_SYSCLK_DIV_1);
+	rcc_set_prescaler(RCC_PRESCALER_APB1, RCC_APB1_HCLK_DIV_2);
+	rcc_set_prescaler(RCC_PRESCALER_APB2, RCC_APB2_HCLK_DIV_1);
+	
+	rcc_clk_enable(RCC_GPIOA);
+	rcc_clk_enable(RCC_GPIOB);
+	rcc_clk_enable(RCC_GPIOC);
+	
+	// setup NVIC
+	nvic_init(0x08000000, 0);
+	
+	systick_init(SYSTICK_RELOAD_VAL);
+	
+	gpio_init_all();
+	afio_init();
+	
 	// Call CTORS of static objects
 	__libc_init_array();
 	
-	// TODO only for STM32
-	//SystemInit();
-	
 	// Call the application's entry point
 	main();
+	
+	exit(1);
 	
 	while (1)
 	{

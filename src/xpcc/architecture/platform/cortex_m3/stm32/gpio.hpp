@@ -90,16 +90,16 @@ namespace xpcc
 		template<unsigned int P, unsigned char N, bool = (N >= 8)>
 		struct GpioMode {
 			ALWAYS_INLINE static void setMode(uint32_t m) {
-				reinterpret_cast<GPIO_TypeDef*> (P)->CRH &= ~(0xf << ((N - 8) * 4));
-				reinterpret_cast<GPIO_TypeDef*> (P)->CRH |= m << ((N - 8) * 4);
+				reinterpret_cast<gpio_reg_map*> (P)->CRH &= ~(0xf << ((N - 8) * 4));
+				reinterpret_cast<gpio_reg_map*> (P)->CRH |= m << ((N - 8) * 4);
 			}
 		};
 		
 		template<unsigned int P, unsigned char N>
 		struct GpioMode<P, N, false> {
 			ALWAYS_INLINE static void setMode(uint32_t m) {
-				reinterpret_cast<GPIO_TypeDef*> (P)->CRL &= ~(0xf << (N * 4));
-				reinterpret_cast<GPIO_TypeDef*> (P)->CRL |= m << (N * 4);
+				reinterpret_cast<gpio_reg_map*> (P)->CRL &= ~(0xf << (N * 4));
+				reinterpret_cast<gpio_reg_map*> (P)->CRL |= m << (N * 4);
 			}
 		};
 	}
@@ -114,36 +114,36 @@ namespace xpcc
 #define	GPIO__IO(name, port, pin) \
 	struct name { \
 		ALWAYS_INLINE static void \
-		configureOutput(::xpcc::stm32::OutputMode mode = ::xpcc::stm32::OUTPUT, \
+		setOutput(::xpcc::stm32::OutputMode mode, \
 				::xpcc::stm32::OutputType type = ::xpcc::stm32::PUSH_PULL, \
 				::xpcc::stm32::OutputSpeed speed = ::xpcc::stm32::SPEED_50MHZ) { \
 			uint32_t config = mode | type | speed; \
-			::xpcc::stm32::GpioMode<GPIO ## port ## _BASE, pin>::setMode(config); \
+			::xpcc::stm32::GpioMode<GPIO ## port ## _BASE_ADDR, pin>::setMode(config); \
 		} \
 		ALWAYS_INLINE static void setOutput() { configureOutput(); } \
 		ALWAYS_INLINE static void setOutput(bool status) { \
 			set(status); \
 			setOutput(); } \
 		ALWAYS_INLINE static void \
-		configureInput(::xpcc::stm32::InputMode mode, \
+		setInput(::xpcc::stm32::InputMode mode, \
 				::xpcc::stm32::InputType type = ::xpcc::stm32::FLOATING) { \
 			uint32_t config = 0; \
 			if (mode != ::xpcc::stm32::ANALOG) { \
 				config = (mode | type) & 0xc0; \
 				if (type == ::xpcc::stm32::PULLUP) { \
-					GPIO ## port->BSRR = (1 << pin); \
+					GPIO ## port ## _BASE->BSRR = (1 << pin); \
 				} else { \
-					GPIO ## port->BRR = (1 << pin); \
+					GPIO ## port ## _BASE->BRR = (1 << pin); \
 				} \
 			} \
-			::xpcc::stm32::GpioMode<GPIO ## port ## _BASE, pin>::setMode(config); \
+			::xpcc::stm32::GpioMode<GPIO ## port ## _BASE_ADDR, pin>::setMode(config); \
 		} \
-		ALWAYS_INLINE static void setInput() { configureInput(::xpcc::stm32::INPUT); } \
-		ALWAYS_INLINE static void set() { GPIO ## port->BSRR = (1 << pin); } \
-		ALWAYS_INLINE static void reset() { GPIO ## port->BRR = (1 << pin); } \
+		ALWAYS_INLINE static void setInput() { setInput(::xpcc::stm32::INPUT); } \
+		ALWAYS_INLINE static void set() { GPIO ## port ## _BASE->BSRR = (1 << pin); } \
+		ALWAYS_INLINE static void reset() { GPIO ## port ## _BASE->BRR = (1 << pin); } \
 		ALWAYS_INLINE static void toggle() { \
-			if (GPIO ## port->IDR & (1 << pin)) { reset(); } else { set(); } } \
-		ALWAYS_INLINE static bool read() { return (GPIO ## port->IDR & (1 << pin)); } \
+			if (GPIO ## port ## _BASE->IDR & (1 << pin)) { reset(); } else { set(); } } \
+		ALWAYS_INLINE static bool read() { return (GPIO ## port ## _BASE->IDR & (1 << pin)); } \
 		\
 		ALWAYS_INLINE static void \
 		set(bool status) { \
@@ -163,13 +163,13 @@ namespace xpcc
  * \code
  * GPIO__OUTPUT(Led, C, 12);
  * 
- * Led::configure(xpcc::stm32::OUTPUT);
- * Led::configure(xpcc::stm32::OUTPUT, xpcc::stm32::PUSH_PULL);
- * Led::configure(xpcc::stm32::OUTPUT, xpcc::stm32::PUSH_PULL, xpcc::stm32::SPEED_10MHZ);
- * Led::configure(xpcc::stm32::OUTPUT, xpcc::stm32::OPEN_DRAIN);
+ * Led::setOutput(xpcc::stm32::OUTPUT);
+ * Led::setOutput(xpcc::stm32::OUTPUT, xpcc::stm32::PUSH_PULL);
+ * Led::setOutput(xpcc::stm32::OUTPUT, xpcc::stm32::PUSH_PULL, xpcc::stm32::SPEED_10MHZ);
+ * Led::setOutput(xpcc::stm32::OUTPUT, xpcc::stm32::OPEN_DRAIN);
  * 
- * Led::configure(xpcc::stm32::ALTERNATE, xpcc::stm32::PUSH_PULL); 
- * Led::configure(xpcc::stm32::ALTERNATE, xpcc::stm32::OPEN_DRAIN);
+ * Led::setOutput(xpcc::stm32::ALTERNATE, xpcc::stm32::PUSH_PULL); 
+ * Led::setOutput(xpcc::stm32::ALTERNATE, xpcc::stm32::OPEN_DRAIN);
  * 
  * Led::set();
  * Led::reset();
@@ -181,21 +181,21 @@ namespace xpcc
  */
 #define	GPIO__OUTPUT(name, port, pin) \
 	struct name { \
-		ALWAYS_INLINE static void setOutput() { configure(::xpcc::stm32::OUTPUT); } \
+		ALWAYS_INLINE static void setOutput() { setOutput(::xpcc::stm32::OUTPUT); } \
 		ALWAYS_INLINE static void setOutput(bool status) { \
 			set(status); \
 			setOutput(); } \
 		ALWAYS_INLINE static void \
-		configure(::xpcc::stm32::OutputMode mode = ::xpcc::stm32::OUTPUT, \
+		setOutput(::xpcc::stm32::OutputMode mode, \
 				::xpcc::stm32::OutputType type = ::xpcc::stm32::PUSH_PULL, \
 				::xpcc::stm32::OutputSpeed speed = ::xpcc::stm32::SPEED_50MHZ) { \
 			uint32_t config = mode | type | speed; \
-			::xpcc::stm32::GpioMode<GPIO ## port ## _BASE, pin>::setMode(config); \
+			::xpcc::stm32::GpioMode<GPIO ## port ## _BASE_ADDR, pin>::setMode(config); \
 		} \
-		ALWAYS_INLINE static void set() { GPIO ## port->BSRR = (1 << pin); } \
-		ALWAYS_INLINE static void reset() { GPIO ## port->BRR = (1 << pin); } \
+		ALWAYS_INLINE static void set() { GPIO ## port ## _BASE->BSRR = (1 << pin); } \
+		ALWAYS_INLINE static void reset() { GPIO ## port ## _BASE->BRR = (1 << pin); } \
 		ALWAYS_INLINE static void toggle() { \
-			if (GPIO ## port->IDR & (1 << pin)) { reset(); } else { set(); } } \
+			if (GPIO ## port ## _BASE->IDR & (1 << pin)) { reset(); } else { set(); } } \
 		ALWAYS_INLINE static void \
 		set(bool status) { \
 			if (status) { \
@@ -214,10 +214,10 @@ namespace xpcc
  * \code
  * GPIO__INPUT(Button, A, 0);
  * 
- * Button::configure(xpcc::stm32::INPUT);
- * Button::configure(xpcc::stm32::INPUT, xpcc::stm32::PULLUP);
- * Button::configure(xpcc::stm32::INPUT, xpcc::stm32::PULLDOWN);
- * Button::configure(xpcc::stm32::ANALOG);
+ * Button::setInput(xpcc::stm32::INPUT);
+ * Button::setInput(xpcc::stm32::INPUT, xpcc::stm32::PULLUP);
+ * Button::setInput(xpcc::stm32::INPUT, xpcc::stm32::PULLDOWN);
+ * Button::setInput(xpcc::stm32::ANALOG);
  * 
  * if (Button::read()) {
  *     ...
@@ -229,21 +229,21 @@ namespace xpcc
 #define GPIO__INPUT(name, port, pin) \
 	struct name { \
 		ALWAYS_INLINE static void \
-		configure(::xpcc::stm32::InputMode mode, \
+		setInput(::xpcc::stm32::InputMode mode, \
 				::xpcc::stm32::InputType type = ::xpcc::stm32::FLOATING) { \
 			uint32_t config = 0; \
 			if (mode == ::xpcc::stm32::INPUT) { \
 				config = (mode | type) & 0xc; \
 				if (type == ::xpcc::stm32::PULLUP) { \
-					GPIO ## port->BSRR = (1 << pin); \
+					GPIO ## port ## _BASE->BSRR = (1 << pin); \
 				} else { \
-					GPIO ## port->BRR = (1 << pin); \
+					GPIO ## port ## _BASE->BRR = (1 << pin); \
 				} \
 			} \
-			::xpcc::stm32::GpioMode<GPIO ## port ## _BASE, pin>::setMode(config); \
+			::xpcc::stm32::GpioMode<GPIO ## port ## _BASE_ADDR, pin>::setMode(config); \
 		} \
-		ALWAYS_INLINE static void setInput() { configure(::xpcc::stm32::INPUT); } \
-		ALWAYS_INLINE static bool read() { return (GPIO ## port->IDR & (1 << pin)); } \
+		ALWAYS_INLINE static void setInput() { setInput(::xpcc::stm32::INPUT); } \
+		ALWAYS_INLINE static bool read() { return (GPIO ## port ## _BASE->IDR & (1 << pin)); } \
 	}
 
 #endif // XPCC_STM32__GPIO_HPP

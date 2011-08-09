@@ -27,7 +27,7 @@
 #ifndef _USB_H_
 #define _USB_H_
 
-#include "usb_lib.h"
+#include "usb_lib/usb_lib.h"
 #include "../libmaple.h"
 
 #ifdef __cplusplus

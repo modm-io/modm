@@ -45,7 +45,7 @@ buildIncludes = []
 globalIncludes = []
 
 # Add the STM32 Standard Peripheral Library
-if env['ARCHITECTURE'].startswith('cortex-m3/stm32f10'):
+if env['ARCHITECTURE'].startswith('cortex-m3/stm32f107'):
 	sourcePath += ['stm32f10x_lib']
 	globalIncludes += [
 		'ext/stm32f10x_lib/CMSIS/CM3/CoreSupport',

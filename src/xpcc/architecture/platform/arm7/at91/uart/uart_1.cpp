@@ -27,7 +27,11 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 // ----------------------------------------------------------------------------
-
+/*
+ * WARNING: This file is generated automatically, do not edit!
+ * Please modify the corresponding *.in file instead and rebuild this file. 
+ */
+// ----------------------------------------------------------------------------
 
 #include <xpcc/architecture/platform/arm7/at91.hpp>
 

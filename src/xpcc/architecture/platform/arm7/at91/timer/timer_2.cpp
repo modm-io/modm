@@ -32,7 +32,11 @@
  * Please modify the corresponding *.in file instead and rebuild this file.
  */
 // ----------------------------------------------------------------------------
-
+/*
+ * WARNING: This file is generated automatically, do not edit!
+ * Please modify the corresponding *.in file instead and rebuild this file. 
+ */
+// ----------------------------------------------------------------------------
 
 #include "../device.h"
 #include "timer_2.hpp"

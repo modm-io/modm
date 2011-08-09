@@ -100,6 +100,7 @@ def show_defines(env, alias="__show"):
 
 def xpcc_library(env, buildpath=None):
 	env.AppendUnique(CPPPATH = env['XPCC_LIBRARY_PATH'])
+	env.AppendUnique(CPPPATH = os.path.join(env['XPCC_ROOTPATH'], 'ext'))
 	
 	backup = env['XPCC_BUILDPATH'], env['XPCC_BASEPATH']
 	

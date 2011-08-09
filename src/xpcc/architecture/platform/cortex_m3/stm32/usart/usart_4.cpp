@@ -27,72 +27,81 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 // ----------------------------------------------------------------------------
-{{ generation_block }}
+/*
+ * WARNING: This file is generated automatically, do not edit!
+ * Please modify the corresponding *.in file instead and rebuild this file. 
+ */
+// ----------------------------------------------------------------------------
 
-#ifndef XPCC_STM32__UART_{{ id }}_HPP
-#define XPCC_STM32__UART_{{ id }}_HPP
+#include <libmaple/usart.h>
+#include "../gpio.hpp"
 
-#include <stdint.h>
+#include "../device.h"
 
-namespace xpcc
+#include "usart_4.hpp"
+
+#ifdef STM32F10X_HD
+
+namespace
 {
-	namespace stm32
-	{
-		/**
-		 * @brief		Universal synchronous/asynchronous receiver
-		 * 				transmitter (USART{{ id }})
-		 * 
-		 * Simple unbuffered implementation.
-		 * 
-		 * @ingroup		stm32
-		 */
-		class Uart{{ id }}
-		{
-		public:
-			Uart{{ id }}(uint32_t baudrate)
-			{
-				setBaudrate(baudrate);
-			}
-			
-			/**
-			 * \brief	Set baudrate
-			 * \param	baudrate	desired baud rate
-			 */
-			static void
-			setBaudrate(uint32_t baudrate);
-			
-			/**
-			 * \brief	Send a single byte
-			 */
-			static void
-			write(char data);
-			
-			/**
-			 * \brief	Write a string
-			 * 
-			 * The string musst end with \c '\\0'.
-			 */
-			static void
-			write(const char *string);
-			
-			/**
-			 * \brief	Read a single byte
-			 */
-			static bool
-			read(char& c);
-			
-			/**
-			 * \brief	Read a block of bytes
-			 * 
-			 * \param	*buffer	Pointer to a buffer big enough to storage \a n bytes
-			 * \param	n	Number of bytes to be read
-			 * 
-			 * \return	Number of bytes which could be read, maximal \a n
-			 */
-			static uint8_t
-			read(char *buffer, uint8_t n);
-		};
+	GPIO__OUTPUT(Txd, C, 10);
+	GPIO__INPUT(Rxd, C, 11);
+}
+
+// ----------------------------------------------------------------------------
+void
+xpcc::stm32::Usart4::setBaudrate(uint32_t baudrate)
+{
+	Txd::setOutput(xpcc::stm32::ALTERNATE, xpcc::stm32::PUSH_PULL);
+	Rxd::setInput(xpcc::stm32::INPUT, xpcc::stm32::FLOATING);
+	
+	usart_init(USART4);
+	usart_set_baud_rate(USART4, 36e6, baudrate);
+	usart_enable(USART4);
+}
+
+// ----------------------------------------------------------------------------
+void
+xpcc::stm32::Usart4::write(char data)
+{
+	usart_putc(USART4, data);
+}
+
+// ----------------------------------------------------------------------------
+void
+xpcc::stm32::Usart4::write(const char *s)
+{
+	char c;
+	while ((c = *s++)) {
+		write(c);
 	}
 }
 
-#endif // XPCC_STM32__UART_{{ id }}_HPP
+// ----------------------------------------------------------------------------
+bool
+xpcc::stm32::Usart4::read(char& c)
+{
+	if (usart_data_available(USART4))
+	{
+		c = usart_getc(USART4);
+		return true;
+	}
+	
+	return false;
+}
+
+// ----------------------------------------------------------------------------
+uint8_t
+xpcc::stm32::Usart4::read(char *buffer, uint8_t n)
+{
+	for (uint8_t i = 0; i < n; ++i)
+	{
+		if (read(*buffer++)) {
+			return i;
+		}
+	}
+	
+	return n;
+}
+
+#endif
