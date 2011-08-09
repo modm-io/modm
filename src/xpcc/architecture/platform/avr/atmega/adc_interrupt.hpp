@@ -42,35 +42,38 @@
 
 namespace xpcc
 {
-	/**
-	 * \brief		ADC Interrupt Module
-	 *
-	 * \author		Niklas Hauser
-	 * \ingroup		atmega
-	 */
-	class AdcInterrupt : public Adc
+	namespace atmega
 	{
-	public:
-		typedef void (*F) ();
-		
-		inline static void
-		setAutoTriggerSource(uint8_t source);
-		
-		inline static void
-		setAutoTrigger(bool enable);
-		
-		inline static void
-		setChannel(uint8_t channel);
-		
-		inline static void
-		attachConversionCompleteInterrupt(F function=xpcc::dummy)
+		/**
+		 * \brief		ADC Interrupt Module
+		 *
+		 * \author		Niklas Hauser
+		 * \ingroup		atmega
+		 */
+		class AdcInterrupt : public Adc
 		{
-			conversionComplete = function;
-		}
-		
-	public:
-		static F conversionComplete;
-	};
+		public:
+			typedef void (*F) ();
+			
+			inline static void
+			setAutoTriggerSource(uint8_t source);
+			
+			inline static void
+			setAutoTrigger(bool enable);
+			
+			inline static void
+			setChannel(uint8_t channel);
+			
+			inline static void
+			attachConversionCompleteInterrupt(F function=xpcc::dummy)
+			{
+				conversionComplete = function;
+			}
+			
+		public:
+			static F conversionComplete;
+		};
+	}
 }
 
 #endif // XPCC__ATMEGA_ADC_INTERRUPT_HPP

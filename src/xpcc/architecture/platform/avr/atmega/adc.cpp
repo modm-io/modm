@@ -43,7 +43,7 @@ xpcc::atmega::Adc::initialize(Reference referenceVoltage, Prescaler prescaler)
 }
 
 uint8_t
-xpcc::Adc::getChannel()
+xpcc::atmega::Adc::getChannel()
 {	
 	return ADMUX & 0x0f;
 }

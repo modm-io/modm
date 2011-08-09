@@ -33,16 +33,16 @@
 #include <avr/interrupt.h>
 #include "adc_interrupt.hpp"
 
-xpcc::AdcInterrupt::F xpcc::AdcInterrupt::conversionComplete=xpcc::dummy;
+xpcc::atmega::AdcInterrupt::F xpcc::atmega::AdcInterrupt::conversionComplete=xpcc::dummy;
 
 void
-xpcc::AdcInterrupt::setAutoTriggerSource(uint8_t source)
+xpcc::atmega::AdcInterrupt::setAutoTriggerSource(uint8_t source)
 {
 	ADCSRB = source;
 }
 
 void
-xpcc::AdcInterrupt::setAutoTrigger(bool enable)
+xpcc::atmega::AdcInterrupt::setAutoTrigger(bool enable)
 {
 	if (enable) {
 		ADCSRA |= (1 << ADATE);
@@ -53,7 +53,7 @@ xpcc::AdcInterrupt::setAutoTrigger(bool enable)
 }
 
 void
-xpcc::AdcInterrupt::setChannel(uint8_t channel)
+xpcc::atmega::AdcInterrupt::setChannel(uint8_t channel)
 {
 	if (channel > 8)
 		return;
@@ -64,6 +64,6 @@ xpcc::AdcInterrupt::setChannel(uint8_t channel)
 
 ISR(ADC_vect)
 {
-	xpcc::AdcInterrupt::conversionComplete();
+	xpcc::atmega::AdcInterrupt::conversionComplete();
 }
 
