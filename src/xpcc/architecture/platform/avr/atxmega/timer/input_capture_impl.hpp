@@ -67,7 +67,7 @@ xpcc::atxmega::InputCapture<TIMER, PIN>::initialize(
 	}
 	
 	// configure the pin
-	pin.configure(pinConfig);
+	pin.setInput(pinConfig);
 	
 	// override input sense if neccessary
 	if (action == input_capture::FREQUENCY) {
