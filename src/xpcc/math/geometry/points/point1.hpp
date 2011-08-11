@@ -39,9 +39,13 @@
 namespace xpcc {
 	/**
 	 * \brief	Class for handling common point operations
+	 *
+	 * Adapted from the implementation of Gaspard Petit (gaspardpetit@gmail.com).
+	 *
+	 * \see <a href"http://www-etud.iro.umontreal.ca/~petitg/cpp/point.html">Homepage</a>
 	 * 
 	 * \ingroup	points
-	 * \author Gaspard Petit (gaspardpetit@gmail.com)
+	 * \author Niklas Hauser
 	 */
 	template<typename T>
 	class Point<T, 1>

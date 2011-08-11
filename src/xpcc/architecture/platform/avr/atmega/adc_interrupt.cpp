@@ -35,32 +35,6 @@
 
 xpcc::atmega::AdcInterrupt::F xpcc::atmega::AdcInterrupt::conversionComplete=xpcc::dummy;
 
-void
-xpcc::atmega::AdcInterrupt::setAutoTriggerSource(uint8_t source)
-{
-	ADCSRB = source;
-}
-
-void
-xpcc::atmega::AdcInterrupt::setAutoTrigger(bool enable)
-{
-	if (enable) {
-		ADCSRA |= (1 << ADATE);
-	}
-	else {
-		ADCSRA &= ~(1 << ADATE);
-	}
-}
-
-void
-xpcc::atmega::AdcInterrupt::setChannel(uint8_t channel)
-{
-	if (channel > 8)
-		return;
-	
-	// select channel
-	ADMUX = (ADMUX & 0xe0) | channel;
-}
 
 ISR(ADC_vect)
 {

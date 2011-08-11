@@ -118,6 +118,7 @@ namespace xpcc
 			
 			static TIMER timer;
 			static PIN pin;
+			
 			static register16_t* captureRegister;
 			static uint16_t capture;
 			static bool newData;

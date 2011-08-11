@@ -42,15 +42,16 @@ namespace xpcc
 	 * \brief	TMP102 digital temperature sensor driver
 	 *
 	 * The TMP102 is a digital temperature sensor with a two-wire interface
-	 * and measures temperature over a range of –40 deg C to +125 deg C with a
+	 * and measures temperature over a range of -40 to +125 deg Celsius with a
 	 * resolution of 1/16 (0.0625) deg C and an accuracy of up to 0.5 deg C.
 	 *
 	 * The sensor has a default refresh rate of 4Hz but can be raised up to
-	 * 30Hz by repeatedly manually starting a conversion, which lasts 26ms.
+	 * 30Hz by repeatedly manually starting a conversion (with 
+	 * startConversion()), which lasts 26ms.
 	 *
-	 * To convert the raw data into degrees Celcius, cast the MSB and LSB into
+	 * To convert the raw data into degrees Celsius, cast the MSB and LSB into
 	 * a signed 16bit integer, shift it right by 4 (or 3 in extended mode) and 
-	 * devide by 16 (or use the \c getTemperature method).
+	 * devide by 16 (or use the getTemperature() method).
 	 *
 	 * If you are only interested in the integer value of the temperature,
 	 * simply only use the MSB (getData()[0]) when not in extended mode.

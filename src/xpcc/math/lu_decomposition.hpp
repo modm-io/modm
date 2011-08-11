@@ -29,12 +29,6 @@
  * $Id$
  */
 // ----------------------------------------------------------------------------
-/**
- * \ingroup		math
- * \defgroup	matrix Matrix
- * \brief		Factorise a matrix A into an L(ower) and U(pper) matrix such that
- *		A = L*U or P*A = L*U where P is a pivot matrix (changes the row order).
- */
 
 #ifndef XPCC__LU_DECOMPOSITION_HPP
 #define XPCC__LU_DECOMPOSITION_HPP
@@ -48,9 +42,16 @@ namespace xpcc {
 
 	/**
 	 * \brief	Class for decomposing matrices
+	*
+	 * Factorise a matrix A into an L(ower) and U(pper) matrix such that
+	 * A = L*U or P*A = L*U where P is a pivot matrix (changes the row order).
+	 *
+	 * Adapted from the implementation of Gaspard Petit (gaspardpetit@gmail.com).
+	 *
+	 * \see <a href"http://www-etud.iro.umontreal.ca/~petitg/cpp/ludecomposition.html">Homepage</a>
 	 * 
 	 * \ingroup	matrix
-	 * \author Gaspard Petit (gaspardpetit@gmail.com)
+	 * \author Niklas Hauser
 	 */
 	class LUDecomposition
 	{

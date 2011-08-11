@@ -42,7 +42,6 @@
 #include <cmath>
 #include <stdint.h>
 #include <xpcc/io/iostream.hpp>
-#include <unittest/testsuite.hpp>
 
 //#def USE_MATRIXUTILS
 
@@ -50,9 +49,13 @@ namespace xpcc
 {
 	/**
 	 * \brief	Class for handling common matrix operations
+	 *
+	 * Adapted from the implementation of Gaspard Petit (gaspardpetit@gmail.com).
+	 *
+	 * \see <a href"http://www-etud.iro.umontreal.ca/~petitg/cpp/matrix.html">Homepage</a>
 	 * 
 	 * \ingroup	matrix
-	 * \author Gaspard Petit (gaspardpetit@gmail.com)
+	 * \author Niklas Hauser
 	 */
 	template<typename T, uint8_t WIDTH, uint8_t HEIGHT>
 	class Matrix

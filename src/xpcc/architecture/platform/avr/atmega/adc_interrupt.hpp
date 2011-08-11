@@ -47,24 +47,47 @@ namespace xpcc
 		/**
 		 * \brief		ADC Interrupt Module
 		 *
+ 		 * \ingroup		atmega
 		 * \author		Niklas Hauser
-		 * \ingroup		atmega
 		 */
 		class AdcInterrupt : public Adc
 		{
 		public:
 			typedef void (*F) ();
 			
-			inline static void
-			setAutoTriggerSource(uint8_t source);
+			static inline void
+			setAutoTriggerSource(uint8_t source)
+			{
+				ADCSRB = source;
+			}
 			
-			inline static void
-			setAutoTrigger(bool enable);
+			static inline void
+			setAutoTrigger(bool enable)
+			{
+				if (enable)
+					ADCSRA |= (1 << ADATE);
+				else
+					ADCSRA &= ~(1 << ADATE);
+			}
 			
-			inline static void
-			setChannel(uint8_t channel);
+			static inline void
+			setInterrupt(bool enable)
+			{
+				if (enable)
+					ADCSRA |= (1 << ADIE);
+				else
+					ADCSRA &= ~(1 << ADIE);
+			}
 			
-			inline static void
+			static inline void
+			setChannel(uint8_t channel)
+			{
+				if (channel > 8)
+					return;
+				ADMUX = (ADMUX & 0xe0) | channel;
+			}
+			
+			static inline void
 			attachConversionCompleteInterrupt(F function=xpcc::dummy)
 			{
 				conversionComplete = function;
