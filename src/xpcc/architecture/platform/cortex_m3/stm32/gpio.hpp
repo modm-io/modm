@@ -61,6 +61,9 @@ namespace xpcc
 			ANALOG = 0x0,
 		};
 		
+		/**
+		 * \ingroup	stm32
+		 */
 		enum InputType
 		{
 			FLOATING = 0x4,
@@ -68,18 +71,27 @@ namespace xpcc
 			PULLDOWN = 0x8,
 		};
 		
+		/**
+		 * \ingroup	stm32
+		 */
 		enum OutputMode
 		{
 			OUTPUT = 0x0,
 			ALTERNATE = 0x8,
 		};
 		
+		/**
+		 * \ingroup	stm32
+		 */
 		enum OutputType
 		{
 			PUSH_PULL = 0x0,
 			OPEN_DRAIN = 0x4,
 		};
 		
+		/**
+		 * \ingroup	stm32
+		 */
 		enum OutputSpeed
 		{
 			SPEED_2MHZ = 0x2,
@@ -87,6 +99,7 @@ namespace xpcc
 			SPEED_50MHZ = 0x3,
 		};
 		
+		/** \internal */
 		template<unsigned int P, unsigned char N, bool = (N >= 8)>
 		struct GpioMode {
 			ALWAYS_INLINE static void setMode(uint32_t m) {
@@ -95,6 +108,7 @@ namespace xpcc
 			}
 		};
 		
+		/** \internal */
 		template<unsigned int P, unsigned char N>
 		struct GpioMode<P, N, false> {
 			ALWAYS_INLINE static void setMode(uint32_t m) {

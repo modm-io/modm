@@ -33,9 +33,10 @@
 #include <avr/interrupt.h>
 #include "adc_interrupt.hpp"
 
-xpcc::atmega::AdcInterrupt::F xpcc::atmega::AdcInterrupt::conversionComplete=xpcc::dummy;
+// ----------------------------------------------------------------------------
+xpcc::atmega::AdcInterrupt::Function xpcc::atmega::AdcInterrupt::conversionComplete=xpcc::dummy;
 
-
+// ----------------------------------------------------------------------------
 ISR(ADC_vect)
 {
 	xpcc::atmega::AdcInterrupt::conversionComplete();

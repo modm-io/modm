@@ -53,8 +53,9 @@ namespace xpcc
 		class AdcInterrupt : public Adc
 		{
 		public:
-			typedef void (*F) ();
+			typedef void (*Function) ();
 			
+#ifdef ADCSRB
 			static inline void
 			setAutoTriggerSource(uint8_t source)
 			{
@@ -69,6 +70,7 @@ namespace xpcc
 				else
 					ADCSRA &= ~(1 << ADATE);
 			}
+#endif
 			
 			static inline void
 			setInterrupt(bool enable)
@@ -88,13 +90,13 @@ namespace xpcc
 			}
 			
 			static inline void
-			attachConversionCompleteInterrupt(F function=xpcc::dummy)
+			attachConversionCompleteInterrupt(Function function=xpcc::dummy)
 			{
 				conversionComplete = function;
 			}
 			
 		public:
-			static F conversionComplete;
+			static Function conversionComplete;
 		};
 	}
 }
