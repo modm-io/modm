@@ -43,7 +43,7 @@
  * transmit after a direct request by the master. They may signal an event by an
  * extra IO line, but this depends on the slave.
  * 
- * A complete example, explaining how to use this classes, is available in the
+ * A complete example, explaining how to use the classes, is available in the
  * \c example/apb folder.
  * 
  * \section apb_protocol Protocol
@@ -94,19 +94,27 @@
  * 
  * \section apb_electric	Electrical characteristics
  * 
- * Between different boards it uses EIA-422 electrical signaling characteristics
- * with two differential line pairs (full duplex operation) in a multi-drop
- * configuration. Meaning it does not allow multiple drivers but only
- * multiple receivers.
+ * Between different boards CAN transceivers are used. Compared to RS485 the
+ * CAN transeivers have to advantage to work without a sperate direction input.
+ * You can just connected the transceiver directly to the UART of your
+ * microcontroller. 
  * 
- * Within a single PCB, standard digital levels are used (either 0-3,3V or 0-5V).
- * The idle state of a UART transmission line is high, standard TTL-AND gates
+ * \image html apb_external.png
+ * 
+ * Within a single PCB, standard digital levels are used (either 0-3,3V or 0-5V)
+ * in a multi-drop configuration. Meaning it does not allow multiple drivers but
+ * multiple receivers.
+ * The idle state of a UART transmission line is high, so standard TTL-AND gates
  * have to be used for bundling transmission lines from multiple slaves.
  * 
- * \image html img/apb_internal.png
+ * \image html apb_internal.png
+ * 
+ * Both approches can be combined to reduce the number of needed CAN
+ * transceivers on a single board. Between two boards you should always use
+ * transceivers and therefore differential signaling to improve noise immunity.
  * 
  * The signal lines to indicate events by the slave are strict optional, you may
- * or may not use them if the slave provides them.
+ * or may not use them (if the slave provides them).
  * 
  * \author	Fabian Greif
  */

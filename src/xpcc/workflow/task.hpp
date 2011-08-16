@@ -42,7 +42,7 @@ namespace xpcc
 	 * and starts execution. It is not declared here because the task may need
 	 * some specific information which should be passed as a parameter.
 	 * 
-	 * \ingroup	workflow
+	 * \ingroup	utils
 	 * \author	Fabian Greif
 	 */
 	class Task

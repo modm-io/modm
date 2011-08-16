@@ -35,7 +35,7 @@
 #include "protothread_test.hpp"
 
 // ----------------------------------------------------------------------------
-class TestingEmptyThread : public xpcc::Protothread
+class TestingEmptyThread : public xpcc::pt::Protothread
 {
 public:
 	bool
@@ -64,7 +64,7 @@ ProtothreadTest::testClassMethods()
 }
 
 // ----------------------------------------------------------------------------
-class TestingChildThread : public xpcc::Protothread
+class TestingChildThread : public xpcc::pt::Protothread
 {
 public:
 	TestingChildThread() :
@@ -90,7 +90,7 @@ public:
 	bool condition;
 };
 
-class TestingThread : public xpcc::Protothread
+class TestingThread : public xpcc::pt::Protothread
 {
 public:
 	TestingThread() :
@@ -206,7 +206,7 @@ ProtothreadTest::testMacros()
 }
 
 // ----------------------------------------------------------------------------
-class TestingThreadRestart : public xpcc::Protothread
+class TestingThreadRestart : public xpcc::pt::Protothread
 {
 public:
 	TestingThreadRestart() :

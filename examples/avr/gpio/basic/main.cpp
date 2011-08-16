@@ -3,16 +3,16 @@
 #include <xpcc/architecture.hpp>
 
 // create a wrapper for a output pin
-GPIO__OUTPUT(LED, B, 0);
-GPIO__OUTPUT(LED2, B, 1);
+GPIO__OUTPUT(Led, B, 0);
+GPIO__OUTPUT(Led2, B, 1);
 
-typedef xpcc::gpio::Invert< LED2 > LedInverted;
+typedef xpcc::gpio::Invert< Led2 > LedInverted;
 
 int
 main(void)
 {
-	LED::setOutput();
-	LED::set();
+	Led::setOutput();
+	Led::set();
 	
 	LedInverted::setOutput();
 	LedInverted::reset();

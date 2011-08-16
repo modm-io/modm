@@ -34,7 +34,7 @@
 #define XPCC_APB__MASTER_HPP
 
 #include <stdint.h>
-#include <xpcc/workflow/timeout.hpp>
+#include <xpcc/utils/timeout.hpp>
 
 #include "interface.hpp"
 

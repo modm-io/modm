@@ -64,7 +64,7 @@ namespace xpcc
 	 * \include timeout/main.cpp
 	 * 
 	 * \author	Fabian Greif
-	 * \ingroup	workflow
+	 * \ingroup	utils
 	 */
 	template<typename T = ::xpcc::Clock>
 	class Timeout

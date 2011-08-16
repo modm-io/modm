@@ -97,11 +97,23 @@ namespace xpcc
 			setBaudrateRegister(uint16_t ubrr);
 		};
 		
-		// ------------------------------------------------------------------------
+		// --------------------------------------------------------------------
 		/**
 		 * \brief	Buffered Uart
 		 * 
-		 * This implementation uses a ringbuffer.
+		 * This implementation uses a ringbuffer. The size of the ringbuffer
+		 * can be changed in the \c project.cfg file.
+		 * 
+		 * Just add add a value for UARTD1_TX_BUFFER_SIZE and/or 
+		 * UARTD1_RX_BUFFER_SIZE in the \c defines section. The size can
+		 * be any value between 1 and 254.
+		 * 
+		 * Example:
+		 * \code
+		 * [defines]
+		 * UARTD1_TX_BUFFER_SIZE = 20
+		 * UARTD1_RX_BUFFER_SIZE = 30
+		 * \endcode
 		 * 
 		 * \ingroup	atxmega_uart
 		 */
@@ -173,7 +185,7 @@ namespace xpcc
 			setBaudrateRegister(uint16_t ubrr, bool doubleSpeed);
 		};
 		
-		// ------------------------------------------------------------------------
+		// --------------------------------------------------------------------
 		/**
 		 * \brief		UARTD1 in SPI master mode
 		 * 

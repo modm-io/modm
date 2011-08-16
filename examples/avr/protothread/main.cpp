@@ -7,7 +7,7 @@
 GPIO__OUTPUT(LedGreen, B, 0);
 GPIO__OUTPUT(LedRed, B, 1);
 
-class BlinkingLightGreen : public xpcc::Protothread
+class BlinkingLightGreen : public xpcc::pt::Protothread
 {
 public:
 	bool
@@ -39,7 +39,7 @@ private:
 	xpcc::Timeout<> timer;
 };
 
-class BlinkingLightRed : public xpcc::Protothread
+class BlinkingLightRed : public xpcc::pt::Protothread
 {
 public:
 	bool

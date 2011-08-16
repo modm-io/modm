@@ -33,7 +33,7 @@
 #ifndef XPCC__PERIODIC_TIMER_HPP
 #define XPCC__PERIODIC_TIMER_HPP
 
-#include <xpcc/workflow/timeout.hpp>
+#include "timeout.hpp"
 
 namespace xpcc
 {
@@ -57,7 +57,7 @@ namespace xpcc
 	 * 
 	 * \see		Timeout
 	 * \author	Fabian Greif
-	 * \ingroup	workflow
+	 * \ingroup	utils
 	 */
 	template<typename T = ::xpcc::Clock>
 	class PeriodicTimer

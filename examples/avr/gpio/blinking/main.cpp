@@ -1,17 +1,17 @@
 
 #include <xpcc/architecture.hpp>
 
-GPIO__OUTPUT(LED, B, 0);
+GPIO__OUTPUT(Led, B, 0);
 
 int
 main(void)
 {
-	LED::setOutput();
-	LED::set();
+	Led::setOutput();
+	Led::set();
 	
 	while (1)
 	{
-		LED::toggle();
+		Led::toggle();
 		xpcc::delay_ms(500);
 	}
 }

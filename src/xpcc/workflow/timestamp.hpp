@@ -44,7 +44,7 @@ namespace xpcc
 	 * The timestap is calculated in milliseconds.
 	 *
 	 * \author	Fabian Greif
-	 * \ingroup	workflow
+	 * \ingroup	utils
 	 */ 
 	class Timestamp
 	{
