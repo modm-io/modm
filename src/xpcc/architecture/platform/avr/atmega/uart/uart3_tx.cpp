@@ -42,7 +42,7 @@
 #include "uart_defines.h"
 #include "xpcc_config.hpp"
 
-#ifdef ATMEGA_HAS_UART3
+#if defined USART3_UDRE_vect
 
 #include "uart3.hpp"
 
@@ -51,17 +51,17 @@ static xpcc::atomic::Queue<char, UART3_TX_BUFFER_SIZE> txBuffer;
 // ----------------------------------------------------------------------------
 // called when the UART is ready to transmit the next byte
 // 
-ISR(UART3_TRANSMIT_INTERRUPT)
+ISR(USART3_UDRE_vect)
 {
 	if (txBuffer.isEmpty())
 	{
 		// transmission finished, disable UDRE interrupt
-		UART3_CONTROL &= ~(1 << UART3_UDRIE);
+		UCSR3B &= ~(1 << UDRIE3);
 	}
 	else {
 		// get one byte from buffer and write it to the UART buffer
 		// which starts the transmission
-		UART3_DATA = txBuffer.get();
+		UDR3 = txBuffer.get();
 		txBuffer.pop();
 	}
 }
@@ -77,7 +77,7 @@ xpcc::atmega::BufferedUart3::write(char c)
 	atomic::Lock lock;
 	
 	// enable UDRE interrupt
-	UART3_CONTROL |= (1 << UART3_UDRIE);
+	UCSR3B |= (1 << UDRIE3);
 }
 
 // ----------------------------------------------------------------------------

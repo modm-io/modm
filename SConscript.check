@@ -1,0 +1,109 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+# 
+# Copyright (c) 2011, Roboterclub Aachen e.V.
+# All rights reserved.
+# 
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+# 
+#  * Redistributions of source code must retain the above copyright
+#    notice, this list of conditions and the following disclaimer.
+#  * Redistributions in binary form must reproduce the above copyright
+#    notice, this list of conditions and the following disclaimer in the
+#    documentation and/or other materials provided with the distribution.
+#  * Neither the name of the Roboterclub Aachen e.V. nor the
+#    names of its contributors may be used to endorse or promote products
+#    derived from this software without specific prior written permission.
+# 
+# THIS SOFTWARE IS PROVIDED BY ROBOTERCLUB AACHEN E.V. ''AS IS'' AND ANY
+# EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+# DISCLAIMED. IN NO EVENT SHALL ROBOTERCLUB AACHEN E.V. BE LIABLE FOR ANY
+# DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+# (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+# ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+# THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+# 
+# $Id$
+# -----------------------------------------------------------------------------
+
+import os
+import string
+
+Import('env')
+
+devices = [
+	{ 'path': 'release/tests/at91',		'arch': 'arm7tdmi',		'device': 'at91sam7s256',	'clock': 48054857 },
+#	{ 'path': 'release/tests/at91',		'arch': 'arm7tdmi',		'device': 'at91sam7x512',	'clock':  1000000 },
+	{ 'path': 'release/tests/atmega',	'arch': 'avr',			'device': 'atmega16',		'clock':  1000000 },
+	{ 'path': 'release/tests/atmega',	'arch': 'avr',			'device': 'atmega16a',		'clock':  1000000 },
+	{ 'path': 'release/tests/atmega',	'arch': 'avr',			'device': 'atmega644',		'clock':  1000000 },
+	{ 'path': 'release/tests/atmega',	'arch': 'avr',			'device': 'atmega8',		'clock':  1000000 },
+	{ 'path': 'release/tests/atmega',	'arch': 'avr',			'device': 'atmega168',		'clock':  1000000 },
+	{ 'path': 'release/tests/atmega',	'arch': 'avr',			'device': 'atmega328p',		'clock':  1000000 },
+	{ 'path': 'release/tests/atmega',	'arch': 'avr',			'device': 'atmega128',		'clock':  1000000 },
+	{ 'path': 'release/tests/atmega',	'arch': 'avr',			'device': 'atmega2561',		'clock':  1000000 },
+	{ 'path': 'release/tests/atmega',	'arch': 'avr',			'device': 'atmega2560',		'clock':  1000000 },
+	{ 'path': 'release/tests/atmega',	'arch': 'avr',			'device': 'at90can128',		'clock': 16000000 },
+	{ 'path': 'release/tests/attiny',	'arch': 'avr',			'device': 'attiny44',		'clock':  1000000 },
+	{ 'path': 'release/tests/attiny',	'arch': 'avr',			'device': 'attiny45',		'clock':  1000000 },
+	{ 'path': 'release/tests/attiny',	'arch': 'avr',			'device': 'attiny26',		'clock':  1000000 },
+	{ 'path': 'release/tests/attiny',	'arch': 'avr',			'device': 'attiny2313',		'clock':  1000000 },
+	{ 'path': 'release/tests/atxmega',	'arch': 'avr',			'device': 'atxmega128a1',	'clock':  1000000 },
+	{ 'path': 'release/tests/atxmega',	'arch': 'avr',			'device': 'atxmega192a3',	'clock':  1000000 },
+	{ 'path': 'release/tests/atxmega',	'arch': 'avr',			'device': 'atxmega32a4',	'clock':  1000000 },
+	{ 'path': 'release/tests/stm32',	'arch': 'cortex-m3',	'device': 'stm32f103rb',	'clock':  1000000 },
+#	{ 'path': 'release/tests/stm32',	'arch': 'cortex-m3',	'device': 'stm32f107vc',	'clock':  1000000 },
+]
+
+check = 'all' if 'check' in BUILD_TARGETS else ARGUMENTS.get('check')
+if check is not None:
+	result = []
+	everythingOk = True
+	
+	# Check that all examples compile without errors. The correct function of the
+	# examples is not checked!
+	if check in ['all', 'examples']:
+		result.append("Examples")
+		for path, directories, files in os.walk('examples'):
+			# exclude the SVN-directories
+			if '.svn' in directories:
+				directories.remove('.svn')
+		
+			if 'SConstruct' in files:
+				exitStatus = os.system("scons -Q -C %s build" % path)
+				result.append("check: %s -> %s" % (path, "Ok" if exitStatus == 0 else "FAIL!"))
+				
+				if exitStatus != 0:
+					everythingOk = False
+	
+	if check in ['all', 'devices']:
+		result.append("\nDevices")
+		for device in devices:
+			path = device['path']
+			projectFile = os.path.join(path, 'project.cfg')
+			
+			output = string.Template(open('release/tests/project.cfg', 'r').read()).safe_substitute(device)
+			open(projectFile, 'w').write(output)
+			
+			exitStatus = os.system("scons -Q -C %s build" % path)
+			result.append("check: %s -> %s" % (device['device'], "Ok" if exitStatus == 0 else "FAIL!"))
+			
+			os.remove(projectFile)
+			
+			if exitStatus != 0:
+				everythingOk = False
+	
+	print "\nRESULTS:\n"
+	print '\n'.join(result)
+	if everythingOk:
+		print "\nOK!"
+		Exit(0)
+	else:
+		print "\nFAIL!"
+		Exit(1)
+
+env.Alias('check', None)

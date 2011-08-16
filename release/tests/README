@@ -1,0 +1,7 @@
+
+To make sure that the library is at least compiling for all supported
+microcontrollers these projects are compiled for different microcontrollers
+of a family.
+
+See "SConscript.check" for more information.
+

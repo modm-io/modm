@@ -93,8 +93,10 @@ env.SConscript('src/xpcc/driver/lcd/font/SConscript.generate', exports='env')
 env.SConscript('src/xpcc/driver/lcd/image/SConscript.generate', exports='env')
 
 # Generate SConstruct files for all projects in the example/ and tests/ folders
-# and provide a 'check' target to compile all examples.
-env.SConscript('SConscript.examples', exports='env')
+env.SConscript('SConscript.generate', exports='env')
+
+# Provides a 'check' target to compile all examples and the release tests.
+env.SConscript('SConscript.check', exports='env')
 
 # Generate the doxygen documentation
 env.Doxygen('doc/doxyfile')

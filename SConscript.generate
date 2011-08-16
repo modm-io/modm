@@ -57,25 +57,3 @@ for dir in ['tests', 'examples']:
 			
 			env.Alias('update', file)
 
-# Check that all examples compile without errors. The correct function of the
-# examples is not checked!
-if 'check' in BUILD_TARGETS:
-	result = []
-	everythingOk = True
-	for path, directories, files in os.walk('examples'):
-		# exclude the SVN-directories
-		if '.svn' in directories:
-			directories.remove('.svn')
-	
-		if 'SConstruct' in files:
-			exitStatus = os.system("scons -Q -C %s build" % path)
-			result.append("check: %s -> %s" % (path, "Ok" if exitStatus == 0 else "FAIL!"))
-			
-			if exitStatus != 0:
-				everythingOk = False
-	
-	print "\nRESULTS:\n"
-	print '\n'.join(result)
-	print "\nOK!" if everythingOk else "\nFAIL!"
-
-env.Alias('check', None)

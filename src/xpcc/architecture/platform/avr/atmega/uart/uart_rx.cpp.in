@@ -38,7 +38,7 @@
 #include "uart_defines.h"
 #include "xpcc_config.hpp"
 
-#ifdef ATMEGA_HAS_UART{{ id }}
+#if defined USART{{ id }}_RX_vect
 
 #include "uart{{ id }}.hpp"
 
@@ -47,21 +47,10 @@ static xpcc::atomic::Queue<char, UART{{ id }}_RX_BUFFER_SIZE> rxBuffer;
 // ----------------------------------------------------------------------------
 // called when the UART has received a character
 // 
-ISR(UART{{ id }}_RECEIVE_INTERRUPT)
+ISR(USART{{ id }}_RX_vect)
 {
-	uint8_t data = UART{{ id }}_DATA;
-	
-	// read UART status register and UART data register
-	//uint8_t usr  = UART{{ id }}_STATUS;
-	
-//	uint8_t last_rx_error;
-//#if defined(ATMEGA_USART)
-//	last_rx_error = usr & ((1 << FE) | (1 << DOR));
-//#elif defined(ATMEGA_USART{{ id }})
-//	last_rx_error = usr & ((1 << FE{{ id }}) | (1 << DOR{{ id }}));
-//#elif defined (ATMEGA_UART)
-//	last_rx_error = usr & ((1 << FE) | (1 << DOR));
-//#endif
+	uint8_t data = UDR{{ id }};
+//	uint8_t last_rx_error = UCSR{{ id }}A & ((1 << FE{{ id }}) | (1 << DOR{{ id }}));
 	
 	// TODO Fehlerbehandlung
 	rxBuffer.push(data);
@@ -71,71 +60,26 @@ ISR(UART{{ id }}_RECEIVE_INTERRUPT)
 void
 xpcc::atmega::BufferedUart{{ id }}::setBaudrateRegister(uint16_t ubrr)
 {
-{% if id == 0 -%}
-#if defined(ATMEGA_UART)
-
-	// set baud rate
-	if (ubrr & 0x8000) {
-		UART0_STATUS = (1 << U2X);  //Enable 2x speed 
-		ubrr &= ~0x8000;
-	}
-	else {
-		UART0_STATUS = 0;
-	}
-	UBRRHI = (uint8_t) (ubrr >> 8);
-	UBRR   = (uint8_t)  ubrr;
-	
-	// Enable UART receiver and transmitter and receive complete interrupt
-	UART0_CONTROL = (1 << RXCIE) | (1 << RXEN) | (1 << TXEN);
-
-#elif defined(ATMEGA_USART)
-
-	// Set baudrate
-	if (ubrr & 0x8000) {
-		UART0_STATUS = (1 << U2X);	// Enable 2x speed 
-		ubrr &= ~0x8000;
-	}
-	else {
-		UART0_STATUS = 0;
-	}
-	UBRRH = (uint8_t) (ubrr >> 8);
-	UBRRL = (uint8_t)  ubrr;
-
-	// Enable USART receiver and transmitter and receive complete interrupt
-	UART0_CONTROL = (1 << RXCIE) | (1<<RXEN) | (1<<TXEN);
-	
-	// Set frame format: asynchronous, 8data, no parity, 1stop bit
-	#ifdef URSEL
-	UCSRC = (1 << URSEL) | (3 << UCSZ0);
-	#else
-	UCSRC = (3 << UCSZ0);
-	#endif
-
-#elif defined(ATMEGA_USART0)
-{% endif %}
 	// Set baud rate
 	if (ubrr & 0x8000) {
-		UART{{ id }}_STATUS = (1 << U2X{{ id }});  //Enable 2x speed 
+		UCSR{{ id }}A = (1 << U2X{{ id }});  //Enable 2x speed 
 		ubrr &= ~0x8000;
 	}
 	else {
-		UART{{ id }}_STATUS = 0;
+		UCSR{{ id }}A = 0;
 	}
-	UBRR{{ id }}H = (uint8_t) (ubrr >> 8);
 	UBRR{{ id }}L = (uint8_t)  ubrr;
-
+	UBRR{{ id }}H = (uint8_t) (ubrr >> 8);
+	
 	// Enable USART receiver and transmitter and receive complete interrupt
-	UART{{ id }}_CONTROL = (1 << RXCIE{{ id }}) | (1 << RXEN{{ id }}) | (1 << TXEN{{ id }});
+	UCSR{{ id }}B = (1 << RXCIE{{ id }}) | (1 << RXEN{{ id }}) | (1 << TXEN{{ id }});
 	
 	// Set frame format: asynchronous, 8data, no parity, 1stop bit
-	#ifdef URSEL{{ id }}
-	UCSR{{ id }}C = (1 << URSEL{{ id }}) | (3 << UCSZ{{ id }}0);
-	#else
-	UCSR{{ id }}C = (3 << UCSZ{{ id }}0);
-	#endif
-{% if id == 0 %}
+#ifdef URSEL{{ id }}
+    UCSR{{ id }}C = (1 << URSEL{{ id }}) | (1 << UCSZ{{ id }}1) | (1 << UCSZ{{ id }}0);
+#else
+    UCSR{{ id }}C = (1 << UCSZ{{ id }}1) | (1 << UCSZ{{ id }}0);
 #endif
-{% endif -%}
 }
 
 // ----------------------------------------------------------------------------

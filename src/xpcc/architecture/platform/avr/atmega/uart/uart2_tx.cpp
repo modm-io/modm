@@ -42,7 +42,7 @@
 #include "uart_defines.h"
 #include "xpcc_config.hpp"
 
-#ifdef ATMEGA_HAS_UART2
+#if defined USART2_UDRE_vect
 
 #include "uart2.hpp"
 
@@ -51,17 +51,17 @@ static xpcc::atomic::Queue<char, UART2_TX_BUFFER_SIZE> txBuffer;
 // ----------------------------------------------------------------------------
 // called when the UART is ready to transmit the next byte
 // 
-ISR(UART2_TRANSMIT_INTERRUPT)
+ISR(USART2_UDRE_vect)
 {
 	if (txBuffer.isEmpty())
 	{
 		// transmission finished, disable UDRE interrupt
-		UART2_CONTROL &= ~(1 << UART2_UDRIE);
+		UCSR2B &= ~(1 << UDRIE2);
 	}
 	else {
 		// get one byte from buffer and write it to the UART buffer
 		// which starts the transmission
-		UART2_DATA = txBuffer.get();
+		UDR2 = txBuffer.get();
 		txBuffer.pop();
 	}
 }
@@ -77,7 +77,7 @@ xpcc::atmega::BufferedUart2::write(char c)
 	atomic::Lock lock;
 	
 	// enable UDRE interrupt
-	UART2_CONTROL |= (1 << UART2_UDRIE);
+	UCSR2B |= (1 << UDRIE2);
 }
 
 // ----------------------------------------------------------------------------

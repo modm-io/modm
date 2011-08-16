@@ -42,7 +42,7 @@
 #include "uart_defines.h"
 #include "xpcc_config.hpp"
 
-#ifdef ATMEGA_HAS_UART3
+#if defined USART3_RX_vect
 
 #include "uart3.hpp"
 
@@ -51,21 +51,10 @@ static xpcc::atomic::Queue<char, UART3_RX_BUFFER_SIZE> rxBuffer;
 // ----------------------------------------------------------------------------
 // called when the UART has received a character
 // 
-ISR(UART3_RECEIVE_INTERRUPT)
+ISR(USART3_RX_vect)
 {
-	uint8_t data = UART3_DATA;
-	
-	// read UART status register and UART data register
-	//uint8_t usr  = UART3_STATUS;
-	
-//	uint8_t last_rx_error;
-//#if defined(ATMEGA_USART)
-//	last_rx_error = usr & ((1 << FE) | (1 << DOR));
-//#elif defined(ATMEGA_USART3)
-//	last_rx_error = usr & ((1 << FE3) | (1 << DOR3));
-//#elif defined (ATMEGA_UART)
-//	last_rx_error = usr & ((1 << FE) | (1 << DOR));
-//#endif
+	uint8_t data = UDR3;
+//	uint8_t last_rx_error = UCSR3A & ((1 << FE3) | (1 << DOR3));
 	
 	// TODO Fehlerbehandlung
 	rxBuffer.push(data);
@@ -75,27 +64,26 @@ ISR(UART3_RECEIVE_INTERRUPT)
 void
 xpcc::atmega::BufferedUart3::setBaudrateRegister(uint16_t ubrr)
 {
-
 	// Set baud rate
 	if (ubrr & 0x8000) {
-		UART3_STATUS = (1 << U2X3);  //Enable 2x speed 
+		UCSR3A = (1 << U2X3);  //Enable 2x speed 
 		ubrr &= ~0x8000;
 	}
 	else {
-		UART3_STATUS = 0;
+		UCSR3A = 0;
 	}
-	UBRR3H = (uint8_t) (ubrr >> 8);
 	UBRR3L = (uint8_t)  ubrr;
-
+	UBRR3H = (uint8_t) (ubrr >> 8);
+	
 	// Enable USART receiver and transmitter and receive complete interrupt
-	UART3_CONTROL = (1 << RXCIE3) | (1 << RXEN3) | (1 << TXEN3);
+	UCSR3B = (1 << RXCIE3) | (1 << RXEN3) | (1 << TXEN3);
 	
 	// Set frame format: asynchronous, 8data, no parity, 1stop bit
-	#ifdef URSEL3
-	UCSR3C = (1 << URSEL3) | (3 << UCSZ30);
-	#else
-	UCSR3C = (3 << UCSZ30);
-	#endif
+#ifdef URSEL3
+    UCSR3C = (1 << URSEL3) | (1 << UCSZ31) | (1 << UCSZ30);
+#else
+    UCSR3C = (1 << UCSZ31) | (1 << UCSZ30);
+#endif
 }
 
 // ----------------------------------------------------------------------------

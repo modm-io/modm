@@ -134,7 +134,7 @@ namespace xpcc
 			uint32_t config = mode | type | speed; \
 			::xpcc::stm32::GpioMode<GPIO ## port ## _BASE_ADDR, pin>::setMode(config); \
 		} \
-		ALWAYS_INLINE static void setOutput() { configureOutput(); } \
+		ALWAYS_INLINE static void setOutput() { setOutput(::xpcc::stm32::OUTPUT); } \
 		ALWAYS_INLINE static void setOutput(bool status) { \
 			set(status); \
 			setOutput(); } \
