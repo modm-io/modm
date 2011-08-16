@@ -57,7 +57,7 @@ namespace xpcc
 	 * 
 	 * \see		Timeout
 	 * \author	Fabian Greif
-	 * \ingroup	utils
+	 * \ingroup	workflow
 	 */
 	template<typename T = ::xpcc::Clock>
 	class PeriodicTimer

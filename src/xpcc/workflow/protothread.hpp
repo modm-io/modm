@@ -30,7 +30,7 @@
  */
 // ----------------------------------------------------------------------------
 /**
- * \ingroup		utils
+ * \ingroup		workflow
  * \defgroup	protothread		Protothreads
  * \brief		Lightweight, stackless threads
  * 
