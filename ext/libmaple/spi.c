@@ -31,6 +31,7 @@
  *        Currently, there is no Integrated Interchip Sound (I2S) support.
  */
 
+#include "libmaple.h"
 #include "spi.h"
 #include "bitband.h"
 

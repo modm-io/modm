@@ -31,6 +31,7 @@
  * @brief USART control routines
  */
 
+#include "libmaple.h"
 #include "usart.h"
 
 /*

@@ -55,6 +55,9 @@ if env['ARCHITECTURE'].startswith('cortex-m3/stm32f107'):
 # Add the libmaple from Leaflabs (see https://github.com/leaflabs/libmaple)
 if env['ARCHITECTURE'].startswith('cortex-m3/stm32f103'):
 	sourcePath += ['libmaple']
+	
+	sourcePath += ['freertos']
+	#globalIncludes += ['ext/freertos']
 
 includes = buildIncludes + globalIncludes
 for path in includes:

@@ -104,7 +104,7 @@ OUTPUT_FORMAT("elf32-littlearm", "elf32-bigarm", "elf32-littlearm")
 OUTPUT_ARCH(arm)
 
 /* First executable instruction in an output file */
-ENTRY(resetHandler)
+ENTRY(Reset_Handler)
 
 /* force linker to include the syscalls from libxpcc.a */
 EXTERN(_sbrk_r)

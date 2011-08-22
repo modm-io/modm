@@ -19,6 +19,8 @@
 #include <libmaple/timer.h>
 #include <libmaple/usb/usb.h>
 
+#include <freertos/MapleFreeRTOS.h>
+
 // ----------------------------------------------------------------------------
 xpcc::stm32::Usart2 debugUart(115200);
 xpcc::IODeviceWrapper<xpcc::stm32::Usart2> loggerDevice(debugUart); 
@@ -104,6 +106,33 @@ pitHandler(void)
 #define	LED_GREEN		0x80
 
 // ----------------------------------------------------------------------------
+static void ledFlashTask(void *)
+{
+	while(1)
+	{
+		vTaskDelay(1000);
+		LedStat::toggle();
+		
+		vTaskDelay(50);
+		LedStat::toggle();
+	}
+}
+
+// ----------------------------------------------------------------------------
+static void displayTask(void *)
+{
+	while(1)
+	{
+		display.setCursor(0, 16);
+		display << "sw  = " << xpcc::hex << gpioExpander.read() << xpcc::ascii;
+		display.update();
+		
+		Led1::set(Button1::read());
+		Led2::set(Button2::read());
+	}
+}
+
+// ----------------------------------------------------------------------------
 int
 main(void)
 {
@@ -135,9 +164,14 @@ main(void)
 	
 	LedStat::reset();
 	
+	xTaskCreate(ledFlashTask,  (signed portCHAR *) "Led Flash", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 2, NULL);
+	xTaskCreate(displayTask, (signed portCHAR *) "Display", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 2, NULL);
+    
+	vTaskStartScheduler();
+	
 	while (1)
 	{
-		xpcc::delay_ms(100);
+		/*xpcc::delay_ms(100);
 		LedStat::toggle();
 		
 		display.setCursor(0, 16);
@@ -145,6 +179,6 @@ main(void)
 		display.update();
 		
 		Led1::set(Button1::read());
-		Led2::set(Button2::read());
+		Led2::set(Button2::read());*/
 	}
 }

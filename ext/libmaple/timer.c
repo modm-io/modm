@@ -30,6 +30,7 @@
  * @brief  New-style timer interface
  */
 
+#include "libmaple.h"
 #include "timer.h"
 
 /* Just like the corresponding DIER bits:
