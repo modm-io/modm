@@ -56,8 +56,8 @@
  *----------------------------------------------------------*/
 
 /* Scheduler includes. */
-#include "FreeRTOS.h"
-#include "task.h"
+#include "../FreeRTOS.h"
+#include "../task.h"
 
 #include <libmaple/systick.h>
 
@@ -99,9 +99,9 @@ static unsigned portBASE_TYPE uxCriticalNesting = 0xaaaaaaaa;
 /*
  * Exception handlers.
  */
-void xPortPendSVHandler( void ) __attribute__ (( naked ));
+//void xPortPendSVHandler( void ) __attribute__ (( naked ));
 void xPortSysTickHandler( void );
-void vPortSVCHandler( void ) __attribute__ (( naked ));
+//void vPortSVCHandler( void ) __attribute__ (( naked ));
 
 /*
  * Start first task is a separate function so it can be tested in isolation.

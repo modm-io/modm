@@ -87,7 +87,7 @@
 #define configUSE_COUNTING_SEMAPHORES 	1
 #define configUSE_ALTERNATIVE_API 		0
 #define configCHECK_FOR_STACK_OVERFLOW	2
-#define configUSE_RECURSIVE_MUTEXES		1
+#define configUSE_RECURSIVE_MUTEXES		1	// TODO are these needed?
 #define configQUEUE_REGISTRY_SIZE		0
 #define configGENERATE_RUN_TIME_STATS	0
 
@@ -117,10 +117,10 @@ NVIC value of 255. */
 /*-----------------------------------------------------------
  * UART configuration.
  *-----------------------------------------------------------*/
-#define configCOM0_RX_BUFFER_LENGTH		128
+/*#define configCOM0_RX_BUFFER_LENGTH		128
 #define configCOM0_TX_BUFFER_LENGTH		128
 #define configCOM1_RX_BUFFER_LENGTH		128
-#define configCOM1_TX_BUFFER_LENGTH		128
+#define configCOM1_TX_BUFFER_LENGTH		128*/
 
 #endif /* FREERTOS_CONFIG_H */
 

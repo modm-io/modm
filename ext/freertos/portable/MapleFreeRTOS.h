@@ -31,10 +31,10 @@ extern "C"
 {
 	#define GCC_ARMCM3
 	
-	#include "FreeRTOS.h"
-	#include "task.h"
-	#include "queue.h"
-	#include "semphr.h"
+	#include "../FreeRTOS.h"
+	#include "../task.h"
+	#include "../queue.h"
+	#include "../semphr.h"
 }
 
 #endif

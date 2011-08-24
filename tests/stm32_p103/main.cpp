@@ -19,7 +19,8 @@
 #include <libmaple/timer.h>
 #include <libmaple/usb/usb.h>
 
-#include <freertos/MapleFreeRTOS.h>
+#include <xpcc/workflow/rtos/scheduler.hpp>
+#include <xpcc/workflow/rtos/task.hpp>
 
 // ----------------------------------------------------------------------------
 xpcc::stm32::Usart2 debugUart(115200);
@@ -106,31 +107,59 @@ pitHandler(void)
 #define	LED_GREEN		0x80
 
 // ----------------------------------------------------------------------------
-static void ledFlashTask(void *)
+class LedTask1 : public xpcc::rtos::Task
 {
-	while(1)
+public:
+	virtual void
+	run()
 	{
-		vTaskDelay(1000);
-		LedStat::toggle();
-		
-		vTaskDelay(50);
-		LedStat::toggle();
+		while (1)
+		{
+			Led2::toggle();
+			this->delay(200);
+		}
 	}
-}
+};
 
-// ----------------------------------------------------------------------------
-static void displayTask(void *)
+class LedTask2 : public xpcc::rtos::Task
 {
-	while(1)
+public:
+	virtual void
+	run()
 	{
-		display.setCursor(0, 16);
-		display << "sw  = " << xpcc::hex << gpioExpander.read() << xpcc::ascii;
-		display.update();
-		
-		Led1::set(Button1::read());
-		Led2::set(Button2::read());
+		while (1)
+		{
+			LedStat::set();
+			this->delay(50);
+			
+			LedStat::reset();
+			this->delay(1000);
+		}
 	}
-}
+};
+
+class DisplayTask : public xpcc::rtos::Task
+{
+public:
+	virtual void
+	run()
+	{
+		while (1)
+		{
+			display.setCursor(0, 16);
+			display << "sw  = " << xpcc::hex << gpioExpander.read() << xpcc::ascii;
+			display.update();
+			
+			Led1::set(Button1::read());
+			
+			this->delay(100);
+		}
+	}
+};
+
+LedTask1 task1;
+LedTask2 task2;
+DisplayTask task3;
 
 // ----------------------------------------------------------------------------
 int
@@ -164,10 +193,7 @@ main(void)
 	
 	LedStat::reset();
 	
-	xTaskCreate(ledFlashTask,  (signed portCHAR *) "Led Flash", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 2, NULL);
-	xTaskCreate(displayTask, (signed portCHAR *) "Display", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 2, NULL);
-    
-	vTaskStartScheduler();
+	xpcc::rtos::Scheduler::schedule();
 	
 	while (1)
 	{
