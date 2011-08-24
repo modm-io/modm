@@ -30,41 +30,58 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_RTOS__QUEUE_HPP
-#define XPCC_RTOS__QUEUE_HPP
+#ifndef XPCC_FREERTOS__SCHEDULER_HPP
+#define XPCC_FREERTOS__SCHEDULER_HPP
 
 #include <freertos/FreeRTOS.h>
-#include <freertos/queue.h>
+#include <freertos/task.h>
 
 namespace xpcc
 {
-	namespace rtos
+	namespace freertos
 	{
 		/**
-		 * \brief	Queue
+		 * \brief	
 		 * 
-		 * \ingroup	rtos
+		 * \ingroup	freertos
 		 */
-		class Queue
+		class Scheduler
 		{
 		public:
 			/**
-			 * \brief	Create a Queue
+			 * \brief	Starts the real time kernel
 			 * 
-			 * \param	length		The maximum number of items the queue can
-			 * 						contain.
-			 * \param	itemSize	The size of one item. All items in the queue
-			 * 						must have the same size.
+			 * The idle task is created automatically when schedule() is called.
+			 * 
+			 * This function does not return until an executing task calls
+			 * Scheduler::stop()
 			 */
-			Queue(unsigned portBASE_TYPE length,
-					unsigned portBASE_TYPE itemSize);
+			static inline void
+			schedule()
+			{
+				vTaskStartScheduler();
+			}
 			
-			~Queue();
+			/**
+			 * \brief	Stops the real time kernel
+			 * 
+			 * FIXME: Check if this works correct for the STM32
+			 */
+			static inline void
+			stop()
+			{
+				vTaskEndScheduler();
+			}
 			
-		private:
-			xQueueHandle handle;
+			/// The count of ticks since Scheduler::schedule() was called
+			static inline portTickType
+			getTicks()
+			{
+				return xTaskGetTickCount();
+			}
+			
 		};
 	}
 }
 
-#endif // XPCC_RTOS__QUEUE_HPP
+#endif // XPCC_FREERTOS__SCHEDULER_HPP

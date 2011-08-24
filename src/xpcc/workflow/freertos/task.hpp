@@ -30,20 +30,73 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_RTOS__TASK_HPP
-#define XPCC_RTOS__TASK_HPP
+#ifndef XPCC_FREERTOS__TASK_HPP
+#define XPCC_FREERTOS__TASK_HPP
 
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 
+/**
+ * \brief	Create a timed periodic loop
+ * 
+ * Example:
+ * \code
+ * void
+ * Task::run()
+ * {
+ *     TIME_LOOP(20 * MILLISECONDS)
+ *     {
+ *         // will be executed every 20ms
+ *     }
+ * }
+ * \endcode
+ * 
+ * \param	frequency	Frequency in ticks
+ * 
+ * \see		MILLISECONDS
+ * \see		vTaskDelayUntil() from FreeRTOS
+ * 
+ * \hideinitializer
+ * \ingroup	freertos
+ */
+#define	TIME_LOOP(frequency)										\
+		for(portTickType lastTime = xTaskGetTickCount() ;			\
+			vTaskDelayUntil(&lastTime,								\
+					static_cast<portTickType>(frequency)), true ;	\
+			)
+
+/**
+ * \brief	Convert between scheduler ticks and milliseconds
+ * 
+ * For example 20 ms in scheduler ticks might be written as:
+ * \code
+ * 20 * MILLISECONDS
+ * \endcode
+ * 
+ * This should only be used with constant values as the calculation is done
+ * using floating point. For constant values the compiler will do the calculation
+ * at compile time.
+ * 
+ * For non constant value use the following formula:
+ * \code
+ * static_cast<portTickType>((time * configTICK_RATE_HZ) / 1000)
+ * \endcode
+ * The parentheses are important because otherwise the division might be done
+ * first which will lead to wrong results.
+ * 
+ * \hideinitializer
+ * \ingroup	freertos
+ */
+#define	MILLISECONDS		(configTICK_RATE_HZ / 1000.0)
+
 namespace xpcc
 {
-	namespace rtos
+	namespace freertos
 	{
 		/**
-		 * \brief	
+		 * \brief	Task
 		 * 
-		 * \ingroup	rtos
+		 * \ingroup	freertos
 		 */
 		class Task
 		{
@@ -51,31 +104,55 @@ namespace xpcc
 			/**
 			 * \brief	Create a task
 			 * 
+			 * \param	priority	Priority (default is 0)
+			 * \param	stackDepth	Stack size for the task
+			 * \param	name		Name of the task (only used for debugging,
+			 * 						can be left empty)
+			 * 
 			 * \warning	Tasks may not be created while the scheduler is running!
 			 * 			Create them be before calling Scheduler::schedule() or
 			 * 			stop the scheduler and restart it afterwards.
 			 */
-			Task(const char* name = NULL,
+			Task(unsigned portBASE_TYPE priority = 0,
 					unsigned short stackDepth = configMINIMAL_STACK_SIZE,
-					unsigned portBASE_TYPE priority = tskIDLE_PRIORITY + 1);
+					const char* name = NULL);
 			
+			/// Delete the task
 			virtual ~Task();
 			
 			/// Obtain the priority of the task
 			unsigned portBASE_TYPE
-			getPriority();
+			getPriority() const;
 			
+			/**
+			 * \brief	Set the priority of the task
+			 * 
+			 * Might cause a context switch if the priority is set to lower
+			 * value than the highest priority of a task ready to run.
+			 */
 			void
 			setPriority(unsigned portBASE_TYPE priority);
 			
-			
+			/**
+			 * \brief	Suspend the Task
+			 * 
+			 * The task won't be executed until the next call of resume() or
+			 * resumeFromInterrupt().
+			 */
 			void
 			suspend();
 			
-			/// Must not be called from within an interrupt
+			/**
+			 * \brief	Resume execution of the task
+			 * 
+			 * \warning	Must \b not be called from within an interrupt!
+			 */
 			void
 			resume();
 			
+			/**
+			 * \brief	Resume execution from within an interrupt context
+			 */
 			void
 			resumeFromInterrupt();
 			
@@ -101,6 +178,17 @@ namespace xpcc
 			resumeAll();
 			
 		protected:
+			/**
+			 * \brief	Delay for the number of ticks
+			 * 
+			 * Use the MILLISECONDS macro to convert ticks to milliseconds:
+			 * \code
+			 * delay(10 * MILLISECONDS);
+			 * \endcode 
+			 * 
+			 * \param	ticks	Number of scheduler ticks to delay for
+			 * \see		MILLISECONDS
+			 */
 			static inline void
 			delay(portTickType ticks)
 			{
@@ -110,6 +198,11 @@ namespace xpcc
 			// TODO
 			//delayUntil();
 			
+			/**
+			 * \brief	Force a context switch
+			 * 
+			 * Gives control to other tasks ready to run.
+			 */
 			static inline void
 			yield()
 			{
@@ -117,6 +210,8 @@ namespace xpcc
 			}
 			
 			/**
+			 * \brief	Worker function
+			 * 
 			 * Must be implemented to never return (i.e. continuous loop)
 			 */
 			virtual void
@@ -126,9 +221,16 @@ namespace xpcc
 			static void
 			wrapper(void *object);
 			
+			// disable copy constructor
+			Task(const Task& other);
+			
+			// disable assignment operator
+			Task&
+			operator = (const Task& other);
+			
 			xTaskHandle handle;
 		};
 	}
 }
 
-#endif // XPCC_RTOS__TASK_HPP
+#endif // XPCC_FREERTOS__TASK_HPP

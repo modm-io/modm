@@ -67,8 +67,6 @@
  *----------------------------------------------------------*/
 
 #define configUSE_PREEMPTION		1
-#define configUSE_IDLE_HOOK			0
-#define configUSE_TICK_HOOK			0
 #define configCPU_CLOCK_HZ			( ( unsigned long ) 72000000 )
 #define configTICK_RATE_HZ			( ( portTickType ) 1000 )
 #define configMAX_PRIORITIES		( ( unsigned portBASE_TYPE ) 5 )
@@ -79,15 +77,19 @@
 #define configUSE_16_BIT_TICKS		0
 #define configIDLE_SHOULD_YIELD		1
 
+#define configUSE_IDLE_HOOK				0		// vApplicationIdleHook()
+#define configUSE_TICK_HOOK				0		// vApplicationTickHook()
+#define configUSE_MALLOC_FAILED_HOOK	0		// vApplicationMallocFailedHook()
+
 /* Co-routine definitions. */
-#define configUSE_CO_ROUTINES 		0
+#define configUSE_CO_ROUTINES 			0
 #define configMAX_CO_ROUTINE_PRIORITIES ( 2 )
 
 #define configUSE_MUTEXES				1
 #define configUSE_COUNTING_SEMAPHORES 	1
 #define configUSE_ALTERNATIVE_API 		0
 #define configCHECK_FOR_STACK_OVERFLOW	2
-#define configUSE_RECURSIVE_MUTEXES		1	// TODO are these needed?
+#define configUSE_RECURSIVE_MUTEXES		0
 #define configQUEUE_REGISTRY_SIZE		0
 #define configGENERATE_RUN_TIME_STATS	0
 
@@ -97,7 +99,7 @@ to exclude the API function. */
 #define INCLUDE_vTaskPrioritySet		1
 #define INCLUDE_uxTaskPriorityGet		1
 #define INCLUDE_vTaskDelete				1
-#define INCLUDE_vTaskCleanUpResources	0
+#define INCLUDE_vTaskCleanUpResources	1
 #define INCLUDE_vTaskSuspend			1
 #define INCLUDE_vTaskDelayUntil			1
 #define INCLUDE_vTaskDelay				1
@@ -113,14 +115,6 @@ priority values, 0 to 15.  This must correspond to the
 configKERNEL_INTERRUPT_PRIORITY setting.  Here 15 corresponds to the lowest
 NVIC value of 255. */
 #define configLIBRARY_KERNEL_INTERRUPT_PRIORITY	15
-
-/*-----------------------------------------------------------
- * UART configuration.
- *-----------------------------------------------------------*/
-/*#define configCOM0_RX_BUFFER_LENGTH		128
-#define configCOM0_TX_BUFFER_LENGTH		128
-#define configCOM1_RX_BUFFER_LENGTH		128
-#define configCOM1_TX_BUFFER_LENGTH		128*/
 
 #endif /* FREERTOS_CONFIG_H */
 

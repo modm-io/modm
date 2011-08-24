@@ -53,30 +53,33 @@ Generates source and header file containing the type definitions. Uses
 
 \subsection options Commandline Options
 - outpath Comon path for output files
-- --source_path Output path for the source file
-- --header_path Output path for the header file
-- --system_include_path Include directive
-- --quote_include_path Include directive
+- \c --source_path Output path for the source file
+- \c --header_path Output path for the header file
+- \c --system_include_path Include directive
+- \c --quote_include_path Include directive
 
 Outpath has to be either a folder or None. If not None generated files will
 have the names 'packets.hpp' and 'packets.cpp'. If different paths
 required don't set outpath.
-If outpath is None both source_path and header_path must be folders. The
-names of files will be 'packets.hpp' and 'packets.cpp'.
+If outpath is \c None both \c source_path and \c header_path must be folders.
+The names of files will be \c 'packets.hpp' and \c 'packets.cpp'.
 
 The file packets.cpp will have one <tt>#include</tt> directive.
+
 \verbatim
-	#include "packets.hpp"
+#include "packets.hpp"
 \endverbatim
-If other is required use one of the options system_include_path or
-quote_include_path. The generated include will be equivalent to:
+
+If other is required use one of the options \c system_include_path or
+\c quote_include_path. The generated include will be equivalent to:
+
 \verbatim
-	if system_include_path:
-		'#indlude <%s>' % os.path.join(system_include_path, 'packets.hpp')
-	elif quote_include_path:
-		'#indlude "%s"' % os.path.join(quote_include_path, 'packets.hpp')
-	else:
-		'#include "packets.hpp"'
+if system_include_path:
+    '#indlude <%s>' % os.path.join(system_include_path, 'packets.hpp')
+elif quote_include_path:
+    '#indlude "%s"' % os.path.join(quote_include_path, 'packets.hpp')
+else:
+    '#include "packets.hpp"'
 \endverbatim
 
 \section cpp_postman cpp_postman.PostmanBuilder

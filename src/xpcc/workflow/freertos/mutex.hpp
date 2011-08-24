@@ -30,64 +30,53 @@
  */
 // ----------------------------------------------------------------------------
 
-#include "task.hpp"
+#ifndef XPCC_FREERTOS__MUTEX_HPP
+#define XPCC_FREERTOS__MUTEX_HPP
 
-// ----------------------------------------------------------------------------
-void
-xpcc::rtos::Task::wrapper(void *object)
+#include <freertos/FreeRTOS.h>
+#include <freertos/semphr.h>
+
+namespace xpcc
 {
-	Task* task = reinterpret_cast<Task *>(object);
-	task->run();
+	namespace freertos
+	{
+		/**
+		 * \brief	Mutex
+		 * 
+		 * Mutexes and binary semaphores are very similar but have some subtle
+		 * differences: Mutexes include a priority inheritance mechanism,
+		 * binary semaphores do not.
+		 * 
+		 * This makes binary semaphores the better choice for implementing
+		 * synchronisation (between tasks or between tasks and an interrupt),
+		 * and mutexes the better choice for implementing simple mutual exclusion.
+		 * 
+		 * \ingroup	freertos
+		 */
+		class Mutex
+		{
+		public:
+			Mutex();
+			
+			~Mutex();
+			
+			bool
+			acquire(portTickType timeout = portMAX_DELAY);
+			
+			void
+			release();
+			
+		private:
+			// disable copy constructor
+			Mutex(const Mutex& other);
+			
+			// disable assignment operator
+			Mutex&
+			operator = (const Mutex& other);
+			
+			xSemaphoreHandle handle;
+		};
+	}
 }
 
-xpcc::rtos::Task::~Task()
-{
-	vTaskDelete(this->handle);
-}
-
-// ----------------------------------------------------------------------------
-xpcc::rtos::Task::Task(const char* name,
-		unsigned short stackDepth,
-		unsigned portBASE_TYPE priority)
-{
-	xTaskCreate(
-			wrapper,
-			(const signed char*) name,
-			stackDepth,
-			this,
-			priority,
-			&this->handle);
-}
-
-// ----------------------------------------------------------------------------
-unsigned portBASE_TYPE
-xpcc::rtos::Task::getPriority()
-{
-	return uxTaskPriorityGet(this->handle);
-}
-
-void
-xpcc::rtos::Task::setPriority(unsigned portBASE_TYPE priority)
-{
-	vTaskPrioritySet(this->handle, priority);
-}
-
-// ----------------------------------------------------------------------------
-void
-xpcc::rtos::Task::suspend()
-{
-	vTaskSuspend(this->handle);
-}
-
-void
-xpcc::rtos::Task::resume()
-{
-	vTaskResume(this->handle);
-}
-
-void
-xpcc::rtos::Task::resumeFromInterrupt()
-{
-	xTaskResumeFromISR(this->handle);
-}
-
+#endif // XPCC_FREERTOS__MUTEX_HPP

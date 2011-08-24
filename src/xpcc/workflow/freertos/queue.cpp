@@ -33,15 +33,78 @@
 #include "queue.hpp"
 
 // ----------------------------------------------------------------------------
-xpcc::rtos::Queue::Queue(unsigned portBASE_TYPE length,
+xpcc::freertos::QueueBase::QueueBase(unsigned portBASE_TYPE length,
 		unsigned portBASE_TYPE itemSize)
 {
 	this->handle = xQueueCreate(length, itemSize);
 }
 
-xpcc::rtos::Queue::~Queue()
+xpcc::freertos::QueueBase::~QueueBase()
 {
 	vQueueDelete(this->handle);
 }
 
 // ----------------------------------------------------------------------------
+bool
+xpcc::freertos::QueueBase::append(const void *item, portTickType timeout)
+{
+	return (xQueueSendToBack(this->handle, item, timeout) == pdTRUE);
+}
+
+bool
+xpcc::freertos::QueueBase::prepend(const void *item, portTickType timeout)
+{
+	return (xQueueSendToFront(this->handle, item, timeout) == pdTRUE);
+}
+
+bool
+xpcc::freertos::QueueBase::peek(void *item, portTickType timeout) const
+{
+	return (xQueuePeek(this->handle, item, timeout) == pdTRUE);
+}
+
+bool
+xpcc::freertos::QueueBase::get(void *item, portTickType timeout)
+{
+	return (xQueueReceive(this->handle, item, timeout) == pdTRUE);
+}
+
+bool
+xpcc::freertos::QueueBase::appendFromInterrupt(const void *item)
+{
+	portBASE_TYPE taskWoken = pdFALSE;
+	portBASE_TYPE result = xQueueSendToBackFromISR(this->handle, item, &taskWoken);
+	
+	// Request a context switch when the IRQ ends if a higher priorty has
+	// been woken.
+	portEND_SWITCHING_ISR(taskWoken);
+	
+	return (result == pdPASS);
+}
+
+bool
+xpcc::freertos::QueueBase::prependFromInterrupt(const void *item)
+{
+	portBASE_TYPE taskWoken = pdFALSE;
+	portBASE_TYPE result = xQueueSendToFrontFromISR(this->handle, item, &taskWoken);
+	
+	// Request a context switch when the IRQ ends if a higher priorty has
+	// been woken.
+	portEND_SWITCHING_ISR(taskWoken);
+	
+	return (result == pdPASS);
+}
+
+bool
+xpcc::freertos::QueueBase::getFromInterrupt(void *item)
+{
+	portBASE_TYPE taskWoken = pdFALSE;
+	portBASE_TYPE result = xQueueReceiveFromISR(this->handle, item, &taskWoken);
+	
+	// Request a context switch when the IRQ ends if a higher priorty has
+	// been woken.
+	portEND_SWITCHING_ISR(taskWoken);
+	
+	return (result == pdTRUE);
+}
+

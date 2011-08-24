@@ -30,45 +30,29 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_RTOS__MUTEX_HPP
-#define XPCC_RTOS__MUTEX_HPP
+#include "mutex.hpp"
 
-#include <freertos/FreeRTOS.h>
-#include <freertos/semphr.h>
-
-namespace xpcc
+// ----------------------------------------------------------------------------
+xpcc::freertos::Mutex::Mutex()
 {
-	namespace rtos
-	{
-		/**
-		 * \brief	Mutex
-		 * 
-		 * Mutexes and binary semaphores are very similar but have some subtle
-		 * differences: Mutexes include a priority inheritance mechanism,
-		 * binary semaphores do not. This makes binary semaphores the better
-		 * choice for implementing synchronisation (between tasks or between
-		 * tasks and an interrupt), and mutexes the better choice for
-		 * implementing simple mutual exclusion.
-		 * 
-		 * \ingroup	rtos
-		 */
-		class Mutex
-		{
-		public:
-			Mutex();
-			
-			~Mutex();
-			
-			bool
-			acquire(portTickType timeout = portMAX_DELAY);
-			
-			void
-			release();
-			
-		private:
-			xSemaphoreHandle handle;
-		};
-	}
+	this->handle = xSemaphoreCreateMutex();
 }
 
-#endif // XPCC_RTOS__MUTEX_HPP
+xpcc::freertos::Mutex::~Mutex()
+{
+	vQueueDelete(this->handle);
+}
+
+// ----------------------------------------------------------------------------
+bool
+xpcc::freertos::Mutex::acquire(portTickType timeout)
+{
+	return (xSemaphoreTake(this->handle, timeout) == pdTRUE);
+}
+
+void
+xpcc::freertos::Mutex::release()
+{
+	xSemaphoreGive(this->handle);
+}
+

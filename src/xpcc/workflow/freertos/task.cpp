@@ -30,54 +30,64 @@
  */
 // ----------------------------------------------------------------------------
 
-#include "semaphore.hpp"
+#include "task.hpp"
 
 // ----------------------------------------------------------------------------
-xpcc::rtos::Semaphore::Semaphore(unsigned portBASE_TYPE max,
-		unsigned portBASE_TYPE initial)
+void
+xpcc::freertos::Task::wrapper(void *object)
 {
-	this->handle = xSemaphoreCreateCounting(max, initial);
+	Task* task = reinterpret_cast<Task *>(object);
+	task->run();
 }
 
-xpcc::rtos::Semaphore::~Semaphore()
+xpcc::freertos::Task::~Task()
 {
-	vQueueDelete(this->handle);
+	vTaskDelete(this->handle);
 }
 
 // ----------------------------------------------------------------------------
-bool
-xpcc::rtos::Semaphore::acquire(portTickType timeout)
+xpcc::freertos::Task::Task(unsigned portBASE_TYPE priority,
+		unsigned short stackDepth,
+		const char* name)
 {
-	return (xSemaphoreTake(this->handle, timeout) == pdTRUE);
+	xTaskCreate(
+			wrapper,
+			(const signed char*) name,
+			stackDepth,
+			this,
+			priority,
+			&this->handle);
+}
+
+// ----------------------------------------------------------------------------
+unsigned portBASE_TYPE
+xpcc::freertos::Task::getPriority() const
+{
+	return uxTaskPriorityGet(this->handle);
 }
 
 void
-xpcc::rtos::Semaphore::release()
+xpcc::freertos::Task::setPriority(unsigned portBASE_TYPE priority)
 {
-	xSemaphoreGive(this->handle);
-}
-
-
-// ----------------------------------------------------------------------------
-xpcc::rtos::BinarySemaphore::BinarySemaphore()
-{
-	vSemaphoreCreateBinary(this->handle);
-}
-
-xpcc::rtos::BinarySemaphore::~BinarySemaphore()
-{
-	vQueueDelete(this->handle);
+	vTaskPrioritySet(this->handle, priority);
 }
 
 // ----------------------------------------------------------------------------
-bool
-xpcc::rtos::BinarySemaphore::acquire(portTickType timeout)
+void
+xpcc::freertos::Task::suspend()
 {
-	return (xSemaphoreTake(this->handle, timeout) == pdTRUE);
+	vTaskSuspend(this->handle);
 }
 
 void
-xpcc::rtos::BinarySemaphore::release()
+xpcc::freertos::Task::resume()
 {
-	xSemaphoreGive(this->handle);
+	vTaskResume(this->handle);
 }
+
+void
+xpcc::freertos::Task::resumeFromInterrupt()
+{
+	xTaskResumeFromISR(this->handle);
+}
+

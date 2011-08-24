@@ -10,6 +10,8 @@
 #include <xpcc/driver/lcd/ea_dog.hpp>
 #include <xpcc/driver/lcd/font.hpp>
 
+#include <xpcc/workflow/freertos.hpp>
+
 #include <libmaple/flash.h>
 #include <libmaple/rcc.h>
 #include <libmaple/nvic.h>
@@ -18,9 +20,6 @@
 #include <libmaple/adc.h>
 #include <libmaple/timer.h>
 #include <libmaple/usb/usb.h>
-
-#include <xpcc/workflow/rtos/scheduler.hpp>
-#include <xpcc/workflow/rtos/task.hpp>
 
 // ----------------------------------------------------------------------------
 xpcc::stm32::Usart2 debugUart(115200);
@@ -106,41 +105,62 @@ pitHandler(void)
 
 #define	LED_GREEN		0x80
 
+xpcc::freertos::Semaphore event(1, 0);
+
 // ----------------------------------------------------------------------------
-class LedTask1 : public xpcc::rtos::Task
+class LedTask1 : public xpcc::freertos::Task
 {
 public:
+	LedTask1() :
+		xpcc::freertos::Task(1)
+	{
+	}
+	
 	virtual void
 	run()
 	{
 		while (1)
 		{
 			Led2::toggle();
-			this->delay(200);
+			this->delay(10 * MILLISECONDS);
+			
+			event.acquire();
 		}
 	}
 };
 
-class LedTask2 : public xpcc::rtos::Task
+class LedTask2 : public xpcc::freertos::Task
 {
 public:
+	LedTask2() :
+		xpcc::freertos::Task(2)
+	{
+	}
+	
 	virtual void
 	run()
 	{
 		while (1)
 		{
+			event.release();
+			
 			LedStat::set();
-			this->delay(50);
+			this->delay(50 * MILLISECONDS);
 			
 			LedStat::reset();
-			this->delay(1000);
+			this->delay(1000 * MILLISECONDS);
 		}
 	}
 };
 
-class DisplayTask : public xpcc::rtos::Task
+class DisplayTask : public xpcc::freertos::Task
 {
 public:
+	DisplayTask() :
+		xpcc::freertos::Task(0)
+	{
+	}
+	
 	virtual void
 	run()
 	{
@@ -193,18 +213,10 @@ main(void)
 	
 	LedStat::reset();
 	
-	xpcc::rtos::Scheduler::schedule();
+	// Start the FreeRTOS scheduler
+	xpcc::freertos::Scheduler::schedule();
 	
 	while (1)
 	{
-		/*xpcc::delay_ms(100);
-		LedStat::toggle();
-		
-		display.setCursor(0, 16);
-		display << "sw  = " << xpcc::hex << gpioExpander.read() << xpcc::ascii;
-		display.update();
-		
-		Led1::set(Button1::read());
-		Led2::set(Button2::read());*/
 	}
 }

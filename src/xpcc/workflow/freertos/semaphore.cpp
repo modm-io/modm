@@ -30,58 +30,51 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_RTOS__SCHEDULER_HPP
-#define XPCC_RTOS__SCHEDULER_HPP
+#include "semaphore.hpp"
 
-#include <freertos/FreeRTOS.h>
-#include <freertos/task.h>
-
-namespace xpcc
+// ----------------------------------------------------------------------------
+xpcc::freertos::SemaphoreBase::~SemaphoreBase()
 {
-	namespace rtos
-	{
-		/**
-		 * \brief	
-		 * 
-		 * \ingroup	rtos
-		 */
-		class Scheduler
-		{
-		public:
-			/**
-			 * \brief	Starts the real time kernel
-			 * 
-			 * The idle task is created automatically when schedule() is called.
-			 * 
-			 * This function does not return until an executing task calls
-			 * Scheduler::stop()
-			 */
-			static inline void
-			schedule()
-			{
-				vTaskStartScheduler();
-			}
-			
-			/**
-			 * \brief	Stops the real time kernel
-			 * 
-			 * FIXME: Check if this works correct for the STM32
-			 */
-			static inline void
-			stop()
-			{
-				vTaskEndScheduler();
-			}
-			
-			/// The count of ticks since Scheduler::schedule() was called
-			static inline portTickType
-			getTicks()
-			{
-				return xTaskGetTickCount();
-			}
-			
-		};
-	}
+	// As semaphores are based on queues we use the queue functions to delete
+	// the semaphore
+	vQueueDelete(this->handle);
 }
 
-#endif // XPCC_RTOS__SCHEDULER_HPP
+// ----------------------------------------------------------------------------
+bool
+xpcc::freertos::SemaphoreBase::acquire(portTickType timeout)
+{
+	return (xSemaphoreTake(this->handle, timeout) == pdTRUE);
+}
+
+void
+xpcc::freertos::SemaphoreBase::release()
+{
+	xSemaphoreGive(this->handle);
+}
+
+void
+xpcc::freertos::SemaphoreBase::releaseFromInterrupt()
+{
+	portBASE_TYPE taskWoken = pdFALSE;
+	
+	xSemaphoreGiveFromISR(this->handle, &taskWoken);
+	
+	// Request a context switch when the IRQ ends if a higher priorty has
+	// been woken.
+	portEND_SWITCHING_ISR(taskWoken);
+}
+
+// ----------------------------------------------------------------------------
+xpcc::freertos::Semaphore::Semaphore(unsigned portBASE_TYPE max,
+		unsigned portBASE_TYPE initial)
+{
+	this->handle = xSemaphoreCreateCounting(max, initial);
+}
+
+// ----------------------------------------------------------------------------
+xpcc::freertos::BinarySemaphore::BinarySemaphore()
+{
+	vSemaphoreCreateBinary(this->handle);
+}
+

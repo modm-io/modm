@@ -58,7 +58,12 @@ namespace xpcc
 		inline bool
 		isEmpty() const;
 		
-
+		/**
+		 * \brief	Get number of items in the list
+		 * 
+		 * Very slow for a long list as it needs to iterate through all
+		 * items in the list.
+		 */
 		std::size_t
 		getSize() const;
 
