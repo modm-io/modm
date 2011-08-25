@@ -55,40 +55,6 @@ namespace xpcc
 		public:
 			typedef void (*Function) ();
 			
-#ifdef ADCSRB
-			static inline void
-			setAutoTriggerSource(uint8_t source)
-			{
-				ADCSRB = source;
-			}
-			
-			static inline void
-			setAutoTrigger(bool enable)
-			{
-				if (enable)
-					ADCSRA |= (1 << ADATE);
-				else
-					ADCSRA &= ~(1 << ADATE);
-			}
-#endif
-			
-			static inline void
-			setInterrupt(bool enable)
-			{
-				if (enable)
-					ADCSRA |= (1 << ADIE);
-				else
-					ADCSRA &= ~(1 << ADIE);
-			}
-			
-			static inline void
-			setChannel(uint8_t channel)
-			{
-				if (channel > 8)
-					return;
-				ADMUX = (ADMUX & 0xe0) | channel;
-			}
-			
 			static inline void
 			attachConversionCompleteInterrupt(Function function=xpcc::dummy)
 			{

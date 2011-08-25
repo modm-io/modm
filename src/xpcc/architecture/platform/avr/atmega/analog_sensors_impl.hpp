@@ -57,7 +57,7 @@ xpcc::atmega::AnalogSensors<ADConv,CHANNELS,SAMPLES>::initialize(uint8_t &sensor
 {
 	map = &sensorMapping;
 	adc.attachConversionCompleteInterrupt(sampleAdc);
-	adc.setInterrupt(true);
+	adc.setInterruptEnable(true);
 }
 
 template < typename ADConv, uint8_t CHANNELS, uint8_t SAMPLES >
