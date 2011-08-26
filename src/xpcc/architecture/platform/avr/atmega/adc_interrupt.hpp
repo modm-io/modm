@@ -45,7 +45,15 @@ namespace xpcc
 	namespace atmega
 	{
 		/**
-		 * \brief		ADC Interrupt Module
+		 * \brief		ADC Interrupt module
+		 *
+		 * This class allows you to attach functions to the ADC Conversion 
+		 * Complete Interrupt via function pointers.
+		 * Be aware however, that this implementation is slower and requires
+		 * more resources than writing the function code directly into
+		 * the interrupt service routines.
+		 *
+		 * \see AnalogSensors uses this implemenation.
 		 *
  		 * \ingroup		atmega
 		 * \author		Niklas Hauser

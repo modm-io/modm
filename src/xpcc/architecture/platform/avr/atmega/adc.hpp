@@ -35,13 +35,36 @@
 
 #include <avr/io.h>
 
+#if defined (__AVR_ATmega64HVE__)
+	#error "The ATmega64HVE is not supported by this ADC class."
+#endif
+#if defined ADCSR
+	#undef ADCSRA
+	#define ADCSRA ADCSR
+#endif
+#if defined VADMUX
+	#undef ADMUX
+	#define ADMUX VADMUX
+#endif
+
 namespace xpcc
 {
 	namespace atmega
 	{
 		/**
-		 * \brief	Analog/Digital-converter
+		 * \brief	Generic Analog/Digital-Converter module
 		 * 
+		 * This class aims at providing a common interface to all the different
+		 * register layouts of the ADC modules in most ATmegas.
+		 * It takes into consideration restrictions and extensions in ADC
+		 * functionality and provides the appropriate methods to configure them.
+		 * 
+		 * This class enables you to address and use a broader array of ATmegas
+		 * with similar ADC functionality without changing a single line of code.
+		 * 
+		 * For best use of this class, check your device's datasheet for the
+		 * supported functionality.
+		 *
 		 * ADC clock frequency should be between 50 and 200 kHz for maximum
 		 * resolution. If less than 10-bits are needed the frequency can be higher.
 		 * 
@@ -75,27 +98,22 @@ namespace xpcc
 		 * // read the converted value
 		 * uint16_t value = xpcc::Adc::getValue();
 		 * \endcode
+		 *
+		 * Alternatively you can use the AdcInterrupt class to attach a function
+		 * to the ADC Interrupt handler for true asynchonous mode.
 		 * 
 		 * For a detailed example see the \c adc folder in the examples folder.
 		 * 
+		 * \see AdcInterrupt
 		 * \author	Fabian Greif, Niklas Hauser
 		 * \ingroup	atmega
 		 */
 		class Adc
 		{
 		public:
-#if defined (__AVR_ATmega64HVE__)
-	#error "The ATmega64HVE is not supported by this ADC class."
-#endif
-#if defined ADCSR
-	#define ADCSRA ADCSR
-#endif
-#if defined VADMUX
-	#define ADMUX VADMUX
-#endif
 			enum Reference
 			{
-#if defined (__AVR_ATmega16M1__) || defined (__AVR_ATmega32M1__) || defined (__AVR_ATmega64M1__) || defined (__AVR_ATmega32C1__) || defined (__AVR_ATmega64C1__)
+#if defined ISRCEN
 				// REF1 REF0 AREFEN -
 				REFERENCE_AREF = 0x20, //0010
 				REFERENCE_INTERNAL_AVCC = 0x60, //0110
@@ -112,7 +130,7 @@ namespace xpcc
 				REFERENCE_INTERNAL_AVDD_NO_CAP = 0x40,
 				REFERENCE_INTERNAL_1V5_NO_CAP = 0x80,
 				REFERENCE_INTERNAL_1V6_NO_CAP = 0xc0
-#elif defined (__AVR_ATmega128__) || defined (__AVR_ATmega64__) || defined (__AVR_ATmega32__) || defined (__AVR_ATmega16__) || defined (__AVR_ATmega16A__) || (__AVR_ATmega323__) || defined (__AVR_ATmega163__) || defined (__AVR_ATmega8535__) || defined (__AVR_ATmega8__)
+#elif defined (__AVR_ATmega128__) || defined (__AVR_ATmega64__) || defined (__AVR_ATmega32__) || defined (__AVR_ATmega16__) || defined (__AVR_ATmega16A__) || (__AVR_ATmega323__) || defined (__AVR_ATmega163__) || defined (__AVR_ATmega8535__) || defined (__AVR_ATmega8__) || defined (__AVR_AT90CAN128__)
 				REFERENCE_AREF = 0,
 				REFERENCE_INTERNAL_AVCC = 0x40,
 				REFERENCE_INTERNAL_2V56 = 0xc0
@@ -137,34 +155,56 @@ namespace xpcc
 			
 		public:
 //------------ ADMUX register -------------------------------------------------
-#if not defined (__AVR_ATmega103__) || not defined (__AVR_ATmega16HVB__) || not defined (__AVR_ATmega32HVB__) || not defined (__AVR_ATmega8HVA__)  || not defined (__AVR_ATmega16HVA__)  || not defined (__AVR_ATmega16HVA2__) || not defined (__AVR_ATmega406__)
+#if not defined VADC || defined (__DOXYGEN__)
+			/**
+			 * \brief voltage reference for the ADC
+			 *
+			 * The internal voltage reference options may not be used if an 
+			 * external reference voltage is being applied to the AREF pin.
+			 */
 			static inline void
 			setReferenceVoltage(Reference referenceVoltage)
 			{
-#if defined (__AVR_ATmega16M1__) || defined (__AVR_ATmega32M1__) || defined (__AVR_ATmega64M1__) || defined (__AVR_ATmega32C1__) || defined (__AVR_ATmega64C1__)
+#if defined ISRCEN
 				ADCSRB = (ADCSRB & ~(1<<AREFEN)) | (referenceVoltage & (1<<AREFEN));
 #endif
 				ADMUX = (ADMUX & ~0xc0) | (referenceVoltage & 0xc0);
 			}
 			
+			/**
+			 * \brief Change the presentation of the ADC conversion result
+			 *
+			 * Set to \c true to left adjust the result. Otherwise, the result
+			 * is right adjusted.
+			 * Change will affect the ADC Data Register immediately, regardless
+			 * of any ongoing conversions.
+			 */
 			static inline void
 			setLeftAdjustResult(bool enable)
 			{
 				ADMUX = (ADMUX & ~(1<<ADLAR)) | (enable ? (1<<ADLAR) : 0);
 			}
 #endif
-
+			/**
+			 * \brief Analog channel selection
+			 *
+			 * Selects which analog inputs are connected to the ADC.
+			 * If this is changed during a conversion, the change will not go
+			 * in effect until this conversion is complete.
+			 * 
+			 * Available on all ATmegas.
+			 */
 			static inline bool
 			setChannel(uint8_t channel)
 			{
-#if defined (__AVR_ATmega16M1__) || defined (__AVR_ATmega32M1__) || defined (__AVR_ATmega64M1__) || defined (__AVR_ATmega32C1__) || defined (__AVR_ATmega64C1__)
+#if defined ISRCEN
 				if (channel > 0x12) return false;
-#elif defined (MUX5)
+#elif defined MUX5
 				if (channel > 0x3f) return false;
 				ADCSRB = (ADCSRB & ~(1<<MUX5)) | ((channel & 0x20) ? (1<<MUX5) : 0);
 #elif defined (__AVR_ATmega103__)
 				if (channel > 0x07) return false;
-#elif not defined (MUX4)
+#elif not defined MUX4 || defined VADC
 				if (channel > 0x0f) return false;
 #else
 				if (channel > 0x1f) return false;
@@ -173,10 +213,15 @@ namespace xpcc
 				return true;
 			}
 			
+			/**
+			 * \return The analog channel connected to the ADC
+			 * 
+			 * Available on all ATmegas.
+			 */
 			static inline uint8_t
 			getChannel()
 			{
-#if defined (MUX5)
+#if defined MUX5
 				return (ADMUX & 0x1f) | ((ADCSRB & (1<<MUX5)) ? 0x20 : 0);
 #else
 				return (ADMUX & 0x1f);
@@ -184,7 +229,7 @@ namespace xpcc
 			}
 			
 //------------ ADCSRA register ------------------------------------------------
-#if defined VADCSR
+#if defined VADC
 			static inline void
 			setEnableAdc(bool enable)
 			{
@@ -211,44 +256,90 @@ namespace xpcc
 				VADCSR = (VADCSR & ~(1<<VADCCIE)) | (enable ? (1<<VADCCIE) : 0);
 			}
 #else
+			/**
+			 * \brief Enables the ADC
+			 *
+			 * Available on all ATmegas.
+			 */
 			static inline void
 			setEnableAdc(bool enable)
 			{
 				ADCSRA = (ADCSRA & ~(1<<ADEN)) | (enable ? (1<<ADEN) : 0);
 			}
+			/**
+			 * In Single Conversion mode, this starts each conversion.
+			 * In Free Running mode, this starts the first conversion.
+			 *
+			 * Available on all ATmegas.
+			 */
 			static inline void
 			setStartConversion()
 			{
 				ADCSRA |= (1<<ADSC);
 			}
-#ifdef ADATE
+#if defined ADATE || defined (__DOXYGEN__)
+			/**
+			 * \brief Enable auto triggering of the ADC
+			 *
+			 * The ADC will start a conversion on a positive edge of the
+			 * selected trigger signal.
+			 * \see setAutoTriggerSource
+			 */
 			static inline void
 			setAutoTriggerEnable(bool enable)
 			{
 				ADCSRA = (ADCSRA & ~(1<<ADATE)) | (enable ? (1<<ADATE) : 0);
 			}
-#elif defined ADFR
+#endif
+#if defined ADFR || defined (__DOXYGEN__)
+			/**
+			 * \brief Enables free running mode
+			 *
+			 * The ADC will continously start conversions and provide the most
+			 * recent result in the ADC register.
+			 */
 			static inline void
 			setFreeRunningMode(bool enable)
 			{
 				ADCSRA = (ADCSRA & ~(1<<ADFR)) | (enable ? (1<<ADFR) : 0);
 			}
 #endif
+			/**
+			 * \return \c true if the flag is set
+			 *
+			 * Available on all ATmegas.
+			 */
 			static inline bool
 			isInterruptFlagSet()
 			{
 				return (ADCSRA & (1<<ADIF));
 			}
+			/**
+			 * \brief Clears the interrupt flag
+			 *
+			 * Available on all ATmegas.
+			 */
 			static inline void
 			clearInterruptFlag()
 			{
 				ADCSRA &= ~(1<<ADIF);
 			}
+			/**
+			 * \brief Enables the ADC Conversion Complete Interrupt
+			 *
+			 * Available on all ATmegas.
+			 *
+			 * \see AdcInterrupt
+			 */
 			static inline void
 			setInterruptEnable(bool enable)
 			{
 				ADCSRA = (ADCSRA & ~(1<<ADIE)) | (enable ? (1<<ADIE) : 0);
 			}
+			/**
+			 * Set the division factor between the system clock frequency
+			 * and the input clock to the ADC.
+			 */
 			static inline void
 			setPrescaler(Prescaler prescaler)
 			{
@@ -258,11 +349,20 @@ namespace xpcc
 			
 			
 //------------ ADCSRB register ------------------------------------------------
-#if defined ADCSRB
+#if defined ADCSRB || defined (__DOXYGEN__)
+			/**
+			 * \brief Selects which source will trigger an ADC conversion
+			 *
+			 * A conversion will be triggered by the rising edge of the
+			 * selected Interrupt Flag. Note that switching from a trigger
+			 * source that is cleared to a trigger source that is set, will
+			 * generate a positive edge on the trigger signal.
+			 * Set to 0 to enable Free Running Mode.
+			 */
 			static inline void
 			setAutoTriggerSource(uint8_t source)
 			{
-#if defined (__AVR_ATmega16M1__) || defined (__AVR_ATmega32M1__) || defined (__AVR_ATmega64M1__) || defined (__AVR_ATmega32C1__) || defined (__AVR_ATmega64C1__)
+#if defined ISRCEN
 				if (source > 0x0d) return;
 #else
 				if (source > 0x07) return;
@@ -277,12 +377,29 @@ namespace xpcc
 			}
 #endif
 			
-#if defined (__AVR_ATmega16M1__) || defined (__AVR_ATmega32M1__) || defined (__AVR_ATmega64M1__) || defined (__AVR_ATmega32C1__) || defined (__AVR_ATmega64C1__)
+#if defined ISRCEN || defined (__DOXYGEN__)
+			/**
+			 * \brief Enable the ADC High Speed mode
+			 *
+			 * Set this if you wish to convert with an ADC clock frequency
+			 * higher than 200KHz.
+			 * Clear this bit to reduce the power consumption of the ADC when
+			 * the ADC clock frequency is lower than 200KHz.
+			 *
+			 * Only Available on the M- and C-series ATmega's!
+			 */
 			static inline void
 			setHighSpeedMode(bool enable)
 			{
 				ADCSRB = (ADCSRB & ~(1<<ADHSM)) | (enable ? (1<<ADHSM) : 0);
 			}
+			/**
+			 * \brief Source a 100μA current to the AREF pin
+			 *
+			 * Clear this bit to use AREF pin as Analog Reference pin.
+			 *
+			 * Only Available on the M- and C-series ATmega's!
+			 */
 			static inline void
 			setCurrentSourceEnable(bool enable)
 			{
@@ -290,17 +407,51 @@ namespace xpcc
 			}
 #endif
 			
-#if defined (__AVR_ATmega128RFA1__)
-			static inline void
+#if defined (__AVR_ATmega128RFA1__) || defined (__DOXYGEN__)
+			/**
+			 * The analog functions of the ADC are powered from the AVDD domain.
+			 * AVDD is supplied from an internal voltage regulator.
+			 * Enabling the ADC will power-up the AVDD domain if not already
+			 * requested by another functional group of the device.
+			 * This method allows the user to monitor (poll) the status of the
+			 * AVDD domain.
+			 *
+			 * \return \c true indicates that AVDD has been powered-up.
+			 *
+			 * Only Available on the ATmega128RFA1!
+			 */
+			static inline bool
 			isAvddOk()
 			{
 				return (ADCSRB & (1<<AVDDOK));
 			}
-			static inline void
+			/**
+			 * The status of the internal generated reference voltage can be 
+			 * monitored through this bit.
+			 * After enabling the ADC and setting the reference voltage, it
+			 * will be available after a start-up delay.
+			 * 
+			 * \return \c true which indicates that the internal generated
+			 * reference voltage is approaching final levels.
+			 *
+			 * Only Available on the ATmega128RFA1!
+			 */
+			static inline bool
 			isReferenceVoltageOk()
 			{
 				return (ADCSRB & (1<<REFOK));
 			}
+			/**
+			 * The user can force a reset of the analog blocks by setting this
+			 * without requesting a different channel. The analog blocks of the
+			 * ADC will be reset to handle possible new voltage ranges. Such a
+			 * reset phase is especially important for the gain amplifier. It
+			 * could be temporarily disabled by a large step of its input common
+			 * voltage leading to erroneous A/D conversion results.
+			 *
+			 * Only Available on the ATmega128RFA1!
+			 */
+			static inline void
 			setAnalogChannelChange()
 			{
 				ADCSRB |= (1<<ACCH);
@@ -319,24 +470,43 @@ namespace xpcc
 			}
 			
 //-----------------------------------------------------------------------------
+#if defined VADC
+			static inline void
+			initialize()
+			{
+				setEnableAdc(true);
+			}
+#else
 			/**
-			 * \brief	Initialize the A/D converter
+			 * \brief	Initialize and enable the A/D converter
+			 *
+			 * Available on all ATmegas.
 			 */
-#if not defined (__AVR_ATmega103__) || not defined (__AVR_ATmega16HVB__) || not defined (__AVR_ATmega32HVB__) || not defined (__AVR_ATmega8HVA__)  || not defined (__AVR_ATmega16HVA__)  || not defined (__AVR_ATmega16HVA2__) || not defined (__AVR_ATmega406__)
 			static inline void
 			initialize(Reference referenceVoltage,
 					   Prescaler prescaler)
 			{
 				setReferenceVoltage(referenceVoltage);
 				setPrescaler(prescaler);
-			}
-#else
-			static inline void
-			initialize(Prescaler prescaler)
-			{
-				setPrescaler(prescaler);
+				setEnableAdc(true);
 			}
 #endif
+			
+			/**
+			 * \brief Correctly enables Free Running Mode
+			 *
+			 * Available on all ATmegas.
+			 */
+			static inline void
+			enableFreeRunningMode()
+			{
+#if defined ADFR
+				setFreeRunningMode(true);
+#else
+				setAutoTriggerEnable(true)l
+				setAutoTriggerSource(0);
+#endif
+			}
 			
 			/**
 			 * \brief	Read the value an analog channel
@@ -344,6 +514,8 @@ namespace xpcc
 			 * A normal conversion takes 13 ADC clock cycles. With a clock frequency
 			 * of for example 200 kHz a conversion therefore needs 65 microseconds.
 			 * This time increases with a lower frequency.
+			 *
+			 * Available on all ATmegas.
 			 */
 			static inline uint16_t
 			readChannel(uint8_t channel)
@@ -357,7 +529,11 @@ namespace xpcc
 				return getDataRegister();
 			}
 			
-			/// Start a new conversion
+			/**
+			 * \brief Start a new conversion
+			 *
+			 * Available on all ATmegas.
+			 */
 			static inline bool
 			startConversion(uint8_t channel)
 			{
@@ -369,14 +545,22 @@ namespace xpcc
 				return true;
 			}
 			
-			/// Check if the conversion is finished
+			/**
+			 * \brief Check if the conversion is finished
+			 * 
+			 * Available on all ATmegas.
+			 */
 			static inline bool
 			isFinished()
 			{
 				return isInterruptFlagSet();
 			}
 			
-			/// Read the converted analog value
+			/**
+			 * \brief the most recent 16bit result of the ADC conversion
+			 *
+			 * Available on all ATmegas.
+			 */
 			static inline uint16_t
 			getValue()
 			{

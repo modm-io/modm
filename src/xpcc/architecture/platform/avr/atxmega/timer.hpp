@@ -38,7 +38,7 @@
  * Be aware that both type 0 and 1 share the same HIRES Extension and, when
  * available for the TC, also the same AWEX Extension!
  * The basic Timer classes extend the HighRes and Waveform classes when available.
- * The more advanced Timer Interrupt Classes extend the basic Timer classe and 
+ * The more advanced Timer Interrupt Classes extend the basic Timer classes and 
  * allow you to attach functions to all the Timer's interrupts via function pointers.
  * Be aware however, that the "interrupt attaching" implementation is slower
  * and requires more resources than writing the function code directly into

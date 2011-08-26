@@ -42,22 +42,22 @@ namespace xpcc
 	{
 		/**
 		 * \brief	Generic ADC wrapper for analog sensors.
-		 *			This template class stores 16bit ADC values in a buffer and 
-		 *			provides an easy interface for managing that data.
-		 *			
-		 *			The code will read the ADC channels you specify in an array.
-		 *			This means you can remap the ADC channels in the order that they
-		 *			should appear in the buffer.
-		 *			The array must obviously have as many elements as channels!
-		 *			For example, if channels 0,2,7 are connected, but the sensors
-		 *			are in the wrong order, just remap them with the array {7,0,2}.
 		 *
-		 *			To make use of oversampling and averaging, set SAMPLES > 0.
-		 *			This will loop 2^SAMPLES times through the ADC channels, adding
-		 *			the average of each result to the buffer.
-		 *			Be aware that averaging more than 64 values (SAMPLES>6) could
-		 *			cause a 16bit overflow depending on your ADC values
-		 *			(10bit * 64 = 16bit).
+		 * This template class stores 16bit ADC values in a buffer and 
+		 * provides an easy interface for managing that data.
+		 *			
+		 * The code will read the ADC channels you specify in an array.
+		 * This means you can remap the ADC channels in the order that they
+		 * should appear in the buffer.
+		 * The array must obviously have as many elements as channels!
+		 * For example, if channels 0,2,7 are connected, but the sensors
+		 * are in the wrong order, just remap them with the array {7,0,2}.
+		 *
+		 * To make use of oversampling and averaging, set SAMPLES > 0.
+		 * This will loop 2^SAMPLES times through the ADC channels, adding
+		 * the average of each result to the buffer.
+		 * Be aware that averaging more than 64 values (SAMPLES>6) could cause
+		 * a 16bit overflow depending on your ADC values (10bit * 64 = 16bit).
 		 *
 		 * \ingroup atmega
 		 * \author	Niklas Hauser
