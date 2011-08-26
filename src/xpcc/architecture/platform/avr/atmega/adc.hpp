@@ -130,7 +130,7 @@ namespace xpcc
 				REFERENCE_INTERNAL_AVDD_NO_CAP = 0x40,
 				REFERENCE_INTERNAL_1V5_NO_CAP = 0x80,
 				REFERENCE_INTERNAL_1V6_NO_CAP = 0xc0
-#elif defined (__AVR_ATmega128__) || defined (__AVR_ATmega64__) || defined (__AVR_ATmega32__) || defined (__AVR_ATmega16__) || defined (__AVR_ATmega16A__) || (__AVR_ATmega323__) || defined (__AVR_ATmega163__) || defined (__AVR_ATmega8535__) || defined (__AVR_ATmega8__) || defined (__AVR_AT90CAN128__)
+#elif defined (__AVR_ATmega128__) || defined (__AVR_ATmega64__) || defined (__AVR_ATmega32__) || defined (__AVR_ATmega16__) || defined (__AVR_ATmega16A__) || defined(__AVR_ATmega323__) || defined (__AVR_ATmega163__) || defined (__AVR_ATmega8535__) || defined (__AVR_ATmega8__) || defined (__AVR_AT90CAN128__)
 				REFERENCE_AREF = 0,
 				REFERENCE_INTERNAL_AVCC = 0x40,
 				REFERENCE_INTERNAL_2V56 = 0xc0
@@ -503,7 +503,7 @@ namespace xpcc
 #if defined ADFR
 				setFreeRunningMode(true);
 #else
-				setAutoTriggerEnable(true)l
+				setAutoTriggerEnable(true);
 				setAutoTriggerSource(0);
 #endif
 			}
