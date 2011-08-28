@@ -29,14 +29,64 @@
  * $Id$
  */
 // ----------------------------------------------------------------------------
-/**
- * \ingroup		driver
- * \defgroup	sensors Hardware Sensors
- * 
- */
 
-#include "sensors/scp1000.hpp"
-#include "sensors/tmp102.hpp"
-#include "sensors/adxl345.hpp"
-#include "sensors/hmc5843.hpp"
-#include "sensors/hmc5883l.hpp"
+#ifndef XPCC__HMC5883L_HPP
+#define XPCC__HMC5883L_HPP
+
+#include "hmc58.hpp"
+
+namespace xpcc
+{
+	/**
+	 * \brief	Driver for the HMC5883L digital compass.
+	 *
+	 * This class extends the HMC58* family driver only by the addition of
+	 * device specific Register bit masks.
+	 *
+	 * \see Hmc58
+	 *
+	 * For further information on this device consult the
+	 * <a href="http://www.insed.de/HMC5883L.pdf">
+	 * datasheet</a>.
+	 *
+	 * \ingroup sensors
+	 * \author	Niklas Hauser
+	 *
+	 * \tparam I2C Asynchronous Two Wire interface
+	 */
+	template < typename I2C >
+	class Hmc5883l : public Hmc58< I2C >
+	{
+	public:
+		/// device specific data output rate options of REGISTER_CONFIG_A
+		enum DataOutputRate {
+			DATA_OUTPUT_RATE_0_75_gc = 0x00,
+			DATA_OUTPUT_RATE_1_5_gc = 0x04,
+			DATA_OUTPUT_RATE_3_gc = 0x08,
+			DATA_OUTPUT_RATE_7_5_gc = 0x0c,
+			DATA_OUTPUT_RATE_15_gc = 0x10,
+			DATA_OUTPUT_RATE_30_gc = 0x14,
+			DATA_OUTPUT_RATE_75_gc = 0x18
+		};
+		
+		/// device specific data gain options of REGISTER_CONFIG_B
+		enum Gain {
+			GAIN_0_88_gc,
+			GAIN_1_3_gc,
+			GAIN_1_9_gc,
+			GAIN_2_5_gc,
+			GAIN_4_0_gc,
+			GAIN_4_7_gc,
+			GAIN_5_6_gc,
+			GAIN_8_1_gc
+		};
+		
+		/// \brief	Constructor, sets address to default of 0x1e
+		Hmc5883l() :
+			Hmc58<I2C>(0x1e)
+		{
+		}
+	};
+}
+
+#endif // XPCC__HMC5883L_HPP

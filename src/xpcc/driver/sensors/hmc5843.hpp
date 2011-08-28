@@ -29,14 +29,64 @@
  * $Id$
  */
 // ----------------------------------------------------------------------------
-/**
- * \ingroup		driver
- * \defgroup	sensors Hardware Sensors
- * 
- */
 
-#include "sensors/scp1000.hpp"
-#include "sensors/tmp102.hpp"
-#include "sensors/adxl345.hpp"
-#include "sensors/hmc5843.hpp"
-#include "sensors/hmc5883l.hpp"
+#ifndef XPCC__HMC5843_HPP
+#define XPCC__HMC5843_HPP
+
+#include "hmc58.hpp"
+
+namespace xpcc
+{
+	/**
+	 * \brief	HMC5843 digital compass driver.
+	 *
+	 * This class extends the HMC58* family driver only by the addition of
+	 * device specific Register bit masks.
+	 *
+	 * \see Hmc58
+	 *
+	 * For further information on this device consult the
+	 * <a href="http://www.sparkfun.com/datasheets/Sensors/Magneto/HMC5843.pdf">
+	 * datasheet</a>.
+	 *
+	 * \ingroup sensors
+	 * \author	Niklas Hauser
+	 *
+	 * \tparam I2C Asynchronous Two Wire interface
+	 */
+	template < typename I2C >
+	class Hmc5843 : public Hmc58< I2C >
+	{
+	public:
+		/// device specific data output rate options of REGISTER_CONFIG_A
+		enum DataOutputRate {
+			DATA_OUTPUT_RATE_0_5_gc = 0x00,
+			DATA_OUTPUT_RATE_1_gc = 0x04,
+			DATA_OUTPUT_RATE_2_gc = 0x08,
+			DATA_OUTPUT_RATE_5_gc = 0x0c,
+			DATA_OUTPUT_RATE_10_gc = 0x10,
+			DATA_OUTPUT_RATE_20_gc = 0x14,
+			DATA_OUTPUT_RATE_50_gc = 0x18
+		};
+		
+		/// device specific data gain options of REGISTER_CONFIG_B
+		enum Gain {
+			GAIN_0_7_gc,
+			GAIN_1_0_gc,
+			GAIN_1_5_gc,
+			GAIN_2_0_gc,
+			GAIN_3_2_gc,
+			GAIN_3_8_gc,
+			GAIN_4_5_gc,
+			GAIN_6_5_gc
+		};
+		
+		/// \brief	Constructor, sets address to default of 0x1e
+		Hmc5843() :
+			Hmc58<I2C>(0x1e)
+		{
+		}
+	};
+}
+
+#endif // XPCC__HMC5843_HPP
