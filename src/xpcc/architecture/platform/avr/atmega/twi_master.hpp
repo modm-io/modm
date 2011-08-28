@@ -154,8 +154,11 @@ namespace xpcc
 			static bool
 			isBusy();
 			
-			static inline i2c::Status
+			static uint8_t
 			getStatus();
+			
+			static bool
+			tranferSucceded();
 		};
 	}
 }

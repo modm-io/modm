@@ -36,3 +36,4 @@
  */
 
 #include "sensors/scp1000.hpp"
+#include "sensors/tmp102.hpp"

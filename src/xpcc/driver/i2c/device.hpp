@@ -43,7 +43,9 @@ namespace xpcc
 		 * \brief	Base class for all I2C Devices
 		 * 
 		 * \tparam	I2C		Must be a driver that implements the
-		 * 					xpcc::i2c::SynchronousMaster interface.
+		 * 					xpcc::i2c::SynchronousMaster interface, or
+		 *					xpcc::i2c::AsynchronousMaster interface, or
+		 *					xpcc::i2c::AsynchronousInterface.
 		 * 
 		 * \ingroup	i2c
 		 * \author	Fabian Greif
@@ -66,6 +68,20 @@ namespace xpcc
 		protected:
 			const uint8_t deviceAddress;
 			static I2C i2c;
+		};
+		
+		template <>
+		class Device<SynchronousMaster>
+		{
+		public:
+			Device(uint8_t address);
+			
+			bool
+			isAvailable() const;
+			
+		protected:
+			const uint8_t deviceAddress;
+			static SynchronousMaster i2c;
 		};
 	}
 }

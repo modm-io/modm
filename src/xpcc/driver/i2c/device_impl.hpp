@@ -50,6 +50,28 @@ template <typename I2C>
 bool
 xpcc::i2c::Device<I2C>::isAvailable() const
 {
+	uint8_t buffer;
+	this->i2c.write(this->deviceAddress, &buffer, 0);
+	while (this->i2c.isBusy())
+		;
+	
+	return !(this->i2c.getStatus());
+}
+
+
+// ----------------------------------------------------------------------------
+xpcc::i2c::SynchronousMaster xpcc::i2c::Device<xpcc::i2c::SynchronousMaster>::i2c;
+
+// ----------------------------------------------------------------------------
+xpcc::i2c::Device<xpcc::i2c::SynchronousMaster>::Device(uint8_t address) :
+deviceAddress(address)
+{
+}
+
+// ----------------------------------------------------------------------------
+bool
+xpcc::i2c::Device<xpcc::i2c::SynchronousMaster>::isAvailable() const
+{
 	bool ack = this->i2c.start(this->deviceAddress | WRITE);
 	this->i2c.stop();
 	

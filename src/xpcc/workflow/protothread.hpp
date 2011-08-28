@@ -44,10 +44,9 @@
  * machines or full multi-threading. 
  * 
  * As they implement some kind of cooperative multithreading 
- * 
  * Protothreads are non-preemptable. Therefore, a context switch can only take
  * place on blocking operations. Therefore you don't need complex
- * synchronisation. Protothreads are also stackless, whic means
+ * synchronisation. Protothreads are also stackless, which means
  * member variables of the xpcc::Protothread subclasses are needed for
  * preserving variables across context switches.
  * 

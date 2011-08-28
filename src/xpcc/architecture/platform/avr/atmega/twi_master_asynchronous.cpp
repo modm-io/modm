@@ -71,7 +71,7 @@ ISR(TWI_vect)
 		// Fall through...
 	case TW_MT_DATA_ACK:
 		// Data byte has been transmitted and ACK received
-		if (twiWriteCounter != 0)
+		if (twiWriteCounter > 0)
 		{
 			// Decrement counter
 			twiWriteCounter--;
@@ -219,13 +219,19 @@ xpcc::atmega::AsynchronousTwiMaster::writeRead(uint8_t address, uint8_t *data,
 		// Wait for previous transaction to finish
 	}
 	
+	// Copy address; clear R/~W bit in SLA+R/W address field
+	twiAddress = address & 0xfe;
+	
 	// prepare read operation, switching from write to read will be done
 	// automatically in the TWI interrupt
 	twiReadCounter = readSize;
-	twiReadBuffer = data;
+	twiWriteCounter = writeSize;
 	
-	// Start the first write operation which does the rest
-	write(address, data, writeSize);
+	twiReadBuffer = data;
+	twiWriteBuffer = data;
+	
+	// Initiate a START condition; Interrupt enabled and flag cleared
+	TWCR = (1 << TWINT) | (1 << TWSTA) | (1 << TWEN) | (1 << TWIE);
 }
 
 // ----------------------------------------------------------------------------
@@ -237,13 +243,15 @@ xpcc::atmega::AsynchronousTwiMaster::isBusy()
 }
 
 // ----------------------------------------------------------------------------
-xpcc::i2c::Status
+uint8_t
 xpcc::atmega::AsynchronousTwiMaster::getStatus()
 {
-	if (twiStatus == TWI_STATUS_DONE) {
-		return i2c::SUCCESS;
-	}
-	else {
-		return i2c::ERROR;
-	}
+	return twiStatus;
+}
+
+// ----------------------------------------------------------------------------
+bool
+xpcc::atmega::AsynchronousTwiMaster::tranferSucceded()
+{
+	return (twiStatus == TWI_STATUS_DONE);
 }

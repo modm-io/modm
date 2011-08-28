@@ -80,8 +80,8 @@ namespace xpcc
 		 */
 		enum Status
 		{
-			SUCCESS = 0,	//!< Last operation was successful
-			ERROR = 1,		//!< Error in last operation
+			SUCCESS = 1,	//!< Last operation was successful
+			ERROR = 0,		//!< Error in last operation
 		};
 		
 		/**
