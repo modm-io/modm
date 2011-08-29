@@ -1,0 +1,39 @@
+
+FreeRTOS port for STM32 microcontrollers
+-------------------------------------------------------------------------------
+
+Interrupt Priorities
+-------------------------------------------------------------------------------
+
+The STM32 implements only four priority bits. The lower four bits of the eight
+bit priority register are unused. A lower value means a higher priority.
+Therefore 0 (=0) is the highest priority and 15 (=15 << 4 => 0xf0) is the
+lowest priority.
+
+The Kernel has the lowest possible priority 15 to make sure that it is not
+interrupting any other interrupt. During the execution of an API function the
+priority is raised to 11.
+
+TODO systick priority
+
+Any interrupt that calls an API function must have a priority between 15 and 11,
+otherwise the system might crash.
+
+Interrupts that do not use any FreeRTOS API functions can use any interrupt
+priority. If the priority is higher (lower value) than 11 the execution won't
+be delayed by anything the kernel is doing.
+
+See http://www.freertos.org/a00110.html > configMAX_SYSCALL_INTERRUPT_PRIORITY
+for further information. 
+
+
+Hints
+-------------------------------------------------------------------------------
+
+ - The scheduler must never be stopped!
+
+   When calling vPortStartFirstTask() (which is called by
+   vTaskStartScheduler()) the stack is reset to it's original value, specified
+   in the vector table. This saves some bytes there but means everything
+   written to the stack before will be lost.
+

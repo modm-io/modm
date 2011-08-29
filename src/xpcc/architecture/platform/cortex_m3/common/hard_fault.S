@@ -29,51 +29,27 @@
  * $Id$
  */
 // ----------------------------------------------------------------------------
-
-#ifndef XPCC_FREERTOS__SCHEDULER_HPP
-#define XPCC_FREERTOS__SCHEDULER_HPP
-
-#include <freertos/FreeRTOS.h>
-#include <freertos/task.h>
-
-namespace xpcc
-{
-	namespace freertos
-	{
-		/**
-		 * \brief	
-		 * 
-		 * vTaskEndScheduler() will not work for the STM32 port of FreeRTOS
-		 * therefore no stop() method is implemented here. See the README
-		 * file in ext/freertos/port for more details.
-		 * 
-		 * \ingroup	freertos
-		 */
-		class Scheduler
-		{
-		public:
-			/**
-			 * \brief	Starts the real time kernel
-			 * 
-			 * This function will never return.
-			 * 
-			 * The idle task is created automatically when schedule() is called.
-			 */
-			static inline void
-			schedule()
-			{
-				vTaskStartScheduler();
-			}
-			
-			/// The count of ticks since Scheduler::schedule() was called
-			static inline portTickType
-			getTicks()
-			{
-				return xTaskGetTickCount();
-			}
-			
-		};
-	}
-}
-
-#endif // XPCC_FREERTOS__SCHEDULER_HPP
+	
+	.text
+	.syntax	unified
+	.align	4
+	.thumb
+	
+	// ------------------------------------------------------------------------
+	/**
+	 * @brief	Hard fault handler
+	 * 
+	 * Prepares data for the C output handler
+	 */
+	.global	HardFault_Handler
+	.type	HardFault_Handler, %function
+	.thumb_func
+	.func	HardFault_Handler
+HardFault_Handler:
+	tst		lr, #4
+	ite		eq
+	mrseq	r0, msp
+	mrsne	r0, psp
+	b		_hardFaultHandler
+	.endfunc
+	.end

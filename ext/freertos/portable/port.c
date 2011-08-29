@@ -99,14 +99,12 @@ static unsigned portBASE_TYPE uxCriticalNesting = 0xaaaaaaaa;
 /*
  * Exception handlers.
  */
-//void xPortPendSVHandler( void ) __attribute__ (( naked ));
-void xPortSysTickHandler( void );
-//void vPortSVCHandler( void ) __attribute__ (( naked ));
+void vPortSysTickHandler( void );
 
 /*
  * Start first task is a separate function so it can be tested in isolation.
  */
-void vPortStartFirstTask( void ) __attribute__ (( naked ));
+void vPortStartFirstTask(void) __attribute__ ((noreturn));
 
 /*-----------------------------------------------------------*/
 
@@ -129,62 +127,24 @@ portSTACK_TYPE *pxPortInitialiseStack( portSTACK_TYPE *pxTopOfStack, pdTASK_CODE
 
 	return pxTopOfStack;
 }
-/*-----------------------------------------------------------*/
-
-// !!! Maple
-// void vPortSVCHandler( void )
-//void __exc_svc( void )
-void SVC_Handler( void )
-// !!! Maple
-{
-	__asm volatile (
-					"	ldr	r3, pxCurrentTCBConst2		\n" /* Restore the context. */
-					"	ldr r1, [r3]					\n" /* Use pxCurrentTCBConst to get the pxCurrentTCB address. */
-					"	ldr r0, [r1]					\n" /* The first item in pxCurrentTCB is the task top of stack. */
-					"	ldmia r0!, {r4-r11}				\n" /* Pop the registers that are not automatically saved on exception entry and the critical nesting count. */
-					"	msr psp, r0						\n" /* Restore the task stack pointer. */
-					"	mov r0, #0 						\n"
-					"	msr	basepri, r0					\n"
-					"	orr r14, #0xd					\n"
-					"	bx r14							\n"
-					"									\n"
-					"	.align 2						\n"
-					"pxCurrentTCBConst2: .word pxCurrentTCB				\n"
-				);
-}
-/*-----------------------------------------------------------*/
-
-void vPortStartFirstTask( void )
-{
-	__asm volatile(
-					" ldr r0, =0xE000ED08 	\n" /* Use the NVIC offset register to locate the stack. */
-					" ldr r0, [r0] 			\n"
-					" ldr r0, [r0] 			\n"
-					" msr msp, r0			\n" /* Set the msp back to the start of the stack. */
-					" cpsie i				\n" /* Globally enable interrupts. */
-					" svc 0					\n" /* System call to start first task. */
-					" nop					\n"
-				);
-}
-/*-----------------------------------------------------------*/
 
 /*
  * See header file for description.
  */
 portBASE_TYPE xPortStartScheduler( void )
 {
-	/* Make PendSV, CallSV and SysTick the same priroity as the kernel. */
+	/* Make PendSV, CallSV the same priority as the kernel. */
 	*(portNVIC_SYSPRI2) |= portNVIC_PENDSV_PRI;
 	*(portNVIC_SYSPRI2) |= portNVIC_SYSTICK_PRI;
 
 // !!! Maple
-	systick_attach_callback(&xPortSysTickHandler);
+	systick_attach_callback(&vPortSysTickHandler);
 //	/* Start the timer that generates the tick ISR.  Interrupts are disabled
 //	here already. */
 //	prvSetupTimerInterrupt();
 // !!! Maple
 
-	/* Initialise the critical nesting count ready for the first task. */
+	/* Initialize the critical nesting count ready for the first task. */
 	uxCriticalNesting = 0;
 
 	/* Start the first task. */
@@ -224,48 +184,10 @@ void vPortExitCritical( void )
 		portENABLE_INTERRUPTS();
 	}
 }
+
 /*-----------------------------------------------------------*/
 
-// !!! Maple
-// void xPortPendSVHandler( void )
-//void __exc_pendsv( void )
-void PendSV_Handler( void )
-// !!! Maple
-{
-	/* This is a naked function. */
-
-	__asm volatile
-	(
-	"	mrs r0, psp							\n"
-	"										\n"
-	"	ldr	r3, pxCurrentTCBConst			\n" /* Get the location of the current TCB. */
-	"	ldr	r2, [r3]						\n"
-	"										\n"
-	"	stmdb r0!, {r4-r11}					\n" /* Save the remaining registers. */
-	"	str r0, [r2]						\n" /* Save the new top of stack into the first member of the TCB. */
-	"										\n"
-	"	stmdb sp!, {r3, r14}				\n"
-	"	mov r0, %0							\n"
-	"	msr basepri, r0						\n"
-	"	bl vTaskSwitchContext				\n"
-	"	mov r0, #0							\n"
-	"	msr basepri, r0						\n"
-	"	ldmia sp!, {r3, r14}				\n"
-	"										\n"	/* Restore the context, including the critical nesting count. */
-	"	ldr r1, [r3]						\n"
-	"	ldr r0, [r1]						\n" /* The first item in pxCurrentTCB is the task top of stack. */
-	"	ldmia r0!, {r4-r11}					\n" /* Pop the registers. */
-	"	msr psp, r0							\n"
-	"	bx r14								\n"
-	"										\n"
-	"	.align 2							\n"
-	"pxCurrentTCBConst: .word pxCurrentTCB	\n"
-	::"i"(configMAX_SYSCALL_INTERRUPT_PRIORITY)
-	);
-}
-/*-----------------------------------------------------------*/
-
-void xPortSysTickHandler( void )
+void vPortSysTickHandler( void )
 {
 unsigned long ulDummy;
 

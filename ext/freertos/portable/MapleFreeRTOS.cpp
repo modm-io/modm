@@ -24,21 +24,24 @@
  * SOFTWARE.
  *****************************************************************************/
 
-#include "MapleFreeRTOS.h"
+#include "../FreeRTOS.h"
+#include "../task.h"
+#include "../queue.h"
+#include "../semphr.h"
 
-extern "C" {
-
-void vApplicationStackOverflowHook(xTaskHandle *pxTask,
-                                   signed char *pcTaskName) {
-    /* This function will get called if a task overflows its stack.
-     * If the parameters are corrupt then inspect pxCurrentTCB to find
-     * which was the offending task. */
-
-    (void) pxTask;
-    (void) pcTaskName;
-
-    while (1)
-        ;
-}
+extern "C"
+{
+	// This function will get called if a task overflows its stack.
+	// If the parameters are corrupt then inspect pxCurrentTCB to find
+	// which was the offending task.
+	void
+	vApplicationStackOverflowHook(xTaskHandle *task, signed char *taskName)
+	{
+		(void) task;
+		(void) taskName;
+		
+		while (1)
+			;
+	}
 
 }

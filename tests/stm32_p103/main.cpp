@@ -105,7 +105,7 @@ pitHandler(void)
 
 #define	LED_GREEN		0x80
 
-xpcc::freertos::Semaphore event(1, 0);
+//xpcc::freertos::Semaphore event(1, 0);
 
 // ----------------------------------------------------------------------------
 class LedTask1 : public xpcc::freertos::Task
@@ -122,9 +122,9 @@ public:
 		while (1)
 		{
 			Led2::toggle();
-			this->delay(10 * MILLISECONDS);
+			this->delay(100 * MILLISECONDS);
 			
-			event.acquire();
+			//event.acquire();
 		}
 	}
 };
@@ -142,7 +142,7 @@ public:
 	{
 		while (1)
 		{
-			event.release();
+			//event.release();
 			
 			LedStat::set();
 			this->delay(50 * MILLISECONDS);

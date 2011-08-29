@@ -30,50 +30,52 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_FREERTOS__SCHEDULER_HPP
-#define XPCC_FREERTOS__SCHEDULER_HPP
+#include <stdint.h>
 
-#include <freertos/FreeRTOS.h>
-#include <freertos/task.h>
+#include <xpcc/debug/logger.hpp>
+#include <xpcc_config.hpp>
 
-namespace xpcc
+#if CORTEX_ENABLE_HARD_FAULT_HANDLER != 0
+#	undef XPCC_LOG_LEVEL
+#	define XPCC_LOG_LEVEL	xpcc::log::ERROR
+
+// ----------------------------------------------------------------------------
+extern "C"
+void
+_hardFaultHandler(const uint32_t * ctx)
 {
-	namespace freertos
+	uint32_t stacked_r0 = ((uint32_t) ctx[0]);
+	uint32_t stacked_r1 = ((uint32_t) ctx[1]);
+	uint32_t stacked_r2 = ((uint32_t) ctx[2]);
+	uint32_t stacked_r3 = ((uint32_t) ctx[3]);
+	
+	uint32_t stacked_r12 = ((uint32_t) ctx[4]);
+	uint32_t stacked_lr  = ((uint32_t) ctx[5]);
+	uint32_t stacked_pc  = ((uint32_t) ctx[6]);
+	uint32_t stacked_psr = ((uint32_t) ctx[7]);
+	
+	uint32_t bfar = (*((volatile uint32_t *)(0xE000ED38)));
+	uint32_t cfsr = (*((volatile uint32_t *)(0xE000ED28)));
+	uint32_t hfsr = (*((volatile uint32_t *)(0xE000ED2C)));
+	uint32_t dfsr = (*((volatile uint32_t *)(0xE000ED30)));
+	uint32_t afsr = (*((volatile uint32_t *)(0xE000ED3C)));
+	
+	XPCC_LOG_ERROR.printf("\n\nHard fault Exception:\n");
+	XPCC_LOG_ERROR.printf("r0 : 0x%08lx   r12 : 0x%08lx\n", stacked_r0, stacked_r12);
+	XPCC_LOG_ERROR.printf("r1 : 0x%08lx   lr  : 0x%08lx\n", stacked_r1, stacked_lr);
+	XPCC_LOG_ERROR.printf("r2 : 0x%08lx   pc  : 0x%08lx\n", stacked_r2, stacked_pc);
+	XPCC_LOG_ERROR.printf("r3 : 0x%08lx   psr : 0x%08lx\n", stacked_r3, stacked_psr);
+	XPCC_LOG_ERROR.printf("BFAR : 0x%08lx\n", bfar);
+	XPCC_LOG_ERROR.printf("CFSR : 0x%08lx\n", cfsr);
+	XPCC_LOG_ERROR.printf("HFSR : 0x%08lx\n", hfsr);
+	XPCC_LOG_ERROR.printf("DFSR : 0x%08lx\n", dfsr);
+	XPCC_LOG_ERROR.printf("AFSR : 0x%08lx\n", afsr);
+	
+	// Infinite loop
+	while (1)
 	{
-		/**
-		 * \brief	
-		 * 
-		 * vTaskEndScheduler() will not work for the STM32 port of FreeRTOS
-		 * therefore no stop() method is implemented here. See the README
-		 * file in ext/freertos/port for more details.
-		 * 
-		 * \ingroup	freertos
-		 */
-		class Scheduler
-		{
-		public:
-			/**
-			 * \brief	Starts the real time kernel
-			 * 
-			 * This function will never return.
-			 * 
-			 * The idle task is created automatically when schedule() is called.
-			 */
-			static inline void
-			schedule()
-			{
-				vTaskStartScheduler();
-			}
-			
-			/// The count of ticks since Scheduler::schedule() was called
-			static inline portTickType
-			getTicks()
-			{
-				return xTaskGetTickCount();
-			}
-			
-		};
 	}
 }
 
-#endif // XPCC_FREERTOS__SCHEDULER_HPP
+#endif
+

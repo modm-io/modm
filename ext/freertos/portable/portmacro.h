@@ -99,7 +99,7 @@ extern void vPortYieldFromISR( void );
 
 #define portYIELD()					vPortYieldFromISR()
 
-#define portEND_SWITCHING_ISR( xSwitchRequired ) if( xSwitchRequired ) vPortYieldFromISR()
+#define portEND_SWITCHING_ISR( xSwitchRequired ) do { if( xSwitchRequired ) { vPortYieldFromISR(); } } while (0)
 /*-----------------------------------------------------------*/
 
 

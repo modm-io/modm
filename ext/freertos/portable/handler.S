@@ -51,72 +51,72 @@
     licensing and training services.
 */
 
-#ifndef FREERTOS_CONFIG_H
-#define FREERTOS_CONFIG_H
+#include "FreeRTOSConfig.h"
 
-#define GCC_ARMCM3
+	.section .text
+	.syntax	unified
+	.align	4
+	.thumb
+	
+	// ------------------------------------------------------------------------
+	.global	SVC_Handler
+	.type	SVC_Handler, %function
+	.thumb_func
+	.func	SVC_Handler
+SVC_Handler:
+	ldr		r3, =pxCurrentTCB	/* Load address of pxCurrentTCB */
+	ldr		r1, [r3]
+	ldr		r0, [r1]			/* The first item in pxCurrentTCB is the task top of stack. */
+	ldmia	r0!, {r4-r11}		/* Pop the registers that are not automatically
+								   saved on exception entry and the critical nesting count. */
+	msr		psp, r0				/* Restore the task stack pointer. */
+	mov		r0, #0
+	msr		basepri, r0
+	orr		r14, #0xd
+	bx		r14
+	.endfunc
 
-/*-----------------------------------------------------------
- * Application specific definitions.
- *
- * These definitions should be adjusted for your particular hardware and
- * application requirements.
- *
- * THESE PARAMETERS ARE DESCRIBED WITHIN THE 'CONFIGURATION' SECTION OF THE
- * FreeRTOS API DOCUMENTATION AVAILABLE ON THE FreeRTOS.org WEB SITE.
- *
- * See http://www.freertos.org/a00110.html.
- *----------------------------------------------------------*/
+	// ------------------------------------------------------------------------
+	.global	vPortStartFirstTask
+	.type	vPortStartFirstTask, %function
+	.thumb_func
+	.func	vPortStartFirstTask
+vPortStartFirstTask:
+	ldr		r0, =0xE000ED08		/* Use the NVIC offset register to locate the stack. */
+	ldr		r0, [r0]
+	ldr		r0, [r0]
+	msr		msp, r0				/* Set the msp back to the start of the stack. */
+	cpsie	i					/* Globally enable interrupts. */
+	svc		0					/* System call to start first task. */
+	nop
+	.endfunc
 
-#define configUSE_PREEMPTION		1
-#define configCPU_CLOCK_HZ			( ( unsigned long ) 72000000 )
-#define configTICK_RATE_HZ			( ( portTickType ) 1000 )
-#define configMAX_PRIORITIES		( ( unsigned portBASE_TYPE ) 5 )
-#define configMINIMAL_STACK_SIZE	( ( unsigned short ) 120 )
-#define configTOTAL_HEAP_SIZE		( ( size_t ) ( 8 * 1024 ) )
-#define configMAX_TASK_NAME_LEN		( 16 )
-#define configUSE_TRACE_FACILITY	0
-#define configUSE_16_BIT_TICKS		0
-#define configIDLE_SHOULD_YIELD		1
-
-#define configUSE_IDLE_HOOK				0		// vApplicationIdleHook()
-#define configUSE_TICK_HOOK				0		// vApplicationTickHook()
-#define configUSE_MALLOC_FAILED_HOOK	0		// vApplicationMallocFailedHook()
-
-/* Co-routine definitions. */
-#define configUSE_CO_ROUTINES 			0
-#define configMAX_CO_ROUTINE_PRIORITIES ( 2 )
-
-#define configUSE_MUTEXES				1
-#define configUSE_COUNTING_SEMAPHORES 	1
-#define configUSE_ALTERNATIVE_API 		0
-#define configCHECK_FOR_STACK_OVERFLOW	2
-#define configUSE_RECURSIVE_MUTEXES		0
-#define configQUEUE_REGISTRY_SIZE		0
-#define configGENERATE_RUN_TIME_STATS	0
-
-/* Set the following definitions to 1 to include the API function, or zero
-to exclude the API function. */
-
-#define INCLUDE_vTaskPrioritySet		1
-#define INCLUDE_uxTaskPriorityGet		1
-#define INCLUDE_vTaskDelete				1
-#define INCLUDE_vTaskCleanUpResources	1
-#define INCLUDE_vTaskSuspend			1
-#define INCLUDE_vTaskDelayUntil			1
-#define INCLUDE_vTaskDelay				1
-
-/* This is the raw value as per the Cortex-M3 NVIC.  Values can be 255
-(lowest) to 0 (1?) (highest). */
-#define configKERNEL_INTERRUPT_PRIORITY 		(15 << 4)
-#define configMAX_SYSCALL_INTERRUPT_PRIORITY 	(11 << 4) /* equivalent to 0xb0, or priority 11. */
-
-
-/* This is the value being used as per the ST library which permits 16
-priority values, 0 to 15.  This must correspond to the
-configKERNEL_INTERRUPT_PRIORITY setting.  Here 15 corresponds to the lowest
-NVIC value of 255. */
-//#define configLIBRARY_KERNEL_INTERRUPT_PRIORITY	15
-
-#endif /* FREERTOS_CONFIG_H */
+// ------------------------------------------------------------------------
+	.global	PendSV_Handler
+	.type	PendSV_Handler, %function
+	.thumb_func
+	.func	PendSV_Handler
+PendSV_Handler:
+	mrs		r0, psp
+	
+	ldr		r3, =pxCurrentTCB	/* Get the location of the current TCB. */
+	ldr		r2, [r3]
+	
+	stmdb	r0!, {r4-r11}		/* Save the remaining registers. */
+	str		r0, [r2]			/* Save the new top of stack into the first member of the TCB. */
+	
+	stmdb	sp!, {r3, r14}
+	mov		r0, configMAX_SYSCALL_INTERRUPT_PRIORITY
+	msr		basepri, r0
+	bl		vTaskSwitchContext
+	mov		r0, #0
+	msr		basepri, r0
+	ldmia	sp!, {r3, r14}		/* Restore the context, including the critical nesting count. */
+	
+	ldr		r1, [r3]
+	ldr		r0, [r1]			/* The first item in pxCurrentTCB is the task top of stack. */
+	ldmia	r0!, {r4-r11}		/* Pop the registers. */
+	msr		psp, r0
+	bx		r14
+	.endfunc
 

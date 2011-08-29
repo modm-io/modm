@@ -21,14 +21,14 @@ the EUROBOT competition, but it can be used for many other purposes as well.
 
 
 Documentation
------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
 
 The main documentation is created from doxygen files in the doc-folder. It can
 be found online at http://xpcc.sourceforge.net/api/.
 
 
 Folder structure
------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
 
 build
    Temporary folder, build files created during building the unit tests etc.
@@ -73,7 +73,7 @@ tools
 
 
 How can I contribute?
------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
 
 Use the library and give us some feedback. That's the easiest way for you and
 the best way for us to see if something is unclear or missing.
