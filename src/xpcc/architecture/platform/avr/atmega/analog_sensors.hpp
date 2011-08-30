@@ -86,14 +86,16 @@ namespace xpcc
 			
 			/**
 			 * \return pointer to first element of 16bit result array
+			 * This method resets isNewDataAvailable() to \c false.
 			 */
 			static inline uint16_t*
 			getData();
 			
 			/**
-			 * This method resets isNewDataAvailable() to \c false.
+			 * \return pointer to first element of 16bit result array, without
+			 * changing isNewDataAvailable()
 			 */
-			static inline void
+			static inline uint16_t*
 			readData();
 			
 			/**

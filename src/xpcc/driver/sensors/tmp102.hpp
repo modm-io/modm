@@ -108,31 +108,31 @@ namespace xpcc
 		 */
 		Tmp102(uint8_t address=0x90);
 		
-		inline void
+		void
 		configure(uint8_t msb=CONFIGURATION_CONVERTER_RESOLUTION_12_gc,
 				  uint8_t lsb=CONFIGURATION_CONVERSION_RATE_4_gc);
 		
 		/// starts a temperature conversion right now
-		inline void
+		void
 		startConversion();
 		
 		/// read the Temperature registers and buffer the results
-		inline void
+		void
 		readTemperature();
 		
 		/// \return pointer to 8bit array containing temperature
-		inline uint8_t*
+		uint8_t*
 		getData();
 		
 		/// \return the temperature as a signed float in Celcius
-		inline float
+		float
 		getTemperature();
 		
 	private:
-		inline void
+		void
 		writeRegister(Register reg, uint8_t msb, uint8_t lsb);
 		
-		inline void
+		void
 		readRegister(Register reg, uint8_t *buffer);
 		
 		uint8_t config;

@@ -454,6 +454,17 @@ xpcc::Point<T, 4>::Point(const xpcc::Point<T, 4> &rhs)
 //------------------------------------------------------------------------------
 //
 template<typename T>
+xpcc::Point<T, 4>::Point(T inVal)
+:
+	x(inVal),
+	y(inVal),
+	z(inVal),
+	w(inVal)
+{}
+
+//------------------------------------------------------------------------------
+//
+template<typename T>
 xpcc::Point<T, 4>& xpcc::Point<T, 4>::operator = (const xpcc::Matrix<T, 1, 4> &rhs)
 {
 	x = reinterpret_cast<const T*>(&rhs)[0];

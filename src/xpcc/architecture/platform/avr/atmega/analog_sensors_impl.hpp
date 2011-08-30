@@ -65,6 +65,7 @@ void
 xpcc::atmega::AnalogSensors<ADConv,CHANNELS,SAMPLES>::sampleAdc()
 {
 	if (SAMPLES) {
+		
 		// do oversample and average
 		static uint8_t indexOfChannel(0);
 		static uint16_t sample[CHANNELS];
@@ -90,6 +91,7 @@ xpcc::atmega::AnalogSensors<ADConv,CHANNELS,SAMPLES>::sampleAdc()
 		}
 		
 	} else {
+		
 		// just get the raw data
 		data[numberOfSamples] = adc.getValue();
 		
@@ -120,16 +122,17 @@ xpcc::atmega::AnalogSensors<ADConv,CHANNELS,SAMPLES>::isNewDataAvailable()
 }
 
 template < typename ADConv, uint8_t CHANNELS, uint8_t SAMPLES >
-void
+uint16_t*
 xpcc::atmega::AnalogSensors<ADConv,CHANNELS,SAMPLES>::readData()
 {
-	newData = false;
+	return &data[0];
 }
 
 template < typename ADConv, uint8_t CHANNELS, uint8_t SAMPLES >
 uint16_t*
 xpcc::atmega::AnalogSensors<ADConv,CHANNELS,SAMPLES>::getData()
 {
+	newData = false;
 	return &data[0];
 }
 

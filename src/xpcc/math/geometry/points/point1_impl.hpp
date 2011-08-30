@@ -115,7 +115,7 @@ bool xpcc::Point<T, 1>::operator < (const xpcc::Point<T, 1> &rhs) const
 template<typename T>
 bool xpcc::Point<T, 1>::operator <= (const xpcc::Point<T, 1> &rhs) const
 {
-	return (x < rhs.x);
+	return (x <= rhs.x);
 }
 
 //------------------------------------------------------------------------------
@@ -131,7 +131,7 @@ bool xpcc::Point<T, 1>::operator > (const xpcc::Point<T, 1> &rhs) const
 template<typename T>
 bool xpcc::Point<T, 1>::operator >= (const xpcc::Point<T, 1> &rhs) const
 {
-	return (x > rhs.x);
+	return (x >= rhs.x);
 }
 
 //------------------------------------------------------------------------------
@@ -288,7 +288,7 @@ const xpcc::Matrix<T, 1, 1>& xpcc::Point<T, 1>::asMatrix() const
 template<typename T>
 bool xpcc::Point<T, 1>::hasNan() const
 {
-	return isnan(x);
+	return std::isnan(x);
 }
 
 //------------------------------------------------------------------------------
@@ -296,13 +296,13 @@ bool xpcc::Point<T, 1>::hasNan() const
 template<typename T>
 bool xpcc::Point<T, 1>::hasInf() const
 {
-	return isinf(x);
+	return std::isinf(x);
 }
 
 //------------------------------------------------------------------------------
 //
-template<typename U, typename T>
-static inline xpcc::Point<T, 1> operator * (const U &lhs, const xpcc::Point<T, 1> &rhs)
-{
-	return rhs * lhs;
-}
+//template<typename U, typename T>
+//static xpcc::Point<T, 1> operator * (const U &lhs, const xpcc::Point<T, 1> &rhs)
+//{
+//	return rhs * lhs;
+//}

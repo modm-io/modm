@@ -43,7 +43,6 @@ namespace xpcc {
 	 *	- : different of points
 	 *	* : dot product or scalar multiplication
 	 *	/ : scalar division
-	 *	~ : perpendicular
 	 *
 	 * Adapted from the implementation of Gaspard Petit (gaspardpetit@gmail.com).
 	 *
@@ -102,17 +101,19 @@ namespace xpcc {
 		
 		Point(const Matrix<T, 1, 4> &rhs);
 		Point(const Point &rhs);
+		
 		Point& operator = (const Matrix<T, 1, 4> &rhs);
 		Point& operator = (const Point &rhs);
+		
 		bool operator == (const Point &rhs) const;
 		bool operator != (const Point &rhs) const;
 		bool operator < (const Point &rhs) const;
 		bool operator <= (const Point &rhs) const;
 		bool operator > (const Point &rhs) const;
 		bool operator >= (const Point &rhs) const;
+		
 		const T& operator [] (uint8_t index) const;
 		T& operator [] (uint8_t index);
-		
 		T* ptr();
 		const T* ptr() const;
 		
@@ -126,12 +127,16 @@ namespace xpcc {
 		Point& operator *= (const T &rhs);
 		Point& operator /= (const T &rhs);
 		Point& operator - ();
+		
 		float length() const;
 		float length2() const;
+		
 		void scale(float newLength);
 		Point scaled(float newLength) const;
+		
 		void normalize();
 		Point normalized() const;
+		
 		Matrix<T, 4, 1>& asMatrix();
 		Matrix<T, 1, 4>& asTMatrix();
 		const Matrix<T, 4, 1>& asMatrix() const;
@@ -214,14 +219,21 @@ namespace xpcc {
 		T w;
 	};
 	
-	template<typename T>
-	static inline Point<T,4> operator * (const T &lhs, const Point<T,4> &rhs);
+	template<typename U, typename T>
+	static inline Point<T,4> operator * (const U &lhs, const Point<T,4> &rhs)
+	{
+		return rhs * lhs;
+	}
 	
 	template<typename T, typename U>
-	static inline Point<U,4> operator * (const Matrix<T, 4, 4> &lhs, const Point<U,4> &rhs);
+	static inline Point<U,4> operator * (const Matrix<T, 4, 4> &lhs, const Point<U,4> &rhs)
+	{
+		return lhs * rhs.asTMatrix();
+	}
 	
 	typedef Point<float, 4> 	Point4f;
-	typedef Point<int8_t, 4>	Point4i;
+	typedef Point<int16_t, 4>	Point4i;
+	typedef Point<uint16_t, 4>	Point4u;
 }
 
 #include "point4_impl.hpp"

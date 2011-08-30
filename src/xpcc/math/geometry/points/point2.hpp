@@ -65,14 +65,17 @@ namespace xpcc {
 		explicit Point(T inVal);
 		Point(const Matrix<T, 1, 2> &rhs);
 		Point(const Point &rhs);
+		
 		Point& operator = (const Point &rhs);
 		Point& operator = (const Matrix<T, 1, 2> &rhs);
+		
 		bool operator == (const Point &rhs) const;
 		bool operator != (const Point &rhs) const;
 		bool operator < (const Point &rhs) const;
 		bool operator <= (const Point &rhs) const;
 		bool operator > (const Point &rhs) const;
 		bool operator >= (const Point &rhs) const;
+		
 		const T& operator [] (uint8_t index) const;
 		T& operator [] (uint8_t index);
 		
@@ -85,13 +88,14 @@ namespace xpcc {
 		T operator ^ (const Point &rhs) const;
 		Point operator * (const T &rhs) const;
 		Point operator / (const T &rhs) const;
-		Point& operator += (const Point &rhs);
 		
+		Point& operator += (const Point &rhs);
 		Point& operator -= (const Point &rhs);
 		Point& operator *= (const T &rhs);
 		Point& operator /= (const T &rhs);
 		Point& operator - ();
 		Point& operator ~ ();
+		
 		float length() const;
 		float length2() const;
 		
@@ -107,6 +111,7 @@ namespace xpcc {
 		const Matrix<T, 1, 2>& asTMatrix() const;
 		Matrix<T, 2, 1>& asMatrix();
 		const Matrix<T, 2, 1>& asMatrix() const;
+		
 		bool hasNan() const;
 		bool hasInf() const;
 		
@@ -134,10 +139,14 @@ namespace xpcc {
 	};
 	
 	template<typename U, typename T>
-	static inline Point<T, 2> operator * (const U &lhs, const Point<T, 2> &rhs);
+	static inline Point<T, 2> operator * (const U &lhs, const Point<T, 2> &rhs)
+	{
+		return rhs * lhs;
+	}
 	
 	typedef Point<float, 2> 	Point2f;
-	typedef Point<int16_t, 2> 		Point2i;
+	typedef Point<int16_t, 2> 	Point2i;
+	typedef Point<uint16_t, 2> 	Point2u;
 }
 
 #include "point2_impl.hpp"

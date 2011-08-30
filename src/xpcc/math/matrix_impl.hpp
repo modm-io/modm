@@ -527,8 +527,8 @@ template <uint8_t MW, uint8_t MH>
 xpcc::Matrix<T, WIDTH, HEIGHT>
 xpcc::Matrix<T, WIDTH, HEIGHT>::subMatrix(uint8_t r, uint8_t c, const xpcc::Matrix<T, MW, MH> &m)
 {
-	TEST_ASSERT_TRUE(WIDTH + c <= MW);
-	TEST_ASSERT_TRUE(HEIGHT + r <= MH);
+//	XPCC__STATIC_ASSERT(WIDTH + c <= MW);
+//	XPCC__STATIC_ASSERT(HEIGHT + r <= MH);
 	
 	xpcc::Matrix<T, WIDTH, HEIGHT> sub;
 	for (uint8_t j = 0; j < HEIGHT; ++j)

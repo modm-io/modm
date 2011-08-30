@@ -141,22 +141,22 @@ Ultra Low Power :   ~1Hz  |  15bit   |   14bit
 		 * Reads the temperature register and buffers the result
 		 * sets isTemperatureAvailable() to \c true
 		 */
-		static inline void
+		static void
 		readTemperature();
 		
 		/**
 		 * Reads the pressure MSB and LSB registers and buffers the results
 		 * sets isPressureAvailable() to \c true
 		 */
-		static inline void
+		static void
 		readPressure();
 		
 		//// \return pointer to the temperature buffer array
-		static inline uint8_t*
+		static uint8_t*
 		getTemperature();
 		
 		/// \return pointer to the pressure buffer array
-		static inline uint8_t*
+		static uint8_t*
 		getPressure();
 		
 		/**
@@ -184,15 +184,15 @@ Ultra Low Power :   ~1Hz  |  15bit   |   14bit
 		reset(uint8_t timeout);
 		
 		/// \return true, if temperature buffer has been refreshed, but not read
-		static inline bool
+		static bool
 		isNewTemperatureAvailable();
 		
 		/// \return true, if pressure buffer has been refreshed, but not read
-		static inline bool
+		static bool
 		isNewPressureAvailable();
 		
 		/// \return state of the INT pin, not buffered!
-		static inline bool
+		static bool
 		isNewDataReady();
 		
 	private:

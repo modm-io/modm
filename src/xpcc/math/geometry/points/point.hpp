@@ -34,6 +34,7 @@
 #define XPCC_POINTS__POINT_HPP
 
 #include <stdint.h>
+#include <cmath>
 #include <xpcc/math/matrix.hpp>
 
 namespace xpcc {

@@ -71,7 +71,7 @@ namespace xpcc
 		};
 		
 		template <>
-		class Device<SynchronousMaster>
+		class Device<AsynchronousMaster>
 		{
 		public:
 			Device(uint8_t address);
@@ -81,7 +81,7 @@ namespace xpcc
 			
 		protected:
 			const uint8_t deviceAddress;
-			static SynchronousMaster i2c;
+			static AsynchronousMaster i2c;
 		};
 	}
 }

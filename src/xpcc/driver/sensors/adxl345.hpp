@@ -186,14 +186,14 @@ namespace xpcc
 		 * Configures the sensor to measurement mode with full resolution with
 		 * the 32-level buffer in Stream Mode and the specified bandwidth.
 		 */
-		inline void
+		void
 		initialize(Bandwidth bandwidth=BANDWIDTH_400);
 		
 		/**
 		 * read the X-ZDATA0-1 registers and buffer the results
 		 * sets isNewDataAvailable() to \c true
 		 */
-		inline void
+		void
 		readAcceleration();
 		
 		/**
@@ -202,13 +202,13 @@ namespace xpcc
 		 * During execution isNewDataAvailable() is set to \c false, because
 		 * the adding and division is done in-place on the data buffer.
 		 */
-		inline void
+		void
 		readAccelerationAverage();
 		
 		/// \return pointer to 8bit array containing xyz accelerations
 		/// Use reinterpret_cast<int16*>(&getData()) to get the results.
 		/// Devide by approx. 256 LSB/g to get the data in gravity.
-		inline uint8_t*
+		uint8_t*
 		getData();
 		
 		/**
@@ -216,14 +216,14 @@ namespace xpcc
 		 * \c false, when the data has already been read, or data is being 
 		 * copied into the buffer (by readAccelerationAverage()).
 		 */
-		inline bool
+		bool
 		isNewDataAvailable();
 		
 		/**
 		 * Reads the sensor register if new results have been computed.
 		 * Use this for low Bandwidth checks.
 		 */
-		inline bool
+		bool
 		isDataReady();
 		
 	private:
@@ -233,7 +233,7 @@ namespace xpcc
 		 * \param reg register address
 		 * \param data 8bit data to write
 		 */
-		inline void
+		void
 		writeRegister(Register reg, uint8_t data);
 		
 		/**
@@ -241,7 +241,7 @@ namespace xpcc
 		 * \param reg the 8bit register to read
 		 * \return 8bit content
 		 */
-		inline uint8_t
+		uint8_t
 		readRegister(Register reg);
 		
 		bool newData;

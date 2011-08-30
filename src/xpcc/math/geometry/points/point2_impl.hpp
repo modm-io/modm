@@ -315,7 +315,7 @@ xpcc::Point<T, 2>& xpcc::Point<T, 2>::operator ~ ()
 template<typename T>
 float xpcc::Point<T, 2>::length() const
 {
-	return sqrt(length2());
+	return std::sqrt(length2());
 }
 
 //------------------------------------------------------------------------------
@@ -405,7 +405,7 @@ const xpcc::Matrix<T, 2, 1>& xpcc::Point<T, 2>::asMatrix() const
 template<typename T>
 bool xpcc::Point<T, 2>::hasNan() const
 {
-	return isnan(x) || isnan(y);
+	return std::isnan(x) || std::isnan(y);
 }
 
 //------------------------------------------------------------------------------
@@ -413,13 +413,13 @@ bool xpcc::Point<T, 2>::hasNan() const
 template<typename T>
 bool xpcc::Point<T, 2>::hasInf() const
 {
-	return isinf(x) || isinf(y);
+	return std::isinf(x) || std::isinf(y);
 }
 
 //------------------------------------------------------------------------------
 //
-template<class U, class T>
-static inline xpcc::Point<T, 2> operator * (const U &lhs, const xpcc::Point<T, 2> &rhs)
-{
-	return rhs * lhs;
-}
+//template<class U, class T>
+//static inline xpcc::Point<T, 2> operator * (const U &lhs, const xpcc::Point<T, 2> &rhs)
+//{
+//	return rhs * lhs;
+//}

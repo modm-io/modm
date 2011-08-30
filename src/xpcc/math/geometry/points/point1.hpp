@@ -100,7 +100,10 @@ namespace xpcc {
 	};
 	
 	template<typename U, typename T>
-	static inline Point<T, 1> operator * (const U &lhs, const Point<T, 1> &rhs);
+	static inline Point<T, 1> operator * (const U &lhs, const Point<T, 1> &rhs)
+	{
+		return rhs * lhs;
+	}
 	
 	typedef Point<float, 1> 	Point1f;
 	typedef Point<int16_t, 1> 	Point1i;

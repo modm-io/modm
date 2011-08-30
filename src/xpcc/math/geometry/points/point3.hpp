@@ -44,7 +44,6 @@ namespace xpcc {
 	 *	* : dot product or scalar multiplication
 	 *	/ : scalar division
 	 *	^ : cross product (determinant)
-	 *	~ : perpendicular
 	 *
 	 * Adapted from the implementation of Gaspard Petit (gaspardpetit@gmail.com).
 	 *
@@ -65,8 +64,9 @@ namespace xpcc {
 		explicit Point(T inVal);
 		Point(T inX, T inY, T inZ);
 		
-		Point(const T &inX, const T &inY, const Point<T, 1> &inZ);
 		Point(const Point<T, 1> &inX, const T &inY, const T &inZ);
+		Point(const T &inX, const Point<T, 1> &inY, const T &inZ);
+		Point(const T &inX, const T &inY, const Point<T, 1> &inZ);
 		
 		Point(const Point<T, 1> &inX, const T &inY, const Point<T, 1> &inZ);
 		Point(const Point<T, 1> &inX, const Point<T, 1> &inY, const T &inZ);
@@ -82,7 +82,6 @@ namespace xpcc {
 		
 		template<typename U>
 		Point(const Point<U, 3> &rhs);
-		
 		Point(const Matrix<T, 1, 3> &rhs);
 		
 		
@@ -95,22 +94,25 @@ namespace xpcc {
 		bool operator <= (const Point &rhs) const;
 		bool operator > (const Point &rhs) const;
 		bool operator >= (const Point &rhs) const;
+		
 		const T& operator [] (uint8_t index) const;
 		T& operator [] (uint8_t index);
 		T* ptr();
 		const T* ptr() const;
+		
 		Point operator + (const Point &rhs) const;
 		Point operator - (const Point &rhs) const;
-		
 		T operator * (const Point &rhs) const;
 		Point operator ^ (const Point &rhs) const;
 		Point operator * (const T &rhs) const;
 		Point operator / (const T &rhs) const;
+		
 		Point& operator += (const Point &rhs);
 		Point& operator -= (const Point &rhs);
 		Point& operator *= (const T &rhs);
 		Point& operator /= (const T &rhs);
 		Point& operator - ();
+		
 		float length() const;
 		float length2() const;
 		
@@ -124,6 +126,7 @@ namespace xpcc {
 		const Matrix<T, 1, 3>& asTMatrix() const;
 		Matrix<T, 3, 1>& asMatrix();
 		const Matrix<T, 3, 1>& asMatrix() const;
+		
 		bool hasNan() const;
 		bool hasInf() const;
 		
@@ -177,15 +180,22 @@ namespace xpcc {
 		T z;
 	};
 	
-	template<typename T>
-	static inline Point<T, 3> operator * (const T &lhs, const Point<T, 3> &rhs);
+	template<typename U, typename T>
+	static inline Point<T, 3> operator * (const U &lhs, const Point<T, 3> &rhs)
+	{
+		return rhs * lhs;
+	}
 	
-	template<typename T>
-	static inline Point<T, 3> operator * (const Matrix<T, 3, 3> &lhs, const Point<T, 3> &rhs);
+	template<typename T, typename U>
+	static inline Point<U, 3> operator * (const Matrix<T, 3, 3> &lhs, const Point<U, 3> &rhs)
+	{
+		return lhs * rhs.asTMatrix();
+	}
 	
 	
 	typedef Point<float, 3> 	Point3f;
-	typedef Point<int16_t, 3>		Point3i;
+	typedef Point<int16_t, 3>	Point3i;
+	typedef Point<uint16_t, 3>	Point3u;
 }
 
 #include "point3_impl.hpp"

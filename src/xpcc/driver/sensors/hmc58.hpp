@@ -134,14 +134,14 @@ namespace xpcc
 		 * ~1Gs and 8 sample averaging in continous updates at the specified
 		 * data output rate.
 		 */
-		inline void
+		void
 		initialize(uint8_t dataOutputRate=0x10);
 		
 		/**
 		 * read the X-ZDATA0-1 registers and buffer the results
 		 * sets isNewDataAvailable() to \c true
 		 */
-		inline void
+		void
 		readCompass();
 		
 		/**
@@ -149,30 +149,30 @@ namespace xpcc
 		 * Be aware that the array is in BIG ENDIAN format, so you cannot
 		 * simply reinterpret the result as int16_t!!
 		 */
-		inline uint8_t*
+		uint8_t*
 		getData();
 		
 		/**
 		 * \c true, when new data has been from the sensor and buffered,
 		 * \c false, when the data has already been read
 		 */
-		inline bool
+		bool
 		isNewDataAvailable();
 		
 		/// Reads the sensor register if new results have been computed.
-		inline bool
+		bool
 		isDataReady();
 		
 		/// Sets the specified measurement mode
-		inline void
+		void
 		setMeasurementMode(MeasurementMode mode=MEASUREMENT_MODE_NORMAL_gc);
 		
 		/// Sets the specified data output mode
-		inline void
+		void
 		setDataOutputRate(uint8_t dataOutputRate=0x10);
 		
 		/// Sets the specified gain
-		inline void
+		void
 		setGain(uint8_t gain=0x20);
 		
 	private:
@@ -182,7 +182,7 @@ namespace xpcc
 		 * \param reg register address
 		 * \param data 8bit data to write
 		 */
-		inline void
+		void
 		writeRegister(Register reg, uint8_t data);
 		
 		/**
@@ -190,7 +190,7 @@ namespace xpcc
 		 * \param reg the 8bit register to read
 		 * \return 8bit content
 		 */
-		inline uint8_t
+		uint8_t
 		readRegister(Register reg);
 		
 		bool newData;

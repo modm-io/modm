@@ -110,21 +110,31 @@ xpcc::Point<T, 3>::Point(const xpcc::Point<T, 1> &inX, const xpcc::Point<T, 1> &
 //------------------------------------------------------------------------------
 //
 template<typename T>
-xpcc::Point<T, 3>::Point(const T &inX, const T &inY, const xpcc::Point<T, 1> &inZ)
+xpcc::Point<T, 3>::Point(const xpcc::Point<T, 1> &inX, const T &inY, const T &inZ)
 :
-	x(inX),
-	y(inY),
-	z(inZ.x)
+x(inX.x),
+y(inY),
+z(inZ)
 {}
 
 //------------------------------------------------------------------------------
 //
 template<typename T>
-xpcc::Point<T, 3>::Point(const xpcc::Point<T, 1> &inX, const T &inY, const T &inZ)
+xpcc::Point<T, 3>::Point(const T &inX, const xpcc::Point<T, 1> &inY, const T &inZ)
 :
-	x(inX.x),
+x(inX),
+y(inY.x),
+z(inZ)
+{}
+
+//------------------------------------------------------------------------------
+//
+template<typename T>
+xpcc::Point<T, 3>::Point(const T &inX, const T &inY, const xpcc::Point<T, 1> &inZ)
+:
+	x(inX),
 	y(inY),
-	z(inZ)
+	z(inZ.x)
 {}
 
 //------------------------------------------------------------------------------
@@ -480,7 +490,7 @@ const xpcc::Matrix<T, 3, 1>& xpcc::Point<T, 3>::asMatrix() const
 template<typename T>
 bool xpcc::Point<T, 3>::hasNan() const
 {
-	return isnan(x) || isnan(y) || isnan(z);
+	return std::isnan(x) || std::isnan(y) || std::isnan(z);
 }
 
 //------------------------------------------------------------------------------
@@ -488,23 +498,23 @@ bool xpcc::Point<T, 3>::hasNan() const
 template<typename T>
 bool xpcc::Point<T, 3>::hasInf() const
 {
-	return isinf(x) || isinf(y) || isinf(z);
+	return std::isinf(x) || std::isinf(y) || std::isinf(z);
 }
 
 
 //------------------------------------------------------------------------------
 //
-template<typename T>
-static inline xpcc::Point<T,3> operator * (const T &lhs, const xpcc::Point<T,3> &rhs)
-{
-	return rhs * lhs;
-}
-
-
-//------------------------------------------------------------------------------
+//template<typename T>
+//static inline xpcc::Point<T,3> operator * (const T &lhs, const xpcc::Point<T,3> &rhs)
+//{
+//	return rhs * lhs;
+//}
 //
-template<typename T>
-static inline xpcc::Point<T,3> operator * (const xpcc::Matrix<T, 3, 3> &lhs, const xpcc::Point<T,3> &rhs)
-{
-	return lhs * rhs.asTMatrix();
-}
+//
+////------------------------------------------------------------------------------
+////
+//template<typename T>
+//static inline xpcc::Point<T,3> operator * (const xpcc::Matrix<T, 3, 3> &lhs, const xpcc::Point<T,3> &rhs)
+//{
+//	return lhs * rhs.asTMatrix();
+//}
