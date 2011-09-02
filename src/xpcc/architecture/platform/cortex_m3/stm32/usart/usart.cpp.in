@@ -35,11 +35,9 @@
 #include "../device.h"
 
 #include "usart_{{ id }}.hpp"
-
-{% if id == 4 or id == 5 -%}
+{% if id == 4 or id == 5 %}
 #ifdef STM32F10X_HD
-{%- endif %}
-
+{% endif %}
 namespace
 {
 	{% if id == 1 -%}
@@ -67,16 +65,29 @@ xpcc::stm32::Usart{{ id }}::setBaudrate(uint32_t baudrate)
 	Txd::setOutput(xpcc::stm32::ALTERNATE, xpcc::stm32::PUSH_PULL);
 	Rxd::setInput(xpcc::stm32::INPUT, xpcc::stm32::FLOATING);
 	
-	usart_init(USART{{ id }});
-	usart_set_baud_rate(USART{{ id }}, {% if id == 1 -%}72e6{%- else -%}36e6{%- endif %}, baudrate);
-	usart_enable(USART{{ id }});
+	rcc_clk_enable(RCC_USART{{ id }});
+	nvic_irq_enable(NVIC_USART{{ id }});
+	
+	// set baudrate
+	USART{{ id }}_BASE->BRR = calculateBaudrateSettings({% if id == 1 -%}72e6{%- else -%}36e6{%- endif %}, baudrate);
+	
+	// Transmitter & Receiver-Enable, 8 Data Bits, 1 Stop Bit
+	USART{{ id }}_BASE->CR1  = USART_CR1_TE | USART_CR1_RE;
+	USART{{ id }}_BASE->CR2  = 0;
+	USART{{ id }}_BASE->CR3  = 0;
+	
+	USART{{ id }}_BASE->CR1 |= USART_CR1_UE;		// Uart Enable
 }
 
 // ----------------------------------------------------------------------------
 void
 xpcc::stm32::Usart{{ id }}::write(char data)
 {
-	usart_putc(USART{{ id }}, data);
+	while (!(USART{{ id }}_BASE->SR & USART_SR_TXE)) {
+		// wait until the data register becomes empty
+	}
+	
+	USART{{ id }}_BASE->DR = data;
 }
 
 // ----------------------------------------------------------------------------
@@ -93,9 +104,9 @@ xpcc::stm32::Usart{{ id }}::write(const char *s)
 bool
 xpcc::stm32::Usart{{ id }}::read(char& c)
 {
-	if (usart_data_available(USART{{ id }}))
+	if (USART{{ id }}_BASE->SR & USART_SR_RXNE)
 	{
-		c = usart_getc(USART{{ id }});
+		c = USART{{ id }}_BASE->DR;
 		return true;
 	}
 	

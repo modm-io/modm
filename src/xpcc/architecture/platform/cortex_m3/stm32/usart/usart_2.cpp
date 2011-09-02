@@ -40,8 +40,6 @@
 
 #include "usart_2.hpp"
 
-
-
 namespace
 {
 	GPIO__OUTPUT(Txd, A, 2);		// Remap D5
@@ -55,16 +53,29 @@ xpcc::stm32::Usart2::setBaudrate(uint32_t baudrate)
 	Txd::setOutput(xpcc::stm32::ALTERNATE, xpcc::stm32::PUSH_PULL);
 	Rxd::setInput(xpcc::stm32::INPUT, xpcc::stm32::FLOATING);
 	
-	usart_init(USART2);
-	usart_set_baud_rate(USART2, 36e6, baudrate);
-	usart_enable(USART2);
+	rcc_clk_enable(RCC_USART2);
+	nvic_irq_enable(NVIC_USART2);
+	
+	// set baudrate
+	USART2_BASE->BRR = calculateBaudrateSettings(36e6, baudrate);
+	
+	// Transmitter & Receiver-Enable, 8 Data Bits, 1 Stop Bit
+	USART2_BASE->CR1  = USART_CR1_TE | USART_CR1_RE;
+	USART2_BASE->CR2  = 0;
+	USART2_BASE->CR3  = 0;
+	
+	USART2_BASE->CR1 |= USART_CR1_UE;		// Uart Enable
 }
 
 // ----------------------------------------------------------------------------
 void
 xpcc::stm32::Usart2::write(char data)
 {
-	usart_putc(USART2, data);
+	while (!(USART2_BASE->SR & USART_SR_TXE)) {
+		// wait until the data register becomes empty
+	}
+	
+	USART2_BASE->DR = data;
 }
 
 // ----------------------------------------------------------------------------
@@ -81,9 +92,9 @@ xpcc::stm32::Usart2::write(const char *s)
 bool
 xpcc::stm32::Usart2::read(char& c)
 {
-	if (usart_data_available(USART2))
+	if (USART2_BASE->SR & USART_SR_RXNE)
 	{
-		c = usart_getc(USART2);
+		c = USART2_BASE->DR;
 		return true;
 	}
 	

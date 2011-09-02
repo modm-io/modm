@@ -1,6 +1,6 @@
 // coding: utf-8
 // ----------------------------------------------------------------------------
-/* Copyright (c) 2009, Roboterclub Aachen e.V.
+/* Copyright (c) 2011, Roboterclub Aachen e.V.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -25,74 +25,39 @@
  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- * $Id$
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_ALLOCATOR__DYNAMIC_HPP
-#define XPCC_ALLOCATOR__DYNAMIC_HPP
+#ifndef XPCC_STM32__UART_BASE_HPP
+#define XPCC_STM32__UART_BASE_HPP
 
-#include "allocator_base.hpp"
+#include <stdint.h>
 
 namespace xpcc
 {
-	namespace allocator
+	namespace stm32
 	{
 		/**
-		 * \brief	Dynamic memory allocator
+		 * @brief		Base class for the UART classes
 		 * 
-		 * Wrapper for the underlying memory management. No additional
-		 * management is done.
+		 * Provides same common helper functions.
 		 * 
-		 * \ingroup	allocator
-		 * \author	Fabian Greif
+		 * @internal
+		 * @ingroup		stm32
 		 */
-		template <typename T>
-		class Dynamic : public AllocatorBase<T>
+		class UsartBase
 		{
-		public:
-			template <typename U>
-			struct rebind
-			{
-				typedef Dynamic<U> other;
-			};
-			
-		public:
-			Dynamic() :
-				AllocatorBase<T>()
-			{
-			}
-			
-			Dynamic(const Dynamic& other) :
-				AllocatorBase<T>(other)
-			{
-			}
-			
-			template <typename U>
-			Dynamic(const Dynamic<U>&) :
-				AllocatorBase<T>()
-			{
-			}
-			
-			T*
-			allocate(size_t n)
-			{
-				// allocate the memory without calling the constructor
-				// of the associated data-type.
-				return static_cast<T*>(::operator new(n * sizeof(T)));
-			}
-			
-			void
-			deallocate(T* p)
-			{
-				// it is important to use this form here, otherwise the
-				// destructor of p will be called which is unwanted here.
-				// The destructor can be called with the destroy()-method.
-				::operator delete(p);
-			}
+		protected:
+			/**
+			 * @brief	Calculate settings for the UBR register
+			 * 
+			 * @param	apbclk		Clock frequency of the USART.
+			 * @param	baudrate	Requested baudrate
+			 */
+			static uint16_t
+			calculateBaudrateSettings(uint32_t apbclk, uint32_t baudrate);
 		};
 	}
 }
 
-#endif // XPCC_ALLOCATOR__DYNAMIC_HPP
+#endif // XPCC_STM32__UART_BASE_HPP

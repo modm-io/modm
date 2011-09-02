@@ -64,16 +64,19 @@ namespace xpcc
 			};
 		
 		public:
-			Block()
+			Block() :
+				AllocatorBase<T>()
 			{
 			}
 			
-			Block(const Block&)
+			Block(const Block& other) :
+				AllocatorBase<T>(other)
 			{
 			}
 			
 			template <typename U>
-			Block(const Block<U, BLOCKSIZE>&)
+			Block(const Block<U, BLOCKSIZE>&) :
+				AllocatorBase<T>()
 			{
 			}
 			

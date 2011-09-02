@@ -31,6 +31,7 @@
  * @brief USART control routines
  */
 
+#if 0
 #include "libmaple.h"
 #include "usart.h"
 
@@ -252,3 +253,5 @@ void __irq_uart5(void) {
     usart_irq(UART5);
 }
 #endif
+#endif
+

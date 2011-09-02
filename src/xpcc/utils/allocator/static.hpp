@@ -60,16 +60,19 @@ namespace xpcc
 			};
 			
 		public:
-			Static()
+			Static() :
+				AllocatorBase<T>()
 			{
 			}
 			
-			Static(const Static&)
+			Static(const Static& other) :
+				AllocatorBase<T>(other)
 			{
 			}
 			
 			template <typename U>
-			Static(const Static<U, N>&)
+			Static(const Static<U, N>&) :
+				AllocatorBase<T>()
 			{
 			}
 			

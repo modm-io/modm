@@ -34,22 +34,22 @@
 #define XPCC_AT91__REGISTERS_H
 
 #if defined __ARM_AT91SAM7S32__
-#	include "device/at91sam7s32.h"
+#	include <at91lib/at91sam7s32.h>
 #elif defined __ARM_AT91SAM7S321__
-#	include "device/at91sam7s321.h"
+#	include <at91lib/at91sam7s321.h>
 #elif defined __ARM_AT91SAM7S64__
-#	include "device/at91sam7s64.h"
+#	include <at91lib/at91sam7s64.h>
 #elif defined __ARM_AT91SAM7S128__
-#	include "device/at91sam7s128.h"
+#	include <at91lib/at91sam7s128.h>
 #elif defined __ARM_AT91SAM7S256__
-#	include "device/at91sam7s256.h"
+#	include <at91lib/at91sam7s256.h>
 #elif defined __ARM_AT91SAM7S512__
-#	include "device/at91sam7s512.h"
+#	include <at91lib/at91sam7s512.h>
 #endif
 
 #ifndef __ASSEMBLER__
 #	define __inline	static inline
-#	include "device/at91lib.h"
+#	include <at91lib/at91lib.h>
 #	undef __inline
 #endif
 

@@ -112,7 +112,8 @@ void rcc_clk_init(rcc_sysclk_src sysclk_src,
      * the HSE */
     ASSERT(sysclk_src == RCC_CLKSRC_PLL &&
            pll_src    == RCC_PLLSRC_HSE);
-
+    (void) sysclk_src;		// avoid warning if assert is not used
+    
     RCC_BASE->CFGR = pll_src | pll_mul;
 
     /* Turn on the HSE */

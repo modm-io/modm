@@ -1,6 +1,6 @@
 // coding: utf-8
 // ----------------------------------------------------------------------------
-/* Copyright (c) 2009, Roboterclub Aachen e.V.
+/* Copyright (c) 2011, Roboterclub Aachen e.V.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -25,74 +25,14 @@
  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- * $Id$
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_ALLOCATOR__DYNAMIC_HPP
-#define XPCC_ALLOCATOR__DYNAMIC_HPP
+#include "usart_base.hpp"
 
-#include "allocator_base.hpp"
-
-namespace xpcc
+uint16_t
+xpcc::stm32::UsartBase::calculateBaudrateSettings(uint32_t apbclk, uint32_t baudrate)
 {
-	namespace allocator
-	{
-		/**
-		 * \brief	Dynamic memory allocator
-		 * 
-		 * Wrapper for the underlying memory management. No additional
-		 * management is done.
-		 * 
-		 * \ingroup	allocator
-		 * \author	Fabian Greif
-		 */
-		template <typename T>
-		class Dynamic : public AllocatorBase<T>
-		{
-		public:
-			template <typename U>
-			struct rebind
-			{
-				typedef Dynamic<U> other;
-			};
-			
-		public:
-			Dynamic() :
-				AllocatorBase<T>()
-			{
-			}
-			
-			Dynamic(const Dynamic& other) :
-				AllocatorBase<T>(other)
-			{
-			}
-			
-			template <typename U>
-			Dynamic(const Dynamic<U>&) :
-				AllocatorBase<T>()
-			{
-			}
-			
-			T*
-			allocate(size_t n)
-			{
-				// allocate the memory without calling the constructor
-				// of the associated data-type.
-				return static_cast<T*>(::operator new(n * sizeof(T)));
-			}
-			
-			void
-			deallocate(T* p)
-			{
-				// it is important to use this form here, otherwise the
-				// destructor of p will be called which is unwanted here.
-				// The destructor can be called with the destroy()-method.
-				::operator delete(p);
-			}
-		};
-	}
+	// see http://www.mikrocontroller.net/topic/143715
+	return ((2 * apbclk) / baudrate + 1) / 2;
 }
-
-#endif // XPCC_ALLOCATOR__DYNAMIC_HPP

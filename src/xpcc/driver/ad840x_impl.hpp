@@ -30,69 +30,56 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_ALLOCATOR__DYNAMIC_HPP
-#define XPCC_ALLOCATOR__DYNAMIC_HPP
+#ifndef XPCC__AD840x_HPP
+#	error "Don't include this file directly, use 'ad840x.hpp' instead!"
+#endif
 
-#include "allocator_base.hpp"
-
-namespace xpcc
+// ----------------------------------------------------------------------------
+template<typename Spi, typename Cs, typename Rs, typename Shdn>
+void
+xpcc::AD840x<Spi, Cs, Rs, Shdn>::initialize()
 {
-	namespace allocator
-	{
-		/**
-		 * \brief	Dynamic memory allocator
-		 * 
-		 * Wrapper for the underlying memory management. No additional
-		 * management is done.
-		 * 
-		 * \ingroup	allocator
-		 * \author	Fabian Greif
-		 */
-		template <typename T>
-		class Dynamic : public AllocatorBase<T>
-		{
-		public:
-			template <typename U>
-			struct rebind
-			{
-				typedef Dynamic<U> other;
-			};
-			
-		public:
-			Dynamic() :
-				AllocatorBase<T>()
-			{
-			}
-			
-			Dynamic(const Dynamic& other) :
-				AllocatorBase<T>(other)
-			{
-			}
-			
-			template <typename U>
-			Dynamic(const Dynamic<U>&) :
-				AllocatorBase<T>()
-			{
-			}
-			
-			T*
-			allocate(size_t n)
-			{
-				// allocate the memory without calling the constructor
-				// of the associated data-type.
-				return static_cast<T*>(::operator new(n * sizeof(T)));
-			}
-			
-			void
-			deallocate(T* p)
-			{
-				// it is important to use this form here, otherwise the
-				// destructor of p will be called which is unwanted here.
-				// The destructor can be called with the destroy()-method.
-				::operator delete(p);
-			}
-		};
-	}
+	Spi::initialize();
+	Cs::setOutput(xpcc::gpio::HIGH);
+	Rs::setOutput(xpcc::gpio::HIGH);
+	Shdn::setOutput(xpcc::gpio::HIGH);
 }
 
-#endif // XPCC_ALLOCATOR__DYNAMIC_HPP
+// ----------------------------------------------------------------------------
+template<typename Spi, typename Cs, typename Rs, typename Shdn>
+inline void
+xpcc::AD840x<Spi, Cs, Rs, Shdn>::reset()
+{
+	Rs::reset();
+	xpcc::delay_us(1);		// wait at least 50ns
+	Rs::set();
+}
+
+// ----------------------------------------------------------------------------
+template<typename Spi, typename Cs, typename Rs, typename Shdn>
+inline void
+xpcc::AD840x<Spi, Cs, Rs, Shdn>::shutdown()
+{
+	Shdn::reset();
+}
+
+template<typename Spi, typename Cs, typename Rs, typename Shdn>
+inline void
+xpcc::AD840x<Spi, Cs, Rs, Shdn>::resume()
+{
+	Shdn::set();
+}
+
+// ----------------------------------------------------------------------------
+template<typename Spi, typename Cs, typename Rs, typename Shdn>
+void
+xpcc::AD840x<Spi, Cs, Rs, Shdn>::setValue(ad840x::Channel channel, uint8_t data)
+{
+	Cs::reset();
+	
+	// only the last 10 bits shifted in are used
+	Spi::write(channel & 0x03);
+	Spi::write(data);
+	
+	Cs::set();
+}

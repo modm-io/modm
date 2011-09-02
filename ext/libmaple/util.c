@@ -26,7 +26,7 @@
  * @brief Utility procedures for debugging, mostly an error LED fade
  * and messages dumped over a UART for failed asserts.
  */
-
+#if 0
 #include "libmaple.h"
 #include "usart.h"
 #include "gpio.h"
@@ -143,3 +143,4 @@ void throb(void) {
         ;
 #endif
 }
+#endif

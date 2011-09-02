@@ -37,6 +37,7 @@
 #define XPCC_STM32__UART_4_HPP
 
 #include <stdint.h>
+#include "usart_base.hpp"
 
 namespace xpcc
 {
@@ -50,7 +51,7 @@ namespace xpcc
 		 * 
 		 * @ingroup		stm32
 		 */
-		class Usart4
+		class Usart4 : public UsartBase
 		{
 		public:
 			Usart4(uint32_t baudrate)

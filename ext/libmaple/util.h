@@ -62,6 +62,8 @@ void throb(void);
 #define DEBUG_FAULT     1
 #define DEBUG_ALL       2
 
+#define	DEBUG_LEVEL		DEBUG_NONE	// FIXME added for xpcc
+
 #ifndef DEBUG_LEVEL
 #define DEBUG_LEVEL DEBUG_ALL
 #endif

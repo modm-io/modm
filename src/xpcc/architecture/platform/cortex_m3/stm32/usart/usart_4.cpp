@@ -55,16 +55,29 @@ xpcc::stm32::Usart4::setBaudrate(uint32_t baudrate)
 	Txd::setOutput(xpcc::stm32::ALTERNATE, xpcc::stm32::PUSH_PULL);
 	Rxd::setInput(xpcc::stm32::INPUT, xpcc::stm32::FLOATING);
 	
-	usart_init(USART4);
-	usart_set_baud_rate(USART4, 36e6, baudrate);
-	usart_enable(USART4);
+	rcc_clk_enable(RCC_USART4);
+	nvic_irq_enable(NVIC_USART4);
+	
+	// set baudrate
+	USART4_BASE->BRR = calculateBaudrateSettings(36e6, baudrate);
+	
+	// Transmitter & Receiver-Enable, 8 Data Bits, 1 Stop Bit
+	USART4_BASE->CR1  = USART_CR1_TE | USART_CR1_RE;
+	USART4_BASE->CR2  = 0;
+	USART4_BASE->CR3  = 0;
+	
+	USART4_BASE->CR1 |= USART_CR1_UE;		// Uart Enable
 }
 
 // ----------------------------------------------------------------------------
 void
 xpcc::stm32::Usart4::write(char data)
 {
-	usart_putc(USART4, data);
+	while (!(USART4_BASE->SR & USART_SR_TXE)) {
+		// wait until the data register becomes empty
+	}
+	
+	USART4_BASE->DR = data;
 }
 
 // ----------------------------------------------------------------------------
@@ -81,9 +94,9 @@ xpcc::stm32::Usart4::write(const char *s)
 bool
 xpcc::stm32::Usart4::read(char& c)
 {
-	if (usart_data_available(USART4))
+	if (USART4_BASE->SR & USART_SR_RXNE)
 	{
-		c = usart_getc(USART4);
+		c = USART4_BASE->DR;
 		return true;
 	}
 	
