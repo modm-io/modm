@@ -65,6 +65,39 @@ namespace xpcc
 				vTaskStartScheduler();
 			}
 			
+			/**
+			 * \brief	Suspends all real time kernel activity while keeping
+			 * 			interrupts (including the kernel tick) enabled.
+			 * 
+			 * After calling suspend() the calling task will continue
+			 * to execute without risk of being swapped out until a call to
+			 * resume() has been made.
+			 * 
+			 * API functions that have the potential to cause a context switch
+			 * (for example, delay()) must not be called while the scheduler
+			 * is suspended.
+			 * 
+			 * \see		resumeAll()
+			 */
+			static inline void
+			suspend()
+			{
+				vTaskSuspendAll();
+			}
+			
+			/**
+			 * \brief	Resumes real time kernel activity following a call
+			 * 			to suspend()
+			 * 
+			 * @return	If resuming the scheduler caused a context switch then 
+			 * 			\c true is returned, otherwise \c false.
+			 */
+			static inline bool
+			resume()
+			{
+				return (xTaskResumeAll() == pdTRUE);
+			}
+			
 			/// The count of ticks since Scheduler::schedule() was called
 			static inline portTickType
 			getTicks()

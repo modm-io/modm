@@ -41,10 +41,9 @@
 
 #include <cmath>
 #include <stdint.h>
+
 #include <xpcc/io/iostream.hpp>
 #include <xpcc/utils/template_metaprogramming.hpp>
-
-//#def USE_MATRIXUTILS
 
 namespace xpcc
 {

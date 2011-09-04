@@ -55,6 +55,8 @@
 #ifndef PORTMACRO_H
 #define PORTMACRO_H
 
+#include <stdint.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -109,29 +111,36 @@ extern void vPortYieldFromISR( void );
  * Set basepri to portMAX_SYSCALL_INTERRUPT_PRIORITY without effecting other
  * registers.  r0 is clobbered.
  */ 
-#define portSET_INTERRUPT_MASK()						\
-	__asm volatile										\
-	(													\
-		"	mov r0, %0								\n"	\
-		"	msr basepri, r0							\n" \
-		::"i"(configMAX_SYSCALL_INTERRUPT_PRIORITY):"r0"	\
-	)
-	
+static inline void portSET_INTERRUPT_MASK(void)
+{
+	uint32_t reg;
+	asm volatile (
+		"mov	%0, %1			\n"
+		"msr	basepri, %0		\n"
+			: "=&r"(reg)		/* output operands */
+			: "i"(configMAX_SYSCALL_INTERRUPT_PRIORITY)	/* input operands */
+			: 					/* clobber list */
+	);
+}
+
 /*
  * Set basepri back to 0 without effective other registers.
  * r0 is clobbered.
  */
-#define portCLEAR_INTERRUPT_MASK()			\
-	__asm volatile							\
-	(										\
-		"	mov r0, #0					\n"	\
-		"	msr basepri, r0				\n"	\
-		:::"r0"								\
-	)
+static inline void portCLEAR_INTERRUPT_MASK(void)
+{
+	uint32_t reg;
+	asm volatile (
+		"mov	%0, #0			\n"
+		"msr	basepri, %0		\n"
+			: "=&r"(reg)		/* output operands */
+			: 					/* input operands */
+			: 					/* clobber list */
+	);
+}
 
 #define portSET_INTERRUPT_MASK_FROM_ISR()		0;portSET_INTERRUPT_MASK()
 #define portCLEAR_INTERRUPT_MASK_FROM_ISR(x)	portCLEAR_INTERRUPT_MASK();(void)x
-
 
 extern void vPortEnterCritical( void );
 extern void vPortExitCritical( void );

@@ -82,10 +82,16 @@ SVC_Handler:
 	.thumb_func
 	.func	vPortStartFirstTask
 vPortStartFirstTask:
-	ldr		r0, =0xE000ED08		/* Use the NVIC offset register to locate the stack. */
-	ldr		r0, [r0]
-	ldr		r0, [r0]
-	msr		msp, r0				/* Set the msp back to the start of the stack. */
+@	ldr		r0, =0xE000ED08		/* Use the NVIC offset register to locate the stack. */
+@	ldr		r0, [r0]
+@	ldr		r0, [r0]
+@	msr		msp, r0				/* Set the msp back to the start of the stack. */
+	ldr		r0, =__handler_stack_top
+	msr		msp, r0
+	ldr		r0, =__thread_stack_top
+	msr		psp, r0
+	mov		r0, #2				/* enable process stack pointer */
+	msr		control, r0
 	cpsie	i					/* Globally enable interrupts. */
 	svc		0					/* System call to start first task. */
 	nop

@@ -156,27 +156,6 @@ namespace xpcc
 			void
 			resumeFromInterrupt();
 			
-			/**
-			 * \brief	Suspends all real time kernel activity while keeping
-			 * 			interrupts (including the kernel tick) enabled.
-			 * 
-			 * After calling suspendAll() the calling task will continue
-			 * to execute without risk of being swapped out until a call to
-			 * resumeAll() has been made.
-			 * 
-			 * API functions that have the potential to cause a context switch
-			 * (for example, delay()) must not be called while the scheduler
-			 * is suspended.
-			 * 
-			 * \see		resumeAll()
-			 */
-			void
-			suspendAll();
-			
-			/// Resumes real time kernel activity following a call to suspendAll()
-			void
-			resumeAll();
-			
 		protected:
 			/**
 			 * \brief	Delay for the number of ticks

@@ -165,6 +165,7 @@ namespace xpcc
 			BinarySemaphore &
 			operator = (const BinarySemaphore&);
 			
+		public:
 			xSemaphoreHandle handle;
 		};
 	}

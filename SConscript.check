@@ -36,8 +36,6 @@ import string
 Import('env')
 
 devices = [
-	{ 'path': 'release/tests/at91',		'arch': 'arm7tdmi',		'device': 'at91sam7s256',	'clock': 48054857 },
-#	{ 'path': 'release/tests/at91',		'arch': 'arm7tdmi',		'device': 'at91sam7x512',	'clock':  1000000 },
 	{ 'path': 'release/tests/atmega',	'arch': 'avr',			'device': 'atmega16',		'clock':  1000000 },
 	{ 'path': 'release/tests/atmega',	'arch': 'avr',			'device': 'atmega16a',		'clock':  1000000 },
 	{ 'path': 'release/tests/atmega',	'arch': 'avr',			'device': 'atmega644',		'clock':  1000000 },
@@ -55,8 +53,10 @@ devices = [
 	{ 'path': 'release/tests/atxmega',	'arch': 'avr',			'device': 'atxmega128a1',	'clock':  1000000 },
 	{ 'path': 'release/tests/atxmega',	'arch': 'avr',			'device': 'atxmega192a3',	'clock':  1000000 },
 	{ 'path': 'release/tests/atxmega',	'arch': 'avr',			'device': 'atxmega32a4',	'clock':  1000000 },
+	{ 'path': 'release/tests/at91',		'arch': 'arm7tdmi',		'device': 'at91sam7s256',	'clock': 48054857 },
+#	{ 'path': 'release/tests/at91',		'arch': 'arm7tdmi',		'device': 'at91sam7x512',	'clock':  1000000 },
 	{ 'path': 'release/tests/stm32',	'arch': 'cortex-m3',	'device': 'stm32f103rb',	'clock':  1000000 },
-#	{ 'path': 'release/tests/stm32',	'arch': 'cortex-m3',	'device': 'stm32f107vc',	'clock':  1000000 },
+	{ 'path': 'release/tests/stm32',	'arch': 'cortex-m3',	'device': 'stm32f107vc',	'clock':  1000000 },
 ]
 
 check = 'all' if 'check' in BUILD_TARGETS else ARGUMENTS.get('check')

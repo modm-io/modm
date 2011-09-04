@@ -28,9 +28,6 @@ typedef xpcc::gpio::Invert<ButtonTamperInverted> ButtonTamper;
 int
 main(void)
 {
-	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);
-	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOC, ENABLE);
-	
 	Led1::setOutput(xpcc::gpio::HIGH);
 	Led2::setOutput(xpcc::gpio::HIGH);
 	ButtonWakeUp::setInput();

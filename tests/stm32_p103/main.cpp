@@ -105,7 +105,7 @@ pitHandler(void)
 
 #define	LED_GREEN		0x80
 
-//xpcc::freertos::Semaphore event(1, 0);
+xpcc::freertos::BinarySemaphore event;
 
 // ----------------------------------------------------------------------------
 class LedTask1 : public xpcc::freertos::Task
@@ -124,7 +124,7 @@ public:
 			Led2::toggle();
 			this->delay(100 * MILLISECONDS);
 			
-			//event.acquire();
+			event.acquire();
 		}
 	}
 };
@@ -142,7 +142,7 @@ public:
 	{
 		while (1)
 		{
-			//event.release();
+			event.release();
 			
 			LedStat::set();
 			this->delay(50 * MILLISECONDS);
@@ -202,6 +202,10 @@ main(void)
 	display.update();
 	
 	display.setFont(xpcc::font::FixedWidth5x8);
+	
+	//display.setCursor(0, 40);
+	//display << event.handle;
+	//display.update();
 	
 	// IO-Expander have to initalized after LCD because they use the same
 	// Reset line

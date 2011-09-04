@@ -53,7 +53,7 @@ if env['ARCHITECTURE'].startswith('cortex-m3/stm32f10'):
 		'ext/stm32f10x_lib/STM32F10x_StdPeriph_Driver/inc']
 
 # Add the libmaple from Leaflabs (see https://github.com/leaflabs/libmaple)
-if env['ARCHITECTURE'].startswith('cortex-m3/stm32f103'):
+if env['ARCHITECTURE'].startswith('cortex-m3/stm32f10'):
 	sourcePath += ['libmaple']
 	
 	sourcePath += ['freertos']

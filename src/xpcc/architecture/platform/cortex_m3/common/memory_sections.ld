@@ -21,14 +21,14 @@
  *                |                                 | <------- __head_start
  *                |---------------------------------| <------- __handler_stack_top, __stack_end
  *                |                                 | 
- *                |         Handler Stack           |
+ *                |    Handler/Main Stack (msp)     |
  *                |       (grows downwards)         | 
  *                |               |                 | 
  *                |               v                 |  
  *                |                                 |  
  *                |---------------------------------| <------- __thread_stack_top
  *                |                                 | 
- *                |          Thread Stack           |
+ *                |    Thread/Process Stack (psp)   |
  *                |       (grows downwards)         | 
  *                |               |                 | 
  *                |               v                 | 

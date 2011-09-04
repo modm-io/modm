@@ -37,6 +37,7 @@
 #include <libmaple/flash.h>
 #include <libmaple/rcc.h>
 #include <libmaple/nvic.h>
+#include <libmaple/scb.h>
 #include <libmaple/gpio.h>
 #include <libmaple/systick.h>
 
@@ -266,10 +267,10 @@ extern uint32_t __stack_end;
 FunctionPointer flashVectors[4] 
 __attribute__ ((section(".reset"))) =
 {
-	(FunctionPointer) &__stack_end,			// stack pointer
-	Reset_Handler,			// code entry point
+	(FunctionPointer) &__stack_end,	// stack pointer
+	Reset_Handler,				// code entry point
 	NMI_Handler,				// NMI handler
-	__exc_hardfault,		// hard fault handler
+	HardFault_Handler,			// hard fault handler
 };
 
 FunctionPointer ramVectors[] __attribute__ ((section(".vectors"))) =
@@ -415,6 +416,17 @@ __libc_init_array(void);
 extern void
 exit(int) __attribute__ ((noreturn, weak));
 
+// TODO
+#define SCB_SHCSR_USGFAULTENA_Pos          18                                             /*!< SCB SHCSR: USGFAULTENA Position */
+#define SCB_SHCSR_USGFAULTENA_Msk          (1ul << SCB_SHCSR_USGFAULTENA_Pos)             /*!< SCB SHCSR: USGFAULTENA Mask */
+
+#define SCB_SHCSR_BUSFAULTENA_Pos          17                                             /*!< SCB SHCSR: BUSFAULTENA Position */
+#define SCB_SHCSR_BUSFAULTENA_Msk          (1ul << SCB_SHCSR_BUSFAULTENA_Pos)             /*!< SCB SHCSR: BUSFAULTENA Mask */
+
+#define SCB_SHCSR_MEMFAULTENA_Pos          16                                             /*!< SCB SHCSR: MEMFAULTENA Position */
+#define SCB_SHCSR_MEMFAULTENA_Msk          (1ul << SCB_SHCSR_MEMFAULTENA_Pos)             /*!< SCB SHCSR: MEMFAULTENA Mask */
+
+
 // ----------------------------------------------------------------------------
 void
 Reset_Handler(void)
@@ -468,6 +480,12 @@ Reset_Handler(void)
 	
 	gpio_init_all();
 	afio_init();
+	
+	// enable fault handlers
+	SCB_BASE->SHCSR |= 
+			SCB_SHCSR_BUSFAULTENA_Msk |
+			SCB_SHCSR_USGFAULTENA_Msk |
+			SCB_SHCSR_MEMFAULTENA_Msk;
 	
 	// Call CTORS of static objects
 	__libc_init_array();

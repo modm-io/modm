@@ -1,6 +1,6 @@
 // coding: utf-8
 // ----------------------------------------------------------------------------
-/* Copyright (c) 2010, Roboterclub Aachen e.V.
+/* Copyright (c) 2011, Roboterclub Aachen e.V.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -33,17 +33,13 @@
 #ifndef STM32__DEVICE_H
 #define STM32__DEVICE_H
 
-#ifdef __STM32F103__
-#	include <libmaple/flash.h>
-#	include <libmaple/rcc.h>
-#	include <libmaple/nvic.h>
-#	include <libmaple/systick.h>
-#	include <libmaple/gpio.h>
-#	include <libmaple/adc.h>
-#	include <libmaple/timer.h>
-#	include <libmaple/usb/usb.h>
-#else
-#	include <stm32f10x.h>
-#endif
+#include <libmaple/flash.h>
+#include <libmaple/rcc.h>
+#include <libmaple/nvic.h>
+#include <libmaple/systick.h>
+#include <libmaple/gpio.h>
+#include <libmaple/adc.h>
+#include <libmaple/timer.h>
+#include <libmaple/usb/usb.h>
 
 #endif // STM32__DEVICE_H

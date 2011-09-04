@@ -46,7 +46,7 @@
 	.thumb_func
 	.func	HardFault_Handler
 HardFault_Handler:
-	tst		lr, #4
+	tst		lr, #4		// TODO müsste hier nicht eine #2 hin?
 	ite		eq
 	mrseq	r0, msp
 	mrsne	r0, psp

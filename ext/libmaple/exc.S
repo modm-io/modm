@@ -39,7 +39,7 @@
 #           r2
 #           r1
 #    SP-->  r0
-
+/*
 .text
 .globl __exc_hardfault
 .globl __exc_nmi
@@ -98,4 +98,4 @@ EXC_RETURN:    .word 0xFFFFFFF9
 TARGET_PC:     .word __error
 NVIC_CCR:      .word 0xE000ED14    @ NVIC configuration control register
 SYSTICK_CSR:   .word 0xE000E010    @ Systick control register
-
+*/
