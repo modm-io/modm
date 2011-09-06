@@ -119,6 +119,9 @@ xpcc::Hmc58<I2C>::writeRegister(Register reg, uint8_t data)
 {
 	uint8_t buffer[2] = {reg, data};
 	this->i2c.write(this->deviceAddress, &buffer[0], 2);
+	
+	while (this->i2c.isBusy())
+		;
 }
 
 template < typename I2C >

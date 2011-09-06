@@ -110,6 +110,7 @@ bool
 xpcc::atmega::AnalogSensors<ADConv,CHANNELS,SAMPLES>::readSensors()
 {
 	if (numberOfSamples > 0) return false;
+	newData = false;
 	adc.startConversion(map[0]);
 	return true;
 }

@@ -147,21 +147,21 @@ namespace xpcc
 			return *this;
 		}
 		
-#if defined(__APPLE__) && defined(__LP64__)
-		// For APPLE 'int32_t' is of type 'int'. Therefore there is no
+#if defined(XPCC__OS_OSX)
+		// For APPLE 'int64_t' is of type 'int'. Therefore there is no
 		// function here for the default type 'long int'. As 'long int' is the same
-		// width as 'int32_t' we just use a typedef here.
+		// width as 'int64_t' we just use a typedef here.
 		ALWAYS_INLINE IOStream&
 		operator << (const long int& v)
 		{
-			this->writeInteger(static_cast<int32_t>(v));
+			this->writeInteger(static_cast<int64_t>(v));
 			return *this;
 		}
 		
 		ALWAYS_INLINE IOStream&
 		operator << (const long unsigned int& v)
 		{
-			this->writeInteger(static_cast<uint32_t>(v));
+			this->writeInteger(static_cast<uint64_t>(v));
 			return *this;
 		}
 #endif

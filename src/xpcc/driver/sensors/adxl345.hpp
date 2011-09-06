@@ -187,7 +187,7 @@ namespace xpcc
 		 * the 32-level buffer in Stream Mode and the specified bandwidth.
 		 */
 		void
-		initialize(Bandwidth bandwidth=BANDWIDTH_400);
+		initialize(Bandwidth bandwidth=BANDWIDTH_50, bool streamMode=false);
 		
 		/**
 		 * read the X-ZDATA0-1 registers and buffer the results
@@ -201,6 +201,7 @@ namespace xpcc
 		 * in stream mode) and calculates the average.
 		 * During execution isNewDataAvailable() is set to \c false, because
 		 * the adding and division is done in-place on the data buffer.
+		 * This method takes a very long time, since all i2c reads are blocking!
 		 */
 		void
 		readAccelerationAverage();

@@ -89,6 +89,9 @@ namespace xpcc
 		virtual void
 		command(Command command);
 		
+		void
+		clear();
+		
 	protected:
 		void
 		writeNibble(uint8_t data);

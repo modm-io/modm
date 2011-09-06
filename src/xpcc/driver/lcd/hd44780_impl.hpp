@@ -99,6 +99,9 @@ xpcc::Hd44780<E, RW, RS, DATA>::setCursor(uint8_t line, uint8_t column)
 	this->line = line;
 	
 	column += 0x40 * line;
+	if (line >= 2) {
+		column += 20;
+	}
 	writeCommand(0x80 | column);
 }
 
@@ -156,6 +159,13 @@ xpcc::Hd44780<E, RW, RS, DATA>::waitBusy()
 	
 	// the address counter is updated 4 us after the busy flag is reseted
 	xpcc::delay_us(2);
+}
+
+template <typename E, typename RW, typename RS, typename DATA>
+void
+xpcc::Hd44780<E, RW, RS, DATA>::clear()
+{
+	writeCommand(0x01);
 }
 
 template <typename E, typename RW, typename RS, typename DATA>

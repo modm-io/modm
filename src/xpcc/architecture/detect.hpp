@@ -164,7 +164,7 @@
 #if defined __X86__ || defined __i386__ || defined i386 || defined _M_IX86 || defined __386__ || defined __x86_64__ || defined _M_X64
 #	define XPCC__CPU_X86 1
 #	if defined __x86_64__ || defined _M_X64
-#		define XPCC__CPU_X86_64 1 
+#		define XPCC__CPU_X86_64 1
 #		define XPCC__CPU_STRING		"AMD x86-64"
 #	else
 #		define XPCC__CPU_STRING		"Intel 386+"

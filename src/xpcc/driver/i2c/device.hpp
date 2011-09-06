@@ -44,8 +44,7 @@ namespace xpcc
 		 * 
 		 * \tparam	I2C		Must be a driver that implements the
 		 * 					xpcc::i2c::SynchronousMaster interface, or
-		 *					xpcc::i2c::AsynchronousMaster interface, or
-		 *					xpcc::i2c::AsynchronousInterface.
+		 *					xpcc::i2c::AsynchronousMaster interface.
 		 * 
 		 * \ingroup	i2c
 		 * \author	Fabian Greif
@@ -71,7 +70,7 @@ namespace xpcc
 		};
 		
 		template <>
-		class Device<AsynchronousMaster>
+		class Device< AsynchronousMaster >
 		{
 		public:
 			Device(uint8_t address);

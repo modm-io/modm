@@ -43,12 +43,15 @@ xpcc::Adxl345<I2C>::Adxl345(uint8_t address) :
 
 template < typename I2C >
 void
-xpcc::Adxl345<I2C>::initialize(Bandwidth bandwidth)
+xpcc::Adxl345<I2C>::initialize(Bandwidth bandwidth, bool streamMode)
 {
 	writeRegister(REGISTER_POWER_CTL, POWER_MEASURE_bm);
 	writeRegister(REGISTER_DATA_FORMAT, DATAFORMAT_FULL_RES_bm);
 	writeRegister(REGISTER_BW_RATE, bandwidth);
-	writeRegister(REGISTER_FIFO_CTL, FIFO_CTL_MODE_STREAM_gc);
+//	writeRegister(REGISTER_INT_ENABLE, INTERRUPT_DATA_READY_bm);
+	if (streamMode) {
+		writeRegister(REGISTER_FIFO_CTL, FIFO_CTL_MODE_STREAM_gc);
+	}
 }
 
 template < typename I2C >
@@ -119,6 +122,9 @@ xpcc::Adxl345<I2C>::writeRegister(Register reg, uint8_t data)
 {
 	uint8_t buffer[2] = {reg, data};
 	this->i2c.write(this->deviceAddress, &buffer[0], 2);
+	
+	while (this->i2c.isBusy())
+		;
 }
 
 template < typename I2C >

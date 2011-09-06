@@ -66,7 +66,7 @@ def generate(env, **kw):
 		# flags for C and C++
 		env['CCFLAGS'] = [
 			"-funsigned-char",
-			"-funsigned-bitfields", 
+			"-funsigned-bitfields",
 			"-Wall",
 			"-Wextra",
 			"-Wundef",

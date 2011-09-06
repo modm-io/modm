@@ -123,7 +123,7 @@ namespace xpcc
 			set(status); \
 			setOutput(); } \
 		ALWAYS_INLINE static void \
-		setoutput(::xpcc::atxmega::Configuration config, \
+		setOutput(::xpcc::atxmega::Configuration config, \
 				  bool invert = false) { \
 			setOutput(); \
 			PORT ## port ## _PIN ## pin ## CTRL = config | ((invert) ? PORT_INVEN_bm : 0); \
@@ -268,7 +268,7 @@ namespace xpcc
 			return (PORT ## port ## _IN >> 4); \
 		} \
 		ALWAYS_INLINE static void write(uint8_t data) { \
-			data = ::xpcc::math::swap(data); \
+			data = ::xpcc::swap(data); \
 			PORT ## port ## _OUTSET =   data & 0xf0; \
 			PORT ## port ## _OUTCLR = ~(data & 0xf0); \
 		} \

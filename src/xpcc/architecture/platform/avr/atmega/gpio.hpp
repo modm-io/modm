@@ -176,7 +176,7 @@ namespace xpcc
 			return (data >> 4); \
 		} \
 		ALWAYS_INLINE static void write(uint8_t data) { \
-			data = ::xpcc::math::swap(data); \
+			data = ::xpcc::swap(data); \
 			PORT ## port = (data & 0xf0) | (PORT ## port & 0x0f); \
 		} \
 	}
