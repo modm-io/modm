@@ -31,10 +31,8 @@
 // ----------------------------------------------------------------------------
 
 #include <unittest/testsuite.hpp>
-#include <cmath>
-#include <xpcc/math/geometry/points/point1.hpp>
 
-class Point1Test : public unittest::TestSuite
+class Vector2Test : public unittest::TestSuite
 {
 public:
 	void
@@ -53,8 +51,44 @@ public:
 	testOperators();
 	
 	void
+	testLengthInteger();
+	
+	void
 	testLength();
 	
 	void
+	testNormalize();
+	
+	void
+	testScale();
+	
+	void
+	testRotate();
+	
+	void
+	testTranslate();
+	
+	void
+	testRotateFloat();
+	
+	void
+	testConversion();
+	
+	void
 	testMathDefs();
+	
+	void
+	testAngle();
+	
+	void
+	testDotProduct();
+	
+	void
+	testCrossProduct();
+	
+	void
+	testDistance();
+	
+	void
+	testCCW();
 };

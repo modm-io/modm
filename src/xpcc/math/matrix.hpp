@@ -55,7 +55,7 @@ namespace xpcc
 	 * \see <a href"http://www-etud.iro.umontreal.ca/~petitg/cpp/matrix.html">Homepage</a>
 	 * 
 	 * \ingroup	matrix
-	 * \author Niklas Hauser
+	 * \author	Niklas Hauser
 	 */
 	template<typename T, uint8_t WIDTH, uint8_t HEIGHT>
 	class Matrix
@@ -108,7 +108,7 @@ namespace xpcc
 		Matrix operator / (const T &rhs) const;
 		Matrix& operator /= (const T &rhs);
 		
-		Matrix<T, HEIGHT, WIDTH> transposed() const;
+		Matrix<T, HEIGHT, WIDTH> asTransposed() const;
 		
 		//	will work only if the matrix is square
 		inline void transpose();
@@ -153,8 +153,8 @@ namespace xpcc
 		T element[WIDTH*HEIGHT];
 		
 	private:
-		size_t size() const;
-		uint8_t count() const;
+		inline size_t getSize() const;
+		inline uint8_t getNumberOfElements() const;
 	};
 	
 	template<typename T, uint8_t WIDTH, uint8_t HEIGHT>
@@ -165,6 +165,17 @@ namespace xpcc
 	typedef Matrix<float, 2, 2> Matrix2f;
 	typedef Matrix<float, 3, 3> Matrix3f;
 	typedef Matrix<float, 4, 4> Matrix4f;
+	
+	// ------------------------------------------------------------------------
+	/**
+	 * \brief	Calculate the determinant
+	 * 
+	 * \param	m	Matrix
+	 * \ingroup	matrix
+	 */
+	template<typename T, uint8_t N>
+	T
+	determinant(const xpcc::Matrix<T, N, N> &m);
 }
 
 #include "matrix_impl.hpp"

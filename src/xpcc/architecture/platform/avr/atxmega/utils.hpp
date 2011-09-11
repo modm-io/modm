@@ -48,6 +48,8 @@ namespace xpcc
 		 * 
 		 * \param	address	A pointer to the address to write to.
 		 * \param	value	The value to put in to the register.
+		 * 
+		 * \ingroup	atxmega
 		 */
 		ALWAYS_INLINE static void
 		changeProtectedRegister(volatile uint8_t * address, uint8_t value)

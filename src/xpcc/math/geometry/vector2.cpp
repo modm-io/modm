@@ -32,7 +32,7 @@
 
 #include <xpcc/math/utils/operator.hpp>
 
-#include "vector_2d.hpp"
+#include "vector2.hpp"
 
 // this explicit namespace is needed here, otherwise we get an error about 
 // "specialization of ... in different namespace"
@@ -40,7 +40,7 @@ namespace xpcc
 {
 	template<>
 	int16_t
-	Vector2D<int16_t>::getLength() const
+	Vector<int16_t, 2>::getLength() const
 	{
 		int32_t t;
 		
@@ -52,7 +52,7 @@ namespace xpcc
 	
 	template<>
 	int32_t
-	Vector2D<int16_t>::getLengthSquared() const
+	Vector<int16_t, 2>::getLengthSquared() const
 	{
 		int32_t t;
 		
@@ -64,7 +64,7 @@ namespace xpcc
 	
 	template<>
 	int32_t
-	Vector2D<int16_t>::dot(const xpcc::Vector2D<int16_t>& other) const
+	Vector<int16_t, 2>::dot(const xpcc::Vector<int16_t, 2>& other) const
 	{
 		int32_t t;
 		
@@ -77,17 +77,17 @@ namespace xpcc
 	// ------------------------------------------------------------------------
 	template<>
 	template<>
-	Vector2D<double>
-	Vector2D<float>::convert() const
+	Vector<double, 2>
+	Vector<float, 2>::convert() const
 	{
-		return Vector2D<double>(this->x, this->y);
+		return Vector<double, 2>(this->x, this->y);
 	}
 	
 	template<>
 	template<>
-	Vector2D<float>
-	Vector2D<double>::convert() const
+	Vector<float, 2>
+	Vector<double, 2>::convert() const
 	{
-		return Vector2D<float>(this->x, this->y);
+		return Vector<float, 2>(this->x, this->y);
 	}
 }

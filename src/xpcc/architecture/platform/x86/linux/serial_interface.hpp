@@ -48,7 +48,6 @@ namespace xpcc
 		 * 			connections with serial ports.
 		 *
 		 * The normal life cycle should look like as follows:
-		 * 
 		 *	- Construct the interface via SerialInterface()
 		 *	- setDeviceName()
 		 *	- setBaudRate()
@@ -57,7 +56,7 @@ namespace xpcc
 		 *	- close()
 		 * 
 		 * @author	Philipp & Metty
-		 * @ingroup	driver
+		 * @ingroup	linux
 		 */
 		class SerialInterface : public IODevice
 		{
@@ -203,10 +202,8 @@ namespace xpcc
 			void
 			dumpErrorMessage();
 			
-			bool 			isConnected;		///< Is there an existing connection?
-	
-			std::string 	deviceName;	///< The port (e.g. /dev/ttyS0)
-			
+			bool 			isConnected;	///< Is there an existing connection?
+			std::string 	deviceName;		///< The port (e.g. /dev/ttyS0)
 			unsigned int 	baudRate;
 			
 			/// The file descriptor that is internally needed for handling the read/ write/ close operations

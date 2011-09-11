@@ -53,6 +53,8 @@ namespace xpcc
 
 /**
  * \brief	Create a input/output pin type
+ * 
+ * \hideinitializer
  * \ingroup	atmega
  */
 #define	GPIO__IO(name, port, pin) \
@@ -91,6 +93,8 @@ namespace xpcc
 
 /**
  * \brief	Create a output pin type
+ * 
+ * \hideinitializer
  * \ingroup	atmega
  */
 #define	GPIO__OUTPUT(name, port, pin) \
@@ -116,6 +120,8 @@ namespace xpcc
 
 /**
  * \brief	Create a input type
+ * 
+ * \hideinitializer
  * \ingroup	atmega
  */
 #define GPIO__INPUT(name, port, pin) \
@@ -136,9 +142,11 @@ namespace xpcc
 	}
 
 /**
- * \brief	Connect the lower four bits to a nibble
+ * \brief	Connect the lower four bits to a nibble (P0..3)
  * 
  * \see		xpcc::gpio::Nibble()
+ * 
+ * \hideinitializer
  * \ingroup	atmega
  */
 #define GPIO__NIBBLE_LOW(name, port) \
@@ -158,9 +166,11 @@ namespace xpcc
 	}
 
 /**
- * \brief	Connect the higher four bits to a nibble
+ * \brief	Connect the higher four bits to a nibble (P4..7)
  * 
  * \see		xpcc::gpio::Nibble()
+ * 
+ * \hideinitializer
  * \ingroup	atmega
  */
 #define GPIO__NIBBLE_HIGH(name, port) \
@@ -185,6 +195,8 @@ namespace xpcc
  * \brief	Use a full 8-Bit port
  * 
  * \see		xpcc::gpio::Port()
+ * 
+ * \hideinitializer
  * \ingroup	atmega
  */
 #define GPIO__PORT(name, port) \

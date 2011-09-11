@@ -30,96 +30,103 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_POINTS__POINT_HPP
-#define XPCC_POINTS__POINT_HPP
+#ifndef XPCC__VECTOR1_HPP
+#define XPCC__VECTOR1_HPP
 
 #include <stdint.h>
-#include <cmath>
-#include <xpcc/math/matrix.hpp>
+#include "vector.hpp"
 
-namespace xpcc {
-	
-	template<typename T, uint8_t W, uint8_t H> class Matrix;
-	
+namespace xpcc
+{
 	/**
-	 * \brief	Class for handling common point operations
+	 * \brief	Class for handling common vector operations (1D)
 	 *
 	 * Adapted from the implementation of Gaspard Petit (gaspardpetit@gmail.com).
 	 *
 	 * \see <a href"http://www-etud.iro.umontreal.ca/~petitg/cpp/point.html">Homepage</a>
 	 * 
-	 * \ingroup	points
-	 * \author Niklas Hauser
+	 * \ingroup	geometry
+	 * \author	Niklas Hauser
 	 */
-	template<typename T, uint8_t SIZE>
-	class Point
+	template<typename T>
+	class Vector<T, 1>
 	{
 	public:
-		Point();
-		Point(const T *ptData);
+		Vector();
+		Vector(T inX);
+		Vector(const Matrix<T, 1, 1> &rhs);
+		Vector(const Vector &rhs);
 		
-		Point(const Matrix<T, 1, SIZE> &rhs);
-		Point(const Point &rhs);
+		inline void
+		set(const T& x);
 		
-		Point& operator = (const Matrix<T, 1, SIZE> &rhs);
-		Point& operator = (const Point &rhs);
+		inline void
+		setX(const T& value);
 		
-		bool operator == (const Point &rhs) const;
-		bool operator != (const Point &rhs) const;
-		bool operator < (const Point &rhs) const;
-		bool operator <= (const Point &rhs) const;
-		bool operator > (const Point &rhs) const;
-		bool operator >= (const Point &rhs) const;
+		inline const T&
+		getX() const;
+		
+		
+		Vector& operator = (const Vector &rhs);
+		Vector& operator = (const Matrix<T, 1, 1> &rhs);
+		
+		bool operator == (const Vector &rhs) const;
+		bool operator != (const Vector &rhs) const;
+		bool operator < (const Vector &rhs) const;
+		bool operator <= (const Vector &rhs) const;
+		bool operator > (const Vector &rhs) const;
+		bool operator >= (const Vector &rhs) const;
 		
 		const T& operator [] (uint8_t index) const;
 		T& operator [] (uint8_t index);
 		T* ptr();
 		const T* ptr() const;
 		
-		Point operator + (const Point &rhs) const;
-		Point operator - (const Point &rhs) const;
-		T operator * (const Point &rhs) const;
-		Point operator * (const T &rhs) const;
-		Point operator / (const T &rhs) const;
-		Point& operator += (const Point &rhs);
-		Point& operator -= (const Point &rhs);
-		Point& operator *= (const T &rhs);
-		Point& operator /= (const T &rhs);
-		Point& operator - ();
+		Vector operator - () const;
+		Vector operator + (const Vector &rhs) const;
+		Vector operator - (const Vector &rhs) const;
+		T operator * (const Vector &rhs) const;
+		Vector operator * (const T &rhs) const;
+		Vector operator / (const T &rhs) const;
 		
-		T length() const;
-		T length2() const;
+		Vector& operator += (const Vector &rhs);
+		Vector& operator -= (const Vector &rhs);
+		Vector& operator *= (const T &rhs);
+		Vector& operator /= (const T &rhs);
 		
-		Matrix<T, 1, SIZE>& asMatrix();
-		const Matrix<T, 1, SIZE>& asMatrix() const;
-		const Matrix<T, SIZE, 1>& asTMatrix() const;
-		Matrix<T, SIZE, 1>& asTMatrix();
+		T getLength() const;
+		T getLengthSquared() const;
+		
+		Matrix<T, 1, 1>&
+		asMatrix();
+		
+		const Matrix<T, 1, 1>&
+		asMatrix() const;
+		
+		bool hasNan() const;
+		bool hasInf() const;
 		
 	public:
-		static uint8_t size();
-		T coords[SIZE];
+		T x;
+		
+	public:
+	#ifndef __DOXYGEN__
+		IMPLEMENT_VECTOR_ACCESSOR2(x,x)
+		IMPLEMENT_VECTOR_ACCESSOR3(x,x,x)
+		IMPLEMENT_VECTOR_ACCESSOR4(x,x,x,x)
+	#endif
 	};
+	
+	template<typename U, typename T>
+	static inline Vector<T, 1> operator * (const U &lhs, const Vector<T, 1> &rhs)
+	{
+		return rhs * lhs;
+	}
+	
+	typedef Vector<float, 1> 	Vector1f;
+	typedef Vector<int16_t, 1> 	Vector1i;
 }
 
-#define IMPLEMENT_POINT_ACCESSOR2(a,b)\
-Point<T, 2> a##b() const\
-{\
-return Point<T, 2>(a, b);\
-}
+#include "vector1_impl.hpp"
 
-#define IMPLEMENT_POINT_ACCESSOR3(a, b, c)\
-Point<T, 3> a##b##c() const\
-{\
-return Point<T, 3>(a, b, c);\
-}
-
-
-#define IMPLEMENT_POINT_ACCESSOR4(a, b, c, d)\
-Point<T, 4> a##b##c##d() const\
-{\
-return Point<T, 4>(a, b, c, d);\
-}
-
-#include "point_impl.hpp"
-
-#endif // XPCC_POINTS__POINT_HPP
+#endif // XPCC__VECTOR1_HPP

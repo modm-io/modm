@@ -29,6 +29,10 @@
  * $Id$
  */
 // ----------------------------------------------------------------------------
+/**
+ * \ingroup		x86
+ * \defgroup	linux	Linux
+ */
 
 #ifndef XPCC__LINUX_HPP
 #define XPCC__LINUX_HPP

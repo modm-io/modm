@@ -70,7 +70,7 @@ namespace xpcc
 		
 		/// append a point to the polygon
 		Polygon2D&
-		operator << (const Vector2D<T>& point);
+		operator << (const Vector<T, 2>& point);
 		
 		/**
 		 * \brief	Check if a intersection exists

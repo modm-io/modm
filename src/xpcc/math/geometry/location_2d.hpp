@@ -38,7 +38,7 @@
 #include <xpcc/io/iostream.hpp>
 
 #include "angle.hpp"
-#include "vector_2d.hpp"
+#include "vector.hpp"
 
 namespace xpcc
 {
@@ -57,11 +57,11 @@ namespace xpcc
 	public:
 		Location2D();
 		
-		Location2D(const Vector2D<T>& position, const float& orientation);
+		Location2D(const Vector<T, 2>& position, const float& orientation);
 		
 		Location2D(const T& x, const T& y, const float& orientation);
 		
-		inline const Vector2D<T>&
+		inline const Vector<T, 2>&
 		getPosition() const;
 		
 		inline const T&
@@ -71,7 +71,7 @@ namespace xpcc
 		getY() const;
 		
 		void
-		setPosition(const Vector2D<T>& point);
+		setPosition(const Vector<T, 2>& point);
 		
 		void
 		setPosition(const T& x, const T& y);
@@ -87,7 +87,7 @@ namespace xpcc
 		move(const Location2D& diff);
 		
 		void
-		move(const Vector2D<T>& diff);
+		move(const Vector<T, 2>& diff);
 		
 		/**
 		 * \brief	Add a increment only in x-direction
@@ -112,8 +112,8 @@ namespace xpcc
 		move(T x, float phi);
 		
 		/// TODO
-		Vector2D<T>
-		translated(const Vector2D<T>& vector) const;
+		Vector<T, 2>
+		translated(const Vector<T, 2>& vector) const;
 		
 		/// Convert between Location-objects with different base-types
 		template <typename U>
@@ -131,7 +131,7 @@ namespace xpcc
 		friend IOStream&
 		operator <<( IOStream&, const Location2D<U>&);
 		
-		Vector2D<T> position;
+		Vector<T, 2> position;
 		float orientation;
 	};
 	

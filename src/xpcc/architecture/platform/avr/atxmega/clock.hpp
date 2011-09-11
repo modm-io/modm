@@ -44,6 +44,7 @@ namespace xpcc
 		 * \brief	Enable an external clock on XTAL1
 		 * 
 		 * \see		enableExternalOscillator() for values of frequency
+		 * \ingroup	atxmega
 		 */
 		void
 		enableExternalClock(
@@ -61,6 +62,8 @@ namespace xpcc
 		 * - \c OSC_XOSCSEL_XTAL_256CLK_gc
 		 * - \c OSC_XOSCSEL_XTAL_1KCLK_gc
 		 * - \c OSC_XOSCSEL_XTAL_16KCLK_gc
+		 * 
+		 * \ingroup	atxmega
 		 */
 		void
 		enableExternalOscillator(
@@ -89,6 +92,8 @@ namespace xpcc
 		 * 
 		 * \param source	Source clock
 		 * \param factor	Multiplication factor
+		 * 
+		 * \ingroup	atxmega
 		 */
 		void
 		enablePll(OSC_PLLSRC_t source, uint8_t factor);
@@ -105,11 +110,16 @@ namespace xpcc
 		 * 
 		 * \warning	Make sure the clock source is stable before
 		 * 			switching to it!
+		 * \ingroup	atxmega
 		 */
 		void
 		selectSystemClockSource(CLK_SCLKSEL_t source);
 		
-		/// TODO documentation
+		/**
+		 * TODO documentation
+		 * 
+		 * \ingroup	atxmega
+		 */
 		void
 		setSystemClockPrescaler(
 				CLK_PSADIV_t prescalerA = CLK_PSADIV_1_gc,

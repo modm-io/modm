@@ -53,7 +53,6 @@ namespace xpcc
 		 * - Output push-pull
 		 * - Alternate function push-pull
 		 * - Alternate function open-drain
-		 * 
 		 */
 		enum InputMode
 		{
@@ -123,7 +122,7 @@ namespace xpcc
  * \ingroup	stm32
  * \brief	Create a input/output pin type
  * 
- * 
+ * \hideinitializer
  */
 #define	GPIO__IO(name, port, pin) \
 	struct name { \
@@ -191,6 +190,7 @@ namespace xpcc
  * Led::toggle();
  * \endcode
  * 
+ * \hideinitializer
  * \ingroup	stm32
  */
 #define	GPIO__OUTPUT(name, port, pin) \
@@ -238,6 +238,7 @@ namespace xpcc
  * }
  * \endcode
  * 
+ * \hideinitializer
  * \ingroup	stm32
  */
 #define GPIO__INPUT(name, port, pin) \

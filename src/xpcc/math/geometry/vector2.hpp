@@ -1,6 +1,6 @@
 // coding: utf-8
 // ----------------------------------------------------------------------------
-/* Copyright (c) 2009, Roboterclub Aachen e.V.
+/* Copyright (c) 2011, Roboterclub Aachen e.V.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -30,13 +30,16 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC__VECTOR_2D_HPP
-#define	XPCC__VECTOR_2D_HPP
+#ifndef XPCC__VECTOR2_HPP
+#define XPCC__VECTOR2_HPP
 
 #include <cmath>
+#include <stdint.h>
 #include <xpcc/io/iostream.hpp>
 
 #include "geometric_traits.hpp"
+#include "angle.hpp"
+#include "vector.hpp"
 
 namespace xpcc
 {
@@ -45,31 +48,30 @@ namespace xpcc
 	class Location2D;
 	
 	/**
-	 * \brief	2D Vector
+	 * \brief	Class for handling common vector operations (2D)
 	 * 
-	 * Basic data type of all geometric operations. Used to represent vectors
-	 * as well as particular points in the coordinate system.
+	 * Operations:
+	 * \code
+	 *	+ : addition of points
+	 *	- : different of points
+	 *	* : dot product or scalar multiplication
+	 *	/ : scalar division
+	 *	^ : cross product (determinant)
+	 *	~ : perpendicular
+	 * \endcode
 	 * 
-	 * \section	point_vector	Point vs. vector
-	 * 
-	 * In geometry, it is often convenient to use vector arithmetic to
-	 * represent points.
-	 * 
-	 * A vector, by its definition, has no fixed starting point, but if we
-	 * imagine the starting point of a vector to be the origin, then the
-	 * endpoint of the vector represents a particular point.
-	 * 
-	 * In this manner, every vector can be said to identify a unique point,
-	 * which is the endpoint of the vector when its starting point is the
-	 * origin.
-	 * 
-	 * Therefore there isn't a Point2D-class, but only a Vector2D class.
+	 * Adapted from the implementation of Gaspard Petit (gaspardpetit@gmail.com)
+	 * and heavily modified.
+	 *
+	 * \see <a href"http://www-etud.iro.umontreal.ca/~petitg/cpp/point.html">Homepage</a>
 	 * 
 	 * \author	Fabian Greif
+	 * \author	Niklas Hauser
+	 * 
 	 * \ingroup	geometry
 	 */
-	template<typename T = int16_t>
-	class Vector2D
+	template<typename T>
+	class Vector<T, 2>
 	{
 		friend class Location2D<T>;
 		
@@ -83,20 +85,16 @@ namespace xpcc
 		 * 
 		 * Creates a Vector with coordinates (0, 0).
 		 */
-		Vector2D();
+		Vector();
 		
-		Vector2D(const T& x, const T& y);
+		Vector(const T& inX, const T& inY);
 		
-		/**
-		 * \brief	Construct the vector from A to B
-		 * 
-		 * Same as
-		 * \code
-		 * vector = B - A
-		 * \endcode
-		 */
-		static inline Vector2D<T>
-		displacement(const Vector2D<T>& A, const Vector2D<T>& B);
+		Vector(const Vector<T, 1> &inX, const Vector<T, 1> &inY);
+		Vector(const T &inX, const Vector<T, 1> &inY);
+		Vector(const Vector<T, 1> &inX, const T &inY);
+		explicit Vector(T inVal);
+		Vector(const Matrix<T, 1, 2> &rhs);
+		Vector(const Vector &rhs);
 		
 		inline void
 		setX(const T& value);
@@ -147,31 +145,37 @@ namespace xpcc
 		 * \warning	This method is only useful if T is a floating point type.
 		 * 			For integer types the result might be wrong!
 		 */
-		Vector2D&
+		Vector&
 		normalize();
-
+		
+		Vector
+		normalized() const;
+		
 		/**
-		 * \brief	Scale the length by \p factor
+		 * \brief	Scale the vector to \p length
 		 */
-		template<typename U>
-		Vector2D&
-		scale(const U& factor);
-
-		Vector2D&
+		Vector&
+		scale(float length);
+		
+		Vector
+		scaled(float length) const;
+		
+		
+		Vector&
 		rotate(float phi);
 		
 		/**
 		 * \brief	Move the point in x and y direction
 		 */
-		Vector2D&
-		translate(const Vector2D<T>& vector);
+		Vector&
+		translate(const Vector& vector);
 		
 		
 		WideType
-		getDistanceTo(const Vector2D<T>& other) const;
+		getDistanceTo(const Vector& other) const;
 		
 		float
-		getAngleTo(const Vector2D<T>& other) const;
+		getAngleTo(const Vector& other) const;
 		
 		/**
 		 * \brief	Calculate the dot-product
@@ -183,7 +187,7 @@ namespace xpcc
 		 * \endcode
 		 */
 		WideType
-		dot(const Vector2D<T>& other) const;
+		dot(const Vector& other) const;
 		
 		/**
 		 * \brief	Calculate the cross-product
@@ -208,13 +212,13 @@ namespace xpcc
 		 * of the vector.
 		 */
 		WideType
-		cross(const Vector2D<T>& other) const;
+		cross(const Vector& other) const;
 		
 		/**
 		 * \brief	Convert between Point-objects with different base-types
 		 */
 		template<typename U>
-		Vector2D<U>
+		Vector<U, 2>
 		convert() const;
 		
 		/**
@@ -222,36 +226,12 @@ namespace xpcc
 		 * 
 		 * \return	(y, -x)
 		 */
-		Vector2D
+		Vector
 		toOrthogonalVector() const;
 		
-		
-		Vector2D
-		operator - () const;
-		
-		Vector2D
-		operator - (const Vector2D &other) const;
-	
-		Vector2D
-		operator + (const Vector2D &other) const;
-		
-		Vector2D&
-		operator += (const Vector2D &other);
-		
-		Vector2D&
-		operator -= (const Vector2D &other);
-		
-		Vector2D
-		operator * (float scale) const;
-		
-		Vector2D
-		operator / (float scale) const;
-		
-		bool
-		operator == (const Vector2D &other) const;
-		
-		bool
-		operator != (const Vector2D &other) const;
+		// TODO
+		Vector
+		perpendicular() const;
 		
 		/**
 		 * \brief	Check if three points are in a counter-clock wise direction
@@ -267,84 +247,158 @@ namespace xpcc
 		 * This definition is useful for inclusion or intersection testing. 
 		 */
 		static int_fast8_t
-		ccw(const Vector2D<T>& a, const Vector2D<T>& b, const Vector2D<T>& c);
+		ccw(const Vector& a, const Vector& b, const Vector& c);
 		
-	protected:
+		Vector& operator = (const Vector &rhs);
+		Vector& operator = (const Matrix<T, 1, 2> &rhs);
+		
+		bool operator == (const Vector &rhs) const;
+		bool operator != (const Vector &rhs) const;
+		bool operator < (const Vector &rhs) const;
+		bool operator <= (const Vector &rhs) const;
+		bool operator > (const Vector &rhs) const;
+		bool operator >= (const Vector &rhs) const;
+		
+		const T& operator [] (uint8_t index) const;
+		T& operator [] (uint8_t index);
+		
+		T* ptr();
+		const T* ptr() const;
+		
+		Vector operator - () const;
+		Vector operator - (const Vector &rhs) const;
+		Vector operator + (const Vector &rhs) const;
+		T operator * (const Vector &rhs) const;
+		T operator ^ (const Vector &rhs) const;
+		Vector operator * (float rhs) const;
+		Vector operator / (float rhs) const;
+		
+		Vector& operator += (const Vector &rhs);
+		Vector& operator -= (const Vector &rhs);
+		Vector& operator *= (const T &rhs);
+		Vector& operator /= (const T &rhs);
+		Vector& operator ~ ();
+		
+		Matrix<T, 2, 1>&
+		asMatrix();
+		
+		const Matrix<T, 2, 1>&
+		asMatrix() const;
+		
+		Matrix<T, 1, 2>&
+		asTransposedMatrix();
+		
+		const Matrix<T, 1, 2>&
+		asTransposedMatrix() const;
+		
+		bool hasNan() const;
+		bool hasInf() const;
+		
+	#ifndef __DOXYGEN__
+		IMPLEMENT_VECTOR_ACCESSOR2(x,x); IMPLEMENT_VECTOR_ACCESSOR2(x,y);
+		IMPLEMENT_VECTOR_ACCESSOR2(y,x); IMPLEMENT_VECTOR_ACCESSOR2(y,y);
+		
+		IMPLEMENT_VECTOR_ACCESSOR3(x,x,x); IMPLEMENT_VECTOR_ACCESSOR3(x,x,y);
+		IMPLEMENT_VECTOR_ACCESSOR3(x,y,x); IMPLEMENT_VECTOR_ACCESSOR3(x,y,y);
+		IMPLEMENT_VECTOR_ACCESSOR3(y,x,x); IMPLEMENT_VECTOR_ACCESSOR3(y,x,y);
+		IMPLEMENT_VECTOR_ACCESSOR3(y,y,x); IMPLEMENT_VECTOR_ACCESSOR3(y,y,y);
+		
+		IMPLEMENT_VECTOR_ACCESSOR4(x,x,x,x); IMPLEMENT_VECTOR_ACCESSOR4(x,x,x,y);
+		IMPLEMENT_VECTOR_ACCESSOR4(x,x,y,x); IMPLEMENT_VECTOR_ACCESSOR4(x,x,y,y);
+		IMPLEMENT_VECTOR_ACCESSOR4(x,y,x,x); IMPLEMENT_VECTOR_ACCESSOR4(x,y,x,y);
+		IMPLEMENT_VECTOR_ACCESSOR4(x,y,y,x); IMPLEMENT_VECTOR_ACCESSOR4(x,y,y,y);
+		
+		IMPLEMENT_VECTOR_ACCESSOR4(y,x,x,x); IMPLEMENT_VECTOR_ACCESSOR4(y,x,x,y);
+		IMPLEMENT_VECTOR_ACCESSOR4(y,x,y,x); IMPLEMENT_VECTOR_ACCESSOR4(y,x,y,y);
+		IMPLEMENT_VECTOR_ACCESSOR4(y,y,x,x); IMPLEMENT_VECTOR_ACCESSOR4(y,y,x,y);
+		IMPLEMENT_VECTOR_ACCESSOR4(y,y,y,x); IMPLEMENT_VECTOR_ACCESSOR4(y,y,y,y);
+	#endif
+		
+	public:
 		T x;
 		T y;
 		
 	protected:
 		template<typename U>
 		friend IOStream&
-		operator <<(IOStream& s, const Vector2D<U>& c);
+		operator <<(IOStream& os, const Vector<U, 2>& c);
 		
 		template<typename U>
-		friend Vector2D<U>
-		operator * (float scale, const Vector2D<U> &vector);
+		friend Vector<U, 2>
+		operator * (float scale, const Vector<U, 2> &vector);
 	};
+	
+	typedef Vector<float, 2> 		Vector2f;
+	typedef Vector<int16_t, 2> 		Vector2i;
+	typedef Vector<uint16_t, 2> 	Vector2u;
 	
 	// ------------------------------------------------------------------------
 	// Global functions
 	// ------------------------------------------------------------------------
 	/**
-	 * \brief	Stream operator for \b xpcc::Vector2D<U>
+	 * \brief	Stream operator for \b xpcc::Vector<U, 2>
 	 * \ingroup	geometry
 	 */
 	template<typename U>
 	IOStream&
-	operator << (IOStream& s, const Vector2D<U>& c);
+	operator << (IOStream& os, const Vector<U, 2>& c);
 	
 	/**
 	 * \brief	Scalar multiplication
 	 * \ingroup	geometry
 	 */
 	template<typename U>
-	Vector2D<U>
-	operator * (float scale, const Vector2D<U> &vector);
+	Vector<U, 2>
+	operator * (float scale, const Vector<U, 2> &vector);
 	
+	/**
+	 * \brief	Scalar division
+	 * \ingroup	geometry
+	 */
 	template<typename U>
-	Vector2D<U>
-	operator / (float scale, const Vector2D<U> &vector);
+	Vector<U, 2>
+	operator / (float scale, const Vector<U, 2> &vector);
 	
 	// ------------------------------------------------------------------------
 	// Declaration of specialized methods
 	// ------------------------------------------------------------------------
 	template<>
 	int16_t
-	Vector2D<int16_t>::getLength() const;
+	Vector<int16_t, 2>::getLength() const;
 	
 	template<>
 	int32_t
-	Vector2D<int16_t>::getLengthSquared() const;
+	Vector<int16_t, 2>::getLengthSquared() const;
 	
 	template<>
 	int32_t
-	Vector2D<int16_t>::dot(const xpcc::Vector2D<int16_t>& other) const;
+	Vector<int16_t, 2>::dot(const xpcc::Vector<int16_t, 2>& other) const;
 	
 	
 	template<> template<>
-	Vector2D<double>
-	Vector2D<float>::convert() const;
+	Vector<double, 2>
+	Vector<float, 2>::convert() const;
 	
 	template<> template<>
-	Vector2D<float>
-	Vector2D<double>::convert() const;
+	Vector<float, 2>
+	Vector<double, 2>::convert() const;
 	
+	// round for everything that's not float => double or double => float
 	template<> template<typename U>
-	Vector2D<U>
-	Vector2D<float>::convert() const
+	Vector<U, 2>
+	Vector<float, 2>::convert() const
 	{
-		return Vector2D<U>(round(this->x), round(this->y));
+		return Vector<U, 2>(round(this->x), round(this->y));
 	}
 	
 	template<> template<typename U>
-	Vector2D<U>
-	Vector2D<double>::convert() const
+	Vector<U, 2>
+	Vector<double, 2>::convert() const
 	{
-		return Vector2D<U>(round(this->x), round(this->y));
+		return Vector<U, 2>(round(this->x), round(this->y));
 	}
 }
 
-#include "vector_2d_impl.hpp"
+#include "vector2_impl.hpp"
 
-#endif	// XPCC__VECTOR_2D_HPP
+#endif // XPCC__VECTOR2_HPP

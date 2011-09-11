@@ -43,7 +43,7 @@ xpcc::Location2D<T>::Location2D() :
 }
 
 template <typename T>
-xpcc::Location2D<T>::Location2D(const Vector2D<T>& position,
+xpcc::Location2D<T>::Location2D(const Vector<T, 2>& position,
 		const float& orientation) :
 	position(position),
 	orientation(orientation)
@@ -59,7 +59,7 @@ xpcc::Location2D<T>::Location2D(const T& x, const T& y, const float& orientation
 
 // ----------------------------------------------------------------------------
 template <typename T>
-const xpcc::Vector2D<T>&
+const xpcc::Vector<T, 2>&
 xpcc::Location2D<T>::getPosition() const
 {
 	return this->position;
@@ -81,7 +81,7 @@ xpcc::Location2D<T>::getY() const
 
 template <typename T>
 void
-xpcc::Location2D<T>::setPosition(const Vector2D<T>& point)
+xpcc::Location2D<T>::setPosition(const Vector<T, 2>& point)
 {
 	this->position = point;
 }
@@ -112,7 +112,7 @@ template <typename T>
 void
 xpcc::Location2D<T>::move(const Location2D<T>& diff)
 {
-	Vector2D<T> movement = diff.position;
+	Vector<T, 2> movement = diff.position;
 	movement.rotate(this->orientation);
 	
 	this->position.translate(movement);
@@ -121,9 +121,9 @@ xpcc::Location2D<T>::move(const Location2D<T>& diff)
 
 template <typename T>
 void
-xpcc::Location2D<T>::move(const Vector2D<T>& diff)
+xpcc::Location2D<T>::move(const Vector<T, 2>& diff)
 {
-	Vector2D<T> movement(diff);
+	Vector<T, 2> movement(diff);
 	movement.rotate(this->orientation);
 	
 	this->position.translate(movement);
@@ -133,7 +133,7 @@ template <typename T>
 void
 xpcc::Location2D<T>::move(T x, float phi)
 {
-	Vector2D<T> vector(GeometricTraits<T>::round(x * std::cos(this->orientation)),
+	Vector<T, 2> vector(GeometricTraits<T>::round(x * std::cos(this->orientation)),
 					   GeometricTraits<T>::round(x * std::sin(this->orientation)));
 	position.translate(vector);
 	
@@ -142,10 +142,10 @@ xpcc::Location2D<T>::move(T x, float phi)
 
 // ----------------------------------------------------------------------------
 template <typename T>
-xpcc::Vector2D<T>
-xpcc::Location2D<T>::translated(const Vector2D<T>& vector) const
+xpcc::Vector<T, 2>
+xpcc::Location2D<T>::translated(const Vector<T, 2>& vector) const
 {
-	Vector2D<T> result(vector);
+	Vector<T, 2> result(vector);
 	result.rotate(this->orientation);
 	result.translate(this->position);
 	

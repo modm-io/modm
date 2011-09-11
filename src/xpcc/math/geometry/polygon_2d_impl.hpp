@@ -58,7 +58,7 @@ xpcc::Polygon2D<T>::operator = (const Polygon2D<T>& other)
 // ----------------------------------------------------------------------------
 template <typename T>
 xpcc::Polygon2D<T>&
-xpcc::Polygon2D<T>::operator << (const Vector2D<T>& point)
+xpcc::Polygon2D<T>::operator << (const Vector<T, 2>& point)
 {
 	this->append(point);
 	return *this;

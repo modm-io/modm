@@ -34,26 +34,29 @@
 
 #include <cstring>
 
-namespace xpcc {
-	namespace tipc {
-		//!	the first 64 ids (types) are used by tipc itself
-		//! \ingroup tipc
-		const unsigned int TYPE_ID_OFFSET = 64;
+namespace xpcc
+{
+	namespace tipc
+	{
+		/**
+		 * the first 64 ids (types) are used by tipc itself
+		 * \ingroup tipc
+		 */
+		static const unsigned int TYPE_ID_OFFSET = 64;
 		
-		//! \ingroup tipc
-		const unsigned int EVENT_OFFSET   = 0x10000;
+		/// \ingroup tipc
+		static const unsigned int EVENT_OFFSET   = 0x10000;
 		
-		//! \ingroup tipc
-		const unsigned int REQUEST_OFFSET = 0x20000;
-
-
+		/// \ingroup tipc
+		static const unsigned int REQUEST_OFFSET = 0x20000;
+		
 		/**
 		 * \brief		The header, that are send over the tipc.
 		 *
 		 * \ingroup		tipc
-		 * \version		$Id$
 		 */
-		struct Header {
+		struct Header
+		{
 			size_t size;
 		};
 	};

@@ -32,7 +32,7 @@
 
 /**
  * \ingroup		atxmega
- * \defgroup	atxmega_spi	ATxmega SPI Module
+ * \defgroup	atxmega_spi	SPI Module
  *
  * Serial Peripheral Interface Module
  *
@@ -55,7 +55,7 @@
  * main(void)
  * {
  *     ...
- *     typedef xpcc::SpiMasterC Spi;
+ *     typedef xpcc::atxmega::SpiMasterC Spi;
  *     Spi::initialize(SPI_PRESCALER_DIV64_gc);     // faster clock
  *     
  *     uint8_t result = Spi::write(0xf3);   // write a byte

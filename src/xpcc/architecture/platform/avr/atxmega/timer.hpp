@@ -32,7 +32,7 @@
 
 /**
  * \ingroup	atxmega
- * \defgroup atxmega_timer ATxmega Timer/Counter Module
+ * \defgroup atxmega_timer Timer/Counter Module
  * 
  * TC type 0 has got four Compare/Capture Units, type 1 only two.
  * Be aware that both type 0 and 1 share the same HIRES Extension and, when

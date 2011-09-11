@@ -45,7 +45,7 @@ namespace xpcc
 {
 	namespace glcd
 	{
-		typedef Vector2D<uint8_t> Point;
+		typedef Vector<uint8_t, 2> Point;
 		
 		enum Color
 		{

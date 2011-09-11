@@ -32,7 +32,7 @@
 
 /**
  * \ingroup		atxmega
- * \defgroup	atxmega_uart	ATxmega UART module
+ * \defgroup	atxmega_uart	UART module
  */
 
 #include "uart/uart_c0.hpp"

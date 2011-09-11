@@ -30,12 +30,9 @@
  */
 // ----------------------------------------------------------------------------
 
-
-#include <cmath>
-#include <xpcc/math/geometry/points/point.hpp>
 #include <unittest/testsuite.hpp>
 
-class PointTest : public unittest::TestSuite
+class Vector3Test : public unittest::TestSuite
 {
 public:
 	void
@@ -55,4 +52,7 @@ public:
 	
 	void
 	testLength();
+	
+	void
+	testMathDefs();
 };

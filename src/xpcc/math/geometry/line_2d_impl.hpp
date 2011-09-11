@@ -42,7 +42,7 @@ xpcc::Line2D<T>::Line2D() :
 }
 
 template <typename T>
-xpcc::Line2D<T>::Line2D(const Vector2D<T>& point, const Vector2D<T>& directionVector) :
+xpcc::Line2D<T>::Line2D(const Vector<T, 2>& point, const Vector<T, 2>& directionVector) :
 	point(point), directionVector(directionVector)
 {
 }
@@ -50,13 +50,13 @@ xpcc::Line2D<T>::Line2D(const Vector2D<T>& point, const Vector2D<T>& directionVe
 // ----------------------------------------------------------------------------
 template <typename T>
 inline void
-xpcc::Line2D<T>::setPoint(const Vector2D<T>& point)
+xpcc::Line2D<T>::setPoint(const Vector<T, 2>& point)
 {
 	this->point = point;
 }
 
 template <typename T>
-inline const xpcc::Vector2D<T>&
+inline const xpcc::Vector<T, 2>&
 xpcc::Line2D<T>::getPoint() const
 {
 	return this->point;
@@ -64,13 +64,13 @@ xpcc::Line2D<T>::getPoint() const
 
 template <typename T>
 inline void
-xpcc::Line2D<T>::setDirectionVector(const Vector2D<T>& vector)
+xpcc::Line2D<T>::setDirectionVector(const Vector<T, 2>& vector)
 {
 	this->directionVector = vector;
 }
 
 template <typename T>
-inline const xpcc::Vector2D<T>&
+inline const xpcc::Vector<T, 2>&
 xpcc::Line2D<T>::getDirectionVector() const
 {
 	return this->directionVector;
@@ -78,7 +78,7 @@ xpcc::Line2D<T>::getDirectionVector() const
 
 template <typename T>
 inline void
-xpcc::Line2D<T>::set(const Vector2D<T>& point, const Vector2D<T>& directionVector)
+xpcc::Line2D<T>::set(const Vector<T, 2>& point, const Vector<T, 2>& directionVector)
 {
 	this->point = point;
 	this->directionVector = directionVector;
@@ -87,10 +87,10 @@ xpcc::Line2D<T>::set(const Vector2D<T>& point, const Vector2D<T>& directionVecto
 // ----------------------------------------------------------------------------
 template <typename T>
 T
-xpcc::Line2D<T>::getDistanceTo(const Vector2D<T>& point) const
+xpcc::Line2D<T>::getDistanceTo(const Vector<T, 2>& point) const
 {
 	// vector from the base point of the line to the new point
-	Vector2D<T> startToPoint = Vector2D<T>::displacement(this->point, point);
+	Vector<T, 2> startToPoint = point - this->point;
 	
 	FloatType c1 = startToPoint.dot(this->directionVector);
 	FloatType c2 = this->directionVector.getLengthSquared();
@@ -98,11 +98,11 @@ xpcc::Line2D<T>::getDistanceTo(const Vector2D<T>& point) const
 	FloatType d = c1 / c2;
 	
 	// calculate the closest point
-	Vector2D<T> closestPoint = this->point + d * this->directionVector;
+	Vector<T, 2> closestPoint = this->point + d * this->directionVector;
 	
 	// return the length of the vector from the closest point on the line
 	// to the given point
-	return Vector2D<T>::displacement(closestPoint, point).getLength();
+	return (point - closestPoint).getLength();
 }
 
 // ----------------------------------------------------------------------------
@@ -111,7 +111,7 @@ bool
 xpcc::Line2D<T>::getIntersections(const Line2D& other,
 		PointSet2D<T>& intersections) const
 {
-	xpcc::Vector2D<T> connectionVector = Vector2D<T>::displacement(other.point, this->point);
+	xpcc::Vector<T, 2> connectionVector = this->point - other.point;
 	
 	WideType d = this->directionVector.cross(other.directionVector);
 	if (d)
@@ -132,7 +132,7 @@ xpcc::Line2D<T>::getIntersections(const Circle2D<T>& circle,
 		PointSet2D<T>& intersections) const
 {
 	// vector from the center of the circle to line start
-	xpcc::Vector2D<T> circleToLine = Vector2D<T>::displacement(circle.center, this->point);
+	xpcc::Vector<T, 2> circleToLine = this->point - circle.center;
 	
 	WideType a = 2 * this->directionVector.dot(this->directionVector);
 	WideType b = 2 * circleToLine.dot(this->directionVector);

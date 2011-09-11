@@ -29,15 +29,27 @@
  * $Id$
  */
 // ----------------------------------------------------------------------------
-/**
- * \ingroup		math
- * \defgroup	points	Points
- * \brief		Common point operations (likes Matrix)
- *
- */
 
-#include "points/point.hpp"
-#include "points/point1.hpp"
-#include "points/point2.hpp"
-#include "points/point3.hpp"
-#include "points/point4.hpp"
+#include <unittest/testsuite.hpp>
+
+class VectorTest : public unittest::TestSuite
+{
+public:
+	void
+	testConstructor();
+	
+	void
+	testAssign();
+	
+	void
+	testCompare();
+	
+	void
+	testRawDataAccess();
+	
+	void
+	testOperators();
+	
+	void
+	testLength();
+};

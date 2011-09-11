@@ -34,11 +34,13 @@
 #define XPCC__LU_DECOMPOSITION_HPP
 
 #include "matrix.hpp"
-#include "geometry/points.hpp"
+#include "geometry/vector.hpp"
 
-namespace xpcc {
+namespace xpcc
+{
+	// forward declaration
 	template <class T, uint8_t WIDTH, uint8_t HEIGHT> class Matrix;
-	template <class T, uint8_t HEIGHT> class Point;
+	template <class T, uint8_t HEIGHT> class Vector;
 
 	/**
 	 * \brief	Class for decomposing matrices
@@ -51,126 +53,124 @@ namespace xpcc {
 	 * \see <a href"http://www-etud.iro.umontreal.ca/~petitg/cpp/ludecomposition.html">Homepage</a>
 	 * 
 	 * \ingroup	matrix
-	 * \author Niklas Hauser
+	 * \author	Niklas Hauser
 	 */
 	class LUDecomposition
 	{
 	public:
-		//--------------------------------------------------------------------------
-		//
-		template<typename T, uint8_t HEIGHT>
-		static bool decompose(
-			const Matrix<T, HEIGHT, HEIGHT> &matrix, 
-			Matrix<T, HEIGHT, HEIGHT> *l, 
-			Matrix<T, HEIGHT, HEIGHT> *u
-		);
+		template <typename T, uint8_t HEIGHT>
+		static bool
+		decompose(const Matrix<T, HEIGHT, HEIGHT> &matrix,
+				Matrix<T, HEIGHT, HEIGHT> *l,
+				Matrix<T, HEIGHT, HEIGHT> *u);
 
-		//--------------------------------------------------------------------------
-		//
-		template<typename T, uint8_t HEIGHT>
-		static bool decompose(
-			const Matrix<T, HEIGHT, HEIGHT> &matrix, 
-			Matrix<T, HEIGHT, HEIGHT> *l,
-			Matrix<T, HEIGHT, HEIGHT> *u,
-			Point<int8_t, HEIGHT> *p);
+		template <typename T, uint8_t HEIGHT>
+		static bool
+		decompose(const Matrix<T, HEIGHT, HEIGHT> &matrix,
+				Matrix<T, HEIGHT, HEIGHT> *l,
+				Matrix<T, HEIGHT, HEIGHT> *u,
+				Vector<int8_t, HEIGHT> *p);
 
-		//--------------------------------------------------------------------------
-		//
-		template<typename T, uint8_t HEIGHT, uint8_t BXWIDTH>
-		static bool solve(
-			const Matrix<T, HEIGHT, HEIGHT> &l, 
-			const Matrix<T, HEIGHT, HEIGHT> &u,
-			Matrix<T, BXWIDTH, HEIGHT> *xb);
-
+		template <typename T, uint8_t HEIGHT, uint8_t BXWIDTH>
+		static bool
+		solve(const Matrix<T, HEIGHT, HEIGHT> &l,
+				const Matrix<T, HEIGHT, HEIGHT> &u,
+				Matrix<T, BXWIDTH, HEIGHT> *xb);
+		
 	private:
-		//==========================================================================
-		// PRIVATE CLASS LUDecomposition::LUSubDecomposition
-		//==========================================================================
 		template<typename T, uint8_t OFFSET, uint8_t WIDTH, uint8_t HEIGHT>
 		class LUSubDecomposition
 		{
 		public:
-			static bool decomposeRecur(T * u, T * l);
-			static bool decompose(T * u, T * l);
-			static bool decomposeRecur(T *u, T *l, int8_t *p);
-			static bool decompose(T *u, T *l, int8_t *p);
+			static bool
+			decomposeRecur(T * u, T * l);
+			
+			static bool
+			decompose(T * u, T * l);
+			
+			static bool
+			decomposeRecur(T *u, T *l, int8_t *p);
+			
+			static bool
+			decompose(T *u, T *l, int8_t *p);
 
 			template<uint8_t BXWIDTH>
-			static bool solveLyEqualsB(
-				Matrix<T, WIDTH, HEIGHT> *l,
-				Matrix<T, BXWIDTH, HEIGHT> *bx);
+			static bool
+			solveLyEqualsB(
+					Matrix<T, WIDTH, HEIGHT> *l,
+					Matrix<T, BXWIDTH, HEIGHT> *bx);
 
 			template<uint8_t BXWIDTH>
-			static bool solveUxEqualsY(
-				Matrix<T, WIDTH, HEIGHT> *u,
-				Matrix<T, BXWIDTH, HEIGHT> *bx);
+			static bool
+			solveUxEqualsY(
+					Matrix<T, WIDTH, HEIGHT> *u,
+					Matrix<T, BXWIDTH, HEIGHT> *bx);
 
 			template<uint8_t BXWIDTH>
-			static bool solve(
-				const Matrix<T, WIDTH, HEIGHT> &l, 
-				const Matrix<T, WIDTH, HEIGHT> &u,
-				Matrix<T, BXWIDTH, HEIGHT> *bx);
+			static bool
+			solve(
+					const Matrix<T, WIDTH, HEIGHT> &l, 
+					const Matrix<T, WIDTH, HEIGHT> &u,
+					Matrix<T, BXWIDTH, HEIGHT> *bx);
 		};
 
-		//==========================================================================
-		// PRIVATE CLASS LUDecomposition::RowOperation
-		//==========================================================================
 		template<typename T, uint8_t HEIGHT>
 		class RowOperation
 		{
 		public:
-			static void multiply(T *intoRow, const T *row, const T &factor);
+			static void
+			multiply(T *intoRow, const T *row, const T &factor);
 
-			static void addRowTimesFactor(
-				T *intoRow, 
-				const T *srcRow, 
-				const T *addRow, 
-				const T &timesFactor
-			);
+			static void
+			addRowTimesFactor(
+					T *intoRow, 
+					const T *srcRow, 
+					const T *addRow, 
+					const T &timesFactor);
 			
-			static void swap(T *row1, T *row2);
+			static void
+			swap(T *row1, T *row2);
 		};
 
-		//==========================================================================
-		// PRIVATE CLASS LUDecomposition::RowOperation<T, 0>
-		//==========================================================================
 		template<typename T>
 		class RowOperation<T, 0>
 		{
 		public:
-			static void multiply(T *intoRow, const T *row, const T &factor);
+			static void
+			multiply(T *intoRow, const T *row, const T &factor);
 
-			static void addRowTimesFactor(
-				T *intoRow, 
-				const T *srcRow, 
-				const T *addRow, 
-				const T &timesFactor
-			);
+			static void
+			addRowTimesFactor(
+					T *intoRow, 
+					const T *srcRow, 
+					const T *addRow, 
+					const T &timesFactor);
 
-			static void swap(T *row1, T *row2);
+			static void
+			swap(T *row1, T *row2);
 		};
 
-		//==========================================================================
-		// PRIVATE CLASS LUDecomposition::LUSubDecomposition
-		//==========================================================================
 		template<typename T, uint8_t OFFSET, uint8_t WIDTH>
 		class LUSubDecomposition<T, OFFSET, WIDTH, OFFSET>
 		{
 		public:
-			static bool decomposeRecur(T *u, T *l, int8_t *p);
-			static bool decomposeRecur(T *u, T *l);
-
+			static bool
+			decomposeRecur(T *u, T *l, int8_t *p);
+			
+			static bool
+			decomposeRecur(T *u, T *l);
+			
 			template<uint8_t BXWIDTH>
-			static bool solveUxEqualsY(
-				Matrix<T, WIDTH, OFFSET> *u, 
-				Matrix<T, BXWIDTH, OFFSET> *bx
-			);
-
+			static bool
+			solveUxEqualsY(
+					Matrix<T, WIDTH, OFFSET> *u, 
+					Matrix<T, BXWIDTH, OFFSET> *bx);
+			
 			template<uint8_t BXWIDTH>
-			static bool solveLyEqualsB(
-				Matrix<T, WIDTH, OFFSET> *l, 
-				Matrix<T, BXWIDTH, OFFSET> *bx
-			);
+			static bool
+			solveLyEqualsB(
+					Matrix<T, WIDTH, OFFSET> *l, 
+					Matrix<T, BXWIDTH, OFFSET> *bx);
 		};
 	};
 }

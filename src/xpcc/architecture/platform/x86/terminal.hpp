@@ -42,7 +42,7 @@ namespace xpcc
 		/**
 		 * \brief	Standard text terminal
 		 * 
-		 * \ingroup	pc
+		 * \ingroup	x86
 		 */
 		class Terminal : public IODevice
 		{

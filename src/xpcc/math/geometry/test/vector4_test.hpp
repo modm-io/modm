@@ -1,6 +1,6 @@
 // coding: utf-8
 // ----------------------------------------------------------------------------
-/* Copyright (c) 2009, Roboterclub Aachen e.V.
+/* Copyright (c) 2011, Roboterclub Aachen e.V.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -32,54 +32,24 @@
 
 #include <unittest/testsuite.hpp>
 
-class Vector2DTest : public unittest::TestSuite
+class Vector4Test : public unittest::TestSuite
 {
 public:
 	void
 	testConstructor();
 	
 	void
+	testAssign();
+	
+	void
+	testCompare();
+	
+	void
+	testRawDataAccess();
+	
+	void
+	testOperators();
+	
+	void
 	testLength();
-	
-	void
-	testLengthFloat();
-	
-	void
-	testAngle();
-	
-	void
-	testNormalize();
-	
-	void
-	testScale();
-	
-	void
-	testRotate();
-	
-	void
-	testTranslate();
-	
-	void
-	testRotateFloat();
-	
-	void
-	testConversion();
-	
-	void
-	testArithmetics();
-	
-	void
-	testComparision();
-	
-	void
-	testDotProduct();
-	
-	void
-	testCrossProduct();
-	
-	void
-	testDistance();
-	
-	void
-	testCCW();
 };

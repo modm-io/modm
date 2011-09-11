@@ -34,7 +34,7 @@
 #define XPCC__POINT_SET_2D_HPP
 
 #include <xpcc/container/dynamic_array.hpp>
-#include "vector_2d.hpp"
+#include "vector.hpp"
 
 namespace xpcc
 {
@@ -74,12 +74,12 @@ namespace xpcc
 		
 		
 		inline void
-		append(const Vector2D<T>& point);
+		append(const Vector<T, 2>& point);
 
-		inline Vector2D<T>&
+		inline Vector<T, 2>&
 		operator [](SizeType index);
 
-		inline const Vector2D<T>&
+		inline const Vector<T, 2>&
 		operator [](SizeType index) const;
 		
 		/**
@@ -89,8 +89,8 @@ namespace xpcc
 		removeAll();
 		
 	public:
-		typedef typename xpcc::DynamicArray< Vector2D<T> >::iterator iterator;
-		typedef typename xpcc::DynamicArray< Vector2D<T> >::const_iterator const_iterator;
+		typedef typename xpcc::DynamicArray< Vector<T, 2> >::iterator iterator;
+		typedef typename xpcc::DynamicArray< Vector<T, 2> >::const_iterator const_iterator;
 		
 		inline iterator
 		begin();
@@ -105,7 +105,7 @@ namespace xpcc
 		end() const;
 		
 	protected:
-		xpcc::DynamicArray< Vector2D<T> > points;
+		xpcc::DynamicArray< Vector<T, 2> > points;
 	};
 }
 

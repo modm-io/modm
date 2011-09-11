@@ -39,6 +39,9 @@
 #include <xpcc/architecture/driver/gpio.hpp>
 
 // ----------------------------------------------------------------------------
+/**
+ * \ingroup	x86
+ */
 #define	GPIO__IO(name, port, pin) \
 	struct name \
 	{ \
@@ -54,6 +57,9 @@
 	}
 
 // ----------------------------------------------------------------------------
+/**
+ * \ingroup	x86
+ */
 #define	GPIO__OUTPUT(name, port, pin) \
 	struct name \
 	{ \
@@ -66,6 +72,9 @@
 	}
 
 // ----------------------------------------------------------------------------
+/**
+ * \ingroup	x86
+ */
 #define GPIO__INPUT(name, port, pin) \
 	struct name \
 	{ \
@@ -73,11 +82,13 @@
 		ALWAYS_INLINE static bool read() { return false; } \
 	}
 
+// ----------------------------------------------------------------------------
 /**
  * \brief	Use a full 8-Bit port
  * 
  * \see		xpcc::gpio::Port()
- * \ingroup	gpio
+ * 
+ * \ingroup	x86
  */
 #define GPIO__PORT(name, port) \
 	struct name { \

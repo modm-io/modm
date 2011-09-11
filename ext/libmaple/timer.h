@@ -120,7 +120,7 @@ typedef struct timer_bas_reg_map {
 #define TIMER3_BASE        ((struct timer_gen_reg_map*)0x40000400)
 /** Timer 4 register map base pointer */
 #define TIMER4_BASE        ((struct timer_gen_reg_map*)0x40000800)
-#ifdef STM32_HIGH_DENSITY
+#if defined(STM32_HIGH_DENSITY) || defined(STM32_XL_DENSITY)
 /** Timer 5 register map base pointer */
 #define TIMER5_BASE        ((struct timer_gen_reg_map*)0x40000C00)
 /** Timer 6 register map base pointer */
@@ -172,7 +172,7 @@ extern timer_dev *TIMER1;
 extern timer_dev *TIMER2;
 extern timer_dev *TIMER3;
 extern timer_dev *TIMER4;
-#ifdef STM32_HIGH_DENSITY
+#if defined(STM32_HIGH_DENSITY) || defined(STM32_XL_DENSITY)
 extern timer_dev *TIMER5;
 extern timer_dev *TIMER6;
 extern timer_dev *TIMER7;

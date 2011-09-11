@@ -51,7 +51,6 @@ namespace xpcc
 }
 
 /**
- * \ingroup	lpc2000
  * \brief	Create a input/output pin type
  * 
  * TODO No internal pullup, reentrant only on set/reset, not on output/input
@@ -131,7 +130,10 @@ str     r2, [r3, #-207] ; Led2::set()
  *   ports 0 and 2 plus EXTINTx pins can be used for external interrupts.
  *   However, in other devices, only dedicated EXTINTx pins could be used as
  *   external interrupts. Please note that only the dedicated EXTINTx pins
- *   can wake the chip from power down mode. 
+ *   can wake the chip from power down mode.
+ * 
+ * \hideinitializer
+ * \ingroup	lpc2000
  */
 #define	GPIO__IO(name, port, pin) \
 	struct name { \
@@ -171,6 +173,8 @@ str     r2, [r3, #-207] ; Led2::set()
 
 /**
  * \brief	Create a output pin type
+ * 
+ * \hideinitializer
  * \ingroup	lpc2000
  */
 #define	GPIO__OUTPUT(name, port, pin) \
@@ -197,6 +201,8 @@ str     r2, [r3, #-207] ; Led2::set()
 
 /**
  * \brief	Create a input type
+ * 
+ * \hideinitializer
  * \ingroup	lpc2000
  */
 #define GPIO__INPUT(name, port, pin) \

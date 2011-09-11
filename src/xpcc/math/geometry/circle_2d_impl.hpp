@@ -42,14 +42,14 @@ xpcc::Circle2D<T>::Circle2D() :
 }
 
 template <typename T>
-xpcc::Circle2D<T>::Circle2D(const Vector2D<T>& center, T radius) :
+xpcc::Circle2D<T>::Circle2D(const Vector<T, 2>& center, T radius) :
 	center(center), radius(radius)
 {
 }
 
 // ----------------------------------------------------------------------------
 template <typename T>
-inline const xpcc::Vector2D<T>&
+inline const xpcc::Vector<T, 2>&
 xpcc::Circle2D<T>::getCenter() const
 {
 	return this->center;
@@ -57,7 +57,7 @@ xpcc::Circle2D<T>::getCenter() const
 
 template <typename T>
 inline void
-xpcc::Circle2D<T>::setCenter(const Vector2D<T>& point)
+xpcc::Circle2D<T>::setCenter(const Vector<T, 2>& point)
 {
 	this->center = point;
 }
@@ -90,7 +90,7 @@ bool
 xpcc::Circle2D<T>::getIntersections(const Circle2D& other,
 		PointSet2D<T>& intersections) const
 {
-	Vector2D<T> circleToCircle = Vector2D<T>::displacement(this->center, other.center);
+	Vector<T, 2> circleToCircle = other.center - this->center;
 	WideType distanceSquared = circleToCircle.getLengthSquared();
 	
 	if (distanceSquared == 0 and (this->radius == other.radius))
@@ -126,13 +126,13 @@ xpcc::Circle2D<T>::getIntersections(const Circle2D& other,
 			(2.0f * distance);
 	
 	// Determine the coordinates of point C
-	Vector2D<T> c = this->center + circleToCircle * (a / distance);
+	Vector<T, 2> c = this->center + circleToCircle * (a / distance);
 	
 	// Determine the distance from point 2 to either of the intersection points
 	float h = std::sqrt((this->radius * this->radius) - (a * a));
 	
 	// Now determine the offsets of the intersection points from point 2
-	Vector2D<T> r = circleToCircle.scale(h / distance);
+	Vector<T, 2> r = circleToCircle * (h / distance);	// TODO check this
 	r = r.toOrthogonalVector();
 	
 	// Determine the absolute intersection points

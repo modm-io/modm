@@ -33,7 +33,7 @@
 #ifndef XPCC__LINE_2D_HPP
 #define XPCC__LINE_2D_HPP
 
-#include "vector_2d.hpp"
+#include "vector.hpp"
 #include "point_set_2d.hpp"
 
 #include "geometric_traits.hpp"
@@ -69,27 +69,27 @@ namespace xpcc
 		 * \param	point			a point on the line
 		 * \param	directionVector	direction vector, the length doesn't matter
 		 */
-		Line2D(const Vector2D<T>& point, const Vector2D<T>& directionVector);
+		Line2D(const Vector<T, 2>& point, const Vector<T, 2>& directionVector);
 		
 		
 		inline void
-		setPoint(const Vector2D<T>& point);
+		setPoint(const Vector<T, 2>& point);
 		
-		inline const Vector2D<T>&
+		inline const Vector<T, 2>&
 		getPoint() const;
 		
 		inline void
-		setDirectionVector(const Vector2D<T>& vector);
+		setDirectionVector(const Vector<T, 2>& vector);
 		
-		inline const Vector2D<T>&
+		inline const Vector<T, 2>&
 		getDirectionVector() const;
 		
 		inline void
-		set(const Vector2D<T>& point, const Vector2D<T>& directionVector);
+		set(const Vector<T, 2>& point, const Vector<T, 2>& directionVector);
 		
 		/// Shortest distance to a point
 		T
-		getDistanceTo(const Vector2D<T>& point) const;
+		getDistanceTo(const Vector<T, 2>& point) const;
 		
 		/**
 		 * \brief	Calculate intersection point(s)
@@ -114,8 +114,8 @@ namespace xpcc
 				PointSet2D<T>& intersections) const;
 		
 	protected:
-		Vector2D<T> point;
-		Vector2D<T> directionVector;
+		Vector<T, 2> point;
+		Vector<T, 2> directionVector;
 	};
 }
 

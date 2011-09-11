@@ -32,7 +32,7 @@
 
 /**
  * \ingroup		atxmega
- * \defgroup	atxmega_adc	ATxmega Analog/Digital Converter Module
+ * \defgroup	atxmega_adc	Analog/Digital Converter Module
  * 
  * The xMEGA family contains one (A4 family) or two (A1,A3 family) 12-bit
  * SAR (Successive Approximation Result) ADCs connected to PORTA and PORTB. 

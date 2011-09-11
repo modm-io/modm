@@ -36,7 +36,7 @@
 #include <cmath>
 #include "geometric_traits.hpp"
 
-#include "vector_2d.hpp"
+#include "vector.hpp"
 #include "point_set_2d.hpp"
 
 namespace xpcc
@@ -66,13 +66,13 @@ namespace xpcc
 	public:
 		Circle2D();
 		
-		Circle2D(const Vector2D<T>& center, T radius);
+		Circle2D(const Vector<T, 2>& center, T radius);
 		
-		inline const Vector2D<T>&
+		inline const Vector<T, 2>&
 		getCenter() const;
 		
 		inline void
-		setCenter(const Vector2D<T>& point);
+		setCenter(const Vector<T, 2>& point);
 		
 		inline T
 		getRadius() const;
@@ -113,7 +113,7 @@ namespace xpcc
 				PointSet2D<T>& intersections) const;
 		
 	protected:
-		Vector2D<T> center;
+		Vector<T, 2> center;
 		T radius;
 		
 	protected:

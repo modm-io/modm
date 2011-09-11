@@ -29,6 +29,11 @@
  * $Id$
  */
 // ----------------------------------------------------------------------------
+/**
+ * \ingroup		x86
+ * \defgroup	windows	Windows
+ * 
+ */
 
 #ifndef XPCC__WINDOWS_HPP
 #define XPCC__WINDOWS_HPP
@@ -40,7 +45,7 @@
  * Provides some defines and functions which are missing in a default
  * windows environment.
  * 
- * \ingroup	platform
+ * \ingroup	windows
  */
 #include <ciso646>
 #include <stdarg.h>

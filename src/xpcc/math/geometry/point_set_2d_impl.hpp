@@ -66,21 +66,21 @@ xpcc::PointSet2D<T>::getNumberOfPoints() const
 // ----------------------------------------------------------------------------
 template <typename T>
 void
-xpcc::PointSet2D<T>::append(const Vector2D<T>& point)
+xpcc::PointSet2D<T>::append(const Vector<T, 2>& point)
 {
 	points.append(point);
 }
 
 // ----------------------------------------------------------------------------
 template <typename T>
-xpcc::Vector2D<T>&
+xpcc::Vector<T, 2>&
 xpcc::PointSet2D<T>::operator [](SizeType index)
 {
 	return points[index];
 }
 
 template <typename T>
-const xpcc::Vector2D<T>&
+const xpcc::Vector<T, 2>&
 xpcc::PointSet2D<T>::operator [](SizeType index) const
 {
 	return points[index];

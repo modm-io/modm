@@ -46,6 +46,6 @@
 #include "geometry/location_2d.hpp"
 #include "geometry/point_set_2d.hpp"
 #include "geometry/polygon_2d.hpp"
-#include "geometry/vector_2d.hpp"
+#include "geometry/vector.hpp"
 
 #endif	// XPCC__GEOMETRY_HPP

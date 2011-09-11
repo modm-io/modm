@@ -105,6 +105,7 @@ namespace xpcc
 /**
  * \brief	Create a input/output pin type
  * 
+ * \hideinitializer
  * \ingroup	atxmega
  */
 #define	GPIO__IO(name, port, pin) \
@@ -152,6 +153,7 @@ namespace xpcc
 /**
  * \brief	Create a output pin type
  * 
+ * \hideinitializer
  * \ingroup	atxmega
  */
 #define	GPIO__OUTPUT(name, port, pin) \
@@ -190,6 +192,7 @@ namespace xpcc
 /**
  * \brief	Create a input pin type
  * 
+ * \hideinitializer
  * \ingroup	atxmega
  */
 #define GPIO__INPUT(name, port, pin) \
@@ -239,6 +242,12 @@ namespace xpcc
 		ALWAYS_INLINE static uint16_t getInterrupt1Vector() { return PORT ## port ## _INT1_vect_num;} \
 	}
 
+/**
+ * \brief	Create a lower nibble P0..3
+ * 
+ * \hideinitializer
+ * \ingroup	atxmega
+ */
 #define GPIO__NIBBLE_LOW(name, port) \
 	struct name { \
 		ALWAYS_INLINE static void setOutput() { \
@@ -256,6 +265,12 @@ namespace xpcc
 		} \
 	}
 
+/**
+ * \brief	Create a lower nibble P4..7
+ * 
+ * \hideinitializer
+ * \ingroup	atxmega
+ */
 #define GPIO__NIBBLE_HIGH(name, port) \
 	struct name { \
 		ALWAYS_INLINE static void setOutput() { \
@@ -278,6 +293,8 @@ namespace xpcc
  * \brief	Use a full 8-Bit port
  * 
  * \see		xpcc::gpio::Port()
+ * 
+ * \hideinitializer
  * \ingroup	atxmega
  */
 #define GPIO__PORT(name, port) \

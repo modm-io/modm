@@ -51,7 +51,7 @@ namespace xpcc
 		 *
 		 * Port is closed right after construction.
 		 *
-		 * \ingroup	pc
+		 * \ingroup	linux
 		 */
 		class SerialPort : IODevice
 		{

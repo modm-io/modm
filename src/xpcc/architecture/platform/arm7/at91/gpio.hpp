@@ -105,6 +105,8 @@ mov     r2, #0x20000    ; Initialize registers
 mvn     r3, #0xb00
 str     r2, [r3, #-207] ; Led2::set()
 \verbatim
+ * 
+ * \hideinitializer
  */
 #define	GPIO__IO(name, port, pin) \
 	struct name { \
@@ -167,6 +169,8 @@ str     r2, [r3, #-207] ; Led2::set()
 
 /**
  * \brief	Create a output pin type
+ * 
+ * \hideinitializer
  * \ingroup	at91
  */
 #define	GPIO__OUTPUT(name, port, pin) \
@@ -204,6 +208,8 @@ str     r2, [r3, #-207] ; Led2::set()
 
 /**
  * \brief	Create a input type
+ * 
+ * \hideinitializer
  * \ingroup	at91
  */
 #define GPIO__INPUT(name, port, pin) \

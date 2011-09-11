@@ -35,7 +35,7 @@
 
 #include "geometric_traits.hpp"
 
-#include "vector_2d.hpp"
+#include "vector.hpp"
 #include "point_set_2d.hpp"
 
 namespace xpcc
@@ -63,28 +63,28 @@ namespace xpcc
 	public:
 		LineSegment2D();
 		
-		LineSegment2D(const Vector2D<T>& start, const Vector2D<T>& end);
+		LineSegment2D(const Vector<T, 2>& start, const Vector<T, 2>& end);
 		
 		
 		/// Set the starting point of the line segment
 		inline void
-		setStartPoint(const Vector2D<T>& point);
+		setStartPoint(const Vector<T, 2>& point);
 		
-		inline const Vector2D<T>&
+		inline const Vector<T, 2>&
 		getStartPoint() const;
 		
 		/// Set the end point of the line segment
 		inline void
-		setEndPoint(const Vector2D<T>& point);
+		setEndPoint(const Vector<T, 2>& point);
 		
-		inline const Vector2D<T>&
+		inline const Vector<T, 2>&
 		getEndPoint() const;
 		
 		inline void
-		set(const Vector2D<T>& start, const Vector2D<T>& end);
+		set(const Vector<T, 2>& start, const Vector<T, 2>& end);
 		
 		void
-		translate(const Vector2D<T>& vector);
+		translate(const Vector<T, 2>& vector);
 		
 		/**
 		 * \brief	Length of the line segment
@@ -94,11 +94,11 @@ namespace xpcc
 		
 		/// Shortest distance to a point
 		const T
-		getDistanceTo(const Vector2D<T>& point) const;
+		getDistanceTo(const Vector<T, 2>& point) const;
 		
 		/// Calculate the point on the line segment closes to the given point
-		const Vector2D<T>
-		getClosestPointTo(const Vector2D<T>& point) const;
+		const Vector<T, 2>
+		getClosestPointTo(const Vector<T, 2>& point) const;
 		
 		/**
 		 * \brief	Check if two line segments intersect
@@ -139,8 +139,8 @@ namespace xpcc
 		operator != (const LineSegment2D &other) const;
 		
 	protected:
-		xpcc::Vector2D<T> startPoint;
-		xpcc::Vector2D<T> endPoint;
+		xpcc::Vector<T, 2> startPoint;
+		xpcc::Vector<T, 2> endPoint;
 	};
 }
 

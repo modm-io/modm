@@ -30,75 +30,53 @@
  */
 // ----------------------------------------------------------------------------
 
-#include "point2_test.hpp"
+#include <xpcc/math/geometry/vector.hpp>
+#include "vector1_test.hpp"
 
 void
-Point2Test::testConstructor()
+Vector1Test::testConstructor()
 {
-	xpcc::Point2i a;
+	xpcc::Vector1i a;
 	TEST_ASSERT_EQUALS(a.x, 0);
-	TEST_ASSERT_EQUALS(a.y, 0);
+	
+	xpcc::Vector1i b(20);
+	TEST_ASSERT_EQUALS(b.x, 20);
 	
 	a.x = 100;
-	a.y = 9;
 	TEST_ASSERT_EQUALS(a.x, 100);
-	TEST_ASSERT_EQUALS(a.y, 9);
 	
-	xpcc::Point2i b(20);
-	TEST_ASSERT_EQUALS(b.x, 20);
-	TEST_ASSERT_EQUALS(b.y, 20);
+	xpcc::Vector1i c(a);
+	TEST_ASSERT_EQUALS(c.x, 100);
 	
-	xpcc::Point2i c(20,30);
-	TEST_ASSERT_EQUALS(c.x, 20);
-	TEST_ASSERT_EQUALS(c.y, 30);
+	int16_t array[1] = {-4};
+	xpcc::Matrix<int16_t, 1, 1> m(array);
 	
-	int16_t array[2] = {-4,5};
-	xpcc::Matrix<int16_t,1,2> m(array);
-	xpcc::Point2i d(m);
+	xpcc::Vector1i d(m);
 	TEST_ASSERT_EQUALS(d.x, -4);
-	TEST_ASSERT_EQUALS(d.y, 5);
-	
-	xpcc::Point2i e(a);
-	TEST_ASSERT_EQUALS(e.x, 100);
-	TEST_ASSERT_EQUALS(e.y, 9);
-	
-	xpcc::Point1i f(4);
-	
-	xpcc::Point2i g(1,f);
-	TEST_ASSERT_EQUALS(g.x, 1);
-	TEST_ASSERT_EQUALS(g.y, 4);
-	xpcc::Point2i h(f,5);
-	TEST_ASSERT_EQUALS(h.x, 4);
-	TEST_ASSERT_EQUALS(h.y, 5);
-	xpcc::Point2i i(f,f);
-	TEST_ASSERT_EQUALS(i.x, 4);
-	TEST_ASSERT_EQUALS(i.y, 4);
 }
 
 void
-Point2Test::testAssign()
+Vector1Test::testAssign()
 {
-	xpcc::Point2i a(42,-4);
-	int16_t array[2] = {-26,9};
-	xpcc::Matrix<int16_t, 1, 2> m(array);
+	xpcc::Vector1i a(42);
+	int16_t array[1] = {-42};
+	xpcc::Matrix<int16_t, 1, 1> m(array);
 	
-	xpcc::Point2i b;
+	xpcc::Vector1i b;
 	
 	b = a;
 	TEST_ASSERT_EQUALS(b.x, 42);
-	TEST_ASSERT_EQUALS(b.y, -4);
 	
 	b = m;
-	TEST_ASSERT_EQUALS(b.x, -26);
-	TEST_ASSERT_EQUALS(b.y, 9);
+	TEST_ASSERT_EQUALS(b.x, -42);
 }
 
 void
-Point2Test::testCompare()
+Vector1Test::testCompare()
 {
-	xpcc::Point2i a(4,3);
-	xpcc::Point2i b(4,5);
-	xpcc::Point2i c(4,5);
+	xpcc::Vector1i a(2);
+	xpcc::Vector1i b(4);
+	xpcc::Vector1i c(4);
 	// ==
 	TEST_ASSERT_TRUE(b == c);
 	TEST_ASSERT_FALSE(a == c);
@@ -124,98 +102,67 @@ Point2Test::testCompare()
 }
 
 void
-Point2Test::testRawDataAccess()
+Vector1Test::testRawDataAccess()
 {
-	xpcc::Point2i a(2,5);
+	xpcc::Vector1i a(2);
 	int16_t *pointer = a.ptr();
 	
 	TEST_ASSERT_EQUALS(a[0], 2);
-	TEST_ASSERT_EQUALS(a[1], 5);
 	TEST_ASSERT_EQUALS(pointer[0], 2);
-	TEST_ASSERT_EQUALS(pointer[1], 5);
 }
 
 void
-Point2Test::testOperators()
+Vector1Test::testOperators()
 {
-	xpcc::Point2i a(7,5);
-	xpcc::Point2i b(-18,7);
+	xpcc::Vector1i a(7);
+	xpcc::Vector1i b(-18);
 	
 	TEST_ASSERT_EQUALS((a + b).x, 7-18);
-	TEST_ASSERT_EQUALS((a + b).y, 5+7);
 	TEST_ASSERT_EQUALS((a - b).x, 7-(-18));
-	TEST_ASSERT_EQUALS((a - b).y, 5-7);
-	TEST_ASSERT_EQUALS((a * b), 7*(-18)+5*7);
-	TEST_ASSERT_EQUALS((a ^ b), 7*7-(-18)*5);
+	TEST_ASSERT_EQUALS((a * b), -7*18);
 	TEST_ASSERT_EQUALS((a * 3).x, 7*3);
-	TEST_ASSERT_EQUALS((a * 3).y, 5*3);
 	TEST_ASSERT_EQUALS((3 * a).x, 3*7);
-	TEST_ASSERT_EQUALS((3 * a).y, 3*5);
 	TEST_ASSERT_EQUALS((b / 2).x, -18/2);
-	TEST_ASSERT_EQUALS((b / 2).y, 7/2);
 	
 	-b;
+	TEST_ASSERT_EQUALS(b.x, -18);
+	b = -b;
 	TEST_ASSERT_EQUALS(b.x, 18);
-	TEST_ASSERT_EQUALS(b.y, -7);
 	a += b;
 	TEST_ASSERT_EQUALS(a.x, 7+18);
-	TEST_ASSERT_EQUALS(a.y, 5-7);
 	a -= b;
 	TEST_ASSERT_EQUALS(a.x, 7+18-18);
-	TEST_ASSERT_EQUALS(a.y, 5-7-(-7));
 	a *= 2;
 	TEST_ASSERT_EQUALS(a.x, 7*2);
-	TEST_ASSERT_EQUALS(a.y, 5*2);
 	b /= 2;
 	TEST_ASSERT_EQUALS(b.x, 18/2);
-	TEST_ASSERT_EQUALS(b.y, -7/2);
-	~b;
-	TEST_ASSERT_EQUALS(b.x, 7/2);
-	TEST_ASSERT_EQUALS(b.y, 18/2);
 	
 	// test division of floats
-	xpcc::Point2f c(-18.7f,5.5f);
+	xpcc::Vector1f c(-18.7f);
 	TEST_ASSERT_EQUALS_FLOAT((c / 2.4f).x, -7.7916666667);
-	TEST_ASSERT_EQUALS_FLOAT((c / 2.4f).y, 2.2916666667);
 	c /= 7.5f;
 	TEST_ASSERT_EQUALS_FLOAT(c.x, -2.4933333333);
-	TEST_ASSERT_EQUALS_FLOAT(c.y, 0.7333333333);
 }
 
 void
-Point2Test::testLength()
+Vector1Test::testLength()
 {
-	xpcc::Point2f a(3.f,4.f);
+	xpcc::Vector1i a(7);
 	
-	TEST_ASSERT_EQUALS_FLOAT(a.length2(), 3.f*3.f+4.f*4.f);
-	TEST_ASSERT_EQUALS_FLOAT(a.length(), 5.f);
-	
-	TEST_ASSERT_EQUALS_FLOAT(a.scaled(2.5f).x, 1.5f);
-	TEST_ASSERT_EQUALS_FLOAT(a.scaled(2.5f).y, 2.f);
-	a.scale(2.f);
-	TEST_ASSERT_EQUALS_FLOAT(a.x, 1.2f);
-	TEST_ASSERT_EQUALS_FLOAT(a.y, 1.6f);
-	
-	TEST_ASSERT_EQUALS_FLOAT(a.normalized().x, 0.6f);
-	TEST_ASSERT_EQUALS_FLOAT(a.normalized().y, 0.8f);
-	a.normalize();
-	TEST_ASSERT_EQUALS_FLOAT(a.x, 0.6f);
-	TEST_ASSERT_EQUALS_FLOAT(a.y, 0.8f);
-	
-	xpcc::Point2f b(a.perpendicular());
-	TEST_ASSERT_EQUALS_FLOAT(b.x, -0.8f);
-	TEST_ASSERT_EQUALS_FLOAT(b.y, 0.6f);
+	TEST_ASSERT_EQUALS(a.getLength(), 7);
+	TEST_ASSERT_EQUALS(a.getLengthSquared(), 7*7);
 }
 
 void
-Point2Test::testMathDefs()
+Vector1Test::testMathDefs()
 {
-	xpcc::Point2i a(7,0);
-	xpcc::Point2f b(INFINITY,NAN);
+	xpcc::Vector1i a(7);
+	xpcc::Vector1f b(NAN);
+	xpcc::Vector1f c(INFINITY);
 	
 	TEST_ASSERT_FALSE(a.hasNan());
 	TEST_ASSERT_FALSE(a.hasInf());
 	
 	TEST_ASSERT_TRUE(b.hasNan());
-	TEST_ASSERT_TRUE(b.hasInf());
+	TEST_ASSERT_TRUE(c.hasInf());
 }
