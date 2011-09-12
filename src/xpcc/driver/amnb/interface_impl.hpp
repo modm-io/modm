@@ -81,23 +81,34 @@ template <typename Device>
 uint8_t xpcc::amnb::Interface<Device>::lengthOfReceivedMessage = 0;
 
 template <typename Device>
-uint8_t xpcc::amnb::Interface<Device>::lengthOfSendingMessage = 0;
+uint8_t xpcc::amnb::Interface<Device>::lengthOfTransmitMessage = 0;
 
 template <typename Device>
 bool xpcc::amnb::Interface<Device>::hasMessageToSend = false;
 
 template <typename Device>
+bool xpcc::amnb::Interface<Device>::rescheduleTransmit = false;
+
+template <typename Device>
 bool xpcc::amnb::Interface<Device>::transmitting = false;
 
 template <typename Device>
-xpcc::Timeout<> xpcc::amnb::Interface<Device>::timer;
+xpcc::Timeout<> xpcc::amnb::Interface<Device>::resetTimer;
+
+template <typename Device>
+xpcc::Timeout<> xpcc::amnb::Interface<Device>::rescheduleTimer;
+
+template <typename Device>
+uint8_t xpcc::amnb::Interface<Device>::rescheduleTimeout;
 
 // ----------------------------------------------------------------------------
 
 template <typename Device>
 void
-xpcc::amnb::Interface<Device>::initialize()
+xpcc::amnb::Interface<Device>::initialize(int seed)
 {
+	srand(seed);
+	rescheduleTimeout = static_cast<uint8_t>(rand());
 	Device::setBaudrate(115200UL);
 	state = SYNC;
 }
@@ -110,23 +121,25 @@ xpcc::amnb::Interface<Device>::writeMessage()
 {
 	char check;
 	transmitting = true;
+	Device::resetError();
 	
-	// detect collisions only on the first two bytes
-	Device::write(syncByte);
-	while (!Device::read(check)) ;
-	if (check != syncByte) {
-		transmitting = false;
-		return false;
-	}
-	Device::write(tx_buffer[0]);
-	while (!Device::read(check)) ;
-	if (check != tx_buffer[0]) {
-		transmitting = false;
-		return false;
-	}
-	
-	for (uint8_t i=1; i < lengthOfSendingMessage; ++i) {
+	for (uint_fast8_t i=0; i < lengthOfTransmitMessage; ++i) {
 		Device::write(tx_buffer[i]);
+		
+		// try and read the transmitted byte back but do not wait infinity
+		uint16_t count(0);
+		while (!Device::read(check) && (++count <= 1000)) ;
+		
+		// if the read timed out or framing error occured or content mismatch
+		if ((count > 1000) || Device::readError() || (check != tx_buffer[i])) {
+			// stop transmitting, signal the collision
+			transmitting = false;
+			rescheduleTransmit = true;
+			Device::resetError();
+			// and wait for a random amount of time before sending again
+			rescheduleTimer.restart(rescheduleTimeout % maxTimeOut);
+			return false;
+		}
 	}
 	
 	hasMessageToSend = false;
@@ -144,9 +157,10 @@ xpcc::amnb::Interface<Device>::sendMessage(uint8_t address, Flags flags,
 	hasMessageToSend = false;
 	uint8_t crc;
 	
-	tx_buffer[0] = payloadLength;
-	tx_buffer[1] = address | flags;
-	tx_buffer[2] = command;
+	tx_buffer[0] = syncByte;
+	tx_buffer[1] = payloadLength;
+	tx_buffer[2] = address | flags;
+	tx_buffer[3] = command;
 	
 	crc = crcUpdate(crcInitialValue, payloadLength);
 	crc = crcUpdate(crc, address | flags);
@@ -157,13 +171,13 @@ xpcc::amnb::Interface<Device>::sendMessage(uint8_t address, Flags flags,
 	for (i = 0; i < payloadLength; ++i)
 	{
 		crc = crcUpdate(crc, *ptr);
-		tx_buffer[i+3] = *ptr;
+		tx_buffer[i+4] = *ptr;
 		ptr++;
 	}
 	
-	tx_buffer[i+3] = crc;
+	tx_buffer[i+4] = crc;
 	
-	lengthOfSendingMessage = payloadLength + 4;
+	lengthOfTransmitMessage = payloadLength + 5;
 	hasMessageToSend = true;
 }
 
@@ -228,7 +242,14 @@ template <typename Device>
 bool
 xpcc::amnb::Interface<Device>::isBusAvailable()
 {
-	return (state == SYNC) && !transmitting;
+	return (state == SYNC) && !transmitting && !rescheduleTransmit;
+}
+
+template <typename Device>
+bool
+xpcc::amnb::Interface<Device>::hasMessageBeenTransmitted()
+{
+	return !hasMessageToSend;
 }
 
 template <typename Device>
@@ -259,8 +280,21 @@ void
 xpcc::amnb::Interface<Device>::update()
 {
 	char byte;
-	while (!transmitting && Device::read(byte))
+	while (Device::read(byte))
 	{
+		if (Device::readError()) {
+			// collision has been detected
+			rescheduleTransmit = true;
+			Device::resetError();
+			// erase the message in the buffer
+			Device::flushReceiveBuffer();
+			// and wait for a random amount of time before sending again
+			rescheduleTimeout = static_cast<uint8_t>(rand());
+			rescheduleTimer.restart(rescheduleTimeout % maxTimeOut);
+			state = SYNC;
+			return;
+		}
+		
 		switch (state)
 		{
 			case SYNC:
@@ -298,12 +332,24 @@ xpcc::amnb::Interface<Device>::update()
 				state = SYNC;
 				break;
 		}
-		timer.restart(timeout);
+		
+		resetTimer.restart(resetTimeout);
 	}
-	if (timer.isExpired())
-	{
-		state = SYNC;
-	}
+	if ((state != SYNC) && resetTimer.isExpired()) state = SYNC;
 	
-	if (hasMessageToSend && isBusAvailable()) writeMessage();
+	// check if we have waited for a random amount of time
+	if (rescheduleTransmit && rescheduleTimer.isExpired()) rescheduleTransmit = false;
+	
+	if (hasMessageToSend && !rescheduleTransmit && !transmitting && (state == SYNC)) {
+		// if channel is free, send with probability P
+		if (rescheduleTimeout < 256 * pValue) {
+			writeMessage();
+		}
+		// otherwise reschedule
+		else {
+			rescheduleTransmit = true;
+			rescheduleTimer.restart(rescheduleTimeout % maxTimeOut);
+		}
+		rescheduleTimeout = static_cast<uint8_t>(rand());
+	}
 }

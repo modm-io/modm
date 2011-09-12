@@ -47,14 +47,18 @@
 #include "uart3.hpp"
 
 static xpcc::atomic::Queue<char, UART3_RX_BUFFER_SIZE> rxBuffer;
+static uint8_t error;
 
 // ----------------------------------------------------------------------------
 // called when the UART has received a character
 // 
 ISR(USART3_RX_vect)
 {
+// TODO: Fix this for all ATmega's
+#if defined (DOR3) && defined (FE3)
+	error |= UCSR3A & ((1 << FE3) | (1 << DOR3));
+#endif
 	uint8_t data = UDR3;
-//	uint8_t last_rx_error = UCSR3A & ((1 << FE3) | (1 << DOR3));
 	
 	// TODO Fehlerbehandlung
 	rxBuffer.push(data);
@@ -117,6 +121,35 @@ xpcc::atmega::BufferedUart3::read(char *buffer, uint8_t n)
 	}
 	
 	return n;
+}
+
+uint8_t
+xpcc::atmega::BufferedUart3::readError()
+{
+	return error;
+}
+
+void
+xpcc::atmega::BufferedUart3::resetError()
+{
+	error = 0;
+}
+
+uint8_t
+xpcc::atmega::BufferedUart3::flushReceiveBuffer()
+{
+	uint8_t i(0);
+	while(!rxBuffer.isEmpty()) {
+		rxBuffer.pop();
+		++i;
+	}
+#if defined (RXC3)
+	unsigned char c;
+	while (UCSR3A & (1 << RXC3))
+		c = UDR3;
+#endif
+	
+	return i;
 }
 
 #endif

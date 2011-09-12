@@ -52,15 +52,17 @@ namespace
 	
 	GPIO__INPUT(RXD, D, 2);
 	GPIO__OUTPUT(TXD, D, 3);
+	
+	uint8_t error;
 }
 
 // ----------------------------------------------------------------------------
 ISR(USARTD0_RXC_vect)
-{
+{	
+	// first save the errors
+	error |= USARTD0_STATUS & (USART_FERR_bm | USART_BUFOVF_bm | USART_PERR_bm);
+	// then read the buffer
 	uint8_t data = USARTD0_DATA;
-	
-	// TODO Fehlerbehandlung
-	//USARTD0_STATUS & (FERR, BUFOVF, PERR)
 	
 	rxBuffer.push(data);
 }
@@ -160,10 +162,11 @@ xpcc::atxmega::BufferedUartD0::read(char& c)
 uint8_t
 xpcc::atxmega::BufferedUartD0::read(char *buffer, uint8_t n)
 {
-	for (uint8_t i = 0; i < n; ++i)
+	uint8_t i(0);
+	for (; i < n; ++i)
 	{
 		if (rxBuffer.isEmpty()) {
-			return n;
+			return i;
 		}
 		else {
 			*buffer++ = rxBuffer.get();
@@ -171,7 +174,47 @@ xpcc::atxmega::BufferedUartD0::read(char *buffer, uint8_t n)
 		}
 	}
 	
-	return n;
+	return i;
 }
+
+uint8_t
+xpcc::atxmega::BufferedUartD0::readError()
+{
+	return error;
+}
+
+void
+xpcc::atxmega::BufferedUartD0::resetError()
+{
+	error = 0;
+}
+
+uint8_t
+xpcc::atxmega::BufferedUartD0::flushReceiveBuffer()
+{
+	uint8_t i(0);
+	while(!rxBuffer.isEmpty()) {
+		rxBuffer.pop();
+		++i;
+	}
+	unsigned char c;
+	while (USARTD0_STATUS & USART_RXCIF_bm)
+		c = USARTD0_DATA;
+	
+	return i;
+}
+
+//uint8_t
+//xpcc::atxmega::BufferedUartD0::flushTransmitBuffer()
+//{
+//	uint8_t i(0);
+//	while(!txBuffer.isEmpty()) {
+//		txBuffer.pop();
+//		++i;
+//	}
+//
+//	return i;
+//}
+
 
 #endif // USARTD0

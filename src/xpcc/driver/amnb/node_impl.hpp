@@ -81,10 +81,10 @@ xpcc::amnb::Action::call(Response& response, const void *payload)
 
 // ----------------------------------------------------------------------------
 inline void
-xpcc::amnb::Listener::call(const void *payload)
+xpcc::amnb::Listener::call(const void *payload, const uint8_t length)
 {
 	// redirect call to the actual object
-	(object->*function)(payload);
+	(object->*function)(payload, length);
 }
 
 // Disable warnings for Visual Studio about using 'this' in a base member
@@ -104,7 +104,7 @@ xpcc::amnb::Node<Interface>::Node(uint8_t address,
 ownAddress(address), actionList(actionList), actionCount(actionCount),
 listenList(listenList), listenCount(listenCount), response(this)
 {
-	Interface::initialize();
+	Interface::initialize(address);
 	queryStatus = ERROR_TIMEOUT;
 }
 
@@ -286,7 +286,7 @@ xpcc::amnb::Node<Interface>::update()
 			}
 		}
 		
-		if (checkListeners) {
+		if (checkListeners && (listenCount > 0)) {
 			uint8_t listenerAddress = Interface::getAddress();
 			uint8_t listenerCommand = Interface::getCommand();
 			
@@ -298,7 +298,7 @@ xpcc::amnb::Node<Interface>::update()
 				if ((listenerAddress == listen.address) && (listenerCommand == listen.command))
 				{
 					// execute callback function
-					listen.call(Interface::getPayload());
+					listen.call(Interface::getPayload(), Interface::getPayloadLength());
 					break;
 				}
 			}

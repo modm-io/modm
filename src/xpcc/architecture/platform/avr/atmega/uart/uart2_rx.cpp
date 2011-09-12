@@ -47,14 +47,18 @@
 #include "uart2.hpp"
 
 static xpcc::atomic::Queue<char, UART2_RX_BUFFER_SIZE> rxBuffer;
+static uint8_t error;
 
 // ----------------------------------------------------------------------------
 // called when the UART has received a character
 // 
 ISR(USART2_RX_vect)
 {
+// TODO: Fix this for all ATmega's
+#if defined (DOR2) && defined (FE2)
+	error |= UCSR2A & ((1 << FE2) | (1 << DOR2));
+#endif
 	uint8_t data = UDR2;
-//	uint8_t last_rx_error = UCSR2A & ((1 << FE2) | (1 << DOR2));
 	
 	// TODO Fehlerbehandlung
 	rxBuffer.push(data);
@@ -117,6 +121,35 @@ xpcc::atmega::BufferedUart2::read(char *buffer, uint8_t n)
 	}
 	
 	return n;
+}
+
+uint8_t
+xpcc::atmega::BufferedUart2::readError()
+{
+	return error;
+}
+
+void
+xpcc::atmega::BufferedUart2::resetError()
+{
+	error = 0;
+}
+
+uint8_t
+xpcc::atmega::BufferedUart2::flushReceiveBuffer()
+{
+	uint8_t i(0);
+	while(!rxBuffer.isEmpty()) {
+		rxBuffer.pop();
+		++i;
+	}
+#if defined (RXC2)
+	unsigned char c;
+	while (UCSR2A & (1 << RXC2))
+		c = UDR2;
+#endif
+	
+	return i;
 }
 
 #endif

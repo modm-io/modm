@@ -37,6 +37,8 @@
 #include <stdint.h>
 #include <xpcc/architecture/utils.hpp>
 #include <xpcc/workflow/timeout.hpp>
+#include <xpcc/architecture/driver/delay.hpp>
+#include <stdlib.h>
 
 #include "constants.hpp"
 
@@ -58,7 +60,9 @@ namespace xpcc
 		/**
 		 * \brief	AMNB interface
 		 * 
-		 * \author	Fabian Greif, Niklas Hauser
+		 * \author	Fabian Greif
+		 * \author	Niklas Hauser
+		 *
 		 * \ingroup	amnb
 		 */
 		template <typename Device>
@@ -69,9 +73,10 @@ namespace xpcc
 			 * \brief	Initialize the interface
 			 * 
 			 * Sets the baudrate for the DEVICE etc.
+			 * \param seed for the random number generator
 			 */
 			static void
-			initialize();
+			initialize(int seed);
 			
 			/**
 			 * \brief	Send a message
@@ -125,11 +130,18 @@ namespace xpcc
 			isAcknowledge();
 			
 			/**
-			 * \brief	Check if anythings is being transmitted on the bus
-			 * \return	\c true if the bus is not busy
+			 * \return	\c true you are allowed to send right now
 			 */
 			static inline bool
 			isBusAvailable();
+			
+			/**
+			 * \brief	Check if there has been an error during transmission
+			 * \return	\c true if the message has been transmitted without
+			 *			collision.
+			 */
+			static inline bool
+			hasMessageBeenTransmitted();
 			
 			/**
 			 * \brief	Access the data of a received message
@@ -178,11 +190,18 @@ namespace xpcc
 			static uint8_t position;
 			static uint8_t length;
 			static uint8_t lengthOfReceivedMessage;
+			static uint8_t lengthOfTransmitMessage;
+			static xpcc::Timeout<> resetTimer;
+			static const uint8_t resetTimeout = 4;
+			
+			static bool rescheduleTransmit;
 			static bool hasMessageToSend;
-			static uint8_t lengthOfSendingMessage;
 			static bool transmitting;
-			static xpcc::Timeout<> timer;
-			static const uint8_t timeout = 4;
+			static xpcc::Timeout<> rescheduleTimer;
+			static uint8_t rescheduleTimeout;
+			// the probability for p-persistent CSMA
+			static const float pValue = 0.75;
+			static const uint8_t maxTimeOut = 12;
 			
 			static State state;
 		};

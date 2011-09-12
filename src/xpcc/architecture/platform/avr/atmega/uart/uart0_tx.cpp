@@ -90,4 +90,16 @@ xpcc::atmega::BufferedUart0::write(const char *s)
 	}
 }
 
+//uint8_t
+//xpcc::atmega::BufferedUart0::flushTransmitBuffer()
+//{
+//	uint8_t i(0);
+//	while(!txBuffer.isEmpty()) {
+//		txBuffer.pop();
+//		++i;
+//	}
+//
+//	return i;
+//}
+
 #endif

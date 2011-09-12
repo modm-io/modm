@@ -171,10 +171,10 @@ namespace xpcc
 		 */
 		struct Listener
 		{
-			typedef void (Callable::*Callback)(const void *payload);
+			typedef void (Callable::*Callback)(const void *payload, const uint8_t length);
 			
 			inline void
-			call(const void *payload);
+			call(const void *payload, const uint8_t length);
 			
 			uint8_t address;			//!< Address of transmitting chip
 			uint8_t command;

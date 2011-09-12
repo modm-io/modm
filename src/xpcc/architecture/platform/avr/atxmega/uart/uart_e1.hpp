@@ -169,6 +169,18 @@ namespace xpcc
 			static bool
 			read(char& c);
 			
+			static uint8_t
+			readError();
+			
+			static void
+			resetError();
+			
+			static uint8_t
+			flushReceiveBuffer();
+			
+//			static uint8_t
+//			flushTransmitBuffer();
+			
 			/**
 			 * \brief	Read a block of bytes
 			 * 

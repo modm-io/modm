@@ -43,14 +43,18 @@
 #include "uart{{ id }}.hpp"
 
 static xpcc::atomic::Queue<char, UART{{ id }}_RX_BUFFER_SIZE> rxBuffer;
+static uint8_t error;
 
 // ----------------------------------------------------------------------------
 // called when the UART has received a character
 // 
 ISR(USART{{ id }}_RX_vect)
 {
+// TODO: Fix this for all ATmega's
+#if defined (DOR{{ id }}) && defined (FE{{ id }})
+	error |= UCSR{{ id }}A & ((1 << FE{{ id }}) | (1 << DOR{{ id }}));
+#endif
 	uint8_t data = UDR{{ id }};
-//	uint8_t last_rx_error = UCSR{{ id }}A & ((1 << FE{{ id }}) | (1 << DOR{{ id }}));
 	
 	// TODO Fehlerbehandlung
 	rxBuffer.push(data);
@@ -113,6 +117,35 @@ xpcc::atmega::BufferedUart{{ id }}::read(char *buffer, uint8_t n)
 	}
 	
 	return n;
+}
+
+uint8_t
+xpcc::atmega::BufferedUart{{ id }}::readError()
+{
+	return error;
+}
+
+void
+xpcc::atmega::BufferedUart{{ id }}::resetError()
+{
+	error = 0;
+}
+
+uint8_t
+xpcc::atmega::BufferedUart{{ id }}::flushReceiveBuffer()
+{
+	uint8_t i(0);
+	while(!rxBuffer.isEmpty()) {
+		rxBuffer.pop();
+		++i;
+	}
+#if defined (RXC{{ id }})
+	unsigned char c;
+	while (UCSR{{ id }}A & (1 << RXC{{ id }}))
+		c = UDR{{ id }};
+#endif
+	
+	return i;
 }
 
 #endif
