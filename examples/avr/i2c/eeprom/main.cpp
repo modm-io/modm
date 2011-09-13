@@ -1,7 +1,7 @@
 
 #include <xpcc/architecture.hpp>
-#include <xpcc/driver/i2c/software_i2c.hpp>
-#include <xpcc/driver/i2c/eeprom.hpp>
+#include <xpcc/driver/connectivity/i2c/software_i2c.hpp>
+#include <xpcc/driver/memory/i2c_eeprom.hpp>
 
 #include <xpcc/io/iostream.hpp>
 
@@ -37,7 +37,7 @@ main()
 	
 	// Create a wrapper object for an 24C256 (32K I2C eeprom) connected
 	// at address 0xA0
-	xpcc::i2c::Eeprom< I2C > eeprom(0xA0);
+	xpcc::I2cEeprom< I2C > eeprom(0xA0);
 	
 	// Check if we can access the Eeprom
 	if (!eeprom.isAvailable())

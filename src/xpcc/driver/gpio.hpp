@@ -29,11 +29,6 @@
  * $Id$
  */
 // ----------------------------------------------------------------------------
-/**
- * \ingroup		driver
- * \defgroup	gpio		IO-Expander
- * 
- */
 
 #include "gpio/mcp23s08.hpp"
 #include "gpio/mcp23s17.hpp"

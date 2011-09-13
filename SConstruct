@@ -87,10 +87,10 @@ env.SConscript('src/xpcc/architecture/platform/arm7/lpc/SConscript.generate', ex
 env.SConscript('src/xpcc/architecture/platform/cortex_m3/stm32/SConscript.generate', exports='env')
 
 # Generate C++ arrays from the font definition files
-env.SConscript('src/xpcc/driver/lcd/font/SConscript.generate', exports='env')
+env.SConscript('src/xpcc/driver/ui/display/font/SConscript.generate', exports='env')
 
 # Generate C++ arrays from the image files
-env.SConscript('src/xpcc/driver/lcd/image/SConscript.generate', exports='env')
+env.SConscript('src/xpcc/driver/ui/display/image/SConscript.generate', exports='env')
 
 # Generate SConstruct files for all projects in the example/ and tests/ folders
 env.SConscript('SConscript.generate', exports='env')

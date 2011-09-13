@@ -33,7 +33,7 @@
 #ifndef XPCC_ATMEGA__TWI_MASTER_HPP
 #define XPCC_ATMEGA__TWI_MASTER_HPP
 
-#include <xpcc/driver/i2c/interface.hpp>
+#include <xpcc/driver/connectivity/i2c/interface.hpp>
 #include <stdint.h>
 
 namespace xpcc

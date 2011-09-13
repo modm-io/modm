@@ -88,11 +88,36 @@ xpcc::IOStream::writeInteger(int32_t value)
 	char buffer[ArithmeticTraits<int32_t>::decimalDigits + 1]; // +1 for '\0'
 	this->device->write(ltoa(value, buffer, 10));
 #else
-	if (value < 0) {
-		value = -value;
+	char buffer[ArithmeticTraits<uint32_t>::decimalDigits + 1]; // +1 for '\0'
+	// ptr points to the end of the string, it will be filled backwards
+	char *ptr = buffer + ArithmeticTraits<uint32_t>::decimalDigits;
+	*ptr = '\0';
+	
+	if (value < 0)
+	{
 		this->device->write('-');
+		
+		// calculate the string backwards
+		ldiv_t qrem = { value, 0 };
+		do {
+			qrem = ldiv(qrem.quot, 10);
+			*(--ptr) = '0' - qrem.rem;
+		}
+		while (qrem.quot != 0);
 	}
-	this->writeInteger(static_cast<uint32_t>(value));
+	else
+	{
+		// calculate the string backwards
+		ldiv_t qrem = { value, 0 };
+		do {
+			qrem = ldiv(qrem.quot, 10);
+			*(--ptr) = '0' + qrem.rem;
+		}
+		while (qrem.quot != 0);
+	}
+	
+	// write string
+	this->device->write(ptr);
 #endif
 }
 
@@ -106,21 +131,10 @@ xpcc::IOStream::writeInteger(uint32_t value)
 	// not always available.
 	this->device->write(ultoa(value, buffer, 10));
 #else
-	// ptr points to the end of the string, it will be filled backwards
-	char *ptr = buffer + ArithmeticTraits<uint32_t>::decimalDigits;
-	
-	*ptr = '\0';
-	
-	// calculate the string backwards
-	ldiv_t qrem = { value, 0 };
-	do {
-		qrem = ldiv(qrem.quot, 10);
-		*(--ptr) = '0' + qrem.rem;
-    }
-    while (qrem.quot != 0);
+	snprintf(buffer, sizeof(buffer), "%u", value);
 	
 	// write string
-	this->device->write(ptr);
+	this->device->write(buffer);
 #endif
 }
 

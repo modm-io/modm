@@ -34,7 +34,7 @@
 #define XPCC__CPU_BOARD2_SLAVE_HPP
 
 #include <xpcc/architecture.hpp>
-#include <xpcc/driver/interconnect/interconnect_interface.hpp>
+#include <xpcc/driver/connectivity/interconnect/interconnect_interface.hpp>
 
 namespace xpcc
 {

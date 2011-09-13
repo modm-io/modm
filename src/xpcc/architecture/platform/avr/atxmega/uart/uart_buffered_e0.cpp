@@ -43,7 +43,7 @@
 #include "uart_e0.hpp"
 #include "xpcc_config.hpp"
 
-#ifdef USARTE0
+#ifdef USARTE0_RXC_vect
 
 namespace
 {

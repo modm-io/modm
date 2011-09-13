@@ -6,7 +6,7 @@
  */
 
 #include <xpcc/architecture/platform.hpp>
-#include <xpcc/driver/apb/slave.hpp>
+#include <xpcc/driver/connectivity/apb/slave.hpp>
 
 // ----------------------------------------------------------------------------
 // wrapper class for the A/D converter

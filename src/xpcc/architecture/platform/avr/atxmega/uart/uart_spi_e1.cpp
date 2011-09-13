@@ -40,7 +40,7 @@
 
 #include "uart_e1.hpp"
 
-#ifdef USARTE1
+#ifdef USARTE1_RXC_vect
 
 namespace
 {

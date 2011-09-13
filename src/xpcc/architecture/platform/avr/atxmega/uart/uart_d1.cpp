@@ -41,7 +41,7 @@
 
 #include "uart_d1.hpp"
 
-#ifdef USARTD1
+#ifdef USARTD1_RXC_vect
 
 namespace
 {

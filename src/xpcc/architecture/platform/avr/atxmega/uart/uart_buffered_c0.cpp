@@ -43,7 +43,7 @@
 #include "uart_c0.hpp"
 #include "xpcc_config.hpp"
 
-#ifdef USARTC0
+#ifdef USARTC0_RXC_vect
 
 namespace
 {

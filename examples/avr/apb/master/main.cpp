@@ -1,6 +1,6 @@
 
 #include <xpcc/architecture/platform.hpp>
-#include <xpcc/driver/apb/interface.hpp>
+#include <xpcc/driver/connectivity/apb/interface.hpp>
 
 MAIN_FUNCTION
 {

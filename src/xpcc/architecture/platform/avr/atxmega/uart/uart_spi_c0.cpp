@@ -40,7 +40,7 @@
 
 #include "uart_c0.hpp"
 
-#ifdef USARTC0
+#ifdef USARTC0_RXC_vect
 
 namespace
 {

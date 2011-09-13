@@ -35,7 +35,7 @@
 #endif
 
 #include <xpcc/math/utils/bit_operation.hpp>
-#include <xpcc/driver/can/message.hpp>
+#include <xpcc/driver/connectivity/can/message.hpp>
 
 // ----------------------------------------------------------------------------
 template<typename Driver>

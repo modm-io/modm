@@ -37,7 +37,7 @@
 
 #include "uart_{{ id.lower() }}.hpp"
 
-#ifdef USART{{ id }}
+#ifdef USART{{ id }}_RXC_vect
 
 namespace
 {

@@ -41,7 +41,7 @@
 
 #include "uart_f0.hpp"
 
-#ifdef USARTF0
+#ifdef USARTF0_RXC_vect
 
 namespace
 {

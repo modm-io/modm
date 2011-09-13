@@ -1,7 +1,7 @@
 
 #include <xpcc/architecture.hpp>
-#include <xpcc/driver/i2c/software_i2c.hpp>
-#include <xpcc/driver/i2c/ds1631.hpp>
+#include <xpcc/driver/connectivity/i2c/software_i2c.hpp>
+#include <xpcc/driver/temperature/ds1631.hpp>
 
 #include <xpcc/io/iostream.hpp>
 
@@ -35,7 +35,7 @@ main()
 	// Initialize the I2C interface.
 	I2C::initialize();
 	
-	xpcc::i2c::Ds1631< I2C > ds1631(0x90);
+	xpcc::Ds1631< I2C > ds1631(0x90);
 	
 	// Check if we can access the DS1631
 	if (ds1631.isAvailable())
@@ -49,7 +49,7 @@ main()
 	}
 	
 	// Enable the 12 bit resolution
-	ds1631.configure(xpcc::i2c::RESOLUTION_12BIT, false);
+	ds1631.configure(xpcc::ds1631::RESOLUTION_12BIT, false);
 	
 	xpcc::delay_ms(1);
 	

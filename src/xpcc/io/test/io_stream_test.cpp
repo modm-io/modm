@@ -224,7 +224,8 @@ IoStreamTest::testStreamInt32_2()
 {
 	char string[] = "-2147483648";
 	
-	(*stream) << static_cast<int32_t>(-2147483648);
+	// avoid a warning about overflow
+	(*stream) << static_cast<int32_t>(-2147483647 - 1);
 	
 	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 11);
 	TEST_ASSERT_EQUALS(device.bytesWritten, 11);
@@ -248,7 +249,7 @@ IoStreamTest::testStreamUint64()
 #ifndef __AVR__
 	char string[] = "12345678901234";
 	
-	(*stream) << static_cast<uint64_t>(12345678901234);
+	(*stream) << static_cast<uint64_t>(12345678901234ULL);
 	
 	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 14);
 	TEST_ASSERT_EQUALS(device.bytesWritten, 14);
@@ -261,7 +262,7 @@ IoStreamTest::testStreamInt64()
 #ifndef __AVR__
 	char string[] = "-12345678901234";
 	
-	(*stream) << static_cast<int64_t>(-12345678901234);
+	(*stream) << static_cast<int64_t>(-12345678901234LL);
 	
 	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 15);
 	TEST_ASSERT_EQUALS(device.bytesWritten, 15);

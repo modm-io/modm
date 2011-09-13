@@ -2,9 +2,69 @@
 // 
 // $Id: driver.dox 76 2009-10-14 23:29:28Z dergraaf $
 
-/*!
+/**
 \defgroup	driver	Device drivers
 \brief 		Drivers to control external devices
 
 
 */
+
+/**
+ * \ingroup		driver
+ * \defgroup	adc			Analog/Digital Converters
+ */
+
+/**
+ * \ingroup		driver
+ * \defgroup	connectivity	Connectivity
+ * 
+ * Interface classes for I2C, SPI, CAN, etc.
+ */
+
+/**
+ * \ingroup		driver
+ * \defgroup	dac			Digital/Analog Converters
+ */
+
+/**
+ * \ingroup		driver
+ * \defgroup	gpio		IO-Expander
+ */
+
+/**
+ * \ingroup		driver
+ * \defgroup	inertial	Inertial measurement
+ * 
+ * Gyroscopes, Acceleration sensors and compasses
+ */
+
+/**
+ * \ingroup		driver
+ * \defgroup	memory		Memory
+ * 
+ * Driver for SPI Flash, SPI RAM, I2C Eeprom, SD card etc.
+ */
+
+/**
+ * \ingroup		driver
+ * \defgroup	driver_other	Other
+ * 
+ * Everything without a distinct group yet.
+ */
+
+/**
+ * \ingroup		driver
+ * \defgroup	pressure	Pressure sensors
+ */
+
+/**
+ * \ingroup		driver
+ * \defgroup	temperature	Temperature sensors
+ */
+
+/**
+ * \ingroup		driver
+ * \defgroup	ui			User interface
+ * 
+ * Displays, Buttons etc.
+ */

@@ -36,12 +36,12 @@
 #include <xpcc/architecture/platform.hpp>
 #include <xpcc/architecture/driver.hpp>
 
-#include <xpcc/driver/software_spi.hpp>
-#include <xpcc/driver/at45db0x1d.hpp>
-#include <xpcc/driver/serial_ram.hpp>
-#include <xpcc/driver/can/mcp2515.hpp>
+#include <xpcc/driver/connectivity/software_spi.hpp>
+#include <xpcc/driver/connectivity/can/mcp2515.hpp>
+#include <xpcc/driver/memory/at45db0x1d.hpp>
+#include <xpcc/driver/memory/spi_ram.hpp>
 
-#include <xpcc/driver/interconnect/interconnect_interface.hpp>
+#include <xpcc/driver/connectivity/interconnect/interconnect_interface.hpp>
 
 namespace xpcc
 {
@@ -134,7 +134,7 @@ namespace xpcc
 		typedef xpcc::At45db0x1d<SpiFlash, CsFlash> Flash;
 		
 		/// 32 kB serial RAM
-		typedef xpcc::SerialRam<SpiFlash, CsRam, HoldRam> Ram;
+		typedef xpcc::SpiRam<SpiFlash, CsRam, HoldRam> Ram;
 		
 		/// CAN Controller
 		typedef xpcc::Mcp2515<SpiCan, Cs, Int> Can;

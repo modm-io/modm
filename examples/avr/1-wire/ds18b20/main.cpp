@@ -1,7 +1,7 @@
 
 #include <xpcc/architecture.hpp>
-#include <xpcc/driver/one_wire/software_one_wire.hpp>
-#include <xpcc/driver/one_wire/ds18b20.hpp>
+#include <xpcc/driver/connectivity/software_one_wire.hpp>
+#include <xpcc/driver/temperature/ds18b20.hpp>
 
 #include <xpcc/io/iostream.hpp>
 
@@ -46,7 +46,7 @@ main()
 	output << "finished!" << xpcc::endl;
 	
 	// read the temperature from a connected DS18B20
-	xpcc::DS18B20< xpcc::SoftwareOneWire<OneWirePin> > ds18b20(rom);
+	xpcc::Ds18b20< xpcc::SoftwareOneWire<OneWirePin> > ds18b20(rom);
 	
 	ds18b20.startConversion();
 	

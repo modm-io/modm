@@ -1,6 +1,6 @@
 
 #include <xpcc/architecture.hpp>
-#include <xpcc/driver/i2c/software_i2c.hpp>
+#include <xpcc/driver/connectivity/i2c/software_i2c.hpp>
 
 #include <xpcc/io/iostream.hpp>
 
