@@ -32,9 +32,9 @@
 
 #include "../operator.hpp"
 
-
-extern "C" uint16_t
-xpcc::math::sqrt32(uint32_t input)
+extern "C"
+uint16_t
+xpcc__sqrt(uint32_t input)
 {
 	return round(std::sqrt(static_cast<double>(input)));
 }

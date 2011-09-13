@@ -303,8 +303,8 @@ namespace xpcc
 #ifdef __DOXYGEN__
 		#define	XPCC__STATIC_ASSERT(condition)
 #else
-		#define	XPCC__STATIC_ASSERT(condition) \
-			typedef ::xpcc::tmp::static_assert_test<\
+		#define	XPCC__STATIC_ASSERT(condition) 					\
+			typedef ::xpcc::tmp::static_assert_test<			\
 				sizeof(::xpcc::tmp::STATIC_ASSERTION_FAILURE< (bool) (condition) >) >\
 					CONCAT(static_assert_typedef_, __LINE__)
 #endif

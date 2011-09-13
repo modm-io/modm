@@ -88,7 +88,7 @@ xpcc::Vector<T, 2>::Vector(T inVal) :
 
 // ----------------------------------------------------------------------------
 template<typename T>
-xpcc::Vector<T, 2>::Vector(const xpcc::Matrix<T, 1, 2> &rhs) :
+xpcc::Vector<T, 2>::Vector(const xpcc::Matrix<T, 2, 1> &rhs) :
 	x(reinterpret_cast<const T*>(&rhs)[0]),
 	y(reinterpret_cast<const T*>(&rhs)[1])
 {
@@ -350,7 +350,7 @@ xpcc::Vector<T, 2>& xpcc::Vector<T, 2>::operator = (const xpcc::Vector<T, 2> &rh
 
 // ----------------------------------------------------------------------------
 template<typename T>
-xpcc::Vector<T, 2>& xpcc::Vector<T, 2>::operator = (const xpcc::Matrix<T, 1, 2> &rhs)
+xpcc::Vector<T, 2>& xpcc::Vector<T, 2>::operator = (const xpcc::Matrix<T, 2, 1> &rhs)
 {
 	x = reinterpret_cast<const T*>(&rhs)[0];
 	y = reinterpret_cast<const T*>(&rhs)[1];

@@ -37,7 +37,7 @@ void
 VectorTest::testConstructor()
 {
 	int16_t array[2] = {1, 2};
-	xpcc::Matrix<int16_t, 1, 2> m(array);
+	xpcc::Matrix<int16_t, 2, 1> m(array);
 	
 	xpcc::Vector<int16_t, 2> a;
 	TEST_ASSERT_EQUALS(a[0], 0);
@@ -66,8 +66,9 @@ VectorTest::testAssign()
 {
 	int16_t array1[4] = {1, 2, 3, 4};
 	xpcc::Vector<int16_t, 4> a(array1);
+	
 	int16_t array2[4] = {5, 6, 7, 8};
-	xpcc::Matrix<int16_t, 1, 4> m(array2);
+	xpcc::Matrix<int16_t, 4, 1> m(array2);
 	
 	xpcc::Vector<int16_t, 4> b;
 	
@@ -140,6 +141,7 @@ VectorTest::testOperators()
 {
 	int16_t array1[4] = {1, 2, 3, 4};
 	xpcc::Vector<int16_t,4> a(array1);
+	
 	int16_t array2[4] = {4, 5, 6, 7};
 	xpcc::Vector<int16_t,4> b(array2);
 	

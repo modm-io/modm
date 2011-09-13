@@ -79,12 +79,12 @@ namespace xpcc
 		Vector(const Vector<T,2> &inXY, const T &inZ);
 		Vector(const T &inX, const Vector<T, 2> &inYZ);
 		
-		Vector(const Vector<T,2> &inXY, const Vector<T, 1> &inZ);
+		Vector(const Vector<T, 2> &inXY, const Vector<T, 1> &inZ);
 		Vector(const Vector<T, 1> &inX, const Vector<T, 2> &inYZ);
 		
 		template<typename U>
 		Vector(const Vector<U, 3> &rhs);
-		Vector(const Matrix<T, 1, 3> &rhs);
+		Vector(const Matrix<T, 3, 1> &rhs);
 		
 		
 		inline void
@@ -111,7 +111,7 @@ namespace xpcc
 		getZ() const;
 		
 		
-		Vector& operator = (const Matrix<T, 1, 3> &rhs);
+		Vector& operator = (const Matrix<T, 3, 1> &rhs);
 		Vector& operator = (const Vector &rhs);
 		
 		bool operator == (const Vector &rhs) const;

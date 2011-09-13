@@ -40,6 +40,8 @@
 
 #include "math/filter.hpp"
 #include "math/geometry.hpp"
+#include "math/matrix.hpp"
+#include "math/lu_decomposition.hpp"
 #include "math/interpolation.hpp"
 #include "math/utils.hpp"
 

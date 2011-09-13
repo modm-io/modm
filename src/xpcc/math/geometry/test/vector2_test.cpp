@@ -54,7 +54,7 @@ Vector2Test::testConstructor()
 	TEST_ASSERT_EQUALS(c.getY(), 30);
 	
 	int16_t array[2] = {-4,5};
-	xpcc::Matrix<int16_t,1,2> m(array);
+	xpcc::Matrix<int16_t, 2, 1> m(array);
 	xpcc::Vector2i d(m);
 	TEST_ASSERT_EQUALS(d.getX(), -4);
 	TEST_ASSERT_EQUALS(d.getY(), 5);
@@ -80,8 +80,9 @@ void
 Vector2Test::testAssign()
 {
 	xpcc::Vector2i a(42,-4);
+	
 	int16_t array[2] = {-26,9};
-	xpcc::Matrix<int16_t, 1, 2> m(array);
+	xpcc::Matrix<int16_t, 2, 1> m(array);
 	
 	xpcc::Vector2i b;
 	

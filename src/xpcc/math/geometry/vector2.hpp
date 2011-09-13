@@ -93,7 +93,7 @@ namespace xpcc
 		Vector(const T &inX, const Vector<T, 1> &inY);
 		Vector(const Vector<T, 1> &inX, const T &inY);
 		explicit Vector(T inVal);
-		Vector(const Matrix<T, 1, 2> &rhs);
+		Vector(const Matrix<T, 2, 1> &rhs);
 		Vector(const Vector &rhs);
 		
 		inline void
@@ -250,7 +250,7 @@ namespace xpcc
 		ccw(const Vector& a, const Vector& b, const Vector& c);
 		
 		Vector& operator = (const Vector &rhs);
-		Vector& operator = (const Matrix<T, 1, 2> &rhs);
+		Vector& operator = (const Matrix<T, 2, 1> &rhs);
 		
 		bool operator == (const Vector &rhs) const;
 		bool operator != (const Vector &rhs) const;

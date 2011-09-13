@@ -35,7 +35,7 @@
 #endif
 
 inline uint32_t
-xpcc::math::mul32(uint16_t a, uint16_t b)
+xpcc::math::mul(uint16_t a, uint16_t b)
 {
 	uint32_t result;
 	asm(
@@ -61,7 +61,7 @@ xpcc::math::mul32(uint16_t a, uint16_t b)
 }
 
 inline int32_t
-xpcc::math::mul32(int16_t a, int16_t b)
+xpcc::math::mul(int16_t a, int16_t b)
 {
 	int32_t result;
 	int8_t help_reg;
@@ -98,7 +98,7 @@ xpcc::math::mul32(int16_t a, int16_t b)
 }
 
 inline int32_t
-xpcc::math::mac32(int32_t result, int16_t a, int16_t b)
+xpcc::math::mac(int32_t result, int16_t a, int16_t b)
 {
 	int8_t help_reg;
 	

@@ -78,10 +78,10 @@ namespace xpcc
 		Vector();
 		Vector(const T *ptData);
 		
-		Vector(const Matrix<T, 1, SIZE> &rhs);
+		Vector(const Matrix<T, SIZE, 1> &rhs);
 		Vector(const Vector &rhs);
 		
-		Vector& operator = (const Matrix<T, 1, SIZE> &rhs);
+		Vector& operator = (const Matrix<T, SIZE, 1> &rhs);
 		Vector& operator = (const Vector &rhs);
 		
 		bool operator == (const Vector &rhs) const;
@@ -93,6 +93,7 @@ namespace xpcc
 		
 		const T& operator [] (uint8_t index) const;
 		T& operator [] (uint8_t index);
+		
 		T* ptr();
 		const T* ptr() const;
 		
@@ -110,16 +111,16 @@ namespace xpcc
 		T getLength() const;
 		T getLengthSquared() const;
 		
-		Matrix<T, 1, SIZE>&
+		Matrix<T, SIZE, 1>&
 		asMatrix();
 		
-		const Matrix<T, 1, SIZE>&
+		const Matrix<T, SIZE, 1>&
 		asMatrix() const;
 		
-		Matrix<T, SIZE, 1>&
+		Matrix<T, 1, SIZE>&
 		asTransposedMatrix();
 		
-		const Matrix<T, SIZE, 1>&
+		const Matrix<T, 1, SIZE>&
 		asTransposedMatrix() const;
 		
 	public:

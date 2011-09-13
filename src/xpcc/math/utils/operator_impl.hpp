@@ -35,19 +35,19 @@
 #endif
 
 inline uint32_t
-xpcc::math::mul32(uint16_t a, uint16_t b)
+xpcc::math::mul(uint16_t a, uint16_t b)
 {
 	return static_cast<uint32_t>(a) * static_cast<uint32_t>(b);
 }
 
 inline int32_t
-xpcc::math::mul32(int16_t a, int16_t b)
+xpcc::math::mul(int16_t a, int16_t b)
 {
 	return static_cast<int32_t>(a) * static_cast<int32_t>(b);
 }
 
 inline int32_t
-xpcc::math::mac32(int32_t result, int16_t a, int16_t b)
+xpcc::math::mac(int32_t result, int16_t a, int16_t b)
 {
 	return result + static_cast<int32_t>(a) * static_cast<int32_t>(b);
 }

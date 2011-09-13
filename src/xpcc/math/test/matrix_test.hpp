@@ -1,6 +1,6 @@
 // coding: utf-8
 // ----------------------------------------------------------------------------
-/* Copyright (c) 2009, Roboterclub Aachen e.V.
+/* Copyright (c) 2011, Roboterclub Aachen e.V.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -30,64 +30,53 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/math/utils/operator.hpp>
+#include <unittest/testsuite.hpp>
 
-#include "vector2.hpp"
-
-// this explicit namespace is needed here, otherwise we get an error about 
-// "specialization of ... in different namespace"
-namespace xpcc
+class MatrixTest : public unittest::TestSuite
 {
-	template<>
-	int16_t
-	Vector<int16_t, 2>::getLength() const
-	{
-		int32_t t;
-		
-		t = math::mul(this->x, this->x);
-		t = math::mac(t,this-> y, this->y);
-		
-		return math::sqrt(t);
-	}
+public:
+	void
+	testConstruction();
 	
-	template<>
-	int32_t
-	Vector<int16_t, 2>::getLengthSquared() const
-	{
-		int32_t t;
-		
-		t = math::mul(this->x, this->x);
-		t = math::mac(t,this-> y, this->y);
-		
-		return t;
-	}
+	void
+	testAssign();
 	
-	template<>
-	int32_t
-	Vector<int16_t, 2>::dot(const xpcc::Vector<int16_t, 2>& other) const
-	{
-		int32_t t;
-		
-		t = math::mul(this->x, other.x);
-		t = math::mac(t,this->y, other.y);
-		
-		return t;
-	}
+	void
+	testIdentityMatrix();
 	
-	// ------------------------------------------------------------------------
-	template<>
-	template<>
-	Vector<double, 2>
-	Vector<float, 2>::convert() const
-	{
-		return Vector<double, 2>(this->x, this->y);
-	}
+	void
+	testZeroMatrix();
 	
-	template<>
-	template<>
-	Vector<float, 2>
-	Vector<double, 2>::convert() const
-	{
-		return Vector<float, 2>(this->x, this->y);
-	}
-}
+	void
+	testSubMatrix();
+	
+	void
+	testAccess();
+	
+	void
+	testCompare();
+	
+	void
+	testArithmetics();
+	
+	void
+	testMatrixMultiplicationInPlace();
+	
+	void
+	testMatrixMultiplication();
+	
+	void
+	testTranspose();
+	
+	void
+	testReplace();
+	
+	void
+	testAddRowColumn();
+	
+	void
+	testRemoveRowColumn();
+	
+	void
+	testDeterminant();
+};

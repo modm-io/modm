@@ -240,7 +240,7 @@ namespace unittest
 	do {	TEST_REPORTER__.reportFailure(__LINE__) \
 			<< msg << '\n'; \
 	} while (0); \
-	TEST_RETURN__(false)
+	TEST_RETURN__((void) false)
 
 #endif	// __DOXYGEN__
 

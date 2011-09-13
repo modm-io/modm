@@ -429,7 +429,7 @@ xpcc::Vector<T, 4>::Vector(const T &inX, const xpcc::Vector<T, 3> &inYZW)
 
 // ----------------------------------------------------------------------------
 template<typename T>
-xpcc::Vector<T, 4>::Vector(const xpcc::Matrix<T, 1, 4> &rhs)
+xpcc::Vector<T, 4>::Vector(const xpcc::Matrix<T, 4, 1> &rhs)
 :
 	x(reinterpret_cast<const T*>(&rhs)[0]),
 	y(reinterpret_cast<const T*>(&rhs)[1]),
@@ -532,7 +532,7 @@ xpcc::Vector<T, 4>::getW() const
 // ----------------------------------------------------------------------------
 template<typename T>
 xpcc::Vector<T, 4>&
-xpcc::Vector<T, 4>::operator = (const xpcc::Matrix<T, 1, 4> &rhs)
+xpcc::Vector<T, 4>::operator = (const xpcc::Matrix<T, 4, 1> &rhs)
 {
 	x = reinterpret_cast<const T*>(&rhs)[0];
 	y = reinterpret_cast<const T*>(&rhs)[1];

@@ -39,8 +39,9 @@ Vector4Test::testConstructor()
 	xpcc::Vector1i p1(1);
 	xpcc::Vector2i p2(2, 2);
 	xpcc::Vector3i p3(3, 3, 3);
+	
 	int16_t array[4] = {1, 2, 3, 4};
-	xpcc::Matrix<int16_t,1,4> m(array);
+	xpcc::Matrix<int16_t, 4, 1> m(array);
 	
 	xpcc::Vector4i a;
 	TEST_ASSERT_EQUALS(a.x, 0);
@@ -263,8 +264,9 @@ void
 Vector4Test::testAssign()
 {
 	xpcc::Vector4i a(1,2,3,4);
+	
 	int16_t array[4] = {5,6,7,8};
-	xpcc::Matrix<int16_t, 1, 4> m(array);
+	xpcc::Matrix<int16_t, 4, 1> m(array);
 	
 	xpcc::Vector4i b;
 	

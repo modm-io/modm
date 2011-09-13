@@ -49,112 +49,206 @@ namespace xpcc
 {
 	/**
 	 * \brief	Class for handling common matrix operations
-	 *
+	 * 
+	 * Having the width and height as template parameters has several
+	 * advantages over the tradition dynamic matrix class:
+	 * 
+	 * - The compiler knows how many elements you have in your matrix and can
+	 *   unroll and optimize loops
+	 * - You can ensure that you are not doing operations on matrices with
+	 *   incompatible sizes (multiplication for example). The compiler will
+	 *   tell you at compile time if you do.
+	 * - When you receive a matrix as a function parameter, you don't need to
+	 *   check that it is what you expect it to be. For example, if your
+	 *   function expects a 4x4 matrix, you'll ask for a Matrix and you are
+	 *   guaranteed to get what you asked for.
+	 * 
 	 * Adapted from the implementation of Gaspard Petit (gaspardpetit@gmail.com).
-	 *
 	 * \see <a href"http://www-etud.iro.umontreal.ca/~petitg/cpp/matrix.html">Homepage</a>
+	 * 
+	 * \tparam	ROWS		Number of rows
+	 * \tparam	COLUMNS		Number of columns
 	 * 
 	 * \ingroup	matrix
 	 * \author	Niklas Hauser
+	 * \author	Fabian Greif
 	 */
-	template<typename T, uint8_t WIDTH, uint8_t HEIGHT>
+	template<typename T, uint8_t ROWS, uint8_t COLUMNS>
 	class Matrix
 	{
 	public:
-		typedef T Type;
-		
-	public:
+		/**
+		 * \brief	Default Constructor
+		 * 
+		 * Creates a Matrix with uninitialized elements. Use zeroMatrix() to
+		 * create a matrix with all elements set to zero.
+		 */
 		Matrix();
+		
+		/**
+		 * \brief	Create a matrix from an array
+		 * 
+		 * Example:
+		 * \code
+		 * const int16_t m[6] = {
+		 *     1, 2,
+		 *     3, 4,
+		 *     5, 6,
+		 * };
+		 * 
+		 * xpcc::Matrix<int16_t, 3, 2> a(m);
+		 * \endcode
+		 */
 		Matrix(const T *data);
-		Matrix(const Matrix<T, WIDTH, HEIGHT> &m);
 		
+		/// Copy constructor
+		Matrix(const Matrix &m);
+		
+		// TODO replace with a explicit convert function
 		template<typename U>
-		Matrix& operator = (const Matrix<U, WIDTH, HEIGHT> &m);
+		Matrix&
+		operator = (const Matrix<U, ROWS, COLUMNS> &m);
 		
-		static const Matrix& identityMatrix();
-		static const Matrix& zeroMatrix();
+		/**
+		 * \brief	Get a zero matrix
+		 * 
+		 * Creates an internal zero matrix and returns a reference to
+		 * that internal matrix.
+		 */
+		static const Matrix&
+		zeroMatrix();
 		
-		template <uint8_t MW, uint8_t MH>
-		static Matrix subMatrix(uint8_t r, uint8_t c, const Matrix<T, MW, MH> &m);
+		/**
+		 * \brief	Get a identity matrix
+		 * 
+		 * Creates an internal identity matrix and returns a reference to
+		 * that internal matrix.
+		 */
+		static const Matrix&
+		identityMatrix();
+		
+		/**
+		 * \brief	Create a new sub matrix
+		 * 
+		 */
+		template <uint8_t MR, uint8_t MC>
+		Matrix<T, MR, MC>
+		subMatrix(uint8_t row, uint8_t column) const;
 		
 		bool operator == (const Matrix &m) const;
 		bool operator != (const Matrix &m) const;
 		
-		const T* operator [] (uint8_t row) const;
-		T* operator [] (uint8_t row);
+		const T*
+		operator [] (uint8_t row) const;
 		
-		inline uint8_t width() const;
-		inline uint8_t height() const;
+		T*
+		operator [] (uint8_t row);
 		
+		inline uint8_t
+		getNumberOfRows() const;
+		
+		inline uint8_t
+		getNumberOfColumns() const;
+		
+		Matrix<T, 1, COLUMNS>
+		getRow(uint8_t index) const;
+		
+		Matrix<T, ROWS, 1>
+		getColumn(uint8_t index) const;
+		
+		// TODO remove these?
 		const T* ptr() const;
 		T* ptr();
 		
-		template<typename U>
-		Matrix& copy(const U *data);
-		
+		Matrix operator - ();
 		Matrix operator + (const Matrix &rhs) const;
-		Matrix& operator += (const Matrix &rhs);
 		Matrix operator - (const Matrix &rhs) const;
+		Matrix operator * (const T &rhs) const;		///< Scalar multiplication
+		Matrix operator / (const T &rhs) const;		///< Scalar division
+		
+		Matrix& operator += (const Matrix &rhs);
 		Matrix& operator -= (const Matrix &rhs);
-		Matrix& operator - ();
+		Matrix& operator *= (const T &rhs);			///< Scalar multiplication
+		Matrix& operator /= (const T &rhs);			///< Scalar division
 		
-		template<uint8_t _RHSWIDTH>
-		Matrix<T, _RHSWIDTH, HEIGHT> operator * (const Matrix<T, _RHSWIDTH, WIDTH> &rhs) const;
-		Matrix operator *= (const Matrix<T, WIDTH, HEIGHT> &rhs);
+		/// Matrix multiplication with matrices with the same size
+		Matrix operator *= (const Matrix &rhs);
 		
-		Matrix operator * (const T &rhs) const;
-		Matrix& operator *= (const T &rhs);
+		/// Matrix multiplication with different size matrices
+		template<uint8_t RHSCOL>
+		Matrix<T, ROWS, ROWS>
+		operator * (const Matrix<T, COLUMNS, RHSCOL> &rhs) const;
 		
-		Matrix operator / (const T &rhs) const;
-		Matrix& operator /= (const T &rhs);
+		Matrix<T, COLUMNS, ROWS>
+		asTransposed() const;
 		
-		Matrix<T, HEIGHT, WIDTH> asTransposed() const;
+		/**
+		 * \brief	Transpose the matrix
+		 * 
+		 * \warning	Will only work if the matrix is square!
+		 */
+		inline void
+		transpose();
 		
-		//	will work only if the matrix is square
-		inline void transpose();
+		/**
+		 * \brief	Calculate the determinant
+		 * 
+		 * Uses xpcc::determinant(*this);
+		 */
+		inline T
+		determinant() const;
 		
-#ifdef USE_MATRIXUTILS
-		void inverse();
-		Matrix inversed() const;
-#endif // USE_MATRIXUTILS
+		// TODO Implement these
+		/*void
+		inverse();
+		
+		Matrix
+		asInversed() const;*/
 		
 		bool hasNan() const;
 		bool hasInf() const;
 		
-//		static Matrix deSerialize(const std::string &str);
+		/// Fill the matrix with the values in \p data
+		template<typename U>
+		Matrix&
+		replace(const U *data);
 		
+		/// 
 		template<uint8_t MW, uint8_t MH>
-		Matrix<T, WIDTH, HEIGHT>& copy(uint8_t r, uint8_t c, const Matrix<T, MW, MH> &m);
+		Matrix&
+		replace(uint8_t row, uint8_t column, const Matrix<T, MW, MH> &m);
 		
-		Matrix<T, WIDTH, HEIGHT>& copyRow(uint8_t index, const Matrix<T, WIDTH, 1> &m);
-		Matrix<T, WIDTH, HEIGHT>& copyCol(uint8_t index, const Matrix<T, 1, HEIGHT> &m);
+		Matrix&
+		replaceRow(uint8_t index, const Matrix<T, 1, COLUMNS> &m);
 		
-		Matrix<T, WIDTH, 1> row(uint8_t index) const;
-		Matrix<T, 1, HEIGHT> col(uint8_t index) const;
+		Matrix&
+		replaceColumn(uint8_t index, const Matrix<T, ROWS, 1> &m);
 		
-		Matrix<T, WIDTH, HEIGHT+1> addBackRow(const Matrix<T, WIDTH, 1> &r ) const;
-		Matrix<T, WIDTH+1, HEIGHT> addBackCol(const Matrix<T, 1, HEIGHT> &c) const;
 		
-		Matrix<T, WIDTH, HEIGHT+1> addFrontRow(const Matrix<T, WIDTH, 1> &r ) const;
-		Matrix<T, WIDTH+1, HEIGHT> addFrontCol(const Matrix<T, 1, HEIGHT> &c) const;
+		Matrix<T, ROWS, COLUMNS+1>
+		addColumn(uint8_t index, const Matrix<T, ROWS, 1> &c) const;
 		
-		Matrix<T, WIDTH, HEIGHT+1> addRow(uint8_t index, const Matrix<T, WIDTH, 1> &r ) const;
-		Matrix<T, WIDTH+1, HEIGHT> addCol(uint8_t index, const Matrix<T, 1, HEIGHT> &c) const;
+		Matrix<T, ROWS+1, COLUMNS>
+		addRow(uint8_t index, const Matrix<T, 1, COLUMNS> &r) const;
 		
-		Matrix<T, WIDTH-1, HEIGHT> removeBackCol() const;
-		Matrix<T, WIDTH-1, HEIGHT> removeFrontCol() const;
-		Matrix<T, WIDTH-1, HEIGHT> removeCol(uint8_t index) const;
 		
-		Matrix<T, WIDTH, HEIGHT-1> removeBackRow() const;
-		Matrix<T, WIDTH, HEIGHT-1> removeFrontRow() const;
-		Matrix<T, WIDTH, HEIGHT-1> removeRow(uint8_t index) const;
+		Matrix<T, ROWS, COLUMNS-1>
+		removeColumn(uint8_t index) const;
+		
+		Matrix<T, ROWS-1, COLUMNS>
+		removeRow(uint8_t index) const;
 		
 	public:
-		T element[WIDTH*HEIGHT];
+		T element[ROWS * COLUMNS];
 		
 	private:
-		inline size_t getSize() const;
-		inline uint8_t getNumberOfElements() const;
+		/// Size of the Matrix in Bytes
+		inline size_t
+		getSize() const;
+		
+		/// Number of elements in the Matrix (rows * columns)
+		inline uint8_t
+		getNumberOfElements() const;
 	};
 	
 	template<typename T, uint8_t WIDTH, uint8_t HEIGHT>
@@ -167,6 +261,16 @@ namespace xpcc
 	typedef Matrix<float, 4, 4> Matrix4f;
 	
 	// ------------------------------------------------------------------------
+	/// \internal
+	template<typename T>
+	T
+	determinant(const xpcc::Matrix<T, 1, 1> &m);
+	
+	/// \internal
+	template<typename T>
+	T
+	determinant(const xpcc::Matrix<T, 2, 2> &m);
+	
 	/**
 	 * \brief	Calculate the determinant
 	 * 

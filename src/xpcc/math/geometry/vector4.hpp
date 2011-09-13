@@ -100,7 +100,7 @@ namespace xpcc
 		Vector(const Vector<T, 1> &inX, const Vector<T, 3> &inYZW);
 		Vector(const T &inX, const Vector<T, 3> &inYZW);
 		
-		Vector(const Matrix<T, 1, 4> &rhs);
+		Vector(const Matrix<T, 4, 1> &rhs);
 		Vector(const Vector &rhs);
 		
 		
@@ -134,7 +134,7 @@ namespace xpcc
 		getW() const;
 		
 		
-		Vector& operator = (const Matrix<T, 1, 4> &rhs);
+		Vector& operator = (const Matrix<T, 4, 1> &rhs);
 		Vector& operator = (const Vector &rhs);
 		
 		bool operator == (const Vector &rhs) const;

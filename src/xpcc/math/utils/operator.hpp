@@ -38,6 +38,8 @@
 
 #include <xpcc/architecture/utils.hpp>
 
+extern "C" uint16_t xpcc__sqrt(uint32_t a);
+
 namespace xpcc
 {
 	namespace math
@@ -55,8 +57,11 @@ namespace xpcc
 		 * 
 		 * \ingroup	math
 		 */
-		extern "C" uint16_t
-		sqrt32(uint32_t);
+		inline uint16_t
+		sqrt(uint32_t a)
+		{
+			return xpcc__sqrt(a);
+		}
 
 		/**
 		 * \brief	unsigned 16bit x 16bit = 32bit multiplication
@@ -65,7 +70,7 @@ namespace xpcc
 		 * \ingroup	math
 		 */
 		inline uint32_t
-		mul32(uint16_t a, uint16_t b);
+		mul(uint16_t a, uint16_t b);
 
 		/**
 		 * \brief	signed 16bit x 16bit = 32bit multiplication
@@ -74,7 +79,7 @@ namespace xpcc
 		 * \ingroup	math
 		 */
 		inline int32_t
-		mul32(int16_t a, int16_t b);
+		mul(int16_t a, int16_t b);
 
 		/**
 		 * \brief	Signed multiply accumulate of two 16bits numbers with
@@ -88,7 +93,7 @@ namespace xpcc
 		 * \ingroup	math
 		 */
 		inline int32_t
-		mac32(int32_t result, int16_t a, int16_t b);
+		mac(int32_t result, int16_t a, int16_t b);
 	}
 }
 

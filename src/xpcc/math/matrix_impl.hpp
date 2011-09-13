@@ -31,18 +31,18 @@
 // ----------------------------------------------------------------------------
 
 #ifndef XPCC__MATRIX_HPP
-	#error	"Don't include this file directly, use 'matrix.hpp' instead!"
+#	error	"Don't include this file directly, use 'matrix.hpp' instead!"
 #endif
 
 // ----------------------------------------------------------------------------
-template<typename T, uint8_t WIDTH, uint8_t HEIGHT>
-xpcc::Matrix<T, WIDTH, HEIGHT>::Matrix()
+template<typename T, uint8_t ROWS, uint8_t COLUMNS>
+xpcc::Matrix<T, ROWS, COLUMNS>::Matrix()
 {
 }
 
 // ----------------------------------------------------------------------------
-template<typename T, uint8_t WIDTH, uint8_t HEIGHT>
-xpcc::Matrix<T, WIDTH, HEIGHT>::Matrix(const T *data)
+template<typename T, uint8_t ROWS, uint8_t COLUMNS>
+xpcc::Matrix<T, ROWS, COLUMNS>::Matrix(const T *data)
 {
 	for (uint_fast8_t i = 0; i < getNumberOfElements(); ++i) {
 		element[i] = data[i];
@@ -50,8 +50,8 @@ xpcc::Matrix<T, WIDTH, HEIGHT>::Matrix(const T *data)
 }
 
 // ----------------------------------------------------------------------------
-template<typename T, uint8_t WIDTH, uint8_t HEIGHT> 
-xpcc::Matrix<T, WIDTH, HEIGHT>::Matrix(const xpcc::Matrix<T, WIDTH, HEIGHT> &m)
+template<typename T, uint8_t ROWS, uint8_t COLUMNS> 
+xpcc::Matrix<T, ROWS, COLUMNS>::Matrix(const Matrix &m)
 {
 	for (uint_fast8_t i = 0; i < getNumberOfElements(); ++i) {
 		element[i] = m.element[i];
@@ -59,9 +59,10 @@ xpcc::Matrix<T, WIDTH, HEIGHT>::Matrix(const xpcc::Matrix<T, WIDTH, HEIGHT> &m)
 }
 
 // ----------------------------------------------------------------------------
-template<typename T, uint8_t WIDTH, uint8_t HEIGHT> template<typename U>
-xpcc::Matrix<T, WIDTH, HEIGHT>& 
-xpcc::Matrix<T, WIDTH, HEIGHT>::operator = (const xpcc::Matrix<U, WIDTH, HEIGHT> &m)
+template<typename T, uint8_t ROWS, uint8_t COLUMNS>
+template<typename U>
+xpcc::Matrix<T, ROWS, COLUMNS>& 
+xpcc::Matrix<T, ROWS, COLUMNS>::operator = (const xpcc::Matrix<U, ROWS, COLUMNS> &m)
 {
 	for (uint_fast8_t i = 0; i < getNumberOfElements(); ++i) {
 		element[i] = m.element[i];
@@ -71,156 +72,148 @@ xpcc::Matrix<T, WIDTH, HEIGHT>::operator = (const xpcc::Matrix<U, WIDTH, HEIGHT>
 }
 
 // ----------------------------------------------------------------------------
-template<typename T, uint8_t WIDTH, uint8_t HEIGHT>
-const xpcc::Matrix<T, WIDTH, HEIGHT>&
-xpcc::Matrix<T, WIDTH, HEIGHT>::identityMatrix()
+template<typename T, uint8_t ROWS, uint8_t COLUMNS>
+const xpcc::Matrix<T, ROWS, COLUMNS>&
+xpcc::Matrix<T, ROWS, COLUMNS>::identityMatrix()
 {
-	static xpcc::Matrix<T, WIDTH, HEIGHT> sIdentityMatrix = zeroMatrix();
+	static xpcc::Matrix<T, ROWS, COLUMNS> matrix = zeroMatrix();
 	static bool hasIdentityMatrix = false;
+	
 	if (!hasIdentityMatrix)
 	{
-		if (WIDTH < HEIGHT)
+		if (ROWS < COLUMNS)
 		{
-			for (uint_fast8_t i = 0; i < WIDTH; ++i) {
-				sIdentityMatrix[i][i] = 1;
+			for (uint_fast8_t i = 0; i < ROWS; ++i) {
+				matrix[i][i] = 1;
 			}
 		}
 		else
 		{
-			for (uint_fast8_t i = 0; i < HEIGHT; ++i) {
-				sIdentityMatrix[i][i] = 1;
+			for (uint_fast8_t i = 0; i < COLUMNS; ++i) {
+				matrix[i][i] = 1;
 			}
 		}
 		
 		hasIdentityMatrix = true;
 	}
 	
-	return sIdentityMatrix;
+	return matrix;
 }
 
 // ----------------------------------------------------------------------------
-template<typename T, uint8_t WIDTH, uint8_t HEIGHT>
-const xpcc::Matrix<T, WIDTH, HEIGHT>&
-xpcc::Matrix<T, WIDTH, HEIGHT>::zeroMatrix()
+template<typename T, uint8_t ROWS, uint8_t COLUMNS>
+const xpcc::Matrix<T, ROWS, COLUMNS>&
+xpcc::Matrix<T, ROWS, COLUMNS>::zeroMatrix()
 {
-	static xpcc::Matrix<T, WIDTH, HEIGHT> sZeroMatrix;
+	static xpcc::Matrix<T, ROWS, COLUMNS> matrix;
 	static bool hasZeroMatrix = false;
+	
 	if (!hasZeroMatrix)
 	{
-		memset(sZeroMatrix.ptr(), 0, sZeroMatrix.size());
+		memset(matrix.ptr(), 0, matrix.getSize());
 		hasZeroMatrix = true;
 	}
 	
-	return sZeroMatrix;
+	return matrix;
 }
 
 // ----------------------------------------------------------------------------
-template<typename T, uint8_t WIDTH, uint8_t HEIGHT>
+template<typename T, uint8_t ROWS, uint8_t COLUMNS>
 bool
-xpcc::Matrix<T, WIDTH, HEIGHT>::operator == (const xpcc::Matrix<T, WIDTH, HEIGHT> &m) const
+xpcc::Matrix<T, ROWS, COLUMNS>::operator == (const xpcc::Matrix<T, ROWS, COLUMNS> &m) const
 {
 	return memcmp(element, m.element, getSize()) == 0;
 }
 
 // ----------------------------------------------------------------------------
-template<typename T, uint8_t WIDTH, uint8_t HEIGHT>
+template<typename T, uint8_t ROWS, uint8_t COLUMNS>
 bool
-xpcc::Matrix<T, WIDTH, HEIGHT>::operator != (const xpcc::Matrix<T, WIDTH, HEIGHT> &m) const
+xpcc::Matrix<T, ROWS, COLUMNS>::operator != (const xpcc::Matrix<T, ROWS, COLUMNS> &m) const
 {
 	return memcmp(element, m.element, getSize()) != 0;
 }
 
 // ----------------------------------------------------------------------------
-template<typename T, uint8_t WIDTH, uint8_t HEIGHT>
-const T*
-xpcc::Matrix<T, WIDTH, HEIGHT>::operator [] (uint8_t row) const
+template<typename T, uint8_t ROWS, uint8_t COLUMNS>
+xpcc::Matrix<T, 1, COLUMNS>
+xpcc::Matrix<T, ROWS, COLUMNS>::getRow(uint8_t index) const
 {
-	return &element[row * WIDTH];
+	return subMatrix<1, COLUMNS>(index, 0);
 }
 
-template<typename T, uint8_t WIDTH, uint8_t HEIGHT>
+// ----------------------------------------------------------------------------
+template<typename T, uint8_t ROWS, uint8_t COLUMNS>
+xpcc::Matrix<T, ROWS, 1>
+xpcc::Matrix<T, ROWS, COLUMNS>::getColumn(uint8_t index) const
+{
+	return subMatrix<ROWS, 1>(0, index);
+}
+
+// ----------------------------------------------------------------------------
+template<typename T, uint8_t ROWS, uint8_t COLUMNS>
 T*
-xpcc::Matrix<T, WIDTH, HEIGHT>::operator [] (uint8_t row)
+xpcc::Matrix<T, ROWS, COLUMNS>::operator [] (uint8_t row)
 {
-	return &element[row * WIDTH];
+	return &element[row * COLUMNS];
 }
 
-// ----------------------------------------------------------------------------
-template<typename T, uint8_t WIDTH, uint8_t HEIGHT>
-uint8_t
-xpcc::Matrix<T, WIDTH, HEIGHT>::width() const	
-{
-	return WIDTH;
-}
-
-// ----------------------------------------------------------------------------
-template<typename T, uint8_t WIDTH, uint8_t HEIGHT>
-uint8_t
-xpcc::Matrix<T, WIDTH, HEIGHT>::height() const	
-{
-	return HEIGHT;
-}
-
-// ----------------------------------------------------------------------------
-template<typename T, uint8_t WIDTH, uint8_t HEIGHT>
+template<typename T, uint8_t ROWS, uint8_t COLUMNS>
 const T*
-xpcc::Matrix<T, WIDTH, HEIGHT>::ptr() const
+xpcc::Matrix<T, ROWS, COLUMNS>::operator [] (uint8_t row) const
+{
+	return &element[row * COLUMNS];
+}
+
+// ----------------------------------------------------------------------------
+template<typename T, uint8_t ROWS, uint8_t COLUMNS>
+uint8_t
+xpcc::Matrix<T, ROWS, COLUMNS>::getNumberOfRows() const	
+{
+	return ROWS;
+}
+
+// ----------------------------------------------------------------------------
+template<typename T, uint8_t ROWS, uint8_t COLUMNS>
+uint8_t
+xpcc::Matrix<T, ROWS, COLUMNS>::getNumberOfColumns() const	
+{
+	return COLUMNS;
+}
+
+// ----------------------------------------------------------------------------
+template<typename T, uint8_t ROWS, uint8_t COLUMNS>
+const T*
+xpcc::Matrix<T, ROWS, COLUMNS>::ptr() const
+{
+	return element;
+}
+
+template<typename T, uint8_t ROWS, uint8_t COLUMNS>
+T*
+xpcc::Matrix<T, ROWS, COLUMNS>::ptr()
 {
 	return element;
 }
 
 // ----------------------------------------------------------------------------
-template<typename T, uint8_t WIDTH, uint8_t HEIGHT>
-T*
-xpcc::Matrix<T, WIDTH, HEIGHT>::ptr()
+template<typename T, uint8_t ROWS, uint8_t COLUMNS>
+xpcc::Matrix<T, ROWS, COLUMNS>
+xpcc::Matrix<T, ROWS, COLUMNS>::operator - ()
 {
-	return element;
-}
-
-// ----------------------------------------------------------------------------
-template<typename T, uint8_t WIDTH, uint8_t HEIGHT> template<typename U>
-xpcc::Matrix<T, WIDTH, HEIGHT>&
-xpcc::Matrix<T, WIDTH, HEIGHT>::copy(const U *data)
-{
+	xpcc::Matrix<T, ROWS, COLUMNS> m;
 	for (uint_fast8_t i = 0; i < getNumberOfElements(); ++i) {
-		element[i] = data[i];
-	}
-	
-	return *this;
-}
-
-// ----------------------------------------------------------------------------
-template<typename T, uint8_t WIDTH, uint8_t HEIGHT>
-xpcc::Matrix<T, WIDTH, HEIGHT>
-xpcc::Matrix<T, WIDTH, HEIGHT>::operator + (const xpcc::Matrix<T, WIDTH, HEIGHT> &rhs) const
-{
-	xpcc::Matrix<T, WIDTH, HEIGHT> m;
-	
-	for (uint_fast8_t i = 0; i < getNumberOfElements(); ++i) {
-		m.element[i] = element[i] + rhs.element[i];
+		m.element[i] = -this->element[i];
 	}
 	
 	return m;
 }
 
 // ----------------------------------------------------------------------------
-template<typename T, uint8_t WIDTH, uint8_t HEIGHT>
-xpcc::Matrix<T, WIDTH, HEIGHT>&
-xpcc::Matrix<T, WIDTH, HEIGHT>::operator += (const xpcc::Matrix<T, WIDTH, HEIGHT> &rhs)
+template<typename T, uint8_t ROWS, uint8_t COLUMNS>
+xpcc::Matrix<T, ROWS, COLUMNS>
+xpcc::Matrix<T, ROWS, COLUMNS>::operator - (const xpcc::Matrix<T, ROWS, COLUMNS> &rhs) const
 {
-	for (uint_fast8_t i = 0; i < getNumberOfElements(); ++i) {
-		element[i] += rhs.element[i];
-	}
-	
-	return *this;
-}
-
-// ----------------------------------------------------------------------------
-template<typename T, uint8_t WIDTH, uint8_t HEIGHT>
-xpcc::Matrix<T, WIDTH, HEIGHT>
-xpcc::Matrix<T, WIDTH, HEIGHT>::operator - (const xpcc::Matrix<T, WIDTH, HEIGHT> &rhs) const
-{
-	xpcc::Matrix<T, WIDTH, HEIGHT> m;
+	xpcc::Matrix<T, ROWS, COLUMNS> m;
 	
 	for (uint_fast8_t i = 0; i < getNumberOfElements(); ++i) {
 		m.element[i] = element[i] - rhs.element[i];
@@ -230,9 +223,35 @@ xpcc::Matrix<T, WIDTH, HEIGHT>::operator - (const xpcc::Matrix<T, WIDTH, HEIGHT>
 }
 
 // ----------------------------------------------------------------------------
-template<typename T, uint8_t WIDTH, uint8_t HEIGHT>
-xpcc::Matrix<T, WIDTH, HEIGHT>&
-xpcc::Matrix<T, WIDTH, HEIGHT>::operator -= (const xpcc::Matrix<T, WIDTH, HEIGHT> &rhs)
+template<typename T, uint8_t ROWS, uint8_t COLUMNS>
+xpcc::Matrix<T, ROWS, COLUMNS>
+xpcc::Matrix<T, ROWS, COLUMNS>::operator + (const xpcc::Matrix<T, ROWS, COLUMNS> &rhs) const
+{
+	xpcc::Matrix<T, ROWS, COLUMNS> m;
+	
+	for (uint_fast8_t i = 0; i < getNumberOfElements(); ++i) {
+		m.element[i] = element[i] + rhs.element[i];
+	}
+	
+	return m;
+}
+
+// ----------------------------------------------------------------------------
+template<typename T, uint8_t ROWS, uint8_t COLUMNS>
+xpcc::Matrix<T, ROWS, COLUMNS>&
+xpcc::Matrix<T, ROWS, COLUMNS>::operator += (const xpcc::Matrix<T, ROWS, COLUMNS> &rhs)
+{
+	for (uint_fast8_t i = 0; i < getNumberOfElements(); ++i) {
+		element[i] += rhs.element[i];
+	}
+	
+	return *this;
+}
+
+// ----------------------------------------------------------------------------
+template<typename T, uint8_t ROWS, uint8_t COLUMNS>
+xpcc::Matrix<T, ROWS, COLUMNS>&
+xpcc::Matrix<T, ROWS, COLUMNS>::operator -= (const xpcc::Matrix<T, ROWS, COLUMNS> &rhs)
 {
 	for (uint_fast8_t i = 0; i < getNumberOfElements(); ++i) {
 		element[i] -= rhs.element[i];
@@ -242,54 +261,42 @@ xpcc::Matrix<T, WIDTH, HEIGHT>::operator -= (const xpcc::Matrix<T, WIDTH, HEIGHT
 }
 
 // ----------------------------------------------------------------------------
-//
-template<typename T, uint8_t WIDTH, uint8_t HEIGHT>
-xpcc::Matrix<T, WIDTH, HEIGHT>&
-xpcc::Matrix<T, WIDTH, HEIGHT>::operator - ()
+template<typename T, uint8_t ROWS, uint8_t COLUMNS>
+template<uint8_t RHSCOL>
+xpcc::Matrix<T, ROWS, ROWS>
+xpcc::Matrix<T, ROWS, COLUMNS>::operator * (const Matrix<T, COLUMNS, RHSCOL> &rhs) const
 {
-	for (uint_fast8_t i = 0; i < getNumberOfElements(); ++i) {
-		element[i] = -element[i];
-	}
+	xpcc::Matrix<T, ROWS, ROWS> m;
 	
-	return *this;
-}
-
-// ----------------------------------------------------------------------------
-template<typename T, uint8_t WIDTH, uint8_t HEIGHT> template<uint8_t RHSWIDTH>
-xpcc::Matrix<T, RHSWIDTH, HEIGHT>
-xpcc::Matrix<T, WIDTH, HEIGHT>::operator * (const xpcc::Matrix<T, RHSWIDTH, WIDTH> &rhs) const
-{
-	xpcc::Matrix<T, RHSWIDTH, HEIGHT> m;
-	
-    for (uint_fast8_t j = 0; j < HEIGHT; ++j)
-    {
-    	for (uint_fast8_t i = 0; i < RHSWIDTH; ++i)
-        {
-			m[j][i] = element[j * WIDTH] * rhs[0][i];
-        	for (uint_fast8_t x = 1; x < WIDTH; ++x)
-        	{
-				m[j][i] += element[j * WIDTH + x] * rhs[x][i];
+	for (uint_fast8_t i = 0; i < ROWS; ++i)
+	{
+		for (uint_fast8_t j = 0; j < RHSCOL; ++j)
+		{
+			m[j][i] = element[j * COLUMNS] * rhs[0][i];
+			for (uint_fast8_t x = 1; x < COLUMNS; ++x)
+			{
+				m[j][i] += element[j * COLUMNS + x] * rhs[x][i];
 			}
 		}
 	}
-    return m;
+	return m;
 }
 
 // ----------------------------------------------------------------------------
-template<typename T, uint8_t WIDTH, uint8_t HEIGHT>
-xpcc::Matrix<T, WIDTH, HEIGHT>
-xpcc::Matrix<T, WIDTH, HEIGHT>::operator *= (const xpcc::Matrix<T, WIDTH, HEIGHT> &rhs)
+template<typename T, uint8_t ROWS, uint8_t COLUMNS>
+xpcc::Matrix<T, ROWS, COLUMNS>
+xpcc::Matrix<T, ROWS, COLUMNS>::operator *= (const xpcc::Matrix<T, ROWS, COLUMNS> &rhs)
 {
 	(*this) = (*this) * rhs;
 	return *this;
 }
 
 // ----------------------------------------------------------------------------
-template<typename T, uint8_t WIDTH, uint8_t HEIGHT>
-xpcc::Matrix<T, WIDTH, HEIGHT>
-xpcc::Matrix<T, WIDTH, HEIGHT>::operator * (const T &rhs) const
+template<typename T, uint8_t ROWS, uint8_t COLUMNS>
+xpcc::Matrix<T, ROWS, COLUMNS>
+xpcc::Matrix<T, ROWS, COLUMNS>::operator * (const T &rhs) const
 {
-	xpcc::Matrix<T, WIDTH, HEIGHT> m;
+	xpcc::Matrix<T, ROWS, COLUMNS> m;
 	for (uint_fast8_t i = 0; i < getNumberOfElements(); ++i) {
 		m.element[i] = element[i] * rhs;
 	}
@@ -298,9 +305,9 @@ xpcc::Matrix<T, WIDTH, HEIGHT>::operator * (const T &rhs) const
 }
 
 // ----------------------------------------------------------------------------
-template<typename T, uint8_t WIDTH, uint8_t HEIGHT>
-xpcc::Matrix<T, WIDTH, HEIGHT>&
-xpcc::Matrix<T, WIDTH, HEIGHT>::operator *= (const T &rhs)
+template<typename T, uint8_t ROWS, uint8_t COLUMNS>
+xpcc::Matrix<T, ROWS, COLUMNS>&
+xpcc::Matrix<T, ROWS, COLUMNS>::operator *= (const T &rhs)
 {
 	for (uint_fast8_t i = 0; i < getNumberOfElements(); ++i) {
 		element[i] *= rhs;
@@ -310,11 +317,11 @@ xpcc::Matrix<T, WIDTH, HEIGHT>::operator *= (const T &rhs)
 }
 
 // ----------------------------------------------------------------------------
-template<typename T, uint8_t WIDTH, uint8_t HEIGHT>
-xpcc::Matrix<T, WIDTH, HEIGHT>
-xpcc::Matrix<T, WIDTH, HEIGHT>::operator / (const T &rhs) const
+template<typename T, uint8_t ROWS, uint8_t COLUMNS>
+xpcc::Matrix<T, ROWS, COLUMNS>
+xpcc::Matrix<T, ROWS, COLUMNS>::operator / (const T &rhs) const
 {
-	xpcc::Matrix<T, WIDTH, HEIGHT> m;
+	xpcc::Matrix<T, ROWS, COLUMNS> m;
 	
 	float oneOverRhs = 1.0f / rhs;
 	
@@ -326,9 +333,9 @@ xpcc::Matrix<T, WIDTH, HEIGHT>::operator / (const T &rhs) const
 }
 
 // ----------------------------------------------------------------------------
-template<typename T, uint8_t WIDTH, uint8_t HEIGHT>
-xpcc::Matrix<T, WIDTH, HEIGHT>&
-xpcc::Matrix<T, WIDTH, HEIGHT>::operator /= (const T &rhs)
+template<typename T, uint8_t ROWS, uint8_t COLUMNS>
+xpcc::Matrix<T, ROWS, COLUMNS>&
+xpcc::Matrix<T, ROWS, COLUMNS>::operator /= (const T &rhs)
 {
 	float oneOverRhs = 1.0f / rhs;
 	
@@ -340,23 +347,15 @@ xpcc::Matrix<T, WIDTH, HEIGHT>::operator /= (const T &rhs)
 }
 
 // ----------------------------------------------------------------------------
-template<typename T, uint8_t WIDTH, uint8_t HEIGHT>
-void
-xpcc::Matrix<T, WIDTH, HEIGHT>::transpose()
+template<typename T, uint8_t ROWS, uint8_t COLUMNS>
+xpcc::Matrix<T, COLUMNS, ROWS>
+xpcc::Matrix<T, ROWS, COLUMNS>::asTransposed() const
 {
-	*this = asTransposed();
-}
-
-// ----------------------------------------------------------------------------
-template<typename T, uint8_t WIDTH, uint8_t HEIGHT>
-xpcc::Matrix<T, HEIGHT, WIDTH>
-xpcc::Matrix<T, WIDTH, HEIGHT>::asTransposed() const
-{
-	xpcc::Matrix<T, HEIGHT, WIDTH> m;
+	xpcc::Matrix<T, COLUMNS, ROWS> m;
 	
-	for (uint_fast8_t j = 0; j < HEIGHT; ++j) {
-		for (uint_fast8_t i = 0; i < WIDTH; ++i) {
-			m.element[i * HEIGHT + j] = element[j * WIDTH + i];
+	for (uint_fast8_t i = 0; i < ROWS; ++i) {
+		for (uint_fast8_t j = 0; j < COLUMNS; ++j) {
+			m.element[j * ROWS + i] = element[i * COLUMNS + j];
 		}
 	}
 	
@@ -364,34 +363,29 @@ xpcc::Matrix<T, WIDTH, HEIGHT>::asTransposed() const
 }
 
 // ----------------------------------------------------------------------------
-/*
-template<typename T, uint8_t WIDTH, uint8_t HEIGHT>
-xpcc::Matrix<T, WIDTH, HEIGHT>
-xpcc::Matrix<T, WIDTH, HEIGHT>::deSerialize(const std::string &str)
+template<typename T, uint8_t ROWS, uint8_t COLUMNS>
+void
+xpcc::Matrix<T, ROWS, COLUMNS>::transpose()
 {
-	char buf[2048];
-	strcpy(buf, str.c_str());
-	xpcc::Matrix<T, WIDTH, HEIGHT> m = xpcc::Matrix<T, WIDTH, HEIGHT>::zeroMatrix();
+	XPCC__STATIC_ASSERT(ROWS == COLUMNS);
 	
-	char *value;
-	value = strtok(buf, " \t\r\n{,}");
-	
-	uint8_t i = 0;
-	while (value && i < WIDTH*HEIGHT)
-	{
-		double v;
-		sscanf(value, "%lf", &v);
-		m.element[i++] = v;
-		value = strtok(NULL, " \t\r\n{,}");
-	}
-	
-	return m;
-}*/
+	*this = asTransposed();
+}
 
 // ----------------------------------------------------------------------------
-template<typename T, uint8_t WIDTH, uint8_t HEIGHT>
+template<typename T, uint8_t ROWS, uint8_t COLUMNS>
+inline T
+xpcc::Matrix<T, ROWS, COLUMNS>::determinant() const
+{
+	XPCC__STATIC_ASSERT(ROWS == COLUMNS);
+	
+	return xpcc::determinant(*this);
+}
+
+// ----------------------------------------------------------------------------
+template<typename T, uint8_t ROWS, uint8_t COLUMNS>
 bool
-xpcc::Matrix<T, WIDTH, HEIGHT>::hasNan() const
+xpcc::Matrix<T, ROWS, COLUMNS>::hasNan() const
 {
 	for (uint_fast8_t i = 0; i < getNumberOfElements(); ++i) {
 		if (isnan(element[i])) {
@@ -403,9 +397,9 @@ xpcc::Matrix<T, WIDTH, HEIGHT>::hasNan() const
 }
 
 // ----------------------------------------------------------------------------
-template<typename T, uint8_t WIDTH, uint8_t HEIGHT>
+template<typename T, uint8_t ROWS, uint8_t COLUMNS>
 bool
-xpcc::Matrix<T, WIDTH, HEIGHT>::hasInf() const
+xpcc::Matrix<T, ROWS, COLUMNS>::hasInf() const
 {
 	for (uint_fast8_t i = 0; i < getNumberOfElements(); ++i) {
 		if (isinf(element[i])) {
@@ -433,13 +427,257 @@ operator * (float lhs, const xpcc::Matrix<T, WIDTH, HEIGHT> &m)
 }
 
 // ----------------------------------------------------------------------------
+/*template<typename T, uint8_t ROWS, uint8_t COLUMNS>
+void
+xpcc::Matrix<T, ROWS, COLUMNS>::inverse()
+{
+	*this = inversed();
+}
+
+// ----------------------------------------------------------------------------
+template<typename T, uint8_t ROWS, uint8_t COLUMNS>
+xpcc::Matrix<T, ROWS, COLUMNS>
+xpcc::Matrix<T, ROWS, COLUMNS>::inversed() const
+{
+	xpcc::Matrix<T, ROWS, COLUMNS> inverse;
+	xpcc::MatrixUtils::luInverse(*this, &inverse, true);
+	return inverse;
+}*/
+
+// ----------------------------------------------------------------------------
+template<typename T, uint8_t ROWS, uint8_t COLUMNS>
+size_t
+xpcc::Matrix<T, ROWS, COLUMNS>::getSize() const
+{
+	return getNumberOfElements() * sizeof(T);
+}
+
+// ----------------------------------------------------------------------------
+template<typename T, uint8_t ROWS, uint8_t COLUMNS>
+uint8_t
+xpcc::Matrix<T, ROWS, COLUMNS>::getNumberOfElements() const
+{
+	return ROWS * COLUMNS;
+}
+
+// ----------------------------------------------------------------------------
+template<typename T, uint8_t ROWS, uint8_t COLUMNS>
+template <uint8_t MR, uint8_t MC>
+xpcc::Matrix<T, MR, MC>
+xpcc::Matrix<T, ROWS, COLUMNS>::subMatrix(uint8_t row, uint8_t column) const
+{
+	XPCC__STATIC_ASSERT(MR <= ROWS);
+	XPCC__STATIC_ASSERT(MC <= COLUMNS);
+	
+	Matrix<T, MR, MC> sub;
+	for (uint_fast8_t i = 0; i < MR; ++i) {
+		for (uint_fast8_t j = 0; j < MC; ++j) {
+			sub[i][j] = (*this)[i + row][j + column];
+		}
+	}
+	
+	return sub;
+}
+
+// ----------------------------------------------------------------------------
+template<typename T, uint8_t ROWS, uint8_t COLUMNS> template<typename U>
+xpcc::Matrix<T, ROWS, COLUMNS>&
+xpcc::Matrix<T, ROWS, COLUMNS>::replace(const U *data)
+{
+	for (uint_fast8_t i = 0; i < getNumberOfElements(); ++i) {
+		element[i] = data[i];
+	}
+	
+	return *this;
+}
+
+// ----------------------------------------------------------------------------
+template<typename T, uint8_t ROWS, uint8_t COLUMNS>
+template <uint8_t MR, uint8_t MC>
+xpcc::Matrix<T, ROWS, COLUMNS>&
+xpcc::Matrix<T, ROWS, COLUMNS>::replace(uint8_t row, uint8_t column, const xpcc::Matrix<T, MR, MC> &m)
+{
+	XPCC__STATIC_ASSERT(MR <= ROWS);
+	XPCC__STATIC_ASSERT(MC <= COLUMNS);
+	
+	for (uint_fast8_t i = 0; i < MR && (i + row) < ROWS; ++i)
+	{
+		for (uint_fast8_t j = 0; j < MC && (j + column) < COLUMNS; ++j)
+		{
+			element[(i + row) * COLUMNS + (j + column)] = m[i][j];
+		}
+	}
+	
+	return *this;
+}
+
+// ----------------------------------------------------------------------------
+template<typename T, uint8_t ROWS, uint8_t COLUMNS>
+xpcc::Matrix<T, ROWS, COLUMNS>&
+xpcc::Matrix<T, ROWS, COLUMNS>::replaceRow(uint8_t index, const xpcc::Matrix<T, 1, COLUMNS> &m)
+{
+	return replace(index, 0, m);
+}
+
+// ----------------------------------------------------------------------------
+template<typename T, uint8_t ROWS, uint8_t COLUMNS>
+xpcc::Matrix<T, ROWS, COLUMNS>&
+xpcc::Matrix<T, ROWS, COLUMNS>::replaceColumn(uint8_t index, const xpcc::Matrix<T, ROWS, 1> &m)
+{
+	return replace(0, index, m);
+}
+
+// ----------------------------------------------------------------------------
+template<typename T, uint8_t ROWS, uint8_t COLUMNS>
+xpcc::Matrix<T, ROWS+1, COLUMNS>
+xpcc::Matrix<T, ROWS, COLUMNS>::addRow(uint8_t index, const xpcc::Matrix<T, 1, COLUMNS> &r) const
+{
+	xpcc::Matrix<T, ROWS+1, COLUMNS> m;
+	uint_fast8_t i = 0, ri = 0;
+	
+	for (; i < index; ++i) {
+		m.replaceRow(ri++, getRow(i));
+	}
+	m.replaceRow(ri++, r);
+	for (; i < ROWS+1; ++i) {
+		m.replaceRow(ri++, getRow(i));
+	}
+	
+	return m;
+}
+
+// ----------------------------------------------------------------------------
+template<typename T, uint8_t ROWS, uint8_t COLUMNS>
+xpcc::Matrix<T, ROWS, COLUMNS+1>
+xpcc::Matrix<T, ROWS, COLUMNS>::addColumn(uint8_t index, const xpcc::Matrix<T, ROWS, 1> &c) const
+{
+	xpcc::Matrix<T, ROWS, COLUMNS+1> m;
+	uint_fast8_t i = 0, ci = 0;
+	
+	for (; i < index; ++i) {
+		m.replaceColumn(ci++, getColumn(i));
+	}
+	m.replaceColumn(ci++, c);
+	for (; i < COLUMNS+1; ++i) {
+		m.replaceColumn(ci++, getColumn(i));
+	}
+	
+	return m;
+}
+
+// ----------------------------------------------------------------------------
+template<typename T, uint8_t ROWS, uint8_t COLUMNS>
+xpcc::Matrix<T, ROWS-1, COLUMNS>
+xpcc::Matrix<T, ROWS, COLUMNS>::removeRow(uint8_t index ) const
+{
+	if (index == 0)
+	{
+		return subMatrix<ROWS-1, COLUMNS>(1, 0);
+	}
+	else if (index == (ROWS - 1))
+	{
+		return subMatrix<ROWS-1, COLUMNS>(0, 0);
+	}
+	else
+	{
+		Matrix<T, ROWS-1, COLUMNS> m;
+		uint_fast8_t i = 0, ri = 0;
+		
+		for (; i < index; ++i) {
+			m.replaceRow(ri++, getRow(i));
+		}
+		++i; // skip one row
+		for (; i < ROWS; ++i) {
+			m.replaceRow(ri++, getRow(i));
+		}
+		
+		return m;
+	}
+}
+
+// ----------------------------------------------------------------------------
+template<typename T, uint8_t ROWS, uint8_t COLUMNS>
+xpcc::Matrix<T, ROWS, COLUMNS-1>
+xpcc::Matrix<T, ROWS, COLUMNS>::removeColumn(uint8_t index) const
+{
+	if (index == 0)
+	{
+		return subMatrix<ROWS, COLUMNS-1>(0, 1);
+	}
+	else if (index == (COLUMNS - 1))
+	{
+		return subMatrix<ROWS, COLUMNS-1>(0, 0);
+	}
+	else
+	{
+		Matrix<T, ROWS, COLUMNS-1> m;
+		uint_fast8_t i = 0, ci = 0;
+		
+		for (; i < index; ++i) {
+			m.replaceColumn(ci++, getColumn(i));
+		}
+		++i; // skip one column
+		for (; i < COLUMNS; ++i) {
+			m.replaceColumn(ci++, getColumn(i));
+		}
+		
+		return m;
+	}
+}
+
+// ----------------------------------------------------------------------------
+template<typename T, uint8_t ROWS, uint8_t COLUMNS>
+xpcc::IOStream&
+xpcc::operator << (xpcc::IOStream& os, const xpcc::Matrix<T, ROWS, COLUMNS> &m)
+{
+	os << "{ ";
+	
+	for (uint_fast8_t i = 0; i < ROWS; ++i)
+	{
+		os << "{ ";
+		for (uint_fast8_t j = 0; j < COLUMNS; ++j)
+		{
+			os << m.element[i * COLUMNS + j];
+			if (j < COLUMNS-1)
+			{
+				os << ", ";
+			}
+		}
+		os << " }";
+		
+		if (i < ROWS-1)
+		{
+			os << ", \n";
+		}
+	}
+	os << " }";
+	return os;
+}
+
+// ----------------------------------------------------------------------------
+template<typename T>
+T
+xpcc::determinant(const xpcc::Matrix<T, 1, 1> &m)
+{
+	return m[0][0];
+}
+
+// ----------------------------------------------------------------------------
+template<typename T>
+T
+xpcc::determinant(const xpcc::Matrix<T, 2, 2> &m)
+{
+	return (m[0][0] * m[1][1] - m[0][1] * m[1][0]);
+}
+
+// ----------------------------------------------------------------------------
 template<typename T, uint8_t N>
 T
 xpcc::determinant(const xpcc::Matrix<T, N, N> &m)
 {
 	// not the most efficient way, but should work for now...
-	T determinant = 0;
-	uint8_t factor = 1;
+	T value = 0;
+	int8_t factor = 1;
 	for (uint_fast8_t i = 0; i < N; ++i)
 	{
 		T coeff = m[0][i];
@@ -457,272 +695,10 @@ xpcc::determinant(const xpcc::Matrix<T, N, N> &m)
 			}
 		}
 		
-		determinant += coeff * factor * Determinant(subM);
+		value += coeff * factor * determinant(subM);
 		factor *= -1;
 	}
 	
-	return determinant;
+	return value;
 }
 
-template<typename T>
-T
-xpcc::determinant(const xpcc::Matrix<T, 1, 1> &m)
-{
-	return m[0][0];
-}
-
-#ifdef USE_MATRIXUTILS
-// ----------------------------------------------------------------------------
-template<typename T, uint8_t WIDTH, uint8_t HEIGHT>
-void
-xpcc::Matrix<T, WIDTH, HEIGHT>::inverse()
-{
-	*this = inversed();
-}
-
-// ----------------------------------------------------------------------------
-template<typename T, uint8_t WIDTH, uint8_t HEIGHT>
-xpcc::Matrix<T, WIDTH, HEIGHT>
-xpcc::Matrix<T, WIDTH, HEIGHT>::inversed() const
-{
-	xpcc::Matrix<T, WIDTH, HEIGHT> inverse;
-	xpcc::MatrixUtils::luInverse(*this, &inverse, true);
-	return inverse;
-}
-#endif // USE_MATRIXUTILS
-
-// ----------------------------------------------------------------------------
-template<typename T, uint8_t WIDTH, uint8_t HEIGHT>
-size_t
-xpcc::Matrix<T, WIDTH, HEIGHT>::getSize() const
-{
-	return getNumberOfElements() * sizeof(T);
-}
-
-// ----------------------------------------------------------------------------
-template<typename T, uint8_t WIDTH, uint8_t HEIGHT>
-uint8_t
-xpcc::Matrix<T, WIDTH, HEIGHT>::getNumberOfElements() const
-{
-	return WIDTH * HEIGHT;
-}
-
-// ----------------------------------------------------------------------------
-template<typename T, uint8_t WIDTH, uint8_t HEIGHT>
-template <uint8_t MW, uint8_t MH>
-xpcc::Matrix<T, WIDTH, HEIGHT>
-xpcc::Matrix<T, WIDTH, HEIGHT>::subMatrix(uint8_t r, uint8_t c, const xpcc::Matrix<T, MW, MH> &m)
-{
-//	XPCC__STATIC_ASSERT(WIDTH + c <= MW);
-//	XPCC__STATIC_ASSERT(HEIGHT + r <= MH);
-	
-	xpcc::Matrix<T, WIDTH, HEIGHT> sub;
-	for (uint_fast8_t j = 0; j < HEIGHT; ++j) {
-		for (uint_fast8_t i = 0; i < WIDTH; ++i) {
-			sub[j][i] = m[r+j][c+i];
-		}
-	}
-	
-	return sub;
-}
-
-// ----------------------------------------------------------------------------
-template<typename T, uint8_t WIDTH, uint8_t HEIGHT>
-template <uint8_t MW, uint8_t MH>
-xpcc::Matrix<T, WIDTH, HEIGHT>&
-xpcc::Matrix<T, WIDTH, HEIGHT>::copy(uint8_t r, uint8_t c, const xpcc::Matrix<T, MW, MH> &m)
-{
-	for (uint_fast8_t j = 0; j < MH && (j+r) < HEIGHT; ++j) {
-		for (uint_fast8_t i = 0; i < MW && (i+c) < WIDTH; ++i) {
-			element[(j+r)*WIDTH+(i+c)] = m[j][i];
-		}
-	}
-	
-	return *this;
-}
-
-
-// ----------------------------------------------------------------------------
-template<typename T, uint8_t WIDTH, uint8_t HEIGHT>
-xpcc::Matrix<T, WIDTH, HEIGHT>&
-xpcc::Matrix<T, WIDTH, HEIGHT>::copyRow(uint8_t index, const xpcc::Matrix<T, WIDTH, 1> &m)
-{
-	return copy(index, 0, m);
-}
-
-// ----------------------------------------------------------------------------
-template<typename T, uint8_t WIDTH, uint8_t HEIGHT>
-xpcc::Matrix<T, WIDTH, HEIGHT>&
-xpcc::Matrix<T, WIDTH, HEIGHT>::copyCol(uint8_t index, const xpcc::Matrix<T, 1, HEIGHT> &m)
-{
-	return copy(0, index, m);
-}
-
-// ----------------------------------------------------------------------------
-template<typename T, uint8_t WIDTH, uint8_t HEIGHT>
-xpcc::Matrix<T, WIDTH, 1>
-xpcc::Matrix<T, WIDTH, HEIGHT>::row(uint8_t index) const
-{
-	return xpcc::Matrix<T, WIDTH, 1>::subMatrix(index, 0, *this);
-}
-
-// ----------------------------------------------------------------------------
-template<typename T, uint8_t WIDTH, uint8_t HEIGHT>
-xpcc::Matrix<T, 1, HEIGHT>
-xpcc::Matrix<T, WIDTH, HEIGHT>::col(uint8_t index) const
-{
-	return xpcc::Matrix<T, 1, HEIGHT>::subMatrix(0, index, *this);
-}
-
-// ----------------------------------------------------------------------------
-template<typename T, uint8_t WIDTH, uint8_t HEIGHT>
-xpcc::Matrix<T, WIDTH, HEIGHT+1>
-xpcc::Matrix<T, WIDTH, HEIGHT>::addBackRow(const xpcc::Matrix<T, WIDTH, 1> &r ) const
-{
-	return addRow(HEIGHT, r);
-}
-
-// ----------------------------------------------------------------------------
-template<typename T, uint8_t WIDTH, uint8_t HEIGHT>
-xpcc::Matrix<T, WIDTH+1, HEIGHT>
-xpcc::Matrix<T, WIDTH, HEIGHT>::addBackCol(const xpcc::Matrix<T, 1, HEIGHT> &c) const
-{
-	return addCol(WIDTH, c);
-}
-
-
-// ----------------------------------------------------------------------------
-template<typename T, uint8_t WIDTH, uint8_t HEIGHT>
-xpcc::Matrix<T, WIDTH, HEIGHT+1>
-xpcc::Matrix<T, WIDTH, HEIGHT>::addFrontRow(const xpcc::Matrix<T, WIDTH, 1> &r ) const
-{
-	return addRow(0, r);
-}
-
-// ----------------------------------------------------------------------------
-template<typename T, uint8_t WIDTH, uint8_t HEIGHT>
-xpcc::Matrix<T, WIDTH+1, HEIGHT>
-xpcc::Matrix<T, WIDTH, HEIGHT>::addFrontCol(const xpcc::Matrix<T, 1, HEIGHT> &c) const
-{
-	return addCol(0, c);
-}
-
-// ----------------------------------------------------------------------------
-template<typename T, uint8_t WIDTH, uint8_t HEIGHT>
-xpcc::Matrix<T, WIDTH, HEIGHT+1>
-xpcc::Matrix<T, WIDTH, HEIGHT>::addRow(uint8_t index, const xpcc::Matrix<T, WIDTH, 1> &r ) const
-{
-	xpcc::Matrix<T, WIDTH, HEIGHT+1> m;
-	uint_fast8_t i = 0, ri = 0;
-	
-	for (; i < index; ++i)	m.copyRow(ri++, row(i));
-	m.copyRow(ri++, r);
-	for (; i < index; ++i)	m.copyRow(ri++, row(i));
-	
-	return m;
-}
-
-// ----------------------------------------------------------------------------
-template<typename T, uint8_t WIDTH, uint8_t HEIGHT>
-xpcc::Matrix<T, WIDTH+1, HEIGHT>
-xpcc::Matrix<T, WIDTH, HEIGHT>::addCol(uint8_t index, const xpcc::Matrix<T, 1, HEIGHT> &c) const
-{
-	xpcc::Matrix<T, WIDTH+1, HEIGHT> m;
-	uint_fast8_t i = 0, ci = 0;
-	
-	for (; i < index; ++i)	m.copyCol(ci++, col(i));
-	m.copyCol(ci++, c);
-	for (; i < index; ++i)	m.copyCol(ci++, col(i));
-	
-	return m;
-}
-
-// ----------------------------------------------------------------------------
-template<typename T, uint8_t WIDTH, uint8_t HEIGHT>
-xpcc::Matrix<T, WIDTH, HEIGHT-1>
-xpcc::Matrix<T, WIDTH, HEIGHT>::removeBackRow() const
-{
-	return xpcc::Matrix<T, WIDTH, HEIGHT-1>::subMatrix(0, 0, *this);
-}
-
-// ----------------------------------------------------------------------------
-template<typename T, uint8_t WIDTH, uint8_t HEIGHT>
-xpcc::Matrix<T, WIDTH-1, HEIGHT>
-xpcc::Matrix<T, WIDTH, HEIGHT>::removeBackCol() const
-{
-	return xpcc::Matrix<T, WIDTH-1, HEIGHT>::subMatrix(0, 0, *this);
-}
-
-// ----------------------------------------------------------------------------
-template<typename T, uint8_t WIDTH, uint8_t HEIGHT>
-xpcc::Matrix<T, WIDTH, HEIGHT-1>
-xpcc::Matrix<T, WIDTH, HEIGHT>::removeFrontRow() const
-{
-	return xpcc::Matrix<T, WIDTH, HEIGHT-1>::subMatrix(1, 0, *this);
-}
-
-// ----------------------------------------------------------------------------
-template<typename T, uint8_t WIDTH, uint8_t HEIGHT>
-xpcc::Matrix<T, WIDTH-1, HEIGHT>
-xpcc::Matrix<T, WIDTH, HEIGHT>::removeFrontCol() const
-{
-	return xpcc::Matrix<T, WIDTH-1, HEIGHT>::subMatrix(0, 1, *this);
-}
-
-// ----------------------------------------------------------------------------
-template<typename T, uint8_t WIDTH, uint8_t HEIGHT>
-xpcc::Matrix<T, WIDTH, HEIGHT-1>
-xpcc::Matrix<T, WIDTH, HEIGHT>::removeRow(uint8_t index ) const
-{
-	xpcc::Matrix<T, WIDTH, HEIGHT-1> m;
-	uint_fast8_t i = 0, ri = 0;
-	
-	for (; i < index; ++i)	m.copyRow(ri++, row(i));
-	++i; // skip one row
-	for (; i < index; ++i)	m.copyRow(ri++, row(i));
-	
-	return m;
-}
-
-// ----------------------------------------------------------------------------
-template<typename T, uint8_t WIDTH, uint8_t HEIGHT>
-xpcc::Matrix<T, WIDTH-1, HEIGHT>
-xpcc::Matrix<T, WIDTH, HEIGHT>::removeCol(uint8_t index) const
-{
-	xpcc::Matrix<T, WIDTH-1, HEIGHT> m;
-	uint_fast8_t i = 0, ci = 0;
-	
-	for (; i < index; ++i)	m.copyCol(ci++, col(i));
-	++i; // skip one column
-	for (; i < index; ++i)	m.copyCol(ci++, col(i));
-	
-	return m;
-}
-
-// ----------------------------------------------------------------------------
-template<typename T, uint8_t WIDTH, uint8_t HEIGHT>
-xpcc::IOStream&
-xpcc::operator << (xpcc::IOStream& os, const xpcc::Matrix<T, WIDTH, HEIGHT> &m)
-{
-	os << "{ ";
-	
-	for (uint_fast8_t j = 0; j < HEIGHT; ++j)
-	{
-		os << "{ ";
-		for (uint_fast8_t i = 0; i < WIDTH; ++i)
-		{
-			os << m.element[j*WIDTH+i];
-			if (i < WIDTH-1)
-			{
-				os << ", ";
-			}
-		}
-		os << " }";
-		if (j < HEIGHT-1)
-		{
-			os << ", \n\r";
-		}
-	}
-	os << " }";
-	return os;
-}

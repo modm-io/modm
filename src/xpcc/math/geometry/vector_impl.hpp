@@ -43,19 +43,19 @@ xpcc::Vector<T, SIZE>::Vector()
 template<typename T, uint8_t SIZE>
 xpcc::Vector<T, SIZE>::Vector(const T *ptData)
 {
-	memcpy(coords, ptData, sizeof(T)*SIZE);
+	memcpy(coords, ptData, sizeof(T) * SIZE);
 }
 
 template<typename T, uint8_t SIZE>
-xpcc::Vector<T, SIZE>::Vector(const xpcc::Matrix<T, 1, SIZE> &rhs)
+xpcc::Vector<T, SIZE>::Vector(const xpcc::Matrix<T, SIZE, 1> &rhs)
 {
-	memcpy(coords, &rhs, sizeof(T)*SIZE);
+	memcpy(coords, &rhs, sizeof(T) * SIZE);
 }
 
 template<typename T, uint8_t SIZE>
 xpcc::Vector<T, SIZE>::Vector(const xpcc::Vector<T, SIZE> &rhs)
 {
-	memcpy(coords, rhs.coords, sizeof(T)*SIZE);
+	memcpy(coords, rhs.coords, sizeof(T) * SIZE);
 }
 
 // ----------------------------------------------------------------------------
@@ -69,9 +69,9 @@ xpcc::Vector<T, SIZE>::getSize()
 // ----------------------------------------------------------------------------
 template<typename T, uint8_t SIZE>
 xpcc::Vector<T, SIZE>&
-xpcc::Vector<T, SIZE>::operator = (const xpcc::Matrix<T, 1, SIZE> &rhs)
+xpcc::Vector<T, SIZE>::operator = (const xpcc::Matrix<T, SIZE, 1> &rhs)
 {
-	memcpy(coords, &rhs, sizeof(T)*SIZE);
+	memcpy(coords, &rhs, sizeof(T) * SIZE);
 	return *this;
 }
 
@@ -226,32 +226,32 @@ xpcc::Vector<T, SIZE>::operator - (const xpcc::Vector<T, SIZE> &rhs) const
 
 // ----------------------------------------------------------------------------
 template<typename T, uint8_t SIZE>
-xpcc::Matrix<T, 1, SIZE>&
+xpcc::Matrix<T, SIZE, 1>&
 xpcc::Vector<T, SIZE>::asMatrix()
 {
-	return *reinterpret_cast<xpcc::Matrix<T, 1, SIZE>*>(this);
+	return *reinterpret_cast<xpcc::Matrix<T, SIZE, 1>*>(this);
 }
 
-template<typename T, uint8_t SIZE>
-const xpcc::Matrix<T, 1, SIZE>&
-xpcc::Vector<T, SIZE>::asMatrix() const
-{
-	return *reinterpret_cast<const xpcc::Matrix<T, 1, SIZE>*>(this);
-}
-
-// ----------------------------------------------------------------------------
 template<typename T, uint8_t SIZE>
 const xpcc::Matrix<T, SIZE, 1>&
-xpcc::Vector<T, SIZE>::asTransposedMatrix() const
+xpcc::Vector<T, SIZE>::asMatrix() const
 {
 	return *reinterpret_cast<const xpcc::Matrix<T, SIZE, 1>*>(this);
 }
 
+// ----------------------------------------------------------------------------
 template<typename T, uint8_t SIZE>
-xpcc::Matrix<T, SIZE, 1>&
+const xpcc::Matrix<T, 1, SIZE>&
+xpcc::Vector<T, SIZE>::asTransposedMatrix() const
+{
+	return *reinterpret_cast<const xpcc::Matrix<T, 1, SIZE>*>(this);
+}
+
+template<typename T, uint8_t SIZE>
+xpcc::Matrix<T, 1, SIZE>&
 xpcc::Vector<T, SIZE>::asTransposedMatrix()
 {
-	return *reinterpret_cast<xpcc::Matrix<T, SIZE, 1>*>(this);
+	return *reinterpret_cast<xpcc::Matrix<T, 1, SIZE>*>(this);
 }
 
 // ----------------------------------------------------------------------------

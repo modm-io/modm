@@ -132,7 +132,7 @@ xpcc::Vector<T, 3>::Vector(const T &inX, const T &inY, const xpcc::Vector<T, 1> 
 
 // ----------------------------------------------------------------------------
 template<typename T>
-xpcc::Vector<T, 3>::Vector(const xpcc::Vector<T,2> &inXY, const T &inZ) :
+xpcc::Vector<T, 3>::Vector(const xpcc::Vector<T, 2> &inXY, const T &inZ) :
 	x(inXY.x),
 	y(inXY.y),
 	z(inZ)
@@ -141,7 +141,7 @@ xpcc::Vector<T, 3>::Vector(const xpcc::Vector<T,2> &inXY, const T &inZ) :
 
 // ----------------------------------------------------------------------------
 template<typename T>
-xpcc::Vector<T, 3>::Vector(const xpcc::Vector<T,2> &inXY, const xpcc::Vector<T, 1> &inZ) :
+xpcc::Vector<T, 3>::Vector(const xpcc::Vector<T, 2> &inXY, const xpcc::Vector<T, 1> &inZ) :
 	x(inXY.x),
 	y(inXY.y),
 	z(inZ.x)
@@ -177,7 +177,7 @@ xpcc::Vector<T, 3>::Vector(T inVal) :
 
 // ----------------------------------------------------------------------------
 template<typename T>
-xpcc::Vector<T, 3>::Vector(const xpcc::Matrix<T, 1, 3> &rhs) :
+xpcc::Vector<T, 3>::Vector(const xpcc::Matrix<T, 3, 1> &rhs) :
 	x(reinterpret_cast<const T*>(&rhs)[0]),
 	y(reinterpret_cast<const T*>(&rhs)[1]),
 	z(reinterpret_cast<const T*>(&rhs)[2])
@@ -187,7 +187,7 @@ xpcc::Vector<T, 3>::Vector(const xpcc::Matrix<T, 1, 3> &rhs) :
 // ----------------------------------------------------------------------------
 template<typename T>
 template<typename U>
-xpcc::Vector<T, 3>::Vector(const xpcc::Vector<U,3> &rhs) :
+xpcc::Vector<T, 3>::Vector(const xpcc::Vector<U, 3> &rhs) :
 	x(rhs.x),
 	y(rhs.y),
 	z(rhs.z)
@@ -251,7 +251,7 @@ xpcc::Vector<T, 3>::getZ() const
 // ----------------------------------------------------------------------------
 template<typename T>
 xpcc::Vector<T, 3>&
-xpcc::Vector<T, 3>::operator = (const xpcc::Matrix<T, 1, 3> &rhs)
+xpcc::Vector<T, 3>::operator = (const xpcc::Matrix<T, 3, 1> &rhs)
 {
 	x = reinterpret_cast<const T*>(&rhs)[0];
 	y = reinterpret_cast<const T*>(&rhs)[1];

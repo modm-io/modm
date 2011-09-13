@@ -8,11 +8,10 @@
 ; Stack incl call = 2-3
 ;------------------------------------------------------------------------------
 
-.text
-.global sqrt32
-.type sqrt32, @function
-
-sqrt32:
+	.text
+	.global	xpcc__sqrt32
+	.type	xpcc__sqrt32, @function
+xpcc__sqrt32:
 	ldi   R19, 0xc0
 	clr   R18          ; rotation mask in R19:R18
 	ldi   R27, 0x40
@@ -54,5 +53,5 @@ sqrt32:
 	mov   R25, R27     ; return in R25:R24 for avr-gcc ABI compliance
 	mov   R24, R26
 	ret
- 
-.size sqrt32, .-sqrt32
+
+	.size	xpcc__sqrt32, . - xpcc__sqrt32

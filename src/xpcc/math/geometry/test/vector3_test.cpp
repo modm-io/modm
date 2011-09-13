@@ -39,8 +39,9 @@ Vector3Test::testConstructor()
 	
 	xpcc::Vector1i p1(3);
 	xpcc::Vector2i p2(1, 2);
+	
 	int16_t array[3] = {-4, 5, 7};
-	xpcc::Matrix<int16_t, 1, 3> m(array);
+	xpcc::Matrix<int16_t, 3, 1> m(array);
 	
 	xpcc::Vector3i a;
 	TEST_ASSERT_EQUALS(a.x, 0);
@@ -139,8 +140,9 @@ void
 Vector3Test::testAssign()
 {
 	xpcc::Vector3i a(42,-4,3);
+	
 	int16_t array[3] = {-26,9,2};
-	xpcc::Matrix<int16_t, 1, 3> m(array);
+	xpcc::Matrix<int16_t, 3, 1> m(array);
 	
 	xpcc::Vector3i b;
 	
