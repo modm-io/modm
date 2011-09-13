@@ -54,13 +54,10 @@ static uint8_t error;
 // 
 ISR(USART0_RX_vect)
 {
-// TODO: Fix this for all ATmega's
-#if defined (DOR0) && defined (FE0)
+	// read error flags
 	error |= UCSR0A & ((1 << FE0) | (1 << DOR0));
-#endif
-	uint8_t data = UDR0;
 	
-	// TODO Fehlerbehandlung
+	uint8_t data = UDR0;
 	rxBuffer.push(data);
 }
 
@@ -143,6 +140,7 @@ xpcc::atmega::BufferedUart0::flushReceiveBuffer()
 		rxBuffer.pop();
 		++i;
 	}
+	
 #if defined (RXC0)
 	unsigned char c;
 	while (UCSR0A & (1 << RXC0))

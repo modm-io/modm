@@ -54,13 +54,10 @@ static uint8_t error;
 // 
 ISR(USART3_RX_vect)
 {
-// TODO: Fix this for all ATmega's
-#if defined (DOR3) && defined (FE3)
+	// read error flags
 	error |= UCSR3A & ((1 << FE3) | (1 << DOR3));
-#endif
-	uint8_t data = UDR3;
 	
-	// TODO Fehlerbehandlung
+	uint8_t data = UDR3;
 	rxBuffer.push(data);
 }
 
@@ -143,6 +140,7 @@ xpcc::atmega::BufferedUart3::flushReceiveBuffer()
 		rxBuffer.pop();
 		++i;
 	}
+	
 #if defined (RXC3)
 	unsigned char c;
 	while (UCSR3A & (1 << RXC3))
