@@ -1,11 +1,11 @@
 // coding: utf-8
 // ----------------------------------------------------------------------------
-/* Copyright (c) 2009, Roboterclub Aachen e.V.
+/* Copyright (c) 2011, Roboterclub Aachen e.V.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- *
+ * 
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -30,77 +30,26 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC_MATH__OPERATOR_HPP
-#define	XPCC_MATH__OPERATOR_HPP
+#include "device.hpp"
 
-#include <cmath>
-#include <stdint.h>
+// ----------------------------------------------------------------------------
+xpcc::i2c::AsynchronousMaster
+xpcc::i2c::Device<xpcc::i2c::AsynchronousMaster>::i2c;
 
-#include <xpcc/architecture/utils.hpp>
-
-extern "C" uint16_t xpcc__sqrt32(uint32_t a);
-
-namespace xpcc
+// ----------------------------------------------------------------------------
+xpcc::i2c::Device<xpcc::i2c::AsynchronousMaster>::Device(uint8_t address) :
+	deviceAddress(address)
 {
-	namespace math
-	{
-		/**
-		 * \brief	Fast AVR integer square root assembly routines
-		 * 
-		 * Square root calculation based on a implementation by Ruud v Gessel.
-		 * The maximum execution time is 310 clock cycles (inclusive CALL+RET)
-		 * 
-		 * \see		<a href="http://www.mikrocontroller.net/articles/AVR_Arithmetik#avr-gcc_Implementierung_.2832_Bit.29" target="_blank">
-		 * 			Article on microcontroller.net</a>
-		 * \see		<a href="http://members.chello.nl/j.beentjes3/Ruud/sqrt32avr.htm" target="_blank">
-		 * 			Original implementation</a>
-		 * 
-		 * \ingroup	math
-		 */
-		inline uint16_t
-		sqrt(uint32_t a)
-		{
-			return xpcc__sqrt32(a);
-		}
-		
-		/**
-		 * \brief	unsigned 16bit x 16bit = 32bit multiplication
-		 * 
-		 * \see		AVR201
-		 * \ingroup	math
-		 */
-		inline uint32_t
-		mul(uint16_t a, uint16_t b);
-		
-		/**
-		 * \brief	signed 16bit x 16bit = 32bit multiplication
-		 * 
-		 * \see		AVR201
-		 * \ingroup	math
-		 */
-		inline int32_t
-		mul(int16_t a, int16_t b);
-		
-		/**
-		 * \brief	Signed multiply accumulate of two 16bits numbers with
-		 * 			a 32bits result
-		 * 
-		 * \code
-		 * result += a * b;
-		 * \endcode
-		 * 
-		 * \see		AVR201
-		 * \ingroup	math
-		 */
-		inline int32_t
-		mac(int32_t result, int16_t a, int16_t b);
-	}
 }
 
-#if defined(__AVR__) && defined(__AVR_HAVE_MUL__)
-	#include "operator_avr_impl.hpp"
-#else
-	#include "operator_impl.hpp"
-#endif
-
-#endif	// XPCC_MATH__OPERATOR_HPP
+// ----------------------------------------------------------------------------
+bool
+xpcc::i2c::Device<xpcc::i2c::AsynchronousMaster>::isAvailable() const
+{
+	uint8_t buffer;
+	this->i2c.write(this->deviceAddress, &buffer, 0);
+	while (this->i2c.isBusy())
+		;
+	
+	return !(this->i2c.getStatus());
+}

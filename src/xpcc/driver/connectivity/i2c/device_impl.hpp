@@ -56,25 +56,3 @@ xpcc::i2c::Device<I2C>::isAvailable() const
 	
 	return ack;
 }
-
-
-// ----------------------------------------------------------------------------
-xpcc::i2c::AsynchronousMaster xpcc::i2c::Device<xpcc::i2c::AsynchronousMaster>::i2c;
-
-// ----------------------------------------------------------------------------
-xpcc::i2c::Device<xpcc::i2c::AsynchronousMaster>::Device(uint8_t address) :
-deviceAddress(address)
-{
-}
-
-// ----------------------------------------------------------------------------
-bool
-xpcc::i2c::Device<xpcc::i2c::AsynchronousMaster>::isAvailable() const
-{
-	uint8_t buffer;
-	this->i2c.write(this->deviceAddress, &buffer, 0);
-	while (this->i2c.isBusy())
-		;
-	
-	return !(this->i2c.getStatus());
-}

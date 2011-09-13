@@ -71,17 +71,17 @@ namespace xpcc
 	 * \ingroup	geometry
 	 * \author	Niklas Hauser
 	 */
-	template<typename T, uint8_t SIZE>
+	template<typename T, uint8_t N>
 	class Vector
 	{
 	public:
 		Vector();
 		Vector(const T *ptData);
 		
-		Vector(const Matrix<T, SIZE, 1> &rhs);
+		Vector(const Matrix<T, N, 1> &rhs);
 		Vector(const Vector &rhs);
 		
-		Vector& operator = (const Matrix<T, SIZE, 1> &rhs);
+		Vector& operator = (const Matrix<T, N, 1> &rhs);
 		Vector& operator = (const Vector &rhs);
 		
 		bool operator == (const Vector &rhs) const;
@@ -111,23 +111,23 @@ namespace xpcc
 		T getLength() const;
 		T getLengthSquared() const;
 		
-		Matrix<T, SIZE, 1>&
+		Matrix<T, N, 1>&
 		asMatrix();
 		
-		const Matrix<T, SIZE, 1>&
+		const Matrix<T, N, 1>&
 		asMatrix() const;
 		
-		Matrix<T, 1, SIZE>&
+		Matrix<T, 1, N>&
 		asTransposedMatrix();
 		
-		const Matrix<T, 1, SIZE>&
+		const Matrix<T, 1, N>&
 		asTransposedMatrix() const;
 		
 	public:
 		static inline uint8_t
 		getSize();
 		
-		T coords[SIZE];
+		T coords[N];
 	};
 }
 

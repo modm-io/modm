@@ -39,17 +39,17 @@
 namespace xpcc
 {
 	// forward declaration
-	template <class T, uint8_t WIDTH, uint8_t HEIGHT> class Matrix;
-	template <class T, uint8_t HEIGHT> class Vector;
+	template <class T, uint8_t ROWS, uint8_t COLUMNS> class Matrix;
+	template <class T, uint8_t N> class Vector;
 
 	/**
 	 * \brief	Class for decomposing matrices
-	*
+	 * 
 	 * Factorise a matrix A into an L(ower) and U(pper) matrix such that
 	 * A = L*U or P*A = L*U where P is a pivot matrix (changes the row order).
-	 *
+	 * 
 	 * Adapted from the implementation of Gaspard Petit (gaspardpetit@gmail.com).
-	 *
+	 * 
 	 * \see <a href"http://www-etud.iro.umontreal.ca/~petitg/cpp/ludecomposition.html">Homepage</a>
 	 * 
 	 * \ingroup	matrix
@@ -58,24 +58,24 @@ namespace xpcc
 	class LUDecomposition
 	{
 	public:
-		template <typename T, uint8_t HEIGHT>
+		template <typename T, uint8_t N>
 		static bool
-		decompose(const Matrix<T, HEIGHT, HEIGHT> &matrix,
-				Matrix<T, HEIGHT, HEIGHT> *l,
-				Matrix<T, HEIGHT, HEIGHT> *u);
+		decompose(const Matrix<T, N, N> &matrix,
+				Matrix<T, N, N> *l,
+				Matrix<T, N, N> *u);
 
-		template <typename T, uint8_t HEIGHT>
+		template <typename T, uint8_t N>
 		static bool
-		decompose(const Matrix<T, HEIGHT, HEIGHT> &matrix,
-				Matrix<T, HEIGHT, HEIGHT> *l,
-				Matrix<T, HEIGHT, HEIGHT> *u,
-				Vector<int8_t, HEIGHT> *p);
+		decompose(const Matrix<T, N, N> &matrix,
+				Matrix<T, N, N> *l,
+				Matrix<T, N, N> *u,
+				Vector<int8_t, N> *p);
 
-		template <typename T, uint8_t HEIGHT, uint8_t BXWIDTH>
+		template <typename T, uint8_t N, uint8_t BXWIDTH>
 		static bool
-		solve(const Matrix<T, HEIGHT, HEIGHT> &l,
-				const Matrix<T, HEIGHT, HEIGHT> &u,
-				Matrix<T, BXWIDTH, HEIGHT> *xb);
+		solve(const Matrix<T, N, N> &l,
+				const Matrix<T, N, N> &u,
+				Matrix<T, BXWIDTH, N> *xb);
 		
 	private:
 		template<typename T, uint8_t OFFSET, uint8_t WIDTH, uint8_t HEIGHT>
