@@ -26,7 +26,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * 
- * $Id: spi.hpp 474 2011-02-11 12:40:19Z salkinium $
+ * $Id$
  */
 // ----------------------------------------------------------------------------
 

@@ -26,7 +26,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: dummy.hpp 364 2010-07-25 13:23:55Z dergraaf $
+ * $Id$
  */
 // ----------------------------------------------------------------------------
 

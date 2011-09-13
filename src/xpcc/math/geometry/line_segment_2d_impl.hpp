@@ -26,7 +26,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: line_segment_2d_impl.hpp 10693 2011-07-02 05:12:27Z thorsten $
+ * $Id$
  */
 // ----------------------------------------------------------------------------
 

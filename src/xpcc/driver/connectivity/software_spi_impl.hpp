@@ -26,7 +26,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: software_spi.hpp 354 2010-07-14 10:21:50Z dergraaf $
+ * $Id$
  */
 // ----------------------------------------------------------------------------
 
