@@ -87,6 +87,14 @@ xpcc::amnb::Listener::call(const void *payload, const uint8_t length)
 	(object->*function)(payload, length);
 }
 
+// ----------------------------------------------------------------------------
+inline void
+xpcc::amnb::ErrorHandler::call(Flags type, const uint8_t errorCode)
+{
+	// redirect call to the actual object
+	(object->*function)(type, errorCode);
+}
+
 // Disable warnings for Visual Studio about using 'this' in a base member
 // initializer list.
 // In this case though it is totally safe so it is ok to disable this warning.
@@ -100,66 +108,169 @@ xpcc::amnb::Node<Interface>::Node(uint8_t address,
 								  xpcc::accessor::Flash<Action> actionList,
 								  uint8_t actionCount,
 								  xpcc::accessor::Flash<Listener> listenList,
-								  uint8_t listenCount) : 
-ownAddress(address), actionList(actionList), actionCount(actionCount),
-listenList(listenList), listenCount(listenCount), response(this)
+								  uint8_t listenCount,
+								  xpcc::accessor::Flash<ErrorHandler> errorHandlerList,
+								  uint8_t errorHandlerCount) :
+ownAddress(address),
+actionList(actionList), actionCount(actionCount),
+listenList(listenList), listenCount(listenCount),
+errorHandlerList(errorHandlerList), errorHandlerCount(errorHandlerCount),
+response(this)
 {
 	Interface::initialize(address);
 	queryStatus = ERROR_TIMEOUT;
 }
 
+template <typename Interface>
+xpcc::amnb::Node<Interface>::Node(uint8_t address,
+								  xpcc::accessor::Flash<Action> actionList,
+								  uint8_t actionCount,
+								  xpcc::accessor::Flash<Listener> listenList,
+								  uint8_t listenCount) :
+ownAddress(address),
+actionList(actionList), actionCount(actionCount),
+listenList(listenList), listenCount(listenCount),
+errorHandlerCount(0),
+response(this)
+{
+	Interface::initialize(address);
+	queryStatus = ERROR_TIMEOUT;
+}
+
+template <typename Interface>
+xpcc::amnb::Node<Interface>::Node(uint8_t address,
+								  xpcc::accessor::Flash<Action> actionList,
+								  uint8_t actionCount) :
+ownAddress(address),
+actionList(actionList), actionCount(actionCount),
+listenCount(0),
+errorHandlerCount(0),
+response(this)
+{
+	Interface::initialize(address);
+	queryStatus = ERROR_TIMEOUT;
+}
+
+// ----------------------------------------------------------------------------
 template <typename Interface> template <typename T>
-void
+bool
 xpcc::amnb::Node<Interface>::query(uint8_t slaveAddress, uint8_t command,
 								   const T& payload, uint8_t responseLength)
 {
-	Interface::dropMessage();
-	Interface::sendMessage(slaveAddress, REQUEST, command, payload);
+	if (queryStatus == IN_PROGRESS) {
+		checkErrorHandlers(slaveAddress, command, REQUEST, ERROR__QUERY_IN_PROGRESS);
+		return false;
+	}
+	
+	bool noError(true);
+	if (!Interface::messageTransmitted()) {
+		checkErrorHandlers(Interface::getTransmittedAddress(),
+						   Interface::getTransmittedCommand(),
+						   Interface::getTransmittedFlags(),
+						   ERROR__MESSAGE_OVERWRITTEN);
+		noError = false;
+	}
+	if (!Interface::sendMessage(slaveAddress, REQUEST, command, payload)) {
+		checkErrorHandlers(slaveAddress, command, REQUEST, ERROR__TRANSMITTER_BUSY);
+		noError = false;
+	}
 	
 	queryStatus = IN_PROGRESS;
 	expectedResponseLength = responseLength;
 	expectedAddress = slaveAddress;
 	
 	timer.restart(timeout);
+	return noError;
 }
 
 template <typename Interface>
-void
+bool
 xpcc::amnb::Node<Interface>::query(uint8_t slaveAddress, uint8_t command,
 								   uint8_t responseLength)
 {
-	Interface::dropMessage();
-	Interface::sendMessage(slaveAddress, REQUEST, command, 0, 0);
+	if (queryStatus == IN_PROGRESS) {
+		checkErrorHandlers(slaveAddress, command, REQUEST, ERROR__QUERY_IN_PROGRESS);
+		return false;
+	}
+	
+	bool noError(true);
+	if (!Interface::messageTransmitted()) {
+		checkErrorHandlers(Interface::getTransmittedAddress(),
+						   Interface::getTransmittedCommand(),
+						   Interface::getTransmittedFlags(),
+						   ERROR__MESSAGE_OVERWRITTEN);
+		noError = false;
+	}
+	if (!Interface::sendMessage(slaveAddress, REQUEST, command, 0, 0)) {
+		checkErrorHandlers(slaveAddress, command, REQUEST, ERROR__TRANSMITTER_BUSY);
+		noError = false;
+	}
 	
 	queryStatus = IN_PROGRESS;
 	expectedResponseLength = responseLength;
 	expectedAddress = slaveAddress;
 	
 	timer.restart(timeout);
+	return noError;
 }
 
+// ----------------------------------------------------------------------------
 template <typename Interface> template <typename T>
-void
+bool
 xpcc::amnb::Node<Interface>::broadcast(uint8_t command, const T& payload)
 {
-	Interface::dropMessage();
-	Interface::sendMessage(this->ownAddress, BROADCAST, command, payload);
+	bool noError(true);
+	if (!Interface::messageTransmitted()) {
+		checkErrorHandlers(Interface::getTransmittedAddress(),
+						   Interface::getTransmittedCommand(),
+						   Interface::getTransmittedFlags(),
+						   ERROR__MESSAGE_OVERWRITTEN);
+		noError = false;
+		
+	}
+	if (!Interface::sendMessage(this->ownAddress, BROADCAST, command, payload)) {
+		checkErrorHandlers(this->ownAddress, command, BROADCAST, ERROR__TRANSMITTER_BUSY);
+		noError = false;
+	}
+	return noError;
 }
 
 template <typename Interface>
-void
+bool
 xpcc::amnb::Node<Interface>::broadcast(uint8_t command, const void *payload, uint8_t payloadLength)
 {
-	Interface::dropMessage();
-	Interface::sendMessage(this->ownAddress, BROADCAST, command, payload, payloadLength);
+	bool noError(true);
+	if (!Interface::messageTransmitted()) {
+		checkErrorHandlers(Interface::getTransmittedAddress(),
+						   Interface::getTransmittedCommand(),
+						   Interface::getTransmittedFlags(),
+						   ERROR__MESSAGE_OVERWRITTEN);
+		noError = false;
+	}
+	if (!Interface::sendMessage(this->ownAddress, BROADCAST, command, payload, payloadLength)) {
+		checkErrorHandlers(this->ownAddress, command, BROADCAST, ERROR__TRANSMITTER_BUSY);
+		noError = false;
+	}
+	return noError;
 }
 
 template <typename Interface>
-void
+bool
 xpcc::amnb::Node<Interface>::broadcast(uint8_t command)
 {
-	Interface::dropMessage();
-	Interface::sendMessage(this->ownAddress, BROADCAST, command, 0,0);
+	bool noError(true);
+	if (!Interface::messageTransmitted()) {
+		checkErrorHandlers(Interface::getTransmittedAddress(),
+						   Interface::getTransmittedCommand(),
+						   Interface::getTransmittedFlags(),
+						   ERROR__MESSAGE_OVERWRITTEN);
+		noError = false;
+	}
+	if (!Interface::sendMessage(this->ownAddress, BROADCAST, command, 0,0)) {
+		checkErrorHandlers(this->ownAddress, command, BROADCAST, ERROR__TRANSMITTER_BUSY);
+		noError = false;
+	}
+	return noError;
 }
 
 // ----------------------------------------------------------------------------
@@ -211,18 +322,19 @@ xpcc::amnb::Node<Interface>::getResponse()
 template <typename Interface>
 void
 xpcc::amnb::Node<Interface>::update()
-{
-	bool checkListeners = false;
-	
+{	
 	Interface::update();
 	
 	if (Interface::isMessageAvailable())
 	{
+		uint8_t messageAddress = Interface::getAddress();
+		uint8_t messageCommand = Interface::getCommand();
+		bool checkListeners = false;
 		// --------------------------------------------------------------------
 		if (Interface::isResponse())
 		{
-			// traditional APB Master query answer
-			if ((queryStatus == IN_PROGRESS) && (Interface::getAddress() == expectedAddress))
+			// my request answer
+			if ((queryStatus == IN_PROGRESS) && (messageAddress == expectedAddress))
 			{
 				if (Interface::isAcknowledge())
 				{
@@ -233,26 +345,28 @@ xpcc::amnb::Node<Interface>::update()
 					}
 					else {
 						queryStatus = ERROR_PAYLOAD;
+						checkErrorHandlers(messageAddress, messageCommand, ACK, ERROR__QUERY_WRONG_PAYLOAD_LENGTH);
 					}
 				}
 				else {
 					queryStatus = ERROR_RESPONSE;
+					checkErrorHandlers(messageAddress, messageCommand, NACK, ERROR__QUERY_ERROR_CODE);
 				}
 			}
-			// some other APB Master query answer
+			// other request answer
 			else {
 				checkListeners = true;
 			}
 		}
+		// --------------------------------------------------------------------
 		else {
-			// --------------------------------------------------------------------
-			// Broadcasts
+			// Requests
 			if (Interface::isAcknowledge())
 			{
-				if (Interface::getAddress() == this->ownAddress)
+				if (messageAddress == this->ownAddress)
 				{
 					this->response.triggered = false;
-					this->currentCommand = Interface::getCommand();
+					this->currentCommand = messageCommand;
 					
 					xpcc::accessor::Flash<Action> list = actionList;
 					for (uint8_t i = 0; i < actionCount; ++i, ++list)
@@ -266,36 +380,38 @@ xpcc::amnb::Node<Interface>::update()
 								action.call(this->response, Interface::getPayload());
 								
 								if (!this->response.triggered) {
-									this->response.error(ERROR__NO_RESPONSE);
+									this->response.error(ERROR__ACTION_NO_RESPONSE);
+									checkErrorHandlers(messageAddress, messageCommand, NACK, ERROR__ACTION_NO_RESPONSE);
 								}
 							}
 							else {
-								this->response.error(ERROR__WRONG_PAYLOAD_LENGTH);
+								this->response.error(ERROR__ACTION_WRONG_PAYLOAD_LENGTH);
+								checkErrorHandlers(messageAddress, messageCommand, NACK, ERROR__ACTION_WRONG_PAYLOAD_LENGTH);
 							}
 							break;
 						}
 					}
 				}
 			}
+			// Broadcasts
 			else {
 				checkListeners = true;
 			}
 			
 			if (!this->response.triggered) {
-				this->response.error(ERROR__NO_ACTION);
+				this->response.error(ERROR__ACTION_NO_ACTION);
+				checkErrorHandlers(messageAddress, messageCommand, NACK, ERROR__ACTION_NO_ACTION);
 			}
 		}
+		// --------------------------------------------------------------------
 		
-		if (checkListeners && (listenCount > 0)) {
-			uint8_t listenerAddress = Interface::getAddress();
-			uint8_t listenerCommand = Interface::getCommand();
-			
-			// check if we want to listen to it
+		if (checkListeners && (listenCount > 0))
+		{	// check if we want to listen to it
 			xpcc::accessor::Flash<Listener> list = listenList;
 			for (uint8_t i = 0; i < listenCount; ++i, ++list)
 			{
 				Listener listen(*list);
-				if ((listenerAddress == listen.address) && (listenerCommand == listen.command))
+				if ((messageAddress == listen.address) && (messageCommand == listen.command))
 				{
 					// execute callback function
 					listen.call(Interface::getPayload(), Interface::getPayloadLength());
@@ -303,15 +419,36 @@ xpcc::amnb::Node<Interface>::update()
 				}
 			}
 		}
-		
+		// finished with the message, drop it.
 		Interface::dropMessage();
 	}
-	// --------------------------------------------------------------------
-	// traditional APB Master query timeout
+	// my request timeout
 	else if (timer.isExpired() && (queryStatus == IN_PROGRESS))
 	{
 		queryStatus = ERROR_TIMEOUT;
+		checkErrorHandlers(Interface::getTransmittedAddress(), Interface::getTransmittedCommand(), REQUEST, ERROR__QUERY_TIMEOUT);
 	}
+}
+
+
+template <typename Interface>
+bool
+xpcc::amnb::Node<Interface>::checkErrorHandlers(uint8_t address, uint8_t command, Flags type, uint8_t errorCode)
+{
+	if (errorHandlerCount == 0) return false;
+	
+	xpcc::accessor::Flash<ErrorHandler> list = errorHandlerList;
+	for (uint8_t i = 0; i < errorHandlerCount; ++i, ++list)
+	{
+		ErrorHandler errorHandler(*list);
+		if ((address == errorHandler.address) && (command == errorHandler.command))
+		{
+			// execute callback function
+			errorHandler.call(type, errorCode);
+			return true;
+		}
+	}
+	return false;
 }
 
 // ----------------------------------------------------------------------------

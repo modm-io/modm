@@ -57,7 +57,7 @@ namespace xpcc
 			 * one for the given problem.
 			 */
 			ERROR__GENERAL_ERROR = 0x00,
-			ERROR__NO_ACTION = 0x01, 		///< No corresponding action found for this command
+			ERROR__ACTION_NO_ACTION = 0x01, ///< No corresponding action found for this command
 			
 			/**
 			 * \brief	Unexpected payload length
@@ -65,7 +65,7 @@ namespace xpcc
 			 * The payload length of the received message differs from the
 			 * expected length for the given command.
 			 */
-			ERROR__WRONG_PAYLOAD_LENGTH = 0x02,
+			ERROR__ACTION_WRONG_PAYLOAD_LENGTH = 0x02,
 			
 			/**
 			 * \brief	No response given by the user
@@ -73,7 +73,19 @@ namespace xpcc
 			 * This error code is generated when no response method is called
 			 * by the user during an action callback.
 			 */
-			ERROR__NO_RESPONSE = 0x03,
+			ERROR__ACTION_NO_RESPONSE = 0x03,
+			
+			ERROR__QUERY_ERROR_CODE = 0x04, ///< Query answer contains an more detailed error code
+			
+			ERROR__QUERY_TIMEOUT = 0x05, ///< Query timed out
+			
+			ERROR__QUERY_WRONG_PAYLOAD_LENGTH = 0x06, ///< Query answer has wrong payload length
+			
+			ERROR__QUERY_IN_PROGRESS = 0x07, ///< Query is already in progress
+			
+			ERROR__TRANSMITTER_BUSY = 0x08,	///< Interface is currently transmitting
+			
+			ERROR__MESSAGE_OVERWRITTEN = 0x09, ///< Another message will be transmitted before this one
 		};
 		
 		/**

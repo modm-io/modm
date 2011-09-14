@@ -176,8 +176,27 @@ namespace xpcc
 			inline void
 			call(const void *payload, const uint8_t length);
 			
-			uint8_t address;			//!< Address of transmitting chip
+			uint8_t address;			//!< Address of transmitting node
 			uint8_t command;
+			Callable *object;
+			Callback function;			//!< Method callActionback
+		};
+		
+		/**
+		 * \brief	Possible Error
+		 * 
+		 * \see		AMNB__ERROR()
+		 * \ingroup	amnb
+		 */
+		struct ErrorHandler
+		{
+			typedef void (Callable::*Callback)(Flags type, const uint8_t errorCode);
+			
+			inline void
+			call(Flags type, const uint8_t errorCode);
+			
+			uint8_t address;			//!< Node address of message
+			uint8_t command;			//!< Command of message
 			Callable *object;
 			Callback function;			//!< Method callActionback
 		};
@@ -193,8 +212,13 @@ namespace xpcc
 		 *     AMNB__ACTION(0x57, object, Object::method1,  0),
 		 *     AMNB__ACTION(0x03, object, Object::method2,  2),
 		 * };
-		 * 
+		 * // optional
 		 * FLASH_STORAGE(xpcc::amnb::Listener listenList[]) =
+		 * {
+		 *     AMNB__LISTEN(0x29, 0x46,	object, Object::method)
+		 * };
+		 * // also optional
+		 * FLASH_STORAGE(xpcc::amnb::ErrorHandler errorHandlerList[]) =
 		 * {
 		 *     AMNB__LISTEN(0x29, 0x46,	object, Object::method)
 		 * };
@@ -206,8 +230,11 @@ namespace xpcc
 		 *     Node node(0x02,
 		 *               xpcc::accessor::asFlash(actionList),
 		 *               sizeof(actionList) / sizeof(xpcc::amnb::Action),
+		 *				 // optional
 		 *               xpcc::accessor::asFlash(listenList),
-		 *               sizeof(listenList) / sizeof(xpcc::amnb::Listener));
+		 *               sizeof(listenList) / sizeof(xpcc::amnb::Listener),
+		 *               xpcc::accessor::asFlash(errorHandlerList),
+		 *               sizeof(errorHandlerList) / sizeof(xpcc::amnb::ErrorHandler));
 		 *     
 		 *     while(1)
 		 *     {
@@ -226,7 +253,7 @@ namespace xpcc
 		{
 		public:
 			/**
-			 * \brief	Initialize the slave
+			 * \brief	Initialize the node
 			 * 
 			 * \param	address		Own address
 			 * \param	actionList	List of all action callbacks, need to be
@@ -235,58 +262,79 @@ namespace xpcc
 			 * \param	listenList	List of all listener callbacks, need to be
 			 * 						stored in flash-memory
 			 * \param	listenCount	Number of entries in \a listenList
+			 * \param	errorHandlerList	List of all error handler callbacks,
+			 *								need to be stored in flash-memory
+			 * \param	errorHandlerCount	Number of entries in \a errorHandlerList
 			 *
-			 * \see		amnb::xpcc::Action
 			 * \see		AMNB__ACTION()
+			 * \see		AMNB__LISTEN()
+			 * \see		AMNB__ERROR()
+			 */
+			Node(uint8_t address, xpcc::accessor::Flash<Action> actionList, uint8_t actionCount,
+				 xpcc::accessor::Flash<Listener> listenList, uint8_t listenCount,
+				 xpcc::accessor::Flash<ErrorHandler> errorHandlerList, uint8_t errorHandlerCount);
+			
+			/**
+			 * \brief	Initialize the node without error handlers
 			 */
 			Node(uint8_t address, xpcc::accessor::Flash<Action> actionList, uint8_t actionCount,
 				 xpcc::accessor::Flash<Listener> listenList, uint8_t listenCount);
 			
 			/**
+			 * \brief	Initialize the node without listeners or error handlers
+			 */
+			Node(uint8_t address, xpcc::accessor::Flash<Action> actionList, uint8_t actionCount);
+			
+			/**
 			 * \brief	Start a new query with a payload
 			 * 
 			 * \param slaveAddress	
-			 * \param command		
-			 * \param payload		
+			 * \param command
+			 * \param payload
 			 * \param responseLength	Expected payload length of the response
+			 * \return \c true if no error occured
 			 */
 			template <typename T>
-			void
+			bool
 			query(uint8_t slaveAddress, uint8_t command,
 				  const T& payload, uint8_t responseLength);
 			
 			/**
 			 * \brief	Start a new query without any payload
-			 * 
+			 *
+			 * \return \c true if no error occured
 			 */
-			void
+			bool
 			query(uint8_t slaveAddress, uint8_t command, uint8_t responseLength);
 			
 			/**
 			 * \brief	Start a new broadcast with a payload
-			 * 
-			 * \param command		
+			 *
+			 * \param command
 			 * \param payload
+			 * \return \c true if no error occured
 			 */
 			template <typename T>
-			void
+			bool
 			broadcast(uint8_t command, const T& payload);
 			
 			/**
 			 * \brief	Start a new broadcast with a payload
-			 * 
+			 *
 			 * \param command
 			 * \param payload
 			 * \param payloadLength
+			 * \return \c true if no error occured
 			 */
-			void
+			bool
 			broadcast(uint8_t command, const void *payload, uint8_t payloadLength);
 			
 			/**
 			 * \brief	Start a new query without any payload
-			 * 
+			 *
+			 * \return \c true if no error occured
 			 */
-			void
+			bool
 			broadcast(uint8_t command);
 			
 			bool
@@ -337,11 +385,17 @@ namespace xpcc
 			void
 			send(bool acknowledge, const void *payload, uint8_t payloadLength);
 			
+			bool
+			checkErrorHandlers(uint8_t address, uint8_t command, Flags type, uint8_t errorCode);
+			
+			
 			uint8_t ownAddress;
 			xpcc::accessor::Flash<Action> actionList;
 			uint8_t actionCount;
 			xpcc::accessor::Flash<Listener> listenList;
 			uint8_t listenCount;
+			xpcc::accessor::Flash<ErrorHandler> errorHandlerList;
+			uint8_t errorHandlerCount;
 			
 			uint8_t currentCommand;
 			Response response;
@@ -430,39 +484,35 @@ namespace xpcc
 	 * 
 	 * Example:
 	 * \code
-	 * class Sensor : public xpcc::amnb::Callable
+	 * class ListenToNodes : public xpcc::amnb::Callable
 	 * {
 	 * public:
 	 *     void
-	 *     doSomething(const uint32_t* parameter)
+	 *     listenToCommand(uint8_t *payload, const uint8_t length)
 	 *     {
 	 *         // ... do something useful ...
 	 *         
 	 *     }
 	 *     
 	 *     // ...
-	 *     
-	 * private:
-	 *     int8_t value;
 	 * };
 	 * 
-	 * Sensor sensor;
+	 * ListenToNodes listen;
 	 * 
 	 * FLASH_STORAGE(xpcc::amnb::Listener listenList[]) =
 	 * {
-	 *     AMNB__LISTEN(0x37, 0x57, sensor, Sensor::sendValue),
-	 *     AMNB__LISTEN(0x46, 0x03, sensor, Sensor::doSomething),
+	 *     AMNB__LISTEN(0x46, 0x03, listen, ListenToNodes::listenToCommand),
 	 * };
 	 * \endcode
 	 * 
 	 * A complete example is available in the \c example/amnb folder.
 	 * 
-	 * \param	address		Address of the transmitting chip
+	 * \param	address		Address of the transmitting node
 	 * \param	command		Command byte
 	 * \param	object		
 	 * \param	function	Member function of object
 	 * 
-	 * \see		xpcc::amnb::Action
+	 * \see		xpcc::amnb::Listener
 	 * \ingroup	amnb
 	 */
 	#define	AMNB__LISTEN(address, command, object, function)
@@ -472,6 +522,53 @@ namespace xpcc
 			command, \
 			static_cast<xpcc::amnb::Callable *>(&object), \
 			reinterpret_cast<xpcc::amnb::Listener::Callback>(&function) }
+#endif	// __DOXYGEN__
+
+
+#ifdef __DOXYGEN__
+	/**
+	 * \brief	Define a amnb::ErrorHandler
+	 * 
+	 * Example:
+	 * \code
+	 * class handleErrors : public xpcc::amnb::Callable
+	 * {
+	 * public:
+	 *     void
+	 *     errorForCommand(xpcc::amnb::Flags type, const uint8_t errorCode)
+	 *     {
+	 *         // ... do something useful with that information ...
+	 *         
+	 *     }
+	 *     
+	 *     // ...
+	 * };
+	 * 
+	 * handleErrors errorhandler;
+	 * 
+	 * FLASH_STORAGE(xpcc::amnb::Listener listenList[]) =
+	 * {
+	 *     AMNB__LISTEN(0x37, 0x57, errorhandler, handleErrors::errorForCommand),
+	 * };
+	 * \endcode
+	 * 
+	 * A complete example is available in the \c example/amnb folder.
+	 * 
+	 * \param	address		Node address of message
+	 * \param	command		Command of message
+	 * \param	object		
+	 * \param	function	Member function of object
+	 * 
+	 * \see		xpcc::amnb::ErrorHandler
+	 * \ingroup	amnb
+	 */
+	#define	AMNB__ERROR(address, command, object, function)
+#else
+	#define	AMNB__ERROR(address, command, object, function)	\
+		{	address, \
+			command, \
+			static_cast<xpcc::amnb::Callable *>(&object), \
+			reinterpret_cast<xpcc::amnb::ErrorHandler::Callback>(&function) }
 #endif	// __DOXYGEN__
 
 #include "node_impl.hpp"

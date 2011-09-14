@@ -117,12 +117,27 @@ namespace xpcc
 			static bool
 			read(char& c);
 			
+			/**
+			 * \brief	Check whether any errors occured during receiving
+			 *			Be aware that these indicate an error that occured
+			 *			somewhere since resetting the Error Flags (with 
+			 *			resetErrorFlags()), so you cannot tell which byte had
+			 *			the error.
+			 *
+			 * \return	\c 0 if no errors occured, otherwise a value that
+			 *			corresponds to the Error Flags in register A.
+			 */
 			static uint8_t
-			readError();
+			readErrorFlags();
 			
 			static void
-			resetError();
+			resetErrorFlags();
 			
+			/**
+			 * \brief	Empty the receive FIFO queue and UART buffer.
+			 *
+			 * \return	the size of the deleted FIFO queue.
+			 */
 			static uint8_t
 			flushReceiveBuffer();
 			

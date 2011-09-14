@@ -33,7 +33,7 @@
 #ifndef XPCC__HMC58_HPP
 #define XPCC__HMC58_HPP
 
-#include <xpcc/driver/i2c/device.hpp>
+#include <xpcc/driver/connectivity/i2c/device.hpp>
 
 namespace xpcc
 {

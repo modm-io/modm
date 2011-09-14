@@ -178,13 +178,13 @@ xpcc::atxmega::BufferedUartC1::read(char *buffer, uint8_t n)
 }
 
 uint8_t
-xpcc::atxmega::BufferedUartC1::readError()
+xpcc::atxmega::BufferedUartC1::readErrorFlags()
 {
 	return error;
 }
 
 void
-xpcc::atxmega::BufferedUartC1::resetError()
+xpcc::atxmega::BufferedUartC1::resetErrorFlags()
 {
 	error = 0;
 }

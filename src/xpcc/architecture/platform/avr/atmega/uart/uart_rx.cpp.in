@@ -117,13 +117,13 @@ xpcc::atmega::BufferedUart{{ id }}::read(char *buffer, uint8_t n)
 }
 
 uint8_t
-xpcc::atmega::BufferedUart{{ id }}::readError()
+xpcc::atmega::BufferedUart{{ id }}::readErrorFlags()
 {
 	return error;
 }
 
 void
-xpcc::atmega::BufferedUart{{ id }}::resetError()
+xpcc::atmega::BufferedUart{{ id }}::resetErrorFlags()
 {
 	error = 0;
 }

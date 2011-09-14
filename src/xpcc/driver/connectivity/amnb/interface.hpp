@@ -39,6 +39,9 @@
 #include <xpcc/workflow/timeout.hpp>
 #include <xpcc/architecture/driver/delay.hpp>
 #include <stdlib.h>
+// debug
+#include <xpcc/architecture/driver/clock.hpp>
+#include <xpcc/workflow/timestamp.hpp>
 
 #include "constants.hpp"
 
@@ -87,7 +90,7 @@ namespace xpcc
 			 * \param	*payload		data field
 			 * \param	payloadLength	size of the data field
 			 */
-			static void
+			static bool
 			sendMessage(uint8_t address, Flags flags, uint8_t command,
 					const void *payload, uint8_t payloadLength);
 			
@@ -95,14 +98,14 @@ namespace xpcc
 			 * \brief	Send a message
 			 */
 			template <typename T>
-			static void ALWAYS_INLINE
+			static bool ALWAYS_INLINE
 			sendMessage(uint8_t address, Flags flags, uint8_t command,
 					const T& payload);
 			
 			/**
 			 * \brief	Send a empty message
 			 */
-			static void ALWAYS_INLINE
+			static bool ALWAYS_INLINE
 			sendMessage(uint8_t address, Flags flags, uint8_t command);
 			
 			/**
@@ -112,6 +115,15 @@ namespace xpcc
 			 */
 			static inline bool
 			isMessageAvailable();
+			
+			static inline uint8_t
+			getTransmittedAddress();
+			
+			static inline uint8_t
+			getTransmittedCommand();
+			
+			static inline Flags
+			getTransmittedFlags();
 			
 			static inline uint8_t
 			getAddress();
@@ -141,7 +153,7 @@ namespace xpcc
 			 *			collision.
 			 */
 			static inline bool
-			hasMessageBeenTransmitted();
+			messageTransmitted();
 			
 			/**
 			 * \brief	Access the data of a received message
@@ -173,6 +185,9 @@ namespace xpcc
 			static void
 			update();
 			
+			static xpcc::Timestamp latency;
+			static uint8_t collisions;
+			
 		private:
 			static bool
 			writeMessage();
@@ -196,12 +211,13 @@ namespace xpcc
 			
 			static bool rescheduleTransmit;
 			static bool hasMessageToSend;
+			static bool messageSent;
 			static bool transmitting;
 			static xpcc::Timeout<> rescheduleTimer;
 			static uint8_t rescheduleTimeout;
 			// the probability for p-persistent CSMA
-			static const float pValue = 0.75;
-			static const uint8_t maxTimeOut = 12;
+			static const float pValue = 0.5f;
+			static const uint8_t maxTimeOut = 4;
 			
 			static State state;
 		};

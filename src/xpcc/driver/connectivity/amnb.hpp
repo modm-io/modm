@@ -36,14 +36,19 @@
  * \section amnb_intro	Introduction
  * 
  * The AMNB (<b>A</b>synchronous <b>M</b>ulti-<b>N</b>ode <b>B</b>us) is a
- * multi-master bus system. It is primarily used to query simple sensors and
- * control actuators inside our robots.
+ * multi-master bus system, using p-persitent CSMA to send messages.
  * 
  * One bus can be populated with up to 32 nodes. The nodes can be queried for
  * data and they will respond like an APB Slave, and can query data from other
  * nodes like an APB Master, or they can just broadcast a message.
  * Each node can listen to all the responses and broadcasts and store that
  * information for its purpose.
+ *
+ * Action callbacks to query requests can be defined as well as universal
+ * callbacks to any transmitted messaged (Listener callbacks).
+ * As an optional advanced feature, error handling callbacks can also be defined,
+ * which fire if messaged have not been able to be sent, or requests timed out
+ * or misbehaved in other manners, or other nodes query unavailable information.
  * 
  * \section amnb_protocol Protocol
  * 
@@ -98,19 +103,17 @@
  * CAN transceivers have the advantage to work without a separate direction input.
  * You can just connected the transceiver directly to the UART of your
  * microcontroller.
+ * These are identical to the APB CAN electrical characteristics.
  * You have to use the CAN transceivers, otherwise it cannot be determined, if
  * the bus is busy or available for transmission.
  * 
- * \image html apb_external.png
- * 
- * 
- * \author	Fabian Greif, Niklas Hauser
+ * \author	Fabian Greif
+ * \author	Niklas Hauser
  */
 
 #ifndef XPCC__AMNB_HPP
 #define XPCC__AMNB_HPP
 
-#include "amnb/interface.hpp"
 #include "amnb/node.hpp"
 
 #endif	// XPCC__AMNB_HPP

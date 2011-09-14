@@ -31,11 +31,11 @@
 // ----------------------------------------------------------------------------
 
 #ifndef	XPCC_AMNB__INTERFACE_HPP
-	#error	"Don't include this file directly, use 'interface.hpp' instead!"
+#	error	"Don't include this file directly, use 'interface.hpp' instead!"
 #endif
 
 #ifdef __AVR__
-	#include <util/crc16.h>
+#	include <util/crc16.h>
 #endif
 
 uint8_t
@@ -101,6 +101,16 @@ xpcc::Timeout<> xpcc::amnb::Interface<Device>::rescheduleTimer;
 template <typename Device>
 uint8_t xpcc::amnb::Interface<Device>::rescheduleTimeout;
 
+template <typename Device>
+bool xpcc::amnb::Interface<Device>::messageSent = false;
+
+// debug
+template <typename Device>
+xpcc::Timestamp xpcc::amnb::Interface<Device>::latency;
+
+template <typename Device>
+uint8_t xpcc::amnb::Interface<Device>::collisions;
+
 // ----------------------------------------------------------------------------
 
 template <typename Device>
@@ -121,7 +131,7 @@ xpcc::amnb::Interface<Device>::writeMessage()
 {
 	char check;
 	transmitting = true;
-	Device::resetError();
+	Device::resetErrorFlags();
 	
 	for (uint_fast8_t i=0; i < lengthOfTransmitMessage; ++i) {
 		Device::write(tx_buffer[i]);
@@ -131,31 +141,39 @@ xpcc::amnb::Interface<Device>::writeMessage()
 		while (!Device::read(check) && (++count <= 1000)) ;
 		
 		// if the read timed out or framing error occured or content mismatch
-		if ((count > 1000) || Device::readError() || (check != tx_buffer[i])) {
+		if ((count > 1000) || Device::readErrorFlags() || (check != tx_buffer[i])) {
 			// stop transmitting, signal the collision
 			transmitting = false;
 			rescheduleTransmit = true;
-			Device::resetError();
+			Device::resetErrorFlags();
 			// and wait for a random amount of time before sending again
 			rescheduleTimer.restart(rescheduleTimeout % maxTimeOut);
+			
+			++collisions;
 			return false;
 		}
 	}
 	
+	latency = xpcc::Clock::now() - latency;
+	
+	messageSent = true;
 	hasMessageToSend = false;
 	transmitting = false;
 	return true;
 }
 
 template <typename Device>
-void
+bool
 xpcc::amnb::Interface<Device>::sendMessage(uint8_t address, Flags flags, 
 		uint8_t command,
 		const void *payload, uint8_t payloadLength)
 {
-	if (transmitting) return; // dont overwrite the buffer when transmitting
+	if (transmitting) return false; // dont overwrite the buffer when transmitting
 	hasMessageToSend = false;
+	messageSent = false;
 	uint8_t crc;
+	
+	latency = xpcc::Clock::now(); // debug
 	
 	tx_buffer[0] = syncByte;
 	tx_buffer[1] = payloadLength;
@@ -167,7 +185,7 @@ xpcc::amnb::Interface<Device>::sendMessage(uint8_t address, Flags flags,
 	crc = crcUpdate(crc, command);
 	
 	const uint8_t *ptr = static_cast<const uint8_t *>(payload);
-	uint8_t i=0;
+	uint_fast8_t i=0;
 	for (i = 0; i < payloadLength; ++i)
 	{
 		crc = crcUpdate(crc, *ptr);
@@ -179,24 +197,25 @@ xpcc::amnb::Interface<Device>::sendMessage(uint8_t address, Flags flags,
 	
 	lengthOfTransmitMessage = payloadLength + 5;
 	hasMessageToSend = true;
+	return true;
 }
 
 template <typename Device> template <typename T>
-void
+bool
 xpcc::amnb::Interface<Device>::sendMessage(uint8_t address, Flags flags,
 		uint8_t command,
 		const T& payload)
 {
-	sendMessage(address, flags,
+	return sendMessage(address, flags,
 				command,
 				reinterpret_cast<const void *>(&payload), sizeof(T));
 }
 
 template <typename Device>
-void
+bool
 xpcc::amnb::Interface<Device>::sendMessage(uint8_t address, Flags flags, uint8_t command)
 {
-	sendMessage(address, flags,
+	return sendMessage(address, flags,
 				command,
 				0, 0);
 }
@@ -208,6 +227,27 @@ bool
 xpcc::amnb::Interface<Device>::isMessageAvailable()
 {
 	return (lengthOfReceivedMessage != 0);
+}
+
+template <typename Device>
+uint8_t
+xpcc::amnb::Interface<Device>::getTransmittedAddress()
+{
+	return (tx_buffer[0] & 0x3f);
+}
+
+template <typename Device>
+uint8_t
+xpcc::amnb::Interface<Device>::getTransmittedCommand()
+{
+	return tx_buffer[1];
+}
+
+template <typename Device>
+xpcc::amnb::Flags
+xpcc::amnb::Interface<Device>::getTransmittedFlags()
+{
+	return static_cast<Flags>(tx_buffer[0] & 0xc0);
 }
 
 template <typename Device>
@@ -247,9 +287,9 @@ xpcc::amnb::Interface<Device>::isBusAvailable()
 
 template <typename Device>
 bool
-xpcc::amnb::Interface<Device>::hasMessageBeenTransmitted()
+xpcc::amnb::Interface<Device>::messageTransmitted()
 {
-	return !hasMessageToSend;
+	return messageSent;
 }
 
 template <typename Device>
@@ -282,16 +322,17 @@ xpcc::amnb::Interface<Device>::update()
 	char byte;
 	while (Device::read(byte))
 	{
-		if (Device::readError()) {
+		if (Device::readErrorFlags()) {
 			// collision has been detected
 			rescheduleTransmit = true;
-			Device::resetError();
+			Device::resetErrorFlags();
 			// erase the message in the buffer
 			Device::flushReceiveBuffer();
 			// and wait for a random amount of time before sending again
 			rescheduleTimeout = static_cast<uint8_t>(rand());
 			rescheduleTimer.restart(rescheduleTimeout % maxTimeOut);
 			state = SYNC;
+			++collisions; // debug
 			return;
 		}
 		

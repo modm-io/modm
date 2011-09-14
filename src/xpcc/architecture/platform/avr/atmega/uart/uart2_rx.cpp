@@ -121,13 +121,13 @@ xpcc::atmega::BufferedUart2::read(char *buffer, uint8_t n)
 }
 
 uint8_t
-xpcc::atmega::BufferedUart2::readError()
+xpcc::atmega::BufferedUart2::readErrorFlags()
 {
 	return error;
 }
 
 void
-xpcc::atmega::BufferedUart2::resetError()
+xpcc::atmega::BufferedUart2::resetErrorFlags()
 {
 	error = 0;
 }
