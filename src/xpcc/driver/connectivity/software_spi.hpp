@@ -46,7 +46,7 @@ namespace xpcc
 	 * \tparam	Clk			clock pin [output]
 	 * \tparam	Mosi		master out slave in pin [output]
 	 * \tparam	Miso		master in slave out pin [input]
-	 * \tparam	Frequency	requested SPI frequency in Hz
+	 * \tparam	Frequency	requested SPI frequency in Hz (default = 2 MHz)
 	 * 
 	 * \ingroup	connectivity
 	 * \see		gpio
@@ -54,7 +54,7 @@ namespace xpcc
 	template< typename Clk,
 			  typename Mosi,
 			  typename Miso,
-			  int32_t Frequency = 1000000 >
+			  int32_t Frequency = 2000000UL >
 	class SoftwareSpi
 	{
 	public:

@@ -52,19 +52,19 @@ namespace xpcc
 	class Mcp23s17
 	{
 	public:
-		void
+		static void
 		initialize();
 		
-		void
+		static void
 		configure(uint16_t inputMask, uint16_t pullupMask);
 		
 		//void
 		//configureInterrupt();
 		
-		uint16_t
+		static uint16_t
 		read();
 		
-		void
+		static void
 		write(uint16_t output);
 		
 	protected:

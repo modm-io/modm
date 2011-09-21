@@ -1884,7 +1884,7 @@ void get_fileinfo (		/* No return code */
 	*p = 0;		/* Terminate SFN str by a \0 */
 
 #if _USE_LFN
-	if (fno->lfname && fno->lfsize) {
+	if ((fno->lfname != 0) && (fno->lfsize != 0)) {
 		TCHAR *tp = fno->lfname;
 		WCHAR w, *lfn;
 
@@ -3010,7 +3010,7 @@ FRESULT f_readdir (
 
 	res = validate(dj->fs, dj->id);			/* Check validity of the object */
 	if (res == FR_OK) {
-		if (!fno) {
+		if (fno == 0) {
 			res = dir_sdi(dj, 0);			/* Rewind the directory object */
 		} else {
 			INIT_BUF(*dj);

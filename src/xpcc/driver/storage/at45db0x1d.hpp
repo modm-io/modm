@@ -37,7 +37,7 @@ namespace xpcc
 {
 	/**
 	 * \see		At45db0x1d
-	 * \ingroup	memory
+	 * \ingroup	storage
 	 */
 	namespace at45db
 	{
@@ -74,7 +74,7 @@ namespace xpcc
 	 * \see		at45db
 	 * \see		<a href="http://www.atmel.com/dyn/resources/prod_documents/doc3595.pdf">Datasheet</a>
 	 * 
-	 * \ingroup	memory
+	 * \ingroup	storage
 	 * \author	Fabian Greif
 	 */
 	template <typename Spi, typename Cs>

@@ -40,7 +40,7 @@
 
 /**
  * \ingroup		driver
- * \defgroup	memory		Memory
+ * \defgroup	storage		Storage
  * 
  * Driver for SPI Flash, SPI RAM, I2C Eeprom, SD card etc.
  */

@@ -33,6 +33,8 @@
 #ifndef XPCC__SPI_RAM_HPP
 #define XPCC__SPI_RAM_HPP
 
+#include <stdint.h>
+
 namespace xpcc
 {
 	/**
@@ -45,7 +47,7 @@ namespace xpcc
 	 * 
 	 * \see		<a href="http://ww1.microchip.com/downloads/en/DeviceDoc/22100D.pdf">Datasheet</a>
 	 * 
-	 * \ingroup	memory
+	 * \ingroup	storage
 	 * \author	Fabian Greif
 	 */
 	template <typename Spi, typename Cs, typename Hold>

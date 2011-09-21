@@ -130,10 +130,11 @@ xpcc::IOStream::writeInteger(uint32_t value)
 	// Uses the optimized non standard function 'ultoa()' which is
 	// not always available.
 	this->device->write(ultoa(value, buffer, 10));
+#elif defined(XPCC__CPU_ARM)
+	snprintf(buffer, sizeof(buffer), "%lu", value);
+	this->device->write(buffer);
 #else
 	snprintf(buffer, sizeof(buffer), "%u", value);
-	
-	// write string
 	this->device->write(buffer);
 #endif
 }

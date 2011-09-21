@@ -3,12 +3,12 @@
 #include <xpcc/workflow.hpp>
 #include <xpcc/debug.hpp>
 
-#include <xpcc/driver/button_group.hpp>
-#include <xpcc/driver/software_spi.hpp>
 #include <xpcc/driver/gpio.hpp>
+#include <xpcc/driver/connectivity/software_spi.hpp>
 
-#include <xpcc/driver/lcd/ea_dog.hpp>
-#include <xpcc/driver/lcd/font.hpp>
+#include <xpcc/driver/ui/button_group.hpp>
+#include <xpcc/driver/ui/display/ea_dog.hpp>
+#include <xpcc/driver/ui/display/font.hpp>
 
 #include <xpcc/workflow/freertos.hpp>
 
@@ -39,12 +39,12 @@ typedef xpcc::gpio::Invert<LedStatInverted> LedStat;
 
 // ----------------------------------------------------------------------------
 GPIO__INPUT(ButtonWakeUpInverted, A, 0);		// inverted, 0=pressed, 1=not pressed
-GPIO__INPUT(Button1Inverted, C, 8);
-GPIO__INPUT(Button2Inverted, C, 9);
+/*GPIO__INPUT(Button1Inverted, C, 8);
+GPIO__INPUT(Button2Inverted, C, 9);*/
 
 typedef xpcc::gpio::Invert<ButtonWakeUpInverted> ButtonWakeUp;
-typedef xpcc::gpio::Invert<Button1Inverted> Button1;
-typedef xpcc::gpio::Invert<Button2Inverted> Button2;
+/*typedef xpcc::gpio::Invert<Button1Inverted> Button1;
+typedef xpcc::gpio::Invert<Button2Inverted> Button2;*/
 
 //#define	BUTTON1		0x1
 //static xpcc::ButtonGroup<uint32_t> button(BUTTON1);
@@ -105,7 +105,7 @@ pitHandler(void)
 
 #define	LED_GREEN		0x80
 
-xpcc::freertos::BinarySemaphore event;
+/*xpcc::freertos::BinarySemaphore event;
 
 // ----------------------------------------------------------------------------
 class LedTask1 : public xpcc::freertos::Task
@@ -122,8 +122,6 @@ public:
 		while (1)
 		{
 			Led2::toggle();
-			this->delay(100 * MILLISECONDS);
-			
 			event.acquire();
 		}
 	}
@@ -179,7 +177,40 @@ public:
 
 LedTask1 task1;
 LedTask2 task2;
-DisplayTask task3;
+DisplayTask task3;*/
+
+#include <libmaple/systick.h>
+#include <fatfs/ff.h>
+
+extern void
+disk_timerproc (void);
+
+void systick_timer(void)
+{
+	static uint16_t cnt=0;
+	static uint8_t cntdiskio=0;
+
+	cnt++;
+	if( cnt >= 500 ) {
+		cnt = 0;
+		// alive sign
+		Led1::toggle();
+	}
+	
+	cntdiskio++;
+	if ( cntdiskio >= 10 ) {
+		cntdiskio = 0;
+		disk_timerproc(); /* to be called every 10ms */
+	}
+
+	//ff_test_term_timerproc(); /* to be called every ms */
+}
+
+FATFS fileSystem;
+FIL file;
+DIR dir;
+FILINFO fno;
+FRESULT rc;
 
 // ----------------------------------------------------------------------------
 int
@@ -190,8 +221,8 @@ main(void)
 	Led2::setOutput(xpcc::gpio::LOW);
 	
 	ButtonWakeUp::setInput();
-	Button1Inverted::setInput(xpcc::stm32::INPUT, xpcc::stm32::PULLUP);
-	Button2Inverted::setInput(xpcc::stm32::INPUT, xpcc::stm32::PULLUP);
+	//Button1Inverted::setInput(xpcc::stm32::INPUT, xpcc::stm32::PULLUP);
+	//Button2Inverted::setInput(xpcc::stm32::INPUT, xpcc::stm32::PULLUP);
 	
 	display.initialize();
 	
@@ -203,10 +234,6 @@ main(void)
 	
 	display.setFont(xpcc::font::FixedWidth5x8);
 	
-	//display.setCursor(0, 40);
-	//display << event.handle;
-	//display.update();
-	
 	// IO-Expander have to initalized after LCD because they use the same
 	// Reset line
 	gpioExpander.initialize();
@@ -217,10 +244,82 @@ main(void)
 	
 	LedStat::reset();
 	
+	systick_attach_callback(&systick_timer);
+	
 	// Start the FreeRTOS scheduler
-	xpcc::freertos::Scheduler::schedule();
+	//xpcc::freertos::Scheduler::schedule();
+	
+	// mount the SD card (any drive number will map to the SD card)
+	XPCC_LOG_DEBUG << "mount file system" << xpcc::endl;
+	f_mount(0, &fileSystem);
+	
+	// Directory testing
+	XPCC_LOG_DEBUG << "Open root directory " << xpcc::endl;
+	rc = f_opendir(&dir, "");
+	
+	if (!rc) {
+		XPCC_LOG_DEBUG << " OK" << xpcc::endl;
+	}
+	else {
+		XPCC_LOG_DEBUG << " Error=" << rc << xpcc::endl;
+	}
+	
+	XPCC_LOG_DEBUG << "\nDirectory listing" << xpcc::endl;
+	for (;;)
+	{
+		rc = f_readdir(&dir, &fno); // Read a directory item
+		if (rc || !fno.fname[0]) {
+			break; // Error or end of dir
+		}
+		
+		if (fno.fattrib & AM_DIR) {
+			XPCC_LOG_DEBUG << "   [dir]  " << fno.fname << xpcc::endl; // is Directory
+		}
+		else {
+			XPCC_LOG_DEBUG.printf("%8lu  %s\n", fno.fsize, fno.fname); // is file
+		}
+	}
+
+	if (!rc) {
+		XPCC_LOG_DEBUG << "Listing Dir complete" << xpcc::endl;
+	}
+	else {
+		XPCC_LOG_DEBUG << "Listing Dir Failure...error = " << rc << xpcc::endl;
+	}
+	
+	XPCC_LOG_DEBUG << "open file" << xpcc::endl;
+	FRESULT res = f_open(&file, "test1.txt", FA_READ);
+	if (res) {
+		XPCC_LOG_DEBUG << "could not open file!" << xpcc::endl;
+	}
+	else {
+		XPCC_LOG_DEBUG << "Read file:" << xpcc::endl;
+		while (1) {
+			char buffer[128];
+			size_t bytesRead;
+			
+			res = f_read(&file, buffer, sizeof(buffer), &bytesRead);
+			
+			if (res || (bytesRead == 0)) {
+				break;
+			}
+			
+			for (uint32_t i = 0; i < bytesRead; ++i) {
+				XPCC_LOG_DEBUG << buffer[i];
+			}
+		}
+		XPCC_LOG_DEBUG << "eof" << xpcc::endl;
+	}
+	f_close(&file);
+	
+	f_mount(0, NULL);
 	
 	while (1)
 	{
+		display.setCursor(0, 16);
+		display << "sw  = " << xpcc::hex << gpioExpander.read() << xpcc::ascii;
+		display.update();
+		
+		//Led1::set(ButtonWakeUp::read());
 	}
 }

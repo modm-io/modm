@@ -48,7 +48,7 @@ namespace xpcc
 24xx256	- base address 0xA0
 \endverbatim
 	 * 
-	 * \ingroup	memory
+	 * \ingroup	storage
 	 * \author	Fabian Greif
 	 */
 	template <typename I2C>

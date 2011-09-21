@@ -34,7 +34,7 @@
 
 #include "iostream.hpp"
 
-void
+xpcc::IOStream&
 xpcc::IOStream::printf(const char *fmt, ...)
 {
 	va_list ap;
@@ -184,5 +184,6 @@ xpcc::IOStream::printf(const char *fmt, ...)
 	}
 	
 	va_end(ap);
+	return *this;
 }
 

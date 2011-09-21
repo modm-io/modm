@@ -50,7 +50,7 @@ namespace xpcc
 	class Mcp23s08
 	{
 	public:
-		void
+		static void
 		initialize();
 		
 		/**
@@ -59,16 +59,16 @@ namespace xpcc
 		 * @param	inputMask	1=Input, 0=Output
 		 * @param	pullupMask	1=Pullup, 0=Pullup-Disabled
 		 */
-		void
+		static void
 		configure(uint8_t inputMask, uint8_t pullupMask);
 		
 		//void
 		//configureInterrupt();
 		
-		uint8_t
+		static uint8_t
 		read();
 		
-		void
+		static void
 		write(uint8_t output);
 		
 	protected:

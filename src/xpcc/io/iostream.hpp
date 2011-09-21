@@ -316,7 +316,7 @@ namespace xpcc
 		 * 
 		 * @param	fmt		Format string
 		 */
-		void
+		IOStream&
 		printf(const char* fmt, ...);
 		
 	protected :

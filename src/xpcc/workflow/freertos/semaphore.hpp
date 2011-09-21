@@ -140,8 +140,6 @@ namespace xpcc
 			// disable assignment operator
 			Semaphore &
 			operator = (const Semaphore&);
-			
-			xSemaphoreHandle handle;
 		};
 		
 		// --------------------------------------------------------------------
@@ -164,9 +162,6 @@ namespace xpcc
 			// disable assignment operator
 			BinarySemaphore &
 			operator = (const BinarySemaphore&);
-			
-		public:
-			xSemaphoreHandle handle;
 		};
 	}
 }

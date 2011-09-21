@@ -3,6 +3,11 @@
 /-----------------------------------------------------------------------*/
 
 #ifndef _DISKIO
+#define _DISKIO
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #define _READONLY	0	/* 1: Remove write functions */
 #define _USE_IOCTL	1	/* 1: Use disk_ioctl fucntion */
@@ -26,7 +31,7 @@ typedef enum {
 /*---------------------------------------*/
 /* Prototypes for disk control functions */
 
-int assign_drives (int, int);
+//int assign_drives (int, int);
 DSTATUS disk_initialize (BYTE);
 DSTATUS disk_status (BYTE);
 DRESULT disk_read (BYTE, BYTE*, DWORD, BYTE);
@@ -74,5 +79,8 @@ DRESULT disk_ioctl (BYTE, BYTE, void*);
 #define NAND_FORMAT			30	/* Create physical format */
 
 
-#define _DISKIO
+#ifdef __cplusplus
+}
+#endif
+
 #endif

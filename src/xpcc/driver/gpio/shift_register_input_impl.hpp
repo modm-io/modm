@@ -5,7 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- *
+ * 
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -30,52 +30,73 @@
  */
 // ----------------------------------------------------------------------------
 
-#include "semaphore.hpp"
+#ifndef XPCC__SHIFT_REGISTER_INPUT_HPP
+	#error	"Don't include this file directly, use 'shift_register_input.hpp' instead!"
+#endif
 
 // ----------------------------------------------------------------------------
-xpcc::freertos::SemaphoreBase::~SemaphoreBase()
-{
-	// As semaphores are based on queues we use the queue functions to delete
-	// the semaphore
-	vQueueDelete(this->handle);
-}
+/*
+ * 74HC165
+ * 
+ * Low level at SH/!LD (= Load) loads input into shift registers. Low-to-high
+ * transition shifts values into the next stage.
+ * 
+ * Load must be low for at least 20n at 4,5V and 100ns at 2V
+ * 
+ * ClkInh (= CS) must be held low for clk to be active.
+ * 
+ * 74HC125 can be used to disable the Dout Output (Tri-State).
+ */
+// ----------------------------------------------------------------------------
+template <typename Spi,	typename Load, size_t N>
+Spi xpcc::ShiftRegisterInput<Spi, Load, N>::spi;
+
+template <typename Spi,	typename Load, size_t N>
+Load xpcc::ShiftRegisterInput<Spi, Load, N>::load;
+
+template <typename Spi,	typename Load, size_t N>
+uint8_t xpcc::ShiftRegisterInput<Spi, Load, N>::value[N];
 
 // ----------------------------------------------------------------------------
-bool
-xpcc::freertos::SemaphoreBase::acquire(portTickType timeout)
-{
-	
-	return (xSemaphoreTake(this->handle, timeout) == pdTRUE);
-}
-
+template <typename Spi,	typename Load, size_t N>
 void
-xpcc::freertos::SemaphoreBase::release()
+xpcc::ShiftRegisterInput<Spi, Load, N>::initialize()
 {
-	xSemaphoreGive(this->handle);
+	spi.initialize();
+	store.setOutput(xpcc::gpio::LOW);
+	
+	for (uint_fast8_t i = 0; i < N; ++i) {
+		cache[i] = 0;
+	}
 }
 
+// ----------------------------------------------------------------------------
+template <typename Spi, typename Store, size_t N>
+const uint8_t&
+xpcc::ShiftRegisterInput<Spi, Store, N>::operator [] (uint_fast8_t port) const
+{
+	return cache[port];
+}
+
+// ----------------------------------------------------------------------------
+template <typename Spi, typename Store, size_t N>
+uint8_t&
+xpcc::ShiftRegisterInput<Spi, Store, N>::operator [] (uint_fast8_t port)
+{
+	return cache[port];
+}
+
+// ----------------------------------------------------------------------------
+template <typename Spi,	typename Load, size_t N>
 void
-xpcc::freertos::SemaphoreBase::releaseFromInterrupt()
+xpcc::ShiftRegisterInput<Spi, Load, N>::update()
 {
-	portBASE_TYPE taskWoken = pdFALSE;
+	/* Load Parallel */
+	store.set();
+	// FIXME delay 20-100ns
+	store.reset();
 	
-	xSemaphoreGiveFromISR(this->handle, &taskWoken);
-	
-	// Request a context switch when the IRQ ends if a higher priorty has
-	// been woken.
-	portEND_SWITCHING_ISR(taskWoken);
+	for (int_fast8_t i = N-1; i >= 0; --i) {
+		cache[i] = spi.write(0);
+	}
 }
-
-// ----------------------------------------------------------------------------
-xpcc::freertos::Semaphore::Semaphore(unsigned portBASE_TYPE max,
-		unsigned portBASE_TYPE initial)
-{
-	this->handle = xSemaphoreCreateCounting(max, initial);
-}
-
-// ----------------------------------------------------------------------------
-xpcc::freertos::BinarySemaphore::BinarySemaphore()
-{
-	vSemaphoreCreateBinary(this->handle);
-}
-

@@ -1,7 +1,7 @@
 
 #include <xpcc/architecture.hpp>
 #include <xpcc/driver/connectivity/i2c/software_i2c.hpp>
-#include <xpcc/driver/memory/i2c_eeprom.hpp>
+#include <xpcc/driver/storage/i2c_eeprom.hpp>
 
 #include <xpcc/io/iostream.hpp>
 

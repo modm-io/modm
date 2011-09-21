@@ -5,7 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- *
+ * 
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -30,51 +30,67 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <stdint.h>
-
-#include <xpcc/debug/logger.hpp>
-#include <xpcc_config.hpp>
+#ifndef XPCC__SHIFT_REGISTER_OUTPUT_HPP
+	#error	"Don't include this file directly, use 'shift_register_output.hpp' instead!"
+#endif
 
 // ----------------------------------------------------------------------------
-extern "C"
+/*
+ * 74HC595
+ * 
+ * Data is moved to the output registers on a low-to-high transition of
+ * RCLK (= Store). 
+ */
+// ----------------------------------------------------------------------------
+template <typename Spi, typename Store, size_t N>
+Spi xpcc::ShiftRegisterOutput<Spi, Store, N>::spi;
+
+template <typename Spi, typename Store, size_t N>
+Store xpcc::ShiftRegisterOutput<Spi, Store, N>::store;
+
+template <typename Spi, typename Store, size_t N>
+uint8_t xpcc::ShiftRegisterOutput<Spi, Store, N>::value[N];
+
+// ----------------------------------------------------------------------------
+template <typename Spi, typename Store, size_t N>
 void
-_hardFaultHandler(const uint32_t * ctx)
+xpcc::ShiftRegisterOutput<Spi, Store, N>::initialize()
 {
-#if CORTEX_ENABLE_HARD_FAULT_HANDLER != 0
-#undef XPCC_LOG_LEVEL
-#define XPCC_LOG_LEVEL	xpcc::log::ERROR
+	spi.initialize();
+	store.setOutput(xpcc::gpio::LOW);
 	
-	uint32_t stacked_r0 = ((uint32_t) ctx[0]);
-	uint32_t stacked_r1 = ((uint32_t) ctx[1]);
-	uint32_t stacked_r2 = ((uint32_t) ctx[2]);
-	uint32_t stacked_r3 = ((uint32_t) ctx[3]);
-	
-	uint32_t stacked_r12 = ((uint32_t) ctx[4]);
-	uint32_t stacked_lr  = ((uint32_t) ctx[5]);
-	uint32_t stacked_pc  = ((uint32_t) ctx[6]);
-	uint32_t stacked_psr = ((uint32_t) ctx[7]);
-	
-	uint32_t bfar = (*((volatile uint32_t *)(0xE000ED38)));
-	uint32_t cfsr = (*((volatile uint32_t *)(0xE000ED28)));
-	uint32_t hfsr = (*((volatile uint32_t *)(0xE000ED2C)));
-	uint32_t dfsr = (*((volatile uint32_t *)(0xE000ED30)));
-	uint32_t afsr = (*((volatile uint32_t *)(0xE000ED3C)));
-	
-	XPCC_LOG_ERROR.printf("\n\nHard fault Exception:\n");
-	XPCC_LOG_ERROR.printf("r0 : 0x%08lx   r12 : 0x%08lx\n", stacked_r0, stacked_r12);
-	XPCC_LOG_ERROR.printf("r1 : 0x%08lx   lr  : 0x%08lx\n", stacked_r1, stacked_lr);
-	XPCC_LOG_ERROR.printf("r2 : 0x%08lx   pc  : 0x%08lx\n", stacked_r2, stacked_pc);
-	XPCC_LOG_ERROR.printf("r3 : 0x%08lx   psr : 0x%08lx\n", stacked_r3, stacked_psr);
-	XPCC_LOG_ERROR.printf("BFAR : 0x%08lx\n", bfar);
-	XPCC_LOG_ERROR.printf("CFSR : 0x%08lx\n", cfsr);
-	XPCC_LOG_ERROR.printf("HFSR : 0x%08lx\n", hfsr);
-	XPCC_LOG_ERROR.printf("DFSR : 0x%08lx\n", dfsr);
-	XPCC_LOG_ERROR.printf("AFSR : 0x%08lx\n", afsr);
-#endif
-	
-	// Infinite loop
-	while (1)
-	{
+	for (uint_fast8_t i = 0; i < N; ++i) {
+		cache[i] = 0;
 	}
 }
 
+// ----------------------------------------------------------------------------
+template <typename Spi, typename Store, size_t N>
+const uint8_t&
+xpcc::ShiftRegisterOutput<Spi, Store, N>::operator [] (uint_fast8_t port) const
+{
+	return cache[port];
+}
+
+// ----------------------------------------------------------------------------
+template <typename Spi, typename Store, size_t N>
+uint8_t&
+xpcc::ShiftRegisterOutput<Spi, Store, N>::operator [] (uint_fast8_t port)
+{
+	return cache[port];
+}
+
+// ----------------------------------------------------------------------------
+template <typename Spi, typename Store, size_t N>
+void
+xpcc::ShiftRegisterOutput<Spi, Store, N>::update()
+{
+	for (int_fast8_t i = N-1; i >= 0; --i) {
+		spi.write(cache[i]);
+	}
+	
+	// Pulse the hc595 store clock to load the shifted bits
+	store.set();
+	// FIXME delay 20-100ns
+	store.reset();
+}
