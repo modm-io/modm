@@ -122,7 +122,7 @@ _at91Init(void)
 	// (here we're extra conservative setting clock cycles equal to 2us)
 	flashParameter |= ((F_CPU * 2 / 1000L) << 16) & AT91C_MC_FMCN;
 	
-#if defined(__AT91SAM7S512__) || defined(__AT91SAM7X512__)
+#if defined(__ARM_AT91SAM7S512__) || defined(__ARM_AT91SAM7X512__)
 	AT91C_BASE_EFC0->EFC_FMR = flashParameter;
 	AT91C_BASE_EFC1->EFC_FMR = flashParameter;
 #else

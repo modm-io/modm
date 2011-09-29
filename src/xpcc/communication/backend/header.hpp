@@ -66,13 +66,13 @@ namespace xpcc
 		{
 		}
 		
-		Header(Type type, bool isAcknowledge,
-				uint8_t destination, uint8_t source,
+		Header(Type type, bool ack,
+				uint8_t dest, uint8_t src,
 				uint8_t id) :
 			type(type),
-			isAcknowledge(isAcknowledge),
-			destination(destination),
-			source(source),
+			isAcknowledge(ack),
+			destination(dest),
+			source(src),
 			packetIdentifier(id)
 		{
 		}

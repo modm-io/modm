@@ -48,7 +48,7 @@ namespace xpcc
 		class StyleWrapper : public IODevice
 		{
 		public :
-			StyleWrapper( STYLE style );
+			StyleWrapper( STYLE inStyle );
 
 			virtual
 			~StyleWrapper();
@@ -79,8 +79,8 @@ namespace xpcc
 // -----------------------------------------------------------------------------
 
 template < typename STYLE >
-xpcc::log::StyleWrapper<STYLE>::StyleWrapper( STYLE style ) :
-	style( style )
+xpcc::log::StyleWrapper<STYLE>::StyleWrapper( STYLE inStyle ) :
+	style( inStyle )
 {
 }
 

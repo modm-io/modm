@@ -36,22 +36,22 @@
 
 // ----------------------------------------------------------------------------
 template <typename T, typename Allocator>
-xpcc::DynamicArray<T, Allocator>::DynamicArray(const Allocator& allocator) :
-	allocator(allocator),
+xpcc::DynamicArray<T, Allocator>::DynamicArray(const Allocator& alloc) :
+	allocator(alloc),
 	size(0), capacity(0), values(0)
 {
 }
 
 template <typename T, typename Allocator>
-xpcc::DynamicArray<T, Allocator>::DynamicArray(SizeType n, const Allocator& allocator) :
-	allocator(allocator), size(0), capacity(n)
+xpcc::DynamicArray<T, Allocator>::DynamicArray(SizeType n, const Allocator& alloc) :
+	allocator(alloc), size(0), capacity(n)
 {
 	this->values = this->allocator.allocate(n);
 }
 
 template <typename T, typename Allocator>
-xpcc::DynamicArray<T, Allocator>::DynamicArray(SizeType n, const T& value, const Allocator& allocator) :
-	allocator(allocator), size(n), capacity(n)
+xpcc::DynamicArray<T, Allocator>::DynamicArray(SizeType n, const T& value, const Allocator& alloc) :
+	allocator(alloc), size(n), capacity(n)
 {
 	this->values = this->allocator.allocate(n);
 	for (SizeType i = 0; i < n; ++i) {

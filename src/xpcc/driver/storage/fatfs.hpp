@@ -33,6 +33,8 @@
 #ifndef XPCC__FATFS_HPP
 #define XPCC__FATFS_HPP
 
+#include <fatfs/ff.h>
+
 namespace xpcc
 {
 	namespace fatfs
@@ -61,18 +63,19 @@ namespace xpcc
 		class FileSystem
 		{
 		public:
-			FileSystem(uint8_t drive = 0);
+			FileSystem(DiskInterface& disk);
 			
 			~FileSystem();
 			
-		public:
-			static DiskInterface *interface;
+			void
+			mount(uint8_t drive);
 		};
 		
 		class Directory
 		{
 		public:
-			
+			bool
+			open(const char* name);
 		};
 		
 		class File

@@ -57,13 +57,13 @@ namespace xpcc
 		/**
 		 * Set the method that will be called when a response is received.
 		 *
-		 * \param	component	Pointer to a component object
-		 * \param	function	Pointer to a function of the component object
+		 * \param	componentObject	Pointer to a component object
+		 * \param	memberFunction	Pointer to a function of the component object
 		 */
 		template <typename C, typename P>
-		ResponseCallback(C *component, void (C::*function)(const Header& header, const P* packet)) : 
-			component(reinterpret_cast<Communicatable *>(component)),
-			function(reinterpret_cast<Function>(function))/*,
+		ResponseCallback(C *componentObject, void (C::*memberFunction)(const Header& header, const P* packet)) : 
+			component(reinterpret_cast<Communicatable *>(componentObject)),
+			function(reinterpret_cast<Function>(memberFunction))/*,
 			packetSize(sizeof(P))*/
 		{
 		}
@@ -78,9 +78,9 @@ namespace xpcc
 		 * \param	function	Pointer to a function of the component object
 		 */
 		template <typename C>
-		ResponseCallback(C *component, void (C::*function)(const Header& header)) :
-			component(reinterpret_cast<Communicatable *>(component)),
-			function(reinterpret_cast<Function>(function))/*,
+		ResponseCallback(C *componentObject, void (C::*memberFunction)(const Header& header)) :
+			component(reinterpret_cast<Communicatable *>(componentObject)),
+			function(reinterpret_cast<Function>(memberFunction))/*,
 			packetSize(0)*/
 		{
 		}

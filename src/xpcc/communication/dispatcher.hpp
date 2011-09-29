@@ -105,23 +105,23 @@ namespace xpcc
 			 * and never else changed. this->typeInfo replaces runtime
 			 * information needed by handling of messages.
 			 */
-			Entry(Type type, const Header& header, SmartPointer& payload) :
+			Entry(Type type, const Header& inHeader, SmartPointer& inPayload) :
 				type(type), next(0),
-				header(header), payload(payload),
+				header(inHeader), payload(inPayload),
 				time(), tries(0)
 			{
 			}
 			
-			Entry(const Header& header, SmartPointer& payload) :
+			Entry(const Header& inHeader, SmartPointer& inPayload) :
 				type(DEFAULT), next(0),
-				header(header), payload(payload),
+				header(inHeader), payload(inPayload),
 				time(), tries(0)
 			{
 			}
 			
-			Entry(const Header& header) :
+			Entry(const Header& inHeader) :
 				type(DEFAULT), next(0),
-				header(header), payload(),
+				header(inHeader), payload(),
 				time(), tries(0)
 			{
 			}
@@ -155,9 +155,9 @@ namespace xpcc
 		{
 		public:
 			CallbackEntry(const Header& header,
-					SmartPointer& payload, ResponseCallback& callback) :
+					SmartPointer& payload, ResponseCallback& callback_) :
 				Entry(CALLBACK, header, payload),
-				callback(callback)
+				callback(callback_)
 			{
 			}
 			

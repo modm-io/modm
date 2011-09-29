@@ -35,8 +35,8 @@
 // ----------------------------------------------------------------------------
 xpcc::Communicator::Communicator(
 		const uint8_t ownIdentifier,
-		Dispatcher *dispatcher) : 
-	ownIdentifier(ownIdentifier), dispatcher(dispatcher)
+		Dispatcher *inDispatcher) : 
+	ownIdentifier(ownIdentifier), dispatcher(inDispatcher)
 {
 }
 

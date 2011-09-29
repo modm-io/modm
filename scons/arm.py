@@ -187,7 +187,7 @@ def generate(env, **kw):
 		"$THUMB_LINKER",
 		"-Wl,--relax",
 		"-Wl,--gc-sections",
-#		"-nostartfiles",
+		"-nostartfiles",
 		"-L${XPCC_ROOTPATH}/src/xpcc/architecture/platform/%s" % linkdir,
 		"-T%s" % linkfile,
 		"-Wl,-Map=${TARGET.base}.map,--cref",

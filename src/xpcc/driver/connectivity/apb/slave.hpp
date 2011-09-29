@@ -202,14 +202,14 @@ namespace xpcc
 			 * \brief	Initialize the slave
 			 * 
 			 * \param	address		Own address
-			 * \param	actionList	List of all action callbacks, need to be
+			 * \param	list		List of all action callbacks, need to be
 			 * 						stored in flash-memory
-			 * \param	actionCount	Number of entries in \a actionList
+			 * \param	count		Number of entries in \a actionList
 			 *
 			 * \see		apb::xpcc::Action
 			 * \see		APB__ACTION()
 			 */
-			Slave(uint8_t address, xpcc::accessor::Flash<Action> actionList, uint8_t actionCount);
+			Slave(uint8_t address, xpcc::accessor::Flash<Action> list, uint8_t count);
 			
 			/**
 			 * \brief	Receive and process messages

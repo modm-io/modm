@@ -108,6 +108,7 @@ ENTRY(Reset_Handler)
 
 /* force linker to include the syscalls from libxpcc.a */
 EXTERN(_sbrk_r)
+EXTERN(_init)
 
 PROVIDE(__ram_start = ORIGIN(RAM));
 PROVIDE(__ram_end   = ORIGIN(RAM) + LENGTH(RAM));

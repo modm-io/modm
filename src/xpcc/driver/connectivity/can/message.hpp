@@ -79,8 +79,8 @@ namespace xpcc
 		 */
 		struct Message
 		{
-			Message(const uint32_t& identifier = 0, uint8_t length = 0) :
-				identifier(identifier), flags(), length(length)
+			Message(const uint32_t& inIdentifier = 0, uint8_t inLength = 0) :
+				identifier(inIdentifier), flags(), length(inLength)
 			{
 			}
 			

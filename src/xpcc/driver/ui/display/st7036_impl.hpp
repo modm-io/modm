@@ -80,37 +80,37 @@ xpcc::St7036<SPI, CS, RS, Width, Heigth>::writeRaw(char c)
 
 template <typename SPI, typename CS, typename RS, unsigned int Width, unsigned int Heigth>
 void
-xpcc::St7036<SPI, CS, RS, Width, Heigth>::command(Command command)
+xpcc::St7036<SPI, CS, RS, Width, Heigth>::execute(Command command)
 {
 	writeCommand(command);
 }
 
 template <typename SPI, typename CS, typename RS, unsigned int Width, unsigned int Heigth>
 void
-xpcc::St7036<SPI, CS, RS, Width, Heigth>::setCursor(uint8_t line, uint8_t column)
+xpcc::St7036<SPI, CS, RS, Width, Heigth>::setCursor(uint8_t newLine, uint8_t newColumn)
 {
-	this->column = column;
-	this->line = line;
+	this->column = newColumn;
+	this->line = newLine;
 	
-	column += 0x40 * line;
-	writeCommand(0x80 | column);
+	newColumn += 0x40 * newLine;
+	writeCommand(0x80 | newColumn);
 }
 
 // ----------------------------------------------------------------------------
 
 template <typename SPI, typename CS, typename RS, unsigned int Width, unsigned int Heigth>
 void
-xpcc::St7036<SPI, CS, RS, Width, Heigth>::writeCommand(uint8_t command)
+xpcc::St7036<SPI, CS, RS, Width, Heigth>::writeCommand(uint8_t inCommand)
 {
 	RS::reset();
 	
 	CS::reset();
-	SPI::write(command);
+	SPI::write(inCommand);
 	CS::set();
 	
 	// check if the command is 'clear display' oder 'return home', these
 	// commands take a bit longer until they are finished.
-	if ((command & 0xfc) == 0) {
+	if ((inCommand & 0xfc) == 0) {
 		xpcc::delay_ms(1.2);
 	}
 	else {

@@ -10,6 +10,8 @@
 #include <xpcc/driver/ui/display/ea_dog.hpp>
 #include <xpcc/driver/ui/display/font.hpp>
 
+#include <xpcc/driver/storage/fatfs.hpp>
+
 #include <xpcc/workflow/freertos.hpp>
 
 #include <libmaple/flash.h>
@@ -198,12 +200,10 @@ void systick_timer(void)
 	}
 	
 	cntdiskio++;
-	if ( cntdiskio >= 10 ) {
+	if (cntdiskio >= 10) {
 		cntdiskio = 0;
-		disk_timerproc(); /* to be called every 10ms */
+		disk_timerproc(); // to be called every 10ms
 	}
-
-	//ff_test_term_timerproc(); /* to be called every ms */
 }
 
 FATFS fileSystem;
@@ -212,6 +212,8 @@ DIR dir;
 FILINFO fno;
 FRESULT rc;
 
+//xpcc::fatfs::FileSystem fs;
+
 // ----------------------------------------------------------------------------
 int
 main(void)
@@ -219,7 +221,7 @@ main(void)
 	LedStat::setOutput(xpcc::gpio::HIGH);
 	Led1::setOutput(xpcc::gpio::LOW);
 	Led2::setOutput(xpcc::gpio::LOW);
-	
+
 	ButtonWakeUp::setInput();
 	//Button1Inverted::setInput(xpcc::stm32::INPUT, xpcc::stm32::PULLUP);
 	//Button2Inverted::setInput(xpcc::stm32::INPUT, xpcc::stm32::PULLUP);

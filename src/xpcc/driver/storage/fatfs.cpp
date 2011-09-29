@@ -82,3 +82,6 @@ disk_ioctl(BYTE drive, BYTE command, void* buffer)
 {
 	return RES_ERROR;
 }*/
+
+// ----------------------------------------------------------------------------
+//_VOLUMES

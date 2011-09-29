@@ -38,8 +38,8 @@
 FLASH_STORAGE(uint16_t base[]) = { 10, 100, 1000, 10000 };
 
 // ----------------------------------------------------------------------------
-xpcc::IOStream::IOStream(IODevice& device) :
-	device(&device),
+xpcc::IOStream::IOStream(IODevice& outputDevice) :
+	device(&outputDevice),
 	mode(ASCII)
 {
 }
@@ -82,39 +82,31 @@ xpcc::IOStream::writeInteger(uint16_t value)
 void
 xpcc::IOStream::writeInteger(int32_t value)
 {
+	char buffer[ArithmeticTraits<int32_t>::decimalDigits + 1]; // +1 for '\0'
+	
 #if defined(XPCC__CPU_AVR)
 	// Uses the optimized non standard function 'ltoa()' which is
 	// not always available.
-	char buffer[ArithmeticTraits<int32_t>::decimalDigits + 1]; // +1 for '\0'
+
 	this->device->write(ltoa(value, buffer, 10));
 #else
-	char buffer[ArithmeticTraits<uint32_t>::decimalDigits + 1]; // +1 for '\0'
 	// ptr points to the end of the string, it will be filled backwards
-	char *ptr = buffer + ArithmeticTraits<uint32_t>::decimalDigits;
+	char *ptr = buffer + ArithmeticTraits<int32_t>::decimalDigits;
+	
 	*ptr = '\0';
 	
-	if (value < 0)
-	{
+	if (value < 0) {
+		value = -value;
 		this->device->write('-');
-		
-		// calculate the string backwards
-		ldiv_t qrem = { value, 0 };
-		do {
-			qrem = ldiv(qrem.quot, 10);
-			*(--ptr) = '0' - qrem.rem;
-		}
-		while (qrem.quot != 0);
 	}
-	else
-	{
-		// calculate the string backwards
-		ldiv_t qrem = { value, 0 };
-		do {
-			qrem = ldiv(qrem.quot, 10);
-			*(--ptr) = '0' + qrem.rem;
-		}
-		while (qrem.quot != 0);
-	}
+	
+	// calculate the string backwards
+	ldiv_t qrem = { value, 0 };
+	do {
+		qrem = ldiv(qrem.quot, 10);
+		*(--ptr) = '0' + qrem.rem;
+    }
+    while (qrem.quot != 0);
 	
 	// write string
 	this->device->write(ptr);
@@ -124,18 +116,14 @@ xpcc::IOStream::writeInteger(int32_t value)
 void
 xpcc::IOStream::writeInteger(uint32_t value)
 {
+#if defined(XPCC__CPU_AVR)
 	char buffer[ArithmeticTraits<uint32_t>::decimalDigits + 1]; // +1 for '\0'
 	
-#if defined(XPCC__CPU_AVR)
 	// Uses the optimized non standard function 'ultoa()' which is
 	// not always available.
 	this->device->write(ultoa(value, buffer, 10));
-#elif defined(XPCC__CPU_ARM)
-	snprintf(buffer, sizeof(buffer), "%lu", value);
-	this->device->write(buffer);
 #else
-	snprintf(buffer, sizeof(buffer), "%u", value);
-	this->device->write(buffer);
+	this->writeInteger(static_cast<int32_t>(value));
 #endif
 }
 
@@ -145,25 +133,32 @@ xpcc::IOStream::writeInteger(int64_t value)
 {
 	char buffer[ArithmeticTraits<int64_t>::decimalDigits + 1]; // +1 for '\0'
 	
-#if __SIZEOF_POINTER__ == 8
-	snprintf(buffer, sizeof(buffer), "%ld", value);
-#else
-	snprintf(buffer, sizeof(buffer), "%lld", value);
-#endif
-	this->device->write(buffer);
+	// ptr points to the end of the string, it will be filled backwards
+	char *ptr = buffer + ArithmeticTraits<int64_t>::decimalDigits;
+	
+	*ptr = '\0';
+	
+	if (value < 0) {
+		value = -value;
+		this->device->write('-');
+	}
+	
+	// calculate the string backwards
+	lldiv_t qrem = { value, 0 };
+	do {
+		qrem = lldiv(qrem.quot, 10);
+		*(--ptr) = '0' + qrem.rem;
+    }
+    while (qrem.quot != 0);
+	
+	// write string
+	this->device->write(ptr);
 }
 
 void
 xpcc::IOStream::writeInteger(uint64_t value)
 {
-	char buffer[ArithmeticTraits<uint64_t>::decimalDigits + 1]; // +1 for '\0'
-	
-#if __SIZEOF_POINTER__ == 8
-	snprintf(buffer, sizeof(buffer), "%lu", value);
-#else
-	snprintf(buffer, sizeof(buffer), "%llu", value);
-#endif
-	this->device->write(buffer);
+	this->writeInteger(static_cast<int64_t>(value));
 }
 #endif
 
@@ -181,14 +176,14 @@ xpcc::IOStream::writeHex(const char* s)
 void
 xpcc::IOStream::writeHexNibble(uint8_t nibble)
 {
-	char hex;
+	char character;
 	if (nibble > 9) {
-		hex = nibble + 'A' - 10;
+		character = nibble + 'A' - 10;
 	}
 	else {
-		hex = nibble + '0';
+		character = nibble + '0';
 	}
-	this->device->write(hex);
+	this->device->write(character);
 }
 
 // ----------------------------------------------------------------------------

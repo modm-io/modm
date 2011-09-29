@@ -35,8 +35,8 @@
 #endif
 
 template <typename T>
-xpcc::ButtonGroup<T>::ButtonGroup(T mask, uint16_t timeout, uint16_t interval) :
-	timeout(timeout), interval(interval), repeatMask(mask), repeatCounter(timeout),
+xpcc::ButtonGroup<T>::ButtonGroup(T mask, uint16_t inTimeout, uint16_t interval) :
+	timeout(inTimeout), interval(interval), repeatMask(mask), repeatCounter(inTimeout),
 	state(), pressState(), releaseState(), repeatState(), ct0(), ct1()
 {
 }

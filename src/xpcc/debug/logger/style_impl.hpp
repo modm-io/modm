@@ -46,8 +46,8 @@ xpcc::log::Style<STYLE>::Style( STYLE style ) :
 // -----------------------------------------------------------------------------
 
 template < typename STYLE >
-xpcc::log::Style<STYLE>::Style( IODevice &device) :
-	device ( &device )
+xpcc::log::Style<STYLE>::Style( IODevice &outputDevice) :
+	device ( &outputDevice )
 {
 }
 

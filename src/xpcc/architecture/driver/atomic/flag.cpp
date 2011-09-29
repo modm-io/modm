@@ -31,8 +31,8 @@
 
 #include "flag.hpp"
 
-xpcc::atomic::Flag::Flag(bool state) : 
-	state(state)
+xpcc::atomic::Flag::Flag(bool inState) : 
+	state(inState)
 {
 }
 

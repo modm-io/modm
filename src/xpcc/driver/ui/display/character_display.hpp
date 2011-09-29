@@ -104,7 +104,7 @@ namespace xpcc
 		 * \param	command		Command to execute
 		 */
 		virtual void
-		command(Command command) = 0;
+		execute(Command command) = 0;
 		
 		/**
 		 * \brief	Set cursor to specified position

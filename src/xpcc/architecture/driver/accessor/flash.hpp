@@ -60,8 +60,8 @@ namespace xpcc
 		{
 		public:
 			ALWAYS_INLINE
-			explicit Flash(const T* address = 0) :
-				address(address)
+			explicit Flash(const T* addr = 0) :
+				address(addr)
 			{
 			}
 			

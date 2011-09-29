@@ -42,8 +42,8 @@ xpcc::Circle2D<T>::Circle2D() :
 }
 
 template <typename T>
-xpcc::Circle2D<T>::Circle2D(const Vector<T, 2>& center, T radius) :
-	center(center), radius(radius)
+xpcc::Circle2D<T>::Circle2D(const Vector<T, 2>& inCenter, T inRadius) :
+	center(inCenter), radius(inRadius)
 {
 }
 
@@ -71,9 +71,9 @@ xpcc::Circle2D<T>::getRadius() const
 
 template <typename T>
 inline void
-xpcc::Circle2D<T>::setRadius(T radius)
+xpcc::Circle2D<T>::setRadius(T newRadius)
 {
-	this->radius = radius;
+	this->radius = newRadius;
 }
 
 // ----------------------------------------------------------------------------

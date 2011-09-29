@@ -62,8 +62,8 @@ namespace xpcc
 		class Logger : public ::xpcc::IOStream
 		{
 			public:
-				Logger(::xpcc::IODevice& device) :
-					IOStream(device)
+				Logger(::xpcc::IODevice& outputDevice) :
+					IOStream(outputDevice)
 				{
 				}
 				

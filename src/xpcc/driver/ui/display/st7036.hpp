@@ -71,7 +71,7 @@ namespace xpcc
 		writeRaw(char c);
 		
 		virtual void
-		command(Command command);
+		execute(Command command);
 		
 		virtual void
 		setCursor(uint8_t line, uint8_t column);

@@ -463,12 +463,12 @@ xpcc::Vector<T, 4>::Vector(T inVal)
 // ----------------------------------------------------------------------------
 template<typename T>
 void
-xpcc::Vector<T, 4>::set(const T& x, const T& y, const T& z, const T& w)
+xpcc::Vector<T, 4>::set(const T& x_, const T& y_, const T& z_, const T& w_)
 {
-	this->x = x;
-	this->y = y;
-	this->z = z;
-	this->w = w;
+	this->x = x_;
+	this->y = y_;
+	this->z = z_;
+	this->w = w_;
 }
 
 // ----------------------------------------------------------------------------

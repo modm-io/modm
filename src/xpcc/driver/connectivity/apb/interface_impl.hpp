@@ -66,25 +66,25 @@ xpcc::apb::Interface<Device>::sendMessage(uint8_t address, Flags flags,
 		uint8_t command,
 		const void *payload, uint8_t payloadLength)
 {
-	uint8_t crc;
+	uint8_t crcSend;
 	
 	Device::write(syncByte);
 	Device::write(payloadLength);
-	crc = crcUpdate(crcInitialValue, payloadLength);
+	crcSend = crcUpdate(crcInitialValue, payloadLength);
 	Device::write(address | flags);
-	crc = crcUpdate(crc, address | flags);
+	crcSend = crcUpdate(crcSend, address | flags);
 	Device::write(command);
-	crc = crcUpdate(crc, command);
+	crcSend = crcUpdate(crcSend, command);
 	
 	const uint8_t *ptr = static_cast<const uint8_t *>(payload);
 	for (uint_fast8_t i = 0; i < payloadLength; ++i)
 	{
-		crc = crcUpdate(crc, *ptr);
+		crcSend = crcUpdate(crcSend, *ptr);
 		Device::write(*ptr);
 		ptr++;
 	}
 	
-	Device::write(crc);
+	Device::write(crcSend);
 }
 
 template <typename Device> template <typename T>

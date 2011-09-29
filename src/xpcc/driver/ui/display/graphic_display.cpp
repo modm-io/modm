@@ -48,9 +48,9 @@ xpcc::GraphicDisplay::GraphicDisplay() :
 
 // ----------------------------------------------------------------------------
 void
-xpcc::GraphicDisplay::setColor(glcd::Color color)
+xpcc::GraphicDisplay::setColor(glcd::Color newColor)
 {
-	switch (color)
+	switch (newColor)
 	{
 		case glcd::BLACK:
 			draw = &xpcc::GraphicDisplay::setPixel;
@@ -60,7 +60,7 @@ xpcc::GraphicDisplay::setColor(glcd::Color color)
 			draw = &xpcc::GraphicDisplay::clearPixel;
 			break;
 	}
-	this->color = color;
+	this->color = newColor;
 }
 
 // ----------------------------------------------------------------------------

@@ -38,10 +38,10 @@
 #define XPCC_LOG_LEVEL xpcc::log::INFO
 
 xpcc::Dispatcher::Dispatcher(
-		BackendInterface *backend,
-		Postman* postman) :
-	backend(backend),
-	postman(postman),
+		BackendInterface *backend_,
+		Postman* postman_) :
+	backend(backend_),
+	postman(postman_),
 	dummyFirst(Header()),
 	first(&dummyFirst),
 	last(&dummyFirst)
@@ -112,11 +112,11 @@ xpcc::Dispatcher::sendAcknowledge(const Header& header)
 }
 
 bool
-xpcc::Dispatcher::Entry::headerFits(const Header& header) const
+xpcc::Dispatcher::Entry::headerFits(const Header& inHeader) const
 {
-	return ((header.source == this->header.destination) &&
-			(header.destination	== this->header.source) &&
-			(header.packetIdentifier == this->header.packetIdentifier));
+	return ((inHeader.source == this->header.destination) &&
+			(inHeader.destination	== this->header.source) &&
+			(inHeader.packetIdentifier == this->header.packetIdentifier));
 }
 
 // ----------------------------------------------------------------------------

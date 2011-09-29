@@ -38,7 +38,7 @@
 #include <xpcc/architecture/driver/gpio.hpp>
 
 {% if id == 1 -%}
-#ifdef __AT91SAM7X__
+#ifdef __ARM_AT91SAM7X__
 {%- endif %}
 
 /*namespace
@@ -77,5 +77,5 @@ xpcc::SpiMaster{{ id }}::write(uint8_t data)
 }*/
 
 {% if id == 1 -%}
-#endif // __AT91SAM7X__
+#endif // __ARM_AT91SAM7X__
 {%- endif %}

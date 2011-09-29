@@ -45,6 +45,8 @@
 // #define STM32_SD_USE_DMA
 
 
+#define	STM32_SD_USE_DMA
+
 #ifdef STM32_SD_USE_DMA
 // #warning "Information only: using DMA"
 #pragma message "*** Using DMA ***"
@@ -356,7 +358,7 @@ release_spi (void)
 /*-----------------------------------------------------------------------*/
 static
 void stm32_dma_transfer(
-	BOOL receive,		/* FALSE for buff->SPI, TRUE for SPI->buff               */
+	bool receive,		/* FALSE for buff->SPI, TRUE for SPI->buff               */
 	const BYTE *buff,	/* receive TRUE  : 512 byte data block to be transmitted
 						   receive FALSE : Data buffer to store received data    */
 	UINT btr 			/* receive TRUE  : Byte count (must be multiple of 2)
@@ -555,7 +557,7 @@ rcvr_datablock (
 	if(token != 0xFE) return false;	/* If not valid data token, return with error */
 
 #ifdef STM32_SD_USE_DMA
-	stm32_dma_transfer( TRUE, buff, btr );
+	stm32_dma_transfer( true, buff, btr );
 #else
 	do {							/* Receive the data block into buffer */
 		rcvr_spi_m(buff++);
@@ -594,7 +596,7 @@ bool xmit_datablock (
 	if (token != 0xFD) {	/* Is data token */
 
 #ifdef STM32_SD_USE_DMA
-		stm32_dma_transfer( FALSE, buff, 512 );
+		stm32_dma_transfer( false, buff, 512 );
 #else
 		wc = 0;
 		do {							/* transmit the 512 byte data block to MMC */

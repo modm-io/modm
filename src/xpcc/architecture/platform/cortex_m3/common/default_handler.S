@@ -1,6 +1,6 @@
 // coding: utf-8
 // ----------------------------------------------------------------------------
-/* Copyright (c) 2009, Roboterclub Aachen e.V.
+/* Copyright (c) 2011, Roboterclub Aachen e.V.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -30,114 +30,49 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC_ACCESSOR__RAM_HPP
-#define	XPCC_ACCESSOR__RAM_HPP
+	.text
+	.syntax	unified
+	.align	4
+	.thumb
+	
+// ----------------------------------------------------------------------------
+// Default functions which does nothing more than to return	
+	.weak	_defaultHandler
+	.type	_defaultHandler, %function
+	.func   _defaultHandler
+_defaultHandler:
+	bx		lr
+	.endfunc
+	
+// ----------------------------------------------------------------------------
+// Needed by __libc_init_array, can be overwritten by user code
+	.weak	_init
+	.type	_init, %function
+	.thumb_func
+	.set	_init, _defaultHandler
+	
+	.weak	_fini
+	.type	_fini, %function
+	.thumb_func
+	.set	_fini, _defaultHandler
 
-#include <cstddef>
-#include <xpcc/architecture/utils.hpp>
-
-namespace xpcc
-{
-	namespace accessor
-	{
-		/**
-		 * \brief	Pointer to RAM
-		 * 
-		 * \ingroup	accessor
-		 * \author	Fabian Greif
-		 */
-		template<typename T>
-		class Ram
-		{
-		public:
-			ALWAYS_INLINE
-			Ram(const T* addr = 0) :
-				address(addr)
-			{
-			}
-			
-			template <typename U>
-			ALWAYS_INLINE
-			explicit Ram(const Ram<U>& rhs) :
-				address((T*) rhs.address)
-			{
-			}
-			
-			ALWAYS_INLINE
-			const T
-			operator *() const
-			{
-				return *address;
-			}
-			
-			ALWAYS_INLINE
-			const T
-			operator [](std::size_t index) const
-			{
-				return *(address + index);
-			}
-			
-			ALWAYS_INLINE
-			Ram&
-			operator ++ ()
-			{
-				*this += 1;
-				return *this;
-			}
-
-			ALWAYS_INLINE
-			Ram
-			operator ++ (int)
-			{
-				Ram ret = *this;
-				++*this;
-				return ret;
-			}
-
-			ALWAYS_INLINE
-			Ram&
-			operator -- ()
-			{
-				*this -= 1;
-				return *this;
-			}
-
-			ALWAYS_INLINE
-			Ram&
-			operator -- (int)
-			{
-				Ram ret = *this;
-				--*this;
-				return ret;
-			}
-			
-			ALWAYS_INLINE
-			Ram&
-			operator += (std::size_t rhs)
-			{
-				address += rhs;
-				return *this;
-			}
-			
-			ALWAYS_INLINE
-			Ram&
-			operator -= (std::size_t rhs)
-			{
-				address -= rhs;
-				return *this;
-			}
-			
-			ALWAYS_INLINE
-			const T*
-			getPointer() const
-			{
-				return address;
-			}
-		
-		private:
-			const T* address;
-		};
-	}
-}
-
-#endif	// XPCC_ACCESSOR__RAM_HPP
+// ----------------------------------------------------------------------------
+// Dummy exit and _exit function to avoid the one from the newlib
+	.weak	exit
+	.type	exit, %function
+	.thumb_func
+	.func	exit
+exit:
+	// Disable Interrupts
+	// TODO
+	
+	// Enter an infinite loop
+    b    	.
+    .endfunc
+    
+	.weak	_exit
+	.type	_exit, %function
+	.thumb_func
+	.set	_exit, exit
+	
+	.end

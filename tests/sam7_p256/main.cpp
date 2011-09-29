@@ -3,12 +3,12 @@
 #include <xpcc/workflow.hpp>
 #include <xpcc/debug.hpp>
 
-#include <xpcc/driver/button_group.hpp>
-#include <xpcc/driver/software_spi.hpp>
+#include <xpcc/driver/ui/button_group.hpp>
+#include <xpcc/driver/connectivity/software_spi.hpp>
 #include <xpcc/driver/gpio.hpp>
 
-#include <xpcc/driver/lcd/ea_dog.hpp>
-#include <xpcc/driver/lcd/font.hpp>
+#include <xpcc/driver/ui/display/ea_dog.hpp>
+#include <xpcc/driver/ui/display/font.hpp>
 
 // ----------------------------------------------------------------------------
 xpcc::at91::Debug debugUart(115200);

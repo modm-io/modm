@@ -42,8 +42,8 @@ xpcc::Line2D<T>::Line2D() :
 }
 
 template <typename T>
-xpcc::Line2D<T>::Line2D(const Vector<T, 2>& point, const Vector<T, 2>& directionVector) :
-	point(point), directionVector(directionVector)
+xpcc::Line2D<T>::Line2D(const Vector<T, 2>& point, const Vector<T, 2>& direction) :
+	point(point), directionVector(direction)
 {
 }
 
@@ -78,10 +78,10 @@ xpcc::Line2D<T>::getDirectionVector() const
 
 template <typename T>
 inline void
-xpcc::Line2D<T>::set(const Vector<T, 2>& point, const Vector<T, 2>& directionVector)
+xpcc::Line2D<T>::set(const Vector<T, 2>& point, const Vector<T, 2>& direction)
 {
 	this->point = point;
-	this->directionVector = directionVector;
+	this->directionVector = direction;
 }
 
 // ----------------------------------------------------------------------------

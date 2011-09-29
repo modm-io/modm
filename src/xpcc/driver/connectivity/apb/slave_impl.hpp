@@ -61,9 +61,9 @@ xpcc::apb::Action::call(Response& response, const void *payload)
 // ----------------------------------------------------------------------------
 template <typename Interface>
 xpcc::apb::Slave<Interface>::Slave(uint8_t address,
-		xpcc::accessor::Flash<Action> actionList,
-		uint8_t actionCount) : 
-	ownAddress(address), actionList(actionList), actionCount(actionCount),
+		xpcc::accessor::Flash<Action> list,
+		uint8_t count) : 
+	ownAddress(address), actionList(list), actionCount(count),
 	response(this)
 {
 	Interface::initialize();

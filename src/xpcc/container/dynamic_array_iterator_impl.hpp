@@ -48,9 +48,9 @@ xpcc::DynamicArray<T, Allocator>::const_iterator::const_iterator() :
 
 template <typename T, typename Allocator>
 xpcc::DynamicArray<T, Allocator>::const_iterator::const_iterator(
-		const DynamicArray* parent, SizeType index) :
-	parent(parent),
-	index(index)
+		const DynamicArray* inParent, SizeType inIndex) :
+	parent(inParent),
+	index(inIndex)
 {
 }
 
@@ -139,9 +139,9 @@ xpcc::DynamicArray<T, Allocator>::iterator::iterator() :
 
 template <typename T, typename Allocator>
 xpcc::DynamicArray<T, Allocator>::iterator::iterator(
-		DynamicArray* parent, SizeType index) :
-	parent(parent),
-	index(index)
+		DynamicArray* inParent, SizeType inIndex) :
+	parent(inParent),
+	index(inIndex)
 {
 }
 

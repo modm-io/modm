@@ -105,10 +105,10 @@ xpcc::Vector<T, 2>::Vector(const Vector &rhs) :
 // ----------------------------------------------------------------------------
 template<typename T>
 void
-xpcc::Vector<T, 2>::set(const T& x, const T& y)
+xpcc::Vector<T, 2>::set(const T& newX, const T& newY)
 {
-	this->x = x;
-	this->y = y;
+	this->x = newX;
+	this->y = newY;
 }
 
 // ----------------------------------------------------------------------------

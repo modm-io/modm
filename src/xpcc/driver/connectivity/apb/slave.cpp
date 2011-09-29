@@ -42,8 +42,8 @@ xpcc::apb::Response::error(uint8_t errorCode)
 {
 	triggered = true;
 	
-	uint8_t error = errorCode;
-	transmitter->send(false, &error, 1);
+	uint8_t tempError = errorCode;
+	transmitter->send(false, &tempError, 1);
 }
 
 void

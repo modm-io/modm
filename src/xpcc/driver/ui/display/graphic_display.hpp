@@ -268,9 +268,9 @@ namespace xpcc
 		 * \see		xpcc::font
 		 */
 		inline void
-		setFont(const uint8_t *font)
+		setFont(const uint8_t *newFont)
 		{
-			this->font = xpcc::accessor::asFlash(font);
+			this->font = xpcc::accessor::asFlash(newFont);
 		}
 		
 		/**
