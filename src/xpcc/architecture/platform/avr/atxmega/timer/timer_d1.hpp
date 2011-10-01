@@ -51,8 +51,6 @@ namespace xpcc
 {
 	namespace atxmega
 	{
-		typedef void (*F) (void);
-		
 		/**
 		 * \brief		Timer Module D1
 		 *

@@ -107,7 +107,7 @@ xpcc::Hd44780<E, RW, RS, DATA>::setCursor(uint8_t line, uint8_t column)
 
 template <typename E, typename RW, typename RS, typename DATA>
 void
-xpcc::Hd44780<E, RW, RS, DATA>::command(Command command)
+xpcc::Hd44780<E, RW, RS, DATA>::execute(Command command)
 {
 	writeCommand(command);
 }

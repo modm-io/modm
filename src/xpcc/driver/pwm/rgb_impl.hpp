@@ -5,7 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -25,66 +25,65 @@
  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
-// ----------------------------------------------------------------------------
-/*
- * WARNING: This file is generated automatically, do not edit!
- * Please modify the corresponding *.in file instead and rebuild this file. 
+ *
+ * $Id$
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_ATXMEGA__TIMER_AWEX_D_HPP
-#define XPCC_ATXMEGA__TIMER_AWEX_D_HPP
+#ifndef XPCC__PWM_RGB_HPP
+#	error	"Don't include this file directly, use 'rgb.hpp' instead!"
+#endif
 
-#include <avr/io.h>
-#include <stdint.h>
+// ----------------------------------------------------------------------------
 
-#if defined(AWEXD) || defined(__DOXYGEN__)
-
-namespace xpcc
+xpcc::pwm::Rgb::Rgb(Led* red, Led* green, Led* blue)
+: redLed(red), greenLed(green), blueLed(blue)
 {
-	namespace atxmega
-	{
-		/**
-		 * \brief		Advanced Waveform EXtension of Timer D
-		 *
-		 * \ingroup		atxmega_timer
-		 */
-		class WaveformD
-		{
-		public:
-			inline static AWEX_t&
-			getWaveformBase()
-			{
-				return AWEXD;
-			}
-			
-			inline static void
-			setAWEXMode(uint8_t mode)
-			{
-				AWEXD_CTRL = (AWEXD_CTRL & ~(AWEX_PGM_bm|AWEX_CWCM_bm)) | mode;
-			}
-			
-			inline static void
-			setAWEXDTIEnable(uint8_t selection)
-			{
-				AWEXD_CTRL = (AWEXD_CTRL & ~(AWEX_DTICCDEN_bm|AWEX_DTICCCEN_bm|AWEX_DTICCBEN_bm|AWEX_DTICCAEN_bm)) | selection;
-			}
-			
-			inline static void
-			setAWEXFaultDetection(uint8_t mode)
-			{
-				AWEXD_FDCTRL = mode;
-			}
-			
-			inline static uint8_t
-			getAWEXStatus()
-			{
-				return AWEXD_STATUS;
-			}
-		};
-	}
 }
 
-#endif	// AWEXD
-#endif // XPCC_ATXMEGA__TIMER_AWEX_D_HPP
+void
+xpcc::pwm::Rgb::setValues(float red, float green, float blue)
+{
+    redLed->setValue(red);
+    greenLed->setValue(green);
+	blueLed->setValue(blue);
+}
+
+float
+xpcc::pwm::Rgb::getValue(Rgba color)
+{
+    switch (color) {
+        case RED:
+            return redLed->getValue();
+        case GREEN:
+            return greenLed->getValue();
+        case BLUE:
+            return blueLed->getValue();
+        default:
+            return 0;
+    }
+}
+
+void
+xpcc::pwm::Rgb::fadeTo(uint16_t time, float red, float green, float blue)
+{
+    redLed->fadeTo(time, red);
+    greenLed->fadeTo(time, green);
+    blueLed->fadeTo(time, blue);
+}
+
+bool
+xpcc::pwm::Rgb::isFading()
+{
+    return (redLed->isFading() ||
+            greenLed->isFading() ||
+            blueLed->isFading());
+}
+
+void
+xpcc::pwm::Rgb::run()
+{
+    redLed->run();
+    greenLed->run();
+    blueLed->run();
+}

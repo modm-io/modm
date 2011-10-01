@@ -1,6 +1,6 @@
 // coding: utf-8
 // ----------------------------------------------------------------------------
-/* Copyright (c) 2011, Roboterclub Aachen e.V.
+/* Copyright (c) 2009, Roboterclub Aachen e.V.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -25,66 +25,12 @@
  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
-// ----------------------------------------------------------------------------
-/*
- * WARNING: This file is generated automatically, do not edit!
- * Please modify the corresponding *.in file instead and rebuild this file. 
+ * 
+ * $Id$
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_ATXMEGA__TIMER_AWEX_D_HPP
-#define XPCC_ATXMEGA__TIMER_AWEX_D_HPP
-
-#include <avr/io.h>
-#include <stdint.h>
-
-#if defined(AWEXD) || defined(__DOXYGEN__)
-
-namespace xpcc
-{
-	namespace atxmega
-	{
-		/**
-		 * \brief		Advanced Waveform EXtension of Timer D
-		 *
-		 * \ingroup		atxmega_timer
-		 */
-		class WaveformD
-		{
-		public:
-			inline static AWEX_t&
-			getWaveformBase()
-			{
-				return AWEXD;
-			}
-			
-			inline static void
-			setAWEXMode(uint8_t mode)
-			{
-				AWEXD_CTRL = (AWEXD_CTRL & ~(AWEX_PGM_bm|AWEX_CWCM_bm)) | mode;
-			}
-			
-			inline static void
-			setAWEXDTIEnable(uint8_t selection)
-			{
-				AWEXD_CTRL = (AWEXD_CTRL & ~(AWEX_DTICCDEN_bm|AWEX_DTICCCEN_bm|AWEX_DTICCBEN_bm|AWEX_DTICCAEN_bm)) | selection;
-			}
-			
-			inline static void
-			setAWEXFaultDetection(uint8_t mode)
-			{
-				AWEXD_FDCTRL = mode;
-			}
-			
-			inline static uint8_t
-			getAWEXStatus()
-			{
-				return AWEXD_STATUS;
-			}
-		};
-	}
-}
-
-#endif	// AWEXD
-#endif // XPCC_ATXMEGA__TIMER_AWEX_D_HPP
+/**
+ * \ingroup		atmega
+ * \defgroup	atmega_pwm	Pulse Width Modulation
+ */

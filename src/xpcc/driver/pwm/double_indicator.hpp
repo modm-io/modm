@@ -5,7 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -25,66 +25,84 @@
  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
-// ----------------------------------------------------------------------------
-/*
- * WARNING: This file is generated automatically, do not edit!
- * Please modify the corresponding *.in file instead and rebuild this file. 
+ *
+ * $Id$
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_ATXMEGA__TIMER_AWEX_D_HPP
-#define XPCC_ATXMEGA__TIMER_AWEX_D_HPP
+#ifndef XPCC__PWM_DOUBLE_INDICATOR_HPP
+#define XPCC__PWM_DOUBLE_INDICATOR_HPP
 
-#include <avr/io.h>
+#include "led.hpp"
 #include <stdint.h>
-
-#if defined(AWEXD) || defined(__DOXYGEN__)
 
 namespace xpcc
 {
-	namespace atxmega
+	namespace pwm
 	{
 		/**
-		 * \brief		Advanced Waveform EXtension of Timer D
+		 * \brief PWM LED Double Indicator.
 		 *
-		 * \ingroup		atxmega_timer
+		 * \see Led
+		 *
+		 * \author	Niklas Hauser
+		 * \ingroup pwm
 		 */
-		class WaveformD
+		class DoubleIndicator
 		{
+		private:
+			xpcc::Timeout<> timer;
+			Led* led;
+			const uint16_t on1;
+			const uint16_t pause1;
+			const uint16_t on2;
+			const uint16_t pause2;
+			const uint8_t onFade;
+			const uint8_t offFade;
+			uint8_t counter;
+			bool isBlinking;
+			bool isCounting;
+			
+			enum
+			{
+				FIRST_FLASH,
+				FIRST_BREAK,
+				SECOND_FLASH,
+				SECOND_BREAK
+			} state;
+			
 		public:
-			inline static AWEX_t&
-			getWaveformBase()
-			{
-				return AWEXD;
-			}
+			/**
+			 * \param	led			a PWM Led module
+			 * \param	period		of the indicating cycle
+			 * \param	on1			length of the first "on" part in percent
+			 * \param	off			length of the first "off" part in percent
+			 * \param	on2			length of the second "on" part in percent
+			 * \param	onFade		time in ms until the LED is fully on
+			 * \param	offFade		time in ms until the LED is fully off
+			 */
+			DoubleIndicator(Led* led, uint16_t period, float on1, float pause,
+							float on2, uint8_t onFade=75,uint8_t offFade=125);
 			
-			inline static void
-			setAWEXMode(uint8_t mode)
-			{
-				AWEXD_CTRL = (AWEXD_CTRL & ~(AWEX_PGM_bm|AWEX_CWCM_bm)) | mode;
-			}
+			/// start indicating for ever.
+			void
+			start();
 			
-			inline static void
-			setAWEXDTIEnable(uint8_t selection)
-			{
-				AWEXD_CTRL = (AWEXD_CTRL & ~(AWEX_DTICCDEN_bm|AWEX_DTICCCEN_bm|AWEX_DTICCBEN_bm|AWEX_DTICCAEN_bm)) | selection;
-			}
+			/// Stops indicating after finishing the current cycle.
+			void
+			stop();
 			
-			inline static void
-			setAWEXFaultDetection(uint8_t mode)
-			{
-				AWEXD_FDCTRL = mode;
-			}
+			/// Indicate a number of times and then stop.
+			void
+			indicateTimes(uint8_t);
 			
-			inline static uint8_t
-			getAWEXStatus()
-			{
-				return AWEXD_STATUS;
-			}
+			/// Must be called periodically, preferably in the main while loop.
+			void
+			run();
 		};
 	}
 }
 
-#endif	// AWEXD
-#endif // XPCC_ATXMEGA__TIMER_AWEX_D_HPP
+#include "double_indicator_impl.hpp"
+
+#endif	// XPCC__PWM_DOUBLE_INDICATOR_HPP

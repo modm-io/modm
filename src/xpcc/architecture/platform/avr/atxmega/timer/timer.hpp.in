@@ -47,8 +47,6 @@ namespace xpcc
 {
 	namespace atxmega
 	{
-		typedef void (*F) (void);
-		
 		/**
 		 * \brief		Timer Module {{ id }}{{ ty }}
 		 *

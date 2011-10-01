@@ -5,7 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -25,66 +25,74 @@
  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
-// ----------------------------------------------------------------------------
-/*
- * WARNING: This file is generated automatically, do not edit!
- * Please modify the corresponding *.in file instead and rebuild this file. 
+ *
+ * $Id$
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_ATXMEGA__TIMER_AWEX_D_HPP
-#define XPCC_ATXMEGA__TIMER_AWEX_D_HPP
+#ifndef XPCC__PWM_RGB_HPP
+#define XPCC__PWM_RGB_HPP
 
-#include <avr/io.h>
-#include <stdint.h>
-
-#if defined(AWEXD) || defined(__DOXYGEN__)
+#include "led.hpp"
 
 namespace xpcc
 {
-	namespace atxmega
+	namespace pwm
 	{
-		/**
-		 * \brief		Advanced Waveform EXtension of Timer D
-		 *
-		 * \ingroup		atxmega_timer
-		 */
-		class WaveformD
+		
+		enum Rgba
 		{
+			RED,
+			GREEN,
+			BLUE,
+			ALPHA
+		};
+		
+		/**
+		 * \brief Group three PWM LED into a RGB controller.
+		 *
+		 * \see Led
+		 *
+		 * \author	Niklas Hauser
+		 * \ingroup pwm
+		 */
+		class Rgb
+		{
+		private:
+			Led* redLed;
+			Led* greenLed;
+			Led* blueLed;
 		public:
-			inline static AWEX_t&
-			getWaveformBase()
-			{
-				return AWEXD;
-			}
+			/**
+			 * \param	red		a PWM Led module of a red color led
+			 * \param	green	a PWM Led module of a green color led
+			 * \param	blue	a PWM Led module of a blue color led
+			 */
+			Rgb(Led* red, Led* green, Led* blue);
 			
-			inline static void
-			setAWEXMode(uint8_t mode)
-			{
-				AWEXD_CTRL = (AWEXD_CTRL & ~(AWEX_PGM_bm|AWEX_CWCM_bm)) | mode;
-			}
+			/// set the normalized brightness
+			void
+			setValues(float red, float green, float blue);
 			
-			inline static void
-			setAWEXDTIEnable(uint8_t selection)
-			{
-				AWEXD_CTRL = (AWEXD_CTRL & ~(AWEX_DTICCDEN_bm|AWEX_DTICCCEN_bm|AWEX_DTICCBEN_bm|AWEX_DTICCAEN_bm)) | selection;
-			}
+			/// get the normalized brightness of any led
+			float
+			getValue(Rgba color);
 			
-			inline static void
-			setAWEXFaultDetection(uint8_t mode)
-			{
-				AWEXD_FDCTRL = mode;
-			}
+			/// \return \c if any led if fading
+			bool
+			isFading();
 			
-			inline static uint8_t
-			getAWEXStatus()
-			{
-				return AWEXD_STATUS;
-			}
+			/// fade to the normalized brightness within x ms
+			void
+			fadeTo(uint16_t time, float red, float green, float blue);
+			
+			/// Must be called periodically, preferably in the main while loop.
+			void
+			run();
 		};
 	}
 }
 
-#endif	// AWEXD
-#endif // XPCC_ATXMEGA__TIMER_AWEX_D_HPP
+#include "rgb_impl.hpp"
+
+#endif	// XPCC__PWM_RGB_HPP

@@ -5,7 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -25,66 +25,54 @@
  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
-// ----------------------------------------------------------------------------
-/*
- * WARNING: This file is generated automatically, do not edit!
- * Please modify the corresponding *.in file instead and rebuild this file. 
+ *
+ * $Id$
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_ATXMEGA__TIMER_AWEX_D_HPP
-#define XPCC_ATXMEGA__TIMER_AWEX_D_HPP
+#ifndef XPCC__PWM_LED_HPP
+#define XPCC__PWM_LED_HPP
 
-#include <avr/io.h>
 #include <stdint.h>
-
-#if defined(AWEXD) || defined(__DOXYGEN__)
+#include <xpcc/workflow/protothread.hpp>
+#include <xpcc/workflow/timeout.hpp>
+#include <xpcc/architecture/driver/accessor/flash.hpp>
 
 namespace xpcc
 {
-	namespace atxmega
+	namespace pwm
 	{
 		/**
-		 * \brief		Advanced Waveform EXtension of Timer D
+		 * \brief PWM LED Interface.
 		 *
-		 * \ingroup		atxmega_timer
+		 * \author	Niklas Hauser
+		 * \ingroup pwm
 		 */
-		class WaveformD
+		class Led : public xpcc::pt::Protothread
 		{
 		public:
-			inline static AWEX_t&
-			getWaveformBase()
-			{
-				return AWEXD;
-			}
+			virtual void
+			setValue(float brightness) = 0;
 			
-			inline static void
-			setAWEXMode(uint8_t mode)
-			{
-				AWEXD_CTRL = (AWEXD_CTRL & ~(AWEX_PGM_bm|AWEX_CWCM_bm)) | mode;
-			}
+			virtual float
+			getValue() = 0;
 			
-			inline static void
-			setAWEXDTIEnable(uint8_t selection)
-			{
-				AWEXD_CTRL = (AWEXD_CTRL & ~(AWEX_DTICCDEN_bm|AWEX_DTICCCEN_bm|AWEX_DTICCBEN_bm|AWEX_DTICCAEN_bm)) | selection;
-			}
+			virtual bool
+			isFading() = 0;
 			
-			inline static void
-			setAWEXFaultDetection(uint8_t mode)
-			{
-				AWEXD_FDCTRL = mode;
-			}
+			virtual void
+			fadeTo(uint16_t time, float brightness) = 0;
 			
-			inline static uint8_t
-			getAWEXStatus()
-			{
-				return AWEXD_STATUS;
-			}
+			virtual void
+			on(uint16_t fadeTime=70) = 0;
+			
+			virtual void
+			off(uint16_t fadeTime=70) = 0;
+			
+			virtual bool
+			run() = 0;
 		};
 	}
 }
 
-#endif	// AWEXD
-#endif // XPCC_ATXMEGA__TIMER_AWEX_D_HPP
+#endif	// XPCC__PWM_LED_HPP

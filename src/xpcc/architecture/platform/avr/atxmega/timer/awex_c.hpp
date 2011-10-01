@@ -46,7 +46,7 @@ namespace xpcc
 	namespace atxmega
 	{
 		/**
-		 * \brief		Advanced WAveform EXtension of Timer C
+		 * \brief		Advanced Waveform EXtension of Timer C
 		 *
 		 * \ingroup		atxmega_timer
 		 */

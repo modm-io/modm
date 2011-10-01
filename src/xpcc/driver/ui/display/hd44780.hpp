@@ -87,7 +87,7 @@ namespace xpcc
 		setCursor(uint8_t line, uint8_t column);
 		
 		virtual void
-		command(Command command);
+		execute(Command command);
 		
 		void
 		clear();

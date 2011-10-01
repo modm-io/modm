@@ -5,7 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -25,66 +25,65 @@
  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
-// ----------------------------------------------------------------------------
-/*
- * WARNING: This file is generated automatically, do not edit!
- * Please modify the corresponding *.in file instead and rebuild this file. 
+ *
+ * $Id$
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_ATXMEGA__TIMER_AWEX_D_HPP
-#define XPCC_ATXMEGA__TIMER_AWEX_D_HPP
+#ifndef XPCC__PWM_PULSE_HPP
+#define XPCC__PWM_PULSE_HPP
 
-#include <avr/io.h>
+#include "led.hpp"
 #include <stdint.h>
-
-#if defined(AWEXD) || defined(__DOXYGEN__)
 
 namespace xpcc
 {
-	namespace atxmega
+	namespace pwm
 	{
 		/**
-		 * \brief		Advanced Waveform EXtension of Timer D
+		 * \brief PWM LED Pulser.
 		 *
-		 * \ingroup		atxmega_timer
+		 * \see Led
+		 *
+		 * \author	Niklas Hauser
+		 * \ingroup pwm
 		 */
-		class WaveformD
+		class Pulse
 		{
+		private:
+			Led* led;
+			const uint16_t halfPeriod;
+			uint8_t counter;
+			bool pulseDirection;
+			bool isPulsing;
+			bool isCounting;
+			
 		public:
-			inline static AWEX_t&
-			getWaveformBase()
-			{
-				return AWEXD;
-			}
+			/**
+			 * \param	led		a PWM Led module
+			 * \param	period	pulse cycle period in ms.
+			 */
+			Pulse(Led* led, uint16_t period=1000);
 			
-			inline static void
-			setAWEXMode(uint8_t mode)
-			{
-				AWEXD_CTRL = (AWEXD_CTRL & ~(AWEX_PGM_bm|AWEX_CWCM_bm)) | mode;
-			}
+			/// start pulsing for ever.
+			void
+			start();
 			
-			inline static void
-			setAWEXDTIEnable(uint8_t selection)
-			{
-				AWEXD_CTRL = (AWEXD_CTRL & ~(AWEX_DTICCDEN_bm|AWEX_DTICCCEN_bm|AWEX_DTICCBEN_bm|AWEX_DTICCAEN_bm)) | selection;
-			}
+			/// Stops pulsing after finishing the current cycle.
+			void
+			stop();
 			
-			inline static void
-			setAWEXFaultDetection(uint8_t mode)
-			{
-				AWEXD_FDCTRL = mode;
-			}
+			/// Pulse a number of times and then stop.
+			void
+			pulseTimes(uint8_t);
 			
-			inline static uint8_t
-			getAWEXStatus()
-			{
-				return AWEXD_STATUS;
-			}
+			/// Must be called periodically, preferably in the main while loop.
+			void
+			run();
 		};
 	}
 }
 
-#endif	// AWEXD
-#endif // XPCC_ATXMEGA__TIMER_AWEX_D_HPP
+#include "pulse_impl.hpp"
+
+#endif	// XPCC__PWM_PULSE_HPP

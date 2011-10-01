@@ -5,7 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -25,66 +25,63 @@
  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
-// ----------------------------------------------------------------------------
-/*
- * WARNING: This file is generated automatically, do not edit!
- * Please modify the corresponding *.in file instead and rebuild this file. 
+ *
+ * $Id$
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_ATXMEGA__TIMER_AWEX_D_HPP
-#define XPCC_ATXMEGA__TIMER_AWEX_D_HPP
+#ifndef XPCC__PWM_PULSE_HPP
+#	error	"Don't include this file directly, use 'pulse.hpp' instead!"
+#endif
 
-#include <avr/io.h>
-#include <stdint.h>
-
-#if defined(AWEXD) || defined(__DOXYGEN__)
-
-namespace xpcc
+// ----------------------------------------------------------------------------
+xpcc::pwm::Pulse::Pulse(Led* led, uint16_t period)
+:	led(led), halfPeriod(period/2), counter(0),
+	pulseDirection(false), isPulsing(false), isCounting(false)
 {
-	namespace atxmega
-	{
-		/**
-		 * \brief		Advanced Waveform EXtension of Timer D
-		 *
-		 * \ingroup		atxmega_timer
-		 */
-		class WaveformD
-		{
-		public:
-			inline static AWEX_t&
-			getWaveformBase()
-			{
-				return AWEXD;
-			}
-			
-			inline static void
-			setAWEXMode(uint8_t mode)
-			{
-				AWEXD_CTRL = (AWEXD_CTRL & ~(AWEX_PGM_bm|AWEX_CWCM_bm)) | mode;
-			}
-			
-			inline static void
-			setAWEXDTIEnable(uint8_t selection)
-			{
-				AWEXD_CTRL = (AWEXD_CTRL & ~(AWEX_DTICCDEN_bm|AWEX_DTICCCEN_bm|AWEX_DTICCBEN_bm|AWEX_DTICCAEN_bm)) | selection;
-			}
-			
-			inline static void
-			setAWEXFaultDetection(uint8_t mode)
-			{
-				AWEXD_FDCTRL = mode;
-			}
-			
-			inline static uint8_t
-			getAWEXStatus()
-			{
-				return AWEXD_STATUS;
-			}
-		};
+}
+
+void
+xpcc::pwm::Pulse::start()
+{
+	isPulsing = true;
+}
+
+void
+xpcc::pwm::Pulse::stop()
+{
+	isPulsing = false;
+}
+
+void
+xpcc::pwm::Pulse::pulseTimes(uint8_t times)
+{
+	if (times) {
+		counter = times;
+		isPulsing = true;
+		isCounting = true;
 	}
 }
 
-#endif	// AWEXD
-#endif // XPCC_ATXMEGA__TIMER_AWEX_D_HPP
+void
+xpcc::pwm::Pulse::run()
+{
+    led->run();
+	
+	if (!led->isFading() && (isPulsing || !pulseDirection))
+	{
+		if (pulseDirection) {
+			led->on(halfPeriod);
+			
+			if (isCounting && !--counter) {
+				isPulsing = false;
+				isCounting = false;
+			}
+		}
+		else {
+			led->off(halfPeriod);
+		}
+		pulseDirection = !pulseDirection;
+	}
+}
+// ----------------------------------------------------------------------------
