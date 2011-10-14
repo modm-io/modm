@@ -74,8 +74,8 @@ namespace xpcc
 		 * This specialization is to be used in case of no payload. The second
 		 * parameter of the method has to be a void*.
 		 *
-		 * \param	component	Pointer to a component object
-		 * \param	function	Pointer to a function of the component object
+		 * \param	componentObject	Pointer to a component object
+		 * \param	memberFunction	Pointer to a function of the component object
 		 */
 		template <typename C>
 		ResponseCallback(C *componentObject, void (C::*memberFunction)(const Header& header)) :

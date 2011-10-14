@@ -13,4 +13,7 @@ websites.
 - \subpage installation_linux "Installation on Linux"
 - \subpage installation_windows "Installation on Windows"
 
+Afterwards you might want to configure your faviorite IDE to use it with xpcc.
+
+- \subpage configure_ide "Configure an IDE"
 */

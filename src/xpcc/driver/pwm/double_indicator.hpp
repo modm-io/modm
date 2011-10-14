@@ -76,7 +76,7 @@ namespace xpcc
 			 * \param	led			a PWM Led module
 			 * \param	period		of the indicating cycle
 			 * \param	on1			length of the first "on" part in percent
-			 * \param	off			length of the first "off" part in percent
+			 * \param	pause		length of the first "off" part in percent
 			 * \param	on2			length of the second "on" part in percent
 			 * \param	onFade		time in ms until the LED is fully on
 			 * \param	offFade		time in ms until the LED is fully off

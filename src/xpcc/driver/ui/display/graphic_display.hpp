@@ -264,7 +264,7 @@ namespace xpcc
 		 * 
 		 * Default font is xpcc::font::FixedWidth5x8.
 		 * 
-		 * \param	font	Active font
+		 * \param	newFont	Active font
 		 * \see		xpcc::font
 		 */
 		inline void

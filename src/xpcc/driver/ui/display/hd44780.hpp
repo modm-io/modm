@@ -51,7 +51,7 @@ namespace xpcc
 	 * data lines.
 	 * 
 	 * Example:
-	 * \include lcd/hd44780/main.cpp
+	 * \include avr/display/hd44780/main.cpp
 	 * 
 	 * \tparam	E		Enable Pin
 	 * \tparam	RW		Read/Write-Select Pin
