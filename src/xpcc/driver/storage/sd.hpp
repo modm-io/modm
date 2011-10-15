@@ -33,7 +33,7 @@
 #ifndef XPCC__SD_HPP
 #define XPCC__SD_HPP
 
-#include "fatfs.hpp"
+#include "fat.hpp"
 
 namespace xpcc
 {

@@ -37,7 +37,6 @@
 #include <libmaple/rcc.h>
 #include <libmaple/nvic.h>
 #include <libmaple/systick.h>
-#include <libmaple/gpio.h>
 #include <libmaple/adc.h>
 #include <libmaple/timer.h>
 #include <libmaple/usb/usb.h>

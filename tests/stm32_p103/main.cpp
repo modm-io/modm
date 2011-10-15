@@ -10,18 +10,10 @@
 #include <xpcc/driver/ui/display/ea_dog.hpp>
 #include <xpcc/driver/ui/display/font.hpp>
 
-#include <xpcc/driver/storage/fatfs.hpp>
+#include <xpcc/driver/storage/fat.hpp>
+#include <xpcc/driver/storage/sd.hpp>
 
 #include <xpcc/workflow/freertos.hpp>
-
-#include <libmaple/flash.h>
-#include <libmaple/rcc.h>
-#include <libmaple/nvic.h>
-#include <libmaple/systick.h>
-#include <libmaple/gpio.h>
-#include <libmaple/adc.h>
-#include <libmaple/timer.h>
-#include <libmaple/usb/usb.h>
 
 // ----------------------------------------------------------------------------
 xpcc::stm32::Usart2 debugUart(115200);
@@ -183,17 +175,24 @@ DisplayTask task3;*/
 
 #include <libmaple/systick.h>
 #include <fatfs/ff.h>
+#include "sd.hpp"
 
-extern void
-disk_timerproc (void);
+SdCard sdCard;
+xpcc::fat::FileSystem fileSystem(&sdCard);
 
-void systick_timer(void)
+FIL file;
+DIR dir;
+FILINFO fno;
+FRESULT rc;
+
+void
+systick_timer(void)
 {
 	static uint16_t cnt=0;
 	static uint8_t cntdiskio=0;
 
 	cnt++;
-	if( cnt >= 500 ) {
+	if (cnt >= 500) {
 		cnt = 0;
 		// alive sign
 		Led1::toggle();
@@ -202,17 +201,9 @@ void systick_timer(void)
 	cntdiskio++;
 	if (cntdiskio >= 10) {
 		cntdiskio = 0;
-		disk_timerproc(); // to be called every 10ms
+		sdCard.disk_timerproc(); /* to be called every 10ms */
 	}
 }
-
-FATFS fileSystem;
-FIL file;
-DIR dir;
-FILINFO fno;
-FRESULT rc;
-
-//xpcc::fatfs::FileSystem fs;
 
 // ----------------------------------------------------------------------------
 int
@@ -221,7 +212,7 @@ main(void)
 	LedStat::setOutput(xpcc::gpio::HIGH);
 	Led1::setOutput(xpcc::gpio::LOW);
 	Led2::setOutput(xpcc::gpio::LOW);
-
+	
 	ButtonWakeUp::setInput();
 	//Button1Inverted::setInput(xpcc::stm32::INPUT, xpcc::stm32::PULLUP);
 	//Button2Inverted::setInput(xpcc::stm32::INPUT, xpcc::stm32::PULLUP);
@@ -236,7 +227,7 @@ main(void)
 	
 	display.setFont(xpcc::font::FixedWidth5x8);
 	
-	// IO-Expander have to initalized after LCD because they use the same
+	// IO-Expander have to initialized after LCD because they use the same
 	// Reset line
 	gpioExpander.initialize();
 	gpioExpander.configure(0x7c, 0x7c);
@@ -250,10 +241,6 @@ main(void)
 	
 	// Start the FreeRTOS scheduler
 	//xpcc::freertos::Scheduler::schedule();
-	
-	// mount the SD card (any drive number will map to the SD card)
-	XPCC_LOG_DEBUG << "mount file system" << xpcc::endl;
-	f_mount(0, &fileSystem);
 	
 	// Directory testing
 	XPCC_LOG_DEBUG << "Open root directory " << xpcc::endl;

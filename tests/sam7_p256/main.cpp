@@ -14,9 +14,9 @@
 xpcc::at91::Debug debugUart(115200);
 xpcc::IODeviceWrapper<xpcc::at91::Debug> loggerDevice(debugUart); 
 
-xpcc::log::Logger xpcc::log::debug(loggerDevice); 
-xpcc::log::Logger xpcc::log::info(loggerDevice); 
-xpcc::log::Logger xpcc::log::warning(loggerDevice); 
+xpcc::log::Logger xpcc::log::debug(loggerDevice);
+xpcc::log::Logger xpcc::log::info(loggerDevice);
+xpcc::log::Logger xpcc::log::warning(loggerDevice);
 xpcc::log::Logger xpcc::log::error(loggerDevice);
 
 // ----------------------------------------------------------------------------

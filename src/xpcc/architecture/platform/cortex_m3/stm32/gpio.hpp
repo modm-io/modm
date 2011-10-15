@@ -34,7 +34,30 @@
 #define XPCC_STM32__GPIO_HPP
 
 #include <xpcc/architecture/driver/gpio.hpp>
-#include "device.h"
+
+// TODO
+#ifndef STDLIB
+#	define	LIBMAPLE
+#endif
+
+#if defined LIBMAPLE
+#include <libmaple/gpio.h>
+
+typedef gpio_reg_map GPIO_TypeDef;
+
+#else
+#include <stm32f10x.h>
+
+#define	GPIOA_BASE_ADDR GPIOA_BASE
+#define	GPIOB_BASE_ADDR GPIOB_BASE
+#define	GPIOC_BASE_ADDR GPIOC_BASE
+#define	GPIOD_BASE_ADDR GPIOD_BASE
+#define	GPIOE_BASE_ADDR GPIOE_BASE
+#define	GPIOF_BASE_ADDR GPIOF_BASE
+#define	GPIOG_BASE_ADDR GPIOG_BASE
+#endif
+
+#define	GPIO_REG(r)		reinterpret_cast<GPIO_TypeDef *>(r)
 
 namespace xpcc
 {
@@ -102,8 +125,8 @@ namespace xpcc
 		template<unsigned int P, unsigned char N, bool = (N >= 8)>
 		struct GpioMode {
 			ALWAYS_INLINE static void setMode(uint32_t m) {
-				reinterpret_cast<gpio_reg_map*> (P)->CRH &= ~(0xf << ((N - 8) * 4));
-				reinterpret_cast<gpio_reg_map*> (P)->CRH |= m << ((N - 8) * 4);
+				reinterpret_cast<GPIO_TypeDef*>(P)->CRH &= ~(0xf << ((N - 8) * 4));
+				reinterpret_cast<GPIO_TypeDef*>(P)->CRH |= m << ((N - 8) * 4);
 			}
 		};
 		
@@ -111,8 +134,8 @@ namespace xpcc
 		template<unsigned int P, unsigned char N>
 		struct GpioMode<P, N, false> {
 			ALWAYS_INLINE static void setMode(uint32_t m) {
-				reinterpret_cast<gpio_reg_map*> (P)->CRL &= ~(0xf << (N * 4));
-				reinterpret_cast<gpio_reg_map*> (P)->CRL |= m << (N * 4);
+				reinterpret_cast<GPIO_TypeDef*>(P)->CRL &= ~(0xf << (N * 4));
+				reinterpret_cast<GPIO_TypeDef*>(P)->CRL |= m << (N * 4);
 			}
 		};
 	}
@@ -144,19 +167,19 @@ namespace xpcc
 			if (mode != ::xpcc::stm32::ANALOG) { \
 				config = (mode | type) & 0xc0; \
 				if (type == ::xpcc::stm32::PULLUP) { \
-					GPIO ## port ## _BASE->BSRR = (1 << pin); \
+					GPIO_REG(GPIO ## port ## _BASE_ADDR)->BSRR = (1 << pin); \
 				} else { \
-					GPIO ## port ## _BASE->BRR = (1 << pin); \
+					GPIO_REG(GPIO ## port ## _BASE_ADDR)->BRR = (1 << pin); \
 				} \
 			} \
 			::xpcc::stm32::GpioMode<GPIO ## port ## _BASE_ADDR, pin>::setMode(config); \
 		} \
 		ALWAYS_INLINE static void setInput() { setInput(::xpcc::stm32::INPUT); } \
-		ALWAYS_INLINE static void set() { GPIO ## port ## _BASE->BSRR = (1 << pin); } \
-		ALWAYS_INLINE static void reset() { GPIO ## port ## _BASE->BRR = (1 << pin); } \
+		ALWAYS_INLINE static void set() { GPIO_REG(GPIO ## port ## _BASE_ADDR)->BSRR = (1 << pin); } \
+		ALWAYS_INLINE static void reset() { GPIO_REG(GPIO ## port ## _BASE_ADDR)->BRR = (1 << pin); } \
 		ALWAYS_INLINE static void toggle() { \
-			if (GPIO ## port ## _BASE->IDR & (1 << pin)) { reset(); } else { set(); } } \
-		ALWAYS_INLINE static bool read() { return (GPIO ## port ## _BASE->IDR & (1 << pin)); } \
+			if (GPIO_REG(GPIO ## port ## _BASE_ADDR)->IDR & (1 << pin)) { reset(); } else { set(); } } \
+		ALWAYS_INLINE static bool read() { return (GPIO_REG(GPIO ## port ## _BASE_ADDR)->IDR & (1 << pin)); } \
 		\
 		ALWAYS_INLINE static void \
 		set(bool status) { \
@@ -206,10 +229,10 @@ namespace xpcc
 			uint32_t config = mode | type | speed; \
 			::xpcc::stm32::GpioMode<GPIO ## port ## _BASE_ADDR, pin>::setMode(config); \
 		} \
-		ALWAYS_INLINE static void set() { GPIO ## port ## _BASE->BSRR = (1 << pin); } \
-		ALWAYS_INLINE static void reset() { GPIO ## port ## _BASE->BRR = (1 << pin); } \
+		ALWAYS_INLINE static void set() { GPIO_REG(GPIO ## port ## _BASE_ADDR)->BSRR = (1 << pin); } \
+		ALWAYS_INLINE static void reset() { GPIO_REG(GPIO ## port ## _BASE_ADDR)->BRR = (1 << pin); } \
 		ALWAYS_INLINE static void toggle() { \
-			if (GPIO ## port ## _BASE->IDR & (1 << pin)) { reset(); } else { set(); } } \
+			if (GPIO_REG(GPIO ## port ## _BASE_ADDR)->IDR & (1 << pin)) { reset(); } else { set(); } } \
 		ALWAYS_INLINE static void \
 		set(bool status) { \
 			if (status) { \
@@ -250,15 +273,15 @@ namespace xpcc
 			if (mode == ::xpcc::stm32::INPUT) { \
 				config = (mode | type) & 0xc; \
 				if (type == ::xpcc::stm32::PULLUP) { \
-					GPIO ## port ## _BASE->BSRR = (1 << pin); \
+					GPIO_REG(GPIO ## port ## _BASE_ADDR)->BSRR = (1 << pin); \
 				} else { \
-					GPIO ## port ## _BASE->BRR = (1 << pin); \
+					GPIO_REG(GPIO ## port ## _BASE_ADDR)->BRR = (1 << pin); \
 				} \
 			} \
 			::xpcc::stm32::GpioMode<GPIO ## port ## _BASE_ADDR, pin>::setMode(config); \
 		} \
 		ALWAYS_INLINE static void setInput() { setInput(::xpcc::stm32::INPUT); } \
-		ALWAYS_INLINE static bool read() { return (GPIO ## port ## _BASE->IDR & (1 << pin)); } \
+		ALWAYS_INLINE static bool read() { return (GPIO_REG(GPIO ## port ## _BASE_ADDR)->IDR & (1 << pin)); } \
 	}
 
 #endif // XPCC_STM32__GPIO_HPP

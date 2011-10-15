@@ -31,8 +31,9 @@
 // ----------------------------------------------------------------------------
 
 #include <fatfs/diskio.h>
+#include <fatfs/ffconf.h>
 
-#include "fatfs.hpp"
+#include "fat.hpp"
 
 // ----------------------------------------------------------------------------
 // FatFs Backend
@@ -48,40 +49,87 @@ get_fattime(void)
 			(0));
 }
 
-/*extern "C"
-DSTATUS
-disk_initialize(BYTE drive)
-{
-	return 0;
-}
+// ----------------------------------------------------------------------------
+#if _VOLUMES == 1
+
+static xpcc::fat::Disk * diskInterface;
 
 extern "C"
 DSTATUS
-disk_status(BYTE drive)
+disk_initialize(BYTE /*drive*/)
 {
-	return 0;
+	return diskInterface->initialize();
+	/*if (diskInterface->initialize()) {
+		return RES_OK;
+	}
+	else {
+		return RES_ERROR;
+	}*/
+}
+
+extern "C"
+DSTATUS
+disk_status(BYTE /*drive*/)
+{
+	return diskInterface->getStatus();
 }
 
 extern "C"
 DRESULT
-disk_read(BYTE drive, BYTE* buffer, DWORD sectorNumber, BYTE sectorCount)
+disk_read(BYTE /*drive*/, BYTE* buffer, DWORD sectorNumber, BYTE sectorCount)
 {
-	return RES_ERROR;
+	return diskInterface->read(buffer, sectorNumber, sectorCount);
+	/*if (diskInterface->read(buffer, sectorNumber, sectorCount)) {
+		return RES_OK;
+	}
+	else {
+		return RES_ERROR;
+	}*/
 }
 
 extern "C"
 DRESULT
-disk_write(BYTE drive, const BYTE* buffer, DWORD sectorNumber, BYTE sectorCount)
+disk_write(BYTE /*drive*/, const BYTE* buffer, DWORD sectorNumber, BYTE sectorCount)
 {
-	return RES_ERROR;
+	return diskInterface->write(buffer, sectorNumber, sectorCount);
+	/*if (diskInterface->write(buffer, sectorNumber, sectorCount)) {
+		return RES_OK;
+	}
+	else {
+		return RES_ERROR;
+	}*/
 }
 
 extern "C"
 DRESULT
-disk_ioctl(BYTE drive, BYTE command, void* buffer)
+disk_ioctl(BYTE /*drive*/, BYTE command, void* buffer)
 {
-	return RES_ERROR;
-}*/
+	return diskInterface->ioctl(command, reinterpret_cast<uint32_t *>(buffer));
+	//return RES_ERROR;
+}
+
+#else
+#	error "Only one FatFS drive supported at the moment!"
+#endif
 
 // ----------------------------------------------------------------------------
-//_VOLUMES
+xpcc::fat::FileSystem::FileSystem(Disk *interface, 
+		uint8_t drive)
+{
+	diskInterface = interface;
+	this->fileSystem.drv = drive;
+	
+	f_mount(drive, &this->fileSystem);
+}
+
+xpcc::fat::FileSystem::~FileSystem()
+{
+	f_mount(this->fileSystem.drv, 0);
+}
+
+// ----------------------------------------------------------------------------
+xpcc::fat::FileInfo::FileInfo()
+{
+	info.lfname = 0;
+	info.lfsize = 0;
+}
