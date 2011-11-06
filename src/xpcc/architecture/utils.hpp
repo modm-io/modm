@@ -115,6 +115,8 @@
 	#ifdef XPCC__CPU_AVR
 	#	define	MAIN_FUNCTION	int main(void) __attribute__((OS_main)); \
 								int main(void)
+	#elif defined XPCC__CPU_X86
+	#	define 	MAIN_FUNCTION	int main( int argc, char* argv[] )
 	#else
 	#	define	MAIN_FUNCTION	int main(void)
 	#endif
