@@ -113,14 +113,14 @@ disk_ioctl(BYTE /*drive*/, BYTE command, void* buffer)
 #endif
 
 // ----------------------------------------------------------------------------
-xpcc::fat::FileSystem::FileSystem(Disk *interface, 
-		uint8_t drive)
-{
-	diskInterface = interface;
-	this->fileSystem.drv = drive;
+//xpcc::fat::FileSystem::FileSystem(Disk *interface, 
+//		uint8_t drive)
+//{
+//	diskInterface = interface;
+//	this->fileSystem.drv = drive;
 	
-	f_mount(drive, &this->fileSystem);
-}
+//	f_mount(drive, &this->fileSystem);
+//}
 
 xpcc::fat::FileSystem::~FileSystem()
 {

@@ -33,6 +33,7 @@
 #ifndef XPCC__FAT_HPP
 #define XPCC__FAT_HPP
 
+#include <stdint.h>
 #include <fatfs/ff.h>
 #include <fatfs/diskio.h>
 
@@ -92,7 +93,7 @@ namespace xpcc
 		class FileSystem
 		{
 		public:
-			FileSystem(Disk *interface, uint8_t drive = 0);
+//			FileSystem(Disk *interface, uint8_t drive = 0);
 			
 			~FileSystem();
 			

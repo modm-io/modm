@@ -187,4 +187,9 @@
 #	define XPCC__CPU_STRING 		"Unknown"
 #endif
 
+// windows lacks support for some macros c99 we need to provide here
+#if defined XPCC__OS_WIN32
+#	include "platform/x86/windows.hpp"
+#endif
+
 #endif	// !__DOXYGEN__
