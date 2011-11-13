@@ -85,8 +85,8 @@
 #define	XPCC__CPU_ARM7TDMI
 #define	XPCC__CPU_CORTEX_M3
 
-#define	XPCC__CPU_X86
-#define	XPCC__CPU_X86_64
+#define	XPCC__CPU_HOSTED
+#define	XPCC__CPU_HOSTED_64
 //@}
 
 #else //!__DOXYGEN__
@@ -162,9 +162,9 @@
 #endif
 
 #if defined __X86__ || defined __i386__ || defined i386 || defined _M_IX86 || defined __386__ || defined __x86_64__ || defined _M_X64
-#	define XPCC__CPU_X86 1
+#	define XPCC__CPU_HOSTED 1
 #	if defined __x86_64__ || defined _M_X64
-#		define XPCC__CPU_X86_64 1
+#		define XPCC__CPU_HOSTED_64 1
 #		define XPCC__CPU_STRING		"AMD x86-64"
 #	else
 #		define XPCC__CPU_STRING		"Intel 386+"
@@ -189,6 +189,7 @@
 
 // windows lacks support for some macros c99 we need to provide here
 #if defined XPCC__OS_WIN32
+#pragma warn bla bla
 #	include "platform/x86/windows.hpp"
 #endif
 

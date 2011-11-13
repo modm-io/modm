@@ -51,7 +51,7 @@
 #	include "platform/arm7.hpp"
 #elif defined XPCC__CPU_CORTEX_M3
 #	include "platform/cortex_m3.hpp"
-#elif defined XPCC__CPU_X86
+#elif defined XPCC__CPU_HOSTED
 #	include "platform/x86.hpp"
 #else
 #	error "Unknown platform"
