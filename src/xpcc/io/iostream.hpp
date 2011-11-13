@@ -149,7 +149,7 @@ namespace xpcc
 		
 #if defined(XPCC__OS_OSX)
 		// For APPLE 'int64_t' is of type 'int'. Therefore there is no
-		// function here for the default type 'long int'. As 'long int' is the same
+		// function here for the default type 'long int'. As 'long int' has the same
 		// width as 'int64_t' we just use a typedef here.
 		ALWAYS_INLINE IOStream&
 		operator << (const long int& v)
@@ -168,7 +168,7 @@ namespace xpcc
 		
 #if defined(XPCC__CPU_ARM)
 		// For ARM 'int32_t' is of type 'long'. Therefore there is no
-		// function here for the default type 'int'. As 'int' is the same
+		// function here for the default type 'int'. As 'int' has the same
 		// width as 'int32_t' we just use a typedef here.
 		ALWAYS_INLINE IOStream&
 		operator << (const int& v)
