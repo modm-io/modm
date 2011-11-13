@@ -189,7 +189,6 @@
 
 // windows lacks support for some macros c99 we need to provide here
 #if defined XPCC__OS_WIN32
-#pragma warn bla bla
 #	include "platform/x86/windows.hpp"
 #endif
 
