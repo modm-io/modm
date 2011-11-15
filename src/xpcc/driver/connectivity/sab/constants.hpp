@@ -30,14 +30,14 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC_APB__CONSTANTS_HPP
-#define	XPCC_APB__CONSTANTS_HPP
+#ifndef	XPCC_SAB__CONSTANTS_HPP
+#define	XPCC_SAB__CONSTANTS_HPP
 
 #include <stdint.h>
 
 namespace xpcc
 {
-	namespace apb
+	namespace sab
 	{
 		/**
 		 * \brief	Error code
@@ -45,7 +45,7 @@ namespace xpcc
 		 * Error codes below 0x20 are reserved for the system. Every other
 		 * code may be used by user.
 		 * 
-		 * \ingroup	apb
+		 * \ingroup	sab
 		 */
 		enum Error
 		{
@@ -78,7 +78,7 @@ namespace xpcc
 		
 		/**
 		 * \brief	Flags
-		 * \ingroup	apb
+		 * \ingroup	sab
 		 */
 		enum Flags
 		{
@@ -89,24 +89,24 @@ namespace xpcc
 		
 		/**
 		 * \brief	Maximum length for the payload
-		 * \ingroup	apb
+		 * \ingroup	sab
 		 */
 		const uint8_t maxPayloadLength = 32;
 		
 		/**
 		 * \internal
-		 * \brief	Universal base class for the APB interface
-		 * \ingroup	apb
+		 * \brief	Universal base class for the SAB interface
+		 * \ingroup	sab
 		 */
 		const uint8_t syncByte = 0x54;
 		
 		/**
 		 * \internal
 		 * \brief	Initial value for the CRC8 calculation
-		 * \ingroup	apb
+		 * \ingroup	sab
 		 */
 		const uint8_t crcInitialValue = 0x00;
 	}
 }
 
-#endif	// XPCC_APB__CONSTANTS_HPP
+#endif	// XPCC_SAB__CONSTANTS_HPP

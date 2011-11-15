@@ -1,4 +1,4 @@
-xpcc::apb::Interface < ... > interface;
+xpcc::sab::Interface < ... > interface;
 
 while (1)
 {

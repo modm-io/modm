@@ -155,11 +155,11 @@ namespace xpcc
 	protected:
 		/**
 		 * \internal
-		 * \brief	Universal base class for the APB interface
+		 * \brief	Universal base class for the SAB interface
 		 * 
 		 * \see		<a href="http://www.maxim-ic.com/app-notes/index.mvp/id/27" target="_blank">
 		 * 			Understanding and Using Cyclic Redundancy Checks with Maxim iButton Products</a>
-		 * \ingroup	apb
+		 * \ingroup	sab
 		 */
 		static uint8_t
 		crcUpdate(uint8_t crc, uint8_t data);

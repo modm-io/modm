@@ -30,7 +30,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC_APB__INTERFACE_HPP
+#ifndef	XPCC_SAB__INTERFACE_HPP
 	#error	"Don't include this file directly, use 'interface.hpp' instead!"
 #endif
 
@@ -39,20 +39,20 @@
 #endif
 
 // ----------------------------------------------------------------------------
-template <typename Device> typename xpcc::apb::Interface<Device>::State \
-	xpcc::apb::Interface<Device>::state = SYNC;
+template <typename Device> typename xpcc::sab::Interface<Device>::State \
+	xpcc::sab::Interface<Device>::state = SYNC;
 
-template <typename Device> uint8_t xpcc::apb::Interface<Device>::buffer[maxPayloadLength + 3];
-template <typename Device> uint8_t xpcc::apb::Interface<Device>::crc;
-template <typename Device> uint8_t xpcc::apb::Interface<Device>::position;
-template <typename Device> uint8_t xpcc::apb::Interface<Device>::length;
-template <typename Device> uint8_t xpcc::apb::Interface<Device>::lengthOfReceivedMessage = 0;
+template <typename Device> uint8_t xpcc::sab::Interface<Device>::buffer[maxPayloadLength + 3];
+template <typename Device> uint8_t xpcc::sab::Interface<Device>::crc;
+template <typename Device> uint8_t xpcc::sab::Interface<Device>::position;
+template <typename Device> uint8_t xpcc::sab::Interface<Device>::length;
+template <typename Device> uint8_t xpcc::sab::Interface<Device>::lengthOfReceivedMessage = 0;
 
 // ----------------------------------------------------------------------------
 
 template <typename Device>
 void
-xpcc::apb::Interface<Device>::initialize()
+xpcc::sab::Interface<Device>::initialize()
 {
 	Device::setBaudrate(115200UL);
 	state = SYNC;
@@ -62,7 +62,7 @@ xpcc::apb::Interface<Device>::initialize()
 
 template <typename Device>
 void
-xpcc::apb::Interface<Device>::sendMessage(uint8_t address, Flags flags, 
+xpcc::sab::Interface<Device>::sendMessage(uint8_t address, Flags flags, 
 		uint8_t command,
 		const void *payload, uint8_t payloadLength)
 {
@@ -89,7 +89,7 @@ xpcc::apb::Interface<Device>::sendMessage(uint8_t address, Flags flags,
 
 template <typename Device> template <typename T>
 void
-xpcc::apb::Interface<Device>::sendMessage(uint8_t address, Flags flags,
+xpcc::sab::Interface<Device>::sendMessage(uint8_t address, Flags flags,
 		uint8_t command,
 		const T& payload)
 {
@@ -100,7 +100,7 @@ xpcc::apb::Interface<Device>::sendMessage(uint8_t address, Flags flags,
 
 template <typename Device>
 void
-xpcc::apb::Interface<Device>::sendMessage(uint8_t address, Flags flags, uint8_t command)
+xpcc::sab::Interface<Device>::sendMessage(uint8_t address, Flags flags, uint8_t command)
 {
 	sendMessage(address, flags,
 			command,
@@ -111,56 +111,56 @@ xpcc::apb::Interface<Device>::sendMessage(uint8_t address, Flags flags, uint8_t 
 
 template <typename Device>
 bool
-xpcc::apb::Interface<Device>::isMessageAvailable()
+xpcc::sab::Interface<Device>::isMessageAvailable()
 {
 	return (lengthOfReceivedMessage != 0);
 }
 
 template <typename Device>
 uint8_t
-xpcc::apb::Interface<Device>::getAddress()
+xpcc::sab::Interface<Device>::getAddress()
 {
 	return (buffer[0] & 0x3f);
 }
 
 template <typename Device>
 uint8_t
-xpcc::apb::Interface<Device>::getCommand()
+xpcc::sab::Interface<Device>::getCommand()
 {
 	return buffer[1];
 }
 
 template <typename Device>
 bool
-xpcc::apb::Interface<Device>::isResponse()
+xpcc::sab::Interface<Device>::isResponse()
 {
 	return (buffer[0] & 0x80) ? true : false;
 }
 
 template <typename Device>
 bool
-xpcc::apb::Interface<Device>::isAcknowledge()
+xpcc::sab::Interface<Device>::isAcknowledge()
 {
 	return (buffer[0] & 0x40) ? true : false;
 }
 
 template <typename Device>
 const uint8_t*
-xpcc::apb::Interface<Device>::getPayload()
+xpcc::sab::Interface<Device>::getPayload()
 {
 	return &buffer[2];
 }
 
 template <typename Device>
 uint8_t
-xpcc::apb::Interface<Device>::getPayloadLength()
+xpcc::sab::Interface<Device>::getPayloadLength()
 {
 	return (lengthOfReceivedMessage - 3);
 }
 
 template <typename Device>
 void
-xpcc::apb::Interface<Device>::dropMessage()
+xpcc::sab::Interface<Device>::dropMessage()
 {
 	lengthOfReceivedMessage = 0;
 }
@@ -169,7 +169,7 @@ xpcc::apb::Interface<Device>::dropMessage()
 
 template <typename Device>
 void
-xpcc::apb::Interface<Device>::update()
+xpcc::sab::Interface<Device>::update()
 {
 	char byte;
 	while (Device::read(byte))

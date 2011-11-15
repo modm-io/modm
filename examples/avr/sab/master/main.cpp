@@ -1,10 +1,10 @@
 
 #include <xpcc/architecture/platform.hpp>
-#include <xpcc/driver/connectivity/apb/interface.hpp>
+#include <xpcc/driver/connectivity/sab/interface.hpp>
 
 MAIN_FUNCTION
 {
-	xpcc::apb::Interface< xpcc::atmega::BufferedUart0 > interface;
+	xpcc::sab::Interface< xpcc::atmega::BufferedUart0 > interface;
 	
 	// set baudrate etc.
 	interface.initialize();

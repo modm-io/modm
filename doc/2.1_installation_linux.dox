@@ -10,14 +10,14 @@ For Ubuntu (and other Debian based Linux-Distributions) just type the
 following in a terminal and you're good to go:
 
 \verbatim
-$ sudo aptitude install python scons python-jinja2 python-lxml doxygen graphviz subversion
+$ sudo apt-get install python scons python-jinja2 python-lxml doxygen graphviz subversion
 \endverbatim
 
 \subsection pc PC
 
 To compile programs for x86 systems you need the following packets:
 \verbatim
-$ sudo aptitude install gcc build-essential tipcutils libboost-thread-dev libboost-system-dev libasio-dev
+$ sudo apt-get install gcc build-essential tipcutils libboost-thread-dev libboost-system-dev libasio-dev
 \endverbatim
 
 \subsection avr AVR
@@ -33,7 +33,7 @@ There some alternatives to get a recent toolchain:
 
 If you're lucky and your distribution offers recent packages the following might do:
 \verbatim
-$ sudo aptitude install gcc-avr binutils-avr avr-libc avrdude
+$ sudo apt-get install gcc-avr binutils-avr avr-libc avrdude
 \endverbatim
 
 \section optimisation Optimisations
@@ -55,7 +55,7 @@ Here is a small guide for Ubuntu 10.10:
 
 Install the dependecies:
 \verbatim
-sudo aptitude install byacc flex libusb-dev
+sudo apt-get install byacc flex libusb-dev
 \endverbatim
 
 Get the latest version of the <a href="http://download.savannah.gnu.org/releases/avrdude/">avrdude source</a>.

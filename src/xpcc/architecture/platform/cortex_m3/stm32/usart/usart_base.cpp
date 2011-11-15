@@ -31,8 +31,8 @@
 #include "usart_base.hpp"
 
 uint16_t
-xpcc::stm32::UsartBase::calculateBaudrateSettings(uint32_t apbclk, uint32_t baudrate)
+xpcc::stm32::UsartBase::calculateBaudrateSettings(uint32_t sabclk, uint32_t baudrate)
 {
 	// see http://www.mikrocontroller.net/topic/143715
-	return ((2 * apbclk) / baudrate + 1) / 2;
+	return ((2 * sabclk) / baudrate + 1) / 2;
 }

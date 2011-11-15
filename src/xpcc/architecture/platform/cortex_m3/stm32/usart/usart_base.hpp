@@ -51,11 +51,11 @@ namespace xpcc
 			/**
 			 * @brief	Calculate settings for the UBR register
 			 * 
-			 * @param	apbclk		Clock frequency of the USART.
+			 * @param	sabclk		Clock frequency of the USART.
 			 * @param	baudrate	Requested baudrate
 			 */
 			static uint16_t
-			calculateBaudrateSettings(uint32_t apbclk, uint32_t baudrate);
+			calculateBaudrateSettings(uint32_t sabclk, uint32_t baudrate);
 		};
 	}
 }

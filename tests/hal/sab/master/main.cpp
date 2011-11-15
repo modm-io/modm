@@ -4,7 +4,7 @@
 #include <avr/interrupt.h>
 
 #include <xpcc/io/iostream.hpp>
-#include <xpcc/communication/apb/interface.hpp>
+#include <xpcc/communication/sab/interface.hpp>
 
 #include <xpcc/architecture/general/gpio.hpp>
 #include <xpcc/architecture/general/time/delay.hpp>
@@ -31,7 +31,7 @@ namespace lcd
 
 xpcc::Hd447800 <lcd::E, lcd::RW, lcd::RS, lcd::Data> display;
 
-xpcc::apb::Interface <xpcc::BufferedUart0> interface;
+xpcc::sab::Interface <xpcc::BufferedUart0> interface;
 
 // ----------------------------------------------------------------------------
 ISR(TIMER2_COMPA_vect) {
@@ -77,7 +77,7 @@ main()
 			timeout.restart(50);
 			
 			uint8_t data = 0xaa;
-			interface.sendMessage(xpcc::apb::Interface<xpcc::BufferedUart0>::ACK, &data, 1);
+			interface.sendMessage(xpcc::sab::Interface<xpcc::BufferedUart0>::ACK, &data, 1);
 		}
 		
 		interface.update();

@@ -31,11 +31,11 @@
 // ----------------------------------------------------------------------------
 /**
  * \ingroup		connectivity
- * \defgroup	apb		(APB) Asynchronous Peripheral Bus
+ * \defgroup	sab		(SAB) Sensor Actor Bus
  * 
- * \section apb_intro	Introduction
+ * \section sab_intro	Introduction
  * 
- * The APB (<b>A</b>synchronous <b>P</b>eripheral <b>B</b>us) is a simple
+ * The SAB (<b>S</b>ensor <b>A</b>actor <b>B</b>us) is a simple
  * master-slave bus system. It is primarily used to query simple sensors and
  * control actuators inside our robots.
  * 
@@ -44,9 +44,9 @@
  * extra IO line, but this depends on the slave.
  * 
  * A complete example, explaining how to use the classes, is available in the
- * \c example/apb folder.
+ * \c example/sab folder.
  * 
- * \section apb_protocol Protocol
+ * \section sab_protocol Protocol
  * 
  * Features:
  * - Baudrate is 115200 Baud.
@@ -92,14 +92,14 @@
  * - \c false - Message signals an error condition and carries only one byte of
  *    payload. This byte is an error code.
  * 
- * \section apb_electric	Electrical characteristics
+ * \section sab_electric	Electrical characteristics
  * 
  * Between different boards CAN transceivers are used. Compared to RS485 the
  * CAN transceivers have the advantage to work without a separate direction input.
  * You can just connected the transceiver directly to the UART of your
  * microcontroller. 
  * 
- * \image html apb_external.png
+ * \image html sab_external.png
  * 
  * Within a single PCB, standard digital levels are used (either 0-3,3V or 0-5V)
  * in a multi-drop configuration. Meaning it does not allow multiple drivers but
@@ -107,7 +107,7 @@
  * The idle state of a UART transmission line is high, so standard TTL-AND gates
  * have to be used for bundling transmission lines from multiple slaves.
  * 
- * \image html apb_internal.png
+ * \image html sab_internal.png
  * 
  * Both approaches can be combined to reduce the number of needed CAN
  * transceivers on a single board. Between two boards you should always use
@@ -119,11 +119,11 @@
  * \author	Fabian Greif
  */
 
-#ifndef XPCC__APB_HPP
-#define XPCC__APB_HPP
+#ifndef XPCC__SAB_HPP
+#define XPCC__SAB_HPP
 
-#include "apb/interface.hpp"
-#include "apb/slave.hpp"
-#include "apb/master.hpp"
+#include "sab/interface.hpp"
+#include "sab/slave.hpp"
+#include "sab/master.hpp"
 
-#endif	// XPCC__APB_HPP
+#endif	// XPCC__SAB_HPP

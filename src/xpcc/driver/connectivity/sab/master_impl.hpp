@@ -30,27 +30,27 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_APB__MASTER_HPP
+#ifndef XPCC_SAB__MASTER_HPP
 	#error	"Don't include this file directly, use 'master.hpp' instead!"
 #endif
 
 // ----------------------------------------------------------------------------
 template <typename Interface>
-Interface xpcc::apb::Master<Interface>::interface;
+Interface xpcc::sab::Master<Interface>::interface;
 
 template <typename Interface>
-typename xpcc::apb::Master<Interface>::QueryStatus xpcc::apb::Master<Interface>::queryStatus;
+typename xpcc::sab::Master<Interface>::QueryStatus xpcc::sab::Master<Interface>::queryStatus;
 
 template <typename Interface>
-uint8_t xpcc::apb::Master<Interface>::expectedResponseLength;
+uint8_t xpcc::sab::Master<Interface>::expectedResponseLength;
 
 template <typename Interface>
-xpcc::Timeout<> xpcc::apb::Master<Interface>::timer;
+xpcc::Timeout<> xpcc::sab::Master<Interface>::timer;
 
 // ----------------------------------------------------------------------------
 template <typename Interface>
 void
-xpcc::apb::Master<Interface>::initialize()
+xpcc::sab::Master<Interface>::initialize()
 {
 	queryStatus = ERROR_TIMEOUT;
 }
@@ -58,7 +58,7 @@ xpcc::apb::Master<Interface>::initialize()
 // ----------------------------------------------------------------------------
 template <typename Interface> template <typename T>
 void
-xpcc::apb::Master<Interface>::query(uint8_t slaveAddress, uint8_t command,
+xpcc::sab::Master<Interface>::query(uint8_t slaveAddress, uint8_t command,
 		const T& payload, uint8_t responseLength)
 {
 	interface.dropMessage();
@@ -72,7 +72,7 @@ xpcc::apb::Master<Interface>::query(uint8_t slaveAddress, uint8_t command,
 
 template <typename Interface>
 void
-xpcc::apb::Master<Interface>::query(uint8_t slaveAddress, uint8_t command,
+xpcc::sab::Master<Interface>::query(uint8_t slaveAddress, uint8_t command,
 		uint8_t responseLength)
 {
 	interface.dropMessage();
@@ -87,7 +87,7 @@ xpcc::apb::Master<Interface>::query(uint8_t slaveAddress, uint8_t command,
 // ----------------------------------------------------------------------------
 template <typename Interface>
 bool
-xpcc::apb::Master<Interface>::isQueryCompleted()
+xpcc::sab::Master<Interface>::isQueryCompleted()
 {
 	return (queryStatus != IN_PROGRESS);
 }
@@ -95,7 +95,7 @@ xpcc::apb::Master<Interface>::isQueryCompleted()
 // ----------------------------------------------------------------------------
 template <typename Interface>
 bool
-xpcc::apb::Master<Interface>::isSuccess()
+xpcc::sab::Master<Interface>::isSuccess()
 {
 	return (queryStatus == SUCCESS);
 }
@@ -103,7 +103,7 @@ xpcc::apb::Master<Interface>::isSuccess()
 // ----------------------------------------------------------------------------
 template <typename Interface>
 uint8_t
-xpcc::apb::Master<Interface>::getErrorCode()
+xpcc::sab::Master<Interface>::getErrorCode()
 {
 	if (queryStatus == ERROR_RESPONSE) {
 		// Error code is in the first payload byte
@@ -117,14 +117,14 @@ xpcc::apb::Master<Interface>::getErrorCode()
 // ----------------------------------------------------------------------------
 template <typename Interface> template <typename T>
 const T *
-xpcc::apb::Master<Interface>::getResponse()
+xpcc::sab::Master<Interface>::getResponse()
 {
 	return reinterpret_cast<const T *>(interface.getPayload());
 }
 
 template <typename Interface>
 const void *
-xpcc::apb::Master<Interface>::getResponse()
+xpcc::sab::Master<Interface>::getResponse()
 {
 	return reinterpret_cast<const void *>(interface.getPayload());
 }
@@ -132,7 +132,7 @@ xpcc::apb::Master<Interface>::getResponse()
 // ----------------------------------------------------------------------------
 template <typename Interface>
 void
-xpcc::apb::Master<Interface>::update()
+xpcc::sab::Master<Interface>::update()
 {
 	interface.update();
 	

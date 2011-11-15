@@ -35,7 +35,7 @@
 #include "fake_io_device.hpp"
 #include "interface_test.hpp"
 
-typedef xpcc::apb::Interface<FakeIODevice> TestingInterface;
+typedef xpcc::sab::Interface<FakeIODevice> TestingInterface;
 
 void
 InterfaceTest::setUp()
@@ -52,7 +52,7 @@ InterfaceTest::testSendRequest()
 	TestingInterface interface;
 	
 	uint32_t data = 0xdeadbeef;
-	interface.sendMessage(0x12, xpcc::apb::REQUEST, 0x34, data);
+	interface.sendMessage(0x12, xpcc::sab::REQUEST, 0x34, data);
 	
 	uint8_t testMessage[9] = {
 		0x54, 4, 0x12, 0x34, 0xef, 0xbe, 0xad, 0xde, 238
@@ -68,7 +68,7 @@ InterfaceTest::testSendAck()
 	TestingInterface interface;
 	
 	uint16_t data = 0xbaaa;
-	interface.sendMessage(0x3f, xpcc::apb::ACK, 0x56, data);
+	interface.sendMessage(0x3f, xpcc::sab::ACK, 0x56, data);
 	
 	uint8_t testMessage[7] = {
 		0x54, 2, 0x3f | 0xc0, 0x56, 0xaa, 0xba, 135
@@ -108,7 +108,7 @@ InterfaceTest::testSendNack()
 		0x12345678
 	};
 	
-	interface.sendMessage(0x06, xpcc::apb::NACK, 0x78, data);
+	interface.sendMessage(0x06, xpcc::sab::NACK, 0x78, data);
 	
 	uint8_t testMessage[12] = {
 		0x54, 7, 0x06 | 0x80, 0x78, 0xff, 0xff, 12, 0x78, 0x56, 0x34, 0x12, 193
@@ -126,7 +126,7 @@ InterfaceTest::testReceive()
 	
 	// write a new message into the FakeIODevice
 	uint32_t data = 0xdeadbeef;
-	interface.sendMessage(0x12, xpcc::apb::REQUEST, 0x34, data);
+	interface.sendMessage(0x12, xpcc::sab::REQUEST, 0x34, data);
 	
 	FakeIODevice::moveSendToReceiveBuffer();
 	
@@ -154,7 +154,7 @@ InterfaceTest::testReceiveAck()
 	
 	// write a new message into the FakeIODevice
 	uint32_t data = 0xdeadbeef;
-	interface.sendMessage(0x12, xpcc::apb::ACK, 0x34, data);
+	interface.sendMessage(0x12, xpcc::sab::ACK, 0x34, data);
 	
 	FakeIODevice::moveSendToReceiveBuffer();
 	
@@ -182,7 +182,7 @@ InterfaceTest::testReceiveNack()
 	
 	// write a new message into the FakeIODevice
 	uint32_t data = 0xdeadbeef;
-	interface.sendMessage(0x12, xpcc::apb::NACK, 0x34, data);
+	interface.sendMessage(0x12, xpcc::sab::NACK, 0x34, data);
 	
 	FakeIODevice::moveSendToReceiveBuffer();
 	

@@ -65,8 +65,8 @@ public:
 	
 	
 protected:
-	typedef xpcc::apb::Interface< FakeIODevice > TestingInterface;
-	typedef xpcc::apb::Slave< TestingInterface > TestingSlave;
+	typedef xpcc::sab::Interface< FakeIODevice > TestingInterface;
+	typedef xpcc::sab::Slave< TestingInterface > TestingSlave;
 	
 	TestingSlave *slave;
 };

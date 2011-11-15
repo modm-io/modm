@@ -34,7 +34,7 @@
 
 namespace
 {
-	class TestingObject : public xpcc::apb::Callable
+	class TestingObject : public xpcc::sab::Callable
 	{
 	public:
 		TestingObject() :
@@ -51,13 +51,13 @@ namespace
 		
 		
 		void
-		emptyFunction(xpcc::apb::Response& /*response*/)
+		emptyFunction(xpcc::sab::Response& /*response*/)
 		{
 			calledFunction = EMPTY;
 		}
 		
 		void
-		responseFunction(xpcc::apb::Response& response)
+		responseFunction(xpcc::sab::Response& response)
 		{
 			calledFunction = RESPONSE;
 			
@@ -66,7 +66,7 @@ namespace
 		}
 		
 		void
-		errorFunction(xpcc::apb::Response& response)
+		errorFunction(xpcc::sab::Response& response)
 		{
 			calledFunction = ERROR;
 			
@@ -74,7 +74,7 @@ namespace
 		}
 		
 		void
-		parameterFunction(xpcc::apb::Response& response, const uint16_t* parameter)
+		parameterFunction(xpcc::sab::Response& response, const uint16_t* parameter)
 		{
 			calledFunction = PARAMETER;
 			
@@ -98,12 +98,12 @@ namespace
 	
 	TestingObject testingObject;
 	
-	FLASH_STORAGE(xpcc::apb::Action actionList[]) =
+	FLASH_STORAGE(xpcc::sab::Action actionList[]) =
 	{
-		APB__ACTION(0x01, testingObject, TestingObject::emptyFunction, 0),
-		APB__ACTION(0x02, testingObject, TestingObject::responseFunction, 0),
-		APB__ACTION(0x03, testingObject, TestingObject::errorFunction, 0),
-		APB__ACTION(0x04, testingObject, TestingObject::parameterFunction, 2),
+		SAB__ACTION(0x01, testingObject, TestingObject::emptyFunction, 0),
+		SAB__ACTION(0x02, testingObject, TestingObject::responseFunction, 0),
+		SAB__ACTION(0x03, testingObject, TestingObject::errorFunction, 0),
+		SAB__ACTION(0x04, testingObject, TestingObject::parameterFunction, 2),
 	};
 }
 
@@ -116,7 +116,7 @@ SlaveTest::setUp()
 	
 	slave = new TestingSlave(0x3f,
 					xpcc::accessor::asFlash(actionList),
-					sizeof(actionList) / sizeof(xpcc::apb::Action));
+					sizeof(actionList) / sizeof(xpcc::sab::Action));
 }
 
 void
@@ -129,7 +129,7 @@ SlaveTest::tearDown()
 void
 SlaveTest::testEmptyMethod()
 {
-	TestingInterface::sendMessage(0x3f, xpcc::apb::REQUEST, 0x01);
+	TestingInterface::sendMessage(0x3f, xpcc::sab::REQUEST, 0x01);
 	FakeIODevice::moveSendToReceiveBuffer();
 	
 	slave->update();
@@ -150,7 +150,7 @@ SlaveTest::testEmptyMethod()
 void
 SlaveTest::testResponseMethod()
 {
-	TestingInterface::sendMessage(0x3f, xpcc::apb::REQUEST, 0x02);
+	TestingInterface::sendMessage(0x3f, xpcc::sab::REQUEST, 0x02);
 	FakeIODevice::moveSendToReceiveBuffer();
 	
 	slave->update();
@@ -176,7 +176,7 @@ SlaveTest::testResponseMethod()
 void
 SlaveTest::testErrorResponse()
 {
-	TestingInterface::sendMessage(0x3f, xpcc::apb::REQUEST, 0x03);
+	TestingInterface::sendMessage(0x3f, xpcc::sab::REQUEST, 0x03);
 	FakeIODevice::moveSendToReceiveBuffer();
 	
 	slave->update();
@@ -200,7 +200,7 @@ SlaveTest::testParameterMethod()
 {
 	uint16_t value = 0x9876;
 	
-	TestingInterface::sendMessage(0x3f, xpcc::apb::REQUEST, 0x04, value);
+	TestingInterface::sendMessage(0x3f, xpcc::sab::REQUEST, 0x04, value);
 	FakeIODevice::moveSendToReceiveBuffer();
 	
 	slave->update();
@@ -228,7 +228,7 @@ SlaveTest::testWrongParameterSize()
 {
 	uint32_t value = 0xbaab;
 	
-	TestingInterface::sendMessage(0x3f, xpcc::apb::REQUEST, 0x04, value);
+	TestingInterface::sendMessage(0x3f, xpcc::sab::REQUEST, 0x04, value);
 	FakeIODevice::moveSendToReceiveBuffer();
 	
 	slave->update();
@@ -250,7 +250,7 @@ SlaveTest::testWrongParameterSize()
 void
 SlaveTest::testNoMethod()
 {
-	TestingInterface::sendMessage(0x3f, xpcc::apb::REQUEST, 0x05);
+	TestingInterface::sendMessage(0x3f, xpcc::sab::REQUEST, 0x05);
 	FakeIODevice::moveSendToReceiveBuffer();
 	
 	slave->update();

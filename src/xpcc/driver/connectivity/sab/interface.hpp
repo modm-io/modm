@@ -30,8 +30,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC_APB__INTERFACE_HPP
-#define	XPCC_APB__INTERFACE_HPP
+#ifndef	XPCC_SAB__INTERFACE_HPP
+#define	XPCC_SAB__INTERFACE_HPP
 
 #include <cstddef>
 #include <stdint.h>
@@ -41,27 +41,27 @@
 
 namespace xpcc
 {
-	namespace apb
+	namespace sab
 	{
 		/**
 		 * \internal
-		 * \brief	Universal base class for the APB interface
+		 * \brief	Universal base class for the SAB interface
 		 * 
 		 * \see		<a href="http://www.maxim-ic.com/app-notes/index.mvp/id/27" target="_blank">
 		 * 			Understanding and Using Cyclic Redundancy Checks with Maxim iButton Products</a>
-		 * \ingroup	apb
+		 * \ingroup	sab
 		 */
 		uint8_t
 		crcUpdate(uint8_t crc, uint8_t data);
 		
 		/**
-		 * \brief	APB interface
+		 * \brief	SAB interface
 		 * 
 		 * Example:
-		 * \include apb_interface.cpp
+		 * \include sab_interface.cpp
 		 * 
 		 * \author	Fabian Greif
-		 * \ingroup	apb
+		 * \ingroup	sab
 		 */
 		template <typename Device>
 		class Interface
@@ -79,7 +79,7 @@ namespace xpcc
 			 * \brief	Send a message
 			 * 
 			 * \param	address			receiver address
-			 * \param	flags			see xpcc::apb::Flags
+			 * \param	flags			see xpcc::sab::Flags
 			 * \param	command			command byte
 			 * \param	*payload		data field
 			 * \param	payloadLength	size of the data field
@@ -177,4 +177,4 @@ namespace xpcc
 
 #include "interface_impl.hpp"
 
-#endif	// XPCC_APB__INTERFACE_HPP
+#endif	// XPCC_SAB__INTERFACE_HPP

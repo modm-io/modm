@@ -4,7 +4,7 @@
 #include <avr/interrupt.h>
 
 #include <xpcc/io/iostream.hpp>
-#include <xpcc/communication/apb/interface.hpp>
+#include <xpcc/communication/sab/interface.hpp>
 
 #include <xpcc/architecture/general/time/delay.hpp>
 #include <xpcc/workflow/time/timeout.hpp>
@@ -18,7 +18,7 @@
 CREATE_OUTPUT_PIN(LedGreen, B, 0);
 CREATE_OUTPUT_PIN(LedRed, B, 1);
 
-static xpcc::apb::Interface <xpcc::BufferedUart0> interface;
+static xpcc::sab::Interface <xpcc::BufferedUart0> interface;
 static xpcc::Debounce keys;
 
 // ----------------------------------------------------------------------------
@@ -87,7 +87,7 @@ main()
 			if (received[0] == 0xaa && interface.getLength() == 1)
 			{
 				uint8_t data[2] = { 0xaa, status };
-				interface.sendMessage(xpcc::apb::Interface <xpcc::BufferedUart0>::ACK, data, 2);
+				interface.sendMessage(xpcc::sab::Interface <xpcc::BufferedUart0>::ACK, data, 2);
 			}
 			interface.dropMessage();
 		}

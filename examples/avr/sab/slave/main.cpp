@@ -6,11 +6,11 @@
  */
 
 #include <xpcc/architecture/platform.hpp>
-#include <xpcc/driver/connectivity/apb/slave.hpp>
+#include <xpcc/driver/connectivity/sab/slave.hpp>
 
 // ----------------------------------------------------------------------------
 // wrapper class for the A/D converter
-class AnalogDigital : public xpcc::apb::Callable
+class AnalogDigital : public xpcc::sab::Callable
 {
 public:
 	AnalogDigital()
@@ -21,7 +21,7 @@ public:
 	}
     
 	void
-	readChannel(xpcc::apb::Response& response, const uint8_t *channel)
+	readChannel(xpcc::sab::Response& response, const uint8_t *channel)
 	{
 		uint16_t value = xpcc::atmega::Adc::readChannel(*channel);
 		response.send(value);
@@ -30,11 +30,11 @@ public:
 
 // ----------------------------------------------------------------------------
 // wrapper for PORTD
-class InOut : public xpcc::apb::Callable
+class InOut : public xpcc::sab::Callable
 {
 public:
 	void
-	setDirection(xpcc::apb::Response& response, const uint8_t *direction)
+	setDirection(xpcc::sab::Response& response, const uint8_t *direction)
 	{
 		DDRD = *direction;
 		
@@ -43,14 +43,14 @@ public:
 	}
 	
 	void
-	readInput(xpcc::apb::Response& response)
+	readInput(xpcc::sab::Response& response)
 	{
 		uint8_t value = PIND;
 		response.send(value);
 	}
 	
 	void
-	setOutput(xpcc::apb::Response& response, const uint8_t *output)
+	setOutput(xpcc::sab::Response& response, const uint8_t *output)
 	{
 		PORTD = *output;
 		response.send();
@@ -64,16 +64,16 @@ InOut inOut;
 
 // ----------------------------------------------------------------------------
 // create a list of all possible actions
-FLASH_STORAGE(xpcc::apb::Action actionList[]) =
+FLASH_STORAGE(xpcc::sab::Action actionList[]) =
 {
-	APB__ACTION( 'A', analogDigital,	AnalogDigital::readChannel,	1 ),
-	APB__ACTION( 'D', inOut,			InOut::setDirection,		1 ),
-	APB__ACTION( 'I', inOut,			InOut::readInput,			0 ),
-	APB__ACTION( 'O', inOut,			InOut::setOutput,			1 ),
+	SAB__ACTION( 'A', analogDigital,	AnalogDigital::readChannel,	1 ),
+	SAB__ACTION( 'D', inOut,			InOut::setDirection,		1 ),
+	SAB__ACTION( 'I', inOut,			InOut::readInput,			0 ),
+	SAB__ACTION( 'O', inOut,			InOut::setOutput,			1 ),
 };
 
 // wrap the type definition inside a typedef to make the code more readable
-typedef xpcc::apb::Slave< xpcc::apb::Interface< xpcc::atmega::BufferedUart0 > > Slave;
+typedef xpcc::sab::Slave< xpcc::sab::Interface< xpcc::atmega::BufferedUart0 > > Slave;
 
 // ----------------------------------------------------------------------------
 MAIN_FUNCTION
@@ -81,7 +81,7 @@ MAIN_FUNCTION
 	// initialize ABP interface, set baudrate etc.
 	Slave slave(0x02,
 			xpcc::accessor::asFlash(actionList),
-			sizeof(actionList) / sizeof(xpcc::apb::Action));
+			sizeof(actionList) / sizeof(xpcc::sab::Action));
 	
 	// enable interrupts
 	sei();

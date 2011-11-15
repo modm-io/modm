@@ -30,8 +30,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_APB__MASTER_HPP
-#define XPCC_APB__MASTER_HPP
+#ifndef XPCC_SAB__MASTER_HPP
+#define XPCC_SAB__MASTER_HPP
 
 #include <stdint.h>
 #include <xpcc/workflow/timeout.hpp>
@@ -40,7 +40,7 @@
 
 namespace xpcc
 {
-	namespace apb
+	namespace sab
 	{
 		/**
 		 * 
@@ -49,7 +49,7 @@ namespace xpcc
 		 * \see	xpcc::Clock
 		 * 
 		 * \author	Fabian Greif
-		 * \ingroup	apb
+		 * \ingroup	sab
 		 */
 		template <typename Interface>
 		class Master
@@ -99,7 +99,7 @@ namespace xpcc
 			 * isSuccess() returns \c false.
 			 * 
 			 * \return	Error code
-			 * \see		xpcc::apb::Error
+			 * \see		xpcc::sab::Error
 			 */
 			static uint8_t
 			getErrorCode();
@@ -139,4 +139,4 @@ namespace xpcc
 
 #include "master_impl.hpp"
 
-#endif	// XPCC_APB__MASTER_HPP
+#endif	// XPCC_SAB__MASTER_HPP

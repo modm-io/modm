@@ -39,8 +39,8 @@
  * multi-master bus system, using p-persitent CSMA to send messages.
  * 
  * One bus can be populated with up to 32 nodes. The nodes can be queried for
- * data and they will respond like an APB Slave, and can query data from other
- * nodes like an APB Master, or they can just broadcast a message.
+ * data and they will respond like an SAB Slave, and can query data from other
+ * nodes like an SAB Master, or they can just broadcast a message.
  * Each node can listen to all the responses and broadcasts and store that
  * information for its purpose.
  *
@@ -103,7 +103,7 @@
  * CAN transceivers have the advantage to work without a separate direction input.
  * You can just connected the transceiver directly to the UART of your
  * microcontroller.
- * These are identical to the APB CAN electrical characteristics.
+ * These are identical to the SAB CAN electrical characteristics.
  * You have to use the CAN transceivers, otherwise it cannot be determined, if
  * the bus is busy or available for transmission.
  * 

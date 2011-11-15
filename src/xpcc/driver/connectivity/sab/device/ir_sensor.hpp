@@ -30,18 +30,18 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_APB__IR_SENSOR_HPP
-#define XPCC_APB__IR_SENSOR_HPP
+#ifndef XPCC_SAB__IR_SENSOR_HPP
+#define XPCC_SAB__IR_SENSOR_HPP
 
 #include "../interface.hpp"
 
 namespace xpcc
 {
-	namespace apb
+	namespace sab
 	{
 		
 		
 	}
 }
 
-#endif	// XPCC_APB__IR_SENSOR_HPP
+#endif	// XPCC_SAB__IR_SENSOR_HPP

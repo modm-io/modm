@@ -30,14 +30,14 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC_APB__SLAVE_HPP
+#ifndef	XPCC_SAB__SLAVE_HPP
 	#error	"Don't include this file directly, use 'slave.hpp' instead!"
 #endif
 
 // ----------------------------------------------------------------------------
 template <typename T>
 void
-xpcc::apb::Response::send(const T& payload)
+xpcc::sab::Response::send(const T& payload)
 {
 	triggered = true;
 	transmitter->send(true, reinterpret_cast<const void *>(&payload), sizeof(T));
@@ -45,7 +45,7 @@ xpcc::apb::Response::send(const T& payload)
 
 // ----------------------------------------------------------------------------
 inline void
-xpcc::apb::Action::call(Response& response, const void *payload)
+xpcc::sab::Action::call(Response& response, const void *payload)
 {
 	// redirect call to the actual object
 	(object->*function)(response, payload);
@@ -60,7 +60,7 @@ xpcc::apb::Action::call(Response& response, const void *payload)
 
 // ----------------------------------------------------------------------------
 template <typename Interface>
-xpcc::apb::Slave<Interface>::Slave(uint8_t address,
+xpcc::sab::Slave<Interface>::Slave(uint8_t address,
 		xpcc::accessor::Flash<Action> list,
 		uint8_t count) : 
 	ownAddress(address), actionList(list), actionCount(count),
@@ -72,7 +72,7 @@ xpcc::apb::Slave<Interface>::Slave(uint8_t address,
 // ----------------------------------------------------------------------------
 template <typename Interface>
 void
-xpcc::apb::Slave<Interface>::update()
+xpcc::sab::Slave<Interface>::update()
 {
 	Interface::update();
 	if (Interface::isMessageAvailable())
@@ -116,15 +116,15 @@ xpcc::apb::Slave<Interface>::update()
 // ----------------------------------------------------------------------------
 template <typename Interface>
 void
-xpcc::apb::Slave<Interface>::send(bool acknowledge,
+xpcc::sab::Slave<Interface>::send(bool acknowledge,
 			const void *payload, uint8_t payloadLength)
 {
 	Flags flags;
 	if (acknowledge) {
-		flags = xpcc::apb::ACK;
+		flags = xpcc::sab::ACK;
 	}
 	else {
-		flags = xpcc::apb::NACK;
+		flags = xpcc::sab::NACK;
 	}
 	
 	Interface::sendMessage(this->ownAddress, flags, this->currentCommand,

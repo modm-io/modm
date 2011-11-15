@@ -2,7 +2,7 @@
 // ----------------------------------------------------------------------------
 /* Copyright (c) 2009, Roboterclub Aachen e.V.
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  * 
@@ -14,7 +14,7 @@
  *     * Neither the name of the Roboterclub Aachen e.V. nor the
  *       names of its contributors may be used to endorse or promote products
  *       derived from this software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY ROBOTERCLUB AACHEN E.V. ''AS IS'' AND ANY
  * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -25,37 +25,23 @@
  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  * $Id$
  */
 // ----------------------------------------------------------------------------
 
-#include "slave.hpp"
+#ifndef XPCC_SAB__SERVO_HPP
+#define XPCC_SAB__SERVO_HPP
 
-xpcc::apb::Response::Response(Transmitter *parent) :
-	transmitter(parent), triggered(false)
+#include "../interface.hpp"
+
+namespace xpcc
 {
+	namespace sab
+	{
+		
+		
+	}
 }
 
-void
-xpcc::apb::Response::error(uint8_t errorCode)
-{
-	triggered = true;
-	
-	uint8_t tempError = errorCode;
-	transmitter->send(false, &tempError, 1);
-}
-
-void
-xpcc::apb::Response::send()
-{
-	triggered = true;
-	transmitter->send(true, 0, 0);
-}
-
-void
-xpcc::apb::Response::send(const void *payload, std::size_t length)
-{
-	triggered = true;
-	transmitter->send(true, payload, length);
-}
+#endif	// XPCC_SAB__SERVO_HPP

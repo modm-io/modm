@@ -44,6 +44,7 @@ namespace xpcc
 		 * \brief	Enable an external clock on XTAL1
 		 * 
 		 * \see		enableExternalOscillator() for values of frequency
+		 * \see		selectSystemClockSource()
 		 * \ingroup	atxmega
 		 */
 		void
@@ -63,6 +64,7 @@ namespace xpcc
 		 * - \c OSC_XOSCSEL_XTAL_1KCLK_gc
 		 * - \c OSC_XOSCSEL_XTAL_16KCLK_gc
 		 * 
+		 * \see		selectSystemClockSource()
 		 * \ingroup	atxmega
 		 */
 		void
@@ -87,12 +89,15 @@ namespace xpcc
 		 * 
 		 * An external clock must be minimum 0.4 MHz to be used as source clock.
 		 * 
-		 * Make sure that the input source is enabled and stable before
-		 * activating the PLL.
+		 * If you use a switchable clock source make sure that the input source
+		 * is enabled and stable before activating the PLL.
+		 * When using a crystal oscillator or an external clock that is always
+		 * active it'll be fine.
 		 * 
 		 * \param source	Source clock
 		 * \param factor	Multiplication factor
 		 * 
+		 * \see		selectSystemClockSource()
 		 * \ingroup	atxmega
 		 */
 		void
@@ -108,8 +113,18 @@ namespace xpcc
 		 * - external clock or oscillator (\c CLK_SCLKSEL_XOSC_gc)
 		 * - PLL (\c CLK_SCLKSEL_PLL_gc)
 		 * 
-		 * \warning	Make sure the clock source is stable before
-		 * 			switching to it!
+		 * Example:
+		 * \code
+		 * // select external clock with 8MHz as clock source and set PLL
+		 * // source to XOSC & factor to x4
+		 * xpcc::atxmega::enableExternalClock(OSC_FRQRANGE_2TO9_gc);
+		 * xpcc::atxmega::enablePll(OSC_PLLSRC_XOSC_gc, 4);
+		 *
+		 * // set up prescalers (=1) and select PLL as clock source (4 x 8MHz)
+		 * xpcc::atxmega::setSystemClockPrescaler();
+		 * xpcc::atxmega::selectSystemClockSource(CLK_SCLKSEL_PLL_gc);
+		 * \endcode
+		 *
 		 * \ingroup	atxmega
 		 */
 		void

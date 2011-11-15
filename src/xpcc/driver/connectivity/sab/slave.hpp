@@ -30,8 +30,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC_APB__SLAVE_HPP
-#define	XPCC_APB__SLAVE_HPP
+#ifndef	XPCC_SAB__SLAVE_HPP
+#define	XPCC_SAB__SLAVE_HPP
 
 #include <cstddef>
 #include <xpcc/architecture/driver/accessor/flash.hpp>
@@ -40,13 +40,13 @@
 
 namespace xpcc
 {
-	namespace apb
+	namespace sab
 	{
 		/**
 		 * \internal
 		 * \brief	Interface used to transmit data through a slave object
 		 * 
-		 * \ingroup	apb
+		 * \ingroup	sab
 		 */
 		class Transmitter
 		{
@@ -58,7 +58,7 @@ namespace xpcc
 		/**
 		 * \brief	Response object for an action call
 		 * 
-		 * \ingroup	apb
+		 * \ingroup	sab
 		 */
 		class Response
 		{
@@ -73,7 +73,7 @@ namespace xpcc
 			 * 						for the system, feel free to use any other
 			 * 						value for specific error conditions.
 			 * 
-			 * \see		xpcc::apb::Error
+			 * \see		xpcc::sab::Error
 			 */
 			void
 			error(uint8_t errorCode = ERROR__GENERAL_ERROR);
@@ -118,11 +118,11 @@ namespace xpcc
 		 * 
 		 * Example:
 		 * \code
-		 * class Sensor : public xpcc::apb::Callable
+		 * class Sensor : public xpcc::sab::Callable
 		 * {
 		 * public:
 		 *     void
-		 *     sendValue(xpcc::apb::Response& response)
+		 *     sendValue(xpcc::sab::Response& response)
 		 *     {
 		 *         response.send(this->value);
 		 *     }
@@ -134,10 +134,10 @@ namespace xpcc
 		 * };
 		 * \endcode
 		 * 
-		 * A complete example is available in the \c example/apb folder.
+		 * A complete example is available in the \c example/sab folder.
 		 * 
-		 * \see		xpcc::apb::Slave
-		 * \ingroup	apb
+		 * \see		xpcc::sab::Slave
+		 * \ingroup	sab
 		 */
 		struct Callable
 		{
@@ -146,8 +146,8 @@ namespace xpcc
 		/**
 		 * \brief	Possible Action
 		 * 
-		 * \see		APB__ACTION()
-		 * \ingroup	apb
+		 * \see		SAB__ACTION()
+		 * \ingroup	sab
 		 */
 		struct Action
 		{
@@ -163,15 +163,15 @@ namespace xpcc
 		};
 		
 		/**
-		 * \brief	APB Slave
+		 * \brief	SAB Slave
 		 * 
 		 * \code
-		 * typedef xpcc::apb::Slave< xpcc::apb::Interface< xpcc::BufferedUart0 > > Slave;
+		 * typedef xpcc::sab::Slave< xpcc::sab::Interface< xpcc::BufferedUart0 > > Slave;
 		 * 
-		 * FLASH_STORAGE(xpcc::apb::Action actionList[]) =
+		 * FLASH_STORAGE(xpcc::sab::Action actionList[]) =
 		 * {
-		 *     APB__ACTION(0x57, object, Object::method1,  0),
-		 *     APB__ACTION(0x03, object, Object::method2,  2),
+		 *     SAB__ACTION(0x57, object, Object::method1,  0),
+		 *     SAB__ACTION(0x03, object, Object::method2,  2),
 		 * };
 		 * 
 		 * int
@@ -180,7 +180,7 @@ namespace xpcc
 		 *     // initialize the interface
 		 *     Slave slave(0x02,
 		 *             xpcc::accessor::asFlash(actionList),
-		 *             sizeof(actionList) / sizeof(xpcc::apb::Action));
+		 *             sizeof(actionList) / sizeof(xpcc::sab::Action));
 		 *     
 		 *     while(1)
 		 *     {
@@ -189,10 +189,10 @@ namespace xpcc
 		 * }
 		 * \endcode
 		 * 
-		 * A complete example is available in the \c example/apb folder.
+		 * A complete example is available in the \c example/sab folder.
 		 * 
 		 * \author	Fabian Greif
-		 * \ingroup	apb
+		 * \ingroup	sab
 		 */
 		template <typename Interface>
 		class Slave : protected Transmitter
@@ -206,8 +206,8 @@ namespace xpcc
 			 * 						stored in flash-memory
 			 * \param	count		Number of entries in \a actionList
 			 *
-			 * \see		apb::xpcc::Action
-			 * \see		APB__ACTION()
+			 * \see		sab::xpcc::Action
+			 * \see		SAB__ACTION()
 			 */
 			Slave(uint8_t address, xpcc::accessor::Flash<Action> list, uint8_t count);
 			
@@ -237,21 +237,21 @@ namespace xpcc
 
 #ifdef __DOXYGEN__
 	/**
-	 * \brief	Define a apb::Action
+	 * \brief	Define a sab::Action
 	 * 
 	 * Example:
 	 * \code
-	 * class Sensor : public xpcc::apb::Callable
+	 * class Sensor : public xpcc::sab::Callable
 	 * {
 	 * public:
 	 *     void
-	 *     sendValue(xpcc::apb::Response& response)
+	 *     sendValue(xpcc::sab::Response& response)
 	 *     {
 	 *         response.send(this->value);
 	 *     }
 	 *     
 	 *     void
-	 *     doSomething(xpcc::apb::Response& response, const uint32_t* parameter)
+	 *     doSomething(xpcc::sab::Response& response, const uint32_t* parameter)
 	 *     {
 	 *         // ... do something usefull ...
 	 *         
@@ -266,32 +266,32 @@ namespace xpcc
 	 * 
 	 * Sensor sensor;
 	 * 
-	 * FLASH_STORAGE(xpcc::apb::Action actionList[]) =
+	 * FLASH_STORAGE(xpcc::sab::Action actionList[]) =
 	 * {
-	 *     APB__ACTION(0x57, sensor, Sensor::sendValue,   0),
-	 *     APB__ACTION(0x03, sensor, Sensor::doSomething, sizeof(uint32_t)),
+	 *     SAB__ACTION(0x57, sensor, Sensor::sendValue,   0),
+	 *     SAB__ACTION(0x03, sensor, Sensor::doSomething, sizeof(uint32_t)),
 	 * };
 	 * \endcode
 	 * 
-	 * A complete example is available in the \c example/apb folder.
+	 * A complete example is available in the \c example/sab folder.
 	 * 
 	 * \param	command		Command byte
 	 * \param	object		
 	 * \param	function	Member function of object
 	 * \param	length		Parameter size in bytes
 	 * 
-	 * \see		xpcc::apb::Action
-	 * \ingroup	apb
+	 * \see		xpcc::sab::Action
+	 * \ingroup	sab
 	 */
-	#define	APB__ACTION(command, object, function, length)
+	#define	SAB__ACTION(command, object, function, length)
 #else
-	#define	APB__ACTION(command, object, function, length)		\
+	#define	SAB__ACTION(command, object, function, length)		\
 		{	command, \
 			length, \
-			static_cast<xpcc::apb::Callable *>(&object), \
-			reinterpret_cast<xpcc::apb::Action::Callback>(&function) }
+			static_cast<xpcc::sab::Callable *>(&object), \
+			reinterpret_cast<xpcc::sab::Action::Callback>(&function) }
 #endif	// __DOXYGEN__
 
 #include "slave_impl.hpp"
 
-#endif	// XPCC_APB__SLAVE_HPP
+#endif	// XPCC_SAB__SLAVE_HPP

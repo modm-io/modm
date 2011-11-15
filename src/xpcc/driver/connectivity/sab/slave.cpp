@@ -30,25 +30,32 @@
  */
 // ----------------------------------------------------------------------------
 
-#include "interface.hpp"
+#include "slave.hpp"
 
-uint8_t
-xpcc::apb::crcUpdate(uint8_t crc, uint8_t data)
+xpcc::sab::Response::Response(Transmitter *parent) :
+	transmitter(parent), triggered(false)
 {
-#ifdef __AVR__
-	return _crc_ibutton_update(crc, data);
-#else
-	crc = crc ^ data;
-	for (uint_fast8_t i = 0; i < 8; ++i)
-	{
-		if (crc & 0x01) {
-			crc = (crc >> 1) ^ 0x8C;
-		}
-		else {
-			crc >>= 1;
-		}
-	}
-	return crc;
-#endif
 }
 
+void
+xpcc::sab::Response::error(uint8_t errorCode)
+{
+	triggered = true;
+	
+	uint8_t tempError = errorCode;
+	transmitter->send(false, &tempError, 1);
+}
+
+void
+xpcc::sab::Response::send()
+{
+	triggered = true;
+	transmitter->send(true, 0, 0);
+}
+
+void
+xpcc::sab::Response::send(const void *payload, std::size_t length)
+{
+	triggered = true;
+	transmitter->send(true, payload, length);
+}
