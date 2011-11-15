@@ -52,7 +52,7 @@
 #elif defined XPCC__CPU_CORTEX_M3
 #	include "platform/cortex_m3.hpp"
 #elif defined XPCC__CPU_HOSTED
-#	include "platform/x86.hpp"
+#	include "platform/hosted.hpp"
 #else
 #	error "Unknown platform"
 #endif

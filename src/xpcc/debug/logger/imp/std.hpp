@@ -48,7 +48,7 @@
 #include "../style/prefix.hpp"
 #include "../style/std_colour.hpp"
 
-#include <xpcc/architecture/platform/x86/terminal.hpp>
+#include <xpcc/architecture/platform/hosted/terminal.hpp>
 
 namespace xpcc
 {

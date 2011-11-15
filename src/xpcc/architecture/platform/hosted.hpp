@@ -1,11 +1,11 @@
 // coding: utf-8
 // ----------------------------------------------------------------------------
-/* Copyright (c) 2009, Roboterclub Aachen e.V.
+/* Copyright (c) 2011, Roboterclub Aachen e.V.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -30,36 +30,37 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_PC__TERMINAL_HPP
-#define XPCC_PC__TERMINAL_HPP
+#ifndef XPCC__HOSTED_HPP
+#define XPCC__HOSTED_HPP
 
-#include <xpcc/io/iodevice.hpp>
+/**
+ * \ingroup		platform
+ * \defgroup	hosted		Hosted platforms (Linux/Windows/...)
+ * 
+ */
 
 namespace xpcc
 {
-	namespace pc
+	/**
+	 * \brief	OS specific functions
+	 * \ingroup	hosted
+	 */
+	namespace x86
 	{
-		/**
-		 * \brief	Standard text terminal
-		 * 
-		 * \ingroup	x86
-		 */
-		class Terminal : public IODevice
-		{
-		public :
-			virtual void
-			write(char c);
-			
-			virtual void
-			write(const char* s);
-			
-			virtual void
-			flush();
-			
-			virtual bool
-			read(char& value);
-		};
 	}
 }
 
-#endif	// XPCC_PC__TERMINAL_HPP
+#include "../detect.hpp"
+
+#if defined XPCC__OS_WIN32
+#	include "hosted/windows.hpp"
+#elif defined XPCC__OS_UNIX
+#	include "hosted/unix.hpp"
+#elif defined XPCC__OS_LINUX
+#	include "hosted/linux.hpp"
+#endif
+
+#include "hosted/terminal.hpp"
+#include "hosted/gpio.hpp"
+
+#endif // XPCC__HOSTED_HPP

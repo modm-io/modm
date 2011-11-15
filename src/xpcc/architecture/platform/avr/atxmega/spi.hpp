@@ -49,8 +49,8 @@
  * from causing contiuous readouts.
  *
  * \code
- * #include <xpcc/architecture/driver/atxmega/spi.hpp>
- *
+ * #include <xpcc/architecture/platform.hpp>
+ * 
  * int
  * main(void)
  * {

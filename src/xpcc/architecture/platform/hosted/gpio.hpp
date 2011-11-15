@@ -40,7 +40,7 @@
 
 // ----------------------------------------------------------------------------
 /**
- * \ingroup	x86
+ * \ingroup	hosted
  */
 #define	GPIO__IO(name, port, pin) \
 	struct name \
@@ -58,7 +58,7 @@
 
 // ----------------------------------------------------------------------------
 /**
- * \ingroup	x86
+ * \ingroup	hosted
  */
 #define	GPIO__OUTPUT(name, port, pin) \
 	struct name \
@@ -73,7 +73,7 @@
 
 // ----------------------------------------------------------------------------
 /**
- * \ingroup	x86
+ * \ingroup	hosted
  */
 #define GPIO__INPUT(name, port, pin) \
 	struct name \
@@ -88,7 +88,7 @@
  * 
  * \see		xpcc::gpio::Port()
  * 
- * \ingroup	x86
+ * \ingroup	hosted
  */
 #define GPIO__PORT(name, port) \
 	struct name { \

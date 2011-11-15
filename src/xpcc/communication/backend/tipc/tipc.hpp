@@ -33,9 +33,9 @@
 #ifndef XPCC__TIPC_HPP
 #define XPCC__TIPC_HPP
 
-#include <xpcc/architecture/platform/x86/linux/tipc/header.hpp>
-#include <xpcc/architecture/platform/x86/linux/tipc/tipc_receiver.hpp>
-#include <xpcc/architecture/platform/x86/linux/tipc/tipc_transmitter.hpp>
+#include <xpcc/architecture/platform/hosted/linux/tipc/header.hpp>
+#include <xpcc/architecture/platform/hosted/linux/tipc/tipc_receiver.hpp>
+#include <xpcc/architecture/platform/hosted/linux/tipc/tipc_transmitter.hpp>
 
 #include <xpcc/container/smart_pointer.hpp>
 

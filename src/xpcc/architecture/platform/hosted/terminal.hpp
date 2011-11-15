@@ -1,11 +1,11 @@
 // coding: utf-8
 // ----------------------------------------------------------------------------
-/* Copyright (c) 2011, Roboterclub Aachen e.V.
+/* Copyright (c) 2009, Roboterclub Aachen e.V.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- *
+ * 
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -30,37 +30,38 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__X86_HPP
-#define XPCC__X86_HPP
+#ifndef XPCC_PC__TERMINAL_HPP
+#define XPCC_PC__TERMINAL_HPP
 
-/**
- * \ingroup		platform
- * \defgroup	x86		x86 (Linux/Windows/...)
- * 
- */
+#include <xpcc/io/iodevice.hpp>
 
 namespace xpcc
 {
-	/**
-	 * \brief	x86 specifiy functions
-	 * \ingroup	x86
-	 */
-	namespace x86
+	namespace pc
 	{
+		/**
+		 * \brief	Standard text terminal
+		 * 
+		 * Uses the STL IOStream for in- and output.
+		 * 
+		 * \ingroup	hosted
+		 */
+		class Terminal : public IODevice
+		{
+		public :
+			virtual void
+			write(char c);
+			
+			virtual void
+			write(const char* s);
+			
+			virtual void
+			flush();
+			
+			virtual bool
+			read(char& value);
+		};
 	}
 }
 
-#include "../detect.hpp"
-
-#if defined XPCC__OS_WIN32
-#	include "x86/windows.hpp"
-#elif defined XPCC__OS_UNIX
-#	include "x86/unix.hpp"
-#elif defined XPCC__OS_LINUX
-#	include "x86/linux.hpp"
-#endif
-
-#include "x86/terminal.hpp"
-#include "x86/gpio.hpp"
-
-#endif // XPCC__X86_HPP
+#endif	// XPCC_PC__TERMINAL_HPP

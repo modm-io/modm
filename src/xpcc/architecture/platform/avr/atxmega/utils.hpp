@@ -34,7 +34,8 @@
 #define	XPCC_ATXMEGA__UTILS_HPP
 
 #include <stddef.h>		// for offsetof()
-#include <xpcc/architecture/platform.hpp>
+#include <xpcc/architecture/utils.hpp>
+#include <xpcc/architecture/platform/avr.hpp>
 
 namespace xpcc
 {
