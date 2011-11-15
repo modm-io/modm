@@ -47,11 +47,16 @@ namespace xpcc
 		class Disk
 		{
 		public:
-			/// Initialize Disk Drive
+			/**
+			 * \brief	Initialize Disk Drive
+			 */
 			virtual Status
 			initialize() = 0;
 			
-			// TODO return value
+			/**
+			 * \brief	
+			 * \return	
+			 */
 			virtual Status
 			getStatus() = 0;
 			
@@ -93,7 +98,7 @@ namespace xpcc
 		class FileSystem
 		{
 		public:
-//			FileSystem(Disk *interface, uint8_t drive = 0);
+			FileSystem(Disk *disk, uint8_t drive = 0);
 			
 			~FileSystem();
 			
