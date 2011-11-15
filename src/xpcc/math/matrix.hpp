@@ -40,6 +40,7 @@
 #define XPCC__MATRIX_HPP
 
 #include <cmath>
+#include <string.h>		// for memset() and memcmp()
 #include <stdint.h>
 
 #include <xpcc/io/iostream.hpp>

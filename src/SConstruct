@@ -83,15 +83,15 @@ import os
 if 'library' in BUILD_TARGETS:
 	defaultConfigfile = 'library.cfg'
 else:
-	target = ARGUMENTS.get('target', 'pc')
+	target = ARGUMENTS.get('target', 'hosted')
 	if target == 'atmega':
 		defaultConfigfile = 'unittest_atmega.cfg'
 	elif target == 'atxmega':
 		defaultConfigfile = 'unittest_atxmega.cfg'
-	elif target == 'pc':
-		defaultConfigfile = 'unittest.cfg'
+	elif target == 'hosted':
+		defaultConfigfile = 'unittest_hosted.cfg'
 	else:
-		print "Error: unknown target '%s'. Use 'pc', 'atmega' or 'atxmega'." % target
+		print "Error: unknown target '%s'. Use 'hosted', 'atmega' or 'atxmega'." % target
 		exit(1)
 
 # create the build environment
