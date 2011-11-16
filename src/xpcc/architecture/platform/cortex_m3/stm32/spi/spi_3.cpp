@@ -33,8 +33,10 @@
  */
 // ----------------------------------------------------------------------------
 
+#include <libmaple/spi.h>
+
+#define	LIBMAPLE
 #include "../gpio.hpp"
-#include "../device.h"
 
 #include "spi_3.hpp"
 

@@ -29,9 +29,8 @@
 // ----------------------------------------------------------------------------
 {{ generation_block }}
 
-#include <libmaple/usart.h>
+//#include <libmaple/usart.h>
 #include "../gpio.hpp"
-
 #include "../device.h"
 
 #include "usart_{{ id }}.hpp"
@@ -65,29 +64,29 @@ xpcc::stm32::Usart{{ id }}::setBaudrate(uint32_t baudrate)
 	Txd::setOutput(xpcc::stm32::ALTERNATE, xpcc::stm32::PUSH_PULL);
 	Rxd::setInput(xpcc::stm32::INPUT, xpcc::stm32::FLOATING);
 	
-	rcc_clk_enable(RCC_USART{{ id }});
-	nvic_irq_enable(NVIC_USART{{ id }});
+	//rcc_clk_enable(RCC_USART{{ id }});
+	//nvic_irq_enable(NVIC_USART{{ id }});
 	
 	// set baudrate
-	USART{{ id }}_BASE->BRR = calculateBaudrateSettings({% if id == 1 -%}72e6{%- else -%}36e6{%- endif %}, baudrate);
+	USART{{ id }}->BRR = calculateBaudrateSettings({% if id == 1 -%}72e6{%- else -%}36e6{%- endif %}, baudrate);
 	
 	// Transmitter & Receiver-Enable, 8 Data Bits, 1 Stop Bit
-	USART{{ id }}_BASE->CR1  = USART_CR1_TE | USART_CR1_RE;
-	USART{{ id }}_BASE->CR2  = 0;
-	USART{{ id }}_BASE->CR3  = 0;
+	USART{{ id }}->CR1  = USART_CR1_TE | USART_CR1_RE;
+	USART{{ id }}->CR2  = 0;
+	USART{{ id }}->CR3  = 0;
 	
-	USART{{ id }}_BASE->CR1 |= USART_CR1_UE;		// Uart Enable
+	USART{{ id }}->CR1 |= USART_CR1_UE;		// Uart Enable
 }
 
 // ----------------------------------------------------------------------------
 void
 xpcc::stm32::Usart{{ id }}::write(char data)
 {
-	while (!(USART{{ id }}_BASE->SR & USART_SR_TXE)) {
+	while (!(USART{{ id }}->SR & USART_SR_TXE)) {
 		// wait until the data register becomes empty
 	}
 	
-	USART{{ id }}_BASE->DR = data;
+	USART{{ id }}->DR = data;
 }
 
 // ----------------------------------------------------------------------------
@@ -104,9 +103,9 @@ xpcc::stm32::Usart{{ id }}::write(const char *s)
 bool
 xpcc::stm32::Usart{{ id }}::read(char& c)
 {
-	if (USART{{ id }}_BASE->SR & USART_SR_RXNE)
+	if (USART{{ id }}->SR & USART_SR_RXNE)
 	{
-		c = USART{{ id }}_BASE->DR;
+		c = USART{{ id }}->DR;
 		return true;
 	}
 	

@@ -70,6 +70,8 @@ _hardFaultHandler(const uint32_t * ctx)
 	XPCC_LOG_ERROR.printf("HFSR : 0x%08lx\n", hfsr);
 	XPCC_LOG_ERROR.printf("DFSR : 0x%08lx\n", dfsr);
 	XPCC_LOG_ERROR.printf("AFSR : 0x%08lx\n", afsr);
+#else
+	(void) ctx;	// avoid warning
 #endif
 	
 	// Infinite loop

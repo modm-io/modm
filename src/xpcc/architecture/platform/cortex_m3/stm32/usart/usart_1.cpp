@@ -33,9 +33,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <libmaple/usart.h>
+//#include <libmaple/usart.h>
 #include "../gpio.hpp"
-
 #include "../device.h"
 
 #include "usart_1.hpp"
@@ -53,29 +52,29 @@ xpcc::stm32::Usart1::setBaudrate(uint32_t baudrate)
 	Txd::setOutput(xpcc::stm32::ALTERNATE, xpcc::stm32::PUSH_PULL);
 	Rxd::setInput(xpcc::stm32::INPUT, xpcc::stm32::FLOATING);
 	
-	rcc_clk_enable(RCC_USART1);
-	nvic_irq_enable(NVIC_USART1);
+	//rcc_clk_enable(RCC_USART1);
+	//nvic_irq_enable(NVIC_USART1);
 	
 	// set baudrate
-	USART1_BASE->BRR = calculateBaudrateSettings(72e6, baudrate);
+	USART1->BRR = calculateBaudrateSettings(72e6, baudrate);
 	
 	// Transmitter & Receiver-Enable, 8 Data Bits, 1 Stop Bit
-	USART1_BASE->CR1  = USART_CR1_TE | USART_CR1_RE;
-	USART1_BASE->CR2  = 0;
-	USART1_BASE->CR3  = 0;
+	USART1->CR1  = USART_CR1_TE | USART_CR1_RE;
+	USART1->CR2  = 0;
+	USART1->CR3  = 0;
 	
-	USART1_BASE->CR1 |= USART_CR1_UE;		// Uart Enable
+	USART1->CR1 |= USART_CR1_UE;		// Uart Enable
 }
 
 // ----------------------------------------------------------------------------
 void
 xpcc::stm32::Usart1::write(char data)
 {
-	while (!(USART1_BASE->SR & USART_SR_TXE)) {
+	while (!(USART1->SR & USART_SR_TXE)) {
 		// wait until the data register becomes empty
 	}
 	
-	USART1_BASE->DR = data;
+	USART1->DR = data;
 }
 
 // ----------------------------------------------------------------------------
@@ -92,9 +91,9 @@ xpcc::stm32::Usart1::write(const char *s)
 bool
 xpcc::stm32::Usart1::read(char& c)
 {
-	if (USART1_BASE->SR & USART_SR_RXNE)
+	if (USART1->SR & USART_SR_RXNE)
 	{
-		c = USART1_BASE->DR;
+		c = USART1->DR;
 		return true;
 	}
 	

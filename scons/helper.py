@@ -34,20 +34,36 @@ import re
 import subprocess
 
 # -----------------------------------------------------------------------------
-# Output of 'arm-none-eabi-size build/stm32_p103.elf':
-# Size after: None
-#   text	   data	    bss	    dec	    hex	filename None
-#    772	      8	    644	   1424	    590	build/stm32_p103.elf
+# Output of 'arm-none-eabi-size -A build/stm32_p103.elf':
+# build/stm32_p103.elf  :
+# section             size        addr
+# .reset               236   134217728
+# .fastcode             48   536870912
+# .text              18220   134218016
+# .rodata             4276   134236240
+# .data               1336   536870960
+# .bss                2688   536872296
+# .stack               640   536874984
+# .comment              42           0
+# .debug_aranges      3360           0
+# (...)
+# Total             285915
 # 
-# Try to match the last line to get the size of the regions
+# Try to match the lines (name, size, address) to get the size of the
+# individual regions
 filter = re.compile('^(?P<section>[.]\w+)\s*(?P<size>\d+)\s*(?P<addr>\d+)$')
 
+# Sections which will remain in the Flash
 flashSectionNames = ['.reset', '.fastcode', '.text', '.rodata', '.data']
+
+# Sections which will be created in RAM or are copied from the Flash. In that
+# case the section will appear also in `flashSectionNames`.
 ramSectionNames = ['.vectors', '.fastcode', '.data', '.bss', '.noinit']
 
 def size_action(target, source, env):
 	cmd = [env['SIZE'], '-A', str(source[0])]
 	
+	# Run the default nm command (`arm-none-eabi-nm` in this case)
 	p = subprocess.Popen(cmd, stdout=subprocess.PIPE)
 	stdout, stderr = p.communicate()
 	

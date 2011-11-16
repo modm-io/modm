@@ -35,11 +35,6 @@
 
 #include <xpcc/architecture/driver/gpio.hpp>
 
-// TODO
-#ifndef STDLIB
-#	define	LIBMAPLE
-#endif
-
 #if defined LIBMAPLE
 #include <libmaple/gpio.h>
 

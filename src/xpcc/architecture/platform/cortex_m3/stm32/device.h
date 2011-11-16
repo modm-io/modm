@@ -33,12 +33,14 @@
 #ifndef STM32__DEVICE_H
 #define STM32__DEVICE_H
 
-#include <libmaple/flash.h>
+/*#include <libmaple/flash.h>
 #include <libmaple/rcc.h>
+#include <libmaple/spi.h>
 #include <libmaple/nvic.h>
 #include <libmaple/systick.h>
 #include <libmaple/adc.h>
 #include <libmaple/timer.h>
-#include <libmaple/usb/usb.h>
+#include <libmaple/usb/usb.h>*/
+#include <stm32f10x.h>
 
 #endif // STM32__DEVICE_H

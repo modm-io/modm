@@ -37,7 +37,8 @@
 #define XPCC_STM32__SPI_3_HPP
 
 #include <stdint.h>
-#include <libmaple/spi.h>
+//#include <libmaple/spi.h>
+#include "../device.h"
 
 namespace xpcc
 {
@@ -65,14 +66,14 @@ namespace xpcc
 			
 			enum Prescaler
 			{
-				PRESCALER_2 = SPI_CR1_BR_PCLK_DIV_2,
-				PRESCALER_4 = SPI_CR1_BR_PCLK_DIV_4,
-				PRESCALER_8 = SPI_CR1_BR_PCLK_DIV_8,
-				PRESCALER_16 = SPI_CR1_BR_PCLK_DIV_16,
-				PRESCALER_32 = SPI_CR1_BR_PCLK_DIV_32,
-				PRESCALER_64 = SPI_CR1_BR_PCLK_DIV_64,
-				PRESCALER_128 = SPI_CR1_BR_PCLK_DIV_128,
-				PRESCALER_256 = SPI_CR1_BR_PCLK_DIV_256,
+				PRESCALER_2 = 0,
+				PRESCALER_4 = SPI_CR1_BR_0,
+				PRESCALER_8 = SPI_CR1_BR_1,
+				PRESCALER_16 = SPI_CR1_BR_1 | SPI_CR1_BR_0,
+				PRESCALER_32 = SPI_CR1_BR_2,
+				PRESCALER_64 = SPI_CR1_BR_2 | SPI_CR1_BR_0,
+				PRESCALER_128 = SPI_CR1_BR_2 | SPI_CR1_BR_1,
+				PRESCALER_256 = SPI_CR1_BR_2 | SPI_CR1_BR_1 | SPI_CR1_BR_0,
 			};
 			
 		public:
