@@ -1,11 +1,11 @@
 // coding: utf-8
 // ----------------------------------------------------------------------------
-/* Copyright (c) 2011, Roboterclub Aachen e.V.
+/* Copyright (c) 2009, Roboterclub Aachen e.V.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -25,57 +25,48 @@
  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
-// ----------------------------------------------------------------------------
-/*
- * WARNING: This file is generated automatically, do not edit!
- * Please modify the corresponding *.in file instead and rebuild this file.
- */
-// ----------------------------------------------------------------------------
-/*
- * WARNING: This file is generated automatically, do not edit!
- * Please modify the corresponding *.in file instead and rebuild this file. 
+ *
+ * $Id$
  */
 // ----------------------------------------------------------------------------
 
-#include "spi_1.hpp"
-#include <xpcc/architecture/driver/gpio.hpp>
+#include "../logger.hpp"
+#include "../style_wrapper.hpp"
+#include "../style/prefix.hpp"
+#include "../style/std_colour.hpp"
 
-#ifdef __ARM_AT91SAM7X__
+#include <xpcc/architecture/utils.hpp>
+#include <xpcc/architecture/platform/hosted/terminal.hpp>
 
-/*namespace
+static xpcc::pc::Terminal device;
+
+namespace xpcc
 {
-	GPIO__OUTPUT(SCK, 1, 7);
-	GPIO__INPUT(MISO, 1, 6);
-	GPIO__OUTPUT(MOSI, 1, 5);
-	GPIO__OUTPUT(SS, 1, 4);
+	namespace log
+	{
+		template < typename T, Colour TEXT, Colour BACKGROUND >
+		class Wrapper : public StyleWrapper< Prefix< T, StdColour<TEXT, BACKGROUND > > >
+		{
+			public:
+				Wrapper(const T& str, ::xpcc::IODevice& device) :
+					StyleWrapper< Prefix< T, StdColour<TEXT, BACKGROUND > > > (
+							Prefix< T, StdColour<TEXT, BACKGROUND > >(
+									str,
+									StdColour<TEXT, BACKGROUND >(device) ) )
+				{
+				}
+		};
+
+		static Wrapper< char[10], BLUE, NONE > debugWrapper("Debug:   ", device);
+		Logger ATTRIBUTE_WEAK debug(debugWrapper);
+
+		static Wrapper< char[10], GREEN, NONE > debugInfo("Info:    ", device);
+		Logger ATTRIBUTE_WEAK info(debugInfo);
+
+		static Wrapper< char[10], YELLOW, NONE > warningInfo("Warning: ", device);
+		Logger ATTRIBUTE_WEAK warning(warningInfo);
+
+		static Wrapper< char[10], RED, NONE > errorInfo("Error:   ", device);
+		Logger ATTRIBUTE_WEAK error(errorInfo);
+	}
 }
-
-// ----------------------------------------------------------------------------
-void
-xpcc::SpiMaster1::initialize(SPI_PRESCALER_t prescaler, 
-		bool doubleSpeed, SPI_MODE_t mode)
-{
-	SS::setOutput();
-	MOSI::setOutput();
-	SCK::setOutput();
-	MISO::configure(::xpcc::gpio::PULLUP);
-	
-	SPI1_CTRL = SPI_ENABLE_bm | SPI_MASTER_bm | mode;
-	
-	setPrescaler(prescaler, doubleSpeed);
-}
-
-uint8_t
-xpcc::SpiMaster1::write(uint8_t data)
-{
-	SPI1_STATUS;
-	SPI1_DATA = data;
-	
-	while (!(SPI1_STATUS & SPI_IF_bm))
-		;
-	
-	return SPI1_DATA;
-}*/
-
-#endif // __ARM_AT91SAM7X__

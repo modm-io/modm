@@ -1,0 +1,18 @@
+FreeRTOS
+========
+
+Example for the [STM32_P103][1] board from Olimex.
+
+It requires two additional LEDs at PA1 and PA8 and a DOGS102 Display connected
+to SPI1.
+
+The example uses three Tasks. One to draws a moving hand on a circle and some
+fonts on the display. The second flashes the Status LED on PA0. The third
+toggles the LED at PA8 synchronized to the second task via a binary
+semaphore.
+
+The third LED (at PA1) is connected to the Wake-Up-Button from within
+the display task.
+
+[1]: http://www.olimex.com/dev/stm32-p103.html
+

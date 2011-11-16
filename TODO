@@ -1,0 +1,5 @@
+Things needed to be done
+========================
+
+* Replace the architecture 'pc' with 'hosted'
+* Remove xpcc/debug/logger/imp/std.hpp after the 16.12.2011

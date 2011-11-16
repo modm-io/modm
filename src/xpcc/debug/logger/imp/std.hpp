@@ -30,58 +30,6 @@
  */
 // ----------------------------------------------------------------------------
 
-// the default style creates globals objects, so it can only one time be included
-#ifdef XPCC_LOG__STYLE_DEFAULT_HPP
-	#error "Second inclusion of a default log style"
-#else
-#define XPCC_LOG__STYLE_DEFAULT_HPP
+#include <xpcc/debug/logger.hpp>
 
-#ifdef __AVR__
-	// this version is to use on PC only
-	#error "You can't use this implementation on an AVRs"
-#endif
-
-#ifndef __DOXYGEN__
-
-#include "../logger.hpp"
-#include "../style_wrapper.hpp"
-#include "../style/prefix.hpp"
-#include "../style/std_colour.hpp"
-
-#include <xpcc/architecture/platform/hosted/terminal.hpp>
-
-namespace xpcc
-{
-	namespace log
-	{
-		xpcc::pc::Terminal device;
-
-		template < typename T, Colour TEXT, Colour BACKGROUND >
-		class Wrapper : public StyleWrapper< Prefix< T, StdColour<TEXT, BACKGROUND > > >
-		{
-			public:
-				Wrapper(const T& str, ::xpcc::IODevice& device) :
-					StyleWrapper< Prefix< T, StdColour<TEXT, BACKGROUND > > > (
-							Prefix< T, StdColour<TEXT, BACKGROUND > >(
-									str,
-									StdColour<TEXT, BACKGROUND >( device ) ) )
-				{
-				}
-		};
-
-		Wrapper< char[10], BLUE, NONE > debugWrapper("Debug:   ", device);
-		Logger debug( debugWrapper );
-
-		Wrapper< char[10], GREEN, NONE > debugInfo("Info:    ", device);
-		Logger info( debugInfo );
-
-		Wrapper< char[10], YELLOW, NONE > warningInfo("Warning: ", device);
-		Logger warning( warningInfo );
-
-		Wrapper< char[10], RED, NONE > errorInfo("Error:   ", device);
-		Logger error( errorInfo );
-	}
-}
-
-#endif	// !__DOXYGEN__
-#endif	// XPCC_LOG__STYLE_DEFAULT_HPP
+#warning "Inclusion of 'xpcc/debug/logger/imp/std.hpp' is deprecated! Only include 'xpcc/debug/logger.hpp' and remove '.../imp/std.hpp'."

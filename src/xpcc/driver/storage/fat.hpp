@@ -44,11 +44,18 @@ namespace xpcc
 		typedef DRESULT Result;
 		typedef DSTATUS Status;
 		
-		class Disk
+		/**
+		 * \brief	Interface to a SD Card, Dataflash, etc.
+		 */
+		class PhysicalVolume
 		{
 		public:
+			virtual ~PhysicalVolume()
+			{
+			}
+
 			/**
-			 * \brief	Initialize Disk Drive
+			 * \brief	Initialize Volume
 			 */
 			virtual Status
 			initialize() = 0;
@@ -98,7 +105,7 @@ namespace xpcc
 		class FileSystem
 		{
 		public:
-			FileSystem(Disk *disk, uint8_t drive = 0);
+			FileSystem(PhysicalVolume *volume, uint8_t drive = 0);
 			
 			~FileSystem();
 			

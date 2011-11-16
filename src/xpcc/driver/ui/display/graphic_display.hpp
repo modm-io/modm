@@ -45,7 +45,7 @@ namespace xpcc
 {
 	namespace glcd
 	{
-		typedef Vector<uint8_t, 2> Point;
+		typedef Vector<int16_t, 2> Point;
 		
 		enum Color
 		{
@@ -69,7 +69,7 @@ namespace xpcc
 	 *    |                     |
 	 *    |                     |
 	 *    +---------------------+
-	 *                e.g. (128, 64)
+	 *                e.g. (127, 63)
 	 * \endcode
 	 * 
 	 * The size (width and height) of a graphics primitive always correspond
@@ -211,7 +211,7 @@ namespace xpcc
 		 * \brief	Draw an ellipse
 		 * 
 		 * Uses a variation of the midpoint algorithm. May be improved through
-		 * simplification of the uses formulas.
+		 * simplification of the used formula.
 		 * 
 		 * \param center	Center of the ellipse
 		 * \param rx		radius in x-direction

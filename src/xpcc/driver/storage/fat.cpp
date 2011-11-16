@@ -52,13 +52,13 @@ get_fattime(void)
 // ----------------------------------------------------------------------------
 #if _VOLUMES == 1
 
-static xpcc::fat::Disk * diskInterface;
+static xpcc::fat::PhysicalVolume * globalVolume;
 
 extern "C"
 DSTATUS
 disk_initialize(BYTE /*drive*/)
 {
-	return diskInterface->initialize();
+	return globalVolume->initialize();
 	/*if (diskInterface->initialize()) {
 		return RES_OK;
 	}
@@ -71,14 +71,14 @@ extern "C"
 DSTATUS
 disk_status(BYTE /*drive*/)
 {
-	return diskInterface->getStatus();
+	return globalVolume->getStatus();
 }
 
 extern "C"
 DRESULT
 disk_read(BYTE /*drive*/, BYTE* buffer, DWORD sectorNumber, BYTE sectorCount)
 {
-	return diskInterface->read(buffer, sectorNumber, sectorCount);
+	return globalVolume->read(buffer, sectorNumber, sectorCount);
 	/*if (diskInterface->read(buffer, sectorNumber, sectorCount)) {
 		return RES_OK;
 	}
@@ -91,7 +91,7 @@ extern "C"
 DRESULT
 disk_write(BYTE /*drive*/, const BYTE* buffer, DWORD sectorNumber, BYTE sectorCount)
 {
-	return diskInterface->write(buffer, sectorNumber, sectorCount);
+	return globalVolume->write(buffer, sectorNumber, sectorCount);
 	/*if (diskInterface->write(buffer, sectorNumber, sectorCount)) {
 		return RES_OK;
 	}
@@ -104,7 +104,7 @@ extern "C"
 DRESULT
 disk_ioctl(BYTE /*drive*/, BYTE command, void* buffer)
 {
-	return diskInterface->ioctl(command, reinterpret_cast<uint32_t *>(buffer));
+	return globalVolume->ioctl(command, reinterpret_cast<uint32_t *>(buffer));
 	//return RES_ERROR;
 }
 
@@ -113,10 +113,10 @@ disk_ioctl(BYTE /*drive*/, BYTE command, void* buffer)
 #endif
 
 // ----------------------------------------------------------------------------
-xpcc::fat::FileSystem::FileSystem(Disk *disk, 
+xpcc::fat::FileSystem::FileSystem(PhysicalVolume *volume,
 		uint8_t drive)
 {
-	diskInterface = disk;
+	globalVolume = volume;
 	this->fileSystem.drv = drive;
 	
 	f_mount(drive, &this->fileSystem);

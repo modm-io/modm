@@ -68,22 +68,22 @@ xpcc::log::Logger xpcc::log::error(device);
 int
 main()
 {
-	xpcc::log::info << "-->XPCC Logger Test" << xpcc::flush;
+	xpcc::log::info << "-->XPCC Logger Test" << xpcc::endl;
 
 	// direct logging (without loglevel testing)
-	xpcc::log::debug << "Debug Message" << xpcc::flush;
-	xpcc::log::info << "zur info: 100=" << 100 << xpcc::flush;
-	xpcc::log::warning << "eine Warnung: 100!=" << 1001 << xpcc::flush;
-	xpcc::log::error << "ein Error: 100!=" << 1001 << xpcc::flush;
+	xpcc::log::debug << "Debug Message" << xpcc::endl;
+	xpcc::log::info << "zur info: 100=" << 100 << xpcc::endl;
+	xpcc::log::warning << "eine Warnung: 100!=" << 1001 << xpcc::endl;
+	xpcc::log::error << "ein Error: 100!=" << 1001 << xpcc::endl;
 
 
-	xpcc::log::info << "-->Output is controlled by log level now:" << xpcc::flush;
+	xpcc::log::info << "-->Output is controlled by log level now:" << xpcc::endl;
 
-	XPCC_LOG_DEBUG 		<< "Debug Message" << xpcc::flush;
-	XPCC_LOG_INFO 		<< "zur info: 100=" << 100 << xpcc::flush;
-	XPCC_LOG_WARNING 	<< "eine Warnung: 100!=" << 1001 << xpcc::flush;
-	XPCC_LOG_ERROR		<< "ein Error: 100!=" << 1001 << xpcc::flush;
+	XPCC_LOG_DEBUG 		<< "Debug Message" << xpcc::endl;
+	XPCC_LOG_INFO 		<< "zur info: 100=" << 100 << xpcc::endl;
+	XPCC_LOG_WARNING 	<< "eine Warnung: 100!=" << 1001 << xpcc::endl;
+	XPCC_LOG_ERROR		<< "ein Error: 100!=" << 1001 << xpcc::endl;
 
 
-	xpcc::log::info << "-->ENDE" << xpcc::flush;
+	xpcc::log::info << "-->ENDE" << xpcc::endl;
 }

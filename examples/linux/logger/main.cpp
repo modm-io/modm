@@ -1,11 +1,6 @@
 
 #include <xpcc/debug/logger.hpp>
 
-// Use the predefined logging devices for the PC. You must include this
-// file only once! Preferably in the main file. Otherwise you will get
-// errors from the linker complaining about double implementations.
-#include <xpcc/debug/logger/imp/std.hpp>
-
 // Set the log level
 #undef	XPCC_LOG_LEVEL
 #define	XPCC_LOG_LEVEL xpcc::log::DEBUG

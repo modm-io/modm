@@ -4,7 +4,7 @@
 #include <xpcc/communication.hpp>
 #include <xpcc/communication/backend/tipc/tipc.hpp>
 
-#include <xpcc/debug/logger/imp/std.hpp>
+#include <xpcc/debug/logger.hpp>
 
 // set new log level
 #undef XPCC_LOG_LEVEL
