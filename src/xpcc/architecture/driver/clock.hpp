@@ -70,7 +70,7 @@ namespace xpcc
 		static Timestamp
 		now();
 		
-#if !defined(XPCC__OS_STRING)
+#if !defined(XPCC__CPU_HOSTED)
 		/// \brief	Set the current time
 		static inline void
 		increment(uint_fast16_t step = 1)
@@ -86,6 +86,8 @@ namespace xpcc
 	/**
 	 * \brief	Internal timer
 	 * 
+	 * TODO Remove this class
+	 *
 	 * This class is implemented using \c gettimeofday() from <sys/time.h> for
 	 * any Unix-OS. 
 	 * 
@@ -115,7 +117,7 @@ namespace xpcc
 		static Timestamp
 		now();
 		
-#if !defined(XPCC__OS_STRING)
+#if !defined(XPCC__CPU_HOSTED)
 		/// \brief	Set the current time
 		static inline void
 		increment(uint_fast16_t step = 1)

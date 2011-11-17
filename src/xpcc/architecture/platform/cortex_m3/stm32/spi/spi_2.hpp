@@ -37,7 +37,6 @@
 #define XPCC_STM32__SPI_2_HPP
 
 #include <stdint.h>
-//#include <libmaple/spi.h>
 #include "../device.h"
 
 namespace xpcc

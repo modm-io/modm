@@ -1,0 +1,6 @@
+Timer
+=====
+
+Internal connection:
+APB2: Timer 1, 8-11
+APB1: Timer 2-7, 12-14

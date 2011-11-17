@@ -45,6 +45,10 @@ namespace
 {
 	GPIO__OUTPUT(Txd, C, 12);
 	GPIO__INPUT(Rxd, D, 2);
+	
+	static const uint32_t nvicId = 53;
+	static const uint32_t apbId = 20;
+	static const uint32_t apbClk = 36000000;	// APB1
 }
 
 // ----------------------------------------------------------------------------
@@ -54,16 +58,19 @@ xpcc::stm32::Usart5::setBaudrate(uint32_t baudrate)
 	Txd::setOutput(xpcc::stm32::ALTERNATE, xpcc::stm32::PUSH_PULL);
 	Rxd::setInput(xpcc::stm32::INPUT, xpcc::stm32::FLOATING);
 	
-	//rcc_clk_enable(RCC_USART5);
-	//nvic_irq_enable(NVIC_USART5);
+	// enable clock
+	
+	
+	// enable USART in the interrupt controller
+	NVIC->ISER[nvicId / 32] = 1 << (nvicId % 32);
 	
 	// set baudrate
-	USART5->BRR = calculateBaudrateSettings(36e6, baudrate);
+	USART5->BRR = calculateBaudrateSettings(apbClk, baudrate);
 	
 	// Transmitter & Receiver-Enable, 8 Data Bits, 1 Stop Bit
-	USART5->CR1  = USART_CR1_TE | USART_CR1_RE;
-	USART5->CR2  = 0;
-	USART5->CR3  = 0;
+	USART5->CR1 = USART_CR1_TE | USART_CR1_RE;
+	USART5->CR2 = 0;
+	USART5->CR3 = 0;
 	
 	USART5->CR1 |= USART_CR1_UE;		// Uart Enable
 }

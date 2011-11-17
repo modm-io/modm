@@ -56,7 +56,7 @@ if env['ARCHITECTURE'].startswith('cortex-m3/stm32f10'):
 
 if env['ARCHITECTURE'].startswith('cortex-m3/stm32f10'):
 	# Add the libmaple from Leaflabs (see https://github.com/leaflabs/libmaple)
-	sourcePath += ['libmaple']
+	#sourcePath += ['libmaple']
 	
 	# FreeRTOS for STM32
 	sourcePath += ['freertos']

@@ -42,18 +42,38 @@ namespace
 	{% if id == 1 -%}
 	GPIO__OUTPUT(Txd, A, 9);		// Remap B6
 	GPIO__INPUT(Rxd, A, 10);		// Remap B7
+	
+	static const uint32_t nvicId = 37;
+	static const uint32_t apbId = 14;
+	static const uint32_t apbClk = 72000000;	// APB2
 	{%- elif id == 2 -%}
 	GPIO__OUTPUT(Txd, A, 2);		// Remap D5
 	GPIO__INPUT(Rxd, A, 3);			// Remap D6
+	
+	static const uint32_t nvicId = 38;
+	static const uint32_t apbId = 17;
+	static const uint32_t apbClk = 36000000;	// APB1
 	{%- elif id == 3 -%}
 	GPIO__OUTPUT(Txd, B, 10);		// Remap D8, C10
 	GPIO__INPUT(Rxd, B, 11);		// Remap D9, C11
+	
+	static const uint32_t nvicId = 39;
+	static const uint32_t apbId = 18;
+	static const uint32_t apbClk = 36000000;	// APB1
 	{%- elif id == 4 -%}
 	GPIO__OUTPUT(Txd, C, 10);
 	GPIO__INPUT(Rxd, C, 11);
+	
+	static const uint32_t nvicId = 52;
+	static const uint32_t apbId = 19;
+	static const uint32_t apbClk = 36000000;	// APB1
 	{%- elif id == 5 -%}
 	GPIO__OUTPUT(Txd, C, 12);
 	GPIO__INPUT(Rxd, D, 2);
+	
+	static const uint32_t nvicId = 53;
+	static const uint32_t apbId = 20;
+	static const uint32_t apbClk = 36000000;	// APB1
 	{%- endif %}
 }
 
@@ -64,16 +84,23 @@ xpcc::stm32::Usart{{ id }}::setBaudrate(uint32_t baudrate)
 	Txd::setOutput(xpcc::stm32::ALTERNATE, xpcc::stm32::PUSH_PULL);
 	Rxd::setInput(xpcc::stm32::INPUT, xpcc::stm32::FLOATING);
 	
-	//rcc_clk_enable(RCC_USART{{ id }});
-	//nvic_irq_enable(NVIC_USART{{ id }});
+	// enable clock
+	{% if id == 1 -%}
+	RCC->APB2ENR |= (1 << apbId);
+	{%- elif id == 2 or id == 3 -%}
+	RCC->APB1ENR |= (1 << apbId);
+	{%- endif %}
+	
+	// enable USART in the interrupt controller
+	NVIC->ISER[nvicId / 32] = 1 << (nvicId % 32);
 	
 	// set baudrate
-	USART{{ id }}->BRR = calculateBaudrateSettings({% if id == 1 -%}72e6{%- else -%}36e6{%- endif %}, baudrate);
+	USART{{ id }}->BRR = calculateBaudrateSettings(apbClk, baudrate);
 	
 	// Transmitter & Receiver-Enable, 8 Data Bits, 1 Stop Bit
-	USART{{ id }}->CR1  = USART_CR1_TE | USART_CR1_RE;
-	USART{{ id }}->CR2  = 0;
-	USART{{ id }}->CR3  = 0;
+	USART{{ id }}->CR1 = USART_CR1_TE | USART_CR1_RE;
+	USART{{ id }}->CR2 = 0;
+	USART{{ id }}->CR3 = 0;
 	
 	USART{{ id }}->CR1 |= USART_CR1_UE;		// Uart Enable
 }

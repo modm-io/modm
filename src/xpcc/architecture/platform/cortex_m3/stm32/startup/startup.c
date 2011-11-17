@@ -31,17 +31,25 @@
 // ----------------------------------------------------------------------------
 
 #include <stdint.h>
+#include <stm32f10x.h>
 #include <xpcc/architecture/utils.hpp>
+
 #include "xpcc_config.hpp"
 
-#include <libmaple/flash.h>
-#include <libmaple/rcc.h>
-#include <libmaple/nvic.h>
-#include <libmaple/scb.h>
-#include <libmaple/gpio.h>
-#include <libmaple/systick.h>
-
+// ----------------------------------------------------------------------------
 #define SYSTICK_RELOAD_VAL		71999
+
+#define FLASH_WAIT_STATE_0              0x0
+#define FLASH_WAIT_STATE_1              0x1
+#define FLASH_WAIT_STATE_2              0x2
+
+#if defined STM32F10X_MD
+#	define NR_INTERRUPTS 43
+#elif defined STM32F10X_HD || defined STM32F10X_XL
+#	define NR_INTERRUPTS 60
+#elif defined STM32F10X_CL
+#	define NR_INTERRUPTS 68
+#endif
 
 // ----------------------------------------------------------------------------
 /*
@@ -193,53 +201,53 @@ FunctionPointer flashVectors[] __attribute__ ((section(".reset"))) =
 	SysTick_Handler,			// SysTick Handler
 	
 	// Peripheral interrupts (STM32 specific)
-	WWDG_IRQHandler,			// Window Watchdog
-	PVD_IRQHandler,				// PVD through EXTI Line detect
-	TAMPER_IRQHandler,			// Tamper
-	RTC_IRQHandler,				// RTC
-	FLASH_IRQHandler,			// Flash
-	RCC_IRQHandler,				// RCC
+	WWDG_IRQHandler,			//  0: Window Watchdog
+	PVD_IRQHandler,				//  1: PVD through EXTI Line detect
+	TAMPER_IRQHandler,			//  2: Tamper
+	RTC_IRQHandler,				//  3: RTC
+	FLASH_IRQHandler,			//  4: Flash
+	RCC_IRQHandler,				//  5: RCC
 	EXTI0_IRQHandler,			// EXTI Line 0
 	EXTI1_IRQHandler,			// EXTI Line 1
 	EXTI2_IRQHandler,			// EXTI Line 2
 	EXTI3_IRQHandler,			// EXTI Line 3
-	EXTI4_IRQHandler,			// EXTI Line 4
+	EXTI4_IRQHandler,			// 10: EXTI Line 4
 	DMA1_Channel1_IRQHandler,	// DMA1 Channel 1
 	DMA1_Channel2_IRQHandler,	// DMA1 Channel 2
 	DMA1_Channel3_IRQHandler,	// DMA1 Channel 3
 	DMA1_Channel4_IRQHandler,	// DMA1 Channel 4
-	DMA1_Channel5_IRQHandler,	// DMA1 Channel 5
+	DMA1_Channel5_IRQHandler,	// 15: DMA1 Channel 5
 	DMA1_Channel6_IRQHandler,	// DMA1 Channel 6
 	DMA1_Channel7_IRQHandler,	// DMA1 Channel 7
 	ADC1_2_IRQHandler,			// ADC1 & ADC2
 	USB_HP_CAN1_TX_IRQHandler,  // USB High Priority or CAN1 TX
-	USB_LP_CAN1_RX0_IRQHandler, // USB Low  Priority or CAN1 RX0
+	USB_LP_CAN1_RX0_IRQHandler, // 20: USB Low  Priority or CAN1 RX0
 	CAN1_RX1_IRQHandler,		// CAN1 RX1
 	CAN1_SCE_IRQHandler,		// CAN1 SCE
 	EXTI9_5_IRQHandler,			// EXTI Line 9..5
 #if defined (STM32F10X_XL)
 	TIM1_BRK_TIM9_IRQHandler,	// TIM1 Break
-	TIM1_UP_TIM10_IRQHandler,	// TIM1 Update
+	TIM1_UP_TIM10_IRQHandler,	// 25: TIM1 Update
 	TIM1_TRG_COM_TIM11_IRQHandler,	// TIM1 Trigger and Commutation
 #else
 	TIM1_BRK_IRQHandler,		// TIM1 Break
-	TIM1_UP_IRQHandler,			// TIM1 Update
+	TIM1_UP_IRQHandler,			// 25: TIM1 Update
 	TIM1_TRG_COM_IRQHandler,	// TIM1 Trigger and Commutation
 #endif
 	TIM1_CC_IRQHandler,			// TIM1 Capture Compare
 	TIM2_IRQHandler,			// TIM2
 	TIM3_IRQHandler,			// TIM3
-	TIM4_IRQHandler,			// TIM4
+	TIM4_IRQHandler,			// 30: TIM4
 	I2C1_EV_IRQHandler,			// I2C1 Event
 	I2C1_ER_IRQHandler,			// I2C1 Error
 	I2C2_EV_IRQHandler,			// I2C2 Event
 	I2C2_ER_IRQHandler,			// I2C2 Error
-	SPI1_IRQHandler,			// SPI1
+	SPI1_IRQHandler,			// 35: SPI1
 	SPI2_IRQHandler,			// SPI2
 	USART1_IRQHandler,			// USART1
 	USART2_IRQHandler,			// USART2
 	USART3_IRQHandler,			// USART3
-	EXTI15_10_IRQHandler,		// EXTI Line 15..10
+	EXTI15_10_IRQHandler,		// 40: EXTI Line 15..10
 	RTCAlarm_IRQHandler,		// RTC Alarm through EXTI Line
 #if defined(STM32F10X_CL)
 	OTG_FS_WKUP_IRQHandler,
@@ -250,7 +258,7 @@ FunctionPointer flashVectors[] __attribute__ ((section(".reset"))) =
 	#if defined(STM32F10X_CL)
 		0,
 		0,
-		0,
+		0,	// 45:
 		0,
 		0,
 		0,
@@ -258,29 +266,29 @@ FunctionPointer flashVectors[] __attribute__ ((section(".reset"))) =
 	#else
 		TIM8_BRK_TIM12_IRQHandler,
 		TIM8_UP_TIM13_IRQHandler,
-		TIM8_TRG_COM_TIM14_IRQHandler,
+		TIM8_TRG_COM_TIM14_IRQHandler,	// 45:
 		TIM8_CC_IRQHandler,
 		ADC3_IRQHandler,
 		FSMC_IRQHandler,
 		SDIO_IRQHandler,
 	#endif
-	TIM5_IRQHandler,
+	TIM5_IRQHandler,					// 50:
 	SPI3_IRQHandler,
 	UART4_IRQHandler,
 	UART5_IRQHandler,
 	TIM6_IRQHandler,
-	TIM7_IRQHandler,
+	TIM7_IRQHandler,					// 55:
 	DMA2_Channel1_IRQHandler,
 	DMA2_Channel2_IRQHandler,
 	DMA2_Channel3_IRQHandler,
 	#if defined(STM32F10X_CL)
 		DMA2_Channel4_IRQHandler,
-		DMA2_Channel5_IRQHandler,
+		DMA2_Channel5_IRQHandler,		// 60:
 		ETH_IRQHandler,
 		ETH_WKUP_IRQHandler,
 		CAN2_TX_IRQHandler,
 		CAN2_RX0_IRQHandler,
-		CAN2_RX1_IRQHandler,
+		CAN2_RX1_IRQHandler,			// 65:
 		CAN2_SCE_IRQHandler,
 		OTG_FS_IRQHandler
 	#else
@@ -313,16 +321,38 @@ __libc_init_array(void);
 extern void
 exit(int) __attribute__ ((noreturn, weak));
 
-// TODO
-#define SCB_SHCSR_USGFAULTENA_Pos          18                                             /*!< SCB SHCSR: USGFAULTENA Position */
-#define SCB_SHCSR_USGFAULTENA_Msk          (1ul << SCB_SHCSR_USGFAULTENA_Pos)             /*!< SCB SHCSR: USGFAULTENA Mask */
+/*
+ * Assume that we're going to clock the chip off the PLL, fed by
+ * the HSE
+ */
+void
+initPll(uint32_t pll_mul)
+{
+	uint32_t cfgr = 0;
 
-#define SCB_SHCSR_BUSFAULTENA_Pos          17                                             /*!< SCB SHCSR: BUSFAULTENA Position */
-#define SCB_SHCSR_BUSFAULTENA_Msk          (1ul << SCB_SHCSR_BUSFAULTENA_Pos)             /*!< SCB SHCSR: BUSFAULTENA Mask */
+	// select HSE as source for the PLL
+	RCC->CFGR = RCC_CFGR_PLLSRC | pll_mul;
 
-#define SCB_SHCSR_MEMFAULTENA_Pos          16                                             /*!< SCB SHCSR: MEMFAULTENA Position */
-#define SCB_SHCSR_MEMFAULTENA_Msk          (1ul << SCB_SHCSR_MEMFAULTENA_Pos)             /*!< SCB SHCSR: MEMFAULTENA Mask */
+	// Turn on the HSE
+	uint32_t cr = RCC->CR;
+	cr |= RCC_CR_HSEON;
+	RCC->CR = cr;
+	while (!(RCC->CR & RCC_CR_HSERDY))
+		;
 
+	// Now the PLL
+	cr |= RCC_CR_PLLON;
+	RCC->CR = cr;
+	while (!(RCC->CR & RCC_CR_PLLRDY))
+		;
+
+	// Finally, let's switch over to the PLL
+	cfgr &= ~RCC_CFGR_SW;
+	cfgr |= RCC_CFGR_SW_PLL;
+	RCC->CFGR = cfgr;
+	while ((RCC->CFGR & RCC_CFGR_SWS) != RCC_CFGR_SWS_PLL)
+		;
+}
 
 // ----------------------------------------------------------------------------
 void
@@ -356,30 +386,53 @@ Reset_Handler(void)
 		*(dest++) = 0;
 	}
 	
-	// setup flash
-	flash_enable_prefetch();
-	flash_set_latency(FLASH_WAIT_STATE_2);
+	// enable flash prefetch
+	FLASH->ACR |= FLASH_ACR_PRFTBE;
+
+	// set 2 waitstates
+	FLASH->ACR = (FLASH->ACR & ~FLASH_ACR_LATENCY) | FLASH_WAIT_STATE_2;
 	
 	// setup clocks
-	rcc_clk_init(RCC_CLKSRC_PLL, RCC_PLLSRC_HSE, RCC_PLLMUL_9);
-	rcc_set_prescaler(RCC_PRESCALER_AHB, RCC_AHB_SYSCLK_DIV_1);
-	rcc_set_prescaler(RCC_PRESCALER_APB1, RCC_APB1_HCLK_DIV_2);
-	rcc_set_prescaler(RCC_PRESCALER_APB2, RCC_APB2_HCLK_DIV_1);
+	initPll(RCC_CFGR_PLLMULL9);
+
+	// set prescalers
+	RCC->CFGR = (RCC->CFGR & ~RCC_CFGR_HPRE) | RCC_CFGR_HPRE_DIV1;		// AHB
+	RCC->CFGR = (RCC->CFGR & ~RCC_CFGR_PPRE1) | RCC_CFGR_PPRE1_DIV2;	// APB1
+	RCC->CFGR = (RCC->CFGR & ~RCC_CFGR_PPRE2) | RCC_CFGR_PPRE2_DIV1;	// APB2
 	
-	rcc_clk_enable(RCC_GPIOA);
-	rcc_clk_enable(RCC_GPIOB);
-	rcc_clk_enable(RCC_GPIOC);
+	// enable clock
+	// GPIOA-D
+	RCC->APB2ENR  |=   RCC_APB2ENR_IOPAEN   | RCC_APB2ENR_IOPBEN   | RCC_APB2ENR_IOPCEN   | RCC_APB2ENR_IOPDEN;
+	RCC->APB2RSTR |=   RCC_APB2RSTR_IOPARST | RCC_APB2RSTR_IOPBRST | RCC_APB2RSTR_IOPCRST | RCC_APB2RSTR_IOPDRST;
+	RCC->APB2RSTR &= ~(RCC_APB2RSTR_IOPARST | RCC_APB2RSTR_IOPBRST | RCC_APB2RSTR_IOPCRST | RCC_APB2RSTR_IOPDRST);
+#if defined (STM32F10X_HD) || defined (STM32F10X_XL) || defined(STM32F10X_CL)
+	// GPIOE-G
+	RCC->APB2ENR  |=   RCC_APB2ENR_IOPEEN   | RCC_APB2ENR_IOPFEN   | RCC_APB2ENR_IOPGEN;
+	RCC->APB2RSTR |=   RCC_APB2RSTR_IOPERST | RCC_APB2RSTR_IOPFRST | RCC_APB2RSTR_IOPGRST;
+	RCC->APB2RSTR &= ~(RCC_APB2RSTR_IOPERST | RCC_APB2RSTR_IOPFRST | RCC_APB2RSTR_IOPGRST);
+#endif
 	
 	// setup NVIC
-	nvic_init(0x08000000, 0);
+	// set vector table
+	const uint32_t offset = 0;
+	SCB->VTOR = 0x08000000 | (offset & 0x1FFFFF80);
+
+	// Lower priority level for all peripheral interrupts to lowest possible
+	for (uint32_t i = 0; i < NR_INTERRUPTS; i++) {
+		const uint32_t priority = 0xF;
+		NVIC->IP[i] = (priority & 0xF) << 4;
+	}
 	
-	systick_init(SYSTICK_RELOAD_VAL);
+	// Lower systick interrupt priority to lowest level
+	NVIC_SetPriority(SysTick_IRQn, 0xf);
 	
-	gpio_init_all();
-	afio_init();
+	// enable clock for alternative functions
+	RCC->APB2ENR |= RCC_APB2ENR_AFIOEN;
+	RCC->APB2RSTR |= RCC_APB2RSTR_AFIORST;
+	RCC->APB2RSTR &= ~RCC_APB2RSTR_AFIORST;
 	
 	// enable fault handlers
-	/*SCB_BASE->SHCSR |= 
+	/*SCB->SHCSR |=
 			SCB_SHCSR_BUSFAULTENA_Msk |
 			SCB_SHCSR_USGFAULTENA_Msk |
 			SCB_SHCSR_MEMFAULTENA_Msk;*/

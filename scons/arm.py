@@ -176,7 +176,7 @@ def generate(env, **kw):
 		"-mthumb-interwork",
 		"$THUMB_ASSEMBLER",
 		"-gdwarf-2",
-		"-xassembler-with-cpp",
+#		"-xassembler-with-cpp",
 		"-Wa,-adhlns=${TARGET.base}.lst",
 		"-D__ASSEMBLY__",		# for at91lib
 	]

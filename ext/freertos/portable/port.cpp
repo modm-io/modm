@@ -59,7 +59,7 @@
 #include "../FreeRTOS.h"
 #include "../task.h"
 
-#include <libmaple/systick.h>
+#include <xpcc/architecture/platform/cortex_m3/stm32/systick_timer.hpp>
 
 /* For backward compatibility, ensure configKERNEL_INTERRUPT_PRIORITY is
 defined.  The value should also ensure backward compatibility.
@@ -99,11 +99,13 @@ static unsigned portBASE_TYPE uxCriticalNesting = 0xaaaaaaaa;
 /*
  * Exception handlers.
  */
+extern "C"
 void vPortSysTickHandler( void );
 
 /*
  * Start first task is a separate function so it can be tested in isolation.
  */
+extern "C"
 void vPortStartFirstTask(void) __attribute__ ((noreturn));
 
 /*-----------------------------------------------------------*/
@@ -111,6 +113,7 @@ void vPortStartFirstTask(void) __attribute__ ((noreturn));
 /*
  * See header file for description.
  */
+extern "C"
 portSTACK_TYPE *pxPortInitialiseStack( portSTACK_TYPE *pxTopOfStack, pdTASK_CODE pxCode, void *pvParameters )
 {
 	/* Simulate the stack frame as it would be created by a context switch
@@ -131,18 +134,15 @@ portSTACK_TYPE *pxPortInitialiseStack( portSTACK_TYPE *pxTopOfStack, pdTASK_CODE
 /*
  * See header file for description.
  */
+extern "C"
 portBASE_TYPE xPortStartScheduler( void )
 {
 	/* Make PendSV, CallSV the same priority as the kernel. */
 	*(portNVIC_SYSPRI2) |= portNVIC_PENDSV_PRI;
 	*(portNVIC_SYSPRI2) |= portNVIC_SYSTICK_PRI;
 
-// !!! Maple
-	systick_attach_callback(&vPortSysTickHandler);
-//	/* Start the timer that generates the tick ISR.  Interrupts are disabled
-//	here already. */
-//	prvSetupTimerInterrupt();
-// !!! Maple
+	xpcc::stm32::SysTickTimer::attachInterrupt(vPortSysTickHandler);
+	xpcc::stm32::SysTickTimer::enable();
 
 	/* Initialize the critical nesting count ready for the first task. */
 	uxCriticalNesting = 0;
@@ -154,28 +154,28 @@ portBASE_TYPE xPortStartScheduler( void )
 	return 0;
 }
 /*-----------------------------------------------------------*/
-
+extern "C"
 void vPortEndScheduler( void )
 {
 	/* It is unlikely that the CM3 port will require this function as there
 	is nothing to return to.  */
 }
 /*-----------------------------------------------------------*/
-
+extern "C"
 void vPortYieldFromISR( void )
 {
 	/* Set a PendSV to request a context switch. */
 	*(portNVIC_INT_CTRL) = portNVIC_PENDSVSET;
 }
 /*-----------------------------------------------------------*/
-
+extern "C"
 void vPortEnterCritical( void )
 {
 	portDISABLE_INTERRUPTS();
 	uxCriticalNesting++;
 }
 /*-----------------------------------------------------------*/
-
+extern "C"
 void vPortExitCritical( void )
 {
 	uxCriticalNesting--;
@@ -186,8 +186,8 @@ void vPortExitCritical( void )
 }
 
 /*-----------------------------------------------------------*/
-
-void vPortSysTickHandler( void )
+extern "C"
+void vPortSysTickHandler(void)
 {
 unsigned long ulDummy;
 

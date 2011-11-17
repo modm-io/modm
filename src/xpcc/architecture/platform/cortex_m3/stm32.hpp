@@ -38,6 +38,8 @@
 
 #include "stm32/device.h"
 
+#include "stm32/core.hpp"
 #include "stm32/gpio.hpp"
 #include "stm32/usart.hpp"
 #include "stm32/spi.hpp"
+#include "stm32/timer.hpp"

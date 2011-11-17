@@ -188,9 +188,35 @@ namespace xpcc
 		_restore_interrupt(cpsr);
 	}
 	
+#elif defined(XPCC__CPU_CORTEX_M3)
+
+	xpcc::atomic::Lock::Lock()
+	{
+		uint32_t mask = 0;
+		asm volatile (
+				"mrs %0, PRIMASK"	"\n\t"
+				"msr PRIMASK, %1"
+				: "=&r" (cpsr)
+				: "r" (mask));
+	}
+
+	xpcc::atomic::Lock::~Lock()
+	{
+		asm volatile ("msr PRIMASK, %0" : : "r" (cpsr) );
+	}
+
+	// FIXME do something useful here
+	xpcc::atomic::Unlock::Unlock()
+	{
+	}
+
+	xpcc::atomic::Unlock::~Unlock()
+	{
+	}
+
 #else
 
-	// TODO: usefull implementation for any non AVR targets
+	// TODO: useful implementation for any non AVR targets
 	xpcc::atomic::Lock::Lock()
 	{
 	}

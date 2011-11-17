@@ -43,6 +43,10 @@ namespace
 {
 	GPIO__OUTPUT(Txd, B, 10);		// Remap D8, C10
 	GPIO__INPUT(Rxd, B, 11);		// Remap D9, C11
+	
+	static const uint32_t nvicId = 39;
+	static const uint32_t apbId = 18;
+	static const uint32_t apbClk = 36000000;	// APB1
 }
 
 // ----------------------------------------------------------------------------
@@ -52,16 +56,19 @@ xpcc::stm32::Usart3::setBaudrate(uint32_t baudrate)
 	Txd::setOutput(xpcc::stm32::ALTERNATE, xpcc::stm32::PUSH_PULL);
 	Rxd::setInput(xpcc::stm32::INPUT, xpcc::stm32::FLOATING);
 	
-	//rcc_clk_enable(RCC_USART3);
-	//nvic_irq_enable(NVIC_USART3);
+	// enable clock
+	RCC->APB1ENR |= (1 << apbId);
+	
+	// enable USART in the interrupt controller
+	NVIC->ISER[nvicId / 32] = 1 << (nvicId % 32);
 	
 	// set baudrate
-	USART3->BRR = calculateBaudrateSettings(36e6, baudrate);
+	USART3->BRR = calculateBaudrateSettings(apbClk, baudrate);
 	
 	// Transmitter & Receiver-Enable, 8 Data Bits, 1 Stop Bit
-	USART3->CR1  = USART_CR1_TE | USART_CR1_RE;
-	USART3->CR2  = 0;
-	USART3->CR3  = 0;
+	USART3->CR1 = USART_CR1_TE | USART_CR1_RE;
+	USART3->CR2 = 0;
+	USART3->CR3 = 0;
 	
 	USART3->CR1 |= USART_CR1_UE;		// Uart Enable
 }

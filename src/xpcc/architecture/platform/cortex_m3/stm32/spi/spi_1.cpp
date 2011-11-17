@@ -33,14 +33,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <libmaple/spi.h>
-
-#define	LIBMAPLE
 #include "../gpio.hpp"
-
 #include "spi_1.hpp"
-
-
 
 namespace
 {
@@ -48,6 +42,8 @@ namespace
 	GPIO__OUTPUT(Sck, A, 5);	// Remap B3
 	GPIO__INPUT(Miso, A, 6);	// Remap B4
 	GPIO__OUTPUT(Mosi, A, 7);	// Remap B5
+	
+	static const uint32_t apbId = 12;	// APB2
 }
 
 // ----------------------------------------------------------------------------
@@ -60,31 +56,37 @@ xpcc::stm32::Spi1::initialize(Mode mode, Prescaler prescaler)
 	Miso::setInput(xpcc::stm32::INPUT, xpcc::stm32::FLOATING);
 	Mosi::setOutput(xpcc::stm32::ALTERNATE, xpcc::stm32::PUSH_PULL);
 	
-	// Software slave management
-	uint32_t flags = SPI_DFF_8_BIT | SPI_SW_SLAVE | SPI_SOFT_SS | SPI_FRAME_MSB;
+	RCC->APB2ENR |= (1 << apbId);
+	RCC->APB2RSTR |= (1 << apbId);
+	RCC->APB2RSTR &= ~(1 << apbId);
 	
-	spi_init(SPI1);
+	// disable all interrupts
+	SPI1->CR2 &= ~(SPI_CR2_TXEIE  | SPI_CR2_RXNEIE  | SPI_CR2_ERRIE);
 	
-	spi_irq_disable(SPI1, SPI_INTERRUPTS_ALL);
-    spi_peripheral_disable(SPI1);
-    SPI1->regs->CR1 = prescaler | mode | SPI_CR1_MSTR | flags;
-    spi_peripheral_enable(SPI1);
+	// disable peripheral
+	SPI1->CR1 &= ~SPI_CR1_SPE;
+	
+	// set new mode
+	SPI1->CR1 = prescaler | mode | SPI_CR1_MSTR | SPI_CR1_SSM | SPI_CR1_SSI;
+	    
+	// reenable peripheral
+	SPI1->CR1 |= SPI_CR1_SPE;
 }
 
 // ----------------------------------------------------------------------------
 uint8_t
 xpcc::stm32::Spi1::write(uint8_t data)
 {
-	while (!spi_is_tx_empty(SPI1)) {
+	while (!(SPI1->SR & SPI_SR_TXE)) {
 		// wait until the previous transmission is finished
 	}
 	
-	spi_tx_reg(SPI1, data);
+	SPI1->DR = data;
 	
-	while (!spi_is_rx_nonempty(SPI1)) {
+	while (!(SPI1->SR & SPI_SR_RXNE)) {
 		// wait until the data is received
 	}
 	
-	return spi_rx_reg(SPI1);
+	return SPI1->DR;
 }
 
