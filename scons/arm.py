@@ -176,7 +176,7 @@ def generate(env, **kw):
 		"-mthumb-interwork",
 		"$THUMB_ASSEMBLER",
 		"-gdwarf-2",
-#		"-xassembler-with-cpp",
+		"-xassembler-with-cpp",
 		"-Wa,-adhlns=${TARGET.base}.lst",
 		"-D__ASSEMBLY__",		# for at91lib
 	]
@@ -220,6 +220,10 @@ def generate(env, **kw):
 		'Listing': builder_listing,
 	})
 
+	# changes env['ARCOM'] and env['LINKCOM']
+	if str(Platform()) == "win32":
+		env.Tool('gcc_windows')
+		
 # -----------------------------------------------------------------------------
 def exists(env):
 	return env.Detect('arm-none-eabi-gcc')
