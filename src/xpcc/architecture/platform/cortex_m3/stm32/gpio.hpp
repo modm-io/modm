@@ -159,8 +159,8 @@ namespace xpcc
 		setInput(::xpcc::stm32::InputMode mode, \
 				::xpcc::stm32::InputType type = ::xpcc::stm32::FLOATING) { \
 			uint32_t config = 0; \
-			if (mode != ::xpcc::stm32::ANALOG) { \
-				config = (mode | type) & 0xc0; \
+			if (mode == ::xpcc::stm32::INPUT) { \
+				config = (mode | type) & 0xc; \
 				if (type == ::xpcc::stm32::PULLUP) { \
 					GPIO_REG(GPIO ## port ## _BASE_ADDR)->BSRR = (1 << pin); \
 				} else { \
