@@ -87,9 +87,18 @@ namespace xpcc
 		isExpired();
 		
 		/**
+		 * \brief	Check if the timer was started and was not stopped.
+		 *
+		 * If isActive() changes to \c false, it will keep this value till
+		 * a call of restart().
+		 */
+		inline bool
+		isActive() const;
+
+		/**
 		 * \brief	Stop the timer
 		 * 
-		 * Sets isExpired() to true.
+		 * Sets isExpired() to \c true, and isActive() to \c false.
 		 */
 		inline void
 		stop();
@@ -103,6 +112,7 @@ namespace xpcc
 	private:
 		enum State
 		{
+			STOPPED,
 			ACTIVE,
 			EXPIRED
 		};

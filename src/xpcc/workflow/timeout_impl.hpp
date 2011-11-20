@@ -65,10 +65,17 @@ xpcc::Timeout<T>::isExpired()
 }
 
 template<typename T>
+bool
+xpcc::Timeout<T>::isActive() const
+{
+	return (this->state != STOPPED);
+}
+
+template<typename T>
 void
 xpcc::Timeout<T>::stop()
 {
-	state = EXPIRED;
+	this->state = STOPPED;
 }
 
 
