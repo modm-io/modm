@@ -39,17 +39,8 @@
 
 #include "timer_5.hpp"
 
-#if defined (STM32F10X_HD) || defined (STM32F10X_CL) || defined (STM32F10X_XL)
+#if !defined (STM32F10X_LD) && !defined (STM32F10X_MD) 
 
-/*namespace
-{
-	GPIO__OUTPUT(Txd, C, 12);
-	GPIO__INPUT(Rxd, D, 2);
-	
-	static const uint32_t nvicId = 53;
-	static const uint32_t apbId = 20;
-	static const uint32_t apbClk = 36000000;	// APB1
-}*/
 
 // ----------------------------------------------------------------------------
 void
@@ -61,9 +52,6 @@ xpcc::stm32::Timer5::enable()
 	// reset timer
 	RCC->APB1RSTR |=  RCC_APB1RSTR_TIM5RST;
 	RCC->APB1RSTR &= ~RCC_APB1RSTR_TIM5RST;
-	
-	// register IRQ at the NVIC
-	NVIC_EnableIRQ(TIM5_IRQn);
 }
 
 void
@@ -79,14 +67,44 @@ xpcc::stm32::Timer5::disable()
 
 // ----------------------------------------------------------------------------
 void
-xpcc::stm32::Timer5::configure()
+xpcc::stm32::Timer5::configureCounter(Mode mode, Direction dir)
 {
 	// ARR Register is buffered, only Under/Overflow generates update interrupt
-	TIM3->CR1 = TIM_CR1_ARPE | TIM_CR1_URS;
-	TIM3->CR2 = 0;
-
+	TIM5->CR1 = TIM_CR1_ARPE | TIM_CR1_URS | mode | dir;
+	TIM5->CR2 = 0;
+	
 	// Slave mode disabled
-	TIM3->SMCR = 0;
+	TIM5->SMCR = 0;
+}
+
+// ----------------------------------------------------------------------------
+void
+xpcc::stm32::Timer5::configureEncoder()
+{
+	TIM5->CR1 = 0;
+	TIM5->CR2 = 0;
+	
+	// SMS[2:0] = 011
+	//   Encoder mode 3 - Counter counts up/down on both TI1FP1 and TI2FP2
+	//   edges depending on the level of the other input.
+	TIM5->SMCR = TIM_SMCR_SMS_1 | TIM_SMCR_SMS_0;
+	
+	setPrescaler(1);
+}
+
+// ----------------------------------------------------------------------------
+void
+xpcc::stm32::Timer5::configurePwm(PwmMode pwm, Direction dir)
+{
+	// disable timer
+	TIM5->CR1 = 0;
+	
+	// ARR Register is buffered, only Under/Overflow generates update interrupt
+	TIM5->CR1 = TIM_CR1_ARPE | TIM_CR1_URS | pwm | dir;
+	TIM5->CR2 = 0;
+	
+	// Slave mode disabled
+	TIM5->SMCR = 0;
 }
 
 // ----------------------------------------------------------------------------
@@ -113,21 +131,49 @@ xpcc::stm32::Timer5::setPeriod(uint32_t microseconds, bool autoRefresh)
 
 // ----------------------------------------------------------------------------
 void
+xpcc::stm32::Timer5::configureOutputChannel(uint32_t channel,
+		OutputCompareMode mode)
+{
+	channel -= 1;	// 1..4 -> 0..3
+	
+	// disable output
+	TIM5->CCER &= ~((TIM_CCER_CC1P | TIM_CCER_CC1E) << (channel * 4));
+	 
+	// enable preload (the compare value is loaded at each update event)
+	uint32_t flags = mode | TIM_CCMR1_OC1PE;
+	
+	if (channel <= 1)
+	{
+		uint32_t offset = 8 * channel;
+		
+		flags <<= offset;
+		flags |= TIM5->CCMR1 & ~(0xff << offset);
+		
+		TIM5->CCMR1 = flags;
+	}
+	else {
+		uint32_t offset = 8 * (channel - 2);
+		
+		flags <<= offset;
+		flags |= TIM5->CCMR2 & ~(0xff << offset);
+		
+		TIM5->CCMR2 = flags; 
+	}
+	
+	if (mode != OUTPUT_INACTIVE) {
+		TIM5->CCER |= (TIM_CCER_CC1E) << (channel * 4);
+	}
+}
+
+// ----------------------------------------------------------------------------
+void
 xpcc::stm32::Timer5::enableInterrupt(Interrupt interrupt)
 {
+	// register IRQ at the NVIC
+	NVIC_EnableIRQ(TIM5_IRQn);
+	
 	TIM5->DIER |= interrupt;
 }
 
-void
-xpcc::stm32::Timer5::disableInterrupt(Interrupt interrupt)
-{
-	TIM5->DIER &= ~interrupt;
-}
-
-void
-xpcc::stm32::Timer5::acknowledgeInterrupt(Interrupt interrupt)
-{
-	TIM5->SR &= ~interrupt;
-}
 
 #endif

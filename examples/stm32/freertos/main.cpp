@@ -85,7 +85,7 @@ class DisplayTask : public xpcc::freertos::Task
 {
 public:
 	DisplayTask() :
-		xpcc::freertos::Task(0)
+		xpcc::freertos::Task(0), index(0)
 	{
 	}
 	
@@ -97,7 +97,7 @@ public:
 			const xpcc::glcd::Point center(80, 32);
 			const uint16_t radius = 20;
 			
-			index = (index + 1) % 360;			
+			index = (index + 1) % 360;
 			
 			display.clear();
 			

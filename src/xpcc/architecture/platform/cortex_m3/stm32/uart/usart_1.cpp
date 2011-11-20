@@ -36,4 +36,86 @@
 #include "../gpio.hpp"
 #include "../device.h"
 
-#include "timer_7.hpp"
+#include "usart_1.hpp"
+
+namespace
+{
+	GPIO__OUTPUT(Txd, A, 9);		// Remap B6
+	GPIO__INPUT(Rxd, A, 10);		// Remap B7
+	
+	static const uint32_t nvicId = 37;
+	static const uint32_t apbId = 14;
+	static const uint32_t apbClk = 72000000;	// APB2
+}
+
+// ----------------------------------------------------------------------------
+void
+xpcc::stm32::Usart1::setBaudrate(uint32_t baudrate)
+{
+	Txd::setOutput(xpcc::stm32::ALTERNATE, xpcc::stm32::PUSH_PULL);
+	Rxd::setInput(xpcc::stm32::INPUT, xpcc::stm32::FLOATING);
+	
+	// enable clock
+	RCC->APB2ENR |= (1 << apbId);
+	
+	// enable USART in the interrupt controller
+	NVIC->ISER[nvicId / 32] = 1 << (nvicId % 32);
+	
+	// set baudrate
+	USART1->BRR = calculateBaudrateSettings(apbClk, baudrate);
+	
+	// Transmitter & Receiver-Enable, 8 Data Bits, 1 Stop Bit
+	USART1->CR1 = USART_CR1_TE | USART_CR1_RE;
+	USART1->CR2 = 0;
+	USART1->CR3 = 0;
+	
+	USART1->CR1 |= USART_CR1_UE;		// Uart Enable
+}
+
+// ----------------------------------------------------------------------------
+void
+xpcc::stm32::Usart1::write(char data)
+{
+	while (!(USART1->SR & USART_SR_TXE)) {
+		// wait until the data register becomes empty
+	}
+	
+	USART1->DR = data;
+}
+
+// ----------------------------------------------------------------------------
+void
+xpcc::stm32::Usart1::write(const char *s)
+{
+	char c;
+	while ((c = *s++)) {
+		write(c);
+	}
+}
+
+// ----------------------------------------------------------------------------
+bool
+xpcc::stm32::Usart1::read(char& c)
+{
+	if (USART1->SR & USART_SR_RXNE)
+	{
+		c = USART1->DR;
+		return true;
+	}
+	
+	return false;
+}
+
+// ----------------------------------------------------------------------------
+uint8_t
+xpcc::stm32::Usart1::read(char *buffer, uint8_t n)
+{
+	for (uint8_t i = 0; i < n; ++i)
+	{
+		if (read(*buffer++)) {
+			return i;
+		}
+	}
+	
+	return n;
+}

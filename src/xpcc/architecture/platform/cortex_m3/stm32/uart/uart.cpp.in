@@ -27,31 +27,35 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 // ----------------------------------------------------------------------------
-/*
- * WARNING: This file is generated automatically, do not edit!
- * Please modify the corresponding *.in file instead and rebuild this file. 
- */
-// ----------------------------------------------------------------------------
+{{ generation_block }}
 
-//#include <libmaple/usart.h>
 #include "../gpio.hpp"
 #include "../device.h"
 
-#include "usart_2.hpp"
+#include "uart_{{ id }}.hpp"
+
+#if defined(STM32F10X_HD) || defined(STM32F10X_XL) || defined(STM32F10X_CL)
 
 namespace
 {
-	GPIO__OUTPUT(Txd, A, 2);		// Remap D5
-	GPIO__INPUT(Rxd, A, 3);			// Remap D6
+	{% if id == 4 -%}
+	GPIO__OUTPUT(Txd, C, 10);
+	GPIO__INPUT(Rxd, C, 11);
 	
-	static const uint32_t nvicId = 38;
-	static const uint32_t apbId = 17;
-	static const uint32_t apbClk = 36000000;	// APB1
+	static const uint32_t nvicId = 52;
+	static const uint32_t apbId = 19;
+	{%- elif id == 5 -%}
+	GPIO__OUTPUT(Txd, C, 12);
+	GPIO__INPUT(Rxd, D, 2);
+	
+	static const uint32_t nvicId = 53;
+	static const uint32_t apbId = 20;
+	{%- endif %}
 }
 
 // ----------------------------------------------------------------------------
 void
-xpcc::stm32::Usart2::setBaudrate(uint32_t baudrate)
+xpcc::stm32::Uart{{ id }}::setBaudrate(uint32_t baudrate)
 {
 	Txd::setOutput(xpcc::stm32::ALTERNATE, xpcc::stm32::PUSH_PULL);
 	Rxd::setInput(xpcc::stm32::INPUT, xpcc::stm32::FLOATING);
@@ -63,30 +67,30 @@ xpcc::stm32::Usart2::setBaudrate(uint32_t baudrate)
 	NVIC->ISER[nvicId / 32] = 1 << (nvicId % 32);
 	
 	// set baudrate
-	USART2->BRR = calculateBaudrateSettings(apbClk, baudrate);
+	UART{{ id }}->BRR = calculateBaudrateSettings(36000000, baudrate);
 	
 	// Transmitter & Receiver-Enable, 8 Data Bits, 1 Stop Bit
-	USART2->CR1 = USART_CR1_TE | USART_CR1_RE;
-	USART2->CR2 = 0;
-	USART2->CR3 = 0;
+	UART{{ id }}->CR1 = USART_CR1_TE | USART_CR1_RE;
+	UART{{ id }}->CR2 = 0;
+	UART{{ id }}->CR3 = 0;
 	
-	USART2->CR1 |= USART_CR1_UE;		// Uart Enable
+	UART{{ id }}->CR1 |= USART_CR1_UE;		// Uart Enable
 }
 
 // ----------------------------------------------------------------------------
 void
-xpcc::stm32::Usart2::write(char data)
+xpcc::stm32::Uart{{ id }}::write(char data)
 {
-	while (!(USART2->SR & USART_SR_TXE)) {
+	while (!(UART{{ id }}->SR & USART_SR_TXE)) {
 		// wait until the data register becomes empty
 	}
 	
-	USART2->DR = data;
+	UART{{ id }}->DR = data;
 }
 
 // ----------------------------------------------------------------------------
 void
-xpcc::stm32::Usart2::write(const char *s)
+xpcc::stm32::Uart{{ id }}::write(const char *s)
 {
 	char c;
 	while ((c = *s++)) {
@@ -96,11 +100,11 @@ xpcc::stm32::Usart2::write(const char *s)
 
 // ----------------------------------------------------------------------------
 bool
-xpcc::stm32::Usart2::read(char& c)
+xpcc::stm32::Uart{{ id }}::read(char& c)
 {
-	if (USART2->SR & USART_SR_RXNE)
+	if (UART{{ id }}->SR & USART_SR_RXNE)
 	{
-		c = USART2->DR;
+		c = UART{{ id }}->DR;
 		return true;
 	}
 	
@@ -109,7 +113,7 @@ xpcc::stm32::Usart2::read(char& c)
 
 // ----------------------------------------------------------------------------
 uint8_t
-xpcc::stm32::Usart2::read(char *buffer, uint8_t n)
+xpcc::stm32::Uart{{ id }}::read(char *buffer, uint8_t n)
 {
 	for (uint8_t i = 0; i < n; ++i)
 	{
@@ -121,3 +125,4 @@ xpcc::stm32::Usart2::read(char *buffer, uint8_t n)
 	return n;
 }
 
+#endif

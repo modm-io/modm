@@ -33,71 +33,89 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_STM32__UART_4_HPP
-#define XPCC_STM32__UART_4_HPP
+#include "../gpio.hpp"
+#include "../device.h"
 
-#include <stdint.h>
-#include "usart_base.hpp"
+#include "usart_3.hpp"
 
-namespace xpcc
+namespace
 {
-	namespace stm32
-	{
-		/**
-		 * @brief		Universal synchronous/asynchronous receiver
-		 * 				transmitter (USART4)
-		 * 
-		 * Simple unbuffered implementation.
-		 * 
-		 * @ingroup		stm32
-		 */
-		class Usart4 : public UsartBase
-		{
-		public:
-			Usart4(uint32_t baudrate)
-			{
-				setBaudrate(baudrate);
-			}
-			
-			/**
-			 * \brief	Set baudrate
-			 * \param	baudrate	desired baud rate
-			 */
-			static void
-			setBaudrate(uint32_t baudrate);
-			
-			/**
-			 * \brief	Send a single byte
-			 */
-			static void
-			write(char data);
-			
-			/**
-			 * \brief	Write a string
-			 * 
-			 * The string musst end with \c '\\0'.
-			 */
-			static void
-			write(const char *string);
-			
-			/**
-			 * \brief	Read a single byte
-			 */
-			static bool
-			read(char& c);
-			
-			/**
-			 * \brief	Read a block of bytes
-			 * 
-			 * \param	*buffer	Pointer to a buffer big enough to storage \a n bytes
-			 * \param	n	Number of bytes to be read
-			 * 
-			 * \return	Number of bytes which could be read, maximal \a n
-			 */
-			static uint8_t
-			read(char *buffer, uint8_t n);
-		};
+	GPIO__OUTPUT(Txd, B, 10);		// Remap D8, C10
+	GPIO__INPUT(Rxd, B, 11);		// Remap D9, C11
+	
+	static const uint32_t nvicId = 39;
+	static const uint32_t apbId = 18;
+	static const uint32_t apbClk = 36000000;	// APB1
+}
+
+// ----------------------------------------------------------------------------
+void
+xpcc::stm32::Usart3::setBaudrate(uint32_t baudrate)
+{
+	Txd::setOutput(xpcc::stm32::ALTERNATE, xpcc::stm32::PUSH_PULL);
+	Rxd::setInput(xpcc::stm32::INPUT, xpcc::stm32::FLOATING);
+	
+	// enable clock
+	RCC->APB1ENR |= (1 << apbId);
+	
+	// enable USART in the interrupt controller
+	NVIC->ISER[nvicId / 32] = 1 << (nvicId % 32);
+	
+	// set baudrate
+	USART3->BRR = calculateBaudrateSettings(apbClk, baudrate);
+	
+	// Transmitter & Receiver-Enable, 8 Data Bits, 1 Stop Bit
+	USART3->CR1 = USART_CR1_TE | USART_CR1_RE;
+	USART3->CR2 = 0;
+	USART3->CR3 = 0;
+	
+	USART3->CR1 |= USART_CR1_UE;		// Uart Enable
+}
+
+// ----------------------------------------------------------------------------
+void
+xpcc::stm32::Usart3::write(char data)
+{
+	while (!(USART3->SR & USART_SR_TXE)) {
+		// wait until the data register becomes empty
+	}
+	
+	USART3->DR = data;
+}
+
+// ----------------------------------------------------------------------------
+void
+xpcc::stm32::Usart3::write(const char *s)
+{
+	char c;
+	while ((c = *s++)) {
+		write(c);
 	}
 }
 
-#endif // XPCC_STM32__UART_4_HPP
+// ----------------------------------------------------------------------------
+bool
+xpcc::stm32::Usart3::read(char& c)
+{
+	if (USART3->SR & USART_SR_RXNE)
+	{
+		c = USART3->DR;
+		return true;
+	}
+	
+	return false;
+}
+
+// ----------------------------------------------------------------------------
+uint8_t
+xpcc::stm32::Usart3::read(char *buffer, uint8_t n)
+{
+	for (uint8_t i = 0; i < n; ++i)
+	{
+		if (read(*buffer++)) {
+			return i;
+		}
+	}
+	
+	return n;
+}

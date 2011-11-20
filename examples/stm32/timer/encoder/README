@@ -1,0 +1,19 @@
+FreeRTOS
+========
+
+Example for the [STM32_P103][1] board from Olimex.
+
+A encoder (STEC12E08, 24 steps and a button) is connected to the remapped
+input channels of timer 3. The reading of the encoder is display on a
+graphic display (DOGS102) connected to SPI1.
+
+Pin Assignment:
+---------------
+
+ * Encoder A => C6
+ * Encoder B => C7
+ * Encoder I => C13
+
+
+[1]: http://www.olimex.com/dev/stm32-p103.html
+

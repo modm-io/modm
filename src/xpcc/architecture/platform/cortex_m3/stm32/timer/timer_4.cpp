@@ -39,15 +39,8 @@
 
 #include "timer_4.hpp"
 
-/*namespace
-{
-	GPIO__OUTPUT(Txd, C, 10);
-	GPIO__INPUT(Rxd, C, 11);
-	
-	static const uint32_t nvicId = 52;
-	static const uint32_t apbId = 19;
-	static const uint32_t apbClk = 36000000;	// APB1
-}*/
+#if !defined (STM32F10X_LD)
+
 
 // ----------------------------------------------------------------------------
 void
@@ -59,9 +52,6 @@ xpcc::stm32::Timer4::enable()
 	// reset timer
 	RCC->APB1RSTR |=  RCC_APB1RSTR_TIM4RST;
 	RCC->APB1RSTR &= ~RCC_APB1RSTR_TIM4RST;
-	
-	// register IRQ at the NVIC
-	NVIC_EnableIRQ(TIM4_IRQn);
 }
 
 void
@@ -77,14 +67,44 @@ xpcc::stm32::Timer4::disable()
 
 // ----------------------------------------------------------------------------
 void
-xpcc::stm32::Timer4::configure()
+xpcc::stm32::Timer4::configureCounter(Mode mode, Direction dir)
 {
 	// ARR Register is buffered, only Under/Overflow generates update interrupt
-	TIM3->CR1 = TIM_CR1_ARPE | TIM_CR1_URS;
-	TIM3->CR2 = 0;
-
+	TIM4->CR1 = TIM_CR1_ARPE | TIM_CR1_URS | mode | dir;
+	TIM4->CR2 = 0;
+	
 	// Slave mode disabled
-	TIM3->SMCR = 0;
+	TIM4->SMCR = 0;
+}
+
+// ----------------------------------------------------------------------------
+void
+xpcc::stm32::Timer4::configureEncoder()
+{
+	TIM4->CR1 = 0;
+	TIM4->CR2 = 0;
+	
+	// SMS[2:0] = 011
+	//   Encoder mode 3 - Counter counts up/down on both TI1FP1 and TI2FP2
+	//   edges depending on the level of the other input.
+	TIM4->SMCR = TIM_SMCR_SMS_1 | TIM_SMCR_SMS_0;
+	
+	setPrescaler(1);
+}
+
+// ----------------------------------------------------------------------------
+void
+xpcc::stm32::Timer4::configurePwm(PwmMode pwm, Direction dir)
+{
+	// disable timer
+	TIM4->CR1 = 0;
+	
+	// ARR Register is buffered, only Under/Overflow generates update interrupt
+	TIM4->CR1 = TIM_CR1_ARPE | TIM_CR1_URS | pwm | dir;
+	TIM4->CR2 = 0;
+	
+	// Slave mode disabled
+	TIM4->SMCR = 0;
 }
 
 // ----------------------------------------------------------------------------
@@ -111,19 +131,49 @@ xpcc::stm32::Timer4::setPeriod(uint32_t microseconds, bool autoRefresh)
 
 // ----------------------------------------------------------------------------
 void
+xpcc::stm32::Timer4::configureOutputChannel(uint32_t channel,
+		OutputCompareMode mode)
+{
+	channel -= 1;	// 1..4 -> 0..3
+	
+	// disable output
+	TIM4->CCER &= ~((TIM_CCER_CC1P | TIM_CCER_CC1E) << (channel * 4));
+	 
+	// enable preload (the compare value is loaded at each update event)
+	uint32_t flags = mode | TIM_CCMR1_OC1PE;
+	
+	if (channel <= 1)
+	{
+		uint32_t offset = 8 * channel;
+		
+		flags <<= offset;
+		flags |= TIM4->CCMR1 & ~(0xff << offset);
+		
+		TIM4->CCMR1 = flags;
+	}
+	else {
+		uint32_t offset = 8 * (channel - 2);
+		
+		flags <<= offset;
+		flags |= TIM4->CCMR2 & ~(0xff << offset);
+		
+		TIM4->CCMR2 = flags; 
+	}
+	
+	if (mode != OUTPUT_INACTIVE) {
+		TIM4->CCER |= (TIM_CCER_CC1E) << (channel * 4);
+	}
+}
+
+// ----------------------------------------------------------------------------
+void
 xpcc::stm32::Timer4::enableInterrupt(Interrupt interrupt)
 {
+	// register IRQ at the NVIC
+	NVIC_EnableIRQ(TIM4_IRQn);
+	
 	TIM4->DIER |= interrupt;
 }
 
-void
-xpcc::stm32::Timer4::disableInterrupt(Interrupt interrupt)
-{
-	TIM4->DIER &= ~interrupt;
-}
 
-void
-xpcc::stm32::Timer4::acknowledgeInterrupt(Interrupt interrupt)
-{
-	TIM4->SR &= ~interrupt;
-}
+#endif

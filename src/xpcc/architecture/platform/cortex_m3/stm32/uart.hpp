@@ -5,7 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -30,50 +30,9 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_STM32__GENERAL_PURPOSE_TIMER_HPP
-#define XPCC_STM32__GENERAL_PURPOSE_TIMER_HPP
+#include "uart/usart_1.hpp"
+#include "uart/usart_2.hpp"
+#include "uart/usart_3.hpp"
+#include "uart/uart_4.hpp"
+#include "uart/uart_5.hpp"
 
-#include <stdint.h>
-#include "../device.h"
-
-namespace xpcc
-{
-	namespace stm32
-	{
-		class GeneralPurposeTimer
-		{
-		public:
-			enum Interrupt
-			{
-				UPDATE_INTERRUPT = TIM_DIER_UIE,
-				CAPTURE_COMPARE_1_INTERRUPT = TIM_DIER_CC1IE,
-				CAPTURE_COMPARE_2_INTERRUPT = TIM_DIER_CC2IE,
-				CAPTURE_COMPARE_3_INTERRUPT = TIM_DIER_CC3IE,
-				CAPTURE_COMPARE_4_INTERRUPT = TIM_DIER_CC4IE,
-				COM_INTERRUPT = TIM_DIER_COMIE,
-				TRIGGER_INTERRUPT = TIM_DIER_TIE,
-				BREAK_INTERRUPT = TIM_DIER_BIE,
-				UPDATE_DMA_REQUEST_INTERRUPT = TIM_DIER_UDE,
-				CAPTURE_COMPARE_1_DMA_REQUEST_INTERRUPT = TIM_DIER_CC1DE,
-				CAPTURE_COMPARE_2_DMA_REQUEST_INTERRUPT = TIM_DIER_CC2DE,
-				CAPTURE_COMPARE_3_DMA_REQUEST_INTERRUPT = TIM_DIER_CC3DE,
-				CAPTURE_COMPARE_4_DMA_REQUEST_INTERRUPT = TIM_DIER_CC4DE,
-				COM_DMA_REQUEST_INTERRUPT = TIM_DIER_COMDE,
-				TRIGGER_DMA_REQUEST_INTERRUPT = TIM_DIER_TDE,
-			};
-
-			enum Mode
-			{
-				MODE_UPCOUNTER,
-				MODE_OUTPUT_COMPARE,
-				MODE_PWM,
-				MODE_PWM_CENTER_ALIGNED,
-				MODE_ONE_SHOOT,
-				MODE_ENCODER,
-				MODE_INPUT_CAPTURE,
-			};
-		};
-	}
-}
-
-#endif // XPCC_STM32__GENERAL_PURPOSE_TIMER_HPP

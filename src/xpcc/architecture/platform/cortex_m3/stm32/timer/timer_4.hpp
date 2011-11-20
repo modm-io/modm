@@ -37,7 +37,7 @@
 #define XPCC_STM32__TIMER_4_HPP
 
 #include <stdint.h>
-#include "general_purpose_timer.hpp"
+#include "timer_base.hpp"
 
 namespace xpcc
 {
@@ -51,6 +51,8 @@ namespace xpcc
 		 * extern "C" void
 		 * TIM4_IRQHandler(void)
 		 * {
+		 *     Timer4::acknowledgeInterrupt(Timer4::...);
+		 *     
 		 *     ...
 		 * }
 		 * \endcode
@@ -59,6 +61,14 @@ namespace xpcc
 		 */
 		class Timer4 : public GeneralPurposeTimer
 		{
+		public:
+			enum Remap
+			{
+				NO_REMAP = 0,
+				FULL_REMAP = AFIO_MAPR_TIM4_REMAP,
+			};
+			static const uint32_t remapMask = AFIO_MAPR_TIM4_REMAP;
+			
 		public:
 			/**
 			 * Enables the clock for the timer and resets all settings
@@ -86,8 +96,35 @@ namespace xpcc
 				TIM4->CR1 |= TIM_CR1_CEN;
 			}
 			
+			/**
+			 * Configure as Up/Down-Counter
+			 */
 			static void
-			configure();
+			configureCounter(Mode mode = PERIODIC, Direction dir = UP_COUNTING);
+			
+			/**
+			 * Configure as Encoder
+			 * 
+			 * The encoder channels A and B must be connected to Timer
+			 * Channel 1 and 2 of the Timer (e.g. TIM3_CH1 and TIM3_CH2).
+			 */
+			static void
+			configureEncoder();
+			
+			/**
+			 * Configure in PWM Mode
+			 * 
+			 */
+			static void
+			configurePwm(PwmMode pwm = EDGE_ALIGNED, Direction dir = UP_COUNTING);
+			
+			// TODO
+			//static void
+			//configureOutputCompare();
+			
+			// TODO
+			//static void
+			//configureInputCapture();
 			
 			/**
 			 * Set new prescaler
@@ -102,7 +139,7 @@ namespace xpcc
 			setPrescaler(uint16_t prescaler)
 			{
 				// Because a prescaler of zero is not possible the actual
-				// prescaler is \p prescaler - 1 (see Datasheet)
+				// prescaler value is \p prescaler - 1 (see Datasheet)
 				TIM4->PSC = prescaler - 1;
 			}
 			
@@ -140,6 +177,23 @@ namespace xpcc
 			setPeriod(uint32_t microseconds, bool autoRefresh = true);
 			
 			/**
+			 * @brief	Reset the counter, and update the prescaler and
+			 * 			overflow values.
+			 *
+			 * This will reset the counter to 0 in up-counting mode (the
+			 * default) or to the maximal value in down-counting mode. It will
+			 * also update the timer's prescaler and overflow values if you
+			 * have set them up to be changed using setPrescaler() or
+			 * setOverflow() (or setPeriod()).
+			 */
+			static inline void
+			refresh()
+			{
+				// Generate Update Event to apply the new settings for ARR
+				TIM4->EGR |= TIM_EGR_UG;
+			}
+			
+			/**
 			 * Get the counter value
 			 */
 			static inline uint16_t
@@ -149,19 +203,39 @@ namespace xpcc
 			}
 			
 			/**
-			 * @brief	Reset the counter, and update the prescaler and
-			 * 			overflow values.
-			 *
-			 * This will reset the counter to 0 in upcounting mode (the
-			 * default). It will also update the timer's prescaler and
-			 * overflow, if you have set them up to be changed using
-			 * setPrescaler() or setOverflow().
+			 * Set a new counter value
 			 */
 			static inline void
-			refresh()
+			setValue(uint16_t value)
 			{
-				// Genererate Update Event to apply the new settings for ARR
-				TIM4->EGR |= TIM_EGR_UG;
+				TIM4->CNT = value;
+			}
+			
+			//static void
+			//configureInputChannel(uint32_t channel, );
+			
+			/**
+			 * @param	channel	[1..4]
+			 */
+			static void
+			configureOutputChannel(uint32_t channel, OutputCompareMode mode);
+			
+			/**
+			 * @param	channel	[1..4]
+			 */
+			static inline void
+			setCompareChannel(uint32_t channel, uint16_t value)
+			{
+				*(&TIM4->CR1 + ((channel - 1) * 2)) = value;
+			}
+			
+			/**
+			 * @param	channel	[1..4]
+			 */
+			static inline uint16_t
+			getCompareChannel(uint32_t channel)
+			{
+				return *(&TIM4->CR1 + ((channel - 1) * 2));
 			}
 			
 			/** Enable interrupt handler */
@@ -170,10 +244,39 @@ namespace xpcc
 			
 			/** Disable interrupt handler */
 			static void
-			disableInterrupt(Interrupt interrupt);
+			disableInterrupt(Interrupt interrupt)
+			{
+				TIM4->DIER &= ~interrupt;
+			}
 			
+			static Interrupt
+			getInterruptCause();
+			
+			/**
+			 * Reset interrupt flags
+			 * 
+			 * You need to call this function at the beginning of the
+			 * interrupt handler function. Preferably as the first command.
+			 */
 			static void
-			acknowledgeInterrupt(Interrupt interrupt);
+			acknowledgeInterrupt(Interrupt interrupt)
+			{
+				// Flags are cleared by writing a zero to the flag position.
+				// Writing a one is ignored.
+				TIM4->SR = ~interrupt;
+			}
+			
+			/**
+			 * Remap compare channels to other locations.
+			 * 
+			 * The pins are not automatically initialized. This has to be
+			 * done by the user.
+			 */
+			static inline void
+			remapPins(Remap mapping)
+			{
+				AFIO->MAPR = (AFIO->MAPR & ~remapMask) | mapping;
+			}
 		};
 	}
 }

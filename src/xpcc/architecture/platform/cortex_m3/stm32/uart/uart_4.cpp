@@ -27,98 +27,66 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 // ----------------------------------------------------------------------------
-{{ generation_block }}
+/*
+ * WARNING: This file is generated automatically, do not edit!
+ * Please modify the corresponding *.in file instead and rebuild this file. 
+ */
+// ----------------------------------------------------------------------------
 
-//#include <libmaple/usart.h>
 #include "../gpio.hpp"
 #include "../device.h"
 
-#include "usart_{{ id }}.hpp"
-{% if id == 4 or id == 5 %}
-#ifdef STM32F10X_HD
-{% endif %}
+#include "uart_4.hpp"
+
+#if defined(STM32F10X_HD) || defined(STM32F10X_XL) || defined(STM32F10X_CL)
+
 namespace
 {
-	{% if id == 1 -%}
-	GPIO__OUTPUT(Txd, A, 9);		// Remap B6
-	GPIO__INPUT(Rxd, A, 10);		// Remap B7
-	
-	static const uint32_t nvicId = 37;
-	static const uint32_t apbId = 14;
-	static const uint32_t apbClk = 72000000;	// APB2
-	{%- elif id == 2 -%}
-	GPIO__OUTPUT(Txd, A, 2);		// Remap D5
-	GPIO__INPUT(Rxd, A, 3);			// Remap D6
-	
-	static const uint32_t nvicId = 38;
-	static const uint32_t apbId = 17;
-	static const uint32_t apbClk = 36000000;	// APB1
-	{%- elif id == 3 -%}
-	GPIO__OUTPUT(Txd, B, 10);		// Remap D8, C10
-	GPIO__INPUT(Rxd, B, 11);		// Remap D9, C11
-	
-	static const uint32_t nvicId = 39;
-	static const uint32_t apbId = 18;
-	static const uint32_t apbClk = 36000000;	// APB1
-	{%- elif id == 4 -%}
 	GPIO__OUTPUT(Txd, C, 10);
 	GPIO__INPUT(Rxd, C, 11);
 	
 	static const uint32_t nvicId = 52;
 	static const uint32_t apbId = 19;
-	static const uint32_t apbClk = 36000000;	// APB1
-	{%- elif id == 5 -%}
-	GPIO__OUTPUT(Txd, C, 12);
-	GPIO__INPUT(Rxd, D, 2);
-	
-	static const uint32_t nvicId = 53;
-	static const uint32_t apbId = 20;
-	static const uint32_t apbClk = 36000000;	// APB1
-	{%- endif %}
 }
 
 // ----------------------------------------------------------------------------
 void
-xpcc::stm32::Usart{{ id }}::setBaudrate(uint32_t baudrate)
+xpcc::stm32::Uart4::setBaudrate(uint32_t baudrate)
 {
 	Txd::setOutput(xpcc::stm32::ALTERNATE, xpcc::stm32::PUSH_PULL);
 	Rxd::setInput(xpcc::stm32::INPUT, xpcc::stm32::FLOATING);
 	
 	// enable clock
-	{% if id == 1 -%}
-	RCC->APB2ENR |= (1 << apbId);
-	{%- elif id == 2 or id == 3 -%}
 	RCC->APB1ENR |= (1 << apbId);
-	{%- endif %}
 	
 	// enable USART in the interrupt controller
 	NVIC->ISER[nvicId / 32] = 1 << (nvicId % 32);
 	
 	// set baudrate
-	USART{{ id }}->BRR = calculateBaudrateSettings(apbClk, baudrate);
+	UART4->BRR = calculateBaudrateSettings(36000000, baudrate);
 	
 	// Transmitter & Receiver-Enable, 8 Data Bits, 1 Stop Bit
-	USART{{ id }}->CR1 = USART_CR1_TE | USART_CR1_RE;
-	USART{{ id }}->CR2 = 0;
-	USART{{ id }}->CR3 = 0;
+	UART4->CR1 = USART_CR1_TE | USART_CR1_RE;
+	UART4->CR2 = 0;
+	UART4->CR3 = 0;
 	
-	USART{{ id }}->CR1 |= USART_CR1_UE;		// Uart Enable
+	UART4->CR1 |= USART_CR1_UE;		// Uart Enable
 }
 
 // ----------------------------------------------------------------------------
 void
-xpcc::stm32::Usart{{ id }}::write(char data)
+xpcc::stm32::Uart4::write(char data)
 {
-	while (!(USART{{ id }}->SR & USART_SR_TXE)) {
+	while (!(UART4->SR & USART_SR_TXE)) {
 		// wait until the data register becomes empty
 	}
 	
-	USART{{ id }}->DR = data;
+	UART4->DR = data;
 }
 
 // ----------------------------------------------------------------------------
 void
-xpcc::stm32::Usart{{ id }}::write(const char *s)
+xpcc::stm32::Uart4::write(const char *s)
 {
 	char c;
 	while ((c = *s++)) {
@@ -128,11 +96,11 @@ xpcc::stm32::Usart{{ id }}::write(const char *s)
 
 // ----------------------------------------------------------------------------
 bool
-xpcc::stm32::Usart{{ id }}::read(char& c)
+xpcc::stm32::Uart4::read(char& c)
 {
-	if (USART{{ id }}->SR & USART_SR_RXNE)
+	if (UART4->SR & USART_SR_RXNE)
 	{
-		c = USART{{ id }}->DR;
+		c = UART4->DR;
 		return true;
 	}
 	
@@ -141,7 +109,7 @@ xpcc::stm32::Usart{{ id }}::read(char& c)
 
 // ----------------------------------------------------------------------------
 uint8_t
-xpcc::stm32::Usart{{ id }}::read(char *buffer, uint8_t n)
+xpcc::stm32::Uart4::read(char *buffer, uint8_t n)
 {
 	for (uint8_t i = 0; i < n; ++i)
 	{
@@ -153,6 +121,4 @@ xpcc::stm32::Usart{{ id }}::read(char *buffer, uint8_t n)
 	return n;
 }
 
-{% if id == 4 or id == 5 -%}
 #endif
-{%- endif %}

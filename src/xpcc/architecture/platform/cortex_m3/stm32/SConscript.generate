@@ -37,18 +37,21 @@ for id in [1, 2, 3]:
 	generator.template('spi_%i.hpp' % id, 'spi.hpp.in', { 'id': id })
 	generator.template('spi_%i.cpp' % id, 'spi.cpp.in', { 'id': id })
 
-generator = env['TemplateGenerator'](env, 'usart')
-for id in [1, 2, 3, 4, 5]:
+generator = env['TemplateGenerator'](env, 'uart')
+for id in [1, 2, 3]:
 	generator.template('usart_%i.hpp' % id, 'usart.hpp.in', { 'id': id })
 	generator.template('usart_%i.cpp' % id, 'usart.cpp.in', { 'id': id })
+for id in [4, 5]:
+	generator.template('uart_%i.hpp' % id, 'uart.hpp.in', { 'id': id })
+	generator.template('uart_%i.cpp' % id, 'uart.cpp.in', { 'id': id })
 
 generator = env['TemplateGenerator'](env, 'timer')
 for id in [1, 8]:
 	generator.template('timer_%i.hpp' % id, 'advanced.hpp.in', { 'id': id })
 	generator.template('timer_%i.cpp' % id, 'advanced.cpp.in', { 'id': id })
 for id in [2, 3, 4, 5]:
-	generator.template('timer_%i.hpp' % id, 'general_purpose_4.hpp.in', { 'id': id })
-	generator.template('timer_%i.cpp' % id, 'general_purpose_4.cpp.in', { 'id': id })
+	generator.template('timer_%i.hpp' % id, 'general_purpose.hpp.in', { 'id': id })
+	generator.template('timer_%i.cpp' % id, 'general_purpose.cpp.in', { 'id': id })
 #for id in [9, 12]:
 #	generator.template('timer_%i.hpp' % id, 'general_purpose_2.hpp.in', { 'id': id })
 #	generator.template('timer_%i.cpp' % id, 'general_purpose_2.cpp.in', { 'id': id })

@@ -33,13 +33,12 @@
  */
 // ----------------------------------------------------------------------------
 
-//#include <libmaple/usart.h>
 #include "../gpio.hpp"
 #include "../device.h"
 
-#include "usart_5.hpp"
+#include "uart_5.hpp"
 
-#ifdef STM32F10X_HD
+#if defined(STM32F10X_HD) || defined(STM32F10X_XL) || defined(STM32F10X_CL)
 
 namespace
 {
@@ -48,47 +47,46 @@ namespace
 	
 	static const uint32_t nvicId = 53;
 	static const uint32_t apbId = 20;
-	static const uint32_t apbClk = 36000000;	// APB1
 }
 
 // ----------------------------------------------------------------------------
 void
-xpcc::stm32::Usart5::setBaudrate(uint32_t baudrate)
+xpcc::stm32::Uart5::setBaudrate(uint32_t baudrate)
 {
 	Txd::setOutput(xpcc::stm32::ALTERNATE, xpcc::stm32::PUSH_PULL);
 	Rxd::setInput(xpcc::stm32::INPUT, xpcc::stm32::FLOATING);
 	
 	// enable clock
-	
+	RCC->APB1ENR |= (1 << apbId);
 	
 	// enable USART in the interrupt controller
 	NVIC->ISER[nvicId / 32] = 1 << (nvicId % 32);
 	
 	// set baudrate
-	USART5->BRR = calculateBaudrateSettings(apbClk, baudrate);
+	UART5->BRR = calculateBaudrateSettings(36000000, baudrate);
 	
 	// Transmitter & Receiver-Enable, 8 Data Bits, 1 Stop Bit
-	USART5->CR1 = USART_CR1_TE | USART_CR1_RE;
-	USART5->CR2 = 0;
-	USART5->CR3 = 0;
+	UART5->CR1 = USART_CR1_TE | USART_CR1_RE;
+	UART5->CR2 = 0;
+	UART5->CR3 = 0;
 	
-	USART5->CR1 |= USART_CR1_UE;		// Uart Enable
+	UART5->CR1 |= USART_CR1_UE;		// Uart Enable
 }
 
 // ----------------------------------------------------------------------------
 void
-xpcc::stm32::Usart5::write(char data)
+xpcc::stm32::Uart5::write(char data)
 {
-	while (!(USART5->SR & USART_SR_TXE)) {
+	while (!(UART5->SR & USART_SR_TXE)) {
 		// wait until the data register becomes empty
 	}
 	
-	USART5->DR = data;
+	UART5->DR = data;
 }
 
 // ----------------------------------------------------------------------------
 void
-xpcc::stm32::Usart5::write(const char *s)
+xpcc::stm32::Uart5::write(const char *s)
 {
 	char c;
 	while ((c = *s++)) {
@@ -98,11 +96,11 @@ xpcc::stm32::Usart5::write(const char *s)
 
 // ----------------------------------------------------------------------------
 bool
-xpcc::stm32::Usart5::read(char& c)
+xpcc::stm32::Uart5::read(char& c)
 {
-	if (USART5->SR & USART_SR_RXNE)
+	if (UART5->SR & USART_SR_RXNE)
 	{
-		c = USART5->DR;
+		c = UART5->DR;
 		return true;
 	}
 	
@@ -111,7 +109,7 @@ xpcc::stm32::Usart5::read(char& c)
 
 // ----------------------------------------------------------------------------
 uint8_t
-xpcc::stm32::Usart5::read(char *buffer, uint8_t n)
+xpcc::stm32::Uart5::read(char *buffer, uint8_t n)
 {
 	for (uint8_t i = 0; i < n; ++i)
 	{

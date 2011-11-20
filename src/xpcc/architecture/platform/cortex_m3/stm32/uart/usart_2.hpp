@@ -27,13 +27,17 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 // ----------------------------------------------------------------------------
-{{ generation_block }}
+/*
+ * WARNING: This file is generated automatically, do not edit!
+ * Please modify the corresponding *.in file instead and rebuild this file. 
+ */
+// ----------------------------------------------------------------------------
 
-#ifndef XPCC_STM32__UART_{{ id }}_HPP
-#define XPCC_STM32__UART_{{ id }}_HPP
+#ifndef XPCC_STM32__USART_2_HPP
+#define XPCC_STM32__USART_2_HPP
 
 #include <stdint.h>
-#include "usart_base.hpp"
+#include "uart_base.hpp"
 
 namespace xpcc
 {
@@ -41,16 +45,16 @@ namespace xpcc
 	{
 		/**
 		 * @brief		Universal synchronous/asynchronous receiver
-		 * 				transmitter (USART{{ id }})
+		 * 				transmitter (USART2)
 		 * 
 		 * Simple unbuffered implementation.
 		 * 
 		 * @ingroup		stm32
 		 */
-		class Usart{{ id }} : public UsartBase
+		class Usart2 : public UartBase
 		{
 		public:
-			Usart{{ id }}(uint32_t baudrate)
+			Usart2(uint32_t baudrate)
 			{
 				setBaudrate(baudrate);
 			}
@@ -96,4 +100,4 @@ namespace xpcc
 	}
 }
 
-#endif // XPCC_STM32__UART_{{ id }}_HPP
+#endif // XPCC_STM32__USART_2_HPP

@@ -5,7 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- *
+ * 
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -25,14 +25,79 @@
  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- * $Id$
+ */
+// ----------------------------------------------------------------------------
+/*
+ * WARNING: This file is generated automatically, do not edit!
+ * Please modify the corresponding *.in file instead and rebuild this file. 
  */
 // ----------------------------------------------------------------------------
 
-#include "usart/usart_1.hpp"
-#include "usart/usart_2.hpp"
-#include "usart/usart_3.hpp"
-#include "usart/usart_4.hpp"
-#include "usart/usart_5.hpp"
+#ifndef XPCC_STM32__USART_3_HPP
+#define XPCC_STM32__USART_3_HPP
 
+#include <stdint.h>
+#include "uart_base.hpp"
+
+namespace xpcc
+{
+	namespace stm32
+	{
+		/**
+		 * @brief		Universal synchronous/asynchronous receiver
+		 * 				transmitter (USART3)
+		 * 
+		 * Simple unbuffered implementation.
+		 * 
+		 * @ingroup		stm32
+		 */
+		class Usart3 : public UartBase
+		{
+		public:
+			Usart3(uint32_t baudrate)
+			{
+				setBaudrate(baudrate);
+			}
+			
+			/**
+			 * \brief	Set baudrate
+			 * \param	baudrate	desired baud rate
+			 */
+			static void
+			setBaudrate(uint32_t baudrate);
+			
+			/**
+			 * \brief	Send a single byte
+			 */
+			static void
+			write(char data);
+			
+			/**
+			 * \brief	Write a string
+			 * 
+			 * The string musst end with \c '\\0'.
+			 */
+			static void
+			write(const char *string);
+			
+			/**
+			 * \brief	Read a single byte
+			 */
+			static bool
+			read(char& c);
+			
+			/**
+			 * \brief	Read a block of bytes
+			 * 
+			 * \param	*buffer	Pointer to a buffer big enough to storage \a n bytes
+			 * \param	n	Number of bytes to be read
+			 * 
+			 * \return	Number of bytes which could be read, maximal \a n
+			 */
+			static uint8_t
+			read(char *buffer, uint8_t n);
+		};
+	}
+}
+
+#endif // XPCC_STM32__USART_3_HPP

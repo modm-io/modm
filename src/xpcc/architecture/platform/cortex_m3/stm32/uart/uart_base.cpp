@@ -27,77 +27,12 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 // ----------------------------------------------------------------------------
-/*
- * WARNING: This file is generated automatically, do not edit!
- * Please modify the corresponding *.in file instead and rebuild this file. 
- */
-// ----------------------------------------------------------------------------
 
-#ifndef XPCC_STM32__UART_1_HPP
-#define XPCC_STM32__UART_1_HPP
+#include "uart_base.hpp"
 
-#include <stdint.h>
-#include "usart_base.hpp"
-
-namespace xpcc
+uint16_t
+xpcc::stm32::UartBase::calculateBaudrateSettings(uint32_t sabclk, uint32_t baudrate)
 {
-	namespace stm32
-	{
-		/**
-		 * @brief		Universal synchronous/asynchronous receiver
-		 * 				transmitter (USART1)
-		 * 
-		 * Simple unbuffered implementation.
-		 * 
-		 * @ingroup		stm32
-		 */
-		class Usart1 : public UsartBase
-		{
-		public:
-			Usart1(uint32_t baudrate)
-			{
-				setBaudrate(baudrate);
-			}
-			
-			/**
-			 * \brief	Set baudrate
-			 * \param	baudrate	desired baud rate
-			 */
-			static void
-			setBaudrate(uint32_t baudrate);
-			
-			/**
-			 * \brief	Send a single byte
-			 */
-			static void
-			write(char data);
-			
-			/**
-			 * \brief	Write a string
-			 * 
-			 * The string musst end with \c '\\0'.
-			 */
-			static void
-			write(const char *string);
-			
-			/**
-			 * \brief	Read a single byte
-			 */
-			static bool
-			read(char& c);
-			
-			/**
-			 * \brief	Read a block of bytes
-			 * 
-			 * \param	*buffer	Pointer to a buffer big enough to storage \a n bytes
-			 * \param	n	Number of bytes to be read
-			 * 
-			 * \return	Number of bytes which could be read, maximal \a n
-			 */
-			static uint8_t
-			read(char *buffer, uint8_t n);
-		};
-	}
+	// see http://www.mikrocontroller.net/topic/143715
+	return ((2 * sabclk) / baudrate + 1) / 2;
 }
-
-#endif // XPCC_STM32__UART_1_HPP

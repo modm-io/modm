@@ -28,11 +28,36 @@
  */
 // ----------------------------------------------------------------------------
 
-#include "usart_base.hpp"
+#ifndef XPCC_STM32__UART_BASE_HPP
+#define XPCC_STM32__UART_BASE_HPP
 
-uint16_t
-xpcc::stm32::UsartBase::calculateBaudrateSettings(uint32_t sabclk, uint32_t baudrate)
+#include <stdint.h>
+
+namespace xpcc
 {
-	// see http://www.mikrocontroller.net/topic/143715
-	return ((2 * sabclk) / baudrate + 1) / 2;
+	namespace stm32
+	{
+		/**
+		 * @brief		Base class for the UART classes
+		 * 
+		 * Provides same common helper functions.
+		 * 
+		 * @internal
+		 * @ingroup		stm32
+		 */
+		class UartBase
+		{
+		protected:
+			/**
+			 * @brief	Calculate settings for the UBR register
+			 * 
+			 * @param	sabclk		Clock frequency of the USART.
+			 * @param	baudrate	Requested baudrate
+			 */
+			static uint16_t
+			calculateBaudrateSettings(uint32_t sabclk, uint32_t baudrate);
+		};
+	}
 }
+
+#endif // XPCC_STM32__UART_BASE_HPP

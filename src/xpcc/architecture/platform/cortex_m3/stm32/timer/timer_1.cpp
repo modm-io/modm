@@ -37,17 +37,3 @@
 #include "../device.h"
 
 #include "timer_1.hpp"
-
-/*namespace
-{
-	GPIO__OUTPUT(Txd, A, 9);		// Remap B6
-	GPIO__INPUT(Rxd, A, 10);		// Remap B7
-	
-	static const uint32_t nvicId = 37;
-	static const uint32_t apbId = 14;
-	static const uint32_t apbClk = 72000000;	// APB2
-}*/
-
-// ----------------------------------------------------------------------------
-
-

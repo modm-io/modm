@@ -1,0 +1,9 @@
+Timer Example
+=============
+
+Example for the [STM32_P103][1] board from Olimex.
+
+The Wake-Up lights the Status LED. The program then sses the One-Shot Mode of
+Timer 3 to keep the LED glowing for one second after the Button was released.
+
+[1]: http://www.olimex.com/dev/stm32-p103.html

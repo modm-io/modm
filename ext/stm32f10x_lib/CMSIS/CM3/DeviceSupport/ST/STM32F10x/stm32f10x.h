@@ -2110,7 +2110,7 @@ typedef struct
  #define  RCC_APB1ENR_USBEN                  ((uint32_t)0x00800000)        /*!< USB Device clock enable */
 #endif
 
-#if defined (STM32F10X_HD) || defined  (STM32F10X_CL)
+#if defined (STM32F10X_HD) || defined  (STM32F10X_XL) || defined  (STM32F10X_CL)
  #define  RCC_APB1ENR_TIM5EN                 ((uint32_t)0x00000008)        /*!< Timer 5 clock enable */
  #define  RCC_APB1ENR_TIM6EN                 ((uint32_t)0x00000010)        /*!< Timer 6 clock enable */
  #define  RCC_APB1ENR_TIM7EN                 ((uint32_t)0x00000020)        /*!< Timer 7 clock enable */

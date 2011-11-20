@@ -29,7 +29,150 @@
 // ----------------------------------------------------------------------------
 {{ generation_block }}
 
+//#include <libmaple/usart.h>
 #include "../gpio.hpp"
 #include "../device.h"
 
 #include "timer_{{ id }}.hpp"
+{% if id == 4 %}
+#if !defined (STM32F10X_LD)
+{% elif id == 5 %}
+#if !defined (STM32F10X_LD) && !defined (STM32F10X_MD) 
+{% endif %}
+
+// ----------------------------------------------------------------------------
+void
+xpcc::stm32::Timer{{ id }}::enable()
+{
+	// enable clock
+	RCC->APB1ENR  |=  RCC_APB1ENR_TIM{{ id }}EN;
+	
+	// reset timer
+	RCC->APB1RSTR |=  RCC_APB1RSTR_TIM{{ id }}RST;
+	RCC->APB1RSTR &= ~RCC_APB1RSTR_TIM{{ id }}RST;
+}
+
+void
+xpcc::stm32::Timer{{ id }}::disable()
+{
+	// disable clock
+	RCC->APB1ENR &= ~RCC_APB1ENR_TIM{{ id }}EN;
+	
+	TIM{{ id }}->CR1 = 0;
+	TIM{{ id }}->DIER = 0;
+	TIM{{ id }}->CCER = 0;
+}
+
+// ----------------------------------------------------------------------------
+void
+xpcc::stm32::Timer{{ id }}::configureCounter(Mode mode, Direction dir)
+{
+	// ARR Register is buffered, only Under/Overflow generates update interrupt
+	TIM{{ id }}->CR1 = TIM_CR1_ARPE | TIM_CR1_URS | mode | dir;
+	TIM{{ id }}->CR2 = 0;
+	
+	// Slave mode disabled
+	TIM{{ id }}->SMCR = 0;
+}
+
+// ----------------------------------------------------------------------------
+void
+xpcc::stm32::Timer{{ id }}::configureEncoder()
+{
+	TIM{{ id }}->CR1 = 0;
+	TIM{{ id }}->CR2 = 0;
+	
+	// SMS[2:0] = 011
+	//   Encoder mode 3 - Counter counts up/down on both TI1FP1 and TI2FP2
+	//   edges depending on the level of the other input.
+	TIM{{ id }}->SMCR = TIM_SMCR_SMS_1 | TIM_SMCR_SMS_0;
+	
+	setPrescaler(1);
+}
+
+// ----------------------------------------------------------------------------
+void
+xpcc::stm32::Timer{{ id }}::configurePwm(PwmMode pwm, Direction dir)
+{
+	// disable timer
+	TIM{{ id }}->CR1 = 0;
+	
+	// ARR Register is buffered, only Under/Overflow generates update interrupt
+	TIM{{ id }}->CR1 = TIM_CR1_ARPE | TIM_CR1_URS | pwm | dir;
+	TIM{{ id }}->CR2 = 0;
+	
+	// Slave mode disabled
+	TIM{{ id }}->SMCR = 0;
+}
+
+// ----------------------------------------------------------------------------
+uint16_t
+xpcc::stm32::Timer{{ id }}::setPeriod(uint32_t microseconds, bool autoRefresh)
+{
+	// This will be inaccurate for non-smooth frequencies (last six digits
+	// unequal to zero)
+	uint32_t cycles = microseconds * (F_CPU / 1000000UL);
+	uint16_t prescaler = (cycles + 65535) / 65536;	// always round up
+	uint16_t overflow = cycles / prescaler;
+	
+	overflow = overflow - 1;	// e.g. 36000 cycles are from 0 to 35999
+	
+	setPrescaler(prescaler);
+	setOverflow(overflow);
+	
+	if (autoRefresh) {
+		refresh();
+	}
+	
+	return overflow;
+}
+
+// ----------------------------------------------------------------------------
+void
+xpcc::stm32::Timer{{ id }}::configureOutputChannel(uint32_t channel,
+		OutputCompareMode mode)
+{
+	channel -= 1;	// 1..4 -> 0..3
+	
+	// disable output
+	TIM{{ id }}->CCER &= ~((TIM_CCER_CC1P | TIM_CCER_CC1E) << (channel * 4));
+	 
+	// enable preload (the compare value is loaded at each update event)
+	uint32_t flags = mode | TIM_CCMR1_OC1PE;
+	
+	if (channel <= 1)
+	{
+		uint32_t offset = 8 * channel;
+		
+		flags <<= offset;
+		flags |= TIM{{ id }}->CCMR1 & ~(0xff << offset);
+		
+		TIM{{ id }}->CCMR1 = flags;
+	}
+	else {
+		uint32_t offset = 8 * (channel - 2);
+		
+		flags <<= offset;
+		flags |= TIM{{ id }}->CCMR2 & ~(0xff << offset);
+		
+		TIM{{ id }}->CCMR2 = flags; 
+	}
+	
+	if (mode != OUTPUT_INACTIVE) {
+		TIM{{ id }}->CCER |= (TIM_CCER_CC1E) << (channel * 4);
+	}
+}
+
+// ----------------------------------------------------------------------------
+void
+xpcc::stm32::Timer{{ id }}::enableInterrupt(Interrupt interrupt)
+{
+	// register IRQ at the NVIC
+	NVIC_EnableIRQ(TIM{{ id }}_IRQn);
+	
+	TIM{{ id }}->DIER |= interrupt;
+}
+
+{% if id == 4 or id == 5 %}
+#endif
+{% endif %}

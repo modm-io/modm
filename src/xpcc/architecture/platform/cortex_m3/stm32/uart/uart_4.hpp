@@ -33,91 +33,72 @@
  */
 // ----------------------------------------------------------------------------
 
-//#include <libmaple/usart.h>
-#include "../gpio.hpp"
-#include "../device.h"
+#ifndef XPCC_STM32__UART_4_HPP
+#define XPCC_STM32__UART_4_HPP
 
-#include "usart_1.hpp"
+#include <stdint.h>
+#include "uart_base.hpp"
 
-namespace
+namespace xpcc
 {
-	GPIO__OUTPUT(Txd, A, 9);		// Remap B6
-	GPIO__INPUT(Rxd, A, 10);		// Remap B7
-	
-	static const uint32_t nvicId = 37;
-	static const uint32_t apbId = 14;
-	static const uint32_t apbClk = 72000000;	// APB2
-}
-
-// ----------------------------------------------------------------------------
-void
-xpcc::stm32::Usart1::setBaudrate(uint32_t baudrate)
-{
-	Txd::setOutput(xpcc::stm32::ALTERNATE, xpcc::stm32::PUSH_PULL);
-	Rxd::setInput(xpcc::stm32::INPUT, xpcc::stm32::FLOATING);
-	
-	// enable clock
-	RCC->APB2ENR |= (1 << apbId);
-	
-	// enable USART in the interrupt controller
-	NVIC->ISER[nvicId / 32] = 1 << (nvicId % 32);
-	
-	// set baudrate
-	USART1->BRR = calculateBaudrateSettings(apbClk, baudrate);
-	
-	// Transmitter & Receiver-Enable, 8 Data Bits, 1 Stop Bit
-	USART1->CR1 = USART_CR1_TE | USART_CR1_RE;
-	USART1->CR2 = 0;
-	USART1->CR3 = 0;
-	
-	USART1->CR1 |= USART_CR1_UE;		// Uart Enable
-}
-
-// ----------------------------------------------------------------------------
-void
-xpcc::stm32::Usart1::write(char data)
-{
-	while (!(USART1->SR & USART_SR_TXE)) {
-		// wait until the data register becomes empty
-	}
-	
-	USART1->DR = data;
-}
-
-// ----------------------------------------------------------------------------
-void
-xpcc::stm32::Usart1::write(const char *s)
-{
-	char c;
-	while ((c = *s++)) {
-		write(c);
-	}
-}
-
-// ----------------------------------------------------------------------------
-bool
-xpcc::stm32::Usart1::read(char& c)
-{
-	if (USART1->SR & USART_SR_RXNE)
+	namespace stm32
 	{
-		c = USART1->DR;
-		return true;
+		/**
+		 * @brief		Universal asynchronous receiver transmitter (UART4)
+		 * 
+		 * Not available on the low- and medium density devices.
+		 * 
+		 * Simple unbuffered implementation.
+		 * 
+		 * @ingroup		stm32
+		 */
+		class Uart4 : public UartBase
+		{
+		public:
+			Uart4(uint32_t baudrate)
+			{
+				setBaudrate(baudrate);
+			}
+			
+			/**
+			 * \brief	Set baudrate
+			 * \param	baudrate	desired baud rate
+			 */
+			static void
+			setBaudrate(uint32_t baudrate);
+			
+			/**
+			 * \brief	Send a single byte
+			 */
+			static void
+			write(char data);
+			
+			/**
+			 * \brief	Write a string
+			 * 
+			 * The string musst end with \c '\\0'.
+			 */
+			static void
+			write(const char *string);
+			
+			/**
+			 * \brief	Read a single byte
+			 */
+			static bool
+			read(char& c);
+			
+			/**
+			 * \brief	Read a block of bytes
+			 * 
+			 * \param	*buffer	Pointer to a buffer big enough to storage \a n bytes
+			 * \param	n	Number of bytes to be read
+			 * 
+			 * \return	Number of bytes which could be read, maximal \a n
+			 */
+			static uint8_t
+			read(char *buffer, uint8_t n);
+		};
 	}
-	
-	return false;
 }
 
-// ----------------------------------------------------------------------------
-uint8_t
-xpcc::stm32::Usart1::read(char *buffer, uint8_t n)
-{
-	for (uint8_t i = 0; i < n; ++i)
-	{
-		if (read(*buffer++)) {
-			return i;
-		}
-	}
-	
-	return n;
-}
-
+#endif // XPCC_STM32__UART_4_HPP

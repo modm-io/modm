@@ -33,11 +33,11 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_STM32__UART_2_HPP
-#define XPCC_STM32__UART_2_HPP
+#ifndef XPCC_STM32__USART_1_HPP
+#define XPCC_STM32__USART_1_HPP
 
 #include <stdint.h>
-#include "usart_base.hpp"
+#include "uart_base.hpp"
 
 namespace xpcc
 {
@@ -45,16 +45,16 @@ namespace xpcc
 	{
 		/**
 		 * @brief		Universal synchronous/asynchronous receiver
-		 * 				transmitter (USART2)
+		 * 				transmitter (USART1)
 		 * 
 		 * Simple unbuffered implementation.
 		 * 
 		 * @ingroup		stm32
 		 */
-		class Usart2 : public UsartBase
+		class Usart1 : public UartBase
 		{
 		public:
-			Usart2(uint32_t baudrate)
+			Usart1(uint32_t baudrate)
 			{
 				setBaudrate(baudrate);
 			}
@@ -100,4 +100,4 @@ namespace xpcc
 	}
 }
 
-#endif // XPCC_STM32__UART_2_HPP
+#endif // XPCC_STM32__USART_1_HPP

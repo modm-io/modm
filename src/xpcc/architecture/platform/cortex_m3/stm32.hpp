@@ -33,13 +33,20 @@
  * \ingroup		cortex_m3
  * \defgroup	stm32		STM32Fxxx
  * 
- * TODO
+ * Supported Devices:
+ * - STM32 F1 series of mainstream MCUs
+ *   - Performance line STM32F103  - 72 MHz, up to 1 Mbyte Flash with motor control, USB and CAN
+ *   - Connectivity line STM32F105/107 - 72 MHz CPU with Ethernet MAC, CAN and USB 2.0 OTG
+ * - TODO: STM32 F2 series of high-performance MCUs
+ * - TODO: STM32 F4 series of high-performance MCUs with DSP and FPU instructions
+ *
+ * STM32F100-102 are not supported!
  */
 
 #include "stm32/device.h"
 
 #include "stm32/core.hpp"
 #include "stm32/gpio.hpp"
-#include "stm32/usart.hpp"
+#include "stm32/uart.hpp"
 #include "stm32/spi.hpp"
 #include "stm32/timer.hpp"
