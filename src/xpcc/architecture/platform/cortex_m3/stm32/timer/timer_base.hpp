@@ -40,7 +40,165 @@ namespace xpcc
 {
 	namespace stm32
 	{
-		class GeneralPurposeTimer
+		class BasicTimer
+		{
+		public:
+			enum Mode
+			{
+				UP_COUNTER = 0,
+				ONE_SHOT_UP_COUNTER = TIM_CR1_OPM,
+			};
+
+			enum Interrupt
+			{
+				UPDATE_INTERRUPT = TIM_DIER_UIE,
+				UPDATE_DMA_REQUEST_INTERRUPT = TIM_DIER_UDE,
+			};
+
+		public:
+			/**
+			 * Enables the clock for the timer and resets all settings
+			 *
+			 * Has to be called before calling any other function from this
+			 * class! Otherwise the settings won't have any effect.
+			 */
+			static void
+			enable();
+
+			/**
+			 * Disable clock.
+			 *
+			 * All settings are ignored in this mode and the timer is
+			 * shut down. Calling any function other than enable() won't
+			 * have any effect.
+			 */
+			static void
+			disable();
+
+			/**
+			 * Pause timer operation
+			 *
+			 * All settings are stored but the timer operation is suspend until
+			 * resume() is called.
+			 */
+			static void
+			pause();
+
+			/**
+			 * Re-enable timer operations
+			 *
+			 * Has to called after the initial configuration to start timer
+			 * or after pause() to restart the timer.
+			 */
+			static void
+			start();
+
+			/**
+			 * Set operation mode of the timer
+			 *
+			 * In Encoder mode the encoder channels A and B must be connected
+			 * to channel 1 and 2 of the timer (e.g. TIM{{ id }}_CH1 and TIM{{ id }}_CH2).
+			 */
+			static void
+			setMode(Mode mode);
+
+			/**
+			 * Set new prescaler
+			 *
+			 * The prescaler can divide the counter clock frequency by any
+			 * factor between 1 and 65536. The new prescaler ratio is taken
+			 * into account at the next update event.
+			 *
+			 * @see		applyAndReset()
+			 */
+			static inline void
+			setPrescaler(uint16_t prescaler);
+
+			/**
+			 * Set overflow.
+			 *
+			 * This sets the maximum counter value of the timer.
+			 * The timer is blocked if \p overflow is set to zero.
+			 *
+			 * Takes effect at next update event.
+			 *
+			 * @see		applyAndReset()
+			 */
+			static inline void
+			setOverflow(uint16_t overflow);
+
+			/**
+			 * Set period in microseconds
+			 *
+			 * Changes prescaler and overflow values.
+			 * Takes effect at next update event.
+			 *
+			 * @param	microseconds	Requested period in microseconds
+			 * @param	autoApply		Update the new value immediately and
+			 * 							reset the counter value.
+			 *
+			 * @return	New overflow value.
+			 *
+			 * @see		applyAndReset()
+			 */
+			static uint16_t
+			setPeriod(uint32_t microseconds, bool autoApply = true);
+
+			/**
+			 * @brief	Reset the counter, and update the prescaler and
+			 * 			overflow values.
+			 *
+			 * Generates an Update-Event without generating an
+			 * Update-Interrupt.
+			 *
+			 * This will reset the counter to 0 in up-counting mode (the
+			 * default) or to the maximal value in down-counting mode. It will
+			 * also update the timer's prescaler and overflow values if you
+			 * have set them up to be changed using setPrescaler() or
+			 * setOverflow() (or setPeriod()).
+			 *
+			 * An Update-Event is also generated when the timer reaches its
+			 * maximal (up-counting) or minimal (down-counting) value. The
+			 * settings for Prescaler, Overflow and Compare values are applied
+			 * then without calling this function.
+			 */
+			static inline void
+			applyAndReset();
+
+			/**
+			 * Get the counter value
+			 */
+			static inline uint16_t
+			getValue();
+
+			/**
+			 * Set a new counter value
+			 */
+			static inline void
+			setValue(uint16_t value);
+
+			/** Enable interrupt handler */
+			static void
+			enableInterrupt(Interrupt interrupt);
+
+			/** Disable interrupt handler */
+			static void
+			disableInterrupt(Interrupt interrupt);
+
+			static Interrupt
+			getInterruptCause();
+
+			/**
+			 * Reset interrupt flags
+			 *
+			 * You need to call this function at the beginning of the
+			 * interrupt handler function. Preferably as the first command.
+			 */
+			static void
+			acknowledgeInterrupt(Interrupt interrupt);
+		};
+
+		class GeneralPurposeTimer : public BasicTimer
 		{
 		public:
 			enum Interrupt
@@ -64,25 +222,17 @@ namespace xpcc
 
 			enum Mode
 			{
-				PERIODIC = 0,
-				ONE_SHOT = TIM_CR1_OPM,
-			};
+				UP_COUNTER = 0,
+				DOWN_COUNTER = TIM_CR1_DIR,
+				ONE_SHOT_UP_COUNTER = TIM_CR1_OPM,
+				ONE_SHOT_DOWN_COUNTER = TIM_CR1_DIR | TIM_CR1_OPM,
 
-			enum Direction
-			{
-				UP_COUNTING = 0,
-				DOWN_COUNTING = TIM_CR1_DIR,
-			};
-
-			enum PwmMode
-			{
-				/// Counter counts up or down (depending on the Direction setting)
-				EDGE_ALIGNED = 0,
-
-				/// Counter counts up and down alternatively, CounterMode is ignored
+				// Counter counts up and down alternatively
 				CENTER_ALIGNED_1 =                 TIM_CR1_CMS_0,	///< Output compare flags only set when counting down
 				CENTER_ALIGNED_2 = TIM_CR1_CMS_1, 					///< Output compare flags only set when counting up
-				CENTER_ALIGNED_3 = TIM_CR1_CMS_1 | TIM_CR1_CMS_0,	///< Output compare flags set when counting up and down
+				CENTER_ALIGNED_3 = TIM_CR1_CMS_1 | TIM_CR1_CMS_0,	///< Output compare flags set when counting up and down (default)
+
+				ENCODER,
 			};
 
 			enum OutputCompareMode
@@ -90,21 +240,87 @@ namespace xpcc
 				/// Output is independent from the compare result
 				OUTPUT_INACTIVE = 0,
 
-				/// PWM Mode 1.
-				/// While up-counting, channel is active as long as
-				/// count is less than channel capture/compare register, else
-				/// inactive.
-				/// In downcounting, channel is	inactive as long as count exceeds
-				/// capture/compare register, else active
+				/**
+				 * PWM Mode 1.
+				 *
+				 * While up-counting, channel is active as long as
+				 * count is less than channel capture/compare register, else
+				 * inactive.
+				 * In downcounting, channel is	inactive as long as count exceeds
+				 * capture/compare register, else active
+				 */
 				OUTPUT_PWM = TIM_CCMR1_OC1M_2 | TIM_CCMR1_OC1M_1,
 
-				/// PWM mode 2.
-				/// In upcounting, channel is inactive as long as
-				/// count is less than capture/compare register, else active.
-				/// In downcounting, channel is active as long as count exceeds
-				/// capture/compare	register, else inactive.
-				OUTPUT_PWM_INVERTED = TIM_CCMR1_OC1M_2 | TIM_CCMR1_OC1M_1 | TIM_CCMR1_OC1M_0,
+				/**
+				 * PWM mode 2.
+				 *
+				 * In upcounting, channel is inactive as long as
+				 * count is less than capture/compare register, else active.
+				 * In downcounting, channel is active as long as count exceeds
+				 * capture/compare	register, else inactive.
+				 */
+				OUTPUT_PWM2 = TIM_CCMR1_OC1M_2 | TIM_CCMR1_OC1M_1 | TIM_CCMR1_OC1M_0,
 			};
+
+		public:
+			// TODO implement this function
+			//static void
+			//configureInputChannel(uint32_t channel, ...);
+
+			/**
+			 * Configure output channel 1..4.
+			 *
+			 * @param	channel			[1..4]
+			 * @param	mode			Output compare mode
+			 * @param	compareValue	Preloaded output compare value (can be
+			 * 							changed later via setCompareValue())
+			 */
+			static void
+			configureOutputChannel(uint32_t channel, OutputCompareMode mode,
+					uint16_t compareValue);
+
+			/**
+			 * Set compare value for channel 1..4.
+			 *
+			 * @param	channel	[1..4]
+			 * @param	value	Compare value
+			 */
+			static inline void
+			setCompareValue(uint32_t channel, uint16_t value);
+
+			/**
+			 * Read compare value for channel 1..4.
+			 *
+			 * @param	channel	[1..4]
+			 * @return	Current compare value
+			 */
+			static inline uint16_t
+			getCompareValue(uint32_t channel);
+		};
+
+		class AdvancedControlTimer : public GeneralPurposeTimer
+		{
+		public:
+			/**
+			 * Configure output channel 1..4.
+			 *
+			 * @param	channel			[1..4]
+			 * @param	mode			Output compare mode
+			 * @param	compareValue	Preloaded output compare value (can be
+			 * 							changed later via setCompareValue())
+			 */
+			// TODO complementary outputs
+			//static void
+			//configureOutputChannel(uint32_t channel, OutputCompareMode mode,
+			//		uint16_t compareValue);
+
+			// TODO Repetition Counter (TIM1_RCR)
+
+			/**
+			 * Enable output pins
+			 */
+			static void
+			enableOutput();
 		};
 	}
 }

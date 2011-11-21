@@ -36,21 +36,109 @@
 #ifndef XPCC_STM32__TIMER_7_HPP
 #define XPCC_STM32__TIMER_7_HPP
 
-#include <stdint.h>
+#include "timer_base.hpp"
 
 namespace xpcc
 {
 	namespace stm32
 	{
 		/**
-		 * @brief		Timer 7
+		 * @brief		Basic Timer 7
 		 * 
+		 * Interrupt handler:
+		 * \code
+		 * extern "C" void
+		 * TIM7_IRQHandler(void)
+		 * {
+		 *     Timer7::acknowledgeInterrupt(Timer7::...);
+		 *     
+		 *     ...
+		 * }
+		 * \endcode
+		 * 
+		 * 
+		 * @author		Fabian Greif
 		 * @ingroup		stm32
 		 */
-		class Timer7
+		class Timer7 : public BasicTimer
 		{
 		public:
+			static void
+			enable();
 			
+			static void
+			disable();
+			
+			static inline void
+			pause()
+			{
+				TIM7->CR1 &= ~TIM_CR1_CEN;
+			}
+			
+			static inline void
+			start()
+			{
+				TIM7->CR1 |= TIM_CR1_CEN;
+			}
+			
+			static void
+			setMode(Mode mode);
+			
+			static inline void
+			setPrescaler(uint16_t prescaler)
+			{
+				// Because a prescaler of zero is not possible the actual
+				// prescaler value is \p prescaler - 1 (see Datasheet)
+				TIM7->PSC = prescaler - 1;
+			}
+			
+			static inline void
+			setOverflow(uint16_t overflow)
+			{
+				TIM7->ARR = overflow;
+			}
+			
+			static uint16_t
+			setPeriod(uint32_t microseconds, bool autoApply = true);
+			
+			static inline void
+			applyAndReset()
+			{
+				// Generate Update Event to apply the new settings for ARR
+				TIM7->EGR |= TIM_EGR_UG;
+			}
+			
+			static inline uint16_t
+			getValue()
+			{
+				return TIM7->CNT;
+			}
+			
+			static inline void
+			setValue(uint16_t value)
+			{
+				TIM7->CNT = value;
+			}
+			
+			static void
+			enableInterrupt(Interrupt interrupt);
+			
+			static void
+			disableInterrupt(Interrupt interrupt)
+			{
+				TIM7->DIER &= ~interrupt;
+			}
+			
+			static Interrupt
+			getInterruptCause();
+			
+			static void
+			acknowledgeInterrupt(Interrupt interrupt)
+			{
+				// Flags are cleared by writing a zero to the flag position.
+				// Writing a one is ignored.
+				TIM7->SR = ~interrupt;
+			}
 		};
 	}
 }

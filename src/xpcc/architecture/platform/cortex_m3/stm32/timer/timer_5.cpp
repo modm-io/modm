@@ -33,7 +33,6 @@
  */
 // ----------------------------------------------------------------------------
 
-//#include <libmaple/usart.h>
 #include "../gpio.hpp"
 #include "../device.h"
 
@@ -67,49 +66,33 @@ xpcc::stm32::Timer5::disable()
 
 // ----------------------------------------------------------------------------
 void
-xpcc::stm32::Timer5::configureCounter(Mode mode, Direction dir)
-{
-	// ARR Register is buffered, only Under/Overflow generates update interrupt
-	TIM5->CR1 = TIM_CR1_ARPE | TIM_CR1_URS | mode | dir;
-	TIM5->CR2 = 0;
-	
-	// Slave mode disabled
-	TIM5->SMCR = 0;
-}
-
-// ----------------------------------------------------------------------------
-void
-xpcc::stm32::Timer5::configureEncoder()
-{
-	TIM5->CR1 = 0;
-	TIM5->CR2 = 0;
-	
-	// SMS[2:0] = 011
-	//   Encoder mode 3 - Counter counts up/down on both TI1FP1 and TI2FP2
-	//   edges depending on the level of the other input.
-	TIM5->SMCR = TIM_SMCR_SMS_1 | TIM_SMCR_SMS_0;
-	
-	setPrescaler(1);
-}
-
-// ----------------------------------------------------------------------------
-void
-xpcc::stm32::Timer5::configurePwm(PwmMode pwm, Direction dir)
+xpcc::stm32::Timer5::setMode(Mode mode)
 {
 	// disable timer
 	TIM5->CR1 = 0;
-	
-	// ARR Register is buffered, only Under/Overflow generates update interrupt
-	TIM5->CR1 = TIM_CR1_ARPE | TIM_CR1_URS | pwm | dir;
 	TIM5->CR2 = 0;
 	
-	// Slave mode disabled
-	TIM5->SMCR = 0;
+	if (mode == ENCODER)
+	{
+		// SMS[2:0] = 011
+		//   Encoder mode 3 - Counter counts up/down on both TI1FP1 and TI2FP2
+		//   edges depending on the level of the other input.
+		TIM5->SMCR = TIM_SMCR_SMS_1 | TIM_SMCR_SMS_0;
+		
+		setPrescaler(1);
+	}
+	else {
+		// ARR Register is buffered, only Under/Overflow generates update interrupt
+		TIM5->CR1 = TIM_CR1_ARPE | TIM_CR1_URS | mode;
+		
+		// Slave mode disabled
+		TIM5->SMCR = 0;
+	}
 }
 
 // ----------------------------------------------------------------------------
 uint16_t
-xpcc::stm32::Timer5::setPeriod(uint32_t microseconds, bool autoRefresh)
+xpcc::stm32::Timer5::setPeriod(uint32_t microseconds, bool autoApply)
 {
 	// This will be inaccurate for non-smooth frequencies (last six digits
 	// unequal to zero)
@@ -122,8 +105,9 @@ xpcc::stm32::Timer5::setPeriod(uint32_t microseconds, bool autoRefresh)
 	setPrescaler(prescaler);
 	setOverflow(overflow);
 	
-	if (autoRefresh) {
-		refresh();
+	if (autoApply) {
+		// Generate Update Event to apply the new settings for ARR
+		TIM5->EGR |= TIM_EGR_UG;
 	}
 	
 	return overflow;
@@ -132,13 +116,15 @@ xpcc::stm32::Timer5::setPeriod(uint32_t microseconds, bool autoRefresh)
 // ----------------------------------------------------------------------------
 void
 xpcc::stm32::Timer5::configureOutputChannel(uint32_t channel,
-		OutputCompareMode mode)
+		OutputCompareMode mode, uint16_t compareValue)
 {
 	channel -= 1;	// 1..4 -> 0..3
 	
 	// disable output
 	TIM5->CCER &= ~((TIM_CCER_CC1P | TIM_CCER_CC1E) << (channel * 4));
-	 
+	
+	setCompareValue(channel, compareValue);
+	
 	// enable preload (the compare value is loaded at each update event)
 	uint32_t flags = mode | TIM_CCMR1_OC1PE;
 	

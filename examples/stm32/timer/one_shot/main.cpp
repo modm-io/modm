@@ -22,7 +22,7 @@ MAIN_FUNCTION
 	ButtonWakeUp::setInput(xpcc::stm32::INPUT, xpcc::stm32::FLOATING);
 
 	Timer3::enable();
-	Timer3::configureCounter(Timer3::ONE_SHOT);
+	Timer3::setMode(Timer3::ONE_SHOT_UP_COUNTER);
 	
 	// enable Update Interrupt
 	Timer3::enableInterrupt(Timer3::UPDATE_INTERRUPT);
@@ -33,8 +33,8 @@ MAIN_FUNCTION
 		if (ButtonWakeUp::read() == xpcc::gpio::HIGH)
 		{
 			// restart timer
-			Timer3::refresh();
-			Timer3::resume();
+			Timer3::applyAndReset();
+			Timer3::start();
 
 			LedStat::reset();
 		}

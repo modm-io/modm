@@ -36,21 +36,109 @@
 #ifndef XPCC_STM32__TIMER_6_HPP
 #define XPCC_STM32__TIMER_6_HPP
 
-#include <stdint.h>
+#include "timer_base.hpp"
 
 namespace xpcc
 {
 	namespace stm32
 	{
 		/**
-		 * @brief		Timer 6
+		 * @brief		Basic Timer 6
 		 * 
+		 * Interrupt handler:
+		 * \code
+		 * extern "C" void
+		 * TIM6_IRQHandler(void)
+		 * {
+		 *     Timer6::acknowledgeInterrupt(Timer6::...);
+		 *     
+		 *     ...
+		 * }
+		 * \endcode
+		 * 
+		 * 
+		 * @author		Fabian Greif
 		 * @ingroup		stm32
 		 */
-		class Timer6
+		class Timer6 : public BasicTimer
 		{
 		public:
+			static void
+			enable();
 			
+			static void
+			disable();
+			
+			static inline void
+			pause()
+			{
+				TIM6->CR1 &= ~TIM_CR1_CEN;
+			}
+			
+			static inline void
+			start()
+			{
+				TIM6->CR1 |= TIM_CR1_CEN;
+			}
+			
+			static void
+			setMode(Mode mode);
+			
+			static inline void
+			setPrescaler(uint16_t prescaler)
+			{
+				// Because a prescaler of zero is not possible the actual
+				// prescaler value is \p prescaler - 1 (see Datasheet)
+				TIM6->PSC = prescaler - 1;
+			}
+			
+			static inline void
+			setOverflow(uint16_t overflow)
+			{
+				TIM6->ARR = overflow;
+			}
+			
+			static uint16_t
+			setPeriod(uint32_t microseconds, bool autoApply = true);
+			
+			static inline void
+			applyAndReset()
+			{
+				// Generate Update Event to apply the new settings for ARR
+				TIM6->EGR |= TIM_EGR_UG;
+			}
+			
+			static inline uint16_t
+			getValue()
+			{
+				return TIM6->CNT;
+			}
+			
+			static inline void
+			setValue(uint16_t value)
+			{
+				TIM6->CNT = value;
+			}
+			
+			static void
+			enableInterrupt(Interrupt interrupt);
+			
+			static void
+			disableInterrupt(Interrupt interrupt)
+			{
+				TIM6->DIER &= ~interrupt;
+			}
+			
+			static Interrupt
+			getInterruptCause();
+			
+			static void
+			acknowledgeInterrupt(Interrupt interrupt)
+			{
+				// Flags are cleared by writing a zero to the flag position.
+				// Writing a one is ignored.
+				TIM6->SR = ~interrupt;
+			}
 		};
 	}
 }

@@ -1,6 +1,7 @@
 Things needed to be done
 ========================
 
-* Replace the architecture 'pc' with 'hosted'
+* Replace the architecture 'pc' with 'hosted' in SCons
 * Remove xpcc/debug/logger/imp/std.hpp after the 16.12.2011
 * Remove xpcc::FlexClock (defined in architecture/driver/clock.hpp)
+* Implement Timer 9-14 for STM32

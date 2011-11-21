@@ -18,14 +18,14 @@ MAIN_FUNCTION
 	LedStat::setOutput(xpcc::gpio::HIGH);
 	
 	Timer3::enable();
-	Timer3::configureCounter();
+	Timer3::setMode(Timer3::UP_COUNTER);
 	
 	// enable Update Interrupt
 	Timer3::enableInterrupt(Timer3::UPDATE_INTERRUPT);
 	Timer3::setPeriod(200000);	// 200 ms
 	
 	// enable timer
-	Timer3::resume();
+	Timer3::start();
 
 	while (1)
 	{

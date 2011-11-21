@@ -52,13 +52,13 @@ for id in [1, 8]:
 for id in [2, 3, 4, 5]:
 	generator.template('timer_%i.hpp' % id, 'general_purpose.hpp.in', { 'id': id })
 	generator.template('timer_%i.cpp' % id, 'general_purpose.cpp.in', { 'id': id })
+for id in [6, 7]:
+	generator.template('timer_%i.hpp' % id, 'basic.hpp.in', { 'id': id })
+	generator.template('timer_%i.cpp' % id, 'basic.cpp.in', { 'id': id })
 #for id in [9, 12]:
 #	generator.template('timer_%i.hpp' % id, 'general_purpose_2.hpp.in', { 'id': id })
 #	generator.template('timer_%i.cpp' % id, 'general_purpose_2.cpp.in', { 'id': id })
 #for id in [10, 11, 13, 14]:
 #	generator.template('timer_%i.hpp' % id, 'general_purpose_1.hpp.in', { 'id': id })
 #	generator.template('timer_%i.cpp' % id, 'general_purpose_1.cpp.in', { 'id': id })
-for id in [6, 7]:
-	generator.template('timer_%i.hpp' % id, 'basic.hpp.in', { 'id': id })
-	generator.template('timer_%i.cpp' % id, 'basic.cpp.in', { 'id': id })
 	

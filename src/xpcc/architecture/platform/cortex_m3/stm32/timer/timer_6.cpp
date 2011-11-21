@@ -37,3 +37,71 @@
 #include "../device.h"
 
 #include "timer_6.hpp"
+
+#if defined (STM32F10X_HD) || defined  (STM32F10X_XL) || defined  (STM32F10X_CL)
+
+// ----------------------------------------------------------------------------
+void
+xpcc::stm32::Timer6::enable()
+{
+	// enable clock
+	RCC->APB1ENR  |=  RCC_APB1ENR_TIM6EN;
+	
+	// reset timer
+	RCC->APB1RSTR |=  RCC_APB1RSTR_TIM6RST;
+	RCC->APB1RSTR &= ~RCC_APB1RSTR_TIM6RST;
+}
+
+void
+xpcc::stm32::Timer6::disable()
+{
+	// disable clock
+	RCC->APB1ENR &= ~RCC_APB1ENR_TIM6EN;
+	
+	TIM6->CR1 = 0;
+	TIM6->DIER = 0;
+}
+
+// ----------------------------------------------------------------------------
+void
+xpcc::stm32::Timer6::setMode(Mode mode)
+{
+	// ARR Register is buffered, only Under/Overflow generates update interrupt
+	TIM6->CR1 = TIM_CR1_ARPE | TIM_CR1_URS | mode;
+	TIM6->CR2 = 0;
+}
+
+// ----------------------------------------------------------------------------
+uint16_t
+xpcc::stm32::Timer6::setPeriod(uint32_t microseconds, bool autoApply)
+{
+	// This will be inaccurate for non-smooth frequencies (last six digits
+	// unequal to zero)
+	uint32_t cycles = microseconds * (F_CPU / 1000000UL);
+	uint16_t prescaler = (cycles + 65535) / 65536;	// always round up
+	uint16_t overflow = cycles / prescaler;
+	
+	overflow = overflow - 1;	// e.g. 36000 cycles are from 0 to 35999
+	
+	setPrescaler(prescaler);
+	setOverflow(overflow);
+	
+	if (autoApply) {
+		// Generate Update Event to apply the new settings for ARR
+		TIM6->EGR |= TIM_EGR_UG;
+	}
+	
+	return overflow;
+}
+
+// ----------------------------------------------------------------------------
+void
+xpcc::stm32::Timer6::enableInterrupt(Interrupt interrupt)
+{
+	// register IRQ at the NVIC
+	NVIC_EnableIRQ(TIM6_IRQn);
+	
+	TIM6->DIER |= interrupt;
+}
+
+#endif

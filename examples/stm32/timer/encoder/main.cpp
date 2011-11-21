@@ -33,9 +33,9 @@ MAIN_FUNCTION
 	
 	Timer3::enable();
 	Timer3::remapPins(Timer3::FULL_REMAP);		// remap CH1 to C6 and CH2 to C7
-	Timer3::configureEncoder();
+	Timer3::setMode(Timer3::ENCODER);
 	Timer3::setOverflow(24*4 - 1);
-	Timer3::resume();
+	Timer3::start();
 	
 	display.initialize();
 	
