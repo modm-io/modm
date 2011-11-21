@@ -372,6 +372,7 @@ def generate(env, **kw):
 	
 	env['BUILDERS']['Object'].add_emitter('.cpp', defaultEmitter)
 	env['BUILDERS']['Object'].add_emitter('.c', defaultEmitter)
+	env['BUILDERS']['Object'].add_emitter('.sx', defaultEmitter)
 	env['BUILDERS']['Object'].add_emitter('.S', defaultEmitter)
 	
 	env['LIBEMITTER'] = defaultEmitter
