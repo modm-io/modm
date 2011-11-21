@@ -170,7 +170,7 @@ namespace xpcc
 			read(char& c);
 			
 			/**
-			 * \brief	Check whether any errors occured during receiving
+			 * \brief	Check whether any errors occurred during receiving
 			 *			Be aware that these indicate an error that occured
 			 *			somewhere since resetting the Error Flags (with 
 			 *			resetErrorFlags()), so you cannot tell which byte had

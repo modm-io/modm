@@ -305,6 +305,12 @@ namespace xpcc
 		ALWAYS_INLINE static void setInput() { \
 			PORT ## port ## _DIRCLR = 0xff; \
 		} \
+		ALWAYS_INLINE static void setInput(::xpcc::atxmega::Configuration config, \
+				  bool invert = false) { \
+			PORT ## port ## _DIRCLR = 0xff; \
+			PORTCFG.MPCMASK = 0xff; \
+			PORT ## port ## _PIN0CTRL = config | ((invert) ? PORT_INVEN_bm : 0); \
+		} \
 		ALWAYS_INLINE static uint8_t read() { \
 			return PORT ## port ## _IN; \
 		} \
