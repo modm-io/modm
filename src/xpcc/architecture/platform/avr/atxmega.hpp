@@ -34,7 +34,62 @@
  * \defgroup	atxmega		XMEGA
  */
 
+#ifndef XPCC_ATXMEGA__ATXMEGA_HPP
+#define XPCC_ATXMEGA__ATXMEGA_HPP
+
 #include "../avr.hpp"
+
+namespace xpcc
+{
+	namespace atxmega
+	{
+		using avr::enableInterrupts;
+		using avr::disableInterrupts;
+
+		enum InterruptLevel
+		{
+			INTERRUPT_LEVEL_LOW = PMIC_LOLVLEN_bm,
+			INTERRUPT_LEVEL_MEDIUM = PMIC_MEDLVLEN_bm,
+			INTERRUPT_LEVEL_HIGH = PMIC_HILVLEN_bm,
+
+			/// Enable all Interrupt levels
+			INTERRUPT_LEVEL_ALL = PMIC_HILVLEN_bm | PMIC_MEDLVLEN_bm | PMIC_LOLVLEN_bm,
+		};
+
+		/**
+		 * Enable one or more of the three Interrupt levels.
+		 *
+		 * In order to work with interrupts on a xMEGA you need to enable
+		 * interrupts in general (enableInterrupts()) and enable the
+		 * level you wont to work with.
+		 *
+		 * Example:
+		 * \code
+		 * // Enable all interrupt levels
+		 * xpcc::atxmega::enableInterrupts();
+		 * xpcc::atxmega::enableInterruptLevel(xpcc::atxmega::INTERRUPT_LEVEL_ALL);
+		 * \endcode
+		 *
+		 * @ingroup	atxmega
+		 */
+		static inline void
+		enableInterruptLevel(InterruptLevel level)
+		{
+			PMIC_CTRL |= level;
+		}
+
+		/**
+		 * Disable interrupt levels.
+		 *
+		 * @ingroup	atxmega
+		 */
+		static inline void
+		disableInterruptLevel(InterruptLevel level)
+		{
+			PMIC_CTRL &= ~level;
+		}
+	}
+}
 
 #include "atxmega/uart.hpp"
 #include "atxmega/spi.hpp"
@@ -43,3 +98,5 @@
 #include "atxmega/adc.hpp"
 #include "atxmega/clock.hpp"
 #include "atxmega/utils.hpp"
+
+#endif

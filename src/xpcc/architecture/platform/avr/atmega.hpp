@@ -34,10 +34,25 @@
  * \defgroup	atmega		megaAVR
  */
 
+#ifndef XPCC_ATMEGA__ATMEGA_HPP
+#define XPCC_ATMEGA__ATMEGA_HPP
+
 #include "../avr.hpp"
+
+namespace xpcc
+{
+	namespace atmega
+	{
+		using avr::enableInterrupts;
+		using avr::disableInterrupts;
+	}
+}
 
 #include "atmega/adc.hpp"
 #include "atmega/uart.hpp"
 #include "atmega/spi.hpp"
 #include "atmega/gpio.hpp"
 #include "atmega/twi_master.hpp"
+
+#endif
+

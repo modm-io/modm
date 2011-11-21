@@ -36,14 +36,6 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 
-#if defined XPCC__CPU_ATMEGA
-#	include "avr/atmega.hpp"
-#elif defined XPCC__CPU_ATXMEGA
-#	include "avr/atxmega.hpp"
-#elif defined XPCC__CPU_ATTINY
-#	include "avr/attiny.hpp"
-#endif
-
 /**
  * \ingroup		platform
  * \defgroup	avr		AVR
@@ -59,7 +51,32 @@ namespace xpcc
 	 */
 	namespace avr
 	{
+		/**
+		 * \ingroup	avr
+		 */
+		static inline void
+		enableInterrupts()
+		{
+			sei();
+		}
+
+		/**
+		 * \ingroup	avr
+		 */
+		static inline void
+		disableInterrupts()
+		{
+			cli();
+		}
 	}
 }
+
+#if defined XPCC__CPU_ATMEGA
+#	include "avr/atmega.hpp"
+#elif defined XPCC__CPU_ATXMEGA
+#	include "avr/atxmega.hpp"
+#elif defined XPCC__CPU_ATTINY
+#	include "avr/attiny.hpp"
+#endif
 
 #endif	// XPCC__AVR_HPP

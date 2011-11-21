@@ -35,7 +35,7 @@
 
 #include <avr/io.h>
 
-#include <xpcc/architecture/platform.hpp>
+#include <xpcc/architecture/platform/avr/atxmega.hpp>
 #include <xpcc/architecture/driver/gpio.hpp>
 
 #include "uart_d1.hpp"

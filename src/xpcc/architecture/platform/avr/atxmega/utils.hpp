@@ -35,7 +35,7 @@
 
 #include <stddef.h>		// for offsetof()
 #include <xpcc/architecture/utils.hpp>
-#include <xpcc/architecture/platform/avr.hpp>
+#include <xpcc/architecture/platform/avr/atxmega.hpp>
 
 namespace xpcc
 {

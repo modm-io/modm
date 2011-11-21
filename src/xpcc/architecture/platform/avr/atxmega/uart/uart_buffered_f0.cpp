@@ -33,7 +33,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/architecture/platform.hpp>
+#include <xpcc/architecture/platform/avr/atxmega.hpp>
 
 #include <xpcc/architecture/driver/atomic/queue.hpp>
 #include <xpcc/architecture/driver/atomic/lock.hpp>
