@@ -120,8 +120,10 @@ namespace xpcc
 		template<unsigned int P, unsigned char N, bool = (N >= 8)>
 		struct GpioMode {
 			ALWAYS_INLINE static void setMode(uint32_t m) {
-				reinterpret_cast<GPIO_TypeDef*>(P)->CRH &= ~(0xf << ((N - 8) * 4));
-				reinterpret_cast<GPIO_TypeDef*>(P)->CRH |= m << ((N - 8) * 4);
+				uint32_t tmp = reinterpret_cast<GPIO_TypeDef*>(P)->CRH;
+				tmp &= ~(0xf << ((N - 8) * 4));
+				tmp |= (m << ((N - 8) * 4));
+				reinterpret_cast<GPIO_TypeDef*>(P)->CRH = tmp;
 			}
 		};
 		
@@ -129,8 +131,10 @@ namespace xpcc
 		template<unsigned int P, unsigned char N>
 		struct GpioMode<P, N, false> {
 			ALWAYS_INLINE static void setMode(uint32_t m) {
-				reinterpret_cast<GPIO_TypeDef*>(P)->CRL &= ~(0xf << (N * 4));
-				reinterpret_cast<GPIO_TypeDef*>(P)->CRL |= m << (N * 4);
+				uint32_t tmp = reinterpret_cast<GPIO_TypeDef*>(P)->CRL;
+				tmp &= ~(0xf << (N * 4));
+				tmp |= m << (N * 4);
+				reinterpret_cast<GPIO_TypeDef*>(P)->CRL = tmp;
 			}
 		};
 	}
@@ -163,7 +167,7 @@ namespace xpcc
 				config = (mode | type) & 0xc; \
 				if (type == ::xpcc::stm32::PULLUP) { \
 					GPIO_REG(GPIO ## port ## _BASE_ADDR)->BSRR = (1 << pin); \
-				} else { \
+				} else if (type == ::xpcc::stm32::PULLDOWN) { \
 					GPIO_REG(GPIO ## port ## _BASE_ADDR)->BRR = (1 << pin); \
 				} \
 			} \
@@ -269,7 +273,7 @@ namespace xpcc
 				config = (mode | type) & 0xc; \
 				if (type == ::xpcc::stm32::PULLUP) { \
 					GPIO_REG(GPIO ## port ## _BASE_ADDR)->BSRR = (1 << pin); \
-				} else { \
+				} else if (type == ::xpcc::stm32::PULLDOWN) { \
 					GPIO_REG(GPIO ## port ## _BASE_ADDR)->BRR = (1 << pin); \
 				} \
 			} \
