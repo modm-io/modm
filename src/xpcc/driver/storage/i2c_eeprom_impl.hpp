@@ -36,8 +36,8 @@
 
 // ----------------------------------------------------------------------------
 template <typename I2C>
-xpcc::I2cEeprom<I2C>::I2cEeprom(uint8_t address) :
-	i2c::Device<I2C>(address)
+xpcc::I2cEeprom<I2C>::I2cEeprom(uint8_t deviceAddress):
+	deviceAddress(deviceAddress)
 {
 }
 
@@ -46,39 +46,31 @@ template <typename I2C>
 bool
 xpcc::I2cEeprom<I2C>::writeByte(uint16_t address, uint8_t data) const
 {
-	bool ack = false;
-	
-	if (this->i2c.start(this->deviceAddress | i2c::WRITE))
+	if (MySyncI2C::startCheck(this->deviceAddress))
 	{
-		ack = true;
-		ack &= this->i2c.write(address >> 8);
-		ack &= this->i2c.write(address & 0xff);
-		ack &= this->i2c.write(data);
+		uint8_t buffer[] = {address >> 8, address & 0xff, data};
+		return MySyncI2C::write(buffer,3) != xpcc::i2c::BUS_RESET;
 	}
-	this->i2c.stop();
-	
-	return ack;
+	else
+		return false;
 }
 
 template <typename I2C>
 bool
 xpcc::I2cEeprom<I2C>::write(uint16_t address, const uint8_t *data, uint8_t bytes) const
 {
-	bool ack = false;
-	
-	if (this->i2c.start(this->deviceAddress | i2c::WRITE))
+	if (MySyncI2C::startCheck(this->deviceAddress))
 	{
-		ack = true;
-		ack &= this->i2c.write(address >> 8);
-		ack &= this->i2c.write(address & 0xff);
-		
-		for (uint8_t i = 0; i < bytes; ++i) {
-			ack &= this->i2c.write(*data++);
+		uint8_t buffer[] = {address >> 8, address & 0xff};
+		if (MySyncI2C::write(buffer,2, xpcc::i2c::SYNC_NO_STOP) == xpcc::i2c::BUS_RESET){
+			MySyncI2C::stop();
+			return false;
 		}
+		
+		return MySyncI2C::write(data, bytes) != xpcc::i2c::BUS_RESET;
 	}
-	this->i2c.stop();
-	
-	return ack;
+	else
+		return false;
 }
 
 template <typename I2C> template <typename T>
@@ -93,44 +85,46 @@ template <typename I2C>
 bool
 xpcc::I2cEeprom<I2C>::readByte(uint16_t address, uint8_t &data) const
 {
-	bool ack = false;
-	if (this->i2c.start(this->deviceAddress | i2c::WRITE))
+	if (MySyncI2C::startCheck(this->deviceAddress))
 	{
-		ack = true;
-		ack &= this->i2c.write(address >> 8);
-		ack &= this->i2c.write(address & 0xff);
-		
-		if (ack && this->i2c.repeatedStart(this->deviceAddress | i2c::READ))
-		{
-			data = this->i2c.read(i2c::NACK);
+		uint8_t buffer[] = {address >> 8, address & 0xff};
+		if (MySyncI2C::write(buffer, 2, xpcc::i2c::SYNC_NO_STOP) == xpcc::i2c::BUS_RESET){
+			MySyncI2C::stop();
+			return false;
 		}
+		
+		if (MySyncI2C::restart(this->deviceAddress) == xpcc::i2c::BUS_RESET){
+			MySyncI2C::stop();
+			return false;
+		}
+
+		return MySyncI2C::read(&data, 1) != xpcc::i2c::BUS_RESET;
 	}
-	this->i2c.stop();
-	
-	return ack;
+	else
+		return false;
 }
 
 template <typename I2C>
 bool
 xpcc::I2cEeprom<I2C>::read(uint16_t address, uint8_t *data, uint8_t bytes) const
 {
-	bool ack = false;
-	if (this->i2c.start(this->deviceAddress | i2c::WRITE))
+	if (MySyncI2C::startCheck(this->deviceAddress))
 	{
-		ack = true;
-		ack &= this->i2c.write(address >> 8);
-		ack &= this->i2c.write(address & 0xff);
-		
-		if (ack && this->i2c.repeatedStart(this->deviceAddress | i2c::READ))
-		{
-			for (uint8_t i = 0; i < bytes; ++i) {
-				*data++ = this->i2c.read(i2c::ACK);
-			}
+		uint8_t buffer[] = {address >> 8, address & 0xff};
+		if (MySyncI2C::write(buffer, 2, xpcc::i2c::SYNC_NO_STOP) == xpcc::i2c::BUS_RESET){
+			MySyncI2C::stop();
+			return false;
 		}
+		
+		if (MySyncI2C::restart(this->deviceAddress) == xpcc::i2c::BUS_RESET){
+			MySyncI2C::stop();
+			return false;
+		}
+
+		return MySyncI2C::read(data, bytes) != xpcc::i2c::BUS_RESET;
 	}
-	this->i2c.stop();
-	
-	return ack;
+	else
+		return false;
 }
 
 template <typename I2C> template <typename T>
@@ -138,4 +132,15 @@ bool
 xpcc::I2cEeprom<I2C>::read(uint16_t address, T& data) const
 {
 	return read(address, static_cast<uint8_t *>(&data), sizeof(T));
+}
+
+// ----------------------------------------------------------------------------
+template <typename I2C>
+bool
+xpcc::I2cEeprom<I2C>::isAvailable() const
+{
+	if(MySyncI2C::startCheck(this->deviceAddress))
+		return (MySyncI2C::write(0, 0) != xpcc::i2c::BUS_RESET);
+	else
+		return false;
 }

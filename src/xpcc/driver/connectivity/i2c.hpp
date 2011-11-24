@@ -53,6 +53,4 @@
  * 		http://en.wikipedia.org/wiki/I2c</a>
  */
 
-#include "i2c/interface.hpp"
-#include "i2c/device.hpp"
 #include "i2c/software_i2c.hpp"

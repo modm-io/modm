@@ -33,7 +33,7 @@
 #ifndef XPCC__I2C_EEPROM_HPP
 #define XPCC__I2C_EEPROM_HPP
 
-#include <xpcc/driver/connectivity/i2c/device.hpp>
+#include <xpcc/driver/connectivity/i2c/sync_master.hpp>
 
 namespace xpcc
 {
@@ -52,7 +52,7 @@ namespace xpcc
 	 * \author	Fabian Greif
 	 */
 	template <typename I2C>
-	class I2cEeprom : public i2c::Device<I2C>
+	class I2cEeprom
 	{
 	public:
 		I2cEeprom(uint8_t address);
@@ -113,6 +113,18 @@ namespace xpcc
 		template <typename T>
 		inline bool
 		read(uint16_t address, T& data) const;
+
+		/**
+		 * \brief	Check if the device is accessable
+		 *
+		 * \return	\c true the device responds to its address,
+		 * 			\c false otherwise, i.a. if bus was not free, statrcondition failed or device did not responded.
+		 */
+		bool
+		isAvailable() const;
+	private:
+		const uint8_t deviceAddress;
+		typedef xpcc::i2c::SyncMaster<I2C> MySyncI2C;
 	};
 }
 

@@ -41,6 +41,111 @@ Scl xpcc::SoftwareI2C<Scl, Sda, Frequency>::scl;
 template <typename Scl, typename Sda, int32_t Frequency>
 Sda xpcc::SoftwareI2C<Scl, Sda, Frequency>::sda;
 
+template <typename Scl, typename Sda, int32_t Frequency>
+bool xpcc::SoftwareI2C<Scl, Sda, Frequency>::occupied = false;
+
+template <typename Scl, typename Sda, int32_t Frequency>
+uint8_t xpcc::SoftwareI2C<Scl, Sda, Frequency>::address;
+
+template <typename Scl, typename Sda, int32_t Frequency>
+xpcc::i2c::BusState xpcc::SoftwareI2C<Scl, Sda, Frequency>::busState;
+
+// ----------------------------------------------------------------------------
+template <typename Scl, typename Sda, int32_t Frequency>
+bool
+xpcc::SoftwareI2C<Scl, Sda, Frequency>::start(uint8_t slaveAddress)
+{
+	if (!occupied){
+		occupied = true;
+		restart(slaveAddress);
+		return true;
+	}
+	return false;
+}
+
+template <typename Scl, typename Sda, int32_t Frequency>
+void
+xpcc::SoftwareI2C<Scl, Sda, Frequency>::restart(uint8_t slaveAddress)
+{
+	address = slaveAddress;
+	busState = xpcc::i2c::BUS_STANDBY;
+}
+
+template <typename Scl, typename Sda, int32_t Frequency>
+void
+xpcc::SoftwareI2C<Scl, Sda, Frequency>::stop()
+{
+	occupied = false;
+	stopCondition();
+}
+
+
+template <typename Scl, typename Sda, int32_t Frequency>
+void
+xpcc::SoftwareI2C<Scl, Sda, Frequency>::read(uint8_t *data, std::size_t size, xpcc::i2c::ReadParameter param)
+{
+	uint8_t *p = data;
+	if (startCondition(address | xpcc::i2c::READ))
+	{
+		for (std::size_t i = 0; i < size; i++)
+		{
+			bool ack = i != (size - 1);
+			uint8_t byte = read(ack);
+			*p++ = byte;
+		}
+		if (param == xpcc::i2c::READ_STOP){
+			busState = xpcc::i2c::BUS_STOPPED;
+		}
+		else{
+			busState = xpcc::i2c::BUS_HOLD;
+		}
+	}
+	else {
+		busState = xpcc::i2c::BUS_RESET;
+	}
+}
+
+template <typename Scl, typename Sda, int32_t Frequency>
+void
+xpcc::SoftwareI2C<Scl, Sda, Frequency>::write(const uint8_t *data, std::size_t size)
+{
+	bool error = false;
+	if (busState == xpcc::i2c::BUS_WRITE || startCondition(address | xpcc::i2c::WRITE))
+	{
+		for (std::size_t i = 0; i < size; ++i)
+		{
+			if (!write(*data++))
+			{
+				error = true;
+				break;
+			}
+		}
+	}
+	else {
+		error = true;
+	}
+
+	busState = error ?
+			xpcc::i2c::BUS_RESET:
+			xpcc::i2c::BUS_WRITE;
+}
+
+template <typename Scl, typename Sda, int32_t Frequency>
+xpcc::i2c::BusyState
+xpcc::SoftwareI2C<Scl, Sda, Frequency>::getBusyState()
+{
+	return  occupied ?
+			xpcc::i2c::OCCUPIED :
+			xpcc::i2c::FREE;
+}
+
+template <typename Scl, typename Sda, int32_t Frequency>
+xpcc::i2c::BusState
+xpcc::SoftwareI2C<Scl, Sda, Frequency>::getBusState()
+{
+	return busState;
+}
+
 // ----------------------------------------------------------------------------
 template <typename Scl, typename Sda, int32_t Frequency>
 void
@@ -55,31 +160,30 @@ xpcc::SoftwareI2C<Scl, Sda, Frequency>::initialize()
 
 template <typename Scl, typename Sda, int32_t Frequency>
 bool
-xpcc::SoftwareI2C<Scl, Sda, Frequency>::start(uint8_t address)
+xpcc::SoftwareI2C<Scl, Sda, Frequency>::startCondition(uint8_t address)
 {
-	sda.setInput();
-	scl.setInput();
-	delay();
-	
-	sda.setOutput();
-	delay();
-	scl.setOutput();
-	delay();
-	
-	return write(address);
-}
+	if (sda.read() == gpio::LOW){// startcondition needs a high sda and scl, so we adjust here
+		if (scl.read() == gpio::HIGH){
+			// a very illegal state
+			// avoid generating a stop condition and hope no other is writing on the bus
+			scl.setOutput();
+			delay();
+			sda.setInput();
+			delay();
+			scl.setInput();
+			delay();
+		}
+		else { //  we are doing a restart
+			sda.setInput();
+			delay();
+		}
+	}
+	else if(scl.read() == gpio::LOW){
+		scl.setInput();
+		delay();
+	}
 
-template <typename Scl, typename Sda, int32_t Frequency>
-bool
-xpcc::SoftwareI2C<Scl, Sda, Frequency>::repeatedStart(uint8_t address)
-{
-	scl.setOutput();
-	delay();
-	sda.setInput();
-	delay();
-	
-	scl.setInput();
-	delay();
+	// here both pins are HIGH, ready for start
 	sda.setOutput();
 	delay();
 	scl.setOutput();
@@ -90,7 +194,7 @@ xpcc::SoftwareI2C<Scl, Sda, Frequency>::repeatedStart(uint8_t address)
 
 template <typename Scl, typename Sda, int32_t Frequency>
 void
-xpcc::SoftwareI2C<Scl, Sda, Frequency>::stop()
+xpcc::SoftwareI2C<Scl, Sda, Frequency>::stopCondition()
 {
 	scl.setOutput();
 	sda.setOutput();
@@ -153,7 +257,7 @@ xpcc::SoftwareI2C<Scl, Sda, Frequency>::readBit()
 	scl.setInput();
 	
 	delay();
-	while (!scl.read())
+	while (scl.read() == gpio::LOW)
 		;
 	
 	bool bit = sda.read();
@@ -178,7 +282,7 @@ xpcc::SoftwareI2C<Scl, Sda, Frequency>::writeBit(bool bit)
 	scl.setInput();
 	delay();
 	
-	while (!scl.read())
+	while (scl.read() == gpio::LOW)
 		;
 	
 	scl.setOutput();

@@ -36,8 +36,8 @@
 
 // ----------------------------------------------------------------------------
 template < typename I2C >
-xpcc::Adxl345<I2C>::Adxl345(uint8_t address) :
-	xpcc::i2c::Device<I2C>(address<<1)
+xpcc::Adxl345<I2C>::Adxl345(uint8_t address):
+	deviceAddress(address)
 {
 }
 
@@ -58,10 +58,9 @@ template < typename I2C >
 void
 xpcc::Adxl345<I2C>::readAcceleration()
 {
-	data[0] = REGISTER_DATA_X0;
-	this->i2c.writeRead(this->deviceAddress, &data[0], 1, 6);
-	
-	newData = true;
+	if(readData(REGISTER_DATA_X0, data, 6)){
+		newData = true;
+	}
 }
 
 template < typename I2C >
@@ -70,16 +69,11 @@ xpcc::Adxl345<I2C>::readAccelerationAverage()
 {
 	newData = false;
 	uint8_t bufferData[6];
-	int16_t *buffer = reinterpret_cast<int16_t*>(&bufferData[0]);
-	int16_t *result = reinterpret_cast<int16_t*>(&data[0]);
+	int16_t *buffer = reinterpret_cast<int16_t*>(bufferData);
+	int16_t *result = reinterpret_cast<int16_t*>(data);
 	
 	for (uint_fast8_t i=0; i < 32; ++i) {	
-		bufferData[0] = REGISTER_DATA_X0;
-		this->i2c.writeRead(this->deviceAddress, &bufferData[0], 1, 6);
-		
-		while (this->i2c.isBusy())
-			;
-		
+		readData(REGISTER_DATA_X0, bufferData, 6);
 		result[0] += buffer[0];
 		result[1] += buffer[1];
 		result[2] += buffer[2];
@@ -96,7 +90,6 @@ template < typename I2C >
 bool
 xpcc::Adxl345<I2C>::isDataReady()
 {
-	if (this->i2c.isBusy()) return false;
 	return readRegister(REGISTER_INT_SOURCE) & INTERRUPT_DATA_READY_bm;
 }
 
@@ -120,23 +113,40 @@ template < typename I2C >
 void
 xpcc::Adxl345<I2C>::writeRegister(Register reg, uint8_t data)
 {
-	uint8_t buffer[2] = {reg, data};
-	this->i2c.write(this->deviceAddress, &buffer[0], 2);
-	
-	while (this->i2c.isBusy())
-		;
+	if (MySyncI2C::startCheck(this->deviceAddress)){
+		uint8_t buffer[2] = {reg, data};
+		MySyncI2C::write(buffer, 2);
+	}
 }
 
 template < typename I2C >
 uint8_t
 xpcc::Adxl345<I2C>::readRegister(Register reg)
 {
-	uint8_t buffer[1] = {reg};
-	this->i2c.writeRead(this->deviceAddress, &buffer[0], 1, 1);
-	
-	while (this->i2c.isBusy())
-		;
-	return buffer[0];
+	uint8_t buffer[1];
+	if(readData(reg, buffer, 1)){
+		return buffer[0];
+	}
+	else{
+		return 0;
+	}
 }
 
+
+template < typename I2C >
+bool
+xpcc::Adxl345<I2C>::readData(Register reg, uint8_t *data, uint8_t size)
+{
+	if (MySyncI2C::startCheck(this->deviceAddress)){
+		if(MySyncI2C::write(&reg, 1, xpcc::i2c::SYNC_NO_STOP) == xpcc::i2c::BUS_RESET){
+			MySyncI2C::stop();
+			return false;
+		}
+		if(MySyncI2C::read(data, size) != xpcc::i2c::BUS_RESET){
+			return true;
+		}
+	}
+	else
+		return false;
+}
 

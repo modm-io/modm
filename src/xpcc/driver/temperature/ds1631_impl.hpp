@@ -36,8 +36,8 @@
 
 // ----------------------------------------------------------------------------
 template <typename I2C>
-xpcc::Ds1631<I2C>::Ds1631(uint8_t address) :
-	i2c::Device<I2C>(address)
+xpcc::Ds1631<I2C>::Ds1631(uint8_t deviceAddress):
+	deviceAddress(deviceAddress)
 {
 }
 
@@ -46,28 +46,25 @@ template <typename I2C>
 void
 xpcc::Ds1631<I2C>::configure(ds1631::Resolution resolution, bool continuousMode)
 {
-	if (this->i2c.start(this->deviceAddress | i2c::WRITE))
-	{
-		this->i2c.write(0xac);
-		
+	if(MySyncI2C::startCheck(this->deviceAddress)){
 		uint8_t config = resolution;
 		if (!continuousMode) {
 			config |= 0x01;
 		}
-		this->i2c.write(config);
+
+		uint8_t buffer[] = {0xac, config};
+		MySyncI2C::write(buffer, 2);
 	}
-	this->i2c.stop();
 }
 
 template <typename I2C>
 void
 xpcc::Ds1631<I2C>::reset()
 {
-	if (this->i2c.start(this->deviceAddress | i2c::WRITE))
-	{
-		this->i2c.write(0x54);
+	if(MySyncI2C::startCheck(this->deviceAddress)){
+		uint8_t buffer[] = {0x54};
+		MySyncI2C::write(buffer, 1);
 	}
-	this->i2c.stop();
 }
 
 // ----------------------------------------------------------------------------
@@ -75,39 +72,48 @@ template <typename I2C>
 void
 xpcc::Ds1631<I2C>::startConversion()
 {
-	if (this->i2c.start(this->deviceAddress | i2c::WRITE))
-	{
-		this->i2c.write(0x51);
+	if(MySyncI2C::startCheck(this->deviceAddress)){
+		uint8_t buffer[] = {0x51};
+		MySyncI2C::write(buffer, 1);
 	}
-	this->i2c.stop();
 }
 
 template <typename I2C>
 void
 xpcc::Ds1631<I2C>::stopConversion()
 {
-	if (this->i2c.start(this->deviceAddress | i2c::WRITE))
-	{
-		this->i2c.write(0x22);
+	if(MySyncI2C::startCheck(this->deviceAddress)){
+		uint8_t buffer[] = {0x22};
+		MySyncI2C::write(buffer, 1);
 	}
-	this->i2c.stop();
 }
 
 template <typename I2C>
 bool
 xpcc::Ds1631<I2C>::isConversionDone()
 {
-	if (this->i2c.start(this->deviceAddress | i2c::WRITE))
-	{
-		this->i2c.write(0xac);
-		this->i2c.repeatedStart(this->deviceAddress | i2c::READ);
-		
-		uint8_t done = this->i2c.read(i2c::NACK) & 0x80;
-		return (done == 0x80);
+	if(MySyncI2C::startCheck(this->deviceAddress)){
+		uint8_t buffer[] = {0xac};
+		if (MySyncI2C::write(buffer, 1, xpcc::i2c::SYNC_NO_STOP) == xpcc::i2c::BUS_RESET){
+			MySyncI2C::stop();
+			return false;
+		}
+
+		if (MySyncI2C::restart(this->deviceAddress) == xpcc::i2c::BUS_RESET){
+			MySyncI2C::stop();
+			return false;
+		}
+
+		if(MySyncI2C::read(buffer, 1) == xpcc::i2c::BUS_RESET){
+			MySyncI2C::stop();
+			return false;
+		}
+
+		return ((buffer[0]&0x80) == 0x80);
 	}
-	this->i2c.stop();
-	
-	return false;
+	else{
+		return false;
+	}
 }
 
 // ----------------------------------------------------------------------------
@@ -115,17 +121,41 @@ template <typename I2C>
 int16_t
 xpcc::Ds1631<I2C>::readTemperature()
 {
-	uint16_t temperature = 0;
-	if (this->i2c.start(this->deviceAddress | i2c::WRITE))
-	{
-		this->i2c.write(0xaa);
-		if (this->i2c.repeatedStart(this->deviceAddress | i2c::READ))
+	if(MySyncI2C::startCheck(this->deviceAddress)){
 		{
-			temperature  = this->i2c.read(i2c::ACK) << 8;
-			temperature |= this->i2c.read(i2c::NACK);
+			uint8_t buffer[] = {0xaa};
+			if (MySyncI2C::write(buffer, 1, xpcc::i2c::SYNC_NO_STOP) == xpcc::i2c::BUS_RESET){
+				MySyncI2C::stop();
+				return 0;
+			}
 		}
+
+		if (MySyncI2C::restart(this->deviceAddress) == xpcc::i2c::BUS_RESET){
+			MySyncI2C::stop();
+			return 0;
+		}
+
+		uint8_t buffer[2];
+		if(MySyncI2C::read(buffer, 2) == xpcc::i2c::BUS_RESET){
+			MySyncI2C::stop();
+			return 0;
+		}
+
+		int16_t temperature = buffer[0]<<8|buffer[1];
+		return temperature;
 	}
-	this->i2c.stop();
-	
-	return temperature;
+	else{
+		return 0;
+	}
+}
+
+// ----------------------------------------------------------------------------
+template <typename I2C>
+bool
+xpcc::Ds1631<I2C>::isAvailable() const
+{
+	if(MySyncI2C::startCheck(this->deviceAddress))
+		return (MySyncI2C::write(0, 0) != xpcc::i2c::BUS_RESET);
+	else
+		return false;
 }

@@ -33,7 +33,7 @@
 #ifndef XPCC__ADXL345_HPP
 #define XPCC__ADXL345_HPP
 
-#include <xpcc/driver/connectivity/i2c/device.hpp>
+#include <xpcc/driver/connectivity/i2c/sync_master.hpp>
 
 namespace xpcc
 {
@@ -67,7 +67,7 @@ namespace xpcc
 	 * \tparam I2C Asynchronous Two Wire interface
 	 */
 	template < typename I2C >
-	class Adxl345 : public i2c::Device< I2C >
+	class Adxl345
 	{
 	public:
 		/// The addresses of the Configuration and Data Registers
@@ -178,7 +178,7 @@ namespace xpcc
 		
 		/**
 		 * \brief	Constructor
-		 * \param	address		address is 0x53 with SDO pin low else 0x1d
+		 * \param	address		address is 0xa6 with SDO pin low else 0x3a
 		 */
 		Adxl345(uint8_t address=0x1d);
 		
@@ -245,8 +245,13 @@ namespace xpcc
 		uint8_t
 		readRegister(Register reg);
 		
+		bool
+		readData(Register reg, uint8_t *data, uint8_t size);
+
 		bool newData;
 		uint8_t data[6];
+		uint8_t deviceAddress;
+		typedef xpcc::i2c::SyncMaster<I2C> MySyncI2C;
 	};
 	
 }

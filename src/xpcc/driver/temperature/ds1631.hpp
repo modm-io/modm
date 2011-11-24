@@ -33,7 +33,7 @@
 #ifndef XPCC__DS1631_HPP
 #define XPCC__DS1631_HPP
 
-#include <xpcc/driver/connectivity/i2c/device.hpp>
+#include <xpcc/driver/connectivity/i2c/sync_master.hpp>
 
 namespace xpcc
 {
@@ -61,7 +61,7 @@ namespace xpcc
 	 * \author	Fabian Greif
 	 */
 	template <typename I2C>
-	class Ds1631 : public i2c::Device<I2C>
+	class Ds1631
 	{
 	public:
 		/**
@@ -126,6 +126,18 @@ namespace xpcc
 		 */
 		int16_t
 		readTemperature();
+
+		/**
+		 * \brief	Check if the device is accessable
+		 *
+		 * \return	\c true the device responds to its address,
+		 * 			\c false otherwise, i.a. if bus was not free, statrcondition failed or device did not responded.
+		 */
+		bool
+		isAvailable() const;
+	private:
+		const uint8_t deviceAddress;
+		typedef xpcc::i2c::SyncMaster<I2C> MySyncI2C;
 	};
 }
 

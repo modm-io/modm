@@ -33,7 +33,7 @@
 #ifndef XPCC_ATMEGA__TWI_MASTER_HPP
 #define XPCC_ATMEGA__TWI_MASTER_HPP
 
-#include <xpcc/driver/connectivity/i2c/interface.hpp>
+#include <xpcc/driver/connectivity/i2c/master.hpp>
 #include <stdint.h>
 
 namespace xpcc
@@ -41,7 +41,9 @@ namespace xpcc
 	namespace atmega
 	{
 		/**
-		 * \brief	Synchronous TWI master module
+		 * \brief	Interrupt-driven TWI master module.
+		 *
+		 * Interrupts must be enabled.
 		 * 
 		 * \warning	You must only use the AsynchronousTwiMaster or the
 		 * 			SynchronousTwiMaster class, never both of them!
@@ -49,7 +51,7 @@ namespace xpcc
 		 * \ingroup	atmega
 		 * \ingroup	i2c
 		 */
-		class SynchronousTwiMaster : public xpcc::i2c::SynchronousMaster
+		class AsynchronousTwiMaster : public xpcc::i2c::Master
 		{
 		public:
 			/**
@@ -101,64 +103,25 @@ namespace xpcc
 			initialize(uint8_t twbr, uint8_t twps);
 			
 			static bool
-			start(uint8_t address);
-			
-			static inline bool
-			repeatedStart(uint8_t address)
-			{
-				return start(address);
-			}
-			
-			static bool
-			write(uint8_t data);
-			
-			static uint8_t
-			read(bool ack);
-			
+			start(uint8_t slaveAddress);
+
+			static void
+			restart(uint8_t slaveAddress);
+
 			static void
 			stop();
-		};
-		
-		/**
-		 * \brief	Interrupt-driven TWI master module
-		 * 
-		 * Interrupts must be enabled.
-		 * 
-		 * \warning	You must only use the AsynchronousTwiMaster or the
-		 * 			SynchronousTwiMaster class, never both of them!
-		 * 
-		 * \ingroup	atmega
-		 * \ingroup	i2c
-		 */
-		class AsynchronousTwiMaster : public xpcc::i2c::AsynchronousMaster
-		{
-		public:
-			/**
-			 * \brief	Initialize hardware
-			 * 
-			 * For a detailed description see SynchronousTwiMaster::initialize().	
-			 */
+
 			static void
-			initialize(uint8_t twbr, uint8_t twps);
-			
+			read(uint8_t *data, std::size_t size, xpcc::i2c::ReadParameter param = xpcc::i2c::READ_STOP);
+
 			static void
-			read(uint8_t address, uint8_t *data, std::size_t size);
-			
-			static void
-			write(uint8_t address, const uint8_t *data, std::size_t size);
-			
-			static void
-			writeRead(uint8_t address, uint8_t *data,
-					std::size_t writeSize, std::size_t readSize);
-			
-			static bool
-			isBusy();
-			
-			static uint8_t
-			getStatus();
-			
-			static bool
-			tranferSucceded();
+			write(const uint8_t *data, std::size_t size);
+
+			static xpcc::i2c::BusyState
+			getBusyState();
+
+			static xpcc::i2c::BusState
+			getBusState();
 		};
 	}
 }

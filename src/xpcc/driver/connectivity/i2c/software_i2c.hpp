@@ -34,7 +34,7 @@
 #define XPCC__SOFTWARE_I2C_HPP
 
 #include <xpcc/architecture/driver/delay.hpp>
-#include "interface.hpp"
+#include "master.hpp"
 
 namespace xpcc
 {
@@ -83,7 +83,7 @@ namespace xpcc
 	 * 
 	 * \tparam	Scl			any IO-Pin (see GPIO__IO())
 	 * \tparam	Sda			any IO-Pin (see GPIO__IO())
-	 * \tparam	Frequency	default is 100kHz
+	 * \tparam	Frequency	in Hz (default frequency is 100kHz)
 	 * 
 	 * \ingroup	i2c
 	 * \see		gpio
@@ -91,7 +91,7 @@ namespace xpcc
 	template< typename Scl,
 			  typename Sda,
 			  int32_t Frequency = 100000 >
-	class SoftwareI2C : public i2c::SynchronousMaster
+	class SoftwareI2C : public i2c::Master
 	{
 	public:
 		/**
@@ -100,11 +100,31 @@ namespace xpcc
 		static void
 		initialize();
 		
+	public:
 		static bool
-		start(uint8_t address);
-		
+		start(uint8_t slaveAddress);
+
+		static void
+		stop();
+
+		static void
+		read(uint8_t *data, std::size_t size, xpcc::i2c::ReadParameter param = xpcc::i2c::READ_STOP);
+
+		static void
+		write(const uint8_t *data, std::size_t size);
+
+		static void
+		restart(uint8_t slaveAddress);
+
+		static xpcc::i2c::BusyState
+		getBusyState();
+
+		static xpcc::i2c::BusState
+		getBusState();
+
+	protected:
 		static bool
-		repeatedStart(uint8_t address);
+		startCondition(uint8_t address);
 		
 		static bool
 		write(uint8_t data);
@@ -113,8 +133,8 @@ namespace xpcc
 		read(bool ack);
 		
 		static void
-		stop();
-		
+		stopCondition();
+
 	protected:
 		static inline bool
 		readBit();
@@ -131,6 +151,9 @@ namespace xpcc
 		
 		static Scl scl;
 		static Sda sda;
+		static bool occupied;
+		static uint8_t address;
+		static xpcc::i2c::BusState busState;
 	};
 }
 
