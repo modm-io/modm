@@ -1,8 +1,8 @@
 #font   : Arcade Classic
 #width  : 7
 #height : 8
-#hspace : 1
-#vspace : 0
+#hspace : 0
+#vspace : 1
 
 #char : 32 ' '
 [       ]

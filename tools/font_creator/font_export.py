@@ -57,6 +57,8 @@ namespace xpcc
 			${size_low}, ${size_high}, // total size of this array
 			${width},	// width (may vary)
 			${height},	// height
+			${hspace},	// hspace
+			${vspace}, 	// vspace
 			${first},	// first char
 			${count},	// char count
 			
@@ -91,6 +93,8 @@ namespace xpcc
 		 * 
 		 * - ${width_string} : ${width}
 		 * - height          : ${height}
+		 * - hspace          : ${hspace}
+		 * - vspace          : ${vspace}
 		 * - first char      : ${first}
 		 * - last char       : ${last}
 		 * - number of chars : ${count}
@@ -245,8 +249,8 @@ if __name__ == '__main__':
 	char_line_count = 0
 	font_data = []
 	
-	# 6 byte header, width table
-	size = 6 + len(font.chars)
+	# 8 byte header, width table
+	size = 8 + len(font.chars)
 	for char in font.chars:
 		size += len(char.data)
 		
@@ -287,6 +291,8 @@ if __name__ == '__main__':
 		'width': preferred_width,
 		'width_string': "fixed width    " if (len(width_histogram) == 1) else "preferred width",
 		'height': font.height,
+		'hspace': font.hspace,
+		'vspace': font.vspace,
 		'first': font.first_char,
 		'last': font.first_char + len(font.chars),
 		'count': len(font.chars),

@@ -41,24 +41,28 @@ xpcc::GraphicDisplay::write(char c)
 	
 	const uint8_t character = static_cast<uint8_t>(c);
 	const uint8_t height = font[3];
+	const uint8_t hspace = font[4];
+	const uint8_t vspace = font[5];
 	
 	if (character == '\n') {
-		this->cursor.set(0, this->cursor.getY() + height);
+		this->cursor.set(0, this->cursor.getY() + height + hspace);
 		return;
 	}
 	
-	const uint8_t first = font[4];
-	const uint8_t count = font[5];
+	const uint8_t first = font[6];
+	const uint8_t count = font[7];
 	
 	if (character >= (first + count) || character < first) {
 		// character is not contained in this font set
 		return;
 	}
 	
-	uint16_t offset = count + 6;
-	uint8_t position = character - first + 6;
-	const uint8_t usedRows = (height + 7) / 8;
-	for (uint8_t i = 6; i < position; i++)
+	const uint8_t offsetWidthTable = 8;
+	
+	uint16_t offset = count + offsetWidthTable;
+	uint8_t position = character - first + offsetWidthTable;
+	const uint8_t usedRows = (height + 7) / 8;	// round up
+	for (uint8_t i = offsetWidthTable; i < position; i++)
 	{
 		offset += font[i] * usedRows;
 	}
@@ -69,13 +73,16 @@ xpcc::GraphicDisplay::write(char c)
 	
 	cursor.setX(cursor.getX() + width);
 	
-	// all characters beyond 128 have an implicit whitespace afterwards
+	// all characters beyond 128 have whitespaces afterwards (number given
+	// by vspace).
 	if (character < 128) {
 		glcd::Color oldColor = this->color;
 		
 		this->setColor(glcd::WHITE);
-		this->drawVerticalLine(cursor, height);
-		cursor.setX(cursor.getX() + 1);
+		for (uint_fast8_t i = 0; i < vspace; ++i) {
+			this->drawVerticalLine(cursor, height);
+			cursor.setX(cursor.getX() + 1);
+		}
 		
 		// restore color
 		this->setColor(oldColor);

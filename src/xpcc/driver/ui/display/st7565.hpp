@@ -51,6 +51,10 @@ namespace xpcc
 	class St7565 : public BufferedGraphicDisplay<Width, Height>
 	{
 	public:
+		virtual ~St7565()
+		{
+		}
+		
 		/**
 		 * \brief	Update the display with the content of the RAM buffer
 		 */

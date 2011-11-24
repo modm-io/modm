@@ -1,8 +1,8 @@
 #font   : Assertion
 #width  : 7
 #height : 15
-#hspace : 1
-#vspace : 0
+#hspace : 0
+#vspace : 1
 
 #char : 32 ' '
 [       ]

@@ -39,7 +39,7 @@ def font_action(target, source, env):
 	infile  = str(source[0])
 	outfile = os.path.splitext(str(target[0]))[0]
 	
-	os.system("%s %s %s" % (command, infile, outfile))
+	os.system('python "%s" "%s" "%s"' % (command, infile, outfile))
 
 def font_string(target, source, env):
 	return "Create Font: '%s'" % (str(source[0]))

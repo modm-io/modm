@@ -2,7 +2,7 @@
 #width   : 5
 #height  : 7
 #vspace  : 1
-#hspace  : 1
+#hspace  : 0
 
 #char : 32 ' '
 [   ]

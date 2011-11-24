@@ -44,6 +44,9 @@ xpcc::BufferedGraphicDisplay<Width, Height>::clear()
 			this->buffer[x][y] = 0;
 		}
 	}
+	
+	// reset the cursor
+	this->cursor = glcd::Point(0, 0);
 }
 
 // ----------------------------------------------------------------------------

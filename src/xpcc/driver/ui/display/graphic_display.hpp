@@ -116,7 +116,7 @@ namespace xpcc
 		virtual uint16_t
 		getHeight() const = 0;
 
-		/// Clear screen
+		/// Clear screen and reset the cursor
 		virtual void
 		clear() = 0;
 		
@@ -291,9 +291,27 @@ namespace xpcc
 		 * \param	y	Cursor y-position
 		 */
 		inline void
-		setCursor(uint8_t x, uint8_t y)
+		setCursor(int16_t x, int16_t y)
 		{
 			this->cursor = glcd::Point(x, y);
+		}
+		
+		inline void
+		setCursorX(int16_t x)
+		{
+			this->cursor.x = x;
+		}
+		
+		inline void
+		setCursorY(int16_t y)
+		{
+			this->cursor.y = y;
+		}
+		
+		inline glcd::Point
+		getCursor() const
+		{
+			return this->cursor;
 		}
 		
 		/// Write a single character

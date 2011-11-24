@@ -39,9 +39,11 @@ namespace xpcc
 	{
 		FLASH_STORAGE(uint8_t Assertion[]) =
 		{
-			0x16, 0x05, // total size of this array
+			0x18, 0x05, // total size of this array
 			7,	// width (may vary)
 			15,	// height
+			0,	// hspace
+			1, 	// vspace
 			32,	// first char
 			96,	// char count
 			
