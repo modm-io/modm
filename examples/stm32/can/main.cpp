@@ -21,14 +21,13 @@ namespace lcd
 // Graphic LCD
 xpcc::DogS102< xpcc::stm32::Spi1, lcd::CS, lcd::A0, lcd::Reset, false > display;
 
-static uint32_t receiveCounter = 0;
-
 using namespace xpcc::stm32;
 
 // ----------------------------------------------------------------------------
 static void
 displayMessage(const xpcc::can::Message& message)
 {
+	static uint32_t receiveCounter = 0;
 	receiveCounter++;
 	
 	display.clear();
@@ -41,10 +40,10 @@ displayMessage(const xpcc::can::Message& message)
 	
 	display.printf("id  =%lx\n", message.getIdentifier());
 	if (message.isExtended()) {
-		display << "extended";
+		display << " extended";
 	}
 	else {
-		display << "standard";
+		display << " standard";
 	}
 	if (message.isRemoteTransmitRequest()) {
 		display << ", rtr";
@@ -57,16 +56,17 @@ displayMessage(const xpcc::can::Message& message)
 		display << "data=";
 		uint8_t x = display.getCursor().getX();
 		for (uint32_t i = 0; i < message.getLength(); ++i) {
-			display << xpcc::hex << message.data[i] << xpcc::ascii << ' ';
-			
-			if (i == 3) {
+			if (i == 4) {
+				// wrap around to the next line
 				display << xpcc::endl;
 				display.setCursorX(x);
 			}
+			
+			display << xpcc::hex << message.data[i] << xpcc::ascii << ' ';
 		}
 		display << xpcc::endl;
 	}
-	display << "#msg=" << receiveCounter;
+	display << "# received=" << receiveCounter;
 	display.update();
 }
 

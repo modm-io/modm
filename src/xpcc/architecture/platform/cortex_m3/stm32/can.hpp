@@ -78,7 +78,7 @@ namespace xpcc
 			};
 			
 			/**
-			 * Remap compare channels to other locations.
+			 * Remap CAN to other locations.
 			 *
 			 * Remap has to be done before calling initialize() otherwise
 			 * the wrong pins are configured.

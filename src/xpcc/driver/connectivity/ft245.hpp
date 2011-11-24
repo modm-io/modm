@@ -95,8 +95,6 @@ namespace xpcc
 		 * 
 		 * This function is called by the constructor to initialize all port pins
 		 * correctly and sets the default values.
-		 * 
-		 * \param	None
 		 */
 		static void
 		initialize();

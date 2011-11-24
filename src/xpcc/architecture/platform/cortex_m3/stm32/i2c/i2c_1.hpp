@@ -33,8 +33,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_STM32__I2C_2_HPP
-#define XPCC_STM32__I2C_2_HPP
+#ifndef XPCC_STM32__I2C_1_HPP
+#define XPCC_STM32__I2C_1_HPP
 
 #include <stdint.h>
 #include <xpcc/driver/connectivity/i2c/master.hpp>
@@ -46,15 +46,31 @@ namespace xpcc
 	namespace stm32
 	{
 		/**
-		 * @brief		I2C2 Module.
+		 * @brief		I2C1 Module.
 		 * 
 		 * @author		Georgi
 		 * @ingroup		stm32
 		 */
-		class I2c2 : ::xpcc::i2c::Master
+		class I2c1 : ::xpcc::i2c::Master
 		{
 		public:
+			enum Remap
+			{
+				REMAP_PB6_PB7 = 0,						///< SCL mapped to PB6, SDA mapped to PB7
+				REMAP_PB8_PB9 = AFIO_MAPR_I2C1_REMAP,	///< SCL mapped to PB8, SDA mapped to PB9
+			};
 			
+			/**
+			 * Remap I2C1 to other locations.
+			 * 
+			 * Remap has to be done before calling initialize() otherwise
+			 * the wrong pins are configured.
+			 */
+			static inline void
+			remapPins(Remap mapping)
+			{
+				AFIO->MAPR = (AFIO->MAPR & ~AFIO_MAPR_I2C1_REMAP) | mapping;
+			}
 			
 			/**
 			 * @brief	Initialize I2C module
@@ -88,4 +104,4 @@ namespace xpcc
 	}
 }
 
-#endif // XPCC_STM32__I2C_2_HPP
+#endif // XPCC_STM32__I2C_1_HPP

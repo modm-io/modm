@@ -159,15 +159,13 @@ namespace xpcc
 			 * \brief	Restarts the bus without loosing control.
 			 * 
 			 * \param[in] slaveAddress	7-bit address of the slave device.
-			 * 					LSB must be zero.
-			 *
+			 * 							LSB must be zero.
 			 */
 			void
 			restart(uint8_t slaveAddress);
 
 			/**
 			 * \brief	Gives up the Bus control.
-
 			 */
 			void
 			stop();
@@ -175,13 +173,9 @@ namespace xpcc
 			/**
 			 * \brief	Read a block of data. Call this method only if BusState allows reading.
 			 *
-			 *
-			 *
 			 * \param[out] *data	Pointer to buffer where received data
-			 * 					should be stored. This must remain valid during operation is in progress.
-			 *
+			 * 						should be stored. This must remain valid during operation is in progress.
 			 * \param[in] size		Number of bytes to be received
-			 *
 			 * \param[in] param		See description ReadParameter. Default is READ_STOP.
 			 *
 			 */

@@ -8,3 +8,5 @@ Things needed to be done
 * Rework the description of the Logger!
 * Check GraphicDisplay for remains of a uint8_t coordinates (now int16_t)
 * Rework the STM32 CAN Filter Interface (needs better names)
+* Implement CAN2 (make CAN1 a template)
+* Check UART interface (char vs. uint8_t)

@@ -46,8 +46,17 @@
 #define CAN_BTR_TS1_POS		16
 
 // ----------------------------------------------------------------------------
-GPIO__INPUT(CanRx, B, 8);
-GPIO__OUTPUT(CanTx, B, 9);
+namespace
+{
+	GPIO__INPUT(CanRx1, A, 11);
+	GPIO__OUTPUT(CanTx1, A, 12);
+	
+	GPIO__INPUT(CanRx2, B, 8);
+	GPIO__OUTPUT(CanTx2, B, 9);
+	
+	GPIO__INPUT(CanRx3, D, 0);
+	GPIO__OUTPUT(CanTx3, D, 1);
+}
 
 // ----------------------------------------------------------------------------
 #if STM32_CAN_TX_BUFFER_SIZE > 0
@@ -55,6 +64,14 @@ xpcc::atomic::Queue<xpcc::can::Message, STM32_CAN_TX_BUFFER_SIZE> txQueue;
 #endif
 #if STM32_CAN_RX_BUFFER_SIZE > 0
 xpcc::atomic::Queue<xpcc::can::Message, STM32_CAN_RX_BUFFER_SIZE> rxQueue;
+#endif
+
+#if !defined(STM32F10X_CL)
+#	define	CAN1_TX_IRQHandler		USB_HP_CAN1_TX_IRQHandler
+#	define	CAN1_RX0_IRQHandler		USB_LP_CAN1_RX0_IRQHandler
+
+#	define	CAN1_TX_IRQn			USB_HP_CAN1_TX_IRQn
+#	define	CAN1_RX0_IRQn			USB_LP_CAN1_RX0_IRQn
 #endif
 
 // ----------------------------------------------------------------------------
@@ -117,7 +134,7 @@ readMailbox(xpcc::can::Message& message, uint32_t mailboxId)
  * Generated when Transmit Mailbox 0..2 becomes empty.
  */
 extern "C" void
-USB_HP_CAN1_TX_IRQHandler()
+CAN1_TX_IRQHandler()
 {
 #if STM32_CAN_TX_BUFFER_SIZE > 0
 	uint32_t mailbox;
@@ -150,7 +167,7 @@ USB_HP_CAN1_TX_IRQHandler()
  * Condition.
  */
 extern "C" void
-USB_LP_CAN1_RX0_IRQHandler()
+CAN1_RX0_IRQHandler()
 {
 	if (CAN1->RF0R & CAN_RF0R_FOVR0) {
 		xpcc::ErrorReport::report(xpcc::stm32::CAN_FIFO0_OVERFLOW);
@@ -225,8 +242,20 @@ nvicEnableInterrupt(IRQn_Type IRQn)
 bool
 xpcc::stm32::Can1::initialize(can::Bitrate bitrate)
 {
-	CanRx::setInput(xpcc::stm32::INPUT, xpcc::stm32::PULLUP);
-	CanTx::setOutput(xpcc::stm32::ALTERNATE, xpcc::stm32::PUSH_PULL);
+	// Initialize IO pins
+	uint32_t remap = (AFIO->MAPR & AFIO_MAPR_CAN_REMAP);
+	if (remap == AFIO_MAPR_CAN_REMAP_REMAP2) {
+		CanRx2::setInput(xpcc::stm32::INPUT, xpcc::stm32::PULLUP);
+		CanTx2::setOutput(xpcc::stm32::ALTERNATE, xpcc::stm32::PUSH_PULL);
+	}
+	else if (remap == AFIO_MAPR_CAN_REMAP_REMAP3) {
+		CanRx3::setInput(xpcc::stm32::INPUT, xpcc::stm32::PULLUP);
+		CanTx3::setOutput(xpcc::stm32::ALTERNATE, xpcc::stm32::PUSH_PULL);
+	}
+	else {
+		CanRx1::setInput(xpcc::stm32::INPUT, xpcc::stm32::PULLUP);
+		CanTx1::setOutput(xpcc::stm32::ALTERNATE, xpcc::stm32::PUSH_PULL);
+	}
 
 	// enable clock
 	RCC->APB1ENR  |=  RCC_APB1ENR_CAN1EN;
@@ -264,13 +293,13 @@ xpcc::stm32::Can1::initialize(can::Bitrate bitrate)
 	
 	// Register Interrupts at the NVIC
 	// TODO: Set priority
-	nvicEnableInterrupt(USB_LP_CAN1_RX0_IRQn);
+	nvicEnableInterrupt(CAN1_RX0_IRQn);
 	nvicEnableInterrupt(CAN1_RX1_IRQn);
 	nvicEnableInterrupt(CAN1_SCE_IRQn);
 	
 #if STM32_CAN_TX_BUFFER_SIZE > 0
 	CAN1->IER |= CAN_IER_TMEIE;
-	nvicEnableInterrupt(USB_HP_CAN1_TX_IRQn);
+	nvicEnableInterrupt(CAN1_TX_IRQn);
 #endif
 	
 #if STM32_CAN_RX_BUFFER_SIZE > 0
@@ -413,16 +442,16 @@ xpcc::stm32::Can1::disableFilter(uint8_t id)
 
 #if defined(STM32F10X_CL)
 // ----------------------------------------------------------------------------
-static void
+void
 xpcc::stm32::Can1::setCan2StartBank(uint8_t startBank)
 {
 	// Initialization mode for the filter
-	CAN1->FMR |= FMR_FINIT;
+	CAN1->FMR |= CAN_FMR_FINIT;
 	
 	CAN1->FMR = (CAN1->FMR & ~0x3f00) | (startBank << 8);
 	
 	// Leave the initialization mode for the filter
-	CAN1->FMR &= ~FMR_FINIT;
+	CAN1->FMR &= ~CAN_FMR_FINIT;
 }
 #endif
 
