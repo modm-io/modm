@@ -1,11 +1,11 @@
 // coding: utf-8
 // ----------------------------------------------------------------------------
-/* Copyright (c) 2011, Roboterclub Aachen e.V.
+/* Copyright (c) 2009, Roboterclub Aachen e.V.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -30,32 +30,25 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_FONT__NUMBERS_40X56_HPP
-#define	XPCC_FONT__NUMBERS_40X56_HPP
+#include "error_report.hpp"
 
-#include <xpcc/architecture/driver/accessor.hpp>
-
-namespace xpcc
+static void
+dummyErrorHandler(uint16_t)
 {
-	namespace font
-	{
-		/**
-		 * \brief	Numbers 40x57
-		 * 
-		 * - fixed width     : 40
-		 * - height          : 56
-		 * - hspace          : 4
-		 * - vspace          : 0
-		 * - first char      : 48
-		 * - last char       : 58
-		 * - number of chars : 10
-		 * - size in bytes   : 2818
-		 * 
-		 * \ingroup	font
-		 */
-		EXTERN_FLASH_STORAGE(uint8_t Numbers40x57[]);
-	}
 }
 
-#endif	// XPCC_FONT__NUMBERS_40X56_HPP
+// ----------------------------------------------------------------------------
+xpcc::ErrorReport::Handler xpcc::ErrorReport::globalErrorHandler = &dummyErrorHandler;
 
+// ----------------------------------------------------------------------------
+void
+xpcc::ErrorReport::attach(Handler handler)
+{
+	globalErrorHandler = handler;
+}
+
+void
+xpcc::ErrorReport::detach()
+{
+	globalErrorHandler = &dummyErrorHandler;
+}

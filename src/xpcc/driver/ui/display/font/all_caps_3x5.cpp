@@ -39,9 +39,11 @@ namespace xpcc
 	{
 		FLASH_STORAGE(uint8_t AllCaps3x5[]) =
 		{
-			0x70, 0x01, // total size of this array
+			0x72, 0x01, // total size of this array
 			3,	// width (may vary)
 			5,	// height
+			1,	// hspace
+			1, 	// vspace
 			32,	// first char
 			96,	// char count
 			

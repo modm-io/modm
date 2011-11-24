@@ -106,10 +106,16 @@
 	#	define ALWAYS_INLINE  		inline __attribute__((always_inline))
 	#	define ATTRIBUTE_UNUSED		__attribute__((unused))
 	#	define ATTRIBUTE_WEAK		__attribute__ ((weak))
+	#	define ATTRIBUTE_ALIGNED(n)	__attribute__((aligned(n)))
+	
+	// see http://dbp-consulting.com/tutorials/StrictAliasing.html
+	#	define ATTRIBUTE_MAY_ALIAS	__attribute__((__may_alias__))	
 	#else
 	#	define ALWAYS_INLINE  		inline
 	#	define ATTRIBUTE_UNUSED
 	#	define ATTRIBUTE_WEAK
+	#	define ATTRIBUTE_ALIGNED(n)
+	#	define ATTRIBUTE_MAY_ALIAS
 	#endif
 	
 	#ifdef XPCC__CPU_AVR

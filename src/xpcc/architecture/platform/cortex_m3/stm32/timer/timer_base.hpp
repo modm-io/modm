@@ -30,8 +30,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_STM32__GENERAL_PURPOSE_TIMER_HPP
-#define XPCC_STM32__GENERAL_PURPOSE_TIMER_HPP
+#ifndef XPCC_STM32__TIMER_BASE_HPP
+#define XPCC_STM32__TIMER_BASE_HPP
 
 #include <stdint.h>
 #include "../device.h"
@@ -95,9 +95,6 @@ namespace xpcc
 
 			/**
 			 * Set operation mode of the timer
-			 *
-			 * In Encoder mode the encoder channels A and B must be connected
-			 * to channel 1 and 2 of the timer (e.g. TIM{{ id }}_CH1 and TIM{{ id }}_CH2).
 			 */
 			static void
 			setMode(Mode mode);
@@ -261,7 +258,17 @@ namespace xpcc
 				 */
 				OUTPUT_PWM2 = TIM_CCMR1_OC1M_2 | TIM_CCMR1_OC1M_1 | TIM_CCMR1_OC1M_0,
 			};
-
+			
+		public:
+			/**
+			 * Set operation mode of the timer
+			 *
+			 * In Encoder mode the encoder channels A and B must be connected
+			 * to channel 1 and 2 of the timer (e.g. TIM2_CH1 and TIM2_CH2).
+			 */
+			static void
+			setMode(Mode mode);
+			
 		public:
 			// TODO implement this function
 			//static void
@@ -325,4 +332,4 @@ namespace xpcc
 	}
 }
 
-#endif // XPCC_STM32__GENERAL_PURPOSE_TIMER_HPP
+#endif // XPCC_STM32__TIMER_BASE_HPP

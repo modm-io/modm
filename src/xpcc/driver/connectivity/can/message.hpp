@@ -34,6 +34,7 @@
 #define XPCC_CAN__MESSAGE_HPP
 
 #include <stdint.h>
+#include <xpcc/architecture/utils.hpp>
 
 namespace xpcc
 {
@@ -73,6 +74,23 @@ namespace xpcc
 			LOOPBACK,
 		};
 		
+		enum BusState
+		{
+			CONNECTED,
+
+			// This bit is set by hardware when the warning limit has been
+			// reached (Receive Error Counter or Transmit Error Counter ≥ 96).
+			ERROR_WARNING,
+
+			// This bit is set by hardware when the Error Passive limit has
+			// been reached (Receive Error Counter or Transmit Error Counter > 127).
+			ERROR_PASSIVE,
+
+			// This bit is set by hardware when it enters the bus-off state.
+			// The bus-off state is entered on TEC overflow, greater than 255
+			BUS_OFF,
+		};
+
 		/**
 		 * \brief	Representation of a CAN message
 		 * \ingroup	can
@@ -84,8 +102,45 @@ namespace xpcc
 			{
 			}
 			
+			inline uint32_t
+			getIdentifier() const
+			{
+				return identifier;
+			}
+			
+			inline void
+			setExtended(bool extended = true)
+			{
+				flags.extended = (extended) ? 1 : 0;
+			}
+			
+			inline bool
+			isExtended() const
+			{
+				return (flags.extended != 0);
+			}
+			
+			inline void
+			setRemoteTransmitRequest(bool rtr = true)
+			{
+				flags.rtr = (rtr) ? 1 : 0;
+			}
+			
+			inline bool
+			isRemoteTransmitRequest() const
+			{
+				return (flags.rtr != 0);
+			}
+			
+			inline uint8_t
+			getLength() const
+			{
+				return length;
+			}
+			
+		public:
 			uint32_t identifier;
-			uint8_t data[8];
+			uint8_t ATTRIBUTE_ALIGNED(4) data[8];
 			struct Flags
 			{
 				Flags() :

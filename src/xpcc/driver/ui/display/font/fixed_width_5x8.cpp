@@ -39,9 +39,11 @@ namespace xpcc
 	{
 		FLASH_STORAGE(uint8_t FixedWidth5x8[]) =
 		{
-			0x46, 0x02, // total size of this array
+			0x48, 0x02, // total size of this array
 			5,	// width (may vary)
 			8,	// height
+			0,	// hspace
+			1, 	// vspace
 			32,	// first char
 			96,	// char count
 			

@@ -1,11 +1,11 @@
 // coding: utf-8
 // ----------------------------------------------------------------------------
-/* Copyright (c) 2011, Roboterclub Aachen e.V.
+/* Copyright (c) 2009, Roboterclub Aachen e.V.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -30,32 +30,52 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_FONT__NUMBERS_40X56_HPP
-#define	XPCC_FONT__NUMBERS_40X56_HPP
+#ifndef XPCC__ERROR_REPORT_HPP
+#define XPCC__ERROR_REPORT_HPP
 
-#include <xpcc/architecture/driver/accessor.hpp>
+#include <stdint.h>
 
 namespace xpcc
 {
-	namespace font
+	/**
+	 * Global error reporter
+	 * 
+	 * Used to report severe errors at one place.
+	 * 
+	 * @ingroup	debug
+	 * @author	Fabian Greif
+	 */
+	class ErrorReport
 	{
+	public:
+		typedef void (*Handler)(uint16_t errorCode);
+		
 		/**
-		 * \brief	Numbers 40x57
+		 * Attach a Global Error Handler Function.
 		 * 
-		 * - fixed width     : 40
-		 * - height          : 56
-		 * - hspace          : 4
-		 * - vspace          : 0
-		 * - first char      : 48
-		 * - last char       : 58
-		 * - number of chars : 10
-		 * - size in bytes   : 2818
-		 * 
-		 * \ingroup	font
+		 * This handler is used to report severe errors (Buffer Overflows in
+		 * Peripheral Drivers etc.). The error code is architecture dependent.
 		 */
-		EXTERN_FLASH_STORAGE(uint8_t Numbers40x57[]);
-	}
+		static void
+		attach(Handler handler);
+		
+		/**
+		 * Remove Error Handler.
+		 */
+		static void
+		detach();
+		
+		static inline void
+		report(uint16_t errorCode)
+		{
+			globalErrorHandler(errorCode);
+		}
+		
+	private:
+		ErrorReport();
+		
+		static Handler globalErrorHandler;
+	};
 }
 
-#endif	// XPCC_FONT__NUMBERS_40X56_HPP
-
+#endif	// XPCC__ERROR_REPORT_HPP

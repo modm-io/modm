@@ -45,12 +45,13 @@
  * - TODO: STM32 F2 series of high-performance MCUs
  * - TODO: STM32 F4 series of high-performance MCUs with DSP and FPU instructions
  *
- * STM32F100-102 are not supported!
+ * The Value line (STM32F100-102) is not supported!
  */
 
 #include "stm32/device.h"
 
 #include "stm32/core.hpp"
+#include "stm32/can.hpp"
 #include "stm32/gpio.hpp"
 #include "stm32/uart.hpp"
 #include "stm32/spi.hpp"

@@ -5,7 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -30,32 +30,22 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_FONT__NUMBERS_40X56_HPP
-#define	XPCC_FONT__NUMBERS_40X56_HPP
-
-#include <xpcc/architecture/driver/accessor.hpp>
+#ifndef XPCC_STM32__ERROR_HPP
+#define XPCC_STM32__ERROR_HPP
 
 namespace xpcc
 {
-	namespace font
+	namespace stm32
 	{
-		/**
-		 * \brief	Numbers 40x57
-		 * 
-		 * - fixed width     : 40
-		 * - height          : 56
-		 * - hspace          : 4
-		 * - vspace          : 0
-		 * - first char      : 48
-		 * - last char       : 58
-		 * - number of chars : 10
-		 * - size in bytes   : 2818
-		 * 
-		 * \ingroup	font
-		 */
-		EXTERN_FLASH_STORAGE(uint8_t Numbers40x57[]);
+		enum ErrorCode
+		{
+			CAN_ERROR_PASSIVE_MODE = 0x0010,
+			CAN_BUS_OFF_MODE = 0x0011,
+			CAN_FIFO0_OVERFLOW = 0x0012,
+			CAN_FIFO1_OVERFLOW = 0x0013,
+			CAN_TX_OVERFLOW = 0x0014,
+		};
 	}
 }
 
-#endif	// XPCC_FONT__NUMBERS_40X56_HPP
-
+#endif

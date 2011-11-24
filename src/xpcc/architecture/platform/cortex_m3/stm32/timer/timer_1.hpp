@@ -79,7 +79,7 @@ namespace xpcc
 		 */
 		class Timer1 : public AdvancedControlTimer
 		{
-			public:
+		public:
 			enum Remap
 			{
 				NO_REMAP = AFIO_MAPR_TIM1_REMAP_NOREMAP,			///< ETR/PA12, CH1/PA8, CH2/PA9, CH3/PA10, CH4/PA11, BKIN/PB12, CH1N/PB13, CH2N/PB14, CH3N/PB15 (default)

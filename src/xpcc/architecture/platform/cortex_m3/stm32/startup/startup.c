@@ -434,8 +434,8 @@ Reset_Handler(void)
 	NVIC_SetPriority(SysTick_IRQn, 0xf);
 	
 	// enable clock for alternative functions
-	RCC->APB2ENR |= RCC_APB2ENR_AFIOEN;
-	RCC->APB2RSTR |= RCC_APB2RSTR_AFIORST;
+	RCC->APB2ENR  |=  RCC_APB2ENR_AFIOEN;
+	RCC->APB2RSTR |=  RCC_APB2RSTR_AFIORST;
 	RCC->APB2RSTR &= ~RCC_APB2RSTR_AFIORST;
 	
 	// enable fault handlers

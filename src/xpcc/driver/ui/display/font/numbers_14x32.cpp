@@ -39,9 +39,11 @@ namespace xpcc
 	{
 		FLASH_STORAGE(uint8_t Numbers14x32[]) =
 		{
-			0x40, 0x02, // total size of this array
+			0x42, 0x02, // total size of this array
 			14,	// width (may vary)
 			32,	// height
+			3,	// hspace
+			4, 	// vspace
 			48,	// first char
 			10,	// char count
 			

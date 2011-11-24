@@ -52,7 +52,7 @@ The name of the stream represents the log level of the message. Available are:
  - XPCC_LOG_WARNING
  - XPCC_LOG_ERROR
 
-The flush has to be used, to signal that the message is complete and can be
+TODO check: The flush has to be used, to signal that the message is complete and can be
 send. A log message can also be generated separately: 
 
 \code
@@ -63,7 +63,7 @@ for(int i = 0; i < sizeof(a); ++i) {
 }
 XPCC_LOG_DEBUG << xpcc::flush;
 \endcode
-But remember that without a xpcc::flush your message will not be forwarded.
+TODO check: But remember that without a xpcc::flush your message will not be forwarded.
 
 \section call_flow Flow of a call
 

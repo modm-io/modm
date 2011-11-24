@@ -37,5 +37,6 @@
 #define XPCC__DEBUG_HPP
 
 #include "debug/logger.hpp"
+#include "debug/error_report.hpp"
 
 #endif	// XPCC__DEBUG_HPP

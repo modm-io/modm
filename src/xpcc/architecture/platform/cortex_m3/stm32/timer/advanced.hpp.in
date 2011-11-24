@@ -87,7 +87,7 @@ namespace xpcc
 		 */
 		class Timer{{ id }} : public AdvancedControlTimer
 		{
-			{% if id == 1 -%}
+		{% if id == 1 -%}
 		public:
 			enum Remap
 			{

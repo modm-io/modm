@@ -142,9 +142,9 @@ def generate(env, **kw):
 		"-fno-unwind-tables",
 		"-mlong-calls",		# when using ".fastcode" without longcall:
 		"-Wall",
+		"-Wformat",
 		"-Wextra",
 		"-Wundef",
-		"-Wcast-align",
 		"-Winit-self",
 #		"-Wcast-qual",		# TODO enable this
 #		"-Wimplicit",

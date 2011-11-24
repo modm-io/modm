@@ -39,9 +39,11 @@ namespace xpcc
 	{
 		FLASH_STORAGE(uint8_t ScriptoNarrow[]) =
 		{
-			0x7C, 0x01, // total size of this array
+			0x7E, 0x01, // total size of this array
 			3,	// width (may vary)
 			7,	// height
+			0,	// hspace
+			1, 	// vspace
 			32,	// first char
 			95,	// char count
 			

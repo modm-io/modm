@@ -44,10 +44,12 @@ namespace xpcc
 		 * 
 		 * - fixed width     : 7
 		 * - height          : 8
+		 * - hspace          : 0
+		 * - vspace          : 1
 		 * - first char      : 32
 		 * - last char       : 128
 		 * - number of chars : 96
-		 * - size in bytes   : 774
+		 * - size in bytes   : 776
 		 * 
 		 * \ingroup	font
 		 */

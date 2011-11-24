@@ -39,9 +39,11 @@ namespace xpcc
 	{
 		FLASH_STORAGE(uint8_t ArcadeClassic[]) =
 		{
-			0x06, 0x03, // total size of this array
+			0x08, 0x03, // total size of this array
 			7,	// width (may vary)
 			8,	// height
+			0,	// hspace
+			1, 	// vspace
 			32,	// first char
 			96,	// char count
 			

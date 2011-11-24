@@ -79,7 +79,7 @@ namespace xpcc
 		 */
 		class Timer8 : public AdvancedControlTimer
 		{
-			
+		
 			
 		public:
 			static void
