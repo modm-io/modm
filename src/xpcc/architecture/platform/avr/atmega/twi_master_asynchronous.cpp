@@ -62,9 +62,6 @@ static volatile bool startConditionGenerated =  false;
 /// TWI state machine interrupt handler
 ISR(TWI_vect)
 {
-	DDRB = 1;
-	PORTB = 1;
-	PORTB = 0;
 	switch(TW_STATUS)
 	{
 	case TW_START:
