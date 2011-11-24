@@ -37,7 +37,14 @@
  * \ingroup		platform
  * \defgroup	cortex_m3	Cortex M3
  * 
- * Tested with Codesourcery G++ lite.
+ * ARM Cortex-M3 is based on ARMv7-M architecture which is not the same as ARM7.
+ * ARM7 microcontrollers are based on ARMv4 architecture.
+ * 
+ * Basically, ARM Cortex-M3 has been designed to improve upon and overcome
+ * several limitations of ARM7.
+ * 
+ * All code developed/tested with Codesourcery G++ lite (now called
+ * "Sourcery CodeBench Lite Edition").
  */
 
 #if defined __ARM_LPC1000__
