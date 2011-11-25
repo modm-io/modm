@@ -2,6 +2,7 @@
 #include <xpcc/architecture.hpp>
 #include <xpcc/driver/ui/display/ea_dog.hpp>
 #include <xpcc/driver/ui/display/font.hpp>
+#include <xpcc/driver/ui/display/image.hpp>
 #include <xpcc/debug.hpp>
 
 // ----------------------------------------------------------------------------
@@ -80,9 +81,10 @@ MAIN_FUNCTION
 	display.initialize();
 	
 	display.clear();
-	display.setFont(xpcc::font::Assertion);
-	display << "  CAN Demo";
-	display.drawLine(0, 13, 102, 13);
+	//display.setFont(xpcc::font::Assertion);
+	//display << "  CAN Demo";
+	//display.drawLine(0, 13, 102, 13);
+	display.drawImage(xpcc::glcd::Point(19, 0), xpcc::accessor::asFlash(bitmap::skull_64x64));
 	display.update();
 	
 	// Remap the Pins of CAN1 to PB8 and PB9.
@@ -91,33 +93,33 @@ MAIN_FUNCTION
 	Can1::initialize(xpcc::can::BITRATE_125_KBPS);
 	
 	// Set filters
-	Can1::setMaskFilter(0, Can1::FIFO0, 
-			Can1::extendedFilter(0x12345678, Can1::EXTENDED, Can1::NO_RTR),
-			Can1::extendedFilter(0x1fffffff, Can1::EXTENDED, Can1::RTR));
-	Can1::setMaskFilter(1, Can1::FIFO0, 
-			Can1::extendedFilter(0x17000000, Can1::EXTENDED, Can1::NO_RTR),
-			Can1::extendedFilter(0x1f000000, Can1::EXTENDED, Can1::RTR));
-	Can1::setMaskFilter(2, Can1::FIFO1,
-			Can1::standardFilter(0x123, Can1::STANDARD, Can1::NO_RTR),
-			Can1::standardFilter(0x3ff, Can1::EXTENDED, Can1::RTR));
-	Can1::setMaskFilter(3, Can1::FIFO1,
-			Can1::standardFilter(0x321, Can1::STANDARD, Can1::RTR),
-			Can1::standardFilter(0x3ff, Can1::EXTENDED, Can1::RTR));
+	CanFilter::setFilter(0, CanFilter::FIFO0, 
+			CanFilter::ExtendedIdentifier(0x12345678),
+			CanFilter::ExtendedFilterMask(0x1fffffff));
+	CanFilter::setFilter(1, CanFilter::FIFO0, 
+			CanFilter::ExtendedIdentifier(0x17000000),
+			CanFilter::ExtendedFilterMask(0x1f000000));
+	CanFilter::setFilter(2, CanFilter::FIFO1,
+			CanFilter::StandardIdentifier(0x123),
+			CanFilter::StandardFilterMask(0x3ff));
+	CanFilter::setFilter(3, CanFilter::FIFO1,
+			CanFilter::StandardIdentifier(0x321, CanFilter::RTR),
+			CanFilter::StandardFilterMask(0x3ff));
 	
-	Can1::setIdentifierFilter(4, Can1::FIFO1,
-			Can1::standardFilter(0x111, Can1::STANDARD, Can1::NO_RTR),
-			Can1::extendedFilter(0x11111111, Can1::EXTENDED, Can1::RTR));
+	CanFilter::setIdentifierFilter(4, CanFilter::FIFO1,
+			CanFilter::StandardIdentifier(0x111),
+			CanFilter::ExtendedIdentifier(0x11111111));
 	
-	Can1::setSmallMaskFilter(5, Can1::FIFO1,
-			Can1::standardSmallFilter(0x202, Can1::STANDARD, Can1::NO_RTR),
-			Can1::standardSmallFilter(0x30f, Can1::STANDARD, Can1::NO_RTR),
-			Can1::extendedSmallFilter(0x12000000, Can1::EXTENDED, Can1::NO_RTR),
-			Can1::extendedSmallFilter(0x1f000000, Can1::EXTENDED, Can1::RTR));
-	Can1::setSmallIdentifierFilter(6, Can1::FIFO1,
-			Can1::standardSmallFilter(0x112, Can1::STANDARD, Can1::NO_RTR),
-			Can1::standardSmallFilter(0x113, Can1::STANDARD, Can1::NO_RTR),
-			Can1::standardSmallFilter(0x114, Can1::EXTENDED, Can1::NO_RTR),
-			Can1::extendedSmallFilter(0x11500000, Can1::EXTENDED, Can1::NO_RTR));
+	CanFilter::setFilterShort(5, CanFilter::FIFO1,
+			CanFilter::StandardIdentifierShort(0x202),
+			CanFilter::StandardFilterMaskShort(0x30f, CanFilter::RTR_DONT_CARE),
+			CanFilter::ExtendedIdentifierShort(0x12000000),
+			CanFilter::ExtendedFilterMaskShort(0x1f000000));
+	CanFilter::setIdentifierFilterShort(6, CanFilter::FIFO1,
+			CanFilter::StandardIdentifierShort(0x112),
+			CanFilter::StandardIdentifierShort(0x113),
+			CanFilter::StandardIdentifierShort(0x114, CanFilter::RTR),
+			CanFilter::ExtendedIdentifierShort(0x11500000));
 	
 	// Send a 11-bit message
 	xpcc::can::Message msg1(1, 0);
@@ -126,7 +128,7 @@ MAIN_FUNCTION
 	Can1::sendMessage(msg1);
 	
 	// Send a batch of 16 29-bit messages. Without setting
-	// STM32_CAN_TX_BUFFER_SIZE to at least 13 this operation will fail because
+	// STM32_CAN1_TX_BUFFER_SIZE to at least 13 this operation will fail because
 	// the STM32 has only three hardware transmission buffers => Led2 will
 	// be off.
 	xpcc::can::Message msg2(0x12345678, 1);

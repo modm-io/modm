@@ -35,5 +35,6 @@
  */
 
 #include "image/rca_logo_128x64.hpp"
+#include "image/skull_64x64.hpp"
 #include "image/home_16x16.hpp"
 

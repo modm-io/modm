@@ -25,8 +25,11 @@
  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- * $Id$
+ */
+// ----------------------------------------------------------------------------
+/*
+ * WARNING: This file is generated automatically, do not edit!
+ * Please modify the corresponding *.in file instead and rebuild this file. 
  */
 // ----------------------------------------------------------------------------
 
@@ -36,13 +39,14 @@
 #include <xpcc/driver/connectivity/can/message.hpp>
 
 #include "device.h"
+#include "can_filter.hpp"
 
 namespace xpcc
 {
 	namespace stm32
 	{
 		/**
-		 * @brief		Basic Extended CAN
+		 * @brief		Basic Extended CAN1
 		 * 
 		 * The Basic Extended CAN peripheral, named bxCAN, interfaces the CAN
 		 * network. It supports the CAN protocols version 2.0A and B. It has
@@ -60,8 +64,8 @@ namespace xpcc
 		 * <h2>Configuration</h2>
 		 * 
 		 * \code
-		 * STM32_CAN_TX_BUFFER_SIZE
-		 * STM32_CAN_RX_BUFFER_SIZE
+		 * STM32_CAN1_TX_BUFFER_SIZE
+		 * STM32_CAN1_RX_BUFFER_SIZE
 		 * \endcode
 		 * 
 		 * @author		Fabian Greif <fabian.greif@rwth-aachen.de>
@@ -73,8 +77,8 @@ namespace xpcc
 			enum Remap
 			{
 				REMAP_PA11_PA12 = AFIO_MAPR_CAN_REMAP_REMAP1,	///< CANRX mapped to PA11, CANTX mapped to PA12
-				REMAP_PB8_PB9 = AFIO_MAPR_CAN_REMAP_REMAP2,	///< CANRX mapped to PB8, CANTX mapped to PB9
-				REMAP_PD0_PD1 = AFIO_MAPR_CAN_REMAP_REMAP3,	///< CANRX mapped to PD0, CANTX mapped to PD1
+				REMAP_PB8_PB9 = AFIO_MAPR_CAN_REMAP_REMAP2,		///< CANRX mapped to PB8, CANTX mapped to PB9
+				REMAP_PD0_PD1 = AFIO_MAPR_CAN_REMAP_REMAP3,		///< CANRX mapped to PD0, CANTX mapped to PD1
 			};
 			
 			/**
@@ -107,98 +111,6 @@ namespace xpcc
 			static void
 			setMode(can::Mode mode);
 			
-		public:
-			enum Fifo
-			{
-				// FIFO assignment
-				FIFO0 = 0x0,		///< Message will be stored in Fifo 0
-				FIFO1 = 0x1,		///< Message will be stored in Fifo 1
-			};
-			
-			static const bool RTR = true;
-			static const bool NO_RTR = false;
-			
-			static const bool EXTENDED = true;
-			static const bool STANDARD = false;
-			
-			static inline uint32_t
-			extendedFilter(uint32_t identifier, bool ide, bool rtr)
-			{
-				return (identifier << 3) | ((ide) ? 0x4 : 0) | ((rtr) ? 0x2 : 0);
-			}
-			
-			static inline uint32_t
-			standardFilter(uint16_t identifier, bool ide, bool rtr)
-			{
-				return (identifier << 21) | ((ide) ? 0x4 : 0) | ((rtr) ? 0x2 : 0);
-			}
-			
-			/**
-			 * Generate a identifier for the Dual Filter mode from an extended
-			 * (29-bit) identifier.
-			 * 
-			 * Uses only the upper 14-bit of the 29-bit identifier!
-			 */
-			static inline uint16_t
-			extendedSmallFilter(uint32_t identifier, bool ide, bool rtr)
-			{
-				uint32_t tmp;
-				tmp  = (identifier >> 13) & 0xffe0;
-				tmp |= (identifier >> 15) & 0x007f;
-				return tmp | ((ide) ? 0x08 : 0) | ((rtr) ? 0x10 : 0);
-			}
-			
-			/**
-			 * Generate a identifier for the Dual Filter mode from a standard
-			 * (11-bit) identifier.
-			 */
-			static inline uint16_t
-			standardSmallFilter(uint16_t identifier, bool ide, bool rtr)
-			{
-				uint32_t tmp;
-				tmp  = (identifier << 5) & 0xffe0;
-				return tmp | ((ide) ? 0x08 : 0) | ((rtr) ? 0x10 : 0);
-			}
-			
-			/**
-			 * TODO
-			 * 
-			 * @param	bank	Number of the filter bank
-			 * @param	fifo	FIFO assignment (message will be stored in Fifo 0 or Fifo 1)
-			 */
-			static void
-			setMaskFilter(uint8_t bank, Fifo fifo, uint32_t id, uint32_t mask);
-			
-			/// TODO
-			static void
-			setIdentifierFilter(uint8_t bank, Fifo fifo, uint32_t id, uint32_t id2);
-			
-			/// TODO
-			static void
-			setSmallMaskFilter(uint8_t bank, Fifo fifo,
-					uint16_t id1, uint16_t mask1,
-					uint16_t id2, uint16_t mask2);
-			
-			/// TODO
-			static void
-			setSmallIdentifierFilter(uint8_t bank, Fifo fifo,
-					uint16_t id1, uint16_t id2,
-					uint16_t id3, uint16_t id4);
-			
-			/// TODO
-			static void
-			disableFilter(uint8_t bank);
-			
-			/**
-			 * TODO
-			 * 
-			 * Only available on connectivity line devices.
-			 * 
-			 * @param	startBank	The start bank for the CAN2 interface (Slave)
-			 * 						in the range 1 to 27.
-			 */
-			static void
-			setCan2StartBank(uint8_t startBank);
 		public:
 			static bool
 			isMessageAvailable();

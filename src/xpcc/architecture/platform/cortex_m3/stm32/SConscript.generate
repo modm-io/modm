@@ -66,4 +66,9 @@ for id in [6, 7]:
 #for id in [10, 11, 13, 14]:
 #	generator.template('timer_%i.hpp' % id, 'general_purpose_1.hpp.in', { 'id': id })
 #	generator.template('timer_%i.cpp' % id, 'general_purpose_1.cpp.in', { 'id': id })
+
+generator = env['TemplateGenerator'](env, '.')
+for id in [1, 2]:
+	generator.template('can_%i.hpp' % id, 'can.hpp.in', { 'id': id })
+	generator.template('can_%i.cpp' % id, 'can.cpp.in', { 'id': id })
 	
