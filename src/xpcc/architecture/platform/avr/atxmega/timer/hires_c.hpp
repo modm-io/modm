@@ -41,6 +41,11 @@
 
 #if defined(HIRESC) || defined(__DOXYGEN__)
 
+// older versions of avr-libc provide false register names
+#ifndef HIRESC_CTRLA
+#	define HIRESC_CTRLA		HIRESC_CTRL
+#endif
+
 namespace xpcc
 {
 	namespace atxmega
@@ -62,7 +67,7 @@ namespace xpcc
 			inline static void
 			setHIRESEnable(HIRES_HREN_t enable)
 			{
-				HIRESC_CTRL = enable;
+				HIRESC_CTRLA = enable;
 			}
 		};
 	}

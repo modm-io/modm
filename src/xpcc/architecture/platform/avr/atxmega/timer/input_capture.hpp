@@ -39,6 +39,11 @@
 
 #include "timer.hpp"
 
+// older versions of avr-libc provide false register names
+#ifndef TC_EVACT_FRQ_gc
+#	define TC_EVACT_FRQ_gc		TC_EVACT_FRW_gc
+#endif
+
 namespace xpcc
 {
 	namespace atxmega
@@ -48,7 +53,7 @@ namespace xpcc
 			enum Mode
 			{
 				NORMAL = TC_EVACT_CAPT_gc,
-				FREQUENCY = TC_EVACT_FRW_gc,
+				FREQUENCY = TC_EVACT_FRQ_gc,
 				PULSEWIDTH = TC_EVACT_PW_gc
 			};
 		}
