@@ -38,7 +38,7 @@
 #if defined (STM32F10X_HD) || defined (STM32F10X_XL) 
 {% endif %}
 
-#if defined(STM32F10X_XL)
+#if defined(STM32F10X_XL) || defined(STM32F2XX) || defined(STM32F4XX)
 #	define TIM1_BRK_IRQn		TIM1_BRK_TIM9_IRQn
 #	define TIM1_UP_IRQn			TIM1_UP_TIM10_IRQn
 #	define TIM1_TRG_COM_IRQn	TIM1_TRG_COM_TIM11_IRQn

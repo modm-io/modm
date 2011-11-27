@@ -142,7 +142,7 @@ main(void)
 	Led2::setOutput(xpcc::gpio::LOW);
 	
 	// The Button has an external Pull-Down resistor
-	ButtonWakeUp::setInput(xpcc::stm32::INPUT, xpcc::stm32::FLOATING);
+	ButtonWakeUp::setInput(xpcc::stm32::FLOATING);
 	
 	display.initialize();
 	display.setFont(xpcc::font::FixedWidth5x8);

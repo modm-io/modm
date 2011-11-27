@@ -38,6 +38,7 @@
 
 #include <stdint.h>
 #include "uart_base.hpp"
+#include "../device.h"
 
 namespace xpcc
 {
@@ -58,6 +59,25 @@ namespace xpcc
 			{
 				setBaudrate(baudrate);
 			}
+			
+			enum Mapping
+			{
+#if defined(STM32F2XX) || defined(STM32F4XX)
+				REMAP_PB10_PB11,	///< TX/PB10, RX/PB11, CK/PB12, CTS/PB13, RTS/PB14
+				REMAP_PC10_PC11,	///< TX/PC10, RX/PC11, CK/PC12, CTS/PB13, RTS/PB14
+				REMAP_PD8_PD9,		///< TX/PD8, RX/PD9, CK/PD10, CTS/PD11, RTS/PD12
+#else
+				REMAP_PB10_PB11 = AFIO_MAPR_USART3_REMAP_NOREMAP,		///< TX/PB10, RX/PB11, CK/PB12, CTS/PB13, RTS/PB14
+				REMAP_PC10_PC11 = AFIO_MAPR_USART3_REMAP_PARTIALREMAP,	///< TX/PC10, RX/PC11, CK/PC12, CTS/PB13, RTS/PB14
+				REMAP_PD8_PD9 = AFIO_MAPR_USART3_REMAP_FULLREMAP,		///< TX/PD8, RX/PD9, CK/PD10, CTS/PD11, RTS/PD12
+#endif
+			};
+			
+			/**
+			 * Configure the IO Pins for I2C3
+			 */
+			static void
+			configurePins(Mapping mapping);
 			
 			/**
 			 * \brief	Set baudrate

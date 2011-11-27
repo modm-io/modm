@@ -108,13 +108,16 @@ def generate(env, **kw):
 		env['THUMB'] = '-mthumb'
 	
 	# Cortex-M3/0 suppports only the Thumb-2 instruction set 
-	if env['ARM_ARCH'] in ['cortex-m0', 'cortex-m3']:
+	if env['ARM_ARCH'].startswith('cortex-m'):
 		env['THUMB'] = '-mthumb'
 		env['THUMB_ASSEMBLER'] = '-mthumb'
 		# Important to let the linker choose thumb implementations of
 		# predefined functions from the standard libraries.
 		# (for example __libc_init_array())
 		env['THUMB_LINKER'] = '-mthumb'
+	
+	if env['ARM_ARCH'] is 'cortex-m4':
+		env['FPU'] = '-mfloat-abi=softfp -mfpu=fpv4-sp-d16'
 	
 	# C flags
 	env['CFLAGS'] = [
@@ -128,6 +131,7 @@ def generate(env, **kw):
 	env['CCFLAGS'] = [
 		"-mcpu=$ARM_ARCH",
 		"$THUMB",			# use THUMB='-mthumb' to compile as thumb code (default for AT91SAM)
+		"$FPU",
 		"-mthumb-interwork",
 		"-Os",
 		"-gdwarf-2",

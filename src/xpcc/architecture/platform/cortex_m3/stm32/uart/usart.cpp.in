@@ -33,49 +33,153 @@
 #include "../device.h"
 
 #include "usart_{{ id }}.hpp"
-
+{% if id == 6 %}
+#if defined(STM32F2XX) || defined(STM32F4XX)
+{% endif %}
 namespace
 {
 	{% if id == 1 -%}
-	GPIO__OUTPUT(Txd, A, 9);		// Remap B6
-	GPIO__INPUT(Rxd, A, 10);		// Remap B7
+	GPIO__OUTPUT(TxdA9, A, 9);
+	GPIO__INPUT(RxdA10, A, 10);
 	
-	static const uint32_t nvicId = 37;
-	static const uint32_t apbId = 14;
+	GPIO__OUTPUT(TxdB6, B, 6);
+	GPIO__INPUT(RxdB7, B, 7);
+	
 	static const uint32_t apbClk = 72000000;	// APB2
 	{%- elif id == 2 -%}
-	GPIO__OUTPUT(Txd, A, 2);		// Remap D5
-	GPIO__INPUT(Rxd, A, 3);			// Remap D6
+	GPIO__OUTPUT(TxdA2, A, 2);
+	GPIO__INPUT(RxdA3, A, 3);
 	
-	static const uint32_t nvicId = 38;
-	static const uint32_t apbId = 17;
+	GPIO__OUTPUT(TxdD5, D, 5);
+	GPIO__INPUT(RxdD6, D, 6);
+	
 	static const uint32_t apbClk = 36000000;	// APB1
 	{%- elif id == 3 -%}
-	GPIO__OUTPUT(Txd, B, 10);		// Remap D8, C10
-	GPIO__INPUT(Rxd, B, 11);		// Remap D9, C11
+	GPIO__OUTPUT(TxdB10, B, 10);
+	GPIO__INPUT(RxdB11, B, 11);
 	
-	static const uint32_t nvicId = 39;
-	static const uint32_t apbId = 18;
+	GPIO__OUTPUT(TxdD8, D, 8);
+	GPIO__INPUT(RxdD9, D, 9);
+	
+	GPIO__OUTPUT(TxdC10, C, 10);
+	GPIO__INPUT(RxdC11, C, 11);
+	
 	static const uint32_t apbClk = 36000000;	// APB1
+	{%- elif id == 6 -%}
+	GPIO__OUTPUT(TxdC6, C, 6);
+	GPIO__INPUT(RxdC7, C, 7);
+	
+	GPIO__OUTPUT(TxdG14, G, 14);
+	GPIO__INPUT(RxdG9, G, 9);
+	
+	static const uint32_t apbClk = 72000000;	// APB2
 	{%- endif %}
+}
+
+// ----------------------------------------------------------------------------
+void
+xpcc::stm32::Usart{{ id }}::configurePins(Mapping mapping)
+{
+	// Enable clock
+	{% if id == 1 or id == 6 -%}
+	RCC->APB2ENR |= RCC_APB2ENR_USART{{ id }}EN;
+	{%- elif id == 2 or id == 3 -%}
+	RCC->APB1ENR |= RCC_APB1ENR_USART{{ id }}EN;
+	{%- endif %}
+	
+	// Initialize IO pins
+#if defined(STM32F2XX) || defined(STM32F4XX)
+	{% if id == 1 -%}
+	if (mapping == REMAP_PA9_PA10) {
+		TxdA9::setAlternateFunction(AF_USART1, xpcc::stm32::PUSH_PULL);
+		RxdA10::setAlternateFunction(AF_USART1);
+	}
+	else {
+		TxdB6::setAlternateFunction(AF_USART1, xpcc::stm32::PUSH_PULL);
+		RxdB7::setAlternateFunction(AF_USART1);
+	}
+	{%- elif id == 2 -%}
+	if (mapping == REMAP_PA2_PA3) {
+		TxdA2::setAlternateFunction(AF_USART2, xpcc::stm32::PUSH_PULL);
+		RxdA3::setAlternateFunction(AF_USART2);
+	}
+	else {
+		TxdD5::setAlternateFunction(AF_USART2, xpcc::stm32::PUSH_PULL);
+		RxdD6::setAlternateFunction(AF_USART2);
+	}
+	{%- elif id == 3 -%}
+	if (mapping == REMAP_PB10_PB11) {
+		TxdB10::setAlternateFunction(AF_USART3, xpcc::stm32::PUSH_PULL);
+		RxdB11::setAlternateFunction(AF_USART3);
+	}
+	else if (mapping == REMAP_PC10_PC11) {
+		TxdC10::setAlternateFunction(AF_USART3, xpcc::stm32::PUSH_PULL);
+		RxdC11::setAlternateFunction(AF_USART3);
+	}
+	else {
+		TxdD8::setAlternateFunction(AF_USART3, xpcc::stm32::PUSH_PULL);
+		RxdD9::setAlternateFunction(AF_USART3);
+	}
+	{%- elif id == 6 -%}
+	if (mapping == REMAP_PC6_PC7) {
+		TxdC6::setAlternateFunction(AF_USART6, xpcc::stm32::PUSH_PULL);
+		RxdC7::setAlternateFunction(AF_USART6);
+	}
+	else {
+		TxdG14::setAlternateFunction(AF_USART6, xpcc::stm32::PUSH_PULL);
+		RxdG9::setAlternateFunction(AF_USART6);
+	}
+	{%- endif %}
+#else
+	AFIO->MAPR = (AFIO->MAPR & ~AFIO_MAPR_USART{{ id }}_REMAP) | mapping;
+	{% if id == 1 -%}
+	if (mapping == REMAP_PA9_PA10) {
+		TxdA9::setAlternateFunction(xpcc::stm32::PUSH_PULL);
+		RxdA10::setInput();
+	}
+	else {
+		TxdB6::setAlternateFunction(xpcc::stm32::PUSH_PULL);
+		RxdB7::setInput();
+	}
+	{%- elif id == 2 -%}
+	if (mapping == REMAP_PA2_PA3) {
+		TxdA2::setAlternateFunction(xpcc::stm32::PUSH_PULL);
+		RxdA3::setInput();
+	}
+	else {
+		TxdD5::setAlternateFunction(xpcc::stm32::PUSH_PULL);
+		RxdD6::setInput();
+	}
+	{%- elif id == 3 -%}
+	if (mapping == REMAP_PB10_PB11) {
+		TxdB10::setAlternateFunction(xpcc::stm32::PUSH_PULL);
+		RxdB11::setInput();
+	}
+	else if (mapping == REMAP_PC10_PC11) {
+		TxdC10::setAlternateFunction(xpcc::stm32::PUSH_PULL);
+		RxdC11::setInput();
+	}
+	else {
+		TxdD8::setAlternateFunction(xpcc::stm32::PUSH_PULL);
+		RxdD9::setInput();
+	}
+	{%- endif %}
+#endif
 }
 
 // ----------------------------------------------------------------------------
 void
 xpcc::stm32::Usart{{ id }}::setBaudrate(uint32_t baudrate)
 {
-	Txd::setOutput(xpcc::stm32::ALTERNATE, xpcc::stm32::PUSH_PULL);
-	Rxd::setInput(xpcc::stm32::INPUT, xpcc::stm32::FLOATING);
-	
-	// enable clock
-	{% if id == 1 -%}
-	RCC->APB2ENR |= (1 << apbId);
+	// Enable clock
+	{% if id == 1 or id == 6 -%}
+	RCC->APB2ENR |= RCC_APB2ENR_USART{{ id }}EN;
 	{%- elif id == 2 or id == 3 -%}
-	RCC->APB1ENR |= (1 << apbId);
+	RCC->APB1ENR |= RCC_APB1ENR_USART{{ id }}EN;
 	{%- endif %}
 	
-	// enable USART in the interrupt controller
-	NVIC->ISER[nvicId / 32] = 1 << (nvicId % 32);
+	// Enable USART in the interrupt controller
+	//NVIC->ISER[nvicId / 32] = 1 << (USART{{ id }}_IRQn & 0x1F);
 	
 	// set baudrate
 	USART{{ id }}->BRR = calculateBaudrateSettings(apbClk, baudrate);
@@ -135,4 +239,8 @@ xpcc::stm32::Usart{{ id }}::read(char *buffer, uint8_t n)
 	
 	return n;
 }
+{% if id == 6 %}
+#endif
+{% endif %}
+
 

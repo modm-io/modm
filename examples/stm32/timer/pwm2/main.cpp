@@ -9,8 +9,8 @@ GPIO__OUTPUT(Led2, A, 8);
 
 MAIN_FUNCTION
 {
-	Led1::setOutput(xpcc::stm32::ALTERNATE, xpcc::stm32::PUSH_PULL);
-	Led2::setOutput(xpcc::stm32::ALTERNATE, xpcc::stm32::PUSH_PULL);
+	Led1::setAlternateFunction(xpcc::stm32::PUSH_PULL);
+	Led2::setAlternateFunction(xpcc::stm32::PUSH_PULL);
 	
 	// Set up Timer 2 (for LED1 connected to PA1)
 	Timer2::enable();

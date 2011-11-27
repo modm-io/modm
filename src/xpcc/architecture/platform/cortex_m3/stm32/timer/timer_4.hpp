@@ -66,6 +66,9 @@ namespace xpcc
 		class Timer4 : public GeneralPurposeTimer
 		{
 		public:
+#if defined(STM32F2XX) || defined(STM32F4XX)
+
+#else
 			enum Remap
 			{
 				NO_REMAP = 0,							///< (default)
@@ -84,7 +87,8 @@ namespace xpcc
 			{
 				AFIO->MAPR = (AFIO->MAPR & ~remapMask) | mapping;
 			}
-			
+#endif
+						
 		public:
 			static void
 			enable();

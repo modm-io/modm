@@ -60,6 +60,17 @@ namespace xpcc
 				setBaudrate(baudrate);
 			}
 			
+			enum Mapping
+			{
+				REMAP_PC12_PD2,		///< TX mapped to PC12, RX mapped to PD2
+			};
+			
+			/**
+			 * Configure the IO Pins for I2C5
+			 */
+			static void
+			configurePins(Mapping mapping);
+			
 			/**
 			 * \brief	Set baudrate
 			 * \param	baudrate	desired baud rate

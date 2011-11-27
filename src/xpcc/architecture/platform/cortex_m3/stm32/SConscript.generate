@@ -38,12 +38,12 @@ for id in [1, 2, 3]:
 	generator.template('spi_%i.cpp' % id, 'spi.cpp.in', { 'id': id })
 
 generator = env['TemplateGenerator'](env, 'i2c')
-for id in [1, 2]:
+for id in [1, 2, 3]:
 	generator.template('i2c_%i.hpp' % id, 'i2c.hpp.in', { 'id': id })
 	generator.template('i2c_%i.cpp' % id, 'i2c.cpp.in', { 'id': id })
 
 generator = env['TemplateGenerator'](env, 'uart')
-for id in [1, 2, 3]:
+for id in [1, 2, 3, 6]:
 	generator.template('usart_%i.hpp' % id, 'usart.hpp.in', { 'id': id })
 	generator.template('usart_%i.cpp' % id, 'usart.cpp.in', { 'id': id })
 for id in [4, 5]:
@@ -67,7 +67,7 @@ for id in [6, 7]:
 #	generator.template('timer_%i.hpp' % id, 'general_purpose_1.hpp.in', { 'id': id })
 #	generator.template('timer_%i.cpp' % id, 'general_purpose_1.cpp.in', { 'id': id })
 
-generator = env['TemplateGenerator'](env, '.')
+generator = env['TemplateGenerator'](env, 'can')
 for id in [1, 2]:
 	generator.template('can_%i.hpp' % id, 'can.hpp.in', { 'id': id })
 	generator.template('can_%i.cpp' % id, 'can.cpp.in', { 'id': id })

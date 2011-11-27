@@ -40,26 +40,54 @@
 
 namespace
 {
-	GPIO__OUTPUT(Txd, A, 9);		// Remap B6
-	GPIO__INPUT(Rxd, A, 10);		// Remap B7
+	GPIO__OUTPUT(TxdA9, A, 9);
+	GPIO__INPUT(RxdA10, A, 10);
 	
-	static const uint32_t nvicId = 37;
-	static const uint32_t apbId = 14;
+	GPIO__OUTPUT(TxdB6, B, 6);
+	GPIO__INPUT(RxdB7, B, 7);
+	
 	static const uint32_t apbClk = 72000000;	// APB2
+}
+
+// ----------------------------------------------------------------------------
+void
+xpcc::stm32::Usart1::configurePins(Mapping mapping)
+{
+	// Enable clock
+	RCC->APB2ENR |= RCC_APB2ENR_USART1EN;
+	
+	// Initialize IO pins
+#if defined(STM32F2XX) || defined(STM32F4XX)
+	if (mapping == REMAP_PA9_PA10) {
+		TxdA9::setAlternateFunction(AF_USART1, xpcc::stm32::PUSH_PULL);
+		RxdA10::setAlternateFunction(AF_USART1);
+	}
+	else {
+		TxdB6::setAlternateFunction(AF_USART1, xpcc::stm32::PUSH_PULL);
+		RxdB7::setAlternateFunction(AF_USART1);
+	}
+#else
+	AFIO->MAPR = (AFIO->MAPR & ~AFIO_MAPR_USART1_REMAP) | mapping;
+	if (mapping == REMAP_PA9_PA10) {
+		TxdA9::setAlternateFunction(xpcc::stm32::PUSH_PULL);
+		RxdA10::setInput();
+	}
+	else {
+		TxdB6::setAlternateFunction(xpcc::stm32::PUSH_PULL);
+		RxdB7::setInput();
+	}
+#endif
 }
 
 // ----------------------------------------------------------------------------
 void
 xpcc::stm32::Usart1::setBaudrate(uint32_t baudrate)
 {
-	Txd::setOutput(xpcc::stm32::ALTERNATE, xpcc::stm32::PUSH_PULL);
-	Rxd::setInput(xpcc::stm32::INPUT, xpcc::stm32::FLOATING);
+	// Enable clock
+	RCC->APB2ENR |= RCC_APB2ENR_USART1EN;
 	
-	// enable clock
-	RCC->APB2ENR |= (1 << apbId);
-	
-	// enable USART in the interrupt controller
-	NVIC->ISER[nvicId / 32] = 1 << (nvicId % 32);
+	// Enable USART in the interrupt controller
+	//NVIC->ISER[nvicId / 32] = 1 << (USART1_IRQn & 0x1F);
 	
 	// set baudrate
 	USART1->BRR = calculateBaudrateSettings(apbClk, baudrate);
@@ -119,3 +147,5 @@ xpcc::stm32::Usart1::read(char *buffer, uint8_t n)
 	
 	return n;
 }
+
+

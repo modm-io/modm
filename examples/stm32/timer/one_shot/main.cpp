@@ -19,7 +19,7 @@ MAIN_FUNCTION
 	LedStat::setOutput(xpcc::gpio::HIGH);
 	
 	// The Button has an external Pull-Down resistor
-	ButtonWakeUp::setInput(xpcc::stm32::INPUT, xpcc::stm32::FLOATING);
+	ButtonWakeUp::setInput(xpcc::stm32::FLOATING);
 
 	Timer3::enable();
 	Timer3::setMode(Timer3::ONE_SHOT_UP_COUNTER);

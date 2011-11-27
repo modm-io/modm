@@ -50,11 +50,15 @@ namespace
 void
 xpcc::stm32::Spi1::initialize(Mode mode, Prescaler prescaler)
 {
-	Cs::setOutput(xpcc::stm32::ALTERNATE, xpcc::stm32::PUSH_PULL);
+#if defined(STM32F2XX) || defined(STM32F4XX)
+
+#else
+	Cs::setAlternateFunction(xpcc::stm32::PUSH_PULL);
 	Cs::set();
-	Sck::setOutput(xpcc::stm32::ALTERNATE, xpcc::stm32::PUSH_PULL);
-	Miso::setInput(xpcc::stm32::INPUT, xpcc::stm32::FLOATING);
-	Mosi::setOutput(xpcc::stm32::ALTERNATE, xpcc::stm32::PUSH_PULL);
+	Sck::setAlternateFunction(xpcc::stm32::PUSH_PULL);
+	Miso::setInput(xpcc::stm32::FLOATING);
+	Mosi::setAlternateFunction(xpcc::stm32::PUSH_PULL);
+#endif
 	
 	RCC->APB2ENR |= (1 << apbId);
 	RCC->APB2RSTR |= (1 << apbId);

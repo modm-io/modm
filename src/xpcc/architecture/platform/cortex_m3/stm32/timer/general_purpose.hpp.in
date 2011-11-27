@@ -62,6 +62,9 @@ namespace xpcc
 		class Timer{{ id }} : public GeneralPurposeTimer
 		{
 		public:
+#if defined(STM32F2XX) || defined(STM32F4XX)
+
+#else
 			{% if id == 2 -%}
 			enum Remap
 			{
@@ -106,7 +109,8 @@ namespace xpcc
 			{
 				AFIO->MAPR = (AFIO->MAPR & ~remapMask) | mapping;
 			}
-			
+#endif
+						
 		public:
 			static void
 			enable();

@@ -54,7 +54,22 @@ namespace xpcc
 		class I2c2 : ::xpcc::i2c::Master
 		{
 		public:
+			enum Mapping
+			{
+#if defined(STM32F2XX) || defined(STM32F4XX)
+				REMAP_PB10_PB11,	///< SCL mapped to PB10, SDA mapped to PB11
+				REMAP_PF1_PF0,		///< SCL mapped to PF1, SDA mapped to PF0
+				REMAP_PH4_PH5,		///< SCL mapped to PH4, SDA mapped to PH5
+#else
+				REMAP_PB10_PB11,						///< SCL mapped to PB10, SDA mapped to PB11
+#endif
+			};
 			
+			/**
+			 * Configure the IO Pins for I2C2
+			 */
+			static void
+			configurePins(Mapping mapping);
 			
 			/**
 			 * @brief	Initialize I2C module

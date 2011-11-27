@@ -41,8 +41,16 @@
 
 namespace
 {
-	GPIO__IO(Scl, B, 10);
-	GPIO__IO(Sda, B, 11);
+	GPIO__IO(SclB10, B, 10);
+	GPIO__IO(SdaB11, B, 11);
+	
+#if defined(STM32F2XX) || defined(STM32F4XX)
+	GPIO__IO(SclF1, F, 1);
+	GPIO__IO(SdaF0, F, 0);
+	
+	GPIO__IO(SclH4, H, 4);
+	GPIO__IO(SdaH5, H, 5);
+#endif
 }
 
 // buffer management
@@ -71,12 +79,12 @@ I2C2_EV_IRQHandler(void)
 	{
 		if (!startConditionGeneratedWaitingForAddress)
 		{
-			// disable interrupts and wait until address and next operation is available
-			// while hold a restart must be performed (interface advice), where busState will change to standby
-			// while write we are here due to restart, so  bus state has to be changed to standby here
+			// Disable interrupts and wait until address and next operation is available
+			// While hold a restart must be performed (interface advice), where busState will change to standby
+			// While write we are here due to restart, so  bus state has to be changed to standby here
 			startConditionGeneratedWaitingForAddress = true;
 			I2C2->CR2 &= ~(I2C_CR2_ITEVTEN | I2C_CR2_ITBUFEN | I2C_CR2_ITERREN);
-			if(busState != xpcc::i2c::BUS_HOLD) {
+			if (busState != xpcc::i2c::BUS_HOLD) {
 				busState = xpcc::i2c::BUS_STANDBY;
 			}
 			busyState = xpcc::i2c::OCCUPIED;
@@ -123,7 +131,7 @@ I2C2_EV_IRQHandler(void)
 			}
 			else
 			{
-				// new data available due to repeated write or interrupt underflow happened
+				// New data available due to repeated write or interrupt underflow happened
 				--bytes_left;
 				I2C2->DR = *(writePointer++); // write data
 				if (bytes_left==0){
@@ -131,7 +139,7 @@ I2C2_EV_IRQHandler(void)
 				}
 			}
 		}
-		else { //ev8 and ev8_1 transmit is empty
+		else { // ev8 and ev8_1 transmit is empty
 			--bytes_left;
 			I2C2->DR = *(writePointer++); // write data
 			if (bytes_left==0) {
@@ -192,25 +200,52 @@ I2C2_ER_IRQHandler(void)
 		busState = xpcc::i2c::BUS_RESET;
 	}
 
-	// overrun error not handled
+	// Overrun error not handled
 	
-	// clear flags
+	// Clear flags
 	I2C2->SR1 = 0;
 	
-	// clear interrupts
+	// Clear interrupts
 	I2C2->CR2 &= ~(I2C_CR2_ITEVTEN | I2C_CR2_ITBUFEN | I2C_CR2_ITERREN);
 	waitForStartConditionAfterWriteFollowedByRestart = false;
 }
 
 // ----------------------------------------------------------------------------
 void
+xpcc::stm32::I2c2::configurePins(Mapping mapping)
+{
+	// Enable clock
+	RCC->APB1ENR |= RCC_APB1ENR_I2C2EN;
+	
+	// Initialize IO pins
+#if defined(STM32F2XX) || defined(STM32F4XX)
+	if (mapping == REMAP_PB10_PB11) {
+		SclB10::setAlternateFunction(AF_I2C2, xpcc::stm32::OPEN_DRAIN);
+		SdaB11::setAlternateFunction(AF_I2C2, xpcc::stm32::OPEN_DRAIN);
+	}
+	if (mapping == REMAP_PF1_PF0) {
+		SclF1::setAlternateFunction(AF_I2C2, xpcc::stm32::OPEN_DRAIN);
+		SdaF0::setAlternateFunction(AF_I2C2, xpcc::stm32::OPEN_DRAIN);
+	}
+	else {
+		SclH4::setAlternateFunction(AF_I2C2, xpcc::stm32::OPEN_DRAIN);
+		SdaH5::setAlternateFunction(AF_I2C2, xpcc::stm32::OPEN_DRAIN);
+	}
+#else
+	(void) mapping;		// avoid compiler warning
+	
+	SclB10::setAlternateFunction(xpcc::stm32::OPEN_DRAIN);
+	SdaB11::setAlternateFunction(xpcc::stm32::OPEN_DRAIN);
+#endif
+}
+
+// ----------------------------------------------------------------------------
+void
 xpcc::stm32::I2c2::initialize()
 {
+	// Enable clock
 	RCC->APB1ENR |= RCC_APB1ENR_I2C2EN;
-
-	Scl::setOutput(xpcc::stm32::ALTERNATE, xpcc::stm32::OPEN_DRAIN);
-	Sda::setOutput(xpcc::stm32::ALTERNATE, xpcc::stm32::OPEN_DRAIN);
-
+	
 	I2C2->CR1 = I2C_CR1_SWRST; 		// reset module
 	I2C2->CR1 = 0;
 
@@ -221,7 +256,7 @@ xpcc::stm32::I2c2::initialize()
 	I2C2->CR2 = 36;		// not enable interrupts, 36 MHz is maximum
 //	I2C2->TRISE = // rise time
 
-	I2C2->CR1 |= I2C_CR1_PE; // enable peripheral
+	I2C2->CR1 |= I2C_CR1_PE; // Enable peripheral
 }
 
 // ----------------------------------------------------------------------------
@@ -233,14 +268,14 @@ xpcc::stm32::I2c2::start(uint8_t slaveAddress)
 		busyState = xpcc::i2c::BUSY;
 		address = slaveAddress;
 
-		// don't write anything but clear the flag if it is set
+		// Don't write anything but clear the flag if it is set
 		if (I2C2->SR1 & I2C_SR1_SB){
 			I2C2->DR = 0xff;
 		}
 
 		I2C2->CR1 |= I2C_CR1_START; // generate a start condition
 		
-		// for interrupt activation in case they are off
+		// For interrupt activation in case they are off
 		waitForStartConditionAfterWriteFollowedByRestart = 
 				!(I2C2->CR2 & (I2C_CR2_ITEVTEN | I2C_CR2_ITBUFEN | I2C_CR2_ITERREN));
 		
@@ -258,7 +293,7 @@ xpcc::stm32::I2c2::restart(uint8_t slaveAddress)
 	
 	I2C2->CR1 |= I2C_CR1_START; // generate a start condition
 	
-	// for interrupt activation in case they are off
+	// For interrupt activation in case they are off
 	waitForStartConditionAfterWriteFollowedByRestart = 
 			!(I2C2->CR2 & (I2C_CR2_ITEVTEN | I2C_CR2_ITBUFEN | I2C_CR2_ITERREN));
 }
@@ -276,11 +311,11 @@ xpcc::stm32::I2c2::stop()
 			startConditionGeneratedWaitingForAddress = false;
 		}
 
-		// interrupts may be disabled due to write, but do not enable because
+		// Interrupts may be disabled due to write, but do not enable because
 		// txe and btf are set during stop condition
 	}
 
-	// clear interrupts
+	// Clear interrupts
 	I2C2->CR2 &= ~(I2C_CR2_ITEVTEN | I2C_CR2_ITBUFEN | I2C_CR2_ITERREN);
 
 	busyState = xpcc::i2c::FREE;
@@ -294,9 +329,9 @@ xpcc::stm32::I2c2::read(uint8_t *data, std::size_t size, xpcc::i2c::ReadParamete
 	readPointer = data;
 	bytes_left = size;
 	busyState = xpcc::i2c::BUSY;
-	restartAfterReading = param == xpcc::i2c::READ_RESTART;
+	restartAfterReading = (param == xpcc::i2c::READ_RESTART);
 
-	// enable interrupts again
+	// Enable interrupts again
 	I2C2->CR2 |= I2C_CR2_ITEVTEN | I2C_CR2_ITBUFEN | I2C_CR2_ITERREN;
 }
 
@@ -309,7 +344,7 @@ xpcc::stm32::I2c2::write(const uint8_t *data, std::size_t size)
 	bytes_left = size;
 	busyState = xpcc::i2c::BUSY;
 
-	// enable interrupts again
+	// Enable interrupts again
 	I2C2->CR2 |= I2C_CR2_ITEVTEN | I2C_CR2_ITBUFEN | I2C_CR2_ITERREN;
 }
 
@@ -322,7 +357,7 @@ xpcc::stm32::I2c2::getBusyState()
 	{
 		waitForStartConditionAfterWriteFollowedByRestart = false;
 		
-		// enableinterrupts
+		// Enable interrupts
 		I2C2->CR2 |= I2C_CR2_ITEVTEN | I2C_CR2_ITBUFEN | I2C_CR2_ITERREN;
 	}
 

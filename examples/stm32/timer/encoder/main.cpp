@@ -27,9 +27,9 @@ MAIN_FUNCTION
 {
 	LedStat::setOutput(xpcc::gpio::HIGH);
 	
-	EncoderIndex::setInput(xpcc::stm32::INPUT, xpcc::stm32::PULLUP);
-	EncoderA::setInput(xpcc::stm32::INPUT, xpcc::stm32::PULLUP);
-	EncoderB::setInput(xpcc::stm32::INPUT, xpcc::stm32::PULLUP);
+	EncoderIndex::setInput(xpcc::stm32::PULLUP);
+	EncoderA::setInput(xpcc::stm32::PULLUP);
+	EncoderB::setInput(xpcc::stm32::PULLUP);
 	
 	Timer3::enable();
 	Timer3::remapPins(Timer3::FULL_REMAP);		// remap CH1 to C6 and CH2 to C7

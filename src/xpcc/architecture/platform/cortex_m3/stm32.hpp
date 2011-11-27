@@ -51,8 +51,20 @@
 #include "stm32/device.h"
 
 #include "stm32/core.hpp"
-#include "stm32/can_1.hpp"
 #include "stm32/gpio.hpp"
-#include "stm32/uart.hpp"
-#include "stm32/spi.hpp"
+
+#include "stm32/can/can_1.hpp"
+#include "stm32/can/can_2.hpp"
+#include "stm32/can/can_filter.hpp"
+
+#include "stm32/uart/usart_1.hpp"
+#include "stm32/uart/usart_2.hpp"
+#include "stm32/uart/usart_3.hpp"
+#include "stm32/uart/uart_4.hpp"
+#include "stm32/uart/uart_5.hpp"
+
+#include "stm32/spi/spi_1.hpp"
+#include "stm32/spi/spi_2.hpp"
+#include "stm32/spi/spi_3.hpp"
+
 #include "stm32/timer.hpp"

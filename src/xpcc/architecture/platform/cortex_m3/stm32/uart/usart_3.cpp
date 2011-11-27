@@ -40,26 +40,65 @@
 
 namespace
 {
-	GPIO__OUTPUT(Txd, B, 10);		// Remap D8, C10
-	GPIO__INPUT(Rxd, B, 11);		// Remap D9, C11
+	GPIO__OUTPUT(TxdB10, B, 10);
+	GPIO__INPUT(RxdB11, B, 11);
 	
-	static const uint32_t nvicId = 39;
-	static const uint32_t apbId = 18;
+	GPIO__OUTPUT(TxdD8, D, 8);
+	GPIO__INPUT(RxdD9, D, 9);
+	
+	GPIO__OUTPUT(TxdC10, C, 10);
+	GPIO__INPUT(RxdC11, C, 11);
+	
 	static const uint32_t apbClk = 36000000;	// APB1
+}
+
+// ----------------------------------------------------------------------------
+void
+xpcc::stm32::Usart3::configurePins(Mapping mapping)
+{
+	// Enable clock
+	RCC->APB1ENR |= RCC_APB1ENR_USART3EN;
+	
+	// Initialize IO pins
+#if defined(STM32F2XX) || defined(STM32F4XX)
+	if (mapping == REMAP_PB10_PB11) {
+		TxdB10::setAlternateFunction(AF_USART3, xpcc::stm32::PUSH_PULL);
+		RxdB11::setAlternateFunction(AF_USART3);
+	}
+	else if (mapping == REMAP_PC10_PC11) {
+		TxdC10::setAlternateFunction(AF_USART3, xpcc::stm32::PUSH_PULL);
+		RxdC11::setAlternateFunction(AF_USART3);
+	}
+	else {
+		TxdD8::setAlternateFunction(AF_USART3, xpcc::stm32::PUSH_PULL);
+		RxdD9::setAlternateFunction(AF_USART3);
+	}
+#else
+	AFIO->MAPR = (AFIO->MAPR & ~AFIO_MAPR_USART3_REMAP) | mapping;
+	if (mapping == REMAP_PB10_PB11) {
+		TxdB10::setAlternateFunction(xpcc::stm32::PUSH_PULL);
+		RxdB11::setInput();
+	}
+	else if (mapping == REMAP_PC10_PC11) {
+		TxdC10::setAlternateFunction(xpcc::stm32::PUSH_PULL);
+		RxdC11::setInput();
+	}
+	else {
+		TxdD8::setAlternateFunction(xpcc::stm32::PUSH_PULL);
+		RxdD9::setInput();
+	}
+#endif
 }
 
 // ----------------------------------------------------------------------------
 void
 xpcc::stm32::Usart3::setBaudrate(uint32_t baudrate)
 {
-	Txd::setOutput(xpcc::stm32::ALTERNATE, xpcc::stm32::PUSH_PULL);
-	Rxd::setInput(xpcc::stm32::INPUT, xpcc::stm32::FLOATING);
+	// Enable clock
+	RCC->APB1ENR |= RCC_APB1ENR_USART3EN;
 	
-	// enable clock
-	RCC->APB1ENR |= (1 << apbId);
-	
-	// enable USART in the interrupt controller
-	NVIC->ISER[nvicId / 32] = 1 << (nvicId % 32);
+	// Enable USART in the interrupt controller
+	//NVIC->ISER[nvicId / 32] = 1 << (USART3_IRQn & 0x1F);
 	
 	// set baudrate
 	USART3->BRR = calculateBaudrateSettings(apbClk, baudrate);
@@ -119,3 +158,5 @@ xpcc::stm32::Usart3::read(char *buffer, uint8_t n)
 	
 	return n;
 }
+
+

@@ -54,23 +54,22 @@ namespace xpcc
 		class I2c1 : ::xpcc::i2c::Master
 		{
 		public:
-			enum Remap
+			enum Mapping
 			{
+#if defined(STM32F2XX) || defined(STM32F4XX)
+				REMAP_PB6_PB7,		///< SCL mapped to PB6, SDA mapped to PB7
+				REMAP_PB8_PB9,		///< SCL mapped to PB8, SDA mapped to PB9
+#else
 				REMAP_PB6_PB7 = 0,						///< SCL mapped to PB6, SDA mapped to PB7
 				REMAP_PB8_PB9 = AFIO_MAPR_I2C1_REMAP,	///< SCL mapped to PB8, SDA mapped to PB9
+#endif
 			};
 			
 			/**
-			 * Remap I2C1 to other locations.
-			 * 
-			 * Remap has to be done before calling initialize() otherwise
-			 * the wrong pins are configured.
+			 * Configure the IO Pins for I2C1
 			 */
-			static inline void
-			remapPins(Remap mapping)
-			{
-				AFIO->MAPR = (AFIO->MAPR & ~AFIO_MAPR_I2C1_REMAP) | mapping;
-			}
+			static void
+			configurePins(Mapping mapping);
 			
 			/**
 			 * @brief	Initialize I2C module

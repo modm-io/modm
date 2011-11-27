@@ -79,7 +79,12 @@ namespace xpcc
 		 */
 		class Timer8 : public AdvancedControlTimer
 		{
+#if defined(STM32F2XX) || defined(STM32F4XX)
+		public:
+			
+#else
 		
+#endif
 			
 		public:
 			static void

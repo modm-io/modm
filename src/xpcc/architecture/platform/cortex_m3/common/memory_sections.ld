@@ -11,7 +11,7 @@
  * Example for STM32F103xB:
  * 
  *                          MEMORY MAP (RAM)
- *                |                                 | 0x20000000 <---- __ram_end, __head_end
+ *                |                                 | 0x200xxxxx <---- __ram_end, __head_end
  *                |---------------------------------| 
  *                |                                 | 
  *                |               ^                 | 

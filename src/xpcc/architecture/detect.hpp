@@ -84,6 +84,7 @@
 #define	XPCC__CPU_ARM
 #define	XPCC__CPU_ARM7TDMI
 #define	XPCC__CPU_CORTEX_M3
+#define	XPCC__CPU_CORTEX_M4
 
 #define	XPCC__CPU_HOSTED
 #define	XPCC__CPU_HOSTED_64
@@ -147,15 +148,15 @@
 #if defined __AVR__
 #	define	XPCC__CPU_AVR 1
 #	if defined __AVR_XMEGA__
-#		define XPCC__CPU_ATXMEGA 1
+#		define XPCC__CPU_ATXMEGA	1
 #		define XPCC__CPU_STRING		"Atmel XMEGA"
 #	else
 		// see http://www.nongnu.org/avr-libc/user-manual/using__tools.html
 #		if __AVR_ARCH__ == 2 || __AVR_ARCH__ == 25 || __AVR_ARCH__ == 1
-#			define XPCC__CPU_ATTINY 1
+#			define XPCC__CPU_ATTINY	1
 #			define XPCC__CPU_STRING	"Atmel tinyAVR"
 #		else
-#			define XPCC__CPU_ATMEGA 1
+#			define XPCC__CPU_ATMEGA	1
 #			define XPCC__CPU_STRING	"Atmel megaAVR"
 #		endif
 #	endif
@@ -164,7 +165,7 @@
 #if defined __X86__ || defined __i386__ || defined i386 || defined _M_IX86 || defined __386__ || defined __x86_64__ || defined _M_X64
 #	define XPCC__CPU_HOSTED 1
 #	if defined __x86_64__ || defined _M_X64
-#		define XPCC__CPU_HOSTED_64 1
+#		define XPCC__CPU_HOSTED_64	1
 #		define XPCC__CPU_STRING		"AMD x86-64"
 #	else
 #		define XPCC__CPU_STRING		"Intel 386+"
@@ -174,11 +175,14 @@
 #if defined __arm__
 #	define XPCC__CPU_ARM 1
 #	if defined __ARM_ARCH_4T__
-#		define XPCC__CPU_ARM7TDMI 1
+#		define XPCC__CPU_ARM7TDMI	1
 #		define XPCC__CPU_STRING		"ARM7TDMI"
 #	elif defined __ARM_ARCH_7M__
-#		define XPCC__CPU_CORTEX_M3 1
+#		define XPCC__CPU_CORTEX_M3	1
 #		define XPCC__CPU_STRING		"Cortex M3"
+#	elif defined __ARM_ARCH_7EM__
+#		define XPCC__CPU_CORTEX_M4	1
+#		define XPCC__CPU_STRING		"Cortex M4"
 #	endif
 #endif
 

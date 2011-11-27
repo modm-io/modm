@@ -1,5 +1,5 @@
-Things needed to be done
-========================
+Things which need to be done
+============================
 
 * Replace the architecture 'pc' with 'hosted' in SCons
 * Remove xpcc/debug/logger/imp/std.hpp after the 16.12.2011
@@ -7,6 +7,5 @@ Things needed to be done
 * Implement Timer 9-14 for STM32
 * Rework the description of the Logger!
 * Check GraphicDisplay for remains of a uint8_t coordinates (now int16_t)
-* Rework the STM32 CAN Filter Interface (needs better names)
-* Implement CAN2 (make CAN1 a template)
 * Check UART interface (char vs. uint8_t)
+* Rework FreeRTOS to work with the STM32F4xx (FPU), see https://github.com/thomask77/FreeRTOS_ARM_CM4F

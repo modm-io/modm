@@ -79,6 +79,10 @@ namespace xpcc
 		 */
 		class Timer1 : public AdvancedControlTimer
 		{
+#if defined(STM32F2XX) || defined(STM32F4XX)
+		public:
+			
+#else
 		public:
 			enum Remap
 			{
@@ -99,6 +103,7 @@ namespace xpcc
 			{
 				AFIO->MAPR = (AFIO->MAPR & ~remapMask) | mapping;
 			}
+#endif
 			
 		public:
 			static void

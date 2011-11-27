@@ -60,6 +60,20 @@ namespace xpcc
 				setBaudrate(baudrate);
 			}
 			
+			enum Mapping
+			{
+				REMAP_PC10_PC11,	///< TX mapped to PC10, RX mapped to PC11
+#if defined(STM32F2XX) || defined(STM32F4XX)
+				REMAP_PA0_PA1,		///< TX mapped to PA0, RX mapped to PA1
+#endif
+			};
+			
+			/**
+			 * Configure the IO Pins for I2C4
+			 */
+			static void
+			configurePins(Mapping mapping);
+			
 			/**
 			 * \brief	Set baudrate
 			 * \param	baudrate	desired baud rate

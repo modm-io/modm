@@ -42,8 +42,8 @@
 
 namespace
 {
-	GPIO__OUTPUT(Txd, C, 12);
-	GPIO__INPUT(Rxd, D, 2);
+	GPIO__OUTPUT(TxdC12, C, 12);
+	GPIO__INPUT(RxdD2, D, 2);
 	
 	static const uint32_t nvicId = 53;
 	static const uint32_t apbId = 20;
@@ -51,18 +51,36 @@ namespace
 
 // ----------------------------------------------------------------------------
 void
-xpcc::stm32::Uart5::setBaudrate(uint32_t baudrate)
+xpcc::stm32::Uart5::configurePins(Mapping mapping)
 {
-	Txd::setOutput(xpcc::stm32::ALTERNATE, xpcc::stm32::PUSH_PULL);
-	Rxd::setInput(xpcc::stm32::INPUT, xpcc::stm32::FLOATING);
-	
-	// enable clock
+	// Enable clock
 	RCC->APB1ENR |= (1 << apbId);
 	
-	// enable USART in the interrupt controller
+	// Initialize IO pins
+#if defined(STM32F2XX) || defined(STM32F4XX)
+	(void) mapping;		// avoid compiler warning
+	
+	TxdC12::setAlternateFunction(AF_UART5, xpcc::stm32::PUSH_PULL);
+	RxdD2::setAlternateFunction(AF_UART5);
+#else
+	(void) mapping;		// avoid compiler warning
+	
+	TxdC12::setAlternateFunction(xpcc::stm32::PUSH_PULL);
+	RxdD2::setInput();
+#endif
+}
+
+// ----------------------------------------------------------------------------
+void
+xpcc::stm32::Uart5::setBaudrate(uint32_t baudrate)
+{
+	// Enable clock
+	RCC->APB1ENR |= (1 << apbId);
+	
+	// Enable USART in the interrupt controller
 	NVIC->ISER[nvicId / 32] = 1 << (nvicId % 32);
 	
-	// set baudrate
+	// Set baudrate
 	UART5->BRR = calculateBaudrateSettings(36000000, baudrate);
 	
 	// Transmitter & Receiver-Enable, 8 Data Bits, 1 Stop Bit

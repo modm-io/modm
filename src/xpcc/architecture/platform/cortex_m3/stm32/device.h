@@ -33,6 +33,12 @@
 #ifndef STM32__DEVICE_H
 #define STM32__DEVICE_H
 
-#include <stm32f10x.h>
+#if defined(STM32F2XX)
+#	include <stm32f2xx.h>
+#elif defined(STM32F4XX)
+#	include <stm32f4xx.h>
+#else
+#	include <stm32f10x.h>
+#endif
 
 #endif // STM32__DEVICE_H

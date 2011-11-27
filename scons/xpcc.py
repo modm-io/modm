@@ -219,14 +219,14 @@ def generate(env, **kw):
 				print "Error: unknown platform: '%s' " % msg
 			clock = ''
 		# TODO what is the allowed architecture?
-		elif architecture == 'atmega' or architecture == 'atxmega' or architecture == 'avr':
+		elif architecture in ['atmega', 'atxmega', 'avr']:
 			device = parser.get('build', 'device')
 			clock = parser.get('build', 'clock')
-		elif architecture == 'arm7tdmi' or architecture == 'cortex-m0' or architecture == 'cortex-m3':
+		elif architecture in ['arm7tdmi', 'cortex-m0', 'cortex-m3', 'cortex-m4']:
 			device = parser.get('build', 'device')
 			clock = parser.get('build', 'clock')
 		else:
-			print "Error: unknown architecture: '%s' " % architecture
+			print "xpcc Error: unknown architecture: '%s'!" % architecture
 			Exit(1)
 		
 		projectName = parser.get('general', 'name')
@@ -330,7 +330,7 @@ def generate(env, **kw):
 		env['ENV'] = os.environ
 		
 		env.Tool('pc')
-	elif architecture in ['arm7tdmi', 'cortex-m0', 'cortex-m3']:
+	elif architecture in ['arm7tdmi', 'cortex-m0', 'cortex-m3', 'cortex-m4']:
 		env['ARM_ARCH'] = architecture
 		env['ARM_DEVICE'] = device
 		env['ARM_CLOCK'] = clock
@@ -348,7 +348,7 @@ def generate(env, **kw):
 				print "Error in Configuration: %s" % e
 				Exit(1)
 	else:
-		print "Unknown architecture '%s'!" % architecture
+		print "xpcc Error: Unknown architecture '%s'!" % architecture
 		Exit(1)
 	
 	# append all values from environment section to the real environment

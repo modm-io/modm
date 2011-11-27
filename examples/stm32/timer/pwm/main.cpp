@@ -7,7 +7,7 @@ GPIO__OUTPUT(Led1, A, 1);
 
 MAIN_FUNCTION
 {
-	Led1::setOutput(xpcc::stm32::ALTERNATE, xpcc::stm32::PUSH_PULL);
+	Led1::setAlternateFunction(xpcc::stm32::PUSH_PULL);
 	
 	Timer2::enable();
 	Timer2::setMode(Timer2::UP_COUNTER);

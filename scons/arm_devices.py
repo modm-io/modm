@@ -212,11 +212,11 @@ devices = \
 	#  Z | 144 pins
 	# 
 	# Size (s):
-	#  B | 128 kB Flash,  48 kB RAM  (R, V)
-	#  C | 256 kB Flash,  96 kB RAM	 (R, V, Z)
-	#  E | 512 kB Flash, 128 kB RAM  (R, V, Z)
-	#  F | 768 kB Flash, 128 kB RAM	 (R, V, Z)
-	#  G |   1 MB Flash, 128 kB RAM  (R, V, Z)
+	#  B | 128 kB Flash,  48+16 kB RAM  (R, V)
+	#  C | 256 kB Flash,  80+16 kB RAM	 (R, V, Z)
+	#  E | 512 kB Flash, 112+16 kB RAM  (R, V, Z)
+	#  F | 768 kB Flash, 112+16 kB RAM	 (R, V, Z)
+	#  G |   1 MB Flash, 112+16 kB RAM  (R, V, Z)
 	# 
 	"stm32f205_b":
 	{
@@ -228,25 +228,25 @@ devices = \
 	{
 		"defines": ["__STM32F205__", "__ARM_STM32__", "STM32F2XX"],
 		"linkerscript": "cortex_m3/stm32/linker/stm32f205_c.ld",
-		"size": { "flash": 262144, "ram": 98304 },
+		"size": { "flash": 262144, "ram": 81920 },
 	},
 	"stm32f205_e":
 	{
 		"defines": ["__STM32F205__", "__ARM_STM32__", "STM32F2XX"],
 		"linkerscript": "cortex_m3/stm32/linker/stm32f205_e.ld",
-		"size": { "flash": 524288, "ram": 131072 },
+		"size": { "flash": 524288, "ram": 114688 },
 	},
 	"stm32f205_f":
 	{
 		"defines": ["__STM32F205__", "__ARM_STM32__", "STM32F2XX"],
 		"linkerscript": "cortex_m3/stm32/linker/stm32f205_f.ld",
-		"size": { "flash": 786432, "ram": 131072 },
+		"size": { "flash": 786432, "ram": 114688 },
 	},
 	"stm32f205_g":
 	{
 		"defines": ["__STM32F205__", "__ARM_STM32__", "STM32F2XX"],
 		"linkerscript": "cortex_m3/stm32/linker/stm32f205_g.ld",
-		"size": { "flash": 1048576, "ram": 131072 },
+		"size": { "flash": 1048576, "ram": 114688 },
 	},
 	
 	# STM32F207 p s
@@ -257,34 +257,34 @@ devices = \
 	#  I | 176 pins
 	# 
 	# Size (s):
-	#  C | 256 kB Flash, 128 kB RAM	 (V, Z, I)
-	#  E | 512 kB Flash, 128 kB RAM  (V, Z, I)
-	#  F | 768 kB Flash, 128 kB RAM	 (V, Z, I)
-	#  G |   1 MB Flash, 128 kB RAM  (V, Z, I)
+	#  C | 256 kB Flash, 112+16 kB RAM	 (V, Z, I)
+	#  E | 512 kB Flash, 112+16 kB RAM  (V, Z, I)
+	#  F | 768 kB Flash, 112+16 kB RAM	 (V, Z, I)
+	#  G |   1 MB Flash, 112+16 kB RAM  (V, Z, I)
 	# 
 	"stm32f207_c":
 	{
 		"defines": ["__STM32F207__", "__ARM_STM32__", "STM32F2XX"],
 		"linkerscript": "cortex_m3/stm32/linker/stm32f207_c.ld",
-		"size": { "flash": 262144, "ram": 131072 },
+		"size": { "flash": 262144, "ram": 114688 },
 	},
 	"stm32f207_e":
 	{
 		"defines": ["__STM32F207__", "__ARM_STM32__", "STM32F2XX"],
 		"linkerscript": "cortex_m3/stm32/linker/stm32f207_e.ld",
-		"size": { "flash": 524288, "ram": 131072 },
+		"size": { "flash": 524288, "ram": 114688 },
 	},
 	"stm32f207_f":
 	{
 		"defines": ["__STM32F207__", "__ARM_STM32__", "STM32F2XX"],
 		"linkerscript": "cortex_m3/stm32/linker/stm32f207_f.ld",
-		"size": { "flash": 786432, "ram": 131072 },
+		"size": { "flash": 786432, "ram": 114688 },
 	},
 	"stm32f207_g":
 	{
 		"defines": ["__STM32F207__", "__ARM_STM32__", "STM32F2XX"],
 		"linkerscript": "cortex_m3/stm32/linker/stm32f207_g.ld",
-		"size": { "flash": 1048576, "ram": 131072 },
+		"size": { "flash": 1048576, "ram": 114688 },
 	},
 	
 	# -------------------------------------------------------------------------
@@ -296,13 +296,13 @@ devices = \
 	#  Z | 144 pins
 	# 
 	# Size (s):
-	#  G |   1 MB Flash, 192 kB RAM
+	#  G |   1 MB Flash, 112+64+16 kB RAM
 	# 
 	"stm32f405_g":
 	{
 		"defines": ["__STM32F405__", "__ARM_STM32__", "STM32F4XX"],
-		"linkerscript": "cortex_m3/stm32/linker/stm32f405_g.ld",
-		"size": { "flash": 1048576, "ram": 196608 },	# TODO check these values
+		"linkerscript": "cortex_m3/stm32/linker/stm32f4xx_g.ld",
+		"size": { "flash": 1048576, "ram": 114688 },
 	},
 	
 	# STM32F407 p s
@@ -313,19 +313,19 @@ devices = \
 	#  I | 176 pins
 	# 
 	# Size (s):
-	#  E | 512 kB Flash, 192 kB RAM
-	#  G |   1 MB Flash, 192 kB RAM
+	#  E | 512 kB Flash, 112+64+16 kB RAM
+	#  G |   1 MB Flash, 112+64+16 kB RAM
 	# 
 	"stm32f407_e":
 	{
 		"defines": ["__STM32F407__", "__ARM_STM32__", "STM32F4XX"],
-		"linkerscript": "cortex_m3/stm32/linker/stm32f407_e.ld",
-		"size": { "flash": 524288, "ram": 196608 },	# TODO check these values
+		"linkerscript": "cortex_m3/stm32/linker/stm32f4xx_e.ld",
+		"size": { "flash": 524288, "ram": 114688 },
 	},
 	"stm32f407_g":
 	{
 		"defines": ["__STM32F407__", "__ARM_STM32__", "STM32F4XX"],
-		"linkerscript": "cortex_m3/stm32/linker/stm32f407_g.ld",
-		"size": { "flash": 1048576, "ram": 196608 },	# TODO check these values
+		"linkerscript": "cortex_m3/stm32/linker/stm32f4xx_g.ld",
+		"size": { "flash": 1048576, "ram": 114688 },
 	},
 }

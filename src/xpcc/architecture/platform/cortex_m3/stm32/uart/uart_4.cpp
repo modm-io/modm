@@ -42,8 +42,11 @@
 
 namespace
 {
-	GPIO__OUTPUT(Txd, C, 10);
-	GPIO__INPUT(Rxd, C, 11);
+	GPIO__OUTPUT(TxdA0, A, 0);
+	GPIO__INPUT(RxdA1, A, 1);
+	
+	GPIO__OUTPUT(TxdC10, C, 10);
+	GPIO__INPUT(RxdC11, C, 11);
 	
 	static const uint32_t nvicId = 52;
 	static const uint32_t apbId = 19;
@@ -51,18 +54,40 @@ namespace
 
 // ----------------------------------------------------------------------------
 void
-xpcc::stm32::Uart4::setBaudrate(uint32_t baudrate)
+xpcc::stm32::Uart4::configurePins(Mapping mapping)
 {
-	Txd::setOutput(xpcc::stm32::ALTERNATE, xpcc::stm32::PUSH_PULL);
-	Rxd::setInput(xpcc::stm32::INPUT, xpcc::stm32::FLOATING);
-	
-	// enable clock
+	// Enable clock
 	RCC->APB1ENR |= (1 << apbId);
 	
-	// enable USART in the interrupt controller
+	// Initialize IO pins
+#if defined(STM32F2XX) || defined(STM32F4XX)
+	if (mapping == REMAP_PA0_PA1) {
+		TxdA0::setAlternateFunction(AF_UART4, xpcc::stm32::PUSH_PULL);
+		RxdA1::setAlternateFunction(AF_UART4);
+	}
+	else {
+		TxdC10::setAlternateFunction(AF_UART4, xpcc::stm32::PUSH_PULL);
+		RxdC11::setAlternateFunction(AF_UART4);
+	}
+#else
+	(void) mapping;		// avoid compiler warning
+	
+	TxdC10::setAlternateFunction(xpcc::stm32::PUSH_PULL);
+	RxdC11::setInput();
+#endif
+}
+
+// ----------------------------------------------------------------------------
+void
+xpcc::stm32::Uart4::setBaudrate(uint32_t baudrate)
+{
+	// Enable clock
+	RCC->APB1ENR |= (1 << apbId);
+	
+	// Enable USART in the interrupt controller
 	NVIC->ISER[nvicId / 32] = 1 << (nvicId % 32);
 	
-	// set baudrate
+	// Set baudrate
 	UART4->BRR = calculateBaudrateSettings(36000000, baudrate);
 	
 	// Transmitter & Receiver-Enable, 8 Data Bits, 1 Stop Bit
