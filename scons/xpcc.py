@@ -208,7 +208,7 @@ def generate(env, **kw):
 		parser.read(configfile)
 		
 		architecture = parser.get('build', 'architecture')
-		if architecture == 'pc':
+		if architecture == 'hosted':
 			try:
 				defaultDevice = {
 					'Darwin': 'darwin',
@@ -315,7 +315,7 @@ def generate(env, **kw):
 		# path to the headers of a very small and incomplete libstdc++ implementation
 		env.Append(CPPPATH = [os.path.join(rootpath, 'src', 'stdc++')])
 		
-	elif architecture == 'pc':
+	elif architecture == 'hosted':
 		if device == 'linux':
 			libs = ['boost_thread-mt', 'boost_system']
 			libpath = ['/usr/lib/']
@@ -329,7 +329,7 @@ def generate(env, **kw):
 		env['LIBPATH'] = libpath
 		env['ENV'] = os.environ
 		
-		env.Tool('pc')
+		env.Tool('hosted')
 	elif architecture in ['arm7tdmi', 'cortex-m0', 'cortex-m3', 'cortex-m4']:
 		env['ARM_ARCH'] = architecture
 		env['ARM_DEVICE'] = device

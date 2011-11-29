@@ -128,7 +128,7 @@ else:
 	env.Alias('symbols', env.Symbols(program))
 	env.Alias('defines', env.ShowDefines())
 	
-	if env.CheckArchitecture('pc'):
+	if env.CheckArchitecture('hosted'):
 		env.Alias('run', env.Run(program))
 		env.Alias('all', ['build', 'run'])
 	else:

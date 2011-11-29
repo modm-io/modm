@@ -34,7 +34,9 @@
  * \defgroup	image	Images for graphical displays
  */
 
-#include "image/rca_logo_128x64.hpp"
+#include "image/logo_xpcc_90x64.hpp"
+#include "image/logo_rca_90x64.hpp"
+#include "image/logo_eurobot_90x64.hpp"
 #include "image/skull_64x64.hpp"
 #include "image/home_16x16.hpp"
 

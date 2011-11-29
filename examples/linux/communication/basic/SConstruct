@@ -25,7 +25,7 @@ env.Alias('size', env.Size(program))
 env.Alias('symbols', env.Symbols(program))
 env.Alias('defines', env.ShowDefines())
 
-if env.CheckArchitecture('pc'):
+if env.CheckArchitecture('hosted'):
 	env.Alias('build', program)
 	env.Alias('run', env.Run(program))
 	

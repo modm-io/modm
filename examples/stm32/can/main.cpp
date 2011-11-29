@@ -81,10 +81,7 @@ MAIN_FUNCTION
 	display.initialize();
 	
 	display.clear();
-	//display.setFont(xpcc::font::Assertion);
-	//display << "  CAN Demo";
-	//display.drawLine(0, 13, 102, 13);
-	display.drawImage(xpcc::glcd::Point(19, 0), xpcc::accessor::asFlash(bitmap::skull_64x64));
+	display.drawImage(xpcc::glcd::Point(6, 0), xpcc::accessor::asFlash(bitmap::logo_xpcc_90x64));
 	display.update();
 	
 	// Remap the Pins of CAN1 to PB8 and PB9.
