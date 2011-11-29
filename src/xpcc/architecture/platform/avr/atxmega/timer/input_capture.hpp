@@ -40,7 +40,7 @@
 #include "timer.hpp"
 
 // older versions of avr-libc provide false register names
-#ifndef TC_EVACT_FRQ_gc
+#if !defined(TC_EVACT_FRQ_gc) && defined(TC_EVACT_FRW_gc)
 #	define TC_EVACT_FRQ_gc		TC_EVACT_FRW_gc
 #endif
 
