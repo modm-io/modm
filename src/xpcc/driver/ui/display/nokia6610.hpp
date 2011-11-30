@@ -89,6 +89,10 @@ namespace xpcc
 
 		void
 		lcdWrite130x130bmp(void);
+
+		// 9bit spi managing
+		uint16_t temp;				//
+		uint8_t countValidBits;		// always < 8
 	};
 }
 

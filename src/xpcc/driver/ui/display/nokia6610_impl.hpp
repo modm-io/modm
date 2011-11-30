@@ -61,9 +61,6 @@ xpcc::Nokia6610<SPI, CS, Reset, GE12>::initialize()
 //	this->update();
 }
 
-uint16_t temp = 0;				//
-uint8_t countValidBits = 0;		// always < 8
-
 template <typename SPI, typename CS, typename Reset, bool GE12>
 void
 xpcc::Nokia6610<SPI, CS, Reset, GE12>::writeSpi9Bit(uint16_t data){
