@@ -53,6 +53,24 @@ xpcc::atomic::Queue<T, N>::isFull()
 
 template<typename T, std::size_t N>
 bool
+xpcc::atomic::Queue<T, N>::isNearFull()
+{
+	XPCC__STATIC_ASSERT(N > 3, "Not possible the check for 'near full' of such a small queue. ");
+	
+	uint8_t tmphead = xpcc::accessor::asVolatile(this->head);
+	uint8_t tmptail = xpcc::accessor::asVolatile(this->tail);
+
+	uint8_t free;
+	if (tmphead >= tmptail)
+		free = N - tmphead + tmptail;
+	else
+		free = N - tmptail + tmphead;
+
+	return (free < 3);
+}
+
+template<typename T, std::size_t N>
+bool
 xpcc::atomic::Queue<T, N>::isEmpty()
 {
 	return (xpcc::accessor::asVolatile(this->head) == xpcc::accessor::asVolatile(this->tail));

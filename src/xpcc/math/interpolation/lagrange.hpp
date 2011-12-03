@@ -91,9 +91,10 @@ namespace xpcc
 			typedef typename T::SecondType OutputType;
 			
 			// WARNING:
-			// Only floating points types are allowed as second type of xpcc::Pair
+			// Only floating point types are allowed as second type of xpcc::Pair
 			// because the calculation will deliver wrong results otherwise!
-			XPCC__STATIC_ASSERT(xpcc::ArithmeticTraits<OutputType>::isFloatingPoint);
+			XPCC__STATIC_ASSERT(xpcc::ArithmeticTraits<OutputType>::isFloatingPoint, 
+					"Only floating point types are allowed as second type of xpcc::Pair");
 		public:
 			/**
 			 * \brief	Constructor

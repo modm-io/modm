@@ -37,6 +37,7 @@
 #include <stdint.h>
 #include <xpcc/architecture/utils.hpp>
 #include <xpcc/architecture/driver/accessor.hpp>
+#include <xpcc/utils/template_metaprogramming.hpp>
 
 namespace xpcc
 {
@@ -60,6 +61,14 @@ namespace xpcc
 			bool
 			isFull();
 			
+			/**
+			 * \brief	Returns false if less than three elements
+			 * 			can be stored in queue. Only works with queue
+			 * 			with more than three elements. 
+			 */
+			bool
+			isNearFull();
+
 			bool
 			isEmpty();
 			

@@ -40,7 +40,7 @@ template<typename T, std::size_t N>
 xpcc::BoundedDeque<T, N>::BoundedDeque() : 
 	head(0), tail(1), size(0)
 {
-	XPCC__STATIC_ASSERT(N > 0);
+	XPCC__STATIC_ASSERT(N > 0, "size = 0 is not allowed");
 }
 
 // ----------------------------------------------------------------------------
