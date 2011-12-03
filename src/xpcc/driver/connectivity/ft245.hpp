@@ -100,17 +100,37 @@ namespace xpcc
 		initialize();
 
 		/**
-		 * \brief	Write a single char to the FIFO
+		 * \brief	Write a single byte to the FIFO
 		 *
-		 * \param	data	Single byte to be sent
+		 * \param	data	Single byte to write
 		 */
 		static void
 		write(char data);
 
 		/**
-		 * \brief	Receive a single char
+		 * \brief	Write a null-terminated string
 		 *
-		 * \param	c		Received byte, if any
+		 * \param	s	String to write
+		 */
+		static void
+		write(const char *s);
+
+		/**
+		 * \brief	Write a block of bytes to the FIFO
+		 *
+		 * This blocks until the buffer is written.
+		 *
+		 * \param	*buffer	Buffer of the data that should be written
+		 * \param	nbyte	Length of buffer
+		 *
+		 */
+		static void
+		write(const char *buffer, uint8_t nbyte);
+
+		/**
+		 * \brief	Read a single byte from the FIFO
+		 *
+		 * \param	c		Byte read, if any
 		 *
 		 * \return	\c true if a byte was received, \c false otherwise
 		 */
@@ -118,36 +138,16 @@ namespace xpcc
 		read(char &c);
 
 		/**
-		 * \brief	Receive a buffer
+		 * \brief	Read a block of bytes from the FIFO
 		 *
 		 * This is blocking.
 		 *
-		 * \param	*buffer	Buffer for the received data
-		 * \param	n		Length of buffer
+		 * \param	*buffer	Buffer for the received data.
+		 * \param	nbyte	Length of buffer
 		 *
 		 */
 		static uint8_t
-		read(char *buffer, uint8_t n);
-
-		/**
-		 * \brief	Send a buffer
-		 *
-		 * This blocks until the buffer is sent.
-		 *
-		 * \param	*buffer	Buffer of the data that should be sent.
-		 * \param	n		Length of buffer
-		 *
-		 */
-		static void
-		write(const char *buffer, uint8_t n);
-
-		/**
-		 * \brief	Send a null-terminated string.
-		 *
-		 * \param	s	String to be sent.
-		 */
-		static void
-		write(const char *s);
+		read(char *buffer, uint8_t nbyte);
 
 	protected:
 		static PORT port;

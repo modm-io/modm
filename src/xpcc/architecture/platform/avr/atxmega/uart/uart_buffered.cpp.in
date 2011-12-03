@@ -140,6 +140,15 @@ xpcc::atxmega::BufferedUart{{ id }}::write(const char *s)
 }
 
 // ----------------------------------------------------------------------------
+void
+xpcc::atxmega::BufferedUart{{ id }}::write(const char *s, uint8_t n)
+{
+	while (--n != 0) {
+		BufferedUart{{ id }}::write(*s++);
+	}
+}
+
+// ----------------------------------------------------------------------------
 bool
 xpcc::atxmega::BufferedUart{{ id }}::read(char& c)
 {
