@@ -1,0 +1,8 @@
+
+Usage
+=====
+
+$ cd xpcc/tools
+$ python regression.py -u
+... change compiler-options in avr.py or arm.py ...
+$ python regression.py -v
