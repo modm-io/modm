@@ -1,10 +1,12 @@
 Things which need to be done
 ============================
 
-* Remove xpcc/debug/logger/imp/std.hpp after the 16.12.2011
-* Remove xpcc::FlexClock (defined in architecture/driver/clock.hpp)
-* Implement Timer 9-14 for STM32
-* Rework the description of the Logger!
 * Check GraphicDisplay for remains of a uint8_t coordinates (now int16_t)
 * Check UART interface (char vs. uint8_t)
 * Rework FreeRTOS to work with the STM32F4xx (FPU), see https://github.com/thomask77/FreeRTOS_ARM_CM4F
+* Implement Timer 9-14 for STM32
+* Rework the description of the Logger!
+* Remove xpcc/debug/logger/imp/std.hpp after the 16.12.2011
+* Remove xpcc::FlexClock (defined in architecture/driver/clock.hpp)
+* Create preview images of the fonts from the font-files
+
