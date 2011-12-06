@@ -12,6 +12,19 @@ GPIO__OUTPUT(VBusOvercurrent, D, 5);	// red LED   (LD8)
 
 GPIO__INPUT(Button, A, 0);
 
+static void initClock(bool useInternal){
+	typedef xpcc::stm32::Core::Clock MyCoreClock;
+	if (useInternal){
+		MyCoreClock::enablePll(MyCoreClock::PLL_HSI, 8, 168);
+		MyCoreClock::switchToPll();
+	}
+	else{ // use external 8MHz crystal
+		MyCoreClock::enableHSE(MyCoreClock::HSE_CRYSTAL);
+		MyCoreClock::enablePll(MyCoreClock::PLL_HSE, 4, 168);
+		MyCoreClock::switchToPll();
+	}
+}
+
 // ----------------------------------------------------------------------------
 MAIN_FUNCTION
 {
@@ -20,10 +33,12 @@ MAIN_FUNCTION
 	LedRed::setOutput(xpcc::gpio::HIGH);
 	LedBlue::setOutput(xpcc::gpio::HIGH);
 	
+	initClock(false);
+
 	while (1)
 	{
 		LedBlue::toggle();
 		LedGreen::toggle();
-		xpcc::delay_ms(200);
+		xpcc::delay_ms(500);
 	}
 }

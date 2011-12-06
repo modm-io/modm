@@ -49,6 +49,71 @@ namespace xpcc
 		{
 		public:
 
+			/**
+			 * Usage:
+			 *
+			 * For using internal clock (which is 16MHz) call
+			 * 		enablePll(PLL_HSI, 8);
+			 * 		switchToPll();
+			 *
+			 *
+			 * For using external crystal or oscillator with frequency f call
+			 * 		if (enableHSE(HSE_CRYSTAL)){
+			 * 			enablePll(PLL_HSE, f/2MHz);
+			 * 			switchToPll();
+			 * 		}
+			 *
+			 * For using external oscillator with frequency f call
+			 * 		if (enableHSE(HSE_BYPASS)){
+			 * 			enablePll(PLL_HSE, f/2MHz);
+			 * 			switchToPll();
+			 * 		}
+			 */
+			class Clock{
+			public:
+				enum PLLSource{
+					PLL_HSI,
+					PLL_HSE,
+				};
+
+				enum HSEConfig{
+					HSE_CRYSTAL,
+					HSE_BYPASS,
+				};
+
+				static bool
+				enableHSE(HSEConfig config, uint32_t wait_cycles = 1500);
+
+				/**
+				 * PLLSRC 			source select for pll and for plli2s. If you are using HSE you must
+				 * 					enable it first.
+				 *
+				 * PLLM				Division factor for the main PLL (PLL) and audio PLL (PLLI2S) input clock.
+				 *
+				 * 					The software has to set these bits correctly to ensure that frequency of selected
+				 * 					source divided by PLLM is in ranges from 1 to 2 MHz.
+				 *
+				 * 					VCO input frequency = PLL input clock frequency / PLLM with 2 ≤ PLLM ≤ 63
+				 *
+				 * PLLN				Main PLL (PLL) multiplication factor for VCO
+				 * 					The software has to set these bits correctly to ensure that the VCO output
+				 * 					frequency is
+				 * 						336 MHz for ST32F4. Core will run at 168 MHz.
+				 *						240 MHz for ST32F2. Core will run at 120 MHz.
+				 *
+				 * 					VCO output frequency = VCO input frequency × PLLN with 64 ≤ PLLN ≤ 432
+				 *
+				 *
+				 *
+				 */
+				static void
+				enablePll(PLLSource source, uint8_t pllM, uint16_t pllN);
+
+				static bool
+				switchToPll(uint32_t wait_cycles = 1500);
+
+			};
+
 		};
 	}
 }
