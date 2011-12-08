@@ -1,9 +1,9 @@
 
 FreeRTOS port for STM32 microcontrollers
--------------------------------------------------------------------------------
+========================================
 
 Interrupt Priorities
--------------------------------------------------------------------------------
+--------------------
 
 The STM32 implements only four priority bits. The lower four bits of the eight
 bit priority register are unused. A lower value means a higher priority.
@@ -28,7 +28,7 @@ for further information.
 
 
 Hints
--------------------------------------------------------------------------------
+-----
 
  - The scheduler must never be stopped!
 
@@ -37,3 +37,9 @@ Hints
    in the vector table. This saves some bytes there but means everything
    written to the stack before will be lost.
 
+
+Port for STM32F4XX with FPU support
+-----------------------------------
+
+Based on the work of Thomas Kindler (thomask77 on github.com)
+see https://github.com/thomask77/FreeRTOS_ARM_CM4F at Nov 30, 2011

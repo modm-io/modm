@@ -67,12 +67,17 @@ SVC_Handler:
 	ldr		r3, =pxCurrentTCB	/* Load address of pxCurrentTCB */
 	ldr		r1, [r3]
 	ldr		r0, [r1]			/* The first item in pxCurrentTCB is the task top of stack. */
+#if defined(STM32F4XX)
+	ldmia	r0!, {r14}			/* Pop the EXC_RETURN value */
+#endif
 	ldmia	r0!, {r4-r11}		/* Pop the registers that are not automatically
 								   saved on exception entry and the critical nesting count. */
 	msr		psp, r0				/* Restore the task stack pointer. */
 	mov		r0, #0
 	msr		basepri, r0
-	orr		r14, #0xd
+#if !defined(STM32F4XX)
+	orr		r14, #0xd			/* TODO why not needed here? */
+#endif
 	bx		r14
 	.endfunc
 
@@ -109,6 +114,12 @@ PendSV_Handler:
 	ldr		r2, [r3]
 	
 	stmdb	r0!, {r4-r11}		/* Save the remaining registers. */
+#if defined(STM32F4XX)
+	tst		r14, #0x10			/* Check for extended frame.. */
+	it		eq
+	vstmdbeq r0!, {s16-s31}		/* Save the high FPU registers (will also trigger a lazy-save) */
+	stmdb	r0!, {r14}			/* Save the EXC_RETURN value */
+#endif
 	str		r0, [r2]			/* Save the new top of stack into the first member of the TCB. */
 	
 	stmdb	sp!, {r3, r14}
@@ -121,6 +132,12 @@ PendSV_Handler:
 	
 	ldr		r1, [r3]
 	ldr		r0, [r1]			/* The first item in pxCurrentTCB is the task top of stack. */
+#if defined(STM32F4XX)
+	ldmia	r0!, {r14}			/* Pop the EXC_RETURN value */
+	tst		r14, #0x10			/* Check for extended frame.. */
+	it		eq
+	vldmiaeq r0!, {s16-s31}		/* Pop the high FPU registers.*/
+#endif
 	ldmia	r0!, {r4-r11}		/* Pop the registers. */
 	msr		psp, r0
 	bx		r14

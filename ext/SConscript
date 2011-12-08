@@ -64,17 +64,14 @@ if env['ARCHITECTURE'].startswith('cortex-m3/stm32f2'):
 		'ext/stm32f2xx_lib/STM32F2xx_StdPeriph_Driver/inc']
 
 if env['ARCHITECTURE'].startswith('cortex-m4/stm32f4'):
-	sourcePath += [
-		'stm32f4xx_lib/STM32F4xx_StdPeriph_Driver/src']
+	#sourcePath += [
+	#	'stm32f4xx_lib/STM32F4xx_StdPeriph_Driver/src']
 	globalIncludes += [
 		'ext/stm32f4xx_lib/CMSIS/Include',
 		'ext/stm32f4xx_lib/CMSIS/Device/ST/STM32F4xx/Include',
 		'ext/stm32f4xx_lib/STM32F4xx_StdPeriph_Driver/inc']
 
-if env['ARCHITECTURE'].startswith('cortex-m3/stm32f10'):
-	# Add the libmaple from Leaflabs (see https://github.com/leaflabs/libmaple)
-	#sourcePath += ['libmaple']
-	
+if 'stm32f' in env['ARCHITECTURE']:
 	# FreeRTOS for STM32
 	sourcePath += ['freertos']
 	

@@ -82,6 +82,7 @@ FreeRTOS.org versions prior to V4.4.0 did not include this definition. */
 
 /* Constants required to set up the initial stack. */
 #define portINITIAL_XPSR			( 0x01000000 )
+#define portINITIAL_EXC_RETURN		( 0xFFFFFFFD )
 
 /* The priority used by the kernel is assigned to a variable to make access
 from inline assembler easier. */
@@ -126,8 +127,13 @@ portSTACK_TYPE *pxPortInitialiseStack( portSTACK_TYPE *pxTopOfStack, pdTASK_CODE
 	*pxTopOfStack = 0;	/* LR */
 	pxTopOfStack -= 5;	/* R12, R3, R2 and R1. */
 	*pxTopOfStack = ( portSTACK_TYPE ) pvParameters;	/* R0 */
+#if defined(STM32F4XX)
+	pxTopOfStack -= 9;	/* R14, R11, R10, R9, R8, R7, R6, R5 and R4. */
+#else
 	pxTopOfStack -= 8;	/* R11, R10, R9, R8, R7, R6, R5 and R4. */
-
+#endif
+	*pxTopOfStack = ( portSTACK_TYPE ) portINITIAL_EXC_RETURN;
+	
 	return pxTopOfStack;
 }
 
@@ -157,7 +163,7 @@ portBASE_TYPE xPortStartScheduler( void )
 extern "C"
 void vPortEndScheduler( void )
 {
-	/* It is unlikely that the CM3 port will require this function as there
+	/* It is unlikely that the CM3/CM4F port will require this function as there
 	is nothing to return to.  */
 }
 /*-----------------------------------------------------------*/

@@ -132,7 +132,7 @@ namespace xpcc
 		 * 			matches, \c false on any difference.
 		 */
 		static bool
-		isEqual();
+		isCompareEqual();
 		
 		/**
 		 * \brief	Write to buffer to a memory page

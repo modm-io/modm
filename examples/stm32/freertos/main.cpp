@@ -45,7 +45,7 @@ public:
 	{
 		while (1)
 		{
-			// synchronise with LedTask2
+			// synchronize with LedTask2
 			event.release();
 			
 			LedStat::set();

@@ -45,8 +45,6 @@ template <typename Spi, typename Cs>
 bool
 xpcc::At45db0x1d<Spi, Cs>::initialize()
 {
-	spi.initialize();
-	
 	cs.set();
 	cs.setOutput();
 	
@@ -123,7 +121,7 @@ xpcc::At45db0x1d<Spi, Cs>::comparePageToBuffer(uint16_t pageAddress, at45db::Buf
 // ----------------------------------------------------------------------------
 template <typename Spi, typename Cs>
 bool
-xpcc::At45db0x1d<Spi, Cs>::isEqual()
+xpcc::At45db0x1d<Spi, Cs>::isCompareEqual()
 {
 	return ((readStatus() & COMP) == 0);
 }

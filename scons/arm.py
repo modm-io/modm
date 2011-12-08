@@ -116,7 +116,11 @@ def generate(env, **kw):
 		# (for example __libc_init_array())
 		env['THUMB_LINKER'] = '-mthumb'
 	
-	if env['ARM_ARCH'] is 'cortex-m4':
+	if env['ARM_ARCH'] == 'cortex-m4':
+		# Options for '-mfloat-abi='
+		# - soft: Full software floating point.
+		# - softfp: Use the FPU, but remain compatible with soft-float code.
+		# - hard: Full hardware floating point. Needs support from libc. 
 		env['FPU'] = '-mfloat-abi=softfp -mfpu=fpv4-sp-d16'
 	
 	# C flags
@@ -130,8 +134,8 @@ def generate(env, **kw):
 	# flags for C and C++
 	env['CCFLAGS'] = [
 		"-mcpu=$ARM_ARCH",
-		"$THUMB",			# use THUMB='-mthumb' to compile as thumb code (default for AT91SAM)
 		"$FPU",
+		"$THUMB",			# use THUMB='-mthumb' to compile as thumb code (default for AT91SAM)
 		"-mthumb-interwork",
 		"-Os",
 		"-gdwarf-2",
@@ -177,6 +181,7 @@ def generate(env, **kw):
 	# Assembler flags
 	env['ASFLAGS'] = [
 		"-mcpu=$ARM_ARCH",
+		"$FPU",
 		"-mthumb-interwork",
 		"$THUMB_ASSEMBLER",
 		"-gdwarf-2",

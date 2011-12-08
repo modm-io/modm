@@ -67,4 +67,9 @@
 #include "stm32/spi/spi_2.hpp"
 #include "stm32/spi/spi_3.hpp"
 
+#include "stm32/i2c/i2c_1.hpp"
+#include "stm32/i2c/i2c_2.hpp"
+#include "stm32/i2c/i2c_3.hpp"
+
+#include "stm32/systick_timer.hpp"
 #include "stm32/timer.hpp"
