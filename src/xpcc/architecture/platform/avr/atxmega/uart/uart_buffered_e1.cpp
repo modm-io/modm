@@ -144,6 +144,15 @@ xpcc::atxmega::BufferedUartE1::write(const char *s)
 }
 
 // ----------------------------------------------------------------------------
+void
+xpcc::atxmega::BufferedUartE1::write(const char *s, uint8_t n)
+{
+	while (--n != 0) {
+		BufferedUartE1::write(*s++);
+	}
+}
+
+// ----------------------------------------------------------------------------
 bool
 xpcc::atxmega::BufferedUartE1::read(char& c)
 {

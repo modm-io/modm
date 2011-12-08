@@ -144,6 +144,15 @@ xpcc::atxmega::BufferedUartF0::write(const char *s)
 }
 
 // ----------------------------------------------------------------------------
+void
+xpcc::atxmega::BufferedUartF0::write(const char *s, uint8_t n)
+{
+	while (--n != 0) {
+		BufferedUartF0::write(*s++);
+	}
+}
+
+// ----------------------------------------------------------------------------
 bool
 xpcc::atxmega::BufferedUartF0::read(char& c)
 {

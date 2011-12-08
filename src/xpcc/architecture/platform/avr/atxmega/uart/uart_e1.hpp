@@ -37,6 +37,7 @@
 #define XPCC_ATXMEGA__UART_E1_HPP
 
 #include <stdint.h>
+#include <xpcc/architecture/utils.hpp>
 
 namespace xpcc
 {
@@ -64,7 +65,7 @@ namespace xpcc
 			 * \param	baudrate	desired baud rate
 			 * \param	u2x			enabled double speed mode
 			 */
-			static inline void
+			static ALWAYS_INLINE void
 			setBaudrate(uint32_t baudrate, bool u2x = false)
 			{
 				uint16_t ubrr;
@@ -78,19 +79,61 @@ namespace xpcc
 				setBaudrateRegister(ubrr);
 			}
 			
+			/* **************************************************** *
+			 * The five standard IO methods for all UARTs and alike *
+			 * **************************************************** */
+			
+			/**
+			 * \brief	Write a single byte
+			 *
+			 * \param	data	Single byte to write
+			 */
 			static void
 			write(char data);
 			
 			/**
-			 * \brief	Write a string
+			 * \brief	Write a null-terminated string
+			 *
+			 * \param	*string	String to write
 			 * 
-			 * The string musst end with '\\0'.
+			 * The string must end with '\\0'.
 			 */
 			static void
 			write(const char *string);
 			
+			/**
+			 * \brief	Write a block of bytes
+			 *
+			 * \param	*buffer	Pointer to buffer with data to write
+			 * \param	nbyte	Number of bytes to write
+			 */
+			static void
+			write(const char *buffer, uint8_t nbyte);
+			
+			/**
+			 * \brief	Read a single byte
+			 *
+			 * \param	&char	Byte read, if any
+			 *
+			 * \return	\n true if a byte was received, \n false otherwise
+			 */
 			static bool
-			read(char& c);
+			read(char& data);
+			
+			/**
+			 * \brief	Read a block of bytes
+			 *
+			 * This is non-blocking. If no data is available this function waits
+			 * about 1.5 times of a frame length. 
+			 * This is only correct at a baud rate of 115200.  
+			 * 
+			 * \param	*buffer	Pointer to a buffer big enough to store \a n bytes
+			 * \param	nbyte	Number of bytes to be read
+			 * 
+			 * \return	Number of bytes which could be read, maximum \a n
+			 */
+			static uint8_t
+			read(char *buffer, uint8_t nbyte);
 			
 		protected:
 			static void
@@ -135,7 +178,7 @@ namespace xpcc
 			 * \param	baudrate	desired baud rate
 			 * \param	doubleSpeed	enabled double speed mode
 			 */
-			static inline void
+			static ALWAYS_INLINE void
 			setBaudrate(uint32_t baudrate, bool doubleSpeed = false)
 			{
 				uint16_t ubrr;
@@ -155,28 +198,62 @@ namespace xpcc
 				setBaudrateRegister(ubrr, false);
 			}
 			
+			/**
+			 * \brief	Write a single byte
+			 *
+			 * \param	data	Byte to write
+			 */
 			static void
 			write(char data);
 			
 			/**
-			 * \brief	Write a string
+			 * \brief	Write a null-terminated string
+			 *
+			 * \param	*string	String to write
 			 * 
 			 * The string must end with '\\0'.
 			 */
 			static void
 			write(const char *string);
 			
-			static bool
-			read(char& c);
+			/**
+			 * \brief	Write a block of bytes
+			 *
+			 * \param	*buffer	Pointer to buffer with data to write
+			 * \param	nbyte	Number of bytes to write
+			 */
+			static void
+			write(const char *buffer, uint8_t nbyte);
 			
 			/**
-			 * \brief	Check whether any errors occured during receiving
-			 *			Be aware that these indicate an error that occured
+			 * \brief	Read a single byte
+			 *
+			 * \param	&char	Byte read, if any
+			 *
+			 * \return	\n true if a byte was received, \n false otherwise
+			 */
+			static bool
+			read(char& data);
+			
+			/**
+			 * \brief	Read a block of bytes
+			 * 
+			 * \param	*buffer	Pointer to a buffer big enough to store \a n bytes
+			 * \param	nbyte	Number of bytes to be read
+			 * 
+			 * \return	Number of bytes which could be read, maximum \a n
+			 */
+			static uint8_t
+			read(char *buffer, uint8_t nbyte);
+			
+			/**
+			 * \brief	Check whether any errors occurred during receiving
+			 *			Be aware that these indicate an error that occurred
 			 *			somewhere since resetting the Error Flags (with 
 			 *			resetErrorFlags()), so you cannot tell which byte had
 			 *			the error.
 			 *
-			 * \return	\c 0 if no errors occured, otherwise a value that
+			 * \return	\c 0 if no errors occurred, otherwise a value that
 			 *			corresponds to the Error Flags in the status register.
 			 */
 			static uint8_t
@@ -195,17 +272,6 @@ namespace xpcc
 			
 //			static uint8_t
 //			flushTransmitBuffer();
-			
-			/**
-			 * \brief	Read a block of bytes
-			 * 
-			 * \param	*buffer	Pointer to a buffer big enough to storage \a n bytes
-			 * \param	n	Number of bytes to be read
-			 * 
-			 * \return	Number of bytes which could be read, maximal \a n
-			 */
-			static uint8_t
-			read(char *buffer, uint8_t n);
 			
 		protected:
 			static void

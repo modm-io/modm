@@ -97,6 +97,15 @@ xpcc::atxmega::UartD0::write(const char *s)
 }
 
 // ----------------------------------------------------------------------------
+void
+xpcc::atxmega::UartD0::write(const char *s, uint8_t n)
+{
+	while (--n != 0) {
+		UartD0::write(*s++);
+	}
+}
+
+// ----------------------------------------------------------------------------
 bool
 xpcc::atxmega::UartD0::read(char& c)
 {
@@ -106,6 +115,61 @@ xpcc::atxmega::UartD0::read(char& c)
 		return true;
 	}
 	return false;
+}
+
+// ----------------------------------------------------------------------------
+uint8_t
+xpcc::atxmega::UartD0::read(char *b, uint8_t n)
+{
+	/*
+	 * The delay of 1.5 times frame time could be calculated at compile time
+	 * if the baud rate was known. It's only known in the constructor, not here. 
+	 * 
+	 * This manual calculation assumes a baud rate of 115200. 
+	 * On cycle of the loop if(USARTD0_STATUS ...) takes nine instructions:
+	 * 
+	 * if (USART...)		LDS		2
+	 * 						SBRS	2
+	 * 						RJMP	2
+	 * if (--delay == 0)	SUBI	1
+	 * 						BRNE	2
+	 * 
+	 * Assuming a baud rate of 115200 a frame (1 stop, 8 data, 1 stop bit)
+	 * lasts 86.6usec. At a CPU frequency of F_CPU a CPU cycle lasts 
+	 * 1/F_CPU seconds. So a frame takes (86.6usec * F_CPU) cycles, or
+	 * 86.6 * (F_CPU/1000000) = (F_CPU / 11547) cycles. Adding a margin of
+	 * 50% (F_CPU / 7698) cycles are equal to 1.5 times the frame time. 
+	 * The loop needs nine instructions so the loop should loop 
+	 * (F_CPU / 69282) times.   
+	 * 
+	 * Example for 32 MHz:
+	 * A CPU cycle takes 31.25nsec. In 86.6usec 2771.2 CPU cycles are executed. 
+	 * The loop takes nine instructions so it is enough to loop 308 times for 
+	 * one frame time.  After adding 50% the loop should loop 462 times. 
+	 *
+	 * This is the same result as (32000000 / 69282) = 462. 
+	 */
+	uint8_t rcvd = 0;
+	uint16_t const delayStart = (F_CPU / 69282);		// TODO Make depend on baudrate 
+	uint16_t delay = delayStart; 
+	while (1)
+	{
+		if (USARTD0_STATUS & USART_RXCIF_bm)
+		{
+			// data available
+			*b++ = USARTD0_DATA;
+			if (++rcvd == n) {
+				return rcvd;
+			}
+			delay = delayStart;	
+		}
+		else {
+			// no new data, but wait a little longer
+			if (--delay == 0) {
+				return rcvd;
+			}
+		}
+	}
 }
 
 #endif // USARTD0
