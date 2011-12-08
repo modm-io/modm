@@ -38,31 +38,43 @@
 
 namespace
 {
-	GPIO__OUTPUT(Cs, B, 12);
-	GPIO__OUTPUT(Sck, B, 13);
-	GPIO__INPUT(Miso, B, 14);
-	GPIO__OUTPUT(Mosi, B, 15);
-	
-	static const uint32_t apbId = 14;	// APB1
+	GPIO__OUTPUT(SckB13, B, 13);
+	GPIO__INPUT(MisoB14, B, 14);
+	GPIO__OUTPUT(MosiB15, B, 15);
 }
+
+// ----------------------------------------------------------------------------
+void
+xpcc::stm32::Spi2::configurePins(Mapping mapping)
+{
+	// Enable clock
+	RCC->APB1ENR |= RCC_APB1ENR_SPI2EN;
+	
+	// Initialize IO pins
+#if defined(STM32F2XX) || defined(STM32F4XX)
+	(void) mapping;		// avoid compiler warning
+	
+	SckB13::setAlternateFunction(AF_SPI2, xpcc::stm32::PUSH_PULL);
+	MisoB14::setAlternateFunction(AF_SPI2);
+	MosiB15::setAlternateFunction(AF_SPI2, xpcc::stm32::PUSH_PULL);
+#else
+	(void) mapping;		// avoid compiler warning
+	
+	SckB13::setAlternateFunction(xpcc::stm32::PUSH_PULL);
+	MisoB14::setInput(xpcc::stm32::FLOATING);
+	MosiB15::setAlternateFunction(xpcc::stm32::PUSH_PULL);
+#endif
+}
+
 
 // ----------------------------------------------------------------------------
 void
 xpcc::stm32::Spi2::initialize(Mode mode, Prescaler prescaler)
 {
-#if defined(STM32F2XX) || defined(STM32F4XX)
-
-#else
-	Cs::setAlternateFunction(xpcc::stm32::PUSH_PULL);
-	Cs::set();
-	Sck::setAlternateFunction(xpcc::stm32::PUSH_PULL);
-	Miso::setInput(xpcc::stm32::FLOATING);
-	Mosi::setAlternateFunction(xpcc::stm32::PUSH_PULL);
-#endif
+	RCC->APB1ENR |= RCC_APB1ENR_SPI2EN;
 	
-	RCC->APB1ENR |= (1 << apbId);
-	RCC->APB1RSTR |= (1 << apbId);
-	RCC->APB1RSTR &= ~(1 << apbId);
+	RCC->APB1RSTR |=  RCC_APB1RSTR_SPI2RST;
+	RCC->APB1RSTR &= ~RCC_APB1RSTR_SPI2RST;
 	
 	// disable all interrupts
 	SPI2->CR2 &= ~(SPI_CR2_TXEIE  | SPI_CR2_RXNEIE  | SPI_CR2_ERRIE);

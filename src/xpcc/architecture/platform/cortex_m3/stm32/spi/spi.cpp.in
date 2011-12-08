@@ -32,56 +32,131 @@
 #include "../gpio.hpp"
 #include "spi_{{ id }}.hpp"
 {% if id == 3 %}
-#ifndef STM32F10X_LD
+#if !defined(STM32F10X_LD) && !defined(STM32F10X_MD)
 {% endif %}
 namespace
 {
 	{% if id == 1 -%}
-	GPIO__OUTPUT(Cs, A, 4);		// Remap A15
-	GPIO__OUTPUT(Sck, A, 5);	// Remap B3
-	GPIO__INPUT(Miso, A, 6);	// Remap B4
-	GPIO__OUTPUT(Mosi, A, 7);	// Remap B5
+	GPIO__OUTPUT(SckA5, A, 5);
+	GPIO__INPUT(MisoA6, A, 6);
+	GPIO__OUTPUT(MosiA7, A, 7);
 	
-	static const uint32_t apbId = 12;	// APB2
+	GPIO__OUTPUT(SckB3, B, 3);
+	GPIO__INPUT(MisoB4, B, 4);
+	GPIO__OUTPUT(MosiB5, B, 5);
 	{%- elif id == 2 -%}
-	GPIO__OUTPUT(Cs, B, 12);
-	GPIO__OUTPUT(Sck, B, 13);
-	GPIO__INPUT(Miso, B, 14);
-	GPIO__OUTPUT(Mosi, B, 15);
-	
-	static const uint32_t apbId = 14;	// APB1
+	GPIO__OUTPUT(SckB13, B, 13);
+	GPIO__INPUT(MisoB14, B, 14);
+	GPIO__OUTPUT(MosiB15, B, 15);
 	{%- elif id == 3 -%}
-	GPIO__OUTPUT(Cs, A, 15);
-	GPIO__OUTPUT(Sck, B, 3);
-	GPIO__INPUT(Miso, B, 4);
-	GPIO__OUTPUT(Mosi, B, 5);
+	GPIO__OUTPUT(SckB3, B, 3);
+	GPIO__INPUT(MisoB4, B, 4);
+	GPIO__OUTPUT(MosiB5, B, 5);
 	
-	static const uint32_t apbId = 15;	// APB1
+	GPIO__OUTPUT(SckC10, C, 10);
+	GPIO__INPUT(MisoC11, C, 11);
+	GPIO__OUTPUT(MosiC12, C, 12);
 	{%- endif %}
 }
 
 // ----------------------------------------------------------------------------
 void
+xpcc::stm32::Spi{{ id }}::configurePins(Mapping mapping)
+{
+	// Enable clock
+	{% if id == 1 -%}
+	RCC->APB2ENR |= RCC_APB2ENR_SPI1EN;
+	{%- elif id == 2 or id == 3 -%}
+	RCC->APB1ENR |= RCC_APB1ENR_SPI{{ id }}EN;
+	{%- endif %}
+	
+	// Initialize IO pins
+#if defined(STM32F2XX) || defined(STM32F4XX)
+	{% if id == 1 -%}
+	if (mapping == REMAP_PA5_PA6_PA7) {
+		SckA5::setAlternateFunction(AF_SPI1, xpcc::stm32::PUSH_PULL);
+		MisoA6::setAlternateFunction(AF_SPI1);
+		MosiA7::setAlternateFunction(AF_SPI1, xpcc::stm32::PUSH_PULL);
+	}
+	else {
+		SckB3::setAlternateFunction(AF_SPI1, xpcc::stm32::PUSH_PULL);
+		MisoB4::setAlternateFunction(AF_SPI1);
+		MosiB5::setAlternateFunction(AF_SPI1, xpcc::stm32::PUSH_PULL);
+	}
+	{%- elif id == 2 -%}
+	(void) mapping;		// avoid compiler warning
+	
+	SckB13::setAlternateFunction(AF_SPI2, xpcc::stm32::PUSH_PULL);
+	MisoB14::setAlternateFunction(AF_SPI2);
+	MosiB15::setAlternateFunction(AF_SPI2, xpcc::stm32::PUSH_PULL);
+	{%- elif id == 3 -%}
+	if (mapping == REMAP_PB3_PB4_PB5) {
+		SckB3::setAlternateFunction(AF_SPI3, xpcc::stm32::PUSH_PULL);
+		MisoB4::setAlternateFunction(AF_SPI3);
+		MosiB5::setAlternateFunction(AF_SPI3, xpcc::stm32::PUSH_PULL);
+	}
+	else {
+		SckC10::setAlternateFunction(AF_SPI3, xpcc::stm32::PUSH_PULL);
+		MisoC11::setAlternateFunction(AF_SPI3);
+		MosiC12::setAlternateFunction(AF_SPI3, xpcc::stm32::PUSH_PULL);
+	}
+	{%- endif %}
+#else
+	{% if id == 1 -%}
+	AFIO->MAPR = (AFIO->MAPR & ~AFIO_MAPR_SPI{{ id }}_REMAP) | mapping;
+	if (mapping == REMAP_PA5_PA6_PA7) {
+		SckA5::setAlternateFunction(xpcc::stm32::PUSH_PULL);
+		MisoA6::setInput(xpcc::stm32::FLOATING);
+		MosiA7::setAlternateFunction(xpcc::stm32::PUSH_PULL);
+	}
+	else {
+		SckB3::setAlternateFunction(xpcc::stm32::PUSH_PULL);
+		MisoB4::setInput(xpcc::stm32::FLOATING);
+		MosiB5::setAlternateFunction(xpcc::stm32::PUSH_PULL);
+	}
+	{%- elif id == 2 -%}
+	(void) mapping;		// avoid compiler warning
+	
+	SckB13::setAlternateFunction(xpcc::stm32::PUSH_PULL);
+	MisoB14::setInput(xpcc::stm32::FLOATING);
+	MosiB15::setAlternateFunction(xpcc::stm32::PUSH_PULL);
+	{%- elif id == 3 -%}
+	(void) mapping;		// avoid compiler warning
+	
+#if defined(STM32F10X_CL)
+	AFIO->MAPR = (AFIO->MAPR & ~AFIO_MAPR_SPI{{ id }}_REMAP) | mapping;
+	if (mapping == REMAP_PB3_PB4_PB5) {
+#endif
+		SckB3::setAlternateFunction(xpcc::stm32::PUSH_PULL);
+		MisoB4::setInput(xpcc::stm32::FLOATING);
+		MosiB5::setAlternateFunction(xpcc::stm32::PUSH_PULL);
+#if defined(STM32F10X_CL)
+	}
+	else {
+		SckC10::setAlternateFunction(xpcc::stm32::PUSH_PULL);
+		MisoC11::setInput(xpcc::stm32::FLOATING);
+		MosiC12::setAlternateFunction(xpcc::stm32::PUSH_PULL);
+	}
+#endif
+	{%- endif %}
+#endif
+}
+
+
+// ----------------------------------------------------------------------------
+void
 xpcc::stm32::Spi{{ id }}::initialize(Mode mode, Prescaler prescaler)
 {
-#if defined(STM32F2XX) || defined(STM32F4XX)
-
-#else
-	Cs::setAlternateFunction(xpcc::stm32::PUSH_PULL);
-	Cs::set();
-	Sck::setAlternateFunction(xpcc::stm32::PUSH_PULL);
-	Miso::setInput(xpcc::stm32::FLOATING);
-	Mosi::setAlternateFunction(xpcc::stm32::PUSH_PULL);
-#endif
-	
 	{% if id == 1 -%}
-	RCC->APB2ENR |= (1 << apbId);
-	RCC->APB2RSTR |= (1 << apbId);
-	RCC->APB2RSTR &= ~(1 << apbId);
+	RCC->APB2ENR |= RCC_APB2ENR_SPI1EN;
+	
+	RCC->APB2RSTR |=  RCC_APB2RSTR_SPI1RST;
+	RCC->APB2RSTR &= ~RCC_APB2RSTR_SPI1RST;
 	{%- elif id == 2 or id == 3 -%}
-	RCC->APB1ENR |= (1 << apbId);
-	RCC->APB1RSTR |= (1 << apbId);
-	RCC->APB1RSTR &= ~(1 << apbId);
+	RCC->APB1ENR |= RCC_APB1ENR_SPI{{ id }}EN;
+	
+	RCC->APB1RSTR |=  RCC_APB1RSTR_SPI{{ id }}RST;
+	RCC->APB1RSTR &= ~RCC_APB1RSTR_SPI{{ id }}RST;
 	{%- endif %}
 	
 	// disable all interrupts

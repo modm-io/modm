@@ -38,31 +38,58 @@
 
 namespace
 {
-	GPIO__OUTPUT(Cs, A, 4);		// Remap A15
-	GPIO__OUTPUT(Sck, A, 5);	// Remap B3
-	GPIO__INPUT(Miso, A, 6);	// Remap B4
-	GPIO__OUTPUT(Mosi, A, 7);	// Remap B5
+	GPIO__OUTPUT(SckA5, A, 5);
+	GPIO__INPUT(MisoA6, A, 6);
+	GPIO__OUTPUT(MosiA7, A, 7);
 	
-	static const uint32_t apbId = 12;	// APB2
+	GPIO__OUTPUT(SckB3, B, 3);
+	GPIO__INPUT(MisoB4, B, 4);
+	GPIO__OUTPUT(MosiB5, B, 5);
 }
+
+// ----------------------------------------------------------------------------
+void
+xpcc::stm32::Spi1::configurePins(Mapping mapping)
+{
+	// Enable clock
+	RCC->APB2ENR |= RCC_APB2ENR_SPI1EN;
+	
+	// Initialize IO pins
+#if defined(STM32F2XX) || defined(STM32F4XX)
+	if (mapping == REMAP_PA5_PA6_PA7) {
+		SckA5::setAlternateFunction(AF_SPI1, xpcc::stm32::PUSH_PULL);
+		MisoA6::setAlternateFunction(AF_SPI1);
+		MosiA7::setAlternateFunction(AF_SPI1, xpcc::stm32::PUSH_PULL);
+	}
+	else {
+		SckB3::setAlternateFunction(AF_SPI1, xpcc::stm32::PUSH_PULL);
+		MisoB4::setAlternateFunction(AF_SPI1);
+		MosiB5::setAlternateFunction(AF_SPI1, xpcc::stm32::PUSH_PULL);
+	}
+#else
+	AFIO->MAPR = (AFIO->MAPR & ~AFIO_MAPR_SPI1_REMAP) | mapping;
+	if (mapping == REMAP_PA5_PA6_PA7) {
+		SckA5::setAlternateFunction(xpcc::stm32::PUSH_PULL);
+		MisoA6::setInput(xpcc::stm32::FLOATING);
+		MosiA7::setAlternateFunction(xpcc::stm32::PUSH_PULL);
+	}
+	else {
+		SckB3::setAlternateFunction(xpcc::stm32::PUSH_PULL);
+		MisoB4::setInput(xpcc::stm32::FLOATING);
+		MosiB5::setAlternateFunction(xpcc::stm32::PUSH_PULL);
+	}
+#endif
+}
+
 
 // ----------------------------------------------------------------------------
 void
 xpcc::stm32::Spi1::initialize(Mode mode, Prescaler prescaler)
 {
-#if defined(STM32F2XX) || defined(STM32F4XX)
-
-#else
-	Cs::setAlternateFunction(xpcc::stm32::PUSH_PULL);
-	Cs::set();
-	Sck::setAlternateFunction(xpcc::stm32::PUSH_PULL);
-	Miso::setInput(xpcc::stm32::FLOATING);
-	Mosi::setAlternateFunction(xpcc::stm32::PUSH_PULL);
-#endif
+	RCC->APB2ENR |= RCC_APB2ENR_SPI1EN;
 	
-	RCC->APB2ENR |= (1 << apbId);
-	RCC->APB2RSTR |= (1 << apbId);
-	RCC->APB2RSTR &= ~(1 << apbId);
+	RCC->APB2RSTR |=  RCC_APB2RSTR_SPI1RST;
+	RCC->APB2RSTR &= ~RCC_APB2RSTR_SPI1RST;
 	
 	// disable all interrupts
 	SPI1->CR2 &= ~(SPI_CR2_TXEIE  | SPI_CR2_RXNEIE  | SPI_CR2_ERRIE);

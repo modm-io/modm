@@ -93,9 +93,9 @@ namespace xpcc
 			write(char data);
 			
 			/**
-			 * \brief	Write a string
+			 * \brief	Write a null-terminated string
 			 * 
-			 * The string musst end with \c '\\0'.
+			 * The string must end with \c '\\0'.
 			 */
 			static void
 			write(const char *string);

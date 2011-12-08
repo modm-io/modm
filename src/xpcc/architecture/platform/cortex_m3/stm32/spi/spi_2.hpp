@@ -44,11 +44,16 @@ namespace xpcc
 	namespace stm32
 	{
 		/**
-		 * @brief		Serial peripheral interface (SPI)
+		 * @brief		Serial peripheral interface (SPI2)
 		 * 
 		 * Simple unbuffered implementation.
 		 * 
-		 * SPI1 (APB2) at 72MHz, SPI2 and SPI3 (APB1) at 36MHz.
+		 * STM32F10x:
+		 * - SPI1 (APB2) at 72MHz
+		 * - SPI2 and SPI3 (APB1) at 36MHz.
+		 * 
+		 * STM32F2/4xx:
+		 * - TODO
 		 * 
 		 * @ingroup		stm32
 		 */
@@ -74,6 +79,27 @@ namespace xpcc
 				PRESCALER_128 = SPI_CR1_BR_2 | SPI_CR1_BR_1,
 				PRESCALER_256 = SPI_CR1_BR_2 | SPI_CR1_BR_1 | SPI_CR1_BR_0,
 			};
+			
+			enum Mapping
+			{
+#if defined(STM32F2XX) || defined(STM32F4XX)
+				REMAP_PB13_PB14_PB15,	///< SCK/PB13, MISO/PB14, MOSI/PB15, NSS/PB12
+				
+				// TODO PB9..15, PC2..3
+				//REMAP_PI1_PI2_PI3,		///< SCK/PI1, MISO/PI2, MOSI/PI3, NSS/PI0
+#else
+				REMAP_PB13_PB14_PB15,							///< SCK/PB13, MISO/PB14, MOSI/PB15, NSS/PB12
+#endif
+			};
+			
+			/**
+			 * Configure the IO Pins for SPI2
+			 * 
+			 * \warning	NSS is not configured and has to be handled
+			 * 			by the user!
+			 */
+			static void
+			configurePins(Mapping mapping);
 			
 		public:
 			/**

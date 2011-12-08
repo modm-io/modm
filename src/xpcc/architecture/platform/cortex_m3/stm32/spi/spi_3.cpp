@@ -36,35 +36,68 @@
 #include "../gpio.hpp"
 #include "spi_3.hpp"
 
-#ifndef STM32F10X_LD
+#if !defined(STM32F10X_LD) && !defined(STM32F10X_MD)
 
 namespace
 {
-	GPIO__OUTPUT(Cs, A, 15);
-	GPIO__OUTPUT(Sck, B, 3);
-	GPIO__INPUT(Miso, B, 4);
-	GPIO__OUTPUT(Mosi, B, 5);
+	GPIO__OUTPUT(SckB3, B, 3);
+	GPIO__INPUT(MisoB4, B, 4);
+	GPIO__OUTPUT(MosiB5, B, 5);
 	
-	static const uint32_t apbId = 15;	// APB1
+	GPIO__OUTPUT(SckC10, C, 10);
+	GPIO__INPUT(MisoC11, C, 11);
+	GPIO__OUTPUT(MosiC12, C, 12);
 }
+
+// ----------------------------------------------------------------------------
+void
+xpcc::stm32::Spi3::configurePins(Mapping mapping)
+{
+	// Enable clock
+	RCC->APB1ENR |= RCC_APB1ENR_SPI3EN;
+	
+	// Initialize IO pins
+#if defined(STM32F2XX) || defined(STM32F4XX)
+	if (mapping == REMAP_PB3_PB4_PB5) {
+		SckB3::setAlternateFunction(AF_SPI3, xpcc::stm32::PUSH_PULL);
+		MisoB4::setAlternateFunction(AF_SPI3);
+		MosiB5::setAlternateFunction(AF_SPI3, xpcc::stm32::PUSH_PULL);
+	}
+	else {
+		SckC10::setAlternateFunction(AF_SPI3, xpcc::stm32::PUSH_PULL);
+		MisoC11::setAlternateFunction(AF_SPI3);
+		MosiC12::setAlternateFunction(AF_SPI3, xpcc::stm32::PUSH_PULL);
+	}
+#else
+	(void) mapping;		// avoid compiler warning
+	
+#if defined(STM32F10X_CL)
+	AFIO->MAPR = (AFIO->MAPR & ~AFIO_MAPR_SPI3_REMAP) | mapping;
+	if (mapping == REMAP_PB3_PB4_PB5) {
+#endif
+		SckB3::setAlternateFunction(xpcc::stm32::PUSH_PULL);
+		MisoB4::setInput(xpcc::stm32::FLOATING);
+		MosiB5::setAlternateFunction(xpcc::stm32::PUSH_PULL);
+#if defined(STM32F10X_CL)
+	}
+	else {
+		SckC10::setAlternateFunction(xpcc::stm32::PUSH_PULL);
+		MisoC11::setInput(xpcc::stm32::FLOATING);
+		MosiC12::setAlternateFunction(xpcc::stm32::PUSH_PULL);
+	}
+#endif
+#endif
+}
+
 
 // ----------------------------------------------------------------------------
 void
 xpcc::stm32::Spi3::initialize(Mode mode, Prescaler prescaler)
 {
-#if defined(STM32F2XX) || defined(STM32F4XX)
-
-#else
-	Cs::setAlternateFunction(xpcc::stm32::PUSH_PULL);
-	Cs::set();
-	Sck::setAlternateFunction(xpcc::stm32::PUSH_PULL);
-	Miso::setInput(xpcc::stm32::FLOATING);
-	Mosi::setAlternateFunction(xpcc::stm32::PUSH_PULL);
-#endif
+	RCC->APB1ENR |= RCC_APB1ENR_SPI3EN;
 	
-	RCC->APB1ENR |= (1 << apbId);
-	RCC->APB1RSTR |= (1 << apbId);
-	RCC->APB1RSTR &= ~(1 << apbId);
+	RCC->APB1RSTR |=  RCC_APB1RSTR_SPI3RST;
+	RCC->APB1RSTR &= ~RCC_APB1RSTR_SPI3RST;
 	
 	// disable all interrupts
 	SPI3->CR2 &= ~(SPI_CR2_TXEIE  | SPI_CR2_RXNEIE  | SPI_CR2_ERRIE);
