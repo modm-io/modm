@@ -203,7 +203,7 @@ xpcc::IOStream::writeHex(uint8_t value)
 xpcc::IOStream&
 xpcc::IOStream::operator << (const void* p)
 {
-#if __SIZEOF_POINTER__ == 2
+#if XPCC__SIZEOF_POINTER == 2
 	
 	this->device->write('0');
 	this->device->write('x');
@@ -213,7 +213,7 @@ xpcc::IOStream::operator << (const void* p)
 	writeHex(value >> 8);
 	writeHex(value);
 	
-#elif __SIZEOF_POINTER__ == 4
+#elif XPCC__SIZEOF_POINTER == 4
 	
 	this->device->write('0');
 	this->device->write('x');
@@ -225,7 +225,7 @@ xpcc::IOStream::operator << (const void* p)
 	writeHex(value >> 8);
 	writeHex(value);
 	
-#elif __SIZEOF_POINTER__ == 8
+#elif XPCC__SIZEOF_POINTER == 8
 	
 	this->device->write('0');
 	this->device->write('x');

@@ -90,6 +90,14 @@
 #define	XPCC__CPU_HOSTED_64
 //@}
 
+/**
+ * \brief	Additional information
+ * \ingroup	platform
+ */
+//@{
+#define	XPCC__SIZEOF_POINTER
+//@}
+
 #else //!__DOXYGEN__
 
 // ----------------------------------------------------------------------------
@@ -143,7 +151,7 @@
 #endif
 
 // ----------------------------------------------------------------------------
-// Determine 
+// Determine CPU type
 
 #if defined __AVR__
 #	define	XPCC__CPU_AVR 1
@@ -191,7 +199,24 @@
 #	define XPCC__CPU_STRING 		"Unknown"
 #endif
 
-// windows lacks support for some macros c99 we need to provide here
+// ----------------------------------------------------------------------------
+// Provide some additional information
+
+#if defined __SIZEOF_POINTER__
+#	define XPCC__SIZEOF_POINTER			__SIZEOF_POINTER__
+#else
+#	if _LP64
+#		define XPCC__SIZEOF_POINTER		8
+#	endif
+#endif
+
+#if !defined XPCC__SIZEOF_POINTER
+#	error "XPCC__SIZEOF_POINTER not defined! Please provide a suitable definition."
+#endif
+
+// ----------------------------------------------------------------------------
+// Windows lacks support for some C99 macros and functions we need to
+// provide here
 #if defined XPCC__OS_WIN32
 #	include "platform/hosted/windows.hpp"
 #endif
