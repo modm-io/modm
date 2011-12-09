@@ -34,7 +34,7 @@
 #define XPCC_STM32F1__CORE_HPP
 
 #include <stdint.h>
-#include <xpcc/architecture/platform/cortex_m3.hpp>
+#include "../device.h"
 
 namespace xpcc
 {
