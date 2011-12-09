@@ -51,8 +51,12 @@ namespace xpcc
 
 			enum Interrupt
 			{
-				UPDATE_INTERRUPT = TIM_DIER_UIE,
-				UPDATE_DMA_REQUEST_INTERRUPT = TIM_DIER_UDE,
+				INTERRUPT_UPDATE = TIM_DIER_UIE,
+			};
+
+			enum StateFlag
+			{
+				FLAG_UPDATE = TIM_SR_UIF,
 			};
 
 		public:
@@ -79,7 +83,7 @@ namespace xpcc
 			 * Pause timer operation
 			 *
 			 * All settings are stored but the timer operation is suspend until
-			 * resume() is called.
+			 * start() is called.
 			 */
 			static void
 			pause();
@@ -174,40 +178,56 @@ namespace xpcc
 			static inline void
 			setValue(uint16_t value);
 
-			/** Enable interrupt handler */
+			/**
+			 * Enables interrupts. Don't forget to enable Interrupt Vector. These methods are provided by Subclasses.
+			 *
+			 * \param interrupts	Interrupts to enable
+			 */
 			static void
 			enableInterrupt(Interrupt interrupt);
 
-			/** Disable interrupt handler */
+			/**
+			 * Disables interrupts.
+			 *
+			 * \param interrupts	Interrupts to disable
+			 */
 			static void
 			disableInterrupt(Interrupt interrupt);
 
-			static Interrupt
-			getInterruptCause();
+			/**
+			 * Returns a bitmap of the enum StateFlag. Use this method while executing
+			 * an interrupt or in any other situation where you want to know which of the state flags are set.
+			 *
+			 * If a flag is a cause of an enabled interrupt
+			 * (and InterruptVector is enabled) then interrupt will be triggered as long
+			 * the flag is set.
+			 *
+			 * You cannot use switch statement for the returned value, since if more then one flag is set none
+			 * of enumeration values will fit to the returned one.
+			 *
+			 * StateFlag sf = TIM{{ id }}::getState()
+			 * if (sf & TIM{{ id }}::FLAG_XX){
+			 * 		// flag was set, clear the flag since flags are set by hardware, but have to be cleared by software
+			 * 		TIM{{ id }}::resetState(TIM{{ id }}::FLAG_XX)
+			 * }
+			 */
+			static StateFlag
+			getState();
 
 			/**
-			 * Reset interrupt flags
+			 * Clears one or multiple flags.
 			 *
-			 * You need to call this function at the beginning of the
-			 * interrupt handler function. Preferably as the first command.
+			 * \param flags		Bitmap of StateFlag
 			 */
 			static void
-			acknowledgeInterrupt(Interrupt interrupt);
+			resetState(StateFlag flags);
 		};
 
 		class GeneralPurposeTimer : public BasicTimer
 		{
 		public:
-			enum Interrupt
+			enum DmaRequestEnable
 			{
-				UPDATE_INTERRUPT = TIM_DIER_UIE,
-				CAPTURE_COMPARE_1_INTERRUPT = TIM_DIER_CC1IE,
-				CAPTURE_COMPARE_2_INTERRUPT = TIM_DIER_CC2IE,
-				CAPTURE_COMPARE_3_INTERRUPT = TIM_DIER_CC3IE,
-				CAPTURE_COMPARE_4_INTERRUPT = TIM_DIER_CC4IE,
-				COM_INTERRUPT = TIM_DIER_COMIE,
-				TRIGGER_INTERRUPT = TIM_DIER_TIE,
-				BREAK_INTERRUPT = TIM_DIER_BIE,
 				UPDATE_DMA_REQUEST_INTERRUPT = TIM_DIER_UDE,
 				CAPTURE_COMPARE_1_DMA_REQUEST_INTERRUPT = TIM_DIER_CC1DE,
 				CAPTURE_COMPARE_2_DMA_REQUEST_INTERRUPT = TIM_DIER_CC2DE,
@@ -215,6 +235,43 @@ namespace xpcc
 				CAPTURE_COMPARE_4_DMA_REQUEST_INTERRUPT = TIM_DIER_CC4DE,
 				COM_DMA_REQUEST_INTERRUPT = TIM_DIER_COMDE,
 				TRIGGER_DMA_REQUEST_INTERRUPT = TIM_DIER_TDE,
+			};
+
+			enum Interrupt
+			{
+				INTERRUPT_UPDATE = TIM_DIER_UIE,
+				INTERRUPT_CAPTURE_COMPARE_1 = TIM_DIER_CC1IE,
+				INTERRUPT_CAPTURE_COMPARE_2 = TIM_DIER_CC2IE,
+				INTERRUPT_CAPTURE_COMPARE_3 = TIM_DIER_CC3IE,
+				INTERRUPT_CAPTURE_COMPARE_4= TIM_DIER_CC4IE,
+				INTERRUPT_COM = TIM_DIER_COMIE,
+				INTERRUPT_TRIGGER = TIM_DIER_TIE,
+				INTERRUPT_BREAK = TIM_DIER_BIE,
+			};
+
+			enum StateFlag
+			{
+				FLAG_UPDATE = TIM_SR_UIF,
+				FLAG_CAPTURE_COMPARE_1 = TIM_SR_CC1IF,
+				FLAG_CAPTURE_COMPARE_2 = TIM_SR_CC2IF,
+				FLAG_CAPTURE_COMPARE_3 = TIM_SR_CC3IF,
+				FLAG_CAPTURE_COMPARE_4 = TIM_SR_CC4IF,
+				FLAG_COM = TIM_SR_COMIF,
+				FLAG_TRIGGER = TIM_SR_TIF,
+				FLAG_BREAK = TIM_SR_BIF,
+				FLAG_OVERCAPTURE_1 = TIM_SR_CC1OF,
+				FLAG_OVERCAPTURE_2 = TIM_SR_CC2OF,
+				FLAG_OVERCAPTURE_3 = TIM_SR_CC3OF,
+				FLAG_OVERCAPTURE_4 = TIM_SR_CC4OF,
+			};
+
+			enum SlaveModeTrigger
+			{
+			};
+
+			enum SlaveMode
+			{
+				SLAVE_DISABLED = 0,
 			};
 
 			enum Mode
@@ -228,8 +285,6 @@ namespace xpcc
 				CENTER_ALIGNED_1 =                 TIM_CR1_CMS_0,	///< Output compare flags only set when counting down
 				CENTER_ALIGNED_2 = TIM_CR1_CMS_1, 					///< Output compare flags only set when counting up
 				CENTER_ALIGNED_3 = TIM_CR1_CMS_1 | TIM_CR1_CMS_0,	///< Output compare flags set when counting up and down (default)
-
-				ENCODER,
 			};
 
 			enum OutputCompareMode
@@ -259,6 +314,36 @@ namespace xpcc
 				OUTPUT_PWM2 = TIM_CCMR1_OC1M_2 | TIM_CCMR1_OC1M_1 | TIM_CCMR1_OC1M_0,
 			};
 			
+			/**
+			 * If more than one Compare Channel is available they are always paired.
+			 * 		(A channel with an odd number is paired with the next even numbered channel)
+			 * It is possible to choose as trigger for the input capture functionality either
+			 * the own timer input or the input associated with the paired channel.
+			 *
+			 * For working with Internal Triggers, TRC can also be selected.
+			 */
+			enum InputCaptureMapping
+			{
+				INPUT_OWN 	= 1,
+				INPUT_OTHER	= 2,
+				INPUT_TRC 	= 3,
+			};
+
+			enum InputCapturePolarity
+			{
+				INPUT_RISING	= 0,
+				INPUT_FALLING	= TIM_CCER_CC1P,
+				INPUT_BOTH		= TIM_CCER_CC1NP | TIM_CCER_CC1P,
+			};
+
+			enum InputCapturePrescaler
+			{
+				INPUT_DIV1	= 0,
+				INPUT_DIV2	= 1,
+				INPUT_DIV4	= 2,
+				INPUT_DIV8	= 3,
+			};
+
 		public:
 			/**
 			 * Set operation mode of the timer

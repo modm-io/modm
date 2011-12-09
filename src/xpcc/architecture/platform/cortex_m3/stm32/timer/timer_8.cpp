@@ -77,28 +77,20 @@ xpcc::stm32::Timer8::disable()
 
 // ----------------------------------------------------------------------------
 void
-xpcc::stm32::Timer8::setMode(Mode mode)
+xpcc::stm32::Timer8::setMode(Mode mode, SlaveMode slaveMode, SlaveModeTrigger slaveModeTrigger)
 {
 	// disable timer
 	TIM8->CR1 = 0;
 	TIM8->CR2 = 0;
 	
-	if (mode == ENCODER)
+	if (slaveMode == SLAVE_ENCODER_1 || slaveMode == SLAVE_ENCODER_2 || slaveMode == SLAVE_ENCODER_3)
 	{
-		// SMS[2:0] = 011
-		//   Encoder mode 3 - Counter counts up/down on both TI1FP1 and TI2FP2
-		//   edges depending on the level of the other input.
-		TIM8->SMCR = TIM_SMCR_SMS_1 | TIM_SMCR_SMS_0;
-		
 		setPrescaler(1);
 	}
-	else {
-		// ARR Register is buffered, only Under/Overflow generates update interrupt
-		TIM8->CR1 = TIM_CR1_ARPE | TIM_CR1_URS | mode;
-		
-		// Slave mode disabled
-		TIM8->SMCR = 0;
-	}
+	
+	// ARR Register is buffered, only Under/Overflow generates update interrupt
+	TIM8->CR1 = TIM_CR1_ARPE | TIM_CR1_URS | mode;
+	TIM8->SMCR = slaveMode|slaveModeTrigger;
 }
 
 // ----------------------------------------------------------------------------
@@ -122,6 +114,41 @@ xpcc::stm32::Timer8::setPeriod(uint32_t microseconds, bool autoApply)
 	}
 	
 	return overflow;
+}
+
+// ----------------------------------------------------------------------------
+void
+xpcc::stm32::Timer8::configureInputChannel(uint32_t channel,
+		InputCaptureMapping input, InputCapturePrescaler prescaler, InputCapturePolarity polarity, uint8_t filter)
+{
+	channel -= 1;	// 1..4 -> 0..3
+	
+	// disable channel
+	TIM8->CCER &= ~((TIM_CCER_CC1NP | TIM_CCER_CC1P | TIM_CCER_CC1E) << (channel * 4));
+	
+	uint32_t flags = input;
+	flags |= ((uint32_t)prescaler) << 2;
+	flags |= ((uint32_t)(filter&0xf)) << 4;
+	
+	if (channel <= 1)
+	{
+		uint32_t offset = 8 * channel;
+		
+		flags <<= offset;
+		flags |= TIM8->CCMR1 & ~(0xff << offset);
+		
+		TIM8->CCMR1 = flags;
+	}
+	else {
+		uint32_t offset = 8 * (channel - 2);
+		
+		flags <<= offset;
+		flags |= TIM8->CCMR2 & ~(0xff << offset);
+		
+		TIM8->CCMR2 = flags; 
+	}
+	
+	TIM8->CCER |= (TIM_CCER_CC1E | polarity) << (channel * 4);
 }
 
 // ----------------------------------------------------------------------------
@@ -175,30 +202,47 @@ nvicEnableInterrupt(IRQn_Type IRQn)
 	NVIC->ISER[((uint32_t)(IRQn) >> 5)] = (1 << ((uint32_t)(IRQn) & 0x1F));
 }
 
+static ALWAYS_INLINE void
+nvicDisableInterrupt(IRQn_Type IRQn)
+{
+	NVIC_DisableIRQ(IRQn);
+}
+
 // ----------------------------------------------------------------------------
 void
-xpcc::stm32::Timer8::enableInterrupt(Interrupt interrupt)
+xpcc::stm32::Timer8::setInterruptVectorEnabled(Interrupt interrupts)
 {
 	// register IRQs at the NVIC
-	if (interrupt & (UPDATE_INTERRUPT | UPDATE_DMA_REQUEST_INTERRUPT)) {
+	if (interrupts & (INTERRUPT_UPDATE)) {
 		nvicEnableInterrupt(TIM8_UP_IRQn);
 	}
-	if (interrupt & BREAK_INTERRUPT) {
-		nvicEnableInterrupt(TIM8_BRK_IRQn);
-	}
-	if (interrupt & (COM_INTERRUPT | TRIGGER_INTERRUPT |
-			COM_DMA_REQUEST_INTERRUPT | TRIGGER_DMA_REQUEST_INTERRUPT)) {
-		nvicEnableInterrupt(TIM8_TRG_COM_IRQn);
-	}	
-	if (interrupt &
-			(CAPTURE_COMPARE_1_INTERRUPT | CAPTURE_COMPARE_2_INTERRUPT |
-			 CAPTURE_COMPARE_3_INTERRUPT | CAPTURE_COMPARE_4_INTERRUPT |
-			 CAPTURE_COMPARE_1_DMA_REQUEST_INTERRUPT | CAPTURE_COMPARE_2_DMA_REQUEST_INTERRUPT |
-			 CAPTURE_COMPARE_3_DMA_REQUEST_INTERRUPT | CAPTURE_COMPARE_4_DMA_REQUEST_INTERRUPT)) {
-		nvicEnableInterrupt(TIM8_CC_IRQn);
+	else{
+		nvicDisableInterrupt(TIM8_UP_IRQn);
 	}
 	
-	TIM8->DIER |= interrupt;
+	if (interrupts & INTERRUPT_BREAK) {
+		nvicEnableInterrupt(TIM8_BRK_IRQn);
+	}
+	else{
+		nvicDisableInterrupt(TIM8_BRK_IRQn);
+	}
+	
+	if (interrupts & (INTERRUPT_COM | INTERRUPT_TRIGGER)) {
+		nvicEnableInterrupt(TIM8_TRG_COM_IRQn);
+	}	
+	else{
+		nvicDisableInterrupt(TIM8_TRG_COM_IRQn);
+	}
+	
+	if (interrupts & 
+			(INTERRUPT_CAPTURE_COMPARE_1 | INTERRUPT_CAPTURE_COMPARE_2 |
+			INTERRUPT_CAPTURE_COMPARE_3 | INTERRUPT_CAPTURE_COMPARE_4)) {
+		nvicEnableInterrupt(TIM8_CC_IRQn);
+	}
+	else{
+		nvicDisableInterrupt(TIM8_CC_IRQn);
+	}
+	
 }
 
 

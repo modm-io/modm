@@ -66,28 +66,20 @@ xpcc::stm32::Timer5::disable()
 
 // ----------------------------------------------------------------------------
 void
-xpcc::stm32::Timer5::setMode(Mode mode)
+xpcc::stm32::Timer5::setMode(Mode mode, SlaveMode slaveMode, SlaveModeTrigger slaveModeTrigger)
 {
 	// disable timer
 	TIM5->CR1 = 0;
 	TIM5->CR2 = 0;
 	
-	if (mode == ENCODER)
+	if (slaveMode == SLAVE_ENCODER_1 || slaveMode == SLAVE_ENCODER_2 || slaveMode == SLAVE_ENCODER_3)
 	{
-		// SMS[2:0] = 011
-		//   Encoder mode 3 - Counter counts up/down on both TI1FP1 and TI2FP2
-		//   edges depending on the level of the other input.
-		TIM5->SMCR = TIM_SMCR_SMS_1 | TIM_SMCR_SMS_0;
-		
 		setPrescaler(1);
 	}
-	else {
-		// ARR Register is buffered, only Under/Overflow generates update interrupt
-		TIM5->CR1 = TIM_CR1_ARPE | TIM_CR1_URS | mode;
-		
-		// Slave mode disabled
-		TIM5->SMCR = 0;
-	}
+	
+	// ARR Register is buffered, only Under/Overflow generates update interrupt
+	TIM5->CR1 = TIM_CR1_ARPE | TIM_CR1_URS | mode;
+	TIM5->SMCR = slaveMode|slaveModeTrigger;
 }
 
 // ----------------------------------------------------------------------------
@@ -115,13 +107,48 @@ xpcc::stm32::Timer5::setPeriod(uint32_t microseconds, bool autoApply)
 
 // ----------------------------------------------------------------------------
 void
+xpcc::stm32::Timer5::configureInputChannel(uint32_t channel,
+		InputCaptureMapping input, InputCapturePrescaler prescaler, InputCapturePolarity polarity, uint8_t filter)
+{
+	channel -= 1;	// 1..4 -> 0..3
+	
+	// disable channel
+	TIM5->CCER &= ~((TIM_CCER_CC1NP | TIM_CCER_CC1P | TIM_CCER_CC1E) << (channel * 4));
+	
+	uint32_t flags = input;
+	flags |= ((uint32_t)prescaler) << 2;
+	flags |= ((uint32_t)(filter&0xf)) << 4;
+	
+	if (channel <= 1)
+	{
+		uint32_t offset = 8 * channel;
+		
+		flags <<= offset;
+		flags |= TIM5->CCMR1 & ~(0xff << offset);
+		
+		TIM5->CCMR1 = flags;
+	}
+	else {
+		uint32_t offset = 8 * (channel - 2);
+		
+		flags <<= offset;
+		flags |= TIM5->CCMR2 & ~(0xff << offset);
+		
+		TIM5->CCMR2 = flags; 
+	}
+	
+	TIM5->CCER |= (TIM_CCER_CC1E | polarity) << (channel * 4);
+}
+
+// ----------------------------------------------------------------------------
+void
 xpcc::stm32::Timer5::configureOutputChannel(uint32_t channel,
 		OutputCompareMode mode, uint16_t compareValue)
 {
 	channel -= 1;	// 1..4 -> 0..3
 	
-	// disable output
-	TIM5->CCER &= ~((TIM_CCER_CC1P | TIM_CCER_CC1E) << (channel * 4));
+	// disable channel
+	TIM5->CCER &= ~((TIM_CCER_CC1NP | TIM_CCER_CC1P | TIM_CCER_CC1E) << (channel * 4));
 	
 	setCompareValue(channel, compareValue);
 	
@@ -153,12 +180,13 @@ xpcc::stm32::Timer5::configureOutputChannel(uint32_t channel,
 
 // ----------------------------------------------------------------------------
 void
-xpcc::stm32::Timer5::enableInterrupt(Interrupt interrupt)
+xpcc::stm32::Timer5::setInterruptVectorEnabled(bool enable)
 {
-	// register IRQ at the NVIC
-	NVIC_EnableIRQ(TIM5_IRQn);
-	
-	TIM5->DIER |= interrupt;
+	if (enable)
+		// register IRQ at the NVIC
+		NVIC_EnableIRQ(TIM5_IRQn);
+	else
+		NVIC_DisableIRQ(TIM5_IRQn);
 }
 
 

@@ -91,6 +91,34 @@ namespace xpcc
 #endif
 						
 		public:
+			enum SlaveModeTrigger
+			{
+				
+				TRIGGER_INTERNAL_1 = TIM_SMCR_TS_0,
+				TRIGGER_INTERNAL_2 = TIM_SMCR_TS_1,
+				
+				
+				TRIGGER_FILTERED_TI1 = TIM_SMCR_TS_2 | TIM_SMCR_TS_0,
+				TRIGGER_FILTERED_TI2 = TIM_SMCR_TS_2 | TIM_SMCR_TS_1,
+				TRIGGER_EXTERNAL = TIM_SMCR_TS_2 | TIM_SMCR_TS_1 | TIM_SMCR_TS_0,
+			};
+			
+			enum SlaveMode
+			{
+				SLAVE_DISABLED	= 0, // Slave mode disabled - if CEN = '1' then the prescaler is clocked directly by the internal clock.
+				
+				
+				SLAVE_ENCODER_1	= TIM_SMCR_SMS_0, // Counter counts up/down on TI2FP2 edge depending on TI1FP1 level.
+				SLAVE_ENCODER_2	= TIM_SMCR_SMS_1, // Counter counts up/down on TI1FP1 edge depending on TI2FP2 level.
+				SLAVE_ENCODER_3	= TIM_SMCR_SMS_1 | TIM_SMCR_SMS_0, // Counter counts up/down on both TI1FP1 and TI2FP2 edges depending on the level of the other input.
+				
+				
+				SLAVE_RESET		= TIM_SMCR_SMS_2, // Rising edge of the selected trigger input (TRGI) reinitializes the counter and generates an update of the registers.
+				SLAVE_GATED		= TIM_SMCR_SMS_2 | TIM_SMCR_SMS_0, // The counter clock is enabled when the trigger input (TRGI) is high. The counter stops (but is not reset) as soon as the trigger becomes low. Both start and stop of the counter are controlled.
+				SLAVE_TRIGGER	= TIM_SMCR_SMS_2 | TIM_SMCR_SMS_1, // The counter starts at a rising edge of the trigger TRGI (but it is not reset). Only the start of the counter is controlled.
+				SLAVE_EXTERNAL_CLOCK = TIM_SMCR_SMS_2 | TIM_SMCR_SMS_1 | TIM_SMCR_SMS_0, // Rising edges of the selected trigger (TRGI) clock the counter.
+			};
+			
 			static void
 			enable();
 			
@@ -110,7 +138,7 @@ namespace xpcc
 			}
 			
 			static void
-			setMode(Mode mode);
+			setMode(Mode mode, SlaveMode slaveMode = SLAVE_DISABLED, SlaveModeTrigger slaveModeTrigger = (SlaveModeTrigger)0);
 			
 			static inline void
 			setPrescaler(uint16_t prescaler)
@@ -149,9 +177,9 @@ namespace xpcc
 			}
 			
 		public:
-			// TODO
-			//static void
-			//configureInputChannel(uint32_t channel, );
+			static void
+			configureInputChannel(uint32_t channel, InputCaptureMapping input,
+					InputCapturePrescaler prescaler, InputCapturePolarity polarity, uint8_t filter);
 			
 			static void
 			configureOutputChannel(uint32_t channel, OutputCompareMode mode,
@@ -160,34 +188,68 @@ namespace xpcc
 			static inline void
 			setCompareValue(uint32_t channel, uint16_t value)
 			{
+#if defined(STM32F2XX) || defined(STM32F4XX)
+				*(&TIM3->CCR1 + (channel - 1)) = value;
+#else
 				*(&TIM3->CCR1 + ((channel - 1) * 2)) = value;
+#endif
 			}
 			
 			static inline uint16_t
 			getCompareValue(uint32_t channel)
 			{
+#if defined(STM32F2XX) || defined(STM32F4XX)
+				return *(&TIM3->CCR1 + (channel - 1));
+#else
 				return *(&TIM3->CCR1 + ((channel - 1) * 2));
+#endif
 			}
 			
 		public:
+			/**
+			 * Enables or disables the Interrupt Vector.
+			 */
 			static void
-			enableInterrupt(Interrupt interrupt);
+			setInterruptVectorEnabled(bool enable);
 			
-			static void
-			disableInterrupt(Interrupt interrupt)
+			/**
+			 * Enables interrupts. Don't forget to enable Interrupt Vector.
+			 * 
+			 * \param interrupts	Interrupts to enable
+			 */
+			static inline void
+			enableInterrupt(Interrupt interrupts)
 			{
-				TIM3->DIER &= ~interrupt;
+				TIM3->DIER |= interrupts;
 			}
 			
-			static Interrupt
-			getInterruptCause();
+			static inline void
+			disableInterrupt(Interrupt interrupts)
+			{
+				TIM3->DIER &= ~interrupts;
+			}
 			
-			static void
-			acknowledgeInterrupt(Interrupt interrupt)
+			static inline void
+			enableDmaRequest(DmaRequestEnable dmaRequests){
+				TIM3->DIER |= dmaRequests;
+			}
+			
+			static inline void
+			disableDmaRequest(DmaRequestEnable dmaRequests){
+				TIM3->DIER &= ~dmaRequests;
+			}
+			
+			static inline StateFlag
+			getState(){
+				return (StateFlag)TIM3->SR;
+			}
+			
+			static inline void
+			resetState(StateFlag flags)
 			{
 				// Flags are cleared by writing a zero to the flag position.
 				// Writing a one is ignored.
-				TIM3->SR = ~interrupt;
+				TIM3->SR = ~flags;
 			}
 		};
 	}
