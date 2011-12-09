@@ -323,39 +323,6 @@ __libc_init_array(void);
 extern void
 exit(int) __attribute__ ((noreturn, weak));
 
-/*
- * Assume that we're going to clock the chip off the PLL, fed by
- * the HSE
- */
-void
-initPll(uint32_t pll_mul)
-{
-	uint32_t cfgr = 0;
-
-	// select HSE as source for the PLL
-	RCC->CFGR = RCC_CFGR_PLLSRC | pll_mul;
-
-	// Turn on the HSE
-	uint32_t cr = RCC->CR;
-	cr |= RCC_CR_HSEON;
-	RCC->CR = cr;
-	while (!(RCC->CR & RCC_CR_HSERDY))
-		;
-
-	// Now the PLL
-	cr |= RCC_CR_PLLON;
-	RCC->CR = cr;
-	while (!(RCC->CR & RCC_CR_PLLRDY))
-		;
-
-	// Finally, let's switch over to the PLL
-	cfgr &= ~RCC_CFGR_SW;
-	cfgr |= RCC_CFGR_SW_PLL;
-	RCC->CFGR = cfgr;
-	while ((RCC->CFGR & RCC_CFGR_SWS) != RCC_CFGR_SWS_PLL)
-		;
-}
-
 // ----------------------------------------------------------------------------
 void
 Reset_Handler(void)
@@ -393,14 +360,6 @@ Reset_Handler(void)
 
 	// set 2 waitstates
 	FLASH->ACR = (FLASH->ACR & ~FLASH_ACR_LATENCY) | FLASH_WAIT_STATE_2;
-	
-	// setup clocks
-	initPll(RCC_CFGR_PLLMULL9);
-
-	// set prescalers
-	RCC->CFGR = (RCC->CFGR & ~RCC_CFGR_HPRE) | RCC_CFGR_HPRE_DIV1;		// AHB
-	RCC->CFGR = (RCC->CFGR & ~RCC_CFGR_PPRE1) | RCC_CFGR_PPRE1_DIV2;	// APB1
-	RCC->CFGR = (RCC->CFGR & ~RCC_CFGR_PPRE2) | RCC_CFGR_PPRE2_DIV1;	// APB2
 	
 	// enable clock
 	// GPIOA-D

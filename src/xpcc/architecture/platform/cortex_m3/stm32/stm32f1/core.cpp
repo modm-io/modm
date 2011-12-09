@@ -26,7 +26,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id$
+ * $Id: core.cpp 662 2011-12-06 18:35:25Z georgi-g $
  */
 // ----------------------------------------------------------------------------
 
@@ -43,69 +43,59 @@ xpcc::stm32::Core::Clock::enableHSE(HSEConfig config, uint32_t wait_cycles){
 	}
 
 	volatile uint32_t t = wait_cycles;
-	while (!(RCC->CR |= RCC_CR_PLLRDY) && --t){
+	while (!(RCC->CR & RCC_CR_HSERDY) && --t){
 	}
 
-	return RCC->CR |= RCC_CR_PLLRDY;
+	return RCC->CR & RCC_CR_HSERDY;
 }
 
+#ifdef STM32F10X_CL
 void
-xpcc::stm32::Core::Clock::enablePll(PLLSource source, uint8_t pllM, uint16_t pllN){
-	// read reserved values
-	uint32_t tmp;
+xpcc::stm32::Core::Clock::enablePll(PLLSource source, PLLMul pllMul, uint8_t preDiv1){
+	uint32_t tmp = 0;
 
-	// read reserved values
-	tmp = RCC->PLLCFGR & ~(RCC_PLLCFGR_PLLSRC|RCC_PLLCFGR_PLLM|RCC_PLLCFGR_PLLN|RCC_PLLCFGR_PLLP|RCC_PLLCFGR_PLLQ);
-	// PLLSRC source for pll and for plli2s
-	tmp |= (source == PLL_HSI)?RCC_PLLCFGR_PLLSRC_HSI:RCC_PLLCFGR_PLLSRC_HSE;
-	// PLLM (0) = factor is user defined VCO input frequency must be configured to 2MHz
-	tmp |= ((uint32_t)pllM)&RCC_PLLCFGR_PLLM;
-	// PLLN (6) = factor is user defined
-	tmp |= (((uint32_t)pllN)<<6)&RCC_PLLCFGR_PLLN;
-#if defined(STM32F4XX)
-	// VCO output frequency must be configured to 336MHz
-	// PLLP (16) = 0 (factor = 2) for cpu frequency = 168MHz
-	// PLLQ (24) = 7 (factor = 7) for 48MHz
-	tmp |= (((uint32_t)7)<<24)&RCC_PLLCFGR_PLLQ;
-#elif defined(STM32F2XX)
-	// VCO output frequency must be configured to 240MHz
-	// PLLP (16) = 0 (factor = 2) for cpu frequency = 168MHz
-	// PLLQ (24) = 5 (factor = 5) for 48MHz
-	tmp |= (((uint32_t)5)<<24)&RCC_PLLCFGR_PLLQ;
-	#error this is not tested yet
-#else
-	#error this file is not supposed to be used with given cpu
-#endif
+	tmp |= pllMul;
+	tmp |= (source == PLL_HSI_DIV_2)?RCC_CFGR_PLLSRC_HSI_Div2:RCC_CFGR_PLLSRC_PREDIV1;
 
 
-	RCC->PLLCFGR = tmp;
+	RCC->CFGR = tmp; // be careful modifying bit 17
+	RCC->CFGR2 |= (preDiv1-1) & RCC_CFGR2_PREDIV1;
+
 
 	// enable pll
 	RCC->CR |= RCC_CR_PLLON;
 }
 
+#else
+
+void
+xpcc::stm32::Core::Clock::enablePll(PLLSource source, PLLMul pllMul){
+	uint32_t tmp = 0;
+
+	tmp |= pllMul;
+	tmp |= (source == PLL_HSI_DIV_2)?RCC_CFGR_PLLSRC_HSI_Div2:RCC_CFGR_PLLSRC_HSE;
+
+
+	RCC->CFGR = tmp;
+
+	// enable pll
+	RCC->CR |= RCC_CR_PLLON;
+}
+
+#endif // Connectivity Line
+
 bool
 xpcc::stm32::Core::Clock::switchToPll(uint32_t wait_cycles){
 	volatile uint32_t t = wait_cycles;
-	while (!(RCC->CR | RCC_CR_PLLRDY)){
+	while (!(RCC->CR & RCC_CR_PLLRDY)){
 		if (!(--t))
 			return false;
 	}
 
-#if defined(STM32F4XX)
-	// APB2 84MHz, APB1 42MHz, AHB 168MHz, select pll as source
+	// APB2 72MHz, APB1 36MHz, AHB 72MHz, select pll as source
 	RCC->CFGR =
 			(RCC->CFGR&0xffff0000) | //try to generate a halfword write
-			((RCC_CFGR_PPRE1_DIV4 | RCC_CFGR_PPRE2_DIV2 | RCC_CFGR_HPRE_DIV1 | RCC_CFGR_SW_PLL)&0x0000ffff);
-#elif defined(STM32F2XX)
-	// APB2 60MHz, APB1 30MHz, AHB 120MHz, select pll as source
-	RCC->CFGR =
-			(RCC->CFGR&0xffff0000) | //try to generate a halfword write
-			((RCC_CFGR_PPRE1_DIV4 | RCC_CFGR_PPRE2_DIV2 | RCC_CFGR_HPRE_DIV1 | RCC_CFGR_SW_PLL)&0x0000ffff);
-	#error this is not tested yet
-#else
-	#error this file is not supposed to be used with given cpu
-#endif
+			((RCC_CFGR_PPRE1_DIV2 | RCC_CFGR_PPRE2_DIV1 | RCC_CFGR_HPRE_DIV1 | RCC_CFGR_SW_PLL)&0x0000ffff);
 
 	/* Wait till the main PLL is used as system clock source */
 	while ((RCC->CFGR & (uint32_t)RCC_CFGR_SWS ) != RCC_CFGR_SWS_PLL);
@@ -114,3 +104,4 @@ xpcc::stm32::Core::Clock::switchToPll(uint32_t wait_cycles){
 
 	return true;
 }
+

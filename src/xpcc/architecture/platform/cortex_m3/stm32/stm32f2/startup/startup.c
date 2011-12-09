@@ -338,7 +338,7 @@ Reset_Handler(void)
 	}
 	
 	// enable flash prefetch
-	//FLASH->ACR |= FLASH_ACR_PRFTBE;
+	FLASH->ACR |= FLASH_ACR_PRFTEN;
 
 #if defined(STM32F4XX)
 	// prepare flash latency for working at 168MHz and supply voltage > 2.7
