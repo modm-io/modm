@@ -25,6 +25,16 @@ namespace lcd
 	GPIO__OUTPUT(Reset, B, 5);
 }
 
+static bool
+initClock(){
+	typedef xpcc::stm32::Core::Clock C;
+	// use external 8MHz crystal, stm32f1
+	if(!C::enableHSE(C::HSE_CRYSTAL))
+		return false;
+	C::enablePll(C::PLL_HSE, C::PLL_MUL_9);
+	return C::switchToPll();
+}
+
 // Graphic LCD
 xpcc::DogS102< xpcc::stm32::Spi1, lcd::CS, lcd::A0, lcd::Reset, false > display;
 
@@ -137,6 +147,8 @@ DisplayTask task3;
 int
 main(void)
 {
+	initClock();
+
 	LedStat::setOutput(xpcc::gpio::HIGH);
 	Led1::setOutput(xpcc::gpio::LOW);
 	Led2::setOutput(xpcc::gpio::LOW);

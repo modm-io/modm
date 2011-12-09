@@ -6,6 +6,16 @@
 // ----------------------------------------------------------------------------
 GPIO__OUTPUT(LedStat, C, 12);	// inverted, 0=on, 1=off
 
+static bool
+initClock(){
+	typedef xpcc::stm32::Core::Clock C;
+	// use external 8MHz crystal, stm32f1
+	if(!C::enableHSE(C::HSE_CRYSTAL))
+		return false;
+	C::enablePll(C::PLL_HSE, C::PLL_MUL_9);
+	return C::switchToPll();
+}
+
 namespace lcd
 {
 	GPIO__OUTPUT(CS, C, 1);
@@ -25,6 +35,8 @@ using namespace xpcc::stm32;
 
 MAIN_FUNCTION
 {
+	initClock();
+
 	LedStat::setOutput(xpcc::gpio::HIGH);
 	
 	EncoderIndex::setInput(xpcc::stm32::PULLUP);
@@ -33,7 +45,7 @@ MAIN_FUNCTION
 	
 	Timer3::enable();
 	Timer3::remapPins(Timer3::FULL_REMAP);		// remap CH1 to C6 and CH2 to C7
-	Timer3::setMode(Timer3::ENCODER);
+	Timer3::setMode(Timer3::UP_COUNTER, Timer3::SLAVE_ENCODER_3);
 	Timer3::setOverflow(24*4 - 1);
 	Timer3::start();
 	
