@@ -161,7 +161,7 @@ xpcc::stm32::Timer8::configureOutputChannel(uint32_t channel,
 	// disable output
 	TIM8->CCER &= ~(0xf << (channel * 4));
 	
-	setCompareValue(channel, compareValue);
+	setCompareValue(channel + 1, compareValue);
 	
 	// enable preload (the compare value is loaded at each update event)
 	uint32_t flags = mode | TIM_CCMR1_OC1PE;

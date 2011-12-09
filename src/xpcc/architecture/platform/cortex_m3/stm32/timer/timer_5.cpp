@@ -150,7 +150,7 @@ xpcc::stm32::Timer5::configureOutputChannel(uint32_t channel,
 	// disable channel
 	TIM5->CCER &= ~((TIM_CCER_CC1NP | TIM_CCER_CC1P | TIM_CCER_CC1E) << (channel * 4));
 	
-	setCompareValue(channel, compareValue);
+	setCompareValue(channel + 1, compareValue);
 	
 	// enable preload (the compare value is loaded at each update event)
 	uint32_t flags = mode | TIM_CCMR1_OC1PE;
