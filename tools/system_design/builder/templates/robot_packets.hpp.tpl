@@ -24,6 +24,18 @@ namespace robot
 			{{ element.name | enumElement }} = {{ element.value }},{% if element.description %}	///< {{ element.description }}{% endif %}
 			{%- endfor %}
 		} __attribute__((packed));
+		
+		inline const char* 
+		enumToString({{ packet.name | typeName }} e)
+		{
+			switch (e)
+			{
+			{%- for element in packet.iter() %}
+				case {{ element.name | enumElement }}: return "{{ element.name | enumElement }}";
+			{%- endfor %}
+				default: return "__UNKNOWN__";
+			}
+		}
 	{% elif packet.isStruct %}
 		struct {{ packet.name | typeName }}
 		{

@@ -18,6 +18,18 @@ namespace robot
 			{{ item.name | upper | replace(' ', '_') }} = {{ item.id }},
 		{%- endfor %}
 		};
+				
+		inline const char* 
+		enumToString(Identifier e)
+		{
+			switch (e)
+			{
+			{%- for item in components %}
+				case {{ item.name | upper | replace(' ', '_') }}: return "{{ item.name | upper | replace(' ', '_') }}";
+			{%- endfor %}
+				default: return "__UNKNOWN__";
+			}
+		}
 	}
 	
 	namespace action
@@ -28,6 +40,18 @@ namespace robot
 			{{ item.name | upper | replace(' ', '_') }} = {{ item.id }},
 		{%- endfor %}
 		};
+				
+		inline const char* 
+		enumToString(Identifier e)
+		{
+			switch (e)
+			{
+			{%- for item in actions %}
+				case {{ item.name | upper | replace(' ', '_') }}: return "{{ item.name | upper | replace(' ', '_') }}";
+			{%- endfor %}
+				default: return "__UNKNOWN__";
+			}
+		}
 	}
 		
 	namespace event
@@ -38,6 +62,18 @@ namespace robot
 			{{ item.name | upper | replace(' ', '_') }} = {{ item.id }},
 		{%- endfor %}
 		};
+		
+		inline const char* 
+		enumToString(Identifier e)
+		{
+			switch (e)
+			{
+			{%- for item in events %}
+				case {{ item.name | upper | replace(' ', '_') }}: return "{{ item.name | upper | replace(' ', '_') }}";
+			{%- endfor %}
+				default: return "__UNKNOWN__";
+			}
+		}
 	}
 }
 
