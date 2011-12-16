@@ -47,15 +47,38 @@ namespace xpcc
 		class SysTickTimer
 		{
 		public:
+			/**
+			 * Enables the SysTick Timer generating periodically events.
+			 * Warning: if SysTick Timer is enabled the xpcc::Clock, which
+			 * 			is bounded to xpcc::Timeout and other similar workflow
+			 * 			classes, is incremented on each event.
+			 * 			You must not increment the xpcc::Clock
+			 * 			additionally somewhere else.
+			 *
+			 */
 			static void
 			enable(uint32_t reload = ((F_CPU / 1000) - 1));
 
+			/**
+			 * Disables SysTick Timer.
+			 * Warning: If SysTick Timer is disabled xpcc::Clock is not
+			 * 			incremented automatically. Workflow classes which
+			 * 			depend on xpcc::Clock will not work if xpcc::Clock
+			 * 			is not incremented.
+			 */
 			static void
 			disable();
 
+			/**
+			 * Passed method will be called periodically on each event.
+			 * Previously passed interrupt handler will be detached.
+			 */
 			static void
 			attachInterrupt(InterruptHandler handler);
 
+			/**
+			 * Detaches previously attached interrupt handler.
+			 */
 			static void
 			detachInterrupt();
 		};
