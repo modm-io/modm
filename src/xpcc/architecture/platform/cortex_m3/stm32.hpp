@@ -45,6 +45,16 @@
  * - TODO: STM32 F2 series of high-performance MCUs
  * - TODO: STM32 F4 series of high-performance MCUs with DSP and FPU instructions
  *
+ * Defines:
+ * - Frequencies: These defines are defined as maximum possible frequencies of
+ * 	 the busses. Hardware drivers like USARTs are using them for configuration.
+ * 	 Remember, you can override defines in the defines section of your project.cfg
+ * 	 if you need.
+ *   - STM32_AHB_FREQUENCY
+ *   - STM32_APB1_FREQUENCY
+ *   - STM32_APB2_FREQUENCY
+ *
+ *
  * The Value line (STM32F100-102) is not supported!
  */
 

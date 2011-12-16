@@ -31,7 +31,7 @@
 // ----------------------------------------------------------------------------
 
 #if defined(STM32F2XX) || defined(STM32F4XX)
-#	include "stm32f2/core.hpp"
+#	include "stm32f2_4/core.hpp"
 #else
 #	include "stm32f1/core.hpp"
 #endif

@@ -38,6 +38,7 @@
 
 #include "timer_1.hpp"
 
+#include <xpcc_config.hpp>
 
 
 #if defined(STM32F10X_XL) || defined(STM32F2XX) || defined(STM32F4XX)
@@ -97,7 +98,9 @@ xpcc::stm32::Timer1::setPeriod(uint32_t microseconds, bool autoApply)
 {
 	// This will be inaccurate for non-smooth frequencies (last six digits
 	// unequal to zero)
-	uint32_t cycles = microseconds * (F_CPU / 1000000UL);
+	uint32_t cycles = microseconds * (
+			((STM32_APB2_FREQUENCY==STM32_AHB_FREQUENCY)?1:2) * 
+			STM32_APB2_FREQUENCY / 1000000UL);
 	uint16_t prescaler = (cycles + 65535) / 65536;	// always round up
 	uint16_t overflow = cycles / prescaler;
 	

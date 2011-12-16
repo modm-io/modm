@@ -33,6 +33,8 @@
 #include "../device.h"
 
 #include "usart_{{ id }}.hpp"
+
+#include <xpcc_config.hpp>
 {% if id == 6 %}
 #if defined(STM32F2XX) || defined(STM32F4XX)
 {% endif %}
@@ -45,7 +47,7 @@ namespace
 	GPIO__OUTPUT(TxdB6, B, 6);
 	GPIO__INPUT(RxdB7, B, 7);
 	
-	static const uint32_t apbClk = 72000000;	// APB2
+	static const uint32_t apbClk = STM32_APB2_FREQUENCY;	// APB2
 	{%- elif id == 2 -%}
 	GPIO__OUTPUT(TxdA2, A, 2);
 	GPIO__INPUT(RxdA3, A, 3);
@@ -53,7 +55,7 @@ namespace
 	GPIO__OUTPUT(TxdD5, D, 5);
 	GPIO__INPUT(RxdD6, D, 6);
 	
-	static const uint32_t apbClk = 36000000;	// APB1
+	static const uint32_t apbClk = STM32_APB1_FREQUENCY;	// APB1
 	{%- elif id == 3 -%}
 	GPIO__OUTPUT(TxdB10, B, 10);
 	GPIO__INPUT(RxdB11, B, 11);
@@ -64,7 +66,7 @@ namespace
 	GPIO__OUTPUT(TxdC10, C, 10);
 	GPIO__INPUT(RxdC11, C, 11);
 	
-	static const uint32_t apbClk = 36000000;	// APB1
+	static const uint32_t apbClk = STM32_APB1_FREQUENCY;	// APB1
 	{%- elif id == 6 -%}
 	GPIO__OUTPUT(TxdC6, C, 6);
 	GPIO__INPUT(RxdC7, C, 7);
@@ -72,7 +74,7 @@ namespace
 	GPIO__OUTPUT(TxdG14, G, 14);
 	GPIO__INPUT(RxdG9, G, 9);
 	
-	static const uint32_t apbClk = 72000000;	// APB2
+	static const uint32_t apbClk = STM32_APB2_FREQUENCY;	// APB2
 	{%- endif %}
 }
 

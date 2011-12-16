@@ -38,6 +38,8 @@
 
 #include "usart_1.hpp"
 
+#include <xpcc_config.hpp>
+
 namespace
 {
 	GPIO__OUTPUT(TxdA9, A, 9);
@@ -46,7 +48,7 @@ namespace
 	GPIO__OUTPUT(TxdB6, B, 6);
 	GPIO__INPUT(RxdB7, B, 7);
 	
-	static const uint32_t apbClk = 72000000;	// APB2
+	static const uint32_t apbClk = STM32_APB2_FREQUENCY;	// APB2
 }
 
 // ----------------------------------------------------------------------------

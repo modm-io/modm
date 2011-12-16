@@ -34,6 +34,8 @@
 
 #include "uart_{{ id }}.hpp"
 
+#include <xpcc_config.hpp>
+
 #if defined(STM32F10X_HD) || defined(STM32F10X_XL) || defined(STM32F10X_CL)
 
 namespace
@@ -104,7 +106,7 @@ xpcc::stm32::Uart{{ id }}::setBaudrate(uint32_t baudrate)
 	NVIC->ISER[nvicId / 32] = 1 << (nvicId % 32);
 	
 	// Set baudrate
-	UART{{ id }}->BRR = calculateBaudrateSettings(36000000, baudrate);
+	UART{{ id }}->BRR = calculateBaudrateSettings(STM32_APB1_FREQUENCY, baudrate);
 	
 	// Transmitter & Receiver-Enable, 8 Data Bits, 1 Stop Bit
 	UART{{ id }}->CR1 = USART_CR1_TE | USART_CR1_RE;

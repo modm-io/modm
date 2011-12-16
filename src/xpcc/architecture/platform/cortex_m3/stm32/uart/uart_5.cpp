@@ -38,6 +38,8 @@
 
 #include "uart_5.hpp"
 
+#include <xpcc_config.hpp>
+
 #if defined(STM32F10X_HD) || defined(STM32F10X_XL) || defined(STM32F10X_CL)
 
 namespace
@@ -81,7 +83,7 @@ xpcc::stm32::Uart5::setBaudrate(uint32_t baudrate)
 	NVIC->ISER[nvicId / 32] = 1 << (nvicId % 32);
 	
 	// Set baudrate
-	UART5->BRR = calculateBaudrateSettings(36000000, baudrate);
+	UART5->BRR = calculateBaudrateSettings(STM32_APB1_FREQUENCY, baudrate);
 	
 	// Transmitter & Receiver-Enable, 8 Data Bits, 1 Stop Bit
 	UART5->CR1 = USART_CR1_TE | USART_CR1_RE;
