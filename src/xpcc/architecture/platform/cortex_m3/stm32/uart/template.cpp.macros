@@ -1,0 +1,230 @@
+
+{%- macro uartConfigurePins(id) -%}
+void
+xpcc::stm32::Uart{{ id }}::configurePins(Mapping mapping)
+{
+	// Enable clock
+	RCC->APB1ENR |= (1 << apbId);
+	
+	// Initialize IO pins
+#if defined(STM32F2XX) || defined(STM32F4XX)
+	{% if id == 4 -%}
+	if (mapping == REMAP_PA0_PA1) {
+		TxdA0::setAlternateFunction(AF_UART4, xpcc::stm32::PUSH_PULL);
+		RxdA1::setAlternateFunction(AF_UART4);
+	}
+	else {
+		TxdC10::setAlternateFunction(AF_UART4, xpcc::stm32::PUSH_PULL);
+		RxdC11::setAlternateFunction(AF_UART4);
+	}
+	{%- elif id == 5 -%}
+	(void) mapping;		// avoid compiler warning
+	
+	TxdC12::setAlternateFunction(AF_UART5, xpcc::stm32::PUSH_PULL);
+	RxdD2::setAlternateFunction(AF_UART5);
+	{%- endif %}
+#else
+	(void) mapping;		// avoid compiler warning
+	
+	{% if id == 4 -%}
+	TxdC10::setAlternateFunction(xpcc::stm32::PUSH_PULL);
+	RxdC11::setInput();
+	{%- elif id == 5 -%}
+	TxdC12::setAlternateFunction(xpcc::stm32::PUSH_PULL);
+	RxdD2::setInput();
+	{%- endif %}
+#endif
+}
+{%- endmacro -%}
+
+{%- macro usartConfigurePins(id) -%}
+void
+xpcc::stm32::Usart{{ id }}::configurePins(Mapping mapping)
+{
+	// Enable clock
+	{% if id == 1 or id == 6 -%}
+	RCC->APB2ENR |= RCC_APB2ENR_USART{{ id }}EN;
+	{%- elif id == 2 or id == 3 -%}
+	RCC->APB1ENR |= RCC_APB1ENR_USART{{ id }}EN;
+	{%- endif %}
+	
+	// Initialize IO pins
+#if defined(STM32F2XX) || defined(STM32F4XX)
+	{% if id == 1 -%}
+	if (mapping == REMAP_PA9_PA10) {
+		TxdA9::setAlternateFunction(AF_USART1, xpcc::stm32::PUSH_PULL);
+		RxdA10::setAlternateFunction(AF_USART1);
+	}
+	else {
+		TxdB6::setAlternateFunction(AF_USART1, xpcc::stm32::PUSH_PULL);
+		RxdB7::setAlternateFunction(AF_USART1);
+	}
+	{%- elif id == 2 -%}
+	if (mapping == REMAP_PA2_PA3) {
+		TxdA2::setAlternateFunction(AF_USART2, xpcc::stm32::PUSH_PULL);
+		RxdA3::setAlternateFunction(AF_USART2);
+	}
+	else {
+		TxdD5::setAlternateFunction(AF_USART2, xpcc::stm32::PUSH_PULL);
+		RxdD6::setAlternateFunction(AF_USART2);
+	}
+	{%- elif id == 3 -%}
+	if (mapping == REMAP_PB10_PB11) {
+		TxdB10::setAlternateFunction(AF_USART3, xpcc::stm32::PUSH_PULL);
+		RxdB11::setAlternateFunction(AF_USART3);
+	}
+	else if (mapping == REMAP_PC10_PC11) {
+		TxdC10::setAlternateFunction(AF_USART3, xpcc::stm32::PUSH_PULL);
+		RxdC11::setAlternateFunction(AF_USART3);
+	}
+	else {
+		TxdD8::setAlternateFunction(AF_USART3, xpcc::stm32::PUSH_PULL);
+		RxdD9::setAlternateFunction(AF_USART3);
+	}
+	{%- elif id == 6 -%}
+	if (mapping == REMAP_PC6_PC7) {
+		TxdC6::setAlternateFunction(AF_USART6, xpcc::stm32::PUSH_PULL);
+		RxdC7::setAlternateFunction(AF_USART6);
+	}
+	else {
+		TxdG14::setAlternateFunction(AF_USART6, xpcc::stm32::PUSH_PULL);
+		RxdG9::setAlternateFunction(AF_USART6);
+	}
+	{%- endif %}
+#else
+	AFIO->MAPR = (AFIO->MAPR & ~AFIO_MAPR_USART{{ id }}_REMAP) | mapping;
+	{% if id == 1 -%}
+	if (mapping == REMAP_PA9_PA10) {
+		TxdA9::setAlternateFunction(xpcc::stm32::PUSH_PULL);
+		RxdA10::setInput();
+	}
+	else {
+		TxdB6::setAlternateFunction(xpcc::stm32::PUSH_PULL);
+		RxdB7::setInput();
+	}
+	{%- elif id == 2 -%}
+	if (mapping == REMAP_PA2_PA3) {
+		TxdA2::setAlternateFunction(xpcc::stm32::PUSH_PULL);
+		RxdA3::setInput();
+	}
+	else {
+		TxdD5::setAlternateFunction(xpcc::stm32::PUSH_PULL);
+		RxdD6::setInput();
+	}
+	{%- elif id == 3 -%}
+	if (mapping == REMAP_PB10_PB11) {
+		TxdB10::setAlternateFunction(xpcc::stm32::PUSH_PULL);
+		RxdB11::setInput();
+	}
+	else if (mapping == REMAP_PC10_PC11) {
+		TxdC10::setAlternateFunction(xpcc::stm32::PUSH_PULL);
+		RxdC11::setInput();
+	}
+	else {
+		TxdD8::setAlternateFunction(xpcc::stm32::PUSH_PULL);
+		RxdD9::setInput();
+	}
+	{%- endif %}
+#endif
+}
+{%- endmacro -%}
+
+{%- macro uartSetBaudrate(id) -%}
+void
+xpcc::stm32::Uart{{ id }}::setBaudrate(uint32_t baudrate)
+{
+	// Enable clock
+	RCC->APB1ENR |= (1 << apbId);
+	
+	// Enable USART in the interrupt controller
+	NVIC->ISER[nvicId / 32] = 1 << (nvicId % 32);
+	
+	// Set baudrate
+	UART{{ id }}->BRR = calculateBaudrateSettings(STM32_APB1_FREQUENCY, baudrate);
+	
+	// Transmitter & Receiver-Enable, 8 Data Bits, 1 Stop Bit
+	UART{{ id }}->CR1 = USART_CR1_TE | USART_CR1_RE;
+	UART{{ id }}->CR2 = 0;
+	UART{{ id }}->CR3 = 0;
+	
+	UART{{ id }}->CR1 |= USART_CR1_UE;		// Uart Enable
+}
+{%- endmacro -%}
+
+{%- macro usartSetBaudrate(id) -%}
+void
+xpcc::stm32::Usart{{ id }}::setBaudrate(uint32_t baudrate)
+{
+	// Enable clock
+	{% if id == 1 or id == 6 -%}
+	RCC->APB2ENR |= RCC_APB2ENR_USART{{ id }}EN;
+	{%- elif id == 2 or id == 3 -%}
+	RCC->APB1ENR |= RCC_APB1ENR_USART{{ id }}EN;
+	{%- endif %}
+	
+	// Enable USART in the interrupt controller
+	//NVIC->ISER[nvicId / 32] = 1 << (USART{{ id }}_IRQn & 0x1F);
+	
+	// set baudrate
+	USART{{ id }}->BRR = calculateBaudrateSettings(apbClk, baudrate);
+	
+	// Transmitter & Receiver-Enable, 8 Data Bits, 1 Stop Bit
+	USART{{ id }}->CR1 = USART_CR1_TE | USART_CR1_RE;
+	USART{{ id }}->CR2 = 0;
+	USART{{ id }}->CR3 = 0;
+	
+	USART{{ id }}->CR1 |= USART_CR1_UE;		// Uart Enable
+}
+{%- endmacro -%}
+
+{%- macro write(className, id) -%}
+void
+xpcc::stm32::{{ className }}{{ id }}::write(char data)
+{
+	while (!({{ className | upper }}{{ id }}->SR & USART_SR_TXE)) {
+		// wait until the data register becomes empty
+	}
+	
+	{{ className | upper }}{{ id }}->DR = data;
+}
+{%- endmacro -%}
+
+{%- macro writeBlock(className, id) -%}
+void
+xpcc::stm32::{{ className }}{{ id }}::write(const char *s)
+{
+	char c;
+	while ((c = *s++)) {
+		write(c);
+	}
+}
+{%- endmacro -%}
+
+{%- macro read(className, id) -%}
+bool
+xpcc::stm32::{{ className }}{{ id }}::read(char& c)
+{
+	if ({{ className | upper }}{{ id }}->SR & USART_SR_RXNE)
+	{
+		c = {{ className | upper }}{{ id }}->DR;
+		return true;
+	}
+	
+	return false;
+}
+{%- endmacro -%}
+
+{%- macro readBlock(className, id) -%}
+uint8_t
+xpcc::stm32::{{ className }}{{ id }}::read(char *buffer, uint8_t n)
+{
+	for (uint8_t i = 0; i < n; ++i)
+	{
+		if (read(*buffer++)) {
+			return i;
+		}
+	}
+	
+	return n;
+}
+{%- endmacro -%}

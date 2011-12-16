@@ -28,7 +28,7 @@
  */
 // ----------------------------------------------------------------------------
 {{ generation_block }}
-
+{% import 'template.cpp.macros' as template %}
 #include "../gpio.hpp"
 #include "../device.h"
 
@@ -59,109 +59,21 @@ namespace
 }
 
 // ----------------------------------------------------------------------------
-void
-xpcc::stm32::Uart{{ id }}::configurePins(Mapping mapping)
-{
-	// Enable clock
-	RCC->APB1ENR |= (1 << apbId);
-	
-	// Initialize IO pins
-#if defined(STM32F2XX) || defined(STM32F4XX)
-	{% if id == 4 -%}
-	if (mapping == REMAP_PA0_PA1) {
-		TxdA0::setAlternateFunction(AF_UART4, xpcc::stm32::PUSH_PULL);
-		RxdA1::setAlternateFunction(AF_UART4);
-	}
-	else {
-		TxdC10::setAlternateFunction(AF_UART4, xpcc::stm32::PUSH_PULL);
-		RxdC11::setAlternateFunction(AF_UART4);
-	}
-	{%- elif id == 5 -%}
-	(void) mapping;		// avoid compiler warning
-	
-	TxdC12::setAlternateFunction(AF_UART5, xpcc::stm32::PUSH_PULL);
-	RxdD2::setAlternateFunction(AF_UART5);
-	{%- endif %}
-#else
-	(void) mapping;		// avoid compiler warning
-	
-	{% if id == 4 -%}
-	TxdC10::setAlternateFunction(xpcc::stm32::PUSH_PULL);
-	RxdC11::setInput();
-	{%- elif id == 5 -%}
-	TxdC12::setAlternateFunction(xpcc::stm32::PUSH_PULL);
-	RxdD2::setInput();
-	{%- endif %}
-#endif
-}
+{{ template.uartConfigurePins(id) }}
 
 // ----------------------------------------------------------------------------
-void
-xpcc::stm32::Uart{{ id }}::setBaudrate(uint32_t baudrate)
-{
-	// Enable clock
-	RCC->APB1ENR |= (1 << apbId);
-	
-	// Enable USART in the interrupt controller
-	NVIC->ISER[nvicId / 32] = 1 << (nvicId % 32);
-	
-	// Set baudrate
-	UART{{ id }}->BRR = calculateBaudrateSettings(STM32_APB1_FREQUENCY, baudrate);
-	
-	// Transmitter & Receiver-Enable, 8 Data Bits, 1 Stop Bit
-	UART{{ id }}->CR1 = USART_CR1_TE | USART_CR1_RE;
-	UART{{ id }}->CR2 = 0;
-	UART{{ id }}->CR3 = 0;
-	
-	UART{{ id }}->CR1 |= USART_CR1_UE;		// Uart Enable
-}
+{{ template.uartSetBaudrate(id) }}
 
 // ----------------------------------------------------------------------------
-void
-xpcc::stm32::Uart{{ id }}::write(char data)
-{
-	while (!(UART{{ id }}->SR & USART_SR_TXE)) {
-		// wait until the data register becomes empty
-	}
-	
-	UART{{ id }}->DR = data;
-}
+{{ template.write('Uart', id) }}
 
 // ----------------------------------------------------------------------------
-void
-xpcc::stm32::Uart{{ id }}::write(const char *s)
-{
-	char c;
-	while ((c = *s++)) {
-		write(c);
-	}
-}
+{{ template.writeBlock('Uart', id) }}
 
 // ----------------------------------------------------------------------------
-bool
-xpcc::stm32::Uart{{ id }}::read(char& c)
-{
-	if (UART{{ id }}->SR & USART_SR_RXNE)
-	{
-		c = UART{{ id }}->DR;
-		return true;
-	}
-	
-	return false;
-}
+{{ template.read('Uart', id) }}
 
 // ----------------------------------------------------------------------------
-uint8_t
-xpcc::stm32::Uart{{ id }}::read(char *buffer, uint8_t n)
-{
-	for (uint8_t i = 0; i < n; ++i)
-	{
-		if (read(*buffer++)) {
-			return i;
-		}
-	}
-	
-	return n;
-}
+{{ template.readBlock('Uart', id) }}
 
 #endif

@@ -72,7 +72,7 @@ namespace xpcc
 			};
 			
 			/**
-			 * Configure the IO Pins for I2C1
+			 * Configure the IO Pins for Usart1
 			 */
 			static void
 			configurePins(Mapping mapping);

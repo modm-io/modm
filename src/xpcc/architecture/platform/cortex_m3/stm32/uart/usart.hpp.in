@@ -28,7 +28,7 @@
  */
 // ----------------------------------------------------------------------------
 {{ generation_block }}
-
+{% import 'template.hpp.macros' as template %}
 #ifndef XPCC_STM32__USART_{{ id }}_HPP
 #define XPCC_STM32__USART_{{ id }}_HPP
 
@@ -88,49 +88,17 @@ namespace xpcc
 #endif
 			};
 			
-			/**
-			 * Configure the IO Pins for I2C{{ id }}
-			 */
-			static void
-			configurePins(Mapping mapping);
+			{{ template.configurePins('Usart', id)|xpcc.indent(3) }}
 			
-			/**
-			 * \brief	Set baudrate
-			 * \param	baudrate	desired baud rate
-			 */
-			static void
-			setBaudrate(uint32_t baudrate);
+			{{ template.setBaudrate()|xpcc.indent(3) }}
 			
-			/**
-			 * \brief	Send a single byte
-			 */
-			static void
-			write(char data);
+			{{ template.write()|xpcc.indent(3) }}
 			
-			/**
-			 * \brief	Write a null-terminated string
-			 * 
-			 * The string must end with \c '\\0'.
-			 */
-			static void
-			write(const char *string);
+			{{ template.writeBlock()|xpcc.indent(3) }}
 			
-			/**
-			 * \brief	Read a single byte
-			 */
-			static bool
-			read(char& c);
+			{{ template.read()|xpcc.indent(3) }}
 			
-			/**
-			 * \brief	Read a block of bytes
-			 * 
-			 * \param	*buffer	Pointer to a buffer big enough to storage \a n bytes
-			 * \param	n	Number of bytes to be read
-			 * 
-			 * \return	Number of bytes which could be read, maximal \a n
-			 */
-			static uint8_t
-			read(char *buffer, uint8_t n);
+			{{ template.readBlock()|xpcc.indent(3) }}
 		};
 	}
 }
