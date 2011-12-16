@@ -40,6 +40,8 @@
 
 #include <xpcc_config.hpp>
 
+
+
 namespace
 {
 	GPIO__OUTPUT(TxdB10, B, 10);

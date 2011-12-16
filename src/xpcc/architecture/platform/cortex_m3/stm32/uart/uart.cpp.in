@@ -32,31 +32,31 @@
 #include "../gpio.hpp"
 #include "../device.h"
 
-#include "uart_{{ id }}.hpp"
+#include "{{ className | lower }}_{{ id }}.hpp"
 
 #include <xpcc_config.hpp>
 
-#if defined(STM32F10X_HD) || defined(STM32F10X_XL) || defined(STM32F10X_CL) || \
-defined(STM32F2XX) || defined(STM32F4XX)
+{{ template.excludeDeclarationsStart(id) }}
 
 {{ template.pinDefinitions(id) }}
 
 // ----------------------------------------------------------------------------
-{{ template.uartConfigurePins(id) }}
+{{ template.configurePins(id) }}
 
 // ----------------------------------------------------------------------------
-{{ template.setBaudrate('Uart', id) }}
+{{ template.setBaudrate(className, id) }}
 
 // ----------------------------------------------------------------------------
-{{ template.write('Uart', id) }}
+{{ template.write(className, id) }}
 
 // ----------------------------------------------------------------------------
-{{ template.writeBlock('Uart', id) }}
+{{ template.writeBlock(className, id) }}
 
 // ----------------------------------------------------------------------------
-{{ template.read('Uart', id) }}
+{{ template.read(className, id) }}
 
 // ----------------------------------------------------------------------------
-{{ template.readBlock('Uart', id) }}
+{{ template.readBlock(className, id) }}
 
-#endif
+{{ template.excludeDeclarationsEnd(id) }}
+

@@ -1,3 +1,19 @@
+
+{%- macro excludeDeclarationsStart(id) -%}
+{%- if id == 6 %}
+#if defined(STM32F2XX) || defined(STM32F4XX)
+{% elif id in [4, 5] -%}
+#if defined(STM32F10X_HD) || defined(STM32F10X_XL) || defined(STM32F10X_CL) || \
+defined(STM32F2XX) || defined(STM32F4XX)
+{%- endif %}
+{%- endmacro -%}
+
+{%- macro excludeDeclarationsEnd(id) -%}
+{%- if id in [4, 5, 6] -%}
+#endif
+{%- endif %}
+{%- endmacro -%}
+
 {%- macro pinDefinitions(id) -%}
 namespace
 {
@@ -51,6 +67,14 @@ namespace
 	static const uint32_t apbClk = STM32_APB1_FREQUENCY;	// APB1
 	{%- endif %}
 }
+{%- endmacro -%}
+
+{%- macro configurePins(id) -%}
+{% if id in [4, 5] -%}
+{{ uartConfigurePins(id) }}
+{%- elif id in [1, 2, 3, 6] -%}
+{{ usartConfigurePins(id) }}
+{%- endif -%}
 {%- endmacro -%}
 
 {%- macro uartConfigurePins(id) -%}

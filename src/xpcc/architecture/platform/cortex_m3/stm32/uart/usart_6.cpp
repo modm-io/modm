@@ -40,7 +40,9 @@
 
 #include <xpcc_config.hpp>
 
+
 #if defined(STM32F2XX) || defined(STM32F4XX)
+
 
 namespace
 {
@@ -146,5 +148,3 @@ xpcc::stm32::Usart6::read(char *buffer, uint8_t n)
 }
 
 #endif
-
-
