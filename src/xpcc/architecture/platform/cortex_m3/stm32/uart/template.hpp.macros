@@ -1,3 +1,57 @@
+{%- macro mapping(id) -%}
+			enum Mapping
+			{
+{%- if id in [4, 5] -%}
+{{ _mapping45(id) }}
+{%- elif id in [1,2,3,6] -%}
+{{ _mapping1236(id) }}
+{%- endif %}
+			};
+{%- endmacro -%}
+
+{%- macro _mapping45(id) -%}
+				{%- if id == 4 %}
+				REMAP_PC10_PC11,	///< TX mapped to PC10, RX mapped to PC11
+#if defined(STM32F2XX) || defined(STM32F4XX)
+				REMAP_PA0_PA1,		///< TX mapped to PA0, RX mapped to PA1
+#endif
+				{%- elif id == 5 %}
+				REMAP_PC12_PD2,		///< TX mapped to PC12, RX mapped to PD2
+				{%- endif %}
+{%- endmacro -%}
+
+{%- macro _mapping1236(id) %}
+#if defined(STM32F2XX) || defined(STM32F4XX)
+				{% if id == 1 -%}
+				REMAP_PA9_PA10,		///< TX mapped to PA9, RX mapped to PA10 (CTS/PA11, RTS/PA12, CK/PA8)
+				REMAP_PB6_PB7,		///< TX mapped to PB6, RX mapped to PB7
+				{%- elif id == 2 -%}
+				REMAP_PA2_PA3,		///< TX mapped to PA2, RX mapped to PA3 (CTS/PA0, RTS/PA1, CK/PA4)
+				REMAP_PD5_PD6,		///< TX mapped to PD5, RX mapped to PD6 (CTS/PD3, RTS/PD4, CK/PD7)
+				{%- elif id == 3 -%}
+				REMAP_PB10_PB11,	///< TX/PB10, RX/PB11, CK/PB12, CTS/PB13, RTS/PB14
+				REMAP_PC10_PC11,	///< TX/PC10, RX/PC11, CK/PC12, CTS/PB13, RTS/PB14
+				REMAP_PD8_PD9,		///< TX/PD8, RX/PD9, CK/PD10, CTS/PD11, RTS/PD12
+				{%- elif id == 6 -%}
+				REMAP_PC6_PC7,		///< TX mapped to PC6, RX mapped to PC7 (CK/PC8)
+				REMAP_PG14_PG9,		///< TX/PG14, RX/PG9, CK/PD10, CTS/PG13,PG15, RTS/PG8,PG12
+				{%- endif %}
+#else
+				{% if id == 1 -%}
+				REMAP_PA9_PA10 = 0,						///< TX mapped to PA9, RX mapped to PA10
+				REMAP_PB6_PB7 = AFIO_MAPR_USART1_REMAP,	///< TX mapped to PB6, RX mapped to PB7
+				{%- elif id == 2 -%}
+				REMAP_PA2_PA3 = 0,						///< TX mapped to PA2, RX mapped to PA3 (CTS/PA0, RTS/PA1, CK/PA4)
+				REMAP_PD5_PD6 = AFIO_MAPR_USART2_REMAP,	///< TX mapped to PD5, RX mapped to PD6 (CTS/PD3, RTS/PD4, CK/PD7)
+				{%- elif id == 3 -%}
+				REMAP_PB10_PB11 = AFIO_MAPR_USART3_REMAP_NOREMAP,		///< TX/PB10, RX/PB11, CK/PB12, CTS/PB13, RTS/PB14
+				REMAP_PC10_PC11 = AFIO_MAPR_USART3_REMAP_PARTIALREMAP,	///< TX/PC10, RX/PC11, CK/PC12, CTS/PB13, RTS/PB14
+				REMAP_PD8_PD9 = AFIO_MAPR_USART3_REMAP_FULLREMAP,		///< TX/PD8, RX/PD9, CK/PD10, CTS/PD11, RTS/PD12
+				{%- endif %}
+#endif
+{%- endmacro -%}
+
+
 {%- macro configurePins(className, id) -%}
 /**
  * Configure the IO Pins for {{ className }}{{ id }}
