@@ -70,8 +70,17 @@ def jinja2_template_action(target, source, env):
 		'generation_block': generationBlockString,
 	}
 	
+	def filter_wordwrap(value, width=79):
+		return '\n\n'.join([textwrap.fill(str, width) for str in value.split('\n\n')])
+
+	def filter_indent(value, level=0):
+		return ('\n' + '\t' * level).join(value.split('\n'))
+		
 	path, filename = os.path.split(source[0].path)
 	loader = jinja2.Environment(loader = jinja2.FileSystemLoader(path))
+	loader.filters['xpcc.wordwrap'] = filter_wordwrap
+	loader.filters['xpcc.indent'] = filter_indent
+	
 	template = loader.get_template(filename, globals=globals)
 	
 	output = template.render(env['substitutions'])

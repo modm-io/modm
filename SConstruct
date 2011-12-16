@@ -70,11 +70,12 @@ class Generator:
 		self.env = env
 		self.basepath = basepath
 	def template(self, target, source, substitutions):
-		self.env.Alias('template',
-				self.env.Jinja2Template(
+		dd = self.env.Jinja2Template(
 						target = os.path.join(self.basepath, target),
 						source = os.path.join(self.basepath, source),
-						substitutions = substitutions))
+						substitutions = substitutions)
+		self.env.Alias('template', dd)
+		return dd
 
 env['TemplateGenerator'] = Generator
 
