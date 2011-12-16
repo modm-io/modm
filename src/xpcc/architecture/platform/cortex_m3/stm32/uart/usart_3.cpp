@@ -102,7 +102,7 @@ xpcc::stm32::Usart3::setBaudrate(uint32_t baudrate)
 	// Enable USART in the interrupt controller
 	//NVIC->ISER[nvicId / 32] = 1 << (USART3_IRQn & 0x1F);
 	
-	// set baudrate
+	// Set baudrate
 	USART3->BRR = calculateBaudrateSettings(apbClk, baudrate);
 	
 	// Transmitter & Receiver-Enable, 8 Data Bits, 1 Stop Bit

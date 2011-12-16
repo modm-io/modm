@@ -36,33 +36,16 @@
 
 #include <xpcc_config.hpp>
 
-#if defined(STM32F10X_HD) || defined(STM32F10X_XL) || defined(STM32F10X_CL)
+#if defined(STM32F10X_HD) || defined(STM32F10X_XL) || defined(STM32F10X_CL) || \
+defined(STM32F2XX) || defined(STM32F4XX)
 
-namespace
-{
-	{% if id == 4 -%}
-	GPIO__OUTPUT(TxdA0, A, 0);
-	GPIO__INPUT(RxdA1, A, 1);
-	
-	GPIO__OUTPUT(TxdC10, C, 10);
-	GPIO__INPUT(RxdC11, C, 11);
-	
-	static const uint32_t nvicId = 52;
-	static const uint32_t apbId = 19;
-	{%- elif id == 5 -%}
-	GPIO__OUTPUT(TxdC12, C, 12);
-	GPIO__INPUT(RxdD2, D, 2);
-	
-	static const uint32_t nvicId = 53;
-	static const uint32_t apbId = 20;
-	{%- endif %}
-}
+{{ template.pinDefinitions(id) }}
 
 // ----------------------------------------------------------------------------
 {{ template.uartConfigurePins(id) }}
 
 // ----------------------------------------------------------------------------
-{{ template.uartSetBaudrate(id) }}
+{{ template.setBaudrate('Uart', id) }}
 
 // ----------------------------------------------------------------------------
 {{ template.write('Uart', id) }}

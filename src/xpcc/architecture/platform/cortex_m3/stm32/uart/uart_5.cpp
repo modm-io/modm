@@ -40,15 +40,15 @@
 
 #include <xpcc_config.hpp>
 
-#if defined(STM32F10X_HD) || defined(STM32F10X_XL) || defined(STM32F10X_CL)
+#if defined(STM32F10X_HD) || defined(STM32F10X_XL) || defined(STM32F10X_CL) || \
+defined(STM32F2XX) || defined(STM32F4XX)
 
 namespace
 {
 	GPIO__OUTPUT(TxdC12, C, 12);
 	GPIO__INPUT(RxdD2, D, 2);
 	
-	static const uint32_t nvicId = 53;
-	static const uint32_t apbId = 20;
+	static const uint32_t apbClk = STM32_APB1_FREQUENCY;	// APB1
 }
 
 // ----------------------------------------------------------------------------
@@ -56,7 +56,7 @@ void
 xpcc::stm32::Uart5::configurePins(Mapping mapping)
 {
 	// Enable clock
-	RCC->APB1ENR |= (1 << apbId);
+	RCC->APB1ENR |= RCC_APB1ENR_UART5EN;
 	
 	// Initialize IO pins
 #if defined(STM32F2XX) || defined(STM32F4XX)
@@ -77,13 +77,13 @@ void
 xpcc::stm32::Uart5::setBaudrate(uint32_t baudrate)
 {
 	// Enable clock
-	RCC->APB1ENR |= (1 << apbId);
+	RCC->APB1ENR |= RCC_APB1ENR_UART5EN;
 	
 	// Enable USART in the interrupt controller
-	NVIC->ISER[nvicId / 32] = 1 << (nvicId % 32);
+	//NVIC->ISER[nvicId / 32] = 1 << (UART5_IRQn & 0x1F);
 	
 	// Set baudrate
-	UART5->BRR = calculateBaudrateSettings(STM32_APB1_FREQUENCY, baudrate);
+	UART5->BRR = calculateBaudrateSettings(apbClk, baudrate);
 	
 	// Transmitter & Receiver-Enable, 8 Data Bits, 1 Stop Bit
 	UART5->CR1 = USART_CR1_TE | USART_CR1_RE;

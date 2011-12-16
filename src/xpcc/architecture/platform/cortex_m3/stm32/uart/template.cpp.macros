@@ -1,10 +1,64 @@
+{%- macro pinDefinitions(id) -%}
+namespace
+{
+	{% if id == 1 -%}
+	GPIO__OUTPUT(TxdA9, A, 9);
+	GPIO__INPUT(RxdA10, A, 10);
+	
+	GPIO__OUTPUT(TxdB6, B, 6);
+	GPIO__INPUT(RxdB7, B, 7);
+	
+	static const uint32_t apbClk = STM32_APB2_FREQUENCY;	// APB2
+	{%- elif id == 2 -%}
+	GPIO__OUTPUT(TxdA2, A, 2);
+	GPIO__INPUT(RxdA3, A, 3);
+	
+	GPIO__OUTPUT(TxdD5, D, 5);
+	GPIO__INPUT(RxdD6, D, 6);
+	
+	static const uint32_t apbClk = STM32_APB1_FREQUENCY;	// APB1
+	{%- elif id == 3 -%}
+	GPIO__OUTPUT(TxdB10, B, 10);
+	GPIO__INPUT(RxdB11, B, 11);
+	
+	GPIO__OUTPUT(TxdD8, D, 8);
+	GPIO__INPUT(RxdD9, D, 9);
+	
+	GPIO__OUTPUT(TxdC10, C, 10);
+	GPIO__INPUT(RxdC11, C, 11);
+	
+	static const uint32_t apbClk = STM32_APB1_FREQUENCY;	// APB1
+	{%- elif id == 6 -%}
+	GPIO__OUTPUT(TxdC6, C, 6);
+	GPIO__INPUT(RxdC7, C, 7);
+	
+	GPIO__OUTPUT(TxdG14, G, 14);
+	GPIO__INPUT(RxdG9, G, 9);
+	
+	static const uint32_t apbClk = STM32_APB2_FREQUENCY;	// APB2
+	{%- elif id == 4 -%}
+	GPIO__OUTPUT(TxdA0, A, 0);
+	GPIO__INPUT(RxdA1, A, 1);
+	
+	GPIO__OUTPUT(TxdC10, C, 10);
+	GPIO__INPUT(RxdC11, C, 11);
+	
+	static const uint32_t apbClk = STM32_APB1_FREQUENCY;	// APB1
+	{%- elif id == 5 -%}
+	GPIO__OUTPUT(TxdC12, C, 12);
+	GPIO__INPUT(RxdD2, D, 2);
+	
+	static const uint32_t apbClk = STM32_APB1_FREQUENCY;	// APB1
+	{%- endif %}
+}
+{%- endmacro -%}
 
 {%- macro uartConfigurePins(id) -%}
 void
 xpcc::stm32::Uart{{ id }}::configurePins(Mapping mapping)
 {
 	// Enable clock
-	RCC->APB1ENR |= (1 << apbId);
+	RCC->APB1ENR |= RCC_APB1ENR_UART{{ id }}EN;
 	
 	// Initialize IO pins
 #if defined(STM32F2XX) || defined(STM32F4XX)
@@ -129,51 +183,31 @@ xpcc::stm32::Usart{{ id }}::configurePins(Mapping mapping)
 }
 {%- endmacro -%}
 
-{%- macro uartSetBaudrate(id) -%}
+{%- macro setBaudrate(className, id) -%}
 void
-xpcc::stm32::Uart{{ id }}::setBaudrate(uint32_t baudrate)
+xpcc::stm32::{{ className }}{{ id }}::setBaudrate(uint32_t baudrate)
 {
 	// Enable clock
-	RCC->APB1ENR |= (1 << apbId);
-	
-	// Enable USART in the interrupt controller
-	NVIC->ISER[nvicId / 32] = 1 << (nvicId % 32);
-	
-	// Set baudrate
-	UART{{ id }}->BRR = calculateBaudrateSettings(STM32_APB1_FREQUENCY, baudrate);
-	
-	// Transmitter & Receiver-Enable, 8 Data Bits, 1 Stop Bit
-	UART{{ id }}->CR1 = USART_CR1_TE | USART_CR1_RE;
-	UART{{ id }}->CR2 = 0;
-	UART{{ id }}->CR3 = 0;
-	
-	UART{{ id }}->CR1 |= USART_CR1_UE;		// Uart Enable
-}
-{%- endmacro -%}
-
-{%- macro usartSetBaudrate(id) -%}
-void
-xpcc::stm32::Usart{{ id }}::setBaudrate(uint32_t baudrate)
-{
-	// Enable clock
-	{% if id == 1 or id == 6 -%}
+	{% if id in [1, 6] -%}
 	RCC->APB2ENR |= RCC_APB2ENR_USART{{ id }}EN;
-	{%- elif id == 2 or id == 3 -%}
+	{%- elif id in [2, 3] -%}
 	RCC->APB1ENR |= RCC_APB1ENR_USART{{ id }}EN;
+	{%- elif id in [4, 5] -%}
+	RCC->APB1ENR |= RCC_APB1ENR_UART{{ id }}EN;
 	{%- endif %}
 	
 	// Enable USART in the interrupt controller
-	//NVIC->ISER[nvicId / 32] = 1 << (USART{{ id }}_IRQn & 0x1F);
+	//NVIC->ISER[nvicId / 32] = 1 << ({{ className | upper }}{{ id }}_IRQn & 0x1F);
 	
-	// set baudrate
-	USART{{ id }}->BRR = calculateBaudrateSettings(apbClk, baudrate);
+	// Set baudrate
+	{{ className | upper }}{{ id }}->BRR = calculateBaudrateSettings(apbClk, baudrate);
 	
 	// Transmitter & Receiver-Enable, 8 Data Bits, 1 Stop Bit
-	USART{{ id }}->CR1 = USART_CR1_TE | USART_CR1_RE;
-	USART{{ id }}->CR2 = 0;
-	USART{{ id }}->CR3 = 0;
+	{{ className | upper }}{{ id }}->CR1 = USART_CR1_TE | USART_CR1_RE;
+	{{ className | upper }}{{ id }}->CR2 = 0;
+	{{ className | upper }}{{ id }}->CR3 = 0;
 	
-	USART{{ id }}->CR1 |= USART_CR1_UE;		// Uart Enable
+	{{ className | upper }}{{ id }}->CR1 |= USART_CR1_UE;		// Uart Enable
 }
 {%- endmacro -%}
 
