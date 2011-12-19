@@ -337,9 +337,6 @@ Reset_Handler(void)
 		*(dest++) = 0;
 	}
 	
-	// enable flash prefetch
-	FLASH->ACR |= FLASH_ACR_PRFTEN;
-
 #if defined(STM32F4XX)
 	// prepare flash latency for working at 168MHz and supply voltage > 2.7
 	FLASH->ACR = (FLASH->ACR & ~FLASH_ACR_LATENCY) | FLASH_WAIT_STATE_5;
@@ -350,6 +347,8 @@ Reset_Handler(void)
 	#error this file is not supposed to be used with given cpu
 #endif
 	
+	// enable flash prefetch
+	FLASH->ACR |= FLASH_ACR_PRFTEN | FLASH_ACR_DCEN | FLASH_ACR_ICEN;
 
 #if defined(STM32F4XX)
 	// Enable FPU in privileged and user mode
