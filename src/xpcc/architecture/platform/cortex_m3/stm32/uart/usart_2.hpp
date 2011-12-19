@@ -88,21 +88,22 @@ namespace xpcc
 			 * \brief	Send a single byte
 			 */
 			static void
-			write(char data);
+			write(uint8_t data);
 			
 			/**
-			 * \brief	Write a null-terminated string
-			 * 
-			 * The string must end with \c '\\0'.
+			 * \brief	Write a block of bytes
+			 *
+			 * \param	*buffer	Pointer to a buffer
+			 * \param	n	Number of bytes to be read
 			 */
 			static void
-			write(const char *string);
+			write(const uint8_t *buffer, uint8_t n);
 			
 			/**
 			 * \brief	Read a single byte
 			 */
 			static bool
-			read(char& c);
+			read(uint8_t& c);
 			
 			/**
 			 * \brief	Read a block of bytes
@@ -113,7 +114,7 @@ namespace xpcc
 			 * \return	Number of bytes which could be read, maximal \a n
 			 */
 			static uint8_t
-			read(char *buffer, uint8_t n);
+			read(uint8_t *buffer, uint8_t n);
 		};
 		
 		
@@ -137,7 +138,7 @@ namespace xpcc
 		 * 
 		 * \ingroup	stm32
 		 */
-		class BufferedUsart2
+		class BufferedUsart2 : public UartBase
 		{
 		public:
 			BufferedUsart2(uint32_t baudrate)
@@ -173,21 +174,22 @@ namespace xpcc
 			 * \brief	Send a single byte
 			 */
 			static void
-			write(char data);
+			write(uint8_t data);
 			
 			/**
-			 * \brief	Write a null-terminated string
-			 * 
-			 * The string must end with \c '\\0'.
+			 * \brief	Write a block of bytes
+			 *
+			 * \param	*buffer	Pointer to a buffer
+			 * \param	n	Number of bytes to be read
 			 */
 			static void
-			write(const char *string);
+			write(const uint8_t *buffer, uint8_t n);
 			
 			/**
 			 * \brief	Read a single byte
 			 */
 			static bool
-			read(char& c);
+			read(uint8_t& c);
 			
 			/**
 			 * \brief	Read a block of bytes
@@ -198,7 +200,7 @@ namespace xpcc
 			 * \return	Number of bytes which could be read, maximal \a n
 			 */
 			static uint8_t
-			read(char *buffer, uint8_t n);
+			read(uint8_t *buffer, uint8_t n);
 			
 			/**
 			 * \brief	Empty the receive FIFO queue and USART buffer.

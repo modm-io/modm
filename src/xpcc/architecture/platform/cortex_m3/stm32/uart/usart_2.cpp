@@ -90,14 +90,13 @@ xpcc::stm32::Usart2::setBaudrate(uint32_t baudrate)
 	// Enable clock
 	RCC->APB1ENR |= RCC_APB1ENR_USART2EN;
 	
-	// Enable USART in the interrupt controller
-	//NVIC->ISER[nvicId / 32] = 1 << (USART2_IRQn & 0x1F);
+	USART2->CR1 = 0;
 	
 	// Set baudrate
 	USART2->BRR = calculateBaudrateSettings(apbClk, baudrate);
 	
 	// Transmitter & Receiver-Enable, 8 Data Bits, 1 Stop Bit
-	USART2->CR1 = USART_CR1_TE | USART_CR1_RE;
+	USART2->CR1 |= USART_CR1_TE | USART_CR1_RE;
 	USART2->CR2 = 0;
 	USART2->CR3 = 0;
 	
@@ -106,7 +105,7 @@ xpcc::stm32::Usart2::setBaudrate(uint32_t baudrate)
 
 // ----------------------------------------------------------------------------
 void
-xpcc::stm32::Usart2::write(char data)
+xpcc::stm32::Usart2::write(uint8_t data)
 {
 	while (!(USART2->SR & USART_SR_TXE)) {
 		// wait until the data register becomes empty
@@ -117,17 +116,16 @@ xpcc::stm32::Usart2::write(char data)
 
 // ----------------------------------------------------------------------------
 void
-xpcc::stm32::Usart2::write(const char *s)
+xpcc::stm32::Usart2::write(const uint8_t *s, uint8_t n)
 {
-	char c;
-	while ((c = *s++)) {
-		write(c);
+	while (n-- != 0) {
+		write(*s++);
 	}
 }
 
 // ----------------------------------------------------------------------------
 bool
-xpcc::stm32::Usart2::read(char& c)
+xpcc::stm32::Usart2::read(uint8_t& c)
 {
 	if (USART2->SR & USART_SR_RXNE)
 	{
@@ -140,7 +138,7 @@ xpcc::stm32::Usart2::read(char& c)
 
 // ----------------------------------------------------------------------------
 uint8_t
-xpcc::stm32::Usart2::read(char *buffer, uint8_t n)
+xpcc::stm32::Usart2::read(uint8_t *buffer, uint8_t n)
 {
 	for (uint8_t i = 0; i < n; ++i)
 	{

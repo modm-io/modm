@@ -86,14 +86,13 @@ xpcc::stm32::Uart4::setBaudrate(uint32_t baudrate)
 	// Enable clock
 	RCC->APB1ENR |= RCC_APB1ENR_UART4EN;
 	
-	// Enable USART in the interrupt controller
-	//NVIC->ISER[nvicId / 32] = 1 << (UART4_IRQn & 0x1F);
+	UART4->CR1 = 0;
 	
 	// Set baudrate
 	UART4->BRR = calculateBaudrateSettings(apbClk, baudrate);
 	
 	// Transmitter & Receiver-Enable, 8 Data Bits, 1 Stop Bit
-	UART4->CR1 = USART_CR1_TE | USART_CR1_RE;
+	UART4->CR1 |= USART_CR1_TE | USART_CR1_RE;
 	UART4->CR2 = 0;
 	UART4->CR3 = 0;
 	
@@ -102,7 +101,7 @@ xpcc::stm32::Uart4::setBaudrate(uint32_t baudrate)
 
 // ----------------------------------------------------------------------------
 void
-xpcc::stm32::Uart4::write(char data)
+xpcc::stm32::Uart4::write(uint8_t data)
 {
 	while (!(UART4->SR & USART_SR_TXE)) {
 		// wait until the data register becomes empty
@@ -113,17 +112,16 @@ xpcc::stm32::Uart4::write(char data)
 
 // ----------------------------------------------------------------------------
 void
-xpcc::stm32::Uart4::write(const char *s)
+xpcc::stm32::Uart4::write(const uint8_t *s, uint8_t n)
 {
-	char c;
-	while ((c = *s++)) {
-		write(c);
+	while (n-- != 0) {
+		write(*s++);
 	}
 }
 
 // ----------------------------------------------------------------------------
 bool
-xpcc::stm32::Uart4::read(char& c)
+xpcc::stm32::Uart4::read(uint8_t& c)
 {
 	if (UART4->SR & USART_SR_RXNE)
 	{
@@ -136,7 +134,7 @@ xpcc::stm32::Uart4::read(char& c)
 
 // ----------------------------------------------------------------------------
 uint8_t
-xpcc::stm32::Uart4::read(char *buffer, uint8_t n)
+xpcc::stm32::Uart4::read(uint8_t *buffer, uint8_t n)
 {
 	for (uint8_t i = 0; i < n; ++i)
 	{

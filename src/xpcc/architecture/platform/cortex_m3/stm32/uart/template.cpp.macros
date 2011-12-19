@@ -69,17 +69,17 @@ namespace
 }
 {%- endmacro -%}
 
-{%- macro configurePins(id) -%}
+{%- macro configurePins(className, id) -%}
 {% if id in [4, 5] -%}
-{{ uartConfigurePins(id) }}
+{{ uartConfigurePins(className, id) }}
 {%- elif id in [1, 2, 3, 6] -%}
-{{ usartConfigurePins(id) }}
+{{ usartConfigurePins(className, id) }}
 {%- endif -%}
 {%- endmacro -%}
 
-{%- macro uartConfigurePins(id) -%}
+{%- macro uartConfigurePins(className, id) -%}
 void
-xpcc::stm32::Uart{{ id }}::configurePins(Mapping mapping)
+xpcc::stm32::{{ className }}{{ id }}::configurePins(Mapping mapping)
 {
 	// Enable clock
 	RCC->APB1ENR |= RCC_APB1ENR_UART{{ id }}EN;
@@ -115,9 +115,9 @@ xpcc::stm32::Uart{{ id }}::configurePins(Mapping mapping)
 }
 {%- endmacro -%}
 
-{%- macro usartConfigurePins(id) -%}
+{%- macro usartConfigurePins(className, id) -%}
 void
-xpcc::stm32::Usart{{ id }}::configurePins(Mapping mapping)
+xpcc::stm32::{{ className }}{{ id }}::configurePins(Mapping mapping)
 {
 	// Enable clock
 	{% if id == 1 or id == 6 -%}
@@ -207,7 +207,7 @@ xpcc::stm32::Usart{{ id }}::configurePins(Mapping mapping)
 }
 {%- endmacro -%}
 
-{%- macro setBaudrate(className, id) -%}
+{%- macro setBaudrate(className, id, moduleName, enableReceiveReadyInterrupt = False) -%}
 void
 xpcc::stm32::{{ className }}{{ id }}::setBaudrate(uint32_t baudrate)
 {
@@ -220,51 +220,56 @@ xpcc::stm32::{{ className }}{{ id }}::setBaudrate(uint32_t baudrate)
 	RCC->APB1ENR |= RCC_APB1ENR_UART{{ id }}EN;
 	{%- endif %}
 	
-	// Enable USART in the interrupt controller
-	//NVIC->ISER[nvicId / 32] = 1 << ({{ className | upper }}{{ id }}_IRQn & 0x1F);
+	{{ moduleName }}{{ id }}->CR1 = 0;
+	
+	{% if enableReceiveReadyInterrupt -%}
+	// Enable USART in the interrupt controller and enable receive ready interrupt
+	NVIC->ISER[{{ moduleName }}{{ id }}_IRQn / 32] = 1 << ({{ moduleName }}{{ id }}_IRQn & 0x1F);
+	{{ moduleName }}{{ id }}->CR1 |= USART_CR1_RXNEIE;
+	
+	{% endif  -%}
 	
 	// Set baudrate
-	{{ className | upper }}{{ id }}->BRR = calculateBaudrateSettings(apbClk, baudrate);
+	{{ moduleName }}{{ id }}->BRR = calculateBaudrateSettings(apbClk, baudrate);
 	
 	// Transmitter & Receiver-Enable, 8 Data Bits, 1 Stop Bit
-	{{ className | upper }}{{ id }}->CR1 = USART_CR1_TE | USART_CR1_RE;
-	{{ className | upper }}{{ id }}->CR2 = 0;
-	{{ className | upper }}{{ id }}->CR3 = 0;
+	{{ moduleName }}{{ id }}->CR1 |= USART_CR1_TE | USART_CR1_RE;
+	{{ moduleName }}{{ id }}->CR2 = 0;
+	{{ moduleName }}{{ id }}->CR3 = 0;
 	
-	{{ className | upper }}{{ id }}->CR1 |= USART_CR1_UE;		// Uart Enable
+	{{ moduleName }}{{ id }}->CR1 |= USART_CR1_UE;		// Uart Enable
 }
 {%- endmacro -%}
 
-{%- macro write(className, id) -%}
+{%- macro write(className, id, moduleName) -%}
 void
-xpcc::stm32::{{ className }}{{ id }}::write(char data)
+xpcc::stm32::{{ className }}{{ id }}::write(uint8_t data)
 {
-	while (!({{ className | upper }}{{ id }}->SR & USART_SR_TXE)) {
+	while (!({{ moduleName }}{{ id }}->SR & USART_SR_TXE)) {
 		// wait until the data register becomes empty
 	}
 	
-	{{ className | upper }}{{ id }}->DR = data;
+	{{ moduleName }}{{ id }}->DR = data;
 }
 {%- endmacro -%}
 
 {%- macro writeBlock(className, id) -%}
 void
-xpcc::stm32::{{ className }}{{ id }}::write(const char *s)
+xpcc::stm32::{{ className }}{{ id }}::write(const uint8_t *s, uint8_t n)
 {
-	char c;
-	while ((c = *s++)) {
-		write(c);
+	while (n-- != 0) {
+		write(*s++);
 	}
 }
 {%- endmacro -%}
 
-{%- macro read(className, id) -%}
+{%- macro read(className, id, moduleName) -%}
 bool
-xpcc::stm32::{{ className }}{{ id }}::read(char& c)
+xpcc::stm32::{{ className }}{{ id }}::read(uint8_t& c)
 {
-	if ({{ className | upper }}{{ id }}->SR & USART_SR_RXNE)
+	if ({{ moduleName }}{{ id }}->SR & USART_SR_RXNE)
 	{
-		c = {{ className | upper }}{{ id }}->DR;
+		c = {{ moduleName }}{{ id }}->DR;
 		return true;
 	}
 	
@@ -274,7 +279,7 @@ xpcc::stm32::{{ className }}{{ id }}::read(char& c)
 
 {%- macro readBlock(className, id) -%}
 uint8_t
-xpcc::stm32::{{ className }}{{ id }}::read(char *buffer, uint8_t n)
+xpcc::stm32::{{ className }}{{ id }}::read(uint8_t *buffer, uint8_t n)
 {
 	for (uint8_t i = 0; i < n; ++i)
 	{

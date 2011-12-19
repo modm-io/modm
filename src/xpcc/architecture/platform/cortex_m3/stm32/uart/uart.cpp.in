@@ -41,19 +41,19 @@
 {{ template.pinDefinitions(id) }}
 
 // ----------------------------------------------------------------------------
-{{ template.configurePins(id) }}
+{{ template.configurePins(className, id) }}
 
 // ----------------------------------------------------------------------------
-{{ template.setBaudrate(className, id) }}
+{{ template.setBaudrate(className, id, className | upper) }}
 
 // ----------------------------------------------------------------------------
-{{ template.write(className, id) }}
+{{ template.write(className, id, className | upper) }}
 
 // ----------------------------------------------------------------------------
 {{ template.writeBlock(className, id) }}
 
 // ----------------------------------------------------------------------------
-{{ template.read(className, id) }}
+{{ template.read(className, id, className | upper) }}
 
 // ----------------------------------------------------------------------------
 {{ template.readBlock(className, id) }}
