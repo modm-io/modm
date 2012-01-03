@@ -4,7 +4,7 @@
 #if defined(STM32F2XX) || defined(STM32F4XX)
 {% elif id in [4, 5] -%}
 #if defined(STM32F10X_HD) || defined(STM32F10X_XL) || defined(STM32F10X_CL) || \
-defined(STM32F2XX) || defined(STM32F4XX)
+	defined(STM32F2XX) || defined(STM32F4XX)
 {%- endif %}
 {%- endmacro -%}
 

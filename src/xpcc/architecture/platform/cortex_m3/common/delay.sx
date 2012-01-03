@@ -69,7 +69,7 @@
 _delay_us:
 	// Example:
 	// F_CPU / 1000000 = cycles per us => 72,000,000 / 1,000,000 = 72
-	// 72 / 5 cycles per loop = 14
+	// 72 / 6 cycles per loop = 12
 	mov		r1, #(F_CPU / 1000000 / 6)
 	muls	r1, r0, r1
 1:

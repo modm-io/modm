@@ -132,9 +132,11 @@ def generate(env, **kw):
 		"-fno-split-wide-types",
 		"-fno-move-loop-invariants",
 		"-fno-tree-loop-optimize",
+		"-finline-limit=10000",
 		"-Wall",
 		"-Wextra",
-		"-Wundef", 
+		"-Wundef",
+#		"-Winline", 
 		"-Wa,-adhlns=${TARGET.base}.lst",
 		"-DBASENAME=${SOURCE.file}",
 	]

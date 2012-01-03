@@ -46,7 +46,7 @@
 
 #include "uart3.hpp"
 
-static xpcc::atomic::Queue<char, UART3_TX_BUFFER_SIZE> txBuffer;
+static xpcc::atomic::Queue<uint8_t, UART3_TX_BUFFER_SIZE> txBuffer;
 
 // ----------------------------------------------------------------------------
 // called when the UART is ready to transmit the next byte
@@ -68,7 +68,7 @@ ISR(USART3_UDRE_vect)
 
 // ----------------------------------------------------------------------------
 void
-xpcc::atmega::BufferedUart3::write(char c)
+xpcc::atmega::BufferedUart3::write(uint8_t c)
 {
 	while (!txBuffer.push(c)) {
 		// wait for a free slot in the buffer
@@ -78,16 +78,6 @@ xpcc::atmega::BufferedUart3::write(char c)
 	
 	// enable UDRE interrupt
 	UCSR3B |= (1 << UDRIE3);
-}
-
-// ----------------------------------------------------------------------------
-void
-xpcc::atmega::BufferedUart3::write(const char *s)
-{
-	char c;
-	while ((c = *s++)) {
-		BufferedUart3::write(c);
-	}
 }
 
 //uint8_t

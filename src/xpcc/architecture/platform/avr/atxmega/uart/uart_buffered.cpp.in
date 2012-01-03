@@ -43,8 +43,8 @@
 
 namespace
 {
-	static xpcc::atomic::Queue<char, UART{{ id }}_RX_BUFFER_SIZE> rxBuffer;
-	static xpcc::atomic::Queue<char, UART{{ id }}_TX_BUFFER_SIZE> txBuffer;
+	static xpcc::atomic::Queue<uint8_t, UART{{ id }}_RX_BUFFER_SIZE> rxBuffer;
+	static xpcc::atomic::Queue<uint8_t, UART{{ id }}_TX_BUFFER_SIZE> txBuffer;
 	
 	GPIO__INPUT(RXD, {{ id[0] }}, {{ number * 4 + 2 }});
 	GPIO__OUTPUT(TXD, {{ id[0] }}, {{ number * 4 + 3 }});
@@ -113,7 +113,7 @@ xpcc::atxmega::BufferedUart{{ id }}::setBaudrateRegister(uint16_t ubrr, bool dou
 
 // ----------------------------------------------------------------------------
 void
-xpcc::atxmega::BufferedUart{{ id }}::write(char c)
+xpcc::atxmega::BufferedUart{{ id }}::write(uint8_t c)
 {
 	uint16_t i(0);		
 	while ( !txBuffer.push(c) && (i < 1000) ) {
@@ -131,17 +131,7 @@ xpcc::atxmega::BufferedUart{{ id }}::write(char c)
 
 // ----------------------------------------------------------------------------
 void
-xpcc::atxmega::BufferedUart{{ id }}::write(const char *s)
-{
-	char c;
-	while ((c = *s++)) {
-		BufferedUart{{ id }}::write(c);
-	}
-}
-
-// ----------------------------------------------------------------------------
-void
-xpcc::atxmega::BufferedUart{{ id }}::write(const char *s, uint8_t n)
+xpcc::atxmega::BufferedUart{{ id }}::write(const uint8_t *s, uint8_t n)
 {
 	while (--n != 0) {
 		BufferedUart{{ id }}::write(*s++);
@@ -150,7 +140,7 @@ xpcc::atxmega::BufferedUart{{ id }}::write(const char *s, uint8_t n)
 
 // ----------------------------------------------------------------------------
 bool
-xpcc::atxmega::BufferedUart{{ id }}::read(char& c)
+xpcc::atxmega::BufferedUart{{ id }}::read(uint8_t& c)
 {
 	if (rxBuffer.isEmpty()) {
 		return false;
@@ -165,7 +155,7 @@ xpcc::atxmega::BufferedUart{{ id }}::read(char& c)
 
 // ----------------------------------------------------------------------------
 uint8_t
-xpcc::atxmega::BufferedUart{{ id }}::read(char *buffer, uint8_t n)
+xpcc::atxmega::BufferedUart{{ id }}::read(uint8_t *buffer, uint8_t n)
 {
 	uint8_t i(0);
 	for (; i < n; ++i)

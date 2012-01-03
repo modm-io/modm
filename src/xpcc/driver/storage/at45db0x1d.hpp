@@ -321,9 +321,6 @@ namespace xpcc
 		
 		static uint8_t
 		readStatus(void);
-		
-		static Spi spi;
-		static Cs cs;
 	};
 }
 

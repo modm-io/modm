@@ -51,79 +51,132 @@ namespace xpcc
 		public:
 
 			/**
-			 * Usage:
+			 * Clock management.
+			 * 
+			 * For using an external crystal with 8 MHz use:
+			 * \code 
+			 * if (enableHSE(HSE_CRYSTAL))
+			 * {
+			 *     enablePll(PLL_HSE, PLL_MUL_9);
+			 *     switchToPll();
+			 * }
+			 * \endcode
 			 *
-			 * For using internal clock (which is 16MHz) call
-			 * 		enablePll(PLL_HSI, 8);
-			 * 		switchToPll();
-			 *
-			 *
-			 * For using external crystal or oscillator with frequency f call
-			 * 		if (enableHSE(HSE_CRYSTAL)){
-			 * 			enablePll(PLL_HSE, f/2MHz);
-			 * 			switchToPll();
-			 * 		}
-			 *
-			 * For using external oscillator with frequency f call
-			 * 		if (enableHSE(HSE_BYPASS)){
-			 * 			enablePll(PLL_HSE, f/2MHz);
-			 * 			switchToPll();
-			 * 		}
+			 * For using an external oscillator with 8 MHz use:
+			 * \code
+			 * if (enableHSE(HSE_BYPASS))
+			 * {
+			 *     enablePll(PLL_HSE, PLL_MUL_9);
+			 *     switchToPll();
+			 * }
+			 * \endcode
+			 * 
+			 * For using a 25 MHz crystal on a Connectivity Line device:
+			 * if (enableHSE(HSE_CRYSTAL))
+			 * {
+			 *     enablePll2(5, PLL2_MUL_8);	// 40 MHz = (25 MHz / 5) * 8
+			 *     enablePll(PLL_PREDIV1, PLL_MUL_9, PREDIV1_PLL2, 5);	// 72 MHz = (40 MHz / 5) * 9
+			 *     switchToPll();
+			 * }
+			 * \endcode
 			 */
-			class Clock{
+			class Clock
+			{
 			public:
-				enum HSEConfig{
+				enum HseConfig
+				{
 					HSE_CRYSTAL,
 					HSE_BYPASS,
 				};
 
 				static bool
-				enableHSE(HSEConfig config, uint32_t wait_cycles = 1500);
+				enableHse(HseConfig config, uint32_t waitCycles = 1500);
 
 #ifdef STM32F10X_CL
-				enum PLLSource{
-					PLL_HSI_DIV_2,
+				enum PllSource
+				{
+					PLL_HSI_DIV_2,		///< Can't be used yet!
 					PLL_PREDIV1,
 				};
-
-				enum PLLMul{
+				
+				enum PreDiv1Source
+				{
+					PREDIV1_HSE,
+					PREDIV1_PLL2,
+				};
+				
+				enum PllMul
+				{
 					PLL_MUL_4 = RCC_CFGR_PLLMULL4,
 					PLL_MUL_5 = RCC_CFGR_PLLMULL5,
 					PLL_MUL_6 = RCC_CFGR_PLLMULL6,
 					PLL_MUL_7 = RCC_CFGR_PLLMULL7,
 					PLL_MUL_8 = RCC_CFGR_PLLMULL8,
 					PLL_MUL_9 = RCC_CFGR_PLLMULL9,
-					PLL_MUL_6_5 = RCC_CFGR_PLLMULL6_5,
+					PLL_MUL_6_5 = RCC_CFGR_PLLMULL6_5,		///< Frequency * 6.5
 				};
-
-				/*
-				 * PLLSRC 			source select for pll and for plli2s. If you are using HSE you must
-				 * 					enable it first.
-				 *
-				 * PLLMul			PLL multiplication factor
-				 *
-				 * 					Set multiplication factor the way, that output of Pll is 72MHz
-				 * 					If PREDIV1 is used as source:
-				 * 					PLL output = pllMul * frequency of Pll source / preDiv1
-				 *
-				 * 					If HSI is used as source
-				 * 					PLL output = pllMul * frequency of Pll source
-				 * 					You will see, it is not possible to run the core on full frequency if
-				 * 					HSI is used, but Api does not handle this case yet. Device will be configured
-				 * 					as running on 72MHz.
-				 *
-				 * preDiv1			Must be within in range 1 to 16.
+				
+				enum Pll2Mul
+				{
+					PLL2_MUL_8 = RCC_CFGR2_PLL2MUL8,
+					PLL2_MUL_9 = RCC_CFGR2_PLL2MUL9,
+					PLL2_MUL_10 = RCC_CFGR2_PLL2MUL10,
+					PLL2_MUL_11 = RCC_CFGR2_PLL2MUL11,
+					PLL2_MUL_12 = RCC_CFGR2_PLL2MUL12,
+					PLL2_MUL_13 = RCC_CFGR2_PLL2MUL13,
+					PLL2_MUL_14 = RCC_CFGR2_PLL2MUL14,
+					PLL2_MUL_16 = RCC_CFGR2_PLL2MUL16,
+					PLL2_MUL_20 = RCC_CFGR2_PLL2MUL20,
+				};
+				
+				/**
+				 * Enable PLL2.
+				 * 
+				 * \param	div
+				 * 		Divisior for PLL2 and PLL3. Must be in
+				 * 		range 1 <= div <= 16.
+				 * 
+				 * \param	mul
+				 * 		PLL2 multiplication factor.
 				 */
 				static void
-				enablePll(PLLSource source, PLLMul pllMul, uint8_t preDiv1);
+				enablePll2(uint32_t div, Pll2Mul mul);
+				
+				/**
+				 * Enable PLL.
+				 * 
+				 * \param	source
+				 * 		Source select for pll and for plli2s. If you are using
+				 * 		HSE you must enable it first (see enableHse()).
+				 *
+				 * \param	pllMull
+				 * 		PLL multiplication factor.
+				 *		Set multiplication factor so that output of the PLL
+				 *		is 72MHz.
+				 * 		If PREDIV1 is used as source:
+				 * 		"PLL output = pllMul * frequency of PLL source / preDiv1"
+				 * 
+				 * \param	preDivFactor
+				 * 		Must be within in range 1 to 16.
+				 * 
+				 * \warning	You will see, it is not possible to run the core on
+				 *			full frequency if HSI is used, but the API does not
+				 *			handle this case yet. Device will be configured
+				 * 			as running on 72MHz.
+				 */
+				static void
+				enablePll(PllSource source, PllMul pllMul,
+						PreDiv1Source preDivSource = PREDIV1_HSE, uint32_t preDivFactor = 1);
 
 #else
-				enum PLLSource{
-					PLL_HSI_DIV_2,
-					PLL_HSE,
+				enum PllSource
+				{
+					PLL_HSI_DIV_2,		///< Can't be used yet!
+					PLL_HSE,//!< PLL_HSE
 				};
 
-				enum PLLMul{
+				enum PllMul
+				{
 					PLL_MUL_2 = RCC_CFGR_PLLMULL2,
 					PLL_MUL_3 = RCC_CFGR_PLLMULL3,
 					PLL_MUL_4 = RCC_CFGR_PLLMULL4,
@@ -141,25 +194,30 @@ namespace xpcc
 					PLL_MUL_16 = RCC_CFGR_PLLMULL16,
 				};
 
-				/*
-				 * PLLSRC 			source select for pll and for plli2s. If you are using HSE you must
-				 * 					enable it first.
+				/**
+				 * Enable PLL.
+				 * 
+				 * \param	source
+				 * 		Source select for PLL and for plli2s. If you are using
+				 * 		HSE you must enable it first (see enableHse()).
 				 *
-				 * pllMul			PLL multiplication factor.
-				 *
-				 * 					Set multiplication factor the way, that output of Pll is 72MHz
-				 * 					PLL output = pllMul * frequency of Pll source
-				 *
-				 * 					You will see, it is not possible to run the core on full frequency if
-				 * 					HSI is used, but Api does not handle this case yet. Device will be configured
-				 * 					as running on 72MHz.
+				 * \param	pllMull
+				 * 		PLL multiplication factor.
+				 *		Set multiplication factor so that the output of the
+				 *		PLL is 72MHz
+				 * 		PLL output = pllMul * frequency of PLL source
+				 * 
+				 * \warning	You will see, it is not possible to run the core on
+				 *			full frequency if HSI is used, but the API does not
+				 *			handle this case yet. Device will be configured
+				 * 			as running on 72MHz.
 				 */
 				static void
-				enablePll(PLLSource source, PLLMul pllMul);
+				enablePll(PllSource source, PllMul pllMul);
 #endif
-
+				
 				static bool
-				switchToPll(uint32_t wait_cycles = 1500);
+				switchToPll(uint32_t waitCycles = 1500);
 
 			};
 

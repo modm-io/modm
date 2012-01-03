@@ -344,7 +344,7 @@ Reset_Handler(void)
 	// prepare flash latency for working at 120MHz and supply voltage > 2.7
 	FLASH->ACR = (FLASH->ACR & ~FLASH_ACR_LATENCY) | FLASH_WAIT_STATE_3;
 #else
-	#error this file is not supposed to be used with given cpu
+	#error "This file is not supposed to be used with given CPU (only STM32F2/4xx)"
 #endif
 	
 	// enable flash prefetch
@@ -361,10 +361,6 @@ Reset_Handler(void)
 	RCC->AHB1ENR  |=   RCC_AHB1ENR_GPIOAEN   | RCC_AHB1ENR_GPIOBEN   | RCC_AHB1ENR_GPIOCEN   | RCC_AHB1ENR_GPIODEN;
 	RCC->AHB1RSTR |=   RCC_AHB1RSTR_GPIOARST | RCC_AHB1RSTR_GPIOBRST | RCC_AHB1RSTR_GPIOCRST | RCC_AHB1RSTR_GPIODRST;
 	RCC->AHB1RSTR &= ~(RCC_AHB1RSTR_GPIOARST | RCC_AHB1RSTR_GPIOBRST | RCC_AHB1RSTR_GPIOCRST | RCC_AHB1RSTR_GPIODRST);
-	// GPIOE
-	RCC->AHB1ENR  |=   RCC_AHB1ENR_GPIOEEN;
-	RCC->AHB1RSTR |=   RCC_AHB1RSTR_GPIOERST;
-	RCC->AHB1RSTR &= ~(RCC_AHB1RSTR_GPIOERST);
 	// GPIOE-I
 	RCC->AHB1ENR  |=   RCC_AHB1ENR_GPIOEEN   | RCC_AHB1ENR_GPIOFEN   | RCC_AHB1ENR_GPIOGEN   | RCC_AHB1ENR_GPIOHEN   | RCC_AHB1ENR_GPIOIEN;
 	RCC->AHB1RSTR |=   RCC_AHB1RSTR_GPIOERST | RCC_AHB1RSTR_GPIOFRST | RCC_AHB1RSTR_GPIOGRST | RCC_AHB1RSTR_GPIOHRST | RCC_AHB1RSTR_GPIOIRST;
@@ -380,9 +376,6 @@ Reset_Handler(void)
 		const uint32_t priority = 0xF;
 		NVIC->IP[i] = (priority & 0xF) << 4;
 	}
-	
-	// Lower systick interrupt priority to lowest level
-	NVIC_SetPriority(SysTick_IRQn, 0xf);
 	
 	// Enable fault handlers
 	/*SCB->SHCSR |=

@@ -113,7 +113,7 @@ namespace xpcc
 		static void
 		write(const uint8_t *data, std::size_t size);
 
-		static void
+		static inline void
 		restart(uint8_t slaveAddress);
 
 		static xpcc::i2c::BusyState

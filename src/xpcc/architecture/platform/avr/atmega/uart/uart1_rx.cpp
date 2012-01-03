@@ -46,7 +46,7 @@
 
 #include "uart1.hpp"
 
-static xpcc::atomic::Queue<char, UART1_RX_BUFFER_SIZE> rxBuffer;
+static xpcc::atomic::Queue<uint8_t, UART1_RX_BUFFER_SIZE> rxBuffer;
 static uint8_t error;
 
 // ----------------------------------------------------------------------------
@@ -89,7 +89,7 @@ xpcc::atmega::BufferedUart1::setBaudrateRegister(uint16_t ubrr)
 
 // ----------------------------------------------------------------------------
 bool
-xpcc::atmega::BufferedUart1::read(char& c)
+xpcc::atmega::BufferedUart1::read(uint8_t& c)
 {
 	if (rxBuffer.isEmpty()) {
 		return false;
@@ -104,7 +104,7 @@ xpcc::atmega::BufferedUart1::read(char& c)
 
 // ----------------------------------------------------------------------------
 uint8_t
-xpcc::atmega::BufferedUart1::read(char *buffer, uint8_t n)
+xpcc::atmega::BufferedUart1::read(uint8_t *buffer, uint8_t n)
 {
 	for (uint8_t i = 0; i < n; ++i)
 	{
@@ -142,9 +142,10 @@ xpcc::atmega::BufferedUart1::flushReceiveBuffer()
 	}
 	
 #if defined (RXC1)
-	unsigned char c;
-	while (UCSR1A & (1 << RXC1))
+	uint8_t c;
+	while (UCSR1A & (1 << RXC1)) {
 		c = UDR1;
+	}
 #endif
 	
 	return i;

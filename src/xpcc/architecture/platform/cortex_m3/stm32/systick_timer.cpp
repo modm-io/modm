@@ -50,6 +50,9 @@ SysTick_Handler(void)
 void
 xpcc::stm32::SysTickTimer::enable(uint32_t reload)
 {
+	// Lower systick interrupt priority to lowest level
+	NVIC_SetPriority(SysTick_IRQn, 0xf);
+	
 	SysTick->LOAD = reload;
 	SysTick->CTRL =
 			SysTick_CTRL_CLKSOURCE_Msk |
@@ -68,7 +71,6 @@ void
 xpcc::stm32::SysTickTimer::attachInterrupt(InterruptHandler handler)
 {
 	atomic::Lock lock;
-
 	sysTickHandler = handler;
 }
 
@@ -76,6 +78,5 @@ void
 xpcc::stm32::SysTickTimer::detachInterrupt()
 {
 	atomic::Lock lock;
-
 	sysTickHandler = &xpcc::dummy;
 }

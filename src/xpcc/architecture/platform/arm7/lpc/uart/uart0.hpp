@@ -85,7 +85,7 @@ namespace xpcc
 		 * @return	\c true if the character was send, \c false otherwise.
 		 */
 		static bool
-		write(char c, bool blocking = true);
+		write(uint8_t c, bool blocking = true);
 		
 		/**
 		 * @brief	Check if a character was received and is ready to be read
@@ -101,7 +101,7 @@ namespace xpcc
 		 * 			in this case.
 		 */
 		static bool
-		read(char &c, bool blocking = false);
+		read(uint8_t &c, bool blocking = false);
 	};
 }
 

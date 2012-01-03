@@ -213,6 +213,95 @@ namespace xpcc
 //			static uint8_t
 //			flushTransmitBuffer();
 		};
+		
+#if defined(STM32F2XX) || defined(STM32F4XX)
+		// --------------------------------------------------------------------
+		/**
+		 * \brief		USART2 in SPI master mode
+		 * 
+		 * FIXME currently not working!
+		 * 
+		 * \ingroup		stm32
+		 */
+		class UsartSpi2 : public UartBase
+		{
+		private:
+			// TX mapped to PA2, RX mapped to PA3 (CTS/PA0, RTS/PA1, CK/PA4)
+			// TX mapped to PD5, RX mapped to PD6 (CTS/PD3, RTS/PD4, CK/PD7)
+			GPIO__OUTPUT(TxdA2, A, 2);
+			GPIO__INPUT(RxdA3, A, 3);
+			GPIO__OUTPUT(CkA4, A, 4);
+			
+			GPIO__OUTPUT(TxdD5, D, 5);
+			GPIO__INPUT(RxdD6, D, 6);
+			GPIO__OUTPUT(CkD7, D, 7);
+			
+		public:
+			enum Mode
+			{
+				MODE_0 = 0,
+				MODE_1 = USART_CR2_CPHA,
+				MODE_2 = USART_CR2_CPOL,
+				MODE_3 = USART_CR2_CPOL | USART_CR2_CPHA,
+			};
+			
+			enum MappingTx
+			{
+				REMAP_PA2,
+				REMAP_PD5,
+			};
+			
+			enum MappingRx
+			{
+				REMAP_PA3,
+				REMAP_PD6,
+			};
+			
+			enum MappingCk
+			{
+				REMAP_PA4,
+				REMAP_PD7,
+			};
+			
+			ALWAYS_INLINE void
+			configureTxPin(MappingTx mapping)
+			{
+				switch (mapping) {
+					case REMAP_PA2:  TxdA2::setAlternateFunction(AF_USART2, xpcc::stm32::PUSH_PULL); break;
+					case REMAP_PD5:  TxdD5::setAlternateFunction(AF_USART2, xpcc::stm32::PUSH_PULL); break;
+				}
+			}
+			
+			ALWAYS_INLINE void
+			configureRxPin(MappingRx mapping)
+			{
+				switch (mapping) {
+					case REMAP_PA3:  RxdA3::setAlternateFunction(AF_USART2); break;
+					case REMAP_PD6:  RxdD6::setAlternateFunction(AF_USART2); break;
+				}
+			}
+			
+			ALWAYS_INLINE void
+			configureCkPin(MappingCk mapping)
+			{
+				switch (mapping) {
+					case REMAP_PA4:  CkA4::setAlternateFunction(AF_USART2, xpcc::stm32::PUSH_PULL); break;
+					case REMAP_PD7:  CkD7::setAlternateFunction(AF_USART2, xpcc::stm32::PUSH_PULL); break;
+				}
+			}
+			
+			/**
+			 * Constructor
+			 */
+			UsartSpi2(uint32_t bitrate, Mode mode = MODE_0);
+			
+			/**
+			 * Transfer byte.
+			 */
+			static uint8_t
+			write(uint8_t data);
+		};
+#endif
 	}
 }
 

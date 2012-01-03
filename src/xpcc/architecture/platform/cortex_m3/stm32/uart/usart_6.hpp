@@ -211,6 +211,95 @@ namespace xpcc
 //			static uint8_t
 //			flushTransmitBuffer();
 		};
+		
+#if defined(STM32F2XX) || defined(STM32F4XX)
+		// --------------------------------------------------------------------
+		/**
+		 * \brief		USART6 in SPI master mode
+		 * 
+		 * FIXME currently not working!
+		 * 
+		 * \ingroup		stm32
+		 */
+		class UsartSpi6 : public UartBase
+		{
+		private:
+			// TX mapped to PC6, RX mapped to PC7 (CK/PC8)
+			// TX/PG14, RX/PG9, CK/PG7, CTS/PG13,PG15, RTS/PG8,PG12
+			GPIO__OUTPUT(TxdC6, C, 6);
+			GPIO__INPUT(RxdC7, C, 7);
+			GPIO__OUTPUT(CkC8, C, 8);
+			
+			GPIO__OUTPUT(TxdG14, G, 14);
+			GPIO__INPUT(RxdG9, G, 9);
+			GPIO__OUTPUT(CkG7, G, 7);
+			
+		public:
+			enum Mode
+			{
+				MODE_0 = 0,
+				MODE_1 = USART_CR2_CPHA,
+				MODE_2 = USART_CR2_CPOL,
+				MODE_3 = USART_CR2_CPOL | USART_CR2_CPHA,
+			};
+			
+			enum MappingTx
+			{
+				REMAP_PC6,
+				REMAP_PG14,
+			};
+			
+			enum MappingRx
+			{
+				REMAP_PC7,
+				REMAP_PG9,
+			};
+			
+			enum MappingCk
+			{
+				REMAP_PC8,
+				REMAP_PG7,
+			};
+			
+			ALWAYS_INLINE void
+			configureTxPin(MappingTx mapping)
+			{
+				switch (mapping) {
+					case REMAP_PC6:  TxdC6::setAlternateFunction(AF_USART6, xpcc::stm32::PUSH_PULL); break;
+					case REMAP_PG14: TxdG14::setAlternateFunction(AF_USART6, xpcc::stm32::PUSH_PULL); break;
+				}
+			}
+			
+			ALWAYS_INLINE void
+			configureRxPin(MappingRx mapping)
+			{
+				switch (mapping) {
+					case REMAP_PC7:  RxdC7::setAlternateFunction(AF_USART6); break;
+					case REMAP_PG9:  RxdG9::setAlternateFunction(AF_USART6); break;
+				}
+			}
+			
+			ALWAYS_INLINE void
+			configureCkPin(MappingCk mapping)
+			{
+				switch (mapping) {
+					case REMAP_PC8:  CkC8::setAlternateFunction(AF_USART6, xpcc::stm32::PUSH_PULL); break;
+					case REMAP_PG7:  CkG7::setAlternateFunction(AF_USART6, xpcc::stm32::PUSH_PULL); break;
+				}
+			}
+			
+			/**
+			 * Constructor
+			 */
+			UsartSpi6(uint32_t bitrate, Mode mode = MODE_0);
+			
+			/**
+			 * Transfer byte.
+			 */
+			static uint8_t
+			write(uint8_t data);
+		};
+#endif
 	}
 }
 

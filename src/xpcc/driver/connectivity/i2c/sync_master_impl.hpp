@@ -38,10 +38,12 @@ template <typename M>
 xpcc::i2c::BusyState
 xpcc::i2c::SyncMaster<M>::wait()
 {
-	while (true){
+	while (true)
+	{
 		BusyState b = M::getBusyState();
-		if (b != xpcc::i2c::BUSY)
+		if (b != xpcc::i2c::BUSY) {
 			return b;
+		}
 	}
 }
 
@@ -49,13 +51,15 @@ template <typename M>
 bool
 xpcc::i2c::SyncMaster<M>::start(uint8_t slaveAddress, BusState *busState)
 {
-	if (M::start(slaveAddress)){
+	if (M::start(slaveAddress))
+	{
 		wait();
 		*busState = M::getBusState();
 		return true;
 	}
-	else
+	else {
 		return false;
+	}
 }
 
 template <typename M>
@@ -63,8 +67,10 @@ bool
 xpcc::i2c::SyncMaster<M>::startCheck(uint8_t slaveAddress)
 {
 	BusState busState;
-	if (start(slaveAddress, &busState)){
-		if (busState != xpcc::i2c::BUS_RESET){
+	if (start(slaveAddress, &busState))
+	{
+		if (busState != xpcc::i2c::BUS_RESET)
+		{
 			return true;
 		}
 		else{
@@ -89,8 +95,9 @@ xpcc::i2c::SyncMaster<M>::read(uint8_t *data, std::size_t size, ReadParameter pa
 {
 	M::read(data, size, param);
 	wait();
+	
 	xpcc::i2c::BusState b = M::getBusState();
-	if (param == xpcc::i2c::READ_STOP && syncParams == SYNC_STOP){
+	if (param == xpcc::i2c::READ_STOP && syncParams == SYNC_STOP) {
 		M::stop();
 		wait();
 	}
@@ -103,8 +110,9 @@ xpcc::i2c::SyncMaster<M>::write(const uint8_t *data, std::size_t size, SyncParam
 {
 	M::write(data, size);
 	wait();
+	
 	xpcc::i2c::BusState b = M::getBusState();
-	if (syncParams == SYNC_STOP){
+	if (syncParams == SYNC_STOP) {
 		M::stop();
 		wait();
 	}

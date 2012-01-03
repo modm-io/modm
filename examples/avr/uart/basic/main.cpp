@@ -10,8 +10,13 @@ main()
 	// Enable interrupts, this is needed for every buffered UART
 	sei();
 	
-	// Write the unavoidable standard message
-	uart.write("Hello World!\n");
+	// Write some characters
+	uart.write('H');
+	uart.write('e');
+	uart.write('l');
+	uart.write('l');
+	uart.write('o');
+	uart.write('\n');
 	
 	while (1)
 	{

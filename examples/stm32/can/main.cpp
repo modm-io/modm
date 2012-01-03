@@ -25,13 +25,15 @@ xpcc::DogS102< xpcc::stm32::Spi1, lcd::CS, lcd::A0, lcd::Reset, false > display;
 using namespace xpcc::stm32;
 
 static bool
-initClock(){
-	typedef xpcc::stm32::Core::Clock C;
+initClock()
+{
 	// use external 8MHz crystal, stm32f1
-	if(!C::enableHSE(C::HSE_CRYSTAL))
+	if (!Core::Clock::enableHse(Core::Clock::HSE_CRYSTAL)) {
 		return false;
-	C::enablePll(C::PLL_HSE, C::PLL_MUL_9);
-	return C::switchToPll();
+	}
+	
+	Core::Clock::enablePll(Core::Clock::PLL_HSE, Core::Clock::PLL_MUL_9);
+	return Core::Clock::switchToPll();
 }
 
 // ----------------------------------------------------------------------------

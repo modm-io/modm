@@ -38,6 +38,8 @@
 	#include <util/crc16.h>
 #endif
 
+//#include <xpcc/debug.hpp>
+
 // ----------------------------------------------------------------------------
 template <typename Device> typename xpcc::sab::Interface<Device>::State \
 	xpcc::sab::Interface<Device>::state = SYNC;
@@ -171,7 +173,7 @@ template <typename Device>
 void
 xpcc::sab::Interface<Device>::update()
 {
-	char byte;
+	uint8_t byte;
 	while (Device::read(byte))
 	{
 		switch (state)
@@ -202,7 +204,11 @@ xpcc::sab::Interface<Device>::update()
 				if (position >= length) {
 					if (crc == 0) {
 						lengthOfReceivedMessage = length;
+						//XPCC_LOG_DEBUG << "SAB received" << xpcc::endl;
 					}
+					//else {
+					//	XPCC_LOG_ERROR << "CRC error" << xpcc::endl;
+					//}
 					state = SYNC;
 				}
 				break;

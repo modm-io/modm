@@ -46,7 +46,7 @@
 
 #include "uart3.hpp"
 
-static xpcc::atomic::Queue<char, UART3_RX_BUFFER_SIZE> rxBuffer;
+static xpcc::atomic::Queue<uint8_t, UART3_RX_BUFFER_SIZE> rxBuffer;
 static uint8_t error;
 
 // ----------------------------------------------------------------------------
@@ -89,7 +89,7 @@ xpcc::atmega::BufferedUart3::setBaudrateRegister(uint16_t ubrr)
 
 // ----------------------------------------------------------------------------
 bool
-xpcc::atmega::BufferedUart3::read(char& c)
+xpcc::atmega::BufferedUart3::read(uint8_t& c)
 {
 	if (rxBuffer.isEmpty()) {
 		return false;
@@ -104,7 +104,7 @@ xpcc::atmega::BufferedUart3::read(char& c)
 
 // ----------------------------------------------------------------------------
 uint8_t
-xpcc::atmega::BufferedUart3::read(char *buffer, uint8_t n)
+xpcc::atmega::BufferedUart3::read(uint8_t *buffer, uint8_t n)
 {
 	for (uint8_t i = 0; i < n; ++i)
 	{
@@ -142,9 +142,10 @@ xpcc::atmega::BufferedUart3::flushReceiveBuffer()
 	}
 	
 #if defined (RXC3)
-	unsigned char c;
-	while (UCSR3A & (1 << RXC3))
+	uint8_t c;
+	while (UCSR3A & (1 << RXC3)) {
 		c = UDR3;
+	}
 #endif
 	
 	return i;

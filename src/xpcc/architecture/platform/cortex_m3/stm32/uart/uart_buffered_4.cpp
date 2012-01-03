@@ -42,7 +42,7 @@
 #include <xpcc_config.hpp>
 
 #if defined(STM32F10X_HD) || defined(STM32F10X_XL) || defined(STM32F10X_CL) || \
-defined(STM32F2XX) || defined(STM32F4XX)
+	defined(STM32F2XX) || defined(STM32F4XX)
 
 namespace
 {
@@ -119,13 +119,15 @@ xpcc::stm32::BufferedUart4::write(const uint8_t *s, uint8_t n)
 	}
 }
 
-#endif
-
 // ----------------------------------------------------------------------------
 extern "C" void
-UART4_IRQHandler(){
+UART4_IRQHandler()
+{
 	uint32_t state = UART4->SR;
-	if (state & USART_SR_RXNE){ // Read Data Register Not Empty 
+	
+	// Read Data Register Not Empty 
+	if (state & USART_SR_RXNE)
+	{
 		// first save the errors TODO
 		// error |= USART4_STATUS & (USART_FERR_bm | USART_BUFOVF_bm | USART_PERR_bm);
 		
@@ -135,7 +137,9 @@ UART4_IRQHandler(){
 		rxBuffer.push(data);
 	}
 	
-	if (state & USART_SR_TXE){ // Transmit Data Register Empty
+	// Transmit Data Register Empty
+	if (state & USART_SR_TXE)
+	{
 		if (txBuffer.isEmpty())
 		{
 			// transmission finished, disable DRE interrupt
@@ -187,7 +191,7 @@ xpcc::stm32::BufferedUart4::read(uint8_t& c)
 uint8_t
 xpcc::stm32::BufferedUart4::read(uint8_t *buffer, uint8_t n)
 {
-	uint8_t i(0);
+	uint_fast8_t i = 0;
 	for (; i < n; ++i)
 	{
 		if (rxBuffer.isEmpty()) {
@@ -205,12 +209,12 @@ xpcc::stm32::BufferedUart4::read(uint8_t *buffer, uint8_t n)
 uint8_t
 xpcc::stm32::BufferedUart4::flushReceiveBuffer()
 {
-	uint8_t i(0);
-	while(!rxBuffer.isEmpty()) {
+	uint_fast8_t i = 0;
+	while (!rxBuffer.isEmpty()) {
 		rxBuffer.pop();
 		++i;
 	}
-	unsigned char c;
+//	unsigned char c;
 //	while (USART4_STATUS & USART_RXCIF_bm)
 //		c = USART4_DATA;
 	
@@ -228,3 +232,6 @@ xpcc::stm32::BufferedUart4::flushReceiveBuffer()
 //
 //	return i;
 //}
+
+#endif
+

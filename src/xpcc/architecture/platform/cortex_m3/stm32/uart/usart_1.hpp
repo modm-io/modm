@@ -213,6 +213,92 @@ namespace xpcc
 //			static uint8_t
 //			flushTransmitBuffer();
 		};
+		
+#if defined(STM32F2XX) || defined(STM32F4XX)
+		// --------------------------------------------------------------------
+		/**
+		 * \brief		USART1 in SPI master mode
+		 * 
+		 * FIXME currently not working!
+		 * 
+		 * \ingroup		stm32
+		 */
+		class UsartSpi1 : public UartBase
+		{
+		private:
+			// TX mapped to PA9, RX mapped to PA10 (CTS/PA11, RTS/PA12, CK/PA8)
+			// TX mapped to PB6, RX mapped to PB7
+			GPIO__OUTPUT(TxdA9, A, 9);
+			GPIO__INPUT(RxdA10, A, 10);
+			GPIO__OUTPUT(CkA8, A, 8);
+			
+			GPIO__OUTPUT(TxdB6, B, 6);
+			GPIO__INPUT(RxdB7, B, 7);
+			
+		public:
+			enum Mode
+			{
+				MODE_0 = 0,
+				MODE_1 = USART_CR2_CPHA,
+				MODE_2 = USART_CR2_CPOL,
+				MODE_3 = USART_CR2_CPOL | USART_CR2_CPHA,
+			};
+			
+			enum MappingTx
+			{
+				REMAP_PA9,
+				REMAP_PB6,
+			};
+			
+			enum MappingRx
+			{
+				REMAP_PA10,
+				REMAP_PB7,
+			};
+			
+			enum MappingCk
+			{
+				REMAP_PA8,
+			};
+			
+			ALWAYS_INLINE void
+			configureTxPin(MappingTx mapping)
+			{
+				switch (mapping) {
+					case REMAP_PA9:  TxdA9::setAlternateFunction(AF_USART1, xpcc::stm32::PUSH_PULL); break;
+					case REMAP_PB6:  TxdB6::setAlternateFunction(AF_USART1, xpcc::stm32::PUSH_PULL); break;
+				}
+			}
+			
+			ALWAYS_INLINE void
+			configureRxPin(MappingRx mapping)
+			{
+				switch (mapping) {
+					case REMAP_PA10: RxdA10::setAlternateFunction(AF_USART1); break;
+					case REMAP_PB7:  RxdB7::setAlternateFunction(AF_USART1); break;
+				}
+			}
+			
+			ALWAYS_INLINE void
+			configureCkPin(MappingCk mapping)
+			{
+				switch (mapping) {
+					case REMAP_PA8:  CkA8::setAlternateFunction(AF_USART1, xpcc::stm32::PUSH_PULL); break;
+				}
+			}
+			
+			/**
+			 * Constructor
+			 */
+			UsartSpi1(uint32_t bitrate, Mode mode = MODE_0);
+			
+			/**
+			 * Transfer byte.
+			 */
+			static uint8_t
+			write(uint8_t data);
+		};
+#endif
 	}
 }
 

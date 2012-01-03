@@ -78,7 +78,7 @@ xpcc::atxmega::UartD0::setBaudrateRegister(uint16_t ubrr)
 
 // ----------------------------------------------------------------------------
 void
-xpcc::atxmega::UartD0::write(char c)
+xpcc::atxmega::UartD0::write(uint8_t c)
 {
 	while (!(USARTD0_STATUS & USART_DREIF_bm))
 		;
@@ -88,17 +88,7 @@ xpcc::atxmega::UartD0::write(char c)
 
 // ----------------------------------------------------------------------------
 void
-xpcc::atxmega::UartD0::write(const char *s)
-{
-	char c;
-	while ((c = *s++)) {
-		UartD0::write(c);
-	}
-}
-
-// ----------------------------------------------------------------------------
-void
-xpcc::atxmega::UartD0::write(const char *s, uint8_t n)
+xpcc::atxmega::UartD0::write(const uint8_t *s, uint8_t n)
 {
 	while (--n != 0) {
 		UartD0::write(*s++);
@@ -107,7 +97,7 @@ xpcc::atxmega::UartD0::write(const char *s, uint8_t n)
 
 // ----------------------------------------------------------------------------
 bool
-xpcc::atxmega::UartD0::read(char& c)
+xpcc::atxmega::UartD0::read(uint8_t& c)
 {
 	if (USARTD0_STATUS & USART_RXCIF_bm) {
 		// the status flag is cleared by reading DATA
@@ -119,7 +109,7 @@ xpcc::atxmega::UartD0::read(char& c)
 
 // ----------------------------------------------------------------------------
 uint8_t
-xpcc::atxmega::UartD0::read(char *b, uint8_t n)
+xpcc::atxmega::UartD0::read(uint8_t *b, uint8_t n)
 {
 	/*
 	 * The delay of 1.5 times frame time could be calculated at compile time

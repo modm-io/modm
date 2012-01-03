@@ -47,6 +47,7 @@ for id in [1, 2, 3, 6]:
 	env.Depends(generator.template('usart_%i.hpp' % id, 'usart.hpp.in', { 'id': id, 'className' : 'Usart' }), 'uart/template.hpp.macros')
 	env.Depends(generator.template('usart_%i.cpp' % id, 'uart.cpp.in', { 'id': id, 'className' : 'Usart' }), 'uart/template.cpp.macros')
 	env.Depends(generator.template('usart_buffered_%i.cpp' % id, 'uart_buffered.cpp.in', { 'id': id, 'className' : 'Usart' }), 'uart/template.cpp.macros')
+	env.Depends(generator.template('usart_spi_%i.cpp' % id, 'usart_spi.cpp.in', { 'id': id, 'className' : 'Usart' }), 'uart/template.cpp.macros')
 for id in [4, 5]:
 	env.Depends(generator.template('uart_%i.hpp' % id, 'uart.hpp.in', { 'id': id, 'className' : 'Uart'  }), 'uart/template.hpp.macros')
 	env.Depends(generator.template('uart_%i.cpp' % id, 'uart.cpp.in', { 'id': id, 'className' : 'Uart'  }), 'uart/template.cpp.macros')

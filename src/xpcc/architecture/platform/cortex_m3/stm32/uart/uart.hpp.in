@@ -58,17 +58,17 @@ namespace xpcc
 			
 			{{ template.mapping(id) }}
 			
-			{{ template.configurePins(className, id)|xpcc.indent(3) }}
+			{{ template.configurePins(className, id) | xpcc.indent(3) }}
 			
-			{{ template.setBaudrate()|xpcc.indent(3) }}
+			{{ template.setBaudrate() | xpcc.indent(3) }}
 			
-			{{ template.write()|xpcc.indent(3) }}
+			{{ template.write() | xpcc.indent(3) }}
 			
-			{{ template.writeBlock()|xpcc.indent(3) }}
+			{{ template.writeBlock() | xpcc.indent(3) }}
 			
-			{{ template.read()|xpcc.indent(3) }}
+			{{ template.read() | xpcc.indent(3) }}
 			
-			{{ template.readBlock()|xpcc.indent(3) }}
+			{{ template.readBlock() | xpcc.indent(3) }}
 		};
 		
 		// --------------------------------------------------------------------
@@ -101,17 +101,17 @@ namespace xpcc
 			
 			{{ template.mapping(id) }}
 			
-			{{ template.configurePins(className, id)|xpcc.indent(3) }}
+			{{ template.configurePins(className, id) | xpcc.indent(3) }}
 			
-			{{ template.setBaudrate()|xpcc.indent(3) }}
+			{{ template.setBaudrate() | xpcc.indent(3) }}
 			
-			{{ template.write()|xpcc.indent(3) }}
+			{{ template.write() | xpcc.indent(3) }}
 			
-			{{ template.writeBlock()|xpcc.indent(3) }}
+			{{ template.writeBlock() | xpcc.indent(3) }}
 			
-			{{ template.read()|xpcc.indent(3) }}
+			{{ template.read() | xpcc.indent(3) }}
 			
-			{{ template.readBlock()|xpcc.indent(3) }}
+			{{ template.readBlock() | xpcc.indent(3) }}
 			
 			/**
 			 * \brief	Empty the receive FIFO queue and {{ className | upper }} buffer.

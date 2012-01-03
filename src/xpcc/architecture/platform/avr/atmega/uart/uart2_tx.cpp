@@ -46,7 +46,7 @@
 
 #include "uart2.hpp"
 
-static xpcc::atomic::Queue<char, UART2_TX_BUFFER_SIZE> txBuffer;
+static xpcc::atomic::Queue<uint8_t, UART2_TX_BUFFER_SIZE> txBuffer;
 
 // ----------------------------------------------------------------------------
 // called when the UART is ready to transmit the next byte
@@ -68,7 +68,7 @@ ISR(USART2_UDRE_vect)
 
 // ----------------------------------------------------------------------------
 void
-xpcc::atmega::BufferedUart2::write(char c)
+xpcc::atmega::BufferedUart2::write(uint8_t c)
 {
 	while (!txBuffer.push(c)) {
 		// wait for a free slot in the buffer
@@ -78,16 +78,6 @@ xpcc::atmega::BufferedUart2::write(char c)
 	
 	// enable UDRE interrupt
 	UCSR2B |= (1 << UDRIE2);
-}
-
-// ----------------------------------------------------------------------------
-void
-xpcc::atmega::BufferedUart2::write(const char *s)
-{
-	char c;
-	while ((c = *s++)) {
-		BufferedUart2::write(c);
-	}
 }
 
 //uint8_t

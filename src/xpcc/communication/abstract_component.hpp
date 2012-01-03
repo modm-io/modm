@@ -48,7 +48,9 @@ namespace xpcc
 	 * This class give to components an interface to xpcc communication, but
 	 * effectively it forwards all requests to the internal created Communicator,
 	 * which is bound to this AbstractComponent.
-	 *
+	 * 
+	 * TODO why do we use the communicator here?
+	 * 
 	 * It is a good convention to give to a component which extends
 	 * xpcc::AbstractComponent an update() method which is to be called
 	 * during the main loop.
@@ -57,7 +59,7 @@ namespace xpcc
 	 * separate classes called Tasks. These Tasks will usually not be
 	 * complete components but want send messages in the name of a parent
 	 * component. Use xpcc::CommunicatableTask for such type of Tasks.
-	 *
+	 * 
 	 * \see		xpcc::Task
 	 * \see		xpcc::Communicatable
 	 *

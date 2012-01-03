@@ -1,8 +1,8 @@
 // coding: utf-8
 // ----------------------------------------------------------------------------
-/* Copyright (c) 2009, Roboterclub Aachen e.V.
+/* Copyright (c) 2011, Roboterclub Aachen e.V.
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  * 
@@ -14,7 +14,7 @@
  *     * Neither the name of the Roboterclub Aachen e.V. nor the
  *       names of its contributors may be used to endorse or promote products
  *       derived from this software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY ROBOTERCLUB AACHEN E.V. ''AS IS'' AND ANY
  * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -27,69 +27,55 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 // ----------------------------------------------------------------------------
-/*
- * WARNING: This file is generated automatically, do not edit!
- * Please modify the corresponding *.in file instead and rebuild this file. 
- */
-// ----------------------------------------------------------------------------
+{{ generation_block }}
+{% import 'template.cpp.macros' as template %}
+#include "../gpio.hpp"
+#include "../device.h"
 
-#include <avr/io.h>
-#include <avr/interrupt.h>
+#include "{{ className | lower }}_{{ id }}.hpp"
 
-#include <xpcc/architecture/driver/atomic/queue.hpp>
-#include <xpcc/architecture/driver/atomic/lock.hpp>
+#include <xpcc_config.hpp>
 
-#include "uart_defines.h"
-#include "xpcc_config.hpp"
-
-#if defined USART0_UDRE_vect
-
-#include "uart0.hpp"
-
-static xpcc::atomic::Queue<uint8_t, UART0_TX_BUFFER_SIZE> txBuffer;
+#if defined(STM32F2XX) || defined(STM32F4XX)
 
 // ----------------------------------------------------------------------------
-// called when the UART is ready to transmit the next byte
-// 
-ISR(USART0_UDRE_vect)
+xpcc::stm32::{{ className }}Spi{{ id }}::{{ className }}Spi{{ id }}(
+		uint32_t bitrate, Mode mode)
 {
-	if (txBuffer.isEmpty())
-	{
-		// transmission finished, disable UDRE interrupt
-		UCSR0B &= ~(1 << UDRIE0);
-	}
-	else {
-		// get one byte from buffer and write it to the UART buffer
-		// which starts the transmission
-		UDR0 = txBuffer.get();
-		txBuffer.pop();
-	}
+	// Enable clock
+	{% if id in [1, 6] -%}
+	RCC->APB2ENR |= RCC_APB2ENR_USART{{ id }}EN;
+	{%- elif id in [2, 3] -%}
+	RCC->APB1ENR |= RCC_APB1ENR_USART{{ id }}EN;
+	{%- endif %}
+	
+	USART{{ id }}->CR1 = 0;
+	
+	// Set baudrate
+	{% if id in [1, 6] -%}
+	USART{{ id }}->BRR = calculateBaudrateSettings(STM32_APB2_FREQUENCY, bitrate);
+	{%- elif id in [2, 3] -%}
+	USART{{ id }}->BRR = calculateBaudrateSettings(STM32_APB1_FREQUENCY, bitrate);
+	{%- endif %}
+	
+	USART{{ id }}->CR2 = USART_CR2_CLKEN | USART_CR2_LBCL | mode;
+	USART{{ id }}->CR3 = 0;
+	
+	// Transmitter & Receiver-Enable, 8 Data Bits, 1 Stop Bit
+	USART{{ id }}->CR1 |= USART_CR1_TE | USART_CR1_RE;
+	USART{{ id }}->CR1 |= USART_CR1_UE;		// Uart Enable
 }
 
 // ----------------------------------------------------------------------------
-void
-xpcc::atmega::BufferedUart0::write(uint8_t c)
+uint8_t
+xpcc::stm32::{{ className }}Spi{{ id }}::write(uint8_t data)
 {
-	while (!txBuffer.push(c)) {
-		// wait for a free slot in the buffer
+	USART{{ id }}->DR = data;
+	while (!(USART{{ id }}->SR & USART_SR_RXNE)) {
+		// wait until the transmission is finished
 	}
-	
-	atomic::Lock lock;
-	
-	// enable UDRE interrupt
-	UCSR0B |= (1 << UDRIE0);
+	return USART{{ id }}->DR;
 }
-
-//uint8_t
-//xpcc::atmega::BufferedUart0::flushTransmitBuffer()
-//{
-//	uint8_t i(0);
-//	while(!txBuffer.isEmpty()) {
-//		txBuffer.pop();
-//		++i;
-//	}
-//
-//	return i;
-//}
 
 #endif
+

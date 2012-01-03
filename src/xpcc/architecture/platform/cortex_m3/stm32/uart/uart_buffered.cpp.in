@@ -56,13 +56,15 @@ namespace
 // ----------------------------------------------------------------------------
 {{ template.writeBlock('Buffered'+className, id) }}
 
-{{ template.excludeDeclarationsEnd(id) }}
-
 // ----------------------------------------------------------------------------
 extern "C" void
-{{ className | upper}}{{ id }}_IRQHandler(){
+{{ className | upper }}{{ id }}_IRQHandler()
+{
 	uint32_t state = {{ className | upper }}{{ id }}->SR;
-	if (state & USART_SR_RXNE){ // Read Data Register Not Empty 
+	
+	// Read Data Register Not Empty 
+	if (state & USART_SR_RXNE)
+	{
 		// first save the errors TODO
 		// error |= USART{{ id }}_STATUS & (USART_FERR_bm | USART_BUFOVF_bm | USART_PERR_bm);
 		
@@ -72,7 +74,9 @@ extern "C" void
 		rxBuffer.push(data);
 	}
 	
-	if (state & USART_SR_TXE){ // Transmit Data Register Empty
+	// Transmit Data Register Empty
+	if (state & USART_SR_TXE)
+	{
 		if (txBuffer.isEmpty())
 		{
 			// transmission finished, disable DRE interrupt
@@ -124,7 +128,7 @@ xpcc::stm32::Buffered{{ className }}{{ id }}::read(uint8_t& c)
 uint8_t
 xpcc::stm32::Buffered{{ className }}{{ id }}::read(uint8_t *buffer, uint8_t n)
 {
-	uint8_t i(0);
+	uint_fast8_t i = 0;
 	for (; i < n; ++i)
 	{
 		if (rxBuffer.isEmpty()) {
@@ -142,12 +146,12 @@ xpcc::stm32::Buffered{{ className }}{{ id }}::read(uint8_t *buffer, uint8_t n)
 uint8_t
 xpcc::stm32::Buffered{{ className }}{{ id }}::flushReceiveBuffer()
 {
-	uint8_t i(0);
-	while(!rxBuffer.isEmpty()) {
+	uint_fast8_t i = 0;
+	while (!rxBuffer.isEmpty()) {
 		rxBuffer.pop();
 		++i;
 	}
-	unsigned char c;
+//	unsigned char c;
 //	while (USART{{ id }}_STATUS & USART_RXCIF_bm)
 //		c = USART{{ id }}_DATA;
 	
@@ -165,4 +169,7 @@ xpcc::stm32::Buffered{{ className }}{{ id }}::flushReceiveBuffer()
 //
 //	return i;
 //}
+
+{{ template.excludeDeclarationsEnd(id) }}
+
 

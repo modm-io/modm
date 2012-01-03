@@ -319,15 +319,18 @@ template <typename Device>
 void
 xpcc::amnb::Interface<Device>::update()
 {
-	char byte;
+	uint8_t byte;
 	while (Device::read(byte))
 	{
-		if (Device::readErrorFlags()) {
+		if (Device::readErrorFlags())
+		{
 			// collision has been detected
 			rescheduleTransmit = true;
 			Device::resetErrorFlags();
+			
 			// erase the message in the buffer
 			Device::flushReceiveBuffer();
+			
 			// and wait for a random amount of time before sending again
 			rescheduleTimeout = static_cast<uint8_t>(rand());
 			rescheduleTimer.restart(rescheduleTimeout % maxTimeOut);

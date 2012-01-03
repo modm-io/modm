@@ -33,71 +33,96 @@
 #include "core.hpp"
 #include <xpcc/architecture/platform/cortex_m3.hpp>
 
+// ----------------------------------------------------------------------------
 bool
-xpcc::stm32::Core::Clock::enableHSE(HSEConfig config, uint32_t wait_cycles){
-	if (config == HSE_BYPASS){
-		RCC->CR |= RCC_CR_HSEBYP|RCC_CR_HSEON;
+xpcc::stm32::Core::Clock::enableHse(HseConfig config, uint32_t waitCycles)
+{
+	if (config == HSE_BYPASS) {
+		RCC->CR |= RCC_CR_HSEBYP | RCC_CR_HSEON;
 	}
-	else{
+	else {
 		RCC->CR |= RCC_CR_HSEON;
 	}
-
-	volatile uint32_t t = wait_cycles;
-	while (!(RCC->CR & RCC_CR_HSERDY) && --t){
+	
+	uint32_t t = waitCycles;
+	while (!(RCC->CR & RCC_CR_HSERDY) && --t) {
 	}
 
 	return RCC->CR & RCC_CR_HSERDY;
 }
 
+// ----------------------------------------------------------------------------
 #ifdef STM32F10X_CL
+// Connectivity Line
 void
-xpcc::stm32::Core::Clock::enablePll(PLLSource source, PLLMul pllMul, uint8_t preDiv1){
-	uint32_t tmp = 0;
+xpcc::stm32::Core::Clock::enablePll2(uint32_t div, Pll2Mul mul)
+{
+	uint32_t cfgr2 = RCC->CFGR2 & ~(RCC_CFGR2_PREDIV2 | RCC_CFGR2_PLL2MUL);
+	cfgr2 |= (((div - 1) << 4) & RCC_CFGR2_PREDIV2) | mul;
+	RCC->CFGR2 = cfgr2;
+	
+	// Enable PLL2
+	RCC->CR |= RCC_CR_PLL2ON;
+	
+	// Wait till PLL2 is ready
+	while((RCC->CR & RCC_CR_PLL2RDY) == 0)
+	{
+	}
+}
 
-	tmp |= pllMul;
-	tmp |= (source == PLL_HSI_DIV_2)?RCC_CFGR_PLLSRC_HSI_Div2:RCC_CFGR_PLLSRC_PREDIV1;
-
-
-	RCC->CFGR = tmp; // be careful modifying bit 17
-	RCC->CFGR2 |= (preDiv1-1) & RCC_CFGR2_PREDIV1;
-
-
-	// enable pll
+void
+xpcc::stm32::Core::Clock::enablePll(PllSource source, PllMul pllMul,
+						PreDiv1Source preDivSource, uint32_t preDivFactor)
+{
+	// CFGR
+	uint32_t cfgr = 0;
+	cfgr |= pllMul;
+	cfgr |= (source == PLL_HSI_DIV_2) ? RCC_CFGR_PLLSRC_HSI_Div2 : RCC_CFGR_PLLSRC_PREDIV1;
+	RCC->CFGR = cfgr; // be careful modifying bit 17 TODO check this!
+	
+	// CFGR2
+	uint32_t cfgr2 = RCC->CFGR2 & ~(RCC_CFGR2_PREDIV1 | RCC_CFGR2_PREDIV1SRC);
+	cfgr2 |= (preDivFactor - 1) & RCC_CFGR2_PREDIV1;
+	cfgr2 |= (preDivSource == PREDIV1_HSE) ? RCC_CFGR2_PREDIV1SRC_HSE : RCC_CFGR2_PREDIV1SRC_PLL2;
+	RCC->CFGR2 = cfgr2;
+	
+	// enable PLL
 	RCC->CR |= RCC_CR_PLLON;
 }
 
 #else
-
+// Mainstream Line
 void
-xpcc::stm32::Core::Clock::enablePll(PLLSource source, PLLMul pllMul){
+xpcc::stm32::Core::Clock::enablePll(PllSource source, PllMul pllMul)
+{
 	uint32_t tmp = 0;
-
+	
 	tmp |= pllMul;
-	tmp |= (source == PLL_HSI_DIV_2)?RCC_CFGR_PLLSRC_HSI_Div2:RCC_CFGR_PLLSRC_HSE;
-
-
+	tmp |= (source == PLL_HSI_DIV_2) ? RCC_CFGR_PLLSRC_HSI_Div2 : RCC_CFGR_PLLSRC_HSE;
+	
 	RCC->CFGR = tmp;
-
-	// enable pll
+	
+	// enable PLL
 	RCC->CR |= RCC_CR_PLLON;
 }
+#endif
 
-#endif // Connectivity Line
-
+// ----------------------------------------------------------------------------
 bool
-xpcc::stm32::Core::Clock::switchToPll(uint32_t wait_cycles){
-	volatile uint32_t t = wait_cycles;
+xpcc::stm32::Core::Clock::switchToPll(uint32_t waitCycles)
+{
+	uint32_t t = waitCycles;
 	while (!(RCC->CR & RCC_CR_PLLRDY)){
 		if (!(--t))
 			return false;
 	}
-
+	
 	// APB2 72MHz, APB1 36MHz, AHB 72MHz, select pll as source
 	RCC->CFGR =
-			(RCC->CFGR&0xffff0000) | //try to generate a halfword write
-			((RCC_CFGR_PPRE1_DIV2 | RCC_CFGR_PPRE2_DIV1 | RCC_CFGR_HPRE_DIV1 | RCC_CFGR_SW_PLL)&0x0000ffff);
+			(RCC->CFGR & 0xffff0000) | //try to generate a halfword write
+			((RCC_CFGR_PPRE1_DIV2 | RCC_CFGR_PPRE2_DIV1 | RCC_CFGR_HPRE_DIV1 | RCC_CFGR_SW_PLL) & 0x0000ffff);
 
-	/* Wait till the main PLL is used as system clock source */
+	// Wait till the main PLL is used as system clock source
 	while ((RCC->CFGR & (uint32_t)RCC_CFGR_SWS ) != RCC_CFGR_SWS_PLL);
 	{
 	}

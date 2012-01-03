@@ -42,7 +42,7 @@
 
 #include "uart{{ id }}.hpp"
 
-static xpcc::atomic::Queue<char, UART{{ id }}_RX_BUFFER_SIZE> rxBuffer;
+static xpcc::atomic::Queue<uint8_t, UART{{ id }}_RX_BUFFER_SIZE> rxBuffer;
 static uint8_t error;
 
 // ----------------------------------------------------------------------------
@@ -85,7 +85,7 @@ xpcc::atmega::BufferedUart{{ id }}::setBaudrateRegister(uint16_t ubrr)
 
 // ----------------------------------------------------------------------------
 bool
-xpcc::atmega::BufferedUart{{ id }}::read(char& c)
+xpcc::atmega::BufferedUart{{ id }}::read(uint8_t& c)
 {
 	if (rxBuffer.isEmpty()) {
 		return false;
@@ -100,7 +100,7 @@ xpcc::atmega::BufferedUart{{ id }}::read(char& c)
 
 // ----------------------------------------------------------------------------
 uint8_t
-xpcc::atmega::BufferedUart{{ id }}::read(char *buffer, uint8_t n)
+xpcc::atmega::BufferedUart{{ id }}::read(uint8_t *buffer, uint8_t n)
 {
 	for (uint8_t i = 0; i < n; ++i)
 	{
@@ -138,9 +138,10 @@ xpcc::atmega::BufferedUart{{ id }}::flushReceiveBuffer()
 	}
 	
 #if defined (RXC{{ id }})
-	unsigned char c;
-	while (UCSR{{ id }}A & (1 << RXC{{ id }}))
+	uint8_t c;
+	while (UCSR{{ id }}A & (1 << RXC{{ id }})) {
 		c = UDR{{ id }};
+	}
 #endif
 	
 	return i;

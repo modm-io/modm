@@ -30,8 +30,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_STM32F2__CORE_HPP
-#define XPCC_STM32F2__CORE_HPP
+#ifndef XPCC_STM32F2_4__CORE_HPP
+#define XPCC_STM32F2_4__CORE_HPP
 
 #include <stdint.h>
 
@@ -50,73 +50,91 @@ namespace xpcc
 		public:
 
 			/**
-			 * Usage:
+			 * Clock management.
+			 * 
+			 * For using the internal clock (which is 16MHz) use:
+			 * \code
+			 * enablePll(PLL_HSI, 8, 120);	// for STM32F2xx
+			 * enablePll(PLL_HSI, 8, 168);	// for STM32F4xx
+			 * switchToPll();
+			 * \endcode
+			 * 
+			 * For using an external crystal with 8 MHz use:
+			 * \code
+			 * if (enableHse(HSE_CRYSTAL))
+			 * {
+			 *     enablePll(PLL_HSE, 4, 120);	// for STM32F2xx
+			 *     enablePll(PLL_HSE, 4, 168);	// for STM32F4xx
+			 *     switchToPll();
+			 * }
+			 * \endcode
 			 *
-			 * For using internal clock (which is 16MHz) call
-			 * 		enablePll(PLL_HSI, 8);
-			 * 		switchToPll();
-			 *
-			 *
-			 * For using external crystal or oscillator with frequency f call
-			 * 		if (enableHSE(HSE_CRYSTAL)){
-			 * 			enablePll(PLL_HSE, f/2MHz);
-			 * 			switchToPll();
-			 * 		}
-			 *
-			 * For using external oscillator with frequency f call
-			 * 		if (enableHSE(HSE_BYPASS)){
-			 * 			enablePll(PLL_HSE, f/2MHz);
-			 * 			switchToPll();
-			 * 		}
+			 * For using an external oscillator with 25 MHz use:
+			 * \code
+			 * if (enableHse(HSE_BYPASS))
+			 * {
+			 *     enablePll(PLL_HSE, 25, 240);	// for STM32F2xx
+			 *     enablePll(PLL_HSE, 25, 336);	// for STM32F4xx
+			 *     switchToPll();
+			 * }
+			 * \endcode
 			 */
-			class Clock{
+			class Clock
+			{
 			public:
-				enum HSEConfig{
-					HSE_CRYSTAL,
-					HSE_BYPASS,
+				enum HseConfig
+				{
+					HSE_CRYSTAL,	///< Use a crystal to generate a clock
+					HSE_BYPASS,		///< Use an external clock (e.g. a crystal oscillator)
 				};
-
+				
+				enum PllSource
+				{
+					PLL_HSI,		///< High speed internal clock (16 MHz)
+					PLL_HSE,		///< High speed external clock (see HseConfig)
+				};
+				
+			public:
 				static bool
-				enableHSE(HSEConfig config, uint32_t wait_cycles = 1500);
-
-				enum PLLSource{
-					PLL_HSI,
-					PLL_HSE,
-				};
-
-
+				enableHse(HseConfig config, uint32_t waitCycles = 1500);
+				
 				/**
-				 * PLLSRC 			source select for pll and for plli2s. If you are using HSE you must
-				 * 					enable it first.
+				 * Enable PLL.
+				 * 
+				 * \code
+				 * VCO input frequency = PLL input clock frequency / PLLM [with 2 ≤ PLLM ≤ 63]
+				 * VCO output frequency = VCO input frequency × PLLN [with 64 ≤ PLLN ≤ 432]
+				 * \endcode
+				 * 
+				 * \param	source 
+				 * 		Source select for PLL and for plli2s. If you are using
+				 * 		HSE you must enable it first (see enableHse()).
 				 *
-				 * PLLM				Division factor for the main PLL (PLL) and audio PLL (PLLI2S) input clock.
-				 *
-				 * 					The software has to set these bits correctly to ensure that frequency of selected
-				 * 					source divided by PLLM is in ranges from 1 to 2 MHz.
-				 *
-				 * 					VCO input frequency = PLL input clock frequency / PLLM with 2 ≤ PLLM ≤ 63
-				 *
-				 * PLLN				Main PLL (PLL) multiplication factor for VCO
-				 * 					The software has to set these bits correctly to ensure that the VCO output
-				 * 					frequency is
-				 * 						336 MHz for ST32F4. Core will run at 168 MHz.
-				 *						240 MHz for ST32F2. Core will run at 120 MHz.
-				 *
-				 * 					VCO output frequency = VCO input frequency × PLLN with 64 ≤ PLLN ≤ 432
-				 *
-				 *
-				 *
+				 * \param	pllM
+				 * 		Division factor for the main PLL (PLL) and
+				 * 		audio PLL (PLLI2S) input clock (with 2 ≤ pllM ≤ 63).
+				 *		The software has to set these bits correctly to ensure
+				 *		that frequency of selected source divided by pllM
+				 *		is in ranges from 1 to 2 MHz.
+				 * 
+				 * \param	pllN
+				 * 		Main PLL (PLL) multiplication factor for VCO (with 64 ≤ pllN ≤ 432).
+				 * 		The software has to set these bits correctly to ensure
+				 * 		that the VCO output frequency is
+				 * 		 - 336 MHz for ST32F4. Core will run at 168 MHz.
+				 *		 - 240 MHz for ST32F2. Core will run at 120 MHz.
+				 * 
+				 * Example:
+				 * 
 				 */
 				static void
-				enablePll(PLLSource source, uint8_t pllM, uint16_t pllN);
+				enablePll(PllSource source, uint8_t pllM, uint16_t pllN);
 
 				static bool
-				switchToPll(uint32_t wait_cycles = 1500);
-
+				switchToPll(uint32_t waitCycles = 1500);
 			};
-
 		};
 	}
 }
 
-#endif	//  XPCC_STM32F2__CORE_HPP
+#endif	//  XPCC_STM32F2_4__CORE_HPP

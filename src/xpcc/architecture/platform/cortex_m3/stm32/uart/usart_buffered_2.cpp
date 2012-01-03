@@ -123,13 +123,15 @@ xpcc::stm32::BufferedUsart2::write(const uint8_t *s, uint8_t n)
 	}
 }
 
-
-
 // ----------------------------------------------------------------------------
 extern "C" void
-USART2_IRQHandler(){
+USART2_IRQHandler()
+{
 	uint32_t state = USART2->SR;
-	if (state & USART_SR_RXNE){ // Read Data Register Not Empty 
+	
+	// Read Data Register Not Empty 
+	if (state & USART_SR_RXNE)
+	{
 		// first save the errors TODO
 		// error |= USART2_STATUS & (USART_FERR_bm | USART_BUFOVF_bm | USART_PERR_bm);
 		
@@ -139,7 +141,9 @@ USART2_IRQHandler(){
 		rxBuffer.push(data);
 	}
 	
-	if (state & USART_SR_TXE){ // Transmit Data Register Empty
+	// Transmit Data Register Empty
+	if (state & USART_SR_TXE)
+	{
 		if (txBuffer.isEmpty())
 		{
 			// transmission finished, disable DRE interrupt
@@ -191,7 +195,7 @@ xpcc::stm32::BufferedUsart2::read(uint8_t& c)
 uint8_t
 xpcc::stm32::BufferedUsart2::read(uint8_t *buffer, uint8_t n)
 {
-	uint8_t i(0);
+	uint_fast8_t i = 0;
 	for (; i < n; ++i)
 	{
 		if (rxBuffer.isEmpty()) {
@@ -209,12 +213,12 @@ xpcc::stm32::BufferedUsart2::read(uint8_t *buffer, uint8_t n)
 uint8_t
 xpcc::stm32::BufferedUsart2::flushReceiveBuffer()
 {
-	uint8_t i(0);
-	while(!rxBuffer.isEmpty()) {
+	uint_fast8_t i = 0;
+	while (!rxBuffer.isEmpty()) {
 		rxBuffer.pop();
 		++i;
 	}
-	unsigned char c;
+//	unsigned char c;
 //	while (USART2_STATUS & USART_RXCIF_bm)
 //		c = USART2_DATA;
 	
@@ -232,3 +236,6 @@ xpcc::stm32::BufferedUsart2::flushReceiveBuffer()
 //
 //	return i;
 //}
+
+
+

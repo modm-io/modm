@@ -72,7 +72,7 @@ installInterrupt(unsigned long source,
 // ----------------------------------------------------------------------------
 namespace
 {
-	static xpcc::atomic::Queue<char, 128> receiveQueue;
+	static xpcc::atomic::Queue<uint8_t, 128> receiveQueue;
 }
 
 // ----------------------------------------------------------------------------
@@ -109,7 +109,7 @@ uart0_interrupt(void)
 			// data defined by the trigger level.
 			case UART_INT_RDA:
 				while (U0LSR & UART_RX_HOLDS_CHAR) {
-					char c = U0RBR;
+					uint8_t c = U0RBR;
 					if (!receiveQueue.push(c)) {
 						// Error: Queue overflow
 						// TODO Error handling or reporting
@@ -126,7 +126,7 @@ uart0_interrupt(void)
 			// multiple of the trigger level size
 			case UART_INT_CTI:
 				while (U0LSR & UART_RX_HOLDS_CHAR) {
-					char c = U0RBR;
+					uint8_t c = U0RBR;
 					if (!receiveQueue.push(c)) {
 						// Error: Queue overflow
 						// TODO Error handling or reporting
@@ -177,7 +177,7 @@ Uart0::initialize(uint8_t level)
 
 // ----------------------------------------------------------------------------
 bool
-Uart0::write(char c, bool blocking)
+Uart0::write(uint8_t c, bool blocking)
 {
 	while (!(U0LSR & UART_TX_BUFFER_FREE))
 	{
@@ -201,7 +201,7 @@ Uart0::isCharacterAvailable()
 }
 
 bool
-Uart0::read(char &c, bool blocking)
+Uart0::read(uint8_t &c, bool blocking)
 {
 	do
 	{

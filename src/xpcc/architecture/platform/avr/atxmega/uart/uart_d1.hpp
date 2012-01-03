@@ -80,7 +80,7 @@ namespace xpcc
 			}
 			
 			/* **************************************************** *
-			 * The five standard IO methods for all UARTs and alike *
+			 * The four standard IO methods for all UARTs and alike *
 			 * **************************************************** */
 			
 			/**
@@ -89,17 +89,7 @@ namespace xpcc
 			 * \param	data	Single byte to write
 			 */
 			static void
-			write(char data);
-			
-			/**
-			 * \brief	Write a null-terminated string
-			 *
-			 * \param	*string	String to write
-			 * 
-			 * The string must end with '\\0'.
-			 */
-			static void
-			write(const char *string);
+			write(uint8_t data);
 			
 			/**
 			 * \brief	Write a block of bytes
@@ -108,7 +98,7 @@ namespace xpcc
 			 * \param	nbyte	Number of bytes to write
 			 */
 			static void
-			write(const char *buffer, uint8_t nbyte);
+			write(const uint8_t *buffer, uint8_t nbyte);
 			
 			/**
 			 * \brief	Read a single byte
@@ -118,7 +108,7 @@ namespace xpcc
 			 * \return	\n true if a byte was received, \n false otherwise
 			 */
 			static bool
-			read(char& data);
+			read(uint8_t& data);
 			
 			/**
 			 * \brief	Read a block of bytes
@@ -133,7 +123,7 @@ namespace xpcc
 			 * \return	Number of bytes which could be read, maximum \a n
 			 */
 			static uint8_t
-			read(char *buffer, uint8_t nbyte);
+			read(uint8_t *buffer, uint8_t nbyte);
 			
 		protected:
 			static void
@@ -204,17 +194,7 @@ namespace xpcc
 			 * \param	data	Byte to write
 			 */
 			static void
-			write(char data);
-			
-			/**
-			 * \brief	Write a null-terminated string
-			 *
-			 * \param	*string	String to write
-			 * 
-			 * The string must end with '\\0'.
-			 */
-			static void
-			write(const char *string);
+			write(uint8_t data);
 			
 			/**
 			 * \brief	Write a block of bytes
@@ -223,7 +203,7 @@ namespace xpcc
 			 * \param	nbyte	Number of bytes to write
 			 */
 			static void
-			write(const char *buffer, uint8_t nbyte);
+			write(const uint8_t *buffer, uint8_t nbyte);
 			
 			/**
 			 * \brief	Read a single byte
@@ -233,7 +213,7 @@ namespace xpcc
 			 * \return	\n true if a byte was received, \n false otherwise
 			 */
 			static bool
-			read(char& data);
+			read(uint8_t& data);
 			
 			/**
 			 * \brief	Read a block of bytes
@@ -244,7 +224,7 @@ namespace xpcc
 			 * \return	Number of bytes which could be read, maximum \a n
 			 */
 			static uint8_t
-			read(char *buffer, uint8_t nbyte);
+			read(uint8_t *buffer, uint8_t nbyte);
 			
 			/**
 			 * \brief	Check whether any errors occurred during receiving

@@ -42,7 +42,7 @@
 
 #include "uart{{ id }}.hpp"
 
-static xpcc::atomic::Queue<char, UART{{ id }}_TX_BUFFER_SIZE> txBuffer;
+static xpcc::atomic::Queue<uint8_t, UART{{ id }}_TX_BUFFER_SIZE> txBuffer;
 
 // ----------------------------------------------------------------------------
 // called when the UART is ready to transmit the next byte
@@ -64,7 +64,7 @@ ISR(USART{{ id }}_UDRE_vect)
 
 // ----------------------------------------------------------------------------
 void
-xpcc::atmega::BufferedUart{{ id }}::write(char c)
+xpcc::atmega::BufferedUart{{ id }}::write(uint8_t c)
 {
 	while (!txBuffer.push(c)) {
 		// wait for a free slot in the buffer
@@ -74,16 +74,6 @@ xpcc::atmega::BufferedUart{{ id }}::write(char c)
 	
 	// enable UDRE interrupt
 	UCSR{{ id }}B |= (1 << UDRIE{{ id }});
-}
-
-// ----------------------------------------------------------------------------
-void
-xpcc::atmega::BufferedUart{{ id }}::write(const char *s)
-{
-	char c;
-	while ((c = *s++)) {
-		BufferedUart{{ id }}::write(c);
-	}
 }
 
 //uint8_t

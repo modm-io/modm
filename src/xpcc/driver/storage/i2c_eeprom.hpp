@@ -122,6 +122,7 @@ namespace xpcc
 		 */
 		bool
 		isAvailable() const;
+		
 	private:
 		const uint8_t deviceAddress;
 		typedef xpcc::i2c::SyncMaster<I2C> MySyncI2C;

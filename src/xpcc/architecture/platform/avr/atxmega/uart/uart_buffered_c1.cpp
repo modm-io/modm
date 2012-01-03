@@ -47,8 +47,8 @@
 
 namespace
 {
-	static xpcc::atomic::Queue<char, UARTC1_RX_BUFFER_SIZE> rxBuffer;
-	static xpcc::atomic::Queue<char, UARTC1_TX_BUFFER_SIZE> txBuffer;
+	static xpcc::atomic::Queue<uint8_t, UARTC1_RX_BUFFER_SIZE> rxBuffer;
+	static xpcc::atomic::Queue<uint8_t, UARTC1_TX_BUFFER_SIZE> txBuffer;
 	
 	GPIO__INPUT(RXD, C, 6);
 	GPIO__OUTPUT(TXD, C, 7);
@@ -117,7 +117,7 @@ xpcc::atxmega::BufferedUartC1::setBaudrateRegister(uint16_t ubrr, bool doubleSpe
 
 // ----------------------------------------------------------------------------
 void
-xpcc::atxmega::BufferedUartC1::write(char c)
+xpcc::atxmega::BufferedUartC1::write(uint8_t c)
 {
 	uint16_t i(0);		
 	while ( !txBuffer.push(c) && (i < 1000) ) {
@@ -135,17 +135,7 @@ xpcc::atxmega::BufferedUartC1::write(char c)
 
 // ----------------------------------------------------------------------------
 void
-xpcc::atxmega::BufferedUartC1::write(const char *s)
-{
-	char c;
-	while ((c = *s++)) {
-		BufferedUartC1::write(c);
-	}
-}
-
-// ----------------------------------------------------------------------------
-void
-xpcc::atxmega::BufferedUartC1::write(const char *s, uint8_t n)
+xpcc::atxmega::BufferedUartC1::write(const uint8_t *s, uint8_t n)
 {
 	while (--n != 0) {
 		BufferedUartC1::write(*s++);
@@ -154,7 +144,7 @@ xpcc::atxmega::BufferedUartC1::write(const char *s, uint8_t n)
 
 // ----------------------------------------------------------------------------
 bool
-xpcc::atxmega::BufferedUartC1::read(char& c)
+xpcc::atxmega::BufferedUartC1::read(uint8_t& c)
 {
 	if (rxBuffer.isEmpty()) {
 		return false;
@@ -169,7 +159,7 @@ xpcc::atxmega::BufferedUartC1::read(char& c)
 
 // ----------------------------------------------------------------------------
 uint8_t
-xpcc::atxmega::BufferedUartC1::read(char *buffer, uint8_t n)
+xpcc::atxmega::BufferedUartC1::read(uint8_t *buffer, uint8_t n)
 {
 	uint8_t i(0);
 	for (; i < n; ++i)

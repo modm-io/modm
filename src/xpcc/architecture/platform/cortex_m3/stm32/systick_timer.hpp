@@ -48,22 +48,27 @@ namespace xpcc
 		{
 		public:
 			/**
-			 * Enables the SysTick Timer generating periodically events.
-			 * Warning: if SysTick Timer is enabled the xpcc::Clock, which
-			 * 			is bounded to xpcc::Timeout and other similar workflow
-			 * 			classes, is incremented on each event.
+			 * Enables the SysTick Timer to generate periodic events.
+			 * 
+			 * \param	reload
+			 * 		Reload value to generate a 1000 Hz interrupt rate.
+			 * 					
+			 * 
+			 * \warning	The SysTick Timer is used by default to increment
+			 * 			xpcc::Clock, which is used by xpcc::Timeout and other
+			 * 			similar workflow classes.
 			 * 			You must not increment the xpcc::Clock
 			 * 			additionally somewhere else.
-			 *
 			 */
 			static void
 			enable(uint32_t reload = ((F_CPU / 1000) - 1));
 
 			/**
 			 * Disables SysTick Timer.
-			 * Warning: If SysTick Timer is disabled xpcc::Clock is not
+			 * 
+			 * \warning	If the SysTick Timer is disabled xpcc::Clock is not
 			 * 			incremented automatically. Workflow classes which
-			 * 			depend on xpcc::Clock will not work if xpcc::Clock
+			 * 			relay on xpcc::Clock will not work if xpcc::Clock
 			 * 			is not incremented.
 			 */
 			static void

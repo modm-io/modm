@@ -65,7 +65,7 @@ namespace xpcc
 		write(uint8_t output);
 		
 	protected:
-		static inline void
+		static ALWAYS_INLINE void
 		delay();
 		
 		// calculate the delay in microseconds needed to achieve the

@@ -85,7 +85,7 @@ xpcc::at91::Uart{{ id }}::setBaudrate(uint32_t baudrate)
 
 // ----------------------------------------------------------------------------
 void
-xpcc::at91::Uart{{ id }}::write(char data)
+xpcc::at91::Uart{{ id }}::write(uint8_t data)
 {
 	while (!(AT91C_BASE_US{{ id }}->US_CSR & AT91C_US_TXRDY)) {
 		// Wait for Empty Tx Buffer
@@ -96,18 +96,8 @@ xpcc::at91::Uart{{ id }}::write(char data)
 }
 
 // ----------------------------------------------------------------------------
-void
-xpcc::at91::Uart{{ id }}::write(const char *s)
-{
-	char c;
-	while ((c = *s++)) {
-		write(c);
-	}
-}
-
-// ----------------------------------------------------------------------------
 bool
-xpcc::at91::Uart{{ id }}::read(char& c)
+xpcc::at91::Uart{{ id }}::read(uint8_t& c)
 {
 	if (AT91C_BASE_US{{ id }}->US_CSR & AT91C_US_RXRDY)
 	{
@@ -120,7 +110,7 @@ xpcc::at91::Uart{{ id }}::read(char& c)
 
 // ----------------------------------------------------------------------------
 uint8_t
-xpcc::at91::Uart{{ id }}::read(char *buffer, uint8_t n)
+xpcc::at91::Uart{{ id }}::read(uint8_t *buffer, uint8_t n)
 {
 	for (uint8_t i = 0; i < n; ++i)
 	{

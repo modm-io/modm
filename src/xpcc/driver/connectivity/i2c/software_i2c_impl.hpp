@@ -55,7 +55,7 @@ template <typename Scl, typename Sda, int32_t Frequency>
 bool
 xpcc::SoftwareI2C<Scl, Sda, Frequency>::start(uint8_t slaveAddress)
 {
-	if (!occupied){
+	if (!occupied) {
 		occupied = true;
 		restart(slaveAddress);
 		return true;

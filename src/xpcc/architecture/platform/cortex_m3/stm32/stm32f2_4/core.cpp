@@ -33,81 +33,94 @@
 #include "core.hpp"
 #include <xpcc/architecture/platform/cortex_m3.hpp>
 
+// ----------------------------------------------------------------------------
 bool
-xpcc::stm32::Core::Clock::enableHSE(HSEConfig config, uint32_t wait_cycles){
-	if (config == HSE_BYPASS){
-		RCC->CR |= RCC_CR_HSEBYP|RCC_CR_HSEON;
+xpcc::stm32::Core::Clock::enableHse(HseConfig config, uint32_t waitCycles)
+{
+	if (config == HSE_BYPASS) {
+		RCC->CR |= RCC_CR_HSEBYP | RCC_CR_HSEON;
 	}
-	else{
+	else {
 		RCC->CR |= RCC_CR_HSEON;
 	}
 
-	volatile uint32_t t = wait_cycles;
-	while (!(RCC->CR & RCC_CR_HSERDY) && --t){
+	uint32_t t = waitCycles;
+	while (!(RCC->CR & RCC_CR_HSERDY) && --t) {
 	}
 
-	return RCC->CR & RCC_CR_HSERDY;
+	return (RCC->CR & RCC_CR_HSERDY);
 }
 
+// ----------------------------------------------------------------------------
 void
-xpcc::stm32::Core::Clock::enablePll(PLLSource source, uint8_t pllM, uint16_t pllN){
-	uint32_t tmp;
-
-	// read reserved values
-	tmp = RCC->PLLCFGR & ~(RCC_PLLCFGR_PLLSRC|RCC_PLLCFGR_PLLM|RCC_PLLCFGR_PLLN|RCC_PLLCFGR_PLLP|RCC_PLLCFGR_PLLQ);
+xpcc::stm32::Core::Clock::enablePll(PllSource source, uint8_t pllM,
+		uint16_t pllN)
+{
+	uint32_t tmp = 0;
+	
+	// Read reserved values and clear all other values
+	tmp |= RCC->PLLCFGR & ~(RCC_PLLCFGR_PLLSRC | RCC_PLLCFGR_PLLM
+			| RCC_PLLCFGR_PLLN | RCC_PLLCFGR_PLLP | RCC_PLLCFGR_PLLQ);
+	
 	// PLLSRC source for pll and for plli2s
-	tmp |= (source == PLL_HSI)?RCC_PLLCFGR_PLLSRC_HSI:RCC_PLLCFGR_PLLSRC_HSE;
+	tmp |= (source == PLL_HSI) ? RCC_PLLCFGR_PLLSRC_HSI
+			: RCC_PLLCFGR_PLLSRC_HSE;
+	
 	// PLLM (0) = factor is user defined VCO input frequency must be configured to 2MHz
-	tmp |= ((uint32_t)pllM)&RCC_PLLCFGR_PLLM;
+	tmp |= ((uint32_t) pllM) & RCC_PLLCFGR_PLLM;
+	
 	// PLLN (6) = factor is user defined
-	tmp |= (((uint32_t)pllN)<<6)&RCC_PLLCFGR_PLLN;
+	tmp |= (((uint32_t) pllN) << 6) & RCC_PLLCFGR_PLLN;
+	
 #if defined(STM32F4XX)
 	// VCO output frequency must be configured to 336MHz
-	// PLLP (16) = 0 (factor = 2) for cpu frequency = 168MHz
+	// PLLP (16) = 0 (factor = 2) for CPU frequency = 168MHz
 	// PLLQ (24) = 7 (factor = 7) for 48MHz
-	tmp |= (((uint32_t)7)<<24)&RCC_PLLCFGR_PLLQ;
+	tmp |= (7UL << 24) & RCC_PLLCFGR_PLLQ;
 #elif defined(STM32F2XX)
 	// VCO output frequency must be configured to 240MHz
-	// PLLP (16) = 0 (factor = 2) for cpu frequency = 168MHz
+	// PLLP (16) = 0 (factor = 2) for CPU frequency = 120MHz
 	// PLLQ (24) = 5 (factor = 5) for 48MHz
-	tmp |= (((uint32_t)5)<<24)&RCC_PLLCFGR_PLLQ;
-	#error "this is not tested yet"
+	tmp |= (5UL << 24) & RCC_PLLCFGR_PLLQ;
+#	error "this is not tested yet"
 #else
-	#error "this file is not supposed to be used with given cpu"
+#	error "This file is not supposed to be used with the given CPU (only STM32F2/4xx)"
 #endif
-
-
+	
 	RCC->PLLCFGR = tmp;
-
+	
 	// enable pll
 	RCC->CR |= RCC_CR_PLLON;
 }
 
+// ----------------------------------------------------------------------------
 bool
-xpcc::stm32::Core::Clock::switchToPll(uint32_t wait_cycles){
-	volatile uint32_t t = wait_cycles;
-	while (!(RCC->CR & RCC_CR_PLLRDY)){
-		if (!(--t))
+xpcc::stm32::Core::Clock::switchToPll(uint32_t waitCycles)
+{
+	uint32_t t = waitCycles;
+	while (!(RCC->CR & RCC_CR_PLLRDY)) {
+		if (!(--t)) {
 			return false;
+		}
 	}
 
 #if defined(STM32F4XX)
-	// APB2 84MHz, APB1 42MHz, AHB 168MHz, select pll as source
+	// APB2 84MHz, APB1 42MHz, AHB 168MHz, select PLL as source
 	RCC->CFGR =
-			(RCC->CFGR&0xffff0000) | //try to generate a halfword write
-			((RCC_CFGR_PPRE1_DIV4 | RCC_CFGR_PPRE2_DIV2 | RCC_CFGR_HPRE_DIV1 | RCC_CFGR_SW_PLL)&0x0000ffff);
+			(RCC->CFGR & 0xffff0000) | // Try to generate a halfword write
+			((RCC_CFGR_PPRE1_DIV4 | RCC_CFGR_PPRE2_DIV2 | RCC_CFGR_HPRE_DIV1 | RCC_CFGR_SW_PLL) & 0x0000ffff);
 #elif defined(STM32F2XX)
-	// APB2 60MHz, APB1 30MHz, AHB 120MHz, select pll as source
+	// APB2 60MHz, APB1 30MHz, AHB 120MHz, select PLL as source
 	RCC->CFGR =
-			(RCC->CFGR&0xffff0000) | //try to generate a halfword write
-			((RCC_CFGR_PPRE1_DIV4 | RCC_CFGR_PPRE2_DIV2 | RCC_CFGR_HPRE_DIV1 | RCC_CFGR_SW_PLL)&0x0000ffff);
-	#error "this is not tested yet"
+			(RCC->CFGR & 0xffff0000) | // Try to generate a halfword write
+			((RCC_CFGR_PPRE1_DIV4 | RCC_CFGR_PPRE2_DIV2 | RCC_CFGR_HPRE_DIV1 | RCC_CFGR_SW_PLL) & 0x0000ffff);
+#	error "this is not tested yet"
 #else
-	#error "this file is not supposed to be used with given cpu"
+#	error "This file is not supposed to be used with the given CPU (only STM32F2/4xx)"
 #endif
-
-	/* Wait till the main PLL is used as system clock source */
-	while ((RCC->CFGR & (uint32_t)RCC_CFGR_SWS ) != RCC_CFGR_SWS_PLL);
+	
+	// Wait till the main PLL is used as system clock source
+	while ((RCC->CFGR & (uint32_t) RCC_CFGR_SWS) != RCC_CFGR_SWS_PLL);
 	{
 	}
 

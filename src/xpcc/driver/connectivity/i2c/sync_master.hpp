@@ -120,6 +120,7 @@ namespace xpcc
 			 */
 			static BusState
 			restart(uint8_t slaveAddress);
+			
 		private:
 			static BusyState
 			wait();

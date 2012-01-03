@@ -1,8 +1,8 @@
 // coding: utf-8
 // ----------------------------------------------------------------------------
-/* Copyright (c) 2009, Roboterclub Aachen e.V.
+/* Copyright (c) 2011, Roboterclub Aachen e.V.
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  * 
@@ -14,7 +14,7 @@
  *     * Neither the name of the Roboterclub Aachen e.V. nor the
  *       names of its contributors may be used to endorse or promote products
  *       derived from this software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY ROBOTERCLUB AACHEN E.V. ''AS IS'' AND ANY
  * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -33,63 +33,44 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <avr/io.h>
-#include <avr/interrupt.h>
+#include "../gpio.hpp"
+#include "../device.h"
 
-#include <xpcc/architecture/driver/atomic/queue.hpp>
-#include <xpcc/architecture/driver/atomic/lock.hpp>
+#include "usart_6.hpp"
 
-#include "uart_defines.h"
-#include "xpcc_config.hpp"
+#include <xpcc_config.hpp>
 
-#if defined USART0_UDRE_vect
-
-#include "uart0.hpp"
-
-static xpcc::atomic::Queue<uint8_t, UART0_TX_BUFFER_SIZE> txBuffer;
+#if defined(STM32F2XX) || defined(STM32F4XX)
 
 // ----------------------------------------------------------------------------
-// called when the UART is ready to transmit the next byte
-// 
-ISR(USART0_UDRE_vect)
+xpcc::stm32::UsartSpi6::UsartSpi6(
+		uint32_t bitrate, Mode mode)
 {
-	if (txBuffer.isEmpty())
-	{
-		// transmission finished, disable UDRE interrupt
-		UCSR0B &= ~(1 << UDRIE0);
-	}
-	else {
-		// get one byte from buffer and write it to the UART buffer
-		// which starts the transmission
-		UDR0 = txBuffer.get();
-		txBuffer.pop();
-	}
+	// Enable clock
+	RCC->APB2ENR |= RCC_APB2ENR_USART6EN;
+	
+	USART6->CR1 = 0;
+	
+	// Set baudrate
+	USART6->BRR = calculateBaudrateSettings(STM32_APB2_FREQUENCY, bitrate);
+	
+	USART6->CR2 = USART_CR2_CLKEN | USART_CR2_LBCL | mode;
+	USART6->CR3 = 0;
+	
+	// Transmitter & Receiver-Enable, 8 Data Bits, 1 Stop Bit
+	USART6->CR1 |= USART_CR1_TE | USART_CR1_RE;
+	USART6->CR1 |= USART_CR1_UE;		// Uart Enable
 }
 
 // ----------------------------------------------------------------------------
-void
-xpcc::atmega::BufferedUart0::write(uint8_t c)
+uint8_t
+xpcc::stm32::UsartSpi6::write(uint8_t data)
 {
-	while (!txBuffer.push(c)) {
-		// wait for a free slot in the buffer
+	USART6->DR = data;
+	while (!(USART6->SR & USART_SR_RXNE)) {
+		// wait until the transmission is finished
 	}
-	
-	atomic::Lock lock;
-	
-	// enable UDRE interrupt
-	UCSR0B |= (1 << UDRIE0);
+	return USART6->DR;
 }
-
-//uint8_t
-//xpcc::atmega::BufferedUart0::flushTransmitBuffer()
-//{
-//	uint8_t i(0);
-//	while(!txBuffer.isEmpty()) {
-//		txBuffer.pop();
-//		++i;
-//	}
-//
-//	return i;
-//}
 
 #endif

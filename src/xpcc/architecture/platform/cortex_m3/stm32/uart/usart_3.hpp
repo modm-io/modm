@@ -217,6 +217,106 @@ namespace xpcc
 //			static uint8_t
 //			flushTransmitBuffer();
 		};
+		
+#if defined(STM32F2XX) || defined(STM32F4XX)
+		// --------------------------------------------------------------------
+		/**
+		 * \brief		USART3 in SPI master mode
+		 * 
+		 * FIXME currently not working!
+		 * 
+		 * \ingroup		stm32
+		 */
+		class UsartSpi3 : public UartBase
+		{
+		private:
+			// TX/PB10, RX/PB11, CK/PB12, CTS/PB13, RTS/PB14
+			// TX/PC10, RX/PC11, CK/PC12, CTS/PB13, RTS/PB14
+			// TX/PD8, RX/PD9, CK/PD10, CTS/PD11, RTS/PD12
+			GPIO__OUTPUT(TxdB10, B, 10);
+			GPIO__INPUT(RxdB11, B, 11);
+			GPIO__OUTPUT(CkB12, B, 12);
+			
+			GPIO__OUTPUT(TxdD8, D, 8);
+			GPIO__INPUT(RxdD9, D, 9);
+			GPIO__OUTPUT(CkD10, D, 10);
+			
+			GPIO__OUTPUT(TxdC10, C, 10);
+			GPIO__INPUT(RxdC11, C, 11);
+			GPIO__OUTPUT(CkC12, C, 12);
+			
+		public:
+			enum Mode
+			{
+				MODE_0 = 0,
+				MODE_1 = USART_CR2_CPHA,
+				MODE_2 = USART_CR2_CPOL,
+				MODE_3 = USART_CR2_CPOL | USART_CR2_CPHA,
+			};
+			
+			enum MappingTx
+			{
+				REMAP_PB10,
+				REMAP_PC10,
+				REMAP_PD8,
+			};
+			
+			enum MappingRx
+			{
+				REMAP_PB11,
+				REMAP_PC11,
+				REMAP_PD9,
+			};
+			
+			enum MappingCk
+			{
+				REMAP_PB12,
+				REMAP_PC12,
+				REMAP_PD10,
+			};
+			
+			ALWAYS_INLINE void
+			configureTxPin(MappingTx mapping)
+			{
+				switch (mapping) {
+					case REMAP_PB10: TxdB10::setAlternateFunction(AF_USART3, xpcc::stm32::PUSH_PULL); break;
+					case REMAP_PC10: TxdC10::setAlternateFunction(AF_USART3, xpcc::stm32::PUSH_PULL); break;
+					case REMAP_PD8:  TxdD8::setAlternateFunction(AF_USART3, xpcc::stm32::PUSH_PULL); break;
+				}
+			}
+			
+			ALWAYS_INLINE void
+			configureRxPin(MappingRx mapping)
+			{
+				switch (mapping) {
+					case REMAP_PB11: RxdB11::setAlternateFunction(AF_USART3); break;
+					case REMAP_PC11: RxdC11::setAlternateFunction(AF_USART3); break;
+					case REMAP_PD9:  RxdD9::setAlternateFunction(AF_USART3); break;
+				}
+			}
+			
+			ALWAYS_INLINE void
+			configureCkPin(MappingCk mapping)
+			{
+				switch (mapping) {
+					case REMAP_PB12: CkB12::setAlternateFunction(AF_USART3, xpcc::stm32::PUSH_PULL); break;
+					case REMAP_PC12: CkC12::setAlternateFunction(AF_USART3, xpcc::stm32::PUSH_PULL); break;
+					case REMAP_PD10: CkD10::setAlternateFunction(AF_USART3, xpcc::stm32::PUSH_PULL); break;
+				}
+			}
+			
+			/**
+			 * Constructor
+			 */
+			UsartSpi3(uint32_t bitrate, Mode mode = MODE_0);
+			
+			/**
+			 * Transfer byte.
+			 */
+			static uint8_t
+			write(uint8_t data);
+		};
+#endif
 	}
 }
 
