@@ -190,15 +190,19 @@ def generate(env, **kw):
 		"-D__ASSEMBLY__",		# for at91lib
 	]
 	
+	# these values can be overwritten by the user
 	linkdir, linkfile = os.path.split(linkerscript)
+	env['LINKPATH'] = "${XPCC_ROOTPATH}/src/xpcc/architecture/platform/%s" % linkdir
+	env['LINKFILE'] = "%s" % linkfile
+	
 	env['LINKFLAGS'] = [
 		"-mcpu=$ARM_ARCH",
 		"$THUMB_LINKER",
 		"-Wl,--relax",
 		"-Wl,--gc-sections",
 		"-nostartfiles",
-		"-L${XPCC_ROOTPATH}/src/xpcc/architecture/platform/%s" % linkdir,
-		"-T%s" % linkfile,
+		"-L$LINKPATH",
+		"-T$LINKFILE",
 		"-Wl,-Map=${TARGET.base}.map,--cref",
 	]
 	

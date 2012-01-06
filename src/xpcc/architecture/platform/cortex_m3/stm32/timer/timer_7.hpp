@@ -56,6 +56,7 @@ namespace xpcc
 		 * }
 		 * \endcode
 		 * 
+		
 		 * 
 		 * @author		Fabian Greif
 		 * @ingroup		stm32
@@ -129,11 +130,11 @@ namespace xpcc
 				TIM7->DIER &= ~interrupt;
 			}
 			
-			static Interrupt
-			getInterruptCause();
+			//static StateFlag
+			//getState();
 			
 			static void
-			acknowledgeInterrupt(Interrupt interrupt)
+			resetState(StateFlag interrupt)
 			{
 				// Flags are cleared by writing a zero to the flag position.
 				// Writing a one is ignored.

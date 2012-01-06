@@ -207,6 +207,8 @@ namespace xpcc
 		public:
 			/**
 			 * Enables or disables the Interrupt Vector.
+			 * 
+			 * TODO set priority!
 			 */
 			static void
 			setInterruptVectorEnabled(bool enable);
@@ -229,17 +231,20 @@ namespace xpcc
 			}
 			
 			static inline void
-			enableDmaRequest(DmaRequestEnable dmaRequests){
+			enableDmaRequest(DmaRequestEnable dmaRequests)
+			{
 				TIM4->DIER |= dmaRequests;
 			}
 			
 			static inline void
-			disableDmaRequest(DmaRequestEnable dmaRequests){
+			disableDmaRequest(DmaRequestEnable dmaRequests)
+			{
 				TIM4->DIER &= ~dmaRequests;
 			}
 			
 			static inline StateFlag
-			getState(){
+			getState()
+			{
 				return (StateFlag)TIM4->SR;
 			}
 			

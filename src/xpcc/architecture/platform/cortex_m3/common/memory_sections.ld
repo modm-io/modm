@@ -112,7 +112,7 @@ EXTERN(_init)
 
 PROVIDE(__ram_start = ORIGIN(RAM));
 PROVIDE(__ram_end   = ORIGIN(RAM) + LENGTH(RAM));
-PROVIDE(__head_end  = ORIGIN(RAM) + LENGTH(RAM));
+PROVIDE(__heap_end  = ORIGIN(RAM) + LENGTH(RAM));
 
 /* Used for interrupt handlers */
 HANDLER_STACK_SIZE = 124 + 4;

@@ -82,7 +82,7 @@ xpcc::stm32::Core::Clock::enablePll(PllSource source, uint8_t pllM,
 	// PLLP (16) = 0 (factor = 2) for CPU frequency = 120MHz
 	// PLLQ (24) = 5 (factor = 5) for 48MHz
 	tmp |= (5UL << 24) & RCC_PLLCFGR_PLLQ;
-#	error "this is not tested yet"
+#	warning "this is not tested yet"
 #else
 #	error "This file is not supposed to be used with the given CPU (only STM32F2/4xx)"
 #endif
@@ -114,7 +114,7 @@ xpcc::stm32::Core::Clock::switchToPll(uint32_t waitCycles)
 	RCC->CFGR =
 			(RCC->CFGR & 0xffff0000) | // Try to generate a halfword write
 			((RCC_CFGR_PPRE1_DIV4 | RCC_CFGR_PPRE2_DIV2 | RCC_CFGR_HPRE_DIV1 | RCC_CFGR_SW_PLL) & 0x0000ffff);
-#	error "this is not tested yet"
+#	warning "this is not tested yet"
 #else
 #	error "This file is not supposed to be used with the given CPU (only STM32F2/4xx)"
 #endif

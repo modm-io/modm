@@ -52,7 +52,7 @@
 // statically allocated data (thus start of heap).
 
 extern uint8_t __heap_start;
-extern uint8_t __head_end;
+extern uint8_t __heap_end;
 uint8_t *__brkval = &__heap_start;		// Points to current end of the heap
 
 // ----------------------------------------------------------------------------
@@ -146,7 +146,7 @@ _sbrk_r(struct _reent *,  ptrdiff_t size)
 	uint8_t *heap = __brkval;
 	__brkval += size;
 	
-	if (__brkval >= &__head_end) {
+	if (__brkval >= &__heap_end) {
 		// ERROR: heap and stack collision!
 		abort();
 	}

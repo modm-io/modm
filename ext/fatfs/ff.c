@@ -906,6 +906,7 @@ FRESULT put_fat (
 
 		default :
 			res = FR_INT_ERR;
+			break;
 		}
 		fs->wflag = 1;
 	}
@@ -1118,8 +1119,7 @@ FRESULT dir_next (	/* FR_OK:Succeeded, FR_NO_FILE:End of table, FR_DENIED:EOT an
 	DWORD clst;
 	WORD i;
 
-
-	stretch = stretch;		/* To suppress warning on read-only cfg. */
+	(void) stretch;		/* To suppress warning on read-only cfg. */
 	i = dj->index + 1;
 	if (!i || !dj->sect)	/* Report EOT when index has reached 65535 */
 		return FR_NO_FILE;
@@ -3655,7 +3655,7 @@ FRESULT f_mkfs (
 	switch (fmt) {	/* Determine system ID for partition table */
 	case FS_FAT12:	sys = 0x01; break;
 	case FS_FAT16:	sys = (n_vol < 0x10000) ? 0x04 : 0x06; break;
-	default: 		sys = 0x0C;
+	default: 		sys = 0x0C; break;
 	}
 
 	if (_MULTI_PARTITION && part) {

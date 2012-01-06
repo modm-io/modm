@@ -38,9 +38,11 @@
 
 #include "timer_7.hpp"
 
-#include <xpcc_config.hpp>
+#if defined(STM32F10X_HD) || defined(STM32F10X_XL) || \
+	defined(STM32F10X_CL) || \
+	defined(STM32F2XX) || defined(STM32F4XX)
 
-#if defined (STM32F10X_HD) || defined  (STM32F10X_XL) || defined  (STM32F10X_CL)
+#include <xpcc_config.hpp>
 
 // ----------------------------------------------------------------------------
 void
@@ -79,9 +81,17 @@ xpcc::stm32::Timer7::setPeriod(uint32_t microseconds, bool autoApply)
 {
 	// This will be inaccurate for non-smooth frequencies (last six digits
 	// unequal to zero)
+#if defined(STM32F2XX)
+#warning "Check if these values are correct!"
+	uint32_t cycles = microseconds * 60;	// APB1 clock * 2 in MHz = 30 * 2 = 60
+#elif defined(STM32F4XX)
+	uint32_t cycles = microseconds * 84;	// APB1 clock * 2 in MHz = 42 * 2 = 84
+#else
 	uint32_t cycles = microseconds * (
 		((STM32_APB1_FREQUENCY==STM32_AHB_FREQUENCY)?1:2) * 
 		STM32_APB1_FREQUENCY / 1000000UL);
+#endif
+	
 	uint16_t prescaler = (cycles + 65535) / 65536;	// always round up
 	uint16_t overflow = cycles / prescaler;
 	
@@ -103,7 +113,9 @@ void
 xpcc::stm32::Timer7::enableInterrupt(Interrupt interrupt)
 {
 	// register IRQ at the NVIC
+	
 	NVIC_EnableIRQ(TIM7_IRQn);
+	
 	
 	TIM7->DIER |= interrupt;
 }

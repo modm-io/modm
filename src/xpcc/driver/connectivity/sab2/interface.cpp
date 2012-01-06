@@ -1,11 +1,11 @@
 // coding: utf-8
 // ----------------------------------------------------------------------------
-/* Copyright (c) 2011, Roboterclub Aachen e.V.
+/* Copyright (c) 2009, Roboterclub Aachen e.V.
  * All rights reserved.
- *
+ * 
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- *
+ * 
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -14,7 +14,7 @@
  *     * Neither the name of the Roboterclub Aachen e.V. nor the
  *       names of its contributors may be used to endorse or promote products
  *       derived from this software without specific prior written permission.
- *
+ * 
  * THIS SOFTWARE IS PROVIDED BY ROBOTERCLUB AACHEN E.V. ''AS IS'' AND ANY
  * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -25,29 +25,30 @@
  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- * $Id$
+ * 
+ * $Id: interface.cpp 625 2011-11-15 17:47:41Z dergraaf $
  */
 // ----------------------------------------------------------------------------
 
-#ifndef STM32__DEVICE_H
-#define STM32__DEVICE_H
+#include "interface.hpp"
 
-#if defined(STM32F2XX)
-#	include <stm32f2xx.h>
-
-#	define APB1_FREQENCY	30000000
-#	define APB2_FREQENCY	60000000
-#elif defined(STM32F4XX)
-#	include <stm32f4xx.h>
-
-#	define APB1_FREQENCY	42000000
-#	define APB2_FREQENCY	84000000
+uint8_t
+xpcc::sab2::crcUpdate(uint8_t crc, uint8_t data)
+{
+#ifdef __AVR__
+	return _crc_ibutton_update(crc, data);
 #else
-#	include <stm32f10x.h>
-
-#	define APB1_FREQENCY	36000000
-#	define APB2_FREQENCY	72000000
+	crc = crc ^ data;
+	for (uint_fast8_t i = 0; i < 8; ++i)
+	{
+		if (crc & 0x01) {
+			crc = (crc >> 1) ^ 0x8C;
+		}
+		else {
+			crc >>= 1;
+		}
+	}
+	return crc;
 #endif
+}
 
-#endif // STM32__DEVICE_H

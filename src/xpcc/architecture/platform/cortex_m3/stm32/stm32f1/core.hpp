@@ -49,7 +49,6 @@ namespace xpcc
 		class Core
 		{
 		public:
-
 			/**
 			 * Clock management.
 			 * 

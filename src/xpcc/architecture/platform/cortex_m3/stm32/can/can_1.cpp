@@ -356,7 +356,7 @@ xpcc::stm32::Can1::initialize(can::Bitrate bitrate)
 	 * where tq refers to the Time quantum
 	 *   tPCLK = time period of the APB clock = 36 MHz
 	 */
-	uint16_t prescaler;
+	uint16_t prescaler = 0;
 	switch (bitrate)
 	{
 		case can::BITRATE_10_KBPS:	prescaler = 200; break;

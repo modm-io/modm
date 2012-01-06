@@ -26,12 +26,12 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * 
- * $Id$
+ * $Id: interface.hpp 625 2011-11-15 17:47:41Z dergraaf $
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC_SAB__INTERFACE_HPP
-#define	XPCC_SAB__INTERFACE_HPP
+#ifndef	XPCC_SAB2__INTERFACE_HPP
+#define	XPCC_SAB2__INTERFACE_HPP
 
 #include <cstddef>
 #include <stdint.h>
@@ -41,27 +41,25 @@
 
 namespace xpcc
 {
-	namespace sab
+	namespace sab2
 	{
 		/**
 		 * \internal
 		 * \brief	Universal base class for the SAB interface
 		 * 
-		 * \see		<a href="http://www.maxim-ic.com/app-notes/index.mvp/id/27" target="_blank">
-		 * 			Understanding and Using Cyclic Redundancy Checks with Maxim iButton Products</a>
-		 * \ingroup	sab
+		 * \ingroup	sab2
 		 */
 		uint8_t
 		crcUpdate(uint8_t crc, uint8_t data);
 		
 		/**
-		 * \brief	SAB interface
+		 * \brief	SAB2 interface
 		 * 
-		 * Example:
-		 * \include sab_interface.cpp
+		 * The framing is adapted from the HDLC asynchronous framing.
+		 * See http://en.wikipedia.org/wiki/High-Level_Data_Link_Control#Asynchronous_framing
 		 * 
 		 * \author	Fabian Greif
-		 * \ingroup	sab
+		 * \ingroup	sab2
 		 */
 		template <typename Device>
 		class Interface
@@ -157,6 +155,9 @@ namespace xpcc
 			update();
 			
 		private:
+			static void
+			writeByteEscaped(uint8_t data);
+			
 			enum State
 			{
 				SYNC,
@@ -169,6 +170,7 @@ namespace xpcc
 			static uint8_t position;
 			static uint8_t length;
 			static uint8_t lengthOfReceivedMessage;
+			static bool nextEscaped;
 			
 			static State state;
 		};
@@ -177,4 +179,4 @@ namespace xpcc
 
 #include "interface_impl.hpp"
 
-#endif	// XPCC_SAB__INTERFACE_HPP
+#endif	// XPCC_SAB2__INTERFACE_HPP

@@ -205,9 +205,9 @@
 #if defined __SIZEOF_POINTER__
 #	define XPCC__SIZEOF_POINTER			__SIZEOF_POINTER__
 #else
-#	if defined(_LP64) || defined(_WIN64)
+#	if defined(XPCC__CPU_HOSTED_64)
 #		define XPCC__SIZEOF_POINTER		8
-#	elif defined(_WIN32)
+#	elif defined(XPCC__CPU_HOSTED_32)
 #		define XPCC__SIZEOF_POINTER		4
 #	endif
 #endif

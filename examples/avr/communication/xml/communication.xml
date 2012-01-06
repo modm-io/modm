@@ -14,7 +14,7 @@
 
 <typedef name="Bool" type="uint8_t">
 	<description>On x86 systems the bool-type has 4 bytes and on AVRs it has 1 byte.
-		This type is defined to make it posible to send bools from everywhere.</description>
+		This type is defined to make it possible to send bools from everywhere.</description>
 </typedef>
 
 <struct name="position">

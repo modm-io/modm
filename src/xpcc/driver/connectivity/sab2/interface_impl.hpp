@@ -26,11 +26,11 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * 
- * $Id$
+ * $Id: interface_impl.hpp 683 2012-01-03 01:50:57Z dergraaf $
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC_SAB__INTERFACE_HPP
+#ifndef	XPCC_SAB2__INTERFACE_HPP
 	#error	"Don't include this file directly, use 'interface.hpp' instead!"
 #endif
 
@@ -38,28 +38,29 @@
 	#include <util/crc16.h>
 #endif
 
-#include <xpcc/debug/logger.hpp>
+#include "constants.hpp"
+//#include <xpcc/debug/logger.hpp>
 
-#undef XPCC_LOG_LEVEL
-#define XPCC_LOG_LEVEL	xpcc::log::DEBUG
+//#undef XPCC_LOG_LEVEL
+//#define XPCC_LOG_LEVEL	xpcc::log::DEBUG
 
 // ----------------------------------------------------------------------------
-template <typename Device> typename xpcc::sab::Interface<Device>::State \
-	xpcc::sab::Interface<Device>::state = SYNC;
+template <typename Device> typename xpcc::sab2::Interface<Device>::State \
+	xpcc::sab2::Interface<Device>::state = SYNC;
 
-template <typename Device> uint8_t xpcc::sab::Interface<Device>::buffer[maxPayloadLength + 3];
-template <typename Device> uint8_t xpcc::sab::Interface<Device>::crc;
-template <typename Device> uint8_t xpcc::sab::Interface<Device>::position;
-template <typename Device> uint8_t xpcc::sab::Interface<Device>::length;
-template <typename Device> uint8_t xpcc::sab::Interface<Device>::lengthOfReceivedMessage = 0;
+template <typename Device> uint8_t xpcc::sab2::Interface<Device>::buffer[maxPayloadLength + 3];
+template <typename Device> uint8_t xpcc::sab2::Interface<Device>::crc;
+template <typename Device> uint8_t xpcc::sab2::Interface<Device>::position;
+template <typename Device> uint8_t xpcc::sab2::Interface<Device>::length;
+template <typename Device> uint8_t xpcc::sab2::Interface<Device>::lengthOfReceivedMessage = 0;
+template <typename Device> bool xpcc::sab2::Interface<Device>::nextEscaped = false;
 
 // ----------------------------------------------------------------------------
 
 template <typename Device>
 void
-xpcc::sab::Interface<Device>::initialize()
+xpcc::sab2::Interface<Device>::initialize()
 {
-	//Device::setBaudrate(115200UL);
 	state = SYNC;
 }
 
@@ -67,36 +68,37 @@ xpcc::sab::Interface<Device>::initialize()
 
 template <typename Device>
 void
-xpcc::sab::Interface<Device>::sendMessage(uint8_t address, Flags flags, 
+xpcc::sab2::Interface<Device>::sendMessage(uint8_t address, Flags flags, 
 		uint8_t command,
 		const void *payload, uint8_t payloadLength)
 {
 	uint8_t crcSend;
 	
-	Device::write(syncByte);
-	Device::write(payloadLength);
+	Device::write(frameBounderyByte);
+	writeByteEscaped(payloadLength);
 	crcSend = crcUpdate(crcInitialValue, payloadLength);
-	Device::write(address | flags);
+	writeByteEscaped(address | flags);
 	crcSend = crcUpdate(crcSend, address | flags);
-	Device::write(command);
+	writeByteEscaped(command);
 	crcSend = crcUpdate(crcSend, command);
 	
 	const uint8_t *ptr = static_cast<const uint8_t *>(payload);
 	for (uint_fast8_t i = 0; i < payloadLength; ++i)
 	{
 		crcSend = crcUpdate(crcSend, *ptr);
-		Device::write(*ptr);
+		writeByteEscaped(*ptr);
 		ptr++;
 	}
 	
-	Device::write(crcSend);
+	writeByteEscaped(crcSend);
+	Device::write(frameBounderyByte);
 	
-	XPCC_LOG_DEBUG << "send a=" << address << " c=" << command << " l=" << payloadLength << xpcc::endl;
+	//XPCC_LOG_DEBUG << "send a=" << address << " c=" << command << " l=" << payloadLength << xpcc::endl;
 }
 
 template <typename Device> template <typename T>
 void
-xpcc::sab::Interface<Device>::sendMessage(uint8_t address, Flags flags,
+xpcc::sab2::Interface<Device>::sendMessage(uint8_t address, Flags flags,
 		uint8_t command,
 		const T& payload)
 {
@@ -107,7 +109,7 @@ xpcc::sab::Interface<Device>::sendMessage(uint8_t address, Flags flags,
 
 template <typename Device>
 void
-xpcc::sab::Interface<Device>::sendMessage(uint8_t address, Flags flags, uint8_t command)
+xpcc::sab2::Interface<Device>::sendMessage(uint8_t address, Flags flags, uint8_t command)
 {
 	sendMessage(address, flags,
 			command,
@@ -118,110 +120,137 @@ xpcc::sab::Interface<Device>::sendMessage(uint8_t address, Flags flags, uint8_t 
 
 template <typename Device>
 bool
-xpcc::sab::Interface<Device>::isMessageAvailable()
+xpcc::sab2::Interface<Device>::isMessageAvailable()
 {
 	return (lengthOfReceivedMessage != 0);
 }
 
 template <typename Device>
 uint8_t
-xpcc::sab::Interface<Device>::getAddress()
+xpcc::sab2::Interface<Device>::getAddress()
 {
 	return (buffer[0] & 0x3f);
 }
 
 template <typename Device>
 uint8_t
-xpcc::sab::Interface<Device>::getCommand()
+xpcc::sab2::Interface<Device>::getCommand()
 {
 	return buffer[1];
 }
 
 template <typename Device>
 bool
-xpcc::sab::Interface<Device>::isResponse()
+xpcc::sab2::Interface<Device>::isResponse()
 {
 	return (buffer[0] & 0x80) ? true : false;
 }
 
 template <typename Device>
 bool
-xpcc::sab::Interface<Device>::isAcknowledge()
+xpcc::sab2::Interface<Device>::isAcknowledge()
 {
 	return (buffer[0] & 0x40) ? true : false;
 }
 
 template <typename Device>
 const uint8_t*
-xpcc::sab::Interface<Device>::getPayload()
+xpcc::sab2::Interface<Device>::getPayload()
 {
 	return &buffer[2];
 }
 
 template <typename Device>
 uint8_t
-xpcc::sab::Interface<Device>::getPayloadLength()
+xpcc::sab2::Interface<Device>::getPayloadLength()
 {
 	return (lengthOfReceivedMessage - 3);
 }
 
 template <typename Device>
 void
-xpcc::sab::Interface<Device>::dropMessage()
+xpcc::sab2::Interface<Device>::dropMessage()
 {
 	lengthOfReceivedMessage = 0;
 }
 
 // ----------------------------------------------------------------------------
-
 template <typename Device>
 void
-xpcc::sab::Interface<Device>::update()
+xpcc::sab2::Interface<Device>::update()
 {
-	uint8_t byte;
-	while (Device::read(byte))
+	uint8_t data;
+	while (Device::read(data))
 	{
-		XPCC_LOG_DEBUG.printf("%02x ", byte);
-		switch (state)
+		//XPCC_LOG_DEBUG.printf("%02x ", data);
+		
+		if (data == frameBounderyByte) {
+			if ((state != SYNC && state != LENGTH) || nextEscaped) {
+				//XPCC_LOG_ERROR << "framing error" << xpcc::endl;
+			}
+			state = LENGTH;
+			nextEscaped = false;
+		}
+		else if (data == controlEscapeByte) {
+			nextEscaped = true;
+			continue;
+		}
+		else
 		{
-			case SYNC:
-				if (byte == syncByte) {
-					state = LENGTH;
-				}
-				break;
+			if (nextEscaped) {
+				nextEscaped = false;
+				data = data ^ 0x20;	// toggle bit 5
+			}
 			
-			case LENGTH:
-				if (byte > maxPayloadLength) {
-					state = SYNC;
-				}
-				else {
-					length = byte + 3;		// +3 for header, command and crc byte
-					position = 0;
-					crc = crcUpdate(crcInitialValue, byte);
-					state = DATA;
-				}
-				break;
-			
-			case DATA:
-				buffer[position] = byte;
-				crc = crcUpdate(crc, byte);
-				
-				position += 1;
-				if (position >= length) {
-					if (crc == 0) {
-						lengthOfReceivedMessage = length;
-						XPCC_LOG_DEBUG << "SAB received" << xpcc::endl;
+			switch (state)
+			{
+				case LENGTH:
+					if (data > maxPayloadLength) {
+						state = SYNC;
 					}
 					else {
-						XPCC_LOG_ERROR << "CRC error" << xpcc::endl;
+						length = data + 3;		// +3 for header, command and crc byte
+						position = 0;
+						crc = crcUpdate(crcInitialValue, data);
+						state = DATA;
 					}
+					break;
+				
+				case DATA:
+					buffer[position] = data;
+					crc = crcUpdate(crc, data);
+					
+					position += 1;
+					if (position >= length) {
+						if (crc == 0) {
+							lengthOfReceivedMessage = length;
+							//XPCC_LOG_DEBUG << "SAB received" << xpcc::endl;
+						}
+						else {
+							//XPCC_LOG_ERROR << "CRC error" << xpcc::endl;
+						}
+						state = SYNC;
+					}
+					break;
+				
+				default:
 					state = SYNC;
-				}
-				break;
-			
-			default:
-				state = SYNC;
-				break;
+					break;
+			}
 		}
+	}
+}
+
+// ----------------------------------------------------------------------------
+template <typename Device>
+void
+xpcc::sab2::Interface<Device>::writeByteEscaped(uint8_t data)
+{
+	if (data == frameBounderyByte || data == controlEscapeByte) {
+		Device::write(controlEscapeByte);
+		Device::write(data ^ 0x20);		// toggle bit 5
+	}
+	else {
+		Device::write(data);
 	}
 }

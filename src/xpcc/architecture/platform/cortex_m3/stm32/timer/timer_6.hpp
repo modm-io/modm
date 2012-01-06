@@ -56,6 +56,16 @@ namespace xpcc
 		 * }
 		 * \endcode
 		 * 
+		* For the STM32F2xx and STM32F4xx:
+		 * \code
+		 * extern "C" void
+		 * TIM6_DAC_IRQn(void)
+		 * {
+		 *     Timer6::acknowledgeInterrupt(Timer6::...);
+		 *     
+		 *     ...
+		 * }
+		 * \endcode
 		 * 
 		 * @author		Fabian Greif
 		 * @ingroup		stm32
@@ -129,11 +139,11 @@ namespace xpcc
 				TIM6->DIER &= ~interrupt;
 			}
 			
-			static Interrupt
-			getInterruptCause();
+			//static StateFlag
+			//getState();
 			
 			static void
-			acknowledgeInterrupt(Interrupt interrupt)
+			resetState(StateFlag interrupt)
 			{
 				// Flags are cleared by writing a zero to the flag position.
 				// Writing a one is ignored.
