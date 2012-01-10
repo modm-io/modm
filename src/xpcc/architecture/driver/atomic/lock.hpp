@@ -188,7 +188,7 @@ namespace xpcc
 		_restore_interrupt(cpsr);
 	}
 	
-#elif defined(XPCC__CPU_CORTEX_M3)
+#elif defined(XPCC__CPU_CORTEX_M3) || defined(XPCC__CPU_CORTEX_M4)
 
 	xpcc::atomic::Lock::Lock()
 	{
@@ -214,9 +214,8 @@ namespace xpcc
 	{
 	}
 
-#else
-
-	// TODO: useful implementation for any non AVR targets
+#elif defined(XPCC__CPU_HOSTED)
+	
 	xpcc::atomic::Lock::Lock()
 	{
 	}
@@ -232,7 +231,9 @@ namespace xpcc
 	xpcc::atomic::Unlock::~Unlock()
 	{
 	}
-
-#endif	// __AVR__
+	
+#else
+#	error	"Please provide an atomic lock implementation for this target!"
+#endif
 
 #endif	// XPCC_ATOMIC__LOCK_HPP

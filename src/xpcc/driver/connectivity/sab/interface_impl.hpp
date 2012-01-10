@@ -38,10 +38,10 @@
 	#include <util/crc16.h>
 #endif
 
-#include <xpcc/debug/logger.hpp>
+/*#include <xpcc/debug/logger.hpp>
 
 #undef XPCC_LOG_LEVEL
-#define XPCC_LOG_LEVEL	xpcc::log::DEBUG
+#define XPCC_LOG_LEVEL	xpcc::log::DEBUG*/
 
 // ----------------------------------------------------------------------------
 template <typename Device> typename xpcc::sab::Interface<Device>::State \
@@ -90,8 +90,6 @@ xpcc::sab::Interface<Device>::sendMessage(uint8_t address, Flags flags,
 	}
 	
 	Device::write(crcSend);
-	
-	XPCC_LOG_DEBUG << "send a=" << address << " c=" << command << " l=" << payloadLength << xpcc::endl;
 }
 
 template <typename Device> template <typename T>
@@ -181,7 +179,7 @@ xpcc::sab::Interface<Device>::update()
 	uint8_t byte;
 	while (Device::read(byte))
 	{
-		XPCC_LOG_DEBUG.printf("%02x ", byte);
+		//XPCC_LOG_DEBUG.printf("%02x ", byte);
 		switch (state)
 		{
 			case SYNC:
@@ -210,10 +208,10 @@ xpcc::sab::Interface<Device>::update()
 				if (position >= length) {
 					if (crc == 0) {
 						lengthOfReceivedMessage = length;
-						XPCC_LOG_DEBUG << "SAB received" << xpcc::endl;
+						//XPCC_LOG_DEBUG << "SAB received" << xpcc::endl;
 					}
 					else {
-						XPCC_LOG_ERROR << "CRC error" << xpcc::endl;
+						//XPCC_LOG_ERROR << "CRC error" << xpcc::endl;
 					}
 					state = SYNC;
 				}

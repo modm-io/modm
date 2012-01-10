@@ -26,61 +26,12 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id$
+ * $Id: core.hpp 675 2011-12-16 10:17:21Z georgi-g $
  */
 // ----------------------------------------------------------------------------
-/**
- * \ingroup		cortex_m3
- * \defgroup	stm32		STM32Fxxx
- * 
- * STM32 is a family of 32-bits ARM Cortex-M3 microcontrollers developed and
- * marketed by STMicroelectronics.
- * 
- * Supported Devices:
- * - STM32 F1 series of mainstream MCUs
- *   - Performance line STM32F103  - 72 MHz, up to 1 Mbyte Flash with motor
- *     control, USB and CAN
- *   - Connectivity line STM32F105/107 - 72 MHz CPU with Ethernet MAC, CAN
- *     and USB 2.0 OTG
- * - TODO: STM32 F2 series of high-performance MCUs
- * - TODO: STM32 F4 series of high-performance MCUs with DSP and FPU instructions
- *
- * Defines:
- * - Frequencies: These defines are defined as maximum possible frequencies of
- * 	 the busses. Hardware drivers like USARTs are using them for configuration.
- * 	 Remember, you can override defines in the defines section of your project.cfg
- * 	 if you need.
- *   - STM32_AHB_FREQUENCY
- *   - STM32_APB1_FREQUENCY
- *   - STM32_APB2_FREQUENCY
- *
- *
- * The Value line (STM32F100-102) is not supported!
- */
 
-#include "stm32/device.h"
-
-#include "stm32/core.hpp"
-#include "stm32/gpio.hpp"
-#include "stm32/clock.hpp"
-
-#include "stm32/can/can_1.hpp"
-#include "stm32/can/can_2.hpp"
-#include "stm32/can/can_filter.hpp"
-
-#include "stm32/uart/usart_1.hpp"
-#include "stm32/uart/usart_2.hpp"
-#include "stm32/uart/usart_3.hpp"
-#include "stm32/uart/uart_4.hpp"
-#include "stm32/uart/uart_5.hpp"
-
-#include "stm32/spi/spi_1.hpp"
-#include "stm32/spi/spi_2.hpp"
-#include "stm32/spi/spi_3.hpp"
-
-#include "stm32/i2c/i2c_1.hpp"
-#include "stm32/i2c/i2c_2.hpp"
-#include "stm32/i2c/i2c_3.hpp"
-
-#include "stm32/systick_timer.hpp"
-#include "stm32/timer.hpp"
+#if defined(STM32F2XX) || defined(STM32F4XX)
+#	include "stm32f2_4/clock.hpp"
+#else
+#	include "stm32f1/clock.hpp"
+#endif

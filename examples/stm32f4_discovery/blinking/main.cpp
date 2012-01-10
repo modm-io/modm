@@ -12,18 +12,18 @@ GPIO__OUTPUT(VBusOvercurrent, D, 5);	// red LED   (LD8)
 
 GPIO__INPUT(Button, A, 0);
 
+using namespace xpcc::stm32;
+
 static bool
 initClock()
 {
-	typedef xpcc::stm32::Core::Clock C;
-	
-	// use external 8MHz crystal, stm32f4
-	if (!C::enableHse(C::HSE_CRYSTAL)) {
+	// use external 8MHz crystal
+	if (!Clock::enableHse(Clock::HSE_CRYSTAL)) {
 		return false;
 	}
 	
-	C::enablePll(C::PLL_HSE, 4, 168);
-	return C::switchToPll();
+	Clock::enablePll(Clock::PLL_HSE, 4, 168);
+	return Clock::switchToPll();
 }
 
 // ----------------------------------------------------------------------------

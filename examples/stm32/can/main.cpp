@@ -28,12 +28,12 @@ static bool
 initClock()
 {
 	// use external 8MHz crystal, stm32f1
-	if (!Core::Clock::enableHse(Core::Clock::HSE_CRYSTAL)) {
+	if (!Clock::enableHse(Clock::HSE_CRYSTAL)) {
 		return false;
 	}
 	
-	Core::Clock::enablePll(Core::Clock::PLL_HSE, Core::Clock::PLL_MUL_9);
-	return Core::Clock::switchToPll();
+	Clock::enablePll(Clock::PLL_HSE, Clock::PLL_MUL_9);
+	return Clock::switchToPll();
 }
 
 // ----------------------------------------------------------------------------

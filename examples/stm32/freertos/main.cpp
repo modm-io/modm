@@ -28,7 +28,7 @@ namespace lcd
 static bool
 initClock()
 {
-	typedef xpcc::stm32::Core::Clock C;
+	typedef xpcc::stm32::Clock C;
 	
 	// use external 8MHz crystal, stm32f1
 	if (!C::enableHse(C::HSE_CRYSTAL)) {

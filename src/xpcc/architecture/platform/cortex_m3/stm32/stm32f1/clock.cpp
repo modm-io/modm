@@ -30,12 +30,12 @@
  */
 // ----------------------------------------------------------------------------
 
-#include "core.hpp"
 #include <xpcc/architecture/platform/cortex_m3.hpp>
+#include "clock.hpp"
 
 // ----------------------------------------------------------------------------
 bool
-xpcc::stm32::Core::Clock::enableHse(HseConfig config, uint32_t waitCycles)
+xpcc::stm32::Clock::enableHse(HseConfig config, uint32_t waitCycles)
 {
 	if (config == HSE_BYPASS) {
 		RCC->CR |= RCC_CR_HSEBYP | RCC_CR_HSEON;
@@ -55,7 +55,7 @@ xpcc::stm32::Core::Clock::enableHse(HseConfig config, uint32_t waitCycles)
 #ifdef STM32F10X_CL
 // Connectivity Line
 void
-xpcc::stm32::Core::Clock::enablePll2(uint32_t div, Pll2Mul mul)
+xpcc::stm32::Clock::enablePll2(uint32_t div, Pll2Mul mul)
 {
 	uint32_t cfgr2 = RCC->CFGR2 & ~(RCC_CFGR2_PREDIV2 | RCC_CFGR2_PLL2MUL);
 	cfgr2 |= (((div - 1) << 4) & RCC_CFGR2_PREDIV2) | mul;
@@ -71,8 +71,8 @@ xpcc::stm32::Core::Clock::enablePll2(uint32_t div, Pll2Mul mul)
 }
 
 void
-xpcc::stm32::Core::Clock::enablePll(PllSource source, PllMul pllMul,
-						PreDiv1Source preDivSource, uint32_t preDivFactor)
+xpcc::stm32::Clock::enablePll(PllSource source, PllMul pllMul,
+		PreDiv1Source preDivSource, uint32_t preDivFactor)
 {
 	// CFGR
 	uint32_t cfgr = 0;
@@ -93,7 +93,7 @@ xpcc::stm32::Core::Clock::enablePll(PllSource source, PllMul pllMul,
 #else
 // Mainstream Line
 void
-xpcc::stm32::Core::Clock::enablePll(PllSource source, PllMul pllMul)
+xpcc::stm32::Clock::enablePll(PllSource source, PllMul pllMul)
 {
 	uint32_t tmp = 0;
 	
@@ -109,7 +109,7 @@ xpcc::stm32::Core::Clock::enablePll(PllSource source, PllMul pllMul)
 
 // ----------------------------------------------------------------------------
 bool
-xpcc::stm32::Core::Clock::switchToPll(uint32_t waitCycles)
+xpcc::stm32::Clock::switchToPll(uint32_t waitCycles)
 {
 	uint32_t t = waitCycles;
 	while (!(RCC->CR & RCC_CR_PLLRDY)){

@@ -30,12 +30,12 @@
  */
 // ----------------------------------------------------------------------------
 
-#include "core.hpp"
 #include <xpcc/architecture/platform/cortex_m3.hpp>
+#include "clock.hpp"
 
 // ----------------------------------------------------------------------------
 bool
-xpcc::stm32::Core::Clock::enableHse(HseConfig config, uint32_t waitCycles)
+xpcc::stm32::Clock::enableHse(HseConfig config, uint32_t waitCycles)
 {
 	if (config == HSE_BYPASS) {
 		RCC->CR |= RCC_CR_HSEBYP | RCC_CR_HSEON;
@@ -53,7 +53,7 @@ xpcc::stm32::Core::Clock::enableHse(HseConfig config, uint32_t waitCycles)
 
 // ----------------------------------------------------------------------------
 void
-xpcc::stm32::Core::Clock::enablePll(PllSource source, uint8_t pllM,
+xpcc::stm32::Clock::enablePll(PllSource source, uint8_t pllM,
 		uint16_t pllN)
 {
 	uint32_t tmp = 0;
@@ -95,7 +95,7 @@ xpcc::stm32::Core::Clock::enablePll(PllSource source, uint8_t pllM,
 
 // ----------------------------------------------------------------------------
 bool
-xpcc::stm32::Core::Clock::switchToPll(uint32_t waitCycles)
+xpcc::stm32::Clock::switchToPll(uint32_t waitCycles)
 {
 	uint32_t t = waitCycles;
 	while (!(RCC->CR & RCC_CR_PLLRDY)) {

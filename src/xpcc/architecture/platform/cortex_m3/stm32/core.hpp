@@ -30,8 +30,38 @@
  */
 // ----------------------------------------------------------------------------
 
+#ifndef XPCC_STM32__CORE_HPP
+#define XPCC_STM32__CORE_HPP
+
+#include <stdint.h>
+
+namespace xpcc
+{
+	namespace stm32
+	{
+		typedef void (*InterruptHandler)(void);
+		
+		class Core
+		{
+		public:
+			/**
+			 * Get unique device id (96-bits)
+			 * 
+			 * @param offset	0..2
+			 * @return	32-bit of the unique id
+			 */
+			uint32_t
+			getUniqueId(uint8_t offset)
+			{
 #if defined(STM32F2XX) || defined(STM32F4XX)
-#	include "stm32f2_4/core.hpp"
+				uint32_t *baseaddress = (uint32_t*) 0x1FFF7A10;
 #else
-#	include "stm32f1/core.hpp"
+				uint32_t *baseaddress = (uint32_t*) 0x1FFFF7E8;
 #endif
+				return *(baseaddress + offset);
+			}
+		};
+	}
+}
+
+#endif	// XPCC_STM32__CORE_HPP
