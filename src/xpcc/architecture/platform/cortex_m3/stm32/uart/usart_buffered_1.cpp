@@ -129,19 +129,19 @@ USART1_IRQHandler()
 {
 	uint32_t state = USART1->SR;
 	
-	// Read Data Register Not Empty 
+	// Read Data Register not empty 
 	if (state & USART_SR_RXNE)
 	{
-		// first save the errors TODO
+		// First save the errors TODO
 		// error |= USART1_STATUS & (USART_FERR_bm | USART_BUFOVF_bm | USART_PERR_bm);
 		
-		// then read the buffer
+		// Then read the buffer (read from DR clears the RXNE flag)
 		uint8_t data = USART1->DR;
-	
+		
 		rxBuffer.push(data);
 	}
 	
-	// Transmit Data Register Empty
+	// Transmit Data Register empty
 	if (state & USART_SR_TXE)
 	{
 		if (txBuffer.isEmpty())
@@ -166,7 +166,7 @@ xpcc::stm32::BufferedUsart1::write(uint8_t c)
 	while ( !txBuffer.push(c) && (i < 1) ) {
 		++i;
 		// wait for a free slot in the buffer
-		// but do not wait infinity
+		// but do not wait infinitely
 	}
 	
 	// disable interrupts

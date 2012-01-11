@@ -58,7 +58,7 @@ namespace xpcc
 		public:
 			Queue();
 			
-			bool
+			ALWAYS_INLINE bool
 			isFull();
 			
 			/**
@@ -69,10 +69,10 @@ namespace xpcc
 			bool
 			isNearFull();
 
-			bool
+			ALWAYS_INLINE bool
 			isEmpty();
 			
-			uint8_t
+			ALWAYS_INLINE uint8_t
 			getMaxSize();
 			
 			const T&

@@ -32,22 +32,23 @@
 
 #include "interface.hpp"
 
-uint8_t
-xpcc::sab2::crcUpdate(uint8_t crc, uint8_t data)
+uint16_t
+xpcc::sab2::crcUpdate(uint16_t crc, uint8_t data)
 {
 #ifdef __AVR__
-	return _crc_ibutton_update(crc, data);
+	return _crc16_update(crc, data);
 #else
-	crc = crc ^ data;
+	crc ^= data;
 	for (uint_fast8_t i = 0; i < 8; ++i)
 	{
-		if (crc & 0x01) {
-			crc = (crc >> 1) ^ 0x8C;
+		if (crc & 1) {
+			crc = (crc >> 1) ^ 0xA001;
 		}
 		else {
-			crc >>= 1;
+			crc = (crc >> 1);
 		}
 	}
+
 	return crc;
 #endif
 }

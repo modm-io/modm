@@ -192,7 +192,9 @@ namespace xpcc
 
 	xpcc::atomic::Lock::Lock()
 	{
-		uint32_t mask = 0;
+		// disable interrupts -> PRIMASK=1
+		// enable interrupts -> PRIMASK=1
+		uint32_t mask = 1;
 		asm volatile (
 				"mrs %0, PRIMASK"	"\n\t"
 				"msr PRIMASK, %1"
@@ -204,14 +206,22 @@ namespace xpcc
 	{
 		asm volatile ("msr PRIMASK, %0" : : "r" (cpsr) );
 	}
-
-	// FIXME do something useful here
+	
 	xpcc::atomic::Unlock::Unlock()
 	{
+		// disable interrupts -> PRIMASK=1
+		// enable interrupts -> PRIMASK=1
+		uint32_t mask = 0;
+		asm volatile (
+				"mrs %0, PRIMASK"	"\n\t"
+				"msr PRIMASK, %1"
+				: "=&r" (cpsr)
+				: "r" (mask));
 	}
 
 	xpcc::atomic::Unlock::~Unlock()
 	{
+		asm volatile ("msr PRIMASK, %0" : : "r" (cpsr) );
 	}
 
 #elif defined(XPCC__CPU_HOSTED)

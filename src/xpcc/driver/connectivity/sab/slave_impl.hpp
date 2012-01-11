@@ -84,7 +84,7 @@ xpcc::sab::Slave<Interface>::update()
 			this->currentCommand = Interface::getCommand();
 			
 			xpcc::accessor::Flash<Action> list = actionList;
-			for (uint8_t i = 0; i < actionCount; ++i, ++list)
+			for (uint_fast8_t i = 0; i < actionCount; ++i, ++list)
 			{
 				Action action(*list);
 				if (this->currentCommand == action.command)
@@ -117,7 +117,7 @@ xpcc::sab::Slave<Interface>::update()
 template <typename Interface>
 void
 xpcc::sab::Slave<Interface>::send(bool acknowledge,
-			const void *payload, uint8_t payloadLength)
+			const void *payload, std::size_t payloadLength)
 {
 	Flags flags;
 	if (acknowledge) {

@@ -170,7 +170,7 @@ xpcc::At45db0x1d<Spi, Cs>::copyBufferToPageWithoutErase(at45db::Buffer buffer, u
 template <typename Spi, typename Cs>
 void
 xpcc::At45db0x1d<Spi, Cs>::readFromBuffer(at45db::Buffer buffer,
-		uint8_t address, uint8_t *data, uint8_t size)
+		uint8_t address, uint8_t *data, std::size_t size)
 {
 	Cs::reset();
 	if (buffer == at45db::BUFFER_0) {
@@ -188,7 +188,7 @@ xpcc::At45db0x1d<Spi, Cs>::readFromBuffer(at45db::Buffer buffer,
 	// don't care byte
 	Spi::write(0);
 	
-	for (uint8_t i = 0; i < size; ++i) {
+	for (std::size_t i = 0; i < size; ++i) {
 		*data++ = Spi::write(0);
 	}
 	Cs::set();
@@ -198,7 +198,7 @@ xpcc::At45db0x1d<Spi, Cs>::readFromBuffer(at45db::Buffer buffer,
 template <typename Spi, typename Cs>
 void
 xpcc::At45db0x1d<Spi, Cs>::writeToBuffer(at45db::Buffer buffer,
-		uint8_t address, const uint8_t *data, uint8_t size)
+		uint8_t address, const uint8_t *data, std::size_t size)
 {
 	Cs::reset();
 	if (buffer == at45db::BUFFER_0) {
@@ -213,7 +213,7 @@ xpcc::At45db0x1d<Spi, Cs>::writeToBuffer(at45db::Buffer buffer,
 	Spi::write(0);
 	Spi::write(address);
 	
-	for (uint8_t i = 0; i < size; ++i) {
+	for (std::size_t i = 0; i < size; ++i) {
 		Spi::write(*data++);
 	}
 	Cs::set();

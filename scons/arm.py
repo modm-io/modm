@@ -148,7 +148,8 @@ def generate(env, **kw):
 		"-fno-move-loop-invariants",
 		"-fno-tree-loop-optimize",
 		"-fno-unwind-tables",
-		"-mlong-calls",		# when using ".fastcode" without longcall:
+		"-finline-limit=10000",
+		"-mlong-calls",		# when using ".fastcode" without longcall
 		"-Wall",
 		"-Wformat",
 		"-Wextra",

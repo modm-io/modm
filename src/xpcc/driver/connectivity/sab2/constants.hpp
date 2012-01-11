@@ -94,7 +94,6 @@ namespace xpcc
 		 * \ingroup	sab2
 		 */
 		const uint8_t frameBounderyByte = 0x7e;
-		
 		const uint8_t controlEscapeByte = 0x7d;
 		
 		/**
@@ -102,7 +101,7 @@ namespace xpcc
 		 * \brief	Initial value for the CRC8 calculation
 		 * \ingroup	sab2
 		 */
-		const uint8_t crcInitialValue = 0x00;
+		const uint16_t crcInitialValue = 0xffff;
 	}
 }
 

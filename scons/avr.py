@@ -136,7 +136,7 @@ def generate(env, **kw):
 		"-Wall",
 		"-Wextra",
 		"-Wundef",
-#		"-Winline", 
+#		"-Winline",
 		"-Wa,-adhlns=${TARGET.base}.lst",
 		"-DBASENAME=${SOURCE.file}",
 	]

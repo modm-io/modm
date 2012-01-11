@@ -52,7 +52,7 @@ namespace xpcc
 		{
 		public:
 			virtual void
-			send(bool acknowledge, const void *payload, uint8_t payloadLength) = 0;
+			send(bool acknowledge, const void *payload, std::size_t payloadLength) = 0;
 		};
 		
 		/**
@@ -156,10 +156,10 @@ namespace xpcc
 			inline void
 			call(Response& response, const void *payload);
 			
-			uint8_t command;
-			uint8_t payloadLength;		//!< Payload length in bytes
 			Callable *object;
 			Callback function;			//!< Method callActionback
+			uint16_t payloadLength;		//!< Payload length in bytes
+			uint8_t command;
 		};
 		
 		/**
@@ -223,7 +223,7 @@ namespace xpcc
 			
 		protected:
 			void
-			send(bool acknowledge, const void *payload, uint8_t payloadLength);
+			send(bool acknowledge, const void *payload, std::size_t payloadLength);
 			
 			uint8_t ownAddress;
 			xpcc::accessor::Flash<Action> actionList;
@@ -286,10 +286,10 @@ namespace xpcc
 	#define	SAB__ACTION(command, object, function, length)
 #else
 	#define	SAB__ACTION(command, object, function, length)		\
-		{	command, \
+		{	static_cast<xpcc::sab::Callable *>(&object), \
+			reinterpret_cast<xpcc::sab::Action::Callback>(&function), \
 			length, \
-			static_cast<xpcc::sab::Callable *>(&object), \
-			reinterpret_cast<xpcc::sab::Action::Callback>(&function) }
+			command }
 #endif	// __DOXYGEN__
 
 #include "slave_impl.hpp"

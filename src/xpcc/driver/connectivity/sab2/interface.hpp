@@ -35,7 +35,9 @@
 
 #include <cstddef>
 #include <stdint.h>
+
 #include <xpcc/architecture/utils.hpp>
+#include <xpcc/utils/template_metaprogramming.hpp>
 
 #include "constants.hpp"
 
@@ -45,12 +47,10 @@ namespace xpcc
 	{
 		/**
 		 * \internal
-		 * \brief	Universal base class for the SAB interface
-		 * 
 		 * \ingroup	sab2
 		 */
-		uint8_t
-		crcUpdate(uint8_t crc, uint8_t data);
+		uint16_t
+		crcUpdate(uint16_t crc, uint8_t data);
 		
 		/**
 		 * \brief	SAB2 interface
@@ -61,9 +61,17 @@ namespace xpcc
 		 * \author	Fabian Greif
 		 * \ingroup	sab2
 		 */
-		template <typename Device>
+		template <typename Device, std::size_t N = maxPayloadLength>
 		class Interface
 		{
+		public:
+			// select the type of the index variables with some template magic :-)
+			typedef typename xpcc::tmp::Select< (N >= 255),
+												uint16_t,
+												uint8_t >::Result Index;
+			
+			typedef Index Size;
+			
 		public:
 			/**
 			 * \brief	Initialize the interface
@@ -84,7 +92,7 @@ namespace xpcc
 			 */
 			static void
 			sendMessage(uint8_t address, Flags flags, uint8_t command,
-					const void *payload, uint8_t payloadLength);
+					const void *payload, Size payloadLength);
 			
 			/**
 			 * \brief	Send a message
@@ -137,7 +145,7 @@ namespace xpcc
 			 * \return	Size of the received message. Zero if no message
 			 * 			is available at the moment.
 			 */
-			static inline uint8_t
+			static inline Size
 			getPayloadLength();
 			
 			/**
@@ -158,21 +166,11 @@ namespace xpcc
 			static void
 			writeByteEscaped(uint8_t data);
 			
-			enum State
-			{
-				SYNC,
-				LENGTH,
-				DATA
-			};
-			
-			static uint8_t buffer[maxPayloadLength + 3];
-			static uint8_t crc;
-			static uint8_t position;
-			static uint8_t length;
-			static uint8_t lengthOfReceivedMessage;
+			static uint8_t buffer[N + 4];
+			static uint16_t crc;
+			static Size length;
+			static Size lengthOfReceivedMessage;
 			static bool nextEscaped;
-			
-			static State state;
 		};
 	}
 }

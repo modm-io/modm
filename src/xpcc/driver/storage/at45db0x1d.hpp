@@ -172,7 +172,7 @@ namespace xpcc
 		 * \param size		Number of bytes to read
 		 */
 		static void
-		readFromBuffer(at45db::Buffer buffer, uint8_t address, uint8_t *data, uint8_t size);
+		readFromBuffer(at45db::Buffer buffer, uint8_t address, uint8_t *data, std::size_t size);
 		
 		/**
 		 * \brief	Write data to a buffer
@@ -186,7 +186,7 @@ namespace xpcc
 		 * \param size		Number of bytes to write
 		 */
 		static void
-		writeToBuffer(at45db::Buffer buffer, uint8_t address, const uint8_t *data, uint8_t size);
+		writeToBuffer(at45db::Buffer buffer, uint8_t address, const uint8_t *data, std::size_t size);
 		
 		/**
 		 * \brief	Continuous read from the memory

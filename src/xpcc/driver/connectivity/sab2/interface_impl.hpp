@@ -34,49 +34,43 @@
 	#error	"Don't include this file directly, use 'interface.hpp' instead!"
 #endif
 
-#ifdef __AVR__
-	#include <util/crc16.h>
-#endif
-
 #include "constants.hpp"
-//#include <xpcc/debug/logger.hpp>
+#include <xpcc/debug/logger.hpp>
 
 //#undef XPCC_LOG_LEVEL
 //#define XPCC_LOG_LEVEL	xpcc::log::DEBUG
 
 // ----------------------------------------------------------------------------
-template <typename Device> typename xpcc::sab2::Interface<Device>::State \
-	xpcc::sab2::Interface<Device>::state = SYNC;
+template <typename Device, std::size_t N> uint8_t xpcc::sab2::Interface<Device, N>::buffer[N + 4];
+template <typename Device, std::size_t N> uint16_t xpcc::sab2::Interface<Device, N>::crc = crcInitialValue;
 
-template <typename Device> uint8_t xpcc::sab2::Interface<Device>::buffer[maxPayloadLength + 3];
-template <typename Device> uint8_t xpcc::sab2::Interface<Device>::crc;
-template <typename Device> uint8_t xpcc::sab2::Interface<Device>::position;
-template <typename Device> uint8_t xpcc::sab2::Interface<Device>::length;
-template <typename Device> uint8_t xpcc::sab2::Interface<Device>::lengthOfReceivedMessage = 0;
-template <typename Device> bool xpcc::sab2::Interface<Device>::nextEscaped = false;
+template <typename Device, std::size_t N> typename xpcc::sab2::Interface<Device, N>::Size \
+	xpcc::sab2::Interface<Device, N>::length;
+template <typename Device, std::size_t N> typename xpcc::sab2::Interface<Device, N>::Size \
+	xpcc::sab2::Interface<Device, N>::lengthOfReceivedMessage = 0;
+
+template <typename Device, std::size_t N> bool xpcc::sab2::Interface<Device, N>::nextEscaped = false;
 
 // ----------------------------------------------------------------------------
 
-template <typename Device>
+template <typename Device, std::size_t N>
 void
-xpcc::sab2::Interface<Device>::initialize()
+xpcc::sab2::Interface<Device, N>::initialize()
 {
-	state = SYNC;
 }
 
 // ----------------------------------------------------------------------------
 
-template <typename Device>
+template <typename Device, std::size_t N>
 void
-xpcc::sab2::Interface<Device>::sendMessage(uint8_t address, Flags flags, 
+xpcc::sab2::Interface<Device, N>::sendMessage(uint8_t address, Flags flags, 
 		uint8_t command,
-		const void *payload, uint8_t payloadLength)
+		const void *payload, Size payloadLength)
 {
-	uint8_t crcSend;
+	uint16_t crcSend = crcInitialValue;
 	
 	Device::write(frameBounderyByte);
-	writeByteEscaped(payloadLength);
-	crcSend = crcUpdate(crcInitialValue, payloadLength);
+	
 	writeByteEscaped(address | flags);
 	crcSend = crcUpdate(crcSend, address | flags);
 	writeByteEscaped(command);
@@ -90,15 +84,15 @@ xpcc::sab2::Interface<Device>::sendMessage(uint8_t address, Flags flags,
 		ptr++;
 	}
 	
-	writeByteEscaped(crcSend);
-	Device::write(frameBounderyByte);
+	writeByteEscaped(crcSend & 0xff);
+	writeByteEscaped(crcSend >> 8);
 	
-	//XPCC_LOG_DEBUG << "send a=" << address << " c=" << command << " l=" << payloadLength << xpcc::endl;
+	Device::write(frameBounderyByte);
 }
 
-template <typename Device> template <typename T>
+template <typename Device, std::size_t N> template <typename T>
 void
-xpcc::sab2::Interface<Device>::sendMessage(uint8_t address, Flags flags,
+xpcc::sab2::Interface<Device, N>::sendMessage(uint8_t address, Flags flags,
 		uint8_t command,
 		const T& payload)
 {
@@ -107,9 +101,9 @@ xpcc::sab2::Interface<Device>::sendMessage(uint8_t address, Flags flags,
 			reinterpret_cast<const void *>(&payload), sizeof(T));
 }
 
-template <typename Device>
+template <typename Device, std::size_t N>
 void
-xpcc::sab2::Interface<Device>::sendMessage(uint8_t address, Flags flags, uint8_t command)
+xpcc::sab2::Interface<Device, N>::sendMessage(uint8_t address, Flags flags, uint8_t command)
 {
 	sendMessage(address, flags,
 			command,
@@ -118,66 +112,66 @@ xpcc::sab2::Interface<Device>::sendMessage(uint8_t address, Flags flags, uint8_t
 
 // ----------------------------------------------------------------------------
 
-template <typename Device>
+template <typename Device, std::size_t N>
 bool
-xpcc::sab2::Interface<Device>::isMessageAvailable()
+xpcc::sab2::Interface<Device, N>::isMessageAvailable()
 {
 	return (lengthOfReceivedMessage != 0);
 }
 
-template <typename Device>
+template <typename Device, std::size_t N>
 uint8_t
-xpcc::sab2::Interface<Device>::getAddress()
+xpcc::sab2::Interface<Device, N>::getAddress()
 {
 	return (buffer[0] & 0x3f);
 }
 
-template <typename Device>
+template <typename Device, std::size_t N>
 uint8_t
-xpcc::sab2::Interface<Device>::getCommand()
+xpcc::sab2::Interface<Device, N>::getCommand()
 {
 	return buffer[1];
 }
 
-template <typename Device>
+template <typename Device, std::size_t N>
 bool
-xpcc::sab2::Interface<Device>::isResponse()
+xpcc::sab2::Interface<Device, N>::isResponse()
 {
 	return (buffer[0] & 0x80) ? true : false;
 }
 
-template <typename Device>
+template <typename Device, std::size_t N>
 bool
-xpcc::sab2::Interface<Device>::isAcknowledge()
+xpcc::sab2::Interface<Device, N>::isAcknowledge()
 {
 	return (buffer[0] & 0x40) ? true : false;
 }
 
-template <typename Device>
+template <typename Device, std::size_t N>
 const uint8_t*
-xpcc::sab2::Interface<Device>::getPayload()
+xpcc::sab2::Interface<Device, N>::getPayload()
 {
 	return &buffer[2];
 }
 
-template <typename Device>
-uint8_t
-xpcc::sab2::Interface<Device>::getPayloadLength()
+template <typename Device, std::size_t N>
+typename xpcc::sab2::Interface<Device, N>::Size
+xpcc::sab2::Interface<Device, N>::getPayloadLength()
 {
-	return (lengthOfReceivedMessage - 3);
+	return (lengthOfReceivedMessage - 4);
 }
 
-template <typename Device>
+template <typename Device, std::size_t N>
 void
-xpcc::sab2::Interface<Device>::dropMessage()
+xpcc::sab2::Interface<Device, N>::dropMessage()
 {
 	lengthOfReceivedMessage = 0;
 }
 
 // ----------------------------------------------------------------------------
-template <typename Device>
+template <typename Device, std::size_t N>
 void
-xpcc::sab2::Interface<Device>::update()
+xpcc::sab2::Interface<Device, N>::update()
 {
 	uint8_t data;
 	while (Device::read(data))
@@ -185,10 +179,22 @@ xpcc::sab2::Interface<Device>::update()
 		//XPCC_LOG_DEBUG.printf("%02x ", data);
 		
 		if (data == frameBounderyByte) {
-			if ((state != SYNC && state != LENGTH) || nextEscaped) {
+			if (nextEscaped) {
 				//XPCC_LOG_ERROR << "framing error" << xpcc::endl;
 			}
-			state = LENGTH;
+			else {
+				if (length >= 4) {
+					if (crc == 0) {
+						lengthOfReceivedMessage = length;
+					}
+					else {
+						//XPCC_LOG_ERROR.printf("crc=%04x\n", crc);
+					}
+				}
+			}
+			
+			crc = crcInitialValue;
+			length = 0;
 			nextEscaped = false;
 		}
 		else if (data == controlEscapeByte) {
@@ -202,49 +208,25 @@ xpcc::sab2::Interface<Device>::update()
 				data = data ^ 0x20;	// toggle bit 5
 			}
 			
-			switch (state)
-			{
-				case LENGTH:
-					if (data > maxPayloadLength) {
-						state = SYNC;
-					}
-					else {
-						length = data + 3;		// +3 for header, command and crc byte
-						position = 0;
-						crc = crcUpdate(crcInitialValue, data);
-						state = DATA;
-					}
-					break;
+			if (length >= (N+4)) {
+				// Error message to long
+				length = 0;
+				//XPCC_LOG_ERROR << "message to long" << xpcc::endl;
+			}
+			else {
+				buffer[length] = data;
+				length += 1;
 				
-				case DATA:
-					buffer[position] = data;
-					crc = crcUpdate(crc, data);
-					
-					position += 1;
-					if (position >= length) {
-						if (crc == 0) {
-							lengthOfReceivedMessage = length;
-							//XPCC_LOG_DEBUG << "SAB received" << xpcc::endl;
-						}
-						else {
-							//XPCC_LOG_ERROR << "CRC error" << xpcc::endl;
-						}
-						state = SYNC;
-					}
-					break;
-				
-				default:
-					state = SYNC;
-					break;
+				crc = crcUpdate(crc, data);
 			}
 		}
 	}
 }
 
 // ----------------------------------------------------------------------------
-template <typename Device>
+template <typename Device, std::size_t N>
 void
-xpcc::sab2::Interface<Device>::writeByteEscaped(uint8_t data)
+xpcc::sab2::Interface<Device, N>::writeByteEscaped(uint8_t data)
 {
 	if (data == frameBounderyByte || data == controlEscapeByte) {
 		Device::write(controlEscapeByte);
