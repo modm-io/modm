@@ -50,7 +50,7 @@ namespace xpcc
 		 * extern "C" void
 		 * TIM6_IRQHandler(void)
 		 * {
-		 *     Timer6::acknowledgeInterrupt(Timer6::...);
+		 *     Timer6::resetInterruptFlag(Timer6::FLAG_UPDATE);
 		 *     
 		 *     ...
 		 * }
@@ -61,7 +61,7 @@ namespace xpcc
 		 * extern "C" void
 		 * TIM6_DAC_IRQn(void)
 		 * {
-		 *     Timer6::acknowledgeInterrupt(Timer6::...);
+		 *     Timer6::resetInterruptFlag(Timer6::FLAG_UPDATE);
 		 *     
 		 *     ...
 		 * }
@@ -131,19 +131,28 @@ namespace xpcc
 			}
 			
 			static void
-			enableInterrupt(Interrupt interrupt);
+			enableInterruptVector(bool enable, uint32_t priority);
 			
-			static void
+			static inline void
+			enableInterrupt(Interrupt interrupt)
+			{
+				TIM6->DIER |= interrupt;
+			}
+			
+			static inline void
 			disableInterrupt(Interrupt interrupt)
 			{
 				TIM6->DIER &= ~interrupt;
 			}
 			
-			//static StateFlag
-			//getState();
+			static inline InterruptFlag
+			getInterruptFlags()
+			{
+				return static_cast<InterruptFlag>(TIM6->SR);
+			}
 			
 			static void
-			resetState(StateFlag interrupt)
+			resetInterruptFlag(InterruptFlag interrupt)
 			{
 				// Flags are cleared by writing a zero to the flag position.
 				// Writing a one is ignored.

@@ -87,39 +87,6 @@ xpcc::stm32::BufferedUart4::configurePins(Mapping mapping)
 }
 
 // ----------------------------------------------------------------------------
-void
-xpcc::stm32::BufferedUart4::setBaudrate(uint32_t baudrate)
-{
-	// Enable clock
-	RCC->APB1ENR |= RCC_APB1ENR_UART4EN;
-	
-	UART4->CR1 = 0;
-	
-	// Enable USART in the interrupt controller and enable receive ready interrupt
-	NVIC->ISER[UART4_IRQn / 32] = 1 << (UART4_IRQn & 0x1F);
-	UART4->CR1 |= USART_CR1_RXNEIE;
-	
-	// Set baudrate
-	UART4->BRR = calculateBaudrateSettings(apbClk, baudrate);
-	
-	// Transmitter & Receiver-Enable, 8 Data Bits, 1 Stop Bit
-	UART4->CR1 |= USART_CR1_TE | USART_CR1_RE;
-	UART4->CR2 = 0;
-	UART4->CR3 = 0;
-	
-	UART4->CR1 |= USART_CR1_UE;		// Uart Enable
-}
-
-// ----------------------------------------------------------------------------
-void
-xpcc::stm32::BufferedUart4::write(const uint8_t *s, uint8_t n)
-{
-	while (n-- != 0) {
-		write(*s++);
-	}
-}
-
-// ----------------------------------------------------------------------------
 extern "C" void
 UART4_IRQHandler()
 {
@@ -156,6 +123,44 @@ UART4_IRQHandler()
 
 // ----------------------------------------------------------------------------
 void
+xpcc::stm32::BufferedUart4::setBaudrate(uint32_t baudrate,
+		uint32_t interruptPriority)
+{
+	// Enable clock
+	RCC->APB1ENR |= RCC_APB1ENR_UART4EN;
+	
+	UART4->CR1 = 0;
+	
+	// Set vector priority
+	NVIC_SetPriority(UART4_IRQn, interruptPriority);
+	
+	// Enable USART in the interrupt controller and enable receive ready interrupt
+	NVIC->ISER[UART4_IRQn / 32] = 1 << (UART4_IRQn & 0x1F);
+	
+	UART4->CR1 |= USART_CR1_RXNEIE;
+	
+	// Set baudrate
+	UART4->BRR = calculateBaudrateSettings(apbClk, baudrate);
+	
+	// Transmitter & Receiver-Enable, 8 Data Bits, 1 Stop Bit
+	UART4->CR1 |= USART_CR1_TE | USART_CR1_RE;
+	UART4->CR2 = 0;
+	UART4->CR3 = 0;
+	
+	UART4->CR1 |= USART_CR1_UE;		// Uart Enable
+}
+
+// ----------------------------------------------------------------------------
+void
+xpcc::stm32::BufferedUart4::write(const uint8_t *s, uint8_t n)
+{
+	while (n-- != 0) {
+		write(*s++);
+	}
+}
+
+// ----------------------------------------------------------------------------
+void
 xpcc::stm32::BufferedUart4::write(uint8_t c)
 {
 	uint16_t i(0);
@@ -165,7 +170,7 @@ xpcc::stm32::BufferedUart4::write(uint8_t c)
 		// but do not wait infinitely
 	}
 	
-	// disable interrupts
+	// Disable interrupts while enabling the transmit interrupt
 	atomic::Lock lock;
 	
 	// Transmit Data Register Empty Interrupt Enable

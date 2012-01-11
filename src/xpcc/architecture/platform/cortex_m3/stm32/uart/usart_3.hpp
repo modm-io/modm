@@ -143,9 +143,10 @@ namespace xpcc
 		class BufferedUsart3 : public UartBase
 		{
 		public:
-			BufferedUsart3(uint32_t baudrate)
+			BufferedUsart3(uint32_t baudrate,
+					uint32_t interruptPriority)
 			{
-				setBaudrate(baudrate);
+				setBaudrate(baudrate, interruptPriority);
 			}
 			
 			enum Mapping
@@ -168,11 +169,14 @@ namespace xpcc
 			configurePins(Mapping mapping);
 			
 			/**
-			 * \brief	Set baudrate
-			 * \param	baudrate	desired baud rate
+			 * Set baudrate.
+			 * 
+			 * \param	baudrate	Desired baud rate (e.g. 115200)
+			 * \param	interruptPriority
+			 * 			Interrupt vector priority (0=highest to 15=lowest)
 			 */
 			static void
-			setBaudrate(uint32_t baudrate);
+			setBaudrate(uint32_t baudrate, uint32_t interruptPriority);
 			
 			/**
 			 * \brief	Send a single byte

@@ -207,7 +207,7 @@ xpcc::stm32::{{ className }}{{ id }}::configurePins(Mapping mapping)
 }
 {%- endmacro -%}
 
-{%- macro setBaudrate(className, id, moduleName, enableReceiveReadyInterrupt = False) -%}
+{%- macro setBaudrate(className, id, moduleName) -%}
 void
 xpcc::stm32::{{ className }}{{ id }}::setBaudrate(uint32_t baudrate)
 {
@@ -221,13 +221,6 @@ xpcc::stm32::{{ className }}{{ id }}::setBaudrate(uint32_t baudrate)
 	{%- endif %}
 	
 	{{ moduleName }}{{ id }}->CR1 = 0;
-	
-	{% if enableReceiveReadyInterrupt -%}
-	// Enable USART in the interrupt controller and enable receive ready interrupt
-	NVIC->ISER[{{ moduleName }}{{ id }}_IRQn / 32] = 1 << ({{ moduleName }}{{ id }}_IRQn & 0x1F);
-	{{ moduleName }}{{ id }}->CR1 |= USART_CR1_RXNEIE;
-	
-	{% endif  -%}
 	
 	// Set baudrate
 	{{ moduleName }}{{ id }}->BRR = calculateBaudrateSettings(apbClk, baudrate);

@@ -50,7 +50,7 @@ namespace xpcc
 		 * extern "C" void
 		 * TIM3_IRQHandler(void)
 		 * {
-		 *     Timer3::acknowledgeInterrupt(Timer3::...);
+		 *     Timer3::resetInterruptFlag(Timer3::...);
 		 *     
 		 *     ...
 		 * }
@@ -107,11 +107,9 @@ namespace xpcc
 			{
 				SLAVE_DISABLED	= 0, // Slave mode disabled - if CEN = '1' then the prescaler is clocked directly by the internal clock.
 				
-				
 				SLAVE_ENCODER_1	= TIM_SMCR_SMS_0, // Counter counts up/down on TI2FP2 edge depending on TI1FP1 level.
 				SLAVE_ENCODER_2	= TIM_SMCR_SMS_1, // Counter counts up/down on TI1FP1 edge depending on TI2FP2 level.
 				SLAVE_ENCODER_3	= TIM_SMCR_SMS_1 | TIM_SMCR_SMS_0, // Counter counts up/down on both TI1FP1 and TI2FP2 edges depending on the level of the other input.
-				
 				
 				SLAVE_RESET		= TIM_SMCR_SMS_2, // Rising edge of the selected trigger input (TRGI) reinitializes the counter and generates an update of the registers.
 				SLAVE_GATED		= TIM_SMCR_SMS_2 | TIM_SMCR_SMS_0, // The counter clock is enabled when the trigger input (TRGI) is high. The counter stops (but is not reset) as soon as the trigger becomes low. Both start and stop of the counter are controlled.
@@ -138,7 +136,8 @@ namespace xpcc
 			}
 			
 			static void
-			setMode(Mode mode, SlaveMode slaveMode = SLAVE_DISABLED, SlaveModeTrigger slaveModeTrigger = (SlaveModeTrigger)0);
+			setMode(Mode mode, SlaveMode slaveMode = SLAVE_DISABLED,
+					SlaveModeTrigger slaveModeTrigger = (SlaveModeTrigger) 0);
 			
 			static inline void
 			setPrescaler(uint16_t prescaler)
@@ -206,19 +205,9 @@ namespace xpcc
 			}
 			
 		public:
-			/**
-			 * Enables or disables the Interrupt Vector.
-			 * 
-			 * TODO set priority!
-			 */
 			static void
-			setInterruptVectorEnabled(bool enable);
+			enableInterruptVector(bool enable, uint32_t priority);
 			
-			/**
-			 * Enables interrupts. Don't forget to enable Interrupt Vector.
-			 * 
-			 * \param interrupts	Interrupts to enable
-			 */
 			static inline void
 			enableInterrupt(Interrupt interrupts)
 			{
@@ -243,14 +232,14 @@ namespace xpcc
 				TIM3->DIER &= ~dmaRequests;
 			}
 			
-			static inline StateFlag
-			getState()
+			static inline InterruptFlag
+			getInterruptFlags()
 			{
-				return (StateFlag)TIM3->SR;
+				return (InterruptFlag) TIM3->SR;
 			}
 			
 			static inline void
-			resetState(StateFlag flags)
+			resetInterruptFlag(InterruptFlag flags)
 			{
 				// Flags are cleared by writing a zero to the flag position.
 				// Writing a one is ignored.

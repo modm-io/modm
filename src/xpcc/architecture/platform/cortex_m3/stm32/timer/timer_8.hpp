@@ -64,7 +64,7 @@ namespace xpcc
 		 * extern "C" void
 		 * TIM8_UP_IRQHandler(void)
 		 * {
-		 *     Timer8::acknowledgeInterrupt(Timer8::...);
+		 *     Timer8::resetInterruptFlag(Timer8::...);
 		 *     
 		 *     ...
 		 * }
@@ -205,12 +205,20 @@ namespace xpcc
 			
 		public:
 			/**
-			 * Enables or disables Interrupt Vectors. You must pass
-			 * an or conjuncted list of entries in enum Interrupt. Interrupt vectors
-			 * which fit to passed interrupts will be enabled, others will be disabled.
+			 * Enables or disables Interrupt Vectors.
+			 * 
+			 * You must pass an or-conjuncted list of entries from the
+			 * Interrupt enum. Interrupt vectors which fit to 
+			 * will be enabled (or disabled if \p enable = false).
+			 * 
+			 * The Adanvced timers have four interrupt vectors:
+			 * - UP (used by INTERRUPT_UPDATE)
+			 * - BRK (used by INTERRUPT_BREAK)
+			 * - TRG_COM (used by INTERRUPT_TRIGGER and INTERRUPT_COM)
+			 * - CC (used by INTERRUPT_CAPTURE_COMPARE_1..3)
 			 */
 			static void
-			setInterruptVectorEnabled(Interrupt interrupts);
+			enableInterruptVector(Interrupt interrupts, bool enable, uint32_t priority);
 			
 			static inline void
 			enableInterrupt(Interrupt interrupts)
@@ -225,22 +233,25 @@ namespace xpcc
 			}
 			
 			static inline void
-			enableDmaRequest(DmaRequestEnable dmaRequests){
+			enableDmaRequest(DmaRequestEnable dmaRequests)
+			{
 				TIM8->DIER |= dmaRequests;
 			}
 			
 			static inline void
-			disableDmaRequest(DmaRequestEnable dmaRequests){
+			disableDmaRequest(DmaRequestEnable dmaRequests)
+			{
 				TIM8->DIER &= ~dmaRequests;
 			}
 			
-			static inline StateFlag
-			getState(){
-				return (StateFlag)TIM8->SR;
+			static inline InterruptFlag
+			getInterruptFlags()
+			{
+				return (InterruptFlag) TIM8->SR;
 			}
 			
 			static inline void
-			resetState(StateFlag flags)
+			resetInterruptFlag(InterruptFlag flags)
 			{
 				// Flags are cleared by writing a zero to the flag position.
 				// Writing a one is ignored.

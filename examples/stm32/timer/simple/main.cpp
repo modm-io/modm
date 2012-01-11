@@ -22,7 +22,7 @@ initClock()
 extern "C" void
 TIM3_IRQHandler(void)
 {
-	Timer3::resetState(Timer3::FLAG_UPDATE);
+	Timer3::resetInterruptFlag(Timer3::FLAG_UPDATE);
 	
 	LedStat::toggle();
 }

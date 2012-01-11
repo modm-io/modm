@@ -389,8 +389,10 @@ Reset_Handler(void)
 		NVIC->IP[i] = (priority & 0xF) << 4;
 	}
 	
-	// Lower systick interrupt priority to lowest level
-	NVIC_SetPriority(SysTick_IRQn, 0xf);
+	// Set the PRIGROUP[10:8] bits to
+	// - 4 bits for pre-emption priority,
+	// - 0 bits for subpriority
+	SCB->AIRCR = 0x05FA0000 | 0x300;
 	
 	// enable clock for alternative functions
 	RCC->APB2ENR  |=  RCC_APB2ENR_AFIOEN;

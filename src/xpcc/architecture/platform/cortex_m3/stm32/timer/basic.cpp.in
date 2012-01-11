@@ -34,12 +34,17 @@
 
 #include "timer_{{ id }}.hpp"
 
+#include <xpcc_config.hpp>
+
 #if defined(STM32F10X_HD) || defined(STM32F10X_XL) || \
 	defined(STM32F10X_CL) || \
 	defined(STM32F2XX) || defined(STM32F4XX)
 
-#include <xpcc_config.hpp>
-
+{% if id == 6 %}
+#if defined(STM32F2XX) || defined(STM32F4XX)
+#	define TIM6_IRQn	TIM6_DAC_IRQn
+#endif
+{% endif %}
 // ----------------------------------------------------------------------------
 void
 xpcc::stm32::Timer{{ id }}::enable()
@@ -84,8 +89,8 @@ xpcc::stm32::Timer{{ id }}::setPeriod(uint32_t microseconds, bool autoApply)
 	uint32_t cycles = microseconds * 84;	// APB1 clock * 2 in MHz = 42 * 2 = 84
 #else
 	uint32_t cycles = microseconds * (
-		((STM32_APB1_FREQUENCY==STM32_AHB_FREQUENCY)?1:2) * 
-		STM32_APB1_FREQUENCY / 1000000UL);
+		((STM32_APB1_FREQUENCY == STM32_AHB_FREQUENCY) ? 1 : 2) * 
+			STM32_APB1_FREQUENCY / 1000000UL);
 #endif
 	
 	uint16_t prescaler = (cycles + 65535) / 65536;	// always round up
@@ -106,20 +111,19 @@ xpcc::stm32::Timer{{ id }}::setPeriod(uint32_t microseconds, bool autoApply)
 
 // ----------------------------------------------------------------------------
 void
-xpcc::stm32::Timer{{ id }}::enableInterrupt(Interrupt interrupt)
+xpcc::stm32::Timer{{ id }}::enableInterruptVector(bool enable, uint32_t priority)
 {
-	// register IRQ at the NVIC
-	{% if id == 6 %}
-#if defined(STM32F2XX) || defined(STM32F4XX)
-	NVIC_EnableIRQ(TIM{{ id }}_DAC_IRQn);
-#else
-	NVIC_EnableIRQ(TIM{{ id }}_IRQn);
-#endif
-	{% else %}
-	NVIC_EnableIRQ(TIM{{ id }}_IRQn);
-	{% endif %}
-	
-	TIM{{ id }}->DIER |= interrupt;
+	if (enable)
+	{
+		// Set vector priority
+		NVIC_SetPriority(TIM{{ id }}_IRQn, priority);
+		
+		// register IRQ at the NVIC
+		NVIC_EnableIRQ(TIM{{ id }}_IRQn);
+	}
+	else {
+		NVIC_DisableIRQ(TIM{{ id }}_IRQn);
+	}
 }
 
 #endif

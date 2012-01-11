@@ -50,7 +50,7 @@ namespace xpcc
 		 * extern "C" void
 		 * TIM7_IRQHandler(void)
 		 * {
-		 *     Timer7::acknowledgeInterrupt(Timer7::...);
+		 *     Timer7::resetInterruptFlag(Timer7::FLAG_UPDATE);
 		 *     
 		 *     ...
 		 * }
@@ -122,19 +122,28 @@ namespace xpcc
 			}
 			
 			static void
-			enableInterrupt(Interrupt interrupt);
+			enableInterruptVector(bool enable, uint32_t priority);
 			
-			static void
+			static inline void
+			enableInterrupt(Interrupt interrupt)
+			{
+				TIM7->DIER |= interrupt;
+			}
+			
+			static inline void
 			disableInterrupt(Interrupt interrupt)
 			{
 				TIM7->DIER &= ~interrupt;
 			}
 			
-			//static StateFlag
-			//getState();
+			static inline InterruptFlag
+			getInterruptFlags()
+			{
+				return static_cast<InterruptFlag>(TIM7->SR);
+			}
 			
 			static void
-			resetState(StateFlag interrupt)
+			resetInterruptFlag(InterruptFlag interrupt)
 			{
 				// Flags are cleared by writing a zero to the flag position.
 				// Writing a one is ignored.

@@ -54,7 +54,7 @@ namespace xpcc
 				INTERRUPT_UPDATE = TIM_DIER_UIE,
 			};
 
-			enum StateFlag
+			enum InterruptFlag
 			{
 				FLAG_UPDATE = TIM_SR_UIF,
 			};
@@ -177,11 +177,25 @@ namespace xpcc
 			 */
 			static inline void
 			setValue(uint16_t value);
-
+			
 			/**
-			 * Enables interrupts. Don't forget to enable Interrupt Vector. These methods are provided by Subclasses.
-			 *
-			 * \param interrupts	Interrupts to enable
+			 * Enables or disables the Interrupt Vector.
+			 * 
+			 * \param	enable
+			 * 				Enable/disable the interrupt vector
+			 * \param	priority
+			 * 				Priority of the interrupt vector
+			 * 				(0=highest to 15=lowest).
+			 */
+			static void
+			enableInterruptVector(bool enable, uint8_t priority);
+			
+			/**
+			 * Enables interrupts. Don't forget to enable the Interrupt Vector.
+			 * 
+			 * \param	interrupts		Interrupts to enable
+			 * 
+			 * \see		enableInterruptVector()
 			 */
 			static void
 			enableInterrupt(Interrupt interrupt);
@@ -195,32 +209,36 @@ namespace xpcc
 			disableInterrupt(Interrupt interrupt);
 
 			/**
-			 * Returns a bitmap of the enum StateFlag. Use this method while executing
-			 * an interrupt or in any other situation where you want to know which of the state flags are set.
+			 * Returns a bitmap of the enum StateFlag. Use this method while
+			 * executing an interrupt or in other situations where you want to
+			 * know which of the flags are set.
 			 *
-			 * If a flag is a cause of an enabled interrupt
-			 * (and InterruptVector is enabled) then interrupt will be triggered as long
+			 * If a flag is a cause of an enabled interrupt (and the Interrupt
+			 * Vector is enabled) then interrupt will be triggered as long
 			 * the flag is set.
 			 *
-			 * You cannot use switch statement for the returned value, since if more then one flag is set none
-			 * of enumeration values will fit to the returned one.
+			 * \warning		You cannot use a switch statement for the returned
+			 * 				value, since multiple flags may be set!
 			 *
-			 * StateFlag sf = TIM{{ id }}::getState()
-			 * if (sf & TIM{{ id }}::FLAG_XX){
-			 * 		// flag was set, clear the flag since flags are set by hardware, but have to be cleared by software
-			 * 		TIM{{ id }}::resetState(TIM{{ id }}::FLAG_XX)
+			 * \code
+			 * InterruptFlag flags = Timer{{ id }}::getInterruptFlags()
+			 * if (flags & Timer{{ id }}::FLAG_XX){
+			 *     // Flag was set, clear the flag since flags are set by
+			 *     // hardware, but have to be cleared by software
+			 *     Timer{{ id }}::resetInterruptFlags(TIM{{ id }}::FLAG_XX)
 			 * }
+			 * \endcode
 			 */
-			static StateFlag
-			getState();
-
+			static InterruptFlag
+			getInterruptFlags();
+			
 			/**
 			 * Clears one or multiple flags.
 			 *
 			 * \param flags		Bitmap of StateFlag
 			 */
 			static void
-			resetState(StateFlag flags);
+			resetInterruptFlags(InterruptFlag flags);
 		};
 
 		class GeneralPurposeTimer : public BasicTimer
@@ -249,7 +267,7 @@ namespace xpcc
 				INTERRUPT_BREAK = TIM_DIER_BIE,
 			};
 
-			enum StateFlag
+			enum InterruptFlag
 			{
 				FLAG_UPDATE = TIM_SR_UIF,
 				FLAG_CAPTURE_COMPARE_1 = TIM_SR_CC1IF,
@@ -355,9 +373,12 @@ namespace xpcc
 			setMode(Mode mode);
 			
 		public:
-			// TODO implement this function
-			//static void
-			//configureInputChannel(uint32_t channel, ...);
+			/**
+			 * TODO Description
+			 */
+			void
+			configureInputChannel(uint32_t channel, InputCaptureMapping input,
+					InputCapturePrescaler prescaler, InputCapturePolarity polarity, uint8_t filter);
 
 			/**
 			 * Configure output channel 1..4.

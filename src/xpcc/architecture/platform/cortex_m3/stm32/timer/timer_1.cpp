@@ -211,38 +211,51 @@ nvicDisableInterrupt(IRQn_Type IRQn)
 
 // ----------------------------------------------------------------------------
 void
-xpcc::stm32::Timer1::setInterruptVectorEnabled(Interrupt interrupts)
+xpcc::stm32::Timer1::enableInterruptVector(Interrupt interrupts, bool enable, uint32_t priority)
 {
-	// register IRQs at the NVIC
-	if (interrupts & (INTERRUPT_UPDATE)) {
-		nvicEnableInterrupt(TIM1_UP_IRQn);
+	if (enable)
+	{
+		if (interrupts & INTERRUPT_UPDATE) {
+			NVIC_SetPriority(TIM1_UP_IRQn, priority);
+			nvicEnableInterrupt(TIM1_UP_IRQn);
+		}
+		
+		if (interrupts & INTERRUPT_BREAK) {
+			NVIC_SetPriority(TIM1_BRK_IRQn, priority);
+			nvicEnableInterrupt(TIM1_BRK_IRQn);
+		}
+		
+		if (interrupts & (INTERRUPT_COM | INTERRUPT_TRIGGER)) {
+			NVIC_SetPriority(TIM1_TRG_COM_IRQn, priority);
+			nvicEnableInterrupt(TIM1_TRG_COM_IRQn);
+		}	
+		
+		if (interrupts & 
+				(INTERRUPT_CAPTURE_COMPARE_1 | INTERRUPT_CAPTURE_COMPARE_2 |
+				 INTERRUPT_CAPTURE_COMPARE_3 | INTERRUPT_CAPTURE_COMPARE_4)) {
+			NVIC_SetPriority(TIM1_CC_IRQn, priority);
+			nvicEnableInterrupt(TIM1_CC_IRQn);
+		}
 	}
-	else{
-		nvicDisableInterrupt(TIM1_UP_IRQn);
+	else
+	{
+		if (interrupts & INTERRUPT_UPDATE) {
+			nvicDisableInterrupt(TIM1_UP_IRQn);
+		}
+		
+		if (interrupts & INTERRUPT_BREAK) {
+			nvicDisableInterrupt(TIM1_BRK_IRQn);
+		}
+		
+		if (interrupts & (INTERRUPT_COM | INTERRUPT_TRIGGER)) {
+			nvicDisableInterrupt(TIM1_TRG_COM_IRQn);
+		}
+		
+		if (interrupts & 
+				(INTERRUPT_CAPTURE_COMPARE_1 | INTERRUPT_CAPTURE_COMPARE_2 |
+				 INTERRUPT_CAPTURE_COMPARE_3 | INTERRUPT_CAPTURE_COMPARE_4)) {
+			nvicDisableInterrupt(TIM1_CC_IRQn);
+		}
 	}
-	
-	if (interrupts & INTERRUPT_BREAK) {
-		nvicEnableInterrupt(TIM1_BRK_IRQn);
-	}
-	else{
-		nvicDisableInterrupt(TIM1_BRK_IRQn);
-	}
-	
-	if (interrupts & (INTERRUPT_COM | INTERRUPT_TRIGGER)) {
-		nvicEnableInterrupt(TIM1_TRG_COM_IRQn);
-	}	
-	else{
-		nvicDisableInterrupt(TIM1_TRG_COM_IRQn);
-	}
-	
-	if (interrupts & 
-			(INTERRUPT_CAPTURE_COMPARE_1 | INTERRUPT_CAPTURE_COMPARE_2 |
-			INTERRUPT_CAPTURE_COMPARE_3 | INTERRUPT_CAPTURE_COMPARE_4)) {
-		nvicEnableInterrupt(TIM1_CC_IRQn);
-	}
-	else{
-		nvicDisableInterrupt(TIM1_CC_IRQn);
-	}
-	
 }
 

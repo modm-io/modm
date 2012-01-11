@@ -66,7 +66,8 @@ xpcc::stm32::Timer2::disable()
 
 // ----------------------------------------------------------------------------
 void
-xpcc::stm32::Timer2::setMode(Mode mode, SlaveMode slaveMode, SlaveModeTrigger slaveModeTrigger)
+xpcc::stm32::Timer2::setMode(Mode mode, SlaveMode slaveMode,
+		SlaveModeTrigger slaveModeTrigger)
 {
 	// disable timer
 	TIM2->CR1 = 0;
@@ -89,8 +90,8 @@ xpcc::stm32::Timer2::setPeriod(uint32_t microseconds, bool autoApply)
 	// This will be inaccurate for non-smooth frequencies (last six digits
 	// unequal to zero)
 	uint32_t cycles = microseconds * (
-			((STM32_APB1_FREQUENCY==STM32_AHB_FREQUENCY)?1:2) * 
-			STM32_APB1_FREQUENCY / 1000000UL);
+			((STM32_APB1_FREQUENCY == STM32_AHB_FREQUENCY) ? 1 : 2) * 
+					STM32_APB1_FREQUENCY / 1000000UL);
 	uint16_t prescaler = (cycles + 65535) / 65536;	// always round up
 	uint16_t overflow = cycles / prescaler;
 	
@@ -110,7 +111,8 @@ xpcc::stm32::Timer2::setPeriod(uint32_t microseconds, bool autoApply)
 // ----------------------------------------------------------------------------
 void
 xpcc::stm32::Timer2::configureInputChannel(uint32_t channel,
-		InputCaptureMapping input, InputCapturePrescaler prescaler, InputCapturePolarity polarity, uint8_t filter)
+		InputCaptureMapping input, InputCapturePrescaler prescaler,
+		InputCapturePolarity polarity, uint8_t filter)
 {
 	channel -= 1;	// 1..4 -> 0..3
 	
@@ -182,12 +184,17 @@ xpcc::stm32::Timer2::configureOutputChannel(uint32_t channel,
 
 // ----------------------------------------------------------------------------
 void
-xpcc::stm32::Timer2::setInterruptVectorEnabled(bool enable)
+xpcc::stm32::Timer2::enableInterruptVector(bool enable, uint32_t priority)
 {
-	if (enable)
+	if (enable) {
+		// Set priority for the interrupt vector
+		NVIC_SetPriority(TIM2_IRQn, priority);
+		
 		// register IRQ at the NVIC
 		NVIC_EnableIRQ(TIM2_IRQn);
-	else
+	}
+	else {
 		NVIC_DisableIRQ(TIM2_IRQn);
+	}
 }
 

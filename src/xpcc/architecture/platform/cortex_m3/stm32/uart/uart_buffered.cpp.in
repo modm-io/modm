@@ -51,12 +51,6 @@ namespace
 {{ template.configurePins('Buffered'+className, id) }}
 
 // ----------------------------------------------------------------------------
-{{ template.setBaudrate('Buffered'+className, id, className | upper, True) }}
-
-// ----------------------------------------------------------------------------
-{{ template.writeBlock('Buffered'+className, id) }}
-
-// ----------------------------------------------------------------------------
 extern "C" void
 {{ className | upper }}{{ id }}_IRQHandler()
 {
@@ -93,6 +87,44 @@ extern "C" void
 
 // ----------------------------------------------------------------------------
 void
+xpcc::stm32::Buffered{{ className }}{{ id }}::setBaudrate(uint32_t baudrate,
+		uint32_t interruptPriority)
+{
+	// Enable clock
+	{% if id in [1, 6] -%}
+	RCC->APB2ENR |= RCC_APB2ENR_USART{{ id }}EN;
+	{%- elif id in [2, 3] -%}
+	RCC->APB1ENR |= RCC_APB1ENR_USART{{ id }}EN;
+	{%- elif id in [4, 5] -%}
+	RCC->APB1ENR |= RCC_APB1ENR_UART{{ id }}EN;
+	{%- endif %}
+	
+	{{ className | upper}}{{ id }}->CR1 = 0;
+	
+	// Set vector priority
+	NVIC_SetPriority({{ className | upper}}{{ id }}_IRQn, interruptPriority);
+	
+	// Enable USART in the interrupt controller and enable receive ready interrupt
+	NVIC->ISER[{{ className | upper}}{{ id }}_IRQn / 32] = 1 << ({{ className | upper}}{{ id }}_IRQn & 0x1F);
+	
+	{{ className | upper}}{{ id }}->CR1 |= USART_CR1_RXNEIE;
+	
+	// Set baudrate
+	{{ className | upper}}{{ id }}->BRR = calculateBaudrateSettings(apbClk, baudrate);
+	
+	// Transmitter & Receiver-Enable, 8 Data Bits, 1 Stop Bit
+	{{ className | upper}}{{ id }}->CR1 |= USART_CR1_TE | USART_CR1_RE;
+	{{ className | upper}}{{ id }}->CR2 = 0;
+	{{ className | upper}}{{ id }}->CR3 = 0;
+	
+	{{ className | upper}}{{ id }}->CR1 |= USART_CR1_UE;		// Uart Enable
+}
+
+// ----------------------------------------------------------------------------
+{{ template.writeBlock('Buffered'+className, id) }}
+
+// ----------------------------------------------------------------------------
+void
 xpcc::stm32::Buffered{{ className }}{{ id }}::write(uint8_t c)
 {
 	uint16_t i(0);
@@ -102,7 +134,7 @@ xpcc::stm32::Buffered{{ className }}{{ id }}::write(uint8_t c)
 		// but do not wait infinitely
 	}
 	
-	// disable interrupts
+	// Disable interrupts while enabling the transmit interrupt
 	atomic::Lock lock;
 	
 	// Transmit Data Register Empty Interrupt Enable

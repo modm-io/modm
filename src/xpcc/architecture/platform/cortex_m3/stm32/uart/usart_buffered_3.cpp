@@ -102,39 +102,6 @@ xpcc::stm32::BufferedUsart3::configurePins(Mapping mapping)
 }
 
 // ----------------------------------------------------------------------------
-void
-xpcc::stm32::BufferedUsart3::setBaudrate(uint32_t baudrate)
-{
-	// Enable clock
-	RCC->APB1ENR |= RCC_APB1ENR_USART3EN;
-	
-	USART3->CR1 = 0;
-	
-	// Enable USART in the interrupt controller and enable receive ready interrupt
-	NVIC->ISER[USART3_IRQn / 32] = 1 << (USART3_IRQn & 0x1F);
-	USART3->CR1 |= USART_CR1_RXNEIE;
-	
-	// Set baudrate
-	USART3->BRR = calculateBaudrateSettings(apbClk, baudrate);
-	
-	// Transmitter & Receiver-Enable, 8 Data Bits, 1 Stop Bit
-	USART3->CR1 |= USART_CR1_TE | USART_CR1_RE;
-	USART3->CR2 = 0;
-	USART3->CR3 = 0;
-	
-	USART3->CR1 |= USART_CR1_UE;		// Uart Enable
-}
-
-// ----------------------------------------------------------------------------
-void
-xpcc::stm32::BufferedUsart3::write(const uint8_t *s, uint8_t n)
-{
-	while (n-- != 0) {
-		write(*s++);
-	}
-}
-
-// ----------------------------------------------------------------------------
 extern "C" void
 USART3_IRQHandler()
 {
@@ -171,6 +138,44 @@ USART3_IRQHandler()
 
 // ----------------------------------------------------------------------------
 void
+xpcc::stm32::BufferedUsart3::setBaudrate(uint32_t baudrate,
+		uint32_t interruptPriority)
+{
+	// Enable clock
+	RCC->APB1ENR |= RCC_APB1ENR_USART3EN;
+	
+	USART3->CR1 = 0;
+	
+	// Set vector priority
+	NVIC_SetPriority(USART3_IRQn, interruptPriority);
+	
+	// Enable USART in the interrupt controller and enable receive ready interrupt
+	NVIC->ISER[USART3_IRQn / 32] = 1 << (USART3_IRQn & 0x1F);
+	
+	USART3->CR1 |= USART_CR1_RXNEIE;
+	
+	// Set baudrate
+	USART3->BRR = calculateBaudrateSettings(apbClk, baudrate);
+	
+	// Transmitter & Receiver-Enable, 8 Data Bits, 1 Stop Bit
+	USART3->CR1 |= USART_CR1_TE | USART_CR1_RE;
+	USART3->CR2 = 0;
+	USART3->CR3 = 0;
+	
+	USART3->CR1 |= USART_CR1_UE;		// Uart Enable
+}
+
+// ----------------------------------------------------------------------------
+void
+xpcc::stm32::BufferedUsart3::write(const uint8_t *s, uint8_t n)
+{
+	while (n-- != 0) {
+		write(*s++);
+	}
+}
+
+// ----------------------------------------------------------------------------
+void
 xpcc::stm32::BufferedUsart3::write(uint8_t c)
 {
 	uint16_t i(0);
@@ -180,7 +185,7 @@ xpcc::stm32::BufferedUsart3::write(uint8_t c)
 		// but do not wait infinitely
 	}
 	
-	// disable interrupts
+	// Disable interrupts while enabling the transmit interrupt
 	atomic::Lock lock;
 	
 	// Transmit Data Register Empty Interrupt Enable

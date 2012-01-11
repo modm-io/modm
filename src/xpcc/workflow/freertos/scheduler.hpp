@@ -41,11 +41,31 @@ namespace xpcc
 	namespace freertos
 	{
 		/**
-		 * \brief	
+		 * FreeRTOS Scheduler	
 		 * 
-		 * vTaskEndScheduler() will not work for the STM32 port of FreeRTOS
-		 * therefore no stop() method is implemented here. See the README
-		 * file in ext/freertos/port for more details.
+		 * <h2>Interrupt Priorities</h2>
+		 * 
+		 * The STM32 implements only four priority bits. The lower four bits of
+		 * the eight bit priority register are unused. A lower value means a
+		 * higher priority.
+	 	 * Therefore 0 (=0) is the highest priority and 15 (=15 << 4 => 0xf0)
+	 	 * is the lowest priority.
+		 * 
+		 * The Kernel has the lowest possible priority 15 to make sure that it
+		 * is not interrupting any other interrupt. During the execution of
+		 * an API function the priority is raised to 11.
+		 * 
+		 * Any interrupt that calls an API function must have a priority
+		 * between 15 and 11, otherwise the system might crash.
+		 *
+		 * Interrupts that do not use any FreeRTOS API functions can use any
+		 * interrupt priority. If the priority is higher (lower value) than 11
+		 * the execution won't be delayed by anything the kernel is doing.
+		 * 
+		 * 
+		 * \warning	vTaskEndScheduler() will not work for the STM32 port of
+		 * 			FreeRTOS therefore no stop() method is implemented here.
+		 * 			See the README file in ext/freertos/port for more details.
 		 * 
 		 * \ingroup	freertos
 		 */
@@ -55,9 +75,12 @@ namespace xpcc
 			/**
 			 * \brief	Starts the real time kernel
 			 * 
-			 * This function will never return.
+			 * Starts the SysTick Timer (1ms periode) and attaches to its
+			 * interrupt.
 			 * 
 			 * The idle task is created automatically when schedule() is called.
+			 * 
+			 * \warning	This function will never return.
 			 */
 			static inline void
 			schedule()
