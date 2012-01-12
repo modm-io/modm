@@ -31,6 +31,8 @@
 // ----------------------------------------------------------------------------
 
 #include <stdlib.h>
+
+#include <xpcc/utils/arithmetic_traits.hpp>
 #include <xpcc/architecture/driver/accessor/flash.hpp>
 
 #include "iostream.hpp"

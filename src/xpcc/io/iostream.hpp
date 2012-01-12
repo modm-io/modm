@@ -185,6 +185,8 @@ namespace xpcc
 		}
 #endif
 		
+// The 64-bit types on the AVR are extremely slow and are
+// therefore excluded here
 #if !defined(XPCC__CPU_AVR)
 		ALWAYS_INLINE IOStream&
 		operator << (const uint64_t& v)
@@ -211,7 +213,11 @@ namespace xpcc
 		ALWAYS_INLINE IOStream&
 		operator << (const double& v)
 		{
-			this->writeFloat(v);
+#if defined(XPCC__CPU_AVR)
+			this->writeFloat(static_cast<float>(v));
+#else
+			this->writeDouble(v);
+#endif
 			return *this;
 		}
 
@@ -347,9 +353,13 @@ namespace xpcc
 		void
 		writeHex(uint8_t value);
 		
-		template<typename T>
 		void
-		writeFloat(const T& value);
+		writeFloat(const float& value);
+		
+#if !defined(XPCC__CPU_AVR)
+		void
+		writeDouble(const double& value);
+#endif
 
 	private :
 		enum Mode
@@ -414,7 +424,5 @@ namespace xpcc
 	}
 };
 
-
-#include "iostream_impl.hpp"
 
 #endif // XPCC__IOSTREAM_HPP

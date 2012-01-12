@@ -149,6 +149,9 @@ def generate(env, **kw):
 		"-fno-tree-loop-optimize",
 		"-fno-unwind-tables",
 		"-finline-limit=10000",
+		# All constants are assumed to be float (32-bit) and not
+		# double (32-bit) by default.
+		"-fsingle-precision-constant",
 		"-mlong-calls",		# when using ".fastcode" without longcall
 		"-Wall",
 		"-Wformat",

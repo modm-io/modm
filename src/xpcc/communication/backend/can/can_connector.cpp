@@ -30,6 +30,8 @@
  */
 // ----------------------------------------------------------------------------
 
+#include <stdlib.h>
+
 #include "can_connector.hpp"
 
 // ----------------------------------------------------------------------------
@@ -55,6 +57,7 @@ xpcc::CanConnectorBase::convertToIdentifier(const Header & header,
 			break;
 		default:
 			identifier = 0;
+			break;
 	}
 	
 	identifier = identifier << 1;
