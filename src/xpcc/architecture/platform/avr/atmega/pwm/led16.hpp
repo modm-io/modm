@@ -143,8 +143,8 @@ namespace xpcc
 				fadeTo(uint16_t time, float brightness);
 				
 				/**
-				 * Mimmics the behaviour of normal lamps, which take a small amount
-				 * of time until achiving full brightness.
+				 * Mimics the behaviour of normal lamps, which take a small amount
+				 * of time until achieving full brightness.
 				 * \param fade		set to false to switch the LED on without fading
 				 * \param fadeTime	specify the fade up time in ms
 				 */
@@ -152,7 +152,7 @@ namespace xpcc
 				on(uint16_t fadeTime=70);
 				
 				/**
-				 * Mimmics the behaviour of normal lamps, which take a small amount
+				 * Mimics the behaviour of normal lamps, which take a small amount
 				 * of time until fully extinguishing.
 				 * \param fade		set to false to switch the LED off without fading
 				 * \param fadeTime	specify the fade down time in ms

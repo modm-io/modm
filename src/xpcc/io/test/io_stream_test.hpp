@@ -113,6 +113,9 @@ public:
 
 	void
 	testHex3();
+	
+	void
+	testHex4();
 
 private:
 	xpcc::IOStream *stream;

@@ -47,7 +47,7 @@ namespace
 
 // ----------------------------------------------------------------------------
 void
-xpcc::atxmega::UartSpi{{ id }}::initialize()
+xpcc::atxmega::UartSpi{{ id }}::initialise()
 {
 	TXD::set();
 	TXD::setOutput();

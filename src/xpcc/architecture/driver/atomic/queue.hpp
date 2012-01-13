@@ -62,15 +62,28 @@ namespace xpcc
 			isFull();
 			
 			/**
-			 * \brief	Returns false if less than three elements
-			 * 			can be stored in queue. Only works with queue
-			 * 			with more than three elements. 
+			 * \returns	\c false if less than three elements
+			 * 			can be stored in queue.
+			 * 
+			 * Only works with queue with more than three elements. 
 			 */
 			bool
-			isNearFull();
+			isNearlyFull();
 
 			ALWAYS_INLINE bool
 			isEmpty();
+			
+			/**
+			 * Check if the queue is nearly empty.
+			 * 
+			 * \returns	\c true if less than three elements are stored
+			 * 			in the queue, \c false otherwise.
+			 *
+			 * Only works with queue with more than three elements.
+			 * TODO: calculations are approximate and may include off-by-one errors.
+			 */
+			bool
+			isNearlyEmpty();
 			
 			ALWAYS_INLINE uint8_t
 			getMaxSize();

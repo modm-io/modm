@@ -94,8 +94,8 @@ namespace xpcc
 			/**
 			 * \brief	Execute a command
 			 * 
-			 * \param command	Command
-			 * \param[in/out] buffer	Contains the parameters for the command
+			 * \param command			Command
+			 * \param[in,out] buffer	Contains the parameters for the command
 			 * 							and will be overwritten with the result.
 			 */
 			virtual Result

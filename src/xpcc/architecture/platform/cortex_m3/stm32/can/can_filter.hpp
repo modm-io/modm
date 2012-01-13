@@ -303,7 +303,7 @@ namespace xpcc
 			 * @param	fifo	FIFO assignment (message will be stored in Fifo 0 or Fifo 1)
 			 * 
 			 * @param	id		11 or 29-bit identifier
-			 * @param	mask	11 or 29-bit mask
+			 * @param	id2		11 or 29-bit identifier
 			 */
 			static ALWAYS_INLINE void
 			setIdentifierFilter(uint8_t bank, Fifo fifo, Identifier id, Identifier id2)
@@ -362,8 +362,10 @@ namespace xpcc
 			 * @param	bank	Number of the filter bank
 			 * @param	fifo	FIFO assignment (message will be stored in Fifo 0 or Fifo 1)
 			 * 
-			 * @param	id		11 or 29-bit identifier
-			 * @param	mask	11 or 29-bit mask
+			 * @param	id1		11 or 29-bit identifier
+			 * @param	id2		11 or 29-bit identifier
+			 * @param	id3		11 or 29-bit identifier
+			 * @param	id4		11 or 29-bit identifier
 			 */
 			static ALWAYS_INLINE void
 			setIdentifierFilterShort(uint8_t bank, Fifo fifo,

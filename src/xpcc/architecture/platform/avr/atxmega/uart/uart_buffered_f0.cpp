@@ -43,7 +43,10 @@
 #include "uart_f0.hpp"
 #include "xpcc_config.hpp"
 
+
 #ifdef USARTF0_RXC_vect
+#if UARTF0_RTS_PIN == -1
+// RTS_PIN = -1 deactivates flow control 
 
 namespace
 {
@@ -57,8 +60,9 @@ namespace
 }
 
 // ----------------------------------------------------------------------------
+#if UARTF0_RTS_PORT == -1
 ISR(USARTF0_RXC_vect)
-{	
+{		
 	// first save the errors
 	error |= USARTF0_STATUS & (USART_FERR_bm | USART_BUFOVF_bm | USART_PERR_bm);
 	// then read the buffer
@@ -82,29 +86,20 @@ ISR(USARTF0_DRE_vect)
 		txBuffer.pop();
 	}
 }
+#endif
 
 // ----------------------------------------------------------------------------
 void
-xpcc::atxmega::BufferedUartF0::setBaudrateRegister(uint16_t ubrr, bool doubleSpeed)
+xpcc::atxmega::BufferedUartF0::initialise()
 {
 	TXD::set();
 	TXD::setOutput();
 	
 	RXD::setInput();
 	
-	// interrupts should be disabled during initialization
+	// interrupts should be disabled during initialisation
 	atomic::Lock lock;
-	
-	// set baud rate
-	if (doubleSpeed) {
-		USARTF0.CTRLB = USART_CLK2X_bm;
-	}
-	else {
-		USARTF0.CTRLB = 0;
-	}
-	USARTF0.BAUDCTRLB = static_cast<uint8_t>(ubrr >> 8);
-	USARTF0.BAUDCTRLA = static_cast<uint8_t>(ubrr);
-	
+		
 	// enable receive complete interrupt
 	USARTF0.CTRLA = USART_RXCINTLVL_MED_gc;
 	
@@ -123,7 +118,7 @@ xpcc::atxmega::BufferedUartF0::write(uint8_t c)
 	while ( !txBuffer.push(c) && (i < 1000) ) {
 		++i;
 		// wait for a free slot in the buffer
-		// but do not wait infinity
+		// but do not wait infinitely
 	}
 	
 	// disable interrupts
@@ -137,7 +132,7 @@ xpcc::atxmega::BufferedUartF0::write(uint8_t c)
 void
 xpcc::atxmega::BufferedUartF0::write(const uint8_t *s, uint8_t n)
 {
-	while (--n != 0) {
+	while (n-- != 0) {
 		BufferedUartF0::write(*s++);
 	}
 }
@@ -215,5 +210,5 @@ xpcc::atxmega::BufferedUartF0::flushReceiveBuffer()
 //	return i;
 //}
 
-
+#endif
 #endif // USARTF0

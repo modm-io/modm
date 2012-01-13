@@ -63,7 +63,7 @@ xpcc::Ft245<PORT, RD, WR, RXF, TXE>::initialize()
 // ----------------------------------------------------------------------------
 template <typename PORT, typename RD, typename WR, typename RXF, typename TXE>
 bool
-xpcc::Ft245<PORT, RD, WR, RXF, TXE>::read(char &c)
+xpcc::Ft245<PORT, RD, WR, RXF, TXE>::read(uint8_t &c)
 {
 	// When RXF is high, do not read data from the FIFO
 	if (rxf.read()) {
@@ -82,7 +82,7 @@ xpcc::Ft245<PORT, RD, WR, RXF, TXE>::read(char &c)
 // ----------------------------------------------------------------------------
 template <typename PORT, typename RD, typename WR, typename RXF, typename TXE>
 uint8_t
-xpcc::Ft245<PORT, RD, WR, RXF, TXE>::read(char *buffer, uint8_t n)
+xpcc::Ft245<PORT, RD, WR, RXF, TXE>::read(uint8_t *buffer, uint8_t n)
 {
 	uint8_t rcvd = 0;
 	uint8_t delay = 20;		// TODO Make depend on CPU frequency
@@ -112,7 +112,7 @@ xpcc::Ft245<PORT, RD, WR, RXF, TXE>::read(char *buffer, uint8_t n)
 // ----------------------------------------------------------------------------
 template <typename PORT, typename RD, typename WR, typename RXF, typename TXE>
 void
-xpcc::Ft245<PORT, RD, WR, RXF, TXE>::write(char c)
+xpcc::Ft245<PORT, RD, WR, RXF, TXE>::write(uint8_t c)
 {
 	// When TXE is high do not write data into the FIFO
 	while (txe.read())
@@ -128,7 +128,7 @@ xpcc::Ft245<PORT, RD, WR, RXF, TXE>::write(char c)
 // ----------------------------------------------------------------------------
 template <typename PORT, typename RD, typename WR, typename RXF, typename TXE>
 void
-xpcc::Ft245<PORT, RD, WR, RXF, TXE>::write(const char *buffer, uint8_t n)
+xpcc::Ft245<PORT, RD, WR, RXF, TXE>::write(const uint8_t *buffer, uint8_t n)
 {
 	port.setOutput();
 	
@@ -136,28 +136,6 @@ xpcc::Ft245<PORT, RD, WR, RXF, TXE>::write(const char *buffer, uint8_t n)
 	{
 		wr.set();
 		port.write(*buffer++);
-
-		// When TXE is high do not write data into the FIFO
-		while (txe.read())
-			;
-		
-		// data is written to the FIFO on the falling edge of WR
-		wr.reset();
-	}
-	port.setInput();
-}
-
-// ----------------------------------------------------------------------------
-template <typename PORT, typename RD, typename WR, typename RXF, typename TXE>
-void
-xpcc::Ft245<PORT, RD, WR, RXF, TXE>::write(const char *s)
-{
-	port.setOutput();
-	char c;
-	while ((c = *s++))
-	{
-		wr.set();
-		port.write(c);
 
 		// When TXE is high do not write data into the FIFO
 		while (txe.read())

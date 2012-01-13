@@ -101,7 +101,11 @@
 	#define	CONCAT4(a,b,c,d)	CONCAT4_(a,b,c,d)
 	#define	CONCAT4_(a,b,c,d)	CONCAT4__(a,b,c,d)
 	#define	CONCAT4__(a,b,c,d)	a ## b ## c ## d
-	
+
+	#define	CONCAT5(a,b,c,d,e)		CONCAT5_(a,b,c,d,e)
+	#define	CONCAT5_(a,b,c,d,e)		CONCAT5__(a,b,c,d,e)
+	#define	CONCAT5__(a,b,c,d,e)	a ## b ## c ## d ## e
+
 	#ifdef XPCC__COMPILER_GCC
 	#	define ALWAYS_INLINE  		inline __attribute__((always_inline))
 	#	define ATTRIBUTE_UNUSED		__attribute__((unused))

@@ -105,16 +105,8 @@ namespace xpcc
 		 * \param	data	Single byte to write
 		 */
 		static void
-		write(char data);
-
-		/**
-		 * \brief	Write a null-terminated string
-		 *
-		 * \param	s	String to write
-		 */
-		static void
-		write(const char *s);
-
+		write(uint8_t data);
+		
 		/**
 		 * \brief	Write a block of bytes to the FIFO
 		 *
@@ -125,7 +117,7 @@ namespace xpcc
 		 *
 		 */
 		static void
-		write(const char *buffer, uint8_t nbyte);
+		write(const uint8_t *buffer, uint8_t nbyte);
 
 		/**
 		 * \brief	Read a single byte from the FIFO
@@ -135,7 +127,7 @@ namespace xpcc
 		 * \return	\c true if a byte was received, \c false otherwise
 		 */
 		static bool
-		read(char &c);
+		read(uint8_t &c);
 
 		/**
 		 * \brief	Read a block of bytes from the FIFO
@@ -147,7 +139,7 @@ namespace xpcc
 		 *
 		 */
 		static uint8_t
-		read(char *buffer, uint8_t nbyte);
+		read(uint8_t *buffer, uint8_t nbyte);
 
 	protected:
 		static PORT port;

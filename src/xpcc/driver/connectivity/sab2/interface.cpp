@@ -30,6 +30,10 @@
  */
 // ----------------------------------------------------------------------------
 
+#ifdef __AVR__
+#	include <util/crc16.h>
+#endif
+
 #include "interface.hpp"
 
 uint16_t

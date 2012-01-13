@@ -111,15 +111,15 @@ namespace xpcc
 #define	GPIO__IO(name, port, pin) \
 	struct name \
 	{ \
-		ALWAYS_INLINE static void setInput() { PORT ## port ## _DIRCLR = (1 << pin); } \
+		ALWAYS_INLINE static void setInput() { CONCAT3(PORT, port, _DIRCLR) = (1 << pin); } \
 		ALWAYS_INLINE static void \
 		setInput(::xpcc::atxmega::Configuration config, \
 				  bool invert = false) { \
 			setInput(); \
-			PORT ## port ## _PIN ## pin ## CTRL = config | ((invert) ? PORT_INVEN_bm : 0); \
+			CONCAT5(PORT, port, _PIN, pin, CTRL) = config | ((invert) ? PORT_INVEN_bm : 0); \
 		} \
 		\
-		ALWAYS_INLINE static void setOutput() { PORT ## port ## _DIRSET = (1 << pin); } \
+		ALWAYS_INLINE static void setOutput() { CONCAT3(PORT, port, _DIRSET) = (1 << pin); } \
 		ALWAYS_INLINE static void setOutput(bool status) { \
 			set(status); \
 			setOutput(); } \
@@ -127,11 +127,11 @@ namespace xpcc
 		setOutput(::xpcc::atxmega::Configuration config, \
 				  bool invert = false) { \
 			setOutput(); \
-			PORT ## port ## _PIN ## pin ## CTRL = config | ((invert) ? PORT_INVEN_bm : 0); \
+			CONCAT5(PORT, port, _PIN, pin, CTRL) = config | ((invert) ? PORT_INVEN_bm : 0); \
 		} \
-		ALWAYS_INLINE static void set() { PORT ## port ## _OUTSET = (1 << pin); } \
-		ALWAYS_INLINE static void reset() { PORT ## port ## _OUTCLR = (1 << pin); } \
-		ALWAYS_INLINE static void toggle() { PORT ## port ## _OUTTGL = (1 << pin); } \
+		ALWAYS_INLINE static void set()    { CONCAT3(PORT, port, _OUTSET) = (1 << pin); } \
+		ALWAYS_INLINE static void reset()  { CONCAT3(PORT, port, _OUTCLR) = (1 << pin); } \
+		ALWAYS_INLINE static void toggle() { CONCAT3(PORT, port, _OUTTGL) = (1 << pin); } \
 		\
 		ALWAYS_INLINE static void \
 		set(bool status) { \
@@ -143,11 +143,11 @@ namespace xpcc
 			} \
 		} \
 		\
-		ALWAYS_INLINE static bool read() { return (PORT ## port ## _IN & (1 << pin)); } \
-		ALWAYS_INLINE static PORT_t& getPort() { return PORT ## port;} \
+		ALWAYS_INLINE static bool read() { return (CONCAT3(PORT, port, _IN) & (1 << pin)); } \
+		ALWAYS_INLINE static PORT_t& getPort() { return CONCAT(PORT, port);} \
 		ALWAYS_INLINE static uint8_t getMask() { return (1 << pin);} \
 		ALWAYS_INLINE static uint8_t getEventChannelMuxInput() { \
-			return (reinterpret_cast<uint16_t>(&PORT ## port) - 0x0600)/4 + 0x50 + pin;} \
+			return (reinterpret_cast<uint16_t>(&CONCAT(PORT, port)) - 0x0600)/4 + 0x50 + pin;} \
 	}
 
 /**
@@ -163,16 +163,16 @@ namespace xpcc
 		setOutput(::xpcc::atxmega::Configuration config, \
 				  bool invert = false) { \
 			setOutput(); \
-			PORT ## port ## _PIN ## pin ## CTRL = config | ((invert) ? PORT_INVEN_bm : 0); \
+			CONCAT5(PORT, port, _PIN, pin, CTRL) = config | ((invert) ? PORT_INVEN_bm : 0); \
 		} \
 		\
-		ALWAYS_INLINE static void setOutput() { PORT ## port ## _DIRSET = (1 << pin); } \
+		ALWAYS_INLINE static void setOutput() { CONCAT3(PORT, port, _DIRSET) = (1 << pin); } \
 		ALWAYS_INLINE static void setOutput(bool status) { \
 			set(status); \
 			setOutput(); } \
-		ALWAYS_INLINE static void set() { PORT ## port ## _OUTSET = (1 << pin); } \
-		ALWAYS_INLINE static void reset() { PORT ## port ## _OUTCLR = (1 << pin); } \
-		ALWAYS_INLINE static void toggle() { PORT ## port ## _OUTTGL = (1 << pin); } \
+		ALWAYS_INLINE static void set()    { CONCAT3(PORT, port, _OUTSET) = (1 << pin); } \
+		ALWAYS_INLINE static void reset()  { CONCAT3(PORT, port, _OUTCLR) = (1 << pin); } \
+		ALWAYS_INLINE static void toggle() { CONCAT3(PORT, port, _OUTTGL) = (1 << pin); } \
 		\
 		ALWAYS_INLINE static void \
 		set(bool status) { \
@@ -183,10 +183,10 @@ namespace xpcc
 				reset(); \
 			} \
 		} \
-		ALWAYS_INLINE static PORT_t& getPort() { return PORT ## port;} \
+		ALWAYS_INLINE static PORT_t& getPort() { return CONCAT(PORT, port);} \
 		ALWAYS_INLINE static uint8_t getMask() { return (1 << pin);} \
 		ALWAYS_INLINE static uint8_t getEventChannelMuxInput() { \
-			return (reinterpret_cast<uint16_t>(&PORT ## port) - 0x0600)/4 + 0x50 + pin;} \
+			return (reinterpret_cast<uint16_t>(&CONCAT(PORT, port)) - 0x0600)/4 + 0x50 + pin;} \
 	}
 
 /**
@@ -202,44 +202,44 @@ namespace xpcc
 		setInput(::xpcc::atxmega::Configuration config, \
 				  bool invert = false) { \
 			setInput(); \
-			PORT ## port ## _PIN ## pin ## CTRL = config | ((invert) ? PORT_INVEN_bm : 0); \
+			CONCAT5(PORT, port, _PIN, pin, CTRL) = config | ((invert) ? PORT_INVEN_bm : 0); \
 		} \
 		\
-		ALWAYS_INLINE static void setInput() { PORT ## port ## _DIRCLR = (1 << pin); } \
-		ALWAYS_INLINE static bool read() { return (PORT ## port ## _IN & (1 << pin)); } \
+		ALWAYS_INLINE static void setInput() { CONCAT3(PORT, port, _DIRCLR) = (1 << pin); } \
+		ALWAYS_INLINE static bool read() { return (CONCAT3(PORT, port, _IN) & (1 << pin)); } \
 		ALWAYS_INLINE static void \
 		configureInputSense(::xpcc::atxmega::InputSense inputSense){\
-			PORT ## port ## _PIN ## pin ## CTRL = (PORT ## port ## _PIN ## pin ## CTRL & ~PORT_ISC_gm) | inputSense; \
+			CONCAT5(PORT, port, _PIN, pin, CTRL) = (CONCAT5(PORT, port, _PIN, pin, CTRL) & ~PORT_ISC_gm) | inputSense; \
 		}\
 		\
 		ALWAYS_INLINE static void \
 		configureInterrupt0(::xpcc::atxmega::InterruptLevel0 interruptLevel) { \
 			if (interruptLevel){\
-				PORT ## port ## _INT0MASK |= getMask();\
-				PORT ## port ## _INTCTRL = (PORT ## port ## _INTCTRL & ~PORT_INT0LVL_gm) | (interruptLevel & PORT_INT0LVL_gm);\
+				CONCAT3(PORT, port, _INT0MASK) |= getMask();\
+				CONCAT3(PORT, port, _INTCTRL) = (CONCAT3(PORT, port, _INTCTRL) & ~PORT_INT0LVL_gm) | (interruptLevel & PORT_INT0LVL_gm);\
 			}\
 			else{\
-				PORT ## port ## _INT0MASK &= ~getMask();\
+				CONCAT3(PORT, port, _INT0MASK) &= ~getMask();\
 			}\
 		} \
 		\
 		ALWAYS_INLINE static void \
 		configureInterrupt1(::xpcc::atxmega::InterruptLevel1 interruptLevel) { \
 			if (interruptLevel){\
-				PORT ## port ## _INT1MASK |= getMask();\
-				PORT ## port ## _INTCTRL = (PORT ## port ## _INTCTRL & ~PORT_INT1LVL_gm) | (interruptLevel & PORT_INT1LVL_gm);\
+				CONCAT3(PORT, port, _INT1MASK) |= getMask();\
+				CONCAT3(PORT, port, _INTCTRL) = (CONCAT3(PORT, port, _INTCTRL) & ~PORT_INT1LVL_gm) | (interruptLevel & PORT_INT1LVL_gm);\
 			}\
 			else{\
-				PORT ## port ## _INT1MASK &= ~getMask();\
+				CONCAT3(PORT, port, _INT1MASK) &= ~getMask();\
 			}\
 		} \
 		\
-		ALWAYS_INLINE static PORT_t& getPort() { return PORT ## port;} \
+		ALWAYS_INLINE static PORT_t& getPort() { return CONCAT(PORT, port);} \
 		ALWAYS_INLINE static uint8_t getMask() { return (1 << pin);} \
 		ALWAYS_INLINE static uint8_t getEventChannelMuxInput() { \
-			return (reinterpret_cast<uint16_t>(&PORT ## port) - 0x0600)/4 + 0x50 + pin;} \
-		ALWAYS_INLINE static uint16_t getInterrupt0Vector() { return PORT ## port ## _INT0_vect_num;} \
-		ALWAYS_INLINE static uint16_t getInterrupt1Vector() { return PORT ## port ## _INT1_vect_num;} \
+			return (reinterpret_cast<uint16_t>(&CONCAT(PORT, port)) - 0x0600)/4 + 0x50 + pin;} \
+		ALWAYS_INLINE static uint16_t getInterrupt0Vector() { return CONCAT3(PORT, port, _INT0_vect_num);} \
+		ALWAYS_INLINE static uint16_t getInterrupt1Vector() { return CONCAT3(PORT, port, _INT1_vect_num);} \
 	}
 
 /**
@@ -251,17 +251,17 @@ namespace xpcc
 #define GPIO__NIBBLE_LOW(name, port) \
 	struct name { \
 		ALWAYS_INLINE static void setOutput() { \
-			PORT ## port ## _DIRSET = 0x0f; \
+			CONCAT3(PORT, port, _DIRSET) = 0x0f; \
 		} \
 		ALWAYS_INLINE static void setInput() { \
-			PORT ## port ## _DIRCLR = 0x0f; \
+			CONCAT3(PORT, port, _DIRCLR) = 0x0f; \
 		} \
 		ALWAYS_INLINE static uint8_t read() { \
-			return PORT ## port ## _IN & 0x0f; \
+			return CONCAT3(PORT, port, _IN) & 0x0f; \
 		} \
 		ALWAYS_INLINE static void write(uint8_t data) { \
-			PORT ## port ## _OUTSET =   data & 0x0f; \
-			PORT ## port ## _OUTCLR = ~(data & 0x0f); \
+			CONCAT3(PORT, port, _OUTSET) =   data & 0x0f; \
+			CONCAT3(PORT, port, _OUTCLR) = ~(data & 0x0f); \
 		} \
 	}
 
@@ -274,18 +274,18 @@ namespace xpcc
 #define GPIO__NIBBLE_HIGH(name, port) \
 	struct name { \
 		ALWAYS_INLINE static void setOutput() { \
-			PORT ## port ## _DIRSET = 0xf0; \
+			CONCAT3(PORT, port, _DIRSET) = 0xf0; \
 		} \
 		ALWAYS_INLINE static void setInput() { \
-			PORT ## port ## _DIRCLR = 0xf0; \
+			CONCAT3(PORT, port, _DIRCLR) = 0xf0; \
 		} \
 		ALWAYS_INLINE static uint8_t read() { \
-			return (PORT ## port ## _IN >> 4); \
+			return (CONCAT3(PORT, port, _IN) >> 4); \
 		} \
 		ALWAYS_INLINE static void write(uint8_t data) { \
 			data = ::xpcc::swap(data); \
-			PORT ## port ## _OUTSET =   data & 0xf0; \
-			PORT ## port ## _OUTCLR = ~(data & 0xf0); \
+			CONCAT3(PORT, port, _OUTSET) =   data & 0xf0; \
+			CONCAT3(PORT, port, _OUTCLR) = ~(data & 0xf0); \
 		} \
 	}
 
@@ -300,22 +300,22 @@ namespace xpcc
 #define GPIO__PORT(name, port) \
 	struct name { \
 		ALWAYS_INLINE static void setOutput() { \
-			PORT ## port ## _DIRSET = 0xff; \
+			CONCAT3(PORT, port, _DIRSET) = 0xff; \
 		} \
 		ALWAYS_INLINE static void setInput() { \
-			PORT ## port ## _DIRCLR = 0xff; \
+			CONCAT3(PORT, port, _DIRCLR) = 0xff; \
 		} \
 		ALWAYS_INLINE static void setInput(::xpcc::atxmega::Configuration config, \
 				  bool invert = false) { \
-			PORT ## port ## _DIRCLR = 0xff; \
+			CONCAT3(PORT, port, _DIRCLR) = 0xff; \
 			PORTCFG.MPCMASK = 0xff; \
-			PORT ## port ## _PIN0CTRL = config | ((invert) ? PORT_INVEN_bm : 0); \
+			CONCAT3(PORT, port, _PIN0CTRL) = config | ((invert) ? PORT_INVEN_bm : 0); \
 		} \
 		ALWAYS_INLINE static uint8_t read() { \
-			return PORT ## port ## _IN; \
+			return CONCAT3(PORT, port, _IN); \
 		} \
 		ALWAYS_INLINE static void write(uint8_t data) { \
-			PORT ## port ## _OUT = data; \
+			CONCAT3(PORT, port, _OUT) = data; \
 		} \
 	}
 

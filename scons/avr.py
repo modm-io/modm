@@ -133,6 +133,7 @@ def generate(env, **kw):
 		"-fno-move-loop-invariants",
 		"-fno-tree-loop-optimize",
 		"-finline-limit=10000",
+		"-fverbose-asm",	# TODO check this
 		"-Wall",
 		"-Wextra",
 		"-Wundef",
@@ -143,7 +144,8 @@ def generate(env, **kw):
 	
 	# C++ flags
 	env['CXXFLAGS'] = [
-		"-std=gnu++98",
+#		"-std=gnu++98",
+		"-std=gnu++0x",
 		"-fno-exceptions", 
 		"-fno-rtti",
 		"-fno-threadsafe-statics",

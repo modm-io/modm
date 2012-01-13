@@ -344,12 +344,25 @@ IoStreamTest::testHex2()
 void
 IoStreamTest::testHex3()
 {
-	char string[] = "123456";
+	char string[] = "0123";
 	
-	int32_t i = 123456;
+	int16_t i = 0x123;
 	
 	(*stream) << xpcc::hex << i;
 
-	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 6);
-	TEST_ASSERT_EQUALS(device.bytesWritten, 6);
+	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 4);
+	TEST_ASSERT_EQUALS(device.bytesWritten, 4);
+}
+
+void
+IoStreamTest::testHex4()
+{
+	char string[] = "12345645";
+	
+	int32_t i = 0x12345645;
+	
+	(*stream) << xpcc::hex << i;
+
+	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 8);
+	TEST_ASSERT_EQUALS(device.bytesWritten, 8);
 }

@@ -70,7 +70,8 @@ namespace xpcc
 			 *
 			 * 			Does not block if busyState is not FREE
 			 *
-			 * \param[out] BusState after completion.
+			 * \param[in]	slaveAddress	Slave address.
+			 * \param[out]	busState		BusState after completion.
 			 *
 			 * \return	True if control is gained
 			 * 			False if no control is gained

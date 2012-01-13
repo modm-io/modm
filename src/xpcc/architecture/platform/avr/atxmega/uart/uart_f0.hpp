@@ -37,46 +37,88 @@
 #define XPCC_ATXMEGA__UART_F0_HPP
 
 #include <stdint.h>
-#include <xpcc/architecture/utils.hpp>
+
+/*
+ * Error messages for linker.  
+ */
+extern void dummy_YOUR_BAUDRATE_IS_NOT_CONSTANT(void);
+extern void dummy_YOUR_BAUDRATE_IS_TOO_HIGH_FOR_CPU_FREQUENCY(void);
 
 namespace xpcc
 {
 	namespace atxmega
 	{
 		/**
+		 * \brief		UARTF0 Baud rate setting
+		 * \ingroup		atxmega_uart
+		 * 
+		 * Baud rate setting for Uart and BufferedUart
+		 */
+		class UartBaudF0 : public UartBase
+		{
+		public:
+			ALWAYS_INLINE static void
+			setBaudrate(uint32_t baudrate)
+			{
+				/*
+				 * Check if baudrate is a constant value at compile time so
+				 * that all the optimisations can be performed. Calculating
+				 * the baud rate registers at runtime is a no-go.
+				 * 
+				 * The idea to use an external function to generate messages
+				 * at link time is from:
+				 * http://stackoverflow.com/questions/6491163/is-it-possible-to-write-these-pure-assert-and-const-assert-macros
+				 */
+				if (!__builtin_constant_p(baudrate))
+				{
+					dummy_YOUR_BAUDRATE_IS_NOT_CONSTANT();
+				}
+				
+				/*
+				 * Assert that the baud rate is less or equal F_CPU/16 which is the maximum
+				 * for normal speed mode.
+				 */
+				if ((F_CPU / 16) < baudrate)
+				{
+					dummy_YOUR_BAUDRATE_IS_TOO_HIGH_FOR_CPU_FREQUENCY();
+				}
+		
+				uint16_t bsel = bSel(baudrate);
+				uint8_t  bscale = bScaleUnsigned(baudrate);
+		
+				USARTF0.BAUDCTRLA = static_cast<uint8_t>(bsel & 0xff);
+				USARTF0.BAUDCTRLB = static_cast<uint8_t>((bscale << USART_BSCALE0_bp) | (bsel >> 8));
+			}
+		};
+			
+		/**
 		 * \brief		UARTF0
 		 * \ingroup		atxmega_uart
 		 */
-		class UartF0
+		class UartF0 : public UartBase
 		{
 		public:
-			UartF0(uint32_t baudrate)
-			{
-				this->setBaudrate(baudrate);
-			}
-			
 			/**
-			 * \brief	Set baud rate
+			 * \brief	Initialise the UART and set baud rate
 			 *
-			 * If this function is called with a constant value as parameter,
-			 * all the calculation is done by the compiler, so no 32-bit
+			 * The constructor takes a constant value as a parameter and the
+			 * compiler will calculate the baud rate register including the
+			 * fractional baud rate register for optimal performance and
+			 * accuracy.
+			 * All the calculation is done by the compiler, so no 32-bit
 			 * arithmetic is needed at run-time!
 			 *
-			 * \param	baudrate	desired baud rate
-			 * \param	u2x			enabled double speed mode
+			 * If you do not provide a constant baud rate or your baud
+			 * rate is too high the linker (!) will emit error messages
+			 * by complaining about undefined functions. The function name
+			 * is the error message. 
+			 *
+			 * \param	baudrate	desired baud rate, must be constant at compile time
 			 */
-			static ALWAYS_INLINE void
-			setBaudrate(uint32_t baudrate, bool u2x = false)
+			UartF0(uint32_t baudrate)
 			{
-				uint16_t ubrr;
-				if (u2x) {
-					ubrr  = (F_CPU / (baudrate * 8l)) - 1;
-					ubrr |= 0x8000;
-				}
-				else {
-					ubrr = (F_CPU / (baudrate * 16l)) - 1;
-				}
-				setBaudrateRegister(ubrr);
+				UartBaudF0::setBaudrate(baudrate);
+				this->initialise(); 
 			}
 			
 			/* **************************************************** *
@@ -99,35 +141,34 @@ namespace xpcc
 			 */
 			static void
 			write(const uint8_t *buffer, uint8_t nbyte);
-			
-			/**
-			 * \brief	Read a single byte
-			 *
-			 * \param	&char	Byte read, if any
-			 *
-			 * \return	\n true if a byte was received, \n false otherwise
-			 */
+
 			static bool
 			read(uint8_t& data);
-			
+
 			/**
 			 * \brief	Read a block of bytes
 			 *
 			 * This is non-blocking. If no data is available this function waits
-			 * about 1.5 times of a frame length. 
-			 * This is only correct at a baud rate of 115200.  
-			 * 
+			 * about 1.5 times of a frame length.
+			 * This is only correct at a baud rate of 115200.
+			 *
 			 * \param	*buffer	Pointer to a buffer big enough to store \a n bytes
 			 * \param	nbyte	Number of bytes to be read
-			 * 
+			 *
 			 * \return	Number of bytes which could be read, maximum \a n
 			 */
 			static uint8_t
 			read(uint8_t *buffer, uint8_t nbyte);
 			
 		protected:
+			/**
+			 * \brief	Initialise UART module
+			 * 
+			 * Set the output and input pins, the interrupts and enables transceiver and receiver. 
+			 * Does *not* set the baudrate. This should be done *before*.
+			 */
 			static void
-			setBaudrateRegister(uint16_t ubrr);
+			initialise();
 		};
 		
 		// --------------------------------------------------------------------
@@ -150,49 +191,15 @@ namespace xpcc
 		 * 
 		 * \ingroup	atxmega_uart
 		 */
-		class BufferedUartF0
+		class BufferedUartF0 : public UartBase
 		{
 		public:
 			BufferedUartF0(uint32_t baudrate)
 			{
-				this->setBaudrate(baudrate);
+				UartBaudF0::setBaudrate(baudrate);
+				this->initialise();
 			}
 			
-			/**
-			 * \brief	Set baud rate
-			 *
-			 * If this function is called with a constant value as parameter,
-			 * all the calculation is done by the compiler, so no 32-bit
-			 * arithmetic is needed at run-time!
-			 *
-			 * \param	baudrate	desired baud rate
-			 * \param	doubleSpeed	enabled double speed mode
-			 */
-			static ALWAYS_INLINE void
-			setBaudrate(uint32_t baudrate, bool doubleSpeed = false)
-			{
-				uint16_t ubrr;
-				if (doubleSpeed) {
-					ubrr  = (F_CPU / (baudrate * 8l)) - 1;
-				}
-				else {
-					ubrr = (F_CPU / (baudrate * 16l)) - 1;
-				}
-				setBaudrateRegister(ubrr, doubleSpeed);
-			}
-			
-			static inline void
-			setFractionalBaudrate(uint16_t bsel, int8_t bscale)
-			{
-				uint16_t ubrr = (bsel & 0x0fff) | ((bscale & 0x0f) << 12);
-				setBaudrateRegister(ubrr, false);
-			}
-			
-			/**
-			 * \brief	Write a single byte
-			 *
-			 * \param	data	Byte to write
-			 */
 			static void
 			write(uint8_t data);
 			
@@ -205,24 +212,9 @@ namespace xpcc
 			static void
 			write(const uint8_t *buffer, uint8_t nbyte);
 			
-			/**
-			 * \brief	Read a single byte
-			 *
-			 * \param	&char	Byte read, if any
-			 *
-			 * \return	\n true if a byte was received, \n false otherwise
-			 */
 			static bool
 			read(uint8_t& data);
 			
-			/**
-			 * \brief	Read a block of bytes
-			 * 
-			 * \param	*buffer	Pointer to a buffer big enough to store \a n bytes
-			 * \param	nbyte	Number of bytes to be read
-			 * 
-			 * \return	Number of bytes which could be read, maximum \a n
-			 */
 			static uint8_t
 			read(uint8_t *buffer, uint8_t nbyte);
 			
@@ -254,9 +246,69 @@ namespace xpcc
 //			flushTransmitBuffer();
 			
 		protected:
-			static void
-			setBaudrateRegister(uint16_t ubrr, bool doubleSpeed);
+			static void			
+			initialise();
 		};
+		
+		// --------------------------------------------------------------------
+		/**
+		 * \brief		UARTF0 buffered with RTS/CTS flow control
+		 * 
+		 * CTS is always an output and should be connected to the RTS input of
+		 * the neighbour. 
+		 * 
+		 * \verbatim
+		 * 
+		 * AVR                                Device
+		 * ===                                ======
+		 * 
+		 * RTS  (IN) ---<<<---, ,--->>>--- (IN)  RTS
+		 *                     X
+		 * CTS (OUT) --->>>---' '---<<<--- (OUT) CTS
+		 * 
+		 * \endverbatim
+		 * 
+		 * HIGH indicates that the receiver is NOT ready to accept data. 
+		 * 
+		 * \ingroup		atxmega_uart
+		 */
+		class BufferedUartFlowF0 : public UartBase
+		{
+		public:
+			BufferedUartFlowF0(uint32_t baudrate)
+			{
+				UartBaudF0::setBaudrate(baudrate);
+				this->initialise();
+			}
+			
+			static void
+			write(uint8_t data);
+			
+			static void
+			write(const uint8_t *buffer, uint8_t nbyte);
+			
+			static bool
+			read(uint8_t& data);
+			
+			static uint8_t
+			read(uint8_t *buffer, uint8_t nbyte);
+			
+			static uint8_t
+			readErrorFlags();
+
+			static void
+			resetErrorFlags();
+
+			static uint8_t
+			flushReceiveBuffer();
+			
+//			static uint8_t
+//			flushTransmitBuffer();
+
+		protected:
+			static void			
+			initialise();
+		}; 
 		
 		// --------------------------------------------------------------------
 		/**
@@ -265,19 +317,20 @@ namespace xpcc
 		 * \ingroup		atxmega_spi
 		 * \ingroup		atxmega_uart
 		 */
-		class UartSpiF0
+		class UartSpiF0 : public UartBase
 		{
 		public:
 			UartSpiF0()
 			{
-				this->initialize();
+				this->initialise();
 			}
-			
-			static void
-			initialize();
-			
+						
 			static uint8_t
 			write(uint8_t data);
+			
+		protected:
+			static void
+			initialise();
 		};
 	}
 }

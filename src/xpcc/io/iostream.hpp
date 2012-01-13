@@ -122,28 +122,56 @@ namespace xpcc
 		ALWAYS_INLINE IOStream&
 		operator << (const uint16_t& v)
 		{
-			this->writeInteger(v);
+			if (this->mode == ASCII) {
+				this->writeInteger(v);
+			}
+			else {
+				this->writeHex(static_cast<uint8_t>(v >> 8));
+				this->writeHex(static_cast<uint8_t>(v & 0xff));
+			}
 			return *this;
 		}
 
 		ALWAYS_INLINE IOStream&
 		operator << (const int16_t& v)
 		{
-			this->writeInteger(v);
+			if (this->mode == ASCII) {
+				this->writeInteger(v);
+			}
+			else {
+				this->writeHex(static_cast<uint8_t>(v >> 8));
+				this->writeHex(static_cast<uint8_t>(v & 0xff));
+			}
 			return *this;
 		}
 
 		ALWAYS_INLINE IOStream&
 		operator << (const uint32_t& v)
 		{
-			this->writeInteger(v);
+			if (this->mode == ASCII) {
+				this->writeInteger(v);
+			}
+			else {
+				this->writeHex(static_cast<uint8_t>(v >> 24));
+				this->writeHex(static_cast<uint8_t>(v >> 16));
+				this->writeHex(static_cast<uint8_t>(v >> 8));
+				this->writeHex(static_cast<uint8_t>(v & 0xff));
+			}
 			return *this;
 		}
 
 		ALWAYS_INLINE IOStream&
 		operator << (const int32_t& v)
 		{
-			this->writeInteger(v);
+			if (this->mode == ASCII) {
+				this->writeInteger(v);
+			}
+			else {
+				this->writeHex(static_cast<uint8_t>(v >> 24));
+				this->writeHex(static_cast<uint8_t>(v >> 16));
+				this->writeHex(static_cast<uint8_t>(v >> 8));
+				this->writeHex(static_cast<uint8_t>(v & 0xff));
+			}
 			return *this;
 		}
 		

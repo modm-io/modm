@@ -1,6 +1,6 @@
 // coding: utf-8
 // ----------------------------------------------------------------------------
-/* Copyright (c) 2009, Roboterclub Aachen e.V.
+/* Copyright (c) 2011, Roboterclub Aachen e.V.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -39,167 +39,225 @@
 #include <xpcc/architecture/driver/atomic/lock.hpp>
 
 #include <xpcc/architecture/driver/gpio.hpp>
+#include <xpcc/architecture/platform/avr/atxmega/gpio.hpp>
 
-#include "uart_c1.hpp"
+#include "uart_d1.hpp"
 #include "xpcc_config.hpp"
 
+#ifdef USARTD1_RXC_vect
 
-#ifdef USARTC1_RXC_vect
-#if UARTC1_RTS_PIN == -1
+#if UARTD1_RTS_PIN >= 0
 // RTS_PIN = -1 deactivates flow control 
 
 namespace
 {
-	static xpcc::atomic::Queue<uint8_t, UARTC1_RX_BUFFER_SIZE> rxBuffer;
-	static xpcc::atomic::Queue<uint8_t, UARTC1_TX_BUFFER_SIZE> txBuffer;
+	static xpcc::atomic::Queue<uint8_t, UARTD1_RX_BUFFER_SIZE> rxBuffer;
+	static xpcc::atomic::Queue<uint8_t, UARTD1_TX_BUFFER_SIZE> txBuffer;
 	
-	GPIO__INPUT(RXD, C, 6);
-	GPIO__OUTPUT(TXD, C, 7);
+	GPIO__INPUT (RXD, D, 6);
+	GPIO__OUTPUT(TXD, D, 7);
 	
+	GPIO__INPUT (RTS, UARTD1_RTS_PORT, UARTD1_RTS_PIN);
+	GPIO__OUTPUT(CTS, UARTD1_CTS_PORT, UARTD1_CTS_PIN);
+
 	uint8_t error;
 }
 
 // ----------------------------------------------------------------------------
-#if UARTC1_RTS_PORT == -1
-ISR(USARTC1_RXC_vect)
+#if UARTD1_RTS_PIN != -1
+ISR(USARTD1_RXC_vect)
 {		
 	// first save the errors
-	error |= USARTC1_STATUS & (USART_FERR_bm | USART_BUFOVF_bm | USART_PERR_bm);
-	// then read the buffer
-	uint8_t data = USARTC1_DATA;
+	error |= USARTD1_STATUS & (USART_FERR_bm | USART_BUFOVF_bm | USART_PERR_bm);
 	
-	rxBuffer.push(data);
+	// then read the buffer
+	uint8_t data = USARTD1_DATA;
+	
+	if (!rxBuffer.push(data)) {
+		// TODO: Error handling if internal buffer is full.		
+	}
+	 
+	// If the internal buffer is now nearly full set CTS to high to inhibit 
+	// remote from sending new data. As the remote may not stop instantenously
+	// it is important to stop before the buffer is completely full. 
+	if (rxBuffer.isNearlyFull()) {
+		CTS::set();
+	}
 }
 
 // ----------------------------------------------------------------------------
-ISR(USARTC1_DRE_vect)
+ISR(USARTD1_DRE_vect)
 {
 	if (txBuffer.isEmpty())
 	{
 		// transmission finished, disable DRE interrupt
-		USARTC1_CTRLA = USART_RXCINTLVL_MED_gc;
+		USARTD1_CTRLA = USART_RXCINTLVL_MED_gc;
 	}
 	else {
-		// get one byte from buffer and write it to the UART buffer
-		// which starts the transmission
-		USARTC1_DATA = txBuffer.get();
-		txBuffer.pop();
+		// check if RTS is high which indicates that the remote device is ready
+		// to accept data
+		if (RTS::read())
+		{
+			// RTS of remote device high: do not send new data. 
+			// Disable DRE interrupt
+			// TODO: Setup interrupt for rising edge of RTS to resume sending. 
+			USARTD1_CTRLA = USART_RXCINTLVL_MED_gc;
+		}
+		else
+		{
+			// RTS of remote device low: ready to receive new data.
+			// get one byte from buffer and write it to the UART buffer
+			// which starts the transmission
+			USARTD1_DATA = txBuffer.get();
+			txBuffer.pop();
+		}
 	}
 }
 #endif
 
+
 // ----------------------------------------------------------------------------
 void
-xpcc::atxmega::BufferedUartC1::initialise()
+xpcc::atxmega::BufferedUartFlowD1::initialise()
 {
 	TXD::set();
 	TXD::setOutput();
 	
 	RXD::setInput();
 	
+	// RTS and CTS pins, ready for reception in few cycles.
+	CTS::setOutput(xpcc::gpio::LOW);
+	RTS::setInput(xpcc::atxmega::PULLUP);
+	
 	// interrupts should be disabled during initialisation
 	atomic::Lock lock;
 		
 	// enable receive complete interrupt
-	USARTC1.CTRLA = USART_RXCINTLVL_MED_gc;
+	USARTD1.CTRLA = USART_RXCINTLVL_MED_gc;
 	
 	// setting the frame size to 8 bit
-	USARTC1.CTRLC = USART_CHSIZE_8BIT_gc;
+	USARTD1.CTRLC = USART_CHSIZE_8BIT_gc;
 	
 	// enable both, receiver and transmitter
-	USARTC1.CTRLB |= USART_RXEN_bm | USART_TXEN_bm;
+	USARTD1.CTRLB |= USART_RXEN_bm | USART_TXEN_bm;
 }
 
 // ----------------------------------------------------------------------------
 void
-xpcc::atxmega::BufferedUartC1::write(uint8_t c)
+xpcc::atxmega::BufferedUartFlowD1::write(uint8_t c)
 {
-	uint16_t i(0);		
-	while ( !txBuffer.push(c) && (i < 1000) ) {
-		++i;
+	while ( !txBuffer.push(c) ) {
 		// wait for a free slot in the buffer
-		// but do not wait infinitely
 	}
+	
+	// Either a byte was enqueued to the buffer or it was not possible because
+	// the buffer was full. In both cases there is something to send now. 
 	
 	// disable interrupts
 	atomic::Lock lock;
 	
 	// enable DRE interrupt
-	USARTC1_CTRLA = USART_RXCINTLVL_MED_gc | USART_DREINTLVL_MED_gc;
+	USARTD1_CTRLA = USART_RXCINTLVL_MED_gc | USART_DREINTLVL_MED_gc;
 }
 
 // ----------------------------------------------------------------------------
 void
-xpcc::atxmega::BufferedUartC1::write(const uint8_t *s, uint8_t n)
+xpcc::atxmega::BufferedUartFlowD1::write(const uint8_t *s, uint8_t n)
 {
 	while (n-- != 0) {
-		BufferedUartC1::write(*s++);
+		BufferedUartFlowD1::write(*s++);
 	}
 }
 
 // ----------------------------------------------------------------------------
 bool
-xpcc::atxmega::BufferedUartC1::read(uint8_t& c)
+xpcc::atxmega::BufferedUartFlowD1::read(uint8_t& c)
 {
+	if (rxBuffer.isNearlyEmpty()) {
+		// When the buffer is nearly empty allow remote device to send again.
+		// This will create a continous flow of data.  
+		CTS::reset();
+	}
+	
+	// Small hack: When the AVR stopped transmission due to a high RTS signal try to resume
+	// transmission now when RTS is low again and there is something to send. 
+	// TODO: can be removed if RTS interrupt is included. 
+	if (!RTS::read() && !txBuffer.isEmpty()) {
+		// enable DRE interrupt to resume transmission
+		USARTD1_CTRLA = USART_RXCINTLVL_MED_gc | USART_DREINTLVL_MED_gc;
+	}
+	
 	if (rxBuffer.isEmpty()) {
+		// no data in buffer anymore
+		CTS::reset();
 		return false;
 	}
 	else {
 		c = rxBuffer.get();
 		rxBuffer.pop();
-		
 		return true;
 	}
 }
 
 // ----------------------------------------------------------------------------
 uint8_t
-xpcc::atxmega::BufferedUartC1::read(uint8_t *buffer, uint8_t n)
+xpcc::atxmega::BufferedUartFlowD1::read(uint8_t *buffer, uint8_t n)
 {
-	uint8_t i(0);
-	for (; i < n; ++i)
+	uint8_t i;
+	for (i = 0; i < n; ++i)
 	{
 		if (rxBuffer.isEmpty()) {
+			CTS::reset();
 			return i;
 		}
 		else {
 			*buffer++ = rxBuffer.get();
 			rxBuffer.pop();
+		
+			if (rxBuffer.isNearlyEmpty()) {
+				// When the buffer is nearly empty allow remote device to send again.
+				// This will create a continous flow of data.  
+				CTS::reset();
+			}
 		}
 	}
 	
 	return i;
 }
 
+// ----------------------------------------------------------------------------
 uint8_t
-xpcc::atxmega::BufferedUartC1::readErrorFlags()
+xpcc::atxmega::BufferedUartFlowD1::readErrorFlags()
 {
 	return error;
 }
 
 void
-xpcc::atxmega::BufferedUartC1::resetErrorFlags()
+xpcc::atxmega::BufferedUartFlowD1::resetErrorFlags()
 {
 	error = 0;
 }
 
+// ----------------------------------------------------------------------------
 uint8_t
-xpcc::atxmega::BufferedUartC1::flushReceiveBuffer()
+xpcc::atxmega::BufferedUartFlowD1::flushReceiveBuffer()
 {
-	uint8_t i(0);
+	uint8_t i = 0;
 	while(!rxBuffer.isEmpty()) {
 		rxBuffer.pop();
 		++i;
 	}
-	unsigned char c;
-	while (USARTC1_STATUS & USART_RXCIF_bm)
-		c = USARTC1_DATA;
+	
+	uint8_t c;
+	while (USARTD1_STATUS & USART_RXCIF_bm) {
+		c = USARTD1_DATA;
+	}
 	
 	return i;
 }
 
 //uint8_t
-//xpcc::atxmega::BufferedUartC1::flushTransmitBuffer()
+//xpcc::atxmega::BufferedUartFlowD1::flushTransmitBuffer()
 //{
 //	uint8_t i(0);
 //	while(!txBuffer.isEmpty()) {
@@ -210,5 +268,6 @@ xpcc::atxmega::BufferedUartC1::flushReceiveBuffer()
 //	return i;
 //}
 
-#endif
-#endif // USARTC1
+
+#endif	
+#endif	// USARTD1_RXC_vect

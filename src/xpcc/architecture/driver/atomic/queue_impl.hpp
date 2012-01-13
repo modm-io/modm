@@ -40,7 +40,7 @@ xpcc::atomic::Queue<T, N>::Queue() :
 }
 
 template<typename T, std::size_t N>
-bool
+ALWAYS_INLINE bool
 xpcc::atomic::Queue<T, N>::isFull()
 {
 	uint8_t tmphead = xpcc::accessor::asVolatile(this->head) + 1;
@@ -52,46 +52,69 @@ xpcc::atomic::Queue<T, N>::isFull()
 }
 
 template<typename T, std::size_t N>
-bool
-xpcc::atomic::Queue<T, N>::isNearFull()
+ALWAYS_INLINE bool
+xpcc::atomic::Queue<T, N>::isNearlyFull()
 {
-	XPCC__STATIC_ASSERT(N > 3, "Not possible the check for 'near full' of such a small queue. ");
+	XPCC__STATIC_ASSERT(N > 3, "Not possible the check for 'nearly full' of such a small queue. ");
 	
 	uint8_t tmphead = xpcc::accessor::asVolatile(this->head);
 	uint8_t tmptail = xpcc::accessor::asVolatile(this->tail);
 
 	uint8_t free;
-	if (tmphead >= tmptail)
-		free = N - tmphead + tmptail;
-	else
-		free = N - tmptail + tmphead;
+	if (tmphead >= tmptail) {
+		free = (N + 1) - tmphead + tmptail;
+	}
+	else {
+		free = tmptail - tmphead;
+	}
 
 	return (free < 3);
 }
 
 template<typename T, std::size_t N>
-bool
+ALWAYS_INLINE bool
 xpcc::atomic::Queue<T, N>::isEmpty()
 {
 	return (xpcc::accessor::asVolatile(this->head) == xpcc::accessor::asVolatile(this->tail));
 }
 
 template<typename T, std::size_t N>
-uint8_t
+ALWAYS_INLINE bool
+xpcc::atomic::Queue<T, N>::isNearlyEmpty()
+{
+	XPCC__STATIC_ASSERT(N > 3, "Not possible the check for 'nearly empty' of such a small queue. ");
+
+	uint8_t tmphead = xpcc::accessor::asVolatile(this->head);
+	uint8_t tmptail = xpcc::accessor::asVolatile(this->tail);
+
+	uint8_t stored;
+	if (tmphead >= tmptail) {
+		stored = tmphead - tmptail;
+	}
+	else {
+		stored = (N + 1) - tmptail + tmphead;
+	}
+
+	return (stored < 3);
+}
+
+
+template<typename T, std::size_t N>
+ALWAYS_INLINE uint8_t
 xpcc::atomic::Queue<T, N>::getMaxSize()
 {
 	return N;
 }
 
 template<typename T, std::size_t N>
-const T&
+ALWAYS_INLINE const T&
 xpcc::atomic::Queue<T, N>::get() const
 {
 	return this->buffer[this->tail];
 }
 
 template<typename T, std::size_t N>
-bool
+ALWAYS_INLINE bool
 xpcc::atomic::Queue<T, N>::push(const T& value)
 {
 	uint8_t tmphead = this->head + 1;
@@ -109,7 +132,7 @@ xpcc::atomic::Queue<T, N>::push(const T& value)
 }
 
 template<typename T, std::size_t N>
-void
+ALWAYS_INLINE void
 xpcc::atomic::Queue<T, N>::pop()
 {
 	uint8_t tmptail = this->tail + 1;

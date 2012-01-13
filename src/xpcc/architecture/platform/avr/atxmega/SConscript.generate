@@ -45,6 +45,7 @@ for port in ['C', 'D', 'E', 'F']:
 		generator.template('uart_%s.hpp' % id, 'uart.hpp.in', substitutions)
 		generator.template('uart_%s.cpp' % id, 'uart.cpp.in', substitutions)
 		generator.template('uart_buffered_%s.cpp' % id, 'uart_buffered.cpp.in', substitutions)
+		generator.template('uart_flow_%s.cpp' % id, 'uart_flow.cpp.in', substitutions)
 		generator.template('uart_spi_%s.cpp' % id, 'uart_spi.cpp.in', substitutions)
 
 generator = env['TemplateGenerator'](env, 'spi')

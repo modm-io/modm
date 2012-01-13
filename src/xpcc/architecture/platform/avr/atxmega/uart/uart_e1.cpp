@@ -51,23 +51,12 @@ namespace
 
 // ----------------------------------------------------------------------------
 void
-xpcc::atxmega::UartE1::setBaudrateRegister(uint16_t ubrr)
+xpcc::atxmega::UartE1::initialise()
 {
 	TXD::set();
 	TXD::setOutput();
 	
 	RXD::setInput();
-	
-	// set baud rate
-	if (ubrr & 0x8000) {
-		USARTE1_CTRLB = USART_CLK2X_bm;  //Enable 2x speed 
-		ubrr &= ~0x8000;
-	}
-	else {
-		USARTE1_CTRLB = 0;
-	}
-	USARTE1_BAUDCTRLB = static_cast<uint8_t>(ubrr >> 8);
-	USARTE1_BAUDCTRLA = static_cast<uint8_t>(ubrr);
 	
 	// setting the frame size to 8 bit
 	USARTE1_CTRLC = USART_CHSIZE_8BIT_gc;

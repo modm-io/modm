@@ -8,12 +8,12 @@
 
 The xpcc project consists of two main parts:
 
- * First part is the xpcc communication module, a packet orientated
+ * First part is the xpcc communication module, a packet oriented
    communication protocol, enabling transparent communication between
    components on different platforms (from PCs to small 8-bit
    microcontrollers). It provides an interface to communicate via CAN,
    TCP/IP or TIPC.
- * The second part is a universal but a bit robotic orientated C++ library
+ * The second part is a universal but a bit robotic oriented C++ library
    for microcontrollers.
 
 The primary aim has been the usage of this system in autonomous robots for
@@ -83,7 +83,7 @@ But don't expect a quick response, we are always busy building robots ;-)
 
 If you want to change the library be sure to read the developer section, to
 familiarize yourself with the coding convention, design decisions etc. The
-Source Code is free avilable, so feel free to adapt it to your needs. The only
+source code is freely available, so feel free to adapt it to your needs. The only
 thing we ask you to do is to contribute your changes back. That way everybody
 can profit from it.
 
