@@ -46,13 +46,13 @@ FakeIODevice::setBaudrate(uint32_t)
 }
 
 void
-FakeIODevice::write(char data)
+FakeIODevice::write(uint8_t data)
 {
 	sendBuffer[bytesSend++] = data;
 }
 
 bool
-FakeIODevice::read(char& byte)
+FakeIODevice::read(uint8_t& byte)
 {
 	if (receivePosition >= bytesReceived) {
 		return false;

@@ -38,11 +38,12 @@
 
 #include "timer_7.hpp"
 
+#include <xpcc_config.hpp>
+
 #if defined(STM32F10X_HD) || defined(STM32F10X_XL) || \
 	defined(STM32F10X_CL) || \
 	defined(STM32F2XX) || defined(STM32F4XX)
 
-#include <xpcc_config.hpp>
 
 // ----------------------------------------------------------------------------
 void

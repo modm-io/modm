@@ -42,10 +42,10 @@ public:
 	setBaudrate(uint32_t);
 	
 	static void
-	write(char data);
+	write(uint8_t data);
 	
 	static bool
-	read(char& byte);
+	read(uint8_t& byte);
 	
 	static void
 	reset();
