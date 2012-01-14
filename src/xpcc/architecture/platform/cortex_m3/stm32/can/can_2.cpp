@@ -224,6 +224,10 @@ extern "C" void
 CAN2_SCE_IRQHandler()
 {
 	// TODO check Bus Off, Error Passive
+	
+	
+	// Acknowledge interrupt
+	CAN2->MSR = CAN_MSR_ERRI;
 }
 
 // ----------------------------------------------------------------------------
@@ -270,13 +274,6 @@ nvicEnableInterrupt(IRQn_Type IRQn)
 bool
 xpcc::stm32::Can2::initialize(can::Bitrate bitrate)
 {
-	
-#if defined(STM32F2XX) || defined(STM32F4XX)
-
-#else
-	
-#endif
-	
 	// enable clock
 	RCC->APB1ENR  |=  RCC_APB1ENR_CAN2EN;
 	

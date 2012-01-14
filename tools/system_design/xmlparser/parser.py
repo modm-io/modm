@@ -99,8 +99,8 @@ class Parser(object):
 			xmltree = et.parse(filename).getroot()
 		except OSError as e:
 			raise ParserException(e)
-		except xml.parsers.expat.ExpatError as e:
-			raise ParserException("Error while parsing xml-file '%s': %s" % (filename, e))
+		except (xml.parsers.expat.ExpatError, xml.etree.ElementTree.ParseError) as e:
+			raise ParserException("while parsing xml-file '%s': %s" % (filename, e))
 		
 		try:
 			import lxml.etree		# for validating

@@ -240,6 +240,10 @@ extern "C" void
 CAN{{ id }}_SCE_IRQHandler()
 {
 	// TODO check Bus Off, Error Passive
+	
+	
+	// Acknowledge interrupt
+	CAN{{ id }}->MSR = CAN_MSR_ERRI;
 }
 
 // ----------------------------------------------------------------------------
@@ -317,13 +321,6 @@ nvicEnableInterrupt(IRQn_Type IRQn)
 bool
 xpcc::stm32::Can{{ id }}::initialize(can::Bitrate bitrate)
 {
-	
-#if defined(STM32F2XX) || defined(STM32F4XX)
-
-#else
-	
-#endif
-	
 	// enable clock
 	RCC->APB1ENR  |=  RCC_APB1ENR_CAN{{ id }}EN;
 	
@@ -374,6 +371,7 @@ xpcc::stm32::Can{{ id }}::initialize(can::Bitrate bitrate)
 	CAN{{ id }}->IER |= CAN_IER_FMPIE1 | CAN_IER_FMPIE0;
 #endif
 	
+	// FIXME wrong timing for the STM32F2xx and 4xx
 	/* Example for CAN bit timing:
 	 *   CLK on APB1 = 36 MHz
 	 *   BaudRate = 125 kBPs = 1 / NominalBitTime
@@ -396,6 +394,7 @@ xpcc::stm32::Can{{ id }}::initialize(can::Bitrate bitrate)
 		case can::BITRATE_250_KBPS:	prescaler =   8; break;
 		case can::BITRATE_500_KBPS:	prescaler =   4; break;
 		case can::BITRATE_1_MBPS:	prescaler =   2; break;
+		default: prescaler = 16; break;
 	}
 	CAN{{ id }}->BTR =
 			 ((1 - 1) << CAN_BTR_SJW_POS) |		// SJW (1 to 4 possible)
