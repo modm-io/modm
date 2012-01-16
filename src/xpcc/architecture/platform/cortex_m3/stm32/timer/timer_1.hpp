@@ -64,7 +64,7 @@ namespace xpcc
 		 * extern "C" void
 		 * TIM1_UP_IRQHandler(void)
 		 * {
-		 *     Timer1::resetInterruptFlag(Timer1::...);
+		 *     Timer1::resetInterruptFlags(Timer1::...);
 		 *     
 		 *     ...
 		 * }
@@ -270,7 +270,7 @@ namespace xpcc
 			}
 			
 			static inline void
-			resetInterruptFlag(InterruptFlag flags)
+			resetInterruptFlags(InterruptFlag flags)
 			{
 				// Flags are cleared by writing a zero to the flag position.
 				// Writing a one is ignored.

@@ -342,6 +342,7 @@ xpcc::stm32::Can1::initialize(can::Bitrate bitrate)
 	CAN1->IER |= CAN_IER_FMPIE1 | CAN_IER_FMPIE0;
 #endif
 	
+	// FIXME wrong timing for the STM32F2xx and 4xx
 	/* Example for CAN bit timing:
 	 *   CLK on APB1 = 36 MHz
 	 *   BaudRate = 125 kBPs = 1 / NominalBitTime
@@ -364,6 +365,7 @@ xpcc::stm32::Can1::initialize(can::Bitrate bitrate)
 		case can::BITRATE_250_KBPS:	prescaler =   8; break;
 		case can::BITRATE_500_KBPS:	prescaler =   4; break;
 		case can::BITRATE_1_MBPS:	prescaler =   2; break;
+		default: prescaler = 16; break;
 	}
 	CAN1->BTR =
 			 ((1 - 1) << CAN_BTR_SJW_POS) |		// SJW (1 to 4 possible)

@@ -46,7 +46,7 @@ namespace xpcc
 		 * extern "C" void
 		 * TIM{{ id }}_IRQHandler(void)
 		 * {
-		 *     Timer{{ id }}::resetInterruptFlag(Timer{{ id }}::...);
+		 *     Timer{{ id }}::resetInterruptFlags(Timer{{ id }}::...);
 		 *     
 		 *     ...
 		 * }
@@ -275,7 +275,7 @@ namespace xpcc
 			}
 			
 			static inline void
-			resetInterruptFlag(InterruptFlag flags)
+			resetInterruptFlags(InterruptFlag flags)
 			{
 				// Flags are cleared by writing a zero to the flag position.
 				// Writing a one is ignored.
