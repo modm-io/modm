@@ -33,6 +33,8 @@
 #ifndef XPCC_I2C__SYNC_MASTER_HPP
 #define XPCC_I2C__SYNC_MASTER_HPP
 
+#include "master.hpp"
+
 namespace xpcc
 {
 	/**

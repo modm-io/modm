@@ -72,9 +72,10 @@ namespace xpcc
 			
 			/**
 			 * @brief	Initialize I2C module
+			 * \param ccrPrescaler: I2CFrequency = STM32_APB1_FREQUENCY / (2 * ccrPrescaler)
 			 */
 			static void
-			initialize();
+			initialize(uint16_t ccrPrescaler);
 			
 		public:
 			static bool

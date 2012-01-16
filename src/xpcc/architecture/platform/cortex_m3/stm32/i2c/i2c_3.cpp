@@ -35,6 +35,7 @@
 
 #include "i2c_3.hpp"
 
+#include <xpcc_config.hpp>
 #include "../gpio.hpp"
 
 #if defined(STM32F2XX) || defined(STM32F4XX)
@@ -115,7 +116,7 @@ I2C3_EV_IRQHandler(void)
 	}
 	if (tmp & I2C_SR1_TXE)
 	{
-		if (tmp & I2C_SR1_BTF)
+		if (bytes_left == 0 || tmp & I2C_SR1_BTF)
 		{
 			if(bytes_left == 0)
 			{
@@ -229,7 +230,7 @@ xpcc::stm32::I2c3::configurePins(Mapping mapping)
 
 // ----------------------------------------------------------------------------
 void
-xpcc::stm32::I2c3::initialize()
+xpcc::stm32::I2c3::initialize(uint16_t ccrPrescaler)
 {
 	// Enable clock
 	RCC->APB1ENR |= RCC_APB1ENR_I2C3EN;
@@ -240,8 +241,9 @@ xpcc::stm32::I2c3::initialize()
 	NVIC_EnableIRQ(I2C3_ER_IRQn);
 	NVIC_EnableIRQ(I2C3_EV_IRQn);
 
-	I2C3->CCR = 0xff; 	// baudrate (prescaler), only while i2c disabled, PE = 0
-	I2C3->CR2 = 36;		// not enable interrupts, 36 MHz is maximum
+	I2C3->CCR = ccrPrescaler; 	// baudrate (prescaler), only while i2c disabled, PE = 0
+	// not enable interrupts | Value of peripheral clock (Unknown effect of this value yet, since Module is always running on APB frequency)
+	I2C3->CR2 = STM32_APB1_FREQUENCY/1000000;
 //	I2C3->TRISE = // rise time
 
 	I2C3->CR1 |= I2C_CR1_PE; // Enable peripheral
