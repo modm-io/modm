@@ -117,6 +117,11 @@ namespace xpcc
 				SLAVE_EXTERNAL_CLOCK = TIM_SMCR_SMS_2 | TIM_SMCR_SMS_1 | TIM_SMCR_SMS_0, // Rising edges of the selected trigger (TRGI) clock the counter.
 			};
 			
+			// This type is the internal size of the counter.
+			// Timer 2 and 5 are the only one which have the size of 32 bit and
+			// only on st32f2 and st32f4
+			typedef uint16_t Value;
+			
 			static void
 			enable();
 			
@@ -163,14 +168,14 @@ namespace xpcc
 				TIM3->EGR |= TIM_EGR_UG;
 			}
 			
-			static inline uint16_t
+			static inline Value
 			getValue()
 			{
 				return TIM3->CNT;
 			}
 			
 			static inline void
-			setValue(uint16_t value)
+			setValue(Value value)
 			{
 				TIM3->CNT = value;
 			}
@@ -182,10 +187,10 @@ namespace xpcc
 			
 			static void
 			configureOutputChannel(uint32_t channel, OutputCompareMode mode,
-					uint16_t compareValue);
+					Value compareValue);
 			
 			static inline void
-			setCompareValue(uint32_t channel, uint16_t value)
+			setCompareValue(uint32_t channel, Value value)
 			{
 #if defined(STM32F2XX) || defined(STM32F4XX)
 				*(&TIM3->CCR1 + (channel - 1)) = value;
@@ -194,7 +199,7 @@ namespace xpcc
 #endif
 			}
 			
-			static inline uint16_t
+			static inline Value
 			getCompareValue(uint32_t channel)
 			{
 #if defined(STM32F2XX) || defined(STM32F4XX)

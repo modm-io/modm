@@ -147,7 +147,7 @@ xpcc::stm32::Timer3::configureInputChannel(uint32_t channel,
 // ----------------------------------------------------------------------------
 void
 xpcc::stm32::Timer3::configureOutputChannel(uint32_t channel,
-		OutputCompareMode mode, uint16_t compareValue)
+		OutputCompareMode mode, Value compareValue)
 {
 	channel -= 1;	// 1..4 -> 0..3
 	
