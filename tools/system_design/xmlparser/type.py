@@ -325,6 +325,7 @@ class Struct(BaseType):
 		
 		self.size = 0
 		size = 0
+		self.level = 0
 		for element in self.elements:
 			if element.size == 0:
 				raise ParserException("Loop in the definition of '%s' and '%s' detected!" % (self.name, self.element.name))

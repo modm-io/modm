@@ -6,18 +6,17 @@
 // ----------------------------------------------------------------------------
 
 #include <xpcc/communication.hpp>
+{% for component in components %}
+#include "component_{{ component.name | camelcase }}/{{ component.name | camelcase }}.hpp"
+{%- endfor %}
 
 #include "packets.hpp"
 #include "identifier.hpp"
 #include "postman.hpp"
 
-{%- for component in components %}
-#include "component_{{ component.name | camelcase }}/{{ component.name | camelcase }}.hpp"
-{%- endfor %}
-
 namespace component
 {
-	{% for component in components -%}
+	{%- for component in components %}
 	extern {{ component.name | CamelCase }}	{{ component.name | camelCase }};
 	{%- endfor %}
 }

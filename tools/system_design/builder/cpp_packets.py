@@ -59,7 +59,10 @@ def filter_constructor(class_, default=True):
 				
 				parameter.append("%s %s" % (type, name))
 		
-		return "%s(%s)" % (filter.typeName(class_.name), ", ".join(parameter))
+		if len(parameter) > 0:
+			return "%s(%s)" % (filter.typeName(class_.name), ", ".join(parameter))
+		else:
+			return ""
 
 def filter_initialization_list(class_, default=True):
 	initList = []

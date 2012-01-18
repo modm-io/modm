@@ -8,7 +8,7 @@
 #include {{ includeDirective }}
 
 {% for packet in packets -%}
-{%- if packet.flattened().isStruct -%}
+{%- if packet.flattened().isStruct and packet.flattened().size > 0-%}
 robot::packet::{{ packet.flattened().name | typeName }}::{{ packet.flattened() | generateConstructor }} :
 	{{ packet.flattened() | generateInitializationList }}
 {

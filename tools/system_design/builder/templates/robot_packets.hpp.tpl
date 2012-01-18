@@ -41,7 +41,9 @@ namespace robot
 		{
 			{{ packet.flattened() | generateConstructor }};
 			
+			{% if packet.flattened().size > 0 -%}
 			{{ packet.flattened() | generateConstructor(default=False) }};
+			{%- endif %}
 			{% for element in packet.flattened().iter() %}
 			{{ element | subtype }};
 			{%- endfor %}
