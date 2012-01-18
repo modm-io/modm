@@ -38,7 +38,7 @@
 
 namespace xpcc
 {
-	namespace freertos
+	namespace rtos
 	{
 		/**
 		 * \brief	Base class for binary and counting semaphores

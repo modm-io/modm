@@ -30,81 +30,52 @@
  */
 // ----------------------------------------------------------------------------
 
-#include "queue.hpp"
+#include "semaphore.hpp"
 
 // ----------------------------------------------------------------------------
-xpcc::freertos::QueueBase::QueueBase(unsigned portBASE_TYPE length,
-		unsigned portBASE_TYPE itemSize)
+xpcc::rtos::SemaphoreBase::~SemaphoreBase()
 {
-	this->handle = xQueueCreate(length, itemSize);
-}
-
-xpcc::freertos::QueueBase::~QueueBase()
-{
+	// As semaphores are based on queues we use the queue functions to delete
+	// the semaphore
 	vQueueDelete(this->handle);
 }
 
 // ----------------------------------------------------------------------------
 bool
-xpcc::freertos::QueueBase::append(const void *item, portTickType timeout)
+xpcc::rtos::SemaphoreBase::acquire(portTickType timeout)
 {
-	return (xQueueSendToBack(this->handle, item, timeout) == pdTRUE);
+	
+	return (xSemaphoreTake(this->handle, timeout) == pdTRUE);
 }
 
-bool
-xpcc::freertos::QueueBase::prepend(const void *item, portTickType timeout)
+void
+xpcc::rtos::SemaphoreBase::release()
 {
-	return (xQueueSendToFront(this->handle, item, timeout) == pdTRUE);
+	xSemaphoreGive(this->handle);
 }
 
-bool
-xpcc::freertos::QueueBase::peek(void *item, portTickType timeout) const
-{
-	return (xQueuePeek(this->handle, item, timeout) == pdTRUE);
-}
-
-bool
-xpcc::freertos::QueueBase::get(void *item, portTickType timeout)
-{
-	return (xQueueReceive(this->handle, item, timeout) == pdTRUE);
-}
-
-bool
-xpcc::freertos::QueueBase::appendFromInterrupt(const void *item)
+void
+xpcc::rtos::SemaphoreBase::releaseFromInterrupt()
 {
 	portBASE_TYPE taskWoken = pdFALSE;
-	portBASE_TYPE result = xQueueSendToBackFromISR(this->handle, item, &taskWoken);
+	
+	xSemaphoreGiveFromISR(this->handle, &taskWoken);
 	
 	// Request a context switch when the IRQ ends if a higher priorty has
 	// been woken.
 	portEND_SWITCHING_ISR(taskWoken);
-	
-	return (result == pdPASS);
 }
 
-bool
-xpcc::freertos::QueueBase::prependFromInterrupt(const void *item)
+// ----------------------------------------------------------------------------
+xpcc::rtos::Semaphore::Semaphore(unsigned portBASE_TYPE max,
+		unsigned portBASE_TYPE initial)
 {
-	portBASE_TYPE taskWoken = pdFALSE;
-	portBASE_TYPE result = xQueueSendToFrontFromISR(this->handle, item, &taskWoken);
-	
-	// Request a context switch when the IRQ ends if a higher priorty has
-	// been woken.
-	portEND_SWITCHING_ISR(taskWoken);
-	
-	return (result == pdPASS);
+	this->handle = xSemaphoreCreateCounting(max, initial);
 }
 
-bool
-xpcc::freertos::QueueBase::getFromInterrupt(void *item)
+// ----------------------------------------------------------------------------
+xpcc::rtos::BinarySemaphore::BinarySemaphore()
 {
-	portBASE_TYPE taskWoken = pdFALSE;
-	portBASE_TYPE result = xQueueReceiveFromISR(this->handle, item, &taskWoken);
-	
-	// Request a context switch when the IRQ ends if a higher priorty has
-	// been woken.
-	portEND_SWITCHING_ISR(taskWoken);
-	
-	return (result == pdTRUE);
+	vSemaphoreCreateBinary(this->handle);
 }
 

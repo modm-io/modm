@@ -30,29 +30,15 @@
  */
 // ----------------------------------------------------------------------------
 
-#include "mutex.hpp"
+#ifndef XPCC_RTOS__SEMAPHORE_HPP
+#define XPCC_RTOS__SEMAPHORE_HPP
 
-// ----------------------------------------------------------------------------
-xpcc::freertos::Mutex::Mutex()
-{
-	this->handle = xSemaphoreCreateMutex();
-}
+#include <xpcc/architecture/utils.hpp>
 
-xpcc::freertos::Mutex::~Mutex()
-{
-	vQueueDelete(this->handle);
-}
+#ifdef XPCC__CPU_HOSTED
+#	include "boost/semaphore.hpp"
+#elif defined(XPCC__CPU_CORTEX_M3) || defined(XPCC__CPU_CORTEX_M4)
+#	include "freertos/semaphore.hpp"
+#endif
 
-// ----------------------------------------------------------------------------
-bool
-xpcc::freertos::Mutex::acquire(portTickType timeout)
-{
-	return (xSemaphoreTake(this->handle, timeout) == pdTRUE);
-}
-
-void
-xpcc::freertos::Mutex::release()
-{
-	xSemaphoreGive(this->handle);
-}
-
+#endif // XPCC_RTOS__SEMAPHORE_HPP

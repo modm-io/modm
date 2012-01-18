@@ -30,79 +30,52 @@
  */
 // ----------------------------------------------------------------------------
 
-#include "task.hpp"
+#include "semaphore.hpp"
 
-/*
- * FreeRTOS is a C library. Therefore it doesn't know anything about objects
- * and their this-pointers. To be able to use FreeRTOS from C++ we use a
- * simple trick:
- *
- * FreeRTOS tasks must be C functions which get a single void-Pointer as
- * argument. To call C++ member functions we use the static member function
- * xpcc::freertos::Task::wrapper() as a wrapper which gets the a pointer to
- * the corresponding task as parameter.
- * To be able to call the right run()-function run() needs to be virtual. This
- * adds the overhead of an additional vtable per Task but is the only portable
- * solution.
- * Casting member functions pointer to void-pointers and back might work but
- * is not guaranteed to.
- */
 // ----------------------------------------------------------------------------
-void
-xpcc::freertos::Task::wrapper(void *object)
+xpcc::rtos::SemaphoreBase::~SemaphoreBase()
 {
-	Task* task = reinterpret_cast<Task *>(object);
-	task->run();
-}
-
-xpcc::freertos::Task::~Task()
-{
-	vTaskDelete(this->handle);
+	// As semaphores are based on queues we use the queue functions to delete
+	// the semaphore
+	vQueueDelete(this->handle);
 }
 
 // ----------------------------------------------------------------------------
-xpcc::freertos::Task::Task(unsigned portBASE_TYPE priority,
-		unsigned short stackDepth,
-		const char* name)
+bool
+xpcc::rtos::SemaphoreBase::acquire(portTickType timeout)
 {
-	xTaskCreate(
-			&wrapper,
-			(const signed char*) name,
-			stackDepth,
-			this,
-			priority,
-			&this->handle);
+	
+	return (xSemaphoreTake(this->handle, timeout) == pdTRUE);
+}
+
+void
+xpcc::rtos::SemaphoreBase::release()
+{
+	xSemaphoreGive(this->handle);
+}
+
+void
+xpcc::rtos::SemaphoreBase::releaseFromInterrupt()
+{
+	portBASE_TYPE taskWoken = pdFALSE;
+	
+	xSemaphoreGiveFromISR(this->handle, &taskWoken);
+	
+	// Request a context switch when the IRQ ends if a higher priorty has
+	// been woken.
+	portEND_SWITCHING_ISR(taskWoken);
 }
 
 // ----------------------------------------------------------------------------
-unsigned portBASE_TYPE
-xpcc::freertos::Task::getPriority() const
+xpcc::rtos::Semaphore::Semaphore(unsigned portBASE_TYPE max,
+		unsigned portBASE_TYPE initial)
 {
-	return uxTaskPriorityGet(this->handle);
-}
-
-void
-xpcc::freertos::Task::setPriority(unsigned portBASE_TYPE priority)
-{
-	vTaskPrioritySet(this->handle, priority);
+	this->handle = xSemaphoreCreateCounting(max, initial);
 }
 
 // ----------------------------------------------------------------------------
-void
-xpcc::freertos::Task::suspend()
+xpcc::rtos::BinarySemaphore::BinarySemaphore()
 {
-	vTaskSuspend(this->handle);
-}
-
-void
-xpcc::freertos::Task::resume()
-{
-	vTaskResume(this->handle);
-}
-
-void
-xpcc::freertos::Task::resumeFromInterrupt()
-{
-	xTaskResumeFromISR(this->handle);
+	vSemaphoreCreateBinary(this->handle);
 }
 

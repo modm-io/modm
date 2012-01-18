@@ -40,7 +40,7 @@
 
 namespace xpcc
 {
-	namespace freertos
+	namespace rtos
 	{
 		/**
 		 * \brief	Queue base class

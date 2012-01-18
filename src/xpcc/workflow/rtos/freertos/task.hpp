@@ -91,7 +91,7 @@
 
 namespace xpcc
 {
-	namespace freertos
+	namespace rtos
 	{
 		/**
 		 * \brief	Task
@@ -156,26 +156,53 @@ namespace xpcc
 			void
 			resumeFromInterrupt();
 			
+			/**
+			 * \brief	When created suspends all real time kernel activity
+			 * 			while keeping interrupts (including the kernel tick)
+			 * 			enabled.
+			 * 
+			 * After creating a instance the calling task will continue
+			 * to execute without risk of being swapped out until the destruction
+			 * of the lock instance.
+			 * 
+			 * API functions that have the potential to cause a context switch
+			 * (for example, delay()) must not be called while the scheduler
+			 * is suspended.
+			 */
+			class Lock
+			{
+			public:
+				Lock()
+				{
+					vTaskSuspendAll();
+				}
+				
+				~Lock()
+				{
+					xTaskResumeAll();
+				}
+			};
+			
 		protected:
 			/**
 			 * \brief	Delay for the number of ticks
 			 * 
 			 * Use the MILLISECONDS macro to convert ticks to milliseconds:
 			 * \code
-			 * delay(10 * MILLISECONDS);
+			 * sleep(10 * MILLISECONDS);
 			 * \endcode 
 			 * 
 			 * \param	ticks	Number of scheduler ticks to delay for
 			 * \see		MILLISECONDS
 			 */
 			static inline void
-			delay(portTickType ticks)
+			sleep(portTickType ticks)
 			{
 				vTaskDelay(ticks);
 			}
 			
 			// TODO
-			//delayUntil();
+			//sleepUntil();
 			
 			/**
 			 * \brief	Force a context switch

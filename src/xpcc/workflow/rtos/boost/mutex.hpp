@@ -38,7 +38,7 @@
 
 namespace xpcc
 {
-	namespace freertos
+	namespace rtos
 	{
 		/**
 		 * \brief	Mutex

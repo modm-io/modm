@@ -7,7 +7,7 @@
 #include <xpcc/driver/ui/display/ea_dog.hpp>
 #include <xpcc/driver/ui/display/font.hpp>
 
-#include <xpcc/workflow/freertos.hpp>
+#include <xpcc/workflow/rtos.hpp>
 
 // ----------------------------------------------------------------------------
 GPIO__OUTPUT(LedStatInverted, C, 12);	// inverted, 0=on, 1=off
@@ -43,14 +43,14 @@ initClock()
 xpcc::DogS102< xpcc::stm32::Spi1, lcd::CS, lcd::A0, lcd::Reset, false > display;
 
 // ----------------------------------------------------------------------------
-xpcc::freertos::BinarySemaphore event;
+xpcc::rtos::BinarySemaphore event;
 
 // ----------------------------------------------------------------------------
-class LedTask1 : public xpcc::freertos::Task
+class LedTask1 : public xpcc::rtos::Task
 {
 public:
 	LedTask1() :
-		xpcc::freertos::Task(2)
+		xpcc::rtos::Task(2)
 	{
 	}
 	
@@ -72,11 +72,11 @@ public:
 };
 
 // Toggle Led2 when LedTask1 starts a new cycle
-class LedTask2 : public xpcc::freertos::Task
+class LedTask2 : public xpcc::rtos::Task
 {
 public:
 	LedTask2() :
-		xpcc::freertos::Task(2)
+		xpcc::rtos::Task(2)
 	{
 	}
 	
@@ -95,11 +95,11 @@ public:
 
 // Display a rotating hand in a circle and some fonts. Lowest priority, will
 // be interrupted by the other Tasks
-class DisplayTask : public xpcc::freertos::Task
+class DisplayTask : public xpcc::rtos::Task
 {
 public:
 	DisplayTask() :
-		xpcc::freertos::Task(0), index(0)
+		xpcc::rtos::Task(0), index(0)
 	{
 	}
 	
@@ -164,6 +164,6 @@ main(void)
 	display.setFont(xpcc::font::FixedWidth5x8);
 	
 	// Start the FreeRTOS scheduler
-	xpcc::freertos::Scheduler::schedule();
+	xpcc::rtos::Scheduler::schedule();
 }
 

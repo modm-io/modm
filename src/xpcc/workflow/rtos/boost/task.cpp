@@ -30,52 +30,52 @@
  */
 // ----------------------------------------------------------------------------
 
-#include "semaphore.hpp"
+#include "task.hpp"
+
+xpcc::rtos::Task* xpcc::rtos::Task::head = 0;
 
 // ----------------------------------------------------------------------------
-xpcc::freertos::SemaphoreBase::~SemaphoreBase()
+xpcc::rtos::Task::Task(uint32_t priority, uint32_t stackDepth, const char* name) :
+	next(0)
 {
-	// As semaphores are based on queues we use the queue functions to delete
-	// the semaphore
-	vQueueDelete(this->handle);
+	// avoid compiler warnings
+	(void) priority;
+	(void) stackDepth;
+	(void) name;
+	
+	// create a list of all threads
+	if (head == 0) {
+		head = this;
+	}
+	else {
+		Task *list = head;
+		while (list->next != 0) {
+			list = list->next;
+		}
+		list->next = this;
+	}
+}
+
+xpcc::rtos::Task::~Task()
+{
 }
 
 // ----------------------------------------------------------------------------
-bool
-xpcc::freertos::SemaphoreBase::acquire(portTickType timeout)
+void
+xpcc::rtos::Task::suspend()
 {
-	
-	return (xSemaphoreTake(this->handle, timeout) == pdTRUE);
+	// delete the current thread 
+	this->thread.reset();
 }
 
 void
-xpcc::freertos::SemaphoreBase::release()
+xpcc::rtos::Task::resume()
 {
-	xSemaphoreGive(this->handle);
+	this->thread.reset(new boost::thread(boost::bind(&Task::run, this)));
 }
 
 void
-xpcc::freertos::SemaphoreBase::releaseFromInterrupt()
+xpcc::rtos::Task::resumeFromInterrupt()
 {
-	portBASE_TYPE taskWoken = pdFALSE;
-	
-	xSemaphoreGiveFromISR(this->handle, &taskWoken);
-	
-	// Request a context switch when the IRQ ends if a higher priorty has
-	// been woken.
-	portEND_SWITCHING_ISR(taskWoken);
+	this->resume();
 }
-
-// ----------------------------------------------------------------------------
-xpcc::freertos::Semaphore::Semaphore(unsigned portBASE_TYPE max,
-		unsigned portBASE_TYPE initial)
-{
-	this->handle = xSemaphoreCreateCounting(max, initial);
-}
-
-// ----------------------------------------------------------------------------
-xpcc::freertos::BinarySemaphore::BinarySemaphore()
-{
-	vSemaphoreCreateBinary(this->handle);
-}
-

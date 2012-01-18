@@ -1,11 +1,11 @@
 // coding: utf-8
 // ----------------------------------------------------------------------------
-/* Copyright (c) 2009, Roboterclub Aachen e.V.
+/* Copyright (c) 2011, Roboterclub Aachen e.V.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -29,36 +29,16 @@
  * $Id$
  */
 // ----------------------------------------------------------------------------
-/**
- * \ingroup		workflow
- * \defgroup	freertos	FreeRTOS
- * 
- * FreeRTOS is a real-time operating system for embedded devices, being ported
- * to several microcontrollers. It is distributed under the GPL with an
- * optional exception.
- * The exception permits users' proprietary code to remain closed source while
- * maintaining the kernel itself as open source, thereby facilitating the use
- * of FreeRTOS in proprietary applications.
- * 
- * Key features:
- * - Small and simple. Very good for hobbyists who are new to OSes.
- * - Scheduler can be configured for both preemptive or cooperative operation.
- * - Coroutine support (Coroutine in FreeRTOS is a very simple and lightweight
- *   task that has very limited use of stack)
- * 
- * \see	http://www.freertos.org/
- */
 
-namespace xpcc
-{
-	/// \ingroup	freertos
-	namespace freertos
-	{	
-	}
-}
+#ifndef XPCC_RTOS__QUEUE_HPP
+#define XPCC_RTOS__QUEUE_HPP
 
-#include "freertos/scheduler.hpp"
-#include "freertos/task.hpp"
-#include "freertos/mutex.hpp"
-#include "freertos/semaphore.hpp"
-#include "freertos/queue.hpp"
+#include <xpcc/architecture/utils.hpp>
+
+#ifdef XPCC__CPU_HOSTED
+#	include "boost/queue.hpp"
+#elif defined(XPCC__CPU_CORTEX_M3) || defined(XPCC__CPU_CORTEX_M4)
+#	include "freertos/queue.hpp"
+#endif
+
+#endif // XPCC_RTOS__QUEUE_HPP
