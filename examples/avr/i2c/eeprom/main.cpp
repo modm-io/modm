@@ -26,9 +26,9 @@ typedef xpcc::atmega::AsynchronousTwiMaster I2C;
 void
 die()
 {
-	// wait for buffered uart sending bytes in buffer
-	xpcc::delay_ms(100);
-	abort();
+	while (1) {
+		// wait forever
+	}
 }
 
 int

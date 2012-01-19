@@ -29,13 +29,16 @@ static const uint8_t OUTX_L = 0x28;
 static const uint8_t OUTX_H = 0x29;
 
 
-void i2cStateMachine(){
-
+void
+i2cStateMachine()
+{
 	static bool init = true;
 
-	if (init){
+	if (init)
+	{
 		// initialize accelerometer
-		if (SyncCortexI2c::startCheck(0x3a)){
+		if (SyncCortexI2c::startCheck(0x3a))
+		{
 			uint8_t registerAddress = CTRL_REG1;
 			uint8_t buffer[2] = {0x87};
 			if (SyncCortexI2c::write(&registerAddress, 1, xpcc::i2c::SYNC_NO_STOP) == xpcc::i2c::BUS_RESET){
@@ -47,8 +50,9 @@ void i2cStateMachine(){
 			}
 		}
 	}
-	else{
-		if (SyncCortexI2c::startCheck(0x3a)){
+	else {
+		if (SyncCortexI2c::startCheck(0x3a))
+		{
 			uint8_t registerAddress = OUTX_L;
 			uint8_t buffer[2];
 
@@ -69,7 +73,8 @@ void i2cStateMachine(){
 
 MAIN_FUNCTION
 {
-	CortexI2c::initialize();
+	// TODO Prescaler setting
+	CortexI2c::initialize(10000);
 
 	while (1)
 	{

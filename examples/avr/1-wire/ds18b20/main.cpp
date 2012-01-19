@@ -28,7 +28,9 @@ main()
 	if (!ow.touchReset()) {
 		output << "No devices found!" << xpcc::endl;
 		xpcc::delay_ms(100);
-		exit(1);
+		while (1) {
+			// wait forever
+		}
 	}
 	
 	// search for connected DS18B20 devices
@@ -63,3 +65,4 @@ main()
 		}
 	}
 }
+

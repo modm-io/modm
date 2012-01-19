@@ -24,7 +24,7 @@ main(void)
 	Io::setInput();
 	Io::read();
 	
-	uart.write("xpcc rocks!");
+	uart.write('x');
 	
 	while (1)
 	{

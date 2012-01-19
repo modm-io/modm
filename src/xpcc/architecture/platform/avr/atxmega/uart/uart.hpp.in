@@ -32,6 +32,8 @@
 #ifndef XPCC_ATXMEGA__UART_{{ id }}_HPP
 #define XPCC_ATXMEGA__UART_{{ id }}_HPP
 
+#ifdef USART{{ id }}
+
 #include <stdint.h>
 
 /*
@@ -331,4 +333,5 @@ namespace xpcc
 	}
 }
 
+#endif // USART{{ id }}
 #endif // XPCC_ATXMEGA__UART_{{ id }}_HPP

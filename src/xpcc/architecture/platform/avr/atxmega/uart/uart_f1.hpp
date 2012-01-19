@@ -36,6 +36,8 @@
 #ifndef XPCC_ATXMEGA__UART_F1_HPP
 #define XPCC_ATXMEGA__UART_F1_HPP
 
+#ifdef USARTF1
+
 #include <stdint.h>
 
 /*
@@ -335,4 +337,5 @@ namespace xpcc
 	}
 }
 
+#endif // USARTF1
 #endif // XPCC_ATXMEGA__UART_F1_HPP

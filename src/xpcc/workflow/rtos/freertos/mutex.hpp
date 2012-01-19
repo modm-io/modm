@@ -76,6 +76,29 @@ namespace xpcc
 			
 			xSemaphoreHandle handle;
 		};
+		
+		/**
+		 * Implements a RAII-style locking.
+		 * 
+		 * Locks the Mutex when created and unlocks it on destruction.
+		 */
+		class MutexGuard
+		{
+		public:
+			MutexGuard(Mutex& m) :
+				mutex(m)
+			{
+				mutex.acquire();
+			}
+			
+			~MutexGuard()
+			{
+				mutex.release();
+			}
+			
+		private:
+			Mutex& mutex;
+		};
 	}
 }
 

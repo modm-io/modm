@@ -35,24 +35,16 @@
 // ----------------------------------------------------------------------------
 xpcc::rtos::Mutex::Mutex()
 {
-	this->handle = xSemaphoreCreateMutex();
 }
 
 xpcc::rtos::Mutex::~Mutex()
 {
-	vQueueDelete(this->handle);
 }
 
 // ----------------------------------------------------------------------------
 bool
-xpcc::rtos::Mutex::acquire(portTickType timeout)
+xpcc::rtos::Mutex::acquire(uint32_t timeout)
 {
-	return (xSemaphoreTake(this->handle, timeout) == pdTRUE);
+	return mutex.timed_lock(
+			boost::posix_time::milliseconds(timeout));
 }
-
-void
-xpcc::rtos::Mutex::release()
-{
-	xSemaphoreGive(this->handle);
-}
-

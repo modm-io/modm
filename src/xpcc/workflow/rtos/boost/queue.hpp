@@ -30,141 +30,66 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_FREERTOS__QUEUE_HPP
-#define XPCC_FREERTOS__QUEUE_HPP
+#ifndef XPCC_BOOST__QUEUE_HPP
+#define XPCC_BOOST__QUEUE_HPP
 
-#include <cstddef>
+#include <stdint.h>
+#include <deque>
 
-#include <freertos/FreeRTOS.h>
-#include <freertos/queue.h>
+#include <boost/thread/mutex.hpp>
+#include <xpcc/container/deque.hpp>
 
 namespace xpcc
 {
 	namespace rtos
 	{
 		/**
-		 * \brief	Queue base class
+		 * Thread-safe Queue.
 		 * 
-		 * \ingroup	freertos
-		 */
-		class QueueBase
-		{
-		public:
-			/**
-			 * \brief	Create a Queue
-			 * 
-			 * \param	length		The maximum number of items the queue can
-			 * 						contain.
-			 * \param	itemSize	The size of one item. All items in the queue
-			 * 						must have the same size.
-			 */
-			QueueBase(unsigned portBASE_TYPE length,
-					unsigned portBASE_TYPE itemSize);
-			
-			~QueueBase();
-			
-			/// Get the number of items stored in the queue
-			inline std::size_t
-			getSize() const
-			{
-				return uxQueueMessagesWaiting(this->handle);
-			}
-			
-			/**
-			 * \brief	Post an item to the back of a queue.
-			 * 
-			 * This function must not be called from an interrupt service
-			 * routine. Use appendFromInterrupt() for this purpose.
-			 */
-			bool
-			append(const void *item, portTickType timeout = portMAX_DELAY);
-			
-			bool
-			prepend(const void *item, portTickType timeout = portMAX_DELAY);
-			
-			bool
-			peek(void *item, portTickType timeout = portMAX_DELAY) const;
-			
-			bool
-			get(void *item, portTickType timeout = portMAX_DELAY);
-			
-			bool
-			appendFromInterrupt(const void *item);
-			
-			bool
-			prependFromInterrupt(const void *item);
-			
-			bool
-			getFromInterrupt(void *item);
-			
-		protected:
-			xQueueHandle handle;
-			
-		private:
-			// disable copy constructor
-			QueueBase(const QueueBase& other);
-			
-			// disable assignment operator
-			QueueBase&
-			operator = (const QueueBase& other);
-		};
-		
-		/**
-		 * \brief	Queue
-		 * 
-		 * This is a type-safe wrapper around QueueBase
-		 * 
-		 * \ingroup	freertos
+		 * \ingroup	rtos_boost
 		 */
 		template<typename T>
-		class Queue : private QueueBase
+		class Queue
 		{
 		public:
-			Queue(unsigned portBASE_TYPE length);
+			/**
+			 * Create a Queue.
+			 * 
+			 * \param length
+			 * 			The maximum number of items the queue can contain.
+			 */
+			Queue(uint32_t length);
 			
-			using QueueBase::getSize;
+			~Queue();
 			
-			inline bool
-			append(const T& item, portTickType timeout = portMAX_DELAY)
-			{
-				return QueueBase::append(&item, timeout);
-			}
+			/**
+			 * Get the number of items stored in the queue
+			 */
+			std::size_t
+			getSize() const;
 			
-			inline bool
-			prepend(const T& item, portTickType timeout = portMAX_DELAY)
-			{
-				return QueueBase::prepend(&item, timeout);
-			}
+			bool
+			append(const T& item, uint32_t timeout = -1);
 			
-			inline bool
-			peek(T& item, portTickType timeout = portMAX_DELAY)
-			{
-				return QueueBase::peek(&item, timeout);
-			}
+			bool
+			prepend(const T& item, uint32_t timeout = -1);
 			
-			inline bool
-			get(T& item, portTickType timeout = portMAX_DELAY)
-			{
-				return QueueBase::get(&item, timeout);
-			}
 			
-			inline bool
-			appendFromInterrupt(const T& item)
-			{
-				return QueueBase::appendFromInterrupt(&item);
-			}
+			bool
+			peek(T& item, uint32_t timeout = -1) const;
+			
+			bool
+			get(T& item, uint32_t timeout = -1);
+			
 			
 			inline bool
-			prependFromInterrupt(const T& item)
-			{
-				return QueueBase::prependFromInterrupt(&item);
-			}
+			appendFromInterrupt(const T& item);
 			
 			inline bool
-			getFromInterrupt(T& item)
-			{
-				return QueueBase::getFromInterrupt(&item);
-			}
+			prependFromInterrupt(const T& item);
+			
+			inline bool
+			getFromInterrupt(T& item);
 			
 		private:
 			// disable copy constructor
@@ -173,8 +98,13 @@ namespace xpcc
 			// disable assignment operator
 			Queue&
 			operator = (const Queue& other);
+			
+			mutable boost::timed_mutex mutex;
+			
+			uint32_t maxSize;
+			std::deque<T> deque;
 		};
 	}
 }
 
-#endif // XPCC_FREERTOS__QUEUE_HPP
+#endif // XPCC_BOOST__QUEUE_HPP

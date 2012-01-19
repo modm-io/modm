@@ -26,8 +26,9 @@ typedef xpcc::atmega::AsynchronousTwiMaster I2C;
 void
 die()
 {
-	xpcc::delay_ms(100);
-	abort();
+	while (1) {
+		// wait forever
+	}
 }
 
 int

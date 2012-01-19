@@ -63,10 +63,10 @@ public:
 			event.release();
 			
 			LedStat::set();
-			this->delay(50 * MILLISECONDS);
+			this->sleep(50 * MILLISECONDS);
 			
 			LedStat::reset();
-			this->delay(1000 * MILLISECONDS);
+			this->sleep(1000 * MILLISECONDS);
 		}
 	}
 };
@@ -133,7 +133,7 @@ public:
 			
 			Led1::set(ButtonWakeUp::read());
 			
-			this->delay(100);
+			this->sleep(100);
 		}
 	}
 

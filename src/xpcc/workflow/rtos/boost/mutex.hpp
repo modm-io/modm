@@ -30,41 +30,49 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_FREERTOS__MUTEX_HPP
-#define XPCC_FREERTOS__MUTEX_HPP
+#ifndef XPCC_BOOST__MUTEX_HPP
+#define XPCC_BOOST__MUTEX_HPP
 
-#include <freertos/FreeRTOS.h>
-#include <freertos/semphr.h>
+#include <boost/thread/mutex.hpp>
 
 namespace xpcc
 {
 	namespace rtos
 	{
+		// forward declaration
+		class MutexGuard;
+		
 		/**
 		 * \brief	Mutex
 		 * 
-		 * Mutexes and binary semaphores are very similar but have some subtle
-		 * differences: Mutexes include a priority inheritance mechanism,
-		 * binary semaphores do not.
-		 * 
-		 * This makes binary semaphores the better choice for implementing
-		 * synchronisation (between tasks or between tasks and an interrupt),
-		 * and mutexes the better choice for implementing simple mutual exclusion.
-		 * 
-		 * \ingroup	freertos
+		 * \ingroup	boost_rtos
 		 */
 		class Mutex
 		{
+			friend class MutexGuard;
+			
 		public:
 			Mutex();
 			
 			~Mutex();
 			
+			/**
+			 * \param	timeout		Timeout in Milliseconds
+			 */
 			bool
-			acquire(portTickType timeout = portMAX_DELAY);
+			acquire(uint32_t timeout);
 			
-			void
-			release();
+			inline void
+			acquire()
+			{
+				mutex.lock();
+			}
+			
+			inline void
+			release()
+			{
+				mutex.unlock();
+			}
 			
 		private:
 			// disable copy constructor
@@ -74,9 +82,27 @@ namespace xpcc
 			Mutex&
 			operator = (const Mutex& other);
 			
-			xSemaphoreHandle handle;
+			boost::timed_mutex mutex;
+		};
+		
+		/**
+		 * Implements a RAII-style locking.
+		 * 
+		 * Locks the Mutex when created and unlocks it on destruction.
+		 */
+		class MutexGuard : boost::lock_guard<boost::timed_mutex>
+		{
+		public:
+			MutexGuard(Mutex& m) :
+				boost::lock_guard<boost::timed_mutex>(m.mutex)
+			{
+			}
+			
+			~MutexGuard()
+			{
+			}
 		};
 	}
 }
 
-#endif // XPCC_FREERTOS__MUTEX_HPP
+#endif // XPCC_BOOST__MUTEX_HPP

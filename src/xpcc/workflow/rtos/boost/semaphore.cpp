@@ -33,49 +33,46 @@
 #include "semaphore.hpp"
 
 // ----------------------------------------------------------------------------
-xpcc::rtos::SemaphoreBase::~SemaphoreBase()
+xpcc::rtos::Semaphore::Semaphore(uint32_t max, uint32_t initial) :
+	count(initial), maxCount(max)
 {
-	// As semaphores are based on queues we use the queue functions to delete
-	// the semaphore
-	vQueueDelete(this->handle);
 }
 
 // ----------------------------------------------------------------------------
 bool
-xpcc::rtos::SemaphoreBase::acquire(portTickType timeout)
+xpcc::rtos::Semaphore::acquire(uint32_t timeout)
 {
+	boost::unique_lock<boost::mutex> lock(mutex);
+	while (count == 0)
+	{
+		 if (!condition.timed_wait(lock,
+				 boost::posix_time::milliseconds(timeout))) {
+			 return false;
+		 }
+	}
+	--count;
 	
-	return (xSemaphoreTake(this->handle, timeout) == pdTRUE);
+	return true;
 }
 
 void
-xpcc::rtos::SemaphoreBase::release()
+xpcc::rtos::Semaphore::release()
 {
-	xSemaphoreGive(this->handle);
-}
-
-void
-xpcc::rtos::SemaphoreBase::releaseFromInterrupt()
-{
-	portBASE_TYPE taskWoken = pdFALSE;
+	boost::unique_lock<boost::mutex> lock(mutex);
 	
-	xSemaphoreGiveFromISR(this->handle, &taskWoken);
-	
-	// Request a context switch when the IRQ ends if a higher priorty has
-	// been woken.
-	portEND_SWITCHING_ISR(taskWoken);
+	if (count < maxCount) {
+		++count;
+		
+		// Wake up any waiting threads. 
+		// Always do this, even if count_ wasn't 0 on entry. Otherwise, we
+		// might not wake up enough waiting threads if we get a number of
+		// signal() calls in a row.
+		condition.notify_one();
+	}
 }
 
 // ----------------------------------------------------------------------------
-xpcc::rtos::Semaphore::Semaphore(unsigned portBASE_TYPE max,
-		unsigned portBASE_TYPE initial)
+xpcc::rtos::BinarySemaphore::BinarySemaphore() :
+		Semaphore(1, 1)
 {
-	this->handle = xSemaphoreCreateCounting(max, initial);
 }
-
-// ----------------------------------------------------------------------------
-xpcc::rtos::BinarySemaphore::BinarySemaphore()
-{
-	vSemaphoreCreateBinary(this->handle);
-}
-
