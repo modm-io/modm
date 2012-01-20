@@ -30,52 +30,15 @@
  */
 // ----------------------------------------------------------------------------
 
-#include "task.hpp"
+#ifndef XPCC_RTOS__THREAD_HPP
+#define XPCC_RTOS__THREAD_HPP
 
-xpcc::rtos::Task* xpcc::rtos::Task::head = 0;
+#include <xpcc/architecture/utils.hpp>
 
-// ----------------------------------------------------------------------------
-xpcc::rtos::Task::Task(uint32_t priority, uint32_t stackDepth, const char* name) :
-	next(0)
-{
-	// avoid compiler warnings
-	(void) priority;
-	(void) stackDepth;
-	(void) name;
-	
-	// create a list of all threads
-	if (head == 0) {
-		head = this;
-	}
-	else {
-		Task *list = head;
-		while (list->next != 0) {
-			list = list->next;
-		}
-		list->next = this;
-	}
-}
+#ifdef XPCC__CPU_HOSTED
+#	include "boost/thread.hpp"
+#elif defined(XPCC__CPU_CORTEX_M3) || defined(XPCC__CPU_CORTEX_M4)
+#	include "freertos/thread.hpp"
+#endif
 
-xpcc::rtos::Task::~Task()
-{
-}
-
-// ----------------------------------------------------------------------------
-void
-xpcc::rtos::Task::suspend()
-{
-	// delete the current thread 
-	this->thread.reset();
-}
-
-void
-xpcc::rtos::Task::resume()
-{
-	this->thread.reset(new boost::thread(boost::bind(&Task::run, this)));
-}
-
-void
-xpcc::rtos::Task::resumeFromInterrupt()
-{
-	this->resume();
-}
+#endif // XPCC_RTOS__THREAD_HPP

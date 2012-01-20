@@ -48,7 +48,7 @@ namespace xpcc
 		 * binary semaphores do not.
 		 * 
 		 * This makes binary semaphores the better choice for implementing
-		 * synchronisation (between tasks or between tasks and an interrupt),
+		 * synchronisation (between threads or between threads and an interrupt),
 		 * and mutexes the better choice for implementing simple mutual exclusion.
 		 * 
 		 * \ingroup	freertos

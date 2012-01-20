@@ -48,7 +48,7 @@ namespace xpcc
 		 * -# Counting events. \n
 		 *    In this usage scenario an event handler will 'release' a semaphore
 		 *    each time an event occurs (incrementing the semaphore count
-		 *    value), and a handler task will 'acquire' a semaphore each time it
+		 *    value), and a handler thread will 'acquire' a semaphore each time it
 		 *    processes an event (decrementing the semaphore count value). The
 		 *    count value is therefore the difference between the number of
 		 *    events that have occurred and the number that have been
@@ -57,10 +57,10 @@ namespace xpcc
 		 * 
 		 * -# Resource management.
 		 *    In this usage scenario the count value indicates the number of
-		 *    resources available. To obtain control of a resource a task must
+		 *    resources available. To obtain control of a resource a thread must
 		 *    first obtain a semaphore - decrementing the semaphore count
 		 *    value. When the count value reaches zero there are no free
-		 *    resources. When a task finishes with the resource it 'gives' the
+		 *    resources. When a thread finishes with the resource it 'gives' the
 		 *    semaphore back (release()) - incrementing the semaphore count value.
 		 *    In this case it is desirable for the initial count value to be
 		 *    equal to the maximum count value, indicating that all resources

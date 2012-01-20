@@ -72,12 +72,12 @@ xpcc::rtos::QueueBase::get(void *item, portTickType timeout)
 bool
 xpcc::rtos::QueueBase::appendFromInterrupt(const void *item)
 {
-	portBASE_TYPE taskWoken = pdFALSE;
-	portBASE_TYPE result = xQueueSendToBackFromISR(this->handle, item, &taskWoken);
+	portBASE_TYPE threadWoken = pdFALSE;
+	portBASE_TYPE result = xQueueSendToBackFromISR(this->handle, item, &threadWoken);
 	
 	// Request a context switch when the IRQ ends if a higher priorty has
 	// been woken.
-	portEND_SWITCHING_ISR(taskWoken);
+	portEND_SWITCHING_ISR(threadWoken);
 	
 	return (result == pdPASS);
 }
@@ -85,12 +85,12 @@ xpcc::rtos::QueueBase::appendFromInterrupt(const void *item)
 bool
 xpcc::rtos::QueueBase::prependFromInterrupt(const void *item)
 {
-	portBASE_TYPE taskWoken = pdFALSE;
-	portBASE_TYPE result = xQueueSendToFrontFromISR(this->handle, item, &taskWoken);
+	portBASE_TYPE threadWoken = pdFALSE;
+	portBASE_TYPE result = xQueueSendToFrontFromISR(this->handle, item, &threadWoken);
 	
 	// Request a context switch when the IRQ ends if a higher priorty has
 	// been woken.
-	portEND_SWITCHING_ISR(taskWoken);
+	portEND_SWITCHING_ISR(threadWoken);
 	
 	return (result == pdPASS);
 }
@@ -98,12 +98,12 @@ xpcc::rtos::QueueBase::prependFromInterrupt(const void *item)
 bool
 xpcc::rtos::QueueBase::getFromInterrupt(void *item)
 {
-	portBASE_TYPE taskWoken = pdFALSE;
-	portBASE_TYPE result = xQueueReceiveFromISR(this->handle, item, &taskWoken);
+	portBASE_TYPE threadWoken = pdFALSE;
+	portBASE_TYPE result = xQueueReceiveFromISR(this->handle, item, &threadWoken);
 	
 	// Request a context switch when the IRQ ends if a higher priorty has
 	// been woken.
-	portEND_SWITCHING_ISR(taskWoken);
+	portEND_SWITCHING_ISR(threadWoken);
 	
 	return (result == pdTRUE);
 }

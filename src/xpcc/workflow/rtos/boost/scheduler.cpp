@@ -31,15 +31,15 @@
 // ----------------------------------------------------------------------------
 
 #include "scheduler.hpp"
-#include "task.hpp"
+#include "thread.hpp"
 
 void
 xpcc::rtos::Scheduler::schedule()
 {
 	// Start all threads
-	Task* list = Task::head;
+	Thread* list = Thread::head;
 	while (list != 0) {
-		list->resume();
+		list->start();
 		list = list->next;
 	}
 	

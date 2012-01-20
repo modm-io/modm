@@ -30,8 +30,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_FREERTOS__TASK_HPP
-#define XPCC_FREERTOS__TASK_HPP
+#ifndef XPCC_FREERTOS__THREAD_HPP
+#define XPCC_FREERTOS__THREAD_HPP
 
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
@@ -42,7 +42,7 @@
  * Example:
  * \code
  * void
- * Task::run()
+ * Thread::run()
  * {
  *     TIME_LOOP(20 * MILLISECONDS)
  *     {
@@ -94,74 +94,71 @@ namespace xpcc
 	namespace rtos
 	{
 		/**
-		 * \brief	Task
+		 * \brief	Thread
+		 * 
+		 * suspend() and resume() are dangerous and are therefore not available.
+		 * 
+		 * Example:
+		 * thread 1 
+		 *  1) lock mutex M 
+		 *  2) do something 
+		 *  3) unlock mutex 
+		 * 
+		 * thread 2 
+		 *  1) suspend thread 1 
+		 *  2) lock mutex 
+		 *  3) unlock mutex M 
+		 *  4) resume thread 1
+		 * 
+		 * If 2.1 happens during 1.2 the first flow for ever brakes, and the
+		 * second - is for ever tired of waiting.
+		 * 
+		 * Use xpcc::rtos::Semaphore if you need to suspend the execution
+		 * of a thread.  
 		 * 
 		 * \ingroup	freertos
 		 */
-		class Task
+		class Thread
 		{
 		public:
 			/**
-			 * \brief	Create a task
+			 * \brief	Create a Thread
 			 * 
 			 * \param	priority	Priority (default is 0)
-			 * \param	stackDepth	Stack size for the task
-			 * \param	name		Name of the task (only used for debugging,
+			 * \param	stackDepth	Stack size for the thread
+			 * \param	name		Name of the thread (only used for debugging,
 			 * 						can be left empty)
 			 * 
-			 * \warning	Tasks may not be created while the scheduler is running!
+			 * \warning	Threads may not be created while the scheduler is running!
 			 * 			Create them be before calling Scheduler::schedule() or
 			 * 			stop the scheduler and restart it afterwards.
 			 */
-			Task(unsigned portBASE_TYPE priority = 0,
+			Thread(unsigned portBASE_TYPE priority = 0,
 					unsigned short stackDepth = configMINIMAL_STACK_SIZE,
 					const char* name = NULL);
 			
-			/// Delete the task
-			virtual ~Task();
+			/// Delete the thread
+			virtual ~Thread();
 			
-			/// Obtain the priority of the task
+			/// Obtain the priority of the thread
 			unsigned portBASE_TYPE
 			getPriority() const;
 			
 			/**
-			 * \brief	Set the priority of the task
+			 * \brief	Set the priority of the thread
 			 * 
 			 * Might cause a context switch if the priority is set to lower
-			 * value than the highest priority of a task ready to run.
+			 * value than the highest priority of a thread ready to run.
 			 */
 			void
 			setPriority(unsigned portBASE_TYPE priority);
-			
-			/**
-			 * \brief	Suspend the Task
-			 * 
-			 * The task won't be executed until the next call of resume() or
-			 * resumeFromInterrupt().
-			 */
-			void
-			suspend();
-			
-			/**
-			 * \brief	Resume execution of the task
-			 * 
-			 * \warning	Must \b not be called from within an interrupt!
-			 */
-			void
-			resume();
-			
-			/**
-			 * \brief	Resume execution from within an interrupt context
-			 */
-			void
-			resumeFromInterrupt();
 			
 			/**
 			 * \brief	When created suspends all real time kernel activity
 			 * 			while keeping interrupts (including the kernel tick)
 			 * 			enabled.
 			 * 
-			 * After creating a instance the calling task will continue
+			 * After creating a instance the calling thread will continue
 			 * to execute without risk of being swapped out until the destruction
 			 * of the lock instance.
 			 * 
@@ -207,7 +204,7 @@ namespace xpcc
 			/**
 			 * \brief	Force a context switch
 			 * 
-			 * Gives control to other tasks ready to run.
+			 * Gives control to other threads ready to run.
 			 */
 			static inline void
 			yield()
@@ -228,15 +225,15 @@ namespace xpcc
 			wrapper(void *object);
 			
 			// disable copy constructor
-			Task(const Task& other);
+			Thread(const Thread& other);
 			
 			// disable assignment operator
-			Task&
-			operator = (const Task& other);
+			Thread&
+			operator = (const Thread& other);
 			
 			xTaskHandle handle;
 		};
 	}
 }
 
-#endif // XPCC_FREERTOS__TASK_HPP
+#endif // XPCC_FREERTOS__THREAD_HPP

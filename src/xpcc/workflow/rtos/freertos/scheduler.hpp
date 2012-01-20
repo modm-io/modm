@@ -78,7 +78,7 @@ namespace xpcc
 			 * Starts the SysTick Timer (1ms periode) and attaches to its
 			 * interrupt.
 			 * 
-			 * The idle task is created automatically when schedule() is called.
+			 * The idle thread is created automatically when schedule() is called.
 			 * 
 			 * \warning	This function will never return.
 			 */

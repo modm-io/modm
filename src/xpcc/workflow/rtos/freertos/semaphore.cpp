@@ -57,13 +57,13 @@ xpcc::rtos::SemaphoreBase::release()
 void
 xpcc::rtos::SemaphoreBase::releaseFromInterrupt()
 {
-	portBASE_TYPE taskWoken = pdFALSE;
+	portBASE_TYPE threadWoken = pdFALSE;
 	
-	xSemaphoreGiveFromISR(this->handle, &taskWoken);
+	xSemaphoreGiveFromISR(this->handle, &threadWoken);
 	
 	// Request a context switch when the IRQ ends if a higher priorty has
 	// been woken.
-	portEND_SWITCHING_ISR(taskWoken);
+	portEND_SWITCHING_ISR(threadWoken);
 }
 
 // ----------------------------------------------------------------------------

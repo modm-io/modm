@@ -44,7 +44,7 @@
  * - Small and simple. Very good for hobbyists who are new to OSes.
  * - Scheduler can be configured for both preemptive or cooperative operation.
  * - Coroutine support (Coroutine in FreeRTOS is a very simple and lightweight
- *   task that has very limited use of stack)
+ *   thread that has very limited use of stack)
  * 
  * \see	http://www.freertos.org/
  */

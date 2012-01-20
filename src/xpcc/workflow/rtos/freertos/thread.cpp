@@ -30,19 +30,19 @@
  */
 // ----------------------------------------------------------------------------
 
-#include "task.hpp"
+#include "thread.hpp"
 
 /*
  * FreeRTOS is a C library. Therefore it doesn't know anything about objects
  * and their this-pointers. To be able to use FreeRTOS from C++ we use a
  * simple trick:
  *
- * FreeRTOS tasks must be C functions which get a single void-Pointer as
+ * FreeRTOS threads must be C functions which get a single void-Pointer as
  * argument. To call C++ member functions we use the static member function
- * xpcc::rtos::Task::wrapper() as a wrapper which gets the a pointer to
- * the corresponding task as parameter.
+ * xpcc::rtos::Thread::wrapper() as a wrapper which gets the a pointer to
+ * the corresponding thread as parameter.
  * To be able to call the right run()-function run() needs to be virtual. This
- * adds the overhead of an additional vtable per Task but is the only portable
+ * adds the overhead of an additional vtable per Thread but is the only portable
  * solution.
  * Casting member functions pointer to void-pointers and back might work but
  * is not guaranteed to.
@@ -50,19 +50,19 @@
 
 // ----------------------------------------------------------------------------
 void
-xpcc::rtos::Task::wrapper(void *object)
+xpcc::rtos::Thread::wrapper(void *object)
 {
-	Task* task = reinterpret_cast<Task *>(object);
-	task->run();
+	Thread* thread = reinterpret_cast<Thread *>(object);
+	thread->run();
 }
 
-xpcc::rtos::Task::~Task()
+xpcc::rtos::Thread::~Thread()
 {
 	vTaskDelete(this->handle);
 }
 
 // ----------------------------------------------------------------------------
-xpcc::rtos::Task::Task(unsigned portBASE_TYPE priority,
+xpcc::rtos::Thread::Thread(unsigned portBASE_TYPE priority,
 		unsigned short stackDepth,
 		const char* name)
 {
@@ -77,32 +77,33 @@ xpcc::rtos::Task::Task(unsigned portBASE_TYPE priority,
 
 // ----------------------------------------------------------------------------
 unsigned portBASE_TYPE
-xpcc::rtos::Task::getPriority() const
+xpcc::rtos::Thread::getPriority() const
 {
 	return uxTaskPriorityGet(this->handle);
 }
 
 void
-xpcc::rtos::Task::setPriority(unsigned portBASE_TYPE priority)
+xpcc::rtos::Thread::setPriority(unsigned portBASE_TYPE priority)
 {
 	vTaskPrioritySet(this->handle, priority);
 }
 
 // ----------------------------------------------------------------------------
-void
-xpcc::rtos::Task::suspend()
+/*void
+xpcc::rtos::Thread::suspend()
 {
 	vTaskSuspend(this->handle);
 }
 
 void
-xpcc::rtos::Task::resume()
+xpcc::rtos::Thread::resume()
 {
 	vTaskResume(this->handle);
 }
 
 void
-xpcc::rtos::Task::resumeFromInterrupt()
+xpcc::rtos::Thread::resumeFromInterrupt()
 {
 	xTaskResumeFromISR(this->handle);
-}
+}*/
+

@@ -30,8 +30,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_BOOST__TASK_HPP
-#define XPCC_BOOST__TASK_HPP
+#ifndef XPCC_BOOST__THREAD_HPP
+#define XPCC_BOOST__THREAD_HPP
 
 #include <boost/scoped_ptr.hpp>
 #include <boost/thread/thread.hpp>
@@ -42,7 +42,7 @@
  * Example:
  * \code
  * void
- * Task::run()
+ * Thread::run()
  * {
  *     TIME_LOOP(20 * MILLISECONDS)
  *     {
@@ -85,32 +85,32 @@ namespace xpcc
 		class Scheduler;
 		
 		/**
-		 * \brief	Task
+		 * \brief	Thread
 		 * 
 		 * \ingroup	boost_rtos
 		 */
-		class Task
+		class Thread
 		{
 		public:
 			/**
-			 * \brief	Create a task
+			 * \brief	Create a Thread
 			 * 
 			 * \param	priority	unused for boost::thread
 			 * \param	stackDepth	unused for boost::thread
 			 * \param	name		unused for boost::thread
 			 * 
-			 * \warning	Tasks may not be created while the scheduler is running!
+			 * \warning	Threads may not be created while the scheduler is running!
 			 * 			Create them be before calling Scheduler::schedule() or
 			 * 			stop the scheduler and restart it afterwards.
 			 */
-			Task(uint32_t priority = 0,
+			Thread(uint32_t priority = 0,
 					uint32_t stackDepth = 0,
 					const char* name = NULL);
 			
-			/// Delete the task
-			virtual ~Task();
+			/// Delete the thread
+			virtual ~Thread();
 			
-			/// Obtain the priority of the task
+			/// Obtain the priority of the thread
 			uint_fast32_t
 			getPriority() const
 			{
@@ -118,7 +118,7 @@ namespace xpcc
 			}
 			
 			/**
-			 * \brief	Set the priority of the task
+			 * \brief	Set the priority of the thread
 			 * 
 			 * Does nothing for boost::thread.
 			 */
@@ -128,24 +128,6 @@ namespace xpcc
 				// avoid compiler warnings
 				(void) priority;
 			}
-			
-			/**
-			 * \brief	Suspend the Task
-			 */
-			void
-			suspend();
-			
-			/**
-			 * \brief	Resume execution of the task
-			 */
-			void
-			resume();
-			
-			/**
-			 * \brief	Resume execution from within an interrupt context
-			 */
-			void
-			resumeFromInterrupt();
 			
 			/**
 			 * If a thread wishes to avoid being interrupted, it can create an
@@ -170,7 +152,7 @@ namespace xpcc
 			/**
 			 * \brief	Force a context switch
 			 * 
-			 * Gives control to other tasks ready to run.
+			 * Gives control to other threads ready to run.
 			 */
 			static inline void
 			yield()
@@ -189,12 +171,17 @@ namespace xpcc
 		private:
 			friend class Scheduler;
 			
-			Task *next;
-			static Task* head;
+			// start the execution of the thread
+			void
+			start();
 			
+			Thread *next;
+			static Thread* head;
+			
+			boost::mutex mutex;
 			boost::scoped_ptr<boost::thread> thread;
 		};
 	}
 }
 
-#endif // XPCC_BOOST__TASK_HPP
+#endif // XPCC_BOOST__THREAD_HPP

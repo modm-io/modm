@@ -30,15 +30,40 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_RTOS__TASK_HPP
-#define XPCC_RTOS__TASK_HPP
+#include "thread.hpp"
 
-#include <xpcc/architecture/utils.hpp>
+xpcc::rtos::Thread* xpcc::rtos::Thread::head = 0;
 
-#ifdef XPCC__CPU_HOSTED
-#	include "boost/task.hpp"
-#elif defined(XPCC__CPU_CORTEX_M3) || defined(XPCC__CPU_CORTEX_M4)
-#	include "freertos/task.hpp"
-#endif
+// ----------------------------------------------------------------------------
+xpcc::rtos::Thread::Thread(uint32_t priority, uint32_t stackDepth, const char* name) :
+	next(0),
+	thread()
+{
+	// avoid compiler warnings
+	(void) priority;
+	(void) stackDepth;
+	(void) name;
+	
+	// create a list of all threads
+	if (head == 0) {
+		head = this;
+	}
+	else {
+		Thread *list = head;
+		while (list->next != 0) {
+			list = list->next;
+		}
+		list->next = this;
+	}
+}
 
-#endif // XPCC_RTOS__TASK_HPP
+xpcc::rtos::Thread::~Thread()
+{
+}
+
+// ----------------------------------------------------------------------------
+void
+xpcc::rtos::Thread::start()
+{
+	this->thread.reset(new boost::thread(boost::bind(&Thread::run, this)));
+}

@@ -31,7 +31,7 @@
 // ----------------------------------------------------------------------------
 
 #include "rtos/scheduler.hpp"
-#include "rtos/task.hpp"
+#include "rtos/thread.hpp"
 #include "rtos/mutex.hpp"
 #include "rtos/semaphore.hpp"
 #include "rtos/queue.hpp"
