@@ -351,6 +351,9 @@ Reset_Handler(void)
 #if defined(STM32F4XX)
 	// Enable FPU in privileged and user mode
 	SCB->CPACR |= ((3UL << 10*2) | (3UL << 11*2));  // set CP10 and CP11 Full Access
+	
+	// Enable Core Coupled Memory (CCM)
+	RCC->AHB1ENR |= RCC_AHB1ENR_CCMDATARAMEN;
 #endif
 	
 	// Enable GPIO clock

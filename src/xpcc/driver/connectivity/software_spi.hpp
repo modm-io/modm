@@ -70,7 +70,7 @@ namespace xpcc
 		
 		// calculate the delay in microseconds needed to achieve the
 		// requested SPI frequency
-		static const float delayTime = (1000000.0 / Frequency) / 2.0;
+		static const uint32_t delayTime = (1000000.0 / Frequency) / 2.0;
 		
 		static Clk clk;
 		static Mosi mosi;
