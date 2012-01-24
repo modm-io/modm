@@ -16,12 +16,17 @@ namespace robot
 	{
 {%- for packet in packets %}
 {%- if packet.isBuiltIn %}{% continue %}{% endif %}
-		{% if packet.description %}/** {{ packet.description | xpcc.wordwrap(68) | xpcc.indent(2) }} */{% endif %}
+		{%- if packet.description %}
+		/** {{ packet.description | xpcc.wordwrap(67) | xpcc.indent(2, " * ") }} */
+		{%- endif %}
 	{%- if packet.isEnum %}
 		enum {{ packet.name | typeName }}
 		{
 			{%- for element in packet.iter() %}
-			{{ element.name | enumElement }} = {{ element.value }},{% if element.description %}	///< {{ element.description }}{% endif %}
+			{%- if element.description %}
+			/** {{ element.description | xpcc.wordwrap(63) | xpcc.indent(3, " * ") }} */
+			{%- endif %}
+			{{ element.name | enumElement }} = {{ element.value }},
 			{%- endfor %}
 		} __attribute__((packed));
 		
@@ -45,6 +50,9 @@ namespace robot
 			{{ packet.flattened() | generateConstructor(default=False) }};
 			{%- endif %}
 			{% for element in packet.flattened().iter() %}
+			{%- if element.description %}
+			/** {{ element.description | xpcc.wordwrap(63) | xpcc.indent(3, " * ") }} */
+			{%- endif %}
 			{{ element | subtype }};
 			{%- endfor %}
 		} __attribute__((packed));

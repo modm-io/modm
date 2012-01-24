@@ -182,8 +182,8 @@ class Builder(object):
 		def filter_wordwrap(value, width=79):
 			return '\n\n'.join([textwrap.fill(str, width) for str in value.split('\n\n')])
 
-		def filter_indent(value, level=0):
-			return ('\n' + '\t' * level).join(value.split('\n'))
+		def filter_indent(value, level=0, prefix=""):
+			return ('\n' + '\t' * level + prefix).join(value.split('\n'))
 		
 		path = os.path.dirname(filename)
 		name = os.path.basename(filename)
@@ -208,6 +208,9 @@ class Builder(object):
 			self.generate()
 		except BuilderException as e:
 			sys.stderr.write("Error: %s\n" % str(e))
+			sys.exit(1)
+		except jinja2.excepetions.TemplateSyntaxError as e:
+			sys.stderr.write("Error in Template: %s\n" % str(e))
 			sys.exit(1)
 		#except Exception as e:
 		#	sys.stderr.write("Internal Error: %s\n" % str(e))
