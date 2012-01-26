@@ -95,16 +95,16 @@ namespace xpcc
 		Quaternion& operator *= (const T &rhs);
 		Quaternion& operator /= (const T &rhs);
 		
-		float getLength();
-		float getLengthSquared();
+		float getLength() const;
+		float getLengthSquared() const;
 		
 		Quaternion& scale(float newLength);
 		Quaternion& normalize();
 		Quaternion& conjugate();
 
-		Quaternion scaled(float newLength);
-		Quaternion normalized();
-		Quaternion conjugated();
+		Quaternion scaled(float newLength) const;
+		Quaternion normalized() const;
+		Quaternion conjugated() const;
 		
 		Quaternion unitInverse();	//	assumes we have a unit quaternion
 		Quaternion inverse();

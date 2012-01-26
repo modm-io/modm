@@ -284,7 +284,7 @@ xpcc::Quaternion<T>::operator - ()
 // ----------------------------------------------------------------------------
 template<class T>
 float
-xpcc::Quaternion<T>::getLength()
+xpcc::Quaternion<T>::getLength() const
 {
 	return sqrt(getLengthSquared());
 }
@@ -292,7 +292,7 @@ xpcc::Quaternion<T>::getLength()
 // ----------------------------------------------------------------------------
 template<class T>
 float
-xpcc::Quaternion<T>::getLengthSquared()
+xpcc::Quaternion<T>::getLengthSquared() const
 {
 	return w*w+x*x+y*y+z*z;
 }
@@ -327,7 +327,7 @@ xpcc::Quaternion<T>::conjugate()
 // ----------------------------------------------------------------------------
 template<class T>
 xpcc::Quaternion<T>
-xpcc::Quaternion<T>::scaled(float newLength)
+xpcc::Quaternion<T>::scaled(float newLength) const
 {
 	float s = newLength/getLength();
 	return Quaternion(w*s, x*s, y*s, z*s);
@@ -336,7 +336,7 @@ xpcc::Quaternion<T>::scaled(float newLength)
 // ----------------------------------------------------------------------------
 template<class T>
 xpcc::Quaternion<T>
-xpcc::Quaternion<T>::normalized()
+xpcc::Quaternion<T>::normalized() const
 {
 	return scaled(1.0f);
 }
@@ -344,7 +344,7 @@ xpcc::Quaternion<T>::normalized()
 // ----------------------------------------------------------------------------
 template<class T>
 xpcc::Quaternion<T>
-xpcc::Quaternion<T>::conjugated()
+xpcc::Quaternion<T>::conjugated() const
 {
 	return Quaternion(w, -x, -y, -z);
 }
