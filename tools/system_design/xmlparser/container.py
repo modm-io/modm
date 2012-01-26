@@ -56,7 +56,7 @@ class Container:
 				
 				self.components[component_name] = component
 			except KeyError:
-				raise ParserException("Unknown component '%s' in container '%s'" % (component, self.name))
+				raise ParserException("Unknown component '%s' in container '%s'." % (component_name, self.name))
 	
 	def updateIndex(self):
 		"""

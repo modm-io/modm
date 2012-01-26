@@ -107,7 +107,7 @@ class Builder(object):
 			parser = Parser()
 			parser.parse(self.xmlfile)
 		except ParserException as e:
-			sys.stderr.write("Error: %s\n" % str(e))
+			sys.stderr.write("Parsing Error: %s\n" % str(e))
 			sys.exit(1)
 		
 		self.tree = parser.tree
@@ -207,7 +207,7 @@ class Builder(object):
 		try:
 			self.generate()
 		except BuilderException as e:
-			sys.stderr.write("Error: %s\n" % str(e))
+			sys.stderr.write("Builder Error: %s\n" % str(e))
 			sys.exit(1)
 		except jinja2.excepetions.TemplateSyntaxError as e:
 			sys.stderr.write("Error in Template: %s\n" % str(e))
