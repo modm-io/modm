@@ -32,6 +32,7 @@
 
 #include "../windows.hpp"
 #include <xpcc/math/utils/operator.hpp>
+#include <math.h>
 
 // ----------------------------------------------------------------------------
 int
@@ -87,5 +88,16 @@ namespace std
 	atan2(int32_t y, int32_t x)
 	{
 		return std::atan2(static_cast<float>(y), static_cast<float>(x));
+	}
+
+	bool
+	isnan(float f)
+	{
+		return _isnanf(f);
+	}
+
+	bool
+	isinf(float f)	{
+		return !_finitef(f);
 	}
 }

@@ -52,6 +52,7 @@
 #include <stdio.h>
 #include <math.h>
 #include <stdint.h>
+#include <limits>
 
 // ----------------------------------------------------------------------------
 // WARNINGS & COMPILER SETTINGS
@@ -94,6 +95,14 @@
 #define	__DBL_EPSILON__		2.2204460492503131e-16
 #endif
 
+#ifndef NAN
+	#define NAN std::numeric_limits<float>::quiet_NaN()
+#endif
+
+#ifndef INFINITY
+	#define INFINITY std::numeric_limits<float>::infinity()
+#endif
+
 // ----------------------------------------------------------------------------
 // FUNCTIONS
 
@@ -130,6 +139,12 @@ namespace std
 
 	float
 	atan2(int32_t y, int32_t x);
+
+	bool
+	isnan(float f);
+
+	bool
+	isinf(float f);
 }
 
 #endif // XPCC__WINDOWS_HPP
