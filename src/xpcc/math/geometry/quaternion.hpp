@@ -100,8 +100,12 @@ namespace xpcc
 		
 		Quaternion& scale(float newLength);
 		Quaternion& normalize();
+		Quaternion& conjugate();
+
+		Quaternion scaled(float newLength);
+		Quaternion normalized();
+		Quaternion conjugated();
 		
-		Quaternion conjugate();
 		Quaternion unitInverse();	//	assumes we have a unit quaternion
 		Quaternion inverse();
 		
