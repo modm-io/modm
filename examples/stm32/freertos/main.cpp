@@ -46,11 +46,11 @@ xpcc::DogS102< xpcc::stm32::Spi1, lcd::CS, lcd::A0, lcd::Reset, false > display;
 xpcc::rtos::BinarySemaphore event;
 
 // ----------------------------------------------------------------------------
-class LedTask1 : public xpcc::rtos::Task
+class LedThread1 : public xpcc::rtos::Thread
 {
 public:
-	LedTask1() :
-		xpcc::rtos::Task(2)
+	LedThread1() :
+		xpcc::rtos::Thread(2)
 	{
 	}
 	
@@ -59,7 +59,7 @@ public:
 	{
 		while (1)
 		{
-			// synchronize with LedTask2
+			// synchronize with LedThread2
 			event.release();
 			
 			LedStat::set();
@@ -71,12 +71,12 @@ public:
 	}
 };
 
-// Toggle Led2 when LedTask1 starts a new cycle
-class LedTask2 : public xpcc::rtos::Task
+// Toggle Led2 when LedThread1 starts a new cycle
+class LedThread2 : public xpcc::rtos::Thread
 {
 public:
-	LedTask2() :
-		xpcc::rtos::Task(2)
+	LedThread2() :
+		xpcc::rtos::Thread(2)
 	{
 	}
 	
@@ -94,12 +94,12 @@ public:
 };
 
 // Display a rotating hand in a circle and some fonts. Lowest priority, will
-// be interrupted by the other Tasks
-class DisplayTask : public xpcc::rtos::Task
+// be interrupted by the other Threads
+class DisplayThread : public xpcc::rtos::Thread
 {
 public:
-	DisplayTask() :
-		xpcc::rtos::Task(0), index(0)
+	DisplayThread() :
+		xpcc::rtos::Thread(0), index(0)
 	{
 	}
 	
@@ -141,11 +141,11 @@ private:
 	uint16_t index;
 };
 
-// Create the three Tasks. They are automatically added to the task list
+// Create the three Threads. They are automatically added to the thread list
 // and started when the FreeRTOS scheduler is called.
-LedTask1 task1;
-LedTask2 task2;
-DisplayTask task3;
+LedThread1 thread1;
+LedThread2 thread2;
+DisplayThread thread3;
 
 // ----------------------------------------------------------------------------
 int

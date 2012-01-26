@@ -35,6 +35,7 @@
 
 #include <xpcc/debug/error_report.hpp>
 #include <xpcc/architecture/driver/atomic/queue.hpp>
+#include <xpcc/utils.hpp>
 
 #include "../gpio.hpp"
 #include "../error_code.hpp"
@@ -226,21 +227,6 @@ CAN1_RX1_IRQHandler()
 }
 
 // ----------------------------------------------------------------------------
-/* Status Change and Error Interrupt
- *
- *
- */
-extern "C" void
-CAN1_SCE_IRQHandler()
-{
-	// TODO check Bus Off, Error Passive
-	
-	
-	// Acknowledge interrupt
-	CAN1->MSR = CAN_MSR_ERRI;
-}
-
-// ----------------------------------------------------------------------------
 void
 xpcc::stm32::Can1::configurePins(Mapping mapping)
 {
@@ -290,7 +276,8 @@ nvicEnableInterrupt(IRQn_Type IRQn)
 
 // ----------------------------------------------------------------------------
 bool
-xpcc::stm32::Can1::initialize(can::Bitrate bitrate)
+xpcc::stm32::Can1::initialize(can::Bitrate bitrate,
+		uint32_t interruptPriority, bool overwriteOnOverrun)
 {
 	// enable clock
 	RCC->APB1ENR  |=  RCC_APB1ENR_CAN1EN;
@@ -311,9 +298,14 @@ xpcc::stm32::Can1::initialize(can::Bitrate bitrate)
 	// Bus off is left automatically by the hardware after 128 occurrences
 	// of 11 recessive bits, TX Order depends on the order of request and
 	// not on the CAN priority.
-	// TODO: No overwrite at RX FIFO: Once a receive FIFO is full the next
-	// incoming message will be discarded
-	CAN1->MCR |= CAN_MCR_ABOM | CAN_MCR_RFLM | CAN_MCR_TXFP;
+	if (overwriteOnOverrun) {
+		CAN1->MCR |= CAN_MCR_ABOM | CAN_MCR_TXFP;
+	}
+	else {
+		// No overwrite at RX FIFO: Once a receive FIFO is full the next
+		// incoming message will be discarded
+		CAN1->MCR |= CAN_MCR_ABOM | CAN_MCR_RFLM | CAN_MCR_TXFP;
+	}
 
 	// Request initialization
 	CAN1->MCR |= CAN_MCR_INRQ;
@@ -324,35 +316,41 @@ xpcc::stm32::Can1::initialize(can::Bitrate bitrate)
 	}
 	
 	// Enable Interrupts:
-	// Bus-Off, Error Passive, FIFO1 Overrun, FIFO0 Overrun
-	CAN1->IER = CAN_IER_BOFIE | CAN_IER_EPVIE | CAN_IER_FOVIE1 | CAN_IER_FOVIE0;
+	// FIFO1 Overrun, FIFO0 Overrun
+	CAN1->IER = CAN_IER_FOVIE1 | CAN_IER_FOVIE0;
+	
+	// Set vector priority
+	NVIC_SetPriority(CAN1_RX0_IRQn, interruptPriority);
+	NVIC_SetPriority(CAN1_RX1_IRQn, interruptPriority);
 	
 	// Register Interrupts at the NVIC
-	// TODO: Set priority
 	nvicEnableInterrupt(CAN1_RX0_IRQn);
 	nvicEnableInterrupt(CAN1_RX1_IRQn);
-	nvicEnableInterrupt(CAN1_SCE_IRQn);
 	
 #if STM32_CAN1_TX_BUFFER_SIZE > 0
 	CAN1->IER |= CAN_IER_TMEIE;
 	nvicEnableInterrupt(CAN1_TX_IRQn);
+	NVIC_SetPriority(CAN1_TX_IRQn, interruptPriority);
 #endif
 	
 #if STM32_CAN1_RX_BUFFER_SIZE > 0
 	CAN1->IER |= CAN_IER_FMPIE1 | CAN_IER_FMPIE0;
 #endif
 	
-	// FIXME wrong timing for the STM32F2xx and 4xx
 	/* Example for CAN bit timing:
 	 *   CLK on APB1 = 36 MHz
 	 *   BaudRate = 125 kBPs = 1 / NominalBitTime
 	 *   NominalBitTime = 8uS = tq + tBS1 + tBS2
 	 * with:
-	 *   tBS1 = tq x (TS1[3:0] + 1)
-	 *   tBS2 = tq x (TS2[2:0] + 1)
-	 *   tq = (BRP[9:0] + 1) x tPCLK
+	 *   tBS1 = tq * (TS1[3:0] + 1) = 12 * tq
+	 *   tBS2 = tq * (TS2[2:0] + 1) = 5 * tq
+	 *   tq = (BRP[9:0] + 1) * tPCLK
 	 * where tq refers to the Time quantum
-	 *   tPCLK = time period of the APB clock = 36 MHz
+	 *   tPCLK = time period of the APB clock = 1 / 36 MHz
+	 * 
+	 * STM32F1xx   tPCLK = 1 / 36 MHz
+	 * STM32F20x   tPCLK = 1 / 30 MHz
+	 * STM32F40x   tPCLK = 1 / 42 MHz 
 	 */
 	uint16_t prescaler;
 	switch (bitrate)
@@ -365,13 +363,36 @@ xpcc::stm32::Can1::initialize(can::Bitrate bitrate)
 		case can::BITRATE_250_KBPS:	prescaler =   8; break;
 		case can::BITRATE_500_KBPS:	prescaler =   4; break;
 		case can::BITRATE_1_MBPS:	prescaler =   2; break;
-		default: prescaler = 16; break;
+		default: prescaler = 16; break;		// 125 kbps
 	}
+	
+#if defined(STM32F10X)
+	XPCC__STATIC_ASSERT(STM32_APB1_FREQUENCY == 36000000UL,
+			"Unsupported frequency for APB1 (only 36 MHz)");
 	CAN1->BTR =
 			 ((1 - 1) << CAN_BTR_SJW_POS) |		// SJW (1 to 4 possible)
-			 ((5 - 1) << CAN_BTR_TS2_POS) |		// BS2 Samplepoint 72%
-			((12 - 1) << CAN_BTR_TS1_POS) |		// BS1 Samplepoint 72%
+			 ((5 - 1) << CAN_BTR_TS2_POS) |		// BS2 Samplepoint
+			((12 - 1) << CAN_BTR_TS1_POS) |		// BS1 Samplepoint
 			(prescaler - 1);
+#elif defined(STM32F2XX)
+	XPCC__STATIC_ASSERT(STM32_APB1_FREQUENCY == 30000000UL,
+			"Unsupported frequency for APB1 (only 30 MHz)");
+	CAN1->BTR =
+			 ((1 - 1) << CAN_BTR_SJW_POS) |		// SJW (1 to 4 possible)
+			 ((4 - 1) << CAN_BTR_TS2_POS) |		// BS2 Samplepoint
+			((10 - 1) << CAN_BTR_TS1_POS) |		// BS1 Samplepoint
+			(prescaler - 1);
+#elif defined(STM32F4XX)
+	XPCC__STATIC_ASSERT(STM32_APB1_FREQUENCY == 42000000UL,
+			"Unsupported frequency for APB1 (only 42 MHz)");
+	CAN1->BTR =
+			 ((1 - 1) << CAN_BTR_SJW_POS) |		// SJW (1 to 4 possible)
+			 ((6 - 1) << CAN_BTR_TS2_POS) |		// BS2 Samplepoint
+			((14 - 1) << CAN_BTR_TS1_POS) |		// BS1 Samplepoint
+			(prescaler - 1);
+#else
+#	error "Unknown CPU Type. Please define STM32F10X, STM32F2XX or STM32F4XX"
+#endif
 	
 	// Request leave initialization
 	CAN1->MCR &= ~(uint32_t)CAN_MCR_INRQ;
@@ -516,5 +537,17 @@ xpcc::stm32::Can1::getBusState()
 	else {
 		return can::CONNECTED;
 	}
+}
+
+// ----------------------------------------------------------------------------
+void
+xpcc::stm32::Can1::enableStatusChangeInterrupt(
+		uint32_t interruptEnable,
+		uint32_t interruptPriority)
+{
+	NVIC_SetPriority(CAN1_SCE_IRQn, interruptPriority);
+	nvicEnableInterrupt(CAN1_SCE_IRQn);
+	
+	CAN1->IER = interruptEnable | (CAN1->IER & 0x000000ff);
 }
 

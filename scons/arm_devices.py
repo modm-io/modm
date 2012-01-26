@@ -105,55 +105,55 @@ devices = \
 	# 
 	"stm32f103_4": 
 	{
-		"defines": ["__STM32F103__", "__ARM_STM32__", "STM32F10X_LD", "STM32_LOW_DENSITY"],
+		"defines": ["__STM32F103__", "__ARM_STM32__", "STM32F10X", "STM32F10X_LD", "STM32_LOW_DENSITY"],
 		"linkerscript": "cortex_m3/stm32/linker/stm32f103_4.ld",
 		"size": { "flash": 16384, "ram": 6144 },
 	},
 	"stm32f103_6": 
 	{
-		"defines": ["__STM32F103__", "__ARM_STM32__", "STM32F10X_LD", "STM32_LOW_DENSITY"],
+		"defines": ["__STM32F103__", "__ARM_STM32__", "STM32F10X", "STM32F10X_LD", "STM32_LOW_DENSITY"],
 		"linkerscript": "cortex_m3/stm32/linker/stm32f103_6.ld",
 		"size": { "flash": 32768, "ram": 10240 },
 	},
 	"stm32f103_8": 
 	{
-		"defines": ["__STM32F103__", "__ARM_STM32__", "STM32F10X_MD", "STM32_MEDIUM_DENSITY"],
+		"defines": ["__STM32F103__", "__ARM_STM32__", "STM32F10X", "STM32F10X_MD", "STM32_MEDIUM_DENSITY"],
 		"linkerscript": "cortex_m3/stm32/linker/stm32f103_8.ld",
 		"size": { "flash": 65536, "ram": 20480 },
 	},
 	"stm32f103_b": 
 	{
-		"defines": ["__STM32F103__", "__ARM_STM32__", "STM32F10X_MD", "STM32_MEDIUM_DENSITY"],
+		"defines": ["__STM32F103__", "__ARM_STM32__", "STM32F10X", "STM32F10X_MD", "STM32_MEDIUM_DENSITY"],
 		"linkerscript": "cortex_m3/stm32/linker/stm32f103_b.ld",
 		"size": { "flash": 131072, "ram": 20480 },
 	},
 	"stm32f103_c": 
 	{
-		"defines": ["__STM32F103__", "__ARM_STM32__", "STM32F10X_HD", "STM32_HIGH_DENSITY"],
+		"defines": ["__STM32F103__", "__ARM_STM32__", "STM32F10X", "STM32F10X_HD", "STM32_HIGH_DENSITY"],
 		"linkerscript": "cortex_m3/stm32/linker/stm32f103_c.ld",
 		"size": { "flash": 262144, "ram": 49152 },
 	},
 	"stm32f103_d": 
 	{
-		"defines": ["__STM32F103__", "__ARM_STM32__", "STM32F10X_HD", "STM32_HIGH_DENSITY"],
+		"defines": ["__STM32F103__", "__ARM_STM32__", "STM32F10X", "STM32F10X_HD", "STM32_HIGH_DENSITY"],
 		"linkerscript": "cortex_m3/stm32/linker/stm32f103_d.ld",
 		"size": { "flash": 393216, "ram": 65536 },
 	},
 	"stm32f103_e": 
 	{
-		"defines": ["__STM32F103__", "__ARM_STM32__", "STM32F10X_HD", "STM32_HIGH_DENSITY"],
+		"defines": ["__STM32F103__", "__ARM_STM32__", "STM32F10X", "STM32F10X_HD", "STM32_HIGH_DENSITY"],
 		"linkerscript": "cortex_m3/stm32/linker/stm32f103_e.ld",
 		"size": { "flash": 524288, "ram": 65536 },
 	},
 	"stm32f103_f": 
 	{
-		"defines": ["__STM32F103__", "__ARM_STM32__", "STM32F10X_XL", "STM32_XL_DENSITY"],
+		"defines": ["__STM32F103__", "__ARM_STM32__", "STM32F10X", "STM32F10X_XL", "STM32_XL_DENSITY"],
 		"linkerscript": "cortex_m3/stm32/linker/stm32f103_f.ld",
 		"size": { "flash": 786432, "ram": 98304 },
 	},
 	"stm32f103_g": 
 	{
-		"defines": ["__STM32F103__", "__ARM_STM32__", "STM32F10X_XL", "STM32_XL_DENSITY"],
+		"defines": ["__STM32F103__", "__ARM_STM32__", "STM32F10X", "STM32F10X_XL", "STM32_XL_DENSITY"],
 		"linkerscript": "cortex_m3/stm32/linker/stm32f103_g.ld",
 		"size": { "flash": 1048576, "ram": 98304 },
 	},
@@ -167,19 +167,19 @@ devices = \
 	# 
 	"stm32f105_8": 
 	{
-		"defines": ["__STM32F105__", "__ARM_STM32__", "STM32F10X_CL", "STM32_CONNECTIVITY"],
+		"defines": ["__STM32F105__", "__ARM_STM32__", "STM32F10X", "STM32F10X_CL", "STM32_CONNECTIVITY"],
 		"linkerscript": "cortex_m3/stm32/linker/stm32f105_8.ld",
 		"size": { "flash": 65536, "ram": 20480 },
 	},
 	"stm32f105_b": 
 	{
-		"defines": ["__STM32F105__", "__ARM_STM32__", "STM32F10X_CL", "STM32_CONNECTIVITY"],
+		"defines": ["__STM32F105__", "__ARM_STM32__", "STM32F10X", "STM32F10X_CL", "STM32_CONNECTIVITY"],
 		"linkerscript": "cortex_m3/stm32/linker/stm32f105_b.ld",
 		"size": { "flash": 131072, "ram": 32768 },
 	},
 	"stm32f105_c": 
 	{
-		"defines": ["__STM32F105__", "__ARM_STM32__", "STM32F10X_CL", "STM32_CONNECTIVITY"],
+		"defines": ["__STM32F105__", "__ARM_STM32__", "STM32F10X", "STM32F10X_CL", "STM32_CONNECTIVITY"],
 		"linkerscript": "cortex_m3/stm32/linker/stm32f105_c.ld",
 		"size": { "flash": 262144, "ram": 65536 },
 	},
@@ -192,13 +192,13 @@ devices = \
 	# 
 	"stm32f107_b": 
 	{
-		"defines": ["__STM32F107__", "__ARM_STM32__", "STM32F10X_CL", "STM32_CONNECTIVITY"],
+		"defines": ["__STM32F107__", "__ARM_STM32__", "STM32F10X", "STM32F10X_CL", "STM32_CONNECTIVITY"],
 		"linkerscript": "cortex_m3/stm32/linker/stm32f107_b.ld",
 		"size": { "flash": 131072, "ram": 49152 },
 	},
 	"stm32f107_c": 
 	{
-		"defines": ["__STM32F107__", "__ARM_STM32__", "STM32F10X_CL", "STM32_CONNECTIVITY"],
+		"defines": ["__STM32F107__", "__ARM_STM32__", "STM32F10X", "STM32F10X_CL", "STM32_CONNECTIVITY"],
 		"linkerscript": "cortex_m3/stm32/linker/stm32f107_c.ld",
 		"size": { "flash": 262144, "ram": 65536 },
 	},
@@ -213,9 +213,9 @@ devices = \
 	# 
 	# Size (s):
 	#  B | 128 kB Flash,  48+16 kB RAM  (R, V)
-	#  C | 256 kB Flash,  80+16 kB RAM	 (R, V, Z)
+	#  C | 256 kB Flash,  80+16 kB RAM  (R, V, Z)
 	#  E | 512 kB Flash, 112+16 kB RAM  (R, V, Z)
-	#  F | 768 kB Flash, 112+16 kB RAM	 (R, V, Z)
+	#  F | 768 kB Flash, 112+16 kB RAM  (R, V, Z)
 	#  G |   1 MB Flash, 112+16 kB RAM  (R, V, Z)
 	# 
 	"stm32f205_b":
@@ -257,10 +257,10 @@ devices = \
 	#  I | 176 pins
 	# 
 	# Size (s):
-	#  C | 256 kB Flash, 112+16 kB RAM	 (V, Z, I)
-	#  E | 512 kB Flash, 112+16 kB RAM  (V, Z, I)
-	#  F | 768 kB Flash, 112+16 kB RAM	 (V, Z, I)
-	#  G |   1 MB Flash, 112+16 kB RAM  (V, Z, I)
+	#  C | 256 kB Flash, 112+16 kB RAM
+	#  E | 512 kB Flash, 112+16 kB RAM
+	#  F | 768 kB Flash, 112+16 kB RAM
+	#  G |   1 MB Flash, 112+16 kB RAM
 	# 
 	"stm32f207_c":
 	{

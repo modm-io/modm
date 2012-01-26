@@ -7,11 +7,11 @@
 xpcc::rtos::BinarySemaphore event;
 
 // ----------------------------------------------------------------------------
-class Task1 : public xpcc::rtos::Task
+class Thread1 : public xpcc::rtos::Thread
 {
 public:
-	Task1() :
-		xpcc::rtos::Task(2)
+	Thread1() :
+		xpcc::rtos::Thread(2)
 	{
 	}
 	
@@ -30,12 +30,11 @@ public:
 	}
 };
 
-// Toggle Led2 when LedTask1 starts a new cycle
-class Task2 : public xpcc::rtos::Task
+class Thread2 : public xpcc::rtos::Thread
 {
 public:
-	Task2() :
-		xpcc::rtos::Task(2)
+	Thread2() :
+		xpcc::rtos::Thread(2)
 	{
 	}
 	
@@ -54,8 +53,8 @@ public:
 
 // Create the two Tasks. They are automatically added to the task list
 // and started when the Scheduler is called.
-Task1 task1;
-Task2 task2;
+Thread1 thread1;
+Thread2 thread2;
 
 int
 main(void)

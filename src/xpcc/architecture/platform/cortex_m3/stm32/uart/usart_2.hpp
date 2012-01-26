@@ -141,6 +141,13 @@ namespace xpcc
 		class BufferedUsart2 : public UartBase
 		{
 		public:
+			/**
+			 * Set baudrate.
+			 * 
+			 * \param	baudrate	Desired baud rate (e.g. 115200)
+			 * \param	interruptPriority
+			 * 			Interrupt vector priority (0=highest to 15=lowest)
+			 */
 			BufferedUsart2(uint32_t baudrate,
 					uint32_t interruptPriority)
 			{
