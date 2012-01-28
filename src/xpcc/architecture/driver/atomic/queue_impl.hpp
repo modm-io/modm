@@ -33,17 +33,22 @@
 #ifndef	XPCC_ATOMIC__QUEUE_IMPL_HPP
 #define	XPCC_ATOMIC__QUEUE_IMPL_HPP
 
+#include <xpcc/architecture/detect.hpp>
+
 template<typename T, std::size_t N>
 xpcc::atomic::Queue<T, N>::Queue() :
 	head(0), tail(0)
 {
+#if defined(XPCC__CPU_AVR)
+	XPCC__STATIC_ASSERT(N > 254, "A maximum of 254 elements is allowed for AVRs!");
+#endif
 }
 
 template<typename T, std::size_t N>
 ALWAYS_INLINE bool
-xpcc::atomic::Queue<T, N>::isFull()
+xpcc::atomic::Queue<T, N>::isFull() const
 {
-	uint8_t tmphead = xpcc::accessor::asVolatile(this->head) + 1;
+	Index tmphead = xpcc::accessor::asVolatile(this->head) + 1;
 	if (tmphead >= (N+1)) {
 		tmphead = 0;
 	}
@@ -52,15 +57,15 @@ xpcc::atomic::Queue<T, N>::isFull()
 }
 
 template<typename T, std::size_t N>
-ALWAYS_INLINE bool
-xpcc::atomic::Queue<T, N>::isNearlyFull()
+bool
+xpcc::atomic::Queue<T, N>::isNearlyFull() const
 {
-	XPCC__STATIC_ASSERT(N > 3, "Not possible the check for 'nearly full' of such a small queue. ");
+	XPCC__STATIC_ASSERT(N > 3, "Not possible the check for 'nearly full' of such a small queue.");
 	
-	uint8_t tmphead = xpcc::accessor::asVolatile(this->head);
-	uint8_t tmptail = xpcc::accessor::asVolatile(this->tail);
+	Index tmphead = xpcc::accessor::asVolatile(this->head);
+	Index tmptail = xpcc::accessor::asVolatile(this->tail);
 
-	uint8_t free;
+	Index free;
 	if (tmphead >= tmptail) {
 		free = (N + 1) - tmphead + tmptail;
 	}
@@ -73,21 +78,21 @@ xpcc::atomic::Queue<T, N>::isNearlyFull()
 
 template<typename T, std::size_t N>
 ALWAYS_INLINE bool
-xpcc::atomic::Queue<T, N>::isEmpty()
+xpcc::atomic::Queue<T, N>::isEmpty() const
 {
 	return (xpcc::accessor::asVolatile(this->head) == xpcc::accessor::asVolatile(this->tail));
 }
 
 template<typename T, std::size_t N>
-ALWAYS_INLINE bool
-xpcc::atomic::Queue<T, N>::isNearlyEmpty()
+bool
+xpcc::atomic::Queue<T, N>::isNearlyEmpty() const
 {
 	XPCC__STATIC_ASSERT(N > 3, "Not possible the check for 'nearly empty' of such a small queue. ");
 
 	uint8_t tmphead = xpcc::accessor::asVolatile(this->head);
 	uint8_t tmptail = xpcc::accessor::asVolatile(this->tail);
 
-	uint8_t stored;
+	Index stored;
 	if (tmphead >= tmptail) {
 		stored = tmphead - tmptail;
 	}
@@ -100,8 +105,8 @@ xpcc::atomic::Queue<T, N>::isNearlyEmpty()
 
 
 template<typename T, std::size_t N>
-ALWAYS_INLINE uint8_t
-xpcc::atomic::Queue<T, N>::getMaxSize()
+ALWAYS_INLINE typename xpcc::atomic::Queue<T, N>::Size
+xpcc::atomic::Queue<T, N>::getMaxSize() const
 {
 	return N;
 }
@@ -117,7 +122,7 @@ template<typename T, std::size_t N>
 ALWAYS_INLINE bool
 xpcc::atomic::Queue<T, N>::push(const T& value)
 {
-	uint8_t tmphead = this->head + 1;
+	Index tmphead = this->head + 1;
 	if (tmphead >= (N+1)) {
 		tmphead = 0;
 	}
@@ -135,7 +140,7 @@ template<typename T, std::size_t N>
 ALWAYS_INLINE void
 xpcc::atomic::Queue<T, N>::pop()
 {
-	uint8_t tmptail = this->tail + 1;
+	Index tmptail = this->tail + 1;
 	if (tmptail >= (N+1)) {
 		tmptail = 0;
 	}

@@ -47,7 +47,7 @@ namespace xpcc
 		 * \ingroup	atomic
 		 * \brief	Interrupt save queue
 		 *
-		 * A maximum size of 254 is allowed
+		 * A maximum size of 254 is allowed for 8-bit mikrocontrollers.
 		 * 
 		 * \todo	This implementation should work but could be improved
 		 */
@@ -56,10 +56,18 @@ namespace xpcc
 		class Queue
 		{
 		public:
+			// select the type of the index variables with some template magic :-)
+			typedef typename xpcc::tmp::Select< (N >= 254),
+												uint16_t,
+												uint8_t >::Result Index;
+			
+			typedef Index Size;
+			
+		public:
 			Queue();
 			
 			ALWAYS_INLINE bool
-			isFull();
+			isFull() const;
 			
 			/**
 			 * \returns	\c false if less than three elements
@@ -68,10 +76,10 @@ namespace xpcc
 			 * Only works with queue with more than three elements. 
 			 */
 			bool
-			isNearlyFull();
+			isNearlyFull() const;
 
 			ALWAYS_INLINE bool
-			isEmpty();
+			isEmpty() const;
 			
 			/**
 			 * Check if the queue is nearly empty.
@@ -83,10 +91,10 @@ namespace xpcc
 			 * TODO: calculations are approximate and may include off-by-one errors.
 			 */
 			bool
-			isNearlyEmpty();
+			isNearlyEmpty() const;
 			
-			ALWAYS_INLINE uint8_t
-			getMaxSize();
+			ALWAYS_INLINE Size
+			getMaxSize() const;
 			
 			const T&
 			get() const;
@@ -98,8 +106,8 @@ namespace xpcc
 			pop();
 	
 		private:
-			uint8_t head;
-			uint8_t tail;
+			Index head;
+			Index tail;
 			
 			T buffer[N+1];
 		};
