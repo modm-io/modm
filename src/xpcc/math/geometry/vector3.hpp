@@ -231,6 +231,13 @@ namespace xpcc
 	typedef Vector<float, 3> 	Vector3f;
 	typedef Vector<int16_t, 3>	Vector3i;
 	typedef Vector<uint16_t, 3>	Vector3u;
+
+	// ------------------------------------------------------------------------
+	// Declaration of specialized methods
+	// ------------------------------------------------------------------------
+	template<>
+	float
+	Vector<float, 3>::getLength() const;
 }
 
 #include "vector3_impl.hpp"

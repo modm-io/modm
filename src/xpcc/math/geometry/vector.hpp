@@ -129,6 +129,16 @@ namespace xpcc
 		
 		T coords[N];
 	};
+
+	// ------------------------------------------------------------------------
+	// Declaration of specialized methods
+	// ------------------------------------------------------------------------
+	template<uint8_t N>
+	float
+	Vector<float, N>::getLength() const
+	{
+		return sqrtf(getLengthSquared());
+	}
 }
 
 #define IMPLEMENT_VECTOR_ACCESSOR2(a,b)			\

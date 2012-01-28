@@ -34,6 +34,7 @@
 #define XPCC__QUATERNION_HPP
 
 #include <cmath>
+#include <stdint.h>
 
 namespace xpcc
 {
@@ -122,6 +123,16 @@ namespace xpcc
 	template<class T>
 	Quaternion<T>
 	operator * (const T &lhs, const Quaternion<T> &rhs);
+
+	// ------------------------------------------------------------------------
+	// Declaration of specialized methods
+	// ------------------------------------------------------------------------
+	template<>
+	Quaternion<float>::Quaternion(const Vector<float, 3> &axis, float angle);
+
+	template<>
+	float
+	Quaternion<float>::getLength() const;
 }
 
 #include "quaternion_impl.hpp"

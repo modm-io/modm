@@ -1,11 +1,11 @@
 // coding: utf-8
 // ----------------------------------------------------------------------------
-/* Copyright (c) 2009, Roboterclub Aachen e.V.
+/* Copyright (c) 2011, Roboterclub Aachen e.V.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- *
+ * 
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -30,71 +30,30 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/math/utils/operator.hpp>
+#include "quaternion.hpp"
 
-#include "vector2.hpp"
-
-// this explicit namespace is needed here, otherwise we get an error about 
-// "specialization of ... in different namespace"
 namespace xpcc
 {
 	template<>
-	int16_t
-	Vector<int16_t, 2>::getLength() const
+	xpcc::Quaternion<float>::Quaternion(const Vector<float, 3> &axis, float angle) :
+		w(),
+		x(),
+		y(),
+		z()
 	{
-		int32_t t;
-		
-		t = math::mul(this->x, this->x);
-		t = math::mac(t,this-> y, this->y);
-		
-		return math::sqrt(t);
-	}
-	
-	template<>
-	float
-	Vector<int16_t, 2>::getLength() const
-	{
-		return sqrtf(getLengthSquared());
+		float sinAngleOver2 = sinf(angle / 2);
+
+		w = cosf(angle / 2);
+		x = reinterpret_cast<const float*>(&axis)[0] * sinAngleOver2;
+		y = reinterpret_cast<const float*>(&axis)[1] * sinAngleOver2;
+		z = reinterpret_cast<const float*>(&axis)[2] * sinAngleOver2;
 	}
 
 	template<>
-	int32_t
-	Vector<int16_t, 2>::getLengthSquared() const
+	float
+	Quaternion<float>::getLength() const
 	{
-		int32_t t;
-		
-		t = math::mul(this->x, this->x);
-		t = math::mac(t,this-> y, this->y);
-		
-		return t;
-	}
-	
-	template<>
-	int32_t
-	Vector<int16_t, 2>::dot(const xpcc::Vector<int16_t, 2>& other) const
-	{
-		int32_t t;
-		
-		t = math::mul(this->x, other.x);
-		t = math::mac(t,this->y, other.y);
-		
-		return t;
-	}
-	
-	// ------------------------------------------------------------------------
-	template<>
-	template<>
-	Vector<double, 2>
-	Vector<float, 2>::convert() const
-	{
-		return Vector<double, 2>(this->x, this->y);
-	}
-	
-	template<>
-	template<>
-	Vector<float, 2>
-	Vector<double, 2>::convert() const
-	{
-		return Vector<float, 2>(this->x, this->y);
+		return sqrtf(getLengthSquared());
 	}
 }
+

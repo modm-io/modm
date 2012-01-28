@@ -268,7 +268,7 @@ template<typename T>
 T
 xpcc::Vector<T, 1>::getLength() const
 {
-	return x;
+	return std::abs(x);
 }
 
 // ----------------------------------------------------------------------------
