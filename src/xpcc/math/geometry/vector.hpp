@@ -133,12 +133,18 @@ namespace xpcc
 	// ------------------------------------------------------------------------
 	// Declaration of specialized methods
 	// ------------------------------------------------------------------------
+	/**
+	 * Partly specialization of member methods is not allow in GCC 4.4
+	 * http://stackoverflow.com/questions/165101/invalid-use-of-incomplete-type-error-with-partial-template-specialization
+	 *
+	 *
 	template<uint8_t N>
 	float
 	Vector<float, N>::getLength() const
 	{
 		return sqrtf(getLengthSquared());
 	}
+	 **/
 }
 
 #define IMPLEMENT_VECTOR_ACCESSOR2(a,b)			\
