@@ -52,7 +52,7 @@ namespace xpcc
 	
 	template<>
 	float
-	Vector<int16_t, 2>::getLength() const
+	Vector<float, 2>::getLength() const
 	{
 		return sqrtf(getLengthSquared());
 	}
