@@ -740,7 +740,7 @@ template<typename T>
 float
 xpcc::Vector<T, 4>::getLength() const
 {
-	return sqrt(getLengthSquared());
+	return std::sqrt(getLengthSquared());
 }
 
 // ----------------------------------------------------------------------------
@@ -748,7 +748,7 @@ template<typename T>
 float
 xpcc::Vector<T, 4>::getLengthSquared() const
 {
-	return x*x+y*y+z*z+w*w;
+	return x*x + y*y + z*z + w*w;
 }
 
 // ----------------------------------------------------------------------------
@@ -764,7 +764,7 @@ template<typename T>
 xpcc::Vector<T, 4>
 xpcc::Vector<T, 4>::scaled(float newLength) const
 {
-	float scale = newLength/getLength();
+	float scale = newLength / getLength();
 	return *this * scale;
 }
 

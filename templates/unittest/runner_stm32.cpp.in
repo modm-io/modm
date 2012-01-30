@@ -1,0 +1,65 @@
+// WARNING: This file is generated automatically, do not edit!
+// Please modify the corresponding 'runner_stm32.cpp.in' file instead.
+// ----------------------------------------------------------------------------
+
+#include <xpcc/architecture/platform.hpp>
+
+#include <unittest/reporter.hpp>
+#include <unittest/controller.hpp>
+
+${includes}
+
+${names}
+
+GPIO__OUTPUT(LedOrange, D, 13);		// User LED 3
+GPIO__OUTPUT(LedGreen, D, 12);		// User LED 4
+GPIO__OUTPUT(LedRed, D, 14);		// User LED 5
+GPIO__OUTPUT(LedBlue, D, 15);		// User LED 6
+
+GPIO__OUTPUT(VBusPresent, A, 9);		// green LED (LD7)
+GPIO__OUTPUT(VBusOvercurrent, D, 5);	// red LED   (LD8)
+
+GPIO__INPUT(Button, A, 0);
+
+using namespace xpcc::stm32;
+
+static bool
+initClock()
+{
+	// use external 8MHz crystal
+	if (!Clock::enableHse(Clock::HSE_CRYSTAL)) {
+		return false;
+	}
+	
+	Clock::enablePll(Clock::PLL_HSE, 4, 168);
+	return Clock::switchToPll();
+}
+
+int
+main(void)
+{
+	initClock();
+
+	LedOrange::setOutput(xpcc::gpio::HIGH);
+	LedGreen::setOutput(xpcc::gpio::LOW);
+	LedRed::setOutput(xpcc::gpio::HIGH);
+	LedBlue::setOutput(xpcc::gpio::HIGH);
+	
+	// initialize output device
+	xpcc::stm32::Usart1 uart(115200);
+	xpcc::IODeviceWrapper<xpcc::stm32::Usart1> device(uart);
+	
+	device.write("Unittests (" __DATE__ ", " __TIME__")\n");
+	
+	unittest::Reporter reporter(device);
+	unittest::Controller::instance().setReporter(reporter);
+	
+	// run tests
+${tests}
+	
+	unittest::Controller::instance().getReporter().printSummary();
+	
+	while (1)
+	{
+	}
+}

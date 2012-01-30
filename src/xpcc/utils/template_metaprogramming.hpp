@@ -288,7 +288,8 @@ namespace xpcc
 			};
 		};
 		
-		template <int x> struct static_assert_test
+		template <int x>
+		struct static_assert_test
 		{
 		};
 		

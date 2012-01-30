@@ -351,7 +351,7 @@ template<typename T, uint8_t N>
 T
 xpcc::Vector<T, N>::getLength() const
 {
-	return sqrt(getLengthSquared());
+	return std::sqrt(getLengthSquared());
 }
 
 // ----------------------------------------------------------------------------

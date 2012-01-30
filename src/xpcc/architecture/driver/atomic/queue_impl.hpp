@@ -40,7 +40,7 @@ xpcc::atomic::Queue<T, N>::Queue() :
 	head(0), tail(0)
 {
 #if defined(XPCC__CPU_AVR)
-	XPCC__STATIC_ASSERT(N > 254, "A maximum of 254 elements is allowed for AVRs!");
+	XPCC__STATIC_ASSERT(N <= 254, "A maximum of 254 elements is allowed for AVRs!");
 #endif
 }
 

@@ -33,7 +33,10 @@
 #ifndef XPCC__VECTOR1_HPP
 #define XPCC__VECTOR1_HPP
 
+#include <cmath>
+#include <cstdlib>
 #include <stdint.h>
+
 #include "vector.hpp"
 
 namespace xpcc

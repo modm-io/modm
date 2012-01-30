@@ -67,9 +67,9 @@ xpcc::Quaternion<T>::Quaternion(const Vector<T, 3> &axis, T angle)
 	y(),
 	z()
 {
-	float sinAngleOver2 = sin(angle / 2);
+	float sinAngleOver2 = std::sin(angle / 2);
 	
-	w = cos(angle / 2);
+	w = std::cos(angle / 2);
 	x = reinterpret_cast<const T*>(&axis)[0]*sinAngleOver2;
 	y = reinterpret_cast<const T*>(&axis)[1]*sinAngleOver2;
 	z = reinterpret_cast<const T*>(&axis)[2]*sinAngleOver2;
@@ -116,6 +116,7 @@ xpcc::Quaternion<T>& xpcc::Quaternion<T>::operator = (const Quaternion<T> &rhs)
 	x = rhs.x;
 	y = rhs.y;
 	z = rhs.z;
+	
 	return *this;
 }
 
@@ -286,7 +287,7 @@ template<class T>
 float
 xpcc::Quaternion<T>::getLength() const
 {
-	return sqrt(getLengthSquared());
+	return std::sqrt(getLengthSquared());
 }
 
 // ----------------------------------------------------------------------------
@@ -294,7 +295,7 @@ template<class T>
 float
 xpcc::Quaternion<T>::getLengthSquared() const
 {
-	return w*w+x*x+y*y+z*z;
+	return w*w + x*x + y*y + z*z;
 }
 
 // ----------------------------------------------------------------------------
@@ -302,8 +303,12 @@ template<class T>
 xpcc::Quaternion<T>&
 xpcc::Quaternion<T>::scale(float newLength)
 {
-	float s = newLength/getLength();
-	w *= s;	x *= s, y *= s; z *= s;
+	float s = newLength / getLength();
+	w *= s;
+	x *= s;
+	y *= s;
+	z *= s;
+	
 	return *this;
 }
 
@@ -320,7 +325,10 @@ template<class T>
 xpcc::Quaternion<T>&
 xpcc::Quaternion<T>::conjugate()
 {
-	x = -x, y = -y; z = -z;
+	x = -x;
+	y = -y;
+	z = -z;
+	
 	return *this;
 }
 
@@ -329,7 +337,7 @@ template<class T>
 xpcc::Quaternion<T>
 xpcc::Quaternion<T>::scaled(float newLength) const
 {
-	float s = newLength/getLength();
+	float s = newLength / getLength();
 	return Quaternion(w*s, x*s, y*s, z*s);
 }
 
@@ -362,7 +370,7 @@ template<class T>
 xpcc::Quaternion<T>
 xpcc::Quaternion<T>::inverse()
 {
-	return conjugate()/getLengthSquared();
+	return conjugate() / getLengthSquared();
 }
 
 // ----------------------------------------------------------------------------

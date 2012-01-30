@@ -365,10 +365,6 @@ namespace xpcc
 	template<>
 	int16_t
 	Vector<int16_t, 2>::getLength() const;
-	
-	template<>
-	float
-	Vector<float, 2>::getLength() const;
 
 	template<>
 	int32_t

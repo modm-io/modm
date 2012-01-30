@@ -276,13 +276,6 @@ namespace xpcc
 	typedef Vector<float, 4> 	Vector4f;
 	typedef Vector<int16_t, 4>	Vector4i;
 	typedef Vector<uint16_t, 4>	Vector4u;
-
-	// ------------------------------------------------------------------------
-	// Declaration of specialized methods
-	// ------------------------------------------------------------------------
-	template<>
-	float
-	Vector<float, 4>::getLength() const;
 }
 
 #include "vector4_impl.hpp"

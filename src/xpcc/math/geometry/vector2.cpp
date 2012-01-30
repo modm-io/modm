@@ -45,16 +45,9 @@ namespace xpcc
 		int32_t t;
 		
 		t = math::mul(this->x, this->x);
-		t = math::mac(t,this-> y, this->y);
+		t = math::mac(t, this-> y, this->y);
 		
 		return math::sqrt(t);
-	}
-	
-	template<>
-	float
-	Vector<float, 2>::getLength() const
-	{
-		return sqrtf(getLengthSquared());
 	}
 
 	template<>

@@ -40,47 +40,47 @@ BoundedDequeTest::testForward()
 	xpcc::BoundedDeque<int16_t, 3> deque;
 	
 	TEST_ASSERT_TRUE(deque.isEmpty());
-	TEST_ASSERT_EQUALS(deque.getMaxSize(), 3);
+	TEST_ASSERT_EQUALS(deque.getMaxSize(), 3U);
 	
-	TEST_ASSERT_EQUALS(deque.getSize(), 0);
+	TEST_ASSERT_EQUALS(deque.getSize(), 0U);
 	
 	TEST_ASSERT_TRUE(deque.append(1));
-	TEST_ASSERT_EQUALS(deque.getSize(), 1);
+	TEST_ASSERT_EQUALS(deque.getSize(), 1U);
 	TEST_ASSERT_TRUE(deque.append(2));
-	TEST_ASSERT_EQUALS(deque.getSize(), 2);
+	TEST_ASSERT_EQUALS(deque.getSize(), 2U);
 	TEST_ASSERT_TRUE(deque.append(3));
-	TEST_ASSERT_EQUALS(deque.getSize(), 3);
+	TEST_ASSERT_EQUALS(deque.getSize(), 3U);
 	
 	TEST_ASSERT_FALSE(deque.append(4));
-	TEST_ASSERT_EQUALS(deque.getSize(), 3);
+	TEST_ASSERT_EQUALS(deque.getSize(), 3U);
 	TEST_ASSERT_TRUE(deque.isFull());
 	
 	TEST_ASSERT_EQUALS(deque.getFront(), 1);
 	deque.removeFront();
-	TEST_ASSERT_EQUALS(deque.getSize(), 2);
+	TEST_ASSERT_EQUALS(deque.getSize(), 2U);
 	
 	TEST_ASSERT_EQUALS(deque.getFront(), 2);
 	deque.removeFront();
-	TEST_ASSERT_EQUALS(deque.getSize(), 1);
+	TEST_ASSERT_EQUALS(deque.getSize(), 1U);
 	
 	TEST_ASSERT_TRUE(deque.append(4));
-	TEST_ASSERT_EQUALS(deque.getSize(), 2);
+	TEST_ASSERT_EQUALS(deque.getSize(), 2U);
 	TEST_ASSERT_TRUE(deque.append(5));
-	TEST_ASSERT_EQUALS(deque.getSize(), 3);
+	TEST_ASSERT_EQUALS(deque.getSize(), 3U);
 	TEST_ASSERT_TRUE(deque.isFull());
 	
 	TEST_ASSERT_EQUALS(deque.getFront(), 3);
 	deque.removeFront();
-	TEST_ASSERT_EQUALS(deque.getSize(), 2);
+	TEST_ASSERT_EQUALS(deque.getSize(), 2U);
 	
 	TEST_ASSERT_EQUALS(deque.getFront(), 4);
 	deque.removeFront();
-	TEST_ASSERT_EQUALS(deque.getSize(), 1);
+	TEST_ASSERT_EQUALS(deque.getSize(), 1U);
 	
 	TEST_ASSERT_EQUALS(deque.getFront(), 5);
 	deque.removeFront();
 	
-	TEST_ASSERT_EQUALS(deque.getSize(), 0);
+	TEST_ASSERT_EQUALS(deque.getSize(), 0U);
 	TEST_ASSERT_TRUE(deque.isEmpty());
 }
 
@@ -123,16 +123,16 @@ BoundedDequeTest::testBoth()
 {
 	xpcc::BoundedDeque<int16_t, 3> deque;
 	
-	TEST_ASSERT_EQUALS(deque.getSize(), 0);
+	TEST_ASSERT_EQUALS(deque.getSize(), 0U);
 	
 	TEST_ASSERT_TRUE(deque.prepend(12));
-	TEST_ASSERT_EQUALS(deque.getSize(), 1);
+	TEST_ASSERT_EQUALS(deque.getSize(), 1U);
 	
 	TEST_ASSERT_TRUE(deque.prepend(11));
-	TEST_ASSERT_EQUALS(deque.getSize(), 2);
+	TEST_ASSERT_EQUALS(deque.getSize(), 2U);
 	
 	TEST_ASSERT_TRUE(deque.prepend(10));
-	TEST_ASSERT_EQUALS(deque.getSize(), 3);
+	TEST_ASSERT_EQUALS(deque.getSize(), 3U);
 	
 	TEST_ASSERT_EQUALS(deque.getFront(), 10);
 	deque.removeFront();
@@ -165,17 +165,17 @@ BoundedDequeTest::testClear()
 	deque.prepend(11);
 	deque.prepend(10);
 	
-	TEST_ASSERT_EQUALS(deque.getSize(), 3);
+	TEST_ASSERT_EQUALS(deque.getSize(), 3U);
 	
 	deque.clear();
 	
-	TEST_ASSERT_EQUALS(deque.getSize(), 0);
+	TEST_ASSERT_EQUALS(deque.getSize(), 0U);
 	TEST_ASSERT_TRUE(deque.isEmpty());
 	
 	deque.prepend(12);
 	deque.prepend(11);
 	deque.prepend(10);
-	TEST_ASSERT_EQUALS(deque.getSize(), 3);
+	TEST_ASSERT_EQUALS(deque.getSize(), 3U);
 	
 	TEST_ASSERT_EQUALS(deque.getFront(), 10);
 	deque.removeFront();

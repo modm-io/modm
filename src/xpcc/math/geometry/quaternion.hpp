@@ -100,10 +100,14 @@ namespace xpcc
 		float getLengthSquared() const;
 		
 		Quaternion& scale(float newLength);
+		
+		/** Rescale to length = 1 */
 		Quaternion& normalize();
 		Quaternion& conjugate();
 
 		Quaternion scaled(float newLength) const;
+		
+		/** Return a new quaternion with the same direction by the length 1 */
 		Quaternion normalized() const;
 		Quaternion conjugated() const;
 		
@@ -123,16 +127,6 @@ namespace xpcc
 	template<class T>
 	Quaternion<T>
 	operator * (const T &lhs, const Quaternion<T> &rhs);
-
-	// ------------------------------------------------------------------------
-	// Declaration of specialized methods
-	// ------------------------------------------------------------------------
-	template<>
-	Quaternion<float>::Quaternion(const Vector<float, 3> &axis, float angle);
-
-	template<>
-	float
-	Quaternion<float>::getLength() const;
 }
 
 #include "quaternion_impl.hpp"

@@ -462,7 +462,7 @@ template<typename T>
 float
 xpcc::Vector<T, 3>::getLength() const
 {
-	return sqrt(getLengthSquared());
+	return std::sqrt(getLengthSquared());
 }
 
 // ----------------------------------------------------------------------------
