@@ -105,6 +105,14 @@ xpcc::LineSegment2D<T>::getLength() const
 
 // ----------------------------------------------------------------------------
 template<typename T>
+xpcc::Vector<T, 2>
+xpcc::LineSegment2D<T>::getDirectionVector() const
+{
+	return endPoint - startPoint;
+}
+
+// ----------------------------------------------------------------------------
+template<typename T>
 const T
 xpcc::LineSegment2D<T>::getDistanceTo(const Vector<T, 2>& point) const
 {

@@ -92,6 +92,9 @@ namespace xpcc
 		T
 		getLength() const;
 		
+		Vector<T, 2>
+		getDirectionVector() const;
+
 		/// Shortest distance to a point
 		const T
 		getDistanceTo(const Vector<T, 2>& point) const;
