@@ -50,7 +50,7 @@ sources, defines, includes = env.SConscript(
 		exports = 'env sources defines')
 
 for path in includes:
-	envOld.AppendUnique(CPPPATH = os.path.join(env['XPCC_ROOTPATH'], path))
+	envOld.AppendUnique(CPPPATH = os.path.join(env['XPCC_ROOTPATH'], 'ext', path))
 
 library = env.Library(target = 'xpcc', source = sources)
 

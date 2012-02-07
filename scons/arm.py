@@ -82,7 +82,7 @@ def generate(env, **kw):
 		# The first character after the number specifies the package. As this
 		# is not important for the memory map of the device we replace it with
 		# an underscore when selecting the linkerscript.
-		device = device[0:9] + '_' + device[10:] 
+		device = device[0:9] + '_' + device[10:]
 	
 	try:
 		defines = device_list.devices[device]['defines']
@@ -93,6 +93,7 @@ def generate(env, **kw):
 	except KeyError as e:
 		print "Unknown device '%s'. Please check the spelling or add the device " \
 				"in scons/arm_devices.py" % env['ARM_DEVICE']
+		env.Exit(1)
 	
 	# Add a empty dict to define the internal type of CPPDEFINES. This way
 	# we can later add lists or dicts. When starting with a list only other

@@ -47,8 +47,8 @@
  * "Sourcery CodeBench Lite Edition").
  */
 
-#if defined __ARM_LPC1000__
-#	include "cortex_m3/lpc.hpp"
+#if defined __ARM_LPC11XX__
+#	include "cortex_m0/lpc.hpp"
 #elif defined __ARM_STM32__
 #	include "cortex_m3/stm32.hpp"
 #endif

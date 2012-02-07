@@ -188,12 +188,12 @@ namespace xpcc
 		_restore_interrupt(cpsr);
 	}
 	
-#elif defined(XPCC__CPU_CORTEX_M3) || defined(XPCC__CPU_CORTEX_M4)
+#elif defined(XPCC__CPU_CORTEX_M0) || defined(XPCC__CPU_CORTEX_M3) || defined(XPCC__CPU_CORTEX_M4)
 
 	xpcc::atomic::Lock::Lock()
 	{
 		// disable interrupts -> PRIMASK=1
-		// enable interrupts -> PRIMASK=1
+		// enable interrupts -> PRIMASK=0
 		uint32_t mask = 1;
 		asm volatile (
 				"mrs %0, PRIMASK"	"\n\t"
@@ -210,7 +210,7 @@ namespace xpcc
 	xpcc::atomic::Unlock::Unlock()
 	{
 		// disable interrupts -> PRIMASK=1
-		// enable interrupts -> PRIMASK=1
+		// enable interrupts -> PRIMASK=0
 		uint32_t mask = 0;
 		asm volatile (
 				"mrs %0, PRIMASK"	"\n\t"

@@ -15,9 +15,16 @@ devices = \
 	},
 	
 	# -------------------------------------------------------------------------
+	"lpc11c24":
+	{
+		"defines": ["__ARM_LPC11XX__", "__ARM_LPC11CXX__"],
+		"linkerscript": "cortex_m0/lpc/linker/lpc11c24.ld",
+		"size": { "flash": 32768, "ram": 8192 },
+	},
+	
 	"lpc1768":
 	{
-		"defines": ["__ARM_LPC1000__"],
+		"defines": ["__ARM_LPC17XX__"],
 		"linkerscript": "cortex_m3/lpc/ld/lpc1768.ld",
 		"size": { "flash": 524288, "ram": 65536 },	# 32kB local SRAM + 2x16kB AHB SRAM
 	},

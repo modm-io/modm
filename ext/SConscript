@@ -51,37 +51,38 @@ if env['ARCHITECTURE'].startswith('cortex-m3/stm32f10'):
 	sourcePath += [
 		'stm32f10x_lib/STM32F10x_StdPeriph_Driver/src']
 	globalIncludes += [
-		'ext/stm32f10x_lib/CMSIS/CM3/CoreSupport',
-		'ext/stm32f10x_lib/CMSIS/CM3/DeviceSupport/ST/STM32F10x',
-		'ext/stm32f10x_lib/STM32F10x_StdPeriph_Driver/inc']
+		'stm32f10x_lib/CMSIS/CM3/CoreSupport',
+		'stm32f10x_lib/CMSIS/CM3/DeviceSupport/ST/STM32F10x',
+		'stm32f10x_lib/STM32F10x_StdPeriph_Driver/inc']
 
 if env['ARCHITECTURE'].startswith('cortex-m3/stm32f2'):
 	sourcePath += [
 		'stm32f2xx_lib/STM32F2xx_StdPeriph_Driver/src']
 	globalIncludes += [
-		'ext/stm32f2xx_lib/CMSIS/CM3/CoreSupport',
-		'ext/stm32f2xx_lib/CMSIS/CM3/DeviceSupport/ST/STM32F2xx',
-		'ext/stm32f2xx_lib/STM32F2xx_StdPeriph_Driver/inc']
+		'stm32f2xx_lib/CMSIS/CM3/CoreSupport',
+		'stm32f2xx_lib/CMSIS/CM3/DeviceSupport/ST/STM32F2xx',
+		'stm32f2xx_lib/STM32F2xx_StdPeriph_Driver/inc']
 
 if env['ARCHITECTURE'].startswith('cortex-m4/stm32f4'):
 	#sourcePath += [
 	#	'stm32f4xx_lib/STM32F4xx_StdPeriph_Driver/src']
 	globalIncludes += [
-		'ext/stm32f4xx_lib/CMSIS/Include',
-		'ext/stm32f4xx_lib/CMSIS/Device/ST/STM32F4xx/Include',
-		'ext/stm32f4xx_lib/STM32F4xx_StdPeriph_Driver/inc']
+		'stm32f4xx_lib/CMSIS/Include',
+		'stm32f4xx_lib/CMSIS/Device/ST/STM32F4xx/Include',
+		'stm32f4xx_lib/STM32F4xx_StdPeriph_Driver/inc']
 
 if 'stm32f' in env['ARCHITECTURE']:
-	# FreeRTOS for STM32
-	sourcePath += ['freertos']
-	
-	# FatFS
-	sourcePath += ['fatfs']
+	sourcePath += ['freertos']		# FreeRTOS for STM32
+	sourcePath += ['fatfs']			# FatFS
+
+if env['ARCHITECTURE'].startswith('cortex-m0/lpc11'):
+	sourcePath += ['lpc11xx/cmsis', 'lpc11xx/driver']
+	globalIncludes += []
 
 # -----------------------------------------------------------------------------
 includes = buildIncludes + globalIncludes
 for path in includes:
-	env.AppendUnique(CPPPATH = os.path.join(env['XPCC_ROOTPATH'], path))
+	env.AppendUnique(CPPPATH = os.path.join(env['XPCC_ROOTPATH'], 'ext', path))
 
 for path in sourcePath:
 	scan = env.FindFiles(path = path)

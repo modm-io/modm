@@ -34,7 +34,7 @@
 #include <stm32f10x.h>
 #include <xpcc/architecture/utils.hpp>
 
-#include "xpcc_config.hpp"
+#include <xpcc_config.hpp>
 
 // ----------------------------------------------------------------------------
 #define SYSTICK_RELOAD_VAL		71999
@@ -59,106 +59,108 @@
  * As they are weak aliases, any function with the same name will override
  * this definition.
  */
-void Reset_Handler(void);
-void NMI_Handler(void)				__attribute__ ((weak, alias("defaultHandler")));
-void HardFault_Handler(void);//		__attribute__ ((weak, alias("defaultHandler")));
-void MemManage_Handler(void)		__attribute__ ((weak, alias("defaultHandler")));
-void BusFault_Handler(void)			__attribute__ ((weak, alias("defaultHandler")));
-void UsageFault_Handler(void)		__attribute__ ((weak, alias("defaultHandler")));
-void SVC_Handler(void)				__attribute__ ((weak, alias("defaultHandler")));
-void DebugMon_Handler(void)			__attribute__ ((weak, alias("defaultHandler")));
-void PendSV_Handler(void)			__attribute__ ((weak, alias("defaultHandler")));
-void SysTick_Handler(void)			__attribute__ ((weak, alias("defaultHandler")));
+#define ALIAS(f) __attribute__ ((weak, alias (#f)))
 
-void WWDG_IRQHandler(void)			__attribute__ ((weak, alias("defaultHandler")));
-void PVD_IRQHandler(void)			__attribute__ ((weak, alias("defaultHandler")));
-void TAMPER_IRQHandler(void)		__attribute__ ((weak, alias("defaultHandler")));
-void RTC_IRQHandler(void)			__attribute__ ((weak, alias("defaultHandler")));
-void FLASH_IRQHandler(void)			__attribute__ ((weak, alias("defaultHandler")));
-void RCC_IRQHandler(void)			__attribute__ ((weak, alias("defaultHandler")));
-void EXTI0_IRQHandler(void)			__attribute__ ((weak, alias("defaultHandler")));
-void EXTI1_IRQHandler(void)			__attribute__ ((weak, alias("defaultHandler")));
-void EXTI2_IRQHandler(void)			__attribute__ ((weak, alias("defaultHandler")));
-void EXTI3_IRQHandler(void)			__attribute__ ((weak, alias("defaultHandler")));
-void EXTI4_IRQHandler(void)			__attribute__ ((weak, alias("defaultHandler")));
-void DMA1_Channel1_IRQHandler(void)	__attribute__ ((weak, alias("defaultHandler")));
-void DMA1_Channel2_IRQHandler(void)	__attribute__ ((weak, alias("defaultHandler")));
-void DMA1_Channel3_IRQHandler(void)	__attribute__ ((weak, alias("defaultHandler")));
-void DMA1_Channel4_IRQHandler(void)	__attribute__ ((weak, alias("defaultHandler")));
-void DMA1_Channel5_IRQHandler(void)	__attribute__ ((weak, alias("defaultHandler")));
-void DMA1_Channel6_IRQHandler(void)	__attribute__ ((weak, alias("defaultHandler")));
-void DMA1_Channel7_IRQHandler(void)	__attribute__ ((weak, alias("defaultHandler")));
-void ADC1_2_IRQHandler(void)		__attribute__ ((weak, alias("defaultHandler")));
-void USB_HP_CAN1_TX_IRQHandler(void)	__attribute__ ((weak, alias("defaultHandler")));
-void USB_LP_CAN1_RX0_IRQHandler(void)	__attribute__ ((weak, alias("defaultHandler")));
-void CAN1_RX1_IRQHandler(void)		__attribute__ ((weak, alias("defaultHandler")));
-void CAN1_SCE_IRQHandler(void)		__attribute__ ((weak, alias("defaultHandler")));
-void EXTI9_5_IRQHandler(void)		__attribute__ ((weak, alias("defaultHandler")));
+void Reset_Handler(void);
+void NMI_Handler(void)				ALIAS(defaultHandler);
+void HardFault_Handler(void);//		ALIAS(defaultHandler);
+void MemManage_Handler(void)		ALIAS(defaultHandler);
+void BusFault_Handler(void)			ALIAS(defaultHandler);
+void UsageFault_Handler(void)		ALIAS(defaultHandler);
+void SVC_Handler(void)				ALIAS(defaultHandler);
+void DebugMon_Handler(void)			ALIAS(defaultHandler);
+void PendSV_Handler(void)			ALIAS(defaultHandler);
+void SysTick_Handler(void)			ALIAS(defaultHandler);
+
+void WWDG_IRQHandler(void)			ALIAS(defaultHandler);
+void PVD_IRQHandler(void)			ALIAS(defaultHandler);
+void TAMPER_IRQHandler(void)		ALIAS(defaultHandler);
+void RTC_IRQHandler(void)			ALIAS(defaultHandler);
+void FLASH_IRQHandler(void)			ALIAS(defaultHandler);
+void RCC_IRQHandler(void)			ALIAS(defaultHandler);
+void EXTI0_IRQHandler(void)			ALIAS(defaultHandler);
+void EXTI1_IRQHandler(void)			ALIAS(defaultHandler);
+void EXTI2_IRQHandler(void)			ALIAS(defaultHandler);
+void EXTI3_IRQHandler(void)			ALIAS(defaultHandler);
+void EXTI4_IRQHandler(void)			ALIAS(defaultHandler);
+void DMA1_Channel1_IRQHandler(void)	ALIAS(defaultHandler);
+void DMA1_Channel2_IRQHandler(void)	ALIAS(defaultHandler);
+void DMA1_Channel3_IRQHandler(void)	ALIAS(defaultHandler);
+void DMA1_Channel4_IRQHandler(void)	ALIAS(defaultHandler);
+void DMA1_Channel5_IRQHandler(void)	ALIAS(defaultHandler);
+void DMA1_Channel6_IRQHandler(void)	ALIAS(defaultHandler);
+void DMA1_Channel7_IRQHandler(void)	ALIAS(defaultHandler);
+void ADC1_2_IRQHandler(void)		ALIAS(defaultHandler);
+void USB_HP_CAN1_TX_IRQHandler(void)	ALIAS(defaultHandler);
+void USB_LP_CAN1_RX0_IRQHandler(void)	ALIAS(defaultHandler);
+void CAN1_RX1_IRQHandler(void)		ALIAS(defaultHandler);
+void CAN1_SCE_IRQHandler(void)		ALIAS(defaultHandler);
+void EXTI9_5_IRQHandler(void)		ALIAS(defaultHandler);
 #if defined (STM32F10X_XL)
-	void TIM1_BRK_TIM9_IRQHandler(void)			__attribute__ ((weak, alias("defaultHandler")));
-	void TIM1_UP_TIM10_IRQHandler(void)			__attribute__ ((weak, alias("defaultHandler")));
-	void TIM1_TRG_COM_TIM11_IRQHandler(void)	__attribute__ ((weak, alias("defaultHandler")));
+	void TIM1_BRK_TIM9_IRQHandler(void)			ALIAS(defaultHandler);
+	void TIM1_UP_TIM10_IRQHandler(void)			ALIAS(defaultHandler);
+	void TIM1_TRG_COM_TIM11_IRQHandler(void)	ALIAS(defaultHandler);
 #else
-	void TIM1_BRK_IRQHandler(void)		__attribute__ ((weak, alias("defaultHandler")));
-	void TIM1_UP_IRQHandler(void)		__attribute__ ((weak, alias("defaultHandler")));
-	void TIM1_TRG_COM_IRQHandler(void)	__attribute__ ((weak, alias("defaultHandler")));
+	void TIM1_BRK_IRQHandler(void)		ALIAS(defaultHandler);
+	void TIM1_UP_IRQHandler(void)		ALIAS(defaultHandler);
+	void TIM1_TRG_COM_IRQHandler(void)	ALIAS(defaultHandler);
 #endif
-void TIM1_CC_IRQHandler(void)		__attribute__ ((weak, alias("defaultHandler")));
-void TIM2_IRQHandler(void)			__attribute__ ((weak, alias("defaultHandler")));
-void TIM3_IRQHandler(void)			__attribute__ ((weak, alias("defaultHandler")));
-void TIM4_IRQHandler(void)			__attribute__ ((weak, alias("defaultHandler")));
-void I2C1_EV_IRQHandler(void)		__attribute__ ((weak, alias("defaultHandler")));
-void I2C1_ER_IRQHandler(void)		__attribute__ ((weak, alias("defaultHandler")));
-void I2C2_EV_IRQHandler(void)		__attribute__ ((weak, alias("defaultHandler")));
-void I2C2_ER_IRQHandler(void)		__attribute__ ((weak, alias("defaultHandler")));
-void SPI1_IRQHandler(void)			__attribute__ ((weak, alias("defaultHandler")));
-void SPI2_IRQHandler(void)			__attribute__ ((weak, alias("defaultHandler")));
-void USART1_IRQHandler(void)		__attribute__ ((weak, alias("defaultHandler")));
-void USART2_IRQHandler(void)		__attribute__ ((weak, alias("defaultHandler")));
-void USART3_IRQHandler(void)		__attribute__ ((weak, alias("defaultHandler")));
-void EXTI15_10_IRQHandler(void)		__attribute__ ((weak, alias("defaultHandler")));
-void RTCAlarm_IRQHandler(void)		__attribute__ ((weak, alias("defaultHandler")));
+void TIM1_CC_IRQHandler(void)		ALIAS(defaultHandler);
+void TIM2_IRQHandler(void)			ALIAS(defaultHandler);
+void TIM3_IRQHandler(void)			ALIAS(defaultHandler);
+void TIM4_IRQHandler(void)			ALIAS(defaultHandler);
+void I2C1_EV_IRQHandler(void)		ALIAS(defaultHandler);
+void I2C1_ER_IRQHandler(void)		ALIAS(defaultHandler);
+void I2C2_EV_IRQHandler(void)		ALIAS(defaultHandler);
+void I2C2_ER_IRQHandler(void)		ALIAS(defaultHandler);
+void SPI1_IRQHandler(void)			ALIAS(defaultHandler);
+void SPI2_IRQHandler(void)			ALIAS(defaultHandler);
+void USART1_IRQHandler(void)		ALIAS(defaultHandler);
+void USART2_IRQHandler(void)		ALIAS(defaultHandler);
+void USART3_IRQHandler(void)		ALIAS(defaultHandler);
+void EXTI15_10_IRQHandler(void)		ALIAS(defaultHandler);
+void RTCAlarm_IRQHandler(void)		ALIAS(defaultHandler);
 #if defined (STM32F10X_CL)
-	void OTG_FS_WKUP_IRQHandler(void)	__attribute__ ((weak, alias("defaultHandler")));
-	void TIM5_IRQHandler(void)			__attribute__ ((weak, alias("defaultHandler")));
-	void SPI3_IRQHandler(void)			__attribute__ ((weak, alias("defaultHandler")));
-	void UART4_IRQHandler(void)			__attribute__ ((weak, alias("defaultHandler")));
-	void UART5_IRQHandler(void)			__attribute__ ((weak, alias("defaultHandler")));
-	void TIM6_IRQHandler(void)			__attribute__ ((weak, alias("defaultHandler")));
-	void TIM7_IRQHandler(void)			__attribute__ ((weak, alias("defaultHandler")));
-	void DMA2_Channel1_IRQHandler(void)	__attribute__ ((weak, alias("defaultHandler")));
-	void DMA2_Channel2_IRQHandler(void)	__attribute__ ((weak, alias("defaultHandler")));
-	void DMA2_Channel3_IRQHandler(void)	__attribute__ ((weak, alias("defaultHandler")));
-	void DMA2_Channel4_IRQHandler(void)	__attribute__ ((weak, alias("defaultHandler")));
-	void DMA2_Channel5_IRQHandler(void)	__attribute__ ((weak, alias("defaultHandler")));
-	void ETH_IRQHandler(void)			__attribute__ ((weak, alias("defaultHandler")));
-	void ETH_WKUP_IRQHandler(void)		__attribute__ ((weak, alias("defaultHandler")));
-	void CAN2_TX_IRQHandler(void)		__attribute__ ((weak, alias("defaultHandler")));
-	void CAN2_RX0_IRQHandler(void)		__attribute__ ((weak, alias("defaultHandler")));
-	void CAN2_RX1_IRQHandler(void)		__attribute__ ((weak, alias("defaultHandler")));
-	void CAN2_SCE_IRQHandler(void)		__attribute__ ((weak, alias("defaultHandler")));
-	void OTG_FS_IRQHandler(void)		__attribute__ ((weak, alias("defaultHandler")));
+	void OTG_FS_WKUP_IRQHandler(void)	ALIAS(defaultHandler);
+	void TIM5_IRQHandler(void)			ALIAS(defaultHandler);
+	void SPI3_IRQHandler(void)			ALIAS(defaultHandler);
+	void UART4_IRQHandler(void)			ALIAS(defaultHandler);
+	void UART5_IRQHandler(void)			ALIAS(defaultHandler);
+	void TIM6_IRQHandler(void)			ALIAS(defaultHandler);
+	void TIM7_IRQHandler(void)			ALIAS(defaultHandler);
+	void DMA2_Channel1_IRQHandler(void)	ALIAS(defaultHandler);
+	void DMA2_Channel2_IRQHandler(void)	ALIAS(defaultHandler);
+	void DMA2_Channel3_IRQHandler(void)	ALIAS(defaultHandler);
+	void DMA2_Channel4_IRQHandler(void)	ALIAS(defaultHandler);
+	void DMA2_Channel5_IRQHandler(void)	ALIAS(defaultHandler);
+	void ETH_IRQHandler(void)			ALIAS(defaultHandler);
+	void ETH_WKUP_IRQHandler(void)		ALIAS(defaultHandler);
+	void CAN2_TX_IRQHandler(void)		ALIAS(defaultHandler);
+	void CAN2_RX0_IRQHandler(void)		ALIAS(defaultHandler);
+	void CAN2_RX1_IRQHandler(void)		ALIAS(defaultHandler);
+	void CAN2_SCE_IRQHandler(void)		ALIAS(defaultHandler);
+	void OTG_FS_IRQHandler(void)		ALIAS(defaultHandler);
 #else
-	void USBWakeUp_IRQHandler(void)		__attribute__ ((weak, alias("defaultHandler")));
+	void USBWakeUp_IRQHandler(void)		ALIAS(defaultHandler);
 	
 	#if defined (STM32F10X_HD) || defined (STM32F10X_XL)
-		void TIM8_BRK_TIM12_IRQHandler(void)		__attribute__ ((weak, alias("defaultHandler")));
-		void TIM8_UP_TIM13_IRQHandler(void)			__attribute__ ((weak, alias("defaultHandler")));
-		void TIM8_TRG_COM_TIM14_IRQHandler(void)	__attribute__ ((weak, alias("defaultHandler")));
-		void TIM8_CC_IRQHandler(void)				__attribute__ ((weak, alias("defaultHandler")));
-		void ADC3_IRQHandler(void)		__attribute__ ((weak, alias("defaultHandler")));
-		void FSMC_IRQHandler(void)		__attribute__ ((weak, alias("defaultHandler")));
-		void SDIO_IRQHandler(void)		__attribute__ ((weak, alias("defaultHandler")));
-		void TIM5_IRQHandler(void)		__attribute__ ((weak, alias("defaultHandler")));
-		void SPI3_IRQHandler(void)		__attribute__ ((weak, alias("defaultHandler")));
-		void UART4_IRQHandler(void)		__attribute__ ((weak, alias("defaultHandler")));
-		void UART5_IRQHandler(void)		__attribute__ ((weak, alias("defaultHandler")));
-		void TIM6_IRQHandler(void)		__attribute__ ((weak, alias("defaultHandler")));
-		void TIM7_IRQHandler(void)		__attribute__ ((weak, alias("defaultHandler")));
-		void DMA2_Channel1_IRQHandler(void)		__attribute__ ((weak, alias("defaultHandler")));
-		void DMA2_Channel2_IRQHandler(void)		__attribute__ ((weak, alias("defaultHandler")));
-		void DMA2_Channel3_IRQHandler(void)		__attribute__ ((weak, alias("defaultHandler")));
-		void DMA2_Channel4_5_IRQHandler(void)	__attribute__ ((weak, alias("defaultHandler")));
+		void TIM8_BRK_TIM12_IRQHandler(void)		ALIAS(defaultHandler);
+		void TIM8_UP_TIM13_IRQHandler(void)			ALIAS(defaultHandler);
+		void TIM8_TRG_COM_TIM14_IRQHandler(void)	ALIAS(defaultHandler);
+		void TIM8_CC_IRQHandler(void)				ALIAS(defaultHandler);
+		void ADC3_IRQHandler(void)		ALIAS(defaultHandler);
+		void FSMC_IRQHandler(void)		ALIAS(defaultHandler);
+		void SDIO_IRQHandler(void)		ALIAS(defaultHandler);
+		void TIM5_IRQHandler(void)		ALIAS(defaultHandler);
+		void SPI3_IRQHandler(void)		ALIAS(defaultHandler);
+		void UART4_IRQHandler(void)		ALIAS(defaultHandler);
+		void UART5_IRQHandler(void)		ALIAS(defaultHandler);
+		void TIM6_IRQHandler(void)		ALIAS(defaultHandler);
+		void TIM7_IRQHandler(void)		ALIAS(defaultHandler);
+		void DMA2_Channel1_IRQHandler(void)		ALIAS(defaultHandler);
+		void DMA2_Channel2_IRQHandler(void)		ALIAS(defaultHandler);
+		void DMA2_Channel3_IRQHandler(void)		ALIAS(defaultHandler);
+		void DMA2_Channel4_5_IRQHandler(void)	ALIAS(defaultHandler);
 	#endif
 #endif
 
@@ -300,7 +302,9 @@ FunctionPointer flashVectors[] __attribute__ ((section(".reset"))) =
 };
 
 // ----------------------------------------------------------------------------
-// defined in the linkerscript
+// The following are constructs created by the linker, indicating where the
+// the "data" and "bss" segments reside in memory.  The initializers for the
+// for the "data" segment resides immediately following the "text" segment.
 extern uint32_t __fastcode_load;
 extern uint32_t __fastcode_start;
 extern uint32_t __fastcode_end;
@@ -313,17 +317,17 @@ extern uint32_t __bss_start;
 extern uint32_t __bss_end;
 
 // Application's main function
-int
-main(void);
-
-// calls CTORS of static objects
-void
-__libc_init_array(void);
-
-extern void
-exit(int) __attribute__ ((noreturn, weak));
+extern int main(void);
+extern void __libc_init_array(void);
+extern void exit(int) __attribute__ ((noreturn, weak));
 
 // ----------------------------------------------------------------------------
+// This is the code that gets called when the processor first starts execution
+// following a reset event.  Only the absolutely necessary set is performed,
+// after which the application supplied main() routine is called.  Any fancy
+// actions (such as making decisions based on the reset cause register, and
+// resetting the bits in that register) are left solely in the hands of the
+// application.
 void
 Reset_Handler(void)
 {

@@ -83,7 +83,8 @@
 
 #define	XPCC__CPU_ARM
 #define	XPCC__CPU_ARM7TDMI
-#define	XPCC__CPU_CORTEX_M3
+#define	XPCC__CPU_CORTEX_M0
+#define	XPCC__CPU_CORTEX_M4
 #define	XPCC__CPU_CORTEX_M4
 
 #define	XPCC__CPU_HOSTED
@@ -185,6 +186,9 @@
 #	if defined __ARM_ARCH_4T__
 #		define XPCC__CPU_ARM7TDMI	1
 #		define XPCC__CPU_STRING		"ARM7TDMI"
+#	elif defined __ARM_ARCH_6SM__
+#		define XPCC__CPU_CORTEX_M0	1
+#		define XPCC__CPU_STRING		"Cortex M0"
 #	elif defined __ARM_ARCH_7M__
 #		define XPCC__CPU_CORTEX_M3	1
 #		define XPCC__CPU_STRING		"Cortex M3"

@@ -1,6 +1,6 @@
 // coding: utf-8
 // ----------------------------------------------------------------------------
-/* Copyright (c) 2009, Roboterclub Aachen e.V.
+/* Copyright (c) 2012, Roboterclub Aachen e.V.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -30,35 +30,17 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__PLATFORM_HPP
-#define XPCC__PLATFORM_HPP
+#include <lpc11xx/cmsis/LPC11xx.h>
+#include <lpc11xx/cmsis/core_cm0.h>
+#include <lpc11xx/cmsis/system_LPC11xx.h>
 
-/**
- * \ingroup 	architecture
- * \defgroup	platform	Supported Platforms
- * 
- * Select built-in functions and macros for the active platform
- */
+#include "gpio.hpp"
 
-#include <stdint.h>
+extern "C"
+{
+	#include <lpc11xx/driver/driver_config.h>
+	
+	#include <lpc11xx/driver/gpio.h>
+	#include <lpc11xx/driver/timer32.h>
+}
 
-#include "detect.hpp"		// sets XPCC__CPU_xx etc. macros
-#include "utils.hpp"
-
-#if defined XPCC__CPU_AVR
-#	include "platform/avr.hpp"
-#elif defined XPCC__CPU_ARM7TDMI
-#	include "platform/arm7.hpp"
-#elif defined XPCC__CPU_CORTEX_M0
-#	include "platform/cortex_m0.hpp"
-#elif defined XPCC__CPU_CORTEX_M3
-#	include "platform/cortex_m3.hpp"
-#elif defined XPCC__CPU_CORTEX_M4
-#	include "platform/cortex_m3.hpp"
-#elif defined XPCC__CPU_HOSTED
-#	include "platform/hosted.hpp"
-#else
-#	error "Unknown platform"
-#endif
-
-#endif	// XPCC__PLATFORM_HPP
