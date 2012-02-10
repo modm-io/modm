@@ -22,10 +22,10 @@ devices = \
 		"size": { "flash": 32768, "ram": 8192 },
 	},
 	
-	"lpc1768":
+	"lpc1769":
 	{
 		"defines": ["__ARM_LPC17XX__"],
-		"linkerscript": "cortex_m3/lpc/ld/lpc1768.ld",
+		"linkerscript": "cortex_m3/lpc/linker/lpc1769.ld",
 		"size": { "flash": 524288, "ram": 65536 },	# 32kB local SRAM + 2x16kB AHB SRAM
 	},
 	

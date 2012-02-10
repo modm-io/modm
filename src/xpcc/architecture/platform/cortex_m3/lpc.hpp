@@ -1,6 +1,6 @@
 // coding: utf-8
 // ----------------------------------------------------------------------------
-/* Copyright (c) 2011, Roboterclub Aachen e.V.
+/* Copyright (c) 2012, Roboterclub Aachen e.V.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -29,30 +29,26 @@
  * $Id$
  */
 // ----------------------------------------------------------------------------
-
-#ifndef XPCC__CORTEX_M3_HPP
-#define XPCC__CORTEX_M3_HPP
-
 /**
- * \ingroup		platform
- * \defgroup	cortex_m3	Cortex M3
+ * \ingroup		cortex_m0
+ * \defgroup	lpc1100		LPC11xx
  * 
- * ARM Cortex-M3 is based on ARMv7-M architecture which is not the same as ARM7.
- * ARM7 microcontrollers are based on ARMv4 architecture.
+ * <h2>Features</h2>
  * 
- * Basically, ARM Cortex-M3 has been designed to improve upon and overcome
- * several limitations of ARM7.
+ * - Based on ARM Cortex processor cores: 
+ *   - Cortex-M0 core (LPC11xx, LPC12xx)
+ *   - Cortex-M3 core (LPC13xx, LPC17xx and LPC18xx)
+ * - Speeds up to 100MHz from flash or RAM 
+ * - Available with: 
+ *   - Ethernet, USB Host/OTG/Device, CAN, I2S 
+ *   - Fast-mode Plus (Fm+), I2C, SPI/SSP, UARTs 
+ *   - 12-bit ADC @ 1MHz conversion rates 
+ *   - Low-power Real Time Clock 
+ *   - Motor Control PWM and Quadrature Encoder Interface 
  * 
- * All code developed/tested with Codesourcery G++ lite (now called
- * "Sourcery CodeBench Lite Edition").
+ * \see		http://ics.nxp.com/products/lpc1000/all/
  */
 
-#if defined __ARM_LPC11XX__
-#	include "cortex_m0/lpc.hpp"
-#elif defined __ARM_LPC17XX__
-#	include "cortex_m3/lpc.hpp"
-#elif defined __ARM_STM32__
-#	include "cortex_m3/stm32.hpp"
+#if defined __ARM_LPC17XX__
+#	include "lpc/lpc17xx.hpp"
 #endif
-
-#endif	// XPCC__CORTEX_M3_HPP

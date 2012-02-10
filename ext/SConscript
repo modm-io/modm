@@ -79,6 +79,10 @@ if env['ARCHITECTURE'].startswith('cortex-m0/lpc11'):
 	sourcePath += ['lpc11xx/cmsis', 'lpc11xx/driver']
 	globalIncludes += []
 
+if env['ARCHITECTURE'].startswith('cortex-m3/lpc17'):
+    sourcePath += ['lpc17xx/cmsis']
+    globalIncludes += []
+
 # -----------------------------------------------------------------------------
 includes = buildIncludes + globalIncludes
 for path in includes:
