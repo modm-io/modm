@@ -34,7 +34,7 @@
 #define XPCC__TMP102_HPP
 
 #include <stdint.h>
-#include <xpcc/driver/connectivity/i2c/master.hpp>
+#include <xpcc/driver/connectivity/i2c/device.hpp>
 
 namespace xpcc
 {
@@ -61,18 +61,18 @@ namespace xpcc
 	 * \ingroup temperature
 	 * \author	Niklas Hauser
 	 *
-	 * \tparam TwiMaster Asynchronous Interface
+	 * \tparam I2C Asynchronous Interface
 	 */
-	template < typename TwiMaster >
-	class Tmp102 : public xpcc::i2c::Delegate
+	template < typename I2C >
+	class Tmp102 : public i2c::Device< I2C >
 	{
 	public:
 		enum Register
 		{
-			REGISTER_TEMPERATURE = 0x00,
-			REGISTER_CONFIGURATION = 0x01,
-			REGISTER_T_LOW = 0x02,
-			REGISTER_T_HIGH = 0x03
+			REGISTER_TEMPERATURE,
+			REGISTER_CONFIGURATION,
+			REGISTER_T_LOW,
+			REGISTER_T_HIGH
 		};
 		
 		enum Temperature
@@ -80,8 +80,9 @@ namespace xpcc
 			TEMPERATURE_EXTENDED_MODE_bm = 0x01
 		};
 		
-		enum Config1
-		{// first byte
+		enum Configuration
+		{
+			// first byte
 			CONFIGURATION_SHUTDOWN_MODE_bm = 0x01,
 			CONFIGURATION_THERMOSTAT_MODE_bm = 0x02,
 			CONFIGURATION_POLARITY_bm = 0x04,
@@ -91,19 +92,17 @@ namespace xpcc
 			CONFIGURATION_FAULT_QUEUE_4_gc = 0x10,
 			CONFIGURATION_FAULT_QUEUE_6_gc = 0x18,
 			CONFIGURATION_CONVERTER_RESOLUTION_gm = 0x60,
-			CONFIGURATION_CONVERTER_RESOLUTION_12bit_gc = 0x60,
-			CONFIGURATION_ONE_SHOT_bm = 0x80
-		};
-		
-		enum Config2
-		{// second byte
+			CONFIGURATION_CONVERTER_RESOLUTION_12_gc = 0x60,
+			CONFIGURATION_ONE_SHOT_bm = 0x80,
+			
+			// second byte
 			CONFIGURATION_EXTENDED_MODE_bm = 0x10,
 			CONFIGURATION_ALERT_bm = 0x20,
 			CONFIGURATION_CONVERSION_RATE_gm = 0xc0,
-			CONFIGURATION_CONVERSION_RATE_0_25Hz_gc = 0x00,
-			CONFIGURATION_CONVERSION_RATE_1Hz_gc = 0x40,
-			CONFIGURATION_CONVERSION_RATE_4Hz_gc = 0x80,
-			CONFIGURATION_CONVERSION_RATE_8Hz_gc = 0xc0
+			CONFIGURATION_CONVERSION_RATE_025_gc = 0x00,
+			CONFIGURATION_CONVERSION_RATE_1_gc = 0x40,
+			CONFIGURATION_CONVERSION_RATE_4_gc = 0x80,
+			CONFIGURATION_CONVERSION_RATE_8_gc = 0xc0
 		};
 		
 		/**
@@ -111,28 +110,17 @@ namespace xpcc
 		 */
 		Tmp102(uint8_t address=0x90);
 		
-		bool
-		initialize(Config1 msb=CONFIGURATION_CONVERTER_RESOLUTION_12bit_gc,
-				   Config2 lsb=CONFIGURATION_CONVERSION_RATE_4Hz_gc);
+		void
+		configure(uint8_t msb=CONFIGURATION_CONVERTER_RESOLUTION_12_gc,
+				  uint8_t lsb=CONFIGURATION_CONVERSION_RATE_4_gc);
 		
 		/// starts a temperature conversion right now
-		bool
+		void
 		startConversion();
 		
-		/**
-		 * read the Temperature registers and buffer the results
-		 * sets isNewDataAvailable() to \c true
-		 */
-		bool
+		/// read the Temperature registers and buffer the results
+		void
 		readTemperature();
-		
-		/**
-		 * \c true, when new data has been from the sensor and buffered,
-		 * \c false, when the data has already been read, or data is being 
-		 * copied into the buffer (by readAccelerationAverage()).
-		 */
-		bool
-		isNewDataAvailable();
 		
 		/// \return pointer to 8bit array containing temperature
 		uint8_t*
@@ -143,17 +131,14 @@ namespace xpcc
 		getTemperature();
 		
 	private:
-		/**
-		 * this delegate function gets called after calling readTemperature()
-		 * \return always \c false, since we do not want to continue using the bus
-		 */
-		bool
-		twiCompletion(const uint8_t *data, std::size_t index, bool reading);
+		void
+		writeRegister(Register reg, uint8_t msb, uint8_t lsb);
 		
-		bool newData;
+		void
+		readRegister(Register reg, uint8_t *buffer);
+		
 		uint8_t config;
 		uint8_t data[2];
-		uint8_t deviceAddress;
 	};
 	
 }

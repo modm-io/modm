@@ -98,6 +98,5 @@ namespace xpcc
 #include "atxmega/adc.hpp"
 #include "atxmega/clock.hpp"
 #include "atxmega/utils.hpp"
-#include "atxmega/twi.hpp"
 
 #endif

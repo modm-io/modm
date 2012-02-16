@@ -1,6 +1,6 @@
 // coding: utf-8
 // ----------------------------------------------------------------------------
-/* Copyright (c) 2012, Roboterclub Aachen e.V.
+/* Copyright (c) 2009, Roboterclub Aachen e.V.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -34,34 +34,29 @@
 #include <avr/interrupt.h>
 #include <util/twi.h>
 
-#include "twi_master.hpp"
+#include "twi_master.hpp"	
+
+// TWI State machine value when finished
+#define TWI_STATUS_DONE 0xff
 
 // ----------------------------------------------------------------------------
-namespace
-{
-	// parameter advice
-	static bool reading;
-	static bool restartAfterReading;
-	static bool restartAfterWriting;
-	static uint8_t twiAddress;
-	
-	// buffer management
-	static const uint8_t *twiWriteBuffer;
-	static uint8_t *twiReadBuffer;
-	static uint8_t twiReadCounter;
-	static uint8_t twiWriteCounter;
-	static uint8_t twiReadBufferSize;
-	static uint8_t twiWriteBufferSize;
-	
-	// state
-	static xpcc::i2c::BusState busState = xpcc::i2c::BUS_RESET;
-	static xpcc::i2c::ErrorState errorState = xpcc::i2c::NO_ERROR;
-	static bool occupied = false;
-	static bool startConditionGenerated =  false;
-	
-	// delegating
-	static xpcc::i2c::Delegate *delegate = 0;
-}
+// parameter advice
+static volatile bool reading;
+static volatile bool restartAfterReading;
+static uint8_t twiAddress;
+
+// buffer management
+static const uint8_t *twiWriteBuffer;
+static uint8_t *twiReadBuffer;
+static uint8_t twiReadCounter;
+static uint8_t twiWriteCounter;
+
+// state
+static volatile xpcc::i2c::BusState busState = xpcc::i2c::BUS_RESET;
+static volatile bool occupied = false;
+static volatile bool startConditionGenerated =  false;
+
+
 
 // ----------------------------------------------------------------------------
 /// TWI state machine interrupt handler
@@ -69,132 +64,109 @@ ISR(TWI_vect)
 {
 	switch(TW_STATUS)
 	{
-		case TW_START:
-			// START has been transmitted
-			// Fall through...
-		case TW_REP_START:
-			// REPEATED START has been transmitted
-			
-			// Load data register with TWI slave address
-			TWDR = twiAddress | reading;
-			// clear interrupt flag to send address
-			TWCR = (1 << TWINT) | (1 << TWEN) | (1 << TWIE);
-			startConditionGenerated = false;
-			break;
-			
-		case TW_MT_SLA_ACK:
-			// SLA+W has been transmitted and ACK received
-			// Fall through...
-		case TW_MT_DATA_ACK:
-			// Data byte has been transmitted and ACK received
-			
-			if (twiWriteCounter > 0)
-			{
-				// Load data register with next byte
-				TWDR = *twiWriteBuffer++;
-				twiWriteCounter--;
-				twiWriteBufferSize++;
-				// TWI Interrupt enabled and clear flag to send next byte
-				TWCR = (1 << TWINT) | (1 << TWEN) | (1 << TWIE);
-			}
-			else
-			{
-				// Transfer finished
-				if (twiReadCounter == 0)
-				{
-					if (restartAfterWriting) {
-						// restart and strech SCL
-						xpcc::atmega::AsynchronousTwiMaster::restart(twiAddress);
-						// the bus is now reserved for further operations
-						busState = xpcc::i2c::BUS_WRITE;
-					}
-					bool stop = true;
-					if (delegate) {
-						xpcc::i2c::Delegate *bufferedDelegate = delegate;
-						delegate = 0;
-						stop = !bufferedDelegate->twiCompletion(twiWriteBuffer-twiWriteBufferSize, twiWriteBufferSize, xpcc::i2c::WRITE);
-					}
-					if (stop) xpcc::atmega::AsynchronousTwiMaster::stop();
-				}
-				else
-				{
-					// restart, BUT do _not_ strech SCL, because we already
-					// know the address of the slave and the operation
-					xpcc::atmega::AsynchronousTwiMaster::restart(twiAddress);
-					reading = true;
-					// enable the interrupt, because we want to continue
-					TWCR |= (1 << TWIE);
-				}
-			}
-			break;
-			
-		case TW_MR_DATA_ACK:
-			// Data byte has been received and ACK transmitted
-			*twiReadBuffer++ = TWDR;
-			twiReadCounter--;
-			twiReadBufferSize++;
-			
-			// Fall through...
-		case TW_MR_SLA_ACK:
-			// SLA+R has been transmitted and ACK received
-			// See if last expected byte will be received ...
-			if (twiReadCounter > 1) {
-				// Send ACK after reception
-				TWCR = (1 << TWINT) | (1 << TWEA) | (1 << TWEN) | (1 << TWIE);
-			}
-			else {
-				// Send NACK after next reception
-				TWCR = (1 << TWINT) | (1 << TWEN) | (1 << TWIE);
-			}
-			break;
-			
-		case TW_MR_DATA_NACK:
-			// Data byte has been received and NACK transmitted
-			// => Transfer finished
-			*twiReadBuffer++ = TWDR;
-			twiReadCounter--;
-			twiReadBufferSize++;
-			
-			if (restartAfterReading) {
-				// restart and strech SCL
-				xpcc::atmega::AsynchronousTwiMaster::restart(twiAddress);
-				// the bus is now reserved for further read operations
-				busState = xpcc::i2c::BUS_HOLD;
-			}
-		{// add scope for local variable
-			bool stop = true;
-			if (delegate) {
-				xpcc::i2c::Delegate *bufferedDelegate = delegate;
-				delegate = 0;
-				stop = !bufferedDelegate->twiCompletion(twiReadBuffer-twiReadBufferSize, twiReadBufferSize, xpcc::i2c::READ);
-			}
-			if (stop) xpcc::atmega::AsynchronousTwiMaster::stop();
+	case TW_START:
+		// START has been transmitted
+		// Fall through...
+	case TW_REP_START:
+		// REPEATED START has been transmitted
+		
+		if (!startConditionGenerated){
+			// Disable interrupts
+			TWCR = (1 << TWEN);
+			startConditionGenerated = true;
+			// busstate is set where startcondition is initiated
 		}
-			break;
-			
-		case TW_MT_SLA_NACK:	// SLA+W transmitted, NACK received
-		case TW_MR_SLA_NACK:	// SLA+R transmitted, NACK received
-			errorState = xpcc::i2c::ADDRESS_NACK;
-		case TW_MT_DATA_NACK:	// data transmitted, NACK received
-			if (!errorState) errorState = xpcc::i2c::DATA_NACK;
-		case TW_MT_ARB_LOST:	// arbitration lost in SLA+W or data
-			//		case TW_MR_ARB_LOST:	// arbitration lost in SLA+R or NACK
-			if (!errorState) errorState = xpcc::i2c::ARBITRATION_LOST;
-			// generate a stop condition
-			TWCR = (1 << TWINT) | (1 << TWSTO) | (1 << TWEN);
-		default:
-			if (!errorState) errorState = xpcc::i2c::UNKNOWN_ERROR;
-			if (delegate) {
-				xpcc::i2c::Delegate *bufferedDelegate = delegate;
-				delegate = 0;
-				bufferedDelegate->twiError(errorState);
-			}
-			// calling this after the callback to be able to get some extra
-			// information of the error during the callback
-			busState = xpcc::i2c::BUS_RESET;
+		else{
 			startConditionGenerated = false;
-			occupied = false;
-			break;
+			// Load data register with TWI slave address
+			TWDR = twiAddress | (reading ? xpcc::i2c::READ : xpcc::i2c::WRITE);
+			// clear interrupt flag to send address
+			TWCR |= (1 << TWINT);
+		}
+		break;
+	
+	case TW_MT_SLA_ACK:
+		// SLA+W has been transmitted and ACK received
+		// Fall through...
+	case TW_MT_DATA_ACK:
+		// Data byte has been transmitted and ACK received
+		if (twiWriteCounter > 0)
+		{
+			// Decrement counter
+			twiWriteCounter--;
+			// Load data register with next byte
+			TWDR = *twiWriteBuffer++;
+			// TWI Interrupt enabled and clear flag to send next byte
+			TWCR |= (1 << TWINT);
+		}
+		else
+		{
+			// Transfer finished
+			// Disable interrupts
+			TWCR = 1 << TWEN;
+			busState = xpcc::i2c::BUS_WRITE;
+
+			// Initiate STOP condition after last byte; TWI Interrupt disabled
+//			TWCR = (1 << TWINT) | (1 << TWSTO) | (1 << TWEN);
+
+
+		}
+		break;
+	
+	case TW_MR_DATA_ACK:
+		// Data byte has been received and ACK transmitted
+		*twiReadBuffer++ = TWDR;
+		twiReadCounter--;
+		
+		// Fall through...
+	case TW_MR_SLA_ACK:
+		// SLA+R has been transmitted and ACK received
+		// See if last expected byte will be received ...
+		if (twiReadCounter > 1) {
+			// Send ACK after reception
+			TWCR = (1 << TWINT) | (1 << TWEA) | (1 << TWEN) | (1 << TWIE);
+		}
+		else {
+			// Send NACK after next reception
+			TWCR = (1 << TWINT) | (1 << TWEN) | (1 << TWIE);
+		}
+		break;
+	
+	case TW_MR_DATA_NACK:
+		// Data byte has been received and NACK transmitted
+		// => Transfer finished
+		*twiReadBuffer++ = TWDR;
+		twiReadCounter--;
+		
+		if (restartAfterReading){
+			// Initiate START (restart) condition; TWI Interrupt stay enabled
+			TWCR |= (1 << TWINT) | (1 << TWSTA);
+			busState = xpcc::i2c::BUS_HOLD;
+		}
+		else{
+			// Initiate STOP condition after last byte; TWI Interrupt disabled
+			TWCR = (1 << TWINT) | (1 << TWSTO) | (1 << TWEN);
+			busState = xpcc::i2c::BUS_STOPPED;
+		}
+		break;
+	
+	case TW_MT_SLA_NACK:	//SLA+W transmitted, NACK received
+	case TW_MT_DATA_NACK:	//data transmitted, NACK received
+	case TW_MR_SLA_NACK:		//SLA+R transmitted, NACK received
+		// generate a stop condition Disable interrupts
+		TWCR = (1 << TWINT) | (1 << TWSTO) | (1 << TWEN);
+		busState = xpcc::i2c::BUS_RESET;
+		startConditionGenerated = false;
+		break;
+
+
+	default:
+		// Another Error condition
+		// Reset TWI Interface; disable interrupt
+		busState = xpcc::i2c::BUS_RESET;
+		startConditionGenerated = false;
+
+		TWCR = 0;
 	}
 }
 
@@ -202,56 +174,52 @@ ISR(TWI_vect)
 void
 xpcc::atmega::AsynchronousTwiMaster::initialize(uint8_t twbr, uint8_t twps)
 {
-	occupied = false;
-	delegate = 0;
+	twiReadCounter = 0;
+	twiWriteCounter = 0;
 	
 	// Initialize TWI clock
 	TWBR = twbr;
 	TWSR = twps & 0x03;
+	
 	// Load data register with default content; release SDA
 	TWDR = 0xff;
+	
 	// Enable TWI peripheral with interrupt disabled
 	TWCR = (1 << TWEN);
 }
 
-// MARK: - ownership
+
 bool
-xpcc::atmega::AsynchronousTwiMaster::start(uint8_t slaveAddress, uint8_t /*operation*/)
+xpcc::atmega::AsynchronousTwiMaster::start(uint8_t slaveAddress)
 {
-	if (getBusyState() == xpcc::i2c::FREE)
-	{
+	if (getBusyState() == xpcc::i2c::FREE){
 		// Copy address; clear R/~W bit in SLA+R/W address field
 		twiAddress = slaveAddress & 0xfe;
 		busState = xpcc::i2c::BUS_STANDBY;
-		occupied = true;
-		startConditionGenerated = true;
-		errorState = xpcc::i2c::NO_ERROR;
-		
-		// Initiate a START condition
-		// BUT do _not_ enable the interrupt
-		// This stretches the clock line, until the call of read/write
-		TWCR = (1 << TWINT) | (1 << TWSTA) | (1 << TWEN);
-		
+
+		// Initiate a START condition; Interrupt enabled and flag cleared
+		TWCR = (1 << TWINT) | (1 << TWSTA) | (1 << TWEN) | (1 << TWIE);
+
 		return true;
 	}
-	return false;
+	else
+		return false;
 }
 
 void
-xpcc::atmega::AsynchronousTwiMaster::restart(uint8_t slaveAddress, uint8_t /*operation*/)
+xpcc::atmega::AsynchronousTwiMaster::restart(uint8_t slaveAddress)
 {
-	if (!startConditionGenerated)
-	{
-		// Copy address; clear R/~W bit in SLA+R/W address field
-		twiAddress = slaveAddress & 0xfe;
-		busState = xpcc::i2c::BUS_STANDBY;
-		occupied = true;
-		startConditionGenerated = true;
-		
-		// Initiate a START condition
-		// BUT do _not_ enable the interrupt
-		// This stretches the clock line, until the call of read/write
-		TWCR = (1 << TWINT) | (1 << TWSTA) | (1 << TWEN);
+	// Copy address; clear R/~W bit in SLA+R/W address field
+	twiAddress = slaveAddress & 0xfe;
+	busState = xpcc::i2c::BUS_STANDBY;
+
+	if (!startConditionGenerated){
+		// Initiate a START condition; Interrupt enabled and flag cleared
+		TWCR = (1 << TWINT) | (1 << TWSTA) | (1 << TWEN) | (1 << TWIE);
+	}
+	else{// after busState is BUS_HOLD startcondition is generated, but restart has to be called
+		// Enable interrupt
+		TWCR |= (1 << TWIE);
 	}
 }
 
@@ -259,83 +227,50 @@ void
 xpcc::atmega::AsynchronousTwiMaster::stop()
 {
 	if (busState != xpcc::i2c::BUS_STOPPED && busState != xpcc::i2c::BUS_RESET)
-	{
-		// generate stop condition
-		TWCR = (1 << TWINT) | (1 << TWSTO) | (1 << TWEN);
-		busState = xpcc::i2c::BUS_STOPPED;
-		startConditionGenerated = false;
-		occupied = false;
-	}
-}
-
-// MARK: - operations
-void
-xpcc::atmega::AsynchronousTwiMaster::read(uint8_t *data, std::size_t size, xpcc::i2c::OperationParameter param)
-{
-	writeRead(data, 0, size, false, (param == xpcc::i2c::READ_RESTART));
+		TWCR |= (1 << TWSTO);
+	occupied = false;
 }
 
 void
-xpcc::atmega::AsynchronousTwiMaster::write(uint8_t *data, std::size_t size, xpcc::i2c::OperationParameter param)
+xpcc::atmega::AsynchronousTwiMaster::read(uint8_t *data, std::size_t size, xpcc::i2c::ReadParameter param)
 {
-	writeRead(data, size, 0, (param == xpcc::i2c::WRITE_RESTART), false);
+	// prepare read operation
+	twiReadBuffer = data;
+	twiReadCounter = size;
+	restartAfterReading = param == xpcc::i2c::READ_RESTART;
+	reading = true;
+
+	// Interrupt enabled and flag cleared
+	TWCR = (1 << TWEN) | (1 << TWIE);
 }
 
 void
-xpcc::atmega::AsynchronousTwiMaster::writeRead(uint8_t *data, std::size_t writeSize, std::size_t readSize, xpcc::i2c::OperationParameter param)
+xpcc::atmega::AsynchronousTwiMaster::write(const uint8_t *data, std::size_t size)
 {
-	writeRead(data, writeSize, readSize, false, (param == xpcc::i2c::READ_RESTART));
-}
+	// Save pointer to data and number of bytes to send
+	twiWriteBuffer = data;
+	twiWriteCounter = size;
+	reading = false;
 
-// MARK: - delegate
-void
-xpcc::atmega::AsynchronousTwiMaster::attachDelegate(xpcc::i2c::Delegate *object)
-{
-	delegate = object;
-}
-
-// MARK: - status
-xpcc::i2c::ErrorState
-xpcc::atmega::AsynchronousTwiMaster::getErrorState()
-{
-	return errorState;
+	// Interrupt enabled
+	TWCR = (1 << TWEN) | (1 << TWIE);
 }
 
 xpcc::i2c::BusyState
 xpcc::atmega::AsynchronousTwiMaster::getBusyState()
 {
 	// If the TWI interrupt is enabled then the peripheral is busy
-	volatile uint8_t tmp = TWCR;
+	uint8_t tmp = TWCR;
 	if ((tmp & (1 << TWIE)) || (tmp & (1 << TWSTO)))
 		return xpcc::i2c::BUSY;
-	
-	return occupied ? xpcc::i2c::OCCUPIED : xpcc::i2c::FREE;
+	else
+		return occupied?
+				xpcc::i2c::OCCUPIED
+				:xpcc::i2c::FREE;
 }
 
 xpcc::i2c::BusState
 xpcc::atmega::AsynchronousTwiMaster::getBusState()
 {
 	return busState;
-}
-
-// MARK: - private
-void
-xpcc::atmega::AsynchronousTwiMaster::writeRead(uint8_t *data, std::size_t writeSize, std::size_t readSize, bool restartW, bool restartR)
-{	
-	// Save pointer to data and number of bytes to send
-	twiWriteBuffer = data;
-	twiReadBuffer = data;
-	twiWriteCounter = writeSize;
-	twiReadCounter = readSize;
-	twiWriteBufferSize = 0;
-	twiReadBufferSize = 0;
-	
-	restartAfterWriting = restartW;
-	restartAfterReading = restartR;
-	reading = writeSize ? false : true;
-	
-	// ONLY enable the interrupt, do _not_ clear the interrupt flag
-	// Since we have streched the SCL, we will first write the address
-	// of the slave, then continue with a write operation
-	TWCR = (1 << TWEN) | (1 << TWIE);
 }

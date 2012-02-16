@@ -61,11 +61,6 @@ for port in ['A', 'B']:
 		generator.template('adc_%s_channel_%s.hpp' % (port.lower(), channel), 'adc_channel.hpp.in', { 'id': port, 'ch': channel })
 		generator.template('adc_%s_channel_%s.cpp' % (port.lower(), channel), 'adc_channel.cpp.in', { 'id': port, 'ch': channel })
 
-generator = env['TemplateGenerator'](env, 'twi')
-for port in ['C', 'D', 'E', 'F']:
-	generator.template('twi_master_%s.hpp' % port.lower(), 'twi_master.hpp.in', { 'id': port })
-	generator.template('twi_master_asynchronous_%s.cpp' % port.lower(), 'twi_master_asynchronous.cpp.in', { 'id': port })
-
 generator = env['TemplateGenerator'](env, 'timer')
 for port in ['C', 'D', 'E', 'F']:
 	generator.template('awex_%s.hpp' % port.lower(), 'awex.hpp.in', { 'id': port })

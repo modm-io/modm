@@ -60,13 +60,13 @@ namespace xpcc
 	public:
 		/// device specific data output rate options of REGISTER_CONFIG_A
 		enum DataOutputRate {
-			DATA_OUTPUT_RATE_0_75Hz_gc = 0x00,
-			DATA_OUTPUT_RATE_1_5Hz_gc = 0x04,
-			DATA_OUTPUT_RATE_3Hz_gc = 0x08,
-			DATA_OUTPUT_RATE_7_5Hz_gc = 0x0c,
-			DATA_OUTPUT_RATE_15Hz_gc = 0x10,
-			DATA_OUTPUT_RATE_30Hz_gc = 0x14,
-			DATA_OUTPUT_RATE_75Hz_gc = 0x18
+			DATA_OUTPUT_RATE_0_75_gc = 0x00,
+			DATA_OUTPUT_RATE_1_5_gc = 0x04,
+			DATA_OUTPUT_RATE_3_gc = 0x08,
+			DATA_OUTPUT_RATE_7_5_gc = 0x0c,
+			DATA_OUTPUT_RATE_15_gc = 0x10,
+			DATA_OUTPUT_RATE_30_gc = 0x14,
+			DATA_OUTPUT_RATE_75_gc = 0x18
 		};
 		
 		/// device specific data gain options of REGISTER_CONFIG_B

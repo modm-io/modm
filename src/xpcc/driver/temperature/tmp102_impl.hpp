@@ -31,57 +31,42 @@
 // ----------------------------------------------------------------------------
 
 #ifndef XPCC__TMP102_HPP
-#	error  "Don't include this file directly, use 'tmp102.hpp' instead!"
+	#error  "Don't include this file directly, use 'tmp102.hpp' instead!"
 #endif
 
 // ----------------------------------------------------------------------------
-template < typename TwiMaster >
-xpcc::Tmp102<TwiMaster>::Tmp102(uint8_t address) :
-	deviceAddress(address)
+template < typename I2C >
+xpcc::Tmp102<I2C>::Tmp102(uint8_t address) :
+	i2c::Device<I2C>(address)
 {
 }
 
-template < typename TwiMaster >
-bool
-xpcc::Tmp102<TwiMaster>::initialize(Config1 msb, Config2 lsb)
+template < typename I2C >
+void
+xpcc::Tmp102<I2C>::configure(uint8_t msb, uint8_t lsb)
 {
 	config = msb;
-	uint8_t buffer[3] = {REGISTER_CONFIGURATION, msb, lsb};
-	if (TwiMaster::startWrite(deviceAddress, buffer, 3))
-	{
-		while (TwiMaster::getBusyState() != xpcc::i2c::FREE)
-			;
-		return true;
-	}
-	return false;
+	writeRegister(REGISTER_CONFIGURATION, msb, lsb);
 }
 
-template < typename TwiMaster >
-bool
-xpcc::Tmp102<TwiMaster>::startConversion()
+template < typename I2C >
+void
+xpcc::Tmp102<I2C>::startConversion()
 {
 	uint8_t buffer[2] = {REGISTER_CONFIGURATION, config & CONFIGURATION_ONE_SHOT_bm};
-	return TwiMaster::startWrite(deviceAddress, buffer, 2);
+	this->i2c.write(this->deviceAddress, &buffer[0], 2);
 }
 
-template < typename TwiMaster >
-bool
-xpcc::Tmp102<TwiMaster>::readTemperature()
+template < typename I2C >
+void
+xpcc::Tmp102<I2C>::readTemperature()
 {
-	if (TwiMaster::start(deviceAddress)) {
-		newData = false;
-		data[0] = REGISTER_TEMPERATURE;
-		TwiMaster::attachDelegate(this);
-		TwiMaster::writeRead(data, 1, 2);
-		
-		return true;
-	}
-	return false;
+	readRegister(REGISTER_TEMPERATURE, &data[0]);
 }
 
-template < typename TwiMaster >
+template < typename I2C >
 float
-xpcc::Tmp102<TwiMaster>::getTemperature()
+xpcc::Tmp102<I2C>::getTemperature()
 {
 	int16_t temp = static_cast<int16_t>((data[0]<<8)|data[1]);
 	if (data[1] & TEMPERATURE_EXTENDED_MODE_bm) {
@@ -92,26 +77,34 @@ xpcc::Tmp102<TwiMaster>::getTemperature()
 	}
 }
 
-template < typename TwiMaster >
-bool
-xpcc::Tmp102<TwiMaster>::isNewDataAvailable()
-{
-	return newData;
-}
-
-template < typename TwiMaster >
+template < typename I2C >
 uint8_t*
-xpcc::Tmp102<TwiMaster>::getData()
+xpcc::Tmp102<I2C>::getData()
 {
-	newData = false;
-	return data;
+	return &data[0];
 }
 
 // ----------------------------------------------------------------------------
-template < typename TwiMaster >
-bool
-xpcc::Tmp102<TwiMaster>::twiCompletion(const uint8_t */*data*/, std::size_t /*index*/, bool /*reading*/)
+template < typename I2C >
+void
+xpcc::Tmp102<I2C>::writeRegister(Register reg, uint8_t msb, uint8_t lsb)
 {
-	newData = true;
-	return false;
+	uint8_t buffer[3] = {reg, msb, lsb};
+	this->i2c.write(this->deviceAddress, &buffer[0], 3);
+	
+	while (this->i2c.isBusy())
+		;
 }
+
+template < typename I2C >
+void
+xpcc::Tmp102<I2C>::readRegister(Register reg, uint8_t *buffer)
+{
+	buffer[0] = reg;
+	this->i2c.writeRead(this->deviceAddress, &buffer[0], 1, 2);
+	
+	while (this->i2c.isBusy())
+		;
+}
+
+

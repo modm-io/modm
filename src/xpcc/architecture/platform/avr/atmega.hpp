@@ -49,8 +49,6 @@ namespace xpcc
 }
 
 #include "atmega/adc.hpp"
-#include "atmega/adc_interrupt.hpp"
-#include "atmega/analog_sensors.hpp"
 #include "atmega/uart.hpp"
 #include "atmega/spi.hpp"
 #include "atmega/gpio.hpp"
