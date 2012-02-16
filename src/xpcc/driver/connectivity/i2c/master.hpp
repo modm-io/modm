@@ -112,57 +112,57 @@ namespace xpcc
 		 * method call for BusyState become not Busy.
 		 *
 		 * All methods but start and getBusyState may only be called by owner and only if BusyState is occupied
+		 * An error is indicated by the BusState reading BUS_RESET.
+		 * During asychnonous operation BusyState indicated BUSY.
 		 *
 		 * After start returned false bus control is not gained by caller.
-		 * no operation has been started, try again later.
+		 * No operation has been started, try again later.
 		 *
 		 * After start returned true bus control is gained by caller.
-		 * BusyState will go occupied after completion
-		 * BusState results to STANDBY or RESET if error occurs
+		 * BusyState transitions to OCCUPIED.
+		 * BusState transitions to BUS_STANDBY.
+		 * The SCL line will be streched until further operation begins!
 		 *
-		 * After restart
-		 * BusyState will go occupied after completion
-		 * BusState results to STANDBY or BUS_RESET if error occurs
+		 * After restart, write, read and writeRead
+		 * BusyState remains OCCUPIED.
+		 * BusState remains BUS_STANDBY.
 		 *
-		 * After write
-		 * BusyState will go occupied after completion
-		 * BusState results to WRITE or BUS_RESET if en error occurs
+		 * After write, read and writeRead complete asynchronously
+		 * BusyState transitions to FREE.
+		 * BusState transitions to BUS_HOLD or BUS_WRITE.
+		 * BusState transitions to BUS_STOPPED, if chosen during setup.
 		 *
-		 * After read
-		 * BusyState will go occupied after completion
-		 * BusState results to BUS_HOLD, BUS_STOPPED or BUS_RESET if error occurs
+		 * After stop
+		 * BusyState transitions to FREE.
+		 * BusState transitions to BUS_STOPPED.
 		 *
-		 * After stop caller is not owner of bus any more
-		 * BusyState will go free after completion
-		 * BusState is irrelevant
-		 *
-		 *
+		 * \author Georgi Grinshpun
+		 * \author Niklas Hauser
 		 * \ingroup	interface
 		 */
 		class Master : public Interface
 		{
 		public:
 			/**
-			 * \brief	Requests the Bus control. This method can be used as a try for gaining control.
+			 * \brief	Requests bus control and generates a start condition.
 			 *
-			 * \param[in] slaveAddress	7-bit address of the slave device.
-			 * 					LSB must be zero.
+			 * \param[in] slaveAddress	Shifted 7-bit address of the slave device.
+			 *							LSB must be zero.
 			 *
-			 * \return	True: BusyState was free before call and goes to occupied after completion.
-			 * 			Caller gains control and must give up later.
-			 * 			False: Call has no effect.
+			 * \return	Caller gains control if \c true. Call has no effect if \c false.
 			 */
 			bool
-			start(uint8_t slaveAddress);
+			start(uint8_t slaveAddress, uint8_t operation=WRITE);
 
 			/**
-			 * \brief	Restarts the bus without loosing control.
+			 * \brief	Restarts the bus without loosing control. Multiple calls
+			 *			will result in generating only one start condition.
 			 * 
-			 * \param[in] slaveAddress	7-bit address of the slave device.
+			 * \param[in] slaveAddress	Shifted 7-bit address of the slave device.
 			 * 							LSB must be zero.
 			 */
 			void
-			restart(uint8_t slaveAddress);
+			restart(uint8_t slaveAddress, uint8_t operation=WRITE);
 
 			/**
 			 * \brief	Gives up the Bus control.
@@ -173,8 +173,8 @@ namespace xpcc
 			/**
 			 * \brief	Read a block of data. Call this method only if BusState allows reading.
 			 *
-			 * \param[out] *data	Pointer to buffer where received data
-			 * 						should be stored. This must remain valid during operation is in progress.
+			 * \param[out] *data	Pointer to buffer where received data should be stored.
+			 * 						This must remain valid during operation is in progress.
 			 * \param[in] size		Number of bytes to be received
 			 * \param[in] param		See description ReadParameter. Default is READ_STOP.
 			 *
@@ -193,6 +193,12 @@ namespace xpcc
 			write(const uint8_t *data, std::size_t size);
 			
 			/**
+			 * \brief	Check current ErrorState.
+			 */
+			ErrorState
+			getErrorState();
+			
+			/**
 			 * \brief	Check current BusyState.
 			 */
 			BusyState
@@ -208,6 +214,57 @@ namespace xpcc
 			 */
 			BusState
 			getBusState();
+			
+			/**
+			 * \brief	writes a block of data, if bus state allows.
+			 *
+			 * \code
+			 * if (start(slaveAddress)) {
+			 *	   write(data, size, param);
+			 *	   return true;
+			 * }
+			 * return false;
+			 * \endcode
+			 *
+			 * \see		start()
+			 * \see		write()
+			 */
+			bool
+			startWrite(uint8_t slaveAddress, uint8_t *data, std::size_t size, OperationParameter param = WRITE_STOP);
+			
+			/**
+			 * \brief	Read a block of data, if bus state allows.
+			 *
+			 * \code
+			 * if (start(slaveAddress, xpcc::i2c::READ)) {
+			 *	   read(data, size, param);
+			 *	   return true;
+			 * }
+			 * return false;
+			 * \endcode
+			 *
+			 * \see		start()
+			 * \see		read()
+			 */
+			bool
+			startRead(uint8_t slaveAddress, uint8_t *data, std::size_t size, OperationParameter param = READ_STOP);
+			
+			/**
+			 * \brief	Write and read blocks of data, if bus state allows.
+			 *
+			 * \code
+			 * if (start(slaveAddress)) {
+			 *	   writeRead(data, writeSize, readSize, param);
+			 *	   return true;
+			 * }
+			 * return false;
+			 * \endcode
+			 *
+			 * \see		start()
+			 * \see		writeRead()
+			 */
+			bool
+			startWriteRead(uint8_t slaveAddress, uint8_t *data, std::size_t writeSize, std::size_t readSize, OperationParameter param = READ_STOP);
 		};
 	}
 }

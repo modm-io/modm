@@ -1,6 +1,6 @@
 // coding: utf-8
 // ----------------------------------------------------------------------------
-/* Copyright (c) 2011, Roboterclub Aachen e.V.
+/* Copyright (c) 2012, Roboterclub Aachen e.V.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -30,24 +30,90 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__TMP102_HPP
-#	error  "Don't include this file directly, use 'tmp102.hpp' instead!"
+#ifndef XPCC__BMA180_HPP
+#	error  "Don't include this file directly, use 'bma180.hpp' instead!"
 #endif
 
 // ----------------------------------------------------------------------------
 template < typename TwiMaster >
-xpcc::Tmp102<TwiMaster>::Tmp102(uint8_t address) :
-	deviceAddress(address)
+xpcc::Bma180<TwiMaster>::Bma180(uint8_t address):
+deviceAddress(address << 1)
 {
 }
 
 template < typename TwiMaster >
 bool
-xpcc::Tmp102<TwiMaster>::initialize(Config1 msb, Config2 lsb)
+xpcc::Bma180<TwiMaster>::initialize(Range range, Bandwidth bandwidth, ModeConfig mode, bool interrupt)
 {
-	config = msb;
-	uint8_t buffer[3] = {REGISTER_CONFIGURATION, msb, lsb};
-	if (TwiMaster::startWrite(deviceAddress, buffer, 3))
+	if (TwiMaster::getBusyState() != xpcc::i2c::FREE) return false;
+	
+	newData = false;
+	// enable image writing
+	bool ok = writeRegister(REGISTER_CTRL0, EE_W_bm);
+	// set range and sample skipping
+	ok &= writeMaskedRegister(REGISTER_OFFSET_LSB1, RANGE_gm | SAMPLE_SKIPPING_bm, SAMPLE_SKIPPING_bm | range);
+	// set bandwidth
+	ok &= writeRegister(REGISTER_BW_TCS, bandwidth);
+	// set mode configuration
+	ok &= writeMaskedRegister(REGISTER_TCO_Z, MODE_CONFIG_gm, mode);
+	// set interrupt
+	if (interrupt) ok &= writeRegister(REGISTER_CTRL3, NEW_DATA_INT_bm);
+	
+	return ok;
+}
+
+template < typename TwiMaster >
+bool
+xpcc::Bma180<TwiMaster>::readAccelerometer()
+{
+	if (TwiMaster::start(deviceAddress)) {
+		newData = false;
+		data[0] = REGISTER_DATA_X0;
+		TwiMaster::attachDelegate(this);
+		TwiMaster::writeRead(data, 1, 7);
+		
+		return true;
+	}
+	return false;
+}
+
+template < typename TwiMaster >
+bool
+xpcc::Bma180<TwiMaster>::isNewDataAvailable()
+{
+	return newData;
+}
+
+template < typename TwiMaster >
+uint8_t*
+xpcc::Bma180<TwiMaster>::getData()
+{
+	newData = false;
+	return data;
+}
+
+template < typename TwiMaster >
+bool
+xpcc::Bma180<TwiMaster>::reset()
+{
+	return writeRegister(REGISTER_RESET, RESET_gc);
+}
+
+template < typename TwiMaster >
+bool
+xpcc::Bma180<TwiMaster>::writeMaskedRegister(Register reg, uint8_t mask, uint8_t value)
+{
+	uint8_t buffer = readRegister(reg);
+	return writeRegister(reg, (buffer & ~mask) | value);
+}
+
+// ----------------------------------------------------------------------------
+template < typename TwiMaster >
+bool
+xpcc::Bma180<TwiMaster>::writeRegister(Register reg, uint8_t data)
+{
+	uint8_t buffer[2] = {reg, data};
+	if (TwiMaster::startWrite(deviceAddress, buffer, 2))
 	{
 		while (TwiMaster::getBusyState() != xpcc::i2c::FREE)
 			;
@@ -57,61 +123,25 @@ xpcc::Tmp102<TwiMaster>::initialize(Config1 msb, Config2 lsb)
 }
 
 template < typename TwiMaster >
-bool
-xpcc::Tmp102<TwiMaster>::startConversion()
+uint8_t
+xpcc::Bma180<TwiMaster>::readRegister(Register reg)
 {
-	uint8_t buffer[2] = {REGISTER_CONFIGURATION, config & CONFIGURATION_ONE_SHOT_bm};
-	return TwiMaster::startWrite(deviceAddress, buffer, 2);
-}
-
-template < typename TwiMaster >
-bool
-xpcc::Tmp102<TwiMaster>::readTemperature()
-{
-	if (TwiMaster::start(deviceAddress)) {
-		newData = false;
-		data[0] = REGISTER_TEMPERATURE;
-		TwiMaster::attachDelegate(this);
-		TwiMaster::writeRead(data, 1, 2);
-		
-		return true;
+	uint8_t buffer[1] = {reg};
+	if (TwiMaster::startWriteRead(deviceAddress, buffer, 1, 1))
+	{
+		while (TwiMaster::getBusyState() != xpcc::i2c::FREE)
+			;
+		return buffer[0];
 	}
-	return false;
-}
-
-template < typename TwiMaster >
-float
-xpcc::Tmp102<TwiMaster>::getTemperature()
-{
-	int16_t temp = static_cast<int16_t>((data[0]<<8)|data[1]);
-	if (data[1] & TEMPERATURE_EXTENDED_MODE_bm) {
-		return (temp>>3)/16.f;
-	}
-	else {
-		return (temp>>4)/16.f;
-	}
-}
-
-template < typename TwiMaster >
-bool
-xpcc::Tmp102<TwiMaster>::isNewDataAvailable()
-{
-	return newData;
-}
-
-template < typename TwiMaster >
-uint8_t*
-xpcc::Tmp102<TwiMaster>::getData()
-{
-	newData = false;
-	return data;
+	return 0;
 }
 
 // ----------------------------------------------------------------------------
 template < typename TwiMaster >
 bool
-xpcc::Tmp102<TwiMaster>::twiCompletion(const uint8_t */*data*/, std::size_t /*index*/, bool /*reading*/)
+xpcc::Bma180<TwiMaster>::twiCompletion(const uint8_t */*data*/, std::size_t /*index*/, bool /*reading*/)
 {
 	newData = true;
 	return false;
 }
+

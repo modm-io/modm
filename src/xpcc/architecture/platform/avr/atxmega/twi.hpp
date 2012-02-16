@@ -1,6 +1,6 @@
 // coding: utf-8
 // ----------------------------------------------------------------------------
-/* Copyright (c) 2009, Roboterclub Aachen e.V.
+/* Copyright (c) 2012, Roboterclub Aachen e.V.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -25,36 +25,20 @@
  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
+ * 
  * $Id$
  */
 // ----------------------------------------------------------------------------
+
 /**
- * \ingroup		avr
- * \defgroup	atmega		megaAVR
+ * \ingroup	atxmega
+ * \defgroup atxmega_twi Twi Wire Module
+ * 
+ * \author	Niklas Hauser
  */
 
-#ifndef XPCC_ATMEGA__ATMEGA_HPP
-#define XPCC_ATMEGA__ATMEGA_HPP
-
-#include "../avr.hpp"
-
-namespace xpcc
-{
-	namespace atmega
-	{
-		using avr::enableInterrupts;
-		using avr::disableInterrupts;
-	}
-}
-
-#include "atmega/adc.hpp"
-#include "atmega/adc_interrupt.hpp"
-#include "atmega/analog_sensors.hpp"
-#include "atmega/uart.hpp"
-#include "atmega/spi.hpp"
-#include "atmega/gpio.hpp"
-#include "atmega/twi_master.hpp"
-
-#endif
+#include "twi/twi_master_c.hpp"
+#include "twi/twi_master_d.hpp"
+#include "twi/twi_master_e.hpp"
+#include "twi/twi_master_f.hpp"
 

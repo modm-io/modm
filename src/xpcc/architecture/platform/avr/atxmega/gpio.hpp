@@ -36,6 +36,7 @@
 #include <xpcc/architecture/utils.hpp>
 #include <xpcc/architecture/platform/avr.hpp>
 #include <xpcc/architecture/driver/gpio.hpp>
+#include <xpcc/math/utils/bit_operation.hpp>
 
 namespace xpcc
 {

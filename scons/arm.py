@@ -121,8 +121,9 @@ def generate(env, **kw):
 		# Options for '-mfloat-abi='
 		# - soft: Full software floating point.
 		# - softfp: Use the FPU, but remain compatible with soft-float code.
-		# - hard: Full hardware floating point. Needs support from libc. 
+		# - hard: Full hardware floating point. Needs support from libc.
 		env['FPU'] = '-mfloat-abi=softfp -mfpu=fpv4-sp-d16'
+		# env['FPU'] = '-mfloat-abi=hard -mfpu=fpv4-sp-d16 -mlittle-endian'
 	
 	# C flags
 	env['CFLAGS'] = [

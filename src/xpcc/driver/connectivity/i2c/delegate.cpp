@@ -1,11 +1,11 @@
 // coding: utf-8
 // ----------------------------------------------------------------------------
-/* Copyright (c) 2009, Roboterclub Aachen e.V.
+/* Copyright (c) 2012, Roboterclub Aachen e.V.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- *
+ * 
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -29,32 +29,19 @@
  * $Id$
  */
 // ----------------------------------------------------------------------------
-/**
- * \ingroup		avr
- * \defgroup	atmega		megaAVR
- */
 
-#ifndef XPCC_ATMEGA__ATMEGA_HPP
-#define XPCC_ATMEGA__ATMEGA_HPP
+#include "delegate.hpp"
 
-#include "../avr.hpp"
-
-namespace xpcc
+// ----------------------------------------------------------------------------
+bool
+xpcc::i2c::Delegate::twiCompletion(const uint8_t */*data*/, std::size_t /*index*/, bool /*reading*/)
 {
-	namespace atmega
-	{
-		using avr::enableInterrupts;
-		using avr::disableInterrupts;
-	}
+	return false;
 }
 
-#include "atmega/adc.hpp"
-#include "atmega/adc_interrupt.hpp"
-#include "atmega/analog_sensors.hpp"
-#include "atmega/uart.hpp"
-#include "atmega/spi.hpp"
-#include "atmega/gpio.hpp"
-#include "atmega/twi_master.hpp"
-
-#endif
+void
+xpcc::i2c::Delegate::twiError(xpcc::i2c::ErrorState /*error*/)
+{
+	// default is empty
+}
 

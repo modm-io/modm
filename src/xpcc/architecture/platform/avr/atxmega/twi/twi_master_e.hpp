@@ -1,6 +1,6 @@
 // coding: utf-8
 // ----------------------------------------------------------------------------
-/* Copyright (c) 2009, Roboterclub Aachen e.V.
+/* Copyright (c) 2011, Roboterclub Aachen e.V.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -25,23 +25,28 @@
  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- * $Id$
+ */
+// ----------------------------------------------------------------------------
+/*
+ * WARNING: This file is generated automatically, do not edit!
+ * Please modify the corresponding *.in file instead and rebuild this file. 
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_ATMEGA__TWI_MASTER_HPP
-#define XPCC_ATMEGA__TWI_MASTER_HPP
+#ifndef XPCC_ATXMEGA__TWI_MASTER_E_HPP
+#define XPCC_ATXMEGA__TWI_MASTER_E_HPP
 
-#include <xpcc/driver/connectivity/i2c/master.hpp>
 #include <stdint.h>
+#include <xpcc/driver/connectivity/i2c/master.hpp>
+
+#if defined(TWIE) || defined(__DOXYGEN__)
 
 namespace xpcc
 {
-	namespace atmega
+	namespace atxmega
 	{
 		/**
-		 * \brief	Interrupt-driven TWI master module.
+		 * \brief	Synchronous TWI master module for Port E
 		 *
 		 * Interrupts must be enabled.
 		 * 
@@ -49,59 +54,14 @@ namespace xpcc
 		 * 			SynchronousTwiMaster class, never both of them!
 		 * 
 		 * \author Niklas Hauser
-		 * \ingroup	atmega
+		 * \ingroup	atxmega_twi
 		 * \ingroup	i2c
 		 */
-		class AsynchronousTwiMaster : public xpcc::i2c::Master
+		class AsynchronousTwiMasterE : public xpcc::i2c::Master
 		{
 		public:
-			/**
-			 * \brief	Initialize hardware
-			 * 
-			 * Sets the SCL frequency. The CPU clock frequency in the slave must
-			 * be at least 16 times higher than the SCL frequency. Note that
-			 * slaves may prolong the SCL low period, thereby reducing the average
-			 * TWI bus clock period. The SCL frequency is generated according to
-			 * the following equation:
-			 * 
-			 * \code
-			 * f_scl = f_cpu / (16 + 2 * twbr * 4 ^ twps)
-			 *       = f_cpu / (16 + 2 * twbr * prescaler)
-			 * 
-			 * twbr = (f_cpu / f_scl - 16) / (2 * prescaler)
-			 * \endcode
-			 * 
-			 * with: \n
-			 * \c twbr in range 0..255 \n
-			 * \c twps in range 0..3
-			 * 
-			 * \code
-			 *  twps | prescaler
-			 * ------+-----------
-			 *   0   |     1
-			 *   1   |     4
-			 *   2   |    16
-			 *   3   |    64
-			 * \endcode
-			 * 
-			 * Examples:
-			 * \code
-			 *   f_cpu  | f_scl |      settings
-			 *   [MHz]  | [kHz] |
-			 * ---------+-------+----------------------
-			 *  16.0000 |  400  | twbr =  12, twps = 0
-			 *          |  100  | twbr =  72, twps = 0
-			 *          |   10  | twbr = 198, twps = 1
-			 *  14.7456 |  400  | twbr =  10, twps = 0
-			 *          |  100  | twbr =  65, twps = 0
-			 *          |   10  | twbr = 182, twps = 1
-			 *   8.0000 |  400  | twbr =   2, twps = 0
-			 *          |  100  | twbr =  32, twps = 0
-			 *          |   10  | twbr =  98, twps = 1
-			 * \endcode
-			 */
 			static void
-			initialize(uint8_t twbr, uint8_t twps);
+			initialize(uint8_t baud, bool pullUpResistors=false);
 			
 			static bool
 			start(uint8_t slaveAddress, uint8_t operation=xpcc::i2c::WRITE);
@@ -173,4 +133,5 @@ namespace xpcc
 	}
 }
 
-#endif // XPCC_ATMEGA__TWI_MASTER_HPP
+#endif	// TWIE
+#endif	// XPCC_ATXMEGA__TWI_MASTER_E_HPP
