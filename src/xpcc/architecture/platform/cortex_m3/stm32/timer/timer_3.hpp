@@ -153,7 +153,7 @@ namespace xpcc
 			}
 			
 			static inline void
-			setOverflow(uint16_t overflow)
+			setOverflow(Value overflow)
 			{
 				TIM3->ARR = overflow;
 			}
