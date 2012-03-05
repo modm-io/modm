@@ -1,2 +1,4 @@
 *.pyc
-pages/
+.sconsign.dblite
+tests/
+doc/homepage/

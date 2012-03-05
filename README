@@ -4,7 +4,7 @@
    /_/\_\  __/ \___\___|
         | |   
         |_|  Cross Platform Component Communication
-             http://xpcc.sourceforge.net
+             http://roboterclubaachen.github.com/xpcc/
 
 The xpcc project consists of two main parts:
 
@@ -24,7 +24,7 @@ Documentation
 -------------------------------------------------------------------------------
 
 The main documentation is created from doxygen files in the doc-folder. It can
-be found online at http://xpcc.sourceforge.net/api/.
+be found online at http://roboterclubaachen.github.com/xpcc/api/.
 
 
 Folder structure
@@ -36,7 +36,7 @@ build
 
 doc
    Documentation, mainly the doxygen documentation. The online documentation
-   on http://xpcc.sourceforge.net/api/ is build by running 'doxygen doxyfile'
+   on http://roboterclubaachen.github.com/xpcc/api/ is build by running 'doxygen doxyfile'
    in this folder.
 
 examples

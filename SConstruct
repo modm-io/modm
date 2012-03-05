@@ -101,7 +101,7 @@ env.SConscript('SConscript.check', exports='env')
 
 # Generate the doxygen documentation
 env.Doxygen('doc/doxyfile')
-env.Alias('doxygen', 'apidoc/html')
+env.Alias('doxygen', 'apidoc/api')
 env.Alias('doc', 'doxygen')
 
 env.Alias('templates', 'template')
