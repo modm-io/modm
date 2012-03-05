@@ -26,7 +26,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id$
+ * $Id: atxmega.hpp 753 2012-03-04 22:29:10Z salkinium $
  */
 // ----------------------------------------------------------------------------
 /**
@@ -46,14 +46,24 @@ namespace xpcc
 		using avr::enableInterrupts;
 		using avr::disableInterrupts;
 
+		/// Used to set the interrupt level of all modules.
+		/// @ingroup	atxmega
 		enum InterruptLevel
 		{
-			INTERRUPT_LEVEL_LOW = PMIC_LOLVLEN_bm,
-			INTERRUPT_LEVEL_MEDIUM = PMIC_MEDLVLEN_bm,
-			INTERRUPT_LEVEL_HIGH = PMIC_HILVLEN_bm,
+			INTERRUPT_LEVEL_OFF = 0x00,
+			INTERRUPT_LEVEL_LOW = 0x01,
+			INTERRUPT_LEVEL_MEDIUM = 0x02,
+			INTERRUPT_LEVEL_HIGH = 0x03,
+		};
+		
+		enum InterruptControlLevel
+		{
+			INTERRUPT_CONTROL_LEVEL_LOW = PMIC_LOLVLEN_bm,
+			INTERRUPT_CONTROL_LEVEL_MEDIUM = PMIC_MEDLVLEN_bm,
+			INTERRUPT_CONTROL_LEVEL_HIGH = PMIC_HILVLEN_bm,
 
 			/// Enable all Interrupt levels
-			INTERRUPT_LEVEL_ALL = PMIC_HILVLEN_bm | PMIC_MEDLVLEN_bm | PMIC_LOLVLEN_bm,
+			INTERRUPT_CONTROL_LEVEL_ALL = PMIC_HILVLEN_bm | PMIC_MEDLVLEN_bm | PMIC_LOLVLEN_bm,
 		};
 
 		/**
@@ -73,7 +83,7 @@ namespace xpcc
 		 * @ingroup	atxmega
 		 */
 		static inline void
-		enableInterruptLevel(InterruptLevel level)
+		enableInterruptLevel(InterruptControlLevel level)
 		{
 			PMIC_CTRL |= level;
 		}
@@ -84,7 +94,7 @@ namespace xpcc
 		 * @ingroup	atxmega
 		 */
 		static inline void
-		disableInterruptLevel(InterruptLevel level)
+		disableInterruptLevel(InterruptControlLevel level)
 		{
 			PMIC_CTRL &= ~level;
 		}
@@ -98,5 +108,7 @@ namespace xpcc
 #include "atxmega/adc.hpp"
 #include "atxmega/clock.hpp"
 #include "atxmega/utils.hpp"
+#include "atxmega/i2c.hpp"
+#include "atxmega/dma.hpp"
 
 #endif

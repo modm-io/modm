@@ -33,13 +33,14 @@
  */
 // ----------------------------------------------------------------------------
 
+
 #ifndef XPCC_ATXMEGA__SPI_E_HPP
 #define XPCC_ATXMEGA__SPI_E_HPP
 
 #include <stdint.h>
-
-#include <xpcc/architecture/utils.hpp>
-#include <xpcc/architecture/platform/avr.hpp>
+#include <avr/io.h>
+#include "spi.hpp"
+#include <xpcc/driver/connectivity/spi/spi_master.hpp>
 
 #if defined(SPIE) || defined(__DOXYGEN__)
 
@@ -50,51 +51,177 @@ namespace xpcc
 		/**
 		 * \brief		SPI Master for Port E
 		 *
+		 * This module only supports DMA read transfers in slave mode, however
+		 * slave mode is not implemented here.
+		 *
+		 * \author		Niklas hauser
 		 * \ingroup		atxmega_spi
 		 */
-		class SpiMasterE
+		class SpiMasterE : public SpiMaster
 		{
 		public:
 			static void
-			initialize(SPI_PRESCALER_t prescaler = SPI_PRESCALER_DIV128_gc,
-					bool doubleSpeed = false,
-					SPI_MODE_t mode = SPI_MODE_0_gc);
+			initialize(spi::Prescaler prescaler=spi::PRESCALER_16,
+					   spi::Mode mode=spi::MODE_0);
 			
-			/// initiates a SPI transfer and returns the received byte
+			inline static void
+			setDataOrder(bool lsbFirst=true)
+			{
+				SPIE_CTRL = (SPIE_CTRL & ~SPI_DORD_bm) | (lsbFirst ? SPI_DORD_bm : 0);
+			}
+			
 			static uint8_t
 			write(uint8_t data);
+			
+			static bool
+			setBuffer(uint16_t length,
+					  uint8_t* transmit=0, uint8_t* receive=0,
+					  bool transmitIncr=true, bool receiveIncr=true);
+			
+			static bool
+			transfer(bool send=true, bool receive=false, bool wait=true);
+			
+			static bool
+			isFinished();
 			
 			inline static SPI_t&
 			getModuleBase()
 			{
 				return SPIE;
 			}
-			
-			/// Enable the SPI module.
-			inline static void
-			enable(bool enable)
-			{
-				SPIE_CTRL = (SPIE_CTRL & ~SPI_ENABLE_bm) | (enable ? SPI_ENABLE_bm : 0);
-			}
-			
-			inline static void
-			setPrescaler(SPI_PRESCALER_t prescaler, bool doubleSpeed)
-			{
-				SPIE_CTRL = (SPIE_CTRL & ~(SPI_PRESCALER_gm | SPI_CLK2X_bm)) | prescaler | (doubleSpeed ? SPI_CLK2X_bm : 0);
-			}
-			
-			inline static void
-			setDataOrder(bool LsbFirst)
-			{
-				SPIE_CTRL = (SPIE_CTRL & ~SPI_DORD_bm) | (LsbFirst ? SPI_DORD_bm : 0);
-			}
-			
-			inline static void
-			setMode(SPI_MODE_t mode)
-			{
-				SPIE_CTRL = (SPIE_CTRL & ~SPI_MODE_gm) | mode;
-			}
 		};
+		
+#if defined(USARTE0) || defined(__DOXYGEN__)
+		/**
+		 * \brief		UART0 in SPI master mode
+		 *
+		 * The USART pins are mapped like this MOSI=>TXO, MISO=>RXI, SCK=>XCK.
+		 * Be aware that this module has no SS pin, so no slave mode is possible.
+		 *
+		 * This module supports DMA transfers between memory (SRAM) and DATA
+		 * register by defining which DMA channel to use for write/read.
+		 * (SPI0_TX_DMA_CHANNEL, SPI0_RX_DMA_CHANNEL)
+		 * In typical use, the DMA channels gets configured once and then several
+		 * transfers get triggered, without CPU interference.
+		 * 
+		 * \author	Niklas Hauser
+		 * \ingroup	atxmega_spi
+		 */
+		class UartSpiMasterE0 : public SpiMaster
+		{
+		public:
+			/**
+			 * Sets pins and calculates the bsel value of the UART module.
+			 * The parameter has to be constant at compile time, so that
+			 * the compiler can do the calculation, and not the uC.
+			 * The DMA channel is configured with a Burst Length of one byte,
+			 * reloading of source address after block transfer completion,
+			 * incr./decr. of source address after each byte transfer,
+			 * no reloading of fixed destination address (=UART DATA register).
+			 * 
+			 * \warning The bitrate must be less than half F_CPU.
+			 * \param	bitrate	SPI frequency in Hz
+			 */
+			static void
+			initialize(uint32_t const bitrate=2000000);
+			
+			static uint8_t
+			write(uint8_t data);
+			
+			static bool
+			setBuffer(uint16_t length,
+					  uint8_t* transmit=0, uint8_t* receive=0,
+					  bool transmitIncr=true, bool receiveIncr=true);
+					  
+			static bool
+			transfer(bool send=true, bool receive=false, bool wait=true);
+			
+			static bool
+			isFinished();
+			
+			inline static USART_t&
+			getModuleBase()
+			{
+				return USARTE0;
+			}
+			
+			inline static void
+			setDataOrder(bool lsbFirst=true)
+			{
+				USARTE0_CTRLC = (USARTE0_CTRLC & ~USART_CHSIZE2_bm) | (lsbFirst ? USART_CHSIZE2_bm : 0);
+			}
+			
+		private:
+			static bool
+			isBusy();
+		};
+#endif	// USARTE0
+		
+#if defined(USARTE1) || defined(__DOXYGEN__)
+		/**
+		 * \brief		UART1 in SPI master mode
+		 *
+		 * The USART pins are mapped like this MOSI=>TXO, MISO=>RXI, SCK=>XCK.
+		 * Be aware that this module has no SS pin, so no slave mode is possible.
+		 *
+		 * This module supports DMA transfers between memory (SRAM) and DATA
+		 * register by defining which DMA channel to use for write/read.
+		 * (SPI1_TX_DMA_CHANNEL, SPI1_RX_DMA_CHANNEL)
+		 * In typical use, the DMA channels gets configured once and then several
+		 * transfers get triggered, without CPU interference.
+		 * 
+		 * \author	Niklas Hauser
+		 * \ingroup	atxmega_spi
+		 */
+		class UartSpiMasterE1 : public SpiMaster
+		{
+		public:
+			/**
+			 * Sets pins and calculates the bsel value of the UART module.
+			 * The parameter has to be constant at compile time, so that
+			 * the compiler can do the calculation, and not the uC.
+			 * The DMA channel is configured with a Burst Length of one byte,
+			 * reloading of source address after block transfer completion,
+			 * incr./decr. of source address after each byte transfer,
+			 * no reloading of fixed destination address (=UART DATA register).
+			 * 
+			 * \warning The bitrate must be less than half F_CPU.
+			 * \param	bitrate	SPI frequency in Hz
+			 */
+			static void
+			initialize(uint32_t const bitrate=2000000);
+			
+			static uint8_t
+			write(uint8_t data);
+			
+			static bool
+			setBuffer(uint16_t length,
+					  uint8_t* transmit=0, uint8_t* receive=0,
+					  bool transmitIncr=true, bool receiveIncr=true);
+					  
+			static bool
+			transfer(bool send=true, bool receive=false, bool wait=true);
+			
+			static bool
+			isFinished();
+			
+			inline static USART_t&
+			getModuleBase()
+			{
+				return USARTE1;
+			}
+			
+			inline static void
+			setDataOrder(bool lsbFirst=true)
+			{
+				USARTE1_CTRLC = (USARTE1_CTRLC & ~USART_CHSIZE2_bm) | (lsbFirst ? USART_CHSIZE2_bm : 0);
+			}
+			
+		private:
+			static bool
+			isBusy();
+		};
+#endif	// USARTE1
 	}
 }
 

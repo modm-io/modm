@@ -26,7 +26,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id$
+ * $Id: hd44780.hpp 728 2012-02-10 22:49:20Z salkinium $
  */
 // ----------------------------------------------------------------------------
 
@@ -84,7 +84,7 @@ namespace xpcc
 		writeRaw(char c);
 		
 		virtual void
-		setCursor(uint8_t line, uint8_t column);
+		setCursor(uint8_t column, uint8_t line);
 		
 		virtual void
 		execute(Command command);

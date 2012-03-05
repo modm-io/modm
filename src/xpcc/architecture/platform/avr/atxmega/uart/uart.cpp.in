@@ -47,7 +47,7 @@ namespace
 
 // ----------------------------------------------------------------------------
 void
-xpcc::atxmega::Uart{{ id }}::initialise()
+xpcc::atxmega::Uart{{ id }}::initialize()
 {
 	TXD::set();
 	TXD::setOutput();

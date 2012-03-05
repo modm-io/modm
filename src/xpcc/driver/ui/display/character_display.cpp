@@ -26,7 +26,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id$
+ * $Id: character_display.cpp 728 2012-02-10 22:49:20Z salkinium $
  */
 // ----------------------------------------------------------------------------
 
@@ -50,7 +50,7 @@ xpcc::CharacterDisplay::write(char c)
 			line = 0;
 		}
 		column = 0;
-		this->setCursor(line, column);
+		this->setCursor(column, line);
 	}
 	else {
 		if (column >= lineWidth) {

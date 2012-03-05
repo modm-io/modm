@@ -26,7 +26,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id$
+ * $Id: sync_master_impl.hpp 752 2012-03-03 23:54:03Z salkinium $
  */
 // ----------------------------------------------------------------------------
 
@@ -73,7 +73,7 @@ xpcc::i2c::SyncMaster<M>::startCheck(uint8_t slaveAddress)
 		{
 			return true;
 		}
-		else{
+		else {
 			M::stop();
 			wait();
 		}

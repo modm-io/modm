@@ -26,7 +26,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id$
+ * $Id: atmega.hpp 752 2012-03-03 23:54:03Z salkinium $
  */
 // ----------------------------------------------------------------------------
 /**
@@ -49,10 +49,12 @@ namespace xpcc
 }
 
 #include "atmega/adc.hpp"
+#include "atmega/adc_interrupt.hpp"
+#include "atmega/analog_sensors.hpp"
 #include "atmega/uart.hpp"
 #include "atmega/spi.hpp"
 #include "atmega/gpio.hpp"
-#include "atmega/twi_master.hpp"
+#include "atmega/i2c_master.hpp"
 
 #endif
 

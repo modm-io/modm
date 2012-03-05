@@ -48,7 +48,8 @@ namespace xpcc
 		/**
 		 * @brief		I2C2 Module.
 		 * 
-		 * @author		Georgi
+		 * @author		Georgi Grinshpun
+		 * @author		Niklas Hauser
 		 * @ingroup		stm32
 		 */
 		class I2c2 : ::xpcc::i2c::Master
@@ -78,28 +79,79 @@ namespace xpcc
 			static void
 			initialize(uint16_t ccrPrescaler);
 			
+			static void
+			reset();
+			
 		public:
 			static bool
 			start(uint8_t slaveAddress);
-
+			
 			static void
 			restart(uint8_t slaveAddress);
-
-			static void
-			stop();
-
-			static void
-			read(uint8_t *data, std::size_t size, xpcc::i2c::ReadParameter param = xpcc::i2c::READ_STOP);
-
-			static void
-			write(const uint8_t *data, std::size_t size);
 			
-		public:
+			static void
+			read(uint8_t *data, std::size_t size, xpcc::i2c::OperationParameter param = xpcc::i2c::READ_STOP);
+			
+			static void
+			write(uint8_t *data, std::size_t size, xpcc::i2c::OperationParameter param = xpcc::i2c::READ_STOP);
+			
+			static void
+			writeRead(uint8_t *data, std::size_t writeSize, std::size_t readSize, xpcc::i2c::OperationParameter param = xpcc::i2c::READ_STOP);
+			
+			static void
+			attachDelegate(xpcc::i2c::Delegate *object);
+			
+			static xpcc::i2c::ErrorState
+			getErrorState();
+			
 			static xpcc::i2c::BusyState
 			getBusyState();
-
+			
 			static xpcc::i2c::BusState
 			getBusState();
+			
+		public:
+			ALWAYS_INLINE
+			static bool
+			startWrite(uint8_t slaveAddress, uint8_t *data, std::size_t size, xpcc::i2c::OperationParameter param = xpcc::i2c::WRITE_STOP)
+			{
+				if (start(slaveAddress)) {
+					writeRead(data, size, 0, (param == xpcc::i2c::WRITE_RESTART), false);
+					return true;
+				}
+				return false;
+			}
+			
+			ALWAYS_INLINE
+			static bool
+			startRead(uint8_t slaveAddress, uint8_t *data, std::size_t size, xpcc::i2c::OperationParameter param = xpcc::i2c::READ_STOP)
+			{
+				if (start(slaveAddress)) {
+					writeRead(data, 0, size, false, (param == xpcc::i2c::READ_RESTART));
+					return true;
+				}
+				return false;
+			}
+			
+			ALWAYS_INLINE
+			static bool
+			startWriteRead(uint8_t slaveAddress, uint8_t *data, std::size_t writeSize, std::size_t readSize, xpcc::i2c::OperationParameter param = xpcc::i2c::READ_STOP)
+			{
+				if (start(slaveAddress)) {
+					writeRead(data, writeSize, readSize, false, (param == xpcc::i2c::READ_RESTART));
+					return true;
+				}
+				return false;
+			}
+			
+		public:
+			ALWAYS_INLINE
+			static void
+			stop();
+			
+		private:
+			static void
+			writeRead(uint8_t *data, std::size_t writeSize, std::size_t readSize, bool restartW, bool restartR);
 		};
 	}
 }

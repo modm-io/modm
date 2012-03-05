@@ -26,7 +26,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id$
+ * $Id: clock.cpp 749 2012-03-01 00:27:05Z salkinium $
  */
 // ----------------------------------------------------------------------------
 
@@ -76,21 +76,6 @@
 	
 	xpcc::Timestamp
 	xpcc::Clock::now()
-	{
-		uint_fast16_t tempTime;
-		{
-			atomic::Lock lock;
-			tempTime = time;
-		}
-		
-		return Timestamp(tempTime);
-	}
-	
-	
-	uint_fast16_t xpcc::FlexClock::time = 0;
-
-	xpcc::Timestamp
-	xpcc::FlexClock::now()
 	{
 		uint_fast16_t tempTime;
 		{

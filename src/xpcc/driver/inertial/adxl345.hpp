@@ -26,50 +26,19 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id$
+ * $Id: adxl345.hpp 738 2012-02-25 17:54:01Z salkinium $
  */
 // ----------------------------------------------------------------------------
 
 #ifndef XPCC__ADXL345_HPP
 #define XPCC__ADXL345_HPP
 
-#include <xpcc/driver/connectivity/i2c/sync_master.hpp>
+#include <xpcc/driver/connectivity/i2c/master.hpp>
 
 namespace xpcc
 {
-	/**
-	 * \brief Basic ADXL345 digital accelerometer sensor driver
-	 *
-	 * The ADXL345 is a 3-axis accelerometer with high resolution (13-bit)
-	 * measurement at up to +-16 g. Digital output data is formatted as 16-bit
-	 * twos complement and is accessible through I2C digital interface.
-	 *
-	 * Its high resolution (4 mg/LSB) enables measurement of inclination 
-	 * changes less than 1.0 degree.
-	 * Several special sensing functions are provided. Activity and inactivity
-	 * sensing detect the presence or lack of motion and if the acceleration on
-	 * any axis exceeds a user-set level. Tap sensing detects single and double
-	 * taps. Free-fall sensing detects if the device is falling. These functions
-	 * can be mapped to one of two interrupt output pins. An integrated 32-level
-	 * first in, first out (FIFO) buffer can be used to store data to minimize
-	 * host processor intervention.
-	 * Low power modes enable intelligent motion-based power management with
-	 * threshold sensing and active acceleration measurement at extremely low
-	 * power dissipation.
-	 *
-	 * For further information on the special sensing functions, consult the
-	 * <a href="http://www.analog.com/static/imported-files/data_sheets/ADXL345.pdf">
-	 * datasheet</a>.
-	 *  
-	 * \author	Niklas Hauser
-	 * \ingroup inertial
-	 *
-	 * \tparam I2C Asynchronous Two Wire interface
-	 */
-	template < typename I2C >
-	class Adxl345
+	namespace adxl345
 	{
-	public:
 		/// The addresses of the Configuration and Data Registers
 		enum Register
 		{
@@ -108,16 +77,16 @@ namespace xpcc
 		/// The bandwidth options of REGISTER_BW_RATE.
 		/// Output frequency = 2 * bandwidth
 		enum Bandwidth {
-			BANDWIDTH_1600 = 0x0F,
-			BANDWIDTH_800 = 0x0E,
-			BANDWIDTH_400 = 0x0D,
-			BANDWIDTH_200 = 0x0C,
-			BANDWIDTH_100 = 0x0B,
-			BANDWIDTH_50 = 0x0A,
-			BANDWIDTH_25 = 0x09,
-			BANDWIDTH_12 = 0x08,
-			BANDWIDTH_6 = 0x07,
-			BANDWIDTH_3 = 0x06
+			BANDWIDTH_1600Hz_gc = 0x0F,
+			BANDWIDTH_800Hz_gc = 0x0E,
+			BANDWIDTH_400Hz_gc = 0x0D,
+			BANDWIDTH_200Hz_gc = 0x0C,
+			BANDWIDTH_100Hz_gc = 0x0B,
+			BANDWIDTH_50Hz_gc = 0x0A,
+			BANDWIDTH_25Hz_gc = 0x09,
+			BANDWIDTH_12Hz_gc = 0x08,
+			BANDWIDTH_6Hz_gc = 0x07,
+			BANDWIDTH_3Hz_gc = 0x06
 		};
 		
 		/// The power options of REGISTER_POWER_CTL.
@@ -127,10 +96,10 @@ namespace xpcc
 			POWER_MEASURE_bm = 0x08,
 			POWER_SLEEP_bm = 0x04,
 			POWER_WAKEUP_gm = 0x03,
-			POWER_WAKEUP_1HZ_gc = 0x03,
-			POWER_WAKEUP_2HZ_gc = 0x02,
-			POWER_WAKEUP_4HZ_gc = 0x01,
-			POWER_WAKEUP_8HZ_gc = 0x00,
+			POWER_WAKEUP_1Hz_gc = 0x03,
+			POWER_WAKEUP_2Hz_gc = 0x02,
+			POWER_WAKEUP_4Hz_gc = 0x01,
+			POWER_WAKEUP_8Hz_gc = 0x00,
 			// BW_RATE register
 			POWER_LOW_POWER = 0x10
 		};
@@ -156,10 +125,10 @@ namespace xpcc
 			DATAFORMAT_FULL_RES_bm = 0x08,
 			DATAFORMAT_JUSTIFY_bm = 0x04,
 			DATAFORMAT_RANGE_gm = 0x03,
-			DATAFORMAT_RANGE_16G_gc = 0x03,
-			DATAFORMAT_RANGE_8G_gc = 0x02,
-			DATAFORMAT_RANGE_4G_gc = 0x01,
-			DATAFORMAT_RANGE_2G_gc = 0x00
+			DATAFORMAT_RANGE_16g_gc = 0x03,
+			DATAFORMAT_RANGE_8g_gc = 0x02,
+			DATAFORMAT_RANGE_4g_gc = 0x01,
+			DATAFORMAT_RANGE_2g_gc = 0x00
 		};
 		
 		/// The options of REGISTER_FIFO_CTL and REGISTER_FIFO_STATUS
@@ -175,36 +144,60 @@ namespace xpcc
 			FIFO_STATUS_TRIG_bm = 0x80,
 			FIFO_STATUS_ENTRIES_gm = 0x3f
 		};
-		
+	}
+	
+	/**
+	 * \brief Basic ADXL345 digital accelerometer sensor driver
+	 *
+	 * The ADXL345 is a 3-axis accelerometer with high resolution (13-bit)
+	 * measurement at up to +-16 g. Digital output data is formatted as 16-bit
+	 * twos complement and is accessible through I2C digital interface.
+	 *
+	 * Its high resolution (4 mg/LSB) enables measurement of inclination 
+	 * changes less than 1.0 degree.
+	 * Several special sensing functions are provided. Activity and inactivity
+	 * sensing detect the presence or lack of motion and if the acceleration on
+	 * any axis exceeds a user-set level. Tap sensing detects single and double
+	 * taps. Free-fall sensing detects if the device is falling. These functions
+	 * can be mapped to one of two interrupt output pins. An integrated 32-level
+	 * first in, first out (FIFO) buffer can be used to store data to minimize
+	 * host processor intervention.
+	 * Low power modes enable intelligent motion-based power management with
+	 * threshold sensing and active acceleration measurement at extremely low
+	 * power dissipation.
+	 *
+	 * For further information on the special sensing functions, consult the
+	 * <a href="http://www.analog.com/static/imported-files/data_sheets/ADXL345.pdf">
+	 * datasheet</a>.
+	 *  
+	 * \author	Niklas Hauser
+	 * \ingroup inertial
+	 *
+	 * \tparam TwiMaster Asynchronous Two Wire interface
+	 */
+	template < typename TwiMaster >
+	class ADXL345 : public xpcc::i2c::Delegate
+	{
+	public:
 		/**
 		 * \brief	Constructor
-		 * \param	address		address is 0xa6 with SDO pin low else 0x3a
+		 * \param	address		address is 0x53 with SDO pin low else 0x1d
 		 */
-		Adxl345(uint8_t address=0x1d);
+		ADXL345(uint8_t address=0x1d);
 		
 		/**
 		 * Configures the sensor to measurement mode with full resolution with
 		 * the 32-level buffer in Stream Mode and the specified bandwidth.
 		 */
-		void
-		initialize(Bandwidth bandwidth=BANDWIDTH_50, bool streamMode=false);
+		bool
+		initialize(adxl345::Bandwidth bandwidth=adxl345::BANDWIDTH_50Hz_gc, bool streamMode=false);
 		
 		/**
 		 * read the X-ZDATA0-1 registers and buffer the results
 		 * sets isNewDataAvailable() to \c true
 		 */
-		void
-		readAcceleration();
-		
-		/**
-		 * read the X-ZDATA0-1 registers 32 times (the entire 32-level buffer 
-		 * in stream mode) and calculates the average.
-		 * During execution isNewDataAvailable() is set to \c false, because
-		 * the adding and division is done in-place on the data buffer.
-		 * This method takes a very long time, since all i2c reads are blocking!
-		 */
-		void
-		readAccelerationAverage();
+		bool
+		readAccelerometer();
 		
 		/// \return pointer to 8bit array containing xyz accelerations
 		/// Use reinterpret_cast<int16*>(&getData()) to get the results.
@@ -228,14 +221,13 @@ namespace xpcc
 		isDataReady();
 		
 	private:
-		
 		/**
-		 * writes 8bit data to a register, non blocking!
+		 * writes 8bit data to a register, blocking!
 		 * \param reg register address
 		 * \param data 8bit data to write
 		 */
-		void
-		writeRegister(Register reg, uint8_t data);
+		bool
+		writeRegister(adxl345::Register reg, uint8_t data);
 		
 		/**
 		 * reads a 8bit register, blocking!
@@ -243,15 +235,18 @@ namespace xpcc
 		 * \return 8bit content
 		 */
 		uint8_t
-		readRegister(Register reg);
+		readRegister(adxl345::Register reg);
 		
-		bool
-		readData(Register reg, uint8_t *data, uint8_t size);
+		/**
+		 * this delegate function gets called after calling readAcceleration()
+		 * \return always \c false, since we do not want to continue using the bus
+		 */
+		void
+		twiCompletion(const uint8_t *data, std::size_t index, bool reading);
 
 		bool newData;
 		uint8_t data[6];
 		uint8_t deviceAddress;
-		typedef xpcc::i2c::SyncMaster<I2C> MySyncI2C;
 	};
 	
 }

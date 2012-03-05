@@ -51,7 +51,7 @@ namespace
 
 // ----------------------------------------------------------------------------
 void
-xpcc::atxmega::UartD1::initialise()
+xpcc::atxmega::UartD1::initialize()
 {
 	TXD::set();
 	TXD::setOutput();

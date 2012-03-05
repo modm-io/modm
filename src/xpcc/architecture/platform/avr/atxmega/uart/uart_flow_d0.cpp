@@ -118,7 +118,7 @@ ISR(USARTD0_DRE_vect)
 
 // ----------------------------------------------------------------------------
 void
-xpcc::atxmega::BufferedUartFlowD0::initialise()
+xpcc::atxmega::BufferedUartFlowD0::initialize()
 {
 	TXD::set();
 	TXD::setOutput();

@@ -26,7 +26,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id$
+ * $Id: st7036_impl.hpp 746 2012-02-28 22:05:40Z salkinium $
  */
 // ----------------------------------------------------------------------------
 
@@ -87,7 +87,7 @@ xpcc::St7036<SPI, CS, RS, Width, Heigth>::execute(Command command)
 
 template <typename SPI, typename CS, typename RS, unsigned int Width, unsigned int Heigth>
 void
-xpcc::St7036<SPI, CS, RS, Width, Heigth>::setCursor(uint8_t newLine, uint8_t newColumn)
+xpcc::St7036<SPI, CS, RS, Width, Heigth>::setCursor(uint8_t newColumn, uint8_t newLine)
 {
 	this->column = newColumn;
 	this->line = newLine;

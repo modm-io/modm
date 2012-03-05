@@ -26,7 +26,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id$
+ * $Id: buffered_graphic_display.hpp 658 2011-12-03 10:18:19Z dergraaf $
  */
 // ----------------------------------------------------------------------------
 
