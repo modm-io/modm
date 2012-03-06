@@ -10,3 +10,6 @@
 [submodule "ext/stm32f10x_lib"]
 	path = ext/stm32f10x_lib
 	url = git://github.com/roboterclubaachen/stm32f10x_lib.git
+[submodule "ext/fatfs"]
+	path = ext/fatfs
+	url = git@github.com:roboterclubaachen/fatfs.git
