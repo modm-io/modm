@@ -1,6 +1,3 @@
-[submodule "ext/libmaple"]
-	path = ext/libmaple
-	url = git://github.com/leaflabs/libmaple.git
 [submodule "ext/stm32f2xx_lib"]
 	path = ext/stm32f2xx_lib
 	url = git://github.com/roboterclubaachen/stm32f2xx_lib.git
