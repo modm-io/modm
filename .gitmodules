@@ -1,0 +1,15 @@
+[submodule "ext/libmaple"]
+	path = ext/libmaple
+	url = git://github.com/leaflabs/libmaple.git
+[submodule "ext/fatfs"]
+	path = ext/fatfs
+	url = git://github.com/roboterclubaachen/fatfs.git
+[submodule "ext/stm32f2xx_lib"]
+	path = ext/stm32f2xx_lib
+	url = git://github.com/roboterclubaachen/stm32f2xx_lib.git
+[submodule "ext/stm32f4xx_lib"]
+	path = ext/stm32f4xx_lib
+	url = git://github.com/roboterclubaachen/stm32f4xx_lib.git
+[submodule "ext/stm32f10x_lib"]
+	path = ext/stm32f10x_lib
+	url = git://github.com/roboterclubaachen/stm32f10x_lib.git
