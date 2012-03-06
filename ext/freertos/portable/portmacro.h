@@ -77,7 +77,7 @@ extern "C" {
 #define portDOUBLE		double
 #define portLONG		long
 #define portSHORT		short
-#define portSTACK_TYPE	unsigned portLONG
+#define portSTACK_TYPE	uint32_t
 #define portBASE_TYPE	long
 
 #if( configUSE_16_BIT_TICKS == 1 )

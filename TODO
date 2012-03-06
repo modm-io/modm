@@ -7,6 +7,9 @@ Things which need to be done
 * Implement Timer 9-14 for STM32
 * Rework the description of the Logger!
 * Remove xpcc/debug/logger/imp/std.hpp after the 16.12.2011
-* Remove xpcc::FlexClock (defined in architecture/driver/clock.hpp)
 * Create preview images of the fonts from the font-files
+
+* Test the STM32 I2C Modules
+* Adapt Software I2C and Synchronous I2C
+* Adapt STM32 SPI Modules
 

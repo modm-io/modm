@@ -84,13 +84,9 @@ FreeRTOS.org versions prior to V4.4.0 did not include this definition. */
 #define portINITIAL_XPSR			( 0x01000000 )
 #define portINITIAL_EXC_RETURN		( 0xFFFFFFFD )
 
-/* The priority used by the kernel is assigned to a variable to make access
-from inline assembler easier. */
-const unsigned long ulKernelPriority = configKERNEL_INTERRUPT_PRIORITY;
-
 /* Each task maintains its own interrupt status in the critical nesting
 variable. */
-static unsigned portBASE_TYPE uxCriticalNesting = 0xaaaaaaaa;
+static uint32_t uxCriticalNesting = 0xaaaaaaaa;
 
 /*
  * Setup the timer to generate the tick interrupts.

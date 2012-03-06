@@ -26,7 +26,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id$
+ * $Id: iostream.cpp 754 2012-03-06 16:04:57Z dergraaf $
  */
 // ----------------------------------------------------------------------------
 
@@ -69,7 +69,7 @@ xpcc::IOStream::writeInteger(uint16_t value)
 	do {
 		i--;
 		char d;
-		for (d = '0'; value >= basePtr[i]; value -= basePtr[i])
+		for (d = static_cast<uint16_t>('0'); value >= basePtr[i]; value -= basePtr[i])
 		{
 			d++;
 			zero = false;

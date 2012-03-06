@@ -880,13 +880,13 @@ FRESULT put_fat (
 			res = move_window(fs, fs->fatbase + (bc / SS(fs)));
 			if (res != FR_OK) break;
 			p = &fs->win[bc % SS(fs)];
-			*p = (clst & 1) ? ((*p & 0x0F) | ((BYTE)val << 4)) : (BYTE)val;
+			*p = (clst & 1) ? ((BYTE)(*p & 0x0F) | ((BYTE)val << 4)) : (BYTE)val;
 			bc++;
 			fs->wflag = 1;
 			res = move_window(fs, fs->fatbase + (bc / SS(fs)));
 			if (res != FR_OK) break;
 			p = &fs->win[bc % SS(fs)];
-			*p = (clst & 1) ? (BYTE)(val >> 4) : ((*p & 0xF0) | ((BYTE)(val >> 8) & 0x0F));
+			*p = (clst & 1) ? (BYTE)(val >> 4) : ((BYTE)(*p & 0xF0) | ((BYTE)(val >> 8) & 0x0F));
 			break;
 
 		case FS_FAT16 :

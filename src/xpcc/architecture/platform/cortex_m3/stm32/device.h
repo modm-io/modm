@@ -26,7 +26,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id$
+ * $Id: device.h 754 2012-03-06 16:04:57Z dergraaf $
  */
 // ----------------------------------------------------------------------------
 
@@ -35,19 +35,10 @@
 
 #if defined(STM32F2XX)
 #	include <stm32f2xx.h>
-
-#	define APB1_FREQENCY	30000000
-#	define APB2_FREQENCY	60000000
 #elif defined(STM32F4XX)
 #	include <stm32f4xx.h>
-
-#	define APB1_FREQENCY	42000000
-#	define APB2_FREQENCY	84000000
 #else
 #	include <stm32f10x.h>
-
-#	define APB1_FREQENCY	36000000
-#	define APB2_FREQENCY	72000000
 #endif
 
 #endif // STM32__DEVICE_H
