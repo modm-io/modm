@@ -28,71 +28,72 @@
  */
 // ----------------------------------------------------------------------------
 {{ generation_block }}
-{% import 'uart_spi.hpp.macros' as uart_spi %}
 
-#ifndef XPCC_ATXMEGA__SPI_{{ port }}_HPP
-#define XPCC_ATXMEGA__SPI_{{ port }}_HPP
+#ifndef XPCC_ATXMEGA__SPI_{{ id }}_HPP
+#define XPCC_ATXMEGA__SPI_{{ id }}_HPP
 
 #include <stdint.h>
-#include <avr/io.h>
-#include "spi.hpp"
-#include <xpcc/driver/connectivity/spi/spi_master.hpp>
 
-#if defined(SPI{{ port }}) || defined(__DOXYGEN__)
+#include <xpcc/architecture/utils.hpp>
+#include <xpcc/architecture/platform/avr.hpp>
+
+#if defined(SPI{{ id }}) || defined(__DOXYGEN__)
 
 namespace xpcc
 {
 	namespace atxmega
 	{
 		/**
-		 * \brief		SPI Master for Port {{ port }}
+		 * \brief		SPI Master for Port {{ id }}
 		 *
-		 * This module only supports DMA read transfers in slave mode, however
-		 * slave mode is not implemented here.
-		 *
-		 * \author		Niklas hauser
 		 * \ingroup		atxmega_spi
 		 */
-		class SpiMaster{{ port }} : public SpiMaster
+		class SpiMaster{{ id }}
 		{
 		public:
 			static void
-			initialize(spi::Prescaler prescaler=spi::PRESCALER_16,
-					   spi::Mode mode=spi::MODE_0);
+			initialize(SPI_PRESCALER_t prescaler = SPI_PRESCALER_DIV128_gc,
+					bool doubleSpeed = false,
+					SPI_MODE_t mode = SPI_MODE_0_gc);
 			
-			inline static void
-			setDataOrder(bool lsbFirst=true)
-			{
-				SPI{{ port }}_CTRL = (SPI{{ port }}_CTRL & ~SPI_DORD_bm) | (lsbFirst ? SPI_DORD_bm : 0);
-			}
-			
+			/// initiates a SPI transfer and returns the received byte
 			static uint8_t
 			write(uint8_t data);
-			
-			static bool
-			setBuffer(uint16_t length,
-					  uint8_t* transmit=0, uint8_t* receive=0,
-					  bool transmitIncr=true, bool receiveIncr=true);
-			
-			static bool
-			transfer(bool send=true, bool receive=false, bool wait=true);
-			
-			static bool
-			isFinished();
 			
 			inline static SPI_t&
 			getModuleBase()
 			{
-				return SPI{{ port }};
+				return SPI{{ id }};
+			}
+			
+			/// Enable the SPI module.
+			inline static void
+			enable(bool enable)
+			{
+				SPI{{ id }}_CTRL = (SPI{{ id }}_CTRL & ~SPI_ENABLE_bm) | (enable ? SPI_ENABLE_bm : 0);
+			}
+			
+			inline static void
+			setPrescaler(SPI_PRESCALER_t prescaler, bool doubleSpeed)
+			{
+				SPI{{ id }}_CTRL = (SPI{{ id }}_CTRL & ~(SPI_PRESCALER_gm | SPI_CLK2X_bm)) | prescaler | (doubleSpeed ? SPI_CLK2X_bm : 0);
+			}
+			
+			inline static void
+			setDataOrder(bool LsbFirst)
+			{
+				SPI{{ id }}_CTRL = (SPI{{ id }}_CTRL & ~SPI_DORD_bm) | (LsbFirst ? SPI_DORD_bm : 0);
+			}
+			
+			inline static void
+			setMode(SPI_MODE_t mode)
+			{
+				SPI{{ id }}_CTRL = (SPI{{ id }}_CTRL & ~SPI_MODE_gm) | mode;
 			}
 		};
-		
-{{ uart_spi.master(port, 0) }}
-		
-{{ uart_spi.master(port, 1) }}
 	}
 }
 
-#endif // SPI{{ port }}
-#endif // XPCC_ATXMEGA__SPI_{{ port }}_HPP
+#endif // SPI{{ id }}
+#endif // XPCC_ATXMEGA__SPI_{{ id }}_HPP
 

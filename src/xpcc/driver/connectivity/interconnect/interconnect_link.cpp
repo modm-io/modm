@@ -26,7 +26,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: interconnect_link.cpp 751 2012-03-02 21:38:40Z salkinium $
+ * $Id: interconnect_link.cpp 607 2011-09-13 19:51:03Z dergraaf $
  */
 // ----------------------------------------------------------------------------
 
@@ -133,7 +133,7 @@ void
 xpcc::InterconnectLink::initialize()
 {
 	UsartSS::configureInputSense(xpcc::atxmega::BOTHEDGES);
-	UsartSS::configureInterrupt0(xpcc::atxmega::INTERRUPT_LEVEL_MEDIUM);
+	UsartSS::configureInterrupt0(xpcc::atxmega::INT0LVL_MED);
 	
 	UsartMS::setOutput();
 	UsartMS::set();

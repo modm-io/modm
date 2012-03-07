@@ -26,7 +26,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: scp1000.hpp 738 2012-02-25 17:54:01Z salkinium $
+ * $Id: scp1000.hpp 607 2011-09-13 19:51:03Z dergraaf $
  */
 // ----------------------------------------------------------------------------
 
@@ -38,8 +38,46 @@
 
 namespace xpcc
 {
-	namespace scp1000
+	/**
+	 * \brief SCP1000-D01 absolute pressure sensor driver
+	 *
+	 * The SCP1000 sensor measures both absolute pressure in Pa as well as
+	 * temperature in degrees Celsius.
+	 *
+	 * The sensor has 4 measurement modes plus standby and power down mode.
+	 * In all measurement modes, the pressure output word-length is 19 bits
+	 * and the temperature output word-length is 14 bits.
+	 *
+\verbatim
+Measurement Mode: refresh | pressure | temperature
+High Resolution :  1.8Hz  |  17bit   |   14bit
+High Speed      :   ~9Hz  |  15bit   |   14bit
+Ultra Low Power :   ~1Hz  |  15bit   |   14bit
+\endverbatim
+	 * 
+	 * DRDY pin pulled high, when new data is available.
+	 * DRDY pin pulled low, when DATARD16 is being read.
+	 *
+	 * You do not have to read out the temperature as it is only used by the
+	 * sensor for internal calculations, but it is important to read the 
+	 * 16 bit pressure register as the last one in the cycle.
+	 * A typical reading sequence: TEMPOUT => DATARD8 => DATARD16
+	 *
+	 * For further information on how to process the sensors data, consult the
+	 * <a href="http://www.sparkfun.com/datasheets/Components/SCP1000-D01.pdf">
+	 * datasheet</a>.
+	 *  
+	 * \author	Niklas Hauser
+	 * \ingroup pressure
+	 *
+	 * \tparam Spi	software or hardware Spi interface
+	 * \tparam Cs	Chip Select pin
+	 * \tparam Int	Interrupt pin
+	 */
+	template < typename Spi, typename Cs, typename Int >
+	class Scp1000
 	{
+	public:
 		/// The addresses of the Direct Access Registers.
 		enum Register
 		{
@@ -92,55 +130,14 @@ namespace xpcc
 			NO_RESET = 0x00,
 			RESET = 0x01
 		};
-	}
-	
-	/**
-	 * \brief SCP1000-D01 absolute pressure sensor driver
-	 *
-	 * The SCP1000 sensor measures both absolute pressure in Pa as well as
-	 * temperature in degrees Celsius.
-	 *
-	 * The sensor has 4 measurement modes plus standby and power down mode.
-	 * In all measurement modes, the pressure output word-length is 19 bits
-	 * and the temperature output word-length is 14 bits.
-	 *
-\verbatim
-Measurement Mode: refresh | pressure | temperature
-High Resolution :  1.8Hz  |  17bit   |   14bit
-High Speed      :   ~9Hz  |  15bit   |   14bit
-Ultra Low Power :   ~1Hz  |  15bit   |   14bit
-\endverbatim
-	 * 
-	 * DRDY pin pulled high, when new data is available.
-	 * DRDY pin pulled low, when DATARD16 is being read.
-	 *
-	 * You do not have to read out the temperature as it is only used by the
-	 * sensor for internal calculations, but it is important to read the 
-	 * 16 bit pressure register as the last one in the cycle.
-	 * A typical reading sequence: TEMPOUT => DATARD8 => DATARD16
-	 *
-	 * For further information on how to process the sensors data, consult the
-	 * <a href="http://www.sparkfun.com/datasheets/Components/SCP1000-D01.pdf">
-	 * datasheet</a>.
-	 *  
-	 * \author	Niklas Hauser
-	 * \ingroup pressure
-	 *
-	 * \tparam Spi	software or hardware Spi interface
-	 * \tparam Cs	Chip Select pin
-	 * \tparam Int	Interrupt pin
-	 */
-	template < typename Spi, typename Cs, typename Int >
-	class SCP1000
-	{
-	public:
+		
 		/**
 		 * Resets and initializes the chip to the new operation mode. This
 		 * takes at least 152ms, since the sensor has a long boot.
 		 * \param opMode Operation Mode.
 		 */
 		static bool
-		initialize(scp1000::Operation opMode=scp1000::OPERATION_HIGH_RESOLUTION_MODE_START);
+		initialize(Operation opMode=OPERATION_HIGH_RESOLUTION_MODE_START);
 		
 		/**
 		 * Reads the temperature register and buffers the result
@@ -173,7 +170,7 @@ Ultra Low Power :   ~1Hz  |  15bit   |   14bit
 		 * 			\c false if it took longer then 16ms to complete.
 		 */
 		static bool
-		setOperation(scp1000::Operation opMode);
+		setOperation(Operation opMode);
 		
 		/**
 		 * \param opStatus set to true to read operation status.
@@ -212,7 +209,7 @@ Ultra Low Power :   ~1Hz  |  15bit   |   14bit
 		 * \param data the data to write
 		 */
 		static void
-		writeRegister(scp1000::Register reg, uint8_t data);
+		writeRegister(Register reg, uint8_t data);
 		
 		/**
 		 * Reads a 8bit Direct Access Register in three SPI cycles.
@@ -221,7 +218,7 @@ Ultra Low Power :   ~1Hz  |  15bit   |   14bit
 		 * \return the 8bit content of the Register
 		 */
 		static uint8_t
-		read8BitRegister(scp1000::Register reg);
+		read8BitRegister(Register reg);
 		
 		/**
 		 * Reads a 16bit Direct Access Register in three SPI cycles.
@@ -231,7 +228,7 @@ Ultra Low Power :   ~1Hz  |  15bit   |   14bit
 		 * \return the 16bit content of the Register
 		 */
 		static void
-		read16BitRegister(scp1000::Register reg, uint8_t *buffer);
+		read16BitRegister(Register reg, uint8_t *buffer);
 		
 		static Spi spi;
 		static Cs chipSelect;

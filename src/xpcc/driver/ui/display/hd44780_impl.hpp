@@ -26,7 +26,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: hd44780_impl.hpp 728 2012-02-10 22:49:20Z salkinium $
+ * $Id: hd44780_impl.hpp 612 2011-10-01 21:27:09Z salkinium $
  */
 // ----------------------------------------------------------------------------
 
@@ -93,7 +93,7 @@ xpcc::Hd44780<E, RW, RS, DATA>::writeRaw(char c)
 
 template <typename E, typename RW, typename RS, typename DATA>
 void
-xpcc::Hd44780<E, RW, RS, DATA>::setCursor(uint8_t column, uint8_t line)
+xpcc::Hd44780<E, RW, RS, DATA>::setCursor(uint8_t line, uint8_t column)
 {
 	this->column = column;
 	this->line = line;

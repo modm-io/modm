@@ -25,7 +25,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id$
+ * $Id: tipc_receiver_socket.hpp 607 2011-09-13 19:51:03Z dergraaf $
  */
 // ----------------------------------------------------------------------------
 
@@ -44,7 +44,7 @@ namespace xpcc {
 		 * \brief		Provide the handling of the socket interface from TIPC.
 		 * 
 		 * \ingroup		tipc
-		 * \version		$Id$
+		 * \version		$Id: tipc_receiver_socket.hpp 607 2011-09-13 19:51:03Z dergraaf $
 		 * \author		Carsten Schmitt < >
 		 */
 		class ReceiverSocket {

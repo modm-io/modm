@@ -25,7 +25,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id$
+ * $Id: tipc_transmitter.hpp 607 2011-09-13 19:51:03Z dergraaf $
  */
 // ----------------------------------------------------------------------------
 #ifndef XPCC__TIPC_TRANSMITTER_HPP
@@ -50,7 +50,7 @@ namespace xpcc
 		 * \todo		exception handling : now it writs only log-messages
 		 * 
 		 * \ingroup		tipc
-		 * \version		$Id$
+		 * \version		$Id: tipc_transmitter.hpp 607 2011-09-13 19:51:03Z dergraaf $
 		 * \author		Carsten Schmitt < >
 		 */
 		class Transmitter

@@ -26,7 +26,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: ad840x_impl.hpp 739 2012-02-25 22:41:56Z salkinium $
+ * $Id: ad840x_impl.hpp 607 2011-09-13 19:51:03Z dergraaf $
  */
 // ----------------------------------------------------------------------------
 
@@ -39,7 +39,7 @@ template<typename Spi, typename Cs, typename Rs, typename Shdn>
 void
 xpcc::AD840x<Spi, Cs, Rs, Shdn>::initialize()
 {
-//	Spi::initialize();
+	Spi::initialize();
 	Cs::setOutput(xpcc::gpio::HIGH);
 	Rs::setOutput(xpcc::gpio::HIGH);
 	Shdn::setOutput(xpcc::gpio::HIGH);

@@ -26,31 +26,48 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: hmc58.hpp 738 2012-02-25 17:54:01Z salkinium $
+ * $Id: hmc58.hpp 608 2011-09-14 17:50:35Z salkinium $
  */
 // ----------------------------------------------------------------------------
 
 #ifndef XPCC__HMC58_HPP
 #define XPCC__HMC58_HPP
 
-#include <xpcc/driver/connectivity/i2c/master.hpp>
+#include <xpcc/driver/connectivity/i2c/device.hpp>
 
 namespace xpcc
 {
-	namespace hmc58
+	/**
+	 * \brief	HMC58* 3-axis digital compass family driver.
+	 *
+	 * The HMC58* is a surface-mount, multi-chip module designed for low-field
+	 * magnetic sensing with a digital interface for applications such as
+	 * low-cost compassing and magnetometry. The HMC58* includes high-resolution
+	 * magneto-resistive sensors plus an ASIC containing amplification,
+	 * automatic degaussing strap drivers, offset cancellation, and a 12-bit
+	 * ADC that enables 1-2 degrees compass heading accuracy.
+	 *
+	 * \ingroup inertial
+	 * \author	Niklas Hauser
+	 *
+	 * \tparam I2C Asynchronous Two Wire interface
+	 */
+	template < typename I2C >
+	class Hmc58 : public i2c::Device< I2C >
 	{
+	public:
 		/// The addresses of the Configuration and Data Registers
 		enum Register
 		{
 			REGISTER_CONFIG_A,
 			REGISTER_CONFIG_B,
 			REGISTER_MODE,
-			REGISTER_DATA_X0,	//!< x-axis MSB
-			REGISTER_DATA_X1,	//!< x-axis LSB
-			REGISTER_DATA_Y0,	//!< y-axis MSB
-			REGISTER_DATA_Y1,	//!< y-axis LSB
-			REGISTER_DATA_Z0,	//!< z-axis MSB
-			REGISTER_DATA_Z1,	//!< z-axis LSB
+			REGISTER_DATA_X0,	///< x-axis MSB
+			REGISTER_DATA_X1,	///< x-axis LSB
+			REGISTER_DATA_Y0,	///< y-axis MSB
+			REGISTER_DATA_Y1,	///< y-axis LSB
+			REGISTER_DATA_Z0,	///< z-axis MSB
+			REGISTER_DATA_Z1,	///< z-axis LSB
 			REGISTER_STATUS,
 			REGISTER_ID_A,
 			REGISTER_ID_B,
@@ -107,44 +124,25 @@ namespace xpcc
 			IDENTIFICATION_B = '4',
 			IDENTIFICATION_C = '3'
 		};
-	}
-	
-	/**
-	 * \brief	HMC58* 3-axis digital magnetometer family driver.
-	 *
-	 * The HMC58* is a surface-mount, multi-chip module designed for low-field
-	 * magnetic sensing with a digital interface for applications such as
-	 * low-cost compassing and magnetometry. The HMC58* includes high-resolution
-	 * magneto-resistive sensors plus an ASIC containing amplification,
-	 * automatic degaussing strap drivers, offset cancellation, and a 12-bit
-	 * ADC that enables 1-2 degrees compass heading accuracy.
-	 *
-	 * \ingroup inertial
-	 * \author	Niklas Hauser
-	 *
-	 * \tparam TwiMaster Asynchronous Two Wire interface
-	 */
-	template < typename TwiMaster >
-	class HMC58 : public xpcc::i2c::Delegate
-	{
-	public:
+		
+		
 		/// \brief	Constructor, sets address to default of 0x1e
-		HMC58(uint8_t address=0x1e);
+		Hmc58(uint8_t address=0x1e);
 		
 		/**
 		 * Configures the sensor to normal measurement mode with default gain of
 		 * ~1Gs and 8 sample averaging in continous updates at the specified
 		 * data output rate.
 		 */
-		bool
+		void
 		initialize(uint8_t dataOutputRate=0x10);
 		
 		/**
 		 * read the X-ZDATA0-1 registers and buffer the results
 		 * sets isNewDataAvailable() to \c true
 		 */
-		bool
-		readMagnetometer();
+		void
+		readCompass();
 		
 		/**
 		 * \return pointer to 8bit array containing xyz Gauss.
@@ -166,26 +164,26 @@ namespace xpcc
 		isDataReady();
 		
 		/// Sets the specified measurement mode
-		bool
-		setMeasurementMode(hmc58::MeasurementMode mode=hmc58::MEASUREMENT_MODE_NORMAL_gc);
+		void
+		setMeasurementMode(MeasurementMode mode=MEASUREMENT_MODE_NORMAL_gc);
 		
 		/// Sets the specified data output mode
-		bool
+		void
 		setDataOutputRate(uint8_t dataOutputRate=0x10);
 		
 		/// Sets the specified gain
-		bool
+		void
 		setGain(uint8_t gain=0x20);
 		
 	private:
 		
 		/**
-		 * writes 8bit data to a register, blocking!
+		 * writes 8bit data to a register, non blocking!
 		 * \param reg register address
 		 * \param data 8bit data to write
 		 */
-		bool
-		writeRegister(hmc58::Register reg, uint8_t data);
+		void
+		writeRegister(Register reg, uint8_t data);
 		
 		/**
 		 * reads a 8bit register, blocking!
@@ -193,18 +191,10 @@ namespace xpcc
 		 * \return 8bit content
 		 */
 		uint8_t
-		readRegister(hmc58::Register reg);
-		
-		/**
-		 * this delegate function gets called after calling readCompass()
-		 * \return always \c false, since we do not want to continue using the bus
-		 */
-		void
-		twiCompletion(const uint8_t *data, std::size_t index, bool reading);
+		readRegister(Register reg);
 		
 		bool newData;
 		uint8_t data[6];
-		uint8_t deviceAddress;
 	};
 	
 }

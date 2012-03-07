@@ -26,7 +26,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id$
+ * $Id: fixed_width_5x8.hpp 693 2012-01-14 01:11:14Z dergraaf $
  */
 // ----------------------------------------------------------------------------
 

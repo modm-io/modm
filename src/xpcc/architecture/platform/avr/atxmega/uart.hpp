@@ -26,7 +26,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * 
- * $Id: uart.hpp 740 2012-02-26 01:31:31Z salkinium $
+ * $Id: uart.hpp 692 2012-01-13 23:51:02Z dergraaf $
  */
 // ----------------------------------------------------------------------------
 /**
@@ -114,7 +114,7 @@ namespace xpcc {
 			 * Does *not* set the baudrate. This should be done *before*.
 			 */
 			static void
-			initialize();
+			initialise();
 
 			/**
 			 * \brief	Set baud rate

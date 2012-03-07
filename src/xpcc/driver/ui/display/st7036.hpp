@@ -26,7 +26,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: st7036.hpp 746 2012-02-28 22:05:40Z salkinium $
+ * $Id: st7036.hpp 611 2011-09-29 13:09:43Z dergraaf $
  */
 // ----------------------------------------------------------------------------
 
@@ -74,7 +74,7 @@ namespace xpcc
 		execute(Command command);
 		
 		virtual void
-		setCursor(uint8_t column, uint8_t line);
+		setCursor(uint8_t line, uint8_t column);
 		
 		// TODO
 		//void

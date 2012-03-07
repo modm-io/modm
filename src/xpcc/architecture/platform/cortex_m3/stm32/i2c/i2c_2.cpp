@@ -54,136 +54,129 @@ namespace
 #endif
 }
 
-namespace
-{
-	// parameter advice
-	static bool reading;
-	static bool restartAfterReading;
-	static bool restartAfterWriting;
-	static uint8_t twiAddress;
-	
-	// buffer management
-	static const uint8_t *twiWriteBuffer;
-	static uint8_t *twiReadBuffer;
-	static uint8_t twiReadCounter;
-	static uint8_t twiWriteCounter;
-	static uint8_t twiReadBufferSize;
-	static uint8_t twiWriteBufferSize;
-	
-	// state
-	static xpcc::i2c::BusState busState = xpcc::i2c::BUS_RESET;
-	static xpcc::i2c::ErrorState errorState = xpcc::i2c::NO_ERROR;
-	static bool occupied = false;
-//	static bool startConditionGenerated =  false;
-	
-	// delegating
-	static xpcc::i2c::Delegate *delegate = 0;
-}
+// buffer management
+static volatile uint8_t bytes_left;
+static volatile uint8_t *readPointer;
+static volatile const uint8_t *writePointer;
+
+// parameter advice
+static volatile bool reading;
+static volatile bool restartAfterReading;
+static volatile uint8_t address;
+
+// state
+static volatile xpcc::i2c::BusyState busyState = xpcc::i2c::FREE;
+static volatile xpcc::i2c::BusState busState;
+static volatile bool startConditionGeneratedWaitingForAddress = false;
+static volatile bool waitForStartConditionAfterWriteFollowedByRestart = false;
 
 // ----------------------------------------------------------------------------
 extern "C" void
 I2C2_EV_IRQHandler(void)
 {
-	uint16_t sr1 = I2C2->SR1;
+	uint16_t tmp = I2C2->SR1;
 
-	if (sr1 & I2C_SR1_SB)
-	{	// EV5: SB=1, cleared by reading SR1 register 
-		// followed by writing DR register with Address.
-		I2C2->DR = twiAddress | reading;
-		
-		return;
+	if (tmp & I2C_SR1_SB) // ev5, start condition generated
+	{
+		if (!startConditionGeneratedWaitingForAddress)
+		{
+			// Disable interrupts and wait until address and next operation is available
+			// While hold a restart must be performed (interface advice), where busState will change to standby
+			// While write we are here due to restart, so  bus state has to be changed to standby here
+			startConditionGeneratedWaitingForAddress = true;
+			I2C2->CR2 &= ~(I2C_CR2_ITEVTEN | I2C_CR2_ITBUFEN | I2C_CR2_ITERREN);
+			if (busState != xpcc::i2c::BUS_HOLD) {
+				busState = xpcc::i2c::BUS_STANDBY;
+			}
+			busyState = xpcc::i2c::OCCUPIED;
+		}
+		else {
+			// send address
+			startConditionGeneratedWaitingForAddress = false;
+			I2C2->DR = address | (reading ? xpcc::i2c::READ : xpcc::i2c::WRITE);
+		}
 	}
 
-	if (sr1 & I2C_SR1_ADDR)
+	if (tmp & I2C_SR1_ADDR) // ev6, address is written successfully
 	{
-		// In case a single byte has to be received, the Acknowledge disable is
-		// made during EV6 (before ADDR flag is cleared) and the STOP condition
-		// generation is made after EV6.
-		
-		// NACK is set in operation setup, no need to clear it again
-		
-		// EV6: ADDR=1, cleared by reading SR1 register followed by reading SR2.
-		uint16_t sr2 = I2C2->SR2;
-		(void) sr2;
-		
-		// EV8_1 will be generated automatically.
-		
-		// Generate STOP condition
-		if (twiReadCounter == 1)
-			I2C2->CR1 &= ~I2C_CR1_STOP;
-		return;
-	}
-	
-	if (sr1 & I2C_SR1_TXE)
-	{
-		// EV8_2: TxE=1, BTF = 1, Program Stop request. TxE and BTF are
-		// cleared by hardware by the Stop condition
-		if (sr1 & I2C_SR1_BTF) {
-			// Transfer finished
-			if (twiReadCounter == 0)
+		uint16_t tmp2 = I2C2->SR2; // clear addr flag
+		if (tmp2 & I2C_SR2_TRA) {
+			// do nothing because ev8_1 will be automatically triggered
+		}
+		else{
+			if (bytes_left <= 1)
 			{
-				if (restartAfterWriting) {
-					I2C2->CR2 &= ~(I2C_CR2_ITEVTEN | I2C_CR2_ITBUFEN | I2C_CR2_ITERREN);
-					xpcc::stm32::I2c2::restart(twiAddress);
-					// the bus is now reserved for further operations
-					busState = xpcc::i2c::BUS_WRITE;
+				I2C2->CR1 &= ~I2C_CR1_ACK;
+				if (restartAfterReading) {
+					I2C2->CR1 |= I2C_CR1_START;
 				}
-				else xpcc::stm32::I2c2::stop();
-				
-				if (delegate) {
-					xpcc::i2c::Delegate *bufferedDelegate = delegate;
-					delegate = 0;
-					bufferedDelegate->twiCompletion(twiWriteBuffer-twiWriteBufferSize, twiWriteBufferSize, xpcc::i2c::WRITE);
+				else {
+					I2C2->CR1 |= I2C_CR1_STOP;
 				}
 			}
-			else xpcc::stm32::I2c2::restart(twiAddress);
-			
-			return;
+			else {
+				I2C2->CR1 |= I2C_CR1_ACK; // for reading more than one byte
+			}
 		}
-		
-		// we have nothing more to send, create BTF condition
-		if (!twiWriteCounter) return;
-		
-		// EV8_1: TxE=1, shift register empty, data register empty, write Data1 in DR.
-		// EV8: TxE=1, shift register not empty, daua register empty, cleared by writing DR register
-		I2C2->DR = *twiWriteBuffer++;
-		twiWriteCounter--;
-		twiWriteBufferSize++;
-		
-		return;
 	}
-	
-	if (sr1 & I2C_SR1_RXNE)
+	if (tmp & I2C_SR1_TXE)
 	{
-		// EV7: RxNE = 1, cleared by reading DR register
-		*twiReadBuffer++ = I2C2->DR & 0xff;
-		twiReadCounter--;
-		twiReadBufferSize++;
-		
-		// ACK is set by default, no need to set it again
-		if (twiReadCounter > 1)
-			return;
-		
-		// EV7_1: RxNE = 1, cleared by reading DR register programming ACK = 0 and STOP request
-		if (twiReadCounter == 1) {
-			I2C2->CR1 &= ~I2C_CR1_ACK;
-			// Disable only the event interrupt
-			I2C2->CR2 &= ~(I2C_CR2_ITEVTEN);
-			if (restartAfterReading) xpcc::stm32::I2c2::restart(twiAddress);
-			else I2C2->CR1 |= I2C_CR1_STOP;
-			
-			return;
+		if (bytes_left == 0 || tmp & I2C_SR1_BTF)
+		{
+			if(bytes_left == 0)
+			{
+				// clear other interrupts too, wait for restart or stop or write
+				I2C2->CR2 &= ~(I2C_CR2_ITEVTEN | I2C_CR2_ITBUFEN | I2C_CR2_ITERREN);
+				busyState = xpcc::i2c::OCCUPIED;
+				busState = xpcc::i2c::BUS_WRITE;
+			}
+			else
+			{
+				// New data available due to repeated write or interrupt underflow happened
+				--bytes_left;
+				I2C2->DR = *(writePointer++); // write data
+				if (bytes_left==0){
+					I2C2->CR2 &= ~I2C_CR2_ITBUFEN; // clear interrupt on txe, so wait for btf
+				}
+			}
 		}
-		
-		if (delegate) {
-			xpcc::i2c::Delegate *bufferedDelegate = delegate;
-			delegate = 0;
-			bufferedDelegate->twiCompletion(twiReadBuffer-twiReadBufferSize, twiReadBufferSize, xpcc::i2c::READ);
+		else { // ev8 and ev8_1 transmit is empty
+			--bytes_left;
+			I2C2->DR = *(writePointer++); // write data
+			if (bytes_left==0) {
+				I2C2->CR2 &= ~I2C_CR2_ITBUFEN; // clear interrupt on txe, so wait for btf
+			}
 		}
-		busState = restartAfterReading ? xpcc::i2c::BUS_HOLD : xpcc::i2c::BUS_STOPPED;
-		occupied = restartAfterReading;
-		// Disable all interrupts
-		I2C2->CR2 &= ~(I2C_CR2_ITEVTEN | I2C_CR2_ITBUFEN | I2C_CR2_ITERREN);
+	}
+
+	if (tmp & I2C_SR1_RXNE)// ev7
+	{
+		uint16_t tmp2 = I2C2->DR; // clear RXNE
+		switch (--bytes_left)
+		{
+			default:
+				break;
+			case 1://ev7_1
+				I2C2->CR1 &= ~I2C_CR1_ACK;
+				if (restartAfterReading) {
+					I2C2->CR1 |= I2C_CR1_START;
+				}
+				else {
+					I2C2->CR1 |= I2C_CR1_STOP;
+				}
+				break;
+			case 0:
+				if (restartAfterReading){
+					busState = xpcc::i2c::BUS_HOLD;
+				}
+				else {
+					busState = xpcc::i2c::BUS_STOPPED;
+					busyState = xpcc::i2c::OCCUPIED;
+				}
+				break;
+		}
+
+		*(readPointer++) = tmp2&0xff;
 	}
 }
 
@@ -191,38 +184,31 @@ I2C2_EV_IRQHandler(void)
 extern "C" void
 I2C2_ER_IRQHandler(void)
 {
-	uint16_t sr1 = I2C2->SR1;
-	
-	twiWriteCounter = 0;
-	twiReadCounter = 0;
-	
-	if (sr1 & I2C_SR1_BERR) {
+	uint16_t tmp = I2C2->SR1;
+
+	if (tmp & I2C_SR1_BERR) {
 		I2C2->CR1 |= I2C_CR1_STOP;
-		errorState = xpcc::i2c::BUS_ERROR;
+		busyState = xpcc::i2c::OCCUPIED;
+		busState = xpcc::i2c::BUS_RESET;
 	}
-	else if (sr1 & I2C_SR1_AF) {			// acknowledge fail
+	if (tmp & I2C_SR1_AF) {			// acknowledge fail
 		I2C2->CR1 |= I2C_CR1_STOP;
-		errorState = xpcc::i2c::DATA_NACK;
+		busyState = xpcc::i2c::OCCUPIED;
+		busState = xpcc::i2c::BUS_RESET;
 	}
-	else if (sr1 & I2C_SR1_ARLO) {		// arbitration lost
-		errorState = xpcc::i2c::ARBITRATION_LOST;
+	if (tmp & I2C_SR1_ARLO) {		// arbitration lost
+		busyState = xpcc::i2c::OCCUPIED;
+		busState = xpcc::i2c::BUS_RESET;
 	}
-	// Overrun error is not handled here
-	if (!errorState) errorState = xpcc::i2c::UNKNOWN_ERROR;
-	
-	if (delegate) {
-		xpcc::i2c::Delegate *bufferedDelegate = delegate;
-		delegate = 0;
-		bufferedDelegate->twiError(errorState);
-	}
-	
-	busState = xpcc::i2c::BUS_RESET;
-	occupied = false;
+
+	// Overrun error not handled
 	
 	// Clear flags
 	I2C2->SR1 = 0;
+	
 	// Clear interrupts
 	I2C2->CR2 &= ~(I2C_CR2_ITEVTEN | I2C_CR2_ITBUFEN | I2C_CR2_ITERREN);
+	waitForStartConditionAfterWriteFollowedByRestart = false;
 }
 
 // ----------------------------------------------------------------------------
@@ -258,8 +244,6 @@ xpcc::stm32::I2c2::configurePins(Mapping mapping)
 void
 xpcc::stm32::I2c2::initialize(uint16_t ccrPrescaler)
 {
-	reset();
-	
 	// Enable clock
 	RCC->APB1ENR |= RCC_APB1ENR_I2C2EN;
 	
@@ -277,148 +261,121 @@ xpcc::stm32::I2c2::initialize(uint16_t ccrPrescaler)
 	I2C2->CR1 |= I2C_CR1_PE; // Enable peripheral
 }
 
-void
-xpcc::stm32::I2c2::reset()
-{
-	twiReadCounter = 0;
-	twiWriteCounter = 0;
-	busState = xpcc::i2c::BUS_RESET;
-	occupied = false;
-	errorState = xpcc::i2c::NO_ERROR;
-	delegate = 0;
-}
-
-// MARK: - ownership
+// ----------------------------------------------------------------------------
 bool
 xpcc::stm32::I2c2::start(uint8_t slaveAddress)
 {
-	if (getBusyState() == xpcc::i2c::FREE)
+	if (busyState == xpcc::i2c::FREE)
 	{
-		twiAddress = slaveAddress & 0xfe;
-		busState = xpcc::i2c::BUS_STANDBY;
-		errorState = xpcc::i2c::NO_ERROR;
-		occupied = true;
+		busyState = xpcc::i2c::BUSY;
+		address = slaveAddress;
+
+		// Don't write anything but clear the flag if it is set
+		if (I2C2->SR1 & I2C_SR1_SB){
+			I2C2->DR = 0xff;
+		}
+
+		I2C2->CR1 |= I2C_CR1_START; // generate a start condition
 		
-		// generate a start condition
-		I2C2->CR1 |= I2C_CR1_START;
+		// For interrupt activation in case they are off
+		waitForStartConditionAfterWriteFollowedByRestart = 
+				!(I2C2->CR2 & (I2C_CR2_ITEVTEN | I2C_CR2_ITBUFEN | I2C_CR2_ITERREN));
 		
 		return true;
 	}
 	return false;
 }
 
+// ----------------------------------------------------------------------------
 void
 xpcc::stm32::I2c2::restart(uint8_t slaveAddress)
 {
-	// if start condition has not been generated
-	if (!(I2C2->SR1 & I2C_SR1_SB))
-	{
-		twiAddress = slaveAddress & 0xfe;
-		busState = xpcc::i2c::BUS_STANDBY;
-		occupied = true;
-		
-		// generate a start condition
-		I2C2->CR1 |= I2C_CR1_START;
-	}
+	address = slaveAddress;
+	busyState = xpcc::i2c::BUSY;
+	
+	I2C2->CR1 |= I2C_CR1_START; // generate a start condition
+	
+	// For interrupt activation in case they are off
+	waitForStartConditionAfterWriteFollowedByRestart = 
+			!(I2C2->CR2 & (I2C_CR2_ITEVTEN | I2C_CR2_ITBUFEN | I2C_CR2_ITERREN));
 }
 
+// ----------------------------------------------------------------------------
 void
 xpcc::stm32::I2c2::stop()
 {
-	if (busState != xpcc::i2c::BUS_STOPPED && busState != xpcc::i2c::BUS_RESET)
+	if ((busState != xpcc::i2c::BUS_STOPPED && busState != xpcc::i2c::BUS_RESET) ||
+			(busState == xpcc::i2c::BUS_STANDBY))
 	{
 		I2C2->CR1 |= I2C_CR1_STOP;
-		busState = xpcc::i2c::BUS_STOPPED;
-		occupied = false;
-		// Clear interrupts
-		I2C2->CR2 &= ~(I2C_CR2_ITEVTEN | I2C_CR2_ITBUFEN | I2C_CR2_ITERREN);
+
+		if (startConditionGeneratedWaitingForAddress){
+			startConditionGeneratedWaitingForAddress = false;
+		}
+
+		// Interrupts may be disabled due to write, but do not enable because
+		// txe and btf are set during stop condition
 	}
+
+	// Clear interrupts
+	I2C2->CR2 &= ~(I2C_CR2_ITEVTEN | I2C_CR2_ITBUFEN | I2C_CR2_ITERREN);
+
+	busyState = xpcc::i2c::FREE;
 }
 
-// MARK: - operations
+// ----------------------------------------------------------------------------
 void
-xpcc::stm32::I2c2::read(uint8_t *data, std::size_t size, xpcc::i2c::OperationParameter param)
+xpcc::stm32::I2c2::read(uint8_t *data, std::size_t size, xpcc::i2c::ReadParameter param)
 {
-	writeRead(data, 0, size, false, (param == xpcc::i2c::READ_RESTART));
+	reading = true;
+	readPointer = data;
+	bytes_left = size;
+	busyState = xpcc::i2c::BUSY;
+	restartAfterReading = (param == xpcc::i2c::READ_RESTART);
+
+	// Enable interrupts again
+	I2C2->CR2 |= I2C_CR2_ITEVTEN | I2C_CR2_ITBUFEN | I2C_CR2_ITERREN;
 }
 
+// ----------------------------------------------------------------------------
 void
-xpcc::stm32::I2c2::write(uint8_t *data, std::size_t size, xpcc::i2c::OperationParameter param)
+xpcc::stm32::I2c2::write(const uint8_t *data, std::size_t size)
 {
-	writeRead(data, size, 0, (param == xpcc::i2c::WRITE_RESTART), false);
+	reading = false;
+	writePointer = data;
+	bytes_left = size;
+	busyState = xpcc::i2c::BUSY;
+
+	// Enable interrupts again
+	I2C2->CR2 |= I2C_CR2_ITEVTEN | I2C_CR2_ITBUFEN | I2C_CR2_ITERREN;
 }
 
-void
-xpcc::stm32::I2c2::writeRead(uint8_t *data, std::size_t writeSize, std::size_t readSize, xpcc::i2c::OperationParameter param)
-{
-	writeRead(data, writeSize, readSize, false, (param == xpcc::i2c::READ_RESTART));
-}
-
-// MARK: - delegate
-void
-xpcc::stm32::I2c2::attachDelegate(xpcc::i2c::Delegate *object)
-{
-	delegate = object;
-}
-
-// MARK: - status
-xpcc::i2c::ErrorState
-xpcc::stm32::I2c2::getErrorState()
-{
-	return errorState;
-}
-
+// ----------------------------------------------------------------------------
 xpcc::i2c::BusyState
 xpcc::stm32::I2c2::getBusyState()
 {
-	// Reading I2C_SR2 after reading I2C_SR1 clears the ADDR flag, even if the 
-	// ADDR flag was set after reading I2C_SR1. Consequently, I2C_SR2 must be read
-	// only when ADDR is found set in I2C_SR1 or when the STOPF bit is cleared.
-	uint16_t sr1 = I2C2->SR1;
-	
-	if (occupied || !((sr1 & I2C_SR1_ADDR) || !(sr1 & I2C_SR1_STOPF)))
-		return xpcc::i2c::OCCUPIED;
-	
-	uint16_t sr2 = I2C2->SR2;
-	
-	if (sr2 & I2C_SR2_BUSY)
+	uint16_t tmp = I2C2->CR1;
+	if (waitForStartConditionAfterWriteFollowedByRestart && !(tmp & I2C_CR1_START))
+	{
+		waitForStartConditionAfterWriteFollowedByRestart = false;
+		
+		// Enable interrupts
+		I2C2->CR2 |= I2C_CR2_ITEVTEN | I2C_CR2_ITBUFEN | I2C_CR2_ITERREN;
+	}
+
+	if (tmp & I2C_CR1_STOP){
 		return xpcc::i2c::BUSY;
-	
-	return xpcc::i2c::FREE;
+	}
+	else {
+		return busyState;
+	}
 }
 
+// ----------------------------------------------------------------------------
 xpcc::i2c::BusState
 xpcc::stm32::I2c2::getBusState()
 {
 	return busState;
-}
-
-// MARK: - private
-void
-xpcc::stm32::I2c2::writeRead(uint8_t *data, std::size_t writeSize, std::size_t readSize, bool restartW, bool restartR)
-{	
-	// Save pointer to data and number of bytes to send
-	twiWriteBuffer = data;
-	twiReadBuffer = data;
-	twiWriteCounter = writeSize;
-	twiReadCounter = readSize;
-	twiWriteBufferSize = 0;
-	twiReadBufferSize = 0;
-	
-	restartAfterWriting = restartW;
-	restartAfterReading = restartR;
-	reading = writeSize ? false : true;
-
-	// Default ACK;
-	if (twiReadCounter > 2) I2C2->CR1 |= I2C_CR1_ACK;
-	else I2C2->CR1 &= ~I2C_CR1_ACK;
-	
-	// sent stop condition, if we do not want to write or read anything.
-	if (!twiWriteCounter && !twiReadCounter)
-		I2C2->CR1 &= ~I2C_CR1_STOP;
-	
-	// Enable interrupts again
-	I2C2->CR2 |= I2C_CR2_ITEVTEN | I2C_CR2_ITBUFEN | I2C_CR2_ITERREN;
 }
 
 

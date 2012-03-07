@@ -25,14 +25,14 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id$
+ * $Id: cxxabi.cpp 611 2011-09-29 13:09:43Z dergraaf $
  */
 // ----------------------------------------------------------------------------
 /**
  * \file	cxxabi.cpp
  * \brief	Minimal C++ support, no exception handling, no RTTI
  * 
- * \version	$Id$
+ * \version	$Id: cxxabi.cpp 611 2011-09-29 13:09:43Z dergraaf $
  */
 // ----------------------------------------------------------------------------
 

@@ -26,7 +26,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * 
- * $Id: spi.hpp 751 2012-03-02 21:38:40Z salkinium $
+ * $Id: spi.hpp 625 2011-11-15 17:47:41Z dergraaf $
  */
 // ----------------------------------------------------------------------------
 
@@ -36,6 +36,8 @@
  *
  * Serial Peripheral Interface Module
  *
+ * This SPI hardware implementation is compatible with both Software SPI as
+ * well as Uart SPI.
  * The write method is blocking until the SPI Interrupt Flag is set (=> SPI
  * transfer is complete).
  * It can be used for higher SPI clock speeds than feasible with Software SPI.
@@ -44,12 +46,29 @@
  * disconnected, the write method does not block, but returns 0x00 or 0xff.
  * If your SPI slave has a "Data Ready" pin, which triggers a SPI readout, make
  * sure to use a pullup/pulldown on the input pin, to keep a disconnected slave
- * from causing continous readouts.
+ * from causing contiguous readouts.
  *
- * For non-blocking operation use DMA to write data from memory to the data register.
- * Be aware that DMA transfers is only possible on the UART in SPI mode module!
+ * \code
+ * #include <xpcc/architecture/platform.hpp>
  *
- * \see		xpcc::SpiMaster
+ * // create a new typedef to shorten the name
+ * typedef xpcc::atxmega::SpiMasterC Spi;
+ *
+ * int
+ * main(void)
+ * {
+ *     ...
+ *     Spi::initialize(SPI_PRESCALER_DIV64_gc);     // faster clock
+ *     // or without the typedef
+ *     // xpcc::atxmega::SpiMasterC::initialize(SPI_PRESCALER_DIV64_gc);
+ *
+ *     uint8_t result = Spi::write(0xf3);   // write a byte
+ *     ...
+ * }
+ * \endcode
+ *
+ * \see		AVR1309
+ * \see		xpcc::SoftwareSpi
  * \author	Niklas Hauser
  */
 

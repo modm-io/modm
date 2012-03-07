@@ -1,6 +1,6 @@
 // coding: utf-8
 // ----------------------------------------------------------------------------
-/* Copyright (c) 2012, Roboterclub Aachen e.V.
+/* Copyright (c) 2011, Roboterclub Aachen e.V.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,7 +26,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * 
- * $Id: adc.hpp 751 2012-03-02 21:38:40Z salkinium $
+ * $Id: adc.hpp 607 2011-09-13 19:51:03Z dergraaf $
  */
 // ----------------------------------------------------------------------------
 
@@ -46,9 +46,6 @@
  * A differential input in signed mode increases accuracy by up to 6 bit (!).
  * \see	<a href="http://blog.frankvh.com/2010/01/03/atmel-xmega-adc-problems-solutions/">
  * XMEGA ADC Problems and Solutions</a>
- *
- * Also read <a href=" http://www.bostonandroid.com/manuals/xmega-precision-adc-howto.html/">
- * this blogpost</a>.
  * 
  * The XMEGA ADC is more complex than of the Mega ADC, and each ADC Module has
  * four ADC Channels which have a separate class. You first have to initialize
@@ -66,7 +63,7 @@
  * main(void)
  * {
  *     ...
- *     AdcModuleA::initialize(xpcc::atxmega::adc::REFERENCE_EXTERNAL_PORTA);
+ *     AdcModuleA::initialize(ADC_REFSEL_AREFA_gc);
  *     AdcModuleA::setSignedConversion(true);
  *     ...
  * }
@@ -83,10 +80,11 @@
  *     ...
  *     typedef AdcChannelA0 myChannel;
  *     
- *     myChannel::initialize(xpcc::atxmega::adc::REFERENCE_EXTERNAL_PORTA);    // PortA AREF
+ *     myChannel::initialize(ADC_REFSEL_AREFA_gc);    // PortA AREF
+ *     myChannel::setSignedConversion(true);
  *     
  *     // Differential input mode
- *     myChannel::setDifferentialInput(xpcc::atxmega::adc::POSITIVE_PIN4, xpcc::atxmega::adc::NEGATIVE_PIN3);
+ *     myChannel::setDifferentialMode(ADC_CH_MUXPOS_PIN4_gc, ADC_CH_MUXNEG_PIN3_gc);
  *     
  *     // The result is always unsigned, so you want to cast it in signed mode
  *     int16_t result = static_cast<int16_t>(myChannel::read());
@@ -94,16 +92,17 @@
  * }
  * \endcode
  *
+ * \sa AVR1300
  * \author Niklas Hauser
  */
 
-#include "adc/adca.hpp"
-#include "adc/adcb.hpp"
-#include "adc/adca_channel0.hpp"
-#include "adc/adca_channel1.hpp"
-#include "adc/adca_channel2.hpp"
-#include "adc/adca_channel3.hpp"
-#include "adc/adcb_channel0.hpp"
-#include "adc/adcb_channel1.hpp"
-#include "adc/adcb_channel2.hpp"
-#include "adc/adcb_channel3.hpp"
+#include "adc/adc_a.hpp"
+#include "adc/adc_b.hpp"
+#include "adc/adc_a_channel_0.hpp"
+#include "adc/adc_a_channel_1.hpp"
+#include "adc/adc_a_channel_2.hpp"
+#include "adc/adc_a_channel_3.hpp"
+#include "adc/adc_b_channel_0.hpp"
+#include "adc/adc_b_channel_1.hpp"
+#include "adc/adc_b_channel_2.hpp"
+#include "adc/adc_b_channel_3.hpp"

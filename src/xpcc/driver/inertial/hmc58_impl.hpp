@@ -26,130 +26,114 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: hmc58_impl.hpp 738 2012-02-25 17:54:01Z salkinium $
+ * $Id: hmc58_impl.hpp 607 2011-09-13 19:51:03Z dergraaf $
  */
 // ----------------------------------------------------------------------------
 
 #ifndef XPCC__HMC58_HPP
-#	error  "Don't include this file directly, use 'hmc58.hpp' instead!"
+	#error  "Don't include this file directly, use 'hmc58.hpp' instead!"
 #endif
 
 // ----------------------------------------------------------------------------
-template < typename TwiMaster >
-xpcc::HMC58<TwiMaster>::HMC58(uint8_t address) :
-	deviceAddress(address<<1)
+template < typename I2C >
+xpcc::Hmc58<I2C>::Hmc58(uint8_t address) :
+	xpcc::i2c::Device<I2C>(address<<1)
 {
 }
 
-template < typename TwiMaster >
-bool
-xpcc::HMC58<TwiMaster>::initialize(uint8_t dataOutputRate)
+template < typename I2C >
+void
+xpcc::Hmc58<I2C>::initialize(uint8_t dataOutputRate)
 {
-	newData = false;
-	data[0] = hmc58::REGISTER_CONFIG_A;
+	data[0] = REGISTER_CONFIG_A;
 	// configuration register A
-	data[1] = hmc58::MEASUREMENT_AVERAGE_8_gc | dataOutputRate | hmc58::MEASUREMENT_MODE_NORMAL_gc;
+	data[1] = MEASUREMENT_AVERAGE_8_gc | dataOutputRate | MEASUREMENT_MODE_NORMAL_gc;
 	// configuration register B
 	data[2] = 0x20; /* default gain of ~1Gs */
 	// mode register
-	data[3] = hmc58::OPERATION_MODE_CONTINUOUS_gc;
+	data[3] = OPERATION_MODE_CONTINUOUS_gc;
+
+	this->i2c.write(this->deviceAddress, &data[0], 4);
+}
+
+template < typename I2C >
+void
+xpcc::Hmc58<I2C>::readCompass()
+{
+	data[0] = REGISTER_DATA_X0;
+	this->i2c.writeRead(this->deviceAddress, &data[0], 1, 6);
 	
-	return TwiMaster::startWrite(deviceAddress, data, 4);
+	newData = true;
 }
 
-template < typename TwiMaster >
+template < typename I2C >
 bool
-xpcc::HMC58<TwiMaster>::readMagnetometer()
+xpcc::Hmc58<I2C>::isDataReady()
 {
-	if (TwiMaster::start(deviceAddress)) {
-		newData = false;
-		data[0] = hmc58::REGISTER_DATA_X0;
-		TwiMaster::attachDelegate(this);
-		TwiMaster::writeRead(data, 1, 6);
-		
-		return true;
-	}
-	return false;
+	if (this->i2c.isBusy()) return false;
+	return readRegister(REGISTER_STATUS) & STATUS_DATA_READY_bm;
 }
 
-template < typename TwiMaster >
+template < typename I2C >
 bool
-xpcc::HMC58<TwiMaster>::isDataReady()
-{
-	return readRegister(hmc58::REGISTER_STATUS) & hmc58::STATUS_DATA_READY_bm;
-}
-
-template < typename TwiMaster >
-bool
-xpcc::HMC58<TwiMaster>::isNewDataAvailable()
+xpcc::Hmc58<I2C>::isNewDataAvailable()
 {
 	return newData;
 }
 
-template < typename TwiMaster >
+template < typename I2C >
 uint8_t*
-xpcc::HMC58<TwiMaster>::getData()
+xpcc::Hmc58<I2C>::getData()
 {
 	newData = false;
-	return data;
+	return &data[0];
 }
 
-template < typename TwiMaster >
-bool
-xpcc::HMC58<TwiMaster>::setDataOutputRate(uint8_t dataOutputRate)
+template < typename I2C >
+void
+xpcc::Hmc58<I2C>::setDataOutputRate(uint8_t dataOutputRate)
 {
-	uint8_t config = readRegister(hmc58::REGISTER_CONFIG_A);
-	return writeRegister(hmc58::REGISTER_CONFIG_A, (config & ~hmc58::DATA_OUTPUT_RATE_gm) | dataOutputRate);
+	uint8_t config = readRegister(REGISTER_CONFIG_A);
+	writeRegister(REGISTER_CONFIG_A, (config & ~DATA_OUTPUT_RATE_gm) | dataOutputRate);
 }
 
-template < typename TwiMaster >
-bool
-xpcc::HMC58<TwiMaster>::setMeasurementMode(hmc58::MeasurementMode mode)
+template < typename I2C >
+void
+xpcc::Hmc58<I2C>::setMeasurementMode(MeasurementMode mode)
 {
-	uint8_t config = readRegister(hmc58::REGISTER_CONFIG_A);
-	return writeRegister(hmc58::REGISTER_CONFIG_A, (config & hmc58::MEASUREMENT_MODE_gm) | mode);
+	uint8_t config = readRegister(REGISTER_CONFIG_A);
+	writeRegister(REGISTER_CONFIG_A, (config & MEASUREMENT_MODE_gm) | mode);
 }
 
-template < typename TwiMaster >
-bool
-xpcc::HMC58<TwiMaster>::setGain(uint8_t gain)
+template < typename I2C >
+void
+xpcc::Hmc58<I2C>::setGain(uint8_t gain)
 {
-	return writeRegister(hmc58::REGISTER_CONFIG_B, gain);
+	writeRegister(REGISTER_CONFIG_B, gain);
 }
 
 // ----------------------------------------------------------------------------
-template < typename TwiMaster >
-bool
-xpcc::HMC58<TwiMaster>::writeRegister(hmc58::Register reg, uint8_t data)
+template < typename I2C >
+void
+xpcc::Hmc58<I2C>::writeRegister(Register reg, uint8_t data)
 {
 	uint8_t buffer[2] = {reg, data};
-	if (TwiMaster::startWrite(deviceAddress, buffer, 2))
-	{
-		while (TwiMaster::getBusyState() != xpcc::i2c::FREE)
-			;
-		return true;
-	}
-	return false;
+	this->i2c.write(this->deviceAddress, &buffer[0], 2);
+	
+	while (this->i2c.isBusy())
+		;
 }
 
-template < typename TwiMaster >
+template < typename I2C >
 uint8_t
-xpcc::HMC58<TwiMaster>::readRegister(hmc58::Register reg)
+xpcc::Hmc58<I2C>::readRegister(Register reg)
 {
 	uint8_t buffer[1] = {reg};
-	if (TwiMaster::startWriteRead(deviceAddress, buffer, 1, 1))
-	{
-		while (TwiMaster::getBusyState() != xpcc::i2c::FREE)
-			;
-		return buffer[0];
-	}
-	return 0;
+	this->i2c.writeRead(this->deviceAddress, &buffer[0], 1, 1);
+	
+	while (this->i2c.isBusy())
+		;
+	return buffer[0];
 }
 
-// ----------------------------------------------------------------------------
-template < typename TwiMaster >
-void
-xpcc::HMC58<TwiMaster>::twiCompletion(const uint8_t */*data*/, std::size_t /*index*/, bool /*reading*/)
-{
-	newData = true;
-}
+

@@ -26,7 +26,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * 
- * $Id$
+ * $Id: response_callback.hpp 613 2011-10-14 10:31:23Z dergraaf $
  */
 // ----------------------------------------------------------------------------
 

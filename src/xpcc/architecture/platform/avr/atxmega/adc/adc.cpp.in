@@ -32,20 +32,17 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 
-#include "adc{{ id.lower() }}.hpp"
-#include <xpcc/architecture/platform/avr/atxmega/utils.hpp>
+#include "adc_{{ id.lower() }}.hpp"
+#include "../utils.hpp"
 
 #ifdef ADC{{ id }}
 
 // ----------------------------------------------------------------------------
 void
-xpcc::atxmega::Adc{{ id }}::initialize(adc::Reference reference,
-									   adc::Prescaler prescaler,
-									   adc::Resolution resolution)
+xpcc::atxmega::AdcModule{{ id }}::initialize(ADC_REFSEL_t reference, ADC_PRESCALER_t prescaler)
 {
 	ADC{{ id }}_REFCTRL = reference;
 	ADC{{ id }}_PRESCALER = prescaler;
-	ADC{{ id }}_CTRLB = resolution;
 	
 	ADC{{ id }}.CALL = atxmega::readCalibrationByte(offsetof(NVM_PROD_SIGNATURES_t, ADC{{ id }}CAL0));
 	ADC{{ id }}.CALH = atxmega::readCalibrationByte(offsetof(NVM_PROD_SIGNATURES_t, ADC{{ id }}CAL1));

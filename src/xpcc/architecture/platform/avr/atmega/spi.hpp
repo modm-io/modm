@@ -26,7 +26,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: spi.hpp 750 2012-03-01 17:01:46Z salkinium $
+ * $Id: spi.hpp 607 2011-09-13 19:51:03Z dergraaf $
  */
 // ----------------------------------------------------------------------------
 
@@ -35,7 +35,6 @@
 
 #include <avr/io.h>
 #include <stdint.h>
-#include <xpcc/driver/spi/spi_master.hpp>
 
 namespace xpcc
 {
@@ -45,7 +44,7 @@ namespace xpcc
 		 * \brief	SPI master module
 		 * \ingroup	atmega
 		 */
-		class SpiMaster : public xpcc::SpiMaster
+		class Spi
 		{
 		public:
 			enum Mode
@@ -80,17 +79,6 @@ namespace xpcc
 			
 			static uint8_t
 			write(uint8_t data);
-			
-			static bool
-			setBuffer(uint16_t length,
-					  uint8_t* transmit=0, uint8_t* receive=0,
-					  bool transmitIncr=true, bool receiveIncr=true);
-			
-			static bool
-			transfer(bool send=true, bool receive=false, bool wait=true);
-			
-			static bool
-			isFinished();
 		};
 	}
 }

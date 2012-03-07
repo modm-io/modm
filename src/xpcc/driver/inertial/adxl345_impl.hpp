@@ -26,106 +26,127 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: adxl345_impl.hpp 738 2012-02-25 17:54:01Z salkinium $
+ * $Id: adxl345_impl.hpp 642 2011-11-24 13:46:48Z georgi-g $
  */
 // ----------------------------------------------------------------------------
 
 #ifndef XPCC__ADXL345_HPP
-#	error  "Don't include this file directly, use 'adxl345.hpp' instead!"
+	#error  "Don't include this file directly, use 'adxl345.hpp' instead!"
 #endif
 
 // ----------------------------------------------------------------------------
-template < typename TwiMaster >
-xpcc::ADXL345<TwiMaster>::ADXL345(uint8_t address):
-	deviceAddress(address << 1)
+template < typename I2C >
+xpcc::Adxl345<I2C>::Adxl345(uint8_t address):
+	deviceAddress(address)
 {
 }
 
-template < typename TwiMaster >
-bool
-xpcc::ADXL345<TwiMaster>::initialize(adxl345::Bandwidth bandwidth, bool streamMode)
+template < typename I2C >
+void
+xpcc::Adxl345<I2C>::initialize(Bandwidth bandwidth, bool streamMode)
 {
-	bool ok = writeRegister(adxl345::REGISTER_POWER_CTL, adxl345::POWER_MEASURE_bm);
-	ok &= writeRegister(adxl345::REGISTER_DATA_FORMAT, adxl345::DATAFORMAT_FULL_RES_bm);
-	ok &= writeRegister(adxl345::REGISTER_BW_RATE, bandwidth);
-//	ok &= writeRegister(adxl345::REGISTER_INT_ENABLE, adxl345::INTERRUPT_DATA_READY_bm);
+	writeRegister(REGISTER_POWER_CTL, POWER_MEASURE_bm);
+	writeRegister(REGISTER_DATA_FORMAT, DATAFORMAT_FULL_RES_bm);
+	writeRegister(REGISTER_BW_RATE, bandwidth);
+//	writeRegister(REGISTER_INT_ENABLE, INTERRUPT_DATA_READY_bm);
 	if (streamMode) {
-		ok &= writeRegister(adxl345::REGISTER_FIFO_CTL, adxl345::FIFO_CTL_MODE_STREAM_gc);
+		writeRegister(REGISTER_FIFO_CTL, FIFO_CTL_MODE_STREAM_gc);
 	}
-	return ok;
 }
 
-template < typename TwiMaster >
-bool
-xpcc::ADXL345<TwiMaster>::readAccelerometer()
+template < typename I2C >
+void
+xpcc::Adxl345<I2C>::readAcceleration()
 {
-	if (TwiMaster::start(deviceAddress)) {
-		newData = false;
-		data[0] = adxl345::REGISTER_DATA_X0;
-		TwiMaster::attachDelegate(this);
-		TwiMaster::writeRead(data, 1, 6);
-		
-		return true;
+	if(readData(REGISTER_DATA_X0, data, 6)){
+		newData = true;
 	}
-	return false;
 }
 
-template < typename TwiMaster >
-bool
-xpcc::ADXL345<TwiMaster>::isDataReady()
+template < typename I2C >
+void
+xpcc::Adxl345<I2C>::readAccelerationAverage()
 {
-	return readRegister(adxl345::REGISTER_INT_SOURCE) & adxl345::INTERRUPT_DATA_READY_bm;
+	newData = false;
+	uint8_t bufferData[6];
+	int16_t *buffer = reinterpret_cast<int16_t*>(bufferData);
+	int16_t *result = reinterpret_cast<int16_t*>(data);
+	
+	for (uint_fast8_t i=0; i < 32; ++i) {	
+		readData(REGISTER_DATA_X0, bufferData, 6);
+		result[0] += buffer[0];
+		result[1] += buffer[1];
+		result[2] += buffer[2];
+	}
+	
+	result[0] >>= 5;
+	result[1] >>= 5;
+	result[2] >>= 5;
+	
+	newData = true;
 }
 
-template < typename TwiMaster >
+template < typename I2C >
 bool
-xpcc::ADXL345<TwiMaster>::isNewDataAvailable()
+xpcc::Adxl345<I2C>::isDataReady()
+{
+	return readRegister(REGISTER_INT_SOURCE) & INTERRUPT_DATA_READY_bm;
+}
+
+template < typename I2C >
+bool
+xpcc::Adxl345<I2C>::isNewDataAvailable()
 {
 	return newData;
 }
 
-template < typename TwiMaster >
+template < typename I2C >
 uint8_t*
-xpcc::ADXL345<TwiMaster>::getData()
+xpcc::Adxl345<I2C>::getData()
 {
 	newData = false;
-	return data;
+	return &data[0];
 }
 
 // ----------------------------------------------------------------------------
-template < typename TwiMaster >
-bool
-xpcc::ADXL345<TwiMaster>::writeRegister(adxl345::Register reg, uint8_t data)
+template < typename I2C >
+void
+xpcc::Adxl345<I2C>::writeRegister(Register reg, uint8_t data)
 {
-	uint8_t buffer[2] = {reg, data};
-	if (TwiMaster::startWrite(deviceAddress, buffer, 2))
-	{
-		while (TwiMaster::getBusyState() != xpcc::i2c::FREE)
-			;
-		return true;
+	if (MySyncI2C::startCheck(this->deviceAddress)){
+		uint8_t buffer[2] = {reg, data};
+		MySyncI2C::write(buffer, 2);
 	}
-	return false;
 }
 
-template < typename TwiMaster >
+template < typename I2C >
 uint8_t
-xpcc::ADXL345<TwiMaster>::readRegister(adxl345::Register reg)
+xpcc::Adxl345<I2C>::readRegister(Register reg)
 {
-	uint8_t buffer[1] = {reg};
-	if (TwiMaster::startWriteRead(deviceAddress, buffer, 1, 1))
-	{
-		while (TwiMaster::getBusyState() != xpcc::i2c::FREE)
-			;
+	uint8_t buffer[1];
+	if(readData(reg, buffer, 1)){
 		return buffer[0];
 	}
-	return 0;
+	else{
+		return 0;
+	}
 }
 
-// ----------------------------------------------------------------------------
-template < typename TwiMaster >
-void
-xpcc::ADXL345<TwiMaster>::twiCompletion(const uint8_t */*data*/, std::size_t /*index*/, bool /*reading*/)
+
+template < typename I2C >
+bool
+xpcc::Adxl345<I2C>::readData(Register reg, uint8_t *data, uint8_t size)
 {
-	newData = true;
+	if (MySyncI2C::startCheck(this->deviceAddress)){
+		if(MySyncI2C::write(&reg, 1, xpcc::i2c::SYNC_NO_STOP) == xpcc::i2c::BUS_RESET){
+			MySyncI2C::stop();
+			return false;
+		}
+		if(MySyncI2C::read(data, size) != xpcc::i2c::BUS_RESET){
+			return true;
+		}
+	}
+	else
+		return false;
 }
 

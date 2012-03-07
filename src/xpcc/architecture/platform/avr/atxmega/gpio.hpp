@@ -26,7 +26,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: gpio.hpp 751 2012-03-02 21:38:40Z salkinium $
+ * $Id: gpio.hpp 734 2012-02-16 22:39:11Z salkinium $
  */
 // ----------------------------------------------------------------------------
 
@@ -36,7 +36,6 @@
 #include <xpcc/architecture/utils.hpp>
 #include <xpcc/architecture/platform/avr.hpp>
 #include <xpcc/architecture/driver/gpio.hpp>
-#include <xpcc/math/utils/bit_operation.hpp>
 
 namespace xpcc
 {
@@ -214,7 +213,7 @@ namespace xpcc
 		}\
 		\
 		ALWAYS_INLINE static void \
-		configureInterrupt0(::xpcc::atxmega::InterruptLevel interruptLevel) { \
+		configureInterrupt0(::xpcc::atxmega::InterruptLevel0 interruptLevel) { \
 			if (interruptLevel){\
 				CONCAT3(PORT, port, _INT0MASK) |= getMask();\
 				CONCAT3(PORT, port, _INTCTRL) = (CONCAT3(PORT, port, _INTCTRL) & ~PORT_INT0LVL_gm) | (interruptLevel & PORT_INT0LVL_gm);\
@@ -225,10 +224,10 @@ namespace xpcc
 		} \
 		\
 		ALWAYS_INLINE static void \
-		configureInterrupt1(::xpcc::atxmega::InterruptLevel interruptLevel) { \
+		configureInterrupt1(::xpcc::atxmega::InterruptLevel1 interruptLevel) { \
 			if (interruptLevel){\
 				CONCAT3(PORT, port, _INT1MASK) |= getMask();\
-				CONCAT3(PORT, port, _INTCTRL) = (CONCAT3(PORT, port, _INTCTRL) & ~PORT_INT1LVL_gm) | ((interruptLevel << 2) & PORT_INT1LVL_gm);\
+				CONCAT3(PORT, port, _INTCTRL) = (CONCAT3(PORT, port, _INTCTRL) & ~PORT_INT1LVL_gm) | (interruptLevel & PORT_INT1LVL_gm);\
 			}\
 			else{\
 				CONCAT3(PORT, port, _INT1MASK) &= ~getMask();\

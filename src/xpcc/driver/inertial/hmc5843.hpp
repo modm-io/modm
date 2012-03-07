@@ -26,7 +26,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: hmc5843.hpp 738 2012-02-25 17:54:01Z salkinium $
+ * $Id: hmc5843.hpp 734 2012-02-16 22:39:11Z salkinium $
  */
 // ----------------------------------------------------------------------------
 
@@ -37,19 +37,36 @@
 
 namespace xpcc
 {
-	namespace hmc5843
+	/**
+	 * \brief	HMC5843 digital compass driver.
+	 *
+	 * This class extends the HMC58* family driver only by the addition of
+	 * device specific Register bit masks.
+	 *
+	 * \see Hmc58
+	 *
+	 * For further information on this device consult the
+	 * <a href="http://www.sparkfun.com/datasheets/Sensors/Magneto/HMC5843.pdf">
+	 * datasheet</a>.
+	 *
+	 * \ingroup inertial
+	 * \author	Niklas Hauser
+	 *
+	 * \tparam I2C Asynchronous Two Wire interface
+	 */
+	template < typename I2C >
+	class Hmc5843 : public Hmc58< I2C >
 	{
-		using namespace hmc58;
-		
+	public:
 		/// device specific data output rate options of REGISTER_CONFIG_A
 		enum DataOutputRate {
-			DATA_OUTPUT_RATE_0_5Hz_gc = 0x00,
-			DATA_OUTPUT_RATE_1Hz_gc = 0x04,
-			DATA_OUTPUT_RATE_2Hz_gc = 0x08,
-			DATA_OUTPUT_RATE_5Hz_gc = 0x0c,
-			DATA_OUTPUT_RATE_10Hz_gc = 0x10,
-			DATA_OUTPUT_RATE_20Hz_gc = 0x14,
-			DATA_OUTPUT_RATE_50Hz_gc = 0x18
+			DATA_OUTPUT_RATE_0_5_gc = 0x00,
+			DATA_OUTPUT_RATE_1_gc = 0x04,
+			DATA_OUTPUT_RATE_2_gc = 0x08,
+			DATA_OUTPUT_RATE_5_gc = 0x0c,
+			DATA_OUTPUT_RATE_10_gc = 0x10,
+			DATA_OUTPUT_RATE_20_gc = 0x14,
+			DATA_OUTPUT_RATE_50_gc = 0x18
 		};
 		
 		/// device specific data gain options of REGISTER_CONFIG_B
@@ -63,32 +80,10 @@ namespace xpcc
 			GAIN_4_5_gc,
 			GAIN_6_5_gc
 		};
-	}
-	
-	/**
-	 * \brief	HMC5843 digital compass driver.
-	 *
-	 * This class extends the HMC58* family driver only by the addition of
-	 * device specific Register bit masks.
-	 *
-	 * \see HMC58
-	 *
-	 * For further information on this device consult the
-	 * <a href="http://www.sparkfun.com/datasheets/Sensors/Magneto/HMC5843.pdf">
-	 * datasheet</a>.
-	 *
-	 * \ingroup inertial
-	 * \author	Niklas Hauser
-	 *
-	 * \tparam TwiMaster Asynchronous Two Wire interface
-	 */
-	template < typename TwiMaster >
-	class HMC5843 : public HMC58< TwiMaster >
-	{
-	public:
+		
 		/// \brief	Constructor, sets address to default of 0x1e
-		HMC5843() :
-			HMC58<TwiMaster>(0x1e)
+		Hmc5843() :
+			Hmc58<I2C>(0x1e)
 		{
 		}
 	};

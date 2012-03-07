@@ -1,6 +1,6 @@
 // coding: utf-8
 // 
-// $Id: driver.dox 753 2012-03-04 22:29:10Z salkinium $
+// $Id: driver.dox 612 2011-10-01 21:27:09Z salkinium $
 
 /**
 \defgroup	driver	Device drivers
@@ -64,7 +64,7 @@
 
 /**
  * \ingroup		driver
- * \defgroup	pwm			PWM Drivers
+ * \defgroup	pwm			PWM LEDs
  */
 
 /**

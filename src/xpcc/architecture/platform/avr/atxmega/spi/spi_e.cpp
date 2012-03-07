@@ -34,7 +34,8 @@
 // ----------------------------------------------------------------------------
 
 #include "spi_e.hpp"
-#include <xpcc/architecture/platform.hpp>
+#include <avr/interrupt.h>
+#include <xpcc/architecture/driver/gpio.hpp>
 
 #ifdef SPIE
 
@@ -44,89 +45,23 @@ namespace
 	GPIO__INPUT(MISO, E, 6);
 	GPIO__OUTPUT(MOSI, E, 5);
 	GPIO__OUTPUT(SS, E, 4);
-	
-	static uint8_t* transmitBuffer(0);
-	static uint8_t* receiveBuffer(0);
-	static uint16_t bufferLength(0);
-	enum
-	{
-		BUFFER_TRANSMIT_INCR_bm = 0x01,
-		BUFFER_RECEIVE_INCR_bm = 0x02,
-		BUFFER_TRANSMIT_IS_NOT_ZERO_bm = 0x04,
-		BUFFER_RECEIVE_IS_NOT_ZERO_bm = 0x08,
-		BUFFER_IS_DUMMY_bm = 0x10,
-		BUFFER_IS_BUSY_SYNC_bm = 0x20
-	};
-	static uint8_t status(0);
 }
 
 // ----------------------------------------------------------------------------
 void
-xpcc::atxmega::SpiMasterE::initialize(spi::Prescaler prescaler, 
-											   spi::Mode mode)
+xpcc::atxmega::SpiMasterE::initialize(SPI_PRESCALER_t prescaler, 
+		bool doubleSpeed, SPI_MODE_t mode)
 {
 	SS::setOutput();
 	MOSI::setOutput();
 	SCK::setOutput();
 	MISO::setInput(PULLUP);
 	
-	SPIE_CTRL = SPI_ENABLE_bm | SPI_MASTER_bm | mode | prescaler;
+	SPIE_CTRL = SPI_ENABLE_bm | SPI_MASTER_bm | mode;
+	
+	setPrescaler(prescaler, doubleSpeed);
 }
 
-// ----------------------------------------------------------------------------
-bool
-xpcc::atxmega::SpiMasterE::setBuffer(uint16_t length, uint8_t* transmit, uint8_t* receive, bool transmitIncr, bool receiveIncr)
-{
-	if (!isFinished()) return false;
-	
-	transmitBuffer = transmit;
-	receiveBuffer = receive ? receive : transmit;
-	bufferLength = length;
-	status &= ~(BUFFER_TRANSMIT_INCR_bm | BUFFER_RECEIVE_INCR_bm);
-	status |= (transmitIncr ? BUFFER_TRANSMIT_INCR_bm : 0) | (receiveIncr ? BUFFER_RECEIVE_INCR_bm : 0);
-	
-	return true;
-}
-
-bool
-xpcc::atxmega::SpiMasterE::transfer(bool transmit, bool receive, bool /*wait*/)
-{
-	if (status & BUFFER_IS_BUSY_SYNC_bm)
-		return false;
-	
-	uint8_t rx(0), tx(0xff);
-	// send the buffer out, blocking
-	status |= BUFFER_IS_BUSY_SYNC_bm;
-	// check if we have to use a dummy buffer
-	transmit &= static_cast<bool>(transmitBuffer);
-	receive &= static_cast<bool>(receiveBuffer);
-	
-	if (status & BUFFER_TRANSMIT_INCR_bm) {
-		for(uint_fast16_t i=0; i < bufferLength; ++i) {
-			if (transmit) tx = transmitBuffer[i];
-			rx = write(tx);
-			if (receive) receiveBuffer[i] = rx;
-		}
-	}
-	else {
-		for(uint_fast16_t i=bufferLength; i > 0; --i) {
-			if (transmit) tx = transmitBuffer[i-1];
-			rx = write(tx);
-			if (receive) receiveBuffer[i-1] = rx;
-		}
-	}
-	status &= ~BUFFER_IS_BUSY_SYNC_bm;
-	
-	return true;
-}
-
-bool
-xpcc::atxmega::SpiMasterE::isFinished()
-{
-	return !(status & BUFFER_IS_BUSY_SYNC_bm);
-}
-
-// ----------------------------------------------------------------------------
 uint8_t
 xpcc::atxmega::SpiMasterE::write(uint8_t data)
 {

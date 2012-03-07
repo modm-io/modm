@@ -26,7 +26,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: character_display.hpp 728 2012-02-10 22:49:20Z salkinium $
+ * $Id: character_display.hpp 611 2011-09-29 13:09:43Z dergraaf $
  */
 // ----------------------------------------------------------------------------
 
@@ -109,11 +109,11 @@ namespace xpcc
 		/**
 		 * \brief	Set cursor to specified position
 		 * 
-		 * \param	column	horizontal position
 		 * \param	line	vertical position
+		 * \param	column	horizontal position
 		 */
 		virtual void
-		setCursor(uint8_t column, uint8_t line) = 0;
+		setCursor(uint8_t line, uint8_t column) = 0;
 		
 	protected:
 		// Interface class for the IOStream
