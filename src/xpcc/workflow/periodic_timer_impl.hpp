@@ -26,7 +26,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id$
+ * $Id: periodic_timer_impl.hpp 755 2012-03-07 01:29:31Z dergraaf $
  */
 // ----------------------------------------------------------------------------
 
@@ -38,6 +38,9 @@ template<typename T>
 xpcc::PeriodicTimer<T>::PeriodicTimer(const Timestamp interval) :
 	timer(interval), interval(interval), isRunning_(true)
 {
+	if (interval == 0) {
+		stop();
+	}
 }
 
 template<typename T>

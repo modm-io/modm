@@ -26,7 +26,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id$
+ * $Id: periodic_timer.hpp 755 2012-03-07 01:29:31Z dergraaf $
  */
 // ----------------------------------------------------------------------------
 
@@ -64,7 +64,11 @@ namespace xpcc
 	{
 	public:
 		/**
-		 * \brief	Create and start the timer
+		 * \brief	Create and start the timer.
+		 * 
+		 * \param interval
+		 * 			Timed interval in millisecond resolution (depends on
+		 * 			xpcc::Clock). Set to zero to create a stopped timer.
 		 */
 		PeriodicTimer(const Timestamp interval);
 		

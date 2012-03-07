@@ -26,7 +26,7 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # 
-# $Id$
+# $Id: arm.py 755 2012-03-07 01:29:31Z dergraaf $
 # -----------------------------------------------------------------------------
 # 
 # DESCRIPTION
@@ -153,6 +153,9 @@ def generate(env, **kw):
 		# All constants are assumed to be float (32-bit) and not
 		# double (32-bit) by default.
 		"-fsingle-precision-constant",
+		# Warn if a float value is implicit promoted to double. Doubles are
+		# emulated in software while floats can use the FPU.
+		"-Wdouble-promotion",
 		"-mlong-calls",		# when using ".fastcode" without longcall
 		"-Wall",
 		"-Wformat",

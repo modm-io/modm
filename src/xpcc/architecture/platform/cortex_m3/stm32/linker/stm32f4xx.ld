@@ -134,10 +134,10 @@ PROVIDE(__ram_end   = ORIGIN(RAM) + LENGTH(RAM));
 PROVIDE(__heap_end  = ORIGIN(RAM) + LENGTH(RAM));
 
 /* Used for interrupt handlers */
-HANDLER_STACK_SIZE = 124 + 4;
+HANDLER_STACK_SIZE = 512;
 
 /* Used during normal program execution */
-THREAD_STACK_SIZE = 508 + 4;
+THREAD_STACK_SIZE = 512;
 
 SECTIONS
 {

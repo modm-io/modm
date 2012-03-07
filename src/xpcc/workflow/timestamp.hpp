@@ -26,7 +26,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id$
+ * $Id: timestamp.hpp 755 2012-03-07 01:29:31Z dergraaf $
  */
 // ----------------------------------------------------------------------------
 
@@ -88,25 +88,25 @@ namespace xpcc
 		inline bool
 		operator < (const Timestamp& other) const
 		{
-			return ((int16_t) (time - other.time)) < 0;
+			return ((int_fast16_t) (time - other.time)) < 0;
 		}
 		
 		inline bool
 		operator > (const Timestamp& other) const
 		{
-			return ((int16_t) (time - other.time)) > 0;
+			return ((int_fast16_t) (time - other.time)) > 0;
 		}
 		
 		inline bool
 		operator <= (const Timestamp& other) const
 		{
-			return ((int16_t) (time - other.time)) <= 0;
+			return ((int_fast16_t) (time - other.time)) <= 0;
 		}
 		
 		inline bool
 		operator >= (const Timestamp& other) const
 		{
-			return ((int16_t) (time - other.time)) >= 0;
+			return ((int_fast16_t) (time - other.time)) >= 0;
 		}
 	
 	private:

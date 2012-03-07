@@ -26,7 +26,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id$
+ * $Id: thread.hpp 755 2012-03-07 01:29:31Z dergraaf $
  */
 // ----------------------------------------------------------------------------
 
@@ -96,6 +96,8 @@ namespace xpcc
 		/**
 		 * \brief	Thread
 		 * 
+		 * <h2>FreeRTOS suspend()/resume()</h2>
+		 * 
 		 * suspend() and resume() are dangerous and are therefore not available.
 		 * 
 		 * Example:
@@ -120,12 +122,14 @@ namespace xpcc
 		 */
 		class Thread
 		{
+			static const uint16_t minimalStackSize = 200;
+			
 		public:
 			/**
 			 * \brief	Create a Thread
 			 * 
 			 * \param	priority	Priority (default is 0)
-			 * \param	stackDepth	Stack size for the thread
+			 * \param	stackDepth	Stack size for the thread in bytes
 			 * \param	name		Name of the thread (only used for debugging,
 			 * 						can be left empty)
 			 * 
@@ -133,15 +137,15 @@ namespace xpcc
 			 * 			Create them be before calling Scheduler::schedule() or
 			 * 			stop the scheduler and restart it afterwards.
 			 */
-			Thread(unsigned portBASE_TYPE priority = 0,
-					unsigned short stackDepth = configMINIMAL_STACK_SIZE,
+			Thread(uint32_t priority = 0,
+					uint16_t stackDepth = minimalStackSize,
 					const char* name = NULL);
 			
 			/// Delete the thread
 			virtual ~Thread();
 			
 			/// Obtain the priority of the thread
-			unsigned portBASE_TYPE
+			uint32_t
 			getPriority() const;
 			
 			/**
@@ -151,7 +155,7 @@ namespace xpcc
 			 * value than the highest priority of a thread ready to run.
 			 */
 			void
-			setPriority(unsigned portBASE_TYPE priority);
+			setPriority(uint32_t priority);
 			
 			/**
 			 * \brief	When created suspends all real time kernel activity

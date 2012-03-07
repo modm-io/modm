@@ -26,7 +26,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id$
+ * $Id: thread.cpp 755 2012-03-07 01:29:31Z dergraaf $
  */
 // ----------------------------------------------------------------------------
 
@@ -35,7 +35,7 @@
 xpcc::rtos::Thread* xpcc::rtos::Thread::head = 0;
 
 // ----------------------------------------------------------------------------
-xpcc::rtos::Thread::Thread(uint32_t priority, uint32_t stackDepth, const char* name) :
+xpcc::rtos::Thread::Thread(uint32_t priority, uint16_t stackDepth, const char* name) :
 	next(0),
 	thread()
 {

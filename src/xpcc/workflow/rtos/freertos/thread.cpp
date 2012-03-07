@@ -26,7 +26,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id$
+ * $Id: thread.cpp 755 2012-03-07 01:29:31Z dergraaf $
  */
 // ----------------------------------------------------------------------------
 
@@ -62,28 +62,28 @@ xpcc::rtos::Thread::~Thread()
 }
 
 // ----------------------------------------------------------------------------
-xpcc::rtos::Thread::Thread(unsigned portBASE_TYPE priority,
-		unsigned short stackDepth,
+xpcc::rtos::Thread::Thread(uint32_t priority,
+		uint16_t stackDepth,
 		const char* name)
 {
 	xTaskCreate(
 			&wrapper,
 			(const signed char*) name,
-			stackDepth,
+			(stackDepth / 4) + 1,
 			this,
 			priority,
 			&this->handle);
 }
 
 // ----------------------------------------------------------------------------
-unsigned portBASE_TYPE
+uint32_t
 xpcc::rtos::Thread::getPriority() const
 {
 	return uxTaskPriorityGet(this->handle);
 }
 
 void
-xpcc::rtos::Thread::setPriority(unsigned portBASE_TYPE priority)
+xpcc::rtos::Thread::setPriority(uint32_t priority)
 {
 	vTaskPrioritySet(this->handle, priority);
 }
