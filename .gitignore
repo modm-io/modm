@@ -2,3 +2,4 @@
 .sconsign.dblite
 tests/
 doc/homepage/
+build/

@@ -10,6 +10,3 @@
 [submodule "ext/fatfs"]
 	path = ext/fatfs
 	url = git@github.com:roboterclubaachen/fatfs.git
-[submodule "ext/libmaple"]
-	path = ext/libmaple
-	url = git@github.com:roboterclubaachen/libmaple.git
