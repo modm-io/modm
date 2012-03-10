@@ -1,10 +1,5 @@
-   __  __ ___   ___ ___ 
-   \ \/ /  _ \ / __/ __|
-    )  (| |_) | (_| (__ 
-   /_/\_\  __/ \___\___|
-        | |   
-        |_|  Cross Platform Component Communication
-             http://roboterclubaachen.github.com/xpcc/
+Cross Platform Component Communication
+======================================
 
 The xpcc project consists of two main parts:
 
@@ -23,63 +18,79 @@ the EUROBOT competition, but it can be used for many other purposes as well.
 Get the Code
 -------------------------------------------------------------------------------
 
-$ git clone git://github.com/roboterclubaachen/xpcc.git xpcc
-$ cd xpcc
-$ git submodule init
-$ git submodule update
-
+    $ git clone git://github.com/roboterclubaachen/xpcc.git xpcc
+    $ cd xpcc
 
 Documentation
 -------------------------------------------------------------------------------
 
 The main documentation is created from doxygen files in the doc-folder. It can
-be found online at http://roboterclubaachen.github.com/xpcc/api/.
+be found [online here] (http://roboterclubaachen.github.com/xpcc/api/).
 
 
 Folder structure
 -------------------------------------------------------------------------------
 
-build
-   Temporary folder, build files created during building the unit tests etc.
-   go in here. Can be deleted to save disk space.
+<dl>
+<dt>build
+</dt><dd>
+Temporary folder, build files created during building the unit tests etc.
+go in here. Can be deleted to save disk space.
+</dd>
 
-doc
-   Documentation, mainly the doxygen documentation. The online documentation
-   on http://roboterclubaachen.github.com/xpcc/api/ is build by running 'doxygen doxyfile'
-   in this folder.
+<dt>doc
+</dt><dd>
+Documentation, mainly the doxygen documentation. The online documentation
+on http://roboterclubaachen.github.com/xpcc/api/ is build by running 'doxygen doxyfile'
+in this folder.
+</dd>
 
-examples
-   Example projects that show the usage of parts of the xpcc library. These
-   projects are always up to date and are tested to compile before a
-   release.
+<dt>examples
+</dt><dd>
+Example projects that show the usage of parts of the xpcc library. These
+projects are always up to date and are tested to compile before a
+release.
+</dd>
 
-release
-   Among other things some test programs which are run before a release to 
-   check that everything is compiling correctly.
+<dt>release
+</dt><dd>
+Among other things some test programs which are run before a release to 
+check that everything is compiling correctly.
+</dd>
 
-scons
-   SCons tools (e.g. xpcc.py for the build process, avr.py for compiling for
-   AVR microcontrollers, arm.py for compiling for ARM7 and Cortex-M0/3, etc.)
-   
-   Look at the SConstruct files in the example folder and the online
-   documentation to see how to use the provided scons tools.
+<dt>scons
+</dt><dd>
+SCons tools (e.g. xpcc.py for the build process, avr.py for compiling for
+AVR microcontrollers, arm.py for compiling for ARM7 and Cortex-M0/3, etc.)
 
-src
-   Source files for the xpcc library
+Look at the SConstruct files in the example folder and the online
+documentation to see how to use the provided scons tools.
+</dd>
 
-templates
-   Template files for xpcc, Unit-Tests etc.
+<dt>src
+</dt><dd>
+Source files for the xpcc library
+</dd>
 
-tests
-   Test programs, used during the development of the library. May be
-   out of date or not working at all.
+<dt>templates
+</dt><dd>
+Template files for xpcc, Unit-Tests etc.
+</dd>
 
-tools
-   Supporting tools for the usage of the library.
+<dt>tests
+</dt><dd>
+Test programs, used during the development of the library. May be
+out of date or not working at all.
+</dd>
 
-   For example the communication builder, used to generate header files for the
-   communication architecture from XML-files.
+<dt>tools
+</dt><dd>
+Supporting tools for the usage of the library.
 
+For example the communication builder, used to generate header files for the
+communication architecture from XML-files.
+</dd>
+</dl>
 
 How can I contribute?
 -------------------------------------------------------------------------------
