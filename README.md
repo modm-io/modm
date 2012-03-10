@@ -20,6 +20,15 @@ The primary aim has been the usage of this system in autonomous robots for
 the EUROBOT competition, but it can be used for many other purposes as well.
 
 
+Get the Code
+-------------------------------------------------------------------------------
+
+$ git clone git://github.com/roboterclubaachen/xpcc.git xpcc
+$ cd xpcc
+$ git submodule init
+$ git submodule update
+
+
 Documentation
 -------------------------------------------------------------------------------
 

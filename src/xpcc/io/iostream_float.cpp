@@ -102,7 +102,7 @@ xpcc::IOStream::writeFloat(const float& value)
 	
 	this->writeInteger(ep);
 #else
-	snprintf(str, sizeof(str), "%.5e", value);
+	snprintf(str, sizeof(str), "%.5e", (double) value);
 	this->device->write(str);
 #endif
 }

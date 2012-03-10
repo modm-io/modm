@@ -104,7 +104,7 @@ namespace xpcc
 			 * 			stop the scheduler and restart it afterwards.
 			 */
 			Thread(uint32_t priority = 0,
-					uint32_t stackDepth = 0,
+					uint16_t stackDepth = 0,
 					const char* name = NULL);
 			
 			/// Delete the thread
