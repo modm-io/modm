@@ -1,12 +1,14 @@
-External Libraries and Git Submodules
-=====================================
+External Libraries
+==================
 This folder is used to store external libraries, that we have adapted to our needs.
-External libraries should be added as git submodules whenever possible.
+Even though we should use git submodules for this, they do not work when using svn to 
+checkout the repository.
+We therefore just store a copy of the repositories here.
 
 Choosing the external library
 -----------------------------
 If the external library already exists on GitHub, fork it and apply
-your modifications before adding it as a git submodule.
+your modifications before adding the neccessary files.
 Basic instructions on forking can be found [here](http://help.github.com/fork-a-repo/).
 
 If the external library is not available as a git repository, you have to create a
@@ -36,7 +38,4 @@ The upstream branch will contain the unmodified releases of the source code, so 
 You can then apply your modifications on the master branch and copy new releases into the upstream branch.
 This way you can merge the upstream branch into the master branch without loosing your modifications.
 
-Git Submodules adding, using, removing and updating
----------------------------------------------------
-[Chris Jean](http://chrisjean.com/2009/04/20/git-submodules-adding-using-removing-and-updating/)
-wrote an excellent post about that.
+Then just copy the files of the master branch into this folder and commit and push.
