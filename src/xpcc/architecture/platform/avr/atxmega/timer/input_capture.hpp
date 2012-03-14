@@ -26,7 +26,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * 
- * $Id: input_capture.hpp 656 2011-11-30 19:16:10Z dergraaf $
+ * $hello please remove me$
  */
 // ----------------------------------------------------------------------------
 

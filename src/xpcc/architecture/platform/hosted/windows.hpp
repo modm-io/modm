@@ -26,7 +26,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: windows.hpp 707 2012-01-26 12:30:06Z georgi-g $
+ * $hello please remove me$
  */
 // ----------------------------------------------------------------------------
 /**

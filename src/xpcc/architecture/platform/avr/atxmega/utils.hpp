@@ -26,7 +26,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * 
- * $Id: utils.hpp 639 2011-11-21 21:42:12Z dergraaf $
+ * $hello please remove me$
  */
 // ----------------------------------------------------------------------------
 

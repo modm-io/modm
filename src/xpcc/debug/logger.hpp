@@ -26,7 +26,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: logger.hpp 645 2011-11-24 20:51:20Z dergraaf $
+ * $hello please remove me$
  */
 // ----------------------------------------------------------------------------
 

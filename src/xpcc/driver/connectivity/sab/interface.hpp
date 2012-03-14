@@ -26,7 +26,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * 
- * $Id: interface.hpp 684 2012-01-06 17:29:21Z dergraaf $
+ * $hello please remove me$
  */
 // ----------------------------------------------------------------------------
 

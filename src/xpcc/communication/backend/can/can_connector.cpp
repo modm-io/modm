@@ -26,7 +26,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * 
- * $Id: can_connector.cpp 690 2012-01-12 21:57:59Z dergraaf $
+ * $hello please remove me$
  */
 // ----------------------------------------------------------------------------
 
