@@ -29,45 +29,110 @@
 // ----------------------------------------------------------------------------
 {{ generation_block }}
 
-#include "spi_{{ id.lower() }}.hpp"
-#include <avr/interrupt.h>
-#include <xpcc/architecture/driver/gpio.hpp>
+#include "spi_{{ port.lower() }}.hpp"
+#include <xpcc/architecture/platform.hpp>
 
-#ifdef SPI{{ id }}
+#ifdef SPI{{ port }}
 
 namespace
 {
-	GPIO__OUTPUT(SCK, {{ id }}, 7);
-	GPIO__INPUT(MISO, {{ id }}, 6);
-	GPIO__OUTPUT(MOSI, {{ id }}, 5);
-	GPIO__OUTPUT(SS, {{ id }}, 4);
+	GPIO__OUTPUT(SCK, {{ port }}, 7);
+	GPIO__INPUT(MISO, {{ port }}, 6);
+	GPIO__OUTPUT(MOSI, {{ port }}, 5);
+	GPIO__OUTPUT(SS, {{ port }}, 4);
+	
+	static uint8_t* transmitBuffer(0);
+	static uint8_t* receiveBuffer(0);
+	static uint16_t bufferLength(0);
+	enum
+	{
+		BUFFER_TRANSMIT_INCR_bm = 0x01,
+		BUFFER_RECEIVE_INCR_bm = 0x02,
+		BUFFER_TRANSMIT_IS_NOT_ZERO_bm = 0x04,
+		BUFFER_RECEIVE_IS_NOT_ZERO_bm = 0x08,
+		BUFFER_IS_DUMMY_bm = 0x10,
+		BUFFER_IS_BUSY_SYNC_bm = 0x20
+	};
+	static uint8_t status(0);
 }
 
 // ----------------------------------------------------------------------------
 void
-xpcc::atxmega::SpiMaster{{ id }}::initialize(SPI_PRESCALER_t prescaler, 
-		bool doubleSpeed, SPI_MODE_t mode)
+xpcc::atxmega::SpiMaster{{ port }}::initialize(spi::Prescaler prescaler, 
+											   spi::Mode mode)
 {
 	SS::setOutput();
 	MOSI::setOutput();
 	SCK::setOutput();
 	MISO::setInput(PULLUP);
 	
-	SPI{{ id }}_CTRL = SPI_ENABLE_bm | SPI_MASTER_bm | mode;
-	
-	setPrescaler(prescaler, doubleSpeed);
+	SPI{{ port }}_CTRL = SPI_ENABLE_bm | SPI_MASTER_bm | mode | prescaler;
 }
 
-uint8_t
-xpcc::atxmega::SpiMaster{{ id }}::write(uint8_t data)
+// ----------------------------------------------------------------------------
+bool
+xpcc::atxmega::SpiMaster{{ port }}::setBuffer(uint16_t length, uint8_t* transmit, uint8_t* receive, bool transmitIncr, bool receiveIncr)
 {
-	SPI{{ id }}_STATUS;
-	SPI{{ id }}_DATA = data;
+	if (!isFinished()) return false;
 	
-	while (!(SPI{{ id }}_STATUS & SPI_IF_bm))
+	transmitBuffer = transmit;
+	receiveBuffer = receive ? receive : transmit;
+	bufferLength = length;
+	status &= ~(BUFFER_TRANSMIT_INCR_bm | BUFFER_RECEIVE_INCR_bm);
+	status |= (transmitIncr ? BUFFER_TRANSMIT_INCR_bm : 0) | (receiveIncr ? BUFFER_RECEIVE_INCR_bm : 0);
+	
+	return true;
+}
+
+bool
+xpcc::atxmega::SpiMaster{{ port }}::transfer(bool transmit, bool receive, bool /*wait*/)
+{
+	if (status & BUFFER_IS_BUSY_SYNC_bm)
+		return false;
+	
+	uint8_t rx(0), tx(0xff);
+	// send the buffer out, blocking
+	status |= BUFFER_IS_BUSY_SYNC_bm;
+	// check if we have to use a dummy buffer
+	transmit &= static_cast<bool>(transmitBuffer);
+	receive &= static_cast<bool>(receiveBuffer);
+	
+	if (status & BUFFER_TRANSMIT_INCR_bm) {
+		for(uint_fast16_t i=0; i < bufferLength; ++i) {
+			if (transmit) tx = transmitBuffer[i];
+			rx = write(tx);
+			if (receive) receiveBuffer[i] = rx;
+		}
+	}
+	else {
+		for(uint_fast16_t i=bufferLength; i > 0; --i) {
+			if (transmit) tx = transmitBuffer[i-1];
+			rx = write(tx);
+			if (receive) receiveBuffer[i-1] = rx;
+		}
+	}
+	status &= ~BUFFER_IS_BUSY_SYNC_bm;
+	
+	return true;
+}
+
+bool
+xpcc::atxmega::SpiMaster{{ port }}::isFinished()
+{
+	return !(status & BUFFER_IS_BUSY_SYNC_bm);
+}
+
+// ----------------------------------------------------------------------------
+uint8_t
+xpcc::atxmega::SpiMaster{{ port }}::write(uint8_t data)
+{
+	SPI{{ port }}_STATUS;
+	SPI{{ port }}_DATA = data;
+	
+	while (!(SPI{{ port }}_STATUS & SPI_IF_bm))
 		;
 	
-	return SPI{{ id }}_DATA;
+	return SPI{{ port }}_DATA;
 }
 
-#endif // SPI{{ id }}
+#endif // SPI{{ port }}

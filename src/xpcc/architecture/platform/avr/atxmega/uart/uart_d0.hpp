@@ -120,7 +120,7 @@ namespace xpcc
 			UartD0(uint32_t baudrate)
 			{
 				UartBaudD0::setBaudrate(baudrate);
-				this->initialise(); 
+				this->initialize(); 
 			}
 			
 			/* **************************************************** *
@@ -170,7 +170,7 @@ namespace xpcc
 			 * Does *not* set the baudrate. This should be done *before*.
 			 */
 			static void
-			initialise();
+			initialize();
 		};
 		
 		// --------------------------------------------------------------------
@@ -199,7 +199,7 @@ namespace xpcc
 			BufferedUartD0(uint32_t baudrate)
 			{
 				UartBaudD0::setBaudrate(baudrate);
-				this->initialise();
+				this->initialize();
 			}
 			
 			static void
@@ -249,7 +249,7 @@ namespace xpcc
 			
 		protected:
 			static void			
-			initialise();
+			initialize();
 		};
 		
 		// --------------------------------------------------------------------
@@ -280,7 +280,7 @@ namespace xpcc
 			BufferedUartFlowD0(uint32_t baudrate)
 			{
 				UartBaudD0::setBaudrate(baudrate);
-				this->initialise();
+				this->initialize();
 			}
 			
 			static void
@@ -309,30 +309,7 @@ namespace xpcc
 
 		protected:
 			static void			
-			initialise();
-		}; 
-		
-		// --------------------------------------------------------------------
-		/**
-		 * \brief		UARTD0 in SPI master mode
-		 * 
-		 * \ingroup		atxmega_spi
-		 * \ingroup		atxmega_uart
-		 */
-		class UartSpiD0 : public UartBase
-		{
-		public:
-			UartSpiD0()
-			{
-				this->initialise();
-			}
-						
-			static uint8_t
-			write(uint8_t data);
-			
-		protected:
-			static void
-			initialise();
+			initialize();
 		};
 	}
 }

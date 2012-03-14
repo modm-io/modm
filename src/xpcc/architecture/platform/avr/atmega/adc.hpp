@@ -73,13 +73,13 @@ namespace xpcc
 		 * int
 		 * main()
 		 * {
-		 *     xpcc::Adc::initialize(
-		 *             xpcc::Adc::REFERENCE_INTERNAL_2V56,
-		 *             xpcc::Adc::PRESCALER_64);
+		 *     xpcc::atmega::Adc::initialize(
+		 *             xpcc::atmega:Adc::REFERENCE_INTERNAL_2V56,
+		 *             xpcc::atmega:Adc::PRESCALER_64);
 		 *     
 		 *     ...
 		 *     // read channel 2
-		 *     uint16_t value = xpcc::Adc::readChannel(2);
+		 *     uint16_t value = xpcc::atmega:Adc::readChannel(2);
 		 *     ...
 		 * }
 		 * \endcode
@@ -87,14 +87,14 @@ namespace xpcc
 		 * Asynchronous mode:
 		 * \code
 		 * // start a new conversion on channel 3
-		 * xpcc::Adc::startConversion(3);
+		 * xpcc::atmega:Adc::startConversion(3);
 		 * 
 		 * // do something usefull while waiting for the result 
-		 * while (!xpcc::Adc::isFinished())
+		 * while (!xpcc::atmega:Adc::isFinished())
 		 *     ;
 		 * 
 		 * // read the converted value
-		 * uint16_t value = xpcc::Adc::getValue();
+		 * uint16_t value = xpcc::atmega:Adc::getValue();
 		 * \endcode
 		 *
 		 * Alternatively you can use the AdcInterrupt class to attach a function

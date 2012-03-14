@@ -33,6 +33,7 @@
 
 #include <avr/io.h>
 #include <stdint.h>
+#include <xpcc/driver/spi/spi_master.hpp>
 
 namespace xpcc
 {
@@ -42,7 +43,7 @@ namespace xpcc
 		 * \brief	SPI master module
 		 * \ingroup	atmega
 		 */
-		class Spi
+		class SpiMaster : public xpcc::SpiMaster
 		{
 		public:
 			enum Mode
@@ -77,6 +78,17 @@ namespace xpcc
 			
 			static uint8_t
 			write(uint8_t data);
+			
+			static bool
+			setBuffer(uint16_t length,
+					  uint8_t* transmit=0, uint8_t* receive=0,
+					  bool transmitIncr=true, bool receiveIncr=true);
+			
+			static bool
+			transfer(bool send=true, bool receive=false, bool wait=true);
+			
+			static bool
+			isFinished();
 		};
 	}
 }

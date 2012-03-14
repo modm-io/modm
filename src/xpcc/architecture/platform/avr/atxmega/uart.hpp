@@ -114,7 +114,7 @@ namespace xpcc {
 			 * Does *not* set the baudrate. This should be done *before*.
 			 */
 			static void
-			initialise();
+			initialize();
 
 			/**
 			 * \brief	Set baud rate
