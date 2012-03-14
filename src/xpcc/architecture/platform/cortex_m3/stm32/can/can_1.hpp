@@ -88,7 +88,7 @@ namespace xpcc
 			};
 			
 			/**
-			 * Configure the IO Pins for CAN1.
+			 * Configure the IO Pins for CAN1
 			 * 
 			 * \warning	Has to done before calling initialize()!
 			 */

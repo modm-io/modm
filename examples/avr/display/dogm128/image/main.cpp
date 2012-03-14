@@ -2,7 +2,7 @@
 #include <xpcc/architecture.hpp>
 
 #include <xpcc/driver/ui/display/ea_dog.hpp>
-#include <xpcc/driver/connectivity/software_spi.hpp>
+#include <xpcc/driver/connectivity/spi/software_spi.hpp>
 
 #include "images/image_64x64_0.hpp"
 #include "images/image_64x64_1.hpp"

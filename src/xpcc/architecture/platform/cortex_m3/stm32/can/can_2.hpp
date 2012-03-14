@@ -89,6 +89,8 @@ namespace xpcc
 			
 			/**
 			 * Configure the IO Pins for CAN2
+			 * 
+			 * \warning	Has to done before calling initialize()!
 			 */
 			static void
 			configurePins(Mapping mapping);
@@ -104,8 +106,8 @@ namespace xpcc
 			 * 			will overwrite the previous one if \c true otherwise
 			 * 			the incoming message will be discarded
 			 * 
-			 * \warning	Has to be before any other function from this class
-			 * 			(except configurePins())!
+			 * \warning	Has to called after configurePins(), but before any
+			 * 			other function from this class!
 			 */
 			static bool
 			initialize(can::Bitrate bitrate, uint32_t interruptPriority,

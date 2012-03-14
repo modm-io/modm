@@ -38,12 +38,11 @@
 #include "spi.hpp"
 #include <xpcc/driver/connectivity/spi/spi_master.hpp>
 
-#if defined(SPI{{ port }}) || defined(__DOXYGEN__)
-
 namespace xpcc
 {
 	namespace atxmega
 	{
+#if defined(SPI{{ port }}) || defined(__DOXYGEN__)
 		/**
 		 * \brief		SPI Master for Port {{ port }}
 		 *
@@ -86,6 +85,7 @@ namespace xpcc
 				return SPI{{ port }};
 			}
 		};
+#endif // SPI{{ port }}
 		
 {{ uart_spi.master(port, 0) }}
 		
@@ -93,6 +93,5 @@ namespace xpcc
 	}
 }
 
-#endif // SPI{{ port }}
 #endif // XPCC_ATXMEGA__SPI_{{ port }}_HPP
 

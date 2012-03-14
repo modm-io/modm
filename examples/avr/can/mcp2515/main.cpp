@@ -2,7 +2,7 @@
 #include <xpcc/architecture.hpp>
 
 #include <xpcc/driver/connectivity/can/mcp2515.hpp>
-#include <xpcc/driver/connectivity/software_spi.hpp>
+#include <xpcc/driver/connectivity/spi/software_spi.hpp>
 
 GPIO__OUTPUT(Cs, B, 4);
 GPIO__INPUT(Int, B, 2);

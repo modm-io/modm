@@ -42,12 +42,11 @@
 #include "spi.hpp"
 #include <xpcc/driver/connectivity/spi/spi_master.hpp>
 
-#if defined(SPID) || defined(__DOXYGEN__)
-
 namespace xpcc
 {
 	namespace atxmega
 	{
+#if defined(SPID) || defined(__DOXYGEN__)
 		/**
 		 * \brief		SPI Master for Port D
 		 *
@@ -90,6 +89,7 @@ namespace xpcc
 				return SPID;
 			}
 		};
+#endif // SPID
 		
 #if defined(USARTD0) || defined(__DOXYGEN__)
 		/**
@@ -225,5 +225,4 @@ namespace xpcc
 	}
 }
 
-#endif // SPID
 #endif // XPCC_ATXMEGA__SPI_D_HPP

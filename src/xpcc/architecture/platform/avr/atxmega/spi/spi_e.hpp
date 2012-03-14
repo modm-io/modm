@@ -42,12 +42,11 @@
 #include "spi.hpp"
 #include <xpcc/driver/connectivity/spi/spi_master.hpp>
 
-#if defined(SPIE) || defined(__DOXYGEN__)
-
 namespace xpcc
 {
 	namespace atxmega
 	{
+#if defined(SPIE) || defined(__DOXYGEN__)
 		/**
 		 * \brief		SPI Master for Port E
 		 *
@@ -90,6 +89,7 @@ namespace xpcc
 				return SPIE;
 			}
 		};
+#endif // SPIE
 		
 #if defined(USARTE0) || defined(__DOXYGEN__)
 		/**
@@ -225,5 +225,4 @@ namespace xpcc
 	}
 }
 
-#endif // SPIE
 #endif // XPCC_ATXMEGA__SPI_E_HPP

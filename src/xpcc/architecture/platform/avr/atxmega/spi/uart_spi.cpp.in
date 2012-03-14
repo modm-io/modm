@@ -30,11 +30,9 @@
 {{ generation_block }}
 
 #include <avr/io.h>
-
 #include <xpcc/architecture/platform/avr/atxmega.hpp>
 #include <xpcc/architecture/driver/gpio.hpp>
 #include "../dma.hpp"
-
 #include "spi_{{ id[0].lower() }}.hpp"
 #include "xpcc_config.hpp"
 

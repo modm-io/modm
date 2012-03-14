@@ -34,7 +34,7 @@
 #include <xpcc/architecture/platform.hpp>
 #include <xpcc/architecture/driver.hpp>
 
-#include <xpcc/driver/connectivity/software_spi.hpp>
+#include <xpcc/driver/connectivity/spi/software_spi.hpp>
 #include <xpcc/driver/connectivity/can/mcp2515.hpp>
 #include <xpcc/driver/storage/at45db0x1d.hpp>
 #include <xpcc/driver/storage/spi_ram.hpp>

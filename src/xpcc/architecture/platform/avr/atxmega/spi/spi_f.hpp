@@ -42,12 +42,11 @@
 #include "spi.hpp"
 #include <xpcc/driver/connectivity/spi/spi_master.hpp>
 
-#if defined(SPIF) || defined(__DOXYGEN__)
-
 namespace xpcc
 {
 	namespace atxmega
 	{
+#if defined(SPIF) || defined(__DOXYGEN__)
 		/**
 		 * \brief		SPI Master for Port F
 		 *
@@ -90,6 +89,7 @@ namespace xpcc
 				return SPIF;
 			}
 		};
+#endif // SPIF
 		
 #if defined(USARTF0) || defined(__DOXYGEN__)
 		/**
@@ -225,5 +225,4 @@ namespace xpcc
 	}
 }
 
-#endif // SPIF
 #endif // XPCC_ATXMEGA__SPI_F_HPP

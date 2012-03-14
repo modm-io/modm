@@ -3,7 +3,7 @@
 
 #include <xpcc/driver/ui/display/ea_dog.hpp>
 #include <xpcc/driver/ui/display/font.hpp>
-#include <xpcc/driver/connectivity/software_spi.hpp>
+#include <xpcc/driver/connectivity/spi/software_spi.hpp>
 #include <xpcc/workflow.hpp>
 
 #include "images/rca_logo_128x64.hpp"

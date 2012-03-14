@@ -33,7 +33,7 @@
 
 #include <avr/io.h>
 #include <stdint.h>
-#include <xpcc/driver/spi/spi_master.hpp>
+#include <xpcc/driver/connectivity/spi/spi_master.hpp>
 
 namespace xpcc
 {

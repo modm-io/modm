@@ -5,7 +5,7 @@
 #include <xpcc/debug/logger.hpp>
 
 #include <xpcc/driver/connectivity/can/mcp2515.hpp>
-#include <xpcc/driver/connectivity/software_spi.hpp>
+#include <xpcc/driver/connectivity/spi/software_spi.hpp>
 
 // set new log level
 #undef XPCC_LOG_LEVEL

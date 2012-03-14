@@ -34,11 +34,9 @@
 // ----------------------------------------------------------------------------
 
 #include <avr/io.h>
-
 #include <xpcc/architecture/platform/avr/atxmega.hpp>
 #include <xpcc/architecture/driver/gpio.hpp>
 #include "../dma.hpp"
-
 #include "spi_d.hpp"
 #include "xpcc_config.hpp"
 
