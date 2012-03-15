@@ -41,11 +41,25 @@ namespace
 	GPIO__OUTPUT(SckB13, B, 13);
 	GPIO__INPUT(MisoB14, B, 14);
 	GPIO__OUTPUT(MosiB15, B, 15);
+	
+	static uint8_t* transmitBuffer(0);
+	static uint8_t* receiveBuffer(0);
+	static uint16_t bufferLength(0);
+	enum
+	{
+		BUFFER_TRANSMIT_INCR_bm = 0x01,
+		BUFFER_RECEIVE_INCR_bm = 0x02,
+		BUFFER_TRANSMIT_IS_NOT_ZERO_bm = 0x04,
+		BUFFER_RECEIVE_IS_NOT_ZERO_bm = 0x08,
+		BUFFER_IS_DUMMY_bm = 0x10,
+		BUFFER_IS_BUSY_SYNC_bm = 0x20
+	};
+	static uint8_t status(0);
 }
 
 // ----------------------------------------------------------------------------
 void
-xpcc::stm32::Spi2::configurePins(Mapping mapping)
+xpcc::stm32::SpiMaster2::configurePins(Mapping mapping)
 {
 	// Enable clock
 	RCC->APB1ENR |= RCC_APB1ENR_SPI2EN;
@@ -69,7 +83,7 @@ xpcc::stm32::Spi2::configurePins(Mapping mapping)
 
 // ----------------------------------------------------------------------------
 void
-xpcc::stm32::Spi2::initialize(Mode mode, Prescaler prescaler)
+xpcc::stm32::SpiMaster2::initialize(Mode mode, Prescaler prescaler)
 {
 	RCC->APB1ENR |= RCC_APB1ENR_SPI2EN;
 	
@@ -88,10 +102,63 @@ xpcc::stm32::Spi2::initialize(Mode mode, Prescaler prescaler)
 	// reenable peripheral
 	SPI2->CR1 |= SPI_CR1_SPE;
 }
+	
+// ----------------------------------------------------------------------------
+bool
+xpcc::stm32::SpiMaster2::setBuffer(uint16_t length, uint8_t* transmit, uint8_t* receive, bool transmitIncr, bool receiveIncr)
+{
+	if (!isFinished()) return false;
+	
+	transmitBuffer = transmit;
+	receiveBuffer = receive ? receive : transmit;
+	bufferLength = length;
+	status &= ~(BUFFER_TRANSMIT_INCR_bm | BUFFER_RECEIVE_INCR_bm);
+	status |= (transmitIncr ? BUFFER_TRANSMIT_INCR_bm : 0) | (receiveIncr ? BUFFER_RECEIVE_INCR_bm : 0);
+	
+	return true;
+}
+
+bool
+xpcc::stm32::SpiMaster2::transfer(bool transmit, bool receive, bool /*wait*/)
+{
+	if (status & BUFFER_IS_BUSY_SYNC_bm)
+		return false;
+	
+	uint8_t rx(0), tx(0xff);
+	// send the buffer out, blocking
+	status |= BUFFER_IS_BUSY_SYNC_bm;
+	// check if we have to use a dummy buffer
+	transmit &= static_cast<bool>(transmitBuffer);
+	receive &= static_cast<bool>(receiveBuffer);
+	
+	if (status & BUFFER_TRANSMIT_INCR_bm) {
+		for(uint_fast16_t i=0; i < bufferLength; ++i) {
+			if (transmit) tx = transmitBuffer[i];
+			rx = write(tx);
+			if (receive) receiveBuffer[i] = rx;
+		}
+	}
+	else {
+		for(uint_fast16_t i=bufferLength; i > 0; --i) {
+			if (transmit) tx = transmitBuffer[i-1];
+			rx = write(tx);
+			if (receive) receiveBuffer[i-1] = rx;
+		}
+	}
+	status &= ~BUFFER_IS_BUSY_SYNC_bm;
+	
+	return true;
+}
+
+bool
+xpcc::stm32::SpiMaster2::isFinished()
+{
+	return !(status & BUFFER_IS_BUSY_SYNC_bm);
+}
 
 // ----------------------------------------------------------------------------
 uint8_t
-xpcc::stm32::Spi2::write(uint8_t data)
+xpcc::stm32::SpiMaster2::write(uint8_t data)
 {
 	while (!(SPI2->SR & SPI_SR_TXE)) {
 		// wait until the previous transmission is finished
