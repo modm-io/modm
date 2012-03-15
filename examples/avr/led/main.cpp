@@ -1,13 +1,6 @@
 // coding: utf-8
 #include <xpcc/architecture/platform.hpp>
 
-// DEBUG ######################################################################
-GPIO__OUTPUT(DEBUG1, F, 7);
-GPIO__OUTPUT(DEBUG2, F, 6);
-GPIO__OUTPUT(DEBUG3, F, 5);
-
-xpcc::atxmega::BufferedUartF0 uart(38400);
-
 // LED FADER ##################################################################
 #include <xpcc/driver/pwm.hpp>
 GPIO__OUTPUT(VPROG, D, 4);
@@ -29,22 +22,6 @@ typedef xpcc::led::TLC594XLed< ledController, 4 > Blue;
 xpcc::led::Pulse<Green> pulse;
 xpcc::led::Indicator<Blue> indicator;
 xpcc::led::DoubleIndicator<Red> strobe;
-
-// OUPUT ######################################################################
-#include <xpcc/io/iodevice_wrapper.hpp>
-xpcc::IODeviceWrapper<xpcc::atxmega::BufferedUartF0> device(uart);
-xpcc::IOStream stream(device);
-#include <xpcc/driver/ui/display.hpp>
-namespace lcd
-{
-	GPIO__OUTPUT(Backlight, A, 4);
-	GPIO__OUTPUT(Rs, A, 5);
-	GPIO__OUTPUT(Rw, A, 6);
-	GPIO__OUTPUT(E, A, 7);
-	GPIO__NIBBLE_LOW(Data, B);
-}
-// create a LCD object
-xpcc::Hd44780< lcd::E, lcd::Rw, lcd::Rs, lcd::Data > display(20, 4);
 
 // INTERRUPTS #################################################################
 #include <xpcc/architecture/driver/clock.hpp>
@@ -72,17 +49,6 @@ MAIN_FUNCTION // FINALLY ######################################################
 	
 	xpcc::atxmega::TimerC1::setMsTimer();
 	
-	// INIT LCD ***************************************************************
-	lcd::Backlight::setOutput(xpcc::gpio::LOW);
-	display.initialize();
-	display.setCursor(0, 0);
-	display << "### RESTART ###\n\n  booting...";
-	
-	// DEBUG ******************************************************************
-	DEBUG1::setOutput(xpcc::gpio::LOW);
-	DEBUG2::setOutput(xpcc::gpio::LOW);
-	DEBUG3::setOutput(xpcc::gpio::LOW);
-	
 	// LED FADER **************************************************************
 	xpcc::atxmega::DmaController::initialize();
 	LedSpi::initialize(F_CPU/2);
@@ -102,19 +68,16 @@ MAIN_FUNCTION // FINALLY ######################################################
 	LedTimer::getModuleBase().CCD = 1;
 	LedTimer::getModuleBase().PER = 513;
 	
+	ledController2::initialize(xpcc::max6966::CURRENT_20mA);
+	
 	// INTERRUPTS *************************************************************
 	xpcc::atxmega::enableInterruptLevel(xpcc::atxmega::INTERRUPT_CONTROL_LEVEL_ALL);
 	xpcc::atxmega::enableInterrupts();
-	xpcc::delay_ms(15);
-	
-	display.clear();
-	display.setCursor(0, 0);
 	
 	pulse.pulse(20);
 	indicator.indicate(200);
 	strobe.indicate(20);
 	
-	ledController2::initialize(xpcc::max6966::CURRENT_20mA);
 	ledController2::setChannel(17, 200);
 	
 	while (1)
