@@ -28,7 +28,7 @@ namespace lcd
 }
 
 // Graphic LCD
-xpcc::DogS102< xpcc::stm32::Spi1, lcd::CS, lcd::A0, lcd::Reset, false > display;
+xpcc::DogS102< xpcc::stm32::SpiMaster1, lcd::CS, lcd::A0, lcd::Reset, false > display;
 
 GPIO__INPUT(EncoderIndex, C, 13);
 GPIO__INPUT(EncoderA, C, 6);
