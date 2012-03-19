@@ -32,7 +32,9 @@
 #define	XPCC__TIMESTAMP_HPP
 
 #include <stdint.h>
+
 #include <xpcc/io/iostream.hpp>
+#include <xpcc/utils/arithmetic_traits.hpp>
 
 namespace xpcc
 {
@@ -46,6 +48,9 @@ namespace xpcc
 	 */ 
 	class Timestamp
 	{
+	public:
+		typedef uint_fast16_t Type;
+		
 	public:
 		///\param time in ms
 		Timestamp(const uint_fast16_t time = 0) : 
@@ -113,7 +118,7 @@ namespace xpcc
 	
 	// ------------------------------------------------------------------------
 	inline IOStream&
-	operator << ( IOStream& os, const Timestamp& t)
+	operator << (IOStream& os, const Timestamp& t)
 	{
 		os << t.getTime();
 		return os;

@@ -47,16 +47,16 @@ namespace
 		}
 		
 		static void
-		setTime(uint16_t time)
+		setTime(xpcc::Timestamp time)
 		{
 			DummyClock::time = time;
 		}
 		
 	private:
-		static uint16_t time;
+		static xpcc::Timestamp time;
 	};
 	
-	uint16_t DummyClock::time = 0;
+	xpcc::Timestamp DummyClock::time = 0;
 }
 
 // ----------------------------------------------------------------------------
@@ -97,20 +97,23 @@ TimeoutTest::testDefaultConstructor()
 void
 TimeoutTest::testTimeOverflow()
 {
-	// overflow after 65535
-	DummyClock::setTime(35570);
+	xpcc::Timestamp::Type time = xpcc::ArithmeticTraits<xpcc::Timestamp::Type>::max();
 	
-	xpcc::Timeout<DummyClock> timeout(30000);
+	// overflow after 65535 for uint16_t => 32767+100 = 32867
+	DummyClock::setTime(time / 2 + 100);
+	
+	xpcc::Timeout<DummyClock> timeout(time / 2 - 1);	//=> 32867 + 32767 = 65634 - 65535 = 99
 	
 	TEST_ASSERT_FALSE(timeout.isExpired());
 	
-	DummyClock::setTime(40000);
+	DummyClock::setTime(time);
 	TEST_ASSERT_FALSE(timeout.isExpired());
 	
-	DummyClock::setTime(33);
+	DummyClock::setTime(0);
 	TEST_ASSERT_FALSE(timeout.isExpired());
 	
-	DummyClock::setTime(34);
+	// Overflow happened. This needs to be avoided by the user!
+	DummyClock::setTime(100);
 	TEST_ASSERT_TRUE(timeout.isExpired());
 }
 

@@ -29,6 +29,7 @@
 // ----------------------------------------------------------------------------
 
 #include <xpcc/workflow/timestamp.hpp>
+#include <xpcc/utils/arithmetic_traits.hpp>
 
 #include "timestamp_test.hpp"
 
@@ -66,7 +67,7 @@ TimestampTest::testComparisons()
 	TEST_ASSERT_TRUE(t1 == t2);
 	TEST_ASSERT_FALSE(t1 != t2);
 	
-	t1 = 32767;
+	t1 = xpcc::ArithmeticTraits<xpcc::Timestamp::Type>::max() / 2;
 	
 	TEST_ASSERT_FALSE(t1 == t2);
 	TEST_ASSERT_TRUE(t1 != t2);
@@ -74,7 +75,7 @@ TimestampTest::testComparisons()
 	TEST_ASSERT_TRUE(t1 > t2);
 	TEST_ASSERT_TRUE(t1 >= t2);
 	
-	t1 = 32768;
+	t1 = xpcc::ArithmeticTraits<xpcc::Timestamp::Type>::max() / 2 + 1;
 	
 	TEST_ASSERT_TRUE(t1 < t2);
 	TEST_ASSERT_TRUE(t1 <= t2);
