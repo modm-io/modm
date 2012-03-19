@@ -39,7 +39,7 @@ BoundedQueueTest::testQueue()
 	
 	TEST_ASSERT_TRUE(queue.isEmpty());
 	
-	TEST_ASSERT_EQUALS(queue.getMaxSize(), 5);
+	TEST_ASSERT_EQUALS(queue.getMaxSize(), 5U);
 	
 	TEST_ASSERT_TRUE(queue.push(1));
 	TEST_ASSERT_TRUE(queue.push(2));
