@@ -38,71 +38,74 @@
 
 namespace xpcc
 {
-	/**
-	 * @brief	Driver for UART0 of the LPC2468
-	 * 
-	 * To use this class for other LPC2xxx device you need to check the PINSELx
-	 * and PINMODEx registers to match the location of the UARTs.
-	 * 
-	 * This implementation requires the VIC to be active.
-	 * 
-	 * @date	May 2011
-	 * @author	Fabian Greif 
-	 */
-	class Uart0
+	namespace lpc2000
 	{
-	public:
 		/**
-		 * @brief	Initialize the hardware
+		 * @brief	Driver for UART0 of the LPC2468
 		 * 
-		 * Sets the registers etc.
+		 * To use this class for other LPC2xxx device you need to check the PINSELx
+		 * and PINMODEx registers to match the location of the UARTs.
 		 * 
-		 * With the trigger level it is possible to make a tradeoff between
-		 * latency and interrupt count. A small value will give you more interrupts
-		 * but a faster response time, a bigger value will decrease the
-		 * number of interrupts.
-		 * Nonetheless after 3.5 - 4.5 character times the remaining bytes will
-		 * be collected from the FIFO. 
+		 * This implementation requires the VIC to be active.
 		 * 
-		 * Possible values for \c level:
-		 * - 0 => 1 byte
-		 * - 1 => 4 byte
-		 * - 2 => 8 byte
-		 * - 3 => 14 byte
-		 * 
-		 * @brief	level	Trigger level for the UART Fifos.
+		 * @date	May 2011
+		 * @author	Fabian Greif 
 		 */
-		static void
-		initialize(uint8_t level = 2);
-		
-		/**
-		 * @brief	Send a character
-		 * 
-		 * @param	c			character to be send
-		 * @param	blocking	If \c true the function will wait until the
-		 * 						character could be send. Otherwise the function
-		 * 						will return immediately even if sending failed.
-		 * @return	\c true if the character was send, \c false otherwise.
-		 */
-		static bool
-		write(uint8_t c, bool blocking = true);
-		
-		/**
-		 * @brief	Check if a character was received and is ready to be read
-		 */
-		static bool
-		isCharacterAvailable();
-		
-		/**
-		 * @brief	Read a single character
-		 * 
-		 * @return	\c true if a character was available and was stored in \c c,
-		 * 			false if nothing was available. \c c will remain untouched
-		 * 			in this case.
-		 */
-		static bool
-		read(uint8_t &c, bool blocking = false);
-	};
+		class Uart0
+		{
+		public:
+			/**
+			 * @brief	Initialize the hardware
+			 * 
+			 * Sets the registers etc.
+			 * 
+			 * With the trigger level it is possible to make a tradeoff between
+			 * latency and interrupt count. A small value will give you more interrupts
+			 * but a faster response time, a bigger value will decrease the
+			 * number of interrupts.
+			 * Nonetheless after 3.5 - 4.5 character times the remaining bytes will
+			 * be collected from the FIFO. 
+			 * 
+			 * Possible values for \c level:
+			 * - 0 => 1 byte
+			 * - 1 => 4 byte
+			 * - 2 => 8 byte
+			 * - 3 => 14 byte
+			 * 
+			 * @brief	level	Trigger level for the UART Fifos.
+			 */
+			static void
+			initialize(uint8_t level = 2);
+			
+			/**
+			 * @brief	Send a character
+			 * 
+			 * @param	c			character to be send
+			 * @param	blocking	If \c true the function will wait until the
+			 * 						character could be send. Otherwise the function
+			 * 						will return immediately even if sending failed.
+			 * @return	\c true if the character was send, \c false otherwise.
+			 */
+			static bool
+			write(uint8_t c, bool blocking = true);
+			
+			/**
+			 * @brief	Check if a character was received and is ready to be read
+			 */
+			static bool
+			isCharacterAvailable();
+			
+			/**
+			 * @brief	Read a single character
+			 * 
+			 * @return	\c true if a character was available and was stored in \c c,
+			 * 			false if nothing was available. \c c will remain untouched
+			 * 			in this case.
+			 */
+			static bool
+			read(uint8_t &c, bool blocking = false);
+		};
+	}
 }
 
 #endif // XPCC__UART0_H

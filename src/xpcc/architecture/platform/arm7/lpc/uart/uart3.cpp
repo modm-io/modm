@@ -139,7 +139,7 @@ uart3_interrupt(void)
 
 // ----------------------------------------------------------------------------
 void
-Uart3::initialize(uint8_t level)
+xpcc::lpc2000::Uart3::initialize(uint8_t level)
 {
 	// Turn power on
 	PCONP_p->peripheral.UART3 = 1;
@@ -177,7 +177,7 @@ Uart3::initialize(uint8_t level)
 
 // ----------------------------------------------------------------------------
 bool
-Uart3::write(uint8_t c, bool blocking)
+xpcc::lpc2000::Uart3::write(uint8_t c, bool blocking)
 {
 	while (!(U3LSR & UART_TX_BUFFER_FREE))
 	{
@@ -195,13 +195,13 @@ Uart3::write(uint8_t c, bool blocking)
 
 // ----------------------------------------------------------------------------
 bool
-Uart3::isCharacterAvailable()
+xpcc::lpc2000::Uart3::isCharacterAvailable()
 {
 	return !receiveQueue.isEmpty();
 }
 
 bool
-Uart3::read(uint8_t &c, bool blocking)
+xpcc::lpc2000::Uart3::read(uint8_t &c, bool blocking)
 {
 	do
 	{
