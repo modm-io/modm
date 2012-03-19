@@ -71,6 +71,7 @@
 #include "stm32/uart/usart_3.hpp"
 #include "stm32/uart/uart_4.hpp"
 #include "stm32/uart/uart_5.hpp"
+#include "stm32/uart/usart_6.hpp"
 
 #include "stm32/spi/spi_1.hpp"
 #include "stm32/spi/spi_2.hpp"
