@@ -264,13 +264,13 @@ namespace xpcc
 		 * 
 		 * namespace pin
 		 * {
-		 *     GPIO__OUTPUT(LED, B, 0);
+		 *     GPIO__OUTPUT(Led, B, 0);
 		 * }
 		 * 
-		 * typedef xpcc::Invert< pin::LED > LED;
+		 * typedef xpcc::gpio::Invert< pin::Led > Led;
 		 * 
 		 * ...
-		 * LED::reset();
+		 * Led::reset();
 		 * \endcode
 		 * 
 		 * \ingroup	gpio
@@ -282,57 +282,51 @@ namespace xpcc
 			ALWAYS_INLINE static void
 			setOutput()
 			{
-				pin.setOutput();
+				Pin::setOutput();
 			}
 			
 			ALWAYS_INLINE static void
 			setOutput(bool value)
 			{
-				pin.setOutput(!value);
+				Pin::setOutput(!value);
 			}
 			
 			ALWAYS_INLINE static void
 			setInput()
 			{
-				pin.setInput();
+				Pin::setInput();
 			}
 			
 			ALWAYS_INLINE static void
 			set()
 			{
-				pin.reset();
+				Pin::reset();
 			}
 			
 			ALWAYS_INLINE static void
 			set(bool value)
 			{
-				pin.set(!value);
+				Pin::set(!value);
 			}
 			
 			ALWAYS_INLINE static void
 			reset()
 			{
-				pin.set();
+				Pin::set();
 			}
 			
 			ALWAYS_INLINE static void
 			toggle()
 			{
-				pin.toggle();
+				Pin::toggle();
 			}
 			
 			ALWAYS_INLINE static bool
 			read()
 			{
-				return !pin.read();
+				return !Pin::read();
 			}
-			
-		protected:
-			static Pin pin;
 		};
-		
-		template <typename Pin>
-		Pin Invert<Pin>::pin;
 		
 		/**
 		 * \brief	Generic implementation of a Nibble composed of four
