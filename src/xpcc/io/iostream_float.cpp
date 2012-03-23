@@ -65,7 +65,7 @@ xpcc::IOStream::writeFloat(const float& value)
 			ep -= 1;
 		}
 
-		if (v >= 10) {
+		while (v > 10) {
 			v *= 0.1f;
 			ep += 1;
 		}
