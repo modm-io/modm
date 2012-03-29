@@ -60,7 +60,7 @@ namespace xpcc
 		 * \endcode
 		 * 
 		 * For using a 25 MHz crystal on a Connectivity Line device:
-		 * if (enableHSE(HSE_CRYSTAL))
+		 * if (enableHse(HSE_CRYSTAL))
 		 * {
 		 *     enablePll2(5, PLL2_MUL_8);	// 40 MHz = (25 MHz / 5) * 8
 		 *     enablePll(PLL_PREDIV1, PLL_MUL_9, PREDIV1_PLL2, 5);	// 72 MHz = (40 MHz / 5) * 9
@@ -76,7 +76,7 @@ namespace xpcc
 				HSE_CRYSTAL,
 				HSE_BYPASS,
 			};
-
+			
 			static bool
 			enableHse(HseConfig config, uint32_t waitCycles = 1500);
 

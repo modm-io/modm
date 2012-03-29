@@ -1,6 +1,10 @@
 *~
 *.pyc
 .sconsign.dblite
+.project
+.cproject
+.pydevproject
+.settings/
 tests/
 doc/homepage/
 build/

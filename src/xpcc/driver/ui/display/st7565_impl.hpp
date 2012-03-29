@@ -85,15 +85,12 @@ void
 xpcc::St7565<SPI, CS, A0, Reset, Width, Height, TopView>::initialize(
 		xpcc::accessor::Flash<uint8_t> configuration, uint8_t size)
 {
-	spi.initialize();
-	cs.set();
-	cs.setOutput();
-	
+	//spi.initialize();
+	cs.setOutput(xpcc::gpio::HIGH);
 	a0.setOutput();
 	
 	// reset the controller
-	reset.setOutput();
-	reset.reset();
+	reset.setOutput(xpcc::gpio::LOW);
 	xpcc::delay_ms(50);
 	reset.set();
 	

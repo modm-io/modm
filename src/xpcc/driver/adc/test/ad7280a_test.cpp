@@ -1,11 +1,11 @@
 // coding: utf-8
 // ----------------------------------------------------------------------------
-/* Copyright (c) 2011, Roboterclub Aachen e.V.
+/* Copyright (c) 2012, Roboterclub Aachen e.V.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -28,66 +28,84 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__MCP4922_HPP
-	#error	"Don't include this file directly, use 'mcp4922.hpp' instead!"
-#endif
+#include <xpcc/driver/adc/ad7280a.hpp>
 
-// ----------------------------------------------------------------------------
-template <typename Spi, typename Cs, typename Ldac>
-void
-xpcc::Mcp4922<Spi, Cs, Ldac>::initialize()
+#include "ad7280a_test.hpp"
+
+#define ENABLE_MACRO_EXPORT
+#include "spi_device.hpp"
+#undef ENABLE_MACRO_EXPORT
+
+test::SpiDevice device;
+
+class Spi
 {
-	//spi.initialize();
+public:
+	static uint8_t
+	write(uint8_t data)
+	{
+		return device.write(data);
+	}
+};
+
+struct Cs
+{
+	static inline void
+	set()
+	{
+		device.deselect();
+	}
 	
-	Cs::setOutput(xpcc::gpio::HIGH);
-	Ldac::setOutput(xpcc::gpio::HIGH);
+	static inline void
+	reset()
+	{
+		device.select();
+	}
+};
+
+typedef xpcc::Ad7280a<Spi, Cs> Ad7280a;
+
+void
+Ad7280aTest::testCrcByte()
+{
+	TEST_ASSERT_EQUALS(Ad7280a::updateCrc(0x00),   0);
+	TEST_ASSERT_EQUALS(Ad7280a::updateCrc(0x10), 174);
+	TEST_ASSERT_EQUALS(Ad7280a::updateCrc(0x20), 115);
+	TEST_ASSERT_EQUALS(Ad7280a::updateCrc(0x51), 103);
+	TEST_ASSERT_EQUALS(Ad7280a::updateCrc(0xAB), 182);
+	TEST_ASSERT_EQUALS(Ad7280a::updateCrc(0xEF), 236);
+	TEST_ASSERT_EQUALS(Ad7280a::updateCrc(0xFF),  66);
 }
 
-// ----------------------------------------------------------------------------
-template <typename Spi, typename Cs, typename Ldac>
 void
-xpcc::Mcp4922<Spi, Cs, Ldac>::setChannelA(uint16_t value, bool doubleGain)
+Ad7280aTest::testCrcMessage()
 {
-	if (doubleGain) {
-		writeRegister(BUF | SHDN | (value & 0x0fff));
-	}
-	else {
-		writeRegister(GA | BUF | SHDN | (value & 0x0fff));
-	}
-}
-
-template <typename Spi, typename Cs, typename Ldac>
-void
-xpcc::Mcp4922<Spi, Cs, Ldac>::setChannelB(uint16_t value, bool doubleGain)
-{
-	if (doubleGain) {
-		writeRegister(CHANNEL_B | BUF | SHDN | (value & 0x0fff));
-	}
-	else {
-		writeRegister(CHANNEL_B | GA | BUF | SHDN | (value & 0x0fff));
-	}
-}
-
-// ----------------------------------------------------------------------------
-template <typename Spi, typename Cs, typename Ldac>
-void
-xpcc::Mcp4922<Spi, Cs, Ldac>::update()
-{
-	xpcc::delay_us(0.04);
-	Ldac::reset();
-	xpcc::delay_us(0.1);
-	Ldac::set();
-}
-
-// ----------------------------------------------------------------------------
-template <typename Spi, typename Cs, typename Ldac>
-void
-xpcc::Mcp4922<Spi, Cs, Ldac>::writeRegister(uint16_t value)
-{
-	Cs::reset();
+	// Datasheet Example 1
+	TEST_ASSERT_EQUALS(Ad7280a::calculateCrc(0x003430), 0x51);
 	
-	Spi::write(static_cast<uint8_t>(value >> 8));
-	Spi::write(static_cast<uint8_t>(value & 0xff));
+	// Datasheet Example 2
+	TEST_ASSERT_EQUALS(Ad7280a::calculateCrc(0x103430), 0x74);
 	
-	Cs::set();
+	// Datasheet Example 3
+	TEST_ASSERT_EQUALS(Ad7280a::calculateCrc(0x0070A1), 0x9A);
+	
+	// Datasheet Example 4
+	TEST_ASSERT_EQUALS(Ad7280a::calculateCrc(0x205335), 0x46);
+}
+
+void
+Ad7280aTest::testInitialize()
+{
+	test::Transmission transmissionsInitialize[] = {
+		test::Transmission(4, RX_DATA(0x01,0xC2,0xB6,0xE2), TX_DATA(0,0,0,0)),
+		test::Transmission(4, RX_DATA(0x03,0x87,0x16,0xCA), TX_DATA(0,0,0,0)),
+		test::Transmission(4, RX_DATA(0xF8,0x00,0x03,0x0A), TX_DATA(0,0,0,0)),
+	};
+	
+	device.start(transmissionsInitialize, ARRAY_SIZE(transmissionsInitialize));
+	
+	TEST_ASSERT_TRUE(Ad7280a::initialize());
+	
+	TEST_ASSERT_TRUE(device.isSuccessful());
+	device.reportErrors();
 }

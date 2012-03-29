@@ -46,6 +46,8 @@ namespace xpcc
 	/**
 	 * \brief	EA DOGS102-6
 	 * 
+	 * SPI needs to operate in Mode 3. Maximum SPI frequency is 33 MHz.
+	 * 
 	 * \see		<a href="http://www.lcd-module.de/eng/pdf/grafik/dogs102-6e.pdf">Datasheet</a>
 	 * \ingroup	lcd
 	 */

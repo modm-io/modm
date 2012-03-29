@@ -1,11 +1,11 @@
 // coding: utf-8
 // ----------------------------------------------------------------------------
-/* Copyright (c) 2011, Roboterclub Aachen e.V.
+/* Copyright (c) 2009, Roboterclub Aachen e.V.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -25,69 +25,26 @@
  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * $Id: testsuite.hpp 607 2011-09-13 19:51:03Z dergraaf $
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__MCP4922_HPP
-	#error	"Don't include this file directly, use 'mcp4922.hpp' instead!"
-#endif
+#include "testsuite.hpp"
 
 // ----------------------------------------------------------------------------
-template <typename Spi, typename Cs, typename Ldac>
-void
-xpcc::Mcp4922<Spi, Cs, Ldac>::initialize()
+unittest::TestSuite::~TestSuite()
 {
-	//spi.initialize();
-	
-	Cs::setOutput(xpcc::gpio::HIGH);
-	Ldac::setOutput(xpcc::gpio::HIGH);
+}
+		
+// ----------------------------------------------------------------------------
+void
+unittest::TestSuite::setUp()
+{
 }
 
 // ----------------------------------------------------------------------------
-template <typename Spi, typename Cs, typename Ldac>
 void
-xpcc::Mcp4922<Spi, Cs, Ldac>::setChannelA(uint16_t value, bool doubleGain)
+unittest::TestSuite::tearDown()
 {
-	if (doubleGain) {
-		writeRegister(BUF | SHDN | (value & 0x0fff));
-	}
-	else {
-		writeRegister(GA | BUF | SHDN | (value & 0x0fff));
-	}
-}
-
-template <typename Spi, typename Cs, typename Ldac>
-void
-xpcc::Mcp4922<Spi, Cs, Ldac>::setChannelB(uint16_t value, bool doubleGain)
-{
-	if (doubleGain) {
-		writeRegister(CHANNEL_B | BUF | SHDN | (value & 0x0fff));
-	}
-	else {
-		writeRegister(CHANNEL_B | GA | BUF | SHDN | (value & 0x0fff));
-	}
-}
-
-// ----------------------------------------------------------------------------
-template <typename Spi, typename Cs, typename Ldac>
-void
-xpcc::Mcp4922<Spi, Cs, Ldac>::update()
-{
-	xpcc::delay_us(0.04);
-	Ldac::reset();
-	xpcc::delay_us(0.1);
-	Ldac::set();
-}
-
-// ----------------------------------------------------------------------------
-template <typename Spi, typename Cs, typename Ldac>
-void
-xpcc::Mcp4922<Spi, Cs, Ldac>::writeRegister(uint16_t value)
-{
-	Cs::reset();
-	
-	Spi::write(static_cast<uint8_t>(value >> 8));
-	Spi::write(static_cast<uint8_t>(value & 0xff));
-	
-	Cs::set();
 }

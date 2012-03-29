@@ -1,6 +1,6 @@
 // coding: utf-8
 // ----------------------------------------------------------------------------
-/* Copyright (c) 2009, Roboterclub Aachen e.V.
+/* Copyright (c) 2012, Roboterclub Aachen e.V.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -25,36 +25,102 @@
  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- * $Id: testsuite.hpp 607 2011-09-13 19:51:03Z dergraaf $
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	UNITTEST__TESTSUITE_HPP
-#define	UNITTEST__TESTSUITE_HPP
+#ifndef TEST__SPI_DEVICE_HPP
+#define TEST__SPI_DEVICE_HPP
 
-#include "harness.hpp"
+#include <cstddef>
+#include <stdint.h>
 
-namespace unittest
+namespace test
 {
+	#ifdef ENABLE_MACRO_EXPORT
+	#	define ANONYMOUS_ARRAY(type, ...)	((type []) { __VA_ARGS__ })
+	#	define ARRAY_SIZE(a)	(sizeof(a) / sizeof(a[0]))	
+	#	define RX_DATA(...)		ANONYMOUS_ARRAY(uint8_t, __VA_ARGS__)
+	#	define TX_DATA(...)		ANONYMOUS_ARRAY(uint8_t, __VA_ARGS__)
+	#endif
+	
 	/**
-	 * \brief	Base class for every test suite
+	 * Single SPI transmission
 	 * 
-	 * \author	Fabian Greif
-	 * \ingroup	unittest
+	 * Example:
+	 * \code
+	 * 
 	 */
-	class TestSuite
+	struct Transmission
+	{
+		Transmission(std::size_t length, uint8_t* rx, uint8_t* tx) :
+			length(length), rx(rx), tx(tx)
+		{
+		}
+		
+		std::size_t length;
+		
+		uint8_t *rx;
+		uint8_t *tx;
+	};
+	
+	/**
+	 * Mock-Up class to simulate SPI devices.
+	 */
+	class SpiDevice
 	{
 	public:
-		virtual
-		~TestSuite();
+		SpiDevice();
 		
-		virtual void
-		setUp();
+		~SpiDevice();
 		
-		virtual void
-		tearDown();
+		void
+		select();
+		
+		void
+		deselect();
+		
+		uint8_t
+		write(uint8_t data);
+		
+		/**
+		 * Start a new set of transmissions.
+		 * 
+		 * Sets the expected transmissions and resets the internal state.
+		 */
+		void
+		start(const Transmission* transmissions,
+				std::size_t transmissionCount);
+		
+		/**
+		 * Check if all transmission were finished successful (content &
+		 * size correct).
+		 */
+		bool
+		isSuccessful();
+		
+		/// Dump an Error report to the console
+		void
+		reportErrors();
+		
+	private:
+		/// Transmission data
+		const Transmission* transmissions;
+		
+		/// Total number of expected transmissions
+		std::size_t transmissionCount;
+		
+		std::size_t currentTransmission;
+		
+		/// Number of Bytes written during the current transmission
+		std::size_t bytesWritten;
+		
+		/// Device is selected via the CS pin
+		bool selected;
+		
+		bool successful;
+		bool complete;
 	};
 }
 
-#endif	// UNITTEST__TESTSUITE_HPP
+#endif // TEST__SPI_DEVICE_HPP
+

@@ -75,6 +75,24 @@ class FunctionScanner:
 		self.text = self.commentFilter.sub('', self.text)
 
 # -----------------------------------------------------------------------------
+def generateClassName(s):
+	words = s.split('_')
+	name = []
+	for word in words:
+		index = 0
+		for c in word:
+			if c.isalpha():
+				break
+			index += 1
+		
+		name.append(word[0:index])
+		name.append(word[index].upper())
+		name.append(word[index+1:])
+	
+	return ''.join(name)
+
+# -----------------------------------------------------------------------------
+
 def unittest_action(target, source, env):
 	if not env.has_key('template'):
 		raise SCons.Errors.UserError, "Use 'UnittestRunner(..., template = ...)'"
@@ -88,7 +106,7 @@ def unittest_action(target, source, env):
 		basename = os.path.splitext(file.name)[0]
 		
 		# io_stream_test -> IoStreamTest
-		class_name = basename.title().replace('_', '')
+		class_name = generateClassName(basename)
 		scanner = FunctionScanner(file.abspath)
 		
 		tests[class_name] = {

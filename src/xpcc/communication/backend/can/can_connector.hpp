@@ -36,6 +36,26 @@
 #include <xpcc/container/linked_list.hpp>
 #include "../backend_interface.hpp"
 
+// Filter
+#define XPCC_CAN_PACKET_DESTINATION(x)		(static_cast<uint32_t>(x) << 16)
+#define XPCC_CAN_PACKET_SOURCE(x)			(static_cast<uint32_t>(x) << 8)
+#define XPCC_CAN_PACKET_ID(x)				(static_cast<uint32_t>(x) << 0)
+
+#define XPCC_CAN_PACKET_TYPE_REQUEST		(0x00UL << 24)
+#define XPCC_CAN_PACKET_ACKNOWLEDGE			(0x04UL << 24)
+
+#define	XPCC_CAN_PACKET_EVENT				(XPCC_CAN_PACKET_TYPE_REQUEST | XPCC_CAN_PACKET_DESTINATION(0))
+
+// Filter Mask
+#define XPCC_CAN_PACKET_DESTINATION_MASK	XPCC_CAN_PACKET_DESTINATION(0xff)
+#define XPCC_CAN_PACKET_SOURCE_MASK			XPCC_CAN_PACKET_SOURCE(0xff)
+#define XPCC_CAN_PACKET_ID_MASK				XPCC_CAN_PACKET_ID(0xff)
+
+#define XPCC_CAN_PACKET_TYPE_MASK			(0x18UL << 24)
+#define XPCC_CAN_PACKET_ACKNOWLEDGE_MASK	(0x04UL << 24)
+
+#define	XPCC_CAN_PACKET_EVENT_MASK			(XPCC_CAN_PACKET_DESTINATION_MASK | XPCC_CAN_PACKET_TYPE_MASK)
+
 namespace xpcc
 {
 	class CanConnectorBase

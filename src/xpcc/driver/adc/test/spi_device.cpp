@@ -1,11 +1,11 @@
 // coding: utf-8
 // ----------------------------------------------------------------------------
-/* Copyright (c) 2011, Roboterclub Aachen e.V.
+/* Copyright (c) 2012, Roboterclub Aachen e.V.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -28,66 +28,122 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__MCP4922_HPP
-	#error	"Don't include this file directly, use 'mcp4922.hpp' instead!"
-#endif
+#include "spi_device.hpp"
 
 // ----------------------------------------------------------------------------
-template <typename Spi, typename Cs, typename Ldac>
-void
-xpcc::Mcp4922<Spi, Cs, Ldac>::initialize()
+test::SpiDevice::SpiDevice() :
+	transmissions(0),
+	transmissionCount(0),
+	currentTransmission(0),
+	bytesWritten(0),
+	selected(false),
+	successful(true),
+	complete(true)
 {
-	//spi.initialize();
-	
-	Cs::setOutput(xpcc::gpio::HIGH);
-	Ldac::setOutput(xpcc::gpio::HIGH);
+}
+
+test::SpiDevice::~SpiDevice()
+{
+	// TODO delete error handling
 }
 
 // ----------------------------------------------------------------------------
-template <typename Spi, typename Cs, typename Ldac>
 void
-xpcc::Mcp4922<Spi, Cs, Ldac>::setChannelA(uint16_t value, bool doubleGain)
+test::SpiDevice::select()
 {
-	if (doubleGain) {
-		writeRegister(BUF | SHDN | (value & 0x0fff));
+	if (!selected) {
+		if (currentTransmission < transmissionCount) {
+			selected = true;
+			bytesWritten = 0;
+		}
+		else {
+			successful = false;
+			// TODO report error
+		}
+	}
+}
+
+void
+test::SpiDevice::deselect()
+{
+	if (selected)
+	{
+		const Transmission* t = &transmissions[currentTransmission];
+		if (bytesWritten != t->length) {
+			successful = false;
+			// TODO report error
+		}
+		
+		if (currentTransmission < transmissionCount) {
+			currentTransmission++;
+			if (currentTransmission == transmissionCount) {
+				complete = true;
+			}
+		}
+		else {
+			successful = false;
+			// TODO report error
+		}
+	}
+	selected = false;
+}
+
+uint8_t
+test::SpiDevice::write(uint8_t data)
+{
+	uint8_t out = 0xff;
+	
+	if (selected)
+	{
+		const Transmission* t = &transmissions[currentTransmission];
+		
+		if (bytesWritten < t->length) {
+			if (data != t->rx[bytesWritten]) {
+				successful = false;
+				// TODO Error reporting
+			}
+			out = t->tx[bytesWritten];
+		}
+		else {
+			successful = false;
+			// TODO Error reporting
+		}
+		bytesWritten++;
 	}
 	else {
-		writeRegister(GA | BUF | SHDN | (value & 0x0fff));
+		successful = false;
+		// TODO Error reporting
 	}
-}
-
-template <typename Spi, typename Cs, typename Ldac>
-void
-xpcc::Mcp4922<Spi, Cs, Ldac>::setChannelB(uint16_t value, bool doubleGain)
-{
-	if (doubleGain) {
-		writeRegister(CHANNEL_B | BUF | SHDN | (value & 0x0fff));
-	}
-	else {
-		writeRegister(CHANNEL_B | GA | BUF | SHDN | (value & 0x0fff));
-	}
+	
+	return out;
 }
 
 // ----------------------------------------------------------------------------
-template <typename Spi, typename Cs, typename Ldac>
 void
-xpcc::Mcp4922<Spi, Cs, Ldac>::update()
+test::SpiDevice::start(const Transmission* transmissions,
+		std::size_t transmissionCount)
 {
-	xpcc::delay_us(0.04);
-	Ldac::reset();
-	xpcc::delay_us(0.1);
-	Ldac::set();
+	complete = (transmissionCount == 0);
+	successful = true;
+	
+	this->transmissions = transmissions;
+	this->transmissionCount = transmissionCount;
+	
+	currentTransmission = 0;
+	bytesWritten = 0;
+	selected = false;
+	
+	// TODO reset error report
 }
 
-// ----------------------------------------------------------------------------
-template <typename Spi, typename Cs, typename Ldac>
-void
-xpcc::Mcp4922<Spi, Cs, Ldac>::writeRegister(uint16_t value)
+bool
+test::SpiDevice::isSuccessful()
 {
-	Cs::reset();
-	
-	Spi::write(static_cast<uint8_t>(value >> 8));
-	Spi::write(static_cast<uint8_t>(value & 0xff));
-	
-	Cs::set();
+	return (complete && successful);
+}
+
+void
+test::SpiDevice::reportErrors()
+{
+	// TODO generate an error report
 }

@@ -1,11 +1,11 @@
 // coding: utf-8
 // ----------------------------------------------------------------------------
-/* Copyright (c) 2011, Roboterclub Aachen e.V.
+/* Copyright (c) 2012, Roboterclub Aachen e.V.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -28,66 +28,26 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__MCP4922_HPP
-	#error	"Don't include this file directly, use 'mcp4922.hpp' instead!"
-#endif
+#ifndef SPI_DEVICE_TEST_HPP
+#define SPI_DEVICE_TEST_HPP
 
-// ----------------------------------------------------------------------------
-template <typename Spi, typename Cs, typename Ldac>
-void
-xpcc::Mcp4922<Spi, Cs, Ldac>::initialize()
+#include <unittest/testsuite.hpp>
+
+class SpiDeviceTest : public unittest::TestSuite
 {
-	//spi.initialize();
+public:
+	void
+	testInitialState();
 	
-	Cs::setOutput(xpcc::gpio::HIGH);
-	Ldac::setOutput(xpcc::gpio::HIGH);
-}
-
-// ----------------------------------------------------------------------------
-template <typename Spi, typename Cs, typename Ldac>
-void
-xpcc::Mcp4922<Spi, Cs, Ldac>::setChannelA(uint16_t value, bool doubleGain)
-{
-	if (doubleGain) {
-		writeRegister(BUF | SHDN | (value & 0x0fff));
-	}
-	else {
-		writeRegister(GA | BUF | SHDN | (value & 0x0fff));
-	}
-}
-
-template <typename Spi, typename Cs, typename Ldac>
-void
-xpcc::Mcp4922<Spi, Cs, Ldac>::setChannelB(uint16_t value, bool doubleGain)
-{
-	if (doubleGain) {
-		writeRegister(CHANNEL_B | BUF | SHDN | (value & 0x0fff));
-	}
-	else {
-		writeRegister(CHANNEL_B | GA | BUF | SHDN | (value & 0x0fff));
-	}
-}
-
-// ----------------------------------------------------------------------------
-template <typename Spi, typename Cs, typename Ldac>
-void
-xpcc::Mcp4922<Spi, Cs, Ldac>::update()
-{
-	xpcc::delay_us(0.04);
-	Ldac::reset();
-	xpcc::delay_us(0.1);
-	Ldac::set();
-}
-
-// ----------------------------------------------------------------------------
-template <typename Spi, typename Cs, typename Ldac>
-void
-xpcc::Mcp4922<Spi, Cs, Ldac>::writeRegister(uint16_t value)
-{
-	Cs::reset();
+	void
+	testEmptyTransmission();
 	
-	Spi::write(static_cast<uint8_t>(value >> 8));
-	Spi::write(static_cast<uint8_t>(value & 0xff));
+	void
+	testSingleTransmission();
 	
-	Cs::set();
-}
+	void
+	testMultipleTransmissions();
+};
+
+
+#endif // SPI_DEVICE_TEST_HPP

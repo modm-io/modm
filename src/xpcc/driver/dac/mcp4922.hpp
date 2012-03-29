@@ -60,7 +60,7 @@ namespace xpcc
 		/**
 		 * \brief	Initialize
 		 * 
-		 * Sets used pins as output etc.
+		 * Sets used pins as output. SPI must be initialized by the user!
 		 */
 		static void
 		initialize();
@@ -111,10 +111,6 @@ namespace xpcc
 		/// Write a 16-bit configuration register
 		static void
 		writeRegister(uint16_t value);
-		
-		static Spi spi;
-		static Cs cs;
-		static Ldac ldac;
 	};
 }
 

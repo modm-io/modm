@@ -357,11 +357,8 @@ Reset_Handler(void)
 		*(dest++) = 0;
 	}
 	
-	// set 2 waitstates
-	FLASH->ACR = (FLASH->ACR & ~FLASH_ACR_LATENCY) | FLASH_WAIT_STATE_2;
-	
-	// enable flash prefetch
-	FLASH->ACR |= FLASH_ACR_PRFTBE;
+	// set 2 waitstates & enable flash prefetch
+	FLASH->ACR = (FLASH->ACR & ~FLASH_ACR_LATENCY) | FLASH_WAIT_STATE_2 | FLASH_ACR_PRFTBE;
 	
 	// enable clock
 	// GPIOA-D
