@@ -1,63 +1,0 @@
-10
-
-dir
-0
-https://github.com/roboterclubaachen/xpcc.git/trunk/tests/stm32_adc
-https://github.com/roboterclubaachen/xpcc.git
-add
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-e061baa3-0504-8700-0cb9-ce57b7db7bff
-
-project.cfg
-file
-
-
-
-add
-
-main.cpp
-file
-
-
-
-add
-
-openocd.cfg
-file
-
-
-
-add
-
-SConstruct
-file
-
-
-
-add
-
-stm32f4x.cfg
-file
-
-
-
-add
-
