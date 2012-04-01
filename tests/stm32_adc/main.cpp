@@ -37,9 +37,12 @@ MAIN_FUNCTION
 
 	uart.configurePins(uart.REMAP_PC12_PD2);
 
-	const uint8_t adc_channel = 18;
+	const uint8_t adc_channel = 1;
 
 	XPCC_LOG_INFO    << xpcc::endl << "This is an ADC Test program by David."    << xpcc::endl;
+
+
+	GPIOA->MODER |= GPIO_MODER_MODER1;
 
 	// --------------------------------------------------
 	// Here some (pseudo) code to use the ADC:
@@ -76,7 +79,7 @@ MAIN_FUNCTION
 		XPCC_LOG_INFO << "Channel " << adc_channel << " = " ;	// set the first conversion channel to adc_channel
 		for(uint32_t t1=0; t1<16200000; t1++) asm volatile ("NOP"); // knowing, that there is probably a better function for this (@see http://xpcc.sourceforge.net/api/classxpcc_1_1stm32_1_1_general_purpose_timer.html)
 		while( (ADC1->SR & ADC_SR_EOC)==0 ) { XPCC_LOG_INFO << "ADC Status is " << xpcc::hex << (uint16_t) ADC1->SR << xpcc::ascii << "| Control is: " << xpcc::hex << (uint16_t) ADC1->CR2 << xpcc::endl; } ///*asm volatile("NOP");*/ }	//wait for a conversion
-		XPCC_LOG_INFO << xpcc::ascii << "[" << (ADC1->DR & 0xFFF) << "]" << xpcc::endl; // send the value
+		XPCC_LOG_INFO << xpcc::ascii << "[" << (ADC1->DR & 0xFFFF) << "]" << xpcc::endl; // send the value
 	}
 
 	// Shut down ADC
