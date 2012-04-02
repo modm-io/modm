@@ -128,7 +128,7 @@ xpcc::stm32::SpiMaster2::transfer(bool transmit, bool receive, bool /*wait*/)
 		return false;
 	}
 	
-	uint8_t rx = 0
+	uint8_t rx = 0;
 	uint8_t tx = 0xff;
 	
 	// send the buffer out, blocking
