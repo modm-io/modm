@@ -189,13 +189,13 @@ CAN1_RX0_IRQHandler()
 	xpcc::can::Message message;
 	readMailbox(message, 0);
 	
-	// Release FIFO (access the next message)
-	CAN1->RF0R = CAN_RF0R_RFOM0;
-	
 	if (!rxQueue.push(message)) {
 		xpcc::ErrorReport::report(xpcc::stm32::CAN1_FIFO0_OVERFLOW);
 	}
 #endif
+	
+	// Release FIFO (access the next message)
+	CAN1->RF0R = CAN_RF0R_RFOM0;
 }
 
 // ----------------------------------------------------------------------------

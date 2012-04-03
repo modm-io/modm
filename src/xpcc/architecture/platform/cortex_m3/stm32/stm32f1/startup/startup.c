@@ -89,8 +89,13 @@ void DMA1_Channel5_IRQHandler(void)	ALIAS(defaultHandler);
 void DMA1_Channel6_IRQHandler(void)	ALIAS(defaultHandler);
 void DMA1_Channel7_IRQHandler(void)	ALIAS(defaultHandler);
 void ADC1_2_IRQHandler(void)		ALIAS(defaultHandler);
-void USB_HP_CAN1_TX_IRQHandler(void)	ALIAS(defaultHandler);
-void USB_LP_CAN1_RX0_IRQHandler(void)	ALIAS(defaultHandler);
+#if defined (STM32F10X_CL)
+	void CAN1_TX_IRQHandler(void)	ALIAS(defaultHandler);
+	void CAN1_RX0_IRQHandler(void)	ALIAS(defaultHandler);
+#else
+	void USB_HP_CAN1_TX_IRQHandler(void)	ALIAS(defaultHandler);
+	void USB_LP_CAN1_RX0_IRQHandler(void)	ALIAS(defaultHandler);
+#endif
 void CAN1_RX1_IRQHandler(void)		ALIAS(defaultHandler);
 void CAN1_SCE_IRQHandler(void)		ALIAS(defaultHandler);
 void EXTI9_5_IRQHandler(void)		ALIAS(defaultHandler);
@@ -222,8 +227,13 @@ FunctionPointer flashVectors[] __attribute__ ((section(".reset"))) =
 	DMA1_Channel6_IRQHandler,	//     DMA1 Channel 6
 	DMA1_Channel7_IRQHandler,	//     DMA1 Channel 7
 	ADC1_2_IRQHandler,			//     ADC1 & ADC2
+#if defined(STM32F10X_CL)
+	CAN1_TX_IRQHandler,			// 
+	CAN1_RX0_IRQHandler,		// 20:
+#else
 	USB_HP_CAN1_TX_IRQHandler,  //     USB High Priority or CAN1 TX
 	USB_LP_CAN1_RX0_IRQHandler, // 20: USB Low  Priority or CAN1 RX0
+#endif
 	CAN1_RX1_IRQHandler,		//     CAN1 RX1
 	CAN1_SCE_IRQHandler,		//     CAN1 SCE
 	EXTI9_5_IRQHandler,			//     EXTI Line 9..5

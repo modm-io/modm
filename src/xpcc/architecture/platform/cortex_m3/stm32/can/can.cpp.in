@@ -187,8 +187,8 @@ CAN{{ id }}_RX0_IRQHandler()
 	if (CAN{{ id }}->RF0R & CAN_RF0R_FOVR0) {
 		xpcc::ErrorReport::report(xpcc::stm32::CAN{{ id }}_FIFO0_OVERFLOW);
 		
-		// release overrun flag
-		CAN{{ id }}->RF0R = CAN_RF0R_FOVR0;
+		// release overrun flag & access the next message
+		CAN{{ id }}->RF0R = CAN_RF0R_FOVR0 | CAN_RF0R_RFOM0;
 	}
 	
 #if STM32_CAN{{ id }}_RX_BUFFER_SIZE > 0
@@ -215,8 +215,8 @@ CAN{{ id }}_RX1_IRQHandler()
 	if (CAN{{ id }}->RF1R & CAN_RF1R_FOVR1) {
 		xpcc::ErrorReport::report(xpcc::stm32::CAN{{ id }}_FIFO1_OVERFLOW);
 		
-		// release overrun flag
-		CAN{{ id }}->RF1R = CAN_RF1R_FOVR1;
+		// release overrun flag & access the next message
+		CAN{{ id }}->RF1R = CAN_RF1R_FOVR1 | CAN_RF1R_RFOM1;
 	}
 	
 #if STM32_CAN{{ id }}_RX_BUFFER_SIZE > 0
