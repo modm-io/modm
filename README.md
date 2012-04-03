@@ -1,3 +1,6 @@
+<img src="https://github.com/roboterclubaachen/xpcc/raw/master/doc/images/logo_xpcc.png" alt="xpcc logo" />
+
+
 Cross Platform Component Communication
 ======================================
 
@@ -8,8 +11,8 @@ The xpcc project consists of two main parts:
    components on different platforms (from PCs to small 8-bit
    microcontrollers). It provides an interface to communicate via CAN,
    TCP/IP or TIPC.
- * The second part is a universal but a bit robotic oriented C++ library
-   for microcontrollers.
+ * The second part is a ever growing universal but a bit robotic oriented
+   C++ library for microcontrollers.
 
 The primary aim has been the usage of this system in autonomous robots for
 the EUROBOT competition, but it can be used for many other purposes as well.
@@ -20,6 +23,7 @@ Get the Code
 
     $ git clone git://github.com/roboterclubaachen/xpcc.git xpcc
     $ cd xpcc
+
 
 Documentation
 -------------------------------------------------------------------------------
@@ -32,65 +36,66 @@ Folder structure
 -------------------------------------------------------------------------------
 
 <dl>
-<dt>build
-</dt><dd>
-Temporary folder, build files created during building the unit tests etc.
-go in here. Can be deleted to save disk space.
+<dt>build</dt>
+<dd>
+  Temporary folder, build files created during building the unit tests etc.
+  go in here. Can be deleted to save disk space.
 </dd>
 
-<dt>doc
-</dt><dd>
-Documentation, mainly the doxygen documentation. The online documentation
-on http://roboterclubaachen.github.com/xpcc/api/ is build by running 'doxygen doxyfile'
-in this folder.
+<dt>doc</dt>
+<dd>
+  Documentation, mainly the doxygen documentation. The online documentation
+  on http://roboterclubaachen.github.com/xpcc/api/ is build by running
+  'doxygen doxyfile' in this folder.
 </dd>
 
-<dt>examples
-</dt><dd>
-Example projects that show the usage of parts of the xpcc library. These
-projects are always up to date and are tested to compile before a
-release.
+<dt>examples</dt>
+<dd>
+  Example projects that show the usage of parts of the xpcc library. These
+  projects are always up to date and are tested to compile before a
+  release.
 </dd>
 
-<dt>release
-</dt><dd>
-Among other things some test programs which are run before a release to 
-check that everything is compiling correctly.
+<dt>release</dt>
+<dd>
+  Among other things some test programs which are run before a release to 
+  check that everything is compiling correctly.
 </dd>
 
-<dt>scons
-</dt><dd>
-SCons tools (e.g. xpcc.py for the build process, avr.py for compiling for
-AVR microcontrollers, arm.py for compiling for ARM7 and Cortex-M0/3, etc.)
-
-Look at the SConstruct files in the example folder and the online
-documentation to see how to use the provided scons tools.
+<dt>scons</dt>
+<dd>
+  SCons tools (e.g. xpcc.py for the build process, avr.py for compiling for
+  AVR microcontrollers, arm.py for compiling for ARM7 and Cortex-M0/3/4, etc.)
+  
+  Look at the SConstruct files in the example folder and the online
+  documentation to see how to use the provided scons tools.
 </dd>
 
-<dt>src
-</dt><dd>
-Source files for the xpcc library
+<dt>src</dt>
+<dd>
+  Source files for the xpcc library
 </dd>
 
-<dt>templates
-</dt><dd>
-Template files for xpcc, Unit-Tests etc.
+<dt>templates</dt>
+<dd>
+  Template files for xpcc, Unit-Tests etc.
 </dd>
 
-<dt>tests
-</dt><dd>
-Test programs, used during the development of the library. May be
-out of date or not working at all.
+<dt>tests</dt>
+<dd>
+  Test programs, used during the development of the library. May be
+  out of date or not working at all.
 </dd>
 
-<dt>tools
-</dt><dd>
-Supporting tools for the usage of the library.
-
-For example the communication builder, used to generate header files for the
-communication architecture from XML-files.
+<dt>tools</dt>
+<dd>
+  Supporting tools for the usage of the library.
+  
+  For example the communication builder, used to generate header files for the
+  communication architecture from XML-files.
 </dd>
 </dl>
+
 
 How can I contribute?
 -------------------------------------------------------------------------------

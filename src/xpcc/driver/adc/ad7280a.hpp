@@ -34,6 +34,8 @@
 #define XPCC__AD7280A_HPP
 
 #include <stdint.h>
+#include <xpcc/architecture/driver/gpio.hpp>
+#include <xpcc/architecture/driver/delay.hpp>
 
 // Forward declaration for the Unit-tests
 class Ad7280aTest;

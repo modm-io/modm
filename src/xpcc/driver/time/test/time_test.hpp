@@ -28,89 +28,44 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/driver/adc/ad7280a.hpp>
+#ifndef TIME_TEST_HPP
+#define TIME_TEST_HPP
 
-#include "ad7280a_test.hpp"
+#include <unittest/testsuite.hpp>
 
-#define ENABLE_MACRO_EXPORT
-#include "spi_device.hpp"
-#undef ENABLE_MACRO_EXPORT
-
-test::SpiDevice device;
-
-class Spi
+class TimeTest : public unittest::TestSuite
 {
 public:
-	static uint8_t
-	write(uint8_t data)
-	{
-		return device.write(data);
-	}
+	void
+	testConversionToUnixTime();
+	
+	void
+	testConversionToUnixTime2();
+	
+	void
+	testConversionToUnixTime3();
+	
+	void
+	testConversionToUnixTime4();
+	
+	void
+	testConversionToUnixTime5();
+	
+	
+	void
+	testConversionToDate();
+	
+	void
+	testConversionToDate2();
+	
+	void
+	testConversionToDate3();
+	
+	void
+	testConversionToDate4();
+	
+	void
+	testConversionToDate5();
 };
 
-struct Cs
-{
-	static inline void
-	set()
-	{
-		device.deselect();
-	}
-	
-	static inline void
-	reset()
-	{
-		device.select();
-	}
-	
-	static void
-	setOutput(bool)
-	{
-	}
-};
-
-typedef xpcc::Ad7280a<Spi, Cs, xpcc::gpio::Unused, 1> Ad7280a;
-
-void
-Ad7280aTest::testCrcByte()
-{
-	TEST_ASSERT_EQUALS(Ad7280a::updateCrc(0x00),   0);
-	TEST_ASSERT_EQUALS(Ad7280a::updateCrc(0x10), 174);
-	TEST_ASSERT_EQUALS(Ad7280a::updateCrc(0x20), 115);
-	TEST_ASSERT_EQUALS(Ad7280a::updateCrc(0x51), 103);
-	TEST_ASSERT_EQUALS(Ad7280a::updateCrc(0xAB), 182);
-	TEST_ASSERT_EQUALS(Ad7280a::updateCrc(0xEF), 236);
-	TEST_ASSERT_EQUALS(Ad7280a::updateCrc(0xFF),  66);
-}
-
-void
-Ad7280aTest::testCrcMessage()
-{
-	// Datasheet Example 1
-	TEST_ASSERT_EQUALS(Ad7280a::calculateCrc(0x003430), 0x51);
-	
-	// Datasheet Example 2
-	TEST_ASSERT_EQUALS(Ad7280a::calculateCrc(0x103430), 0x74);
-	
-	// Datasheet Example 3
-	TEST_ASSERT_EQUALS(Ad7280a::calculateCrc(0x0070A1), 0x9A);
-	
-	// Datasheet Example 4
-	TEST_ASSERT_EQUALS(Ad7280a::calculateCrc(0x205335), 0x46);
-}
-
-void
-Ad7280aTest::testInitialize()
-{
-	test::Transmission transmissionsInitialize[] = {
-		test::Transmission(4, RX_DATA(0x01,0xC2,0xB6,0xE2), TX_DATA(0,0,0,0)),
-		test::Transmission(4, RX_DATA(0x03,0x87,0x16,0xCA), TX_DATA(0,0,0,0)),
-		test::Transmission(4, RX_DATA(0xF8,0x00,0x03,0x0A), TX_DATA(0,0,0,0)),
-	};
-	
-	device.start(transmissionsInitialize, ARRAY_SIZE(transmissionsInitialize));
-	
-	TEST_ASSERT_TRUE(Ad7280a::initialize());
-	
-	TEST_ASSERT_TRUE(device.isSuccessful());
-	device.reportErrors();
-}
+#endif	// TIME_TEST_HPP

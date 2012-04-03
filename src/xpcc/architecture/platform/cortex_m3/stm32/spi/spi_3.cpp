@@ -130,11 +130,14 @@ xpcc::stm32::SpiMaster3::initialize(Mode mode, Prescaler prescaler)
 bool
 xpcc::stm32::SpiMaster3::setBuffer(uint16_t length, uint8_t* transmit, uint8_t* receive, bool transmitIncr, bool receiveIncr)
 {
-	if (!isFinished()) return false;
+	if (!isFinished()) {
+		return false;
+	}
 	
 	transmitBuffer = transmit;
 	receiveBuffer = receive ? receive : transmit;
 	bufferLength = length;
+	
 	status &= ~(BUFFER_TRANSMIT_INCR_bm | BUFFER_RECEIVE_INCR_bm);
 	status |= (transmitIncr ? BUFFER_TRANSMIT_INCR_bm : 0) | (receiveIncr ? BUFFER_RECEIVE_INCR_bm : 0);
 	
@@ -144,26 +147,34 @@ xpcc::stm32::SpiMaster3::setBuffer(uint16_t length, uint8_t* transmit, uint8_t* 
 bool
 xpcc::stm32::SpiMaster3::transfer(bool transmit, bool receive, bool /*wait*/)
 {
-	if (status & BUFFER_IS_BUSY_SYNC_bm)
+	if (status & BUFFER_IS_BUSY_SYNC_bm) {
 		return false;
+	}
 	
-	uint8_t rx(0), tx(0xff);
+	uint8_t rx = 0;
+	uint8_t tx = 0xff;
+	
 	// send the buffer out, blocking
 	status |= BUFFER_IS_BUSY_SYNC_bm;
+	
 	// check if we have to use a dummy buffer
 	transmit &= static_cast<bool>(transmitBuffer);
 	receive &= static_cast<bool>(receiveBuffer);
 	
 	if (status & BUFFER_TRANSMIT_INCR_bm) {
-		for(uint_fast16_t i=0; i < bufferLength; ++i) {
-			if (transmit) tx = transmitBuffer[i];
+		for (uint_fast16_t i = 0; i < bufferLength; ++i) {
+			if (transmit) {
+				tx = transmitBuffer[i];
+			}
 			rx = write(tx);
 			if (receive) receiveBuffer[i] = rx;
 		}
 	}
 	else {
-		for(uint_fast16_t i=bufferLength; i > 0; --i) {
-			if (transmit) tx = transmitBuffer[i-1];
+		for (uint_fast16_t i = bufferLength; i > 0; --i) {
+			if (transmit) {
+				tx = transmitBuffer[i-1];
+			}
 			rx = write(tx);
 			if (receive) receiveBuffer[i-1] = rx;
 		}

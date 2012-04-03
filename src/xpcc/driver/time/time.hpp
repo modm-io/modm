@@ -5,7 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- *
+ * 
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -28,89 +28,70 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/driver/adc/ad7280a.hpp>
+#ifndef XPCC__TIME_HPP
+#define XPCC__TIME_HPP
 
-#include "ad7280a_test.hpp"
+#include <stdint.h>
 
-#define ENABLE_MACRO_EXPORT
-#include "spi_device.hpp"
-#undef ENABLE_MACRO_EXPORT
-
-test::SpiDevice device;
-
-class Spi
+namespace xpcc
 {
-public:
-	static uint8_t
-	write(uint8_t data)
+	// forward declaration
+	class Date;
+	
+	/**
+	 * Number of Seconds since 00:00, Jan 1 1970 UTC
+	 * 
+	 * @author	Fabian Greif
+	 */
+	class UnixTime
 	{
-		return device.write(data);
-	}
-};
-
-struct Cs
-{
-	static inline void
-	set()
-	{
-		device.deselect();
-	}
-	
-	static inline void
-	reset()
-	{
-		device.select();
-	}
-	
-	static void
-	setOutput(bool)
-	{
-	}
-};
-
-typedef xpcc::Ad7280a<Spi, Cs, xpcc::gpio::Unused, 1> Ad7280a;
-
-void
-Ad7280aTest::testCrcByte()
-{
-	TEST_ASSERT_EQUALS(Ad7280a::updateCrc(0x00),   0);
-	TEST_ASSERT_EQUALS(Ad7280a::updateCrc(0x10), 174);
-	TEST_ASSERT_EQUALS(Ad7280a::updateCrc(0x20), 115);
-	TEST_ASSERT_EQUALS(Ad7280a::updateCrc(0x51), 103);
-	TEST_ASSERT_EQUALS(Ad7280a::updateCrc(0xAB), 182);
-	TEST_ASSERT_EQUALS(Ad7280a::updateCrc(0xEF), 236);
-	TEST_ASSERT_EQUALS(Ad7280a::updateCrc(0xFF),  66);
-}
-
-void
-Ad7280aTest::testCrcMessage()
-{
-	// Datasheet Example 1
-	TEST_ASSERT_EQUALS(Ad7280a::calculateCrc(0x003430), 0x51);
-	
-	// Datasheet Example 2
-	TEST_ASSERT_EQUALS(Ad7280a::calculateCrc(0x103430), 0x74);
-	
-	// Datasheet Example 3
-	TEST_ASSERT_EQUALS(Ad7280a::calculateCrc(0x0070A1), 0x9A);
-	
-	// Datasheet Example 4
-	TEST_ASSERT_EQUALS(Ad7280a::calculateCrc(0x205335), 0x46);
-}
-
-void
-Ad7280aTest::testInitialize()
-{
-	test::Transmission transmissionsInitialize[] = {
-		test::Transmission(4, RX_DATA(0x01,0xC2,0xB6,0xE2), TX_DATA(0,0,0,0)),
-		test::Transmission(4, RX_DATA(0x03,0x87,0x16,0xCA), TX_DATA(0,0,0,0)),
-		test::Transmission(4, RX_DATA(0xF8,0x00,0x03,0x0A), TX_DATA(0,0,0,0)),
+	public:
+		UnixTime(uint32_t t) :
+			time(t)
+		{
+		}
+		
+		operator uint32_t () const
+		{
+			return time;
+		}
+		
+		/**
+		 * Converts given time since epoch as xpcc::UnixTime value into
+		 * calendar time, expressed in Coordinated Universal Time (UTC).
+		 */
+		void
+		toDate(Date* date) const;
+		
+	private:
+		uint32_t time;
 	};
 	
-	device.start(transmissionsInitialize, ARRAY_SIZE(transmissionsInitialize));
-	
-	TEST_ASSERT_TRUE(Ad7280a::initialize());
-	
-	TEST_ASSERT_TRUE(device.isSuccessful());
-	device.reportErrors();
+	/**
+	 * @brief	Calender Date and Time
+	 * 
+	 * @author	Fabian Greif
+	 */
+	class Date
+	{
+	public:
+		/**
+		 * Converts calendar time to a time since epoch as a
+		 * xpcc::UnixTime object.
+		 */
+		UnixTime
+		toUnixTimestamp() const;
+		
+	public:
+		uint8_t second;			///< Seconds after the minute [0, 60]
+		uint8_t minute;			///< Minutes after the hour [0, 59] 
+		uint8_t hour;			///< Hours since midnight [0, 23] 
+		uint8_t day;			///< Day of the month [1, 31] 
+		uint8_t month;			///< Months since January [0, 11]
+		uint8_t year;			///< Years since 1900 (up to 2099)
+		uint8_t dayOfTheWeek;	///< Days since Sunday [0, 6] (0=Sunday, 6=Saturday)
+		uint8_t dayOfTheYear;	///< Days since January 1 [0, 365]
+	};
 }
+
+#endif	// XPCC__TIME_HPP
