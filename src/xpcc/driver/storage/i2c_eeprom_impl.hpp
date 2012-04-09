@@ -59,7 +59,7 @@ xpcc::I2cEeprom<I2C>::write(uint16_t address, const uint8_t *data, uint8_t bytes
 {
 	if (MySyncI2C::startCheck(this->deviceAddress))
 	{
-		uint8_t buffer[] = { address >> 8, address & 0xff };
+		uint8_t buffer[] = { (uint8_t)(address >> 8), (uint8_t)(address & 0xff) };
 		if (MySyncI2C::write(buffer, 2, xpcc::i2c::SYNC_NO_STOP) == xpcc::i2c::BUS_RESET)
 		{
 			MySyncI2C::stop();
@@ -86,7 +86,7 @@ xpcc::I2cEeprom<I2C>::readByte(uint16_t address, uint8_t &data) const
 {
 	if (MySyncI2C::startCheck(this->deviceAddress))
 	{
-		uint8_t buffer[] = {address >> 8, address & 0xff};
+		uint8_t buffer[] = {(uint8_t)(address >> 8), (uint8_t)(address & 0xff)};
 		if (MySyncI2C::write(buffer, 2, xpcc::i2c::SYNC_NO_STOP) == xpcc::i2c::BUS_RESET) {
 			MySyncI2C::stop();
 			return false;
@@ -109,7 +109,7 @@ xpcc::I2cEeprom<I2C>::read(uint16_t address, uint8_t *data, uint8_t bytes) const
 {
 	if (MySyncI2C::startCheck(this->deviceAddress))
 	{
-		uint8_t buffer[] = {address >> 8, address & 0xff};
+		uint8_t buffer[] = {(uint8_t)(address >> 8), (uint8_t)(address & 0xff)};
 		if (MySyncI2C::write(buffer, 2, xpcc::i2c::SYNC_NO_STOP) == xpcc::i2c::BUS_RESET){
 			MySyncI2C::stop();
 			return false;

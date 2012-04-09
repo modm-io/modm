@@ -39,9 +39,18 @@
 
 #include "timer.hpp"
 
-#if !defined(HIRESD_CTRLA)
 // older versions of avr-libc provide false register names
-#	define TC_EVACT_FRQ_gc		TC_EVACT_FRW_gc
+#if defined _AVR_ATxmega128A3_H_  || \
+    defined _AVR_ATxmega16A4_H_   || \
+    defined _AVR_ATxmega16D4_H_   || \
+    defined _AVR_ATxmega192A3_H_  || \
+    defined _AVR_ATxmega256A3_H_  || \
+    defined _AVR_ATxmega256A3B_H_ || \
+    defined _AVR_ATxmega32A4_H_   || \
+    defined _AVR_ATxmega32D4_H_   || \
+    defined _AVR_ATxmega64A1_H_   || \
+    defined _AVR_ATxmega64A3_H_
+#define TC_EVACT_FRQ_gc	(0x05<<5)
 #endif
 
 namespace xpcc
