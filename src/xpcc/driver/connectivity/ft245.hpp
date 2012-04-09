@@ -40,7 +40,7 @@ namespace xpcc
 	/**
 	 * \brief	FT245 USB FIFO
 	 * 
-	 * The FT245R USB FIFO from Future Technology Devices International is
+	 * The FT245R USB FIFO from Future Technology Devices International is a
 	 * single chip USB to parallel FIFO bidirectional data transfer interface.
 	 *
 	 * \section ft245_example Example

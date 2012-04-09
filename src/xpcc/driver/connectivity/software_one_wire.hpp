@@ -39,17 +39,17 @@ namespace xpcc
 	/**
 	 * \brief	Software emulation of a 1-wire master
 	 * 
-	 * 1-Wire is extremly timing critical. This implementation relies
+	 * 1-Wire is extremely timing critical. This implementation relies
 	 * on simple delay loops to achieve this timing. Any interrupt during
 	 * the operation can disturb the timing.
 	 * 
-	 * You should make sure that no interrupt ocurres during the 1-Wire
+	 * You should make sure that no interrupt occurs during the 1-Wire
 	 * transmissions, for example by disabling interrupts.
 	 * 
 	 * Based on the Maxim 1-Wire AppNote at
 	 * http://www.maxim-ic.com/appnotes.cfm/appnote_number/126
 	 *
-	 * 1-Wire Search Alogrithm based on AppNote 187 at
+	 * 1-Wire Search Algorithm based on AppNote 187 at
 	 * http://www.maxim-ic.com/appnotes.cfm/appnote_number/187
 	 * 
 	 * \ingroup	1-wire
