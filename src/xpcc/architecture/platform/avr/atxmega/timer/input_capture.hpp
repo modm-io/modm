@@ -40,7 +40,8 @@
 #include "timer.hpp"
 
 // older versions of avr-libc provide false register names
-#if defined _AVR_ATxmega128A3_H_  || \
+#if defined _AVR_ATxmega128A1_H_  || \
+    defined _AVR_ATxmega128A3_H_  || \
     defined _AVR_ATxmega16A4_H_   || \
     defined _AVR_ATxmega16D4_H_   || \
     defined _AVR_ATxmega192A3_H_  || \
