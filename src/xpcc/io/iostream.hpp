@@ -448,6 +448,100 @@ namespace xpcc
 	{
 		return ios.ascii();
 	}
+
+	/**
+	 * \brief	Set the foreground colour on ANSI terminals.
+	 *
+	 * \ingroup io
+	 */
+	inline IOStream&
+	black(IOStream& ios)
+	{
+		ios.write('\033');
+		ios.write('[');
+		ios.write('3');
+		ios.write('0');
+		ios.write('m');
+		return ios;
+	}
+
+	inline IOStream&
+	red(IOStream& ios)
+	{
+		ios.write('\033');
+		ios.write('[');
+		ios.write('3');
+		ios.write('1');
+		ios.write('m');
+		return ios;
+	}
+
+	inline IOStream&
+	green(IOStream& ios)
+	{
+		ios.write('\033');
+		ios.write('[');
+		ios.write('3');
+		ios.write('2');
+		ios.write('m');
+		return ios;
+	}
+
+	inline IOStream&
+	yellow(IOStream& ios)
+	{
+		ios.write('\033');
+		ios.write('[');
+		ios.write('3');
+		ios.write('3');
+		ios.write('m');
+		return ios;
+	}
+
+	inline IOStream&
+	blue(IOStream& ios)
+	{
+		ios.write('\033');
+		ios.write('[');
+		ios.write('3');
+		ios.write('4');
+		ios.write('m');
+		return ios;
+	}
+
+	inline IOStream&
+	magenta(IOStream& ios)
+	{
+		ios.write('\033');
+		ios.write('[');
+		ios.write('3');
+		ios.write('1');
+		ios.write('m');
+		return ios;
+	}
+
+	inline IOStream&
+	cyan(IOStream& ios)
+	{
+		ios.write('\033');
+		ios.write('[');
+		ios.write('3');
+		ios.write('6');
+		ios.write('m');
+		return ios;
+	}
+
+	inline IOStream&
+	white(IOStream& ios)
+	{
+		ios.write('\033');
+		ios.write('[');
+		ios.write('3');
+		ios.write('7');
+		ios.write('m');
+		return ios;
+	}
+
 };
 
 
