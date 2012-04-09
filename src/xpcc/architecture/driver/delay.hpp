@@ -74,7 +74,7 @@ namespace xpcc
 		}
 	}
 
-#elif defined(XPCC__OS_UNIX)
+#elif defined(XPCC__OS_UNIX) || defined(XPCC__OS_OSX)
 
 	#include <unistd.h>
 	

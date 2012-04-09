@@ -43,7 +43,7 @@
 		return Timestamp(time);
 	}
 
-#elif defined(XPCC__OS_UNIX)
+#elif ( defined(XPCC__OS_UNIX) || defined(XPCC__OS_OSX) )
 #	include <sys/time.h>
 
 	xpcc::Timestamp
