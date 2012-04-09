@@ -25,23 +25,32 @@
  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- * 
- * $hello please remove me$
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__CANUSB_FORMATER_HPP
-#define XPCC__CANUSB_FORMATER_HPP
+#ifndef XPCC__CAN_LAWICEL_FORMATTER_HPP
+#define XPCC__CAN_LAWICEL_FORMATTER_HPP
 
-#include "../message.hpp"
+#include <xpcc/driver/connectivity/can/message.hpp>
 
 namespace xpcc
 {
-	class CanUsbFormater
+	/**
+	 * \brief	Converts XPCC CAN messages (xpcc::can::Message) to and from the Lawicel string format (char *).
+	 *
+	 * Lawicel AB (\see http://www.lawicel.com/) offers medium sized CAN to USB
+	 * and CAN to RS232 converters. Their data format is widely used, including
+	 * RCA's BotControl Java GUI and Fabian's USB2CAN dongle.
+	 *
+	 * This converter only understands messages of type 'r', 't', 'R' and 'T' which
+	 * transmits CAN frames. It does not understand commands to change the baud rate et cetera.
+	 *
+	 */
+	class CanLawicelFormatter
 	{
 	public:
 		static bool
-		convertToCanMessage(const char* in,can::Message& out);
+		convertToCanMessage(const char* in, can::Message& out);
 
 		static bool
 		convertToString(const can::Message& in, char* out);
@@ -60,4 +69,4 @@ namespace xpcc
 		byteToHex(uint8_t num);
 	};
 }
-#endif // XPCC__CANUSB_FORMATER_HPP
+#endif // XPCC__CAN_LAWICEL_FORMATTER_HPP
