@@ -89,7 +89,7 @@ uint8_t
 xpcc::MAX6966<Spi, Cs, DRIVERS>::getChannel(uint16_t channel)
 {
 	if (channel >= DRIVERS*10)
-		return;
+		return 0;
 	
 	uint8_t driver = channel / 10;
 	uint8_t reg = channel % 10;
