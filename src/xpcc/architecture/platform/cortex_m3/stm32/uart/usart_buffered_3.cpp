@@ -178,8 +178,11 @@ xpcc::stm32::BufferedUsart3::write(const uint8_t *s, uint8_t n)
 void
 xpcc::stm32::BufferedUsart3::write(uint8_t c)
 {
-	while (!txBuffer.push(c)) {
+	uint16_t i(0);
+	while ( !txBuffer.push(c) && (i < 1) ) {
+		++i;
 		// wait for a free slot in the buffer
+		// but do not wait infinitely
 	}
 	
 	// Disable interrupts while enabling the transmit interrupt
