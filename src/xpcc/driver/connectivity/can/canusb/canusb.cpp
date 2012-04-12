@@ -25,8 +25,6 @@
  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- * 
- * $hello please remove me$
  */
 // ----------------------------------------------------------------------------
 
@@ -35,7 +33,7 @@
 #include <xpcc/architecture/driver.hpp>
 #include <xpcc/workflow/timeout.hpp>
 
-#include "canusb_formater.hpp"
+#include "../can_lawicel_formatter/can_lawicel_formatter.hpp"
 #include "../canusb.hpp"
 
 xpcc::CanUsb::CanUsb() :
@@ -104,7 +102,7 @@ bool xpcc::CanUsb::open(std::string deviceName, unsigned int baudRate)
 		}
 		if (a != '\r')
 		{
-			std::cout << "Wrong answere on S4: " << std::hex << (int) a	<< std::endl;
+			std::cout << "Wrong answer on S4: " << std::hex << (int) a	<< std::endl;
 			this->serialPort.close();
 			while (this->serialPort.isOpen()) {
 				//wait for port to close;
@@ -128,7 +126,7 @@ bool xpcc::CanUsb::open(std::string deviceName, unsigned int baudRate)
 		}
 		if (a != '\r')
 		{
-			std::cout << "Wrong answere on O: " << std::hex << (int) a << std::endl;
+			std::cout << "Wrong answer on O: " << std::hex << (int) a << std::endl;
 			this->serialPort.close();
 			while (this->serialPort.isOpen()) {
 				//wait for port to close;
@@ -183,7 +181,7 @@ bool xpcc::CanUsb::getMessage(can::Message& message)
 bool xpcc::CanUsb::sendMessage(const can::Message& message)
 {
 	char str[128];
-	xpcc::CanUsbFormater::convertToString(message, str);
+	xpcc::CanLawicelFormatter::convertToString(message, str);
 	this->serialPort.write(str);
 	return true;
 }
@@ -204,7 +202,7 @@ void xpcc::CanUsb::update()
 			}
 
 			can::Message message;
-			if (xpcc::CanUsbFormater::convertToCanMessage(
+			if (xpcc::CanLawicelFormatter::convertToCanMessage(
 					this->tmpRead.c_str(), message))
 			{
 				this->readBuffer.push(message);

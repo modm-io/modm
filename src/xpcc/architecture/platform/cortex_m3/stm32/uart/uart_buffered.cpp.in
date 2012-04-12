@@ -43,6 +43,8 @@ namespace
 {
 	static xpcc::atomic::Queue<char, {{ className | upper }}{{ id }}_RX_BUFFER_SIZE> rxBuffer;
 	static xpcc::atomic::Queue<char, {{ className | upper }}{{ id }}_TX_BUFFER_SIZE> txBuffer;
+	
+	static bool isBlocking = true;
 }
 
 {{ template.pinDefinitions(id) }}
@@ -88,7 +90,7 @@ extern "C" void
 // ----------------------------------------------------------------------------
 void
 xpcc::stm32::Buffered{{ className }}{{ id }}::setBaudrate(uint32_t baudrate,
-		uint32_t interruptPriority)
+		uint32_t interruptPriority, bool blocking)
 {
 	// Enable clock
 	{% if id in [1, 6] -%}
@@ -98,6 +100,8 @@ xpcc::stm32::Buffered{{ className }}{{ id }}::setBaudrate(uint32_t baudrate,
 	{%- elif id in [4, 5] -%}
 	RCC->APB1ENR |= RCC_APB1ENR_UART{{ id }}EN;
 	{%- endif %}
+	
+	isBlocking = blocking;
 	
 	{{ className | upper}}{{ id }}->CR1 = 0;
 	
@@ -127,11 +131,10 @@ xpcc::stm32::Buffered{{ className }}{{ id }}::setBaudrate(uint32_t baudrate,
 void
 xpcc::stm32::Buffered{{ className }}{{ id }}::write(uint8_t c)
 {
-	uint16_t i(0);
-	while ( !txBuffer.push(c) && (i < 1) ) {
-		++i;
-		// wait for a free slot in the buffer
-		// but do not wait infinitely
+	while ( !txBuffer.push(c) ) {
+		if (!isBlocking) {
+			return;
+		}
 	}
 	
 	// Disable interrupts while enabling the transmit interrupt

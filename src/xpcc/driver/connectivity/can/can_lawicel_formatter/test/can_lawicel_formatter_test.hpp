@@ -30,7 +30,7 @@
 
 #include <unittest/testsuite.hpp>
 
-class CanusbFormaterTest : public unittest::TestSuite
+class CanLawicelFormatterTest : public unittest::TestSuite
 {
 public:
 	void
@@ -48,4 +48,19 @@ public:
 	void
 	testStringToMessage();
 
+	/**
+	 * \brief	Test if this library can decode their own messages
+	 *
+	 * string -> message -> string.
+	 */
+	void
+	testRoundtripMessage();
+
+	/**
+	 * \brief	Test if this library can decode their own messages
+	 *
+	 * message -> string -> message.
+	 */
+	void
+	testRoudtripString();
 };

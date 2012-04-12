@@ -25,19 +25,17 @@
  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- * 
- * $hello please remove me$
  */
 // ----------------------------------------------------------------------------
 
-#include "canusb_formater.hpp"
+#include "can_lawicel_formatter.hpp"
 
 #include <stdint.h>
 #include <cstring>
 
 
 bool
-xpcc::CanUsbFormater::convertToCanMessage(const char* in,can::Message& out)
+xpcc::CanLawicelFormatter::convertToCanMessage(const char* in,can::Message& out)
 {
 	uint8_t dlc_pos;
 
@@ -109,7 +107,7 @@ xpcc::CanUsbFormater::convertToCanMessage(const char* in,can::Message& out)
 
 
 bool
-xpcc::CanUsbFormater::convertToString(const can::Message& in, char* out)
+xpcc::CanLawicelFormatter::convertToString(const can::Message& in, char* out)
 {
 	if(in.flags.extended){
 		if(in.flags.rtr){
@@ -138,6 +136,7 @@ xpcc::CanUsbFormater::convertToString(const can::Message& in, char* out)
 			++ptr;
 		}
 		out[9] = byteToHex(in.length);
+		out[10] = '\0';
 		dataBegin=10;
 	}
 	else
@@ -146,18 +145,20 @@ xpcc::CanUsbFormater::convertToString(const can::Message& in, char* out)
 		out[2] = byteToHex((*(ptr))>>4);
 		out[3] = byteToHex((*(ptr)));
 		out[4] = byteToHex(in.length);
+		out[5] = '\0';	// terminate if no data is appended.
 		dataBegin=5;
 
 	}
 
 	if (!in.flags.rtr)
 	{
-		for(uint_fast8_t i = 0 ; i < in.length ; i++)
+		uint_fast8_t i = 0;
+		for( ; i < in.length ; i++)
 		{
 			out[dataBegin+2*i] = byteToHex(in.data[i]>>4);
 			out[dataBegin+2*i+1] = byteToHex(in.data[i]);
 		}
-		out[dataBegin+2*in.length]='\0';
+		out[dataBegin+2*i]='\0';
 	}
 
 	return true;
@@ -165,7 +166,7 @@ xpcc::CanUsbFormater::convertToString(const can::Message& in, char* out)
 
 
 uint8_t
-xpcc::CanUsbFormater::charToByte(const char *s)
+xpcc::CanLawicelFormatter::charToByte(const char *s)
 {
 	uint8_t t = *s;
 	if (t >= 'a')
@@ -178,7 +179,7 @@ xpcc::CanUsbFormater::charToByte(const char *s)
 }
 
 char
-xpcc::CanUsbFormater::byteToHex(uint8_t num)
+xpcc::CanLawicelFormatter::byteToHex(uint8_t num)
 {
 	num &= 0x0f;
 	if(num<10)

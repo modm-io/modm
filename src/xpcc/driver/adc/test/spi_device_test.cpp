@@ -48,7 +48,7 @@ SpiDeviceTest::testEmptyTransmission()
 {
 	test::SpiDevice device;
 	
-	device.start(0, 0);
+	device.start(0, 0, __LINE__, false);
 	
 	TEST_ASSERT_TRUE(device.isSuccessful());
 }
@@ -61,7 +61,7 @@ SpiDeviceTest::testSingleTransmission()
 	};
 	
 	test::SpiDevice device;
-	device.start(transmissions, ARRAY_SIZE(transmissions));
+	device.start(transmissions, ARRAY_SIZE(transmissions), __LINE__, false);
 	
 	TEST_ASSERT_FALSE(device.isSuccessful());
 	
@@ -80,7 +80,7 @@ SpiDeviceTest::testSingleTransmission()
 	TEST_ASSERT_FALSE(device.isSuccessful());
 	
 	// Restart transmission
-	device.start(transmissions, ARRAY_SIZE(transmissions));
+	device.start(transmissions, ARRAY_SIZE(transmissions), __LINE__, false);
 	device.select();
 	TEST_ASSERT_EQUALS(device.write(1), 4);
 	TEST_ASSERT_EQUALS(device.write(2), 3);
@@ -101,7 +101,7 @@ SpiDeviceTest::testMultipleTransmissions()
 	};
 	
 	test::SpiDevice device;
-	device.start(transmissions, ARRAY_SIZE(transmissions));
+	device.start(transmissions, ARRAY_SIZE(transmissions), __LINE__, false);
 	
 	TEST_ASSERT_FALSE(device.isSuccessful());
 	

@@ -49,6 +49,7 @@ namespace test
 	 * Example:
 	 * \code
 	 * 
+	 * \endcode
 	 */
 	struct Transmission
 	{
@@ -65,6 +66,11 @@ namespace test
 	
 	/**
 	 * Mock-Up class to simulate SPI devices.
+	 * 
+	 * It has a separate start() function instead of using the Constructor
+	 * to allow the usage with static classes.
+	 * 
+	 * \author	Fabian Greif
 	 */
 	class SpiDevice
 	{
@@ -89,18 +95,22 @@ namespace test
 		 */
 		void
 		start(const Transmission* transmissions,
-				std::size_t transmissionCount);
+				std::size_t transmissionCount,
+				std::size_t line,
+				bool reportErrors = true);
 		
 		/**
 		 * Check if all transmission were finished successful (content &
 		 * size correct).
 		 */
-		bool
-		isSuccessful();
-		
-		/// Dump an Error report to the console
 		void
-		reportErrors();
+		finish();
+		
+		bool
+		isSuccessful()
+		{
+			return (complete && (error == NO_ERROR));
+		}
 		
 	private:
 		/// Transmission data
@@ -117,8 +127,21 @@ namespace test
 		/// Device is selected via the CS pin
 		bool selected;
 		
-		bool successful;
 		bool complete;
+		
+		enum Error
+		{
+			NO_ERROR = 0,
+			DOUBLE_SELECT = (1 << 1),
+			MAX_TRANSMISSION_COUNT_EXCEEDED = (1 << 2),		///< more transmissions than expected
+			WRONG_LENGTH = (1 << 3),		///< Transmission is to short or to long
+			WRONG_DATA_RECEIVED = (1 << 4),			///< Other data bytes received
+		};
+		uint8_t error;
+		
+		std::size_t lineNumber;
+		bool reportErrors;
+		uint8_t *rxBuffer;
 	};
 }
 

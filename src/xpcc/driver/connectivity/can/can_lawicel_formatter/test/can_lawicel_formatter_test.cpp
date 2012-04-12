@@ -30,35 +30,49 @@
 
 #include <cstring>
 
-#include "../canusb_formater.hpp"
-#include "canusb_formater_test.hpp"
+#include "../can_lawicel_formatter.hpp"
+#include "can_lawicel_formatter_test.hpp"
 
 void
-CanusbFormaterTest::testIdentifierToStringExtended()
+CanLawicelFormatterTest::testIdentifierToStringExtended()
 {
-	xpcc::can::Message msg(0x12345678, 0);
+	xpcc::can::Message msg(0x75395165, 0);
+
 	char buffer[128];
+	for (int i = 0; i < 128; ++i) {
+		buffer[i] = 'a';
+	}
 	
-	xpcc::CanUsbFormater::convertToString(msg, buffer);
+	TEST_ASSERT_TRUE(xpcc::CanLawicelFormatter::convertToString(msg, buffer));
 	
-	TEST_ASSERT_EQUALS_ARRAY(buffer, "T12345678", 9);
+	TEST_ASSERT_EQUALS(std::strlen(buffer), 10U);
+	/*              \0-terminatation of string >-+
+	 *                                           |
+	 *                           data length >-+ |
+	 *                                         | |
+	 *                                 |--id--|v v       */
+	TEST_ASSERT_EQUALS_ARRAY(buffer, "T753951650\0", 11);
 }
 
 void
-CanusbFormaterTest::testIdentifierToStringStandard()
+CanLawicelFormatterTest::testIdentifierToStringStandard()
 {
 	xpcc::can::Message msg(0x123, 0);
 	msg.flags.extended = false;
 	
 	char buffer[128];
+	for (int i = 0; i < 128; ++i) {
+		buffer[i] = 'a';
+	}
 	
-	xpcc::CanUsbFormater::convertToString(msg, buffer);
+	TEST_ASSERT_TRUE(xpcc::CanLawicelFormatter::convertToString(msg, buffer));
 	
-	TEST_ASSERT_EQUALS_ARRAY(buffer, "t123", 4);
+	TEST_ASSERT_EQUALS(std::strlen(buffer), 5U);
+	TEST_ASSERT_EQUALS_ARRAY(buffer, "t1230\0", 6);
 }
 
 void
-CanusbFormaterTest::testMessageToStringStandard()
+CanLawicelFormatterTest::testMessageToStringStandard()
 {
 	xpcc::can::Message msg(0x123, 4);
 	msg.flags.extended = false;
@@ -72,14 +86,19 @@ CanusbFormaterTest::testMessageToStringStandard()
 		buffer[i] = 'a';
 	}
 	
-	xpcc::CanUsbFormater::convertToString(msg, buffer);
+	TEST_ASSERT_TRUE(xpcc::CanLawicelFormatter::convertToString(msg, buffer));
 	
 	TEST_ASSERT_EQUALS(std::strlen(buffer), 13U);
-	TEST_ASSERT_EQUALS_ARRAY(buffer, "t123444FF1A12", 13);
+	/*                 \0-terminatation of string >-+
+	 *                                              |
+	 *                      data length >-+         |
+	 *                                    |         |
+	 *                                 id v|-data-| v       */
+	TEST_ASSERT_EQUALS_ARRAY(buffer, "t123444FF1A12\0", 14);
 }
 
 void
-CanusbFormaterTest::testMessageToStringExtended()
+CanLawicelFormatterTest::testMessageToStringExtended()
 {
 	xpcc::can::Message msg(0x123, 4);
 	msg.flags.extended = true;
@@ -93,19 +112,20 @@ CanusbFormaterTest::testMessageToStringExtended()
 		buffer[i] = 'a';
 	}
 	
-	xpcc::CanUsbFormater::convertToString(msg, buffer);
+	TEST_ASSERT_TRUE(xpcc::CanLawicelFormatter::convertToString(msg, buffer));
 	
 	TEST_ASSERT_EQUALS(std::strlen(buffer), 18U);
-	TEST_ASSERT_EQUALS_ARRAY(buffer, "T00000123444FF1A12", 18);
+	TEST_ASSERT_EQUALS_ARRAY(buffer, "T00000123444FF1A12\0", 19);
 }
 
 void
-CanusbFormaterTest::testStringToMessage()
+CanLawicelFormatterTest::testStringToMessage()
 {
 	const char *input = "T000016108F8FF00002394883D";
 	xpcc::can::Message output;
 	
-	TEST_ASSERT_TRUE(xpcc::CanUsbFormater::convertToCanMessage(input, output));
+	TEST_ASSERT_TRUE(xpcc::CanLawicelFormatter::convertToCanMessage(input, output));
+
 	TEST_ASSERT_EQUALS(output.identifier, 0x00001610U);
 	TEST_ASSERT_EQUALS(output.length, 8U);
 	TEST_ASSERT_EQUALS(output.flags.extended, true);
@@ -120,3 +140,54 @@ CanusbFormaterTest::testStringToMessage()
 	TEST_ASSERT_EQUALS(output.data[6], 0x88);
 	TEST_ASSERT_EQUALS(output.data[7], 0x3d);
 }
+
+void
+CanLawicelFormatterTest::testRoundtripMessage()
+{
+	const char *string = "T000016108F8FF00002394883D";
+	xpcc::can::Message message;
+
+	char buffer[128];
+	for (int i = 0; i < 128; ++i) {
+		buffer[i] = 'a';
+	}
+
+	TEST_ASSERT_TRUE(xpcc::CanLawicelFormatter::convertToCanMessage(string, message));
+	TEST_ASSERT_TRUE(xpcc::CanLawicelFormatter::convertToString(message, buffer));
+
+	/** check for 0-termination */
+	TEST_ASSERT_EQUALS_ARRAY(string, buffer, sizeof(string) + 1);
+}
+
+
+
+void
+CanLawicelFormatterTest::testRoudtripString()
+{
+	xpcc::can::Message msg(0x123, 4);
+	msg.flags.extended = true;
+	msg.data[0] = 0x44;
+	msg.data[1] = 0xff;
+	msg.data[2] = 0x1A;
+	msg.data[3] = 0x12;
+
+	char buffer[128];
+	for (int i = 0; i < 128; ++i) {
+		buffer[i] = 'a';
+	}
+
+	TEST_ASSERT_TRUE(xpcc::CanLawicelFormatter::convertToString(msg, buffer));
+
+	xpcc::can::Message myMsg;
+	TEST_ASSERT_TRUE(xpcc::CanLawicelFormatter::convertToCanMessage(buffer, myMsg));
+
+	TEST_ASSERT_EQUALS(msg.identifier, myMsg.identifier);
+	TEST_ASSERT_EQUALS(msg.length, myMsg.length);
+	TEST_ASSERT_EQUALS(msg.flags.extended, myMsg.flags.extended);
+	TEST_ASSERT_EQUALS(msg.flags.rtr, myMsg.flags.rtr);
+	TEST_ASSERT_EQUALS_ARRAY(msg.data, myMsg.data, 4U);
+}
+
+
+
+

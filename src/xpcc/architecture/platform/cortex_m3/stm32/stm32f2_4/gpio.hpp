@@ -241,10 +241,10 @@ namespace xpcc
 		setOutput(::xpcc::stm32::OutputType out = ::xpcc::stm32::PUSH_PULL, \
 				::xpcc::stm32::OutputSpeed speed = ::xpcc::stm32::SPEED_50MHZ, \
 				::xpcc::stm32::PullType pull = ::xpcc::stm32::FLOATING) { \
-			GPIO ## port->MODER = (GPIO ## port->MODER & ~(0x3 << (pin * 2))) | (0x1 << (pin * 2)); \
-			GPIO ## port->OTYPER = (GPIO ## port->OTYPER & ~(1 << pin)) | (out << pin); \
-			GPIO ## port->OSPEEDR = (GPIO ## port->OSPEEDR & ~(0x3 << (pin * 2))) | (speed << (pin * 2)); \
-			GPIO ## port->PUPDR = (GPIO ## port->PUPDR & ~(0x3 << (pin * 2))) | (pull << (pin * 2)); \
+			CONCAT(GPIO, port)->MODER = (CONCAT(GPIO, port)->MODER & ~(0x3 << (pin * 2))) | (0x1 << (pin * 2)); \
+			CONCAT(GPIO, port)->OTYPER = (CONCAT(GPIO, port)->OTYPER & ~(1 << pin)) | (out << pin); \
+			CONCAT(GPIO, port)->OSPEEDR = (CONCAT(GPIO, port)->OSPEEDR & ~(0x3 << (pin * 2))) | (speed << (pin * 2)); \
+			CONCAT(GPIO, port)->PUPDR = (CONCAT(GPIO, port)->PUPDR & ~(0x3 << (pin * 2))) | (pull << (pin * 2)); \
 		} \
 		ALWAYS_INLINE static void \
 		setAlternateFunction( \
@@ -252,42 +252,42 @@ namespace xpcc
 				::xpcc::stm32::OutputType out, \
 				::xpcc::stm32::OutputSpeed speed = ::xpcc::stm32::SPEED_50MHZ, \
 				::xpcc::stm32::PullType pull = ::xpcc::stm32::FLOATING) { \
-			GPIO ## port->MODER = (GPIO ## port->MODER & ~(0x3 << (pin * 2))) | (0x2 << (pin * 2)); \
-			::xpcc::stm32::AlternateMode<GPIO ## port ## _BASE, pin>::setMode(alt); \
-			GPIO ## port->OTYPER = (GPIO ## port->OTYPER & ~(1 << pin)) | (out << pin); \
-			GPIO ## port->OSPEEDR = (GPIO ## port->OSPEEDR & ~(0x3 << (pin * 2))) | (speed << (pin * 2)); \
-			GPIO ## port->PUPDR = (GPIO ## port->PUPDR & ~(0x3 << (pin * 2))) | (pull << (pin * 2)); \
+			CONCAT(GPIO, port)->MODER = (CONCAT(GPIO, port)->MODER & ~(0x3 << (pin * 2))) | (0x2 << (pin * 2)); \
+			::xpcc::stm32::AlternateMode<CONCAT3(GPIO, port, _BASE), pin>::setMode(alt); \
+			CONCAT(GPIO, port)->OTYPER = (CONCAT(GPIO, port)->OTYPER & ~(1 << pin)) | (out << pin); \
+			CONCAT(GPIO, port)->OSPEEDR = (CONCAT(GPIO, port)->OSPEEDR & ~(0x3 << (pin * 2))) | (speed << (pin * 2)); \
+			CONCAT(GPIO, port)->PUPDR = (CONCAT(GPIO, port)->PUPDR & ~(0x3 << (pin * 2))) | (pull << (pin * 2)); \
 		} \
 		ALWAYS_INLINE static void \
 		setAlternateFunction( \
 				::xpcc::stm32::AlternateFunction alt, \
 				::xpcc::stm32::PullType pull) { \
-			GPIO ## port->MODER = (GPIO ## port->MODER & ~(0x3 << (pin * 2))) | (0x2 << (pin * 2)); \
-			::xpcc::stm32::AlternateMode<GPIO ## port ## _BASE, pin>::setMode(alt); \
-			GPIO ## port->OTYPER = (GPIO ## port->OTYPER & ~(1 << pin)) | \
+			CONCAT(GPIO, port)->MODER = (CONCAT(GPIO, port)->MODER & ~(0x3 << (pin * 2))) | (0x2 << (pin * 2)); \
+			::xpcc::stm32::AlternateMode<CONCAT3(GPIO, port, _BASE), pin>::setMode(alt); \
+			CONCAT(GPIO, port)->OTYPER = (CONCAT(GPIO, port)->OTYPER & ~(1 << pin)) | \
 				(::xpcc::stm32::PUSH_PULL << pin); \
-			GPIO ## port->OSPEEDR = (GPIO ## port->OSPEEDR & ~(0x3 << (pin * 2))) | \
+			CONCAT(GPIO, port)->OSPEEDR = (CONCAT(GPIO, port)->OSPEEDR & ~(0x3 << (pin * 2))) | \
 				(::xpcc::stm32::SPEED_2MHZ << (pin * 2)); \
-			GPIO ## port->PUPDR = (GPIO ## port->PUPDR & ~(0x3 << (pin * 2))) | (pull << (pin * 2)); \
+			CONCAT(GPIO, port)->PUPDR = (CONCAT(GPIO, port)->PUPDR & ~(0x3 << (pin * 2))) | (pull << (pin * 2)); \
 		} \
 		ALWAYS_INLINE static void \
 		setInput(::xpcc::stm32::PullType type = ::xpcc::stm32::FLOATING) { \
-			GPIO ## port->MODER &= ~(0x3 << (pin * 2)); \
-			GPIO ## port->PUPDR = \
-				(GPIO ## port->PUPDR & ~(0x3 << (pin * 2))) | \
+			CONCAT(GPIO, port)->MODER &= ~(0x3 << (pin * 2)); \
+			CONCAT(GPIO, port)->PUPDR = \
+				(CONCAT(GPIO, port)->PUPDR & ~(0x3 << (pin * 2))) | \
 				(type << (pin * 2)); \
 		} \
 		ALWAYS_INLINE static void \
 		setAnalogInput() { \
-			GPIO ## port->MODER |= 0x3 << (pin * 2); \
+			CONCAT(GPIO, port)->MODER |= 0x3 << (pin * 2); \
 		} \
-		ALWAYS_INLINE static void set() { GPIO ## port->BSRRL = (1 << pin); } \
-		ALWAYS_INLINE static void reset() { GPIO ## port->BSRRH = (1 << pin); } \
-		ALWAYS_INLINE static void toggle() { if (GPIO ## port->ODR & (1 << pin)) { reset(); } else { set(); } } \
+		ALWAYS_INLINE static void set() { CONCAT(GPIO, port)->BSRRL = (1 << pin); } \
+		ALWAYS_INLINE static void reset() { CONCAT(GPIO, port)->BSRRH = (1 << pin); } \
+		ALWAYS_INLINE static void toggle() { if (CONCAT(GPIO, port)->ODR & (1 << pin)) { reset(); } else { set(); } } \
 		ALWAYS_INLINE static void set(bool status) { if (status) { set(); } else { reset(); } } \
 		\
 		ALWAYS_INLINE static bool read() { \
-			return GPIO ## port->IDR & (1 << pin); \
+			return CONCAT(GPIO, port)->IDR & (1 << pin); \
 		} \
 	}
 
@@ -326,10 +326,10 @@ namespace xpcc
 		setOutput(::xpcc::stm32::OutputType out = ::xpcc::stm32::PUSH_PULL, \
 				::xpcc::stm32::OutputSpeed speed = ::xpcc::stm32::SPEED_50MHZ, \
 				::xpcc::stm32::PullType pull = ::xpcc::stm32::FLOATING) { \
-			GPIO ## port->MODER = (GPIO ## port->MODER & ~(0x3 << (pin * 2))) | (0x1 << (pin * 2)); \
-			GPIO ## port->OTYPER = (GPIO ## port->OTYPER & ~(1 << pin)) | (out << pin); \
-			GPIO ## port->OSPEEDR = (GPIO ## port->OSPEEDR & ~(0x3 << (pin * 2))) | (speed << (pin * 2)); \
-			GPIO ## port->PUPDR = (GPIO ## port->PUPDR & ~(0x3 << (pin * 2))) | (pull << (pin * 2)); \
+			CONCAT(GPIO, port)->MODER = (CONCAT(GPIO, port)->MODER & ~(0x3 << (pin * 2))) | (0x1 << (pin * 2)); \
+			CONCAT(GPIO, port)->OTYPER = (CONCAT(GPIO, port)->OTYPER & ~(1 << pin)) | (out << pin); \
+			CONCAT(GPIO, port)->OSPEEDR = (CONCAT(GPIO, port)->OSPEEDR & ~(0x3 << (pin * 2))) | (speed << (pin * 2)); \
+			CONCAT(GPIO, port)->PUPDR = (CONCAT(GPIO, port)->PUPDR & ~(0x3 << (pin * 2))) | (pull << (pin * 2)); \
 		} \
 		ALWAYS_INLINE static void \
 		setAlternateFunction( \
@@ -337,15 +337,15 @@ namespace xpcc
 				::xpcc::stm32::OutputType out, \
 				::xpcc::stm32::OutputSpeed speed = ::xpcc::stm32::SPEED_50MHZ, \
 				::xpcc::stm32::PullType pull = ::xpcc::stm32::FLOATING) { \
-			GPIO ## port->MODER = (GPIO ## port->MODER & ~(0x3 << (pin * 2))) | (0x2 << (pin * 2)); \
-			::xpcc::stm32::AlternateMode<GPIO ## port ## _BASE, pin>::setMode(alt); \
-			GPIO ## port->OTYPER = (GPIO ## port->OTYPER & ~(1 << pin)) | (out << pin); \
-			GPIO ## port->OSPEEDR = (GPIO ## port->OSPEEDR & ~(0x3 << (pin * 2))) | (speed << (pin * 2)); \
-			GPIO ## port->PUPDR = (GPIO ## port->PUPDR & ~(0x3 << (pin * 2))) | (pull << (pin * 2)); \
+			CONCAT(GPIO, port)->MODER = (CONCAT(GPIO, port)->MODER & ~(0x3 << (pin * 2))) | (0x2 << (pin * 2)); \
+			::xpcc::stm32::AlternateMode<CONCAT3(GPIO, port, _BASE), pin>::setMode(alt); \
+			CONCAT(GPIO, port)->OTYPER = (CONCAT(GPIO, port)->OTYPER & ~(1 << pin)) | (out << pin); \
+			CONCAT(GPIO, port)->OSPEEDR = (CONCAT(GPIO, port)->OSPEEDR & ~(0x3 << (pin * 2))) | (speed << (pin * 2)); \
+			CONCAT(GPIO, port)->PUPDR = (CONCAT(GPIO, port)->PUPDR & ~(0x3 << (pin * 2))) | (pull << (pin * 2)); \
 		} \
-		ALWAYS_INLINE static void set() { GPIO ## port->BSRRL = (1 << pin); } \
-		ALWAYS_INLINE static void reset() { GPIO ## port->BSRRH = (1 << pin); } \
-		ALWAYS_INLINE static void toggle() { if (GPIO ## port->ODR & (1 << pin)) { reset(); } else { set(); } } \
+		ALWAYS_INLINE static void set() { CONCAT(GPIO, port)->BSRRL = (1 << pin); } \
+		ALWAYS_INLINE static void reset() { CONCAT(GPIO, port)->BSRRH = (1 << pin); } \
+		ALWAYS_INLINE static void toggle() { if (CONCAT(GPIO, port)->ODR & (1 << pin)) { reset(); } else { set(); } } \
 		ALWAYS_INLINE static void set(bool status) { if (status) { set(); } else { reset(); } } \
 	}
 
@@ -375,29 +375,29 @@ namespace xpcc
 	struct name { \
 		ALWAYS_INLINE static void \
 		setInput(::xpcc::stm32::PullType type = ::xpcc::stm32::FLOATING) { \
-			GPIO ## port->MODER &= ~(0x3 << (pin * 2)); \
-			GPIO ## port->PUPDR = \
-				(GPIO ## port->PUPDR & ~(0x3 << (pin * 2))) | \
+			CONCAT(GPIO, port)->MODER &= ~(0x3 << (pin * 2)); \
+			CONCAT(GPIO, port)->PUPDR = \
+				(CONCAT(GPIO, port)->PUPDR & ~(0x3 << (pin * 2))) | \
 				(type << (pin * 2)); \
 		} \
 		ALWAYS_INLINE static void \
 		setAnalogInput() { \
-			GPIO ## port->MODER |= 0x3 << (pin * 2); \
+			CONCAT(GPIO, port)->MODER |= 0x3 << (pin * 2); \
 		} \
 		ALWAYS_INLINE static void \
 		setAlternateFunction( \
 				::xpcc::stm32::AlternateFunction alt, \
 				::xpcc::stm32::PullType pull = ::xpcc::stm32::FLOATING) { \
-			GPIO ## port->MODER = (GPIO ## port->MODER & ~(0x3 << (pin * 2))) | (0x2 << (pin * 2)); \
-			::xpcc::stm32::AlternateMode<GPIO ## port ## _BASE, pin>::setMode(alt); \
-			GPIO ## port->OTYPER = (GPIO ## port->OTYPER & ~(1 << pin)) | \
+			CONCAT(GPIO, port)->MODER = (CONCAT(GPIO, port)->MODER & ~(0x3 << (pin * 2))) | (0x2 << (pin * 2)); \
+			::xpcc::stm32::AlternateMode<CONCAT3(GPIO, port, _BASE), pin>::setMode(alt); \
+			CONCAT(GPIO, port)->OTYPER = (CONCAT(GPIO, port)->OTYPER & ~(1 << pin)) | \
 				(::xpcc::stm32::PUSH_PULL << pin); \
-			GPIO ## port->OSPEEDR = (GPIO ## port->OSPEEDR & ~(0x3 << (pin * 2))) | \
+			CONCAT(GPIO, port)->OSPEEDR = (CONCAT(GPIO, port)->OSPEEDR & ~(0x3 << (pin * 2))) | \
 				(::xpcc::stm32::SPEED_2MHZ << (pin * 2)); \
-			GPIO ## port->PUPDR = (GPIO ## port->PUPDR & ~(0x3 << (pin * 2))) | (pull << (pin * 2)); \
+			CONCAT(GPIO, port)->PUPDR = (CONCAT(GPIO, port)->PUPDR & ~(0x3 << (pin * 2))) | (pull << (pin * 2)); \
 		} \
 		ALWAYS_INLINE static bool read() { \
-			return GPIO ## port->IDR & (1 << pin); \
+			return CONCAT(GPIO, port)->IDR & (1 << pin); \
 		} \
 	}
 

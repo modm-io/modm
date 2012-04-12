@@ -52,7 +52,7 @@ main(void)
 	std::ofstream file("plot.dat");
 	while(1)
 	{
-		file << index << " " << speed << " " << position << " " << (speed - oldSpeed) << std::endl;
+		file      << index << " " << speed << " " << position << " " << (speed - oldSpeed) << std::endl;
 		std::cout << index << " " << speed << " " << position << " " << (speed - oldSpeed) << std::endl;
 		
 		oldSpeed = speed;

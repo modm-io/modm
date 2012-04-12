@@ -108,6 +108,16 @@ namespace xpcc
 			CURRENT_17_5mA = 0x06,
 			CURRENT_20mA = 0x07,
 		};
+
+		/**
+		 * \brief	None-intuitive correspondence between PWM value and brightness.
+		 */
+		enum Brightness
+		{
+			ON  = 0xfe,
+			OFF = 0xff,
+			MIN = 0x03
+		};
 	}
 	
 	/**

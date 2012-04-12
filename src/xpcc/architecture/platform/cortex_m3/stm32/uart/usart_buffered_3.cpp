@@ -47,6 +47,8 @@ namespace
 {
 	static xpcc::atomic::Queue<char, USART3_RX_BUFFER_SIZE> rxBuffer;
 	static xpcc::atomic::Queue<char, USART3_TX_BUFFER_SIZE> txBuffer;
+	
+	static bool isBlocking = true;
 }
 
 namespace
@@ -139,10 +141,12 @@ USART3_IRQHandler()
 // ----------------------------------------------------------------------------
 void
 xpcc::stm32::BufferedUsart3::setBaudrate(uint32_t baudrate,
-		uint32_t interruptPriority)
+		uint32_t interruptPriority, bool blocking)
 {
 	// Enable clock
 	RCC->APB1ENR |= RCC_APB1ENR_USART3EN;
+	
+	isBlocking = blocking;
 	
 	USART3->CR1 = 0;
 	
@@ -178,8 +182,10 @@ xpcc::stm32::BufferedUsart3::write(const uint8_t *s, uint8_t n)
 void
 xpcc::stm32::BufferedUsart3::write(uint8_t c)
 {
-	while (!txBuffer.push(c)) {
-		// wait for a free slot in the buffer
+	while ( !txBuffer.push(c) ) {
+		if (!isBlocking) {
+			return;
+		}
 	}
 	
 	// Disable interrupts while enabling the transmit interrupt

@@ -48,7 +48,7 @@ TimeTest::testConversionToUnixTime()
 	date.dayOfTheWeek = 0;
 	date.dayOfTheYear = 251;
 	
-	TEST_ASSERT_EQUALS(date.toUnixTimestamp(), 1000000000UL);
+	TEST_ASSERT_EQUALS(date.toUnixTimestamp(), static_cast<uint32_t>(1000000000UL));
 }
 
 // ----------------------------------------------------------------------------
@@ -67,7 +67,7 @@ TimeTest::testConversionToUnixTime2()
 	date.dayOfTheWeek = 6;
 	date.dayOfTheYear = 9;
 	
-	TEST_ASSERT_EQUALS(date.toUnixTimestamp(), 1073741824UL);
+	TEST_ASSERT_EQUALS(date.toUnixTimestamp(), static_cast<uint32_t>(1073741824UL));
 }
 
 // ----------------------------------------------------------------------------
@@ -86,7 +86,7 @@ TimeTest::testConversionToUnixTime3()
 	date.dayOfTheWeek = 3;
 	date.dayOfTheYear = 207;
 	
-	TEST_ASSERT_EQUALS(date.toUnixTimestamp(), 1311738121UL);
+	TEST_ASSERT_EQUALS(date.toUnixTimestamp(), static_cast<uint32_t>(1311738121UL));
 }
 
 // ----------------------------------------------------------------------------
@@ -104,7 +104,7 @@ TimeTest::testConversionToUnixTime4()
 	date.dayOfTheWeek = 1;
 	date.dayOfTheYear = 92;
 	
-	TEST_ASSERT_EQUALS(date.toUnixTimestamp(), 1333329284UL);
+	TEST_ASSERT_EQUALS(date.toUnixTimestamp(), static_cast<uint32_t>(1333329284UL));
 }
 
 // ----------------------------------------------------------------------------
@@ -123,7 +123,7 @@ TimeTest::testConversionToUnixTime5()
 	date.dayOfTheWeek = 0;
 	date.dayOfTheYear = 201;
 	
-	TEST_ASSERT_EQUALS(date.toUnixTimestamp(), 3141592653UL);
+	TEST_ASSERT_EQUALS(date.toUnixTimestamp(), static_cast<uint32_t>(3141592653UL));
 }
 
 // ----------------------------------------------------------------------------
