@@ -43,7 +43,22 @@ public:
 	testCrcMessage();
 	
 	void
-	testInitialize();
+	testChainSetup();
+	
+	void
+	testSelftest();
+	
+	void
+	testSoftwareReset();
+	
+	void
+	testChannelRead();
+	
+	void
+	testAllChannelRead();
+	
+	void
+	testBalancer();
 };
 
 

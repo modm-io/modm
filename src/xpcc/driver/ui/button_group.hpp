@@ -132,7 +132,7 @@ isReleased()     -------X----------------------X-------X----
 		
 		/** \brief	 check if a key has been pressed
 		 * 
-		 * Each pressed key is reported only once.
+		 * Each pressed key is only reported once.
 		 * 
 		 * \code
 		 * xpcc::ButtonGroup<> buttons;
@@ -151,7 +151,7 @@ isReleased()     -------X----------------------X-------X----
 		/** \brief	Check if a key has been pressed long enough such that the
 		 *			key repeat functionality kicks in.
 		 *
-		 * After a small setup delay the key is reported beeing pressed
+		 * After a small setup delay the key is reported being pressed
 		 * subsequent calls to this function. This simulates the user
 		 * repeatedly pressing and releasing the key.
 		 * 

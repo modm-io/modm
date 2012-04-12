@@ -32,6 +32,7 @@
 
 #include "ad7280a_test.hpp"
 
+// ----------------------------------------------------------------------------
 #define ENABLE_MACRO_EXPORT
 #include "spi_device.hpp"
 #undef ENABLE_MACRO_EXPORT
@@ -70,6 +71,7 @@ struct Cs
 
 typedef xpcc::Ad7280a<Spi, Cs, xpcc::gpio::Unused, 1> Ad7280a;
 
+// ----------------------------------------------------------------------------
 void
 Ad7280aTest::testCrcByte()
 {
@@ -82,6 +84,7 @@ Ad7280aTest::testCrcByte()
 	TEST_ASSERT_EQUALS(Ad7280a::updateCrc(0xFF),  66);
 }
 
+// ----------------------------------------------------------------------------
 void
 Ad7280aTest::testCrcMessage()
 {
@@ -98,19 +101,126 @@ Ad7280aTest::testCrcMessage()
 	TEST_ASSERT_EQUALS(Ad7280a::calculateCrc(0x205335), 0x46);
 }
 
+// ----------------------------------------------------------------------------
 void
-Ad7280aTest::testInitialize()
+Ad7280aTest::testChainSetup()
 {
 	test::Transmission transmissionsInitialize[] = {
-		test::Transmission(4, RX_DATA(0x01,0xC2,0xB6,0xE2), TX_DATA(0,0,0,0)),
-		test::Transmission(4, RX_DATA(0x03,0x87,0x16,0xCA), TX_DATA(0,0,0,0)),
-		test::Transmission(4, RX_DATA(0xF8,0x00,0x03,0x0A), TX_DATA(0,0,0,0)),
+		test::Transmission(4, RX_DATA(0x01,0xD2,0xB4,0x12), TX_DATA(0x00,0x00,0x00,0x00)),
+		test::Transmission(4, RX_DATA(0x01,0xC2,0xB6,0xE2), TX_DATA(0x00,0x00,0x00,0x00)),
+		test::Transmission(4, RX_DATA(0x03,0x87,0x16,0xCA), TX_DATA(0x00,0x00,0x00,0x00)),
+		test::Transmission(4, RX_DATA(0xF8,0x00,0x03,0x0A), TX_DATA(0x11,0xC2,0x65,0xDC)),
 	};
 	
-	device.start(transmissionsInitialize, ARRAY_SIZE(transmissionsInitialize));
+	device.start(transmissionsInitialize, ARRAY_SIZE(transmissionsInitialize), __LINE__);
 	
-	TEST_ASSERT_TRUE(Ad7280a::initialize());
+	TEST_ASSERT_TRUE(Ad7280a::chainSetup());
 	
-	TEST_ASSERT_TRUE(device.isSuccessful());
-	device.reportErrors();
+	device.finish();
+}
+
+// ----------------------------------------------------------------------------
+void
+Ad7280aTest::testSelftest()
+{
+	test::Transmission transmissionsInitialize[] = {
+		test::Transmission(4, RX_DATA(0x01,0xB8,0x10,0x92), TX_DATA(0x00,0x00,0x00,0x00)),
+		test::Transmission(4, RX_DATA(0x01,0xC2,0xB6,0xE2), TX_DATA(0x00,0x00,0x00,0x00)),
+		test::Transmission(4, RX_DATA(0x03,0x86,0x17,0xCA), TX_DATA(0x00,0x00,0x00,0x00)),
+		test::Transmission(4, RX_DATA(0x03,0xA0,0x54,0x6A), TX_DATA(0x00,0x00,0x00,0x00)),
+		test::Transmission(4, RX_DATA(0x03,0xA0,0x34,0x0A), TX_DATA(0x00,0x00,0x00,0x00)),
+		
+		// Read the self-test conversion result (value = 980)
+		test::Transmission(4, RX_DATA(0xF8,0x00,0x03,0x0A), TX_DATA(0x00,0x1E,0xA5,0x90)),
+	};
+	
+	device.start(transmissionsInitialize, ARRAY_SIZE(transmissionsInitialize), __LINE__);
+	
+	TEST_ASSERT_TRUE(Ad7280a::performSelftest());
+	
+	device.finish();
+}
+
+// ----------------------------------------------------------------------------
+void
+Ad7280aTest::testSoftwareReset()
+{
+	test::Transmission transmissionsInitialize[] = {
+		test::Transmission(4, RX_DATA(0x01,0xD2,0xB4,0x12), TX_DATA(0x00,0x00,0x00,0x00)),
+		test::Transmission(4, RX_DATA(0x01,0xC2,0xB6,0xE2), TX_DATA(0x00,0x00,0x00,0x00)),
+	};
+	
+	device.start(transmissionsInitialize, ARRAY_SIZE(transmissionsInitialize), __LINE__);
+	
+	Ad7280a::softwareReset();
+	
+	device.finish();
+}
+
+// ----------------------------------------------------------------------------
+void
+Ad7280aTest::testChannelRead()
+{
+	test::Transmission transmissionsInitialize[] = {
+		test::Transmission(4, RX_DATA(0x01,0xA6,0x15,0x1A), TX_DATA(0x00,0x00,0x00,0x00)),
+		test::Transmission(4, RX_DATA(0x01,0xA1,0x02,0x0A), TX_DATA(0x00,0x00,0x00,0x00)),
+		
+		test::Transmission(4, RX_DATA(0xF8,0x00,0x03,0x0A), TX_DATA(0x01,0x91,0x2D,0x88)),
+	};
+	
+	device.start(transmissionsInitialize, ARRAY_SIZE(transmissionsInitialize), __LINE__);
+	
+	uint16_t value;
+	TEST_ASSERT_TRUE(Ad7280a::readChannel(0, xpcc::ad7280a::CELL_VOLTAGE_4, &value));
+	
+	TEST_ASSERT_EQUALS(value, 549);
+	
+	device.finish();
+}
+
+// ----------------------------------------------------------------------------
+void
+Ad7280aTest::testAllChannelRead()
+{
+	test::Transmission transmissionsInitialize[] = {
+		test::Transmission(4, RX_DATA(0x03,0x80,0x11,0xCA), TX_DATA(0x00,0x00,0x00,0x00)),
+		test::Transmission(4, RX_DATA(0x01,0xB4,0x15,0xEA), TX_DATA(0x00,0x00,0x00,0x00)),
+		test::Transmission(4, RX_DATA(0x03,0xA0,0x54,0x6A), TX_DATA(0x00,0x00,0x00,0x00)),
+		
+		test::Transmission(4, RX_DATA(0xF8,0x00,0x03,0x0A), TX_DATA(0x00,0x03,0x27,0x24)),
+		test::Transmission(4, RX_DATA(0xF8,0x00,0x03,0x0A), TX_DATA(0x00,0x86,0x47,0x34)),
+		test::Transmission(4, RX_DATA(0xF8,0x00,0x03,0x0A), TX_DATA(0x01,0x09,0x67,0x84)),
+		test::Transmission(4, RX_DATA(0xF8,0x00,0x03,0x0A), TX_DATA(0x01,0x8C,0x87,0x14)),
+		test::Transmission(4, RX_DATA(0xF8,0x00,0x03,0x0A), TX_DATA(0x02,0x0F,0xA5,0xEC)),
+		test::Transmission(4, RX_DATA(0xF8,0x00,0x03,0x0A), TX_DATA(0x02,0x92,0xC6,0x74)),
+	};
+	
+	device.start(transmissionsInitialize, ARRAY_SIZE(transmissionsInitialize), __LINE__);
+	
+	uint16_t values[6];
+	TEST_ASSERT_TRUE(Ad7280a::readAllChannels(values));
+	
+	TEST_ASSERT_EQUALS(values[0], 100);
+	TEST_ASSERT_EQUALS(values[1], 200);
+	TEST_ASSERT_EQUALS(values[2], 300);
+	TEST_ASSERT_EQUALS(values[3], 400);
+	TEST_ASSERT_EQUALS(values[4], 500);
+	TEST_ASSERT_EQUALS(values[5], 600);
+	
+	device.finish();
+}
+
+// ----------------------------------------------------------------------------
+void
+Ad7280aTest::testBalancer()
+{
+	test::Transmission transmissionsInitialize[] = {
+		test::Transmission(4, RX_DATA(0x02,0x81,0x83,0xC2), TX_DATA(0x00,0x00,0x00,0x00)),
+	};
+	
+	device.start(transmissionsInitialize, ARRAY_SIZE(transmissionsInitialize), __LINE__);
+	
+	Ad7280a::enableBalancer(0, xpcc::ad7280a::CB1 | xpcc::ad7280a::CB2);
+	
+	device.finish();
 }

@@ -34,8 +34,11 @@
 #define XPCC__AD7280A_HPP
 
 #include <stdint.h>
+
 #include <xpcc/architecture/driver/gpio.hpp>
 #include <xpcc/architecture/driver/delay.hpp>
+
+#include <xpcc/io/iostream.hpp>
 
 // Forward declaration for the Unit-tests
 class Ad7280aTest;
@@ -46,72 +49,100 @@ namespace xpcc
 	{
 		enum Cell
 		{
+			BALANCER_OFF = 0,
+			
 			CB1 = (1 << 2),
 			CB2 = (1 << 3),
 			CB3 = (1 << 4),
 			CB4 = (1 << 5),
 			CB5 = (1 << 6),
 			CB6 = (1 << 7),
+			
+			BALANCER_ALL = 0xfc,
 		};
 		
-		enum Register
+		enum Channel
 		{
 			// The cell voltage registers store the conversion result from
 			// each cell input. The conversion result is in 12-bit straight
 			// binary format.
-			CELL_VOLTAGE_1 =        0x0,	// D11 to D0, Read only
-			CELL_VOLTAGE_2 =        0x1,	// D11 to D0, Read only
-			CELL_VOLTAGE_3 =        0x2,	// D11 to D0, Read only
-			CELL_VOLTAGE_4 =        0x3,	// D11 to D0, Read only
-			CELL_VOLTAGE_5 =        0x4,	// D11 to D0, Read only
-			CELL_VOLTAGE_6 =        0x5,	// D11 to D0, Read only
+			CELL_VOLTAGE_1 = 0x0,	// D11 to D0, Read only
+			CELL_VOLTAGE_2 = 0x1,	// D11 to D0, Read only
+			CELL_VOLTAGE_3 = 0x2,	// D11 to D0, Read only
+			CELL_VOLTAGE_4 = 0x3,	// D11 to D0, Read only
+			CELL_VOLTAGE_5 = 0x4,	// D11 to D0, Read only
+			CELL_VOLTAGE_6 = 0x5,	// D11 to D0, Read only
 			
 			// The AUX ADC registers store the conversion result from each
 			// auxiliary ADC input. The conversion result is in 12-bit straight
 			// binary format.
-			AUX_ADC_1 =             0x6,	// D11 to D0, Read only
-			AUX_ADC_2 =             0x7,	// D11 to D0, Read only
-			AUX_ADC_3 =             0x8,	// D11 to D0, Read only
-			AUX_ADC_4 =             0x9,	// D11 to D0, Read only
-			AUX_ADC_5 =             0xA,	// D11 to D0, Read only
-			AUX_ADC_6 =             0xB,	// D11 to D0, Read only
+			AUX_ADC_1 = 0x6,	// D11 to D0, Read only
+			AUX_ADC_2 = 0x7,	// D11 to D0, Read only
+			AUX_ADC_3 = 0x8,	// D11 to D0, Read only
+			AUX_ADC_4 = 0x9,	// D11 to D0, Read only
+			AUX_ADC_5 = 0xA,	// D11 to D0, Read only
+			AUX_ADC_6 = 0xB,	// D11 to D0, Read only
 			
 			// The self-test register stores the conversion result of the ADC
 			// self-test. The conversion result is in 12-bit straight binary
 			// format.
-			SELF_TEST =             0xC,	// D11 to D0, Read only
-			
+			SELF_TEST = 0xC,	// D11 to D0, Read only
+		};
+		
+		enum Register
+		{
 			// The control register is a 16-bit register that is used to
 			// configure the AD7280A
-			CONTROL_HB =            0xD,	// D15 to D8, Read/write
-			CONTROL_LB =            0xE,	// D7 to D0, Read/write
+			CTRL_HB = 0xD,	// D15 to D8, Read/write
+			CTRL_LB = 0xE,	// D7 to D0, Read/write
 			
-			CELL_OVERVOLTAGE =      0xF,	// D7 to D0, Read/write
-			CELL_UNDERVOLTAGE =     0x10,	// D7 to D0, Read/write
-			AUX_ADC_OVERVOLTAGE =   0x11,	// D7 to D0, Read/write
-			AUX_ADC_UNDERVOLTAGE =  0x12,	// D7 to D0, Read/write
-			ALERT =                 0x13,	// D7 to D0, Read/write
-			CELL_BALANCE =          0x14,	// D7 to D0, Read/write
+			CELL_OVERVOLTAGE = 0xF,			// D7 to D0, Read/write
+			CELL_UNDERVOLTAGE = 0x10,		// D7 to D0, Read/write
+			AUX_ADC_OVERVOLTAGE = 0x11,		// D7 to D0, Read/write
+			AUX_ADC_UNDERVOLTAGE = 0x12,	// D7 to D0, Read/write
+			ALERT = 0x13,					// D7 to D0, Read/write
+			CELL_BALANCE = 0x14,			// D7 to D0, Read/write
 			
 			// [D7:D3] 5-bit binary code to set the CB timer to a value
 			//         from 0 minutes to 36.9 minutes, Resolution is 71,5 s.
 			// [D2:D0] Reserved; set to 000
-			CB1_TIMER =             0x15,	// D7 to D0, Read/write
-			CB2_TIMER =             0x16,	// D7 to D0, Read/write
-			CB3_TIMER =             0x17,	// D7 to D0, Read/write
-			CB4_TIMER =             0x18,	// D7 to D0, Read/write
-			CB5_TIMER =             0x19,	// D7 to D0, Read/write
-			CB6_TIMER =             0x1A,	// D7 to D0, Read/write
+			CB1_TIMER = 0x15,	// D7 to D0, Read/write
+			CB2_TIMER = 0x16,	// D7 to D0, Read/write
+			CB3_TIMER = 0x17,	// D7 to D0, Read/write
+			CB4_TIMER = 0x18,	// D7 to D0, Read/write
+			CB5_TIMER = 0x19,	// D7 to D0, Read/write
+			CB6_TIMER = 0x1A,	// D7 to D0, Read/write
 			
 			// [D7:D3] 5-bit binary code to set the PD timer to a value
 			//         from 0 minutes to 36.9 minutes, Resolution is 71,5 s.
 			// [D2:D0] Reserved; set to 000
-			PD_TIMER =              0x1B,	// D7 to D0, Read/write
+			PD_TIMER = 0x1B,	// D7 to D0, Read/write
 			
 			// [D7:D2] 6-bit binary address for the register to be read, 
 			// [D1:D0] Reserved; set to 00.
-			READ =                  0x1C,	// D7 to D0, Read/write
-			CNVST_CONTROL =         0x1D,	// D7 to D0, Read/write
+			READ = 0x1C,			// D7 to D0, Read/write
+			CNVST_CONTROL = 0x1D,	// D7 to D0, Read/write
+		};
+		
+		enum Device
+		{
+			MASTER = 0,
+		};
+		
+		struct RegisterValue
+		{
+			uint8_t device;
+			uint8_t registerAddress;
+			uint8_t value;
+			bool acknowledge;
+		};
+		
+		struct ConversionValue
+		{
+			uint8_t device;
+			uint8_t channel;
+			uint16_t value;			///< 12-Bit => 0..4095
+			bool acknowledge;
 		};
 	}
 	
@@ -137,36 +168,49 @@ namespace xpcc
 	 * \tparam	Spi		SPI interface
 	 * \tparam	Cs		Chip-Select Pin
 	 * \tparam	Cnvst	Conversion Start Pin
-	 * \tparam	N		Number of devices in a daisy chain
+	 * \tparam	N		Number of devices in a daisy chain (1..8)
 	 */
 	template <typename Spi, typename Cs, typename Cnvst, int N>
 	class Ad7280a
 	{
+		// used for Unittests
 		friend class ::Ad7280aTest;
+		
 	public:
+		static void
+		initialize();
+		
 		/*
-		 * \param deviceCount
-		 * 		Number of devices in the Daisy-Chain (0..8).
+		 * Initialize daisy chain.
 		 */
 		static bool
-		initialize();
+		chainSetup();
 		
 		/**
 		 * Enable/Disable the six cell balance outputs.
 		 */
 		static void
-		enableBalancer(uint8_t device, ad7280a::Cell cells);
+		enableBalancer(uint8_t device, uint8_t cells);
+		
+		static bool
+		performSelftest();
 		
 		static void
-		performSelftest();
+		softwareReset();
+		
+		/**
+		 * Read a single channel
+		 */
+		static bool
+		readChannel(uint8_t device, ad7280a::Channel channel, uint16_t *value);
 		
 		/**
 		 * Perform a conversion and read the results back.
 		 * 
 		 * \param[out]	values		Array containing the results
 		 */
-		static void
-		readVoltages(uint16_t *values);
+		static bool
+		readAllChannels(uint16_t *values);
 		
 	private:
 		/**
@@ -178,7 +222,7 @@ namespace xpcc
 		/**
 		 * Calculate the CRC value for an entire message.
 		 * 
-		 * The message needs to be right aligned, so that bit 0 is the MSB: 
+		 * The message needs to be right aligned, bit 0 is the MSB: 
 		 * \code
 		 * // CRC for write operation
 		 * uint8_t crc = calculateCrc(reg >> 11);
@@ -186,7 +230,6 @@ namespace xpcc
 		 * // CRC for read operation
 		 * uint8_t crc = calculateCrc(reg >> 10);
 		 * \endcode
-		 * 
 		 */
 		static uint8_t
 		calculateCrc(uint32_t data);
@@ -194,34 +237,31 @@ namespace xpcc
 		static bool
 		write(uint8_t device, ad7280a::Register reg, bool addressAll, uint8_t value);
 		
-		struct RegisterTransfer
-		{
-			uint8_t device;
-			uint8_t reg;			///< Register Number
-			uint8_t data;
-			bool acknowledge;
-		};
+		static bool
+		read(uint32_t *value);
 		
-		struct ConversionTransfer
-		{
-			uint8_t device;
-			uint8_t channel;
-			uint16_t data;			///< 12-Bit => 0..4095
-			bool acknowledge;
-		};
 		
 		static bool
-		readRegister(RegisterTransfer* result, uint32_t value);
+		readRegister(ad7280a::RegisterValue* result);
 		
 		static bool
-		readConversion(ConversionTransfer* result, uint32_t value);
+		readConversionResult(ad7280a::ConversionValue* result);
 		
-		static void
+		
+		/*static void
 		dumpRegisterRead(uint32_t value);
 		
 		static void
-		dumpConversion(uint32_t value);
+		dumpConversion(uint32_t value);*/
 	};
+	
+	// ------------------------------------------------------------------------
+	// Output operators
+	IOStream&
+	operator << (IOStream& os, const ad7280a::RegisterValue& c);
+	
+	IOStream&
+	operator << (IOStream& os, const ad7280a::ConversionValue& c);
 }
 
 #include "ad7280a_impl.hpp"

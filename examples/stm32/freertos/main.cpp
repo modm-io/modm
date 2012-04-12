@@ -151,6 +151,8 @@ DisplayThread thread3;
 int
 main(void)
 {
+	// Switch to the external clock and enable the PLL to let
+	// the STM32 run at 72 MHz.
 	initClock();
 
 	LedStat::setOutput(xpcc::gpio::HIGH);
