@@ -1,7 +1,7 @@
 #include <xpcc/architecture.hpp>
 #include <xpcc/debug/logger.hpp>
 
-#include "Adc.hpp"
+#include "adc/adc_3.hpp"
 
 /**! \file main.cpp
  * @author David Hebbeker
@@ -79,13 +79,9 @@ extern "C" void ADC1_2_IRQHandler(void)
 	XPCC_LOG_INFO << "ADC_INT1" << xpcc::endl;
 }
 
-static inline void enableInterrupt()
-{
-	ADC1->CR1 |= ADC_CR1_EOCIE;
-}
-
-
 using namespace xpcc;
+
+#define Adc Adc3
 
 MAIN_FUNCTION
 {
@@ -93,11 +89,11 @@ MAIN_FUNCTION
 
 	uart.configurePins(uart.REMAP_PC12_PD2);
 
-	XPCC_LOG_INFO << xpcc::endl << "This is an ADC Test program by David." << xpcc::endl;
+	XPCC_LOG_INFO << xpcc::endl << "This is an ADC Test program by David. 12.04.2012" << xpcc::endl;
 
 	Adc::initialize();
 	Adc::enableFreeRunningMode();
-	Adc::setChannel(PIN_A1);
+	Adc::setChannel(Adc::PIN_A1);
 	Adc::startConversion();
 
 	while(1)
