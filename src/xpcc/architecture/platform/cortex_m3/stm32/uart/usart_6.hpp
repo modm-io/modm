@@ -146,11 +146,14 @@ namespace xpcc
 			 * \param	baudrate	Desired baud rate (e.g. 115200)
 			 * \param	interruptPriority
 			 * 			Interrupt vector priority (0=highest to 15=lowest)
+			 * \param	blocking
+			 * 			The write-function waits until a free slot is available
+			 * 			in the send buffer.
 			 */
 			BufferedUsart6(uint32_t baudrate,
-					uint32_t interruptPriority)
+					uint32_t interruptPriority, bool blocking = true)
 			{
-				setBaudrate(baudrate, interruptPriority);
+				setBaudrate(baudrate, interruptPriority, blocking);
 			}
 			
 			enum Mapping
@@ -175,9 +178,13 @@ namespace xpcc
 			 * \param	baudrate	Desired baud rate (e.g. 115200)
 			 * \param	interruptPriority
 			 * 			Interrupt vector priority (0=highest to 15=lowest)
+			 * \param	blocking
+			 * 			The write-function waits until a free slot is available
+			 * 			in the send buffer.
 			 */
 			static void
-			setBaudrate(uint32_t baudrate, uint32_t interruptPriority);
+			setBaudrate(uint32_t baudrate, uint32_t interruptPriority,
+					bool blocking = true);
 			
 			/**
 			 * \brief	Send a single byte

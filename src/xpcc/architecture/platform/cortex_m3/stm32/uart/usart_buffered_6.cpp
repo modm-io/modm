@@ -49,6 +49,8 @@ namespace
 {
 	static xpcc::atomic::Queue<char, USART6_RX_BUFFER_SIZE> rxBuffer;
 	static xpcc::atomic::Queue<char, USART6_TX_BUFFER_SIZE> txBuffer;
+	
+	static bool isBlocking = true;
 }
 
 namespace
@@ -123,10 +125,12 @@ USART6_IRQHandler()
 // ----------------------------------------------------------------------------
 void
 xpcc::stm32::BufferedUsart6::setBaudrate(uint32_t baudrate,
-		uint32_t interruptPriority)
+		uint32_t interruptPriority, bool blocking)
 {
 	// Enable clock
 	RCC->APB2ENR |= RCC_APB2ENR_USART6EN;
+	
+	isBlocking = blocking;
 	
 	USART6->CR1 = 0;
 	
@@ -162,11 +166,10 @@ xpcc::stm32::BufferedUsart6::write(const uint8_t *s, uint8_t n)
 void
 xpcc::stm32::BufferedUsart6::write(uint8_t c)
 {
-	uint16_t i(0);
-	while ( !txBuffer.push(c) && (i < 1) ) {
-		++i;
-		// wait for a free slot in the buffer
-		// but do not wait infinitely
+	while ( !txBuffer.push(c) ) {
+		if (!isBlocking) {
+			return;
+		}
 	}
 	
 	// Disable interrupts while enabling the transmit interrupt
