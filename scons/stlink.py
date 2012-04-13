@@ -25,40 +25,25 @@
 # ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-# 
-# $Id: openocd.py 633 2011-11-18 20:23:55Z georgi-g $
 
 import platform
 from SCons.Script import *
 
 # -----------------------------------------------------------------------------
-def openocd_run(env, source, alias='openocd_run'):
-	if platform.system() == "Windows":
-
-		# The commands are wrapped into '-c "command1" -c "command2" ...'
-		env['OPENOCD_COMMANDS'] = env['OPENOCD_COMMANDS'].replace("$SOURCE", str(source[0]).replace("\\","/"))
-		commands = [c for c in env['OPENOCD_COMMANDS'].split('\n') if c != '']
-#		commands[0] = commands[0].replace("\\", "/")
-		action = Action("$OPENOCD -f $OPENOCD_CONFIGFILE %s" % ' '.join(['-c "%s"' % c for c in commands]), 
-			cmdstr="$OPENOCD_COMSTR")
-		return env.AlwaysBuild(env.Alias(alias, source, action))
-	else:
-	
-		# The commands are wrapped into '-c "command1" -c "command2" ...'
-		commands = [c for c in env['OPENOCD_COMMANDS'].split('\n') if c != '']
-		action = Action("$OPENOCD -f $OPENOCD_CONFIGFILE %s" % ' '.join(['-c "%s"' % c for c in commands]), 
-			cmdstr="$OPENOCD_COMSTR")
-		return env.AlwaysBuild(env.Alias(alias, source, action))
+def stlink_run(env, source, alias='stlink_run'):
+	action = Action("$STLINK -c SWD UR -P $SOURCE -V -Rst", cmdstr="$STLINK_COMSTR")
+	return env.AlwaysBuild(env.Alias(alias, source, action))
 
 # -----------------------------------------------------------------------------
 def generate(env, **kw):
 	# build messages
 	if not ARGUMENTS.get('verbose'):
-		env['OPENOCD_COMSTR'] = "OpenOCD: program $SOURCE"
+		env['STLINK_COMSTR'] = "STLink: program $SOURCE"
 	
-	env['OPENOCD'] = 'openocd'
+#	if platform.system() == "Windows":
+	env['STLINK'] = 'ST-LINK_CLI'
 	
-	env.AddMethod(openocd_run, 'OpenOcd')
+	env.AddMethod(stlink_run, 'STLink')
 
 def exists(env):
-	return env.Detect('openocd')
+	return True

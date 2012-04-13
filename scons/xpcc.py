@@ -346,6 +346,10 @@ def generate(env, **kw):
 					env.Tool('openocd')
 					env['OPENOCD_CONFIGFILE'] = parser.get('openocd', 'configfile')
 					env['OPENOCD_COMMANDS'] = parser.get('openocd', 'commands')
+				if parser.get('program', 'tool') == 'stlink':
+					env.Tool('stlink')
+					#env['OPENOCD_CONFIGFILE'] = parser.get('openocd', 'configfile')
+					#env['OPENOCD_COMMANDS'] = parser.get('openocd', 'commands')
 			except configparser.ParserException as e:
 				print "Error in Configuration: %s" % e
 				Exit(1)

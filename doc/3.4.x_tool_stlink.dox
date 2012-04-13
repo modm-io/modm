@@ -1,0 +1,26 @@
+// coding: utf-8
+
+/*!
+\page tool_stlink Tool: stlink
+
+Interface to STLink.
+
+Example from \c project.cfg:
+\verbatim
+[program]
+tool = stlink
+\endverbatim
+
+SConstruct:
+\verbatim
+program = env.Program(...)
+hexfile = env.Hex(program)
+env.Alias('program', env.STLink(hexfile))
+\endverbatim
+
+\section tool_arm_provides Provided builders and methods
+
+\subsection tool_stlink_program STLink(hex-file)
+
+Program a HEX-file into a connected target.
+*/
