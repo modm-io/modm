@@ -4,11 +4,6 @@
  *  Created on: 03.04.2012
  *      Author: dhebbeker
  */
-/*
- * WARNING: This file is generated automatically, do not edit!
- * Please modify the corresponding *.in file instead and rebuild this file. 
- */
-// ----------------------------------------------------------------------------
 
 #ifndef XPCC_STM32__ADC_HPP
 #define XPCC_STM32__ADC_HPP
@@ -18,9 +13,9 @@
 namespace xpcc
 {
 	namespace stm32
-	{	
+	{
 		/**
-		 * \brief	Analog/Digital-Converter module (ADC3)
+		 * Analog/Digital-Converter module (ADC3).
 		 *
 		 * \author	Stephan Kugelmann, David Hebbeker
 		 * \ingroup	stm32
@@ -28,16 +23,16 @@ namespace xpcc
 		class Adc3 : public Interface
 		{
 		public:
+			
+			/**
+			 * Channels, which can be used with this ADC.
+			 * 
+			 * You can specify the channel by using a pin-name, like PIN_C0, an 
+			 * internal sensor, like TEMPERATURE_SENSOR or just the plain 
+			 * channel number, like CHANNEL_0. 
+			 */
 			enum Channels
 			{
-				PIN_F3 = 9,
-				PIN_F4 = 14,
-				PIN_F5 = 15,
-				PIN_F6 = 4,
-				PIN_F7 = 5,
-				PIN_F8 = 6,
-				PIN_F9 = 7,
-				PIN_F10 = 8,
 				PIN_C0 = 10,
 				PIN_C1 = 11,
 				PIN_C2 = 12,
@@ -46,11 +41,38 @@ namespace xpcc
 				PIN_A1 = 1,
 				PIN_A2 = 2,
 				PIN_A3 = 3,
-		
+				PIN_F3 = 9,
+				PIN_F4 = 14,
+				PIN_F5 = 15,
+				PIN_F6 = 4,
+				PIN_F7 = 5,
+				PIN_F8 = 6,
+				PIN_F9 = 7,
+				PIN_F10 = 8,
+				/** Measure the ambient temperature of the device.
+				 * 
+				 * \li Supported temperature range: -40 to 125 C
+				 * \li Precision: +-1.5 C
+				 * 
+				 * @see Reference manual (i.e. RM0090) for the formula for the
+				 * 	calculation of the actual temperature.
+				 * @note The TSVREFE bit must be set to enable the conversion of 
+				 * 	this internal channel.
+				 */
 				TEMPERATURE_SENSOR = 16,
-				V_REFINT = 17,// internal reference voltage
+
+				/** Internal reference voltage.
+				 * 
+				 * @note The TSVREFE bit must be set to enable the conversion of 
+				 * 	this internal channel.
+				 */
+				V_REFINT = 17,
+				
+				/**
+				 * The half V_BAT voltage.
+				 */
 				VBAT = 18,
-		
+
 				CHANNEL_0 = 0,
 				CHANNEL_1 = 1,
 				CHANNEL_2 = 2,
@@ -69,53 +91,84 @@ namespace xpcc
 				CHANNEL_15 = 15,
 				CHANNEL_16 = 16,
 				CHANNEL_17 = 17,
-				CHANNEL_18 = 18 
+				CHANNEL_18 = 18
 			};
-
+			
+			/**
+			 * Programmable prescaler to divide the APB2 clock frequency, which 
+			 * is used fot the analog circuitry (not the digital interface which
+			 * is used for registers). 
+			 */
 			enum Prescaler
 			{
-				PRESCALER_2 = 0x00,
-				PRESCALER_4 = ADC_CCR_ADCPRE_0,
-				PRESCALER_6 = ADC_CCR_ADCPRE_1,
-				PRESCALER_8 = ADC_CCR_ADCPRE_1 | ADC_CCR_ADCPRE_0
+				PRESCALER_2 = 0x00,									//!< PCLK2 divided by 2
+				PRESCALER_4 = ADC_CCR_ADCPRE_0,						//!< PCLK2 divided by 4
+				PRESCALER_6 = ADC_CCR_ADCPRE_1,						//!< PCLK2 divided by 6
+				PRESCALER_8 = ADC_CCR_ADCPRE_1 | ADC_CCR_ADCPRE_0	//!< PCLK2 divided by 8
 			};
-
+			
+			/**
+			 * Sampling time of the input voltage.
+			 * 
+			 * Total conversion time is T_con = Sampling time + 12 cycles
+			 */
 			enum SampleTime
 			{
-				CYCLES_3 	= 0b000,
-				CYCLES_15 	= 0b001,
-				CYCLES_28 	= 0b010,
-				CYCLES_56 	= 0b011,
-				CYCLES_84 	= 0b100,
-				CYCLES_112 	= 0b101,
-				CYCLES_144 	= 0b110,
-				CYCLES_480 	= 0b111
-			};
+				CYCLES_3 	= 0b000,	//!< 3 ADCCLK cycles
+				CYCLES_15 	= 0b001,	//!< 15 ADCCLK cycles
+				CYCLES_28 	= 0b010,	//!< 28 ADCCLK cycles
+				CYCLES_56 	= 0b011,	//!< 56 ADCCLK cycles
+				CYCLES_84 	= 0b100,	//!< 84 ADCCLK cycles
+				CYCLES_112 	= 0b101,	//!< 112 ADCCLK cycles
+				CYCLES_144 	= 0b110,	//!< 144 ADCCLK cycles
+				CYCLES_480 	= 0b111		//!< 480 ADCCLK cycles
+			}; 
 
+			/**
+			 * Possible interrupt flags.
+			 * 
+			 * An interrupt can be produced on the end of conversion for regular
+			 * and injected groups, when the analog watchdog status bit is set 
+			 * and when the overrun status bit is set. 
+			 */
 			enum InterruptFlag
 			{
-				END_OF_CONVERSION_REGULAR	= ADC_SR_EOC,
-				END_OF_CONVERSION_INJECTED	= ADC_SR_JEOC,
-				ANALOG_WATCHDOG				= ADC_SR_AWD,
-				OVERRUN						= ADC_SR_OVR
+				END_OF_CONVERSION_REGULAR	= ADC_SR_EOC,	//!< End of conversion of a regular group
+				END_OF_CONVERSION_INJECTED	= ADC_SR_JEOC,	//!< End of conversion of an injected group
+				ANALOG_WATCHDOG				= ADC_SR_AWD,	//!< Analog watchdog status bit is set 
+				OVERRUN						= ADC_SR_OVR	//!< Overrun (if data are lost)
 			};
 
 
 		public:
 
 			/**
-			 * \brief Change the presentation of the ADC conversion result
+			 * Change the presentation of the ADC conversion result.
 			 *
-			 * Set to \c true to left adjust the result. Otherwise, the result
-			 * is right adjusted.
-			 * Change will affect the ADC Data Register immediately, regardless
-			 * of any ongoing conversions.
+			 * @param enable Set to \c true to left adjust the result. 
+			 * 	Otherwise, the result is right adjusted.
+			 * @pre The ADC clock must be started and the ADC switched on with initialize()
 			 */
 			static inline void
-			setLeftAdjustResult(const bool enable);
+			setLeftAdjustResult(const bool enable)
+			{
+				if(enable)
+					ADC3->CR2 |= ADC_CR2_ALIGN;
+				else
+					ADC3->CR2 &= ~ADC_CR2_ALIGN;
+						
+			}
 
 			/**
-			 * \brief Analog channel selection
+			 * Analog channel selection.
+			 * 
+			 * This is for single conversion mode only! The number of channels
+			 * will be set to 1, the channel selected and the corresponding pin
+			 * will be set to analog input.
+			 * 
+			 * @param channel		The channel which shall be read.
+			 * @param sampleTime	The sample time to sample the input voltage.
+			 * @pre The ADC clock must be started and the ADC switched on with initialize()
 			 */
 			static inline void
 			setChannel(const Channels channel, const SampleTime sampleTime=CYCLES_3)
@@ -127,7 +180,7 @@ namespace xpcc
 					ADC3->SMPR2 |= sampleTime << (static_cast<uint8_t>(channel) * 3);
 				else
 					ADC3->SMPR1 |= sampleTime << ((static_cast<uint8_t>(channel)-10) * 3);
-					
+
 				if(channel <4)
 					GPIOA->MODER |= 0b11 << ((channel + 0) * 2);
 				else if(channel <9)
@@ -138,14 +191,14 @@ namespace xpcc
 					GPIOC->MODER |= 0b11 << ((channel - 10) * 2);
 				else if(channel <16)
 					GPIOF->MODER |= 0b11 << ((channel - 10) * 2);
-					
-			}
+				}
 
 			/**
 			 * \brief Enables free running mode
 			 *
 			 * The ADC will continously start conversions and provide the most
 			 * recent result in the ADC register.
+			 * @pre The ADC clock must be started and the ADC switched on with initialize()
 			 */
 			static inline void
 			enableFreeRunningMode(void)
@@ -153,6 +206,13 @@ namespace xpcc
 				ADC3->CR2 |= ADC_CR2_CONT;		// set to continuous mode
 			}
 
+			/**
+			 * \brief Disables free running mode
+			 *
+			 * The ADC will do only one sample and stop. The result will be in 
+			 * the ADC register.
+			 * @pre The ADC clock must be started and the ADC switched on with initialize()
+			 */
 			static inline void
 			disableFreeRunningMode(void)
 			{
@@ -160,9 +220,11 @@ namespace xpcc
 			}
 
 			/**
+			 * Returns if the specified interrupt flag is set.
+			 * 
 			 * \return \c true if the flag is set
-			 *
-			 * Available on all ATmegas.
+			 * @pre The ADC clock must be started and the ADC switched on with initialize()
+			 * @param flag The interrupt flag, which shall be checked.
 			 */
 			static inline bool
 			isInterruptFlagSet(const InterruptFlag flag)
@@ -171,9 +233,10 @@ namespace xpcc
 			}
 
 			/**
-			 * \brief Clears the interrupt flag
+			 * Clears the specified interrupt flag.
 			 *
-			 * Available on all ATmegas.
+			 * @pre The ADC clock must be started and the ADC switched on with initialize()
+			 * @param flag The interrupt flag, which shall be cleared.
 			 */
 			static inline void
 			clearInterruptFlag(const InterruptFlag flag)
@@ -181,7 +244,9 @@ namespace xpcc
 				ADC3->SR &= ~flag;
 			}
 
-
+			/**
+			 * Disables the ADC Conversion Complete Interrupt.
+			 */
 			static inline void
 			disableInterrupt(void)
 			{
@@ -190,14 +255,15 @@ namespace xpcc
 			}
 
 			/**
-			 * \brief Enables the ADC Conversion Complete Interrupt
+			 * Enables the ADC Conversion Complete Interrupt.
 			 *
-			 * Available on all ATmegas.
-			 *
-			 * \see AdcInterrupt
+			 * You could catch the interrupt using this function:
+			 * 	\code extern "C" void ADC_IRQHandler(void) \endcode
+			 * @pre The ADC clock must be started and the ADC switched on with initialize()
+			 * @param priority Priority to set
 			 */
 			static inline void
-			enableInterrupt(const uint8_t priority)
+			enableInterrupt(const uint32_t priority)
 			{
 				// Set priority for the interrupt vector
 				NVIC_SetPriority(ADC_IRQn, priority);
@@ -207,9 +273,12 @@ namespace xpcc
 				ADC3->CR1 |= ADC_CR1_EOCIE;
 			}
 
-			/**
-			 * Set the division factor between the system clock frequency
-			 * and the input clock to the ADC.
+			/** 
+			 * Select the frequency of the clock to the ADC. The clock is common
+			 * for all the ADCs (ADC1, ADC2, ADC3) and all channels. 
+			 * @pre The ADC clock must be started and the ADC switched on with initialize()
+			 * @param prescaler The prescaler specifies by which factor the 
+			 * 	system clock will be divided.
 			 */
 			static inline void
 			setPrescaler(const Prescaler prescaler)
@@ -219,7 +288,12 @@ namespace xpcc
 			}
 
 			/**
-			 * \brief	Initialize and enable the A/D converter
+			 * Initialize and enable the A/D converter.
+			 *
+			 * Enables the ADC clock and switches on the ADC. The ADC clock
+			 * prescaler will be set as well.
+			 * @param prescaler The prescaler specifies by which factor the 
+			 * 	system clock will be divided.
 			 */
 			static inline void
 			initialize(Prescaler prescaler=PRESCALER_2)
@@ -232,6 +306,9 @@ namespace xpcc
 				setPrescaler(prescaler);
 			}
 
+			/**
+			 * Turns off the ADC and its clock.
+			 */
 			static inline void
 			shutdownADC(void)
 			{
@@ -240,7 +317,9 @@ namespace xpcc
 			}
 
 			/**
-			 * \brief Start a new conversion
+			 * Start a new conversion or continuous conversions.
+			 * @pre A ADC channel must be selected with setChannel()
+			 * @post The result can be fetched with getValue()
 			 */
 			static inline void
 			startConversion(void)
@@ -249,10 +328,9 @@ namespace xpcc
 				ADC3->CR2 |= ADC_CR2_SWSTART;	// starts single conversion for the regular group
 			}
 
-			/**
-			 * \brief Check if the conversion is finished
-			 *
-			 * Available on all ATmegas.
+			/** 
+			 * @return If the conversion is finished.
+			 * @pre A conversion should have been stared with startConversion()
 			 */
 			static inline bool
 			isConversionFinished(void)
@@ -261,9 +339,8 @@ namespace xpcc
 			}
 
 			/**
-			 * \brief the most recent 16bit result of the ADC conversion
-			 *
-			 * Available on all ATmegas.
+			 * @return The most recent 16bit result of the ADC conversion.
+			 * @pre A conversion should have been stared with startConversion()
 			 */
 			static inline uint16_t
 			getValue(void)

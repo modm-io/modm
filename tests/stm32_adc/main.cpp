@@ -89,7 +89,7 @@ MAIN_FUNCTION
 
 	uart.configurePins(uart.REMAP_PC12_PD2);
 
-	XPCC_LOG_INFO << xpcc::endl << "This is an ADC Test program by David. 12.04.2012" << xpcc::endl;
+	XPCC_LOG_INFO << xpcc::endl << "This is an ADC Test program by David. 14.04.2012" << xpcc::endl;
 
 	Adc::initialize();
 	Adc::enableFreeRunningMode();
