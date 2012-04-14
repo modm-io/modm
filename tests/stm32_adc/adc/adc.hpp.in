@@ -5,8 +5,16 @@
  *      Author: dhebbeker
  */
 
-#ifndef XPCC_STM32__ADC_HPP
-#define XPCC_STM32__ADC_HPP
+#ifndef XPCC_STM32__ADC{{ id }}_HPP
+#define XPCC_STM32__ADC{{ id }}_HPP
+
+#if !defined (STM32F4XX) && !defined (STM32F10X_LD) && !defined (STM32F10X_LD_VL) && !defined (STM32F10X_MD) && !defined (STM32F10X_MD_VL) && !defined (STM32F10X_HD) && !defined (STM32F10X_HD_VL) && !defined (STM32F10X_XL) && !defined (STM32F10X_CL)
+ #error "Please select first the target STM32F?XX device used in your application (in stm32f?xx.h file)"
+#endif
+
+{% if id>2 %}
+#if defined (STM32F10X_HD) || defined (STM32F10X_XL)
+{% endif -%}
 
 #include <xpcc/architecture.hpp>
 
@@ -59,7 +67,7 @@ namespace xpcc
 				PIN_F8 = 6,
 				PIN_F9 = 7,
 				PIN_F10 = 8,
-#elif defined(STM32F4XX)	// Actually STM32F405xx or STM32F407xx is meant!
+#if defined(STM32F4XX)	// Actually STM32F405xx or STM32F407xx is meant!
 				PIN_F3 = 9,
 				PIN_F4 = 14,
 				PIN_F5 = 15,
@@ -92,7 +100,7 @@ namespace xpcc
 				VBAT = 18,
 				
 				{% if id == 1 -%}
-#elif defined(STM32F1XX)
+#elif defined (STM32F10X_LD) || defined (STM32F10X_LD_VL) || defined (STM32F10X_MD) || defined (STM32F10X_MD_VL) || defined (STM32F10X_HD) || defined (STM32F10X_HD_VL) || defined (STM32F10X_XL) || defined (STM32F10X_CL)
 				/** Measure the ambient temperature of the device.
 				 * 
 				 * \li Supported temperature range: -40 to 125 C
@@ -111,8 +119,8 @@ namespace xpcc
 				 * 	this internal channel.
 				 */
 				V_REFINT = 17,
-#endif
 				{% endif -%}
+#endif
 				
 				CHANNEL_0 = 0,
 				CHANNEL_1 = 1,
@@ -134,7 +142,7 @@ namespace xpcc
 				CHANNEL_16 = 16,
 				CHANNEL_17 = 17,
 				CHANNEL_18 = 18
-#elif defined(STM32F1XX)
+#elif defined (STM32F10X_LD) || defined (STM32F10X_LD_VL) || defined (STM32F10X_MD) || defined (STM32F10X_MD_VL) || defined (STM32F10X_HD) || defined (STM32F10X_HD_VL) || defined (STM32F10X_XL) || defined (STM32F10X_CL)
 				{% if id < 3 -%}	// For ADC1 and ADC2
 				CHANNEL_9 = 9,
 				CHANNEL_14 = 14,
@@ -176,7 +184,7 @@ namespace xpcc
 				CYCLES_112 	= 0b101,	//!< 112 ADCCLK cycles
 				CYCLES_144 	= 0b110,	//!< 144 ADCCLK cycles
 				CYCLES_480 	= 0b111		//!< 480 ADCCLK cycles
-#elif defined(STM32F1XX)
+#elif defined (STM32F10X_LD) || defined (STM32F10X_LD_VL) || defined (STM32F10X_MD) || defined (STM32F10X_MD_VL) || defined (STM32F10X_HD) || defined (STM32F10X_HD_VL) || defined (STM32F10X_XL) || defined (STM32F10X_CL)
 				CYCLES_2 	= 0b000,	//!< 1.5 ADCCLK cycles
 				CYCLES_8 	= 0b001,	//!< 7.5 ADCCLK cycles
 				CYCLES_14 	= 0b010,	//!< 13.5 ADCCLK cycles
@@ -238,7 +246,7 @@ namespace xpcc
 			 * 	initialize()
 			 */
 			static inline void
-			setChannel(const Channels channel, const SampleTime sampleTime=CYCLES_3)
+			setChannel(const Channels channel, const SampleTime sampleTime=static_cast<SampleTime> (0b000))
 			{
 				ADC{{ id }}->SQR1 = 0;		// clear number of conversions in the sequence and set number of conversions to 1
 				ADC{{ id }}->SQR3 |= channel & 0b11111;
@@ -248,6 +256,7 @@ namespace xpcc
 				else
 					ADC{{ id }}->SMPR1 |= sampleTime << ((static_cast<uint8_t>(channel)-10) * 3);
 
+#if defined(STM32F4XX) 
 				{% if id < 3 -%}
 				if(channel <8)
 					GPIOA->MODER |= 0b11 << ((channel + 0) * 2);
@@ -260,17 +269,32 @@ namespace xpcc
 					GPIOA->MODER |= 0b11 << ((channel + 0) * 2);
 				else if(channel <9)
 					GPIOF->MODER |= 0b11 << ((channel + 2) * 2);
-#if defined(STM32F4XX) 
 				else if(channel == 9)
 					GPIOF->MODER |= 0b11 << ((channel - 6) * 2);
-#endif
 				else if(channel <14)
 					GPIOC->MODER |= 0b11 << ((channel - 10) * 2);
-#if defined(STM32F4XX)
 				else if(channel <16)
 					GPIOF->MODER |= 0b11 << ((channel - 10) * 2);
-#endif
 				{% endif -%}
+#elif defined (STM32F10X_LD) || defined (STM32F10X_LD_VL) || defined (STM32F10X_MD) || defined (STM32F10X_MD_VL) || defined (STM32F10X_HD) || defined (STM32F10X_HD_VL) || defined (STM32F10X_XL) || defined (STM32F10X_CL)
+				{% if id < 3 -%}
+				if(channel <8)
+					GPIOA->CRL &= ~(0b1111 << ((channel + 0) * 4));
+				else if(channel <10)
+					GPIOB->CRL &= ~(0b1111 << ((channel - 8) * 4));
+				else if(channel <16)
+					GPIOC->CRL &= ~(0b1111 << ((channel - 10) * 4));
+				{% elif id == 3 -%}
+				if(channel <4)
+					GPIOA->CRL &= ~(0b1111 << ((channel + 0) * 4));
+				else if(channel <6)
+					GPIOF->CRL &= ~(0b1111 << ((channel + 2) * 4));
+				else if(channel <9)
+					GPIOF->CRH &= ~(0b1111 << ((channel - 6) * 4));
+				else if(channel <14 && channel>9)
+					GPIOC->CRL &= ~(0b1111 << ((channel - 10) * 4));;
+				{% endif -%}
+#endif
 			}
 
 			/**
@@ -334,7 +358,15 @@ namespace xpcc
 			static inline void
 			disableInterrupt(const Interrupt interrupt)
 			{
+#if defined(STM32F4XX)
 				NVIC_DisableIRQ(ADC_IRQn);
+#elif defined (STM32F10X_LD) || defined (STM32F10X_LD_VL) || defined (STM32F10X_MD) || defined (STM32F10X_MD_VL) || defined (STM32F10X_HD) || defined (STM32F10X_HD_VL) || defined (STM32F10X_XL) || defined (STM32F10X_CL)
+				{% if id < 3 -%}
+				NVIC_DisableIRQ(ADC1_2_IRQn);
+				{% elif id == 3 -%}
+				NVIC_DisableIRQ(ADC3_IRQn);
+				{% endif -%}
+#endif
 
 				switch(interrupt)
 				{
@@ -370,12 +402,25 @@ namespace xpcc
 			static inline void
 			enableInterrupt(const Interrupt interrupt, const uint32_t priority)
 			{
-				// Set priority for the interrupt vector
-				NVIC_SetPriority(ADC_IRQn, priority);
-
+#if defined(STM32F4XX)
+				// Set priority for the interrupt vector				
+				NVIC_SetPriority(ADC_IRQn, priority);				
 				// register IRQ at the NVIC
 				NVIC_EnableIRQ(ADC_IRQn);
-
+#elif defined (STM32F10X_LD) || defined (STM32F10X_LD_VL) || defined (STM32F10X_MD) || defined (STM32F10X_MD_VL) || defined (STM32F10X_HD) || defined (STM32F10X_HD_VL) || defined (STM32F10X_XL) || defined (STM32F10X_CL)
+				{% if id < 3 -%}
+				// Set priority for the interrupt vector
+				NVIC_SetPriority(ADC1_2_IRQn, priority);
+				// register IRQ at the NVIC
+				NVIC_EnableIRQ(ADC1_2_IRQn);
+				{% elif id == 3 -%}
+				// Set priority for the interrupt vector
+				NVIC_SetPriority(ADC3_IRQn, priority);
+				// register IRQ at the NVIC
+				NVIC_EnableIRQ(ADC3_IRQn);
+				{%- endif %}
+#endif
+				
 				switch(interrupt)
 				{
 					case END_OF_CONVERSION_REGULAR:
@@ -409,7 +454,7 @@ namespace xpcc
 #if defined(STM32F4XX)
 				ADC->CCR &= 0b11 << 17;				// Clear prescaler
 				ADC->CCR |= prescaler << 17;		// set prescaler
-#elif defined(STM32F1XX)
+#elif defined (STM32F10X_LD) || defined (STM32F10X_LD_VL) || defined (STM32F10X_MD) || defined (STM32F10X_MD_VL) || defined (STM32F10X_HD) || defined (STM32F10X_HD_VL) || defined (STM32F10X_XL) || defined (STM32F10X_CL)
 				RCC->CFGR &= 0b11 << 14;			// Clear prescaler
 				RCC->CFGR |= prescaler << 14;		// set prescaler
 #endif
@@ -450,7 +495,11 @@ namespace xpcc
 			static inline void
 			startConversion(void)
 			{
+#if defined(STM32F4XX)
 				clearInterruptFlag(static_cast<Interrupt>(END_OF_CONVERSION_REGULAR | END_OF_CONVERSION_INJECTED | ANALOG_WATCHDOG | OVERRUN));
+#elif defined (STM32F10X_LD) || defined (STM32F10X_LD_VL) || defined (STM32F10X_MD) || defined (STM32F10X_MD_VL) || defined (STM32F10X_HD) || defined (STM32F10X_HD_VL) || defined (STM32F10X_XL) || defined (STM32F10X_CL)
+				clearInterruptFlag(static_cast<Interrupt>(END_OF_CONVERSION_REGULAR | END_OF_CONVERSION_INJECTED | ANALOG_WATCHDOG));
+#endif
 				ADC{{ id }}->CR2 |= ADC_CR2_SWSTART;	// starts single conversion for the regular group
 			}
 
@@ -478,4 +527,8 @@ namespace xpcc
 
 }
 
-#endif /* XPCC_STM32__ADC_HPP */
+{% if id>2 %}
+#endif // STM32F10X_HD || STM32F10X_XL
+{% endif -%}
+
+#endif /* XPCC_STM32__ADC{{ id }}_HPP */
