@@ -58,24 +58,7 @@ namespace xpcc
 				PIN_C4 = 14,
 				PIN_C5 = 15,
 				#if defined(STM32F4XX)
-				/** Measure the ambient temperature of the device.
-				 * 
-				 * \li Supported temperature range: -40 to 125 C
-				 * \li Precision: +-1.5 C
-				 * 
-				 * @see Reference manual (i.e. RM0090) for the formula for the
-				 * 	calculation of the actual temperature.
-				 * @note The TSVREFE bit must be set to enable the conversion of 
-				 * 	this internal channel.
-				 */
-				TEMPERATURE_SENSOR = 16,
-
-				/** Internal reference voltage.
-				 * 
-				 * @note The TSVREFE bit must be set to enable the conversion of 
-				 * 	this internal channel.
-				 */
-				V_REFINT = 17,
+				#define TEMP_REF_AVIALABLE (1)
 				
 				/**
 				 * The half V_BAT voltage.
@@ -83,6 +66,10 @@ namespace xpcc
 				VBAT = 18,
 				
 				#elif defined (STM32F10X_LD) || defined (STM32F10X_LD_VL) || defined (STM32F10X_MD) || defined (STM32F10X_MD_VL) || defined (STM32F10X_HD) || defined (STM32F10X_HD_VL) || defined (STM32F10X_XL) || defined (STM32F10X_CL)
+				#define TEMP_REF_AVIALABLE (1)
+				#endif
+				
+#ifdef TEMP_REF_AVIALABLE
 				/** Measure the ambient temperature of the device.
 				 * 
 				 * \li Supported temperature range: -40 to 125 C
@@ -101,7 +88,7 @@ namespace xpcc
 				 * 	this internal channel.
 				 */
 				V_REFINT = 17,
-				#endif
+#endif // TEMP_REF_AVIALABLE
 				
 				CHANNEL_0 = 0,
 				CHANNEL_1 = 1,
@@ -194,6 +181,28 @@ namespace xpcc
 
 		public:
 
+#ifdef TEMP_REF_AVIALABLE
+			static inline void
+			enableTemperatureRefVMeasurement(void)
+			{
+#ifdef TMS32F4XX
+				ADC1->CCR |= ADC_CCR_TSVREFE;
+#elif defined (STM32F10X_LD) || defined (STM32F10X_LD_VL) || defined (STM32F10X_MD) || defined (STM32F10X_MD_VL) || defined (STM32F10X_HD) || defined (STM32F10X_HD_VL) || defined (STM32F10X_XL) || defined (STM32F10X_CL)
+				ADC1->CR2 |= ADC_CR2_TSVREFE;
+#endif
+			}
+
+			static inline void
+			disableTemperatureRefVMeasurement(void)
+			{
+#ifdef TMS32F4XX
+				ADC1->CCR &= ~ADC_CCR_TSVREFE;
+#elif defined (STM32F10X_LD) || defined (STM32F10X_LD_VL) || defined (STM32F10X_MD) || defined (STM32F10X_MD_VL) || defined (STM32F10X_HD) || defined (STM32F10X_HD_VL) || defined (STM32F10X_XL) || defined (STM32F10X_CL)
+				ADC1->CR2 &= ~ADC_CR2_TSVREFE;
+#endif
+			}
+#endif
+
 			/**
 			 * Change the presentation of the ADC conversion result.
 			 *
@@ -241,14 +250,14 @@ namespace xpcc
 					GPIOB->MODER |= 0b11 << ((channel - 8) * 2);
 				else if(channel <16)
 					GPIOC->MODER |= 0b11 << ((channel - 10) * 2);
-				#elif defined (STM32F10X_LD) || defined (STM32F10X_LD_VL) || defined (STM32F10X_MD) || defined (STM32F10X_MD_VL) || defined (STM32F10X_HD) || defined (STM32F10X_HD_VL) || defined (STM32F10X_XL) || defined (STM32F10X_CL)
+#elif defined (STM32F10X_LD) || defined (STM32F10X_LD_VL) || defined (STM32F10X_MD) || defined (STM32F10X_MD_VL) || defined (STM32F10X_HD) || defined (STM32F10X_HD_VL) || defined (STM32F10X_XL) || defined (STM32F10X_CL)
 				if(channel <8)
 					GPIOA->CRL &= ~(0b1111 << ((channel + 0) * 4));
 				else if(channel <10)
 					GPIOB->CRL &= ~(0b1111 << ((channel - 8) * 4));
 				else if(channel <16)
 					GPIOC->CRL &= ~(0b1111 << ((channel - 10) * 4));
-				#endif
+#endif
 			}
 
 			/**
@@ -396,10 +405,10 @@ namespace xpcc
 			setPrescaler(const Prescaler prescaler)
 			{
 #if defined(STM32F4XX)
-				ADC->CCR &= 0b11 << 17;				// Clear prescaler
+				ADC->CCR &= ~(0b11 << 17);				// Clear prescaler
 				ADC->CCR |= prescaler << 17;		// set prescaler
 #elif defined (STM32F10X_LD) || defined (STM32F10X_LD_VL) || defined (STM32F10X_MD) || defined (STM32F10X_MD_VL) || defined (STM32F10X_HD) || defined (STM32F10X_HD_VL) || defined (STM32F10X_XL) || defined (STM32F10X_CL)
-				RCC->CFGR &= 0b11 << 14;			// Clear prescaler
+				RCC->CFGR &= ~(0b11 << 14);			// Clear prescaler
 				RCC->CFGR |= prescaler << 14;		// set prescaler
 #endif
 			}
@@ -464,6 +473,10 @@ namespace xpcc
 			static inline uint16_t
 			getValue(void)
 			{
+				while(!isConversionFinished())
+				{
+					asm volatile("NOP");
+				}
 				return ADC1->DR & 0xFFFF;
 			}
 		};

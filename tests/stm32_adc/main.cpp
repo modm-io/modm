@@ -99,7 +99,15 @@ MAIN_FUNCTION
 
 	Adc::initialize();
 	Adc::enableFreeRunningMode();
+#ifdef __OLIMEX
+	Adc::setChannel(Adc::PIN_B0);
+	/*
+	Adc::enableTemperatureRefVMeasurement();
+	Adc::setChannel(Adc::TEMPERATURE_SENSOR);
+	*/
+#elif defined(__DISCOVERY)
 	Adc::setChannel(Adc::PIN_A1);
+#endif
 	Adc::startConversion();
 
 	while(1)
