@@ -19,11 +19,14 @@ namespace xpcc
 		 *
 		 * \author	Stephan Kugelmann, David Hebbeker
 		 * \ingroup	stm32
+		 * @todo add functionality for STM32F103
+		 * This API is designed for STM32F103xF, STM32F103xG, STM32F405xx and 
+		 * STM32F407xx.  
 		 */
 		class Adc2 : public Interface
 		{
 		public:
-			
+
 			/**
 			 * Channels, which can be used with this ADC.
 			 * 
@@ -33,22 +36,24 @@ namespace xpcc
 			 */
 			enum Channels
 			{
-				PIN_C0 = 10,
-				PIN_C1 = 11,
-				PIN_C2 = 12,
-				PIN_C3 = 13,
 				PIN_A0 = 0,
 				PIN_A1 = 1,
 				PIN_A2 = 2,
 				PIN_A3 = 3,
+				PIN_C0 = 10,
+				PIN_C1 = 11,
+				PIN_C2 = 12,
+				PIN_C3 = 13,
+				// For ADC1 and ADC2
 				PIN_A4 = 4,
 				PIN_A5 = 5,
 				PIN_A6 = 6,
 				PIN_A7 = 7,
-				PIN_C4 = 14,
-				PIN_C5 = 15,
 				PIN_B0 = 8,
 				PIN_B1 = 9,
+				PIN_C4 = 14,
+				PIN_C5 = 15,
+				#if defined(STM32F4XX)
 				/** Measure the ambient temperature of the device.
 				 * 
 				 * \li Supported temperature range: -40 to 125 C
@@ -72,7 +77,7 @@ namespace xpcc
 				 * The half V_BAT voltage.
 				 */
 				VBAT = 18,
-
+				
 				CHANNEL_0 = 0,
 				CHANNEL_1 = 1,
 				CHANNEL_2 = 2,
@@ -82,16 +87,23 @@ namespace xpcc
 				CHANNEL_6 = 6,
 				CHANNEL_7 = 7,
 				CHANNEL_8 = 8,
-				CHANNEL_9 = 9,
 				CHANNEL_10= 10,
 				CHANNEL_11 = 11,
 				CHANNEL_12 = 12,
 				CHANNEL_13 = 13,
+#if defined(STM32F4XX)
+				CHANNEL_9 = 9,
 				CHANNEL_14 = 14,
 				CHANNEL_15 = 15,
 				CHANNEL_16 = 16,
 				CHANNEL_17 = 17,
 				CHANNEL_18 = 18
+#elif defined(STM32F1XX)
+				// For ADC1 and ADC2
+				CHANNEL_9 = 9,
+				CHANNEL_14 = 14,
+				CHANNEL_15 = 15,
+				#endif
 			};
 			
 			/**
@@ -101,10 +113,10 @@ namespace xpcc
 			 */
 			enum Prescaler
 			{
-				PRESCALER_2 = 0x00,									//!< PCLK2 divided by 2
-				PRESCALER_4 = ADC_CCR_ADCPRE_0,						//!< PCLK2 divided by 4
-				PRESCALER_6 = ADC_CCR_ADCPRE_1,						//!< PCLK2 divided by 6
-				PRESCALER_8 = ADC_CCR_ADCPRE_1 | ADC_CCR_ADCPRE_0	//!< PCLK2 divided by 8
+				PRESCALER_2 = 0b00,	//!< PCLK2 divided by 2
+				PRESCALER_4 = 0b01,	//!< PCLK2 divided by 4
+				PRESCALER_6 = 0b10,	//!< PCLK2 divided by 6
+				PRESCALER_8 = 0b11	//!< PCLK2 divided by 8
 			};
 			
 			/**
@@ -114,6 +126,7 @@ namespace xpcc
 			 */
 			enum SampleTime
 			{
+#if defined(STM32F4XX)
 				CYCLES_3 	= 0b000,	//!< 3 ADCCLK cycles
 				CYCLES_15 	= 0b001,	//!< 15 ADCCLK cycles
 				CYCLES_28 	= 0b010,	//!< 28 ADCCLK cycles
@@ -122,21 +135,33 @@ namespace xpcc
 				CYCLES_112 	= 0b101,	//!< 112 ADCCLK cycles
 				CYCLES_144 	= 0b110,	//!< 144 ADCCLK cycles
 				CYCLES_480 	= 0b111		//!< 480 ADCCLK cycles
+#elif defined(STM32F1XX)
+				CYCLES_2 	= 0b000,	//!< 1.5 ADCCLK cycles
+				CYCLES_8 	= 0b001,	//!< 7.5 ADCCLK cycles
+				CYCLES_14 	= 0b010,	//!< 13.5 ADCCLK cycles
+				CYCLES_29 	= 0b011,	//!< 28.5 ADCCLK cycles
+				CYCLES_42 	= 0b100,	//!< 41.5 ADCCLK cycles
+				CYCLES_56 	= 0b101,	//!< 55.5 ADCCLK cycles
+				CYCLES_72 	= 0b110,	//!< 71.5 ADCCLK cycles
+				CYCLES_240 	= 0b111		//!< 239.5 ADCCLK cycles
+#endif
 			}; 
 
 			/**
-			 * Possible interrupt flags.
+			 * Possible interrupts.
 			 * 
 			 * An interrupt can be produced on the end of conversion for regular
 			 * and injected groups, when the analog watchdog status bit is set 
 			 * and when the overrun status bit is set. 
 			 */
-			enum InterruptFlag
+			enum Interrupt
 			{
 				END_OF_CONVERSION_REGULAR	= ADC_SR_EOC,	//!< End of conversion of a regular group
 				END_OF_CONVERSION_INJECTED	= ADC_SR_JEOC,	//!< End of conversion of an injected group
-				ANALOG_WATCHDOG				= ADC_SR_AWD,	//!< Analog watchdog status bit is set 
+				ANALOG_WATCHDOG				= ADC_SR_AWD,	//!< Analog watchdog status bit is set
+#if defined(STM32F4XX) 
 				OVERRUN						= ADC_SR_OVR	//!< Overrun (if data are lost)
+#endif
 			};
 
 
@@ -147,7 +172,8 @@ namespace xpcc
 			 *
 			 * @param enable Set to \c true to left adjust the result. 
 			 * 	Otherwise, the result is right adjusted.
-			 * @pre The ADC clock must be started and the ADC switched on with initialize()
+			 * @pre The ADC clock must be started and the ADC switched on with 
+			 * 	initialize()
 			 */
 			static inline void
 			setLeftAdjustResult(const bool enable)
@@ -155,8 +181,7 @@ namespace xpcc
 				if(enable)
 					ADC2->CR2 |= ADC_CR2_ALIGN;
 				else
-					ADC2->CR2 &= ~ADC_CR2_ALIGN;
-						
+					ADC2->CR2 &= ~ADC_CR2_ALIGN;			
 			}
 
 			/**
@@ -168,13 +193,14 @@ namespace xpcc
 			 * 
 			 * @param channel		The channel which shall be read.
 			 * @param sampleTime	The sample time to sample the input voltage.
-			 * @pre The ADC clock must be started and the ADC switched on with initialize()
+			 * @pre The ADC clock must be started and the ADC switched on with 
+			 * 	initialize()
 			 */
 			static inline void
 			setChannel(const Channels channel, const SampleTime sampleTime=CYCLES_3)
 			{
 				ADC2->SQR1 = 0;		// clear number of conversions in the sequence and set number of conversions to 1
-				ADC2->SQR3 |= channel;
+				ADC2->SQR3 |= channel & 0b11111;
 
 				if(static_cast<uint8_t>(channel) < 10)
 					ADC2->SMPR2 |= sampleTime << (static_cast<uint8_t>(channel) * 3);
@@ -194,12 +220,13 @@ namespace xpcc
 			 *
 			 * The ADC will continously start conversions and provide the most
 			 * recent result in the ADC register.
-			 * @pre The ADC clock must be started and the ADC switched on with initialize()
+			 * @pre The ADC clock must be started and the ADC switched on with 
+			 * 	initialize()
 			 */
 			static inline void
 			enableFreeRunningMode(void)
 			{
-				ADC2->CR2 |= ADC_CR2_CONT;		// set to continuous mode
+				ADC2->CR2 |= ADC_CR2_CONT;	// set to continuous mode
 			}
 
 			/**
@@ -207,23 +234,25 @@ namespace xpcc
 			 *
 			 * The ADC will do only one sample and stop. The result will be in 
 			 * the ADC register.
-			 * @pre The ADC clock must be started and the ADC switched on with initialize()
+			 * @pre The ADC clock must be started and the ADC switched on with 
+			 * 	initialize()
 			 */
 			static inline void
 			disableFreeRunningMode(void)
 			{
-				ADC2->CR2 &= ~ADC_CR2_CONT;		// set to single
+				ADC2->CR2 &= ~ADC_CR2_CONT;		// set to single mode
 			}
 
 			/**
 			 * Returns if the specified interrupt flag is set.
 			 * 
 			 * \return \c true if the flag is set
-			 * @pre The ADC clock must be started and the ADC switched on with initialize()
+			 * @pre The ADC clock must be started and the ADC switched on with 
+			 * 	initialize()
 			 * @param flag The interrupt flag, which shall be checked.
 			 */
 			static inline bool
-			isInterruptFlagSet(const InterruptFlag flag)
+			isInterruptFlagSet(const Interrupt flag)
 			{
 				return ADC2->SR & flag;
 			}
@@ -231,11 +260,12 @@ namespace xpcc
 			/**
 			 * Clears the specified interrupt flag.
 			 *
-			 * @pre The ADC clock must be started and the ADC switched on with initialize()
+			 * @pre The ADC clock must be started and the ADC switched on with 
+			 * 	initialize()
 			 * @param flag The interrupt flag, which shall be cleared.
 			 */
 			static inline void
-			clearInterruptFlag(const InterruptFlag flag)
+			clearInterruptFlag(const Interrupt flag)
 			{
 				ADC2->SR &= ~flag;
 			}
@@ -244,10 +274,27 @@ namespace xpcc
 			 * Disables the ADC Conversion Complete Interrupt.
 			 */
 			static inline void
-			disableInterrupt(void)
+			disableInterrupt(const Interrupt interrupt)
 			{
 				NVIC_DisableIRQ(ADC_IRQn);
-				ADC2->CR1 &= ~ADC_CR1_EOCIE;
+
+				switch(interrupt)
+				{
+					case END_OF_CONVERSION_REGULAR:
+						ADC2->CR1 &= ~ADC_CR1_EOCIE;
+						break;
+					case END_OF_CONVERSION_INJECTED:
+						ADC2->CR1 &= ~ADC_CR1_JEOCIE;
+						break;
+					case ANALOG_WATCHDOG:
+						ADC2->CR1 &= ~ADC_CR1_AWDIE;
+						break;
+#if defined(STM32F4XX)
+					case OVERRUN:
+						ADC2->CR1 &= ~ADC_CR1_OVRIE;
+						break;
+#endif
+				}
 			}
 
 			/**
@@ -255,32 +302,59 @@ namespace xpcc
 			 *
 			 * You could catch the interrupt using this function:
 			 * 	\code extern "C" void ADC_IRQHandler(void) \endcode
-			 * @pre The ADC clock must be started and the ADC switched on with initialize()
+			 * @pre The ADC clock must be started and the ADC switched on with 
+			 * 	initialize()
 			 * @param priority Priority to set
+			 * @note ADC1 and ADC2 interrupts are mapped onto the same interrupt
+			 * 	vector. ADC3 interrupts are mapped onto a separate interrupt 
+			 * 	vector.
 			 */
 			static inline void
-			enableInterrupt(const uint32_t priority)
+			enableInterrupt(const Interrupt interrupt, const uint32_t priority)
 			{
 				// Set priority for the interrupt vector
 				NVIC_SetPriority(ADC_IRQn, priority);
 
 				// register IRQ at the NVIC
 				NVIC_EnableIRQ(ADC_IRQn);
-				ADC2->CR1 |= ADC_CR1_EOCIE;
+
+				switch(interrupt)
+				{
+					case END_OF_CONVERSION_REGULAR:
+						ADC2->CR1 |= ADC_CR1_EOCIE;
+						break;
+					case END_OF_CONVERSION_INJECTED:
+						ADC2->CR1 |= ADC_CR1_JEOCIE;
+						break;
+					case ANALOG_WATCHDOG:
+						ADC2->CR1 |= ADC_CR1_AWDIE;
+						break;
+#if defined(STM32F4XX)
+					case OVERRUN:
+						ADC2->CR1 |= ADC_CR1_OVRIE;
+						break;
+#endif
+				}
 			}
 
 			/** 
 			 * Select the frequency of the clock to the ADC. The clock is common
 			 * for all the ADCs (ADC1, ADC2, ADC3) and all channels. 
-			 * @pre The ADC clock must be started and the ADC switched on with initialize()
+			 * @pre The ADC clock must be started and the ADC switched on with 
+			 * 	initialize()
 			 * @param prescaler The prescaler specifies by which factor the 
 			 * 	system clock will be divided.
 			 */
 			static inline void
 			setPrescaler(const Prescaler prescaler)
 			{
-				ADC->CCR &= 3 << 17;
-				ADC->CCR |= prescaler << 17;
+#if defined(STM32F4XX)
+				ADC->CCR &= 0b11 << 17;				// Clear prescaler
+				ADC->CCR |= prescaler << 17;		// set prescaler
+#elif defined(STM32F1XX)
+				RCC->CFGR &= 0b11 << 14;			// Clear prescaler
+				RCC->CFGR |= prescaler << 14;		// set prescaler
+#endif
 			}
 
 			/**
@@ -295,10 +369,8 @@ namespace xpcc
 			initialize(Prescaler prescaler=PRESCALER_2)
 			{
 				// Initialize ADC
-				RCC->APB2ENR |= RCC_APB2ENR_ADC2EN; // start ADC Clock
-
-				ADC2->CR2 |= ADC_CR2_ADON;		// switch on ADC
-
+				RCC->APB2ENR |= RCC_APB2ENR_ADC2EN;	// start ADC Clock
+				ADC2->CR2 |= ADC_CR2_ADON;			// switch on ADC
 				setPrescaler(prescaler);
 			}
 
@@ -308,8 +380,8 @@ namespace xpcc
 			static inline void
 			shutdownADC(void)
 			{
-				ADC2->CR2 &= ~(ADC_CR2_ADON);
-				RCC->APB2ENR &= ~RCC_APB2ENR_ADC2EN; // start ADC Clock
+				ADC2->CR2 &= ~(ADC_CR2_ADON);		// switch off ADC
+				RCC->APB2ENR &= ~RCC_APB2ENR_ADC2EN; // stop ADC Clock
 			}
 
 			/**
@@ -320,7 +392,7 @@ namespace xpcc
 			static inline void
 			startConversion(void)
 			{
-				clearInterruptFlag(static_cast<InterruptFlag>(END_OF_CONVERSION_REGULAR | END_OF_CONVERSION_INJECTED | ANALOG_WATCHDOG | OVERRUN));
+				clearInterruptFlag(static_cast<Interrupt>(END_OF_CONVERSION_REGULAR | END_OF_CONVERSION_INJECTED | ANALOG_WATCHDOG | OVERRUN));
 				ADC2->CR2 |= ADC_CR2_SWSTART;	// starts single conversion for the regular group
 			}
 
@@ -341,9 +413,8 @@ namespace xpcc
 			static inline uint16_t
 			getValue(void)
 			{
-				return ADC2->DR;
+				return ADC2->DR & 0xFFFF;
 			}
-
 		};
 	}
 
