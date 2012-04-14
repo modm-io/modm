@@ -12,8 +12,8 @@
 
 using namespace xpcc::stm32;
 
-#define __DISCOVERY (1)
-//#define __OLIMEX (1)
+//#define __DISCOVERY (1)
+#define __OLIMEX (1)
 
 static bool initClock()
 {
