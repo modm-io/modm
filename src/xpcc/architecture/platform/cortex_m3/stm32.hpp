@@ -77,6 +77,10 @@
 #include "stm32/spi/spi_2.hpp"
 #include "stm32/spi/spi_3.hpp"
 
+#include "stm32/adc/adc_1.hpp"
+#include "stm32/adc/adc_2.hpp"
+#include "stm32/adc/adc_3.hpp"
+
 #include "stm32/i2c/i2c_1.hpp"
 #include "stm32/i2c/i2c_2.hpp"
 #include "stm32/i2c/i2c_3.hpp"
