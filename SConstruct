@@ -106,7 +106,7 @@ env.Alias('doc', 'doxygen')
 
 env.Alias('templates', 'template')
 
-env.Phony(show='@firefox doc/apidoc/html/index.html &')
+env.Phony(show='@firefox doc/homepage/api/index.html &')
 env.Phony(unittest='@scons -Q -C src/')
 
 env.Alias('all', ['doc', 'update', 'templates', 'unittest'])
