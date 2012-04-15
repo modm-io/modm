@@ -498,8 +498,13 @@ namespace xpcc
 
 			/**
 			 * Start a new conversion or continuous conversions.
-			 * @pre A ADC channel must be selected with setChannel()
+			 * @pre A ADC channel must be selected with setChannel(). When using
+			 * 	a STM32F10x a delay of at least t_STAB after initialize() must 
+			 * 	be waited! 
 			 * @post The result can be fetched with getValue()
+			 * @attention When using a STM32F10x, the application should allow a delay of t_STAB between
+			 * 	power up and start of conversion. Refer to Reference Manual 
+			 * 	(RM0008) ADC_CR2_ADON. 
 			 */
 			static inline void
 			startConversion(void)
@@ -508,6 +513,7 @@ namespace xpcc
 				clearInterruptFlag(static_cast<Interrupt>(END_OF_CONVERSION_REGULAR | END_OF_CONVERSION_INJECTED | ANALOG_WATCHDOG | OVERRUN));
 #elif defined (STM32F10X_LD) || defined (STM32F10X_LD_VL) || defined (STM32F10X_MD) || defined (STM32F10X_MD_VL) || defined (STM32F10X_HD) || defined (STM32F10X_HD_VL) || defined (STM32F10X_XL) || defined (STM32F10X_CL)
 				clearInterruptFlag(static_cast<Interrupt>(END_OF_CONVERSION_REGULAR | END_OF_CONVERSION_INJECTED | ANALOG_WATCHDOG));
+				ADC{{ id }}->CR2 |= ADC_CR2_EXTTRIG | ADC_CR2_EXTSEL_0 | ADC_CR2_EXTSEL_1 | ADC_CR2_EXTSEL_2; // select the SWSTART event used to trigger the start of conversion of a regular group
 #endif
 				ADC{{ id }}->CR2 |= ADC_CR2_SWSTART;	// starts single conversion for the regular group
 			}

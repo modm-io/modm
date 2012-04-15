@@ -1,7 +1,6 @@
 #include <xpcc/architecture.hpp>
 #include <xpcc/debug/logger.hpp>
 
-
 #include "adc/adc_1.hpp"
 #include "adc/adc_2.hpp"
 #include "adc/adc_3.hpp"
@@ -12,8 +11,8 @@
 
 using namespace xpcc::stm32;
 
-//#define __DISCOVERY (1)
-#define __OLIMEX (1)
+#define __DISCOVERY (1)
+//#define __OLIMEX (1)
 
 static bool initClock()
 {
@@ -99,12 +98,9 @@ MAIN_FUNCTION
 
 	Adc::initialize();
 	Adc::enableFreeRunningMode();
+	// set channel
 #ifdef __OLIMEX
 	Adc::setChannel(Adc::PIN_B0);
-	/*
-	Adc::enableTemperatureRefVMeasurement();
-	Adc::setChannel(Adc::TEMPERATURE_SENSOR);
-	*/
 #elif defined(__DISCOVERY)
 	Adc::setChannel(Adc::PIN_A1);
 #endif
@@ -112,7 +108,7 @@ MAIN_FUNCTION
 
 	while(1)
 	{
-		for(uint32_t t1=0; t1<16200000; t1+=2) asm volatile ("NOP");
+		for(uint32_t t1=0; t1<1620000; t1+=2) asm volatile ("NOP");
 		XPCC_LOG_INFO << xpcc::ascii << "adc=" << Adc::getValue() << xpcc::endl; // send the value
 	}
 
