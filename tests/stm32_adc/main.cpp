@@ -5,14 +5,16 @@
 #include "adc/adc_2.hpp"
 #include "adc/adc_3.hpp"
 
+#define Adc Adc1
+
 /**! \file main.cpp
  * @author David Hebbeker
  */
 
 using namespace xpcc::stm32;
 
-#define __DISCOVERY (1)
-//#define __OLIMEX (1)
+//#define __DISCOVERY (1)
+#define __OLIMEX (1)
 
 static bool initClock()
 {
@@ -62,28 +64,21 @@ xpcc::log::Logger xpcc::log::error(loggerDevice);
 #undef	XPCC_LOG_LEVEL
 #define	XPCC_LOG_LEVEL xpcc::log::DEBUG
 
-#define ADC_CHANNEL_NUM (2)
-
-uint16_t ADC_buffer[ADC_CHANNEL_NUM];
+uint16_t ADC_buffer;
 
 extern "C" void ADC_IRQHandler(void)
 {
-	static uint8_t index=0;
-	ADC_buffer[index++] = ADC1->DR & 0xFFF;
-	if(index == ADC_CHANNEL_NUM) index=0;
-	ADC1->SR &= ~ADC_SR_EOC;
+	ADC_buffer = Adc::getValue();
+	Adc::clearInterruptFlag(Adc::END_OF_CONVERSION_REGULAR);
 }
 
 extern "C" void ADC1_2_IRQHandler(void)
 {
-	ADC1->SR &= ~ADC_SR_EOC;
-
-	XPCC_LOG_INFO << "ADC_INT1" << xpcc::endl;
+	ADC_buffer = Adc::getValue();
+	Adc::clearInterruptFlag(Adc::END_OF_CONVERSION_REGULAR);
 }
 
 using namespace xpcc;
-
-#define Adc Adc1
 
 MAIN_FUNCTION
 {
@@ -96,7 +91,7 @@ MAIN_FUNCTION
 
 	XPCC_LOG_INFO << xpcc::endl << "This is an ADC Test program by dhebbeker for multiple devices. 14.04.2012" << xpcc::endl;
 
-	Adc::initialize();
+	Adc::initialize(Adc::PRESCALER_8);
 	Adc::enableFreeRunningMode();
 	// set channel
 #ifdef __OLIMEX
@@ -105,14 +100,16 @@ MAIN_FUNCTION
 	Adc::setChannel(Adc::PIN_A1);
 #endif
 	Adc::startConversion();
+	Adc::enableInterrupt(Adc::END_OF_CONVERSION_REGULAR, 15);
+
+	uint8_t i=0;
 
 	while(1)
 	{
-		for(uint32_t t1=0; t1<1620000; t1+=2) asm volatile ("NOP");
-		XPCC_LOG_INFO << xpcc::ascii << "adc=" << Adc::getValue() << xpcc::endl; // send the value
+		XPCC_LOG_INFO << xpcc::ascii << "adc=" << ADC_buffer << xpcc::endl; // send the value
 	}
 
-	Adc::shutdownADC();
+	Adc::shutdownAdc();
 
 	while (1)
 	{
