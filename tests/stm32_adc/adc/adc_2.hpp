@@ -21,11 +21,10 @@ namespace xpcc
 		/**
 		 * Analog/Digital-Converter module (ADC2).
 		 *
+		 * This API is designed for STM32F4XX, STM32F10X_LD, STM32F10X_LD_VL, STM32F10X_MD, STM32F10X_MD_VL, STM32F10X_HD, STM32F10X_HD_VL, STM32F10X_XL and STM32F10X_CL.
+
 		 * \author	Stephan Kugelmann, David Hebbeker
 		 * \ingroup	stm32
-		 * @todo add functionality for STM32F103
-		 * This API is designed for STM32F103xF, STM32F103xG, STM32F405xx and 
-		 * STM32F407xx.  
 		 */
 		class Adc2 : public Interface
 		{
@@ -350,6 +349,8 @@ namespace xpcc
 			 * @pre The ADC clock must be started and the ADC switched on with 
 			 * 	initialize()
 			 * @param priority Priority to set
+			 * @param interrupt The interrupt, which shall be enabled. See 
+			 * 	Interrupt for available interrupts.
 			 * @note ADC1 and ADC2 interrupts are mapped onto the same interrupt
 			 * 	vector. ADC3 interrupts are mapped onto a separate interrupt 
 			 * 	vector.
