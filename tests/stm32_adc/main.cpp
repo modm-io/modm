@@ -1,10 +1,10 @@
 #include <xpcc/architecture.hpp>
 #include <xpcc/debug/logger.hpp>
-
+/*
 #include "adc/adc_1.hpp"
 #include "adc/adc_2.hpp"
 #include "adc/adc_3.hpp"
-
+*/
 #define Adc Adc1
 
 /**! \file main.cpp
