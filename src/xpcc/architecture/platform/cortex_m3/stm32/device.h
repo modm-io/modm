@@ -31,6 +31,10 @@
 #ifndef STM32__DEVICE_H
 #define STM32__DEVICE_H
 
+#if !defined (STM32F4XX) && !defined (STM32F10X_LD) && !defined (STM32F10X_LD_VL) && !defined (STM32F10X_MD) && !defined (STM32F10X_MD_VL) && !defined (STM32F10X_HD) && !defined (STM32F10X_HD_VL) && !defined (STM32F10X_XL) && !defined (STM32F10X_CL)
+ #error "Please select first the target STM32F?XX device used in your application (in stm32f?xx.h file)"
+#endif
+
 #if defined(STM32F2XX)
 #	include <stm32f2xx.h>
 #elif defined(STM32F4XX)
