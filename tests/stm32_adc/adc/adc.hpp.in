@@ -1,9 +1,38 @@
+// coding: utf-8
+// ----------------------------------------------------------------------------
+/* Copyright (c) 2012, Roboterclub Aachen e.V.
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ *     * Redistributions of source code must retain the above copyright
+ *       notice, this list of conditions and the following disclaimer.
+ *     * Redistributions in binary form must reproduce the above copyright
+ *       notice, this list of conditions and the following disclaimer in the
+ *       documentation and/or other materials provided with the distribution.
+ *     * Neither the name of the Roboterclub Aachen e.V. nor the
+ *       names of its contributors may be used to endorse or promote products
+ *       derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY ROBOTERCLUB AACHEN E.V. ''AS IS'' AND ANY
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL ROBOTERCLUB AACHEN E.V. BE LIABLE FOR ANY
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+ * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+// ----------------------------------------------------------------------------
 /** \file adc_{{ id }}.hpp
  *
  *	The documentation is compiled for STM32F4XX.
  *
  *  @date	03.04.2012
- *  @author	dhebbeker
+ *  @author	David Hebbeker
  */
 
 #ifndef XPCC_STM32__ADC{{ id }}_HPP
@@ -16,10 +45,6 @@
 		 */
 		#define STM32F4XX (1)
 	#endif
-#endif
-
-#if !defined (STM32F4XX) && !defined (STM32F10X_LD) && !defined (STM32F10X_LD_VL) && !defined (STM32F10X_MD) && !defined (STM32F10X_MD_VL) && !defined (STM32F10X_HD) && !defined (STM32F10X_HD_VL) && !defined (STM32F10X_XL) && !defined (STM32F10X_CL)
- #error "Please select first the target STM32F?XX device used in your application (in stm32f?xx.h file)"
 #endif
 
 {% if id>2 %}
@@ -35,8 +60,10 @@ namespace xpcc
 		/**
 		 * Analog/Digital-Converter module (ADC{{ id }}).
 		 *
-		 * This API is designed for STM32F4XX, STM32F10X_LD, STM32F10X_LD_VL, STM32F10X_MD, STM32F10X_MD_VL, STM32F10X_HD, STM32F10X_HD_VL, STM32F10X_XL and STM32F10X_CL.
-
+		 * This API is designed for the internal ADCs of STM32F4XX, 
+		 * STM32F10X_LD, STM32F10X_LD_VL, STM32F10X_MD, STM32F10X_MD_VL, 
+		 * STM32F10X_HD, STM32F10X_HD_VL, STM32F10X_XL and STM32F10X_CL.
+		 * 
 		 * \author	Stephan Kugelmann, David Hebbeker
 		 * \ingroup	stm32
 		 */
@@ -87,7 +114,7 @@ namespace xpcc
 				/** Flag to show, that the temperature and V_Ref measurements 
 				 * 	are available for this ADC.
 				 */ 
-				#define TEMP_REF_AVIALABLE (1) 
+				#define TEMPERATURE_REFVOLTAGE_AVIALABLE (1) 
 				
 				/**
 				 * The half V_BAT voltage.
@@ -95,15 +122,15 @@ namespace xpcc
 				VBAT = 18,
 				
 				{% if id == 1 -%}
-#elif defined (STM32F10X_LD) || defined (STM32F10X_LD_VL) || defined (STM32F10X_MD) || defined (STM32F10X_MD_VL) || defined (STM32F10X_HD) || defined (STM32F10X_HD_VL) || defined (STM32F10X_XL) || defined (STM32F10X_CL)				
+#elif defined(STM32F10X)				
 				/** Flag to show, that the temperature and V_Ref measurements 
 				 * 	are available for this ADC.
 				 */ 
-				#define TEMP_REF_AVIALABLE (1)
+				#define TEMPERATURE_REFVOLTAGE_AVIALABLE (1)
 				{% endif -%}
 #endif
 				
-#ifdef TEMP_REF_AVIALABLE
+#ifdef TEMPERATURE_REFVOLTAGE_AVIALABLE
 				/** Measure the ambient temperature of the device.
 				 * 
 				 * \li Supported temperature range: -40 to 125 C
@@ -122,7 +149,7 @@ namespace xpcc
 				 * 	this internal channel.
 				 */
 				V_REFINT = 17,
-#endif // TEMP_REF_AVIALABLE
+#endif // TEMPERATURE_REFVOLTAGE_AVIALABLE
 				
 				CHANNEL_0 = 0,
 				CHANNEL_1 = 1,
@@ -144,7 +171,7 @@ namespace xpcc
 				CHANNEL_16 = 16,
 				CHANNEL_17 = 17,
 				CHANNEL_18 = 18
-#elif defined (STM32F10X_LD) || defined (STM32F10X_LD_VL) || defined (STM32F10X_MD) || defined (STM32F10X_MD_VL) || defined (STM32F10X_HD) || defined (STM32F10X_HD_VL) || defined (STM32F10X_XL) || defined (STM32F10X_CL)
+#elif defined(STM32F10X)
 				{% if id < 3 -%}	// For ADC1 and ADC2
 				CHANNEL_9 = 9,
 				CHANNEL_14 = 14,
@@ -186,7 +213,7 @@ namespace xpcc
 				CYCLES_112 	= 0b101,	//!< 112 ADCCLK cycles
 				CYCLES_144 	= 0b110,	//!< 144 ADCCLK cycles
 				CYCLES_480 	= 0b111		//!< 480 ADCCLK cycles
-#elif defined (STM32F10X_LD) || defined (STM32F10X_LD_VL) || defined (STM32F10X_MD) || defined (STM32F10X_MD_VL) || defined (STM32F10X_HD) || defined (STM32F10X_HD_VL) || defined (STM32F10X_XL) || defined (STM32F10X_CL)
+#elif defined(STM32F10X)
 				CYCLES_2 	= 0b000,	//!< 1.5 ADCCLK cycles
 				CYCLES_8 	= 0b001,	//!< 7.5 ADCCLK cycles
 				CYCLES_14 	= 0b010,	//!< 13.5 ADCCLK cycles
@@ -218,14 +245,14 @@ namespace xpcc
 
 		public:
 
-#ifdef TEMP_REF_AVIALABLE || defined(__DOXYGEN__)
+#if defined(TEMPERATURE_REFVOLTAGE_AVIALABLE) || defined(__DOXYGEN__)
 			/** Switch on temperature- and V_REF measurement. */
 			static inline void
 			enableTemperatureRefVMeasurement(void)
 			{
-#ifdef TMS32F4XX
-				ADC{{ id }}->CCR |= ADC_CCR_TSVREFE;
-#elif defined (STM32F10X_LD) || defined (STM32F10X_LD_VL) || defined (STM32F10X_MD) || defined (STM32F10X_MD_VL) || defined (STM32F10X_HD) || defined (STM32F10X_HD_VL) || defined (STM32F10X_XL) || defined (STM32F10X_CL)
+#ifdef STM32F4XX
+				ADC->CCR |= ADC_CCR_TSVREFE;
+#elif defined(STM32F10X)
 				ADC{{ id }}->CR2 |= ADC_CR2_TSVREFE;
 #endif
 			}
@@ -234,13 +261,13 @@ namespace xpcc
 			static inline void
 			disableTemperatureRefVMeasurement(void)
 			{
-#ifdef TMS32F4XX
-				ADC{{ id }}->CCR &= ~ADC_CCR_TSVREFE;
-#elif defined (STM32F10X_LD) || defined (STM32F10X_LD_VL) || defined (STM32F10X_MD) || defined (STM32F10X_MD_VL) || defined (STM32F10X_HD) || defined (STM32F10X_HD_VL) || defined (STM32F10X_XL) || defined (STM32F10X_CL)
+#ifdef STM32F4XX
+				ADC->CCR &= ~ADC_CCR_TSVREFE;
+#elif defined(STM32F10X)
 				ADC{{ id }}->CR2 &= ~ADC_CR2_TSVREFE;
 #endif
 			}
-#endif
+#endif // TEMPERATURE_REFVOLTAGE_AVIALABLE
 
 			/**
 			 * Change the presentation of the ADC conversion result.
@@ -271,60 +298,11 @@ namespace xpcc
 			 * @pre The ADC clock must be started and the ADC switched on with 
 			 * 	initialize()
 			 */
-			static inline void
-			setChannel(const Channels channel, const SampleTime sampleTime=static_cast<SampleTime> (0b000))
-			{
-				ADC{{ id }}->SQR1 = 0;		// clear number of conversions in the sequence and set number of conversions to 1
-				ADC{{ id }}->SQR3 |= channel & 0b11111;
-
-				if(static_cast<uint8_t>(channel) < 10)
-					ADC{{ id }}->SMPR2 |= sampleTime << (static_cast<uint8_t>(channel) * 3);
-				else
-					ADC{{ id }}->SMPR1 |= sampleTime << ((static_cast<uint8_t>(channel)-10) * 3);
-
-#if defined(STM32F4XX) 
-				{% if id < 3 -%}
-				if(channel <8)
-					GPIOA->MODER |= 0b11 << ((channel + 0) * 2);
-				else if(channel <10)
-					GPIOB->MODER |= 0b11 << ((channel - 8) * 2);
-				else if(channel <16)
-					GPIOC->MODER |= 0b11 << ((channel - 10) * 2);
-				{%- elif id == 3 -%}
-				if(channel <4)
-					GPIOA->MODER |= 0b11 << ((channel + 0) * 2);
-				else if(channel <9)
-					GPIOF->MODER |= 0b11 << ((channel + 2) * 2);
-				else if(channel == 9)
-					GPIOF->MODER |= 0b11 << ((channel - 6) * 2);
-				else if(channel <14)
-					GPIOC->MODER |= 0b11 << ((channel - 10) * 2);
-				else if(channel <16)
-					GPIOF->MODER |= 0b11 << ((channel - 10) * 2);
-				{%- endif %}
-#elif defined (STM32F10X_LD) || defined (STM32F10X_LD_VL) || defined (STM32F10X_MD) || defined (STM32F10X_MD_VL) || defined (STM32F10X_HD) || defined (STM32F10X_HD_VL) || defined (STM32F10X_XL) || defined (STM32F10X_CL)
-				{% if id < 3 -%}
-				if(channel <8)
-					GPIOA->CRL &= ~(0b1111 << ((channel + 0) * 4));
-				else if(channel <10)
-					GPIOB->CRL &= ~(0b1111 << ((channel - 8) * 4));
-				else if(channel <16)
-					GPIOC->CRL &= ~(0b1111 << ((channel - 10) * 4));
-				{%- elif id == 3 -%}
-				if(channel <4)
-					GPIOA->CRL &= ~(0b1111 << ((channel + 0) * 4));
-				else if(channel <6)
-					GPIOF->CRL &= ~(0b1111 << ((channel + 2) * 4));
-				else if(channel <9)
-					GPIOF->CRH &= ~(0b1111 << ((channel - 6) * 4));
-				else if(channel <14 && channel>9)
-					GPIOC->CRL &= ~(0b1111 << ((channel - 10) * 4));;
-				{%- endif %}
-#endif
-			}
+			static void
+			setChannel(const Channels channel, const SampleTime sampleTime=static_cast<SampleTime> (0b000));
 
 			/**
-			 * \brief Enables free running mode
+			 * Enables free running mode
 			 *
 			 * The ADC will continously start conversions and provide the most
 			 * recent result in the ADC register.
@@ -338,7 +316,7 @@ namespace xpcc
 			}
 
 			/**
-			 * \brief Disables free running mode
+			 * Disables free running mode
 			 *
 			 * The ADC will do only one sample and stop. The result will be in 
 			 * the ADC register.
@@ -354,7 +332,7 @@ namespace xpcc
 			/**
 			 * Returns if the specified interrupt flag is set.
 			 * 
-			 * \return \c true if the flag is set
+			 * @return \c true if the flag is set
 			 * @pre The ADC clock must be started and the ADC switched on with 
 			 * 	initialize()
 			 * @param flag The interrupt flag, which shall be checked.
@@ -381,43 +359,16 @@ namespace xpcc
 			/**
 			 * Disables the ADC Conversion Complete Interrupt.
 			 */
-			static inline void
-			disableInterrupt(const Interrupt interrupt)
-			{
-#if defined(STM32F4XX)
-				NVIC_DisableIRQ(ADC_IRQn);
-#elif defined (STM32F10X_LD) || defined (STM32F10X_LD_VL) || defined (STM32F10X_MD) || defined (STM32F10X_MD_VL) || defined (STM32F10X_HD) || defined (STM32F10X_HD_VL) || defined (STM32F10X_XL) || defined (STM32F10X_CL)
-				{% if id < 3 -%}
-				NVIC_DisableIRQ(ADC1_2_IRQn);
-				{% elif id == 3 -%}
-				NVIC_DisableIRQ(ADC3_IRQn);
-				{% endif -%}
-#endif
-
-				switch(interrupt)
-				{
-					case END_OF_CONVERSION_REGULAR:
-						ADC{{ id }}->CR1 &= ~ADC_CR1_EOCIE;
-						break;
-					case END_OF_CONVERSION_INJECTED:
-						ADC{{ id }}->CR1 &= ~ADC_CR1_JEOCIE;
-						break;
-					case ANALOG_WATCHDOG:
-						ADC{{ id }}->CR1 &= ~ADC_CR1_AWDIE;
-						break;
-#if defined(STM32F4XX)
-					case OVERRUN:
-						ADC{{ id }}->CR1 &= ~ADC_CR1_OVRIE;
-						break;
-#endif
-				}
-			}
+			static void
+			disableInterrupt(const Interrupt interrupt);
 
 			/**
 			 * Enables the ADC Conversion Complete Interrupt.
 			 *
-			 * You could catch the interrupt using this function:
-			 * 	\code extern "C" void ADC_IRQHandler(void) \endcode
+			 * You could catch the interrupt using this example function:
+			 * \li for STM32F4XX: \code extern "C" void ADC_IRQHandler(void) \endcode
+			 * \li for STM32F10X: \code extern "C" void ADC1_2_IRQHandler(void) \endcode
+			 * 
 			 * @pre The ADC clock must be started and the ADC switched on with 
 			 * 	initialize()
 			 * @param priority Priority to set
@@ -427,46 +378,8 @@ namespace xpcc
 			 * 	vector. ADC3 interrupts are mapped onto a separate interrupt 
 			 * 	vector.
 			 */
-			static inline void
-			enableInterrupt(const Interrupt interrupt, const uint32_t priority)
-			{
-#if defined(STM32F4XX)
-				// Set priority for the interrupt vector				
-				NVIC_SetPriority(ADC_IRQn, priority);				
-				// register IRQ at the NVIC
-				NVIC_EnableIRQ(ADC_IRQn);
-#elif defined (STM32F10X_LD) || defined (STM32F10X_LD_VL) || defined (STM32F10X_MD) || defined (STM32F10X_MD_VL) || defined (STM32F10X_HD) || defined (STM32F10X_HD_VL) || defined (STM32F10X_XL) || defined (STM32F10X_CL)
-				{% if id < 3 -%}
-				// Set priority for the interrupt vector
-				NVIC_SetPriority(ADC1_2_IRQn, priority);
-				// register IRQ at the NVIC
-				NVIC_EnableIRQ(ADC1_2_IRQn);
-				{% elif id == 3 -%}
-				// Set priority for the interrupt vector
-				NVIC_SetPriority(ADC3_IRQn, priority);
-				// register IRQ at the NVIC
-				NVIC_EnableIRQ(ADC3_IRQn);
-				{%- endif %}
-#endif
-				
-				switch(interrupt)
-				{
-					case END_OF_CONVERSION_REGULAR:
-						ADC{{ id }}->CR1 |= ADC_CR1_EOCIE;
-						break;
-					case END_OF_CONVERSION_INJECTED:
-						ADC{{ id }}->CR1 |= ADC_CR1_JEOCIE;
-						break;
-					case ANALOG_WATCHDOG:
-						ADC{{ id }}->CR1 |= ADC_CR1_AWDIE;
-						break;
-#if defined(STM32F4XX)
-					case OVERRUN:
-						ADC{{ id }}->CR1 |= ADC_CR1_OVRIE;
-						break;
-#endif
-				}
-			}
+			static void
+			enableInterrupt(const Interrupt interrupt, const uint32_t priority);
 
 			/** 
 			 * Select the frequency of the clock to the ADC. The clock is common
@@ -482,7 +395,7 @@ namespace xpcc
 #if defined(STM32F4XX)
 				ADC->CCR &= ~(0b11 << 17);				// Clear prescaler
 				ADC->CCR |= prescaler << 17;		// set prescaler
-#elif defined (STM32F10X_LD) || defined (STM32F10X_LD_VL) || defined (STM32F10X_MD) || defined (STM32F10X_MD_VL) || defined (STM32F10X_HD) || defined (STM32F10X_HD_VL) || defined (STM32F10X_XL) || defined (STM32F10X_CL)
+#elif defined(STM32F10X)
 				RCC->CFGR &= ~(0b11 << 14);			// Clear prescaler
 				RCC->CFGR |= prescaler << 14;		// set prescaler
 #endif
@@ -509,7 +422,7 @@ namespace xpcc
 			 * Turns off the ADC and its clock.
 			 */
 			static inline void
-			shutdownADC(void)
+			shutdownAdc(void)
 			{
 				ADC{{ id }}->CR2 &= ~(ADC_CR2_ADON);		// switch off ADC
 				RCC->APB2ENR &= ~RCC_APB2ENR_ADC{{ id }}EN; // stop ADC Clock
@@ -530,7 +443,7 @@ namespace xpcc
 			{
 #if defined(STM32F4XX)
 				clearInterruptFlag(static_cast<Interrupt>(END_OF_CONVERSION_REGULAR | END_OF_CONVERSION_INJECTED | ANALOG_WATCHDOG | OVERRUN));
-#elif defined (STM32F10X_LD) || defined (STM32F10X_LD_VL) || defined (STM32F10X_MD) || defined (STM32F10X_MD_VL) || defined (STM32F10X_HD) || defined (STM32F10X_HD_VL) || defined (STM32F10X_XL) || defined (STM32F10X_CL)
+#elif defined(STM32F10X)
 				clearInterruptFlag(static_cast<Interrupt>(END_OF_CONVERSION_REGULAR | END_OF_CONVERSION_INJECTED | ANALOG_WATCHDOG));
 				ADC{{ id }}->CR2 |= ADC_CR2_EXTTRIG | ADC_CR2_EXTSEL_0 | ADC_CR2_EXTSEL_1 | ADC_CR2_EXTSEL_2; // select the SWSTART event used to trigger the start of conversion of a regular group
 #endif
@@ -550,15 +463,19 @@ namespace xpcc
 			/**
 			 * @return The most recent 16bit result of the ADC conversion.
 			 * @pre A conversion should have been stared with startConversion()
+			 * 
+			 * To have a blocking GET you might do it this way:
+			 * @code
+				while(!isConversionFinished()) 
+				{
+					// Waiting for conversion
+				}
+				@endcode
 			 */
 			static inline uint16_t
 			getValue(void)
 			{
-				while(!isConversionFinished())
-				{
-					asm volatile("NOP");
-				}
-				return ADC{{ id }}->DR & 0xFFFF;
+				return ADC{{ id }}->DR;
 			}
 		};
 	}

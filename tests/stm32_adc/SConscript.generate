@@ -35,4 +35,5 @@ Import('env')
 generator = env['TemplateGenerator'](env, 'adc')
 for id in [1, 2, 3]:
 	generator.template('adc_%i.hpp' % id, 'adc.hpp.in', { 'id': id })
+	generator.template('adc_%i.cpp' % id, 'adc.cpp.in', { 'id': id })
 	
