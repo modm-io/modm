@@ -1,12 +1,22 @@
-/*
- * adc_1.hpp
+/** \file adc_1.hpp
  *
- *  Created on: 03.04.2012
- *      Author: dhebbeker
+ *	The documentation is compiled for STM32F4XX.
+ *
+ *  @date	03.04.2012
+ *  @author	dhebbeker
  */
 
 #ifndef XPCC_STM32__ADC1_HPP
 #define XPCC_STM32__ADC1_HPP
+
+#if defined(__DOXYGEN__)
+	#ifndef STM32F4XX
+		/** Symbol defined to select the platform for which the documentation is 
+		 *	build.
+		 */
+		#define STM32F4XX (1)
+	#endif
+#endif
 
 #if !defined (STM32F4XX) && !defined (STM32F10X_LD) && !defined (STM32F10X_LD_VL) && !defined (STM32F10X_MD) && !defined (STM32F10X_MD_VL) && !defined (STM32F10X_HD) && !defined (STM32F10X_HD_VL) && !defined (STM32F10X_XL) && !defined (STM32F10X_CL)
  #error "Please select first the target STM32F?XX device used in your application (in stm32f?xx.h file)"
@@ -56,15 +66,21 @@ namespace xpcc
 				PIN_B1 = 9,
 				PIN_C4 = 14,
 				PIN_C5 = 15,
-				#if defined(STM32F4XX)
-				#define TEMP_REF_AVIALABLE (1)
+				#if defined(STM32F4XX)				
+				/** Flag to show, that the temperature and V_Ref measurements 
+				 * 	are available for this ADC.
+				 */ 
+				#define TEMP_REF_AVIALABLE (1) 
 				
 				/**
 				 * The half V_BAT voltage.
 				 */
 				VBAT = 18,
 				
-				#elif defined (STM32F10X_LD) || defined (STM32F10X_LD_VL) || defined (STM32F10X_MD) || defined (STM32F10X_MD_VL) || defined (STM32F10X_HD) || defined (STM32F10X_HD_VL) || defined (STM32F10X_XL) || defined (STM32F10X_CL)
+				#elif defined (STM32F10X_LD) || defined (STM32F10X_LD_VL) || defined (STM32F10X_MD) || defined (STM32F10X_MD_VL) || defined (STM32F10X_HD) || defined (STM32F10X_HD_VL) || defined (STM32F10X_XL) || defined (STM32F10X_CL)				
+				/** Flag to show, that the temperature and V_Ref measurements 
+				 * 	are available for this ADC.
+				 */ 
 				#define TEMP_REF_AVIALABLE (1)
 				#endif
 				
@@ -180,7 +196,8 @@ namespace xpcc
 
 		public:
 
-#ifdef TEMP_REF_AVIALABLE
+#ifdef TEMP_REF_AVIALABLE || defined(__DOXYGEN__)
+			/** Switch on temperature- and V_REF measurement. */
 			static inline void
 			enableTemperatureRefVMeasurement(void)
 			{
@@ -191,6 +208,7 @@ namespace xpcc
 #endif
 			}
 
+			/** Switch on temperature- and V_REF measurement. */
 			static inline void
 			disableTemperatureRefVMeasurement(void)
 			{

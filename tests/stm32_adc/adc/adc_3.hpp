@@ -1,19 +1,29 @@
-/*
- * adc_3.hpp
+/** \file adc_3.hpp
  *
- *  Created on: 03.04.2012
- *      Author: dhebbeker
+ *	The documentation is compiled for STM32F4XX.
+ *
+ *  @date	03.04.2012
+ *  @author	dhebbeker
  */
 
 #ifndef XPCC_STM32__ADC3_HPP
 #define XPCC_STM32__ADC3_HPP
+
+#if defined(__DOXYGEN__)
+	#ifndef STM32F4XX
+		/** Symbol defined to select the platform for which the documentation is 
+		 *	build.
+		 */
+		#define STM32F4XX (1)
+	#endif
+#endif
 
 #if !defined (STM32F4XX) && !defined (STM32F10X_LD) && !defined (STM32F10X_LD_VL) && !defined (STM32F10X_MD) && !defined (STM32F10X_MD_VL) && !defined (STM32F10X_HD) && !defined (STM32F10X_HD_VL) && !defined (STM32F10X_XL) && !defined (STM32F10X_CL)
  #error "Please select first the target STM32F?XX device used in your application (in stm32f?xx.h file)"
 #endif
 
 
-#if defined (STM32F10X_HD) || defined (STM32F10X_XL)
+#if defined(STM32F4XX) || defined (STM32F10X_HD) || defined (STM32F10X_XL) || defined(__DOXYGEN__)
 #include <xpcc/architecture.hpp>
 
 namespace xpcc
@@ -55,13 +65,16 @@ namespace xpcc
 				PIN_F8 = 6,
 				PIN_F9 = 7,
 				PIN_F10 = 8,
-#if defined(STM32F4XX)	// Actually STM32F405xx or STM32F407xx is meant!
+#if defined(STM32F4XX)
 				PIN_F3 = 9,
 				PIN_F4 = 14,
 				PIN_F5 = 15,
 #endif
-				#if defined(STM32F4XX)
-				#define TEMP_REF_AVIALABLE (1)
+				#if defined(STM32F4XX)				
+				/** Flag to show, that the temperature and V_Ref measurements 
+				 * 	are available for this ADC.
+				 */ 
+				#define TEMP_REF_AVIALABLE (1) 
 				
 				/**
 				 * The half V_BAT voltage.
@@ -176,7 +189,8 @@ namespace xpcc
 
 		public:
 
-#ifdef TEMP_REF_AVIALABLE
+#ifdef TEMP_REF_AVIALABLE || defined(__DOXYGEN__)
+			/** Switch on temperature- and V_REF measurement. */
 			static inline void
 			enableTemperatureRefVMeasurement(void)
 			{
@@ -187,6 +201,7 @@ namespace xpcc
 #endif
 			}
 
+			/** Switch on temperature- and V_REF measurement. */
 			static inline void
 			disableTemperatureRefVMeasurement(void)
 			{
@@ -493,5 +508,5 @@ namespace xpcc
 }
 
 
-#endif // STM32F10X_HD || STM32F10X_XL
+#endif // defined(STM32F4XX) || defined (STM32F10X_HD) || defined (STM32F10X_XL)
 #endif /* XPCC_STM32__ADC3_HPP */
