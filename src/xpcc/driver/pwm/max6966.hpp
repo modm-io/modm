@@ -125,21 +125,21 @@ namespace xpcc
 	 *
 	 * \tparam	Spi		Spi interface
 	 * \tparam	Cs		Chip Select Pin
-	 * \tparam DRIVERS	Number of daisy-chained chips
+	 * \tparam	DRIVERS	Number of daisy-chained chips
 	 * 
 	 * \author	Niklas Hauser
 	 * \ingroup	pwm
 	 */
 	template<
-	typename Spi,
-	typename Cs,
-	uint8_t DRIVERS=1 >
+		typename Spi,
+		typename Cs,
+		uint8_t DRIVERS=1 >
 	class MAX6966
 	{
 	public:
 		/**
-		 * \param current		set the global current
-		 * \param enableDOUT	enable Data Output, disable external Clock Input
+		 * \param current	Set the global current
+		 * \param config	Enable Data Output, disable external Clock Input
 		 */
 		static void
 		initialize(max6966::Current current, uint8_t config=0);

@@ -31,8 +31,11 @@
 #ifndef STM32__DEVICE_H
 #define STM32__DEVICE_H
 
-#if !defined (STM32F4XX) && !defined (STM32F10X_LD) && !defined (STM32F10X_LD_VL) && !defined (STM32F10X_MD) && !defined (STM32F10X_MD_VL) && !defined (STM32F10X_HD) && !defined (STM32F10X_HD_VL) && !defined (STM32F10X_XL) && !defined (STM32F10X_CL)
- #error "Please select first the target STM32F?XX device used in your application (in stm32f?xx.h file)"
+#if !defined(STM32F4XX) && !defined(STM32F2XX) && \
+	!defined(STM32F10X_CL) && \
+	!defined(STM32F10X_LD) && !defined(STM32F10X_MD) && !defined(STM32F10X_HD) && !defined(STM32F10X_XL) && \
+	!defined(STM32F10X_LD_VL) && !defined(STM32F10X_MD_VL) && !defined (STM32F10X_HD_VL) 
+#	error "Please select the target STM32F??X device used in your application (in the stm32f??x.h file)"
 #endif
 
 #if defined(STM32F2XX)
@@ -42,5 +45,15 @@
 #else
 #	include <stm32f10x.h>
 #endif
+
+/**
+ * \defgroup	stm32f1		STM32F10x
+ * \ingroup		stm32
+ */
+
+/**
+ * \defgroup	stm32f2_4	STM32F2xx and STM32F4xx
+ * \ingroup		stm32
+ */
 
 #endif // STM32__DEVICE_H

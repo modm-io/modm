@@ -60,6 +60,7 @@ namespace xpcc
 		 * \endcode
 		 * 
 		 * For using a 25 MHz crystal on a Connectivity Line device:
+		 * \code
 		 * if (enableHse(HSE_CRYSTAL))
 		 * {
 		 *     enablePll2(5, PLL2_MUL_8);	// 40 MHz = (25 MHz / 5) * 8
@@ -67,6 +68,8 @@ namespace xpcc
 		 *     switchToPll();
 		 * }
 		 * \endcode
+		 * 
+		 * \ingroup	stm32f1
 		 */
 		class Clock
 		{
@@ -189,7 +192,7 @@ namespace xpcc
 			 * 		Source select for PLL and for plli2s. If you are using
 			 * 		HSE you must enable it first (see enableHse()).
 			 *
-			 * \param	pllMull
+			 * \param	pllMul
 			 * 		PLL multiplication factor.
 			 *		Set multiplication factor so that the output of the
 			 *		PLL is 72MHz

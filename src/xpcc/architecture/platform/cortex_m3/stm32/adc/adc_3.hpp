@@ -39,16 +39,17 @@
 #define XPCC_STM32__ADC3_HPP
 
 #if defined(__DOXYGEN__)
-	#ifndef STM32F4XX
+	#if !defined(STM32F4XX)
 		/** Symbol defined to select the platform for which the documentation is 
 		 *	build.
 		 */
-		#define STM32F4XX (1)
+		#define STM32F4XX	1
 	#endif
 #endif
 
 
-#if defined(STM32F4XX) || defined (STM32F10X_HD) || defined (STM32F10X_XL) || defined(__DOXYGEN__)
+#if defined(STM32F4XX) || defined(STM32F2XX) || \
+	defined(STM32F10X_HD) || defined(STM32F10X_XL) || defined(__DOXYGEN__)
 #include <xpcc/architecture.hpp>
 
 namespace xpcc
@@ -92,12 +93,12 @@ namespace xpcc
 				PIN_F8 = 6,
 				PIN_F9 = 7,
 				PIN_F10 = 8,
-#if defined(STM32F4XX)
+#if defined(STM32F2XX) || defined(STM32F4XX)
 				PIN_F3 = 9,
 				PIN_F4 = 14,
 				PIN_F5 = 15,
 #endif
-				#if defined(STM32F4XX)				
+				#if defined(STM32F2XX) || defined(STM32F4XX)				
 				/** Flag to show, that the temperature and V_Ref measurements 
 				 * 	are available for this ADC.
 				 */ 
@@ -144,7 +145,7 @@ namespace xpcc
 				CHANNEL_11 = 11,
 				CHANNEL_12 = 12,
 				CHANNEL_13 = 13,
-#if defined(STM32F4XX)
+#if defined(STM32F2XX) || defined(STM32F4XX)
 				CHANNEL_9 = 9,
 				CHANNEL_14 = 14,
 				CHANNEL_15 = 15,
@@ -175,7 +176,7 @@ namespace xpcc
 			 */
 			enum SampleTime
 			{
-#if defined(STM32F4XX)
+#if defined(STM32F2XX) || defined(STM32F4XX)
 				CYCLES_3 	= 0b000,	//!< 3 ADCCLK cycles
 				CYCLES_15 	= 0b001,	//!< 15 ADCCLK cycles
 				CYCLES_28 	= 0b010,	//!< 28 ADCCLK cycles
@@ -208,7 +209,7 @@ namespace xpcc
 				END_OF_CONVERSION_REGULAR	= ADC_SR_EOC,	//!< End of conversion of a regular group
 				END_OF_CONVERSION_INJECTED	= ADC_SR_JEOC,	//!< End of conversion of an injected group
 				ANALOG_WATCHDOG				= ADC_SR_AWD,	//!< Analog watchdog status bit is set
-#if defined(STM32F4XX) 
+#if defined(STM32F2XX) || defined(STM32F4XX) 
 				OVERRUN						= ADC_SR_OVR	//!< Overrun (if data are lost)
 #endif
 			};
@@ -221,7 +222,7 @@ namespace xpcc
 			static inline void
 			enableTemperatureRefVMeasurement(void)
 			{
-#ifdef STM32F4XX
+#if defined(STM32F2XX) || defined(STM32F4XX)
 				ADC->CCR |= ADC_CCR_TSVREFE;
 #elif defined(STM32F10X)
 				ADC3->CR2 |= ADC_CR2_TSVREFE;
@@ -232,7 +233,7 @@ namespace xpcc
 			static inline void
 			disableTemperatureRefVMeasurement(void)
 			{
-#ifdef STM32F4XX
+#if defined(STM32F2XX) || defined(STM32F4XX)
 				ADC->CCR &= ~ADC_CCR_TSVREFE;
 #elif defined(STM32F10X)
 				ADC3->CR2 &= ~ADC_CR2_TSVREFE;
@@ -363,7 +364,7 @@ namespace xpcc
 			static inline void
 			setPrescaler(const Prescaler prescaler)
 			{
-#if defined(STM32F4XX)
+#if defined(STM32F2XX) || defined(STM32F4XX)
 				ADC->CCR &= ~(0b11 << 17);				// Clear prescaler
 				ADC->CCR |= prescaler << 17;		// set prescaler
 #elif defined(STM32F10X)
@@ -401,9 +402,11 @@ namespace xpcc
 
 			/**
 			 * Start a new conversion or continuous conversions.
+			 * 
 			 * @pre A ADC channel must be selected with setChannel(). When using
 			 * 	a STM32F10x a delay of at least t_STAB after initialize() must 
 			 * 	be waited! 
+			 * 
 			 * @post The result can be fetched with getValue()
 			 * @attention When using a STM32F10x, the application should allow a delay of t_STAB between
 			 * 	power up and start of conversion. Refer to Reference Manual 
@@ -412,13 +415,22 @@ namespace xpcc
 			static inline void
 			startConversion(void)
 			{
-#if defined(STM32F4XX)
-				clearInterruptFlag(static_cast<Interrupt>(END_OF_CONVERSION_REGULAR | END_OF_CONVERSION_INJECTED | ANALOG_WATCHDOG | OVERRUN));
+#if defined(STM32F2XX) || defined(STM32F4XX)
+				clearInterruptFlag(static_cast<Interrupt>(
+						END_OF_CONVERSION_REGULAR | END_OF_CONVERSION_INJECTED |
+						ANALOG_WATCHDOG | OVERRUN));
 #elif defined(STM32F10X)
-				clearInterruptFlag(static_cast<Interrupt>(END_OF_CONVERSION_REGULAR | END_OF_CONVERSION_INJECTED | ANALOG_WATCHDOG));
-				ADC3->CR2 |= ADC_CR2_EXTTRIG | ADC_CR2_EXTSEL_0 | ADC_CR2_EXTSEL_1 | ADC_CR2_EXTSEL_2; // select the SWSTART event used to trigger the start of conversion of a regular group
+				clearInterruptFlag(static_cast<Interrupt>(
+						END_OF_CONVERSION_REGULAR | END_OF_CONVERSION_INJECTED |
+						ANALOG_WATCHDOG));
+				
+				// select the SWSTART event used to trigger the start of
+				// conversion of a regular group
+				ADC3->CR2 |= ADC_CR2_EXTTRIG | ADC_CR2_EXTSEL_0 |
+						ADC_CR2_EXTSEL_1 | ADC_CR2_EXTSEL_2;
 #endif
-				ADC3->CR2 |= ADC_CR2_SWSTART;	// starts single conversion for the regular group
+				// starts single conversion for the regular group
+				ADC3->CR2 |= ADC_CR2_SWSTART;
 			}
 
 			/** 
@@ -454,5 +466,5 @@ namespace xpcc
 }
 
 
-#endif // defined(STM32F4XX) || defined (STM32F10X_HD) || defined (STM32F10X_XL)
-#endif /* XPCC_STM32__ADC3_HPP */
+#endif // defined(STM32F2XX) || defined(STM32F4XX) || defined (STM32F10X_HD) || defined (STM32F10X_XL)
+#endif	// XPCC_STM32__ADC3_HPP

@@ -66,6 +66,8 @@ namespace xpcc
 		 *     switchToPll();
 		 * }
 		 * \endcode
+		 * 
+		 * \ingroup	stm32f2_4
 		 */
 		class Clock
 		{

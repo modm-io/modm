@@ -209,26 +209,26 @@ nvicDisableInterrupt(IRQn_Type IRQn)
 
 // ----------------------------------------------------------------------------
 void
-xpcc::stm32::Timer{{ id }}::enableInterruptVector(Interrupt interrupts, bool enable, uint32_t priority)
+xpcc::stm32::Timer{{ id }}::enableInterruptVector(Interrupt interrupt, bool enable, uint32_t priority)
 {
 	if (enable)
 	{
-		if (interrupts & INTERRUPT_UPDATE) {
+		if (interrupt & INTERRUPT_UPDATE) {
 			NVIC_SetPriority(TIM{{ id }}_UP_IRQn, priority);
 			nvicEnableInterrupt(TIM{{ id }}_UP_IRQn);
 		}
 		
-		if (interrupts & INTERRUPT_BREAK) {
+		if (interrupt & INTERRUPT_BREAK) {
 			NVIC_SetPriority(TIM{{ id }}_BRK_IRQn, priority);
 			nvicEnableInterrupt(TIM{{ id }}_BRK_IRQn);
 		}
 		
-		if (interrupts & (INTERRUPT_COM | INTERRUPT_TRIGGER)) {
+		if (interrupt & (INTERRUPT_COM | INTERRUPT_TRIGGER)) {
 			NVIC_SetPriority(TIM{{ id }}_TRG_COM_IRQn, priority);
 			nvicEnableInterrupt(TIM{{ id }}_TRG_COM_IRQn);
 		}	
 		
-		if (interrupts & 
+		if (interrupt & 
 				(INTERRUPT_CAPTURE_COMPARE_1 | INTERRUPT_CAPTURE_COMPARE_2 |
 				 INTERRUPT_CAPTURE_COMPARE_3 | INTERRUPT_CAPTURE_COMPARE_4)) {
 			NVIC_SetPriority(TIM{{ id }}_CC_IRQn, priority);
@@ -237,19 +237,19 @@ xpcc::stm32::Timer{{ id }}::enableInterruptVector(Interrupt interrupts, bool ena
 	}
 	else
 	{
-		if (interrupts & INTERRUPT_UPDATE) {
+		if (interrupt & INTERRUPT_UPDATE) {
 			nvicDisableInterrupt(TIM{{ id }}_UP_IRQn);
 		}
 		
-		if (interrupts & INTERRUPT_BREAK) {
+		if (interrupt & INTERRUPT_BREAK) {
 			nvicDisableInterrupt(TIM{{ id }}_BRK_IRQn);
 		}
 		
-		if (interrupts & (INTERRUPT_COM | INTERRUPT_TRIGGER)) {
+		if (interrupt & (INTERRUPT_COM | INTERRUPT_TRIGGER)) {
 			nvicDisableInterrupt(TIM{{ id }}_TRG_COM_IRQn);
 		}
 		
-		if (interrupts & 
+		if (interrupt & 
 				(INTERRUPT_CAPTURE_COMPARE_1 | INTERRUPT_CAPTURE_COMPARE_2 |
 				 INTERRUPT_CAPTURE_COMPARE_3 | INTERRUPT_CAPTURE_COMPARE_4)) {
 			nvicDisableInterrupt(TIM{{ id }}_CC_IRQn);

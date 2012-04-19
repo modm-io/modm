@@ -214,15 +214,15 @@ namespace xpcc
 			enableInterruptVector(bool enable, uint32_t priority);
 			
 			static inline void
-			enableInterrupt(Interrupt interrupts)
+			enableInterrupt(Interrupt interrupt)
 			{
-				TIM3->DIER |= interrupts;
+				TIM3->DIER |= interrupt;
 			}
 			
 			static inline void
-			disableInterrupt(Interrupt interrupts)
+			disableInterrupt(Interrupt interrupt)
 			{
-				TIM3->DIER &= ~interrupts;
+				TIM3->DIER &= ~interrupt;
 			}
 			
 			static inline void

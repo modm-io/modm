@@ -191,7 +191,8 @@ namespace xpcc
 			/**
 			 * Enables interrupts. Don't forget to enable the Interrupt Vector.
 			 * 
-			 * \param	interrupts		Interrupts to enable
+			 * \param	interrupt	
+			 * 				Interrupts to enable
 			 * 
 			 * \see		enableInterruptVector()
 			 */
@@ -201,7 +202,8 @@ namespace xpcc
 			/**
 			 * Disables interrupts.
 			 *
-			 * \param interrupts	Interrupts to disable
+			 * \param	interrupt
+			 * 				Interrupts to disable
 			 */
 			static void
 			disableInterrupt(Interrupt interrupt);
@@ -412,7 +414,7 @@ namespace xpcc
 		class AdvancedControlTimer : public GeneralPurposeTimer
 		{
 		public:
-			/**
+			/*
 			 * Configure output channel 1..4.
 			 *
 			 * @param	channel			[1..4]

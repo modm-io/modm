@@ -34,7 +34,9 @@
 // ----------------------------------------------------------------------------
 
 #include "spi_e.hpp"
-#include <xpcc/architecture/platform.hpp>
+
+#include <xpcc/architecture/platform/avr/atxmega.hpp>
+#include <xpcc/architecture/driver/gpio.hpp>
 
 #ifdef SPIE
 

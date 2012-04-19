@@ -130,7 +130,9 @@ namespace xpcc
 			}
 			
 			static void
-			setMode(Mode mode, SlaveMode slaveMode = SLAVE_DISABLED, SlaveModeTrigger slaveModeTrigger = (SlaveModeTrigger)0);
+			setMode(Mode mode,
+					SlaveMode slaveMode = SLAVE_DISABLED,
+					SlaveModeTrigger slaveModeTrigger = TRIGGER_INTERNAL_0);
 			
 			static inline void
 			setPrescaler(uint16_t prescaler)
@@ -218,18 +220,18 @@ namespace xpcc
 			 * - CC (used by INTERRUPT_CAPTURE_COMPARE_1..3)
 			 */
 			static void
-			enableInterruptVector(Interrupt interrupts, bool enable, uint32_t priority);
+			enableInterruptVector(Interrupt interrupt, bool enable, uint32_t priority);
 			
 			static inline void
-			enableInterrupt(Interrupt interrupts)
+			enableInterrupt(Interrupt interrupt)
 			{
-				TIM8->DIER |= interrupts;
+				TIM8->DIER |= interrupt;
 			}
 			
 			static inline void
-			disableInterrupt(Interrupt interrupts)
+			disableInterrupt(Interrupt interrupt)
 			{
-				TIM8->DIER &= ~interrupts;
+				TIM8->DIER &= ~interrupt;
 			}
 			
 			static inline void

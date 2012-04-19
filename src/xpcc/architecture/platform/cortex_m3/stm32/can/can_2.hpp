@@ -98,7 +98,9 @@ namespace xpcc
 		public:
 			/**
 			 * Enables the clock for the CAN controller and resets all settings
-			 *
+			 * 
+			 * \param bitrate
+			 * 			CAN bitrate (defined in driver/connectivity/can/message.hpp)
 			 * \param interruptPriority
 			 * 			Interrupt vector priority (0=highest to 15=lowest)
 			 * \param overwriteOnOverrun

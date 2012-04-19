@@ -30,7 +30,9 @@
 {{ generation_block }}
 
 #include "spi_{{ port.lower() }}.hpp"
-#include <xpcc/architecture/platform.hpp>
+
+#include <xpcc/architecture/platform/avr/atxmega.hpp>
+#include <xpcc/architecture/driver/gpio.hpp>
 
 #ifdef SPI{{ port }}
 
