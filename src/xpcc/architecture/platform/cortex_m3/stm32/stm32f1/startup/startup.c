@@ -340,7 +340,7 @@ void
 Reset_Handler(void)
 {
 	// startup delay
-	for (volatile unsigned long i = 0; i < 500000; i++)
+	for (volatile unsigned long i = 0; i < 50000; i++)
 	{
 	}
 	
