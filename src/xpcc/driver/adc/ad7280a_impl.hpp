@@ -25,8 +25,6 @@
  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- * $Id$
  */
 // ----------------------------------------------------------------------------
 /*
@@ -150,10 +148,16 @@
 
 // ----------------------------------------------------------------------------
 template <typename Spi, typename Cs, typename Cnvst, int N>
+uint8_t xpcc::Ad7280a<Spi, Cs, Cnvst, N>::controlHighByte = 0;
+
+// ----------------------------------------------------------------------------
+template <typename Spi, typename Cs, typename Cnvst, int N>
 void
-xpcc::Ad7280a<Spi, Cs, Cnvst, N>::initialize()
+xpcc::Ad7280a<Spi, Cs, Cnvst, N>::initialize(ad7280a::Average average)
 {
 	XPCC__STATIC_ASSERT(N == 1, "Daisy chain length is currently limited to 1!");
+	
+	controlHighByte = average;
 	
 	Cs::setOutput(xpcc::gpio::HIGH);
 	Cnvst::setOutput(xpcc::gpio::HIGH);
@@ -185,6 +189,7 @@ xpcc::Ad7280a<Spi, Cs, Cnvst, N>::chainSetup()
 	// register, 0x0E, to the read register on all devices.
 	write(ad7280a::MASTER, ad7280a::READ, true, ad7280a::CTRL_LB << 2);
 	
+	//XPCC_LOG_DEBUG << "chain setup" << xpcc::endl;
 	// To verify that all AD7280As in the chain have received and
 	// locked their unique device address, a daisy-chain register read
 	// should be requested from all devices. This can be done by
@@ -223,11 +228,6 @@ template <typename Spi, typename Cs, typename Cnvst, int N>
 bool
 xpcc::Ad7280a<Spi, Cs, Cnvst, N>::performSelftest()
 {
-	// To select the self-test conversion, set Bits[D15:D14] of the
-	// control register to 1, and set Bits[D13:D12] of the control
-	// register to 0 on all parts.
-	write(0, ad7280a::CTRL_HB, true, AD7280A_CTRL_HB_CONV_INPUT_SELF_TEST);
-	
 	// Set Bit D0 of the control register to 1 on all parts. This
 	// setting enables the daisy-chain register read operation on
 	// all parts.
@@ -236,34 +236,22 @@ xpcc::Ad7280a<Spi, Cs, Cnvst, N>::performSelftest()
 			AD7280A_CTRL_LB_LOCK_DEV_ADDR |
 			AD7280A_CTRL_LB_DAISY_CHAIN_RB_EN);
 	
-	// The register address corresponding to the self-test
-	// conversion should be written to the read register of all
-	// parts (see Table 13 for register addresses). The 32-bit write
-	// command is 0x03 86 17 CA (see Table 29, Write 3).
-	write(0, ad7280a::READ, true, ad7280a::SELF_TEST << 2);
-	
-	// Program the CNVST control register to 0x02 on all parts
-	// to allow conversions to be initiated using the CNVST pin.
-	// The 32-bit write command is 0x03 A0 54 6A (see Table 29,
-	// Write 4).
-	write(0, ad7280a::CNVST_CONTROL, true, 0x02);
-	
-	// Initiate conversions through the falling edge of CNVST.
-	Cnvst::reset();
+	// To select the self-test conversion, set Bits[D15:D14] of the
+	// control register to 1, and set Bits[D13:D12] of the control
+	// register to 0 on all parts.
+	write(0, ad7280a::CTRL_HB, true,
+			AD7280A_CTRL_HB_CONV_INPUT_SELF_TEST |
+			AD7280A_CTRL_HB_CONV_START_CS);
 	
 	// Allow sufficient time for the self-test conversions to be
 	// completed plus tWAIT.
 	xpcc::delay_ms(50);		// TODO
-	Cnvst::set();
 	
-	// The CNVST control register should be programmed to
-	// gate the CNVST signal on all parts. The 32-bit write
-	// command is 0x03 A0 34 0A (see Table 29, Write 5). This
-	// write prevents unintentional conversions from being
-	// initiated by noise or glitches on the CNVST pin. This write
-	// also updates the on-chip output registers of all devices in
-	// the daisy chain.
-	write(0, ad7280a::CNVST_CONTROL, true, 0x01);
+	// The register address corresponding to the self-test
+	// conversion should be written to the read register of all
+	// parts (see Table 13 for register addresses). The 32-bit write
+	// command is 0x03 86 17 CA (see Table 29, Write 3).
+	write(0, ad7280a::READ, true, static_cast<uint8_t>(ad7280a::SELF_TEST << 2));
 	
 	//XPCC_LOG_DEBUG << "result:" << xpcc::endl;
 	// Apply a CS low pulse that frames 32 SCLKs to read back
@@ -275,6 +263,7 @@ xpcc::Ad7280a<Spi, Cs, Cnvst, N>::performSelftest()
 	// result typically varies between Code 970 and Code 990.
 	ad7280a::ConversionValue conversion;
 	if (readConversionResult(&conversion)) {
+		XPCC_LOG_DEBUG << "selftest = " << conversion.value << xpcc::endl;
 		if (conversion.value > 970 && conversion.value < 990) {
 			return true;
 		}
@@ -291,12 +280,14 @@ xpcc::Ad7280a<Spi, Cs, Cnvst, N>::softwareReset()
 	write(ad7280a::MASTER, ad7280a::CTRL_LB, true,
 			AD7280A_CTRL_LB_SWRST |
 			AD7280A_CTRL_LB_MUST_SET |
-			AD7280A_CTRL_LB_LOCK_DEV_ADDR | AD7280A_CTRL_LB_DAISY_CHAIN_RB_EN);
+			AD7280A_CTRL_LB_LOCK_DEV_ADDR |
+			AD7280A_CTRL_LB_DAISY_CHAIN_RB_EN);
 	
 	// Clear reset bit
 	write(ad7280a::MASTER, ad7280a::CTRL_LB, true,
 			AD7280A_CTRL_LB_MUST_SET |
-			AD7280A_CTRL_LB_LOCK_DEV_ADDR | AD7280A_CTRL_LB_DAISY_CHAIN_RB_EN);
+			AD7280A_CTRL_LB_LOCK_DEV_ADDR |
+			AD7280A_CTRL_LB_DAISY_CHAIN_RB_EN);
 }
 
 // ----------------------------------------------------------------------------
@@ -316,6 +307,9 @@ xpcc::Ad7280a<Spi, Cs, Cnvst, N>::readChannel(uint8_t device,
 	
 	// Wait for the conversion to finish
 	xpcc::delay_ms(5);
+	
+	// Read one channel
+	write(device, ad7280a::READ, false, channel);
 	
 	ad7280a::ConversionValue conversion;
 	if (readConversionResult(&conversion) &&
@@ -337,22 +331,15 @@ xpcc::Ad7280a<Spi, Cs, Cnvst, N>::readAllChannels(uint16_t *values)
 	// Write Register Address 0x00 to the read register on all
 	// parts. A device address of 0x00 is used when computing
 	// the CRC for commands to write to all parts.
-	write(0, ad7280a::READ, true, 0x00);
+	write(0, ad7280a::READ, true, static_cast<uint8_t>(ad7280a::CELL_VOLTAGE_1));
 	
 	write(0, ad7280a::CTRL_HB, true,
 			AD7280A_CTRL_HB_CONV_INPUT_6CELL |
-			AD7280A_CTRL_HB_CONV_RES_READ_6CELL);
-	
-	// Program the CNVST control register to 0x02 on all parts
-	// to allow conversions to be initiated using the CNVST pin.
-	write(0, ad7280a::CNVST_CONTROL, true, 0x02);
-	
-	// Initiate conversions through the falling edge of CNVST.
-	Cnvst::reset();
+			AD7280A_CTRL_HB_CONV_RES_READ_6CELL |
+			AD7280A_CTRL_HB_CONV_START_CS);
 	
 	// Allow sufficient time for all conversions to be completed plus tWAIT.
 	xpcc::delay_ms(5);
-	Cnvst::set();
 	
 	// Apply a CS low pulse that frames 32 SCLKs to read back
 	// the desired voltage. This frame should simultaneously
@@ -443,12 +430,14 @@ xpcc::Ad7280a<Spi, Cs, Cnvst, N>::read(uint32_t *value)
 	*value |= Spi::write(0x0A);
 	Cs::set();
 	
+	//XPCC_LOG_DEBUG << "read = " << xpcc::hex << *value << xpcc::ascii << xpcc::endl;
+	
 	uint8_t crc = calculateCrc(*value >> 10);
 	if (crc == ((*value >> 2) & 0xff)) {
 		return true;
 	}
 	else {
-		//XPCC_LOG_DEBUG << "expected=" << crc << ", got=" << ((value >> 2) & 0xff) << xpcc::endl;
+		//XPCC_LOG_DEBUG << "expected=" << crc << ", got=" << ((*value >> 2) & 0xff) << xpcc::endl;
 		return false;
 	}
 }
@@ -489,28 +478,4 @@ xpcc::Ad7280a<Spi, Cs, Cnvst, N>::readConversionResult(ad7280a::ConversionValue*
 	}
 	
 	return false;
-}
-
-// ----------------------------------------------------------------------------
-xpcc::IOStream&
-xpcc::operator << (xpcc::IOStream& s, const ad7280a::RegisterValue& c)
-{
-	s	<< " (dev=" << c.device
-		<< ", reg=" << c.registerAddress
-		<< ", val=" << c.value
-		<< ", ack=" << c.acknowledge << ")";
-	
-	return s;
-}
-
-// ----------------------------------------------------------------------------
-xpcc::IOStream&
-xpcc::operator << (xpcc::IOStream& s, const ad7280a::ConversionValue& c)
-{
-	s	<< " (dev=" << c.device
-		<< ", ch =" << c.channel
-		<< ", val=" << c.value
-		<< ", ack=" << c.acknowledge << ")";
-	
-	return s;
 }

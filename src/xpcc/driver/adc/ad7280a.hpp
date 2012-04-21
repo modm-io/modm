@@ -25,8 +25,6 @@
  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- * $Id$
  */
 // ----------------------------------------------------------------------------
 
@@ -144,6 +142,14 @@ namespace xpcc
 			uint16_t value;			///< 12-Bit => 0..4095
 			bool acknowledge;
 		};
+		
+		enum Average
+		{
+			NO_AVERAGE = (0 << 1),		///< Single conversion only
+			AVERAGE_BY_2 = (1 << 1),	///< Average over 2 samples
+			AVERAGE_BY_4 = (2 << 1),	///< Average over 4 samples
+			AVERAGE_BY_8 = (3 << 1),	///< Average over 8 samples
+		};
 	}
 	
 	/**
@@ -178,7 +184,7 @@ namespace xpcc
 		
 	public:
 		static void
-		initialize();
+		initialize(ad7280a::Average average = ad7280a::NO_AVERAGE);
 		
 		/*
 		 * Initialize daisy chain.
@@ -253,6 +259,8 @@ namespace xpcc
 		
 		static void
 		dumpConversion(uint32_t value);*/
+		
+		static uint8_t controlHighByte;
 	};
 	
 	// ------------------------------------------------------------------------
