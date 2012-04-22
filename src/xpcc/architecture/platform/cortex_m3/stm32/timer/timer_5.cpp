@@ -75,18 +75,21 @@ xpcc::stm32::Timer5::setMode(Mode mode, SlaveMode slaveMode,
 	TIM5->CR1 = 0;
 	TIM5->CR2 = 0;
 	
-	if (slaveMode == SLAVE_ENCODER_1 || slaveMode == SLAVE_ENCODER_2 || slaveMode == SLAVE_ENCODER_3)
+	if (slaveMode == SLAVE_ENCODER_1 || \
+		slaveMode == SLAVE_ENCODER_2 || \
+		slaveMode == SLAVE_ENCODER_3)
 	{
+		// Prescaler has to be 1 when using the quadrature decoder
 		setPrescaler(1);
 	}
 	
 	// ARR Register is buffered, only Under/Overflow generates update interrupt
 	TIM5->CR1 = TIM_CR1_ARPE | TIM_CR1_URS | mode;
-	TIM5->SMCR = slaveMode|slaveModeTrigger;
+	TIM5->SMCR = slaveMode | slaveModeTrigger;
 }
 
 // ----------------------------------------------------------------------------
-uint16_t
+xpcc::stm32::Timer5::Value
 xpcc::stm32::Timer5::setPeriod(uint32_t microseconds, bool autoApply)
 {
 	// This will be inaccurate for non-smooth frequencies (last six digits
@@ -95,7 +98,7 @@ xpcc::stm32::Timer5::setPeriod(uint32_t microseconds, bool autoApply)
 			((STM32_APB1_FREQUENCY == STM32_AHB_FREQUENCY) ? 1 : 2) * 
 					STM32_APB1_FREQUENCY / 1000000UL);
 	uint16_t prescaler = (cycles + 65535) / 65536;	// always round up
-	uint16_t overflow = cycles / prescaler;
+	Value overflow = cycles / prescaler;
 	
 	overflow = overflow - 1;	// e.g. 36000 cycles are from 0 to 35999
 	

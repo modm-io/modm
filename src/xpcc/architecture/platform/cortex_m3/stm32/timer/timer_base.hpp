@@ -370,7 +370,8 @@ namespace xpcc
 			 * to channel 1 and 2 of the timer (e.g. TIM2_CH1 and TIM2_CH2).
 			 */
 			static void
-			setMode(Mode mode);
+			setMode(Mode mode, SlaveMode slaveMode = SLAVE_DISABLED,
+					SlaveModeTrigger slaveModeTrigger = (SlaveModeTrigger) 0);
 			
 		public:
 			/**

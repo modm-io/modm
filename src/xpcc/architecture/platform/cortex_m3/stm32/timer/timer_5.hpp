@@ -161,7 +161,7 @@ namespace xpcc
 				TIM5->ARR = overflow;
 			}
 			
-			static uint16_t
+			static Value
 			setPeriod(uint32_t microseconds, bool autoApply = true);
 			
 			static inline void
