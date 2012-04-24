@@ -201,7 +201,7 @@ namespace xpcc
 	template<>
 	struct ArithmeticTraits<int32_t>
 	{
-#ifdef __AVR__
+#if defined(XPCC__CPU_AVR)
 		typedef float WideType; // int64_t is on AVRs only a int32_t
 #else
 		typedef int64_t WideType;
@@ -231,7 +231,7 @@ namespace xpcc
 	template<>
 	struct ArithmeticTraits<uint32_t>
 	{
-#ifdef __AVR__
+#if defined(XPCC__CPU_AVR)
 		typedef float WideType; // int64_t is on AVRs only a int32_t
 #else
 		typedef uint64_t WideType;
@@ -256,6 +256,61 @@ namespace xpcc
 			return 4294967295UL;
 		}
 	};
+	
+#if defined(XPCC__CPU_ARM)
+	// ------------------------------------------------------------------------
+	// For ARM 'int32_t' is of type 'long'. Therefore there is no
+	// class here for the default type 'int'.
+	template<>
+	struct ArithmeticTraits<int>
+	{
+		typedef int64_t WideType;
+		typedef int32_t SignedType;
+		typedef uint32_t UnsignedType;
+
+		static const uint8_t decimalDigits = 11; // inc. sign
+		static const bool isSigned = true;
+		static const bool isFloatingPoint = false;
+		static const bool isInteger = true;
+
+		static ALWAYS_INLINE int32_t
+		min()
+		{
+			return -2147483647L - 1;
+		}
+		
+		static ALWAYS_INLINE int32_t
+		max()
+		{
+			return 2147483647L;
+		}
+	};
+	
+	template<>
+	struct ArithmeticTraits<unsigned int>
+	{
+		typedef uint64_t WideType;
+		typedef int32_t SignedType;
+		typedef uint32_t UnsignedType;
+
+		static const uint8_t decimalDigits = 10;
+		static const bool isSigned = false;
+		static const bool isFloatingPoint = false;
+		static const bool isInteger = true;
+
+		static ALWAYS_INLINE uint32_t
+		min()
+		{
+			return 0;
+		}
+		
+		static ALWAYS_INLINE uint32_t
+		max()
+		{
+			return 4294967295UL;
+		}
+	};
+#endif
 	
 	// ------------------------------------------------------------------------
 	template<>

@@ -129,6 +129,8 @@
 	#	define	MAIN_FUNCTION	int main(void)
 	#endif
 
+	#define XPCC__ARRAY_SIZE(x)	(sizeof(x) / sizeof(x[0]))
+
 #endif	// !__DOXYGEN__
 
 #endif	// XPCC__UTILS_HPP
