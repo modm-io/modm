@@ -81,7 +81,7 @@ Adc1::disableInterrupt(const Interrupt interrupt)
 	NVIC_DisableIRQ(ADC_IRQn);
 #elif defined(STM32F10X)
 	NVIC_DisableIRQ(ADC1_2_IRQn);
-	#endif
+#endif
 
 	switch(interrupt)
 	{

@@ -213,9 +213,52 @@ namespace xpcc
 #endif
 			};
 
-
 		public:
-
+			/**
+			 * Initialize and enable the A/D converter.
+			 *
+			 * Enables the ADC clock and switches on the ADC. The ADC clock
+			 * prescaler will be set as well.
+			 * 
+			 * The ADC clock must not exceed 14 MHz. Default is a prescaler
+			 * of 8 which gives a 9 Mhz ADC clock at 72 MHz APB2 clock.
+			 * 
+			 * @param prescaler
+			 * 		The prescaler specifies by which factor the 
+			 * 		APB2 clock (72 MHz) will be divided.
+			 */
+			static inline void
+			initialize(Prescaler prescaler=PRESCALER_8)
+			{
+				// Initialize ADC
+				RCC->APB2ENR |= RCC_APB2ENR_ADC2EN;	// start ADC Clock
+				ADC2->CR2 |= ADC_CR2_ADON;			// switch on ADC
+				setPrescaler(prescaler);
+			}
+			
+			/** 
+			 * Select the frequency of the clock to the ADC. The clock is common
+			 * for all the ADCs (ADC1, ADC2, ADC3) and all channels. 
+			 * 
+			 * @pre The ADC clock must be started and the ADC switched on with 
+			 * 	initialize()
+			 * 
+			 * @param prescaler
+			 * 		The prescaler specifies by which factor the system clock
+			 * 		will be divided.
+			 */
+			static inline void
+			setPrescaler(const Prescaler prescaler)
+			{
+#if defined(STM32F2XX) || defined(STM32F4XX)
+				ADC->CCR &= ~(0b11 << 17);				// Clear prescaler
+				ADC->CCR |= prescaler << 17;		// set prescaler
+#elif defined(STM32F10X)
+				RCC->CFGR &= ~(0b11 << 14);			// Clear prescaler
+				RCC->CFGR |= prescaler << 14;		// set prescaler
+#endif
+			}
+			
 #if defined(TEMPERATURE_REFVOLTAGE_AVIALABLE) || defined(__DOXYGEN__)
 			/** Switch on temperature- and V_REF measurement. */
 			static inline void
@@ -243,18 +286,22 @@ namespace xpcc
 			/**
 			 * Change the presentation of the ADC conversion result.
 			 *
-			 * @param enable Set to \c true to left adjust the result. 
-			 * 	Otherwise, the result is right adjusted.
+			 * @param enable
+			 * 		Set to \c true to left adjust the result. 
+			 *		Otherwise, the result is right adjusted.
+			 * 
 			 * @pre The ADC clock must be started and the ADC switched on with 
-			 * 	initialize()
+			 * 		initialize()
 			 */
 			static inline void
 			setLeftAdjustResult(const bool enable)
 			{
-				if(enable)
+				if (enable) {
 					ADC2->CR2 |= ADC_CR2_ALIGN;
-				else
-					ADC2->CR2 &= ~ADC_CR2_ALIGN;			
+				}
+				else {
+					ADC2->CR2 &= ~ADC_CR2_ALIGN;
+				}
 			}
 
 			/**
@@ -266,8 +313,9 @@ namespace xpcc
 			 * 
 			 * @param channel		The channel which shall be read.
 			 * @param sampleTime	The sample time to sample the input voltage.
+			 * 
 			 * @pre The ADC clock must be started and the ADC switched on with 
-			 * 	initialize()
+			 * 		initialize()
 			 */
 			static void
 			setChannel(const Channels channel, const SampleTime sampleTime=static_cast<SampleTime> (0b000));
@@ -277,8 +325,9 @@ namespace xpcc
 			 *
 			 * The ADC will continously start conversions and provide the most
 			 * recent result in the ADC register.
+			 * 
 			 * @pre The ADC clock must be started and the ADC switched on with 
-			 * 	initialize()
+			 * 		initialize()
 			 */
 			static inline void
 			enableFreeRunningMode(void)
@@ -291,8 +340,9 @@ namespace xpcc
 			 *
 			 * The ADC will do only one sample and stop. The result will be in 
 			 * the ADC register.
+			 * 
 			 * @pre The ADC clock must be started and the ADC switched on with 
-			 * 	initialize()
+			 * 		initialize()
 			 */
 			static inline void
 			disableFreeRunningMode(void)
@@ -317,12 +367,14 @@ namespace xpcc
 			/**
 			 * Clears the specified interrupt flag.
 			 *
+			 * @param flag
+			 * 		The interrupt flag, which shall be cleared.
+			 *
 			 * @pre The ADC clock must be started and the ADC switched on with 
-			 * 	initialize()
-			 * @param flag The interrupt flag, which shall be cleared.
+			 * 		initialize().
 			 */
 			static inline void
-			clearInterruptFlag(const Interrupt flag)
+			resetInterruptFlags(const Interrupt flag)
 			{
 				ADC2->SR &= ~flag;
 			}
@@ -342,53 +394,18 @@ namespace xpcc
 			 * 
 			 * @pre The ADC clock must be started and the ADC switched on with 
 			 * 	initialize()
+			 * 
 			 * @param priority Priority to set
 			 * @param interrupt The interrupt, which shall be enabled. See 
 			 * 	Interrupt for available interrupts.
+			 * 
 			 * @note ADC1 and ADC2 interrupts are mapped onto the same interrupt
 			 * 	vector. ADC3 interrupts are mapped onto a separate interrupt 
 			 * 	vector.
 			 */
 			static void
 			enableInterrupt(const Interrupt interrupt, const uint32_t priority);
-
-			/** 
-			 * Select the frequency of the clock to the ADC. The clock is common
-			 * for all the ADCs (ADC1, ADC2, ADC3) and all channels. 
-			 * @pre The ADC clock must be started and the ADC switched on with 
-			 * 	initialize()
-			 * @param prescaler The prescaler specifies by which factor the 
-			 * 	system clock will be divided.
-			 */
-			static inline void
-			setPrescaler(const Prescaler prescaler)
-			{
-#if defined(STM32F2XX) || defined(STM32F4XX)
-				ADC->CCR &= ~(0b11 << 17);				// Clear prescaler
-				ADC->CCR |= prescaler << 17;		// set prescaler
-#elif defined(STM32F10X)
-				RCC->CFGR &= ~(0b11 << 14);			// Clear prescaler
-				RCC->CFGR |= prescaler << 14;		// set prescaler
-#endif
-			}
-
-			/**
-			 * Initialize and enable the A/D converter.
-			 *
-			 * Enables the ADC clock and switches on the ADC. The ADC clock
-			 * prescaler will be set as well.
-			 * @param prescaler The prescaler specifies by which factor the 
-			 * 	system clock will be divided.
-			 */
-			static inline void
-			initialize(Prescaler prescaler=PRESCALER_2)
-			{
-				// Initialize ADC
-				RCC->APB2ENR |= RCC_APB2ENR_ADC2EN;	// start ADC Clock
-				ADC2->CR2 |= ADC_CR2_ADON;			// switch on ADC
-				setPrescaler(prescaler);
-			}
-
+			
 			/**
 			 * Turns off the ADC and its clock.
 			 */
@@ -415,11 +432,11 @@ namespace xpcc
 			startConversion(void)
 			{
 #if defined(STM32F2XX) || defined(STM32F4XX)
-				clearInterruptFlag(static_cast<Interrupt>(
+				resetInterruptFlags(static_cast<Interrupt>(
 						END_OF_CONVERSION_REGULAR | END_OF_CONVERSION_INJECTED |
 						ANALOG_WATCHDOG | OVERRUN));
 #elif defined(STM32F10X)
-				clearInterruptFlag(static_cast<Interrupt>(
+				resetInterruptFlags(static_cast<Interrupt>(
 						END_OF_CONVERSION_REGULAR | END_OF_CONVERSION_INJECTED |
 						ANALOG_WATCHDOG));
 				
