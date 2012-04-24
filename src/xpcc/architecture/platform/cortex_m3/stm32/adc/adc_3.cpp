@@ -35,11 +35,12 @@
 	defined (STM32F10X_HD) || defined (STM32F10X_XL)
 using namespace xpcc::stm32;
 
+// ----------------------------------------------------------------------------
 void
 Adc3::setChannel(const Channels channel, const SampleTime sampleTime)
 {
 	ADC3->SQR1 = 0;		// clear number of conversions in the sequence and set number of conversions to 1
-	ADC3->SQR3 |= channel & 0b11111;
+	ADC3->SQR3 = channel & 0b11111;
 
 	if (static_cast<uint8_t>(channel) < 10) {
 		ADC3->SMPR2 |= sampleTime << (static_cast<uint8_t>(channel) * 3);
@@ -89,6 +90,7 @@ Adc3::setChannel(const Channels channel, const SampleTime sampleTime)
 #endif
 }
 
+// ----------------------------------------------------------------------------
 void
 Adc3::disableInterrupt(const Interrupt interrupt)
 {
@@ -117,6 +119,7 @@ Adc3::disableInterrupt(const Interrupt interrupt)
 	}
 }
 
+// ----------------------------------------------------------------------------
 void
 Adc3::enableInterrupt(const Interrupt interrupt, const uint32_t priority)
 {

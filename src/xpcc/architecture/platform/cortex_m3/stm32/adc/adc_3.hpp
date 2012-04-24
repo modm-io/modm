@@ -237,6 +237,10 @@ namespace xpcc
 				setPrescaler(prescaler);
 			}
 			
+			// TODO
+			//static void
+			//calibrate();
+			
 			/** 
 			 * Select the frequency of the clock to the ADC. The clock is common
 			 * for all the ADCs (ADC1, ADC2, ADC3) and all channels. 
@@ -319,7 +323,7 @@ namespace xpcc
 			 * 		initialize()
 			 */
 			static void
-			setChannel(const Channels channel, const SampleTime sampleTime=static_cast<SampleTime> (0b000));
+			setChannel(const Channels channel, const SampleTime sampleTime=static_cast<SampleTime>(0b000));
 
 			/**
 			 * Enables free running mode
@@ -390,8 +394,8 @@ namespace xpcc
 			 * Enables the ADC Conversion Complete Interrupt.
 			 *
 			 * You could catch the interrupt using this example function:
-			 * \li for STM32F4XX: \code extern "C" void ADC_IRQHandler(void) \endcode
-			 * \li for STM32F10X: \code extern "C" void ADC1_2_IRQHandler(void) \endcode
+			 * \li for STM32F4XX: \code extern "C" void ADC_IRQHandler() \endcode
+			 * \li for STM32F10X: \code extern "C" void ADC1_2_IRQHandler() \endcode
 			 * 
 			 * @pre The ADC clock must be started and the ADC switched on with 
 			 * 	initialize()

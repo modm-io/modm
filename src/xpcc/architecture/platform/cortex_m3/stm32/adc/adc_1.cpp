@@ -32,11 +32,12 @@
 
 using namespace xpcc::stm32;
 
+// ----------------------------------------------------------------------------
 void
 Adc1::setChannel(const Channels channel, const SampleTime sampleTime)
 {
 	ADC1->SQR1 = 0;		// clear number of conversions in the sequence and set number of conversions to 1
-	ADC1->SQR3 |= channel & 0b11111;
+	ADC1->SQR3 = channel & 0b11111;
 
 	if (static_cast<uint8_t>(channel) < 10) {
 		ADC1->SMPR2 |= sampleTime << (static_cast<uint8_t>(channel) * 3);
@@ -46,7 +47,7 @@ Adc1::setChannel(const Channels channel, const SampleTime sampleTime)
 	}
 
 #if defined(STM32F2XX) || defined(STM32F4XX) 
-	if(channel < 8) 
+	if (channel < 8)
 	{
 		GPIOA->MODER |= 0b11 << ((channel + 0) * 2);
 	}
@@ -74,6 +75,7 @@ Adc1::setChannel(const Channels channel, const SampleTime sampleTime)
 #endif
 }
 
+// ----------------------------------------------------------------------------
 void
 Adc1::disableInterrupt(const Interrupt interrupt)
 {
@@ -81,7 +83,7 @@ Adc1::disableInterrupt(const Interrupt interrupt)
 	NVIC_DisableIRQ(ADC_IRQn);
 #elif defined(STM32F10X)
 	NVIC_DisableIRQ(ADC1_2_IRQn);
-#endif
+	#endif
 
 	switch(interrupt)
 	{
@@ -102,6 +104,7 @@ Adc1::disableInterrupt(const Interrupt interrupt)
 	}
 }
 
+// ----------------------------------------------------------------------------
 void
 Adc1::enableInterrupt(const Interrupt interrupt, const uint32_t priority)
 {
