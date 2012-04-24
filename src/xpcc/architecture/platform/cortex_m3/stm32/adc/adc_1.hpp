@@ -318,9 +318,13 @@ namespace xpcc
 			/**
 			 * Analog channel selection.
 			 * 
-			 * This is for single conversion mode only! The number of channels
-			 * will be set to 1, the channel selected and the corresponding pin
-			 * will be set to analog input.
+			 * This not for scan mode. The number of channels will be set to 1, 
+			 * the channel selected and the corresponding pin will be set to 
+			 * analog input.
+			 * If the the channel is modified during a conversion, the current
+			 * conversion is reset and a new start pulse is sent to the ADC to 
+			 * convert the new chosen channnel / group of channels.
+			 * 
 			 * 
 			 * @param channel		The channel which shall be read.
 			 * @param sampleTime	The sample time to sample the input voltage.
