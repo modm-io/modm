@@ -55,7 +55,13 @@ namespace xpcc
 	{
 		/**
 		 * Analog/Digital-Converter module (ADC2).
-		 *
+		 * 
+		 * The 12-bit ADC is a successive approximation analog-to-digital
+		 * converter. It has up to 18 multiplexed channels allowing it measure
+		 * signals from 16 external and two internal sources.
+		 * The result of the ADC is stored in a left-aligned or right-aligned
+		 * 16-bit data register.
+		 * 
 		 * This API is designed for the internal ADCs of STM32F4XX, 
 		 * STM32F10X_LD, STM32F10X_LD_VL, STM32F10X_MD, STM32F10X_MD_VL, 
 		 * STM32F10X_HD, STM32F10X_HD_VL, STM32F10X_XL and STM32F10X_CL.
