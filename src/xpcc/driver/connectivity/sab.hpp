@@ -29,11 +29,11 @@
 // ----------------------------------------------------------------------------
 /**
  * \ingroup		connectivity
- * \defgroup	sab		(SAB) Sensor Actor Bus
+ * \defgroup	sab		(SAB) Sensor Actuator Bus
  * 
  * \section sab_intro	Introduction
  * 
- * The SAB (<b>S</b>ensor <b>A</b>actor <b>B</b>us) is a simple
+ * The SAB (<b>S</b>ensor <b>A</b>ctuator <b>B</b>us) is a simple
  * master-slave bus system. It is primarily used to query simple sensors and
  * control actuators inside our robots.
  * 

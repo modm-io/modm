@@ -35,8 +35,8 @@
 #endif
 
 #include "constants.hpp"
-#include <xpcc/debug/logger.hpp>
 
+//#include <xpcc/debug/logger.hpp>
 //#undef XPCC_LOG_LEVEL
 //#define XPCC_LOG_LEVEL	xpcc::log::DEBUG
 
@@ -174,7 +174,7 @@ void
 xpcc::sab2::Interface<Device, N>::update()
 {
 	uint8_t data;
-	while (Device::read(data))
+	while ((lengthOfReceivedMessage == 0) && Device::read(data))
 	{
 		//XPCC_LOG_DEBUG.printf("%02x ", data);
 		

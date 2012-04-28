@@ -25,13 +25,11 @@
  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- * 
- * $hello please remove me$
  */
 // ----------------------------------------------------------------------------
 
 #ifndef XPCC_SAB__MASTER_HPP
-	#error	"Don't include this file directly, use 'master.hpp' instead!"
+#	error	"Don't include this file directly, use 'master.hpp' instead!"
 #endif
 
 // ----------------------------------------------------------------------------
@@ -61,7 +59,9 @@ void
 xpcc::sab::Master<Interface>::query(uint8_t slaveAddress, uint8_t command,
 		const T& payload, uint8_t responseLength)
 {
-	interface.dropMessage();
+	while (interface.isMessageAvailable()) {
+		interface.dropMessage();
+	}
 	interface.sendMessage(slaveAddress, REQUEST, command, payload);
 	
 	queryStatus = IN_PROGRESS;
@@ -75,7 +75,9 @@ void
 xpcc::sab::Master<Interface>::query(uint8_t slaveAddress, uint8_t command,
 		uint8_t responseLength)
 {
-	interface.dropMessage();
+	while (interface.isMessageAvailable()) {
+		interface.dropMessage();
+	}
 	interface.sendMessage(slaveAddress, REQUEST, command, 0, 0);
 	
 	queryStatus = IN_PROGRESS;
