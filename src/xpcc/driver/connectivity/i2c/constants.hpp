@@ -1,6 +1,6 @@
 // coding: utf-8
 // ----------------------------------------------------------------------------
-/* Copyright (c) 2011, Roboterclub Aachen e.V.
+/* Copyright (c) 2012, Roboterclub Aachen e.V.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,81 +27,33 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 // ----------------------------------------------------------------------------
-/*
- * WARNING: This file is generated automatically, do not edit!
- * Please modify the corresponding *.in file instead and rebuild this file. 
- */
-// ----------------------------------------------------------------------------
 
-#ifndef XPCC_STM32__I2C_1_HPP
-#define XPCC_STM32__I2C_1_HPP
+#ifndef XPCC_I2C__CONSTANTS_HPP
+#define XPCC_I2C__CONSTANTS_HPP
 
 #include <stdint.h>
-#include <xpcc/driver/connectivity/i2c/master.hpp>
-
-#include "../device.h"
 
 namespace xpcc
 {
-	namespace stm32
+	/**
+	 * \brief	I2C Interface
+	 * \ingroup	i2c
+	 */
+	namespace i2c
 	{
-		/**
-		 * @brief		I2C1 Module.
-		 * 
-		 * @author		Georgi
-		 * @ingroup		stm32
-		 */
-		class I2c1 : ::xpcc::i2c::Master
+		static const uint8_t WRITE = 0x00;
+		static const uint8_t READ = 0x01;
+		
+		namespace adapter
 		{
-		public:
-			enum Mapping
+			enum State
 			{
-#if defined(STM32F2XX) || defined(STM32F4XX)
-				REMAP_PB6_PB7,		///< SCL mapped to PB6, SDA mapped to PB7
-				REMAP_PB8_PB9,		///< SCL mapped to PB8, SDA mapped to PB9
-#else
-				REMAP_PB6_PB7 = 0,						///< SCL mapped to PB6, SDA mapped to PB7
-				REMAP_PB8_PB9 = AFIO_MAPR_I2C1_REMAP,	///< SCL mapped to PB8, SDA mapped to PB9
-#endif
+				BUSY,
+				NO_ERROR,
+				ERROR
 			};
-			
-			/**
-			 * Configure the IO Pins for I2C1
-			 */
-			static void
-			configurePins(Mapping mapping);
-			
-			/**
-			 * @brief	Initialize I2C module
-			 * \param ccrPrescaler: I2CFrequency = STM32_APB1_FREQUENCY / (2 * ccrPrescaler)
-			 */
-			static void
-			initialize(uint16_t ccrPrescaler);
-			
-		public:
-			static bool
-			start(uint8_t slaveAddress);
-
-			static void
-			restart(uint8_t slaveAddress);
-
-			static void
-			stop();
-
-			static void
-			read(uint8_t *data, std::size_t size, xpcc::i2c::ReadParameter param = xpcc::i2c::READ_STOP);
-
-			static void
-			write(const uint8_t *data, std::size_t size);
-			
-		public:
-			static xpcc::i2c::BusyState
-			getBusyState();
-
-			static xpcc::i2c::BusState
-			getBusState();
-		};
+		}
 	}
 }
 
-#endif // XPCC_STM32__I2C_1_HPP
+#endif // XPCC_I2C__CONSTANTS_HPP

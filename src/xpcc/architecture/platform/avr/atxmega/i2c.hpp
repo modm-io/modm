@@ -1,11 +1,11 @@
 // coding: utf-8
 // ----------------------------------------------------------------------------
-/* Copyright (c) 2009, Roboterclub Aachen e.V.
+/* Copyright (c) 2012, Roboterclub Aachen e.V.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -28,29 +28,15 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__LM75_HPP
-	#error	"Don't include this file directly, use 'lm75.hpp' instead!"
-#endif
+/**
+ * \ingroup	atxmega
+ * \defgroup atxmega_i2c I2C Module
+ * 
+ * \author	Niklas Hauser
+ */
 
-// ----------------------------------------------------------------------------
-template <typename I2C>
-xpcc::LM75<I2C>::LM75(uint8_t address) :
-	i2c::Device<I2C>(address)
-{
-}
+#include "i2c/i2c_master_c.hpp"
+#include "i2c/i2c_master_d.hpp"
+#include "i2c/i2c_master_e.hpp"
+#include "i2c/i2c_master_f.hpp"
 
-// ----------------------------------------------------------------------------
-template <typename I2C>
-int16_t
-xpcc::LM75<I2C>::readTemperature()
-{
-	uint16_t temperature = 0;
-	if (this->i2c.start(this->deviceAddress | i2c::READ))
-	{
-		temperature  = this->i2c.read(i2c::ACK) << 8;
-		temperature |= this->i2c.read(i2c::NACK);
-	}
-	this->i2c.stop();
-	
-	return temperature;
-}

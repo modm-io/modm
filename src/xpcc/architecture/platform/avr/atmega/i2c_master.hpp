@@ -39,19 +39,26 @@ namespace xpcc
 	namespace atmega
 	{
 		/**
-		 * \brief	Interrupt-driven TWI master module.
+		 * \brief	Interrupt-driven I2C master module.
 		 *
 		 * Interrupts must be enabled.
 		 * 
-		 * \warning	You must only use the AsynchronousTwiMaster or the
-		 * 			SynchronousTwiMaster class, never both of them!
-		 * 
+		 * \author Niklas Hauser
 		 * \ingroup	atmega
 		 * \ingroup	i2c
 		 */
-		class AsynchronousTwiMaster : public xpcc::i2c::Master
+		class I2cMaster : public ::xpcc::i2c::Master
 		{
 		public:
+			enum ErrorState
+			{
+				NO_ERROR,			//!< No Error ocurred
+				DATA_NACK,			//!< Data was transmitted and NACK received
+				ADDRESS_NACK,		//!< Address was transmitted and NACK received
+				ARBITRATION_LOST,	//!< Arbitration was lost during writing or reading
+				BUS_ERROR,			//!< Misplaced Start or Stop condition
+				UNKNOWN_ERROR		//!< Unknown error condition
+			};
 			/**
 			 * \brief	Initialize hardware
 			 * 
@@ -100,26 +107,22 @@ namespace xpcc
 			static void
 			initialize(uint8_t twbr, uint8_t twps);
 			
+			static void
+			reset(bool error=false);
+			
+		public:
 			static bool
-			start(uint8_t slaveAddress);
-
-			static void
-			restart(uint8_t slaveAddress);
-
-			static void
-			stop();
-
-			static void
-			read(uint8_t *data, std::size_t size, xpcc::i2c::ReadParameter param = xpcc::i2c::READ_STOP);
-
-			static void
-			write(const uint8_t *data, std::size_t size);
-
-			static xpcc::i2c::BusyState
-			getBusyState();
-
-			static xpcc::i2c::BusState
-			getBusState();
+			start(xpcc::i2c::Delegate *delegate);
+			
+			static bool
+			startSync(xpcc::i2c::Delegate *delegate);
+			
+			/**
+			 * This method returns the actual error state if it is called
+			 * from the delegates stop method.
+			 */
+			static uint8_t
+			getErrorState();
 		};
 	}
 }

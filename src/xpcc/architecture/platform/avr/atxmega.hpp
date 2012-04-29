@@ -106,7 +106,7 @@ namespace xpcc
 #include "atxmega/adc.hpp"
 #include "atxmega/clock.hpp"
 #include "atxmega/utils.hpp"
-//#include "atxmega/i2c.hpp"
+#include "atxmega/i2c.hpp"
 #include "atxmega/dma.hpp"
 
 #endif

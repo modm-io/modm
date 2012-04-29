@@ -29,140 +29,161 @@
 // ----------------------------------------------------------------------------
 
 #ifndef XPCC__SOFTWARE_I2C_HPP
-	#error	"Don't include this file directly, use 'software_i2c.hpp' instead!"
+#	error	"Don't include this file directly, use 'software_i2c.hpp' instead!"
 #endif
 
-// ----------------------------------------------------------------------------
 template <typename Scl, typename Sda, int32_t Frequency>
 Scl xpcc::SoftwareI2C<Scl, Sda, Frequency>::scl;
-
 template <typename Scl, typename Sda, int32_t Frequency>
 Sda xpcc::SoftwareI2C<Scl, Sda, Frequency>::sda;
 
 template <typename Scl, typename Sda, int32_t Frequency>
-bool xpcc::SoftwareI2C<Scl, Sda, Frequency>::occupied = false;
-
+xpcc::i2c::Delegate::NextOperation xpcc::SoftwareI2C<Scl, Sda, Frequency>::nextOperation;
 template <typename Scl, typename Sda, int32_t Frequency>
-uint8_t xpcc::SoftwareI2C<Scl, Sda, Frequency>::address;
-
+xpcc::i2c::Delegate *xpcc::SoftwareI2C<Scl, Sda, Frequency>::myDelegate(0);
 template <typename Scl, typename Sda, int32_t Frequency>
-xpcc::i2c::BusState xpcc::SoftwareI2C<Scl, Sda, Frequency>::busState;
+uint8_t xpcc::SoftwareI2C<Scl, Sda, Frequency>::errorState(NO_ERROR);
 
 // ----------------------------------------------------------------------------
 template <typename Scl, typename Sda, int32_t Frequency>
-bool
-xpcc::SoftwareI2C<Scl, Sda, Frequency>::start(uint8_t slaveAddress)
+void
+xpcc::SoftwareI2C<Scl, Sda, Frequency>::initialize(bool pullup)
 {
-	if (!occupied) {
-		occupied = true;
-		restart(slaveAddress);
-		return true;
+	if (pullup)
+	{
+#if defined XPCC__CPU_ATXMEGA
+		scl.setInput(::xpcc::atxmega::PULLUP);
+#elif defined XPCC__CPU_ATMEGA
+		scl.setInput(::xpcc::atmega::PULLUP);
+#elif defined __ARM_STM32__
+		scl.setInput(::xpcc::stm32::PULLUP);
+#else
+		scl.setInput();
+#endif	
+#if defined XPCC__CPU_ATXMEGA
+		sda.setInput(::xpcc::atxmega::PULLUP);
+#elif defined XPCC__CPU_ATMEGA
+		sda.setInput(::xpcc::atmega::PULLUP);
+#elif defined __ARM_STM32__
+		sda.setInput(::xpcc::stm32::PULLUP);
+#else
+		sda.setInput();
+#endif
+	} else {
+		scl.setInput();
+		sda.setInput();
+	}
+	scl.reset();
+	sda.reset();
+}
+
+template <typename Scl, typename Sda, int32_t Frequency>
+void
+xpcc::SoftwareI2C<Scl, Sda, Frequency>::reset(bool error)
+{
+	if (myDelegate) myDelegate->stopped(error ? xpcc::i2c::Delegate::ERROR_CONDITION : xpcc::i2c::Delegate::SOFTWARE_RESET);
+	myDelegate = 0;
+}
+
+template <typename Scl, typename Sda, int32_t Frequency>
+bool
+xpcc::SoftwareI2C<Scl, Sda, Frequency>::start(xpcc::i2c::Delegate *delegate)
+{
+	if (!myDelegate && delegate && delegate->attaching())
+	{
+		myDelegate = delegate;
+		
+		while(1)
+		{
+			DEBUG_SW_I2C('\n');
+			DEBUG_SW_I2C('s');
+			startCondition();
+			xpcc::i2c::Delegate::Starting s = myDelegate->started();
+			uint8_t address;
+			
+			address = (s.address & 0xfe);
+			if (s.next == xpcc::i2c::Delegate::READ_OP)
+				address |= xpcc::i2c::READ;
+			
+			if (!write(address))
+				return true;
+			if (nextOperation == xpcc::i2c::Delegate::RESTART_OP) {DEBUG_SW_I2C('R');}
+			nextOperation = s.next;
+			
+			do {
+				switch (nextOperation)
+				{
+					case xpcc::i2c::Delegate::READ_OP:
+					{
+						xpcc::i2c::Delegate::Reading r = myDelegate->reading();
+						for (uint8_t i=0; i < r.size-1; ++i) {
+							*r.buffer++ = read(true);
+							DEBUG_SW_I2C('\n');
+							DEBUG_SW_I2C('a');
+						}
+						*r.buffer = read(false);
+						DEBUG_SW_I2C('\n');
+						DEBUG_SW_I2C('n');
+						nextOperation = static_cast<xpcc::i2c::Delegate::NextOperation>(r.next);
+					}
+						break;
+						
+					case xpcc::i2c::Delegate::WRITE_OP:
+					{
+						xpcc::i2c::Delegate::Writing w = myDelegate->writing();
+						for (uint8_t i=0; i < w.size; ++i) {
+							if (!write(*w.buffer++))
+								return true;
+							DEBUG_SW_I2C('\n');
+							DEBUG_SW_I2C('A');
+						}
+						nextOperation = static_cast<xpcc::i2c::Delegate::NextOperation>(w.next);
+					}
+						break;
+					
+					case xpcc::i2c::Delegate::STOP_OP:
+						DEBUG_SW_I2C('S');
+						myDelegate->stopped(xpcc::i2c::Delegate::NORMAL_STOP);
+						myDelegate = 0;
+						stopCondition();
+						return true;
+						
+					default:
+						break;
+				}
+			} while (nextOperation != xpcc::i2c::Delegate::RESTART_OP);
+		}
 	}
 	return false;
 }
 
 template <typename Scl, typename Sda, int32_t Frequency>
-void
-xpcc::SoftwareI2C<Scl, Sda, Frequency>::restart(uint8_t slaveAddress)
+uint8_t
+xpcc::SoftwareI2C<Scl, Sda, Frequency>::getErrorState()
 {
-	address = slaveAddress;
-	busState = xpcc::i2c::BUS_STANDBY;
+	return errorState;
 }
 
+// MARK: - private
 template <typename Scl, typename Sda, int32_t Frequency>
 void
-xpcc::SoftwareI2C<Scl, Sda, Frequency>::stop()
+xpcc::SoftwareI2C<Scl, Sda, Frequency>::error()
 {
-	occupied = false;
+	DEBUG_SW_I2C('E');
 	stopCondition();
+	errorState = DATA_NACK;
+	reset(true);
 }
 
-
+// MARK: bus control
 template <typename Scl, typename Sda, int32_t Frequency>
 void
-xpcc::SoftwareI2C<Scl, Sda, Frequency>::read(uint8_t *data, std::size_t size, xpcc::i2c::ReadParameter param)
+xpcc::SoftwareI2C<Scl, Sda, Frequency>::startCondition()
 {
-	uint8_t *p = data;
-	if (startCondition(address | xpcc::i2c::READ))
-	{
-		for (std::size_t i = 0; i < size; i++)
-		{
-			bool ack = i != (size - 1);
-			uint8_t byte = read(ack);
-			*p++ = byte;
-		}
-		if (param == xpcc::i2c::READ_STOP){
-			busState = xpcc::i2c::BUS_STOPPED;
-		}
-		else{
-			busState = xpcc::i2c::BUS_HOLD;
-		}
-	}
-	else {
-		busState = xpcc::i2c::BUS_RESET;
-	}
-}
-
-template <typename Scl, typename Sda, int32_t Frequency>
-void
-xpcc::SoftwareI2C<Scl, Sda, Frequency>::write(const uint8_t *data, std::size_t size)
-{
-	bool error = false;
-	if (busState == xpcc::i2c::BUS_WRITE || startCondition(address | xpcc::i2c::WRITE))
-	{
-		for (std::size_t i = 0; i < size; ++i)
-		{
-			if (!write(*data++))
-			{
-				error = true;
-				break;
-			}
-		}
-	}
-	else {
-		error = true;
-	}
-
-	busState = error ?
-			xpcc::i2c::BUS_RESET:
-			xpcc::i2c::BUS_WRITE;
-}
-
-template <typename Scl, typename Sda, int32_t Frequency>
-xpcc::i2c::BusyState
-xpcc::SoftwareI2C<Scl, Sda, Frequency>::getBusyState()
-{
-	return  occupied ?
-			xpcc::i2c::OCCUPIED :
-			xpcc::i2c::FREE;
-}
-
-template <typename Scl, typename Sda, int32_t Frequency>
-xpcc::i2c::BusState
-xpcc::SoftwareI2C<Scl, Sda, Frequency>::getBusState()
-{
-	return busState;
-}
-
-// ----------------------------------------------------------------------------
-template <typename Scl, typename Sda, int32_t Frequency>
-void
-xpcc::SoftwareI2C<Scl, Sda, Frequency>::initialize()
-{
-	scl.setInput();
-	scl.reset();
-	
-	sda.setInput();
-	sda.reset();
-}
-
-template <typename Scl, typename Sda, int32_t Frequency>
-bool
-xpcc::SoftwareI2C<Scl, Sda, Frequency>::startCondition(uint8_t address)
-{
-	if (sda.read() == gpio::LOW){// startcondition needs a high sda and scl, so we adjust here
-		if (scl.read() == gpio::HIGH){
-			// a very illegal state
+	if (sda.read() == gpio::LOW)
+	{// startcondition needs a high sda and scl, so we adjust here
+		if (scl.read() == gpio::HIGH)
+		{// a very illegal state
 			// avoid generating a stop condition and hope no other is writing on the bus
 			scl.setOutput();
 			delay();
@@ -180,14 +201,12 @@ xpcc::SoftwareI2C<Scl, Sda, Frequency>::startCondition(uint8_t address)
 		scl.setInput();
 		delay();
 	}
-
+	
 	// here both pins are HIGH, ready for start
 	sda.setOutput();
 	delay();
 	scl.setOutput();
 	delay();
-	
-	return write(address);
 }
 
 template <typename Scl, typename Sda, int32_t Frequency>
@@ -204,7 +223,7 @@ xpcc::SoftwareI2C<Scl, Sda, Frequency>::stopCondition()
 	delay();
 }
 
-// ----------------------------------------------------------------------------
+// MARK: byte operations
 template <typename Scl, typename Sda, int32_t Frequency>
 bool
 xpcc::SoftwareI2C<Scl, Sda, Frequency>::write(uint8_t data)
@@ -219,7 +238,12 @@ xpcc::SoftwareI2C<Scl, Sda, Frequency>::write(uint8_t data)
 	sda.setInput();
 	
 	// return acknowledge bit
-	return !readBit();
+	if (readBit()) {
+		DEBUG_SW_I2C('N');
+		error();
+		return false;
+	}
+	return true;
 }
 
 template <typename Scl, typename Sda, int32_t Frequency>
@@ -246,7 +270,7 @@ xpcc::SoftwareI2C<Scl, Sda, Frequency>::read(bool ack)
 	return data;
 }
 
-// ----------------------------------------------------------------------------
+// MARK: bit operations
 template <typename Scl, typename Sda, int32_t Frequency>
 bool
 xpcc::SoftwareI2C<Scl, Sda, Frequency>::readBit()

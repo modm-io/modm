@@ -91,7 +91,7 @@ xpcc::Hd44780<E, RW, RS, DATA>::writeRaw(char c)
 
 template <typename E, typename RW, typename RS, typename DATA>
 void
-xpcc::Hd44780<E, RW, RS, DATA>::setCursor(uint8_t line, uint8_t column)
+xpcc::Hd44780<E, RW, RS, DATA>::setCursor(uint8_t column, uint8_t line)
 {
 	this->column = column;
 	this->line = line;

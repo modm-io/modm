@@ -31,43 +31,12 @@
 #ifndef XPCC__ADXL345_HPP
 #define XPCC__ADXL345_HPP
 
-#include <xpcc/driver/connectivity/i2c/sync_master.hpp>
+#include <xpcc/driver/connectivity/i2c/master.hpp>
 
 namespace xpcc
 {
-	/**
-	 * \brief Basic ADXL345 digital accelerometer sensor driver
-	 *
-	 * The ADXL345 is a 3-axis accelerometer with high resolution (13-bit)
-	 * measurement at up to +-16 g. Digital output data is formatted as 16-bit
-	 * twos complement and is accessible through I2C digital interface.
-	 *
-	 * Its high resolution (4 mg/LSB) enables measurement of inclination 
-	 * changes less than 1.0 degree.
-	 * Several special sensing functions are provided. Activity and inactivity
-	 * sensing detect the presence or lack of motion and if the acceleration on
-	 * any axis exceeds a user-set level. Tap sensing detects single and double
-	 * taps. Free-fall sensing detects if the device is falling. These functions
-	 * can be mapped to one of two interrupt output pins. An integrated 32-level
-	 * first in, first out (FIFO) buffer can be used to store data to minimize
-	 * host processor intervention.
-	 * Low power modes enable intelligent motion-based power management with
-	 * threshold sensing and active acceleration measurement at extremely low
-	 * power dissipation.
-	 *
-	 * For further information on the special sensing functions, consult the
-	 * <a href="http://www.analog.com/static/imported-files/data_sheets/ADXL345.pdf">
-	 * datasheet</a>.
-	 *  
-	 * \author	Niklas Hauser
-	 * \ingroup inertial
-	 *
-	 * \tparam I2C Asynchronous Two Wire interface
-	 */
-	template < typename I2C >
-	class Adxl345
+	namespace adxl345
 	{
-	public:
 		/// The addresses of the Configuration and Data Registers
 		enum Register
 		{
@@ -106,29 +75,29 @@ namespace xpcc
 		/// The bandwidth options of REGISTER_BW_RATE.
 		/// Output frequency = 2 * bandwidth
 		enum Bandwidth {
-			BANDWIDTH_1600 = 0x0F,
-			BANDWIDTH_800 = 0x0E,
-			BANDWIDTH_400 = 0x0D,
-			BANDWIDTH_200 = 0x0C,
-			BANDWIDTH_100 = 0x0B,
-			BANDWIDTH_50 = 0x0A,
-			BANDWIDTH_25 = 0x09,
-			BANDWIDTH_12 = 0x08,
-			BANDWIDTH_6 = 0x07,
-			BANDWIDTH_3 = 0x06
+			BANDWIDTH_1600Hz = 0x0F,
+			BANDWIDTH_800Hz = 0x0E,
+			BANDWIDTH_400Hz = 0x0D,
+			BANDWIDTH_200Hz = 0x0C,
+			BANDWIDTH_100Hz = 0x0B,
+			BANDWIDTH_50Hz = 0x0A,
+			BANDWIDTH_25Hz = 0x09,
+			BANDWIDTH_12Hz = 0x08,
+			BANDWIDTH_6Hz = 0x07,
+			BANDWIDTH_3Hz = 0x06
 		};
 		
 		/// The power options of REGISTER_POWER_CTL.
 		enum Power {
-			POWER_LINK_bm = 0x20,
-			POWER_AUTO_SLEEP_bm = 0x10,
-			POWER_MEASURE_bm = 0x08,
-			POWER_SLEEP_bm = 0x04,
+			POWER_LINK = 0x20,
+			POWER_AUTO_SLEEP = 0x10,
+			POWER_MEASURE = 0x08,
+			POWER_SLEEP = 0x04,
 			POWER_WAKEUP_gm = 0x03,
-			POWER_WAKEUP_1HZ_gc = 0x03,
-			POWER_WAKEUP_2HZ_gc = 0x02,
-			POWER_WAKEUP_4HZ_gc = 0x01,
-			POWER_WAKEUP_8HZ_gc = 0x00,
+			POWER_WAKEUP_1Hz = 0x03,
+			POWER_WAKEUP_2Hz = 0x02,
+			POWER_WAKEUP_4Hz = 0x01,
+			POWER_WAKEUP_8Hz = 0x00,
 			// BW_RATE register
 			POWER_LOW_POWER = 0x10
 		};
@@ -136,73 +105,97 @@ namespace xpcc
 		/// The interrupt bit masks of REGISTER_INT_ENABLE, REGISTER_INT_MAP and
 		/// REGISTER_INT_SOURCE.
 		enum Interrupt {
-			INTERRUPT_DATA_READY_bm = 0x80,
-			INTERRUPT_SINGLE_TAP_bm = 0x40,
-			INTERRUPT_DOUBLE_TAP_bm = 0x20,
-			INTERRUPT_ACTIVITY_bm = 0x10,
-			INTERRUPT_INACTIVITY_bm = 0x08,
-			INTERRUPT_FREE_FALL_bm = 0x04,
-			INTERRUPT_WATERMARK_bm = 0x02,
-			INTERRUPT_OVERRUN_bm = 0x01,
+			INTERRUPT_DATA_READY = 0x80,
+			INTERRUPT_SINGLE_TAP = 0x40,
+			INTERRUPT_DOUBLE_TAP = 0x20,
+			INTERRUPT_ACTIVITY = 0x10,
+			INTERRUPT_INACTIVITY = 0x08,
+			INTERRUPT_FREE_FALL = 0x04,
+			INTERRUPT_WATERMARK = 0x02,
+			INTERRUPT_OVERRUN = 0x01,
 		};
 		
 		/// The options of REGISTER_DATA_FORMAT
 		enum DataFormat {
-			DATAFORMAT_SELF_TEST_bm = 0x80,
-			DATAFORMAT_SPI_bm = 0x40,
-			DATAFORMAT_INT_INVERT_bm = 0x20,
-			DATAFORMAT_FULL_RES_bm = 0x08,
-			DATAFORMAT_JUSTIFY_bm = 0x04,
+			DATAFORMAT_SELF_TEST = 0x80,
+			DATAFORMAT_SPI = 0x40,
+			DATAFORMAT_INT_INVERT = 0x20,
+			DATAFORMAT_FULL_RES = 0x08,
+			DATAFORMAT_JUSTIFY = 0x04,
 			DATAFORMAT_RANGE_gm = 0x03,
-			DATAFORMAT_RANGE_16G_gc = 0x03,
-			DATAFORMAT_RANGE_8G_gc = 0x02,
-			DATAFORMAT_RANGE_4G_gc = 0x01,
-			DATAFORMAT_RANGE_2G_gc = 0x00
+			DATAFORMAT_RANGE_16g = 0x03,
+			DATAFORMAT_RANGE_8g = 0x02,
+			DATAFORMAT_RANGE_4g = 0x01,
+			DATAFORMAT_RANGE_2g = 0x00
 		};
 		
 		/// The options of REGISTER_FIFO_CTL and REGISTER_FIFO_STATUS
 		enum FIFO {
 			FIFO_CTL_MODE_gm = 0xc0,
-			FIFO_CTL_MODE_TRIGGER_gc = 0xc0,
-			FIFO_CTL_MODE_STREAM_gc = 0x80,
-			FIFO_CTL_MODE_FIFO_gc = 0x40,
-			FIFO_CTL_MODE_BYPASS_gc = 0x00,
-			FIFO_CTL_TRIGGER_bm = 0x20,
+			FIFO_CTL_MODE_TRIGGER = 0xc0,
+			FIFO_CTL_MODE_STREAM = 0x80,
+			FIFO_CTL_MODE_FIFO = 0x40,
+			FIFO_CTL_MODE_BYPASS = 0x00,
+			FIFO_CTL_TRIGGER = 0x20,
 			FIFO_CTL_SAMPLES_gm = 0x0f,
 			// FIFO_STATUS register
-			FIFO_STATUS_TRIG_bm = 0x80,
+			FIFO_STATUS_TRIG = 0x80,
 			FIFO_STATUS_ENTRIES_gm = 0x3f
 		};
-		
+	}
+	
+	/**
+	 * \brief Basic ADXL345 digital accelerometer sensor driver
+	 *
+	 * The ADXL345 is a 3-axis accelerometer with high resolution (13-bit)
+	 * measurement at up to +-16 g. Digital output data is formatted as 16-bit
+	 * twos complement and is accessible through I2C digital interface.
+	 *
+	 * Its high resolution (4 mg/LSB) enables measurement of inclination 
+	 * changes less than 1.0 degree.
+	 * Several special sensing functions are provided. Activity and inactivity
+	 * sensing detect the presence or lack of motion and if the acceleration on
+	 * any axis exceeds a user-set level. Tap sensing detects single and double
+	 * taps. Free-fall sensing detects if the device is falling. These functions
+	 * can be mapped to one of two interrupt output pins. An integrated 32-level
+	 * first in, first out (FIFO) buffer can be used to store data to minimize
+	 * host processor intervention.
+	 * Low power modes enable intelligent motion-based power management with
+	 * threshold sensing and active acceleration measurement at extremely low
+	 * power dissipation.
+	 *
+	 * For further information on the special sensing functions, consult the
+	 * <a href="http://www.analog.com/static/imported-files/data_sheets/ADXL345.pdf">
+	 * datasheet</a>.
+	 *  
+	 * \author	Niklas Hauser
+	 * \ingroup inertial
+	 *
+	 * \tparam I2cMaster Asynchronous Two Wire interface
+	 */
+	template < typename I2cMaster >
+	class ADXL345 : public xpcc::i2c::Delegate
+	{
+	public:
 		/**
 		 * \brief	Constructor
-		 * \param	address		address is 0xa6 with SDO pin low else 0x3a
+		 * \param	address		address is 0x53 with SDO pin low else 0x1d
 		 */
-		Adxl345(uint8_t address=0x1d);
+		ADXL345(uint8_t address=0x1d);
 		
 		/**
 		 * Configures the sensor to measurement mode with full resolution with
 		 * the 32-level buffer in Stream Mode and the specified bandwidth.
 		 */
-		void
-		initialize(Bandwidth bandwidth=BANDWIDTH_50, bool streamMode=false);
+		bool
+		initialize(adxl345::Bandwidth bandwidth=adxl345::BANDWIDTH_50Hz, bool streamMode=false);
 		
 		/**
 		 * read the X-ZDATA0-1 registers and buffer the results
 		 * sets isNewDataAvailable() to \c true
 		 */
-		void
-		readAcceleration();
-		
-		/**
-		 * read the X-ZDATA0-1 registers 32 times (the entire 32-level buffer 
-		 * in stream mode) and calculates the average.
-		 * During execution isNewDataAvailable() is set to \c false, because
-		 * the adding and division is done in-place on the data buffer.
-		 * This method takes a very long time, since all i2c reads are blocking!
-		 */
-		void
-		readAccelerationAverage();
+		bool
+		readAccelerometer();
 		
 		/// \return pointer to 8bit array containing xyz accelerations
 		/// Use reinterpret_cast<int16*>(&getData()) to get the results.
@@ -226,14 +219,13 @@ namespace xpcc
 		isDataReady();
 		
 	private:
-		
 		/**
-		 * writes 8bit data to a register, non blocking!
+		 * writes 8bit data to a register, blocking!
 		 * \param reg register address
 		 * \param data 8bit data to write
 		 */
-		void
-		writeRegister(Register reg, uint8_t data);
+		bool
+		writeRegister(adxl345::Register reg, uint8_t data);
 		
 		/**
 		 * reads a 8bit register, blocking!
@@ -241,15 +233,34 @@ namespace xpcc
 		 * \return 8bit content
 		 */
 		uint8_t
-		readRegister(Register reg);
+		readRegister(adxl345::Register reg);
 		
-		bool
-		readData(Register reg, uint8_t *data, uint8_t size);
-
-		bool newData;
+		
+		virtual bool
+		attaching();
+		
+		virtual Starting
+		started();
+		
+		virtual Reading
+		reading();
+		
+		virtual Writing
+		writing();
+		
+		virtual void
+		stopped(DetachCause cause);
+		
 		uint8_t data[6];
+		uint8_t buffer[2];
+		uint8_t* readPointer;
+		uint8_t writeSize;
+		uint8_t readSize;
+		bool isReading;
+		bool isWriteRead;
+		
+		bool newData;
 		uint8_t deviceAddress;
-		typedef xpcc::i2c::SyncMaster<I2C> MySyncI2C;
 	};
 	
 }

@@ -90,7 +90,7 @@ namespace xpcc
 			inline static void
 			enableCompareCapture(uint8_t selection)
 			{
-				TCD1_CTRLB = (TCD1_CTRLB & 0xf0) | selection;
+				TCD1_CTRLB = (TCD1_CTRLB & ~0x30) | (selection & 0x30);
 			}
 	
 			inline static void

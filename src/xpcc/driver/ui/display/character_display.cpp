@@ -48,7 +48,7 @@ xpcc::CharacterDisplay::write(char c)
 			line = 0;
 		}
 		column = 0;
-		this->setCursor(line, column);
+		this->setCursor(column, line);
 	}
 	else {
 		if (column >= lineWidth) {

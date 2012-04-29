@@ -37,7 +37,7 @@ template<typename Spi, typename Cs, typename Rs, typename Shdn>
 void
 xpcc::AD840x<Spi, Cs, Rs, Shdn>::initialize()
 {
-	Spi::initialize();
+//	Spi::initialize();
 	Cs::setOutput(xpcc::gpio::HIGH);
 	Rs::setOutput(xpcc::gpio::HIGH);
 	Shdn::setOutput(xpcc::gpio::HIGH);

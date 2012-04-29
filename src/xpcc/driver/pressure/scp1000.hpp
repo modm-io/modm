@@ -36,6 +36,62 @@
 
 namespace xpcc
 {
+	namespace scp1000
+	{
+		/// The addresses of the Direct Access Registers.
+		enum Register
+		{
+			REGISTER_REVID = 0x00,
+			REGISTER_DATAWR = 0x01,
+			REGISTER_ADDPTR = 0x02,
+			REGISTER_OPERATION = 0x03,
+			REGISTER_OPSTATUS = 0x04,
+			REGISTER_RSTR = 0x06,
+			REGISTER_STATUS = 0x07,
+			REGISTER_DATARD8 = 0x1F,
+			REGISTER_DATARD16 = 0x20,
+			REGISTER_TEMPOUT = 0x21
+		};
+		
+		/// The operation options of REGISTER_OPERATION.
+		enum Operation
+		{
+			OPERATION_NO_OPERATION = 0x00,
+			OPERATION_READ_REGISTER = 0x01,
+			OPERATION_WRITE_REGISTER = 0x02,
+			OPERATION_READ_EEPROM = 0x05,
+			OPERATION_WRITE_EEPROM = 0x06,
+			OPERATION_INIT_SEQUENCE = 0x07,
+			OPERATION_HIGH_RESOLUTION_MODE_START = 0x0A,
+			OPERATION_HIGH_SPEED_MODE_START = 0x09,
+			OPERATION_ULTRA_LOW_POWER_MODE_START = 0x0B,
+			OPERATION_LOW_POWER_AQUISITION = 0x0C,
+			OPERATION_ASIC_TEST = 0x0F
+		};
+		
+		/// The status bitmasks of REGISTER_STATUS.
+		enum Status
+		{
+			STATUS_EXT_TRIGGERED_AQUISITION_RUNNING = 0x40,
+			STATUS_DATA_READY = 0x20,
+			STATUS_REAL_TIME_ERROR = 0x10,
+			STATUS_STARTUP_RUNNING = 0x01
+		};
+		
+		/// The status of REGISTER_OPSTATUS.
+		enum OperationStatus
+		{
+			OPERATION_STATUS_FINISHED = 0x00,
+			OPERATION_STATUS_RUNNING = 0x01
+		};
+		
+		enum Reset
+		{
+			NO_RESET = 0x00,
+			RESET = 0x01
+		};
+	}
+	
 	/**
 	 * \brief SCP1000-D01 absolute pressure sensor driver
 	 *
@@ -76,66 +132,13 @@ Ultra Low Power :   ~1Hz  |  15bit   |   14bit
 	class Scp1000
 	{
 	public:
-		/// The addresses of the Direct Access Registers.
-		enum Register
-		{
-			REGISTER_REVID = 0x00,
-			REGISTER_DATAWR = 0x01,
-			REGISTER_ADDPTR = 0x02,
-			REGISTER_OPERATION = 0x03,
-			REGISTER_OPSTATUS = 0x04,
-			REGISTER_RSTR = 0x06,
-			REGISTER_STATUS = 0x07,
-			REGISTER_DATARD8 = 0x1F,
-			REGISTER_DATARD16 = 0x20,
-			REGISTER_TEMPOUT = 0x21
-		};
-		
-		/// The operation options of REGISTER_OPERATION.
-		enum Operation
-		{
-			OPERATION_NO_OPERATION = 0x00,
-			OPERATION_READ_REGISTER = 0x01,
-			OPERATION_WRITE_REGISTER = 0x02,
-			OPERATION_READ_EEPROM = 0x05,
-			OPERATION_WRITE_EEPROM = 0x06,
-			OPERATION_INIT_SEQUENCE = 0x07,
-			OPERATION_HIGH_RESOLUTION_MODE_START = 0x0A,
-			OPERATION_HIGH_SPEED_MODE_START = 0x09,
-			OPERATION_ULTRA_LOW_POWER_MODE_START = 0x0B,
-			OPERATION_LOW_POWER_AQUISITION = 0x0C,
-			OPERATION_ASIC_TEST = 0x0F
-		};
-		
-		/// The status bitmasks of REGISTER_STATUS.
-		enum Status
-		{
-			STATUS_EXT_TRIGGERED_AQUISITION_RUNNING_bm = 0x40,
-			STATUS_DATA_READY_bm = 0x20,
-			STATUS_REAL_TIME_ERROR_bm = 0x10,
-			STATUS_STARTUP_RUNNING_bm = 0x01
-		};
-		
-		/// The status of REGISTER_OPSTATUS.
-		enum OperationStatus
-		{
-			OPERATION_STATUS_FINISHED = 0x00,
-			OPERATION_STATUS_RUNNING = 0x01
-		};
-		
-		enum Reset
-		{
-			NO_RESET = 0x00,
-			RESET = 0x01
-		};
-		
 		/**
 		 * Resets and initializes the chip to the new operation mode. This
 		 * takes at least 152ms, since the sensor has a long boot.
 		 * \param opMode Operation Mode.
 		 */
 		static bool
-		initialize(Operation opMode=OPERATION_HIGH_RESOLUTION_MODE_START);
+		initialize(scp1000::Operation opMode=scp1000::OPERATION_HIGH_RESOLUTION_MODE_START);
 		
 		/**
 		 * Reads the temperature register and buffers the result
@@ -168,7 +171,7 @@ Ultra Low Power :   ~1Hz  |  15bit   |   14bit
 		 * 			\c false if it took longer then 16ms to complete.
 		 */
 		static bool
-		setOperation(Operation opMode);
+		setOperation(scp1000::Operation opMode);
 		
 		/**
 		 * \param opStatus set to true to read operation status.
@@ -207,7 +210,7 @@ Ultra Low Power :   ~1Hz  |  15bit   |   14bit
 		 * \param data the data to write
 		 */
 		static void
-		writeRegister(Register reg, uint8_t data);
+		writeRegister(scp1000::Register reg, uint8_t data);
 		
 		/**
 		 * Reads a 8bit Direct Access Register in three SPI cycles.
@@ -216,7 +219,7 @@ Ultra Low Power :   ~1Hz  |  15bit   |   14bit
 		 * \return the 8bit content of the Register
 		 */
 		static uint8_t
-		read8BitRegister(Register reg);
+		read8BitRegister(scp1000::Register reg);
 		
 		/**
 		 * Reads a 16bit Direct Access Register in three SPI cycles.
@@ -226,7 +229,7 @@ Ultra Low Power :   ~1Hz  |  15bit   |   14bit
 		 * \return the 16bit content of the Register
 		 */
 		static void
-		read16BitRegister(Register reg, uint8_t *buffer);
+		read16BitRegister(scp1000::Register reg, uint8_t *buffer);
 		
 		static Spi spi;
 		static Cs chipSelect;

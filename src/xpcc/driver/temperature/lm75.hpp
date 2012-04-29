@@ -31,7 +31,7 @@
 #ifndef XPCC__LM75_HPP
 #define XPCC__LM75_HPP
 
-#include <xpcc/driver/connectivity/i2c/device.hpp>
+#include <xpcc/driver/connectivity/i2c/read_adapter.hpp>
 
 namespace xpcc
 {
@@ -41,27 +41,75 @@ namespace xpcc
 	 * \ingroup	temperature
 	 * \author	Fabian Greif
 	 */
-	template <typename I2C>
-	class LM75 : public i2c::Device<I2C>
+	template <typename I2cMaster >
+	class Lm75
 	{
 	public:
 		/**
-		 * \brief	Constructor
-		 * 
+		 * \param	data		pointer to a 2 uint8_t buffer
 		 * \param	address		Default address is 0x90.
 		 */
-		LM75(uint8_t address);
+		Lm75(uint8_t *data, uint8_t address=0x90)
+		:	status(0), data(data)
+		{
+			adapter.initialize(address << 1, data, 2);
+		}
 		
 		/**
-		 * \return	Temperature in degree
-		 * 
-		 * \todo	convert result into a better format 
+		 * read the temperature registers and buffer the results
+		 * sets isNewDataAvailable() to \c true
 		 */
-		int16_t
-		readTemperature();
+		ALWAYS_INLINE void
+		readTemperature()
+		{
+			status |= READ_TEMPERATURE_PENDING;
+		}
+		
+		/**
+		 * \c true, when new data has been read from the sensor
+		 */
+		ALWAYS_INLINE bool
+		isNewDataAvailable()
+		{
+			return status & NEW_TEMPERATURE_DATA;
+		}
+		
+		/// \return pointer to 8bit array containing temperature
+		inline uint8_t*
+		getData()
+		{
+			newData = false;
+			return data;
+		}
+		
+		void
+		update()
+		{
+			if (status & READ_TEMPERATURE_RUNNING &&
+				adapter.getState() == xpcc::i2c::adapter::NO_ERROR) {
+				status &= ~READ_TEMPERATURE_RUNNING;
+				status |= NEW_TEMPERATURE_DATA;
+			}
+			if (status & READ_TEMPERATURE_PENDING) {
+				if (I2cMaster::start(&adapter)) {
+					status &= ~READ_TEMPERATURE_PENDING;
+					status |= READ_TEMPERATURE_RUNNING;
+				}
+			}
+		}
+		
+	private:
+		xpcc::i2c::ReadAdapter adapter;
+		
+		enum Status {
+			READ_TEMPERATURE_PENDING = 0x01,
+			READ_TEMPERATURE_RUNNING = 0x02,
+			NEW_TEMPERATURE_DATA = 0x04,
+		};
+		
+		uint8_t status;
+		uint8_t *data;
 	};
 }
-
-#include "lm75_impl.hpp"
 
 #endif // XPCC__LM75_HPP

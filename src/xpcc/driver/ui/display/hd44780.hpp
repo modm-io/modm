@@ -82,7 +82,7 @@ namespace xpcc
 		writeRaw(char c);
 		
 		virtual void
-		setCursor(uint8_t line, uint8_t column);
+		setCursor(uint8_t column, uint8_t line);
 		
 		virtual void
 		execute(Command command);

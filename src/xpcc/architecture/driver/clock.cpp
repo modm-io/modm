@@ -84,21 +84,6 @@
 		return Timestamp(tempTime);
 	}
 	
-	
-	uint_fast16_t xpcc::FlexClock::time = 0;
-
-	xpcc::Timestamp
-	xpcc::FlexClock::now()
-	{
-		uint_fast16_t tempTime;
-		{
-			atomic::Lock lock;
-			tempTime = time;
-		}
-		
-		return Timestamp(tempTime);
-	}
-	
 #else
 #	error	"Don't know how to create a Timestamp for this target!"
 #endif

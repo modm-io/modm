@@ -56,7 +56,7 @@ uint8_t xpcc::Scp1000<Spi, Cs, Int>::pressure[3];
 // ----------------------------------------------------------------------------
 template < typename Spi, typename Cs, typename Int >
 bool
-xpcc::Scp1000<Spi, Cs, Int>::initialize(Operation opMode)
+xpcc::Scp1000<Spi, Cs, Int>::initialize(scp1000::Operation opMode)
 {
 	chipSelect.setOutput();
 	chipSelect.set();
@@ -78,7 +78,7 @@ template < typename Spi, typename Cs, typename Int >
 void
 xpcc::Scp1000<Spi, Cs, Int>::readTemperature()
 {
-	read16BitRegister(REGISTER_TEMPOUT, &temperature[0]);
+	read16BitRegister(scp1000::REGISTER_TEMPOUT, temperature);
 	newTemperature = true;
 }
 
@@ -86,8 +86,8 @@ template < typename Spi, typename Cs, typename Int >
 void
 xpcc::Scp1000<Spi, Cs, Int>::readPressure()
 {
-	pressure[0] = read8BitRegister(REGISTER_DATARD8);
-	read16BitRegister(REGISTER_DATARD16, &pressure[1]);
+	pressure[0] = read8BitRegister(scp1000::REGISTER_DATARD8);
+	read16BitRegister(scp1000::REGISTER_DATARD16, &pressure[1]);
 	
 	newPressure = true;
 }
@@ -97,7 +97,7 @@ uint8_t*
 xpcc::Scp1000<Spi, Cs, Int>::getTemperature()
 {
 	newTemperature = false;
-	return &temperature[0];
+	return temperature;
 }
 
 template < typename Spi, typename Cs, typename Int >
@@ -105,19 +105,19 @@ uint8_t*
 xpcc::Scp1000<Spi, Cs, Int>::getPressure()
 {
 	newPressure = false;
-	return &pressure[0];
+	return pressure;
 }
 
 
 template < typename Spi, typename Cs, typename Int >
 bool
-xpcc::Scp1000<Spi, Cs, Int>::setOperation(Operation opMode)
+xpcc::Scp1000<Spi, Cs, Int>::setOperation(scp1000::Operation opMode)
 {
-	writeRegister(REGISTER_OPERATION, opMode);
+	writeRegister(scp1000::REGISTER_OPERATION, opMode);
 	
 	uint8_t retries = 16;
 	// wait for the sensor to complete setting the operation
-	while (--retries && (readStatus(true) & OPERATION_STATUS_RUNNING)) {
+	while (--retries && (readStatus(true) & scp1000::OPERATION_STATUS_RUNNING)) {
 		xpcc::delay_ms(1);
 	}
 	
@@ -132,9 +132,9 @@ template < typename Spi, typename Cs, typename Int >
 uint8_t
 xpcc::Scp1000<Spi, Cs, Int>::readStatus(bool opStatus)
 {
-	Register address = REGISTER_STATUS;
+	Register address = scp1000::REGISTER_STATUS;
 	if (opStatus) {
-		address = REGISTER_OPSTATUS;
+		address = scp1000::REGISTER_OPSTATUS;
 	}
 	return read8BitRegister(address);
 }
@@ -143,14 +143,14 @@ template < typename Spi, typename Cs, typename Int >
 bool
 xpcc::Scp1000<Spi, Cs, Int>::reset(uint8_t timeout=50)
 {
-	writeRegister(REGISTER_RSTR, RESET);
+	writeRegister(scp1000::REGISTER_RSTR, scp1000::RESET);
 	
 	// wait a bit to give the Scp1000 some time to restart
 	xpcc::delay_ms(151);
 	
 	uint8_t retries = timeout;
 	// wait for the sensor to complete start up, this should take 160ms
-	while (--retries && (readStatus() & STATUS_STARTUP_RUNNING_bm)) {
+	while (--retries && (readStatus() & scp1000::STATUS_STARTUP_RUNNING_bm)) {
 		xpcc::delay_ms(1);
 	}
 	
@@ -185,7 +185,7 @@ xpcc::Scp1000<Spi, Cs, Int>::isNewDataReady()
 
 template < typename Spi, typename Cs, typename Int >
 void
-xpcc::Scp1000<Spi, Cs, Int>::writeRegister(Register reg, uint8_t data)
+xpcc::Scp1000<Spi, Cs, Int>::writeRegister(scp1000::Register reg, uint8_t data)
 {
 	chipSelect.reset();
 	spi.write(reg<<2|0x02);
@@ -195,7 +195,7 @@ xpcc::Scp1000<Spi, Cs, Int>::writeRegister(Register reg, uint8_t data)
 
 template < typename Spi, typename Cs, typename Int >
 uint8_t
-xpcc::Scp1000<Spi, Cs, Int>::read8BitRegister(Register reg)
+xpcc::Scp1000<Spi, Cs, Int>::read8BitRegister(scp1000::Register reg)
 {
 	uint8_t result;
 	chipSelect.reset();
@@ -207,7 +207,7 @@ xpcc::Scp1000<Spi, Cs, Int>::read8BitRegister(Register reg)
 
 template < typename Spi, typename Cs, typename Int >
 void
-xpcc::Scp1000<Spi, Cs, Int>::read16BitRegister(Register reg, uint8_t *buffer)
+xpcc::Scp1000<Spi, Cs, Int>::read16BitRegister(scp1000::Register reg, uint8_t *buffer)
 {
 	chipSelect.reset();
 	spi.write(reg<<2);

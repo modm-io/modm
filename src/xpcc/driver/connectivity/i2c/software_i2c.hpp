@@ -34,6 +34,10 @@
 #include <xpcc/architecture/driver/delay.hpp>
 #include "master.hpp"
 
+// debugging for dummies
+//#define DEBUG_SW_I2C(x) xpcc::atxmega::BufferedUartF0::write(x)
+#define DEBUG_SW_I2C(x)
+
 namespace xpcc
 {
 	/**
@@ -92,48 +96,55 @@ namespace xpcc
 	class SoftwareI2C : public i2c::Master
 	{
 	public:
+		enum ErrorState
+		{
+			NO_ERROR,			//!< No Error ocurred
+			DATA_NACK,			//!< Data was transmitted and NACK received
+			ARBITRATION_LOST,	//!< Arbitration was lost during writing or reading
+			BUS_ERROR,			//!< Misplaced Start or Stop condition
+			UNKNOWN_ERROR		//!< Unknown error condition
+		};
+		
 		/**
 		 * \brief	Initialize the hardware
 		 */
 		static void
-		initialize();
+		initialize(bool pullup=false);
 		
 	public:
+		static void
+		reset(bool error=false);
+		
 		static bool
-		start(uint8_t slaveAddress);
-
-		static void
-		stop();
-
-		static void
-		read(uint8_t *data, std::size_t size, xpcc::i2c::ReadParameter param = xpcc::i2c::READ_STOP);
-
-		static void
-		write(const uint8_t *data, std::size_t size);
-
-		static inline void
-		restart(uint8_t slaveAddress);
-
-		static xpcc::i2c::BusyState
-		getBusyState();
-
-		static xpcc::i2c::BusState
-		getBusState();
-
-	protected:
+		start(xpcc::i2c::Delegate *delegate);
+		
 		static bool
-		startCondition(uint8_t address);
+		startSync(xpcc::i2c::Delegate *delegate)
+		{
+			return start(delegate);
+		};
+		
+		static uint8_t
+		getErrorState();
+
+	private:
+		static void
+		error();
+		
+	private:
+		static void
+		startCondition();
+		
+		static void
+		stopCondition();
 		
 		static bool
 		write(uint8_t data);
 		
 		static uint8_t
 		read(bool ack);
-		
-		static void
-		stopCondition();
 
-	protected:
+	private:
 		static inline bool
 		readBit();
 		
@@ -149,9 +160,10 @@ namespace xpcc
 		
 		static Scl scl;
 		static Sda sda;
-		static bool occupied;
-		static uint8_t address;
-		static xpcc::i2c::BusState busState;
+		
+		static xpcc::i2c::Delegate::NextOperation nextOperation;
+		static xpcc::i2c::Delegate *myDelegate;
+		static uint8_t errorState;
 	};
 }
 

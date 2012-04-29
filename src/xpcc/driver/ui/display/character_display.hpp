@@ -107,11 +107,11 @@ namespace xpcc
 		/**
 		 * \brief	Set cursor to specified position
 		 * 
-		 * \param	line	vertical position
 		 * \param	column	horizontal position
+		 * \param	line	vertical position
 		 */
 		virtual void
-		setCursor(uint8_t line, uint8_t column) = 0;
+		setCursor(uint8_t column, uint8_t line) = 0;
 		
 	protected:
 		// Interface class for the IOStream

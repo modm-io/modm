@@ -26,6 +26,8 @@
 # ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+# 
+# $Id: SConscript.generate 752 2012-03-03 23:54:03Z salkinium $
 # -----------------------------------------------------------------------------
 
 Import('env')
@@ -64,10 +66,10 @@ generator = env['TemplateGenerator'](env, 'dma')
 for channel in [0,1,2,3]:
 	generator.template('dma_channel%s.hpp' % channel, 'dma_channel.hpp.in', { 'ch': channel })
 
-#generator = env['TemplateGenerator'](env, 'i2c')
-#for port in ['C', 'D', 'E', 'F']:
-#	generator.template('i2c_master_%s.hpp' % port.lower(), 'i2c_master.hpp.in', { 'id': port })
-#	generator.template('i2c_master_asynchronous_%s.cpp' % port.lower(), 'i2c_master_asynchronous.cpp.in', { 'id': port })
+generator = env['TemplateGenerator'](env, 'i2c')
+for port in ['C', 'D', 'E', 'F']:
+	generator.template('i2c_master_%s.hpp' % port.lower(), 'i2c_master.hpp.in', { 'id': port })
+	generator.template('i2c_master_%s.cpp' % port.lower(), 'i2c_master.cpp.in', { 'id': port })
 
 generator = env['TemplateGenerator'](env, 'timer')
 for port in ['C', 'D', 'E', 'F']:

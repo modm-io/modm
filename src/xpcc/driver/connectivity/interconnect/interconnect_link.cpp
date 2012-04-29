@@ -131,7 +131,7 @@ void
 xpcc::InterconnectLink::initialize()
 {
 	UsartSS::configureInputSense(xpcc::atxmega::BOTHEDGES);
-	UsartSS::configureInterrupt0(xpcc::atxmega::INT0LVL_MED);
+	UsartSS::configureInterrupt0(xpcc::atxmega::INTERRUPT_LEVEL_MEDIUM);
 	
 	UsartMS::setOutput();
 	UsartMS::set();

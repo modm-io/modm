@@ -32,10 +32,56 @@
 #define XPCC__TMP102_HPP
 
 #include <stdint.h>
-#include <xpcc/driver/connectivity/i2c/device.hpp>
+#include <xpcc/driver/connectivity/i2c/write_read_adapter.hpp>
 
 namespace xpcc
 {
+	/**
+	 * \see		TMP102
+	 * \ingroup	temperature
+	 */
+	namespace tmp102
+	{
+		enum Register
+		{
+			REGISTER_TEMPERATURE = 0x00,
+			REGISTER_CONFIGURATION = 0x01,
+			REGISTER_T_LOW = 0x02,
+			REGISTER_T_HIGH = 0x03
+		};
+		
+		enum Temperature
+		{
+			TEMPERATURE_EXTENDED_MODE = 0x01
+		};
+		
+		enum Config1
+		{// first byte
+			CONFIGURATION_SHUTDOWN_MODE = 0x01,
+			CONFIGURATION_THERMOSTAT_MODE = 0x02,
+			CONFIGURATION_POLARITY = 0x04,
+			CONFIGURATION_FAULT_QUEUE = 0x18,
+			CONFIGURATION_FAULT_QUEUE_1 = 0x00,
+			CONFIGURATION_FAULT_QUEUE_2 = 0x08,
+			CONFIGURATION_FAULT_QUEUE_4 = 0x10,
+			CONFIGURATION_FAULT_QUEUE_6 = 0x18,
+			CONFIGURATION_CONVERTER_RESOLUTION = 0x60,
+			CONFIGURATION_CONVERTER_RESOLUTION_12BIT = 0x60,
+			CONFIGURATION_ONE_SHOT = 0x80
+		};
+		
+		enum Config2
+		{// second byte
+			CONFIGURATION_EXTENDED_MODE = 0x10,
+			CONFIGURATION_ALERT = 0x20,
+			CONFIGURATION_CONVERSION_RATE = 0xc0,
+			CONFIGURATION_CONVERSION_RATE_0_25HZ = 0x00,
+			CONFIGURATION_CONVERSION_RATE_1HZ = 0x40,
+			CONFIGURATION_CONVERSION_RATE_4HZ = 0x80,
+			CONFIGURATION_CONVERSION_RATE_8HZ = 0xc0
+		};
+	}
+	
 	/**
 	 * \brief	TMP102 digital temperature sensor driver
 	 *
@@ -59,68 +105,41 @@ namespace xpcc
 	 * \ingroup temperature
 	 * \author	Niklas Hauser
 	 *
-	 * \tparam I2C Asynchronous Interface
+	 * \tparam I2cMaster Asynchronous Interface
 	 */
-	template < typename I2C >
-	class Tmp102 : public i2c::Device< I2C >
+	template < typename I2cMaster >
+	class Tmp102
 	{
 	public:
-		enum Register
-		{
-			REGISTER_TEMPERATURE,
-			REGISTER_CONFIGURATION,
-			REGISTER_T_LOW,
-			REGISTER_T_HIGH
-		};
-		
-		enum Temperature
-		{
-			TEMPERATURE_EXTENDED_MODE_bm = 0x01
-		};
-		
-		enum Configuration
-		{
-			// first byte
-			CONFIGURATION_SHUTDOWN_MODE_bm = 0x01,
-			CONFIGURATION_THERMOSTAT_MODE_bm = 0x02,
-			CONFIGURATION_POLARITY_bm = 0x04,
-			CONFIGURATION_FAULT_QUEUE_gm = 0x18,
-			CONFIGURATION_FAULT_QUEUE_1_gc = 0x00,
-			CONFIGURATION_FAULT_QUEUE_2_gc = 0x08,
-			CONFIGURATION_FAULT_QUEUE_4_gc = 0x10,
-			CONFIGURATION_FAULT_QUEUE_6_gc = 0x18,
-			CONFIGURATION_CONVERTER_RESOLUTION_gm = 0x60,
-			CONFIGURATION_CONVERTER_RESOLUTION_12_gc = 0x60,
-			CONFIGURATION_ONE_SHOT_bm = 0x80,
-			
-			// second byte
-			CONFIGURATION_EXTENDED_MODE_bm = 0x10,
-			CONFIGURATION_ALERT_bm = 0x20,
-			CONFIGURATION_CONVERSION_RATE_gm = 0xc0,
-			CONFIGURATION_CONVERSION_RATE_025_gc = 0x00,
-			CONFIGURATION_CONVERSION_RATE_1_gc = 0x40,
-			CONFIGURATION_CONVERSION_RATE_4_gc = 0x80,
-			CONFIGURATION_CONVERSION_RATE_8_gc = 0xc0
-		};
-		
 		/**
-		 * Constructor, Default address is 0x90 (alternatives are 0x91, 0x92 and 0x93)
+		 * \param	data		pointer to a 2 uint8_t buffer
+		 * \param	address		Default address is 0x48 (alternatives are 0x49, 0x4A and 0x4B)
 		 */
-		Tmp102(uint8_t address=0x90);
+		Tmp102(uint8_t* data, uint8_t address=0x48);
 		
-		void
-		configure(uint8_t msb=CONFIGURATION_CONVERTER_RESOLUTION_12_gc,
-				  uint8_t lsb=CONFIGURATION_CONVERSION_RATE_4_gc);
+		bool
+		configure(tmp102::Config2 lsb=tmp102::CONFIGURATION_CONVERSION_RATE_4HZ,
+				  tmp102::Config1 msb=tmp102::CONFIGURATION_CONVERTER_RESOLUTION_12BIT);
 		
 		/// starts a temperature conversion right now
-		void
+		ALWAYS_INLINE void
 		startConversion();
 		
-		/// read the Temperature registers and buffer the results
-		void
+		/**
+		 * read the Temperature registers and buffer the results
+		 * sets isNewDataAvailable() to \c true
+		 */
+		ALWAYS_INLINE void
 		readTemperature();
 		
-		/// \return pointer to 8bit array containing temperature
+		/**
+		 * \c true, when new data has been read from the sensor and is buffered,
+		 * \c false, when the data has been accessed
+		 */
+		ALWAYS_INLINE bool
+		isNewDataAvailable();
+		
+		/// \return pointer to 8bit array containing temperature as big endian int16_t
 		uint8_t*
 		getData();
 		
@@ -128,15 +147,29 @@ namespace xpcc
 		float
 		getTemperature();
 		
+		void
+		update();
+		
 	private:
-		void
-		writeRegister(Register reg, uint8_t msb, uint8_t lsb);
+		xpcc::i2c::WriteReadAdapter adapter;
 		
-		void
-		readRegister(Register reg, uint8_t *buffer);
+		enum Running {
+			NOTHING_RUNNING,
+			READ_TEMPERATURE_RUNNING,
+			START_CONVERSION_RUNNING,
+		};
 		
+		enum Status {
+			START_CONVERSION_PENDING = 0x01,
+			READ_TEMPERATURE_PENDING = 0x02,
+			NEW_TEMPERATURE_DATA = 0x04,
+		};
+		
+		uint8_t running;
+		uint8_t status;
 		uint8_t config;
-		uint8_t data[2];
+		uint8_t* data;
+		uint8_t buffer[3];
 	};
 	
 }

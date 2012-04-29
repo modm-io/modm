@@ -80,53 +80,6 @@ namespace xpcc
 	protected:
 		static uint_fast16_t time;
 	};
-	
-	/**
-	 * \brief	Internal timer
-	 * 
-	 * TODO Remove this class
-	 *
-	 * This class is implemented using \c gettimeofday() from <sys/time.h> for
-	 * any Unix-OS. 
-	 * 
-	 * For the AVRs targets the user has to use the increment() method to
-	 * generate a suitable timebase, preferably by incrementing the time
-	 * value inside a timer interrupt function.
-	 * 
-	 * Example:
-	 * \code
-	 * // Interrupt every 1ms
-	 * ISR(TIMER)
-	 * {
-	 *     xpcc::Clock::increment();
-	 * }
-	 * \endcode
-	 * 
-	 * \ingroup	architecture
-	 */
-	class FlexClock
-	{
-	public:
-		/**
-		 * \brief	Get the current time
-		 * 
-		 * Provides an atomic access to the current time
-		 */
-		static Timestamp
-		now();
-		
-#if !defined(XPCC__CPU_HOSTED)
-		/// \brief	Set the current time
-		static inline void
-		increment(uint_fast16_t step = 1)
-		{
-			time += step;
-		}
-#endif
-		
-	protected:
-		static uint_fast16_t time;
-	};
 }
 
 #endif	// XPCC__CLOCK_HPP

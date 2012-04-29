@@ -48,12 +48,40 @@ namespace xpcc
 		/**
 		 * @brief		I2C2 Module.
 		 * 
-		 * @author		Georgi
+		 * @author		Georgi Grinshpun
+		 * @author		Niklas Hauser
 		 * @ingroup		stm32
 		 */
-		class I2c2 : ::xpcc::i2c::Master
+		class I2cMaster2 : ::xpcc::i2c::Master
 		{
 		public:
+			
+#if (defined DRIVER_CONNECTIVITY_I2C_DEBUG) && DRIVER_CONNECTIVITY_I2C_DEBUG
+			enum DebugEnum{
+				IRQ_EV,
+				STARTBIT_SET,
+				ADDRESS_SENT,
+				TRANSMITTER,
+				RECEIVER_NEXT_RESTART,
+				RECEIVER_NEXT_STOP,
+				RECEIVER_MANY_BYTES,
+				AFTER_WRITE_FINISHED_IRQ,
+				TXE_NO_BYTES_LEFT,
+				TXE_NEXT_WRITE,
+				TXE_NEXT_RESTART,
+				TXE_NEXT_STOP,
+				TXE_BTF_NEXT_RESTART,
+				TXE_MORE_BYTES_LEFT,
+				RXNE_IRQ,
+				RXNE_MANY_BYTES_LEFT,
+				RXNE_ONE_BYTE_LEFT,
+				RXNE_NO_BYTES_LEFT_NEXT_RESTART,
+				RXNE_NO_BYTES_LEFT_NEXT_STOP,
+
+				IRQ_ER,
+			};
+#endif
+
 			enum Mapping
 			{
 #if defined(STM32F2XX) || defined(STM32F4XX)
@@ -65,41 +93,80 @@ namespace xpcc
 #endif
 			};
 			
+			enum ErrorState
+			{
+				NO_ERROR,			//!< No Error ocurred
+				DATA_NACK,			//!< Data was transmitted and NACK received
+				ARBITRATION_LOST,	//!< Arbitration was lost during writing or reading
+				BUS_ERROR,			//!< Misplaced Start or Stop condition
+				UNKNOWN_ERROR		//!< Unknown error condition
+			};
+			
+			
 			/**
-			 * Configure the IO Pins for I2C2
+			 * @brief	Enables the peripheral clock for this module.
+			 * You don't need to call this method at start, but you may.
+			 */
+			static void
+			enable();
+
+			/**
+			 * Configure the IO Pins for this module
 			 */
 			static void
 			configurePins(Mapping mapping);
 			
 			/**
-			 * @brief	Initialize I2C module
+			 * @brief	Initialize this module
+			 * You must initialize pins before call to this method either by
+			 * calling configurePins
 			 * \param ccrPrescaler: I2CFrequency = STM32_APB1_FREQUENCY / (2 * ccrPrescaler)
 			 */
 			static void
 			initialize(uint16_t ccrPrescaler);
 			
-		public:
-			static bool
-			start(uint8_t slaveAddress);
-
 			static void
-			restart(uint8_t slaveAddress);
-
-			static void
-			stop();
-
-			static void
-			read(uint8_t *data, std::size_t size, xpcc::i2c::ReadParameter param = xpcc::i2c::READ_STOP);
-
-			static void
-			write(const uint8_t *data, std::size_t size);
+			reset(bool error=false);
 			
 		public:
-			static xpcc::i2c::BusyState
-			getBusyState();
-
-			static xpcc::i2c::BusState
-			getBusState();
+			/**
+			 * You initialize an I2C transaction calling this method. Passed
+			 * delegate will be attached to this module and has to manage
+			 * the transaction until it is detached by calling stop.
+			 * \return true if module is free and module is attached, false
+			 * if module was busy. Be aware, that the delagete may get attached
+			 * and detached before this method returns. In this case
+			 * true is returned. That means each interconnection between
+			 * passed delegate and the caller of this method must be
+			 * performed before call.
+			 * 
+			 * \code
+			 * ... initialization of delegate
+			 * if (xpcc::stm32::I2c2::start(&delegate)){
+			 *  // wait until delegate is finished
+			 *  // don't interconnect with the delegate, only while a call to 
+			 *  // one of it's methods
+			 *  // after delegates' stop method has been called it is detached
+			 *  // from module
+			 * }
+			 * else{
+			 *  // delegate has not been attached because module was busy
+			 * }
+			 * 
+			 * \endcode
+			 */
+			static bool
+			start(xpcc::i2c::Delegate *delegate);
+			
+			static bool
+			startSync(xpcc::i2c::Delegate *delegate);
+			
+			/**
+			 * This method returns the actual error state if it is called
+			 * from the delegates stop method.
+			 */
+			static uint8_t
+			getErrorState();
 		};
 	}
 }

@@ -33,127 +33,76 @@
 #endif
 
 // ----------------------------------------------------------------------------
-template <typename I2C>
-xpcc::Ds1631<I2C>::Ds1631(uint8_t deviceAddress):
-	deviceAddress(deviceAddress)
+template <typename I2cMaster>
+xpcc::Ds1631<I2cMaster>::Ds1631(uint8_t deviceAddress)
+:	status(0), config(0), data(data)
 {
+	adapter.initialize(address << 1, buffer, 0, data, 0);
 }
 
 // ----------------------------------------------------------------------------
-template <typename I2C>
+template <typename I2cMaster>
 void
-xpcc::Ds1631<I2C>::configure(ds1631::Resolution resolution, bool continuousMode)
+xpcc::Ds1631<I2cMaster>::configure(ds1631::Resolution resolution, bool continuousMode)
 {
-	if(MySyncI2C::startCheck(this->deviceAddress)){
-		uint8_t config = resolution;
-		if (!continuousMode) {
-			config |= 0x01;
-		}
-
-		uint8_t buffer[] = {0xac, config};
-		MySyncI2C::write(buffer, 2);
-	}
+	buffer[0] = 0xac;
+	buffer[1] = resolution | (continuousMode ? 0 : 0x01);
+	adapter.initialize(buffer, 3, data, 0);
+	
+	return I2cMaster::startSync(&adapter);
 }
 
-template <typename I2C>
+template <typename I2cMaster>
 void
-xpcc::Ds1631<I2C>::reset()
+xpcc::Ds1631<I2cMaster>::reset()
 {
-	if(MySyncI2C::startCheck(this->deviceAddress)){
-		uint8_t buffer[] = {0x54};
-		MySyncI2C::write(buffer, 1);
-	}
+	buffer[0] = 0x54;
+	adapter.initialize(buffer, 1, data, 0);
+	
+	return I2cMaster::start(&adapter);
 }
 
 // ----------------------------------------------------------------------------
-template <typename I2C>
+template <typename I2cMaster>
 void
-xpcc::Ds1631<I2C>::startConversion()
+xpcc::Ds1631<I2cMaster>::startConversion()
 {
-	if(MySyncI2C::startCheck(this->deviceAddress)){
-		uint8_t buffer[] = {0x51};
-		MySyncI2C::write(buffer, 1);
-	}
+	buffer[0] = 0x51;
+	adapter.initialize(buffer, 1, data, 0);
+	
+	return I2cMaster::start(&adapter);
 }
 
-template <typename I2C>
+template <typename I2cMaster>
 void
-xpcc::Ds1631<I2C>::stopConversion()
+xpcc::Ds1631<I2cMaster>::stopConversion()
 {
-	if(MySyncI2C::startCheck(this->deviceAddress)){
-		uint8_t buffer[] = {0x22};
-		MySyncI2C::write(buffer, 1);
-	}
+	buffer[0] = 0x22;
+	adapter.initialize(buffer, 1, data, 0);
+	
+	return I2cMaster::start(&adapter);
 }
 
-template <typename I2C>
+template <typename I2cMaster>
 bool
-xpcc::Ds1631<I2C>::isConversionDone()
+xpcc::Ds1631<I2cMaster>::isConversionDone()
 {
-	if(MySyncI2C::startCheck(this->deviceAddress)){
-		uint8_t buffer[] = {0xac};
-		if (MySyncI2C::write(buffer, 1, xpcc::i2c::SYNC_NO_STOP) == xpcc::i2c::BUS_RESET){
-			MySyncI2C::stop();
-			return false;
-		}
+	buffer[0] = 0xac;
+	adapter.initialize(buffer, 1, buffer, 1);
 
-		if (MySyncI2C::restart(this->deviceAddress) == xpcc::i2c::BUS_RESET){
-			MySyncI2C::stop();
-			return false;
-		}
-
-		if(MySyncI2C::read(buffer, 1) == xpcc::i2c::BUS_RESET){
-			MySyncI2C::stop();
-			return false;
-		}
-
-		return ((buffer[0]&0x80) == 0x80);
-	}
-	else{
-		return false;
-	}
+	if (I2cMaster::startSync(&adapter))
+		return (buffer[0] & 0x80);
+	
+	return false;
 }
 
 // ----------------------------------------------------------------------------
-template <typename I2C>
+template <typename I2cMaster>
 int16_t
-xpcc::Ds1631<I2C>::readTemperature()
+xpcc::Ds1631<I2cMaster>::readTemperature()
 {
-	if(MySyncI2C::startCheck(this->deviceAddress)){
-		{
-			uint8_t buffer[] = {0xaa};
-			if (MySyncI2C::write(buffer, 1, xpcc::i2c::SYNC_NO_STOP) == xpcc::i2c::BUS_RESET){
-				MySyncI2C::stop();
-				return 0;
-			}
-		}
-
-		if (MySyncI2C::restart(this->deviceAddress) == xpcc::i2c::BUS_RESET){
-			MySyncI2C::stop();
-			return 0;
-		}
-
-		uint8_t buffer[2];
-		if(MySyncI2C::read(buffer, 2) == xpcc::i2c::BUS_RESET){
-			MySyncI2C::stop();
-			return 0;
-		}
-
-		int16_t temperature = buffer[0]<<8|buffer[1];
-		return temperature;
-	}
-	else{
-		return 0;
-	}
-}
-
-// ----------------------------------------------------------------------------
-template <typename I2C>
-bool
-xpcc::Ds1631<I2C>::isAvailable() const
-{
-	if(MySyncI2C::startCheck(this->deviceAddress))
-		return (MySyncI2C::write(0, 0) != xpcc::i2c::BUS_RESET);
-	else
-		return false;
+	buffer[0] = 0xaa;
+	adapter.initialize(buffer, 1, data, 2);
+	
+	return I2cMaster::start(&adapter);
 }

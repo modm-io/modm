@@ -29,109 +29,130 @@
 // ----------------------------------------------------------------------------
 
 #ifndef XPCC__HMC58_HPP
-	#error  "Don't include this file directly, use 'hmc58.hpp' instead!"
+#	error  "Don't include this file directly, use 'hmc58.hpp' instead!"
 #endif
 
 // ----------------------------------------------------------------------------
-template < typename I2C >
-xpcc::Hmc58<I2C>::Hmc58(uint8_t address) :
-	xpcc::i2c::Device<I2C>(address<<1)
+template < typename I2cMaster >
+xpcc::Hmc58<I2cMaster>::Hmc58(uint8_t* data, uint8_t address)
+:	status(0), data(data)
 {
+	adapter.initialize(address << 1, buffer, 0, data, 0);
 }
 
-template < typename I2C >
-void
-xpcc::Hmc58<I2C>::initialize(uint8_t dataOutputRate)
+template < typename I2cMaster >
+bool
+xpcc::Hmc58<I2cMaster>::configure(uint8_t dataOutputRate)
 {
-	data[0] = REGISTER_CONFIG_A;
+	buffer[0] = hmc58::REGISTER_CONFIG_A;
 	// configuration register A
-	data[1] = MEASUREMENT_AVERAGE_8_gc | dataOutputRate | MEASUREMENT_MODE_NORMAL_gc;
+	buffer[1] = hmc58::MEASUREMENT_AVERAGE_8 | dataOutputRate | hmc58::MEASUREMENT_MODE_NORMAL;
 	// configuration register B
-	data[2] = 0x20; /* default gain of ~1Gs */
+	buffer[2] = 0x20; /* default gain of ~1Gs */
 	// mode register
-	data[3] = OPERATION_MODE_CONTINUOUS_gc;
-
-	this->i2c.write(this->deviceAddress, &data[0], 4);
-}
-
-template < typename I2C >
-void
-xpcc::Hmc58<I2C>::readCompass()
-{
-	data[0] = REGISTER_DATA_X0;
-	this->i2c.writeRead(this->deviceAddress, &data[0], 1, 6);
+	buffer[3] = hmc58::OPERATION_MODE_CONTINUOUS;
+	adapter.initialize(buffer, 4, data, 0);
 	
-	newData = true;
+	return I2cMaster::startSync(&adapter);
 }
 
-template < typename I2C >
-bool
-xpcc::Hmc58<I2C>::isDataReady()
+template < typename I2cMaster >
+void
+xpcc::Hmc58<I2cMaster>::readMagnetometer()
 {
-	if (this->i2c.isBusy()) return false;
-	return readRegister(REGISTER_STATUS) & STATUS_DATA_READY_bm;
+	status |= READ_MAGNETOMETER_PENDING;
 }
 
-template < typename I2C >
+template < typename I2cMaster >
 bool
-xpcc::Hmc58<I2C>::isNewDataAvailable()
+xpcc::Hmc58<I2cMaster>::isDataReady()
 {
-	return newData;
+	return readRegister(hmc58::REGISTER_STATUS) & hmc58::STATUS_DATA_READY;
 }
 
-template < typename I2C >
+template < typename I2cMaster >
+bool
+xpcc::Hmc58<I2cMaster>::isNewDataAvailable()
+{
+	return status & NEW_MAGNETOMETER_DATA;
+}
+
+template < typename I2cMaster >
 uint8_t*
-xpcc::Hmc58<I2C>::getData()
+xpcc::Hmc58<I2cMaster>::getData()
 {
-	newData = false;
-	return &data[0];
+	status &= ~NEW_MAGNETOMETER_DATA;
+	return data;
 }
 
-template < typename I2C >
-void
-xpcc::Hmc58<I2C>::setDataOutputRate(uint8_t dataOutputRate)
+template < typename I2cMaster >
+bool
+xpcc::Hmc58<I2cMaster>::setDataOutputRate(uint8_t dataOutputRate)
 {
-	uint8_t config = readRegister(REGISTER_CONFIG_A);
-	writeRegister(REGISTER_CONFIG_A, (config & ~DATA_OUTPUT_RATE_gm) | dataOutputRate);
+	uint8_t config = readRegister(hmc58::REGISTER_CONFIG_A);
+	return writeRegister(hmc58::REGISTER_CONFIG_A, (config & ~hmc58::DATA_OUTPUT_RATE_gm) | dataOutputRate);
 }
 
-template < typename I2C >
-void
-xpcc::Hmc58<I2C>::setMeasurementMode(MeasurementMode mode)
+template < typename I2cMaster >
+bool
+xpcc::Hmc58<I2cMaster>::setMeasurementMode(hmc58::MeasurementMode mode)
 {
-	uint8_t config = readRegister(REGISTER_CONFIG_A);
-	writeRegister(REGISTER_CONFIG_A, (config & MEASUREMENT_MODE_gm) | mode);
+	uint8_t config = readRegister(hmc58::REGISTER_CONFIG_A);
+	return writeRegister(hmc58::REGISTER_CONFIG_A, (config & hmc58::MEASUREMENT_MODE_gm) | mode);
 }
 
-template < typename I2C >
-void
-xpcc::Hmc58<I2C>::setGain(uint8_t gain)
+template < typename I2cMaster >
+bool
+xpcc::Hmc58<I2cMaster>::setGain(uint8_t gain)
 {
-	writeRegister(REGISTER_CONFIG_B, gain);
+	return writeRegister(hmc58::REGISTER_CONFIG_B, gain);
 }
 
-// ----------------------------------------------------------------------------
-template < typename I2C >
+template < typename I2cMaster >
 void
-xpcc::Hmc58<I2C>::writeRegister(Register reg, uint8_t data)
+xpcc::Hmc58<I2cMaster>::update()
 {
-	uint8_t buffer[2] = {reg, data};
-	this->i2c.write(this->deviceAddress, &buffer[0], 2);
-	
-	while (this->i2c.isBusy())
+	if (status & READ_MAGNETOMETER_RUNNING &&
+		adapter.getState() == xpcc::i2c::adapter::NO_ERROR) {
+		status &= ~READ_MAGNETOMETER_RUNNING;
+		status |= NEW_MAGNETOMETER_DATA;
+	}
+	else if (status & READ_MAGNETOMETER_PENDING) 
+	{
+		buffer[0] = hmc58::REGISTER_DATA_X0;
+		adapter.initialize(buffer, 1, data, 6);
+		
+		if (I2cMaster::start(&adapter)) {
+			status &= ~READ_MAGNETOMETER_PENDING;
+			status |= READ_MAGNETOMETER_RUNNING;
+		}
+	};
+}
+
+// MARK: - private
+template < typename I2cMaster >
+bool
+xpcc::Hmc58<I2cMaster>::writeRegister(hmc58::Register reg, uint8_t value)
+{
+	while (adapter.getState() == xpcc::i2c::adapter::BUSY)
 		;
+	buffer[0] = reg;
+	buffer[1] = value;
+	adapter.initialize(buffer, 2, data, 0);
+	
+	return I2cMaster::startSync(&adapter);
 }
 
-template < typename I2C >
+template < typename I2cMaster >
 uint8_t
-xpcc::Hmc58<I2C>::readRegister(Register reg)
+xpcc::Hmc58<I2cMaster>::readRegister(hmc58::Register reg)
 {
-	uint8_t buffer[1] = {reg};
-	this->i2c.writeRead(this->deviceAddress, &buffer[0], 1, 1);
+	while (adapter.getState() == xpcc::i2c::adapter::BUSY)
+		;
+	buffer[0] = reg;
+	adapter.initialize(buffer, 1, buffer, 1);
 	
-	while (this->i2c.isBusy())
+	while (!I2cMaster::startSync(&adapter))
 		;
 	return buffer[0];
 }
-
-

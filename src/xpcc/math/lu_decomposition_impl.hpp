@@ -119,7 +119,7 @@ xpcc::LUDecomposition::RowOperation<T, SIZE>::swap(T *row1, T *row2)
 template<typename T>
 void
 xpcc::LUDecomposition::RowOperation<T, 0>::multiply(
-		T *intoRow, const T *row, const T &factor)
+		T * /* intoRow */, const T * /* row */, const T & /* factor */)
 {
 }
 
@@ -127,14 +127,14 @@ xpcc::LUDecomposition::RowOperation<T, 0>::multiply(
 template<typename T>
 void
 xpcc::LUDecomposition::RowOperation<T, 0>::addRowTimesFactor(
-		T *intoRow, const T *srcRow, const T *addRow, const T &timesFactor)
+		T * /* intoRow */, const T * /* srcRow */, const T * /* addRow */, const T & /* timesFactor */)
 {
 }
 
 // ----------------------------------------------------------------------------
 template<typename T>
 void
-xpcc::LUDecomposition::RowOperation<T, 0>::swap(T *row1, T *row2)
+xpcc::LUDecomposition::RowOperation<T, 0>::swap(T * /* row1 */, T * /* row2 */)
 {
 }
 
@@ -312,7 +312,7 @@ xpcc::LUDecomposition::LUSubDecomposition<T, OFFSET, WIDTH, HEIGHT>::solve(
 // ----------------------------------------------------------------------------
 template<typename T, uint8_t OFFSET, uint8_t WIDTH>
 bool
-xpcc::LUDecomposition::LUSubDecomposition<T, OFFSET, WIDTH, OFFSET>::decomposeRecur(T *u, T *l, int8_t *p)
+xpcc::LUDecomposition::LUSubDecomposition<T, OFFSET, WIDTH, OFFSET>::decomposeRecur(T * /* u */, T * /* l */, int8_t * /* p */)
 {
 	return true;
 }
@@ -320,7 +320,7 @@ xpcc::LUDecomposition::LUSubDecomposition<T, OFFSET, WIDTH, OFFSET>::decomposeRe
 // ----------------------------------------------------------------------------
 template<typename T, uint8_t OFFSET, uint8_t WIDTH>
 bool
-xpcc::LUDecomposition::LUSubDecomposition<T, OFFSET, WIDTH, OFFSET>::decomposeRecur(T *u, T *l)
+xpcc::LUDecomposition::LUSubDecomposition<T, OFFSET, WIDTH, OFFSET>::decomposeRecur(T * /* u */, T * /* l */)
 {
 	return true;
 }
@@ -329,8 +329,8 @@ xpcc::LUDecomposition::LUSubDecomposition<T, OFFSET, WIDTH, OFFSET>::decomposeRe
 template<typename T, uint8_t OFFSET, uint8_t WIDTH> template<uint8_t BXWIDTH>
 bool
 xpcc::LUDecomposition::LUSubDecomposition<T, OFFSET, WIDTH, OFFSET>::solveUxEqualsY(
-		xpcc::Matrix<T, WIDTH, OFFSET> *u,
-		xpcc::Matrix<T, BXWIDTH, OFFSET> *bx)
+		xpcc::Matrix<T, WIDTH, OFFSET> * /* u */,
+		xpcc::Matrix<T, BXWIDTH, OFFSET> * /* bx */)
 {
 	return true;
 }
@@ -339,8 +339,8 @@ xpcc::LUDecomposition::LUSubDecomposition<T, OFFSET, WIDTH, OFFSET>::solveUxEqua
 template<typename T, uint8_t OFFSET, uint8_t WIDTH> template<uint8_t BXWIDTH>
 bool
 xpcc::LUDecomposition::LUSubDecomposition<T, OFFSET, WIDTH, OFFSET>::solveLyEqualsB(
-		xpcc::Matrix<T, WIDTH, OFFSET> *l,
-		xpcc::Matrix<T, BXWIDTH, OFFSET> *bx)
+		xpcc::Matrix<T, WIDTH, OFFSET> * /* l */,
+		xpcc::Matrix<T, BXWIDTH, OFFSET> * /* bx */)
 {	
 	return true;
 }

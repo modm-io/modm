@@ -36,7 +36,7 @@
 namespace xpcc
 {
 	/**
-	 * \see		Ds1631
+	 * \see		DS1631
 	 * \ingroup	temperature
 	 */
 	namespace ds1631
@@ -58,16 +58,15 @@ namespace xpcc
 	 * \ingroup	temperature
 	 * \author	Fabian Greif
 	 */
-	template <typename I2C>
+	template < typename I2cMaster >
 	class Ds1631
 	{
 	public:
 		/**
-		 * \brief	Constructor
-		 * 
-		 * \param	address		Default address is 0x90.
+		 * \param	data		pointer to a 2 uint8_t buffer
+		 * \param	address		Default address is 0x90
 		 */
-		Ds1631(uint8_t address);
+		Ds1631(uint8_t* data, uint8_t address=0x90);
 		
 		/**
 		 * \brief	Configure DS1631
@@ -84,14 +83,9 @@ namespace xpcc
 		 * \param resolution		Conversion result resolution
 		 * \param continuousMode	Enable the continuous mode
 		 */
-		void
-		configure(ds1631::Resolution resolution, bool continuousMode);
-		
-		/**
-		 * \brief	Perform a software reset
-		 */
-		void
-		reset();
+		bool
+		configure(ds1631::Resolution resolution=ds1631::RESOLUTION_12BIT,
+				  bool continuousMode=true);
 		
 		/**
 		 * \brief	Initiates temperature conversions
@@ -101,21 +95,35 @@ namespace xpcc
 		 * conversions are performed until a Stop Convert command is
 		 * issued.
 		 */
-		void
+		bool
 		startConversion();
 		
-		/**
-		 * \brief	Stops temperature conversions when the device is in
-		 * 			continuous conversion mode.
-		 */
-		void
-		stopConversion();
+		bool
+		setContinousMode(bool enable=true);
 		
 		/**
-		 * \brief	Check if the conversion is done
+		 * read the Temperature registers and buffer the results
+		 * sets isNewDataAvailable() to \c true
 		 */
 		bool
-		isConversionDone();
+		readTemperature();
+		
+		/**
+		 * \c true, when new data has been read from the sensor and is buffered,
+		 * \c false, when the data has been accessed
+		 */
+		bool
+		isNewDataAvailable();
+		
+		/// \return pointer to 8bit array containing raw temperature
+		uint8_t*
+		getData();
+		
+		/**
+		 * \brief	Perform a software reset
+		 */
+		bool
+		reset();
 		
 		/**
 		 * \return	Temperature in degree
@@ -123,19 +131,21 @@ namespace xpcc
 		 * Output format is Q7.8
 		 */
 		int16_t
-		readTemperature();
-
-		/**
-		 * \brief	Check if the device is accessable
-		 *
-		 * \return	\c true the device responds to its address,
-		 * 			\c false otherwise, i.a. if bus was not free, statrcondition failed or device did not responded.
-		 */
-		bool
-		isAvailable() const;
+		getTemperature();
+		
 	private:
-		const uint8_t deviceAddress;
-		typedef xpcc::i2c::SyncMaster<I2C> MySyncI2C;
+		xpcc::i2c::WriteReadAdapter adapter;
+		
+		enum Status {
+			START_CONVERSION_PENDING = 0x01,
+			READ_TEMPERATURE_PENDING = 0x02,
+			READ_TEMPERATURE_STARTED = 0x04,
+			NEW_TEMPERATURE_DATA = 0x08,
+		};
+		
+		uint8_t status;
+		uint8_t* data;
+		uint8_t buffer[2];
 	};
 }
 

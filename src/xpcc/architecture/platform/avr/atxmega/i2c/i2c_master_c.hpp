@@ -33,74 +33,87 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_STM32__I2C_3_HPP
-#define XPCC_STM32__I2C_3_HPP
+#ifndef XPCC_ATXMEGA__I2C_MASTER_C_HPP
+#define XPCC_ATXMEGA__I2C_MASTER_C_HPP
 
 #include <stdint.h>
 #include <xpcc/driver/connectivity/i2c/master.hpp>
 
-#include "../device.h"
+#if defined(TWIC) || defined(__DOXYGEN__)
 
 namespace xpcc
 {
-	namespace stm32
+	namespace atxmega
 	{
 		/**
-		 * @brief		I2C3 Module.
+		 * \brief	Asynchronous I2C master module for Port C
+		 *
+		 * Interrupts must be enabled.
 		 * 
-		 * @author		Georgi
-		 * @ingroup		stm32
+		 * \author Niklas Hauser
+		 * \ingroup	atxmega_i2c
+		 * \ingroup	i2c
 		 */
-		class I2c3 : ::xpcc::i2c::Master
+		class I2cMasterC : ::xpcc::i2c::Master
 		{
 		public:
-			enum Mapping
+			enum ErrorState
 			{
-#if defined(STM32F2XX) || defined(STM32F4XX)
-				REMAP_PA8_PC9,		///< SCL mapped to PA8, SDA mapped to PC9
-				REMAP_PH7_PH8,		///< SCL mapped to PH7, SDA mapped to PH8
-#else
-				
-#endif
+				NO_ERROR,			//!< No Error ocurred
+				DATA_NACK,			//!< Data was transmitted and NACK received
+				ARBITRATION_LOST,	//!< Arbitration was lost during writing or reading
+				BUS_ERROR,			//!< Misplaced Start or Stop condition
+				UNKNOWN_ERROR		//!< Unknown error condition
 			};
 			
-			/**
-			 * Configure the IO Pins for I2C3
-			 */
 			static void
-			configurePins(Mapping mapping);
+			initialize(uint8_t baud, bool pullUpResistors=false);
 			
-			/**
-			 * @brief	Initialize I2C module
-			 * \param ccrPrescaler: I2CFrequency = STM32_APB1_FREQUENCY / (2 * ccrPrescaler)
-			 */
 			static void
-			initialize(uint16_t ccrPrescaler);
+			reset(bool error=false);
 			
 		public:
+			/**
+			 * You initialize an I2C transaction calling this method. Passed
+			 * delegate will be attached to this module and has to manage
+			 * the transaction until it is detached by calling stop.
+			 * \return true if module is free and module is attached, false
+			 * if module was busy. Be aware, that the delagete may get attached
+			 * and detached before this method returns. In this case
+			 * true is returned. That means each interconnection between
+			 * passed delegate and the caller of this method must be
+			 * performed before call.
+			 * 
+			 * \code
+			 * ... initialization of delegate
+			 * if (xpcc::stm32::I2cC::start(&delegate)){
+			 *  // wait until delegate is finished
+			 *  // don't interconnect with the delegate, only while a call to 
+			 *  // one of it's methods
+			 *  // after delegates' stop method has been called it is detached
+			 *  // from module
+			 * }
+			 * else{
+			 *  // delegate has not been attached because module was busy
+			 * }
+			 * 
+			 * \endcode
+			 */
 			static bool
-			start(uint8_t slaveAddress);
-
-			static void
-			restart(uint8_t slaveAddress);
-
-			static void
-			stop();
-
-			static void
-			read(uint8_t *data, std::size_t size, xpcc::i2c::ReadParameter param = xpcc::i2c::READ_STOP);
-
-			static void
-			write(const uint8_t *data, std::size_t size);
+			start(xpcc::i2c::Delegate *delegate);
 			
-		public:
-			static xpcc::i2c::BusyState
-			getBusyState();
-
-			static xpcc::i2c::BusState
-			getBusState();
+			static bool
+			startSync(xpcc::i2c::Delegate *delegate);
+			
+			/**
+			 * This method returns the actual error state if it is called
+			 * from the delegates stop method.
+			 */
+			static uint8_t
+			getErrorState();
 		};
 	}
 }
 
-#endif // XPCC_STM32__I2C_3_HPP
+#endif	// TWIC
+#endif	// XPCC_ATXMEGA__I2C_MASTER_C_HPP

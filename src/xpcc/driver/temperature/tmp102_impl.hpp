@@ -29,45 +29,50 @@
 // ----------------------------------------------------------------------------
 
 #ifndef XPCC__TMP102_HPP
-	#error  "Don't include this file directly, use 'tmp102.hpp' instead!"
+#	error  "Don't include this file directly, use 'tmp102.hpp' instead!"
 #endif
 
 // ----------------------------------------------------------------------------
-template < typename I2C >
-xpcc::Tmp102<I2C>::Tmp102(uint8_t address) :
-	i2c::Device<I2C>(address)
+template < typename I2cMaster >
+xpcc::Tmp102<I2cMaster>::Tmp102(uint8_t* data, uint8_t address)
+:	running(0), status(0), config(0), data(data)
 {
+	adapter.initialize(address << 1, buffer, 0, data, 0);
 }
 
-template < typename I2C >
-void
-xpcc::Tmp102<I2C>::configure(uint8_t msb, uint8_t lsb)
+template < typename I2cMaster >
+bool
+xpcc::Tmp102<I2cMaster>::configure(tmp102::Config2 lsb, tmp102::Config1 msb)
 {
 	config = msb;
-	writeRegister(REGISTER_CONFIGURATION, msb, lsb);
+	buffer[0] = tmp102::REGISTER_CONFIGURATION;
+	buffer[1] = msb;
+	buffer[2] = lsb;
+	adapter.initialize(buffer, 3, data, 0);
+	
+	return I2cMaster::startSync(&adapter);
 }
 
-template < typename I2C >
+template < typename I2cMaster >
 void
-xpcc::Tmp102<I2C>::startConversion()
+xpcc::Tmp102<I2cMaster>::startConversion()
 {
-	uint8_t buffer[2] = {REGISTER_CONFIGURATION, config & CONFIGURATION_ONE_SHOT_bm};
-	this->i2c.write(this->deviceAddress, &buffer[0], 2);
+	status |= START_CONVERSION_PENDING;
 }
 
-template < typename I2C >
+template < typename I2cMaster >
 void
-xpcc::Tmp102<I2C>::readTemperature()
+xpcc::Tmp102<I2cMaster>::readTemperature()
 {
-	readRegister(REGISTER_TEMPERATURE, &data[0]);
+	status |= READ_TEMPERATURE_PENDING;
 }
 
-template < typename I2C >
+template < typename I2cMaster >
 float
-xpcc::Tmp102<I2C>::getTemperature()
+xpcc::Tmp102<I2cMaster>::getTemperature()
 {
 	int16_t temp = static_cast<int16_t>((data[0]<<8)|data[1]);
-	if (data[1] & TEMPERATURE_EXTENDED_MODE_bm) {
+	if (data[1] & tmp102::TEMPERATURE_EXTENDED_MODE) {
 		return (temp>>3)/16.f;
 	}
 	else {
@@ -75,34 +80,64 @@ xpcc::Tmp102<I2C>::getTemperature()
 	}
 }
 
-template < typename I2C >
+template < typename I2cMaster >
+bool
+xpcc::Tmp102<I2cMaster>::isNewDataAvailable()
+{
+	return status & NEW_TEMPERATURE_DATA;
+}
+
+template < typename I2cMaster >
 uint8_t*
-xpcc::Tmp102<I2C>::getData()
+xpcc::Tmp102<I2cMaster>::getData()
 {
-	return &data[0];
+	status &= ~NEW_TEMPERATURE_DATA;
+	return data;
 }
 
-// ----------------------------------------------------------------------------
-template < typename I2C >
+template < typename I2cMaster >
 void
-xpcc::Tmp102<I2C>::writeRegister(Register reg, uint8_t msb, uint8_t lsb)
+xpcc::Tmp102<I2cMaster>::update()
 {
-	uint8_t buffer[3] = {reg, msb, lsb};
-	this->i2c.write(this->deviceAddress, &buffer[0], 3);
-	
-	while (this->i2c.isBusy())
-		;
-}
-
-template < typename I2C >
-void
-xpcc::Tmp102<I2C>::readRegister(Register reg, uint8_t *buffer)
-{
-	buffer[0] = reg;
-	this->i2c.writeRead(this->deviceAddress, &buffer[0], 1, 2);
-	
-	while (this->i2c.isBusy())
-		;
+	if (running != NOTHING_RUNNING)
+	{
+		switch (adapter.getState())
+		{
+			case xpcc::i2c::adapter::NO_ERROR:
+				if (running == READ_TEMPERATURE_RUNNING) {
+					status |= NEW_TEMPERATURE_DATA;
+				}
+				
+			case xpcc::i2c::adapter::ERROR:
+				running = NOTHING_RUNNING;
+				
+			default:
+				break;
+		}
+	}
+	else  {
+		if (status & START_CONVERSION_PENDING)
+		{
+			buffer[0] = tmp102::REGISTER_CONFIGURATION;
+			buffer[1] = config & tmp102::CONFIGURATION_ONE_SHOT;
+			adapter.initialize(buffer, 2, data, 0);
+			
+			if (I2cMaster::start(&adapter)) {
+				status &= ~START_CONVERSION_PENDING;
+				running = START_CONVERSION_RUNNING;
+			}
+		}
+		else if (status & READ_TEMPERATURE_PENDING)
+		{
+			buffer[0] = tmp102::REGISTER_TEMPERATURE;
+			adapter.initialize(buffer, 1, data, 2);
+			
+			if (I2cMaster::start(&adapter)) {
+				status &= ~READ_TEMPERATURE_PENDING;
+				running = READ_TEMPERATURE_RUNNING;
+			}
+		}
+	}
 }
 
 

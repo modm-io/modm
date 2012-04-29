@@ -25,103 +25,22 @@
  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * $$
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_I2C__SYNC_MASTER_HPP
-	#error	"Don't include this file directly, use 'sync_master.hpp' instead!"
-#endif
+#include <unittest/testsuite.hpp>
 
-template <typename M>
-xpcc::i2c::BusyState
-xpcc::i2c::SyncMaster<M>::wait()
+class WriteTest : public unittest::TestSuite
 {
-	while (true)
-	{
-		BusyState b = M::getBusyState();
-		if (b != xpcc::i2c::BUSY) {
-			return b;
-		}
-	}
-}
-
-template <typename M>
-bool
-xpcc::i2c::SyncMaster<M>::start(uint8_t slaveAddress, BusState *busState)
-{
-	if (M::start(slaveAddress))
-	{
-		wait();
-		*busState = M::getBusState();
-		return true;
-	}
-	else {
-		return false;
-	}
-}
-
-template <typename M>
-bool
-xpcc::i2c::SyncMaster<M>::startCheck(uint8_t slaveAddress)
-{
-	BusState busState;
-	if (start(slaveAddress, &busState))
-	{
-		if (busState != xpcc::i2c::BUS_RESET)
-		{
-			return true;
-		}
-		else{
-			M::stop();
-			wait();
-		}
-	}
-	return false;
-}
-
-template <typename M>
-void
-xpcc::i2c::SyncMaster<M>::stop()
-{
-	M::stop();
-	wait();
-}
-
-template <typename M>
-xpcc::i2c::BusState
-xpcc::i2c::SyncMaster<M>::read(uint8_t *data, std::size_t size, ReadParameter param, SyncParams syncParams)
-{
-	M::read(data, size, param);
-	wait();
+public:
+	virtual void
+	setUp();
 	
-	xpcc::i2c::BusState b = M::getBusState();
-	if (param == xpcc::i2c::READ_STOP && syncParams == SYNC_STOP) {
-		M::stop();
-		wait();
-	}
-	return b;
-}
+	void
+	testWrite();
 
-template <typename M>
-xpcc::i2c::BusState
-xpcc::i2c::SyncMaster<M>::write(const uint8_t *data, std::size_t size, SyncParams syncParams)
-{
-	M::write(data, size);
-	wait();
-	
-	xpcc::i2c::BusState b = M::getBusState();
-	if (syncParams == SYNC_STOP) {
-		M::stop();
-		wait();
-	}
-	return b;
-}
-
-template <typename M>
-xpcc::i2c::BusState
-xpcc::i2c::SyncMaster<M>::restart(uint8_t slaveAddress)
-{
-	M::restart(slaveAddress);
-	wait();
-	return M::getBusState();
-}
+	void
+	testWriteFail();
+};

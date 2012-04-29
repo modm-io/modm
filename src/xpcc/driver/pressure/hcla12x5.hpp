@@ -28,6 +28,73 @@
  */
 // ----------------------------------------------------------------------------
 
-#include "pwm/tlc594x.hpp"
-#include "pwm/max6966.hpp"
+#ifndef XPCC_HCLA12X5_HPP
+#define XPCC_HCLA12X5_HPP
 
+#include <xpcc/driver/connectivity/i2c/read_adapter.hpp>
+
+namespace xpcc
+{
+	/**
+	 * \brief	Driver for the HCLA12X5 differential pressure sensor.
+	 * \ingroup sensors
+	 * \tparam	I2cMaster	I2C interface
+	 * \author	Niklas Hauser
+	 */
+	template < typename I2cMaster >
+	class Hcla12x5
+	{
+	public:
+		/**
+		 * \brief	Constructor
+		 * \param	data		pointer to a 2 uint8_t buffer
+		 * \param	address		Default address is 0x78.
+		 * \bug The address of the sensor is by factory default set to 0x78.
+		 *      This means you cannot use two HCLA sensors on the same bus!
+		 *      You have to use a MUX or two seperate TWI busses.
+		 */
+		Hcla12x5(uint8_t *data, uint8_t address=0x78)
+		:	data(data), newData(false);
+		{
+			reader.initialize(address << 1, data, 2);
+		}
+		
+		/**
+		 * read the pressure registers and buffer the results
+		 * sets isNewDataAvailable() to \c true
+		 */
+		inline bool
+		readPressure()
+		{
+			if (I2cMaster::start(&reader)) {
+				newData = true;
+				return true;
+			}
+			return false;
+		}
+		
+		/**
+		 * \c true, when new data has been read from the sensor
+		 */
+		inline bool
+		isNewDataAvailable()
+		{
+			return (newData && reader.getState() == xpcc::i2c::ReadAdapter::NO_ERROR)
+		}
+		
+		/// \return pointer to 8bit array containing pressure
+		inline uint8_t *
+		getData()
+		{
+			newData = false;
+			return data;
+		}
+		
+	private:
+		xpcc::i2c::ReadAdapter reader;
+		uint8_t *data;
+		bool newData;
+	};
+}
+
+#endif // XPCC_HCLA12X5_HPP

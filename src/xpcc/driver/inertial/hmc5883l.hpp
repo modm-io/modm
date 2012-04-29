@@ -35,13 +35,41 @@
 
 namespace xpcc
 {
+	namespace hmc5883l
+	{
+		using namespace hmc58;
+		
+		/// device specific data output rate options of REGISTER_CONFIG_A
+		enum DataOutputRate {
+			DATA_OUTPUT_RATE_0_75Hz = 0x00,
+			DATA_OUTPUT_RATE_1_5Hz = 0x04,
+			DATA_OUTPUT_RATE_3Hz = 0x08,
+			DATA_OUTPUT_RATE_7_5Hz = 0x0c,
+			DATA_OUTPUT_RATE_15Hz = 0x10,
+			DATA_OUTPUT_RATE_30Hz = 0x14,
+			DATA_OUTPUT_RATE_75Hz = 0x18
+		};
+		
+		/// device specific data gain options of REGISTER_CONFIG_B
+		enum Gain {
+			GAIN_0_88,
+			GAIN_1_3,
+			GAIN_1_9,
+			GAIN_2_5,
+			GAIN_4_0,
+			GAIN_4_7,
+			GAIN_5_6,
+			GAIN_8_1
+		};
+	}
+	
 	/**
 	 * \brief	Driver for the HMC5883L digital compass.
 	 *
 	 * This class extends the HMC58* family driver only by the addition of
 	 * device specific Register bit masks.
 	 *
-	 * \see Hmc58
+	 * \see HMC58
 	 *
 	 * For further information on this device consult the
 	 * <a href="http://www.insed.de/HMC5883L.pdf">
@@ -50,38 +78,15 @@ namespace xpcc
 	 * \ingroup inertial
 	 * \author	Niklas Hauser
 	 *
-	 * \tparam I2C Asynchronous Two Wire interface
+	 * \tparam I2cMaster Asynchronous Two Wire interface
 	 */
-	template < typename I2C >
-	class Hmc5883l : public Hmc58< I2C >
+	template < typename I2cMaster >
+	class Hmc5883l : public Hmc58< I2cMaster >
 	{
 	public:
-		/// device specific data output rate options of REGISTER_CONFIG_A
-		enum DataOutputRate {
-			DATA_OUTPUT_RATE_0_75_gc = 0x00,
-			DATA_OUTPUT_RATE_1_5_gc = 0x04,
-			DATA_OUTPUT_RATE_3_gc = 0x08,
-			DATA_OUTPUT_RATE_7_5_gc = 0x0c,
-			DATA_OUTPUT_RATE_15_gc = 0x10,
-			DATA_OUTPUT_RATE_30_gc = 0x14,
-			DATA_OUTPUT_RATE_75_gc = 0x18
-		};
-		
-		/// device specific data gain options of REGISTER_CONFIG_B
-		enum Gain {
-			GAIN_0_88_gc,
-			GAIN_1_3_gc,
-			GAIN_1_9_gc,
-			GAIN_2_5_gc,
-			GAIN_4_0_gc,
-			GAIN_4_7_gc,
-			GAIN_5_6_gc,
-			GAIN_8_1_gc
-		};
-		
 		/// \brief	Constructor, sets address to default of 0x1e
-		Hmc5883l() :
-			Hmc58<I2C>(0x1e)
+		Hmc5883l(uint8_t* data, uint8_t address=0x1e)
+		:	Hmc58<I2cMaster>(data, address)
 		{
 		}
 	};
