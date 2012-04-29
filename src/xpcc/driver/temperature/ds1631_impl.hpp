@@ -34,15 +34,15 @@
 
 // ----------------------------------------------------------------------------
 template <typename I2cMaster>
-xpcc::Ds1631<I2cMaster>::Ds1631(uint8_t deviceAddress)
-:	status(0), config(0), data(data)
+xpcc::Ds1631<I2cMaster>::Ds1631(uint8_t* data, uint8_t address)
+:	status(0), data(data)
 {
 	adapter.initialize(address << 1, buffer, 0, data, 0);
 }
 
 // ----------------------------------------------------------------------------
 template <typename I2cMaster>
-void
+bool
 xpcc::Ds1631<I2cMaster>::configure(ds1631::Resolution resolution, bool continuousMode)
 {
 	buffer[0] = 0xac;
@@ -56,10 +56,30 @@ template <typename I2cMaster>
 void
 xpcc::Ds1631<I2cMaster>::reset()
 {
-	buffer[0] = 0x54;
-	adapter.initialize(buffer, 1, data, 0);
-	
-	return I2cMaster::start(&adapter);
+	status |= RESET_PENDING;
+}
+
+template < typename I2cMaster >
+bool
+xpcc::Ds1631<I2cMaster>::isNewDataAvailable()
+{
+	return status & NEW_TEMPERATURE_DATA;
+}
+
+template < typename I2cMaster >
+int16_t
+xpcc::Ds1631<I2cMaster>::getTemperature()
+{
+	int16_t temp = data[0] | (data[1] << 8);
+	return temp;
+}
+
+template < typename I2cMaster >
+uint8_t*
+xpcc::Ds1631<I2cMaster>::getData()
+{
+	status &= ~NEW_TEMPERATURE_DATA;
+	return data;
 }
 
 // ----------------------------------------------------------------------------
@@ -67,42 +87,98 @@ template <typename I2cMaster>
 void
 xpcc::Ds1631<I2cMaster>::startConversion()
 {
-	buffer[0] = 0x51;
-	adapter.initialize(buffer, 1, data, 0);
-	
-	return I2cMaster::start(&adapter);
+	status |= START_CONVERSION_PENDING;
 }
 
 template <typename I2cMaster>
 void
 xpcc::Ds1631<I2cMaster>::stopConversion()
 {
-	buffer[0] = 0x22;
-	adapter.initialize(buffer, 1, data, 0);
-	
-	return I2cMaster::start(&adapter);
+	status |= STOP_CONVERSION_PENDING;
 }
 
 template <typename I2cMaster>
 bool
 xpcc::Ds1631<I2cMaster>::isConversionDone()
 {
-	buffer[0] = 0xac;
-	adapter.initialize(buffer, 1, buffer, 1);
+	if (running == NOTHING_RUNNING)
+	{
+		buffer[0] = 0xac;
+		adapter.initialize(buffer, 1, buffer, 1);
 
-	if (I2cMaster::startSync(&adapter))
-		return (buffer[0] & 0x80);
-	
+		if (I2cMaster::startSync(&adapter))
+			return (buffer[0] & 0x80);
+	}
 	return false;
 }
 
-// ----------------------------------------------------------------------------
 template <typename I2cMaster>
-int16_t
+void
 xpcc::Ds1631<I2cMaster>::readTemperature()
 {
-	buffer[0] = 0xaa;
-	adapter.initialize(buffer, 1, data, 2);
-	
-	return I2cMaster::start(&adapter);
+	status |= READ_TEMPERATURE_PENDING;
+}
+
+template < typename I2cMaster >
+void
+xpcc::Ds1631<I2cMaster>::update()
+{
+	if (running != NOTHING_RUNNING)
+	{
+		switch (adapter.getState())
+		{
+			case xpcc::i2c::adapter::NO_ERROR:
+				if (running == READ_TEMPERATURE_RUNNING) {
+					status |= NEW_TEMPERATURE_DATA;
+				}
+				
+			case xpcc::i2c::adapter::ERROR:
+				running = NOTHING_RUNNING;
+				
+			default:
+				break;
+		}
+	}
+	else  {
+		if (status & RESET_PENDING)
+		{
+			buffer[0] = 0x54;
+			adapter.initialize(buffer, 1, data, 0);
+			
+			if (I2cMaster::start(&adapter)) {
+				status &= ~RESET_PENDING;
+				running = RESET_RUNNING;
+			}
+		}
+		else if (status & STOP_CONVERSION_PENDING)
+		{
+			buffer[0] = 0x22;
+			adapter.initialize(buffer, 1, data, 0);
+			
+			if (I2cMaster::start(&adapter)) {
+				status &= ~STOP_CONVERSION_PENDING;
+				running = STOP_CONVERSION_RUNNING;
+			}
+		}
+		else if (status & START_CONVERSION_PENDING)
+		{
+			buffer[0] = 0x51;
+			adapter.initialize(buffer, 1, data, 0);
+			
+			if (I2cMaster::start(&adapter)) {
+				status &= ~START_CONVERSION_PENDING;
+				running = START_CONVERSION_RUNNING;
+			}
+		}
+		else if (status & READ_TEMPERATURE_PENDING)
+		{
+			buffer[0] = 0xaa;
+			adapter.initialize(buffer, 1, data, 2);
+			
+			if (I2cMaster::start(&adapter)) {
+				status &= ~READ_TEMPERATURE_PENDING;
+				running = READ_TEMPERATURE_RUNNING;
+			}
+		}
+	}
 }

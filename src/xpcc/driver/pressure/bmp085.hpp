@@ -185,7 +185,7 @@ namespace xpcc
 		};
 		
 		bmp085::Mode config;
-		uint8_t running;
+		Running running;
 		uint8_t status;
 		uint8_t calculation;
 		uint8_t* data;

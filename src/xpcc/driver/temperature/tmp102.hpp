@@ -165,7 +165,7 @@ namespace xpcc
 			NEW_TEMPERATURE_DATA = 0x04,
 		};
 		
-		uint8_t running;
+		Running running;
 		uint8_t status;
 		uint8_t config;
 		uint8_t* data;

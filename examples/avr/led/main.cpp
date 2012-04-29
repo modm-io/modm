@@ -2,7 +2,8 @@
 #include <xpcc/architecture/platform.hpp>
 
 // LED FADER ##################################################################
-#include <xpcc/driver/pwm.hpp>
+#include <xpcc/driver/pwm/tlc594x.hpp>
+#include <xpcc/driver/pwm/max6966.hpp>
 GPIO__OUTPUT(VPROG, D, 4);
 GPIO__INPUT(XERR, D, 1);
 GPIO__OUTPUT(BLANK, D, 3);

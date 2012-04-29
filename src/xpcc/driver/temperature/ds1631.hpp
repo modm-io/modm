@@ -31,7 +31,7 @@
 #ifndef XPCC__DS1631_HPP
 #define XPCC__DS1631_HPP
 
-#include <xpcc/driver/connectivity/i2c/sync_master.hpp>
+#include <xpcc/driver/connectivity/i2c/write_read_adapter.hpp>
 
 namespace xpcc
 {
@@ -95,17 +95,20 @@ namespace xpcc
 		 * conversions are performed until a Stop Convert command is
 		 * issued.
 		 */
-		bool
+		ALWAYS_INLINE void
 		startConversion();
 		
+		ALWAYS_INLINE void
+		stopConversion();
+		
 		bool
-		setContinousMode(bool enable=true);
+		isConversionDone();
 		
 		/**
 		 * read the Temperature registers and buffer the results
 		 * sets isNewDataAvailable() to \c true
 		 */
-		bool
+		ALWAYS_INLINE void
 		readTemperature();
 		
 		/**
@@ -122,8 +125,11 @@ namespace xpcc
 		/**
 		 * \brief	Perform a software reset
 		 */
-		bool
+		ALWAYS_INLINE void
 		reset();
+		
+		void
+		update();
 		
 		/**
 		 * \return	Temperature in degree
@@ -136,13 +142,23 @@ namespace xpcc
 	private:
 		xpcc::i2c::WriteReadAdapter adapter;
 		
-		enum Status {
-			START_CONVERSION_PENDING = 0x01,
-			READ_TEMPERATURE_PENDING = 0x02,
-			READ_TEMPERATURE_STARTED = 0x04,
-			NEW_TEMPERATURE_DATA = 0x08,
+		enum Running {
+			NOTHING_RUNNING,
+			READ_TEMPERATURE_RUNNING,
+			START_CONVERSION_RUNNING,
+			STOP_CONVERSION_RUNNING,
+			RESET_RUNNING,
 		};
 		
+		enum Status {
+			START_CONVERSION_PENDING = 0x01,
+			STOP_CONVERSION_PENDING = 0x02,
+			RESET_PENDING = 0x04,
+			READ_TEMPERATURE_PENDING = 0x08,
+			NEW_TEMPERATURE_DATA = 0x10,
+		};
+		
+		Running running;
 		uint8_t status;
 		uint8_t* data;
 		uint8_t buffer[2];

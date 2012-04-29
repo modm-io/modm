@@ -20,7 +20,7 @@ typedef xpcc::SoftwareI2C<Scl, Sda> I2C;
 #endif
 
 #if defined USE_HARDWARE
-typedef xpcc::atmega::AsynchronousTwiMaster I2C;
+typedef xpcc::atmega::I2cMaster I2C;
 #endif
 
 void
@@ -52,18 +52,8 @@ main()
 	I2C::initialize(65, 0);
 #endif
 	
-	xpcc::Ds1631< I2C > ds1631(0x90);
-	
-	// Check if we can access the DS1631
-	if (ds1631.isAvailable())
-	{
-		output << "DS1631 available" << xpcc::endl;
-	}
-	else
-	{
-		output << "Could not connect to the DS1631" << xpcc::endl;
-		die();
-	}
+	uint8_t data[2];
+	xpcc::Ds1631< I2C > ds1631(data, 0x90);
 
 	// Enable the 12 bit resolution
 	ds1631.configure(xpcc::ds1631::RESOLUTION_12BIT, false);
@@ -76,9 +66,11 @@ main()
 	while (1)
 	{
 		if (ds1631.isConversionDone())
-		{
-			int16_t temperature = ds1631.readTemperature();
+			ds1631.readTemperature();
 
+		if (ds1631.isNewDataAvailable())
+		{
+			int16_t temperature = ds1631.getTemperature();
 			// print the integer part
 			output << (temperature >> 8) << ".";
 
