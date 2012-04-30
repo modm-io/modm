@@ -126,7 +126,7 @@ xpcc::Hmc58<I2cMaster>::update()
 			status &= ~READ_MAGNETOMETER_PENDING;
 			status |= READ_MAGNETOMETER_RUNNING;
 		}
-	};
+	}
 }
 
 // MARK: - private

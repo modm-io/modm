@@ -31,7 +31,7 @@
 #ifndef XPCC__ADXL345_HPP
 #define XPCC__ADXL345_HPP
 
-#include <xpcc/driver/connectivity/i2c/master.hpp>
+#include <xpcc/driver/connectivity/i2c/write_read_adapter.hpp>
 
 namespace xpcc
 {
@@ -174,27 +174,27 @@ namespace xpcc
 	 * \tparam I2cMaster Asynchronous Two Wire interface
 	 */
 	template < typename I2cMaster >
-	class ADXL345 : public xpcc::i2c::Delegate
+	class Adxl345
 	{
 	public:
 		/**
 		 * \brief	Constructor
 		 * \param	address		address is 0x53 with SDO pin low else 0x1d
 		 */
-		ADXL345(uint8_t address=0x1d);
+		Adxl345(uint8_t* data, uint8_t address=0x1d);
 		
 		/**
 		 * Configures the sensor to measurement mode with full resolution with
 		 * the 32-level buffer in Stream Mode and the specified bandwidth.
 		 */
 		bool
-		initialize(adxl345::Bandwidth bandwidth=adxl345::BANDWIDTH_50Hz, bool streamMode=false);
+		initialize(adxl345::Bandwidth bandwidth=adxl345::BANDWIDTH_50Hz, bool streamMode=false, bool enableInterrupt=true);
 		
 		/**
 		 * read the X-ZDATA0-1 registers and buffer the results
 		 * sets isNewDataAvailable() to \c true
 		 */
-		bool
+		void
 		readAccelerometer();
 		
 		/// \return pointer to 8bit array containing xyz accelerations
@@ -218,6 +218,9 @@ namespace xpcc
 		bool
 		isDataReady();
 		
+		void
+		update();
+		
 	private:
 		/**
 		 * writes 8bit data to a register, blocking!
@@ -225,7 +228,7 @@ namespace xpcc
 		 * \param data 8bit data to write
 		 */
 		bool
-		writeRegister(adxl345::Register reg, uint8_t data);
+		writeRegister(adxl345::Register reg, uint8_t value);
 		
 		/**
 		 * reads a 8bit register, blocking!
@@ -235,32 +238,17 @@ namespace xpcc
 		uint8_t
 		readRegister(adxl345::Register reg);
 		
+		xpcc::i2c::WriteReadAdapter adapter;
 		
-		virtual bool
-		attaching();
+		enum Status {
+			READ_ACCELEROMETER_PENDING = 0x01,
+			READ_ACCELEROMETER_RUNNING = 0x02,
+			NEW_ACCELEROMETER_DATA = 0x04,
+		};
 		
-		virtual Starting
-		started();
-		
-		virtual Reading
-		reading();
-		
-		virtual Writing
-		writing();
-		
-		virtual void
-		stopped(DetachCause cause);
-		
-		uint8_t data[6];
+		uint8_t status;
+		uint8_t* data;
 		uint8_t buffer[2];
-		uint8_t* readPointer;
-		uint8_t writeSize;
-		uint8_t readSize;
-		bool isReading;
-		bool isWriteRead;
-		
-		bool newData;
-		uint8_t deviceAddress;
 	};
 	
 }

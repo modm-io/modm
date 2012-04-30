@@ -34,138 +34,99 @@
 
 // ----------------------------------------------------------------------------
 template < typename I2cMaster >
-xpcc::ADXL345<I2cMaster>::ADXL345(uint8_t address)
-:	readPointer(data), isReading(false), isWriteRead(false),
-	newData(false), deviceAddress(address << 1)
+xpcc::Adxl345<I2cMaster>::Adxl345(uint8_t* data, uint8_t address)
+:	status(0), data(data)
 {
+	adapter.initialize(address << 1, buffer, 0, data, 0);
 }
 
 template < typename I2cMaster >
 bool
-xpcc::ADXL345<I2cMaster>::initialize(adxl345::Bandwidth bandwidth, bool streamMode)
+xpcc::Adxl345<I2cMaster>::initialize(adxl345::Bandwidth bandwidth, bool streamMode, bool enableInterrupt)
 {
 	bool ok = writeRegister(adxl345::REGISTER_POWER_CTL, adxl345::POWER_MEASURE);
 	ok &= writeRegister(adxl345::REGISTER_DATA_FORMAT, adxl345::DATAFORMAT_FULL_RES);
 	ok &= writeRegister(adxl345::REGISTER_BW_RATE, bandwidth);
-//	ok &= writeRegister(adxl345::REGISTER_INT_ENABLE, adxl345::INTERRUPT_DATA_READY);
+	if (enableInterrupt) ok &= writeRegister(adxl345::REGISTER_INT_ENABLE, adxl345::INTERRUPT_DATA_READY);
 	if (streamMode) ok &= writeRegister(adxl345::REGISTER_FIFO_CTL, adxl345::FIFO_CTL_MODE_STREAM);
 	return ok;
 }
 
 template < typename I2cMaster >
-bool
-xpcc::ADXL345<I2cMaster>::readAccelerometer()
+void
+xpcc::Adxl345<I2cMaster>::readAccelerometer()
 {
-	buffer[0] = adxl345::REGISTER_DATA_X0;
-	writeSize = 1;
-	readSize = 6;
-	isWriteRead = true;
-	
-	return I2cMaster::start(this);
+	status |= READ_ACCELEROMETER_PENDING;
 }
 
 template < typename I2cMaster >
 bool
-xpcc::ADXL345<I2cMaster>::isDataReady()
+xpcc::Adxl345<I2cMaster>::isDataReady()
 {
 	return readRegister(adxl345::REGISTER_INT_SOURCE) & adxl345::INTERRUPT_DATA_READY;
 }
 
 template < typename I2cMaster >
 bool
-xpcc::ADXL345<I2cMaster>::isNewDataAvailable()
+xpcc::Adxl345<I2cMaster>::isNewDataAvailable()
 {
-	return newData;
+	return status & NEW_ACCELEROMETER_DATA;
 }
 
 template < typename I2cMaster >
 uint8_t*
-xpcc::ADXL345<I2cMaster>::getData()
+xpcc::Adxl345<I2cMaster>::getData()
 {
-	newData = false;
+	status &= ~NEW_ACCELEROMETER_DATA;
 	return data;
+}
+
+template < typename I2cMaster >
+void
+xpcc::Adxl345<I2cMaster>::update()
+{
+	if (status & READ_ACCELEROMETER_RUNNING &&
+		adapter.getState() == xpcc::i2c::adapter::NO_ERROR) {
+		status &= ~READ_ACCELEROMETER_RUNNING;
+		status |= NEW_ACCELEROMETER_DATA;
+	}
+	else if (status & READ_ACCELEROMETER_PENDING) 
+	{
+		buffer[0] = adxl345::REGISTER_DATA_X0;
+		adapter.initialize(buffer, 1, data, 6);
+		
+		if (I2cMaster::start(&adapter)) {
+			status &= ~READ_ACCELEROMETER_PENDING;
+			status |= READ_ACCELEROMETER_RUNNING;
+		}
+	}
 }
 
 // ----------------------------------------------------------------------------
 template < typename I2cMaster >
 bool
-xpcc::ADXL345<I2cMaster>::writeRegister(adxl345::Register reg, uint8_t data)
+xpcc::Adxl345<I2cMaster>::writeRegister(adxl345::Register reg, uint8_t value)
 {
+	while (adapter.getState() == xpcc::i2c::adapter::BUSY)
+		;
 	buffer[0] = reg;
-	buffer[1] = data;
-	writeSize = 2;
-	readSize = 0;
-	isWriteRead = false;
+	buffer[1] = value;
+	adapter.initialize(buffer, 2, data, 0);
 	
-	return I2cMaster::startSync(this);
+	return I2cMaster::startSync(&adapter);
 }
 
 template < typename I2cMaster >
 uint8_t
-xpcc::ADXL345<I2cMaster>::readRegister(adxl345::Register reg)
+xpcc::Adxl345<I2cMaster>::readRegister(adxl345::Register reg)
 {
+	while (adapter.getState() == xpcc::i2c::adapter::BUSY)
+		;
 	buffer[0] = reg;
-	writeSize = 1;
-	readPointer = buffer;
-	readSize = 1;
-	isWriteRead = true;
+	adapter.initialize(buffer, 1, buffer, 1);
 	
-	if (I2cMaster::startSync(this))
-	{
-		return buffer[0];
-	}
-	return 0;
-}
-
-// MARK: delegate
-template < typename I2cMaster >
-bool
-xpcc::ADXL345<I2cMaster>::attaching()
-{
-	return true;
-}
-
-template < typename I2cMaster >
-xpcc::i2c::Delegate::Starting
-xpcc::ADXL345<I2cMaster>::started()
-{
-	Starting s;
-	s.address = deviceAddress;
-	s.next = isReading ? READ_OP : WRITE_OP;
-	isReading = !isReading;
-	return s;
-}
-
-template < typename I2cMaster >
-xpcc::i2c::Delegate::Writing
-xpcc::ADXL345<I2cMaster>::writing()
-{
-	Writing w;
-	w.buffer = buffer;
-	w.size = writeSize;
-	w.next = isWriteRead ? WRITE_RESTART : WRITE_STOP;
-	return w;
-}
-
-template < typename I2cMaster >
-xpcc::i2c::Delegate::Reading
-xpcc::ADXL345<I2cMaster>::reading()
-{
-	Reading r;
-	r.buffer = readPointer;
-	r.size = readSize;
-	r.next = READ_STOP;
-	return r;
-}
-
-template < typename I2cMaster >
-void
-xpcc::ADXL345<I2cMaster>::stopped(DetachCause cause)
-{
-	isReading = false;
-	readPointer = data;
-	
-	if (cause == NORMAL_STOP && readSize == 6)
-		newData = true;
+	while (!I2cMaster::startSync(&adapter))
+		;
+	return buffer[0];
 }
 
