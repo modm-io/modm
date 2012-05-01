@@ -44,6 +44,8 @@ def find_includes(file):
 		match = includeExpression.search(line)
 		if match:
 			filename = match.group(1)
+			if not os.path.isabs(filename):
+				filename = os.path.join(os.path.dirname(os.path.abspath(file)), filename)
 			files.append(filename)
 	return files
 

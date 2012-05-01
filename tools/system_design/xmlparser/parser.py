@@ -85,6 +85,7 @@ class Parser(object):
 		filename	-- xml file to load
 		"""
 		self.rootfile = filename
+		self.include_path = os.path.dirname(os.path.abspath(self.rootfile))
 		self._parse_file(filename)
 		
 	def _parse_file(self, filename):
@@ -121,7 +122,8 @@ class Parser(object):
 		for node in xmltree.findall('include'):
 			include_file = node.text
 			if not os.path.isabs(include_file):
-				include_file = os.path.dirname(os.path.abspath(self.rootfile)) + '/' + include_file
+				include_file = os.path.join(self.include_path, include_file)
+			self.include_path = os.path.dirname(os.path.abspath(include_file))
 			self._parse_file(include_file)
 		
 		self._parse_types(xmltree)
