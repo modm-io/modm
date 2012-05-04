@@ -64,18 +64,30 @@ xpcc::log::Logger xpcc::log::error(loggerDevice);
 #undef	XPCC_LOG_LEVEL
 #define	XPCC_LOG_LEVEL xpcc::log::DEBUG
 
-uint16_t ADC_buffer;
+volatile Adc::Channels new_channel = Adc::PIN_B1;
+volatile uint16_t ADC_buffer[2];
 
 extern "C" void ADC_IRQHandler(void)
 {
-	ADC_buffer = Adc::getValue();
-	Adc::clearInterruptFlag(Adc::END_OF_CONVERSION_REGULAR);
+	ADC_buffer[0] = Adc::getValue();
+	Adc::resetInterruptFlags(Adc::END_OF_CONVERSION_REGULAR);
 }
 
 extern "C" void ADC1_2_IRQHandler(void)
 {
-	ADC_buffer = Adc::getValue();
-	Adc::clearInterruptFlag(Adc::END_OF_CONVERSION_REGULAR);
+	if(new_channel== Adc::PIN_B1)
+	{
+		new_channel = Adc::PIN_B0;
+		ADC_buffer[1] = Adc::getValue();
+	}
+	else
+	{
+		new_channel = Adc::PIN_B1;
+		ADC_buffer[0] = Adc::getValue();
+	}
+
+	Adc::setChannel(new_channel);
+	Adc::resetInterruptFlags(Adc::END_OF_CONVERSION_REGULAR);
 }
 
 using namespace xpcc;
@@ -106,7 +118,7 @@ MAIN_FUNCTION
 
 	while(1)
 	{
-		XPCC_LOG_INFO << xpcc::ascii << "adc=" << ADC_buffer << xpcc::endl; // send the value
+		XPCC_LOG_INFO << xpcc::ascii << "adc0=" << ADC_buffer[0] << " adc1=" << ADC_buffer[1]<< xpcc::endl; // send the value
 	}
 
 	Adc::shutdownAdc();
