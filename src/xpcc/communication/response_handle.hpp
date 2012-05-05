@@ -52,7 +52,7 @@ namespace xpcc
 		{
 		}
 		
-		ResponseHandle(const Header& header) :
+		explicit ResponseHandle(const Header& header) :
 			destination(header.source),
 			packetIdentifier(header.packetIdentifier)
 		{
