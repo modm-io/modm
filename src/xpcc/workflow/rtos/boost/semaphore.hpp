@@ -31,6 +31,10 @@
 #ifndef XPCC_BOOST__SEMAPHORE_HPP
 #define XPCC_BOOST__SEMAPHORE_HPP
 
+#ifndef XPCC_RTOS__SEMAPHORE_HPP
+#	error "Don't include this file directly, use <xpcc/workflow/rtos/semaphore.hpp>"
+#endif
+
 #include <boost/thread/mutex.hpp>    
 #include <boost/thread/condition_variable.hpp>
 

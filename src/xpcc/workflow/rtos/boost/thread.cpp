@@ -28,7 +28,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include "thread.hpp"
+#include "../thread.hpp"
 
 xpcc::rtos::Thread* xpcc::rtos::Thread::head = 0;
 

@@ -28,8 +28,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#include "scheduler.hpp"
-#include "thread.hpp"
+#include "../scheduler.hpp"
+#include "../thread.hpp"
 
 void
 xpcc::rtos::Scheduler::schedule()

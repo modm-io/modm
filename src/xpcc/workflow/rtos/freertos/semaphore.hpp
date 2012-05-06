@@ -31,6 +31,10 @@
 #ifndef XPCC_FREERTOS__SEMAPHORE_HPP
 #define XPCC_FREERTOS__SEMAPHORE_HPP
 
+#ifndef XPCC_RTOS__SEMAPHORE_HPP
+#	error "Don't include this file directly, use <xpcc/workflow/rtos/semaphore.hpp>"
+#endif
+
 #include <freertos/FreeRTOS.h>
 #include <freertos/semphr.h>
 

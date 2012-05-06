@@ -31,6 +31,10 @@
 #ifndef XPCC_FREERTOS__THREAD_HPP
 #define XPCC_FREERTOS__THREAD_HPP
 
+#ifndef XPCC_RTOS__THREAD_HPP
+#	error "Don't include this file directly, use <xpcc/workflow/rtos/thread.hpp>"
+#endif
+
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 

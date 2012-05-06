@@ -31,6 +31,10 @@
 #ifndef XPCC_FREERTOS__QUEUE_HPP
 #define XPCC_FREERTOS__QUEUE_HPP
 
+#ifndef XPCC_RTOS__QUEUE_HPP
+#	error "Don't include this file directly, use <xpcc/workflow/rtos/queue.hpp>"
+#endif
+
 #include <cstddef>
 
 #include <freertos/FreeRTOS.h>

@@ -31,6 +31,10 @@
 #ifndef XPCC_FREERTOS__SCHEDULER_HPP
 #define XPCC_FREERTOS__SCHEDULER_HPP
 
+#ifndef XPCC_RTOS__SCHEDULER_HPP
+#	error "Don't include this file directly, use <xpcc/workflow/rtos/scheduler.hpp>"
+#endif
+
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 

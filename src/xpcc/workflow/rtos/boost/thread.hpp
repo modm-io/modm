@@ -31,6 +31,10 @@
 #ifndef XPCC_BOOST__THREAD_HPP
 #define XPCC_BOOST__THREAD_HPP
 
+#ifndef XPCC_RTOS__THREAD_HPP
+#	error "Don't include this file directly, use <xpcc/workflow/rtos/thread.hpp>"
+#endif
+
 #include <boost/scoped_ptr.hpp>
 #include <boost/thread/thread.hpp>
 

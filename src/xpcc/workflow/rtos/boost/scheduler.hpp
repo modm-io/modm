@@ -31,6 +31,10 @@
 #ifndef XPCC_RTOS_BOOST__SCHEDULER_HPP
 #define XPCC_RTOS_BOOST__SCHEDULER_HPP
 
+#ifndef XPCC_RTOS__SCHEDULER_HPP
+#	error "Don't include this file directly, use <xpcc/workflow/rtos/scheduler.hpp>"
+#endif
+
 #include <boost/thread/thread.hpp>
 
 namespace xpcc
