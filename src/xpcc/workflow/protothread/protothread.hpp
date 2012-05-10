@@ -177,16 +177,16 @@ namespace xpcc
 			 * Used to store a protothread's position (what Dunkels calls a
 			 * "local continuation").
 			 */
-			typedef uint16_t State;
+			typedef uint16_t PtState;
 			
 			/// An invalid line number, used to mark the protothread has ended.
-			static const State Invalid = static_cast<State>(-1);
+			static const PtState Invalid = static_cast<PtState>(-1);
 			
 			/**
 			 * Stores the protothread's position (by storing the line number of
 			 * the last PT_WAIT, which is then switched on at the next Run).
 			 */
-			State ptState;
+			PtState ptState;
 		};
 	}
 }

@@ -75,6 +75,12 @@ namespace xpcc
 		operator = (const Communicator&);
 		
 	public:
+		inline uint8_t
+		getIdentifier() const
+		{
+			return this->ownIdentifier;
+		}
+		
 		void
 		callAction(uint8_t receiver, uint8_t actionIdentifier);
 		
