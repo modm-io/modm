@@ -402,7 +402,10 @@ xpcc::Ad7280a<Spi, Cs, Cnvst, N>::write(uint8_t device, ad7280a::Register reg,
 {
 	// The device address is send with LSB first
 	uint8_t a = bitReverse(device);
-	uint32_t t = (a << (27-3) | reg << 21 | value << 13 | addressAll << 12);
+	uint32_t t = 	(static_cast<uint32_t>(a) << (27L-3) |
+			 static_cast<uint32_t>(reg) << 21L |
+			 static_cast<uint32_t>(value) << 13 |
+			 addressAll << 12);
 	
 	t |= calculateCrc(t >> 11) << 3 | 0x2;
 	
