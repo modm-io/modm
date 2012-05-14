@@ -56,8 +56,8 @@ namespace xpcc
 			/**
 			 * \brief	Create a ramp generator
 			 * 
-			 * \param	increment		Stepwith for positive direction
-			 * \param	decrement		Stepwith for the negative direction.
+			 * \param	increment		Step size for positive direction
+			 * \param	decrement		Step size for the negative direction.
 			 * 							<b>Needs to be positive!</b>
 			 * \param	initialValue	Starting value
 			 * 
