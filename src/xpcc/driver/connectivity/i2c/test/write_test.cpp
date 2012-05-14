@@ -52,7 +52,7 @@ WriteTest::testWrite()
 	TEST_ASSERT_TRUE(writeAdapter.initialize(0,buffer,5));
 	TEST_ASSERT_TRUE(mockMaster.start(&writeAdapter));
 
-	TEST_ASSERT_EQUALS(writeAdapter.getState(), writeAdapter.NO_ERROR);
+	TEST_ASSERT_EQUALS(writeAdapter.getState(), xpcc::i2c::adapter::NO_ERROR);
 }
 
 void
@@ -62,5 +62,5 @@ WriteTest::testWriteFail()
 	TEST_ASSERT_TRUE(writeAdapter.initialize(0,buffer,5));
 	TEST_ASSERT_TRUE(mockMaster.start(&writeAdapter));
 	
-	TEST_ASSERT_EQUALS(writeAdapter.getState(), writeAdapter.ERROR);
+	TEST_ASSERT_EQUALS(writeAdapter.getState(), xpcc::i2c::adapter::ERROR);
 }
