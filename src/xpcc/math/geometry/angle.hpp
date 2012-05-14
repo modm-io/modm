@@ -80,6 +80,15 @@ namespace xpcc
 		static float
 		reverse(float angle);
 		
+		/**
+		 * \brief	Find a perpendicular angle
+		 *
+		 * \param	cw	If cw is true the angle is rotated clockwise.
+		 * 				Ohterwise the angle is rotated anti clockwise.
+		 */
+
+		static float
+		perpendicular(float angle, const bool cw);
 		
 		static inline float
 		toRadian(float angle)

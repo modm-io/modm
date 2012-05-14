@@ -65,3 +65,18 @@ xpcc::Angle::reverse(float angle)
 	
 	return angle;
 }
+
+// ----------------------------------------------------------------------------
+float
+xpcc::Angle::perpendicular(float angle, const bool cw)
+{
+	if (cw)
+	{
+		angle = xpcc::Angle::normalize(angle - M_PI_2);
+	}
+	else {
+		angle = xpcc::Angle::normalize(angle + M_PI_2);
+	}
+
+	return angle;
+}

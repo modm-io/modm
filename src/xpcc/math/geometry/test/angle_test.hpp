@@ -38,4 +38,10 @@ public:
 	
 	void
 	testReverse();
+
+	void
+	testPerpendicularCw();
+
+	void
+	testPerpendicularCcw();
 };
