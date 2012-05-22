@@ -42,7 +42,7 @@ xpcc::Adxl345<I2cMaster>::Adxl345(uint8_t* data, uint8_t address)
 
 template < typename I2cMaster >
 bool
-xpcc::Adxl345<I2cMaster>::initialize(adxl345::Bandwidth bandwidth, bool streamMode, bool enableInterrupt)
+xpcc::Adxl345<I2cMaster>::configure(adxl345::Bandwidth bandwidth, bool streamMode, bool enableInterrupt)
 {
 	bool ok = writeRegister(adxl345::REGISTER_POWER_CTL, adxl345::POWER_MEASURE);
 	ok &= writeRegister(adxl345::REGISTER_DATA_FORMAT, adxl345::DATAFORMAT_FULL_RES);

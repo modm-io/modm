@@ -37,7 +37,7 @@
 // ----------------------------------------------------------------------------
 template < typename I2cMaster >
 xpcc::Bmp085<I2cMaster>::Bmp085(uint8_t* data, uint8_t address)
-:	running(0), status(0), calculation(0), data(data)
+:	running(NOTHING_RUNNING), status(0), calculation(0), data(data)
 {
 	adapter.initialize(address << 1, buffer, 0, data, 0);
 }
@@ -260,7 +260,7 @@ xpcc::Bmp085<I2cMaster>::update()
 			
 			if (I2cMaster::start(&adapter)) {
 				status &= ~START_TEMPERATURE_PENDING;
-				running |= START_TEMPERATURE_RUNNING;
+				running = START_TEMPERATURE_RUNNING;
 			}
 		}
 		else if (status & READ_TEMPERATURE_PENDING)
@@ -270,7 +270,7 @@ xpcc::Bmp085<I2cMaster>::update()
 			
 			if (I2cMaster::start(&adapter)) {
 				status &= ~READ_TEMPERATURE_PENDING;
-				running |= READ_TEMPERATURE_RUNNING;
+				running = READ_TEMPERATURE_RUNNING;
 			}
 		}
 		else if (status & START_PRESSURE_PENDING)
@@ -281,7 +281,7 @@ xpcc::Bmp085<I2cMaster>::update()
 			
 			if (I2cMaster::start(&adapter)) {
 				status &= ~START_PRESSURE_PENDING;
-				running |= START_PRESSURE_RUNNING;
+				running = START_PRESSURE_RUNNING;
 			}
 		}
 		else if (status & READ_PRESSURE_PENDING)
@@ -290,8 +290,8 @@ xpcc::Bmp085<I2cMaster>::update()
 			adapter.initialize(buffer, 1, data+2, 3);
 			
 			if (I2cMaster::start(&adapter)) {
-				running |= READ_PRESSURE_RUNNING;
 				status &= ~READ_PRESSURE_PENDING;
+				running = READ_PRESSURE_RUNNING;
 			}
 		}
 	}

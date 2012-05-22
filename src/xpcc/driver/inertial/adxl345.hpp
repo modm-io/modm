@@ -75,16 +75,16 @@ namespace xpcc
 		/// The bandwidth options of REGISTER_BW_RATE.
 		/// Output frequency = 2 * bandwidth
 		enum Bandwidth {
-			BANDWIDTH_1600Hz = 0x0F,
-			BANDWIDTH_800Hz = 0x0E,
-			BANDWIDTH_400Hz = 0x0D,
-			BANDWIDTH_200Hz = 0x0C,
-			BANDWIDTH_100Hz = 0x0B,
-			BANDWIDTH_50Hz = 0x0A,
-			BANDWIDTH_25Hz = 0x09,
-			BANDWIDTH_12Hz = 0x08,
-			BANDWIDTH_6Hz = 0x07,
-			BANDWIDTH_3Hz = 0x06
+			BANDWIDTH_1600HZ = 0x0F,
+			BANDWIDTH_800HZ = 0x0E,
+			BANDWIDTH_400HZ = 0x0D,
+			BANDWIDTH_200HZ = 0x0C,
+			BANDWIDTH_100HZ = 0x0B,
+			BANDWIDTH_50HZ = 0x0A,
+			BANDWIDTH_25HZ = 0x09,
+			BANDWIDTH_12HZ = 0x08,
+			BANDWIDTH_6HZ = 0x07,
+			BANDWIDTH_3HZ = 0x06
 		};
 		
 		/// The power options of REGISTER_POWER_CTL.
@@ -94,10 +94,10 @@ namespace xpcc
 			POWER_MEASURE = 0x08,
 			POWER_SLEEP = 0x04,
 			POWER_WAKEUP_gm = 0x03,
-			POWER_WAKEUP_1Hz = 0x03,
-			POWER_WAKEUP_2Hz = 0x02,
-			POWER_WAKEUP_4Hz = 0x01,
-			POWER_WAKEUP_8Hz = 0x00,
+			POWER_WAKEUP_1HZ = 0x03,
+			POWER_WAKEUP_2HZ = 0x02,
+			POWER_WAKEUP_4HZ = 0x01,
+			POWER_WAKEUP_8HZ = 0x00,
 			// BW_RATE register
 			POWER_LOW_POWER = 0x10
 		};
@@ -123,10 +123,10 @@ namespace xpcc
 			DATAFORMAT_FULL_RES = 0x08,
 			DATAFORMAT_JUSTIFY = 0x04,
 			DATAFORMAT_RANGE_gm = 0x03,
-			DATAFORMAT_RANGE_16g = 0x03,
-			DATAFORMAT_RANGE_8g = 0x02,
-			DATAFORMAT_RANGE_4g = 0x01,
-			DATAFORMAT_RANGE_2g = 0x00
+			DATAFORMAT_RANGE_16G = 0x03,
+			DATAFORMAT_RANGE_8G = 0x02,
+			DATAFORMAT_RANGE_4G = 0x01,
+			DATAFORMAT_RANGE_2G = 0x00
 		};
 		
 		/// The options of REGISTER_FIFO_CTL and REGISTER_FIFO_STATUS
@@ -188,7 +188,7 @@ namespace xpcc
 		 * the 32-level buffer in Stream Mode and the specified bandwidth.
 		 */
 		bool
-		initialize(adxl345::Bandwidth bandwidth=adxl345::BANDWIDTH_50Hz, bool streamMode=false, bool enableInterrupt=true);
+		configure(adxl345::Bandwidth bandwidth=adxl345::BANDWIDTH_50HZ, bool streamMode=false, bool enableInterrupt=true);
 		
 		/**
 		 * read the X-ZDATA0-1 registers and buffer the results

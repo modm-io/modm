@@ -72,7 +72,7 @@ namespace xpcc
 			 * \param sensorMapping first element of a remap array
 			 */
 			static inline void
-			initialize(uint8_t &sensorMapping);
+			initialize(uint8_t* sensorMapping, uint16_t* sensorData);
 			
 			/**
 			 * Starts the ADC readout routine and buffers the results,
@@ -110,7 +110,7 @@ namespace xpcc
 			
 			static bool newData;
 			static uint8_t* map;
-			static uint16_t data[CHANNELS];
+			static uint16_t *data;
 			static uint16_t numberOfSamples;
 		};
 	}	

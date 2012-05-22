@@ -45,10 +45,36 @@
 
 #include "constants.hpp"
 
+#define AMNB_TIMING_DEBUG 1
+
 namespace xpcc
 {
 	namespace amnb
 	{
+		/**
+		 * This clock should run at 10kHz. It is used to provide the back-off
+		 * timer with finer control over timing, which enabled much higher
+		 * thoughput.
+		 * When using a very high datarate and short message length this clock
+		 * can be run at higher speeds than the recommended 10kHz.
+		 */
+		class Clock
+		{
+		public:
+			static Timestamp
+			now();
+			
+			/// \brief	Set the current time
+			static inline void
+			increment(uint_fast16_t step = 1)
+			{
+				time += step;
+			}
+			
+		protected:
+			static uint_fast16_t time;
+		};
+		
 		/**
 		 * \internal
 		 * \brief	Universal base class for the AMNB interface
@@ -63,19 +89,17 @@ namespace xpcc
 		/**
 		 * \brief	AMNB interface
 		 * 
-		 * \author	Fabian Greif
 		 * \author	Niklas Hauser
 		 *
 		 * \ingroup	amnb
 		 */
-		template <typename Device>
+		template <typename Device, uint8_t PROBABILITY=50, uint8_t TIMEOUT=4>
 		class Interface
 		{
 		public:
 			/**
 			 * \brief	Initialize the interface
 			 * 
-			 * Sets the baudrate for the DEVICE etc.
 			 * \param seed for the random number generator
 			 */
 			static void
@@ -113,38 +137,38 @@ namespace xpcc
 			 * 
 			 * Reset the status with a call of dropMessage().
 			 */
-			static inline bool
+			static ALWAYS_INLINE bool
 			isMessageAvailable();
 			
-			static inline uint8_t
+			static ALWAYS_INLINE uint8_t
 			getTransmittedAddress();
 			
-			static inline uint8_t
+			static ALWAYS_INLINE uint8_t
 			getTransmittedCommand();
 			
-			static inline Flags
+			static ALWAYS_INLINE Flags
 			getTransmittedFlags();
 			
-			static inline uint8_t
+			static ALWAYS_INLINE uint8_t
 			getAddress();
 			
-			static inline uint8_t
+			static ALWAYS_INLINE uint8_t
 			getCommand();
 			
-			static inline bool
+			static ALWAYS_INLINE bool
 			isResponse();
 			
 			/**
 			 * \brief	Check if the message is an ACK or NACK
 			 * \return	\c true if the message is an ACK, \c false on NACK.
 			 */
-			static inline bool
+			static ALWAYS_INLINE bool
 			isAcknowledge();
 			
 			/**
 			 * \return	\c true you are allowed to send right now
 			 */
-			static inline bool
+			static ALWAYS_INLINE bool
 			isBusAvailable();
 			
 			/**
@@ -152,7 +176,7 @@ namespace xpcc
 			 * \return	\c true if the message has been transmitted without
 			 *			collision.
 			 */
-			static inline bool
+			static ALWAYS_INLINE bool
 			messageTransmitted();
 			
 			/**
@@ -161,14 +185,14 @@ namespace xpcc
 			 * Data access is only valid after isMessageAvailable() returns
 			 * \c true and before any call of dropMessage() or update()
 			 */
-			static inline const uint8_t *
+			static ALWAYS_INLINE const uint8_t *
 			getPayload();
 			
 			/**
 			 * \return	Size of the received message. Zero if no message
 			 * 			is available at the moment.
 			 */
-			static inline uint8_t
+			static ALWAYS_INLINE uint8_t
 			getPayloadLength();
 			
 			/**
@@ -185,8 +209,10 @@ namespace xpcc
 			static void
 			update();
 			
+#if AMNB_TIMING_DEBUG
 			static xpcc::Timestamp latency;
 			static uint8_t collisions;
+#endif
 			
 		private:
 			static bool
@@ -213,11 +239,8 @@ namespace xpcc
 			static bool hasMessageToSend;
 			static bool messageSent;
 			static bool transmitting;
-			static xpcc::Timeout<> rescheduleTimer;
+			static xpcc::Timeout<xpcc::amnb::Clock> rescheduleTimer;
 			static uint8_t rescheduleTimeout;
-			// the probability for p-persistent CSMA
-			static const float pValue = 0.5f;
-			static const uint8_t maxTimeOut = 4;
 			
 			static State state;
 		};

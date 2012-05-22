@@ -197,14 +197,14 @@ namespace xpcc
 		/// The options of REGISTER_BW_TCS
 		enum Bandwidth {
 			BW = 0xF0,
-			BW_10Hz = 0x00,
-			BW_20Hz = 0x10,
-			BW_40Hz = 0x20,
-			BW_75Hz = 0x30,
-			BW_150Hz = 0x40,
-			BW_300Hz = 0x50,
-			BW_600Hz = 0x60,
-			BW_1200Hz = 0x70,
+			BW_10HZ = 0x00,
+			BW_20HZ = 0x10,
+			BW_40HZ = 0x20,
+			BW_75HZ = 0x30,
+			BW_150HZ = 0x40,
+			BW_300HZ = 0x50,
+			BW_600HZ = 0x60,
+			BW_1200HZ = 0x70,
 			BW_HP = 0x80,
 			BW_BP = 0x90
 		};
@@ -320,10 +320,10 @@ namespace xpcc
 		enum WakeUpDuration {
 			TCO_Y = (0x3F << 2),
 			WAKE_UP_DURATION = 0x03,
-			WAKE_UP_DURATION_20ms = 0x00,
-			WAKE_UP_DURATION_80ms = 0x01,
-			WAKE_UP_DURATION_320ms = 0x02,
-			WAKE_UP_DURATION_2560ms = 0x03
+			WAKE_UP_DURATION_20MS = 0x00,
+			WAKE_UP_DURATION_80MS = 0x01,
+			WAKE_UP_DURATION_320MS = 0x02,
+			WAKE_UP_DURATION_2560MS = 0x03
 		};
 		/// The options of REGISTER_TCO_Z
 		enum ModeConfig {
@@ -364,13 +364,13 @@ namespace xpcc
 		enum Range {
 			OFFSET_X_LSB = 0xF0,
 			RANGE = (0x07 << 1),
-			RANGE_1g = (0x00 << 1),
-			RANGE_1_5g = (0x01 << 1),
-			RANGE_2g = (0x02 << 1),
-			RANGE_3g = (0x03 << 1),
-			RANGE_4g = (0x04 << 1),
-			RANGE_8g = (0x05 << 1),
-			RANGE_16g = (0x06 << 1),
+			RANGE_1G = (0x00 << 1),
+			RANGE_1_5G = (0x01 << 1),
+			RANGE_2G = (0x02 << 1),
+			RANGE_3G = (0x03 << 1),
+			RANGE_4G = (0x04 << 1),
+			RANGE_8G = (0x05 << 1),
+			RANGE_16G = (0x06 << 1),
 			SAMPLE_SKIPPING = 0x01
 		};
 		/// The options of REGISTER_OFFSET_LSB2
@@ -426,7 +426,7 @@ namespace xpcc
 		 * subsequently an offset correction has to be performed.
 		 */
 		bool
-		initialize(bma180::Range range=bma180::RANGE_3g, bma180::Bandwidth bandwidth=bma180::BW_75Hz, bma180::ModeConfig mode=bma180::MODE_CONFIG_LOW_NOISE, bool interrupt=true);
+		configure(bma180::Range range=bma180::RANGE_3G, bma180::Bandwidth bandwidth=bma180::BW_75HZ, bma180::ModeConfig mode=bma180::MODE_CONFIG_LOW_NOISE, bool interrupt=true);
 		
 		/**
 		 * only read the X-ZDATA0-1 registers and buffer the results

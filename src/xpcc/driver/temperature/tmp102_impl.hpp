@@ -35,7 +35,7 @@
 // ----------------------------------------------------------------------------
 template < typename I2cMaster >
 xpcc::Tmp102<I2cMaster>::Tmp102(uint8_t* data, uint8_t address)
-:	running(0), status(0), config(0), data(data)
+:	running(NOTHING_RUNNING), status(0), config(0), data(data)
 {
 	adapter.initialize(address << 1, buffer, 0, data, 0);
 }

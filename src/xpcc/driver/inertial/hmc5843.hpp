@@ -41,13 +41,13 @@ namespace xpcc
 		
 		/// device specific data output rate options of REGISTER_CONFIG_A
 		enum DataOutputRate {
-			DATA_OUTPUT_RATE_0_5Hz = 0x00,
-			DATA_OUTPUT_RATE_1Hz = 0x04,
-			DATA_OUTPUT_RATE_2Hz = 0x08,
-			DATA_OUTPUT_RATE_5Hz = 0x0c,
-			DATA_OUTPUT_RATE_10Hz = 0x10,
-			DATA_OUTPUT_RATE_20Hz = 0x14,
-			DATA_OUTPUT_RATE_50Hz = 0x18
+			DATA_OUTPUT_RATE_0_5HZ = 0x00,
+			DATA_OUTPUT_RATE_1HZ = 0x04,
+			DATA_OUTPUT_RATE_2HZ = 0x08,
+			DATA_OUTPUT_RATE_5HZ = 0x0c,
+			DATA_OUTPUT_RATE_10HZ = 0x10,
+			DATA_OUTPUT_RATE_20HZ = 0x14,
+			DATA_OUTPUT_RATE_50HZ = 0x18
 		};
 		
 		/// device specific data gain options of REGISTER_CONFIG_B

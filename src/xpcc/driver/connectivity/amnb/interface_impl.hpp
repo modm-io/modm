@@ -34,6 +34,23 @@
 #	error	"Don't include this file directly, use 'interface.hpp' instead!"
 #endif
 
+#include <xpcc/architecture/driver/atomic/lock.hpp>
+
+uint_fast16_t xpcc::amnb::Clock::time = 0;
+
+xpcc::Timestamp
+xpcc::amnb::Clock::now()
+{
+	uint_fast16_t tempTime;
+	{
+		atomic::Lock lock;
+		tempTime = time;
+	}
+	
+	return Timestamp(tempTime);
+}
+
+// ----------------------------------------------------------------------------
 #ifdef __AVR__
 #	include <util/crc16.h>
 #endif
@@ -59,77 +76,77 @@ xpcc::amnb::crcUpdate(uint8_t crc, uint8_t data)
 }
 
 // ----------------------------------------------------------------------------
-template <typename Device> typename xpcc::amnb::Interface<Device>::State \
-	xpcc::amnb::Interface<Device>::state = SYNC;
+template <typename Device, uint8_t PROBABILITY, uint8_t TIMEOUT> typename xpcc::amnb::Interface<Device,PROBABILITY,TIMEOUT>::State \
+	xpcc::amnb::Interface<Device,PROBABILITY,TIMEOUT>::state = SYNC;
 
-template <typename Device> 
-uint8_t xpcc::amnb::Interface<Device>::rx_buffer[maxPayloadLength + 3];
+template <typename Device, uint8_t PROBABILITY, uint8_t TIMEOUT> 
+uint8_t xpcc::amnb::Interface<Device,PROBABILITY,TIMEOUT>::rx_buffer[maxPayloadLength + 3];
 
-template <typename Device> 
-uint8_t xpcc::amnb::Interface<Device>::tx_buffer[maxPayloadLength + 4];
+template <typename Device, uint8_t PROBABILITY, uint8_t TIMEOUT> 
+uint8_t xpcc::amnb::Interface<Device,PROBABILITY,TIMEOUT>::tx_buffer[maxPayloadLength + 4];
 
-template <typename Device>
-uint8_t xpcc::amnb::Interface<Device>::crc;
+template <typename Device, uint8_t PROBABILITY, uint8_t TIMEOUT>
+uint8_t xpcc::amnb::Interface<Device,PROBABILITY,TIMEOUT>::crc;
 
-template <typename Device>
-uint8_t xpcc::amnb::Interface<Device>::position;
+template <typename Device, uint8_t PROBABILITY, uint8_t TIMEOUT>
+uint8_t xpcc::amnb::Interface<Device,PROBABILITY,TIMEOUT>::position;
 
-template <typename Device>
-uint8_t xpcc::amnb::Interface<Device>::length;
+template <typename Device, uint8_t PROBABILITY, uint8_t TIMEOUT>
+uint8_t xpcc::amnb::Interface<Device,PROBABILITY,TIMEOUT>::length;
 
-template <typename Device>
-uint8_t xpcc::amnb::Interface<Device>::lengthOfReceivedMessage = 0;
+template <typename Device, uint8_t PROBABILITY, uint8_t TIMEOUT>
+uint8_t xpcc::amnb::Interface<Device,PROBABILITY,TIMEOUT>::lengthOfReceivedMessage = 0;
 
-template <typename Device>
-uint8_t xpcc::amnb::Interface<Device>::lengthOfTransmitMessage = 0;
+template <typename Device, uint8_t PROBABILITY, uint8_t TIMEOUT>
+uint8_t xpcc::amnb::Interface<Device,PROBABILITY,TIMEOUT>::lengthOfTransmitMessage = 0;
 
-template <typename Device>
-bool xpcc::amnb::Interface<Device>::hasMessageToSend = false;
+template <typename Device, uint8_t PROBABILITY, uint8_t TIMEOUT>
+bool xpcc::amnb::Interface<Device,PROBABILITY,TIMEOUT>::hasMessageToSend = false;
 
-template <typename Device>
-bool xpcc::amnb::Interface<Device>::rescheduleTransmit = false;
+template <typename Device, uint8_t PROBABILITY, uint8_t TIMEOUT>
+bool xpcc::amnb::Interface<Device,PROBABILITY,TIMEOUT>::rescheduleTransmit = false;
 
-template <typename Device>
-bool xpcc::amnb::Interface<Device>::transmitting = false;
+template <typename Device, uint8_t PROBABILITY, uint8_t TIMEOUT>
+bool xpcc::amnb::Interface<Device,PROBABILITY,TIMEOUT>::transmitting = false;
 
-template <typename Device>
-xpcc::Timeout<> xpcc::amnb::Interface<Device>::resetTimer;
+template <typename Device, uint8_t PROBABILITY, uint8_t TIMEOUT>
+xpcc::Timeout<> xpcc::amnb::Interface<Device,PROBABILITY,TIMEOUT>::resetTimer;
 
-template <typename Device>
-xpcc::Timeout<> xpcc::amnb::Interface<Device>::rescheduleTimer;
+template <typename Device, uint8_t PROBABILITY, uint8_t TIMEOUT>
+xpcc::Timeout<xpcc::amnb::Clock> xpcc::amnb::Interface<Device,PROBABILITY,TIMEOUT>::rescheduleTimer;
 
-template <typename Device>
-uint8_t xpcc::amnb::Interface<Device>::rescheduleTimeout;
+template <typename Device, uint8_t PROBABILITY, uint8_t TIMEOUT>
+uint8_t xpcc::amnb::Interface<Device,PROBABILITY,TIMEOUT>::rescheduleTimeout;
 
-template <typename Device>
-bool xpcc::amnb::Interface<Device>::messageSent = false;
+template <typename Device, uint8_t PROBABILITY, uint8_t TIMEOUT>
+bool xpcc::amnb::Interface<Device,PROBABILITY,TIMEOUT>::messageSent = false;
 
-// debug
-template <typename Device>
-xpcc::Timestamp xpcc::amnb::Interface<Device>::latency;
+#if AMNB_TIMING_DEBUG
+template <typename Device, uint8_t PROBABILITY, uint8_t TIMEOUT>
+xpcc::Timestamp xpcc::amnb::Interface<Device,PROBABILITY,TIMEOUT>::latency;
 
-template <typename Device>
-uint8_t xpcc::amnb::Interface<Device>::collisions;
+template <typename Device, uint8_t PROBABILITY, uint8_t TIMEOUT>
+uint8_t xpcc::amnb::Interface<Device,PROBABILITY,TIMEOUT>::collisions;
+#endif
 
 // ----------------------------------------------------------------------------
 
-template <typename Device>
+template <typename Device, uint8_t PROBABILITY, uint8_t TIMEOUT>
 void
-xpcc::amnb::Interface<Device>::initialize(int seed)
+xpcc::amnb::Interface<Device,PROBABILITY,TIMEOUT>::initialize(int seed)
 {
 	srand(seed);
 	rescheduleTimeout = static_cast<uint8_t>(rand());
-	Device::setBaudrate(115200UL);
 	state = SYNC;
 }
 
 // ----------------------------------------------------------------------------
 
-template <typename Device>
+template <typename Device, uint8_t PROBABILITY, uint8_t TIMEOUT>
 bool
-xpcc::amnb::Interface<Device>::writeMessage()
+xpcc::amnb::Interface<Device,PROBABILITY,TIMEOUT>::writeMessage()
 {
-	char check;
+	uint8_t check;
 	transmitting = true;
 	Device::resetErrorFlags();
 	
@@ -147,14 +164,17 @@ xpcc::amnb::Interface<Device>::writeMessage()
 			rescheduleTransmit = true;
 			Device::resetErrorFlags();
 			// and wait for a random amount of time before sending again
-			rescheduleTimer.restart(rescheduleTimeout % maxTimeOut);
-			
+			rescheduleTimer.restart(rescheduleTimeout % TIMEOUT);
+#if AMNB_TIMING_DEBUG
 			++collisions;
+#endif
 			return false;
 		}
 	}
 	
+#if AMNB_TIMING_DEBUG
 	latency = xpcc::Clock::now() - latency;
+#endif
 	
 	messageSent = true;
 	hasMessageToSend = false;
@@ -162,18 +182,22 @@ xpcc::amnb::Interface<Device>::writeMessage()
 	return true;
 }
 
-template <typename Device>
+template <typename Device, uint8_t PROBABILITY, uint8_t TIMEOUT>
 bool
-xpcc::amnb::Interface<Device>::sendMessage(uint8_t address, Flags flags, 
+xpcc::amnb::Interface<Device,PROBABILITY,TIMEOUT>::sendMessage(uint8_t address, Flags flags, 
 		uint8_t command,
 		const void *payload, uint8_t payloadLength)
 {
-	if (transmitting) return false; // dont overwrite the buffer when transmitting
+	 // dont overwrite the buffer when transmitting
+	if (transmitting) return false;
+	
 	hasMessageToSend = false;
 	messageSent = false;
 	uint8_t crc;
-	
-	latency = xpcc::Clock::now(); // debug
+
+#if AMNB_TIMING_DEBUG
+	latency = xpcc::Clock::now();
+#endif
 	
 	tx_buffer[0] = syncByte;
 	tx_buffer[1] = payloadLength;
@@ -186,7 +210,7 @@ xpcc::amnb::Interface<Device>::sendMessage(uint8_t address, Flags flags,
 	
 	const uint8_t *ptr = static_cast<const uint8_t *>(payload);
 	uint_fast8_t i=0;
-	for (i = 0; i < payloadLength; ++i)
+	for (; i < payloadLength; ++i)
 	{
 		crc = crcUpdate(crc, *ptr);
 		tx_buffer[i+4] = *ptr;
@@ -200,9 +224,9 @@ xpcc::amnb::Interface<Device>::sendMessage(uint8_t address, Flags flags,
 	return true;
 }
 
-template <typename Device> template <typename T>
+template <typename Device, uint8_t PROBABILITY, uint8_t TIMEOUT> template <typename T>
 bool
-xpcc::amnb::Interface<Device>::sendMessage(uint8_t address, Flags flags,
+xpcc::amnb::Interface<Device,PROBABILITY,TIMEOUT>::sendMessage(uint8_t address, Flags flags,
 		uint8_t command,
 		const T& payload)
 {
@@ -211,9 +235,9 @@ xpcc::amnb::Interface<Device>::sendMessage(uint8_t address, Flags flags,
 				reinterpret_cast<const void *>(&payload), sizeof(T));
 }
 
-template <typename Device>
+template <typename Device, uint8_t PROBABILITY, uint8_t TIMEOUT>
 bool
-xpcc::amnb::Interface<Device>::sendMessage(uint8_t address, Flags flags, uint8_t command)
+xpcc::amnb::Interface<Device,PROBABILITY,TIMEOUT>::sendMessage(uint8_t address, Flags flags, uint8_t command)
 {
 	return sendMessage(address, flags,
 				command,
@@ -222,102 +246,102 @@ xpcc::amnb::Interface<Device>::sendMessage(uint8_t address, Flags flags, uint8_t
 
 // ----------------------------------------------------------------------------
 
-template <typename Device>
+template <typename Device, uint8_t PROBABILITY, uint8_t TIMEOUT>
 bool
-xpcc::amnb::Interface<Device>::isMessageAvailable()
+xpcc::amnb::Interface<Device,PROBABILITY,TIMEOUT>::isMessageAvailable()
 {
 	return (lengthOfReceivedMessage != 0);
 }
 
-template <typename Device>
+template <typename Device, uint8_t PROBABILITY, uint8_t TIMEOUT>
 uint8_t
-xpcc::amnb::Interface<Device>::getTransmittedAddress()
+xpcc::amnb::Interface<Device,PROBABILITY,TIMEOUT>::getTransmittedAddress()
 {
 	return (tx_buffer[0] & 0x3f);
 }
 
-template <typename Device>
+template <typename Device, uint8_t PROBABILITY, uint8_t TIMEOUT>
 uint8_t
-xpcc::amnb::Interface<Device>::getTransmittedCommand()
+xpcc::amnb::Interface<Device,PROBABILITY,TIMEOUT>::getTransmittedCommand()
 {
 	return tx_buffer[1];
 }
 
-template <typename Device>
+template <typename Device, uint8_t PROBABILITY, uint8_t TIMEOUT>
 xpcc::amnb::Flags
-xpcc::amnb::Interface<Device>::getTransmittedFlags()
+xpcc::amnb::Interface<Device,PROBABILITY,TIMEOUT>::getTransmittedFlags()
 {
 	return static_cast<Flags>(tx_buffer[0] & 0xc0);
 }
 
-template <typename Device>
+template <typename Device, uint8_t PROBABILITY, uint8_t TIMEOUT>
 uint8_t
-xpcc::amnb::Interface<Device>::getAddress()
+xpcc::amnb::Interface<Device,PROBABILITY,TIMEOUT>::getAddress()
 {
 	return (rx_buffer[0] & 0x3f);
 }
 
-template <typename Device>
+template <typename Device, uint8_t PROBABILITY, uint8_t TIMEOUT>
 uint8_t
-xpcc::amnb::Interface<Device>::getCommand()
+xpcc::amnb::Interface<Device,PROBABILITY,TIMEOUT>::getCommand()
 {
 	return rx_buffer[1];
 }
 
-template <typename Device>
+template <typename Device, uint8_t PROBABILITY, uint8_t TIMEOUT>
 bool
-xpcc::amnb::Interface<Device>::isResponse()
+xpcc::amnb::Interface<Device,PROBABILITY,TIMEOUT>::isResponse()
 {
-	return (rx_buffer[0] & 0x80) ? true : false;
+	return (rx_buffer[0] & 0x80);
 }
 
-template <typename Device>
+template <typename Device, uint8_t PROBABILITY, uint8_t TIMEOUT>
 bool
-xpcc::amnb::Interface<Device>::isAcknowledge()
+xpcc::amnb::Interface<Device,PROBABILITY,TIMEOUT>::isAcknowledge()
 {
-	return (rx_buffer[0] & 0x40) ? true : false;
+	return (rx_buffer[0] & 0x40);
 }
 
-template <typename Device>
+template <typename Device, uint8_t PROBABILITY, uint8_t TIMEOUT>
 bool
-xpcc::amnb::Interface<Device>::isBusAvailable()
+xpcc::amnb::Interface<Device,PROBABILITY,TIMEOUT>::isBusAvailable()
 {
 	return (state == SYNC) && !transmitting && !rescheduleTransmit;
 }
 
-template <typename Device>
+template <typename Device, uint8_t PROBABILITY, uint8_t TIMEOUT>
 bool
-xpcc::amnb::Interface<Device>::messageTransmitted()
+xpcc::amnb::Interface<Device,PROBABILITY,TIMEOUT>::messageTransmitted()
 {
 	return messageSent;
 }
 
-template <typename Device>
+template <typename Device, uint8_t PROBABILITY, uint8_t TIMEOUT>
 const uint8_t*
-xpcc::amnb::Interface<Device>::getPayload()
+xpcc::amnb::Interface<Device,PROBABILITY,TIMEOUT>::getPayload()
 {
-	return &rx_buffer[2];
+	return rx_buffer+2;
 }
 
-template <typename Device>
+template <typename Device, uint8_t PROBABILITY, uint8_t TIMEOUT>
 uint8_t
-xpcc::amnb::Interface<Device>::getPayloadLength()
+xpcc::amnb::Interface<Device,PROBABILITY,TIMEOUT>::getPayloadLength()
 {
 	return (lengthOfReceivedMessage - 3);
 }
 
-template <typename Device>
+template <typename Device, uint8_t PROBABILITY, uint8_t TIMEOUT>
 void
-xpcc::amnb::Interface<Device>::dropMessage()
+xpcc::amnb::Interface<Device,PROBABILITY,TIMEOUT>::dropMessage()
 {
 	lengthOfReceivedMessage = 0;
 }
 
 // ----------------------------------------------------------------------------
 
-template <typename Device>
+template <typename Device, uint8_t PROBABILITY, uint8_t TIMEOUT>
 void
-xpcc::amnb::Interface<Device>::update()
+xpcc::amnb::Interface<Device,PROBABILITY,TIMEOUT>::update()
 {
 	uint8_t byte;
 	while (Device::read(byte))
@@ -333,18 +357,18 @@ xpcc::amnb::Interface<Device>::update()
 			
 			// and wait for a random amount of time before sending again
 			rescheduleTimeout = static_cast<uint8_t>(rand());
-			rescheduleTimer.restart(rescheduleTimeout % maxTimeOut);
+			rescheduleTimer.restart(rescheduleTimeout % TIMEOUT);
 			state = SYNC;
-			++collisions; // debug
+#if AMNB_TIMING_DEBUG
+			++collisions;
+#endif
 			return;
 		}
 		
 		switch (state)
 		{
 			case SYNC:
-				if (byte == syncByte) {
-					state = LENGTH;
-				}
+				if (byte == syncByte) state = LENGTH;
 				break;
 			
 			case LENGTH:
@@ -360,14 +384,12 @@ xpcc::amnb::Interface<Device>::update()
 				break;
 			
 			case DATA:
-				rx_buffer[position] = byte;
+				rx_buffer[position++] = byte;
 				crc = crcUpdate(crc, byte);
 				
-				position += 1;
-				if (position >= length) {
-					if (crc == 0) {
-						lengthOfReceivedMessage = length;
-					}
+				if (position >= length)
+				{
+					if (crc == 0) lengthOfReceivedMessage = length;
 					state = SYNC;
 				}
 				break;
@@ -386,13 +408,13 @@ xpcc::amnb::Interface<Device>::update()
 	
 	if (hasMessageToSend && !rescheduleTransmit && !transmitting && (state == SYNC)) {
 		// if channel is free, send with probability P
-		if (rescheduleTimeout < 256 * pValue) {
+		if (rescheduleTimeout < static_cast<uint8_t>(2.56f * PROBABILITY)) {
 			writeMessage();
 		}
 		// otherwise reschedule
 		else {
 			rescheduleTransmit = true;
-			rescheduleTimer.restart(rescheduleTimeout % maxTimeOut);
+			rescheduleTimer.restart(rescheduleTimeout % TIMEOUT);
 		}
 		rescheduleTimeout = static_cast<uint8_t>(rand());
 	}

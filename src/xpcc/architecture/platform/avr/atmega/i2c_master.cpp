@@ -53,33 +53,33 @@ namespace
 	static uint8_t writeBytesLeft;
 	
 	// delegating
-	static xpcc::i2c::Delegate *delegate = 0;
+	static xpcc::i2c::Delegate *delegate(0);
 	static xpcc::atmega::I2cMaster::ErrorState errorState(xpcc::atmega::I2cMaster::NO_ERROR);
 	static bool newSession;
 	
 	// helper functions
-	static void
+	static ALWAYS_INLINE void
 	initializeWrite(xpcc::i2c::Delegate::Writing w) {
 		writePointer = w.buffer;
 		writeBytesLeft = w.size;
 		nextOperation = static_cast<xpcc::i2c::Delegate::NextOperation>(w.next);
 	}
 	
-	static void
+	static ALWAYS_INLINE void
 	initializeRead(xpcc::i2c::Delegate::Reading r) {
 		readPointer = r.buffer;
 		readBytesLeft = r.size;
 		nextOperation = static_cast<xpcc::i2c::Delegate::NextOperation>(r.next);
 	}
 	
-	static void
+	static ALWAYS_INLINE void
 	initializeStopAfterAddress() {
 		//writePointer = ..;
 		writeBytesLeft = 0;
 		nextOperation = xpcc::i2c::Delegate::STOP_OP;
 	}
 	
-	static void
+	static ALWAYS_INLINE void
 	initializeRestartAfterAddress() {
 		//writePointer = ..;
 		writeBytesLeft = 0;
@@ -166,7 +166,6 @@ ISR(TWI_vect)
 						
 					default:
 						DEBUG('S');
-						asm volatile ("nop");
 						TWCR = (1 << TWINT) | (1 << TWSTO) | (1 << TWEN);
 						delegate->stopped(xpcc::i2c::Delegate::NORMAL_STOP);
 						delegate = 0;
@@ -297,13 +296,18 @@ xpcc::atmega::I2cMaster::startSync(xpcc::i2c::Delegate *delegate)
 	if (!::delegate && delegate && delegate->attaching())
 	{
 		::delegate = delegate;
-		DEBUG('Y');
 		newSession = true;
+		DEBUG('Y');
 		TWCR = (1 << TWINT) | (1 << TWSTA) | (1 << TWEN) | (1 << TWIE);
+		
+		// the compiler generates out of order code here
+		// so we introduce a memory barrier
+		// to make sure, ::delegate is set _before_ entering a deadlock
+		__asm__ volatile ("" ::: "memory");
 		
 		while (::delegate)
 			;
-		DEBUG('d');
+		DEBUG('f');
 		
 		return true;
 	}

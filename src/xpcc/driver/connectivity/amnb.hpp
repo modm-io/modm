@@ -45,13 +45,12 @@
  * Action callbacks to query requests can be defined as well as universal
  * callbacks to any transmitted messaged (Listener callbacks).
  * As an optional advanced feature, error handling callbacks can also be defined,
- * which fire if messaged have not been able to be sent, or requests timed out
+ * which fire if messages have not been able to be sent, or requests timed out
  * or misbehaved in other manners, or other nodes query unavailable information.
  * 
  * \section amnb_protocol Protocol
  * 
  * Features:
- * - Baudrate is 115200 Baud.
  * - Maximum payload length is 32 byte.
  * - CRC8 (1-Wire)
  * 

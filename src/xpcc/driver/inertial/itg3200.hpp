@@ -62,13 +62,13 @@ namespace xpcc
 			SCALE_FS_gm = (0x03 << 3),
 			SCALE_FS_2000 = (0x03 << 3),
 			FILTER_DLPF_gm = 0x07,
-			FILTER_DLPF_256Hz = 0x00,
-			FILTER_DLPF_188Hz = 0x01,
-			FILTER_DLPF_98Hz = 0x02,
-			FILTER_DLPF_42Hz = 0x03,
-			FILTER_DLPF_20Hz = 0x04,
-			FILTER_DLPF_10Hz = 0x05,
-			FILTER_DLPF_5Hz = 0x06
+			FILTER_DLPF_256HZ = 0x00,
+			FILTER_DLPF_188HZ = 0x01,
+			FILTER_DLPF_98HZ = 0x02,
+			FILTER_DLPF_42HZ = 0x03,
+			FILTER_DLPF_20HZ = 0x04,
+			FILTER_DLPF_10HZ = 0x05,
+			FILTER_DLPF_5HZ = 0x06
 		};
 		
 		/// The interrupt bit masks of REGISTER_INTERRUPT
@@ -99,7 +99,7 @@ namespace xpcc
 			POWER_CLK_PLL_XG = 0x01,
 			POWER_CLK_PLL_YG = 0x02,
 			POWER_CLK_PLL_ZG = 0x03,
-			POWER_CLK_EXTERNAL_32k = 0x04,
+			POWER_CLK_EXTERNAL_32K = 0x04,
 			POWER_CLK_EXTERNAL_19M = 0x05,
 		};
 	}
@@ -130,7 +130,7 @@ namespace xpcc
 		 * Configures the sensor to full scale resolution with 
 		 */
 		bool
-		configure(uint8_t divider=0, itg3200::Filter filter=itg3200::FILTER_DLPF_20Hz, bool interrupt=true);
+		configure(uint8_t divider=0, itg3200::Filter filter=itg3200::FILTER_DLPF_20HZ, bool interrupt=true);
 		
 		/**
 		 * only read the X-ZDATA0-1 registers and buffer the results

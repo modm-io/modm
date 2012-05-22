@@ -43,7 +43,7 @@ template < typename ADConv, uint8_t CHANNELS, uint8_t SAMPLES >
 uint8_t* xpcc::atmega::AnalogSensors<ADConv,CHANNELS,SAMPLES>::map;
 
 template < typename ADConv, uint8_t CHANNELS, uint8_t SAMPLES >
-uint16_t xpcc::atmega::AnalogSensors<ADConv,CHANNELS,SAMPLES>::data[CHANNELS];
+uint16_t* xpcc::atmega::AnalogSensors<ADConv,CHANNELS,SAMPLES>::data;
 
 template < typename ADConv, uint8_t CHANNELS, uint8_t SAMPLES >
 uint16_t xpcc::atmega::AnalogSensors<ADConv,CHANNELS,SAMPLES>::numberOfSamples(0);
@@ -51,9 +51,10 @@ uint16_t xpcc::atmega::AnalogSensors<ADConv,CHANNELS,SAMPLES>::numberOfSamples(0
 // ----------------------------------------------------------------------------
 template < typename ADConv, uint8_t CHANNELS, uint8_t SAMPLES >
 void
-xpcc::atmega::AnalogSensors<ADConv,CHANNELS,SAMPLES>::initialize(uint8_t &sensorMapping)
+xpcc::atmega::AnalogSensors<ADConv,CHANNELS,SAMPLES>::initialize(uint8_t* sensorMapping, uint16_t* sensorData)
 {
-	map = &sensorMapping;
+	map = sensorMapping;
+	data = sensorData;
 	adc.attachConversionCompleteInterrupt(sampleAdc);
 	adc.setInterruptEnable(true);
 }

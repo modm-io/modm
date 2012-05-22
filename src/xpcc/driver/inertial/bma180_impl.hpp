@@ -42,7 +42,7 @@ xpcc::Bma180<I2cMaster>::Bma180(uint8_t* data, uint8_t address)
 
 template < typename I2cMaster >
 bool
-xpcc::Bma180<I2cMaster>::initialize(bma180::Range range, bma180::Bandwidth bandwidth, bma180::ModeConfig mode, bool interrupt)
+xpcc::Bma180<I2cMaster>::configure(bma180::Range range, bma180::Bandwidth bandwidth, bma180::ModeConfig mode, bool interrupt)
 {
 	// enable image writing
 	bool ok;
