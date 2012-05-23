@@ -1,4 +1,6 @@
 // WARNING: This file is generated automatically, do not edit!
+// Its content is created from the [defines] section in project.cfg of the
+// current project and the build.cfg in each include directory. 
 // ----------------------------------------------------------------------------
 
 #ifndef XPCC_CONFIG_HPP
