@@ -42,4 +42,6 @@ MAIN_FUNCTION
 		LedGreen::toggle();
 		xpcc::delay_ms(500);
 	}
+
+	return 0;
 }
