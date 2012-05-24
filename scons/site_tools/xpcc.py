@@ -35,6 +35,7 @@ import platform
 import configfile as configparser
 
 from SCons.Script import *
+import SCons.Tool		# to get the SCons default tool search path
 
 # -----------------------------------------------------------------------------
 def exclude_from_scanner(path, filename='build.cfg'):
@@ -188,14 +189,32 @@ def generate(env, **kw):
 	
 	# detect the rootpath to the xpcc folder
 	rootpath = env.get('rootpath')
+	
+	if rootpath is None:
+		# Check if a global environment variable exists that point to
+		# the root of the xpcc-folder
+		rootpath = ARGUMENTS.get('XPCC_HOME', None)
+		if rootpath is not None and ARGUMENTS.get('verbose') == '1':
+			print "Use path from 'XPCC_HOME': '%s'" % rootpath
+	
 	if rootpath is None:
 		# try to detect the rootpath
-		sitepath = 'scons'
-		for path in env['toolpath']:
+		sitepath = os.path.join('scons', 'site_tools')
+		
+		# DefaultToolpath is used when the xpcc toolpath is added via --site-dir=$/xpcc/scons
+		searchpath = env.get('toolpath', []) + SCons.Tool.DefaultToolpath
+		
+		for path in searchpath:
 			path = os.path.normpath(path)
 			if path.endswith(sitepath):
-				rootpath = path[:-len(sitepath) - 1]
-				break
+				p = path[:-len(sitepath) - 1]
+				# To avoid false detection of directories with a similar
+				# name check if at least a 'src' directory exists 
+				if os.path.exists(os.path.join(p, 'src')):
+					rootpath = p
+					if ARGUMENTS.get('verbose') == '1':
+						print "Extracted path from tool path: '%s'" % rootpath
+					break
 		
 		if rootpath is None:
 			print "Could not detect the path to the xpcc-library. Use " \

@@ -61,7 +61,7 @@ check
 import os
 
 env = Environment(
-		toolpath = ['scons'],
+		toolpath = ['scons/site_tools'],
 		tools = ['template', 'doxygen', 'configfile', 'helper', 'font', 'bitmap'],
 		ENV = os.environ)
 
