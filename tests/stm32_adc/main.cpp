@@ -20,21 +20,21 @@ static bool initClock()
 {
 #ifdef __DISCOVERY
 	// use external 8MHz crystal
-	if (!Clock::enableHse(Clock::HSE_CRYSTAL)) {
+	if (!Clock::enableHse(Clock::HseConfig::HSE_CRYSTAL)) {
 		return false;
 	}
 
-	Clock::enablePll(Clock::PLL_HSE, 4, 168);
+	Clock::enablePll(Clock::PllSource::PLL_HSE, 4, 168);
 	return Clock::switchToPll();
 #elif defined __OLIMEX
 	typedef xpcc::stm32::Clock C;
 
 	// use external 8MHz crystal, stm32f1
-	if (!C::enableHse(C::HSE_CRYSTAL)) {
+	if (!C::enableHse(C::HseConfig::HSE_CRYSTAL)) {
 		return false;
 	}
 
-	C::enablePll(C::PLL_HSE, C::PLL_MUL_9);
+	C::enablePll(C::PllSource::PLL_HSE, C::PllMul::PLL_MUL_9);
 	return C::switchToPll();
 #else
 	// For using an external oscillator with 8 MHz use:
@@ -113,8 +113,6 @@ MAIN_FUNCTION
 #endif
 	Adc::startConversion();
 	Adc::enableInterrupt(Adc::END_OF_CONVERSION_REGULAR, 15);
-
-	uint8_t i=0;
 
 	while(1)
 	{
