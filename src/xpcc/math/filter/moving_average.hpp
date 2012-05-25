@@ -41,7 +41,7 @@ namespace xpcc
 	 * \brief	Moving average filter
 	 * 
 	 * Calculates the average of N newest values, i.a. the sum of the last N
-	 * values have been passed to update(...), devided by N. If less than N
+	 * values have been passed to update(...), divided by N. If less than N
 	 * values have been passed to the filter, the division factor is still N,
 	 * so missing values are assumed to be zero.
 	 *
