@@ -28,11 +28,11 @@ static bool
 initClock()
 {
 	// use external 8MHz crystal, stm32f1
-	if (!Clock::enableHse(Clock::HSE_CRYSTAL)) {
+	if (!Clock::enableHse(Clock::HseConfig::HSE_CRYSTAL)) {
 		return false;
 	}
 	
-	Clock::enablePll(Clock::PLL_HSE, Clock::PLL_MUL_9);
+	Clock::enablePll(Clock::PllSource::PLL_HSE, Clock::PllMul::PLL_MUL_9);
 	return Clock::switchToPll();
 }
 
@@ -92,6 +92,7 @@ MAIN_FUNCTION
 	LedStat::set();
 	
 	// Initialize display
+	SpiMaster1::configurePins(SpiMaster1::REMAP_PA5_PA6_PA7);
 	display.initialize();
 	
 	display.clear();
@@ -101,7 +102,7 @@ MAIN_FUNCTION
 	// Remap the Pins of CAN1 to PB8 and PB9.
 	// This has to be done before calling initialize()!
 	Can1::configurePins(Can1::REMAP_PB8_PB9);
-	Can1::initialize(xpcc::can::BITRATE_125_KBPS, 15);
+	Can1::initialize(xpcc::can::BITRATE_125_KBPS, 9);
 	
 	// Set filters
 	CanFilter::setFilter(0, CanFilter::FIFO0, 

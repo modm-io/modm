@@ -25,8 +25,6 @@
 # ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-# 
-# $Id: arm.py 755 2012-03-07 01:29:31Z dergraaf $
 # -----------------------------------------------------------------------------
 # 
 # DESCRIPTION
@@ -175,7 +173,7 @@ def generate(env, **kw):
 	env['CXXFLAGS'] = [
 #		"-fverbose-asm",
 #		"-save-temps",		# save preprocessed files
-		"-std=gnu++98",
+		"-std=gnu++0x",
 		"-fno-exceptions",
 		"-fno-rtti",
 		"-fno-threadsafe-statics",

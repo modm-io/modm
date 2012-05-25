@@ -1,7 +1,7 @@
 
 #include <xpcc/architecture.hpp>
 #include <xpcc/driver/connectivity/i2c/software_i2c.hpp>
-#include <xpcc/architecture/platform/avr/atmega/twi_master.hpp>
+#include <xpcc/architecture/platform/avr/atmega/i2c_master.hpp>
 #include <xpcc/driver/storage/i2c_eeprom.hpp>
 
 #include <xpcc/io/iostream.hpp>

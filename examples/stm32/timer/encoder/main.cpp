@@ -12,11 +12,11 @@ initClock()
 	typedef xpcc::stm32::Clock C;
 	
 	// use external 8MHz crystal, stm32f1
-	if (!C::enableHse(C::HSE_CRYSTAL)) {
+	if (!C::enableHse(C::HseConfig::HSE_CRYSTAL)) {
 		return false;
 	}
 	
-	C::enablePll(C::PLL_HSE, C::PLL_MUL_9);
+	C::enablePll(C::PllSource::PLL_HSE, C::PllMul::PLL_MUL_9);
 	return C::switchToPll();
 }
 
@@ -40,6 +40,8 @@ using namespace xpcc::stm32;
 MAIN_FUNCTION
 {
 	initClock();
+	SpiMaster1::initialize(SpiMaster1::MODE_0, SpiMaster1::PRESCALER_256);
+	xpcc::stm32::SpiMaster1::configurePins(xpcc::stm32::SpiMaster1::REMAP_PA5_PA6_PA7);
 
 	LedStat::setOutput(xpcc::gpio::HIGH);
 	

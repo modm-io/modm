@@ -35,7 +35,7 @@
 bool
 xpcc::stm32::Clock::enableHse(HseConfig config, uint32_t waitCycles)
 {
-	if (config == HSE_BYPASS) {
+	if (config == HseConfig::HSE_BYPASS) {
 		RCC->CR |= RCC_CR_HSEBYP | RCC_CR_HSEON;
 	}
 	else {
@@ -56,7 +56,7 @@ void
 xpcc::stm32::Clock::enablePll2(uint32_t div, Pll2Mul mul)
 {
 	uint32_t cfgr2 = RCC->CFGR2 & ~(RCC_CFGR2_PREDIV2 | RCC_CFGR2_PLL2MUL);
-	cfgr2 |= (((div - 1) << 4) & RCC_CFGR2_PREDIV2) | mul;
+	cfgr2 |= (((div - 1) << 4) & RCC_CFGR2_PREDIV2) | static_cast<uint32_t>(mul);
 	RCC->CFGR2 = cfgr2;
 	
 	// Enable PLL2
@@ -74,14 +74,14 @@ xpcc::stm32::Clock::enablePll(PllSource source, PllMul pllMul,
 {
 	// CFGR
 	uint32_t cfgr = 0;
-	cfgr |= pllMul;
-	cfgr |= (source == PLL_HSI_DIV_2) ? RCC_CFGR_PLLSRC_HSI_Div2 : RCC_CFGR_PLLSRC_PREDIV1;
+	cfgr |= static_cast<uint32_t>(pllMul);
+	cfgr |= (source == PllSource::PLL_HSI_DIV_2) ? RCC_CFGR_PLLSRC_HSI_Div2 : RCC_CFGR_PLLSRC_PREDIV1;
 	RCC->CFGR = cfgr; // be careful modifying bit 17 TODO check this!
 	
 	// CFGR2
 	uint32_t cfgr2 = RCC->CFGR2 & ~(RCC_CFGR2_PREDIV1 | RCC_CFGR2_PREDIV1SRC);
 	cfgr2 |= (preDivFactor - 1) & RCC_CFGR2_PREDIV1;
-	cfgr2 |= (preDivSource == PREDIV1_HSE) ? RCC_CFGR2_PREDIV1SRC_HSE : RCC_CFGR2_PREDIV1SRC_PLL2;
+	cfgr2 |= (preDivSource == PreDiv1Source::PREDIV1_HSE) ? RCC_CFGR2_PREDIV1SRC_HSE : RCC_CFGR2_PREDIV1SRC_PLL2;
 	RCC->CFGR2 = cfgr2;
 	
 	// enable PLL
@@ -95,8 +95,8 @@ xpcc::stm32::Clock::enablePll(PllSource source, PllMul pllMul)
 {
 	uint32_t tmp = 0;
 	
-	tmp |= pllMul;
-	tmp |= (source == PLL_HSI_DIV_2) ? RCC_CFGR_PLLSRC_HSI_Div2 : RCC_CFGR_PLLSRC_HSE;
+	tmp |= static_cast<uint32_t>(pllMul);
+	tmp |= (source == PllSource::PLL_HSI_DIV_2) ? RCC_CFGR_PLLSRC_HSI_Div2 : RCC_CFGR_PLLSRC_HSE;
 	
 	RCC->CFGR = tmp;
 	

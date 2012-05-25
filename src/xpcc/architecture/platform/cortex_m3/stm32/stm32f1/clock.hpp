@@ -74,7 +74,7 @@ namespace xpcc
 		class Clock
 		{
 		public:
-			enum HseConfig
+			enum class HseConfig
 			{
 				HSE_CRYSTAL,
 				HSE_BYPASS,
@@ -84,19 +84,19 @@ namespace xpcc
 			enableHse(HseConfig config, uint32_t waitCycles = 1500);
 
 #ifdef STM32F10X_CL
-			enum PllSource
+			enum class PllSource
 			{
 				PLL_HSI_DIV_2,		///< Can't be used yet!
 				PLL_PREDIV1,
 			};
 			
-			enum PreDiv1Source
+			enum class PreDiv1Source
 			{
 				PREDIV1_HSE,
 				PREDIV1_PLL2,
 			};
 			
-			enum PllMul
+			enum class PllMul
 			{
 				PLL_MUL_4 = RCC_CFGR_PLLMULL4,
 				PLL_MUL_5 = RCC_CFGR_PLLMULL5,
@@ -107,7 +107,7 @@ namespace xpcc
 				PLL_MUL_6_5 = RCC_CFGR_PLLMULL6_5,		///< Frequency * 6.5
 			};
 			
-			enum Pll2Mul
+			enum class Pll2Mul
 			{
 				PLL2_MUL_8 = RCC_CFGR2_PLL2MUL8,
 				PLL2_MUL_9 = RCC_CFGR2_PLL2MUL9,
@@ -157,16 +157,16 @@ namespace xpcc
 			 */
 			static void
 			enablePll(PllSource source, PllMul pllMul,
-					PreDiv1Source preDivSource = PREDIV1_HSE, uint32_t preDivFactor = 1);
+					PreDiv1Source preDivSource = PreDiv1Source::PREDIV1_HSE, uint32_t preDivFactor = 1);
 
 #else
-			enum PllSource
+			enum class PllSource
 			{
 				PLL_HSI_DIV_2,		///< Can't be used yet!
-				PLL_HSE,//!< PLL_HSE
+				PLL_HSE,			//!< PLL_HSE
 			};
 
-			enum PllMul
+			enum class PllMul : uint32_t
 			{
 				PLL_MUL_2 = RCC_CFGR_PLLMULL2,
 				PLL_MUL_3 = RCC_CFGR_PLLMULL3,

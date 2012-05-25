@@ -18,11 +18,11 @@ static bool
 initClock()
 {
 	// use external 8MHz crystal
-	if (!Clock::enableHse(Clock::HSE_CRYSTAL)) {
+	if (!Clock::enableHse(Clock::HseConfig::HSE_CRYSTAL)) {
 		return false;
 	}
 	
-	Clock::enablePll(Clock::PLL_HSE, 4, 168);
+	Clock::enablePll(Clock::PllSource::PLL_HSE, 4, 168);
 	return Clock::switchToPll();
 }
 

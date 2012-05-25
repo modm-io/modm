@@ -42,17 +42,19 @@ namespace xpcc
 		 * 
 		 * For using the internal clock (which is 16MHz) use:
 		 * \code
-		 * enablePll(PLL_HSI, 8, 120);	// for STM32F2xx
-		 * enablePll(PLL_HSI, 8, 168);	// for STM32F4xx
+		 * typedef xpcc::stm32::Clock C;
+		 * enablePll(C::PllSource::PLL_HSI, 8, 120);	// for STM32F2xx
+		 * enablePll(C::PllSource::PLL_HSI, 8, 168);	// for STM32F4xx
 		 * switchToPll();
 		 * \endcode
 		 * 
 		 * For using an external crystal with 8 MHz use:
 		 * \code
-		 * if (enableHse(HSE_CRYSTAL))
+		 * typedef xpcc::stm32::Clock C;
+		 * if (enableHse(C::HseConfig::HSE_CRYSTAL))
 		 * {
-		 *     enablePll(PLL_HSE, 4, 120);	// for STM32F2xx
-		 *     enablePll(PLL_HSE, 4, 168);	// for STM32F4xx
+		 *     enablePll(C::PllSource::PLL_HSE, 4, 120);	// for STM32F2xx
+		 *     enablePll(C::PllSource::PLL_HSE, 4, 168);	// for STM32F4xx
 		 *     switchToPll();
 		 * }
 		 * \endcode
@@ -72,13 +74,13 @@ namespace xpcc
 		class Clock
 		{
 		public:
-			enum HseConfig
+			enum class HseConfig
 			{
 				HSE_CRYSTAL,	///< Use a crystal to generate a clock
 				HSE_BYPASS,		///< Use an external clock (e.g. a crystal oscillator)
 			};
 			
-			enum PllSource
+			enum class PllSource
 			{
 				PLL_HSI,		///< High speed internal clock (16 MHz)
 				PLL_HSE,		///< High speed external clock (see HseConfig)

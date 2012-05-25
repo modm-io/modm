@@ -35,7 +35,7 @@
 bool
 xpcc::stm32::Clock::enableHse(HseConfig config, uint32_t waitCycles)
 {
-	if (config == HSE_BYPASS) {
+	if (config == HseConfig::HSE_BYPASS) {
 		RCC->CR |= RCC_CR_HSEBYP | RCC_CR_HSEON;
 	}
 	else {
@@ -61,7 +61,7 @@ xpcc::stm32::Clock::enablePll(PllSource source, uint8_t pllM,
 			| RCC_PLLCFGR_PLLN | RCC_PLLCFGR_PLLP | RCC_PLLCFGR_PLLQ);
 	
 	// PLLSRC source for pll and for plli2s
-	tmp |= (source == PLL_HSI) ? RCC_PLLCFGR_PLLSRC_HSI
+	tmp |= (source == PllSource::PLL_HSI) ? RCC_PLLCFGR_PLLSRC_HSI
 			: RCC_PLLCFGR_PLLSRC_HSE;
 	
 	// PLLM (0) = factor is user defined VCO input frequency must be configured to 2MHz
