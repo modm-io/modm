@@ -45,6 +45,10 @@ namespace xpcc
 	 */
 	class Task
 	{
+		virtual ~Task()
+		{
+		}
+		
 	public:
 #ifdef __DOXYGEN__
 		void
