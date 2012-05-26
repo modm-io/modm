@@ -311,6 +311,12 @@ def generate(env, **kw):
 			env.Tool('avrdude')
 			env['AVRDUDE_PROGRAMMER'] = parser.get('avrdude', 'programmer')
 			env['AVRDUDE_PORT'] = parser.get('avrdude', 'port')
+			env['AVRDUDE_OPTIONS'] = ""
+			for key, value in configuration['avrdude'].items():
+				if key == 'baudrate':
+					env['AVRDUDE_BAUDRATE'] = value
+				if key == 'options':
+					env['AVRDUDE_OPTIONS'] = value
 			env['AVR_FUSEBITS'] = []
 			
 			if 'fusebits' in configuration:

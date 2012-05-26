@@ -33,6 +33,7 @@ from SCons.Script import *
 
 # -----------------------------------------------------------------------------
 def avrdude_flash(env, source, alias='avrdude_program'):
+	actionString = '$AVRDUDE -p $AVR_DEVICE -c $AVRDUDE_PROGRAMMER -P $AVRDUDE_PORT $AVRDUDE_OPTIONS -U flash:w:'
 	if platform.system() == "Windows":
 		# avrdude on Windows has problems with absolute path names.
 		# The leading drive letter plus colon backslash (e.g. "c:\path") 
@@ -45,12 +46,20 @@ def avrdude_flash(env, source, alias='avrdude_program'):
 		if os.path.isabs(filename):
 			filename = os.path.relpath(filename)
 		filename = filename.replace("\\", "/")
-		
-		action = Action('$AVRDUDE -p $AVR_DEVICE -c $AVRDUDE_PROGRAMMER -P $AVRDUDE_PORT -U flash:w:"%s"' % filename, 
+		actionString += filename
+		if env['AVRDUDE_BAUDRATE'] is not None:
+			actionString += " -b $AVRDUDE_BAUDRATE"
+
+		action = Action(actionString, 
 						cmdstr="$AVRDUDE_COMSTR")
 		return env.AlwaysBuild(env.Alias(alias, source, action))
 	else:
-		action = Action("$AVRDUDE -p $AVR_DEVICE -c $AVRDUDE_PROGRAMMER -P $AVRDUDE_PORT -U flash:w:$SOURCE", 
+		actionString += "$SOURCE"
+
+		if env['AVRDUDE_BAUDRATE'] is not None:
+			actionString += " -b $AVRDUDE_BAUDRATE"
+
+		action = Action(actionString,
 						cmdstr="$AVRDUDE_COMSTR")
 		return env.AlwaysBuild(env.Alias(alias, source, action))
 
@@ -59,8 +68,12 @@ def avrdude_fuse(env, alias='avrdude_fuse'):
 	for fusebit in env['AVR_FUSEBITS']:
 		key, value = fusebit.items()[0]
 		fusebits.append("-U %s:w:0x%02x:m" % (key, int(value, 0)))
-	
-	action = Action("$AVRDUDE -p $AVR_DEVICE -c $AVRDUDE_PROGRAMMER -P $AVRDUDE_PORT -u %s" % " ".join(fusebits), 
+	actionString = "$AVRDUDE -p $AVR_DEVICE -c $AVRDUDE_PROGRAMMER -P $AVRDUDE_PORT $AVRDUDE_OPTIONS -u %s" % " ".join(fusebits)
+
+	if env['AVRDUDE_BAUDRATE'] is not None:
+			actionString += " -b $AVRDUDE_BAUDRATE"
+
+	action = Action(actionString, 
 					cmdstr="$AVRDUDE_FUSECOMSTR")
 	return env.AlwaysBuild(env.Alias(alias, [], action))
 
