@@ -228,6 +228,8 @@ template<uint16_t CHANNELS, typename Spi, typename Xlat, typename Vprog, typenam
 bool
 xpcc::TLC594X<CHANNELS, Spi, Xlat, Vprog, Xerr>::writeChannels(bool flush)
 {
+	Spi::setBuffer(CHANNELS*3/2, gs, status);
+	
 	if (flush)
 	{
 		if (!Spi::transferSync(xpcc::SpiMaster::TRANSFER_SEND_BUFFER_SAVE_RECEIVE))
@@ -248,7 +250,8 @@ xpcc::TLC594X<CHANNELS, Spi, Xlat, Vprog, Xerr>::writeDotCorrection()
 	Spi::setBuffer(CHANNELS*3/4, dc);
 	
 	// transfer
-	if (!Spi::transferSync(xpcc::SpiMaster::TRANSFER_SEND_BUFFER_DISCARD_RECEIVE)) {
+	if (!Spi::transferSync(xpcc::SpiMaster::TRANSFER_SEND_BUFFER_DISCARD_RECEIVE))
+	{
 		// reset Grayscale PWM buffer
 		Spi::setBuffer(CHANNELS*3/2, gs, status);
 		Vprog::reset();
