@@ -58,7 +58,7 @@ xpcc::atmega::SpiMaster::initialize(Mode mode, Prescaler prescaler)
 
 // ----------------------------------------------------------------------------
 bool
-xpcc::atmega::SpiMaster::setBuffer(uint16_t length, uint8_t* transmit, uint8_t* receive, bool transmitIncr, bool receiveIncr)
+xpcc::atmega::SpiMaster::setBuffer(uint16_t length, uint8_t* transmit, uint8_t* receive, BufferIncrease bufferIncrease)
 {
 	if (!isFinished()) return false;
 	
@@ -66,13 +66,13 @@ xpcc::atmega::SpiMaster::setBuffer(uint16_t length, uint8_t* transmit, uint8_t* 
 	receiveBuffer = receive ? receive : transmit;
 	bufferLength = length;
 	status &= ~(BUFFER_TRANSMIT_INCR_bm | BUFFER_RECEIVE_INCR_bm);
-	status |= (transmitIncr ? BUFFER_TRANSMIT_INCR_bm : 0) | (receiveIncr ? BUFFER_RECEIVE_INCR_bm : 0);
+	status |= bufferIncrease;
 	
 	return true;
 }
 
 bool
-xpcc::atmega::SpiMaster::transfer(bool transmit, bool receive, bool /*wait*/)
+xpcc::atmega::SpiMaster::transfer(TransferOptions options)
 {
 	if (status & BUFFER_IS_BUSY_SYNC_bm)
 		return false;
@@ -81,26 +81,30 @@ xpcc::atmega::SpiMaster::transfer(bool transmit, bool receive, bool /*wait*/)
 	// send the buffer out, blocking
 	status |= BUFFER_IS_BUSY_SYNC_bm;
 	// check if we have to use a dummy buffer
-	transmit &= static_cast<bool>(transmitBuffer);
-	receive &= static_cast<bool>(receiveBuffer);
+	bool transmit = (options & TRANSFER_SEND_BUFFER_DISCARD_RECEIVE) & static_cast<bool>(transmitBuffer);
+	bool receive = (options & TRANSFER_SEND_DUMMY_SAVE_RECEIVE) & static_cast<bool>(receiveBuffer);
 	
-	if (status & BUFFER_TRANSMIT_INCR_bm) {
-		for(uint_fast16_t i=0; i < bufferLength; ++i) {
-			if (transmit) tx = transmitBuffer[i];
-			rx = write(tx);
-			if (receive) receiveBuffer[i] = rx;
+	for(uint_fast16_t i=0; i < bufferLength; ++i)
+	{
+		if (transmit) {
+			tx = transmitBuffer[(status & BUFFER_TRANSMIT_INCR_bm) ? i : bufferLength-1-i];
 		}
-	}
-	else {
-		for(uint_fast16_t i=bufferLength; i > 0; --i) {
-			if (transmit) tx = transmitBuffer[i-1];
-			rx = write(tx);
-			if (receive) receiveBuffer[i-1] = rx;
+		
+		rx = write(tx);
+		
+		if (receive) {
+			receiveBuffer[(status & BUFFER_RECEIVE_INCR_bm) ? i : bufferLength-1-i] = rx;
 		}
 	}
 	status &= ~BUFFER_IS_BUSY_SYNC_bm;
 	
 	return true;
+}
+
+bool
+xpcc::atmega::SpiMaster::transferSync(TransferOptions options)
+{
+	return transfer(options);
 }
 
 bool

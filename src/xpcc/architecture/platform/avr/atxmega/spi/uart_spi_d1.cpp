@@ -115,7 +115,7 @@ xpcc::atxmega::UartSpiMasterD1::initialize(uint32_t const bitrate)
 
 // ----------------------------------------------------------------------------
 bool
-xpcc::atxmega::UartSpiMasterD1::setBuffer(uint16_t length, uint8_t* transmit, uint8_t* receive, bool transmitIncr, bool receiveIncr)
+xpcc::atxmega::UartSpiMasterD1::setBuffer(uint16_t length, uint8_t* transmit, uint8_t* receive, BufferIncrease bufferIncrease)
 {
 	if (isBusy()) return false;
 	
@@ -123,16 +123,19 @@ xpcc::atxmega::UartSpiMasterD1::setBuffer(uint16_t length, uint8_t* transmit, ui
 	receiveBuffer = receive ? receive : transmit;
 	bufferLength = length;
 	status &= ~(BUFFER_TRANSMIT_INCR_bm | BUFFER_RECEIVE_INCR_bm);
-	status |= (transmitIncr ? BUFFER_TRANSMIT_INCR_bm : 0) | (receiveIncr ? BUFFER_RECEIVE_INCR_bm : 0);
+	status |= bufferIncrease;
 	
 #ifdef DMA_TX
-	DMA_TX::setBlockTransferCount(length);
-	if (transmit) {
-		DMA_TX::setSourceAddressMode(transmitIncr ? dma::ADDRESS_INCREMENT : dma::ADDRESS_DECREMENT);
+	DMA_TX::setBlockTransferCount(bufferLength);
+	if (transmit)
+	{
+		DMA_TX::setSourceAddressMode((bufferIncrease & BUFFER_INCR_TRANSMIT_DECR_RECEIVE)
+									 ? dma::ADDRESS_INCREMENT : dma::ADDRESS_DECREMENT);
 		DMA_TX::setSource(transmitBuffer);
 		// tell everyone we have a non-zero buffer
 		status |= BUFFER_TRANSMIT_IS_NOT_ZERO_bm;
-	} else {
+	}
+	else {
 		// no buffer means we should send a dummy value
 		DMA_TX::setSource(&dummyBuffer);
 		// stop the address from increasing
@@ -142,13 +145,16 @@ xpcc::atxmega::UartSpiMasterD1::setBuffer(uint16_t length, uint8_t* transmit, ui
 #endif
 	
 #ifdef DMA_RX
-	if (receive) {
-		DMA_RX::setBlockTransferCount(length);
-		DMA_RX::setDestinationAddressMode(receiveIncr ? dma::ADDRESS_INCREMENT : dma::ADDRESS_DECREMENT);
+	if (receive)
+	{
+		DMA_RX::setBlockTransferCount(bufferLength);
+		DMA_RX::setDestinationAddressMode((bufferIncrease & BUFFER_DECR_TRANSMIT_INCR_RECEIVE)
+										  ? dma::ADDRESS_INCREMENT : dma::ADDRESS_DECREMENT);
 		DMA_RX::setDestination(receiveBuffer);
 		// tell everyone we have a non-zero buffer
 		status |= BUFFER_RECEIVE_IS_NOT_ZERO_bm;
-	} else {
+	}
+	else {
 		// we could write to a dummy buffer, but what use is that?
 		status &= ~BUFFER_TRANSMIT_IS_NOT_ZERO_bm;
 	}
@@ -159,26 +165,18 @@ xpcc::atxmega::UartSpiMasterD1::setBuffer(uint16_t length, uint8_t* transmit, ui
 
 // ----------------------------------------------------------------------------
 bool
-#ifdef DMA_TX
-#	ifdef DMA_RX
-xpcc::atxmega::UartSpiMasterD1::transfer(bool transmit, bool receive, bool wait)
-#	else
-xpcc::atxmega::UartSpiMasterD1::transfer(bool transmit, bool /*receive*/, bool wait)
-#	endif
-#else
-xpcc::atxmega::UartSpiMasterD1::transfer(bool transmit, bool receive, bool /*wait*/)
-#endif
+xpcc::atxmega::UartSpiMasterD1::transfer(TransferOptions options)
 {
 	if (isBusy()) return false;
 	
 #if defined (DMA_TX) || defined (DMA_RX)
 		
 #	ifdef DMA_TX
-	DMA_TX::getStatus(true);
+	DMA_TX::getAndClearStatus();
 	
 	if (status & BUFFER_TRANSMIT_IS_NOT_ZERO_bm)
 	{// if buffer is not intentionally set to dummy values
-		if (!transmit) {
+		if (!(options & TRANSFER_SEND_BUFFER_DISCARD_RECEIVE)) {
 			// temporarily use the dummy buffer
 			DMA_TX::setSourceAddressMode(dma::ADDRESS_FIXED);
 			DMA_TX::setSource(&dummyBuffer);
@@ -197,46 +195,60 @@ xpcc::atxmega::UartSpiMasterD1::transfer(bool transmit, bool receive, bool /*wai
 #	endif
 	
 #	ifdef DMA_RX
-	DMA_RX::getStatus(true);
+	DMA_RX::getAndClearStatus();
 	
 	// if there is a buffer to write something to, start the DMA transfer
-	if (receive && (status & BUFFER_RECEIVE_IS_NOT_ZERO_bm)) {
+	if ((options & TRANSFER_SEND_DUMMY_SAVE_RECEIVE)
+		&& (status & BUFFER_RECEIVE_IS_NOT_ZERO_bm)) {
 		// empty the buffer
 		(void) USARTD1_DATA;
 		DMA_RX::enable();
 	}
 #	endif
-	if (wait)
-		while (!isFinished()) ;
 	
 #else
 	uint8_t rx(0), tx(dummyBuffer);
 	// send the buffer out, blocking
 	status |= BUFFER_IS_BUSY_SYNC_bm;
 	// check if we have to use a dummy buffer
-	transmit &= static_cast<bool>(transmitBuffer);
-	receive &= static_cast<bool>(receiveBuffer);
+	bool transmit = (options & TRANSFER_SEND_BUFFER_DISCARD_RECEIVE) & static_cast<bool>(transmitBuffer);
+	bool receive = (options & TRANSFER_SEND_DUMMY_SAVE_RECEIVE) & static_cast<bool>(receiveBuffer);
 	
-	if (status & BUFFER_TRANSMIT_INCR_bm) {
-		for(uint_fast16_t i=0; i < bufferLength; ++i) {
-			if (transmit) tx = transmitBuffer[i];
-			rx = write(tx);
-			if (receive) receiveBuffer[i] = rx;
+	for(uint_fast16_t i=0; i < bufferLength; ++i)
+	{
+		if (transmit) {
+			tx = transmitBuffer[(status & BUFFER_TRANSMIT_INCR_bm) ? i : bufferLength-1-i];
+		}
+		
+		rx = write(tx);
+		
+		if (receive) {
+			receiveBuffer[(status & BUFFER_RECEIVE_INCR_bm) ? i : bufferLength-1-i] = rx;
 		}
 	}
-	else {
-		for(uint_fast16_t i=bufferLength; i > 0; --i) {
-			if (transmit) tx = transmitBuffer[i-1];
-			rx = write(tx);
-			if (receive) receiveBuffer[i-1] = rx;
-		}
-	}
+	
 	status &= ~BUFFER_IS_BUSY_SYNC_bm;
 #endif
 	
 	return true;
 }
 
+
+bool
+xpcc::atxmega::UartSpiMasterD1::transferSync(TransferOptions options)
+{
+#if defined (DMA_TX) || defined (DMA_RX)
+	if (transfer(options))
+	{
+		while (!isFinished())
+			;
+		return true;
+	}
+	return false;
+#else
+	return transfer(options);
+#endif
+}
 
 bool
 xpcc::atxmega::UartSpiMasterD1::isFinished()

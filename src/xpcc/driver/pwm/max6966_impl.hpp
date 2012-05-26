@@ -144,7 +144,7 @@ xpcc::MAX6966<Spi, Cs, DRIVERS>::writeToDriver(uint8_t driver, max6966::Register
 	Cs::reset();
 	for (uint_fast8_t i=0; i < DRIVERS; ++i)
 	{
-		Spi::write((i == driver) ? reg : max6966::REGISTER_NO_OP);
+		Spi::write((i == driver) ? (reg | max6966::WRITE) : max6966::REGISTER_NO_OP);
 		Spi::write(data);
 	}
 	Cs::set();

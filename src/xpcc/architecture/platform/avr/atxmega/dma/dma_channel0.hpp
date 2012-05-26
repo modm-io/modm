@@ -125,10 +125,16 @@ namespace xpcc
 			
 			// MARK: CTRLB
 			inline static uint8_t
-			getStatus(bool clear=false)
+			getStatus()
+			{
+				return DMA_CH0_CTRLB & 0xf0;
+			}
+			
+			inline static uint8_t
+			getAndClearStatus()
 			{
 				uint8_t status = DMA_CH0_CTRLB & 0xf0;
-				if (clear) DMA_CH0_CTRLB |= status;
+				DMA_CH0_CTRLB |= status;
 				return status;
 			}
 			

@@ -39,6 +39,7 @@ namespace xpcc
 {
 	namespace max6966
 	{
+		static const uint8_t WRITE = 0x00;
 		static const uint8_t READ = 0x80;
 		
 		enum Register

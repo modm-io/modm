@@ -65,6 +65,23 @@ namespace xpcc
 	class SpiMaster : public Interface
 	{
 	public:
+		enum BufferIncrease
+		{
+			BUFFER_DECR_BOTH = 0x00,
+			BUFFER_INCR_TRANSMIT_DECR_RECEIVE = 0x01,
+			BUFFER_DECR_TRANSMIT_INCR_RECEIVE = 0x02,
+			BUFFER_INCR_BOTH = 0x03,
+		};
+		
+		enum TransferOptions
+		{
+			TRANSFER_SEND_DUMMY_DISCARD_RECEIVE = 0x00,
+			TRANSFER_SEND_BUFFER_DISCARD_RECEIVE = 0x01,
+			TRANSFER_SEND_DUMMY_SAVE_RECEIVE = 0x02,
+			TRANSFER_SEND_BUFFER_SAVE_RECEIVE = 0x03,
+		};
+		
+	public:	
 		/// initiates a SPI transfer and returns the received byte
 		static uint8_t
 		write(uint8_t data);
@@ -75,25 +92,26 @@ namespace xpcc
 		 * \param	length		length of buffer or number of dummy bytes to be send
 		 * \param	transmit	pointer to transmit buffer, set to zero to send dummy bytes
 		 * \param	receive		pointer to receive buffer, if set to zero transmit buffer is used
-		 * \param	transmitIncr	increment or decrement transmit buffer
-		 * \param	receiveIncr		increment or decrement receive buffer
+		 * \param	bufferIncrease	increment or decrement buffers
 		 * \return	\c true		if buffer has been successfully copied
 		 */
 		static bool
 		setBuffer(uint16_t length,
 				  uint8_t* transmit=0, uint8_t* receive=0,
-				  bool transmitIncr=true, bool receiveIncr=true);
+				  BufferIncrease bufferIncrease=BUFFER_INCR_BOTH);
 		
 		/**
-		 * Request a transfer, not buffered, blocking if not using DMA.
+		 * Request an asynchronous transfer, synchronous if DMA unavailable
 		 * 
-		 * \param	send	set to false to send dummy data (0xff)
-		 * \param	receive	set to true to write received data back in buffer.
-		 * \param	wait	set to true to wait until (DMA) operation finished
+		 * \param	options	TransferOptions
 		 * \return	\c true if request was successfully serviced
 		 */
 		static bool
-		transfer(bool send=true, bool receive=false, bool wait=true);
+		transfer(TransferOptions options=TRANSFER_SEND_BUFFER_SAVE_RECEIVE);
+		
+		/// synchronous transfer, even if using DMA
+		static bool
+		transferSync(TransferOptions options=TRANSFER_SEND_BUFFER_SAVE_RECEIVE);
 		
 		/// \return \c true if any DMA operation finished using the SPI peripheral
 		static bool

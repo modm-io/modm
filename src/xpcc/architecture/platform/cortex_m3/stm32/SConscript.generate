@@ -44,8 +44,8 @@ for id in [1, 2, 3]:
 
 generator = env['TemplateGenerator'](env, 'i2c')
 for id in [1, 2, 3]:
-	generator.template('i2c_%i.hpp' % id, 'i2c.hpp.in', { 'id': id })
-	generator.template('i2c_%i.cpp' % id, 'i2c.cpp.in', { 'id': id })
+	generator.template('i2c_master_%i.hpp' % id, 'i2c_master.hpp.in', { 'id': id })
+	generator.template('i2c_master_%i.cpp' % id, 'i2c_master.cpp.in', { 'id': id })
 
 generator = env['TemplateGenerator'](env, 'uart')
 for id in [1, 2, 3, 6]:

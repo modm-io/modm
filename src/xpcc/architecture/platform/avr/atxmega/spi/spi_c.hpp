@@ -41,6 +41,7 @@
 #include <avr/io.h>
 #include "spi.hpp"
 #include <xpcc/driver/connectivity/spi/spi_master.hpp>
+#include <xpcc/architecture/utils.hpp>
 
 namespace xpcc
 {
@@ -75,10 +76,13 @@ namespace xpcc
 			static bool
 			setBuffer(uint16_t length,
 					  uint8_t* transmit=0, uint8_t* receive=0,
-					  bool transmitIncr=true, bool receiveIncr=true);
+					  BufferIncrease bufferIncrease=BUFFER_INCR_BOTH);
 			
 			static bool
-			transfer(bool send=true, bool receive=false, bool wait=true);
+			transfer(TransferOptions options=TRANSFER_SEND_BUFFER_SAVE_RECEIVE);
+			
+			static ALWAYS_INLINE bool
+			transferSync(TransferOptions options=TRANSFER_SEND_BUFFER_SAVE_RECEIVE);
 			
 			static bool
 			isFinished();
@@ -131,10 +135,13 @@ namespace xpcc
 			static bool
 			setBuffer(uint16_t length,
 					  uint8_t* transmit=0, uint8_t* receive=0,
-					  bool transmitIncr=true, bool receiveIncr=true);
+					  BufferIncrease bufferIncrease=BUFFER_INCR_BOTH);
 					  
 			static bool
-			transfer(bool send=true, bool receive=false, bool wait=true);
+			transfer(TransferOptions options=TRANSFER_SEND_BUFFER_SAVE_RECEIVE);
+			
+			static bool
+			transferSync(TransferOptions options=TRANSFER_SEND_BUFFER_SAVE_RECEIVE);
 			
 			static bool
 			isFinished();
@@ -197,10 +204,13 @@ namespace xpcc
 			static bool
 			setBuffer(uint16_t length,
 					  uint8_t* transmit=0, uint8_t* receive=0,
-					  bool transmitIncr=true, bool receiveIncr=true);
+					  BufferIncrease bufferIncrease=BUFFER_INCR_BOTH);
 					  
 			static bool
-			transfer(bool send=true, bool receive=false, bool wait=true);
+			transfer(TransferOptions options=TRANSFER_SEND_BUFFER_SAVE_RECEIVE);
+			
+			static bool
+			transferSync(TransferOptions options=TRANSFER_SEND_BUFFER_SAVE_RECEIVE);
 			
 			static bool
 			isFinished();
