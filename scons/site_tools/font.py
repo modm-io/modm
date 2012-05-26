@@ -32,7 +32,7 @@ import os
 import os.path
 
 script_path = os.path.dirname(__file__)
-command = os.path.join(script_path, "../tools/font_creator/font_export.py")
+command = os.path.join(script_path, "../../tools/font_creator/font_export.py")
 
 # -----------------------------------------------------------------------------
 def font_action(target, source, env):
