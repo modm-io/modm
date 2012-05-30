@@ -312,6 +312,8 @@ def generate(env, **kw):
 			env['AVRDUDE_PROGRAMMER'] = parser.get('avrdude', 'programmer')
 			env['AVRDUDE_PORT'] = parser.get('avrdude', 'port')
 			env['AVRDUDE_OPTIONS'] = ""
+			env['AVRDUDE_BAUDRATE'] = []
+			env['AVRDUDE_OPTIONS'] = []
 			for key, value in configuration['avrdude'].items():
 				if key == 'baudrate':
 					env['AVRDUDE_BAUDRATE'] = value
