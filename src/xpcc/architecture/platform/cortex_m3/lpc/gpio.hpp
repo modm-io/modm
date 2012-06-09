@@ -28,8 +28,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_LPC11XX__GPIO_HPP
-#define XPCC_LPC11XX__GPIO_HPP
+#ifndef XPCC_LPC17XX__GPIO_HPP
+#define XPCC_LPC17XX__GPIO_HPP
 
 #include <xpcc/architecture/driver/gpio.hpp>
 #include <lpc17xx/cmsis/LPC17xx.h>
@@ -88,32 +88,32 @@ namespace xpcc
 		setOutput(::xpcc::lpc::OutputType type = ::xpcc::lpc::PUSH_PULL, \
 				::xpcc::lpc::OutputSpeed speed = ::xpcc::lpc::SPEED_50MHZ) { \
 			uint32_t config = 0x0 | type | speed; \
-			::xpcc::lpc::GpioMode<GPIO ## port ## _BASE_ADDR, pin>::setMode(config); \
+			::xpcc::lpc::GpioMode<CONCAT3(GPIO, port, _BASE_ADDR), pin>::setMode(config); \
 		} \
 		ALWAYS_INLINE static void \
 		setAlternateFunction(::xpcc::lpc::OutputType type = ::xpcc::lpc::PUSH_PULL, \
 				::xpcc::lpc::OutputSpeed speed = ::xpcc::lpc::SPEED_50MHZ) { \
 			uint32_t config = 0x8 | type | speed; \
-			::xpcc::lpc::GpioMode<GPIO ## port ## _BASE_ADDR, pin>::setMode(config); \
+			::xpcc::lpc::GpioMode<CONCAT3(GPIO, port, _BASE_ADDR), pin>::setMode(config); \
 		} \
 		ALWAYS_INLINE static void \
 		setInput(::xpcc::lpc::InputType type = ::xpcc::lpc::FLOATING) { \
 			if (type == ::xpcc::lpc::PULLUP) { \
-				GPIO_REG(GPIO ## port ## _BASE_ADDR)->BSRR = (1 << pin); \
+				GPIO_REG(CONCAT3(GPIO, port, _BASE_ADDR))->BSRR = (1 << pin); \
 			} else if (type == ::xpcc::lpc::PULLDOWN) { \
-				GPIO_REG(GPIO ## port ## _BASE_ADDR)->BRR = (1 << pin); \
+				GPIO_REG(CONCAT3(GPIO, port, _BASE_ADDR))->BRR = (1 << pin); \
 			} \
-			::xpcc::lpc::GpioMode<GPIO ## port ## _BASE_ADDR, pin>::setMode(type & 0xc); \
+			::xpcc::lpc::GpioMode<CONCAT3(GPIO, port, _BASE_ADDR), pin>::setMode(type & 0xc); \
 		} \
 		ALWAYS_INLINE static void \
 		setAnalogInput() { \
-			::xpcc::lpc::GpioMode<GPIO ## port ## _BASE_ADDR, pin>::setMode(0); \
+			::xpcc::lpc::GpioMode<CONCAT3(IO, port, _BASE_ADDR), pin>::setMode(0); \
 		} \
-		ALWAYS_INLINE static void set() { GPIO_REG(GPIO ## port ## _BASE_ADDR)->BSRR = (1 << pin); } \
-		ALWAYS_INLINE static void reset() { GPIO_REG(GPIO ## port ## _BASE_ADDR)->BRR = (1 << pin); } \
+		ALWAYS_INLINE static void set() { GPIO_REG(CONCAT3(GPIO, port, _BASE_ADDR))->BSRR = (1 << pin); } \
+		ALWAYS_INLINE static void reset() { GPIO_REG(CONCAT3(GPIO, port, _BASE_ADDR))->BRR = (1 << pin); } \
 		ALWAYS_INLINE static void toggle() { \
-			if (GPIO_REG(GPIO ## port ## _BASE_ADDR)->IDR & (1 << pin)) { reset(); } else { set(); } } \
-		ALWAYS_INLINE static bool read() { return (GPIO_REG(GPIO ## port ## _BASE_ADDR)->IDR & (1 << pin)); } \
+			if (GPIO_REG(CONCAT3(GPIO, port, _BASE_ADDR))->IDR & (1 << pin)) { reset(); } else { set(); } } \
+		ALWAYS_INLINE static bool read() { return (GPIO_REG(CONCAT3(GPIO, port, _BASE_ADDR))->IDR & (1 << pin)); } \
 		\
 		ALWAYS_INLINE static void \
 		set(bool status) { \
@@ -153,19 +153,19 @@ namespace xpcc
 			setOutput(); } \
 		ALWAYS_INLINE static void \
 		setOutput(::xpcc::lpc::OutputType type = ::xpcc::lpc::PUSH_PULL) { \
-			LPC_GPIO##port->FIODIR |= (1 << pin);\
+			CONCAT(LPC_GPIO, port)->FIODIR |= (1 << pin);\
 		} \
 		ALWAYS_INLINE static void \
-		set() { LPC_GPIO##port->FIOSET = (1 << pin); } \
+		set() { CONCAT(LPC_GPIO, port)->FIOSET = (1 << pin); } \
 		ALWAYS_INLINE static void \
-		reset() { LPC_GPIO##port->FIOCLR  = (1 << pin); } \
+		reset() { CONCAT(LPC_GPIO, port)->FIOCLR  = (1 << pin); } \
 		ALWAYS_INLINE static void \
 		toggle() { if (read()) { reset(); } else { set(); } } \
 		ALWAYS_INLINE static void \
 		set(bool status) { if (status) { set(); } else { reset(); } } \
 	protected: \
 		ALWAYS_INLINE static bool \
-		read() { return (LPC_GPIO##port->FIOPIN & (1 << pin)); } \
+		read() { return (CONCAT(LPC_GPIO, port)->FIOPIN & (1 << pin)); } \
 	}
 
 /**
@@ -191,9 +191,10 @@ namespace xpcc
 	struct name { \
 		ALWAYS_INLINE static void \
 		setInput(::xpcc::lpc::InputType type = ::xpcc::lpc::FLOATING) { \
-			LPC_GPIO##port->FIODIR &= ~(1 << pin); \
+			CONCAT(LPC_GPIO, port)->FIODIR &= ~(1 << pin); \
 		} \
-		ALWAYS_INLINE static bool read() { return (LPC_GPIO ## port->MASKED_ACCESS[1 << pin]) >> pin; } \
+		ALWAYS_INLINE static bool \
+		read() { return (CONCAT(LPC_GPIO, port)->MASKED_ACCESS[1 << pin]) >> pin; } \
 	}
 
-#endif // XPCC_LPC11XX__GPIO_HPP
+#endif // XPCC_LPC17XX__GPIO_HPP
