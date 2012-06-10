@@ -1,0 +1,22 @@
+This project was succesfully tested in real hardware on 2012-06-10.
+
+Development board
+-----------------
+Desciption:
+http://www.etteam.com/product/ARM/CH_JR_ARM7_LPC2368.htm
+http://www.etteam.com/product/ARM/CP-JR%20ARM7%20LPC2368.pdf
+
+Manual:
+http://www.micro4you.com/files/lpc2368/ARM7_LPC2368.pdf
+
+Flash Command
+-------------
+~/rca/lpc21isp/lpc21isp -wipe build/blink.hex /dev/ttyUSB0 38400 12000
+
+
+Knwon Issues
+------------
+The device takes very long to start up because in low_level_init.sx a 
+long loop at the beginning of _lowLevelInit. 
+
+The timing with delay_ms is not correct. 
