@@ -122,6 +122,9 @@ str     r2, [r3, #-207] ; Led2::set()
  *   If 72MHz operation is used, then the toggling speed is around 5MHz.
  *   The toggling speed on the Fast GPIO pins is system clock/4. If 72MHz
  *   operation is used, then the toggling speed is around 18MHz.
+ * - In LPC23xx new accelerated GPIO functions were introduced.
+ *   Only Ports 0 and 1 are accessible by the legacy group of registers.
+ *   See UM10211, p170
  * 
  * External Interrupts:
  * - In some devices (like the LPC23xx and LPC24xx series), all pins on
@@ -133,84 +136,11 @@ str     r2, [r3, #-207] ; Led2::set()
  * \hideinitializer
  * \ingroup	lpc2000
  */
-#define	GPIO__IO(name, port, pin) \
-	struct name { \
-		ALWAYS_INLINE static void \
-		configure(::xpcc::gpio::Mode mode, \
-				  ::xpcc::gpio::Configuration config = ::xpcc::gpio::NORMAL) \
-		{ \
-			if (mode == ::xpcc::gpio::INPUT) { \
-				setInput(); \
-			} \
-			else { \
-				setOutput(); \
-			} \
-		} \
-		ALWAYS_INLINE static void setOutput() { \
-			IODIR ## port |= (1 << pin); } \
-		ALWAYS_INLINE static void setOutput(bool status) { \
-			set(status); \
-			setOutput(); } \
-		ALWAYS_INLINE static void setInput() { IODIR ## port &= ~(1 << pin); } \
-		ALWAYS_INLINE static void set() { IOSET ## port = (1 << pin); } \
-		ALWAYS_INLINE static void reset() { IOCLR ## port = (1 << pin); } \
-		ALWAYS_INLINE static void toggle() { \
-			if (IOSET ## port & (1 << pin)) { reset(); } else { set(); } } \
-		ALWAYS_INLINE static bool read() { return (IOPIN ## port & (1 << pin)); } \
-		\
-		ALWAYS_INLINE static void \
-		set(bool status) { \
-			if (status) { \
-				set(); \
-			} \
-			else { \
-				reset(); \
-			} \
-		} \
-	}
 
-/**
- * \brief	Create a output pin type
- * 
- * \hideinitializer
- * \ingroup	lpc2000
- */
-#define	GPIO__OUTPUT(name, port, pin) \
-	struct name { \
-		ALWAYS_INLINE static void setOutput() { \
-			IODIR ## port |= (1 << pin); } \
-		ALWAYS_INLINE static void setOutput(bool status) { \
-			set(status); \
-			setOutput(); } \
-		ALWAYS_INLINE static void set() { IOSET ## port = (1 << pin); } \
-		ALWAYS_INLINE static void reset() { IOCLR ## port = (1 << pin); } \
-		ALWAYS_INLINE static void toggle() { \
-			if (IOSET ## port & (1 << pin)) { reset(); } else { set(); } } \
-		ALWAYS_INLINE static void \
-		set(bool status) { \
-			if (status) { \
-				set(); \
-			} \
-			else { \
-				reset(); \
-			} \
-		} \
-	}
+#ifdef __ARM_LPC23_24__
+#include "gpio/gpio_lpc23_24xx.hpp"
+#else
+#include "gpio/gpio_lpc21xx.hpp"
+#endif
 
-/**
- * \brief	Create a input type
- * 
- * \hideinitializer
- * \ingroup	lpc2000
- */
-#define GPIO__INPUT(name, port, pin) \
-	struct name { \
-		ALWAYS_INLINE static void \
-		configure(::xpcc::gpio::Configuration config = ::xpcc::gpio::NORMAL) { \
-			setInput(); \
-		} \
-		ALWAYS_INLINE static void setInput() { IODIR ## port &= ~(1 << pin); } \
-		ALWAYS_INLINE static bool read() { return (IOPIN ## port & (1 << pin)); } \
-	}
-
-#endif // XPCC_AT91__GPIO_HPP
+#endif // XPCC_LPC__GPIO_HPP

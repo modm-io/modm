@@ -56,13 +56,18 @@ _lowLevelInit:
 	// For CPU clock frequencies slower than 20 MHz, set MAMTIM to 0x01.
 	// For CPU clock frequencies between 20 MHz and 40 MHz, set MAMTIM to 0x02,
 	// and for values above 40 MHz set MAMTIM to 0x03.
+	//
+	// From the User Manual for LPC23xx:
+	// For CPU clock frequencies above 60 MHz set MAMTIM to 0x04. 
 	ldr		r0, =LPC_MAM_BASE
 #if F_CPU < 20000000UL
 	mov		r1, #1
-#elif F_CPU < 20000000UL
+#elif F_CPU < 40000000UL
 	mov		r1, #2
-#else
+#elif F_CPU < 60000000UL
 	mov		r1, #3
+#else
+	mov		r1, #4
 #endif
 	str		r1, [r0, #MAM_TIM]
 	

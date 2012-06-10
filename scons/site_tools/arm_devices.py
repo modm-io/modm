@@ -7,6 +7,12 @@ devices = \
 		"linkerscript": "arm7/lpc/linker/lpc2129.ld",
 		"size": { "flash": 262144, "ram": 16384 },
 	},
+	"lpc2368":
+	{
+		"defines": ["__ARM_LPC2000__", "__ARM_LPC23_24__"],
+		"linkerscript": "arm7/lpc/linker/lpc2368.ld",
+		"size": { "flash": 524288, "ram": 32768 },
+	},
 	"lpc2468":
 	{
 		"defines": ["__ARM_LPC2000__", "__ARM_LPC23_24__"],
