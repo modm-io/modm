@@ -43,46 +43,6 @@ namespace xpcc
 	/**
 	 * \brief	Software emulation of a I2C master implementation
 	 * 
-	 * Example 1:
-	 * \code
-	 * GPIO__IO(Scl, C, 0);
-	 * GPIO__IO(Sda, C, 1);
-	 * 
-	 * xpcc::SoftwareI2C<Scl, Sda> i2c;
-	 * 
-	 * i2c.initialize();
-	 * 
-	 * // start an SRF08 ranging in cm
-	 * if (i2c.start(0xE0 | xpcc::i2c::WRITE))
-	 * {
-	 *     i2c.write(0x00);
-	 *     i2c.write(0x51);
-	 * }
-	 * i2c.stop();
-	 * \endcode
-	 * 
-	 * Example 2:
-	 * \code
-	 * GPIO__IO(Scl, C, 0);
-	 * GPIO__IO(Sda, C, 1);
-	 * 
-	 * xpcc::SoftwareI2C<Scl, Sda> i2c;
-	 * 
-	 * i2c.initialize();
-	 * 
-	 * // read the result from a SRF08
-	 * if (i2c.start(0xE0 | xpcc::i2c::WRITE))
-	 * {
-	 *     i2c.write(0x01);
-	 *     
-	 *     i2c.repeatedStart(0xE0 | xpcc::i2c::WRITE);
-	 *     i2c.read(true);
-	 *     i2c.read(true);
-	 *     i2c.read(false);
-	 * }
-	 * i2c.stop();
-	 * \endcode
-	 * 
 	 * \tparam	Scl			any IO-Pin (see GPIO__IO())
 	 * \tparam	Sda			any IO-Pin (see GPIO__IO())
 	 * \tparam	Frequency	in Hz (default frequency is 100kHz)
