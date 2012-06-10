@@ -67,7 +67,7 @@ namespace xpcc
 	{
 	public:
 		/// Constructor
-		Hd44780(uint8_t width, uint8_t heigth);
+		Hd44780(uint8_t width, uint8_t height);
 		
 		/**
 		 * \brief	Initialize the display
