@@ -31,6 +31,15 @@
 #ifndef XPCC_LPC23_24xx__GPIO_HPP
 #define XPCC_LPC23_24xx__GPIO_HPP
 
+/*
+ * Ports 2 to 4 must always accessed it the enhanced mode.
+ * Only ports 0 and 1 can be accessed in the legacy mode.
+ * This driver accesses all ports in the enhanced mode.
+ * To access the ports 0 and 1 in enhanced mode GPIOM = 1
+ * must be selected in the System Controls and Status Register
+ * (SCS). The startup code should take care about that.
+ */
+
 #define	GPIO__IO(name, port, pin) \
 	struct name { \
 		ALWAYS_INLINE static void \

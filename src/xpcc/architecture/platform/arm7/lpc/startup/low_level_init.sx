@@ -37,6 +37,8 @@
 #define MAM_CR			0x0000
 #define MAM_TIM			0x0004
 
+#define LPC_SCS_BASE	0xE01FC1A0
+
 	.text
 	.arm
 	
@@ -51,6 +53,15 @@ _lowLevelInit:
 	bne		1b
 	
 	push	{lr}
+	
+	// In LPC23xx and LPC24xx use the 'fast' GPIOs for ports 0 and 1
+	// Set GPIOM in SCS
+#ifdef __ARM_LPC23_24__
+	ldr		r0, =LPC_SCS_BASE
+	ldr		r1, [r0, #0]
+	orr		r1, r1, #1
+	str		r1, [r0, #0]
+#endif
 	
 	// From the Errata Sheet of the LPC2138:
 	// For CPU clock frequencies slower than 20 MHz, set MAMTIM to 0x01.

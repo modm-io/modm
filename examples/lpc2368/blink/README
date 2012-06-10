@@ -19,11 +19,12 @@ Flash Command
 ~/rca/lpc21isp/lpc21isp -wipe build/blink.hex /dev/ttyUSB0 38400 12000
 
 Results as of 2012-06-10
--------
+------------------------
 The processor starts the external oscillator. A 12 MHz signal can be observed
 at the crystal. It then initialises the PLL and runs at 72 MHz. 
 After a long delay (about 5 seconds) the LEDs P3.25 and P3.26 start flashing. 
 P3.26 is on for 900msec and then P3.25 is on for 100msec. 
+Input P4.28 was successfully tested. 
 
 Knwon Issues
 ------------
