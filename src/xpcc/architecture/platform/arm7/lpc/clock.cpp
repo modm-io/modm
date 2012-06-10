@@ -61,7 +61,7 @@
 void
 xpcc::lpc::Clock::initialize()
 {
-/*
+
 	if ((PLLSTAT & (PLLSTAT_PLLC)) != 0) {
 		// Enable PLL, disconnected
 		PLLCON = 1;
@@ -84,7 +84,7 @@ xpcc::lpc::Clock::initialize()
 	// select main OSC as the PLL clock source
 	CLKSRCSEL = 0x1;
 
-	PLLCFG = (PLL_MValue & 0x7FFF) | ((PLL_NValue & 0xFF) << 16);
+	PLLCFG = (PLL_MValue & 0x7fff) | ((PLL_NValue & 0xff) << 16);
 	PLLFEED = 0xaa;
 	PLLFEED = 0x55;
 	
@@ -115,5 +115,5 @@ xpcc::lpc::Clock::initialize()
 	while ( ((PLLSTAT & (PLLSTAT_PLLC)) == 0) ) {
 		// Check connect bit status
 	}
-*/
+
 }

@@ -10,6 +10,30 @@
 GPIO__OUTPUT(LedA, 3, 25);
 GPIO__OUTPUT(LedB, 3, 26);
 
+// Test fixture to measure actual CPU frequency
+__attribute__ ((section(".fastcode")))
+__attribute__((noinline))
+void pulse(void)
+{
+	while (1)
+	{
+		LedA::set();
+		asm("nop");
+		asm("nop");
+		asm("nop");
+		asm("nop");
+		asm("nop");
+		asm("nop");
+		asm("nop");
+		asm("nop");
+		asm("nop");
+		asm("nop");
+		LedA::reset();
+		xpcc::delay_ms(100);
+	}
+
+}
+
 int
 main(void)
 {
@@ -21,6 +45,8 @@ main(void)
 	LedA::setOutput();
 	LedB::setOutput();
 
+//	pulse();
+
 	while (1)
 	{
 		LedA::reset();
@@ -30,4 +56,8 @@ main(void)
 		LedB::reset();
 		xpcc::delay_ms(900);
 	}
+
+	while(1);
+
+	return 0;
 }

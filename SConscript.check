@@ -37,7 +37,7 @@ Import('env')
 
 devices = [
 	{ 'path': 'release/tests/lpc/lpc23xx',	'arch': 'arm7tdmi',		'device': 'lpc2368',		'clock': 100000000 },
-	{ 'path': 'release/tests/lpc/lpc21xx',	'arch': 'arm7tdmi',		'device': 'lpc2138',		'clock':  60000000 },
+	{ 'path': 'release/tests/lpc/lpc21xx',	'arch': 'arm7tdmi',		'device': 'lpc2129',		'clock':  60000000 },
 #	{ 'path': 'release/tests/atmega',	'arch': 'avr',			'device': 'atmega16',		'clock':   1000000 },
 #	{ 'path': 'release/tests/atmega',	'arch': 'avr',			'device': 'atmega16a',		'clock':   1000000 },
 	{ 'path': 'release/tests/atmega',	'arch': 'avr',			'device': 'atmega644',		'clock':   1000000 },

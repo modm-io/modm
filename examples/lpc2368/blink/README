@@ -9,14 +9,23 @@ http://www.etteam.com/product/ARM/CP-JR%20ARM7%20LPC2368.pdf
 Manual:
 http://www.micro4you.com/files/lpc2368/ARM7_LPC2368.pdf
 
+This is a development board with an LPC2368 in TQFP100. It 
+features USB connection, RTC, Ethernet, CAN, RS232, RS422, RS485, 
+piezo speaker, SD card slot, LEDs push buttons, potentiometers and
+an LCD connector. The crystal frequency is 12 MHz. 
+
 Flash Command
 -------------
 ~/rca/lpc21isp/lpc21isp -wipe build/blink.hex /dev/ttyUSB0 38400 12000
 
+Results as of 2012-06-10
+-------
+The processor starts the external oscillator. A 12 MHz signal can be observed
+at the crystal. It then initialises the PLL and runs at 72 MHz. 
+After a long delay (about 5 seconds) the LEDs P3.25 and P3.26 start flashing. 
+P3.26 is on for 900msec and then P3.25 is on for 100msec. 
 
 Knwon Issues
 ------------
 The device takes very long to start up because in low_level_init.sx a 
 long loop at the beginning of _lowLevelInit. 
-
-The timing with delay_ms is not correct. 
