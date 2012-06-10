@@ -71,12 +71,13 @@
 #endif
 
 #include <xpcc/math/utils/bit_operation.hpp>
+#include <xpcc/utils/template_metaprogramming.hpp>
 
-// TODO DEBUG!
+/*// TODO DEBUG!
 #include <xpcc/debug/logger.hpp>
 #undef XPCC_LOG_LEVEL
 #define XPCC_LOG_LEVEL	xpcc::log::DEBUG
-
+*/
 // ----------------------------------------------------------------------------
 // Bits and Masks
 
@@ -263,7 +264,7 @@ xpcc::Ad7280a<Spi, Cs, Cnvst, N>::performSelftest()
 	// result typically varies between Code 970 and Code 990.
 	ad7280a::ConversionValue conversion;
 	if (readConversionResult(&conversion)) {
-		XPCC_LOG_DEBUG << "selftest = " << conversion.value << xpcc::endl;
+		//XPCC_LOG_DEBUG << "selftest = " << conversion.value << xpcc::endl;
 		if (conversion.value > 970 && conversion.value < 990) {
 			return true;
 		}
