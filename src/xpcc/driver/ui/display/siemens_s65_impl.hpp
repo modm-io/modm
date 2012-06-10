@@ -25,17 +25,16 @@
  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
+ */
+// ----------------------------------------------------------------------------
+/*
  * Code from:
  * http://www.watterott.net/projects/s65-shield
  * http://www.superkranz.de/christian/S65_Display/DisplaySoftware.html
  *
  * Pinout from:
  * http://www.juras-projects.org/eng/lcd.php
- *
- * $Id: nokia6610_impl.hpp 657 2011-11-30 21:16:45Z georgi-g $
  */
-// ----------------------------------------------------------------------------
 
 #ifndef XPCC__SIEMENS_S65_HPP
 #error	"Don't include this file directly, use 'siemens_s65.hpp' instead!"
@@ -48,7 +47,6 @@ template <typename SPI, typename CS, typename RS, typename Reset>
 void
 xpcc::SiemensS65<SPI, CS, RS, Reset>::initialize()
 {
-
 	// CS pin
 	CS::set();
 	CS::setOutput();
