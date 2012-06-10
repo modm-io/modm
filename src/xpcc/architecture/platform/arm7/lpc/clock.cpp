@@ -25,8 +25,6 @@
  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- * 
- * $hello please remove me$
  */
 // ----------------------------------------------------------------------------
 
@@ -56,10 +54,15 @@
 #define PLLSTAT_PLLC	(1 << 25)
 #define PLLSTAT_PLOCK	(1 << 26)
 
+#define SCS_OSCRANGE	(1 << 4)
+#define SCS_OSCEN		(1 << 5)
+#define SCS_OSCSTAT		(1 << 6)
+
 void
 xpcc::lpc::Clock::initialize()
 {
-	/*if ((PLLSTAT & (PLLSTAT_PLLC)) != 0) {
+/*
+	if ((PLLSTAT & (PLLSTAT_PLLC)) != 0) {
 		// Enable PLL, disconnected
 		PLLCON = 1;
 		PLLFEED = 0xaa;
@@ -72,9 +75,9 @@ xpcc::lpc::Clock::initialize()
 	PLLFEED = 0x55;
 
 	// Set SCS.OSCRANGE = 0  (Fosc = 1MHz..20MHz) and enable main OSC
-	SCS = SCS & ~(1 << 4);
-	SCS = SCS |  (1 << 5);
-	while (!(SCS & 0x40)) {
+	SCS = SCS & ~SCS_OSCRANGE;
+	SCS = SCS |  SCS_OSCEN;
+	while (!(SCS & SCS_OSCSTAT)) {
 		// Wait until main OSC is usable
 	}
 
@@ -100,8 +103,8 @@ xpcc::lpc::Clock::initialize()
 	// TODO
 	volatile unsigned long MValue = PLLSTAT & 0x00007FFF;
 	volatile unsigned long NValue = (PLLSTAT & 0x00FF0000) >> 16;
-	while ((MValue != PLL_MValue) && (NValue != PLL_NValue)) {
-		
+	while ((MValue != PLL_MValue) || (NValue != PLL_NValue)) {
+
 	}
 	
 	// enable and connect
@@ -111,5 +114,6 @@ xpcc::lpc::Clock::initialize()
 
 	while ( ((PLLSTAT & (PLLSTAT_PLLC)) == 0) ) {
 		// Check connect bit status
-	}*/
+	}
+*/
 }

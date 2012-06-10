@@ -39,6 +39,7 @@ namespace xpcc
 	{
 		class Clock
 		{
+		public:
 			static void
 			initialize();
 		};
