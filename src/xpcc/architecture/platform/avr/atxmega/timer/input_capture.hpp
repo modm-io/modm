@@ -121,7 +121,7 @@ namespace xpcc
 					InputSense inputSense=RISING);
 			
 			inline static bool
-			isDataAvailable();
+			isNewDataAvailable();
 			
 			/// \return the buffered, most recent result
 			inline static uint16_t

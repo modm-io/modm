@@ -36,7 +36,7 @@
  * The AMNB (<b>A</b>synchronous <b>M</b>ulti-<b>N</b>ode <b>B</b>us) is a
  * multi-master bus system, using p-persitent CSMA to send messages.
  * 
- * One bus can be populated with up to 32 nodes. The nodes can be queried for
+ * One bus can be populated with up to 64 nodes. The nodes can be queried for
  * data and they will respond like an SAB Slave, and can query data from other
  * nodes like an SAB Master, or they can just broadcast a message.
  * Each node can listen to all the responses and broadcasts and store that

@@ -65,6 +65,7 @@ namespace xpcc
 	class SpiMaster : public Interface
 	{
 	public:
+		/// options to increase or decrease the transmit or receive buffer
 		enum BufferIncrease
 		{
 			BUFFER_DECR_BOTH = 0x00,
@@ -73,6 +74,7 @@ namespace xpcc
 			BUFFER_INCR_BOTH = 0x03,
 		};
 		
+		/// options to send the buffer or dummy bytes, and save or discard the received bytes
 		enum TransferOptions
 		{
 			TRANSFER_SEND_DUMMY_DISCARD_RECEIVE = 0x00,

@@ -114,7 +114,7 @@ xpcc::atxmega::InputCapture<TIMER, PIN>::captureData()
 
 template <typename TIMER, typename PIN>
 inline bool
-xpcc::atxmega::InputCapture<TIMER, PIN>::isDataAvailable()
+xpcc::atxmega::InputCapture<TIMER, PIN>::isNewDataAvailable()
 {
 	return newData;
 }

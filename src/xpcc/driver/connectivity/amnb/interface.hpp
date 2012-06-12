@@ -39,7 +39,6 @@
 #include <xpcc/workflow/timeout.hpp>
 #include <xpcc/architecture/driver/delay.hpp>
 #include <stdlib.h>
-// debug
 #include <xpcc/architecture/driver/clock.hpp>
 #include <xpcc/workflow/timestamp.hpp>
 

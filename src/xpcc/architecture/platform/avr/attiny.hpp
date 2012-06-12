@@ -34,4 +34,13 @@
 
 #include "../avr.hpp"
 
+namespace xpcc
+{
+	namespace attiny
+	{
+		using avr::enableInterrupts;
+		using avr::disableInterrupts;
+	}
+}
+
 #include "atmega/gpio.hpp"
