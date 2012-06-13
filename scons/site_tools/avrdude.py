@@ -47,20 +47,19 @@ def avrdude_flash(env, source, alias='avrdude_program'):
 			filename = os.path.relpath(filename)
 		filename = filename.replace("\\", "/")
 		actionString += filename
-		if env['AVRDUDE_BAUDRATE'] is not None:
+
+		if env.get('AVRDUDE_BAUDRATE') != []:
 			actionString += " -b $AVRDUDE_BAUDRATE"
 
-		action = Action(actionString, 
-						cmdstr="$AVRDUDE_COMSTR")
+		action = Action(actionString, cmdstr="$AVRDUDE_COMSTR")
 		return env.AlwaysBuild(env.Alias(alias, source, action))
 	else:
 		actionString += "$SOURCE"
 
-		if env.get('AVRDUDE_BAUDRATE', None) is not None:
+		if env.get('AVRDUDE_BAUDRATE') != []:
 			actionString += " -b $AVRDUDE_BAUDRATE"
 
-		action = Action(actionString,
-						cmdstr="$AVRDUDE_COMSTR")
+		action = Action(actionString, cmdstr="$AVRDUDE_COMSTR")
 		return env.AlwaysBuild(env.Alias(alias, source, action))
 
 def avrdude_fuse(env, alias='avrdude_fuse'):
@@ -70,7 +69,7 @@ def avrdude_fuse(env, alias='avrdude_fuse'):
 		fusebits.append("-U %s:w:0x%02x:m" % (key, int(value, 0)))
 	actionString = "$AVRDUDE -p $AVR_DEVICE -c $AVRDUDE_PROGRAMMER -P $AVRDUDE_PORT $AVRDUDE_OPTIONS -u %s" % " ".join(fusebits)
 
-	if env.get('AVRDUDE_BAUDRATE', None) is not None:
+	if env.get('AVRDUDE_BAUDRATE') != []:
 			actionString += " -b $AVRDUDE_BAUDRATE"
 
 	action = Action(actionString, 
