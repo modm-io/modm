@@ -32,7 +32,6 @@
 #define XPCC_I2C__READ_ADAPTER_HPP
 
 #include "delegate.hpp"
-#include <xpcc/architecture.hpp>
 
 namespace xpcc
 {

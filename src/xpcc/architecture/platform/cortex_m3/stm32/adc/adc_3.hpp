@@ -50,7 +50,7 @@
 
 #if defined(STM32F4XX) || defined(STM32F2XX) || \
 	defined(STM32F10X_HD) || defined(STM32F10X_XL) || defined(__DOXYGEN__)
-#include <xpcc/architecture.hpp>
+#include <xpcc/architecture/platform/cortex_m3/stm32.hpp>
 
 namespace xpcc
 {

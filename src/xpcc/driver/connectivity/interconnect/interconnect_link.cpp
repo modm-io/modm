@@ -29,7 +29,7 @@
 // ----------------------------------------------------------------------------
 
 #include <avr/interrupt.h>
-#include <xpcc/architecture.hpp>
+#include <xpcc/architecture/platform/avr/atxmega.hpp>
 
 #include "interconnect_link.hpp"
 #include <xpcc_config.hpp>

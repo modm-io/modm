@@ -1,11 +1,9 @@
 
 #include <xpcc/architecture.hpp>
 
-//xpcc::stm32::Usart1 uart(115200);
-
-GPIO__OUTPUT(Out, 4, 0);
-GPIO__INPUT(In, 4, 1);
-GPIO__IO(Io, 4, 2);
+GPIO__OUTPUT(Out, 3, 0);
+GPIO__INPUT(In, 3, 1);
+GPIO__IO(Io, 3, 2);
 
 int
 main(void)

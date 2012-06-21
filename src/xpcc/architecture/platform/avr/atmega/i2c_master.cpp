@@ -31,7 +31,9 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include <util/twi.h>
+
 #include "i2c_master.hpp"
+
 // uncomment to debug your driver using simple uart
 /*
 #include <xpcc/architecture/platform.hpp>
@@ -265,7 +267,9 @@ xpcc::atmega::I2cMaster::reset(bool error)
 	DEBUG('T');
 	writeBytesLeft = 0;
 	readBytesLeft = 0;
-	if (delegate) delegate->stopped(error ? xpcc::i2c::Delegate::ERROR_CONDITION : xpcc::i2c::Delegate::SOFTWARE_RESET);
+	if (delegate) delegate->stopped(
+			error ?	xpcc::i2c::Delegate::ERROR_CONDITION :
+					xpcc::i2c::Delegate::SOFTWARE_RESET);
 	delegate = 0;
 }
 

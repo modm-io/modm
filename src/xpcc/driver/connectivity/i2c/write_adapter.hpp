@@ -33,8 +33,6 @@
 
 #include "delegate.hpp"
 
-#include <xpcc/architecture.hpp>
-
 namespace xpcc
 {
 	/**

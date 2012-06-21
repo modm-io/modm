@@ -25,13 +25,15 @@
  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- * 
- * $hello please remove me$
  */
 // ----------------------------------------------------------------------------
 
 #ifndef XPCC_LPC__CLOCK_HPP
 #define XPCC_LPC__CLOCK_HPP
+
+#include <stdint.h>
+
+#include "registers.h"
 
 namespace xpcc
 {
@@ -42,6 +44,13 @@ namespace xpcc
 		public:
 			static void
 			initialize();
+			
+			// TODO untested
+			static uint32_t
+			getPllMultiplier()
+			{
+				return (PLLCON & 1 ? (PLLCFG & 0xF) + 1 : 1);
+			}
 		};
 	}
 }

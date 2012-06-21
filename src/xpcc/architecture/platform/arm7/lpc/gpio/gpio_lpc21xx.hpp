@@ -111,4 +111,4 @@
 		ALWAYS_INLINE static bool read() { return (CONCAT(IOPIN, port) & (1 << pin)); } \
 	}
 
-#endif XPCC_LPC21xx__GPIO_HPP
+#endif // XPCC_LPC21xx__GPIO_HPP

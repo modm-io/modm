@@ -47,7 +47,7 @@
 	#endif
 #endif
 
-#include <xpcc/architecture.hpp>
+#include <xpcc/architecture/platform/cortex_m3/stm32.hpp>
 
 namespace xpcc
 {

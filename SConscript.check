@@ -26,8 +26,6 @@
 # ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-# 
-# $Id$
 # -----------------------------------------------------------------------------
 
 import os
@@ -74,6 +72,17 @@ if check is not None:
 	result = []
 	everythingOk = True
 	
+	if str(Platform()) != "win32":
+		color_red = "\033[0;31m"
+		color_green = "\033[0;32m"
+		color_yellow = "\033[0;33m"
+		color_default = "\033[0m"
+	else:
+		color_red = ""
+		color_green = ""
+		color_yellow = ""
+		color_default = ""
+	
 	# Check that all examples compile without errors. The correct function of the
 	# examples is not checked!
 	if check in ['all', 'examples']:
@@ -85,7 +94,10 @@ if check is not None:
 		
 			if 'SConstruct' in files:
 				exitStatus = os.system("scons -Q -C %s build" % path)
-				result.append("check: %s -> %s" % (path, "Ok" if exitStatus == 0 else "FAIL!"))
+				if exitStatus == 0:
+					result.append("check: %s -> Ok" % path)
+				else:
+					result.append(color_red + ("check: %s -> FAIL!" % path) + color_default)
 				
 				if exitStatus != 0:
 					everythingOk = False
@@ -100,7 +112,10 @@ if check is not None:
 			open(projectFile, 'w').write(output)
 			
 			exitStatus = os.system("scons -Q -C %s build" % path)
-			result.append("check: %s -> %s" % (device['device'], "Ok" if exitStatus == 0 else "FAIL!"))
+			if exitStatus == 0:
+				result.append("check: %s -> Ok" % device['device'])
+			else:
+				result.append(color_red + ("check: %s -> FAIL!" % device['device']) + color_default)
 			
 			os.remove(projectFile)
 			

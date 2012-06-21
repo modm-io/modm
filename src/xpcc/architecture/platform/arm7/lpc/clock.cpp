@@ -58,10 +58,12 @@
 #define SCS_OSCEN		(1 << 5)
 #define SCS_OSCSTAT		(1 << 6)
 
+#define PLLCON_ENABLE	(1 << 0)
+#define PLLCON_CONNECT	(1 << 1)
+
 void
 xpcc::lpc::Clock::initialize()
 {
-
 	if ((PLLSTAT & (PLLSTAT_PLLC)) != 0) {
 		// Enable PLL, disconnected
 		PLLCON = 1;
@@ -89,7 +91,7 @@ xpcc::lpc::Clock::initialize()
 	PLLFEED = 0x55;
 	
 	// Enable PLL, disconnected
-	PLLCON = 1;
+	PLLCON = PLLCON_ENABLE;
 	PLLFEED = 0xaa;
 	PLLFEED = 0x55;
 	
@@ -108,7 +110,7 @@ xpcc::lpc::Clock::initialize()
 	}
 	
 	// enable and connect
-	PLLCON = 3;
+	PLLCON = PLLCON_ENABLE | PLLCON_CONNECT;
 	PLLFEED = 0xaa;
 	PLLFEED = 0x55;
 

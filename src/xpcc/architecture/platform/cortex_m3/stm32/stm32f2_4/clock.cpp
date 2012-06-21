@@ -28,7 +28,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/architecture/platform/cortex_m3.hpp>
+#include <xpcc/architecture/platform/cortex_m3/stm32.hpp>
 #include "clock.hpp"
 
 // ----------------------------------------------------------------------------
