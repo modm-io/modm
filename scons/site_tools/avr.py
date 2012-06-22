@@ -58,7 +58,7 @@
 # Library()     .o   -> .a
 # Program()     .o   -> .elf
 # Hex()         .elf -> .hex
-#               .elf -> .eep
+# Eeprom()      .elf -> .eep
 # Listing()     .elf -> .lss
 #
 # The 'Program' builder will automatically call the 'Object' builder so
@@ -110,6 +110,7 @@ def generate(env, **kw):
 		env['SIZECOMSTR'] = "Size after:"
 		env['SYMBOLSCOMSTR'] = "Show symbols for '$SOURCE':"
 		env['HEXCOMSTR'] = "Creating load file for Flash: $TARGET"
+		env['EEPROMCOMSTR'] = "Creating load file for EEPROM: $TARGET"
 		env['LSSCOMSTR'] = "Creating Extended Listing: $TARGET"
 	
 	# C flags
@@ -183,7 +184,13 @@ def generate(env, **kw):
 						cmdstr = "$HEXCOMSTR"), 
 		suffix = ".hex", 
 		src_suffix = ".elf")
-	
+
+	builder_eeprom = Builder(
+		action = Action("$OBJCOPY -j .eeprom --set-section-flags=.eeprom=\"alloc,load\" --change-section-lma .eeprom=0 --no-change-warnings --change-section-lma .eeprom=0 -O ihex $SOURCE $TARGET",
+						cmdstr = "$EEPROMCOMSTR"), 
+		suffix = ".eep",
+		src_suffix = ".elf")
+
 	builder_listing = Builder(
 		action = Action("$OBJDUMP -h -S $SOURCE > $TARGET",
 						cmdstr = "$LSSCOMSTR"), 
@@ -192,6 +199,7 @@ def generate(env, **kw):
 	
 	env.Append(BUILDERS = {
 		'Hex': builder_hex,
+		'Eeprom': builder_eeprom,
 		'Listing': builder_listing,
 	})
 

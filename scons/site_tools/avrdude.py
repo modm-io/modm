@@ -32,7 +32,7 @@ import platform
 from SCons.Script import *
 
 # -----------------------------------------------------------------------------
-def avrdude_flash(env, source, alias='avrdude_program'):
+def avrdude_flash(env, source, eeprom_source='', alias='avrdude_program'):
 	actionString = '$AVRDUDE -p $AVR_DEVICE -c $AVRDUDE_PROGRAMMER -P $AVRDUDE_PORT $AVRDUDE_OPTIONS -U flash:w:'
 	if platform.system() == "Windows":
 		# avrdude on Windows has problems with absolute path names.
@@ -48,6 +48,13 @@ def avrdude_flash(env, source, alias='avrdude_program'):
 		filename = filename.replace("\\", "/")
 		actionString += filename
 
+		if (eeprom_source != ''):
+			filename = str(eeprom_source[0])
+			if os.path.isabs(filename):
+				filename = os.path.relpath(filename)
+			filename = filename.replace("\\", "/")
+			actionString += "-U eeprom:w:" + filename
+
 		if env.get('AVRDUDE_BAUDRATE') != []:
 			actionString += " -b $AVRDUDE_BAUDRATE"
 
@@ -55,6 +62,8 @@ def avrdude_flash(env, source, alias='avrdude_program'):
 		return env.AlwaysBuild(env.Alias(alias, source, action))
 	else:
 		actionString += "$SOURCE"
+		if (eeprom_source != ''):
+			actionString += " -U eeprom:w:" + str(eeprom_source[0])
 
 		if env.get('AVRDUDE_BAUDRATE') != []:
 			actionString += " -b $AVRDUDE_BAUDRATE"
