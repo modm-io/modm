@@ -330,7 +330,7 @@ namespace xpcc
 			broadcast(uint8_t command, const void *payload, uint8_t payloadLength);
 			
 			/**
-			 * \brief	Start a new query without any payload
+			 * \brief	Start a new broadcast without any payload
 			 *
 			 * \return \c true if no error occured
 			 */
