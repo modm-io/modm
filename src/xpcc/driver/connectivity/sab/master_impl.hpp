@@ -54,6 +54,22 @@ xpcc::sab::Master<Interface>::initialize()
 }
 
 // ----------------------------------------------------------------------------
+template <typename Interface>
+void
+xpcc::sab::Master<Interface>::query(uint8_t slaveAddress, uint8_t command,
+									const void *payload, uint8_t payloadLength, uint8_t responseLength)
+{
+	while (interface.isMessageAvailable()) {
+		interface.dropMessage();
+	}
+	interface.sendMessage(slaveAddress, REQUEST, command, payload, payloadLength);
+	
+	queryStatus = IN_PROGRESS;
+	expectedResponseLength = responseLength;
+	
+	timer.restart(timeout);
+}
+
 template <typename Interface> template <typename T>
 void
 xpcc::sab::Master<Interface>::query(uint8_t slaveAddress, uint8_t command,

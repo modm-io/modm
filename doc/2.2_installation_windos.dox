@@ -14,7 +14,7 @@ To use more than one CPU you can change/create the 'SCONSFLAGS' Variable in the
 'System Properties' window. Fill it with the following value:
 
 \verbatim
--Q -j4 --site-tools=\path\to\the\xpcc\root\folder\scons\
+-Q -j4 --site-dir=\path\to\the\xpcc\root\folder\scons\
 \endverbatim
 
 Adjust this \c -j paramter to the number of CPUs in your system, this example

@@ -142,6 +142,35 @@ namespace xpcc
 			} \
 		} \
 		\
+		ALWAYS_INLINE static void \
+		configureInputSense(::xpcc::atxmega::InputSense inputSense){\
+			CONCAT5(PORT, port, _PIN, pin, CTRL) = (CONCAT5(PORT, port, _PIN, pin, CTRL) & ~PORT_ISC_gm) | inputSense; \
+		}\
+		\
+		ALWAYS_INLINE static void \
+		configureInterrupt0(::xpcc::atxmega::InterruptLevel interruptLevel) { \
+			if (interruptLevel){\
+				CONCAT3(PORT, port, _INT0MASK) |= getMask();\
+				CONCAT3(PORT, port, _INTCTRL) = (CONCAT3(PORT, port, _INTCTRL) & ~PORT_INT0LVL_gm) | (interruptLevel & PORT_INT0LVL_gm);\
+			}\
+			else{\
+				CONCAT3(PORT, port, _INT0MASK) &= ~getMask();\
+			}\
+		} \
+		\
+		ALWAYS_INLINE static void \
+		configureInterrupt1(::xpcc::atxmega::InterruptLevel interruptLevel) { \
+			if (interruptLevel){\
+				CONCAT3(PORT, port, _INT1MASK) |= getMask();\
+				CONCAT3(PORT, port, _INTCTRL) = (CONCAT3(PORT, port, _INTCTRL) & ~PORT_INT1LVL_gm) | ((interruptLevel << 2) & PORT_INT1LVL_gm);\
+			}\
+			else{\
+				CONCAT3(PORT, port, _INT1MASK) &= ~getMask();\
+			}\
+		} \
+		\
+		ALWAYS_INLINE static void clearInterruptFlag0() { CONCAT3(PORT, port, _INTFLAGS) |= PORT_INT0IF_bm; } \
+		ALWAYS_INLINE static void clearInterruptFlag1() { CONCAT3(PORT, port, _INTFLAGS) |= PORT_INT1IF_bm; } \
 		ALWAYS_INLINE static bool read() { return (CONCAT3(PORT, port, _IN) & (1 << pin)); } \
 		ALWAYS_INLINE static PORT_t& getPort() { return CONCAT(PORT, port);} \
 		ALWAYS_INLINE static uint8_t getMask() { return (1 << pin);} \
@@ -233,6 +262,8 @@ namespace xpcc
 			}\
 		} \
 		\
+		ALWAYS_INLINE static void clearInterruptFlag0() { CONCAT3(PORT, port, _INTFLAGS) |= PORT_INT0IF_bm; } \
+		ALWAYS_INLINE static void clearInterruptFlag1() { CONCAT3(PORT, port, _INTFLAGS) |= PORT_INT1IF_bm; } \
 		ALWAYS_INLINE static PORT_t& getPort() { return CONCAT(PORT, port);} \
 		ALWAYS_INLINE static uint8_t getMask() { return (1 << pin);} \
 		ALWAYS_INLINE static uint8_t getEventChannelMuxInput() { \

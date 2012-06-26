@@ -71,6 +71,11 @@ namespace xpcc
 			query(uint8_t slaveAddress, uint8_t command,
 					const T& payload, uint8_t responseLength);
 			
+			
+			static void
+			query(uint8_t slaveAddress, uint8_t command,
+				  const void *payload, uint8_t payloadLength, uint8_t responseLength);
+			
 			/**
 			 * \brief	Start a new query without any payload
 			 * 

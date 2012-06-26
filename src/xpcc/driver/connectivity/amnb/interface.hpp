@@ -44,7 +44,7 @@
 
 #include "constants.hpp"
 
-#define AMNB_TIMING_DEBUG 1
+#define AMNB_TIMING_DEBUG 0
 
 namespace xpcc
 {

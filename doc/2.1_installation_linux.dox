@@ -43,8 +43,8 @@ To use more than one CPU you might want to add the following to the end of your
 '.bashrc' file (adjust the '4' to the number of CPUs in your system):
 
 \verbatim
-export XPCC_HOME = "path/to/the/xpcc/root/folder"
-export SCONSFLAGS="-Q -j4 --site-tools=${XPCC_HOME}/scons/"
+export XPCC_HOME="path/to/the/xpcc/root/folder/"
+export SCONSFLAGS="-Q -j4 --site-dir=${XPCC_HOME}/scons/"
 \endverbatim
 
 For more information on the parameter this read the chapter about
