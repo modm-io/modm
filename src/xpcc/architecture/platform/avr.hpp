@@ -44,7 +44,7 @@
 namespace xpcc
 {
 	/**
-	 * \brief	AVR specifiy functions
+	 * \brief	AVR specific functions
 	 * \ingroup	avr
 	 */
 	namespace avr

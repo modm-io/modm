@@ -41,7 +41,7 @@ namespace xpcc
 	/**
 	 * \brief	Simple 16-bit timestamp
 	 * 
-	 * The timestap is calculated in milliseconds.
+	 * The timestamp is calculated in milliseconds.
 	 *
 	 * \author	Fabian Greif
 	 * \ingroup	workflow

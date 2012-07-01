@@ -51,7 +51,7 @@ namespace xpcc
 	 * Example:
 	 * \include gpio/button_group/main.cpp
 	 * 
-	 * The detection for long or repreated presses works only correct for
+	 * The detection for long or repeated presses works only correctly for
 	 * one key at a time. This constraint only applies to buttons listed in the
 	 * \em mask variable.
 	 * 

@@ -57,7 +57,7 @@ xpcc::ButtonGroup<T>::isReleased(T mask)
 	atomic::Lock lock;
 	
 	mask &= releaseState;
-	releaseState ^= mask;
+	releaseState ^= mask;	// clear releaseState bits
 	
 	return mask;
 }
@@ -70,7 +70,7 @@ xpcc::ButtonGroup<T>::isPressed(T mask)
 	atomic::Lock lock;
 	
 	mask &= pressState;
-	pressState ^= mask;
+	pressState ^= mask;		// clear pressState bits
 	
 	return mask;
 }
@@ -82,7 +82,7 @@ xpcc::ButtonGroup<T>::isRepeated(T mask)
 	atomic::Lock lock;
 	
 	mask &= repeatState;
-	repeatState ^= mask;
+	repeatState ^= mask;	// clear repeatState bits
 	
 	return mask;
 }
