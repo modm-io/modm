@@ -136,6 +136,9 @@ def xpcc_library(env, buildpath=None):
 		'defines': '\n'.join(define_list),
 		'name': env['XPCC_CONFIG']['general']['name']
 	}
+
+	print os.path.join(env['XPCC_BUILDPATH'], 'xpcc_config.hpp')
+
 	file = env.Template(
 			target = os.path.join(env['XPCC_BUILDPATH'], 'xpcc_config.hpp'),
 			source = os.path.join(env['XPCC_ROOTPATH'], 

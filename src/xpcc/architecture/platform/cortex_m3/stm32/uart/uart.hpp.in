@@ -147,6 +147,84 @@ namespace xpcc
 //			static uint8_t
 //			flushTransmitBuffer();
 		};
+
+		// --------------------------------------------------------------------
+		/**
+		 * \brief	BufferedFlow {{ className }}
+		 * 
+		 * This implementation uses a ringbuffer. The size of the ringbuffer
+		 * can be changed in the \c project.cfg file.
+		 * 
+		 * Just add add a value for {{ className | upper }}{{ id }}_TX_BUFFER_SIZE and/or 
+		 * {{ className | upper }}{{ id }}_RX_BUFFER_SIZE in the \c defines section. The size can
+		 * be any value between 1 and 254.
+		 * 
+		 * Example:
+		 * \code
+		 * [defines]
+		 * {{ className | upper }}{{ id }}_TX_BUFFER_SIZE = 20
+		 * {{ className | upper }}{{ id }}_RX_BUFFER_SIZE = 30
+		 * \endcode
+		 * 
+		 * \ingroup	stm32
+		 */
+		class BufferedFlow{{ className }}{{ id }} : public UartBase
+		{
+		public:
+			/**
+			 * Set baudrate.
+			 * 
+			 * \param	baudrate	Desired baud rate (e.g. 115200)
+			 * \param	interruptPriority
+			 * 			Interrupt vector priority (0=highest to 15=lowest)
+			 * \param	blocking
+			 * 			The write-function waits until a free slot is available
+			 * 			in the send buffer.
+			 */
+			BufferedFlow{{ className }}{{ id }}(uint32_t baudrate,
+					uint32_t interruptPriority, bool blocking = true)
+			{
+				setBaudrate(baudrate, interruptPriority, blocking);
+			}
+			
+			{{ template.mapping(id) }}
+			
+			{{ template.configurePins(className, id) | xpcc.indent(3) }}
+			
+			/**
+			 * Set baudrate.
+			 * 
+			 * \param	baudrate	Desired baud rate (e.g. 115200)
+			 * \param	interruptPriority
+			 * 			Interrupt vector priority (0=highest to 15=lowest)
+			 * \param	blocking
+			 * 			The write-function waits until a free slot is available
+			 * 			in the send buffer.
+			 */
+			static void
+			setBaudrate(uint32_t baudrate, uint32_t interruptPriority,
+					bool blocking = true);
+			
+			{{ template.write() | xpcc.indent(3) }}
+			
+			{{ template.writeBlock() | xpcc.indent(3) }}
+			
+			{{ template.read() | xpcc.indent(3) }}
+			
+			{{ template.readBlock() | xpcc.indent(3) }}
+			
+			/**
+			 * \brief	Empty the receive FIFO queue and {{ className | upper }} buffer.
+			 *
+			 * \return	the size of the deleted FIFO queue.
+			 */
+			static uint8_t
+			flushReceiveBuffer();
+			
+//			static uint8_t
+//			flushTransmitBuffer();
+		};
+
 	}
 }
 

@@ -224,6 +224,118 @@ namespace xpcc
 //			static uint8_t
 //			flushTransmitBuffer();
 		};
+
+		// --------------------------------------------------------------------
+		/**
+		 * \brief	BufferedFlow Uart
+		 * 
+		 * This implementation uses a ringbuffer. The size of the ringbuffer
+		 * can be changed in the \c project.cfg file.
+		 * 
+		 * Just add add a value for UART4_TX_BUFFER_SIZE and/or 
+		 * UART4_RX_BUFFER_SIZE in the \c defines section. The size can
+		 * be any value between 1 and 254.
+		 * 
+		 * Example:
+		 * \code
+		 * [defines]
+		 * UART4_TX_BUFFER_SIZE = 20
+		 * UART4_RX_BUFFER_SIZE = 30
+		 * \endcode
+		 * 
+		 * \ingroup	stm32
+		 */
+		class BufferedFlowUart4 : public UartBase
+		{
+		public:
+			/**
+			 * Set baudrate.
+			 * 
+			 * \param	baudrate	Desired baud rate (e.g. 115200)
+			 * \param	interruptPriority
+			 * 			Interrupt vector priority (0=highest to 15=lowest)
+			 * \param	blocking
+			 * 			The write-function waits until a free slot is available
+			 * 			in the send buffer.
+			 */
+			BufferedFlowUart4(uint32_t baudrate,
+					uint32_t interruptPriority, bool blocking = true)
+			{
+				setBaudrate(baudrate, interruptPriority, blocking);
+			}
+			
+			enum Mapping
+			{
+				REMAP_PC10_PC11,	///< TX mapped to PC10, RX mapped to PC11
+#if defined(STM32F2XX) || defined(STM32F4XX)
+				REMAP_PA0_PA1,		///< TX mapped to PA0, RX mapped to PA1
+#endif
+			};
+			
+			/**
+			 * Configure the IO Pins for Uart4
+			 */
+			static void
+			configurePins(Mapping mapping);
+			
+			/**
+			 * Set baudrate.
+			 * 
+			 * \param	baudrate	Desired baud rate (e.g. 115200)
+			 * \param	interruptPriority
+			 * 			Interrupt vector priority (0=highest to 15=lowest)
+			 * \param	blocking
+			 * 			The write-function waits until a free slot is available
+			 * 			in the send buffer.
+			 */
+			static void
+			setBaudrate(uint32_t baudrate, uint32_t interruptPriority,
+					bool blocking = true);
+			
+			/**
+			 * \brief	Send a single byte
+			 */
+			static void
+			write(uint8_t data);
+			
+			/**
+			 * \brief	Write a block of bytes
+			 *
+			 * \param	*buffer	Pointer to a buffer
+			 * \param	n	Number of bytes to be read
+			 */
+			static void
+			write(const uint8_t *buffer, uint8_t n);
+			
+			/**
+			 * \brief	Read a single byte
+			 */
+			static bool
+			read(uint8_t& c);
+			
+			/**
+			 * \brief	Read a block of bytes
+			 * 
+			 * \param	*buffer	Pointer to a buffer big enough to storage \a n bytes
+			 * \param	n	Number of bytes to be read
+			 * 
+			 * \return	Number of bytes which could be read, maximal \a n
+			 */
+			static uint8_t
+			read(uint8_t *buffer, uint8_t n);
+			
+			/**
+			 * \brief	Empty the receive FIFO queue and UART buffer.
+			 *
+			 * \return	the size of the deleted FIFO queue.
+			 */
+			static uint8_t
+			flushReceiveBuffer();
+			
+//			static uint8_t
+//			flushTransmitBuffer();
+		};
+
 	}
 }
 

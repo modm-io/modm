@@ -69,6 +69,15 @@ namespace
 }
 {%- endmacro -%}
 
+{%- macro pinDefinitionsFlowControl(className, id) -%}
+namespace
+{
+	GPIO__OUTPUT(RTS, {{ className | upper}}{{ id }}_RTS_PORT, {{ className | upper}}{{ id }}_RTS_PIN);
+	GPIO__INPUT (CTS, {{ className | upper}}{{ id }}_CTS_PORT, {{ className | upper}}{{ id }}_CTS_PIN);
+}
+{%- endmacro -%}
+
+
 {%- macro configurePins(className, id) -%}
 {% if id in [4, 5] -%}
 {{ uartConfigurePins(className, id) }}

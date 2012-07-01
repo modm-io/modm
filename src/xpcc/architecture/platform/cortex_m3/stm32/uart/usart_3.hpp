@@ -235,6 +235,126 @@ namespace xpcc
 //			static uint8_t
 //			flushTransmitBuffer();
 		};
+
+		// --------------------------------------------------------------------
+		/**
+		 * \brief	BufferedFlow Usart
+		 * 
+		 * Buffered UARAT with Hardware Flow Control. 
+		 * 
+		 * This implementation uses a ringbuffer. The size of the ringbuffer
+		 * can be changed in the \c project.cfg file.
+		 * 
+		 * Just add add a value for USART3_TX_BUFFER_SIZE and/or 
+		 * USART3_RX_BUFFER_SIZE in the \c defines section. The size can
+		 * be any value between 1 and 254.
+		 * 
+		 * Example:
+		 * \code
+		 * [defines]
+		 * USART3_TX_BUFFER_SIZE = 20
+		 * USART3_RX_BUFFER_SIZE = 30
+		 * \endcode
+		 * 
+		 * \ingroup	stm32
+		 */
+		class BufferedFlowUsart3 : public UartBase
+		{
+		public:
+			/**
+			 * Set baudrate.
+			 * 
+			 * \param	baudrate	Desired baud rate (e.g. 115200)
+			 * \param	interruptPriority
+			 * 			Interrupt vector priority (0=highest to 15=lowest)
+			 * \param	blocking
+			 * 			The write-function waits until a free slot is available
+			 * 			in the send buffer.
+			 */
+			BufferedFlowUsart3(uint32_t baudrate,
+					uint32_t interruptPriority, bool blocking = true)
+			{
+				setBaudrate(baudrate, interruptPriority, blocking);
+			}
+			
+			enum Mapping
+			{
+#if defined(STM32F2XX) || defined(STM32F4XX)
+				REMAP_PB10_PB11,	///< TX/PB10, RX/PB11, CK/PB12, CTS/PB13, RTS/PB14
+				REMAP_PC10_PC11,	///< TX/PC10, RX/PC11, CK/PC12, CTS/PB13, RTS/PB14
+				REMAP_PD8_PD9,		///< TX/PD8, RX/PD9, CK/PD10, CTS/PD11, RTS/PD12
+#else
+				REMAP_PB10_PB11 = AFIO_MAPR_USART3_REMAP_NOREMAP,		///< TX/PB10, RX/PB11, CK/PB12, CTS/PB13, RTS/PB14
+				REMAP_PC10_PC11 = AFIO_MAPR_USART3_REMAP_PARTIALREMAP,	///< TX/PC10, RX/PC11, CK/PC12, CTS/PB13, RTS/PB14
+				REMAP_PD8_PD9 = AFIO_MAPR_USART3_REMAP_FULLREMAP,		///< TX/PD8, RX/PD9, CK/PD10, CTS/PD11, RTS/PD12
+#endif
+			};
+			
+			/**
+			 * Configure the IO Pins for Usart3
+			 */
+			static void
+			configurePins(Mapping mapping);
+			
+			/**
+			 * Set baudrate.
+			 * 
+			 * \param	baudrate	Desired baud rate (e.g. 115200)
+			 * \param	interruptPriority
+			 * 			Interrupt vector priority (0=highest to 15=lowest)
+			 * \param	blocking
+			 * 			The write-function waits until a free slot is available
+			 * 			in the send buffer.
+			 */
+			static void
+			setBaudrate(uint32_t baudrate, uint32_t interruptPriority,
+					bool blocking = true);
+			
+			/**
+			 * \brief	Send a single byte
+			 */
+			static void
+			write(uint8_t data);
+			
+			/**
+			 * \brief	Write a block of bytes
+			 *
+			 * \param	*buffer	Pointer to a buffer
+			 * \param	n	Number of bytes to be read
+			 */
+			static void
+			write(const uint8_t *buffer, uint8_t n);
+			
+			/**
+			 * \brief	Read a single byte
+			 */
+			static bool
+			read(uint8_t& c);
+			
+			/**
+			 * \brief	Read a block of bytes
+			 * 
+			 * \param	*buffer	Pointer to a buffer big enough to storage \a n bytes
+			 * \param	n	Number of bytes to be read
+			 * 
+			 * \return	Number of bytes which could be read, maximal \a n
+			 */
+			static uint8_t
+			read(uint8_t *buffer, uint8_t n);
+			
+			/**
+			 * \brief	Empty the receive FIFO queue and USART buffer.
+			 *
+			 * \return	the size of the deleted FIFO queue.
+			 */
+			static uint8_t
+			flushReceiveBuffer();
+			
+//			static uint8_t
+//			flushTransmitBuffer();
+		};
+
+		
 		
 #if defined(STM32F2XX) || defined(STM32F4XX)
 		// --------------------------------------------------------------------
