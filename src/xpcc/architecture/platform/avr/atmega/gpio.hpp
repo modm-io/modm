@@ -57,26 +57,26 @@ namespace xpcc
  */
 #define	GPIO__IO(name, port, pin) \
 	struct name { \
-		ALWAYS_INLINE static void setInput() { DDR ## port &= ~(1 << pin); } \
+		ALWAYS_INLINE static void setInput() { CONCAT(DDR, port) &= ~(1 << pin); } \
 		ALWAYS_INLINE static void \
 		setInput(::xpcc::atmega::Configuration config) \
 		{ \
 			setInput(); \
 			if (config == ::xpcc::atmega::PULLUP) { \
-				PORT ## port |= (1 << pin); \
+				CONCAT(PORT, port) |= (1 << pin); \
 			} \
 			else { \
-				PORT ## port &= ~(1 << pin); \
+				CONCAT(PORT, port) &= ~(1 << pin); \
 			} \
 		} \
-		ALWAYS_INLINE static void setOutput() { DDR ## port |= (1 << pin); } \
+		ALWAYS_INLINE static void setOutput() { CONCAT(DDR, port) |= (1 << pin); } \
 		ALWAYS_INLINE static void setOutput(bool status) { \
 			set(status); \
 			setOutput(); } \
-		ALWAYS_INLINE static void set() { PORT ## port |= (1 << pin); } \
-		ALWAYS_INLINE static void reset() { PORT ## port &= ~(1 << pin); } \
-		ALWAYS_INLINE static void toggle() { PORT ## port ^= (1 << pin); } \
-		ALWAYS_INLINE static bool read() { return (PIN ## port & (1 << pin)); } \
+		ALWAYS_INLINE static void set()    { CONCAT(PORT, port) |=  (1 << pin); } \
+		ALWAYS_INLINE static void reset()  { CONCAT(PORT, port) &= ~(1 << pin); } \
+		ALWAYS_INLINE static void toggle() { CONCAT(PORT, port) ^=  (1 << pin); } \
+		ALWAYS_INLINE static bool read()   { return (CONCAT(PIN, port) & (1 << pin)); } \
 		\
 		ALWAYS_INLINE static void \
 		set(bool status) { \
@@ -97,13 +97,13 @@ namespace xpcc
  */
 #define	GPIO__OUTPUT(name, port, pin) \
 	struct name { \
-		ALWAYS_INLINE static void setOutput() { DDR ## port |= (1 << pin); } \
+		ALWAYS_INLINE static void setOutput() { CONCAT(DDR, port) |= (1 << pin); } \
 		ALWAYS_INLINE static void setOutput(bool status) { \
 			set(status); \
 			setOutput(); } \
-		ALWAYS_INLINE static void set() { PORT ## port |= (1 << pin); } \
-		ALWAYS_INLINE static void reset() { PORT ## port &= ~(1 << pin); } \
-		ALWAYS_INLINE static void toggle() { PORT ## port ^= (1 << pin); } \
+		ALWAYS_INLINE static void set()    { CONCAT(PORT, port) |=  (1 << pin); } \
+		ALWAYS_INLINE static void reset()  { CONCAT(PORT, port) &= ~(1 << pin); } \
+		ALWAYS_INLINE static void toggle() { CONCAT(PORT, port) ^=  (1 << pin); } \
 		\
 		ALWAYS_INLINE static void \
 		set(bool status) { \
@@ -128,15 +128,15 @@ namespace xpcc
 		setInput(::xpcc::atmega::Configuration config) { \
 			setInput(); \
 			if (config == ::xpcc::atmega::PULLUP) { \
-				PORT ## port |= (1 << pin); \
+				CONCAT(PORT, port) |= (1 << pin); \
 			} \
 			else { \
-				PORT ## port &= ~(1 << pin); \
+				CONCAT(PORT, port) &= ~(1 << pin); \
 			} \
 		} \
 		\
-		ALWAYS_INLINE static void setInput() { DDR ## port &= ~(1 << pin); } \
-		ALWAYS_INLINE static bool read() { return (PIN ## port & (1 << pin)); } \
+		ALWAYS_INLINE static void setInput() { CONCAT(DDR, port) &= ~(1 << pin); } \
+		ALWAYS_INLINE static bool read() { return (CONCAT(PIN, port) & (1 << pin)); } \
 	}
 
 /**
@@ -150,16 +150,16 @@ namespace xpcc
 #define GPIO__NIBBLE_LOW(name, port) \
 	struct name { \
 		ALWAYS_INLINE static void setOutput() { \
-			DDR ## port |= 0x0f; \
+			CONCAT(DDR, port) |= 0x0f; \
 		} \
 		ALWAYS_INLINE static void setInput() { \
-			DDR ## port &= ~0x0f; \
+			CONCAT(DDR, port) &= ~0x0f; \
 		} \
 		ALWAYS_INLINE static uint8_t read() { \
-			return (PIN ## port & 0x0f); \
+			return (CONCAT(PIN, port) & 0x0f); \
 		} \
 		ALWAYS_INLINE static void write(uint8_t data) { \
-			PORT ## port = (data & 0x0f) | (PORT ## port & 0xf0); \
+			CONCAT(PORT, port) = (data & 0x0f) | (CONCAT(PORT, port) & 0xf0); \
 		} \
 	}
 
@@ -174,18 +174,18 @@ namespace xpcc
 #define GPIO__NIBBLE_HIGH(name, port) \
 	struct name { \
 		ALWAYS_INLINE static void setOutput() { \
-			DDR ## port |= 0xf0; \
+			CONCAT(DDR, port) |= 0xf0; \
 		} \
 		ALWAYS_INLINE static void setInput() { \
-			DDR ## port &= ~0xf0; \
+			CONCAT(DDR, port) &= ~0xf0; \
 		} \
 		ALWAYS_INLINE static uint8_t read() { \
-			uint8_t data = PIN ## port; \
+			uint8_t data = CONCAT(PIN, port); \
 			return (data >> 4); \
 		} \
 		ALWAYS_INLINE static void write(uint8_t data) { \
 			data = ::xpcc::swap(data); \
-			PORT ## port = (data & 0xf0) | (PORT ## port & 0x0f); \
+			CONCAT(PORT, port) = (data & 0xf0) | (CONCAT(PORT, port) & 0x0f); \
 		} \
 	}
 
@@ -200,16 +200,16 @@ namespace xpcc
 #define GPIO__PORT(name, port) \
 	struct name { \
 		ALWAYS_INLINE static void setOutput() { \
-			DDR ## port = 0xff; \
+			CONCAT(DDR, port) = 0xff; \
 		} \
 		ALWAYS_INLINE static void setInput() { \
-			DDR ## port = 0; \
+			CONCAT(DDR, port) = 0; \
 		} \
 		ALWAYS_INLINE static uint8_t read() { \
-			return PIN ## port; \
+			return CONCAT(PIN, port); \
 		} \
 		ALWAYS_INLINE static void write(uint8_t data) { \
-			PORT ## port = data; \
+			CONCAT(PORT, port) = data; \
 		} \
 	}
 

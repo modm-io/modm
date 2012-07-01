@@ -136,32 +136,32 @@ namespace xpcc
 		setOutput(::xpcc::stm32::OutputType type = ::xpcc::stm32::PUSH_PULL, \
 				::xpcc::stm32::OutputSpeed speed = ::xpcc::stm32::SPEED_50MHZ) { \
 			uint32_t config = 0x0 | type | speed; \
-			::xpcc::stm32::GpioMode<GPIO ## port ## _BASE_ADDR, pin>::setMode(config); \
+			::xpcc::stm32::GpioMode<CONCAT3(GPIO, port, _BASE_ADDR), pin>::setMode(config); \
 		} \
 		ALWAYS_INLINE static void \
 		setAlternateFunction(::xpcc::stm32::OutputType type = ::xpcc::stm32::PUSH_PULL, \
 				::xpcc::stm32::OutputSpeed speed = ::xpcc::stm32::SPEED_50MHZ) { \
 			uint32_t config = 0x8 | type | speed; \
-			::xpcc::stm32::GpioMode<GPIO ## port ## _BASE_ADDR, pin>::setMode(config); \
+			::xpcc::stm32::GpioMode<CONCAT3(GPIO, port, _BASE_ADDR), pin>::setMode(config); \
 		} \
 		ALWAYS_INLINE static void \
 		setInput(::xpcc::stm32::InputType type = ::xpcc::stm32::FLOATING) { \
 			if (type == ::xpcc::stm32::PULLUP) { \
-				GPIO_REG(GPIO ## port ## _BASE_ADDR)->BSRR = (1 << pin); \
+				GPIO_REG(CONCAT3(GPIO, port, _BASE_ADDR))->BSRR = (1 << pin); \
 			} else if (type == ::xpcc::stm32::PULLDOWN) { \
-				GPIO_REG(GPIO ## port ## _BASE_ADDR)->BRR = (1 << pin); \
+				GPIO_REG(CONCAT3(GPIO, port, _BASE_ADDR))->BRR = (1 << pin); \
 			} \
-			::xpcc::stm32::GpioMode<GPIO ## port ## _BASE_ADDR, pin>::setMode(type & 0xc); \
+			::xpcc::stm32::GpioMode<CONCAT3(GPIO, port, _BASE_ADDR), pin>::setMode(type & 0xc); \
 		} \
 		ALWAYS_INLINE static void \
 		setAnalogInput() { \
-			::xpcc::stm32::GpioMode<GPIO ## port ## _BASE_ADDR, pin>::setMode(0); \
+			::xpcc::stm32::GpioMode<CONCAT3(GPIO, port, _BASE_ADDR), pin>::setMode(0); \
 		} \
-		ALWAYS_INLINE static void set() { GPIO_REG(GPIO ## port ## _BASE_ADDR)->BSRR = (1 << pin); } \
-		ALWAYS_INLINE static void reset() { GPIO_REG(GPIO ## port ## _BASE_ADDR)->BRR = (1 << pin); } \
+		ALWAYS_INLINE static void set() { GPIO_REG(CONCAT3(GPIO, port, _BASE_ADDR))->BSRR = (1 << pin); } \
+		ALWAYS_INLINE static void reset() { GPIO_REG(CONCAT3(GPIO, port, _BASE_ADDR))->BRR = (1 << pin); } \
 		ALWAYS_INLINE static void toggle() { \
-			if (GPIO_REG(GPIO ## port ## _BASE_ADDR)->IDR & (1 << pin)) { reset(); } else { set(); } } \
-		ALWAYS_INLINE static bool read() { return (GPIO_REG(GPIO ## port ## _BASE_ADDR)->IDR & (1 << pin)); } \
+			if (GPIO_REG(CONCAT3(GPIO, port, _BASE_ADDR))->IDR & (1 << pin)) { reset(); } else { set(); } } \
+		ALWAYS_INLINE static bool read() { return (GPIO_REG(CONCAT3(GPIO, port, _BASE_ADDR))->IDR & (1 << pin)); } \
 		\
 		ALWAYS_INLINE static void \
 		set(bool status) { \
@@ -207,18 +207,18 @@ namespace xpcc
 		setOutput(::xpcc::stm32::OutputType type = ::xpcc::stm32::PUSH_PULL, \
 				::xpcc::stm32::OutputSpeed speed = ::xpcc::stm32::SPEED_50MHZ) { \
 			uint32_t config = 0x0 | type | speed; \
-			::xpcc::stm32::GpioMode<GPIO ## port ## _BASE_ADDR, pin>::setMode(config); \
+			::xpcc::stm32::GpioMode<CONCAT3(GPIO, port, _BASE_ADDR), pin>::setMode(config); \
 		} \
 		ALWAYS_INLINE static void \
 		setAlternateFunction(::xpcc::stm32::OutputType type = ::xpcc::stm32::PUSH_PULL, \
 				::xpcc::stm32::OutputSpeed speed = ::xpcc::stm32::SPEED_50MHZ) { \
 			uint32_t config = 0x8 | type | speed; \
-			::xpcc::stm32::GpioMode<GPIO ## port ## _BASE_ADDR, pin>::setMode(config); \
+			::xpcc::stm32::GpioMode<CONCAT3(GPIO, port, _BASE_ADDR), pin>::setMode(config); \
 		} \
-		ALWAYS_INLINE static void set() { GPIO_REG(GPIO ## port ## _BASE_ADDR)->BSRR = (1 << pin); } \
-		ALWAYS_INLINE static void reset() { GPIO_REG(GPIO ## port ## _BASE_ADDR)->BRR = (1 << pin); } \
+		ALWAYS_INLINE static void set() { GPIO_REG(CONCAT3(GPIO, port, _BASE_ADDR))->BSRR = (1 << pin); } \
+		ALWAYS_INLINE static void reset() { GPIO_REG(CONCAT3(GPIO, port, _BASE_ADDR))->BRR = (1 << pin); } \
 		ALWAYS_INLINE static void toggle() { \
-			if (GPIO_REG(GPIO ## port ## _BASE_ADDR)->IDR & (1 << pin)) { reset(); } else { set(); } } \
+			if (GPIO_REG(CONCAT3(GPIO, port, _BASE_ADDR))->IDR & (1 << pin)) { reset(); } else { set(); } } \
 		ALWAYS_INLINE static void \
 		set(bool status) { \
 			if (status) { \
@@ -255,17 +255,17 @@ namespace xpcc
 		ALWAYS_INLINE static void \
 		setInput(::xpcc::stm32::InputType type = ::xpcc::stm32::FLOATING) { \
 			if (type == ::xpcc::stm32::PULLUP) { \
-				GPIO_REG(GPIO ## port ## _BASE_ADDR)->BSRR = (1 << pin); \
+				GPIO_REG(CONCAT3(GPIO, port, _BASE_ADDR))->BSRR = (1 << pin); \
 			} else if (type == ::xpcc::stm32::PULLDOWN) { \
-				GPIO_REG(GPIO ## port ## _BASE_ADDR)->BRR = (1 << pin); \
+				GPIO_REG(CONCAT3(GPIO, port, _BASE_ADDR))->BRR = (1 << pin); \
 			} \
-			::xpcc::stm32::GpioMode<GPIO ## port ## _BASE_ADDR, pin>::setMode(type & 0xc); \
+			::xpcc::stm32::GpioMode<CONCAT3(GPIO, port, _BASE_ADDR), pin>::setMode(type & 0xc); \
 		} \
 		ALWAYS_INLINE static void \
 		setAnalogInput() { \
-			::xpcc::stm32::GpioMode<GPIO ## port ## _BASE_ADDR, pin>::setMode(0); \
+			::xpcc::stm32::GpioMode<CONCAT3(GPIO, port, _BASE_ADDR), pin>::setMode(0); \
 		} \
-		ALWAYS_INLINE static bool read() { return (GPIO_REG(GPIO ## port ## _BASE_ADDR)->IDR & (1 << pin)); } \
+		ALWAYS_INLINE static bool read() { return (GPIO_REG(CONCAT3(GPIO, port, _BASE_ADDR))->IDR & (1 << pin)); } \
 	}
 
 #endif // XPCC_STM32F1__GPIO_HPP

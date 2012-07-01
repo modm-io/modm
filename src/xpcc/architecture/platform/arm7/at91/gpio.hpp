@@ -115,10 +115,10 @@ str     r2, [r3, #-207] ; Led2::set()
 			if (mode == ::xpcc::gpio::INPUT) { \
 				setInput(); \
 				if (config == ::xpcc::gpio::PULLUP) { \
-					AT91C_BASE_PIO ## port->PIO_PPUER = (1 << pin); \
+					CONCAT(AT91C_BASE_PIO, port)->PIO_PPUER = (1 << pin); \
 				} \
 				else { \
-					AT91C_BASE_PIO ## port->PIO_PPUDR = (1 << pin); \
+					CONCAT(AT91C_BASE_PIO, port)->PIO_PPUDR = (1 << pin); \
 				} \
 			} \
 			else { \
@@ -127,19 +127,19 @@ str     r2, [r3, #-207] ; Led2::set()
 		} \
 		ALWAYS_INLINE static void setOutput() { \
 			/* PIO Enable and Output Enable */ \
-			AT91C_BASE_PIO ## port->PIO_PER = (1 << pin); \
-			AT91C_BASE_PIO ## port->PIO_OER = (1 << pin); } \
+			CONCAT(AT91C_BASE_PIO, port)->PIO_PER = (1 << pin); \
+			CONCAT(AT91C_BASE_PIO, port)->PIO_OER = (1 << pin); } \
 		ALWAYS_INLINE static void setOutput(bool status) { \
 			set(status); \
 			setOutput(); } \
 		ALWAYS_INLINE static void setInput() { \
-			AT91C_BASE_PIO ## port->PIO_PER = (1 << pin); \
-			AT91C_BASE_PIO ## port->PIO_ODR = (1 << pin); } \
-		ALWAYS_INLINE static void set() { AT91C_BASE_PIO ## port->PIO_SODR = (1 << pin); } \
-		ALWAYS_INLINE static void reset() { AT91C_BASE_PIO ## port->PIO_CODR = (1 << pin); } \
+			CONCAT(AT91C_BASE_PIO, port)->PIO_PER = (1 << pin); \
+			CONCAT(AT91C_BASE_PIO, port)->PIO_ODR = (1 << pin); } \
+		ALWAYS_INLINE static void set()    { CONCAT(AT91C_BASE_PIO, port)->PIO_SODR = (1 << pin); } \
+		ALWAYS_INLINE static void reset()  { CONCAT(AT91C_BASE_PIO, port)->PIO_CODR = (1 << pin); } \
 		ALWAYS_INLINE static void toggle() { \
-			if (AT91C_BASE_PIO ## port->PIO_ODSR & (1 << pin)) { reset(); } else { set(); } } \
-		ALWAYS_INLINE static bool read() { return (AT91C_BASE_PIO ## port->PIO_PDSR & (1 << pin)); } \
+			if (CONCAT(AT91C_BASE_PIO, port)->PIO_ODSR & (1 << pin)) { reset(); } else { set(); } } \
+		ALWAYS_INLINE static bool read() { return (CONCAT(AT91C_BASE_PIO, port)->PIO_PDSR & (1 << pin)); } \
 		\
 		ALWAYS_INLINE static void \
 		set(bool status) { \
@@ -151,18 +151,18 @@ str     r2, [r3, #-207] ; Led2::set()
 			} \
 		} \
 		\
-		ALWAYS_INLINE static void enableOpenDrainOutput() { AT91C_BASE_PIO ## port->PIO_MDER = (1 << pin); } \
-		ALWAYS_INLINE static void disableOpenDrainOutput() { AT91C_BASE_PIO ## port->PIO_MDDR = (1 << pin); } \
+		ALWAYS_INLINE static void enableOpenDrainOutput()  { CONCAT(AT91C_BASE_PIO, port)->PIO_MDER = (1 << pin); } \
+		ALWAYS_INLINE static void disableOpenDrainOutput() { CONCAT(AT91C_BASE_PIO, port)->PIO_MDDR = (1 << pin); } \
 		\
-		ALWAYS_INLINE static void enableInterrupt() { AT91C_BASE_PIO ## port->PIO_IER = (1 << pin); } \
-		ALWAYS_INLINE static void disableInterrupt() { AT91C_BASE_PIO ## port->PIO_IDR = (1 << pin); } \
+		ALWAYS_INLINE static void enableInterrupt()  { CONCAT(AT91C_BASE_PIO, port)->PIO_IER = (1 << pin); } \
+		ALWAYS_INLINE static void disableInterrupt() { CONCAT(AT91C_BASE_PIO, port)->PIO_IDR = (1 << pin); } \
 		\
 		ALWAYS_INLINE static void enablePeripheralA() { \
-			AT91C_BASE_PIO ## port->PIO_PDR = (1 << pin); \
-			AT91C_BASE_PIO ## port->PIO_ASR = (1 << pin); } \
+			CONCAT(AT91C_BASE_PIO, port)->PIO_PDR = (1 << pin); \
+			CONCAT(AT91C_BASE_PIO, port)->PIO_ASR = (1 << pin); } \
 		ALWAYS_INLINE static void enablePeripheralB() { \
-			AT91C_BASE_PIO ## port->PIO_PDR = (1 << pin); \
-			AT91C_BASE_PIO ## port->PIO_BSR = (1 << pin); } \
+			CONCAT(AT91C_BASE_PIO, port->PIO_PDR) = (1 << pin); \
+			CONCAT(AT91C_BASE_PIO, port->PIO_BSR) = (1 << pin); } \
 	}
 
 /**
@@ -175,15 +175,15 @@ str     r2, [r3, #-207] ; Led2::set()
 	struct name { \
 		ALWAYS_INLINE static void setOutput() { \
 			/* PIO Enable and Output Enable */ \
-			AT91C_BASE_PIO ## port->PIO_PER = (1 << pin); \
-			AT91C_BASE_PIO ## port->PIO_OER = (1 << pin); } \
+			CONCAT(AT91C_BASE_PIO, port)->PIO_PER = (1 << pin); \
+			CONCAT(AT91C_BASE_PIO, port)->PIO_OER = (1 << pin); } \
 		ALWAYS_INLINE static void setOutput(bool status) { \
 			set(status); \
 			setOutput(); } \
-		ALWAYS_INLINE static void set() { AT91C_BASE_PIO ## port->PIO_SODR = (1 << pin); } \
-		ALWAYS_INLINE static void reset() { AT91C_BASE_PIO ## port->PIO_CODR = (1 << pin); } \
+		ALWAYS_INLINE static void set()    { CONCAT(AT91C_BASE_PIO, port)->PIO_SODR = (1 << pin); } \
+		ALWAYS_INLINE static void reset()  { CONCAT(AT91C_BASE_PIO, port)->PIO_CODR = (1 << pin); } \
 		ALWAYS_INLINE static void toggle() { \
-			if (AT91C_BASE_PIO ## port->PIO_ODSR & (1 << pin)) { reset(); } else { set(); } } \
+			if (CONCAT(AT91C_BASE_PIO, port)->PIO_ODSR & (1 << pin)) { reset(); } else { set(); } } \
 		ALWAYS_INLINE static void \
 		set(bool status) { \
 			if (status) { \
@@ -193,15 +193,15 @@ str     r2, [r3, #-207] ; Led2::set()
 				reset(); \
 			} \
 		} \
-		ALWAYS_INLINE static void enableOpenDrainOutput() { AT91C_BASE_PIO ## port->PIO_MDER = (1 << pin); } \
-		ALWAYS_INLINE static void disableOpenDrainOutput() { AT91C_BASE_PIO ## port->PIO_MDDR = (1 << pin); } \
+		ALWAYS_INLINE static void enableOpenDrainOutput()  { CONCAT(AT91C_BASE_PIO, port)->PIO_MDER = (1 << pin); } \
+		ALWAYS_INLINE static void disableOpenDrainOutput() { CONCAT(AT91C_BASE_PIO, port)->PIO_MDDR = (1 << pin); } \
 		\
 		ALWAYS_INLINE static void enablePeripheralA() { \
-			AT91C_BASE_PIO ## port->PIO_PDR = (1 << pin); \
-			AT91C_BASE_PIO ## port->PIO_ASR = (1 << pin); } \
+			CONCAT(AT91C_BASE_PIO, port)->PIO_PDR = (1 << pin); \
+			CONCAT(AT91C_BASE_PIO, port)->PIO_ASR = (1 << pin); } \
 		ALWAYS_INLINE static void enablePeripheralB() { \
-			AT91C_BASE_PIO ## port->PIO_PDR = (1 << pin); \
-			AT91C_BASE_PIO ## port->PIO_BSR = (1 << pin); } \
+			CONCAT(AT91C_BASE_PIO, port)->PIO_PDR = (1 << pin); \
+			CONCAT(AT91C_BASE_PIO, port)->PIO_BSR = (1 << pin); } \
 	}
 
 /**
@@ -216,26 +216,26 @@ str     r2, [r3, #-207] ; Led2::set()
 		configure(::xpcc::gpio::Configuration config = ::xpcc::gpio::NORMAL) { \
 			setInput(); \
 			if (config == ::xpcc::gpio::PULLUP) { \
-				AT91C_BASE_PIO ## port->PIO_PPUER = (1 << pin); \
+				CONCAT(AT91C_BASE_PIO, port)->PIO_PPUER = (1 << pin); \
 			} \
 			else { \
-				AT91C_BASE_PIO ## port->PIO_PPUDR = (1 << pin); \
+				CONCAT(AT91C_BASE_PIO, port)->PIO_PPUDR = (1 << pin); \
 			} \
 		} \
 		ALWAYS_INLINE static void setInput() { \
-			AT91C_BASE_PIO ## port->PIO_PER = (1 << pin); \
-			AT91C_BASE_PIO ## port->PIO_ODR = (1 << pin); } \
-		ALWAYS_INLINE static bool read() { return (AT91C_BASE_PIO ## port->PIO_PDSR & (1 << pin)); } \
+			CONCAT(AT91C_BASE_PIO, port)->PIO_PER = (1 << pin); \
+			CONCAT(AT91C_BASE_PIO, port)->PIO_ODR = (1 << pin); } \
+		ALWAYS_INLINE static bool read() { return (CONCAT(AT91C_BASE_PIO port)->PIO_PDSR & (1 << pin)); } \
 		\
-		ALWAYS_INLINE static void enableInterrupt() { AT91C_BASE_PIO ## port->PIO_IER = (1 << pin); } \
-		ALWAYS_INLINE static void disableInterrupt() { AT91C_BASE_PIO ## port->PIO_IDR = (1 << pin); } \
+		ALWAYS_INLINE static void enableInterrupt()  { CONCAT(AT91C_BASE_PIO, port)->PIO_IER = (1 << pin); } \
+		ALWAYS_INLINE static void disableInterrupt() { CONCAT(AT91C_BASE_PIO, port)->PIO_IDR = (1 << pin); } \
 		\
 		ALWAYS_INLINE static void enablePeripheralA() { \
-			AT91C_BASE_PIO ## port->PIO_PDR = (1 << pin); \
-			AT91C_BASE_PIO ## port->PIO_ASR = (1 << pin); } \
+			CONCAT(AT91C_BASE_PIO, port)->PIO_PDR = (1 << pin); \
+			CONCAT(AT91C_BASE_PIO, port)->PIO_ASR = (1 << pin); } \
 		ALWAYS_INLINE static void enablePeripheralB() { \
-			AT91C_BASE_PIO ## port->PIO_PDR = (1 << pin); \
-			AT91C_BASE_PIO ## port->PIO_BSR = (1 << pin); } \
+			CONCAT(AT91C_BASE_PIO, port)->PIO_PDR = (1 << pin); \
+			CONCAT(AT91C_BASE_PIO, port)->PIO_BSR = (1 << pin); } \
 	}
 
 #endif // XPCC_AT91__GPIO_HPP
