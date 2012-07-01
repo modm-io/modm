@@ -81,29 +81,39 @@
 #define IODIR3         (*(volatile unsigned long *)(GPIO_BASE_ADDR + 0x38))
 #define IOCLR3         (*(volatile unsigned long *)(GPIO_BASE_ADDR + 0x3C))
 
+/* System Control Block(SCB) modules include Memory Accelerator Module,
+Phase Locked Loop, VPB divider, Power Control, External Interrupt,
+Reset, and Code Security/Debugging */
+#define SCB_BASE_ADDR	0xE01FC000
+
 /* Memory Accelerator Module (MAM) */
-#define MAMCR          (*((volatile unsigned char *) 0xE01FC000))
-#define MAMTIM         (*((volatile unsigned char *) 0xE01FC004))
-#define MEMMAP         (*((volatile unsigned char *) 0xE01FC040))
+
+
+#define MAMCR          (*(volatile unsigned char *)(SCB_BASE_ADDR + 0x00))
+#define MAMTIM         (*(volatile unsigned char *)(SCB_BASE_ADDR + 0x04))
+#define MEMMAP         (*(volatile unsigned char *)(SCB_BASE_ADDR + 0x40))
 
 /* Phase Locked Loop (PLL) */
-#define PLLCON         (*((volatile unsigned char *) 0xE01FC080))
-#define PLLCFG         (*((volatile unsigned char *) 0xE01FC084))
-#define PLLSTAT        (*((volatile unsigned short*) 0xE01FC088))
-#define PLLFEED        (*((volatile unsigned char *) 0xE01FC08C))
-
-/* VPB Divider */
-#define VPBDIV         (*((volatile unsigned char *) 0xE01FC100))
+#define PLLCON         (*(volatile unsigned char *)(SCB_BASE_ADDR + 0x80))
+#define PLLCFG         (*(volatile unsigned char *)(SCB_BASE_ADDR + 0x84))
+#define PLLSTAT        (*(volatile unsigned short*)(SCB_BASE_ADDR + 0x88))
+#define PLLFEED        (*(volatile unsigned char *)(SCB_BASE_ADDR + 0x8C))
 
 /* Power Control */
-#define PCON           (*((volatile unsigned char *) 0xE01FC0C0))
-#define PCONP          (*((volatile unsigned long *) 0xE01FC0C4))
+#define PCON           (*(volatile unsigned char *)(SCB_BASE_ADDR + 0xC0))
+#define PCONP          (*(volatile unsigned long *)(SCB_BASE_ADDR + 0xC4))
+
+/* APB Divider */
+#define APBDIV         (*(volatile unsigned char *)(SCB_BASE_ADDR + 0x100))
+
+/* System Controls and Status */
+#define SCS            (*(volatile unsigned long *)(SCB_BASE_ADDR + 0x1A0))
 
 /* External Interrupts */
-#define EXTINT         (*((volatile unsigned char *) 0xE01FC140))
-#define EXTWAKE        (*((volatile unsigned char *) 0xE01FC144))	// LPC213x: INTWAKE
-#define EXTMODE        (*((volatile unsigned char *) 0xE01FC148))
-#define EXTPOLAR       (*((volatile unsigned char *) 0xE01FC14C))
+#define EXTINT         (*(volatile unsigned char *)(SCB_BASE_ADDR + 0x140))
+#define EXTWAKE        (*(volatile unsigned char *)(SCB_BASE_ADDR + 0x144))	// LPC213x: INTWAKE
+#define EXTMODE        (*(volatile unsigned char *)(SCB_BASE_ADDR + 0x148))
+#define EXTPOLAR       (*(volatile unsigned char *)(SCB_BASE_ADDR + 0x14C))
 
 /* LPC213x: Reset */
 #define RSID           (*((volatile unsigned char *) 0xE01FC180))

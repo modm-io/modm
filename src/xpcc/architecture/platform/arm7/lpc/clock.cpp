@@ -83,8 +83,10 @@ xpcc::lpc::Clock::initialize()
 		// Wait until main OSC is usable
 	}
 
-	// select main OSC as the PLL clock source
+	// In LPC23xx/LPC24xx: select main OSC as the PLL clock source
+#if defined(__ARM_LPC23_24__)
 	CLKSRCSEL = 0x1;
+#endif
 
 	PLLCFG = (PLL_MValue & 0x7fff) | ((PLL_NValue & 0xff) << 16);
 	PLLFEED = 0xaa;
@@ -95,8 +97,10 @@ xpcc::lpc::Clock::initialize()
 	PLLFEED = 0xaa;
 	PLLFEED = 0x55;
 	
-	// Set clock divider
+	// In LPC23xx/LPC24xx: Set clock divider
+#if defined(__ARM_LPC23_24__)
 	CCLKCFG = CCLKDivValue;
+#endif
 
 	while ((PLLSTAT & PLLSTAT_PLOCK) == 0) {
 		// wait for PLL lock

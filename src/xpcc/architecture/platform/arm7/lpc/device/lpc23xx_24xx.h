@@ -1,5 +1,5 @@
 /**
- * @file	lpc21xx.h
+ * @file	lpc23xx_24xx.h
  * @brief	Header file for all LPC23xx/24xx Microprocessors
  * 
  * The header file is the super set of all hardware definition of the 
