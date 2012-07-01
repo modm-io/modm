@@ -215,8 +215,8 @@ namespace xpcc
 			uint32_t config = 0x8 | type | speed; \
 			::xpcc::stm32::GpioMode<CONCAT3(GPIO, port, _BASE_ADDR), pin>::setMode(config); \
 		} \
-		ALWAYS_INLINE static void set() { GPIO_REG(CONCAT3(GPIO, port, _BASE_ADDR))->BSRR = (1 << pin); } \
-		ALWAYS_INLINE static void reset() { GPIO_REG(CONCAT3(GPIO, port, _BASE_ADDR))->BRR = (1 << pin); } \
+		ALWAYS_INLINE static void set()    { GPIO_REG(CONCAT3(GPIO, port, _BASE_ADDR))->BSRR = (1 << pin); } \
+		ALWAYS_INLINE static void reset()  { GPIO_REG(CONCAT3(GPIO, port, _BASE_ADDR))->BRR  = (1 << pin); } \
 		ALWAYS_INLINE static void toggle() { \
 			if (GPIO_REG(CONCAT3(GPIO, port, _BASE_ADDR))->IDR & (1 << pin)) { reset(); } else { set(); } } \
 		ALWAYS_INLINE static void \
