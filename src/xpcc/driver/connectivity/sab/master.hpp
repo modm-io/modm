@@ -114,7 +114,7 @@ namespace xpcc
 			static inline const T *
 			getResponse();
 			
-			static inline const void *
+			static inline const uint8_t *
 			getResponse();
 			
 			

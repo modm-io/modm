@@ -81,10 +81,10 @@ xpcc::amnb::Action::call(Response& response, const void *payload)
 
 // ----------------------------------------------------------------------------
 inline void
-xpcc::amnb::Listener::call(const void *payload, const uint8_t length)
+xpcc::amnb::Listener::call(const void *payload, const uint8_t length, const uint8_t sender)
 {
 	// redirect call to the actual object
-	(object->*function)(payload, length);
+	(object->*function)(payload, length, sender);
 }
 
 // ----------------------------------------------------------------------------
@@ -414,7 +414,7 @@ xpcc::amnb::Node<Interface>::update()
 				if ((messageAddress == listen.address) && (messageCommand == listen.command))
 				{
 					// execute callback function
-					listen.call(Interface::getPayload(), Interface::getPayloadLength());
+					listen.call(Interface::getPayload(), Interface::getPayloadLength(), messageAddress);
 					break;
 				}
 			}

@@ -171,10 +171,10 @@ namespace xpcc
 		 */
 		struct Listener
 		{
-			typedef void (Callable::*Callback)(const void *payload, const uint8_t length);
+			typedef void (Callable::*Callback)(const void *payload, const uint8_t length, const uint8_t sender);
 			
 			inline void
-			call(const void *payload, const uint8_t length);
+			call(const void *payload, const uint8_t length, const uint8_t sender);
 			
 			uint8_t address;			//!< Address of transmitting node
 			uint8_t command;
@@ -488,7 +488,14 @@ namespace xpcc
 	 * {
 	 * public:
 	 *     void
-	 *     listenToCommand(uint8_t *payload, const uint8_t length)
+	 *     listenToCommand(uint8_t *payload, const uint8_t length, uint8_t sender)
+	 *     {
+	 *         // ... do something useful ...
+	 *         
+	 *     }
+	 *
+	 *     void
+	 *     listenToCommandWithOutCaringForSender(uint8_t *payload, const uint8_t length)
 	 *     {
 	 *         // ... do something useful ...
 	 *         

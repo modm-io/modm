@@ -141,10 +141,10 @@ xpcc::sab::Master<Interface>::getResponse()
 }
 
 template <typename Interface>
-const void *
+const uint8_t *
 xpcc::sab::Master<Interface>::getResponse()
 {
-	return reinterpret_cast<const void *>(interface.getPayload());
+	return reinterpret_cast<const uint8_t *>(interface.getPayload());
 }
 
 // ----------------------------------------------------------------------------
