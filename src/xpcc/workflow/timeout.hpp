@@ -107,6 +107,12 @@ namespace xpcc
 		void
 		restart(Timestamp time);
 		
+		/**
+		 * \brief	Returns the remaining time until a timeout.
+		 */
+		inline xpcc::Timestamp
+		remaining();
+
 	private:
 		enum State
 		{

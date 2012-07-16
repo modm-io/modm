@@ -84,3 +84,13 @@ xpcc::Timeout<T>::restart(Timestamp time)
 	endTime = T::now() + time;
 	state = ACTIVE;
 }
+
+template<typename T>
+xpcc::Timestamp
+xpcc::Timeout<T>::remaining()
+{
+	if (isExpired())
+		return 0;
+	else
+		return (endTime - T::now());
+}
