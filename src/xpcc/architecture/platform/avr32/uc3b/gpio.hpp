@@ -50,6 +50,30 @@ namespace xpcc
 }
 
 /**
+ * \brief	Pin Macros without padding a padding 0. Ugly but \c #if is not possible in \c #define
+ */
+#define AVR32_PIN_PA1 AVR32_PIN_PA01
+#define AVR32_PIN_PA2 AVR32_PIN_PA02
+#define AVR32_PIN_PA3 AVR32_PIN_PA03
+#define AVR32_PIN_PA4 AVR32_PIN_PA04
+#define AVR32_PIN_PA5 AVR32_PIN_PA05
+#define AVR32_PIN_PA6 AVR32_PIN_PA06
+#define AVR32_PIN_PA7 AVR32_PIN_PA07
+#define AVR32_PIN_PA8 AVR32_PIN_PA08
+#define AVR32_PIN_PA9 AVR32_PIN_PA09
+
+#define AVR32_PIN_PB1 AVR32_PIN_PB01
+#define AVR32_PIN_PB2 AVR32_PIN_PB02
+#define AVR32_PIN_PB3 AVR32_PIN_PB03
+#define AVR32_PIN_PB4 AVR32_PIN_PB04
+#define AVR32_PIN_PB5 AVR32_PIN_PB05
+#define AVR32_PIN_PB6 AVR32_PIN_PB06
+#define AVR32_PIN_PB7 AVR32_PIN_PB07
+#define AVR32_PIN_PB8 AVR32_PIN_PB08
+#define AVR32_PIN_PB9 AVR32_PIN_PB09
+
+
+/**
  * \brief	Create a input/output pin type
  * 
  * \hideinitializer
@@ -98,24 +122,42 @@ namespace xpcc
  * \ingroup	uc3b
  */
 
-
 #define	GPIO__OUTPUT(name, g_port, gpio_pin) \
 	struct name { \
-		ALWAYS_INLINE static void setOutput()            { \
-			volatile avr32_gpio_port_t *gpio_port = &AVR32_GPIO.port[CONCAT3(AVR32_PIN_P, g_port, gpio_pin) >> 5]; /* Enable GPIO pin */ \
+		ALWAYS_INLINE static void setOutput() { \
+			volatile avr32_gpio_port_t *gpio_port = &AVR32_GPIO.port[CONCAT3(AVR32_PIN_P, g_port, gpio_pin) >> 5]; \
 			gpio_port->oders = 1 << (gpio_pin & 0x1F); /* The GPIO output driver is enabled for that pin. */ \
 			gpio_port->gpers = 1 << (gpio_pin & 0x1F); /* The GPIO module controls that pin. */ \
 		} \
-		ALWAYS_INLINE static void setOutput(bool status) {} \
-		ALWAYS_INLINE static void set()     { \
-			volatile avr32_gpio_port_t *gpio_port = &AVR32_GPIO.port[CONCAT3(AVR32_PIN_P, g_port, gpio_pin) >> 5]; /* Enable GPIO pin */ \
+		ALWAYS_INLINE static void \
+		setOutput(bool status) { \
+			set(status); \
+			setOutput(); \
+		} \
+		ALWAYS_INLINE static void \
+		set()     { \
+			volatile avr32_gpio_port_t *gpio_port = &AVR32_GPIO.port[CONCAT3(AVR32_PIN_P, g_port, gpio_pin) >> 5]; \
 			gpio_port->ovrs  = 1 << (gpio_pin & 0x1F); /* Value to be driven on the I/O line: 1. */ \
 		} \
-		ALWAYS_INLINE static void reset()   { \
-			volatile avr32_gpio_port_t *gpio_port = &AVR32_GPIO.port[CONCAT3(AVR32_PIN_P, g_port, gpio_pin) >> 5]; /* Enable GPIO pin */ \
-			gpio_port->ovrc  = 1 << (gpio_pin & 0x1F); /* Value to be driven on the I/O line: 1. */ \
+		ALWAYS_INLINE static void \
+		reset()   { \
+			volatile avr32_gpio_port_t *gpio_port = &AVR32_GPIO.port[CONCAT3(AVR32_PIN_P, g_port, gpio_pin) >> 5]; \
+			gpio_port->ovrc  = 1 << (gpio_pin & 0x1F); /* Value to be driven on the I/O line: 0. */ \
 		} \
-		ALWAYS_INLINE static void toggle()  {} \
+		ALWAYS_INLINE static void \
+		toggle()  { \
+			volatile avr32_gpio_port_t *gpio_port = &AVR32_GPIO.port[CONCAT3(AVR32_PIN_P, g_port, gpio_pin) >> 5]; \
+			gpio_port->ovrt  = 1 << (gpio_pin & 0x1F); /* Toggle the I/O line. */ \
+		} \
+		ALWAYS_INLINE static void \
+		set(bool status) { \
+			if (status) { \
+				set(); \
+			} \
+			else { \
+				reset(); \
+			} \
+		} \
 	}
 
 #if 1 == 0
@@ -144,27 +186,37 @@ namespace xpcc
 /**
  * \brief	Create a input type
  * 
+ * read: PVR
+ * config:
+ *
  * \hideinitializer
  * \ingroup	atmega
  */
-#if 1 == 0
-#define GPIO__INPUT(name, port, pin) \
+#define GPIO__INPUT(name, g_port, gpio_pin) \
 	struct name { \
 		ALWAYS_INLINE static void \
-		setInput(::xpcc::atmega::Configuration config) { \
+		setInput(::xpcc::avr32::Configuration config) { \
 			setInput(); \
-			if (config == ::xpcc::atmega::PULLUP) { \
-				CONCAT(PORT, port) |= (1 << pin); \
+			volatile avr32_gpio_port_t *gpio_port = &AVR32_GPIO.port[CONCAT3(AVR32_PIN_P, g_port, gpio_pin) >> 5]; \
+			if (config == ::xpcc::avr32::PULLUP) { \
+				gpio_port->puers = 1 << (gpio_pin & 0x1F); /* The pull-up is enabled for that pin. */ \
 			} \
 			else { \
-				CONCAT(PORT, port) &= ~(1 << pin); \
+				gpio_port->puerc = 1 << (gpio_pin & 0x1F); /* The pull-up is disabled for that pin. */ \
 			} \
 		} \
-		\
-		ALWAYS_INLINE static void setInput() { CONCAT(DDR, port) &= ~(1 << pin); } \
-		ALWAYS_INLINE static bool read() { return (CONCAT(PIN, port) & (1 << pin)); } \
+		ALWAYS_INLINE static void \
+		setInput() { \
+			volatile avr32_gpio_port_t *gpio_port = &AVR32_GPIO.port[CONCAT3(AVR32_PIN_P, g_port, gpio_pin) >> 5]; \
+			gpio_port->oderc = 1 << (gpio_pin & 0x1F); /* The GPIO output driver is disabled for that pin. */ \
+			gpio_port->gpers = 1 << (gpio_pin & 0x1F); /* The GPIO module controls that pin. */ \
+		} \
+		ALWAYS_INLINE static bool \
+		read() { \
+			volatile avr32_gpio_port_t *gpio_port = &AVR32_GPIO.port[CONCAT3(AVR32_PIN_P, g_port, gpio_pin) >> 5]; \
+			return (gpio_port->pvr & (1 << (gpio_pin & 0x1f))); \
+		} \
 	}
-#endif
 
 /**
  * \brief	Connect the lower four bits to a nibble (P0..3)

@@ -46,6 +46,7 @@ namespace xpcc
 	}
 }
 
+#include "uc3b/clock.hpp"
 //#include "atmega/adc.hpp"
 //#include "atmega/adc_interrupt.hpp"
 //#include "atmega/analog_sensors.hpp"
