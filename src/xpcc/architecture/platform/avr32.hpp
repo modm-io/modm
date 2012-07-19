@@ -28,37 +28,48 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__PLATFORM_HPP
-#define XPCC__PLATFORM_HPP
+#ifndef XPCC__AVR32_HPP
+#define XPCC__AVR32_HPP
+
+#include <avr32/io.h>
+//#include <avr32/interrupt.h>
 
 /**
- * \ingroup 	architecture
- * \defgroup	platform	Supported Platforms
+ * \ingroup		platform
+ * \defgroup	avr		AVR32
  * 
- * Select built-in functions and macros for the active platform
+ * Tested under OS X with avr32-gcc.
  */
+namespace xpcc
+{
+	/**
+	 * \brief	AVR32 specific functions
+	 * \ingroup	avr
+	 */
+	namespace avr32
+	{
+//		/**
+//		 * \ingroup	avr32
+//		 */
+//		static inline void
+//		enableInterrupts()
+//		{
+//			sei();
+//		}
+//
+//		/**
+//		 * \ingroup	avr32
+//		 */
+//		static inline void
+//		disableInterrupts()
+//		{
+//			cli();
+//		}
+	}
+}
 
-#include <stdint.h>
-
-#include "detect.hpp"		// sets XPCC__CPU_xx etc. macros
-#include "utils.hpp"
-
-#if defined XPCC__CPU_AVR
-#	include "platform/avr.hpp"
-#elif defined XPCC__CPU_ARM7TDMI
-#	include "platform/arm7.hpp"
-#elif defined XPCC__CPU_CORTEX_M0
-#	include "platform/cortex_m0.hpp"
-#elif defined XPCC__CPU_CORTEX_M3
-#	include "platform/cortex_m3.hpp"
-#elif defined XPCC__CPU_CORTEX_M4
-#	include "platform/cortex_m3.hpp"
-#elif defined XPCC__CPU_HOSTED
-#	include "platform/hosted.hpp"
-#elif defined XPCC__CPU_AVR32
-#	include "platform/avr32.hpp"
-#else
-#	error "Unknown platform"
+#if defined XPCC__CPU_AVR32
+#	include "avr32/uc3b.hpp"
 #endif
 
-#endif	// XPCC__PLATFORM_HPP
+#endif	// XPCC__AVR32_HPP

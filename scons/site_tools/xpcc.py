@@ -249,6 +249,9 @@ def generate(env, **kw):
 		elif architecture in ['arm7tdmi', 'cortex-m0', 'cortex-m3', 'cortex-m4']:
 			device = parser.get('build', 'device')
 			clock = parser.get('build', 'clock')
+		elif architecture in ['avr32', ]:
+			device = parser.get('build', 'device')
+			clock  = parser.get('build', 'clock')
 		else:
 			print "xpcc Error: unknown architecture: '%s'!" % architecture
 			Exit(1)
@@ -383,6 +386,13 @@ def generate(env, **kw):
 			except configparser.ParserException as e:
 				print "Error in Configuration: %s" % e
 				Exit(1)
+	elif architecture == 'avr32':
+		env['AVR32_DEVICE'] = device
+		env['AVR32_CLOCK']  = clock
+		env['LIBS']         = ['']
+		env['LIBPATH']      = []
+
+		env.Tool('avr32')
 	else:
 		print "xpcc Error: Unknown architecture '%s'!" % architecture
 		Exit(1)

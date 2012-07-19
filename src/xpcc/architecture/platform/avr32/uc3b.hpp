@@ -1,6 +1,6 @@
 // coding: utf-8
 // ----------------------------------------------------------------------------
-/* Copyright (c) 2009, Roboterclub Aachen e.V.
+/* Copyright (c) 2012, Roboterclub Aachen e.V.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,38 +27,32 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 // ----------------------------------------------------------------------------
-
-#ifndef XPCC__PLATFORM_HPP
-#define XPCC__PLATFORM_HPP
-
 /**
- * \ingroup 	architecture
- * \defgroup	platform	Supported Platforms
- * 
- * Select built-in functions and macros for the active platform
+ * \ingroup		avr32
+ * \defgroup	ucb3		UC3B
  */
 
-#include <stdint.h>
+#ifndef XPCC_AVR32__UC3B_HPP
+#define XPCC_AVR32__UC3B_HPP
 
-#include "detect.hpp"		// sets XPCC__CPU_xx etc. macros
-#include "utils.hpp"
+#include "../avr32.hpp"
 
-#if defined XPCC__CPU_AVR
-#	include "platform/avr.hpp"
-#elif defined XPCC__CPU_ARM7TDMI
-#	include "platform/arm7.hpp"
-#elif defined XPCC__CPU_CORTEX_M0
-#	include "platform/cortex_m0.hpp"
-#elif defined XPCC__CPU_CORTEX_M3
-#	include "platform/cortex_m3.hpp"
-#elif defined XPCC__CPU_CORTEX_M4
-#	include "platform/cortex_m3.hpp"
-#elif defined XPCC__CPU_HOSTED
-#	include "platform/hosted.hpp"
-#elif defined XPCC__CPU_AVR32
-#	include "platform/avr32.hpp"
-#else
-#	error "Unknown platform"
+namespace xpcc
+{
+	namespace avr32
+	{
+//		using avr32::enableInterrupts;
+//		using avr32::disableInterrupts;
+	}
+}
+
+//#include "atmega/adc.hpp"
+//#include "atmega/adc_interrupt.hpp"
+//#include "atmega/analog_sensors.hpp"
+//#include "atmega/uart.hpp"
+//#include "atmega/spi.hpp"
+#include "uc3b/gpio.hpp"
+//#include "atmega/i2c_master.hpp"
+
 #endif
 
-#endif	// XPCC__PLATFORM_HPP

@@ -67,7 +67,7 @@
 		return Timestamp( now.wMilliseconds + now.wSecond*1000 + now.wMinute*1000*60 );
 	}
 	
-#elif defined(XPCC__CPU_AVR) || defined(XPCC__CPU_ARM)
+#elif defined(XPCC__CPU_AVR) || defined(XPCC__CPU_ARM) || defined(XPCC__CPU_AVR32)
 #	include <xpcc/architecture/driver/atomic/lock.hpp>
 	
 	uint_fast16_t xpcc::Clock::time = 0;

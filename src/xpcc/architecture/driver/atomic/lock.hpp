@@ -240,6 +240,28 @@ namespace xpcc
 	{
 	}
 	
+#elif defined(XPCC__CPU_AVR32)
+	xpcc::atomic::Lock::Lock()
+	{
+#warning Implement xpcc::atomic::Lock::Lock()
+	}
+
+	xpcc::atomic::Lock::~Lock()
+	{
+#warning Implement xpcc::atomic::Lock::~Lock()
+	}
+
+	xpcc::atomic::Unlock::Unlock()
+	{
+#warning Implement xpcc::atomic::Unlock::Unlock()
+	}
+
+	xpcc::atomic::Unlock::~Unlock()
+	{
+#warning Implement xpcc::atomic::Unlock::~Unlock()
+	}
+
+
 #else
 #	error	"Please provide an atomic lock implementation for this target!"
 #endif
