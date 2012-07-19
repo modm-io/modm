@@ -2,6 +2,11 @@
 #include <xpcc/architecture/platform/avr32/uc3b.hpp>
 #include "clock.hpp"
 
+typedef union
+{
+  unsigned long                 cksel;
+  avr32_pm_cksel_t              CKSEL;
+} u_avr32_pm_cksel_t;
 
 typedef union
 {
@@ -39,7 +44,7 @@ xpcc::avr32::Clock::enableOsc(OscConfig mode)
 }
 
 void
-xpcc::avr32::Clock::enableClk(StartupConfig startup)
+xpcc::avr32::Clock::startOsc(StartupConfig startup)
 {
 	  // Read register
 	  u_avr32_pm_oscctrl0_t u_avr32_pm_oscctrl0 = {AVR32_PM.oscctrl0};
@@ -68,13 +73,13 @@ xpcc::avr32::Clock::switchToClock(ClockSource source)
 }
 
 void
-xpcc::avr32::Clock::pllSetup(Pll pll, uint8_t mul, uint8_t div, Osc osc, uint8_t lockcount, Range range, OutputDivider div2)
+xpcc::avr32::Clock::pllSetup(Pll pll, Mul mul, Div div, Osc osc, uint8_t lockcount, Range range, OutputDivider div2)
 {
 	  u_avr32_pm_pll_t u_avr32_pm_pll = {0};
 
 	  u_avr32_pm_pll.PLL.pllosc   = static_cast<uint8_t>(osc);
-	  u_avr32_pm_pll.PLL.plldiv   = div;
-	  u_avr32_pm_pll.PLL.pllmul   = mul;
+	  u_avr32_pm_pll.PLL.plldiv   = static_cast<uint8_t>(div);
+	  u_avr32_pm_pll.PLL.pllmul   = static_cast<uint8_t>(mul);
 	  u_avr32_pm_pll.PLL.pllcount = lockcount;
 
 	  uint8_t pll_wbwdisable = 0;
@@ -82,7 +87,6 @@ xpcc::avr32::Clock::pllSetup(Pll pll, uint8_t mul, uint8_t div, Osc osc, uint8_t
 	  u_avr32_pm_pll.PLL.pllopt = (static_cast<uint8_t>(range) << 0) | (static_cast<uint8_t>(div2) << 1) | (pll_wbwdisable << 2);
 
 	  AVR32_PM.pll[static_cast<uint8_t>(pll)] = u_avr32_pm_pll.pll;
-
 }
 
 void
@@ -98,6 +102,26 @@ xpcc::avr32::Clock::pllEnable(Pll pll)
 		while (!(AVR32_PM.poscsr & AVR32_PM_POSCSR_LOCK1_MASK));
 	break;
 	}
+}
+
+void
+xpcc::avr32::Clock::selectClock(bool pbadiv, uint8_t pbasel, bool pbbdiv, uint8_t pbbsel, bool cpudiv, uint8_t cpusel)
+{
+	  u_avr32_pm_cksel_t u_avr32_pm_cksel = {0};
+
+	  u_avr32_pm_cksel.CKSEL.cpusel = cpusel;
+	  u_avr32_pm_cksel.CKSEL.cpudiv = cpudiv;
+	  u_avr32_pm_cksel.CKSEL.hsbsel = cpusel;
+	  u_avr32_pm_cksel.CKSEL.hsbdiv = cpudiv;
+	  u_avr32_pm_cksel.CKSEL.pbasel = pbasel;
+	  u_avr32_pm_cksel.CKSEL.pbadiv = pbadiv;
+	  u_avr32_pm_cksel.CKSEL.pbbsel = pbbsel;
+	  u_avr32_pm_cksel.CKSEL.pbbdiv = pbbdiv;
+
+	  AVR32_PM.cksel = u_avr32_pm_cksel.cksel;
+
+	  // Wait for ckrdy bit and then clear it
+	  while (!(AVR32_PM.poscsr & AVR32_PM_POSCSR_CKRDY_MASK));
 }
 
 void
@@ -123,7 +147,7 @@ void
 xpcc::avr32::Clock::enableUsbClock()
 {
 	// Use 12MHz from OSC0 and generate 96 MHz
-	pllSetup(Pll::PLL1, 7, 1, Osc::OSC0, 16, Range::MHZ_160_TO_240, OutputDivider::FPLL_EQUAL_FCVO_DIVIDED_BY_TWO);
+	pllSetup(Pll::PLL1, Mul::MUL8, Div::DIV1, Osc::OSC0, 16, Range::MHZ_160_TO_240, OutputDivider::FPLL_EQUAL_FVCO_DIVIDED_BY_TWO);
 
 	// start PLL1 and wait for lock
 	pllEnable(Pll::PLL1);

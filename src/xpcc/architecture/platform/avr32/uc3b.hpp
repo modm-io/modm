@@ -53,6 +53,7 @@ namespace xpcc
 //#include "atmega/uart.hpp"
 //#include "atmega/spi.hpp"
 #include "uc3b/gpio.hpp"
+#include "uc3b/timer.hpp"
 //#include "atmega/i2c_master.hpp"
 
 #endif

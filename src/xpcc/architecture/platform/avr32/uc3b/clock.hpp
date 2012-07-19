@@ -80,6 +80,47 @@ namespace xpcc
 			OSC1	= 1,
 		};
 
+		enum class
+		Mul : uint8_t
+		{
+			MUL1	= 0,
+			MUL2	= 1,
+			MUL3	= 2,
+			MUL4	= 3,
+			MUL5	= 4,
+			MUL6 	= 5,
+			MUL7	= 6,
+			MUL8	= 7,
+			MUL9	= 8,
+			MUL10 	= 9,
+			MUL11	= 10,
+			MUL12	= 11,
+			MUL13	= 12,
+			MUL14	= 13,
+			MUL15	= 14,
+			MUL16	= 15
+		};
+
+		enum class
+		Div : uint8_t
+		{
+			DIV1	= 1,
+			DIV2	= 2,
+			DIV3	= 3,
+			DIV4	= 4,
+			DIV5	= 5,
+			DIV6	= 6,
+			DIV7	= 7,
+			DIV8	= 8,
+			DIV9	= 9,
+			DIV10	= 10,
+			DIV11	= 11,
+			DIV12	= 12,
+			DIV13	= 13,
+			DIV14	= 14,
+			DIV15	= 15
+		};
+
 		enum class Range : uint8_t
 		{
 			MHZ_160_TO_240		= 0,	///< The PLL operates in the frequency range from 160 to 240 MHz
@@ -89,7 +130,7 @@ namespace xpcc
 		enum class OutputDivider : uint8_t
 		{
 			FPLL_EQUAL_FVCO 					= 0,
-			FPLL_EQUAL_FCVO_DIVIDED_BY_TWO		= 1,
+			FPLL_EQUAL_FVCO_DIVIDED_BY_TWO		= 1,
 		};
 
 		enum class GenericClock : uint8_t
@@ -109,16 +150,22 @@ namespace xpcc
 			PLL1			= 0x03,		///< The source of the generic clock is a  PLL        with number 1.
 		};
 
-
-
-
 	public:
+		/**
+		 * \brief	Enable the Oscillator 0.
+		 */
 		static void
 		enableOsc(OscConfig mode);
 
+		/**
+		 * \brief	Start the Oscillator 0 and wait until ready.
+		 */
 		static void
-		enableClk(StartupConfig startup = StartupConfig::CYCLES_2048);
+		startOsc(StartupConfig startup = StartupConfig::CYCLES_2048);
 
+		/**
+		 * \brief	Select the source of the main clock.
+		 */
 		static void
 		switchToClock(ClockSource source);
 
@@ -132,7 +179,7 @@ namespace xpcc
 		 * \param	lockcount
 		 */
 		static void
-		pllSetup(Pll pll, uint8_t Mul, uint8_t div, Osc osc, uint8_t lockcount, Range range, OutputDivider div2);
+		pllSetup(Pll pll, Mul mul, Div div, Osc osc, uint8_t lockcount, Range range, OutputDivider div2);
 
 		/**
 		 * \brief	Start PLL and wait for lock.
@@ -143,11 +190,20 @@ namespace xpcc
 		pllEnable(Pll pll);
 
 		/**
+		 * \brief	Select the clock for CPU, HSB, PBA und PBB.
+		 */
+		static void
+		selectClock(bool pbadiv, uint8_t pbasel, bool pbbdiv, uint8_t pbbsel, bool cpudiv, uint8_t cpusel);
+
+		/**
 		 * \brief	Setup a generic clock.
 		 */
 		static void
 		gcSetup(GenericClock gc, GenericClockSource source, bool diven, uint8_t div = 0);
 
+		/**
+		 * \brief	Start the generic clock \c gc.
+		 */
 		static void
 		gcEnable(GenericClock gc);
 
