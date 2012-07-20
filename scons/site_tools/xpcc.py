@@ -393,6 +393,9 @@ def generate(env, **kw):
 		env['LIBPATH']      = []
 
 		env.Tool('avr32')
+
+		env.Tool('dfu-programmer')
+
 	else:
 		print "xpcc Error: Unknown architecture '%s'!" % architecture
 		Exit(1)
