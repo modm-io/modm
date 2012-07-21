@@ -32,7 +32,7 @@ from SCons.Script import *
 # -----------------------------------------------------------------------------
 def dfu_programmer_flash(env, source, alias='dfu_program'):
 	actionString = '$DFU_PROGRAMMER ''at32''$AVR32_DEVICE erase &&'
-	actionString += '$DFU_PROGRAMMER ''at32''$AVR32_DEVICE flash $SOURCE'
+	actionString += '$DFU_PROGRAMMER ''at32''$AVR32_DEVICE flash --suppress-bootloader-mem $SOURCE'
 
 	action = Action(actionString, cmdstr="$DFU_PROGRAMMER_COMSTR")
 	return env.AlwaysBuild(env.Alias(alias, source, action))

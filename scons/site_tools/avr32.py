@@ -117,26 +117,32 @@ def generate(env, **kw):
 		"-Wstrict-prototypes",
 		"-Wredundant-decls",
 		"-Wnested-externs",
-		"-fpack-struct",
+#		"-fpack-struct",
 	]
 	
 	# flags for C and C++
 	env['CCFLAGS'] = [
+		"-march=ucr1",
 		"-mpart=$AVR32_DEVICE", 
 		"-Os",
-		"-gdwarf-2", 
+#		"-gdwarf-2",
+		"-g3",
+		"-MD",
+		"-MP",
+		"-MQ",
 		"-funsigned-char",
-		"-funsigned-bitfields", 
-		"-fshort-enums", 
+#		"-funsigned-bitfields", 
+#		"-fshort-enums",
 		"-ffunction-sections",
 		"-fdata-sections",
-		"-fno-split-wide-types",
-		"-fno-move-loop-invariants",
-		"-fno-tree-loop-optimize",
-		"-finline-limit=10000",
+#		"-fno-split-wide-types",
+#		"-fno-move-loop-invariants",
+#		"-fno-tree-loop-optimize",
+#		"-finline-limit=10000",
 #		"-fverbose-asm",	# TODO check this
-		"-masm-addr-pseudos",
+#		"-masm-addr-pseudos",
 		"-mrelax",
+		"-pipe",
 		"-Wall",
 		"-Wextra",
 		"-Wundef",
@@ -150,6 +156,7 @@ def generate(env, **kw):
 		"-Wunused",
 		"-Wa,-adhlns=${TARGET.base}.lst",
 		"-DBASENAME=${SOURCE.file}",
+		"-mno-cond-exec-before-reload", 	# fixes compiler error? TODO check if bugfix exists
 	]
 	
 	# C++ flags
@@ -168,17 +175,28 @@ def generate(env, **kw):
 	
 	# Assembler flags
 	env['ASFLAGS'] = [
+		"-march=ucr1",
 		"-mpart=$AVR32_DEVICE",
+		"-MD",
+		"-MP",
+		"-MQ",
 		"-gdwarf-2",
+		"-mrelax",
+		"-D__ASSEMBLY__",
 		"-Wa,-adhlns=${TARGET.base}.lst",
 		"-xassembler-with-cpp",
 	]
 	
+	env['LINKFILE'] = ["/Users/user/rca/xpcc/ext/asf/avr32/utils/linker_scripts/at32uc3b/0256/gcc/link_uc3b0256.lds"]
+
+	# Link flags
 	env['LINKFLAGS'] = [
 		"-mpart=$AVR32_DEVICE", 
-#		"-Wl,--relax", 						# As of 2012-07-19 this generates un-runable code
+		"-T${LINKFILE}",
+		"-Wl,--relax",
 		"-Wl,--gc-sections",
-#		"-nostartfiles",					# this will generate an empty *.hex file
+		"-nostartfiles",
+		'-Wl,-e,_trampoline',				# place a jump to 0x80002000 at 0x80000000. Needed for DFU bootloader. 
 		"-Wl,-Map=${TARGET.base}.map,--cref", 
 #		"-Wl,-u,vfprintf -lprintf_flt"		# enable float support for vfprinft
 	]
