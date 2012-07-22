@@ -8,7 +8,7 @@ We therefore just store a copy of the repositories here.
 Choosing the external library
 -----------------------------
 If the external library already exists on GitHub, fork it and apply
-your modifications before adding the neccessary files.
+your modifications before adding the necessary files.
 Basic instructions on forking can be found [here](http://help.github.com/fork-a-repo/).
 
 If the external library is not available as a git repository, you have to create a
