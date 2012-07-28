@@ -32,7 +32,10 @@ namespace xpcc
 			}
 
 			static void
-			initWaveform(const tc_waveform_opt_t *opt);
+			initWaveform(const timer::waveform *opt);
+
+			static void
+			configureInterrupts(const timer::interrupt *bitfield);
 
 
 			static inline Value
@@ -77,8 +80,7 @@ namespace xpcc
 				AVR32_TC.channel[0].rc = rc;
 			}
 
-
-		};
+		}; // Timer0 class
 	} // avr32 namespace
 } // xpcc namesapce
 

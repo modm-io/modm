@@ -7,6 +7,8 @@ namespace xpcc
 {
 namespace avr32
 {
+namespace timer
+{
 
 /*! \name External Clock Signal 0 Selection
  */
@@ -204,11 +206,6 @@ ClockSelection : uint8_t
 //! Parameters when initializing a timer/counter in waveform mode.
 typedef struct
 {
-	uint8_t mem;
-} mystruct_t;
-
-typedef struct
-{
   //! Channel to initialize.
 //  unsigned int channel            ;
 
@@ -347,13 +344,42 @@ typedef struct
   //!   - \ref TC_CLOCK_SOURCE_XC2.
 //  unsigned int tcclks          : 3;
   ClockSelection tcclks;
-} tc_waveform_opt_t;
+} waveform;
 
+//! Timer/counter interrupts.
+typedef struct
+{
+  //! External trigger interrupt.
+  uint8_t etrgs           : 1;
+
+  //! RB load interrupt.
+  uint8_t ldrbs           : 1;
+
+  //! RA load interrupt.
+  uint8_t ldras           : 1;
+
+  //! RC compare interrupt.
+  uint8_t cpcs            : 1;
+
+  //! RB compare interrupt.
+  uint8_t cpbs            : 1;
+
+  //! RA compare interrupt.
+  uint8_t cpas            : 1;
+
+  //! Load overrun interrupt.
+  uint8_t lovrs           : 1;
+
+  //! Counter overflow interrupt.
+  uint8_t covfs           : 1;
+} interrupt;
+
+} // timer namespace
 } // avr32 namesapce
 } // xpcc namespace
 
 #include "timer/timer_0.hpp"
-#include "timer/timer_1.hpp"
-#include "timer/timer_2.hpp"
+//#include "timer/timer_1.hpp"
+//#include "timer/timer_2.hpp"
 
 #endif // XPCC_AVR32__TIMER_0_HPP

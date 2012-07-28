@@ -1,9 +1,8 @@
-# WARNING: This file is generated automatically, do not edit!
-
 # path to the xpcc root directory
 rootpath = '../../../..'
 
 env = Environment(tools = ['xpcc'], toolpath = [rootpath + '/scons/site_tools'])
+env.Append(CPPDEFINES = "BOARD=EVK1101")
 
 # find all source files
 files = env.FindFiles('.')

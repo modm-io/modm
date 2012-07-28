@@ -80,11 +80,18 @@ namespace xpcc
 			OSC1	= 1,
 		};
 
+		/**
+		 * \brief	Frequency multiplication.
+		 *
+		 * The divisor in the feedback loop of the PLL which will
+		 * lead to a multiplication of the frequency.
+		 *
+		 * Note that the PLLMUL field cannot be equal to 0 or 1, or
+		 * the behavior of the PLL will be undefined.
+		 */
 		enum class
 		Mul : uint8_t
 		{
-			MUL1	= 0,
-			MUL2	= 1,
 			MUL3	= 2,
 			MUL4	= 3,
 			MUL5	= 4,
@@ -101,6 +108,12 @@ namespace xpcc
 			MUL16	= 15
 		};
 
+		/**
+		 * \brief	Frequency division.
+		 *
+		 * The divisor before the input of the PLL.
+		 * The special case of PLLDIV = 0 is not treated here.
+		 */
 		enum class
 		Div : uint8_t
 		{
@@ -144,10 +157,10 @@ namespace xpcc
 
 		enum class GenericClockSource : uint8_t
 		{
-			OSC0			= 0x00,		///< The source of the generic clock is an oscillator with number 0.
-			OSC1			= 0x01,		///< The source of the generic clock is an oscillator with number 1.
-			PLL0			= 0x02,		///< The source of the generic clock is a  PLL        with number 0.
-			PLL1			= 0x03,		///< The source of the generic clock is a  PLL        with number 1.
+			OSC0			= (0x00 | 0x00),		///< The source of the generic clock is an oscillator with number 0.
+			OSC1			= (0x00 | 0x01),		///< The source of the generic clock is an oscillator with number 1.
+			PLL0			= (0x02 | 0x00),		///< The source of the generic clock is a  PLL        with number 0.
+			PLL1			= (0x02 | 0x01),		///< The source of the generic clock is a  PLL        with number 1.
 		};
 
 	public:
@@ -211,7 +224,7 @@ namespace xpcc
 		 * \brief	Supply 48 MHz to the USB controller using a 12 MHz crystal at OSC0 and PLL1.
 		 */
 		static void
-		enableUsbClock();
+		enableUsbClock(void);
 	}; // Clock class
 	} // avr32 namespace
 } // xpcc namespace

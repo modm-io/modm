@@ -117,7 +117,7 @@ def generate(env, **kw):
 		"-Wstrict-prototypes",
 		"-Wredundant-decls",
 		"-Wnested-externs",
-#		"-fpack-struct",
+#		"-fpack-struct",		# WARNING: incompatible with Atmel's interrupt handler
 	]
 	
 	# flags for C and C++
@@ -131,14 +131,14 @@ def generate(env, **kw):
 		"-MP",
 		"-MQ",
 		"-funsigned-char",
-#		"-funsigned-bitfields", 
-#		"-fshort-enums",
+		"-funsigned-bitfields",
+		"-fshort-enums",
 		"-ffunction-sections",
 		"-fdata-sections",
-#		"-fno-split-wide-types",
-#		"-fno-move-loop-invariants",
-#		"-fno-tree-loop-optimize",
-#		"-finline-limit=10000",
+		"-fno-split-wide-types",
+		"-fno-move-loop-invariants",
+		"-fno-tree-loop-optimize",
+		"-finline-limit=10000",
 #		"-fverbose-asm",	# TODO check this
 #		"-masm-addr-pseudos",
 		"-mrelax",

@@ -69,7 +69,6 @@ xpcc::avr32::Clock::switchToClock(ClockSource source)
 	  u_avr32_pm_mcctrl.MCCTRL.mcsel = static_cast<uint8_t>(source);
 	  // Write back
 	  AVR32_PM.mcctrl = u_avr32_pm_mcctrl.mcctrl;
-
 }
 
 void
@@ -147,7 +146,15 @@ void
 xpcc::avr32::Clock::enableUsbClock()
 {
 	// Use 12MHz from OSC0 and generate 96 MHz
-	pllSetup(Pll::PLL1, Mul::MUL8, Div::DIV1, Osc::OSC0, 16, Range::MHZ_160_TO_240, OutputDivider::FPLL_EQUAL_FVCO_DIVIDED_BY_TWO);
+	pllSetup(
+			Pll::PLL1,
+			Mul::MUL4,
+			Div::DIV1,
+			Osc::OSC0,
+			16,
+			Range::MHZ_80_TO_180,
+			OutputDivider::FPLL_EQUAL_FVCO
+			);
 
 	// start PLL1 and wait for lock
 	pllEnable(Pll::PLL1);

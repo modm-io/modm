@@ -31,6 +31,8 @@
 #ifndef XPCC__AVR32_HPP
 #define XPCC__AVR32_HPP
 
+#if defined XPCC__CPU_AVR32
+
 #include <avr32/io.h>
 //#include <avr32/interrupt.h>
 
@@ -68,8 +70,7 @@ namespace xpcc
 	}
 }
 
-#if defined XPCC__CPU_AVR32
 #	include "avr32/uc3b.hpp"
-#endif
+#endif	// XPCC__CPU_AVR32
 
 #endif	// XPCC__AVR32_HPP

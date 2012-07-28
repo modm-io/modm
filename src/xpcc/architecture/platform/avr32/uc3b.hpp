@@ -46,6 +46,9 @@ namespace xpcc
 	}
 }
 
+// use the interrupt controller files from the ASF
+#include "asf/avr32/drivers/intc/intc.h"
+
 #include "uc3b/clock.hpp"
 //#include "atmega/adc.hpp"
 //#include "atmega/adc_interrupt.hpp"
