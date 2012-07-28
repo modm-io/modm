@@ -82,6 +82,17 @@ namespace xpcc
 		 */
 		uint8_t
 		readCalibrationByte(uint8_t index);		
+		
+		/**
+		 * Reset the Xmega via software.
+		 *
+		 * @ingroup	atxmega
+		 */
+		static inline void
+		softwareReset()
+		{
+			changeProtectedRegister(&RST_CTRL, RST_SWRST_bm);
+		}
 	}
 }
 

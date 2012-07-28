@@ -183,6 +183,37 @@ xpcc::amnb::Node<Interface>::query(uint8_t slaveAddress, uint8_t command,
 	return noError;
 }
 
+template <typename Interface> template <typename T>
+bool
+xpcc::amnb::Node<Interface>::query(uint8_t slaveAddress, uint8_t command,
+								   const void *payload, uint8_t payloadLength, uint8_t responseLength)
+{
+	if (queryStatus == IN_PROGRESS) {
+		checkErrorHandlers(slaveAddress, command, REQUEST, ERROR__QUERY_IN_PROGRESS);
+		return false;
+	}
+	
+	bool noError(true);
+	if (!Interface::messageTransmitted()) {
+		checkErrorHandlers(Interface::getTransmittedAddress(),
+						   Interface::getTransmittedCommand(),
+						   Interface::getTransmittedFlags(),
+						   ERROR__MESSAGE_OVERWRITTEN);
+		noError = false;
+	}
+	if (!Interface::sendMessage(slaveAddress, REQUEST, command, payload, payloadLength)) {
+		checkErrorHandlers(slaveAddress, command, REQUEST, ERROR__TRANSMITTER_BUSY);
+		noError = false;
+	}
+	
+	queryStatus = IN_PROGRESS;
+	expectedResponseLength = responseLength;
+	expectedAddress = slaveAddress;
+	
+	timer.restart(timeout);
+	return noError;
+}
+
 template <typename Interface>
 bool
 xpcc::amnb::Node<Interface>::query(uint8_t slaveAddress, uint8_t command,
