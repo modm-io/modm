@@ -60,7 +60,7 @@
  * 
  * C = Acknowledge
  * 
- * Device Adress is send LSB first, all other data is send MSB first.
+ * Device Address is send LSB first, all other data is send MSB first.
  * 
  * The CRC is calculated over Bit 31-11 on write and Bit 31-10 on read
  * (everything before the CRC).
