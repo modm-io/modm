@@ -44,7 +44,7 @@ COMMANDLINE ARGUMENTS
       $ scons run config=unittest.cfg
 
 config=file
-   Load a different configuration file. The path to 'file' must be relativ
+   Load a different configuration file. The path to 'file' must be relative
    to the current directory or an absolute path.
    To build the unittests for an ATxmega use for example:
    
@@ -99,7 +99,7 @@ else:
 # create the build environment
 env = Environment(
 		tools = ['xpcc'],
-		toolpath = ['../scons'],
+		toolpath = ['../scons/site_tools'],
 		configfile = ARGUMENTS.get('config', defaultConfigfile))
 
 # build the xpcc library
