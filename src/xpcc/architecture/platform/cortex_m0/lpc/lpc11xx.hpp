@@ -33,6 +33,7 @@
 #include <lpc11xx/cmsis/system_LPC11xx.h>
 
 #include "gpio.hpp"
+#include "spi/spi_0.hpp"
 
 extern "C"
 {
