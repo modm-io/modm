@@ -82,8 +82,8 @@ namespace xpcc
 	struct name { \
 		ALWAYS_INLINE static void \
 		setOutput(bool status) { \
-			set(status); \
 			setOutput(); \
+			set(status); \
 		} \
 		ALWAYS_INLINE static void \
 		setOutput(::xpcc::lpc::OutputType type = ::xpcc::lpc::PUSH_PULL) { \
@@ -126,8 +126,8 @@ namespace xpcc
 	struct name { \
 		ALWAYS_INLINE static void \
 		setOutput(bool status) { \
-			set(status); \
 			setOutput(); \
+			set(status); \
 		} \
 		ALWAYS_INLINE static void \
 		setOutput(::xpcc::lpc::OutputType type = ::xpcc::lpc::PUSH_PULL) { \
