@@ -10,8 +10,8 @@ The pin out is:
  3 /CS
  4 CLK
  5 DATA
- 6 VCC
+ 6 VCC  (2.9 Volt)
  7 GND
  8 ---
- 9 LED +
+ 9 LED +  (ca. 10 V, 20 mA)
 10 LED -

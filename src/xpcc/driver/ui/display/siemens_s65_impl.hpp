@@ -48,16 +48,13 @@ void
 xpcc::SiemensS65<SPI, CS, RS, Reset>::initialize()
 {
 	// CS pin
-	CS::set();
-	CS::setOutput();
+	CS::setOutput(true);
 
 	// RS pin
-	RS::reset();
-	RS::setOutput();
+	RS::setOutput(false);
 
 	// Reset pin
-	Reset::reset();
-	Reset::setOutput();
+	Reset::setOutput(false);
 
 	lcdSettings();
 
