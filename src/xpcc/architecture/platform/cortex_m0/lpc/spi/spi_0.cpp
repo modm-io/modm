@@ -10,8 +10,8 @@ xpcc::lpc::SpiMaster0::configurePins(MappingSck mapping, bool useSsel)
 	// Enable peripheral clock
 	LPC_SYSCON->SYSAHBCLKCTRL	|= SYSAHBCLKCTRL_SSP0;
 
-	// Divide peripheral clock by 2
-	LPC_SYSCON->SSP0CLKDIV = 0x02;
+	// Divide peripheral clock by 1
+	LPC_SYSCON->SSP0CLKDIV = 0x01;
 
 	// MISO at PIO0_8 and MOSI at PIO0_9
 	LPC_IOCON->PIO0_8			&= ~0x07;
@@ -37,7 +37,6 @@ xpcc::lpc::SpiMaster0::configurePins(MappingSck mapping, bool useSsel)
 		LPC_IOCON->SCK_LOC = 0x01;
 		LPC_IOCON->PIO2_11 = 0x01;	/* P2.11 function 1 is SSP clock, need to
 										combined with IOCONSCKLOC register setting */
-
 	break;
 	}
 
@@ -46,9 +45,6 @@ xpcc::lpc::SpiMaster0::configurePins(MappingSck mapping, bool useSsel)
 		LPC_IOCON->PIO0_2 &= ~0x07;
 		LPC_IOCON->PIO0_2 |=  0x01;		/* SSP SSEL */
 	}
-
-
-
 }
 
 void
@@ -77,21 +73,29 @@ xpcc::lpc::SpiMaster0::initialize(
 	LPC_SSP0->CR1 = SPI_CR1_SSE;
 }
 
-
-
-uint8_t
+void
 xpcc::lpc::SpiMaster0::write(uint8_t data)
 {
-	/* Move on only if NOT busy and TX FIFO not full. */
-	while ( (LPC_SSP0->SR & (SPI_SRn_TNF|SPI_SRn_BSY)) != SPI_SRn_TNF );
+	/* Move on only if TX FIFO not full. */
+	while (!(LPC_SSP0->SR & SPI_SRn_TNF));
 
+	/* Put data into FIFO */
 	LPC_SSP0->DR = data;
-
-	/* Wait until the Busy bit is cleared. */
-	while ( LPC_SSP0->SR & SPI_SRn_BSY );
-
-	return 0;
 }
 
+void
+xpcc::lpc::SpiMaster0::write(uint8_t * data, uint8_t len)
+{
+	while (len-- > 0)
+	{
+		while (!(LPC_SSP0->SR & SPI_SRn_TNF));
+		LPC_SSP0->DR = *data;
+		++data;
+	}
+}
 
-
+bool
+xpcc::lpc::SpiMaster0::isBusy()
+{
+	return (LPC_SSP0->SR & SPI_SRn_BSY);
+}

@@ -251,13 +251,31 @@ namespace xpcc
 					TransferSize transferSize = TransferSize::BIT_08,
 					FrameFormat frameFormat = FrameFormat::SPI);
 
-			static uint8_t
+			/**
+			 * \brief	Write a single byte to the queue.
+			 *
+			 * When the function returns the data was put
+			 * successfully into the FIFO. It may take a while
+			 * until it is send.
+			 */
+			static void
 			write(uint8_t data);
+
+			static void
+			write(uint8_t * data, uint8_t size);
+
+			/**
+			 * \brief	Check if the SPI is busy.
+			 *
+			 * If data is still transmitted this returns true.
+			 * If all data is transmitted it returns false.
+			 */
+			static bool
+			isBusy();
 
 		protected:
 			static constexpr uint8_t
 			fifoSize = 8;
-
 		};
 	} // lpc namespace
 } // xpcc namespace
