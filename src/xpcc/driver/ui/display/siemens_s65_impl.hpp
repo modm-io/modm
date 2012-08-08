@@ -40,8 +40,6 @@
 #error	"Don't include this file directly, use 'siemens_s65.hpp' instead!"
 #endif
 
-//#include "nokia6610_defines.hpp"
-
 // ----------------------------------------------------------------------------
 template <typename SPI, typename CS, typename RS, typename Reset>
 void
@@ -57,14 +55,6 @@ xpcc::SiemensS65<SPI, CS, RS, Reset>::initialize()
 	Reset::setOutput(false);
 
 	lcdSettings();
-
-	//	while (1)
-	//	{
-	//		lcdCls(0xf800);
-	//		xpcc::delay_ms(500);
-	//		lcdCls(0x001f);
-	//		xpcc::delay_ms(500);
-	//	}
 
 	this->clear();
 	//	this->update();
@@ -83,9 +73,11 @@ void
 xpcc::SiemensS65<SPI, CS, RS, Reset>::writeReg(uint8_t reg)
 {
 	CS::reset();
-	SPI::write(0x74);
+	SPI::write(0x74); // start byte, RS = 0, R/W = 0, receive index register
 	SPI::write(0x00);
 	SPI::write(reg);
+
+	while(SPI::isBusy()); // wait until SPI has emptied its buffer before setting CS.
 	CS::set();
 }
 
@@ -94,9 +86,11 @@ void
 xpcc::SiemensS65<SPI, CS, RS, Reset>::writeData(uint16_t data)
 {
 	CS::reset();
-	SPI::write(0x76);	//instruction or RAM data
+	SPI::write(0x76);	// start byte, RS = 1, R/W, receive instruction or RAM data
 	SPI::write(data>>8);
 	SPI::write(data);
+
+	while(SPI::isBusy());
 	CS::set();
 }
 
@@ -151,7 +145,7 @@ xpcc::SiemensS65<SPI, CS, RS, Reset>::lcdSettings() {
 template <typename SPI, typename CS, typename RS, typename Reset>
 void
 xpcc::SiemensS65<SPI, CS, RS, Reset>::lcdCls(uint16_t colour) {
-	writeReg(0x22);
+	writeReg(0x22); // ?? write data when CS is high does not make sense.
 	CS::reset();
 	SPI::write(0x76);
 
@@ -164,33 +158,43 @@ xpcc::SiemensS65<SPI, CS, RS, Reset>::lcdCls(uint16_t colour) {
 		SPI::write(c2);
 	}
 
+	while(SPI::isBusy());
 	CS::set();
 }
-
 
 template <typename SPI, typename CS, typename RS, typename Reset>
 void
 xpcc::SiemensS65<SPI, CS, RS, Reset>::update() {
 
 	// WRITE MEMORY
-	writeReg(0x22);
 	CS::reset();
-	SPI::write(0x76);
+	SPI::write(0x76);	// start byte
 
-	static const uint16_t mask1Blank  = 0x0000; // RRRR RGGG GGGB BBBB
+//	static const uint16_t mask1Blank  = 0x0000; // RRRR RGGG GGGB BBBB
 	static const uint16_t mask1Filled = 0x37e0; // RRRR RGGG GGGB BBBB
+	uint8_t fill_h = mask1Filled >> 8;
+	uint8_t fill_l = mask1Filled & 0xff;
+	uint8_t blank = 0;
 
 	for (uint8_t x = this->getWidth() - 1; x != 0xff; --x)
 	{
 		for (uint8_t y = 0; y < this->getHeight()/8; ++y)
 		{
+			// group of 8 black-and-white pixels
 			uint8_t group = this->buffer[x][y];
-			for (uint8_t pix = 0; pix < 8; pix++, group>>=1){
-				uint16_t data =	((group&1)?mask1Filled:mask1Blank);
 
-				SPI::write(data>>8);
-				SPI::write(data);
-			}
+			for (uint8_t pix = 0; pix < 8; ++pix, group >>= 1){
+				if (group & 1)
+				{
+					SPI::write(fill_h);
+					SPI::write(fill_l);
+				}
+				else
+				{
+					SPI::write(blank);
+					SPI::write(blank);
+				}
+			} // pix
 		}
 	}
 
@@ -202,5 +206,6 @@ xpcc::SiemensS65<SPI, CS, RS, Reset>::update() {
 //		SPI::write(data);
 //	}
 
+	while(SPI::isBusy());
 	CS::set();
 }
