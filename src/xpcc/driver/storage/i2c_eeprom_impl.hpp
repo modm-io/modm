@@ -33,113 +33,189 @@
 #endif
 
 // ----------------------------------------------------------------------------
-template <typename I2C>
-xpcc::I2cEeprom<I2C>::I2cEeprom(uint8_t deviceAddress):
-	deviceAddress(deviceAddress)
+template <typename I2cMaster>
+xpcc::I2cEeprom<I2cMaster>::I2cEeprom(uint8_t address)
+:	address(address << 1), state(xpcc::i2c::adapter::NO_ERROR)
 {
+	initialize(0, 0, 0, 0);
 }
 
-// ----------------------------------------------------------------------------
-template <typename I2C>
+// // MARK: - write operations
+template <typename I2cMaster>
 bool
-xpcc::I2cEeprom<I2C>::writeByte(uint16_t address, uint8_t data) const
+xpcc::I2cEeprom<I2cMaster>::writeByte(uint16_t address, uint8_t data)
 {
-	if (MySyncI2C::startCheck(this->deviceAddress))
-	{
-		uint8_t buffer[] = {address >> 8, address & 0xff, data};
-		return MySyncI2C::write(buffer,3) != xpcc::i2c::BUS_RESET;
-	}
-	else
-		return false;
+	buffer[0] = address >> 8;
+	buffer[1] = address;
+	buffer[2] = data;
+	initialize(buffer, 3, 0, 0);
+	
+	return I2cMaster::startSync(this);
 }
 
-template <typename I2C>
+template <typename I2cMaster>
 bool
-xpcc::I2cEeprom<I2C>::write(uint16_t address, const uint8_t *data, uint8_t bytes) const
+xpcc::I2cEeprom<I2cMaster>::write(uint16_t address, const uint8_t *data, uint8_t bytes)
 {
-	if (MySyncI2C::startCheck(this->deviceAddress))
-	{
-		uint8_t buffer[] = { (uint8_t)(address >> 8), (uint8_t)(address & 0xff) };
-		if (MySyncI2C::write(buffer, 2, xpcc::i2c::SYNC_NO_STOP) == xpcc::i2c::BUS_RESET)
-		{
-			MySyncI2C::stop();
-			return false;
-		}
-		
-		return MySyncI2C::write(data, bytes) != xpcc::i2c::BUS_RESET;
-	}
-	else
-		return false;
+	buffer[0] = address >> 8;
+	buffer[1] = address;
+	initialize(buffer, 2, data, bytes, 0, 0);
+	
+	return I2cMaster::startSync(this);
 }
 
-template <typename I2C> template <typename T>
+template <typename I2cMaster> template <typename T>
 bool
-xpcc::I2cEeprom<I2C>::write(uint16_t address, const T& data) const
+xpcc::I2cEeprom<I2cMaster>::write(uint16_t address, const T& data)
 {
 	return write(address, static_cast<const uint8_t *>(&data), sizeof(T));
 }
 
-// ----------------------------------------------------------------------------
-template <typename I2C>
+// MARK: - read operations
+template <typename I2cMaster>
 bool
-xpcc::I2cEeprom<I2C>::readByte(uint16_t address, uint8_t &data) const
+xpcc::I2cEeprom<I2cMaster>::readByte(uint16_t address, uint8_t &data)
 {
-	if (MySyncI2C::startCheck(this->deviceAddress))
-	{
-		uint8_t buffer[] = {(uint8_t)(address >> 8), (uint8_t)(address & 0xff)};
-		if (MySyncI2C::write(buffer, 2, xpcc::i2c::SYNC_NO_STOP) == xpcc::i2c::BUS_RESET) {
-			MySyncI2C::stop();
-			return false;
-		}
-		
-		if (MySyncI2C::restart(this->deviceAddress) == xpcc::i2c::BUS_RESET) {
-			MySyncI2C::stop();
-			return false;
-		}
-
-		return MySyncI2C::read(&data, 1) != xpcc::i2c::BUS_RESET;
-	}
-	else
-		return false;
+	buffer[0] = address >> 8;
+	buffer[1] = address;
+	initialize(buffer, 2, &data, 1);
+	
+	return I2cMaster::startSync(this);
 }
 
-template <typename I2C>
+template <typename I2cMaster>
 bool
-xpcc::I2cEeprom<I2C>::read(uint16_t address, uint8_t *data, uint8_t bytes) const
+xpcc::I2cEeprom<I2cMaster>::read(uint16_t address, uint8_t *data, uint8_t bytes)
 {
-	if (MySyncI2C::startCheck(this->deviceAddress))
-	{
-		uint8_t buffer[] = {(uint8_t)(address >> 8), (uint8_t)(address & 0xff)};
-		if (MySyncI2C::write(buffer, 2, xpcc::i2c::SYNC_NO_STOP) == xpcc::i2c::BUS_RESET){
-			MySyncI2C::stop();
-			return false;
-		}
-		
-		if (MySyncI2C::restart(this->deviceAddress) == xpcc::i2c::BUS_RESET){
-			MySyncI2C::stop();
-			return false;
-		}
-
-		return MySyncI2C::read(data, bytes) != xpcc::i2c::BUS_RESET;
-	}
-	else
-		return false;
+	buffer[0] = address >> 8;
+	buffer[1] = address;
+	initialize(buffer, 2, data, bytes);
+	
+	return I2cMaster::startSync(this);
 }
 
-template <typename I2C> template <typename T>
+template <typename I2cMaster> template <typename T>
 bool
-xpcc::I2cEeprom<I2C>::read(uint16_t address, T& data) const
+xpcc::I2cEeprom<I2cMaster>::read(uint16_t address, T& data)
 {
 	return read(address, static_cast<uint8_t *>(&data), sizeof(T));
 }
 
-// ----------------------------------------------------------------------------
-template <typename I2C>
+// MARK: - available
+template <typename I2cMaster>
 bool
-xpcc::I2cEeprom<I2C>::isAvailable() const
+xpcc::I2cEeprom<I2cMaster>::isAvailable()
 {
-	if(MySyncI2C::startCheck(this->deviceAddress))
-		return (MySyncI2C::write(0, 0) != xpcc::i2c::BUS_RESET);
-	else
+	initialize(0, 0, 0, 0);
+	
+	if (I2cMaster::startSync(this))
+	{
+		return (state == xpcc::i2c::adapter::NO_ERROR);
+	}
+	return false;
+}
+
+// MARK: - i2c delegates
+template <typename I2cMaster>
+bool
+xpcc::I2cEeprom<I2cMaster>::initialize(const uint8_t* writeBuffer, uint8_t writeSize, uint8_t* readBuffer, uint8_t readSize)
+{
+	if (state != xpcc::i2c::adapter::BUSY)
+	{
+		this->address = address;
+		this->readBuffer = readBuffer;
+		this->readSize = readSize;
+		this->writeBuffer = writeBuffer;
+		this->writeSize = writeSize;
+		isReading = writeSize ? false : true;
+		twoBuffers = false;
+		return true;
+	}
+	return false;
+}
+
+template <typename I2cMaster>
+bool
+xpcc::I2cEeprom<I2cMaster>::initialize(const uint8_t* auxWriteBuffer, uint8_t auxWriteSize, const uint8_t* writeBuffer, uint8_t writeSize, uint8_t* readBuffer, uint8_t readSize)
+{
+	if (state != xpcc::i2c::adapter::BUSY)
+	{
+		this->address = address;
+		this->readBuffer = readBuffer;
+		this->readSize = readSize;
+		this->auxWriteBuffer = auxWriteBuffer;
+		this->auxWriteSize = auxWriteSize;
+		this->writeBuffer = writeBuffer;
+		this->writeSize = writeSize;
+		isReading = writeSize ? false : true;
+		twoBuffers = true;
+		return true;
+	}
+	return false;
+}
+
+template <typename I2cMaster>
+bool
+xpcc::I2cEeprom<I2cMaster>::attaching()
+{
+	if (state == xpcc::i2c::adapter::BUSY)
 		return false;
+	state = xpcc::i2c::adapter::BUSY;
+	return true;
+}
+
+template <typename I2cMaster>
+xpcc::i2c::Delegate::Starting
+xpcc::I2cEeprom<I2cMaster>::started()
+{
+	Starting s;
+	s.address = address;
+	if (isReading) {
+		s.next = readSize ? READ_OP : STOP_OP;
+	}
+	else {
+		s.next = writeSize ? WRITE_OP : STOP_OP;
+	}
+	isReading = !isReading;
+	return s;
+}
+
+template <typename I2cMaster>
+xpcc::i2c::Delegate::Writing
+xpcc::I2cEeprom<I2cMaster>::writing()
+{
+	Writing w;
+	if (twoBuffers)
+	{
+		w.buffer = auxWriteBuffer;
+		w.size = auxWriteSize;
+		w.next = WRITE_WRITE;
+		twoBuffers = false;
+	}
+	else {
+		w.buffer = writeBuffer;
+		w.size = writeSize;
+		w.next = readSize ? WRITE_RESTART : WRITE_STOP;
+	}
+	return w;
+}
+
+template <typename I2cMaster>
+xpcc::i2c::Delegate::Reading
+xpcc::I2cEeprom<I2cMaster>::reading()
+{
+	Reading r;
+	r.buffer = readBuffer;
+	r.size = readSize;
+	r.next = READ_STOP;
+	return r;
+}
+
+template <typename I2cMaster>
+void
+xpcc::I2cEeprom<I2cMaster>::stopped(DetachCause cause)
+{
+	isReading = false;
+	twoBuffers = false;
+	state = (cause == NORMAL_STOP) ? xpcc::i2c::adapter::NO_ERROR : xpcc::i2c::adapter::ERROR;
 }

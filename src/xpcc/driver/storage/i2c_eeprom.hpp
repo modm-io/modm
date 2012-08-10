@@ -31,26 +31,23 @@
 #ifndef XPCC__I2C_EEPROM_HPP
 #define XPCC__I2C_EEPROM_HPP
 
-#include <xpcc/driver/connectivity/i2c/sync_master.hpp>
+#include <xpcc/driver/connectivity/i2c/delegate.hpp>
 
 namespace xpcc
 {
 	/**
 	 * \brief	I2C Eeprom
 	 * 
-	 * Compatible with the 24C256 family and other I2C eeprom with an
-	 * 16-bit address pointer.
-	 * 
-	 * For example:
-\verbatim
-24xx256	- base address 0xA0
-\endverbatim
+	 * Compatible with the 24C256 (ST) and 24FC1025 (Microchip) family and other
+	 * I2C eeprom with an 16-bit address pointer.
+	 * Base address for most 24xxyyyy eeproms is 0xA0.
 	 * 
 	 * \ingroup	storage
 	 * \author	Fabian Greif
+	 * \author	Niklas Hauser
 	 */
-	template <typename I2C>
-	class I2cEeprom
+	template <typename I2cMaster>
+	class I2cEeprom : public xpcc::i2c::Delegate
 	{
 	public:
 		I2cEeprom(uint8_t address);
@@ -65,7 +62,7 @@ namespace xpcc
 		 * 			\c false otherwise
 		 */
 		bool
-		writeByte(uint16_t address, uint8_t data) const;
+		writeByte(uint16_t address, uint8_t data);
 		
 		/**
 		 * \brief	Write block
@@ -78,7 +75,7 @@ namespace xpcc
 		 * 			\c false otherwise
 		 */
 		bool
-		write(uint16_t address, const uint8_t *data, uint8_t bytes) const;
+		write(uint16_t address, const uint8_t *data, uint8_t bytes);
 		
 		/**
 		 * \brief	Convenience function
@@ -90,15 +87,15 @@ namespace xpcc
 		 */
 		template <typename T>
 		inline bool
-		write(uint16_t address, const T& data) const;
+		write(uint16_t address, const T& data);
 		
 		/// Read byte
 		bool
-		readByte(uint16_t address, uint8_t &data) const;
+		readByte(uint16_t address, uint8_t &data);
 		
 		/// Read block
 		bool
-		read(uint16_t address, uint8_t *data, uint8_t bytes) const;
+		read(uint16_t address, uint8_t *data, uint8_t bytes);
 		
 		/**
 		 * \brief	Convenience function
@@ -110,20 +107,46 @@ namespace xpcc
 		 */
 		template <typename T>
 		inline bool
-		read(uint16_t address, T& data) const;
-
-		/**
-		 * \brief	Check if the device is accessable
-		 *
-		 * \return	\c true the device responds to its address,
-		 * 			\c false otherwise, i.a. if bus was not free, statrcondition failed or device did not responded.
-		 */
+		read(uint16_t address, T& data);
+		
 		bool
-		isAvailable() const;
+		isAvailable();
 		
 	private:
-		const uint8_t deviceAddress;
-		typedef xpcc::i2c::SyncMaster<I2C> MySyncI2C;
+		uint8_t address;
+		uint8_t readSize;
+		uint8_t writeSize;
+		uint8_t auxWriteSize;
+		uint8_t *readBuffer;
+		const uint8_t *writeBuffer;
+		const uint8_t *auxWriteBuffer;
+		bool twoBuffers;
+		volatile xpcc::i2c::adapter::State state;
+		bool isReading;
+		
+		uint8_t buffer[3];
+		
+	private:
+		bool
+		initialize(const uint8_t* writeBuffer, uint8_t writeSize, uint8_t* readBuffer, uint8_t readSize);
+		
+		bool
+		initialize(const uint8_t* auxWriteBuffer, uint8_t auxWriteSize, const uint8_t* writeBuffer, uint8_t writeSize, uint8_t* readBuffer, uint8_t readSize);
+		
+		virtual bool
+		attaching();
+		
+		virtual Starting
+		started();
+		
+		virtual Writing
+		writing();
+		
+		virtual Reading
+		reading();
+		
+		virtual void
+		stopped(DetachCause cause);
 	};
 }
 

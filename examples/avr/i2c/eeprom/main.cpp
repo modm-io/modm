@@ -16,11 +16,11 @@ xpcc::atmega::BufferedUart0 uart(9600);
 #define USE_HARDWARE
 
 #if defined USE_SOFTWARE
-typedef xpcc::SoftwareI2C<Scl, Sda> I2C;
+typedef xpcc::SoftwareI2C<Scl, Sda> Twi;
 #endif
 
 #if defined USE_HARDWARE
-typedef xpcc::atmega::AsynchronousTwiMaster I2C;
+typedef xpcc::atmega::I2cMaster Twi;
 #endif
 
 void
@@ -45,23 +45,16 @@ main()
 	
 #if defined USE_SOFTWARE
 	// Initialize the I2C interface.
-	I2C::initialize();
+	Twi::initialize();
 #endif
 
 #if defined USE_HARDWARE
-	I2C::initialize(65, 0);
+	Twi::initialize(65, 0);
 #endif
 
 	// Create a wrapper object for an 24C256 (32K I2C eeprom) connected
 	// at address 0xA0
-	xpcc::I2cEeprom< I2C > eeprom(0xA0);
-
-	// Check if we can access the Eeprom
-	if (!eeprom.isAvailable())
-	{
-		output << "Could not connect to the 24C256" << xpcc::endl;
-		die();
-	}
+	xpcc::I2cEeprom< Twi > eeprom(0xA0);
 
 	// write a small pattern in the first eight bytes if it isn't
 	// already present
