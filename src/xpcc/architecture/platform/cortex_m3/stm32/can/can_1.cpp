@@ -83,7 +83,8 @@ xpcc::atomic::Queue<xpcc::can::Message, STM32_CAN1_RX_BUFFER_SIZE> rxQueue;
 #endif
 
 // ----------------------------------------------------------------------------
-// Configure the mailbox
+// Configure the mailbox to send a CAN message.
+// Low level function called by sendMessage and by Tx Interrupt.
 static void
 sendMailbox(const xpcc::can::Message& message, uint32_t mailboxId)
 {
@@ -113,6 +114,8 @@ sendMailbox(const xpcc::can::Message& message, uint32_t mailboxId)
 }
 
 // ----------------------------------------------------------------------------
+// Low level function to receive a message from mailbox.
+// Called by Rx Interrupt or by getMessage.
 static void
 readMailbox(xpcc::can::Message& message, uint32_t mailboxId)
 {
