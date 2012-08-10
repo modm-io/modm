@@ -34,6 +34,7 @@
 
 #include "gpio.hpp"
 #include "spi/spi_0.hpp"
+#include "c_can/c_can.hpp"
 
 extern "C"
 {
