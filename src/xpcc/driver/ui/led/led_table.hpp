@@ -37,7 +37,7 @@
 namespace xpcc
 {
 	/**
-	 * These are lookup tables for alpha corrected values used in fading LEDs.
+	 * These are lookup tables for gamma corrected values used in fading LEDs.
 	 * Most of the time, 256 (8bit) steps are enough for simple indication,
 	 * however, for color sensitive tasks (like RGB LEDs) consider using the
 	 * 1000 step table.
@@ -45,6 +45,7 @@ namespace xpcc
 	 *
 	 * If any special behavior is expected, you can copy and modify these
 	 * tables into your own project.
+	 * Most of these use a gamma of 2.0.
 	 */
 	namespace led
 	{
