@@ -85,6 +85,7 @@ env.SConscript('src/xpcc/architecture/platform/avr/atmega/SConscript.generate', 
 env.SConscript('src/xpcc/architecture/platform/avr/atxmega/SConscript.generate', exports='env')
 env.SConscript('src/xpcc/architecture/platform/arm7/at91/SConscript.generate', exports='env')
 env.SConscript('src/xpcc/architecture/platform/arm7/lpc/SConscript.generate', exports='env')
+env.SConscript('src/xpcc/architecture/platform/cortex_m0/lpc/SConscript.generate', exports='env')
 env.SConscript('src/xpcc/architecture/platform/cortex_m3/stm32/SConscript.generate', exports='env')
 
 # Generate C++ arrays from the font definition files

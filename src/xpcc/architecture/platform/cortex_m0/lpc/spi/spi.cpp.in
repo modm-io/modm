@@ -1,32 +1,37 @@
 
-/*
- * WARNING: This file is generated automatically, do not edit!
- * Please modify the corresponding *.in file instead and rebuild this file. 
- */
-// ----------------------------------------------------------------------------
+{{ generation_block }}
 
 #include "../gpio.hpp"
-#include "spi_0.hpp"
+#include "spi_{{ id }}.hpp"
 
 void
-xpcc::lpc::SpiMaster0::configurePins(MappingSck mapping, bool useSsel)
+xpcc::lpc::SpiMaster{{ id }}::configurePins(MappingSck mapping, bool useSsel)
 {
 	// Deassert Reset
-	LPC_SYSCON->PRESETCTRL 		|= PRESETCTRL_SSP0_RST_N;
+	LPC_SYSCON->PRESETCTRL 		|= PRESETCTRL_SSP{{ id }}_RST_N;
 
 	// Enable peripheral clock
-	LPC_SYSCON->SYSAHBCLKCTRL	|= SYSAHBCLKCTRL_SSP0;
+	LPC_SYSCON->SYSAHBCLKCTRL	|= SYSAHBCLKCTRL_SSP{{ id }};
 
 	// Divide peripheral clock by 1
-	LPC_SYSCON->SSP0CLKDIV = 0x01;
+	LPC_SYSCON->SSP{{ id }}CLKDIV = 0x01;
 
+	{% if id == 0 -%}
 	// MISO at PIO0_8 and MOSI at PIO0_9
 	LPC_IOCON->PIO0_8			&= ~0x07;
 	LPC_IOCON->PIO0_8			|=  0x01;	/* SSP MISO */
 	LPC_IOCON->PIO0_9			&= ~0x07;
 	LPC_IOCON->PIO0_9			|=  0x01;	/* SSP MOSI */
+	{%- else -%}
+	// MISO1 at PIO2_2 and MOSI1 at PIO2_3
+	LPC_IOCON->PIO2_2			&= ~0x07;
+	LPC_IOCON->PIO2_2			|=  0x02;	/* SSP MISO */
+	LPC_IOCON->PIO2_3			&= ~0x07;
+	LPC_IOCON->PIO2_3			|=  0x02;	/* SSP MOSI */
+	{%- endif %}
 
 
+	{% if id == 0 -%}
 	// For SPI0 SCK0 can be at PIO0_6, PIO0_10 or PIO2_11
 	switch (mapping)
 	{
@@ -47,18 +52,28 @@ xpcc::lpc::SpiMaster0::configurePins(MappingSck mapping, bool useSsel)
 										combined with IOCONSCKLOC register setting */
 	break;
 	}
+	{%- else -%}
+	// For SPI1 SCK1 is fixed at PIO2_1
+	LPC_IOCON->PIO2_11 = 0x02;
+	{%- endif %}
 
 
 	if (useSsel) {
-	// SSEL0 fixed at PIO0_2
+	{% if id == 0 -%}
+		// SSEL0 fixed at PIO0_2
 		LPC_IOCON->PIO0_2 &= ~0x07;
 		LPC_IOCON->PIO0_2 |=  0x01;		/* SSP SSEL */
+	{%- else -%}
+		// SSEL1 fixed at PIO2_0
+		LPC_IOCON->PIO2_0 &= ~0x07;
+		LPC_IOCON->PIO2_0 |=  0x02;
+	{%- endif %}
 	}
 
 }
 
 void
-xpcc::lpc::SpiMaster0::initialize(
+xpcc::lpc::SpiMaster{{ id }}::initialize(
 		Mode mode,
 		Presacler prescaler,
 		uint8_t serialClockRate,
@@ -66,49 +81,49 @@ xpcc::lpc::SpiMaster0::initialize(
 		FrameFormat frameFormat)
 {
 	// Control register 0
-	LPC_SSP0->CR0 = (serialClockRate << 8) |
+	LPC_SSP{{ id }}->CR0 = (serialClockRate << 8) |
 			 (static_cast<uint16_t>(mode)) |
 			((static_cast<uint16_t>(frameFormat)) << 4) |
 			((static_cast<uint16_t>(transferSize)) << 0);
 
 	// Clock prescale register
-	LPC_SSP0->CPSR = static_cast<uint8_t>(prescaler);
+	LPC_SSP{{ id }}->CPSR = static_cast<uint8_t>(prescaler);
 
 	for (uint8_t ii = 0; ii < fifoSize; ++ii)
 	{
-	  uint16_t Dummy = LPC_SSP0->DR;		/* clear the RxFIFO */
+	  uint16_t Dummy = LPC_SSP{{ id }}->DR;		/* clear the RxFIFO */
 	  (void)Dummy; // unused
 	}
 
 	/* TODO Enable the SSP Interrupt */
 
 	// Enable SPI0 in master mode
-	LPC_SSP0->CR1 = SPI_CR1_SSE;
+	LPC_SSP{{ id }}->CR1 = SPI_CR1_SSE;
 }
 
 void
-xpcc::lpc::SpiMaster0::write(uint8_t data)
+xpcc::lpc::SpiMaster{{ id }}::write(uint8_t data)
 {
 	/* Move on only if TX FIFO not full. */
-	while (!(LPC_SSP0->SR & SPI_SRn_TNF));
+	while (!(LPC_SSP{{ id }}->SR & SPI_SRn_TNF));
 
 	/* Put data into FIFO */
-	LPC_SSP0->DR = data;
+	LPC_SSP{{ id }}->DR = data;
 }
 
 void
-xpcc::lpc::SpiMaster0::write(uint8_t * data, uint8_t len)
+xpcc::lpc::SpiMaster{{ id }}::write(uint8_t * data, uint8_t len)
 {
 	while (len-- > 0)
 	{
-		while (!(LPC_SSP0->SR & SPI_SRn_TNF));
-		LPC_SSP0->DR = *data;
+		while (!(LPC_SSP{{ id }}->SR & SPI_SRn_TNF));
+		LPC_SSP{{ id }}->DR = *data;
 		++data;
 	}
 }
 
 bool
-xpcc::lpc::SpiMaster0::isBusy()
+xpcc::lpc::SpiMaster{{ id }}::isBusy()
 {
-	return (LPC_SSP0->SR & SPI_SRn_BSY);
+	return (LPC_SSP{{ id }}->SR & SPI_SRn_BSY);
 }

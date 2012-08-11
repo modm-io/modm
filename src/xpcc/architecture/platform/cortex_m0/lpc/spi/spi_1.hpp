@@ -5,8 +5,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_LPC11__SPI_0_HPP
-#define XPCC_LPC11__SPI_0_HPP
+#ifndef XPCC_LPC11__SPI_1_HPP
+#define XPCC_LPC11__SPI_1_HPP
 
 #include <stdint.h>
 #include <xpcc/driver/connectivity/spi/spi_master.hpp>
@@ -17,7 +17,7 @@ namespace xpcc
 	namespace lpc
 	{
 		/**
-		 * \brief	Serial peripheral interface (SPI0)
+		 * \brief	Serial peripheral interface (SPI1)
 		 *
 		 * As the NXP peripherals provide a hardware buffer, this
 		 * implementation is already bufferd.
@@ -33,7 +33,7 @@ namespace xpcc
 		 * \ingroup	lpc11
 		 *
 		 */
-		class SpiMaster0 : public xpcc::SpiMaster
+		class SpiMaster1 : public xpcc::SpiMaster
 		{
 		public:
 			enum class TransferSize
@@ -205,14 +205,12 @@ namespace xpcc
 
 			enum class MappingSck
 			{
-			PIO0_6  = 0,		///< Selects SCK0 function in pin location SWCLK/PIO0_10/SCK0/CT16B0_MAT2
-				PIO0_10 = 1,		///< Selects SCK0 function in pin location PIO2_11/SCK0
-				PIO2_11 = 2,		///< Selects SCK0 function in pin location PIO0_6/SCK0
+			PIO2_1 = 0,			///< Selects SCK1 function in PIO2_1. No choice possible.
 			};
 
 			static void
 			configurePins(
-					MappingSck mapping = xpcc::lpc::SpiMaster0::MappingSck::PIO0_6,
+					MappingSck mapping = xpcc::lpc::SpiMaster1::MappingSck::PIO2_1,
 					bool useSsel = false);
 
 		public:
@@ -255,4 +253,4 @@ namespace xpcc
 		};
 	} // lpc namespace
 } // xpcc namespace
-#endif // XPCC_LPC11__SPI_0_HPP
+#endif // XPCC_LPC11__SPI_1_HPP
