@@ -90,6 +90,17 @@ main(void)
 		}
 		else {
 			led::Onboard::set();
+
+			// Write four digits, from right to left.
+			// (First byte is for the very right display)
+			ssd::Spi::write(timer32_0_counter);
+			ssd::Spi::write(0x03);
+			ssd::Spi::write(0x07);
+			ssd::Spi::write(0x0f);
+
+			// on rising edge data is moved to storage registers
+			ssd::Load::set();
+			ssd::Load::reset();
 		}
 		
 		// Go to sleep to save power between timer interrupts

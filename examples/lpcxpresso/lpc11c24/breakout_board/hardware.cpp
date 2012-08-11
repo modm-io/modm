@@ -31,6 +31,10 @@ Hardware::initialize()
 	button::Ok::setInput(xpcc::lpc::InputType::PULLUP);
 	button::Down::setInput(xpcc::lpc::InputType::PULLUP);
 
+	ssd::Spi::initialize();
+	ssd::Load::setOutput();
+	ssd::Pwm::setOutput();
+
 }
 
 // ----------------------------------------------------------------------------
