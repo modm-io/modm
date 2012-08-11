@@ -35,6 +35,7 @@
 #include "gpio.hpp"
 #include "uart/uart_1.hpp"
 #include "spi/spi_0.hpp"
+#include "spi/spi_1.hpp"
 #include "c_can/c_can.hpp"
 
 extern "C"

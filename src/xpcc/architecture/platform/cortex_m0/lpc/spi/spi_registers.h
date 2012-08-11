@@ -21,6 +21,6 @@
 
 /*******************  Bit definition for SYSAHBCLKCTRL register  **************/
 #define SYSAHBCLKCTRL_SSP0					((uint16_t)(1 << 11)) ///< Enables clock for SPI0
-#define SYSAHBCLKCTRL_SSP1					((uint16_t)(1 << 18)) ///< Enables clock for SPI1
+#define SYSAHBCLKCTRL_SSP1					((uint32_t)(1 << 18)) ///< Enables clock for SPI1
 
 #endif // XPCC__SPI_REGISTERS_HPP

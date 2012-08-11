@@ -30,7 +30,6 @@ xpcc::lpc::SpiMaster{{ id }}::configurePins(MappingSck mapping, bool useSsel)
 	LPC_IOCON->PIO2_3			|=  0x02;	/* SSP MOSI */
 	{%- endif %}
 
-
 	{% if id == 0 -%}
 	// For SPI0 SCK0 can be at PIO0_6, PIO0_10 or PIO2_11
 	switch (mapping)
@@ -54,9 +53,9 @@ xpcc::lpc::SpiMaster{{ id }}::configurePins(MappingSck mapping, bool useSsel)
 	}
 	{%- else -%}
 	// For SPI1 SCK1 is fixed at PIO2_1
-	LPC_IOCON->PIO2_11 = 0x02;
+	LPC_IOCON->PIO2_1 = 0x02;
+	(void) mapping; // unused
 	{%- endif %}
-
 
 	if (useSsel) {
 	{% if id == 0 -%}
@@ -97,7 +96,7 @@ xpcc::lpc::SpiMaster{{ id }}::initialize(
 
 	/* TODO Enable the SSP Interrupt */
 
-	// Enable SPI0 in master mode
+	// Enable SPI{{ id }} in master mode
 	LPC_SSP{{ id }}->CR1 = SPI_CR1_SSE;
 }
 

@@ -26,7 +26,6 @@ xpcc::lpc::SpiMaster0::configurePins(MappingSck mapping, bool useSsel)
 	LPC_IOCON->PIO0_9			&= ~0x07;
 	LPC_IOCON->PIO0_9			|=  0x01;	/* SSP MOSI */
 
-
 	// For SPI0 SCK0 can be at PIO0_6, PIO0_10 or PIO2_11
 	switch (mapping)
 	{
@@ -47,7 +46,6 @@ xpcc::lpc::SpiMaster0::configurePins(MappingSck mapping, bool useSsel)
 										combined with IOCONSCKLOC register setting */
 	break;
 	}
-
 
 	if (useSsel) {
 	// SSEL0 fixed at PIO0_2
