@@ -10,7 +10,8 @@
 
 namespace led
 {
-	GPIO__OUTPUT(Onboard,  0, 7);
+	GPIO__OUTPUT(Xpresso,  0, 7);
+	GPIO__OUTPUT(Onboard,  3, 3);
 	GPIO__OUTPUT(DuoGreen, 3, 2);
 	GPIO__OUTPUT(DuoRed,   3, 1);
 }
@@ -47,5 +48,6 @@ namespace ssd
 
 	// software SPI, write only
 	typedef xpcc::SoftwareSpi<spi::Sck, spi::Mosi, xpcc::gpio::Unused, 2000000> Spi;
+//	typedef xpcc::lpc::SpiMaster1 Spi;
 }
 #endif	// CONFIG_HPP

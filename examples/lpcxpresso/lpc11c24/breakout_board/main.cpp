@@ -87,9 +87,11 @@ main(void)
 		// Check TimeTick to see whether to set or clear the LED I/O pin
 		if ((timer32_0_counter % (LED_TOGGLE_TICKS / COUNT_MAX)) < ((LED_TOGGLE_TICKS / COUNT_MAX) / 2)) {
 			led::Onboard::reset();
+			led::Xpresso::reset();
 		}
 		else {
 			led::Onboard::set();
+			led::Xpresso::set();
 
 			// Write four digits, from right to left.
 			// (First byte is for the very right display)
