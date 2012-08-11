@@ -47,7 +47,9 @@ namespace ssd
 	GPIO__OUTPUT(Pwm,  1, 1);
 
 	// software SPI, write only
-	typedef xpcc::SoftwareSpi<spi::Sck, spi::Mosi, xpcc::gpio::Unused, 2000000> Spi;
-//	typedef xpcc::lpc::SpiMaster1 Spi;
+//	typedef xpcc::SoftwareSpi<spi::Sck, spi::Mosi, xpcc::gpio::Unused, 2000000> Spi;
+
+	// Hardware SPI1
+	typedef xpcc::lpc::SpiMaster1 Spi;
 }
 #endif	// CONFIG_HPP

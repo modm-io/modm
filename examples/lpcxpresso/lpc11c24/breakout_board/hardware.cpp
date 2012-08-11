@@ -33,8 +33,11 @@ Hardware::initialize()
 	button::Ok::setInput(xpcc::lpc::InputType::PULLUP);
 	button::Down::setInput(xpcc::lpc::InputType::PULLUP);
 
+	ssd::Spi::configurePins(ssd::Spi::MappingSck::PIO2_1);
+//	ssd::Spi::configurePins(ssd::Spi::MappingSck::PIO0_6);
 	ssd::Spi::initialize();
-//	ssd::Spi::configurePins(ssd::Spi::MappingSck::PIO2_11)
+
+	led::DuoGreen::set();
 
 	ssd::Load::setOutput();
 	ssd::Pwm::setOutput();
