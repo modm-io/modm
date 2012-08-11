@@ -34,6 +34,9 @@
 #include <xpcc/architecture/driver/gpio.hpp>
 #include <lpc11xx/cmsis/LPC11xx.h>
 
+// All these pins are not GPIOs as default.
+// Some special handling is necessary.
+// To use them as GPIO the LPC_IOCON register must be set.
 #define PIO0_0		RESET_PIO0_0
 #define PIO0_10		SWCLK_PIO0_10
 #define PIO0_11		R_PIO0_11
