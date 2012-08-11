@@ -67,13 +67,14 @@
 _delay_us:
 	// Example:
 	// F_CPU / 1000000 = cycles per us => 72,000,000 / 1,000,000 = 72
-	// 72 / 6 cycles per loop = 12
+	// 72 / 4 cycles per loop = 18
 	movs	r1, #(F_CPU / 1000000 / 4)
 	muls	r1, r0, r1
 	beq		2f
 1:
 	subs	r1, r1, #1
 	bne		1b
+2:
 	bx		lr
 	.size	_delay_us, . - _delay_us
 	.endfunc
@@ -100,7 +101,6 @@ _delay_ms:
 	muls	r1, r0, r1
 	beq		2f
 1:
-	// itt		ne
 	subs	r1, r1, #1
 	bne		1b
 2:	bx		lr
