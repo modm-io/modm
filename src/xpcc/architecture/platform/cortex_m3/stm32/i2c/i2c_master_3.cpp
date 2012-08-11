@@ -105,8 +105,8 @@ namespace
 	// buffer management
 	static uint8_t *readPointer;
 	static const uint8_t *writePointer;
-	static uint8_t readBytesLeft;
-	static uint8_t writeBytesLeft;
+	static std::size_t readBytesLeft;
+	static std::size_t writeBytesLeft;
 	
 	// delegating
 	static xpcc::i2c::Delegate *delegate = 0;
