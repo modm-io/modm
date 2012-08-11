@@ -5,6 +5,7 @@
 
 #include <xpcc/architecture.hpp>
 #include <xpcc/driver/connectivity/spi.hpp>
+#include <xpcc/driver/ui/seven_segment.hpp>
 
 // ----------------------------------------------------------------------------
 
@@ -51,5 +52,8 @@ namespace ssd
 
 	// Hardware SPI1
 	typedef xpcc::lpc::SpiMaster1 Spi;
+
+	// A seven-segment display with 4 Digits
+	typedef xpcc::sevenSegment::SevenSegmentDisplay<Spi, Load, 4> Ssd;
 }
 #endif	// CONFIG_HPP
