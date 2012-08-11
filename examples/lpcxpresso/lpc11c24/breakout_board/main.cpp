@@ -1,6 +1,9 @@
 
 #include <xpcc/architecture.hpp>
 
+#include "hardware.hpp"
+#include "config.hpp"
+
 #define LED_TOGGLE_TICKS 150		// 100 ticks = 1 Hz flash rate
 #define COUNT_MAX		3			// how high to count on the LED display
 
@@ -54,12 +57,10 @@ Init7Segment(void)
 }
 */
 
-GPIO__OUTPUT(Led, 0, 7);
-
 int
 main(void)
 {
-	SystemInit();
+	Hardware::initialize();
 	
 	// Initialize 32-bit timer 0. TIME_INTERVAL is defined as 10mS
 	// You may also want to use the Cortex SysTick timer to do this
@@ -69,18 +70,19 @@ main(void)
 	// the TimeTick global each time timer 0 matches and resets.
 	enable_timer32(0);
 	
-	// Set LED port pin to output
-	Led::setOutput();
-	
 	while (1)
 	{
 		// Each time we wake up...
 		// Check TimeTick to see whether to set or clear the LED I/O pin
 		if ((timer32_0_counter % (LED_TOGGLE_TICKS / COUNT_MAX)) < ((LED_TOGGLE_TICKS / COUNT_MAX) / 2)) {
-			Led::reset();
+			led::Onboard::reset();
+			led::DuoGreen::set();
+			led::DuoRed::reset();
 		}
 		else {
-			Led::set();
+			led::Onboard::set();
+			led::DuoGreen::reset();
+			led::DuoRed::set();
 		}
 		
 		// Go to sleep to save power between timer interrupts

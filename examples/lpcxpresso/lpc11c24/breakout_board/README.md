@@ -5,10 +5,10 @@ made in 2012 by Fabian.
 Current Status:
 
 * Done
-  * 
+  * Duo LED
 
 * In progress
-  * Duo LED
+  * Buttons
 
 * Not done:
   * Everything else
