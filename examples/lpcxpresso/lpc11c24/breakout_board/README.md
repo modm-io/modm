@@ -6,9 +6,10 @@ Current Status:
 
 * Done
   * Duo LED
+  * Buttons
 
 * In progress
-  * Buttons
+  * 7-Segment-Display
 
 * Not done:
   * Everything else

@@ -73,16 +73,23 @@ main(void)
 	while (1)
 	{
 		// Each time we wake up...
+		// set the Leds
+		if (button::Ok::read())
+		{
+			led::DuoRed::set();
+			led::DuoGreen::set();
+		}
+		else {
+			led::DuoRed::set(button::Up::read());
+			led::DuoGreen::set(button::Down::read());
+		}
+
 		// Check TimeTick to see whether to set or clear the LED I/O pin
 		if ((timer32_0_counter % (LED_TOGGLE_TICKS / COUNT_MAX)) < ((LED_TOGGLE_TICKS / COUNT_MAX) / 2)) {
 			led::Onboard::reset();
-			led::DuoGreen::set();
-			led::DuoRed::reset();
 		}
 		else {
 			led::Onboard::set();
-			led::DuoGreen::reset();
-			led::DuoRed::set();
 		}
 		
 		// Go to sleep to save power between timer interrupts

@@ -180,4 +180,75 @@ namespace xpcc
 		} \
 	}
 
+
+namespace xpcc
+{
+	/**
+	 * \brief	General purpose input and/or output pins
+	 * \ingroup	gpio
+	 */
+	namespace lpc
+	{
+	template <typename Pin>
+	class Invert
+	{
+	public:
+		ALWAYS_INLINE static void
+		setOutput()
+		{
+			Pin::setOutput();
+		}
+
+		ALWAYS_INLINE static void
+		setOutput(bool value)
+		{
+			Pin::setOutput(!value);
+		}
+
+		ALWAYS_INLINE static void
+		setInput()
+		{
+			Pin::setInput();
+		}
+
+		ALWAYS_INLINE static void
+		setInput(xpcc::lpc::InputType t)
+		{
+			Pin::setInput(t);
+		}
+
+		ALWAYS_INLINE static void
+		set()
+		{
+			Pin::reset();
+		}
+
+		ALWAYS_INLINE static void
+		set(bool value)
+		{
+			Pin::set(!value);
+		}
+
+		ALWAYS_INLINE static void
+		reset()
+		{
+			Pin::set();
+		}
+
+		ALWAYS_INLINE static void
+		toggle()
+		{
+			Pin::toggle();
+		}
+
+		ALWAYS_INLINE static bool
+		read()
+		{
+			return !Pin::read();
+		}
+	};
+
+	} // gpio namespace
+} // xpcc namespace
+
 #endif // XPCC_LPC11XX__GPIO_HPP
