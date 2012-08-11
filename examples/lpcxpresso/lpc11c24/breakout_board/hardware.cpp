@@ -39,8 +39,15 @@ Hardware::initialize()
 
 	led::DuoGreen::set();
 
+	ssd::Ssel::setOutput();
 	ssd::Load::setOutput();
+
+	// PIO1_1 is a reserved pin and must be set as a GPIO first.
 	ssd::Pwm::setOutput();
+	// Set Alternative function after using setOutput because setOutput overwrites
+	// the whole register.
+	LPC_IOCON->R_PIO1_1  &= ~0x07;
+	LPC_IOCON->R_PIO1_1  |= 0x01;
 
 }
 

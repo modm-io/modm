@@ -37,12 +37,12 @@ namespace spi
 	GPIO__OUTPUT(Sck,  2, 1);
 	GPIO__OUTPUT(Mosi, 2, 3);
 	GPIO__INPUT (Miso, 2, 2);
-	GPIO__OUTPUT(Ssel, 2, 0);
 }
 
 namespace ssd
 {
 	// Seven-segment displays, the first bit is the most right display
+	GPIO__OUTPUT(Ssel, 2, 0);
 	GPIO__OUTPUT(Load, 3, 0);
 	GPIO__OUTPUT(Pwm,  1, 1);
 
