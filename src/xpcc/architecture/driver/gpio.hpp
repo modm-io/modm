@@ -42,10 +42,10 @@
  * definitions for hardware pins which then can be used as template
  * parameters for miscellaneous device drivers.
  * 
- * \warning	When you use the pins direct outside any device driver class you
+ * \warning	When you use the pins directly outside any device driver class you
  * 			have to remember to initialize them first. Call configure(),
  * 			setInput() or setOutput() before the first use, otherwise the
- * 			result is undefined and most likely not what you except!
+ * 			result is undefined and most likely not what you expect!
  * 
  * Example:
  * \code
@@ -401,7 +401,7 @@ namespace xpcc
 		 * \brief	Create a 8-bit port from arbitrary pins.
 		 * 
 		 * Be aware that this method is slow, because for every write or read
-		 * cycle, everyone of the eight pins have to be read/written
+		 * cycle, every of the eight pins have to be read/written
 		 * individually.
 		 * 
 		 * This class is included here because it can be very useful sometimes,
@@ -489,7 +489,7 @@ namespace xpcc
 		/**
 		 * \brief	Configuration possibilities of a general purpose pin
 		 * 
-		 * This type is defined different for every architecture as they
+		 * This type is defined differently for every architecture as they
 		 * provide different capabilities.
 		 * 
 		 * \e NORMAL and \e PULLUP is the minimal interface that should be
