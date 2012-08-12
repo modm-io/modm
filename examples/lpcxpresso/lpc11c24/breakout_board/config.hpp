@@ -57,3 +57,15 @@ namespace ssd
 	typedef xpcc::sevenSegment::SevenSegmentDisplay<Spi, Load, 4> Ssd;
 }
 #endif	// CONFIG_HPP
+
+namespace adc
+{
+	// BATTERY	PIO0.11	AD0
+	// CURRENT	PIO1.0	AD1
+	// --				AD2
+	// POSITION	PIO1.2	AD3
+	// --		SWD		AD4
+	// POTI		PIO1.4	AD5
+	// BEMF_A	PIO1.10	AD6
+	// BEMF_B	PIO1.11	AD7
+}

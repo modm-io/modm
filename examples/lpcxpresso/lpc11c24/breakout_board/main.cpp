@@ -7,56 +7,6 @@
 #define LED_TOGGLE_TICKS 150		// 100 ticks = 1 Hz flash rate
 #define COUNT_MAX		3			// how high to count on the LED display
 
-/*
-static const uint8_t segmentlut[10] = {
-//    FCPBAGED
-	0b11011011, // 0
-	0b01010000, // 1
-	0b00011111, // 2
-	0b01011101, // 3
-	0b11010100, // 4
-	0b11001101, // 5
-	0b11001111, // 6
-	0b01011000, // 7
-	0b11011111, // 8
-	0b11011101, // 9
-};
-
-void
-SetSegment(int n)
-{
-	int i;
-	
-	GPIOSetValue(1, 11, 0);
-	
-	if (n < 0)
-		n = 0;
-	else
-		n = segmentlut[n];
-	
-	for (i = 0; i < 8; i++) {
-		if ((n >> (7 - i)) & 1)
-			GPIOSetValue(0, 9, 0);
-		else
-			GPIOSetValue(0, 9, 1);
-		GPIOSetValue(2, 11, 0);
-		GPIOSetValue(2, 11, 1);
-	}
-	GPIOSetValue(1, 11, 1);
-}
-
-void
-Init7Segment(void)
-{
-	// Turn off 7-segment display
-	GPIOSetDir(0, 9, 1); // MOSI
-	GPIOSetDir(2, 11, 1); // CLK
-	GPIOSetDir(1, 11, 1); // CS
-	GPIOSetValue(1, 11, 0);
-	SetSegment(-1);
-}
-*/
-
 int
 main(void)
 {
