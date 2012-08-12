@@ -39,7 +39,7 @@ main(void)
 	xpcc::can::Message message;
 	message.identifier = 0x123456;
 	message.length = 8;
-	message.setRemoteTransmitRequest();
+	message.setRemoteTransmitRequest(false);
 	message.data[0] = 'A';
 	message.data[1] = 'B';
 	message.data[2] = 'C';
