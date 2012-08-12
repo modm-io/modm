@@ -90,7 +90,7 @@ def generate(env, **kw):
 		env['DEVICE_SIZE'] = device_list.devices[device]['size']
 	except KeyError as e:
 		print "Unknown device '%s'. Please check the spelling or add the device " \
-				"in scons/arm_devices.py" % env['ARM_DEVICE']
+				"in scons/site_tools/arm_devices.py" % env['ARM_DEVICE']
 		env.Exit(1)
 	
 	# Add a empty dict to define the internal type of CPPDEFINES. This way
