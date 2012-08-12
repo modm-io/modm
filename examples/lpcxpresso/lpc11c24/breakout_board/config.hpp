@@ -56,6 +56,12 @@ namespace ssd
 	// A seven-segment display with 4 Digits
 	typedef xpcc::sevenSegment::SevenSegmentDisplay<Spi, Load, 4> Ssd;
 }
+
+namespace can
+{
+	// CAN Controller
+	typedef xpcc::lpc::Can Can;
+}
 #endif	// CONFIG_HPP
 
 namespace adc

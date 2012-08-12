@@ -55,6 +55,8 @@ Hardware::initialize()
 	LPC_IOCON->R_PIO1_1  &= ~0x07;
 	LPC_IOCON->R_PIO1_1  |= 0x01;
 
+	can::Can::initialize(xpcc::can::BITRATE_125_KBPS);
+
 }
 
 // ----------------------------------------------------------------------------
