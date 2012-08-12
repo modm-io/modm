@@ -6,14 +6,33 @@
 
 #include <xpcc/architecture.hpp>
 
+#include <xpcc/debug/logger.hpp>
+
 GPIO__OUTPUT(Led, 0, 7);
 GPIO__OUTPUT(WriteInd, 3, 1);
+
+// ----------------------------------------------------------------------------
+// Logging
+
+extern xpcc::lpc::Uart1 loggerUart;
+xpcc::IODeviceWrapper<xpcc::lpc::Uart1> loggerDevice(loggerUart);
+
+xpcc::log::Logger xpcc::log::debug(loggerDevice);
+xpcc::log::Logger xpcc::log::info(loggerDevice);
+xpcc::log::Logger xpcc::log::warning(loggerDevice);
+xpcc::log::Logger xpcc::log::error(loggerDevice);
+
+// ----------------------------------------------------------------------------
+
 
 void
 testWriteSingle(void);
 
 void
 testWriteBuffer(void);
+
+void
+testXpccLogger(void);
 
 extern xpcc::lpc::BufferedUart1 uart;
 
@@ -33,7 +52,7 @@ main(void)
 	// Set LED port pin to output
 	Led::setOutput();
 	
-	xpcc::lpc::BufferedUart1 uart(115200);
+	xpcc::lpc::Uart1 uart(115200);
 
 	xpcc::delay_ms(100); // glitch ?
 
@@ -42,7 +61,9 @@ main(void)
 	uart.write('X');
 
 //	testWriteSingle();
-	testWriteBuffer();
+//	testWriteBuffer();
+
+	testXpccLogger();
 
 	while(1);
 
@@ -115,4 +136,13 @@ testWriteBuffer(void)
 			xpcc::delay_ms(5000);
 		}
 	} // while (1)
+}
+
+void
+testXpccLogger(void)
+{
+	while (1)
+	{
+		XPCC_LOG_DEBUG << "Hello world" << xpcc::endl;
+	}
 }
