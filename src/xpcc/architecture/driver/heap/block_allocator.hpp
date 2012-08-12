@@ -32,6 +32,8 @@
 #define XPCC__BLOCK_ALLOCATOR_HPP
 
 #include <stdint.h>
+#include <cstddef>
+
 #include <xpcc/architecture/utils.hpp>
 #include <xpcc/utils/arithmetic_traits.hpp>
 

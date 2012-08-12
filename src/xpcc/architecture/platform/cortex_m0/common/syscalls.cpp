@@ -48,14 +48,6 @@
 #include <xpcc/architecture/driver/heap/block_allocator.hpp>
 
 // ----------------------------------------------------------------------------
-// __heap_start is set in the linker command file and is the end of
-// statically allocated data (thus start of heap).
-
-extern uint8_t __heap_start;
-extern uint8_t __heap_end;
-uint8_t *__brkval = &__heap_start;		// Points to current end of the heap
-
-// ----------------------------------------------------------------------------
 /*
  * @brief	Simple abort implementation
  * 
@@ -140,17 +132,33 @@ _isatty(int /*file*/)
  */
 extern "C"
 void *
-_sbrk_r(struct _reent *,  ptrdiff_t size)
+_sbrk_r(struct _reent *,  ptrdiff_t)
 {
-	// move heap pointer
-	uint8_t *heap = __brkval;
-	__brkval += size;
-	
-	if (__brkval >= &__heap_end) {
-		// ERROR: heap and stack collision!
-		abort();
-	}
-	
-	//  Return pointer to start of new heap area.
-	return heap;
+	return 0;
+}
+
+// ----------------------------------------------------------------------------
+// __heap_start is set in the linker command file and is the end of
+// statically allocated data (thus start of heap).
+extern uint8_t __heap_start;
+extern uint8_t __heap_end;
+
+static xpcc::BlockAllocator<uint16_t, 8> allocator;
+
+extern "C"
+void __xpcc_initialize_memory(void)
+{
+	allocator.initialize(&__heap_start, &__heap_end);
+}
+
+extern "C"
+void *malloc(size_t size)
+{
+	return allocator.allocate(size);
+}
+
+extern "C"
+void free(void *p)
+{
+	allocator.free(p);
 }
