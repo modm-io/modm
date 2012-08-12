@@ -7,11 +7,28 @@
 
 #define ADC_CR_START_NOW (1 << 24)
 
+/* ---------- Power-down configuration register bit names -----*/
+#define PDRUNCFG_ADC_PD (1 << 4)
+
+/* ---------- System AHB clock control register bit names -----*/
+#define SYSAHBCLKCTRL_ADC (1 << 13)
+
 namespace xpcc {
 	namespace lpc111x {
 		/**
 		 * \brief 	Analog-to-Digital Converter Module of
 		 * 			LPC111x, LPC11D14 and LPC11Cxx parts.
+		 *
+		 * Two usage scenarios where considered when designing this class:
+		 * 1) Manual control: Single Channel, Single Shot
+		 *    From a given set of channels a conversion is started
+		 *    manually and the result is fetched after waiting for the
+		 *    ADC to finish this single channel.
+		 *
+		 * 2) Automatic mode: Multiple Channels, automatic repeat
+		 *    Some channels channels are selected to be sampled automatically.
+		 *    The latest result can be fetched by polling or an interrupt
+		 *    handler can be installed.
 		 *
 		 */
 		class Adc
@@ -79,14 +96,24 @@ namespace xpcc {
 				BITS_3 	= (0x7 << 17),	///< 4 clocks / 3 bits
 			};
 
+			/**
+			 * \brief	Initialise the ADC block.
+			 *
+			 * \param	channelBitmask	Select which channels are configured
+			 * 							by a bitmask. The corresponding IO pins
+			 * 							are changed to analog mode.
+			 * \param	resolution		More bits mean lower conversion rate.
+			 */
 			static void inline
-			initialize(uint8_t channelBitmask)
+			initialize(
+					const uint8_t channelBitmask = 0xff,
+					const Resolution resolution = Resolution::BITS_10)
 			{
 				  /* Disable Power down bit to the ADC block. */
-				  LPC_SYSCON->PDRUNCFG &= ~(0x1<<4);
+				  LPC_SYSCON->PDRUNCFG &= ~(PDRUNCFG_ADC_PD);
 
 				  /* Enable AHB clock to the ADC. */
-				  LPC_SYSCON->SYSAHBCLKCTRL |= (1<<13);
+				  LPC_SYSCON->SYSAHBCLKCTRL |= SYSAHBCLKCTRL_ADC;
 
 				  if (channelBitmask & 0x01) {
 					  LPC_IOCON->R_PIO0_11 &= ~0x8F; /*  ADC I/O config */
