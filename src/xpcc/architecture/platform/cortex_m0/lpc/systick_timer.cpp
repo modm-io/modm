@@ -1,6 +1,6 @@
 // coding: utf-8
 // ----------------------------------------------------------------------------
-/* Copyright (c) 2012, Roboterclub Aachen e.V.
+/* Copyright (c) 2011, Roboterclub Aachen e.V.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -28,24 +28,54 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <lpc11xx/cmsis/LPC11xx.h>
-#include <lpc11xx/cmsis/core_cm0.h>
-#include <lpc11xx/cmsis/system_LPC11xx.h>
+#include <xpcc/architecture/driver/atomic/lock.hpp>
+#include <xpcc/architecture/driver/clock.hpp>
+#include <xpcc/utils/dummy.hpp>
 
+#include <xpcc/architecture.hpp>
+//#include "device.h"  // TODO@Fabian: Why using an extra file and not rely on xpcc/architecture?
 #include "systick_timer.hpp"
 
-#include "adc/adc.hpp"
-#include "gpio.hpp"
-#include "uart/uart_1.hpp"
-#include "spi/spi_0.hpp"
-#include "spi/spi_1.hpp"
-#include "c_can/c_can.hpp"
+static xpcc::lpc11::InterruptHandler sysTickHandler = &xpcc::dummy;
 
-extern "C"
+extern "C" void
+SysTick_Handler(void)
 {
-	#include <lpc11xx/driver/driver_config.h>
-	
-	#include <lpc11xx/driver/gpio.h>
-	#include <lpc11xx/driver/timer32.h>
+	xpcc::Clock::increment();
+	sysTickHandler();
 }
 
+// ----------------------------------------------------------------------------
+void
+xpcc::lpc11::SysTickTimer::enable(uint32_t reload)
+{
+	// Lower systick interrupt priority to lowest level
+	NVIC_SetPriority(SysTick_IRQn, 0xf);
+	
+	SysTick->LOAD = reload;
+	SysTick->CTRL =
+			SysTick_CTRL_CLKSOURCE_Msk |
+			SysTick_CTRL_ENABLE_Msk |
+			SysTick_CTRL_TICKINT_Msk;
+}
+
+void
+xpcc::lpc11::SysTickTimer::disable()
+{
+	SysTick->CTRL = SysTick_CTRL_CLKSOURCE_Msk;
+}
+
+// ----------------------------------------------------------------------------
+void
+xpcc::lpc11::SysTickTimer::attachInterrupt(InterruptHandler handler)
+{
+	atomic::Lock lock;
+	sysTickHandler = handler;
+}
+
+void
+xpcc::lpc11::SysTickTimer::detachInterrupt()
+{
+	atomic::Lock lock;
+	sysTickHandler = &xpcc::dummy;
+}

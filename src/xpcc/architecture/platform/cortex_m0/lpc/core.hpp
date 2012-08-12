@@ -1,6 +1,6 @@
 // coding: utf-8
 // ----------------------------------------------------------------------------
-/* Copyright (c) 2012, Roboterclub Aachen e.V.
+/* Copyright (c) 2011, Roboterclub Aachen e.V.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -28,24 +28,34 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <lpc11xx/cmsis/LPC11xx.h>
-#include <lpc11xx/cmsis/core_cm0.h>
-#include <lpc11xx/cmsis/system_LPC11xx.h>
+#ifndef XPCC_LPC11__CORE_HPP
+#define XPCC_LPC11__CORE_HPP
 
-#include "systick_timer.hpp"
+#include <stdint.h>
 
-#include "adc/adc.hpp"
-#include "gpio.hpp"
-#include "uart/uart_1.hpp"
-#include "spi/spi_0.hpp"
-#include "spi/spi_1.hpp"
-#include "c_can/c_can.hpp"
-
-extern "C"
+namespace xpcc
 {
-	#include <lpc11xx/driver/driver_config.h>
-	
-	#include <lpc11xx/driver/gpio.h>
-	#include <lpc11xx/driver/timer32.h>
+	namespace lpc11
+	{
+		typedef void (*InterruptHandler)(void);
+		
+		class Core
+		{
+		public:
+			/**
+			 * Get unique device id (96-bits)
+			 * 
+			 * @param offset	0..2
+			 * @return	32-bit of the unique id
+			 */
+//			uint32_t
+//			getUniqueId(uint8_t offset)
+//			{
+//				uint32_t *baseaddress = (uint32_t*) 0x1FFFF7E8;
+//				return *(baseaddress + offset);
+//			}
+		};
+	}
 }
 
+#endif	// XPCC_LPC11__CORE_HPP

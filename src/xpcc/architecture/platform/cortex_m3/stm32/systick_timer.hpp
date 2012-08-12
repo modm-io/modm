@@ -66,7 +66,7 @@ namespace xpcc
 			 * 
 			 * \warning	If the SysTick Timer is disabled xpcc::Clock is not
 			 * 			incremented automatically. Workflow classes which
-			 * 			relay on xpcc::Clock will not work if xpcc::Clock
+			 * 			rely on xpcc::Clock will not work if xpcc::Clock
 			 * 			is not incremented.
 			 */
 			static void

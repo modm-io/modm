@@ -1,6 +1,6 @@
 // coding: utf-8
 // ----------------------------------------------------------------------------
-/* Copyright (c) 2012, Roboterclub Aachen e.V.
+/* Copyright (c) 2011, Roboterclub Aachen e.V.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -28,24 +28,67 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <lpc11xx/cmsis/LPC11xx.h>
-#include <lpc11xx/cmsis/core_cm0.h>
-#include <lpc11xx/cmsis/system_LPC11xx.h>
+#ifndef XPCC_LPC11__SYSTICK_TIMER_HPP
+#define XPCC_LPC11__SYSTICK_TIMER_HPP
 
-#include "systick_timer.hpp"
+#include <stdint.h>
+#include "core.hpp"
 
-#include "adc/adc.hpp"
-#include "gpio.hpp"
-#include "uart/uart_1.hpp"
-#include "spi/spi_0.hpp"
-#include "spi/spi_1.hpp"
-#include "c_can/c_can.hpp"
-
-extern "C"
+namespace xpcc
 {
-	#include <lpc11xx/driver/driver_config.h>
-	
-	#include <lpc11xx/driver/gpio.h>
-	#include <lpc11xx/driver/timer32.h>
+	namespace lpc11
+	{
+		/**
+		 * @brief		SysTick Timer
+		 * @ingroup		lpc11
+		 */
+		class SysTickTimer
+		{
+		public:
+			/**
+			 * Enables the SysTick Timer to generate periodic events.
+			 * 
+			 * \param	reload
+			 * 		Reload value to generate a 1000 Hz interrupt rate.
+			 * 					
+			 * 
+			 * \warning	The SysTick Timer is used by default to increment
+			 * 			xpcc::Clock, which is used by xpcc::Timeout and other
+			 * 			similar workflow classes.
+			 * 			You must not increment the xpcc::Clock
+			 * 			additionally somewhere else.
+			 *
+			 * In LPC11 the SysTick timer is normally fed with half of the
+			 * system clock but it is changed to system clock here.
+			 */
+			static void
+			enable(uint32_t reload = ((F_CPU / 1000) - 1));
+
+			/**
+			 * Disables SysTick Timer.
+			 * 
+			 * \warning	If the SysTick Timer is disabled xpcc::Clock is not
+			 * 			incremented automatically. Workflow classes which
+			 * 			rely on xpcc::Clock will not work if xpcc::Clock
+			 * 			is not incremented.
+			 */
+			static void
+			disable();
+
+			/**
+			 * Passed method will be called periodically on each event.
+			 * Previously passed interrupt handler will be detached.
+			 */
+			static void
+			attachInterrupt(InterruptHandler handler);
+
+			/**
+			 * Detaches previously attached interrupt handler.
+			 */
+			static void
+			detachInterrupt();
+		};
+	}
 }
 
+#endif	//  XPCC_LPC11__SYSTICK_TIMER_HPP
