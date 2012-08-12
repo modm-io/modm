@@ -43,11 +43,9 @@ main(void)
 			led::Onboard::set();
 			led::Xpresso::reset();
 
-			// Write four digits, from right to left.
-			// ssd::Ssd::writeHex(timer32_0_counter);
-			if (adc::Adc::isConversionFinished()) {
-				ssd::Ssd::write(adc::Adc::getValue());
-				adc::Adc::startConverstion(adc::Adc::ChannelMask::PIO1_4);
+			uint16_t val;
+			if (adc::Adc::read(val, adc::Adc::Channel::PIO1_4)) {
+				ssd::Ssd::write(val);
 			}
 		}
 		

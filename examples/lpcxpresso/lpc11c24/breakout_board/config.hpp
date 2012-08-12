@@ -69,5 +69,6 @@ namespace adc
 	// BEMF_A	PIO1.10	AD6
 	// BEMF_B	PIO1.11	AD7
 
-	typedef xpcc::lpc111x::Adc Adc;
+//	typedef xpcc::lpc111x::AdcManualSingle Adc;
+	typedef xpcc::lpc111x::AdcAutomaticBurst Adc;
 }

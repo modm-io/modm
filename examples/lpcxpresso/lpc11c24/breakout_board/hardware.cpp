@@ -42,8 +42,11 @@ Hardware::initialize()
 	ssd::Ssel::setOutput();
 	ssd::Load::setOutput();
 
-	adc::Adc::initialize(static_cast<uint8_t>(adc::Adc::ChannelMask::PIO1_4));
-	adc::Adc::startConverstion(adc::Adc::ChannelMask::PIO1_4);
+	uint8_t mask = static_cast<uint8_t>(adc::Adc::ChannelMask::PIO1_4);
+
+	adc::Adc::configurePins(mask);
+	adc::Adc::initialize();
+	adc::Adc::startConversion(mask);
 
 	// PIO1_1 is a reserved pin and must be set as a GPIO first.
 	ssd::Pwm::setOutput();
