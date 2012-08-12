@@ -68,4 +68,6 @@ namespace adc
 	// POTI		PIO1.4	AD5
 	// BEMF_A	PIO1.10	AD6
 	// BEMF_B	PIO1.11	AD7
+
+	typedef xpcc::lpc111x::Adc Adc;
 }

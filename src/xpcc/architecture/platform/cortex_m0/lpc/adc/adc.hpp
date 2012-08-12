@@ -3,6 +3,10 @@
 
 #include <xpcc/architecture.hpp>
 
+#define ADC_GDR_DONE (1 << 31)
+
+#define ADC_CR_START_NOW (1 << 24)
+
 namespace xpcc {
 	namespace lpc111x {
 		/**
@@ -21,7 +25,7 @@ namespace xpcc {
 			 *  or just the plain channel number, like CHANNEL_0.
 			 *
 			 */
-			enum class Channels
+			enum class ChannelMask
 			{
 				PIO0_11	= 0x01,
 				PIO1_0 	= 0x02,
@@ -40,6 +44,27 @@ namespace xpcc {
 				CHANNEL_5 = 0x20,
 				CHANNEL_6 = 0x40,
 				CHANNEL_7 = 0x80,
+			};
+
+			enum class Channel
+			{
+				PIO0_11	= 0,
+				PIO1_0 	= 1,
+				PIO1_1	= 2,
+				PIO1_2	= 3,
+//				PIO1_3	= 4,
+				PIO1_4	= 5,
+				PIO1_10	= 6,
+				PIO1_11	= 7,
+
+				CHANNEL_0 = 0,
+				CHANNEL_1 = 1,
+				CHANNEL_2 = 2,
+				CHANNEL_3 = 3,
+//				CHANNEL_4 = 4,
+				CHANNEL_5 = 5,
+				CHANNEL_6 = 6,
+				CHANNEL_7 = 7,
 			};
 
 			enum class Resolution
@@ -93,8 +118,32 @@ namespace xpcc {
 				  }
 
 				  /* Set clock */
-				  LPC_ADC->CR = 10; // 48 MHz / 11 = 4.35 MHz
+				  LPC_ADC->CR = 10 << 8; // 48 MHz / 11 = 4.35 MHz
+			}
 
+			static inline void
+			startConverstion(ChannelMask channelMask)
+			{
+				// clear and then select bits
+				LPC_ADC->CR &= ~(0xff);
+				LPC_ADC->CR |= ADC_CR_START_NOW | static_cast<uint8_t>(channelMask);
+
+			}
+
+			static inline bool
+			isConversionFinished(void)
+			{
+				return (LPC_ADC->GDR & ADC_GDR_DONE);
+			}
+
+			static inline uint16_t
+			getValue()
+			{
+				// stop ADC by clearing START_MASK
+//				LPC_ADC->CR &= ~(0x07000000);
+
+				// Result is left adjusted, convert to right adjusted.
+				return ((LPC_ADC->GDR & 0xffff) >> 6);
 			}
 
 		protected:

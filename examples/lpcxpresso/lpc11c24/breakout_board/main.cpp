@@ -37,15 +37,18 @@ main(void)
 		// Check TimeTick to see whether to set or clear the LED I/O pin
 		if ((timer32_0_counter % (LED_TOGGLE_TICKS / COUNT_MAX)) < ((LED_TOGGLE_TICKS / COUNT_MAX) / 2)) {
 			led::Onboard::reset();
-			led::Xpresso::reset();
+			led::Xpresso::set();
 		}
 		else {
 			led::Onboard::set();
-			led::Xpresso::set();
+			led::Xpresso::reset();
 
 			// Write four digits, from right to left.
 			// ssd::Ssd::writeHex(timer32_0_counter);
-			ssd::Ssd::write(timer32_0_counter);
+			if (adc::Adc::isConversionFinished()) {
+				ssd::Ssd::write(adc::Adc::getValue());
+				adc::Adc::startConverstion(adc::Adc::ChannelMask::PIO1_4);
+			}
 		}
 		
 		// Go to sleep to save power between timer interrupts
