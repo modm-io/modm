@@ -1,8 +1,18 @@
 
+import os
+
 # path to the xpcc root directory
 rootpath = '../../../..'
 
-env = Environment(tools = ['xpcc'], toolpath = [rootpath + '/scons/site_tools'])
+env = Environment(
+    tools = ['xpcc'],
+    toolpath = [rootpath + '/scons/site_tools'],
+    ENV = {
+	'PATH' : os.environ['PATH'],
+	'TERM' : os.environ['TERM'],
+	'HOME' : os.environ['HOME']
+    }
+    )
 
 # find all source files
 files = env.FindFiles('.')
