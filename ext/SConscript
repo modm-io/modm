@@ -77,7 +77,8 @@ if 'stm32f' in env['ARCHITECTURE']:
 
 if env['ARCHITECTURE'].startswith('cortex-m0/lpc11'):
 	sourcePath += ['lpc11xx/cmsis', 'lpc11xx/driver']
-	globalIncludes += []
+	globalIncludes += [
+		'lpc11xx/cmsis']
 
 if env['ARCHITECTURE'].startswith('cortex-m3/lpc17'):
     sourcePath += ['lpc17xx/cmsis']
@@ -86,37 +87,35 @@ if env['ARCHITECTURE'].startswith('cortex-m3/lpc17'):
 # Add portions of the Atmel ASF
 if env['ARCHITECTURE'].startswith('avr32'):
 	sourcePath += [
-				'asf/avr32',
-				'asf/common',
-				]
+		'asf/avr32',
+		'asf/common']
 	globalIncludes += [
-					'asf/avr32/boards',
-					'asf/avr32/boards/evk1101',
-					'asf/avr32/drivers/cpu',
-					'asf/avr32/drivers/flashc',
-					'asf/avr32/drivers/gpio',
-					'asf/avr32/drivers/intc',
-					'asf/avr32/drivers/pm',
-					'asf/avr32/drivers/tc',
-					'asf/avr32/drivers/usart',
-					'asf/avr32/drivers/usbb',
-					'asf/avr32/utils',
-					'asf/avr32/utils/preprocessor',
-					'asf/common/boards',
-					'asf/common/services',
-					'asf/common/services/clock',
-					'asf/common/services/sleepmgr',
-					'asf/common/services/usb',
-					'asf/common/services/usb/class',
-					'asf/common/services/usb/class/cdc',
-					'asf/common/services/usb/class/cdc/device',
-					'asf/common/services/usb/class/cdc/device/example',
-					'asf/common/services/usb/class/cdc/device/example/at32uc3b0256_evk1101',
-					'asf/common/services/usb/class/cdc/device/example/at32uc3b0256_evk1101/gcc',
-					'asf/common/services/usb/udc',
-					'asf/common/utils',
-					'asf/common/utils/interrupt',
-					]
+		'asf/avr32/boards',
+		'asf/avr32/boards/evk1101',
+		'asf/avr32/drivers/cpu',
+		'asf/avr32/drivers/flashc',
+		'asf/avr32/drivers/gpio',
+		'asf/avr32/drivers/intc',
+		'asf/avr32/drivers/pm',
+		'asf/avr32/drivers/tc',
+		'asf/avr32/drivers/usart',
+		'asf/avr32/drivers/usbb',
+		'asf/avr32/utils',
+		'asf/avr32/utils/preprocessor',
+		'asf/common/boards',
+		'asf/common/services',
+		'asf/common/services/clock',
+		'asf/common/services/sleepmgr',
+		'asf/common/services/usb',
+		'asf/common/services/usb/class',
+		'asf/common/services/usb/class/cdc',
+		'asf/common/services/usb/class/cdc/device',
+		'asf/common/services/usb/class/cdc/device/example',
+		'asf/common/services/usb/class/cdc/device/example/at32uc3b0256_evk1101',
+		'asf/common/services/usb/class/cdc/device/example/at32uc3b0256_evk1101/gcc',
+		'asf/common/services/usb/udc',
+		'asf/common/utils',
+		'asf/common/utils/interrupt']
 
 # -----------------------------------------------------------------------------
 includes = buildIncludes + globalIncludes

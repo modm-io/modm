@@ -1,11 +1,10 @@
 // coding: utf-8
 // ----------------------------------------------------------------------------
-/* Copyright (c) 2012, Roboterclub Aachen e.V.
+/* Copyright (c) 2011, Roboterclub Aachen e.V.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -27,26 +26,74 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 // ----------------------------------------------------------------------------
+/**
+ * \file	cxxabi.cpp
+ * \brief	Minimal C++ support, no exception handling, no RTTI
+ */
+// ----------------------------------------------------------------------------
 
-#ifndef	XPCC_LPC__RAM_HPP
-#define	XPCC_LPC__RAM_HPP
+#include <stdlib.h>                   // for prototypes of malloc() and free()
 
-#include <stdint.h>
-#include <cstddef>
-
-namespace xpcc
+extern "C"
 {
-	namespace lpc
-	{	
-		void *
-		allocateMemory(std::size_t requestedSize);
-		
-		void
-		freeMemory(void *ptr);
-		
-		// TODO functions to retrieve status informations about used memory
+	// ------------------------------------------------------------------------
+	void* __dso_handle = (void *) &__dso_handle;
+	
+	void
+	__cxa_pure_virtual()
+	{
+		// put error handling here
+	}
+	
+	// ------------------------------------------------------------------------
+	__extension__ typedef int __guard __attribute__((mode (__DI__)));
+	
+	int
+	__cxa_guard_acquire(__guard *g)
+	{
+		return !*(char *)(g);
+	}
+	
+	void
+	__cxa_guard_release (__guard *g)
+	{
+		*(char *) g = 1;
+	}
+	
+	void
+	__cxa_guard_abort (__guard *)
+	{
+	}
+	
+	// ------------------------------------------------------------------------
+	int
+	__aeabi_atexit(void */*object*/, void (*/*destructor*/)(void *), void */*dso_handle*/)
+	{
+		return 0;
 	}
 }
 
-#endif	// XPCC_LPC__RAM_HPP
+// ----------------------------------------------------------------------------
+void *
+operator new(size_t size) throw ()
+{
+	return malloc(size);
+}
 
+void *
+operator new[](size_t size) throw ()
+{
+	return malloc(size);
+}
+
+void
+operator delete(void *p) throw ()
+{
+	free(p);
+}
+
+void
+operator delete[](void* p) throw ()
+{
+	free(p);
+}

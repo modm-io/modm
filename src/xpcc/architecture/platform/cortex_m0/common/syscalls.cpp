@@ -45,6 +45,8 @@
 #include <reent.h>
 #include <sys/stat.h>
 
+#include <xpcc/architecture/driver/heap/block_allocator.hpp>
+
 // ----------------------------------------------------------------------------
 // __heap_start is set in the linker command file and is the end of
 // statically allocated data (thus start of heap).
