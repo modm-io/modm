@@ -3,6 +3,7 @@
 
 #include <xpcc/architecture.hpp>
 
+/* ---------- ADC Data Register bit names --------------------*/
 #define ADC_GDR_DONE (1 << 31)
 #define ADC_DR_DONE ADC_GDR_DONE
 
@@ -20,6 +21,10 @@
 #define ADC_CR_EDGE_FALLING			(  1 << 27)	///< Start conversion whenever a falling edge occurs
 #define ADC_CR_START_EDGE_MASK			ADC_CR_START_CT16B0_MAT1 | ADC_CR_EDGE_FALLING
 
+/* ---------- ADC Status Register bit names -------------------*/
+#define ADC_STAT_DONE_MASK			( 0xff)		///< Individual DONE flags for channels 7 to 0.
+
+/* ---------- ADC INterrtup Enable Register bit names ---------*/
 #define ADC_INTEN_ADGINTEN			(  1 << 8)	///< Interrupt when global DONE is 1
 
 /* ---------- Power-down configuration register bit names -----*/
@@ -56,6 +61,13 @@ namespace xpcc {
 		 * triggered by a timer. When triggered by a timer only a single
 		 * channel (BURST = 0) can be selected.
 		 *
+		 * AD4 is not supported because the pin is used by the Serial Wire
+		 * Debug interface.
+		 *
+		 * TOOD:
+		 * - Overrun flag support
+		 * - Enable/Disable/Test Interrupts
+		 * - Clock setting dependig on the CPU frequency. 48 MHz is used now.
 		 */
 		class Adc
 		{
@@ -64,7 +76,10 @@ namespace xpcc {
 			 * \brief	Channels which can be used as ADC input.
 			 *
 			 * You can specify the channel by using a pin-name, like PIO0_11
-			 *  or just the plain channel number, like CHANNEL_0.
+			 * or just the plain channel number, like CHANNEL_0.
+			 *
+			 * ChannelMask corresponds directly to the bitmask in the ADC module
+			 * Channel can be casted to and from an integer.
 			 *
 			 */
 			enum class ChannelMask
@@ -146,28 +161,10 @@ namespace xpcc {
 					  LPC_IOCON->PIO1_11   = 0x01;	// Select AD7 pin function
 				  }
 			}
-
-			/**
-			 * \brief	Initialise the ADC block.
-			 *
-			 * \param	mode			Software controlled start or free running mode.
-			 */
-			static void inline
-			initialize()
-			{
-				  /* Disable Power down bit to the ADC block. */
-				  LPC_SYSCON->PDRUNCFG &= ~(PDRUNCFG_ADC_PD);
-
-				  /* Enable AHB clock to the ADC. */
-				  LPC_SYSCON->SYSAHBCLKCTRL |= SYSAHBCLKCTRL_ADC;
-
-				  /* Set clock */
-				  LPC_ADC->CR = (10 << 8);
-			}
 		};
 
 		/**
-		 * \brief	Implementation of first usage scenario of ADC.
+		 * \brief	Implementation of the Manual Single Mode.
 		 *
 		 * Use all the common features from Adc class.
 		 */
@@ -200,6 +197,22 @@ namespace xpcc {
 				RISING 	= ADC_CR_EDGE_RISING,
 				FALLING	= ADC_CR_EDGE_FALLING,
 			};
+
+			/**
+			 * \brief	Initialise the ADC block in Manual Single Mode.
+			 */
+			static void inline
+			initialize()
+			{
+				  /* Disable Power down bit to the ADC block. */
+				  LPC_SYSCON->PDRUNCFG &= ~(PDRUNCFG_ADC_PD);
+
+				  /* Enable AHB clock to the ADC. */
+				  LPC_SYSCON->SYSAHBCLKCTRL |= SYSAHBCLKCTRL_ADC;
+
+				  /* Set clock */
+				  LPC_ADC->CR = (10 << 8);
+			}
 
 			/**
 			 * \brief	Start a single conversion of the single selected channel.
@@ -237,6 +250,18 @@ namespace xpcc {
 				// Convert to right adjusted value.
 				return ((LPC_ADC->GDR & 0xffff) >> 6);
 			}
+
+			static inline bool
+			read(uint16_t & val)
+			{
+				if (isConversionFinished()) {
+					val = getValue();
+					return true;
+				}
+				else {
+					return false;
+				}
+			}
 		};
 
 		/**
@@ -262,10 +287,9 @@ namespace xpcc {
 			};
 
 			/**
-			 * \brief
+			 * \brief	Initialise the ADC module in free running mode.
 			 *
 			 * \param	resolution		More bits mean lower conversion rate.
-			 * 							Only meaningful in burst mode.
 			 */
 			static inline void
 			initialize (Resolution resolution = Resolution::BITS_10)
@@ -303,7 +327,7 @@ namespace xpcc {
 				LPC_ADC->CR &= ~(ADC_CR_SEL_MASK | ADC_CR_START_EDGE_MASK);
 				LPC_ADC->CR |= channelMask;
 
-				// Set burst to start conversion
+				// Set burst to start conversion now.
 				LPC_ADC->CR |= ADC_CR_BURST;
 			}
 
@@ -324,7 +348,7 @@ namespace xpcc {
 			static inline bool
 			isConversionFinished(uint8_t channelMask)
 			{
-				return ((LPC_ADC->STAT & 0xff) & channelMask);
+				return ((LPC_ADC->STAT & ADC_STAT_DONE_MASK) & channelMask);
 			}
 
 			/**
@@ -353,6 +377,9 @@ namespace xpcc {
 			}
 
 		protected:
+			/**
+			 * \brief	Read a ADC data register. Clears DONE and OVERRUN flags.
+			 */
 			static inline uint32_t
 			getAdcRegister(Channel channel)
 			{
@@ -361,8 +388,6 @@ namespace xpcc {
 			}
 
 		};
-
-
 	}  // namespace lpc111x
 }
 
