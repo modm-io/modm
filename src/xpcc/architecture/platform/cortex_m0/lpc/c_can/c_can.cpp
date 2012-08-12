@@ -150,8 +150,8 @@ xpcc::lpc::Can::initialize(can::Bitrate bitrate)
 
 	// Use Message Objects 1 to 16 for reception
 	// TODO Use Message Objects 1 to 16
-	msg_obj.msgobj = 0;
-	msg_obj.mode_id = 0x400; // extended
+	msg_obj.msgobj = 1;
+	msg_obj.mode_id = CAN_MSGOBJ_EXT; // extended
 	msg_obj.mask = CAN_MSGOBJ_EXT;	// get all extended frames.
 	// TODO Check if standard frames are received.
 
