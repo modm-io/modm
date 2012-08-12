@@ -16,7 +16,7 @@
 // ----------------------------------------------------------------------------
 // Logging
 
-xpcc::lpc::Uart1 loggerUart(115200);
+extern xpcc::lpc::Uart1 loggerUart;
 xpcc::IODeviceWrapper<xpcc::lpc::Uart1> loggerDevice(loggerUart);
 
 xpcc::log::Logger xpcc::log::debug(loggerDevice);
@@ -45,6 +45,12 @@ namespace component
 // ----------------------------------------------------------------------------
 MAIN_FUNCTION
 {
+	SystemInit();
+
+	xpcc::lpc11::SysTickTimer::enable();
+
+	xpcc::lpc::Uart1 loggerUart(115200);
+
 	// Configure Can device and set the filters
 	device.initialize(xpcc::can::BITRATE_125_KBPS);
 //	device.setFilter(xpcc::accessor::asFlash(canFilter));

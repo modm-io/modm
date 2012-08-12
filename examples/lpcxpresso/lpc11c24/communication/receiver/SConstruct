@@ -32,8 +32,9 @@ if env.CheckArchitecture('hosted'):
 	env.Alias('all', ['build', 'run'])
 else:
 	hexfile = env.Hex(program)
+	binfile = env.Bin(program)
 	
-	env.Alias('build', [hexfile, env.Listing(program)])
+	env.Alias('build', [hexfile, binfile, env.Listing(program)])
 	env.Alias('all', ['build', 'size'])
 
 env.Default('all')
