@@ -32,6 +32,7 @@
 #include <lpc11xx/cmsis/core_cm0.h>
 #include <lpc11xx/cmsis/system_LPC11xx.h>
 
+#include "adc/adc.hpp"
 #include "gpio.hpp"
 #include "uart/uart_1.hpp"
 #include "spi/spi_0.hpp"

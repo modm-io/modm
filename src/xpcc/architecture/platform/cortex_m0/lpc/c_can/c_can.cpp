@@ -106,10 +106,22 @@ xpcc::lpc::Can::initialize(can::Bitrate bitrate)
 {
 	// TODO variable baud rate configuration
 
+	/**
+	 * CAN CANCLKDIV always 0.
+	 *
+	 * MAIN_CLOCK / SYSAHBCLKDIV / (CANCLKDIV_val + 1) = 48 MHz
+	 *
+	 * 48 MHz	 125 kbit	0x451f	OK
+	 * 48 MHz	 250 kbit	0x450f 	OK
+	 * 48 MHz	 500 kbit	0x4507	OK
+	 * 48 MHz	1000 kbit	0x4503	OK
+	 *
+	 */
+
 	/* Initialize CAN Controller */
 	uint32_t ClkInitTable[2] = {
 	  0x00000000UL, // CANCLKDIV
-	  0x00001C57UL  // CANBT: bit timing register
+	  0x0000451fUL  // CANBT: bit timing register:
 	};
 
 #if LPC11C_USING_CAN_INTERRUPTS
@@ -187,7 +199,7 @@ xpcc::lpc::Can::CAN_error(uint32_t /* error_info */)
 	It's function is to call the isr() API located in the ROM */
 extern "C" void
 CAN_IRQHandler(void) {
-  (*xpcc::lpc::Can::rom)->pCAND->isr();
+	(*xpcc::lpc::Can::rom)->pCAND->isr();
 }
 
 // ----------------------------------------------------------------------------
