@@ -28,6 +28,22 @@ main(void)
 		{
 			led::DuoRed::set();
 			led::DuoGreen::set();
+
+			xpcc::can::Message message;
+			message.identifier = 0x123456;
+			message.length = 8;
+			message.setRemoteTransmitRequest(false);
+			message.data[0] = 'A';
+			message.data[1] = 'B';
+			message.data[2] = 'C';
+			message.data[3] = 'D';
+			message.data[4] = 'E';
+			message.data[5] = 'F';
+			message.data[6] = 'G';
+			message.data[7] = 'H';
+			if (can::Can::isReadyToSend()) {
+				can::Can::sendMessage(message);
+			}
 		}
 		else {
 			led::DuoRed::set(button::Up::read());
