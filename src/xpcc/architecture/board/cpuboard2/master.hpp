@@ -158,7 +158,7 @@ namespace xpcc
 		/**
 		 * \brief	Initialize all peripheral devices
 		 * 
-		 * \return	\c true if the initialization was successfull, \c false
+		 * \return	\c true if the initialization was successful, \c false
 		 * 			if one of the chips didn't respond.
 		 */
 		static bool

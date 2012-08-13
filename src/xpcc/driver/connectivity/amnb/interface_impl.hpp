@@ -157,7 +157,7 @@ xpcc::amnb::Interface<Device,PROBABILITY,TIMEOUT>::writeMessage()
 		uint16_t count(0);
 		while (!Device::read(check) && (++count <= 1000)) ;
 		
-		// if the read timed out or framing error occured or content mismatch
+		// if the read timed out or framing error occurred or content mismatch
 		if ((count > 1000) || Device::readErrorFlags() || (check != tx_buffer[i])) {
 			// stop transmitting, signal the collision
 			transmitting = false;

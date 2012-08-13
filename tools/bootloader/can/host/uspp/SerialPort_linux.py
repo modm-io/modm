@@ -186,7 +186,7 @@ class SerialPort:
 				cc[VTIME]=0
 			else:
 				# Time-out reading. For a reading to be correct
-				# a character must be recieved in VTIME*100 seconds.
+				# a character must be received in VTIME*100 seconds.
 				cc[VMIN]=0
 				cc[VTIME]=self.__timeout/100
 				self.__params.append(cc)               # c_cc

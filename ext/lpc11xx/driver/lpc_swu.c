@@ -300,7 +300,7 @@ void swu_isr_tx(LPC_TMR_TypeDef* const TX_ISR_TIMER) {
 void swu_isr_rx(LPC_TMR_TypeDef* const RX_ISR_TIMER) {
 	signed long int edge_temp;
 	//sw uart receive isr code begin
-	if (0 != (RX_ISR_TIMER->IR & 0x10)) //capture interrupt occured:
+	if (0 != (RX_ISR_TIMER->IR & 0x10)) //capture interrupt occurred:
 	{
 		GPIOSetDir(PORT_INT_RX, PIN_INT_RX, 0); //rx interrupt activity begin
 

@@ -292,7 +292,7 @@ namespace xpcc
 			 * \param command
 			 * \param payload
 			 * \param responseLength	Expected payload length of the response
-			 * \return \c true if no error occured
+			 * \return \c true if no error occurred
 			 */
 			template <typename T>
 			bool
@@ -307,7 +307,7 @@ namespace xpcc
 			/**
 			 * \brief	Start a new query without any payload
 			 *
-			 * \return \c true if no error occured
+			 * \return \c true if no error occurred
 			 */
 			bool
 			query(uint8_t slaveAddress, uint8_t command, uint8_t responseLength);
@@ -317,7 +317,7 @@ namespace xpcc
 			 *
 			 * \param command
 			 * \param payload
-			 * \return \c true if no error occured
+			 * \return \c true if no error occurred
 			 */
 			template <typename T>
 			bool
@@ -329,7 +329,7 @@ namespace xpcc
 			 * \param command
 			 * \param payload
 			 * \param payloadLength
-			 * \return \c true if no error occured
+			 * \return \c true if no error occurred
 			 */
 			bool
 			broadcast(uint8_t command, const void *payload, uint8_t payloadLength);
@@ -337,7 +337,7 @@ namespace xpcc
 			/**
 			 * \brief	Start a new broadcast without any payload
 			 *
-			 * \return \c true if no error occured
+			 * \return \c true if no error occurred
 			 */
 			bool
 			broadcast(uint8_t command);
@@ -408,7 +408,7 @@ namespace xpcc
 			enum QueryStatus
 			{
 				IN_PROGRESS,			///< Query in progress
-				SUCCESS,				///< Response sucessfully received
+				SUCCESS,				///< Response successfully received
 				ERROR_RESPONSE = 0x40,	///< Error in the received message
 				ERROR_TIMEOUT = 0x41,	///< No message received within the timeout window
 				ERROR_PAYLOAD = 0x42,	///< Wrong payload size

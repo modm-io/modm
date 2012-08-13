@@ -176,7 +176,7 @@ typedef struct {
 
 typedef enum {
 	FR_OK = 0,				/* (0) Succeeded */
-	FR_DISK_ERR,			/* (1) A hard error occured in the low level disk I/O layer */
+	FR_DISK_ERR,			/* (1) A hard error occurred in the low level disk I/O layer */
 	FR_INT_ERR,				/* (2) Assertion failed */
 	FR_NOT_READY,			/* (3) The physical drive cannot work */
 	FR_NO_FILE,				/* (4) Could not find the file */

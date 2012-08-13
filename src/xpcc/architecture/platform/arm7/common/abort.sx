@@ -90,7 +90,7 @@
  * in the datasheet).
  * This happens mostly because of an invalid pointer. These errors are easy
  * to find as the Program Counter points directly to the line in which the
- * invalid access occured. Trace back where the data came from an the error
+ * invalid access occurred. Trace back where the data came from an the error
  * should be located.
  * 
  * More problematic are Undefined Instruction and Prefetch Aborts. These may

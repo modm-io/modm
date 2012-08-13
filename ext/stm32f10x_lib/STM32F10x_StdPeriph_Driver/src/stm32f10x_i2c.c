@@ -941,7 +941,7 @@ void I2C_FastModeDutyCycleConfig(I2C_TypeDef* I2Cx, uint16_t I2C_DutyCycle)
  *          - I2Cx_ER_IRQHandler() which is called when the error interrupt occurs.
  *            Where x is the peripheral instance (I2C1, I2C2 ...)
  *          - I2C_GetFlagStatus() or I2C_GetITStatus() to be called into I2Cx_ER_IRQHandler() 
- *            in order to determine which error occured.
+ *            in order to determine which error occurred.
  *          - I2C_ClearFlag() or I2C_ClearITPendingBit() and/or I2C_SoftwareResetCmd()
  *            and/or I2C_GenerateStop() in order to clear the error flag and source,
  *            and return to correct communication status.

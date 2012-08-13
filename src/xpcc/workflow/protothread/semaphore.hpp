@@ -102,7 +102,7 @@ namespace xpcc
 			 * \endcode
 			 * 
 			 * \return	\c false if the Semaphore count not be acquired,
-			 * 			\c true if the operation was successfull.
+			 * 			\c true if the operation was successful.
 			 */
 			bool
 			acquire()

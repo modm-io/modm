@@ -94,7 +94,7 @@ namespace xpcc
 			
 			enum ErrorState
 			{
-				NO_ERROR,			//!< No Error ocurred
+				NO_ERROR,			//!< No Error occurred
 				DATA_NACK,			//!< Data was transmitted and NACK received
 				ARBITRATION_LOST,	//!< Arbitration was lost during writing or reading
 				BUS_ERROR,			//!< Misplaced Start or Stop condition

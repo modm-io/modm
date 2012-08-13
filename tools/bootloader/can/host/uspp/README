@@ -38,7 +38,7 @@ I like very much to make electronic widgets with microcontrollers, specially
 those that can be connected to the computer to send and receive data.
 Some months ago, I discovered Python and inmediatelly liked it a lot. 
 I started playing with it and saw that I could use it to make prototypes of
-comunication protocols between computer and microcontrollers really
+communication protocols between computer and microcontrollers really
 fast and easily than using C. At the same time, I was interested in
 working over different platforms.
 I started looking for Python modules to access serial port and I found

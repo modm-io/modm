@@ -125,7 +125,7 @@ namespace xpcc
 			enum QueryStatus
 			{
 				IN_PROGRESS,			///< Query in progress
-				SUCCESS,				///< Response sucessfully received
+				SUCCESS,				///< Response successfully received
 				ERROR_RESPONSE = 0x40,	///< Error in the received message
 				ERROR_TIMEOUT = 0x41,	///< No message received within the timeout window
 				ERROR_PAYLOAD = 0x42,	///< Wrong payload size

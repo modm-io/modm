@@ -1948,7 +1948,7 @@ FRESULT follow_path (	/* FR_OK(0): successful, !=0: error code */
 			res = dir_find(dj);				/* Find it */
 			ns = *(dj->fn+NS);
 			if (res != FR_OK) {				/* Failed to find the object */
-				if (res != FR_NO_FILE) break;	/* Abort if any hard error occured */
+				if (res != FR_NO_FILE) break;	/* Abort if any hard error occurred */
 				/* Object not found */
 				if (_FS_RPATH && (ns & NS_DOT)) {	/* If dot entry is not exit */
 					dj->sclust = 0; dj->dir = 0;	/* It is the root dir */

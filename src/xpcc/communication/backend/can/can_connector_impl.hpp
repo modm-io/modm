@@ -74,18 +74,18 @@ template<typename Driver>
 void
 xpcc::CanConnector<Driver>::sendPacket(const Header &header, SmartPointer payload)
 {
-	bool successfull = false;
+	bool successful = false;
 	bool fragmented = (payload.getSize() > 8);
 	
 	uint32_t identifier = convertToIdentifier(header, fragmented);
 	if (!fragmented && this->canDriver->isReadyToSend())
 	{
 		// try to send the message directly
-		successfull = this->sendMessage(identifier,
+		successful = this->sendMessage(identifier,
 				payload.getPointer(), payload.getSize());
 	}
 	
-	if (!successfull)
+	if (!successful)
 	{
 		// append the message to the list of waiting messages
 		this->sendList.append(SendListItem(identifier, payload));
