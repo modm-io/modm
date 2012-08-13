@@ -1,9 +1,10 @@
-# WARNING: This file is generated automatically, do not edit!
+# WARNING: This file is generated automatically from templates/SConstruct.in
+# do not edit!
 
 # path to the xpcc root directory
 rootpath = '${rootpath}'
 
-env = Environment(tools = ['xpcc'], toolpath = [rootpath + '/scons'])
+env = Environment(tools = ['xpcc'], toolpath = [rootpath + '/scons/site_tools'])
 
 # find all source files
 files = env.FindFiles('.')
