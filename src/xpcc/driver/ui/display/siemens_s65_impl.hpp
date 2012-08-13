@@ -89,8 +89,6 @@ xpcc::SiemensS65<SPI, CS, RS, Reset>::writeData(uint16_t data)
 	SPI::write(0x76);	// start byte, RS = 1, R/W, receive instruction or RAM data
 	SPI::write(data>>8);
 	SPI::write(data);
-
-//	while(SPI::isBusy());
 	CS::set();
 }
 
@@ -158,9 +156,11 @@ xpcc::SiemensS65<SPI, CS, RS, Reset>::lcdCls(uint16_t colour) {
 		SPI::write(c2);
 	}
 
-//	while(SPI::isBusy());
 	CS::set();
 }
+
+GPIO__OUTPUT(Dbg, 1, 11);
+GPIO__OUTPUT(Dbg2, 1, 10);
 
 template <typename SPI, typename CS, typename RS, typename Reset>
 void
@@ -170,42 +170,87 @@ xpcc::SiemensS65<SPI, CS, RS, Reset>::update() {
 	CS::reset();
 	SPI::write(0x76);	// start byte
 
-//	static const uint16_t mask1Blank  = 0x0000; // RRRR RGGG GGGB BBBB
-	static const uint16_t mask1Filled = 0x37e0; // RRRR RGGG GGGB BBBB
-	uint8_t fill_h = mask1Filled >> 8;
-	uint8_t fill_l = mask1Filled & 0xff;
-	uint8_t blank = 0;
+	const uint16_t maskBlank  = 0x0000; // RRRR RGGG GGGB BBBB
+	const uint16_t maskFilled = 0x37e0; // RRRR RGGG GGGB BBBB
 
-	for (uint8_t x = this->getWidth() - 1; x != 0xff; --x)
+	const uint8_t width = this->getWidth();
+	const uint8_t height = this->getHeight()/8;
+
+#ifdef LPC_ACCELERATED
+	/**
+	 * This is an extremely optimised version of the copy routine for LPC
+	 * microcontrollers. It will work with any SPI block that support 16-bit
+	 * transfer and a FIFO with a size of at least 8 frames.
+	 *
+	 * The SPI is switched to 16-bit mode to reduce the
+	 * numbers of bus accesses and use the trick that then 8 pixels of each
+	 * 16 bits fit into the FIFO.
+	 *
+	 * This reduces the copy time to 17.6 msec when running at 48 MHz. This
+	 * is a peak transfer rate of 2.6 MiByte/sec
+	 */
+
+	// switch to 16 bit mode, wait for empty FIFO before
+	while (!(LPC_SSP0->SR & SPI_SRn_TFE));
+	LPC_SSP0->CR0 |= 0x0f;
+
+	for (uint8_t x = width - 1; x != 0xff; --x)
 	{
-		for (uint8_t y = 0; y < this->getHeight()/8; ++y)
+		for (uint8_t y = 0; y < height; ++y)
 		{
 			// group of 8 black-and-white pixels
 			uint8_t group = this->buffer[x][y];
 
-			for (uint8_t pix = 0; pix < 8; ++pix, group >>= 1){
+			// 8 pixels of 16 bits fit in the Tx FIFO if it is empty.
+			while (!(LPC_SSP0->SR & SPI_SRn_TFE));
+
+			for (uint8_t pix = 0; pix < 8; ++pix, group >>= 1) {
+				LPC_SSP0->DR = (group & 1) ? maskFilled : maskBlank;
+			} // pix
+		} // y
+	} // x
+
+	// switch back to 8 bit transfer, wait for empty FIFO before.
+	while (!(LPC_SSP0->SR & SPI_SRn_TFE));
+	LPC_SSP0->CR0 &= ~0xff;
+	LPC_SSP0->CR0 |=  0x07;
+
+#else
+	// ----- Normal version with SPI buffer
+	const uint8_t fill_h = maskFilled >> 8;
+	const uint8_t fill_l = maskFilled & 0xff;
+
+	const uint8_t blank_h = maskBlank >> 8;
+	const uint8_t blank_l = maskBlank & 0xff;
+
+	for (uint8_t x = width - 1; x != 0xff; --x)
+	{
+		for (uint8_t y = 0; y < height; ++y)
+		{
+			// group of 8 black-and-white pixels
+			uint8_t group = this->buffer[x][y];
+			uint8_t spiBuffer[16];
+			uint8_t spiIdx = 0;
+
+			for (uint8_t pix = 0; pix < 8; ++pix, group >>= 1) {
 				if (group & 1)
 				{
-					SPI::write(fill_h);
-					SPI::write(fill_l);
+					spiBuffer[spiIdx++] = fill_h;
+					spiBuffer[spiIdx++] = fill_l;
 				}
 				else
 				{
-					SPI::write(blank);
-					SPI::write(blank);
+					spiBuffer[spiIdx++] = blank_h;
+					spiBuffer[spiIdx++] = blank_l;
 				}
 			} // pix
-		}
-	}
 
-	// fill pixel not handled by buffered display
-//	uint16_t data = mask1Blank;
-//	for (uint16_t y = 0; y < 4*176; ++y)
-//	{
-//		SPI::write(data>>8);
-//		SPI::write(data);
-//	}
+			// use transfer() of SPI to transfer spiBuffer
+			SPI::setBuffer(16, spiBuffer);
+			SPI::transfer(SPI::TRANSFER_SEND_BUFFER_DISCARD_RECEIVE);
+		} // y
+	} // x
+#endif
 
-//	while(SPI::isBusy());
 	CS::set();
 }
