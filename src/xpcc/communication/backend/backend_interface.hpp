@@ -52,7 +52,7 @@ namespace xpcc
 	 * \brief 		The BackendInterface provides a common interface for using
 	 * 				different hardware modules to transmit messages.
 	 *
-	 * All backends have to implement the this interface.
+	 * All backends have to implement this interface.
 	 *
 	 * \ingroup		communication
 	 * \author		Martin Rosekeit, Fabian Greif
