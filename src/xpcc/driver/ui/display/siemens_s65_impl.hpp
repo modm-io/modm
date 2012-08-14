@@ -159,9 +159,6 @@ xpcc::SiemensS65<SPI, CS, RS, Reset>::lcdCls(uint16_t colour) {
 	CS::set();
 }
 
-GPIO__OUTPUT(Dbg, 1, 11);
-GPIO__OUTPUT(Dbg2, 1, 10);
-
 template <typename SPI, typename CS, typename RS, typename Reset>
 void
 xpcc::SiemensS65<SPI, CS, RS, Reset>::update() {
@@ -176,7 +173,7 @@ xpcc::SiemensS65<SPI, CS, RS, Reset>::update() {
 	const uint8_t width = this->getWidth();
 	const uint8_t height = this->getHeight()/8;
 
-#ifdef LPC_ACCELERATED
+#if S65_LPC_ACCELERATED > 0
 	/**
 	 * This is an extremely optimised version of the copy routine for LPC
 	 * microcontrollers. It will work with any SPI block that support 16-bit
