@@ -25,7 +25,7 @@ binfile = env.Bin(program)
 
 #env.Alias('program', env.OpenOcd(program))
 env.Alias('init', env.LpcLinkInit(program))
-env.Alias('program', env.LpcLinkFlash(program))
+env.Alias('program', env.LpcLinkFlash(binfile))
 env.Alias('debug', env.GdbDebug(program))
 env.Alias('lpcdebug', env.LpcLinkDebug(program))
 

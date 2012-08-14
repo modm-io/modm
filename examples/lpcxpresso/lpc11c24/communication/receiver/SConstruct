@@ -25,16 +25,16 @@ env.Alias('size', env.Size(program))
 env.Alias('symbols', env.Symbols(program))
 env.Alias('defines', env.ShowDefines())
 
-if env.CheckArchitecture('hosted'):
-	env.Alias('build', program)
-	env.Alias('run', env.Run(program))
-	
-	env.Alias('all', ['build', 'run'])
-else:
-	hexfile = env.Hex(program)
-	binfile = env.Bin(program)
-	
-	env.Alias('build', [hexfile, binfile, env.Listing(program)])
-	env.Alias('all', ['build', 'size'])
+hexfile = env.Hex(program)
+binfile = env.Bin(program)
+
+# env.Alias('program', env.OpenOcd(program))
+env.Alias('init', env.LpcLinkInit(program))
+env.Alias('program', env.LpcLinkFlash(binfile))
+env.Alias('debug', env.GdbDebug(program))
+env.Alias('lpcdebug', env.LpcLinkDebug(program))
+
+env.Alias('build', [hexfile, binfile, env.Listing(program)])
+env.Alias('all', ['build', 'size'])
 
 env.Default('all')

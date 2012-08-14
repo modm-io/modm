@@ -4,6 +4,7 @@ import os
 # path to the xpcc root directory
 rootpath = '../../../..'
 
+# Environment for colorgcc
 env = Environment(
     tools = ['xpcc'],
     toolpath = [rootpath + '/scons/site_tools'],
@@ -11,7 +12,7 @@ env = Environment(
 	'PATH' : os.environ['PATH'],
 	'TERM' : os.environ['TERM'],
 	'HOME' : os.environ['HOME']
-    }
+    	}
     )
 
 # find all source files
@@ -33,7 +34,12 @@ env.Alias('defines', env.ShowDefines())
 hexfile = env.Hex(program)
 binfile = env.Bin(program)
 
-env.Alias('program', env.OpenOcd(program))
+# env.Alias('program', env.OpenOcd(program))
+env.Alias('init', env.LpcLinkInit(program))
+env.Alias('program', env.LpcLinkFlash(binfile))
+env.Alias('debug', env.GdbDebug(program))
+env.Alias('lpcdebug', env.LpcLinkDebug(program))
+
 env.Alias('build', [hexfile, binfile, env.Listing(program)])
 env.Alias('all', ['build', 'size'])
 
