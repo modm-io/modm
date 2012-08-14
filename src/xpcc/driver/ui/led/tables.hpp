@@ -49,14 +49,17 @@ namespace xpcc
 	 */
 	namespace led
 	{
-		/// Provides 12bit resolution (0 to 4095) in 256 steps, 512 bytes of flash.
-		EXTERN_FLASH_STORAGE(uint16_t PwmTable12_256[256]);
-		
-		/// Provides 12bit resolution (0 to 4095) in 1000 steps, 2000 bytes of flash.
-		EXTERN_FLASH_STORAGE(uint16_t PwmTable12_1000[1000]);
-		
 		/// Provides 8bit resolution (0 to 255) in 256 steps, 256 bytes of flash.
-		EXTERN_FLASH_STORAGE(uint8_t PwmTable8_256[256]);
+		EXTERN_FLASH_STORAGE(uint8_t table8_256[256]);
+		
+		/// Provides 10bit resolution (0 to 1023) in 256 steps, 512 bytes of flash.
+		EXTERN_FLASH_STORAGE(uint16_t table10_256[256]);
+		
+		/// Provides 12bit resolution (0 to 4095) in 256 steps, 512 bytes of flash.
+		EXTERN_FLASH_STORAGE(uint16_t table12_256[256]);
+		
+		/// Provides 16bit resolution (0 to 65535) in 256 steps, 512 bytes of flash.
+		EXTERN_FLASH_STORAGE(uint16_t table16_256[256]);
 	}
 }
 
