@@ -86,6 +86,9 @@ env.SConscript('src/xpcc/architecture/platform/arm7/lpc/SConscript.generate', ex
 env.SConscript('src/xpcc/architecture/platform/cortex_m0/lpc/SConscript.generate', exports='env')
 env.SConscript('src/xpcc/architecture/platform/cortex_m3/stm32/SConscript.generate', exports='env')
 
+# Generate C++ arrays for gamma corrected led brightness lookup tables
+env.SConscript('src/xpcc/driver/ui/led/tables/SConscript.generate', exports='env')
+
 # Generate C++ arrays from the font definition files
 env.SConscript('src/xpcc/driver/ui/display/font/SConscript.generate', exports='env')
 
