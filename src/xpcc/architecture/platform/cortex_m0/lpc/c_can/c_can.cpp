@@ -93,7 +93,7 @@ readMessageObject(xpcc::can::Message & message, uint8_t messageObjectId)
 
 	// Copy Data
 	// TODO Use memcpy or reinterpret_cast
-	for (uint8_t ii = 0; ii < 8; ++ii)
+	for (uint8_t ii = 0; ii < message.length; ++ii)
 	{
 		message.data[ii] = msg_obj.data[ii];
 	}

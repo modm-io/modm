@@ -354,7 +354,7 @@ namespace xpcc
 			 * Use bank as identifier filter for standard or extended messages.
 			 * 
 			 * The message have to match the given identifier exactly! For
-			 * extended messages only the upper 14-bit are check. The lower
+			 * extended messages only the upper 14-bit are checked. The lower
 			 * 15-bit are don't care!
 			 * 
 			 * @param	bank	Number of the filter bank

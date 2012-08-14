@@ -21,13 +21,20 @@ namespace lpc
 	 * For these parts, the CAN_RXD and CAN_TXD signals are connected internally
 	 * to the on-chip transceiver, and the transceiver signals are pinned out.
 	 *
+	 * This class uses the on-chip CAN drivers.
+	 *
 	 * There are 32 Message Objects in two groups of 16 Message Objects.
 	 * (1 to 16 and 17 to 32).
 	 *
+	 * In this class the following assumption is made:
 	 * Message Objects  1 to 16 are used for reception and
 	 * Message Objects 17 to 32 are used for transmission.
 	 *
 	 * TODO Group Message Objects to a FIFO ?! p307 section 16.7.3.10.1
+	 *
+	 * TODO Filter
+	 *
+	 * TODO Configuration
 	 *
 	 * \author	strongly-typed
 	 * \ingroup	lpc11
