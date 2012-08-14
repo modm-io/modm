@@ -28,7 +28,7 @@ devices = \
 		"size": { "flash": 32768, "ram": 8192 },
 	},
 	
-	"lpc11c24":
+	"lpc11c24_301":
 	{
 		"defines": ["__ARM_LPC11XX__", "__ARM_LPC11CXX__"],
 		"linkerscript": "cortex_m0/lpc/linker/lpc11c24.ld",

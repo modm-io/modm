@@ -381,11 +381,22 @@ def generate(env, **kw):
 					env['OPENOCD_COMMANDS'] = parser.get('openocd', 'commands')
 				if parser.get('program', 'tool') == 'stlink':
 					env.Tool('stlink')
+				if parser.get('program', 'tool') == 'lpclink':
+					env['GDB_PORT'] = parser.get('debug', 'gdbport')
+					env.Tool('lpclink')
 					#env['OPENOCD_CONFIGFILE'] = parser.get('openocd', 'configfile')
 					#env['OPENOCD_COMMANDS'] = parser.get('openocd', 'commands')
 			except configparser.ParserException as e:
 				print "Error in Configuration: %s" % e
 				Exit(1)
+		if parser.has_section('debug'):
+			try:
+				if parser.get('debug', 'tool') == 'gdb':
+					env['GDB_PORT'] = parser.get('debug', 'gdbport')
+					env.Tool('gdb')
+			except configparser.ParserException as e:
+				print "Error in Configuration: %s" % e
+				Exit(1)			
 	elif architecture == 'avr32':
 		env['AVR32_DEVICE'] = device
 		env['AVR32_CLOCK']  = clock
