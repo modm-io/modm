@@ -67,3 +67,36 @@ MAIN_FUNCTION
 		xpcc::delay_us(100);
 	}
 }
+
+/**
+ * Provide empty while loops for every handler that is normally
+ * handled by defaultHandler. 
+ * This is for debugging purposes to see which exception occurred.
+ */
+
+extern "C" {
+void NMI_Handler(){while(1);}
+void HardFault_Handler(){while(1);}
+void SVCall_Handler(){while(1);}
+void PendSV_Handler(){while(1);}
+//void SysTick_Handler(){while(1);}	// Implemented by SysTickTimer
+
+//void CAN_IRQHandler(){while(1);}	// Implemented
+void SSP1_IRQHandler(){while(1);}
+void I2C_IRQHandler(){while(1);}
+void TIMER16_0_IRQHandler(){while(1);}
+void TIMER16_1_IRQHandler(){while(1);}
+void TIMER32_0_IRQHandler(){while(1);}
+void TIMER32_1_IRQHandler(){while(1);}
+void SSP0_IRQHandler(){while(1);}
+//void UART_IRQHandler(){while(1);}	// Implemented
+void ADC_IRQHandler(){while(1);}
+void WDT_IRQHandler(){while(1);}
+void BOD_IRQHandler(){while(1);}
+void PIOINT3_IRQHandler(){while(1);}
+void PIOINT2_IRQHandler(){while(1);}
+void PIOINT1_IRQHandler(){while(1);}
+void PIOINT0_IRQHandler(){while(1);}
+void WAKEUP_IRQHandler(){while(1);}
+}
+
