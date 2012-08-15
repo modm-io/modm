@@ -223,7 +223,8 @@ template<typename T, unsigned int BLOCK_SIZE >
 ALWAYS_INLINE T *
 xpcc::BlockAllocator<T, BLOCK_SIZE>::alignPointer(void * ptr) const
 {
-	std::size_t misalignment = ((uintptr_t) ptr & XPCC__ALIGNMENT);
+	// (XPCC__ALIGNMENT - 1) is used as a bitmask
+	std::size_t misalignment = ((uintptr_t) ptr & (XPCC__ALIGNMENT - 1));
 	const uint8_t offset[4] = { 2, 1, 0, 3 };
 	
 	return (T *) (((uintptr_t) ptr) + offset[misalignment]);

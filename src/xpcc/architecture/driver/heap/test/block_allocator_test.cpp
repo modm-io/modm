@@ -94,3 +94,25 @@ BlockAllocatorTest::testFree()
 	
 	delete[] heap;
 }
+
+void
+BlockAllocatorTest::testAlignment()
+{
+	uint8_t *heap = new uint8_t[512];
+
+	for (uint_fast8_t misalignment = 0; misalignment < 6; ++misalignment)
+	{
+		xpcc::BlockAllocator<uint16_t, 8> allocator;
+		allocator.initialize(heap + misalignment, heap + 512);
+
+		TEST_ASSERT_EQUALS(allocator.getAvailableSize(), 496U);
+
+		void* firstBlock = allocator.allocate(12);
+		void* secondBlock = allocator.allocate(12);
+
+		TEST_ASSERT_EQUALS( ((uintptr_t)firstBlock) % 4, 0U);
+		TEST_ASSERT_EQUALS( ((uintptr_t)secondBlock) % 4, 0U);
+	}
+
+	delete[] heap;
+}

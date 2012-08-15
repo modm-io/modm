@@ -44,6 +44,9 @@ public:
 	
 	void
 	testFree();
+
+	void
+	testAlignment();
 };
 
 #endif	// BLOCK_ALLOCATOR_TEST_HPP

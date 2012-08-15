@@ -66,7 +66,7 @@ namespace xpcc
 		 * be called only once!
 		 * 
 		 * \param	heapStart
-		 * 		Needs to point on the first available byte
+		 * 		Needs to point to the first available byte
 		 * \param	heapEnd
 		 * 		Needs to point directly above the last available memory
 		 * 		position.
@@ -96,7 +96,7 @@ namespace xpcc
 		getAvailableSize() const;
 		
 	private:
-		// Align the pointer to 
+		// Align the pointer to a multiple of XPCC__ALIGNMENT
 		ALWAYS_INLINE T *
 		alignPointer(void * ptr) const;
 		
