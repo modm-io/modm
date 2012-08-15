@@ -128,7 +128,7 @@ xpcc::GraphicDisplay::drawLine(uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2)
 void
 xpcc::GraphicDisplay::drawHorizontalLine(glcd::Point start, uint8_t length)
 {
-	for (uint8_t i = start.getX(); i < start.getX() + length; ++i) {
+	for (uint8_t i = start.getX(); i < (start.getX() + length); ++i) {
 		(this->*draw)(i, start.getY());
 	}
 }
@@ -136,7 +136,7 @@ xpcc::GraphicDisplay::drawHorizontalLine(glcd::Point start, uint8_t length)
 void
 xpcc::GraphicDisplay::drawVerticalLine(glcd::Point start, uint8_t length)
 {
-	for (uint8_t i = start.getY(); i < start.getY() + length; ++i) {
+	for (uint8_t i = start.getY(); i < (start.getY() + length); ++i) {
 		(this->*draw)(start.getX(), i);
 	}
 }
@@ -145,8 +145,8 @@ void
 xpcc::GraphicDisplay::drawRectangle(glcd::Point upperLeft,
 		uint8_t width, uint8_t height)
 {
-	uint16_t x2 = upperLeft.getX() + width;
-	uint16_t y2 = upperLeft.getY() + height;
+	uint16_t x2 = upperLeft.getX() + width  - 1;
+	uint16_t y2 = upperLeft.getY() + height - 1;
 	
 	this->drawHorizontalLine(upperLeft,  width);
 	this->drawHorizontalLine(glcd::Point(upperLeft.getX(), y2), width);
