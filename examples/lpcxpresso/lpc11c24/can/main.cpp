@@ -34,7 +34,7 @@ main(void)
 	LPC_SYSCON->CLKOUTUEN = 1;
 	while (!(LPC_SYSCON->CLKOUTUEN & 0x01));
 
-	xpcc::lpc::Can::initialize(xpcc::can::BITRATE_10_KBPS);
+	xpcc::lpc::Can::initialize(xpcc::can::BITRATE_125_KBPS);
 
 	xpcc::can::Message message;
 	message.identifier = 0x123456;

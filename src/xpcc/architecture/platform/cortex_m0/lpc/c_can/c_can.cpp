@@ -117,10 +117,28 @@ xpcc::lpc::Can::initialize(can::Bitrate bitrate)
 	 *
 	 */
 
+	XPCC__STATIC_ASSERT(F_CPU == 48000000UL,
+			"Other main clocks than 48 MHz are not yet supported.");
+
+	uint16_t prescaler;
+	uint32_t canclkdiv = 0;
+	switch (bitrate)
+	{
+		case can::BITRATE_10_KBPS:	prescaler =  39; canclkdiv = 9; break;
+		case can::BITRATE_20_KBPS:	prescaler =  39; canclkdiv = 4; break;
+		case can::BITRATE_50_KBPS:	prescaler =   7; canclkdiv = 9; break;
+		case can::BITRATE_100_KBPS:	prescaler =  39; break;
+		case can::BITRATE_125_KBPS:	prescaler =  31; break;
+		case can::BITRATE_250_KBPS:	prescaler =  15; break;
+		case can::BITRATE_500_KBPS:	prescaler =   7; break;
+		case can::BITRATE_1_MBPS:	prescaler =   3; break;
+		default: prescaler = 31; break;		// 125 kbps
+	}
+
 	/* Initialize CAN Controller */
 	uint32_t ClkInitTable[2] = {
-	  0x00000000UL, // CANCLKDIV
-	  0x0000451fUL  // CANBT: bit timing register:
+			canclkdiv, // CANCLKDIV
+			0x00004500UL | prescaler  // CANBT: bit timing register:
 	};
 
 #if LPC11C_USING_CAN_INTERRUPTS
