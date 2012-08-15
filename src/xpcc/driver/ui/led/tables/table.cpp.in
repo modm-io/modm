@@ -29,7 +29,7 @@
 // ----------------------------------------------------------------------------
 {{ generation_block }}
 
-#include "../led_table.hpp"
+#include "../tables.hpp"
 
 namespace xpcc
 {
