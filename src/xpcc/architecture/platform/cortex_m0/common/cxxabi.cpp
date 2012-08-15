@@ -1,11 +1,10 @@
 // coding: utf-8
 // ----------------------------------------------------------------------------
-/* Copyright (c) 2009, Roboterclub Aachen e.V.
+/* Copyright (c) 2011, Roboterclub Aachen e.V.
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -14,7 +13,7 @@
  *     * Neither the name of the Roboterclub Aachen e.V. nor the
  *       names of its contributors may be used to endorse or promote products
  *       derived from this software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY ROBOTERCLUB AACHEN E.V. ''AS IS'' AND ANY
  * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -25,68 +24,76 @@
  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- * 
- * $hello please remove me$
+ */
+// ----------------------------------------------------------------------------
+/**
+ * \file	cxxabi.cpp
+ * \brief	Minimal C++ support, no exception handling, no RTTI
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC__BACKEND_INTERFACE_HPP
-#define	XPCC__BACKEND_INTERFACE_HPP
+#include <stdlib.h>                   // for prototypes of malloc() and free()
 
-#include <stdint.h>
-
-#include "header.hpp"
-
-/**
- * \ingroup		communication
- * \defgroup 	backend Backend
- * \brief 		The backend provides connection to different hardware modules
- * 				to transmit the communication.
- *
- * All backend-implementations have to implement xpcc::BackendInterface.
- */
-
-namespace xpcc
+extern "C"
 {
-	/**
-	 * \brief 		The BackendInterface provides a common interface for using
-	 * 				different hardware modules to transmit messages.
-	 *
-	 * All backends have to implement this interface.
-	 *
-	 * \ingroup		communication
-	 * \author		Martin Rosekeit, Fabian Greif
-	 */
-	class BackendInterface
+	// ------------------------------------------------------------------------
+	void* __dso_handle = (void *) &__dso_handle;
+	
+	void
+	__cxa_pure_virtual()
 	{
-	public:
-		virtual
-		~BackendInterface()
-		{
-		}
-
-		virtual void
-		update() = 0;
-		
-		/// Send a Message.
-		virtual void
-		sendPacket(const Header &header,
-				SmartPointer payload = SmartPointer()) = 0;
-		
-		/// Check if a new packet was received by the backend
-		virtual bool
-		isPacketAvailable() const = 0;
-		
-		/// Access the packet.
-		virtual const Header&
-		getPacketHeader() const = 0;
-		
-		virtual const SmartPointer
-		getPacketPayload() const = 0;
-		
-		virtual void
-		dropPacket() = 0;
-	};
+		// put error handling here
+	}
+	
+	// ------------------------------------------------------------------------
+	__extension__ typedef int __guard __attribute__((mode (__DI__)));
+	
+	int
+	__cxa_guard_acquire(__guard *g)
+	{
+		return !*(char *)(g);
+	}
+	
+	void
+	__cxa_guard_release (__guard *g)
+	{
+		*(char *) g = 1;
+	}
+	
+	void
+	__cxa_guard_abort (__guard *)
+	{
+	}
+	
+	// ------------------------------------------------------------------------
+	int
+	__aeabi_atexit(void */*object*/, void (*/*destructor*/)(void *), void */*dso_handle*/)
+	{
+		return 0;
+	}
 }
 
-#endif	// XPCC__BACKEND_INTERFACE_HPP
+// ----------------------------------------------------------------------------
+void *
+operator new(size_t size) throw ()
+{
+	return malloc(size);
+}
+
+void *
+operator new[](size_t size) throw ()
+{
+	return malloc(size);
+}
+
+void
+operator delete(void *p) throw ()
+{
+	free(p);
+}
+
+void
+operator delete[](void* p) throw ()
+{
+	free(p);
+}

@@ -68,7 +68,7 @@ namespace lpc
 
 	public:
 		static constexpr
-		ROM **rom = (ROM **)0x1fff1ff8;
+		ROM **rom = (ROM **) 0x1fff1ff8;
 
 	protected:
 		static void

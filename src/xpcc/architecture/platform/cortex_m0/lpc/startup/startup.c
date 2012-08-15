@@ -167,6 +167,7 @@ extern uint32_t __bss_end;
 
 // Application's main function
 extern int main(void);
+extern void __xpcc_initialize_memory(void);
 extern void __libc_init_array(void);
 extern void exit(int) __attribute__ ((noreturn, weak));
 
@@ -210,6 +211,8 @@ Reset_Handler(void)
 	
 	// Enable AHB clock to the GPIO domain.
 	LPC_SYSCON->SYSAHBCLKCTRL |= (1 << 6);
+	
+	__xpcc_initialize_memory();
 	
 	// Call C++ library initialization
 	__libc_init_array();
