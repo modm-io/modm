@@ -1,19 +1,29 @@
 #include <xpcc/debug/error_report.hpp>
 #include <xpcc/architecture/driver/atomic/queue.hpp>
 
-//#include "../error_code.hpp"
+#include "../error_code.hpp"
 
 #include "c_can.hpp"
 #include <xpcc_config.hpp>
 
-#define LPC11C_USING_CAN_INTERRUPTS ((LPC11C_CAN_TX_BUFFER_SIZE > 0) && (LPC11C_CAN_RX_BUFFER_SIZE > 0))
+#include <xpcc/architecture.hpp> // debugging
+
+// at least one queue, so activate interrupts
+#define LPC11C_USING_CAN_INTERRUPTS ((LPC11C_CAN_TX_BUFFER_SIZE > 0) || (LPC11C_CAN_RX_BUFFER_SIZE > 0))
 
 // ----------------------------------------------------------------------------
-
-#if LPC11C_USING_CAN_INTERRUPTS
+namespace xpcc
+{
+namespace lpc
+{
+#if LPC11C_CAN_TX_BUFFER_SIZE > 0
 xpcc::atomic::Queue<xpcc::can::Message, LPC11C_CAN_TX_BUFFER_SIZE> txQueue;
+#endif
+#if LPC11C_CAN_RX_BUFFER_SIZE > 0
 xpcc::atomic::Queue<xpcc::can::Message, LPC11C_CAN_RX_BUFFER_SIZE> rxQueue;
 #endif
+}
+}
 
 // ----------------------------------------------------------------------------
 /* Low level function:
@@ -52,9 +62,6 @@ sendMessageObject(const xpcc::can::Message & message, uint8_t messageObjectId)
 
 	// Really send the message
 	(*xpcc::lpc::Can::rom)->pCAND->can_transmit(&msg_obj);
-
-	// Really necessary to call the interrupt?
-	(*xpcc::lpc::Can::rom)->pCAND->isr();
 }
 
 // ----------------------------------------------------------------------------
@@ -106,9 +113,9 @@ xpcc::lpc::Can::initialize(can::Bitrate bitrate)
 	// TODO variable baud rate configuration
 
 	/**
-	 * CAN CANCLKDIV always 0.
+	 * MAIN_CLOCK / SYSAHBCLKDIV should be 48 MHz.
 	 *
-	 * MAIN_CLOCK / SYSAHBCLKDIV / (CANCLKDIV_val + 1) = 48 MHz
+	 * 48 MHz / (canclkdiv + 1) / (prescaler + 1) / 12 = bitrate
 	 *
 	 * 48 MHz	 125 kbit	0x451f	OK
 	 * 48 MHz	 250 kbit	0x450f 	OK
@@ -183,11 +190,39 @@ xpcc::lpc::Can::initialize(can::Bitrate bitrate)
 
 // ----------------------------------------------------------------------------
 
+/**
+ * \brief	CAN message transmit callback
+ *
+ * Called on the interrupt level by the CAN interrupt handler after a message
+ * has been successfully transmitted on the bus.
+ *
+ */
 void
 xpcc::lpc::Can::CAN_tx(uint8_t /* msg_obj_num */)
 {
-#if LPC11C_USING_CAN_INTERRUPTS
+#if LPC11C_CAN_TX_BUFFER_SIZE > 0
 	// Send next from queue, if available
+
+	while (!txQueue.isEmpty())
+	{
+		// Still messages in the queue.
+
+		/* At least one Message Object is free, find first empty
+		 * transmit Message Object from bitmask and use this
+		 * Message Object to send message. */
+		uint8_t bit = ffs(LPC_CAN->TXREQ2 & 0xff00);
+
+		if (bit == 0) {
+			// no empty message object found
+			break;
+		}
+		else {
+			uint8_t messageObjectId =  bit - 1;
+
+			sendMessageObject(txQueue.get(), messageObjectId);
+			txQueue.pop();
+		}
+	}
 #endif
 }
 
@@ -196,8 +231,8 @@ xpcc::lpc::Can::CAN_tx(uint8_t /* msg_obj_num */)
 void
 xpcc::lpc::Can::CAN_rx(uint8_t /* msg_obj_num */)
 {
-#if LPC11C_USING_CAN_INTERRUPTS
-	// Move to queue
+#if LPC11C_CAN_RX_BUFFER_SIZE > 0
+	// Move received message to queue
 #endif
 }
 
@@ -221,17 +256,20 @@ CAN_IRQHandler(void) {
 
 // ----------------------------------------------------------------------------
 
+GPIO__OUTPUT(Dbg, 0, 1);
+
 bool
-xpcc::lpc::Can::sendMessage(const can::Message & message)
+xpcc::lpc::Can::sendMessage(/*const*/ can::Message & message)
 {
 	// This function is not reentrant. If one of the mailboxes is empty it
 	// means that the software buffer is empty too. Therefore the mailbox
 	// will stay empty and won't be taken by an interrupt.
-	if (!(~(LPC_CAN->TXREQ2 & 0xff00)))
+
+	if (!(((~LPC_CAN->TXREQ2) & 0x0000ffff)))
 	{
 		/* All Message Objects used for sending (17 to 32) are pending
 		 * at the moment. */
-#if LPC11C_USING_CAN_INTERRUPTS
+#if LPC11C_CAN_TX_BUFFER_SIZE > 0
 		if (!txQueue.push(message)) {
 			xpcc::ErrorReport::report(xpcc::lpc::CAN_TX_OVERFLOW);
 			// All Message Objects are full and no space left in software buffer.
@@ -248,8 +286,25 @@ xpcc::lpc::Can::sendMessage(const can::Message & message)
 		/* At least one Message Object is free, find first empty
 		 * transmit Message Object from bitmask and use this
 		 * Message Object to send message. */
-		uint8_t messageObject = ffs(LPC_CAN->TXREQ2 & 0xff00) - 1;
-		sendMessageObject(message, messageObject);
+		Dbg::setOutput(1);
+
+		// find the first 0 in TXREQ2 which means the slot is empty.
+		//   The ffs counts the bit number from 1 (LSB) to 32 (MSB)
+		//   The lower 16 bits of TXREQ2 correspond to MessageObjects 32 to 16
+		//   with messageObjectIds 31 to 0.
+		uint8_t messageObjectId = ffs(~(LPC_CAN->TXREQ2 & 0x0000ffff)) - 1 + 16;
+
+		// note wich messageObject was used
+		message.data[0] = LPC_CAN->TXREQ2 >> 24;
+		message.data[1] = LPC_CAN->TXREQ2 >> 16;
+		message.data[2] = LPC_CAN->TXREQ2 >>  8;
+		message.data[3] = LPC_CAN->TXREQ2 >>  0;
+
+
+		message.data[6] = messageObjectId;
+
+		sendMessageObject(message, messageObjectId);
+		Dbg::reset();
 		return true;
 	}
 }
@@ -259,7 +314,7 @@ xpcc::lpc::Can::sendMessage(const can::Message & message)
 bool
 xpcc::lpc::Can::getMessage(can::Message & message)
 {
-#if LPC11C_USING_CAN_INTERRUPTS
+#if LPC11C_CAN_RX_BUFFER_SIZE > 0
 	if (rxQueue.isEmpty())
 	{
 		// no message in the receive buffer
@@ -290,7 +345,7 @@ xpcc::lpc::Can::getMessage(can::Message & message)
 bool
 xpcc::lpc::Can::isMessageAvailable()
 {
-#if LPC11C_USING_CAN_INTERRUPTS
+#if LPC11C_CAN_RX_BUFFER_SIZE > 0
 	return !rxQueue.isEmpty();
 #else
 	/* Check if new data is available in the Message
@@ -304,7 +359,7 @@ xpcc::lpc::Can::isMessageAvailable()
 bool
 xpcc::lpc::Can::isReadyToSend()
 {
-#if LPC11C_USING_CAN_INTERRUPTS
+#if LPC11C_CAN_TX_BUFFER_SIZE > 0
 	return !txQueue.isFull();
 #else
 	/* Check if at least one Message Object 17 to 32
