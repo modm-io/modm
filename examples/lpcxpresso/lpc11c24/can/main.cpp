@@ -58,7 +58,7 @@ main(void)
 	{
 		if (canTxTimer.isExpired()) {
 			// burst!
-			for (uint8_t ii = 0; ii < 17; ++ii)
+			for (uint8_t ii = 0; ii < 32; ++ii)
 			{
 				static uint8_t id = 0;
 				message.data[7] = id++;

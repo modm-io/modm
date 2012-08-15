@@ -6,8 +6,6 @@
 #include "c_can.hpp"
 #include <xpcc_config.hpp>
 
-#include <xpcc/architecture.hpp> // debugging
-
 // at least one queue, so activate interrupts
 #define LPC11C_USING_CAN_INTERRUPTS ((LPC11C_CAN_TX_BUFFER_SIZE > 0) || (LPC11C_CAN_RX_BUFFER_SIZE > 0))
 
@@ -203,24 +201,37 @@ xpcc::lpc::Can::CAN_tx(uint8_t /* msg_obj_num */)
 #if LPC11C_CAN_TX_BUFFER_SIZE > 0
 	// Send next from queue, if available
 
-	while (!txQueue.isEmpty())
-	{
-		// Still messages in the queue.
+	if ((LPC_CAN->TXREQ2 & 0x0000ffff) == 0x0000) {
+		// All message objects empty. Otherwise the order of messages
+		// is not maintained
 
-		/* At least one Message Object is free, find first empty
-		 * transmit Message Object from bitmask and use this
-		 * Message Object to send message. */
-		uint8_t bit = ffs(LPC_CAN->TXREQ2 & 0xff00);
+		while (!txQueue.isEmpty())
+		{
+			// Still messages in the queue.
 
-		if (bit == 0) {
-			// no empty message object found
-			break;
-		}
-		else {
-			uint8_t messageObjectId =  bit - 1;
+			/* At least one Message Object is free, find first empty
+			 * transmit Message Object from bitmask and use this
+			 * Message Object to send message. */
+			uint8_t firstZero = ffs(~(LPC_CAN->TXREQ2 & 0x0000ffff));
 
-			sendMessageObject(txQueue.get(), messageObjectId);
-			txQueue.pop();
+			if (firstZero == 17) {
+				// no empty message object found
+				// Actually, this should not happen because the interrupt
+				// is called when a message was sent successfully.
+				// It may happen if a message was sent from a message object
+				// that was not intended for sending in this class. Then,
+				// an interrupt may occurr but no of the used message
+				// objects got freed.
+				break;
+			}
+			else {
+				// Send the Message Object. See sendMessage for messageObjectId
+				// calculation.
+				uint8_t messageObjectId = (firstZero - 1) + 16;
+
+				sendMessageObject(txQueue.get(), messageObjectId);
+				txQueue.pop();
+			}
 		}
 	}
 #endif
@@ -256,8 +267,6 @@ CAN_IRQHandler(void) {
 
 // ----------------------------------------------------------------------------
 
-GPIO__OUTPUT(Dbg, 0, 1);
-
 bool
 xpcc::lpc::Can::sendMessage(/*const*/ can::Message & message)
 {
@@ -265,7 +274,12 @@ xpcc::lpc::Can::sendMessage(/*const*/ can::Message & message)
 	// means that the software buffer is empty too. Therefore the mailbox
 	// will stay empty and won't be taken by an interrupt.
 
-	if (!(((~LPC_CAN->TXREQ2) & 0x0000ffff)))
+	// Find a free Message Object for sending.
+	// If none found push to queue if available
+
+	uint8_t firstZero = ffs(~(LPC_CAN->TXREQ2 & 0x0000ffff));
+
+	if (firstZero == 17)
 	{
 		/* All Message Objects used for sending (17 to 32) are pending
 		 * at the moment. */
@@ -282,17 +296,17 @@ xpcc::lpc::Can::sendMessage(/*const*/ can::Message & message)
 		return false;
 #endif
 	}
-	else {
+	else
+	{
 		/* At least one Message Object is free, find first empty
 		 * transmit Message Object from bitmask and use this
 		 * Message Object to send message. */
-		Dbg::setOutput(1);
 
 		// find the first 0 in TXREQ2 which means the slot is empty.
 		//   The ffs counts the bit number from 1 (LSB) to 32 (MSB)
 		//   The lower 16 bits of TXREQ2 correspond to MessageObjects 32 to 16
-		//   with messageObjectIds 31 to 0.
-		uint8_t messageObjectId = ffs(~(LPC_CAN->TXREQ2 & 0x0000ffff)) - 1 + 16;
+		//   with messageObjectIds 31 to 15.
+		uint8_t messageObjectId = (firstZero - 1) + 16;
 
 		// note wich messageObject was used
 		message.data[0] = LPC_CAN->TXREQ2 >> 24;
@@ -304,7 +318,6 @@ xpcc::lpc::Can::sendMessage(/*const*/ can::Message & message)
 		message.data[6] = messageObjectId;
 
 		sendMessageObject(message, messageObjectId);
-		Dbg::reset();
 		return true;
 	}
 }
