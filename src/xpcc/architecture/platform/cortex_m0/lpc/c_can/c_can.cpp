@@ -46,8 +46,7 @@ sendMessageObject(const xpcc::can::Message & message, uint8_t messageObjectId)
 
 	// Copy the data.
 	// TODO reinterpret_cast or memcpy
-	for (uint8_t ii = 0; ii < 8; ++ii)
-	{
+	for (uint8_t ii = 0; ii < msg_obj.dlc; ++ii) {
 		msg_obj.data[ii] = message.data[ii];
 	}
 
@@ -59,8 +58,8 @@ sendMessageObject(const xpcc::can::Message & message, uint8_t messageObjectId)
 }
 
 // ----------------------------------------------------------------------------
-/* Low level function
- * Called by interrupt of by getMessage to receive a message */
+/* Low level function:
+ * Called by interrupt or by getMessage to receive a message */
 static void
 readMessageObject(xpcc::can::Message & message, uint8_t messageObjectId)
 {

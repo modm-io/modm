@@ -71,16 +71,45 @@ namespace lpc
 		ROM **rom = (ROM **) 0x1fff1ff8;
 
 	protected:
+		/**
+		 * Callback functions for the on-chip CAN driver library.
+		 * They are registered in initialize() and called from the
+		 * interrupt handler of the on-chip CAN driver (pCAND->isr())
+		 */
+
+		/**
+		 * \brief	Receive Callback
+		 *
+		 * The CAN message received callback function is called on the
+		 * interrupt level by the CAN interrupt handler when a message was
+		 * received.
+		 *
+		 * \param	msg_obj_num	Message Object that contains a new message
+		 */
 		static void
 		CAN_rx(uint8_t msg_obj_num);
 
+		/**
+		 * \brief	Transmit Callback
+		 *
+		 * Called on the interrupt level by the CAN interrupt handler after a
+		 * message has been successfully transmitted on the bus.
+		 *
+		 * \param	msg_obj_num	Message Object that was transmitted
+		 */
 		static void
 		CAN_tx(uint8_t msg_obj_num);
 
+		/**
+		 * \brief	Error Callback
+		 *
+		 * Called on the interrupt level by the CAN interrupt handler after a
+		 * message has been successfully transmitted on the bus.
+		 *
+		 * \param	error_info	Error bitmask
+		 */
 		static void
 		CAN_error(uint32_t error_info);
-
-
 	};
 
 } // lpc namespace
