@@ -77,9 +77,6 @@ namespace xpcc
 
 		ALWAYS_INLINE void
 		lcdCls(uint16_t colour);
-
-//		void
-//		lcdWrite130x130bmp(void);
 	};
 }
 

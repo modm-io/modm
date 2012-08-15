@@ -57,7 +57,6 @@ xpcc::SiemensS65<SPI, CS, RS, Reset>::initialize()
 	lcdSettings();
 
 	this->clear();
-	//	this->update();
 }
 
 template <typename SPI, typename CS, typename RS, typename Reset>
@@ -73,11 +72,9 @@ void
 xpcc::SiemensS65<SPI, CS, RS, Reset>::writeReg(uint8_t reg)
 {
 	CS::reset();
-	SPI::write(0x74); // start byte, RS = 0, R/W = 0, receive index register
+	SPI::write(0x74); // start byte, RS = 0, R/W = 0, write index register
 	SPI::write(0x00);
 	SPI::write(reg);
-
-//	while(SPI::isBusy()); // wait until SPI has emptied its buffer before setting CS.
 	CS::set();
 }
 
@@ -86,7 +83,7 @@ void
 xpcc::SiemensS65<SPI, CS, RS, Reset>::writeData(uint16_t data)
 {
 	CS::reset();
-	SPI::write(0x76);	// start byte, RS = 1, R/W, receive instruction or RAM data
+	SPI::write(0x76);	// start byte, RS = 1, R/W = 0, write instruction or RAM data
 	SPI::write(data>>8);
 	SPI::write(data);
 	CS::set();
@@ -143,18 +140,44 @@ xpcc::SiemensS65<SPI, CS, RS, Reset>::lcdSettings() {
 template <typename SPI, typename CS, typename RS, typename Reset>
 void
 xpcc::SiemensS65<SPI, CS, RS, Reset>::lcdCls(uint16_t colour) {
-	writeReg(0x22); // ?? write data when CS is high does not make sense.
+	// Set CGRAM Address to 0 = upper left corner
+	writeCmd(0x21, 0x0000);
+
+	// Set instruction register to "RAM Data write"
+	writeReg(0x22);
+
 	CS::reset();
-	SPI::write(0x76);
+	SPI::write(0x76);	// start byte
 
 	// start data transmission
+
+#if S65_LPC_ACCELERATED > 0
+	// switch to 16 bit mode, wait for empty FIFO before
+	while (!(LPC_SSP0->SR & SPI_SRn_TFE));
+	LPC_SSP0->CR0 |= 0x0f;
+
+	for (uint_fast16_t ii = 0; ii < (132 * 176); ++ii)
+	{
+		// 8 pixels of 16 bits fit in the Tx FIFO if it is empty.
+		while (!(LPC_SSP0->SR & SPI_SRn_TFE));
+
+		for (uint_fast8_t jj = 0; jj < 8; ++jj) {
+			LPC_SSP0->DR = colour;
+		}
+	}
+	// switch back to 8 bit transfer, wait for empty FIFO before.
+	while (!(LPC_SSP0->SR & SPI_SRn_TFE));
+	LPC_SSP0->CR0 &= ~0xff;
+	LPC_SSP0->CR0 |=  0x07;
+#else
+	// generic implementation
 	uint8_t c1 = colour >> 8;
 	uint8_t c2 = colour & 0xff;
-	for (uint16_t i = 0; i < 132*176; i++)
-	{
+	for (uint16_t i = 0; i < (132 * 176); ++i) {
 		SPI::write(c1);
 		SPI::write(c2);
 	}
+#endif
 
 	CS::set();
 }
@@ -162,6 +185,11 @@ xpcc::SiemensS65<SPI, CS, RS, Reset>::lcdCls(uint16_t colour) {
 template <typename SPI, typename CS, typename RS, typename Reset>
 void
 xpcc::SiemensS65<SPI, CS, RS, Reset>::update() {
+	// Set CGRAM Address to 0 = upper left corner
+	writeCmd(0x21, 0x0000);
+
+	// Set instruction register to "RAM Data write"
+	writeReg(0x22);
 
 	// WRITE MEMORY
 	CS::reset();
@@ -176,15 +204,15 @@ xpcc::SiemensS65<SPI, CS, RS, Reset>::update() {
 #if S65_LPC_ACCELERATED > 0
 	/**
 	 * This is an extremely optimised version of the copy routine for LPC
-	 * microcontrollers. It will work with any SPI block that support 16-bit
+	 * microcontrollers. It will work with any SPI block that supports 16-bit
 	 * transfer and a FIFO with a size of at least 8 frames.
 	 *
 	 * The SPI is switched to 16-bit mode to reduce the
 	 * numbers of bus accesses and use the trick that then 8 pixels of each
 	 * 16 bits fit into the FIFO.
 	 *
-	 * This reduces the copy time to 17.6 msec when running at 48 MHz. This
-	 * is a peak transfer rate of 2.6 MiByte/sec
+	 * This reduces the copy time to 17.6 msec when running at 24 MHz SPI clock.
+	 * This is a peak transfer rate of 2.6 MiByte/sec
 	 */
 
 	// switch to 16 bit mode, wait for empty FIFO before
