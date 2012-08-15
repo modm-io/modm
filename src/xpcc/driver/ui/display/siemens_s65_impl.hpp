@@ -43,7 +43,7 @@
 // ----------------------------------------------------------------------------
 template <typename SPI, typename CS, typename RS, typename Reset>
 void
-xpcc::SiemensS65<SPI, CS, RS, Reset>::initialize()
+xpcc::SiemensS65Portrait<SPI, CS, RS, Reset>::initialize()
 {
 	// CS pin
 	CS::setOutput(true);
@@ -54,10 +54,32 @@ xpcc::SiemensS65<SPI, CS, RS, Reset>::initialize()
 	// Reset pin
 	Reset::setOutput(false);
 
-	lcdSettings();
+	SiemensS65Common<SPI, CS, RS, Reset>::lcdSettings();
 
 	this->clear();
 }
+
+// ----------------------------------------------------------------------------
+
+template <typename SPI, typename CS, typename RS, typename Reset>
+void
+xpcc::SiemensS65Landscape<SPI, CS, RS, Reset>::initialize()
+{
+	// CS pin
+	CS::setOutput(true);
+
+	// RS pin
+	RS::setOutput(false);
+
+	// Reset pin
+	Reset::setOutput(false);
+
+	SiemensS65Common<SPI, CS, RS, Reset>::lcdSettings();
+
+	this->clear();
+}
+
+// ----------------------------------------------------------------------------
 
 template <typename SPI, typename CS, typename RS, typename Reset>
 void
@@ -91,49 +113,49 @@ xpcc::SiemensS65Common<SPI, CS, RS, Reset>::writeData(uint16_t data)
 
 template <typename SPI, typename CS, typename RS, typename Reset>
 void
-xpcc::SiemensS65<SPI, CS, RS, Reset>::lcdSettings() {
+xpcc::SiemensS65Common<SPI, CS, RS, Reset>::lcdSettings() {
 	// Hardware reset is low from initialize
 	xpcc::delay_ms(50);
 	Reset::set();
 	xpcc::delay_ms(50);
 
-	SiemensS65Common<SPI, CS, RS, Reset>::writeCmd(0x07, 0x0000); //display off
+	writeCmd(0x07, 0x0000); //display off
 	xpcc::delay_ms(10);
 
 	//power on sequence
-	SiemensS65Common<SPI, CS, RS, Reset>::writeCmd(0x02, 0x0400); //lcd drive control
-	SiemensS65Common<SPI, CS, RS, Reset>::writeCmd(0x0C, 0x0001); //power control 3: VC        //step 1
-	SiemensS65Common<SPI, CS, RS, Reset>::writeCmd(0x0D, 0x0006); //power control 4: VRH
-	SiemensS65Common<SPI, CS, RS, Reset>::writeCmd(0x04, 0x0000); //power control 2: CAD
-	SiemensS65Common<SPI, CS, RS, Reset>::writeCmd(0x0D, 0x0616); //power control 4: VRL
-	SiemensS65Common<SPI, CS, RS, Reset>::writeCmd(0x0E, 0x0010); //power control 5: VCM
-	SiemensS65Common<SPI, CS, RS, Reset>::writeCmd(0x0E, 0x1010); //power control 5: VDV
-	SiemensS65Common<SPI, CS, RS, Reset>::writeCmd(0x03, 0x0000); //power control 1: BT        //step 2
-	SiemensS65Common<SPI, CS, RS, Reset>::writeCmd(0x03, 0x0000); //power control 1: DC
-	SiemensS65Common<SPI, CS, RS, Reset>::writeCmd(0x03, 0x000C); //power control 1: AP
+	writeCmd(0x02, 0x0400); //lcd drive control
+	writeCmd(0x0C, 0x0001); //power control 3: VC        //step 1
+	writeCmd(0x0D, 0x0006); //power control 4: VRH
+	writeCmd(0x04, 0x0000); //power control 2: CAD
+	writeCmd(0x0D, 0x0616); //power control 4: VRL
+	writeCmd(0x0E, 0x0010); //power control 5: VCM
+	writeCmd(0x0E, 0x1010); //power control 5: VDV
+	writeCmd(0x03, 0x0000); //power control 1: BT        //step 2
+	writeCmd(0x03, 0x0000); //power control 1: DC
+	writeCmd(0x03, 0x000C); //power control 1: AP
 	xpcc::delay_ms(40);
-	SiemensS65Common<SPI, CS, RS, Reset>::writeCmd(0x0E, 0x2D1F); //power control 5: VCOMG     //step 3
+	writeCmd(0x0E, 0x2D1F); //power control 5: VCOMG     //step 3
 	xpcc::delay_ms(40);
-	SiemensS65Common<SPI, CS, RS, Reset>::writeCmd(0x0D, 0x0616); //power control 4: PON       //step 4
+	writeCmd(0x0D, 0x0616); //power control 4: PON       //step 4
 	xpcc::delay_ms(100);
 
 	//display options
 #if defined(S65_MIRROR)
-	SiemensS65Common<SPI, CS, RS, Reset>::writeCmd(0x05, 0x0008); //Entry mode --
+	writeCmd(0x05, 0x0008); //Entry mode --
 #else
-	SiemensS65Common<SPI, CS, RS, Reset>::writeCmd(0x05, 0x0038); //Entry mode ++
+	writeCmd(0x05, 0x0038); //Entry mode ++
 #endif
 	//setArea(0, 0, (S65_WIDTH-1), (S65_HEIGHT-1));
 	//  writeCmd(0x16, 176<<8); //set y
 	//  writeCmd(0x17, 132<<8); //set x
 
 	//display on sequence (bit2 = reversed colors)
-	SiemensS65Common<SPI, CS, RS, Reset>::writeCmd(0x07, 0x0005); //display control: D0
-	SiemensS65Common<SPI, CS, RS, Reset>::writeCmd(0x07, 0x0025); //display control: GON
-	SiemensS65Common<SPI, CS, RS, Reset>::writeCmd(0x07, 0x0027); //display control: D1
-	SiemensS65Common<SPI, CS, RS, Reset>::writeCmd(0x07, 0x0037); //display control: DTE
+	writeCmd(0x07, 0x0005); //display control: D0
+	writeCmd(0x07, 0x0025); //display control: GON
+	writeCmd(0x07, 0x0027); //display control: D1
+	writeCmd(0x07, 0x0037); //display control: DTE
 	xpcc::delay_ms(10);
-	SiemensS65Common<SPI, CS, RS, Reset>::lcdCls(0x03e0);
+	lcdCls(0x03e0);
 }
 
 template <typename SPI, typename CS, typename RS, typename Reset>
@@ -183,7 +205,7 @@ xpcc::SiemensS65Common<SPI, CS, RS, Reset>::lcdCls(uint16_t colour) {
 
 template <typename SPI, typename CS, typename RS, typename Reset>
 void
-xpcc::SiemensS65<SPI, CS, RS, Reset>::update() {
+xpcc::SiemensS65Portrait<SPI, CS, RS, Reset>::update() {
 	// Set CGRAM Address to 0 = upper left corner
 	SiemensS65Common<SPI, CS, RS, Reset>::writeCmd(0x21, 0x0000);
 
@@ -277,4 +299,9 @@ xpcc::SiemensS65<SPI, CS, RS, Reset>::update() {
 #endif
 
 	CS::set();
+}
+
+template <typename SPI, typename CS, typename RS, typename Reset>
+void
+xpcc::SiemensS65Landscape<SPI, CS, RS, Reset>::update() {
 }

@@ -59,12 +59,14 @@ namespace xpcc
 
 		ALWAYS_INLINE void
 		lcdCls(uint16_t colour);
+
+		ALWAYS_INLINE void
+		lcdSettings(void);
+
 	};
 
-
-
 	template <typename SPI, typename CS, typename RS, typename Reset>
-	class SiemensS65 :
+	class SiemensS65Portrait :
 		public BufferedGraphicDisplay<132, 176>,
 		public SiemensS65Common<SPI, CS, RS, Reset>
 	{
@@ -78,18 +80,30 @@ namespace xpcc
 		virtual void
 		update();
 
-
-//		/**
-//		 * \brief	Change display contrast 0..127
-//		 */
-//		void
-//		setContrast(uint8_t contrast);
-
-	private:
-		ALWAYS_INLINE void
-		lcdSettings(void);
-
 	};
+
+		/**
+		 * The display in landscape mode does not match the required
+		 * alignment of BufferedGraphicDisplay which requests that
+		 * the vertical resolution can be divided by 8.
+		 *
+		 */
+	template <typename SPI, typename CS, typename RS, typename Reset>
+	class SiemensS65Landscape :
+		public BufferedGraphicDisplay<176, 136>,
+		public SiemensS65Common<SPI, CS, RS, Reset>
+	{
+	public:
+		void
+		initialize();
+
+		/**
+		 * \brief	Update the display with the content of the RAM buffer
+		 */
+		virtual void
+		update();
+	};
+
 }
 
 #include "siemens_s65_impl.hpp"

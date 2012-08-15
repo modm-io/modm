@@ -38,7 +38,8 @@ typedef xpcc::lpc::SpiMaster0 SpiDisplay;
 typedef xpcc::SoftwareSpi<spi::Sck, spi::Mosi, xpcc::gpio::Unused, 2000000> SpiDisplay;
 #endif
 
-typedef xpcc::SiemensS65<SpiDisplay, lcd::Cs, lcd::Rs, lcd::Reset> Display;
+//typedef xpcc::SiemensS65Portrait<SpiDisplay, lcd::Cs, lcd::Rs, lcd::Reset> Display;
+typedef xpcc::SiemensS65Landscape<SpiDisplay, lcd::Cs, lcd::Rs, lcd::Reset> Display;
 
 #define LED_TOGGLE_TICKS 100		// 100 ticks = 1 Hz flash rate
 #define COUNT_MAX		3			// how high to count on the LED display
@@ -168,13 +169,14 @@ main(void)
 					display.getWidth()-20,
 					display.getHeight()-88);
 
+
 			x += xSpeed;
 			y += ySpeed;
 
-			if (x < 10 + radius + 3 || x > display.getWidth() - radius - 13) {
+			if (x < 10 + radius + 3 || x > display.getWidth() - radius - 14) {
 				xSpeed = -xSpeed;
 			}
-			if (y < 78 + radius + 1 || y > display.getHeight() - 10 - radius - 1) {
+			if (y < 78 + radius + 1 || y > display.getHeight() - 10 - radius - 2) {
 				ySpeed = -ySpeed;
 			}
 
