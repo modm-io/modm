@@ -222,7 +222,7 @@ xpcc::SiemensS65Portrait<SPI, CS, RS, Reset>::update() {
 	const uint16_t maskBlank  = 0x0000; // RRRR RGGG GGGB BBBB
 	const uint16_t maskFilled = 0x37e0; // RRRR RGGG GGGB BBBB
 
-	const uint8_t width = 136; // this->getWidth();
+	const uint8_t width = 132; // this->getWidth();
 	const uint8_t height = 176 / 8; // this->getHeight()/8;
 
 #if S65_LPC_ACCELERATED > 0
