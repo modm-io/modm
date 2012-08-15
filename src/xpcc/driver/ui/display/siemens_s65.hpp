@@ -42,8 +42,31 @@ namespace xpcc
 	 *
 	 * \ingroup	lcd
 	 */
+
+	// common for landscape and portrait
 	template <typename SPI, typename CS, typename RS, typename Reset>
-	class SiemensS65 : public BufferedGraphicDisplay<132, 176>
+	class SiemensS65Common
+	{
+	protected:
+		ALWAYS_INLINE void
+		writeCmd(uint8_t reg, uint16_t param);
+
+		ALWAYS_INLINE void
+		writeReg(uint8_t reg);
+
+		ALWAYS_INLINE void
+		writeData(uint16_t param);
+
+		ALWAYS_INLINE void
+		lcdCls(uint16_t colour);
+	};
+
+
+
+	template <typename SPI, typename CS, typename RS, typename Reset>
+	class SiemensS65 :
+		public BufferedGraphicDisplay<132, 176>,
+		public SiemensS65Common<SPI, CS, RS, Reset>
 	{
 	public:
 		void
@@ -66,17 +89,6 @@ namespace xpcc
 		ALWAYS_INLINE void
 		lcdSettings(void);
 
-		ALWAYS_INLINE void
-		writeCmd(uint8_t reg, uint16_t param);
-
-		ALWAYS_INLINE void
-		writeReg(uint8_t reg);
-
-		ALWAYS_INLINE void
-		writeData(uint16_t param);
-
-		ALWAYS_INLINE void
-		lcdCls(uint16_t colour);
 	};
 }
 
