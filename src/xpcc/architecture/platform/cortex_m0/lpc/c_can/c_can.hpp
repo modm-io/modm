@@ -64,7 +64,7 @@ namespace lpc
 		 * \return true if the message was send, false otherwise
 		 */
 		static bool
-		sendMessage(/*const*/ can::Message& message);
+		sendMessage(const can::Message& message);
 
 	public:
 		static constexpr

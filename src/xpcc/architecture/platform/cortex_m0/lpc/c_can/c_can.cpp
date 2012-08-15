@@ -4,6 +4,8 @@
 #include "../error_code.hpp"
 
 #include "c_can.hpp"
+#include "c_can_registers.h"
+
 #include <xpcc_config.hpp>
 
 // at least one queue, so activate interrupts
@@ -32,7 +34,8 @@ sendMessageObject(const xpcc::can::Message & message, uint8_t messageObjectId)
 	// NXP's data structure for sending CAN messages
 	CAN_MSG_OBJ msg_obj;
 
-	// Which Message Object to use
+	// Which Message Object to use, valid numbers are 0 to 31.
+	// In this class 16 to 31 are used.
 	msg_obj.msgobj  = messageObjectId;
 
 	// Mode and Identifier
@@ -167,18 +170,70 @@ xpcc::lpc::Can::initialize(can::Bitrate bitrate)
 	};
 	(*rom)->pCAND->config_calb(&callbacks);
 
-	// NXP's data structure for CAN messages
-	CAN_MSG_OBJ msg_obj;
 
 	// Use Message Objects 1 to 16 for reception
-	// TODO Use Message Objects 1 to 16
-	msg_obj.msgobj = 1;
-	msg_obj.mode_id = CAN_MSGOBJ_EXT; // extended
-	msg_obj.mask = CAN_MSGOBJ_EXT;	// get all extended frames.
-	// TODO Check if standard frames are received.
 
-	// Configure
-	(*rom)->pCAND->config_rxmsgobj(&msg_obj);
+	// With the on-chip drivers it is not possible to set up a FIFO.
+	// So configure the receive message objects manually.
+
+	//#define ID_EXT_MASK 0x1FFFFFFF
+	#define ID_EXT_MASK 0x0
+	#define RX_EXT_MSG_ID 0x00
+
+	for (uint8_t ii = 0; ii < 16; ++ii) {
+		// What to write
+		LPC_CAN->IF1_CMDMSK =
+				CAN_IFn_CMDMSK_WR |
+				CAN_IFn_CMDMSK_MASK |
+				CAN_IFn_CMDMSK_ARB |
+				CAN_IFn_CMDMSK_CTRL |
+				CAN_IFn_CMDMSK_DATAA |
+				CAN_IFn_CMDMSK_DATAB;
+
+		// Mask
+		LPC_CAN->IF1_MSK1 = ID_EXT_MASK & 0xFFFF;
+		LPC_CAN->IF1_MSK2 = CAN_IFn_MSK2_MXTD | (ID_EXT_MASK >> 16);
+
+		// Arbitration
+		LPC_CAN->IF1_ARB1 = (RX_EXT_MSG_ID) & 0xFFFF;
+		LPC_CAN->IF1_ARB2 = CAN_IFn_ARB2_MSGVAL | CAN_IFn_ARB2_XTD | ((RX_EXT_MSG_ID) >> 16);
+
+		if (ii == 15 ) {
+			// End of FIFO block
+			LPC_CAN->IF1_MCTRL =
+					CAN_IFn_MCTRL_UMASK |
+					CAN_IFn_MCTRL_RXIE |
+					CAN_IFn_MCTRL_EOB |
+					CAN_IFn_MCTRL_DLC_MAX;
+		}
+		else {
+			LPC_CAN->IF1_MCTRL =
+					CAN_IFn_MCTRL_UMASK |
+					CAN_IFn_MCTRL_RXIE |
+					CAN_IFn_MCTRL_DLC_MAX;
+		}
+
+		LPC_CAN->IF1_DA1 = 0x0000;
+		LPC_CAN->IF1_DA2 = 0x0000;
+		LPC_CAN->IF1_DB1 = 0x0000;
+		LPC_CAN->IF1_DB2 = 0x0000;
+
+		// Transfer data to message RAM
+		LPC_CAN->IF1_CMDREQ = ii + 1;
+		while( LPC_CAN->IF1_CMDREQ & CAN_IFn_CMDREQ_BUSY );
+	}
+
+	// NXP's data structure for CAN messages
+	//	CAN_MSG_OBJ msg_obj;
+
+	//	for (uint8_t ii = 0; ii < 16; ++ii)
+	//	{
+	//		msg_obj.msgobj = ii;
+	//		msg_obj.mode_id = 0x1FFFFFFF | CAN_MSGOBJ_EXT; // Receive all extended frames
+	//		msg_obj.mask = 0x00; // get all extended frames.
+	//		// Configure
+	//		(*rom)->pCAND->config_rxmsgobj(&msg_obj);
+	//	}
 
 	/* Always enable the CAN Interrupt. */
 	NVIC_EnableIRQ(CAN_IRQn);
@@ -239,11 +294,37 @@ xpcc::lpc::Can::CAN_tx(uint8_t /* msg_obj_num */)
 
 // ----------------------------------------------------------------------------
 
+/**
+ * \brief	CAN message receive callback
+ *
+ * Called on the interrupt level by the CAN interrupt handler when
+ * a new message has been successfully received.
+ */
 void
-xpcc::lpc::Can::CAN_rx(uint8_t /* msg_obj_num */)
+xpcc::lpc::Can::CAN_rx(uint8_t msg_obj_num)
 {
 #if LPC11C_CAN_RX_BUFFER_SIZE > 0
-	// Move received message to queue
+	// Move received message to queue if possible
+
+	if (!rxQueue.isFull()) {
+		xpcc::can::Message message;
+		readMessageObject(message, msg_obj_num);
+		if (!rxQueue.push(message)) {
+			xpcc::ErrorReport::report(xpcc::lpc::CAN_RX_OVERFLOW);
+		}
+	}
+	else {
+		// Keep message in hardware buffer.
+		// As soon as one element was popped from the queue this
+		// driver must check if there are any messages pending in the
+		// hardware MOBSs
+		// .
+		// Now the queue and all MOBs are full.
+		// No further interrupt is generated because no message can be
+		// successfully written to MOB.
+		return;
+	}
+
 #endif
 }
 
@@ -268,7 +349,7 @@ CAN_IRQHandler(void) {
 // ----------------------------------------------------------------------------
 
 bool
-xpcc::lpc::Can::sendMessage(/*const*/ can::Message & message)
+xpcc::lpc::Can::sendMessage(const can::Message & message)
 {
 	// This function is not reentrant. If one of the mailboxes is empty it
 	// means that the software buffer is empty too. Therefore the mailbox
@@ -307,16 +388,6 @@ xpcc::lpc::Can::sendMessage(/*const*/ can::Message & message)
 		//   The lower 16 bits of TXREQ2 correspond to MessageObjects 32 to 16
 		//   with messageObjectIds 31 to 15.
 		uint8_t messageObjectId = (firstZero - 1) + 16;
-
-		// note wich messageObject was used
-		message.data[0] = LPC_CAN->TXREQ2 >> 24;
-		message.data[1] = LPC_CAN->TXREQ2 >> 16;
-		message.data[2] = LPC_CAN->TXREQ2 >>  8;
-		message.data[3] = LPC_CAN->TXREQ2 >>  0;
-
-
-		message.data[6] = messageObjectId;
-
 		sendMessageObject(message, messageObjectId);
 		return true;
 	}
@@ -336,14 +407,27 @@ xpcc::lpc::Can::getMessage(can::Message & message)
 	else {
 		memcpy(&message, &rxQueue.get(), sizeof(message));
 		rxQueue.pop();
+
+		// Check for other messages in MOBs
+		// Happens if an interrupt was missed or the rxQueue got full
+		// temporarily and messages were stored in the hardware FIFO
+		// See Rx Interrupt for further explanation.
+		while ((!rxQueue.isFull()) && (LPC_CAN->ND1 & 0x0000ffff)) {
+			uint8_t messageObjectId = ffs(LPC_CAN->ND1 & 0x0000ffff) - 1;
+			xpcc::can::Message newMessage;
+			readMessageObject(newMessage, messageObjectId);
+			if (!rxQueue.push(newMessage)) {
+				xpcc::ErrorReport::report(xpcc::lpc::CAN_RX_OVERFLOW);
+			}
+		}
 		return true;
 	}
 #else
 	// No interrupts, polling
-	if (LPC_CAN->ND1 & 0x00ff)
+	if (LPC_CAN->ND1 & 0x0000ffff)
 	{
 		// At least one Message Object has unread data.
-		uint8_t messageObject = ffs(LPC_CAN->ND1 & 0x00ff) - 1;
+		uint8_t messageObject = ffs(LPC_CAN->ND1 & 0x0000ffff) - 1;
 		readMessageObject(message, messageObject);
 		return true;
 	} else {
@@ -363,7 +447,7 @@ xpcc::lpc::Can::isMessageAvailable()
 #else
 	/* Check if new data is available in the Message
 	 * Objects 1 to 16. */
-	return (LPC_CAN->ND1 & 0x00ff);
+	return (LPC_CAN->ND1 & 0x0000ffff);
 #endif
 }
 
@@ -377,6 +461,6 @@ xpcc::lpc::Can::isReadyToSend()
 #else
 	/* Check if at least one Message Object 17 to 32
 	 * is not pending. If it is not pending it is free. */
-	return ( ~(LPC_CAN->TXREQ2 & 0xff00) );
+	return ( ~(LPC_CAN->TXREQ2 & 0xffff0000) );
 #endif
 }
