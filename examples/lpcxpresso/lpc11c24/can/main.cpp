@@ -61,7 +61,7 @@ main(void)
 			for (uint8_t ii = 0; ii < 32; ++ii)
 			{
 				static uint8_t id = 0;
-				message.data[7] = id++;
+				message.data[0] = id++;
 				xpcc::lpc::Can::sendMessage(message);
 			}
 		}
