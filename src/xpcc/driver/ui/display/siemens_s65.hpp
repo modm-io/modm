@@ -61,7 +61,7 @@ namespace xpcc
 		lcdCls(uint16_t colour);
 
 		ALWAYS_INLINE void
-		lcdSettings(void);
+		lcdSettings(bool landscape);
 
 	};
 

@@ -54,7 +54,7 @@ xpcc::SiemensS65Portrait<SPI, CS, RS, Reset>::initialize()
 	// Reset pin
 	Reset::setOutput(false);
 
-	SiemensS65Common<SPI, CS, RS, Reset>::lcdSettings();
+	SiemensS65Common<SPI, CS, RS, Reset>::lcdSettings(false);
 
 	this->clear();
 }
@@ -74,7 +74,7 @@ xpcc::SiemensS65Landscape<SPI, CS, RS, Reset>::initialize()
 	// Reset pin
 	Reset::setOutput(false);
 
-	SiemensS65Common<SPI, CS, RS, Reset>::lcdSettings();
+	SiemensS65Common<SPI, CS, RS, Reset>::lcdSettings(true);
 
 	this->clear();
 }
@@ -113,7 +113,7 @@ xpcc::SiemensS65Common<SPI, CS, RS, Reset>::writeData(uint16_t data)
 
 template <typename SPI, typename CS, typename RS, typename Reset>
 void
-xpcc::SiemensS65Common<SPI, CS, RS, Reset>::lcdSettings() {
+xpcc::SiemensS65Common<SPI, CS, RS, Reset>::lcdSettings(bool landscape) {
 	// Hardware reset is low from initialize
 	xpcc::delay_ms(50);
 	Reset::set();
@@ -140,11 +140,14 @@ xpcc::SiemensS65Common<SPI, CS, RS, Reset>::lcdSettings() {
 	xpcc::delay_ms(100);
 
 	//display options
-#if defined(S65_MIRROR)
-	writeCmd(0x05, 0x0008); //Entry mode --
-#else
-	writeCmd(0x05, 0x0038); //Entry mode ++
-#endif
+	if (landscape) {
+		writeCmd(0x05, 0x0030); //Entry mode AM=0, ID0=1, ID1=1
+	}
+	else {
+		// portrait mode
+		writeCmd(0x05, 0x0038); //Entry mode AM=1, ID0=1, ID1=1
+	}
+
 	//setArea(0, 0, (S65_WIDTH-1), (S65_HEIGHT-1));
 	//  writeCmd(0x16, 176<<8); //set y
 	//  writeCmd(0x17, 132<<8); //set x
@@ -219,8 +222,8 @@ xpcc::SiemensS65Portrait<SPI, CS, RS, Reset>::update() {
 	const uint16_t maskBlank  = 0x0000; // RRRR RGGG GGGB BBBB
 	const uint16_t maskFilled = 0x37e0; // RRRR RGGG GGGB BBBB
 
-	const uint8_t width = this->getWidth();
-	const uint8_t height = this->getHeight()/8;
+	const uint8_t width = 136; // this->getWidth();
+	const uint8_t height = 176 / 8; // this->getHeight()/8;
 
 #if S65_LPC_ACCELERATED > 0
 	/**
@@ -304,4 +307,103 @@ xpcc::SiemensS65Portrait<SPI, CS, RS, Reset>::update() {
 template <typename SPI, typename CS, typename RS, typename Reset>
 void
 xpcc::SiemensS65Landscape<SPI, CS, RS, Reset>::update() {
+	// Set CGRAM Address to 0 = upper left corner
+	SiemensS65Common<SPI, CS, RS, Reset>::writeCmd(0x21, 0x0000);
+
+	// Set instruction register to "RAM Data write"
+	SiemensS65Common<SPI, CS, RS, Reset>::writeReg(0x22);
+
+	// WRITE MEMORY
+	CS::reset();
+	SPI::write(0x76);	// start byte
+
+	const uint16_t maskBlank  = 0x0000; // RRRR RGGG GGGB BBBB
+	const uint16_t maskFilled = 0x37e0; // RRRR RGGG GGGB BBBB
+
+	// size of the XPCC Display buffer, not the hardware pixels
+	const uint8_t width = 176;
+	const uint8_t height = 136 / 8; // Display is only 132 pixels high.
+
+#if S65_LPC_ACCELERATED > 0
+	// See SiemensS65Portrait for a description
+
+	// switch to 16 bit mode, wait for empty FIFO before
+	while (!(LPC_SSP0->SR & SPI_SRn_TFE));
+	LPC_SSP0->CR0 |= 0x0f;
+
+	for (uint8_t x = 0; x < width; ++x)
+	{
+		for (uint8_t y = 0; y < height; ++y)
+		{
+			// group of 8 black-and-white pixels
+			uint8_t group = this->buffer[x][y];
+
+			// 8 pixels of 16 bits fit in the Tx FIFO if it is empty.
+			while (!(LPC_SSP0->SR & SPI_SRn_TFE));
+
+			// Only 4 pixels at the lower end of the display in landscape mode
+			uint8_t pixels = (y == (height - 1)) ? 4 : 8;
+
+			for (uint8_t pix = 0; pix < pixels; ++pix, group >>= 1) {
+				LPC_SSP0->DR = (group & 1) ? maskFilled : maskBlank;
+			} // pix
+		} // y
+	} // x
+
+	// switch back to 8 bit transfer, wait for empty FIFO before.
+	while (!(LPC_SSP0->SR & SPI_SRn_TFE));
+	LPC_SSP0->CR0 &= ~0xff;
+	LPC_SSP0->CR0 |=  0x07;
+
+#else
+	// ----- Normal version with SPI buffer
+	const uint8_t fill_h = maskFilled >> 8;
+	const uint8_t fill_l = maskFilled & 0xff;
+
+	const uint8_t blank_h = maskBlank >> 8;
+	const uint8_t blank_l = maskBlank & 0xff;
+
+	for (uint8_t x = 0; x < width; ++x)
+	{
+		for (uint8_t y = 0; y < height; ++y)
+		{
+			// group of 8 black-and-white pixels
+			uint8_t group = this->buffer[x][y];
+
+			uint8_t spiBuffer[16];
+			uint8_t bufSize = 16;
+			uint_fast8_t spiIdx = 0;
+
+			// Only 4 pixels at the lower end of the display in landscape mode
+			uint8_t pixels;
+			if (y == (height - 1)) {
+				// The last pixels
+				pixels = 4;
+				bufSize = 8;
+			}
+			else {
+				pixels = 8;
+			}
+
+			for (uint8_t pix = 0; pix < pixels; ++pix, group >>= 1) {
+				if (group & 1)
+				{
+					spiBuffer[spiIdx++] = fill_h;
+					spiBuffer[spiIdx++] = fill_l;
+				}
+				else
+				{
+					spiBuffer[spiIdx++] = blank_h;
+					spiBuffer[spiIdx++] = blank_l;
+				}
+			} // pix
+
+			// use transfer() of SPI to transfer spiBuffer
+			SPI::setBuffer(bufSize, spiBuffer);
+			SPI::transfer(SPI::TRANSFER_SEND_BUFFER_DISCARD_RECEIVE);
+		} // y
+	} // x
+#endif
+
+	CS::set();
 }
