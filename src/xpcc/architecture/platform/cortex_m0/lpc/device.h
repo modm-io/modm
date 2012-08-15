@@ -1,11 +1,11 @@
 // coding: utf-8
 // ----------------------------------------------------------------------------
-/* Copyright (c) 2012, Roboterclub Aachen e.V.
+/* Copyright (c) 2011, Roboterclub Aachen e.V.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -28,19 +28,28 @@
  */
 // ----------------------------------------------------------------------------
 
-#include "uart_base.hpp"
-#include "lpc11_uart_registers.hpp"
+#ifndef LPC11__DEVICE_H
+#define LPC11__DEVICE_H
 
-#include "../device.h"
+/**
+ * Reduce compile dependencies for the hardware drivers.
+ * Do not include <xpcc/architecture.hpp> to avoid recompiling the whole set
+ * of drivers if anything unrelated changed.
+ */
 
-void
-xpcc::lpc::UartBase::setBaudrate(uint32_t baudrate)
-{
-	LPC_UART->LCR = LCR_DLAB;             /* DLAB = 1 */
-	uint32_t regVal = LPC_SYSCON->UARTCLKDIV;
-	uint32_t   Fdiv = (((SystemCoreClock * LPC_SYSCON->SYSAHBCLKDIV)/regVal)/16)/baudrate ;	/*baud rate */
-	LPC_UART->DLM = Fdiv >>    8;
-	LPC_UART->DLL = Fdiv  & 0xff;
+#if !defined(__ARM_LPC11XX__) && !defined(__ARM_LPC11CXX__)
+#	error "Please select the target LPCxxxx device used in your application (in the lpc11xx.hpp file)"
+#endif
 
-	LPC_UART->LCR = LCR_WLS_8_BIT;		/* 8 bits, no Parity, 1 Stop bit, DLAB = 0 */
-}
+#if defined(__ARM_LPC11XX__) || defined(__ARM_LPC11CXX__)
+#	include "lpc11xx.hpp"
+#endif
+
+// Doxygen hierarchy
+
+/**
+ * \defgroup	lpc11		LPC11xx
+ * \ingroup		lpc
+ */
+
+#endif // LPC11__DEVICE_H

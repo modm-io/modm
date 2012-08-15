@@ -31,6 +31,12 @@
 #ifndef STM32__DEVICE_H
 #define STM32__DEVICE_H
 
+/**
+ * Reduce compile dependencies for the hardware drivers.
+ * Do not include <xpcc/architecture.hpp> to avoid recompiling the whole set
+ * of drivers if anything unrelated changed.
+ */
+
 #if !defined(STM32F4XX) && !defined(STM32F2XX) && \
 	!defined(STM32F10X_CL) && \
 	!defined(STM32F10X_LD) && !defined(STM32F10X_MD) && !defined(STM32F10X_HD) && !defined(STM32F10X_XL) && \

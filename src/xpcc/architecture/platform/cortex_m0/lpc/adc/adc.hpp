@@ -1,7 +1,7 @@
 #ifndef XPCC_LPC111X__ADC_HPP
 #define XPCC_LPC111X__ADC_HPP
 
-#include <xpcc/architecture.hpp>
+#include "../device.h"
 
 /* ---------- ADC Data Register bit names --------------------*/
 #define ADC_GDR_DONE (1 << 31)

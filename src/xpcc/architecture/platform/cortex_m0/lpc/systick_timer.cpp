@@ -32,8 +32,7 @@
 #include <xpcc/architecture/driver/clock.hpp>
 #include <xpcc/utils/dummy.hpp>
 
-#include <xpcc/architecture.hpp>
-//#include "device.h"  // TODO@Fabian: Why using an extra file and not rely on xpcc/architecture?
+#include "device.h"
 #include "systick_timer.hpp"
 
 static xpcc::lpc11::InterruptHandler sysTickHandler = &xpcc::dummy;
