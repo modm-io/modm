@@ -29,7 +29,7 @@
 # 
 # DESCRIPTION
 # 
-# This is a tool to compile programs for ARM7 and Cortex-M3 microcontrollers.
+# This is a tool to compile programs for ARM7, Cortex-M0 and Cortex-M3 microcontrollers.
 
 import os
 from SCons.Script import *
