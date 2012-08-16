@@ -34,7 +34,6 @@ Hardware::initialize()
 	button::Down::setInput(xpcc::lpc::InputType::PULLUP);
 
 	ssd::Spi::configurePins(ssd::Spi::MappingSck::PIO2_1);
-//	ssd::Spi::configurePins(ssd::Spi::MappingSck::PIO0_6);
 	ssd::Spi::initialize();
 
 	led::DuoGreen::set();
@@ -57,6 +56,10 @@ Hardware::initialize()
 
 	can::Can::initialize(xpcc::can::BITRATE_125_KBPS);
 
+	servo::EnA::setOutput(0);
+	servo::EnB::setOutput(0);
+	servo::PwmA::setOutput(0);
+	servo::PwmB::setOutput(0);
 }
 
 // ----------------------------------------------------------------------------

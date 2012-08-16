@@ -40,6 +40,8 @@ namespace spi
 	GPIO__INPUT (Miso, 2, 2);
 }
 
+// ----------------------------------------------------------------------------
+
 namespace ssd
 {
 	// Seven-segment displays, the first bit is the most right display
@@ -57,6 +59,8 @@ namespace ssd
 	typedef xpcc::sevenSegment::SevenSegmentDisplay<Spi, Load, 4> Ssd;
 }
 
+// ----------------------------------------------------------------------------
+
 namespace can
 {
 	// CAN Controller
@@ -64,12 +68,14 @@ namespace can
 }
 #endif	// CONFIG_HPP
 
+// ----------------------------------------------------------------------------
+
 namespace adc
 {
 	// BATTERY	PIO0.11	AD0
 	// CURRENT	PIO1.0	AD1
 	// --				AD2
-	// POSITION	PIO1.2	AD3
+	// POSITION	PIO1.2	AD3 (Servo)
 	// --		SWD		AD4
 	// POTI		PIO1.4	AD5
 	// BEMF_A	PIO1.10	AD6
@@ -77,4 +83,14 @@ namespace adc
 
 //	typedef xpcc::lpc111x::AdcManualSingle Adc;
 	typedef xpcc::lpc111x::AdcAutomaticBurst Adc;
+}
+
+// ----------------------------------------------------------------------------
+
+namespace servo
+{
+	GPIO__OUTPUT(EnA,  2, 11);
+	GPIO__OUTPUT(EnB,  0,  2);
+	GPIO__OUTPUT(PwmA, 0,  8);
+	GPIO__OUTPUT(PwmB, 0,  9);
 }

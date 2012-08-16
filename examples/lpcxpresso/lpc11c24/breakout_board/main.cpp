@@ -50,6 +50,25 @@ main(void)
 			led::DuoGreen::set(button::Down::read());
 		}
 
+		if (button::Up::read() & !button::Down::read()) {
+			servo::EnA::set();
+			servo::PwmB::set();
+		}
+		else {
+			servo::EnA::reset();
+			servo::PwmB::reset();
+		}
+
+		if (!button::Up::read() & button::Down::read()) {
+			servo::EnB::set();
+			servo::PwmA::set();
+		}
+		else {
+			servo::EnB::reset();
+			servo::PwmA::reset();
+		}
+
+
 		// Check TimeTick to see whether to set or clear the LED I/O pin
 		if ((timer32_0_counter % (LED_TOGGLE_TICKS / COUNT_MAX)) < ((LED_TOGGLE_TICKS / COUNT_MAX) / 2)) {
 			led::Onboard::reset();
