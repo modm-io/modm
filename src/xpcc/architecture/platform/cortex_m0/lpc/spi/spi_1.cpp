@@ -199,7 +199,7 @@ xpcc::lpc::SpiMaster1::write(uint8_t data)
 	LPC_SSP1->DR = data;
 	
 	/* Wait until data is received */
-	while (!LPC_SSP1->SR & SPI_SRn_RNE);
+	while (LPC_SSP1->SR & SPI_SRn_BSY);
 	
 	return LPC_SSP1->DR;
 }

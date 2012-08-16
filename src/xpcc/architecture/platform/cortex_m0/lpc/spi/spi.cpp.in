@@ -232,7 +232,7 @@ xpcc::lpc::SpiMaster{{ id }}::write(uint8_t data)
 	LPC_SSP{{ id }}->DR = data;
 	
 	/* Wait until data is received */
-	while (!LPC_SSP{{ id }}->SR & SPI_SRn_RNE);
+	while (LPC_SSP{{ id }}->SR & SPI_SRn_BSY);
 	
 	return LPC_SSP{{ id }}->DR;
 }
