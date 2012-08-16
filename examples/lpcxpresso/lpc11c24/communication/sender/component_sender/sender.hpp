@@ -59,7 +59,8 @@ namespace component
 				const robot::packet::Position *parameter);
 		
 		xpcc::ResponseCallback positionCallback;
-		xpcc::PeriodicTimer<> timer;
+		xpcc::PeriodicTimer<> actionTimer;
+		xpcc::PeriodicTimer<> eventTimer;
 
 		uint16_t position;
 	};

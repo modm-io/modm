@@ -43,7 +43,8 @@
 component::Sender::Sender(uint8_t id, xpcc::Dispatcher *communication) :
 	xpcc::AbstractComponent(id, communication),
 	positionCallback(this, &Sender::getPositionCallback),
-	timer(2000)
+	actionTimer(2000),
+	eventTimer(10)
 {
 }
 
@@ -72,7 +73,7 @@ component::Sender::getPositionCallback(const xpcc::Header&,
 void
 component::Sender::update()
 {
-	if (timer.isExpired())
+	if (actionTimer.isExpired())
 	{
 		XPCC_LOG_INFO << XPCC_FILE_INFO << "sender update" << xpcc::endl;
 		
@@ -87,7 +88,11 @@ component::Sender::update()
 				robot::component::RECEIVER,
 				robot::action::GET_POSITION,
 				positionCallback);
+	}
 
+	if (eventTimer.isExpired())
+	{
+		robot::packet::Position xpccPosition(position, 20);
 		this->publishEvent(robot::event::POSITION, xpccPosition);
 	}
 
