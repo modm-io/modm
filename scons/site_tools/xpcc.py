@@ -292,7 +292,7 @@ def generate(env, **kw):
 	env['XPCC_CONFIG_FILE'] = os.path.abspath(configfile)
 	env['XPCC_SYSTEM_BUILDER'] = os.path.join(rootpath, 'tools', 'system_design', 'builder')
 	
-	# tools which are used independent of the architecture
+	# tools which are used independently of the architecture
 	env.Tool('template')
 	env.Tool('unittest')
 	env.Tool('configfile')
