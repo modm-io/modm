@@ -40,7 +40,7 @@ class SortedDictionary(dict):
 		return self.__iter__()
 
 class SingleAssignDictionary(SortedDictionary):
-	""" A dictionary which don't allow overwritting attributes after
+	""" A dictionary which don't allow overwriting attributes after
 	the initial creation.
 	"""
 	def __init__(self,  name):
