@@ -14,8 +14,6 @@ import event
 import component
 import container
 
-__version__ = "$Id$"
-
 #logging.basicConfig(level=logging.DEBUG)
 logging.basicConfig(level=logging.WARNING)
 

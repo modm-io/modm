@@ -26,8 +26,6 @@
 # ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-# 
-# $Id$
 # -----------------------------------------------------------------------------
 
 import os
@@ -93,8 +91,6 @@ def toBufferMethodStructAccess(element, name=None):
 
 # -----------------------------------------------------------------------------
 class JavaPacketsBuilder(builder_base.Builder):
-	
-	VERSION = "$Id$"
 	
 	def setup(self, optparser):
 		optparser.add_option(
