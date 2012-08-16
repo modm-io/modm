@@ -20,9 +20,9 @@
 
 namespace lcd
 {
-	GPIO__OUTPUT(Rs,    1,  7);
+	GPIO__OUTPUT(Rs,    2,  1);
 	GPIO__OUTPUT(Reset, 2,  0);
-	GPIO__OUTPUT(Cs,    2, 11);
+	GPIO__OUTPUT(Cs,    2,  2);
 //	GPIO__OUTPUT(Backlight, F, 0);
 }
 

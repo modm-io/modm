@@ -55,6 +55,8 @@ MAIN_FUNCTION
 	device.initialize(xpcc::can::BITRATE_125_KBPS);
 //	device.setFilter(xpcc::accessor::asFlash(canFilter));
 	
+	component::sender.initialize();
+
 	XPCC_LOG_INFO << "Welcome to the communication test at Sender!" << xpcc::endl;
 	
 	while (1)

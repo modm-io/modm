@@ -31,9 +31,22 @@
 #ifndef COMPONENT__RECEIVER_HPP
 #define COMPONENT__RECEIVER_HPP
 
+#include <xpcc/architecture.hpp>
 #include <xpcc/communication/abstract_component.hpp>
+#include <xpcc/workflow/periodic_timer.hpp>
 
 #include "communication/packets.hpp"
+
+#include <xpcc/driver/ui/display/siemens_s65.hpp>
+
+namespace lcd
+{
+	GPIO__OUTPUT(Rs,    2,  1);
+	GPIO__OUTPUT(Reset, 2,  0);
+	GPIO__OUTPUT(Cs,    2,  2);
+}
+typedef xpcc::lpc::SpiMaster0 SpiDisplay;
+typedef xpcc::SiemensS65Landscape<SpiDisplay, lcd::Cs, lcd::Rs, lcd::Reset> Display;
 
 namespace component
 {
@@ -42,6 +55,9 @@ namespace component
 	public:
 		Receiver(uint8_t id, xpcc::Dispatcher *communication);
 		
+		void
+		initialize();
+
 		void
 		eventPosition(
 				const xpcc::Header & header,
@@ -59,6 +75,7 @@ namespace component
 		
 	private:
 		robot::packet::Position position;
+		xpcc::PeriodicTimer<> displayTimer;
 	};
 }
 

@@ -49,6 +49,17 @@ component::Sender::Sender(uint8_t id, xpcc::Dispatcher *communication) :
 
 // ----------------------------------------------------------------------------
 void
+component::Sender::initialize()
+{
+	uint8_t mask = static_cast<uint8_t>(Adc::ChannelMask::PIO1_4);
+
+	Adc::configurePins(mask);
+	Adc::initialize();
+	Adc::startConversion(mask);
+}
+
+// ----------------------------------------------------------------------------
+void
 component::Sender::getPositionCallback(const xpcc::Header&,
 		const robot::packet::Position *parameter)
 {
@@ -65,18 +76,25 @@ component::Sender::update()
 	{
 		XPCC_LOG_INFO << XPCC_FILE_INFO << "sender update" << xpcc::endl;
 		
-		robot::packet::Position position(10, 20);
+		robot::packet::Position xpccPosition(position, 20);
 		
 		this->callAction(
 				robot::component::RECEIVER,
 				robot::action::SET_POSITION,
-				position);
+				xpccPosition);
 		
 		this->callAction(
 				robot::component::RECEIVER,
 				robot::action::GET_POSITION,
 				positionCallback);
 
-		this->publishEvent(robot::event::POSITION, position);
+		this->publishEvent(robot::event::POSITION, xpccPosition);
 	}
+
+	uint16_t val;
+	if (Adc::read(val, Adc::Channel::PIO1_4)) {
+		position = val;
+	}
+
+
 }

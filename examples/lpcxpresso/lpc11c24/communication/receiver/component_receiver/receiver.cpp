@@ -36,10 +36,27 @@
 
 #include "receiver.hpp"
 
+Display display;
+
 // ----------------------------------------------------------------------------
 component::Receiver::Receiver(uint8_t id, xpcc::Dispatcher *communication) :
-	xpcc::AbstractComponent(id, communication)
+	xpcc::AbstractComponent(id, communication),
+	displayTimer(100)
 {
+}
+
+void
+component::Receiver::initialize()
+{
+	SpiDisplay::configurePins(SpiDisplay::MappingSck::PIO0_6);
+	SpiDisplay::initialize(SpiDisplay::Mode::MODE_0, SpiDisplay::Presacler::DIV002, 0);
+
+	display.initialize();
+	display.setFont(xpcc::font::Assertion);
+	display.clear();
+	display.setCursor(5, 5);
+	display << "Communication Demo" << xpcc::endl;
+	display.update();
 }
 
 // ----------------------------------------------------------------------------
@@ -51,6 +68,7 @@ component::Receiver::actionSetPosition(const xpcc::ResponseHandle&,
 			<< "action set position: x=" << parameter->x
 			<< ", y=" << parameter->y << xpcc::endl;
 	
+	// Store parameter locally
 	position = *parameter;
 }
 
@@ -72,10 +90,27 @@ component::Receiver::eventPosition(
 	XPCC_LOG_INFO << XPCC_FILE_INFO
 			<< "event position: x=" << parameter->x
 			<< ", y=" << parameter->y << xpcc::endl;
+
+	// Store parameter locally
+	position = *parameter;
 }
 
 // ----------------------------------------------------------------------------
 void
 component::Receiver::update()
 {
+	if (displayTimer.isExpired())
+	{
+		static uint32_t ctr = 0;
+
+		display.clear();
+		display.setCursor(5, 5);
+		display << "Communication Demo" << xpcc::endl;
+		display << "x=" << position.x
+				<< ", y=" << position.y << ", ctr=" << ctr << xpcc::endl;
+
+		++ctr;
+
+		display.update();
+	}
 }

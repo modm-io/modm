@@ -31,10 +31,14 @@
 #ifndef COMPONENT__SENDER_HPP
 #define COMPONENT__SENDER_HPP
 
+#include <xpcc/architecture.hpp>
+
 #include <xpcc/communication/abstract_component.hpp>
 #include <xpcc/workflow/periodic_timer.hpp>
 
 #include "communication/packets.hpp"
+
+typedef xpcc::lpc111x::AdcAutomaticBurst Adc;
 
 namespace component
 {
@@ -43,6 +47,9 @@ namespace component
 	public:
 		Sender(uint8_t id, xpcc::Dispatcher *communication);
 		
+		void
+		initialize();
+
 		void
 		update();
 		
@@ -53,6 +60,8 @@ namespace component
 		
 		xpcc::ResponseCallback positionCallback;
 		xpcc::PeriodicTimer<> timer;
+
+		uint16_t position;
 	};
 }
 
