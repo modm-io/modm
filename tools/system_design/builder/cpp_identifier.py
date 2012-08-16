@@ -33,6 +33,8 @@ import builder_base
 
 class IdentifierBuilder(builder_base.Builder):
 	
+	VERSION = "0.1"
+	
 	def generate(self):
 		# check the commandline options
 		if not self.options.outpath:
