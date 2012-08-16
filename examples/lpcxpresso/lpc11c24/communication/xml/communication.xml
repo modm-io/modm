@@ -24,15 +24,39 @@
 	<element name="y" type="int16_t" unit="mm" />
 </struct>
 
+<event name="position" type="position" id="0x02" >
+	<description>
+	</description>
+</event>
+
 <component name="sender" id="0x01">
-	
+	<description>
+	</description>
+	<actions>
+	</actions>
+	<events>
+		<publish>
+			<event name="position" />
+		</publish>
+		<subscribe>
+		</subscribe>
+	</events>
 </component>
 
 <component name="receiver" id="0x02">
+	<description>
+	</description>
 	<actions>
 		<action name="set position" id="0x01" parameterType="position" />
 		<action name="get position" id="0x02" returnType="position" />
 	</actions>
+	<events>
+		<publish>
+		</publish>
+		<subscribe>
+			<event name="position" />
+		</subscribe>
+	</events>
 </component>
 
 

@@ -45,6 +45,11 @@ namespace component
 		Receiver(uint8_t id, xpcc::Dispatcher *communication);
 		
 		void
+		eventPosition(
+				const xpcc::Header & header,
+				const robot::packet::Position * parameter);
+
+		void
 		actionSetPosition(const xpcc::ResponseHandle& handle,
 				const robot::packet::Position *parameter);
 		

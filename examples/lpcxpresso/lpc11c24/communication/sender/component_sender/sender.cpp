@@ -78,5 +78,7 @@ component::Sender::update()
 				robot::component::RECEIVER,
 				robot::action::GET_POSITION,
 				positionCallback);
+
+		this->publishEvent(robot::event::POSITION, position);
 	}
 }

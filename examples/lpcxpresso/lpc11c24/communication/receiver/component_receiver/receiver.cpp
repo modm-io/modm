@@ -67,6 +67,17 @@ component::Receiver::actionGetPosition(const xpcc::ResponseHandle& handle)
 
 // ----------------------------------------------------------------------------
 void
+component::Receiver::eventPosition(
+		const xpcc::Header & header,
+		const robot::packet::Position *parameter)
+{
+	XPCC_LOG_INFO << XPCC_FILE_INFO
+			<< "event position: x=" << parameter->x
+			<< ", y=" << parameter->y << xpcc::endl;
+}
+
+// ----------------------------------------------------------------------------
+void
 component::Receiver::update()
 {
 }
