@@ -1,0 +1,5 @@
+#ifndef XPCC_LPC11__TIMER_16_0_HPP
+#define XPCC_LPC11__TIMER_16_0_HPP
+
+
+#endif // XPCC_LPC11__TIMER_16_0_HPP
