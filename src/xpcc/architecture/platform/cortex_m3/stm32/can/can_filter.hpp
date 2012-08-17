@@ -185,7 +185,7 @@ namespace xpcc
 			
 		public:
 			/**
-			 * Generate a identifier for the Dual Filter mode from an extended
+			 * Generate an identifier for the Dual Filter mode from an extended
 			 * (29-bit) identifier.
 			 * 
 			 * @warning	Uses only the upper 14-bit of the 29-bit identifier!
@@ -204,7 +204,7 @@ namespace xpcc
 			};
 			
 			/**
-			 * Generates a mask for an 29-bit identifier.
+			 * Generates a mask for a 29-bit identifier.
 			 * 
 			 * @warning	Uses only the upper 14-bit of the 29-bit mask!
 			 * 			The lower 15-bit will be don't care! 
@@ -231,7 +231,7 @@ namespace xpcc
 			};
 			
 			/**
-			 * Generate a identifier for the Dual Filter mode from a standard
+			 * Generate an identifier for the Dual Filter mode from a standard
 			 * (11-bit) identifier.
 			 */
 			struct StandardIdentifierShort : public IdentifierShort
