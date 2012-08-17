@@ -70,6 +70,7 @@
 // The C_CAN block is available in LPC11Cxx parts only (LPC11C00 series).
 #if defined(__ARM_LPC11CXX__)
 #include "c_can/c_can.hpp"
+#include "c_can/c_can_filter.hpp"
 #endif
 
 // Chapter 18: LPC1100/LPC1100C/LPC1100L series 16-bit counter/timer CT16B0/1

@@ -63,7 +63,28 @@ MAIN_FUNCTION
 
 	// Configure CAN device and set the filters
 	device.initialize(xpcc::can::BITRATE_125_KBPS);
-//	device.setFilter(xpcc::accessor::asFlash(canFilter));
+
+	// FIFO of 4 MOBs (0 to 3) for extended messages with XPCC destination RECEIVER
+
+	xpcc::lpc11c::CanFilter::setFilter(
+			xpcc::lpc11c::CanFilter::ExtendedIdentifier(
+					XPCC_CAN_PACKET_DESTINATION(robot::component::RECEIVER),
+					xpcc::lpc11c::CanFilter::NO_RTR),
+			xpcc::lpc11c::CanFilter::ExtendedFilterMask(
+					XPCC_CAN_PACKET_DESTINATION_MASK,
+					xpcc::lpc11c::CanFilter::RTR_MATCH),
+			0, 4);
+
+	// FIFO of 8 MOBs (4 to 11) for extended messages for XPCC events.
+	xpcc::lpc11c::CanFilter::setFilter(
+			xpcc::lpc11c::CanFilter::ExtendedIdentifier(
+					XPCC_CAN_PACKET_EVENT,
+					xpcc::lpc11c::CanFilter::NO_RTR),
+			xpcc::lpc11c::CanFilter::ExtendedFilterMask(
+					XPCC_CAN_PACKET_DESTINATION_MASK,
+					xpcc::lpc11c::CanFilter::RTR_MATCH),
+			4, 8);
+
 	
 	component::receiver.initialize();
 

@@ -169,69 +169,8 @@ xpcc::lpc::Can::initialize(can::Bitrate bitrate)
 	(*rom)->pCAND->config_calb(&callbacks);
 
 
-	// Use Message Objects 1 to 16 for reception
-
-	// With the on-chip drivers it is not possible to set up a FIFO.
-	// So configure the receive message objects manually.
-
-	//#define ID_EXT_MASK 0x1FFFFFFF
-	#define ID_EXT_MASK 0x0
-	#define RX_EXT_MSG_ID 0x00
-
-	for (uint8_t ii = 0; ii < 16; ++ii) {
-		// What to write
-		LPC_CAN->IF1_CMDMSK =
-				CAN_IFn_CMDMSK_WR |
-				CAN_IFn_CMDMSK_MASK |
-				CAN_IFn_CMDMSK_ARB |
-				CAN_IFn_CMDMSK_CTRL |
-				CAN_IFn_CMDMSK_DATAA |
-				CAN_IFn_CMDMSK_DATAB;
-
-		// Mask
-		LPC_CAN->IF1_MSK1 = ID_EXT_MASK & 0xFFFF;
-		LPC_CAN->IF1_MSK2 = CAN_IFn_MSK2_MXTD | (ID_EXT_MASK >> 16);
-
-		// Arbitration
-		LPC_CAN->IF1_ARB1 = (RX_EXT_MSG_ID) & 0xFFFF;
-		LPC_CAN->IF1_ARB2 = CAN_IFn_ARB2_MSGVAL | CAN_IFn_ARB2_XTD | ((RX_EXT_MSG_ID) >> 16);
-
-		if (ii == 15 ) {
-			// End of FIFO block
-			LPC_CAN->IF1_MCTRL =
-					CAN_IFn_MCTRL_UMASK |
-					CAN_IFn_MCTRL_RXIE |
-					CAN_IFn_MCTRL_EOB |
-					CAN_IFn_MCTRL_DLC_MAX;
-		}
-		else {
-			LPC_CAN->IF1_MCTRL =
-					CAN_IFn_MCTRL_UMASK |
-					CAN_IFn_MCTRL_RXIE |
-					CAN_IFn_MCTRL_DLC_MAX;
-		}
-
-		LPC_CAN->IF1_DA1 = 0x0000;
-		LPC_CAN->IF1_DA2 = 0x0000;
-		LPC_CAN->IF1_DB1 = 0x0000;
-		LPC_CAN->IF1_DB2 = 0x0000;
-
-		// Transfer data to message RAM
-		LPC_CAN->IF1_CMDREQ = ii + 1;
-		while( LPC_CAN->IF1_CMDREQ & CAN_IFn_CMDREQ_BUSY );
-	}
-
-	// NXP's data structure for CAN messages
-	//	CAN_MSG_OBJ msg_obj;
-
-	//	for (uint8_t ii = 0; ii < 16; ++ii)
-	//	{
-	//		msg_obj.msgobj = ii;
-	//		msg_obj.mode_id = 0x1FFFFFFF | CAN_MSGOBJ_EXT; // Receive all extended frames
-	//		msg_obj.mask = 0x00; // get all extended frames.
-	//		// Configure
-	//		(*rom)->pCAND->config_rxmsgobj(&msg_obj);
-	//	}
+	// Use only Message Objects 1 to 16 for reception.
+	// use setFilter of CanFilter to setup message reception.
 
 	/* Always enable the CAN Interrupt. */
 	NVIC_EnableIRQ(CAN_IRQn);
@@ -299,10 +238,10 @@ xpcc::lpc::Can::CAN_tx(uint8_t /* msg_obj_num */)
  * Called on the interrupt level by the CAN interrupt handler when
  * a new message has been successfully received.
  */
+#if LPC11C_CAN_RX_BUFFER_SIZE > 0
 void
 xpcc::lpc::Can::CAN_rx(uint8_t msg_obj_num)
 {
-#if LPC11C_CAN_RX_BUFFER_SIZE > 0
 	// Move received message to queue if possible
 
 	if (!rxQueue.isFull()) {
@@ -324,8 +263,13 @@ xpcc::lpc::Can::CAN_rx(uint8_t msg_obj_num)
 		return;
 	}
 
-#endif
 }
+#else
+void
+xpcc::lpc::Can::CAN_rx(uint8_t /* msg_obj_num */)
+{
+}
+#endif
 
 // ----------------------------------------------------------------------------
 
