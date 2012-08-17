@@ -111,8 +111,6 @@ readMessageObject(xpcc::can::Message & message, uint8_t messageObjectId)
 bool
 xpcc::lpc::Can::initialize(can::Bitrate bitrate)
 {
-	// TODO variable baud rate configuration
-
 	/**
 	 * MAIN_CLOCK / SYSAHBCLKDIV should be 48 MHz.
 	 *
@@ -256,7 +254,8 @@ xpcc::lpc::Can::CAN_tx(uint8_t /* msg_obj_num */)
 #if LPC11C_CAN_TX_BUFFER_SIZE > 0
 	// Send next from queue, if available
 
-	if ((LPC_CAN->TXREQ2 & 0x0000ffff) == 0x0000) {
+	// MOBs 16 to 32 are in TXREQ2, at the *lower* bits
+	if ((LPC_CAN->TXREQ2 & 0xffff) == 0x0000) {
 		// All message objects empty. Otherwise the order of messages
 		// is not maintained
 
@@ -267,7 +266,7 @@ xpcc::lpc::Can::CAN_tx(uint8_t /* msg_obj_num */)
 			/* At least one Message Object is free, find first empty
 			 * transmit Message Object from bitmask and use this
 			 * Message Object to send message. */
-			uint8_t firstZero = ffs(~(LPC_CAN->TXREQ2 & 0x0000ffff));
+			uint8_t firstZero = ffs(~(LPC_CAN->TXREQ2 & 0xffff));
 
 			if (firstZero == 17) {
 				// no empty message object found
@@ -358,7 +357,7 @@ xpcc::lpc::Can::sendMessage(const can::Message & message)
 	// Find a free Message Object for sending.
 	// If none found push to queue if available
 
-	uint8_t firstZero = ffs(~(LPC_CAN->TXREQ2 & 0x0000ffff));
+	uint8_t firstZero = ffs(~(LPC_CAN->TXREQ2 & 0xffff));
 
 	if (firstZero == 17)
 	{
@@ -412,8 +411,8 @@ xpcc::lpc::Can::getMessage(can::Message & message)
 		// Happens if an interrupt was missed or the rxQueue got full
 		// temporarily and messages were stored in the hardware FIFO
 		// See Rx Interrupt for further explanation.
-		while ((!rxQueue.isFull()) && (LPC_CAN->ND1 & 0x0000ffff)) {
-			uint8_t messageObjectId = ffs(LPC_CAN->ND1 & 0x0000ffff) - 1;
+		while ((!rxQueue.isFull()) && (LPC_CAN->ND1 & 0xffff)) {
+			uint8_t messageObjectId = ffs(LPC_CAN->ND1 & 0xffff) - 1;
 			xpcc::can::Message newMessage;
 			readMessageObject(newMessage, messageObjectId);
 			if (!rxQueue.push(newMessage)) {
@@ -424,10 +423,10 @@ xpcc::lpc::Can::getMessage(can::Message & message)
 	}
 #else
 	// No interrupts, polling
-	if (LPC_CAN->ND1 & 0x0000ffff)
+	if (LPC_CAN->ND1 & 0xffff)
 	{
 		// At least one Message Object has unread data.
-		uint8_t messageObject = ffs(LPC_CAN->ND1 & 0x0000ffff) - 1;
+		uint8_t messageObject = ffs(LPC_CAN->ND1 & 0xffff) - 1;
 		readMessageObject(message, messageObject);
 		return true;
 	} else {
@@ -447,7 +446,7 @@ xpcc::lpc::Can::isMessageAvailable()
 #else
 	/* Check if new data is available in the Message
 	 * Objects 1 to 16. */
-	return (LPC_CAN->ND1 & 0x0000ffff);
+	return (LPC_CAN->ND1 & 0xffff);
 #endif
 }
 
@@ -460,7 +459,8 @@ xpcc::lpc::Can::isReadyToSend()
 	return !txQueue.isFull();
 #else
 	/* Check if at least one Message Object 17 to 32
-	 * is not pending. If it is not pending it is free. */
-	return ( ~(LPC_CAN->TXREQ2 & 0xffff0000) );
+	 * is not pending. If not all are pending at least
+	 * one is free. */
+	return ( (LPC_CAN->TXREQ2 & 0xffff) != 0xffff );
 #endif
 }
