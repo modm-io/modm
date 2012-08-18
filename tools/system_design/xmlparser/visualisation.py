@@ -29,6 +29,9 @@ def get_component_width(component):
 def get_container_width(container):
     width = 0
     for component in container.components:
+        # include actions from abstract component
+        component = component.flattened()
+
         width = width + get_component_width(component) + 0.1
     
     return width
@@ -114,6 +117,9 @@ if __name__ == "__main__":
         if container.name in skipList:
             continue
         for component in container.components:
+            # include actions from abstract component
+            component = component.flattened()
+            
             for event in component.events.publish:
                 # add only once
                 if not (event in eventsSorted):
@@ -140,6 +146,9 @@ if __name__ == "__main__":
     for event in tree.events:
         sourceless = True
         for component in tree.components:
+            # include actions from abstract component
+            component = component.flattened()
+
             if component.name in skipList:
                 continue
             for event_cmp in component.events.publish:
@@ -154,6 +163,9 @@ if __name__ == "__main__":
     for event in tree.events:
         sinkless = True
         for component in tree.components:
+            # include actions from abstract component
+            component = component.flattened()
+
             if component.name in skipList:
                 continue
             for event_cmp in component.events.subscribe:
@@ -195,6 +207,9 @@ if __name__ == "__main__":
         
         
         for component in container.components:
+            # include actions from abstract component
+            component = component.flattened()
+            
             print "  ", component
                         
             A = text.text(component_x + get_component_width(component)/2 + 0.1, 9.8, r"\bf %s" % component, textattrs)
