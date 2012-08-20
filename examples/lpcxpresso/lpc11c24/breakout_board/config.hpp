@@ -66,7 +66,6 @@ namespace can
 	// CAN Controller
 	typedef xpcc::lpc::Can Can;
 }
-#endif	// CONFIG_HPP
 
 // ----------------------------------------------------------------------------
 
@@ -81,11 +80,8 @@ namespace adc
 	// BEMF_A	PIO1.10	AD6
 	// BEMF_B	PIO1.11	AD7
 
-//	typedef xpcc::lpc111x::AdcManualSingle Adc;
 	typedef xpcc::lpc111x::AdcAutomaticBurst Adc;
 }
-
-// ----------------------------------------------------------------------------
 
 namespace servo
 {
@@ -95,3 +91,10 @@ namespace servo
 	GPIO__OUTPUT(PwmA, 0,  8);
 	GPIO__OUTPUT(PwmB, 0,  9);
 }
+
+namespace usb
+{
+	typedef xpcc::lpc::Uart1 uart;
+}
+
+#endif	// CONFIG_HPP

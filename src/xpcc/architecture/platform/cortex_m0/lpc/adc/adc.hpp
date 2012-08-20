@@ -210,7 +210,7 @@ namespace xpcc {
 				  /* Enable AHB clock to the ADC. */
 				  LPC_SYSCON->SYSAHBCLKCTRL |= SYSAHBCLKCTRL_ADC;
 
-				  /* Set clock */
+				  /* Set clock: 48 MHz / (10 + 1) = 4.36 MHz < 4.5 MHz */
 				  LPC_ADC->CR = (10 << 8);
 			}
 
