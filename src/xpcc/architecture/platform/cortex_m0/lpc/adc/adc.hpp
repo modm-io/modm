@@ -305,6 +305,9 @@ namespace xpcc {
 
 			  /* Set clock and resolution */
 			  LPC_ADC->CR = (static_cast<uint32_t>(resolution)) | (10 << 8);
+
+			  /* Enable interrupts */
+			  NVIC_EnableIRQ(ADC_IRQn);
 			}
 
 			/**

@@ -89,6 +89,7 @@ namespace adc
 
 namespace servo
 {
+	typedef xpcc::lpc11::Timer16_0 pwmTimer;
 	GPIO__OUTPUT(EnA,  2, 11);
 	GPIO__OUTPUT(EnB,  0,  2);
 	GPIO__OUTPUT(PwmA, 0,  8);
