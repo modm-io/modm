@@ -141,5 +141,16 @@ ADC_IRQHandler(void) {
 
 		// Display Servo position
 //		ssd::Ssd::write(val);
+		uint8_t buf[10];
+		uint8_t len;
+		buf[0] = '#';
+		buf[1] = val >> 8;
+		buf[2] = val & 0xff;
+		len = 3;
+
+		static uint16_t d = 0;
+		if (++d == 0) {
+			usb::uart::write(buf[0]);
+		}
 	}
 }

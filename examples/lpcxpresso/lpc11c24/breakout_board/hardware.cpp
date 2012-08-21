@@ -59,6 +59,11 @@ Hardware::initialize()
 
 	can::Can::initialize(xpcc::can::BITRATE_125_KBPS);
 
+	usb::uart uart(1000000);
+	usb::uart::setBaudrate(1500000);
+	uint8_t str[] = "Hello!";
+	usb::uart::write(str, 12);
+
 	servo::EnA::setOutput(0);
 	servo::EnB::setOutput(0);
 	servo::PwmA::setOutput(0);
