@@ -1,10 +1,11 @@
 // coding: utf-8
 // ----------------------------------------------------------------------------
-/* Copyright (c) 2011, Roboterclub Aachen e.V.
+/* Copyright (c) 2012, Roboterclub Aachen e.V.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
+ * 
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -26,76 +27,88 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 // ----------------------------------------------------------------------------
+
+#ifndef XPCC__BLOCK_ALLOCATOR_HPP
+#define XPCC__BLOCK_ALLOCATOR_HPP
+
+#include <stdint.h>
+#include <cstddef>
+
+#include <xpcc/architecture/utils.hpp>
+#include <xpcc/utils/arithmetic_traits.hpp>
+
 /**
- * \file	cxxabi.cpp
- * \brief	Minimal C++ support, no exception handling, no RTTI
+ * Memory allocator.
  * 
- * \version	$Id: cxxabi.cpp 723 2012-02-07 14:45:54Z dergraaf $
+ * 
+ * \tparam	T
+ * 		TODO
+ * 
+ * \tparam	BLOCK_SIZE
+ * 		Size of one allocatable block in words (sizeof(T) bytes)
+ *		(BLOCKSIZE * sizeof(T) * n) - 4 has to be dividable by 4 for every n
+ * 
+ * \author	Fabian Greif
  */
-// ----------------------------------------------------------------------------
 
-#include <stdlib.h>                   // for prototypes of malloc() and free()
-
-extern "C"
+namespace xpcc
 {
-	// ------------------------------------------------------------------------
-	void* __dso_handle = (void *) &__dso_handle;
-	
-	void
-	__cxa_pure_virtual()
+	template <typename T, unsigned int BLOCK_SIZE >
+	class BlockAllocator
 	{
-		// put error handling here
-	}
-	
-	// ------------------------------------------------------------------------
-	__extension__ typedef int __guard __attribute__((mode (__DI__)));
-	
-	int
-	__cxa_guard_acquire(__guard *g)
-	{
-		return !*(char *)(g);
-	}
-	
-	void
-	__cxa_guard_release (__guard *g)
-	{
-		*(char *) g = 1;
-	}
-	
-	void
-	__cxa_guard_abort (__guard *)
-	{
-	}
-	
-	// ------------------------------------------------------------------------
-	int
-	__aeabi_atexit(void */*object*/, void (*/*destructor*/)(void *), void */*dso_handle*/)
-	{
-		return 0;
-	}
+		typedef typename xpcc::ArithmeticTraits<T>::SignedType SignedType;
+		
+	public:
+		/**
+		 * Initialize the raw memory.
+		 * 
+		 * Needs to called before any calls to allocate() or free(). Must
+		 * be called only once!
+		 * 
+		 * \param	heapStart
+		 * 		Needs to point to the first available byte
+		 * \param	heapEnd
+		 * 		Needs to point directly above the last available memory
+		 * 		position.
+		 */
+		ALWAYS_INLINE void
+		initialize(void * heapStart, void * heapEnd);
+		
+		/**
+		 * Allocate memory
+		 * 
+		 */
+		ALWAYS_INLINE void *
+		allocate(std::size_t requestedSize);
+		
+		/**
+		 * Free memory in O(1)
+		 * 
+		 * \param	ptr
+		 * 		Must be the same pointer previously acquired by
+		 * 		allocate().
+		 */
+		ALWAYS_INLINE void
+		free(void *ptr);
+		
+	public:
+		std::size_t
+		getAvailableSize() const;
+		
+	private:
+		// Align the pointer to a multiple of XPCC__ALIGNMENT
+		ALWAYS_INLINE T *
+		alignPointer(void * ptr) const;
+		
+		//static const int MAX_BLOCK_PARTS = 2048;
+		
+		T* start;
+		T* end;
+		
+		T* freeHint;
+	};
 }
 
-// ----------------------------------------------------------------------------
-void *
-operator new(size_t size) throw ()
-{
-	return malloc(size);
-}
+#include "block_allocator_impl.hpp"
 
-void *
-operator new[](size_t size) throw ()
-{
-	return malloc(size);
-}
-
-void
-operator delete(void *p) throw ()
-{
-	free(p);
-}
-
-void
-operator delete[](void* p) throw ()
-{
-	free(p);
-}
+#endif	// XPCC__BLOCK_ALLOCATOR_HPP
