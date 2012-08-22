@@ -37,5 +37,7 @@
 #include "display/hd44780.hpp"
 #include "display/st7036.hpp"
 
+#include "display/siemens_m55.hpp"
+
 #include "display/st7565.hpp"
 #include "display/font.hpp"
