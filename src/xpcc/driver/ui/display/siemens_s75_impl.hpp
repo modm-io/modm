@@ -147,33 +147,54 @@ xpcc::SiemensS75Common<PORT, CS, RS, WR, Reset>::lcdSettings(bool landscape) {
 	Reset::set();
 	xpcc::delay_ms(50);
 
-	writeCmd(0x00, 0x0001); //display off
+	writeCmd(0x00, 0x0001); // R00: Start oscillation
 	xpcc::delay_ms(10);
 
 	//power on sequence
-	writeCmd(0x10, 0x1f92);
-	writeCmd(0x11, 0x0014);
-	writeCmd(0x00, 0x0001);
-	writeCmd(0x10, 0x1f92);
-	writeCmd(0x11, 0x001c);
-	writeCmd(0x28, 0x0006);
-	writeCmd(0x02, 0x0000);
-	writeCmd(0x12, 0x040f);
+	writeCmd(0x10, 0x1f92);	// ??
+	writeCmd(0x11, 0x0014);	// ?? vertical scroll control?
+	writeCmd(0x00, 0x0001);	// R00: Start oscillation
+	writeCmd(0x10, 0x1f92);	// ??
+	writeCmd(0x11, 0x001c); // ?? vertical scroll control?
+	writeCmd(0x28, 0x0006);	// ??
+	writeCmd(0x02, 0x0000);	// ?? LCD drive AC control
+	writeCmd(0x12, 0x040f); // ??
 
 	xpcc::delay_ms(100);
 
-	writeCmd(0x03, 0x7830); //display control: GON
-	writeCmd(0x01, 0x31af); //display control: D1
+	writeCmd(0x03, 0x7838);	// ?? Set entry mode
+	/**
+	 * Bit 0 set: stopped working
+	 * Bit 1 set: no change
+	 * | 0x0003: no change
+	 * | 0x0004: stoppend working
+	 * | 0x0008: landscape
+	 *
+	 * 0x7838 | 0x0001:		stopped working
+	 * 0x7838 | 0x0002:		no change
+	 * 0x7838 | 0x0003:		colour inverted
+	 * 0x7838 | 0x0004:		no change
+	 * 0x7800
+	 */
+
+	writeCmd(0x01, 0x31af);	//
 	writeCmd(0x07, 0x0033);
 	xpcc::delay_ms(10);
-	lcdCls(0x03e0);
+	lcdCls(0xf800); // red 		rrrr rggg gggb bbbb
+	lcdCls(0x07e0); // green	rrrr rggg gggb bbbb
+	lcdCls(0x001f); // blue		rrrr rggg gggb bbbb
+	lcdCls(0xffff); // white	rrrr rggg gggb bbbb
+	lcdCls(0x0000); // black	rrrr rggg gggb bbbb
+	lcdCls(0xffe0); // red + green = yellow
+	lcdCls(0xf81f); // red + blue  = violet
+	lcdCls(0x07ff); // green + blue = cyan
 }
 
 template <typename PORT, typename CS, typename RS, typename WR, typename Reset>
 void
 xpcc::SiemensS75Common<PORT, CS, RS, WR, Reset>::lcdCls(uint16_t colour) {
 	// Set CGRAM Address to 0 = upper left corner
-//	writeCmd(0x21, 0x0000);
+	writeCmd(0x21, 0x0000);
 
 	// Set instruction register to "RAM Data write"
 	writeReg(0x22);
@@ -187,19 +208,17 @@ xpcc::SiemensS75Common<PORT, CS, RS, WR, Reset>::lcdCls(uint16_t colour) {
 	uint8_t c1 = colour >> 8;
 	uint8_t c2 = colour & 0xff;
 	for (uint16_t i = 0; i < (132 * 176); ++i) {
+		WR::reset();
 		PORT::write(c1);
-		xpcc::delay_us(100);
-		WR::reset();
-		xpcc::delay_us(100);
+//		xpcc::delay_us(100);
 		WR::set();
-		xpcc::delay_us(100);
+//		xpcc::delay_us(100);
 
-		PORT::write(c2);
-		xpcc::delay_us(100);
 		WR::reset();
-		xpcc::delay_us(100);
+		PORT::write(c2);
+//		xpcc::delay_us(100);
 		WR::set();
-		xpcc::delay_us(100);
+//		xpcc::delay_us(100);
 	}
 
 	CS::set();
@@ -230,7 +249,7 @@ xpcc::SiemensS75Portrait<PORT, CS, RS, WR, Reset>::update() {
 	const uint8_t blank_h = maskBlank >> 8;
 	const uint8_t blank_l = maskBlank & 0xff;
 
-	for (uint8_t x = width - 1; x != 0xff; --x)
+	for (uint8_t x = 0; x < width; ++x)
 	{
 		for (uint8_t y = 0; y < height; ++y)
 		{
@@ -254,15 +273,9 @@ xpcc::SiemensS75Portrait<PORT, CS, RS, WR, Reset>::update() {
 
 			for (uint8_t ii = 0; ii < PORTIdx; ++ii) {
 				PORT::write(PORTBuffer[ii]);
-				xpcc::delay_us(100);
+//				xpcc::delay_us(100);
 				WR::reset();	// High-to-low strobe
-				xpcc::delay_us(100);
-				WR::set();
-
-				PORT::write(PORTBuffer[ii] >> 8);
-				xpcc::delay_us(100);
-				WR::reset();	// High-to-low strobe
-				xpcc::delay_us(100);
+//				xpcc::delay_us(100);
 				WR::set();
 			}
 		} // y

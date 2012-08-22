@@ -64,7 +64,7 @@ main(void)
 	
 	while (1)
 	{
-		static uint16_t ii = 20;
+		static uint16_t ii = 10;
 		Led::toggle();
 		xpcc::delay_ms(100);
 		Led::toggle();
