@@ -147,40 +147,24 @@ xpcc::SiemensS75Common<PORT, CS, RS, WR, Reset>::lcdSettings(bool landscape) {
 	Reset::set();
 	xpcc::delay_ms(50);
 
-	writeCmd(0x07, 0x0000); //display off
+	writeCmd(0x00, 0x0001); //display off
 	xpcc::delay_ms(10);
 
 	//power on sequence
-	writeCmd(0x02, 0x0400); //lcd drive control
-	writeCmd(0x0C, 0x0001); //power control 3: VC        //step 1
-	writeCmd(0x0D, 0x0006); //power control 4: VRH
-	writeCmd(0x04, 0x0000); //power control 2: CAD
-	writeCmd(0x0D, 0x0616); //power control 4: VRL
-	writeCmd(0x0E, 0x0010); //power control 5: VCM
-	writeCmd(0x0E, 0x1010); //power control 5: VDV
-	writeCmd(0x03, 0x0000); //power control 1: BT        //step 2
-	writeCmd(0x03, 0x0000); //power control 1: DC
-	writeCmd(0x03, 0x000C); //power control 1: AP
-	xpcc::delay_ms(40);
-	writeCmd(0x0E, 0x2D1F); //power control 5: VCOMG     //step 3
-	xpcc::delay_ms(40);
-	writeCmd(0x0D, 0x0616); //power control 4: PON       //step 4
+	writeCmd(0x10, 0x1f92);
+	writeCmd(0x11, 0x0014);
+	writeCmd(0x00, 0x0001);
+	writeCmd(0x10, 0x1f92);
+	writeCmd(0x11, 0x001c);
+	writeCmd(0x28, 0x0006);
+	writeCmd(0x02, 0x0000);
+	writeCmd(0x12, 0x040f);
+
 	xpcc::delay_ms(100);
 
-	//display options
-	if (landscape) {
-		writeCmd(0x05, 0x0030); //Entry mode AM=0, ID0=1, ID1=1
-	}
-	else {
-		// portrait mode
-		writeCmd(0x05, 0x0038); //Entry mode AM=1, ID0=1, ID1=1
-	}
-
-	//display on sequence (bit2 = reversed colors)
-	writeCmd(0x07, 0x0005); //display control: D0
-	writeCmd(0x07, 0x0025); //display control: GON
-	writeCmd(0x07, 0x0027); //display control: D1
-	writeCmd(0x07, 0x0037); //display control: DTE
+	writeCmd(0x03, 0x7830); //display control: GON
+	writeCmd(0x01, 0x31af); //display control: D1
+	writeCmd(0x07, 0x0033);
 	xpcc::delay_ms(10);
 	lcdCls(0x03e0);
 }
@@ -189,7 +173,7 @@ template <typename PORT, typename CS, typename RS, typename WR, typename Reset>
 void
 xpcc::SiemensS75Common<PORT, CS, RS, WR, Reset>::lcdCls(uint16_t colour) {
 	// Set CGRAM Address to 0 = upper left corner
-	writeCmd(0x21, 0x0000);
+//	writeCmd(0x21, 0x0000);
 
 	// Set instruction register to "RAM Data write"
 	writeReg(0x22);
