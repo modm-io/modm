@@ -38,10 +38,11 @@
 namespace xpcc
 {
 	/**
-	 * \brief	Driver for Siemens S75 displays
+	 * \brief	Driver for Siemens S75/CX75/C81/M75 displays
 	 *
-	 * The controller is a Hitachi HD66773 which can drive color displays of up
-	 * ot 132 x 176 pixels in 18 bit colour.
+	 * The controller in displays manufactured by Alps is a
+	 * SOLOMON SYSTECH SSD1286 which can drive color
+	 * displays of up to 132 x 176 pixels in 18 bit colour.
 	 *
 	 * The portrait mode is a bit more 'native' for this display because
 	 * xpcc::BufferedGraphicDisplay requests that the vertical resolution is

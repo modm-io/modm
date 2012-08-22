@@ -151,35 +151,37 @@ xpcc::SiemensS75Common<PORT, CS, RS, WR, Reset>::lcdSettings(bool landscape) {
 	xpcc::delay_ms(10);
 
 	//power on sequence
-	writeCmd(0x10, 0x1f92);	// ??
-	writeCmd(0x11, 0x0014);	// ?? vertical scroll control?
+	writeCmd(0x10, 0x1f92);	// R10: Power Control 1
+	writeCmd(0x11, 0x0014);	// R11: Power Control 2
 	writeCmd(0x00, 0x0001);	// R00: Start oscillation
-	writeCmd(0x10, 0x1f92);	// ??
-	writeCmd(0x11, 0x001c); // ?? vertical scroll control?
-	writeCmd(0x28, 0x0006);	// ??
-	writeCmd(0x02, 0x0000);	// ?? LCD drive AC control
-	writeCmd(0x12, 0x040f); // ??
+	writeCmd(0x10, 0x1f92);	// R10: Power Control 1
+	writeCmd(0x11, 0x001c); // R11: Power Control 2
+	writeCmd(0x28, 0x0006);	// R28: VCOM OTP (1)
+	writeCmd(0x02, 0x0000);	// R02: LCD drive AC control
+	writeCmd(0x12, 0x040f); // R12: Power Control 2
 
 	xpcc::delay_ms(100);
 
-	writeCmd(0x03, 0x7838);	// ?? Set entry mode
+	writeCmd(0x03, 0x7838);	// R03: Entry mode
 	/**
 	 * Bit 0 set: stopped working
 	 * Bit 1 set: no change
-	 * | 0x0003: no change
-	 * | 0x0004: stoppend working
-	 * | 0x0008: landscape
+	 * 0x7830 | 0x0003: no change
+	 * 0x7830 | 0x0004: stoppend working
+	 * 0x7830 | 0x0008:	landscape
 	 *
-	 * 0x7838 | 0x0001:		stopped working
-	 * 0x7838 | 0x0002:		no change
-	 * 0x7838 | 0x0003:		colour inverted
-	 * 0x7838 | 0x0004:		no change
+	 * 0x7838 | 0x0001:	stopped working
+	 * 0x7838 | 0x0002:	no change
+	 * 0x7838 | 0x0003:	colour inverted
+	 * 0x7838 | 0x0004:	no change
 	 * 0x7800
 	 */
 
-	writeCmd(0x01, 0x31af);	//
-	writeCmd(0x07, 0x0033);
+	writeCmd(0x01, 0x31af);	// R01: Driver output control
+	writeCmd(0x07, 0x0033);	// R07: Display Control
 	xpcc::delay_ms(10);
+
+	// colourful test
 	lcdCls(0xf800); // red 		rrrr rggg gggb bbbb
 	lcdCls(0x07e0); // green	rrrr rggg gggb bbbb
 	lcdCls(0x001f); // blue		rrrr rggg gggb bbbb
