@@ -162,7 +162,12 @@ xpcc::SiemensS75Common<PORT, CS, RS, WR, Reset>::lcdSettings(bool landscape) {
 
 	xpcc::delay_ms(100);
 
-	writeCmd(0x03, 0x7838);	// R03: Entry mode
+	if (landscape) {
+		writeCmd(0x03, 0x7820);
+	}
+	else {
+		writeCmd(0x03, 0x7838);	// R03: Entry mode
+	}
 	/**
 	 * Bit 0 set: stopped working
 	 * Bit 1 set: no change
@@ -182,14 +187,7 @@ xpcc::SiemensS75Common<PORT, CS, RS, WR, Reset>::lcdSettings(bool landscape) {
 	xpcc::delay_ms(10);
 
 	// colourful test
-	lcdCls(0xf800); // red 		rrrr rggg gggb bbbb
-	lcdCls(0x07e0); // green	rrrr rggg gggb bbbb
-	lcdCls(0x001f); // blue		rrrr rggg gggb bbbb
-	lcdCls(0xffff); // white	rrrr rggg gggb bbbb
-	lcdCls(0x0000); // black	rrrr rggg gggb bbbb
-	lcdCls(0xffe0); // red + green = yellow
-	lcdCls(0xf81f); // red + blue  = violet
-	lcdCls(0x07ff); // green + blue = cyan
+	lcdCls(0x0000); // black
 }
 
 template <typename PORT, typename CS, typename RS, typename WR, typename Reset>
@@ -212,15 +210,11 @@ xpcc::SiemensS75Common<PORT, CS, RS, WR, Reset>::lcdCls(uint16_t colour) {
 	for (uint16_t i = 0; i < (132 * 176); ++i) {
 		WR::reset();
 		PORT::write(c1);
-//		xpcc::delay_us(100);
 		WR::set();
-//		xpcc::delay_us(100);
 
 		WR::reset();
 		PORT::write(c2);
-//		xpcc::delay_us(100);
 		WR::set();
-//		xpcc::delay_us(100);
 	}
 
 	CS::set();
@@ -236,8 +230,8 @@ xpcc::SiemensS75Portrait<PORT, CS, RS, WR, Reset>::update() {
 	SiemensS75Common<PORT, CS, RS, WR, Reset>::writeReg(0x22);
 
 	// WRITE MEMORY
-	CS::reset();
 	RS::set();
+	CS::reset();
 
 	const uint16_t maskBlank  = 0x0000; // RRRR RGGG GGGB BBBB
 	const uint16_t maskFilled = 0x37e0; // RRRR RGGG GGGB BBBB
@@ -275,9 +269,7 @@ xpcc::SiemensS75Portrait<PORT, CS, RS, WR, Reset>::update() {
 
 			for (uint8_t ii = 0; ii < PORTIdx; ++ii) {
 				PORT::write(PORTBuffer[ii]);
-//				xpcc::delay_us(100);
-				WR::reset();	// High-to-low strobe
-//				xpcc::delay_us(100);
+				WR::reset();	// Low-to-high strobe
 				WR::set();
 			}
 		} // y
@@ -286,73 +278,71 @@ xpcc::SiemensS75Portrait<PORT, CS, RS, WR, Reset>::update() {
 	CS::set();
 }
 
-//template <typename PORT, typename CS, typename RS, typename WR, typename Reset>
-//void
-//xpcc::SiemensS75Landscape<PORT, CS, RS, WR, Reset>::update() {
-//	// Set CGRAM Address to 0 = upper left corner
-//	SiemensS75Common<PORT, CS, RS, WR, Reset>::writeCmd(0x21, 0x0000);
-//
-//	// Set instruction register to "RAM Data write"
-//	SiemensS75Common<PORT, CS, RS, WR, Reset>::writeReg(0x22);
-//
-//	// WRITE MEMORY
-//	CS::reset();
-//	PORT::write(0x76);	// start byte
-//
-//	const uint16_t maskBlank  = 0x0000; // RRRR RGGG GGGB BBBB
-//	const uint16_t maskFilled = 0x37e0; // RRRR RGGG GGGB BBBB
-//
-//	// size of the XPCC Display buffer, not the hardware pixels
-//	const uint8_t width = 176;
-//	const uint8_t height = 136 / 8; // Display is only 132 pixels high.
-//
-//	// ----- Normal version with PORT buffer
-//	const uint8_t fill_h = maskFilled >> 8;
-//	const uint8_t fill_l = maskFilled & 0xff;
-//
-//	const uint8_t blank_h = maskBlank >> 8;
-//	const uint8_t blank_l = maskBlank & 0xff;
-//
-//	for (uint8_t x = 0; x < width; ++x)
-//	{
-//		for (uint8_t y = 0; y < height; ++y)
-//		{
-//			// group of 8 black-and-white pixels
-//			uint8_t group = this->buffer[x][y];
-//
-//			uint8_t PORTBuffer[16];
-//			uint8_t bufSize = 16;
-//			uint_fast8_t PORTIdx = 0;
-//
-//			// Only 4 pixels at the lower end of the display in landscape mode
-//			uint8_t pixels;
-//			if (y == (height - 1)) {
-//				// The last pixels
-//				pixels = 4;
-//				bufSize = 8;
-//			}
-//			else {
-//				pixels = 8;
-//			}
-//
-//			for (uint8_t pix = 0; pix < pixels; ++pix, group >>= 1) {
-//				if (group & 1)
-//				{
-//					PORTBuffer[PORTIdx++] = fill_h;
-//					PORTBuffer[PORTIdx++] = fill_l;
-//				}
-//				else
-//				{
-//					PORTBuffer[PORTIdx++] = blank_h;
-//					PORTBuffer[PORTIdx++] = blank_l;
-//				}
-//			} // pix
-//
-//			// use transfer() of PORT to transfer PORTBuffer
-//			PORT::setBuffer(bufSize, PORTBuffer);
-//			PORT::transfer(PORT::TRANSFER_SEND_BUFFER_DISCARD_RECEIVE);
-//		} // y
-//	} // x
-//
-//	CS::set();
-//}
+template <typename PORT, typename CS, typename RS, typename WR, typename Reset>
+void
+xpcc::SiemensS75Landscape<PORT, CS, RS, WR, Reset>::update() {
+	// Set CGRAM Address to height-1 = upper left corner
+	SiemensS75Common<PORT, CS, RS, WR, Reset>::writeCmd(0x21, 131);
+
+	// Set instruction register to "RAM Data write"
+	SiemensS75Common<PORT, CS, RS, WR, Reset>::writeReg(0x22);
+
+	// WRITE MEMORY
+	RS::set();
+	CS::reset();
+
+	const uint16_t maskBlank  = 0x0000; // RRRR RGGG GGGB BBBB
+	const uint16_t maskFilled = 0x37e0; // RRRR RGGG GGGB BBBB
+
+	// size of the XPCC Display buffer, not the hardware pixels
+	const uint8_t width = 176;
+	const uint8_t height = 136 / 8; // Display is only 132 pixels high.
+
+	const uint8_t fill_h = maskFilled >> 8;
+	const uint8_t fill_l = maskFilled & 0xff;
+
+	const uint8_t blank_h = maskBlank >> 8;
+	const uint8_t blank_l = maskBlank & 0xff;
+
+	for (uint8_t x = 0; x < width; ++x)
+	{
+		for (uint8_t y = 0; y < height; ++y)
+		{
+			// group of 8 black-and-white pixels
+			uint8_t group = this->buffer[x][y];
+
+			uint8_t PORTBuffer[16];
+			uint_fast8_t PORTIdx = 0;
+
+			// Only 4 pixels at the lower end of the display in landscape mode
+			uint8_t pixels;
+			if (y == (height - 1)) {
+				// The last pixels
+				pixels = 4;
+			}
+			else {
+				pixels = 8;
+			}
+
+			for (uint8_t pix = 0; pix < pixels; ++pix, group >>= 1) {
+				if (group & 1)
+				{
+					PORTBuffer[PORTIdx++] = fill_h;
+					PORTBuffer[PORTIdx++] = fill_l;
+				}
+				else
+				{
+					PORTBuffer[PORTIdx++] = blank_h;
+					PORTBuffer[PORTIdx++] = blank_l;
+				}
+			} // pix
+			for (uint8_t ii = 0; ii < PORTIdx; ++ii) {
+				PORT::write(PORTBuffer[ii]);
+				WR::reset();	// Low-to-high strobe
+				WR::set();
+			}
+		} // y
+	} // x
+
+	CS::set();
+}

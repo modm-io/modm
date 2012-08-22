@@ -35,7 +35,7 @@ namespace lcd
 	GPIO__OUTPUT(Wr,    1,  4);
 }
 
-typedef xpcc::SiemensS75Portrait<lcd::Port, lcd::Cs, lcd::Rs, lcd::Wr, lcd::Reset> Display;
+typedef xpcc::SiemensS75Landscape<lcd::Port, lcd::Cs, lcd::Rs, lcd::Wr, lcd::Reset> Display;
 
 #define LED_TOGGLE_TICKS 100		// 100 ticks = 1 Hz flash rate
 #define COUNT_MAX		3			// how high to count on the LED display
