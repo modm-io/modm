@@ -404,8 +404,8 @@ Reset_Handler(void)
 /**
  * @brief	Default interrupt handler
  * 
- * This functions gets called if an interrupt handler is not defines. It just
- * enters an infinite loop leaving the processor state intact for an debugger
+ * This functions gets called if an interrupt handler is not defined. It just
+ * enters an infinite loop leaving the processor state intact for a debugger
  * to be examined.
 */
 void
