@@ -73,6 +73,24 @@ xpcc::MAX6966<Spi, Cs, DRIVERS>::setChannel(uint16_t channel, uint8_t value)
 
 template<typename Spi, typename Cs, uint8_t DRIVERS>
 void
+xpcc::MAX6966<Spi, Cs, DRIVERS>::setChannels(uint8_t * values)
+{
+	// for all channels
+	for (uint_fast8_t ch = 0; ch < 10; ++ch)
+	{
+		Cs::reset();
+		// for all drivers
+		for (uint_fast8_t dr = 0; dr < DRIVERS; ++dr)
+		{
+			Spi::write(max6966::REGISTER_PORT0 + ch);
+			Spi::write(values[ch + dr * 10]);
+		}
+		Cs::set();
+	}
+}
+
+template<typename Spi, typename Cs, uint8_t DRIVERS>
+void
 xpcc::MAX6966<Spi, Cs, DRIVERS>::setAllChannels(uint8_t value)
 {
 	Cs::reset();

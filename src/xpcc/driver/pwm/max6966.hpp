@@ -189,8 +189,15 @@ namespace xpcc
 		/// set the 8bit value of a channel
 		static void
 		setChannel(uint16_t channel, uint8_t value);
+
+		/// More efficient version to set all channels differently
+		/// Avoids writing NO_OPS. Sets the same channels of all drivers
+		/// at the same time.
+		/// \param values	array with all pwm values for all channels and drivers.
+		static void
+		setChannels(uint8_t * values);
 		
-		/// \param value	the 8bit value of all channels
+		/// \param value	the 8bit value of all channels (same value for all channels)
 		static void
 		setAllChannels(uint8_t value);
 		
