@@ -190,6 +190,12 @@ namespace xpcc
 		static void
 		setChannel(uint16_t channel, uint8_t value);
 
+		static void
+		setChannelIntensity(uint16_t channel, uint8_t intensity)
+		{
+			setChannel(channel, intensityToPwm(intensity));
+		}
+
 		/// More efficient version to set all channels differently
 		/// Avoids writing NO_OPS. Sets the same channels of all drivers
 		/// at the same time.
@@ -197,10 +203,27 @@ namespace xpcc
 		static void
 		setChannels(uint8_t * values);
 		
+		static void
+		setChannelsIntensity(uint8_t * intensity)
+		{
+			// for all channels and drivers
+			for (uint_fast8_t ii = 0; ii < 10 * DRIVERS; ++ii)
+			{
+				intensity[ii] = intensityToPwm(intensity[ii]);
+			}
+			setChannels(intensity);
+		}
+
 		/// \param value	the 8bit value of all channels (same value for all channels)
 		static void
 		setAllChannels(uint8_t value);
 		
+		static void
+		setAllChannelsIntensity(uint8_t value)
+		{
+			setAllChannels(intensityToPwm(value));
+		}
+
 		/// get the 8bit value of a channel from the chip
 		static uint8_t
 		getChannel(uint16_t channel);
@@ -231,6 +254,22 @@ namespace xpcc
 		{
 			uint8_t readout = readFromDriver(driver, reg);
 			writeToDriver(driver, reg, (data & mask) | (readout & ~mask));
+		}
+
+		/** Fix the stupid PWM values of MAX6966 */
+		static inline uint8_t
+		intensityToPwm(uint8_t intensity)
+		{
+			if (intensity == 0xff) {
+				return max6966::ON;
+			}
+			if (intensity == 0x00) {
+				return max6966::OFF;
+			}
+			if (intensity < 3) {
+				return max6966::MIN;
+			}
+			return intensity;
 		}
 	};
 }
