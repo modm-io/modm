@@ -77,7 +77,8 @@ if 'stm32f' in env['ARCHITECTURE']:
 
 if env['ARCHITECTURE'].startswith('cortex-m0/lpc11'):
 	sourcePath += ['lpc11xx/cmsis', 'lpc11xx/driver']
-	globalIncludes += []
+	globalIncludes += [
+		'lpc11xx/cmsis']
 
 if env['ARCHITECTURE'].startswith('cortex-m3/lpc17'):
     sourcePath += ['lpc17xx/cmsis']

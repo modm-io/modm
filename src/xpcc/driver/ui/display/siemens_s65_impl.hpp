@@ -77,7 +77,6 @@ xpcc::SiemensS65<SPI, CS, RS, Reset>::writeReg(uint8_t reg)
 	SPI::write(0x00);
 	SPI::write(reg);
 
-	while(SPI::isBusy()); // wait until SPI has emptied its buffer before setting CS.
 	CS::set();
 }
 
@@ -90,7 +89,6 @@ xpcc::SiemensS65<SPI, CS, RS, Reset>::writeData(uint16_t data)
 	SPI::write(data>>8);
 	SPI::write(data);
 
-	while(SPI::isBusy());
 	CS::set();
 }
 
@@ -158,7 +156,6 @@ xpcc::SiemensS65<SPI, CS, RS, Reset>::lcdCls(uint16_t colour) {
 		SPI::write(c2);
 	}
 
-	while(SPI::isBusy());
 	CS::set();
 }
 
@@ -206,6 +203,5 @@ xpcc::SiemensS65<SPI, CS, RS, Reset>::update() {
 //		SPI::write(data);
 //	}
 
-	while(SPI::isBusy());
 	CS::set();
 }
