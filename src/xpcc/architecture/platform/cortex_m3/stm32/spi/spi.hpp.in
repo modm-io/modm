@@ -49,8 +49,12 @@ namespace xpcc
 		 * - SPI1 (APB2) at 72MHz
 		 * - SPI2 and SPI3 (APB1) at 36MHz.
 		 * 
-		 * STM32F2/4xx:
+		 * STM32F2:
 		 * - TODO
+		 * 
+		 * STM32F4xx:
+		 * - SPI1 (APB2) at 84MHz
+		 * - SPI2, SPI3 (APB1) at 42MHz
 		 * 
 		 * @ingroup		stm32
 		 */
