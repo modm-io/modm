@@ -33,7 +33,7 @@ import builder_base
 
 class IdentifierBuilder(builder_base.Builder):
 	
-	VERSION = "$Id$"
+	VERSION = "0.1"
 	
 	def generate(self):
 		# check the commandline options

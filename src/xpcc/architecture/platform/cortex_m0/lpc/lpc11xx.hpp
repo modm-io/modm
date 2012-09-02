@@ -28,16 +28,91 @@
  */
 // ----------------------------------------------------------------------------
 
+/**
+ * Platform support for
+ * 		NXP Cortex-M0 Series LPC11xx and LPC11Cxx
+ */
+
+// Use NXP CMSIS library for register name definitions
 #include <lpc11xx/cmsis/LPC11xx.h>
 #include <lpc11xx/cmsis/core_cm0.h>
 #include <lpc11xx/cmsis/system_LPC11xx.h>
 
-#include "adc/adc.hpp"
+/**
+ * XPCC drivers for various peripherals and core components.
+ *
+ * Reference is
+ * 		LPC111x/LPC11Cxx User manual
+ *		Rev. 11 — 26 July 2012
+ *		UM10398
+ */
+
+// Chapter 12: General Purpose I/O (GPIO)
 #include "gpio.hpp"
+
+// Chapter 13: UART
 #include "uart/uart_1.hpp"
+
+// Chapter 14: SPI0/1 with SSP
 #include "spi/spi_0.hpp"
 #include "spi/spi_1.hpp"
+
+// Chapter 15: I2C bus
+// TODO
+
+// Chapter 16: C_CAN controller
+// The C_CAN block is available in LPC11Cxx parts only (LPC11C00 series).
+#if defined(__ARM_LPC11CXX__)
+// TODO Write own CAN driver if needed
+#endif
+
+// Chapter 17: C_CAN on-chip drivers
+// The C_CAN block is available in LPC11Cxx parts only (LPC11C00 series).
+#if defined(__ARM_LPC11CXX__)
 #include "c_can/c_can.hpp"
+#include "c_can/c_can_filter.hpp"
+#endif
+
+// Chapter 18: LPC1100/LPC1100C/LPC1100L series 16-bit counter/timer CT16B0/1
+#if defined(__ARM_LPC11XX__) || defined(__ARM_LPC11CXX__) || defined(__ARM_LPC11XXL__)
+#include "timer/timer_registers.hpp"
+#include "timer/timer16_0.hpp"
+#endif
+
+// Chapter 19: LPC1100XL series: 16-bit counter/timer CT16B0/1
+#if defined(__ARM_LPC1100XL__)
+// TODO
+#endif
+
+// Chapter 20: LPC1100/LPC1100C/LPC1100L series: 32-bit counter/timer CT32B0/1
+#if defined(__ARM_LPC11XX__) || defined(__ARM_LPC11CXX__) || defined(__ARM_LPC11XXL__)
+// TODO
+#endif
+
+// Chapter 21: LPC1100XL series: 32-bit counter/timer CT32B0/1
+#if defined(__ARM_LPC1100XL__)
+// TODO
+#endif
+
+// Chapter 22/23: LPC111x/LPC11Cxx (Windowed) WatchDog Timer (WDT)
+#if defined(__ARM_LPC11XX__) || defined(__ARM_LPC11CXX__)
+// TODO
+#endif
+
+// Chapter 24: LPC111x/LPC11Cxx System tick timer (SysTick)
+#if defined(__ARM_LPC11XX__) || defined(__ARM_LPC11CXX__)
+#include "systick_timer.hpp"
+#endif
+
+// Chapter 25: LPC111x/LPC11Cxx ADC
+#if defined(__ARM_LPC11XX__) || defined(__ARM_LPC11CXX__)
+#include "adc/adc.hpp"
+#endif
+
+// Chapter 26: LPC111x/LPC11Cxx Flash programming firmware
+#if defined(__ARM_LPC11XX__) || defined(__ARM_LPC11CXX__)
+// TODO
+#endif
 
 extern "C"
 {

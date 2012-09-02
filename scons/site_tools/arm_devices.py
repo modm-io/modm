@@ -1,6 +1,7 @@
 devices = \
 {
 	# -------------------------------------------------------------------------
+    # NXP ARM7TDMI devices Series LPC21xx, LPC22xx, LPC23xx, LPC24xx
 	"lpc2129":
 	{
 		"defines": ["__ARM_LPC2000__"],
@@ -21,6 +22,14 @@ devices = \
 	},
 	
 	# -------------------------------------------------------------------------
+    # NXP Cortex-M0 devices Series LPC11xx and LPC11Cxx
+    "lpc1112_301":
+    {
+        "defines": ["__ARM_LPC11XX__",],
+        "linkerscript": "cortex_m0/lpc/linker/lpc1112_301.ld",
+        "size": { "flash": 16384, "ram": 8192 },
+    },
+
 	"lpc1114_301":
 	{
 		"defines": ["__ARM_LPC11XX__",],
@@ -28,13 +37,28 @@ devices = \
 		"size": { "flash": 32768, "ram": 8192 },
 	},
 	
-	"lpc11c24":
+    # Integrated CAN transceiver
+	"lpc11c22_301":
 	{
 		"defines": ["__ARM_LPC11XX__", "__ARM_LPC11CXX__"],
-		"linkerscript": "cortex_m0/lpc/linker/lpc11c24.ld",
-		"size": { "flash": 32768, "ram": 8192 },
+		"linkerscript": "cortex_m0/lpc/linker/lpc11c22.ld",
+		"size": { "flash": 16384, "ram": 8192 },
 	},
+
+    # Integrated CAN transceiver
+    "lpc11c24_301":
+    {
+        "defines": ["__ARM_LPC11XX__", "__ARM_LPC11CXX__"],
+        "linkerscript": "cortex_m0/lpc/linker/lpc11c24.ld",
+        "size": { "flash": 32768, "ram": 8192 },
+    },
+
+    # -------------------------------------------------------------------------
+    # NXP Cortex-M3 devices Series LPC13xx
+    # TODO
 	
+    # -------------------------------------------------------------------------
+    # NXP Cortex-M3 devices Series LPC17xx
 	"lpc1769":
 	{
 		"defines": ["__ARM_LPC17XX__"],

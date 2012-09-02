@@ -92,8 +92,6 @@ def toBufferMethodStructAccess(element, name=None):
 # -----------------------------------------------------------------------------
 class JavaPacketsBuilder(builder_base.Builder):
 	
-	VERSION = "$Id$"
-	
 	def setup(self, optparser):
 		optparser.add_option(
 				"--package",

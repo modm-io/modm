@@ -1,6 +1,5 @@
 #include "uart_1.hpp"
 
-#include <xpcc/architecture.hpp> // DEBUG GPIO
 #include <xpcc/architecture/driver/atomic.hpp>
 
 #include <lpc11xx/cmsis/LPC11xx.h>

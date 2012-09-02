@@ -21,13 +21,20 @@ namespace lpc
 	 * For these parts, the CAN_RXD and CAN_TXD signals are connected internally
 	 * to the on-chip transceiver, and the transceiver signals are pinned out.
 	 *
+	 * This class uses the on-chip CAN drivers.
+	 *
 	 * There are 32 Message Objects in two groups of 16 Message Objects.
 	 * (1 to 16 and 17 to 32).
 	 *
+	 * In this class the following assumption is made:
 	 * Message Objects  1 to 16 are used for reception and
 	 * Message Objects 17 to 32 are used for transmission.
 	 *
 	 * TODO Group Message Objects to a FIFO ?! p307 section 16.7.3.10.1
+	 *
+	 * TODO Filter
+	 *
+	 * TODO Configuration
 	 *
 	 * \author	strongly-typed
 	 * \ingroup	lpc11
@@ -64,16 +71,45 @@ namespace lpc
 		ROM **rom = (ROM **) 0x1fff1ff8;
 
 	protected:
+		/**
+		 * Callback functions for the on-chip CAN driver library.
+		 * They are registered in initialize() and called from the
+		 * interrupt handler of the on-chip CAN driver (pCAND->isr())
+		 */
+
+		/**
+		 * \brief	Receive Callback
+		 *
+		 * The CAN message received callback function is called on the
+		 * interrupt level by the CAN interrupt handler when a message was
+		 * received.
+		 *
+		 * \param	msg_obj_num	Message Object that contains a new message
+		 */
 		static void
 		CAN_rx(uint8_t msg_obj_num);
 
+		/**
+		 * \brief	Transmit Callback
+		 *
+		 * Called on the interrupt level by the CAN interrupt handler after a
+		 * message has been successfully transmitted on the bus.
+		 *
+		 * \param	msg_obj_num	Message Object that was transmitted
+		 */
 		static void
 		CAN_tx(uint8_t msg_obj_num);
 
+		/**
+		 * \brief	Error Callback
+		 *
+		 * Called on the interrupt level by the CAN interrupt handler after a
+		 * message has been successfully transmitted on the bus.
+		 *
+		 * \param	error_info	Error bitmask
+		 */
 		static void
 		CAN_error(uint32_t error_info);
-
-
 	};
 
 } // lpc namespace

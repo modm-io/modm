@@ -1,7 +1,7 @@
 #ifndef XPCC_LPC111X__ADC_HPP
 #define XPCC_LPC111X__ADC_HPP
 
-#include <xpcc/architecture.hpp>
+#include "../device.h"
 
 /* ---------- ADC Data Register bit names --------------------*/
 #define ADC_GDR_DONE (1 << 31)
@@ -210,7 +210,7 @@ namespace xpcc {
 				  /* Enable AHB clock to the ADC. */
 				  LPC_SYSCON->SYSAHBCLKCTRL |= SYSAHBCLKCTRL_ADC;
 
-				  /* Set clock */
+				  /* Set clock: 48 MHz / (10 + 1) = 4.36 MHz < 4.5 MHz */
 				  LPC_ADC->CR = (10 << 8);
 			}
 
@@ -305,6 +305,9 @@ namespace xpcc {
 
 			  /* Set clock and resolution */
 			  LPC_ADC->CR = (static_cast<uint32_t>(resolution)) | (10 << 8);
+
+			  /* Enable interrupts */
+			  NVIC_EnableIRQ(ADC_IRQn);
 			}
 
 			/**

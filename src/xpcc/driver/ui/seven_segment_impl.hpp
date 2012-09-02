@@ -23,9 +23,6 @@ xpcc::sevenSegment::SevenSegmentDisplay<Spi, Load, DIGITS>::write(uint32_t val)
 		val /= 10;
 	}
 
-	// wait until all data is written to the segments
-	while(Spi::isBusy());
-
 	// on rising edge data is moved to storage registers
 	Load::reset();
 	Load::set();
@@ -42,11 +39,7 @@ xpcc::sevenSegment::SevenSegmentDisplay<Spi, Load, DIGITS>::writeHex(uint32_t va
 		val >>= 4;
 	}
 
-	// wait until all data is written to the segments
-	while(Spi::isBusy());
-
 	// on rising edge data is moved to storage registers
 	Load::reset();
 	Load::set();
 }
-

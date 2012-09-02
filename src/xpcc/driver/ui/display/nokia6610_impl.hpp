@@ -235,7 +235,7 @@ xpcc::Nokia6610<SPI, CS, Reset, GE12>::update() {
 	}
 	else
 	{
-		// wait aproximetly 100ms
+		// wait approximately 100ms
 		xpcc::delay_ms(100);
 
 		// Display On
