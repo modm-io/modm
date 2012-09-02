@@ -57,8 +57,14 @@ devices = \
     # NXP Cortex-M3 devices Series LPC13xx
     # TODO
 	
-    # -------------------------------------------------------------------------
-    # NXP Cortex-M3 devices Series LPC17xx
+	# -------------------------------------------------------------------------
+	"lpc1343":
+	{
+		"defines": ["__ARM_LPC13XX__",],
+		"linkerscript": "cortex_m3/lpc/linker/lpc1343.ld",
+		"size": { "flash": 32768, "ram":8192 },
+	},
+	
 	"lpc1769":
 	{
 		"defines": ["__ARM_LPC17XX__"],

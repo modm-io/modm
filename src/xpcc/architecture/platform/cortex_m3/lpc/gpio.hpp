@@ -32,7 +32,6 @@
 #define XPCC_LPC17XX__GPIO_HPP
 
 #include <xpcc/architecture/driver/gpio.hpp>
-#include <lpc17xx/cmsis/LPC17xx.h>
 
 /*
  * 32-bit ports.
