@@ -76,37 +76,37 @@ devices = \
 	# AT91SAM7S
 	"at91sam7s32": 
 	{
-		"defines": ["__ARM_AT91__", "__ARM_AT91SAM7S__"],
+		"defines": ["__ARM_AT91__", "__ARM_AT91SAM7S__", "__ARM_AT91SAM7S32__"],
 		"linkerscript": "arm7/at91/linker/at91sam7s32.ld",
 		"size": { "flash": 32768, "ram": 4096 },
 	},
 	"at91sam7s321": 
 	{
-		"defines": ["__ARM_AT91__", "__ARM_AT91SAM7S__"],
+		"defines": ["__ARM_AT91__", "__ARM_AT91SAM7S__", "__ARM_AT91SAM7S321__"],
 		"linkerscript": "arm7/at91/linker/at91sam7s32.ld",
 		"size": { "flash": 32768, "ram": 8192 },
 	},
 	"at91sam7s64": 
 	{
-		"defines": ["__ARM_AT91__", "__ARM_AT91SAM7S__"],
+		"defines": ["__ARM_AT91__", "__ARM_AT91SAM7S__", "__ARM_AT91SAM7S64__"],
 		"linkerscript": "arm7/at91/linker/at91sam7s64.ld",
 		"size": { "flash": 65536, "ram": 16384 },
 	},
 	"at91sam7s128": 
 	{
-		"defines": ["__ARM_AT91__", "__ARM_AT91SAM7S__"],
+		"defines": ["__ARM_AT91__", "__ARM_AT91SAM7S__", "__ARM_AT91SAM7S128__"],
 		"linkerscript": "arm7/at91/linker/at91sam7s128.ld",
 		"size": { "flash": 131072, "ram": 32768 },
 	},
 	"at91sam7s256": 
 	{
-		"defines": ["__ARM_AT91__", "__ARM_AT91SAM7S__"],
+		"defines": ["__ARM_AT91__", "__ARM_AT91SAM7S__", "__ARM_AT91SAM7S256__"],
 		"linkerscript": "arm7/at91/linker/at91sam7s256.ld",
 		"size": { "flash": 262144, "ram": 65536 },
 	},
 	"at91sam7s512": 
 	{
-		"defines": ["__ARM_AT91__", "__ARM_AT91SAM7S__"],
+		"defines": ["__ARM_AT91__", "__ARM_AT91SAM7S__", "__ARM_AT91SAM7S512__"],
 		"linkerscript": "arm7/at91/linker/at91sam7s512.ld",
 		"size": { "flash": 524288, "ram": 65536 },
 	},
@@ -128,7 +128,7 @@ devices = \
 	"at91sam7x512": 
 	{
 		"defines": ["__ARM_AT91__", "__ARM_AT91SAM7X__"],
-		"linkerscript": "arm7/at91/linker/at91sam7s512.ld",
+		"linkerscript": "arm7/at91/linker/at91sam7x512.ld",
 		"size": { "flash": 524288, "ram": 131072 },
 	},
 	

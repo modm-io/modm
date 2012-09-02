@@ -5,7 +5,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include "../gpio.hpp"
+#include "../device.h"
 #include "spi_0.hpp"
 
 namespace
