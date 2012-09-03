@@ -5,6 +5,5 @@
 .cproject
 .pydevproject
 .settings/
-tests/
 doc/homepage/
 build/
