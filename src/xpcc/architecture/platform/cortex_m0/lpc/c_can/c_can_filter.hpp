@@ -36,7 +36,7 @@ namespace xpcc
 		 * of Extended CAN messages (29 bit identifier) is implemented yet.
 		 *
 		 * \author		strongly-typed
-		 * \ingroup		lpc11c
+		 * \ingroup		lpc1100
 		 */
 		class CanFilter
 		{
