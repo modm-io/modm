@@ -1,0 +1,3 @@
+Use this URL to reset the Editor to your settings:
+
+http://highslide.com/editor/?config=%7B%22thumbnailExplanation%22%3A+%22both-below%22,+%22loadingStyle%22%3A+%22White%3A+big+icon%22,+%22useCloseButton%22%3A+true,+%22closeButtonStyle%22%3A+%22simplewhite%22,+%22showCredits%22%3A+false,+%22htmlHeadingSource%22%3A+%22a.title%22%7D

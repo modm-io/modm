@@ -1,0 +1,148 @@
+/**
+* @file: highslide.css 
+* @version: 4.1.9
+*/
+.highslide-container div {
+	font-family: Verdana, Helvetica;
+	font-size: 10pt;
+}
+.highslide-container table {
+	background: none;
+}
+.highslide {
+	outline: none;
+	text-decoration: none;
+}
+.highslide img {
+	border: 2px solid silver;
+}
+.highslide:hover img {
+	border-color: gray;
+}
+.highslide-active-anchor img {
+	visibility: hidden;
+}
+.highslide-gallery .highslide-active-anchor img {
+	border-color: black;
+	visibility: visible;
+	cursor: default;
+}
+.highslide-image {
+	border-width: 2px;
+	border-style: solid;
+	border-color: white;
+}
+.highslide-wrapper, .highslide-outline {
+	background: white;
+}
+.glossy-dark {
+	background: #111;
+}
+
+.highslide-image-blur {
+}
+.highslide-number {
+	font-weight: bold;
+	color: gray;
+	font-size: .9em;
+}
+.highslide-caption {
+	display: none;
+	font-size: 1em;
+	padding: 5px;
+	/*background: white;*/
+}
+.highslide-heading {
+	display: none;
+	font-weight: bold;
+	margin: 0.4em;
+}
+.highslide-dimming {
+	/*position: absolute;*/
+	background: black;
+}
+a.highslide-full-expand {
+   background: url(graphics/fullexpand.gif) no-repeat;
+   display: block;
+   margin: 0 10px 10px 0;
+   width: 34px;
+   height: 34px;
+}
+.highslide-loading {
+	display: block;
+	color: black;
+	font-size: 9px;
+	font-weight: bold;
+	text-transform: uppercase;
+	text-decoration: none;
+	padding: 3px;
+	border: 1px solid white;
+	background-color: white;
+	padding-left: 22px;
+	background-image: url(graphics/loader.white.gif);
+	background-repeat: no-repeat;
+	background-position: 3px 1px;
+}
+.highslide-move, .highslide-move * {
+	cursor: move;
+}
+
+.highslide-viewport {
+	display: none;
+	position: fixed;
+	width: 100%;
+	height: 100%;
+	z-index: 1;
+	background: none;
+	left: 0;
+	top: 0;
+}
+.highslide-overlay {
+	display: none;
+}
+.hidden-container {
+	display: none;
+}
+/* Example of a semitransparent, offset closebutton */
+.closebutton {
+	position: relative;
+	top: -15px;
+	left: 15px;
+	width: 30px;
+	height: 30px;
+	cursor: pointer;
+	background: url(graphics/close.png);
+	/* NOTE! For IE6, you also need to update the highslide-ie6.css file. */
+}
+
+/* The following styles are added by the Highslide Editor */
+.highslide-wrapper, .highslide-outline {
+	background: #FFFFFF;
+}
+.highslide img {
+	border: 1px solid #D0D0D0;
+}
+.highslide:hover img {
+	border-color: #A0A0A0;
+}
+.highslide-image {
+	border: 2px solid #FFFFFF;
+}
+.highslide-loading {
+	display: block;
+	padding: 3px 0 3px 38px;
+	width: 0;
+	height: 32px;
+	overflow: hidden;
+	background-color: white;
+	background-repeat: no-repeat;
+	background-position: 3px 3px;
+	background-image: url(graphics/loader.big.white.gif);
+}
+
+.close-simple-white {
+	width: 16px;
+	height: 16px;
+	background: white url(graphics/controlbar-text-buttons.png) 0 -221px;
+	cursor: pointer;
+}
