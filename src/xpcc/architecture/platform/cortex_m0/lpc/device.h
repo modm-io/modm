@@ -31,12 +31,11 @@
 #ifndef LPC11__DEVICE_H
 #define LPC11__DEVICE_H
 
-/**
+/*
  * Reduce compile dependencies for the hardware drivers.
  * Do not include <xpcc/architecture.hpp> to avoid recompiling the whole set
  * of drivers if anything unrelated changed.
  */
-
 #if !defined(__ARM_LPC11XX__) && !defined(__ARM_LPC11CXX__)
 #	error "Please select the target LPCxxxx device used in your application (in the lpc11xx.hpp file)"
 #endif
@@ -44,12 +43,5 @@
 #if defined(__ARM_LPC11XX__) || defined(__ARM_LPC11CXX__)
 #	include "lpc11xx.hpp"
 #endif
-
-// Doxygen hierarchy
-
-/**
- * \defgroup	lpc11		LPC11xx
- * \ingroup		lpc
- */
 
 #endif // LPC11__DEVICE_H

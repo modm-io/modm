@@ -28,6 +28,11 @@
  */
 // ----------------------------------------------------------------------------
 
+/**
+ * \ingroup		driver
+ * \defgroup	driver_gpio		General Purpose Input/Output Pins
+ */
+
 #include "gpio/mcp23s08.hpp"
 #include "gpio/mcp23s17.hpp"
 
