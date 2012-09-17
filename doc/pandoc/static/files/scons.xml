@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<schemetools>
+	<global>
+        <tool name="SCons" command="scons.bat" folder="%d" params="" shortcut="0" parsepattern="" flags="45" />
+        <tool name="SCons Verbose" command="scons.bat" folder="%d" params="verbose=1" shortcut="0" parsepattern="" flags="45" />
+        <tool name="SCons Clean" command="scons.bat" folder="%d" params="-c" shortcut="0" parsepattern="" flags="41" />
+		<tool name="SCons Program" command="scons.bat" folder="%d" params="program" shortcut="0" parsepattern="" flags="41" />
+		<tool name="SCons Fuse" command="scons.bat" folder="%d" params="fuse" shortcut="0" parsepattern="" flags="41" />
+	</global>
+</schemetools>
