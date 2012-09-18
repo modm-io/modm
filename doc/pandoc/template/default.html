@@ -21,18 +21,18 @@ $if(date)$
 $endif$
 	<meta name="generator" content="pandoc" />
 	
-	<link rel="icon" href="favicon.png" type="image/png" />
-	<link rel="shortcut icon" href="favicon.png" type="image/png" />
-	<link rel="stylesheet" type="text/css" href="default.css" media="screen" />
+	<link rel="icon" href="~/favicon.png" type="image/png" />
+	<link rel="shortcut icon" href="~/favicon.png" type="image/png" />
+	<link rel="stylesheet" type="text/css" href="~/default.css" media="screen" />
 	
-	<script type="text/javascript" src="highslide/highslide.js"></script>
-	<script type="text/javascript" src="highslide/highslide.config.js" charset="utf-8"></script>
-	<link rel="stylesheet" type="text/css" href="highslide/highslide.css" media="screen" />
+	<script type="text/javascript" src="~/highslide/highslide.js"></script>
+	<script type="text/javascript" src="~/highslide/highslide.config.js" charset="utf-8"></script>
+	<link rel="stylesheet" type="text/css" href="~/highslide/highslide.css" media="screen" />
 	<!--[if lt IE 7]>
-	<link rel="stylesheet" type="text/css" href="highslide/highslide-ie6.css" />
+	<link rel="stylesheet" type="text/css" href="~/highslide/highslide-ie6.css" />
 	<![endif]-->
 $for(css)$
-	<link rel="stylesheet" href="$css$" type="text/css" />
+	<link rel="stylesheet" href=":/$css$" type="text/css" />
 $endfor$
 	
 $if(highlighting-css)$
@@ -52,7 +52,7 @@ $endfor$
 <body>
 <div id="menu">
 	<ul id="main">
-		<li class="current_page"><a href="mainpage.html">Home</a></li>
+		<li class="current_page"><a href="~/mainpage.html">Home</a></li>
 		<li><a href="https://github.com/roboterclubaachen/xpcc/">Development and Download</a></li>
 		<li><a href="https://github.com/roboterclubaachen/xpcc/wiki/">Wiki</a></li>
 		<li><a href="http://roboterclubaachen.github.com/xpcc/api/">API Documentation</a></li>
@@ -62,6 +62,7 @@ $endfor$
 
 <div id="wrapper">
 <div id="page">
+	<breadcrumb />
 $if(title)$
 	<h1 class="title">$title$</h1>
 $endif$
@@ -70,23 +71,13 @@ $endif$
 			<li>
 				<h2>Navigation</h2>
 				<ul>
-					<li><a href="why_use_xpcc.html">Why use xpcc?</a></li>
-					<li><a href="get_code.html">Get the Code</a></li>
-					<li><a href="installation.html">Installation</a></li>
-					<li><a href="getting_started.html">Getting Started</a></li>
-					<li><a href="developer.html">Developer</a></li>
+					<li><a href="~/why_use_xpcc.html">Why use xpcc?</a></li>
+					<li><a href="~/get_the_code.html">Get the Code</a></li>
+					<li><a href="~/install.html">Installation</a></li>
+					<li><a href="~/getting_started.html">Getting Started</a></li>
+					<li><a href="~/developer.html">Developer</a></li>
 				</ul>
 			</li>
-			<!--<li>
-				<h2>Recent Updates</h2>
-				<ul>
-					<li><h3>5th March 2012</h3>Project moved to GitHub</li>
-					<li><h3>20th Jul 2011</h3>Creation of version 1.1</li>
-					<li><h3>11th Jun 2010</h3>Creation of version 1.0</li>
-					<li><h3>28th Oct 2009</h3>Launch of this Website.</li>
-					<li><h3>31st Aug 2009</h3>Creation of the XPCC project.</li>
-				</ul>
-			</li>-->
 		</ul>
 	</div>
 	<div id="content">
