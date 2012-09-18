@@ -3,7 +3,7 @@ INDIR = source
 TEMPDIR = .temp
 OUTDIR = www
 
-INPUT = $(wildcard $(INDIR)/*.md)
+INPUT = $(wildcard $(INDIR)/*.md) $(wildcard $(INDIR)/**/*.md) $(wildcard $(INDIR)/**/**/*.md)
 GENERATED = $(patsubst $(INDIR)/%.md,$(TEMPDIR)/%.html,$(INPUT))
 POSTPROCESSED = $(patsubst $(TEMPDIR)/%.html,$(OUTDIR)/%.html,$(GENERATED))
 
@@ -12,6 +12,8 @@ all: environment generate postprocess copy
 environment:
 	mkdir -p $(TEMPDIR)
 	mkdir -p $(OUTDIR)
+	cd $(TEMPDIR); (cd ../$(INDIR); find -type d ! -name .) | xargs mkdir -p
+	cd $(OUTDIR); (cd ../$(INDIR); find -type d ! -name .) | xargs mkdir -p
 
 generate: environment $(GENERATED)
 
@@ -30,7 +32,7 @@ $(TEMPDIR)/%.html: $(INDIR)/%.md template/default.html
 
 # Post process the HTML files to add some additional markup
 $(OUTDIR)/%.html: $(TEMPDIR)/%.html tools/postprocess.py
-	python tools/postprocess.py $< $@
+	python tools/postprocess.py -p $(TEMPDIR) -s $(INDIR) $< $@
 
 clean:
 	rm -rf $(TEMPDIR)

@@ -81,6 +81,11 @@ dd p {
 	padding-left: 20px;
 }
 
+#toc {
+	padding-left: 30px;
+	margin-bottom: -20px;
+}
+
 #menu {
 	width: 972px;
 	height: 52px;

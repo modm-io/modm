@@ -2,7 +2,7 @@
 % Fabian Greif
 % 2012-09-16
 
-![](images/logo_xpcc.png "xpcc logo")
+![](~/images/logo_xpcc.png "xpcc logo")
 
 The XPCC project consists of two main parts:
 
@@ -20,15 +20,15 @@ described in the \ref container section.
 
 This manual is divided in the following sections:
 
-- [Why use xpcc?](why_use_xpcc.html)
+- [Why use xpcc?](~/why_use_xpcc.html)
 - get_code
 - installation
 	- installation_linux
-	- [Install Windows](installation_windows.html)
+	- [Install Windows](~/installation_windows.html)
 	- IDE
-		- [Configure Eclipse (DE)](install_ide_eclipse.html)
-		- [Configure PN2 (DE)](install_ide_pn2.html)
-		- [Configure AVR Studio 2 (DE)](install_ide_avrstudio4.html)
+		- [Configure Eclipse (DE)](~/install_ide_eclipse.html)
+		- [Configure PN2 (DE)](~/install_ide_pn2.html)
+		- [Configure AVR Studio 2 (DE)](~/install/ide/avrstudio4.html)
 -  build_system
 	- sconstruct_template
 	- sconstruct
@@ -49,7 +49,7 @@ This manual is divided in the following sections:
 The people behind this library
 ------------------------------
 
-![](images/rca_2010.jpg "Team 2010")
+![](~/images/rca_2010.jpg "Team 2010")
 
 During the last years we, [the Roboterclub Aachen e.V.][rca], have developed a
 software library for communication among components that are distributed on
@@ -75,7 +75,7 @@ and we will look into it. But don't expect a quick response, we are always
 busy building robots ;-)
 
 If you want to change the library be sure to read the 
-[developer section][develop.html], to familiarize yourself with the coding
+[developer section][~/develop.html], to familiarize yourself with the coding
 convention, design decisions etc.
 The Source Code is free avilable, so feel free to adapt it to your needs. The
 only thing we ask you to do is to contribute your changes back. That way
