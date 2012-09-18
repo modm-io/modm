@@ -148,7 +148,7 @@ dd p {
 }
 
 #content div { clear: left; }
-#content h2 { clear: both; }
+#content h2 { clear: left; }
 
 #sidebar {
 	float: right;
@@ -159,8 +159,14 @@ dd p {
 .sidebar {
 	float: left;
 	width: 200px;
-	padding: 10px 0 0 21px;
+	padding: 0 0 0 21px;
 }
+
+/*.sidebar a {
+	text-decoration: none;
+	border-bottom: 1px dashed #dddddd;
+	color: #000000;
+}*/
 
 .sidebar ul {
 	margin: 0;
@@ -169,10 +175,11 @@ dd p {
 }
 
 .sidebar li {
-	margin-bottom: 10px;
+	margin-bottom: 40px;
 	padding: 0 0 20px 0px;
-	background: url(images/side_mid.png) repeat-y left top;
-	border-bottom: 1px solid #CCCCCC;
+	border-left: 1px solid #cccccc;
+	/*background: url(images/side_mid.png) repeat-y left top;*/
+	/*border-bottom: 1px solid #CCCCCC;*/
 }
 
 .sidebar li li {
@@ -184,17 +191,17 @@ dd p {
 .sidebar li h2 {
 	height: 30px;
 	margin: 10px 0 10px 0;
-	padding: 12px 0 5px 15px;
-	background: url(images/side_top.png) no-repeat left top;
-	font-size: 17px;
-	font-weight: normal;
-	color: #ffffff;
+	padding: 12px 0 5px 10px;
+	/*background: url(images/side_top.png) no-repeat left top;*/
+	font-size: 1.4em;
+	font-weight: bold;
+	/*color: #ffffff;*/
 }
 
 .sidebar h3 {
 	margin: 0;
 	padding: 0;
-	color: #0153B4;
+	/*color: #0153B4;*/
 }
 
 .sidebar p {

@@ -1,5 +1,5 @@
 
-INDIR = files
+INDIR = source
 TEMPDIR = .temp
 OUTDIR = www
 

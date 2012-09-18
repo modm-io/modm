@@ -61,7 +61,7 @@ have merged together into a single library to simplifiy and unifiy the software
 development.
 
 This library was successfully used in our robot [Insitor][rca_insitor] with which we won the
-[vize world champion][rca_eurobot_2010] title in 2010.
+[vice world champion][rca_eurobot_2010] title in 2010.
 
 
 How can I contribute?
