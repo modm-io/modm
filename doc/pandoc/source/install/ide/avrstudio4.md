@@ -1,4 +1,10 @@
-% AVR Studio als Entwicklungsumgebung
+% AVR Studio (DE)
+% 
+%
+
+AVR Studio als Entwicklungsumgebung
+===================================
+
 
 AVR Studio 4 bietet zwar keine Unterstützung für C++ in Form
 von Syntax-Highlighing oder ähnlichem, enthält dafür aber einen Simulator.

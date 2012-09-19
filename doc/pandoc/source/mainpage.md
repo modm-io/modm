@@ -21,13 +21,13 @@ described in the \ref container section.
 This manual is divided in the following sections:
 
 - [Why use xpcc?](~/why_use_xpcc.html)
-- get_code
-- installation
-	- installation_linux
+- [Get the Code](~/get_the_code.html)
+- [Installation](~/install.html)
+	- [Installation on Linux](~/install/linux.html)
 	- [Install Windows](~/installation_windows.html)
-	- IDE
-		- [Configure Eclipse (DE)](~/install_ide_eclipse.html)
-		- [Configure PN2 (DE)](~/install_ide_pn2.html)
+	- [IDE](~/install/ide.html)
+		- [Configure Eclipse (DE)](~/install/ide/eclipse.html)
+		- [Configure PN2 (DE)](~/install/ide/pn2.html)
 		- [Configure AVR Studio 2 (DE)](~/install/ide/avrstudio4.html)
 -  build_system
 	- sconstruct_template

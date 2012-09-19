@@ -1,4 +1,9 @@
-% avrdude und libusb
+% avrdude and libusb
+% 
+% 
+
+avrdude und libusb
+==================
 
 Ohne installierte *libusb* findet avrdude unter Windows keinerlei
 USB-Programmer. Es erscheint nur eine Fehlermeldung wie *did not find

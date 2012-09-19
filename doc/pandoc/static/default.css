@@ -8,7 +8,7 @@ body {
 }
 
 h1, h2, h3 {
-	padding-top: 10px;
+	padding-top: 20px;
 	color: #0153B4;
 }
 
@@ -17,8 +17,10 @@ p {
 }
 
 h1 {
+	margin: 0;
+	padding-bottom: 10px;
 	font-size: 2.5em;
-	line-height: 1;
+	line-height: 1.2;
 }
 
 h2 {
@@ -55,6 +57,12 @@ div.figure img {
 	padding-left: 30px;
 }
 
+img {
+	display: block;
+	margin-left: auto;
+	margin-right: auto;
+}
+
 img.left {
 	float: left;
 	margin: 0 20px 0 0;
@@ -81,9 +89,19 @@ dd p {
 	padding-left: 20px;
 }
 
+pre {
+	margin-left: 30px;
+	padding: 5px 5px 5px 10px;
+	background-color: #fcf7ec;
+	border: 3px solid #eee;
+	width: 93%;
+	display:block;
+	background-attachment: scroll;
+	overflow:auto;
+}
+
 #toc {
 	padding-left: 30px;
-	margin-bottom: -20px;
 }
 
 #menu {
@@ -158,20 +176,11 @@ dd p {
 #sidebar {
 	float: right;
 	width:200px;
-	padding-right: 30px;
 }
 
 .sidebar {
-	float: left;
-	width: 200px;
-	padding: 0 0 0 21px;
+	padding: 60px 0 0 21px;
 }
-
-/*.sidebar a {
-	text-decoration: none;
-	border-bottom: 1px dashed #dddddd;
-	color: #000000;
-}*/
 
 .sidebar ul {
 	margin: 0;
@@ -183,8 +192,6 @@ dd p {
 	margin-bottom: 40px;
 	padding: 0 0 20px 0px;
 	border-left: 1px solid #cccccc;
-	/*background: url(images/side_mid.png) repeat-y left top;*/
-	/*border-bottom: 1px solid #CCCCCC;*/
 }
 
 .sidebar li li {
@@ -197,16 +204,13 @@ dd p {
 	height: 30px;
 	margin: 10px 0 10px 0;
 	padding: 12px 0 5px 10px;
-	/*background: url(images/side_top.png) no-repeat left top;*/
 	font-size: 1.4em;
 	font-weight: bold;
-	/*color: #ffffff;*/
 }
 
 .sidebar h3 {
 	margin: 0;
 	padding: 0;
-	/*color: #0153B4;*/
 }
 
 .sidebar p {
@@ -227,7 +231,7 @@ dd p {
 }
 
 #footer img {
-	margin-bottom: -15px;
+	margin-bottom: -10px;
 }
 
 #footer a {

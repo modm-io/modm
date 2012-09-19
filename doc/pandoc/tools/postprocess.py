@@ -29,8 +29,11 @@ class Processor:
 			line = p.sub(self._screenshot, line)
 			line = re.sub('<clear />', '<div style="clear: both;" />', line)
 			line = re.sub('<breadcrumb />', self._breadcrump, line)
+			
+			# adjust paths (href for links, src for images and internal: for everything else
 			line = re.sub('(href=)"~/([^"]*?)"', self._link, line)
 			line = re.sub('(src=)"~/([^"]*?)"', self._link, line)
+			line = re.sub('internal:~/', self._internal, line)
 			self.outfile.write(line)
 		
 		self.outfile.close()
@@ -89,6 +92,9 @@ class Processor:
 	
 	def _link(self, match):
 		return '%s"%s"' % (match.group(1), self._adjust_url(match.group(2)))
+	
+	def _internal(self, match):
+		return self._adjust_url("")
 	
 	def _adjust_url(self, input):
 		return "../" * (self.depth - 1) + input

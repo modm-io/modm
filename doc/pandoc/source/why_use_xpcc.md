@@ -1,6 +1,9 @@
-% Why should I use this library?
+% Why use xpcc?
 % 
 % 2012-09-16
+
+Why should I use this library?
+==============================
 
 ![](images/rca_insitor.jpg "Insitor")
 
