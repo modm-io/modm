@@ -1,4 +1,9 @@
-% Installationsanleitung für Windows
+% Install on Windows (DE)
+% 
+% 
+
+Installationsanleitung für Windows
+==================================
 
 Diese Anleitung ist für Windows 7 geschrieben, sollte sich aber
 für ältere Versionen (Windows XP und Vista) mit leichten Änderungen

@@ -25,8 +25,10 @@ $endif$
 	<link rel="shortcut icon" href="~/favicon.png" type="image/png" />
 	<link rel="stylesheet" type="text/css" href="~/default.css" media="screen" />
 	
-	<script type="text/javascript" src="~/highslide/highslide.js"></script>
-	<script type="text/javascript" src="~/highslide/highslide.config.js" charset="utf-8"></script>
+	<script type="text/javascript" src="internal:~/highslide/highslide.js"></script>
+	<script type="text/javascript" src="internal:~/highslide/highslide.config.js" charset="utf-8"></script>
+	<script type="text/javascript">hs.graphicsDir="internal:~/highslide/graphics/";</script>
+	
 	<link rel="stylesheet" type="text/css" href="~/highslide/highslide.css" media="screen" />
 	<!--[if lt IE 7]>
 	<link rel="stylesheet" type="text/css" href="~/highslide/highslide-ie6.css" />
@@ -63,9 +65,6 @@ $endfor$
 <div id="wrapper">
 <div id="page">
 	<breadcrumb />
-$if(title)$
-	<h1 class="title">$title$</h1>
-$endif$
 	<div id="sidebar" class="sidebar">
 		<ul>
 			<li>
@@ -81,19 +80,7 @@ $endif$
 		</ul>
 	</div>
 	<div id="content">
-
-$for(include-before)$
-$include-before$
-$endfor$
-$if(toc)$
-$toc$
-$endif$
-
 $body$
-
-$for(include-after)$
-$include-after$
-$endfor$
 	</div>
 	<div style="clear: both;">&nbsp;</div>
 </div>
@@ -102,7 +89,7 @@ $endfor$
 <div id="footer">
 	<p>&copy; 2009 <a href="http://www.roboterclub.rwth-aachen.de">Roboterclub Aachen e.V.</a> &bull;
 		Project hosted on <a href="https://github.com/roboterclubaachen">
-			<img src="images/github.svg" height="25" alt="Get Cross Platform Component Communication at GitHub.com" /></a> &bull;
+			<img src="~/images/github.svg" height="25" alt="Get xpcc at GitHub.com" /></a> &bull;
 		<a href="http://github.com/about">About</a> &bull;
 		<a href="http://help.github.com/terms-of-service/">Legal</a> &bull;
 		<a href="https://github.com/contact">Help</a></p>

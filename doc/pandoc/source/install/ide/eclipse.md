@@ -1,6 +1,9 @@
-% Eclipse als Entwicklungsumgebung
+% Eclipse (DE)
 % Fabian Greif
 % 
+
+Eclipse als Entwicklungsumgebung
+================================
 
 Eclipse ist eine sehr mächtige IDE. Das bedeutet leider auch das es
 sehr viel einzustellen gibt. Hat man dies aber einmal erledigt kann man
