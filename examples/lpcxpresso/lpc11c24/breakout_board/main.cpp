@@ -10,7 +10,7 @@
 
 static uint16_t servoSetPosition = 511;
 
-static xpcc::Logger::OutputStream<logger::Sample> loggerStream;
+static xpcc::Logger::OutputStream<logger::Sample, 1024> loggerStream;
 
 enum class AdcState
 {
@@ -73,7 +73,7 @@ MAIN_FUNCTION
 		// use buttons Up and Down to set new setVal for servo. OK to confirm.
 		static uint16_t setVal = 511;
 		if (timeout.isExpired()) {
-			timeout.restart(1);
+			timeout.restart(10);
 			if (button::Up::read()) {
 				if (setVal <= 1022) {
 					++setVal;
@@ -87,6 +87,9 @@ MAIN_FUNCTION
 //			ssd::Ssd::write(setVal);
 
 			if (button::Ok::read()) {
+				// block keys for 0.5 sec, otherwise triggering more than once
+				timeout.restart(500);
+
 				// set servo
 				servoSetPosition = setVal;
 
@@ -146,6 +149,8 @@ ADC_IRQHandler(void) {
 		// Read position and clear individual interrupt mask
 		// Cast to signed for less problems when subtracting
 		int16_t position = adc::Adc::getValue(adc::Adc::Channel::CHANNEL_3);
+		loggerStream.channel.position = position;
+
 
 		// display position
 //		static uint16_t dd = 0;

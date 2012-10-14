@@ -78,7 +78,7 @@ Hardware::initialize()
 
 	can::Can::initialize(xpcc::can::BITRATE_125_KBPS);
 
-	usb::uart::initialize(1500000);
+	usb::uart::initialize(3000000);
 	usb::uart::write('#'); // start char
 
 	servo::EnA::setOutput(0);

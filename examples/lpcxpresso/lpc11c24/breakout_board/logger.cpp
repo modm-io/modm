@@ -17,5 +17,6 @@
 void
 xpcc::Logger::initialize()
 {
-
+	// synchronisation
+//	xpcc::lpc::Uart1::write('#');
 }

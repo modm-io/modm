@@ -3,7 +3,9 @@
 
 #include <xpcc/architecture.hpp>
 
-// ugly debugging
+// ----------------------------------------------------------------------------
+
+// Ugly, for debugging only
 #ifdef XPCC__HOSTED_HPP
 #include <stdio.h>
 
@@ -28,11 +30,13 @@ public:
 }
 #endif
 
+// ----------------------------------------------------------------------------
+
 namespace xpcc
 {
 
 /**
- * This is a logger for capturing fast data on the target and transfering
+ * This is a logger for capturing fast data on the target and transferring
  * it to a computer for displaying.
  * It is intend for development, design and debugging of control loops.
  *
@@ -92,7 +96,7 @@ namespace xpcc
  * (like 'pre-trigger' on an oscilloscope).
  * If the remaining buffer is filled the data is send to the computer.
  *
- * No samples are taken until the last sample is send to the computer.
+ * No new samples are taken until the last sample is send to the computer.
  *
  * The GUI does not know anything about the data types. There is some
  * work to do.
@@ -111,7 +115,7 @@ private:
 	};
 
 public:
-	template <typename T>
+	template <typename T, int BufferSize>
 	class OutputStream
 	{
 		friend class Logger;
@@ -121,17 +125,11 @@ public:
 
 		OutputStream();
 
-		inline bool
-		isValid()
-		{
-			return true;
-		}
-
 		inline void
 		write()
 		{
 			// when IDLE or TRIGGERED write sample to ringbuffer.
-			// When the
+			// Do not write data when sending data
 			if ((state == State::READY) || (state == State::TRIGGERED))
 			{
 				// Keep copying current values to the ring buffer
@@ -139,11 +137,12 @@ public:
 
 				if ((state == State::TRIGGERED) && (currentSample == endSample)) {
 					// The buffer is now full. Writing more samples would overwrite the pre-triggered data
+					sendSample = firstSample;
 					state = State::FULL;
 				}
 				else {
 					// increase index, wrap around
-					currentSample = (currentSample + 1) % 32;
+					currentSample = (currentSample + 1) % BufferSize;
 				}
 			}
 		} // write
@@ -163,10 +162,10 @@ public:
 				triggerSample = currentSample;
 
 				// calculate last sample and wrap around
-				endSample = (currentSample + 32 - preTrigger) % 32;
+				endSample = (currentSample + BufferSize - preTrigger) % BufferSize;
 
 				// calculate first sample and wrap around
-				firstSample = (currentSample + (32 + 1) - preTrigger) % 32;
+				firstSample = (endSample + 1) % BufferSize;
 
 				state = State::TRIGGERED;
 			}
@@ -182,11 +181,10 @@ public:
 		{
 			if (state == State::FULL)
 			{
-				static uint16_t sampleIndex = firstSample;
-				xpcc::lpc::Uart1::write( (const uint8_t *) (&samples[sampleIndex]), sizeof(T));
+				xpcc::lpc::Uart1::write( (const uint8_t *) (&samples[sendSample]), sizeof(T));
 
-				if (sampleIndex != endSample) {
-					sampleIndex = (sampleIndex + 1) % 32;
+				if (sendSample != endSample) {
+					sendSample = (sendSample + 1) % BufferSize;
 				}
 				else {
 					// All sent, ready again.
@@ -197,12 +195,13 @@ public:
 		}
 
 	private:
-		T samples[32];
+		T samples[BufferSize];
 
 		State state;
 
-		uint16_t currentSample;
-		uint16_t triggerSample;
+		uint16_t currentSample;		// Index while writing and sending
+		uint16_t triggerSample;		// The sample where the trigger was hit
+		uint16_t sendSample;		// Index while sending
 		uint16_t firstSample;
 		uint16_t endSample;
 	};
@@ -217,8 +216,8 @@ public:
 
 } // xpcc namespace
 
-template <typename T>
-xpcc::Logger::OutputStream<T>::OutputStream() :
+template <typename T, int BufferSize>
+xpcc::Logger::OutputStream<T, BufferSize>::OutputStream() :
 	state(State::READY),
 	currentSample(0),
 	triggerSample(0),
