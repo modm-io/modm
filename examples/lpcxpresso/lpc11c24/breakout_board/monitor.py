@@ -15,95 +15,131 @@ import serial
 # Parsing data
 import struct
 
-def unpackPacket(buffer, format):
-    '''Parses a packet from the logger'''
-    packet = struct.unpack(format, buffer)
+class Monitor(object):
+    """ 
+    """
     
-    return packet
+    def __init__(self, args, format):
+        self.args = args
+        self.struct = struct.Struct(format)
+        
+        self.displayWidth = 2000
+        
+        self.handler = SerialHandler(self.args, self.struct.size)
+        
+        # Allocate memory for every channel. 
+        # Unpack an arbitrary string to see how many channels the struct has
+        self.channels = len(self.struct.unpack_from("                  "))
+        self.values = pylab.zeros([self.displayWidth, self.channels])
+        
+        self.createCanvas()
+        self.startTimers()
+
+    def unpackSample(self, buffer):
+        ''' Unpacks a (packed) sample. 
+        '''
+        sample = self.struct.unpack(buffer)
+        return sample
+
+    def createCanvas(self):
+#        global fig, line1, ax, manager
+        xAxis = pylab.arange(0, self.displayWidth, 1)
+        yAxis = pylab.array([0] * self.displayWidth)
+    
+        self.fig = pylab.figure(1)
+        self.ax = self.fig.add_subplot(111)
+        self.ax.grid(True)
+        self.ax.set_title("Realtime Waveform Plot")
+        self.ax.set_xlabel("Time")
+        self.ax.set_ylabel("Amplitude")
+        self.ax.axis([0, self.displayWidth, -500, 500])
+        self.line1 = self.ax.plot(xAxis, yAxis, '-')
+        
+        self.manager = pylab.get_current_fig_manager()
+
+    def realtimePlotter(self, arg):
+        ''' Thread (?) that updates the plot.'''
+        
+        newestIndex = pylab.shape(self.values)[0]
+        
+        CurrentXAxis = pylab.arange(newestIndex - self.displayWidth, newestIndex, 1)
+        self.line1[0].set_data(CurrentXAxis, self.values[:,0][-self.displayWidth:])
+        
+        # Set limits of plot
+        self.ax.axis([CurrentXAxis.min(), CurrentXAxis.max(), -1000, 1000])
+        
+        self.manager.canvas.draw()
+        
+    def parser(self, argument):
+        """ Parse data from the data source and fills the values array
+        """
+        while True:
+            buffer = self.handler.serialHandler()
+            if buffer <> None:
+                sample = self.unpackSample(buffer)
+                if sample <> None:
+                    self.values = pylab.append(self.values, pylab.array([sample]), axis=0)
+            else:
+                break
+        
+    def startTimers(self):
+        timerPlotter = self.fig.canvas.new_timer(interval = 50)
+        timerPlotter.add_callback(self.realtimePlotter, ())
+                
+        timerParser = self.fig.canvas.new_timer(interval = 10)
+        timerParser.add_callback(self.parser, ())
+        
+        timerPlotter.start()
+        timerParser.start()
+
+class SerialHandler:
+    """ 
+    """
+    synchronised = False
+    packetLength = 0
+    
+    def __init__(self, args, packetLength):
+        self.packetLength = packetLength
+        if args.verbose:
+            print "Packets of size %d expected." % (self.packetLength,)
+            print "Opening port %s at %s baud." % (args.port, args.baudrate)
+            
+        self.ser = serial.Serial(args.port, args.baudrate, timeout = None)
+        
+    def serialHandler(self):
+        """ Receive the stream from the serial port.
+            It should be called regularly from a timer
+        """
+        if not self.synchronised:
+            if self.ser.inWaiting() >= 1:
+                sBuf = self.ser.read(1)
+                if sBuf == '#':
+                    print "Go!"
+                    self.synchronised = True
+        
+        if self.synchronised:
+            while self.ser.inWaiting() >= self.packetLength:
+                sBuf = self.ser.read(self.packetLength)
+                return sBuf
 
 class SerialDummy:
-    '''Dummy class for emulating data from the serial port for development and debugging.'''
+    """ Dummy data source for development and debugging.
+    """
     ii = 0
+    def __init__(self, args, packetLength):
+        self.struct = struct.Struct('hh')
     
     def read(self, len):
         self.ii = self.ii + 1
-        return struct.pack('hh', self.ii, self.ii * 2)
-    
-    def inWaiting(self):
-        return 100
-    
-def createCanvas():
-    global fig, line1, ax, manager
-    xAxis = pylab.arange(0, 2000, 1)
-    yAxis = pylab.array([0] * 2000)
+        
+        if len <> self.struct.size:
+            raise "Wrong length requested."
+        
+        return self.struct.pack(self.ii, self.ii * 2)
+        
 
-    fig = pylab.figure(1)
-    ax = fig.add_subplot(111)
-    ax.grid(True)
-    ax.set_title("Realtime Waveform Plot")
-    ax.set_xlabel("Time")
-    ax.set_ylabel("Amplitude")
-    ax.axis([0, 2000, -500, 500])
-    line1 = ax.plot(xAxis, yAxis, '-')
-    
-    manager = pylab.get_current_fig_manager()
-
-def timerStart():
-    global fig
-    timerPlotter = fig.canvas.new_timer(interval = 50)
-    timerPlotter.add_callback(realtimePlotter, ())
-    
-    timerSerial = fig.canvas.new_timer(interval = 10)
-    timerSerial.add_callback(serialThread, ())
-    
-    timerPlotter.start()
-    timerSerial.start()
-
-
-def realtimePlotter(arg):
-    '''Thread (?) that updates the plot.'''
-    global values, line1, ax, manager
-    
-    CurrentXAxis = pylab.arange(len(values) - 2000, len(values), 1)
-    line1[0].set_data(CurrentXAxis, pylab.array(values[-2000:]))
-    
-    # Set limits of plot
-    ax.axis([CurrentXAxis.min(), CurrentXAxis.max(), -1000, 1000])
-    
-    manager.canvas.draw()
-
-def serialThread(arg):
-    '''Thread (?) that is called from timer'''
-    global ser, synchronised
-    
-    if synchronised:
-        while ser.inWaiting() >= packetLen:
-            sBuf = ser.read(packetLen)
-            
-            try:
-                packet = unpackPacket(sBuf, packetFormat)
-            except (struct.error):
-                synchronised = False
-                if args.debug:
-                    print "Synchronisation lost."
-            
-            print packet
-            values.append(packet[0])
-    else:
-        if ser.inWaiting() >= 1:
-            sBuf = ser.read(1)
-            if sBuf == '#':
-                print "Go!"
-                synchronised = True
 
 def main():
-    global values, ser, synchronised
-    
-    synchronised = False
-    
-    values = []
-    values = [0 for x in range(2000)]
-    
     parser = argparse.ArgumentParser(description='Display debug data from XPCC Logger')
     parser.add_argument('-v', '--verbose', action='store_true', help='Be more verbose while running.')
     parser.add_argument('-d', '--debug', action='store_true', help='Run the program in debug mode without external hardware.')
@@ -120,28 +156,13 @@ def main():
             print "Opening dummy source."
             
         ser = SerialDummy()
-            
     else:
-        if args.verbose:
-            print "Opening port %s at %s baud." % (args.port, args.baudrate)
-            
-        ser = serial.Serial(args.port, args.baudrate, timeout=None)
-
-    global packetLen, packetFormat
-
-    packetLen = 4
-    packetFormat = 'hh'
-        
-    synchronised = False
+        pass
     
-#    if args.debug:
-        # skip synchronisation
-#        synchronised = True
-        
-    createCanvas()
-    timerStart()
-    
-    # Main loop
+    myMonitor = Monitor(args, 'hh')
+    myMonitor.realtimePlotter('nix')
+
+#    # Main loop
     pylab.show()
     
 if __name__ == "__main__":
