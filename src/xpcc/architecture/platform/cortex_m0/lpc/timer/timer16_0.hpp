@@ -58,7 +58,7 @@ namespace xpcc
 					LPC_IOCON->SWCLK_PIO0_10 |= 0x03;		/* Timer0_16 MAT2 */
 				}
 
-				// usr channel 3 to set the PWM period
+				// use channel 3 to set the PWM period
 				LPC_TMR16B0->PWMC = (1<<3)|(matchEnable);
 
 				LPC_TMR16B0->MR3 	= period;
@@ -70,7 +70,7 @@ namespace xpcc
 
 				/* Set match control register */
 				// Reset on MR3: the TC will be reset if MR3 matches it.
-				LPC_TMR16B0->MCR = 1<<10;// | 1<<9;				/* Reset on MR3 */
+				LPC_TMR16B0->MCR = (1 << 10);// | 1<<9;				/* Reset on MR3 */
 			}
 
 			static void
