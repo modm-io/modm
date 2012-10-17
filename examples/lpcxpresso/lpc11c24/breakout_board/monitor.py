@@ -23,7 +23,7 @@ class Monitor(object):
         self.args = args
         self.struct = struct.Struct(format)
         
-        self.displayWidth = 2000
+        self.displayWidth = 1200
         
         self.handler = SerialHandler(self.args, self.struct.size)
         
@@ -42,7 +42,6 @@ class Monitor(object):
         return sample
 
     def createCanvas(self):
-#        global fig, line1, ax, manager
         xAxis = pylab.arange(0, self.displayWidth, 1)
         yAxis = pylab.array([0] * self.displayWidth)
     
@@ -52,8 +51,11 @@ class Monitor(object):
         self.ax.set_title("Realtime Waveform Plot")
         self.ax.set_xlabel("Time")
         self.ax.set_ylabel("Amplitude")
-        self.ax.axis([0, self.displayWidth, -500, 500])
-        self.line1 = self.ax.plot(xAxis, yAxis, '-')
+        self.ax.axis([0, self.displayWidth, 0, 1000])
+        
+#        self.lines = []
+#        for style in ['r-', 'b-']:
+        self.lines = self.ax.plot(xAxis, yAxis, 'r-', xAxis, yAxis, 'b-')
         
         self.manager = pylab.get_current_fig_manager()
 
@@ -63,10 +65,11 @@ class Monitor(object):
         newestIndex = pylab.shape(self.values)[0]
         
         CurrentXAxis = pylab.arange(newestIndex - self.displayWidth, newestIndex, 1)
-        self.line1[0].set_data(CurrentXAxis, self.values[:,0][-self.displayWidth:])
+        self.lines[0].set_data(CurrentXAxis, self.values[:,0][-self.displayWidth:])
+        self.lines[1].set_data(CurrentXAxis, self.values[:,1][-self.displayWidth:])
         
         # Set limits of plot
-        self.ax.axis([CurrentXAxis.min(), CurrentXAxis.max(), -1000, 1000])
+        self.ax.axis([CurrentXAxis.min(), CurrentXAxis.max(), 0, 1000])
         
         self.manager.canvas.draw()
         
@@ -127,7 +130,7 @@ class SerialDummy:
     """
     ii = 0
     def __init__(self, args, packetLength):
-        self.struct = struct.Struct('hh')
+        self.struct = struct.Struct('hhh')
     
     def read(self, len):
         self.ii = self.ii + 1
@@ -159,7 +162,7 @@ def main():
     else:
         pass
     
-    myMonitor = Monitor(args, 'hh')
+    myMonitor = Monitor(args, 'hhh')
     myMonitor.realtimePlotter('nix')
 
 #    # Main loop

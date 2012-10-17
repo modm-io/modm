@@ -122,6 +122,7 @@ namespace logger
 	struct Sample
 	{
 		int16_t current;
+		int16_t current_filtered;
 		int16_t position;
 	} __attribute__((packed));
 }

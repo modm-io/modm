@@ -98,7 +98,9 @@ Hardware::initialize()
 	 *
 	 */
 
-	servo::pwmTimer::setMatchValue(2, 1800); // MAT2 Interrupt for current measurment, just before PWM is switched off
+	// Use MAT2 Interrupt for current measurement.
+	// Adjust the sampling point just before PWM is switched off.
+	servo::pwmTimer::setMatchValue(2, 1550);
 
 	// Interrupt on cycle
 	// MR2 to call interrupt whenever the Timer Counter is reset

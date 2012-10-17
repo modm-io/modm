@@ -10,7 +10,7 @@
 
 static uint16_t servoSetPosition = 511;
 
-static xpcc::Logger::OutputStream<logger::Sample, 1024> loggerStream;
+static xpcc::Logger::OutputStream<logger::Sample, 512> loggerStream;
 
 enum class AdcState
 {
@@ -19,6 +19,14 @@ enum class AdcState
 };
 
 static AdcState adcState = AdcState::CURRENT;
+
+static const int32_t fir_coeffs[] = {
+		  -2037,   -1126,   1258,   2852,
+		   1645,   -1945,  -4753,  -3056,
+		   4278,   14260,  21391,  21391,
+		  14260,    4278,  -3055,  -4753,
+		  -1944,    1645,   2852,   1258,
+		  -1125,   -2037};
 
 MAIN_FUNCTION
 {
@@ -111,13 +119,33 @@ ADC_IRQHandler(void) {
 	{
 	case AdcState::CURRENT:
 	{
-//		led::Onboard::toggle();
-//		led::Onboard::toggle();
-
 		// Read current and clear individual interrupt mask
 		uint16_t current = adc::Adc::getValue(adc::Adc::Channel::CHANNEL_1);
 
 		loggerStream.channel.current = current;
+
+		/**
+		 * Current filtering, FIR
+		 */
+
+		static int32_t fir_state[22] = {0};
+
+		fir_state[0] = current << 16;
+
+		int32_t acc = 0.0;
+		for (uint8_t ii = 0; ii < 22; ++ii)
+		{
+			int32_t prod = (fir_coeffs[ii] >> 8) * (fir_state[ii] >> 8);
+			acc += prod;
+		}
+
+		// shift
+		for (uint8_t ii = 21; ii > 0; --ii)
+		{
+			fir_state[ii] = fir_state[ii - 1];
+		}
+
+		loggerStream.channel.current_filtered = acc >> 16;
 
 		/**
 		 * TODO: Current limiter
@@ -141,16 +169,10 @@ ADC_IRQHandler(void) {
 
 	case AdcState::POSITION:
 	{
-//		led::Onboard::toggle();
-//		led::Onboard::toggle();
-//		led::Onboard::toggle();
-//		led::Onboard::toggle();
-
 		// Read position and clear individual interrupt mask
 		// Cast to signed for less problems when subtracting
 		int16_t position = adc::Adc::getValue(adc::Adc::Channel::CHANNEL_3);
 		loggerStream.channel.position = position;
-
 
 		// display position
 //		static uint16_t dd = 0;
@@ -159,9 +181,10 @@ ADC_IRQHandler(void) {
 //			ssd::Ssd::write(position);
 //		}
 
-//		static uint8_t delay = 0;
-
-//		if ((++delay % 24) == 0) {
+		static uint8_t delay = 0;
+		if (++delay == 100)
+		{
+			delay = 0;
 			if (abs(position - servoSetPosition) > 50) {
 				// something to do
 				if (position > servoSetPosition) {
@@ -188,7 +211,7 @@ ADC_IRQHandler(void) {
 				servo::pwmTimer::setMatchValue(0, 2000);
 				servo::pwmTimer::setMatchValue(1, 2000);
 			}
-//		} // delay
+		}
 
 		// next conversion is triggered by timer and will be the current measurement.
 		adcState = AdcState::CURRENT;
@@ -199,14 +222,20 @@ ADC_IRQHandler(void) {
 	led::Onboard::reset();
 }
 
-extern "C" void
-TIMER16_0_IRQHandler() __attribute__ ((section (".fastcode")));
+// Interrupt handler in RAM for fastes performance
+// extern "C" void
+// TIMER16_0_IRQHandler() __attribute__ ((section (".fastcode")));
 
 extern "C" void
 TIMER16_0_IRQHandler()
 {
 	// write all old values to stream
-	loggerStream.write();
+	static uint8_t delay = 0;
+	if (++delay == 2)
+	{
+		delay = 0;
+		loggerStream.write();
+	}
 
 	// Start the ADC to measure current
 	adc::Adc::startConversion(adc::Adc::ChannelMask::CHANNEL_1);
