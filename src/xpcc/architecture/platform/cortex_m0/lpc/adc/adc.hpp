@@ -135,20 +135,16 @@ namespace xpcc {
 			configurePins(uint8_t channelBitmask = 0xff)
 			{
 				  if (channelBitmask & 0x01) {
-					  LPC_IOCON->R_PIO0_11 &= ~0x8F; /*  ADC I/O config */
-					  LPC_IOCON->R_PIO0_11 |= 0x02;  /* ADC IN0 */
+					  LPC_IOCON->R_PIO0_11 = 0x02;  /* ADC IN0 */
 				  }
 				  if (channelBitmask & 0x02) {
-					  LPC_IOCON->R_PIO1_0  &= ~0x8F;
-					  LPC_IOCON->R_PIO1_0  |= 0x02;  /* ADC IN1 */
+					  LPC_IOCON->R_PIO1_0  = 0x02;  /* ADC IN1 */
 				  }
 				  if (channelBitmask & 0x04) {
-					  LPC_IOCON->R_PIO1_1  &= ~0x8F;
-					  LPC_IOCON->R_PIO1_1  |= 0x02;  /* ADC IN2 */
+					  LPC_IOCON->R_PIO1_1  = 0x02;  /* ADC IN2 */
 				  }
 				  if (channelBitmask & 0x08) {
-					  LPC_IOCON->R_PIO1_2 &= ~0x8F;
-					  LPC_IOCON->R_PIO1_2 |= 0x02;	/* ADC IN3 */
+					  LPC_IOCON->R_PIO1_2 = 0x02;	/* ADC IN3 */
 				  }
 //				  if (channelBitmask & 0x10) {}
 				  if (channelBitmask & 0x20) {
