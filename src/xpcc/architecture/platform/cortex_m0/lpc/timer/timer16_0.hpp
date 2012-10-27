@@ -10,7 +10,7 @@
 
 namespace xpcc
 {
-	namespace lpc11
+	namespace lpc
 	{
 		/**
 		 * \ingroup	lpc1100

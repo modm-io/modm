@@ -43,7 +43,7 @@ namespace xpcc
 		 * Provides same common helper functions.
 		 * 
 		 * @internal
-		 * @ingroup		lpc1100
+		 * @ingroup		lpc
 		 */
 		class UartBase
 		{

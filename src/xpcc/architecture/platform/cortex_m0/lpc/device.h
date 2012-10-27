@@ -44,4 +44,10 @@
 #	include "lpc11xx.hpp"
 #endif
 
+// Doxygen hierarchy
+
+/**
+ * \defgroup	lpc		LPC11xx
+ * \ingroup		lpc
+ */
 #endif // LPC11__DEVICE_H

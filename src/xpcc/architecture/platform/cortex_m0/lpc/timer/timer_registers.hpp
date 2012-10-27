@@ -3,7 +3,7 @@
 
 namespace xpcc
 {
-	namespace lpc11
+	namespace lpc
 	{
 		enum TMR_TCR
 		{

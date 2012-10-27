@@ -35,7 +35,7 @@
 #include "device.h"
 #include "systick_timer.hpp"
 
-static xpcc::lpc11::InterruptHandler sysTickHandler = &xpcc::dummy;
+static xpcc::lpc::InterruptHandler sysTickHandler = &xpcc::dummy;
 
 extern "C" void
 SysTick_Handler(void)
@@ -46,7 +46,7 @@ SysTick_Handler(void)
 
 // ----------------------------------------------------------------------------
 void
-xpcc::lpc11::SysTickTimer::enable(uint32_t reload)
+xpcc::lpc::SysTickTimer::enable(uint32_t reload)
 {
 	// Lower systick interrupt priority to lowest level
 	NVIC_SetPriority(SysTick_IRQn, 0xf);
@@ -59,21 +59,21 @@ xpcc::lpc11::SysTickTimer::enable(uint32_t reload)
 }
 
 void
-xpcc::lpc11::SysTickTimer::disable()
+xpcc::lpc::SysTickTimer::disable()
 {
 	SysTick->CTRL = SysTick_CTRL_CLKSOURCE_Msk;
 }
 
 // ----------------------------------------------------------------------------
 void
-xpcc::lpc11::SysTickTimer::attachInterrupt(InterruptHandler handler)
+xpcc::lpc::SysTickTimer::attachInterrupt(InterruptHandler handler)
 {
 	atomic::Lock lock;
 	sysTickHandler = handler;
 }
 
 void
-xpcc::lpc11::SysTickTimer::detachInterrupt()
+xpcc::lpc::SysTickTimer::detachInterrupt()
 {
 	atomic::Lock lock;
 	sysTickHandler = &xpcc::dummy;

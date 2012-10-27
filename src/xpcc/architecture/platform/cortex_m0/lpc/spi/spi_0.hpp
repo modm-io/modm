@@ -30,7 +30,7 @@ namespace xpcc
 		 * - 8-frame FIFOs for both transmit and receive
 		 * - 4-bit to 16-bit frame
 		 *
-		 * \ingroup	lpc1100
+		 * \ingroup	lpc
 		 *
 		 */
 		class SpiMaster0 : public xpcc::SpiMaster

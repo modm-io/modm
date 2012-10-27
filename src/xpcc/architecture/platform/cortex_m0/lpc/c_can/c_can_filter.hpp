@@ -8,7 +8,7 @@
 
 namespace xpcc
 {
-	namespace lpc11c
+	namespace lpc
 	{
 		/**
 		 * \brief		Reception Filters for the C_CAN module in LPC11C00 Series.
@@ -36,7 +36,7 @@ namespace xpcc
 		 * of Extended CAN messages (29 bit identifier) is implemented yet.
 		 *
 		 * \author		strongly-typed
-		 * \ingroup		lpc1100
+		 * \ingroup		lpc
 		 */
 		class CanFilter
 		{
@@ -119,7 +119,7 @@ namespace xpcc
 
 
 		}; // CanFilter class
-	} // lpc11 namespace
+	} // lpc namespace
 } // xpcc namespace
 
 #endif // XPCC_LPC11C__CAN_FILTER_HPP

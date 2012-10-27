@@ -36,8 +36,10 @@
 #define ADC_OFFSET		0x10
 #define ADC_INDEX		4
 
-namespace xpcc {
-	namespace lpc111x {
+namespace xpcc
+{
+	namespace lpc
+	{
 		/**
 		 * \brief 	Analog-to-Digital Converter Module of
 		 * 			LPC111x, LPC11D14 and LPC11Cxx parts.
@@ -391,7 +393,7 @@ namespace xpcc {
 			}
 
 		};
-	}  // namespace lpc111x
+	}  // namespace lpc
 }
 
 #endif // XPCC_LPC111X__ADC_HPP

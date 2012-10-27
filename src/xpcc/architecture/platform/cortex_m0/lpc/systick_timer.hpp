@@ -36,11 +36,11 @@
 
 namespace xpcc
 {
-	namespace lpc11
+	namespace lpc
 	{
 		/**
 		 * @brief		SysTick Timer
-		 * @ingroup		lpc11
+		 * @ingroup		lpc
 		 */
 		class SysTickTimer
 		{

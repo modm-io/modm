@@ -37,7 +37,7 @@ namespace lpc
 	 * TODO Configuration
 	 *
 	 * \author	strongly-typed
-	 * \ingroup	lpc1100
+	 * \ingroup	lpc
 	 */
 	class Can
 	{

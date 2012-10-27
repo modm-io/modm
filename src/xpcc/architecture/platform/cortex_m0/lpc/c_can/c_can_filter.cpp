@@ -3,7 +3,7 @@
 
 // ----------------------------------------------------------------------------
 void
-xpcc::lpc11c::CanFilter::setFilter(
+xpcc::lpc::CanFilter::setFilter(
 					ExtendedIdentifier id,
 					ExtendedFilterMask mask,
 					uint8_t firstMob,

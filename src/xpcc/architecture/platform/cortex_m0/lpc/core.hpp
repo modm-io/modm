@@ -35,7 +35,7 @@
 
 namespace xpcc
 {
-	namespace lpc11
+	namespace lpc
 	{
 		typedef void (*InterruptHandler)(void);
 		
