@@ -5,7 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- *
+ * 
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -27,44 +27,35 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 // ----------------------------------------------------------------------------
-
-#ifndef	XPCC__CPU_BOARD2_SLAVE_HPP
-	#error	"Don't include this file directly, use 'slave.hpp' instead"
-#endif
-
+/*
+ * WARNING: This file is generated automatically, do not edit!
+ * Please modify the corresponding *.in file instead and rebuild this file. 
+ */
 // ----------------------------------------------------------------------------
-template <typename Transmit, typename Receive>
-bool
-xpcc::CpuBoard2Slave<Transmit, Receive>::initialize()
-{
-	Leds::setOutput();
-	Leds::write(0);
-	
-	enableExternalClock();
-	
-	Interconnect::initialize();
-	
-	for (uint8_t i = 0; i < 4; ++i)
-	{
-		Leds::write(0x0f);
-		xpcc::delay_ms(50);
-		Leds::write(0x00);
-		xpcc::delay_ms(50);
-	}
-	
-	return true;
-}
 
-// ----------------------------------------------------------------------------
-template <typename Transmit, typename Receive>
+#include <avr/interrupt.h>
+#include "timer_e0.hpp"
+
+#ifdef TCE0
+
 void
-xpcc::CpuBoard2Slave<Transmit, Receive>::enableExternalClock()
+xpcc::xmega::TimerE0::setTimerCommand(uint8_t command, bool clear)
 {
-	// select external clock with 8MHz as clock source and set PLL source to XOSC & factor to x4
-	xpcc::xmega::enableExternalClock(OSC_FRQRANGE_2TO9_gc);
-	xpcc::xmega::enablePll(OSC_PLLSRC_XOSC_gc, 4);
-	
-	// set up prescalers (=1) and select PLL as clock source (4 x 8MHz)
-	xpcc::xmega::setSystemClockPrescaler();
-	xpcc::xmega::selectSystemClockSource(CLK_SCLKSEL_PLL_gc);
+	if (clear) {
+		TCE0_CTRLFCLR = command;
+	}
+	else {
+		TCE0_CTRLFSET = command;
+	}
 }
+
+// specific configuration combinations
+void
+xpcc::xmega::TimerE0::setMsTimer(uint8_t interval)
+{
+	setClockSource(TC_CLKSEL_DIV64_gc);
+	setOverflowInterrupt(TC_OVFINTLVL_MED_gc);
+	TCE0_PER = (interval * F_CPU) / 64000l;
+}
+
+#endif	// TCE0

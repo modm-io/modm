@@ -32,7 +32,7 @@
 #define XPCC__CPU_BOARD2_SLAVE_HPP
 
 #include <xpcc/architecture/utils.hpp>
-#include <xpcc/architecture/platform/avr/atxmega.hpp>
+#include <xpcc/architecture/platform/avr/xmega.hpp>
 #include <xpcc/driver/connectivity/interconnect/interconnect_interface.hpp>
 
 namespace xpcc

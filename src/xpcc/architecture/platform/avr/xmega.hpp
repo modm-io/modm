@@ -27,54 +27,86 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 // ----------------------------------------------------------------------------
-
-#ifndef XPCC__AVR_HPP
-#define XPCC__AVR_HPP
-
-#include <avr/io.h>
-#include <avr/interrupt.h>
-
 /**
- * \ingroup		platform
- * \defgroup	avr		AVR
- * 
- * Tested under Linux with avr-gcc and under Windows with WinAVR (also avr-gcc).
- * Other compilers might work as well but are untested.
+ * \ingroup		avr
+ * \defgroup	xmega		XMEGA
  */
+
+#ifndef XPCC_ATXMEGA__ATXMEGA_HPP
+#define XPCC_ATXMEGA__ATXMEGA_HPP
+
+#include "../avr.hpp"
+
 namespace xpcc
 {
-	/**
-	 * \brief	AVR specific functions
-	 * \ingroup	avr
-	 */
-	namespace avr
+	namespace xmega
 	{
+		using avr::enableInterrupts;
+		using avr::disableInterrupts;
+		
+		/// Used to set the interrupt level of all modules.
+		/// @ingroup	xmega
+		enum InterruptLevel
+		{
+			INTERRUPT_LEVEL_OFF = 0x00,
+			INTERRUPT_LEVEL_LOW = 0x01,
+			INTERRUPT_LEVEL_MEDIUM = 0x02,
+			INTERRUPT_LEVEL_HIGH = 0x03,
+		};
+		
+		enum InterruptControlLevel
+		{
+			INTERRUPT_CONTROL_LEVEL_LOW = PMIC_LOLVLEN_bm,
+			INTERRUPT_CONTROL_LEVEL_MEDIUM = PMIC_MEDLVLEN_bm,
+			INTERRUPT_CONTROL_LEVEL_HIGH = PMIC_HILVLEN_bm,
+			
+			/// Enable all Interrupt levels
+			INTERRUPT_CONTROL_LEVEL_ALL = PMIC_HILVLEN_bm | PMIC_MEDLVLEN_bm | PMIC_LOLVLEN_bm,
+		};
+		
 		/**
-		 * \ingroup	avr
+		 * Enable one or more of the three Interrupt levels.
+		 *
+		 * In order to work with interrupts on a xMEGA you need to enable
+		 * interrupts in general (enableInterrupts()) and enable the
+		 * level you wont to work with.
+		 *
+		 * Example:
+		 * \code
+		 * // Enable all interrupt levels
+		 * xpcc::xmega::enableInterrupts();
+		 * xpcc::xmega::enableInterruptLevel(xpcc::xmega::INTERRUPT_LEVEL_ALL);
+		 * \endcode
+		 *
+		 * @ingroup	xmega
 		 */
 		static inline void
-		enableInterrupts()
+		enableInterruptLevel(InterruptControlLevel level)
 		{
-			sei();
+			PMIC_CTRL |= level;
 		}
-
+		
 		/**
-		 * \ingroup	avr
+		 * Disable interrupt levels.
+		 *
+		 * @ingroup	xmega
 		 */
 		static inline void
-		disableInterrupts()
+		disableInterruptLevel(InterruptControlLevel level)
 		{
-			cli();
+			PMIC_CTRL &= ~level;
 		}
 	}
 }
 
-#if defined XPCC__CPU_ATMEGA
-#	include "avr/atmega.hpp"
-#elif defined XPCC__CPU_ATXMEGA
-#	include "avr/xmega.hpp"
-#elif defined XPCC__CPU_ATTINY
-#	include "avr/attiny.hpp"
-#endif
+#include "xmega/uart.hpp"
+#include "xmega/spi.hpp"
+#include "xmega/gpio.hpp"
+#include "xmega/timer.hpp"
+#include "xmega/adc.hpp"
+#include "xmega/clock.hpp"
+#include "xmega/utils.hpp"
+#include "xmega/i2c.hpp"
+#include "xmega/dma.hpp"
 
-#endif	// XPCC__AVR_HPP
+#endif

@@ -2,10 +2,10 @@
 // ----------------------------------------------------------------------------
 /* Copyright (c) 2011, Roboterclub Aachen e.V.
  * All rights reserved.
- *
+ * 
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- *
+ * 
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -14,7 +14,7 @@
  *     * Neither the name of the Roboterclub Aachen e.V. nor the
  *       names of its contributors may be used to endorse or promote products
  *       derived from this software without specific prior written permission.
- *
+ * 
  * THIS SOFTWARE IS PROVIDED BY ROBOTERCLUB AACHEN E.V. ''AS IS'' AND ANY
  * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -28,43 +28,59 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC__CPU_BOARD2_SLAVE_HPP
-	#error	"Don't include this file directly, use 'slave.hpp' instead"
-#endif
+#include "utils.hpp"
+#include "clock.hpp"
 
 // ----------------------------------------------------------------------------
-template <typename Transmit, typename Receive>
-bool
-xpcc::CpuBoard2Slave<Transmit, Receive>::initialize()
+void
+xpcc::xmega::enableExternalClock(OSC_FRQRANGE_t frequency)
 {
-	Leds::setOutput();
-	Leds::write(0);
+	// select external clock with 8MHz as clock source
+	OSC.XOSCCTRL = frequency | OSC_XOSCSEL_EXTCLK_gc;
+	OSC.CTRL |= OSC_XOSCEN_bm;
 	
-	enableExternalClock();
-	
-	Interconnect::initialize();
-	
-	for (uint8_t i = 0; i < 4; ++i)
-	{
-		Leds::write(0x0f);
-		xpcc::delay_ms(50);
-		Leds::write(0x00);
-		xpcc::delay_ms(50);
-	}
-	
-	return true;
+	// wait for osc to become ready
+	while ((OSC.STATUS & OSC_XOSCRDY_bm) == 0)
+		;
 }
 
 // ----------------------------------------------------------------------------
-template <typename Transmit, typename Receive>
 void
-xpcc::CpuBoard2Slave<Transmit, Receive>::enableExternalClock()
+xpcc::xmega::enableExternalOscillator(OSC_FRQRANGE_t frequency, OSC_XOSCSEL_t startupTime)
 {
-	// select external clock with 8MHz as clock source and set PLL source to XOSC & factor to x4
-	xpcc::xmega::enableExternalClock(OSC_FRQRANGE_2TO9_gc);
-	xpcc::xmega::enablePll(OSC_PLLSRC_XOSC_gc, 4);
+	// select external clock with 16MHz as clock source
+	OSC.XOSCCTRL = frequency | startupTime;
+	OSC.CTRL |= OSC_XOSCEN_bm;
 	
-	// set up prescalers (=1) and select PLL as clock source (4 x 8MHz)
-	xpcc::xmega::setSystemClockPrescaler();
-	xpcc::xmega::selectSystemClockSource(CLK_SCLKSEL_PLL_gc);
+	// wait for osc to become ready
+	while ((OSC.STATUS & OSC_XOSCRDY_bm) == 0)
+		;
+}
+
+// ----------------------------------------------------------------------------
+void
+xpcc::xmega::enablePll(OSC_PLLSRC_t source, uint8_t factor)
+{
+	// set PLL source to XOSC & factor to x4
+	OSC.PLLCTRL = source | ((factor & 0x1f) << OSC_PLLFAC_gp);
+	OSC.CTRL |= OSC_PLLEN_bm;		// enable PLL
+	
+	// wait for PLL to become ready
+	while ((OSC.STATUS & OSC_PLLRDY_bm) == 0)
+		;
+}
+
+// ----------------------------------------------------------------------------
+void
+xpcc::xmega::selectSystemClockSource(CLK_SCLKSEL_t source)
+{
+	changeProtectedRegister(&CLK_CTRL, source);
+}
+
+// ----------------------------------------------------------------------------
+void
+xpcc::xmega::setSystemClockPrescaler(CLK_PSADIV_t prescalerA,
+		CLK_PSBCDIV_t prescalerBC)
+{
+	CLK.PSCTRL = prescalerA | prescalerBC;
 }

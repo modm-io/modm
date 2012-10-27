@@ -5,7 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- *
+ * 
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -27,44 +27,34 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 // ----------------------------------------------------------------------------
+/*
+ * WARNING: This file is generated automatically, do not edit!
+ * Please modify the corresponding *.in file instead and rebuild this file. 
+ */
+// ----------------------------------------------------------------------------
 
-#ifndef	XPCC__CPU_BOARD2_SLAVE_HPP
-	#error	"Don't include this file directly, use 'slave.hpp' instead"
-#endif
+#include <avr/io.h>
+#include <avr/interrupt.h>
+
+#include "adcb.hpp"
+#include <xpcc/architecture/platform/avr/xmega/utils.hpp>
+
+#ifdef ADCB
 
 // ----------------------------------------------------------------------------
-template <typename Transmit, typename Receive>
-bool
-xpcc::CpuBoard2Slave<Transmit, Receive>::initialize()
-{
-	Leds::setOutput();
-	Leds::write(0);
-	
-	enableExternalClock();
-	
-	Interconnect::initialize();
-	
-	for (uint8_t i = 0; i < 4; ++i)
-	{
-		Leds::write(0x0f);
-		xpcc::delay_ms(50);
-		Leds::write(0x00);
-		xpcc::delay_ms(50);
-	}
-	
-	return true;
-}
-
-// ----------------------------------------------------------------------------
-template <typename Transmit, typename Receive>
 void
-xpcc::CpuBoard2Slave<Transmit, Receive>::enableExternalClock()
+xpcc::xmega::AdcB::initialize(adc::Reference reference,
+									   adc::Prescaler prescaler,
+									   adc::Resolution resolution)
 {
-	// select external clock with 8MHz as clock source and set PLL source to XOSC & factor to x4
-	xpcc::xmega::enableExternalClock(OSC_FRQRANGE_2TO9_gc);
-	xpcc::xmega::enablePll(OSC_PLLSRC_XOSC_gc, 4);
+	ADCB_REFCTRL = reference;
+	ADCB_PRESCALER = prescaler;
+	ADCB_CTRLB = resolution;
 	
-	// set up prescalers (=1) and select PLL as clock source (4 x 8MHz)
-	xpcc::xmega::setSystemClockPrescaler();
-	xpcc::xmega::selectSystemClockSource(CLK_SCLKSEL_PLL_gc);
+	ADCB.CALL = xmega::readCalibrationByte(offsetof(NVM_PROD_SIGNATURES_t, ADCBCAL0));
+	ADCB.CALH = xmega::readCalibrationByte(offsetof(NVM_PROD_SIGNATURES_t, ADCBCAL1));
+	
+	ADCB_CTRLA = ADC_ENABLE_bm;
 }
+
+#endif // ADCB

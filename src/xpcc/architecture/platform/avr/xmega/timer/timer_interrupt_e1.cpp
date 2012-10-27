@@ -5,7 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- *
+ * 
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -27,44 +27,66 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 // ----------------------------------------------------------------------------
-
-#ifndef	XPCC__CPU_BOARD2_SLAVE_HPP
-	#error	"Don't include this file directly, use 'slave.hpp' instead"
-#endif
-
+/*
+ * WARNING: This file is generated automatically, do not edit!
+ * Please modify the corresponding *.in file instead and rebuild this file. 
+ */
 // ----------------------------------------------------------------------------
-template <typename Transmit, typename Receive>
-bool
-xpcc::CpuBoard2Slave<Transmit, Receive>::initialize()
+
+#include <avr/interrupt.h>
+#include "timer_interrupt_e1.hpp"
+
+#ifdef TCE1
+
+xpcc::xmega::TimerInterruptE1::F xpcc::xmega::TimerInterruptE1::overflow=xpcc::dummy;
+xpcc::xmega::TimerInterruptE1::F xpcc::xmega::TimerInterruptE1::error=xpcc::dummy;
+xpcc::xmega::TimerInterruptE1::F xpcc::xmega::TimerInterruptE1::cca=xpcc::dummy;
+xpcc::xmega::TimerInterruptE1::F xpcc::xmega::TimerInterruptE1::ccb=xpcc::dummy;
+
+
+ISR(TCE1_ERR_vect)
 {
-	Leds::setOutput();
-	Leds::write(0);
-	
-	enableExternalClock();
-	
-	Interconnect::initialize();
-	
-	for (uint8_t i = 0; i < 4; ++i)
-	{
-		Leds::write(0x0f);
-		xpcc::delay_ms(50);
-		Leds::write(0x00);
-		xpcc::delay_ms(50);
-	}
-	
-	return true;
+	xpcc::xmega::TimerInterruptE1::error();
 }
 
-// ----------------------------------------------------------------------------
-template <typename Transmit, typename Receive>
+ISR(TCE1_OVF_vect)
+{
+	xpcc::xmega::TimerInterruptE1::overflow();
+}
+
+ISR(TCE1_CCA_vect)
+{
+	xpcc::xmega::TimerInterruptE1::cca();
+}
+
+ISR(TCE1_CCB_vect)
+{
+	xpcc::xmega::TimerInterruptE1::ccb();
+}
+
+
+// specific configuration combinations
 void
-xpcc::CpuBoard2Slave<Transmit, Receive>::enableExternalClock()
+xpcc::xmega::TimerInterruptE1::setMsTimer(F function, uint8_t interval)
 {
-	// select external clock with 8MHz as clock source and set PLL source to XOSC & factor to x4
-	xpcc::xmega::enableExternalClock(OSC_FRQRANGE_2TO9_gc);
-	xpcc::xmega::enablePll(OSC_PLLSRC_XOSC_gc, 4);
-	
-	// set up prescalers (=1) and select PLL as clock source (4 x 8MHz)
-	xpcc::xmega::setSystemClockPrescaler();
-	xpcc::xmega::selectSystemClockSource(CLK_SCLKSEL_PLL_gc);
+	setClockSource(TC_CLKSEL_DIV64_gc);
+	attachOverflowInterrupt(TC_OVFINTLVL_MED_gc, function);
+	TCE1_PER = (interval * F_CPU) / 64000l;
 }
+
+bool
+xpcc::xmega::TimerInterruptE1::attachCompareCaptureInterrupt(xpcc::timer::Channel channel, uint8_t level, F function)
+{
+	level <<= 2*channel;
+	if (channel == xpcc::timer::CHANNELA) {
+		attachCompareCaptureAInterrupt(static_cast<TC_CCAINTLVL_t>(level), function);
+		return true;
+	}
+	else if (channel == xpcc::timer::CHANNELB) {
+		attachCompareCaptureBInterrupt(static_cast<TC_CCBINTLVL_t>(level), function);
+		return true;
+	}
+	return false;
+}
+
+#endif	// TCE1

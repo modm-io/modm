@@ -1,6 +1,6 @@
 // coding: utf-8
 // ----------------------------------------------------------------------------
-/* Copyright (c) 2011, Roboterclub Aachen e.V.
+/* Copyright (c) 2012, Roboterclub Aachen e.V.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -28,43 +28,15 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC__CPU_BOARD2_SLAVE_HPP
-	#error	"Don't include this file directly, use 'slave.hpp' instead"
-#endif
+/**
+ * \ingroup	xmega
+ * \defgroup xmega_i2c I2C Module
+ * 
+ * \author	Niklas Hauser
+ */
 
-// ----------------------------------------------------------------------------
-template <typename Transmit, typename Receive>
-bool
-xpcc::CpuBoard2Slave<Transmit, Receive>::initialize()
-{
-	Leds::setOutput();
-	Leds::write(0);
-	
-	enableExternalClock();
-	
-	Interconnect::initialize();
-	
-	for (uint8_t i = 0; i < 4; ++i)
-	{
-		Leds::write(0x0f);
-		xpcc::delay_ms(50);
-		Leds::write(0x00);
-		xpcc::delay_ms(50);
-	}
-	
-	return true;
-}
+#include "i2c/i2c_master_c.hpp"
+#include "i2c/i2c_master_d.hpp"
+#include "i2c/i2c_master_e.hpp"
+#include "i2c/i2c_master_f.hpp"
 
-// ----------------------------------------------------------------------------
-template <typename Transmit, typename Receive>
-void
-xpcc::CpuBoard2Slave<Transmit, Receive>::enableExternalClock()
-{
-	// select external clock with 8MHz as clock source and set PLL source to XOSC & factor to x4
-	xpcc::xmega::enableExternalClock(OSC_FRQRANGE_2TO9_gc);
-	xpcc::xmega::enablePll(OSC_PLLSRC_XOSC_gc, 4);
-	
-	// set up prescalers (=1) and select PLL as clock source (4 x 8MHz)
-	xpcc::xmega::setSystemClockPrescaler();
-	xpcc::xmega::selectSystemClockSource(CLK_SCLKSEL_PLL_gc);
-}

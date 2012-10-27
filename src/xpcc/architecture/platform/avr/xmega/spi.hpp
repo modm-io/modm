@@ -5,7 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- *
+ * 
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -28,43 +28,30 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC__CPU_BOARD2_SLAVE_HPP
-	#error	"Don't include this file directly, use 'slave.hpp' instead"
-#endif
+/**
+ * \ingroup		xmega
+ * \defgroup	xmega_spi	SPI Module
+ *
+ * Serial Peripheral Interface Module
+ *
+ * The write method is blocking until the SPI Interrupt Flag is set (=> SPI
+ * transfer is complete).
+ * It can be used for higher SPI clock speeds than feasible with Software SPI.
+ *
+ * The MISO pin uses a pull-up resistor so that if the SPI slave is accidentally
+ * disconnected, the write method does not block, but returns 0x00 or 0xff.
+ * If your SPI slave has a "Data Ready" pin, which triggers a SPI readout, make
+ * sure to use a pullup/pulldown on the input pin, to keep a disconnected slave
+ * from causing continous readouts.
+ *
+ * For non-blocking operation use DMA to write data from memory to the data register.
+ * Be aware that DMA transfers is only possible on the UART in SPI mode module!
+ *
+ * \see		xpcc::SpiMaster
+ * \author	Niklas Hauser
+ */
 
-// ----------------------------------------------------------------------------
-template <typename Transmit, typename Receive>
-bool
-xpcc::CpuBoard2Slave<Transmit, Receive>::initialize()
-{
-	Leds::setOutput();
-	Leds::write(0);
-	
-	enableExternalClock();
-	
-	Interconnect::initialize();
-	
-	for (uint8_t i = 0; i < 4; ++i)
-	{
-		Leds::write(0x0f);
-		xpcc::delay_ms(50);
-		Leds::write(0x00);
-		xpcc::delay_ms(50);
-	}
-	
-	return true;
-}
-
-// ----------------------------------------------------------------------------
-template <typename Transmit, typename Receive>
-void
-xpcc::CpuBoard2Slave<Transmit, Receive>::enableExternalClock()
-{
-	// select external clock with 8MHz as clock source and set PLL source to XOSC & factor to x4
-	xpcc::xmega::enableExternalClock(OSC_FRQRANGE_2TO9_gc);
-	xpcc::xmega::enablePll(OSC_PLLSRC_XOSC_gc, 4);
-	
-	// set up prescalers (=1) and select PLL as clock source (4 x 8MHz)
-	xpcc::xmega::setSystemClockPrescaler();
-	xpcc::xmega::selectSystemClockSource(CLK_SCLKSEL_PLL_gc);
-}
+#include "spi/spi_c.hpp"
+#include "spi/spi_d.hpp"
+#include "spi/spi_e.hpp"
+#include "spi/spi_f.hpp"

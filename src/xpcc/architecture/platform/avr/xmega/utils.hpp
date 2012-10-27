@@ -2,10 +2,10 @@
 // ----------------------------------------------------------------------------
 /* Copyright (c) 2011, Roboterclub Aachen e.V.
  * All rights reserved.
- *
+ * 
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- *
+ * 
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -14,7 +14,7 @@
  *     * Neither the name of the Roboterclub Aachen e.V. nor the
  *       names of its contributors may be used to endorse or promote products
  *       derived from this software without specific prior written permission.
- *
+ * 
  * THIS SOFTWARE IS PROVIDED BY ROBOTERCLUB AACHEN E.V. ''AS IS'' AND ANY
  * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -28,43 +28,70 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC__CPU_BOARD2_SLAVE_HPP
-	#error	"Don't include this file directly, use 'slave.hpp' instead"
-#endif
+#ifndef XPCC_ATXMEGA__UTILS_HPP
+#define	XPCC_ATXMEGA__UTILS_HPP
 
-// ----------------------------------------------------------------------------
-template <typename Transmit, typename Receive>
-bool
-xpcc::CpuBoard2Slave<Transmit, Receive>::initialize()
+#include <stddef.h>		// for offsetof()
+#include <xpcc/architecture/utils.hpp>
+#include <xpcc/architecture/platform/avr/xmega.hpp>
+
+namespace xpcc
 {
-	Leds::setOutput();
-	Leds::write(0);
-	
-	enableExternalClock();
-	
-	Interconnect::initialize();
-	
-	for (uint8_t i = 0; i < 4; ++i)
+	namespace xmega
 	{
-		Leds::write(0x0f);
-		xpcc::delay_ms(50);
-		Leds::write(0x00);
-		xpcc::delay_ms(50);
+		/**
+		 * \brief	CCP write helper function
+		 * 
+		 * This function is written in assembly because of the time critical
+		 * operation of writing to the registers.
+		 * 
+		 * \param	address	A pointer to the address to write to.
+		 * \param	value	The value to put in to the register.
+		 * 
+		 * \ingroup	xmega
+		 */
+		ALWAYS_INLINE static void
+		changeProtectedRegister(volatile uint8_t * address, uint8_t value)
+		{
+		#ifdef RAMPZ
+			RAMPZ = 0;
+		#endif
+			
+			asm volatile (
+				"movw r30, %0"		"\n\t"
+				"ldi  r16, 0xD8"	"\n\t"
+				"out  0x34, r16"	"\n\t"
+				"st   Z,  %1"
+					:
+					: "r" (address), "r" (value)
+					: "r16", "r30", "r31"
+			);
+		}
+		
+		/**
+		 * \brief	Read a calibration byte
+		 * 
+		 * Example:
+		 * \code
+		 * ADCA.CALL = readCalibrationByte(offsetof(NVM_PROD_SIGNATURES_t, ADCACAL0));
+		 * \endcode
+		 * 
+		 * \ingroup	xmega
+		 */
+		uint8_t
+		readCalibrationByte(uint8_t index);		
+		
+		/**
+		 * Reset the Xmega via software.
+		 *
+		 * @ingroup	xmega
+		 */
+		static inline void
+		softwareReset()
+		{
+			changeProtectedRegister(&RST_CTRL, RST_SWRST_bm);
+		}
 	}
-	
-	return true;
 }
 
-// ----------------------------------------------------------------------------
-template <typename Transmit, typename Receive>
-void
-xpcc::CpuBoard2Slave<Transmit, Receive>::enableExternalClock()
-{
-	// select external clock with 8MHz as clock source and set PLL source to XOSC & factor to x4
-	xpcc::xmega::enableExternalClock(OSC_FRQRANGE_2TO9_gc);
-	xpcc::xmega::enablePll(OSC_PLLSRC_XOSC_gc, 4);
-	
-	// set up prescalers (=1) and select PLL as clock source (4 x 8MHz)
-	xpcc::xmega::setSystemClockPrescaler();
-	xpcc::xmega::selectSystemClockSource(CLK_SCLKSEL_PLL_gc);
-}
+#endif	// XPCC_ATXMEGA__UTILS_HPP

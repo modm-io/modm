@@ -1,11 +1,11 @@
 // coding: utf-8
 // ----------------------------------------------------------------------------
-/* Copyright (c) 2011, Roboterclub Aachen e.V.
+/* Copyright (c) 2012, Roboterclub Aachen e.V.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- *
+ * 
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -28,43 +28,35 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC__CPU_BOARD2_SLAVE_HPP
-	#error	"Don't include this file directly, use 'slave.hpp' instead"
-#endif
+#ifndef XPCC_ATXMEGA__SPI_HPP
+#define XPCC_ATXMEGA__SPI_HPP
 
-// ----------------------------------------------------------------------------
-template <typename Transmit, typename Receive>
-bool
-xpcc::CpuBoard2Slave<Transmit, Receive>::initialize()
+namespace xpcc
 {
-	Leds::setOutput();
-	Leds::write(0);
-	
-	enableExternalClock();
-	
-	Interconnect::initialize();
-	
-	for (uint8_t i = 0; i < 4; ++i)
+	namespace xmega
 	{
-		Leds::write(0x0f);
-		xpcc::delay_ms(50);
-		Leds::write(0x00);
-		xpcc::delay_ms(50);
+		namespace spi
+		{
+			enum Mode
+			{
+				MODE_0 = SPI_MODE_0_gc,	///< SCK normal, sample on rising edge
+				MODE_1 = SPI_MODE_1_gc, ///< SCK normal, sample on falling edge
+				MODE_2 = SPI_MODE_2_gc, ///< SCK inverted, sample on falling edge
+				MODE_3 = SPI_MODE_3_gc	///< SCK inverted, sample on rising edge
+			};
+			
+			enum Prescaler
+			{
+				PRESCALER_2 = SPI_CLK2X_bm | SPI_PRESCALER_DIV4_gc,
+				PRESCALER_4 = SPI_PRESCALER_DIV4_gc,
+				PRESCALER_8 = SPI_CLK2X_bm | SPI_PRESCALER_DIV16_gc,
+				PRESCALER_16 = SPI_PRESCALER_DIV16_gc,
+				PRESCALER_32 = SPI_CLK2X_bm | SPI_PRESCALER_DIV64_gc,
+				PRESCALER_64 = SPI_PRESCALER_DIV64_gc,
+				PRESCALER_128 = SPI_PRESCALER_DIV128_gc
+			};
+		}
 	}
-	
-	return true;
 }
 
-// ----------------------------------------------------------------------------
-template <typename Transmit, typename Receive>
-void
-xpcc::CpuBoard2Slave<Transmit, Receive>::enableExternalClock()
-{
-	// select external clock with 8MHz as clock source and set PLL source to XOSC & factor to x4
-	xpcc::xmega::enableExternalClock(OSC_FRQRANGE_2TO9_gc);
-	xpcc::xmega::enablePll(OSC_PLLSRC_XOSC_gc, 4);
-	
-	// set up prescalers (=1) and select PLL as clock source (4 x 8MHz)
-	xpcc::xmega::setSystemClockPrescaler();
-	xpcc::xmega::selectSystemClockSource(CLK_SCLKSEL_PLL_gc);
-}
+#endif	// XPCC_ATXMEGA__SPI_HPP

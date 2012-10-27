@@ -5,7 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- *
+ * 
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -27,44 +27,51 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 // ----------------------------------------------------------------------------
+/*
+ * WARNING: This file is generated automatically, do not edit!
+ * Please modify the corresponding *.in file instead and rebuild this file. 
+ */
+// ----------------------------------------------------------------------------
 
-#ifndef	XPCC__CPU_BOARD2_SLAVE_HPP
-	#error	"Don't include this file directly, use 'slave.hpp' instead"
+#ifndef XPCC_ATXMEGA__TIMER_HIRES_D_HPP
+#define XPCC_ATXMEGA__TIMER_HIRES_D_HPP
+
+#include <avr/io.h>
+#include <stdint.h>
+
+#if defined(HIRESD) || defined(__DOXYGEN__)
+
+// older versions of avr-libc provide false register names
+#ifndef HIRESD_CTRLA
+#	define HIRESD_CTRLA		HIRESD_CTRL
 #endif
 
-// ----------------------------------------------------------------------------
-template <typename Transmit, typename Receive>
-bool
-xpcc::CpuBoard2Slave<Transmit, Receive>::initialize()
+namespace xpcc
 {
-	Leds::setOutput();
-	Leds::write(0);
-	
-	enableExternalClock();
-	
-	Interconnect::initialize();
-	
-	for (uint8_t i = 0; i < 4; ++i)
+	namespace xmega
 	{
-		Leds::write(0x0f);
-		xpcc::delay_ms(50);
-		Leds::write(0x00);
-		xpcc::delay_ms(50);
+		/**
+		 * \brief		HIgh RESolution Extension of Timer D
+		 *
+		 * \ingroup		xmega_timer
+		 */
+		class HighResD
+		{
+		public:
+			inline static HIRES_t&
+			getHighResBase()
+			{
+				return HIRESD;
+			}
+			
+			inline static void
+			setHIRESEnable(HIRES_HREN_t enable)
+			{
+				HIRESD_CTRLA = enable;
+			}
+		};
 	}
-	
-	return true;
 }
 
-// ----------------------------------------------------------------------------
-template <typename Transmit, typename Receive>
-void
-xpcc::CpuBoard2Slave<Transmit, Receive>::enableExternalClock()
-{
-	// select external clock with 8MHz as clock source and set PLL source to XOSC & factor to x4
-	xpcc::xmega::enableExternalClock(OSC_FRQRANGE_2TO9_gc);
-	xpcc::xmega::enablePll(OSC_PLLSRC_XOSC_gc, 4);
-	
-	// set up prescalers (=1) and select PLL as clock source (4 x 8MHz)
-	xpcc::xmega::setSystemClockPrescaler();
-	xpcc::xmega::selectSystemClockSource(CLK_SCLKSEL_PLL_gc);
-}
+#endif // HIRESD
+#endif // XPCC_ATXMEGA__TIMER_HIRES_D_HPP

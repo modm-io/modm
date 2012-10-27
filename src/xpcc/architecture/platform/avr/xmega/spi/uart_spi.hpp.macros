@@ -1,0 +1,70 @@
+{%- macro master(character, number) -%}
+#if defined(USART{{ character }}{{ number }}) || defined(__DOXYGEN__)
+		/**
+		 * \brief		UART{{ port }}{{ number }} in SPI master mode
+		 *
+		 * The USART pins are mapped like this MOSI=>TXO, MISO=>RXI, SCK=>XCK.
+		 * Be aware that this module has no SS pin, so no slave mode is possible.
+		 *
+		 * This module supports DMA transfers between memory (SRAM) and DATA
+		 * register by defining which DMA channel to use for write/read.
+		 * (SPI{{ port }}{{ number }}_TX_DMA_CHANNEL, SPI{{ port }}{{ number }}_RX_DMA_CHANNEL)
+		 * In typical use, the DMA channels gets configured once and then several
+		 * transfers get triggered, without CPU interference.
+		 * 
+		 * \author	Niklas Hauser
+		 * \ingroup	xmega_spi
+		 */
+		class UartSpiMaster{{ character }}{{ number }} : public SpiMaster
+		{
+		public:
+			/**
+			 * Sets pins and calculates the bsel value of the UART module.
+			 * The parameter has to be constant at compile time, so that
+			 * the compiler can do the calculation, and not the uC.
+			 * The DMA channel is configured with a Burst Length of one byte,
+			 * reloading of source address after block transfer completion,
+			 * incr./decr. of source address after each byte transfer,
+			 * no reloading of fixed destination address (=UART DATA register).
+			 * 
+			 * \warning The bitrate must be less than half F_CPU.
+			 * \param	bitrate	SPI frequency in Hz
+			 */
+			static void
+			initialize(uint32_t const bitrate=2000000);
+			
+			static uint8_t
+			write(uint8_t data);
+			
+			static bool
+			setBuffer(uint16_t length,
+					  uint8_t* transmit=0, uint8_t* receive=0,
+					  BufferIncrease bufferIncrease=BUFFER_INCR_BOTH);
+					  
+			static bool
+			transfer(TransferOptions options=TRANSFER_SEND_BUFFER_SAVE_RECEIVE);
+			
+			static bool
+			transferSync(TransferOptions options=TRANSFER_SEND_BUFFER_SAVE_RECEIVE);
+			
+			static bool
+			isFinished();
+			
+			inline static USART_t&
+			getModuleBase()
+			{
+				return USART{{ character }}{{ number }};
+			}
+			
+			inline static void
+			setDataOrder(bool lsbFirst=true)
+			{
+				USART{{ character }}{{ number }}_CTRLC = (USART{{ character }}{{ number }}_CTRLC & ~USART_CHSIZE2_bm) | (lsbFirst ? USART_CHSIZE2_bm : 0);
+			}
+			
+		private:
+			static bool
+			isBusy();
+		};
+#endif	// USART{{ character }}{{ number }}
+{%- endmacro -%}

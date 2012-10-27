@@ -5,7 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- *
+ * 
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -27,44 +27,64 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 // ----------------------------------------------------------------------------
-
-#ifndef	XPCC__CPU_BOARD2_SLAVE_HPP
-	#error	"Don't include this file directly, use 'slave.hpp' instead"
-#endif
-
+/*
+ * WARNING: This file is generated automatically, do not edit!
+ * Please modify the corresponding *.in file instead and rebuild this file. 
+ */
 // ----------------------------------------------------------------------------
-template <typename Transmit, typename Receive>
-bool
-xpcc::CpuBoard2Slave<Transmit, Receive>::initialize()
+
+#ifndef XPCC_ATXMEGA__TIMER_AWEX_E_HPP
+#define XPCC_ATXMEGA__TIMER_AWEX_E_HPP
+
+#include <avr/io.h>
+#include <stdint.h>
+
+#if defined(AWEXE) || defined(__DOXYGEN__)
+
+namespace xpcc
 {
-	Leds::setOutput();
-	Leds::write(0);
-	
-	enableExternalClock();
-	
-	Interconnect::initialize();
-	
-	for (uint8_t i = 0; i < 4; ++i)
+	namespace xmega
 	{
-		Leds::write(0x0f);
-		xpcc::delay_ms(50);
-		Leds::write(0x00);
-		xpcc::delay_ms(50);
+		/**
+		 * \brief		Advanced Waveform EXtension of Timer E
+		 *
+		 * \ingroup		xmega_timer
+		 */
+		class WaveformE
+		{
+		public:
+			inline static AWEX_t&
+			getWaveformBase()
+			{
+				return AWEXE;
+			}
+			
+			inline static void
+			setAWEXMode(uint8_t mode)
+			{
+				AWEXE_CTRL = (AWEXE_CTRL & ~(AWEX_PGM_bm|AWEX_CWCM_bm)) | mode;
+			}
+			
+			inline static void
+			setAWEXDTIEnable(uint8_t selection)
+			{
+				AWEXE_CTRL = (AWEXE_CTRL & ~(AWEX_DTICCDEN_bm|AWEX_DTICCCEN_bm|AWEX_DTICCBEN_bm|AWEX_DTICCAEN_bm)) | selection;
+			}
+			
+			inline static void
+			setAWEXFaultDetection(uint8_t mode)
+			{
+				AWEXE_FDCTRL = mode;
+			}
+			
+			inline static uint8_t
+			getAWEXStatus()
+			{
+				return AWEXE_STATUS;
+			}
+		};
 	}
-	
-	return true;
 }
 
-// ----------------------------------------------------------------------------
-template <typename Transmit, typename Receive>
-void
-xpcc::CpuBoard2Slave<Transmit, Receive>::enableExternalClock()
-{
-	// select external clock with 8MHz as clock source and set PLL source to XOSC & factor to x4
-	xpcc::xmega::enableExternalClock(OSC_FRQRANGE_2TO9_gc);
-	xpcc::xmega::enablePll(OSC_PLLSRC_XOSC_gc, 4);
-	
-	// set up prescalers (=1) and select PLL as clock source (4 x 8MHz)
-	xpcc::xmega::setSystemClockPrescaler();
-	xpcc::xmega::selectSystemClockSource(CLK_SCLKSEL_PLL_gc);
-}
+#endif	// AWEXE
+#endif // XPCC_ATXMEGA__TIMER_AWEX_E_HPP

@@ -29,7 +29,7 @@
 // ----------------------------------------------------------------------------
 
 #include <avr/interrupt.h>
-#include <xpcc/architecture/platform/avr/atxmega.hpp>
+#include <xpcc/architecture/platform/avr/xmega.hpp>
 
 #include "interconnect_link.hpp"
 #include <xpcc_config.hpp>
@@ -130,8 +130,8 @@ bool xpcc::InterconnectLink::newDataReceived;
 void
 xpcc::InterconnectLink::initialize()
 {
-	UsartSS::configureInputSense(xpcc::atxmega::BOTHEDGES);
-	UsartSS::configureInterrupt0(xpcc::atxmega::INTERRUPT_LEVEL_MEDIUM);
+	UsartSS::configureInputSense(xpcc::xmega::BOTHEDGES);
+	UsartSS::configureInterrupt0(xpcc::xmega::INTERRUPT_LEVEL_MEDIUM);
 	
 	UsartMS::setOutput();
 	UsartMS::set();

@@ -5,7 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- *
+ * 
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -27,44 +27,75 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 // ----------------------------------------------------------------------------
+{{ generation_block }}
+{% import 'uart_spi.hpp.macros' as uart_spi %}
 
-#ifndef	XPCC__CPU_BOARD2_SLAVE_HPP
-	#error	"Don't include this file directly, use 'slave.hpp' instead"
-#endif
+#ifndef XPCC_ATXMEGA__SPI_{{ port }}_HPP
+#define XPCC_ATXMEGA__SPI_{{ port }}_HPP
 
-// ----------------------------------------------------------------------------
-template <typename Transmit, typename Receive>
-bool
-xpcc::CpuBoard2Slave<Transmit, Receive>::initialize()
+#include <stdint.h>
+#include <avr/io.h>
+#include "spi.hpp"
+#include <xpcc/driver/connectivity/spi/spi_master.hpp>
+#include <xpcc/architecture/utils.hpp>
+
+namespace xpcc
 {
-	Leds::setOutput();
-	Leds::write(0);
-	
-	enableExternalClock();
-	
-	Interconnect::initialize();
-	
-	for (uint8_t i = 0; i < 4; ++i)
+	namespace xmega
 	{
-		Leds::write(0x0f);
-		xpcc::delay_ms(50);
-		Leds::write(0x00);
-		xpcc::delay_ms(50);
+#if defined(SPI{{ port }}) || defined(__DOXYGEN__)
+		/**
+		 * \brief		SPI Master for Port {{ port }}
+		 *
+		 * This module only supports DMA read transfers in slave mode, however
+		 * slave mode is not implemented here.
+		 *
+		 * \author		Niklas hauser
+		 * \ingroup		xmega_spi
+		 */
+		class SpiMaster{{ port }} : public SpiMaster
+		{
+		public:
+			static void
+			initialize(spi::Prescaler prescaler=spi::PRESCALER_16,
+					   spi::Mode mode=spi::MODE_0);
+			
+			inline static void
+			setDataOrder(bool lsbFirst=true)
+			{
+				SPI{{ port }}_CTRL = (SPI{{ port }}_CTRL & ~SPI_DORD_bm) | (lsbFirst ? SPI_DORD_bm : 0);
+			}
+			
+			static uint8_t
+			write(uint8_t data);
+			
+			static bool
+			setBuffer(uint16_t length,
+					  uint8_t* transmit=0, uint8_t* receive=0,
+					  BufferIncrease bufferIncrease=BUFFER_INCR_BOTH);
+			
+			static bool
+			transfer(TransferOptions options=TRANSFER_SEND_BUFFER_SAVE_RECEIVE);
+			
+			static ALWAYS_INLINE bool
+			transferSync(TransferOptions options=TRANSFER_SEND_BUFFER_SAVE_RECEIVE);
+			
+			static bool
+			isFinished();
+			
+			inline static SPI_t&
+			getModuleBase()
+			{
+				return SPI{{ port }};
+			}
+		};
+#endif // SPI{{ port }}
+		
+{{ uart_spi.master(port, 0) }}
+		
+{{ uart_spi.master(port, 1) }}
 	}
-	
-	return true;
 }
 
-// ----------------------------------------------------------------------------
-template <typename Transmit, typename Receive>
-void
-xpcc::CpuBoard2Slave<Transmit, Receive>::enableExternalClock()
-{
-	// select external clock with 8MHz as clock source and set PLL source to XOSC & factor to x4
-	xpcc::xmega::enableExternalClock(OSC_FRQRANGE_2TO9_gc);
-	xpcc::xmega::enablePll(OSC_PLLSRC_XOSC_gc, 4);
-	
-	// set up prescalers (=1) and select PLL as clock source (4 x 8MHz)
-	xpcc::xmega::setSystemClockPrescaler();
-	xpcc::xmega::selectSystemClockSource(CLK_SCLKSEL_PLL_gc);
-}
+#endif // XPCC_ATXMEGA__SPI_{{ port }}_HPP
+
