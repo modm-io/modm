@@ -38,7 +38,7 @@
 
 namespace xpcc
 {
-	namespace lpc2000
+	namespace lpc
 	{
 		/**
 		 * @brief	Driver for UART1 of the LPC2468
