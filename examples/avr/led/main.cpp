@@ -12,8 +12,8 @@ GPIO__OUTPUT(CLKOUT, C, 7);
 
 #include <xpcc/driver/ui/led.hpp>
 
-typedef xpcc::atxmega::UartSpiMasterD1 LedSpi;
-typedef xpcc::atxmega::TimerD0 LedTimer;
+typedef xpcc::xmega::UartSpiMasterD1 LedSpi;
+typedef xpcc::xmega::TimerD0 LedTimer;
 typedef xpcc::TLC594X< 16, LedSpi, XLAT, VPROG, XERR > ledController;
 typedef xpcc::MAX6966< LedSpi, XLAT, 4 > ledController2;
 
@@ -39,17 +39,17 @@ ISR(TCC1_OVF_vect)
 MAIN_FUNCTION // FINALLY ######################################################
 {	// INIT BASICS
 	// Switch main clock to 32 MHz
-	xpcc::atxmega::enableExternalOscillator(OSC_FRQRANGE_2TO9_gc, OSC_XOSCSEL_XTAL_256CLK_gc);
-	xpcc::atxmega::enablePll(OSC_PLLSRC_XOSC_gc, 4);
-	xpcc::atxmega::setSystemClockPrescaler(CLK_PSADIV_1_gc, CLK_PSBCDIV_1_1_gc);
-	xpcc::atxmega::selectSystemClockSource(CLK_SCLKSEL_PLL_gc);
+	xpcc::xmega::enableExternalOscillator(OSC_FRQRANGE_2TO9_gc, OSC_XOSCSEL_XTAL_256CLK_gc);
+	xpcc::xmega::enablePll(OSC_PLLSRC_XOSC_gc, 4);
+	xpcc::xmega::setSystemClockPrescaler(CLK_PSADIV_1_gc, CLK_PSBCDIV_1_1_gc);
+	xpcc::xmega::selectSystemClockSource(CLK_SCLKSEL_PLL_gc);
 	
-	xpcc::atxmega::TimerC1::setMsTimer();
+	xpcc::xmega::TimerC1::setMsTimer();
 	
 	// LED FADER **************************************************************
-	xpcc::atxmega::DmaController::initialize();
+	xpcc::xmega::DmaController::initialize();
 	LedSpi::initialize(F_CPU/2);
-	XERR::setInput(xpcc::atxmega::PULLUP);
+	XERR::setInput(xpcc::xmega::PULLUP);
 	BLANK::setOutput(xpcc::gpio::LOW);
 	
 	// initialize the tlc5940
@@ -77,8 +77,8 @@ MAIN_FUNCTION // FINALLY ######################################################
 	ledController2::initialize(xpcc::max6966::CURRENT_20mA);
 	
 	// INTERRUPTS *************************************************************
-	xpcc::atxmega::enableInterruptLevel(xpcc::atxmega::INTERRUPT_CONTROL_LEVEL_ALL);
-	xpcc::atxmega::enableInterrupts();
+	xpcc::xmega::enableInterruptLevel(xpcc::xmega::INTERRUPT_CONTROL_LEVEL_ALL);
+	xpcc::xmega::enableInterrupts();
 	
 	pulse.pulse(20);
 	indicator.indicate(200);

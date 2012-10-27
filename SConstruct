@@ -80,7 +80,7 @@ env['TemplateGenerator'] = Generator
 # Generate driver classes with static methods for the microcontroller peripherals
 # from template files
 env.SConscript('src/xpcc/architecture/platform/avr/atmega/SConscript.generate',  exports='env')
-env.SConscript('src/xpcc/architecture/platform/avr/atxmega/SConscript.generate', exports='env')
+env.SConscript('src/xpcc/architecture/platform/avr/xmega/SConscript.generate', exports='env')
 env.SConscript('src/xpcc/architecture/platform/arm7/at91/SConscript.generate', exports='env')
 env.SConscript('src/xpcc/architecture/platform/arm7/lpc/SConscript.generate', exports='env')
 env.SConscript('src/xpcc/architecture/platform/cortex_m0/lpc/SConscript.generate', exports='env')

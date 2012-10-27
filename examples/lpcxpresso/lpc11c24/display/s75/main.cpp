@@ -48,7 +48,7 @@ main(void)
 {
 	SystemInit();
 	
-	xpcc::lpc11::SysTickTimer::enable();
+	xpcc::lpc::SysTickTimer::enable();
 
 	// Set LED port pin to output
 	Led::setOutput();

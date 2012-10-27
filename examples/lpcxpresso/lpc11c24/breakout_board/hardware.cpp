@@ -17,7 +17,7 @@ Hardware::initialize()
 	// Setup clock
 	SystemInit();
 
-	xpcc::lpc11::SysTickTimer::enable();
+	xpcc::lpc::SysTickTimer::enable();
 
 	led::Onboard::setOutput(xpcc::gpio::HIGH);
 	led::Xpresso::setOutput(xpcc::gpio::HIGH);

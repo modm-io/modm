@@ -80,12 +80,12 @@ namespace adc
 	// BEMF_A	PIO1.10	AD6
 	// BEMF_B	PIO1.11	AD7
 
-	typedef xpcc::lpc111x::AdcAutomaticBurst Adc;
+	typedef xpcc::lpc11::AdcAutomaticBurst Adc;
 }
 
 namespace servo
 {
-	typedef xpcc::lpc11::Timer16_0 pwmTimer;
+	typedef xpcc::lpc::Timer16_0 pwmTimer;
 	GPIO__OUTPUT(EnA,  2, 11);
 	GPIO__OUTPUT(EnB,  0,  2);
 	GPIO__OUTPUT(PwmA, 0,  8);
