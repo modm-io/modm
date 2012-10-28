@@ -34,6 +34,8 @@ import filter.java as filter
 
 class JavaIdentifierBuilder(builder_base.Builder):
 	
+	VERSION = "0.1"
+	
 	def setup(self, optparser):
 		optparser.add_option(
 				"--package",
