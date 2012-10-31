@@ -48,6 +48,10 @@ def generate(env, **kw):
 		env['NM'] = "nm"
 		env['SIZE'] = "du -s -h"
 		
+		if platform.system() == 'Darwin':
+			env['CC'] = "gcc"
+			env['CXX'] = "g++"
+		
 		# build messages
 		if ARGUMENTS.get('verbose') != '1':
 			env['CCCOMSTR'] = "Compiling C: $TARGET"

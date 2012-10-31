@@ -38,7 +38,7 @@
 
 #include "communication/packets.hpp"
 
-typedef xpcc::lpc111x::AdcAutomaticBurst Adc;
+typedef xpcc::lpc::AdcAutomaticBurst Adc;
 
 namespace component
 {
