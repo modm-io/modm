@@ -1,7 +1,7 @@
 
 #include <xpcc/architecture.hpp>
 #include <xpcc/driver/connectivity/can/message.hpp>
-#include <xpcc/workflow/periodic_timer.hpp>
+#include <xpcc/processing/periodic_timer.hpp>
 #include <xpcc/driver/ui/display/siemens_s65.hpp>
 
 #define LED_TOGGLE_TICKS 150		// 100 ticks = 1 Hz flash rate

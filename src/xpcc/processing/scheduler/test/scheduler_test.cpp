@@ -1,6 +1,6 @@
 // coding: utf-8
 // ----------------------------------------------------------------------------
-/* Copyright (c) 2011, Roboterclub Aachen e.V.
+/* Copyright (c) 2009, Roboterclub Aachen e.V.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -28,80 +28,82 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_FREERTOS__MUTEX_HPP
-#define XPCC_FREERTOS__MUTEX_HPP
+#include <xpcc/processing/scheduler/scheduler.hpp>
 
-#ifndef XPCC_RTOS__MUTEX_HPP
-#	error "Don't include this file directly, use <xpcc/workflow/rtos/mutex.hpp>"
-#endif
+#include "scheduler_test.hpp"
 
-#include <freertos/FreeRTOS.h>
-#include <freertos/semphr.h>
+// ----------------------------------------------------------------------------
 
-namespace xpcc
+static unsigned int count = 1;
+
+class TestTask : public xpcc::Scheduler::Task
 {
-	namespace rtos
+public:
+	TestTask() :
+		order(0)
 	{
-		/**
-		 * \brief	Mutex
-		 * 
-		 * Mutexes and binary semaphores are very similar but have some subtle
-		 * differences: Mutexes include a priority inheritance mechanism,
-		 * binary semaphores do not.
-		 * 
-		 * This makes binary semaphores the better choice for implementing
-		 * synchronisation (between threads or between threads and an interrupt),
-		 * and mutexes the better choice for implementing simple mutual exclusion.
-		 * 
-		 * \ingroup	freertos
-		 */
-		class Mutex
-		{
-		public:
-			Mutex();
-			
-			~Mutex();
-			
-			bool
-			acquire(portTickType timeout = portMAX_DELAY);
-			
-			void
-			release();
-			
-		private:
-			// disable copy constructor
-			Mutex(const Mutex& other);
-			
-			// disable assignment operator
-			Mutex&
-			operator = (const Mutex& other);
-			
-			xSemaphoreHandle handle;
-		};
-		
-		/**
-		 * Implements a RAII-style locking.
-		 * 
-		 * Locks the Mutex when created and unlocks it on destruction.
-		 */
-		class MutexGuard
-		{
-		public:
-			MutexGuard(Mutex& m) :
-				mutex(m)
-			{
-				mutex.acquire();
-			}
-			
-			~MutexGuard()
-			{
-				mutex.release();
-			}
-			
-		private:
-			Mutex& mutex;
-		};
 	}
-}
+	
+	virtual void
+	run()
+	{
+		order = count;
+		count++;
+	}
+	
+	uint8_t order;
+};
 
-#endif // XPCC_FREERTOS__MUTEX_HPP
+// ----------------------------------------------------------------------------
+
+void
+SchedulerTest::testScheduler()
+{
+	xpcc::Scheduler scheduler;
+	
+	TestTask task1;
+	TestTask task2;
+	TestTask task3;
+	TestTask task4;
+	
+	scheduler.scheduleTask(task1, 3, 10);
+	scheduler.scheduleTask(task2, 3);
+	scheduler.scheduleTask(task3, 3, 20);
+	scheduler.scheduleTask(task4, 3, 200);
+	
+	scheduler.schedule();
+	scheduler.schedule();
+	
+	TEST_ASSERT_EQUALS(task1.order, 0);
+	TEST_ASSERT_EQUALS(task2.order, 0);
+	TEST_ASSERT_EQUALS(task3.order, 0);
+	TEST_ASSERT_EQUALS(task4.order, 0);
+	
+	scheduler.schedule();
+	
+	TEST_ASSERT_EQUALS(task1.order, 4);
+	TEST_ASSERT_EQUALS(task2.order, 2);
+	TEST_ASSERT_EQUALS(task3.order, 3);
+	TEST_ASSERT_EQUALS(task4.order, 1);
+	
+	count = 1;
+	task1.order = 0;
+	task2.order = 0;
+	task3.order = 0;
+	task4.order = 0;
+	
+	scheduler.schedule();
+	scheduler.schedule();
+	
+	TEST_ASSERT_EQUALS(task1.order, 0);
+	TEST_ASSERT_EQUALS(task2.order, 0);
+	TEST_ASSERT_EQUALS(task3.order, 0);
+	TEST_ASSERT_EQUALS(task4.order, 0);
+	
+	scheduler.schedule();
+	
+	TEST_ASSERT_EQUALS(task1.order, 4);
+	TEST_ASSERT_EQUALS(task2.order, 2);
+	TEST_ASSERT_EQUALS(task3.order, 3);
+	TEST_ASSERT_EQUALS(task4.order, 1);
+}

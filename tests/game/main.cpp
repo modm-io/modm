@@ -11,7 +11,7 @@
 #include <xpcc/driver/software_spi.hpp>
 #include <xpcc/driver/gpio.hpp>
 
-#include <xpcc/workflow.hpp>
+#include <xpcc/processing.hpp>
 
 #include "intro.hpp"
 

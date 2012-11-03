@@ -1,6 +1,6 @@
 
 #include <xpcc/architecture.hpp>
-#include <xpcc/workflow/rtos.hpp>
+#include <xpcc/processing/rtos.hpp>
 #include <xpcc/debug/logger.hpp>
 
 // ----------------------------------------------------------------------------

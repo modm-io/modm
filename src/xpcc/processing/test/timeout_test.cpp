@@ -28,7 +28,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/workflow/timeout.hpp>
+#include <xpcc/processing/timeout.hpp>
 #include <xpcc/architecture/driver/clock_dummy.hpp>
 
 #include "timeout_test.hpp"

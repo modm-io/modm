@@ -28,75 +28,22 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_FREERTOS__SEMAPHORE_HPP
-#define XPCC_FREERTOS__SEMAPHORE_HPP
+#ifndef XPCC_BOOST__SEMAPHORE_HPP
+#define XPCC_BOOST__SEMAPHORE_HPP
 
 #ifndef XPCC_RTOS__SEMAPHORE_HPP
-#	error "Don't include this file directly, use <xpcc/workflow/rtos/semaphore.hpp>"
+#	error "Don't include this file directly, use <xpcc/processing/rtos/semaphore.hpp>"
 #endif
 
-#include <freertos/FreeRTOS.h>
-#include <freertos/semphr.h>
+#include <boost/thread/mutex.hpp>    
+#include <boost/thread/condition_variable.hpp>
 
 namespace xpcc
 {
 	namespace rtos
 	{
 		/**
-		 * \brief	Base class for binary and counting semaphores
-		 * \internal
-		 */
-		class SemaphoreBase
-		{
-		public:
-			~SemaphoreBase();
-			
-			/**
-			 * \brief	Aquire the semaphore
-			 * 
-			 * Decrements the internal count. This function might be called
-			 * 'take' or 'wait' in other implementations.
-			 */
-			bool
-			acquire(portTickType timeout = portMAX_DELAY);
-			
-			/**
-			 * \brief	Release the semaphore
-			 * 
-			 * Increments the internal count. This function might be called
-			 * 'give' or 'signal' in other implementations.
-			 */
-			void
-			release();
-			
-			/**
-			 * \brief	Release the Semaphore from within an interrupt context
-			 * 
-			 * Might request an context switch after finishing the interrupt
-			 * if a higher priority thread has been woken through the release.
-			 */
-			void
-			releaseFromInterrupt();
-			
-		protected:
-			SemaphoreBase()
-			{
-			}
-			
-			xSemaphoreHandle handle;
-			
-		private:
-			// disable copy constructor
-			SemaphoreBase(const SemaphoreBase&);
-			
-			// disable assignment operator
-			SemaphoreBase &
-			operator = (const SemaphoreBase&);
-		};
-		
-		// --------------------------------------------------------------------
-		/**
-		 * \brief	Counting semaphore
+		 * Counting semaphore.
 		 * 
 		 * Counting semaphores are typically used for two things:
 		 * 
@@ -121,9 +68,9 @@ namespace xpcc
 		 *    equal to the maximum count value, indicating that all resources
 		 *    are free.
 		 * 
-		 * \ingroup	freertos
+		 * \ingroup	rtos_boost
 		 */
-		class Semaphore : public SemaphoreBase
+		class Semaphore
 		{
 		public:
 			/**
@@ -132,8 +79,35 @@ namespace xpcc
 			 * \param	max		Maximum count value
 			 * \param	initial	Initial value
 			 */
-			Semaphore(unsigned portBASE_TYPE max,
-					unsigned portBASE_TYPE initial);
+			Semaphore(uint32_t max,
+					uint32_t initial);
+			
+			/**
+			 * \brief	Aquire the semaphore
+			 * 
+			 * Decrements the internal count. This function might be called
+			 * 'take' or 'wait' in other implementations.
+			 */
+			bool
+			acquire(uint32_t timeout = -1);
+			
+			/**
+			 * \brief	Release the semaphore
+			 * 
+			 * Increments the internal count. This function might be called
+			 * 'give' or 'signal' in other implementations.
+			 */
+			void
+			release();
+			
+			/**
+			 * \brief	Release the Semaphore from within an interrupt context
+			 */
+			inline void
+			releaseFromInterrupt()
+			{
+				release();
+			}
 			
 		private:
 			// disable copy constructor
@@ -142,17 +116,30 @@ namespace xpcc
 			// disable assignment operator
 			Semaphore &
 			operator = (const Semaphore&);
+			
+			// The current semaphore count.
+			unsigned int count;
+			unsigned int maxCount;
+			
+			// Mutex protects count.
+			// 
+			// Any code that reads or writes the count_ data must hold a lock
+			// on the mutex.
+			mutable boost::mutex mutex;
+			
+			// Code that increments count_ must notify the condition variable.
+			mutable boost::condition_variable condition;
+
 		};
 		
-		// --------------------------------------------------------------------
 		/**
 		 * \brief	Binary semaphore
 		 * 
 		 * The semaphore is released by default.
 		 * 
-		 * \ingroup	rtos
+		 * \ingroup	rtos_boost
 		 */
-		class BinarySemaphore : public SemaphoreBase
+		class BinarySemaphore : public Semaphore
 		{
 		public:
 			BinarySemaphore();
@@ -168,4 +155,4 @@ namespace xpcc
 	}
 }
 
-#endif // XPCC_FREERTOS__SEMAPHORE_HPP
+#endif // XPCC_BOOST__SEMAPHORE_HPP

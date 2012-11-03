@@ -1,13 +1,13 @@
 
 #include <xpcc/architecture.hpp>
-#include <xpcc/workflow.hpp>
+#include <xpcc/processing.hpp>
 #include <xpcc/debug.hpp>
 
 #include <xpcc/driver/gpio.hpp>
 #include <xpcc/driver/ui/display/ea_dog.hpp>
 #include <xpcc/driver/ui/display/font.hpp>
 
-#include <xpcc/workflow/rtos.hpp>
+#include <xpcc/processing/rtos.hpp>
 
 // ----------------------------------------------------------------------------
 GPIO__OUTPUT(LedStatInverted, C, 12);	// inverted, 0=on, 1=off

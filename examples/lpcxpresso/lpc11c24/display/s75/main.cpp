@@ -13,7 +13,7 @@
 #include "../../../../../build/lpcxpresso/lpc11c24/display_s75/libxpcc/xpcc_config.hpp"
 #include <xpcc/driver/ui/display/siemens_s75.hpp>
 
-#include <xpcc/workflow/timeout.hpp>
+#include <xpcc/processing/timeout.hpp>
 
 namespace lcd
 {

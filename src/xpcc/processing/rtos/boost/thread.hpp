@@ -28,15 +28,15 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_FREERTOS__THREAD_HPP
-#define XPCC_FREERTOS__THREAD_HPP
+#ifndef XPCC_BOOST__THREAD_HPP
+#define XPCC_BOOST__THREAD_HPP
 
 #ifndef XPCC_RTOS__THREAD_HPP
-#	error "Don't include this file directly, use <xpcc/workflow/rtos/thread.hpp>"
+#	error "Don't include this file directly, use <xpcc/processing/rtos/thread.hpp>"
 #endif
 
-#include <freertos/FreeRTOS.h>
-#include <freertos/task.h>
+#include <boost/scoped_ptr.hpp>
+#include <boost/thread/thread.hpp>
 
 /**
  * \brief	Create a timed periodic loop
@@ -56,16 +56,15 @@
  * \param	frequency	Frequency in ticks
  * 
  * \see		MILLISECONDS
- * \see		vTaskDelayUntil() from FreeRTOS
  * 
  * \hideinitializer
- * \ingroup	freertos
+ * \ingroup	boost_rtos
  */
-#define	TIME_LOOP(frequency)										\
+/*#define	TIME_LOOP(frequency)										\
 		for(portTickType lastTime = xTaskGetTickCount() ;			\
 			vTaskDelayUntil(&lastTime,								\
 					static_cast<portTickType>(frequency)), true ;	\
-			)
+			)*/
 
 /**
  * \brief	Convert between scheduler ticks and milliseconds
@@ -75,137 +74,82 @@
  * 20 * MILLISECONDS
  * \endcode
  * 
- * This should only be used with constant values as the calculation is done
- * using floating point. For constant values the compiler will do the calculation
- * at compile time.
- * 
- * For non constant value use the following formula:
- * \code
- * static_cast<portTickType>((time * configTICK_RATE_HZ) / 1000)
- * \endcode
- * The parentheses are important because otherwise the division might be done
- * first which will lead to wrong results.
- * 
  * \hideinitializer
- * \ingroup	freertos
+ * \ingroup	boost_rtos
  */
-#define	MILLISECONDS		(configTICK_RATE_HZ / 1000.0)
+#define	MILLISECONDS		1
 
 namespace xpcc
 {
 	namespace rtos
 	{
+		// forward declaration
+		class Scheduler;
+		
 		/**
 		 * \brief	Thread
 		 * 
-		 * <h2>FreeRTOS suspend()/resume()</h2>
-		 * 
-		 * suspend() and resume() are dangerous and are therefore not available.
-		 * 
-		 * Example:
-		 * thread 1 
-		 *  1) lock mutex M 
-		 *  2) do something 
-		 *  3) unlock mutex 
-		 * 
-		 * thread 2 
-		 *  1) suspend thread 1 
-		 *  2) lock mutex 
-		 *  3) unlock mutex M 
-		 *  4) resume thread 1
-		 * 
-		 * If 2.1 happens during 1.2 the first flow for ever brakes, and the
-		 * second - is for ever tired of waiting.
-		 * 
-		 * Use xpcc::rtos::Semaphore if you need to suspend the execution
-		 * of a thread.  
-		 * 
-		 * \ingroup	freertos
+		 * \ingroup	boost_rtos
 		 */
 		class Thread
 		{
-			static const uint16_t minimalStackSize = 200;
-			
 		public:
 			/**
 			 * \brief	Create a Thread
 			 * 
-			 * \param	priority	Priority (default is 0)
-			 * \param	stackDepth	Stack size for the thread in bytes
-			 * \param	name		Name of the thread (only used for debugging,
-			 * 						can be left empty)
+			 * \param	priority	unused for boost::thread
+			 * \param	stackDepth	unused for boost::thread
+			 * \param	name		unused for boost::thread
 			 * 
 			 * \warning	Threads may not be created while the scheduler is running!
 			 * 			Create them be before calling Scheduler::schedule() or
 			 * 			stop the scheduler and restart it afterwards.
 			 */
 			Thread(uint32_t priority = 0,
-					uint16_t stackDepth = minimalStackSize,
+					uint16_t stackDepth = 0,
 					const char* name = NULL);
 			
 			/// Delete the thread
 			virtual ~Thread();
 			
 			/// Obtain the priority of the thread
-			uint32_t
-			getPriority() const;
+			uint_fast32_t
+			getPriority() const
+			{
+				return 0;
+			}
 			
 			/**
 			 * \brief	Set the priority of the thread
 			 * 
-			 * Might cause a context switch if the priority is set to lower
-			 * value than the highest priority of a thread ready to run.
+			 * Does nothing for boost::thread.
 			 */
 			void
-			setPriority(uint32_t priority);
+			setPriority(uint_fast32_t priority)
+			{
+				// avoid compiler warnings
+				(void) priority;
+			}
 			
 			/**
-			 * \brief	When created suspends all real time kernel activity
-			 * 			while keeping interrupts (including the kernel tick)
-			 * 			enabled.
+			 * If a thread wishes to avoid being interrupted, it can create an
+			 * instance of Lock. Objects of this class disable interruption
+			 * for the thread that created them on construction, and restore
+			 * the interruption state to whatever it was before on destruction.
 			 * 
-			 * After creating a instance the calling thread will continue
-			 * to execute without risk of being swapped out until the destruction
-			 * of the lock instance.
-			 * 
-			 * API functions that have the potential to cause a context switch
-			 * (for example, delay()) must not be called while the scheduler
-			 * is suspended.
+			 * \see		boost::this_thread::disable_interruption
 			 */
-			class Lock
-			{
-			public:
-				Lock()
-				{
-					vTaskSuspendAll();
-				}
-				
-				~Lock()
-				{
-					xTaskResumeAll();
-				}
-			};
+			typedef boost::this_thread::disable_interruption Lock;
 			
 		protected:
 			/**
-			 * \brief	Delay for the number of ticks
-			 * 
-			 * Use the MILLISECONDS macro to convert ticks to milliseconds:
-			 * \code
-			 * sleep(10 * MILLISECONDS);
-			 * \endcode 
-			 * 
-			 * \param	ticks	Number of scheduler ticks to delay for
-			 * \see		MILLISECONDS
+			 * \brief	Delay for the number of Milliseconds
 			 */
 			static inline void
-			sleep(portTickType ticks)
+			sleep(uint32_t ms)
 			{
-				vTaskDelay(ticks);
+				boost::this_thread::sleep(boost::posix_time::milliseconds(ms));
 			}
-			
-			// TODO
-			//sleepUntil();
 			
 			/**
 			 * \brief	Force a context switch
@@ -215,7 +159,7 @@ namespace xpcc
 			static inline void
 			yield()
 			{
-				taskYIELD();
+				boost::this_thread::yield();
 			}
 			
 			/**
@@ -227,19 +171,19 @@ namespace xpcc
 			run() = 0;
 			
 		private:
-			static void
-			wrapper(void *object);
+			friend class Scheduler;
 			
-			// disable copy constructor
-			Thread(const Thread& other);
+			// start the execution of the thread
+			void
+			start();
 			
-			// disable assignment operator
-			Thread&
-			operator = (const Thread& other);
+			Thread *next;
+			static Thread* head;
 			
-			xTaskHandle handle;
+			boost::mutex mutex;
+			boost::scoped_ptr<boost::thread> thread;
 		};
 	}
 }
 
-#endif // XPCC_FREERTOS__THREAD_HPP
+#endif // XPCC_BOOST__THREAD_HPP

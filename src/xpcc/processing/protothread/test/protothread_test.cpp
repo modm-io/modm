@@ -28,7 +28,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/workflow/protothread.hpp>
+#include <xpcc/processing/protothread.hpp>
 
 #include "protothread_test.hpp"
 

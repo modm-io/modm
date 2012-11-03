@@ -32,7 +32,7 @@
 #define XPCC__BMP085_HPP
 
 #include <xpcc/driver/connectivity/i2c/write_read_adapter.hpp>
-#include <xpcc/workflow/timeout.hpp>
+#include <xpcc/processing/timeout.hpp>
 
 namespace xpcc
 {

@@ -1,11 +1,11 @@
 // coding: utf-8
 // ----------------------------------------------------------------------------
-/* Copyright (c) 2009, Roboterclub Aachen e.V.
+/* Copyright (c) 2012, Roboterclub Aachen e.V.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- *
+ * 
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -27,83 +27,30 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 // ----------------------------------------------------------------------------
+/**
+ * \ingroup		processing
+ * \defgroup	freertos	FreeRTOS
+ * 
+ * FreeRTOS is a real-time operating system for embedded devices, being ported
+ * to several microcontrollers. It is distributed under the GPL with an
+ * optional exception.
+ * The exception permits users' proprietary code to remain closed source while
+ * maintaining the kernel itself as open source, thereby facilitating the use
+ * of FreeRTOS in proprietary applications.
+ * 
+ * Key features:
+ * - Small and simple. Very good for hobbyists who are new to OSes.
+ * - Scheduler can be configured for both preemptive or cooperative operation.
+ * - Coroutine support (Coroutine in FreeRTOS is a very simple and lightweight
+ *   thread that has very limited use of stack)
+ * 
+ * \see	http://www.freertos.org/
+ */
 
-#include <xpcc/workflow/scheduler/scheduler.hpp>
-
-#include "scheduler_test.hpp"
-
-// ----------------------------------------------------------------------------
-
-static unsigned int count = 1;
-
-class TestTask : public xpcc::Scheduler::Task
+namespace xpcc
 {
-public:
-	TestTask() :
-		order(0)
-	{
+	/// \ingroup	freertos
+	namespace freertos
+	{	
 	}
-	
-	virtual void
-	run()
-	{
-		order = count;
-		count++;
-	}
-	
-	uint8_t order;
-};
-
-// ----------------------------------------------------------------------------
-
-void
-SchedulerTest::testScheduler()
-{
-	xpcc::Scheduler scheduler;
-	
-	TestTask task1;
-	TestTask task2;
-	TestTask task3;
-	TestTask task4;
-	
-	scheduler.scheduleTask(task1, 3, 10);
-	scheduler.scheduleTask(task2, 3);
-	scheduler.scheduleTask(task3, 3, 20);
-	scheduler.scheduleTask(task4, 3, 200);
-	
-	scheduler.schedule();
-	scheduler.schedule();
-	
-	TEST_ASSERT_EQUALS(task1.order, 0);
-	TEST_ASSERT_EQUALS(task2.order, 0);
-	TEST_ASSERT_EQUALS(task3.order, 0);
-	TEST_ASSERT_EQUALS(task4.order, 0);
-	
-	scheduler.schedule();
-	
-	TEST_ASSERT_EQUALS(task1.order, 4);
-	TEST_ASSERT_EQUALS(task2.order, 2);
-	TEST_ASSERT_EQUALS(task3.order, 3);
-	TEST_ASSERT_EQUALS(task4.order, 1);
-	
-	count = 1;
-	task1.order = 0;
-	task2.order = 0;
-	task3.order = 0;
-	task4.order = 0;
-	
-	scheduler.schedule();
-	scheduler.schedule();
-	
-	TEST_ASSERT_EQUALS(task1.order, 0);
-	TEST_ASSERT_EQUALS(task2.order, 0);
-	TEST_ASSERT_EQUALS(task3.order, 0);
-	TEST_ASSERT_EQUALS(task4.order, 0);
-	
-	scheduler.schedule();
-	
-	TEST_ASSERT_EQUALS(task1.order, 4);
-	TEST_ASSERT_EQUALS(task2.order, 2);
-	TEST_ASSERT_EQUALS(task3.order, 3);
-	TEST_ASSERT_EQUALS(task4.order, 1);
 }

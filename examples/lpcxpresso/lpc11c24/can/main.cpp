@@ -1,7 +1,7 @@
 
 #include <xpcc/architecture.hpp>
 #include <xpcc/driver/connectivity/can/message.hpp>
-#include <xpcc/workflow/periodic_timer.hpp>
+#include <xpcc/processing/periodic_timer.hpp>
 
 #define LED_TOGGLE_TICKS 150		// 100 ticks = 1 Hz flash rate
 #define COUNT_MAX		3			// how high to count on the LED display

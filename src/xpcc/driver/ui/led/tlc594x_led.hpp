@@ -35,7 +35,7 @@
 #include "led.hpp"
 #include "tables.hpp"
 #include <xpcc/driver/pwm/tlc594x.hpp>
-#include <xpcc/workflow/periodic_timer.hpp>
+#include <xpcc/processing/periodic_timer.hpp>
 #include <xpcc/architecture/driver/accessor/flash.hpp>
 
 namespace xpcc

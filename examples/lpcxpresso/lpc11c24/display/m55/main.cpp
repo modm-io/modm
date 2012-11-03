@@ -14,7 +14,7 @@
 #include "../../../../../build/lpcxpresso/lpc11c24/display_m55/libxpcc/xpcc_config.hpp"
 #include <xpcc/driver/ui/display/siemens_m55.hpp>
 
-#include <xpcc/workflow/timeout.hpp>
+#include <xpcc/processing/timeout.hpp>
 
 //#define USE_HARDWARE_SPI
 

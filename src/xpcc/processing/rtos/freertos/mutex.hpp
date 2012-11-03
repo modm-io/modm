@@ -28,31 +28,80 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_RTOS_BOOST__SCHEDULER_HPP
-#define XPCC_RTOS_BOOST__SCHEDULER_HPP
+#ifndef XPCC_FREERTOS__MUTEX_HPP
+#define XPCC_FREERTOS__MUTEX_HPP
 
-#ifndef XPCC_RTOS__SCHEDULER_HPP
-#	error "Don't include this file directly, use <xpcc/workflow/rtos/scheduler.hpp>"
+#ifndef XPCC_RTOS__MUTEX_HPP
+#	error "Don't include this file directly, use <xpcc/processing/rtos/mutex.hpp>"
 #endif
 
-#include <boost/thread/thread.hpp>
+#include <freertos/FreeRTOS.h>
+#include <freertos/semphr.h>
 
 namespace xpcc
 {
 	namespace rtos
 	{
-		class Scheduler
+		/**
+		 * \brief	Mutex
+		 * 
+		 * Mutexes and binary semaphores are very similar but have some subtle
+		 * differences: Mutexes include a priority inheritance mechanism,
+		 * binary semaphores do not.
+		 * 
+		 * This makes binary semaphores the better choice for implementing
+		 * synchronisation (between threads or between threads and an interrupt),
+		 * and mutexes the better choice for implementing simple mutual exclusion.
+		 * 
+		 * \ingroup	freertos
+		 */
+		class Mutex
 		{
 		public:
-			/**
-			 * \brief	Starts the real time kernel
-			 * 
-			 * \warning	This function will never return.
-			 */
-			static void
-			schedule();
+			Mutex();
+			
+			~Mutex();
+			
+			bool
+			acquire(portTickType timeout = portMAX_DELAY);
+			
+			void
+			release();
+			
+		private:
+			// disable copy constructor
+			Mutex(const Mutex& other);
+			
+			// disable assignment operator
+			Mutex&
+			operator = (const Mutex& other);
+			
+			xSemaphoreHandle handle;
+		};
+		
+		/**
+		 * Implements a RAII-style locking.
+		 * 
+		 * Locks the Mutex when created and unlocks it on destruction.
+		 */
+		class MutexGuard
+		{
+		public:
+			MutexGuard(Mutex& m) :
+				mutex(m)
+			{
+				mutex.acquire();
+			}
+			
+			~MutexGuard()
+			{
+				mutex.release();
+			}
+			
+		private:
+			Mutex& mutex;
 		};
 	}
 }
 
-#endif // XPCC_RTOS_BOOST__SCHEDULER_HPP
+#endif // XPCC_FREERTOS__MUTEX_HPP

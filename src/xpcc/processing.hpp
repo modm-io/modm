@@ -1,6 +1,6 @@
 // coding: utf-8
 // ----------------------------------------------------------------------------
-/* Copyright (c) 2011, Roboterclub Aachen e.V.
+/* Copyright (c) 2009, Roboterclub Aachen e.V.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,84 +27,23 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 // ----------------------------------------------------------------------------
+/**
+ * \defgroup 	processing Processing
+ * \brief 		processing
+ * 
+ */
 
-#ifndef XPCC_BOOST__MUTEX_HPP
-#define XPCC_BOOST__MUTEX_HPP
+#ifndef XPCC__PROCESSING_HPP
+#define	XPCC__PROCESSING_HPP
 
-#ifndef XPCC_RTOS__MUTEX_HPP
-#	error "Don't include this file directly, use <xpcc/workflow/rtos/mutex.hpp>"
-#endif
+#include "processing/task.hpp"
+#include "processing/communicatable_task.hpp"
+#include "processing/protothread.hpp"
 
-#include <boost/thread/mutex.hpp>
+#include "processing/scheduler/scheduler.hpp"
 
-namespace xpcc
-{
-	namespace rtos
-	{
-		// forward declaration
-		class MutexGuard;
-		
-		/**
-		 * \brief	Mutex
-		 * 
-		 * \ingroup	boost_rtos
-		 */
-		class Mutex
-		{
-			friend class MutexGuard;
-			
-		public:
-			Mutex();
-			
-			~Mutex();
-			
-			/**
-			 * \param	timeout		Timeout in Milliseconds
-			 */
-			bool
-			acquire(uint32_t timeout);
-			
-			inline void
-			acquire()
-			{
-				mutex.lock();
-			}
-			
-			inline void
-			release()
-			{
-				mutex.unlock();
-			}
-			
-		private:
-			// disable copy constructor
-			Mutex(const Mutex& other);
-			
-			// disable assignment operator
-			Mutex&
-			operator = (const Mutex& other);
-			
-			boost::timed_mutex mutex;
-		};
-		
-		/**
-		 * Implements a RAII-style locking.
-		 * 
-		 * Locks the Mutex when created and unlocks it on destruction.
-		 */
-		class MutexGuard : boost::lock_guard<boost::timed_mutex>
-		{
-		public:
-			MutexGuard(Mutex& m) :
-				boost::lock_guard<boost::timed_mutex>(m.mutex)
-			{
-			}
-			
-			~MutexGuard()
-			{
-			}
-		};
-	}
-}
+#include "processing/timestamp.hpp"
+#include "processing/timeout.hpp"
+#include "processing/periodic_timer.hpp"
 
-#endif // XPCC_BOOST__MUTEX_HPP
+#endif	// XPCC__PROCESSING_HPP

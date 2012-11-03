@@ -32,7 +32,7 @@
 #define	XPCC__CLOCK_HPP
 
 #include <xpcc/architecture/utils.hpp>
-#include <xpcc/workflow/timestamp.hpp>
+#include <xpcc/processing/timestamp.hpp>
 
 namespace xpcc
 {

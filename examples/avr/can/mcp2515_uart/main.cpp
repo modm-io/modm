@@ -4,7 +4,7 @@
 #include <xpcc/driver/connectivity/can/mcp2515.hpp>
 #include <xpcc/driver/connectivity/spi/software_spi.hpp>
 
-#include <xpcc/workflow/periodic_timer.hpp>
+#include <xpcc/processing/periodic_timer.hpp>
 
 GPIO__OUTPUT(LedGreen, B, 0);
 GPIO__OUTPUT(LedRed, B, 1);

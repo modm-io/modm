@@ -28,55 +28,70 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/workflow/timestamp.hpp>
-#include <xpcc/utils/arithmetic_traits.hpp>
+#include <xpcc/processing/periodic_timer.hpp>
+#include <xpcc/architecture/driver/clock_dummy.hpp>
 
-#include "timestamp_test.hpp"
+#include "periodic_timer_test.hpp"
 
-// ----------------------------------------------------------------------------
 void
-TimestampTest::testConstructors()
+PeriodicTimerTest::setUp()
 {
-	xpcc::Timestamp t1;
-	TEST_ASSERT_TRUE(t1 == 0);
-	
-	xpcc::Timestamp t2(1000);
-	TEST_ASSERT_TRUE(t2 == 1000);
-	
-	t1 = 500;
-	TEST_ASSERT_TRUE(t1 == 500);
+	xpcc::ClockDummy::setTime(0);
 }
 
 void
-TimestampTest::testArithmetics()
+PeriodicTimerTest::testConstructor()
 {
-	xpcc::Timestamp t1(200);
-	xpcc::Timestamp t2(500);
-	xpcc::Timestamp t3;
+	xpcc::PeriodicTimer<xpcc::ClockDummy> timer(10);
 	
-	t3 = t1 + t2;
-	TEST_ASSERT_TRUE(t3 == 700);
+	TEST_ASSERT_TRUE(timer.isRunning());
+	TEST_ASSERT_FALSE(timer.isExpired());
 }
 
 void
-TimestampTest::testComparisons()
+PeriodicTimerTest::testTimer()
 {
-	xpcc::Timestamp t1;
-	xpcc::Timestamp t2;
+	xpcc::PeriodicTimer<xpcc::ClockDummy> timer(10);
 	
-	TEST_ASSERT_TRUE(t1 == t2);
-	TEST_ASSERT_FALSE(t1 != t2);
+	TEST_ASSERT_FALSE(timer.isExpired());
 	
-	t1 = xpcc::ArithmeticTraits<xpcc::Timestamp::Type>::max() / 2;
+	int i;
+	for (i = 0; i < 9; ++i) {
+		xpcc::ClockDummy::setTime(i);
+		TEST_ASSERT_FALSE(timer.isExpired());
+	}
 	
-	TEST_ASSERT_FALSE(t1 == t2);
-	TEST_ASSERT_TRUE(t1 != t2);
+	xpcc::ClockDummy::setTime(10);
+	TEST_ASSERT_TRUE(timer.isExpired());
+	TEST_ASSERT_FALSE(timer.isExpired());
 	
-	TEST_ASSERT_TRUE(t1 > t2);
-	TEST_ASSERT_TRUE(t1 >= t2);
+	xpcc::ClockDummy::setTime(20);
+	TEST_ASSERT_TRUE(timer.isExpired());
+	TEST_ASSERT_FALSE(timer.isExpired());
 	
-	t1 = xpcc::ArithmeticTraits<xpcc::Timestamp::Type>::max() / 2 + 1;
+	xpcc::ClockDummy::setTime(100);
+	TEST_ASSERT_TRUE(timer.isExpired());
+	TEST_ASSERT_FALSE(timer.isExpired());
+}
+
+void
+PeriodicTimerTest::testRestart()
+{
+	xpcc::PeriodicTimer<xpcc::ClockDummy> timer(10);
 	
-	TEST_ASSERT_TRUE(t1 < t2);
-	TEST_ASSERT_TRUE(t1 <= t2);
+	TEST_ASSERT_TRUE(timer.isRunning());
+	TEST_ASSERT_FALSE(timer.isExpired());
+	
+	timer.stop();
+	
+	TEST_ASSERT_FALSE(timer.isRunning());
+	
+	timer.restart(5);
+	
+	TEST_ASSERT_TRUE(timer.isRunning());
+	TEST_ASSERT_FALSE(timer.isExpired());
+	
+	xpcc::ClockDummy::setTime(5);
+	TEST_ASSERT_TRUE(timer.isExpired());
+	TEST_ASSERT_FALSE(timer.isExpired());
 }

@@ -1,11 +1,11 @@
 // coding: utf-8
 // ----------------------------------------------------------------------------
-/* Copyright (c) 2012, Roboterclub Aachen e.V.
+/* Copyright (c) 2009, Roboterclub Aachen e.V.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -27,30 +27,56 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 // ----------------------------------------------------------------------------
-/**
- * \ingroup		workflow
- * \defgroup	freertos	FreeRTOS
- * 
- * FreeRTOS is a real-time operating system for embedded devices, being ported
- * to several microcontrollers. It is distributed under the GPL with an
- * optional exception.
- * The exception permits users' proprietary code to remain closed source while
- * maintaining the kernel itself as open source, thereby facilitating the use
- * of FreeRTOS in proprietary applications.
- * 
- * Key features:
- * - Small and simple. Very good for hobbyists who are new to OSes.
- * - Scheduler can be configured for both preemptive or cooperative operation.
- * - Coroutine support (Coroutine in FreeRTOS is a very simple and lightweight
- *   thread that has very limited use of stack)
- * 
- * \see	http://www.freertos.org/
- */
 
-namespace xpcc
+#include <xpcc/processing/timestamp.hpp>
+#include <xpcc/utils/arithmetic_traits.hpp>
+
+#include "timestamp_test.hpp"
+
+// ----------------------------------------------------------------------------
+void
+TimestampTest::testConstructors()
 {
-	/// \ingroup	freertos
-	namespace freertos
-	{	
-	}
+	xpcc::Timestamp t1;
+	TEST_ASSERT_TRUE(t1 == 0);
+	
+	xpcc::Timestamp t2(1000);
+	TEST_ASSERT_TRUE(t2 == 1000);
+	
+	t1 = 500;
+	TEST_ASSERT_TRUE(t1 == 500);
+}
+
+void
+TimestampTest::testArithmetics()
+{
+	xpcc::Timestamp t1(200);
+	xpcc::Timestamp t2(500);
+	xpcc::Timestamp t3;
+	
+	t3 = t1 + t2;
+	TEST_ASSERT_TRUE(t3 == 700);
+}
+
+void
+TimestampTest::testComparisons()
+{
+	xpcc::Timestamp t1;
+	xpcc::Timestamp t2;
+	
+	TEST_ASSERT_TRUE(t1 == t2);
+	TEST_ASSERT_FALSE(t1 != t2);
+	
+	t1 = xpcc::ArithmeticTraits<xpcc::Timestamp::Type>::max() / 2;
+	
+	TEST_ASSERT_FALSE(t1 == t2);
+	TEST_ASSERT_TRUE(t1 != t2);
+	
+	TEST_ASSERT_TRUE(t1 > t2);
+	TEST_ASSERT_TRUE(t1 >= t2);
+	
+	t1 = xpcc::ArithmeticTraits<xpcc::Timestamp::Type>::max() / 2 + 1;
+	
+	TEST_ASSERT_TRUE(t1 < t2);
+	TEST_ASSERT_TRUE(t1 <= t2);
 }

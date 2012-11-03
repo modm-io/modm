@@ -33,7 +33,7 @@
 
 #include <cstddef>
 #include <xpcc/architecture/driver/accessor/flash.hpp>
-#include <xpcc/workflow/timeout.hpp>
+#include <xpcc/processing/timeout.hpp>
 
 #include "interface.hpp"
 

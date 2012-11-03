@@ -1,8 +1,8 @@
 
 #include <xpcc/architecture/platform.hpp>
 #include <xpcc/architecture/driver/gpio.hpp>
-#include <xpcc/workflow/protothread.hpp>
-#include <xpcc/workflow/timeout.hpp>
+#include <xpcc/processing/protothread.hpp>
+#include <xpcc/processing/timeout.hpp>
 
 GPIO__OUTPUT(LedGreen, B, 0);
 GPIO__OUTPUT(LedRed, B, 1);

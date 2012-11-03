@@ -2,8 +2,8 @@
 #ifndef MONSTER_SHIP_HPP
 #define MONSTER_SHIP_HPP
 
-#include <xpcc/workflow/protothread.hpp>
-#include <xpcc/workflow/timeout.hpp>
+#include <xpcc/processing/protothread.hpp>
+#include <xpcc/processing/timeout.hpp>
 #include <xpcc/driver/lcd/graphic_display.hpp>
 
 class MonsterShip : public xpcc::Protothread

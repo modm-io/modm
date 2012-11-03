@@ -31,7 +31,7 @@
 #ifndef	XPCC__DISPATCHER_HPP
 #define	XPCC__DISPATCHER_HPP
 
-#include <xpcc/workflow/timeout.hpp>
+#include <xpcc/processing/timeout.hpp>
 
 #include "backend/backend_interface.hpp"
 #include "postman/postman.hpp"

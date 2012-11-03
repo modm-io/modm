@@ -1,7 +1,7 @@
 #include <xpcc/architecture/platform.hpp>
 
 #include <xpcc/architecture/driver/gpio.hpp>
-#include <xpcc/workflow/timeout.hpp>
+#include <xpcc/processing/timeout.hpp>
 
 // create a output device for the led
 GPIO__OUTPUT(Led, B, 0);

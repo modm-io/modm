@@ -1,6 +1,6 @@
 // coding: utf-8
 // ----------------------------------------------------------------------------
-/* Copyright (c) 2009, Roboterclub Aachen e.V.
+/* Copyright (c) 2011, Roboterclub Aachen e.V.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -28,70 +28,83 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/workflow/periodic_timer.hpp>
-#include <xpcc/architecture/driver/clock_dummy.hpp>
+#ifndef XPCC_BOOST__MUTEX_HPP
+#define XPCC_BOOST__MUTEX_HPP
 
-#include "periodic_timer_test.hpp"
+#ifndef XPCC_RTOS__MUTEX_HPP
+#	error "Don't include this file directly, use <xpcc/processing/rtos/mutex.hpp>"
+#endif
 
-void
-PeriodicTimerTest::setUp()
+#include <boost/thread/mutex.hpp>
+
+namespace xpcc
 {
-	xpcc::ClockDummy::setTime(0);
-}
-
-void
-PeriodicTimerTest::testConstructor()
-{
-	xpcc::PeriodicTimer<xpcc::ClockDummy> timer(10);
-	
-	TEST_ASSERT_TRUE(timer.isRunning());
-	TEST_ASSERT_FALSE(timer.isExpired());
-}
-
-void
-PeriodicTimerTest::testTimer()
-{
-	xpcc::PeriodicTimer<xpcc::ClockDummy> timer(10);
-	
-	TEST_ASSERT_FALSE(timer.isExpired());
-	
-	int i;
-	for (i = 0; i < 9; ++i) {
-		xpcc::ClockDummy::setTime(i);
-		TEST_ASSERT_FALSE(timer.isExpired());
+	namespace rtos
+	{
+		// forward declaration
+		class MutexGuard;
+		
+		/**
+		 * \brief	Mutex
+		 * 
+		 * \ingroup	boost_rtos
+		 */
+		class Mutex
+		{
+			friend class MutexGuard;
+			
+		public:
+			Mutex();
+			
+			~Mutex();
+			
+			/**
+			 * \param	timeout		Timeout in Milliseconds
+			 */
+			bool
+			acquire(uint32_t timeout);
+			
+			inline void
+			acquire()
+			{
+				mutex.lock();
+			}
+			
+			inline void
+			release()
+			{
+				mutex.unlock();
+			}
+			
+		private:
+			// disable copy constructor
+			Mutex(const Mutex& other);
+			
+			// disable assignment operator
+			Mutex&
+			operator = (const Mutex& other);
+			
+			boost::timed_mutex mutex;
+		};
+		
+		/**
+		 * Implements a RAII-style locking.
+		 * 
+		 * Locks the Mutex when created and unlocks it on destruction.
+		 */
+		class MutexGuard : boost::lock_guard<boost::timed_mutex>
+		{
+		public:
+			MutexGuard(Mutex& m) :
+				boost::lock_guard<boost::timed_mutex>(m.mutex)
+			{
+			}
+			
+			~MutexGuard()
+			{
+			}
+		};
 	}
-	
-	xpcc::ClockDummy::setTime(10);
-	TEST_ASSERT_TRUE(timer.isExpired());
-	TEST_ASSERT_FALSE(timer.isExpired());
-	
-	xpcc::ClockDummy::setTime(20);
-	TEST_ASSERT_TRUE(timer.isExpired());
-	TEST_ASSERT_FALSE(timer.isExpired());
-	
-	xpcc::ClockDummy::setTime(100);
-	TEST_ASSERT_TRUE(timer.isExpired());
-	TEST_ASSERT_FALSE(timer.isExpired());
 }
 
-void
-PeriodicTimerTest::testRestart()
-{
-	xpcc::PeriodicTimer<xpcc::ClockDummy> timer(10);
-	
-	TEST_ASSERT_TRUE(timer.isRunning());
-	TEST_ASSERT_FALSE(timer.isExpired());
-	
-	timer.stop();
-	
-	TEST_ASSERT_FALSE(timer.isRunning());
-	
-	timer.restart(5);
-	
-	TEST_ASSERT_TRUE(timer.isRunning());
-	TEST_ASSERT_FALSE(timer.isExpired());
-	
-	xpcc::ClockDummy::setTime(5);
-	TEST_ASSERT_TRUE(timer.isExpired());
-	TEST_ASSERT_FALSE(timer.isExpired());
-}
+#endif // XPCC_BOOST__MUTEX_HPP
