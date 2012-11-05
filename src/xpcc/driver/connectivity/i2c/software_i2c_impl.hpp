@@ -98,7 +98,8 @@ xpcc::SoftwareI2C<Scl, Sda, Frequency>::start(xpcc::i2c::Delegate *delegate)
 			DEBUG_SW_I2C('\n');
 			DEBUG_SW_I2C('s');
 			startCondition();
-			xpcc::i2c::Delegate::Starting s = myDelegate->started();
+
+			xpcc::i2c::Delegate::Starting s = myDelegate->starting();
 			uint8_t address = s.address;
 			
 			address &= 0xfe;

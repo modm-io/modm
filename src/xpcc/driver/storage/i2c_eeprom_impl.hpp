@@ -166,7 +166,7 @@ xpcc::I2cEeprom<I2cMaster>::attaching()
 
 template <typename I2cMaster>
 xpcc::i2c::Delegate::Starting
-xpcc::I2cEeprom<I2cMaster>::started()
+xpcc::I2cEeprom<I2cMaster>::starting()
 {
 	Starting s;
 	s.address = address;

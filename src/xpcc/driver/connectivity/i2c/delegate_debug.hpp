@@ -144,7 +144,7 @@ namespace xpcc
 			 * also be called while restart.
 			 */
 			virtual Delegate::Starting
-			started() = 0;
+			starting() = 0;
 			
 			/**
 			 * Before a read operation starts is called to retrieve the buffer

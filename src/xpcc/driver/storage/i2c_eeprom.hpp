@@ -137,7 +137,7 @@ namespace xpcc
 		attaching();
 		
 		virtual Starting
-		started();
+		starting();
 		
 		virtual Writing
 		writing();

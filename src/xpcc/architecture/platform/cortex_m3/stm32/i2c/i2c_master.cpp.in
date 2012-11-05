@@ -314,7 +314,7 @@ I2C{{ id }}_EV_IRQHandler(void)
 		// EV5: SB=1, cleared by reading SR1 register followed by writing DR register with Address.
 		DEBUG_STREAM("startbit set");
 		
-		xpcc::i2c::Delegate::Starting s = delegate->started();
+		xpcc::i2c::Delegate::Starting s = delegate->starting();
 		uint8_t address;
 		
 		switch (s.next)

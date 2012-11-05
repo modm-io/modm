@@ -99,7 +99,7 @@ namespace
 		writeBytesLeft = 0;
 		readBytesLeft = 0;
 		TWIF_MASTER_CTRLA &= ~(TWI_MASTER_RIEN_bm | TWI_MASTER_WIEN_bm);
-		xpcc::i2c::Delegate::Starting s = delegate->started();
+		xpcc::i2c::Delegate::Starting s = delegate->starting();
 		uint8_t address;
 		switch (s.next)
 		{

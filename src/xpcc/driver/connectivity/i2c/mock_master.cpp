@@ -81,10 +81,10 @@ void xpcc::i2c::MockMaster::update(){
 				
 			case Delegate::RESTART_OP:
 				if (slaveDevice != DEVICE_MISSING){
-					nextOperation = delegate->started().next;
+					nextOperation = delegate->starting().next;
 				}
 				else{
-					delegate->started();
+					delegate->starting();
 					error = ADDRESS_NACK;
 					delegate->stopped(Delegate::ERROR_CONDITION);
 					delegate = 0;

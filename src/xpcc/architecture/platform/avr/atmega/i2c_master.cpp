@@ -102,7 +102,7 @@ ISR(TWI_vect)
 			{
 				DEBUG('s');
 				// REPEATED START has been transmitted
-				xpcc::i2c::Delegate::Starting s = delegate->started();
+				xpcc::i2c::Delegate::Starting s = delegate->starting();
 				uint8_t address;
 				switch (s.next)
 				{

@@ -133,7 +133,7 @@ namespace xpcc
 			}
 
 			virtual Starting
-			started()
+			starting()
 			{
 				Starting s;
 				s.address = address;
