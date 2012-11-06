@@ -30,7 +30,6 @@
 #ifndef XPCC_INTERFACE__UART_HPP
 #define XPCC_INTERFACE__UART_HPP
 
-#include <stdint.h>
 
 namespace xpcc
 {
@@ -58,9 +57,8 @@ namespace xpcc
 		 * \brief	Write a block of bytes and wait for completion.
 		 */
 		static void
-		writeBlocking(const uint8_t *data, std::size_t lenth);
+		writeBlocking(const uint8_t *data, std::size_t length);
 		
-		// asynchronous
 		/**
 		 * \brief	Read a single byte
 		 *
@@ -75,7 +73,7 @@ namespace xpcc
 	 *
 	 * \ingroup		interface
 	 */
-	class BufferedUart : public Uart
+	class BufferedUart : public Interface
 	{
 	public:
 		/**
@@ -98,6 +96,20 @@ namespace xpcc
 		write(const uint8_t *data, std::size_t length);
 		
 		/**
+		 * \return	`true` if the buffer is empty and the last byte has been sent
+		 */
+		static bool
+		isWriteFinished();
+		
+		/**
+		 * \brief	Read a single byte
+		 *
+		 * \return	`true` if a byte has been read
+		 */
+		static bool
+		read(uint8_t &c);
+		
+		/**
 		 * \brief	Read a block of bytes
 		 *
 		 * \param	*buffer	Pointer to a buffer big enough to store \a n bytes
@@ -107,12 +119,6 @@ namespace xpcc
 		 */
 		static std::size_t
 		read(uint8_t *buffer, std::size_t length);
-		
-		/**
-		 * \return	`true` if the buffer is empty and the last byte has been sent
-		 */
-		static bool
-		isWriteFinished();
 	};
 }
 

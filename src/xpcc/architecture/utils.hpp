@@ -93,6 +93,8 @@
 	 *
 	 * \ingroup	platform
 	 */
+	// this is defined as a doxygen preprocessor macro
+	// see doc/doxyfile, PREDEFINED definition
 	#define	INHERIT_DOCUMENTATION(class)
 
 #else // !__DOXYGEN__

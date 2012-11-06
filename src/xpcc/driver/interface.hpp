@@ -2,10 +2,10 @@
 // ----------------------------------------------------------------------------
 /* Copyright (c) 2009, Roboterclub Aachen e.V.
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -14,7 +14,7 @@
  *     * Neither the name of the Roboterclub Aachen e.V. nor the
  *       names of its contributors may be used to endorse or promote products
  *       derived from this software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY ROBOTERCLUB AACHEN E.V. ''AS IS'' AND ANY
  * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -27,93 +27,37 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 // ----------------------------------------------------------------------------
-{{ generation_block }}
 
-#include <avr/io.h>
-#include <avr/interrupt.h>
+#ifndef XPCC__INTERFACE_HPP
+#define XPCC__INTERFACE_HPP
 
-#include <xpcc/architecture/driver/atomic/queue.hpp>
-#include <xpcc/architecture/driver/atomic/lock.hpp>
-
-#include "uart_defines.h"
-#include "xpcc_config.hpp"
-
-#if defined USART{{ id }}_UDRE_vect
-
-#include "uart{{ id }}.hpp"
-
-static xpcc::atomic::Queue<uint8_t, UART{{ id }}_TX_BUFFER_SIZE> txBuffer;
-
-// ----------------------------------------------------------------------------
-// called when the UART is ready to transmit the next byte
-// 
-ISR(USART{{ id }}_UDRE_vect)
+namespace xpcc
 {
-	if (txBuffer.isEmpty())
+	/**
+	 * \brief	Interface class
+	 *
+	 * This class defines no real functionality but acts as a base class for
+	 * all classes describing the public interface of some hardware drivers.
+	 *
+	 * As we use template parameters to configure drivers for different pin
+	 * layouts etc. we have no way of describing the interface expected by
+	 * the driver.
+	 * This class and its subclasses should bridge this gap in the
+	 * documentation as they show the expected interface.
+	 *
+	 * Because they don't have any virtual methods and don't implement any
+	 * of the methods they don't add any overhead to the system.
+	 *
+	 * The user must implement all given methods and therewith shadowing the
+	 * methods of the base classes. Otherwise the Compiler will try to use
+	 * methods of the base class and this will lead to Linker errors because
+	 * of the missing implementation.
+	 *
+	 * \ingroup	driver
+	 */
+	class Interface
 	{
-		// transmission finished, disable UDRE interrupt
-		UCSR{{ id }}B &= ~(1 << UDRIE{{ id }});
-	}
-	else {
-		// get one byte from buffer and write it to the UART buffer
-		// which starts the transmission
-		UDR{{ id }} = txBuffer.get();
-		txBuffer.pop();
-	}
+	};
 }
 
-// ----------------------------------------------------------------------------
-bool
-xpcc::atmega::BufferedUart{{ id }}::write(uint8_t data)
-{
-	if (!txBuffer.push(data))
-		return false;
-	
-	atomic::Lock lock;
-	
-	// enable UDRE interrupt
-	UCSR{{ id }}B |= (1 << UDRIE{{ id }});
-	
-	return true;
-}
-
-std::size_t
-xpcc::atmega::BufferedUart{{ id }}::write(const uint8_t *data, std::size_t length)
-{
-	for (std::size_t i = 0; i < length; ++i)
-	{
-		if (!write(*data++))
-		{
-			return i;
-		}
-	}
-	
-	return length;
-}
-
-bool
-xpcc::atmega::BufferedUart{{ id }}::isWriteFinished()
-{
-	return (txBuffer.isEmpty() && !(UCSR{{ id }}B & (1 << UDRIE{{ id }})));
-}
-
-std::size_t
-xpcc::atmega::BufferedUart{{ id }}::flushTransmitBuffer()
-{
-	{
-		atomic::Lock lock;
-		UCSR{{ id }}B &= ~(1 << UDRIE{{ id }});
-	}
-	
-	uint8_t i(0);
-	while(!txBuffer.isEmpty())
-	{
-		txBuffer.pop();
-		++i;
-	}
-
-	return i;
-}
-
-#endif
-
+#endif // XPCC__INTERFACE_HPP

@@ -67,29 +67,56 @@ ISR(USART0_UDRE_vect)
 }
 
 // ----------------------------------------------------------------------------
-void
-xpcc::atmega::BufferedUart0::write(uint8_t c)
+bool
+xpcc::atmega::BufferedUart0::write(uint8_t data)
 {
-	while (!txBuffer.push(c)) {
-		// wait for a free slot in the buffer
-	}
+	if (!txBuffer.push(data))
+		return false;
 	
 	atomic::Lock lock;
 	
 	// enable UDRE interrupt
 	UCSR0B |= (1 << UDRIE0);
+	
+	return true;
 }
 
-//uint8_t
-//xpcc::atmega::BufferedUart0::flushTransmitBuffer()
-//{
-//	uint8_t i(0);
-//	while(!txBuffer.isEmpty()) {
-//		txBuffer.pop();
-//		++i;
-//	}
-//
-//	return i;
-//}
+std::size_t
+xpcc::atmega::BufferedUart0::write(const uint8_t *data, std::size_t length)
+{
+	for (std::size_t i = 0; i < length; ++i)
+	{
+		if (!write(*data++))
+		{
+			return i;
+		}
+	}
+	
+	return length;
+}
+
+bool
+xpcc::atmega::BufferedUart0::isWriteFinished()
+{
+	return (txBuffer.isEmpty() && !(UCSR0B & (1 << UDRIE0)));
+}
+
+std::size_t
+xpcc::atmega::BufferedUart0::flushTransmitBuffer()
+{
+	{
+		atomic::Lock lock;
+		UCSR0B &= ~(1 << UDRIE0);
+	}
+	
+	uint8_t i(0);
+	while(!txBuffer.isEmpty())
+	{
+		txBuffer.pop();
+		++i;
+	}
+
+	return i;
+}
 
 #endif

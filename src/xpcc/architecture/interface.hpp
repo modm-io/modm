@@ -31,6 +31,9 @@
 #ifndef XPCC__INTERFACE_HPP
 #define XPCC__INTERFACE_HPP
 
+#include <stdint.h>
+#include <cstddef>
+
 /**
  * \ingroup 	architecture
  * \defgroup	interface

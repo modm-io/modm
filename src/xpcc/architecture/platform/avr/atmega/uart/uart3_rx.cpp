@@ -91,25 +91,23 @@ xpcc::atmega::BufferedUart3::setBaudrateRegister(uint16_t ubrr)
 bool
 xpcc::atmega::BufferedUart3::read(uint8_t& c)
 {
-	if (rxBuffer.isEmpty()) {
+	if (rxBuffer.isEmpty())
 		return false;
-	}
-	else {
-		c = rxBuffer.get();
-		rxBuffer.pop();
-		
-		return true;
-	}
+	
+	c = rxBuffer.get();
+	rxBuffer.pop();
+	
+	return true;
 }
 
 // ----------------------------------------------------------------------------
-uint8_t
-xpcc::atmega::BufferedUart3::read(uint8_t *buffer, uint8_t n)
+std::size_t
+xpcc::atmega::BufferedUart3::read(uint8_t *buffer, std::size_t length)
 {
-	for (uint8_t i = 0; i < n; ++i)
+	for (uint8_t i = 0; i < length; ++i)
 	{
 		if (rxBuffer.isEmpty()) {
-			return n;
+			return length;
 		}
 		else {
 			*buffer++ = rxBuffer.get();
@@ -117,26 +115,27 @@ xpcc::atmega::BufferedUart3::read(uint8_t *buffer, uint8_t n)
 		}
 	}
 	
-	return n;
+	return length;
 }
 
 uint8_t
-xpcc::atmega::BufferedUart3::readErrorFlags()
+xpcc::atmega::BufferedUart3::getErrorFlags()
 {
 	return error;
 }
 
 void
-xpcc::atmega::BufferedUart3::resetErrorFlags()
+xpcc::atmega::BufferedUart3::acknowledgeErrorFlags()
 {
 	error = 0;
 }
 
-uint8_t
+std::size_t
 xpcc::atmega::BufferedUart3::flushReceiveBuffer()
 {
 	uint8_t i(0);
-	while(!rxBuffer.isEmpty()) {
+	while(!rxBuffer.isEmpty())
+	{
 		rxBuffer.pop();
 		++i;
 	}

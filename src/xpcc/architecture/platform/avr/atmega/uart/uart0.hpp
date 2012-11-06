@@ -65,7 +65,7 @@ namespace xpcc
 		 * 
 		 * \ingroup		atmega
 		 */
-		class BufferedUart0
+		class BufferedUart0 INHERIT_DOCUMENTATION(::xpcc::BufferedUart)
 		{
 		public:
 			BufferedUart0(uint32_t baudrate)
@@ -97,17 +97,25 @@ namespace xpcc
 				setBaudrateRegister(ubrr);
 			}
 			
-			/**
-			 * \brief	Send a single byte
-			 */
-			static void
+			// documentation inherited
+			static bool
 			write(uint8_t data);
 			
-			/**
-			 * \brief	Read a single byte
-			 */
+			// documentation inherited
 			static bool
 			read(uint8_t& c);
+			
+			// documentation inherited
+			static std::size_t
+			write(const uint8_t *data, std::size_t length);
+
+			// documentation inherited
+			static std::size_t
+			read(uint8_t *buffer, std::size_t length);
+
+			// documentation inherited
+			static bool
+			isWriteFinished();
 			
 			/**
 			 * \brief	Check whether any errors occurred during receiving
@@ -120,32 +128,21 @@ namespace xpcc
 			 *			corresponds to the Error Flags in register A.
 			 */
 			static uint8_t
-			readErrorFlags();
+			getErrorFlags();
 			
 			static void
-			resetErrorFlags();
+			acknowledgeErrorFlags();
 			
 			/**
 			 * \brief	Empty the receive FIFO queue and UART buffer.
 			 *
 			 * \return	the size of the deleted FIFO queue.
 			 */
-			static uint8_t
+			static std::size_t
 			flushReceiveBuffer();
 			
-//			static uint8_t
-//			flushTransmitBuffer();
-			
-			/**
-			 * \brief	Read a block of bytes
-			 * 
-			 * \param	*buffer	Pointer to a buffer big enough to storage \a n bytes
-			 * \param	n	Number of bytes to be read
-			 * 
-			 * \return	Number of bytes which could be read, maximal \a n
-			 */
-			static uint8_t
-			read(uint8_t *buffer, uint8_t n);
+			static std::size_t
+			flushTransmitBuffer();
 			
 		protected:
 			static void

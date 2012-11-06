@@ -87,25 +87,23 @@ xpcc::atmega::BufferedUart{{ id }}::setBaudrateRegister(uint16_t ubrr)
 bool
 xpcc::atmega::BufferedUart{{ id }}::read(uint8_t& c)
 {
-	if (rxBuffer.isEmpty()) {
+	if (rxBuffer.isEmpty())
 		return false;
-	}
-	else {
-		c = rxBuffer.get();
-		rxBuffer.pop();
-		
-		return true;
-	}
+	
+	c = rxBuffer.get();
+	rxBuffer.pop();
+	
+	return true;
 }
 
 // ----------------------------------------------------------------------------
-uint8_t
-xpcc::atmega::BufferedUart{{ id }}::read(uint8_t *buffer, uint8_t n)
+std::size_t
+xpcc::atmega::BufferedUart{{ id }}::read(uint8_t *buffer, std::size_t length)
 {
-	for (uint8_t i = 0; i < n; ++i)
+	for (uint8_t i = 0; i < length; ++i)
 	{
 		if (rxBuffer.isEmpty()) {
-			return n;
+			return length;
 		}
 		else {
 			*buffer++ = rxBuffer.get();
@@ -113,26 +111,27 @@ xpcc::atmega::BufferedUart{{ id }}::read(uint8_t *buffer, uint8_t n)
 		}
 	}
 	
-	return n;
+	return length;
 }
 
 uint8_t
-xpcc::atmega::BufferedUart{{ id }}::readErrorFlags()
+xpcc::atmega::BufferedUart{{ id }}::getErrorFlags()
 {
 	return error;
 }
 
 void
-xpcc::atmega::BufferedUart{{ id }}::resetErrorFlags()
+xpcc::atmega::BufferedUart{{ id }}::acknowledgeErrorFlags()
 {
 	error = 0;
 }
 
-uint8_t
+std::size_t
 xpcc::atmega::BufferedUart{{ id }}::flushReceiveBuffer()
 {
 	uint8_t i(0);
-	while(!rxBuffer.isEmpty()) {
+	while(!rxBuffer.isEmpty())
+	{
 		rxBuffer.pop();
 		++i;
 	}
