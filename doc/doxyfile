@@ -1536,7 +1536,8 @@ INCLUDE_FILE_PATTERNS  =
 PREDEFINED             = __DOXYGEN__ \
                          __cplusplus \
                          "EXTERN_FLASH_STORAGE(x):=const x" \
-                         "ALWAYS_INLINE=inline"
+                         "ALWAYS_INLINE=inline" \
+                         "INHERIT_DOCUMENTATION(class)= : public class"
 
 # If the MACRO_EXPANSION and EXPAND_ONLY_PREDEF tags are set to YES then
 # this tag can be used to specify a list of macro names that should be expanded.

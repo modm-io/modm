@@ -1,11 +1,11 @@
 // coding: utf-8
 // ----------------------------------------------------------------------------
-/* Copyright (c) 2009, Roboterclub Aachen e.V.
+/* Copyright (c) 2012, Roboterclub Aachen e.V.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -31,33 +31,67 @@
 #ifndef XPCC__INTERFACE_HPP
 #define XPCC__INTERFACE_HPP
 
+/**
+ * \ingroup 	architecture
+ * \defgroup	interface
+ * 
+ * All common hardware interfaces
+ */
+
 namespace xpcc
 {
 	/**
 	 * \brief	Interface class
-	 * 
-	 * This class defines no real functionality but acts as a base class for
-	 * all classes describing the public interface of some hardware drivers.
-	 * 
-	 * As we use template parameters to configure drivers for different pin
-	 * layouts etc. we have no way of describing the interface expected by
-	 * the driver.
-	 * This class and its subclasses should bridge this gap in the
-	 * documentation as they show the expected interface.
-	 * 
-	 * Because they don't have any virtual methods and don't implement any
-	 * of the methods they don't add any overhead to the system.
-	 * 
-	 * The user must implement all given methods and therewith shadowing the
-	 * methods of the base classes. Otherwise the Compiler will try to use
-	 * methods of the base class and this will lead to Linker errors because
-	 * of the missing implementation.
-	 * 
-	 * \ingroup	driver
+	 *
+	 * This class defines acts as a base class for all classes describing the
+	 * public interface of common peripheral drivers.
+	 * As there is no implementation given, the classes specific to the platform
+	 * inherit from their respective base classes and must shadow the methods of
+	 * them.
+	 *
+	 * The inheritance is only visible for the documenation, it is completely
+	 * removed during compile time keeping a possible error at platform level.
+	 * This is safe, because only one platform can be compiled at once.
+	 *
+	 * This way, no virtual functions are needed and no overhead is generated,
+	 * but we still have clean inheritance in the documentation.
+	 * There is no need to document the platform specific implementation, since
+	 * it is taken from the base class.
+	 *
+	 * \ingroup interface
+	 * \author	Niklas Hauser
 	 */
 	class Interface
 	{
+		/**
+		 * \brief initializes the peripheral, must be called before use.
+		 */
+		static void
+		initialize();
+		
+		/**
+		 * \brief configures a peripheral for a specific purpose
+		 */
+		static void
+		configurePurpose();
+		
+		/**
+		 * \brief sets a parameter
+		 */
+		static void
+		setParameter();
+		
+		/**
+		 * \brief acknowledges an interrupt flag
+		 *
+		 * We use acknowledge here, because it describes the intention rather
+		 * than the actual implementation.
+		 */
+		static void
+		acknowledgeInterruptFlag();
 	};
 }
 
-#endif // XPCC__INTERFACE_HPP
+#include "interface/uart.hpp"
+
+#endif	// XPCC__INTERFACE_HPP
