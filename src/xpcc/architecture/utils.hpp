@@ -82,21 +82,6 @@
 	 */
 	#define	CONCAT(a,b)		a ## b
 
-	/**
-	 * \brief	Inherits the documentation of a class
-	 *
-	 * This inherits the documentation from common hardware interfaces,
-	 * by inheriting its methods, however the relation is not compiled and
-	 * only visible for documenation.
-	 * This way, no overhead is generated, and the documentation is in only
-	 * one place.
-	 *
-	 * \ingroup	platform
-	 */
-	// this is defined as a doxygen preprocessor macro
-	// see doc/doxyfile, PREDEFINED definition
-	#define	INHERIT_DOCUMENTATION(class)
-
 #else // !__DOXYGEN__
 
 	#define	STRINGIFY(s)	STRINGIFY_(s)
@@ -118,8 +103,6 @@
 	#define	CONCAT5(a,b,c,d,e)		CONCAT5_(a,b,c,d,e)
 	#define	CONCAT5_(a,b,c,d,e)		CONCAT5__(a,b,c,d,e)
 	#define	CONCAT5__(a,b,c,d,e)	a ## b ## c ## d ## e
-
-	#define	INHERIT_DOCUMENTATION(class)
 
 	#ifdef XPCC__COMPILER_GCC
 	#	define ALWAYS_INLINE  		inline __attribute__((always_inline))
