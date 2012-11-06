@@ -28,23 +28,23 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__INTERFACE_HPP
-#define XPCC__INTERFACE_HPP
+#ifndef XPCC__PERIPHERAL_HPP
+#define XPCC__PERIPHERAL_HPP
 
 #include <stdint.h>
 #include <cstddef>
 
 /**
  * \ingroup 	architecture
- * \defgroup	interface
+ * \defgroup	peripheral	Peripherals
  * 
- * All common hardware interfaces
+ * All hardware peripherals with common interfaces.
  */
 
 namespace xpcc
 {
 	/**
-	 * \brief	Interface class
+	 * \brief	Peripheral class
 	 *
 	 * This class defines acts as a base class for all classes describing the
 	 * public interface of common peripheral drivers.
@@ -61,40 +61,40 @@ namespace xpcc
 	 * There is no need to document the platform specific implementation, since
 	 * it is taken from the base class.
 	 *
-	 * \ingroup interface
+	 * \ingroup peripheral
 	 * \author	Niklas Hauser
 	 */
-	class Interface
+	class Peripheral
 	{
-		/**
-		 * \brief initializes the peripheral, must be called before use.
-		 */
-		static void
-		initialize();
-		
-		/**
-		 * \brief configures a peripheral for a specific purpose
-		 */
-		static void
-		configurePurpose();
-		
-		/**
-		 * \brief sets a parameter
-		 */
-		static void
-		setParameter();
-		
-		/**
-		 * \brief acknowledges an interrupt flag
-		 *
-		 * We use acknowledge here, because it describes the intention rather
-		 * than the actual implementation.
-		 */
-		static void
-		acknowledgeInterruptFlag();
+//		/**
+//		 * \brief initializes the peripheral, must be called before use.
+//		 */
+//		static void
+//		initialize();
+//		
+//		/**
+//		 * \brief configures a peripheral for a specific purpose
+//		 */
+//		static void
+//		configurePurpose();
+//		
+//		/**
+//		 * \brief sets a parameter
+//		 */
+//		static void
+//		setParameter();
+//		
+//		/**
+//		 * \brief acknowledges an interrupt flag
+//		 *
+//		 * We use acknowledge here, because it describes the intention rather
+//		 * than the actual implementation.
+//		 */
+//		static void
+//		acknowledgeInterruptFlag();
 	};
 }
 
-#include "interface/uart.hpp"
+#include "peripheral/uart.hpp"
 
-#endif	// XPCC__INTERFACE_HPP
+#endif	// XPCC__PERIPHERAL_HPP

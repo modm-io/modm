@@ -27,26 +27,23 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef XPCC_INTERFACE__UART_HPP
-#define XPCC_INTERFACE__UART_HPP
+#ifndef XPCC_PERIPHERAL__UART_HPP
+#define XPCC_PERIPHERAL__UART_HPP
 
+#include "../peripheral.hpp"
 
 namespace xpcc
 {
 	/**
-	 * \brief		Buffered UART
+	 * \brief		Uart
 	 *
-	 * \ingroup		interface
+	 * \ingroup		peripheral
+	 * \author		Niklas Hauser
 	 */
-	class Uart : public Interface
+	class Uart : public ::xpcc::Peripheral
 	{
+#if defined __DOXYGEN__
 	public:
-		/**
-		 * \brief	Sets the baudrate at compile time.
-		 */
-		static void
-		setBaudrate(uint32_t baudrate);
-		
 		/**
 		 * \brief	Write a single byte and wait for completion.
 		 */
@@ -60,26 +57,17 @@ namespace xpcc
 		writeBlocking(const uint8_t *data, std::size_t length);
 		
 		/**
-		 * \brief	Read a single byte
-		 *
-		 * \return	`true` if a byte has been read
+		 * \brief Flush the write buffer, waits in a while loop until
+		 *			isWriteFinished() returns `true`
 		 */
-		static bool
-		read(uint8_t &c);
-	};
-
-	/**
-	 * \brief		Buffered UART
-	 *
-	 * \ingroup		interface
-	 */
-	class BufferedUart : public Interface
-	{
-	public:
+		static void
+		flushWriteBuffer();
+		
+		
 		/**
 		 * \brief	Pushes a single byte into the buffer
 		 *
-		 * \return	`false` if buffer is full
+		 * \return	`true` if data has been buffered, `false` if buffer is full
 		 */
 		static bool
 		write(uint8_t data);
@@ -87,10 +75,10 @@ namespace xpcc
 		/**
 		 * \brief	Pushes a block of bytes into the buffer
 		 *
-		 * \param	*buffer	Pointer to a buffer big enough to store \a n bytes
-		 * \param	n		Number of bytes to be written
+		 * \param	*buffer	Pointer to a buffer big enough to store \a length bytes
+		 * \param	length	Number of bytes to be written
 		 *
-		 * \return	the number of bytes pushed into the buffer, maximal \a n
+		 * \return	the number of bytes pushed into the buffer, maximal \a length
 		 */
 		static std::size_t
 		write(const uint8_t *data, std::size_t length);
@@ -104,10 +92,12 @@ namespace xpcc
 		/**
 		 * \brief	Read a single byte
 		 *
-		 * \return	`true` if a byte has been read
+		 * \param	&data	Byte read, if any
+		 *
+		 * \return	\n true if a byte was received, \n false otherwise
 		 */
 		static bool
-		read(uint8_t &c);
+		read(uint8_t &data);
 		
 		/**
 		 * \brief	Read a block of bytes
@@ -119,7 +109,24 @@ namespace xpcc
 		 */
 		static std::size_t
 		read(uint8_t *buffer, std::size_t length);
+		
+		/**
+		 * \brief	Empty the receive software and hardware buffer.
+		 *
+		 * \return	the size of the deleted FIFO queue.
+		 */
+		static std::size_t
+		discardReceiveBuffer();
+		
+		/**
+		 * \brief	Empty the transmit FIFO queue and UART buffer.
+		 *
+		 * \return	the size of the deleted FIFO queue.
+		 */
+		static std::size_t
+		discardTransmitBuffer();
+#endif
 	};
 }
 
-#endif // XPCC_INTERFACE__UART_HPP
+#endif // XPCC_PERIPHERAL__UART_HPP
