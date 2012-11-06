@@ -3,7 +3,7 @@
 #include <xpcc/io/iostream.hpp>
 
 // Create a new UART object and configure it to a baudrate of 115200
-xpcc::atmega::BufferedUart0 uart(115200);
+xpcc::atmega::Uart0 uart(115200);
 
 int
 main()

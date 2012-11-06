@@ -38,6 +38,7 @@
 
 #include <stdint.h>
 #include <xpcc/architecture/utils.hpp>
+#include <xpcc/architecture/peripheral/uart.hpp>
 
 namespace xpcc
 {
@@ -65,10 +66,10 @@ namespace xpcc
 		 * 
 		 * \ingroup		atmega
 		 */
-		class BufferedUart2 INHERIT_DOCUMENTATION(::xpcc::BufferedUart)
+		class Uart2 : public ::xpcc::Uart
 		{
 		public:
-			BufferedUart2(uint32_t baudrate)
+			Uart2(uint32_t baudrate)
 			{
 				this->setBaudrate(baudrate);
 			}
@@ -97,26 +98,43 @@ namespace xpcc
 				setBaudrateRegister(ubrr);
 			}
 			
-			// documentation inherited
+			// start documentation inherited
+			// MARK: write blocking
+			static void
+			writeBlocking(uint8_t data);
+			
+			static void
+			writeBlocking(const uint8_t *data, std::size_t length);
+			
+			static void
+			flushWriteBuffer();
+			
+			// MARK: write
 			static bool
 			write(uint8_t data);
 			
-			// documentation inherited
-			static bool
-			read(uint8_t& c);
-			
-			// documentation inherited
 			static std::size_t
 			write(const uint8_t *data, std::size_t length);
-
-			// documentation inherited
-			static std::size_t
-			read(uint8_t *buffer, std::size_t length);
-
-			// documentation inherited
+			
 			static bool
 			isWriteFinished();
 			
+			// MARK: read
+			static bool
+			read(uint8_t& data);
+			
+			static std::size_t
+			read(uint8_t *buffer, std::size_t length);
+			
+			// MARK: discard
+			static std::size_t
+			discardReceiveBuffer();
+			
+			static std::size_t
+			discardTransmitBuffer();
+			// end documentation inherited
+			
+			// MARK: error
 			/**
 			 * \brief	Check whether any errors occurred during receiving
 			 *			Be aware that these indicate an error that occurred
@@ -132,17 +150,6 @@ namespace xpcc
 			
 			static void
 			acknowledgeErrorFlags();
-			
-			/**
-			 * \brief	Empty the receive FIFO queue and UART buffer.
-			 *
-			 * \return	the size of the deleted FIFO queue.
-			 */
-			static std::size_t
-			flushReceiveBuffer();
-			
-			static std::size_t
-			flushTransmitBuffer();
 			
 		protected:
 			static void

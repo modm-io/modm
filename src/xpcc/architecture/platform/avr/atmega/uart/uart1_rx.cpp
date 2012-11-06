@@ -63,7 +63,7 @@ ISR(USART1_RX_vect)
 
 // ----------------------------------------------------------------------------
 void
-xpcc::atmega::BufferedUart1::setBaudrateRegister(uint16_t ubrr)
+xpcc::atmega::Uart1::setBaudrateRegister(uint16_t ubrr)
 {
 	// Set baud rate
 	if (ubrr & 0x8000) {
@@ -87,22 +87,21 @@ xpcc::atmega::BufferedUart1::setBaudrateRegister(uint16_t ubrr)
 #endif
 }
 
-// ----------------------------------------------------------------------------
+// MARK: - read
 bool
-xpcc::atmega::BufferedUart1::read(uint8_t& c)
+xpcc::atmega::Uart1::read(uint8_t& data)
 {
 	if (rxBuffer.isEmpty())
 		return false;
 	
-	c = rxBuffer.get();
+	data = rxBuffer.get();
 	rxBuffer.pop();
 	
 	return true;
 }
 
-// ----------------------------------------------------------------------------
 std::size_t
-xpcc::atmega::BufferedUart1::read(uint8_t *buffer, std::size_t length)
+xpcc::atmega::Uart1::read(uint8_t *buffer, std::size_t length)
 {
 	for (uint8_t i = 0; i < length; ++i)
 	{
@@ -118,20 +117,9 @@ xpcc::atmega::BufferedUart1::read(uint8_t *buffer, std::size_t length)
 	return length;
 }
 
-uint8_t
-xpcc::atmega::BufferedUart1::getErrorFlags()
-{
-	return error;
-}
-
-void
-xpcc::atmega::BufferedUart1::acknowledgeErrorFlags()
-{
-	error = 0;
-}
-
+// MARK: - discard
 std::size_t
-xpcc::atmega::BufferedUart1::flushReceiveBuffer()
+xpcc::atmega::Uart1::discardReceiveBuffer()
 {
 	uint8_t i(0);
 	while(!rxBuffer.isEmpty())
@@ -142,12 +130,26 @@ xpcc::atmega::BufferedUart1::flushReceiveBuffer()
 	
 #if defined (RXC1)
 	uint8_t c;
-	while (UCSR1A & (1 << RXC1)) {
+	while (UCSR1A & (1 << RXC1))
+	{
 		c = UDR1;
 	}
 #endif
 	
 	return i;
+}
+
+// MARK: - error
+uint8_t
+xpcc::atmega::Uart1::getErrorFlags()
+{
+	return error;
+}
+
+void
+xpcc::atmega::Uart1::acknowledgeErrorFlags()
+{
+	error = 0;
 }
 
 #endif

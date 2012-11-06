@@ -66,9 +66,45 @@ ISR(USART1_UDRE_vect)
 	}
 }
 
-// ----------------------------------------------------------------------------
+// MARK: - write blocking
+void
+xpcc::atmega::Uart1::writeBlocking(uint8_t data)
+{
+	// wait until there is some place in the buffer
+	while (!write(data))
+		;
+	
+	// wait until everything has been sent
+	while (!isWriteFinished())
+		;
+}
+
+void
+xpcc::atmega::Uart1::writeBlocking(const uint8_t *data, std::size_t length)
+{
+	// first push everything into the buffer
+	for (std::size_t i = 0; i < length; ++i)
+	{
+		while (!write(*data++))
+			;
+	}
+	
+	// then wait
+	while (!isWriteFinished())
+		;
+}
+
+void
+xpcc::atmega::Uart1::flushWriteBuffer()
+{
+	// just wait until the last byte has been sent
+	while (!isWriteFinished())
+		;
+}
+
+// MARK: - write
 bool
-xpcc::atmega::BufferedUart1::write(uint8_t data)
+xpcc::atmega::Uart1::write(uint8_t data)
 {
 	if (!txBuffer.push(data))
 		return false;
@@ -82,7 +118,7 @@ xpcc::atmega::BufferedUart1::write(uint8_t data)
 }
 
 std::size_t
-xpcc::atmega::BufferedUart1::write(const uint8_t *data, std::size_t length)
+xpcc::atmega::Uart1::write(const uint8_t *data, std::size_t length)
 {
 	for (std::size_t i = 0; i < length; ++i)
 	{
@@ -96,20 +132,21 @@ xpcc::atmega::BufferedUart1::write(const uint8_t *data, std::size_t length)
 }
 
 bool
-xpcc::atmega::BufferedUart1::isWriteFinished()
+xpcc::atmega::Uart1::isWriteFinished()
 {
 	return (txBuffer.isEmpty() && !(UCSR1B & (1 << UDRIE1)));
 }
 
+// MARK: - discard
 std::size_t
-xpcc::atmega::BufferedUart1::flushTransmitBuffer()
+xpcc::atmega::Uart1::discardTransmitBuffer()
 {
 	{
 		atomic::Lock lock;
 		UCSR1B &= ~(1 << UDRIE1);
 	}
 	
-	uint8_t i(0);
+	std::size_t i = 0;
 	while(!txBuffer.isEmpty())
 	{
 		txBuffer.pop();
