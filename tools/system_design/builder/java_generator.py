@@ -33,6 +33,8 @@ import builder_base
 import filter.java as filter
 
 class JavaGeneratorBuilder(builder_base.Builder):
+
+	VERSION = "0.1"
 	
 	def setup(self, optparser):
 		optparser.add_option(
