@@ -33,11 +33,11 @@
 #include "fir_test.hpp"
 
 #define TAP_ZERO 0.0f
-#define TAP_A 0.8645f
-#define TAP_B 0.7855f
-#define TAP_C 0.2658f
-#define TAP_D 0.0256f
-#define TAP_E -0.456f
+#define TAP_A 0.1111f
+#define TAP_B 0.2222f
+#define TAP_C 0.3333f
+#define TAP_D 0.4444f
+#define TAP_E 0.5555f
 
 
 void
@@ -46,47 +46,22 @@ FirTest::testFir()
 	/* Delay Line */
 	float delay_line_coeffs[5] = {0,0,0,0,1};
 	float delay_line_taps[5] = {TAP_A,TAP_B,TAP_C,TAP_D,TAP_E};
-	float delay_line_results[10] = {TAP_ZERO,TAP_ZERO,TAP_ZERO,TAP_ZERO,TAP_ZERO,TAP_A,TAP_B,TAP_C,TAP_D,TAP_E};
-	testFilter<float, 5>(delay_line_coeffs, delay_line_taps, 5, delay_line_results);
-
-	/*
-
-	
-	xpcc::filter::Fir<float, 3> filter(delay_line_coeffs);
-
-	// Append two new taps
-	filter.append(TAP_A);
-	filter.append(TAP_C);
-
-	// Result should be Zero
-	filter.update();
-	TEST_ASSERT_EQUALS(filter.getValue(), TAP_ZERO);
-
-	// Append third Tap
-	filter.append(TAP_B);
-
-	// Result should now be TAP_A
-	filter.update();
-	TEST_ASSERT_EQUALS(filter.getValue(), TAP_A);
-
-	filter.append(TAP_B);
-	filter.update();
-	TEST_ASSERT_EQUALS(filter.getValue(), TAP_C);
-	*/
+	float delay_line_results[10] = {TAP_ZERO,TAP_ZERO,TAP_ZERO,TAP_ZERO,TAP_A,TAP_B,TAP_C,TAP_D,TAP_E,TAP_ZERO};
+	testFilter<float, 5, 2>(delay_line_coeffs, delay_line_taps, 5, delay_line_results);
 }
 
 /* Length of results array needs to be len(taps) + len(coeff) */
-template<typename T, int N>
+template<typename T, int N, int BLOCK_SIZE>
 void FirTest::testFilter(const T (&coeff)[N],
 	 const T taps[], int taps_length, const T results[])
 {
-	xpcc::filter::Fir<T, N> filter(coeff);
+	xpcc::filter::Fir<T, N, BLOCK_SIZE> filter(coeff);
 	for(int i = 0; i < (taps_length + N); i++){
-		filter.update();
-		TEST_ASSERT_EQUALS(filter.getValue(), results[i]);
 		if(i < taps_length)
 			filter.append(taps[i]);
 		else
 			filter.append(0);
+		filter.update();
+		TEST_ASSERT_EQUALS(filter.getValue(), results[i]);
 	} 
 }

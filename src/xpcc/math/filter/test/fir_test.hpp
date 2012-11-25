@@ -39,7 +39,7 @@ public:
 
 private:
 	/* Length of results array needs to be len(taps) + len(coeff) */
-	template<typename T, int N>
+	template<typename T, int N, int BLOCK_SIZE>
 	void testFilter(const T (&coeff)[N],
 		const T taps[], int taps_length, const T results[]);
 };

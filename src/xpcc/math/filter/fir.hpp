@@ -47,7 +47,7 @@ namespace xpcc
 	 */
 	namespace filter
 	{
-		template<typename T, int N>
+		template<typename T, int N, int BLOCK_SIZE>
 		class Fir
 		{
 
@@ -95,8 +95,9 @@ namespace xpcc
 		
 		private:
 			T output;	
-			T taps[N];
+			T taps[N+BLOCK_SIZE];
 			T coefficients[N];
+			int taps_index;
 		};
 	}
 }
