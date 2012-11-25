@@ -74,7 +74,16 @@ template<typename T, int N>
 void
 xpcc::filter::Fir<T, N>::update()
 {
-	// TODO: Implement FIR Function
-	output = (T)-1;
+	T sum = (T)0;
+	for(int i = 0; i < (N - (N%4)); i++){
+		sum += taps[i]*coefficients[i]; i++;
+		sum += taps[i]*coefficients[i]; i++;
+		sum += taps[i]*coefficients[i]; i++;
+		sum += taps[i]*coefficients[i];
+	}
+	for(int i = (N - (N%4)); i < N; i++){
+		sum += taps[i]*coefficients[i];
+	}
+	output = sum;
 }
 #endif // XPCC__FIR_IMPL_HPP

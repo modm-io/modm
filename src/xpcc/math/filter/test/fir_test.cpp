@@ -44,10 +44,10 @@ void
 FirTest::testFir()
 {
 	/* Delay Line */
-	float delay_line_coeffs[3] = {0,0,1};
+	float delay_line_coeffs[5] = {0,0,0,0,1};
 	float delay_line_taps[5] = {TAP_A,TAP_B,TAP_C,TAP_D,TAP_E};
-	float delay_line_results[8] = {TAP_ZERO,TAP_ZERO,TAP_ZERO,TAP_A,TAP_B,TAP_C,TAP_D,TAP_E};
-	testFilter<float, 3>(delay_line_coeffs, delay_line_taps, 5, delay_line_results);
+	float delay_line_results[10] = {TAP_ZERO,TAP_ZERO,TAP_ZERO,TAP_ZERO,TAP_ZERO,TAP_A,TAP_B,TAP_C,TAP_D,TAP_E};
+	testFilter<float, 5>(delay_line_coeffs, delay_line_taps, 5, delay_line_results);
 
 	/*
 

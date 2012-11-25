@@ -38,6 +38,7 @@ namespace xpcc
 	/**
 	 * \brief	A finit impulse response (FIR) filter implementation
 	 *
+	 * g[n] = SUM(h[k]x[n-k])
 	 * 
 	 * \todo	
 	 * 
