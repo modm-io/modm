@@ -41,18 +41,18 @@ namespace xpcc
 	 * 
 	 * TODO Untested!
 	 * 
-	 * \verbatim
-	    74HC165
-         _____
-  Load -|  U  |- Vcc
-   Clk -|     |- ClkInh (-> low)
-    P4 -|     |- P3
-    P5 -|     |- P2
-    P6 -|     |- P1
-    P7 -|     |- P0
- !Dout -|     |- Din
-   Gnd -|_____|- Dout (MISO)
-\endverbatim
+	\verbatim
+	         74HC165
+	          _____
+	   Load -|  U  |- Vcc
+	    Clk -|     |- ClkInh (-> low)
+	     P4 -|     |- P3
+	     P5 -|     |- P2
+	     P6 -|     |- P1
+	     P7 -|     |- P0
+	  !Dout -|     |- Din
+	    Gnd -|_____|- Dout (MISO)
+	\endverbatim
 	 * 
 	 * f_clk max. is 25 MHz at 4,5V and 5 MHz at 2V.
 	 * 
@@ -66,7 +66,7 @@ namespace xpcc
 	 * \tparam	N			Number of HC165 Chips
 	 * 
 	 * \author	Fabian Greif
-	 * \ingroup	gpio
+	 * \ingroup	driver_gpio
 	 */
 	template <typename Spi,	typename Load, size_t N>
 	class ShiftRegisterInput

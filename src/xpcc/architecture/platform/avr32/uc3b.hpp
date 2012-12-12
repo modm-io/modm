@@ -27,6 +27,12 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 // ----------------------------------------------------------------------------
+
+/**
+ * \ingroup		platform
+ * \defgroup	avr32		AVR32
+ */
+
 /**
  * \ingroup		avr32
  * \defgroup	ucb3		UC3B

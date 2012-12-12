@@ -69,7 +69,9 @@ namespace xpcc
 		{
 		public:
 			/**
-			 * \param sensorMapping first element of a remap array
+			 * \param sensorMapping
+			 * 			first element of a remap array
+			 * \param sensorData
 			 */
 			static inline void
 			initialize(uint8_t* sensorMapping, uint16_t* sensorData);
