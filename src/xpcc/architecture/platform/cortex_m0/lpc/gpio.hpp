@@ -32,7 +32,6 @@
 #define XPCC_LPC11XX__GPIO_HPP
 
 #include <xpcc/architecture/driver/gpio.hpp>
-#include <lpc11xx/cmsis/LPC11xx.h>
 
 // All these pins are not GPIOs as default.
 // Some special handling is necessary.

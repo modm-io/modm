@@ -25,8 +25,6 @@
 # ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-# 
-# $Id: avrdude.py 607 2011-09-13 19:51:03Z dergraaf $
 
 import platform
 from SCons.Script import *
@@ -37,7 +35,7 @@ def avrdude_flash(env, source, eeprom_source='', alias='avrdude_program'):
 	if platform.system() == "Windows":
 		# avrdude on Windows has problems with absolute path names.
 		# The leading drive letter plus colon backslash (e.g. "c:\path") 
-		# gets confused with the colon used as argument seperator.
+		# gets confused with the colon used as argument separator.
 		# 
 		# To avoid this problem we try to use relative path names if
 		# possible.

@@ -33,7 +33,7 @@ Usage:
 2) Test if the GPIO works correctly.
    Write a simple application to that lights up a LED if your button is pressed.
    Once you configured the bootloader to check the GPIO pin you need
-   a JTAG adaptor to change the firmware agaein if your button does not work.
+   a JTAG adaptor to change the firmware again if your button does not work.
 
 3) Create the configuration using this tool.
    Select the GPIO number (e.g. 19) and the active level (--low or --high) of your GPIO.

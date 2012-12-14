@@ -1,6 +1,7 @@
 devices = \
 {
 	# -------------------------------------------------------------------------
+    # NXP ARM7TDMI devices Series LPC21xx, LPC22xx, LPC23xx, LPC24xx
 	"lpc2129":
 	{
 		"defines": ["__ARM_LPC2000__"],
@@ -21,6 +22,14 @@ devices = \
 	},
 	
 	# -------------------------------------------------------------------------
+    # NXP Cortex-M0 devices Series LPC11xx and LPC11Cxx
+    "lpc1112_301":
+    {
+        "defines": ["__ARM_LPC11XX__",],
+        "linkerscript": "cortex_m0/lpc/linker/lpc1112_301.ld",
+        "size": { "flash": 16384, "ram": 8192 },
+    },
+
 	"lpc1114_301":
 	{
 		"defines": ["__ARM_LPC11XX__",],
@@ -28,11 +37,32 @@ devices = \
 		"size": { "flash": 32768, "ram": 8192 },
 	},
 	
-	"lpc11c24":
+    # Integrated CAN transceiver
+	"lpc11c22_301":
 	{
 		"defines": ["__ARM_LPC11XX__", "__ARM_LPC11CXX__"],
-		"linkerscript": "cortex_m0/lpc/linker/lpc11c24.ld",
-		"size": { "flash": 32768, "ram": 8192 },
+		"linkerscript": "cortex_m0/lpc/linker/lpc11c22.ld",
+		"size": { "flash": 16384, "ram": 8192 },
+	},
+
+    # Integrated CAN transceiver
+    "lpc11c24_301":
+    {
+        "defines": ["__ARM_LPC11XX__", "__ARM_LPC11CXX__"],
+        "linkerscript": "cortex_m0/lpc/linker/lpc11c24.ld",
+        "size": { "flash": 32768, "ram": 8192 },
+    },
+
+    # -------------------------------------------------------------------------
+    # NXP Cortex-M3 devices Series LPC13xx
+    # TODO
+	
+	# -------------------------------------------------------------------------
+	"lpc1343":
+	{
+		"defines": ["__ARM_LPC13XX__",],
+		"linkerscript": "cortex_m3/lpc/linker/lpc1343.ld",
+		"size": { "flash": 32768, "ram":8192 },
 	},
 	
 	"lpc1769":
@@ -46,37 +76,37 @@ devices = \
 	# AT91SAM7S
 	"at91sam7s32": 
 	{
-		"defines": ["__ARM_AT91__", "__ARM_AT91SAM7S__"],
+		"defines": ["__ARM_AT91__", "__ARM_AT91SAM7S__", "__ARM_AT91SAM7S32__"],
 		"linkerscript": "arm7/at91/linker/at91sam7s32.ld",
 		"size": { "flash": 32768, "ram": 4096 },
 	},
 	"at91sam7s321": 
 	{
-		"defines": ["__ARM_AT91__", "__ARM_AT91SAM7S__"],
+		"defines": ["__ARM_AT91__", "__ARM_AT91SAM7S__", "__ARM_AT91SAM7S321__"],
 		"linkerscript": "arm7/at91/linker/at91sam7s32.ld",
 		"size": { "flash": 32768, "ram": 8192 },
 	},
 	"at91sam7s64": 
 	{
-		"defines": ["__ARM_AT91__", "__ARM_AT91SAM7S__"],
+		"defines": ["__ARM_AT91__", "__ARM_AT91SAM7S__", "__ARM_AT91SAM7S64__"],
 		"linkerscript": "arm7/at91/linker/at91sam7s64.ld",
 		"size": { "flash": 65536, "ram": 16384 },
 	},
 	"at91sam7s128": 
 	{
-		"defines": ["__ARM_AT91__", "__ARM_AT91SAM7S__"],
+		"defines": ["__ARM_AT91__", "__ARM_AT91SAM7S__", "__ARM_AT91SAM7S128__"],
 		"linkerscript": "arm7/at91/linker/at91sam7s128.ld",
 		"size": { "flash": 131072, "ram": 32768 },
 	},
 	"at91sam7s256": 
 	{
-		"defines": ["__ARM_AT91__", "__ARM_AT91SAM7S__"],
+		"defines": ["__ARM_AT91__", "__ARM_AT91SAM7S__", "__ARM_AT91SAM7S256__"],
 		"linkerscript": "arm7/at91/linker/at91sam7s256.ld",
 		"size": { "flash": 262144, "ram": 65536 },
 	},
 	"at91sam7s512": 
 	{
-		"defines": ["__ARM_AT91__", "__ARM_AT91SAM7S__"],
+		"defines": ["__ARM_AT91__", "__ARM_AT91SAM7S__", "__ARM_AT91SAM7S512__"],
 		"linkerscript": "arm7/at91/linker/at91sam7s512.ld",
 		"size": { "flash": 524288, "ram": 65536 },
 	},
@@ -98,7 +128,7 @@ devices = \
 	"at91sam7x512": 
 	{
 		"defines": ["__ARM_AT91__", "__ARM_AT91SAM7X__"],
-		"linkerscript": "arm7/at91/linker/at91sam7s512.ld",
+		"linkerscript": "arm7/at91/linker/at91sam7x512.ld",
 		"size": { "flash": 524288, "ram": 131072 },
 	},
 	

@@ -35,7 +35,7 @@
  * \ingroup		ui
  */
 
-#include "led/led_table.hpp"
+#include "led/tables.hpp"
 #include "led/led.hpp"
 #include "led/tlc594x_led.hpp"
 #include "led/double_indicator.hpp"

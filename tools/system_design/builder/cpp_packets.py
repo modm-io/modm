@@ -26,8 +26,6 @@
 # ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-# 
-# $Id$
 # -----------------------------------------------------------------------------
 
 import os
@@ -84,7 +82,7 @@ def filter_initialization_list(class_, default=True):
 # -----------------------------------------------------------------------------
 class TypeBuilder(builder_base.Builder):
 	
-	VERSION = "$Id$"
+	VERSION = "0.1"
 	
 	def setup(self, optparser):
 		optparser.add_option(

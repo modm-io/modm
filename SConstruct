@@ -26,8 +26,6 @@
 # ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-# 
-# $Id$
 # -----------------------------------------------------------------------------
 Help("""
 DESCRIPTION
@@ -88,6 +86,9 @@ env.SConscript('src/xpcc/architecture/platform/arm7/lpc/SConscript.generate', ex
 env.SConscript('src/xpcc/architecture/platform/cortex_m0/lpc/SConscript.generate', exports='env')
 env.SConscript('src/xpcc/architecture/platform/cortex_m3/stm32/SConscript.generate', exports='env')
 
+# Generate C++ arrays for gamma corrected led brightness lookup tables
+env.SConscript('src/xpcc/driver/ui/led/tables/SConscript.generate', exports='env')
+
 # Generate C++ arrays from the font definition files
 env.SConscript('src/xpcc/driver/ui/display/font/SConscript.generate', exports='env')
 
@@ -102,12 +103,12 @@ env.SConscript('SConscript.check', exports='env')
 
 # Generate the doxygen documentation
 env.Doxygen('doc/doxyfile')
-env.Alias('doxygen', 'homepage/api')
+env.Alias('doxygen', 'build/api')
 env.Alias('doc', 'doxygen')
 
 env.Alias('templates', 'template')
 
-env.Phony(show='@firefox doc/homepage/api/index.html &')
+env.Phony(show='@firefox doc/build/api/index.html &')
 env.Phony(unittest='@scons -Q -C src/')
 
 env.Alias('all', ['doc', 'update', 'templates', 'unittest'])

@@ -1,6 +1,7 @@
 
 #include <xpcc/architecture.hpp>
 #include <xpcc/driver/connectivity/can/message.hpp>
+#include <xpcc/workflow/periodic_timer.hpp>
 
 #define LED_TOGGLE_TICKS 150		// 100 ticks = 1 Hz flash rate
 #define COUNT_MAX		3			// how high to count on the LED display
@@ -11,7 +12,8 @@ int
 main(void)
 {
 	SystemInit();
-	
+	xpcc::lpc11::SysTickTimer::enable();
+
 	// Initialize 32-bit timer 0. TIME_INTERVAL is defined as 10mS
 	// You may also want to use the Cortex SysTick timer to do this
 	init_timer32(0, TIME_INTERVAL);
@@ -34,7 +36,7 @@ main(void)
 	LPC_SYSCON->CLKOUTUEN = 1;
 	while (!(LPC_SYSCON->CLKOUTUEN & 0x01));
 
-	xpcc::lpc::Can::initialize(xpcc::can::BITRATE_10_KBPS);
+	xpcc::lpc::Can::initialize(xpcc::can::BITRATE_125_KBPS);
 
 	xpcc::can::Message message;
 	message.identifier = 0x123456;
@@ -50,8 +52,20 @@ main(void)
 	message.data[7] = 'H';
 	xpcc::lpc::Can::sendMessage(message);
 
+	xpcc::PeriodicTimer<> canTxTimer(3000);
+
 	while (1)
 	{
+		if (canTxTimer.isExpired()) {
+			// burst!
+			for (uint8_t ii = 0; ii < 32; ++ii)
+			{
+				static uint8_t id = 0;
+				message.data[0] = id++;
+				xpcc::lpc::Can::sendMessage(message);
+			}
+		}
+
 		// Each time we wake up...
 		// Check TimeTick to see whether to set or clear the LED I/O pin
 		if ((timer32_0_counter % (LED_TOGGLE_TICKS / COUNT_MAX)) < ((LED_TOGGLE_TICKS / COUNT_MAX) / 2)) {

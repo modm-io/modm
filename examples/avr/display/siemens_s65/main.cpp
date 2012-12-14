@@ -12,7 +12,7 @@ typedef xpcc::SoftwareSpi<Sck, Mosi, xpcc::gpio::Unused> Spi;
 GPIO__OUTPUT(Cs, E, 2);
 GPIO__OUTPUT(Rs, E, 3);
 GPIO__OUTPUT(Reset, K, 3);
-typedef xpcc::SiemensS65<Spi, Cs, Rs, Reset> Display;
+typedef xpcc::SiemensS65Portrait<Spi, Cs, Rs, Reset> Display;
 
 GPIO__OUTPUT(Backlight, F, 0);
 

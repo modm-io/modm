@@ -47,6 +47,8 @@
  * \see		http://ics.nxp.com/products/lpc1000/all/
  */
 
-#if defined __ARM_LPC17XX__
+#if defined __ARM_LPC13XX__
+#	include "lpc/lpc13xx.hpp"
+#elif defined __ARM_LPC17XX__
 #	include "lpc/lpc17xx.hpp"
 #endif

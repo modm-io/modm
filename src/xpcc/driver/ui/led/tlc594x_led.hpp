@@ -33,7 +33,7 @@
 
 #include <stdint.h>
 #include "led.hpp"
-#include "led_table.hpp"
+#include "tables.hpp"
 #include <xpcc/driver/pwm/tlc594x.hpp>
 #include <xpcc/workflow/periodic_timer.hpp>
 #include <xpcc/architecture/driver/accessor/flash.hpp>
@@ -55,7 +55,7 @@ namespace xpcc
 		 */
 		template< typename PwmController,
 				  uint16_t CHANNEL,
-				  const uint16_t* PwmTable=PwmTable12_256,
+				  const uint16_t* PwmTable=led::table12_256,
 				  uint16_t const PwmTableSize=256 >
 		class TLC594XLed : public Led
 		{

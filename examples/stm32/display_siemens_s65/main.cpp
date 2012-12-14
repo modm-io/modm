@@ -17,7 +17,7 @@ namespace spi
 	GPIO__OUTPUT(Mosi, A, 7);
 }
 
-typedef xpcc::SiemensS65<xpcc::stm32::SpiMaster1, lcd::Cs, lcd::Rs, lcd::Reset> Display;
+typedef xpcc::SiemensS65Portrait<xpcc::stm32::SpiMaster1, lcd::Cs, lcd::Rs, lcd::Reset> Display;
 
 GPIO__OUTPUT(LedStat, C, 12);		// inverted, 0=on, 1=off
 

@@ -28,7 +28,7 @@
  */
 // ----------------------------------------------------------------------------
 /**
- * \defgroup	debug	Debugging utilies
+ * \defgroup	debug	Debugging utilities
  * \brief		Logging etc.
  */
 #ifndef XPCC__DEBUG_HPP

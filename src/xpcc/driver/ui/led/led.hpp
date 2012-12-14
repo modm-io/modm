@@ -32,7 +32,7 @@
 #define XPCC__LED_LED_HPP
 
 #include <stdint.h>
-#include "led_table.hpp"
+#include "tables.hpp"
 
 namespace xpcc
 {

@@ -31,7 +31,7 @@
 #include "uart_base.hpp"
 #include "lpc11_uart_registers.hpp"
 
-#include <xpcc/architecture.hpp>
+#include "../device.h"
 
 void
 xpcc::lpc::UartBase::setBaudrate(uint32_t baudrate)

@@ -225,7 +225,7 @@ str     r2, [r3, #-207] ; Led2::set()
 		ALWAYS_INLINE static void setInput() { \
 			CONCAT(AT91C_BASE_PIO, port)->PIO_PER = (1 << pin); \
 			CONCAT(AT91C_BASE_PIO, port)->PIO_ODR = (1 << pin); } \
-		ALWAYS_INLINE static bool read() { return (CONCAT(AT91C_BASE_PIO port)->PIO_PDSR & (1 << pin)); } \
+		ALWAYS_INLINE static bool read() { return (CONCAT(AT91C_BASE_PIO, port)->PIO_PDSR & (1 << pin)); } \
 		\
 		ALWAYS_INLINE static void enableInterrupt()  { CONCAT(AT91C_BASE_PIO, port)->PIO_IER = (1 << pin); } \
 		ALWAYS_INLINE static void disableInterrupt() { CONCAT(AT91C_BASE_PIO, port)->PIO_IDR = (1 << pin); } \
