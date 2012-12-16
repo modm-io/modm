@@ -51,6 +51,31 @@ namespace xpcc
 	 * In portrait mode the connector is at the bottom.
 	 * In landscape mode the connector is at the right border.
 	 *
+	 * Pinout at LCD:
+	 *  1  IN  CD
+	 *  2  IN  RESET
+	 *  3  IN  CS
+	 *  4  OUT VD
+	 *  5      GND
+	 *  6  IN  D0
+	 *  7      3V3 (2V9)
+	 *  8      GND
+	 *  9      VLED +
+	 * 10      VLED -
+	 * 11      GND
+	 * 12  IN  RD
+	 * 13  IN  WR
+	 * 14  IN  D1
+	 * 15  IN  D2
+	 * 16  IN  D3
+	 * 17  IN  D4
+	 * 18  IN  D5
+	 * 19  IN  D6
+	 * 20  IN  D7
+	 *
+	 * The backlight (VLED +, VLED -) consists of four white
+	 * LEDs in series. The forward voltage is about 12 volts.
+	 *
 	 * \ingroup	lcd
 	 */
 

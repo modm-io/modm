@@ -269,7 +269,7 @@ xpcc::SiemensS75Portrait<PORT, CS, RS, WR, Reset>::update() {
 
 			for (uint8_t ii = 0; ii < PORTIdx; ++ii) {
 				PORT::write(PORTBuffer[ii]);
-				WR::reset();	// Low-to-high strobe
+				WR::reset();	// High-to-Low strobe
 				WR::set();
 			}
 		} // y
