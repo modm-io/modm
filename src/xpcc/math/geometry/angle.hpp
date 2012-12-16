@@ -83,6 +83,7 @@ namespace xpcc
 		/**
 		 * \brief	Find a perpendicular angle
 		 *
+		 * \param	angle
 		 * \param	cw	If cw is true the angle is rotated clockwise.
 		 * 				Ohterwise the angle is rotated anti clockwise.
 		 */

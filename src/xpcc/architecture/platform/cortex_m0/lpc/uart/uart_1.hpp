@@ -15,6 +15,8 @@ namespace xpcc
 		 * Simple implementation without interrupts.
 		 * It is buffered in hardware with 16-bytes FIFOs (one for receive and
 		 * one for transmit)
+		 * 
+		 * \ingroup	lpc1100
 		 */
 		class Uart1 : public UartBase
 		{

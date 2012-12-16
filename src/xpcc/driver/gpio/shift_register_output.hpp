@@ -41,19 +41,19 @@ namespace xpcc
 	 * 
 	 * TODO Untested!
 	 * 
-	 * \verbatim
-
-	    74HC595
-         _____
-    P1 -|  U  |- Vcc
-    P2 -|     |- P0
-    P3 -|     |- Din (MOSI)
-    P4 -|     |- !OE (Output Enable -> low)
-    P5 -|     |- Store
-    P6 -|     |- Clk
-    P7 -|     |- !Reset (-> low)
-   Gnd -|_____|- Dout     
-\endverbatim
+	\verbatim
+	
+		  74HC595
+	       _____
+	  P1 -|  U  |- Vcc
+	  P2 -|     |- P0
+	  P3 -|     |- Din (MOSI)
+	  P4 -|     |- !OE (Output Enable -> low)
+	  P5 -|     |- Store
+	  P6 -|     |- Clk
+	  P7 -|     |- !Reset (-> low)
+	 Gnd -|_____|- Dout     
+	\endverbatim
 	 * 
 	 * f_clk max. is 25 MHz at 4,5V and 5 MHz at 2V.
 	 * 
@@ -62,7 +62,7 @@ namespace xpcc
 	 * \tparam	N		Number of HC595 Chips
 	 * 
 	 * \author	Fabian Greif
-	 * \ingroup	gpio
+	 * \ingroup	driver_gpio
 	 */
 	template <typename Spi, typename Store, size_t N>
 	class ShiftRegisterOutput
