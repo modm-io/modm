@@ -52,26 +52,26 @@ namespace xpcc
 	 * In landscape mode the connector is at the right border.
 	 *
 	 * Pinout at LCD:
-	 *  1  IN  CD
-	 *  2  IN  RESET
-	 *  3  IN  CS
-	 *  4  OUT VD
-	 *  5      GND
-	 *  6  IN  D0
-	 *  7      3V3 (2V9)
-	 *  8      GND
-	 *  9      VLED +
-	 * 10      VLED -
-	 * 11      GND
-	 * 12  IN  RD
-	 * 13  IN  WR
-	 * 14  IN  D1
-	 * 15  IN  D2
-	 * 16  IN  D3
-	 * 17  IN  D4
-	 * 18  IN  D5
-	 * 19  IN  D6
-	 * 20  IN  D7
+	 *  1  IN  CD         Command / Data                      Low = Command (Register) High = Data.
+	 *  2  IN  RESET      Resets the display.  Active low.    Low = Reset,             High = No reset.
+	 *  3  IN  CS         Chip select.         Active low.    Low = Chip is selected,  High = Chip is not selected.
+	 *  4  OUT VD         Sync Output.         Unused.
+	 *  5      GND        Supply
+	 *  6  IN  D0         Bit 0 of parallel data
+	 *  7      3V3 (2V9)  Supply
+	 *  8      GND        Supply
+	 *  9      VLED +     Supply Backlight
+	 * 10      VLED -     Supply Backlight
+	 * 11      GND        Supply
+	 * 12  IN  RD         Read Strobe.         Unused.
+	 * 13  IN  WR         Write Strobe.        High-to-Low strobe write data to display memory.
+	 * 14  IN  D1         Bit 1 of parallel data.
+	 * 15  IN  D2         Bit 2 of parallel data.
+	 * 16  IN  D3         Bit 3 of parallel data.
+	 * 17  IN  D4         Bit 4 of parallel data.
+	 * 18  IN  D5         Bit 5 of parallel data.
+	 * 19  IN  D6         Bit 6 of parallel data.
+	 * 20  IN  D7         Bit 7 of parallel data.
 	 *
 	 * The backlight (VLED +, VLED -) consists of four white
 	 * LEDs in series. The forward voltage is about 12 volts.
