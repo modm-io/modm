@@ -7,7 +7,6 @@
  */
 
 #include <xpcc/architecture.hpp>
-#include <xpcc/driver/connectivity/spi.hpp>
 
 // How to include the defines?
 // #include "xpcc_config.hpp" does not work.
@@ -51,14 +50,6 @@ main(void)
 	
 	xpcc::lpc11::SysTickTimer::enable();
 
-	// Initialize 32-bit timer 0. TIME_INTERVAL is defined as 10mS
-	// You may also want to use the Cortex SysTick timer to do this
-	init_timer32(0, TIME_INTERVAL);
-	
-	// Enable timer 0. Our interrupt handler will begin incrementing
-	// the TimeTick global each time timer 0 matches and resets.
-	enable_timer32(0);
-	
 	// Set LED port pin to output
 	Led::setOutput();
 	
@@ -79,8 +70,6 @@ main(void)
 	// Initialise the display
 	display.initialize();
 	display.setFont(xpcc::font::Assertion);
-
-	xpcc::Timeout<> fpsTimeout(1000);
 
 	bool dir = true;
 	uint8_t y = 0;
@@ -109,21 +98,5 @@ main(void)
 		}
 		// finished, copy to lcd
 		display.update();
-	}
-
-
-	while (1)
-	{
-		// Each time we wake up...
-		// Check TimeTick to see whether to set or clear the LED I/O pin
-		if ((timer32_0_counter % (LED_TOGGLE_TICKS / COUNT_MAX)) < ((LED_TOGGLE_TICKS / COUNT_MAX) / 2)) {
-			Led::reset();
-		}
-		else {
-			Led::set();
-		}
-		
-		// Go to sleep to save power between timer interrupts
-		__WFI();
 	}
 }
