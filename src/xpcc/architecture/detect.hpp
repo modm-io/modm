@@ -206,7 +206,7 @@
 #	endif
 #endif
 
-#if defined __arm__ || __ARM_EABI__
+#if defined __arm__ || defined __ARM_EABI__
 #	define XPCC__CPU_ARM	1
 #	define XPCC__ALIGNMENT	4
 #	if defined __ARM_ARCH_4T__
