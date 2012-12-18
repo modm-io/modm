@@ -38,7 +38,7 @@
 #ifdef DEBUG
 	#include <stdio.h>
 
-	#define DEBUG_APPEND
+	//#define DEBUG_APPEND
 	#define DEBUG_UPDATE
 
 	#ifdef DEBUG_UPDATE
@@ -52,27 +52,27 @@
 
 
 
-template<typename T, int N, int BLOCK_SIZE>
-xpcc::filter::Fir<T, N, BLOCK_SIZE>::Fir(const T (&coeff)[N])
+template<typename T, int N, int BLOCK_SIZE, signed int ScaleFactor>
+xpcc::filter::Fir<T, N, BLOCK_SIZE, ScaleFactor>::Fir(const float (&coeff)[N])
 {
 	setCoefficients(coeff);
 	reset();
 }
 
 // -----------------------------------------------------------------------------
-template<typename T, int N, int BLOCK_SIZE>
+template<typename T, int N, int BLOCK_SIZE, signed int ScaleFactor>
 void
-xpcc::filter::Fir<T, N, BLOCK_SIZE>::setCoefficients(const T (&coeff)[N])
+xpcc::filter::Fir<T, N, BLOCK_SIZE, ScaleFactor>::setCoefficients(const float (&coeff)[N])
 {
 	for(int i = 0; i < N; i++){
-		coefficients[i] = coeff[i];
+		coefficients[i] = static_cast<T>(coeff[i] * ScaleFactor);
 	}
 }
 
 // -----------------------------------------------------------------------------
-template<typename T, int N, int BLOCK_SIZE>
+template<typename T, int N, int BLOCK_SIZE, signed int ScaleFactor>
 void
-xpcc::filter::Fir<T, N, BLOCK_SIZE>::reset()
+xpcc::filter::Fir<T, N, BLOCK_SIZE, ScaleFactor>::reset()
 {
 	// reset all to make debugging easier
 	for(int i = 0; i < N + BLOCK_SIZE; i++){
@@ -82,9 +82,9 @@ xpcc::filter::Fir<T, N, BLOCK_SIZE>::reset()
 }
 
 // -----------------------------------------------------------------------------
-template<typename T, int N, int BLOCK_SIZE>
+template<typename T, int N, int BLOCK_SIZE, signed int ScaleFactor>
 void
-xpcc::filter::Fir<T, N, BLOCK_SIZE>::append(const T& input)
+xpcc::filter::Fir<T, N, BLOCK_SIZE, ScaleFactor>::append(const T& input)
 {
 #ifdef DEBUG_APPEND
 	printf("append(%f);\ttaps_index=%d\n", input, taps_index);
@@ -114,9 +114,9 @@ xpcc::filter::Fir<T, N, BLOCK_SIZE>::append(const T& input)
 }
 
 // -----------------------------------------------------------------------------
-template<typename T, int N, int BLOCK_SIZE>
+template<typename T, int N, int BLOCK_SIZE, signed int ScaleFactor>
 void
-xpcc::filter::Fir<T, N, BLOCK_SIZE>::update()
+xpcc::filter::Fir<T, N, BLOCK_SIZE, ScaleFactor>::update()
 {
 #ifdef DEBUG_UPDATE
 	printf("update();\ttaps_index=%d\n", taps_index);

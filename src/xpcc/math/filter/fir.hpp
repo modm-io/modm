@@ -47,7 +47,7 @@ namespace xpcc
 	 */
 	namespace filter
 	{
-		template<typename T, int N, int BLOCK_SIZE>
+		template<typename T, int N, int BLOCK_SIZE, signed int ScaleFactor = 1>
 		class Fir
 		{
 
@@ -55,7 +55,7 @@ namespace xpcc
 			/**
 			 * \param	coeff	array containing the coefficients
 			 **/
-			Fir(const T (&coeff)[N]);
+			Fir(const float (&coeff)[N]);
 		
 			/**
 			 * Reset the coefficients.
@@ -63,7 +63,7 @@ namespace xpcc
 			 * \param	coeff	array containing the coefficients
 			 **/
 			void
-			setCoefficients(const T (&coeff)[N]);
+			setCoefficients(const float (&coeff)[N]);
 		
 			/**
 			 * \brief	Resets the tap buffer
