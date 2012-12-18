@@ -33,22 +33,22 @@
 
 #define likely(x) __builtin_expect((x),1)
 
-//#define DEBUG
+//#define FIR_DEBUG
 
-#ifdef DEBUG
+#ifdef FIR_DEBUG
 	#include <stdio.h>
 
-	//#define DEBUG_APPEND
-	#define DEBUG_UPDATE
+	//#define FIR_DEBUG_APPEND
+	#define FIR_DEBUG_UPDATE
 
-	#ifdef DEBUG_UPDATE
-	#define DEBUG_SUM(tap, coeff) printf("sum += %.3f * %.3f;\n", tap, coeff)
+	#ifdef FIR_DEBUG_UPDATE
+	#define FIR_DEBUG_SUM(tap, coeff) printf("sum += %.3f * %.3f;\n", tap, coeff)
 	#else
-	#define DEBUG_SUM(tap, coeff)
-	#endif /*DEBUG_UPDATE*/
+	#define FIR_DEBUG_SUM(tap, coeff)
+	#endif /*FIR_DEBUG_UPDATE*/
 #else
-	#define DEBUG_SUM(tap, coeff)
-#endif /*DEBUG*/
+	#define FIR_DEBUG_SUM(tap, coeff)
+#endif /*FIR_DEBUG*/
 
 
 
@@ -86,14 +86,14 @@ template<typename T, int N, int BLOCK_SIZE, signed int ScaleFactor>
 void
 xpcc::filter::Fir<T, N, BLOCK_SIZE, ScaleFactor>::append(const T& input)
 {
-#ifdef DEBUG_APPEND
+#ifdef FIR_DEBUG_APPEND
 	printf("append(%f);\ttaps_index=%d\n", input, taps_index);
 	printf("BEFORE: ");
 	for(int i = 0; i < N + BLOCK_SIZE; i++)
 		if(i >= taps_index && i-taps_index < N) printf("n-%d:%.3f; ", i-taps_index, taps[i]);
 		else printf("(%.3f)    ", taps[i]);
 	printf("\n");
-#endif // DEBUG_APPEND
+#endif // FIR_DEBUG_APPEND
 	if(likely(taps_index > 0)){
 		taps_index--;
 	}
@@ -104,13 +104,13 @@ xpcc::filter::Fir<T, N, BLOCK_SIZE, ScaleFactor>::append(const T& input)
 	}
 	taps[taps_index] = input;
 
-#ifdef DEBUG_APPEND
+#ifdef FIR_DEBUG_APPEND
 	printf(" AFTER: ");
 	for(int i = 0; i < N + BLOCK_SIZE; i++)
 		if(i >= taps_index && i-taps_index < N) printf("n-%d:%.3f; ", i-taps_index, taps[i]);
 		else printf("(%.3f)    ", taps[i]);
 	printf("\n\n");
-#endif // DEBUG_APPEND
+#endif // FIR_DEBUG_APPEND
 }
 
 // -----------------------------------------------------------------------------
@@ -118,33 +118,33 @@ template<typename T, int N, int BLOCK_SIZE, signed int ScaleFactor>
 void
 xpcc::filter::Fir<T, N, BLOCK_SIZE, ScaleFactor>::update()
 {
-#ifdef DEBUG_UPDATE
+#ifdef FIR_DEBUG_UPDATE
 	printf("update();\ttaps_index=%d\n", taps_index);
 	for(int i = 0; i < N + BLOCK_SIZE; i++)
 		if(i >= taps_index && i-taps_index < N) printf("n-%d:%.3f; ", i-taps_index, taps[i]);
 		else printf("(%.3f)    ", taps[i]);
 	printf("\n");
-#endif // DEBUG_UPDATE
+#endif // FIR_DEBUG_UPDATE
 
 	T sum = (T)0;
 	T *tap = taps + taps_index;
 	for(int i = 0; i < (N - (N%4)); i++){
-		DEBUG_SUM(tap[i], coefficients[i]);
+		FIR_DEBUG_SUM(tap[i], coefficients[i]);
 		sum += tap[i]*coefficients[i]; i++;
-		DEBUG_SUM(tap[i], coefficients[i]);
+		FIR_DEBUG_SUM(tap[i], coefficients[i]);
 		sum += tap[i]*coefficients[i]; i++;
-		DEBUG_SUM(tap[i], coefficients[i]);
+		FIR_DEBUG_SUM(tap[i], coefficients[i]);
 		sum += tap[i]*coefficients[i]; i++;
-		DEBUG_SUM(tap[i], coefficients[i]);
+		FIR_DEBUG_SUM(tap[i], coefficients[i]);
 		sum += tap[i]*coefficients[i];
 	}
 	for(int i = (N - (N%4)); i < N; i++){
-		DEBUG_SUM(tap[i], coefficients[i]);
+		FIR_DEBUG_SUM(tap[i], coefficients[i]);
 		sum += tap[i]*coefficients[i];
 	}
 	output = sum;
-#ifdef DEBUG_UPDATE
+#ifdef FIR_DEBUG_UPDATE
 	printf("sum=%.3f\n", sum);
-#endif // DEBUG_UPDATE
+#endif // FIR_DEBUG_UPDATE
 }
 #endif // XPCC__FIR_IMPL_HPP
