@@ -1,11 +1,11 @@
 // coding: utf-8
 // ----------------------------------------------------------------------------
-/* Copyright (c) 2009, Roboterclub Aachen e.V.
+/* Copyright (c) 2012, Roboterclub Aachen e.V.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -28,77 +28,46 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__MCP23S08_HPP
-#define XPCC__MCP23S08_HPP
+#ifndef XPCC_STM32__FSMC_HPP
+#define XPCC_STM32__FSMC_HPP
 
-#include <xpcc/architecture/utils.hpp>
-#include <xpcc/architecture/driver/gpio.hpp>
+#include <stdint.h>
 
 namespace xpcc
 {
-	/**
-	 * \brief	8-Bit I/O Expander with Serial Interface
-	 * 
-	 * A1 and A0 need to be tided low.
-	 * 
-	 * \author	Fabian Greif
-	 * \ingroup	driver_gpio
-	 */
-	template <typename Spi, typename Cs, typename Int>
-	class Mcp23s08
+	namespace stm32
 	{
-	public:
-		static void
-		initialize();
-		
 		/**
-		 * @brief	Configure pins
+		 * Flexible static memory controller.
 		 * 
-		 * @param	inputMask	1=Input, 0=Output
-		 * @param	pullupMask	1=Pullup, 0=Pullup-Disabled
+		 * Memory Map:
+		 * 0x6000 0000 - 0x6fff ffff : Bank 1 4 NOR or [P]SRAM devices
+		 * 0x7000 0000 - 0x7fff ffff : Bank 2 NAND Flash device
+		 * 0x8000 0000 - 0x8fff ffff : Bank 3 NAND Flash device
+		 * 0x9000 0000 - 0x9fff ffff : Bank 4 PC Card device
+		 * 
+		 * NOR/PSRAM/SRAM Flash signals:
+		 * CLK       - Clock (for synchronous burst)
+		 * A[25:0]   - Address Bus
+		 * AD[15:0]  - 16-bit multiplexed, bidirectional address/data bus or data bus
+		 * NE[x]     - Chip select, x=1..4
+		 * NOE       - Output enable
+		 * NWE       - Write enable
+		 * NL(=NADV) - Latch enable (this signal is called address valid,
+		 *             NADV, by some NOR Flash devices)
+		 * NWAIT     - NOR Flash wait input signal to the FSMC
+		 * NBL1      - Upper byte enable (memory signal name: NUB)
+		 * NBL0      - Lowed byte enable (memory signal name: NLB)
+		 * 
+		 * 
+		 * \author	Fabian Greif
 		 */
-		static void
-		configure(uint8_t inputMask, uint8_t pullupMask);
-		
-		//void
-		//configureInterrupt();
-		
-		static uint8_t
-		read();
-		
-		static void
-		write(uint8_t output);
-		
-	protected:
-		enum RegisterAddress
+		class Fsmc
 		{
-			MCP_IODIR = 0x00,		///< Port direction (1=input, 0=output)
-			MCP_IPOL = 0x01,		///< Invert polarity
-			MCP_GPINTEN = 0x02,		///< Enable interrupt
-			MCP_DEFVAL = 0x03,		///< Compare register for interrupt
-			MCP_INTCON = 0x04,
-			MCP_IOCON = 0x05,		///< Configuration
-			MCP_GPPU = 0x06,		///< Enable pullups
-			MCP_INTF = 0x07,		///< Interrupt flag register
-			MCP_INTCAP = 0x08,		///< Interrupt capture register
-			MCP_GPIO = 0x09,		///< Port values
-			MCP_OLAT = 0x0a			///< Output latch register
+		public:
+			
 		};
-		
-		enum RW
-		{
-			WRITE = 0,
-			READ = 1
-		};
-		
-		static const uint8_t deviceAddress = 0x40;
-		
-		static Spi spi;
-		static Cs cs;
-		static Int interrupt;
-	};
+	}
 }
 
-#include "mcp23s08_impl.hpp"
-
-#endif	// XPCC__MCP23S08_HPP
+#endif	// XPCC_STM32__FSMC_HPP

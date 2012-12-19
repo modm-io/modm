@@ -48,11 +48,6 @@ def generate(env, **kw):
 		env['NM'] = "nm"
 		env['SIZE'] = "du -s -h"
 		
-		# in OS X use never gcc
-		if platform.system() == 'Darwin':
-			env['CC'] = "gcc-4.6"
-			env['CXX'] = "g++-4.6"
-		
 		# build messages
 		if ARGUMENTS.get('verbose') != '1':
 			env['CCCOMSTR'] = "Compiling C: $TARGET"

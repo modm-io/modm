@@ -269,7 +269,7 @@ xpcc::SiemensS75Portrait<PORT, CS, RS, WR, Reset>::update() {
 
 			for (uint8_t ii = 0; ii < PORTIdx; ++ii) {
 				PORT::write(PORTBuffer[ii]);
-				WR::reset();	// Low-to-high strobe
+				WR::reset();	// High-to-Low strobe
 				WR::set();
 			}
 		} // y
@@ -337,9 +337,9 @@ xpcc::SiemensS75Landscape<PORT, CS, RS, WR, Reset>::update() {
 				}
 			} // pix
 			for (uint8_t ii = 0; ii < PORTIdx; ++ii) {
+				WR::reset();	// Low phase of WR must be at least x ns long
 				PORT::write(PORTBuffer[ii]);
-				WR::reset();	// Low-to-high strobe
-				WR::set();
+				WR::set();		// Low-to-high strobe
 			}
 		} // y
 	} // x

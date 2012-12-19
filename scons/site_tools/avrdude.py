@@ -35,7 +35,7 @@ def avrdude_flash(env, source, eeprom_source='', alias='avrdude_program'):
 	if platform.system() == "Windows":
 		# avrdude on Windows has problems with absolute path names.
 		# The leading drive letter plus colon backslash (e.g. "c:\path") 
-		# gets confused with the colon used as argument seperator.
+		# gets confused with the colon used as argument separator.
 		# 
 		# To avoid this problem we try to use relative path names if
 		# possible.

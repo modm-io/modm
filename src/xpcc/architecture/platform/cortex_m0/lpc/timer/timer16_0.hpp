@@ -12,6 +12,9 @@ namespace xpcc
 {
 	namespace lpc11
 	{
+		/**
+		 * \ingroup	lpc1100
+		 */
 		class Timer16_0
 		{
 		public:
