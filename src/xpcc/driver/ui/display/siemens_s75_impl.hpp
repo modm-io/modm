@@ -92,23 +92,16 @@ void
 xpcc::SiemensS75Common<PORT, CS, RS, WR, Reset>::writeReg(uint8_t reg)
 {
 	RS::reset();
-	xpcc::delay_us(100);
 
 	CS::reset();
 
+	WR::reset();
 	PORT::write(0);
-	xpcc::delay_us(100);
-	WR::reset();	// High-to-low strobe
-	xpcc::delay_us(100);
-	WR::set();
-	xpcc::delay_us(100);
+	WR::set();		// Low-to-High strobe
 
+	WR::reset();
 	PORT::write(reg);
-	xpcc::delay_us(100);
-	WR::reset();	// High-to-low strobe
-	xpcc::delay_us(100);
-	WR::set();
-	xpcc::delay_us(100);
+	WR::set();		// Low-to-High strobe
 
 	CS::set();
 }
@@ -118,23 +111,16 @@ void
 xpcc::SiemensS75Common<PORT, CS, RS, WR, Reset>::writeData(uint16_t data)
 {
 	RS::set();		// RS = 1, R/W = 0, write instruction or RAM data
-	xpcc::delay_us(100);
 
 	CS::reset();
 
+	WR::reset();
 	PORT::write(data>>8);
-	xpcc::delay_us(100);
-	WR::reset();	// High-to-low strobe
-	xpcc::delay_us(100);
-	WR::set();
-	xpcc::delay_us(100);
+	WR::set();		// Low-to-High strobe
 
+	WR::reset();
 	PORT::write(data);
-	xpcc::delay_us(100);
-	WR::reset();	// High-to-low strobe
-	xpcc::delay_us(100);
-	WR::set();
-	xpcc::delay_us(100);
+	WR::set();		// Low-to-High strobe
 
 	CS::set();
 }
@@ -207,7 +193,7 @@ xpcc::SiemensS75Common<PORT, CS, RS, WR, Reset>::lcdCls(uint16_t colour) {
 	// generic implementation
 	uint8_t c1 = colour >> 8;
 	uint8_t c2 = colour & 0xff;
-	for (uint16_t i = 0; i < (132 * 176); ++i) {
+	for (uint_fast16_t ii = 0; ii < (132 * 176); ++ii) {
 		WR::reset();
 		PORT::write(c1);
 		WR::set();
@@ -245,32 +231,32 @@ xpcc::SiemensS75Portrait<PORT, CS, RS, WR, Reset>::update() {
 	const uint8_t blank_h = maskBlank >> 8;
 	const uint8_t blank_l = maskBlank & 0xff;
 
-	for (uint8_t x = 0; x < width; ++x)
+	for (uint_fast8_t x = 0; x < width; ++x)
 	{
-		for (uint8_t y = 0; y < height; ++y)
+		for (uint_fast8_t y = 0; y < height; ++y)
 		{
 			// group of 8 black-and-white pixels
-			uint8_t group = this->buffer[x][y];
-			uint8_t PORTBuffer[16];
-			uint8_t PORTIdx = 0;
+			uint_fast8_t group = this->buffer[x][y];
+			uint_fast8_t PortBuffer[16];
+			uint_fast8_t PortIdx = 0;
 
-			for (uint8_t pix = 0; pix < 8; ++pix, group >>= 1) {
+			for (uint_fast8_t pix = 0; pix < 8; ++pix, group >>= 1) {
 				if (group & 1)
 				{
-					PORTBuffer[PORTIdx++] = fill_h;
-					PORTBuffer[PORTIdx++] = fill_l;
+					PortBuffer[PortIdx++] = fill_h;
+					PortBuffer[PortIdx++] = fill_l;
 				}
 				else
 				{
-					PORTBuffer[PORTIdx++] = blank_h;
-					PORTBuffer[PORTIdx++] = blank_l;
+					PortBuffer[PortIdx++] = blank_h;
+					PortBuffer[PortIdx++] = blank_l;
 				}
 			} // pix
 
-			for (uint8_t ii = 0; ii < PORTIdx; ++ii) {
-				PORT::write(PORTBuffer[ii]);
-				WR::reset();	// Low-to-high strobe
-				WR::set();
+			for (uint_fast8_t ii = 0; ii < PortIdx; ++ii) {
+				WR::reset();
+				PORT::write(PortBuffer[ii]);
+				WR::set();		// Low-to-high strobe
 			}
 		} // y
 	} // x
@@ -304,18 +290,17 @@ xpcc::SiemensS75Landscape<PORT, CS, RS, WR, Reset>::update() {
 	const uint8_t blank_h = maskBlank >> 8;
 	const uint8_t blank_l = maskBlank & 0xff;
 
-	for (uint8_t x = 0; x < width; ++x)
+	for (uint_fast8_t x = 0; x < width; ++x)
 	{
-		for (uint8_t y = 0; y < height; ++y)
+		for (uint_fast8_t y = 0; y < height; ++y)
 		{
 			// group of 8 black-and-white pixels
-			uint8_t group = this->buffer[x][y];
-
-			uint8_t PORTBuffer[16];
-			uint_fast8_t PORTIdx = 0;
+			uint_fast8_t group = this->buffer[x][y];
+			uint_fast8_t PortBuffer[16];
+			uint_fast8_t PortIdx = 0;
 
 			// Only 4 pixels at the lower end of the display in landscape mode
-			uint8_t pixels;
+			uint_fast8_t pixels;
 			if (y == (height - 1)) {
 				// The last pixels
 				pixels = 4;
@@ -324,22 +309,23 @@ xpcc::SiemensS75Landscape<PORT, CS, RS, WR, Reset>::update() {
 				pixels = 8;
 			}
 
-			for (uint8_t pix = 0; pix < pixels; ++pix, group >>= 1) {
+			for (uint_fast8_t pix = 0; pix < pixels; ++pix, group >>= 1) {
 				if (group & 1)
 				{
-					PORTBuffer[PORTIdx++] = fill_h;
-					PORTBuffer[PORTIdx++] = fill_l;
+					PortBuffer[PortIdx++] = fill_h;
+					PortBuffer[PortIdx++] = fill_l;
 				}
 				else
 				{
-					PORTBuffer[PORTIdx++] = blank_h;
-					PORTBuffer[PORTIdx++] = blank_l;
+					PortBuffer[PortIdx++] = blank_h;
+					PortBuffer[PortIdx++] = blank_l;
 				}
 			} // pix
-			for (uint8_t ii = 0; ii < PORTIdx; ++ii) {
-				PORT::write(PORTBuffer[ii]);
-				WR::reset();	// Low-to-high strobe
-				WR::set();
+
+			for (uint_fast8_t ii = 0; ii < PortIdx; ++ii) {
+				WR::reset();
+				PORT::write(PortBuffer[ii]);
+				WR::set();		// Low-to-high strobe
 			}
 		} // y
 	} // x
