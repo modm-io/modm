@@ -65,45 +65,6 @@ xpcc::SiemensS75Landscape<MEMORY, RESET>::initialize()
 
 // ----------------------------------------------------------------------------
 
-
-template <typename MEMORY, typename RESET>
-void
-xpcc::SiemensS75Common<MEMORY, RESET>::writeReg(uint8_t reg)
-{
-//	RS::reset();
-
-//	CS::reset();
-
-//	WR::reset();
-//	PORT::write(0);
-//	WR::set();		// Low-to-High strobe
-
-//	WR::reset();
-//	PORT::write(reg);
-//	WR::set();		// Low-to-High strobe
-
-//	CS::set();
-}
-
-template <typename MEMORY, typename RESET>
-void
-xpcc::SiemensS75Common<MEMORY, RESET>::writeData(uint16_t data)
-{
-//	RS::set();		// RS = 1, R/W = 0, write instruction or RAM data
-//
-//	CS::reset();
-//
-//	WR::reset();
-//	PORT::write(data>>8);
-//	WR::set();		// Low-to-High strobe
-//
-//	WR::reset();
-//	PORT::write(data);
-//	WR::set();		// Low-to-High strobe
-//
-//	CS::set();
-}
-
 template <typename MEMORY, typename RESET>
 void
 xpcc::SiemensS75Common<MEMORY, RESET>::lcdSettings(bool landscape) {
@@ -131,7 +92,7 @@ xpcc::SiemensS75Common<MEMORY, RESET>::lcdSettings(bool landscape) {
 		MEMORY::writeCommand(0x03, 0x7820);
 	}
 	else {
-		MEMORY::writeCommand(0x03, 0x7838);	// R03: Entry mode
+		MEMORY::writeCommand(0x03, 0x7838); 	// R03: Entry mode
 	}
 	/**
 	 * Bit 0 set: stopped working
@@ -162,27 +123,10 @@ xpcc::SiemensS75Common<MEMORY, RESET>::lcdCls(uint16_t colour) {
 	MEMORY::writeCommand(0x21, 0x0000);
 
 	// Set instruction register to "RAM Data write"
-	writeReg(0x22);
+	MEMORY::writeRegister(0x22);
 
-//	RS::set();
-//	CS::reset();
-
-	// start data transmission
-
-	// generic implementation
-	uint8_t c1 = colour >> 8;
-	uint8_t c2 = colour & 0xff;
-	for (uint_fast16_t ii = 0; ii < (132 * 176); ++ii) {
-//		WR::reset();
-//		PORT::write(c1);
-//		WR::set();
-
-//		WR::reset();
-//		PORT::write(c2);
-//		WR::set();
-	}
-
-//	CS::set();
+	// Write all pixels to the same colour
+	MEMORY::writeDataMult(colour, 132 * 176);
 }
 
 template <typename MEMORY, typename RESET>
@@ -192,11 +136,7 @@ xpcc::SiemensS75Portrait<MEMORY, RESET>::update() {
 	MEMORY::writeCommand(0x21, 0x0000);
 
 	// Set instruction register to "RAM Data write"
-	SiemensS75Common<MEMORY, RESET>::writeReg(0x22);
-
-	// WRITE MEMORY
-//	RS::set();
-//	CS::reset();
+	MEMORY::writeRegister(0x22);
 
 	const uint16_t maskBlank  = 0x0000; // RRRR RGGG GGGB BBBB
 	const uint16_t maskFilled = 0x37e0; // RRRR RGGG GGGB BBBB
@@ -216,7 +156,7 @@ xpcc::SiemensS75Portrait<MEMORY, RESET>::update() {
 		{
 			// group of 8 black-and-white pixels
 			uint_fast8_t group = this->buffer[x][y];
-			uint_fast8_t PortBuffer[16];
+			uint8_t PortBuffer[16];
 			uint_fast8_t PortIdx = 0;
 
 			for (uint_fast8_t pix = 0; pix < 8; ++pix, group >>= 1) {
@@ -232,15 +172,9 @@ xpcc::SiemensS75Portrait<MEMORY, RESET>::update() {
 				}
 			} // pix
 
-			for (uint_fast8_t ii = 0; ii < PortIdx; ++ii) {
-//				WR::reset();
-//				PORT::write(PortBuffer[ii]);
-//				WR::set();		// Low-to-high strobe
-			}
+			MEMORY::writeRam(PortBuffer, PortIdx);
 		} // y
 	} // x
-
-//	CS::set();
 }
 
 template <typename MEMORY, typename RESET>
@@ -250,11 +184,7 @@ xpcc::SiemensS75Landscape<MEMORY, RESET>::update() {
 	MEMORY::writeCommand(0x21, 131);
 
 	// Set instruction register to "RAM Data write"
-	SiemensS75Common<MEMORY, RESET>::writeReg(0x22);
-
-	// WRITE MEMORY
-//	RS::set();
-//	CS::reset();
+	MEMORY::writeRegister(0x22);
 
 	const uint16_t maskBlank  = 0x0000; // RRRR RGGG GGGB BBBB
 	const uint16_t maskFilled = 0x37e0; // RRRR RGGG GGGB BBBB
@@ -275,7 +205,7 @@ xpcc::SiemensS75Landscape<MEMORY, RESET>::update() {
 		{
 			// group of 8 black-and-white pixels
 			uint_fast8_t group = this->buffer[x][y];
-			uint_fast8_t PortBuffer[16];
+			uint8_t PortBuffer[16];
 			uint_fast8_t PortIdx = 0;
 
 			// Only 4 pixels at the lower end of the display in landscape mode
@@ -301,13 +231,7 @@ xpcc::SiemensS75Landscape<MEMORY, RESET>::update() {
 				}
 			} // pix
 
-			for (uint_fast8_t ii = 0; ii < PortIdx; ++ii) {
-//				WR::reset();
-//				PORT::write(PortBuffer[ii]);
-//				WR::set();		// Low-to-high strobe
-			}
+			MEMORY::writeRam(PortBuffer, PortIdx);
 		} // y
 	} // x
-
-//	CS::set();
 }

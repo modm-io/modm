@@ -61,17 +61,10 @@ namespace xpcc
 	{
 	protected:
 		ALWAYS_INLINE void
-		writeReg(uint8_t reg);
-
-		ALWAYS_INLINE void
-		writeData(uint16_t param);
-
-		ALWAYS_INLINE void
 		lcdCls(uint16_t colour);
 
 		ALWAYS_INLINE void
 		lcdSettings(bool landscape);
-
 	};
 
 	template <typename MEMORY, typename RESET>
