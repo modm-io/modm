@@ -110,10 +110,13 @@ xpcc::SiemensS75Common<MEMORY, RESET>::lcdSettings(bool landscape) {
 
 	MEMORY::writeCommand(0x01, 0x31af);	// R01: Driver output control
 	MEMORY::writeCommand(0x07, 0x0033);	// R07: Display Control
+
+	MEMORY::writeCommand(0x44, 0x8300); // Horizontal RAM Address
+	MEMORY::writeCommand(0x45, 0xaf00); // Vertical RAM Address
 	xpcc::delay_ms(10);
 
 	// colourful test
-	lcdCls(0x0000); // black
+	lcdCls(0x00f0); // black
 }
 
 template <typename MEMORY, typename RESET>

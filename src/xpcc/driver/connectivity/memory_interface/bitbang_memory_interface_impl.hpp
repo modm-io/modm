@@ -35,15 +35,11 @@ void xpcc::BitbangMemoryInterface<PORT, CS, CD, WR>::writeRegister(uint8_t reg)
 
 	WR::reset();
 	PORT::write(0);
-	xpcc::delay_us(1);
 	WR::set();		// Low-to-High strobe
-	xpcc::delay_us(1);
 
 	WR::reset();
 	PORT::write(reg);
-	xpcc::delay_us(1);
 	WR::set();		// Low-to-High strobe
-	xpcc::delay_us(1);
 
 	CS::set();
 }
@@ -57,15 +53,11 @@ void xpcc::BitbangMemoryInterface<PORT, CS, CD, WR>::writeData(uint16_t data)
 
 	WR::reset();
 	PORT::write(data>>8);
-	xpcc::delay_us(1);
 	WR::set();		// Low-to-High strobe
-	xpcc::delay_us(1);
 
 	WR::reset();
 	PORT::write(data);
-	xpcc::delay_us(1);
 	WR::set();		// Low-to-High strobe
-	xpcc::delay_us(1);
 
 	CS::set();
 }
@@ -81,15 +73,11 @@ void xpcc::BitbangMemoryInterface<PORT, CS, CD, WR>::writeDataMult(uint16_t data
 	{
 		WR::reset();
 		PORT::write(data>>8);
-		xpcc::delay_us(1);
 		WR::set();		// Low-to-High strobe
-		xpcc::delay_us(1);
 
 		WR::reset();
 		PORT::write(data);
-		xpcc::delay_us(1);
 		WR::set();		// Low-to-High strobe
-		xpcc::delay_us(1);
 	}
 
 	CS::set();
@@ -114,9 +102,7 @@ void xpcc::BitbangMemoryInterface<PORT, CS, CD, WR>::writeRam(uint8_t * addr, ui
 	{
 		WR::reset();
 		PORT::write(*(addr++));
-		xpcc::delay_us(1);
 		WR::set();		// Low-to-high strobe
-		xpcc::delay_us(1);
 	}
 
 	CS::set();

@@ -29,8 +29,8 @@ namespace lcd
 
 	GPIO__OUTPUT(Reset, E,  3);     // Reset, not FSMC
 
-	typedef xpcc::BitbangMemoryInterface<Port, Cs, Cd, Wr> Memory;
-//	typedef xpcc::stm32::FsmcExperimental Memory;
+//	typedef xpcc::BitbangMemoryInterface<Port, Cs, Cd, Wr> Memory;
+	typedef xpcc::stm32::FsmcExperimental Memory;
 }
 
 typedef xpcc::SiemensS75Landscape<lcd::Memory, lcd::Reset> Display;
@@ -70,7 +70,7 @@ MAIN_FUNCTION
 		Clock::switchToPll();
 	}
 	
-	Led::setOutput();
+	Led::setOutput(true);
 	Button::setInput(xpcc::stm32::PULLUP);
 
 	// -------------
@@ -94,28 +94,31 @@ MAIN_FUNCTION
 
 	// -------------
 
-	lcd::Port::setOutput();
+	// Do not set to output when using as FSMC
+//		lcd::Port::setOutput();
 
 	display.initialize();
 	display.setFont(xpcc::font::Assertion);
 
 	while (1) {
-		static uint8_t y = 0;
+		static uint8_t x = 0;
 		display.clear();
-		display.setCursor(5, y);
+		display.setCursor(x, 5);
 		display << "Hello";
-		display.setCursor(46, 16);
-		display << "World!";
+		display.setCursor(46, 24);
+		display << "World! abcdefghijk";
 
 		// finished, copy to LCD
+		// Drawingtime with FSMC: 14 msec
+		Led::set();
 		display.update();
+		Led::reset();
 
-		Led::toggle();
-		xpcc::delay_ms(50);
+		xpcc::delay_ms(10);
 
-		if (++y > 10)
+		if (++x > 170)
 		{
-			y = 0;
+			x = 0;
 		}
 	}
 }
