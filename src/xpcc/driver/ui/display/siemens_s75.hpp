@@ -55,7 +55,7 @@ namespace xpcc
 	 */
 
 	// common for landscape and portrait
-	template <typename PORT, typename CS, typename RS, typename WR, typename Reset>
+	template <typename MEMORY, typename RESET>
 	class SiemensS75Common
 	{
 	protected:
@@ -76,10 +76,10 @@ namespace xpcc
 
 	};
 
-	template <typename PORT, typename CS, typename RS, typename WR, typename Reset>
+	template <typename MEMORY, typename RESET>
 	class SiemensS75Portrait :
 		public BufferedGraphicDisplay<132, 176>,
-		public SiemensS75Common<PORT, CS, RS, WR, Reset>
+		public SiemensS75Common<MEMORY, RESET>
 	{
 	public:
 		void
@@ -99,10 +99,10 @@ namespace xpcc
 		 * the vertical resolution can be divided by 8.
 		 *
 		 */
-	template <typename PORT, typename CS, typename RS, typename WR, typename Reset>
+	template <typename MEMORY, typename RESET>
 	class SiemensS75Landscape :
 		public BufferedGraphicDisplay<176, 136>,
-		public SiemensS75Common<PORT, CS, RS, WR, Reset>
+		public SiemensS75Common<MEMORY, RESET>
 	{
 	public:
 		void

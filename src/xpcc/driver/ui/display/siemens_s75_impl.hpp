@@ -33,104 +33,104 @@
 #endif
 
 // ----------------------------------------------------------------------------
-template <typename PORT, typename CS, typename RS, typename WR, typename Reset>
+template <typename MEMORY, typename RESET>
 void
-xpcc::SiemensS75Portrait<PORT, CS, RS, WR, Reset>::initialize()
+xpcc::SiemensS75Portrait<MEMORY, RESET>::initialize()
 {
 	// CS pin
-	CS::setOutput(true);
+//	CS::setOutput(true);
 
 	// RS pin
-	RS::setOutput(false);
+//	RS::setOutput(false);
 
 	// WR Pin
-	WR::setOutput(false);
+//	WR::setOutput(false);
 
 	// Reset pin
-	Reset::setOutput(false);
+	RESET::setOutput(false);
 
-	SiemensS75Common<PORT, CS, RS, WR, Reset>::lcdSettings(false);
+	SiemensS75Common<MEMORY, RESET>::lcdSettings(false);
 
 	this->clear();
 }
 
 // ----------------------------------------------------------------------------
 
-template <typename PORT, typename CS, typename RS, typename WR, typename Reset>
+template <typename MEMORY, typename RESET>
 void
-xpcc::SiemensS75Landscape<PORT, CS, RS, WR, Reset>::initialize()
+xpcc::SiemensS75Landscape<MEMORY, RESET>::initialize()
 {
 	// CS pin
-	CS::setOutput(true);
+//	CS::setOutput(true);
 
 	// RS pin
-	RS::setOutput(false);
+//	RS::setOutput(false);
 
 	// WR Pin
-	WR::setOutput(false);
+//	WR::setOutput(false);
 
 	// Reset pin
-	Reset::setOutput(false);
+	RESET::setOutput(false);
 
-	SiemensS75Common<PORT, CS, RS, WR, Reset>::lcdSettings(true);
+	SiemensS75Common<MEMORY, RESET>::lcdSettings(true);
 
 	this->clear();
 }
 
 // ----------------------------------------------------------------------------
 
-template <typename PORT, typename CS, typename RS, typename WR, typename Reset>
+template <typename MEMORY, typename RESET>
 void
-xpcc::SiemensS75Common<PORT, CS, RS, WR, Reset>::writeCmd(uint8_t reg, uint16_t param)
+xpcc::SiemensS75Common<MEMORY, RESET>::writeCmd(uint8_t reg, uint16_t param)
 {
 	writeReg(reg);
 	writeData(param);
 }
 
-template <typename PORT, typename CS, typename RS, typename WR, typename Reset>
+template <typename MEMORY, typename RESET>
 void
-xpcc::SiemensS75Common<PORT, CS, RS, WR, Reset>::writeReg(uint8_t reg)
+xpcc::SiemensS75Common<MEMORY, RESET>::writeReg(uint8_t reg)
 {
-	RS::reset();
+//	RS::reset();
 
-	CS::reset();
+//	CS::reset();
 
-	WR::reset();
-	PORT::write(0);
-	WR::set();		// Low-to-High strobe
+//	WR::reset();
+//	PORT::write(0);
+//	WR::set();		// Low-to-High strobe
 
-	WR::reset();
-	PORT::write(reg);
-	WR::set();		// Low-to-High strobe
+//	WR::reset();
+//	PORT::write(reg);
+//	WR::set();		// Low-to-High strobe
 
-	CS::set();
+//	CS::set();
 }
 
-template <typename PORT, typename CS, typename RS, typename WR, typename Reset>
+template <typename MEMORY, typename RESET>
 void
-xpcc::SiemensS75Common<PORT, CS, RS, WR, Reset>::writeData(uint16_t data)
+xpcc::SiemensS75Common<MEMORY, RESET>::writeData(uint16_t data)
 {
-	RS::set();		// RS = 1, R/W = 0, write instruction or RAM data
-
-	CS::reset();
-
-	WR::reset();
-	PORT::write(data>>8);
-	WR::set();		// Low-to-High strobe
-
-	WR::reset();
-	PORT::write(data);
-	WR::set();		// Low-to-High strobe
-
-	CS::set();
+//	RS::set();		// RS = 1, R/W = 0, write instruction or RAM data
+//
+//	CS::reset();
+//
+//	WR::reset();
+//	PORT::write(data>>8);
+//	WR::set();		// Low-to-High strobe
+//
+//	WR::reset();
+//	PORT::write(data);
+//	WR::set();		// Low-to-High strobe
+//
+//	CS::set();
 }
 
-template <typename PORT, typename CS, typename RS, typename WR, typename Reset>
+template <typename MEMORY, typename RESET>
 void
-xpcc::SiemensS75Common<PORT, CS, RS, WR, Reset>::lcdSettings(bool landscape) {
+xpcc::SiemensS75Common<MEMORY, RESET>::lcdSettings(bool landscape) {
 	// Hardware reset is low from initialize
 	xpcc::delay_ms(50);
-	Reset::set();
+	RESET::set();
 	xpcc::delay_ms(50);
 
 	writeCmd(0x00, 0x0001); // R00: Start oscillation
@@ -176,17 +176,17 @@ xpcc::SiemensS75Common<PORT, CS, RS, WR, Reset>::lcdSettings(bool landscape) {
 	lcdCls(0x0000); // black
 }
 
-template <typename PORT, typename CS, typename RS, typename WR, typename Reset>
+template <typename MEMORY, typename RESET>
 void
-xpcc::SiemensS75Common<PORT, CS, RS, WR, Reset>::lcdCls(uint16_t colour) {
+xpcc::SiemensS75Common<MEMORY, RESET>::lcdCls(uint16_t colour) {
 	// Set CGRAM Address to 0 = upper left corner
 	writeCmd(0x21, 0x0000);
 
 	// Set instruction register to "RAM Data write"
 	writeReg(0x22);
 
-	RS::set();
-	CS::reset();
+//	RS::set();
+//	CS::reset();
 
 	// start data transmission
 
@@ -194,30 +194,30 @@ xpcc::SiemensS75Common<PORT, CS, RS, WR, Reset>::lcdCls(uint16_t colour) {
 	uint8_t c1 = colour >> 8;
 	uint8_t c2 = colour & 0xff;
 	for (uint_fast16_t ii = 0; ii < (132 * 176); ++ii) {
-		WR::reset();
-		PORT::write(c1);
-		WR::set();
+//		WR::reset();
+//		PORT::write(c1);
+//		WR::set();
 
-		WR::reset();
-		PORT::write(c2);
-		WR::set();
+//		WR::reset();
+//		PORT::write(c2);
+//		WR::set();
 	}
 
-	CS::set();
+//	CS::set();
 }
 
-template <typename PORT, typename CS, typename RS, typename WR, typename Reset>
+template <typename MEMORY, typename RESET>
 void
-xpcc::SiemensS75Portrait<PORT, CS, RS, WR, Reset>::update() {
+xpcc::SiemensS75Portrait<MEMORY, RESET>::update() {
 	// Set CGRAM Address to 0 = upper left corner
-	SiemensS75Common<PORT, CS, RS, WR, Reset>::writeCmd(0x21, 0x0000);
+	SiemensS75Common<MEMORY, RESET>::writeCmd(0x21, 0x0000);
 
 	// Set instruction register to "RAM Data write"
-	SiemensS75Common<PORT, CS, RS, WR, Reset>::writeReg(0x22);
+	SiemensS75Common<MEMORY, RESET>::writeReg(0x22);
 
 	// WRITE MEMORY
-	RS::set();
-	CS::reset();
+//	RS::set();
+//	CS::reset();
 
 	const uint16_t maskBlank  = 0x0000; // RRRR RGGG GGGB BBBB
 	const uint16_t maskFilled = 0x37e0; // RRRR RGGG GGGB BBBB
@@ -254,28 +254,28 @@ xpcc::SiemensS75Portrait<PORT, CS, RS, WR, Reset>::update() {
 			} // pix
 
 			for (uint_fast8_t ii = 0; ii < PortIdx; ++ii) {
-				WR::reset();
-				PORT::write(PortBuffer[ii]);
-				WR::set();		// Low-to-high strobe
+//				WR::reset();
+//				PORT::write(PortBuffer[ii]);
+//				WR::set();		// Low-to-high strobe
 			}
 		} // y
 	} // x
 
-	CS::set();
+//	CS::set();
 }
 
-template <typename PORT, typename CS, typename RS, typename WR, typename Reset>
+template <typename MEMORY, typename RESET>
 void
-xpcc::SiemensS75Landscape<PORT, CS, RS, WR, Reset>::update() {
+xpcc::SiemensS75Landscape<MEMORY, RESET>::update() {
 	// Set CGRAM Address to height-1 = upper left corner
-	SiemensS75Common<PORT, CS, RS, WR, Reset>::writeCmd(0x21, 131);
+	SiemensS75Common<MEMORY, RESET>::writeCmd(0x21, 131);
 
 	// Set instruction register to "RAM Data write"
-	SiemensS75Common<PORT, CS, RS, WR, Reset>::writeReg(0x22);
+	SiemensS75Common<MEMORY, RESET>::writeReg(0x22);
 
 	// WRITE MEMORY
-	RS::set();
-	CS::reset();
+//	RS::set();
+//	CS::reset();
 
 	const uint16_t maskBlank  = 0x0000; // RRRR RGGG GGGB BBBB
 	const uint16_t maskFilled = 0x37e0; // RRRR RGGG GGGB BBBB
@@ -323,12 +323,12 @@ xpcc::SiemensS75Landscape<PORT, CS, RS, WR, Reset>::update() {
 			} // pix
 
 			for (uint_fast8_t ii = 0; ii < PortIdx; ++ii) {
-				WR::reset();
-				PORT::write(PortBuffer[ii]);
-				WR::set();		// Low-to-high strobe
+//				WR::reset();
+//				PORT::write(PortBuffer[ii]);
+//				WR::set();		// Low-to-high strobe
 			}
 		} // y
 	} // x
 
-	CS::set();
+//	CS::set();
 }
