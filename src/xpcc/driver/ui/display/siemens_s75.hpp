@@ -61,9 +61,6 @@ namespace xpcc
 	{
 	protected:
 		ALWAYS_INLINE void
-		writeCmd(uint8_t reg, uint16_t param);
-
-		ALWAYS_INLINE void
 		writeReg(uint8_t reg);
 
 		ALWAYS_INLINE void

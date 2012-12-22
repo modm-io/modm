@@ -21,13 +21,16 @@ WR xpcc::BitbangMemoryInterface<PORT, CS, CD, WR>::wr;
 template <typename PORT, typename CS, typename CD, typename WR>
 void xpcc::BitbangMemoryInterface<PORT, CS, CD, WR>::initialize()
 {
-
+	cs.setOutput(true);
+	cd.setOutput(false);
+	wr.setOutput(false);
 }
 
 template <typename PORT, typename CS, typename CD, typename WR>
 void xpcc::BitbangMemoryInterface<PORT, CS, CD, WR>::writeCommand(uint8_t command, uint16_t data)
 {
-
+	//	writeReg(command);
+	//	writeData(data);
 }
 
 template <typename PORT, typename CS, typename CD, typename WR>

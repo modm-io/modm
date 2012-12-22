@@ -37,14 +37,7 @@ template <typename MEMORY, typename RESET>
 void
 xpcc::SiemensS75Portrait<MEMORY, RESET>::initialize()
 {
-	// CS pin
-//	CS::setOutput(true);
-
-	// RS pin
-//	RS::setOutput(false);
-
-	// WR Pin
-//	WR::setOutput(false);
+	MEMORY::initialize();
 
 	// Reset pin
 	RESET::setOutput(false);
@@ -60,14 +53,7 @@ template <typename MEMORY, typename RESET>
 void
 xpcc::SiemensS75Landscape<MEMORY, RESET>::initialize()
 {
-	// CS pin
-//	CS::setOutput(true);
-
-	// RS pin
-//	RS::setOutput(false);
-
-	// WR Pin
-//	WR::setOutput(false);
+	MEMORY::initialize();
 
 	// Reset pin
 	RESET::setOutput(false);
@@ -79,13 +65,6 @@ xpcc::SiemensS75Landscape<MEMORY, RESET>::initialize()
 
 // ----------------------------------------------------------------------------
 
-template <typename MEMORY, typename RESET>
-void
-xpcc::SiemensS75Common<MEMORY, RESET>::writeCmd(uint8_t reg, uint16_t param)
-{
-	writeReg(reg);
-	writeData(param);
-}
 
 template <typename MEMORY, typename RESET>
 void
@@ -133,26 +112,26 @@ xpcc::SiemensS75Common<MEMORY, RESET>::lcdSettings(bool landscape) {
 	RESET::set();
 	xpcc::delay_ms(50);
 
-	writeCmd(0x00, 0x0001); // R00: Start oscillation
+	MEMORY::writeCommand(0x00, 0x0001); // R00: Start oscillation
 	xpcc::delay_ms(10);
 
 	//power on sequence
-	writeCmd(0x10, 0x1f92);	// R10: Power Control 1
-	writeCmd(0x11, 0x0014);	// R11: Power Control 2
-	writeCmd(0x00, 0x0001);	// R00: Start oscillation
-	writeCmd(0x10, 0x1f92);	// R10: Power Control 1
-	writeCmd(0x11, 0x001c); // R11: Power Control 2
-	writeCmd(0x28, 0x0006);	// R28: VCOM OTP (1)
-	writeCmd(0x02, 0x0000);	// R02: LCD drive AC control
-	writeCmd(0x12, 0x040f); // R12: Power Control 2
+	MEMORY::writeCommand(0x10, 0x1f92);	// R10: Power Control 1
+	MEMORY::writeCommand(0x11, 0x0014);	// R11: Power Control 2
+	MEMORY::writeCommand(0x00, 0x0001);	// R00: Start oscillation
+	MEMORY::writeCommand(0x10, 0x1f92);	// R10: Power Control 1
+	MEMORY::writeCommand(0x11, 0x001c); // R11: Power Control 2
+	MEMORY::writeCommand(0x28, 0x0006);	// R28: VCOM OTP (1)
+	MEMORY::writeCommand(0x02, 0x0000);	// R02: LCD drive AC control
+	MEMORY::writeCommand(0x12, 0x040f); // R12: Power Control 2
 
 	xpcc::delay_ms(100);
 
 	if (landscape) {
-		writeCmd(0x03, 0x7820);
+		MEMORY::writeCommand(0x03, 0x7820);
 	}
 	else {
-		writeCmd(0x03, 0x7838);	// R03: Entry mode
+		MEMORY::writeCommand(0x03, 0x7838);	// R03: Entry mode
 	}
 	/**
 	 * Bit 0 set: stopped working
@@ -168,8 +147,8 @@ xpcc::SiemensS75Common<MEMORY, RESET>::lcdSettings(bool landscape) {
 	 * 0x7800
 	 */
 
-	writeCmd(0x01, 0x31af);	// R01: Driver output control
-	writeCmd(0x07, 0x0033);	// R07: Display Control
+	MEMORY::writeCommand(0x01, 0x31af);	// R01: Driver output control
+	MEMORY::writeCommand(0x07, 0x0033);	// R07: Display Control
 	xpcc::delay_ms(10);
 
 	// colourful test
@@ -180,7 +159,7 @@ template <typename MEMORY, typename RESET>
 void
 xpcc::SiemensS75Common<MEMORY, RESET>::lcdCls(uint16_t colour) {
 	// Set CGRAM Address to 0 = upper left corner
-	writeCmd(0x21, 0x0000);
+	MEMORY::writeCommand(0x21, 0x0000);
 
 	// Set instruction register to "RAM Data write"
 	writeReg(0x22);
@@ -210,7 +189,7 @@ template <typename MEMORY, typename RESET>
 void
 xpcc::SiemensS75Portrait<MEMORY, RESET>::update() {
 	// Set CGRAM Address to 0 = upper left corner
-	SiemensS75Common<MEMORY, RESET>::writeCmd(0x21, 0x0000);
+	MEMORY::writeCommand(0x21, 0x0000);
 
 	// Set instruction register to "RAM Data write"
 	SiemensS75Common<MEMORY, RESET>::writeReg(0x22);
@@ -268,7 +247,7 @@ template <typename MEMORY, typename RESET>
 void
 xpcc::SiemensS75Landscape<MEMORY, RESET>::update() {
 	// Set CGRAM Address to height-1 = upper left corner
-	SiemensS75Common<MEMORY, RESET>::writeCmd(0x21, 131);
+	MEMORY::writeCommand(0x21, 131);
 
 	// Set instruction register to "RAM Data write"
 	SiemensS75Common<MEMORY, RESET>::writeReg(0x22);

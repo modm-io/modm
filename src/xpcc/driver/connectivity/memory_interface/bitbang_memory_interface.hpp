@@ -23,13 +23,13 @@ namespace xpcc
 	class BitbangMemoryInterface
 	{
 	public:
-		static void
+		ALWAYS_INLINE static void
 		initialize();
 
-		static void
+		ALWAYS_INLINE static void
 		writeCommand(uint8_t command, uint16_t data);
 
-		static void
+		ALWAYS_INLINE static void
 		writeData(uint8_t data);
 
 		static void
