@@ -144,10 +144,6 @@ class Scanner:
 		
 		for basepath in pathlist:
 			for path, directories, files in os.walk(basepath):
-				# exclude the SVN-directories
-				if '.svn' in directories:
-					directories.remove('.svn')
-				
 				if os.path.normpath(path) in ignoreList:
 					directories = self._excludeDirectories(directories)
 					continue
