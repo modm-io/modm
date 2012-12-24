@@ -47,6 +47,7 @@
 	#endif
 #endif
 
+#include <xpcc/driver/interface.hpp>
 #include <xpcc/architecture/platform/cortex_m3/stm32.hpp>
 
 namespace xpcc
