@@ -41,6 +41,7 @@
  *   - Connectivity line STM32F105/107 - 72 MHz CPU with Ethernet MAC, CAN
  *     and USB 2.0 OTG
  * - TODO: STM32 F2 series of high-performance MCUs
+ * - TODO: STM32 F3 series of high-performance MCUs with DSP and FPU instructions and analog peripherals
  * - TODO: STM32 F4 series of high-performance MCUs with DSP and FPU instructions
  *
  * Defines:
@@ -56,12 +57,20 @@
  * The Value line (STM32F100-102) is not supported!
  */
 
+/*
+ * Common to all STM32 processors.
+ */
+
 #include "stm32/device.h"
 
 #include "stm32/core.hpp"
 #include "stm32/gpio.hpp"
 #include "stm32/clock.hpp"
 
+/**
+ * Specific hardware for different processors.
+ */
+#if defined(STM32F10X) || defined(STM32F2XX) || defined(STM32F4XX)
 #include "stm32/fsmc.hpp"
 
 #include "stm32/can/can_1.hpp"
@@ -89,3 +98,5 @@
 
 #include "stm32/systick_timer.hpp"
 #include "stm32/timer.hpp"
+
+#endif
