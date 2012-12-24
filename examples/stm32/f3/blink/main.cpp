@@ -22,7 +22,7 @@ initClock()
 		return false;
 	}
 	
-	Clock::enablePll(Clock::PllSource::PLL_HSE, 4, 168);
+	Clock::enablePll(Clock::PllSource::PLL_HSE, Clock::PllMul::MUL_8);
 	return Clock::switchToPll();
 }
 
