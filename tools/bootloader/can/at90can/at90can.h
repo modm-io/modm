@@ -25,8 +25,6 @@
  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- * $Id$
  */
 // ----------------------------------------------------------------------------
 
@@ -40,7 +38,6 @@
  * \brief		allgemeines CAN Interface für AT90CAN32/64/128, MCP2515 und SJA1000
  *
  * \author 		Fabian Greif <fabian.greif@rwth-aachen.de>
- * \version		$Id$
  */
 // ----------------------------------------------------------------------------
 
