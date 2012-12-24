@@ -74,6 +74,8 @@ devices = [
 	{ 'path': 'release/tests/stm32',	'arch': 'cortex-m3',	'device': 'stm32f107vc',	'clock':  72000000 },	# connectivity
 	{ 'path': 'release/tests/stm32',	'arch': 'cortex-m3',	'device': 'stm32f205ve',	'clock': 120000000 },
 	{ 'path': 'release/tests/stm32',	'arch': 'cortex-m3',	'device': 'stm32f207ze',	'clock': 120000000 },
+	{ 'path': 'release/tests/stm32',	'arch': 'cortex-m4',	'device': 'stm32f303cb',	'clock':  72000000 },
+	{ 'path': 'release/tests/stm32',	'arch': 'cortex-m4',	'device': 'stm32f303cc',	'clock':  72000000 },
 	{ 'path': 'release/tests/stm32',	'arch': 'cortex-m4',	'device': 'stm32f405vg',	'clock': 168000000 },
 	{ 'path': 'release/tests/stm32',	'arch': 'cortex-m4',	'device': 'stm32f407vg',	'clock': 168000000 },
 ]
