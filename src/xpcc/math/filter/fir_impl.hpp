@@ -142,9 +142,9 @@ xpcc::filter::Fir<T, N, BLOCK_SIZE, ScaleFactor>::update()
 		FIR_DEBUG_SUM(tap[i], coefficients[i]);
 		sum += tap[i]*coefficients[i];
 	}
-	output = sum;
+	output = sum / ScaleFactor;
 #ifdef FIR_DEBUG_UPDATE
-	printf("sum=%.3f\n", sum);
+	printf("sum=%.3f\n", output);
 #endif // FIR_DEBUG_UPDATE
 }
 #endif // XPCC__FIR_IMPL_HPP
