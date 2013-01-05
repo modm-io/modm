@@ -36,6 +36,12 @@ MAIN_FUNCTION
 	LedRed::setOutput(xpcc::gpio::HIGH);
 	LedBlue::setOutput(xpcc::gpio::HIGH);
 	
+	// Remap the Pins of CAN1 to PB8 and PB9.
+	// This has to be done before calling initialize()!
+	Can1::configurePins(Can1::REMAP_PB8_PB9);
+	Can1::initialize(xpcc::can::BITRATE_125_KBPS, 9);
+
+
 	while (1)
 	{
 		LedBlue::toggle();

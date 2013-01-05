@@ -161,6 +161,7 @@ namespace xpcc
 			AF_USART1  = 0x07,	///< USART1 Alternate Function mapping
 			AF_USART2  = 0x07,	///< USART2 Alternate Function mapping
 			AF_USART3  = 0x07,	///< USART3 Alternate Function mapping
+			AF_CAN_D  = 0x07,	///< CAN at Port D Alternate Function mapping
 
 			// AF 8 selection
 			AF_UART4   = 0x08,	///< UART4  Alternate Function mapping
@@ -168,7 +169,7 @@ namespace xpcc
 			AF_USART6  = 0x08,	///< USART6 Alternate Function mapping
 
 			// AF 9 selection
-			AF_CAN    = 0x09,	///< CAN   Alternate Function mapping
+			AF_CAN    = 0x09,	///< CAN at Port A and B Alternate Function mapping
 			AF_TIM12  = 0x09,	///< TIM12 Alternate Function mapping
 			AF_TIM13  = 0x09,	///< TIM13 Alternate Function mapping
 			AF_TIM14  = 0x09,	///< TIM14 Alternate Function mapping
