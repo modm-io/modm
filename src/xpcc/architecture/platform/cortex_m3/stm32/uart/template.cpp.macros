@@ -247,11 +247,19 @@ xpcc::stm32::{{ className }}{{ id }}::setBaudrate(uint32_t baudrate)
 void
 xpcc::stm32::{{ className }}{{ id }}::write(uint8_t data)
 {
+#if defined(STM32F3XX)
+	while (!({{ moduleName }}{{ id }}->ISR & USART_ISR_TXE)) {
+		// wait until the data register becomes empty
+	}
+
+	{{ moduleName }}{{ id }}->TDR = data;
+#else
 	while (!({{ moduleName }}{{ id }}->SR & USART_SR_TXE)) {
 		// wait until the data register becomes empty
 	}
 	
 	{{ moduleName }}{{ id }}->DR = data;
+#endif
 }
 {%- endmacro -%}
 
@@ -269,12 +277,19 @@ xpcc::stm32::{{ className }}{{ id }}::write(const uint8_t *s, uint8_t n)
 bool
 xpcc::stm32::{{ className }}{{ id }}::read(uint8_t& c)
 {
+#if defined(STM32F3XX)
+	if ({{ moduleName }}{{ id }}->ISR & USART_ISR_RXNE)
+	{
+		c = {{ moduleName }}{{ id }}->RDR;
+		return true;
+	}
+#else
 	if ({{ moduleName }}{{ id }}->SR & USART_SR_RXNE)
 	{
 		c = {{ moduleName }}{{ id }}->DR;
 		return true;
 	}
-	
+#endif
 	return false;
 }
 {%- endmacro -%}
