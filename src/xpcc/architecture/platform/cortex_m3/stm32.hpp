@@ -70,12 +70,26 @@
 /**
  * Specific hardware for different processors.
  */
+
+/**
+ * CAN Controller
+ */
+
+// CAN1
+#if defined(STM32F10X) || defined(STM32F3XX) || defined(STM32F2XX) || defined(STM32F4XX)
+#include "stm32/can/can_1.hpp"
+#include "stm32/can/can_filter.hpp"
+#endif
+
+// CAN2
+#if defined(STM32F10X) || defined(STM32F2XX) || defined(STM32F4XX)
+#include "stm32/can/can_2.hpp"
+#endif
+
+
+// Other hardware, not yet implemented for F3
 #if defined(STM32F10X) || defined(STM32F2XX) || defined(STM32F4XX)
 #include "stm32/fsmc.hpp"
-
-#include "stm32/can/can_1.hpp"
-#include "stm32/can/can_2.hpp"
-#include "stm32/can/can_filter.hpp"
 
 #include "stm32/uart/usart_1.hpp"
 #include "stm32/uart/usart_2.hpp"
