@@ -41,6 +41,9 @@ MAIN_FUNCTION
 	Can1::configurePins(Can1::REMAP_PB8_PB9);
 	Can1::initialize(xpcc::can::BITRATE_125_KBPS, 9);
 
+	Usart2 uart(115200);
+	uart.configurePins(REMAP_PB3_PB4);	// STM32F3 specific mapping
+	usart.write("What is the second parameter of this function for?", 5);
 
 	while (1)
 	{
