@@ -87,15 +87,21 @@
 #endif
 
 
-// Other hardware, not yet implemented for F3
-#if defined(STM32F10X) || defined(STM32F2XX) || defined(STM32F4XX)
-#include "stm32/fsmc.hpp"
-
+// HW drivers enabled for all supported STM32 series
+#if defined(STM32F10X) || defined(STM32F2XX) || defined(STM32F3XX) \
+	|| defined(STM32F4XX)
 #include "stm32/uart/usart_1.hpp"
 #include "stm32/uart/usart_2.hpp"
 #include "stm32/uart/usart_3.hpp"
 #include "stm32/uart/uart_4.hpp"
 #include "stm32/uart/uart_5.hpp"
+#endif
+
+
+// Other hardware, not yet implemented for F3
+#if defined(STM32F10X) || defined(STM32F2XX) || defined(STM32F4XX)
+#include "stm32/fsmc.hpp"
+
 #include "stm32/uart/usart_6.hpp"
 
 #include "stm32/spi/spi_1.hpp"
