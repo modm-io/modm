@@ -4,7 +4,7 @@
 #if defined(STM32F2XX) || defined(STM32F4XX)
 {% elif id in [4, 5] -%}
 #if defined(STM32F10X_HD) || defined(STM32F10X_XL) || defined(STM32F10X_CL) || \
-	defined(STM32F2XX) || defined(STM32F4XX)
+	defined(STM32F2XX) || defined(STM32F3XX) || defined(STM32F4XX)
 {%- endif %}
 {%- endmacro -%}
 
@@ -95,6 +95,8 @@ xpcc::stm32::{{ className }}{{ id }}::configurePins(Mapping mapping)
 	
 	// Initialize IO pins
 #if defined(STM32F2XX) || defined(STM32F4XX)
+
+	// TODO: check if port appings are correct for STM32F3 then add check for define
 	{% if id == 4 -%}
 	if (mapping == REMAP_PA0_PA1) {
 		TxdA0::setAlternateFunction(AF_UART4, xpcc::stm32::PUSH_PULL);
@@ -178,7 +180,56 @@ xpcc::stm32::{{ className }}{{ id }}::configurePins(Mapping mapping)
 		RxdG9::setAlternateFunction(AF_USART6);
 	}
 	{%- endif %}
-#else
+#elif defined(STM32F3XX)
+	/* While some if the mapping are the same as above, there are a cupple
+	 * of missing or different mapping on the STM32F3 series probably due
+	 * to its integrated opamps.
+	*/
+
+	// TODO: Adjust mappings
+	{% if id == 1 -%}
+	if (mapping == REMAP_PA9_PA10) {
+		TxdA9::setAlternateFunction(AF_USART1, xpcc::stm32::PUSH_PULL);
+		RxdA10::setAlternateFunction(AF_USART1);
+	}
+	else {
+		TxdB6::setAlternateFunction(AF_USART1, xpcc::stm32::PUSH_PULL);
+		RxdB7::setAlternateFunction(AF_USART1);
+	}
+	{%- elif id == 2 -%}
+	if (mapping == REMAP_PA2_PA3) {
+		TxdA2::setAlternateFunction(AF_USART2, xpcc::stm32::PUSH_PULL);
+		RxdA3::setAlternateFunction(AF_USART2);
+	}
+	else {
+		TxdD5::setAlternateFunction(AF_USART2, xpcc::stm32::PUSH_PULL);
+		RxdD6::setAlternateFunction(AF_USART2);
+	}
+	{%- elif id == 3 -%}
+	if (mapping == REMAP_PB10_PB11) {
+		TxdB10::setAlternateFunction(AF_USART3, xpcc::stm32::PUSH_PULL);
+		RxdB11::setAlternateFunction(AF_USART3);
+	}
+	else if (mapping == REMAP_PC10_PC11) {
+		TxdC10::setAlternateFunction(AF_USART3, xpcc::stm32::PUSH_PULL);
+		RxdC11::setAlternateFunction(AF_USART3);
+	}
+	else {
+		TxdD8::setAlternateFunction(AF_USART3, xpcc::stm32::PUSH_PULL);
+		RxdD9::setAlternateFunction(AF_USART3);
+	}
+	{%- elif id == 6 -%}
+	if (mapping == REMAP_PC6_PC7) {
+		TxdC6::setAlternateFunction(AF_USART6, xpcc::stm32::PUSH_PULL);
+		RxdC7::setAlternateFunction(AF_USART6);
+	}
+	else {
+		TxdG14::setAlternateFunction(AF_USART6, xpcc::stm32::PUSH_PULL);
+		RxdG9::setAlternateFunction(AF_USART6);
+	}
+	{%- endif %}
+#elif defined(STM32F10X) || defined(STM32F10X_HD) || defined(STM32F10X_XL) \
+	|| defined(STM32F10X_CL)
 	AFIO->MAPR = (AFIO->MAPR & ~AFIO_MAPR_USART{{ id }}_REMAP) | mapping;
 	{% if id == 1 -%}
 	if (mapping == REMAP_PA9_PA10) {
@@ -212,6 +263,8 @@ xpcc::stm32::{{ className }}{{ id }}::configurePins(Mapping mapping)
 		RxdD9::setInput();
 	}
 	{%- endif %}
+#else
+#  error "Unknown CPU Type. Please define STM32F10X_.., STM32F2XX, STM32F3XX or STM32F4XX"
 #endif
 }
 {%- endmacro -%}

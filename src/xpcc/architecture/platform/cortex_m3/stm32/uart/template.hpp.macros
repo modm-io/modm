@@ -9,6 +9,8 @@
 			};
 {%- endmacro -%}
 
+// TODO: check mapping for STM32F3 compatiblity
+
 {%- macro _mapping45(id) -%}
 				{%- if id == 4 %}
 				REMAP_PC10_PC11,	///< TX mapped to PC10, RX mapped to PC11

@@ -56,6 +56,9 @@ namespace
 extern "C" void
 {{ className | upper }}{{ id }}_IRQHandler()
 {
+
+#if defined(STM32F3XX)
+#else
 	uint32_t state = {{ className | upper }}{{ id }}->SR;
 	
 	// Read Data Register not empty 
