@@ -6,7 +6,6 @@
 #if defined(STM32F10X_HD) || defined(STM32F10X_XL) || defined(STM32F10X_CL) || \
 	defined(STM32F2XX) || defined(STM32F3XXV) || defined(STM32F4XX)
 // only devices with 100 pins have Port D and therefore UART5
-{%- endif %}
 {% elif id == 4 -%}
 #if defined(STM32F10X_HD) || defined(STM32F10X_XL) || defined(STM32F10X_CL) || \
 	defined(STM32F2XX) || defined(STM32F3XX) || defined(STM32F4XX)
@@ -110,7 +109,7 @@ xpcc::stm32::{{ className }}{{ id }}::configurePins(Mapping mapping)
 	// Initialize IO pins
 #if defined(STM32F2XX) || defined(STM32F3XX) || defined(STM32F4XX)
 	{% if id == 4 -%}
-#if defined(STM32F3XX
+#if defined(STM32F3XX)
 	TxdC10::setAlternateFunction(AF_UART4, xpcc::stm32::PUSH_PULL);
 	RxdC11::setAlternateFunction(AF_UART4);
 #else
