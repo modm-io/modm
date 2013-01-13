@@ -1,0 +1,245 @@
+// coding: utf-8
+// ----------------------------------------------------------------------------
+/* Copyright (c) 2013, Roboterclub Aachen e.V.
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ * 
+ *     * Redistributions of source code must retain the above copyright
+ *       notice, this list of conditions and the following disclaimer.
+ *     * Redistributions in binary form must reproduce the above copyright
+ *       notice, this list of conditions and the following disclaimer in the
+ *       documentation and/or other materials provided with the distribution.
+ *     * Neither the name of the Roboterclub Aachen e.V. nor the
+ *       names of its contributors may be used to endorse or promote products
+ *       derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY ROBOTERCLUB AACHEN E.V. ''AS IS'' AND ANY
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL ROBOTERCLUB AACHEN E.V. BE LIABLE FOR ANY
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+ * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+// ----------------------------------------------------------------------------
+{{ generation_block }}
+
+#ifndef XPCC_STM32__COMP{{ id }}_HPP
+#define XPCC_STM32__COMP{{ id }}_HPP
+
+namespace xpcc
+{
+	namespace stm32
+	{
+		/**
+		 * @brief		Comparator Class for STM32F3 series
+		 * 
+		 * The class provides an interface to the comparators 1-7 availably on
+		 * ST's STM32F3 microcontroller series.
+		 * 
+		 * @internal
+		 * @ingroup		stm32
+		 */
+		class Comp
+		{
+		public:
+			enum BlankingSource
+			{
+				NO_BLANKING = 0b000,
+			{% if id <= 2 -%}
+				TIMER_1_OC5 = 0b001,
+				TIMER_2_OC3 = 0b010,
+				TIMER_3_OC3 = 0b011
+			{% elif id == 3 -%}
+				TIMER_1_OC5 = 0b001,
+				TIMER_2_OC4 = 0b011
+			{% elif id == 4 -%}
+				TIMER_3_OC4 = 0b001,
+				TIMER_8_OC5 = 0b010,
+				TIMER_15_OC1 = 0b011
+			{% elif id == 5 -%}
+				TIMER_8_OC5 = 0b010,
+				TIMER_3_OC3 = 0b011
+			{% elif id == 6 -%}
+				TIMER_8_OC5 = 0b010,
+				TIMER_2_OC4 = 0b011,
+				TIMER_15_OC2 = 0b100,
+			{% elif id == 7 -%}
+				TIMER_1_OC5 = 0b001,
+				TIMER_8_OC5 = 0b010,
+				TIMER_15_OC2 = 0b100
+			{% endif -%}
+			};
+
+			enum Hysteresis
+			{
+				NO_HYSTERESIS = 0b00,
+				LOW_HYSTERESIS = 0b01,
+				MEDIUM_HYSTERESIS = 0b10,
+				HIGH_HYSTERESIS = 0b11
+			};
+
+			enum Output
+			{
+				NOT_CONNECTED = 0b0000,
+				TIMER_1_BREAK_INPUT = 0b0001,
+				TIMER_1_BREAK_INPUT_2 = 0b0010,
+				TIMER_8_BREAK_INPUT = 0b0011,
+				TIMER_8_BREAK_INPUT_2 = 0b0100,
+				TIMER_8_OR_1_BREAK_INPUTS_2 = 0b0101,
+
+			{% if id == 1 -%}
+				TIMER_1_OCREF_CLEAR_INPUT = 0b0110,
+				TIMER_1_INPUT_CAPTURE_1 = 0b0111,
+				TIMER_1_INPUT_CAPTURE_4 = 0b1000,
+				TIMER_2_OCREF_CLEAR_INPUT = 0b1001,
+				TIMER_3_INPUT_CAPTURE_1 = 0b1010,
+				TIMER_3_OCREF_CLEAR_INPUT = 0b1011
+			{% elif id == 2 -%}
+				TIMER_1_OCREF_CLEAR_INPUT = 0b0110,
+				TIMER_1_INPUT_CAPTURE_1 = 0b0111,
+				TIMER_2_INPUT_CAPTURE_4 = 0b1000,
+				TIMER_2_OCREF_CLEAR_INPUT = 0b1001,
+				TIMER_3_INPUT_CAPTURE_1 = 0b1010,
+				TIMER_3_OCREF_CLEAR_INPUT = 0b1011
+			{% elif id == 3 -%}
+				TIMER_1_OCREF_CLEAR_INPUT = 0b0110,
+				TIMER_4_INPUT_CAPTURE_1 = 0b0111,
+				TIMER_3_INPUT_CAPTURE_2 = 0b1000,
+				TIMER_2_OCREF_CLEAR_INPUT = 0b1001,
+				TIMER_15_INPUT_CAPTURE_1 = 0b1010,
+				TIMER_15_BREAK_INPUT = 0b1011
+			{% elif id == 4 -%}
+				TIMER_3_INPUT_CAPTURE_3 = 0b0110,
+				TIMER_8_OCREF_CLEAR_INPUT = 0b0111,
+				TIMER_15_INPUT_CAPTURE_2 = 0b1000,
+				TIMER_4_INPUT_CAPTURE_2 = 0b1001,
+				TIMER_15_OCREF_CLEAR_INPUT = 0b1010,
+				TIMER_3_OCREF_CLEAR_INPUT = 0b1011
+			{% elif id == 5 -%}
+				TIMER_2_INPUT_CAPTURE_1 = 0b0110,
+				TIMER_8_OCREF_CLEAR_INPUT = 0b0111,
+				TIMER_17_INPUT_CAPTURE_1 = 0b1000,
+				TIMER_4_INPUT_CAPTURE_3 = 0b1001,
+				TIMER_16_BREAK_INPUT = 0b1010,
+				TIMER_3_OCREF_CLEAR_INPUT = 0b1011
+			{% elif id == 6 -%}
+				TIMER_2_INPUT_CAPTURE_1 = 0b0110,
+				TIMER_8_OCREF_CLEAR_INPUT = 0b0111,
+				TIMER_2_OCREF_CLEAR_INPUT = 0b1000,
+				TIMER_16_OCREF_CLEAR_INPUT = 0b1001,
+				TIMER_16_INPUT_CAPTURE_1 = 0b1010,
+				TIMER_4_INPUT_CAPTURE_4 = 0b1011
+			{% elif id == 7 -%}
+				TIMER_1_OCREF_CLEAR_INPUT = 0b0110,
+				TIMER_8_OCREF_CLEAR_INPUT = 0b0111,
+				TIMER_2_INPUT_CAPTURE_3 = 0b1000,
+				TIMER_1_INPUT_CAPTURE_2 = 0b1001,
+				TIMER_17_OCREF_CLEAR_INPUT = 0b1010,
+				TIMER_17_BREAK_INPUT = 0b1011
+			{% endif -%}
+			};
+
+			enum InvertingInput
+			{
+				VREF_1_4 = 0b000,	// 1/4 of Vrefint
+				VREF_1_2 = 0b001,	// 1/2 of Vrefint
+				VREF_3_4 = 0b010,	// 3/4 of Vrefint
+				VREF = 0b011,		// Vrefint
+				// Common Port Aliases
+				PA4 = 0b100,
+				DAC1 = 0b100,
+				PA5 = 0b101,
+				DAC2 = 0b101,
+			{% if id == 1 -%}
+				COMP1_INM4 = 0b100,		// PA4 or DAC1 output if enabled
+				COMP1_INM5 = 0b101,		// PA5 or DAC2 output if enabled
+				COMP1_INM6 = 0b110,		// PA0
+				// Port Alias
+				PA0 = 0b110
+			{% elif id == 2 -%}
+				COMP2_INM4 = 0b100,		// PA4 or DAC1 output if enabled
+				COMP2_INM5 = 0b101,		// PA5 or DAC2 output if enabled
+				COMP2_INM6 = 0b110,		// PA2
+				// Port Alias
+				PA2 = 0b110
+			{% elif id == 3 -%}
+				COMP3_INM4 = 0b100,		// PA4 or DAC1 output if enabled
+				COMP3_INM5 = 0b101,		// PA5 or DAC2 output if enabled
+				COMP3_INM6 = 0b110,		// PD15
+				COMP3_INM7 = 0b111,		// PB12
+				// Port Aliases
+				PD15 = 0b110,
+				PB12 = 0b111
+			{% elif id == 4 -%}
+				COMP4_INM4 = 0b100,		// PA4 or DAC1 output if enabled
+				COMP4_INM5 = 0b101,		// PA5 or DAC2 output if enabled
+				COMP4_INM6 = 0b110,			// PE8
+				COMP4_INM7 = 0b111,			// PB2
+				// Port Aliases
+				PE8 = 0b110,
+				PB2 = 0b111
+			{% elif id == 5 -%}
+				COMP5_INM4 = 0b100,		// PA4 or DAC1 output if enabled
+				COMP5_INM5 = 0b101,		// PA5 or DAC2 output if enabled
+				COMP5_INM6 = 0b110,		// PD13
+				COMP5_INM7 = 0b111,		// PB10
+				// Port Aliases
+				PD13 = 0b110,
+				PB10 = 0b111
+			{% elif id == 6 -%}
+				// While they are named COMP4_.. in the reference manual, this
+				// does not make any sense and is assumed to be an error
+				COMP6_INM4 = 0b100,		// PA4 or DAC1 output if enabled
+				COMP6_INM5 = 0b101,		// PA5 or DAC2 output if enabled
+				COMP6_INM6 = 0b110,		// PD10
+				COMP6_INM7 = 0b111,		// PB15
+				// Port Aliases
+				PD10 = 0b110,
+				PB15 = 0b111
+			{% elif id == 7 -%}
+				// While they are named COMP5_.. in the reference manual, this
+				// does not make any sense and is assumed to be an error
+				COMP7_INM4 = 0b100,		// PA4 or DAC1 output if enabled
+				COMP7_INM5 = 0b101,		// PA5 or DAC2 output if enabled
+				COMP7_INM6 = 0b110,			// PC0
+				// Port Alias
+				PC0 = 0b110
+			{% endif -%}
+			};
+
+			enum Mode
+			{
+				ULTRA_LOW_POWER = 0b00,
+				LOW_POWER = 0b01,
+				MEDIUM_POWER = 0b10,
+				HIGH_SPEED = 0b11
+			};
+
+		public:
+
+			/**
+			 * \brief	Locks the comparator. 
+			 *
+			 * Comparator can only be unlocked by a system reset.
+			 */
+			static void
+			lock(void);
+
+			/**
+			 * \brief	Returns the current Comparator output.
+			 */
+			static uint8_t
+			getOutput();
+
+
+		};
+	}
+}
+
+#endif	//  XPCC_STM32__COMP{{ id }}_HPP
