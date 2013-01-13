@@ -86,7 +86,7 @@ xpcc::stm32::BufferedFlowUsart3::configurePins(Mapping mapping)
 	RCC->APB1ENR |= RCC_APB1ENR_USART3EN;
 	
 	// Initialize IO pins
-#if defined(STM32F2XX) || defined(STM32F4XX)
+#if defined(STM32F2XX) || defined(STM32F3XX) || defined(STM32F4XX)
 	if (mapping == REMAP_PB10_PB11) {
 		TxdB10::setAlternateFunction(AF_USART3, xpcc::stm32::PUSH_PULL);
 		RxdB11::setAlternateFunction(AF_USART3);
@@ -99,7 +99,8 @@ xpcc::stm32::BufferedFlowUsart3::configurePins(Mapping mapping)
 		TxdD8::setAlternateFunction(AF_USART3, xpcc::stm32::PUSH_PULL);
 		RxdD9::setAlternateFunction(AF_USART3);
 	}
-#else
+#elif defined(STM32F10X) || defined(STM32F10X_HD) || defined(STM32F10X_XL) \
+	|| defined(STM32F10X_CL)
 	AFIO->MAPR = (AFIO->MAPR & ~AFIO_MAPR_USART3_REMAP) | mapping;
 	if (mapping == REMAP_PB10_PB11) {
 		TxdB10::setAlternateFunction(xpcc::stm32::PUSH_PULL);
@@ -113,14 +114,37 @@ xpcc::stm32::BufferedFlowUsart3::configurePins(Mapping mapping)
 		TxdD8::setAlternateFunction(xpcc::stm32::PUSH_PULL);
 		RxdD9::setInput();
 	}
+#else
+#  error "Unknown CPU Type. Please define STM32F10X_.., STM32F2XX, STM32F3XX or STM32F4XX"
 #endif
 }
 
 // ----------------------------------------------------------------------------
+#if defined(STM32F3XX)
+	#define USART_SR_RXNE USART_ISR_RXNE
+	#define USART_SR_TXE  USART_ISR_TXE
+
+	// new register names for STM32F3 series
+	#define USART3_SR \
+		USART3->ISR
+	#define USART3_RDR \
+		USART3->RDR
+	#define USART3_TDR \
+		USART3->TDR
+
+#else
+	#define USART3_SR \
+		USART3->SR
+	#define USART3_RDR \
+		USART3->DR
+	#define USART3_TDR \
+		USART3->DR
+#endif
+
 extern "C" void
 USART3_IRQHandler()
 {
-	uint32_t state = USART3->SR;
+	uint32_t state = USART3_SR;
 	
 	// Read Data Register not empty 
 	if (state & USART_SR_RXNE)
@@ -129,7 +153,7 @@ USART3_IRQHandler()
 		// error |= USART3_STATUS & (USART_FERR_bm | USART_BUFOVF_bm | USART_PERR_bm);
 		
 		// Then read the buffer (read from DR clears the RXNE flag)
-		uint8_t data = USART3->DR;
+		uint8_t data = USART3_RDR;
 		
 		if (!rxBuffer.push(data))
 		{
@@ -169,7 +193,7 @@ USART3_IRQHandler()
 				// RTS of remote device low: ready to receive new data.
 				// get one byte from buffer and write it to the UART buffer
 				// which starts the transmission
-				USART3->DR = txBuffer.get();
+				USART3_TDR = txBuffer.get();
 				txBuffer.pop();
 			} // CTS
 		} // txBuffer

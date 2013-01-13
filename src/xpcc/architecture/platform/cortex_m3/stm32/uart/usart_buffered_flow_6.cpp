@@ -85,7 +85,7 @@ xpcc::stm32::BufferedFlowUsart6::configurePins(Mapping mapping)
 	RCC->APB2ENR |= RCC_APB2ENR_USART6EN;
 	
 	// Initialize IO pins
-#if defined(STM32F2XX) || defined(STM32F4XX)
+#if defined(STM32F2XX) || defined(STM32F3XX) || defined(STM32F4XX)
 	if (mapping == REMAP_PC6_PC7) {
 		TxdC6::setAlternateFunction(AF_USART6, xpcc::stm32::PUSH_PULL);
 		RxdC7::setAlternateFunction(AF_USART6);
@@ -94,17 +94,41 @@ xpcc::stm32::BufferedFlowUsart6::configurePins(Mapping mapping)
 		TxdG14::setAlternateFunction(AF_USART6, xpcc::stm32::PUSH_PULL);
 		RxdG9::setAlternateFunction(AF_USART6);
 	}
-#else
+#elif defined(STM32F10X) || defined(STM32F10X_HD) || defined(STM32F10X_XL) \
+	|| defined(STM32F10X_CL)
 	AFIO->MAPR = (AFIO->MAPR & ~AFIO_MAPR_USART6_REMAP) | mapping;
 	
+#else
+#  error "Unknown CPU Type. Please define STM32F10X_.., STM32F2XX, STM32F3XX or STM32F4XX"
 #endif
 }
 
 // ----------------------------------------------------------------------------
+#if defined(STM32F3XX)
+	#define USART_SR_RXNE USART_ISR_RXNE
+	#define USART_SR_TXE  USART_ISR_TXE
+
+	// new register names for STM32F3 series
+	#define USART6_SR \
+		USART6->ISR
+	#define USART6_RDR \
+		USART6->RDR
+	#define USART6_TDR \
+		USART6->TDR
+
+#else
+	#define USART6_SR \
+		USART6->SR
+	#define USART6_RDR \
+		USART6->DR
+	#define USART6_TDR \
+		USART6->DR
+#endif
+
 extern "C" void
 USART6_IRQHandler()
 {
-	uint32_t state = USART6->SR;
+	uint32_t state = USART6_SR;
 	
 	// Read Data Register not empty 
 	if (state & USART_SR_RXNE)
@@ -113,7 +137,7 @@ USART6_IRQHandler()
 		// error |= USART6_STATUS & (USART_FERR_bm | USART_BUFOVF_bm | USART_PERR_bm);
 		
 		// Then read the buffer (read from DR clears the RXNE flag)
-		uint8_t data = USART6->DR;
+		uint8_t data = USART6_RDR;
 		
 		if (!rxBuffer.push(data))
 		{
@@ -153,7 +177,7 @@ USART6_IRQHandler()
 				// RTS of remote device low: ready to receive new data.
 				// get one byte from buffer and write it to the UART buffer
 				// which starts the transmission
-				USART6->DR = txBuffer.get();
+				USART6_TDR = txBuffer.get();
 				txBuffer.pop();
 			} // CTS
 		} // txBuffer

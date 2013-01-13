@@ -64,7 +64,7 @@ xpcc::stm32::Usart3::configurePins(Mapping mapping)
 	RCC->APB1ENR |= RCC_APB1ENR_USART3EN;
 	
 	// Initialize IO pins
-#if defined(STM32F2XX) || defined(STM32F4XX)
+#if defined(STM32F2XX) || defined(STM32F3XX) || defined(STM32F4XX)
 	if (mapping == REMAP_PB10_PB11) {
 		TxdB10::setAlternateFunction(AF_USART3, xpcc::stm32::PUSH_PULL);
 		RxdB11::setAlternateFunction(AF_USART3);
@@ -77,7 +77,8 @@ xpcc::stm32::Usart3::configurePins(Mapping mapping)
 		TxdD8::setAlternateFunction(AF_USART3, xpcc::stm32::PUSH_PULL);
 		RxdD9::setAlternateFunction(AF_USART3);
 	}
-#else
+#elif defined(STM32F10X) || defined(STM32F10X_HD) || defined(STM32F10X_XL) \
+	|| defined(STM32F10X_CL)
 	AFIO->MAPR = (AFIO->MAPR & ~AFIO_MAPR_USART3_REMAP) | mapping;
 	if (mapping == REMAP_PB10_PB11) {
 		TxdB10::setAlternateFunction(xpcc::stm32::PUSH_PULL);
@@ -91,6 +92,8 @@ xpcc::stm32::Usart3::configurePins(Mapping mapping)
 		TxdD8::setAlternateFunction(xpcc::stm32::PUSH_PULL);
 		RxdD9::setInput();
 	}
+#else
+#  error "Unknown CPU Type. Please define STM32F10X_.., STM32F2XX, STM32F3XX or STM32F4XX"
 #endif
 }
 
@@ -118,11 +121,19 @@ xpcc::stm32::Usart3::setBaudrate(uint32_t baudrate)
 void
 xpcc::stm32::Usart3::write(uint8_t data)
 {
+#if defined(STM32F3XX)
+	while (!(USART3->ISR & USART_ISR_TXE)) {
+		// wait until the data register becomes empty
+	}
+
+	USART3->TDR = data;
+#else
 	while (!(USART3->SR & USART_SR_TXE)) {
 		// wait until the data register becomes empty
 	}
 	
 	USART3->DR = data;
+#endif
 }
 
 // ----------------------------------------------------------------------------
@@ -138,12 +149,19 @@ xpcc::stm32::Usart3::write(const uint8_t *s, uint8_t n)
 bool
 xpcc::stm32::Usart3::read(uint8_t& c)
 {
+#if defined(STM32F3XX)
+	if (USART3->ISR & USART_ISR_RXNE)
+	{
+		c = USART3->RDR;
+		return true;
+	}
+#else
 	if (USART3->SR & USART_SR_RXNE)
 	{
 		c = USART3->DR;
 		return true;
 	}
-	
+#endif
 	return false;
 }
 

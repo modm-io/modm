@@ -62,7 +62,7 @@ namespace xpcc
 			
 			enum Mapping
 			{
-#if defined(STM32F2XX) || defined(STM32F4XX)
+#if defined(STM32F2XX) || defined(STM32F3XX) || defined(STM32F4XX)
 				REMAP_PC6_PC7,		///< TX mapped to PC6, RX mapped to PC7 (CK/PC8)
 				REMAP_PG14_PG9,		///< TX/PG14, RX/PG9, CK/PD10, CTS/PG13,PG15, RTS/PG8,PG12
 #else
@@ -158,7 +158,7 @@ namespace xpcc
 			
 			enum Mapping
 			{
-#if defined(STM32F2XX) || defined(STM32F4XX)
+#if defined(STM32F2XX) || defined(STM32F3XX) || defined(STM32F4XX)
 				REMAP_PC6_PC7,		///< TX mapped to PC6, RX mapped to PC7 (CK/PC8)
 				REMAP_PG14_PG9,		///< TX/PG14, RX/PG9, CK/PD10, CTS/PG13,PG15, RTS/PG8,PG12
 #else
@@ -273,7 +273,7 @@ namespace xpcc
 			
 			enum Mapping
 			{
-#if defined(STM32F2XX) || defined(STM32F4XX)
+#if defined(STM32F2XX) || defined(STM32F3XX) || defined(STM32F4XX)
 				REMAP_PC6_PC7,		///< TX mapped to PC6, RX mapped to PC7 (CK/PC8)
 				REMAP_PG14_PG9,		///< TX/PG14, RX/PG9, CK/PD10, CTS/PG13,PG15, RTS/PG8,PG12
 #else

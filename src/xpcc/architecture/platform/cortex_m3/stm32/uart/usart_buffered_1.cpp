@@ -70,7 +70,7 @@ xpcc::stm32::BufferedUsart1::configurePins(Mapping mapping)
 	RCC->APB2ENR |= RCC_APB2ENR_USART1EN;
 	
 	// Initialize IO pins
-#if defined(STM32F2XX) || defined(STM32F4XX)
+#if defined(STM32F2XX) || defined(STM32F3XX) || defined(STM32F4XX)
 	if (mapping == REMAP_PA9_PA10) {
 		TxdA9::setAlternateFunction(AF_USART1, xpcc::stm32::PUSH_PULL);
 		RxdA10::setAlternateFunction(AF_USART1);
@@ -79,7 +79,8 @@ xpcc::stm32::BufferedUsart1::configurePins(Mapping mapping)
 		TxdB6::setAlternateFunction(AF_USART1, xpcc::stm32::PUSH_PULL);
 		RxdB7::setAlternateFunction(AF_USART1);
 	}
-#else
+#elif defined(STM32F10X) || defined(STM32F10X_HD) || defined(STM32F10X_XL) \
+	|| defined(STM32F10X_CL)
 	AFIO->MAPR = (AFIO->MAPR & ~AFIO_MAPR_USART1_REMAP) | mapping;
 	if (mapping == REMAP_PA9_PA10) {
 		TxdA9::setAlternateFunction(xpcc::stm32::PUSH_PULL);
@@ -89,14 +90,38 @@ xpcc::stm32::BufferedUsart1::configurePins(Mapping mapping)
 		TxdB6::setAlternateFunction(xpcc::stm32::PUSH_PULL);
 		RxdB7::setInput();
 	}
+#else
+#  error "Unknown CPU Type. Please define STM32F10X_.., STM32F2XX, STM32F3XX or STM32F4XX"
 #endif
 }
 
 // ----------------------------------------------------------------------------
+#if defined(STM32F3XX)
+	#define USART_SR_RXNE USART_ISR_RXNE
+	#define USART_SR_TXE  USART_ISR_TXE
+
+	// new register names for STM32F3 series
+	#define USART1_SR \
+		USART1->ISR
+	#define USART1_RDR \
+		USART1->RDR
+	#define USART1_TDR \
+		USART1->TDR
+
+#else
+	#define USART1_SR \
+		USART1->SR
+	#define USART1_RDR \
+		USART1->DR
+	#define USART1_TDR \
+		USART1->DR
+#endif
+
 extern "C" void
 USART1_IRQHandler()
 {
-	uint32_t state = USART1->SR;
+
+	uint32_t state = USART1_SR;
 	
 	// Read Data Register not empty 
 	if (state & USART_SR_RXNE)
@@ -105,7 +130,7 @@ USART1_IRQHandler()
 		// error |= USART1_STATUS & (USART_FERR_bm | USART_BUFOVF_bm | USART_PERR_bm);
 		
 		// Then read the buffer (read from DR clears the RXNE flag)
-		uint8_t data = USART1->DR;
+		uint8_t data = USART1_RDR;
 		
 		rxBuffer.push(data);
 	}
@@ -121,7 +146,7 @@ USART1_IRQHandler()
 		else {
 			// get one byte from buffer and write it to the UART buffer
 			// which starts the transmission
-			USART1->DR = txBuffer.get();
+			USART1_TDR = txBuffer.get();
 			txBuffer.pop();
 		}
 	}

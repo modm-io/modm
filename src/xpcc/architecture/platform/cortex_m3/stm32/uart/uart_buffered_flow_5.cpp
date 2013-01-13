@@ -49,7 +49,9 @@
     (UART5_CTS_PORT != -1) */
 
 #if defined(STM32F10X_HD) || defined(STM32F10X_XL) || defined(STM32F10X_CL) || \
-	defined(STM32F2XX) || defined(STM32F4XX)
+	defined(STM32F2XX) || defined(STM32F3XXV) || defined(STM32F4XX)
+// only devices with 100 pins have Port D and therefore UART5
+
 
 namespace
 {
@@ -81,7 +83,7 @@ xpcc::stm32::BufferedFlowUart5::configurePins(Mapping mapping)
 	RCC->APB1ENR |= RCC_APB1ENR_UART5EN;
 	
 	// Initialize IO pins
-#if defined(STM32F2XX) || defined(STM32F4XX)
+#if defined(STM32F2XX) || defined(STM32F3XX) || defined(STM32F4XX)
 	(void) mapping;		// avoid compiler warning
 	
 	TxdC12::setAlternateFunction(AF_UART5, xpcc::stm32::PUSH_PULL);
@@ -95,10 +97,31 @@ xpcc::stm32::BufferedFlowUart5::configurePins(Mapping mapping)
 }
 
 // ----------------------------------------------------------------------------
+#if defined(STM32F3XX)
+	#define USART_SR_RXNE USART_ISR_RXNE
+	#define USART_SR_TXE  USART_ISR_TXE
+
+	// new register names for STM32F3 series
+	#define UART5_SR \
+		UART5->ISR
+	#define UART5_RDR \
+		UART5->RDR
+	#define UART5_TDR \
+		UART5->TDR
+
+#else
+	#define UART5_SR \
+		UART5->SR
+	#define UART5_RDR \
+		UART5->DR
+	#define UART5_TDR \
+		UART5->DR
+#endif
+
 extern "C" void
 UART5_IRQHandler()
 {
-	uint32_t state = UART5->SR;
+	uint32_t state = UART5_SR;
 	
 	// Read Data Register not empty 
 	if (state & USART_SR_RXNE)
@@ -107,7 +130,7 @@ UART5_IRQHandler()
 		// error |= USART5_STATUS & (USART_FERR_bm | USART_BUFOVF_bm | USART_PERR_bm);
 		
 		// Then read the buffer (read from DR clears the RXNE flag)
-		uint8_t data = UART5->DR;
+		uint8_t data = UART5_RDR;
 		
 		if (!rxBuffer.push(data))
 		{
@@ -147,7 +170,7 @@ UART5_IRQHandler()
 				// RTS of remote device low: ready to receive new data.
 				// get one byte from buffer and write it to the UART buffer
 				// which starts the transmission
-				UART5->DR = txBuffer.get();
+				UART5_TDR = txBuffer.get();
 				txBuffer.pop();
 			} // CTS
 		} // txBuffer
