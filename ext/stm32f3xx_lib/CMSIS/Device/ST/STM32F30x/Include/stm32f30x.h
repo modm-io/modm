@@ -2046,7 +2046,8 @@ typedef struct
 #define COMP6_CSR_COMP6HYST             ((uint32_t)0x00030000) /*!< COMP6 hysteresis */
 #define COMP6_CSR_COMP6HYST_0           ((uint32_t)0x00010000) /*!< COMP6 hysteresis bit 0 */
 #define COMP6_CSR_COMP6HYST_1           ((uint32_t)0x00020000) /*!< COMP6 hysteresis bit 1 */
-#define COMP6_CSR_COMP6BLANKING         ((uint32_t)0x000C0000) /*!< COMP6 blanking */
+/* Adjusted from 0x000C0000 to 0x001C0000 */
+#define COMP6_CSR_COMP6BLANKING         ((uint32_t)0x001C0000) /*!< COMP6 blanking */
 #define COMP6_CSR_COMP6BLANKING_0       ((uint32_t)0x00040000) /*!< COMP6 blanking bit 0 */
 #define COMP6_CSR_COMP6BLANKING_1       ((uint32_t)0x00080000) /*!< COMP6 blanking bit 1 */
 #define COMP6_CSR_COMP6BLANKING_2       ((uint32_t)0x00100000) /*!< COMP6 blanking bit 2 */
@@ -2072,7 +2073,8 @@ typedef struct
 #define COMP7_CSR_COMP7HYST             ((uint32_t)0x00030000) /*!< COMP7 hysteresis */
 #define COMP7_CSR_COMP7HYST_0           ((uint32_t)0x00010000) /*!< COMP7 hysteresis bit 0 */
 #define COMP7_CSR_COMP7HYST_1           ((uint32_t)0x00020000) /*!< COMP7 hysteresis bit 1 */
-#define COMP7_CSR_COMP7BLANKING         ((uint32_t)0x000C0000) /*!< COMP7 blanking */
+/* Adjusted from 0x000C0000 to 0x001C0000 */
+#define COMP7_CSR_COMP7BLANKING         ((uint32_t)0x001C0000) /*!< COMP7 blanking */
 #define COMP7_CSR_COMP7BLANKING_0       ((uint32_t)0x00040000) /*!< COMP7 blanking bit 0 */
 #define COMP7_CSR_COMP7BLANKING_1       ((uint32_t)0x00080000) /*!< COMP7 blanking bit 1 */
 #define COMP7_CSR_COMP7BLANKING_2       ((uint32_t)0x00100000) /*!< COMP7 blanking bit 2 */
