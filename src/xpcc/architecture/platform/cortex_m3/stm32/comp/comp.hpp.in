@@ -46,7 +46,7 @@ namespace xpcc
 		 * @internal
 		 * @ingroup		stm32
 		 */
-		class Comp
+		class Comp{{ id }}
 		{
 		public:
 			enum Mode
@@ -198,22 +198,22 @@ namespace xpcc
 			enum NonInvertingInput
 			{
 			{% if id == 2 -%}
-				PA7 = 0b0;
+				PA7 = 0b0,
 				PA3 = COMP{{ id }}_CSR_COMP{{ id }}NONINSEL		//0b1
 			{% elif id == 3 -%}
-				PB14 = 0b0;
+				PB14 = 0b0,
 				PD14 = COMP{{ id }}_CSR_COMP{{ id }}NONINSEL	//0b1
 			{% elif id == 4 -%}
-				PB0 = 0b0;
+				PB0 = 0b0,
 				PE7 = COMP{{ id }}_CSR_COMP{{ id }}NONINSEL		//0b1
 			{% elif id == 5 -%}
-				PD12 = 0b0;
+				PD12 = 0b0,
 				PB13 = COMP{{ id }}_CSR_COMP{{ id }}NONINSEL	//0b1
 			{% elif id == 6 -%}
-				PD11 = 0b0;
+				PD11 = 0b0,
 				PB11 = COMP{{ id }}_CSR_COMP{{ id }}NONINSEL	//0b1
 			{% elif id == 7 -%}
-				PA0 = 0b0;
+				PA0 = 0b0,
 				PC1 = COMP{{ id }}_CSR_COMP{{ id }}NONINSEL		//0b1
 			{% endif -%}
 			};
@@ -382,7 +382,7 @@ namespace xpcc
 			{
 				NOT_INVERTED = 0b0,
 				INVERTED = COMP{{ id }}_CSR_COMP{{ id }}POL		//0b1
-			}
+			};
 
 			enum Hysteresis
 			{
@@ -416,11 +416,11 @@ namespace xpcc
 								COMP{{ id }}_CSR_COMP{{ id }}BLANKING_0	// 0b011
 			{% elif id == 6 -%}
 				TIMER_8_OC5 = COMP{{ id }}_CSR_COMP{{ id }}BLANKING_1,	// 0b010
-				COMP{{ id }}_CSR_COMP{{ id }}BLANKING_1 |
+				TIMER_2_OC4 = COMP{{ id }}_CSR_COMP{{ id }}BLANKING_1 |
 								COMP{{ id }}_CSR_COMP{{ id }}BLANKING_0,// 0b011
 				TIMER_15_OC2 = COMP{{ id }}_CSR_COMP{{ id }}BLANKING_2	// 0b100
 			{% elif id == 7 -%}
-				TIMER_1_OC5 = COMP{{ id }}_CSR_COMP{{ id }}BLANKING_0	// 0b001
+				TIMER_1_OC5 = COMP{{ id }}_CSR_COMP{{ id }}BLANKING_0,	// 0b001
 				TIMER_8_OC5 = COMP{{ id }}_CSR_COMP{{ id }}BLANKING_1,	// 0b010
 				TIMER_15_OC2 = COMP{{ id }}_CSR_COMP{{ id }}BLANKING_2	// 0b100
 			{% endif -%}
@@ -442,11 +442,11 @@ namespace xpcc
 					{% if id > 1 -%}
 						NonInvertingInput p_in,
 					{% endif -%}
-						Output out = Output:NOT_CONNECTED,
-						Hysteresis hyst = Hysteresis:NO_HYSTERESIS,
-						Mode mode = Mode:HIGH_SPEED,
-						Polarity pol = Polarity:NOT_INVERTED,
-						bool lock = false)
+						Output out = Output::NOT_CONNECTED,
+						Hysteresis hyst = Hysteresis::NO_HYSTERESIS,
+						Mode mode = Mode::HIGH_SPEED,
+						Polarity pol = Polarity::NOT_INVERTED,
+						bool lock_comp = false)
 			{
 				setInvertingInput(n_in);
 			{% if id > 1 -%}
@@ -457,7 +457,7 @@ namespace xpcc
 				setMode(mode);
 				setPolarity(pol);
 				setEnabled(true);	// enable comparator
-				if(lock) lock();
+				if(lock_comp) lock();
 			}
 			
 
@@ -466,7 +466,7 @@ namespace xpcc
 			 * \brief	Enable/Disable the comparator.
 			 */
 			static inline void
-			setEnabled(bool enabled) const
+			setEnabled(bool enabled)
 			{
 				if(enabled)
 					COMP{{ id }}->CSR |= COMP{{ id }}_CSR_COMP{{ id }}EN;
@@ -478,7 +478,7 @@ namespace xpcc
 			 * \brief	Returns whether the comparator is enabled.
 			 */
 			static inline bool
-			isEnabled() const
+			isEnabled()
 			{
 				return COMP{{ id }}->CSR & COMP{{ id }}_CSR_COMP{{ id }}EN;
 			}
@@ -491,7 +491,7 @@ namespace xpcc
 			 * and DAC out pin (PA4)
 			 */
 			static inline void
-			setSwitch1(bool closed) const
+			setSwitch1(bool closed)
 			{
 				if(closed)
 					COMP{{ id }}->CSR |= COMP{{ id }}_CSR_COMP{{ id }}SW1;
@@ -506,7 +506,7 @@ namespace xpcc
 			 * and DAC out pin (PA4)
 			 */
 			static inline bool
-			isSwitch1Closed() const
+			isSwitch1Closed()
 			{
 				return COMP{{ id }}->CSR & COMP{{ id }}_CSR_COMP{{ id }}SW1;
 			}
@@ -518,7 +518,7 @@ namespace xpcc
 			 * This setting is also called "output mode".
 			 */
 			static inline void
-			setMode(Mode mode) const
+			setMode(Mode mode)
 			{
 				COMP{{ id }}->CSR |=
 					(COMP{{ id }}->CSR & ~COMP{{ id }}_CSR_COMP{{ id }}MODE)
@@ -531,7 +531,7 @@ namespace xpcc
 			 * This setting is also called "output mode".
 			 */
 			static inline Mode
-			getMode() const
+			getMode()
 			{
 				return static_cast<Mode>
 					(COMP{{ id }}->CSR & COMP{{ id }}_CSR_COMP{{ id }}MODE);
@@ -541,7 +541,7 @@ namespace xpcc
 			 * \brief	Selects what the inverting input is connected to.
 			 */
 			static inline void
-			setInvertingInput(InvertingInput input) const
+			setInvertingInput(InvertingInput input)
 			{
 				COMP{{ id }}->CSR |=
 					(COMP{{ id }}->CSR & ~COMP{{ id }}_CSR_COMP{{ id }}INSEL)
@@ -552,7 +552,7 @@ namespace xpcc
 			 * \brief	Returns what is connected to the inverting input.
 			 */
 			static inline InvertingInput
-			getInvertingInput() const
+			getInvertingInput()
 			{
 				return static_cast<InvertingInput>
 					(COMP{{ id }}->CSR & COMP{{ id }}_CSR_COMP{{ id }}INSEL);
@@ -563,7 +563,7 @@ namespace xpcc
 			 * \brief	Selects what the non-inverting input is connected to.
 			 */
 			static inline void
-			setNonInvertingInput(NonInvertingInput input) const
+			setNonInvertingInput(NonInvertingInput input)
 			{
 				COMP{{ id }}->CSR |=
 					(COMP{{ id }}->CSR & ~COMP{{ id }}_CSR_COMP{{ id }}NONINSEL)
@@ -574,19 +574,19 @@ namespace xpcc
 			 * \brief	Returns what is connected to the non-inverting input.
 			 */
 			static inline NonInvertingInput
-			getNonInvertingInput() const
+			getNonInvertingInput()
 			{
 				return static_cast<NonInvertingInput>
 					(COMP{{ id }}->CSR & COMP{{ id }}_CSR_COMP{{ id }}NONINSEL);
 			}
 		{% endif -%}
 
-		{% if id == 2 or id == 4 or id = 6 -%}
+		{% if id == 2 or id == 4 or id == 6 -%}
 			/**
 			 * \brief Enable/Disable window mode for COMP{{ (id-1) }}/{{ id }}.
 			 */
 			static inline void
-			setWindowMode(bool enabled) const
+			setWindowMode(bool enabled)
 			{
 				if(enabled)
 					COMP{{ id }}->CSR |= COMP{{ id }}_CSR_COMP{{ id }}WNDWEN;
@@ -598,7 +598,7 @@ namespace xpcc
 			 * \brief Returns true if win mode for COMP{{ (id-1) }}/{{ id }} on.
 			 */
 			static inline bool
-			isWindowModeEnabled() const
+			isWindowModeEnabled()
 			{
 				return COMP{{ id }}->CSR & COMP{{ id }}_CSR_COMP{{ id }}WNDWEN;
 			}
@@ -608,7 +608,7 @@ namespace xpcc
 			 * \brief	Selects what the output is connected to.
 			 */
 			static inline void
-			setOutputSelection(Output output) const
+			setOutputSelection(Output output)
 			{
 				COMP{{ id }}->CSR |=
 					(COMP{{ id }}->CSR & ~COMP{{ id }}_CSR_COMP{{ id }}OUTSEL)
@@ -619,7 +619,7 @@ namespace xpcc
 			 * \brief	Returns what is connected to the output.
 			 */
 			static inline Output
-			getOutputSelection() const
+			getOutputSelection()
 			{
 				return static_cast<Output>
 					(COMP{{ id }}->CSR & COMP{{ id }}_CSR_COMP{{ id }}OUTSEL);
@@ -629,7 +629,7 @@ namespace xpcc
 			 * \brief	Selects output polarity.
 			 */
 			static inline void
-			setPolarity(Polarity pol) const
+			setPolarity(Polarity pol)
 			{
 				COMP{{ id }}->CSR |=
 					(COMP{{ id }}->CSR & ~COMP{{ id }}_CSR_COMP{{ id }}POL)
@@ -640,7 +640,7 @@ namespace xpcc
 			 * \brief	Returns output polarity.
 			 */
 			static inline Polarity
-			getPolarity() const
+			getPolarity()
 			{
 				return static_cast<Polarity>
 					(COMP{{ id }}->CSR & COMP{{ id }}_CSR_COMP{{ id }}POL);
@@ -650,7 +650,7 @@ namespace xpcc
 			 * \brief	Selects the hysteresis.
 			 */
 			static inline void
-			setHysteresis(Hysteresis hyst) const
+			setHysteresis(Hysteresis hyst)
 			{
 				COMP{{ id }}->CSR |=
 					(COMP{{ id }}->CSR & ~COMP{{ id }}_CSR_COMP{{ id }}HYST)
@@ -661,7 +661,7 @@ namespace xpcc
 			 * \brief	Returns the hysteresis.
 			 */
 			static inline Hysteresis
-			getHysteresis() const
+			getHysteresis()
 			{
 				return static_cast<Hysteresis>
 					(COMP{{ id }}->CSR & COMP{{ id }}_CSR_COMP{{ id }}HYST);
@@ -671,18 +671,18 @@ namespace xpcc
 			 * \brief	Selects the blanking source.
 			 */
 			static inline void
-			setBlankingSource(BlankingSource blanking) const
+			setBlankingSource(BlankingSource blanking)
 			{
 				COMP{{ id }}->CSR |=
 					(COMP{{ id }}->CSR & ~COMP{{ id }}_CSR_COMP{{ id }}BLANKING)
-					| static_cast<uint32_t>(hyst);
+					| static_cast<uint32_t>(blanking);
 			}
 
 			/**.
 			 * \brief	Returns the blanking source.
 			 */
 			static inline BlankingSource
-			getBlankingSource() const
+			getBlankingSource()
 			{
 				return static_cast<BlankingSource>
 					(COMP{{ id }}->CSR & COMP{{ id }}_CSR_COMP{{ id }}BLANKING);
@@ -691,8 +691,8 @@ namespace xpcc
 			/**
 			 * \brief	Returns the current Comparator output.
 			 */
-			static bool
-			getOutput() const
+			static inline bool
+			getOutput()
 			{
 				return COMP{{ id }}->CSR & COMP{{ id }}_CSR_COMP{{ id }}OUT;
 			}
@@ -702,8 +702,8 @@ namespace xpcc
 			 *
 			 * Comparator can only be unlocked by a system reset.
 			 */
-			static void
-			lock(void) const
+			static inline void
+			lock(void)
 			{
 				COMP{{ id }}->CSR |= COMP{{ id }}_CSR_COMP{{ id }}LOCK;
 			}
@@ -711,8 +711,8 @@ namespace xpcc
 			/**
 			 * \brief	Returns true if the comparator is locked.
 			 */
-			static bool
-			isLocked(void) const
+			static inline bool
+			isLocked(void)
 			{
 				return COMP{{ id }}->CSR & COMP{{ id }}_CSR_COMP{{ id }}LOCK;
 			}
