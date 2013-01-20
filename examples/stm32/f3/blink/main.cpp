@@ -45,6 +45,9 @@ MAIN_FUNCTION
 	uart.configurePins(Usart2::Mapping::REMAP_PB3_PB4);
 	uart.write('k');
 
+	// COMP1 compile test
+	Comp1::initialize(Comp1::InvertingInput::VREF);
+
 	while (1)
 	{
 		LedBlue::toggle();
