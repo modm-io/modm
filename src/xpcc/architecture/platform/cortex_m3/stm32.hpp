@@ -97,6 +97,17 @@
 #include "stm32/uart/uart_5.hpp"
 #endif
 
+// COMP1-7 only available on STM32F3 series
+#if defined(STM32F3XX)
+#include "stm32/comp/comp_1.hpp"
+#include "stm32/comp/comp_2.hpp"
+#include "stm32/comp/comp_3.hpp"
+#include "stm32/comp/comp_4.hpp"
+#include "stm32/comp/comp_5.hpp"
+#include "stm32/comp/comp_6.hpp"
+#include "stm32/comp/comp_7.hpp"
+#endif
+
 
 // Other hardware, not yet implemented for F3
 #if defined(STM32F10X) || defined(STM32F2XX) || defined(STM32F4XX)

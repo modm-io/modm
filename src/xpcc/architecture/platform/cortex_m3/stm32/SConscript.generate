@@ -79,4 +79,7 @@ generator = env['TemplateGenerator'](env, 'can')
 for id in [1, 2]:
 	generator.template('can_%i.hpp' % id, 'can.hpp.in', { 'id': id })
 	generator.template('can_%i.cpp' % id, 'can.cpp.in', { 'id': id })
-	
+
+generator = env['TemplateGenerator'](env, 'comp')
+for id in [1, 2, 3, 4, 5, 6, 7]:
+	generator.template('comp_%i.hpp' % id, 'comp.hpp.in', { 'id': id })
