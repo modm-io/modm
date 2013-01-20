@@ -32,6 +32,7 @@
 #ifndef XPCC_STM32__COMP{{ id }}_HPP
 #define XPCC_STM32__COMP{{ id }}_HPP
 
+#if defined(STM32F3XX)
 namespace xpcc
 {
 	namespace stm32
@@ -48,47 +49,175 @@ namespace xpcc
 		class Comp
 		{
 		public:
-			enum BlankingSource
+			enum Mode
 			{
-				NO_BLANKING = 0b000,
-			{% if id <= 2 -%}
-				TIMER_1_OC5 = COMP{{ id }}_CSR_COMP{{ id }}BLANKING_0,	// 0b001
-				TIMER_2_OC3 = COMP{{ id }}_CSR_COMP{{ id }}BLANKING_1,	// 0b010
-				TIMER_3_OC3 = COMP{{ id }}_CSR_COMP{{ id }}BLANKING_1 |
-								COMP{{ id }}_CSR_COMP{{ id }}BLANKING_0	// 0b011
+				ULTRA_LOW_POWER = 0b00,
+				LOW_POWER = COMP{{ id }}_CSR_COMP{{ id }}MODE_0,		//0b01
+				MEDIUM_POWER = COMP{{ id }}_CSR_COMP{{ id }}MODE_1,		//0b10
+				HIGH_SPEED = 	COMP{{ id }}_CSR_COMP{{ id }}MODE_0 |
+								COMP{{ id }}_CSR_COMP{{ id }}MODE_1		//0b11
+			};
+
+			enum InvertingInput
+			{
+				VREF_1_4 = 0b000,	//0b000 1/4 of Vrefint
+				VREF_1_2 =			// 1/2 of Vrefint
+							COMP{{ id }}_CSR_COMP{{ id }}INSEL_0,	//0b001
+				VREF_3_4 =			// 3/4 of Vrefint
+							COMP{{ id }}_CSR_COMP{{ id }}INSEL_1,	//0b010
+				VREF = 				// Vrefint
+							COMP{{ id }}_CSR_COMP{{ id }}INSEL_1 |
+							COMP{{ id }}_CSR_COMP{{ id }}INSEL_0,	//0b011
+				// Common Port Aliases
+				PA4 =	COMP{{ id }}_CSR_COMP{{ id }}INSEL_2,		//0b100
+				DAC1 =	COMP{{ id }}_CSR_COMP{{ id }}INSEL_2,		//0b100
+				PA5 = 	COMP{{ id }}_CSR_COMP{{ id }}INSEL_2 |
+						COMP{{ id }}_CSR_COMP{{ id }}INSEL_0,		//0b101
+				DAC2 = 	COMP{{ id }}_CSR_COMP{{ id }}INSEL_2 |
+						COMP{{ id }}_CSR_COMP{{ id }}INSEL_0,		//0b101
+			{% if id == 1 -%}
+				// PA4 or DAC1 output if enabled
+				COMP1_INM4 = 	COMP{{ id }}_CSR_COMP{{ id }}INSEL_2,	//0b100
+				// PA5 or DAC2 output if enabled
+				COMP1_INM5 = 	COMP{{ id }}_CSR_COMP{{ id }}INSEL_2 |
+								COMP{{ id }}_CSR_COMP{{ id }}INSEL_0,	//0b101
+				// PA0
+				COMP1_INM6 = 	COMP{{ id }}_CSR_COMP{{ id }}INSEL_2 |
+								COMP{{ id }}_CSR_COMP{{ id }}INSEL_1,	//0b110
+				// Port Alias
+				PA0 = 			COMP{{ id }}_CSR_COMP{{ id }}INSEL_2 |
+								COMP{{ id }}_CSR_COMP{{ id }}INSEL_1	//0b110
+			{% elif id == 2 -%}
+				// PA4 or DAC1 output if enabled
+				COMP2_INM4 = 	COMP{{ id }}_CSR_COMP{{ id }}INSEL_2,	//0b100
+				// PA5 or DAC2 output if enabled
+				COMP2_INM5 = 	COMP{{ id }}_CSR_COMP{{ id }}INSEL_2 |
+								COMP{{ id }}_CSR_COMP{{ id }}INSEL_0,	//0b101
+				// PA2
+				COMP2_INM6 = 	COMP{{ id }}_CSR_COMP{{ id }}INSEL_2 |
+								COMP{{ id }}_CSR_COMP{{ id }}INSEL_1,	//0b110
+				// Port Alias
+				PA2 = 			COMP{{ id }}_CSR_COMP{{ id }}INSEL_2 |
+								COMP{{ id }}_CSR_COMP{{ id }}INSEL_1	//0b110
 			{% elif id == 3 -%}
-				TIMER_1_OC5 = COMP{{ id }}_CSR_COMP{{ id }}BLANKING_0,	// 0b001
-				TIMER_2_OC4 = COMP{{ id }}_CSR_COMP{{ id }}BLANKING_1 |
-								COMP{{ id }}_CSR_COMP{{ id }}BLANKING_0	// 0b011
+				// PA4 or DAC1 output if enabled
+				COMP3_INM4 = 	COMP{{ id }}_CSR_COMP{{ id }}INSEL_2,	//0b100
+				// PA5 or DAC2 output if enabled
+				COMP3_INM5 = 	COMP{{ id }}_CSR_COMP{{ id }}INSEL_2 |
+								COMP{{ id }}_CSR_COMP{{ id }}INSEL_0,	//0b101
+				// PD15
+				COMP3_INM6 = 	COMP{{ id }}_CSR_COMP{{ id }}INSEL_2 |
+								COMP{{ id }}_CSR_COMP{{ id }}INSEL_1,	//0b110
+				// PB12
+				COMP3_INM7 = 	COMP{{ id }}_CSR_COMP{{ id }}INSEL_2 |
+								COMP{{ id }}_CSR_COMP{{ id }}INSEL_1 |
+								COMP{{ id }}_CSR_COMP{{ id }}INSEL_0,	//0b111
+				// Port Alias
+				PD15 = 			COMP{{ id }}_CSR_COMP{{ id }}INSEL_2 |
+								COMP{{ id }}_CSR_COMP{{ id }}INSEL_1,	//0b110
+				PB12 = 			COMP{{ id }}_CSR_COMP{{ id }}INSEL_2 |
+								COMP{{ id }}_CSR_COMP{{ id }}INSEL_1 |
+								COMP{{ id }}_CSR_COMP{{ id }}INSEL_0	//0b111
 			{% elif id == 4 -%}
-				TIMER_3_OC4 = COMP{{ id }}_CSR_COMP{{ id }}BLANKING_0,	// 0b001
-				TIMER_8_OC5 = COMP{{ id }}_CSR_COMP{{ id }}BLANKING_1,	// 0b010
-				TIMER_15_OC1 = COMP{{ id }}_CSR_COMP{{ id }}BLANKING_1 |
-								COMP{{ id }}_CSR_COMP{{ id }}BLANKING_0	// 0b011
+				// PA4 or DAC1 output if enabled
+				COMP4_INM4 = 	COMP{{ id }}_CSR_COMP{{ id }}INSEL_2,	//0b100
+				// PA5 or DAC2 output if enabled
+				COMP4_INM5 = 	COMP{{ id }}_CSR_COMP{{ id }}INSEL_2 |
+								COMP{{ id }}_CSR_COMP{{ id }}INSEL_0,	//0b101
+				// PE8
+				COMP4_INM6 = 	COMP{{ id }}_CSR_COMP{{ id }}INSEL_2 |
+								COMP{{ id }}_CSR_COMP{{ id }}INSEL_1,	//0b110
+				// PB2
+				COMP4_INM7 = 	COMP{{ id }}_CSR_COMP{{ id }}INSEL_2 |
+								COMP{{ id }}_CSR_COMP{{ id }}INSEL_1 |
+								COMP{{ id }}_CSR_COMP{{ id }}INSEL_0,	//0b111
+				// Port Alias
+				PE8 = 			COMP{{ id }}_CSR_COMP{{ id }}INSEL_2 |
+								COMP{{ id }}_CSR_COMP{{ id }}INSEL_1,	//0b110
+				PB2 = 			COMP{{ id }}_CSR_COMP{{ id }}INSEL_2 |
+								COMP{{ id }}_CSR_COMP{{ id }}INSEL_1 |
+								COMP{{ id }}_CSR_COMP{{ id }}INSEL_0	//0b111
 			{% elif id == 5 -%}
-				TIMER_8_OC5 = COMP{{ id }}_CSR_COMP{{ id }}BLANKING_1,	// 0b010
-				TIMER_3_OC3 = COMP{{ id }}_CSR_COMP{{ id }}BLANKING_1 |
-								COMP{{ id }}_CSR_COMP{{ id }}BLANKING_0	// 0b011
+				// PA4 or DAC1 output if enabled
+				COMP5_INM4 = 	COMP{{ id }}_CSR_COMP{{ id }}INSEL_2,	//0b100
+				// PA5 or DAC2 output if enabled
+				COMP5_INM5 = 	COMP{{ id }}_CSR_COMP{{ id }}INSEL_2 |
+								COMP{{ id }}_CSR_COMP{{ id }}INSEL_0,	//0b101
+				// PD13
+				COMP5_INM6 = 	COMP{{ id }}_CSR_COMP{{ id }}INSEL_2 |
+								COMP{{ id }}_CSR_COMP{{ id }}INSEL_1,	//0b110
+				// PB10
+				COMP5_INM7 = 	COMP{{ id }}_CSR_COMP{{ id }}INSEL_2 |
+								COMP{{ id }}_CSR_COMP{{ id }}INSEL_1 |
+								COMP{{ id }}_CSR_COMP{{ id }}INSEL_0,	//0b111
+				// Port Alias
+				PD13 = 			COMP{{ id }}_CSR_COMP{{ id }}INSEL_2 |
+								COMP{{ id }}_CSR_COMP{{ id }}INSEL_1,	//0b110
+				PB10 = 			COMP{{ id }}_CSR_COMP{{ id }}INSEL_2 |
+								COMP{{ id }}_CSR_COMP{{ id }}INSEL_1 |
+								COMP{{ id }}_CSR_COMP{{ id }}INSEL_0	//0b111
 			{% elif id == 6 -%}
-				TIMER_8_OC5 = COMP{{ id }}_CSR_COMP{{ id }}BLANKING_1,	// 0b010
-				COMP{{ id }}_CSR_COMP{{ id }}BLANKING_1 |
-								COMP{{ id }}_CSR_COMP{{ id }}BLANKING_0,// 0b011
-				TIMER_15_OC2 = COMP{{ id }}_CSR_COMP{{ id }}BLANKING_2	// 0b100
+				// While they are named COMP4_.. in the reference manual, this
+				// does not make any sense and is assumed to be an error
+				// PA4 or DAC1 output if enabled
+				COMP6_INM4 = 	COMP{{ id }}_CSR_COMP{{ id }}INSEL_2,	//0b100
+				// PA5 or DAC2 output if enabled
+				COMP6_INM5 = 	COMP{{ id }}_CSR_COMP{{ id }}INSEL_2 |
+								COMP{{ id }}_CSR_COMP{{ id }}INSEL_0,	//0b101
+				// PD10
+				COMP6_INM6 = 	COMP{{ id }}_CSR_COMP{{ id }}INSEL_2 |
+								COMP{{ id }}_CSR_COMP{{ id }}INSEL_1,	//0b110
+				// PB15
+				COMP6_INM7 = 	COMP{{ id }}_CSR_COMP{{ id }}INSEL_2 |
+								COMP{{ id }}_CSR_COMP{{ id }}INSEL_1 |
+								COMP{{ id }}_CSR_COMP{{ id }}INSEL_0,	//0b111
+				// Port Alias
+				PD10 = 			COMP{{ id }}_CSR_COMP{{ id }}INSEL_2 |
+								COMP{{ id }}_CSR_COMP{{ id }}INSEL_1,	//0b110
+				PB15 = 			COMP{{ id }}_CSR_COMP{{ id }}INSEL_2 |
+								COMP{{ id }}_CSR_COMP{{ id }}INSEL_1 |
+								COMP{{ id }}_CSR_COMP{{ id }}INSEL_0	//0b111
 			{% elif id == 7 -%}
-				TIMER_1_OC5 = COMP{{ id }}_CSR_COMP{{ id }}BLANKING_0	// 0b001
-				TIMER_8_OC5 = COMP{{ id }}_CSR_COMP{{ id }}BLANKING_1,	// 0b010
-				TIMER_15_OC2 = COMP{{ id }}_CSR_COMP{{ id }}BLANKING_2	// 0b100
+				// While they are named COMP5_.. in the reference manual, this
+				// does not make any sense and is assumed to be an error
+				// PA4 or DAC1 output if enabled
+				COMP7_INM4 = 	COMP{{ id }}_CSR_COMP{{ id }}INSEL_2,	//0b100
+				// PA5 or DAC2 output if enabled
+				COMP7_INM5 = 	COMP{{ id }}_CSR_COMP{{ id }}INSEL_2 |
+								COMP{{ id }}_CSR_COMP{{ id }}INSEL_0,	//0b101
+				// PC0
+				COMP7_INM6 = 	COMP{{ id }}_CSR_COMP{{ id }}INSEL_2 |
+								COMP{{ id }}_CSR_COMP{{ id }}INSEL_1,	//0b110
+				// Port Alias
+				PC0 = 			COMP{{ id }}_CSR_COMP{{ id }}INSEL_2 |
+								COMP{{ id }}_CSR_COMP{{ id }}INSEL_1	//0b110
 			{% endif -%}
 			};
 
-			enum Hysteresis
+{% if id > 1 -%}
+			enum NonInvertingInput
 			{
-				NO_HYSTERESIS = 0b00,
-				LOW_HYSTERESIS = COMP{{ id }}_CSR_COMP{{ id }}HYST_0,	//0b01
-				MEDIUM_HYSTERESIS = COMP{{ id }}_CSR_COMP{{ id }}HYST_1,//0b10
-				HIGH_HYSTERESIS = COMP{{ id }}_CSR_COMP{{ id }}HYST_1 |
-									COMP{{ id }}_CSR_COMP{{ id }}HYST_0	//0b11
+			{% if id == 2 -%}
+				PA7 = 0b0;
+				PA3 = COMP{{ id }}_CSR_COMP{{ id }}NONINSEL		//0b1
+			{% elif id == 3 -%}
+				PB14 = 0b0;
+				PD14 = COMP{{ id }}_CSR_COMP{{ id }}NONINSEL	//0b1
+			{% elif id == 4 -%}
+				PB0 = 0b0;
+				PE7 = COMP{{ id }}_CSR_COMP{{ id }}NONINSEL		//0b1
+			{% elif id == 5 -%}
+				PD12 = 0b0;
+				PB13 = COMP{{ id }}_CSR_COMP{{ id }}NONINSEL	//0b1
+			{% elif id == 6 -%}
+				PD11 = 0b0;
+				PB11 = COMP{{ id }}_CSR_COMP{{ id }}NONINSEL	//0b1
+			{% elif id == 7 -%}
+				PA0 = 0b0;
+				PC1 = COMP{{ id }}_CSR_COMP{{ id }}NONINSEL		//0b1
+			{% endif -%}
 			};
+{% endif -%}
 
 			enum Output
 			{
@@ -249,152 +378,324 @@ namespace xpcc
 			{% endif -%}
 			};
 
-			enum InvertingInput
+			enum Polarity
 			{
-				VREF_1_4 = 0b000,	//0b000 1/4 of Vrefint
-				VREF_1_2 =			// 1/2 of Vrefint
-							COMP{{ id }}_CSR_COMP{{ id }}INSEL_0,	//0b001
-				VREF_3_4 =			// 3/4 of Vrefint
-							COMP{{ id }}_CSR_COMP{{ id }}INSEL_1,	//0b010
-				VREF = 				// Vrefint
-							COMP{{ id }}_CSR_COMP{{ id }}INSEL_1 |
-							COMP{{ id }}_CSR_COMP{{ id }}INSEL_0,	//0b011
-				// Common Port Aliases
-				PA4 =	COMP{{ id }}_CSR_COMP{{ id }}INSEL_2,		//0b100
-				DAC1 =	COMP{{ id }}_CSR_COMP{{ id }}INSEL_2,		//0b100
-				PA5 = 	COMP{{ id }}_CSR_COMP{{ id }}INSEL_2 |
-						COMP{{ id }}_CSR_COMP{{ id }}INSEL_0,		//0b101
-				DAC2 = 	COMP{{ id }}_CSR_COMP{{ id }}INSEL_2 |
-						COMP{{ id }}_CSR_COMP{{ id }}INSEL_0,		//0b101
-			{% if id == 1 -%}
-				// PA4 or DAC1 output if enabled
-				COMP1_INM4 = 	COMP{{ id }}_CSR_COMP{{ id }}INSEL_2,	//0b100
-				// PA5 or DAC2 output if enabled
-				COMP1_INM5 = 	COMP{{ id }}_CSR_COMP{{ id }}INSEL_2 |
-								COMP{{ id }}_CSR_COMP{{ id }}INSEL_0,	//0b101
-				// PA0
-				COMP1_INM6 = 	COMP{{ id }}_CSR_COMP{{ id }}INSEL_2 |
-								COMP{{ id }}_CSR_COMP{{ id }}INSEL_1,	//0b110
-				// Port Alias
-				PA0 = 			COMP{{ id }}_CSR_COMP{{ id }}INSEL_2 |
-								COMP{{ id }}_CSR_COMP{{ id }}INSEL_1	//0b110
-			{% elif id == 2 -%}
-				// PA4 or DAC1 output if enabled
-				COMP2_INM4 = 	COMP{{ id }}_CSR_COMP{{ id }}INSEL_2,	//0b100
-				// PA5 or DAC2 output if enabled
-				COMP2_INM5 = 	COMP{{ id }}_CSR_COMP{{ id }}INSEL_2 |
-								COMP{{ id }}_CSR_COMP{{ id }}INSEL_0,	//0b101
-				// PA2
-				COMP2_INM6 = 	COMP{{ id }}_CSR_COMP{{ id }}INSEL_2 |
-								COMP{{ id }}_CSR_COMP{{ id }}INSEL_1,	//0b110
-				// Port Alias
-				PA2 = 			COMP{{ id }}_CSR_COMP{{ id }}INSEL_2 |
-								COMP{{ id }}_CSR_COMP{{ id }}INSEL_1	//0b110
+				NOT_INVERTED = 0b0,
+				INVERTED = COMP{{ id }}_CSR_COMP{{ id }}POL		//0b1
+			}
+
+			enum Hysteresis
+			{
+				NO_HYSTERESIS = 0b00,
+				LOW_HYSTERESIS = COMP{{ id }}_CSR_COMP{{ id }}HYST_0,	//0b01
+				MEDIUM_HYSTERESIS = COMP{{ id }}_CSR_COMP{{ id }}HYST_1,//0b10
+				HIGH_HYSTERESIS = COMP{{ id }}_CSR_COMP{{ id }}HYST_1 |
+									COMP{{ id }}_CSR_COMP{{ id }}HYST_0	//0b11
+			};
+
+			enum BlankingSource
+			{
+				NO_BLANKING = 0b000,
+			{% if id <= 2 -%}
+				TIMER_1_OC5 = COMP{{ id }}_CSR_COMP{{ id }}BLANKING_0,	// 0b001
+				TIMER_2_OC3 = COMP{{ id }}_CSR_COMP{{ id }}BLANKING_1,	// 0b010
+				TIMER_3_OC3 = COMP{{ id }}_CSR_COMP{{ id }}BLANKING_1 |
+								COMP{{ id }}_CSR_COMP{{ id }}BLANKING_0	// 0b011
 			{% elif id == 3 -%}
-				// PA4 or DAC1 output if enabled
-				COMP3_INM4 = 	COMP{{ id }}_CSR_COMP{{ id }}INSEL_2,	//0b100
-				// PA5 or DAC2 output if enabled
-				COMP3_INM5 = 	COMP{{ id }}_CSR_COMP{{ id }}INSEL_2 |
-								COMP{{ id }}_CSR_COMP{{ id }}INSEL_0,	//0b101
-				// PD15
-				COMP3_INM6 = 	COMP{{ id }}_CSR_COMP{{ id }}INSEL_2 |
-								COMP{{ id }}_CSR_COMP{{ id }}INSEL_1,	//0b110
-				// PB12
-				COMP3_INM7 = 	COMP{{ id }}_CSR_COMP{{ id }}INSEL_2 |
-								COMP{{ id }}_CSR_COMP{{ id }}INSEL_1 |
-								COMP{{ id }}_CSR_COMP{{ id }}INSEL_0,	//0b111
-				// Port Alias
-				PD15 = 			COMP{{ id }}_CSR_COMP{{ id }}INSEL_2 |
-								COMP{{ id }}_CSR_COMP{{ id }}INSEL_1,	//0b110
-				PB12 = 			COMP{{ id }}_CSR_COMP{{ id }}INSEL_2 |
-								COMP{{ id }}_CSR_COMP{{ id }}INSEL_1 |
-								COMP{{ id }}_CSR_COMP{{ id }}INSEL_0	//0b111
+				TIMER_1_OC5 = COMP{{ id }}_CSR_COMP{{ id }}BLANKING_0,	// 0b001
+				TIMER_2_OC4 = COMP{{ id }}_CSR_COMP{{ id }}BLANKING_1 |
+								COMP{{ id }}_CSR_COMP{{ id }}BLANKING_0	// 0b011
 			{% elif id == 4 -%}
-				// PA4 or DAC1 output if enabled
-				COMP4_INM4 = 	COMP{{ id }}_CSR_COMP{{ id }}INSEL_2,	//0b100
-				// PA5 or DAC2 output if enabled
-				COMP4_INM5 = 	COMP{{ id }}_CSR_COMP{{ id }}INSEL_2 |
-								COMP{{ id }}_CSR_COMP{{ id }}INSEL_0,	//0b101
-				// PE8
-				COMP4_INM6 = 	COMP{{ id }}_CSR_COMP{{ id }}INSEL_2 |
-								COMP{{ id }}_CSR_COMP{{ id }}INSEL_1,	//0b110
-				// PB2
-				COMP4_INM7 = 	COMP{{ id }}_CSR_COMP{{ id }}INSEL_2 |
-								COMP{{ id }}_CSR_COMP{{ id }}INSEL_1 |
-								COMP{{ id }}_CSR_COMP{{ id }}INSEL_0,	//0b111
-				// Port Alias
-				PE8 = 			COMP{{ id }}_CSR_COMP{{ id }}INSEL_2 |
-								COMP{{ id }}_CSR_COMP{{ id }}INSEL_1,	//0b110
-				PB2 = 			COMP{{ id }}_CSR_COMP{{ id }}INSEL_2 |
-								COMP{{ id }}_CSR_COMP{{ id }}INSEL_1 |
-								COMP{{ id }}_CSR_COMP{{ id }}INSEL_0	//0b111
+				TIMER_3_OC4 = COMP{{ id }}_CSR_COMP{{ id }}BLANKING_0,	// 0b001
+				TIMER_8_OC5 = COMP{{ id }}_CSR_COMP{{ id }}BLANKING_1,	// 0b010
+				TIMER_15_OC1 = COMP{{ id }}_CSR_COMP{{ id }}BLANKING_1 |
+								COMP{{ id }}_CSR_COMP{{ id }}BLANKING_0	// 0b011
 			{% elif id == 5 -%}
-				// PA4 or DAC1 output if enabled
-				COMP5_INM4 = 	COMP{{ id }}_CSR_COMP{{ id }}INSEL_2,	//0b100
-				// PA5 or DAC2 output if enabled
-				COMP5_INM5 = 	COMP{{ id }}_CSR_COMP{{ id }}INSEL_2 |
-								COMP{{ id }}_CSR_COMP{{ id }}INSEL_0,	//0b101
-				// PD13
-				COMP5_INM6 = 	COMP{{ id }}_CSR_COMP{{ id }}INSEL_2 |
-								COMP{{ id }}_CSR_COMP{{ id }}INSEL_1,	//0b110
-				// PB10
-				COMP5_INM7 = 	COMP{{ id }}_CSR_COMP{{ id }}INSEL_2 |
-								COMP{{ id }}_CSR_COMP{{ id }}INSEL_1 |
-								COMP{{ id }}_CSR_COMP{{ id }}INSEL_0,	//0b111
-				// Port Alias
-				PD13 = 			COMP{{ id }}_CSR_COMP{{ id }}INSEL_2 |
-								COMP{{ id }}_CSR_COMP{{ id }}INSEL_1,	//0b110
-				PB10 = 			COMP{{ id }}_CSR_COMP{{ id }}INSEL_2 |
-								COMP{{ id }}_CSR_COMP{{ id }}INSEL_1 |
-								COMP{{ id }}_CSR_COMP{{ id }}INSEL_0	//0b111
+				TIMER_8_OC5 = COMP{{ id }}_CSR_COMP{{ id }}BLANKING_1,	// 0b010
+				TIMER_3_OC3 = COMP{{ id }}_CSR_COMP{{ id }}BLANKING_1 |
+								COMP{{ id }}_CSR_COMP{{ id }}BLANKING_0	// 0b011
 			{% elif id == 6 -%}
-				// While they are named COMP4_.. in the reference manual, this
-				// does not make any sense and is assumed to be an error
-				// PA4 or DAC1 output if enabled
-				COMP6_INM4 = 	COMP{{ id }}_CSR_COMP{{ id }}INSEL_2,	//0b100
-				// PA5 or DAC2 output if enabled
-				COMP6_INM5 = 	COMP{{ id }}_CSR_COMP{{ id }}INSEL_2 |
-								COMP{{ id }}_CSR_COMP{{ id }}INSEL_0,	//0b101
-				// PD10
-				COMP6_INM6 = 	COMP{{ id }}_CSR_COMP{{ id }}INSEL_2 |
-								COMP{{ id }}_CSR_COMP{{ id }}INSEL_1,	//0b110
-				// PB15
-				COMP6_INM7 = 	COMP{{ id }}_CSR_COMP{{ id }}INSEL_2 |
-								COMP{{ id }}_CSR_COMP{{ id }}INSEL_1 |
-								COMP{{ id }}_CSR_COMP{{ id }}INSEL_0,	//0b111
-				// Port Alias
-				PD10 = 			COMP{{ id }}_CSR_COMP{{ id }}INSEL_2 |
-								COMP{{ id }}_CSR_COMP{{ id }}INSEL_1,	//0b110
-				PB15 = 			COMP{{ id }}_CSR_COMP{{ id }}INSEL_2 |
-								COMP{{ id }}_CSR_COMP{{ id }}INSEL_1 |
-								COMP{{ id }}_CSR_COMP{{ id }}INSEL_0	//0b111
+				TIMER_8_OC5 = COMP{{ id }}_CSR_COMP{{ id }}BLANKING_1,	// 0b010
+				COMP{{ id }}_CSR_COMP{{ id }}BLANKING_1 |
+								COMP{{ id }}_CSR_COMP{{ id }}BLANKING_0,// 0b011
+				TIMER_15_OC2 = COMP{{ id }}_CSR_COMP{{ id }}BLANKING_2	// 0b100
 			{% elif id == 7 -%}
-				// While they are named COMP5_.. in the reference manual, this
-				// does not make any sense and is assumed to be an error
-				// PA4 or DAC1 output if enabled
-				COMP7_INM4 = 	COMP{{ id }}_CSR_COMP{{ id }}INSEL_2,	//0b100
-				// PA5 or DAC2 output if enabled
-				COMP7_INM5 = 	COMP{{ id }}_CSR_COMP{{ id }}INSEL_2 |
-								COMP{{ id }}_CSR_COMP{{ id }}INSEL_0,	//0b101
-				// PC0
-				COMP7_INM6 = 	COMP{{ id }}_CSR_COMP{{ id }}INSEL_2 |
-								COMP{{ id }}_CSR_COMP{{ id }}INSEL_1,	//0b110
-				// Port Alias
-				PC0 = 			COMP{{ id }}_CSR_COMP{{ id }}INSEL_2 |
-								COMP{{ id }}_CSR_COMP{{ id }}INSEL_1	//0b110
+				TIMER_1_OC5 = COMP{{ id }}_CSR_COMP{{ id }}BLANKING_0	// 0b001
+				TIMER_8_OC5 = COMP{{ id }}_CSR_COMP{{ id }}BLANKING_1,	// 0b010
+				TIMER_15_OC2 = COMP{{ id }}_CSR_COMP{{ id }}BLANKING_2	// 0b100
 			{% endif -%}
 			};
 
-			enum Mode
-			{
-				ULTRA_LOW_POWER = 0b00,
-				LOW_POWER = COMP{{ id }}_CSR_COMP{{ id }}MODE_0,		//0b01
-				MEDIUM_POWER = COMP{{ id }}_CSR_COMP{{ id }}MODE_1,		//0b10
-				HIGH_SPEED = 	COMP{{ id }}_CSR_COMP{{ id }}MODE_0 |
-								COMP{{ id }}_CSR_COMP{{ id }}MODE_1		//0b11
-			};
-
 		public:
+
+			/**
+			 * Initialize and enable the comparator.
+			 *
+			 * Enables the comperator and sets important values.
+			 * 
+			 * Do NOT set lock = true if you want to be able to set other values
+			 * later.
+			 */
+			static inline void
+			initialize(
+						InvertingInput n_in,
+					{% if id > 1 -%}
+						NonInvertingInput p_in,
+					{% endif -%}
+						Output out = Output:NOT_CONNECTED,
+						Hysteresis hyst = Hysteresis:NO_HYSTERESIS,
+						Mode mode = Mode:HIGH_SPEED,
+						Polarity pol = Polarity:NOT_INVERTED,
+						bool lock = false)
+			{
+				setInvertingInput(n_in);
+			{% if id > 1 -%}
+				setNonInvertingInput(p_in);
+			{% endif -%}
+				setOutputSelection(out);
+				setHysteresis(hyst);
+				setMode(mode);
+				setPolarity(pol);
+				setEnabled(true);	// enable comparator
+				if(lock) lock();
+			}
+			
+
+
+			/**
+			 * \brief	Enable/Disable the comparator.
+			 */
+			static inline void
+			setEnabled(bool enabled) const
+			{
+				if(enabled)
+					COMP{{ id }}->CSR |= COMP{{ id }}_CSR_COMP{{ id }}EN;
+				else
+					COMP{{ id }}->CSR &= ~COMP{{ id }}_CSR_COMP{{ id }}EN;
+			}
+
+			/**
+			 * \brief	Returns whether the comparator is enabled.
+			 */
+			static inline bool
+			isEnabled() const
+			{
+				return COMP{{ id }}->CSR & COMP{{ id }}_CSR_COMP{{ id }}EN;
+			}
+
+		{% if id == 1 -%}
+			/**
+			 * \brief Open/Close Switch between comp and DAC out I/O.
+			 *
+			 * This bit closes a switch between comp 1 non inverting input (PA0)
+			 * and DAC out pin (PA4)
+			 */
+			static inline void
+			setSwitch1(bool closed) const
+			{
+				if(closed)
+					COMP{{ id }}->CSR |= COMP{{ id }}_CSR_COMP{{ id }}SW1;
+				else
+					COMP{{ id }}->CSR &= ~COMP{{ id }}_CSR_COMP{{ id }}SW1;
+			}
+
+			/**
+			 * \brief Returns true if Switch is closed.
+			 *
+			 * This bit closes a switch between comp 1 non inverting input (PA0)
+			 * and DAC out pin (PA4)
+			 */
+			static inline bool
+			isSwitch1Closed() const
+			{
+				return COMP{{ id }}->CSR & COMP{{ id }}_CSR_COMP{{ id }}SW1;
+			}
+		{% endif -%}
+
+			/**
+			 * \brief	Sets the mode that determins speed/power consumption.
+			 * 
+			 * This setting is also called "output mode".
+			 */
+			static inline void
+			setMode(Mode mode) const
+			{
+				COMP{{ id }}->CSR |=
+					(COMP{{ id }}->CSR & ~COMP{{ id }}_CSR_COMP{{ id }}MODE)
+					| static_cast<uint32_t>(mode);
+			}
+
+			/**
+			 * \brief	Sets the mode that determins speed/power consumption.
+			 * 
+			 * This setting is also called "output mode".
+			 */
+			static inline Mode
+			getMode() const
+			{
+				return static_cast<Mode>
+					(COMP{{ id }}->CSR & COMP{{ id }}_CSR_COMP{{ id }}MODE);
+			}
+
+			/**
+			 * \brief	Selects what the inverting input is connected to.
+			 */
+			static inline void
+			setInvertingInput(InvertingInput input) const
+			{
+				COMP{{ id }}->CSR |=
+					(COMP{{ id }}->CSR & ~COMP{{ id }}_CSR_COMP{{ id }}INSEL)
+					| static_cast<uint32_t>(input);
+			}
+
+			/**.
+			 * \brief	Returns what is connected to the inverting input.
+			 */
+			static inline InvertingInput
+			getInvertingInput() const
+			{
+				return static_cast<InvertingInput>
+					(COMP{{ id }}->CSR & COMP{{ id }}_CSR_COMP{{ id }}INSEL);
+			}
+
+		{% if id > 1 -%}
+			/**
+			 * \brief	Selects what the non-inverting input is connected to.
+			 */
+			static inline void
+			setNonInvertingInput(NonInvertingInput input) const
+			{
+				COMP{{ id }}->CSR |=
+					(COMP{{ id }}->CSR & ~COMP{{ id }}_CSR_COMP{{ id }}NONINSEL)
+					| static_cast<uint32_t>(input);
+			}
+
+			/**.
+			 * \brief	Returns what is connected to the non-inverting input.
+			 */
+			static inline NonInvertingInput
+			getNonInvertingInput() const
+			{
+				return static_cast<NonInvertingInput>
+					(COMP{{ id }}->CSR & COMP{{ id }}_CSR_COMP{{ id }}NONINSEL);
+			}
+		{% endif -%}
+
+		{% if id == 2 or id == 4 or id = 6 -%}
+			/**
+			 * \brief Enable/Disable window mode for COMP{{ (id-1) }}/{{ id }}.
+			 */
+			static inline void
+			setWindowMode(bool enabled) const
+			{
+				if(enabled)
+					COMP{{ id }}->CSR |= COMP{{ id }}_CSR_COMP{{ id }}WNDWEN;
+				else
+					COMP{{ id }}->CSR &= ~COMP{{ id }}_CSR_COMP{{ id }}WNDWEN;
+			}
+
+			/**
+			 * \brief Returns true if win mode for COMP{{ (id-1) }}/{{ id }} on.
+			 */
+			static inline bool
+			isWindowModeEnabled() const
+			{
+				return COMP{{ id }}->CSR & COMP{{ id }}_CSR_COMP{{ id }}WNDWEN;
+			}
+		{% endif -%}
+
+			/**
+			 * \brief	Selects what the output is connected to.
+			 */
+			static inline void
+			setOutputSelection(Output output) const
+			{
+				COMP{{ id }}->CSR |=
+					(COMP{{ id }}->CSR & ~COMP{{ id }}_CSR_COMP{{ id }}OUTSEL)
+					| static_cast<uint32_t>(output);
+			}
+
+			/**.
+			 * \brief	Returns what is connected to the output.
+			 */
+			static inline Output
+			getOutputSelection() const
+			{
+				return static_cast<Output>
+					(COMP{{ id }}->CSR & COMP{{ id }}_CSR_COMP{{ id }}OUTSEL);
+			}
+
+			/**
+			 * \brief	Selects output polarity.
+			 */
+			static inline void
+			setPolarity(Polarity pol) const
+			{
+				COMP{{ id }}->CSR |=
+					(COMP{{ id }}->CSR & ~COMP{{ id }}_CSR_COMP{{ id }}POL)
+					| static_cast<uint32_t>(pol);
+			}
+
+			/**.
+			 * \brief	Returns output polarity.
+			 */
+			static inline Polarity
+			getPolarity() const
+			{
+				return static_cast<Polarity>
+					(COMP{{ id }}->CSR & COMP{{ id }}_CSR_COMP{{ id }}POL);
+			}
+
+			/**
+			 * \brief	Selects the hysteresis.
+			 */
+			static inline void
+			setHysteresis(Hysteresis hyst) const
+			{
+				COMP{{ id }}->CSR |=
+					(COMP{{ id }}->CSR & ~COMP{{ id }}_CSR_COMP{{ id }}HYST)
+					| static_cast<uint32_t>(hyst);
+			}
+
+			/**.
+			 * \brief	Returns the hysteresis.
+			 */
+			static inline Hysteresis
+			getHysteresis() const
+			{
+				return static_cast<Hysteresis>
+					(COMP{{ id }}->CSR & COMP{{ id }}_CSR_COMP{{ id }}HYST);
+			}
+
+			/**
+			 * \brief	Selects the blanking source.
+			 */
+			static inline void
+			setBlankingSource(BlankingSource blanking) const
+			{
+				COMP{{ id }}->CSR |=
+					(COMP{{ id }}->CSR & ~COMP{{ id }}_CSR_COMP{{ id }}BLANKING)
+					| static_cast<uint32_t>(hyst);
+			}
+
+			/**.
+			 * \brief	Returns the blanking source.
+			 */
+			static inline BlankingSource
+			getBlankingSource() const
+			{
+				return static_cast<BlankingSource>
+					(COMP{{ id }}->CSR & COMP{{ id }}_CSR_COMP{{ id }}BLANKING);
+			}
+
+			/**
+			 * \brief	Returns the current Comparator output.
+			 */
+			static bool
+			getOutput() const
+			{
+				return COMP{{ id }}->CSR & COMP{{ id }}_CSR_COMP{{ id }}OUT;
+			}
 
 			/**
 			 * \brief	Locks the comparator. 
@@ -402,17 +703,25 @@ namespace xpcc
 			 * Comparator can only be unlocked by a system reset.
 			 */
 			static void
-			lock(void);
+			lock(void) const
+			{
+				COMP{{ id }}->CSR |= COMP{{ id }}_CSR_COMP{{ id }}LOCK;
+			}
 
 			/**
-			 * \brief	Returns the current Comparator output.
+			 * \brief	Returns true if the comparator is locked.
 			 */
-			static uint8_t
-			getOutput();
-
-
+			static bool
+			isLocked(void) const
+			{
+				return COMP{{ id }}->CSR & COMP{{ id }}_CSR_COMP{{ id }}LOCK;
+			}
 		};
 	}
 }
+#else	// defined(STM32F3XX)
+	#  error 	"STM32F3XX not defined. Are you sure the comparator hw " \
+				"feature is enabled on you platform?"
+#endif
 
 #endif	//  XPCC_STM32__COMP{{ id }}_HPP
