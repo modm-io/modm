@@ -90,13 +90,14 @@ def toBufferMethodStructAccess(element, name=None):
 		return "%s.toBuffer(buffer)" % name
 
 # -----------------------------------------------------------------------------
-class JavaPacketsBuilder(builder_base.Builder):
+class JavaCommunicationBuilder(builder_base.Builder):
 	"""
-	Generate the whole packageset. The Output is a Java Class named Packages.java,
-	which contains as subclasses all the Packages.
+	Generate the whole communication tree. The Output is a class named
+	Communication, which contains all concrete Components. They all contain
+	methods, which are corresponding to Actions of given Components.
 	
 	A common call would be like:
-	$python java_packets.py  --outpath source/rca/robot --package rca.robot robot.xml;
+	$python java_communication.py  --outpath source/rca/robot --package rca.robot robot.xml;
 	"""
 	
 	
@@ -123,26 +124,24 @@ class JavaPacketsBuilder(builder_base.Builder):
 			'toBufferMethod': toBufferMethod,
 			'toBufferMethodStructAccess': toBufferMethodStructAccess,
 		}
-		template = self.template('templates/java_packets.tpl',
+		template = self.template('templates/java_communication.tpl',
 								filter = javaFilter)
 		
 		# Bool has a special status because its primitive but user generated
 		# and the only not numerical type
-		packets = self.tree.types
-		packets.remove('Bool')
+		components = self.tree.components
 		
 		primitives = filter.PRIMITIVES.values()
 		primitives.sort()
 		
 		substitutions = {
 			'package' : self.options.package,
-			'packets': packets,
-			'primitives': primitives,
+			'components': components,
 		}
 		
-		file = os.path.join(self.options.outpath, 'Packets.java')
+		file = os.path.join(self.options.outpath, 'Communication.java')
 		self.write(file, template.render(substitutions))
 
 # -----------------------------------------------------------------------------
 if __name__ == '__main__':
-	JavaPacketsBuilder().run()
+	JavaCommunicationBuilder().run()

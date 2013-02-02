@@ -33,6 +33,13 @@ import builder_base
 import filter.java as filter
 
 class JavaGeneratorBuilder(builder_base.Builder):
+	"""
+	Generate one Static method which is able to retrieve a Package from bytebuffer in
+	a typesafe manner based on xml communication definitions.
+	
+	A common call would be like:
+	$python java_generator.py --outpath source/rca/robot --package rca.robot robot.xml;
+	"""
 
 	VERSION = "0.1"
 	
