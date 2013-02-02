@@ -37,7 +37,7 @@ SECTIONS
 		KEEP(*(.vectors))
 		KEEP(*(.fastcode))
 		
-		*(.glue_7t)		/* TODO: are these usefull here or better only in .text? */
+		*(.glue_7t)		/* TODO: are these useful here or better only in .text? */
 		*(.glue_7)
 		
 		. = ALIGN (4);

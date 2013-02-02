@@ -251,7 +251,7 @@ namespace xpcc
 	 *     void
 	 *     doSomething(xpcc::sab::Response& response, const uint32_t* parameter)
 	 *     {
-	 *         // ... do something usefull ...
+	 *         // ... do something useful ...
 	 *         
 	 *         response.send();
 	 *     }

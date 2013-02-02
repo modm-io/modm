@@ -89,7 +89,7 @@ namespace xpcc
 		 * // start a new conversion on channel 3
 		 * xpcc::atmega:Adc::startConversion(3);
 		 * 
-		 * // do something usefull while waiting for the result 
+		 * // do something useful while waiting for the result 
 		 * while (!xpcc::atmega:Adc::isFinished())
 		 *     ;
 		 * 
