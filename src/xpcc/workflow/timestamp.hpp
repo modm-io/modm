@@ -113,7 +113,7 @@ namespace xpcc
 		}
 	
 	private:
-		uint_fast16_t time;
+		Timestamp::Type time;
 	};
 	
 	// ------------------------------------------------------------------------
