@@ -76,3 +76,6 @@ def variableName(name):
 
 def enumElement(name):
 	return name.upper().replace(' ', '_')
+
+def inStringDescription(description):
+	return "\\n".join(description.replace('"', '\\"').splitlines());
