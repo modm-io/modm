@@ -14,30 +14,30 @@ public class MetaCommunication {
 	private final Communication communication;
 	private final List<Component> components;
 	
-	public interface Action<T extends Packets.Packet> {
+	public interface Action<P extends Packets.Packet, T extends MetaPackets.Packet<P>> {
 		public String getName();
 		public String getDescription();
-		public Class<T> getParameterType();
+		public T getParameterType();
 
-		void execute(T packet);
+		void execute(P packet);
 	}
 
 	public class Component {
-		private final List<Action<?>> actions;
+		private final List<Action<?,?>> actions;
 		private String name;
 		private String description;
 		
 		public Component(String name, String description) {
 			this.name = name;
 			this.description = description;
-			this.actions = new ArrayList<MetaCommunication.Action<?>>();
+			this.actions = new ArrayList<MetaCommunication.Action<?,?>>();
 		}
 		
 		public String getName() {
 			return name;
 		}
 		
-		public Iterable<Action<?>> actions() {
+		public Iterable<Action<?,?>> actions() {
 			return Collections.unmodifiableList(actions);
 		}
 		
@@ -58,10 +58,13 @@ public class MetaCommunication {
 			components.add(c);
 			{%- for action in component.flattened().actions %}
 			c.actions.add(new MyAction<
-				{%- if action.parameterType -%}Packets.{{ action.parameterType.flattened().name | typeObjectName }}{%- else -%}Packets.Void{%- endif -%}>(
+				{% if action.parameterType -%}Packets.{{ action.parameterType.flattened().name | typeObjectName }}{%- else -%}Packets.Void{%- endif -%},
+				MetaPackets.Packet<
+				{% if action.parameterType -%}Packets.{{ action.parameterType.flattened().name | typeObjectName }}{%- else -%}Packets.Void{%- endif -%}
+				>>(
 				"{{ action.name }}",
 				"{%- if action.description -%}{{ action.description | inStringDescription }}{%- endif -%}",
-				{%- if action.parameterType -%}Packets.{{ action.parameterType.flattened().name | typeObjectName }}{%- else -%}Packets.Void{%- endif -%}.class) {
+				{% if action.parameterType -%}MetaPackets.{{ action.parameterType.flattened().name | typeObjectName }}{%- else -%}MetaPackets.Void{%- endif -%}) {
 				@Override
 				public void execute(
 				{%- if action.parameterType %}Packets.{{ action.parameterType.flattened().name | typeObjectName }}{%- else %}Packets.Void{%- endif %} packet){
@@ -77,12 +80,12 @@ public class MetaCommunication {
 		return Collections.unmodifiableList(components);
 	}
 	
-	private abstract class MyAction<T extends Packets.Packet> implements Action<T> {
+	private abstract class MyAction<P extends Packets.Packet, T extends MetaPackets.Packet<P>> implements Action<P,T> {
 		private final String name;
 		private final String description;
-		private final Class<T> parameterType;
+		private final T parameterType;
 		
-		public MyAction(String name, String description, Class<T> parameterType) {
+		public MyAction(String name, String description, T parameterType) {
 			this.name = name;
 			this.description = description;
 			this.parameterType = parameterType;
@@ -99,13 +102,13 @@ public class MetaCommunication {
 		}
 		
 		@Override
-		public Class<T> getParameterType() {
+		public T getParameterType() {
 			return parameterType;
 		}
 		
 		@Override
 		public String toString() {
-			return String.format("%s(%s)", getName(), parameterType.getSimpleName());
+			return String.format("%s(%s)", getName(), parameterType.getClass().getSimpleName());
 		}
 	}
 	
