@@ -67,7 +67,7 @@ xpcc::stm32::Timer{{ id }}::disable()
 // ----------------------------------------------------------------------------
 void
 xpcc::stm32::Timer{{ id }}::setMode(Mode mode, SlaveMode slaveMode,
-		SlaveModeTrigger slaveModeTrigger)
+		SlaveModeTrigger slaveModeTrigger, MasterMode masterMode)
 {
 	// disable timer
 	TIM{{ id }}->CR1 = 0;
@@ -83,6 +83,7 @@ xpcc::stm32::Timer{{ id }}::setMode(Mode mode, SlaveMode slaveMode,
 	
 	// ARR Register is buffered, only Under/Overflow generates update interrupt
 	TIM{{ id }}->CR1 = TIM_CR1_ARPE | TIM_CR1_URS | mode;
+	TIM{{ id }}->CR2 = masterMode;
 	TIM{{ id }}->SMCR = slaveMode | slaveModeTrigger;
 }
 
@@ -116,7 +117,7 @@ void
 xpcc::stm32::Timer{{ id }}::configureInputChannel(uint32_t channel,
 		InputCaptureMapping input, InputCapturePrescaler prescaler,
 		InputCapturePolarity polarity, uint8_t filter,
-		bool xor_ch1_3=false)
+		bool xor_ch1_3)
 {
 	channel -= 1;	// 1..4 -> 0..3
 
@@ -136,7 +137,7 @@ xpcc::stm32::Timer{{ id }}::configureInputChannel(uint32_t channel,
 
 		TIM{{ id }}->CCMR1 = flags;
 
-		if(channel == 0)
+		if(channel == 0) {
 			if(xor_ch1_3)
 				TIM{{ id }}->CR2 |= TIM_CR2_TI1S;
 			else
