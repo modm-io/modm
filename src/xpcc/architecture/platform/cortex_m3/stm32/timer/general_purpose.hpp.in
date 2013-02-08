@@ -214,7 +214,9 @@ namespace xpcc
 		public:
 			static void
 			configureInputChannel(uint32_t channel, InputCaptureMapping input,
-					InputCapturePrescaler prescaler, InputCapturePolarity polarity, uint8_t filter);
+					InputCapturePrescaler prescaler,
+					InputCapturePolarity polarity, uint8_t filter,
+					bool xor_ch1_3=false);
 			
 			static void
 			configureOutputChannel(uint32_t channel, OutputCompareMode mode,
