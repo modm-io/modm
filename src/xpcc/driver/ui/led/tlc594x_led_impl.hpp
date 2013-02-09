@@ -33,46 +33,47 @@
 #endif
 
 // ----------------------------------------------------------------------------
-template < typename PwmController, uint16_t CHANNEL, const uint16_t* PwmTable,  uint16_t const PwmTableSize >
-xpcc::led::TLC594XLed<PwmController, CHANNEL, PwmTable, PwmTableSize>::TLC594XLed()
+template < typename PwmController, const uint8_t* Channels, uint8_t const ChannelSize, const uint16_t* PwmTable,  uint16_t const PwmTableSize >
+xpcc::led::TLC594XLed<PwmController, Channels, ChannelSize, PwmTable, PwmTableSize>::TLC594XLed()
 :	currentValue(0), deltaValue(0), startValue(0), endValue(0), fadeTime(0), timer(1), table(PwmTable)
 {
-	PwmController::setChannel(CHANNEL, table[0]);
+	setChannels(0);
 }
 
-template < typename PwmController, uint16_t CHANNEL, const uint16_t* PwmTable,  uint16_t const PwmTableSize >
+template < typename PwmController, const uint8_t* Channels, uint8_t const ChannelSize, const uint16_t* PwmTable,  uint16_t const PwmTableSize >
 void
-xpcc::led::TLC594XLed<PwmController, CHANNEL, PwmTable, PwmTableSize>::setBrightness(uint16_t brightness)
+xpcc::led::TLC594XLed<PwmController, Channels, ChannelSize, PwmTable, PwmTableSize>::setBrightness(uint16_t brightness)
 {
 	fadeTime = 0;
 	if (brightness > PwmTableSize-1) brightness = PwmTableSize-1;
 	currentValue = brightness;
-	PwmController::setChannel(CHANNEL, table[currentValue]);
+	
+	setChannels(currentValue);
 }
 
-template < typename PwmController, uint16_t CHANNEL, const uint16_t* PwmTable,  uint16_t const PwmTableSize >
+template < typename PwmController, const uint8_t* Channels, uint8_t const ChannelSize, const uint16_t* PwmTable,  uint16_t const PwmTableSize >
 uint16_t
-xpcc::led::TLC594XLed<PwmController, CHANNEL, PwmTable, PwmTableSize>::getBrightness()
+xpcc::led::TLC594XLed<PwmController, Channels, ChannelSize, PwmTable, PwmTableSize>::getBrightness()
 {
 	return currentValue;
 }
 
-template < typename PwmController, uint16_t CHANNEL, const uint16_t* PwmTable,  uint16_t const PwmTableSize >
+template < typename PwmController, const uint8_t* Channels, uint8_t const ChannelSize, const uint16_t* PwmTable,  uint16_t const PwmTableSize >
 bool
-xpcc::led::TLC594XLed<PwmController, CHANNEL, PwmTable, PwmTableSize>::isFading()
+xpcc::led::TLC594XLed<PwmController, Channels, ChannelSize, PwmTable, PwmTableSize>::isFading()
 {
 	return static_cast<bool>(fadeTime);
 }
 
-template < typename PwmController, uint16_t CHANNEL, const uint16_t* PwmTable,  uint16_t const PwmTableSize >
+template < typename PwmController, const uint8_t* Channels, uint8_t const ChannelSize, const uint16_t* PwmTable,  uint16_t const PwmTableSize >
 void
-xpcc::led::TLC594XLed<PwmController, CHANNEL, PwmTable, PwmTableSize>::fadeTo(uint16_t time, uint16_t brightness)
+xpcc::led::TLC594XLed<PwmController, Channels, ChannelSize, PwmTable, PwmTableSize>::fadeTo(uint16_t time, uint16_t brightness)
 {
 	if (brightness == currentValue) return;
 	if (brightness > PwmTableSize-1) brightness = PwmTableSize-1;
 	if (!time) {
 		currentValue = brightness;
-		PwmController::setChannel(CHANNEL, table[currentValue]);
+		setChannels(currentValue);
 	}
 	else {
 		startValue = currentValue;
@@ -82,23 +83,23 @@ xpcc::led::TLC594XLed<PwmController, CHANNEL, PwmTable, PwmTableSize>::fadeTo(ui
 	fadeTime = time;
 }
 
-template < typename PwmController, uint16_t CHANNEL, const uint16_t* PwmTable,  uint16_t const PwmTableSize >
+template < typename PwmController, const uint8_t* Channels, uint8_t const ChannelSize, const uint16_t* PwmTable,  uint16_t const PwmTableSize >
 void
-xpcc::led::TLC594XLed<PwmController, CHANNEL, PwmTable, PwmTableSize>::on(uint16_t time)
+xpcc::led::TLC594XLed<PwmController, Channels, ChannelSize, PwmTable, PwmTableSize>::on(uint16_t time)
 {
 	fadeTo(time, PwmTableSize-1);
 }
 
-template < typename PwmController, uint16_t CHANNEL, const uint16_t* PwmTable,  uint16_t const PwmTableSize >
+template < typename PwmController, const uint8_t* Channels, uint8_t const ChannelSize, const uint16_t* PwmTable,  uint16_t const PwmTableSize >
 void
-xpcc::led::TLC594XLed<PwmController, CHANNEL, PwmTable, PwmTableSize>::off(uint16_t time)
+xpcc::led::TLC594XLed<PwmController, Channels, ChannelSize, PwmTable, PwmTableSize>::off(uint16_t time)
 {
 	fadeTo(time, 0);
 }
 
-template < typename PwmController, uint16_t CHANNEL, const uint16_t* PwmTable,  uint16_t const PwmTableSize >
+template < typename PwmController, const uint8_t* Channels, uint8_t const ChannelSize, const uint16_t* PwmTable,  uint16_t const PwmTableSize >
 void
-xpcc::led::TLC594XLed<PwmController, CHANNEL, PwmTable, PwmTableSize>::run()
+xpcc::led::TLC594XLed<PwmController, Channels, ChannelSize, PwmTable, PwmTableSize>::run()
 {
 	if (timer.isExpired() && fadeTime)
 	{
@@ -106,10 +107,18 @@ xpcc::led::TLC594XLed<PwmController, CHANNEL, PwmTable, PwmTableSize>::run()
 		currentValue = static_cast<uint16_t>(startValue);
 		if (!--fadeTime) currentValue = endValue;
 		
-		PwmController::setChannel(CHANNEL, table[currentValue]);
+		setChannels(currentValue);
 	}
 }
 
+// ----------------------------------------------------------------------------
 
-
-
+template < typename PwmController, const uint8_t* Channels, uint8_t const ChannelSize, const uint16_t* PwmTable,  uint16_t const PwmTableSize >
+void
+xpcc::led::TLC594XLed<PwmController, Channels, ChannelSize, PwmTable, PwmTableSize>::setChannels(uint16_t brightness)
+{
+	for (uint_fast8_t i = 0; i < ChannelSize; ++i)
+	{
+		PwmController::setChannel(Channels[i], table[brightness]);
+	}
+}
