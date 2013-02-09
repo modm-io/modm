@@ -49,12 +49,14 @@ namespace xpcc
 		 * \ingroup led
 		 *
 		 * \tparam	PwmController	TLC594X driver
-		 * \tparam	CHANNEL			the channel the LED is attached to
+		 * \tparam	Channels		array containing the channels the LEDs are attached to
+		 * \tparam	ChannelSize		the size of the channel array
 		 * \tparam	PwmTable		the pwm value look-up table
 		 * \tparam	PwmTableSize	the size of the look-up table
 		 */
 		template< typename PwmController,
-				  uint16_t CHANNEL,
+				  const uint8_t* channels,
+				  uint8_t const channelSize=1,
 				  const uint16_t* PwmTable=led::table12_256,
 				  uint16_t const PwmTableSize=256 >
 		class TLC594XLed : public Led
@@ -69,6 +71,9 @@ namespace xpcc
 			
 			xpcc::PeriodicTimer<> timer;
 			xpcc::accessor::Flash<uint16_t> table;
+			
+			void
+			setChannels(uint16_t brightness);
 			
 		public:
 			TLC594XLed();
