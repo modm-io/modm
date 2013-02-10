@@ -31,14 +31,22 @@
 
 #include <xpcc_config.hpp>
 
-#if DRIVER_CONNECTIVITY_I2C_DEBUG
-// some header magic
-// replace the release delegate definition by the debug version
-#include <xpcc/driver/connectivity/i2c/delegate_debug.hpp>
-#define DEBUG(code) if (delegate) delegate->event(xpcc::stm32::I2cMaster{{ id }}::code)
-#else
-#define DEBUG(code)
-#endif
+//#if DRIVER_CONNECTIVITY_I2C_DEBUG
+//// some header magic
+//// replace the release delegate definition by the debug version
+//#include <xpcc/driver/connectivity/i2c/delegate_debug.hpp>
+//#define DEBUG(code) if (delegate) delegate->event(xpcc::stm32::I2cMaster{{ id }}::code)
+//#else
+//#define DEBUG(code)
+//#endif
+
+// uncomment to debug your driver using simple uart
+//*
+#include "../uart/uart_5.hpp"
+#define DEBUG(x) xpcc::stm32::BufferedUart5::write(x)
+/*/
+#define DEBUG(x)
+//*/
 
 #include "i2c_master_{{ id }}.hpp"
 
@@ -80,6 +88,32 @@
  * erloest.
  */
 
+
+enum DebugEnum
+{
+	IRQ_EV = 'i',
+	STARTBIT_SET = 's',
+	ADDRESS_SENT = 'a',
+	TRANSMITTER = 'T',
+	RECEIVER_NEXT_RESTART = 'r',
+	RECEIVER_NEXT_STOP = 'S',
+	RECEIVER_MANY_BYTES = 'm',
+	AFTER_WRITE_FINISHED_IRQ = 'f',
+	TXE_NO_BYTES_LEFT = 'l',
+	TXE_NEXT_WRITE = 'w',
+	TXE_NEXT_RESTART = 'R',
+	TXE_NEXT_STOP = 't',
+	TXE_BTF_NEXT_RESTART = 'b',
+	TXE_MORE_BYTES_LEFT = 'M',
+	RXNE_IRQ = 'Q',
+	RXNE_MANY_BYTES_LEFT = 'X',
+	RXNE_ONE_BYTE_LEFT = 'O',
+	RXNE_NO_BYTES_LEFT_NEXT_RESTART = 'B',
+	RXNE_NO_BYTES_LEFT_NEXT_STOP = 'K',
+	CALL_STARTING = 'Y',
+	
+	IRQ_ER = 'E',
+};
 
 {% if id == 2 %}
 #if !defined(STM32F10X_LD)
@@ -129,44 +163,43 @@ namespace
 	static xpcc::i2c::Delegate *delegate = 0;
 	static xpcc::stm32::I2cMaster{{ id }}::ErrorState errorState(xpcc::stm32::I2cMaster{{ id }}::NO_ERROR);
 
-	enum WriteFinished
-	{
-		WRITE_NOT_FINISHED,
-		WRITE_FINISHED,
-		WRITE_FINISHED_CONDITION_GENERATED
-	};
-	WriteFinished writeFinished = WRITE_NOT_FINISHED;
-
 	static void
-	initializeWrite(xpcc::i2c::Delegate::Writing w) {
+	initializeWrite(xpcc::i2c::Delegate::Writing w)
+	{
 		writePointer = w.buffer;
 		writeBytesLeft = w.size;
 		nextOperation = static_cast<xpcc::i2c::Delegate::NextOperation>(w.next);
 	}
 
 	static void
-	initializeRead(xpcc::i2c::Delegate::Reading r) {
+	initializeRead(xpcc::i2c::Delegate::Reading r)
+	{
 		readPointer = r.buffer;
 		readBytesLeft = r.size;
 		nextOperation = static_cast<xpcc::i2c::Delegate::NextOperation>(r.next);
 	}
 
 	static void
-	initializeStopAfterAddress(){
+	initializeStopAfterAddress()
+	{
 		//writePointer = ..;
 		writeBytesLeft = 0;
 		nextOperation = xpcc::i2c::Delegate::STOP_OP;
 	}
 
 	static void
-	initializeRestartAfterAddress(){
+	initializeRestartAfterAddress()
+	{
 		//writePointer = ..;
 		writeBytesLeft = 0;
 		nextOperation = xpcc::i2c::Delegate::RESTART_OP;
 	}
 
 	void
-	callStarting(){
+	callStarting()
+	{
+		DEBUG(CALL_STARTING);
+		
 		// avoid setting the stop bit twice, so wait until it is cleared by hardware
 		while (I2C{{ id }}->CR1 & I2C_CR1_STOP)
 			;
@@ -177,6 +210,21 @@ namespace
 		// and enable interrupts
 		I2C{{ id }}->CR2 |= I2C_CR2_ITEVTEN | I2C_CR2_ITBUFEN | I2C_CR2_ITERREN;
 	}
+	
+	enum WriteFinished
+	{
+		WRITE_NOT_FINISHED,
+		WRITE_FINISHED,
+		WRITE_FINISHED_CONDITION_GENERATED
+	};
+	WriteFinished writeFinished = WRITE_NOT_FINISHED;
+	
+	enum ReadFinished
+	{
+		READ_NOT_FINISHED,
+		READ_FINISHED_CONDITION_GENERATED,
+	};
+	ReadFinished readFinished = READ_NOT_FINISHED;
 }
 
 // ----------------------------------------------------------------------------
@@ -194,18 +242,23 @@ I2C{{ id }}_EV_IRQHandler(void)
 
 		// see note1
 		writeFinished = WRITE_NOT_FINISHED;
+		readFinished = READ_NOT_FINISHED;
 		I2C{{ id }}->CR2 |= I2C_CR2_ITEVTEN | I2C_CR2_ITBUFEN | I2C_CR2_ITERREN;
 
 		xpcc::i2c::Delegate::Starting s = delegate->started();
 		uint8_t address;
-		switch (s.next){
+		
+		switch (s.next)
+		{
 			case xpcc::i2c::Delegate::READ_OP:
 				address = (s.address & 0xfe) | xpcc::i2c::READ;
 				initializeRead(delegate->reading());
-				if (readBytesLeft <= 1){
+				if (readBytesLeft <= 1)
+				{
 					I2C{{ id }}->CR1 &= ~I2C_CR1_ACK;
 				}
-				else{
+				else
+				{
 					I2C{{ id }}->CR1 |= I2C_CR1_ACK;
 				}
 				// TODO special case if 2?!, what to do if length is 0? generate stop?
@@ -215,16 +268,19 @@ I2C{{ id }}_EV_IRQHandler(void)
 				address = (s.address & 0xfe) | xpcc::i2c::WRITE;
 				initializeWrite(delegate->writing());
 				break;
+				
 			default:
 			case xpcc::i2c::Delegate::STOP_OP:
 				address = (s.address & 0xfe) | xpcc::i2c::WRITE;
 				initializeStopAfterAddress();
 				break;
+				
 			case xpcc::i2c::Delegate::RESTART_OP:
 				address = (s.address & 0xfe) | xpcc::i2c::WRITE;
 				initializeRestartAfterAddress();
 				break;
 		}
+		
 		I2C{{ id }}->DR = address;
 	}
 
@@ -241,18 +297,24 @@ I2C{{ id }}_EV_IRQHandler(void)
 		
 		// NACK is set in operation setup, no need to clear it again
 
-		if (sr2 & I2C_SR2_TRA) {
+		if (sr2 & I2C_SR2_TRA)
+		{
 			DEBUG(TRANSMITTER);
 			// EV8_1 will be generated automatically.
 		}
-		else{
+		else
+		{
 			// Generate STOP condition
-			if (readBytesLeft <= 1){
-				if (nextOperation == xpcc::i2c::Delegate::RESTART_OP){
+			if (readBytesLeft <= 1)
+			{
+				if (nextOperation == xpcc::i2c::Delegate::RESTART_OP)
+				{
 					DEBUG(RECEIVER_NEXT_RESTART);
 					I2C{{ id }}->CR1 |= I2C_CR1_START;
 				}
-				else{
+				else
+				{
+					readFinished = READ_FINISHED_CONDITION_GENERATED;
 					DEBUG(RECEIVER_NEXT_STOP);
 					I2C{{ id }}->CR1 |= I2C_CR1_STOP;
 				}
@@ -265,10 +327,12 @@ I2C{{ id }}_EV_IRQHandler(void)
 	
 	else if (sr1 & I2C_SR1_TXE)
 	{
-		if (writeFinished == WRITE_FINISHED_CONDITION_GENERATED){
+		if (writeFinished == WRITE_FINISHED_CONDITION_GENERATED)
+		{
 			// do nothing, the finalizing condition is being generated
 		}
-		else if (writeFinished == WRITE_FINISHED){
+		else if (writeFinished == WRITE_FINISHED)
+		{
 			// see note1. Here you come in during a restart after write or
 			// if (after stop after write) an other host is attached
 			// to this module before the write of the last byte is finished
@@ -276,14 +340,17 @@ I2C{{ id }}_EV_IRQHandler(void)
 			// sending the last byte, but during the stop
 			// or restart condition this is triggered all the time
 
-			if (sr1 & I2C_SR1_BTF) {// perform specially the stop condition after the last byte is ready
-				if (nextOperation == xpcc::i2c::Delegate::RESTART_OP){
+			if (sr1 & I2C_SR1_BTF)
+			{// perform specially the stop condition after the last byte is ready
+				if (nextOperation == xpcc::i2c::Delegate::RESTART_OP)
+				{
 					// should not happen (doubled code)
 					DEBUG(TXE_BTF_NEXT_RESTART);
 					I2C{{ id }}->CR1 |= I2C_CR1_START;
 					writeFinished = WRITE_FINISHED_CONDITION_GENERATED;
 				}
-				else {
+				else
+				{
 					// we are ready
 					// clear interrupts, generate stop condition detach delegate
 					I2C{{ id }}->CR2 &= ~(I2C_CR2_ITEVTEN | I2C_CR2_ITBUFEN | I2C_CR2_ITERREN);
@@ -293,21 +360,27 @@ I2C{{ id }}_EV_IRQHandler(void)
 					writeFinished = WRITE_FINISHED_CONDITION_GENERATED;
 				}
 			}
-			else {
+			else
+			{
 				I2C{{ id }}->CR2 &= ~I2C_CR2_ITBUFEN; // clear interrupt for txe, so wait for btf
 				DEBUG(AFTER_WRITE_FINISHED_IRQ);
 			}
 		}
-		else{
+		else
+		{
 			// EV8..: TxE=1 and BTF may be 1, Program Stop request. TxE and BTF are
 			// cleared by hardware after the Stop condition see note1
-			if (writeBytesLeft == 0){
+			if (writeBytesLeft == 0)
+			{
 				DEBUG(TXE_NO_BYTES_LEFT);
-				if (nextOperation == xpcc::i2c::Delegate::WRITE_OP){
+				
+				if (nextOperation == xpcc::i2c::Delegate::WRITE_OP)
+				{
 					DEBUG(TXE_NEXT_WRITE);
 					initializeWrite(delegate->writing());
 				}
-				else if (nextOperation == xpcc::i2c::Delegate::RESTART_OP){
+				else if (nextOperation == xpcc::i2c::Delegate::RESTART_OP)
+				{
 					DEBUG(TXE_NEXT_RESTART);
 
 					// see note1. It is possible to set restart here, no need to wait
@@ -315,7 +388,8 @@ I2C{{ id }}_EV_IRQHandler(void)
 					I2C{{ id }}->CR1 |= I2C_CR1_START;
 					writeFinished = WRITE_FINISHED_CONDITION_GENERATED;
 				}
-				else{ // STOP and default behaviour
+				else
+				{ // STOP and default behaviour
 					DEBUG(TXE_NEXT_STOP);
 
 					// don't set the stop flag here, wait for btf
@@ -323,7 +397,8 @@ I2C{{ id }}_EV_IRQHandler(void)
 					writeFinished = WRITE_FINISHED;
 				}
 			}
-			else{ // writeBytesLeft != 0
+			else
+			{ // writeBytesLeft != 0
 				DEBUG(TXE_MORE_BYTES_LEFT);
 				--writeBytesLeft;
 				I2C{{ id }}->DR = *writePointer++; // write data
@@ -337,31 +412,40 @@ I2C{{ id }}_EV_IRQHandler(void)
 		// EV7: RxNE = 1, cleared by reading DR register
 		uint16_t dr = I2C{{ id }}->DR; // clear RXNE
 
-		if (readBytesLeft > 0){
+		if (readBytesLeft > 0)
+		{
 			*readPointer++ = dr & 0xff;
 			readBytesLeft--;
 		}
-
-		switch (readBytesLeft){
+		
+		switch (readBytesLeft)
+		{
 			default:
 				DEBUG(RXNE_MANY_BYTES_LEFT);
 				// ACK is set by default, no need to set it again
 				break;
+				
 			case 1:
 				DEBUG(RXNE_ONE_BYTE_LEFT);
 				// EV7_1: programming ACK = 0 and STOP/RESTART request
 				I2C{{ id }}->CR1 &= ~I2C_CR1_ACK;
 				break;
+				
 			case 0:
-				switch (nextOperation){
+				switch (nextOperation)
+				{
 					case xpcc::i2c::Delegate::RESTART_OP:
 						DEBUG(RXNE_NO_BYTES_LEFT_NEXT_RESTART);
 						I2C{{ id }}->CR1 |= I2C_CR1_START;
 						break;
+						
 					default: // should not happen // TODO signal wrong operation or not? eigentlich haette das schon vorher aufgefallen sein muessen
 					case xpcc::i2c::Delegate::STOP_OP:
 						DEBUG(RXNE_NO_BYTES_LEFT_NEXT_STOP);
-						I2C{{ id }}->CR1 |= I2C_CR1_STOP;
+						if (readFinished == READ_NOT_FINISHED)
+						{
+							I2C{{ id }}->CR1 |= I2C_CR1_STOP;
+						}
 						// Disable all interrupts
 						I2C{{ id }}->CR2 &= ~(I2C_CR2_ITEVTEN | I2C_CR2_ITBUFEN | I2C_CR2_ITERREN);
 						delegate->stopped(xpcc::i2c::Delegate::NORMAL_STOP);
@@ -383,31 +467,39 @@ I2C{{ id }}_ER_IRQHandler(void)
 	writeBytesLeft = 0;
 	readBytesLeft = 0;
 
-	if (sr1 & I2C_SR1_BERR) {
+	if (sr1 & I2C_SR1_BERR)
+	{
 		I2C{{ id }}->CR1 |= I2C_CR1_STOP;
-		if (delegate){
+		if (delegate)
+		{
 			errorState = xpcc::stm32::I2cMaster{{ id }}::BUS_ERROR;
 			delegate->stopped(xpcc::i2c::Delegate::ERROR_CONDITION);
 			delegate = 0;
 		}
 	}
-	else if (sr1 & I2C_SR1_AF) {			// acknowledge fail
+	else if (sr1 & I2C_SR1_AF)
+	{			// acknowledge fail
 		I2C{{ id }}->CR1 |= I2C_CR1_STOP;
-		if (delegate){
+		if (delegate)
+		{
 			errorState = xpcc::stm32::I2cMaster{{ id }}::DATA_NACK; // may olso be ADDRESS_NACK
 			delegate->stopped(xpcc::i2c::Delegate::ERROR_CONDITION);
 			delegate = 0;
 		}
 	}
-	else if (sr1 & I2C_SR1_ARLO) {		// arbitration lost
-		if (delegate){
+	else if (sr1 & I2C_SR1_ARLO)
+	{		// arbitration lost
+		if (delegate)
+		{
 			errorState = xpcc::stm32::I2cMaster{{ id }}::ARBITRATION_LOST;
 			delegate->stopped(xpcc::i2c::Delegate::ERROR_CONDITION);
 			delegate = 0;
 		}
 	}
-	else{
-		if (delegate){
+	else
+	{
+		if (delegate)
+		{
 			errorState = xpcc::stm32::I2cMaster{{ id }}::UNKNOWN_ERROR;
 			delegate->stopped(xpcc::i2c::Delegate::ERROR_CONDITION);
 			delegate = 0;
@@ -495,7 +587,7 @@ xpcc::stm32::I2cMaster{{ id }}::initialize(uint16_t ccrPrescaler)
 	reset();
 	
 	// Enable clock
-	RCC->APB1ENR |= RCC_APB1ENR_I2C{{ id }}EN;
+	enable();
 	
 	I2C{{ id }}->CR1 = I2C_CR1_SWRST; 		// reset module
 	I2C{{ id }}->CR1 = 0;
@@ -503,10 +595,10 @@ xpcc::stm32::I2cMaster{{ id }}::initialize(uint16_t ccrPrescaler)
 	NVIC_EnableIRQ(I2C{{ id }}_ER_IRQn);
 	NVIC_EnableIRQ(I2C{{ id }}_EV_IRQn);
 
-	I2C{{ id }}->CCR = ccrPrescaler; 	// baudrate (prescaler), only while i2c disabled, PE = 0
+	I2C{{ id }}->CCR = 0x28; 	// baudrate (prescaler), only while i2c disabled, PE = 0
 	// not enable interrupts | Value of peripheral clock (Unknown effect of this value yet, since Module is always running on APB frequency)
-	I2C{{ id }}->CR2 = STM32_APB1_FREQUENCY/1000000;
-//	I2C{{ id }}->TRISE = // rise time
+	I2C{{ id }}->CR2 = 0x08;
+	I2C{{ id }}->TRISE = 0x09;
 
 	I2C{{ id }}->CR1 |= I2C_CR1_PE; // Enable peripheral
 }
@@ -526,6 +618,7 @@ xpcc::stm32::I2cMaster{{ id }}::start(xpcc::i2c::Delegate *delegate)
 {
 	if (!::delegate && delegate && delegate->attaching())
 	{
+		DEBUG('\n');
 		::delegate = delegate;
 		callStarting();
 
@@ -539,6 +632,7 @@ xpcc::stm32::I2cMaster{{ id }}::startSync(xpcc::i2c::Delegate *delegate)
 {
 	if (!::delegate && delegate && delegate->attaching())
 	{
+		DEBUG('\n');
 		::delegate = delegate;
 		callStarting();
 		
