@@ -37,6 +37,7 @@
 #define XPCC_STM32__I2C_1_HPP
 
 #include <stdint.h>
+#include <xpcc/architecture/driver/delay.hpp>
 #include <xpcc/driver/connectivity/i2c/master.hpp>
 
 
@@ -56,38 +57,85 @@ namespace xpcc
 		class I2cMaster1 : ::xpcc::i2c::Master
 		{
 		public:
+			/*
+			enum DebugEnum
+			{
+				 IRQ_EV = 'i',
+				 STARTBIT_SET = 's',
+				 ADDRESS_SENT = 'a',
+				 TRANSMITTER = 'T',
+				 RECEIVER_NEXT_RESTART = 'r',
+				 RECEIVER_NEXT_STOP = 'S',
+				 RECEIVER_MANY_BYTES = 'm',
+				 RECEIVER_TWO_BYTES = 'E',
+				 RECEIVER_ONE_BYTE = 'W',
+				 AFTER_WRITE_FINISHED_IRQ = 'f',
+				 TXE_NO_BYTES_LEFT = 'l',
+				 TXE_NEXT_WRITE = 'w',
+				 TXE_NEXT_RESTART = 'R',
+				 TXE_NEXT_STOP = 't',
+				 TXE_BTF_NEXT_RESTART = 'b',
+				 TXE_MORE_BYTES_LEFT = 'M',
+				 RXNE_IRQ = 'Q',
+				 RXNE_MANY_BYTES_LEFT = 'X',
+				 RXNE_TWO_BYTES_LEFT = 'P',
+				 RXNE_ONE_BYTE_LEFT = 'O',
+				 RXNE_NO_BYTES_LEFT_NEXT_RESTART = 'B',
+				 RXNE_NO_BYTES_LEFT_NEXT_STOP = 'K',
+				 CALL_STARTING = 'Y',
+				 
+				 IRQ_ER = 'E',
+			};//*/
 			
-//#if (defined DRIVER_CONNECTIVITY_I2C_DEBUG) && DRIVER_CONNECTIVITY_I2C_DEBUG
-//			enum DebugEnum
-//			{
-//				IRQ_EV = 'i',
-//				STARTBIT_SET = 's',
-//				ADDRESS_SENT = 'a',
-//				TRANSMITTER = 'T',
-//				RECEIVER_NEXT_RESTART = 'r',
-//				RECEIVER_NEXT_STOP = 'S',
-//				RECEIVER_MANY_BYTES = 'm',
-//				AFTER_WRITE_FINISHED_IRQ = 'f',
-//				TXE_NO_BYTES_LEFT = 'l',
-//				TXE_NEXT_WRITE = 'w',
-//				TXE_NEXT_RESTART = 'R',
-//				TXE_NEXT_STOP = 't',
-//				TXE_BTF_NEXT_RESTART = 'b',
-//				TXE_MORE_BYTES_LEFT = 'M',
-//				RXNE_IRQ = 'Q',
-//				RXNE_MANY_BYTES_LEFT = 'X',
-//				RXNE_ONE_BYTE_LEFT = 'O',
-//				RXNE_NO_BYTES_LEFT_NEXT_RESTART = 'B',
-//				RXNE_NO_BYTES_LEFT_NEXT_STOP = 'K',
-//				CALL_STARTING = 'Y',
-//
-//				IRQ_ER = 'E',
-//			};
-//#endif
+			/*
+			 YisiaTiMilRisiamiQX ... iQXiQOiQK
+			 
+			 adapter.initialize(buffer, 1, buffer, 1);
+			 CALL_STARTING
+			 
+			 IRQ_EV
+			 STARTBIT_SET
+			 
+			 IRQ_EV
+			 ADDRESS_SENT
+			 TRANSMITTER
+			 
+			 IRQ_EV
+			 TXE_MORE_BYTES_LEFT
+			 
+			 IRQ_EV
+			 TXE_NO_BYTES_LEFT
+			 TXE_NEXT_RESTART
+			 
+			 IRQ_EV
+			 STARTBIT_SET
+			 
+			 IRQ_EV
+			 ADDRESS_SENT
+			 RECEIVER_MANY_BYTES
+			 
+			 IRQ_EV
+			 RXNE_IRQ
+			 RXNE_MANY_BYTES_LEFT
+			 
+			 ...
+			 
+			 IRQ_EV
+			 RXNE_IRQ
+			 RXNE_MANY_BYTES_LEFT
+			 
+			 IRQ_EV
+			 RXNE_IRQ
+			 RXNE_ONE_BYTE_LEFT
+			 
+			 IRQ_EV
+			 RXNE_IRQ
+			 RXNE_NO_BYTES_LEFT_NEXT_STOP
+			 
+			 //*/
+			
 			/*
 			 YisiaTiMiMilti
-			 YisiaTiMilRisiaSiQK
-			 Y
 			 
 			 adapter.initialize(buffer, 2, data, 0);
 			 CALL_STARTING
@@ -111,7 +159,10 @@ namespace xpcc
 			 
 			 IRQ_EV
 			 stopped
+			 //*/
 			 
+			/*
+			 YisiaTiMilRisiaSiQK
 			 
 			 adapter.initialize(buffer, 1, buffer, 1);
 			 CALL_STARTING
@@ -140,12 +191,6 @@ namespace xpcc
 			 IRQ_EV
 			 RXNE_IRQ
 			 RXNE_NO_BYTES_LEFT_NEXT_STOP
-			 
-			 
-			 !! breaking !!
-			 
-			 
-			 CALL_STARTING
 			 
 			 //*/
 			
