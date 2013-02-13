@@ -331,7 +331,13 @@ namespace xpcc
 				 */
 				OUTPUT_PWM2 = TIM_CCMR1_OC1M_2 | TIM_CCMR1_OC1M_1 | TIM_CCMR1_OC1M_0,
 			};
-			
+
+			enum OutputComparePolarity
+			{
+				OUTPUT_ACTIVE_HIGH = 0,
+				OUTPUT_ACTIVE_LOW = TIM_CCER_CC1P,
+			};
+
 			/**
 			 * If more than one Compare Channel is available they are always paired.
 			 * 		(A channel with an odd number is paired with the next even numbered channel)
