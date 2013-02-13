@@ -309,6 +309,16 @@ namespace xpcc
 			{
 				/// Output is independent from the compare result
 				OUTPUT_INACTIVE = 0,
+				/// Output is forced high on match
+				OUTPUT_HIGH_ON_MATCH = TIM_CCMR1_OC1M_0,
+				/// Output is forced low on match
+				OUTPUT_LOW_ON_MATCH = TIM_CCMR1_OC1M_1,
+				/// Output is toggled on match
+				OUTPUT_TOGGLE = TIM_CCMR1_OC1M_1 | TIM_CCMR1_OC1M_0,
+				/// Output is forced low
+				OUTPUT_FORCE_LOW = TIM_CCMR1_OC1M_2,
+				/// Output is forced high
+				OUTPUT_FORCE_HIGH = TIM_CCMR1_OC1M_2 | TIM_CCMR1_OC1M_0,
 
 				/**
 				 * PWM Mode 1.
