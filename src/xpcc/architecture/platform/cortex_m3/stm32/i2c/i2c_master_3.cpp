@@ -242,9 +242,9 @@ I2C3_EV_IRQHandler(void)
 			DEBUG_STREAM("STOP");
 			I2C3->CR1 |= I2C_CR1_STOP;
 			
-			DEBUG_STREAM("waiting for stop");
-			while (I2C3->CR1 & I2C_CR1_STOP)
-				;
+//			DEBUG_STREAM("waiting for stop");
+//			while (I2C3->CR1 & I2C_CR1_STOP)
+//				;
 			
 			uint16_t dr = I2C3->DR;
 			*readPointer++ = dr & 0xff;
@@ -289,6 +289,13 @@ I2C3_EV_IRQHandler(void)
 			
 			DEBUG_STREAM("RXNE: readBytesLeft=" << readBytesLeft);
 		}
+		
+		if (readBytesLeft <= 3)
+		{
+			// disable RXnE, and wait for BTF
+			DEBUG_STREAM("fourth last byte received, wait for btf");
+			I2C3->CR2 &= ~I2C_CR2_ITBUFEN;
+		}
 	}
 	
 	
@@ -307,9 +314,9 @@ I2C3_EV_IRQHandler(void)
 			uint16_t dr = I2C3->DR;
 			*readPointer++ = dr & 0xff;
 			
-			DEBUG_STREAM("waiting for stop");
-			while (I2C3->CR1 & I2C_CR1_STOP)
-				;
+//			DEBUG_STREAM("waiting for stop");
+//			while (I2C3->CR1 & I2C_CR1_STOP)
+//				;
 			
 			DEBUG_STREAM("reading data2");
 			dr = I2C3->DR;
