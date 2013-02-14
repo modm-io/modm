@@ -75,13 +75,6 @@ namespace xpcc
 				UNKNOWN_ERROR		//!< Unknown error condition
 			};
 			
-			
-			/**
-			 * @brief	Enables the peripheral clock for this module.
-			 * You don't need to call this method at start, but you may.
-			 */
-			static void
-			enable();
 
 			/**
 			 * Configure the IO Pins for this module
@@ -90,9 +83,11 @@ namespace xpcc
 			configurePins(Mapping mapping);
 			
 			/**
-			 * @brief	Initialize this module
+			 * @brief	Initialize this with a prescaler
+			 *
 			 * You must initialize pins before call to this method either by
 			 * calling configurePins
+			 
 			 * \param ccrPrescaler: I2CFrequency = STM32_APB1_FREQUENCY / (2 * ccrPrescaler)
 			 */
 			static void
@@ -102,32 +97,6 @@ namespace xpcc
 			reset(bool error=false);
 			
 		public:
-			/**
-			 * You initialize an I2C transaction calling this method. Passed
-			 * delegate will be attached to this module and has to manage
-			 * the transaction until it is detached by calling stop.
-			 * \return true if module is free and module is attached, false
-			 * if module was busy. Be aware, that the delagete may get attached
-			 * and detached before this method returns. In this case
-			 * true is returned. That means each interconnection between
-			 * passed delegate and the caller of this method must be
-			 * performed before call.
-			 * 
-			 * \code
-			 * ... initialization of delegate
-			 * if (xpcc::stm32::I2c3::start(&delegate)){
-			 *  // wait until delegate is finished
-			 *  // don't interconnect with the delegate, only while a call to 
-			 *  // one of it's methods
-			 *  // after delegates' stop method has been called it is detached
-			 *  // from module
-			 * }
-			 * else{
-			 *  // delegate has not been attached because module was busy
-			 * }
-			 * 
-			 * \endcode
-			 */
 			static bool
 			start(xpcc::i2c::Delegate *delegate);
 			

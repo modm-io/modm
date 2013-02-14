@@ -35,32 +35,164 @@
 
 #include <xpcc_config.hpp>
 
-//#if DRIVER_CONNECTIVITY_I2C_DEBUG
-//// some header magic
-//// replace the release delegate definition by the debug version
-//#include <xpcc/driver/connectivity/i2c/delegate_debug.hpp>
-//#define DEBUG(code) if (delegate) delegate->event(xpcc::stm32::I2cMaster2::code)
-//#else
-//#define DEBUG(code)
-//#endif
-
-// uncomment to debug your driver using simple uart
 /*
-#include "../uart/uart_5.hpp"
-typedef xpcc::stm32::BufferedUart5 DebugUart;
-#include <xpcc/io/iostream.hpp>
-extern xpcc::IOStream stream;
-#define DEBUG_STREAM(x) stream << x << xpcc::endl
-#define DEBUG(x) xpcc::stm32::BufferedUart5::write(x)
-/*/
-#define DEBUG_STREAM(x)
-#define DEBUG(x)
-//*/
+ * This driver was not so straight forward to implement, because the official
+ * documentation by ST is not so clear about the reading operation.
+ * So here is the easier to understand version (# = wait for next interrupt).
+ *
+ * Writing:
+ * --------
+ *	- set start bit
+ *	#
+ *	- check SB bit
+ *	- write address
+ *	#
+ *	- check ADDR bit
+ *	- clear ADDR bit
+ *	- if no bytes are to be written, check for next operation immidiately
+ *	#
+ *	- check TXE bit
+ *	- write data
+ *	- on write of last bytes, disable Buffer interrupt, and wait for BTF interrupt
+ *	#
+ *	- check BTF bit
+ *	- if no bytes left, check for next operation
+ *
+ * It if important to note, that we wait for the last byte transfer to complete
+ * before checking the next operation.
+ *
+ *
+ * Reading is a lot more complicated. In master read mode, the controller can
+ * stretch the SCL line low, while there is new received data in the registers.
+ * 
+ * The data and the shift register together hold two bytes, so we have to send
+ * NACK and the STOP condition two bytes in advance and then read both bytes!!!
+ *
+ * 1-byte read:
+ * ------------
+ *	- set start bit (RESTART!)
+ *	#
+ *	- check SB bit
+ *	- set ACK low
+ *	- write address
+ *	#
+ *	- check ADDR bit
+ *	- clear ADDR bit
+ *	- set STOP high
+ *	- (wait until STOP low)
+ *	- read data 1
+ *	- check for next operation
+ *
+ * 2-byte read:
+ * ------------
+ *	- set start bit (RESTART!)
+ *	#
+ *	- check SB bit
+ *	- set ACK low
+ *	- set POS high (must be used ONLY in two byte transfers, clear it afterwards!)
+ *	- write address
+ *	#
+ *	- check ADDR bit
+ *	- clear ADDR bit
+ *	#
+ *	- check BTF bit
+ *	- set STOP high
+ *	- read data 1
+ *	- (wait until STOP low)
+ *	- read data 2
+ *	- check for next operation
+ *
+ * 3-byte read:
+ * ------------
+ *	- set start bit (RESTART!)
+ *	#
+ *	- check SB bit
+ *	- write address
+ *	#
+ *	- check ADDR bit
+ *	- clear ADDR bit
+ *	#
+ *	- check BTF bit
+ *	- set ACK LOW
+ *	- read data 1
+ *	#
+ *	- check BTF bit
+ *	- set STOP high
+ *	- read data 1
+ *	- (wait until STOP low)
+ *	- read data 2
+ *	- check for next operation
+ *
+ * N-byte read:
+ * -------------
+ *	- set start bit (RESTART!)
+ *	#
+ *	- check SB bit
+ *	- write address
+ *	#
+ *	- check ADDR bit
+ *	- enable Buffer Interrupt
+ *	- clear ADDR bit
+ *	#
+ *	- check RXNE bit
+ *	- read data < N-3
+ *	#
+ *	- check RXNE bit
+ *	- read data N-3
+ *	- disable Buffer Interrupt
+ *	#
+ *	- check BTF bit
+ *	- set ACK low
+ *	- read data N-2
+ *	#
+ *	- check BTF bit
+ *	- set STOP high
+ *	- read data N-1
+ *	- (wait until STOP low)
+ *	- read data N
+ *	- check for next operation
+ *
+ * Please read the documentation of the driver before you attempt to fix this
+ * driver. I strongly recommend the use of an logic analizer or oscilloscope,
+ * to confirm the drivers behavior.
+ * The event states are labeled as 'EVn_m' in reference to the manual.
+ */
+
+/* To debug the internal state of the driver, you can instantiate a
+ * xpcc::IOStream, which will then be used to dump state data of the operations
+ * via the serial port.
+ * Be advised, that a typical I2C read/write operation can take 10 to 100 longer
+ * because the strings have to be copied during the interrupt!
+ *
+ * You can enable serial debugging with this define.
+ */
+#define SERIAL_DEBUGGING 0
+
+#if SERIAL_DEBUGGING
+#	include "../uart/uart_5.hpp"
+	typedef xpcc::stm32::BufferedUart5 DebugUart;
+#	include <xpcc/io/iostream.hpp>
+	extern xpcc::IOStream stream;
+#	define DEBUG_STREAM(x) //stream << x << "\n"
+#	define DEBUG(x) xpcc::stm32::BufferedUart5::write(x)
+#else
+#	define DEBUG_STREAM(x)
+#	define DEBUG(x)
+#endif
+
+/*
+ * It is mildly recommended to wait for the STOP operation to finish, before
+ * reading the shift register, however since no interrupt is generated after a
+ * STOP condition, the only solution is to busy wait until the STOP bit is 
+ * cleared by hardware.
+ * Busy waiting in this interrupt is potentially dangerous and can make program
+ * behavior unpredictable and debugging very cumbersome.
+ * Therefore, this is disabled by default, you _can_ reenable it with this define.
+ */
+#define WAIT_FOR_STOP_LOW 0
 
 #include "i2c_master_2.hpp"
-
 #include "../gpio.hpp"
-
 
 
 #if !defined(STM32F10X_LD)
@@ -167,6 +299,7 @@ I2C2_EV_IRQHandler(void)
 	
 	if (sr1 & I2C_SR1_SB)
 	{
+		// EV5: SB=1, cleared by reading SR1 register followed by writing DR register with Address.
 		DEBUG_STREAM("startbit set");
 		
 		xpcc::i2c::Delegate::Starting s = delegate->started();
@@ -177,7 +310,7 @@ I2C2_EV_IRQHandler(void)
 			case xpcc::i2c::Delegate::READ_OP:
 				address = (s.address & 0xfe) | xpcc::i2c::READ;
 				initializeRead(delegate->reading());
-				if (readBytesLeft <= 1)
+				if (readBytesLeft <= 2)
 				{
 					DEBUG_STREAM("NACK");
 					I2C2->CR1 &= ~I2C_CR1_ACK;
@@ -186,6 +319,11 @@ I2C2_EV_IRQHandler(void)
 				{
 					DEBUG_STREAM("ACK");
 					I2C2->CR1 |= I2C_CR1_ACK;
+				}
+				if (readBytesLeft == 2)
+				{
+					DEBUG_STREAM("POS");
+					I2C2->CR1 |= I2C_CR1_POS;
 				}
 				DEBUG_STREAM("read op: reading=" << readBytesLeft);
 				break;
@@ -217,23 +355,19 @@ I2C2_EV_IRQHandler(void)
 	
 	else if (sr1 & I2C_SR1_ADDR)
 	{
+		// EV6: ADDR=1, cleared by reading SR1 register followed by reading SR2.
 		DEBUG_STREAM("address sent");
 		DEBUG_STREAM("writeBytesLeft=" << writeBytesLeft);
 		DEBUG_STREAM("readBytesLeft=" << readBytesLeft);
 		
-		if (writeBytesLeft > 0 || readBytesLeft > 2)
+		if (writeBytesLeft > 0 || readBytesLeft > 3)
 		{
 			DEBUG_STREAM("enable buffers");
 			I2C2->CR2 |= I2C_CR2_ITBUFEN;
 		}
 		if (!readBytesLeft && !writeBytesLeft)
-			checkNextOperation = CHECK_NEXT_OPERATION_YES;
-		
-		if (readBytesLeft == 2)
 		{
-			DEBUG_STREAM("NACK | POS");
-			I2C2->CR1 &= ~I2C_CR1_ACK;
-			I2C2->CR1 |= I2C_CR1_POS;
+			checkNextOperation = CHECK_NEXT_OPERATION_YES;
 		}
 		
 		
@@ -247,9 +381,11 @@ I2C2_EV_IRQHandler(void)
 			DEBUG_STREAM("STOP");
 			I2C2->CR1 |= I2C_CR1_STOP;
 			
-//			DEBUG_STREAM("waiting for stop");
-//			while (I2C2->CR1 & I2C_CR1_STOP)
-//				;
+#if WAIT_FOR_STOP_LOW
+			DEBUG_STREAM("waiting for stop");
+			while (I2C2->CR1 & I2C_CR1_STOP)
+				;
+#endif
 			
 			uint16_t dr = I2C2->DR;
 			*readPointer++ = dr & 0xff;
@@ -262,7 +398,8 @@ I2C2_EV_IRQHandler(void)
 	
 	else if (sr1 & I2C_SR1_TXE)
 	{
-		// EV8
+		// EV8_1: TxE=1, shift register empty, data register empty, write Data1 in DR
+		// EV8: TxE=1, shift register not empty, data register empty, cleared by writing DR
 		if (writeBytesLeft > 0)
 		{
 			DEBUG_STREAM("tx more bytes");
@@ -276,7 +413,7 @@ I2C2_EV_IRQHandler(void)
 		// no else!
 		if (writeBytesLeft == 0)
 		{
-			// disable TXE, and wait for BTF
+			// disable TxE, and wait for EV8_2
 			DEBUG_STREAM("last byte transmitted, wait for btf");
 			I2C2->CR2 &= ~I2C_CR2_ITBUFEN;
 		}
@@ -287,7 +424,8 @@ I2C2_EV_IRQHandler(void)
 	else if (sr1 & I2C_SR1_RXNE)
 	{
 		if (readBytesLeft > 3)
-		{	
+		{
+			// EV7: RxNE=1, cleared by reading DR register
 			uint16_t dr = I2C2->DR;
 			*readPointer++ = dr & 0xff;
 			readBytesLeft--;
@@ -297,7 +435,7 @@ I2C2_EV_IRQHandler(void)
 		
 		if (readBytesLeft <= 3)
 		{
-			// disable RXnE, and wait for BTF
+			// disable RxNE, and wait for BTF
 			DEBUG_STREAM("fourth last byte received, wait for btf");
 			I2C2->CR2 &= ~I2C_CR2_ITBUFEN;
 		}
@@ -312,6 +450,7 @@ I2C2_EV_IRQHandler(void)
 		
 		if (readBytesLeft == 2)
 		{
+			// EV7_1: RxNE=1, cleared by reading DR register, programming STOP=1
 			DEBUG_STREAM("STOP");
 			I2C2->CR1 |= I2C_CR1_STOP;
 			
@@ -319,9 +458,11 @@ I2C2_EV_IRQHandler(void)
 			uint16_t dr = I2C2->DR;
 			*readPointer++ = dr & 0xff;
 			
-//			DEBUG_STREAM("waiting for stop");
-//			while (I2C2->CR1 & I2C_CR1_STOP)
-//				;
+#if WAIT_FOR_STOP_LOW
+			DEBUG_STREAM("waiting for stop");
+			while (I2C2->CR1 & I2C_CR1_STOP)
+				;
+#endif
 			
 			DEBUG_STREAM("reading data2");
 			dr = I2C2->DR;
@@ -333,6 +474,7 @@ I2C2_EV_IRQHandler(void)
 		
 		if (readBytesLeft == 3)
 		{
+			// EV7_1: RxNE=1, cleared by reading DR register, programming ACK=0
 			I2C2->CR1 &= ~I2C_CR1_ACK;
 			DEBUG_STREAM("NACK");
 			
@@ -346,6 +488,8 @@ I2C2_EV_IRQHandler(void)
 		if (checkNextOperation == CHECK_NEXT_OPERATION_NO_WAIT_FOR_BTF
 			&& writeBytesLeft == 0)
 		{
+			// EV8_2: TxE=1, BTF = 1, Program Stop request.
+			// TxE and BTF are cleared by hardware by the Stop condition
 			DEBUG_STREAM("BTF, write=0");
 			checkNextOperation = CHECK_NEXT_OPERATION_YES;
 		}
@@ -396,8 +540,6 @@ I2C2_ER_IRQHandler(void)
 {
 	DEBUG_STREAM("ERROR!");
 	uint16_t sr1 = I2C2->SR1;
-	uint16_t sr2 = I2C2->SR2;
-	(void) sr2;
 	
 	if (sr1 & I2C_SR1_BERR)
 	{
@@ -447,7 +589,8 @@ I2C2_ER_IRQHandler(void)
 void
 xpcc::stm32::I2cMaster2::configurePins(Mapping mapping)
 {
-	enable();
+	// Enable clock
+	RCC->APB1ENR |= RCC_APB1ENR_I2C2EN;
 	
 	// Initialize IO pins
 #if defined(STM32F2XX) || defined(STM32F4XX)
@@ -471,19 +614,12 @@ xpcc::stm32::I2cMaster2::configurePins(Mapping mapping)
 #endif
 }
 	
-// ----------------------------------------------------------------------------
-void
-xpcc::stm32::I2cMaster2::enable()
-{
-	// Enable clock
-	RCC->APB1ENR |= RCC_APB1ENR_I2C2EN;
-}
-	
 void
 xpcc::stm32::I2cMaster2::initialize(uint16_t ccrPrescaler)
 {
 	reset();
-	enable();
+	// Enable clock
+	RCC->APB1ENR |= RCC_APB1ENR_I2C2EN;
 	
 	I2C2->CR1 = I2C_CR1_SWRST; 		// reset module
 	I2C2->CR1 = 0;
