@@ -51,50 +51,21 @@ typedef xpcc::stm32::BufferedUart5 DebugUart;
 #include <xpcc/io/iostream.hpp>
 extern xpcc::IOStream stream;
 #define DEBUG_STREAM(x) stream << x << xpcc::endl
-#define DEBUG(x) //xpcc::stm32::BufferedUart5::write(x)
+#define DEBUG(x) xpcc::stm32::BufferedUart5::write(x)
 /*/
- #define DEBUG_STREAM(x) //xpcc::delay_us(32)
- #define DEBUG(x)
- //*/
+#define DEBUG_STREAM(x)
+#define DEBUG(x)
+//*/
 
 #include "i2c_master_1.hpp"
 
 #include "../gpio.hpp"
 
 
-enum DebugEnum
-{
-	IRQ_EV = 'i',
-	STARTBIT_SET = 's',
-	ADDRESS_SENT = 'a',
-	TRANSMITTER = 'T',
-	RECEIVER_NEXT_RESTART = 'r',
-	RECEIVER_NEXT_STOP = 'S',
-	RECEIVER_MANY_BYTES = 'm',
-	RECEIVER_TWO_BYTES = 'E',
-	RECEIVER_ONE_BYTE = 'W',
-	AFTER_WRITE_FINISHED_IRQ = 'f',
-	TXE_NO_BYTES_LEFT = 'l',
-	TXE_NEXT_WRITE = 'w',
-	TXE_NEXT_RESTART = 'R',
-	TXE_NEXT_STOP = 't',
-	TXE_BTF_NEXT_RESTART = 'b',
-	TXE_MORE_BYTES_LEFT = 'M',
-	RXNE_IRQ = 'Q',
-	RXNE_MANY_BYTES_LEFT = 'X',
-	RXNE_TWO_BYTES_LEFT = 'P',
-	RXNE_ONE_BYTE_LEFT = 'O',
-	RXNE_NO_BYTES_LEFT_NEXT_RESTART = 'B',
-	RXNE_NO_BYTES_LEFT_NEXT_STOP = 'K',
-	CALL_STARTING = 'Y',
-	
-	IRQ_ER = 'E',
-};
 
-
-	namespace
+namespace
 {
-GPIO__IO(SclB6, B, 6);
+	GPIO__IO(SclB6, B, 6);
 	GPIO__IO(SdaB7, B, 7);
 	
 	GPIO__IO(SclB8, B, 8);
@@ -114,13 +85,12 @@ namespace
 		
 	};
 	CheckNextOperation checkNextOperation = CHECK_NEXT_OPERATION_NO;
-	static std::size_t readBytes = 0;
 	
 	// buffer management
 	static uint8_t *readPointer;
 	static const uint8_t *writePointer;
-	static std::size_t readBytesLeft;
-	static std::size_t writeBytesLeft;
+	static std::size_t readBytesLeft = 0;
+	static std::size_t writeBytesLeft = 0;
 	
 	// delegating
 	static xpcc::i2c::Delegate *delegate = 0;
@@ -132,7 +102,6 @@ namespace
 		writePointer = w.buffer;
 		writeBytesLeft = w.size;
 		readBytesLeft = 0;
-		readBytes = 0;
 		nextOperation = static_cast<xpcc::i2c::Delegate::NextOperation>(w.next);
 	}
 	
@@ -142,27 +111,22 @@ namespace
 		readPointer = r.buffer;
 		readBytesLeft = r.size;
 		writeBytesLeft = 0;
-		readBytes = readBytesLeft;
 		nextOperation = static_cast<xpcc::i2c::Delegate::NextOperation>(r.next);
 	}
 	
 	static void
 	initializeStopAfterAddress()
 	{
-		//writePointer = ..;
 		writeBytesLeft = 0;
 		readBytesLeft = 0;
-		readBytes = 0;
 		nextOperation = xpcc::i2c::Delegate::STOP_OP;
 	}
 	
 	static void
 	initializeRestartAfterAddress()
 	{
-		//writePointer = ..;
 		writeBytesLeft = 0;
 		readBytesLeft = 0;
-		readBytes = 0;
 		nextOperation = xpcc::i2c::Delegate::RESTART_OP;
 	}
 	
@@ -170,12 +134,10 @@ namespace
 	callStarting()
 	{
 		DEBUG_STREAM("callStarting");
-		DEBUG(CALL_STARTING);
 		
 		I2C1->CR1 &= ~I2C_CR1_POS;
 		I2C1->SR1 = 0;
 		I2C1->SR2 = 0;
-		readBytes = 0;
 		
 		// generate startcondition
 		I2C1->CR1 |= I2C_CR1_START;
@@ -183,8 +145,8 @@ namespace
 		
 		// and enable interrupts
 		DEBUG_STREAM("enable interrupts");
-		I2C1->CR2 |= I2C_CR2_ITEVTEN | I2C_CR2_ITERREN;
 		I2C1->CR2 &= ~I2C_CR2_ITBUFEN;
+		I2C1->CR2 |= I2C_CR2_ITEVTEN | I2C_CR2_ITERREN;
 	}
 }
 	
@@ -192,15 +154,12 @@ namespace
 extern "C" void
 I2C1_EV_IRQHandler(void)
 {
-//	DebugUart::write('i');
-	DEBUG(IRQ_EV);
 	DEBUG_STREAM("\n--- interrupt ---");
 	
 	uint16_t sr1 = I2C1->SR1;
 	
 	if (sr1 & I2C_SR1_SB)
 	{
-		DEBUG(STARTBIT_SET);
 		DEBUG_STREAM("startbit set");
 		
 		xpcc::i2c::Delegate::Starting s = delegate->started();
@@ -211,11 +170,13 @@ I2C1_EV_IRQHandler(void)
 			case xpcc::i2c::Delegate::READ_OP:
 				address = (s.address & 0xfe) | xpcc::i2c::READ;
 				initializeRead(delegate->reading());
-				if (readBytesLeft <= 1) {
+				if (readBytesLeft <= 1)
+				{
 					DEBUG_STREAM("NACK");
 					I2C1->CR1 &= ~I2C_CR1_ACK;
 				}
-				else {
+				else
+				{
 					DEBUG_STREAM("ACK");
 					I2C1->CR1 |= I2C_CR1_ACK;
 				}
@@ -228,17 +189,17 @@ I2C1_EV_IRQHandler(void)
 				DEBUG_STREAM("write op: writing=" << writeBytesLeft);
 				break;
 				
+			case xpcc::i2c::Delegate::RESTART_OP:
+				address = (s.address & 0xfe) | xpcc::i2c::WRITE;
+				initializeRestartAfterAddress();
+				DEBUG_STREAM("restart op");
+				break;
+				
 			default:
 			case xpcc::i2c::Delegate::STOP_OP:
 				address = (s.address & 0xfe) | xpcc::i2c::WRITE;
 				initializeStopAfterAddress();
 				DEBUG_STREAM("stop op");
-				break;
-				
-			case xpcc::i2c::Delegate::RESTART_OP:
-				address = (s.address & 0xfe) | xpcc::i2c::WRITE;
-				initializeRestartAfterAddress();
-				DEBUG_STREAM("restart op");
 				break;
 		}
 		
@@ -249,8 +210,6 @@ I2C1_EV_IRQHandler(void)
 	
 	else if (sr1 & I2C_SR1_ADDR)
 	{
-		// EV6: address is written successfully
-		DEBUG(ADDRESS_SENT);
 		DEBUG_STREAM("address sent");
 		DEBUG_STREAM("writeBytesLeft=" << writeBytesLeft);
 		DEBUG_STREAM("readBytesLeft=" << readBytesLeft);
@@ -265,7 +224,6 @@ I2C1_EV_IRQHandler(void)
 		
 		if (readBytesLeft == 2)
 		{
-			DEBUG(RECEIVER_TWO_BYTES);
 			DEBUG_STREAM("NACK | POS");
 			I2C1->CR1 &= ~I2C_CR1_ACK;
 			I2C1->CR1 |= I2C_CR1_POS;
@@ -297,15 +255,14 @@ I2C1_EV_IRQHandler(void)
 	
 	else if (sr1 & I2C_SR1_TXE)
 	{
-		DEBUG_STREAM("TXE: writeBytesLeft=" << writeBytesLeft);
-		
 		// EV8
 		if (writeBytesLeft > 0)
 		{
 			DEBUG_STREAM("tx more bytes");
-			DEBUG(TXE_MORE_BYTES_LEFT);
 			I2C1->DR = *writePointer++; // write data
 			writeBytesLeft--;
+			
+			DEBUG_STREAM("TXE: writeBytesLeft=" << writeBytesLeft);
 			
 			checkNextOperation = CHECK_NEXT_OPERATION_NO_WAIT_FOR_BTF;
 		}
@@ -313,7 +270,6 @@ I2C1_EV_IRQHandler(void)
 		if (writeBytesLeft == 0)
 		{
 			// disable TXE, and wait for BTF
-			DEBUG(TXE_NO_BYTES_LEFT);
 			DEBUG_STREAM("last byte transmitted, wait for btf");
 			I2C1->CR2 &= ~I2C_CR2_ITBUFEN;
 		}
@@ -390,7 +346,6 @@ I2C1_EV_IRQHandler(void)
 			case xpcc::i2c::Delegate::WRITE_OP:
 				if (checkNextOperation != CHECK_NEXT_OPERATION_YES_NO_STOP_BIT)
 				{
-					DEBUG(TXE_NEXT_WRITE);
 					initializeWrite(delegate->writing());
 					// reenable TXE
 					I2C1->CR2 |= I2C_CR2_ITBUFEN;
@@ -411,10 +366,9 @@ I2C1_EV_IRQHandler(void)
 				}
 				
 				DEBUG_STREAM("disable interrupts");
-				I2C1->CR2 &= ~(I2C_CR2_ITEVTEN | I2C_CR2_ITBUFEN);
-				DEBUG_STREAM("delegate=0");
-				::delegate->stopped(xpcc::i2c::Delegate::NORMAL_STOP);
-				::delegate = 0;
+				I2C1->CR2 &= ~(I2C_CR2_ITEVTEN | I2C_CR2_ITBUFEN | I2C_CR2_ITERREN);
+				if (delegate) delegate->stopped(xpcc::i2c::Delegate::NORMAL_STOP);
+				delegate = 0;
 				DEBUG_STREAM("write finished");
 				break;
 		}
@@ -426,63 +380,51 @@ I2C1_EV_IRQHandler(void)
 extern "C" void
 I2C1_ER_IRQHandler(void)
 {
-	DEBUG(IRQ_ER);
 	DEBUG_STREAM("ERROR!");
 	uint16_t sr1 = I2C1->SR1;
 	uint16_t sr2 = I2C1->SR2;
 	(void) sr2;
 	
-	writeBytesLeft = 0;
-	readBytesLeft = 0;
-	
-	DEBUG_STREAM("delegate=0");
 	if (sr1 & I2C_SR1_BERR)
 	{
 		DEBUG_STREAM("BUS ERROR");
 		I2C1->CR1 |= I2C_CR1_STOP;
-		if (delegate)
-		{
-			errorState = xpcc::stm32::I2cMaster1::BUS_ERROR;
-			delegate->stopped(xpcc::i2c::Delegate::ERROR_CONDITION);
-			delegate = 0;
-		}
+		errorState = xpcc::stm32::I2cMaster1::BUS_ERROR;
 	}
 	else if (sr1 & I2C_SR1_AF)
-	{			// acknowledge fail
+	{	// acknowledge fail
 		I2C1->CR1 |= I2C_CR1_STOP;
 		DEBUG_STREAM("ACK FAIL");
-		if (delegate)
-		{
-			errorState = xpcc::stm32::I2cMaster1::DATA_NACK; // may olso be ADDRESS_NACK
-			delegate->stopped(xpcc::i2c::Delegate::ERROR_CONDITION);
-			delegate = 0;
-		}
+		 // may also be ADDRESS_NACK
+		errorState = xpcc::stm32::I2cMaster1::DATA_NACK;
 	}
 	else if (sr1 & I2C_SR1_ARLO)
-	{		// arbitration lost
+	{	// arbitration lost
 		DEBUG_STREAM("ARBITRATION LOST");
-		if (delegate)
-		{
-			errorState = xpcc::stm32::I2cMaster1::ARBITRATION_LOST;
-			delegate->stopped(xpcc::i2c::Delegate::ERROR_CONDITION);
-			delegate = 0;
-		}
+		errorState = xpcc::stm32::I2cMaster1::ARBITRATION_LOST;
 	}
 	else
 	{
 		DEBUG_STREAM("UNKNOWN");
-		if (delegate)
-		{
-			errorState = xpcc::stm32::I2cMaster1::UNKNOWN_ERROR;
-			delegate->stopped(xpcc::i2c::Delegate::ERROR_CONDITION);
-			delegate = 0;
-		}
+		errorState = xpcc::stm32::I2cMaster1::UNKNOWN_ERROR;
 	}
+	
+	if (delegate)
+	{
+		delegate->stopped(xpcc::i2c::Delegate::ERROR_CONDITION);
+		delegate = 0;
+	}
+	
 	// Overrun error is not handled here separately
 	
 	// Clear flags and interrupts
+	I2C1->CR1 &= ~I2C_CR1_POS;
 	I2C1->SR1 = 0;
 	I2C1->SR2 = 0;
+	writeBytesLeft = 0;
+	readBytesLeft = 0;
+	checkNextOperation = CHECK_NEXT_OPERATION_NO;
+	
 	DEBUG_STREAM("disable interrupts");
 	I2C1->CR2 &= ~(I2C_CR2_ITEVTEN | I2C_CR2_ITBUFEN | I2C_CR2_ITERREN);
 }
@@ -491,8 +433,7 @@ I2C1_ER_IRQHandler(void)
 void
 xpcc::stm32::I2cMaster1::configurePins(Mapping mapping)
 {
-	// Enable clock
-	RCC->APB1ENR |= RCC_APB1ENR_I2C1EN;
+	enable();
 	
 	// Initialize IO pins
 #if defined(STM32F2XX) || defined(STM32F4XX)
@@ -529,8 +470,6 @@ void
 xpcc::stm32::I2cMaster1::initialize(uint16_t ccrPrescaler)
 {
 	reset();
-	
-	// Enable clock
 	enable();
 	
 	I2C1->CR1 = I2C_CR1_SWRST; 		// reset module
@@ -540,13 +479,9 @@ xpcc::stm32::I2cMaster1::initialize(uint16_t ccrPrescaler)
 	NVIC_EnableIRQ(I2C1_EV_IRQn);
 	
 	I2C1->CR2 = STM32_APB1_FREQUENCY/1000000;
-	// baudrate (prescaler), only while i2c disabled, PE = 0, 210 standard
 	I2C1->CCR = ccrPrescaler;
 	DEBUG_STREAM("ccrPrescaler=" << ccrPrescaler);
-	//	DEBUG_STREAM("APB1_FREQUENCY=" << STM32_APB1_FREQUENCY);
-	//	DEBUG_STREAM("APB1_FREQUENCY/1000000=" << STM32_APB1_FREQUENCY/1000000);
 	I2C1->TRISE = 0x09;
-	DEBUG_STREAM("TRISE=" << 0x09);
 	
 	I2C1->CR1 |= I2C_CR1_PE; // Enable peripheral
 }
@@ -566,7 +501,6 @@ xpcc::stm32::I2cMaster1::start(xpcc::i2c::Delegate *delegate)
 {
 	if (!::delegate && delegate && delegate->attaching())
 	{
-		DEBUG('\n');
 		DEBUG_STREAM("\n###\n");
 		::delegate = delegate;
 		callStarting();
@@ -581,7 +515,6 @@ xpcc::stm32::I2cMaster1::startSync(xpcc::i2c::Delegate *delegate)
 {
 	if (!::delegate && delegate && delegate->attaching())
 	{
-		DEBUG('\n');
 		DEBUG_STREAM("\n###\n");
 		::delegate = delegate;
 		callStarting();
