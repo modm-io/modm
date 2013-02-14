@@ -250,6 +250,41 @@ PinState out_n, OutputComparePolarity polarity_n)
 	TIM{{ id }}->CCER |= flags << (channel * 4);
 }
 
+void
+configureOutputChannel(uint32_t channel, OutputCompareMode mode,
+uint32_t outputPorts)
+{
+	channel -= 1;	// 1..4 -> 0..3
+
+	// disable output
+	TIM{{ id }}->CCER &= ~(0xf << (channel * 4));
+
+	uint32_t flags = mode;
+
+	if (channel <= 1)
+	{
+		uint32_t offset = 8 * channel;
+
+		flags <<= offset;
+		flags |= TIM{{ id }}->CCMR1 & ~(0xff << offset);
+
+		TIM{{ id }}->CCMR1 = flags;
+	}
+	else {
+		uint32_t offset = 8 * (channel - 2);
+
+		flags <<= offset;
+		flags |= TIM{{ id }}->CCMR2 & ~(0xff << offset);
+
+		TIM{{ id }}->CCMR2 = flags; 
+	}
+
+	// Disable Repetition Counter (FIXME has to be done here for some unknown reason)
+	TIM{{ id }}->RCR = 0;
+
+	TIM{{ id }}->CCER |= outputPorts << (channel * 4);
+}
+
 // ----------------------------------------------------------------------------
 // Re-implemented here to save some code space. As all arguments in the calls
 // below are constant the compiler is able to calculate everything at

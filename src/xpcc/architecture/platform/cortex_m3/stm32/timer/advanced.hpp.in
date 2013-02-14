@@ -312,6 +312,25 @@ namespace xpcc
 					PinState out_n,
 					OutputComparePolarity polarity_n = OUTPUT_ACTIVE_HIGH);
 
+			/*
+			 * Configure Output Channel with outputPorts quadruple
+			 *
+			 * This is the least typsafe way of doing this and should only
+			 * be done if it provides a necessary performance benefit.
+			 * i.e. if you have specific output quadruples precalculated and
+			 * just want to load them as fast as possible.
+			 *
+			 * The "outputPorts quadruple" is a uint that contains four bits
+			 * that describe the itnended output setting:
+			 * Bit0: Output Enabled/Disabled
+			 * Bit1: Output Polarity
+			 * Bit2: Complementary Output Enable/Disable
+			 * Bit3: Complementary Output Polarity
+			 */
+			static void
+			configureOutputChannel(uint32_t channel, OutputCompareMode mode,
+					uint32_t outputPorts);
+
 			static inline void
 			setCompareValue(uint32_t channel, uint16_t value)
 			{
