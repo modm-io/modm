@@ -181,6 +181,18 @@ namespace xpcc
 				SLAVE_EXTERNAL_CLOCK = TIM_SMCR_SMS_2 | TIM_SMCR_SMS_1 | TIM_SMCR_SMS_0, // Rising edges of the selected trigger (TRGI) clock the counter.
 			};
 
+			enum OffStateForRunMode
+			{
+				OSSR_DISABLE = 0,
+				OSSR_ENABLE = TIM_BDTR_OSSR,
+			};
+
+			enum OffStateForIdleMode
+			{
+				OSSI_DISABLE = 0,
+				OSSI_ENABLE = TIM_BDTR_OSSI,
+			};
+
 			
 			static void
 			enable();
@@ -280,7 +292,34 @@ namespace xpcc
 			{
 				TIM{{ id }}->BDTR |= TIM_BDTR_MOE;
 			}
-			
+
+			/*
+			 * Enable/Disable automatic set of MOE bit at the next update event
+			 */
+			static inline void
+			setAutomaticUpdate(bool enable)
+			{
+				if(enable)
+					TIM{{ id }}->BDTR |= TIM_BDTR_AOE;
+				else
+					TIM{{ id }}->BDTR &= ~TIM_BDTR_AOE;
+			}
+
+			static inline void
+			setOffState(OffStateForRunMode runMode, OffStateForIdleMode idleMode)
+			{
+				uint32_t flags = TIM{{ id }}->BDTR;
+				flags &= ~(TIM_BDTR_OSSR | TIM_BDTR_OSSI);
+				flags |= runMode | idleMode;
+				TIM{{ id }}->BDTR = flags;
+			}
+
+			static inline void
+			setDeadTime()
+			{
+				
+			}
+
 		public:
 			static void
 			configureInputChannel(uint32_t channel, InputCaptureMapping input,
