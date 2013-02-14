@@ -287,11 +287,31 @@ namespace xpcc
 					InputCapturePrescaler prescaler,
 					InputCapturePolarity polarity, uint8_t filter,
 					bool xor_ch1_3=false);
-			
+
 			static void
 			configureOutputChannel(uint32_t channel, OutputCompareMode mode,
 					uint16_t compareValue);
-			
+			// TODO: Maybe add some functionality from the configureOutput
+			//       function below...
+
+			/*
+			 * Configure Output Channel without changing the Compare Value
+			 *
+			 * Normally used to REconfigure the Output channel without touching
+			 * the compare value. This can e.g. be useful for commutation of a
+			 * bldc motor.
+			 *
+			 * This function probably won't be used for a one time setup but
+			 * rather for adjusting the output setting periodically.
+			 * Therefore it aims aims to provide the best performance possible
+			 * without sacrificing code readability.
+			 */
+			static void
+			configureOutputChannel(uint32_t channel, OutputCompareMode mode,
+					PinState out, OutputComparePolarity polarity,
+					PinState out_n,
+					OutputComparePolarity polarity_n = OUTPUT_ACTIVE_HIGH);
+
 			static inline void
 			setCompareValue(uint32_t channel, uint16_t value)
 			{

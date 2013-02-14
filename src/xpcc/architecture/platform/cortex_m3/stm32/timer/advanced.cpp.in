@@ -210,6 +210,46 @@ xpcc::stm32::Timer{{ id }}::configureOutputChannel(uint32_t channel,
 	}
 }
 
+void
+xpcc::stm32::Timer{{ id }}::configureOutputChannel(uint32_t channel,
+OutputCompareMode mode,
+PinState out, OutputComparePolarity polarity,
+PinState out_n, OutputComparePolarity polarity_n)
+{
+	channel -= 1;	// 1..4 -> 0..3
+
+	// disable output
+	TIM{{ id }}->CCER &= ~(0xf << (channel * 4));
+
+	uint32_t flags = mode;
+
+	if (channel <= 1)
+	{
+		uint32_t offset = 8 * channel;
+
+		flags <<= offset;
+		flags |= TIM{{ id }}->CCMR1 & ~(0xff << offset);
+
+		TIM{{ id }}->CCMR1 = flags;
+	}
+	else {
+		uint32_t offset = 8 * (channel - 2);
+
+		flags <<= offset;
+		flags |= TIM{{ id }}->CCMR2 & ~(0xff << offset);
+
+		TIM{{ id }}->CCMR2 = flags; 
+	}
+
+	// Disable Repetition Counter (FIXME has to be done here for some unknown reason)
+	TIM{{ id }}->RCR = 0;
+
+	// CCER Flags (Enable/Polarity)
+	flags = (polarity_n<<2) | (out_n<<2) | polarity | out;
+
+	TIM{{ id }}->CCER |= flags << (channel * 4);
+}
+
 // ----------------------------------------------------------------------------
 // Re-implemented here to save some code space. As all arguments in the calls
 // below are constant the compiler is able to calculate everything at

@@ -378,6 +378,12 @@ namespace xpcc
 				INPUT_DIV8	= 3,
 			};
 
+			enum PinState
+			{
+				DISABLE = 0,
+				ENABLE = 1,
+			};
+
 		public:
 			/**
 			 * Set operation mode of the timer
