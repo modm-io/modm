@@ -18,11 +18,14 @@ xpcc::IOStream stream(device);
 
 
 // SENSORS ####################################################################
-// hardware I2C
+#define USE_HARDWARE_I2C 1
+
+#if USE_HARDWARE_I2C
 typedef xpcc::stm32::I2cMaster1 Twi1;
-// software I2C
+#else
 #include <xpcc/driver/connectivity/i2c/software_i2c.hpp>
-//typedef xpcc::SoftwareI2C< SCL, SDA > Twi1;
+typedef xpcc::SoftwareI2C< SCL, SDA > Twi1;
+#endif
 
 #include <xpcc/driver/pressure/bmp085.hpp>
 uint8_t barometerData[5];
@@ -74,11 +77,12 @@ MAIN_FUNCTION // ##############################################################
 	Button::setInput(xpcc::stm32::PULLUP);
 	LED::setOutput(xpcc::gpio::HIGH);
 	
-	// hardware I2C
+#if USE_HARDWARE_I2C
 	Twi1::configurePins(Twi1::REMAP_PB8_PB9);
 	Twi1::initialize(210);
-	// software I2C
-//	Twi1::initialize();
+#else
+	Twi1::initialize();
+#endif
 	
 	stream << "init BMA180\n";
 	accelerometer.configure(xpcc::bma180::RANGE_2G, xpcc::bma180::BW_20HZ);
