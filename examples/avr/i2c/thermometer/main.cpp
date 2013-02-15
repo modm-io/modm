@@ -1,6 +1,5 @@
 
 #include <xpcc/architecture.hpp>
-#include <xpcc/driver/connectivity/i2c/software_i2c.hpp>
 #include <xpcc/driver/temperature/ds1631.hpp>
 
 
@@ -16,6 +15,7 @@ xpcc::atmega::BufferedUart0 uart(9600);
 #define USE_HARDWARE
 
 #if defined USE_SOFTWARE
+#include <xpcc/driver/connectivity/i2c/software_i2c.hpp>
 typedef xpcc::SoftwareI2C<Scl, Sda> I2C;
 #endif
 
