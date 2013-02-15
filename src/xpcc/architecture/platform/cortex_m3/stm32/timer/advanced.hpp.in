@@ -87,7 +87,7 @@ namespace xpcc
 		 */
 		class Timer{{ id }} : public AdvancedControlTimer
 		{
-#if defined(STM32F2XX) || defined(STM32F4XX)
+#if defined(STM32F2XX) || defined(STM32F3XX) || defined(STM32F4XX)
 		public:
 			
 #else
@@ -462,7 +462,7 @@ namespace xpcc
 			static inline void
 			setCompareValue(uint32_t channel, uint16_t value)
 			{
-#if defined(STM32F2XX) || defined(STM32F4XX)
+#if defined(STM32F2XX) || defined(STM32F3XX) || defined(STM32F4XX)
 				*(&TIM{{ id }}->CCR1 + (channel - 1)) = value;
 #else
 				*(&TIM{{ id }}->CCR1 + ((channel - 1) * 2)) = value;
@@ -472,7 +472,7 @@ namespace xpcc
 			static inline uint16_t
 			getCompareValue(uint32_t channel)
 			{
-#if defined(STM32F2XX) || defined(STM32F4XX)
+#if defined(STM32F2XX) || defined(STM32F3XX) || defined(STM32F4XX)
 				return *(&TIM{{ id }}->CCR1 + (channel - 1));
 #else
 				return *(&TIM{{ id }}->CCR1 + ((channel - 1) * 2));

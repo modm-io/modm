@@ -32,7 +32,14 @@
 #ifndef XPCC_STM32__TIMER_{{ id }}_HPP
 #define XPCC_STM32__TIMER_{{ id }}_HPP
 
+
 #include "timer_base.hpp"
+
+{% if id == 4 %}
+#if !defined (STM32F10X_LD)
+{% elif id == 5 %}
+#if !defined (STM32F10X_LD) && !defined (STM32F10X_MD) && !defined(STM32F3XX)
+{% endif %}
 
 namespace xpcc
 {
@@ -62,7 +69,7 @@ namespace xpcc
 		class Timer{{ id }} : public GeneralPurposeTimer
 		{
 		public:
-#if defined(STM32F2XX) || defined(STM32F4XX)
+#if defined(STM32F2XX) || defined(STM32F3XX) || defined(STM32F4XX)
 
 #else
 			{% if id == 2 -%}
@@ -166,7 +173,7 @@ namespace xpcc
 			// Timer 2 and 5 are the only one which have the size of 32 bit and
 			// only on st32f2 and st32f4
 			{%- if id in [2, 5] %}
-#if defined(STM32F2XX) || defined(STM32F4XX)
+#if defined(STM32F2XX) || defined(STM32F3XX) || defined(STM32F4XX)
 			typedef uint32_t Value;
 #else
 			typedef uint16_t Value;
@@ -249,7 +256,7 @@ namespace xpcc
 			static inline void
 			setCompareValue(uint32_t channel, Value value)
 			{
-#if defined(STM32F2XX) || defined(STM32F4XX)
+#if defined(STM32F2XX) || defined(STM32F3XX) || defined(STM32F4XX)
 				*(&TIM{{ id }}->CCR1 + (channel - 1)) = value;
 #else
 				*(&TIM{{ id }}->CCR1 + ((channel - 1) * 2)) = value;
@@ -259,7 +266,7 @@ namespace xpcc
 			static inline Value
 			getCompareValue(uint32_t channel)
 			{
-#if defined(STM32F2XX) || defined(STM32F4XX)
+#if defined(STM32F2XX) || defined(STM32F3XX) || defined(STM32F4XX)
 				return *(&TIM{{ id }}->CCR1 + (channel - 1));
 #else
 				return *(&TIM{{ id }}->CCR1 + ((channel - 1) * 2));
@@ -310,5 +317,9 @@ namespace xpcc
 		};
 	}
 }
+
+{% if id == 4 or id == 5 %}
+#endif
+{% endif %}
 
 #endif // XPCC_STM32__TIMER_{{ id }}_HPP

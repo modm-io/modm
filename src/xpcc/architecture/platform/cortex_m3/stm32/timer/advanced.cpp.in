@@ -36,7 +36,8 @@
 
 #include <xpcc_config.hpp>
 {% if id == 8 %}
-#if defined (STM32F10X_HD) || defined (STM32F10X_XL) || defined(STM32F2XX) || defined(STM32F4XX)
+#if defined (STM32F10X_HD) || defined (STM32F10X_XL) || defined(STM32F2XX) \
+							   || defined(STM32F3XX) || defined(STM32F4XX)
 {% endif %}
 
 #if defined(STM32F10X_XL) || defined(STM32F2XX) || defined(STM32F4XX)
@@ -47,6 +48,10 @@
 #	define TIM8_BRK_IRQn		TIM8_BRK_TIM12_IRQn
 #	define TIM8_UP_IRQn			TIM8_UP_TIM13_IRQn
 #	define TIM8_TRG_COM_IRQn	TIM8_TRG_COM_TIM14_IRQn
+#elif defined(STM32F3XX)
+#	define TIM1_BRK_IRQn		TIM1_BRK_TIM15_IRQn
+#	define TIM1_UP_IRQn			TIM1_UP_TIM16_IRQn
+#	define TIM1_TRG_COM_IRQn	TIM1_TRG_COM_TIM17_IRQn
 #endif
 
 // ----------------------------------------------------------------------------

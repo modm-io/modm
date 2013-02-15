@@ -106,6 +106,7 @@
 #include "stm32/adc/adc_1.hpp"
 #include "stm32/adc/adc_2.hpp"
 #include "stm32/adc/adc_3.hpp"
+#include "stm32/timer.hpp"
 #endif
 
 // COMP1-7 and ADC4 only available on STM32F3 series
@@ -138,6 +139,6 @@
 #include "stm32/i2c/i2c_master_3.hpp"
 
 #include "stm32/systick_timer.hpp"
-#include "stm32/timer.hpp"
+
 
 #endif
