@@ -351,7 +351,7 @@ xpcc::rpr::Interface<Device, N>::update()
 				default:
 					if (status & STATUS_DESTINATION_RECOGNISED)
 					{
-						if (length < N+4)
+						if (length <= N+8)
 						{
 							XPCC_RPR_LOG("rx: buffering payload");
 							receiveBuffer.payload[length-5] = data;

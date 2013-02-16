@@ -86,24 +86,24 @@ namespace xpcc
 			 * \return pointer to first element of 16bit result array
 			 * This method resets isNewDataAvailable() to \c false.
 			 */
-			static inline uint16_t*
+			static ALWAYS_INLINE uint16_t*
 			getData();
 			
 			/**
 			 * \return pointer to first element of 16bit result array, without
 			 * changing isNewDataAvailable()
 			 */
-			static inline uint16_t*
+			static ALWAYS_INLINE uint16_t*
 			readData();
 			
 			/**
 			 * \return \c true if new data is available and has not yet been read.
 			 */
-			static inline bool
+			static ALWAYS_INLINE bool
 			isNewDataAvailable();
 			
 		private:
-			static inline void
+			static void
 			sampleAdc();
 			
 			static ADConv adc;

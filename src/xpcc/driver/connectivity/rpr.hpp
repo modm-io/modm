@@ -34,11 +34,8 @@
  * This is a simplified version of the [Resilient Packet Ring]
  * ( http://en.wikipedia.org/wiki/Resilient_Packet_Ring ).
  *
- * Action callbacks to query requests can be defined as well as universal
- * callbacks to any transmitted messaged (Listener callbacks).
- * As an optional advanced feature, error handling callbacks can also be defined,
- * which fire if messages have not been able to be sent, or requests timed out
- * or misbehaved in other manners, or other nodes query unavailable information.
+ * Listener callbacks to received messaged can be defined. All messages are buffered.
+ * As an optional advanced feature, error handling callbacks can also be defined.
  *
  *
  * Frame Format
