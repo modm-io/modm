@@ -44,3 +44,4 @@ namespace xpcc
 }
 
 #include "atmega/gpio.hpp"
+#include "atmega/adc.hpp"

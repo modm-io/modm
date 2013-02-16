@@ -74,12 +74,12 @@ namespace xpcc
 		 * main()
 		 * {
 		 *     xpcc::atmega::Adc::initialize(
-		 *             xpcc::atmega:Adc::REFERENCE_INTERNAL_2V56,
-		 *             xpcc::atmega:Adc::PRESCALER_64);
+		 *             xpcc::atmega::Adc::REFERENCE_INTERNAL_2V56,
+		 *             xpcc::atmega::Adc::PRESCALER_64);
 		 *     
 		 *     ...
 		 *     // read channel 2
-		 *     uint16_t value = xpcc::atmega:Adc::readChannel(2);
+		 *     uint16_t value = xpcc::atmega::Adc::readChannel(2);
 		 *     ...
 		 * }
 		 * \endcode
@@ -87,14 +87,14 @@ namespace xpcc
 		 * Asynchronous mode:
 		 * \code
 		 * // start a new conversion on channel 3
-		 * xpcc::atmega:Adc::startConversion(3);
+		 * xpcc::atmega::Adc::startConversion(3);
 		 * 
 		 * // do something useful while waiting for the result 
-		 * while (!xpcc::atmega:Adc::isFinished())
+		 * while (!xpcc::atmega::Adc::isFinished())
 		 *     ;
 		 * 
 		 * // read the converted value
-		 * uint16_t value = xpcc::atmega:Adc::getValue();
+		 * uint16_t value = xpcc::atmega::Adc::getValue();
 		 * \endcode
 		 *
 		 * Alternatively you can use the AdcInterrupt class to attach a function
@@ -102,7 +102,7 @@ namespace xpcc
 		 * 
 		 * For a detailed example see the \c adc folder in the examples folder.
 		 * 
-		 * \see AdcInterrupt
+		 * \see 	AdcInterrupt
 		 * \author	Fabian Greif, Niklas Hauser
 		 * \ingroup	atmega
 		 */
@@ -118,7 +118,11 @@ namespace xpcc
 				REFERENCE_INTERNAL_AVCC_NO_CAP = 0x40, //0100
 				REFERENCE_INTERNAL_2V56 = 0xe0, //1110
 				REFERENCE_INTERNAL_2V56_NO_CAP = 0xc0 //1100
-#elif defined (__AVR_ATmega640__) || defined (__AVR_ATmega1280__) || defined (__AVR_ATmega1281__) || defined (__AVR_ATmega2560__) || defined (__AVR_ATmega2561__) || defined (__AVR_ATmega1284P__) || defined (__AVR_ATmega164A__) || defined (__AVR_ATmega164P__) || defined (__AVR_ATmega324A__) || defined (__AVR_ATmega324P__) || defined (__AVR_ATmega644PA__) || defined (__AVR_ATmega644A__) || defined (__AVR_ATmega644__) || defined (__AVR_ATmega644P__)
+#elif defined (__AVR_ATmega640__) || defined (__AVR_ATmega1280__) || defined (__AVR_ATmega1281__) || \
+	defined (__AVR_ATmega2560__) || defined (__AVR_ATmega2561__) || defined (__AVR_ATmega1284P__) || \
+	defined (__AVR_ATmega164A__) || defined (__AVR_ATmega164P__) || defined (__AVR_ATmega324A__) || \
+	defined (__AVR_ATmega324P__) || defined (__AVR_ATmega644PA__) || defined (__AVR_ATmega644A__) || \
+	defined (__AVR_ATmega644__) || defined (__AVR_ATmega644P__)
 				REFERENCE_AREF = 0,
 				REFERENCE_INTERNAL_AVCC = 0x40,
 				REFERENCE_INTERNAL_1V1 = 0x80,
@@ -128,7 +132,10 @@ namespace xpcc
 				REFERENCE_INTERNAL_AVDD_NO_CAP = 0x40,
 				REFERENCE_INTERNAL_1V5_NO_CAP = 0x80,
 				REFERENCE_INTERNAL_1V6_NO_CAP = 0xc0
-#elif defined (__AVR_ATmega128__) || defined (__AVR_ATmega64__) || defined (__AVR_ATmega32__) || defined (__AVR_ATmega16__) || defined (__AVR_ATmega16A__) || defined(__AVR_ATmega323__) || defined (__AVR_ATmega163__) || defined (__AVR_ATmega8535__) || defined (__AVR_ATmega8__) || defined (__AVR_AT90CAN128__)
+#elif defined (__AVR_ATmega128__) || defined (__AVR_ATmega64__) || defined (__AVR_ATmega32__) || \
+	defined (__AVR_ATmega16__) || defined (__AVR_ATmega16A__) || defined(__AVR_ATmega323__) || \
+	defined (__AVR_ATmega163__) || defined (__AVR_ATmega8535__) || defined (__AVR_ATmega8__) || \
+	defined (__AVR_AT90CAN128__)
 				REFERENCE_AREF = 0,
 				REFERENCE_INTERNAL_AVCC = 0x40,
 				REFERENCE_INTERNAL_2V56 = 0xc0
@@ -137,7 +144,9 @@ namespace xpcc
 				REFERENCE_INTERNAL_AVCC = 0x40,
 				REFERENCE_INTERNAL_1V1 = 0xc0
 #endif
-// ATmega103, ATmega16HVB, ATmega32HVB, ATmega8HVA, ATmega16HVA, ATmega16HVA2, ATmega406 do no have selectable voltage reference
+			// ATmega103, ATmega16HVB, ATmega32HVB, ATmega8HVA,
+			// ATmega16HVA, ATmega16HVA2, ATmega406 do no have selectable
+			// voltage reference
 			};
 			
 			enum Prescaler
@@ -164,7 +173,7 @@ namespace xpcc
 			setReferenceVoltage(Reference referenceVoltage)
 			{
 #if defined ISRCEN
-				ADCSRB = (ADCSRB & ~(1<<AREFEN)) | (referenceVoltage & (1<<AREFEN));
+				ADCSRB = (ADCSRB & ~(1 << AREFEN)) | (referenceVoltage & (1 << AREFEN));
 #endif
 				ADMUX = (ADMUX & ~0xc0) | (referenceVoltage & 0xc0);
 			}
@@ -180,7 +189,7 @@ namespace xpcc
 			static inline void
 			setLeftAdjustResult(bool enable)
 			{
-				ADMUX = (ADMUX & ~(1<<ADLAR)) | (enable ? (1<<ADLAR) : 0);
+				ADMUX = (ADMUX & ~(1 << ADLAR)) | (enable ? (1 << ADLAR) : 0);
 			}
 #endif
 			/**
