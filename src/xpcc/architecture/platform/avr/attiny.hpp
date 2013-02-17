@@ -44,4 +44,7 @@ namespace xpcc
 }
 
 #include "atmega/gpio.hpp"
+
+#if !defined(__AVR_ATtiny2313__)
 #include "atmega/adc.hpp"
+#endif
