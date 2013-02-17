@@ -109,14 +109,13 @@ namespace xpcc
 				const uint_fast8_t idx = (pinnr & 0x0f) >> 2;
 				const uint16_t mask = ((pinnr & 0xf0) >> 4) << ( (pinnr & 0x03)  << 2);
 
-#if defined(STM32F2XX) || \
-	defined(STM32F10X_CL) || \
-	defined(STM32F10X_LD)    || defined(STM32F10X_MD)    || defined(STM32F10X_HD)    || defined(STM32F10X_XL) || \
-	defined(STM32F10X_LD_VL) || defined(STM32F10X_MD_VL) || defined(STM32F10X_HD_VL)
+#if		defined(STM32F10X_CL) || \
+		defined(STM32F10X_LD)    || defined(STM32F10X_MD)    || defined(STM32F10X_HD)    || defined(STM32F10X_XL) || \
+		defined(STM32F10X_LD_VL) || defined(STM32F10X_MD_VL) || defined(STM32F10X_HD_VL)
 				// Enable AFIO
 				RCC->APB2ENR |= RCC_APB2ENR_AFIOEN;
 				AFIO->EXTICR[idx] |= mask;
-#elif defined(STM32F4XX)
+#elif	defined(STM32F2XX) || defined(STM32F4XX)
 				// Enable SYSCFG
 				RCC->APB2ENR |= RCC_APB2ENR_SYSCFGEN;
 				SYSCFG->EXTICR[idx] |= mask;
