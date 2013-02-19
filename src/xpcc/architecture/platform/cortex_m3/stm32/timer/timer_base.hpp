@@ -342,6 +342,13 @@ namespace xpcc
 				OUTPUT_PWM2 = TIM_CCMR1_OC1M_2 | TIM_CCMR1_OC1M_1 | TIM_CCMR1_OC1M_0,
 			};
 
+			enum OutputComparePreload
+			{
+				PRELOAD_REGISTER_DISABLED = 0,
+				PRELOAD_REGISTER_ENABLED  = TIM_CCMR1_OC1PE,
+			};
+
+
 			enum OutputComparePolarity
 			{
 				OUTPUT_ACTIVE_HIGH = 0,

@@ -395,7 +395,8 @@ namespace xpcc
 			configureOutputChannel(uint32_t channel, OutputCompareMode mode,
 					PinState out, OutputComparePolarity polarity,
 					PinState out_n,
-					OutputComparePolarity polarity_n = OUTPUT_ACTIVE_HIGH);
+					OutputComparePolarity polarity_n = OUTPUT_ACTIVE_HIGH,
+					OutputComparePreload preload = PRELOAD_REGISTER_DISABLED);
 
 			/*
 			 * Configure Output Channel width Mode/OutputPort uint
