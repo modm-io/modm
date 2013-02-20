@@ -135,7 +135,7 @@ namespace xpcc
 				TRIGGER_INTERNAL_1 = TIM_SMCR_TS_0,
 				TRIGGER_INTERNAL_2 = TIM_SMCR_TS_1,
 				{% if (id < 2 or id > 5) and id != 9 and id != 12 %}TRIGGER_INTERNAL_3 = TIM_SMCR_TS_1 | TIM_SMCR_TS_0,{% endif %}
-				{% if id < 2 or id > 5 %}TRIGGER_TI1_EDGE_DETECTOR = TIM_SMCR_TS_2,{% endif %}
+				TRIGGER_TI1_EDGE_DETECTOR = TIM_SMCR_TS_2,
 				TRIGGER_FILTERED_TI1 = TIM_SMCR_TS_2 | TIM_SMCR_TS_0,
 				TRIGGER_FILTERED_TI2 = TIM_SMCR_TS_2 | TIM_SMCR_TS_1,
 				{% if id != 9 and id != 12 %}TRIGGER_EXTERNAL = TIM_SMCR_TS_2 | TIM_SMCR_TS_1 | TIM_SMCR_TS_0,{% endif %}
