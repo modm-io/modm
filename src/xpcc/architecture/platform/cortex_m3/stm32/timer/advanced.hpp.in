@@ -193,6 +193,12 @@ namespace xpcc
 				OSSI_ENABLE = TIM_BDTR_OSSI,
 			};
 
+			enum OutputIdleState
+			{
+				IDLE_STATE_RESET = 0,
+				IDLE_STATE_SET = TIM_CR2_OIS1,
+			};
+
 			
 			static void
 			enable();
@@ -246,7 +252,7 @@ namespace xpcc
 			}
 
 			static inline void
-			disableCaptureCcomparePreloadedControl()
+			disableCaptureComparePreloadedControl()
 			{
 				TIM{{ id }}->CR2 &= ~TIM_CR2_CCPC;
 			}
@@ -312,6 +318,19 @@ namespace xpcc
 				flags &= ~(TIM_BDTR_OSSR | TIM_BDTR_OSSI);
 				flags |= runMode | idleMode;
 				TIM{{ id }}->BDTR = flags;
+			}
+
+			static inline void
+			setOutputIdleState(uint32_t channel, OutputIdleState idle,
+									OutputIdleState idle_n = IDLE_STATE_RESET)
+			{
+				uint32_t flags = TIM{{ id }}->CR2;
+				channel -= 1;
+				flags &=  (IDLE_STATE_SET << (channel * 2))
+						| (IDLE_STATE_SET << (channel * 2 + 1));
+				flags |= (idle   << (channel * 2));
+				flags |= (idle_n << (channel * 2 + 1));
+				TIM{{ id }}->CR2 = flags;
 			}
 
 			/*
@@ -419,7 +438,8 @@ namespace xpcc
 			 * port output quadruple specified above.
 			 */
 			static void
-			configureOutputChannel(uint32_t channel, uint32_t modeOutputPorts);
+			configureOutputChannel(uint32_t channel, uint32_t modeOutputPorts,
+					OutputComparePreload preload = PRELOAD_REGISTER_DISABLED);
 
 			static inline void
 			setCompareValue(uint32_t channel, uint16_t value)
