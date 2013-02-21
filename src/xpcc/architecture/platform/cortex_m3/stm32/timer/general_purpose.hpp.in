@@ -238,7 +238,7 @@ namespace xpcc
 			
 			static void
 			configureOutputChannel(uint32_t channel, OutputCompareMode mode,
-					Value compareValue);
+					Value compareValue, PinState out = ENABLE);
 			
 			static inline void
 			setCompareValue(uint32_t channel, Value value)
