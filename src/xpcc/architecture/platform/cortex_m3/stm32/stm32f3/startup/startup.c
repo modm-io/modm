@@ -347,6 +347,14 @@ Reset_Handler(void)
 			| RCC_AHBRSTR_GPIODRST
 			| RCC_AHBRSTR_GPIOFRST
 			; // Reset value is 0, check if this can be left out.
+
+	RCC->AHBRSTR &=
+			~( RCC_AHBRSTR_GPIOARST
+			 | RCC_AHBRSTR_GPIOBRST
+			 | RCC_AHBRSTR_GPIOCRST
+			 | RCC_AHBRSTR_GPIODRST
+			 | RCC_AHBRSTR_GPIOFRST)
+			;
 	
 	// Setup NVIC
 	// Set vector table
