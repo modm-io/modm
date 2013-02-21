@@ -58,8 +58,8 @@ xpcc::stm32::Clock::enablePll(PllSource source, PllMul pllM)
 
 	uint32_t tmp = 0;
 	
-	// Read reserved values and clear all other values
-	tmp |= RCC->CFGR & ~(
+	// Read reserved and read-only values and clear all other values
+	tmp |= RCC->CFGR & (
 			(1 << 31) | (1 << 30) | (1 << 29) | (1 << 28) | (1 << 27) |
 			(1 << 15) | (1 << 14) |
 			(1 <<  3) | (1 <<  2));
