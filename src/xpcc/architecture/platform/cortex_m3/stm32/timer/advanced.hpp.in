@@ -438,8 +438,7 @@ namespace xpcc
 			 * port output quadruple specified above.
 			 */
 			static void
-			configureOutputChannel(uint32_t channel, uint32_t modeOutputPorts,
-					OutputComparePreload preload = PRELOAD_REGISTER_DISABLED);
+			configureOutputChannel(uint32_t channel, uint32_t modeOutputPorts);
 
 			static inline void
 			setCompareValue(uint32_t channel, uint16_t value)
