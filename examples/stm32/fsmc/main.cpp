@@ -9,6 +9,7 @@ GPIO__OUTPUT(Led, A, 8);
 GPIO__INPUT(Button, C, 13);
 
 using namespace xpcc::stm32;
+using namespace xpcc::stm32::fsmc;
 
 namespace lcd
 {
@@ -100,6 +101,15 @@ MAIN_FUNCTION
 	display.initialize();
 	display.setFont(xpcc::font::Assertion);
 
+	/*NorSram::AsynchronousTiming timing = {
+		
+	};
+	
+	Fsmc::initialize();
+	NorSram::configureAsynchronousRegion(NorSram::CHIP_SELECT_1,
+			NorSram::NO_MULTIPLEX,
+			timing);*/
+	
 	while (1) {
 		static uint8_t x = 0;
 		display.clear();
@@ -121,4 +131,6 @@ MAIN_FUNCTION
 			x = 0;
 		}
 	}
+	
+	return 0;
 }

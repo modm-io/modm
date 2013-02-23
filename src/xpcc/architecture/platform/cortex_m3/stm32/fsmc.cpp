@@ -30,3 +30,61 @@
 
 #include "fsmc.hpp"
 
+// ----------------------------------------------------------------------------
+/*
+ * - Byte select lanes (NBL[1:0]) are not used during read access (they are
+ *   kept low). Read access is always 16 bit!
+ * - Output signal change on the rising edge of HCLK
+ * - In synchronous mode the output data changes on the falling edge of CLK
+ */
+void
+xpcc::stm32::Fsmc::initialize()
+{
+	
+}
+
+// ----------------------------------------------------------------------------
+void
+xpcc::stm32::fsmc::NorSram::resetRegion(Region region)
+{
+	/* FSMC_Bank1_NORSRAM1 */
+	if (region == CHIP_SELECT_1)
+	{
+		FSMC_Bank1->BTCR[region] = 0x000030DB;   
+	}
+	/* FSMC_Bank1_NORSRAM2,  FSMC_Bank1_NORSRAM3 or FSMC_Bank1_NORSRAM4 */
+	else
+	{   
+		FSMC_Bank1->BTCR[region] = 0x000030D2;
+	}
+	
+	FSMC_Bank1->BTCR[region + 1] = 0x0FFFFFFF;
+	FSMC_Bank1E->BWTR[region] = 0x0FFFFFFF;
+}
+
+void
+xpcc::stm32::fsmc::NorSram::configureSynchronousRegion(Region region,
+		Muliplex multiplex, SynchronousTiming timing)
+{
+	// Bank1 NOR/SRAM control register configuration
+	FSMC_Bank1->BTCR[region] = FSMC_BCR1_EXTMOD;
+	
+	
+/*  FSMC_Bank1->BTCR[FSMC_NORSRAMInitStruct->FSMC_Bank] = 
+            (uint32_t)FSMC_NORSRAMInitStruct->FSMC_DataAddressMux |
+            FSMC_NORSRAMInitStruct->FSMC_MemoryType |
+            FSMC_NORSRAMInitStruct->FSMC_MemoryDataWidth |
+            FSMC_NORSRAMInitStruct->FSMC_BurstAccessMode |
+            FSMC_NORSRAMInitStruct->FSMC_AsynchronousWait |
+            FSMC_NORSRAMInitStruct->FSMC_WaitSignalPolarity |
+            FSMC_NORSRAMInitStruct->FSMC_WrapMode |
+            FSMC_NORSRAMInitStruct->FSMC_WaitSignalActive |
+            FSMC_NORSRAMInitStruct->FSMC_WriteOperation |
+            FSMC_NORSRAMInitStruct->FSMC_WaitSignal |
+            FSMC_NORSRAMInitStruct->FSMC_ExtendedMode |
+            FSMC_NORSRAMInitStruct->FSMC_WriteBurst;
+  if(FSMC_NORSRAMInitStruct->FSMC_MemoryType == FSMC_MemoryType_NOR)
+  {
+    FSMC_Bank1->BTCR[FSMC_NORSRAMInitStruct->FSMC_Bank] |= (uint32_t)BCR_FACCEN_SET;
+  }*/
+}
