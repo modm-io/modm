@@ -28,8 +28,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__LED_TLC594X_LED_HPP
-#define XPCC__LED_TLC594X_LED_HPP
+#ifndef XPCC__LED_TLC594X_MULTIPLE_LED_HPP
+#define XPCC__LED_TLC594X_MULTIPLE_LED_HPP
 
 #include <stdint.h>
 #include "led.hpp"
@@ -49,7 +49,7 @@ namespace xpcc
 		 * \ingroup led
 		 */
 		template< typename PwmController >
-		class TLC594XLed : public Led
+		class TLC594XMultipleLed : public Led
 		{
 		private:
 			uint16_t currentValue;
@@ -61,20 +61,25 @@ namespace xpcc
 			
 			xpcc::PeriodicTimer<> timer;
 			
-			const uint8_t channel;
+			const uint8_t *channels;
+			uint8_t channelSize;
+			
 			xpcc::accessor::Flash<uint16_t> table;
 			std::size_t const tableSize;
 			
 			void
 			setChannels(uint16_t brightness)
 			{
-				PwmController::setChannel(channel, table[brightness]);
+				for (uint_fast8_t i = 0; i < channelSize; ++i)
+				{
+					PwmController::setChannel(channels[i], table[brightness]);
+				}
 			}
 			
 		public:
-			TLC594XLed(const uint8_t channel, const uint16_t* table=led::table12_256, std::size_t const tableSize=256)
+			TLC594XMultipleLed(const uint8_t* channels, uint8_t const channelSize, const uint16_t* table=led::table12_256, uint16_t const tableSize=256)
 			:	currentValue(0), deltaValue(0), startValue(0), endValue(0), fadeTime(0), timer(1),
-				channel(channel), table(table), tableSize(tableSize)
+				channels(channels), channelSize(channelSize), table(table), tableSize(tableSize)
 			{
 				setChannels(0);
 			}
@@ -147,4 +152,4 @@ namespace xpcc
 	}
 }
 
-#endif	// XPCC__LED_TLC594X_LED_HPP
+#endif	// XPCC__LED_TLC594X_MULTIPLE_LED_HPP

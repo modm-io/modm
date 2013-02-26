@@ -80,7 +80,7 @@ namespace xpcc
 		 * \param writeDC	write dots value to chip
 		 */
 		static void
-		initialize(uint16_t channels=0, uint8_t dots=0x3f, bool writeCH=true, bool writeDC=true);
+		initialize(uint16_t channels=0, uint8_t dots=63, bool writeCH=true, bool writeDC=true);
 		
 		/// set the 12bit value of a channel
 		/// call transfer() to update the chip

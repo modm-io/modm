@@ -10,19 +10,20 @@ GPIO__OUTPUT(BLANK, D, 3);
 GPIO__OUTPUT(XLAT, D, 2);
 GPIO__OUTPUT(CLKOUT, C, 7);
 
+#include <xpcc/driver/ui/led.hpp>
+
 typedef xpcc::atxmega::UartSpiMasterD1 LedSpi;
 typedef xpcc::atxmega::TimerD0 LedTimer;
 typedef xpcc::TLC594X< 16, LedSpi, XLAT, VPROG, XERR > ledController;
 typedef xpcc::MAX6966< LedSpi, XLAT, 4 > ledController2;
 
-#include <xpcc/driver/ui/led.hpp>
-typedef xpcc::led::TLC594XLed< ledController, 2 > Red;
-typedef xpcc::led::TLC594XLed< ledController, 3 > Green;
-typedef xpcc::led::TLC594XLed< ledController, 4 > Blue;
+xpcc::led::TLC594XLed< ledController > red(2);
+xpcc::led::TLC594XLed< ledController > green(3);
+xpcc::led::TLC594XLed< ledController > blue(4);
 
-xpcc::led::Pulse<Green> pulse;
-xpcc::led::Indicator<Blue> indicator;
-xpcc::led::DoubleIndicator<Red> strobe;
+xpcc::led::Pulse pulse(&green);
+xpcc::led::Indicator indicator(&blue);
+xpcc::led::DoubleIndicator strobe(&red);
 
 // INTERRUPTS #################################################################
 #include <xpcc/architecture/driver/clock.hpp>
@@ -31,11 +32,6 @@ xpcc::led::DoubleIndicator<Red> strobe;
 ISR(TCC1_OVF_vect)
 {
 	xpcc::Clock::increment();
-	xpcc::atomic::Unlock unlock;
-	
-	pulse.run();
-	indicator.run();
-	strobe.run();
 	
 	ledController::writeChannels();
 }
@@ -55,20 +51,29 @@ MAIN_FUNCTION // FINALLY ######################################################
 	LedSpi::initialize(F_CPU/2);
 	XERR::setInput(xpcc::atxmega::PULLUP);
 	BLANK::setOutput(xpcc::gpio::LOW);
+	
+	// initialize the tlc5940
 	ledController::initialize(0, 63, true, false);
 	ledController::setDotCorrection(3, 10);
 	ledController::setDotCorrection(4, 20);
 	ledController::writeDotCorrection();
 	
+	// GSCLK, 32MHz Grayscale clock
 	CLKOUT::setOutput();
 	PORTCFG.CLKEVOUT = PORTCFG_CLKOUT_PC7_gc;
 	
+	// the Grayscale counter needs to be manually reset to 0
+	// This happens at 32000kHz/4096 = 7.8125kHz
+	// So we need to set and reset the BLANK pin at a slightly lower frequency
+	// 32000kHz/8/513 = ~7.79kHz
+	// Please look at the datasheet figure 11 !!!
 	LedTimer::setClockSource(TC_CLKSEL_DIV8_gc);
 	LedTimer::setWaveformGenerationMode(TC_WGMODE_SS_gc);
 	LedTimer::enableCompareCapture(TC0_CCDEN_bm);
 	LedTimer::getModuleBase().CCD = 1;
 	LedTimer::getModuleBase().PER = 513;
 	
+	// The MAX6966 requires a bit less external hardware 
 	ledController2::initialize(xpcc::max6966::CURRENT_20mA);
 	
 	// INTERRUPTS *************************************************************
@@ -83,6 +88,9 @@ MAIN_FUNCTION // FINALLY ######################################################
 	
 	while (1)
 	{
+		pulse.run();
+		indicator.run();
+		strobe.run();
 	}
 }
 
