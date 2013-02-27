@@ -29,12 +29,13 @@
 # -----------------------------------------------------------------------------
 
 class Primitive:
-	def __init__(self, type, javaType, name, size, equivalent, accessor, mask):
+	def __init__(self, type, javaType, name, size, equivalent, javaWrapper, accessor, mask):
 		self.type = type
 		self.javaType = javaType
 		self.name = name
 		self.size = size
 		self.equivalent = equivalent
+		self.javaWrapper = javaWrapper
 		self.accessor = accessor
 		self.mask = mask
 	
@@ -45,18 +46,24 @@ class Primitive:
 			return cmp(self.name, other.name)
 
 PRIMITIVES = {
-	"int8_t":	Primitive("int8_t", 	"int",		"Int8",		1,	"byte",		"", 	None),
-	"int16_t":	Primitive("int16_t", 	"int",		"Int16",	2,	"short",	"Short",None),
-	"int32_t":	Primitive("int32_t", 	"int",		"Int32",	4,	"int",		"Int",	None),
-	"uint8_t":	Primitive("uint8_t", 	"int",		"Uint8",	1,	"byte",		"",		"0xFF"),
-	"uint16_t":	Primitive("uint16_t", 	"int",		"Uint16",	2,	"short",	"Short","0xFFFF"),
-	"uint32_t":	Primitive("uint32_t", 	"long",		"Uint32",	4,	"int",		"Int",	"0xFFFFFFFFl"),
-	"float": 	Primitive("float", 		"float",	"Float",	4,	"float",	"Float",None),
-	"char":		Primitive("char", 		"char",		"Char",		1,	"byte",		"",		None),
-	"Bool":		Primitive("Bool",		"boolean",	"Bool", 	1,	"boolean",	"",		None),
+	"int8_t":	Primitive("int8_t", 	"int",		"Int8",		1,	"byte",		"Byte",		"", 	None),
+	"int16_t":	Primitive("int16_t", 	"int",		"Int16",	2,	"short",	"Integer",	"Short",None),
+	"int32_t":	Primitive("int32_t", 	"int",		"Int32",	4,	"int", 		"Integer",	"Int",	None),
+	"uint8_t":	Primitive("uint8_t", 	"int",		"Uint8",	1,	"byte",		"Integer",	"",		"0xFF"),
+	"uint16_t":	Primitive("uint16_t", 	"int",		"Uint16",	2,	"short",	"Integer",	"Short","0xFFFF"),
+	"uint32_t":	Primitive("uint32_t", 	"long",		"Uint32",	4,	"int",		"Long",		"Int",	"0xFFFFFFFFl"),
+	"float": 	Primitive("float", 		"float",	"Float",	4,	"float",	"Float",	"Float",None),
+	"char":		Primitive("char", 		"char",		"Char",		1,	"byte",		"Character",		"",		None),
+	"Bool":		Primitive("Bool",		"boolean",	"Bool", 	1,	"boolean",	"Boolean",	"",		None),
 }
 
 # -----------------------------------------------------------------------------
+def typeJavaObjectName(name):
+	if name in PRIMITIVES:
+		return PRIMITIVES[name].javaWrapper
+	else:
+		return name.title().replace(' ', '')
+
 def typeName(name):
 	if name in PRIMITIVES:
 		return PRIMITIVES[name].javaType

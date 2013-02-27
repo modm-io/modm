@@ -61,6 +61,7 @@ class JavaPacketsBuilder(builder_base.Builder):
 			'enumElement': filter.enumElement,
 			'typeName': filter.typeName,
 			'typeObjectName': filter.typeObjectName,
+			'typeJavaObjectName': filter.typeJavaObjectName,
 			'variableName': filter.variableName,
 			'inStringDescription': filter.inStringDescription,
 		}
