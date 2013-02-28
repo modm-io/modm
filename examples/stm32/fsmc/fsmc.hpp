@@ -7,27 +7,27 @@ namespace xpcc
 {
 	namespace stm32
 	{
-		class FsmcExperimental
+		class FsmcDisplayS75
 		{
 		public:
 			static void
 			initialize();
 
 			static void
-			writeRegister(uint8_t reg);
+			writeRegister(const uint8_t reg);
 
 			static void
-			writeCommand(uint8_t command, uint16_t data);
+			writeCommand(const uint8_t command, const uint16_t data);
 
 			static void
-			writeDataMult(uint16_t data, uint16_t count);
+			writeDataMult(const uint16_t data, const uint16_t count);
 
 			static void
-			writeRam(uint8_t * addr, uint16_t size);
+			writeRam(const uint8_t * addr, const uint16_t size);
 
 		protected:
 			static void
-			writeData(uint16_t data);
+			writeData(const uint16_t data);
 
 			/**
 			 * Accessing the same address twice will destroy the
@@ -45,7 +45,8 @@ namespace xpcc
 			private:
 			  uint8_t dummy1[3];
 			public:
-			  uint8_t REG2;
+//			  uint8_t REG2;
+			  uint8_t dummy33;
 			private:
 			  uint8_t dummy2[(1 << 23) - 5];
 			public:
@@ -53,7 +54,8 @@ namespace xpcc
 			private:
 			  uint8_t dummy3[3];
 			public:
-			  uint8_t RAM2;
+//			  uint8_t RAM2;
+			  uint8_t dummy99;
 			} __attribute__((__packed__)) LCD_TypeDef;
 
 			/* LCD is connected to the FSMC_Bank1_NOR/SRAM1 and NE1 is used as ship select signal */

@@ -18,7 +18,7 @@ GPIO__OUTPUT(Cd,    E,  2);		// Command / Data,  FSMC: A23
 GPIO__OUTPUT(Wr,    D,  5);		// Write operation, FSMC: NWE
 
 void
-xpcc::stm32::FsmcExperimental::initialize()
+xpcc::stm32::FsmcDisplayS75::initialize()
 {
 	// switch on FSMC peripheral
 	#define RCC_AHB3Periph_FSMC               ((uint32_t)0x00000001)
@@ -82,46 +82,46 @@ xpcc::stm32::FsmcExperimental::initialize()
 }
 
 void
-xpcc::stm32::FsmcExperimental::writeCommand(uint8_t command, uint16_t data)
+xpcc::stm32::FsmcDisplayS75::writeCommand(const uint8_t command, const uint16_t data)
 {
 	writeRegister(command);
 	writeData(data);
 }
 
 void
-xpcc::stm32::FsmcExperimental::writeDataMult(uint16_t data, uint16_t count)
+xpcc::stm32::FsmcDisplayS75::writeDataMult(const uint16_t data, const uint16_t count)
 {
-	for (; count > 0; --count)
+	for (uint_fast16_t ii = count; ii > 0; --ii)
 	{
 		LCD->RAM1 = data >> 8;
-		LCD->RAM2 = data;
+		LCD->RAM1 = data;
 	}
 }
 
 void
-xpcc::stm32::FsmcExperimental::writeRam(uint8_t * addr, uint16_t size)
+xpcc::stm32::FsmcDisplayS75::writeRam(const uint8_t * addr, const uint16_t size)
 {
-	for (; size > 0; --size)
+	for (uint_fast16_t ii = size; ii > 0; --ii)
 	{
 		LCD->RAM1 = *(addr++);
-		if (--size == 0)
+		if (--ii == 0)
 		{
 			return;
 		}
-		LCD->RAM2 = *(addr++);
+		LCD->RAM1 = *(addr++);
 	}
 }
 
 void
-xpcc::stm32::FsmcExperimental::writeRegister(uint8_t reg)
+xpcc::stm32::FsmcDisplayS75::writeRegister(const uint8_t reg)
 {
 	LCD->REG1 = 0;
-	LCD->REG2 = reg;
+	LCD->REG1 = reg;
 }
 
 void
-xpcc::stm32::FsmcExperimental::writeData(uint16_t data)
+xpcc::stm32::FsmcDisplayS75::writeData(const uint16_t data)
 {
 	LCD->RAM1 = data >> 8;
-	LCD->RAM2 = data;
+	LCD->RAM1 = data;
 }
