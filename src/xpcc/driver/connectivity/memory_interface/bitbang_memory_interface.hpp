@@ -27,20 +27,20 @@ namespace xpcc
 		initialize();
 
 		ALWAYS_INLINE static void
-		writeRegister(uint8_t reg);
+		writeRegister(const uint8_t reg);
 
 		ALWAYS_INLINE static void
-		writeCommand(uint8_t command, uint16_t data);
+		writeCommand(const uint8_t command, const uint16_t data);
 
 		static void
-		writeDataMult(uint16_t data, uint16_t count);
+		writeDataMult(const uint16_t data, const uint16_t count);
 
 		static void
-		writeRam(uint8_t * addr, uint16_t size);
+		writeRam(uint8_t * addr, const uint16_t size);
 
 	protected:
 		ALWAYS_INLINE static void
-		writeData(uint16_t data);
+		writeData(const uint16_t data);
 
 	protected:
 		static PORT port;
