@@ -1,3 +1,8 @@
+/**
+ * Example of Siemens S75 Display connected to STM32's FSMC bus.
+ *
+ * Board used:	stm32f407_breakout
+ */
 
 #include <xpcc/architecture.hpp>
 #include <xpcc/driver/ui/display/siemens_s75.hpp>
@@ -30,8 +35,8 @@ namespace lcd
 
 	GPIO__OUTPUT(Reset, E,  3);     // Reset, not FSMC
 
-//	typedef xpcc::BitbangMemoryInterface<Port, Cs, Cd, Wr> Memory;
-	typedef xpcc::stm32::FsmcExperimental Memory;
+	typedef xpcc::BitbangMemoryInterface<Port, Cs, Cd, Wr> Memory;
+//	typedef xpcc::stm32::FsmcDisplayS75 Memory;
 }
 
 typedef xpcc::SiemensS75Landscape<lcd::Memory, lcd::Reset> Display;
@@ -44,19 +49,19 @@ Display display;
  * Pin out for FSMC,
  * 100 pin
  *
- * Signal  STM   Port      PCB    Display Pin		Oszi
- * D0       61   PD14               6				LC0
- * D1       62   PD15              14				LC1
- * D2       81   PD 0              15				LC2
+ * Signal  STM   Port      PCB    Display Pin
+ * D0       61   PD14               6
+ * D1       62   PD15              14
+ * D2       81   PD 0              15
  * D3       82   PD 1              16
  * D4       38   PE 7              17
  * D5       39   PE 8              18
  * D6       40   PE 9              19
  * D7       41   PE10              20
  *
- * WR = NWE 86   PD 5              13				Ch1
- * CS = NE1	88   PD 7               3				Ch2
- * CD = A23  1   PE 2               1				LC3
+ * WR = NWE 86   PD 5              13
+ * CS = NE1	88   PD 7               3
+ * CD = A23  1   PE 2               1
  *
  * Reset         PE 3               2
  *
@@ -74,23 +79,31 @@ MAIN_FUNCTION
 	Led::setOutput(true);
 	Button::setInput(xpcc::stm32::PULLUP);
 
-	// -------------
-//	typedef xpcc::stm32::FsmcExperimental fsmc;
-//
-//	fsmc::initialize();
-//
+	lcd::Reset::setOutput(false);
+	lcd::Cd::setOutput(false);
+	lcd::Cs::setOutput(false);
+	lcd::Wr::setOutput(false);
+	lcd::D0::setOutput(false);
+	lcd::D1::setOutput(false);
+	lcd::D2::setOutput(false);
+	lcd::D3::setOutput(false);
+	lcd::D4::setOutput(false);
+	lcd::D5::setOutput(false);
+	lcd::D6::setOutput(false);
+	lcd::D7::setOutput(false);
+
+	lcd::Memory::initialize();
+
 //	uint16_t ii = 0;
 //	while (1)
 //	{
-//		fsmc::writeData(ii++);
+//		lcd::Memory::writeData(ii++);
+//		lcd::Memory::writeRegister(ii++);
 //		fsmc::writeRegister(ii++);
-////		fsmc::writeRegister(ii++);
-////		fsmc::writeRegister(ii++);
-////		fsmc::writeRegister(ii++);
-//
+//		fsmc::writeRegister(ii++);
+//		fsmc::writeRegister(ii++);
 //		Led::toggle();
-//
-//		xpcc::delay_ms(100);
+//		xpcc::delay_ms(1);
 //	}
 
 	// -------------
@@ -124,7 +137,7 @@ MAIN_FUNCTION
 		display.update();
 		Led::reset();
 
-		xpcc::delay_ms(10);
+		xpcc::delay_ms(200);
 
 		if (++x > 170)
 		{
