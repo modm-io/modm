@@ -43,37 +43,37 @@ xpcc::stm32::FsmcDisplayS75::initialize()
 
 	/*-- FSMC Configuration ------------------------------------------------------*/
 	/* FSMC_Bank1_NORSRAM1 timing configuration */
-	p.FSMC_AddressSetupTime = 0x0f;
-	p.FSMC_AddressHoldTime = 0;
-	p.FSMC_DataSetupTime = 20;
-	p.FSMC_BusTurnAroundDuration = 0;
-	p.FSMC_CLKDivision = 0;
-	p.FSMC_DataLatency = 0;
-	p.FSMC_AccessMode = FSMC_AccessMode_B;
+	p.FSMC_AddressSetupTime 		= 2;
+	p.FSMC_AddressHoldTime 			= 0;
+	p.FSMC_DataSetupTime 			= 5;
+	p.FSMC_BusTurnAroundDuration 	= 5;
+	p.FSMC_CLKDivision 				= 1;
+	p.FSMC_DataLatency 				= 0;
+	p.FSMC_AccessMode 				= FSMC_AccessMode_A;
 
 	//               Chip Select NE1
 	//                   v
 	/* FSMC_Bank1_NORSRAM1 configured as follows:
 		- Data/Address MUX = Disable
 		- Memory Type = SRAM
-		- Data Width = 16bit
+		- Data Width = 8bit
 		- Write Operation = Enable
 		- Extended Mode = Disable
 		- Asynchronous Wait = Disable */
-	FSMC_NORSRAMInitStructure.FSMC_Bank = FSMC_Bank1_NORSRAM1;
-	FSMC_NORSRAMInitStructure.FSMC_DataAddressMux = FSMC_DataAddressMux_Disable;
-	FSMC_NORSRAMInitStructure.FSMC_MemoryType = FSMC_MemoryType_SRAM;
-	FSMC_NORSRAMInitStructure.FSMC_MemoryDataWidth = FSMC_MemoryDataWidth_8b;
-	FSMC_NORSRAMInitStructure.FSMC_BurstAccessMode = FSMC_BurstAccessMode_Disable;
-	FSMC_NORSRAMInitStructure.FSMC_WaitSignalPolarity = FSMC_WaitSignalPolarity_Low;
-	FSMC_NORSRAMInitStructure.FSMC_WrapMode = FSMC_WrapMode_Disable;
-	FSMC_NORSRAMInitStructure.FSMC_WaitSignalActive = FSMC_WaitSignalActive_BeforeWaitState;
-	FSMC_NORSRAMInitStructure.FSMC_WriteOperation = FSMC_WriteOperation_Enable;
-	FSMC_NORSRAMInitStructure.FSMC_WaitSignal = FSMC_WaitSignal_Disable;
-	FSMC_NORSRAMInitStructure.FSMC_ExtendedMode = FSMC_ExtendedMode_Disable;
-	FSMC_NORSRAMInitStructure.FSMC_WriteBurst = FSMC_WriteBurst_Disable;
-	FSMC_NORSRAMInitStructure.FSMC_ReadWriteTimingStruct = &p;
-	FSMC_NORSRAMInitStructure.FSMC_WriteTimingStruct = &p;
+	FSMC_NORSRAMInitStructure.FSMC_Bank 					= FSMC_Bank1_NORSRAM1;
+	FSMC_NORSRAMInitStructure.FSMC_DataAddressMux 			= FSMC_DataAddressMux_Disable;
+	FSMC_NORSRAMInitStructure.FSMC_MemoryType 				= FSMC_MemoryType_SRAM;
+	FSMC_NORSRAMInitStructure.FSMC_MemoryDataWidth 			= FSMC_MemoryDataWidth_8b;  // 8b is not available??
+	FSMC_NORSRAMInitStructure.FSMC_BurstAccessMode 			= FSMC_BurstAccessMode_Disable;
+	FSMC_NORSRAMInitStructure.FSMC_WaitSignalPolarity 		= FSMC_WaitSignalPolarity_Low;
+	FSMC_NORSRAMInitStructure.FSMC_WrapMode 				= FSMC_WrapMode_Disable;
+	FSMC_NORSRAMInitStructure.FSMC_WaitSignalActive 		= FSMC_WaitSignalActive_BeforeWaitState;
+	FSMC_NORSRAMInitStructure.FSMC_WriteOperation 			= FSMC_WriteOperation_Enable;
+	FSMC_NORSRAMInitStructure.FSMC_WaitSignal 				= FSMC_WaitSignal_Disable;
+	FSMC_NORSRAMInitStructure.FSMC_ExtendedMode 			= FSMC_ExtendedMode_Disable;
+	FSMC_NORSRAMInitStructure.FSMC_WriteBurst 				= FSMC_WriteBurst_Disable;
+	FSMC_NORSRAMInitStructure.FSMC_ReadWriteTimingStruct 	= &p;
+	FSMC_NORSRAMInitStructure.FSMC_WriteTimingStruct 		= &p;
 
 	FSMC_NORSRAMInit(&FSMC_NORSRAMInitStructure);
 
@@ -116,12 +116,15 @@ void
 xpcc::stm32::FsmcDisplayS75::writeRegister(const uint8_t reg)
 {
 	LCD->REG1 = 0;
+	xpcc::delay_us(5);
 	LCD->REG1 = reg;
+	xpcc::delay_us(5);
 }
 
 void
 xpcc::stm32::FsmcDisplayS75::writeData(const uint16_t data)
 {
-	LCD->RAM1 = data >> 8;
+	LCD->REG1 = data >> 8;
+	xpcc::delay_us(0.1);
 	LCD->RAM1 = data;
 }

@@ -35,8 +35,8 @@ namespace lcd
 
 	GPIO__OUTPUT(Reset, E,  3);     // Reset, not FSMC
 
-	typedef xpcc::BitbangMemoryInterface<Port, Cs, Cd, Wr> Memory;
-//	typedef xpcc::stm32::FsmcDisplayS75 Memory;
+//	typedef xpcc::BitbangMemoryInterface<Port, Cs, Cd, Wr> Memory;
+	typedef xpcc::stm32::FsmcDisplayS75 Memory;
 }
 
 typedef xpcc::SiemensS75Landscape<lcd::Memory, lcd::Reset> Display;
@@ -80,31 +80,39 @@ MAIN_FUNCTION
 	Button::setInput(xpcc::stm32::PULLUP);
 
 	lcd::Reset::setOutput(false);
-	lcd::Cd::setOutput(false);
-	lcd::Cs::setOutput(false);
-	lcd::Wr::setOutput(false);
-	lcd::D0::setOutput(false);
-	lcd::D1::setOutput(false);
-	lcd::D2::setOutput(false);
-	lcd::D3::setOutput(false);
-	lcd::D4::setOutput(false);
-	lcd::D5::setOutput(false);
-	lcd::D6::setOutput(false);
-	lcd::D7::setOutput(false);
+//	lcd::Cd::setOutput(false);
+//	lcd::Cs::setOutput(false);
+//	lcd::Wr::setOutput(false);
+//	lcd::D0::setOutput(false);
+//	lcd::D1::setOutput(false);
+//	lcd::D2::setOutput(false);
+//	lcd::D3::setOutput(false);
+//	lcd::D4::setOutput(false);
+//	lcd::D5::setOutput(false);
+//	lcd::D6::setOutput(false);
+//	lcd::D7::setOutput(false);
 
 	lcd::Memory::initialize();
 
-//	uint16_t ii = 0;
-//	while (1)
-//	{
+	uint8_t ii = 0;
+	while (1)
+	{
+//		lcd::Memory::writeCommand(0x10, 0x1f92);	// R10: Power Control 1
+		lcd::Memory::writeData(((~ii)<<8) | ii);
+		ii++;
+//		lcd::Memory::writeData(0xcd);
+//		lcd::Memory::writeCommand(0x11, 0x0014);	// R11: Power Control 2
+//		lcd::Memory::writeCommand(0x00, 0x0001);	// R00: Start oscillation
+
 //		lcd::Memory::writeData(ii++);
 //		lcd::Memory::writeRegister(ii++);
 //		fsmc::writeRegister(ii++);
 //		fsmc::writeRegister(ii++);
 //		fsmc::writeRegister(ii++);
-//		Led::toggle();
-//		xpcc::delay_ms(1);
-//	}
+		Led::toggle();
+		lcd::Reset::toggle();
+		xpcc::delay_ms(1);
+	}
 
 	// -------------
 

@@ -26,6 +26,7 @@ namespace xpcc
 			writeRam(const uint8_t * addr, const uint16_t size);
 
 		protected:
+		public:
 			static void
 			writeData(const uint16_t data);
 
@@ -45,20 +46,18 @@ namespace xpcc
 			private:
 			  uint8_t dummy1[3];
 			public:
-//			  uint8_t REG2;
-			  uint8_t dummy33;
+			  uint8_t REG2;
 			private:
-			  uint8_t dummy2[(1 << 23) - 5];
+			  uint8_t dummy2[(1 << 25) - 5];
 			public:
 			  uint8_t RAM1;
 			private:
 			  uint8_t dummy3[3];
 			public:
-//			  uint8_t RAM2;
-			  uint8_t dummy99;
+			  uint8_t RAM2;
 			} __attribute__((__packed__)) LCD_TypeDef;
 
-			/* LCD is connected to the FSMC_Bank1_NOR/SRAM1 and NE1 is used as ship select signal */
+			/* LCD is connected to the FSMC_Bank1_NOR/SRAM1 and NE1 is used as chip select signal */
 			#define LCD_BASE    ((u32)(0x60000000 | 0x00000000))
 			#define LCD         ((LCD_TypeDef *) LCD_BASE)
 		};
