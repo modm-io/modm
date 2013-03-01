@@ -29,8 +29,6 @@
 /**
  * \file	cxxabi.cpp
  * \brief	Minimal C++ support, no exception handling, no RTTI
- * 
- * \version	$Id: cxxabi.cpp 611 2011-09-29 13:09:43Z dergraaf $
  */
 // ----------------------------------------------------------------------------
 

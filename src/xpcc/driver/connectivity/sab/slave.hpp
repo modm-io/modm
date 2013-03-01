@@ -25,8 +25,6 @@
  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- * 
- * $hello please remove me$
  */
 // ----------------------------------------------------------------------------
 
@@ -134,7 +132,7 @@ namespace xpcc
 		 * };
 		 * \endcode
 		 * 
-		 * A complete example is available in the \c example/sab folder.
+		 * A complete example is available in the \c example/avr/sab folder.
 		 * 
 		 * \see		xpcc::sab::Slave
 		 * \ingroup	sab
@@ -253,7 +251,7 @@ namespace xpcc
 	 *     void
 	 *     doSomething(xpcc::sab::Response& response, const uint32_t* parameter)
 	 *     {
-	 *         // ... do something usefull ...
+	 *         // ... do something useful ...
 	 *         
 	 *         response.send();
 	 *     }

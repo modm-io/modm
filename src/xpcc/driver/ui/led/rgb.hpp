@@ -53,41 +53,69 @@ namespace xpcc
 		 *
 		 * \author	Niklas Hauser
 		 * \ingroup led
-		 * 
-		 * \tparam	Red		typedef Led of red color
-		 * \tparam	Green	typedef Led of green color
-		 * \tparam	Blue	typedef Led of blue color
 		 */
-		template< typename Red, typename Green, typename Blue >
 		class Rgb
 		{
 		private:
-			Red red;
-			Green green;
-			Blue blue;
+			Led* red;
+			Led* green;
+			Led* blue;
 			
 		public:
-			Rgb();
+			Rgb(Led* red, Led* green, Led* blue)
+			:	red(red), green(green), blue(blue)
+			{
+			}
 			
-			void
-			setBrightness(uint16_t redValue, uint16_t greenValue, uint16_t blueValue);
+			inline void
+			setBrightness(uint16_t redValue, uint16_t greenValue, uint16_t blueValue)
+			{
+				red->setBrightness(redValue);
+				green->setBrightness(greenValue);
+				blue->setBrightness(blueValue);
+			}
 			
-			uint16_t
-			getBrightness(Color color);
+			inline uint16_t
+			getBrightness(Color color)
+			{
+				switch (color) {
+					case RED:
+						return red->getBrightness();
+					case GREEN:
+						return green->getBrightness();
+					case BLUE:
+						return blue->getBrightness();
+					default:
+						return 0;
+				}
+			}
 			
-			bool
-			isFading();
+			inline bool
+			isFading()
+			{
+				return (red->isFading() ||
+						green->isFading() ||
+						blue->isFading());
+			}
 			
-			void
-			fadeTo(uint16_t time, uint16_t redValue, uint16_t greenValue, uint16_t blueValue);
+			inline void
+			fadeTo(uint16_t time, uint16_t redValue, uint16_t greenValue, uint16_t blueValue)
+			{
+				red->fadeTo(time, redValue);
+				green->fadeTo(time, greenValue);
+				blue->fadeTo(time, blueValue);
+			}
 			
 			/// Must be called at least every ms
-			void
-			run();
+			inline void
+			run()
+			{
+				red->run();
+				green->run();
+				blue->run();
+			}
 		};
 	}
 }
-
-#include "rgb_impl.hpp"
 
 #endif	// XPCC__PWM_RGB_LED_HPP

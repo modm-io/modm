@@ -3,6 +3,9 @@ rootpath = '../../../..'
 
 env = Environment(tools = ['xpcc'], toolpath = [rootpath + '/scons/site_tools'])
 
+# Set define for ASF
+env.Append(CPPDEFINES = "BOARD=EVK1101")
+
 # find all source files
 files = env.FindFiles('.')
 

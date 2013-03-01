@@ -67,9 +67,13 @@
 #include "stm32/gpio.hpp"
 #include "stm32/clock.hpp"
 
+
 /**
  * Specific hardware for different processors.
  */
+
+
+
 
 /**
  * CAN Controller
@@ -86,6 +90,10 @@
 #include "stm32/can/can_2.hpp"
 #endif
 
+// External Interrupt only tested on STM32F4XX
+#if defined(STM32F4XX)
+#include "stm32/exti.hpp"
+#endif
 
 // HW drivers enabled for all supported STM32 series
 #if defined(STM32F10X) || defined(STM32F2XX) || defined(STM32F3XX) \

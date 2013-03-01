@@ -1,6 +1,5 @@
 // coding: utf-8
 // 
-// $Id: driver.dox 753 2012-03-04 22:29:10Z salkinium $
 
 /**
 \defgroup	driver	Device drivers

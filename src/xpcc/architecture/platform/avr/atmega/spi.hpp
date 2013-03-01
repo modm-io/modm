@@ -85,7 +85,7 @@ namespace xpcc
 					  uint8_t* transmit=0, uint8_t* receive=0,
 					  BufferIncrease bufferIncrease=BUFFER_INCR_BOTH);
 			
-			static ALWAYS_INLINE bool
+			static bool
 			transfer(TransferOptions options=TRANSFER_SEND_BUFFER_SAVE_RECEIVE);
 			
 			static bool
