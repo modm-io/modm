@@ -90,16 +90,44 @@ namespace xpcc
 			};
 
 		public:
-			{{ className }}{{ id }}(uint32_t baudrate)
+
+			/*
+			 * Enables the clock, resets the hardware and sets the UE bit
+			 */
+			static void
+			enable();
+
+			/*
+			 * Disables the hw module (by disabling its clock line)
+			 */
+			static void
+			disable();
+
+			/*
+			 * Initiaize Uart Hall Peripheral
+			 *
+			 * Enables clocks, the UART peripheral (but neither TX nor RX)
+			 * Sets baudrate and parity.
+			 */
+			static void
+			initialize(uint32_t baudrate, Parity parity = PARITY_DISABLED)
 			{
+				enable();
 				setBaudrate(baudrate);
+				setParity(parity);
 			}
 
 			{{ template.mapping(id) }}
 
 			{{ template.configurePins(className, id) | xpcc.indent(3) }}
 
-			{{ template.setBaudrate() | xpcc.indent(3) }}
+			/*
+			 * Set Baudrate
+			 *
+			 * Remember to enable the periheral before setting the baudrate
+			 */
+			static void
+			setBaudrate(uint32_t baudrate);
 
 			/*
 			 * \brief	Write a single byte to the transmit register
@@ -188,7 +216,7 @@ namespace xpcc
 			 * Returns true if data can be written
 			 */
 			static inline bool
-			isTrasmitRegisterEmpty()
+			isTransmitRegisterEmpty()
 			{
 			#if defined(STM32F3XX)
 				return {{ moduleName }}{{ id }}->ISR & USART_ISR_TXE;

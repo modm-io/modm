@@ -45,8 +45,64 @@
 {{ template.configurePins(className, id) }}
 
 // ----------------------------------------------------------------------------
-{{ template.setBaudrate(className, id, moduleName) }}
+void
+xpcc::stm32::{{ className }}{{ id }}::setBaudrate(uint32_t baudrate)
+{
+	{{ moduleName }}{{ id }}->BRR =	calculateBaudrateSettings(apbClk, baudrate);
+}
 
+// ----------------------------------------------------------------------------
+void
+xpcc::stm32::{{ className }}{{ id }}::enable()
+{
+{% if id in [1, 6] -%}
+	// enable clock
+	RCC->APB2ENR |= RCC_APB2ENR_USART{{ id }}EN;
+	// reset timer
+	RCC->APB2RSTR |=  RCC_APB2RSTR_USART{{ id }}RST;
+	RCC->APB2RSTR &= ~RCC_APB2RSTR_USART{{ id }}RST;
+{%- elif id in [2, 3] -%}
+	// enable clock
+	RCC->APB1ENR |= RCC_APB1ENR_USART{{ id }}EN;
+	// reset timer
+	RCC->APB1RSTR |=  RCC_APB1RSTR_USART{{ id }}RST;
+	RCC->APB1RSTR &= ~RCC_APB1RSTR_USART{{ id }}RST;
+{%- elif id in [4, 5] -%}
+	// FIXME: there seems to be a bug in the stm32f3xxlib which does not provide
+	//        the necessary RCC_APB1ENR_UART5EN define and probably defines
+	//        RCC_APB1ENR_UART4EN incorrectly (0x00100000 instead of 0x00080000)
+	// enable clock
+	RCC->APB1ENR |= RCC_APB1ENR_UART{{ id }}EN;
+	// reset uart
+	RCC->APB1RSTR |=  RCC_APB1RSTR_UART{{ id }}RST;
+	RCC->APB1RSTR &= ~RCC_APB1RSTR_UART{{ id }}RST;
+{%- endif %}
+
+	{{ moduleName }}{{ id }}->CR1 |= USART_CR1_UE;		// Uart Enable
+}
+
+// ----------------------------------------------------------------------------
+void
+xpcc::stm32::{{ className }}{{ id }}::disable()
+{
+	{{ moduleName }}{{ id }}->CR1 = 0;		// TX, RX, Uart, etc. Disable
+
+{% if id in [1, 6] -%}
+	// disable clock
+	RCC->APB2ENR &= ~RCC_APB2ENR_USART{{ id }}EN;
+{%- elif id in [2, 3] -%}
+	// disable clock
+	RCC->APB1ENR &= ~RCC_APB1ENR_USART{{ id }}EN;
+{%- elif id in [4, 5] -%}
+	// FIXME: there seems to be a bug in the stm32f3xxlib which does not provide
+	//        the necessary RCC_APB1ENR_UART5EN define and probably defines
+	//        RCC_APB1ENR_UART4EN incorrectly (0x00100000 instead of 0x00080000)
+	// disable clock
+	RCC->APB1ENR &= ~RCC_APB1ENR_UART{{ id }}EN;
+{%- endif %}
+}
+
+// ----------------------------------------------------------------------------
 void
 xpcc::stm32::{{ className }}{{ id }}::enableInterruptVector(bool enable,
 uint32_t priority)
