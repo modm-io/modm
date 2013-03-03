@@ -23,6 +23,7 @@ xpcc::IODeviceWrapper<xpcc::lpc::Uart1> loggerDevice(loggerUart);
 // I2C
 #include <xpcc/driver/connectivity/i2c/software_i2c.hpp>
 #include <xpcc/driver/connectivity/i2c/write_read_adapter.hpp>
+#include <xpcc/driver/other/tcs3414.hpp>
 
 xpcc::log::Logger xpcc::log::debug(loggerDevice);
 xpcc::log::Logger xpcc::log::info(loggerDevice);
@@ -45,6 +46,7 @@ GPIO__OUTPUT(gruen, 2, 8);
 GPIO__OUTPUT(weiss, 2, 6);
 
 typedef xpcc::SoftwareI2C<scl, sda> i2c;
+typedef xpcc::Tcs3414<i2c> tcs;
 // ----------------------------------------------------------------------------
 
 int
@@ -86,21 +88,25 @@ main(void)
 	XPCC_LOG_DEBUG << "Hello world" << xpcc::endl;
 
 
+
+
 	uint8_t buffer_write[3];
 	uint8_t buffer_read[8];
 
 	// Initialize colour sensor
 	const uint8_t address = 0b0111001 << 1;
 
-	buffer_write[0] = 0x80 | 0x40 | 0x00;		// command to write into the control register with block mode
-	buffer_write[1] = 1;				// set the number of bytes to write
-	buffer_write[2] = 0b11;				// control to power up and start conversion
-	wrA.initialize(address, buffer_write, 3, buffer_read, 0	);
-	if(!i2c::startSync(&wrA))
-		{while(1){}}
-	if(wrA.getState() != xpcc::i2c::adapter::State::NO_ERROR)
-		XPCC_LOG_DEBUG << "ERROR WITH:";
-	XPCC_LOG_DEBUG << "Sensor initialised." << xpcc::endl;
+	if(!tcs::initialize()) {
+		XPCC_LOG_DEBUG << "ERROR WITH INTIALIZING!" << xpcc::endl; }
+//	buffer_write[0] = 0x80 | 0x40 | 0x00;		// command to write into the control register with block mode
+//	buffer_write[1] = 1;				// set the number of bytes to write
+//	buffer_write[2] = 0b11;				// control to power up and start conversion
+//	wrA.initialize(address, buffer_write, 3, buffer_read, 0	);
+//	if(!i2c::startSync(&wrA))
+//		{while(1){}}
+//	if(wrA.getState() != xpcc::i2c::adapter::State::NO_ERROR)
+//		XPCC_LOG_DEBUG << "ERROR WITH:";
+//	XPCC_LOG_DEBUG << "Sensor initialised." << xpcc::endl;
 	xpcc::delay_ms(100);
 
 //	buffer_write[0] = 0x80 | 0x40 | 0x00;		// command to write into the control register with block mode
