@@ -31,6 +31,10 @@
 #include <xpcc/architecture/platform/cortex_m3/stm32.hpp>
 #include "clock.hpp"
 
+#if !defined(STM32F3XX)
+#	error "This file is not supposed to be used with the given CPU (only STM32F3xx)"
+#endif
+
 // ----------------------------------------------------------------------------
 bool
 xpcc::stm32::Clock::enableHse(HseConfig config, uint32_t waitCycles)
@@ -53,11 +57,8 @@ xpcc::stm32::Clock::enableHse(HseConfig config, uint32_t waitCycles)
 void
 xpcc::stm32::Clock::enablePll(PllSource source, PllMul pllM)
 {
-#if defined(STM32F3XX)
-#	warning "this is not tested yet"
-
 	uint32_t tmp = 0;
-	
+
 	// Read reserved and read-only values and clear all other values
 	tmp |= RCC->CFGR & (
 			(1 << 31) | (1 << 30) | (1 << 29) | (1 << 28) | (1 << 27) |
@@ -69,23 +70,18 @@ xpcc::stm32::Clock::enablePll(PllSource source, PllMul pllM)
 			: RCC_CFGR_PLLSRC_PREDIV1;
 	
 	// PLLMUL = factor is user defined
-	tmp |=  static_cast<uint32_t>(pllM);
+	tmp |= static_cast<uint32_t>(pllM);
 	
 	RCC->CFGR = tmp;
 	
-	// enable pll
+	// enable PLL
 	RCC->CR |= RCC_CR_PLLON;
-#else
-#	error "This file is not supposed to be used with the given CPU (only STM32F3xx)"
-#endif
 }
 
 // ----------------------------------------------------------------------------
 bool
 xpcc::stm32::Clock::switchToPll(uint32_t waitCycles)
 {
-#if defined(STM32F3XX)
-#	warning "this is not tested yet"
 	uint32_t t = waitCycles;
 	while (!(RCC->CR & RCC_CR_PLLRDY)) {
 		if (!(--t)) {
@@ -110,7 +106,26 @@ xpcc::stm32::Clock::switchToPll(uint32_t waitCycles)
 	}
 
 	return true;
-#else
-#	error "This file is not supposed to be used with the given CPU (only STM32F3xx)"
-#endif
+}
+
+bool
+xpcc::stm32::Clock::switchToHse(uint32_t waitCycles)
+{
+	// Expect HSE to be up and running
+
+	RCC->CFGR =
+			(RCC->CFGR & 0xffff0000) | // Try to generate a halfword write
+			((
+					RCC_CFGR_PPRE1_DIV2 | /* APB1   = 72 / 2 = 36 MHz */
+					RCC_CFGR_PPRE2_DIV1 | /* APB2   = 72 / 1 = 72 MHz */
+					RCC_CFGR_HPRE_DIV1  | /* SYSCLK = 72 / 1 = 72 MHz */
+					RCC_CFGR_SW_HSE)      /* select HSE as source */
+					& 0x0000ffff);
+
+	// Wait till the main HSE is used as system clock source
+	while ((RCC->CFGR & (uint32_t) RCC_CFGR_SWS) != RCC_CFGR_SWS_HSE);
+	{
+	}
+
+	return true;
 }
