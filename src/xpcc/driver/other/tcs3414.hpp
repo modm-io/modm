@@ -268,9 +268,9 @@ namespace xpcc
 		{
 			refreshAllColors();
 			return {
-				data.red.getMSB()	/ data.clear.getMSB(),
-				data.green.getMSB()	/ data.clear.getMSB(),
-				data.blue.getMSB()	/ data.clear.getMSB()};
+				(static_cast<float>(data.red.get())	*100.0f)/ data.clear.get(),
+				(static_cast<float>(data.green.get())*100.0f)/ data.clear.get(),
+				(static_cast<float>(data.blue.get())	*100.0f)/ data.clear.get()};
 		};
 		//!@}
 

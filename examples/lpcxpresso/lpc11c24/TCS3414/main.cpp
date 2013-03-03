@@ -104,27 +104,21 @@ main(void)
 		static uint16_t i=0;
 		xpcc::delay_ms(150);
 
-		tcs::refreshAllColors();
-
-		const uint16_t green	= tcs::getOldColorGreen();
-		const uint16_t red		= tcs::getOldColorRed();
-		const uint16_t blue		= tcs::getOldColorBlue();
-		const uint16_t clear	= tcs::getOldColorClear();
+		const xpcc::color::Rgb colors = tcs::getNewRelColors();
 
 		XPCC_LOG_DEBUG <<
-				green	<< "\t" <<
-				red		<< "\t" <<
-				blue	<< "\t" <<
-				clear	<< xpcc::endl;
+				colors.green	<< "%\t" <<
+				colors.red		<< "%\t" <<
+				colors.blue		<< "%" << xpcc::endl;
 
-		if((red*100)/clear > 70)
-			rot::set();
-		else
-			rot::reset();
-
-		if((red*100)/clear < 40)
-				blau::set();
-			else
-				blau::reset();
+//		if((red*100)/clear > 70)
+//			rot::set();
+//		else
+//			rot::reset();
+//
+//		if((red*100)/clear < 40)
+//				blau::set();
+//			else
+//				blau::reset();
 	}
 }
