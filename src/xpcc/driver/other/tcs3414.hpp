@@ -41,20 +41,21 @@
 
 #include <xpcc/driver/ui/color.hpp>
 #include <xpcc/driver/connectivity/i2c/write_read_adapter.hpp>
-//#include <xpcc/architecture/driver/gpio.hpp>
-//#include <xpcc/architecture/driver/delay.hpp>
-//
-//#include <xpcc/io/iostream.hpp>
 
 namespace xpcc
 {
+	/**
+	 * \brief 	Settings to configure the digital color sensor Tcs3414
+	 * \see		Tcs3414
+	 * \ingroup	driver_other
+	 */
 	namespace tcs3414
 	{
-		/** @name Gain register
+		/** @name Gain_Register
 		 * @{
 		 */
 
-		//! Analog gain control
+		//! \brief 	Analog gain control
 		enum class Gain : uint8_t
 		{
 			X1	= 0b000000,	//!< x1 gain
@@ -64,7 +65,7 @@ namespace xpcc
 			DEFAULT = 0		//!< default value on chip reset
 		};
 
-		//! Prescaler mode
+		//! \brief 	Prescaler mode
 		enum class Prescaler : uint8_t
 		{
 			D1	= 0b000,	//!< divide by 1
@@ -83,7 +84,7 @@ namespace xpcc
 		 * @{
 		 */
 
-		//! Select mode how to choose the integration time
+		//! \brief 	Select mode how to choose the integration time
 		enum class IntegrationMode : uint8_t
 		{
 			INTERNAL	= 0b000000,	//!< integrates with the free-running mode
@@ -93,7 +94,7 @@ namespace xpcc
 			DEFAULT = 0				//!< default value on chip reset
 		};
 
-		//! Integration for a fixed time
+		//! \brief 	Integration for a fixed time
 		enum class NominalIntegrationTime : uint8_t
 		{
 			MSEC_12		= 0b0000,	//!< integrate over 12 ms
@@ -102,7 +103,7 @@ namespace xpcc
 			DEFAULT = 0				//!< default value on chip reset
 		};
 
-		//! The number of pulses on sync pin to integrate over
+		//! \brief 	The number of pulses on sync pin to integrate over
 		enum class SyncPulseCount : uint8_t
 		{
 			PULSES_1	= 0b0000,	//!< integrate over 1 pulses of sync pin
@@ -118,19 +119,19 @@ namespace xpcc
 		};
 		//! @}
 
-		//! Register addresses
+		//! \brief 	Register addresses
 		enum class RegisterAddress : uint8_t
 		{
-			CONTROL					= 0x00,
-			TIMING					= 0x01,
-			INTERRUPT				= 0x02,
-			INT_SOURCE				= 0x03,
-			ID						= 0x04,
-			GAIN					= 0x07,
-			LOW_THRESH_LOW_BYTE		= 0x08,
-			LOW_THRESH_HIGH_BYTE	= 0x09,
-			HIGH_THRESH_LOW_BYTE	= 0x0A,
-			HIGH_THRESH_HIGH_BYTE	= 0x0B,
+			CONTROL					= 0x00,	//!< Control of basic functions
+			TIMING					= 0x01,	//!< Integration time control  @see Tcs3414::setIntegrationTime
+			INTERRUPT				= 0x02,	//!< Interrupt settings
+			INT_SOURCE				= 0x03,	//!< Interrupt source
+			ID						= 0x04,	//!< Part number
+			GAIN					= 0x07,	//!< Sensitivity settings @see Tcs3414::setGain
+			LOW_THRESH_LOW_BYTE		= 0x08,	//!< Low byte of low interrupt threshold
+			LOW_THRESH_HIGH_BYTE	= 0x09,	//!< High byte of low interrupt threshold
+			HIGH_THRESH_LOW_BYTE	= 0x0A,	//!< Low byte of high interrupt threshold
+			HIGH_THRESH_HIGH_BYTE	= 0x0B,	//!< High byte of high interrupt threshold
 			// Data registers
 			DATA1LOW				= 0x10,	//!< Low byte of ADC green channel
 			DATA1HIGH				= 0x11,	//!< High byte of ADC green channel
@@ -145,15 +146,35 @@ namespace xpcc
 	
 	using namespace tcs3414;
 
+	/**
+	 * \brief	TCS3414 Digital Color Sensors
+	 *
+	 * \todo	Not all features of the sensors are implemented in this driver
+	 * 			yet.
+	 *
+	 * \tparam	I2CMaster	I2C interface which needs an \em initialized
+	 * 						xpcc::i2c::Master
+	 * \see		tcs3414
+	 * \author	David Hebbeker
+	 * \ingroup	driver_other
+	 */
 	template<typename I2cMaster>
 	class Tcs3414
 	{
 	public:
+		/**
+		 * \brief 	Power up sensor and start conversions
+		 * @return	false if an error occurred
+		 */
 		static inline bool
 		initialize(){
 			return writeRegister(RegisterAddress::CONTROL, 0b11);	// control to power up and start conversion
 		}
 		
+		/**
+		 * \brief 	Configures some of the most important settings for the sensor.
+		 * @return	false if an error occurred
+		 */
 		static inline bool
 		configure(
 				const Gain gain = Gain::DEFAULT,
@@ -163,6 +184,10 @@ namespace xpcc
 			return configure(gain, prescaler, mode, static_cast<uint8_t>(time));
 		}
 
+		/**
+		 * \brief	Configures some of the most important settings for the sensor.
+		 * @return	false if an error occurred
+		 */
 		static inline bool
 		configure(
 				const Gain gain = Gain::DEFAULT,
@@ -172,6 +197,16 @@ namespace xpcc
 			return configure(gain, prescaler, mode, static_cast<uint8_t>(time));
 		}
 
+		/**
+		 * \brief	The gain can be used to adjust the sensitivity of all ADC output
+		 * 			channels.
+		 * Uses RegisterAddress::GAIN.
+		 *
+		 * @param	gain
+		 * @param	prescaler	reduces the sensitivity in order to avoid digital
+		 * 			saturation by dividing all channels by the prescaler value
+		 * @return	false if an error occurred
+		 */
 		static inline bool
 		setGain(
 				const Gain gain = Gain::DEFAULT,
@@ -180,6 +215,10 @@ namespace xpcc
 					static_cast<uint8_t>(gain) | static_cast<uint8_t>(prescaler));
 		}
 
+		/**
+		 * \brief Sets the integration time for the ADCs.
+		 * @return	false if an error occurred
+		 */
 		static inline bool
 		setIntegrationTime(
 				const IntegrationMode mode = IntegrationMode::DEFAULT,
@@ -187,6 +226,10 @@ namespace xpcc
 			return setIntegrationTime(mode, static_cast<uint8_t>(time));
 		}
 
+		/**
+		 * \brief Sets the integration time for the ADCs.
+		 * @return	false if an error occurred
+		 */
 		static inline bool
 		setIntegrationTime(
 				const IntegrationMode mode = IntegrationMode::DEFAULT,
@@ -214,6 +257,7 @@ namespace xpcc
 		getOldColors()
 		{ return {data.red.getMSB(), data.green.getMSB(), data.blue.getMSB() }; };
 
+		// TODO use same function as getNewRelColors does!
 		inline static xpcc::color::Rgb
 		getOldRelColors()
 		{
@@ -295,6 +339,12 @@ namespace xpcc
 				const IntegrationMode mode = IntegrationMode::DEFAULT,
 				const uint8_t time = 0);
 
+		/**
+		 * \brief Sets the integration time for the ADCs.
+		 * Uses RegisterAddress::TIMING.
+		 * @param	time	is written to the RegisterAddress::TIMING register
+		 * @return	false if an error occurred
+		 */
 		static inline bool
 		setIntegrationTime(
 				const IntegrationMode mode = IntegrationMode::DEFAULT,
