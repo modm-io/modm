@@ -61,10 +61,10 @@ namespace xpcc
 	{
 	protected:
 		ALWAYS_INLINE void
-		lcdCls(uint16_t colour);
+		lcdCls(const uint16_t colour);
 
 		ALWAYS_INLINE void
-		lcdSettings(bool landscape);
+		lcdSettings(const bool landscape);
 	};
 
 	template <typename MEMORY, typename RESET>
