@@ -17,7 +17,7 @@ static bool
 initClock()
 {
 	// use external 8MHz crystal
-	if (!Clock::enableHse(Clock::HseConfig::HSE_CRYSTAL)) {
+	if (!Clock::enableHse(Clock::HseConfig::HSE_BYPASS)) {
 		return false;
 	}
 	
