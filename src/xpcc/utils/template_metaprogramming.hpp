@@ -300,6 +300,7 @@ namespace xpcc
 		 * 
 		 * \see	http://www.boost.org/doc/libs/1_43_0/doc/html/boost_staticassert.html
 		 * \ingroup	tmp
+		 * \deprecated Use static_assert(bool_constexpr, string) (since C++11) instead.
 		 */
 #ifdef __DOXYGEN__
 		#define	XPCC__STATIC_ASSERT(condition, msg)
