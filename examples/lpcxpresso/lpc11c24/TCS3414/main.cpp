@@ -83,100 +83,48 @@ main(void)
 
 	xpcc::delay_ms(10); // glitch ?
 
-	xpcc::i2c::WriteReadAdapter wrA;
 	i2c::initialize();
 	XPCC_LOG_DEBUG << "Hello world" << xpcc::endl;
-
-
-
-
-	uint8_t buffer_write[3];
-	uint8_t buffer_read[8];
 
 	// Initialize colour sensor
 	const uint8_t address = 0b0111001 << 1;
 
 	if(!tcs::initialize()) {
 		XPCC_LOG_DEBUG << "ERROR WITH INTIALIZING!" << xpcc::endl; }
-//	buffer_write[0] = 0x80 | 0x40 | 0x00;		// command to write into the control register with block mode
-//	buffer_write[1] = 1;				// set the number of bytes to write
-//	buffer_write[2] = 0b11;				// control to power up and start conversion
-//	wrA.initialize(address, buffer_write, 3, buffer_read, 0	);
-//	if(!i2c::startSync(&wrA))
-//		{while(1){}}
-//	if(wrA.getState() != xpcc::i2c::adapter::State::NO_ERROR)
-//		XPCC_LOG_DEBUG << "ERROR WITH:";
-//	XPCC_LOG_DEBUG << "Sensor initialised." << xpcc::endl;
+
 	xpcc::delay_ms(100);
 
-//	buffer_write[0] = 0x80 | 0x40 | 0x00;		// command to write into the control register with block mode
-//	buffer_write[1] = 0b11;				// control to power up and start conversion
-//	wrA.initialize(address, buffer_write, 2, buffer_read, 0	);
-//
-//	xpcc::delay_ms(100);
-
-	buffer_write[0] = 0x80 | 0x40 | 0x01;		// command to write into timing register
-	buffer_write[1] = 1;				// set the number of bytes to write
-	buffer_write[2] = 0b01;				// command to set the integration time to 100ms
-	wrA.initialize(buffer_write, 3, buffer_read, 0	);
-	if(!i2c::startSync(&wrA))
-		{while(1){}}
-	if(wrA.getState() != xpcc::i2c::adapter::State::NO_ERROR)
-		XPCC_LOG_DEBUG << "ERROR WITH:";
-	XPCC_LOG_DEBUG << "timing initialised." << xpcc::endl;
-	xpcc::delay_ms(100);
-
-	buffer_write[0] = 0x80 | 0x40 | 0x07;		// command to write into gain register
-	buffer_write[1] = 1;				// set the number of bytes to write
-	buffer_write[2] = 0x20;				// command to set the gain to 4x
-	wrA.initialize(buffer_write, 3, buffer_read, 0	);
-	if(!i2c::startSync(&wrA))
-		{while(1){}}
-	if(wrA.getState() != xpcc::i2c::adapter::State::NO_ERROR)
-		XPCC_LOG_DEBUG << "ERROR WITH:";
-	XPCC_LOG_DEBUG << "gain initialised." << xpcc::endl;
-	xpcc::delay_ms(100);
-
-//	buffer_write[0] = 0x80 | 0x40 | 0x01;		// command to write into timing register
-//	buffer_write[1] = 0b00;						// command to set the integration time to 100ms
-//	wrA.initialize(buffer_write, 2, buffer_read, 0	);
+	tcs::configure(xpcc::tcs3414::Gain::X4, xpcc::tcs3414::Prescaler::DEFAULT,
+			xpcc::tcs3414::IntegrationMode::DEFAULT, xpcc::tcs3414::NominalIntegrationTime::MSEC_100);
 
 	while (1)
 	{
+		uint8_t buffer_read[8];
 		gelb::toggle();
 		static uint16_t i=0;
 		xpcc::delay_ms(150);
 
-		buffer_write[0] = 0x80 | 0x40 | 0x10;				// request to read data channels
-		wrA.initialize(buffer_write, 1, buffer_read, 2*4);	// read all 8 data registers
-		if(!i2c::startSync(&wrA))
-			{while(1){}}
-		if(wrA.getState() != xpcc::i2c::adapter::State::NO_ERROR)
-			XPCC_LOG_DEBUG << "ERROR WITH:";
+		tcs::refreshAllColors();
 
-		uint16_t value[4] = {0};
-		for(uint8_t i=0; i<4; ++i)
-		{
-			value[i] =	buffer_read[0+2*i];
-			value[i] |=	buffer_read[1+2*i]	<< 8;
-			XPCC_LOG_DEBUG << "\t" << value[i] << ":";
-		}
-		XPCC_LOG_DEBUG << xpcc::endl;
+		const uint16_t green	= tcs::getOldColorGreen();
+		const uint16_t red		= tcs::getOldColorRed();
+		const uint16_t blue		= tcs::getOldColorBlue();
+		const uint16_t clear	= tcs::getOldColorClear();
 
-		if((value[1]*100)/value[3] > 70)
+		XPCC_LOG_DEBUG <<
+				green	<< "\t" <<
+				red		<< "\t" <<
+				blue	<< "\t" <<
+				clear	<< xpcc::endl;
+
+		if((red*100)/clear > 70)
 			rot::set();
 		else
 			rot::reset();
 
-		if((value[1]*100)/value[3] < 40)
+		if((red*100)/clear < 40)
 				blau::set();
 			else
 				blau::reset();
-
-//		if((value[2]*100)/value[3] < 20)
-//				gelb::set();
-//			else
-//				gelb::reset();
 	}
 }
-

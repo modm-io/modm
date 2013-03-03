@@ -12,9 +12,12 @@ template<typename I2cMaster>
 xpcc::i2c::WriteReadAdapter xpcc::Tcs3414<I2cMaster>::i2cWRadapter;
 
 template<typename I2cMaster>
+typename xpcc::Tcs3414<I2cMaster>::Data xpcc::Tcs3414<I2cMaster>::data;
+
+template<typename I2cMaster>
 bool xpcc::Tcs3414<I2cMaster>::configure(const Gain gain,
 	const Prescaler prescaler, const IntegrationMode mode,
-	const IntegrationTime time) {
+	const uint8_t time) {
 	if(!setGain(gain, prescaler)) {
 		return false; }
 	return setIntegrationTime(mode, time);
@@ -40,15 +43,9 @@ bool xpcc::Tcs3414<I2cMaster>::writeRegister(
 template<typename I2cMaster>
 bool xpcc::Tcs3414<I2cMaster>::readRegisters(
 	const RegisterAddress address, uint8_t* const values, const uint8_t count) {
-	// FIXME: use this code as soon as you have a proper compiler
-//	const uint8_t buffer_write =
-//				static_cast<uint8_t>(0x80)		// write command
-//			|	static_cast<uint8_t>(0x40)		// with SMB read/write protocol
-//			|	static_cast<uint8_t>(address);	// at this address
-	// FIXME instead of this code
 	const uint8_t buffer_write =
-				0x80		// write command
-			|	0x40		// with SMB read/write protocol
+				static_cast<uint8_t>(0x80)		// write command
+			|	static_cast<uint8_t>(0x40)		// with SMB read/write protocol
 			|	static_cast<uint8_t>(address);	// at this address
 	i2cWRadapter.initialize(&buffer_write, 1, values, count);	// read registers
 	if(!I2cMaster::startSync(&i2cWRadapter))

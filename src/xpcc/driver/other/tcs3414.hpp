@@ -97,8 +97,8 @@ namespace xpcc
 		enum class NominalIntegrationTime : uint8_t
 		{
 			MSEC_12		= 0b0000,	//!< integrate over 12 ms
-			MSEC_100	= 0b0000,	//!< integrate over 100 ms
-			MSEC_400	= 0b0000,	//!< integrate over 400 ms
+			MSEC_100	= 0b0001,	//!< integrate over 100 ms
+			MSEC_400	= 0b0010,	//!< integrate over 400 ms
 			DEFAULT = 0				//!< default value on chip reset
 		};
 
@@ -115,12 +115,6 @@ namespace xpcc
 			PULSES_128	= 0b0111,	//!< integrate over 128 pulses of sync pin
 			PULSES_256	= 0b1000,	//!< integrate over 256 pulses of sync pin
 			DEFAULT = 0		//!< default value on chip reset
-		};
-
-		union IntegrationTime
-		{
-			NominalIntegrationTime	nominalIntegrationTime;
-			SyncPulseCount			syncPulseCount;
 		};
 		//! @}
 
@@ -165,7 +159,18 @@ namespace xpcc
 				const Gain gain = Gain::DEFAULT,
 				const Prescaler prescaler = Prescaler::DEFAULT,
 				const IntegrationMode mode = IntegrationMode::DEFAULT,
-				const IntegrationTime time = NominalIntegrationTime::DEFAULT);
+				const NominalIntegrationTime time = NominalIntegrationTime::DEFAULT) {
+			return configure(gain, prescaler, mode, static_cast<uint8_t>(time));
+		}
+
+		static inline bool
+		configure(
+				const Gain gain = Gain::DEFAULT,
+				const Prescaler prescaler = Prescaler::DEFAULT,
+				const IntegrationMode mode = IntegrationMode::DEFAULT,
+				const SyncPulseCount time = SyncPulseCount::DEFAULT) {
+			return configure(gain, prescaler, mode, static_cast<uint8_t>(time));
+		}
 
 		static inline bool
 		setGain(
@@ -178,13 +183,16 @@ namespace xpcc
 		static inline bool
 		setIntegrationTime(
 				const IntegrationMode mode = IntegrationMode::DEFAULT,
-				const IntegrationTime time = NominalIntegrationTime::DEFAULT){
-			return writeRegister(RegisterAddress::TIMING,
-					static_cast<uint8_t>(mode) | static_cast<uint8_t>(time.nominalIntegrationTime));
+				const NominalIntegrationTime time = NominalIntegrationTime::DEFAULT){
+			return setIntegrationTime(mode, static_cast<uint8_t>(time));
 		}
 
-//		static void
-//		acknowledgeInterruptFlags();
+		static inline bool
+		setIntegrationTime(
+				const IntegrationMode mode = IntegrationMode::DEFAULT,
+				const SyncPulseCount time = SyncPulseCount::DEFAULT){
+			return setIntegrationTime(mode, static_cast<uint8_t>(time));
+		}
 
 		/**
 		 * @name Return already sampled color
@@ -205,6 +213,15 @@ namespace xpcc
 		inline static xpcc::color::Rgb
 		getOldColors()
 		{ return {data.red.getMSB(), data.green.getMSB(), data.blue.getMSB() }; };
+
+		inline static xpcc::color::Rgb
+		getOldRelColors()
+		{
+			return {
+				data.red.getMSB()	/ data.clear.getMSB(),
+				data.green.getMSB()	/ data.clear.getMSB(),
+				data.blue.getMSB()	/ data.clear.getMSB()};
+		};
 		//!@}
 
 		/**
@@ -245,6 +262,16 @@ namespace xpcc
 			refreshAllColors();
 			return {data.red.getMSB(), data.green.getMSB(), data.blue.getMSB() };
 		};
+
+		inline static xpcc::color::Rgb
+		getNewRelColors()
+		{
+			refreshAllColors();
+			return {
+				data.red.getMSB()	/ data.clear.getMSB(),
+				data.green.getMSB()	/ data.clear.getMSB(),
+				data.blue.getMSB()	/ data.clear.getMSB()};
+		};
 		//!@}
 
 		inline static bool
@@ -253,7 +280,29 @@ namespace xpcc
 					data.dataBytes, sizeof(data.dataBytes));
 		}
 
+		static bool
+		readRegisters(
+				const RegisterAddress address,
+				uint8_t * const values,
+				const uint8_t count = 1);
+
 	private:
+
+		static bool
+		configure(
+				const Gain gain = Gain::DEFAULT,
+				const Prescaler prescaler = Prescaler::DEFAULT,
+				const IntegrationMode mode = IntegrationMode::DEFAULT,
+				const uint8_t time = 0);
+
+		static inline bool
+		setIntegrationTime(
+				const IntegrationMode mode = IntegrationMode::DEFAULT,
+				const uint8_t time = 0){
+			return writeRegister(RegisterAddress::TIMING,
+					static_cast<uint8_t>(mode) | time);
+		}
+
 		static constexpr uint8_t ADDRESS = 0b0111001 << 1; // The address needs to be shifted by one the the left for the xpcc::i2c::WriteReadAdapter
 		static i2c::WriteReadAdapter i2cWRadapter;
 		
@@ -274,18 +323,12 @@ namespace xpcc
 			inline uint8_t getMSB()	const { return high; }
 		} __attribute__ ((packed));
 
-		static inline bool
+		static bool
 		writeRegister(
 				const RegisterAddress address,
 				const uint8_t value);
-		
-		static inline bool
-		readRegisters(
-				const RegisterAddress address,
-				uint8_t * const values,
-				const uint8_t count = 1);
 
-		static union
+		static union Data
 		{
 			uint8_t dataBytes[2*4];
 			struct
