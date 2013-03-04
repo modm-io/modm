@@ -73,6 +73,11 @@ namespace xpcc
 		public SiemensS75Common<MEMORY, RESET>
 	{
 	public:
+		/**
+		 * \brief	Initialises the display.
+		 *
+		 * Expects an initialised memory.
+		 */
 		void
 		initialize();
 

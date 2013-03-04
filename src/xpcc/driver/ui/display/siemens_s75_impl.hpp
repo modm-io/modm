@@ -53,8 +53,6 @@ template <typename MEMORY, typename RESET>
 void
 xpcc::SiemensS75Landscape<MEMORY, RESET>::initialize()
 {
-	MEMORY::initialize();
-
 	// Reset pin
 	RESET::setOutput(false);
 
