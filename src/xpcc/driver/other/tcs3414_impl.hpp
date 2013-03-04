@@ -15,7 +15,7 @@ template<typename I2cMaster>
 typename xpcc::Tcs3414<I2cMaster>::Data xpcc::Tcs3414<I2cMaster>::data;
 
 template<typename I2cMaster>
-bool xpcc::Tcs3414<I2cMaster>::configure(const Gain gain,
+xpcc::tcs3414::OperationSuccess xpcc::Tcs3414<I2cMaster>::configure(const Gain gain,
 	const Prescaler prescaler, const IntegrationMode mode,
 	const uint8_t time) {
 	if(!setGain(gain, prescaler)) {
@@ -24,7 +24,7 @@ bool xpcc::Tcs3414<I2cMaster>::configure(const Gain gain,
 }
 
 template<typename I2cMaster>
-bool xpcc::Tcs3414<I2cMaster>::writeRegister(
+xpcc::tcs3414::OperationSuccess xpcc::Tcs3414<I2cMaster>::writeRegister(
 	const RegisterAddress address, const uint8_t value) {
 	uint8_t buffer_write[3] = { 0, 1 };	// set the number of bytes to 1
 	buffer_write[0] =
@@ -41,7 +41,7 @@ bool xpcc::Tcs3414<I2cMaster>::writeRegister(
 }
 
 template<typename I2cMaster>
-bool xpcc::Tcs3414<I2cMaster>::readRegisters(
+xpcc::tcs3414::OperationSuccess xpcc::Tcs3414<I2cMaster>::readRegisters(
 	const RegisterAddress address, uint8_t* const values, const uint8_t count) {
 	const uint8_t buffer_write =
 				static_cast<uint8_t>(0x80)		// write command

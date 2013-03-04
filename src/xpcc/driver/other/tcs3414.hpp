@@ -142,6 +142,10 @@ namespace xpcc
 			DATA4LOW				= 0x16,	//!< Low byte of ADC green channel
 			DATA5HIGH				= 0x17	//!< High byte of ADC green channel
 		};
+
+		typedef bool		OperationSuccess;	//!< false if an error occurred
+		typedef uint16_t	UnderlyingType;		//!< datatype of color values
+		typedef color::Rgba<UnderlyingType> Rgba;
 	}
 	
 	using namespace tcs3414;
@@ -162,20 +166,14 @@ namespace xpcc
 	class Tcs3414
 	{
 	public:
-		/**
-		 * \brief 	Power up sensor and start conversions
-		 * @return	false if an error occurred
-		 */
-		static inline bool
+		//! \brief 	Power up sensor and start conversions
+		static inline OperationSuccess
 		initialize(){
 			return writeRegister(RegisterAddress::CONTROL, 0b11);	// control to power up and start conversion
 		}
 		
-		/**
-		 * \brief 	Configures some of the most important settings for the sensor.
-		 * @return	false if an error occurred
-		 */
-		static inline bool
+		//! \brief 	Configures some of the most important settings for the sensor.
+		static inline OperationSuccess
 		configure(
 				const Gain gain = Gain::DEFAULT,
 				const Prescaler prescaler = Prescaler::DEFAULT,
@@ -184,11 +182,8 @@ namespace xpcc
 			return configure(gain, prescaler, mode, static_cast<uint8_t>(time));
 		}
 
-		/**
-		 * \brief	Configures some of the most important settings for the sensor.
-		 * @return	false if an error occurred
-		 */
-		static inline bool
+		//! \brief	Configures some of the most important settings for the sensor.
+		static inline OperationSuccess
 		configure(
 				const Gain gain = Gain::DEFAULT,
 				const Prescaler prescaler = Prescaler::DEFAULT,
@@ -197,17 +192,8 @@ namespace xpcc
 			return configure(gain, prescaler, mode, static_cast<uint8_t>(time));
 		}
 
-		/**
-		 * \brief	The gain can be used to adjust the sensitivity of all ADC output
-		 * 			channels.
-		 * Uses RegisterAddress::GAIN.
-		 *
-		 * @param	gain
-		 * @param	prescaler	reduces the sensitivity in order to avoid digital
-		 * 			saturation by dividing all channels by the prescaler value
-		 * @return	false if an error occurred
-		 */
-		static inline bool
+		//! \brief	The gain can be used to adjust the sensitivity of all ADC output channels.
+		static inline OperationSuccess
 		setGain(
 				const Gain gain = Gain::DEFAULT,
 				const Prescaler prescaler = Prescaler::DEFAULT) {
@@ -215,22 +201,16 @@ namespace xpcc
 					static_cast<uint8_t>(gain) | static_cast<uint8_t>(prescaler));
 		}
 
-		/**
-		 * \brief Sets the integration time for the ADCs.
-		 * @return	false if an error occurred
-		 */
-		static inline bool
+		//! \brief Sets the integration time for the ADCs.
+		static inline OperationSuccess
 		setIntegrationTime(
 				const IntegrationMode mode = IntegrationMode::DEFAULT,
 				const NominalIntegrationTime time = NominalIntegrationTime::DEFAULT){
 			return setIntegrationTime(mode, static_cast<uint8_t>(time));
 		}
 
-		/**
-		 * \brief Sets the integration time for the ADCs.
-		 * @return	false if an error occurred
-		 */
-		static inline bool
+		//! \brief Sets the integration time for the ADCs.
+		static inline OperationSuccess
 		setIntegrationTime(
 				const IntegrationMode mode = IntegrationMode::DEFAULT,
 				const SyncPulseCount time = SyncPulseCount::DEFAULT){
@@ -241,90 +221,74 @@ namespace xpcc
 		 * @name Return already sampled color
 		 * @{
 		 */
-		inline static uint16_t
+		inline static UnderlyingType
 		getOldColorGreen()	{ return data.green.get(); }
 
-		inline static uint16_t
+		inline static UnderlyingType
 		getOldColorRed()		{ return data.red.get(); }
 
-		inline static uint16_t
+		inline static UnderlyingType
 		getOldColorBlue()		{ return data.blue.get(); }
 
-		inline static uint16_t
+		inline static UnderlyingType
 		getOldColorClear()	{ return data.clear.get(); }
 
-		inline static xpcc::color::Rgb
+		inline static xpcc::color::Rgba<UnderlyingType>
 		getOldColors()
-		{ return {data.red.getMSB(), data.green.getMSB(), data.blue.getMSB() }; };
+		{ return {data.red.get(), data.green.get(), data.blue.get(), data.clear.get() }; };
 
-		// TODO use same function as getNewRelColors does!
-		inline static xpcc::color::Rgb
-		getOldRelColors()
-		{
-			return {
-				data.red.getMSB()	/ data.clear.getMSB(),
-				data.green.getMSB()	/ data.clear.getMSB(),
-				data.blue.getMSB()	/ data.clear.getMSB()};
-		};
 		//!@}
 
 		/**
 		 * @name Sample and return fresh color values
 		 * @{
 		 */
-		inline static uint16_t
+		inline static UnderlyingType
 		getNewColorGreen()
 		{
 			readRegisters(RegisterAddress::DATA1LOW, &(data.dataBytes[0]), 2);
 			return data.green.get();
 		}
 
-		inline static uint16_t
+		inline static UnderlyingType
 		getNewColorRed()
 		{
 			readRegisters(RegisterAddress::DATA2LOW, &(data.dataBytes[2]), 2);
 			return data.red.get();
 		}
 
-		inline static uint16_t
+		inline static UnderlyingType
 		getNewColorBlue()
 		{
 			readRegisters(RegisterAddress::DATA3LOW, &(data.dataBytes[4]), 2);
 			return data.blue.get();
 		}
 
-		inline static uint16_t
+		inline static UnderlyingType
 		getNewColorClear()
 		{
 			readRegisters(RegisterAddress::DATA4LOW, &(data.dataBytes[6]), 2);
 			return data.clear.get();
 		}
 
-		inline static xpcc::color::Rgb
+		inline static xpcc::color::Rgba<UnderlyingType>
 		getNewColors()
 		{
 			refreshAllColors();
-			return {data.red.getMSB(), data.green.getMSB(), data.blue.getMSB() };
+			return getOldColors();
 		};
 
-		inline static xpcc::color::Rgb
-		getNewRelColors()
-		{
-			refreshAllColors();
-			return {
-				(static_cast<float>(data.red.get())	*100.0f)/ data.clear.get(),
-				(static_cast<float>(data.green.get())*100.0f)/ data.clear.get(),
-				(static_cast<float>(data.blue.get())	*100.0f)/ data.clear.get()};
-		};
 		//!@}
 
-		inline static bool
+		//! \brief	Read current samples of ADC conversions for all channels.
+		inline static OperationSuccess
 		refreshAllColors() {
 			return readRegisters(RegisterAddress::DATA1LOW,
 					data.dataBytes, sizeof(data.dataBytes));
 		}
 
-		static bool
+		//! \brief	Read value of specific register.
+		static OperationSuccess
 		readRegisters(
 				const RegisterAddress address,
 				uint8_t * const values,
@@ -332,20 +296,15 @@ namespace xpcc
 
 	private:
 
-		static bool
+		static OperationSuccess
 		configure(
 				const Gain gain = Gain::DEFAULT,
 				const Prescaler prescaler = Prescaler::DEFAULT,
 				const IntegrationMode mode = IntegrationMode::DEFAULT,
 				const uint8_t time = 0);
 
-		/**
-		 * \brief Sets the integration time for the ADCs.
-		 * Uses RegisterAddress::TIMING.
-		 * @param	time	is written to the RegisterAddress::TIMING register
-		 * @return	false if an error occurred
-		 */
-		static inline bool
+		//! \brief Sets the integration time for the ADCs.
+		static inline OperationSuccess
 		setIntegrationTime(
 				const IntegrationMode mode = IntegrationMode::DEFAULT,
 				const uint8_t time = 0){
@@ -373,7 +332,7 @@ namespace xpcc
 			inline uint8_t getMSB()	const { return high; }
 		} __attribute__ ((packed));
 
-		static bool
+		static OperationSuccess
 		writeRegister(
 				const RegisterAddress address,
 				const uint8_t value);
