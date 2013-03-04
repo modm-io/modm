@@ -21,8 +21,7 @@ void
 xpcc::stm32::FsmcDisplayS75::initialize()
 {
 	// switch on FSMC peripheral
-	#define RCC_AHB3Periph_FSMC               ((uint32_t)0x00000001)
-	RCC->AHB3ENR |= RCC_AHB3Periph_FSMC;
+	RCC->AHB3ENR |= RCC_AHB3ENR_FSMCEN;
 
 	// Set pins to alternate function, push pull
 	D0::setAlternateFunction(xpcc::stm32::AF_FSMC, xpcc::stm32::PUSH_PULL, xpcc::stm32::SPEED_50MHZ, xpcc::stm32::PULLUP);
@@ -41,12 +40,16 @@ xpcc::stm32::FsmcDisplayS75::initialize()
 	FSMC_NORSRAMInitTypeDef  FSMC_NORSRAMInitStructure;
 	FSMC_NORSRAMTimingInitTypeDef  p;
 
+	FSMC_NORSRAMInitStructure.FSMC_ReadWriteTimingStruct 	= &p;
+	FSMC_NORSRAMInitStructure.FSMC_WriteTimingStruct 		= &p;
+	FSMC_NORSRAMStructInit(&FSMC_NORSRAMInitStructure);
+
 	/*-- FSMC Configuration ------------------------------------------------------*/
 	/* FSMC_Bank1_NORSRAM1 timing configuration */
 	p.FSMC_AddressSetupTime 		= 2;
 	p.FSMC_AddressHoldTime 			= 0;
 	p.FSMC_DataSetupTime 			= 5;
-	p.FSMC_BusTurnAroundDuration 	= 5;
+	p.FSMC_BusTurnAroundDuration 	= 0;
 	p.FSMC_CLKDivision 				= 1;
 	p.FSMC_DataLatency 				= 0;
 	p.FSMC_AccessMode 				= FSMC_AccessMode_A;
@@ -72,8 +75,6 @@ xpcc::stm32::FsmcDisplayS75::initialize()
 	FSMC_NORSRAMInitStructure.FSMC_WaitSignal 				= FSMC_WaitSignal_Disable;
 	FSMC_NORSRAMInitStructure.FSMC_ExtendedMode 			= FSMC_ExtendedMode_Disable;
 	FSMC_NORSRAMInitStructure.FSMC_WriteBurst 				= FSMC_WriteBurst_Disable;
-	FSMC_NORSRAMInitStructure.FSMC_ReadWriteTimingStruct 	= &p;
-	FSMC_NORSRAMInitStructure.FSMC_WriteTimingStruct 		= &p;
 
 	FSMC_NORSRAMInit(&FSMC_NORSRAMInitStructure);
 
@@ -93,8 +94,8 @@ xpcc::stm32::FsmcDisplayS75::writeDataMult(const uint16_t data, const uint16_t c
 {
 	for (uint_fast16_t ii = count; ii > 0; --ii)
 	{
-		LCD->RAM1 = data >> 8;
-		LCD->RAM1 = data;
+		LCD->RAM = data >> 8;
+		LCD->RAM = data;
 	}
 }
 
@@ -103,28 +104,20 @@ xpcc::stm32::FsmcDisplayS75::writeRam(const uint8_t * addr, const uint16_t size)
 {
 	for (uint_fast16_t ii = size; ii > 0; --ii)
 	{
-		LCD->RAM1 = *(addr++);
-		if (--ii == 0)
-		{
-			return;
-		}
-		LCD->RAM1 = *(addr++);
+		LCD->RAM = *(addr++);
 	}
 }
 
 void
 xpcc::stm32::FsmcDisplayS75::writeRegister(const uint8_t reg)
 {
-	LCD->REG1 = 0;
-	xpcc::delay_us(5);
-	LCD->REG1 = reg;
-	xpcc::delay_us(5);
+	LCD->REG = 0;
+	LCD->REG = reg;
 }
 
 void
 xpcc::stm32::FsmcDisplayS75::writeData(const uint16_t data)
 {
-	LCD->REG1 = data >> 8;
-	xpcc::delay_us(0.1);
-	LCD->RAM1 = data;
+	LCD->RAM = data >> 8;
+	LCD->RAM = data;
 }

@@ -11,7 +11,6 @@
 
 // ----------------------------------------------------------------------------
 GPIO__OUTPUT(Led, A, 8);
-GPIO__INPUT(Button, C, 13);
 
 using namespace xpcc::stm32;
 using namespace xpcc::stm32::fsmc;
@@ -77,9 +76,9 @@ MAIN_FUNCTION
 	}
 	
 	Led::setOutput(true);
-	Button::setInput(xpcc::stm32::PULLUP);
 
 	lcd::Reset::setOutput(false);
+
 //	lcd::Cd::setOutput(false);
 //	lcd::Cs::setOutput(false);
 //	lcd::Wr::setOutput(false);
@@ -93,31 +92,6 @@ MAIN_FUNCTION
 //	lcd::D7::setOutput(false);
 
 	lcd::Memory::initialize();
-
-	uint8_t ii = 0;
-	while (1)
-	{
-//		lcd::Memory::writeCommand(0x10, 0x1f92);	// R10: Power Control 1
-		lcd::Memory::writeData(((~ii)<<8) | ii);
-		ii++;
-//		lcd::Memory::writeData(0xcd);
-//		lcd::Memory::writeCommand(0x11, 0x0014);	// R11: Power Control 2
-//		lcd::Memory::writeCommand(0x00, 0x0001);	// R00: Start oscillation
-
-//		lcd::Memory::writeData(ii++);
-//		lcd::Memory::writeRegister(ii++);
-//		fsmc::writeRegister(ii++);
-//		fsmc::writeRegister(ii++);
-//		fsmc::writeRegister(ii++);
-		Led::toggle();
-		lcd::Reset::toggle();
-		xpcc::delay_ms(1);
-	}
-
-	// -------------
-
-	// Do not set to output when using as FSMC
-//		lcd::Port::setOutput();
 
 	display.initialize();
 	display.setFont(xpcc::font::Assertion);
@@ -145,7 +119,7 @@ MAIN_FUNCTION
 		display.update();
 		Led::reset();
 
-		xpcc::delay_ms(200);
+		xpcc::delay_ms(20);
 
 		if (++x > 170)
 		{
