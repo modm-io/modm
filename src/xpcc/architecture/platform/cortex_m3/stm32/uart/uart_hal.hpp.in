@@ -51,7 +51,7 @@ namespace xpcc
 		 */
 		class {{ className }}{{ id }} : public UartBase
 		{
-
+		public:
 			enum Interrupt
 			{
 				INTERRUPT_CHARACTER_MATCH = USART_CR1_CMIE,
