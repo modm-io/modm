@@ -41,7 +41,7 @@
 #include "can_filter.hpp"
 #include "../device.h"
 
-#if defined(STM32F10X_CL)
+#if defined(STM32F10X_CL) || defined(STM32F4XX)
 
 namespace xpcc
 {
