@@ -139,6 +139,8 @@ namespace xpcc
 
 			/*
 			 * Disable Parity or Enable Odd/Even Parity
+			 *
+			 * This method assumes 8 databit + 1 parity bit
 			 */
 			static inline void
 			setParity(Parity parity)
@@ -146,6 +148,8 @@ namespace xpcc
 				uint32_t flags = {{ moduleName }}{{ id }}->CR1;
 				flags &= ~(USART_CR1_PCE | USART_CR1_PS);
 				flags |= parity;
+				// Parity Bit counts as 9th bit -> enable 9 data bits
+				flags |= USART_CR1_M;
 				{{ moduleName }}{{ id }}->CR1 = flags;
 			}
 
