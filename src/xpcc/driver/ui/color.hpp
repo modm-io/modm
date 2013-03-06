@@ -32,6 +32,7 @@
 #define XPCC__COLOR_HPP
 
 #include <stdint.h>
+#include <xpcc/io/iostream.hpp>
 
 namespace xpcc
 {
@@ -44,18 +45,82 @@ namespace xpcc
 			uint8_t green;
 			uint8_t blue;
 		};
-		
+
 		class Hsv
 		{
 		public:
 			void
 			toRgb(Rgb* color);
-		
+
 			uint8_t hue;
 			uint8_t saturation;
 			uint8_t value;
 		};
+
+		template<typename UnderlyingType = uint8_t>
+		class Rgba
+		{
+		public:
+			UnderlyingType red;
+			UnderlyingType green;
+			UnderlyingType blue;
+			UnderlyingType alpha;
+
+			template<typename IntermediateType__ = float, unsigned int multiplier__ = 100, typename ReturnType__ = UnderlyingType>
+			inline ReturnType__ getRelative(const UnderlyingType color) const
+			{
+				return static_cast<ReturnType__>(
+						(static_cast<IntermediateType__>(color) *
+						static_cast<IntermediateType__>(multiplier__)) /
+						static_cast<IntermediateType__>(alpha));
+			}
+
+			template<typename IntermediateType_ = float, unsigned int multiplier_ = 100, typename ReturnType_ = UnderlyingType>
+			inline ReturnType_ getRelativeRed() const
+			{
+				return getRelative<IntermediateType_, multiplier_, ReturnType_>(red);
+			}
+
+			template<typename IntermediateType_ = float, unsigned int multiplier_ = 100, typename ReturnType_ = UnderlyingType>
+			inline ReturnType_ getRelativeGreen() const
+			{
+				return getRelative<IntermediateType_, multiplier_, ReturnType_>(green);
+			}
+
+			template<typename IntermediateType_ = float, unsigned int multiplier_ = 100, typename ReturnType_ = UnderlyingType>
+			inline ReturnType_ getRelativeBlue() const
+			{
+				return getRelative<IntermediateType_, multiplier_, ReturnType_>(blue);
+			}
+
+			template<typename IntermediateType = float, unsigned int multiplier = 100, typename ReturnType = UnderlyingType>
+			inline Rgba<ReturnType> getRelativeColors() const
+			{
+				return {
+					getRelativeRed	<IntermediateType, multiplier, ReturnType>(),
+					getRelativeGreen<IntermediateType, multiplier, ReturnType>(),
+					getRelativeBlue	<IntermediateType, multiplier, ReturnType>(),
+					multiplier };
+			}
+private:
+			template<typename T>
+			friend IOStream&
+			operator << ( IOStream& os, const Rgba<T>&);
+		};
+
+
+		template <typename UnderlyingType>
+		IOStream& operator << ( IOStream& os, const color::Rgba<UnderlyingType>& color);
 	}
 }
+
+template <typename UnderlyingType>
+xpcc::IOStream&
+xpcc::color::operator << ( xpcc::IOStream& os, const xpcc::color::Rgba<UnderlyingType>& color)
+{
+	os << color.red << "\t" << color.green << "\t" << color.blue << "\t" << color.alpha;
+	return os;
+}
+
 
 #endif // XPCC__COLOR_HPP
