@@ -42,7 +42,7 @@ xpcc::SiemensS75Portrait<MEMORY, RESET>::initialize()
 	// Reset pin
 	RESET::setOutput(false);
 
-	SiemensS75Common<MEMORY, RESET>::lcdSettings(false);
+	SiemensS75Common<MEMORY, RESET>::lcdSettings(SiemensS75Common<MEMORY, RESET>::Orientation::Portrait);
 
 	this->clear();
 }
@@ -51,12 +51,24 @@ xpcc::SiemensS75Portrait<MEMORY, RESET>::initialize()
 
 template <typename MEMORY, typename RESET>
 void
-xpcc::SiemensS75Landscape<MEMORY, RESET>::initialize()
+xpcc::SiemensS75LandscapeLeft<MEMORY, RESET>::initialize()
 {
 	// Reset pin
 	RESET::setOutput(false);
 
-	SiemensS75Common<MEMORY, RESET>::lcdSettings(true);
+	SiemensS75Common<MEMORY, RESET>::lcdSettings(SiemensS75Common<MEMORY, RESET>::Orientation::LandscapeLeft);
+
+	this->clear();
+}
+
+template <typename MEMORY, typename RESET>
+void
+xpcc::SiemensS75LandscapeRight<MEMORY, RESET>::initialize()
+{
+	// Reset pin
+	RESET::setOutput(false);
+
+	SiemensS75Common<MEMORY, RESET>::lcdSettings(SiemensS75Common<MEMORY, RESET>::Orientation::LandscapeRight);
 
 	this->clear();
 }
@@ -65,7 +77,7 @@ xpcc::SiemensS75Landscape<MEMORY, RESET>::initialize()
 
 template <typename MEMORY, typename RESET>
 void
-xpcc::SiemensS75Common<MEMORY, RESET>::lcdSettings(bool landscape) {
+xpcc::SiemensS75Common<MEMORY, RESET>::lcdSettings(const Orientation orientation) {
 	// Hardware reset is low from initialize
 	xpcc::delay_ms(50);
 	RESET::set();
@@ -86,12 +98,23 @@ xpcc::SiemensS75Common<MEMORY, RESET>::lcdSettings(bool landscape) {
 
 	xpcc::delay_ms(100);
 
-	if (landscape) {
+	// R03: Entry mode
+	switch (orientation)
+	{
+	case SiemensS75Common::Orientation::LandscapeLeft:
 		MEMORY::writeCommand(0x03, 0x7820);
+		break;
+	case SiemensS75Common::Orientation::LandscapeRight:
+		MEMORY::writeCommand(0x03, 0x7810);
+		break;
+	case SiemensS75Common::Orientation::Portrait:
+		MEMORY::writeCommand(0x03, 0x7838);
+		break;
+	case SiemensS75Common::Orientation::PortraitUpsideDown:
+		break;
+
 	}
-	else {
-		MEMORY::writeCommand(0x03, 0x7838); 	// R03: Entry mode
-	}
+
 	/**
 	 * Bit 0 set: stopped working
 	 * Bit 1 set: no change
@@ -173,6 +196,7 @@ xpcc::SiemensS75Portrait<MEMORY, RESET>::update() {
 				}
 			} // pix
 
+			xpcc::delay_us(10000);
 			MEMORY::writeRam(PortBuffer, PortIdx);
 		} // y
 	} // x
@@ -180,7 +204,7 @@ xpcc::SiemensS75Portrait<MEMORY, RESET>::update() {
 
 template <typename MEMORY, typename RESET>
 void
-xpcc::SiemensS75Landscape<MEMORY, RESET>::update() {
+xpcc::SiemensS75LandscapeLeft<MEMORY, RESET>::update() {
 	// Set CGRAM Address to height-1 = upper left corner
 	MEMORY::writeCommand(0x21, 131);
 
@@ -232,6 +256,67 @@ xpcc::SiemensS75Landscape<MEMORY, RESET>::update() {
 				}
 			} // pix
 
+			xpcc::delay_us(10000);
+			MEMORY::writeRam(PortBuffer, PortIdx);
+		} // y
+	} // x
+}
+
+template <typename MEMORY, typename RESET>
+void
+xpcc::SiemensS75LandscapeRight<MEMORY, RESET>::update() {
+	// Set CGRAM Address to height-1 = upper left corner
+	MEMORY::writeCommand(0x21, 131);
+
+	// Set instruction register to "RAM Data write"
+	MEMORY::writeRegister(0x22);
+
+	const uint16_t maskBlank  = 0x0000; // RRRR RGGG GGGB BBBB
+	const uint16_t maskFilled = 0x37e0; // RRRR RGGG GGGB BBBB
+
+	// size of the XPCC Display buffer, not the hardware pixels
+	const uint8_t width = 176;
+	const uint8_t height = 136 / 8; // Display is only 132 pixels high.
+
+	const uint8_t fill_h = maskFilled >> 8;
+	const uint8_t fill_l = maskFilled & 0xff;
+
+	const uint8_t blank_h = maskBlank >> 8;
+	const uint8_t blank_l = maskBlank & 0xff;
+
+	for (uint_fast8_t x = 0; x < width; ++x)
+	{
+		for (uint_fast8_t y = 0; y < height; ++y)
+		{
+			// group of 8 black-and-white pixels
+			uint_fast8_t group = this->buffer[x][y];
+			uint8_t PortBuffer[16];
+			uint_fast8_t PortIdx = 0;
+
+			// Only 4 pixels at the lower end of the display in landscape mode
+			uint_fast8_t pixels;
+			if (y == (height - 1)) {
+				// The last pixels
+				pixels = 4;
+			}
+			else {
+				pixels = 8;
+			}
+
+			for (uint_fast8_t pix = 0; pix < pixels; ++pix, group >>= 1) {
+				if (group & 1)
+				{
+					PortBuffer[PortIdx++] = fill_h;
+					PortBuffer[PortIdx++] = fill_l;
+				}
+				else
+				{
+					PortBuffer[PortIdx++] = blank_h;
+					PortBuffer[PortIdx++] = blank_l;
+				}
+			} // pix
+
+			xpcc::delay_us(10000);
 			MEMORY::writeRam(PortBuffer, PortIdx);
 		} // y
 	} // x

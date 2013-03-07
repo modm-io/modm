@@ -49,8 +49,9 @@ namespace xpcc
 	 * xpcc::BufferedGraphicDisplay requests that the vertical resolution is
 	 * dividable by 8.
 	 *
-	 * In portrait mode the connector is at the bottom.
-	 * In landscape mode the connector is at the right border.
+	 * In portrait mode the connector is at top.
+	 * In landscapeLeft  mode the connector is at the left border.
+	 * In landscapeRight mode the connector is at the right border.
 	 *
 	 * \ingroup	lcd
 	 */
@@ -59,12 +60,20 @@ namespace xpcc
 	template <typename MEMORY, typename RESET>
 	class SiemensS75Common
 	{
+	public:
+		enum class Orientation : uint8_t
+		{
+			Portrait, 				//< Connector top
+			LandscapeRight,			//< Connector right
+			LandscapeLeft,			//< Connector left
+			PortraitUpsideDown,		//< Connector bottom
+		};
 	protected:
 		ALWAYS_INLINE void
 		lcdCls(const uint16_t colour);
 
 		ALWAYS_INLINE void
-		lcdSettings(const bool landscape);
+		lcdSettings(const Orientation landscape);
 	};
 
 	template <typename MEMORY, typename RESET>
@@ -89,14 +98,14 @@ namespace xpcc
 
 	};
 
-		/**
-		 * The display in landscape mode does not match the required
-		 * alignment of BufferedGraphicDisplay which requests that
-		 * the vertical resolution can be divided by 8.
-		 *
-		 */
+	/**
+	 * The display in landscape mode does not match the required
+	 * alignment of BufferedGraphicDisplay which requests that
+	 * the vertical resolution can be divided by 8.
+	 *
+	 */
 	template <typename MEMORY, typename RESET>
-	class SiemensS75Landscape :
+	class SiemensS75LandscapeLeft :
 		public BufferedGraphicDisplay<176, 136>,
 		public SiemensS75Common<MEMORY, RESET>
 	{
@@ -104,13 +113,22 @@ namespace xpcc
 		void
 		initialize();
 
-		/**
-		 * \brief	Update the display with the content of the RAM buffer
-		 */
 		virtual void
 		update();
 	};
 
+	template <typename MEMORY, typename RESET>
+	class SiemensS75LandscapeRight :
+		public BufferedGraphicDisplay<176, 136>,
+		public SiemensS75Common<MEMORY, RESET>
+	{
+	public:
+		void
+		initialize();
+
+		virtual void
+		update();
+	};
 }
 
 #include "siemens_s75_impl.hpp"
