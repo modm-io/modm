@@ -56,46 +56,48 @@ namespace xpcc
 	 * \ingroup	lcd
 	 */
 
-	// common for landscape and portrait
-	template <typename MEMORY, typename RESET>
-	class SiemensS75Common
+	enum class Orientation : uint8_t
+	{
+		Portrait, 				//< Connector top
+		LandscapeRight,			//< Connector right
+		LandscapeLeft,			//< Connector left
+		PortraitUpsideDown,		//< Connector bottom
+	};
+
+	template <
+		typename MEMORY,
+		typename RESET,
+		uint8_t  WIDTH,
+		uint8_t  HEIGHT,
+		xpcc::Orientation ORIENTATION>
+	class SiemensS75Common :
+			public BufferedGraphicDisplay<WIDTH, HEIGHT>
 	{
 	public:
-		enum class Orientation : uint8_t
-		{
-			Portrait, 				//< Connector top
-			LandscapeRight,			//< Connector right
-			LandscapeLeft,			//< Connector left
-			PortraitUpsideDown,		//< Connector bottom
-		};
+		void
+		update(void);
+
+		void
+		initialize(void);
+
 	protected:
 		ALWAYS_INLINE void
 		lcdCls(const uint16_t colour);
 
 		ALWAYS_INLINE void
-		lcdSettings(const Orientation landscape);
+		lcdSettings();
 	};
 
 	template <typename MEMORY, typename RESET>
 	class SiemensS75Portrait :
-		public BufferedGraphicDisplay<132, 176>,
-		public SiemensS75Common<MEMORY, RESET>
+		public SiemensS75Common<MEMORY, RESET, 136, 176, xpcc::Orientation::Portrait>
 	{
-	public:
-		/**
-		 * \brief	Initialises the display.
-		 *
-		 * Expects an initialised memory.
-		 */
-		void
-		initialize();
+	};
 
-		/**
-		 * \brief	Update the display with the content of the RAM buffer
-		 */
-		virtual void
-		update();
-
+	template <typename MEMORY, typename RESET>
+	class SiemensS75PortraitUpsideDown:
+		public SiemensS75Common<MEMORY, RESET, 136, 176, xpcc::Orientation::PortraitUpsideDown>
+	{
 	};
 
 	/**
@@ -106,28 +108,14 @@ namespace xpcc
 	 */
 	template <typename MEMORY, typename RESET>
 	class SiemensS75LandscapeLeft :
-		public BufferedGraphicDisplay<176, 136>,
-		public SiemensS75Common<MEMORY, RESET>
+		public SiemensS75Common<MEMORY, RESET, 176, 136, xpcc::Orientation::LandscapeLeft>
 	{
-	public:
-		void
-		initialize();
-
-		virtual void
-		update();
 	};
 
 	template <typename MEMORY, typename RESET>
 	class SiemensS75LandscapeRight :
-		public BufferedGraphicDisplay<176, 136>,
-		public SiemensS75Common<MEMORY, RESET>
+		public SiemensS75Common<MEMORY, RESET, 176, 136, xpcc::Orientation::LandscapeRight>
 	{
-	public:
-		void
-		initialize();
-
-		virtual void
-		update();
 	};
 }
 
