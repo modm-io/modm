@@ -196,7 +196,6 @@ xpcc::SiemensS75Portrait<MEMORY, RESET>::update() {
 				}
 			} // pix
 
-			xpcc::delay_us(10000);
 			MEMORY::writeRam(PortBuffer, PortIdx);
 		} // y
 	} // x
@@ -256,7 +255,6 @@ xpcc::SiemensS75LandscapeLeft<MEMORY, RESET>::update() {
 				}
 			} // pix
 
-			xpcc::delay_us(10000);
 			MEMORY::writeRam(PortBuffer, PortIdx);
 		} // y
 	} // x
@@ -316,7 +314,6 @@ xpcc::SiemensS75LandscapeRight<MEMORY, RESET>::update() {
 				}
 			} // pix
 
-			xpcc::delay_us(10000);
 			MEMORY::writeRam(PortBuffer, PortIdx);
 		} // y
 	} // x
