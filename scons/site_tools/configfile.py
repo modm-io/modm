@@ -144,7 +144,7 @@ class Scanner:
 		
 		for basepath in pathlist:
 			for path, directories, files in os.walk(basepath):
-				if os.path.normpath(path) in ignoreList:
+				if self._fileInList (path, ignoreList):
 					directories = self._excludeDirectories(directories)
 					continue
 				
@@ -254,6 +254,13 @@ class Scanner:
 		else:
 			string += "None"
 		return string
+
+	def _fileInList(self, file, fileList):
+		# returns true if file (or directory) is contained in fileList
+		for f in fileList:
+			if self._samefile (file, f):
+				return True
+		return False
 
 # -----------------------------------------------------------------------------
 def generate(env, **kw):
