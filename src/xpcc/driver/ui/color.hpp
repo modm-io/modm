@@ -100,7 +100,7 @@ namespace xpcc
 					getRelativeRed	<IntermediateType, multiplier, ReturnType>(),
 					getRelativeGreen<IntermediateType, multiplier, ReturnType>(),
 					getRelativeBlue	<IntermediateType, multiplier, ReturnType>(),
-					multiplier };
+					alpha };
 			}
 private:
 			template<typename T>
