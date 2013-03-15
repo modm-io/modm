@@ -412,7 +412,7 @@ namespace xpcc
 			/*
 			 * Configure Output Channel width Mode/OutputPort uint
 			 *
-			 * This is the least typsafe way of doing this and should only
+			 * This is the least typesafe way of doing this and should only
 			 * be done if it provides a necessary performance
 			 * (or more or less) lazyness benefit.
 			 * i.e. if you have specific mode/output uints precalculated and
