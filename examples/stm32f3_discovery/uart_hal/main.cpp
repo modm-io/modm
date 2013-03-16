@@ -49,16 +49,23 @@ MAIN_FUNCTION
 	UART3_TX::setAlternateFunction(AF_USART3, xpcc::stm32::PUSH_PULL);
 	UART3_RX::setAlternateFunction(AF_USART3);
 	UsartHal3::initialize(115200, UsartHal3::Parity::Odd);
+	UsartHal3::enableInterruptVector(true, 14);
+	UsartHal3::enableInterrupt(UsartHal3::INTERRUPT_TX_EMPTY);
 	UsartHal3::setTransmitterEnable(true);
 
 	while (1)
 	{
-		// Send the same byte over and over again
-		while(!UsartHal3::isTransmitRegisterEmpty()) {
-			// wait for register to be empty
-		}
-		UsartHal3::write(0x45);
 	}
 
 	return 0;
+}
+
+// Interrupt Handler
+extern "C" void
+USART3_IRQHandler(void)
+{
+	UsartHal3::getInterruptFlags();
+	if(UsartHal3::isTransmitRegisterEmpty()) {
+		UsartHal3::write(0x46);
+	}
 }
