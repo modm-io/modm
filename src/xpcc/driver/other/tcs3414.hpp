@@ -145,7 +145,7 @@ namespace xpcc
 
 		typedef bool		OperationSuccess;	//!< false if an error occurred
 		typedef uint16_t	UnderlyingType;		//!< datatype of color values
-		typedef color::Rgba<UnderlyingType> Rgba;
+		typedef color::RgbT<UnderlyingType> Rgb;
 	}
 	
 	using namespace tcs3414;
@@ -221,21 +221,9 @@ namespace xpcc
 		 * @name Return already sampled color
 		 * @{
 		 */
-		inline static UnderlyingType
-		getOldColorGreen()	{ return data.green.get(); }
-
-		inline static UnderlyingType
-		getOldColorRed()		{ return data.red.get(); }
-
-		inline static UnderlyingType
-		getOldColorBlue()		{ return data.blue.get(); }
-
-		inline static UnderlyingType
-		getOldColorClear()	{ return data.clear.get(); }
-
-		inline static xpcc::color::Rgba<UnderlyingType>
+		inline static tcs3414::Rgb
 		getOldColors()
-		{ return {data.red.get(), data.green.get(), data.blue.get(), data.clear.get() }; };
+		{ return color; };
 
 		//!@}
 
@@ -243,35 +231,7 @@ namespace xpcc
 		 * @name Sample and return fresh color values
 		 * @{
 		 */
-		inline static UnderlyingType
-		getNewColorGreen()
-		{
-			readRegisters(RegisterAddress::DATA1LOW, &(data.dataBytes[0]), 2);
-			return data.green.get();
-		}
-
-		inline static UnderlyingType
-		getNewColorRed()
-		{
-			readRegisters(RegisterAddress::DATA2LOW, &(data.dataBytes[2]), 2);
-			return data.red.get();
-		}
-
-		inline static UnderlyingType
-		getNewColorBlue()
-		{
-			readRegisters(RegisterAddress::DATA3LOW, &(data.dataBytes[4]), 2);
-			return data.blue.get();
-		}
-
-		inline static UnderlyingType
-		getNewColorClear()
-		{
-			readRegisters(RegisterAddress::DATA4LOW, &(data.dataBytes[6]), 2);
-			return data.clear.get();
-		}
-
-		inline static xpcc::color::Rgba<UnderlyingType>
+		inline static tcs3414::Rgb
 		getNewColors()
 		{
 			refreshAllColors();
@@ -283,8 +243,21 @@ namespace xpcc
 		//! \brief	Read current samples of ADC conversions for all channels.
 		inline static OperationSuccess
 		refreshAllColors() {
-			return readRegisters(RegisterAddress::DATA1LOW,
+			const OperationSuccess success = readRegisters(RegisterAddress::DATA1LOW,
 					data.dataBytes, sizeof(data.dataBytes));
+			// adapt the values to the overall light intensity
+			// so that R+G+B = C
+			color.red	= data.red.get();
+			color.green	= data.green.get();
+			color.blue	= data.blue.get();
+			const float c =	static_cast<float>(color.red) +
+								static_cast<float>(color.green) +
+								static_cast<float>(color.blue);
+			const float f = data.clear.get() / c;
+			color.red	*= f;
+			color.green	*= f;
+			color.blue	*= f;
+			return success;
 		}
 
 		//! \brief	Read value of specific register.
@@ -348,6 +321,8 @@ namespace xpcc
 				uint16_t_LOW_HIGH clear;
 			} __attribute__ ((packed));
 		} data;
+
+		static Rgb	color;
 	};
 }
 

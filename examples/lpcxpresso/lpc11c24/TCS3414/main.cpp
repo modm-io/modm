@@ -88,7 +88,7 @@ main(void)
 		gelb::toggle();
 		xpcc::delay_ms(150);
 
-		const xpcc::tcs3414::Rgba colors = tcs::getNewColors().getRelativeColors();
+		const xpcc::tcs3414::Rgb colors = tcs::getNewColors().getRelativeColors();
 
 		XPCC_LOG_DEBUG << colors << ";" << xpcc::endl;
 

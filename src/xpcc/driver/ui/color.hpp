@@ -45,32 +45,6 @@ namespace xpcc
 			UnderlyingType red;
 			UnderlyingType green;
 			UnderlyingType blue;
-		};
-
-		typedef RgbT<>	Rgb;
-
-		template<class UnderlyingType = uint8_t>
-		class HsvT
-		{
-		public:
-			void
-			toRgb(RgbT<UnderlyingType>* color);
-
-			UnderlyingType hue;
-			UnderlyingType saturation;
-			UnderlyingType value;
-		};
-
-		typedef HsvT<>	Hsv;
-
-		template<typename UnderlyingType = uint8_t>
-		class Rgba
-		{
-		public:
-			UnderlyingType red;
-			UnderlyingType green;
-			UnderlyingType blue;
-			UnderlyingType alpha;
 
 			template<typename IntermediateType__ = float, unsigned int multiplier__ = 100, typename ReturnType__ = UnderlyingType>
 			inline ReturnType__ getRelative(const UnderlyingType color) const
@@ -78,7 +52,7 @@ namespace xpcc
 				return static_cast<ReturnType__>(
 						(static_cast<IntermediateType__>(color) *
 						static_cast<IntermediateType__>(multiplier__)) /
-						static_cast<IntermediateType__>(alpha));
+						static_cast<IntermediateType__>(red + green + blue));
 			}
 
 			template<typename IntermediateType_ = float, unsigned int multiplier_ = 100, typename ReturnType_ = UnderlyingType>
@@ -100,31 +74,46 @@ namespace xpcc
 			}
 
 			template<typename IntermediateType = float, unsigned int multiplier = 100, typename ReturnType = UnderlyingType>
-			inline Rgba<ReturnType> getRelativeColors() const
+			inline RgbT<ReturnType> getRelativeColors() const
 			{
 				return {
 					getRelativeRed	<IntermediateType, multiplier, ReturnType>(),
 					getRelativeGreen<IntermediateType, multiplier, ReturnType>(),
-					getRelativeBlue	<IntermediateType, multiplier, ReturnType>(),
-					alpha };
+					getRelativeBlue	<IntermediateType, multiplier, ReturnType>()};
 			}
-private:
+
+		private:
 			template<typename T>
 			friend IOStream&
-			operator << ( IOStream& os, const Rgba<T>&);
+			operator << ( IOStream& os, const RgbT<T>&);
 		};
 
+		typedef RgbT<>	Rgb;
+
+		template<class UnderlyingType = uint8_t>
+		class HsvT
+		{
+		public:
+			void
+			toRgb(RgbT<UnderlyingType>* color);
+
+			UnderlyingType hue;
+			UnderlyingType saturation;
+			UnderlyingType value;
+		};
+
+		typedef HsvT<>	Hsv;
 
 		template <typename UnderlyingType>
-		IOStream& operator << ( IOStream& os, const color::Rgba<UnderlyingType>& color);
+		IOStream& operator << ( IOStream& os, const color::RgbT<UnderlyingType>& color);
 	}
 }
 
 template <typename UnderlyingType>
 xpcc::IOStream&
-xpcc::color::operator << ( xpcc::IOStream& os, const xpcc::color::Rgba<UnderlyingType>& color)
+xpcc::color::operator << ( xpcc::IOStream& os, const xpcc::color::RgbT<UnderlyingType>& color)
 {
-	os << color.red << "\t" << color.green << "\t" << color.blue << "\t" << color.alpha;
+	os << color.red << "\t" << color.green << "\t" << color.blue;
 	return os;
 }
 
