@@ -38,24 +38,30 @@ namespace xpcc
 {
 	namespace color
 	{
-		class Rgb
+		template<class UnderlyingType = uint8_t>
+		class RgbT
 		{
 		public:
-			uint8_t red;
-			uint8_t green;
-			uint8_t blue;
+			UnderlyingType red;
+			UnderlyingType green;
+			UnderlyingType blue;
 		};
 
-		class Hsv
+		typedef RgbT<>	Rgb;
+
+		template<class UnderlyingType = uint8_t>
+		class HsvT
 		{
 		public:
 			void
-			toRgb(Rgb* color);
+			toRgb(RgbT<UnderlyingType>* color);
 
-			uint8_t hue;
-			uint8_t saturation;
-			uint8_t value;
+			UnderlyingType hue;
+			UnderlyingType saturation;
+			UnderlyingType value;
 		};
+
+		typedef HsvT<>	Hsv;
 
 		template<typename UnderlyingType = uint8_t>
 		class Rgba
