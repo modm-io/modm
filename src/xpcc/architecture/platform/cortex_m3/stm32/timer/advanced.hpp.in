@@ -199,6 +199,19 @@ namespace xpcc
 				IDLE_STATE_SET = TIM_CR2_OIS1,
 			};
 
+			enum Event
+			{
+				EVENT_BREAK_2 							= TIM_EGR_B2G,
+				EVENT_BREAK 							= TIM_EGR_BG,
+				EVENT_TRIGGER 							= TIM_EGR_TG,
+				EVENT_CAPTURE_COMPARE_CONTROL_UPDATE 	= TIM_EGR_COMG,
+				EVENT_CAPTURE_COMPARE_4 				= TIM_EGR_CC4G,
+				EVENT_CAPTURE_COMPARE_3 				= TIM_EGR_CC3G,
+				EVENT_CAPTURE_COMPARE_2 				= TIM_EGR_CC2G,
+				EVENT_CAPTURE_COMPARE_1 				= TIM_EGR_CC1G,
+				EVENT_UPDATE 							= TIM_EGR_UG,
+			};
+
 			
 			static void
 			enable();
@@ -278,9 +291,15 @@ namespace xpcc
 			applyAndReset()
 			{
 				// Generate Update Event to apply the new settings for ARR
-				TIM{{ id }}->EGR |= TIM_EGR_UG;
+				generateEvent(EVENT_UPDATE);
 			}
-			
+
+			static inline void
+			generateEvent(Event ev)
+			{
+				TIM{{ id }}->EGR |= static_cast<uint32_t>(ev);
+			}
+
 			static inline uint16_t
 			getValue()
 			{
