@@ -50,7 +50,13 @@ Adc{{ id }}::setChannel(const Channels channel, const SampleTime sampleTime)
 	else {
 		ADC{{ id }}->SMPR1 |= sampleTime << ((static_cast<uint8_t>(channel)-10) * 3);
 	}
-
+	/*
+	 * FIXME: Setting Pins to analog mode based on the channel isn't really
+	 * a great idea as long as we do not take package size into consideration.
+	 * To quote STM32F302_3xx datasheet page 40:
+	 * "the GPIO pins which are not present on these packages, must
+	 *  not be configured in analog mode."
+	 */
 #if defined(STM32F2XX) || defined(STM32F4XX) 
 	{% if id < 3 -%}
 	if (channel < 8)
