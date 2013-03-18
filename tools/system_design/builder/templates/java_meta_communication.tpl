@@ -20,6 +20,7 @@ public class MetaCommunication {
 		public T getParameterType();
 
 		void execute(P packet);
+		void tryExecute(Packets.Packet packet);
 	}
 
 	public class Component {
@@ -108,7 +109,17 @@ public class MetaCommunication {
 		
 		@Override
 		public String toString() {
-			return String.format("%s(%s)", getName(), parameterType.getClass().getSimpleName());
+			return String.format("%s(%s)", getName(), parameterType.name);
+		}
+		
+		@Override
+		public void tryExecute(Packets.Packet packet) {
+			if (packet == null)
+				throw new NullPointerException("Parameter is null.");
+			
+			@SuppressWarnings("unchecked")
+			P p = (P)packet;
+			execute(p);
 		}
 	}
 	
