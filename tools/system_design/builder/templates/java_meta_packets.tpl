@@ -30,14 +30,29 @@ public class MetaPackets
 			return "" + getClass().getSimpleName();
 		}
 		
-		public abstract T getPacket(Object ...values);
-		public abstract Object[] getValues(T packet);
+		/**
+		 * @param values Packets, from which the packet can be created.
+		 * @return a new created Packet from given Values, or passed value, in
+		 * case of a primitive
+		 * @throws NullPointerException if one of values is null.
+		 */
+		public abstract T getPacket(Packets.Packet ...values);
+		
+		/**
+		 * @param packet
+		 * @return Array of sub Packets, from which this packet can be re created, or
+		 * the passed packet, if it has no subpackets.
+		 * @throws NullPointerException if packet is null
+		 */
+		public abstract Packets.Packet[] getValues(T packet);
 	}
 	
 	public static abstract class Primitive<T extends Packets.Packet> extends Packet<T> {
 		public Primitive(String name, String description, Class<T> type) {
 			super(name, description, type);
 		}
+		
+		public abstract T getPacketFromPrimitive(Object value);
 	}
 	
 	public static abstract class Struct<T extends Packets.Packet> extends Packet<T> {
@@ -67,14 +82,14 @@ public class MetaPackets
 		}
 		
 		@Override
-		public Object[] getValues(T packet) {
+		public Packets.Packet[] getValues(T packet) {
 			if (packet == null)
 				throw new NullPointerException();
-			return new Object[] {packet};
+			return new Packets.Packet[] {packet};
 		}
 		
 		@Override
-		public T getPacket(Object... values) {
+		public T getPacket(Packets.Packet... values) {
 			@SuppressWarnings("unchecked")
 			T t = (T)values[0];
 			if (t == null)
@@ -108,24 +123,34 @@ public class MetaPackets
 	
 	public static Primitive<Packets.Void> Void = new Primitive<Packets.Void>("Void", "", Packets.Void.class) {
 		@Override
-		public Packets.Void getPacket(Object... values) {
+		public Packets.Void getPacket(Packets.Packet... values) {
 			return new Packets.Void();
 		}
 		@Override
-		public Object[] getValues(Packets.Void packet) {
-			return new Object[]{};
+		public Packets.Packet[] getValues(Packets.Void packet) {
+			return new Packets.Packet[]{};
 		};
+		
+		@Override
+		public rca.robot.Packets.Void getPacketFromPrimitive(Object value) {
+			return new Packets.Void();
+		}
 	};
 	{%- for primitive in primitives %}
 	public static Primitive<Packets.{{ primitive.name }}> {{ primitive.name }} = new Primitive<Packets.{{ primitive.name }}>("{{ primitive.type }}", "", Packets.{{ primitive.name }}.class) {
 		@Override
-		public Packets.{{ primitive.name }} getPacket(Object... values) {
-			return new Packets.{{ primitive.name }}(({{ primitive.javaWrapper }})values[0]);
+		public Packets.{{ primitive.name }} getPacket(Packets.Packet... values) {
+			return (Packets.{{ primitive.name }})(values[0]);
 		}
 		@Override
-		public Object[] getValues(Packets.{{ primitive.name }} packet) {
-			return new Object[]{packet.value};
+		public Packets.Packet[] getValues(Packets.{{ primitive.name }} packet) {
+			return new Packets.Packet[]{packet};
 		};
+		
+		@Override
+		public Packets.{{ primitive.name }} getPacketFromPrimitive(Object value) {
+			return new Packets.{{ primitive.name }}(({{ primitive.javaWrapper }})value);
+		}
 	};
 	{%- endfor %}
 	
@@ -146,7 +171,7 @@ public class MetaPackets
 						{%- endfor %}
 						) {
 		@Override
-		public Packets.{{ packet.name | typeObjectName }} getPacket(Object... values) {
+		public Packets.{{ packet.name | typeObjectName }} getPacket(Packets.Packet... values) {
 			Packets.{{ packet.name | typeObjectName }} p = new Packets.{{ packet.name | typeObjectName }}();
 			{% for element in packet.iter() %}
 			if (values[{{ loop.index-1 }}] == null)
@@ -162,9 +187,19 @@ public class MetaPackets
 		}
 
 		@Override
-		public Object[] getValues(Packets.{{ packet.name | typeObjectName }} packet) {
-
-			return null;
+		public Packets.Packet[] getValues(Packets.{{ packet.name | typeObjectName }} packet) {
+			if (packet == null)
+				throw new NullPointerException();
+		
+			return new Packets.Packet[]{
+			{%- for element in packet.iter() %}
+			{%- if element.subtype.type.isBuiltIn or element.subtype.type.name == 'Bool' %}
+				new Packets.{{ element.subtype.name | typeObjectName }} (packet.{{ element.name | variableName }}){% if not loop.last %},{% endif %}
+			{%- else %}
+				packet.{{ element.name | variableName }}{% if not loop.last %},{% endif %}
+			{%- endif %}
+			{%- endfor %}
+			};
 		}
 	};
 	{%- elif packet.isEnum %}
@@ -182,7 +217,7 @@ public class MetaPackets
 						new StructElement<Packets.{{ packet.subtype.name | typeObjectName }}>("Value", {{ packet.subtype.name | typeObjectName }})
 						) {
 		@Override
-		public Packets.{{ packet.name | typeObjectName }} getPacket(Object... values) {
+		public Packets.{{ packet.name | typeObjectName }} getPacket(Packets.Packet... values) {
 			Packets.{{ packet.name | typeObjectName }} p = new Packets.{{ packet.name | typeObjectName }}();
 			if (values[0] == null)
 				throw new NullPointerException();
@@ -195,8 +230,8 @@ public class MetaPackets
 		}
 
 		@Override
-		public Object[] getValues(Packets.{{ packet.name | typeObjectName }} packet) {
-			return new Object[]{packet.value};
+		public Packets.Packet[] getValues(Packets.{{ packet.name | typeObjectName }} packet) {
+			return new Packets.Packet[]{packet};
 		}
 	};
 	{%- endif %}
