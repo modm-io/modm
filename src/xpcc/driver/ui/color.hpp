@@ -33,11 +33,20 @@
 
 #include <stdint.h>
 #include <xpcc/io/iostream.hpp>
+#include <limits>
+#include <algorithm>
 
 namespace xpcc
 {
 	namespace color
 	{
+
+		template<typename T>
+		class HsvT;
+
+		template<typename T>
+		class RgbT;
+
 		template<class UnderlyingType = uint8_t>
 		class RgbT
 		{
@@ -82,6 +91,9 @@ namespace xpcc
 					getRelativeBlue	<IntermediateType, multiplier, ReturnType>()};
 			}
 
+			template<typename T> void
+			toHsv(HsvT<T>* color);
+
 		private:
 			template<typename T>
 			friend IOStream&
@@ -116,6 +128,52 @@ xpcc::color::operator << ( xpcc::IOStream& os, const xpcc::color::RgbT<Underlyin
 	os << color.red << "\t" << color.green << "\t" << color.blue;
 	return os;
 }
+
+/**
+ * @see http://de.wikipedia.org/wiki/HSV-Farbraum#Umrechnung_RGB_in_HSV.2FHSL
+ * @param color
+ */
+template<typename UnderlyingType> template<typename T>
+inline void xpcc::color::RgbT<UnderlyingType>::toHsv(HsvT<T>* color) {
+	using namespace std;
+	typedef float CalcType;
+	const CalcType maxValue = std::numeric_limits<T>::max();
+	const CalcType _red		= static_cast<CalcType>(red) / maxValue;
+	const CalcType _blue	= static_cast<CalcType>(blue) / maxValue;
+	const CalcType _green	= static_cast<CalcType>(green) / maxValue;
+	const CalcType _max = max(_red, min(_green, _blue));
+	const CalcType _min = min(_red, min(_green, _blue));
+	const CalcType _diff = _max - _min;
+
+	// CALCULATE HUE
+	if(_max == _min) {
+		color->hue = 0;
+	}
+	else if(_max == _red) {
+		color->hue = 60 * (0 + (_green - _blue)	/ _diff );
+	}
+	else if(_max == _green) {
+		color->hue = 60 * (0 + (_blue - _red)	/ _diff );
+	}
+	else /*if(_max == _blue)*/ {
+		color->hue = 60 * (0 + (_red - _green)	/ _diff );
+	}
+
+	// CALCULATE VALUE (brightness)
+	if(color->hue < 0) {
+		color->hue += 360;
+	}
+
+	// CALCULATE SATURATION
+	if(_max == 0) {
+		color->saturation = 0;
+	} else {
+		color->saturation = _diff / _max;
+	}
+
+	color->value = _max;
+}
+
 
 
 #endif // XPCC__COLOR_HPP
