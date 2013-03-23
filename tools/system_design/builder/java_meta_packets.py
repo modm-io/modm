@@ -33,14 +33,13 @@ import builder_base
 import filter.java as filter
 
 # -----------------------------------------------------------------------------
-class JavaCommunicationBuilder(builder_base.Builder):
+class JavaPacketsBuilder(builder_base.Builder):
 	"""
-	Generate the whole communication tree. The Output is a class named
-	Communication, which contains all concrete Components. They all contain
-	methods, which are corresponding to Actions of given Components.
+	Generate the whole packageset. The Output is a Java Class named Packages.java,
+	which contains as subclasses all the Packages.
 	
 	A common call would be like:
-	$python java_communication.py  --outpath source/rca/robot --package rca.robot robot.xml;
+	$python java_packets.py  --outpath source/rca/robot --package rca.robot robot.xml;
 	"""
 	
 	
@@ -62,26 +61,30 @@ class JavaCommunicationBuilder(builder_base.Builder):
 			'enumElement': filter.enumElement,
 			'typeName': filter.typeName,
 			'typeObjectName': filter.typeObjectName,
+			'typeJavaObjectName': filter.typeJavaObjectName,
 			'variableName': filter.variableName,
+			'inStringDescription': filter.inStringDescription,
 		}
-		template = self.template('templates/java_communication.tpl',
+		template = self.template('templates/java_meta_packets.tpl',
 								filter = javaFilter)
 		
 		# Bool has a special status because its primitive but user generated
 		# and the only not numerical type
-		components = self.tree.components
+		packets = self.tree.types
+		packets.remove('Bool')
 		
 		primitives = filter.PRIMITIVES.values()
 		primitives.sort()
 		
 		substitutions = {
 			'package' : self.options.package,
-			'components': components,
+			'packets': packets,
+			'primitives': primitives,
 		}
 		
-		file = os.path.join(self.options.outpath, 'Communication.java')
+		file = os.path.join(self.options.outpath, 'MetaPackets.java')
 		self.write(file, template.render(substitutions))
 
 # -----------------------------------------------------------------------------
 if __name__ == '__main__':
-	JavaCommunicationBuilder().run()
+	JavaPacketsBuilder().run()

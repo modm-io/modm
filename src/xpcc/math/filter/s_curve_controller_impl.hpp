@@ -41,7 +41,16 @@ xpcc::SCurveController<T>::Parameter::Parameter(
 	speedMaximum(speedMaximum), speedMinimum(speedMinimum),
 	speedTarget(speedTarget)
 {
-}			
+}
+
+// ----------------------------------------------------------------------------
+
+template<typename T>
+void
+xpcc::SCurveController<T>::setParameter(const Parameter& parameter)
+{
+	this->parameter = parameter;
+}
 
 // ----------------------------------------------------------------------------
 

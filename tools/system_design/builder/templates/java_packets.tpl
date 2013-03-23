@@ -28,7 +28,7 @@ public class Packets
 	}
 	
 	/** Base class for all struct types */
-	public static abstract class Struct implements Packet
+	public static abstract class Struct implements Packet, Cloneable
 	{
 		public byte[] getBytes() {
 			ByteBuffer buffer = ByteBuffer.allocate(this.getSize());
@@ -42,8 +42,45 @@ public class Packets
 	//                        Primitive types
 	// ------------------------------------------------------------------------
 	
+	public static final class Void implements Packet, Cloneable
+	{// manual primitive
+		public Void(){
+		}
+		
+		@Override
+		public final int getSize() {
+			return 0;
+		}
+		
+		public byte[] getBytes() {
+			return new byte[0];
+		}
+		
+		public ByteBuffer toBuffer(ByteBuffer buffer){
+			return buffer;
+		}
+		
+		public static Void fromBuffer(ByteBuffer buffer){
+			return new Void();
+		}
+		
+		public static Void fromBuffer(byte[] bytes){
+			return new Void();
+		}
+		
+		@Override
+		public String toString(){
+			return "void";
+		}
+		
+		@Override
+		public Void clone() throws CloneNotSupportedException {
+			return (Void)super.clone();
+		}
+	}
+	
 	{% for primitive in primitives %}
-	public static final class {{ primitive.name }} implements Packet
+	public static final class {{ primitive.name }} implements Packet, Cloneable
 	{// primitives
 		public {{ primitive.javaType }} value;
 		
@@ -82,6 +119,11 @@ public class Packets
 		public String toString(){
 			return "" + value;
 		}
+		
+		@Override
+		public {{ primitive.name }} clone() throws CloneNotSupportedException {
+			return ({{ primitive.name }})super.clone();
+		}
 	}
 	{% endfor %}
 	
@@ -93,7 +135,7 @@ public class Packets
 	
 	{% if packet.description %}/** {{ packet.description | xpcc.wordwrap(72) | xpcc.indent(1) }} */{% endif %}
 	{%- if packet.isStruct %}
-	public static {% if (not packet.extending) %}final {% endif %}class {{ packet.flattened().name | typeName }} extends {% if packet.extends %}{{ packet.extends.name | typeName }}{% else %} Struct {% endif %}
+	public static {% if (not packet.extending) %}final {% endif %}class {{ packet.flattened().name | typeName }} extends {% if packet.extends %}{{ packet.extends.name | typeName }}{% else %}Struct{% endif %}
 	{// packet.isStruct
 		{%- for element in packet.iter() %}
 		public {{ element.subtype.name | typeName }} {{ element.name | variableName }};
@@ -121,7 +163,7 @@ public class Packets
 		}
 		
 		public static {{ packet.name | typeName }} fromBuffer(ByteBuffer buffer) {
-			{% if packet.extending %}
+			{%- if packet.extending %}
 			{{ packet.elements[0].subtype.name | typeName }} type = {{ packet.elements[0].subtype.name | typeName }}.fromValue(buffer.get());
 			buffer.rewind();
 			switch(type){
@@ -132,9 +174,9 @@ public class Packets
 				default:
 					throw new RuntimeException("No extending type from struct '{{ packet.flattened().name | typeName }}' for TypeIdentifier " + type + " defined.");
 			}
-			{% else %}
+			{%- else %}
 			return new {{ packet.name | typeName }}(buffer);
-			{% endif %}
+			{%- endif %}
 		}
 		
 		public static {{ packet.name | typeName }} fromBuffer(byte[] bytes) {
@@ -163,6 +205,18 @@ public class Packets
 			buff.append({{ element.name | variableName }}{% if loop.last %}+")"{% else %}+" "{% endif %});
 			{%- endfor %}
 			return buff.toString();
+		}
+		
+		@Override
+		public {{ packet.name | typeName }} clone() throws CloneNotSupportedException {
+			{{ packet.name | typeName }} o = ({{ packet.name | typeName }})super.clone();
+			{%- for element in packet.iter() %}
+			{%- if element.subtype.type.isStruct %}
+			o.{{ element.name | variableName }} = {{ element.name | variableName }}.clone();
+			{%- endif %}
+			{%- endfor %}
+			
+			return o;
 		}
 	}
 	{%- elif packet.isEnum %}
@@ -233,7 +287,11 @@ public class Packets
 		}
 		
 		public static {{ packet.name | typeName }} fromBuffer(ByteBuffer buffer) {
+			{%- if packet.subtype.type.isStruct %}
+			return new {{ packet.name | typeName }}({{ packet.subtype.name | typeObjectName }}.fromBuffer(buffer));
+			{%- else %}
 			return new {{ packet.name | typeName }}({{ packet.subtype.name | typeObjectName }}.fromBuffer(buffer).value);
+			{%- endif %}
 		}
 		
 		public static {{ packet.name | typeName }} fromBuffer(byte[] bytes) {
@@ -251,6 +309,16 @@ public class Packets
 		@Override
 		public String toString(){
 			return "" + value;
+		}
+		
+		@Override
+		public {{ packet.name | typeName }} clone() throws CloneNotSupportedException {
+			{{ packet.name | typeName }} o = ({{ packet.name | typeName }})super.clone();
+			{%- if packet.subtype.type.isStruct %}
+			o.value = value.clone();
+			{%- endif %}
+			
+			return o;
 		}
 	}
 	{%- endif %}
