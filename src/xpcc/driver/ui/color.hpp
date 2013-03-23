@@ -33,7 +33,7 @@
 
 #include <stdint.h>
 #include <xpcc/io/iostream.hpp>
-#include <limits>
+#include <xpcc/utils/arithmetic_traits.hpp>
 #include <algorithm>
 
 namespace xpcc
@@ -137,7 +137,7 @@ template<typename UnderlyingType> template<typename T>
 inline void xpcc::color::RgbT<UnderlyingType>::toHsv(HsvT<T>* color) {
 	using namespace std;
 	typedef float CalcType;
-	const CalcType maxValue = std::numeric_limits<T>::max();
+	const CalcType maxValue = xpcc::ArithmeticTraits<T>::max();
 	const CalcType _red		= static_cast<CalcType>(red) / maxValue;
 	const CalcType _blue	= static_cast<CalcType>(blue) / maxValue;
 	const CalcType _green	= static_cast<CalcType>(green) / maxValue;
