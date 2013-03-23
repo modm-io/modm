@@ -250,6 +250,14 @@ namespace xpcc
 			color.red	= data.red.get();
 			color.green	= data.green.get();
 			color.blue	= data.blue.get();
+			// START --> This part is not really necessary
+			// Rationale:
+			// Imagine a low band light. For example a green laser. In case the filters
+			// of this sensors do not transfer this wavelength well, it might
+			// result in all colors being very low. The clear value will not
+			// filter colors and thus it will see a bright light (intensity).
+			// In order to still have some signal the very low green value can be
+			// amplified with the clear value.
 			const float c =	static_cast<float>(color.red) +
 								static_cast<float>(color.green) +
 								static_cast<float>(color.blue);
@@ -257,6 +265,7 @@ namespace xpcc
 			color.red	*= f;
 			color.green	*= f;
 			color.blue	*= f;
+			// <-- END
 			return success;
 		}
 
