@@ -25,8 +25,6 @@
  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- * 
- * $hello please remove me$
  */
 // ----------------------------------------------------------------------------
 
@@ -87,7 +85,7 @@ namespace xpcc
 			isQueryCompleted();
 			
 			/**
-			 * \brief	Check if the last query could be performed successful
+			 * \brief	Check if the last query could be performed successfully
 			 * 
 			 * Only valid if isQueryCompleted() returns \c true.
 			 * 

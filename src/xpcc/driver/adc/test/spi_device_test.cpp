@@ -56,8 +56,11 @@ SpiDeviceTest::testEmptyTransmission()
 void
 SpiDeviceTest::testSingleTransmission()
 {
+	uint8_t arg1Rx[] = {1, 2, 3, 4};
+	uint8_t arg1Tx[] = {4, 3, 2, 1};
+
 	test::Transmission transmissions[] = {
-		test::Transmission(4, RX_DATA(1,2,3,4), TX_DATA(4,3,2,1)),
+		test::Transmission(XPCC__ARRAY_SIZE(arg1Rx), arg1Rx, arg1Tx),
 	};
 	
 	test::SpiDevice device;
@@ -95,9 +98,15 @@ SpiDeviceTest::testSingleTransmission()
 void
 SpiDeviceTest::testMultipleTransmissions()
 {
+	uint8_t arg1Rx[] = {1, 2, 3, 4};
+	uint8_t arg1Tx[] = {4, 3, 2, 1};
+
+	uint8_t arg2Rx[] = {5, 6};
+	uint8_t arg2Tx[] = {100, 101};
+
 	test::Transmission transmissions[] = {
-		test::Transmission(4, RX_DATA(1,2,3,4), TX_DATA(4,3,2,1)),
-		test::Transmission(2, RX_DATA(5, 6), TX_DATA(100, 101)),
+		test::Transmission(XPCC__ARRAY_SIZE(arg1Rx), arg1Rx, arg1Tx),
+		test::Transmission(XPCC__ARRAY_SIZE(arg2Rx), arg2Rx, arg2Tx),
 	};
 	
 	test::SpiDevice device;

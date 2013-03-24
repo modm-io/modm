@@ -50,11 +50,10 @@ namespace xpcc
 		 * 
 		 * \tparam	LedClass	typedef of a Led
 		 */
-		template< typename LedClass >
 		class Indicator
 		{
 		private:
-			LedClass led;
+			Led* led;
 			uint16_t const on;
 			uint16_t const off;
 			uint8_t const onFade;
@@ -73,28 +72,68 @@ namespace xpcc
 			 * \param	onFade		time in ms until the LED is fully on
 			 * \param	offFade		time in ms until the LED is fully off
 			 */
-			Indicator(uint16_t const period=1000, float const dutyCycle=0.45f,
-					  uint8_t const onFade=75, uint8_t const offFade=110);
+			Indicator(Led* led, uint16_t const period=1000, float const dutyCycle=0.45f,
+					  uint8_t const onFade=75, uint8_t const offFade=110)
+			:	led(led), on(period * dutyCycle), off(period - on), onFade(onFade), offFade(offFade),
+			counter(0), blinkDirection(true), isBlinking(false), isCounting(false)
+			{
+			}
 			
 			/// start indicating for ever
-			void
-			start();
+			ALWAYS_INLINE void
+			start()
+			{
+				isBlinking = true;
+			}
 			
 			/// Stops indicating after finishing the current cycle
-			void
-			stop();
+			ALWAYS_INLINE void
+			stop()
+			{
+				isBlinking = false;
+			}
 			
 			/// Indicate a number of times and then stop
-			void
-			indicate(uint8_t times=1);
+			inline void
+			indicate(uint8_t times=1)
+			{
+				if (times) {
+					counter = times;
+					isBlinking = true;
+					isCounting = true;
+				}
+			}
 			
 			/// Must be called at least every ms
 			void
-			run();
+			run()
+			{
+				led->run();
+				
+				if (timer.isExpired() && (isBlinking || !blinkDirection))
+				{
+					if (blinkDirection)
+					{
+						led->on(onFade);
+						
+						if (isCounting && !--counter) {
+							isBlinking = false;
+							isCounting = false;
+						}
+						
+						timer.restart(on);
+					}
+					else
+					{
+						led->off(offFade);
+						
+						timer.restart(off);
+					}
+					blinkDirection = !blinkDirection;
+				}
+			}
 		};
 	}
 }
-
-#include "indicator_impl.hpp"
 
 #endif	// XPCC__LED_INDICATOR_HPP

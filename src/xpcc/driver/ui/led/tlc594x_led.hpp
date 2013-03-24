@@ -47,16 +47,8 @@ namespace xpcc
 		 *
 		 * \author	Niklas Hauser
 		 * \ingroup led
-		 *
-		 * \tparam	PwmController	TLC594X driver
-		 * \tparam	CHANNEL			the channel the LED is attached to
-		 * \tparam	PwmTable		the pwm value look-up table
-		 * \tparam	PwmTableSize	the size of the look-up table
 		 */
-		template< typename PwmController,
-				  uint16_t CHANNEL,
-				  const uint16_t* PwmTable=led::table12_256,
-				  uint16_t const PwmTableSize=256 >
+		template< typename PwmController >
 		class TLC594XLed : public Led
 		{
 		private:
@@ -68,36 +60,91 @@ namespace xpcc
 			uint16_t fadeTime;
 			
 			xpcc::PeriodicTimer<> timer;
+			
+			const uint8_t channel;
 			xpcc::accessor::Flash<uint16_t> table;
+			std::size_t const tableSize;
+			
+			void
+			setChannels(uint16_t brightness)
+			{
+				PwmController::setChannel(channel, table[brightness]);
+			}
 			
 		public:
-			TLC594XLed();
+			TLC594XLed(const uint8_t channel, const uint16_t* table=led::table12_256, std::size_t const tableSize=256)
+			:	currentValue(0), deltaValue(0), startValue(0), endValue(0), fadeTime(0), timer(1),
+				channel(channel), table(table), tableSize(tableSize)
+			{
+				setChannels(0);
+			}
 			
-			void
-			setBrightness(uint16_t brightness);
+			virtual void
+			setBrightness(uint16_t brightness)
+			{
+				fadeTime = 0;
+				if (brightness > tableSize-1) brightness = tableSize-1;
+				currentValue = brightness;
+				
+				setChannels(currentValue);
+			}
 			
-			uint16_t
-			getBrightness();
+			virtual uint16_t
+			getBrightness()
+			{
+				return currentValue;
+			}
 			
-			bool
-			isFading();
+			virtual bool
+			isFading()
+			{
+				return static_cast<bool>(fadeTime);
+			}
 			
-			void
-			fadeTo(uint16_t time, uint16_t brightness);
+			virtual void
+			fadeTo(uint16_t time, uint16_t brightness)
+			{
+				if (brightness == currentValue) return;
+				if (brightness > tableSize-1) brightness = tableSize-1;
+				if (!time) {
+					currentValue = brightness;
+					setChannels(currentValue);
+				}
+				else {
+					startValue = currentValue;
+					endValue = brightness;
+					deltaValue = (endValue - startValue) / static_cast<float>(time);
+				}
+				fadeTime = time;
+			}
 			
-			void
-			on(uint16_t time=7);
+			virtual void
+			on(uint16_t time=7)
+			{
+				fadeTo(time, tableSize-1);
+			}
 			
-			void
-			off(uint16_t time=7);
+			virtual void
+			off(uint16_t time=7)
+			{
+				fadeTo(time, 0);
+			}
 			
 			/// must be called at least every ms
 			void
-			run();
+			run()
+			{
+				if (timer.isExpired() && fadeTime)
+				{
+					startValue += deltaValue;
+					currentValue = static_cast<uint16_t>(startValue);
+					if (!--fadeTime) currentValue = endValue;
+					
+					setChannels(currentValue);
+				}
+			}
 		};
 	}
 }
-
-#include "tlc594x_led_impl.hpp"
 
 #endif	// XPCC__LED_TLC594X_LED_HPP

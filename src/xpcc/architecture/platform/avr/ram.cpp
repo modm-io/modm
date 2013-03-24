@@ -68,7 +68,7 @@
 static uint8_t *heapStart = (uint8_t *) &__heap_start;
 static uint8_t *heapEnd = (uint8_t *) &__heap_end;
 
-static uint8_t *freeHint;		// TODO implement freeHint usefull ;-)
+static uint8_t *freeHint;		// TODO implement freeHint useful ;-)
 static uint8_t *currentHeapEnd;
 
 // ----------------------------------------------------------------------------

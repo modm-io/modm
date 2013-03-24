@@ -75,6 +75,9 @@ namespace xpcc
 			// get rid of the warning about an unused parameter
 			(void) device;
 		}
+		IODeviceWrapper()
+		{
+		}
 		
 		virtual void
 		write(char c)

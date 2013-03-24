@@ -152,10 +152,6 @@ def update_files():
 	rename = [("regression.2.txt", "regression.txt")]
 	
 	for path, directories, files in os.walk('regression'):
-		# exclude the SVN-directories
-		if '.svn' in directories:
-			directories.remove('.svn')
-		
 		for file in files:
 			if file.endswith(".2.txt"):
 				# *.2.txt -> *.txt
@@ -200,10 +196,6 @@ if __name__ == '__main__':
 
 	#for path, directories, files in os.walk('../examples'):
 	for path, directories, files in os.walk(dir):
-		# exclude the SVN-directories
-		if '.svn' in directories:
-			directories.remove('.svn')
-		
 		if 'SConstruct' in files:
 			cmd = ['scons', '-C%s' % path, 'size']
 			p = subprocess.Popen(cmd, stdout=subprocess.PIPE)

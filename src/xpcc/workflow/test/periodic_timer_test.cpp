@@ -29,48 +29,20 @@
 // ----------------------------------------------------------------------------
 
 #include <xpcc/workflow/periodic_timer.hpp>
+#include <xpcc/architecture/driver/clock_dummy.hpp>
 
 #include "periodic_timer_test.hpp"
-
-// ----------------------------------------------------------------------------
-// dummy implementation to control the time
-
-namespace
-{
-	class DummyClock
-	{
-	public:
-		static xpcc::Timestamp
-		now()
-		{
-			return time;
-		}
-		
-		static void
-		setTime(uint16_t time)
-		{
-			DummyClock::time = time;
-		}
-		
-	private:
-		static uint16_t time;
-	};
-	
-	uint16_t DummyClock::time = 0;
-}
-
-// ----------------------------------------------------------------------------
 
 void
 PeriodicTimerTest::setUp()
 {
-	DummyClock::setTime(0);
+	xpcc::ClockDummy::setTime(0);
 }
 
 void
 PeriodicTimerTest::testConstructor()
 {
-	xpcc::PeriodicTimer<DummyClock> timer(10);
+	xpcc::PeriodicTimer<xpcc::ClockDummy> timer(10);
 	
 	TEST_ASSERT_TRUE(timer.isRunning());
 	TEST_ASSERT_FALSE(timer.isExpired());
@@ -79,25 +51,25 @@ PeriodicTimerTest::testConstructor()
 void
 PeriodicTimerTest::testTimer()
 {
-	xpcc::PeriodicTimer<DummyClock> timer(10);
+	xpcc::PeriodicTimer<xpcc::ClockDummy> timer(10);
 	
 	TEST_ASSERT_FALSE(timer.isExpired());
 	
 	int i;
 	for (i = 0; i < 9; ++i) {
-		DummyClock::setTime(i);
+		xpcc::ClockDummy::setTime(i);
 		TEST_ASSERT_FALSE(timer.isExpired());
 	}
 	
-	DummyClock::setTime(10);
+	xpcc::ClockDummy::setTime(10);
 	TEST_ASSERT_TRUE(timer.isExpired());
 	TEST_ASSERT_FALSE(timer.isExpired());
 	
-	DummyClock::setTime(20);
+	xpcc::ClockDummy::setTime(20);
 	TEST_ASSERT_TRUE(timer.isExpired());
 	TEST_ASSERT_FALSE(timer.isExpired());
 	
-	DummyClock::setTime(100);
+	xpcc::ClockDummy::setTime(100);
 	TEST_ASSERT_TRUE(timer.isExpired());
 	TEST_ASSERT_FALSE(timer.isExpired());
 }
@@ -105,7 +77,7 @@ PeriodicTimerTest::testTimer()
 void
 PeriodicTimerTest::testRestart()
 {
-	xpcc::PeriodicTimer<DummyClock> timer(10);
+	xpcc::PeriodicTimer<xpcc::ClockDummy> timer(10);
 	
 	TEST_ASSERT_TRUE(timer.isRunning());
 	TEST_ASSERT_FALSE(timer.isExpired());
@@ -119,7 +91,7 @@ PeriodicTimerTest::testRestart()
 	TEST_ASSERT_TRUE(timer.isRunning());
 	TEST_ASSERT_FALSE(timer.isExpired());
 	
-	DummyClock::setTime(5);
+	xpcc::ClockDummy::setTime(5);
 	TEST_ASSERT_TRUE(timer.isExpired());
 	TEST_ASSERT_FALSE(timer.isExpired());
 }

@@ -50,13 +50,13 @@ namespace xpcc
 		 * extern "C" void
 		 * TIM7_IRQHandler(void)
 		 * {
-		 *     Timer7::resetInterruptFlag(Timer7::FLAG_UPDATE);
+		 *     Timer7::resetInterruptFlags(Timer7::FLAG_UPDATE);
 		 *     
 		 *     ...
 		 * }
 		 * \endcode
 		 * 
-		
+		 
 		 * 
 		 * @author		Fabian Greif
 		 * @ingroup		stm32
@@ -143,7 +143,7 @@ namespace xpcc
 			}
 			
 			static void
-			resetInterruptFlag(InterruptFlag interrupt)
+			resetInterruptFlags(InterruptFlag interrupt)
 			{
 				// Flags are cleared by writing a zero to the flag position.
 				// Writing a one is ignored.

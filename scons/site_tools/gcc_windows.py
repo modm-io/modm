@@ -95,7 +95,10 @@ class TempFileMungeWindows(object):
         output = " ".join(args).replace("\\", "\\\\")
         os.write(fd, output + "\n")
         os.close(fd)
-        return [cmd[0], '@' + native_tmp + '\nrm', native_tmp]
+        if SCons.Action.print_actions:
+            print("TempFileMungeWindows: Using tempfile "+native_tmp+" for command line:\n"+
+                  str(cmd[0]) + " " + " ".join(args))
+        return [cmd[0], '@"' + native_tmp + '"\ndel', '"' + native_tmp + '"']
 
 # -----------------------------------------------------------------------------
 def generate(env, **kw):

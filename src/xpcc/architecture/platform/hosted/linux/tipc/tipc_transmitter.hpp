@@ -48,7 +48,6 @@ namespace xpcc
 		 * \todo		exception handling : now it writs only log-messages
 		 * 
 		 * \ingroup		tipc
-		 * \version		$Id: tipc_transmitter.hpp 607 2011-09-13 19:51:03Z dergraaf $
 		 * \author		Carsten Schmitt < >
 		 */
 		class Transmitter

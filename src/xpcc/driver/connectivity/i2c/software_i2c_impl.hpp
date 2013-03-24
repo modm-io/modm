@@ -99,9 +99,9 @@ xpcc::SoftwareI2C<Scl, Sda, Frequency>::start(xpcc::i2c::Delegate *delegate)
 			DEBUG_SW_I2C('s');
 			startCondition();
 			xpcc::i2c::Delegate::Starting s = myDelegate->started();
-			uint8_t address;
+			uint8_t address = s.address;
 			
-			address = (s.address & 0xfe);
+			address &= 0xfe;
 			if (s.next == xpcc::i2c::Delegate::READ_OP)
 				address |= xpcc::i2c::READ;
 			
@@ -185,7 +185,7 @@ xpcc::SoftwareI2C<Scl, Sda, Frequency>::startCondition()
 		if (scl.read() == gpio::HIGH)
 		{// a very illegal state
 			// avoid generating a stop condition and hope no other is writing on the bus
-			scl.setOutput();
+			scl.setOutput(0);
 			delay();
 			sda.setInput();
 			delay();
@@ -203,9 +203,9 @@ xpcc::SoftwareI2C<Scl, Sda, Frequency>::startCondition()
 	}
 	
 	// here both pins are HIGH, ready for start
-	sda.setOutput();
+	sda.setOutput(0);
 	delay();
-	scl.setOutput();
+	scl.setOutput(0);
 	delay();
 }
 
@@ -213,8 +213,8 @@ template <typename Scl, typename Sda, int32_t Frequency>
 void
 xpcc::SoftwareI2C<Scl, Sda, Frequency>::stopCondition()
 {
-	scl.setOutput();
-	sda.setOutput();
+	scl.setOutput(0);
+	sda.setOutput(0);
 	
 	delay();
 	scl.setInput();
@@ -284,7 +284,7 @@ xpcc::SoftwareI2C<Scl, Sda, Frequency>::readBit()
 	
 	bool bit = sda.read();
 	
-	scl.setOutput();
+	scl.setOutput(0);
 	
 	return bit;
 }
@@ -297,7 +297,7 @@ xpcc::SoftwareI2C<Scl, Sda, Frequency>::writeBit(bool bit)
 		sda.setInput();
 	}
 	else {
-		sda.setOutput();
+		sda.setOutput(0);
 	}
 	delay();
 	
@@ -307,7 +307,7 @@ xpcc::SoftwareI2C<Scl, Sda, Frequency>::writeBit(bool bit)
 	while (scl.read() == gpio::LOW)
 		;
 	
-	scl.setOutput();
+	scl.setOutput(0);
 }
 
 // ----------------------------------------------------------------------------

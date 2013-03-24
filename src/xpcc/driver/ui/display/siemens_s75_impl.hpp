@@ -212,5 +212,162 @@ xpcc::SiemensS75Common<MEMORY, RESET, WIDTH, HEIGHT, ORIENTATION>::lcdSettings()
 	xpcc::delay_ms(10);
 
 	// colourful test
-	lcdCls(0x00f0); // black
+	lcdCls(0x0000); // black
+}
+
+template <typename PORT, typename CS, typename RS, typename WR, typename Reset>
+void
+xpcc::SiemensS75Common<PORT, CS, RS, WR, Reset>::lcdCls(uint16_t colour) {
+	// Set CGRAM Address to 0 = upper left corner
+	writeCmd(0x21, 0x0000);
+
+	// Set instruction register to "RAM Data write"
+	writeReg(0x22);
+
+	RS::set();
+	CS::reset();
+
+	// start data transmission
+
+	// generic implementation
+	uint8_t c1 = colour >> 8;
+	uint8_t c2 = colour & 0xff;
+	for (uint16_t i = 0; i < (132 * 176); ++i) {
+		WR::reset();
+		PORT::write(c1);
+		WR::set();
+
+		WR::reset();
+		PORT::write(c2);
+		WR::set();
+	}
+
+	CS::set();
+}
+
+template <typename PORT, typename CS, typename RS, typename WR, typename Reset>
+void
+xpcc::SiemensS75Portrait<PORT, CS, RS, WR, Reset>::update() {
+	// Set CGRAM Address to 0 = upper left corner
+	SiemensS75Common<PORT, CS, RS, WR, Reset>::writeCmd(0x21, 0x0000);
+
+	// Set instruction register to "RAM Data write"
+	SiemensS75Common<PORT, CS, RS, WR, Reset>::writeReg(0x22);
+
+	// WRITE MEMORY
+	RS::set();
+	CS::reset();
+
+	const uint16_t maskBlank  = 0x0000; // RRRR RGGG GGGB BBBB
+	const uint16_t maskFilled = 0x37e0; // RRRR RGGG GGGB BBBB
+
+	const uint8_t width = 132;
+	const uint8_t height = 176 / 8;
+
+	const uint8_t fill_h = maskFilled >> 8;
+	const uint8_t fill_l = maskFilled & 0xff;
+
+	const uint8_t blank_h = maskBlank >> 8;
+	const uint8_t blank_l = maskBlank & 0xff;
+
+	for (uint8_t x = 0; x < width; ++x)
+	{
+		for (uint8_t y = 0; y < height; ++y)
+		{
+			// group of 8 black-and-white pixels
+			uint8_t group = this->buffer[x][y];
+			uint8_t PORTBuffer[16];
+			uint8_t PORTIdx = 0;
+
+			for (uint8_t pix = 0; pix < 8; ++pix, group >>= 1) {
+				if (group & 1)
+				{
+					PORTBuffer[PORTIdx++] = fill_h;
+					PORTBuffer[PORTIdx++] = fill_l;
+				}
+				else
+				{
+					PORTBuffer[PORTIdx++] = blank_h;
+					PORTBuffer[PORTIdx++] = blank_l;
+				}
+			} // pix
+
+			for (uint8_t ii = 0; ii < PORTIdx; ++ii) {
+				PORT::write(PORTBuffer[ii]);
+				WR::reset();	// High-to-Low strobe
+				WR::set();
+			}
+		} // y
+	} // x
+
+	CS::set();
+}
+
+template <typename PORT, typename CS, typename RS, typename WR, typename Reset>
+void
+xpcc::SiemensS75Landscape<PORT, CS, RS, WR, Reset>::update() {
+	// Set CGRAM Address to height-1 = upper left corner
+	SiemensS75Common<PORT, CS, RS, WR, Reset>::writeCmd(0x21, 131);
+
+	// Set instruction register to "RAM Data write"
+	SiemensS75Common<PORT, CS, RS, WR, Reset>::writeReg(0x22);
+
+	// WRITE MEMORY
+	RS::set();
+	CS::reset();
+
+	const uint16_t maskBlank  = 0x0000; // RRRR RGGG GGGB BBBB
+	const uint16_t maskFilled = 0x37e0; // RRRR RGGG GGGB BBBB
+
+	// size of the XPCC Display buffer, not the hardware pixels
+	const uint8_t width = 176;
+	const uint8_t height = 136 / 8; // Display is only 132 pixels high.
+
+	const uint8_t fill_h = maskFilled >> 8;
+	const uint8_t fill_l = maskFilled & 0xff;
+
+	const uint8_t blank_h = maskBlank >> 8;
+	const uint8_t blank_l = maskBlank & 0xff;
+
+	for (uint8_t x = 0; x < width; ++x)
+	{
+		for (uint8_t y = 0; y < height; ++y)
+		{
+			// group of 8 black-and-white pixels
+			uint8_t group = this->buffer[x][y];
+
+			uint8_t PORTBuffer[16];
+			uint_fast8_t PORTIdx = 0;
+
+			// Only 4 pixels at the lower end of the display in landscape mode
+			uint8_t pixels;
+			if (y == (height - 1)) {
+				// The last pixels
+				pixels = 4;
+			}
+			else {
+				pixels = 8;
+			}
+
+			for (uint8_t pix = 0; pix < pixels; ++pix, group >>= 1) {
+				if (group & 1)
+				{
+					PORTBuffer[PORTIdx++] = fill_h;
+					PORTBuffer[PORTIdx++] = fill_l;
+				}
+				else
+				{
+					PORTBuffer[PORTIdx++] = blank_h;
+					PORTBuffer[PORTIdx++] = blank_l;
+				}
+			} // pix
+			for (uint8_t ii = 0; ii < PORTIdx; ++ii) {
+				WR::reset();	// Low phase of WR must be at least x ns long
+				PORT::write(PORTBuffer[ii]);
+				WR::set();		// Low-to-high strobe
+			}
+		} // y
+	} // x
+
+	CS::set();
 }

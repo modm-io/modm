@@ -58,37 +58,40 @@ namespace xpcc
 #endif
 			
 			/// \param brightness of the LED between 0 and length of lookup-table
-			void
-			setBrightness(uint16_t brightness);
+			virtual void
+			setBrightness(uint16_t brightness) = 0;
 			
 			/// \return brightness of the LED
-			uint16_t
-			getBrightness();
+			virtual uint16_t
+			getBrightness() = 0;
 			
 			/// \return \c true if LED is currently fading to another brightness,
 			///			\c false if otherwise
-			bool
-			isFading();
+			virtual bool
+			isFading() = 0;
 			
 			/// Fade from the current brightness to a new brightness in the specified ms.
-			void
-			fadeTo(uint16_t time, uint16_t brightness);
+			virtual void
+			fadeTo(uint16_t time, uint16_t brightness) = 0;
 			
 			/**
 			 * Mimmics the behaviour of normal lamps, which take a small amount
 			 * of time until achiving full brightness.
 			 * \param time	specify the fade up time in ms, 0 turn the LED on instantly
 			 */
-			void
-			on(uint16_t time=7);
+			virtual void
+			on(uint16_t time=7) = 0;
 			
 			/**
 			 * Mimmics the behaviour of normal lamps, which take a small amount
 			 * of time until fully extinguishing.
 			 * \param time	specify the fade up time in ms, 0 turn the LED off instantly
 			 */
-			void
-			off(uint16_t time=7);
+			virtual void
+			off(uint16_t time=7) = 0;
+			
+			virtual void
+			run() = 0;
 		};
 	}
 }

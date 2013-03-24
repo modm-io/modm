@@ -1,0 +1,140 @@
+; Windows 2000, XP, Vista and 7 (x32 and x64) setup file for Atmel CDC Devices
+
+; Copyright (c) 2000 Microsoft Corporation
+; Copyright (C) 2000-2012 ATMEL, Inc.
+
+[Version] 
+Signature="$Windows NT$" 
+Class=Ports 
+ClassGuid={4D36E978-E325-11CE-BFC1-08002BE10318} 
+
+Provider=%ATMEL% 
+LayoutFile=layout.inf 
+DriverVer=10/15/1999,5.0.2153.1 
+
+;----------------------------------------------------------
+; Targets
+;----------------------------------------------------------
+[Manufacturer] 
+%ATMEL%=ATMEL, NTamd64 
+
+[ATMEL] 
+%ATMEL_CDC_XPLAINED%=Reader, USB\VID_03EB&PID_2122 
+%ATMEL_CDC_SFW_EXAMPLE%=Reader, USB\VID_03EB&PID_2307 
+%ATMEL_CDC_EVK1XXX%=Reader, USB\VID_03EB&PID_2310 
+%ATMEL_CDC_ASF_EXAMPLE%=Reader, USB\VID_03EB&PID_2404
+%ATMEL_CDC_ASF_COMPOSITE_EXAMPLE2%=Reader, USB\VID_03EB&PID_2421&MI_00
+%ATMEL_CDC_ASF_COMPOSITE_EXAMPLE4%=Reader, USB\VID_03EB&PID_2424&MI_00
+%ATMEL_CDC_ASF_EXAMPLE2_COM1%=Reader, USB\VID_03EB&PID_2425&MI_00
+%ATMEL_CDC_ASF_EXAMPLE2_COM2%=Reader, USB\VID_03EB&PID_2425&MI_02
+%ATMEL_CDC_ASF_EXAMPLE3_COM1%=Reader, USB\VID_03EB&PID_2426&MI_00
+%ATMEL_CDC_ASF_EXAMPLE3_COM2%=Reader, USB\VID_03EB&PID_2426&MI_02
+%ATMEL_CDC_ASF_EXAMPLE3_COM3%=Reader, USB\VID_03EB&PID_2426&MI_04
+%ATMEL_CDC_ASF_EXAMPLE3_COM4%=Reader, USB\VID_03EB&PID_2426&MI_06
+%ATMEL_CDC_ASF_EXAMPLE3_COM5%=Reader, USB\VID_03EB&PID_2426&MI_08
+%ATMEL_CDC_ASF_EXAMPLE3_COM6%=Reader, USB\VID_03EB&PID_2426&MI_0A
+%ATMEL_CDC_ASF_EXAMPLE3_COM7%=Reader, USB\VID_03EB&PID_2426&MI_0C
+
+[ATMEL.NTamd64]
+%ATMEL_CDC_XPLAINED%=DriverInstall, USB\VID_03EB&PID_2122 
+%ATMEL_CDC_SFW_EXAMPLE%=DriverInstall, USB\VID_03EB&PID_2307 
+%ATMEL_CDC_EVK1XXX%=DriverInstall, USB\VID_03EB&PID_2310 
+%ATMEL_CDC_ASF_EXAMPLE%=DriverInstall, USB\VID_03EB&PID_2404 
+%ATMEL_CDC_ASF_COMPOSITE_EXAMPLE2%=DriverInstall, USB\VID_03EB&PID_2421&MI_00
+%ATMEL_CDC_ASF_COMPOSITE_EXAMPLE4%=DriverInstall, USB\VID_03EB&PID_2424&MI_00
+%ATMEL_CDC_ASF_EXAMPLE2_COM1%=DriverInstall, USB\VID_03EB&PID_2425&MI_00
+%ATMEL_CDC_ASF_EXAMPLE2_COM2%=DriverInstall, USB\VID_03EB&PID_2425&MI_02
+%ATMEL_CDC_ASF_EXAMPLE3_COM1%=DriverInstall, USB\VID_03EB&PID_2426&MI_00
+%ATMEL_CDC_ASF_EXAMPLE3_COM2%=DriverInstall, USB\VID_03EB&PID_2426&MI_02
+%ATMEL_CDC_ASF_EXAMPLE3_COM3%=DriverInstall, USB\VID_03EB&PID_2426&MI_04
+%ATMEL_CDC_ASF_EXAMPLE3_COM4%=DriverInstall, USB\VID_03EB&PID_2426&MI_06
+%ATMEL_CDC_ASF_EXAMPLE3_COM5%=DriverInstall, USB\VID_03EB&PID_2426&MI_08
+%ATMEL_CDC_ASF_EXAMPLE3_COM6%=DriverInstall, USB\VID_03EB&PID_2426&MI_0A
+%ATMEL_CDC_ASF_EXAMPLE3_COM7%=DriverInstall, USB\VID_03EB&PID_2426&MI_0C
+
+;----------------------------------------------------------
+; Windows 2K, XP, and Vista32
+;----------------------------------------------------------
+[Reader_Install.NTx86] 
+
+
+[DestinationDirs] 
+DefaultDestDir=12 
+Reader.NT.Copy=12 
+
+[Reader.NT] 
+include=mdmcpq.inf
+CopyFiles=Reader.NT.Copy 
+AddReg=Reader.NT.AddReg 
+
+[Reader.NT.Copy] 
+usbser.sys 
+
+[Reader.NT.AddReg]
+HKR,,DevLoader,,*ntkern 
+HKR,,NTMPDriver,,usbser.sys 
+HKR,,EnumPropPages32,,"MsPorts.dll,SerialPortPropPageProvider" 
+
+[Reader.NT.Services] 
+AddService = usbser, 0x00000002, Service_Inst 
+
+[Service_Inst] 
+DisplayName = %Serial.SvcDesc% 
+ServiceType = 1 ; SERVICE_KERNEL_DRIVER 
+StartType = 3 ; SERVICE_DEMAND_START 
+ErrorControl = 1 ; SERVICE_ERROR_NORMAL 
+ServiceBinary = %12%\usbser.sys 
+LoadOrderGroup = Base 
+
+
+;----------------------------------------------------------
+; Vista64
+;----------------------------------------------------------
+
+[DriverInstall.NTamd64]
+include=mdmcpq.inf
+CopyFiles=DriverCopyFiles.NTamd64
+AddReg=DriverInstall.NTamd64.AddReg
+
+[DriverCopyFiles.NTamd64]
+usbser.sys,,,0x20
+
+[DriverInstall.NTamd64.AddReg]
+HKR,,DevLoader,,*ntkern
+HKR,,NTMPDriver,,usbser.sys
+HKR,,EnumPropPages32,,"MsPorts.dll,SerialPortPropPageProvider"
+
+[DriverInstall.NTamd64.Services]
+AddService=usbser, 0x00000002, DriverService.NTamd64
+
+[DriverService.NTamd64]
+DisplayName=%Serial.SvcDesc%
+ServiceType=1
+StartType=3
+ErrorControl=1
+ServiceBinary=%12%\usbser.sys
+
+;----------------------------------------------------------
+; String
+;----------------------------------------------------------
+
+[Strings] 
+ATMEL = "ATMEL, Inc." 
+ATMEL_CDC_XPLAINED = "XPLAINED Virtual Com Port"
+ATMEL_CDC_SFW_EXAMPLE = "Communication Device Class SFW example"
+ATMEL_CDC_EVK1XXX = "EVK1XXX Virtual Com Port"
+ATMEL_CDC_ASF_EXAMPLE = "Communication Device Class ASF example"
+ATMEL_CDC_ASF_COMPOSITE_EXAMPLE2 = "Communication Device Class ASF composite example 2"
+ATMEL_CDC_ASF_COMPOSITE_EXAMPLE4 = "Communication Device Class ASF composite example 4"
+ATMEL_CDC_ASF_EXAMPLE2_COM1 = "Communication Device Class ASF example2, COM1"
+ATMEL_CDC_ASF_EXAMPLE2_COM2 = "Communication Device Class ASF example2, COM2"
+ATMEL_CDC_ASF_EXAMPLE3_COM1 = "Communication Device Class ASF example3, COM1"
+ATMEL_CDC_ASF_EXAMPLE3_COM2 = "Communication Device Class ASF example3, COM2"
+ATMEL_CDC_ASF_EXAMPLE3_COM3 = "Communication Device Class ASF example3, COM3"
+ATMEL_CDC_ASF_EXAMPLE3_COM4 = "Communication Device Class ASF example3, COM4"
+ATMEL_CDC_ASF_EXAMPLE3_COM5 = "Communication Device Class ASF example3, COM5"
+ATMEL_CDC_ASF_EXAMPLE3_COM6 = "Communication Device Class ASF example3, COM6"
+ATMEL_CDC_ASF_EXAMPLE3_COM7 = "Communication Device Class ASF example3, COM7"
+
+Serial.SvcDesc = "USB Serial emulation driver" 
+

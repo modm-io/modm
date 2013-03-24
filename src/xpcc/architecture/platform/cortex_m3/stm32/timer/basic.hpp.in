@@ -46,24 +46,24 @@ namespace xpcc
 		 * extern "C" void
 		 * TIM{{ id }}_IRQHandler(void)
 		 * {
-		 *     Timer{{ id }}::resetInterruptFlag(Timer{{ id }}::FLAG_UPDATE);
+		 *     Timer{{ id }}::resetInterruptFlags(Timer{{ id }}::FLAG_UPDATE);
 		 *     
 		 *     ...
 		 * }
 		 * \endcode
 		 * 
-		{% if id == 6 -%}
+		 {% if id == 6 -%}
 		 * For the STM32F2xx and STM32F4xx:
 		 * \code
 		 * extern "C" void
-		 * TIM{{ id }}_DAC_IRQn(void)
+		 * TIM{{ id }}_DAC_IRQHandler(void)
 		 * {
-		 *     Timer{{ id }}::resetInterruptFlag(Timer{{ id }}::FLAG_UPDATE);
+		 *     Timer{{ id }}::resetInterruptFlags(Timer{{ id }}::FLAG_UPDATE);
 		 *     
 		 *     ...
 		 * }
 		 * \endcode
-		{%- endif %}
+		 {%- endif %}
 		 * 
 		 * @author		Fabian Greif
 		 * @ingroup		stm32
@@ -150,7 +150,7 @@ namespace xpcc
 			}
 			
 			static void
-			resetInterruptFlag(InterruptFlag interrupt)
+			resetInterruptFlags(InterruptFlag interrupt)
 			{
 				// Flags are cleared by writing a zero to the flag position.
 				// Writing a one is ignored.
