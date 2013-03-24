@@ -152,18 +152,21 @@ inline void xpcc::color::RgbT<UnderlyingType>::toHsv(HsvT<T>* color) const
 	// CALCULATE HUE
 	if(_max == _min) { // all three color values are the same
 		hue_temp = 0;
+		color->value = _max * maxValue;
 	}
 	else if(_max == _red) {
 		hue_temp = 60 * (0 + (_green - _blue)	/ _diff );
+		color->value = red;
 	}
 	else if(_max == _green) {
 		hue_temp = 60 * (2 + (_blue - _red)		/ _diff );
+		color->value = green;
 	}
 	else /*if(_max == _blue)*/ {
 		hue_temp = 60 * (4 + (_red - _green)	/ _diff );
+		color->value = blue;
 	}
 
-	// CALCULATE VALUE (brightness)
 	if(hue_temp < 0) {
 		color->hue = (hue_temp + 360	) * (maxValue / 360);
 	}
@@ -177,8 +180,6 @@ inline void xpcc::color::RgbT<UnderlyingType>::toHsv(HsvT<T>* color) const
 	} else {
 		color->saturation = _diff / _max * maxValue;
 	}
-
-	color->value = _max * maxValue;
 }
 
 #endif // XPCC__COLOR_HPP
