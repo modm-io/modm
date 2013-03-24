@@ -31,9 +31,13 @@
 Import('env')
 
 generator = env['TemplateGenerator'](env, 'adc')
-for id in [1, 2, 3]:
-	generator.template('adc_%i.hpp' % id, 'adc.hpp.in', { 'id': id })
-	generator.template('adc_%i.cpp' % id, 'adc.cpp.in', { 'id': id })
+for id in [1, 2, 3, 4]:
+	if id < 3:
+		generator.template('adc_%i.hpp' % id, 'adc.hpp.in', { 'id': id, 'id_common': '12', 'id_common_u': '1_2' })
+		generator.template('adc_%i.cpp' % id, 'adc.cpp.in', { 'id': id, 'id_common': '12', 'id_common_u': '1_2' })
+	else:
+		generator.template('adc_%i.hpp' % id, 'adc.hpp.in', { 'id': id, 'id_common': '34', 'id_common_u': '3_4' })
+		generator.template('adc_%i.cpp' % id, 'adc.cpp.in', { 'id': id, 'id_common': '34', 'id_common_u': '3_4' })
 
 generator = env['TemplateGenerator'](env, 'spi')
 for id in [1, 2, 3]:
