@@ -28,14 +28,24 @@
  */
 // ----------------------------------------------------------------------------
 
+#include "../gpio.hpp"
+#include "../device.h"
+
 #include "adc_{{ id }}.hpp"
+
+#include <xpcc_config.hpp>
+#include <xpcc/architecture/driver/delay.hpp>	// xpcc::delay_us
+
+using namespace xpcc::stm32;
+
+{% if id < 4 %}
+#if defined(STM32F4XX) || defined(STM32F2XX) || defined(STM32F10X)
 
 {% if id>2 %}
 #if defined(STM32F2XX) || defined(STM32F4XX) || \
 	defined (STM32F10X_HD) || defined (STM32F10X_XL)
 {% endif -%}
 
-using namespace xpcc::stm32;
 
 // ----------------------------------------------------------------------------
 void
@@ -206,3 +216,51 @@ Adc{{ id }}::enableInterrupt(const Interrupt interrupt, const uint32_t priority)
 {% if id>2 %}
 #endif	// defined(STM32F2XX) || defined(STM32F4XX) || defined (STM32F10X_HD) || defined (STM32F10X_XL)
 {% endif -%}
+
+#elif defined(STM32F3XX)
+{% else -%}
+#if defined(STM32F3XX)
+{% endif -%} /* id < 4 */
+
+
+void
+Adc{{ id }}::initialize(const ClockMode clk, const Prescaler pre,
+		const CalibrationMode cal, const bool blocking)
+{
+	uint32_t tmp = 0;
+
+	// enable clock
+	RCC->AHBENR |= RCC_AHBENR_ADC{{ id_common }}EN;
+
+	// reset ADC
+	// FIXME: not a good idea since you can only reset both
+	// ADC1/ADC2 or ADC3/ADC4 at once ....
+	// RCC->APB2RSTR |=  RCC_APB2RSTR_ADC{{ id }}RST;
+	// RCC->APB2RSTR &= ~RCC_APB2RSTR_ADC{{ id }}RST;
+
+	// set ADC "analog" clock source
+	if (clk != ClockMode::DoNotChange) {
+		if (clk == ClockMode::Asynchronous) {
+			setPrescaler(pre);
+		}
+		tmp  =  ADC{{ id_common_u }}->CCR;
+		tmp &= ~ADC12_CCR_CKMODE;
+		tmp |=  static_cast<uint32_t>(clk);
+		ADC{{ id_common_u }}->CCR = tmp;
+	}
+
+	// enable regulator
+	ADC{{ id }}->CR &= ~ADC_CR_ADVREGEN;
+	ADC{{ id }}->CR |= static_cast<uint32_t>(VoltageRegulatorState::Enabled);
+	xpcc::delay_us(10);	// FIXME: this is ugly -> find better solution
+
+	calibrate(cal, true);	// blocking calibration
+
+	ADC{{ id }}->CR |= ADC_CR_ADEN;
+	if (blocking) {
+		while(!isReady());
+		resetInterruptFlags(InterruptFlag::Ready);
+	}
+}
+
+#endif
