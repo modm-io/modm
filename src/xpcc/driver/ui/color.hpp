@@ -92,7 +92,7 @@ namespace xpcc
 			}
 
 			template<typename T> void
-			toHsv(HsvT<T>* color);
+			toHsv(HsvT<T>* color) const;
 
 		private:
 			template<typename T>
@@ -106,8 +106,9 @@ namespace xpcc
 		class HsvT
 		{
 		public:
+			template<typename T=UnderlyingType>
 			void
-			toRgb(RgbT<UnderlyingType>* color);
+			toRgb(RgbT<T>* color) const;
 
 			UnderlyingType hue;
 			UnderlyingType saturation;
@@ -134,7 +135,8 @@ xpcc::color::operator << ( xpcc::IOStream& os, const xpcc::color::RgbT<Underlyin
  * @param color
  */
 template<typename UnderlyingType> template<typename T>
-inline void xpcc::color::RgbT<UnderlyingType>::toHsv(HsvT<T>* color) {
+inline void xpcc::color::RgbT<UnderlyingType>::toHsv(HsvT<T>* color) const
+{
 	using namespace std;
 	typedef float CalcType;
 	const CalcType maxValue = xpcc::ArithmeticTraits<T>::max();
@@ -173,7 +175,5 @@ inline void xpcc::color::RgbT<UnderlyingType>::toHsv(HsvT<T>* color) {
 
 	color->value = _max;
 }
-
-
 
 #endif // XPCC__COLOR_HPP

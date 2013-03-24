@@ -89,8 +89,12 @@ main(void)
 		xpcc::delay_ms(150);
 
 		const xpcc::tcs3414::Rgb colors = tcs::getNewColors().getRelativeColors();
+		xpcc::color::HsvT<xpcc::tcs3414::UnderlyingType> hsv;
+		colors.toHsv(&hsv);
 
 		XPCC_LOG_DEBUG << colors << ";" << xpcc::endl;
+		XPCC_LOG_DEBUG << "HSV: " << hsv.hue << ", " << hsv.saturation << ", " << hsv.value << ";" << xpcc::endl;
+
 
 		if(colors.red > 55)
 			rot::set();

@@ -33,9 +33,9 @@
 // ----------------------------------------------------------------------------
 namespace xpcc {
 namespace color {
-template<>
+template<> template<>
 void
-HsvT<uint8_t>::toRgb(RgbT<uint8_t>* color)
+HsvT<uint8_t>::toRgb(RgbT<uint8_t>* color) const
 {
 	uint16_t vs = value * saturation;
 	uint16_t h6 = 6 * hue;
