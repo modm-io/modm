@@ -8,12 +8,12 @@
 #include <xpcc/architecture.hpp>
 #include <xpcc/architecture/platform.hpp>
 
-#include <xpcc/debug/logger.hpp>
 #include <xpcc/workflow/periodic_timer.hpp>
 #include <xpcc/driver/other/tcs3414.hpp>
 
 // ----------------------------------------------------------------------------
 // Logging
+#include <xpcc/debug/logger.hpp>
 extern xpcc::lpc::Uart1 loggerUart;
 xpcc::IODeviceWrapper<xpcc::lpc::Uart1> loggerDevice(loggerUart);
 xpcc::log::Logger xpcc::log::debug(loggerDevice);
@@ -88,13 +88,12 @@ main(void)
 		gelb::toggle();
 		xpcc::delay_ms(150);
 
-		const xpcc::tcs3414::Rgb colors = tcs::getNewColors().getRelativeColors();
+		const xpcc::tcs3414::Rgb colors = tcs::getNewColors();
 		xpcc::color::HsvT<xpcc::tcs3414::UnderlyingType> hsv;
 		colors.toHsv(&hsv);
 
-		XPCC_LOG_DEBUG << colors << ";" << xpcc::endl;
-		XPCC_LOG_DEBUG << "HSV: " << hsv.hue << ", " << hsv.saturation << ", " << hsv.value << ";" << xpcc::endl;
-
+		XPCC_LOG_DEBUG << "RGB: " << colors << ";" << xpcc::endl;
+		XPCC_LOG_DEBUG << "HSV: " << hsv.hue << "\t" << hsv.saturation << "\t" << hsv.value << "\t" << xpcc::endl;
 
 		if(colors.red > 55)
 			rot::set();

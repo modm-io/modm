@@ -143,37 +143,42 @@ inline void xpcc::color::RgbT<UnderlyingType>::toHsv(HsvT<T>* color) const
 	const CalcType _red		= static_cast<CalcType>(red) / maxValue;
 	const CalcType _blue	= static_cast<CalcType>(blue) / maxValue;
 	const CalcType _green	= static_cast<CalcType>(green) / maxValue;
-	const CalcType _max = max(_red, min(_green, _blue));
+	const CalcType _max = max(_red, max(_green, _blue));
 	const CalcType _min = min(_red, min(_green, _blue));
 	const CalcType _diff = _max - _min;
 
+	CalcType hue_temp;
+
 	// CALCULATE HUE
-	if(_max == _min) {
-		color->hue = 0;
+	if(_max == _min) { // all three color values are the same
+		hue_temp = 0;
 	}
 	else if(_max == _red) {
-		color->hue = 60 * (0 + (_green - _blue)	/ _diff );
+		hue_temp = 60 * (0 + (_green - _blue)	/ _diff );
 	}
 	else if(_max == _green) {
-		color->hue = 60 * (0 + (_blue - _red)	/ _diff );
+		hue_temp = 60 * (2 + (_blue - _red)		/ _diff );
 	}
 	else /*if(_max == _blue)*/ {
-		color->hue = 60 * (0 + (_red - _green)	/ _diff );
+		hue_temp = 60 * (4 + (_red - _green)	/ _diff );
 	}
 
 	// CALCULATE VALUE (brightness)
-	if(color->hue < 0) {
-		color->hue += 360;
+	if(hue_temp < 0) {
+		color->hue = (hue_temp + 360	) * (maxValue / 360);
+	}
+	else {
+		color->hue = (hue_temp			) * (maxValue / 360);
 	}
 
 	// CALCULATE SATURATION
 	if(_max == 0) {
 		color->saturation = 0;
 	} else {
-		color->saturation = _diff / _max;
+		color->saturation = _diff / _max * maxValue;
 	}
 
-	color->value = _max;
+	color->value = _max * maxValue;
 }
 
 #endif // XPCC__COLOR_HPP
