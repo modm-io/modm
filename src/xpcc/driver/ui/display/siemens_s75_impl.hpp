@@ -194,7 +194,7 @@ xpcc::SiemensS75Common<MEMORY, RESET, WIDTH, HEIGHT, ORIENTATION>::lcdSettings()
 	 * Bit 0 set: stopped working
 	 * Bit 1 set: no change
 	 * 0x7830 | 0x0003: no change
-	 * 0x7830 | 0x0004: stoppend working
+	 * 0x7830 | 0x0004: stopped working
 	 * 0x7830 | 0x0008:	landscape
 	 *
 	 * 0x7838 | 0x0001:	stopped working
