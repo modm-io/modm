@@ -33,63 +33,6 @@ import builder_base
 import filter.java as filter
 
 # -----------------------------------------------------------------------------
-def fromBufferMethod(element):
-	if isinstance(element, filter.Primitive):
-		type = str(element.type)
-	else:
-		type = str(element.subtype.name)
-	if type in filter.PRIMITIVES:
-		if type == "Bool":
-			return "new Bool(buffer.get() != 0)"
-		elif (type == "char"):
-			return "new Char((char)buffer.get())"
-		else:
-			if (filter.PRIMITIVES[type].mask == None):
-				return "new %s(buffer.get%s())" % ( 
-						filter.PRIMITIVES[type].name,
-						filter.PRIMITIVES[type].accessor)
-			else:
-				return "new %s(buffer.get%s()&%s)" % (
-						filter.PRIMITIVES[type].name,
-						filter.PRIMITIVES[type].accessor,
-						filter.PRIMITIVES[type].mask,)
-			
-	else:
-		return "%s.fromBuffer(buffer)" % (filter.typeName(type))
-
-def toBufferMethod(element, name=None):
-	if isinstance(element, filter.Primitive):
-		type = str(element.type)
-	else:
-		type = str(element.subtype.name)
-	if name == None:
-		name = filter.variableName(element.name)
-	if type in filter.PRIMITIVES:
-		if type == "Bool":
-			return "buffer.put((byte) (%s ? 1 : 0))" % name
-		else:
-			return "buffer.put%s((%s) %s)" % \
-						(filter.PRIMITIVES[type].accessor,
-						 filter.PRIMITIVES[type].equivalent,
-						 name)
-	else:
-		return "%s.toBuffer(buffer)" % name
-
-def toBufferMethodStructAccess(element, name=None):
-	if isinstance(element, filter.Primitive):
-		type = str(element.type)
-	else:
-		type = str(element.subtype.name)
-	if name == None:
-		name = filter.variableName(element.name)
-	if type in filter.PRIMITIVES:
-		return "new %s(%s).toBuffer(buffer)" % \
-						(filter.PRIMITIVES[type].name,
-						 name)
-	else:
-		return "%s.toBuffer(buffer)" % name
-
-# -----------------------------------------------------------------------------
 class JavaCommunicationBuilder(builder_base.Builder):
 	"""
 	Generate the whole communication tree. The Output is a class named
@@ -120,9 +63,6 @@ class JavaCommunicationBuilder(builder_base.Builder):
 			'typeName': filter.typeName,
 			'typeObjectName': filter.typeObjectName,
 			'variableName': filter.variableName,
-			'fromBufferMethod': fromBufferMethod,
-			'toBufferMethod': toBufferMethod,
-			'toBufferMethodStructAccess': toBufferMethodStructAccess,
 		}
 		template = self.template('templates/java_communication.tpl',
 								filter = javaFilter)

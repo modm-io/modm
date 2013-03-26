@@ -179,6 +179,11 @@ namespace xpcc
 		 *
 		 * Returns a reference to the element at position n in the
 		 * dynamic array container.
+		 * 
+		 * \warning Do not use this operator to access an element the 
+		 * first time. Use the append methode to create it. 
+		 * 
+		 * \see	append()
 		 */
 		inline T&
 		operator [](SizeType index)

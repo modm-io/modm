@@ -67,11 +67,14 @@ public class Communication {
 			sender.sendPacket(message);
 		}
 		{% else -%}
-		public void {{ action.name | variableName }} (/*void*/) {
+		public void {{ action.name | variableName }} () {
 			Header header = new Header(HeaderType.REQUEST, false, this.id.id, me.id, Identifier.Action.{{ action.name | enumElement }}.id);
 			
 			DefaultXpccMessage message = new DefaultXpccMessage(header, null);
 			sender.sendPacket(message);
+		}
+		public void {{ action.name | variableName }} (Packets.Void packet) {
+			{{ action.name | variableName }}();
 		}
 		{% endif %}
 		{%- endfor %}

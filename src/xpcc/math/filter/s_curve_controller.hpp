@@ -86,6 +86,14 @@ namespace xpcc
 		
 	public:
 		SCurveController(const Parameter& parameter);
+
+		/**
+		 * Reset the parameters of the controller.
+		 *
+		 * \param	parameter list of the controller
+		 **/
+		void
+		setParameter(const Parameter& parameter);
 		
 		inline void
 		setSpeedMaximum(const T& speed);
