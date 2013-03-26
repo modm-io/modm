@@ -1,11 +1,9 @@
 
 #include <xpcc/architecture.hpp>
 
-extern "C"
-{
-	#include "touchpanel.h"
-	#include "LCD.h"
-}
+#include "lcd.h"
+
+#include "touchscreen_calibrator.hpp"
 
 // ----------------------------------------------------------------------------
 GPIO__OUTPUT(LedOrange, D, 13);		// User LED 3

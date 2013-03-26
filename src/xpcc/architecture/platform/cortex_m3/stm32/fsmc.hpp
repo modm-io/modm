@@ -168,6 +168,18 @@ namespace xpcc
 				static void
 				resetRegion(Region region);
 				
+				static inline void
+				enableRegion(Region region, bool enable)
+				{
+					if (enable) {
+						FSMC_Bank1->BTCR[region * 2] |= FSMC_BCR1_MBKEN;
+					}
+					else {
+						FSMC_Bank1->BTCR[region * 2] &= ~FSMC_BCR1_MBKEN;
+					}
+					
+				}
+				
 				static void
 				configureSynchronousRegion(Region region,
 						Muliplex multiplex,
@@ -252,6 +264,19 @@ namespace xpcc
 			 */
 			static void
 			initialize();
+			
+		private:
+			static inline void
+			enable()
+			{
+				RCC->AHB3ENR |= RCC_AHB3ENR_FSMCEN;
+			}
+			
+			static inline void
+			disable()
+			{
+				RCC->AHB3ENR &= ~RCC_AHB3ENR_FSMCEN;
+			}
 		};
 	}
 }

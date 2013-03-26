@@ -40,21 +40,23 @@
 void
 xpcc::stm32::Fsmc::initialize()
 {
+	//RCC->AHB3RSTR |= RCC_AHB3RSTR_FSMCRST;
 	
+	enable();
 }
 
 // ----------------------------------------------------------------------------
 void
 xpcc::stm32::fsmc::NorSram::resetRegion(Region region)
 {
-	/* FSMC_Bank1_NORSRAM1 */
 	if (region == CHIP_SELECT_1)
 	{
+		// FSMC_Bank1_NORSRAM1
 		FSMC_Bank1->BTCR[region] = 0x000030DB;   
 	}
-	/* FSMC_Bank1_NORSRAM2,  FSMC_Bank1_NORSRAM3 or FSMC_Bank1_NORSRAM4 */
 	else
-	{   
+	{
+		// FSMC_Bank1_NORSRAM2,  FSMC_Bank1_NORSRAM3 or FSMC_Bank1_NORSRAM4
 		FSMC_Bank1->BTCR[region] = 0x000030D2;
 	}
 	
@@ -87,4 +89,11 @@ xpcc::stm32::fsmc::NorSram::configureSynchronousRegion(Region region,
   {
     FSMC_Bank1->BTCR[FSMC_NORSRAMInitStruct->FSMC_Bank] |= (uint32_t)BCR_FACCEN_SET;
   }*/
+}
+
+void
+xpcc::stm32::fsmc::NorSram::configureAsynchronousRegion(Region region,
+		Muliplex multiplex, AsynchronousTiming timing)
+{
+	
 }

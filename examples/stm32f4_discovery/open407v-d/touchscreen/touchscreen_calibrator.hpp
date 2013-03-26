@@ -45,16 +45,16 @@ public:
 #include "stm32f4xx.h"
 
 /* Private typedef -----------------------------------------------------------*/
-typedef struct POINT
+struct Coordinate
 {
 	uint16_t x;
 	uint16_t y;
-} Coordinate;
+};
 
-typedef struct Matrix
+struct Matrix
 {
 	float An, Bn, Cn, Dn, En, Fn, scale;
-} Matrix;
+};
 
 /* Private variables ---------------------------------------------------------*/
 extern Coordinate ScreenSample[3];
@@ -64,8 +64,8 @@ extern Coordinate display;
 
 /* Private define ------------------------------------------------------------*/
 
-#define CHX 	0x90
-#define CHY 	0xd0
+//#define CHX 	0x90
+//#define CHY 	0xd0
 
 /* Private function prototypes -----------------------------------------------*/
 void TP_Init(void);

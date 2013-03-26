@@ -12,11 +12,15 @@
  *
  *********************************************************************************************************/
 
+#include <xpcc/architecture.hpp>
+
 /* Includes ------------------------------------------------------------------*/
-#include "LCD.h"
+#include "lcd.h"
 #include "stm32f4xx_gpio.h"
 #include "stm32f4xx_rcc.h"
 #include "stm32f4xx_fsmc.h"
+
+using namespace xpcc::stm32;
 
 __inline void LCD_WriteIndex(uint16_t index);
 __inline void LCD_WriteData(uint16_t data);
@@ -50,86 +54,62 @@ static uint8_t LCD_Code;
 #define  LGDP4535   12 /* 0x4535 */  
 #define  SSD2119    13 /* 3.5 LCD 0x9919 */
 
-/*******************************************************************************
- * Function Name  : LCD_CtrlLinesConfig
- * Description    : Configures LCD Control lines (FSMC Pins) in alternate function
- Push-Pull mode.
- * Input          : None
- * Output         : None
- * Return         : None
- * Attention		 : None
- *******************************************************************************/
-static void LCD_CtrlLinesConfig(void)
+GPIO__IO(D0, D, 14);
+GPIO__IO(D1, D, 15);
+GPIO__IO(D2, D, 0);
+GPIO__IO(D3, D, 1);
+GPIO__IO(D4, E, 7);
+GPIO__IO(D5, E, 8);
+GPIO__IO(D6, E, 9);
+GPIO__IO(D7, E, 10);
+GPIO__IO(D8, E, 11);
+GPIO__IO(D9, E, 12);
+GPIO__IO(D10, E, 13);
+GPIO__IO(D11, E, 14);
+GPIO__IO(D12, E, 15);
+GPIO__IO(D13, D, 8);
+GPIO__IO(D14, D, 9);
+GPIO__IO(D15, D, 10);
+
+GPIO__OUTPUT(A16, D, 11);
+GPIO__OUTPUT(A23, E, 2);
+
+GPIO__OUTPUT(NOE, D, 4);
+GPIO__OUTPUT(NWE, D, 5);
+
+GPIO__OUTPUT(CS, D, 7);
+
+// Configures LCD Control lines (FSMC Pins) in alternate function
+static void
+LCD_CtrlLinesConfig(void)
 {
-	GPIO_InitTypeDef GPIO_InitStructure;
-
-	/* Enable GPIOs clock */
-	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD | RCC_AHB1Periph_GPIOE, ENABLE);
-
-	/* Enable FSMC clock */
-	RCC_AHB3PeriphClockCmd(RCC_AHB3Periph_FSMC, ENABLE);
-
-	/*-- GPIOs Configuration ------------------------------------------------------*/
-	/*
-	 +-------------------+--------------------+------------------+------------------+
-	 +                       SRAM pins assignment                                   +
-
-	 +-------------------+--------------------+
-	 */
-	/* GPIOD configuration */
-	/* Set PD.00(D2), PD.01(D3), PD.04(NOE), PD.05(NWE), PD.08(D13), PD.09(D14),
-	 PD.10(D15), PD.11(A16), PD.14(D0), PD.15(D1) as alternate function push pull */
-	GPIO_PinAFConfig(GPIOD, GPIO_PinSource0, GPIO_AF_FSMC);
-	GPIO_PinAFConfig(GPIOD, GPIO_PinSource1, GPIO_AF_FSMC);
-	GPIO_PinAFConfig(GPIOD, GPIO_PinSource4, GPIO_AF_FSMC);
-	GPIO_PinAFConfig(GPIOD, GPIO_PinSource5, GPIO_AF_FSMC);
-	GPIO_PinAFConfig(GPIOD, GPIO_PinSource8, GPIO_AF_FSMC);
-	GPIO_PinAFConfig(GPIOD, GPIO_PinSource9, GPIO_AF_FSMC);
-	GPIO_PinAFConfig(GPIOD, GPIO_PinSource10, GPIO_AF_FSMC);
-	GPIO_PinAFConfig(GPIOD, GPIO_PinSource11, GPIO_AF_FSMC);
-	GPIO_PinAFConfig(GPIOD, GPIO_PinSource14, GPIO_AF_FSMC);
-	GPIO_PinAFConfig(GPIOD, GPIO_PinSource15, GPIO_AF_FSMC);
-
-	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0 | GPIO_Pin_1 | GPIO_Pin_4
-			| GPIO_Pin_5 | GPIO_Pin_8 | GPIO_Pin_9 | GPIO_Pin_10 | GPIO_Pin_11
-			| GPIO_Pin_14 | GPIO_Pin_15;
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
-	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;
-	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
-	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;
-
-	GPIO_Init(GPIOD, &GPIO_InitStructure);
-
-	/* Set PE.07(D4), PE.08(D5), PE.09(D6), PE.10(D7), PE.11(D8), PE.12(D9), PE.13(D10),
-	 PE.14(D11), PE.15(D12) as alternate function push pull */
-	/* GPIOE configuration */
-	GPIO_PinAFConfig(GPIOE, GPIO_PinSource2, GPIO_AF_FSMC);
-	GPIO_PinAFConfig(GPIOE, GPIO_PinSource7, GPIO_AF_FSMC);
-	GPIO_PinAFConfig(GPIOE, GPIO_PinSource8, GPIO_AF_FSMC);
-	GPIO_PinAFConfig(GPIOE, GPIO_PinSource9, GPIO_AF_FSMC);
-	GPIO_PinAFConfig(GPIOE, GPIO_PinSource10, GPIO_AF_FSMC);
-	GPIO_PinAFConfig(GPIOE, GPIO_PinSource11, GPIO_AF_FSMC);
-	GPIO_PinAFConfig(GPIOE, GPIO_PinSource12, GPIO_AF_FSMC);
-	GPIO_PinAFConfig(GPIOE, GPIO_PinSource13, GPIO_AF_FSMC);
-	GPIO_PinAFConfig(GPIOE, GPIO_PinSource14, GPIO_AF_FSMC);
-	GPIO_PinAFConfig(GPIOE, GPIO_PinSource15, GPIO_AF_FSMC);
-
-	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_2 | GPIO_Pin_7 | GPIO_Pin_8
-			| GPIO_Pin_9 | GPIO_Pin_10 | GPIO_Pin_11 | GPIO_Pin_12 | GPIO_Pin_13
-			| GPIO_Pin_14 | GPIO_Pin_15;
-
-	GPIO_Init(GPIOE, &GPIO_InitStructure);
-
-	/*CS always low*/
-	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD, ENABLE);
-
-	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_7;
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
-	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
-	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;
-	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;
-	GPIO_Init(GPIOD, &GPIO_InitStructure);
-	GPIO_ResetBits(GPIOD, GPIO_Pin_7); //CS=0;
+	Fsmc::initialize();
+	
+	D0::setAlternateFunction(AF_FSMC, PUSH_PULL, SPEED_100MHZ);
+	D1::setAlternateFunction(AF_FSMC, PUSH_PULL, SPEED_100MHZ);
+	D2::setAlternateFunction(AF_FSMC, PUSH_PULL, SPEED_100MHZ);
+	D3::setAlternateFunction(AF_FSMC, PUSH_PULL, SPEED_100MHZ);
+	D4::setAlternateFunction(AF_FSMC, PUSH_PULL, SPEED_100MHZ);
+	D5::setAlternateFunction(AF_FSMC, PUSH_PULL, SPEED_100MHZ);
+	D6::setAlternateFunction(AF_FSMC, PUSH_PULL, SPEED_100MHZ);
+	D7::setAlternateFunction(AF_FSMC, PUSH_PULL, SPEED_100MHZ);
+	D8::setAlternateFunction(AF_FSMC, PUSH_PULL, SPEED_100MHZ);
+	D9::setAlternateFunction(AF_FSMC, PUSH_PULL, SPEED_100MHZ);
+	D10::setAlternateFunction(AF_FSMC, PUSH_PULL, SPEED_100MHZ);
+	D11::setAlternateFunction(AF_FSMC, PUSH_PULL, SPEED_100MHZ);
+	D12::setAlternateFunction(AF_FSMC, PUSH_PULL, SPEED_100MHZ);
+	D13::setAlternateFunction(AF_FSMC, PUSH_PULL, SPEED_100MHZ);
+	D14::setAlternateFunction(AF_FSMC, PUSH_PULL, SPEED_100MHZ);
+	D15::setAlternateFunction(AF_FSMC, PUSH_PULL, SPEED_100MHZ);
+	
+	A16::setAlternateFunction(AF_FSMC, PUSH_PULL, SPEED_100MHZ);
+	A23::setAlternateFunction(AF_FSMC, PUSH_PULL, SPEED_100MHZ);
+	
+	NOE::setAlternateFunction(AF_FSMC, PUSH_PULL, SPEED_100MHZ);
+	NWE::setAlternateFunction(AF_FSMC, PUSH_PULL, SPEED_100MHZ);
+	
+	CS::setOutput();
+	CS::reset();
 }
 
 /*******************************************************************************
@@ -166,21 +146,20 @@ static void LCD_FSMCConfig(void)
 			&FSMC_NORSRAMTimingInitStructure;
 //	FSMC_NORSRAMInit(&FSMC_NORSRAMInitStructure); 
 
-	/* FSMCд�ٶ����� */
-	FSMC_NORSRAMTimingInitStructure.FSMC_AddressSetupTime = 15; //1;   /* ��ַ����ʱ��  */
+	/* FSMC */
+	FSMC_NORSRAMTimingInitStructure.FSMC_AddressSetupTime = 15;
 	FSMC_NORSRAMTimingInitStructure.FSMC_AddressHoldTime = 0;
-	FSMC_NORSRAMTimingInitStructure.FSMC_DataSetupTime = 15; //1;	   /* ��ݽ���ʱ��  */
+	FSMC_NORSRAMTimingInitStructure.FSMC_DataSetupTime = 15;
 	FSMC_NORSRAMTimingInitStructure.FSMC_BusTurnAroundDuration = 0x00;
 	FSMC_NORSRAMTimingInitStructure.FSMC_CLKDivision = 0x00;
 	FSMC_NORSRAMTimingInitStructure.FSMC_DataLatency = 0x00;
-	FSMC_NORSRAMTimingInitStructure.FSMC_AccessMode = FSMC_AccessMode_A; /* FSMC ����ģʽ */
+	FSMC_NORSRAMTimingInitStructure.FSMC_AccessMode = FSMC_AccessMode_A;
 	FSMC_NORSRAMInitStructure.FSMC_WriteTimingStruct =
 			&FSMC_NORSRAMTimingInitStructure;
 
 	FSMC_NORSRAMInit(&FSMC_NORSRAMInitStructure);
-
-	/* Enable FSMC Bank4_SRAM Bank */
-	FSMC_NORSRAMCmd(FSMC_Bank1_NORSRAM1, ENABLE);
+	
+	fsmc::NorSram::enableRegion(CHIP_SELECT_1);
 }
 
 /*******************************************************************************

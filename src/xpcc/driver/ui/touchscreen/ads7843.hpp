@@ -31,6 +31,8 @@
 #ifndef XPCC__ADS7843_HPP
 #define XPCC__ADS7843_HPP
 
+#include <stdint.h>
+
 namespace xpcc
 {
 	/**

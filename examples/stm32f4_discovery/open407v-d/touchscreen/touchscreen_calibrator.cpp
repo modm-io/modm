@@ -32,13 +32,9 @@
 
 
 #include <xpcc/architecture.hpp>
-#include "ads7843.hpp"
+#include <xpcc/driver/ui/touchscreen/ads7843.hpp>
 
-extern "C"
-{
-#include "LCD.h"
-}
-#include "touchscreen.hpp"
+#include "lcd.h"
 
 using namespace xpcc::stm32;
 
