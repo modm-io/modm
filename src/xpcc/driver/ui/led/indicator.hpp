@@ -84,6 +84,7 @@ namespace xpcc
 			start()
 			{
 				isBlinking = true;
+				isCounting = false;
 			}
 			
 			/// Stops indicating after finishing the current cycle
@@ -91,6 +92,12 @@ namespace xpcc
 			stop()
 			{
 				isBlinking = false;
+			}
+			
+			ALWAYS_INLINE bool
+			isRunning()
+			{
+				return isBlinking;
 			}
 			
 			/// Indicate a number of times and then stop

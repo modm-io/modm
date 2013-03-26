@@ -94,6 +94,7 @@ namespace xpcc
 			{
 				state = FIRST_FLASH;
 				isBlinking = true;
+				isCounting = false;
 			}
 			
 			/// Stops indicating after finishing the current cycle
@@ -101,6 +102,12 @@ namespace xpcc
 			stop()
 			{
 				isBlinking = false;
+			}
+			
+			ALWAYS_INLINE bool
+			isRunning()
+			{
+				return isBlinking;
 			}
 			
 			/// Indicate a number of times and then stop
@@ -120,9 +127,10 @@ namespace xpcc
 			{
 				led->run();
 				
-				if (timer.isExpired() && (isBlinking || state == SECOND_BREAK))
+				if (timer.isExpired() && (isBlinking || state == FIRST_BREAK || state == SECOND_BREAK))
 				{
-					switch (state) {
+					switch (state)
+					{
 						case FIRST_FLASH:
 							led->on(onFade);
 							
