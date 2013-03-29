@@ -46,12 +46,11 @@ namespace xpcc
 		 * 
 		 * \tparam LedClass typedef of a Led
 		 */
-		template< typename LedClass >
 		class DoubleIndicator
 		{
 		private:
 			xpcc::Timeout<> timer;
-			LedClass led;
+			Led* led;
 			uint16_t const on1;
 			uint16_t const pause1;
 			uint16_t const on2;
@@ -79,29 +78,98 @@ namespace xpcc
 			 * \param	onFade		time in ms until the LED is fully on
 			 * \param	offFade		time in ms until the LED is fully off
 			 */
-			DoubleIndicator(uint16_t const period=1000, float const on1=0.1f,
+			DoubleIndicator(Led* led, uint16_t const period=1000, float const on1=0.1f,
 							float const pause=0.2f, float const on2=0.1f,
-							uint8_t const onFade=60, uint8_t const offFade=90);
+							uint8_t const onFade=60, uint8_t const offFade=90)
+			:	led(led), on1(period * on1), pause1(period * pause),
+			on2(period * on2), pause2(period - on1 - pause1 - on2),
+			onFade(onFade), offFade(offFade), counter(0),
+			isBlinking(false), isCounting(false), state(FIRST_FLASH)
+			{
+			}
 			
 			/// start indicating for ever
-			void
-			start();
+			ALWAYS_INLINE void
+			start()
+			{
+				state = FIRST_FLASH;
+				isBlinking = true;
+				isCounting = false;
+			}
 			
 			/// Stops indicating after finishing the current cycle
-			void
-			stop();
+			ALWAYS_INLINE void
+			stop()
+			{
+				isBlinking = false;
+			}
+			
+			ALWAYS_INLINE bool
+			isRunning()
+			{
+				return isBlinking;
+			}
 			
 			/// Indicate a number of times and then stop
-			void
-			indicate(uint8_t times=1);
+			inline void
+			indicate(uint8_t times=1)
+			{
+				if (times) {
+					counter = times;
+					isBlinking = true;
+					isCounting = true;
+				}
+			}
 			
 			/// Must be called at least every ms
 			void
-			run();
+			run()
+			{
+				led->run();
+				
+				if (timer.isExpired() && (isBlinking || state == FIRST_BREAK || state == SECOND_BREAK))
+				{
+					switch (state)
+					{
+						case FIRST_FLASH:
+							led->on(onFade);
+							
+							timer.restart(on1);
+							state = FIRST_BREAK;
+							break;
+							
+						case FIRST_BREAK:
+							led->off(offFade);
+							
+							timer.restart(pause1);
+							state = SECOND_FLASH;
+							break;
+							
+						case SECOND_FLASH:
+							led->on(onFade);
+							
+							if (isCounting && !--counter) {
+								isBlinking = false;
+								isCounting = false;
+							}
+							
+							timer.restart(on2);
+							state = SECOND_BREAK;
+							break;
+							
+						case SECOND_BREAK:
+							led->off(offFade);
+							
+							timer.restart(pause2);
+							
+						default:
+							state = FIRST_FLASH;
+							break;
+					}
+				}
+			}
 		};
 	}
 }
-
-#include "double_indicator_impl.hpp"
 
 #endif	// XPCC__LED_DOUBLE_INDICATOR_HPP

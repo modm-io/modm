@@ -11,6 +11,9 @@ namespace xpcc
 {
 	namespace avr32
 	{
+		/**
+		 * \ingroup	ucb3
+		 */
 		class Timer0
 		{
 		public:

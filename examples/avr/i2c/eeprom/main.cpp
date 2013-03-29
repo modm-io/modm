@@ -1,7 +1,5 @@
 
 #include <xpcc/architecture.hpp>
-#include <xpcc/driver/connectivity/i2c/software_i2c.hpp>
-#include <xpcc/architecture/platform/avr/atmega/i2c_master.hpp>
 #include <xpcc/driver/storage/i2c_eeprom.hpp>
 
 #include <xpcc/io/iostream.hpp>
@@ -16,6 +14,7 @@ xpcc::atmega::BufferedUart0 uart(9600);
 #define USE_HARDWARE
 
 #if defined USE_SOFTWARE
+#include <xpcc/driver/connectivity/i2c/software_i2c.hpp>
 typedef xpcc::SoftwareI2C<Scl, Sda> Twi;
 #endif
 

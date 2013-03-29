@@ -42,7 +42,7 @@ namespace xpcc
 	 * A1 and A0 need to be tided low.
 	 * 
 	 * \author	Fabian Greif
-	 * \ingroup	gpio
+	 * \ingroup	driver_gpio
 	 */
 	template <typename Spi, typename Cs, typename Int>
 	class Mcp23s08

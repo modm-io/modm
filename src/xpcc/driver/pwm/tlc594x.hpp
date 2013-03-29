@@ -55,6 +55,17 @@ namespace xpcc
 	 * Therefore this class can also be used with daisy-chained TLC59s, e.g.
 	 * to control two TLC5940s set CHANNELS to 2*16.
 	 *
+	 * ####  WARNING  ####
+	 *
+	 * Each channel in the TLC594x chip drives a transistor using a feedback loop
+	 * to make it meet a particular current requirement.
+	 * If a channel is disconnected, the feedback loop will fully drive the transistor.
+	 * If most of the channels are disconnected (quite common in a testing
+	 * environment if not in production), this will end up pulling quite a bit 
+	 * of power from the chip's 3.3 or 5v supply.
+	 * This can heat up the chip and cause power supply issues.
+	 *
+	 *
 	 * \tparam CHANNELS	Number of channels must be multiples of 4, adjust for daisy-chained chips
 	 * \tparam	Spi		Spi interface
 	 * \tparam	Xlat	Level triggered latch pin
@@ -80,7 +91,7 @@ namespace xpcc
 		 * \param writeDC	write dots value to chip
 		 */
 		static void
-		initialize(uint16_t channels=0, uint8_t dots=0x3f, bool writeCH=true, bool writeDC=true);
+		initialize(uint16_t channels=0, uint8_t dots=63, bool writeCH=true, bool writeDC=true);
 		
 		/// set the 12bit value of a channel
 		/// call transfer() to update the chip

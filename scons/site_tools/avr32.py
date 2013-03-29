@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # 
-# Copyright (c) 2009, Roboterclub Aachen e.V.
+# Copyright (c) 2012, Roboterclub Aachen e.V.
 # All rights reserved.
 # 
 # Redistribution and use in source and binary forms, with or without
@@ -187,8 +187,17 @@ def generate(env, **kw):
 		"-xassembler-with-cpp",
 	]
 	
-	env['LINKFILE'] = ["/Users/user/rca/xpcc/ext/asf/avr32/utils/linker_scripts/at32uc3b/0256/gcc/link_uc3b0256.lds"]
-
+	# Determine linker script from selected processor. 
+	# This could be replaced by a dictionary as in arm_devices.py
+	
+	# AVR32_DEVICE is e.g. 'uc3b0256'
+	# get number: 064, 164, 1256, 0256, 1128, 0512, 1512 or 0128
+	# get device: uc3b
+	avr32_number = env['AVR32_DEVICE'][4:]
+	avr32_device = 'at32' + env['AVR32_DEVICE'][0:4]
+	
+	env['LINKFILE'] = ["%s/ext/asf/avr32/utils/linker_scripts/%s/%s/gcc/link_%s.lds" % (env['XPCC_ROOTPATH'], avr32_device, avr32_number, env['AVR32_DEVICE'])]
+	
 	# Link flags
 	env['LINKFLAGS'] = [
 		"-mpart=$AVR32_DEVICE", 

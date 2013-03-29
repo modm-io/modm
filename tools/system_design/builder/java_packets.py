@@ -91,6 +91,16 @@ def toBufferMethodStructAccess(element, name=None):
 
 # -----------------------------------------------------------------------------
 class JavaPacketsBuilder(builder_base.Builder):
+	"""
+	Generate the whole packageset. The Output is a Java Class named Packages.java,
+	which contains as subclasses all the Packages.
+	
+	A common call would be like:
+	$python java_packets.py  --outpath source/rca/robot --package rca.robot robot.xml;
+	"""
+	
+	
+	VERSION = "0.1"
 	
 	def setup(self, optparser):
 		optparser.add_option(

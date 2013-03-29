@@ -3,6 +3,8 @@
 
 #include <avr32/io.h>
 
+#ifndef __DOXYGEN__
+
 namespace xpcc
 {
 namespace avr32
@@ -377,6 +379,8 @@ typedef struct
 } // timer namespace
 } // avr32 namesapce
 } // xpcc namespace
+
+#endif	// __DOXYGEN__
 
 #include "timer/timer_0.hpp"
 //#include "timer/timer_1.hpp"

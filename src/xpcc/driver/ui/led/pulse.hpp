@@ -49,11 +49,10 @@ namespace xpcc
 		 * 
 		 * \tparam LedClass typedef of a Led
 		 */
-		template< typename LedClass >
 		class Pulse
 		{
 		private:
-			LedClass led;
+			Led* led;
 			uint16_t const halfPeriod;
 			uint8_t counter;
 			bool pulseDirection;
@@ -62,27 +61,69 @@ namespace xpcc
 			
 		public:
 			/// \param	period	pulse cycle period in ms.
-			Pulse(uint16_t const period=1000);
+			Pulse(Led* led, uint16_t const period=1000)
+			:	led(led), halfPeriod(period/2), counter(0),
+				pulseDirection(false), isPulsing(false), isCounting(false)
+			{
+			}
 			
 			/// start pulsing forever
-			void
-			start();
+			ALWAYS_INLINE void
+			start()
+			{
+				isPulsing = true;
+				isCounting = false;
+			}
 			
 			/// Stops pulsing after finishing the current cycle
-			void
-			stop();
+			ALWAYS_INLINE void
+			stop()
+			{
+				isPulsing = false;
+			}
+			
+			ALWAYS_INLINE bool
+			isRunning()
+			{
+				return isPulsing;
+			}
 			
 			/// Pulses a number of times and then stops
-			void
-			pulse(uint8_t times=1);
+			inline void
+			pulse(uint8_t times=1)
+			{
+				if (times) {
+					counter = times;
+					isPulsing = true;
+					isCounting = true;
+				}
+				else isPulsing = false;
+			}
 			
 			/// Must be called at least every ms
 			void
-			run();
+			run()
+			{
+				led->run();
+				
+				if (!led->isFading() && (isPulsing || !pulseDirection))
+				{
+					if (pulseDirection) {
+						led->on(halfPeriod);
+						
+						if (isCounting && !--counter) {
+							isPulsing = false;
+							isCounting = false;
+						}
+					}
+					else {
+						led->off(halfPeriod);
+					}
+					pulseDirection = !pulseDirection;
+				}
+			}
 		};
 	}
 }
-
-#include "pulse_impl.hpp"
 
 #endif	// XPCC__LED_PULSE_HPP

@@ -106,6 +106,20 @@
 // ----------------------------------------------------------------------------
 // Determine compilation environment
 
+/**
+ * This relies on the predefined defines of the compiler.
+ * To display the defines run:
+ * $your-gcc-compiler -dM -E - < /dev/null | sort | less
+ *
+ * e.g.
+ * $arm-none-eabi-g++ -dM -E - < /dev/null | sort | less
+ *
+ * Be aware that the defines change when you set options
+ * for a specific compiler at compile time:
+ *
+ * $arm-none-eabi-g++ -dM -E -mcpu=cortex-m0 -mthumb -D__ARM_LPC1114_301__ -D__ARM_LPC11XX__ - < /dev/null
+ */
+
 #if defined __GNUC__
 #	define XPCC__COMPILER_STRING	"Gnu GCC"
 #	define XPCC__COMPILER_GCC 1
@@ -192,13 +206,13 @@
 #	endif
 #endif
 
-#if defined __arm__
+#if defined __arm__ || defined __ARM_EABI__
 #	define XPCC__CPU_ARM	1
 #	define XPCC__ALIGNMENT	4
 #	if defined __ARM_ARCH_4T__
 #		define XPCC__CPU_ARM7TDMI	1
 #		define XPCC__CPU_STRING		"ARM7TDMI"
-#	elif defined __ARM_ARCH_6SM__
+#	elif defined __ARM_ARCH_6SM__ || defined __ARM_ARCH_6M__
 #		define XPCC__CPU_CORTEX_M0	1
 #		define XPCC__CPU_STRING		"Cortex M0"
 #	elif defined __ARM_ARCH_7M__

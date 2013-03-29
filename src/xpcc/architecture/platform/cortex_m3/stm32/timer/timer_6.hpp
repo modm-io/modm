@@ -50,18 +50,18 @@ namespace xpcc
 		 * extern "C" void
 		 * TIM6_IRQHandler(void)
 		 * {
-		 *     Timer6::resetInterruptFlag(Timer6::FLAG_UPDATE);
+		 *     Timer6::resetInterruptFlags(Timer6::FLAG_UPDATE);
 		 *     
 		 *     ...
 		 * }
 		 * \endcode
 		 * 
-		* For the STM32F2xx and STM32F4xx:
+		 * For the STM32F2xx and STM32F4xx:
 		 * \code
 		 * extern "C" void
-		 * TIM6_DAC_IRQn(void)
+		 * TIM6_DAC_IRQHandler(void)
 		 * {
-		 *     Timer6::resetInterruptFlag(Timer6::FLAG_UPDATE);
+		 *     Timer6::resetInterruptFlags(Timer6::FLAG_UPDATE);
 		 *     
 		 *     ...
 		 * }
@@ -152,7 +152,7 @@ namespace xpcc
 			}
 			
 			static void
-			resetInterruptFlag(InterruptFlag interrupt)
+			resetInterruptFlags(InterruptFlag interrupt)
 			{
 				// Flags are cleared by writing a zero to the flag position.
 				// Writing a one is ignored.

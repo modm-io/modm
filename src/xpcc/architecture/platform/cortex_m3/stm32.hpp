@@ -62,6 +62,10 @@
 #include "stm32/gpio.hpp"
 #include "stm32/clock.hpp"
 
+#include "stm32/exti.hpp"
+
+#include "stm32/fsmc.hpp"
+
 #include "stm32/can/can_1.hpp"
 #include "stm32/can/can_2.hpp"
 #include "stm32/can/can_filter.hpp"

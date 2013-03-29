@@ -94,7 +94,7 @@ namespace xpcc
 		 * side by side, allowing the robot to move only in the drive direction
 		 * (x-direction in the local coordinate system of the robot) and
 		 * rotate. A movement perpendicular to the drive direction is
-		 * impossible with a external force.
+		 * impossible without an external force.
 		 * 
 		 * To estimate the position of the robot over time, we use odometry.
 		 * Therefore it is necessary to add a lot small increments of

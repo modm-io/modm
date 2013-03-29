@@ -254,6 +254,7 @@ class Struct(BaseType):
 			self.description = xml_utils.get_description(node)
 			self.subtype = SubType(node.get('type'), tree.types)
 			self.unit = node.get('unit')
+			self.value = node.get('value')
 			
 			self.level = None
 			self.size = None
