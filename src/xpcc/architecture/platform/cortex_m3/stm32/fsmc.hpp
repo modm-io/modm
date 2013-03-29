@@ -126,23 +126,44 @@ namespace xpcc
 					WAIT_LOW_ACTIVE,
 				};
 				
-				enum Muliplex
+				enum BusType
 				{
-					NO_MULTIPLEX,
-					ADDRESS_DATA_MULIPLEX,
+					NO_MULTIPLEX_8IT = 0,
+					NO_MULTIPLEX_16BIT = FSMC_BCR1_MWID_0,
+					ADDRESS_DATA_MULIPLEX_8BIT = FSMC_BCR1_MUXEN,
+					ADDRESS_DATA_MULIPLEX_16BIT = FSMC_BCR1_MUXEN | FSMC_BCR1_MWID_0,
+				};
+				
+				enum MemoryType
+				{
+					SRAM_ROM = 0,
+					PSRAM = FSMC_BCR1_MTYP_0, ///< PSRAM (CRAM)
+					NOR = FSMC_BCR1_MTYP_1, ///< NOR Flash/OneNAND Flash
+				};
+				
+				enum AccessMode
+				{
+					MODE_A = 0,	///< access mode A
+					MODE_B = FSMC_BTR1_ACCMOD_0, ///< access mode B
+					MODE_C = FSMC_BTR1_ACCMOD_1, ///< access mode C
+					MODE_D = FSMC_BTR1_ACCMOD_0 | FSMC_BTR1_ACCMOD_1 ///< access mode D
 				};
 				
 				/**
-				 * 
+				 * Timing for asynchronous access
 				 */
 				struct AsynchronousTiming
 				{
 					uint8_t readAddressSetup;	///< 0..15
-					uint8_t readAddressHold;	///< 1..15
+					
+					/// (only for muxed I/O) 1..15
+					uint8_t readAddressHold;
 					uint8_t readDataPhase;		///< 1..256
 					
 					uint8_t writeAddressSetup;	///< 0..15
-					uint8_t writeAddressHold;	///< 1..15
+					
+					/// (only for muxed I/O) 1..15
+					uint8_t writeAddressHold;
 					uint8_t writeDataPhase;		///< 1..256
 					
 					/**
@@ -150,17 +171,20 @@ namespace xpcc
 					 * 
 					 * Time from NEx high to NEx low => time between two bus
 					 * accesses (0..15 HCLK cycles).
-					 * 
-					 * TODO read/write?
 					 */
 					uint8_t busTurnAround;
 				};
 				
+				/**
+				 * Timing for synchronous access
+				 */
 				struct SynchronousTiming
 				{
 					uint8_t busTurnAround;		///< 0..15
+					
 					/** Number of HCLK cycles for one CLK cycle, [1..16] */
 					uint8_t clockDivideRatio;
+					
 					uint8_t dataLatency;		///< 2..17 CLK cycles
 				};
 				
@@ -169,25 +193,34 @@ namespace xpcc
 				resetRegion(Region region);
 				
 				static inline void
-				enableRegion(Region region, bool enable)
+				enableRegion(Region region, bool enable = true)
 				{
 					if (enable) {
-						FSMC_Bank1->BTCR[region * 2] |= FSMC_BCR1_MBKEN;
+						FSMC_Bank1->BTCR[region] |= FSMC_BCR1_MBKEN;
 					}
 					else {
-						FSMC_Bank1->BTCR[region * 2] &= ~FSMC_BCR1_MBKEN;
+						FSMC_Bank1->BTCR[region] &= ~FSMC_BCR1_MBKEN;
 					}
 					
 				}
 				
+				/**
+				 * Configure a region of Bank 1 for synchronous access.
+				 * 
+				 * The region is disabled afterwards and has to be enabled
+				 * via enableRegion().
+				 */
 				static void
 				configureSynchronousRegion(Region region,
-						Muliplex multiplex,
+						BusType multiplex,
+						MemoryType memoryType,
 						SynchronousTiming timing);
 				
 				static void
 				configureAsynchronousRegion(Region region,
-						Muliplex multiplex,
+						BusType multiplex,
+						MemoryType memoryType,
+						AccessMode accessMode,
 						AsynchronousTiming timing);
 				
 				static inline void

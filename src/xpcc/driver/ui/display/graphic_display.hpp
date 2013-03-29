@@ -106,20 +106,26 @@ namespace xpcc
 		{
 		}
 		
-		/// Number of pixel in horizontal direction
+		/**
+		 * Number of pixel in horizontal direction
+		 */
 		virtual uint16_t
 		getWidth() const = 0;
 
-		/// Number of pixel in vertical direction
+		/**
+		 * Number of pixel in vertical direction.
+		 */
 		virtual uint16_t
 		getHeight() const = 0;
 
-		/// Clear screen and reset the cursor
+		/**
+		 * Clear screen and reset the cursor.
+		 */
 		virtual void
 		clear() = 0;
 		
 		/**
-		 * \brief	Transfer the content of the RAM buffer to the real display.
+		 * Transfer the content of the RAM buffer to the real display.
 		 */
 		virtual void
 		update() = 0;

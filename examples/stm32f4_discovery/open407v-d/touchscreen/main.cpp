@@ -16,6 +16,32 @@ GPIO__OUTPUT(VBusOvercurrent, D, 5);	// red LED   (LD8)
 
 GPIO__INPUT(Button, A, 0);
 
+// FSMC
+GPIO__IO(D0, D, 14);
+GPIO__IO(D1, D, 15);
+GPIO__IO(D2, D, 0);
+GPIO__IO(D3, D, 1);
+GPIO__IO(D4, E, 7);
+GPIO__IO(D5, E, 8);
+GPIO__IO(D6, E, 9);
+GPIO__IO(D7, E, 10);
+GPIO__IO(D8, E, 11);
+GPIO__IO(D9, E, 12);
+GPIO__IO(D10, E, 13);
+GPIO__IO(D11, E, 14);
+GPIO__IO(D12, E, 15);
+GPIO__IO(D13, D, 8);
+GPIO__IO(D14, D, 9);
+GPIO__IO(D15, D, 10);
+
+GPIO__OUTPUT(A16, D, 11);
+GPIO__OUTPUT(A23, E, 2);
+
+GPIO__OUTPUT(NOE, D, 4);
+GPIO__OUTPUT(NWE, D, 5);
+
+GPIO__OUTPUT(CS, D, 7);
+
 using namespace xpcc::stm32;
 
 static bool
@@ -39,6 +65,58 @@ MAIN_FUNCTION
 	LedGreen::setOutput(xpcc::gpio::LOW);
 	LedRed::setOutput(xpcc::gpio::HIGH);
 	LedBlue::setOutput(xpcc::gpio::HIGH);
+	
+	Fsmc::initialize();
+		
+	D0::setAlternateFunction(AF_FSMC, PUSH_PULL, SPEED_100MHZ);
+	D1::setAlternateFunction(AF_FSMC, PUSH_PULL, SPEED_100MHZ);
+	D2::setAlternateFunction(AF_FSMC, PUSH_PULL, SPEED_100MHZ);
+	D3::setAlternateFunction(AF_FSMC, PUSH_PULL, SPEED_100MHZ);
+	D4::setAlternateFunction(AF_FSMC, PUSH_PULL, SPEED_100MHZ);
+	D5::setAlternateFunction(AF_FSMC, PUSH_PULL, SPEED_100MHZ);
+	D6::setAlternateFunction(AF_FSMC, PUSH_PULL, SPEED_100MHZ);
+	D7::setAlternateFunction(AF_FSMC, PUSH_PULL, SPEED_100MHZ);
+	D8::setAlternateFunction(AF_FSMC, PUSH_PULL, SPEED_100MHZ);
+	D9::setAlternateFunction(AF_FSMC, PUSH_PULL, SPEED_100MHZ);
+	D10::setAlternateFunction(AF_FSMC, PUSH_PULL, SPEED_100MHZ);
+	D11::setAlternateFunction(AF_FSMC, PUSH_PULL, SPEED_100MHZ);
+	D12::setAlternateFunction(AF_FSMC, PUSH_PULL, SPEED_100MHZ);
+	D13::setAlternateFunction(AF_FSMC, PUSH_PULL, SPEED_100MHZ);
+	D14::setAlternateFunction(AF_FSMC, PUSH_PULL, SPEED_100MHZ);
+	D15::setAlternateFunction(AF_FSMC, PUSH_PULL, SPEED_100MHZ);
+	
+	A16::setAlternateFunction(AF_FSMC, PUSH_PULL, SPEED_100MHZ);
+	A23::setAlternateFunction(AF_FSMC, PUSH_PULL, SPEED_100MHZ);
+	
+	NOE::setAlternateFunction(AF_FSMC, PUSH_PULL, SPEED_100MHZ);
+	NWE::setAlternateFunction(AF_FSMC, PUSH_PULL, SPEED_100MHZ);
+	
+	CS::setOutput();
+	CS::reset();
+	
+	fsmc::NorSram::AsynchronousTiming timing = {
+		// read
+		15,
+		0,
+		15,
+		
+		// write
+		15,
+		0,
+		15,
+		
+		// bus turn around 
+		0
+	};
+	
+	fsmc::NorSram::configureAsynchronousRegion(
+			fsmc::NorSram::CHIP_SELECT_1,
+			fsmc::NorSram::NO_MULTIPLEX_16BIT,
+			fsmc::NorSram::SRAM_ROM,
+			fsmc::NorSram::MODE_A,
+			timing);
+	
+	fsmc::NorSram::enableRegion(fsmc::NorSram::CHIP_SELECT_1);
 	
 	TP_Init();
 	LCD_Initializtion();
