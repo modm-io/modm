@@ -23,16 +23,12 @@ namespace
 	
 	GPIO__OUTPUT(TxdB6, B, 6);
 	GPIO__INPUT(RxdB7, B, 7);
-	
-	static const uint32_t apbClk = STM32_APB2_FREQUENCY;	// APB2
 	{%- elif id == 2 -%}
 	GPIO__OUTPUT(TxdA2, A, 2);
 	GPIO__INPUT(RxdA3, A, 3);
 	
 	GPIO__OUTPUT(TxdD5, D, 5);
 	GPIO__INPUT(RxdD6, D, 6);
-	
-	static const uint32_t apbClk = STM32_APB1_FREQUENCY;	// APB1
 	{%- elif id == 3 -%}
 	GPIO__OUTPUT(TxdB10, B, 10);
 	GPIO__INPUT(RxdB11, B, 11);
@@ -42,29 +38,21 @@ namespace
 	
 	GPIO__OUTPUT(TxdC10, C, 10);
 	GPIO__INPUT(RxdC11, C, 11);
-	
-	static const uint32_t apbClk = STM32_APB1_FREQUENCY;	// APB1
 	{%- elif id == 6 -%}
 	GPIO__OUTPUT(TxdC6, C, 6);
 	GPIO__INPUT(RxdC7, C, 7);
 	
 	GPIO__OUTPUT(TxdG14, G, 14);
 	GPIO__INPUT(RxdG9, G, 9);
-	
-	static const uint32_t apbClk = STM32_APB2_FREQUENCY;	// APB2
 	{%- elif id == 4 -%}
 	GPIO__OUTPUT(TxdA0, A, 0);
 	GPIO__INPUT(RxdA1, A, 1);
 	
 	GPIO__OUTPUT(TxdC10, C, 10);
 	GPIO__INPUT(RxdC11, C, 11);
-	
-	static const uint32_t apbClk = STM32_APB1_FREQUENCY;	// APB1
 	{%- elif id == 5 -%}
 	GPIO__OUTPUT(TxdC12, C, 12);
 	GPIO__INPUT(RxdD2, D, 2);
-	
-	static const uint32_t apbClk = STM32_APB1_FREQUENCY;	// APB1
 	{%- endif %}
 }
 {%- endmacro -%}
@@ -74,6 +62,17 @@ namespace
 {
 	GPIO__OUTPUT(RTS, {{ className | upper}}{{ id }}_RTS_PORT, {{ className | upper}}{{ id }}_RTS_PIN);
 	GPIO__INPUT (CTS, {{ className | upper}}{{ id }}_CTS_PORT, {{ className | upper}}{{ id }}_CTS_PIN);
+}
+{%- endmacro -%}
+
+{%- macro apbClkDefinitions(id) -%}
+namespace
+{
+	{% if id in [1, 6] -%}
+	static const uint32_t apbClk = STM32_APB2_FREQUENCY;	// APB2
+	{%- elif id in [2, 3, 4, 5] -%}
+	static const uint32_t apbClk = STM32_APB1_FREQUENCY;	// APB1
+	{%- endif %}
 }
 {%- endmacro -%}
 

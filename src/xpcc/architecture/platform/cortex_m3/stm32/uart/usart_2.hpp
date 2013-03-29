@@ -355,8 +355,6 @@ namespace xpcc
 		/**
 		 * \brief		USART2 in SPI master mode
 		 * 
-		 * FIXME currently not working!
-		 * 
 		 * \ingroup		stm32
 		 */
 		class UsartSpi2 : public UartBase
@@ -399,7 +397,7 @@ namespace xpcc
 				REMAP_PD7,
 			};
 			
-			ALWAYS_INLINE void
+			ALWAYS_INLINE static void
 			configureTxPin(MappingTx mapping)
 			{
 				switch (mapping) {
@@ -408,7 +406,7 @@ namespace xpcc
 				}
 			}
 			
-			ALWAYS_INLINE void
+			ALWAYS_INLINE static void
 			configureRxPin(MappingRx mapping)
 			{
 				switch (mapping) {
@@ -417,7 +415,7 @@ namespace xpcc
 				}
 			}
 			
-			ALWAYS_INLINE void
+			ALWAYS_INLINE static void
 			configureCkPin(MappingCk mapping)
 			{
 				switch (mapping) {
@@ -427,9 +425,21 @@ namespace xpcc
 			}
 			
 			/**
-			 * Constructor
+			 * @brief	Initialize module in syncronous mode (SPI)
+			 * 
+			 * The bitrate is calculated in the same manner as for the
+			 * asynchronous mode and is limited.
+			 * 
+			 * @param	bitrate		Desired Frequency of the SPI clock.
+			 * @param	mode		Select the Spi Mode. Default is MODE_0.
+			 * @param	over8		Using over8 sets the Oversampling down from 16
+			 * 			to 8 hovewer in SPI Mode this should have effect on
+			 * 			sample and hold type only, since Data are sampled
+			 * 			at clock edges. Benefit of over8 is a doubled maximal
+			 * 			bitrate.
 			 */
-			UsartSpi2(uint32_t bitrate, Mode mode = MODE_0);
+			static void
+			initialize(uint32_t bitrate, Mode mode = MODE_0, bool over8 = false);
 			
 			/**
 			 * Transfer byte.
