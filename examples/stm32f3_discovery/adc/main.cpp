@@ -46,6 +46,7 @@ MAIN_FUNCTION
 	Adc4::initialize(Adc4::ClockMode::Asynchronous, Adc4::Prescaler::Div256,
 					Adc4::CalibrationMode::SingleEndedInputsMode, true);
 
+	AdcIn0::setAnalogInput();
 	Adc4::setChannel(Adc4::Channel::PinB12, Adc4::SampleTime::Cycles182);
 
 	while (1)
