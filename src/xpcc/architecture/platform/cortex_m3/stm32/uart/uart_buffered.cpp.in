@@ -48,6 +48,7 @@ namespace
 }
 
 {{ template.pinDefinitions(id) }}
+{{ template.apbClkDefinitions(id) }}
 
 // ----------------------------------------------------------------------------
 {{ template.configurePins('Buffered'+className, id) }}

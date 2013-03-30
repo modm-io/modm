@@ -39,6 +39,7 @@
 {{ template.excludeDeclarationsStart(id) }}
 
 {{ template.pinDefinitions(id) }}
+{{ template.apbClkDefinitions(id) }}
 
 // ----------------------------------------------------------------------------
 {{ template.configurePins(className, id) }}
