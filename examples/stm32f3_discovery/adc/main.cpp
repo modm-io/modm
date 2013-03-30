@@ -1,5 +1,7 @@
 
 #include <xpcc/architecture.hpp>
+#include <xpcc/debug/logger.hpp>
+
 
 // ----------------------------------------------------------------------------
 GPIO__OUTPUT(LedNorth,     E,  9); // LD3
@@ -15,7 +17,34 @@ GPIO__INPUT(AdcIn0, B,  12);
 
 GPIO__INPUT(Button, A, 0);
 
+
+/* Uncomment to use Interrupts */
+// #define USE_INTERRUPTS
+
+// Set the log level
+#undef	XPCC_LOG_LEVEL
+#define	XPCC_LOG_LEVEL xpcc::log::DEBUG
+
 using namespace xpcc::stm32;
+
+xpcc::IODeviceWrapper<Usart3> loggerDevice;
+xpcc::log::Logger xpcc::log::debug(loggerDevice);
+xpcc::log::Logger xpcc::log::info(loggerDevice);
+xpcc::log::Logger xpcc::log::warning(loggerDevice);
+xpcc::log::Logger xpcc::log::error(loggerDevice);
+
+
+static void
+printAdc()
+{
+	const float maxVoltage = 3.3;
+	float voltage = 0.0;
+	int adcValue = 0;
+	adcValue = Adc4::getValue();
+	XPCC_LOG_DEBUG << "adcValue=" << adcValue;
+	voltage = adcValue * maxVoltage / 0xfff;
+	XPCC_LOG_DEBUG << " voltage=" << voltage << xpcc::endl;
+}
 
 static bool
 initClock()
@@ -32,6 +61,8 @@ initClock()
 // ----------------------------------------------------------------------------
 MAIN_FUNCTION
 {
+
+
 	initClock();
 
 	LedNorth::setOutput(xpcc::gpio::LOW);
@@ -43,8 +74,16 @@ MAIN_FUNCTION
 	LedWest::setOutput(xpcc::gpio::LOW);
 	LedNorthWest::setOutput(xpcc::gpio::LOW);
 
+	Usart3::configurePins(Usart3::Mapping::REMAP_PB10_PB11);
+	Usart3::setBaudrate(115200);
+
 	Adc4::initialize(Adc4::ClockMode::Asynchronous, Adc4::Prescaler::Div256,
 					Adc4::CalibrationMode::SingleEndedInputsMode, true);
+
+#if defined(USE_INTERRUPTS)
+	Adc4::enableInterruptVector(5);
+	Adc4::enableInterrupt(Adc4::Interrupt::EndOfRegularConversion);
+#endif /* USE_INTERRUPTS */
 
 	AdcIn0::setAnalogInput();
 	Adc4::setChannel(Adc4::Channel::PinB12, Adc4::SampleTime::Cycles182);
@@ -52,9 +91,23 @@ MAIN_FUNCTION
 	while (1)
 	{
 		Adc4::startConversion();
+	#if !defined(USE_INTERRUPTS)
 		while(!Adc4::isConversionFinished);
-		Adc4::getValue();
+		printAdc();
+	#endif
+		xpcc::delay_ms(500);
 	}
 
 	return 0;
 }
+
+#if defined(USE_INTERRUPTS)
+extern "C" void
+ADC4_IRQHandler(void)
+{
+	if (Adc4::getInterruptFlags() & Adc4::InterruptFlag::EndOfRegularConversion) {
+		Adc4::resetInterruptFlags(Adc4::InterruptFlag::EndOfRegularConversion);
+		printAdc();
+	}
+}
+#endif /* USE_INTERRUPTS */
