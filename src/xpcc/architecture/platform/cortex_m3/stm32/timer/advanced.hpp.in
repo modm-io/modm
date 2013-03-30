@@ -201,7 +201,9 @@ namespace xpcc
 
 			enum Event
 			{
+			#if defined(STM32F3XX)
 				EVENT_BREAK_2 							= TIM_EGR_B2G,
+			#endif
 				EVENT_BREAK 							= TIM_EGR_BG,
 				EVENT_TRIGGER 							= TIM_EGR_TG,
 				EVENT_CAPTURE_COMPARE_CONTROL_UPDATE 	= TIM_EGR_COMG,
