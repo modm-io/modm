@@ -40,8 +40,12 @@
 #define ENUM_CLASS_FLAG(name) \
 inline name operator|(name a, name b) \
 {return static_cast<name>(static_cast<uint32_t>(a) | static_cast<uint32_t>(b));} \
-inline name operator&(name a, name b) \
-{return static_cast<name>(static_cast<uint32_t>(a) & static_cast<uint32_t>(b));}
+inline uint32_t operator&(name a, name b) \
+{return (static_cast<uint32_t>(a) & static_cast<uint32_t>(b));} \
+inline uint32_t operator&(uint32_t a, name b) \
+{return ((a) & static_cast<uint32_t>(b));} \
+inline uint32_t operator&(name a, uint32_t b) \
+{return (static_cast<uint32_t>(a) & (b));}
 
 
 #ifndef XPCC_STM32__ADC2_HPP
