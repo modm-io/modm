@@ -18,9 +18,6 @@ GPIO__INPUT(AdcIn0, B,  12);
 GPIO__INPUT(Button, A, 0);
 
 
-/* Uncomment to use Interrupts */
-// #define USE_INTERRUPTS
-
 // Set the log level
 #undef	XPCC_LOG_LEVEL
 #define	XPCC_LOG_LEVEL xpcc::log::DEBUG
@@ -80,10 +77,6 @@ MAIN_FUNCTION
 	Adc4::initialize(Adc4::ClockMode::Asynchronous, Adc4::Prescaler::Div256,
 					Adc4::CalibrationMode::SingleEndedInputsMode, true);
 
-#if defined(USE_INTERRUPTS)
-	Adc4::enableInterruptVector(5);
-	Adc4::enableInterrupt(Adc4::Interrupt::EndOfRegularConversion);
-#endif /* USE_INTERRUPTS */
 
 	AdcIn0::setAnalogInput();
 	Adc4::setChannel(Adc4::Channel::PinB12, Adc4::SampleTime::Cycles182);
@@ -91,23 +84,10 @@ MAIN_FUNCTION
 	while (1)
 	{
 		Adc4::startConversion();
-	#if !defined(USE_INTERRUPTS)
 		while(!Adc4::isConversionFinished);
 		printAdc();
-	#endif
 		xpcc::delay_ms(500);
 	}
 
 	return 0;
 }
-
-#if defined(USE_INTERRUPTS)
-extern "C" void
-ADC4_IRQHandler(void)
-{
-	if (Adc4::getInterruptFlags() & Adc4::InterruptFlag::EndOfRegularConversion) {
-		Adc4::resetInterruptFlags(Adc4::InterruptFlag::EndOfRegularConversion);
-		printAdc();
-	}
-}
-#endif /* USE_INTERRUPTS */
