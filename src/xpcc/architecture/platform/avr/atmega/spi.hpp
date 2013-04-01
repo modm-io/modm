@@ -77,8 +77,15 @@ namespace xpcc
 			static void
 			initialize(Mode mode, Prescaler prescaler);
 			
-			static uint8_t
-			write(uint8_t data);
+			static inline uint8_t
+			write(uint8_t data)
+			{
+				SPDR = data;
+				// wait for the transmission to complete
+				while (!(SPSR & (1 << SPIF)))
+					;
+				return SPDR;
+			}
 			
 			static bool
 			setBuffer(uint16_t length,
@@ -88,8 +95,11 @@ namespace xpcc
 			static bool
 			transfer(TransferOptions options=TRANSFER_SEND_BUFFER_SAVE_RECEIVE);
 			
-			static bool
-			transferSync(TransferOptions options=TRANSFER_SEND_BUFFER_SAVE_RECEIVE);
+			static inline bool
+			transferSync(TransferOptions options=TRANSFER_SEND_BUFFER_SAVE_RECEIVE)
+			{
+				return transfer(options);
+			}
 			
 			static bool
 			isFinished();
