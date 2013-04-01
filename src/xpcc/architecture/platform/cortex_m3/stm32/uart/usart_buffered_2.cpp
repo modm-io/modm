@@ -66,6 +66,9 @@ namespace
 	GPIO__OUTPUT(TxdB3, B, 3);
 	GPIO__INPUT(RxdB4, B, 4);
 #endif
+}
+namespace
+{
 	static const uint32_t apbClk = STM32_APB1_FREQUENCY;	// APB1
 }
 

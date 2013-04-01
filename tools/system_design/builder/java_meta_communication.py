@@ -36,11 +36,15 @@ import filter.java as filter
 class JavaCommunicationBuilder(builder_base.Builder):
 	"""
 	Generate the whole communication tree. The Output is a class named
-	Communication, which contains all concrete Components. They all contain
-	methods, which are corresponding to Actions of given Components.
+	MetaCommunication. It Provides a list of all concrete Components.
+	Each Component provides it's name, description and a list of Actions.
+	Each Action provides it's name, description, type of parameter and
+	a generic call mechanism.
+	
+	This is intended to be used in a generic user interface.
 	
 	A common call would be like:
-	$python java_communication.py  --outpath source/rca/robot --package rca.robot robot.xml;
+	$python java_meta_communication.py  --outpath source/rca/robot --package rca.robot robot.xml;
 	"""
 	
 	
@@ -63,8 +67,9 @@ class JavaCommunicationBuilder(builder_base.Builder):
 			'typeName': filter.typeName,
 			'typeObjectName': filter.typeObjectName,
 			'variableName': filter.variableName,
+			'inStringDescription': filter.inStringDescription,
 		}
-		template = self.template('templates/java_communication.tpl',
+		template = self.template('templates/java_meta_communication.tpl',
 								filter = javaFilter)
 		
 		# Bool has a special status because its primitive but user generated
@@ -79,7 +84,7 @@ class JavaCommunicationBuilder(builder_base.Builder):
 			'components': components,
 		}
 		
-		file = os.path.join(self.options.outpath, 'Communication.java')
+		file = os.path.join(self.options.outpath, 'MetaCommunication.java')
 		self.write(file, template.render(substitutions))
 
 # -----------------------------------------------------------------------------

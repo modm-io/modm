@@ -74,7 +74,7 @@ def generate(env, **kw):
 		
 		# C++ flags
 		env['CXXFLAGS'] = [
-			"-std=gnu++98",
+			"-std=gnu++0x",
 	#		"-Weffc++",
 			"-Woverloaded-virtual",
 		]

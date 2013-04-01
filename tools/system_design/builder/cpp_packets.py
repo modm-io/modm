@@ -71,9 +71,13 @@ def filter_initialization_list(class_, default=True):
 		else:
 			type = filter.typeName(item.subtype.name)
 			name = filter.variableName(item.name)
+			if item.value is not None:
+				defaultValue = item.value
+			else :
+				defaultValue = ''
 			
 			if default:
-				initList.append("%s()" % name)
+				initList.append("%s(%s)" % (name, defaultValue))
 			else:
 				initList.append("%s(%s)" % (name, name))
 	

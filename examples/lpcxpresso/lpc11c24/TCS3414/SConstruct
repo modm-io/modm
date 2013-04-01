@@ -11,9 +11,6 @@ files = env.FindFiles('.')
 program = env.Program(target = env['XPCC_CONFIG']['general']['name'], source = files.sources)
 
 env['CXXFLAGS'].append("-g")
-env['CXXFLAGS'].append("-g")
-
-print env['CXXFLAGS']
 
 # build the xpcc library
 env.XpccLibrary()

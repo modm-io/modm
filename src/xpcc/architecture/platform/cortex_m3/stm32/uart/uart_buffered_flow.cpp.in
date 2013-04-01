@@ -55,6 +55,7 @@ namespace
 }
 
 {{ template.pinDefinitions(id) }}
+{{ template.apbClkDefinitions(id) }}
 
 {{ template.pinDefinitionsFlowControl(className, id) }}
 
