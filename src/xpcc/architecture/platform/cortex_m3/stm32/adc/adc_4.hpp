@@ -61,8 +61,8 @@ inline uint32_t operator&(name a, uint32_t b) \
 #endif
 
 
-#if defined(STM32F4XX) || defined(STM32F3XX) || defined(STM32F2XX) || \
-	defined(STM32F10X_HD) || defined(STM32F10X_XL) || defined(__DOXYGEN__)
+
+#if defined(STM32F3XX)
 #include <xpcc/driver/interface.hpp>
 #include <stdint.h>
 #include "../device.h"

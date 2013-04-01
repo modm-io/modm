@@ -41,7 +41,7 @@ using namespace xpcc::stm32;
 {% if id < 4 %}
 #if defined(STM32F4XX) || defined(STM32F2XX) || defined(STM32F10X)
 
-{% if id>2 %}
+{% if id > 2 and id < 4 %}
 #if defined(STM32F2XX) || defined(STM32F4XX) || \
 	defined (STM32F10X_HD) || defined (STM32F10X_XL)
 {% endif -%}
