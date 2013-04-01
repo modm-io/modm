@@ -28,52 +28,96 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef TOUCHSCREEN_CALIBRATOR_HPP
-#define TOUCHSCREEN_CALIBRATOR_HPP
+#ifndef XPCC__TOUCHSCREEN_CALIBRATOR_HPP
+#define XPCC__TOUCHSCREEN_CALIBRATOR_HPP
 
-template <typename Screen, typename Display>
-class TouchscreenCalibrator
+namespace xpcc
 {
-public:
+	class TouchscreenCalibrator
+	{
+	public:
+		TouchscreenCalibrator();
+		
+		/**
+		 * 
+		 */
+		bool
+		calibrate(xpcc::glcd::Point * display, xpcc::glcd::Point * sample);
+		
+		void
+		translate(xpcc::glcd::Point * raw, xpcc::glcd::Point * translated);
+		
+	private:
+		float An;
+		float Bn;
+		float Cn;
+		float Dn;
+		float En;
+		float Fn;
+		float scale;
+	};
+}
+
+#endif // XPCC__TOUCHSCREEN_CALIBRATOR_HPP
+
+#ifndef XPCC__TOUCHSCREEN_CALIBRATOR_HPP
+#	error "Don't include this file directly, use touchscreen_calibrator.hpp instead!"
+#endif
+
+xpcc::TouchscreenCalibrator::TouchscreenCalibrator() :
+	scale(0.f)
+{
+}
+
+bool
+xpcc::TouchscreenCalibrator::calibrate(
+		xpcc::glcd::Point * display, xpcc::glcd::Point * sample)
+{
+	// K��(X0��X2) (Y1��Y2)��(X1��X2) (Y0��Y2)
+	scale =	((sample[0].x - sample[2].x) * (sample[1].y - sample[2].y)) -
+			((sample[1].x - sample[2].x) * (sample[0].y - sample[2].y));
 	
-};
+	if (scale == 0) {
+		return false;
+	}
+	
+	// A��((XD0��XD2) (Y1��Y2)��(XD1��XD2) (Y0��Y2))��K
+	An =	((display[0].x - display[2].x) * (sample[1].y - sample[2].y)) -
+			((display[1].x - display[2].x) * (sample[0].y - sample[2].y));
+	// B��((X0��X2) (XD1��XD2)��(XD0��XD2) (X1��X2))��K	*/
+	Bn =	((sample[0].x - sample[2].x) * (display[1].x - display[2].x)) -
+			((display[0].x - display[2].x) * (sample[1].x - sample[2].x));
+	// C��(Y0(X2XD1��X1XD2)+Y1(X0XD2��X2XD0)+Y2(X1XD0��X0XD1))��K */
+	Cn =	(sample[2].x * display[1].x - sample[1].x * display[2].x) * sample[0].y +
+			(sample[0].x * display[2].x - sample[2].x * display[0].x) * sample[1].y +
+			(sample[1].x * display[0].x - sample[0].x * display[1].x) * sample[2].y;
+	
+	// D��((YD0��YD2) (Y1��Y2)��(YD1��YD2) (Y0��Y2))��K	*/
+	Dn =	((display[0].y - display[2].y) * (sample[1].y - sample[2].y)) -
+			((display[1].y - display[2].y) * (sample[0].y - sample[2].y));
+	// E��((X0��X2) (YD1��YD2)��(YD0��YD2) (X1��X2))��K	*/
+	En =	((sample[0].x - sample[2].x) * (display[1].y - display[2].y)) -
+			((display[0].y - display[2].y) * (sample[1].x - sample[2].x));
+	// F��(Y0(X2YD1��X1YD2)+Y1(X0YD2��X2YD0)+Y2(X1YD0��X0YD1))��K */
+	Fn =	(sample[2].x * display[1].y - sample[1].x * display[2].y) * sample[0].y +
+			(sample[0].x * display[2].y - sample[2].x * display[0].y) * sample[1].y +
+			(sample[1].x * display[0].y - sample[0].x * display[1].y) * sample[2].y;
+	
+	return true;
+}
 
-#endif // TOUCHSCREEN_CALIBRATOR_HPP
-
-
-
-#include "stm32f4xx.h"
-
-/* Private typedef -----------------------------------------------------------*/
-struct Coordinate
+void
+xpcc::TouchscreenCalibrator::translate(xpcc::glcd::Point * raw, xpcc::glcd::Point * translated)
 {
-	uint16_t x;
-	uint16_t y;
-};
-
-struct Matrix
-{
-	float An, Bn, Cn, Dn, En, Fn, scale;
-};
-
-/* Private variables ---------------------------------------------------------*/
-extern Coordinate ScreenSample[3];
-extern Coordinate DisplaySample[3];
-extern Matrix matrix;
-extern Coordinate display;
-
-/* Private define ------------------------------------------------------------*/
-
-//#define CHX 	0x90
-//#define CHY 	0xd0
-
-/* Private function prototypes -----------------------------------------------*/
-void TP_Init(void);
-Coordinate *Read_Ads7846(void);
-void TouchPanel_Calibrate(void);
-void DrawCross(uint16_t Xpos, uint16_t Ypos);
-void TP_DrawPoint(uint16_t Xpos, uint16_t Ypos);
-FunctionalState setCalibrationMatrix(Coordinate * displayPtr,
-		Coordinate * screenPtr, Matrix * matrixPtr);
-FunctionalState getDisplayPoint(Coordinate * displayPtr, Coordinate * screenPtr,
-		Matrix * matrixPtr);
+	if (scale != 0)
+	{
+		/* XD = AX+BY+C */
+		translated->x =
+				((An * raw->x) +
+				 (Bn * raw->y) + Cn) / scale;
+		/* YD = DX+EY+F */
+		translated->y =
+				((Dn * raw->x)	+
+				 (En * raw->y) + Fn) / scale;
+	}
+}

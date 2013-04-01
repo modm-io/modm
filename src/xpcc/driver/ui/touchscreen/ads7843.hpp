@@ -32,6 +32,7 @@
 #define XPCC__ADS7843_HPP
 
 #include <stdint.h>
+#include <xpcc/driver/ui/display/graphic_display.hpp>
 
 namespace xpcc
 {
@@ -54,24 +55,41 @@ namespace xpcc
 		static void
 		initialize();
 		
+		/**
+		 * Get the smoothed (x,y) position.
+		 * 
+		 * @param	point
+		 * 		(x,y) position on the pressed touchscreen
+		 * 
+		 * @return	`true` if the touchscreen is pressed and the value is
+		 * 			stable enough to provide a reading, otherwise `false`.
+		 */
+		static bool
+		read(xpcc::glcd::Point * point);
+		
 		static inline uint16_t
 		readX()
 		{
-			return read(CHX);
+			return readData(CHX);
 		}
 		
 		static inline uint16_t
 		readY()
 		{
-			return read(CHY);
+			return readData(CHY);
 		}
 		
 	private:
 		static const uint8_t CHX = 0x90;
 		static const uint8_t CHY = 0xd0;
 		
+		static const uint16_t threshold = 2;
+		
+		static bool
+		getAverage(uint16_t * buffer, int16_t & value);
+		
 		static uint16_t
-		read(uint8_t command);
+		readData(uint8_t command);
 	};
 }
 

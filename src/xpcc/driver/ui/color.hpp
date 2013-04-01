@@ -38,6 +38,9 @@ namespace xpcc
 {
 	namespace color
 	{
+		/**
+		 * 24 bit RGB color model.
+		 */
 		class Rgb
 		{
 		public:
@@ -45,7 +48,65 @@ namespace xpcc
 			uint8_t green;
 			uint8_t blue;
 		};
-
+		
+		/**
+		 * 16 bit RGB color model.
+		 * 
+		 * Uses the 565 model:
+		 * - 5 bit red
+		 * - 6 bit green
+		 * - 5 bit blue
+		 */
+		class Rgb16
+		{
+		public:
+			static ALWAYS_INLINE Rgb16 white()   { return Rgb16(0xffff); };
+			static ALWAYS_INLINE Rgb16 black()   { return Rgb16(0x0000); };
+			static ALWAYS_INLINE Rgb16 grey()    { return Rgb16(0xF7DE); };
+			static ALWAYS_INLINE Rgb16 blue()    { return Rgb16(0x001F); };
+			static ALWAYS_INLINE Rgb16 red()     { return Rgb16(0xF800); };
+			static ALWAYS_INLINE Rgb16 magenta() { return Rgb16(0xF81F); };
+			static ALWAYS_INLINE Rgb16 green()   { return Rgb16(0x07E0); };
+			static ALWAYS_INLINE Rgb16 cyan()    { return Rgb16(0x7FFF); };
+			static ALWAYS_INLINE Rgb16 yellow()  { return Rgb16(0xFFE0); };
+			
+			/**
+			 * @param	red
+			 * 		Range [0..255]
+			 * @param	green
+			 * 		Range [0..255]
+			 * @param	blue
+			 * 		Range [0..255]
+			 */
+			Rgb16(uint8_t red, uint8_t green, uint8_t blue) :
+				value(((static_cast<uint16_t>(red >> 3) << 11) |
+						(static_cast<uint16_t>(green >> 2) << 5) |
+						static_cast<uint16_t>(blue >> 3)))
+			{
+			}
+			
+			Rgb16(uint16_t color) :
+				value(color)
+			{
+			}
+			
+			inline uint16_t
+			getValue() const
+			{
+				return value;
+			}
+			
+			bool
+			operator == (const Rgb16& other) const {
+				return (value == other.value);
+			}
+			
+			uint16_t value;
+		};
+		
+		/**
+		 * 24 bit HSV (Hue Saturation Value) color space.
+		 */
 		class Hsv
 		{
 		public:

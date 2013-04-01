@@ -3,18 +3,20 @@
 
 #include "parallel_tft.hpp"
 #include <xpcc/driver/ui/display/image.hpp>
+#include <xpcc/driver/ui/touchscreen/ads7843.hpp>
 
-#include "lcd.h"
 #include "touchscreen_calibrator.hpp"
+
+using namespace xpcc::stm32;
 
 // ----------------------------------------------------------------------------
 GPIO__OUTPUT(LedOrange, D, 13);		// User LED 3
 GPIO__OUTPUT(LedGreen, D, 12);		// User LED 4
-GPIO__OUTPUT(LedRed, D, 14);		// User LED 5
-GPIO__OUTPUT(LedBlue, D, 15);		// User LED 6
+//GPIO__OUTPUT(LedRed, D, 14);		// User LED 5 (used as FSMC D0)
+//GPIO__OUTPUT(LedBlue, D, 15);		// User LED 6 (used as FSMC D1)
 
 GPIO__OUTPUT(VBusPresent, A, 9);		// green LED (LD7)
-GPIO__OUTPUT(VBusOvercurrent, D, 5);	// red LED   (LD8)
+//GPIO__OUTPUT(VBusOvercurrent, D, 5);	// red LED   (LD8) (used as FSMC NWE)
 
 GPIO__INPUT(Button, A, 0);
 
@@ -44,8 +46,21 @@ GPIO__OUTPUT(NWE, D, 5);
 
 GPIO__OUTPUT(CS, D, 7);
 
-using namespace xpcc::stm32;
+xpcc::TftMemoryBus parallelBus(
+		(volatile uint16_t *) 0x60000000,
+		(volatile uint16_t *) 0x60020000);
 
+xpcc::ParallelTft<xpcc::TftMemoryBus> tft(parallelBus);
+
+// ----------------------------------------------------------------------------
+// Touchscreen
+GPIO__OUTPUT(CsTouchscreen, C, 4);
+GPIO__INPUT(Int, C, 5);
+
+xpcc::Ads7843<SpiMaster2, CsTouchscreen, Int> ads7843;
+xpcc::TouchscreenCalibrator touchscreen;
+
+// ----------------------------------------------------------------------------
 static bool
 initClock()
 {
@@ -59,14 +74,74 @@ initClock()
 }
 
 // ----------------------------------------------------------------------------
+static void
+drawCross(xpcc::GraphicDisplay& display, xpcc::glcd::Point center)
+{
+	display.setColor(xpcc::glcd::Color::red());
+	display.drawLine(center.x - 15, center.y, center.x - 2, center.y);
+	display.drawLine(center.x + 2, center.y, center.x + 15, center.y);
+	display.drawLine(center.x, center.y - 15, center.x, center.y - 2);
+	display.drawLine(center.x, center.y + 2, center.x, center.y + 15);
+
+	display.setColor(xpcc::glcd::Color::white());
+	display.drawLine(center.x - 15, center.y + 15, center.x - 7, center.y + 15);
+	display.drawLine(center.x - 15, center.y + 7, center.x - 15, center.y + 15);
+
+	display.drawLine(center.x - 15, center.y - 15, center.x - 7, center.y - 15);
+	display.drawLine(center.x - 15, center.y - 7, center.x - 15, center.y - 15);
+
+	display.drawLine(center.x + 7, center.y + 15, center.x + 15, center.y + 15);
+	display.drawLine(center.x + 15, center.y + 7, center.x + 15, center.y + 15);
+
+	display.drawLine(center.x + 7, center.y - 15, center.x + 15, center.y - 15);
+	display.drawLine(center.x + 15, center.y - 15, center.x + 15, center.y - 7);
+}
+
+static void
+calibrateTouchscreen(xpcc::GraphicDisplay& display)
+{
+	xpcc::glcd::Point calibrationPoint[3] = { { 45, 45 }, { 270, 90 }, { 100, 190 } };
+	xpcc::glcd::Point sample[3];
+	
+	for (uint8_t i = 0; i < 3; i++)
+	{
+		display.setColor(xpcc::glcd::Color::black());
+		display.clear();
+		
+		display.setColor(xpcc::glcd::Color::yellow());
+		display.setCursor(44, 10);
+		display << "Touch crosshair to calibrate";
+		
+		drawCross(display, calibrationPoint[i]);
+		xpcc::delay_ms(500);
+		
+		while (!ads7843.read(&sample[i])) {
+			// wait until a valid sample can be taken
+		}
+	}
+	
+	touchscreen.calibrate(calibrationPoint, sample);
+	
+	display.setColor(xpcc::glcd::Color::black());
+	display.clear();
+}
+
+void
+drawPoint(xpcc::GraphicDisplay& display, xpcc::glcd::Point point)
+{
+	display.drawPixel(point.x, point.y);
+	display.drawPixel(point.x + 1, point.y);
+	display.drawPixel(point.x, point.y + 1);
+	display.drawPixel(point.x + 1, point.y + 1);
+}
+
+// ----------------------------------------------------------------------------
 MAIN_FUNCTION
 {
 	initClock();
 
 	LedOrange::setOutput(xpcc::gpio::HIGH);
 	LedGreen::setOutput(xpcc::gpio::LOW);
-	LedRed::setOutput(xpcc::gpio::HIGH);
-	LedBlue::setOutput(xpcc::gpio::HIGH);
 	
 	Fsmc::initialize();
 		
@@ -120,12 +195,6 @@ MAIN_FUNCTION
 	
 	fsmc::NorSram::enableRegion(fsmc::NorSram::CHIP_SELECT_1);
 	
-	xpcc::TftMemoryBus parallelBus(
-			(volatile uint16_t *) 0x60000000,
-			(volatile uint16_t *) 0x60020000);
-	
-	xpcc::ParallelTft<xpcc::TftMemoryBus> tft(parallelBus);
-	
 	tft.initialize();
 	
 	tft.setColor(xpcc::glcd::Color::blue());
@@ -139,18 +208,34 @@ MAIN_FUNCTION
 	tft.setColor(xpcc::glcd::Color::yellow());
 	tft << "Hello World!";
 	
-	TP_Init();
-	//LCD_Initializtion();
-	TouchPanel_Calibrate();
+	CsTouchscreen::setOutput();
+	CsTouchscreen::set();
+	
+	Int::setInput(PULLUP);
+
+	SpiMaster2::initialize(SpiMaster2::MODE_0, SpiMaster2::PRESCALER_64);
+	SpiMaster2::configurePins(SpiMaster2::REMAP_PB13_PB14_PB15);
+	
+	ads7843.initialize();
+	
+	calibrateTouchscreen(tft);
+	
+	tft.setColor(xpcc::glcd::Color::green());
 	
 	while (1)	
 	{
-		getDisplayPoint(&display, Read_Ads7846(), &matrix);
-		TP_DrawPoint(display.x,display.y);
-		
-		LedBlue::toggle();
-		LedGreen::toggle();
-		//xpcc::delay_ms(500); 
+		xpcc::glcd::Point raw;
+		if (ads7843.read(&raw)) {
+			xpcc::glcd::Point point;
+			
+			touchscreen.translate(&raw, &point);
+			drawPoint(tft, point);
+			
+			LedGreen::set();
+		}
+		else {
+			LedGreen::reset();
+		}
 	}
 
 	return 0;
