@@ -45,12 +45,65 @@ namespace xpcc
 	{
 		typedef Vector<int16_t, 2> Point;
 		
-		enum Color
+		// RGB16 (565) Format
+		class Color
 		{
-			BLACK = 0,
-			WHITE = 1
+		public:
+			static ALWAYS_INLINE Color white() { return Color(0xffff); };
+			static ALWAYS_INLINE Color black() { return Color(0); };
+			static ALWAYS_INLINE Color grey() { return Color(0xF7DE); };
+			static ALWAYS_INLINE Color blue() { return Color(0x001F); };
+			static ALWAYS_INLINE Color blue2() { return Color(0x051F); };
+			static ALWAYS_INLINE Color red() { return Color(0xF800); };
+			static ALWAYS_INLINE Color magenta() { return Color(0xF81F); };
+			static ALWAYS_INLINE Color green() { return Color(0x07E0); };
+			static ALWAYS_INLINE Color cyan() { return Color(0x7FFF); };
+			static ALWAYS_INLINE Color yellow() { return Color(0xFFE0); };
+			
+			/**
+			 * @param	red
+			 * 		Range [0..255]
+			 * @param	green
+			 * 		Range [0..255]
+			 * @param	blue
+			 * 		Range [0..255]
+			 */
+			Color(uint8_t red, uint8_t green, uint8_t blue) :
+				color(((static_cast<uint16_t>(red >> 3) << 11) |
+						(static_cast<uint16_t>(green >> 2) << 5) |
+						static_cast<uint16_t>(blue >> 3)))
+			{
+			}
+			
+			Color(uint16_t color) :
+				color(color)
+			{
+			}
+			
+			inline uint16_t
+			getValue() const
+			{
+				return color;
+			}
+			
+			bool
+			operator == (const Color& other) const {
+				return (color == other.color);
+			}
+			
+		private:
+			uint16_t color;
 		};
 	}
+	
+	// TODO
+//	enum class Orientation : uint8_t
+//	{
+//		Portrait, 				//< Connector top
+//		LandscapeRight,			//< Connector right
+//		LandscapeLeft,			//< Connector left
+//		PortraitUpsideDown,		//< Connector bottom
+//	};
 	
 	/**
 	 * \brief	Base class for graphical displays 
@@ -131,7 +184,7 @@ namespace xpcc
 		update() = 0;
 		
 		void
-		setColor(glcd::Color color);
+		setColor(const glcd::Color& color);
 		
 		inline glcd::Color
 		getColor() const
@@ -159,7 +212,7 @@ namespace xpcc
 		 * \param	y	y-position
 		 */
 		inline void
-		drawPixel(uint8_t x, uint8_t y)
+		drawPixel(int16_t x, int16_t y)
 		{
 			(this->*draw)(x, y);
 		}
@@ -182,23 +235,23 @@ namespace xpcc
 		
 		/// Draw a line specified by x and y coordinates of both points
 		void
-		drawLine(uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2);
+		drawLine(int16_t x1, int16_t y1, int16_t x2, int16_t y2);
 		
 		inline void
-		drawRectangle(uint8_t x, uint8_t y, uint8_t width, uint8_t height)
+		drawRectangle(int16_t x, int16_t y, uint16_t width, uint16_t height)
 		{
 			drawRectangle(glcd::Point(x, y), width, height);
 		}
 		
 		/// Draw a rectangle
 		void
-		drawRectangle(glcd::Point upperLeft, uint8_t width, uint8_t height);
+		drawRectangle(glcd::Point upperLeft, uint16_t width, uint16_t height);
 		
 		/// Draw a rectangle with rounded corners
 		void
 		drawRoundedRectangle(glcd::Point upperLeft,
-				uint8_t width, uint8_t height,
-				uint8_t radius);
+				uint16_t width, uint16_t height,
+				uint16_t radius);
 		
 		/**
 		 * \brief	Draw a circle
@@ -209,7 +262,7 @@ namespace xpcc
 		 * \param radius	Radius of the circle
 		 */
 		void
-		drawCircle(glcd::Point center, uint8_t radius);
+		drawCircle(glcd::Point center, uint16_t radius);
 		
 		/**
 		 * \brief	Draw an ellipse
@@ -222,7 +275,7 @@ namespace xpcc
 		 * \param ry		radius in y-direction
 		 */
 		void
-		drawEllipse(glcd::Point center, uint8_t rx, uint8_t ry);
+		drawEllipse(glcd::Point center, int16_t rx, int16_t ry);
 		
 		/**
 		 * \brief	Draw an image
@@ -245,22 +298,22 @@ namespace xpcc
 		 */
 		virtual void
 		drawImageRaw(glcd::Point upperLeft,
-				uint8_t width, uint8_t height,
+				uint16_t width, uint16_t height,
 				xpcc::accessor::Flash<uint8_t> data);
 		
 		/// Fill a rectangle
 		void
-		fillRectangle(glcd::Point upperLeft, uint8_t width, uint8_t height);
+		fillRectangle(glcd::Point upperLeft, uint16_t width, uint16_t height);
 		
 		inline void
-		fillRectangle(uint8_t x, uint8_t y, uint8_t width, uint8_t height)
+		fillRectangle(int16_t x, int16_t y, uint16_t width, uint16_t height)
 		{
 			fillRectangle(glcd::Point(x, y), width, height);
 		}
 		
 		/// Fill a circle
 		void
-		fillCircle(glcd::Point center, uint8_t radius);
+		fillCircle(glcd::Point center, uint16_t radius);
 		
 	public:
 		/**
@@ -325,7 +378,7 @@ namespace xpcc
 	protected:
 		/// helper method for drawCircle() and drawEllipse()
 		void
-		drawCircle4(glcd::Point center, uint8_t x, uint8_t y);
+		drawCircle4(glcd::Point center, int16_t x, int16_t y);
 		
 		virtual void
 		drawHorizontalLine(glcd::Point start, uint8_t length);
@@ -334,13 +387,13 @@ namespace xpcc
 		drawVerticalLine(glcd::Point start, uint8_t length);
 		
 		virtual void
-		setPixel(uint8_t x, uint8_t y) = 0;
+		setPixel(int16_t x, int16_t y) = 0;
 		
 		virtual void
-		clearPixel(uint8_t x, uint8_t y) = 0;
+		clearPixel(int16_t x, int16_t y) = 0;
 		
 		virtual bool
-		getPixel(uint8_t x, uint8_t y) = 0;
+		getPixel(int16_t x, int16_t y) = 0;
 		
 	protected:
 		// Interface class for the IOStream
@@ -374,7 +427,7 @@ namespace xpcc
 		Writer writer;
 		
 		// callback function for drawing pixels
-		void (GraphicDisplay::*draw)(uint8_t x, uint8_t y);
+		void (GraphicDisplay::*draw)(int16_t x, int16_t y);
 		
 		glcd::Color color;
 		xpcc::accessor::Flash<uint8_t> font;

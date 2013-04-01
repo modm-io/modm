@@ -36,8 +36,14 @@
 namespace xpcc
 {
 	/**
-	 * ADS7843 Touch Screen Controller
+	 * ADS7843 Touch Screen Controller.
 	 * 
+	 * The ADS7843 by Texas Instruments is the de-facto standard for cheap
+	 * resistive touch screens.
+	 * 
+	 * There are many compatible devices from other manufacturers available,
+	 * such as the UH7843 by Zilltek, the TSC2046 and the XPT2046 by XPTEK.
+	 * All of these are 100% compatible with the ADS7843. 
 	 * 
 	 * @author	Fabian Greif <fabian.greif@rwth-aachen.de>
 	 */

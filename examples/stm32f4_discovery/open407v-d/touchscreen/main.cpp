@@ -1,8 +1,10 @@
 
 #include <xpcc/architecture.hpp>
 
-#include "lcd.h"
+#include "parallel_tft.hpp"
+#include <xpcc/driver/ui/display/image.hpp>
 
+#include "lcd.h"
 #include "touchscreen_calibrator.hpp"
 
 // ----------------------------------------------------------------------------
@@ -118,8 +120,27 @@ MAIN_FUNCTION
 	
 	fsmc::NorSram::enableRegion(fsmc::NorSram::CHIP_SELECT_1);
 	
+	xpcc::TftMemoryBus parallelBus(
+			(volatile uint16_t *) 0x60000000,
+			(volatile uint16_t *) 0x60020000);
+	
+	xpcc::ParallelTft<xpcc::TftMemoryBus> tft(parallelBus);
+	
+	tft.initialize();
+	
+	tft.setColor(xpcc::glcd::Color::blue());
+	tft.drawLine(0, 0, 100, 100);
+	
+	tft.setColor(xpcc::glcd::Color::red());
+	tft.drawImage(xpcc::glcd::Point(100, 100), xpcc::accessor::asFlash(bitmap::logo_xpcc_90x64));
+	
+	tft.setCursor(100, 20);
+	tft.setFont(xpcc::font::Assertion);
+	tft.setColor(xpcc::glcd::Color::yellow());
+	tft << "Hello World!";
+	
 	TP_Init();
-	LCD_Initializtion();
+	//LCD_Initializtion();
 	TouchPanel_Calibrate();
 	
 	while (1)	

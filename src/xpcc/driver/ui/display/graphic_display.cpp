@@ -39,31 +39,27 @@ xpcc::GraphicDisplay::GraphicDisplay() :
 	IOStream(writer),
 	writer(this),
 	draw(&xpcc::GraphicDisplay::setPixel),
-	color(glcd::BLACK),
+	color(glcd::Color::black()),
 	font(xpcc::accessor::asFlash(xpcc::font::FixedWidth5x8))
 {
 }
 
 // ----------------------------------------------------------------------------
 void
-xpcc::GraphicDisplay::setColor(glcd::Color newColor)
+xpcc::GraphicDisplay::setColor(const glcd::Color& newColor)
 {
-	switch (newColor)
-	{
-		case glcd::BLACK:
-			draw = &xpcc::GraphicDisplay::setPixel;
-			break;
-			
-		case glcd::WHITE:
-			draw = &xpcc::GraphicDisplay::clearPixel;
-			break;
+	if (newColor == glcd::Color::black()) {
+		draw = &xpcc::GraphicDisplay::clearPixel;
+	}
+	else {
+		draw = &xpcc::GraphicDisplay::setPixel;
 	}
 	this->color = newColor;
 }
 
 // ----------------------------------------------------------------------------
 void
-xpcc::GraphicDisplay::drawLine(uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2)
+xpcc::GraphicDisplay::drawLine(int16_t x1, int16_t y1, int16_t x2, int16_t y2)
 {
 	if (x1 == x2)
 	{
@@ -143,7 +139,7 @@ xpcc::GraphicDisplay::drawVerticalLine(glcd::Point start, uint8_t length)
 
 void
 xpcc::GraphicDisplay::drawRectangle(glcd::Point upperLeft,
-		uint8_t width, uint8_t height)
+		uint16_t width, uint16_t height)
 {
 	uint16_t x2 = upperLeft.getX() + width  - 1;
 	uint16_t y2 = upperLeft.getY() + height - 1;
@@ -156,17 +152,17 @@ xpcc::GraphicDisplay::drawRectangle(glcd::Point upperLeft,
 
 void
 xpcc::GraphicDisplay::drawRoundedRectangle(glcd::Point upperLeft,
-		uint8_t width, uint8_t height, uint8_t radius)
+		uint16_t width, uint16_t height, uint16_t radius)
 {
 	if (radius == 0) {
 		this->drawRectangle(upperLeft, width, height);
 	}
 	
-	const uint8_t x = upperLeft.getX();
-	const uint8_t y = upperLeft.getY();
+	const int16_t x = upperLeft.getX();
+	const int16_t y = upperLeft.getY();
 	
-	int8_t x1 = 0;
-	int8_t y1 = radius;
+	int16_t x1 = 0;
+	int16_t y1 = radius;
   	int16_t f = 3 - 2 * radius;
 	
 	while (x1 <= y1)
@@ -198,7 +194,7 @@ xpcc::GraphicDisplay::drawRoundedRectangle(glcd::Point upperLeft,
 }
 
 void
-xpcc::GraphicDisplay::drawCircle(glcd::Point center, uint8_t radius)
+xpcc::GraphicDisplay::drawCircle(glcd::Point center, uint16_t radius)
 {
 	if (radius == 0) {
 		return;
@@ -228,10 +224,10 @@ xpcc::GraphicDisplay::drawCircle(glcd::Point center, uint8_t radius)
 }
 
 void
-xpcc::GraphicDisplay::drawCircle4(glcd::Point center, uint8_t x, uint8_t y)
+xpcc::GraphicDisplay::drawCircle4(glcd::Point center, int16_t x, int16_t y)
 {
-	const uint8_t cx = center.getX();
-	const uint8_t cy = center.getY();
+	const int16_t cx = center.getX();
+	const int16_t cy = center.getY();
 	
 	(this->*draw)(cx + x, cy + y);
 	(this->*draw)(cx - x, cy - y);
@@ -244,7 +240,7 @@ xpcc::GraphicDisplay::drawCircle4(glcd::Point center, uint8_t x, uint8_t y)
 }
 
 void
-xpcc::GraphicDisplay::drawEllipse(glcd::Point center, uint8_t rx, uint8_t ry)
+xpcc::GraphicDisplay::drawEllipse(glcd::Point center, int16_t rx, int16_t ry)
 {
 	int32_t rx_2 = rx * rx;
 	int32_t ry_2 = ry * ry;
@@ -311,20 +307,20 @@ xpcc::GraphicDisplay::drawImage(glcd::Point upperLeft,
 
 void
 xpcc::GraphicDisplay::drawImageRaw(glcd::Point upperLeft,
-		uint8_t width, uint8_t height,
+		uint16_t width, uint16_t height,
 		xpcc::accessor::Flash<uint8_t> data)
 {
-	uint8_t rows = (height + 7) / 8;
-	for (uint8_t i = 0; i < width; i++)
+	uint16_t rows = (height + 7) / 8;
+	for (uint16_t i = 0; i < width; i++)
 	{
-		for (uint8_t k = 0; k < rows; k++)
+		for (uint16_t k = 0; k < rows; k++)
 		{
-			uint8_t byte = data[i + k * width];
-			uint8_t rowHeight = height - k * 8;
+			uint16_t byte = data[i + k * width];
+			uint16_t rowHeight = height - k * 8;
 			if (rowHeight > 8) {
 				rowHeight = 8;
 			}
-			for (uint8_t j = 0; j < rowHeight; j++)
+			for (uint16_t j = 0; j < rowHeight; j++)
 			{
 				if (byte & 0x01) {
 					this->setPixel(upperLeft.getX() + i, upperLeft.getY() + k * 8 + j);
