@@ -92,8 +92,8 @@ namespace xpcc
 	template <
 		typename MEMORY,
 		typename RESET,
-		uint8_t  WIDTH,
-		uint8_t  HEIGHT,
+		uint16_t  WIDTH,
+		uint16_t  HEIGHT,
 		xpcc::Orientation ORIENTATION>
 	class SiemensS75Common :
 			public BufferedGraphicDisplay<WIDTH, HEIGHT>

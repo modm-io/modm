@@ -38,7 +38,7 @@ namespace lcd
 	typedef xpcc::stm32::FsmcDisplayS75 Memory;
 }
 
-typedef xpcc::SiemensS75Landscape<lcd::Memory, lcd::Reset> Display;
+typedef xpcc::SiemensS75LandscapeLeft<lcd::Memory, lcd::Reset> Display;
 
 Display display;
 

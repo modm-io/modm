@@ -104,7 +104,7 @@ xpcc::GraphicDisplay::drawLine(int16_t x1, int16_t y1, int16_t x2, int16_t y2)
 			yStep = -1;
 		}
 		
-		for (uint16_t x = x1; x < x2; ++x)
+		for (int_fast16_t x = x1; x < x2; ++x)
 		{
 			if (steep) {
 				(this->*draw)(y, x);
@@ -122,17 +122,17 @@ xpcc::GraphicDisplay::drawLine(int16_t x1, int16_t y1, int16_t x2, int16_t y2)
 }
 
 void
-xpcc::GraphicDisplay::drawHorizontalLine(glcd::Point start, uint8_t length)
+xpcc::GraphicDisplay::drawHorizontalLine(glcd::Point start, uint16_t length)
 {
-	for (uint16_t i = start.getX(); i < (start.getX() + length); ++i) {
+	for (int_fast16_t i = start.getX(); i < static_cast<int16_t>(start.getX() + length); ++i) {
 		(this->*draw)(i, start.getY());
 	}
 }
 
 void
-xpcc::GraphicDisplay::drawVerticalLine(glcd::Point start, uint8_t length)
+xpcc::GraphicDisplay::drawVerticalLine(glcd::Point start, uint16_t length)
 {
-	for (uint16_t i = start.getY(); i < (start.getY() + length); ++i) {
+	for (int_fast16_t i = start.getY(); i < static_cast<int16_t>(start.getY() + length); ++i) {
 		(this->*draw)(start.getX(), i);
 	}
 }

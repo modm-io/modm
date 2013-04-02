@@ -48,7 +48,7 @@ namespace xpcc
 	 * \author	Fabian Greif
 	 * \ingroup	lcd
 	 */
-	template <uint8_t Width, uint8_t Height>
+	template <uint16_t Width, uint16_t Height>
 	class BufferedGraphicDisplay : public GraphicDisplay
 	{
 		// Height must be a multiple of 8
@@ -83,26 +83,26 @@ namespace xpcc
 		// Faster version adapted for the RAM buffer
 		virtual void
 		drawImageRaw(glcd::Point upperLeft,
-				uint8_t width, uint8_t height,
+				uint16_t width, uint16_t height,
 				xpcc::accessor::Flash<uint8_t> data);
 		
 	protected:
 		// Faster version adapted for the RAM buffer
 		virtual void
-		drawHorizontalLine(glcd::Point start, uint8_t length);
+		drawHorizontalLine(glcd::Point start, uint16_t length);
 		
 		// TODO Faster version adapted for the RAM buffer
 		//virtual void
 		//drawVerticalLine(glcd::Point start, uint8_t length);
 		
 		virtual void
-		setPixel(uint8_t x, uint8_t y);
+		setPixel(int16_t x, int16_t y);
 		
 		virtual void
-		clearPixel(uint8_t x, uint8_t y);
+		clearPixel(int16_t x, int16_t y);
 		
 		virtual bool
-		getPixel(uint8_t x, uint8_t y);
+		getPixel(int16_t x, int16_t y);
 		
 		uint8_t buffer[Width][Height / 8];
 	};

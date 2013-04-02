@@ -154,6 +154,7 @@ namespace xpcc
 				return getRelative<IntermediateType_, multiplier_, ReturnType_>(blue);
 			}
 
+#if (defined(__GXX_EXPERIMENTAL_CXX0X__) || __cplusplus >= 201103L) && __GNUC__ >= 4 && __GNUC_MINOR__ >= 6
 			template<typename IntermediateType = float, unsigned int multiplier = 100, typename ReturnType = UnderlyingType>
 			inline Rgba<ReturnType> getRelativeColors() const
 			{
@@ -163,7 +164,9 @@ namespace xpcc
 					getRelativeBlue	<IntermediateType, multiplier, ReturnType>(),
 					alpha };
 			}
-private:
+#endif
+			
+		private:
 			template<typename T>
 			friend IOStream&
 			operator << ( IOStream& os, const Rgba<T>&);

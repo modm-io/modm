@@ -129,6 +129,10 @@ calibrateTouchscreen(xpcc::GraphicDisplay& display)
 void
 drawPoint(xpcc::GraphicDisplay& display, xpcc::glcd::Point point)
 {
+	if (point.x < 0 || point.y < 0) {
+		return;
+	}
+	
 	display.drawPixel(point.x, point.y);
 	display.drawPixel(point.x + 1, point.y);
 	display.drawPixel(point.x, point.y + 1);
@@ -144,7 +148,7 @@ MAIN_FUNCTION
 	LedGreen::setOutput(xpcc::gpio::LOW);
 	
 	Fsmc::initialize();
-		
+	
 	D0::setAlternateFunction(AF_FSMC, PUSH_PULL, SPEED_100MHZ);
 	D1::setAlternateFunction(AF_FSMC, PUSH_PULL, SPEED_100MHZ);
 	D2::setAlternateFunction(AF_FSMC, PUSH_PULL, SPEED_100MHZ);

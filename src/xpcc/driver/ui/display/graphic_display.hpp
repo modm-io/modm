@@ -390,10 +390,10 @@ namespace xpcc
 		drawCircle4(glcd::Point center, int16_t x, int16_t y);
 		
 		virtual void
-		drawHorizontalLine(glcd::Point start, uint8_t length);
+		drawHorizontalLine(glcd::Point start, uint16_t length);
 		
 		virtual void
-		drawVerticalLine(glcd::Point start, uint8_t length);
+		drawVerticalLine(glcd::Point start, uint16_t length);
 		
 		virtual void
 		setPixel(int16_t x, int16_t y) = 0;
