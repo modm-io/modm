@@ -194,7 +194,7 @@ namespace xpcc
 		 * @see	setBackgroundColor()
 		 */
 		void
-		setForegroundColor(const glcd::Color& color);
+		setColor(const glcd::Color& color);
 		
 		inline glcd::Color
 		getForegroundColor() const
@@ -207,7 +207,7 @@ namespace xpcc
 		 * 
 		 * The background color used when clearing the screen. Default is black.
 		 * 
-		 * @see	setForegroundColor()
+		 * @see	setColor()
 		 */
 		void
 		setBackgroundColor(const glcd::Color& color);

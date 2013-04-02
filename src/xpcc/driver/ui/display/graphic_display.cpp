@@ -47,7 +47,7 @@ xpcc::GraphicDisplay::GraphicDisplay() :
 
 // ----------------------------------------------------------------------------
 void
-xpcc::GraphicDisplay::setForegroundColor(const glcd::Color& newColor)
+xpcc::GraphicDisplay::setColor(const glcd::Color& newColor)
 {
 	if (newColor == glcd::Color::black()) {
 		draw = &xpcc::GraphicDisplay::clearPixel;

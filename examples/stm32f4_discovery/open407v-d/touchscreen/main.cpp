@@ -147,13 +147,13 @@ initTouchscreen()
 static void
 drawCross(xpcc::GraphicDisplay& display, xpcc::glcd::Point center)
 {
-	display.setForegroundColor(xpcc::glcd::Color::red());
+	display.setColor(xpcc::glcd::Color::red());
 	display.drawLine(center.x - 15, center.y, center.x - 2, center.y);
 	display.drawLine(center.x + 2, center.y, center.x + 15, center.y);
 	display.drawLine(center.x, center.y - 15, center.x, center.y - 2);
 	display.drawLine(center.x, center.y + 2, center.x, center.y + 15);
 
-	display.setForegroundColor(xpcc::glcd::Color::white());
+	display.setColor(xpcc::glcd::Color::white());
 	display.drawLine(center.x - 15, center.y + 15, center.x - 7, center.y + 15);
 	display.drawLine(center.x - 15, center.y + 7, center.x - 15, center.y + 15);
 
@@ -177,7 +177,7 @@ calibrateTouchscreen(xpcc::GraphicDisplay& display)
 	{
 		display.clear();
 		
-		display.setForegroundColor(xpcc::glcd::Color::yellow());
+		display.setColor(xpcc::glcd::Color::yellow());
 		display.setCursor(50, 5);
 		display << "Touch crosshair to calibrate";
 		
@@ -222,9 +222,9 @@ MAIN_FUNCTION
 	
 	calibrateTouchscreen(tft);
 	
-	tft.setForegroundColor(xpcc::glcd::Color::lime());
+	tft.setColor(xpcc::glcd::Color::lime());
 	
-	while (1)	
+	while (1)
 	{
 		xpcc::glcd::Point raw;
 		if (ads7843.read(&raw)) {
