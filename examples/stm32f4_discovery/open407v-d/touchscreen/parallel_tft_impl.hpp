@@ -142,7 +142,7 @@ xpcc::ParallelTft<INTERFACE>::clear()
 	interface.writeIndex(0x0022);
 	for (uint32_t i = 0; i < MAX_X * MAX_Y; i++)
 	{
-		interface.writeData(color.getValue());
+		interface.writeData(foregroundColor.getValue());
 	}
 }
 
@@ -155,7 +155,7 @@ xpcc::ParallelTft<INTERFACE>::setPixel(int16_t x, int16_t y)
 	}
 	
 	writeCursor(x, y);
-	interface.writeRegister(0x0022, color.getValue());
+	interface.writeRegister(0x0022, foregroundColor.getValue());
 }
 
 template <typename INTERFACE>

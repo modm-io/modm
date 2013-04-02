@@ -105,7 +105,6 @@ calibrateTouchscreen(xpcc::GraphicDisplay& display)
 	
 	for (uint8_t i = 0; i < 3; i++)
 	{
-		display.setColor(xpcc::glcd::Color::black());
 		display.clear();
 		
 		display.setColor(xpcc::glcd::Color::yellow());
@@ -122,7 +121,6 @@ calibrateTouchscreen(xpcc::GraphicDisplay& display)
 	
 	touchscreen.calibrate(calibrationPoint, sample);
 	
-	display.setColor(xpcc::glcd::Color::black());
 	display.clear();
 }
 
@@ -219,8 +217,6 @@ MAIN_FUNCTION
 
 	SpiMaster2::initialize(SpiMaster2::MODE_0, SpiMaster2::PRESCALER_64);
 	SpiMaster2::configurePins(SpiMaster2::REMAP_PB13_PB14_PB15);
-	
-	ads7843.initialize();
 	
 	calibrateTouchscreen(tft);
 	

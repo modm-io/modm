@@ -126,7 +126,7 @@ xpcc::stm32::fsmc::NorSram::configureAsynchronousRegion(Region region,
 {
 	// NOR/PSRAM chip-select control register (BCR)
 	FSMC_Bank1->BTCR[region*2] =
-	//		FSMC_BCR1_EXTMOD |	// Enable extended mode, this allows different timings for read and write
+			FSMC_BCR1_EXTMOD |	// Enable extended mode, this allows different timings for read and write
 			FSMC_BCR1_WREN |	// enable write
 			(1 << 7) |			// FWPRLVL (unknown, should be kept at reset level (=1)) 
 			memoryType |

@@ -35,8 +35,18 @@ void
 xpcc::GraphicDisplay::fillRectangle(glcd::Point upperLeft,
 		uint16_t width, uint16_t height)
 {
-	for (uint16_t i = upperLeft.getX(); (i < upperLeft.getX() + width) && (i < 128); i++) {
-		for (uint16_t k = upperLeft.getY(); (k < upperLeft.getY() + height) && (k < 64); k++) {
+	uint16_t i = upperLeft.getX();
+	if (i < 0) {
+		i = 0;
+	}
+	
+	uint16_t k = upperLeft.getY();
+	if (k < 0) {
+		k = 0;
+	}
+	
+	for (; (i < upperLeft.getX() + width) && (i < getHeight()); ++i) {
+		for (; (k < upperLeft.getY() + height) && (k < getWidth()); ++k) {
 			(this->*draw)(i, k);
 		}
 	}
@@ -52,7 +62,6 @@ xpcc::GraphicDisplay::fillCircle(glcd::Point center, uint16_t radius)
 	uint16_t y = radius;
 	
 	this->drawVerticalLine(glcd::Point(center.getX(), center.getY() - radius), 2 * radius);
-	//this->drawHorizontalLine(center.getX() - radius, center.getY(), 2* radius);
 	
 	while(x < y)
 	{
