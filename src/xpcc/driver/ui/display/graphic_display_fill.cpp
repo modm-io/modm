@@ -35,18 +35,14 @@ void
 xpcc::GraphicDisplay::fillRectangle(glcd::Point upperLeft,
 		uint16_t width, uint16_t height)
 {
-	uint16_t i = upperLeft.getX();
-	if (i < 0) {
-		i = 0;
-	}
-	
-	uint16_t k = upperLeft.getY();
-	if (k < 0) {
-		k = 0;
-	}
-	
-	for (; (i < upperLeft.getX() + width) && (i < getHeight()); ++i) {
-		for (; (k < upperLeft.getY() + height) && (k < getWidth()); ++k) {
+	for (uint16_t i = upperLeft.getX();
+			(i < upperLeft.getX() + width) && (i < getHeight());
+			++i)
+	{
+		for (uint16_t k = upperLeft.getY();
+				(k < upperLeft.getY() + height) && (k < getWidth());
+				++k)
+		{
 			(this->*draw)(i, k);
 		}
 	}

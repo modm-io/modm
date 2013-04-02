@@ -54,12 +54,12 @@ xpcc::BufferedGraphicDisplay<Width, Height>::drawHorizontalLine(
 		glcd::Point start,
 		uint16_t length)
 {
-	const uint8_t y = start.getY() / 8;
+	const uint16_t y = start.getY() / 8;
 	
 	if (this->foregroundColor == glcd::Color::black())
 	{
 		const uint8_t mask = 1 << (start.getY() & 0x07);
-		for (int_fast16_t x = start.getX(); x < start.getX() + length; ++x) {
+		for (uint_fast16_t x = start.getX(); x < static_cast<uint16_t>(start.getX() + length); ++x) {
 			if( x < Width && y < Height ) {
 				this->buffer[x][y] |= mask;
 			}
@@ -67,7 +67,7 @@ xpcc::BufferedGraphicDisplay<Width, Height>::drawHorizontalLine(
 	}
 	else {
 		const uint8_t mask = ~(1 << (start.getY() & 0x07));
-		for (int_fast16_t x = start.getX(); x < start.getX() + length; ++x) {
+		for (uint_fast16_t x = start.getX(); x < static_cast<uint16_t>(start.getX() + length); ++x) {
 			if( x < Width && y < Height ) {
 				this->buffer[x][y] &= mask;
 			}
@@ -113,7 +113,7 @@ template <uint16_t Width, uint16_t Height>
 void
 xpcc::BufferedGraphicDisplay<Width, Height>::setPixel(int16_t x, int16_t y)
 {
-	if( x < Width && y < Height ) {
+	if (static_cast<uint16_t>(x) < Width && static_cast<uint16_t>(y) < Height) {
 		this->buffer[x][y / 8] |= (1 << (y & 0x07));
 	}
 }
@@ -122,7 +122,7 @@ template <uint16_t Width, uint16_t Height>
 void
 xpcc::BufferedGraphicDisplay<Width, Height>::clearPixel(int16_t x, int16_t y)
 {
-	if( x < Width && y < Height ) {
+	if (static_cast<uint16_t>(x) < Width && static_cast<uint16_t>(y) < Height) {
 		this->buffer[x][y / 8] &= ~(1 << (y & 0x07));
 	}
 }
@@ -131,7 +131,7 @@ template <uint16_t Width, uint16_t Height>
 bool
 xpcc::BufferedGraphicDisplay<Width, Height>::getPixel(int16_t x, int16_t y)
 {
-	if( x < Width && y < Height ) {
+	if (static_cast<uint16_t>(x) < Width && static_cast<uint16_t>(y) < Height) {
 		return (this->buffer[x][y / 8] & (1 << (y & 0x07)));
 	}
 	else {

@@ -39,7 +39,8 @@ xpcc::GraphicDisplay::GraphicDisplay() :
 	IOStream(writer),
 	writer(this),
 	draw(&xpcc::GraphicDisplay::setPixel),
-	foregroundColor(glcd::Color::black()),
+	foregroundColor(glcd::Color::white()),
+	backgroundColor(glcd::Color::black()),
 	font(xpcc::accessor::asFlash(xpcc::font::FixedWidth5x8))
 {
 }

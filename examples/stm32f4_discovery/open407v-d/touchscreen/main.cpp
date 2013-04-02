@@ -73,78 +73,9 @@ initClock()
 	return Clock::switchToPll();
 }
 
-// ----------------------------------------------------------------------------
 static void
-drawCross(xpcc::GraphicDisplay& display, xpcc::glcd::Point center)
+initDisplay()
 {
-	display.setColor(xpcc::glcd::Color::red());
-	display.drawLine(center.x - 15, center.y, center.x - 2, center.y);
-	display.drawLine(center.x + 2, center.y, center.x + 15, center.y);
-	display.drawLine(center.x, center.y - 15, center.x, center.y - 2);
-	display.drawLine(center.x, center.y + 2, center.x, center.y + 15);
-
-	display.setColor(xpcc::glcd::Color::white());
-	display.drawLine(center.x - 15, center.y + 15, center.x - 7, center.y + 15);
-	display.drawLine(center.x - 15, center.y + 7, center.x - 15, center.y + 15);
-
-	display.drawLine(center.x - 15, center.y - 15, center.x - 7, center.y - 15);
-	display.drawLine(center.x - 15, center.y - 7, center.x - 15, center.y - 15);
-
-	display.drawLine(center.x + 7, center.y + 15, center.x + 15, center.y + 15);
-	display.drawLine(center.x + 15, center.y + 7, center.x + 15, center.y + 15);
-
-	display.drawLine(center.x + 7, center.y - 15, center.x + 15, center.y - 15);
-	display.drawLine(center.x + 15, center.y - 15, center.x + 15, center.y - 7);
-}
-
-static void
-calibrateTouchscreen(xpcc::GraphicDisplay& display)
-{
-	xpcc::glcd::Point calibrationPoint[3] = { { 45, 45 }, { 270, 90 }, { 100, 190 } };
-	xpcc::glcd::Point sample[3];
-	
-	for (uint8_t i = 0; i < 3; i++)
-	{
-		display.clear();
-		
-		display.setColor(xpcc::glcd::Color::yellow());
-		display.setCursor(44, 10);
-		display << "Touch crosshair to calibrate";
-		
-		drawCross(display, calibrationPoint[i]);
-		xpcc::delay_ms(500);
-		
-		while (!ads7843.read(&sample[i])) {
-			// wait until a valid sample can be taken
-		}
-	}
-	
-	touchscreen.calibrate(calibrationPoint, sample);
-	
-	display.clear();
-}
-
-void
-drawPoint(xpcc::GraphicDisplay& display, xpcc::glcd::Point point)
-{
-	if (point.x < 0 || point.y < 0) {
-		return;
-	}
-	
-	display.drawPixel(point.x, point.y);
-	display.drawPixel(point.x + 1, point.y);
-	display.drawPixel(point.x, point.y + 1);
-	display.drawPixel(point.x + 1, point.y + 1);
-}
-
-// ----------------------------------------------------------------------------
-MAIN_FUNCTION
-{
-	initClock();
-
-	LedOrange::setOutput(xpcc::gpio::HIGH);
-	LedGreen::setOutput(xpcc::gpio::LOW);
-	
 	Fsmc::initialize();
 	
 	D0::setAlternateFunction(AF_FSMC, PUSH_PULL, SPEED_100MHZ);
@@ -198,18 +129,11 @@ MAIN_FUNCTION
 	fsmc::NorSram::enableRegion(fsmc::NorSram::CHIP_SELECT_1);
 	
 	tft.initialize();
-	
-	tft.setColor(xpcc::glcd::Color::blue());
-	tft.drawLine(0, 0, 100, 100);
-	
-	tft.setColor(xpcc::glcd::Color::red());
-	tft.drawImage(xpcc::glcd::Point(100, 100), xpcc::accessor::asFlash(bitmap::logo_xpcc_90x64));
-	
-	tft.setCursor(100, 20);
-	tft.setFont(xpcc::font::Assertion);
-	tft.setColor(xpcc::glcd::Color::yellow());
-	tft << "Hello World!";
-	
+}
+
+static void
+initTouchscreen()
+{
 	CsTouchscreen::setOutput();
 	CsTouchscreen::set();
 	
@@ -217,10 +141,88 @@ MAIN_FUNCTION
 
 	SpiMaster2::initialize(SpiMaster2::MODE_0, SpiMaster2::PRESCALER_64);
 	SpiMaster2::configurePins(SpiMaster2::REMAP_PB13_PB14_PB15);
+}
+
+// ----------------------------------------------------------------------------
+static void
+drawCross(xpcc::GraphicDisplay& display, xpcc::glcd::Point center)
+{
+	display.setForegroundColor(xpcc::glcd::Color::red());
+	display.drawLine(center.x - 15, center.y, center.x - 2, center.y);
+	display.drawLine(center.x + 2, center.y, center.x + 15, center.y);
+	display.drawLine(center.x, center.y - 15, center.x, center.y - 2);
+	display.drawLine(center.x, center.y + 2, center.x, center.y + 15);
+
+	display.setForegroundColor(xpcc::glcd::Color::white());
+	display.drawLine(center.x - 15, center.y + 15, center.x - 7, center.y + 15);
+	display.drawLine(center.x - 15, center.y + 7, center.x - 15, center.y + 15);
+
+	display.drawLine(center.x - 15, center.y - 15, center.x - 7, center.y - 15);
+	display.drawLine(center.x - 15, center.y - 7, center.x - 15, center.y - 15);
+
+	display.drawLine(center.x + 7, center.y + 15, center.x + 15, center.y + 15);
+	display.drawLine(center.x + 15, center.y + 7, center.x + 15, center.y + 15);
+
+	display.drawLine(center.x + 7, center.y - 15, center.x + 15, center.y - 15);
+	display.drawLine(center.x + 15, center.y - 15, center.x + 15, center.y - 7);
+}
+
+static void
+calibrateTouchscreen(xpcc::GraphicDisplay& display)
+{
+	xpcc::glcd::Point calibrationPoint[3] = { { 45, 45 }, { 270, 90 }, { 100, 190 } };
+	xpcc::glcd::Point sample[3];
+	
+	for (uint8_t i = 0; i < 3; i++)
+	{
+		display.clear();
+		
+		display.setForegroundColor(xpcc::glcd::Color::yellow());
+		display.setCursor(50, 5);
+		display << "Touch crosshair to calibrate";
+		
+		drawCross(display, calibrationPoint[i]);
+		xpcc::delay_ms(500);
+		
+		while (!ads7843.read(&sample[i])) {
+			// wait until a valid sample can be taken
+		}
+	}
+	
+	touchscreen.calibrate(calibrationPoint, sample);
+	
+	display.clear();
+}
+
+void
+drawPoint(xpcc::GraphicDisplay& display, xpcc::glcd::Point point)
+{
+	if (point.x < 0 || point.y < 0) {
+		return;
+	}
+	
+	display.drawPixel(point.x, point.y);
+	display.drawPixel(point.x + 1, point.y);
+	display.drawPixel(point.x, point.y + 1);
+	display.drawPixel(point.x + 1, point.y + 1);
+}
+
+// ----------------------------------------------------------------------------
+MAIN_FUNCTION
+{
+	initClock();
+
+	LedOrange::setOutput(xpcc::gpio::HIGH);
+	LedGreen::setOutput(xpcc::gpio::LOW);
+	
+	Button::setInput(PULLDOWN);
+	
+	initDisplay();
+	initTouchscreen();
 	
 	calibrateTouchscreen(tft);
 	
-	tft.setColor(xpcc::glcd::Color::green());
+	tft.setForegroundColor(xpcc::glcd::Color::lime());
 	
 	while (1)	
 	{
@@ -235,6 +237,11 @@ MAIN_FUNCTION
 		}
 		else {
 			LedGreen::reset();
+		}
+		
+		// clear screen if the user button is pressed
+		if (Button::read()) {
+			tft.clear();
 		}
 	}
 

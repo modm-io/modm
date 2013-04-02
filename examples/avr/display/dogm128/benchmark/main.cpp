@@ -153,7 +153,7 @@ MAIN_FUNCTION
 		while (!timer.isExpired())
 		{
 			// rectangle in left side of screen
-			display.setColor(Color::black());
+			display.setForegroundColor(Color::black());
 			display.drawRectangle(Point(0, 0), 62, 62);
 			
 			// rounded rectangle around text area
@@ -168,14 +168,14 @@ MAIN_FUNCTION
 			display.drawCircle(Point(31, 31), 31);
 			
 			// clear previous spinner position
-			display.setColor(Color::white());
+			display.setForegroundColor(Color::white());
 			display.fillRectangle(Point(87, 40), 16, 16);
 			
 			static uint8_t loops = 0;
-			display.setColor(Color::black());
+			display.setForegroundColor(Color::black());
 			drawSpinner(Point(95, 48), loops++);
 			
-			display.setColor(Color::white());
+			display.setForegroundColor(Color::white());
 			display.setCursor(Point(25, 40));
 			display << ++iter;
 			display.update();
@@ -184,7 +184,7 @@ MAIN_FUNCTION
 		// print number of iterations in one second
 		display.clear();
 		display.setCursor(Point(80, 10));
-		display.setColor(Color::white());
+		display.setForegroundColor(Color::white());
 		display << "FPS=" << iter;
 	}
 }

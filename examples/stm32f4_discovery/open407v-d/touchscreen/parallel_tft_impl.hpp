@@ -142,7 +142,7 @@ xpcc::ParallelTft<INTERFACE>::clear()
 	interface.writeIndex(0x0022);
 	for (uint32_t i = 0; i < MAX_X * MAX_Y; i++)
 	{
-		interface.writeData(foregroundColor.getValue());
+		interface.writeData(backgroundColor.getValue());
 	}
 }
 

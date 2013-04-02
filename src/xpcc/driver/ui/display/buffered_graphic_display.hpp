@@ -37,7 +37,7 @@
 namespace xpcc
 {
 	/**
-	 * \brief	Base class for graphical displays with a RAM buffer
+	 * Base class for graphical displays with a RAM buffer.
 	 * 
 	 * Every operation works on the internal RAM buffer, therefore the content
 	 * of the real display is not changed until a call of update().
