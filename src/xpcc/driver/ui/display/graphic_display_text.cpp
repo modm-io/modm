@@ -31,6 +31,16 @@
 #include "graphic_display.hpp"
 
 // ----------------------------------------------------------------------------
+uint8_t
+xpcc::GraphicDisplay::getFontHeight() const
+{
+	if (!this->font.isValid())
+		return 0;
+	
+	return font[3];
+}
+
+// ----------------------------------------------------------------------------
 void
 xpcc::GraphicDisplay::write(char c)
 {

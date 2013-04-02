@@ -39,14 +39,14 @@ xpcc::GraphicDisplay::GraphicDisplay() :
 	IOStream(writer),
 	writer(this),
 	draw(&xpcc::GraphicDisplay::setPixel),
-	color(glcd::Color::black()),
+	foregroundColor(glcd::Color::black()),
 	font(xpcc::accessor::asFlash(xpcc::font::FixedWidth5x8))
 {
 }
 
 // ----------------------------------------------------------------------------
 void
-xpcc::GraphicDisplay::setColor(const glcd::Color& newColor)
+xpcc::GraphicDisplay::setForegroundColor(const glcd::Color& newColor)
 {
 	if (newColor == glcd::Color::black()) {
 		draw = &xpcc::GraphicDisplay::clearPixel;
@@ -54,7 +54,13 @@ xpcc::GraphicDisplay::setColor(const glcd::Color& newColor)
 	else {
 		draw = &xpcc::GraphicDisplay::setPixel;
 	}
-	this->color = newColor;
+	this->foregroundColor = newColor;
+}
+
+void
+xpcc::GraphicDisplay::setBackgroundColor(const glcd::Color& newColor)
+{
+	this->backgroundColor = newColor;
 }
 
 // ----------------------------------------------------------------------------

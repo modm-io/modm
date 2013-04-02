@@ -56,7 +56,7 @@ xpcc::BufferedGraphicDisplay<Width, Height>::drawHorizontalLine(
 {
 	const uint8_t y = start.getY() / 8;
 	
-	if (this->color == glcd::Color::black())
+	if (this->foregroundColor == glcd::Color::black())
 	{
 		const uint8_t mask = 1 << (start.getY() & 0x07);
 		for (int_fast16_t x = start.getX(); x < start.getX() + length; ++x) {
