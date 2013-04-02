@@ -35,6 +35,10 @@
 
 #include "device.h"
 
+#if defined (STM32F10X_HD) || defined (STM32F10X_XL) || \
+	defined (STM32F10X_HD_VL) || \
+	defined(STM32F2XX) || defined(STM32F4XX)
+
 namespace xpcc
 {
 	namespace stm32
@@ -302,16 +306,26 @@ namespace xpcc
 			static inline void
 			enable()
 			{
+#if defined(STM32F4XX) || defined(STM32F2XX)
 				RCC->AHB3ENR |= RCC_AHB3ENR_FSMCEN;
+#else
+				RCC->AHBENR |= RCC_AHBENR_FSMCEN;
+#endif
 			}
 			
 			static inline void
 			disable()
 			{
+#if defined(STM32F4XX) || defined(STM32F2XX)
 				RCC->AHB3ENR &= ~RCC_AHB3ENR_FSMCEN;
+#else
+				RCC->AHBENR &= ~RCC_AHBENR_FSMCEN;
+#endif
 			}
 		};
 	}
 }
+
+#endif
 
 #endif	// XPCC_STM32__FSMC_HPP

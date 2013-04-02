@@ -30,6 +30,10 @@
 
 #include "fsmc.hpp"
 
+#if defined (STM32F10X_HD) || defined (STM32F10X_XL) || \
+	defined (STM32F10X_HD_VL) || \
+	defined(STM32F2XX) || defined(STM32F4XX)
+
 // ----------------------------------------------------------------------------
 /*
  * - Byte select lanes (NBL[1:0]) are not used during read access (they are
@@ -144,3 +148,5 @@ xpcc::stm32::fsmc::NorSram::configureAsynchronousRegion(Region region,
 			timing.writeAddressHold << 4 |
 			timing.writeAddressSetup;
 }
+
+#endif
