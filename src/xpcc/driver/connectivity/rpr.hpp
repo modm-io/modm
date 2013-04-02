@@ -102,9 +102,4 @@
  * \author	Niklas Hauser
  */
 
-#ifndef XPCC__RPR_HPP
-#define XPCC__RPR_HPP
-
 #include "rpr/node.hpp"
-
-#endif	// XPCC__RESILIENT_PACKET_RING_HPP
