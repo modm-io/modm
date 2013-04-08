@@ -58,6 +58,14 @@ namespace
 	
 	GPIO__OUTPUT(TxdD5, D, 5);
 	GPIO__INPUT(RxdD6, D, 6);
+
+#if defined(STM32F3XX)
+	GPIO__OUTPUT(TxdA14, A, 14);
+	GPIO__INPUT(RxdA15, A, 15);
+
+	GPIO__OUTPUT(TxdB3, B, 3);
+	GPIO__INPUT(RxdB4, B, 4);
+#endif
 }
 namespace
 {
@@ -72,16 +80,27 @@ xpcc::stm32::BufferedUsart2::configurePins(Mapping mapping)
 	RCC->APB1ENR |= RCC_APB1ENR_USART2EN;
 	
 	// Initialize IO pins
-#if defined(STM32F2XX) || defined(STM32F4XX)
+#if defined(STM32F2XX) || defined(STM32F3XX) || defined(STM32F4XX)
 	if (mapping == REMAP_PA2_PA3) {
 		TxdA2::setAlternateFunction(AF_USART2, xpcc::stm32::PUSH_PULL);
 		RxdA3::setAlternateFunction(AF_USART2);
 	}
+#if defined(STM32F3XX)
+	else if(mapping == REMAP_PA14_PA15) {
+		TxdA14::setAlternateFunction(AF_USART2, xpcc::stm32::PUSH_PULL);
+		RxdA15::setAlternateFunction(AF_USART2);
+	}
+	else if(mapping == REMAP_PB3_PB4) {
+		TxdB3::setAlternateFunction(AF_USART2, xpcc::stm32::PUSH_PULL);
+		RxdB4::setAlternateFunction(AF_USART2);
+	}
+#endif
 	else {
 		TxdD5::setAlternateFunction(AF_USART2, xpcc::stm32::PUSH_PULL);
 		RxdD6::setAlternateFunction(AF_USART2);
 	}
-#else
+#elif defined(STM32F10X) || defined(STM32F10X_HD) || defined(STM32F10X_XL) \
+	|| defined(STM32F10X_CL)
 	AFIO->MAPR = (AFIO->MAPR & ~AFIO_MAPR_USART2_REMAP) | mapping;
 	if (mapping == REMAP_PA2_PA3) {
 		TxdA2::setAlternateFunction(xpcc::stm32::PUSH_PULL);
@@ -91,14 +110,38 @@ xpcc::stm32::BufferedUsart2::configurePins(Mapping mapping)
 		TxdD5::setAlternateFunction(xpcc::stm32::PUSH_PULL);
 		RxdD6::setInput();
 	}
+#else
+#  error "Unknown CPU Type. Please define STM32F10X_.., STM32F2XX, STM32F3XX or STM32F4XX"
 #endif
 }
 
 // ----------------------------------------------------------------------------
+#if defined(STM32F3XX)
+	#define USART_SR_RXNE USART_ISR_RXNE
+	#define USART_SR_TXE  USART_ISR_TXE
+
+	// new register names for STM32F3 series
+	#define USART2_SR \
+		USART2->ISR
+	#define USART2_RDR \
+		USART2->RDR
+	#define USART2_TDR \
+		USART2->TDR
+
+#else
+	#define USART2_SR \
+		USART2->SR
+	#define USART2_RDR \
+		USART2->DR
+	#define USART2_TDR \
+		USART2->DR
+#endif
+
 extern "C" void
 USART2_IRQHandler()
 {
-	uint32_t state = USART2->SR;
+
+	uint32_t state = USART2_SR;
 	
 	// Read Data Register not empty 
 	if (state & USART_SR_RXNE)
@@ -107,7 +150,7 @@ USART2_IRQHandler()
 		// error |= USART2_STATUS & (USART_FERR_bm | USART_BUFOVF_bm | USART_PERR_bm);
 		
 		// Then read the buffer (read from DR clears the RXNE flag)
-		uint8_t data = USART2->DR;
+		uint8_t data = USART2_RDR;
 		
 		rxBuffer.push(data);
 	}
@@ -123,7 +166,7 @@ USART2_IRQHandler()
 		else {
 			// get one byte from buffer and write it to the UART buffer
 			// which starts the transmission
-			USART2->DR = txBuffer.get();
+			USART2_TDR = txBuffer.get();
 			txBuffer.pop();
 		}
 	}

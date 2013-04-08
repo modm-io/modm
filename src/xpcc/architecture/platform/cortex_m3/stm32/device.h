@@ -40,20 +40,37 @@
 #if !defined(STM32F4XX) && !defined(STM32F2XX) && \
 	!defined(STM32F10X_CL) && \
 	!defined(STM32F10X_LD) && !defined(STM32F10X_MD) && !defined(STM32F10X_HD) && !defined(STM32F10X_XL) && \
-	!defined(STM32F10X_LD_VL) && !defined(STM32F10X_MD_VL) && !defined (STM32F10X_HD_VL) 
+	!defined(STM32F10X_LD_VL) && !defined(STM32F10X_MD_VL) && !defined (STM32F10X_HD_VL) && \
+	!defined(STM32F30X)
 #	error "Please select the target STM32F??X device used in your application (in the stm32f??x.h file)"
 #endif
 
-#if defined(STM32F2XX)
+#if defined(STM32F10X_CL)    || \
+	defined(STM32F10X_LD)    || \
+	defined(STM32F10X_MD)    || \
+	defined(STM32F10X_HD)    || \
+	defined(STM32F10X_XL)    || \
+	defined(STM32F10X_LD_VL) || \
+	defined(STM32F10X_MD_VL) || \
+	defined(STM32F10X_HD_VL)
+#	include <stm32f10x.h>
+#elif defined(STM32F2XX)
 #	include <stm32f2xx.h>
+#elif defined(STM32F30X)
+#	include <stm32f30x.h>
 #elif defined(STM32F4XX)
 #	include <stm32f4xx.h>
 #else
-#	include <stm32f10x.h>
+#error "Please be more specific here."
 #endif
 
 /**
  * \defgroup	stm32f1		STM32F10x
+ * \ingroup		stm32
+ */
+
+/**
+ * \defgroup	stm32f3		STM32F3xx
  * \ingroup		stm32
  */
 

@@ -2,9 +2,13 @@
 {%- macro excludeDeclarationsStart(id) -%}
 {%- if id == 6 %}
 #if defined(STM32F2XX) || defined(STM32F4XX)
-{% elif id in [4, 5] -%}
+{% elif id == 5 -%}
 #if defined(STM32F10X_HD) || defined(STM32F10X_XL) || defined(STM32F10X_CL) || \
-	defined(STM32F2XX) || defined(STM32F4XX)
+	defined(STM32F2XX) || defined(STM32F3XXV) || defined(STM32F4XX)
+// only devices with 100 pins have Port D and therefore UART5
+{% elif id == 4 -%}
+#if defined(STM32F10X_HD) || defined(STM32F10X_XL) || defined(STM32F10X_CL) || \
+	defined(STM32F2XX) || defined(STM32F3XX) || defined(STM32F4XX)
 {%- endif %}
 {%- endmacro -%}
 
@@ -29,6 +33,15 @@ namespace
 	
 	GPIO__OUTPUT(TxdD5, D, 5);
 	GPIO__INPUT(RxdD6, D, 6);
+
+#if defined(STM32F3XX)
+	GPIO__OUTPUT(TxdA14, A, 14);
+	GPIO__INPUT(RxdA15, A, 15);
+
+	GPIO__OUTPUT(TxdB3, B, 3);
+	GPIO__INPUT(RxdB4, B, 4);
+#endif
+
 	{%- elif id == 3 -%}
 	GPIO__OUTPUT(TxdB10, B, 10);
 	GPIO__INPUT(RxdB11, B, 11);
@@ -45,8 +58,10 @@ namespace
 	GPIO__OUTPUT(TxdG14, G, 14);
 	GPIO__INPUT(RxdG9, G, 9);
 	{%- elif id == 4 -%}
+#if defined(STM32F2XX) || defined(STM32F4XX)
 	GPIO__OUTPUT(TxdA0, A, 0);
 	GPIO__INPUT(RxdA1, A, 1);
+#endif
 	
 	GPIO__OUTPUT(TxdC10, C, 10);
 	GPIO__INPUT(RxdC11, C, 11);
@@ -93,8 +108,12 @@ xpcc::stm32::{{ className }}{{ id }}::configurePins(Mapping mapping)
 	RCC->APB1ENR |= RCC_APB1ENR_UART{{ id }}EN;
 	
 	// Initialize IO pins
-#if defined(STM32F2XX) || defined(STM32F4XX)
+#if defined(STM32F2XX) || defined(STM32F3XX) || defined(STM32F4XX)
 	{% if id == 4 -%}
+#if defined(STM32F3XX)
+	TxdC10::setAlternateFunction(AF_UART4, xpcc::stm32::PUSH_PULL);
+	RxdC11::setAlternateFunction(AF_UART4);
+#else
 	if (mapping == REMAP_PA0_PA1) {
 		TxdA0::setAlternateFunction(AF_UART4, xpcc::stm32::PUSH_PULL);
 		RxdA1::setAlternateFunction(AF_UART4);
@@ -103,6 +122,7 @@ xpcc::stm32::{{ className }}{{ id }}::configurePins(Mapping mapping)
 		TxdC10::setAlternateFunction(AF_UART4, xpcc::stm32::PUSH_PULL);
 		RxdC11::setAlternateFunction(AF_UART4);
 	}
+#endif
 	{%- elif id == 5 -%}
 	(void) mapping;		// avoid compiler warning
 	
@@ -135,7 +155,7 @@ xpcc::stm32::{{ className }}{{ id }}::configurePins(Mapping mapping)
 	{%- endif %}
 	
 	// Initialize IO pins
-#if defined(STM32F2XX) || defined(STM32F4XX)
+#if defined(STM32F2XX) || defined(STM32F3XX) || defined(STM32F4XX)
 	{% if id == 1 -%}
 	if (mapping == REMAP_PA9_PA10) {
 		TxdA9::setAlternateFunction(AF_USART1, xpcc::stm32::PUSH_PULL);
@@ -150,6 +170,16 @@ xpcc::stm32::{{ className }}{{ id }}::configurePins(Mapping mapping)
 		TxdA2::setAlternateFunction(AF_USART2, xpcc::stm32::PUSH_PULL);
 		RxdA3::setAlternateFunction(AF_USART2);
 	}
+#if defined(STM32F3XX)
+	else if(mapping == REMAP_PA14_PA15) {
+		TxdA14::setAlternateFunction(AF_USART2, xpcc::stm32::PUSH_PULL);
+		RxdA15::setAlternateFunction(AF_USART2);
+	}
+	else if(mapping == REMAP_PB3_PB4) {
+		TxdB3::setAlternateFunction(AF_USART2, xpcc::stm32::PUSH_PULL);
+		RxdB4::setAlternateFunction(AF_USART2);
+	}
+#endif
 	else {
 		TxdD5::setAlternateFunction(AF_USART2, xpcc::stm32::PUSH_PULL);
 		RxdD6::setAlternateFunction(AF_USART2);
@@ -177,7 +207,8 @@ xpcc::stm32::{{ className }}{{ id }}::configurePins(Mapping mapping)
 		RxdG9::setAlternateFunction(AF_USART6);
 	}
 	{%- endif %}
-#else
+#elif defined(STM32F10X) || defined(STM32F10X_HD) || defined(STM32F10X_XL) \
+	|| defined(STM32F10X_CL)
 	AFIO->MAPR = (AFIO->MAPR & ~AFIO_MAPR_USART{{ id }}_REMAP) | mapping;
 	{% if id == 1 -%}
 	if (mapping == REMAP_PA9_PA10) {
@@ -211,6 +242,8 @@ xpcc::stm32::{{ className }}{{ id }}::configurePins(Mapping mapping)
 		RxdD9::setInput();
 	}
 	{%- endif %}
+#else
+#  error "Unknown CPU Type. Please define STM32F10X_.., STM32F2XX, STM32F3XX or STM32F4XX"
 #endif
 }
 {%- endmacro -%}
@@ -225,6 +258,9 @@ xpcc::stm32::{{ className }}{{ id }}::setBaudrate(uint32_t baudrate)
 	{%- elif id in [2, 3] -%}
 	RCC->APB1ENR |= RCC_APB1ENR_USART{{ id }}EN;
 	{%- elif id in [4, 5] -%}
+	// FIXME: there seems to be a bug in the stm32f3xxlib which does not provide
+	//        the necessary RCC_APB1ENR_UART5EN define and probably defines
+	//        RCC_APB1ENR_UART4EN incorrectly (0x00100000 instead of 0x00080000)
 	RCC->APB1ENR |= RCC_APB1ENR_UART{{ id }}EN;
 	{%- endif %}
 	
@@ -246,11 +282,19 @@ xpcc::stm32::{{ className }}{{ id }}::setBaudrate(uint32_t baudrate)
 void
 xpcc::stm32::{{ className }}{{ id }}::write(uint8_t data)
 {
+#if defined(STM32F3XX)
+	while (!({{ moduleName }}{{ id }}->ISR & USART_ISR_TXE)) {
+		// wait until the data register becomes empty
+	}
+
+	{{ moduleName }}{{ id }}->TDR = data;
+#else
 	while (!({{ moduleName }}{{ id }}->SR & USART_SR_TXE)) {
 		// wait until the data register becomes empty
 	}
 	
 	{{ moduleName }}{{ id }}->DR = data;
+#endif
 }
 {%- endmacro -%}
 
@@ -268,12 +312,19 @@ xpcc::stm32::{{ className }}{{ id }}::write(const uint8_t *s, uint8_t n)
 bool
 xpcc::stm32::{{ className }}{{ id }}::read(uint8_t& c)
 {
+#if defined(STM32F3XX)
+	if ({{ moduleName }}{{ id }}->ISR & USART_ISR_RXNE)
+	{
+		c = {{ moduleName }}{{ id }}->RDR;
+		return true;
+	}
+#else
 	if ({{ moduleName }}{{ id }}->SR & USART_SR_RXNE)
 	{
 		c = {{ moduleName }}{{ id }}->DR;
 		return true;
 	}
-	
+#endif
 	return false;
 }
 {%- endmacro -%}

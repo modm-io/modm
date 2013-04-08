@@ -28,9 +28,18 @@
  */
 // ----------------------------------------------------------------------------
 
+#include "../gpio.hpp"
+#include "../device.h"
+
 #include "adc_2.hpp"
 
+#include <xpcc_config.hpp>
+#include <xpcc/architecture/driver/delay.hpp>	// xpcc::delay_us
+
 using namespace xpcc::stm32;
+
+
+#if defined(STM32F4XX) || defined(STM32F2XX) || defined(STM32F10X)
 
 // ----------------------------------------------------------------------------
 void
@@ -45,7 +54,13 @@ Adc2::setChannel(const Channels channel, const SampleTime sampleTime)
 	else {
 		ADC2->SMPR1 |= sampleTime << ((static_cast<uint8_t>(channel)-10) * 3);
 	}
-
+	/*
+	 * FIXME: Setting Pins to analog mode based on the channel isn't really
+	 * a great idea as long as we do not take package size into consideration.
+	 * To quote STM32F302_3xx datasheet page 40:
+	 * "the GPIO pins which are not present on these packages, must
+	 *  not be configured in analog mode."
+	 */
 #if defined(STM32F2XX) || defined(STM32F4XX) 
 	if (channel < 8)
 	{
@@ -140,3 +155,48 @@ Adc2::enableInterrupt(const Interrupt interrupt, const uint32_t priority)
 	}
 }
 
+#elif defined(STM32F3XX)
+/* id < 4 */
+
+
+void
+Adc2::initialize(const ClockMode clk, const Prescaler pre,
+		const CalibrationMode cal, const bool blocking)
+{
+	uint32_t tmp = 0;
+
+	// enable clock
+	RCC->AHBENR |= RCC_AHBENR_ADC12EN;
+
+	// reset ADC
+	// FIXME: not a good idea since you can only reset both
+	// ADC1/ADC2 or ADC3/ADC4 at once ....
+	// RCC->APB2RSTR |=  RCC_APB2RSTR_ADC2RST;
+	// RCC->APB2RSTR &= ~RCC_APB2RSTR_ADC2RST;
+
+	// set ADC "analog" clock source
+	if (clk != ClockMode::DoNotChange) {
+		if (clk == ClockMode::Asynchronous) {
+			setPrescaler(pre);
+		}
+		tmp  =  ADC1_2->CCR;
+		tmp &= ~ADC12_CCR_CKMODE;
+		tmp |=  static_cast<uint32_t>(clk);
+		ADC1_2->CCR = tmp;
+	}
+
+	// enable regulator
+	ADC2->CR &= ~ADC_CR_ADVREGEN;
+	ADC2->CR |= static_cast<uint32_t>(VoltageRegulatorState::Enabled);
+	xpcc::delay_us(10);	// FIXME: this is ugly -> find better solution
+
+	calibrate(cal, true);	// blocking calibration
+
+	ADC2->CR |= ADC_CR_ADEN;
+	if (blocking) {
+		while(!isReady());
+		resetInterruptFlags(InterruptFlag::Ready);
+	}
+}
+
+#endif
