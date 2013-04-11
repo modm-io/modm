@@ -213,7 +213,6 @@ namespace xpcc
 		// calculated in getTemperature, needed for getPressure
 		int32_t b5;
 	};
-	
 }
 
 #include "bmp085_impl.hpp"
