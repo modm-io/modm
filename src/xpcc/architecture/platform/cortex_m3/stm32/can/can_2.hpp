@@ -78,12 +78,14 @@ namespace xpcc
 		public:
 			enum Mapping
 			{
-#if defined(STM32F2XX) || defined(STM32F4XX)
+#if defined(STM32F2XX) || defined(STM32F3XX) || defined(STM32F4XX)
 				REMAP_PB12_PB13,		///< CAN2RX mapped to PB12, CAN2TX mapped to PB13
 				REMAP_PB5_PB6,			///< CAN2RX mapped to PB5,  CAN2TX mapped to PB6
-#else
+#elif defined(STM32F10X)
 				REMAP_PB12_PB13 = 0,							///< CAN2RX mapped to PB12, CAN2TX mapped to PB13
 				REMAP_PB5_PB6 = AFIO_MAPR_CAN2_REMAP,			///< CAN2RX mapped to PB5,  CAN2TX mapped to PB6
+#else 
+#error "Please be more specific about the processor here"
 #endif
 			};
 			
