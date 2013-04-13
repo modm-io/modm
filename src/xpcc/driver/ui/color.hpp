@@ -33,38 +33,27 @@
 
 #include <stdint.h>
 #include <xpcc/io/iostream.hpp>
+#include <xpcc/utils/arithmetic_traits.hpp>
+#include <algorithm>
 
 namespace xpcc
 {
 	namespace color
 	{
-		class Rgb
-		{
-		public:
-			uint8_t red;
-			uint8_t green;
-			uint8_t blue;
-		};
 
-		class Hsv
-		{
-		public:
-			void
-			toRgb(Rgb* color);
+		template<typename T>
+		class HsvT;
 
-			uint8_t hue;
-			uint8_t saturation;
-			uint8_t value;
-		};
+		template<typename T>
+		class RgbT;
 
-		template<typename UnderlyingType = uint8_t>
-		class Rgba
+		template<class UnderlyingType = uint8_t>
+		class RgbT
 		{
 		public:
 			UnderlyingType red;
 			UnderlyingType green;
 			UnderlyingType blue;
-			UnderlyingType alpha;
 
 			template<typename IntermediateType__ = float, unsigned int multiplier__ = 100, typename ReturnType__ = UnderlyingType>
 			inline ReturnType__ getRelative(const UnderlyingType color) const
@@ -72,7 +61,7 @@ namespace xpcc
 				return static_cast<ReturnType__>(
 						(static_cast<IntermediateType__>(color) *
 						static_cast<IntermediateType__>(multiplier__)) /
-						static_cast<IntermediateType__>(alpha));
+						static_cast<IntermediateType__>(red + green + blue));
 			}
 
 			template<typename IntermediateType_ = float, unsigned int multiplier_ = 100, typename ReturnType_ = UnderlyingType>
@@ -94,33 +83,103 @@ namespace xpcc
 			}
 
 			template<typename IntermediateType = float, unsigned int multiplier = 100, typename ReturnType = UnderlyingType>
-			inline Rgba<ReturnType> getRelativeColors() const
+			inline RgbT<ReturnType> getRelativeColors() const
 			{
 				return {
 					getRelativeRed	<IntermediateType, multiplier, ReturnType>(),
 					getRelativeGreen<IntermediateType, multiplier, ReturnType>(),
-					getRelativeBlue	<IntermediateType, multiplier, ReturnType>(),
-					alpha };
+					getRelativeBlue	<IntermediateType, multiplier, ReturnType>()};
 			}
-private:
+
+			template<typename T> void
+			toHsv(HsvT<T>* color) const;
+
+		private:
 			template<typename T>
 			friend IOStream&
-			operator << ( IOStream& os, const Rgba<T>&);
+			operator << ( IOStream& os, const RgbT<T>&);
 		};
 
+		typedef RgbT<>	Rgb;
+
+		template<class UnderlyingType = uint8_t>
+		class HsvT
+		{
+		public:
+			template<typename T=UnderlyingType>
+			void
+			toRgb(RgbT<T>* color) const;
+
+			UnderlyingType hue;
+			UnderlyingType saturation;
+			UnderlyingType value;
+		};
+
+		typedef HsvT<>	Hsv;
 
 		template <typename UnderlyingType>
-		IOStream& operator << ( IOStream& os, const color::Rgba<UnderlyingType>& color);
+		IOStream& operator << ( IOStream& os, const color::RgbT<UnderlyingType>& color);
 	}
 }
 
 template <typename UnderlyingType>
 xpcc::IOStream&
-xpcc::color::operator << ( xpcc::IOStream& os, const xpcc::color::Rgba<UnderlyingType>& color)
+xpcc::color::operator << ( xpcc::IOStream& os, const xpcc::color::RgbT<UnderlyingType>& color)
 {
-	os << color.red << "\t" << color.green << "\t" << color.blue << "\t" << color.alpha;
+	os << color.red << "\t" << color.green << "\t" << color.blue;
 	return os;
 }
 
+/**
+ * @see http://de.wikipedia.org/wiki/HSV-Farbraum#Umrechnung_RGB_in_HSV.2FHSL
+ * @param color
+ */
+template<typename UnderlyingType> template<typename T>
+inline void xpcc::color::RgbT<UnderlyingType>::toHsv(HsvT<T>* color) const
+{
+	using namespace std;
+	typedef float CalcType;
+	const CalcType maxValue = xpcc::ArithmeticTraits<T>::max();
+	const CalcType _red		= static_cast<CalcType>(red) / maxValue;
+	const CalcType _blue	= static_cast<CalcType>(blue) / maxValue;
+	const CalcType _green	= static_cast<CalcType>(green) / maxValue;
+	const CalcType _max = max(_red, max(_green, _blue));
+	const CalcType _min = min(_red, min(_green, _blue));
+	const CalcType _diff = _max - _min;
+
+	CalcType hue_temp;
+
+	// CALCULATE HUE
+	if(_max == _min) { // all three color values are the same
+		hue_temp = 0;
+		color->value = _max * maxValue;
+	}
+	else if(_max == _red) {
+		hue_temp = 60 * (0 + (_green - _blue)	/ _diff );
+		color->value = red;
+	}
+	else if(_max == _green) {
+		hue_temp = 60 * (2 + (_blue - _red)		/ _diff );
+		color->value = green;
+	}
+	else /*if(_max == _blue)*/ {
+		hue_temp = 60 * (4 + (_red - _green)	/ _diff );
+		color->value = blue;
+	}
+
+	if(hue_temp < 0) {
+		color->hue = (hue_temp + 360	) * (maxValue / 360);
+	}
+	else {
+		color->hue = (hue_temp			) * (maxValue / 360);
+	}
+
+	// CALCULATE SATURATION
+	if(_max == 0) {
+		color->saturation = 0;
+	} else {
+		color->saturation = _diff / _max * maxValue;
+	}
+}
 
 #endif // XPCC__COLOR_HPP
