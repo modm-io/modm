@@ -239,6 +239,7 @@ public class MetaPackets
 {%- endfor %}
 
 
+	@SuppressWarnings("unchecked")
 	public static <T extends Packets.Packet> Packet<T> getMetaPacket(Class<T> packetType) {
 		if (packetType == Packets.Void.class)
 			return (Packet<T>)Void;
