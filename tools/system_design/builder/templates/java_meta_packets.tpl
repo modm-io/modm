@@ -231,7 +231,16 @@ public class MetaPackets
 
 		@Override
 		public Packets.Packet[] getValues(Packets.{{ packet.name | typeObjectName }} packet) {
-			return new Packets.Packet[]{packet};
+			if (packet == null)
+				throw new NullPointerException();
+		
+			return new Packets.Packet[]{
+			{%- if packet.subtype.type.isBuiltIn or packet.subtype.type.name == 'Bool' %}
+				new Packets.{{ packet.subtype.name | typeObjectName }} (packet.value)
+			{%- else %}
+				packet.value
+			{%- endif %}
+			};
 		}
 	};
 	{%- endif %}
