@@ -122,6 +122,14 @@ namespace xpcc
 }
 
 /**
+ * \brief	Turn off messages print
+ * \ingroup logger
+ */
+#define XPCC_LOG_OFF \
+	if ( false )	\
+		xpcc::log::debug
+
+/**
  * \brief	Output stream for debug messages
  * \ingroup logger
  */
