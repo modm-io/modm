@@ -111,6 +111,8 @@ xpcc::stm32::{{ className }}{{ id }}::configurePins(Mapping mapping)
 #if defined(STM32F2XX) || defined(STM32F3XX) || defined(STM32F4XX)
 	{% if id == 4 -%}
 #if defined(STM32F3XX)
+	(void) mapping;		// avoid compiler warning
+
 	TxdC10::setAlternateFunction(AF_UART4, xpcc::stm32::PUSH_PULL);
 	RxdC11::setAlternateFunction(AF_UART4);
 #else
