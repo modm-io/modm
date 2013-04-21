@@ -122,6 +122,10 @@ class Enum(BaseType):
 			if not re.match("^[0-9A-Z_]*$", self.name):
 				raise ParserException("Attribute name of element in enum has to be UPPER_UNDERSCORE_STYLE (found: '%s')" % (self.name))
 			
+			self.string = node.get('string')
+			if self.string is None:
+				self.string = self.name
+				
 			self.description = xml_utils.get_description(node)
 			self.string = xml_utils.get_string(node)
 			
