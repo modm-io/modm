@@ -23,12 +23,16 @@ in your local _SConstruct_ file:
 Your debug config for OpenOCD should look like this:
 
 
-	source [find interface/stlink-v2.cfg]		# programmer
-	source [find target/stm32f3x_stlink.cfg]	# target
+	# programmer
+	source [find interface/stlink-v2.cfg]
+	# target
+	source [find target/stm32f3x_stlink.cfg]
 	reset_config srst_only
-	gdb_port 1324								# gdb port
+	# gdb port
+	gdb_port 1324
 	init
-	halt	# halt device when openocd is started
+	# halt device when openocd is started
+	halt
 
 ## Start Debugging
 
