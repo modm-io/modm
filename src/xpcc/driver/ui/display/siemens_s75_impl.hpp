@@ -47,7 +47,7 @@ xpcc::SiemensS75Common<MEMORY, RESET, WIDTH, HEIGHT, ORIENTATION>::update()
 	case xpcc::Orientation::LandscapeRight:
 	{
 		// Set CGRAM Address to height - 1 = upper left corner
-		MEMORY::writeCommand(0x21, 131);
+		MEMORY::writeCommand(0x21, 0xAF00);
 		// size of the XPCC Display buffer, not the hardware pixels
 		width  = 176;
 		height = 136 / 8; // Display is only 132 pixels high.

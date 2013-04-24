@@ -154,6 +154,8 @@ namespace xpcc
 	class GraphicDisplay : public IOStream
 	{
 	public:
+		friend class VirtualGraphicDisplay;
+
 		GraphicDisplay();
 		
 		virtual
