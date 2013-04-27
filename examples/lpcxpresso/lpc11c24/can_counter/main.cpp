@@ -53,8 +53,8 @@ main(void)
 	rot::reset();
 	gelb::reset();
 	blau::reset();
-	gruen::reset();
-	weiss::set();
+	gruen::set();
+	weiss::reset();
 
 	// ----------------------------------------
 	// Initialize UART
@@ -70,15 +70,21 @@ main(void)
 	xpcc::can::Message message;
 	xpcc::lpc::Can::initialize(xpcc::can::BITRATE_125_KBPS);
 
+	// allow all messages to be received
+	xpcc::lpc11c::CanFilter::setFilter(
+			xpcc::lpc11c::CanFilter::ExtendedIdentifier(0),
+			xpcc::lpc11c::CanFilter::ExtendedFilterMask(0),
+			0, 4);
 
 	XPCC_LOG_INFO << "CAN Counter Alpha 0.1" << xpcc::endl;
 
+	uint32_t msg_counter = 0;
+	uint32_t msg_counter_win_start = 0; // start of 10 ms window
+	uint32_t msg_counter_max_win = 0;   // max messages in 10 ms window
+	uint32_t loop_counter = 0;
+
 	while (1)
 	{
-		static uint32_t msg_counter = 0;
-		static uint32_t msg_counter_win_start = 0; // start of 10 ms window
-		static uint32_t msg_counter_max_win = 0;   // max messages in 10 ms window
-
 		if (xpcc::lpc::Can::isMessageAvailable()) {
 			++msg_counter;
 			xpcc::lpc::Can::getMessage(message);	// dummy read
@@ -92,12 +98,16 @@ main(void)
 		}
 
 		if(sendTimer.isExpired()) {
+			XPCC_LOG_INFO << xpcc::endl << "------------------------ " << loop_counter << xpcc::endl;
 			XPCC_LOG_INFO << msg_counter << "msg/sec" << xpcc::endl;
 			XPCC_LOG_INFO << "10ms peak window:" << xpcc::endl;
 			XPCC_LOG_INFO << msg_counter_max_win << "msg/10msec" << xpcc::endl;
+
 			msg_counter = 0;
 			msg_counter_win_start = 0;
 			msg_counter_max_win = 0;
+			gelb::toggle();
+			loop_counter++;
 		}
 	}
 }
