@@ -82,7 +82,7 @@ if (XPCC_LOG_LEVEL <= xpcc::log::DEBUG)
    Call of xpcc::Logger::operator << (T) (with T = int32_t) which is inline
    - IOStream::operator << (T) (with T = int32_t) is inline
    - IOStream::writeInteger(int32_t)
--# IOStream::writeInteger(int32_t) will create the formated string via snprintf()
+-# IOStream::writeInteger(int32_t) will create the formatted string via snprintf()
 -# virtual call of IODevice::write(const char*)
 -# redirect to std::cout
 

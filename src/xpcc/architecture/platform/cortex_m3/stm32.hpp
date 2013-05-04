@@ -41,6 +41,7 @@
  *   - Connectivity line STM32F105/107 - 72 MHz CPU with Ethernet MAC, CAN
  *     and USB 2.0 OTG
  * - TODO: STM32 F2 series of high-performance MCUs
+ * - TODO: STM32 F3 series of high-performance MCUs with DSP and FPU instructions and analog peripherals
  * - TODO: STM32 F4 series of high-performance MCUs with DSP and FPU instructions
  *
  * Defines:
@@ -56,34 +57,81 @@
  * The Value line (STM32F100-102) is not supported!
  */
 
+/*
+ * Common to all STM32 processors.
+ */
+
 #include "stm32/device.h"
 
 #include "stm32/core.hpp"
 #include "stm32/gpio.hpp"
 #include "stm32/clock.hpp"
 
-#include "stm32/exti.hpp"
 
-#include "stm32/fsmc.hpp"
+/**
+ * Specific hardware for different processors.
+ */
 
+
+
+
+/**
+ * CAN Controller
+ */
+
+// CAN1
+#if defined(STM32F10X) || defined(STM32F3XX) || defined(STM32F2XX) || defined(STM32F4XX)
 #include "stm32/can/can_1.hpp"
-#include "stm32/can/can_2.hpp"
 #include "stm32/can/can_filter.hpp"
+#endif
 
+// CAN2
+#if defined(STM32F10X) || defined(STM32F2XX) || defined(STM32F4XX)
+#include "stm32/can/can_2.hpp"
+#endif
+
+// External Interrupt only tested on STM32F4XX
+#if defined(STM32F4XX)
+#include "stm32/exti.hpp"
+#endif
+
+// HW drivers enabled for all supported STM32 series
+#if defined(STM32F10X) || defined(STM32F2XX) || defined(STM32F3XX) \
+	|| defined(STM32F4XX)
 #include "stm32/uart/usart_1.hpp"
 #include "stm32/uart/usart_2.hpp"
 #include "stm32/uart/usart_3.hpp"
 #include "stm32/uart/uart_4.hpp"
 #include "stm32/uart/uart_5.hpp"
+#include "stm32/adc/adc_1.hpp"
+#include "stm32/adc/adc_2.hpp"
+#include "stm32/adc/adc_3.hpp"
+#endif
+
+// COMP1-7 and ADC4 only available on STM32F3 series
+#if defined(STM32F3XX)
+#include "stm32/comp/comp_1.hpp"
+#include "stm32/comp/comp_2.hpp"
+#include "stm32/comp/comp_3.hpp"
+#include "stm32/comp/comp_4.hpp"
+#include "stm32/comp/comp_5.hpp"
+#include "stm32/comp/comp_6.hpp"
+#include "stm32/comp/comp_7.hpp"
+#include "stm32/adc/adc_4.hpp"
+#endif
+
+
+// Other hardware, not yet implemented for F3
+#if defined(STM32F10X) || defined(STM32F2XX) || defined(STM32F4XX)
+#include "stm32/fsmc.hpp"
+
 #include "stm32/uart/usart_6.hpp"
 
 #include "stm32/spi/spi_1.hpp"
 #include "stm32/spi/spi_2.hpp"
 #include "stm32/spi/spi_3.hpp"
 
-#include "stm32/adc/adc_1.hpp"
-#include "stm32/adc/adc_2.hpp"
-#include "stm32/adc/adc_3.hpp"
+
 
 #include "stm32/i2c/i2c_master_1.hpp"
 #include "stm32/i2c/i2c_master_2.hpp"
@@ -91,3 +139,5 @@
 
 #include "stm32/systick_timer.hpp"
 #include "stm32/timer.hpp"
+
+#endif

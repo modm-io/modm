@@ -72,6 +72,7 @@ namespace xpcc
 			start()
 			{
 				isPulsing = true;
+				isCounting = false;
 			}
 			
 			/// Stops pulsing after finishing the current cycle
@@ -79,6 +80,12 @@ namespace xpcc
 			stop()
 			{
 				isPulsing = false;
+			}
+			
+			ALWAYS_INLINE bool
+			isRunning()
+			{
+				return isPulsing;
 			}
 			
 			/// Pulses a number of times and then stops

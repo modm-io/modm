@@ -62,9 +62,13 @@ namespace xpcc
 			
 			enum Mapping
 			{
-#if defined(STM32F2XX) || defined(STM32F4XX)
+#if defined(STM32F2XX) || defined(STM32F3XX) || defined(STM32F4XX)
 				REMAP_PA2_PA3,		///< TX mapped to PA2, RX mapped to PA3 (CTS/PA0, RTS/PA1, CK/PA4)
 				REMAP_PD5_PD6,		///< TX mapped to PD5, RX mapped to PD6 (CTS/PD3, RTS/PD4, CK/PD7)
+#if defined (STM32F3XX)
+				REMAP_PA14_PA15,	///< TX mapped to PA14, RX mapped to PA15
+				REMAP_PB3_PB4,		///< TX mapped to PB3, RX mapped to PB4 (CK/PB5)
+#endif
 #else
 				REMAP_PA2_PA3 = 0,						///< TX mapped to PA2, RX mapped to PA3 (CTS/PA0, RTS/PA1, CK/PA4)
 				REMAP_PD5_PD6 = AFIO_MAPR_USART2_REMAP,	///< TX mapped to PD5, RX mapped to PD6 (CTS/PD3, RTS/PD4, CK/PD7)
@@ -159,9 +163,13 @@ namespace xpcc
 			
 			enum Mapping
 			{
-#if defined(STM32F2XX) || defined(STM32F4XX)
+#if defined(STM32F2XX) || defined(STM32F3XX) || defined(STM32F4XX)
 				REMAP_PA2_PA3,		///< TX mapped to PA2, RX mapped to PA3 (CTS/PA0, RTS/PA1, CK/PA4)
 				REMAP_PD5_PD6,		///< TX mapped to PD5, RX mapped to PD6 (CTS/PD3, RTS/PD4, CK/PD7)
+#if defined (STM32F3XX)
+				REMAP_PA14_PA15,	///< TX mapped to PA14, RX mapped to PA15
+				REMAP_PB3_PB4,		///< TX mapped to PB3, RX mapped to PB4 (CK/PB5)
+#endif
 #else
 				REMAP_PA2_PA3 = 0,						///< TX mapped to PA2, RX mapped to PA3 (CTS/PA0, RTS/PA1, CK/PA4)
 				REMAP_PD5_PD6 = AFIO_MAPR_USART2_REMAP,	///< TX mapped to PD5, RX mapped to PD6 (CTS/PD3, RTS/PD4, CK/PD7)
@@ -275,9 +283,13 @@ namespace xpcc
 			
 			enum Mapping
 			{
-#if defined(STM32F2XX) || defined(STM32F4XX)
+#if defined(STM32F2XX) || defined(STM32F3XX) || defined(STM32F4XX)
 				REMAP_PA2_PA3,		///< TX mapped to PA2, RX mapped to PA3 (CTS/PA0, RTS/PA1, CK/PA4)
 				REMAP_PD5_PD6,		///< TX mapped to PD5, RX mapped to PD6 (CTS/PD3, RTS/PD4, CK/PD7)
+#if defined (STM32F3XX)
+				REMAP_PA14_PA15,	///< TX mapped to PA14, RX mapped to PA15
+				REMAP_PB3_PB4,		///< TX mapped to PB3, RX mapped to PB4 (CK/PB5)
+#endif
 #else
 				REMAP_PA2_PA3 = 0,						///< TX mapped to PA2, RX mapped to PA3 (CTS/PA0, RTS/PA1, CK/PA4)
 				REMAP_PD5_PD6 = AFIO_MAPR_USART2_REMAP,	///< TX mapped to PD5, RX mapped to PD6 (CTS/PD3, RTS/PD4, CK/PD7)
@@ -355,8 +367,6 @@ namespace xpcc
 		/**
 		 * \brief		USART2 in SPI master mode
 		 * 
-		 * FIXME currently not working!
-		 * 
 		 * \ingroup		stm32
 		 */
 		class UsartSpi2 : public UartBase
@@ -399,7 +409,7 @@ namespace xpcc
 				REMAP_PD7,
 			};
 			
-			ALWAYS_INLINE void
+			ALWAYS_INLINE static void
 			configureTxPin(MappingTx mapping)
 			{
 				switch (mapping) {
@@ -408,7 +418,7 @@ namespace xpcc
 				}
 			}
 			
-			ALWAYS_INLINE void
+			ALWAYS_INLINE static void
 			configureRxPin(MappingRx mapping)
 			{
 				switch (mapping) {
@@ -417,7 +427,7 @@ namespace xpcc
 				}
 			}
 			
-			ALWAYS_INLINE void
+			ALWAYS_INLINE static void
 			configureCkPin(MappingCk mapping)
 			{
 				switch (mapping) {
@@ -427,9 +437,21 @@ namespace xpcc
 			}
 			
 			/**
-			 * Constructor
+			 * @brief	Initialize module in syncronous mode (SPI)
+			 * 
+			 * The bitrate is calculated in the same manner as for the
+			 * asynchronous mode and is limited.
+			 * 
+			 * @param	bitrate		Desired Frequency of the SPI clock.
+			 * @param	mode		Select the Spi Mode. Default is MODE_0.
+			 * @param	over8		Using over8 sets the Oversampling down from 16
+			 * 			to 8 hovewer in SPI Mode this should have effect on
+			 * 			sample and hold type only, since Data are sampled
+			 * 			at clock edges. Benefit of over8 is a doubled maximal
+			 * 			bitrate.
 			 */
-			UsartSpi2(uint32_t bitrate, Mode mode = MODE_0);
+			static void
+			initialize(uint32_t bitrate, Mode mode = MODE_0, bool over8 = false);
 			
 			/**
 			 * Transfer byte.

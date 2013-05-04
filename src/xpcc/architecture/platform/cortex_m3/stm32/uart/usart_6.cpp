@@ -51,7 +51,9 @@ namespace
 	
 	GPIO__OUTPUT(TxdG14, G, 14);
 	GPIO__INPUT(RxdG9, G, 9);
-	
+}
+namespace
+{
 	static const uint32_t apbClk = STM32_APB2_FREQUENCY;	// APB2
 }
 
@@ -63,7 +65,7 @@ xpcc::stm32::Usart6::configurePins(Mapping mapping)
 	RCC->APB2ENR |= RCC_APB2ENR_USART6EN;
 	
 	// Initialize IO pins
-#if defined(STM32F2XX) || defined(STM32F4XX)
+#if defined(STM32F2XX) || defined(STM32F3XX) || defined(STM32F4XX)
 	if (mapping == REMAP_PC6_PC7) {
 		TxdC6::setAlternateFunction(AF_USART6, xpcc::stm32::PUSH_PULL);
 		RxdC7::setAlternateFunction(AF_USART6);
@@ -72,9 +74,12 @@ xpcc::stm32::Usart6::configurePins(Mapping mapping)
 		TxdG14::setAlternateFunction(AF_USART6, xpcc::stm32::PUSH_PULL);
 		RxdG9::setAlternateFunction(AF_USART6);
 	}
-#else
+#elif defined(STM32F10X) || defined(STM32F10X_HD) || defined(STM32F10X_XL) \
+	|| defined(STM32F10X_CL)
 	AFIO->MAPR = (AFIO->MAPR & ~AFIO_MAPR_USART6_REMAP) | mapping;
 	
+#else
+#  error "Unknown CPU Type. Please define STM32F10X_.., STM32F2XX, STM32F3XX or STM32F4XX"
 #endif
 }
 
@@ -102,11 +107,19 @@ xpcc::stm32::Usart6::setBaudrate(uint32_t baudrate)
 void
 xpcc::stm32::Usart6::write(uint8_t data)
 {
+#if defined(STM32F3XX)
+	while (!(USART6->ISR & USART_ISR_TXE)) {
+		// wait until the data register becomes empty
+	}
+
+	USART6->TDR = data;
+#else
 	while (!(USART6->SR & USART_SR_TXE)) {
 		// wait until the data register becomes empty
 	}
 	
 	USART6->DR = data;
+#endif
 }
 
 // ----------------------------------------------------------------------------
@@ -122,12 +135,19 @@ xpcc::stm32::Usart6::write(const uint8_t *s, uint8_t n)
 bool
 xpcc::stm32::Usart6::read(uint8_t& c)
 {
+#if defined(STM32F3XX)
+	if (USART6->ISR & USART_ISR_RXNE)
+	{
+		c = USART6->RDR;
+		return true;
+	}
+#else
 	if (USART6->SR & USART_SR_RXNE)
 	{
 		c = USART6->DR;
 		return true;
 	}
-	
+#endif
 	return false;
 }
 

@@ -49,7 +49,7 @@
     (UART4_CTS_PORT != -1) */
 
 #if defined(STM32F10X_HD) || defined(STM32F10X_XL) || defined(STM32F10X_CL) || \
-	defined(STM32F2XX) || defined(STM32F4XX)
+	defined(STM32F2XX) || defined(STM32F3XX) || defined(STM32F4XX)
 
 namespace
 {
@@ -61,12 +61,16 @@ namespace
 
 namespace
 {
+	#if defined(STM32F2XX) || defined(STM32F4XX)
 	GPIO__OUTPUT(TxdA0, A, 0);
 	GPIO__INPUT(RxdA1, A, 1);
+#endif
 	
 	GPIO__OUTPUT(TxdC10, C, 10);
 	GPIO__INPUT(RxdC11, C, 11);
-	
+}
+namespace
+{
 	static const uint32_t apbClk = STM32_APB1_FREQUENCY;	// APB1
 }
 
@@ -84,7 +88,11 @@ xpcc::stm32::BufferedFlowUart4::configurePins(Mapping mapping)
 	RCC->APB1ENR |= RCC_APB1ENR_UART4EN;
 	
 	// Initialize IO pins
-#if defined(STM32F2XX) || defined(STM32F4XX)
+#if defined(STM32F2XX) || defined(STM32F3XX) || defined(STM32F4XX)
+	#if defined(STM32F3XX)
+	TxdC10::setAlternateFunction(AF_UART4, xpcc::stm32::PUSH_PULL);
+	RxdC11::setAlternateFunction(AF_UART4);
+#else
 	if (mapping == REMAP_PA0_PA1) {
 		TxdA0::setAlternateFunction(AF_UART4, xpcc::stm32::PUSH_PULL);
 		RxdA1::setAlternateFunction(AF_UART4);
@@ -93,6 +101,7 @@ xpcc::stm32::BufferedFlowUart4::configurePins(Mapping mapping)
 		TxdC10::setAlternateFunction(AF_UART4, xpcc::stm32::PUSH_PULL);
 		RxdC11::setAlternateFunction(AF_UART4);
 	}
+#endif
 #else
 	(void) mapping;		// avoid compiler warning
 	
@@ -102,10 +111,31 @@ xpcc::stm32::BufferedFlowUart4::configurePins(Mapping mapping)
 }
 
 // ----------------------------------------------------------------------------
+#if defined(STM32F3XX)
+	#define USART_SR_RXNE USART_ISR_RXNE
+	#define USART_SR_TXE  USART_ISR_TXE
+
+	// new register names for STM32F3 series
+	#define UART4_SR \
+		UART4->ISR
+	#define UART4_RDR \
+		UART4->RDR
+	#define UART4_TDR \
+		UART4->TDR
+
+#else
+	#define UART4_SR \
+		UART4->SR
+	#define UART4_RDR \
+		UART4->DR
+	#define UART4_TDR \
+		UART4->DR
+#endif
+
 extern "C" void
 UART4_IRQHandler()
 {
-	uint32_t state = UART4->SR;
+	uint32_t state = UART4_SR;
 	
 	// Read Data Register not empty 
 	if (state & USART_SR_RXNE)
@@ -114,7 +144,7 @@ UART4_IRQHandler()
 		// error |= USART4_STATUS & (USART_FERR_bm | USART_BUFOVF_bm | USART_PERR_bm);
 		
 		// Then read the buffer (read from DR clears the RXNE flag)
-		uint8_t data = UART4->DR;
+		uint8_t data = UART4_RDR;
 		
 		if (!rxBuffer.push(data))
 		{
@@ -154,7 +184,7 @@ UART4_IRQHandler()
 				// RTS of remote device low: ready to receive new data.
 				// get one byte from buffer and write it to the UART buffer
 				// which starts the transmission
-				UART4->DR = txBuffer.get();
+				UART4_TDR = txBuffer.get();
 				txBuffer.pop();
 			} // CTS
 		} // txBuffer

@@ -53,7 +53,8 @@
 
 
 #if defined(STM32F10X_LD) || defined(STM32F10X_MD) || \
-	defined(STM32F10X_HD) || defined(STM32F10X_XL)
+	defined(STM32F10X_HD) || defined(STM32F10X_XL) || \
+	defined(STM32F3XX)
 #	define	CAN1_TX_IRQHandler		USB_HP_CAN1_TX_IRQHandler
 #	define	CAN1_RX0_IRQHandler		USB_LP_CAN1_RX0_IRQHandler
 
@@ -250,7 +251,23 @@ xpcc::stm32::Can1::configurePins(Mapping mapping)
 		CanRxA11::setAlternateFunction(AF_CAN1, xpcc::stm32::PULLUP);
 		CanTxA12::setAlternateFunction(AF_CAN1, xpcc::stm32::PUSH_PULL);
 	}
-#else
+#elif defined(STM32F3XX)
+	if (mapping == REMAP_PB8_PB9) {
+		CanRxB8::setAlternateFunction(AF_CAN, xpcc::stm32::PULLUP);
+		CanTxB9::setAlternateFunction(AF_CAN, xpcc::stm32::PUSH_PULL);
+	}
+#if defined(STM32F3XXV)
+	// only devices with 100 pins have Port D
+	else if (mapping == REMAP_PD0_PD1) {
+		CanRxD0::setAlternateFunction(AF_CAN_D, xpcc::stm32::PULLUP);
+		CanTxD1::setAlternateFunction(AF_CAN_D, xpcc::stm32::PUSH_PULL);
+	}
+#endif
+	else {
+		CanRxA11::setAlternateFunction(AF_CAN, xpcc::stm32::PULLUP);
+		CanTxA12::setAlternateFunction(AF_CAN, xpcc::stm32::PUSH_PULL);
+	}
+#elif defined(STM32F10X)
 	AFIO->MAPR = (AFIO->MAPR & ~AFIO_MAPR_CAN_REMAP) | mapping;
 	if (mapping == REMAP_PB8_PB9) {
 		CanRxB8::setInput(xpcc::stm32::PULLUP);
@@ -264,6 +281,8 @@ xpcc::stm32::Can1::configurePins(Mapping mapping)
 		CanRxA11::setInput(xpcc::stm32::PULLUP);
 		CanTxA12::setAlternateFunction(xpcc::stm32::PUSH_PULL);
 	}
+#else
+#error "Please be more specific about the processor. "
 #endif
 }
 
@@ -369,7 +388,7 @@ xpcc::stm32::Can1::initialize(can::Bitrate bitrate,
 		default: prescaler = 16; break;		// 125 kbps
 	}
 	
-#if defined(STM32F10X)
+#if defined(STM32F10X) || defined(STM32F3XX)
 	XPCC__STATIC_ASSERT(STM32_APB1_FREQUENCY == 36000000UL,
 			"Unsupported frequency for APB1 (only 36 MHz)");
 	CAN1->BTR =
@@ -394,7 +413,7 @@ xpcc::stm32::Can1::initialize(can::Bitrate bitrate,
 			((14 - 1) << CAN_BTR_TS1_POS) |		// BS1 Samplepoint
 			(prescaler - 1);
 #else
-#	error "Unknown CPU Type. Please define STM32F10X, STM32F2XX or STM32F4XX"
+#	error "Unknown CPU Type. Please define STM32F10X, STM32F2XX, STM32F3XX or STM32F4XX"
 #endif
 	
 	// Request leave initialization

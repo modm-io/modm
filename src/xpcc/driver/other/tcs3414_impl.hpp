@@ -15,6 +15,9 @@ template<typename I2cMaster>
 typename xpcc::Tcs3414<I2cMaster>::Data xpcc::Tcs3414<I2cMaster>::data;
 
 template<typename I2cMaster>
+typename xpcc::tcs3414::Rgb xpcc::Tcs3414<I2cMaster>::color;
+
+template<typename I2cMaster>
 xpcc::tcs3414::OperationSuccess xpcc::Tcs3414<I2cMaster>::configure(const Gain gain,
 	const Prescaler prescaler, const IntegrationMode mode,
 	const uint8_t time) {

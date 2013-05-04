@@ -40,11 +40,17 @@
 
 #include <xpcc_config.hpp>
 
+namespace
+{
+	static const uint32_t apbClk = STM32_APB1_FREQUENCY;	// APB1
+}
+
 #if defined(STM32F2XX) || defined(STM32F4XX)
 
 // ----------------------------------------------------------------------------
-xpcc::stm32::UsartSpi2::UsartSpi2(
-		uint32_t bitrate, Mode mode)
+void
+xpcc::stm32::UsartSpi2::initialize(
+		uint32_t bitrate, Mode mode, bool over8)
 {
 	// Enable clock
 	RCC->APB1ENR |= RCC_APB1ENR_USART2EN;
@@ -52,7 +58,14 @@ xpcc::stm32::UsartSpi2::UsartSpi2(
 	USART2->CR1 = 0;
 	
 	// Set baudrate
-	USART2->BRR = calculateBaudrateSettings(STM32_APB1_FREQUENCY, bitrate);
+	if (over8) {
+		const uint16_t brr = calculateBaudrateSettings(apbClk, bitrate/2);
+		USART2->CR1 |= USART_CR1_OVER8;
+		USART2->BRR = (USART_BRR_DIV_Mantissa & brr) | ((USART_BRR_DIV_Fraction & brr)>>1);
+	}
+	else {
+		USART2->BRR = calculateBaudrateSettings(apbClk, bitrate);
+	}
 	
 	USART2->CR2 = USART_CR2_CLKEN | USART_CR2_LBCL | mode;
 	USART2->CR3 = 0;
@@ -66,11 +79,11 @@ xpcc::stm32::UsartSpi2::UsartSpi2(
 uint8_t
 xpcc::stm32::UsartSpi2::write(uint8_t data)
 {
-	USART2->DR = data;
+	USART2->DR = __REV(__RBIT(data));
 	while (!(USART2->SR & USART_SR_RXNE)) {
 		// wait until the transmission is finished
 	}
-	return USART2->DR;
+	return __REV(__RBIT(USART2->DR));
 }
 
 #endif
