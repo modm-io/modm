@@ -16,6 +16,7 @@ class BaseType(object):
 	reference	--	True if the type is only used as reference for other
 					types and should not be included in the output.
 	description	--	Description of the type
+	string		--  Short description for enum members
 	isEnum		--	True if the type is an enum type
 	isStruct	--	analog
 	isTypedef	--	analog
@@ -30,6 +31,7 @@ class BaseType(object):
 		self.name = node.get('name')
 		self._check_name()
 		self.description = None
+		self.string = None
 		
 		self.isEnum = False
 		self.isStruct = False
@@ -92,6 +94,7 @@ class BuiltIn(BaseType):
 			return
 		
 		self.description = xml_utils.get_description(self.node)
+		self.string = xml_utils.get_string(self.node)
 		self.size = int(self.node.get('size'))
 		
 		self.node = None
@@ -120,6 +123,7 @@ class Enum(BaseType):
 				raise ParserException("Attribute name of element in enum has to be UPPER_UNDERSCORE_STYLE (found: '%s')" % (self.name))
 			
 			self.description = xml_utils.get_description(node)
+			self.string = xml_utils.get_string(node)
 			
 			value = node.get('value')
 			self.value = None if (value is None) else int(value, 0)
@@ -149,6 +153,7 @@ class Enum(BaseType):
 			return
 		
 		self.description = xml_utils.get_description(self.node)
+		self.string = xml_utils.get_string(self.node)
 		for node in self.node.findall('element'):
 			self.__add(self.Element(node))
 		
@@ -252,6 +257,7 @@ class Struct(BaseType):
 			self.name = node.get('name')
 			
 			self.description = xml_utils.get_description(node)
+			self.string = xml_utils.get_string(node)
 			self.subtype = SubType(node.get('type'), tree.types)
 			self.unit = node.get('unit')
 			self.value = node.get('value')
@@ -292,6 +298,7 @@ class Struct(BaseType):
 			return
 		
 		self.description = xml_utils.get_description(self.node)
+		self.string = xml_utils.get_string(self.node)
 		for node in self.node.findall('element'):
 			try:
 				self.elements.append(self.Element(node, tree))
@@ -415,6 +422,7 @@ class Typedef(BaseType):
 	
 	def evaluate(self, tree):
 		self.description = xml_utils.get_description(self.node)
+		self.string = xml_utils.get_string(self.node)
 		self.unit = self.node.get('unit')
 		try:
 			self.subtype = SubType(self.node.get('type'), tree.types)
