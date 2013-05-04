@@ -36,7 +36,11 @@ namespace robot
 			switch (e)
 			{
 			{%- for element in packet.iter() %}
+			{%- if element.string %}
+				case {{ element.name | enumElement }}: return "{{ element.string }}";
+			{%- else %}
 				case {{ element.name | enumElement }}: return "{{ element.name | enumElement }}";
+			{%- endif %}
 			{%- endfor %}
 				default: return "__UNKNOWN__";
 			}
