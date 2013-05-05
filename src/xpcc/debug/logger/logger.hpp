@@ -164,7 +164,7 @@ namespace xpcc
  * \ingroup logger
  */
 #define XPCC_LOG_ERROR \
-	if (XPCC_LOG_LEVEL > xpcc::log::ERROR)	\
+	if (XPCC_LOG_LEVEL > xpcc::log::ERROR){}	\
 	else xpcc::log::error
 
 #ifdef __DOXYGEN__
