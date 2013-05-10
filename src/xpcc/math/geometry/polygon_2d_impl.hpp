@@ -142,3 +142,34 @@ xpcc::Polygon2D<T>::getIntersections(const LineSegment2D<T>& segment, PointSet2D
 	
 	return intersectionFound;
 }
+
+// ----------------------------------------------------------------------------
+template <typename T>
+bool
+xpcc::Polygon2D<T>::isInside(const Vector<T, 2>& point)
+{
+	bool cw = true;
+	bool ccw = true;
+	
+	SizeType n = this->points.getSize();
+	for (SizeType i = 0; i < n; ++i) {
+		int_fast8_t r = Vector<T, 2>::ccw(this->points[i], this->points[(i + 1) % n], point);
+		
+		switch (r) {
+		case 0:
+			// point is one of the lines on the edge of the polygon.
+			return true;
+			break;
+			
+		case 1:
+			cw = false;
+			break;
+			
+		case -1:
+			ccw = false;
+			break;
+		}
+	}
+	
+	return (cw || ccw);
+}

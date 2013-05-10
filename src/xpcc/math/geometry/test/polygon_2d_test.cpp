@@ -318,3 +318,62 @@ Polygon2DTest::testIntersectionPointsLineSegment()
 	
 	points.removeAll();
 }
+
+/**
+ * Check if a point is contained inside the area of a polygon.
+ * 
+ * 
+ * 
+ *                .    (10,30)  -    -   -    (50,30)
+ *         .  /                            .
+ *  (0,0)                        (30, 0)
+ *                                         .
+ *                                               .   
+ *                                                  (60,-50)
+ * 
+ */
+void
+Polygon2DTest::testPointContainedCW()
+{
+	xpcc::Polygon2D<int16_t> polygon(5);
+	polygon << xpcc::Vector2i(0, 0)
+			<< xpcc::Vector2i(10, 30)
+			<< xpcc::Vector2i(50, 30)
+			<< xpcc::Vector2i(30, 0)
+			<< xpcc::Vector2i(60, -50);
+	
+	TEST_ASSERT_TRUE(polygon.isInside(xpcc::Vector<int16_t, 2>(0, 0)));
+	TEST_ASSERT_TRUE(polygon.isInside(xpcc::Vector<int16_t, 2>(5, 0)));
+	TEST_ASSERT_FALSE(polygon.isInside(xpcc::Vector<int16_t, 2>(5, 30)));
+	TEST_ASSERT_TRUE(polygon.isInside(xpcc::Vector<int16_t, 2>(30, 30)));
+	TEST_ASSERT_FALSE(polygon.isInside(xpcc::Vector<int16_t, 2>(15, 35)));
+	TEST_ASSERT_FALSE(polygon.isInside(xpcc::Vector<int16_t, 2>(40, 28)));
+	TEST_ASSERT_FALSE(polygon.isInside(xpcc::Vector<int16_t, 2>(40, 20)));
+	TEST_ASSERT_TRUE(polygon.isInside(xpcc::Vector<int16_t, 2>(60, -50)));
+	TEST_ASSERT_FALSE(polygon.isInside(xpcc::Vector<int16_t, 2>(70, -40)));
+	TEST_ASSERT_FALSE(polygon.isInside(xpcc::Vector<int16_t, 2>(30, -40)));
+	TEST_ASSERT_FALSE(polygon.isInside(xpcc::Vector<int16_t, 2>(-1, 0)));
+}
+
+void
+Polygon2DTest::testPointContainedCCW()
+{
+	xpcc::Polygon2D<int16_t> polygon(5);
+		polygon << xpcc::Vector2i(0, 0)
+				<< xpcc::Vector2i(60, -50)
+				<< xpcc::Vector2i(30, 0)
+				<< xpcc::Vector2i(50, 30)
+				<< xpcc::Vector2i(10, 30);
+		
+	TEST_ASSERT_TRUE(polygon.isInside(xpcc::Vector<int16_t, 2>(0, 0)));
+	TEST_ASSERT_TRUE(polygon.isInside(xpcc::Vector<int16_t, 2>(5, 0)));
+	TEST_ASSERT_FALSE(polygon.isInside(xpcc::Vector<int16_t, 2>(5, 30)));
+	TEST_ASSERT_TRUE(polygon.isInside(xpcc::Vector<int16_t, 2>(30, 30)));
+	TEST_ASSERT_FALSE(polygon.isInside(xpcc::Vector<int16_t, 2>(15, 35)));
+	TEST_ASSERT_FALSE(polygon.isInside(xpcc::Vector<int16_t, 2>(40, 28)));
+	TEST_ASSERT_FALSE(polygon.isInside(xpcc::Vector<int16_t, 2>(40, 20)));
+	TEST_ASSERT_TRUE(polygon.isInside(xpcc::Vector<int16_t, 2>(60, -50)));
+	TEST_ASSERT_FALSE(polygon.isInside(xpcc::Vector<int16_t, 2>(70, -40)));
+	TEST_ASSERT_FALSE(polygon.isInside(xpcc::Vector<int16_t, 2>(30, -40)));
+	TEST_ASSERT_FALSE(polygon.isInside(xpcc::Vector<int16_t, 2>(-1, 0)));
+}

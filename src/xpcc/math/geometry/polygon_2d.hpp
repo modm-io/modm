@@ -32,6 +32,7 @@
 #define XPCC__POLYGON_2D_HPP
 
 #include "point_set_2d.hpp"
+#include "vector2.hpp"
 
 namespace xpcc
 {
@@ -93,6 +94,17 @@ namespace xpcc
 		bool
 		getIntersections(const LineSegment2D<T>& segment,
 				PointSet2D<T>& intersectionPoints) const;
+		
+		/**
+		 * Check if the point is contained inside the area of the polygon.
+		 * 
+		 * The borders of the polygon are included in the area of the polygon.
+		 * 
+		 * @return	`true` if point is contained in the area, `false` if
+		 * 			it is outside.
+		 */
+		bool
+		isInside(const Vector<T, 2>& point);
 	};
 }
 
