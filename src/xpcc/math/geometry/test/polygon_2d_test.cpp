@@ -335,21 +335,26 @@ Polygon2DTest::testIntersectionPointsLineSegment()
 void
 Polygon2DTest::testPointContainedCW()
 {
+	// this is a concave polygon 
 	xpcc::Polygon2D<int16_t> polygon(5);
-	polygon << xpcc::Vector2i(0, 0)
-			<< xpcc::Vector2i(10, 30)
-			<< xpcc::Vector2i(50, 30)
-			<< xpcc::Vector2i(30, 0)
-			<< xpcc::Vector2i(60, -50);
+	polygon << xpcc::Vector<int16_t, 2>(0, 0)
+			<< xpcc::Vector<int16_t, 2>(10, 30)
+			<< xpcc::Vector<int16_t, 2>(50, 30)
+			<< xpcc::Vector<int16_t, 2>(30, 0)
+			<< xpcc::Vector<int16_t, 2>(60, -50);
 	
 	TEST_ASSERT_TRUE(polygon.isInside(xpcc::Vector<int16_t, 2>(0, 0)));
 	TEST_ASSERT_TRUE(polygon.isInside(xpcc::Vector<int16_t, 2>(5, 0)));
 	TEST_ASSERT_FALSE(polygon.isInside(xpcc::Vector<int16_t, 2>(5, 30)));
-	TEST_ASSERT_TRUE(polygon.isInside(xpcc::Vector<int16_t, 2>(30, 30)));
+	
+	// point is
+	TEST_ASSERT_TRUE(polygon.isInside(xpcc::Vector<int16_t, 2>(30, 29)));
+	
 	TEST_ASSERT_FALSE(polygon.isInside(xpcc::Vector<int16_t, 2>(15, 35)));
 	TEST_ASSERT_FALSE(polygon.isInside(xpcc::Vector<int16_t, 2>(40, 28)));
 	TEST_ASSERT_FALSE(polygon.isInside(xpcc::Vector<int16_t, 2>(40, 20)));
 	TEST_ASSERT_TRUE(polygon.isInside(xpcc::Vector<int16_t, 2>(60, -50)));
+	TEST_ASSERT_TRUE(polygon.isInside(xpcc::Vector<int16_t, 2>(45, -33)));
 	TEST_ASSERT_FALSE(polygon.isInside(xpcc::Vector<int16_t, 2>(70, -40)));
 	TEST_ASSERT_FALSE(polygon.isInside(xpcc::Vector<int16_t, 2>(30, -40)));
 	TEST_ASSERT_FALSE(polygon.isInside(xpcc::Vector<int16_t, 2>(-1, 0)));

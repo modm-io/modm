@@ -43,6 +43,9 @@ namespace xpcc
 	template <typename T>
 	class LineSegment2D;
 	
+	template <typename T>
+	class Ray2D;
+	
 	/**
 	 * \brief	Polygon
 	 *
@@ -88,6 +91,10 @@ namespace xpcc
 		bool
 		intersects(const LineSegment2D<T>& segment) const;
 		
+		/// Check if a intersection exists
+		bool
+		intersects(const Ray2D<T>& segment) const;
+		
 		/**
 		 * \brief	Calculate the intersection point(s)
 		 */
@@ -100,8 +107,10 @@ namespace xpcc
 		 * 
 		 * The borders of the polygon are included in the area of the polygon.
 		 * 
-		 * @return	`true` if point is contained in the area, `false` if
-		 * 			it is outside.
+		 * @warning Only works for convex polygons! 
+		 * 
+		 * @return  `true` if point is contained in the area, `false` if
+		 *          it is outside.
 		 */
 		bool
 		isInside(const Vector<T, 2>& point);
@@ -110,6 +119,7 @@ namespace xpcc
 
 #include "circle_2d.hpp"
 #include "line_segment_2d.hpp"
+#include "ray_2d.hpp"
 
 #include "polygon_2d_impl.hpp"
 
