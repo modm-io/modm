@@ -31,6 +31,16 @@
 #include "graphic_display.hpp"
 
 // ----------------------------------------------------------------------------
+uint8_t
+xpcc::GraphicDisplay::getFontHeight() const
+{
+	if (!this->font.isValid())
+		return 0;
+	
+	return font[3];
+}
+
+// ----------------------------------------------------------------------------
 void
 xpcc::GraphicDisplay::write(char c)
 {
@@ -71,19 +81,19 @@ xpcc::GraphicDisplay::write(char c)
 	
 	cursor.setX(cursor.getX() + width);
 	
-	// all characters beyond 128 have whitespaces afterwards (number given
+	// all characters below 128 have whitespace afterwards (number given
 	// by vspace).
 	if (character < 128) {
-		glcd::Color oldColor = this->color;
+		//glcd::Color oldColor = this->color;
 		
-		this->setColor(glcd::WHITE);
+		//this->setColor(glcd::Color::white());
 		for (uint_fast8_t i = 0; i < vspace; ++i) {
-			this->drawVerticalLine(cursor, height);
+			//this->drawVerticalLine(cursor, height);
 			cursor.setX(cursor.getX() + 1);
 		}
 		
 		// restore color
-		this->setColor(oldColor);
+		//this->setColor(oldColor);
 	}
 }
 

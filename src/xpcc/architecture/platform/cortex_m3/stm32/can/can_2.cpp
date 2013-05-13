@@ -44,7 +44,7 @@
 #include <xpcc_config.hpp>
 
 
-#if defined(STM32F10X_CL)
+#if defined(STM32F10X_CL) || defined(STM32F4XX)
 
 
 // ----------------------------------------------------------------------------

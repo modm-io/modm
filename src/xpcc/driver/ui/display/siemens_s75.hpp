@@ -32,6 +32,7 @@
 #define XPCC__SIEMENS_S75_HPP
 
 #include <xpcc/architecture/driver/delay.hpp>
+#include <xpcc/driver/connectivity/memory_interface/bitbang_memory_interface.hpp>
 
 #include "buffered_graphic_display.hpp"
 
@@ -48,8 +49,9 @@ namespace xpcc
 	 * xpcc::BufferedGraphicDisplay requests that the vertical resolution is
 	 * dividable by 8.
 	 *
-	 * In portrait mode the connector is at the bottom.
-	 * In landscape mode the connector is at the right border.
+	 * In portrait mode the connector is at top.
+	 * In landscapeLeft  mode the connector is at the left border.
+	 * In landscapeRight mode the connector is at the right border.
 	 *
 	 * Pinout at LCD:
 	 *  1  IN  CD         Command / Data                      Low = Command (Register) High = Data.
@@ -79,67 +81,67 @@ namespace xpcc
 	 * \ingroup	lcd
 	 */
 
-	// common for landscape and portrait
-	template <typename PORT, typename CS, typename RS, typename WR, typename Reset>
-	class SiemensS75Common
+	enum class Orientation : uint8_t
 	{
+		Portrait, 				//< Connector top
+		LandscapeRight,			//< Connector right
+		LandscapeLeft,			//< Connector left
+		PortraitUpsideDown,		//< Connector bottom
+	};
+
+	template <
+		typename MEMORY,
+		typename RESET,
+		uint16_t  WIDTH,
+		uint16_t  HEIGHT,
+		xpcc::Orientation ORIENTATION>
+	class SiemensS75Common :
+			public BufferedGraphicDisplay<WIDTH, HEIGHT>
+	{
+	public:
+		void
+		update(void);
+
+		void
+		initialize(void);
+
 	protected:
 		ALWAYS_INLINE void
-		writeCmd(uint8_t reg, uint16_t param);
+		lcdCls(const uint16_t colour);
 
 		ALWAYS_INLINE void
-		writeReg(uint8_t reg);
-
-		ALWAYS_INLINE void
-		writeData(uint16_t param);
-
-		ALWAYS_INLINE void
-		lcdCls(uint16_t colour);
-
-		ALWAYS_INLINE void
-		lcdSettings(bool landscape);
-
+		lcdSettings();
 	};
 
-	template <typename PORT, typename CS, typename RS, typename WR, typename Reset>
+	template <typename MEMORY, typename RESET>
 	class SiemensS75Portrait :
-		public BufferedGraphicDisplay<132, 176>,
-		public SiemensS75Common<PORT, CS, RS, WR, Reset>
+		public SiemensS75Common<MEMORY, RESET, 136, 176, xpcc::Orientation::Portrait>
 	{
-	public:
-		void
-		initialize();
-
-		/**
-		 * \brief	Update the display with the content of the RAM buffer
-		 */
-		virtual void
-		update();
-
 	};
 
-		/**
-		 * The display in landscape mode does not match the required
-		 * alignment of BufferedGraphicDisplay which requests that
-		 * the vertical resolution can be divided by 8.
-		 *
-		 */
-	template <typename PORT, typename CS, typename RS, typename WR, typename Reset>
-	class SiemensS75Landscape :
-		public BufferedGraphicDisplay<176, 136>,
-		public SiemensS75Common<PORT, CS, RS, WR, Reset>
+	template <typename MEMORY, typename RESET>
+	class SiemensS75PortraitUpsideDown:
+		public SiemensS75Common<MEMORY, RESET, 136, 176, xpcc::Orientation::PortraitUpsideDown>
 	{
-	public:
-		void
-		initialize();
-
-		/**
-		 * \brief	Update the display with the content of the RAM buffer
-		 */
-		virtual void
-		update();
 	};
 
+	/**
+	 * The display in landscape mode does not match the required
+	 * alignment of BufferedGraphicDisplay which requests that
+	 * the vertical resolution can be divided by 8.
+	 *
+	 */
+	template <typename MEMORY, typename RESET>
+	class SiemensS75LandscapeLeft :
+		public SiemensS75Common<MEMORY, RESET, 176, 136, xpcc::Orientation::LandscapeLeft>
+	{
+	};
+
+	template <typename MEMORY, typename RESET>
+	class SiemensS75LandscapeRight :
+		public SiemensS75Common<MEMORY, RESET, 176, 136, xpcc::Orientation::LandscapeRight>
+	{
+	};
 }
 
 #include "siemens_s75_impl.hpp"
