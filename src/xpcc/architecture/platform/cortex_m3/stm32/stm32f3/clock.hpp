@@ -79,7 +79,8 @@ namespace xpcc
 			
 			enum class PllSource
 			{
-				PLL_HSI,		///< High speed internal clock (8 MHz)
+				// It is known that HSI does not work yet.
+//				PLL_HSI,		///< High speed internal clock (8 MHz)
 				PLL_HSE,		///< High speed external clock (see HseConfig)
 			};
 			
