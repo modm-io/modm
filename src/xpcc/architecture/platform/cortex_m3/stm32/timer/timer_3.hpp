@@ -36,7 +36,10 @@
 #ifndef XPCC_STM32__TIMER_3_HPP
 #define XPCC_STM32__TIMER_3_HPP
 
+
 #include "timer_base.hpp"
+
+
 
 namespace xpcc
 {
@@ -66,7 +69,7 @@ namespace xpcc
 		class Timer3 : public GeneralPurposeTimer
 		{
 		public:
-#if defined(STM32F2XX) || defined(STM32F4XX)
+#if defined(STM32F2XX) || defined(STM32F3XX) || defined(STM32F4XX)
 
 #else
 			enum Remap
@@ -91,13 +94,29 @@ namespace xpcc
 #endif
 						
 		public:
+
+			enum MasterMode
+			{
+				MASTER_RESET 			= 0,							// 0b000
+				MASTER_ENABLE 			= TIM_CR2_MMS_0,				// 0b001
+				MASTER_UPDATE 			= TIM_CR2_MMS_1,				// 0b010
+				MASTER_COMPARE_PULSE 	= TIM_CR2_MMS_1 | TIM_CR2_MMS_0,// 0b011
+				MASTER_COMPARE_OC1REF 	= TIM_CR2_MMS_2,				// 0b100
+				MASTER_COMPARE_OC2REF 	= TIM_CR2_MMS_2 | TIM_CR2_MMS_0,// 0b101
+			
+				// Only available on TIM2/3/4
+				MASTER_COMPARE_OC3REF 	= TIM_CR2_MMS_2 | TIM_CR2_MMS_1,// 0b110
+				MASTER_COMPARE_OC4REF 	= TIM_CR2_MMS_2 | TIM_CR2_MMS_1	// 0b111
+														| TIM_CR2_MMS_0,
+			};
+
 			enum SlaveModeTrigger
 			{
 				
 				TRIGGER_INTERNAL_1 = TIM_SMCR_TS_0,
 				TRIGGER_INTERNAL_2 = TIM_SMCR_TS_1,
 				
-				
+				TRIGGER_TI1_EDGE_DETECTOR = TIM_SMCR_TS_2,
 				TRIGGER_FILTERED_TI1 = TIM_SMCR_TS_2 | TIM_SMCR_TS_0,
 				TRIGGER_FILTERED_TI2 = TIM_SMCR_TS_2 | TIM_SMCR_TS_1,
 				TRIGGER_EXTERNAL = TIM_SMCR_TS_2 | TIM_SMCR_TS_1 | TIM_SMCR_TS_0,
@@ -115,6 +134,11 @@ namespace xpcc
 				SLAVE_GATED		= TIM_SMCR_SMS_2 | TIM_SMCR_SMS_0, // The counter clock is enabled when the trigger input (TRGI) is high. The counter stops (but is not reset) as soon as the trigger becomes low. Both start and stop of the counter are controlled.
 				SLAVE_TRIGGER	= TIM_SMCR_SMS_2 | TIM_SMCR_SMS_1, // The counter starts at a rising edge of the trigger TRGI (but it is not reset). Only the start of the counter is controlled.
 				SLAVE_EXTERNAL_CLOCK = TIM_SMCR_SMS_2 | TIM_SMCR_SMS_1 | TIM_SMCR_SMS_0, // Rising edges of the selected trigger (TRGI) clock the counter.
+				
+				#if defined(STM32F3XX)
+				SLAVE_RESET_TRIGGER	= TIM_SMCR_SMS_3,	// reinitialize and start counter
+				#endif
+				
 			};
 			
 			// This type is the internal size of the counter.
@@ -142,7 +166,9 @@ namespace xpcc
 			
 			static void
 			setMode(Mode mode, SlaveMode slaveMode = SLAVE_DISABLED,
-					SlaveModeTrigger slaveModeTrigger = (SlaveModeTrigger) 0);
+					SlaveModeTrigger slaveModeTrigger = (SlaveModeTrigger) 0,
+					MasterMode masterMode = MASTER_RESET,
+					bool enableOnePulseMode = false);
 			
 			static inline void
 			setPrescaler(uint16_t prescaler)
@@ -179,20 +205,22 @@ namespace xpcc
 			{
 				TIM3->CNT = value;
 			}
-			
+
 		public:
 			static void
 			configureInputChannel(uint32_t channel, InputCaptureMapping input,
-					InputCapturePrescaler prescaler, InputCapturePolarity polarity, uint8_t filter);
+					InputCapturePrescaler prescaler,
+					InputCapturePolarity polarity, uint8_t filter,
+					bool xor_ch1_3=false);
 			
 			static void
 			configureOutputChannel(uint32_t channel, OutputCompareMode mode,
-					Value compareValue);
+					Value compareValue, PinState out = ENABLE);
 			
 			static inline void
 			setCompareValue(uint32_t channel, Value value)
 			{
-#if defined(STM32F2XX) || defined(STM32F4XX)
+#if defined(STM32F2XX) || defined(STM32F3XX) || defined(STM32F4XX)
 				*(&TIM3->CCR1 + (channel - 1)) = value;
 #else
 				*(&TIM3->CCR1 + ((channel - 1) * 2)) = value;
@@ -202,7 +230,7 @@ namespace xpcc
 			static inline Value
 			getCompareValue(uint32_t channel)
 			{
-#if defined(STM32F2XX) || defined(STM32F4XX)
+#if defined(STM32F2XX) || defined(STM32F3XX) || defined(STM32F4XX)
 				return *(&TIM3->CCR1 + (channel - 1));
 #else
 				return *(&TIM3->CCR1 + ((channel - 1) * 2));
@@ -253,5 +281,7 @@ namespace xpcc
 		};
 	}
 }
+
+
 
 #endif // XPCC_STM32__TIMER_3_HPP

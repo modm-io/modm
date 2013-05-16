@@ -69,7 +69,8 @@ xpcc::stm32::Timer4::disable()
 // ----------------------------------------------------------------------------
 void
 xpcc::stm32::Timer4::setMode(Mode mode, SlaveMode slaveMode,
-		SlaveModeTrigger slaveModeTrigger)
+		SlaveModeTrigger slaveModeTrigger, MasterMode masterMode,
+		bool enableOnePulseMode)
 {
 	// disable timer
 	TIM4->CR1 = 0;
@@ -84,7 +85,11 @@ xpcc::stm32::Timer4::setMode(Mode mode, SlaveMode slaveMode,
 	}
 	
 	// ARR Register is buffered, only Under/Overflow generates update interrupt
-	TIM4->CR1 = TIM_CR1_ARPE | TIM_CR1_URS | mode;
+	if(enableOnePulseMode)
+		TIM4->CR1 = TIM_CR1_ARPE | TIM_CR1_URS | TIM_CR1_OPM | mode;
+	else
+		TIM4->CR1 = TIM_CR1_ARPE | TIM_CR1_URS | mode;
+	TIM4->CR2 = masterMode;
 	TIM4->SMCR = slaveMode | slaveModeTrigger;
 }
 
@@ -117,13 +122,14 @@ xpcc::stm32::Timer4::setPeriod(uint32_t microseconds, bool autoApply)
 void
 xpcc::stm32::Timer4::configureInputChannel(uint32_t channel,
 		InputCaptureMapping input, InputCapturePrescaler prescaler,
-		InputCapturePolarity polarity, uint8_t filter)
+		InputCapturePolarity polarity, uint8_t filter,
+		bool xor_ch1_3)
 {
 	channel -= 1;	// 1..4 -> 0..3
-	
+
 	// disable channel
 	TIM4->CCER &= ~((TIM_CCER_CC1NP | TIM_CCER_CC1P | TIM_CCER_CC1E) << (channel * 4));
-	
+
 	uint32_t flags = input;
 	flags |= ((uint32_t)prescaler) << 2;
 	flags |= ((uint32_t)(filter&0xf)) << 4;
@@ -131,18 +137,25 @@ xpcc::stm32::Timer4::configureInputChannel(uint32_t channel,
 	if (channel <= 1)
 	{
 		uint32_t offset = 8 * channel;
-		
+
 		flags <<= offset;
 		flags |= TIM4->CCMR1 & ~(0xff << offset);
-		
+
 		TIM4->CCMR1 = flags;
+
+		if(channel == 0) {
+			if(xor_ch1_3)
+				TIM4->CR2 |= TIM_CR2_TI1S;
+			else
+				TIM4->CR2 &= ~TIM_CR2_TI1S;
+		}
 	}
 	else {
 		uint32_t offset = 8 * (channel - 2);
-		
+
 		flags <<= offset;
 		flags |= TIM4->CCMR2 & ~(0xff << offset);
-		
+
 		TIM4->CCMR2 = flags; 
 	}
 	
@@ -152,7 +165,7 @@ xpcc::stm32::Timer4::configureInputChannel(uint32_t channel,
 // ----------------------------------------------------------------------------
 void
 xpcc::stm32::Timer4::configureOutputChannel(uint32_t channel,
-		OutputCompareMode mode, Value compareValue)
+		OutputCompareMode mode, Value compareValue, PinState out)
 {
 	channel -= 1;	// 1..4 -> 0..3
 	
@@ -182,7 +195,7 @@ xpcc::stm32::Timer4::configureOutputChannel(uint32_t channel,
 		TIM4->CCMR2 = flags; 
 	}
 	
-	if (mode != OUTPUT_INACTIVE) {
+	if (mode != OUTPUT_INACTIVE && out == ENABLE) {
 		TIM4->CCER |= (TIM_CCER_CC1E) << (channel * 4);
 	}
 }
