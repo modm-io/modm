@@ -109,7 +109,16 @@
 #include "stm32/timer.hpp"
 #endif
 
-// COMP1-7 and ADC4 only available on STM32F3 series
+// Uart HAL tested only on STM32F3 series
+#if defined(STM32F3XX)
+#include "stm32/uart/usart_hal_1.hpp"
+#include "stm32/uart/usart_hal_2.hpp"
+#include "stm32/uart/usart_hal_3.hpp"
+#include "stm32/uart/uart_hal_4.hpp"
+#include "stm32/uart/uart_hal_5.hpp"
+#endif
+
+// COMP1-7 only available on STM32F3 series
 #if defined(STM32F3XX)
 #include "stm32/comp/comp_1.hpp"
 #include "stm32/comp/comp_2.hpp"
