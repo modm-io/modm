@@ -313,23 +313,27 @@ namespace xpcc
 					OutputComparePolarity polarity_n = OUTPUT_ACTIVE_HIGH);
 
 			/*
-			 * Configure Output Channel with outputPorts quadruple
+			 * Configure Output Channel width Mode/OutputPort uint
 			 *
 			 * This is the least typsafe way of doing this and should only
-			 * be done if it provides a necessary performance benefit.
-			 * i.e. if you have specific output quadruples precalculated and
+			 * be done if it provides a necessary performance
+			 * (or more or less) lazyness benefit.
+			 * i.e. if you have specific mode/output uints precalculated and
 			 * just want to load them as fast as possible.
 			 *
-			 * The "outputPorts quadruple" is a uint that contains four bits
-			 * that describe the itnended output setting:
+			 * The "mode/output" uint contains four bits
+			 * that describe the intended output setting:
 			 * Bit0: Output Enabled/Disabled
 			 * Bit1: Output Polarity
 			 * Bit2: Complementary Output Enable/Disable
 			 * Bit3: Complementary Output Polarity
+			 *
+			 * As well as Mode Information (Bit6-Bit4)
+			 * which is just an OutputCompareMode constant ored with the
+			 * port output quadruple specified above.
 			 */
 			static void
-			configureOutputChannel(uint32_t channel, OutputCompareMode mode,
-					uint32_t outputPorts);
+			configureOutputChannel(uint32_t channel, uint32_t modeOutputPorts);
 
 			static inline void
 			setCompareValue(uint32_t channel, uint16_t value)

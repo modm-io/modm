@@ -251,15 +251,14 @@ PinState out_n, OutputComparePolarity polarity_n)
 }
 
 void
-configureOutputChannel(uint32_t channel, OutputCompareMode mode,
-uint32_t outputPorts)
+configureOutputChannel(uint32_t channel, uint32_t modeOutputPorts)
 {
 	channel -= 1;	// 1..4 -> 0..3
 
 	// disable output
 	TIM{{ id }}->CCER &= ~(0xf << (channel * 4));
 
-	uint32_t flags = mode;
+	uint32_t flags = modeOutputPorts & (0x70);
 
 	if (channel <= 1)
 	{
@@ -282,7 +281,7 @@ uint32_t outputPorts)
 	// Disable Repetition Counter (FIXME has to be done here for some unknown reason)
 	TIM{{ id }}->RCR = 0;
 
-	TIM{{ id }}->CCER |= outputPorts << (channel * 4);
+	TIM{{ id }}->CCER |= (modeOutputPorts & (0xf)) << (channel * 4);
 }
 
 // ----------------------------------------------------------------------------
