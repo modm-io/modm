@@ -45,17 +45,18 @@ MAIN_FUNCTION
 
 
 	Timer1::enable();
-	Timer1::setMode(Timer1::CENTER_ALIGNED_3);
-	//Timer1::setOverflow(0xff);
-	Timer1::setPeriod(4);
+	//Timer1::setMode(Timer1::CENTER_ALIGNED_3);
+	Timer1::setMode(Timer1::UP_COUNTER);
+	Timer1::setOverflow(0x8ff);
+	//Timer1::setPeriod(4);
 	Timer1::applyAndReset();
 	Timer1::start();
 
 	LedNorth::setAlternateFunction(AF_2, PUSH_PULL);		// TIM1_CH1
 	LedNorthWest::setAlternateFunction(AF_2, PUSH_PULL);	// TIM1_CH1N
 	Timer1::setCompareValue(1, 0x80);
-	Timer1::configureOutputChannel(1, Timer1::OUTPUT_PWM | 0b0101);
-	Timer1::setDeadTime(0b10000000 | 7);
+	Timer1::configureOutputChannel(1, Timer1::OUTPUT_PWM | 0b1101);
+	Timer1::setDeadTime(7);
 
 
 
