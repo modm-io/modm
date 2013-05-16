@@ -384,6 +384,16 @@ namespace xpcc
 				ENABLE = 1,
 			};
 
+			/* Different Resolution Depending on DeadTime[7:5]: */
+			enum DeadTimeResolution
+			{
+				FROM_0_125NS_STEP = 0,									//0xx
+				FROM_16US_250NS_STEP = TIM_BDTR_DTG_7,					//10x
+				FROM_32US_1US_STEP = TIM_BDTR_DTG_7 | TIM_BDTR_DTG_6,	//110
+				FROM_64US_2US_STEP = TIM_BDTR_DTG_7 | TIM_BDTR_DTG_6	//111
+													| TIM_BDTR_DTG_5,
+			};
+
 		public:
 			/**
 			 * Set operation mode of the timer
