@@ -309,6 +309,16 @@ namespace xpcc
 			{
 				/// Output is independent from the compare result
 				OUTPUT_INACTIVE = 0,
+				/// Output is forced high on match
+				OUTPUT_HIGH_ON_MATCH = TIM_CCMR1_OC1M_0,
+				/// Output is forced low on match
+				OUTPUT_LOW_ON_MATCH = TIM_CCMR1_OC1M_1,
+				/// Output is toggled on match
+				OUTPUT_TOGGLE = TIM_CCMR1_OC1M_1 | TIM_CCMR1_OC1M_0,
+				/// Output is forced low
+				OUTPUT_FORCE_LOW = TIM_CCMR1_OC1M_2,
+				/// Output is forced high
+				OUTPUT_FORCE_HIGH = TIM_CCMR1_OC1M_2 | TIM_CCMR1_OC1M_0,
 
 				/**
 				 * PWM Mode 1.
@@ -331,7 +341,20 @@ namespace xpcc
 				 */
 				OUTPUT_PWM2 = TIM_CCMR1_OC1M_2 | TIM_CCMR1_OC1M_1 | TIM_CCMR1_OC1M_0,
 			};
-			
+
+			enum OutputComparePreload
+			{
+				PRELOAD_REGISTER_DISABLED = 0,
+				PRELOAD_REGISTER_ENABLED  = TIM_CCMR1_OC1PE,
+			};
+
+
+			enum OutputComparePolarity
+			{
+				OUTPUT_ACTIVE_HIGH = 0,
+				OUTPUT_ACTIVE_LOW = TIM_CCER_CC1P,
+			};
+
 			/**
 			 * If more than one Compare Channel is available they are always paired.
 			 * 		(A channel with an odd number is paired with the next even numbered channel)
@@ -360,6 +383,22 @@ namespace xpcc
 				INPUT_DIV2	= 1,
 				INPUT_DIV4	= 2,
 				INPUT_DIV8	= 3,
+			};
+
+			enum PinState
+			{
+				DISABLE = 0,
+				ENABLE = 1,
+			};
+
+			/* Different Resolution Depending on DeadTime[7:5]: */
+			enum DeadTimeResolution
+			{
+				FROM_0_125NS_STEP = 0,									//0xx
+				FROM_16US_250NS_STEP = TIM_BDTR_DTG_7,					//10x
+				FROM_32US_1US_STEP = TIM_BDTR_DTG_7 | TIM_BDTR_DTG_6,	//110
+				FROM_64US_2US_STEP = TIM_BDTR_DTG_7 | TIM_BDTR_DTG_6	//111
+													| TIM_BDTR_DTG_5,
 			};
 
 		public:
