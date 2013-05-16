@@ -54,13 +54,12 @@ namespace xpcc
 		public:
 			enum Interrupt
 			{
-				INTERRUPT_CHARACTER_MATCH = USART_CR1_CMIE,
-				// called when the transmit register is empty (i.e. the byte
-				// has been transfered to the shift out register)
-				INTERRUPT_TX_EMPTY		= USART_CR1_TXEIE,
-				INTERRUPT_TX_COMPLETE	= USART_CR1_TCIE,		/**< called when the byte was completely transmitted*/
-				INTERRUPT_RX_NOT_EMPTY	= USART_CR1_RXNEIE,
-				INTERRUPT_PARITY_ERROR	= USART_CR1_PEIE,
+				INTERRUPT_CHARACTER_MATCH = USART_CR1_CMIE,		/**< */
+				INTERRUPT_TX_EMPTY		  = USART_CR1_TXEIE,	/**< Call interrupt when transmit register is empty (i.e. the byte 
+																 *   has been transfered to the shift out register */
+				INTERRUPT_TX_COMPLETE	  = USART_CR1_TCIE,		/**< called when the byte was completely transmitted */
+				INTERRUPT_RX_NOT_EMPTY	  = USART_CR1_RXNEIE,
+				INTERRUPT_PARITY_ERROR	  = USART_CR1_PEIE,
 			};
 
 			enum InterruptFlag
@@ -70,6 +69,7 @@ namespace xpcc
 				FLAG_TX_COMPLETE		= USART_ISR_TC,
 				FLAG_RX_NOT_EMPTY		= USART_ISR_RXNE,
 				FLAG_PARITY_ERROR		= USART_ISR_PE,
+				FLAG_OVERRUN_ERROR		= USART_ISR_ORE,
 			};
 
 			enum class Parity : uint32_t
