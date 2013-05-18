@@ -1,6 +1,6 @@
 // coding: utf-8
 // ----------------------------------------------------------------------------
-/* Copyright (c) 2011, Roboterclub Aachen e.V.
+/* Copyright (c) 2013, Roboterclub Aachen e.V.
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -31,16 +31,23 @@
 #ifndef XPCC__VIEWSTACK_HPP
 #define XPCC__VIEWSTACK_HPP
 
-#include <xpcc/driver/ui/display/graphic_display.hpp>
-
-#include <xpcc/container/stack.hpp>
-#include <xpcc/container/linked_list.hpp>
-
+#include "../display/graphic_display.hpp"
+#include "../../../container/stack.hpp"
 #include "menu_buttons.hpp"
 #include "abstract_view.hpp"
 
 namespace xpcc
 {
+	/**
+	* \brief Stack which handles the displaying
+	*        of views on the graphic display.
+	*
+	* This class also deallocates the views passed
+	* to the stack.
+	*
+	* \ingroup	display_menu
+	* \author	Thorsten Lajewski
+	*/
 	class ViewStack
 	{
 	public:
@@ -48,30 +55,58 @@ namespace xpcc
 		
 		virtual ~ViewStack();
 		
+		/**
+		 * @brief get the top view from the stack
+		 * @return pointer to view from stack
+		 */
+
 		inline xpcc::AbstractView* 
 		get()
 		{
 			return this->stack.get();
 		}
 		
+		/**
+		 * @brief push new view on top of stack the new
+		 *        view will be displayed instead of the old
+		 *        one
+		 *
+		 * @param view next displayed view
+		 */
 		inline void
 		push(xpcc::AbstractView* view)
 		{
 			this->stack.push(view);
 			this->getDisplay().clear();
+			xpcc::AbstractView* top = this->get();
+			top->draw();
+			this->display->update();
 		}
 
+		/**
+		 * @brief getDisplay access underlying GraphicDisplay
+		 */
 		inline xpcc::GraphicDisplay&
 		getDisplay()
 		{
 			return *this->display;
 		}
 		
+		/**
+		 * @brief pop remove top view from the stack. The removed
+		 *        view is deleted
+		 */
+
 		void
 		pop();
 		
 		virtual void
 		update();
+
+		/**
+		 * @brief shortButtonPress pass the button press to the current top view
+		 * @param button the pressed button
+		 */
 		
 		void
 		shortButtonPress(xpcc::MenuButtons::Button button);
