@@ -45,6 +45,7 @@ namespace xpcc
 	 *        handled by the ViewStack class
 	 *
 	 *\author Thorsten Lajewski
+	 *\ingroup display_menu
 	 */
 
 	class AbstractView

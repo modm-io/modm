@@ -35,6 +35,14 @@ namespace xpcc
 {
 	namespace MenuButtons
 	{
+	   /**
+		 *
+		 * @brief The Button enum defines the five buttons, which are used in the views.
+		 *
+		 * \author Thorsten Lajewski
+		 *
+		 * \ingroup display_menu
+		 */
 		enum Button
 		{
 			LEFT,

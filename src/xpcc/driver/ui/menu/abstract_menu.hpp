@@ -1,6 +1,6 @@
 // coding: utf-8
 // ----------------------------------------------------------------------------
-/* Copyright (c) 2011, Roboterclub Aachen e.V.
+/* Copyright (c) 2013, Roboterclub Aachen e.V.
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -36,6 +36,14 @@
 
 namespace xpcc{
 	
+	 /**
+	 * @brief The AbstractMenu class is the same as the AbstractView class,
+	 *        except it forces the developer to reimplement the handling
+	 *        of button presses.
+	 *
+	 * \author Thorsten Lajewski
+	 * \ingroup display_menu
+	 */
 	class AbstractMenu: public AbstractView
 	{
 		public:
