@@ -34,10 +34,9 @@
 #include "abstract_menu.hpp"
 #include "scrollable_text.hpp"
 #include "menu_entry_callback.hpp"
-#include <xpcc/container/doubly_linked_list.hpp>
-#include <xpcc/workflow/periodic_timer.hpp>
+#include "../../../container/doubly_linked_list.hpp"
+#include "../../../workflow/periodic_timer.hpp"
 
-#define DISPLAY_UPDATE_TIME 500 //after this time the display is redrawn
 
 namespace xpcc
 {
@@ -46,7 +45,6 @@ namespace xpcc
 		MenuEntry(const char* text, uint16_t space, MenuEntryCallback func);
 		
 		ScrollableText text;
-		/*const char* text;*/
 		MenuEntryCallback callback;
 	};
 	
@@ -79,10 +77,11 @@ namespace xpcc
 		selectedEntryFunction(uint8_t selected);
 
 	private:
+		uint16_t display_update_time; //after this time the display is redrawn,
+									  // important for scrolling
 
 		xpcc::PeriodicTimer<> timer;
 		bool buttonAction;
-		bool newOnStack;
 
 		const char* title;
 
@@ -90,6 +89,7 @@ namespace xpcc
 
 		uint8_t homePosition; // first entry drawn
 		uint8_t position; // selected entry
+
 
 	protected:
 

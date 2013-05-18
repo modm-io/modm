@@ -38,9 +38,9 @@ xpcc::MenuEntry::MenuEntry(const char* text, uint16_t space, MenuEntryCallback f
 
 xpcc::StandardMenu::StandardMenu(xpcc::ViewStack* stack, uint8_t identifier) :
 	xpcc::AbstractMenu(stack, identifier),
-	timer(DISPLAY_UPDATE_TIME),
+	display_update_time(500),
+	timer(display_update_time),
 	buttonAction(false),
-	newOnStack(true),
 	title(""),
 	homePosition(0),
 	position(0)
@@ -50,9 +50,9 @@ xpcc::StandardMenu::StandardMenu(xpcc::ViewStack* stack, uint8_t identifier) :
 
 xpcc::StandardMenu::StandardMenu(xpcc::ViewStack* stack, uint8_t identifier, const char* title) :
 	xpcc::AbstractMenu(stack, identifier),
-	timer(DISPLAY_UPDATE_TIME),
+	display_update_time(500),
+	timer(display_update_time),
 	buttonAction(false),
-	newOnStack(true),
 	title(title),
 	homePosition(0),
 	position(0)
@@ -102,18 +102,17 @@ xpcc::StandardMenu::draw()
 
 		display->setCursor(4, 12+i*8);
 		if (this->position - this->homePosition == i) {
-				(*display) << ">"; // TODO schönes Zeichen nehmen
+				(*display) << ">"; // TODO add nicer symbol
 		}
 		else {
 				(*display) << " ";
 		}
 		
 		(*display) << iter->text.getText();
-		//(*display) << iter->text;
 		++iter;
 	}
 
-	// TODO wenn möglich pfeil nach oben und nach unten einfügen
+	// todo add file up and / or down if some entrys are not displayed on screen
 }
 
 bool
