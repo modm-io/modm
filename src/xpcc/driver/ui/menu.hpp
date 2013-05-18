@@ -1,6 +1,6 @@
 // coding: utf-8
 // ----------------------------------------------------------------------------
-/* Copyright (c) 2009, Roboterclub Aachen e.V.
+/* Copyright (c) 2013, Roboterclub Aachen e.V.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -42,7 +42,7 @@
  * Right: Go to next screen.
  * Up: Go to previous selected entry on screen
  * Down: Go to next entry on screen
- * Center: Edit selected entry
+ * OK: Edit selected entry
  *
  *\warning Some classes currently only work with the font
  *         xpcc::font::FixedWidth5x8
