@@ -28,8 +28,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_STM32F2_4__CLOCK_HPP
-#define XPCC_STM32F2_4__CLOCK_HPP
+#ifndef XPCC_STM32__CLOCK_HPP
+#define XPCC_STM32__CLOCK_HPP
 
 #include <stdint.h>
 
@@ -128,4 +128,4 @@ namespace xpcc
 	}
 }
 
-#endif	//  XPCC_STM32F2_4__CLOCK_HPP
+#endif	//  XPCC_STM32__CLOCK_HPP
