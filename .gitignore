@@ -6,3 +6,7 @@
 .pydevproject
 .settings/
 build/
+
+# Directories containing device specific files generated from templates
+# in src/xpcc/architecture/
+/src/xpcc/architecture/generated*
