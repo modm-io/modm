@@ -62,7 +62,7 @@ namespace xpcc
 		 * };
 		 * 
 		 * xpcc::interpolation::Linear<Point>
-		 *         supportingPoints, 6);
+		 *         value(supportingPoints, 6);
 		 * 
 		 * ...
 		 * 
