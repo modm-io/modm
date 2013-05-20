@@ -26,37 +26,41 @@
 		<define size-id="e">STM32F407XE</define> <!-- Defines can depend on pin/size ids-->
 		<!-- TODO: add linkerscript -->
 		<!-- Core Driver -->
-		<driver type="core" name="cortex-m3"/> <!-- cortex-m3 driver works for cortex-m4 as well -->
+		<driver type="core" name="cortex-m3/generic"/> <!-- cortex-m3 driver works for cortex-m4 as well -->
 		<!-- Peripheral Drivers -->
 		<driver type="clock" name="stm32" /> <!-- the clock peripheral does not need the instances attribute because there is only one instance -->
 		<driver type="timer" name="stm32" instances="1,2,3,4,5,6,7,8" />
+		<!-- for testing: some imaginary driver that should never be used because of the high pin count -->
+		<driver type="magic" name="unicorn" instances="1,2,3,4,5,6,7,8" pin-count="500+"/>
 		<driver type="gpio" name="stm32_af">
-			<!-- separate field for port and id are needed because
-			     e.g. on the lpc platform both are a number -->
-			<gpio port="A" id="0" analog="Adc0,Adc1,Adc2">
-				<!-- This makes the GPIO connect to all peripheral drivers
-				     of a certain kind. For example Uart as well as UartHAL
-				     driver for the stm32 platform are both of the type uart
-				     and thus use the same alternate function -->
-				<af id="1" peripheral-type="timer" peripheral-id="2"/>
-				<af id="2" peripheral-type="timer" peripheral-id="5"/>
-				<af id="3" peripheral-type="timer" peripheral-id="8"/>
-				<!-- According to the development summit 2012 the driver
-				     directory is call uard thus the type will always be
-				     called uart and never usart! -->
-				<af id="7" peripheral-type="uart" peripheral-id="2"/>
-				<af id="8" peripheral-type="uart" peripheral-id="4"/>
-			</gpio>
-			<!-- For this proof of concept af, as well as analog are not
-			     evaluated
-			     TODO: add alternate functions as well as analog input connections -->
-			<gpio port="A" id="9"></gpio>
-			<!-- PD5 is only available on devices with 90 pins or more -->
-			<gpio port="D" id="5" pin-count="90+"></gpio>
-			<gpio port="D" id="12" pin-count="90+"></gpio>
-			<gpio port="D" id="13" pin-count="100+"></gpio>
-			<gpio port="D" id="14" pin-count="90+"></gpio>
-			<gpio port="D" id="15" pin-count="90+"></gpio>
+			<gpios><!--Needed to be able to iterate over generated dictionary structure -->
+				<!-- separate field for port and id are needed because
+					 e.g. on the lpc platform both are a number -->
+				<gpio port="A" id="0" analog="Adc0,Adc1,Adc2">
+					<!-- This makes the GPIO connect to all peripheral drivers
+						 of a certain kind. For example Uart as well as UartHAL
+						 driver for the stm32 platform are both of the type uart
+						 and thus use the same alternate function -->
+					<af id="1" peripheral-type="timer" peripheral-id="2"/>
+					<af id="2" peripheral-type="timer" peripheral-id="5"/>
+					<af id="3" peripheral-type="timer" peripheral-id="8"/>
+					<!-- According to the development summit 2012 the driver
+						 directory is call uard thus the type will always be
+						 called uart and never usart! -->
+					<af id="7" peripheral-type="uart" peripheral-id="2"/>
+					<af id="8" peripheral-type="uart" peripheral-id="4"/>
+				</gpio>
+				<!-- For this proof of concept af, as well as analog are not
+					 evaluated
+					 TODO: add alternate functions as well as analog input connections -->
+				<gpio port="A" id="9"></gpio>
+				<!-- PD5 is only available on devices with 90 pins or more -->
+				<gpio port="D" id="5" pin-count="90+"></gpio>
+				<gpio port="D" id="12" pin-count="90+"></gpio>
+				<gpio port="D" id="13" pin-count="100+"></gpio>
+				<gpio port="D" id="14" pin-count="90+"></gpio>
+				<gpio port="D" id="15" pin-count="90+"></gpio>
+			</gpios>
 		</driver>
 	</device>
 </rca>
