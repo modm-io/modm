@@ -23,10 +23,10 @@
 		<define>__STM32F407__</define>
 		<define>__ARM_STM32__</define>
 		<define>STM32F4XX</define>
-		<define size-id="e">STM32F407xE</define> <!-- Defines can depend on pin/size ids-->
+		<define size-id="e">STM32F407XE</define> <!-- Defines can depend on pin/size ids-->
 		<!-- TODO: add linkerscript -->
 		<!-- Core Driver -->
-		<core>cortex-m4</core>
+		<core name="cortex-m4"/>
 		<!-- Peripheral Drivers -->
 		<peripheral type="clock" name="stm32" />
 		<peripheral type="gpio" name="stm32_af">
@@ -37,14 +37,14 @@
 				     of a certain kind. For example Uart as well as UartHAL
 				     driver for the stm32 platform are both of the type uart
 				     and thus use the same alternate function -->
-				<af peripheral-type="timer" peripheral-id="2">1</af>
-				<af peripheral-type="timer" peripheral-id="5">2</af>
-				<af peripheral-type="timer" peripheral-id="8">3</af>
+				<af id="1" peripheral-type="timer" peripheral-id="2"/>
+				<af id="2" peripheral-type="timer" peripheral-id="5"/>
+				<af id="3" peripheral-type="timer" peripheral-id="8"/>
 				<!-- According to the development summit 2012 the driver
 				     directory is call uard thus the type will always be
 				     called uart and never usart! -->
-				<af peripheral-type="uart" peripheral-id="2">7</af>
-				<af peripheral-type="uart" peripheral-id="4">8</af>
+				<af id="7" peripheral-type="uart" peripheral-id="2"/>
+				<af id="8" peripheral-type="uart" peripheral-id="4"/>
 			</gpio>
 			<!-- For this proof of concept af, as well as analog are not
 			     evaluated
