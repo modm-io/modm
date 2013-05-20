@@ -1,0 +1,18 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE rca SYSTEM "../../xml/driver.dtd">
+<rca version="1.0">
+	<driver type="timer" name="stm32">
+		<!-- Template: file that needs to be turned into a source file -->
+		<template instances="1,8">advanced.cpp.in</template>
+		<template instances="1,8">advanced.hpp.in</template>
+		<template instances="6,7">basic.hpp.in</template>
+		<template instances="6,7">basic.cpp.in</template>
+		<template instances="2,3,4,5">general_purpose.hpp.in</template>
+		<template instances="2,3,4,5">general_purpose.cpp.in</template>
+		<!-- Static: files thht just need to be copied to the generated dir-->
+		<static>timer_base.hpp</static>
+		<!-- Empty/No 'instances' attribute defaults to all instances -->
+		<!-- Dependancies: static files that are shared between drivers -->
+		<!-- Dependancies need to be located in the platform directory!! -->
+	</driver>
+</rca>
