@@ -26,10 +26,10 @@
 		<define size-id="e">STM32F407XE</define> <!-- Defines can depend on pin/size ids-->
 		<!-- TODO: add linkerscript -->
 		<!-- Core Driver -->
-		<core name="cortex-m3"/> <!-- cortex-m3 driver works for cortex-m4 as well -->
+		<driver type="core" name="cortex-m3"/> <!-- cortex-m3 driver works for cortex-m4 as well -->
 		<!-- Peripheral Drivers -->
-		<peripheral type="clock" name="stm32" />
-		<peripheral type="gpio" name="stm32_af">
+		<driver type="clock" name="stm32" />
+		<driver type="gpio" name="stm32_af">
 			<!-- separate field for port and id are needed because
 			     e.g. on the lpc platform both are a number -->
 			<gpio port="A" id="0" analog="Adc0,Adc1,Adc2">
@@ -56,6 +56,6 @@
 			<gpio port="D" id="13" pin-count="100+"></gpio>
 			<gpio port="D" id="14" pin-count="90+"></gpio>
 			<gpio port="D" id="15" pin-count="90+"></gpio>
-		</peripheral>
+		</driver>
 	</device>
 </rca>
