@@ -26,7 +26,7 @@
 		<define size-id="e">STM32F407XE</define> <!-- Defines can depend on pin/size ids-->
 		<!-- TODO: add linkerscript -->
 		<!-- Core Driver -->
-		<core name="cortex-m4"/>
+		<core name="cortex-m3"/> <!-- cortex-m3 driver works for cortex-m4 as well -->
 		<!-- Peripheral Drivers -->
 		<peripheral type="clock" name="stm32" />
 		<peripheral type="gpio" name="stm32_af">
