@@ -29,6 +29,7 @@
 # -----------------------------------------------------------------------------
 
 import re
+import os
 import xml.etree.ElementTree as et
 import xml.parsers.expat
 from parser_exception import ParserException
@@ -102,7 +103,10 @@ class Device:
 					values.append(prop.value)
 		return values
 
-	def getBuildList(self, peripheral_path, device_string):
+	def getBuildList(self, peripheral_path, device_string, target_path=None):
+		"""
+		target_path: normally the absolute path to the architecture/platform_device_string.generated directory
+		"""
 		s = DeviceString(device_string)
 		if s.valid == False:
 			return False
@@ -123,6 +127,14 @@ class Device:
 			if len(f) == 3: # is template file
 				f[2] = dict(f[2].items() + s.getTargetDict().items()) # merge substitutions
 			build.append(f)
+		# patch build list to absolute pahts
+		if target_path != None:
+			old_build = build
+			build = []
+			for f in old_build:
+				f[0] = os.path.join(peripheral_path, f[0])
+				f[1] = os.path.join(target_path, f[1])
+				build.append(f)
 		return build
 
 	def __str__(self):
@@ -161,7 +173,8 @@ if __name__ == "__main__":
 	Some test code
 	"""
 	dev = Device("../../src/xpcc/architecture/platform/xml/stm32f40.xml")
-	build = dev.getBuildList("../../src/xpcc/architecture/platform", 'stm32f407vg')
+	a_dir = os.path.abspath("../../src/xpcc/architecture/")
+	build = dev.getBuildList(os.path.join(a_dir, 'platform'), 'stm32f407vg', os.path.join(a_dir, 'platform_stm32f407vg.generated'))
 	for f in build:
 		if len(f) == 2:
 			print "static:   %s => %s" % (f[0], f[1])
