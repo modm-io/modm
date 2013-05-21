@@ -171,82 +171,84 @@ namespace xpcc
 		inline bool
 		exitUserCalibrationMode();
 
+		/// resets the processor, any new command is delayed by 500ms
 		inline bool
 		resetProcessor();
 
 		// data management
 		/**
-		 * read the Acceleration registers and buffer the results
+		 * reads the Acceleration registers and buffer the results
 		 * sets isNewAccelerationDataAvailable() to \c true
 		 */
 		ALWAYS_INLINE void
 		readAcceleration();
 
 		/**
-		 * read the Magnetometer registers and buffer the results
+		 * reads the Magnetometer registers and buffer the results
 		 * sets isNewMagnetometerDataAvailable() to \c true
 		 */
 		ALWAYS_INLINE void
 		readMagnetometer();
 
 		/**
-		 * read the Attitude registers and buffer the results
+		 * reads the Attitude registers and buffer the results
 		 * sets isNewAttitudeDataAvailable() to \c true
 		 */
 		ALWAYS_INLINE void
 		readAttitude();
 
 		/**
-		 * read the Tilt registers and buffer the results
+		 * reads the Temperature registers and buffer the results
 		 * sets isNewTemperatureDataAvailable() to \c true
 		 */
 		ALWAYS_INLINE void
 		readTemperature();
 
-		/**
-		 * \c true, when new data has been from the sensor and buffered,
-		 * \c false, when the data has already been read
-		 */
 		ALWAYS_INLINE bool
 		isNewAccelerationDataAvailable();
 
-		/**
-		 * \c true, when new data has been from the sensor and buffered,
-		 * \c false, when the data has already been read
-		 */
 		ALWAYS_INLINE bool
 		isNewMagnetometerDataAvailable();
 
-		/**
-		 * \c true, when new data has been from the sensor and buffered,
-		 * \c false, when the data has already been read
-		 */
 		ALWAYS_INLINE bool
 		isNewAttitudeDataAvailable();
 
-		/**
-		 * \c true, when new data has been from the sensor and buffered,
-		 * \c false, when the data has already been read
-		 */
 		ALWAYS_INLINE bool
 		isNewTemperatureDataAvailable();
 
 		// access to data
+		uint16_t
+		getDeviceID();
+
+		/**
+		 * \return pointer to 8bit array containing 3 16bit Axyz values.
+		 * Be aware that the array is in BIG ENDIAN format, so you cannot
+		 * simply reinterpret the result as int16_t!!
+		 */
 		inline uint8_t*
 		getAcceleration();
 
+		/**
+		 * \return pointer to 8bit array containing 3 16bit Mxyz values.
+		 * Be aware that the array is in BIG ENDIAN format, so you cannot
+		 * simply reinterpret the result as int16_t!!
+		 */
 		inline uint8_t*
 		getMagnetometer();
 
+		/// returns the heading in tenth of degrees (0 -> 3600)
 		inline uint16_t
 		getHeading();
 
+		/// returns the Pitch in tenth of degrees (-900 -> 0 -> 900)
 		inline int16_t
 		getPitch();
 
+		/// returns the Roll in tenth of degrees (-900 -> 0 -> 900)
 		inline int16_t
 		getRoll();
 
+		/// returns the temperature in unknown format (was not specified in datasheet)
 		inline int16_t
 		getTemperature();
 
@@ -262,7 +264,7 @@ namespace xpcc
 		void
 		update();
 
-	protected:
+	public:
 		bool
 		writeCommand(hmc6343::Command command);
 

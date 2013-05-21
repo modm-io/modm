@@ -48,7 +48,9 @@ template < typename I2cMaster >
 bool
 xpcc::Hmc6343<I2cMaster>::configure(hmc6343::MeasurementRate measurementRate)
 {
-	return writeRegister(hmc6343::EEPROM_OPERATION_MODE_2, measurementRate);
+	bool ok = true;
+	ok &= writeRegister(hmc6343::EEPROM_OPERATION_MODE_2, measurementRate);
+	return ok;
 }
 
 template < typename I2cMaster >
@@ -219,6 +221,16 @@ xpcc::Hmc6343<I2cMaster>::isNewTemperatureDataAvailable()
 }
 
 // MARK: - data access
+template < typename I2cMaster >
+uint16_t
+xpcc::Hmc6343<I2cMaster>::getDeviceID()
+{
+	uint8_t lsb = readRegister(hmc6343::EEPROM_DEVICE_SERIAL_LSB);
+	uint8_t msb = readRegister(hmc6343::EEPROM_DEVICE_SERIAL_MSB);
+
+	return (msb << 8) | lsb;
+}
+
 
 template < typename I2cMaster >
 uint8_t*
@@ -242,7 +254,7 @@ xpcc::Hmc6343<I2cMaster>::getHeading()
 {
 	uint16_t* rawData = reinterpret_cast<uint16_t*>(data);
 	status &= ~NEW_ATTITUDE_DATA;
-	return xpcc::swap(rawData[7]);
+	return xpcc::swap(rawData[6]);
 }
 
 template < typename I2cMaster >
@@ -251,7 +263,7 @@ xpcc::Hmc6343<I2cMaster>::getPitch()
 {
 	uint16_t* rawData = reinterpret_cast<uint16_t*>(data);
 	status &= ~NEW_ATTITUDE_DATA;
-	return static_cast<int16_t>(xpcc::swap(rawData[8]));
+	return static_cast<int16_t>(xpcc::swap(rawData[7]));
 }
 
 template < typename I2cMaster >
@@ -260,7 +272,7 @@ xpcc::Hmc6343<I2cMaster>::getRoll()
 {
 	uint16_t* rawData = reinterpret_cast<uint16_t*>(data);
 	status &= ~NEW_ATTITUDE_DATA;
-	return static_cast<int16_t>(xpcc::swap(rawData[9]));
+	return static_cast<int16_t>(xpcc::swap(rawData[8]));
 }
 
 template < typename I2cMaster >
@@ -269,7 +281,7 @@ xpcc::Hmc6343<I2cMaster>::getTemperature()
 {
 	uint16_t* rawData = reinterpret_cast<uint16_t*>(data);
 	status &= ~NEW_TEMPERATURE_DATA;
-	return static_cast<int16_t>(xpcc::swap(rawData[10]));
+	return static_cast<int16_t>(xpcc::swap(rawData[9]));
 }
 
 template < typename I2cMaster >
@@ -329,10 +341,13 @@ xpcc::Hmc6343<I2cMaster>::readRegister(hmc6343::Register reg)
 
 	buffer[0] = hmc6343::COMMAND_READ_EEPROM;
 	buffer[1] = reg;
-	adapter.initialize(buffer, 2, buffer, 1);
+	// reading two bytes here is a hack, it does not work on stm32 with just reading one.
+	// this might be a bug in the STM32 driver.
+	adapter.initialize(buffer, 2, buffer, 2);
 
 	while(!I2cMaster::startSync(&adapter))
 		;
+
 	// 10ms timing delay
 	timeout.restart(10);
 
