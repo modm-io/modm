@@ -32,7 +32,9 @@
 #include "timer/timer_2.hpp"
 #include "timer/timer_3.hpp"
 #include "timer/timer_4.hpp"
+#if !defined (STM32F10X_LD) && !defined (STM32F10X_MD) && !defined(STM32F3XX)
 #include "timer/timer_5.hpp"
+#endif
 #include "timer/timer_6.hpp"
 #include "timer/timer_7.hpp"
 #include "timer/timer_8.hpp"

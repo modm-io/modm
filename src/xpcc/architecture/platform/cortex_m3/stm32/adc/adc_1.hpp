@@ -489,7 +489,7 @@ namespace xpcc
 
 			/** 
 			 * @return If the conversion is finished.
-			 * @pre A conversion should have been started with startConversion()
+			 * @pre A conversion should have been stared with startConversion()
 			 */
 			static inline bool
 			isConversionFinished(void)

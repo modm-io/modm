@@ -79,7 +79,7 @@ namespace xpcc
 		 */
 		class Timer1 : public AdvancedControlTimer
 		{
-#if defined(STM32F2XX) || defined(STM32F4XX)
+#if defined(STM32F2XX) || defined(STM32F3XX) || defined(STM32F4XX)
 		public:
 			
 #else
@@ -106,6 +106,47 @@ namespace xpcc
 #endif
 			
 		public:
+			enum MasterMode
+			{
+				MASTER_RESET 			= 0,							// 0b000
+				MASTER_ENABLE 			= TIM_CR2_MMS_0,				// 0b001
+				MASTER_UPDATE 			= TIM_CR2_MMS_1,				// 0b010
+				MASTER_COMPARE_PULSE 	= TIM_CR2_MMS_1 | TIM_CR2_MMS_0,// 0b011
+				MASTER_COMPARE_OC1REF 	= TIM_CR2_MMS_2,				// 0b100
+				MASTER_COMPARE_OC2REF 	= TIM_CR2_MMS_2 | TIM_CR2_MMS_0,// 0b101
+				MASTER_COMPARE_OC3REF 	= TIM_CR2_MMS_2 | TIM_CR2_MMS_1,// 0b110
+				MASTER_COMPARE_OC4REF 	= TIM_CR2_MMS_2 | TIM_CR2_MMS_1	// 0b111
+														| TIM_CR2_MMS_0,
+			};
+
+			enum CaptureCompareControlUpdate
+			{
+				SET_COMG = 0,
+				SET_COMG_OR_TRGI_RIDING_EDGE = TIM_CR2_CCUS
+			};
+
+#if defined(STM32F3XX)
+			enum MasterMode2
+			{
+				MASTER2_RESET			= 0,							//0b0000
+				MASTER2_ENABLE			= TIM_CR2_MMS2_0,				//0b0001
+				MASTER2_UPDATE			= TIM_CR2_MMS2_1,				//0b0010
+				MASTER2_COMPARE_PULSE	= TIM_CR2_MMS2_1				//0b0010
+										| TIM_CR2_MMS2_0,
+				MASTER2_COMPARE_OC1REF	= TIM_CR2_MMS2_2,				//0b0100
+				MASTER2_COMPARE_OC2REF	= TIM_CR2_MMS2_2				//0b0101
+										| TIM_CR2_MMS2_0,
+				MASTER2_COMPARE_OC3REF	= TIM_CR2_MMS2_2				//0b0110
+										| TIM_CR2_MMS2_1,
+				MASTER2_COMPARE_OC4REF	= TIM_CR2_MMS2_2				//0b0111
+										| TIM_CR2_MMS2_1 | TIM_CR2_MMS2_0,
+				MASTER2_COMPARE_OC5REF	= TIM_CR2_MMS2_3,				//0b1000
+				MASTER2_COMPARE_OC6REF	= TIM_CR2_MMS2_3				//0b1001
+										| TIM_CR2_MMS2_0,
+				// TODO: Add other Master Modes
+			};
+#endif /* defined(STM32F3XX) */
+
 			enum SlaveModeTrigger
 			{
 				TRIGGER_INTERNAL_0 = 0,
@@ -129,6 +170,40 @@ namespace xpcc
 				SLAVE_TRIGGER	= TIM_SMCR_SMS_2 | TIM_SMCR_SMS_1, // The counter starts at a rising edge of the trigger TRGI (but it is not reset). Only the start of the counter is controlled.
 				SLAVE_EXTERNAL_CLOCK = TIM_SMCR_SMS_2 | TIM_SMCR_SMS_1 | TIM_SMCR_SMS_0, // Rising edges of the selected trigger (TRGI) clock the counter.
 			};
+
+			enum OffStateForRunMode
+			{
+				OSSR_DISABLE = 0,
+				OSSR_ENABLE = TIM_BDTR_OSSR,
+			};
+
+			enum OffStateForIdleMode
+			{
+				OSSI_DISABLE = 0,
+				OSSI_ENABLE = TIM_BDTR_OSSI,
+			};
+
+			enum OutputIdleState
+			{
+				IDLE_STATE_RESET = 0,
+				IDLE_STATE_SET = TIM_CR2_OIS1,
+			};
+
+			enum Event
+			{
+			#if defined(STM32F3XX)
+				EVENT_BREAK_2 							= TIM_EGR_B2G,
+			#endif
+				EVENT_BREAK 							= TIM_EGR_BG,
+				EVENT_TRIGGER 							= TIM_EGR_TG,
+				EVENT_CAPTURE_COMPARE_CONTROL_UPDATE 	= TIM_EGR_COMG,
+				EVENT_CAPTURE_COMPARE_4 				= TIM_EGR_CC4G,
+				EVENT_CAPTURE_COMPARE_3 				= TIM_EGR_CC3G,
+				EVENT_CAPTURE_COMPARE_2 				= TIM_EGR_CC2G,
+				EVENT_CAPTURE_COMPARE_1 				= TIM_EGR_CC1G,
+				EVENT_UPDATE 							= TIM_EGR_UG,
+			};
+
 			
 			static void
 			enable();
@@ -151,7 +226,41 @@ namespace xpcc
 			static void
 			setMode(Mode mode,
 					SlaveMode slaveMode = SLAVE_DISABLED,
-					SlaveModeTrigger slaveModeTrigger = TRIGGER_INTERNAL_0);
+					SlaveModeTrigger slaveModeTrigger = TRIGGER_INTERNAL_0,
+					MasterMode masterMode = MASTER_RESET
+#if defined(STM32F3XX)
+					, MasterMode2 masterMode2 = MASTER2_RESET
+#endif /* defined(STM32F3XX) */
+					);
+
+			static inline void
+			setCaptureCompareControlUpdate(CaptureCompareControlUpdate update)
+			{
+				TIM1->CR2 =  (TIM1->CR2 & ~TIM_CR2_CCUS)
+									| update;
+			};
+
+
+			/*
+			 * Enables Capture/Compare preloaded control
+			 *
+			 * If enabled CCxE, CCxNE and OCxM bits are preloaded and only
+			 * updated when the COMG bit is set or on a rising edge on TRGI
+			 * This is determined by the CaptureCompareControlUpdate setting.
+			 */
+			static inline void
+			enableCaptureComparePreloadedControl
+			(CaptureCompareControlUpdate update = SET_COMG)
+			{
+				TIM1->CR2 = (TIM1->CR2 & ~TIM_CR2_CCUS)
+									| update | TIM_CR2_CCPC;
+			}
+
+			static inline void
+			disableCaptureComparePreloadedControl()
+			{
+				TIM1->CR2 &= ~TIM_CR2_CCPC;
+			}
 			
 			static inline void
 			setPrescaler(uint16_t prescaler)
@@ -174,9 +283,15 @@ namespace xpcc
 			applyAndReset()
 			{
 				// Generate Update Event to apply the new settings for ARR
-				TIM1->EGR |= TIM_EGR_UG;
+				generateEvent(EVENT_UPDATE);
 			}
-			
+
+			static inline void
+			generateEvent(Event ev)
+			{
+				TIM1->EGR |= static_cast<uint32_t>(ev);
+			}
+
 			static inline uint16_t
 			getValue()
 			{
@@ -194,20 +309,152 @@ namespace xpcc
 			{
 				TIM1->BDTR |= TIM_BDTR_MOE;
 			}
-			
+
+			/*
+			 * Enable/Disable automatic set of MOE bit at the next update event
+			 */
+			static inline void
+			setAutomaticUpdate(bool enable)
+			{
+				if(enable)
+					TIM1->BDTR |= TIM_BDTR_AOE;
+				else
+					TIM1->BDTR &= ~TIM_BDTR_AOE;
+			}
+
+			static inline void
+			setOffState(OffStateForRunMode runMode, OffStateForIdleMode idleMode)
+			{
+				uint32_t flags = TIM1->BDTR;
+				flags &= ~(TIM_BDTR_OSSR | TIM_BDTR_OSSI);
+				flags |= runMode | idleMode;
+				TIM1->BDTR = flags;
+			}
+
+			static inline void
+			setOutputIdleState(uint32_t channel, OutputIdleState idle,
+									OutputIdleState idle_n = IDLE_STATE_RESET)
+			{
+				uint32_t flags = TIM1->CR2;
+				channel -= 1;
+				flags &=  (IDLE_STATE_SET << (channel * 2))
+						| (IDLE_STATE_SET << (channel * 2 + 1));
+				flags |= (idle   << (channel * 2));
+				flags |= (idle_n << (channel * 2 + 1));
+				TIM1->CR2 = flags;
+			}
+
+			/*
+			 * Set Dead Time Value
+			 *
+			 * Different Resolution Depending on DeadTime[7:5]:
+			 *     0xx =>  DeadTime[6:0]            * T(DTS)
+			 *     10x => (DeadTime[5:0] + 32) *  2 * T(DTS)
+			 *     110 => (DeadTime[4:0] + 4)  *  8 * T(DTS)
+			 *     111 => (DeadTime[4:0] + 2)  * 16 * T(DTS)
+			 */
+			static inline void
+			setDeadTime(uint8_t deadTime)
+			{
+				uint32_t flags = TIM1->BDTR;
+				flags &= TIM_BDTR_DTG;
+				flags |= deadTime;
+				TIM1->BDTR = flags;
+			}
+
+			/*
+			 * Set Dead Time Value
+			 *
+			 * Different Resolution Depending on DeadTime[7:5]:
+			 *     0xx =>  DeadTime[6:0]            * T(DTS)
+			 *     10x => (DeadTime[5:0] + 32) *  2 * T(DTS)
+			 *     110 => (DeadTime[4:0] + 4)  *  8 * T(DTS)
+			 *     111 => (DeadTime[4:0] + 2)  * 16 * T(DTS)
+			 */
+			static inline void
+			setDeadTime(DeadTimeResolution resolution, uint8_t deadTime)
+			{
+				uint8_t bitmask;
+				switch(resolution){
+					case FROM_0_125NS_STEP:
+						bitmask = 0b01111111;
+						break;
+					case FROM_16US_250NS_STEP:
+						bitmask = 0b00111111;
+						break;
+					case FROM_32US_1US_STEP:
+					case FROM_64US_2US_STEP:
+						bitmask = 0b00011111;
+						break;
+					default:
+						bitmask = 0x00;
+						break;
+				}
+				uint32_t flags = TIM1->BDTR;
+				flags &= TIM_BDTR_DTG;
+				flags |= (deadTime & bitmask) | resolution;
+				TIM1->BDTR = flags;
+			}
+
 		public:
 			static void
 			configureInputChannel(uint32_t channel, InputCaptureMapping input,
-					InputCapturePrescaler prescaler, InputCapturePolarity polarity, uint8_t filter);
-			
+					InputCapturePrescaler prescaler,
+					InputCapturePolarity polarity, uint8_t filter,
+					bool xor_ch1_3=false);
+
 			static void
 			configureOutputChannel(uint32_t channel, OutputCompareMode mode,
 					uint16_t compareValue);
-			
+			// TODO: Maybe add some functionality from the configureOutput
+			//       function below...
+
+			/*
+			 * Configure Output Channel without changing the Compare Value
+			 *
+			 * Normally used to REconfigure the Output channel without touching
+			 * the compare value. This can e.g. be useful for commutation of a
+			 * bldc motor.
+			 *
+			 * This function probably won't be used for a one time setup but
+			 * rather for adjusting the output setting periodically.
+			 * Therefore it aims aims to provide the best performance possible
+			 * without sacrificing code readability.
+			 */
+			static void
+			configureOutputChannel(uint32_t channel, OutputCompareMode mode,
+					PinState out, OutputComparePolarity polarity,
+					PinState out_n,
+					OutputComparePolarity polarity_n = OUTPUT_ACTIVE_HIGH,
+					OutputComparePreload preload = PRELOAD_REGISTER_DISABLED);
+
+			/*
+			 * Configure Output Channel width Mode/OutputPort uint
+			 *
+			 * This is the least typesafe way of doing this and should only
+			 * be done if it provides a necessary performance
+			 * (or more or less) lazyness benefit.
+			 * i.e. if you have specific mode/output uints precalculated and
+			 * just want to load them as fast as possible.
+			 *
+			 * The "mode/output" uint contains four bits
+			 * that describe the intended output setting:
+			 * Bit0: Output Enabled/Disabled
+			 * Bit1: Output Polarity
+			 * Bit2: Complementary Output Enable/Disable
+			 * Bit3: Complementary Output Polarity
+			 *
+			 * As well as Mode Information (Bit6-Bit4)
+			 * which is just an OutputCompareMode constant ored with the
+			 * port output quadruple specified above.
+			 */
+			static void
+			configureOutputChannel(uint32_t channel, uint32_t modeOutputPorts);
+
 			static inline void
 			setCompareValue(uint32_t channel, uint16_t value)
 			{
-#if defined(STM32F2XX) || defined(STM32F4XX)
+#if defined(STM32F2XX) || defined(STM32F3XX) || defined(STM32F4XX)
 				*(&TIM1->CCR1 + (channel - 1)) = value;
 #else
 				*(&TIM1->CCR1 + ((channel - 1) * 2)) = value;
@@ -217,7 +464,7 @@ namespace xpcc
 			static inline uint16_t
 			getCompareValue(uint32_t channel)
 			{
-#if defined(STM32F2XX) || defined(STM32F4XX)
+#if defined(STM32F2XX) || defined(STM32F3XX) || defined(STM32F4XX)
 				return *(&TIM1->CCR1 + (channel - 1));
 #else
 				return *(&TIM1->CCR1 + ((channel - 1) * 2));
