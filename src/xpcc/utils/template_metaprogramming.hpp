@@ -305,10 +305,16 @@ namespace xpcc
 #ifdef __DOXYGEN__
 		#define	XPCC__STATIC_ASSERT(condition, msg)
 #else
+		// automatically use C++11 if possible
+#	if __cplusplus < 201103L
 		#define	XPCC__STATIC_ASSERT(condition, msg) 					\
 			typedef ::xpcc::tmp::static_assert_test<					\
 				sizeof(::xpcc::tmp::STATIC_ASSERTION_FAILURE< (bool) (condition) >) >\
 					CONCAT(static_assert_typedef_, __LINE__)
+#	else
+		#define	XPCC__STATIC_ASSERT(condition, msg) 					\
+			static_assert(condition, msg)
+#	endif
 #endif
 	}
 }
