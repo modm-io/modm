@@ -177,6 +177,15 @@ xpcc::IOStream::writeHex(const char* s)
 	}
 }
 
+void
+xpcc::IOStream::writeBin(const char* s)
+{
+	while (*s != '\0') {
+		this->writeBin(*s);
+		s++;
+	}
+}
+
 // ----------------------------------------------------------------------------
 void
 xpcc::IOStream::writeHexNibble(uint8_t nibble)
@@ -197,6 +206,22 @@ xpcc::IOStream::writeHex(uint8_t value)
 {
 	writeHexNibble(value >> 4);
 	writeHexNibble(value & 0xF);
+}
+
+void
+xpcc::IOStream::writeBin(uint8_t value)
+{
+	for (uint_fast8_t ii = 0; ii < 8; ii++)
+	{
+		if (value & 0x80) {
+			this->device->write('1');
+		}
+		else {
+			this->device->write('0');
+		}
+		value <<= 1;
+	}
+
 }
 
 // ----------------------------------------------------------------------------

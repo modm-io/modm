@@ -103,6 +103,7 @@ public:
 	void
 	testFloat4();
 
+	// hex
 	void
 	testHex1();
 
@@ -114,6 +115,19 @@ public:
 	
 	void
 	testHex4();
+
+	// bin
+	void
+	testBin1();
+
+	void
+	testBin2();
+
+	void
+	testBin3();
+
+	void
+	testBin4();
 
 private:
 	xpcc::IOStream *stream;
