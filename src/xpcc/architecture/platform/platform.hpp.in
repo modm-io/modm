@@ -35,7 +35,6 @@
  * \ingroup 	architecture
  * \defgroup	platform	Supported Platforms
  * 
- * Select built-in functions and macros for the active platform
  */
 
 #include <stdint.h>
@@ -43,22 +42,7 @@
 #include "detect.hpp"		// sets XPCC__CPU_xx etc. macros
 #include "utils.hpp"
 
-#if defined XPCC__CPU_AVR
-#	include "platform/avr.hpp"
-#elif defined XPCC__CPU_ARM7TDMI
-#	include "platform/arm7.hpp"
-#elif defined XPCC__CPU_CORTEX_M0
-#	include "platform/cortex_m0.hpp"
-#elif defined XPCC__CPU_CORTEX_M3
-#	include "platform/cortex_m3.hpp"
-#elif defined XPCC__CPU_CORTEX_M4
-#	include "platform/cortex_m3.hpp"
-#elif defined XPCC__CPU_HOSTED
-#	include "platform/hosted.hpp"
-#elif defined XPCC__CPU_AVR32
-#	include "platform/avr32.hpp"
-#else
-#	error "Unknown platform"
-#endif
+// Include generated Platform sources:
+#include "platform_${device}.generated/${device}.hpp"
 
 #endif	// XPCC__PLATFORM_HPP
