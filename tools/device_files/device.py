@@ -88,6 +88,40 @@ class Device:
 		# expect that all required elements exist...
 		return xmltree[0]
 
+##-------------  Methods used by the SCons Platform Tools ---------------------
+	def getProperties(self, device_string):
+		"""
+		Returns a dictionary containing:
+		'flash', 'ram', 'pin-count' and 'defines'
+		that are specific to the device_string.
+
+		This is used by the Scons Platform Tools. Think before editing.
+		"""
+		s = DeviceString(device_string)
+		if s.valid == False:
+			return None
+		props = {}
+		props['flash'] = self.getProperty('flash', device_string)[0]
+		props['ram'] = self.getProperty('ram', device_string)[0]
+		props['pin-count'] = self.getProperty('pin-count', device_string)[0]
+		props['defines'] = self.getProperty('define', device_string)
+		return props
+
+	def getDriverList(self, device_string):
+		"""
+		This function uses data gathered from the device file to generate
+		a list fo drivers that need to be built.
+		Every driver is represented by a dictionary that contains the following
+		keys:
+		'driver_file': contains the absolute path to the drivers xml file
+		'substitutions': substitution values that are derived from the device
+		                 file, will be appended by those introduced by the
+		                 driver file
+		'instances': instances that will be created of this driver
+		"""
+		return []
+
+##-----------------------------------------------------------------------------
 	def getProperty(self, prop_type, device_string):
 		"""
 		Can be used to inquire flash size, ram size, pin-count or defines
@@ -181,5 +215,5 @@ if __name__ == "__main__":
 		elif len(f) == 3:
 			print "template: %s => %s" % (f[0], f[1])
 			print "substitutions: %s" % f[2]
-	print "dev.getProperty('flash', 'stm32f407vg'): %s" % dev.getProperty('flash', 'stm32f407vg')
-	print "dev.getProperty('flash', 'stm32f407ve'): %s" % dev.getProperty('flash', 'stm32f407ve')
+	print "dev.getProperties('stm32f407vg'): %s" % dev.getProperties('stm32f407vg')
+	print "dev.getProperties('stm32f407ve'): %s" % dev.getProperties('stm32f407ve')
