@@ -83,9 +83,9 @@
 #define	GPIO__IO(name, port, pin) \
 typedef CONCAT3(Gpio, port, pin) name
 #define	GPIO__OUTPUT(name, port, pin) \
-typedef ::xpcc::stm32::Output<CONCAT3(Gpio, port, pin)> name
+typedef ::xpcc::stm32::Output< ::xpcc::stm32::CONCAT3(Gpio, port, pin)> name
 #define	GPIO__INPUT(name, port, pin) \
-typedef ::xpcc::stm32::Input<CONCAT3(Gpio, port, pin)> name
+typedef ::xpcc::stm32::Input< ::xpcc::stm32::CONCAT3(Gpio, port, pin)> name
 
 namespace xpcc
 {
@@ -248,20 +248,20 @@ namespace xpcc
 		 */
 		template<class IO>		/* the undelying gpio class */
 		struct Output : Gpio {	/* inherit enums from Gpio base class */
-			ALWAYS_INLINE static void setOutput(bool status) { IO.setOutput(status); }
+			ALWAYS_INLINE static void setOutput(bool status) { IO::setOutput(status); }
 			ALWAYS_INLINE static void setOutput(OutputType out = PUSH_PULL,
-				OutputSpeed speed = SPEED_50MHZ, PullType pull = FLOATING) [
-				IO.setOutput(ouz, speed, pull);
+				OutputSpeed speed = SPEED_50MHZ, PullType pull = FLOATING) {
+				IO::setOutput(out, speed, pull);
 			}
 			ALWAYS_INLINE static void
 			setAlternateFunction(AlternateFunction alt, OutputType out,
 				OutputSpeed speed = SPEED_50MHZ, PullType pull = FLOATING) {
-				IO.setAlternateFunction(alt, out, speed, pull);
+				IO::setAlternateFunction(alt, out, speed, pull);
 			}
-			ALWAYS_INLINE static void set() { IO.set(); }
-			ALWAYS_INLINE static void reset() { IO.reset(); }
-			ALWAYS_INLINE static void toggle() {  IO.toggle(); }
-			ALWAYS_INLINE static void set(bool status) { IO.set(status); }
+			ALWAYS_INLINE static void set() { IO::set(); }
+			ALWAYS_INLINE static void reset() { IO::reset(); }
+			ALWAYS_INLINE static void toggle() {  IO::toggle(); }
+			ALWAYS_INLINE static void set(bool status) { IO::set(status); }
 		};
 
 		/**
@@ -273,14 +273,14 @@ namespace xpcc
 		template<class IO>		/* the undelying gpio class */
 		struct Input : Gpio {	/* inherit enums from Gpio base class */
 			ALWAYS_INLINE static void setInput(PullType type = FLOATING) {
-				IO.setInput(type);
+				IO::setInput(type);
 			}
-			ALWAYS_INLINE static void setAnalogInput() { IO.setAnalogInput(); }
+			ALWAYS_INLINE static void setAnalogInput() { IO::setAnalogInput(); }
 			ALWAYS_INLINE static void
 			setAlternateFunction(AlternateFunction alt, PullType pull) {
-				IO.setAlternateFunction(alt, pull);
+				IO::setAlternateFunction(alt, pull);
 			}
-			ALWAYS_INLINE static bool read() { IO.read(); }
+			ALWAYS_INLINE static bool read() { return IO::read(); }
 		};
 
 		/**
@@ -288,7 +288,8 @@ namespace xpcc
 		 */
 		{% for gpio in gpios -%}
 			{% set reg  = "GPIO" ~ gpio.port|upper -%}
-			{% set name = "Gpio" ~ gpio.port|upper ~ gpio.pin %}
+			{% set name = "Gpio" ~ gpio.port|upper ~ gpio.id %}
+			{% set pin  = gpio.id %}
 
 
 		struct {{name}} : Gpio {
@@ -300,52 +301,52 @@ namespace xpcc
 			ALWAYS_INLINE static void
 			setOutput(OutputType out = PUSH_PULL,
 				OutputSpeed speed = SPEED_50MHZ, PullType pull = FLOATING) { 
-				{{reg}}->MODER   = ({{reg}}->MODER   & ~(0x3 << (pin * 2))) | (0x1 << (pin * 2));
-				{{reg}}->OTYPER  = ({{reg}}->OTYPER  & ~(1 << pin)) | (out << pin);
-				{{reg}}->OSPEEDR = ({{reg}}->OSPEEDR & ~(0x3 << (pin * 2))) | (speed << (pin * 2));
-				{{reg}}->PUPDR   = ({{reg}}->PUPDR   & ~(0x3 << (pin * 2))) | (pull << (pin * 2));
+				{{reg}}->MODER   = ({{reg}}->MODER   & ~(0x3 << ({{pin}} * 2))) | (0x1 << ({{pin}} * 2));
+				{{reg}}->OTYPER  = ({{reg}}->OTYPER  & ~(1 << {{pin}})) | (out << {{pin}});
+				{{reg}}->OSPEEDR = ({{reg}}->OSPEEDR & ~(0x3 << ({{pin}} * 2))) | (speed << ({{pin}} * 2));
+				{{reg}}->PUPDR   = ({{reg}}->PUPDR   & ~(0x3 << ({{pin}} * 2))) | (pull << ({{pin}} * 2));
 			}
 
 			ALWAYS_INLINE static void
 			setAlternateFunction(AlternateFunction alt, OutputType out,
 				OutputSpeed speed = SPEED_50MHZ, PullType pull = FLOATING) {
-				{{reg}}->MODER   = ({{reg}}->MODER   & ~(0x3 << (pin * 2))) | (0x2 << (pin * 2));
-				AlternateMode<{{reg}}_BASE, pin>::setMode(alt);
-				{{reg}}->OTYPER  = ({{reg}}->OTYPER  & ~(1 << pin)) | (out << pin);
-				{{reg}}->OSPEEDR = ({{reg}}->OSPEEDR & ~(0x3 << (pin * 2))) | (speed << (pin * 2));
-				{{reg}}->PUPDR   = ({{reg}}->PUPDR   & ~(0x3 << (pin * 2))) | (pull << (pin * 2));
+				{{reg}}->MODER   = ({{reg}}->MODER   & ~(0x3 << ({{pin}} * 2))) | (0x2 << ({{pin}} * 2));
+				AlternateMode<{{reg}}_BASE, {{pin}}>::setMode(alt);
+				{{reg}}->OTYPER  = ({{reg}}->OTYPER  & ~(1 << {{pin}})) | (out << {{pin}});
+				{{reg}}->OSPEEDR = ({{reg}}->OSPEEDR & ~(0x3 << ({{pin}} * 2))) | (speed << ({{pin}} * 2));
+				{{reg}}->PUPDR   = ({{reg}}->PUPDR   & ~(0x3 << ({{pin}} * 2))) | (pull << ({{pin}} * 2));
 			}
 
 			ALWAYS_INLINE static void
 			setAlternateFunction(AlternateFunction alt, PullType pull) {
-				{{reg}}->MODER   = ({{reg}}->MODER   & ~(0x3 << (pin * 2))) | (0x2 << (pin * 2));
-				AlternateMode<{{reg}}_BASE, pin>::setMode(alt);
-				{{reg}}->OTYPER  = ({{reg}}->OTYPER  & ~(1 << pin)) | (PUSH_PULL << pin);
-				{{reg}}->OSPEEDR = ({{reg}}->OSPEEDR & ~(0x3 << (pin * 2))) | (SPEED_2MHZ << (pin * 2));
-				{{reg}}->PUPDR   = ({{reg}}->PUPDR   & ~(0x3 << (pin * 2))) | (pull << (pin * 2));
+				{{reg}}->MODER   = ({{reg}}->MODER   & ~(0x3 << ({{pin}} * 2))) | (0x2 << ({{pin}} * 2));
+				AlternateMode<{{reg}}_BASE, {{pin}}>::setMode(alt);
+				{{reg}}->OTYPER  = ({{reg}}->OTYPER  & ~(1 << {{pin}})) | (PUSH_PULL << {{pin}});
+				{{reg}}->OSPEEDR = ({{reg}}->OSPEEDR & ~(0x3 << ({{pin}} * 2))) | (SPEED_2MHZ << ({{pin}} * 2));
+				{{reg}}->PUPDR   = ({{reg}}->PUPDR   & ~(0x3 << ({{pin}} * 2))) | (pull << ({{pin}} * 2));
 			}
 
 			ALWAYS_INLINE static void
 			setInput(PullType type = FLOATING) {
-				{{reg}}->MODER &= ~(0x3 << (pin * 2));
-				{{reg}})->PUPDR = ({{reg}}->PUPDR & ~(0x3 << (pin * 2))) | (type << (pin * 2));
+				{{reg}}->MODER &= ~(0x3 << ({{pin}} * 2));
+				{{reg}}->PUPDR = ({{reg}}->PUPDR & ~(0x3 << ({{pin}} * 2))) | (type << ({{pin}} * 2));
 			}
 
 			ALWAYS_INLINE static void
 			setAnalogInput() {
-				{{reg}}->MODER |= 0x3 << (pin * 2);
+				{{reg}}->MODER |= 0x3 << ({{pin}} * 2);
 			}
 
 			ALWAYS_INLINE static void set() {
-				{{reg}}->BSRRL = (1 << pin);
+				{{reg}}->BSRRL = (1 << {{pin}});
 			}
 
 			ALWAYS_INLINE static void reset() {
-				{{reg}}->BSRRH = (1 << pin);
+				{{reg}}->BSRRH = (1 << {{pin}});
 			}
 
 			ALWAYS_INLINE static void toggle() {
-				if ({{reg}}->ODR & (1 << pin)) { reset(); }
+				if ({{reg}}->ODR & (1 << {{pin}})) { reset(); }
 				else { set(); }
 			}
 
@@ -355,7 +356,7 @@ namespace xpcc
 			}
 
 			ALWAYS_INLINE static bool read() {
-				return {{reg}}->IDR & (1 << pin);
+				return {{reg}}->IDR & (1 << {{pin}});
 			}
 		};
 		{% endfor %}
