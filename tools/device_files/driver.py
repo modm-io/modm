@@ -200,24 +200,25 @@ class Driver(DeviceElementBase):
 			return self.substitutions
 		# Now this is were it gets interesting:
 		# parsing the inner nodes of the driver node recursively:
-		for c in self.node:
-			self.substitutions = dict(self._NodeToDict(c).items() + self.substitutions.items())
+		self.substitutions = dict(self._NodeToDict(self.node).items() + self.substitutions.items())
 		return self.substitutions
 
 
 	def _NodeToDict(self, node):
 		"""
-		lets assume that top nodes can become one of two things:
-		1.) a list, if they have children
-		2.) a string/int value if they do not have children, but text content
-		WARNING: at the moment this is a very crappy implementation that only
-		works for specific case, but I want to see the blink example compile...
+		attribute of the node are turnded into key/value pairs
+		child nodes are added to a list which is the value
+		of the child node name + 's' key.
+		Example:
+		TODO..
 		"""
-		if len(node) > 0: # => list
-			dic = {node.tag: []}
-			for c in node: # => cool recursion... GGI 1 rulez 
-				dic[node.tag].append(self._NodeToDict(c))
-		else:
-			dic = {node.tag: dict(node.items())}
+		# Fist add attributes
+		dic = dict(node.items())
+		# Now add children
+		for c in node:
+			child_name = c.tag + 's'
+			if child_name not in dic:
+				dic[child_name] = [] # create child list
+			dic[child_name].append(self._NodeToDict(c))
 		return dic
 
