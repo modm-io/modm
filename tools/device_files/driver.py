@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # 
 # Copyright (c) 2013, Roboterclub Aachen e.V.
@@ -37,38 +36,12 @@ import xml.etree.ElementTree as et
 import xml.parsers.expat
 
 from parser_exception import ParserException
-from device_element import DeviceElementBase, DeviceString
 
-class Driver(DeviceElementBase):
-	""" Peripheral
-	Represents a driver needed by the device, i.e.
-	peripheral or core driver.
+class DriverFile():
 
-	Use like this:
-	1.) Create from XML by calling the constructor with a valid node
-	2.) Call the gather data function to parse the driver file
-	3.) Now you can access the substitutions, templateFiles and staticFiles
-	    members
-	"""
-
-
-	def __init__(self, device, node):
-		DeviceElementBase.__init__(self, device, node)
-		self.type = node.get('type') # this overwrite is somewhat unfortunate
-		self.name = node.get('name')
-		self.instances = node.get('instances')
-		if self.instances != None:
-			self.instances = self.instances.split(',')
-		# Calculate driver path relative to architecture
-		if self.type == 'core':
-			self.path = 'core'
-		else:
-			self.path = os.path.join('peripheral', self.type)
-		self.path = os.path.join(self.path, os.sep.join(self.name.split('/')))
-		self.substitutions = self._getDriverSubstitutions(node)
-		# Static Variables
-		self.source_file_extentions = ['.cpp', '.sx', '.c', '.ld', '.s'] # FIXME: are there other files that need to be considered?
-		# print "New Driver of type: " + self.type
+	def __init__(self, filename):
+		# TODO: what else is needed?
+		print "DriverFile: " + filename
 
 	def getBuildList(self, peripheral_path, device_string, pin_count):
 		"""
@@ -176,41 +149,3 @@ class Driver(DeviceElementBase):
 		path = os.sep.join(self.path.split(os.sep)[:(path_length-go_up)])
 		file_name = os.path.join(path, file_name)
 		return file_name
-
-	def _getDriverSubstitutions(self, node):
-		"""
-		Returns a dict containing substitution values
-		that are specific to this driver.
-		"""
-		# If Substitutions Dict does not exist => create
-		substitutions = {}
-		# Probably the less interesting stuff, but maybe ther will be other
-		# more usefull stuff that can be added here
-		substitutions['driver-name'] = self.name
-		substitutions['driver-type'] = self.type
-		if len(node) <= 0: # if the node is childless
-			return substitutions
-		# Now this is were it gets interesting:
-		# parsing the inner nodes of the driver node recursively:
-		substitutions = dict(self._NodeToDict(node).items() + substitutions.items())
-		return substitutions
-
-
-	def _NodeToDict(self, node):
-		"""
-		attribute of the node are turnded into key/value pairs
-		child nodes are added to a list which is the value
-		of the child node name + 's' key.
-		Example:
-		TODO..
-		"""
-		# Fist add attributes
-		dic = dict(node.items())
-		# Now add children
-		for c in node:
-			child_name = c.tag + 's'
-			if child_name not in dic:
-				dic[child_name] = [] # create child list
-			dic[child_name].append(self._NodeToDict(c))
-		return dic
-

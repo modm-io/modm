@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # 
 # Copyright (c) 2013, Roboterclub Aachen e.V.
@@ -34,10 +33,9 @@ import xml.etree.ElementTree as et
 import xml.parsers.expat
 from parser_exception import ParserException
 from device_element import DeviceElementBase, DeviceString
-from driver import Driver
 
-class Device:
-	""" Device
+class DeviceFile:
+	""" DeviceFile
 	Represents a device target for xpcc.
 	This can be a microcontroller, a pc or a doxygen "fake" target.
 	"""
@@ -96,6 +94,7 @@ class Device:
 		that are specific to the device_string.
 
 		This is used by the Scons Platform Tools. Think before editing.
+		TODO: defines, flash and ram may depend on pin-count....
 		"""
 		s = DeviceString(device_string)
 		if s.valid == False:
@@ -107,19 +106,48 @@ class Device:
 		props['defines'] = self.getProperty('define', device_string)
 		return props
 
-	def getDriverList(self, device_string):
+	def getDriverList(self, device_string, platform_path):
 		"""
 		This function uses data gathered from the device file to generate
 		a list fo drivers that need to be built.
+		The platform_path is needed in order to return absolute paths.
 		Every driver is represented by a dictionary that contains the following
 		keys:
+		'name':
+		'type':
 		'driver_file': contains the absolute path to the drivers xml file
+		               if it exists, else the value is None
+		'path': path to the driver files
 		'substitutions': substitution values that are derived from the device
 		                 file, will be appended by those introduced by the
 		                 driver file
-		'instances': instances that will be created of this driver
+		'instances': list of instances that will be created of this driver
 		"""
-		return []
+		# Check Device string
+		s = DeviceString(device_string)
+		if s.valid == False:
+			return None
+		# Check Pin Count
+		pin_count = self.getProperty('pin-count', device_string)
+		if pin_count == None or len(pin_count) <= 0:
+			pin_count = 10000
+		elif len(pin_count) == 1:
+			pin_count = pin_count[0]
+		else:
+			pin_count = 0
+		# Loop Through Drivers
+		drivers = []
+		for d in self.drivers:
+			if d.appliesTo(s, pin_count):
+				dic = {}
+				dic['name'] = d.name
+				dic['type'] = d.type
+				dic['driver_file'] = d.getDriverFile(platform_path)
+				dic['path'] = os.path.join(platform_path, d.path)
+				dic['substitutions'] = d.substitutions
+				dic['instances'] = d.instances
+				drivers.append(dic)
+		return drivers
 
 ##-----------------------------------------------------------------------------
 	def getProperty(self, prop_type, device_string):
@@ -137,10 +165,19 @@ class Device:
 					values.append(prop.value)
 		return values
 
+	def __str__(self):
+		s  = "Platform: " + self.platform + "\n"
+		s += "Family: " + self.family + "\n"
+		s += "Names: "
+		for name in self.names:
+			s += name + ", "
+		return s
+
+"""
 	def getBuildList(self, peripheral_path, device_string, target_path=None):
-		"""
-		target_path: normally the absolute path to the architecture/platform_device_string.generated directory
-		"""
+		#""
+		#target_path: normally the absolute path to the architecture/platform_device_string.generated directory
+		#""
 		s = DeviceString(device_string)
 		if s.valid == False:
 			return False
@@ -170,14 +207,73 @@ class Device:
 				f[1] = os.path.join(target_path, f[1])
 				build.append(f)
 		return build
+"""
 
-	def __str__(self):
-		s  = "Platform: " + self.platform + "\n"
-		s += "Family: " + self.family + "\n"
-		s += "Names: "
-		for name in self.names:
-			s += name + ", "
-		return s
+##------------- A Driver Node contains Driver and Property Nodes --------------
+class Driver(DeviceElementBase):
+
+	def __init__(self, device, node):
+		DeviceElementBase.__init__(self, device, node)
+		self.type = node.get('type') # this overwrite is somewhat unfortunate
+		self.name = node.get('name')
+		self.instances = node.get('instances')
+		if self.instances != None:
+			self.instances = self.instances.split(',')
+		# Calculate driver path relative to architecture
+		if self.type == 'core':
+			self.path = 'core'
+		else:
+			self.path = os.path.join('peripheral', self.type)
+		self.path = os.path.join(self.path, os.sep.join(self.name.split('/')))
+		self.substitutions = self._getDriverSubstitutions(node)
+
+	def getDriverFile(self, platform_path):
+		"""
+		Returns None if file does not exist
+		"""
+		f = os.path.join(platform_path, self.path, self.name.split('/')[-1:][0] + '.xml')
+		if not os.path.isfile(f):
+			return None
+		else:
+			return f
+
+	def _getDriverSubstitutions(self, node):
+		"""
+		Returns a dict containing substitution values
+		that are specific to this driver.
+		"""
+		# If Substitutions Dict does not exist => create
+		substitutions = {}
+		# Probably the less interesting stuff, but maybe ther will be other
+		# more usefull stuff that can be added here
+		substitutions['driver-name'] = self.name
+		substitutions['driver-type'] = self.type
+		if len(node) <= 0: # if the node is childless
+			return substitutions
+		# Now this is were it gets interesting:
+		# parsing the inner nodes of the driver node recursively:
+		substitutions = dict(self._NodeToDict(node).items() + substitutions.items())
+		return substitutions
+
+	def _NodeToDict(self, node):
+		"""
+		attribute of the node are turnded into key/value pairs
+		child nodes are added to a list which is the value
+		of the child node name + 's' key.
+		Example:
+		TODO..
+		"""
+		# Fist add attributes
+		dic = dict(node.items())
+		# Now add children
+		for c in node:
+			child_name = c.tag + 's'
+			if child_name not in dic:
+				dic[child_name] = [] # create child list
+			dic[child_name].append(self._NodeToDict(c))
+		return dic
+
+
 
 class Property(DeviceElementBase):
 	""" Property
@@ -200,20 +296,3 @@ class Property(DeviceElementBase):
 		elif self.type in ['define']:
 			if not re.match("^[0-9A-Z_]*$", self.value):
 				raise ParserException("Value of '%s' properties needs to be UPPER_UNDERSCORE_STYLE (found: '%s')" % (self.type, self.value))
-
-
-if __name__ == "__main__":
-	"""
-	Some test code
-	"""
-	dev = Device("../../src/xpcc/architecture/platform/xml/stm32f40.xml")
-	a_dir = os.path.abspath("../../src/xpcc/architecture/")
-	build = dev.getBuildList(os.path.join(a_dir, 'platform'), 'stm32f407vg', os.path.join(a_dir, 'platform_stm32f407vg.generated'))
-	for f in build:
-		if len(f) == 2:
-			print "static:   %s => %s" % (f[0], f[1])
-		elif len(f) == 3:
-			print "template: %s => %s" % (f[0], f[1])
-			print "substitutions: %s" % f[2]
-	print "dev.getProperties('stm32f407vg'): %s" % dev.getProperties('stm32f407vg')
-	print "dev.getProperties('stm32f407ve'): %s" % dev.getProperties('stm32f407ve')
