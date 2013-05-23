@@ -39,7 +39,6 @@ class DeviceElementBase:
 	"""
 
 	def __init__(self, device, node):
-		self.node = node
 		self.type = node.tag
 		self.device = device # parent
 		# load attributes

@@ -43,16 +43,16 @@ class Device:
 	"""
 
 	def __init__(self, xml_file):
-		self.node = self._openDeviceXML(xml_file)
+		node = self._openDeviceXML(xml_file)
 
-		self.platform = self.node.get('platform')
-		self.family = self.node.get('family')
-		self.names = self.node.get('name').split('|')
+		self.platform = node.get('platform')
+		self.family = node.get('family')
+		self.names = node.get('name').split('|')
 
 		self.properties = []
 		self.drivers = []
 
-		for c in self.node:
+		for c in node:
 			if c.tag in ['flash', 'ram', 'pin-count', 'define']:
 				self.properties.append(Property(self, c))
 			elif c.tag in ['driver']:

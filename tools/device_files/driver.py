@@ -65,8 +65,7 @@ class Driver(DeviceElementBase):
 		else:
 			self.path = os.path.join('peripheral', self.type)
 		self.path = os.path.join(self.path, os.sep.join(self.name.split('/')))
-		self.substitutions = None
-		self._getDriverSubstitutions() # load substitutions haha
+		self.substitutions = self._getDriverSubstitutions(node)
 		# Static Variables
 		self.source_file_extentions = ['.cpp', '.sx', '.c', '.ld', '.s'] # FIXME: are there other files that need to be considered?
 		# print "New Driver of type: " + self.type
@@ -151,7 +150,7 @@ class Driver(DeviceElementBase):
 					output = output.replace('{{id}}', instance_id)
 				template = self._makeAbsoluteToPlatform(template)
 				output = self._makeAbsoluteToPlatform(output)
-				substitutions = dict({'id': instance_id}.items() + self._getDriverSubstitutions().items())
+				substitutions = dict({'id': instance_id}.items() + self.substitutions.items())
 				template_file = [template, output, substitutions]
 				build_list.append(template_file) # always append template files since they will get a different id
 
@@ -178,30 +177,23 @@ class Driver(DeviceElementBase):
 		file_name = os.path.join(path, file_name)
 		return file_name
 
-	def _getDriverSubstitutions(self):
+	def _getDriverSubstitutions(self, node):
 		"""
 		Returns a dict containing substitution values
 		that are specific to this driver.
-		Don't know if all of these are necessary but whatever.
-		This uses lazy evaluation (because the author wanted to try that
-		out after reading about it in More Effective C++) thus
-		once the result was calculated it will be stored and returned
-		every time this method is called
 		"""
-		if self.substitutions != None:
-			return self.substitutions
 		# If Substitutions Dict does not exist => create
-		self.substitutions = {}
+		substitutions = {}
 		# Probably the less interesting stuff, but maybe ther will be other
 		# more usefull stuff that can be added here
-		self.substitutions['driver-name'] = self.name
-		self.substitutions['driver-type'] = self.type
-		if len(self.node) <= 0: # if the node is childless
-			return self.substitutions
+		substitutions['driver-name'] = self.name
+		substitutions['driver-type'] = self.type
+		if len(node) <= 0: # if the node is childless
+			return substitutions
 		# Now this is were it gets interesting:
 		# parsing the inner nodes of the driver node recursively:
-		self.substitutions = dict(self._NodeToDict(self.node).items() + self.substitutions.items())
-		return self.substitutions
+		substitutions = dict(self._NodeToDict(node).items() + substitutions.items())
+		return substitutions
 
 
 	def _NodeToDict(self, node):
