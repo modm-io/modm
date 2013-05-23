@@ -288,6 +288,7 @@ def generate(env, **kw):
 	env['XPCC_CONFIG'] = configuration
 	env['XPCC_CONFIG_FILE'] = os.path.abspath(configfile)
 	env['XPCC_SYSTEM_BUILDER'] = os.path.join(rootpath, 'tools', 'system_design', 'builder')
+	env['XPCC_DEVICE'] = device 			# needed by the platform tools
 	
 	# tools which are used independently of the architecture
 	env.Tool('template')
@@ -295,7 +296,8 @@ def generate(env, **kw):
 	env.Tool('configfile')
 	env.Tool('helper')
 	env.Tool('system_design')
-	
+	env.Tool('platform_tools')
+
 	env['LIBS'] = ['']
 	env['LIBPATH'] = []
 	env['CPPPATH'] = []
