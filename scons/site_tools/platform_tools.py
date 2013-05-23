@@ -39,6 +39,7 @@
 
 from SCons.Script import *
 import os
+from string import Template
 
 from configfile import Scanner # for header and source file endings
 
@@ -65,11 +66,6 @@ def platform_tools_generate(env, architecture_path):
 	# make paths
 	platform_path = os.path.join(architecture_path, 'platform')
 	generated_path = os.path.join(architecture_path, env['XPCC_PLATFORM_GENERATED_DIR'])
-	# Show SCons how to build the architecture/platform.hpp file:
-	src = os.path.join(platform_path, 'platform.hpp.in')
-	tar = os.path.join(architecture_path, 'platform.hpp')
-	sub = {'device': device}
-	env.Template(target = tar, source = src, substitutions = sub)
 	# Find Device File
 	xml_path = os.path.join(env['XPCC_PLATFORM_PATH'], 'xml')
 	files = []
@@ -95,6 +91,7 @@ def platform_tools_generate(env, architecture_path):
 	# Todo: Do something more with the properties...
 	prop = dev.getProperties(device)
 	defines = prop['defines']
+	device_headers = prop['headers']
 	# print "Properties: %s" % prop
 	# Loop through Drivers
 	device_substitutions = {} # Substitutions for the drivers.hpp.in file
@@ -122,10 +119,21 @@ def platform_tools_generate(env, architecture_path):
 			elif os.path.splitext(tar)[1] in Scanner.SOURCE:
 				sources.append(res)
 		device_substitutions['drivers'].append(ddic)
+	####### Generate Header Templates #########################################
+	# Show SCons how to build the architecture/platform.hpp file:
+	src = os.path.join(platform_path, 'platform.hpp.in')
+	tar = os.path.join(architecture_path, 'platform.hpp')
+	sub = {'device': device}
+	env.Template(target = tar, source = src, substitutions = sub)
 	# Show SCons how to build the drivers.hpp.in file:
 	src = os.path.join(platform_path, 'drivers.hpp.in')
 	tar = os.path.join(generated_path, 'drivers.hpp')
 	env.Jinja2Template(target = tar, source = src, substitutions = device_substitutions)
+	# Show SCons how to build external.hpp.in file:
+	src = os.path.join(platform_path, 'external.hpp.in')
+	tar = os.path.join(generated_path, 'external.hpp')
+	sub = {'headers': device_headers}
+	env.Jinja2Template(target = tar, source = src, substitutions = sub)
 	return sources, defines, includes
 
 # -----------------------------------------------------------------------------

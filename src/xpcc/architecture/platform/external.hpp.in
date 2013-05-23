@@ -28,16 +28,13 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__DRIVERS_HPP
-#define XPCC__DRIVERS_HPP
+#ifndef XPCC__EXTERNAL_HPP
+#define XPCC__EXTERNAL_HPP
 
-// Include driver header files
-{% for driver in drivers -%}
-// {{driver.type}}/{{driver.name}}
-{% for header in driver.headers -%}
-#include "{{header}}"
-{% endfor -%}
+// Include external device headers
+{% for header in headers -%}
+#include <{{header}}>
 {% endfor -%}
 
-#endif	// XPCC__DRIVERS_HPP
+#endif	// XPCC__EXTERNAL_HPP
 

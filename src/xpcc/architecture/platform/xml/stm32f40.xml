@@ -19,6 +19,8 @@
 		<pin-count pin-id="v">100</pin-count>
 		<pin-count pin-id="z">144</pin-count>
 		<pin-count pin-id="i">176</pin-count>
+		<!-- Headers to be included with the {{ include_device_headers }} substitution-->
+		<header>stm32f4xx.h</header>
 		<!-- Cpp Defines -->
 		<define>__STM32F407__</define>
 		<define>__ARM_STM32__</define>

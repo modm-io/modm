@@ -31,6 +31,7 @@ import re
 import os
 import xml.etree.ElementTree as et
 import xml.parsers.expat
+from string import Template
 from parser_exception import ParserException
 from device_element import DeviceElementBase, DeviceString
 
@@ -51,12 +52,14 @@ class DeviceFile:
 		self.drivers = []
 
 		for c in node:
-			if c.tag in ['flash', 'ram', 'pin-count', 'define']:
+			if c.tag in ['flash', 'ram', 'pin-count', 'define', 'header']:
 				self.properties.append(Property(self, c))
 			elif c.tag in ['driver']:
 				self.drivers.append(Driver(self, c))
 			else:
 				raise ParserException("Parse Error: unknown tag (%s)" % (c.tag))
+
+		# Add Device specific substitutions to driver
 
 	def _openDeviceXML(self, filename):
 		try:
@@ -104,6 +107,7 @@ class DeviceFile:
 		props['ram'] = self.getProperty('ram', device_string)[0]
 		props['pin-count'] = self.getProperty('pin-count', device_string)[0]
 		props['defines'] = self.getProperty('define', device_string)
+		props['headers'] = self.getProperty('header', device_string)
 		return props
 
 	def getDriverList(self, device_string, platform_path):
@@ -140,7 +144,9 @@ class DeviceFile:
 		drivers = []
 		for d in self.drivers:
 			if d.appliesTo(s, pin_count):
-				drivers.append(d.toDict(platform_path))
+				substitutions = s.getTargetDict()
+				substitutions.update(self.getSubstitutions())
+				drivers.append(d.toDict(platform_path, substitutions))
 		return drivers
 
 ##-----------------------------------------------------------------------------
@@ -165,6 +171,15 @@ class DeviceFile:
 					if prop.appliesTo(s):
 						values.append(prop.value)
 		return values
+
+	def getSubstitutions(self):
+		"""
+		Generates a Dictionary containing
+		Substitutitons for this device
+		At the moment that is nothing
+		"""
+		dic = {}
+		return dic
 
 	def __str__(self):
 		s  = "Platform: " + self.platform + "\n"
@@ -192,7 +207,7 @@ class Driver(DeviceElementBase):
 		self.path = os.path.join(self.path, os.sep.join(self.name.split('/')))
 		self.substitutions = self._getDriverSubstitutions(node)
 
-	def toDict(self, platform_path):
+	def toDict(self, platform_path, substitutions):
 		"""
 		This is used to package information about a driver extracted from
 		a device file into a dictionary.
@@ -205,7 +220,8 @@ class Driver(DeviceElementBase):
 		dic['type'] = self.type
 		dic['driver_file'] = self.getDriverFile(platform_path)
 		dic['path'] = self.path
-		dic['substitutions'] = self.substitutions
+		dic['substitutions'] = substitutions
+		dic['substitutions'].update(self.substitutions) # own substitutions overwrite
 		dic['instances'] = self.instances
 		return dic
 
