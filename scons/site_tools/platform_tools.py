@@ -97,9 +97,15 @@ def platform_tools_generate(env, architecture_path):
 	defines = prop['defines']
 	# print "Properties: %s" % prop
 	# Loop through Drivers
+	device_substitutions = {} # Substitutions for the device.hpp.in file
+	device_substitutions['drivers'] = []
 	drivers = dev.getDriverList(device, env['XPCC_PLATFORM_PATH'])
 	for driver in drivers:
+		ddic = {} # create dictionary describing the driver
 		d = DriverFile.fromDict(driver)
+		ddic['name'] = d.name
+		ddic['type'] = d.type
+		ddic['headers'] = []
 		build = d.getBuildList(env['XPCC_PLATFORM_PATH'])
 		for f in build:
 			src = os.path.join(platform_path, f[0])
@@ -107,13 +113,19 @@ def platform_tools_generate(env, architecture_path):
 			if len(f) == 3:
 				res = env.Jinja2Template(target = tar, source = src, substitutions = f[2])
 			else:
-				res = env.Install(tar, src) # copy f[0] to f[1]
+				res = env.Command(tar, src, Copy("$TARGET", "$SOURCE"))
 			# check if target is header file
 			if os.path.splitext(tar)[1] in Scanner.HEADER:
+				ddic['headers'].append(f[1]) # append path relative to platform dir
 				includes.append(os.path.dirname(tar))
 			# or source file
 			elif os.path.splitext(tar)[1] in Scanner.SOURCE:
 				sources.append(res)
+		device_substitutions['drivers'].append(ddic)
+	# Show SCons how to build the device.hpp.in file:
+	src = os.path.join(platform_path, 'device.hpp.in')
+	tar = os.path.join(generated_path, device + '.hpp')
+	env.Jinja2Template(target = tar, source = src, substitutions = device_substitutions)
 	return sources, defines, includes
 
 # -----------------------------------------------------------------------------

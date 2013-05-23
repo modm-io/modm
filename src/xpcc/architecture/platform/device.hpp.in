@@ -28,21 +28,16 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__PLATFORM_HPP
-#define XPCC__PLATFORM_HPP
+#ifndef XPCC__{{device|upper}}_HPP
+#define XPCC__{{device|upper}}_HPP
 
-/**
- * \ingroup 	architecture
- * \defgroup	platform	Supported Platforms
- * 
- */
+// Include driver header files
+{% for driver in drivers -%}
+// {{driver.type}}/{{driver.name}}
+{% for header in driver.headers -%}
+#include "{{header}}"
+{% endfor -%}
+{% endfor -%}
 
-#include <stdint.h>
+#endif	// XPCC__{{device|upper}}_HPP
 
-#include "detect.hpp"		// sets XPCC__CPU_xx etc. macros
-#include "utils.hpp"
-
-// Include generated Platform sources:
-#include "generated_platform_${device}/${device}.hpp"
-
-#endif	// XPCC__PLATFORM_HPP
