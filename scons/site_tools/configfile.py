@@ -99,7 +99,7 @@ class FileList(list):
 	
 	def extend(self, l):
 		for item in l:
-			self.__append(item)
+			self.append(item)
 	
 	def __iadd__(self, item):
 		self.append(item)
