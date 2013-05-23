@@ -30,23 +30,17 @@
 
 import os
 from device import DeviceFile
+from driver import DriverFile
 
 
 if __name__ == "__main__":
 	"""
 	Some test code
 	"""
-	dev = DeviceFile("../../src/xpcc/architecture/platform/xml/stm32f40.xml")
 	p_dir = os.path.abspath("../../src/xpcc/architecture/platform")
-	"""
-	build = dev.getBuildList(os.path.join(a_dir, 'platform'), 'stm32f407vg', os.path.join(a_dir, 'platform_stm32f407vg.generated'))
-	for f in build:
-		if len(f) == 2:
-			print "static:   %s => %s" % (f[0], f[1])
-		elif len(f) == 3:
-			print "template: %s => %s" % (f[0], f[1])
-			print "substitutions: %s" % f[2]
-	"""
+
+	# Test Device File Class
+	dev = DeviceFile("../../src/xpcc/architecture/platform/xml/stm32f40.xml")
 	print "dev.getProperties('stm32f407vg'): %s" % dev.getProperties('stm32f407vg')
 	print "dev.getProperties('stm32f407ve'): %s" % dev.getProperties('stm32f407ve')
 	print "dev.getDriverList('stm32f407vg', a_dir):"
@@ -62,3 +56,12 @@ if __name__ == "__main__":
 		print str(d['substitutions'])
 		print ""
 		i += 1
+
+	# Test DriverFile Class
+	for d in dList:
+		df = DriverFile.fromDict(d)
+		print "df.getBuildList():"
+		print str(df.getBuildList(p_dir))
+		print ""
+		print ""
+

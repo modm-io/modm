@@ -41,31 +41,39 @@ class DriverFile():
 
 	def __init__(self, filename):
 		# TODO: what else is needed?
-		print "DriverFile: " + filename
+		print "DriverFile: " + str(filename)
 
-	def getBuildList(self, peripheral_path, device_string, pin_count):
+	@classmethod
+	def fromDict(self, dic):
 		"""
-		Searches for the xml file belonging to this driver, opens it
-		and extracts all data needed for creating this driver for the
-		specific device_string
+		This is used to create a DriverFile instance from information about
+		a driver extracted from a device file and packaged into a dictionary.
+		Corresponds to the toDict Method of the Driver class
+		in device.py.
+		Remember to update if you change anything!
+		"""
+		d = DriverFile(dic['driver_file'])
+		d.name = dic['name']
+		d.type = dic['type']
+		d.filename = dic['driver_file']
+		d.path = dic['path']
+		d.substitutions = dic['substitutions']
+		d.instances = dic['instances']
+		return d
+
+	def getBuildList(self, platform_path, source_file_extentions = ['.cpp', '.c', '.sx', '.S', '.h', '.hpp']):
+		"""
 		The data is put into a list of the format:
 		[ ['static_file_name', 'static_output_file_name'],
 		['template_src_file','template_target_file',{'Dict': 'a', 'of': 'b', 'defines': 's'}]]
-		Please Note:
-		It is the Device Classes Responibility to add Device specific substitution
-		values like device family, name, pincount etc.
+		Note: all file paths are relative to the platform path.
 		"""
 		# Initialize Return List
 		build = []
-		# Check if this driver "applies"
-		if not self.appliesTo(device_string, pin_count):
-			return None
-		# Build Path to xml 
-		f = os.path.join(peripheral_path, self.path, self.name.split('/')[-1:][0] + '.xml')
-		# Check if file exists and open
-		xmltree = None
-		if os.path.isfile(f):
+		# Check if there is a driver file and open
+		if self.filename != None:
 			try:
+				f = os.path.join(platform_path, self.filename)
 				xmltree = et.parse(f).getroot()
 			except OSError as e:
 				raise ParserException(e)
@@ -89,9 +97,9 @@ class DriverFile():
 					self._parseDriverXml(node, instance, build)
 		else: # if no xml driver file exists, just add all files that look like source files
 			# Query all files in directory
-			for source_file in os.listdir(os.path.join(peripheral_path, self.path)):
-				if os.path.splitext(source_file)[1].lower() in self.source_file_extentions:
-					source_file = self._makeAbsoluteToPlatform(source_file)
+			for source_file in os.listdir(os.path.join(platform_path, self.path)):
+				if os.path.splitext(source_file)[1] in source_file_extentions:
+					source_file = self._makeRelativeToPlatform(source_file)
 					build.append([source_file, source_file])
 		return build
 
@@ -109,8 +117,8 @@ class DriverFile():
 					output = node.get('out')
 					if output == None or len(output) <= 0: # if no out attribute was found
 						output = static
-					static = self._makeAbsoluteToPlatform(static)
-					output = self._makeAbsoluteToPlatform(output)
+					static = self._makeRelativeToPlatform(static)
+					output = self._makeRelativeToPlatform(output)
 					build_list.append([static, output])# => add static file
 			elif node.tag == 'template':
 				template = node.text
@@ -121,13 +129,13 @@ class DriverFile():
 						output = output[:-3]
 				else: # replace '{{id}}' with id
 					output = output.replace('{{id}}', instance_id)
-				template = self._makeAbsoluteToPlatform(template)
-				output = self._makeAbsoluteToPlatform(output)
+				template = self._makeRelativeToPlatform(template)
+				output = self._makeRelativeToPlatform(output)
 				substitutions = dict({'id': instance_id}.items() + self.substitutions.items())
 				template_file = [template, output, substitutions]
 				build_list.append(template_file) # always append template files since they will get a different id
 
-	def _makeAbsoluteToPlatform(self, file_name):
+	def _makeRelativeToPlatform(self, file_name):
 		"""
 		All file names are relative to the xml device
 		description file.

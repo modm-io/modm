@@ -115,13 +115,14 @@ class DeviceFile:
 		keys:
 		'name':
 		'type':
-		'driver_file': contains the absolute path to the drivers xml file
+		'driver_file': contains the path to the drivers xml file
 		               if it exists, else the value is None
 		'path': path to the driver files
 		'substitutions': substitution values that are derived from the device
 		                 file, will be appended by those introduced by the
 		                 driver file
 		'instances': list of instances that will be created of this driver
+		Please note: all paths are relative to the platform_path.
 		"""
 		# Check Device string
 		s = DeviceString(device_string)
@@ -139,14 +140,7 @@ class DeviceFile:
 		drivers = []
 		for d in self.drivers:
 			if d.appliesTo(s, pin_count):
-				dic = {}
-				dic['name'] = d.name
-				dic['type'] = d.type
-				dic['driver_file'] = d.getDriverFile(platform_path)
-				dic['path'] = os.path.join(platform_path, d.path)
-				dic['substitutions'] = d.substitutions
-				dic['instances'] = d.instances
-				drivers.append(dic)
+				drivers.append(d.toDict(platform_path))
 		return drivers
 
 ##-----------------------------------------------------------------------------
@@ -173,42 +167,6 @@ class DeviceFile:
 			s += name + ", "
 		return s
 
-"""
-	def getBuildList(self, peripheral_path, device_string, target_path=None):
-		#""
-		#target_path: normally the absolute path to the architecture/platform_device_string.generated directory
-		#""
-		s = DeviceString(device_string)
-		if s.valid == False:
-			return False
-		pin_count = self.getProperty('pin-count', device_string)
-		if len(pin_count) != 1:
-			raise ParserException("Parse Error: none definite pin_count: %s" % (pin_count))
-		else:
-			pin_count = int(pin_count[0])
-		build = []
-		for driver in self.drivers:
-			build_list = driver.getBuildList(peripheral_path, device_string, pin_count)
-			if build_list != None:
-				build = build + build_list # => unite lists to make a list to rule them all
-		# patch build list for templates to include target substitution variable
-		old_build = build
-		build = []
-		for f in old_build:
-			if len(f) == 3: # is template file
-				f[2] = dict(f[2].items() + s.getTargetDict().items()) # merge substitutions
-			build.append(f)
-		# patch build list to absolute pahts
-		if target_path != None:
-			old_build = build
-			build = []
-			for f in old_build:
-				f[0] = os.path.join(peripheral_path, f[0])
-				f[1] = os.path.join(target_path, f[1])
-				build.append(f)
-		return build
-"""
-
 ##------------- A Driver Node contains Driver and Property Nodes --------------
 class Driver(DeviceElementBase):
 
@@ -227,12 +185,29 @@ class Driver(DeviceElementBase):
 		self.path = os.path.join(self.path, os.sep.join(self.name.split('/')))
 		self.substitutions = self._getDriverSubstitutions(node)
 
+	def toDict(self, platform_path):
+		"""
+		This is used to package information about a driver extracted from
+		a device file into a dictionary.
+		Corresponds to the fromDict Method of the DriverFile class
+		in driver.py.
+		Remember to update if you change anything!
+		"""
+		dic = {}
+		dic['name'] = self.name
+		dic['type'] = self.type
+		dic['driver_file'] = self.getDriverFile(platform_path)
+		dic['path'] = self.path
+		dic['substitutions'] = self.substitutions
+		dic['instances'] = self.instances
+		return dic
+
 	def getDriverFile(self, platform_path):
 		"""
 		Returns None if file does not exist
 		"""
-		f = os.path.join(platform_path, self.path, self.name.split('/')[-1:][0] + '.xml')
-		if not os.path.isfile(f):
+		f = os.path.join(self.path, self.name.split('/')[-1:][0] + '.xml')
+		if not os.path.isfile(os.path.join(platform_path, f)):
 			return None
 		else:
 			return f
