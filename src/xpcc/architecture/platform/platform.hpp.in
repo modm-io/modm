@@ -43,6 +43,6 @@
 #include "utils.hpp"
 
 // Include generated Platform sources:
-#include "generated_platform_${device}/${device}.hpp"
+#include "generated_platform_${device}/drivers.hpp"
 
 #endif	// XPCC__PLATFORM_HPP
