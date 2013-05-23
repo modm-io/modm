@@ -50,32 +50,6 @@ from device import DeviceFile
 from driver import DriverFile
 from parser_exception import ParserException
 
-"""
-# Stupid name => what dos this do anyway => FIXME: change!!
-def platform_generator_generate(env, alias='platform_generator_generate'):
-	if not isinstance(env['XPCC_DEVICE_OBJECT'], DeviceFileObject):
-		print "XPCC Error: XmlDeviceFile needs to be opened before generating platform sources."
-		Exit(1)
-	try:
-		build = env['XPCC_DEVICE_OBJECT'].getBuildList(env['XPCC_PLATFORM_PATH'], env['XPCC_DEVICE'], env['XPCC_GENERATED_PATH'])
-	except ParserException as e:
-		print "XPCC Error: Failed to create build list for device file (%s): %s" % (env['XPCC_DEVICE_FILE'], e)
-		Exit(1)
-	# Add Templates to Builder
-	sources = []
-	for f in build:
-		if len(f) == 3:
-			res = env.Jinja2Template(target = f[1], source = f[0], substitutions = f[2])
-		else:
-			res = env.Install(f[1], f[0]) # copy f[0] to f[1]
-		# Append src directory:
-		if os.path.splitext(f[1])[1] in ['.cpp', '.c', '.sx', '.S']:
-			env.AppendUnique(CPPPATH = os.path.dirname(f[1]))
-			sources.append(f[1])
-	return sources
-
-"""
-
 #------------------------------------------------------------------------------
 # Builder that finds the xml device file
 # expects the content of env['XPCC_DEVICE'] as source
