@@ -40,6 +40,8 @@
 from SCons.Script import *
 import os
 
+from configfile import Scanner # for header and source file endings
+
 # add device_file module from tools to path
 # this is apparently not pythonic, but I see no other way to do this
 # without polluting the site_tools directory or haveing duplicate code
@@ -139,12 +141,32 @@ def platform_tools_parse_xml_device_file_string(target, source, env):
 #------------------------------------------------------------------------------
 # Builder that reads the content of a xml driver property file
 # Use the xml driver file as a target or some dummy target if
-# it does not exist.
+# it does not exist. The target only matters as a dependency,
+# because if the driver xml is changed, different files
+# may need to be built
 # Also add driver=DriverDictionary when calling the builder
 # driver dictionary need to be built by calling Driver.toDict
 def platform_tools_parse_xml_driver_file_action(target, source, env):
 	if not env.has_key('driver'):
 		raise SCons.Errors.UserError, "Use 'ParseXmlDriverFile(..., driver = ...)'"
+	d = DriverFile.fromDict(env['driver'])
+	build = d.getBuildList(env['XPCC_PLATFORM_PATH'])
+	for f in build:
+		src = os.path.join(env['XPCC_PLATFORM_PATH'], f[0])
+		tar = os.path.join(env['XPCC_GENERATED_PATH'], f[1])
+		if len(f) == 3:
+			res = env.Jinja2Template(target = tar, source = src, substitutions = f[2])
+		else:
+			res = env.Install(tar, src) # copy f[0] to f[1]
+		# check if target is header file
+		if os.path.splitext(tar)[1] in Scanner.HEADER:
+			env.AppendUnique(CPPPATH = os.path.dirname(f[1]))
+		# or source file
+		elif os.path.splitext(tar)[1] in Scanner.SOURCE:
+			# Very ugly and probably does not work.....
+			if env['XPCC_PLATFORM_SOURCES'] == None:
+				env['XPCC_PLATFORM_SOURCES'] = []
+			env['XPCC_PLATFORM_SOURCES'].append(tar)
 
 def platform_tools_parse_xml_driver_file_emitter(target, source, env):
 	Depends(target, SCons.Node.Python.Value(env['driver']))
@@ -161,7 +183,7 @@ def platform_tools_parse_xml_driver_file_string(target, source, env):
 def generate(env, **kw):
 	# Set some paths used by this file
 	env['XPCC_PLATFORM_PATH'] = os.path.join(env['XPCC_LIBRARY_PATH'], 'xpcc', 'architecture', 'platform')
-	env['XPCC_GENERATED_PATH'] = os.path.join(env['XPCC_LIBRARY_PATH'], 'xpcc', 'architecture', 'platform_' + env['XPCC_DEVICE'] + '.generated')
+	env['XPCC_GENERATED_PATH'] = os.path.join(env['XPCC_LIBRARY_PATH'], 'xpcc', 'architecture', 'generated_platform_' + env['XPCC_DEVICE'])
 
 	# Add Custom builders etc.
 	env['BUILDERS']['FindXmlDeviceFile'] = \
