@@ -43,6 +43,17 @@ scan = env.FindFiles(path = '.', unittest=False)
 sources = scan.sources
 defines = scan.defines
 
+# Platform Files
+architecture_path = os.path.join('.', 'xpcc', 'architecture')
+p_sources, p_defines, p_includes = env.GeneratePlatform(architecture_path)
+
+sources.append(p_sources)
+defines.update(p_defines)
+
+for path in p_includes:
+	envOld.AppendUnique(CPPPATH = path)
+
+
 sources, defines, includes = env.SConscript(
 		os.path.join(env['XPCC_ROOTPATH'], 'ext', 'SConscript'),
 		exports = 'env sources defines')

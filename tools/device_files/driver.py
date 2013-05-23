@@ -40,8 +40,9 @@ from parser_exception import ParserException
 class DriverFile():
 
 	def __init__(self, filename):
+		pass
 		# TODO: what else is needed?
-		print "DriverFile: " + str(filename)
+		# print "DriverFile: " + str(filename)
 
 	@classmethod
 	def fromDict(self, dic):

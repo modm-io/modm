@@ -152,11 +152,18 @@ class DeviceFile:
 		s = DeviceString(device_string)
 		if s.valid == False:
 			return None
-		values = []
-		for prop in self.properties:
-			if prop.type == prop_type:
-				if prop.appliesTo(s):
-					values.append(prop.value)
+		if prop_type == 'define':
+			values = {}
+			for prop in self.properties:
+				if prop.type == prop_type:
+					if prop.appliesTo(s):
+						values[prop.value] = '1'
+		else:
+			values = []
+			for prop in self.properties:
+				if prop.type == prop_type:
+					if prop.appliesTo(s):
+						values.append(prop.value)
 		return values
 
 	def __str__(self):
