@@ -98,13 +98,12 @@ def platform_tools_generate(env, architecture_path):
 	# xpp_config.hpp and which via a command line option
 	env.Append(CPPDEFINES = defines)
 	device_headers = prop['headers']
-	print "Linkerscript: " + prop['linkerscript']
 	# Set Size
 	env['DEVICE_SIZE'] = { "flash": prop['flash'], "ram": prop['ram'] }
 	# Find Linkerscript:
 	linkerfile = os.path.join(env['XPCC_PLATFORM_PATH'], 'linker', prop['linkerscript'])
 	if not os.path.isfile(linkerfile):
-		linkerfile = os.path.join(env['XPCC_PLATFORM_PATH'], 'linker', prop['target']['family'], prop['linkerscript'])
+		linkerfile = os.path.join(env['XPCC_PLATFORM_PATH'], 'linker', prop['target']['platform'], prop['linkerscript'])
 		if not os.path.isfile(linkerfile):
 			print "Linkerscript for %s (%s) could not be found." % (device, linkerfile)
 			Exit(1)
@@ -112,8 +111,6 @@ def platform_tools_generate(env, architecture_path):
 	linkdir = linkdir.replace(env['XPCC_ROOTPATH'], "${XPCC_ROOTPATH}")
 	env['LINKPATH'] = str(linkdir)
 	env['LINKFILE'] = str(linkfile)
-	print "env['LINKPATH']=%s, env['LINKFILE']=%s" % (env['LINKPATH'], env['LINKFILE'])
-
 
 	# Loop through Drivers
 	device_substitutions = {} # Substitutions for the drivers.hpp.in file
