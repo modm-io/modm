@@ -22,9 +22,14 @@
 		<!-- Headers to be included with the {{ include_device_headers }} substitution-->
 		<header>stm32f4xx.h</header>
 		<!-- Cpp Defines -->
-		<define>__STM32F407__</define>
+		<define>__STM32F407__</define> <!-- just a name implies a value of 1 -->
 		<define>__ARM_STM32__</define>
 		<define>STM32F4XX</define>
+		<define>STM32_AHB_FREQUENCY  = 168000000</define>
+		<define>STM32_APB1_FREQUENCY =  42000000</define>
+		<define>STM32_APB2_FREQUENCY =  84000000</define>
+		<define>CORTEX_VECTORS_RAM = 0</define>
+		<define>CORTEX_ENABLE_HARD_FAULT_HANDLER = 0</define>
 		<define size-id="e">STM32F407XE</define> <!-- Defines can depend on pin/size ids-->
 		<!-- TODO: add linkerscript -->
 		<!-- Core Driver -->

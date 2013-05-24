@@ -163,7 +163,7 @@ class DeviceFile:
 			for prop in self.properties:
 				if prop.type == prop_type:
 					if prop.appliesTo(s):
-						values[prop.value] = '1'
+						values[prop.value] = prop.content
 		else:
 			values = []
 			for prop in self.properties:
@@ -292,5 +292,11 @@ class Property(DeviceElementBase):
 			else:
 				self.value = int(self.value)
 		elif self.type in ['define']:
+			# Separate Value (= Name of Define) and Content
+			if self.value.find('=') > 0:
+				self.content = self.value[self.value.find('=')+1:].strip()
+				self.value = self.value[:self.value.find('=')].strip()
+			else:
+				self.content = '1'
 			if not re.match("^[0-9A-Z_]*$", self.value):
 				raise ParserException("Value of '%s' properties needs to be UPPER_UNDERSCORE_STYLE (found: '%s')" % (self.type, self.value))
