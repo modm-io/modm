@@ -28,8 +28,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__EXTERNAL_HPP
-#define XPCC__EXTERNAL_HPP
+#ifndef XPCC__DEVICE_HPP
+#define XPCC__DEVICE_HPP
 
 // Defines for example the ALWAYS_INLINE macro
 #include <xpcc/architecture/utils.hpp>
@@ -39,5 +39,5 @@
 #include <{{header}}>
 {% endfor -%}
 
-#endif	// XPCC__EXTERNAL_HPP
+#endif	// XPCC__DEVICE_HPP
 

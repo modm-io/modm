@@ -149,9 +149,9 @@ def platform_tools_generate(env, architecture_path):
 	src = os.path.join(platform_path, 'drivers.hpp.in')
 	tar = os.path.join(generated_path, 'drivers.hpp')
 	env.Jinja2Template(target = tar, source = src, substitutions = device_substitutions)
-	# Show SCons how to build external.hpp.in file:
-	src = os.path.join(platform_path, 'external.hpp.in')
-	tar = os.path.join(generated_path, 'external.hpp')
+	# Show SCons how to build device.hpp.in file:
+	src = os.path.join(platform_path, 'device.hpp.in')
+	tar = os.path.join(generated_path, 'device.hpp')
 	sub = {'headers': device_headers}
 	env.Jinja2Template(target = tar, source = src, substitutions = sub)
 	return sources, defines, includes

@@ -32,7 +32,7 @@
 #define XPCC_STM32__TIMER_BASE_HPP
 
 #include <stdint.h>
-#include "../../../external.hpp"
+#include "../../../device.hpp"
 
 namespace xpcc
 {

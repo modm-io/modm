@@ -32,7 +32,7 @@
 #define XPCC_STM32__GPIO_HPP
 
 #include <xpcc/architecture/driver/gpio.hpp>
-#include "../../../external.hpp"
+#include "../../../device.hpp"
 
 /* 
  * GPIO Ports

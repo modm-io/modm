@@ -29,7 +29,7 @@
 // ----------------------------------------------------------------------------
 {{ generation_block }}
 
-#include "../../../external.hpp"
+#include "../../../device.hpp"
 
 #include "timer_{{ id }}.hpp"
 
