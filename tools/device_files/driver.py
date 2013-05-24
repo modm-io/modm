@@ -132,6 +132,8 @@ class DriverFile():
 					output = output.replace('{{id}}', instance_id)
 				template = self._makeRelativeToPlatform(template)
 				output = self._makeRelativeToPlatform(output)
+				if instance_id.isdigit():
+					instance_id = int(instance_id)
 				substitutions = dict({'id': instance_id}.items() + self.substitutions.items())
 				template_file = [template, output, substitutions]
 				build_list.append(template_file) # always append template files since they will get a different id
