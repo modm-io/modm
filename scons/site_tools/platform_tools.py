@@ -79,6 +79,7 @@ def platform_tools_generate(env, architecture_path):
 			device = device[:-1]
 			device_file = None
 	device = env['XPCC_DEVICE'] # restore device
+
 	# Check for error
 	if device_file == None:
 		emsg = "XPCC Error: Could not find xml device file." + os.linesep
@@ -88,11 +89,32 @@ def platform_tools_generate(env, architecture_path):
 	print "Using Xml Device File '%s'" % os.path.basename(device_file)
 	# Now we need to parse the Xml File
 	dev = DeviceFile(device_file)
-	# Todo: Do something more with the properties...
+
+	# Parse Properties
 	prop = dev.getProperties(device)
 	defines = prop['defines']
+	# FIXME: This is a hack to make everything build without arm_devices.py
+	# We realy need to look into which defines we want to be available via a
+	# xpp_config.hpp and which via a command line option
+	env.Append(CPPDEFINES = defines)
 	device_headers = prop['headers']
-	# print "Properties: %s" % prop
+	print "Linkerscript: " + prop['linkerscript']
+	# Set Size
+	env['DEVICE_SIZE'] = { "flash": prop['flash'], "ram": prop['ram'] }
+	# Find Linkerscript:
+	linkerfile = os.path.join(env['XPCC_PLATFORM_PATH'], 'linker', prop['linkerscript'])
+	if not os.path.isfile(linkerfile):
+		linkerfile = os.path.join(env['XPCC_PLATFORM_PATH'], 'linker', prop['target']['family'], prop['linkerscript'])
+		if not os.path.isfile(linkerfile):
+			print "Linkerscript for %s (%s) could not be found." % (device, linkerfile)
+			Exit(1)
+	linkdir, linkfile = os.path.split(linkerfile)
+	linkdir = linkdir.replace(env['XPCC_ROOTPATH'], "${XPCC_ROOTPATH}")
+	env['LINKPATH'] = str(linkdir)
+	env['LINKFILE'] = str(linkfile)
+	print "env['LINKPATH']=%s, env['LINKFILE']=%s" % (env['LINKPATH'], env['LINKFILE'])
+
+
 	# Loop through Drivers
 	device_substitutions = {} # Substitutions for the drivers.hpp.in file
 	device_substitutions['drivers'] = []
@@ -119,6 +141,7 @@ def platform_tools_generate(env, architecture_path):
 			elif os.path.splitext(tar)[1] in Scanner.SOURCE:
 				sources.append(res)
 		device_substitutions['drivers'].append(ddic)
+
 	####### Generate Header Templates #########################################
 	# Show SCons how to build the architecture/platform.hpp file:
 	src = os.path.join(platform_path, 'platform.hpp.in')

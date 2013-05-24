@@ -61,6 +61,13 @@ sources, defines, includes = env.SConscript(
 for path in includes:
 	envOld.AppendUnique(CPPPATH = os.path.join(env['XPCC_ROOTPATH'], 'ext', path))
 
+# Update Enivronment Vars set by env.GeneratePlatform for "envOld"
+# FIXME: this is very very ugly
+# Maybe there is a better way....??
+envOld['LINKPATH'] = env['LINKPATH']
+envOld['LINKFILE'] = env['LINKFILE']
+envOld['DEVICE_SIZE'] = env['DEVICE_SIZE']
+
 library = env.Library(target = 'xpcc', source = sources)
 
 result = (library, defines)
