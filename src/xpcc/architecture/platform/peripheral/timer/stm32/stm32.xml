@@ -3,12 +3,12 @@
 <rca version="1.0">
 	<driver type="timer" name="stm32">
 		<!-- Template: file that needs to be turned into a source file -->
-		<template instances="1,8" out="timer{{id}}.cpp">advanced.cpp.in</template>
-		<template instances="1,8" out="timer{{id}}.hpp">advanced.hpp.in</template>
-		<template instances="6,7" out="timer{{id}}.cpp">basic.cpp.in</template>
-		<template instances="6,7" out="timer{{id}}.hpp">basic.hpp.in</template>
-		<template instances="2,3,4,5" out="timer{{id}}.cpp">general_purpose.cpp.in</template>
-		<template instances="2,3,4,5" out="timer{{id}}.hpp">general_purpose.hpp.in</template>
+		<template instances="1,8" out="timer_{{id}}.cpp">advanced.cpp.in</template>
+		<template instances="1,8" out="timer_{{id}}.hpp">advanced.hpp.in</template>
+		<template instances="6,7" out="timer_{{id}}.cpp">basic.cpp.in</template>
+		<template instances="6,7" out="timer_{{id}}.hpp">basic.hpp.in</template>
+		<template instances="2,3,4,5" out="timer_{{id}}.cpp">general_purpose.cpp.in</template>
+		<template instances="2,3,4,5" out="timer_{{id}}.hpp">general_purpose.hpp.in</template>
 		<!-- Static: files thht just need to be copied to the generated dir-->
 		<static>timer_base.hpp</static>
 		<!-- Empty/No 'instances' attribute defaults to all instances -->
