@@ -29,8 +29,7 @@
 // ----------------------------------------------------------------------------
 {{ generation_block }}
 
-#include "../gpio.hpp"
-#include "../device.h"
+#include "../../../external.hpp"
 
 #include "timer_{{ id }}.hpp"
 

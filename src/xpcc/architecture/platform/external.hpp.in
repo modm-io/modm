@@ -31,6 +31,9 @@
 #ifndef XPCC__EXTERNAL_HPP
 #define XPCC__EXTERNAL_HPP
 
+// Defines for example the ALWAYS_INLINE macro
+#include <xpcc/architecture/utils.hpp>
+
 // Include external device headers
 {% for header in headers -%}
 #include <{{header}}>
