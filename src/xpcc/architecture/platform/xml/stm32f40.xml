@@ -14,6 +14,9 @@
 		<flash size-id="e">524288</flash>
 		<flash size-id="g">1048576</flash>
 		<ram>114688</ram>	<!--Missing id => applies to all devices-->
+		<!-- Linker Script -->
+		<linkerscript size-id="g">stm32f4xx_g.ld</linkerscript>
+		<linkerscript size-id="e">stm32f4xx_e.ld</linkerscript>
 		<!-- Number of pins -->
 		<pin-count pin-id="r">64</pin-count>
 		<pin-count pin-id="v">100</pin-count>
@@ -22,9 +25,10 @@
 		<!-- Headers to be included with the {{ include_device_headers }} substitution-->
 		<header>stm32f4xx.h</header>
 		<!-- Cpp Defines -->
-		<define>__STM32F407__</define> <!-- just a name implies a value of 1 -->
-		<define>__ARM_STM32__</define>
+		<define>__ARM_STM32__</define> <!-- just a name implies a value of 1 -->
 		<define>STM32F4XX</define>
+		<define device-name="407">__STM32F407__</define>
+		<define device-name="405">__STM32F405__</define>
 		<define>STM32_AHB_FREQUENCY  = 168000000</define>
 		<define>STM32_APB1_FREQUENCY =  42000000</define>
 		<define>STM32_APB2_FREQUENCY =  84000000</define>

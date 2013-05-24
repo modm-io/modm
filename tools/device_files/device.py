@@ -41,6 +41,8 @@ class DeviceFile:
 	This can be a microcontroller, a pc or a doxygen "fake" target.
 	"""
 
+	PROPERTY_TAGS = ['flash', 'ram', 'pin-count', 'define', 'header', 'linkerscript']
+
 	def __init__(self, xml_file):
 		node = self._openDeviceXML(xml_file)
 
@@ -52,7 +54,7 @@ class DeviceFile:
 		self.drivers = []
 
 		for c in node:
-			if c.tag in ['flash', 'ram', 'pin-count', 'define', 'header']:
+			if c.tag in self.PROPERTY_TAGS:
 				self.properties.append(Property(self, c))
 			elif c.tag in ['driver']:
 				self.drivers.append(Driver(self, c))
@@ -103,11 +105,13 @@ class DeviceFile:
 		if s.valid == False:
 			return None
 		props = {}
-		props['flash'] = self.getProperty('flash', device_string)[0]
-		props['ram'] = self.getProperty('ram', device_string)[0]
-		props['pin-count'] = self.getProperty('pin-count', device_string)[0]
+		props['flash'] = self.getProperty('flash', device_string, True)[0]
+		props['ram'] = self.getProperty('ram', device_string, True)[0]
+		props['pin-count'] = self.getProperty('pin-count', device_string, True)[0]
+		props['linkerscript'] = self.getProperty('linkerscript', device_string, True)[0]
 		props['defines'] = self.getProperty('define', device_string)
 		props['headers'] = self.getProperty('header', device_string)
+		props['target'] = s.getTargetDict()
 		return props
 
 	def getDriverList(self, device_string, platform_path):
@@ -150,10 +154,11 @@ class DeviceFile:
 		return drivers
 
 ##-----------------------------------------------------------------------------
-	def getProperty(self, prop_type, device_string):
+	def getProperty(self, prop_type, device_string, require_singelton=False):
 		"""
 		Can be used to inquire flash size, ram size, pin-count or defines
 		Always returns as list if a valid device string is handed to function.
+		Set require_singelton if you need exactly one value to be returned.
 		"""
 		s = DeviceString(device_string)
 		if s.valid == False:
@@ -170,6 +175,13 @@ class DeviceFile:
 				if prop.type == prop_type:
 					if prop.appliesTo(s):
 						values.append(prop.value)
+		if require_singelton:
+			if len(values) > 1:
+				raise ParserException("There can only be one %s for %s. %s found: %s" \
+					% (prop_type, device_string, len(values), values))
+			elif len(values) < 1:
+				raise ParserException("There needs to be at least one %s for %s." \
+					% (prop_type, device_string))
 		return values
 
 	def getSubstitutions(self):
