@@ -32,6 +32,8 @@
 # i.e. Drivers and Properties
 #
 
+import re
+
 class DeviceElementBase:
 	""" DeviceElementBase
 	Base class for Property as well as Driver class.
@@ -125,6 +127,18 @@ class DeviceString:
 				self.size_id = string[10]
 			if len(string) >= 9:
 				self.valid = True
+		# AVR platform with ATmega and ATxmega family
+		elif string.startswith('at'):
+			self.platform = "avr"
+			match = re.search("(?P<family>atmega|atxmega)(?P<name>\d+)(?P<type>\w*)", string)
+			if match:
+				self.family = match.group('family')
+				self.name = match.group('name')
+				if match.group('type') != '':
+					self.pin_id = match.group('type')
+				self.valid = True
+			print self.family, self.name, self.pin_id
+			
 		else:
 			raise ParserException("Parse Error: unknown platform. Device string: %" % (string))
 
