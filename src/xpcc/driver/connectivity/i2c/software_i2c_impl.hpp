@@ -32,6 +32,10 @@
 #	error	"Don't include this file directly, use 'software_i2c.hpp' instead!"
 #endif
 
+// debugging for serious dummies
+//#define DEBUG_SW_I2C(x) xpcc::lpc::BufferedUart1::write(x)
+#define DEBUG_SW_I2C(x)
+
 template <typename Scl, typename Sda, int32_t Frequency>
 Scl xpcc::SoftwareI2C<Scl, Sda, Frequency>::scl;
 template <typename Scl, typename Sda, int32_t Frequency>
@@ -180,28 +184,14 @@ template <typename Scl, typename Sda, int32_t Frequency>
 void
 xpcc::SoftwareI2C<Scl, Sda, Frequency>::startCondition()
 {
-	if (sda.read() == gpio::LOW)
-	{// startcondition needs a high sda and scl, so we adjust here
-		if (scl.read() == gpio::HIGH)
-		{// a very illegal state
-			// avoid generating a stop condition and hope no other is writing on the bus
-			scl.setOutput(0);
-			delay();
-			sda.setInput();
-			delay();
-			scl.setInput();
-			delay();
-		}
-		else { //  we are doing a restart
-			sda.setInput();
-			delay();
-		}
-	}
-	else if(scl.read() == gpio::LOW){
-		scl.setInput();
-		delay();
-	}
-	
+	sda.setInput();
+	while((sda.read() == gpio::LOW))
+		;
+	delay();
+
+	sclSetAndWait();
+	delay();
+
 	// here both pins are HIGH, ready for start
 	sda.setOutput(0);
 	delay();
@@ -217,7 +207,7 @@ xpcc::SoftwareI2C<Scl, Sda, Frequency>::stopCondition()
 	sda.setOutput(0);
 	
 	delay();
-	scl.setInput();
+	sclSetAndWait();
 	delay();
 	sda.setInput();
 	delay();
@@ -276,12 +266,10 @@ bool
 xpcc::SoftwareI2C<Scl, Sda, Frequency>::readBit()
 {
 	delay();
-	scl.setInput();
+	sclSetAndWait();
 	
 	delay();
-	while (scl.read() == gpio::LOW)
-		;
-	
+
 	bool bit = sda.read();
 	
 	scl.setOutput(0);
@@ -301,13 +289,34 @@ xpcc::SoftwareI2C<Scl, Sda, Frequency>::writeBit(bool bit)
 	}
 	delay();
 	
-	scl.setInput();
+	sclSetAndWait();
+	
 	delay();
-	
-	while (scl.read() == gpio::LOW)
-		;
-	
+
 	scl.setOutput(0);
+}
+
+template <typename Scl, typename Sda, int32_t Frequency>
+void
+xpcc::SoftwareI2C<Scl, Sda, Frequency>::sclSetAndWait()
+{
+	scl.setInput();
+	// wait for clock stretching by slave
+	// only wait a maximum of 250 half clock cycles
+	uint_fast8_t deadlockPreventer = 250;
+	while (scl.read() == gpio::LOW && deadlockPreventer)
+	{
+		xpcc::delay_us(delayTime/2);
+		deadlockPreventer--;
+		// double the read amount
+		if (scl.read() != gpio::LOW) return;
+		xpcc::delay_us(delayTime/2);
+	}
+	// if extreme clock stretching occurs, then there might be an external error
+	if (!deadlockPreventer)
+	{
+		error();
+	}
 }
 
 // ----------------------------------------------------------------------------
