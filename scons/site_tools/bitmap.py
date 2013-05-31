@@ -76,7 +76,7 @@ def bitmap_action(target, source, env):
 	
 	input = open(filename).read()
 	if input[0:3] != "P1\n":
-		print "Error: format needs to be a portable bitmap in ascii format (file descriptor 'P1')!"
+		env.Error("Error: format needs to be a portable bitmap in ascii format (file descriptor 'P1')!")
 		exit(1)
 	
 	input = input[3:]
@@ -87,7 +87,7 @@ def bitmap_action(target, source, env):
 	
 	result = re.match("^(\d+) (\d+)\n", input)
 	if not result:
-		print "Error: bad format!"
+		env.Error("Error: bad format!")
 	
 	width = int(result.group(1))
 	height = int(result.group(2))

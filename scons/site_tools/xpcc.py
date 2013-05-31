@@ -137,7 +137,6 @@ def xpcc_library(env, buildpath=None):
 		'defines': '\n'.join(define_list),
 		'name': env['XPCC_CONFIG']['general']['name']
 	}
-	#print os.path.join(env['XPCC_BUILDPATH'], 'xpcc_config.hpp')
 
 	file = env.Template(
 			target = os.path.join(env['XPCC_BUILDPATH'], 'xpcc_config.hpp'),
@@ -200,8 +199,8 @@ def generate(env, **kw):
 		# Check if a global environment variable exists that point to
 		# the root of the xpcc-folder
 		rootpath = ARGUMENTS.get('XPCC_HOME', None)
-		if rootpath is not None and ARGUMENTS.get('verbose') == '1':
-			print "Use path from 'XPCC_HOME': '%s'" % rootpath
+		if rootpath is not None:
+			env.Info("Use path from 'XPCC_HOME': '%s'" % rootpath)
 	
 	if rootpath is None:
 		# try to detect the rootpath
@@ -218,13 +217,12 @@ def generate(env, **kw):
 				# name check if at least a 'src' directory exists 
 				if os.path.exists(os.path.join(p, 'src')):
 					rootpath = p
-					if ARGUMENTS.get('verbose') == '1':
-						print "Extracted path from tool path: '%s'" % rootpath
+					env.Info("Extracted path from tool path: '%s'" % rootpath)
 					break
 		
 		if rootpath is None:
-			print "Could not detect the path to the xpcc-library. Use " \
-				  "'Environment(rootpath=...)' to set the path to the root folder of xpcc."
+			env.Error("Could not detect the path to the xpcc-library. Use " \
+				  "'Environment(rootpath=...)' to set the path to the root folder of xpcc.")
 			env.Exit(1)
 	rootpath = os.path.abspath(rootpath)
 	
@@ -243,7 +241,7 @@ def generate(env, **kw):
 					'Windows': 'windows' }[platform.system()]
 				device = parser.get('build', 'device', defaultDevice)
 			except KeyError, msg:
-				print "Error: unknown platform: '%s' " % msg
+				env.Warn("Error: unknown platform: '%s' " % msg)
 			clock = ''
 		# TODO what is the allowed architecture?
 		elif architecture in ['atmega', 'atxmega', 'avr']:
@@ -256,7 +254,7 @@ def generate(env, **kw):
 			device = parser.get('build', 'device')
 			clock  = parser.get('build', 'clock')
 		else:
-			print "xpcc Error: unknown architecture: '%s'!" % architecture
+			env.Error("xpcc Error: unknown architecture: '%s'!" % architecture)
 			Exit(1)
 		
 		projectName = parser.get('general', 'name')
@@ -276,7 +274,7 @@ def generate(env, **kw):
 		# exclude the buildpath from the FileScanner
 		exclude_from_scanner(buildpath)
 	except configparser.ParserException, msg:
-		print "Error parsing file configuration file '%s':\n%s" % (configfile, str(msg))
+		env.Error("Error parsing file configuration file '%s':\n%s" % (configfile, str(msg)))
 		Exit(1)
 	
 	configuration = { 'defines': {}, 'environment': {} }
@@ -337,20 +335,20 @@ def generate(env, **kw):
 					fuses = ['lfuse', 'hfuse', 'efuse']
 					for key, value in configuration['fusebits'].items():
 						if key not in fuses:
-							print "Unknown fusebit '%s'! Allowed values are '%s'!" % \
-									(key, "', '".join(fuses))
+							env.Error("Unknown fusebit '%s'! Allowed values are '%s'!" % \
+									(key, "', '".join(fuses)))
 							Exit(1)
 						env.Append(AVR_FUSEBITS = {key: value} )
 				elif device.startswith('atxmega'):
 					fuses = ['fuse0', 'fuse1', 'fuse2', 'fuse4', 'fuse5']
 					for key, value in configuration['fusebits'].items():
 						if key not in fuses:
-							print "Unknown fusebit '%s'! Allowed values are '%s'!" % \
-									(key, "', '".join(fuses))
+							env.Error("Unknown fusebit '%s'! Allowed values are '%s'!" % \
+									(key, "', '".join(fuses)))
 							Exit(1)
 						env.Append(AVR_FUSEBITS = {key: value} )
 				else:
-					print "Ignoring 'fusebit' section in project configuration. Unknown device %s" % device
+					env.Warn("Ignoring 'fusebit' section in project configuration. Unknown device %s" % device)
 		
 		# path to the headers of a very small and incomplete libstdc++ implementation
 		env.Append(CPPPATH = [os.path.join(rootpath, 'src', 'stdc++')])
@@ -392,7 +390,7 @@ def generate(env, **kw):
 					#env['OPENOCD_CONFIGFILE'] = parser.get('openocd', 'configfile')
 					#env['OPENOCD_COMMANDS'] = parser.get('openocd', 'commands')
 			except configparser.ParserException as e:
-				print "Error in Configuration: %s" % e
+				env.Error("Error in Configuration: %s" % e)
 				Exit(1)
 		if parser.has_section('debug'):
 			try:
@@ -400,7 +398,7 @@ def generate(env, **kw):
 					env['GDB_PORT'] = parser.get('debug', 'gdbport')
 					env.Tool('gdb')
 			except configparser.ParserException as e:
-				print "Error in Configuration: %s" % e
+				env.Error("Error in Configuration: %s" % e)
 				Exit(1)			
 	elif architecture == 'avr32':
 		env['AVR32_DEVICE'] = device
@@ -413,7 +411,7 @@ def generate(env, **kw):
 		env.Tool('dfu-programmer')
 
 	else:
-		print "xpcc Error: Unknown architecture '%s'!" % architecture
+		env.Error("xpcc Error: Unknown architecture '%s'!" % architecture)
 		Exit(1)
 	
 	# append all values from environment section to the real environment

@@ -59,7 +59,7 @@ def jinja2_template_action(target, source, env):
 	try:
 		import jinja2
 	except ImportError:
-		print "To use this functionality you need to install the jinja2 template engine"
+		env.Error("To use this functionality you need to install the jinja2 template engine")
 		Exit(1)
 	
 	globals = {

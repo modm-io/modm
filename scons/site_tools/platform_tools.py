@@ -86,7 +86,7 @@ def platform_tools_generate(env, architecture_path):
 		for f in files:
 			emsg += "Tried: " + f + os.linesep
 		raise SCons.Errors.BuildError(node=target, errstr=emsg)
-	print "Using Xml Device File '%s'" % os.path.basename(device_file)
+	env.Info("Using Xml Device File '%s'" % os.path.basename(device_file))
 	# Now we need to parse the Xml File
 	dev = DeviceFile(device_file)
 
@@ -105,7 +105,7 @@ def platform_tools_generate(env, architecture_path):
 	if not os.path.isfile(linkerfile):
 		linkerfile = os.path.join(env['XPCC_PLATFORM_PATH'], 'linker', prop['target']['platform'], prop['linkerscript'])
 		if not os.path.isfile(linkerfile):
-			print "Linkerscript for %s (%s) could not be found." % (device, linkerfile)
+			env.Error("Linkerscript for %s (%s) could not be found." % (device, linkerfile))
 			Exit(1)
 	linkdir, linkfile = os.path.split(linkerfile)
 	linkdir = linkdir.replace(env['XPCC_ROOTPATH'], "${XPCC_ROOTPATH}")

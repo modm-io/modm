@@ -66,7 +66,7 @@ def size_action(target, source, env):
 	stdout, stderr = p.communicate()
 	
 	if stderr is not None:
-		print "Error while running %s" % ' '.join(cmd)
+		env.Error("Error while running %s" % ' '.join(cmd))
 		Exit(1)
 	
 	flashSize = 0
