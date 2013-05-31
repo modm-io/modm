@@ -115,7 +115,7 @@ class DeviceFile:
 		props = {}
 		props['flash'] = self.getProperty('flash', device_string, True)[0]
 		props['ram'] = self.getProperty('ram', device_string, True)[0]
-		props['eeprom'] = self.getProperty('eeprom', device_string, True)[0]
+		props['eeprom'] = self.getProperty('eeprom', device_string, True, 0)[0]
 		props['pin-count'] = self.getProperty('pin-count', device_string, True)[0]
 		props['linkerscript'] = self.getProperty('linkerscript', device_string, True)[0]
 		props['defines'] = self.getProperty('define', device_string)
@@ -163,7 +163,7 @@ class DeviceFile:
 		return drivers
 
 ##-----------------------------------------------------------------------------
-	def getProperty(self, prop_type, device_string, require_singelton=False):
+	def getProperty(self, prop_type, device_string, require_singelton=False, default=None):
 		"""
 		Can be used to inquire flash size, ram size, pin-count or defines
 		Always returns as list if a valid device string is handed to function.
@@ -189,8 +189,11 @@ class DeviceFile:
 				raise ParserException("There can only be one %s for %s. %s found: %s" \
 					% (prop_type, device_string, len(values), values))
 			elif len(values) < 1:
-				raise ParserException("There needs to be at least one %s for %s." \
-					% (prop_type, device_string))
+				if default == None:
+					raise ParserException("There needs to be at least one %s for %s." \
+						% (prop_type, device_string))
+				else:
+					values.append(default)
 		return values
 
 	def getSubstitutions(self):
