@@ -99,7 +99,7 @@ def platform_tools_generate(env, architecture_path):
 	env.Append(CPPDEFINES = defines)
 	device_headers = prop['headers']
 	# Set Size
-	env['DEVICE_SIZE'] = { "flash": prop['flash'], "ram": prop['ram'] }
+	env['DEVICE_SIZE'] = { "flash": prop['flash'], "ram": prop['ram'], "eeprom": prop['eeprom'] }
 	# Find Linkerscript:
 	linkerfile = os.path.join(env['XPCC_PLATFORM_PATH'], 'linker', prop['linkerscript'])
 	if not os.path.isfile(linkerfile):
