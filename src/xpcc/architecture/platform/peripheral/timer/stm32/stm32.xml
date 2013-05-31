@@ -9,7 +9,7 @@
 		<template instances="6,7" out="timer_{{id}}.hpp">basic.hpp.in</template>
 		<template instances="2,3,4,5" out="timer_{{id}}.cpp">general_purpose.cpp.in</template>
 		<template instances="2,3,4,5" out="timer_{{id}}.hpp">general_purpose.hpp.in</template>
-		<!-- Static: files thht just need to be copied to the generated dir-->
+		<!-- Static: files that just need to be copied to the generated dir-->
 		<static>timer_base.hpp</static>
 		<!-- Empty/No 'instances' attribute defaults to all instances -->
 		<!-- Dependancies: static files that are shared between drivers -->

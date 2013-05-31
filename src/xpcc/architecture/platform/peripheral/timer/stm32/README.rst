@@ -8,7 +8,7 @@ Targets
 * STM32F2
 * STM32F3
 * STM32F4
-* pissibly other targets from the STM32 platform
+* possibly other targets from the STM32 platform
 
 Device Specific Data
 --------------------
