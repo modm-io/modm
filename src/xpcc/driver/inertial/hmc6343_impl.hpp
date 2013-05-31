@@ -341,9 +341,7 @@ xpcc::Hmc6343<I2cMaster>::readRegister(hmc6343::Register reg)
 
 	buffer[0] = hmc6343::COMMAND_READ_EEPROM;
 	buffer[1] = reg;
-	// reading two bytes here is a hack, it does not work on stm32 with just reading one.
-	// this might be a bug in the STM32 driver.
-	adapter.initialize(buffer, 2, buffer, 2);
+	adapter.initialize(buffer, 2, buffer, 1);
 
 	while(!I2cMaster::startSync(&adapter))
 		;
