@@ -311,5 +311,3 @@ class Property(DeviceElementBase):
 				self.value = self.value[:self.value.find('=')].strip()
 			else:
 				self.content = '1'
-			if not re.match("^[0-9A-Z_]*$", self.value):
-				raise ParserException("Value of '%s' properties needs to be UPPER_UNDERSCORE_STYLE (found: '%s')" % (self.type, self.value))
