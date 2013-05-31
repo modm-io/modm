@@ -31,21 +31,26 @@
 #
 #
 
-import os
+import os, sys
 import xml.etree.ElementTree as et
 import xml.parsers.expat
 
 from parser_exception import ParserException
 
+# add python module logger to path
+sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'logger'))
+from logger import Logger
+
 class DriverFile():
 
-	def __init__(self, filename):
-		pass
-		# TODO: what else is needed?
-		# print "DriverFile: " + str(filename)
+	def __init__(self, logger=None):
+		if logger == None:
+			self.log = Logger()
+		else:
+			self.log = logger
 
 	@classmethod
-	def fromDict(self, dic):
+	def fromDict(self, dic, logger=None):
 		"""
 		This is used to create a DriverFile instance from information about
 		a driver extracted from a device file and packaged into a dictionary.
@@ -53,7 +58,7 @@ class DriverFile():
 		in device.py.
 		Remember to update if you change anything!
 		"""
-		d = DriverFile(dic['driver_file'])
+		d = DriverFile(logger)
 		d.name = dic['name']
 		d.type = dic['type']
 		d.filename = dic['driver_file']

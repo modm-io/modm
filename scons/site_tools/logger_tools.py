@@ -60,6 +60,10 @@ def logger_is_log_level(env, log_level, alias='logger_is_log_level'):
 	env['XPCC_LOGGER'].isLogLevel(log_level)
 
 # -----------------------------------------------------------------------------
+def logger_get_logger(env, alias='logger_is_log_level'):
+	return env['XPCC_LOGGER']
+
+# -----------------------------------------------------------------------------
 def generate(env, **kw):
 	env['XPCC_LOGGER'] = Logger()
 	env.AddMethod(logger_debug, 'Debug')
@@ -68,6 +72,7 @@ def generate(env, **kw):
 	env.AddMethod(logger_error, 'Error')
 	env.AddMethod(logger_set_log_level, 'SetLogLevel')
 	env.AddMethod(logger_is_log_level, 'IsLogLevel')
+	env.AddMethod(logger_get_logger, 'GetLogger')
 
 def exists(env):
 	return True

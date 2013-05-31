@@ -27,13 +27,16 @@
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # -----------------------------------------------------------------------------
 
-import re
-import os
+import re, os, sys
 import xml.etree.ElementTree as et
 import xml.parsers.expat
 from string import Template
 from parser_exception import ParserException
 from device_element import DeviceElementBase, DeviceString
+
+# add python module logger to path
+sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'logger'))
+from logger import Logger
 
 class DeviceFile:
 	""" DeviceFile
@@ -43,8 +46,13 @@ class DeviceFile:
 
 	PROPERTY_TAGS = ['flash', 'ram', 'eeprom', 'pin-count', 'define', 'header', 'linkerscript']
 
-	def __init__(self, xml_file):
+	def __init__(self, xml_file, logger=None):
 		node = self._openDeviceXML(xml_file)
+
+		if logger == None:
+			self.log = Logger()
+		else:
+			self.log = logger
 
 		self.platform = node.get('platform')
 		self.family = node.get('family')

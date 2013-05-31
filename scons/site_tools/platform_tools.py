@@ -88,7 +88,7 @@ def platform_tools_generate(env, architecture_path):
 		raise SCons.Errors.BuildError(node=target, errstr=emsg)
 	env.Info("Using Xml Device File '%s'" % os.path.basename(device_file))
 	# Now we need to parse the Xml File
-	dev = DeviceFile(device_file)
+	dev = DeviceFile(device_file, env.GetLogger())
 
 	# Parse Properties
 	prop = dev.getProperties(device)
@@ -118,7 +118,7 @@ def platform_tools_generate(env, architecture_path):
 	drivers = dev.getDriverList(device, env['XPCC_PLATFORM_PATH'])
 	for driver in drivers:
 		ddic = {} # create dictionary describing the driver
-		d = DriverFile.fromDict(driver)
+		d = DriverFile.fromDict(driver, env.GetLogger())
 		ddic['name'] = d.name
 		ddic['type'] = d.type
 		ddic['headers'] = []

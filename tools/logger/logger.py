@@ -57,12 +57,12 @@ class Logger:
 		'disabled': 4 }
 
 
-	def __init__(self):
+	def __init__(self, log_level='err'):
 		self.stderr_color = self._checkColorSupport(sys.stderr)
 		self.stdout_color = self._checkColorSupport(sys.stdout)
 		# Default is Error
-		self.log_level = self.LOG_LEVEL['err']
-		self.line_info = True
+		self.setLogLevel(log_level)
+		self.line_info = True # to be implemented
 
 	def debug(self, s):
 		if self.log_level <= self.LOG_LEVEL['debug']:
