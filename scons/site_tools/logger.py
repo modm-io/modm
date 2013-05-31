@@ -65,23 +65,23 @@ class Logger:
 		self.log_level = self.LOG_LEVEL['err']
 		self.line_info = True
 
-	def debug(self, s, format_list):
+	def debug(self, s):
 		if self.log_level <= self.LOG_LEVEL['debug']:
-			self.write("Debug: " + s, format_list, self.COLOR_DEBUG, sys.stdout)
+			self.write("Debug: " + s, self.COLOR_DEBUG, sys.stdout)
 
-	def info(self, s, format_list):
+	def info(self, s):
 		if self.log_level <= self.LOG_LEVEL['info']:
-			self.write("Info: " + s, format_list, self.COLOR_INFO, sys.stdout)
+			self.write("Info: " + s, self.COLOR_INFO, sys.stdout)
 
-	def warn(self, s, format_list):
+	def warn(self, s):
 		if self.log_level <= self.LOG_LEVEL['warn']:
-			self.write("Warn: " + s, format_list, self.COLOR_WARN, sys.stderr)
+			self.write("Warn: " + s, self.COLOR_WARN, sys.stderr)
 
-	def error(self, s, format_list):
+	def error(self, s):
 		if self.log_level <= self.LOG_LEVEL['error']:
-			self.write("Error: " + s, format_list, self.COLOR_ERROR, sys.stderr)
+			self.write("Error: " + s, self.COLOR_ERROR, sys.stderr)
 
-	def write(self, string, format_list=None, color=None, stream=sys.stdout):
+	def write(self, string, color=None, stream=sys.stdout):
 		# Check Color Support
 		if stream == sys.stdout and not self.stdout_color:
 			color = None
@@ -91,10 +91,7 @@ class Logger:
 		if color != None:
 			stream.write(color)
 		# Print String
-		if format_list != None:
-			stream.write(string % format_list)
-		else:
-			stream.write(string)
+		stream.write(string)
 		# End Color
 		if color != None:
 			stream.write(self.COLOR_END)
@@ -118,20 +115,20 @@ class Logger:
 
 
 # -----------------------------------------------------------------------------
-def logger_debug(env, s, format_list=None, alias='logger_debug'):
-	env['XPCC_LOGGER'].debug(s, format_list)
+def logger_debug(env, s, alias='logger_debug'):
+	env['XPCC_LOGGER'].debug(s)
 
 # -----------------------------------------------------------------------------
-def logger_info(env, s, format_list=None, alias='logger_info'):
-	env['XPCC_LOGGER'].info(s, format_list)
+def logger_info(env, s, alias='logger_info'):
+	env['XPCC_LOGGER'].info(s)
 
 # -----------------------------------------------------------------------------
-def logger_warn(env, s, format_list=None, alias='logger_warn'):
-	env['XPCC_LOGGER'].warn(s, format_list)
+def logger_warn(env, s, alias='logger_warn'):
+	env['XPCC_LOGGER'].warn(s)
 
 # -----------------------------------------------------------------------------
-def logger_error(env, s, format_list=None, alias='logger_error'):
-	env['XPCC_LOGGER'].error(s, format_list)
+def logger_error(env, s, alias='logger_error'):
+	env['XPCC_LOGGER'].error(s)
 
 # -----------------------------------------------------------------------------
 def logger_set_log_level(env, new_level, alias='logger_set_log_level'):
