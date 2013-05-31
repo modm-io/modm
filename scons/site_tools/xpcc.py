@@ -189,7 +189,10 @@ def generate(env, **kw):
 	# features from this version like os.path.relpath() are used.
 	EnsurePythonVersion(2, 6)
 	EnsureSConsVersion(1, 0)
-	
+
+	# Import Logger Tool
+	env.Tool('logger')
+
 	# detect the rootpath to the xpcc folder
 	rootpath = env.get('rootpath')
 	
