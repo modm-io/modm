@@ -54,7 +54,7 @@ namespace xpcc
 			 * 
 			 * \warning	The SysTick Timer is used by default to increment
 			 * 			xpcc::Clock, which is used by xpcc::Timeout and other
-			 * 			similar workflow classes.
+			 * 			similar processing classes.
 			 * 			You must not increment the xpcc::Clock
 			 * 			additionally somewhere else.
 			 *

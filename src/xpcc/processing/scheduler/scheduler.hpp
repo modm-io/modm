@@ -40,7 +40,7 @@
 namespace xpcc
 {
 	/**
-	 * \ingroup	workflow
+	 * \ingroup	processing
 	 * \brief	%Scheduler
 	 * 
 	 * If the schedule() method is call from a timer interrupt, this scheduler

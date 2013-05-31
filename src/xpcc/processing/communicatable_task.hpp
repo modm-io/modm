@@ -47,7 +47,7 @@ namespace xpcc
 	 * \see		xpcc::Communicator
 	 * \see		xpcc::Communicatable
 	 * 
-	 * \ingroup	workflow
+	 * \ingroup	processing
 	 * \author	Fabian Greif
 	 */
 	class CommunicatableTask : public Task,
