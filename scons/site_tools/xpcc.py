@@ -190,7 +190,13 @@ def generate(env, **kw):
 	EnsureSConsVersion(1, 0)
 
 	# Import Logger Tool
-	env.Tool('logger')
+	env.Tool('logger_tools')
+	log_level = ARGUMENTS.get('LOG_LEVEL', None)
+	if log_level == None:
+		log_level = ARGUMENTS.get('ll', None)
+	if log_level == None:
+		log_level = 'warn'
+	env.SetLogLevel(log_level)
 
 	# detect the rootpath to the xpcc folder
 	rootpath = env.get('rootpath')
