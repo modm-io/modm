@@ -27,7 +27,8 @@
 		<eeprom device-name="328">1024</eeprom>
 		
 		<!-- Number of pins -->
-		<pin-count>28</pin-count>
+		<pin-count pin-id="mmh|mmhr|pu|mmn|mmnr|pn">28</pin-count>
+		<pin-count pin-id="au|aur|ccu|ccur|mu|mur|an|anr|mn|mnr">32</pin-count>
 		<!-- Headers to be included with the {{ include_device_headers }} substitution-->
 		<header>avr/io.h</header>
 		<header>avr/interrupt.h</header>
