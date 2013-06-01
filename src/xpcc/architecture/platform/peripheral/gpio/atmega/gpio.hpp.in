@@ -40,13 +40,13 @@
  */
 
 #define	GPIO__IO(name, port, pin) \
-typedef CONCAT3(Gpio, port, pin) name
+typedef CONCAT3(::xpcc::atmega::Gpio, port, pin) name
 
 #define	GPIO__OUTPUT(name, port, pin) \
-typedef ::xpcc::atmega::Output< ::xpcc::atmega::CONCAT3(Gpio, port, pin) > name
+typedef CONCAT3(::xpcc::atmega::GpioOutput, port, pin) name
 
 #define	GPIO__INPUT(name, port, pin) \
-typedef ::xpcc::atmega::Input< ::xpcc::atmega::CONCAT3(Gpio, port, pin) > name
+typedef CONCAT3(::xpcc::atmega::GpioInput, port, pin) name
 
 
 namespace xpcc
@@ -66,56 +66,50 @@ namespace xpcc
 		};
 
 		/**
-		 * Gpio Output Template
-		 *
-		 * In case you want to make sure one Gpio is only used as an output.
-		 * This wrapes a Gpio and makes only the output functions available.
-		 */
-		template<class IO>		/* the undelying gpio class */
-		struct Output : Gpio {	/* inherit enums from Gpio base class */
-			ALWAYS_INLINE static void setOutput(bool status) { IO::setOutput(status); }
-			ALWAYS_INLINE static void setOutput() { IO::setOutput(); }
-			ALWAYS_INLINE static void set() { IO::set(); }
-			ALWAYS_INLINE static void reset() { IO::reset(); }
-			ALWAYS_INLINE static void toggle() {  IO::toggle(); }
-			ALWAYS_INLINE static void set(bool status) { IO::set(status); }
-		};
-
-		/**
-		 * Gpio Input Template
-		 *
-		 * In case you want to make sure one Gpio is only used as an input.
-		 * This wrapes a Gpio and makes only the input functions available.
-		 */
-		template<class IO>		/* the undelying gpio class */
-		struct Input : Gpio {	/* inherit enums from Gpio base class */
-			ALWAYS_INLINE static void setInput(PullType type = FLOATING) { IO::setInput(type); }
-			ALWAYS_INLINE static void setInput() { IO::setInput(); }
-			ALWAYS_INLINE static bool read() { return IO::read(); }
-		};
-
-		/**
 		 * Gpio Classes created from the XML Device File Gpio Description
 		 */
 		{% for gpio in gpios -%}
 			{% set port  = gpio.port|upper -%}
-			{% set name = "Gpio" ~ gpio.port|upper ~ gpio.id %}
-			{% set pin  = gpio.id %}
-
-
-		struct {{name}} : Gpio {
+			{% set pin  = gpio.id -%}
+			
+		{% for type in ["Output", "Input", ""] -%}
+			{% set name = "Gpio" ~ type ~ port ~ pin -%}
+		
+		struct {{name}} : Gpio
+		{
+			{% if type == "" or type == "Output" -%}
 			ALWAYS_INLINE static void setOutput(bool status) {
 				set(status);
 				setOutput();
 			}
 
-			ALWAYS_INLINE static void
-			setOutput() {
+			ALWAYS_INLINE static void setOutput() {
 				DDR{{port}} |= (1 << {{pin}});
 			}
 
+			ALWAYS_INLINE static void set() {
+				PORT{{port}} |=  (1 << {{pin}});
+			}
+			
+			ALWAYS_INLINE static void set(bool status) {
+				if (status) { set(); }
+				else { reset(); }
+			}
+
+			ALWAYS_INLINE static void reset() {
+				PORT{{port}} &= ~(1 << {{pin}});
+			}
+
+			ALWAYS_INLINE static void toggle() {
+				PORT{{port}} ^=  (1 << {{pin}});
+			}{% endif %}
+			{% if type == "" or type == "Input" -%}
+			ALWAYS_INLINE static void setInput() {
+				DDR{{port}} &= ~(1 << {{pin}});
+			}
+
 			ALWAYS_INLINE static void
-			setInput(PullType type = FLOATING) {
+			setInput(PullType type) {
 				setInput();
 				if (type == PullType::PULLUP) {
 					PORT{{port}} |= (1 << {{pin}});
@@ -125,27 +119,12 @@ namespace xpcc
 				}
 			}
 
-			ALWAYS_INLINE static void set() {
-				PORT{{port}} |=  (1 << {{pin}});
-			}
-
-			ALWAYS_INLINE static void reset() {
-				PORT{{port}} &= ~(1 << {{pin}});
-			}
-
-			ALWAYS_INLINE static void toggle() {
-				PORT{{port}} ^=  (1 << {{pin}});
-			}
-
-			ALWAYS_INLINE static void set(bool status) {
-				if (status) { set(); }
-				else { reset(); }
-			}
-
 			ALWAYS_INLINE static bool read() {
 				return (PIN{{port}} & (1 << {{pin}}));
-			}
+			}{% endif %}
 		};
+		
+		{% endfor %}
 		{% endfor %}
 	}
 }
