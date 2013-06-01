@@ -1,0 +1,154 @@
+// coding: utf-8
+// ----------------------------------------------------------------------------
+/* Copyright (c) 2013, Roboterclub Aachen e.V.
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ *     * Redistributions of source code must retain the above copyright
+ *       notice, this list of conditions and the following disclaimer.
+ *     * Redistributions in binary form must reproduce the above copyright
+ *       notice, this list of conditions and the following disclaimer in the
+ *       documentation and/or other materials provided with the distribution.
+ *     * Neither the name of the Roboterclub Aachen e.V. nor the
+ *       names of its contributors may be used to endorse or promote products
+ *       derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY ROBOTERCLUB AACHEN E.V. ''AS IS'' AND ANY
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL ROBOTERCLUB AACHEN E.V. BE LIABLE FOR ANY
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+ * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+// ----------------------------------------------------------------------------
+
+#ifndef XPCC__ATMEGA_GPIO_HPP
+#define XPCC__ATMEGA_GPIO_HPP
+
+#include <xpcc/architecture/driver/gpio.hpp>
+#include "../../../device.hpp"
+
+
+/**
+ * Macros for backwards compatibility:
+ */
+
+#define	GPIO__IO(name, port, pin) \
+typedef CONCAT3(Gpio, port, pin) name
+
+#define	GPIO__OUTPUT(name, port, pin) \
+typedef ::xpcc::atmega::Output< ::xpcc::atmega::CONCAT3(Gpio, port, pin) > name
+
+#define	GPIO__INPUT(name, port, pin) \
+typedef ::xpcc::atmega::Input< ::xpcc::atmega::CONCAT3(Gpio, port, pin) > name
+
+
+namespace xpcc
+{
+	namespace atmega
+	{
+		struct Gpio
+		{
+			/**
+			 * \ingroup	atmega
+			 */
+			enum PullType
+			{
+				FLOATING = 0,
+				PULLUP = 1,
+			};
+		};
+
+		/**
+		 * Gpio Output Template
+		 *
+		 * In case you want to make sure one Gpio is only used as an output.
+		 * This wrapes a Gpio and makes only the output functions available.
+		 */
+		template<class IO>		/* the undelying gpio class */
+		struct Output : Gpio {	/* inherit enums from Gpio base class */
+			ALWAYS_INLINE static void setOutput(bool status) { IO::setOutput(status); }
+			ALWAYS_INLINE static void setOutput() { IO::setOutput(); }
+			ALWAYS_INLINE static void set() { IO::set(); }
+			ALWAYS_INLINE static void reset() { IO::reset(); }
+			ALWAYS_INLINE static void toggle() {  IO::toggle(); }
+			ALWAYS_INLINE static void set(bool status) { IO::set(status); }
+		};
+
+		/**
+		 * Gpio Input Template
+		 *
+		 * In case you want to make sure one Gpio is only used as an input.
+		 * This wrapes a Gpio and makes only the input functions available.
+		 */
+		template<class IO>		/* the undelying gpio class */
+		struct Input : Gpio {	/* inherit enums from Gpio base class */
+			ALWAYS_INLINE static void setInput(PullType type = FLOATING) { IO::setInput(type); }
+			ALWAYS_INLINE static void setInput() { IO::setInput(); }
+			ALWAYS_INLINE static bool read() { return IO::read(); }
+		};
+
+		/**
+		 * Gpio Classes created from the XML Device File Gpio Description
+		 */
+		{% for gpio in gpios -%}
+			{% set port  = gpio.port|upper -%}
+			{% set name = "Gpio" ~ gpio.port|upper ~ gpio.id %}
+			{% set pin  = gpio.id %}
+
+
+		struct {{name}} : Gpio {
+			ALWAYS_INLINE static void setOutput(bool status) {
+				set(status);
+				setOutput();
+			}
+
+			ALWAYS_INLINE static void
+			setOutput() {
+				DDR{{port}} |= (1 << {{pin}});
+			}
+
+			ALWAYS_INLINE static void
+			setInput(PullType type = FLOATING) {
+				setInput();
+				if (config == ::xpcc::atmega::PULLUP) {
+					PORT{{port}} |= (1 << {{pin}});
+				}
+				else {
+					PORT{{port}} &= ~(1 << {{pin}});
+				}
+			}
+
+			ALWAYS_INLINE static void set() {
+				PORT{{port}} |=  (1 << {{pin}});
+			}
+
+			ALWAYS_INLINE static void reset() {
+				PORT{{port}} &= ~(1 << {{pin}});
+			}
+
+			ALWAYS_INLINE static void toggle() {
+				PORT{{port}} ^=  (1 << {{pin}});
+			}
+
+			ALWAYS_INLINE static void set(bool status) {
+				if (status) { set(); }
+				else { reset(); }
+			}
+
+			ALWAYS_INLINE static bool read() {
+				return (PIN{{port}} & (1 << {{pin}}));
+			}
+		};
+		{% endfor %}
+	}
+}
+
+
+#endif // XPCC_STM32__GPIO_HPP
