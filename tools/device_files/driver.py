@@ -104,9 +104,15 @@ class DriverFile():
 		else: # if no xml driver file exists, just add all files that look like source files
 			# Query all files in directory
 			for source_file in os.listdir(os.path.join(platform_path, self.path)):
+				# Detect Static Source and Header Files
 				if os.path.splitext(source_file)[1] in source_file_extentions:
 					source_file = self._makeRelativeToPlatform(source_file)
 					build.append([source_file, source_file])
+				# Detect Template Files
+				elif os.path.splitext(source_file)[1] == '.in':
+					template = self._makeRelativeToPlatform(source_file)
+					output = self._makeRelativeToPlatform(source_file[:-3])
+					build.append([template, output, self.substitutions])
 		return build
 
 	def _parseDriverXml(self, driver_node, instance_id, build_list):
