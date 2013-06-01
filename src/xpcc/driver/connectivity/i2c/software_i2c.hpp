@@ -34,10 +34,6 @@
 #include <xpcc/architecture/driver/delay.hpp>
 #include "master.hpp"
 
-// debugging for dummies
-//#define DEBUG_SW_I2C(x) xpcc::atxmega::BufferedUartF0::write(x)
-#define DEBUG_SW_I2C(x)
-
 namespace xpcc
 {
 	/**
@@ -111,6 +107,9 @@ namespace xpcc
 		static inline void
 		writeBit(bool bit);
 		
+		static inline void
+		sclSetAndWait();
+
 		static inline void
 		delay();
 		

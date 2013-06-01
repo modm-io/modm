@@ -78,7 +78,10 @@ def jinja2_template_action(target, source, env):
 	loader = jinja2.Environment(loader = jinja2.FileSystemLoader(path))
 	loader.filters['xpcc.wordwrap'] = filter_wordwrap
 	loader.filters['xpcc.indent'] = filter_indent
-	
+	# Jinja2 Line Statements
+	loader.line_statement_prefix = '%%'
+	loader.line_comment_prefix = '%#'
+
 	template = loader.get_template(filename, globals=globals)
 	
 	output = template.render(env['substitutions'])

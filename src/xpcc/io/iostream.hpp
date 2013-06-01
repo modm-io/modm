@@ -76,6 +76,14 @@ namespace xpcc
 			return *this;
 		}
 		
+		/// set the output mode to BIN style for \c char and \c char*
+		ALWAYS_INLINE IOStream&
+		bin()
+		{
+			this->mode = BIN;
+			return *this;
+		}
+
 		/// set the output mode to HEX style for \c char and \c char*
 		ALWAYS_INLINE IOStream&
 		hex()
@@ -99,6 +107,9 @@ namespace xpcc
 			if (this->mode == ASCII) {
 				this->writeInteger(static_cast<uint16_t>(v));
 			}
+			else if (this->mode == BIN) {
+				this->writeBin(v);
+			}
 			else {
 				this->writeHex(v);
 			}
@@ -111,6 +122,9 @@ namespace xpcc
 			if (this->mode == ASCII) {
 				this->device->write(v);
 			}
+			else if (this->mode == BIN) {
+				this->writeBin(v);
+			}
 			else {
 				this->writeHex(v);
 			}
@@ -122,6 +136,10 @@ namespace xpcc
 		{
 			if (this->mode == ASCII) {
 				this->writeInteger(v);
+			}
+			else if (this->mode == BIN) {
+				this->writeBin(static_cast<uint8_t>(v >> 8));
+				this->writeBin(static_cast<uint8_t>(v & 0xff));
 			}
 			else {
 				this->writeHex(static_cast<uint8_t>(v >> 8));
@@ -136,6 +154,10 @@ namespace xpcc
 			if (this->mode == ASCII) {
 				this->writeInteger(v);
 			}
+			else if (this->mode == BIN) {
+				this->writeBin(static_cast<uint8_t>(v >> 8));
+				this->writeBin(static_cast<uint8_t>(v & 0xff));
+			}
 			else {
 				this->writeHex(static_cast<uint8_t>(v >> 8));
 				this->writeHex(static_cast<uint8_t>(v & 0xff));
@@ -148,6 +170,12 @@ namespace xpcc
 		{
 			if (this->mode == ASCII) {
 				this->writeInteger(v);
+			}
+			else if (this->mode == BIN) {
+				this->writeBin(static_cast<uint8_t>(v >> 24));
+				this->writeBin(static_cast<uint8_t>(v >> 16));
+				this->writeBin(static_cast<uint8_t>(v >> 8));
+				this->writeBin(static_cast<uint8_t>(v & 0xff));
 			}
 			else {
 				this->writeHex(static_cast<uint8_t>(v >> 24));
@@ -163,6 +191,12 @@ namespace xpcc
 		{
 			if (this->mode == ASCII) {
 				this->writeInteger(v);
+			}
+			else if (this->mode == BIN) {
+				this->writeBin(static_cast<uint8_t>(v >> 24));
+				this->writeBin(static_cast<uint8_t>(v >> 16));
+				this->writeBin(static_cast<uint8_t>(v >> 8));
+				this->writeBin(static_cast<uint8_t>(v & 0xff));
 			}
 			else {
 				this->writeHex(static_cast<uint8_t>(v >> 24));
@@ -252,6 +286,9 @@ namespace xpcc
 		{
 			if( this->mode == ASCII ) {
 				this->device->write(s);
+			}
+			else if( this->mode == BIN ) {
+				this->writeBin(s);
 			}
 			else {
 				this->writeHex(s);
@@ -374,11 +411,17 @@ namespace xpcc
 		writeHex(const char* s);
 		
 		void
+		writeBin(const char* s);
+
+		void
 		writeHexNibble(uint8_t nibble);
 		
 		void
 		writeHex(uint8_t value);
 		
+		void
+		writeBin(uint8_t value);
+
 		void
 		writeFloat(const float& value);
 		
@@ -391,7 +434,8 @@ namespace xpcc
 		enum Mode
 		{
 			ASCII,
-			HEX
+			HEX,
+			BIN
 		};
 		
 		IOStream(const IOStream&);
@@ -425,6 +469,17 @@ namespace xpcc
 	endl(IOStream& ios)
 	{
 		return flush(ios.write('\n'));
+	}
+
+	/**
+	 * \brief  set the output mode to BIN style for \b char and \b char*
+	 *
+	 * \ingroup io
+	 */
+	inline IOStream&
+	bin(IOStream& ios)
+	{
+		return ios.bin();
 	}
 
 	/**
