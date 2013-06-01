@@ -29,9 +29,9 @@
 		<!-- Number of pins -->
 		<pin-count>28</pin-count>
 		<!-- Headers to be included with the {{ include_device_headers }} substitution-->
-		<!--
-		<header>stm32f4xx.h</header>
-		-->
+		<header>avr/io.h</header>
+		<header>avr/interrupt.h</header>
+		<header>avr/sleep.h</header>
 		<!-- Cpp Defines -->
 		<define>__AVR__</define> <!-- just a name implies a value of 1 -->
 		<define device-name="48">__AVR_ATmega48__</define>
@@ -41,6 +41,29 @@
 		
 		<driver type="gpio" name="atmega">
 			<gpio port="B" id="0"></gpio>
+			<gpio port="B" id="1"></gpio>
+			<gpio port="B" id="2"></gpio>
+			<gpio port="B" id="3"></gpio>
+			<gpio port="B" id="4"></gpio>
+			<gpio port="B" id="5"></gpio>
+			<gpio port="B" id="6"></gpio>
+			<gpio port="B" id="7"></gpio>
+			
+			<gpio port="C" id="0"></gpio>
+			<gpio port="C" id="1"></gpio>
+			<gpio port="C" id="2"></gpio>
+			<gpio port="C" id="3"></gpio>
+			<gpio port="C" id="4"></gpio>
+			<gpio port="C" id="5"></gpio>
+			
+			<gpio port="D" id="0"></gpio>
+			<gpio port="D" id="1"></gpio>
+			<gpio port="D" id="2"></gpio>
+			<gpio port="D" id="3"></gpio>
+			<gpio port="D" id="4"></gpio>
+			<gpio port="D" id="5"></gpio>
+			<gpio port="D" id="6"></gpio>
+			<gpio port="D" id="7"></gpio>
 		</driver>
 	</device>
 </rca>
