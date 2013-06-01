@@ -36,9 +36,17 @@
 		<!-- Cpp Defines -->
 		<define>__AVR__</define> <!-- just a name implies a value of 1 -->
 		<define device-name="48">__AVR_ATmega48__</define>
+		<define device-name="48" device-type="a">__AVR_ATmega48A__</define>
+		<define device-name="48" device-type="p">__AVR_ATmega48P__</define>
 		<define device-name="88">__AVR_ATmega88__</define>
+		<define device-name="88" device-type="a">__AVR_ATmega88A__</define>
+		<define device-name="88" device-type="p">__AVR_ATmega88P__</define>
+		<define device-name="88" device-type="pa">__AVR_ATmega88PA__</define>
 		<define device-name="168">__AVR_ATmega168__</define>
+		<define device-name="168" device-type="a">__AVR_ATmega168A__</define>
+		<define device-name="168" device-type="p">__AVR_ATmega168P__</define>
 		<define device-name="328">__AVR_ATmega328__</define>
+		<define device-name="328" device-type="p">__AVR_ATmega328P__</define>
 		
 		<driver type="gpio" name="atmega">
 			<gpio port="B" id="0"></gpio>
