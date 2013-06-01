@@ -50,6 +50,17 @@ class DeviceElementBase:
 		self.device_platform = node.get('device-platform') # e.g. stm32
 		self.device_family   = node.get('device-family')   # e.g. f4
 		self.device_name     = node.get('device-name')     # e.g. 405
+		# Split Attributes that can be split
+		if self.pin_id != None:
+			self.pin_id = self.pin_id.split('|')
+		if self.size_id != None:
+			self.size_id = self.size_id.split('|')
+		if self.device_platform != None:
+			self.device_platform = self.device_platform.split('|')
+		if self.device_family != None:
+			self.device_family = self.device_family.split('|')
+		if self.device_name != None:
+			self.device_name = self.device_name.split('|')
 		# parse pin count
 		[self.pin_count, self.pin_count_type] = self._parsePinCount(self.pin_count)
 
@@ -73,19 +84,19 @@ class DeviceElementBase:
 		"""
 		s = device_string
 		if self.device_platform != None:
-			if s.platform == None or s.platform != self.device_platform:
+			if s.platform == None or s.platform not in self.device_platform:
 				return False
 		if self.device_family != None:
-			if s.family == None or s.family != self.device_family:
+			if s.family == None or s.family not in self.device_family:
 				return False
 		if self.device_name != None:
-			if s.name == None or s.name != self.device_name:
+			if s.name == None or s.name not in self.device_name:
 				return False
 		if self.pin_id != None:
-			if s.pin_id == None or self.pin_id != s.pin_id:
+			if s.pin_id == None or s.pin_id not in self.pin_id:
 				return False
 		if self.size_id != None:
-			if s.size_id == None or self.size_id != s.size_id:
+			if s.size_id == None or s.size_id not in self.size_id:
 				return False
 		if self.pin_count != None and self.pin_count > 0:
 			if self.pin_count_type == '==':
