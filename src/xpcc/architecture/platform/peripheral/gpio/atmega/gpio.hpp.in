@@ -117,7 +117,7 @@ namespace xpcc
 			ALWAYS_INLINE static void
 			setInput(PullType type = FLOATING) {
 				setInput();
-				if (config == ::xpcc::atmega::PULLUP) {
+				if (type == PullType::PULLUP) {
 					PORT{{port}} |= (1 << {{pin}});
 				}
 				else {
