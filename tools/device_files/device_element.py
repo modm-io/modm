@@ -149,12 +149,22 @@ class DeviceString:
 		# AVR platform with ATmega and ATxmega family
 		elif string.startswith('at'):
 			self.platform = "avr"
-			match = re.search("(?P<family>atmega|atxmega)(?P<name>\d+)(?P<type>\w*)", string)
+			match = re.search("(?P<family>attiny|atmega|atxmega)(?P<name>\d+)", string)
 			if match:
 				self.family = match.group('family')
 				self.name = match.group('name')
-				if match.group('type') != '':
-					self.type = match.group('type')
+				if (self.family == "atmega"):
+					match = re.search(self.family + self.name + "(?P<type>\w*)-?(?P<package>\w*)", string)
+					if match.group('type') != '':
+						self.type = match.group('type').lower()
+					if match.group('package') != '':
+						self.pin_id = match.group('package').lower()
+				elif (self.family == "atxmega"):
+					match = re.search(self.family + self.name + "(?P<type>[A-Ea-e])(?P<package>[1-4])(?P<usb>[Bb][Uu])", string)
+					if match.group('type') != '':
+						self.type = match.group('type').lower()
+					if match.group('package') != '':
+						self.pin_id = match.group('package').lower()
 				self.valid = True
 			
 		else:
