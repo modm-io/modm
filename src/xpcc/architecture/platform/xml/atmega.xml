@@ -38,5 +38,9 @@
 		<define device-name="88">__AVR_ATmega88__</define>
 		<define device-name="168">__AVR_ATmega168__</define>
 		<define device-name="328">__AVR_ATmega328__</define>
+		
+		<driver type="gpio" name="atmega">
+			<gpio port="B" id="0"></gpio>
+		</driver>
 	</device>
 </rca>
