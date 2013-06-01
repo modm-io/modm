@@ -55,38 +55,35 @@ xpcc::stm32::Clock::enablePll(PllSource source, uint8_t pllM,
 		uint16_t pllN)
 {
 	uint32_t tmp = 0;
-	
+
 	// Read reserved values and clear all other values
 	tmp |= RCC->PLLCFGR & ~(RCC_PLLCFGR_PLLSRC | RCC_PLLCFGR_PLLM
 			| RCC_PLLCFGR_PLLN | RCC_PLLCFGR_PLLP | RCC_PLLCFGR_PLLQ);
-	
+
 	// PLLSRC source for pll and for plli2s
 	tmp |= (source == PllSource::PLL_HSI) ? RCC_PLLCFGR_PLLSRC_HSI
 			: RCC_PLLCFGR_PLLSRC_HSE;
-	
+
 	// PLLM (0) = factor is user defined VCO input frequency must be configured to 2MHz
 	tmp |= ((uint32_t) pllM) & RCC_PLLCFGR_PLLM;
-	
+
 	// PLLN (6) = factor is user defined
 	tmp |= (((uint32_t) pllN) << 6) & RCC_PLLCFGR_PLLN;
-	
-#if defined(STM32F4XX)
+
+%% if target is f4
 	// VCO output frequency must be configured to 336MHz
 	// PLLP (16) = 0 (factor = 2) for CPU frequency = 168MHz
 	// PLLQ (24) = 7 (factor = 7) for 48MHz
 	tmp |= (7UL << 24) & RCC_PLLCFGR_PLLQ;
-#elif defined(STM32F2XX)
+%% elif target is f2
 	// VCO output frequency must be configured to 240MHz
 	// PLLP (16) = 0 (factor = 2) for CPU frequency = 120MHz
 	// PLLQ (24) = 5 (factor = 5) for 48MHz
 	tmp |= (5UL << 24) & RCC_PLLCFGR_PLLQ;
-#	warning "this is not tested yet"
-#else
-#	error "This file is not supposed to be used with the given CPU (only STM32F2/4xx)"
-#endif
-	
+%% endif
+
 	RCC->PLLCFGR = tmp;
-	
+
 	// enable pll
 	RCC->CR |= RCC_CR_PLLON;
 }
@@ -102,21 +99,18 @@ xpcc::stm32::Clock::switchToPll(uint32_t waitCycles)
 		}
 	}
 
-#if defined(STM32F4XX)
+%% if target is f4
 	// APB2 84MHz, APB1 42MHz, AHB 168MHz, select PLL as source
 	RCC->CFGR =
 			(RCC->CFGR & 0xffff0000) | // Try to generate a halfword write
 			((RCC_CFGR_PPRE1_DIV4 | RCC_CFGR_PPRE2_DIV2 | RCC_CFGR_HPRE_DIV1 | RCC_CFGR_SW_PLL) & 0x0000ffff);
-#elif defined(STM32F2XX)
+%% elif target is f2
 	// APB2 60MHz, APB1 30MHz, AHB 120MHz, select PLL as source
 	RCC->CFGR =
 			(RCC->CFGR & 0xffff0000) | // Try to generate a halfword write
 			((RCC_CFGR_PPRE1_DIV4 | RCC_CFGR_PPRE2_DIV2 | RCC_CFGR_HPRE_DIV1 | RCC_CFGR_SW_PLL) & 0x0000ffff);
-#	warning "this is not tested yet"
-#else
-#	error "This file is not supposed to be used with the given CPU (only STM32F2/4xx)"
-#endif
-	
+%% endif
+
 	// Wait till the main PLL is used as system clock source
 	while ((RCC->CFGR & (uint32_t) RCC_CFGR_SWS) != RCC_CFGR_SWS_PLL);
 	{
