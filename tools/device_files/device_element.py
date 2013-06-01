@@ -51,6 +51,7 @@ class DeviceElementBase:
 		self.device_platform = node.get('device-platform') # e.g. stm32
 		self.device_family   = node.get('device-family')   # e.g. f4
 		self.device_name     = node.get('device-name')     # e.g. 405
+		self.device_type     = node.get('device-type')     # e.g. for avr: m1
 		# Split Attributes that can be split
 		if self.pin_id != None:
 			self.pin_id = self.pin_id.split('|')
@@ -62,6 +63,8 @@ class DeviceElementBase:
 			self.device_family = self.device_family.split('|')
 		if self.device_name != None:
 			self.device_name = self.device_name.split('|')
+		if self.device_type != None:
+			self.device_type = self.device_type.split('|')
 		# parse pin count
 		[self.pin_count, self.pin_count_type] = self._parsePinCount(self.pin_count)
 
@@ -93,6 +96,9 @@ class DeviceElementBase:
 		if self.device_name != None:
 			if s.name == None or s.name not in self.device_name:
 				return False
+		if self.device_type != None:
+			if s.type == None or s.type not in self.device_type:
+				return False
 		if self.pin_id != None:
 			if s.pin_id == None or s.pin_id not in self.pin_id:
 				return False
@@ -122,11 +128,12 @@ class DeviceString:
 	def __init__(self, string):
 		self.string = string
 		# default for properties is None
-		self.platform = None
-		self.family   = None
-		self.name     = None
-		self.pin_id   = None
-		self.size_id  = None
+		self.platform = None # e.g. stm32, avr
+		self.family   = None # e.g.    f4, atmega
+		self.name     = None # e.g.   405, 16
+		self.type     = None # e.g. -----, m1
+		self.pin_id   = None # e.g.     r, -----
+		self.size_id  = None # e.g.     g, -----
 		self.valid = False
 		# try to determine platform and to parse string accordingly
 		if string.startswith('stm32f'):
@@ -147,7 +154,7 @@ class DeviceString:
 				self.family = match.group('family')
 				self.name = match.group('name')
 				if match.group('type') != '':
-					self.pin_id = match.group('type')
+					self.type = match.group('type')
 				self.valid = True
 			
 		else:
@@ -158,6 +165,7 @@ class DeviceString:
 		dic['target']['platform'] = self.platform
 		dic['target']['family'] = self.family
 		dic['target']['name'] = self.name
+		dic['target']['type'] = self.type
 		dic['target']['pin_id'] = self.pin_id
 		dic['target']['size_id'] = self.size_id
 		dic['target']['string'] = self.string
