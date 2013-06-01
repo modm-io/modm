@@ -43,6 +43,7 @@ class DeviceElementBase:
 	def __init__(self, device, node):
 		self.type = node.tag
 		self.device = device # parent
+		self.log = device.log
 		# load attributes
 		self.pin_id      = node.get('pin-id')
 		self.size_id     = node.get('size-id')

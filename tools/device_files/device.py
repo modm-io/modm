@@ -319,10 +319,14 @@ class Driver(DeviceElementBase):
 			return substitutions
 		# Now this is were it gets interesting:
 		# parsing the inner nodes of the driver node recursively:
-		substitutions = dict(self._NodeToDict(node).items() + substitutions.items())
+		substitutions = dict(self._nodeToDict(node).items() + substitutions.items())
+		# If this is the gpio driver parse gpio nodes in order to
+		# derive nibbles and ports
+		if self.type == 'gpio':
+			self._gpioCreateNibblePort(substitutions)
 		return substitutions
 
-	def _NodeToDict(self, node):
+	def _nodeToDict(self, node):
 		"""
 		attribute of the node are turnded into key/value pairs
 		child nodes are added to a list which is the value
@@ -337,8 +341,11 @@ class Driver(DeviceElementBase):
 			child_name = c.tag + 's'
 			if child_name not in dic:
 				dic[child_name] = [] # create child list
-			dic[child_name].append(self._NodeToDict(c))
+			dic[child_name].append(self._nodeToDict(c))
 		return dic
+
+	def _gpioCreateNibblePort(self, substitutions):
+		self.log.debug("device.py:348 TODO: create nipple and port substitutions from gpios")
 
 
 
