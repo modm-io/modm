@@ -68,8 +68,7 @@ class DeviceFile:
 				self.drivers.append(Driver(self, c))
 			else:
 				raise ParserException("Parse Error: unknown tag (%s)" % (c.tag))
-
-		# Add Device specific substitutions to driver
+		self._checkDeviceFileData(xml_file)
 
 	def _openDeviceXML(self, filename):
 		try:
@@ -99,6 +98,43 @@ class DeviceFile:
 		# expect that all required elements exist...
 		return xmltree[0]
 
+	def _checkDeviceFileData(self, xml_file):
+		"""
+		This checks if there are any problems with the device file.
+		It also considers the different requirements of the various platforms.
+		Warnings/Errors are logged when a problem is discovered. An information
+		is logged when there is something that probably could be improved.
+		This method won't throw any errors because any error that prevents the
+		device to be built will be discovered later. It is intended to notify
+		users if device files aren't completely correct instead.
+		"""
+		# Print some Information
+		self.log.info("Using Xml Device File '%s'" % os.path.basename(xml_file))
+		self.log.info("Found %s Properties:" % len(self.properties))
+		# Check Properties
+		prop_count = {}
+		for prop in self.properties:
+			if prop.type in prop_count:
+				prop_count[prop.type] += 1
+			else:
+				prop_count[prop.type] = 1
+		self.log.info("Found %s Drivers" % len(self.drivers))
+		# Checks for all Platforms
+
+		# Checks for STM32 Platform
+		if self.platform == 'stm32':
+			families = ['f0', 'f1', 'f2', 'f3', 'f4']
+			if self.family not in families:
+				self.log.error("Unknown family '%s' for platform %s."
+				" Valid families for this platform are: %s" %
+				(self.family, self.platform, families))
+		elif self.platform == 'avr':
+			pass
+		else:
+			self.log.error("Unknown platform '%s'" % self.platform)
+
+
+
 ##-------------  Methods used by the SCons Platform Tools ---------------------
 	def getProperties(self, device_string):
 		"""
@@ -121,6 +157,15 @@ class DeviceFile:
 		props['defines'] = self.getProperty('define', device_string)
 		props['headers'] = self.getProperty('header', device_string)
 		props.update(s.getTargetDict())
+
+		#Check Some Properties
+		if self.platform == 'stm32':
+			if props['eeprom'] != 0:
+				self.log.warn("On platform stm32 there is no eeprom.")
+		if self.platform == 'stm32':
+			if props['eeprom'] != 0:
+				self.log.warn("On platform stm32 there is no eeprom.")
+
 		return props
 
 	def getDriverList(self, device_string, platform_path):

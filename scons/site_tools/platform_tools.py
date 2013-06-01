@@ -59,6 +59,7 @@ from driver import DriverFile
 # architecture_path for relative build paths
 def platform_tools_generate(env, architecture_path):
 	device = env['XPCC_DEVICE']
+	env.Debug("Device String: %s" % device)
 	# Initialize Return Lists/Dicts
 	sources = []
 	defines = {}
@@ -86,12 +87,12 @@ def platform_tools_generate(env, architecture_path):
 		for f in files:
 			emsg += "Tried: " + f + os.linesep
 		raise SCons.Errors.BuildError(node=target, errstr=emsg)
-	env.Info("Using Xml Device File '%s'" % os.path.basename(device_file))
 	# Now we need to parse the Xml File
 	dev = DeviceFile(device_file, env.GetLogger())
 
 	# Parse Properties
 	prop = dev.getProperties(device)
+	env.Debug("Found properties: %s" % prop)
 	defines = prop['defines']
 	# FIXME: This is a hack to make everything build without arm_devices.py
 	# We realy need to look into which defines we want to be available via a
