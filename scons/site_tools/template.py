@@ -78,13 +78,15 @@ def jinja2_template_action(target, source, env):
 	loader = jinja2.Environment(loader = jinja2.FileSystemLoader(path))
 	loader.filters['xpcc.wordwrap'] = filter_wordwrap
 	loader.filters['xpcc.indent'] = filter_indent
+	if env['XPCC_JINJA2_TEST'] != None:
+		loader.tests = env['XPCC_JINJA2_TEST']
 	# Jinja2 Line Statements
 	loader.line_statement_prefix = '%%'
 	loader.line_comment_prefix = '%#'
 
 	template = loader.get_template(filename, globals=globals)
 	
-	output = template.render(env['substitutions'])
+	output = template.render(env['substitutions']).encode('utf-8')
 	open(target[0].path, 'w').write(output)
 
 def template_emitter(target, source, env):
@@ -93,6 +95,11 @@ def template_emitter(target, source, env):
 
 def template_string(target, source, env):
 	return "Template: '%s' to '%s'" % (str(source[0]), str(target[0]))
+
+def template_add_test(env, test_name, test_function, alias='template_add_test'):
+	if 'XPCC_JINJA2_TEST' not in env:
+		env['XPCC_JINJA2_TEST'] = {}
+	env['XPCC_JINJA2_TEST'][test_name] = test_function
 
 # -----------------------------------------------------------------------------
 def generate(env, **kw):
@@ -112,6 +119,7 @@ def generate(env, **kw):
 			single_source = True
 		),
 	})
+	env.AddMethod(template_add_test, 'AddTemplateJinja2Test')
 
 def exists(env):
 	return True

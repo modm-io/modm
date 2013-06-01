@@ -301,7 +301,7 @@ def generate(env, **kw):
 	env['XPCC_DEVICE'] = device 			# needed by the platform tools
 	
 	# tools which are used independently of the architecture
-	env.Tool('template')
+	env.Tool('template') # needs to be added before platform_tools
 	env.Tool('unittest')
 	env.Tool('configfile')
 	env.Tool('helper')

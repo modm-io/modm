@@ -161,7 +161,24 @@ def platform_tools_generate(env, architecture_path):
 	env.Jinja2Template(target = tar, source = src, substitutions = sub)
 	return sources, defines, includes
 
+############## Template Tests #################################################
 # -----------------------------------------------------------------------------
+def test_platform(target, platform):
+	if 'platform' not in target or target['platform'] != platform:
+		return False
+	return True
+
+# -----------------------------------------------------------------------------
+def test_family(target, platform, family):
+	if not test_platform(target, platform):
+		return False
+	if 'family' not in target or target['family'] != family:
+		return False
+	else:
+		return True
+
+# -----------------------------------------------------------------------------
+###################### Generate Platform Tools ################################
 def generate(env, **kw):
 	# Set some paths used by this file
 	env['XPCC_PLATFORM_PATH'] = \
@@ -172,6 +189,32 @@ def generate(env, **kw):
 
 	# Add Method to Parse XML Files, and create Template / Copy Dependencies
 	env.AddMethod(platform_tools_generate, 'GeneratePlatform')
+
+	########## Add Template Tests #############################################
+	# Platform Tests
+	def test_is_stm32(target):
+		return test_platform(target, 'stm32')
+	env.AddTemplateJinja2Test('stm32', test_is_stm32)
+	def test_is_avr(target):
+		return test_platform(target, 'avr')
+	env.AddTemplateJinja2Test('avr', test_is_avr)
+
+	# STM32 Family Test
+	def test_is_f0(target):
+		return test_family(target, 'stm32', 'f0')
+	env.AddTemplateJinja2Test('f0', test_is_f0)
+	def test_is_f1(target):
+		return test_family(target, 'stm32', 'f1')
+	env.AddTemplateJinja2Test('f1', test_is_f1)
+	def test_is_f2(target):
+		return test_family(target, 'stm32', 'f2')
+	env.AddTemplateJinja2Test('f2', test_is_f2)
+	def test_is_f3(target):
+		return test_family(target, 'stm32', 'f3')
+	env.AddTemplateJinja2Test('f3', test_is_f3)
+	def test_is_f4(target):
+		return test_family(target, 'stm32', 'f4')
+	env.AddTemplateJinja2Test('f4', test_is_f4)
 
 # -----------------------------------------------------------------------------
 def exists(env):
