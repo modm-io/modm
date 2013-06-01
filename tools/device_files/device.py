@@ -117,7 +117,7 @@ class DeviceFile:
 		props['ram'] = self.getProperty('ram', device_string, True)[0]
 		props['eeprom'] = self.getProperty('eeprom', device_string, True, 0)[0]
 		props['pin-count'] = self.getProperty('pin-count', device_string, True)[0]
-		props['linkerscript'] = self.getProperty('linkerscript', device_string, True)[0]
+		props['linkerscript'] = self.getProperty('linkerscript', device_string, True, "")[0]
 		props['defines'] = self.getProperty('define', device_string)
 		props['headers'] = self.getProperty('header', device_string)
 		props.update(s.getTargetDict())
@@ -310,7 +310,7 @@ class Property(DeviceElementBase):
 		# print "New Property of type: %s and value: %s" % (self.type, self.value)
 
 	def _checkValue(self):
-		if self.type in ['flash', 'ram', 'pin-count']:
+		if self.type in ['flash', 'ram', 'eeprom', 'pin-count']:
 			if not self.value.isdigit():
 				raise ParserException("Invalid content of '%s' property: '%s' is not an integer." % (self.type, self.value))
 			else:

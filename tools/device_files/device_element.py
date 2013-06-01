@@ -137,7 +137,6 @@ class DeviceString:
 				if match.group('type') != '':
 					self.pin_id = match.group('type')
 				self.valid = True
-			print self.family, self.name, self.pin_id
 			
 		else:
 			raise ParserException("Parse Error: unknown platform. Device string: %" % (string))

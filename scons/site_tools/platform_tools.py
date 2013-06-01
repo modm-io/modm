@@ -100,17 +100,21 @@ def platform_tools_generate(env, architecture_path):
 	device_headers = prop['headers']
 	# Set Size
 	env['DEVICE_SIZE'] = { "flash": prop['flash'], "ram": prop['ram'], "eeprom": prop['eeprom'] }
-	# Find Linkerscript:
-	linkerfile = os.path.join(env['XPCC_PLATFORM_PATH'], 'linker', prop['linkerscript'])
-	if not os.path.isfile(linkerfile):
-		linkerfile = os.path.join(env['XPCC_PLATFORM_PATH'], 'linker', prop['target']['platform'], prop['linkerscript'])
+	if (prop['linkerscript'] != ""):
+		# Find Linkerscript:
+		linkerfile = os.path.join(env['XPCC_PLATFORM_PATH'], 'linker', prop['linkerscript'])
 		if not os.path.isfile(linkerfile):
-			env.Error("Linkerscript for %s (%s) could not be found." % (device, linkerfile))
-			Exit(1)
-	linkdir, linkfile = os.path.split(linkerfile)
-	linkdir = linkdir.replace(env['XPCC_ROOTPATH'], "${XPCC_ROOTPATH}")
-	env['LINKPATH'] = str(linkdir)
-	env['LINKFILE'] = str(linkfile)
+			linkerfile = os.path.join(env['XPCC_PLATFORM_PATH'], 'linker', prop['target']['platform'], prop['linkerscript'])
+			if not os.path.isfile(linkerfile):
+				env.Error("Linkerscript for %s (%s) could not be found." % (device, linkerfile))
+				Exit(1)
+		linkdir, linkfile = os.path.split(linkerfile)
+		linkdir = linkdir.replace(env['XPCC_ROOTPATH'], "${XPCC_ROOTPATH}")
+		env['LINKPATH'] = str(linkdir)
+		env['LINKFILE'] = str(linkfile)
+	else:
+		env['LINKPATH'] = ""
+		env['LINKFILE'] = ""
 
 	# Loop through Drivers
 	device_substitutions = {} # Substitutions for the drivers.hpp.in file
