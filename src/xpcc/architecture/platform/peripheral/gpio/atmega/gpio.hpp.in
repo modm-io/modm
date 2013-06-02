@@ -70,8 +70,19 @@ namespace xpcc
 			 */
 			enum PullType
 			{
-				FLOATING = 0,
-				PULLUP = 1,
+				FLOATING,
+				PULLUP,
+			};
+			
+			/**
+			 * \ingroup	atmega
+			 */
+			enum TriggerType
+			{
+				LOW_LEVEL = 0x0,
+				ANY_CHANGE = 0x1,
+				FALLING_EDGE = 0x2,
+				RISING_EDGE = 0x3,
 			};
 		};
 
@@ -133,17 +144,90 @@ namespace xpcc
 			ALWAYS_INLINE static bool read() {
 				return (PIN{{port}} & (1 << {{pin}}));
 			}
+			%% for af in gpio.afs
+
+			%% if af.type == "extint"
+			ALWAYS_INLINE static void enableExternalInterrupt(TriggerType trigger) {
+				EICRA |= (trigger << 2*{{af.id}});
+				EIMSK |= (1 << {{af.id}});
+			}
+
+			ALWAYS_INLINE static void disableExternalInterrupt() {
+				EICRA &= ~(0x3 << 2*{{af.id}});
+				EIMSK &= ~(1 << {{af.id}});
+			}
+
+			ALWAYS_INLINE static bool getExternalInterruptFlag() {
+				return (EIFR & (1 << {{af.id}}));
+			}
+
+			ALWAYS_INLINE static void acknowledgeExternalInterruptFlag() {
+				EIFR |= (1 << {{af.id}});
+			}
+			%% endif
+
+			%% if af.type == "pcint"
+			ALWAYS_INLINE static void enablePCInterrupt() {
+				%% if port == "B"
+				PCMSK0 |= (1 << {{pin}});
+				PCICR  |= (1 << PCIE0);
+				%% elif port == "C"
+				PCMSK1 |= (1 << {{pin}});
+				PCICR  |= (1 << PCIE1);
+				%% elif port == "D"
+				PCMSK2 |= (1 << {{pin}});
+				PCICR  |= (1 << PCIE2);
+				%% endif
+			}
+
+			ALWAYS_INLINE static void disablePCInterrupt() {
+				%% if port == "B"
+				PCMSK0 &= ~(1 << {{pin}});
+				if (!PCMSK0) PCICR &= ~(1 << PCIE0);
+				%% elif port == "C"
+				PCMSK1 &= ~(1 << {{pin}});
+				if (!PCMSK1) PCICR &= ~(1 << PCIE1);
+				%% elif port == "D"
+				PCMSK2 &= ~(1 << {{pin}});
+				if (!PCMSK2) PCICR &= ~(1 << PCIE2);
+				%% endif
+			}
+
+			ALWAYS_INLINE static bool getPCInterruptFlag() {
+				%% if port == "B"
+				return (PCIFR & (1 << PCIF0));
+				%% elif port == "C"
+				return (PCIFR & (1 << PCIF1));
+				%% elif port == "D"
+				return (PCIFR & (1 << PCIF2));
+				%% endif
+			}
+
+			ALWAYS_INLINE static void acknowledgePCInterruptFlag() {
+				%% if port == "B"
+				PCIFR |= (1 << PCIF0);
+				%% elif port == "C"
+				PCIFR |= (1 << PCIF1);
+				%% elif port == "D"
+				PCIFR |= (1 << PCIF2);
+				%% endif
+			}
+
+			%% endif
+
+			%% endfor
+
 			%% endif
 		};
-		
+
 		%% endfor
 		%% endfor
-		
+
 		%% for nibble in nibbles
 			%% set port = nibble.port|upper
-			
+
 			%% for id in nibble.position
-		
+
 		%% if id == 0
 		struct GpioLowNibble{{port}}
 		{
@@ -179,15 +263,15 @@ namespace xpcc
 			}
 		};
 		%% endif
-		
+
 		%% endfor
 		%% endfor
-		
+
 		%% for octet in octets
 			%% set port = octet.port|upper
-			
+
 			%% for id in octet.position
-		
+
 		%% if id == 0
 		struct GpioPort{{port}}
 		{
@@ -205,7 +289,7 @@ namespace xpcc
 			}
 		};
 		%% endif
-		
+
 		%% endfor
 		%% endfor
 	}

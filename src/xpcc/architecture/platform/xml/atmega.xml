@@ -27,6 +27,7 @@
 		<eeprom device-name="328">1024</eeprom>
 		
 		<!-- Number of pins -->
+		<pin-count>28</pin-count>
 		<pin-count pin-id="mmh|mmhr|pu|mmn|mmnr|pn">28</pin-count>
 		<pin-count pin-id="au|aur|ccu|ccur|mu|mur|an|anr|mn|mnr">32</pin-count>
 		<!-- Headers to be included with the {{ include_device_headers }} substitution-->
@@ -49,30 +50,79 @@
 		<define device-name="328" device-type="p">__AVR_ATmega328P__</define>
 		
 		<driver type="gpio" name="atmega">
-			<gpio port="B" id="0"></gpio>
-			<gpio port="B" id="1"></gpio>
-			<gpio port="B" id="2"></gpio>
-			<gpio port="B" id="3"></gpio>
-			<gpio port="B" id="4"></gpio>
-			<gpio port="B" id="5"></gpio>
-			<gpio port="B" id="6"></gpio>
-			<gpio port="B" id="7"></gpio>
+			<gpio port="B" id="0">
+				<af type="pcint" id="0"/>
+			</gpio>
+			<gpio port="B" id="1">
+				<af type="pcint" id="1"/>
+			</gpio>
+			<gpio port="B" id="2">
+				<af type="pcint" id="2"/>
+			</gpio>
+			<gpio port="B" id="3">
+				<af type="pcint" id="3"/>
+			</gpio>
+			<gpio port="B" id="4">
+				<af type="pcint" id="4"/>
+			</gpio>
+			<gpio port="B" id="5">
+				<af type="pcint" id="5"/>
+			</gpio>
+			<gpio port="B" id="6">
+				<af type="pcint" id="6"/>
+			</gpio>
+			<gpio port="B" id="7">
+				<af type="pcint" id="7"/>
+			</gpio>
 			
-			<gpio port="C" id="0"></gpio>
-			<gpio port="C" id="1"></gpio>
-			<gpio port="C" id="2"></gpio>
-			<gpio port="C" id="3"></gpio>
-			<gpio port="C" id="4"></gpio>
-			<gpio port="C" id="5"></gpio>
+			<gpio port="C" id="0">
+				<af type="pcint" id="8"/>
+			</gpio>
+			<gpio port="C" id="1">
+				<af type="pcint" id="9"/>
+			</gpio>
+			<gpio port="C" id="2">
+				<af type="pcint" id="10"/>
+			</gpio>
+			<gpio port="C" id="3">
+				<af type="pcint" id="11"/>
+			</gpio>
+			<gpio port="C" id="4">
+				<af type="pcint" id="12"/>
+			</gpio>
+			<gpio port="C" id="5">
+				<af type="pcint" id="13"/>
+			</gpio>
+			<gpio port="C" id="6">
+				<af type="pcint" id="14"/>
+			</gpio>
 			
-			<gpio port="D" id="0"></gpio>
-			<gpio port="D" id="1"></gpio>
-			<gpio port="D" id="2"></gpio>
-			<gpio port="D" id="3"></gpio>
-			<gpio port="D" id="4"></gpio>
-			<gpio port="D" id="5"></gpio>
-			<gpio port="D" id="6"></gpio>
-			<gpio port="D" id="7"></gpio>
+			<gpio port="D" id="0">
+				<af type="pcint" id="16"/>
+			</gpio>
+			<gpio port="D" id="1">
+				<af type="pcint" id="17"/>
+			</gpio>
+			<gpio port="D" id="2">
+				<af type="extint" id="0"/>
+				<af type="pcint" id="18"/>
+			</gpio>
+			<gpio port="D" id="3">
+				<af type="extint" id="1"/>
+				<af type="pcint" id="19"/>
+			</gpio>
+			<gpio port="D" id="4">
+				<af type="pcint" id="20"/>
+			</gpio>
+			<gpio port="D" id="5">
+				<af type="pcint" id="21"/>
+			</gpio>
+			<gpio port="D" id="6">
+				<af type="pcint" id="22"/>
+			</gpio>
+			<gpio port="D" id="7">
+				<af type="pcint" id="23"/>
+			</gpio>
 		</driver>
 	</device>
 </rca>
