@@ -163,19 +163,10 @@ def platform_tools_generate(env, architecture_path):
 
 ############## Template Tests #################################################
 # -----------------------------------------------------------------------------
-def test_platform(target, platform):
-	if 'platform' not in target or target['platform'] != platform:
+def test_item(dic, item_key, item_value):
+	if item_key not in dic or dic[item_key] != item_value:
 		return False
 	return True
-
-# -----------------------------------------------------------------------------
-def test_family(target, platform, family):
-	if not test_platform(target, platform):
-		return False
-	if 'family' not in target or target['family'] != family:
-		return False
-	else:
-		return True
 
 # -----------------------------------------------------------------------------
 ###################### Generate Platform Tools ################################
@@ -191,30 +182,53 @@ def generate(env, **kw):
 	env.AddMethod(platform_tools_generate, 'GeneratePlatform')
 
 	########## Add Template Tests #############################################
+	# Generaic Tests (they accept a string)
+	def test_platform(target, platform):
+		return test_item(target, 'platform', platform)
+	env.AddTemplateJinja2Test('platform', test_platform)
+	def test_family(target, family):
+		return test_item(target, 'family', family)
+	env.AddTemplateJinja2Test('family', test_family)
+	def test_name(target, name):
+		return test_item(target, 'name', name)
+	env.AddTemplateJinja2Test('name', test_name)
+	def test_type(target, type):
+		return test_item(target, 'type', type)
+	env.AddTemplateJinja2Test('type', test_type)
+	def test_size_id(target, size_id):
+		return test_item(target, 'size-id', size_id)
+	env.AddTemplateJinja2Test('size_id', test_size_id)
+	def test_pin_id(target, pin_id):
+		return test_item(target, 'pin-id', pin_id)
+	env.AddTemplateJinja2Test('pin_id', test_pin_id)
+
 	# Platform Tests
 	def test_is_stm32(target):
 		return test_platform(target, 'stm32')
 	env.AddTemplateJinja2Test('stm32', test_is_stm32)
+	def test_is_lpc(target):
+		return test_platform(target, 'lpc')
+	env.AddTemplateJinja2Test('lpc', test_is_lpc)
 	def test_is_avr(target):
 		return test_platform(target, 'avr')
 	env.AddTemplateJinja2Test('avr', test_is_avr)
 
 	# STM32 Family Test
-	def test_is_f0(target):
-		return test_family(target, 'stm32', 'f0')
-	env.AddTemplateJinja2Test('f0', test_is_f0)
-	def test_is_f1(target):
-		return test_family(target, 'stm32', 'f1')
-	env.AddTemplateJinja2Test('f1', test_is_f1)
-	def test_is_f2(target):
-		return test_family(target, 'stm32', 'f2')
-	env.AddTemplateJinja2Test('f2', test_is_f2)
-	def test_is_f3(target):
-		return test_family(target, 'stm32', 'f3')
-	env.AddTemplateJinja2Test('f3', test_is_f3)
-	def test_is_f4(target):
-		return test_family(target, 'stm32', 'f4')
-	env.AddTemplateJinja2Test('f4', test_is_f4)
+	def test_is_stm32f0(target):
+		return test_platform(target, 'stm32') and test_family(target, 'f0')
+	env.AddTemplateJinja2Test('stm32f0', test_is_stm32f0)
+	def test_is_stm32f1(target):
+		return test_platform(target, 'stm32') and test_family(target, 'f1')
+	env.AddTemplateJinja2Test('stm32f1', test_is_stm32f1)
+	def test_is_stm32f2(target):
+		return test_platform(target, 'stm32') and test_family(target, 'f2')
+	env.AddTemplateJinja2Test('stm32f2', test_is_stm32f2)
+	def test_is_stm32f3(target):
+		return test_platform(target, 'stm32') and test_family(target, 'f3')
+	env.AddTemplateJinja2Test('stm32f3', test_is_stm32f3)
+	def test_is_stm32f4(target):
+		return test_platform(target, 'stm32') and test_family(target, 'f4')
+	env.AddTemplateJinja2Test('stm32f4', test_is_stm32f4)
 
 # -----------------------------------------------------------------------------
 def exists(env):
