@@ -39,8 +39,8 @@ namespace xpcc
 	/**
 	 * \brief	Software emulation of a I2C master implementation
 	 * 
-	 * \tparam	Scl			any IO-Pin (see GPIO__IO())
-	 * \tparam	Sda			any IO-Pin (see GPIO__IO())
+	 * \tparam	Scl			an Open-Drain Output pin
+	 * \tparam	Sda			an Open-Drain Output pin
 	 * \tparam	Frequency	in Hz (default frequency is 100kHz)
 	 * 
 	 * \ingroup	i2c
@@ -65,7 +65,7 @@ namespace xpcc
 		 * \brief	Initialize the hardware
 		 */
 		static void
-		initialize(bool pullup=false);
+		initialize();
 		
 	public:
 		static void

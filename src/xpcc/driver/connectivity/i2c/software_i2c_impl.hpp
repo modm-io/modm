@@ -51,34 +51,10 @@ uint8_t xpcc::SoftwareI2C<Scl, Sda, Frequency>::errorState(NO_ERROR);
 // ----------------------------------------------------------------------------
 template <typename Scl, typename Sda, int32_t Frequency>
 void
-xpcc::SoftwareI2C<Scl, Sda, Frequency>::initialize(bool pullup)
+xpcc::SoftwareI2C<Scl, Sda, Frequency>::initialize()
 {
-	if (pullup)
-	{
-#if defined XPCC__CPU_ATXMEGA
-		scl.setInput(::xpcc::atxmega::PULLUP);
-#elif defined XPCC__CPU_ATMEGA
-		scl.setInput(::xpcc::atmega::PULLUP);
-#elif defined __ARM_STM32__
-		scl.setInput(::xpcc::stm32::PULLUP);
-#else
-		scl.setInput();
-#endif	
-#if defined XPCC__CPU_ATXMEGA
-		sda.setInput(::xpcc::atxmega::PULLUP);
-#elif defined XPCC__CPU_ATMEGA
-		sda.setInput(::xpcc::atmega::PULLUP);
-#elif defined __ARM_STM32__
-		sda.setInput(::xpcc::stm32::PULLUP);
-#else
-		sda.setInput();
-#endif
-	} else {
-		scl.setInput();
-		sda.setInput();
-	}
-	scl.reset();
-	sda.reset();
+	scl.set();
+	sda.set();
 }
 
 template <typename Scl, typename Sda, int32_t Frequency>
@@ -185,7 +161,7 @@ template <typename Scl, typename Sda, int32_t Frequency>
 void
 xpcc::SoftwareI2C<Scl, Sda, Frequency>::startCondition()
 {
-	sda.setInput();
+	sda.set();
 	while((sda.read() == gpio::LOW))
 		;
 	delay();
@@ -194,9 +170,9 @@ xpcc::SoftwareI2C<Scl, Sda, Frequency>::startCondition()
 	delay();
 
 	// here both pins are HIGH, ready for start
-	sda.setOutput(0);
+	sda.reset();
 	delay();
-	scl.setOutput(0);
+	scl.reset();
 	delay();
 }
 
@@ -204,13 +180,13 @@ template <typename Scl, typename Sda, int32_t Frequency>
 void
 xpcc::SoftwareI2C<Scl, Sda, Frequency>::stopCondition()
 {
-	scl.setOutput(0);
-	sda.setOutput(0);
+	scl.reset();
+	sda.reset();
 	
 	delay();
 	sclSetAndWait();
 	delay();
-	sda.setInput();
+	sda.set();
 	delay();
 }
 
@@ -226,7 +202,7 @@ xpcc::SoftwareI2C<Scl, Sda, Frequency>::write(uint8_t data)
 	}
 	
 	// release sda
-	sda.setInput();
+	sda.set();
 	
 	// return acknowledge bit
 	if (readBit()) {
@@ -241,7 +217,7 @@ template <typename Scl, typename Sda, int32_t Frequency>
 uint8_t
 xpcc::SoftwareI2C<Scl, Sda, Frequency>::read(bool ack)
 {
-	sda.setInput();
+	sda.set();
 	
 	uint8_t data = 0;
 	for(uint8_t i = 0; i < 8; ++i)
@@ -256,7 +232,7 @@ xpcc::SoftwareI2C<Scl, Sda, Frequency>::read(bool ack)
 	writeBit(!ack);
 	
 	// release sda
-	sda.setInput();
+	sda.set();
 	
 	return data;
 }
@@ -273,7 +249,7 @@ xpcc::SoftwareI2C<Scl, Sda, Frequency>::readBit()
 
 	bool bit = sda.read();
 	
-	scl.setOutput(0);
+	scl.reset;
 	
 	return bit;
 }
@@ -283,10 +259,10 @@ void
 xpcc::SoftwareI2C<Scl, Sda, Frequency>::writeBit(bool bit)
 {
 	if (bit) {
-		sda.setInput();
+		sda.set();
 	}
 	else {
-		sda.setOutput(0);
+		sda.reset();
 	}
 	delay();
 	
@@ -294,14 +270,14 @@ xpcc::SoftwareI2C<Scl, Sda, Frequency>::writeBit(bool bit)
 	
 	delay();
 
-	scl.setOutput(0);
+	scl.reset();
 }
 
 template <typename Scl, typename Sda, int32_t Frequency>
 void
 xpcc::SoftwareI2C<Scl, Sda, Frequency>::sclSetAndWait()
 {
-	scl.setInput();
+	scl.set();
 	// wait for clock stretching by slave
 	// only wait a maximum of 250 half clock cycles
 	uint_fast8_t deadlockPreventer = 250;
