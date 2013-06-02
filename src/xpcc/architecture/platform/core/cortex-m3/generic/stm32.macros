@@ -1,0 +1,188 @@
+%# coding: utf-8
+%# ----------------------------------------------------------------------------
+%#* Copyright (c) 2011, Roboterclub Aachen e.V.
+%#* All rights reserved.
+%#*
+%#* Redistribution and use in source and binary forms, with or without
+%#* modification, are permitted provided that the following conditions are met:
+%#* 
+%#*     * Redistributions of source code must retain the above copyright
+%#*       notice, this list of conditions and the following disclaimer.
+%#*     * Redistributions in binary form must reproduce the above copyright
+%#*       notice, this list of conditions and the following disclaimer in the
+%#*       documentation and/or other materials provided with the distribution.
+%#*     * Neither the name of the Roboterclub Aachen e.V. nor the
+%#*       names of its contributors may be used to endorse or promote products
+%#*       derived from this software without specific prior written permission.
+%#*
+%#* THIS SOFTWARE IS PROVIDED BY ROBOTERCLUB AACHEN E.V. ''AS IS'' AND ANY
+%#* EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+%#* WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+%#. IN NO EVENT SHALL ROBOTERCLUB AACHEN E.V. BE LIABLE FOR ANY
+%#* DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+%#* (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+%#* LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+%#* ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+%#* (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+%#* THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+%#*/
+
+
+%# This File includes STM32 specific macros for the generic cortex-m3 startup.c
+
+
+%% macro startupHeader()
+
+#define FLASH_WAIT_STATE_0		0x0
+#define FLASH_WAIT_STATE_1		0x1
+#define FLASH_WAIT_STATE_2		0x2
+#define FLASH_WAIT_STATE_3		0x3
+#define FLASH_WAIT_STATE_4		0x4
+#define FLASH_WAIT_STATE_5		0x5
+#define FLASH_WAIT_STATE_6		0x6
+#define FLASH_WAIT_STATE_7		0x7
+
+#define NR_INTERRUPTS 82
+
+%% do i.append(["WWDG_IRQHandler", "Window Watchdog"])
+%% do i.append(["PVD_IRQHandler", "PVD through EXTI Line detect"])
+%% do i.append(["TAMP_STAMP_IRQHandler", "Tamper and TimeStamps through the EXTI line"])
+%% do i.append(["RTC_WKUP_IRQHandler", "Wakeup through the EXTI line"])
+%% do i.append(["FLASH_IRQHandler", "Flash"])
+%% do i.append(["RCC_IRQHandler", "RCC"])
+%% do i.append(["EXTI0_IRQHandler", "EXTI Line 0"])
+%% do i.append(["EXTI1_IRQHandler", "EXTI Line 1"])
+%% do i.append(["EXTI2_IRQHandler", "EXTI Line 2"])
+%% do i.append(["EXTI3_IRQHandler", "EXTI Line 3"])
+%% do i.append(["EXTI4_IRQHandler", "EXTI Line 4"])
+%% do i.append(["DMA1_Stream0_IRQHandler", "DMA1 Stream 0"])
+%% do i.append(["DMA1_Stream1_IRQHandler", "DMA1 Stream 1"])
+%% do i.append(["DMA1_Stream2_IRQHandler", "DMA1 Stream 2"])
+%% do i.append(["DMA1_Stream3_IRQHandler", "DMA1 Stream 3"])
+%% do i.append(["DMA1_Stream4_IRQHandler", "DMA1 Stream 4"])
+%% do i.append(["DMA1_Stream5_IRQHandler", "DMA1 Stream 5"])
+%% do i.append(["DMA1_Stream6_IRQHandler", "DMA1 Stream 6"])
+%% do i.append(["ADC_IRQHandler", "ADC1, ADC2 and ADC3s"])
+%% do i.append(["CAN1_TX_IRQHandler", "CAN1 TX"])
+%% do i.append(["CAN1_RX0_IRQHandler", "CAN1 RX0"])
+%% do i.append(["CAN1_RX1_IRQHandler", "CAN1 RX1"])
+%% do i.append(["CAN1_SCE_IRQHandler", "CAN1 SCE"])
+%% do i.append(["EXTI9_5_IRQHandler", "EXTI Line 9..5"])
+%% do i.append(["TIM1_BRK_TIM9_IRQHandler", "TIM1 Break"])
+%% do i.append(["TIM1_UP_TIM10_IRQHandler", "TIM1 Update"])
+%% do i.append(["TIM1_TRG_COM_TIM11_IRQHandler", "TIM1 Trigger and Commutation"])
+%% do i.append(["TIM1_CC_IRQHandler", "TIM1 Capture Compare"])
+%% do i.append(["TIM2_IRQHandler", "TIM2"])
+%% do i.append(["TIM3_IRQHandler", "TIM3"])
+%% do i.append(["TIM4_IRQHandler", "TIM4"])
+%% do i.append(["I2C1_EV_IRQHandler", "I2C1 Event"])
+%% do i.append(["I2C1_ER_IRQHandler", "I2C1 Error"])
+%% do i.append(["I2C2_EV_IRQHandler", "I2C2 Event"])
+%% do i.append(["I2C2_ER_IRQHandler", "I2C2 Error"])
+%% do i.append(["SPI1_IRQHandler", "SPI1"])
+%% do i.append(["SPI2_IRQHandler", "SPI2"])
+%% do i.append(["USART1_IRQHandler", "USART1"])
+%% do i.append(["USART2_IRQHandler", "USART2"])
+%% do i.append(["USART3_IRQHandler", "USART3"])
+%% do i.append(["EXTI15_10_IRQHandler", "External Line[15:10]s"])
+%% do i.append(["RTCAlarm_IRQHandler", "RTC Alarm (A and B) through EXTI Line"])
+%% do i.append(["OTG_FS_WKUP_IRQHandler", "USB OTG FS Wakeup through EXTI line"])
+%% do i.append(["TIM8_BRK_TIM12_IRQHandler", "TIM8 Break and TIM12"])
+%% do i.append(["TIM8_UP_TIM13_IRQHandler", "TIM8 Update and TIM13"])
+%% do i.append(["TIM8_TRG_COM_TIM14_IRQHandler", "TIM8 Trigger and Commutation and TIM14"])
+%% do i.append(["TIM8_CC_IRQHandler", ""])
+%% do i.append(["DMA1_Stream7_IRQHandler", ""])
+%% do i.append(["FSMC_IRQHandler", ""])
+%% do i.append(["SDIO_IRQHandler", ""])
+%% do i.append(["TIM5_IRQHandler", ""])
+%% do i.append(["SPI3_IRQHandler", ""])
+%% do i.append(["UART4_IRQHandler", ""])
+%% do i.append(["UART5_IRQHandler", ""])
+%% do i.append(["TIM6_DAC_IRQHandler", "TIM6 and DAC1&2 under-run errors"])
+%% do i.append(["TIM7_IRQHandler", ""])
+%% do i.append(["DMA2_Stream0_IRQHandler", ""])
+%% do i.append(["DMA2_Stream1_IRQHandler", ""])
+%% do i.append(["DMA2_Stream2_IRQHandler", ""])
+%% do i.append(["DMA2_Stream3_IRQHandler", ""])
+%% do i.append(["DMA2_Stream4_IRQHandler", ""])
+%% do i.append(["ETH_IRQHandler", ""])
+%% do i.append(["ETH_WKUP_IRQHandler", "Ethernet Wakeup through EXTI line"])
+%% do i.append(["CAN2_TX_IRQHandler", ""])
+%% do i.append(["CAN2_RX0_IRQHandler", ""])
+%% do i.append(["CAN2_RX1_IRQHandler", ""])
+%% do i.append(["CAN2_SCE_IRQHandler", ""])
+%% do i.append(["OTG_FS_IRQHandler", ""])
+%% do i.append(["DMA2_Stream5_IRQHandler", "DMA2 Stream 5"])
+%% do i.append(["DMA2_Stream6_IRQHandler", "DMA2 Stream 6"])
+%% do i.append(["DMA2_Stream7_IRQHandler", "DMA2 Stream 7"])
+%% do i.append(["USART6_IRQHandler", "USART6"])
+%% do i.append(["I2C3_EV_IRQHandler", "I2C3 event"])
+%% do i.append(["I2C3_ER_IRQHandler", "I2C3 error"])
+%% do i.append(["OTG_HS_EP1_OUT_IRQHandler", "USB OTG HS End Point 1 Out"])
+%% do i.append(["OTG_HS_EP1_IN_IRQHandler", "USB OTG HS End Point 1 In"])
+%% do i.append(["OTG_HS_WKUP_IRQHandler", "USB OTG HS Wakeup through EXTI"])
+%% do i.append(["OTG_HS_IRQHandler", "USB OTG HS"])
+%% do i.append(["DCMI_IRQHandler", "DCMI"])
+%% do i.append(["CRYP_IRQHandler", "CRYP Crypto"])
+%% do i.append(["HASH_RNG_IRQHandler", "Hash and Random Number Generator"])
+%% do i.append(["FPU_IRQHandler", "FPU"])
+
+%% endmacro
+
+
+%% macro startupBody()
+
+%% if target is stm32f4
+	// prepare flash latency for working at 168MHz and supply voltage > 2.7
+	FLASH->ACR = (FLASH->ACR & ~FLASH_ACR_LATENCY) | FLASH_WAIT_STATE_5;
+%% elif target is stm32f2
+	// prepare flash latency for working at 120MHz and supply voltage > 2.7
+	FLASH->ACR = (FLASH->ACR & ~FLASH_ACR_LATENCY) | FLASH_WAIT_STATE_3;
+%% endif
+
+	// enable flash prefetch
+	FLASH->ACR |= FLASH_ACR_PRFTEN | FLASH_ACR_DCEN | FLASH_ACR_ICEN;
+
+%% if target is stm32f4
+	// Enable FPU in privileged and user mode
+	SCB->CPACR |= ((3UL << 10*2) | (3UL << 11*2));  // set CP10 and CP11 Full Access
+	
+	// Enable Core Coupled Memory (CCM)
+	RCC->AHB1ENR |= RCC_AHB1ENR_CCMDATARAMEN;
+%% endif
+
+	// Enable GPIO clock
+	// TODO adapt to actual pin count!
+	// TODO move to gpio driver??
+	// GPIOA-D
+	RCC->AHB1ENR  |=   RCC_AHB1ENR_GPIOAEN   | RCC_AHB1ENR_GPIOBEN   | RCC_AHB1ENR_GPIOCEN   | RCC_AHB1ENR_GPIODEN;
+	RCC->AHB1RSTR |=   RCC_AHB1RSTR_GPIOARST | RCC_AHB1RSTR_GPIOBRST | RCC_AHB1RSTR_GPIOCRST | RCC_AHB1RSTR_GPIODRST;
+	RCC->AHB1RSTR &= ~(RCC_AHB1RSTR_GPIOARST | RCC_AHB1RSTR_GPIOBRST | RCC_AHB1RSTR_GPIOCRST | RCC_AHB1RSTR_GPIODRST);
+	// GPIOE-I
+	RCC->AHB1ENR  |=   RCC_AHB1ENR_GPIOEEN   | RCC_AHB1ENR_GPIOFEN   | RCC_AHB1ENR_GPIOGEN   | RCC_AHB1ENR_GPIOHEN   | RCC_AHB1ENR_GPIOIEN;
+	RCC->AHB1RSTR |=   RCC_AHB1RSTR_GPIOERST | RCC_AHB1RSTR_GPIOFRST | RCC_AHB1RSTR_GPIOGRST | RCC_AHB1RSTR_GPIOHRST | RCC_AHB1RSTR_GPIOIRST;
+	RCC->AHB1RSTR &= ~(RCC_AHB1RSTR_GPIOERST | RCC_AHB1RSTR_GPIOFRST | RCC_AHB1RSTR_GPIOGRST | RCC_AHB1RSTR_GPIOHRST | RCC_AHB1RSTR_GPIOIRST);
+
+	// Setup NVIC
+	// Set vector table
+	const uint32_t offset = 0;
+	SCB->VTOR = 0x08000000 | (offset & 0x1FFFFF80);
+
+	// Lower priority level for all peripheral interrupts to lowest possible
+	for (uint32_t i = 0; i < NR_INTERRUPTS; i++) {
+		const uint32_t priority = 0xF;
+		NVIC->IP[i] = (priority & 0xF) << 4;
+	}
+
+	// Set the PRIGROUP[10:8] bits to
+	// - 4 bits for pre-emption priority,
+	// - 0 bits for subpriority
+	SCB->AIRCR = 0x05FA0000 | 0x300;
+
+	// Enable fault handlers
+	/*SCB->SHCSR |=
+			SCB_SHCSR_BUSFAULTENA_Msk |
+			SCB_SHCSR_USGFAULTENA_Msk |
+			SCB_SHCSR_MEMFAULTENA_Msk;*/
+
+%% endmacro
