@@ -61,7 +61,7 @@ def jinja2_template_action(target, source, env):
 	except ImportError:
 		env.Error("To use this functionality you need to install the jinja2 template engine")
 		Exit(1)
-	
+
 	globals = {
 		'time': time.strftime("%d %b %Y, %H:%M:%S", time.localtime()),
 		'match': re.match,
@@ -75,7 +75,7 @@ def jinja2_template_action(target, source, env):
 		return ('\n' + '\t' * level).join(value.split('\n'))
 		
 	path, filename = os.path.split(source[0].path)
-	loader = jinja2.Environment(loader = jinja2.FileSystemLoader(path))
+	loader = jinja2.Environment(loader = jinja2.FileSystemLoader(path), extensions=['jinja2.ext.do'])
 	loader.filters['xpcc.wordwrap'] = filter_wordwrap
 	loader.filters['xpcc.indent'] = filter_indent
 	if env['XPCC_JINJA2_TEST'] != None:
@@ -85,7 +85,7 @@ def jinja2_template_action(target, source, env):
 	loader.line_comment_prefix = '%#'
 
 	template = loader.get_template(filename, globals=globals)
-	
+
 	output = template.render(env['substitutions']).encode('utf-8')
 	open(target[0].path, 'w').write(output)
 
