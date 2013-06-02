@@ -32,6 +32,7 @@
 #define XPCC__ATMEGA_GPIO_HPP
 
 #include <xpcc/architecture/driver/gpio.hpp>
+#include <xpcc/math/utils/bit_operation.hpp>
 #include "../../../device.hpp"
 
 
@@ -47,6 +48,15 @@ typedef CONCAT3(::xpcc::atmega::GpioOutput, port, pin) name
 
 #define	GPIO__INPUT(name, port, pin) \
 typedef CONCAT3(::xpcc::atmega::GpioInput, port, pin) name
+
+#define	GPIO__NIBBLE_LOW(name, port) \
+typedef CONCAT(::xpcc::atmega::GpioLowNibble, port) name
+
+#define	GPIO__NIBBLE_HIGH(name, port) \
+typedef CONCAT(::xpcc::atmega::GpioHighNibble, port) name
+
+#define	GPIO__PORT(name, port) \
+typedef CONCAT(::xpcc::atmega::GpioPort, port) name
 
 
 namespace xpcc
@@ -68,16 +78,16 @@ namespace xpcc
 		/**
 		 * Gpio Classes created from the XML Device File Gpio Description
 		 */
-		{% for gpio in gpios -%}
-			{% set port  = gpio.port|upper -%}
-			{% set pin  = gpio.id -%}
+		%% for gpio in gpios
+			%% set port = gpio.port|upper
+			%% set pin  = gpio.id
 			
-		{% for type in ["Output", "Input", ""] -%}
-			{% set name = "Gpio" ~ type ~ port ~ pin -%}
+		%% for type in ["Output", "Input", ""]
+			%% set name = "Gpio" ~ type ~ port ~ pin
 		
 		struct {{name}} : Gpio
 		{
-			{% if type == "" or type == "Output" -%}
+			%% if type == "" or type == "Output"
 			ALWAYS_INLINE static void setOutput(bool status) {
 				set(status);
 				setOutput();
@@ -102,8 +112,9 @@ namespace xpcc
 
 			ALWAYS_INLINE static void toggle() {
 				PORT{{port}} ^=  (1 << {{pin}});
-			}{% endif %}
-			{% if type == "" or type == "Input" -%}
+			}
+			%% endif
+			%% if type == "" or type == "Input"
 			ALWAYS_INLINE static void setInput() {
 				DDR{{port}} &= ~(1 << {{pin}});
 			}
@@ -121,11 +132,82 @@ namespace xpcc
 
 			ALWAYS_INLINE static bool read() {
 				return (PIN{{port}} & (1 << {{pin}}));
-			}{% endif %}
+			}
+			%% endif
 		};
 		
-		{% endfor %}
-		{% endfor %}
+		%% endfor
+		%% endfor
+		
+		%% for nibble in nibbles
+			%% set port = nibble.port|upper
+			
+			%% for id in nibble.position
+		
+		%% if id == 0
+		struct GpioLowNibble{{port}}
+		{
+			ALWAYS_INLINE static void setOutput() {
+				DDR{{port}} |= 0x0f;
+			}
+			ALWAYS_INLINE static void setInput() {
+				DDR{{port}} &= ~0x0f;
+			}
+			ALWAYS_INLINE static uint8_t read() {
+				return (PIN{{port}} & 0x0f);
+			}
+			ALWAYS_INLINE static void write(uint8_t data) {
+				PORT{{port}} = (data & 0x0f) | (PORT{{port}} & 0xf0);
+			}
+		};
+		%% elif id == 1
+		struct GpioHighNibble{{port}}
+		{
+			ALWAYS_INLINE static void setOutput() {
+				DDR{{port}} |= 0xf0;
+			}
+			ALWAYS_INLINE static void setInput() {
+				DDR{{port}} &= ~0xf0;
+			}
+			ALWAYS_INLINE static uint8_t read() {
+				uint8_t data = PIN{{port}};
+				return (data >> 4);
+			}
+			ALWAYS_INLINE static void write(uint8_t data) {
+				data <<= 4;
+				PORT{{port}} = data | (PORT{{port}} & 0x0f);
+			}
+		};
+		%% endif
+		
+		%% endfor
+		%% endfor
+		
+		%% for octet in octets
+			%% set port = octet.port|upper
+			
+			%% for id in octet.position
+		
+		%% if id == 0
+		struct GpioPort{{port}}
+		{
+			ALWAYS_INLINE static void setOutput() {
+				DDR{{port}} = 0xff;
+			}
+			ALWAYS_INLINE static void setInput() {
+				DDR{{port}} = 0;
+			}
+			ALWAYS_INLINE static uint8_t read() {
+				return PIN{{port}};
+			}
+			ALWAYS_INLINE static void write(uint8_t data) {
+				PORT{{port}} = data;
+			}
+		};
+		%% endif
+		
+		%% endfor
+		%% endfor
 	}
 }
 
