@@ -104,6 +104,9 @@ namespace xpcc
 				if (status) { set(); }
 				else { reset(); }
 			}
+			ALWAYS_INLINE static bool read() {
+				return IO::read();
+			}
 		};
 
 		/**
