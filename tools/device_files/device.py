@@ -345,7 +345,53 @@ class Driver(DeviceElementBase):
 		return dic
 
 	def _gpioCreateNibblePort(self, substitutions):
-		self.log.debug("device.py:348 TODO: create nipple and port substitutions from gpios")
+		# a nibble is 4 bit, an octet is 8bit
+		# a port is either 8 bit for AVR or 16 bit for ARM
+		gpios = substitutions['gpios']
+		if gpios != None:
+			# unique port list
+			ports = {v['port'] for v in gpios}
+			portArrays = []
+			for port in ports:
+				ids = [0] * 16
+				for gpio in gpios:
+					if gpio['port'] == port:
+						ids[int(gpio['id'])] = 1
+				# lets find some nibbles
+				nibbles = [1] * 4
+				for nibble in range(4):
+					for id in range(4):
+						if ids[nibble*4+id] == 0:
+							nibbles[nibble] = 0
+				# lets find some ports
+				octets = [1] * 2
+				for octet in range(2):
+					for nibble in range(2):
+						if nibbles[octet*2+nibble] == 0:
+							octets[octet] = 0
+
+				portArrays.append( {'port' : port, 'nibbles': nibbles, 'octets': octets} )
+
+			# reduce the arrays and create two of them
+			nibbleSub = []
+			octetSub = []
+
+			for port in portArrays:
+				nibbles = []
+				for nibble in range(4):
+					if port['nibbles'][nibble] == 1:
+						nibbles.append(nibble)
+				octets = []
+				for octet in range(2):
+					if port['octets'][octet] == 1:
+						octets.append(octet)
+				if len(nibbles) > 0:
+					nibbleSub.append( {'port': port['port'], 'position': nibbles} )
+				if len(octets) > 0:
+					octetSub.append( {'port': port['port'], 'position': octets} )
+
+			substitutions['nibbles'] = nibbleSub
+			substitutions['octets'] = octetSub
 
 
 
