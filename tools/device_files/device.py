@@ -324,6 +324,7 @@ class Driver(DeviceElementBase):
 		# derive nibbles and ports
 		if self.type == 'gpio':
 			self._gpioCreateNibblePort(substitutions)
+		self.log.debug("Found substitutions: " + str(substitutions))
 		return substitutions
 
 	def _nodeToDict(self, node):
