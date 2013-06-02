@@ -87,6 +87,26 @@ namespace xpcc
 		};
 
 		/**
+		 * Gpio OpenDrain template, which remaps the behavior of the Gpio pin to
+		 * simulate an open-drain Output.
+		 * This maps set() -> setOutput() and reset() -> setInput(PullType::PULLUP)
+		 */
+		template< class IO >
+		struct GpioOpenDrain : Gpio
+		{
+			ALWAYS_INLINE static void set() {
+				IO::setInput(PullType::PULLUP);
+			}
+			ALWAYS_INLINE static void reset() {
+				IO::setOutput(::xpcc::gpio::LOW);
+			}
+			ALWAYS_INLINE static void set(bool status) {
+				if (status) { set(); }
+				else { reset(); }
+			}
+		};
+
+		/**
 		 * Gpio Classes created from the XML Device File Gpio Description
 		 */
 		%% for gpio in gpios
