@@ -37,11 +37,12 @@ if __name__ == "__main__":
 	Some test code
 	"""
 
-	files = glob.glob(os.path.join(os.path.dirname(__file__), '..', '..', '..', 'AVR_devices') + "/ATmega328P*")
+	files = glob.glob(os.path.join(os.path.dirname(__file__), '..', '..', '..', 'AVR_devices') + "/ATmega32*")
 	for file in files:
 		dev = PartDescriptionFile(file)
-		print dev
-		print dev.properties
+		print dev.name
+		for gpio in dev.gpios:
+			print gpio
 	
 	
 

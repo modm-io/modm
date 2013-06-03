@@ -376,7 +376,7 @@ class Driver(DeviceElementBase):
 						if nibbles[octet*2+nibble] == 0:
 							octets[octet] = 0
 
-				portArrays.append( {'port' : port, 'nibbles': nibbles, 'octets': octets} )
+				portArrays.append( {'port': port, 'nibbles': nibbles, 'octets': octets} )
 
 			# reduce the arrays and create two of them
 			nibbleSub = []

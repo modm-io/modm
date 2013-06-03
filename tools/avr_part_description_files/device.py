@@ -44,8 +44,7 @@ class PartDescriptionFile:
 	"""
 
 	def __init__(self, xml_file, logger=None):
-		self.pnode = self._openDeviceXML(xml_file)
-		node = self.pnode
+		node = self._openDeviceXML(xml_file)
 		
 		if logger == None:
 			self.log = Logger()
@@ -63,7 +62,7 @@ class PartDescriptionFile:
 			size = int(memory_segment.get('size'), 16)
 			if name == 'FLASH':
 				self.properties['flash'] = size
-			elif name == 'IRAM':
+			elif name == 'IRAM' or name == 'SRAM':
 				self.properties['ram'] = size
 			elif name == 'EEPROM':
 				self.properties['eeprom'] = size
@@ -74,13 +73,15 @@ class PartDescriptionFile:
 			
 		self.modules = node.findall('modules')[0]
 		self.properties['modules'] = []
-		ignore_modules = ['LOCKBIT', 'FUSE', 'EEPROM', 'CPU', 'WATCHDOG']
+		self.gpios = []
+		ignore_modules = ['LOCKBIT', 'FUSE', 'EEPROM', 'CPU', 'WATCHDOG', 'BOOT_LOAD', 'PLL', 'USB_DEVICE', 'PS2']
 		
 		for module in self.modules.iter('module'):
 			name = module.get('name')
 			if name not in ignore_modules:
 				self.properties['modules'].append(name)
-		
+			if "PORT" in name:
+				self.gpios.append(self._parseGpios(module));
 
 	def _openDeviceXML(self, filename):
 		try:
@@ -90,25 +91,34 @@ class PartDescriptionFile:
 			raise ParserException(e)
 		except (xml.parsers.expat.ExpatError, xml.etree.ElementTree.ParseError) as e:
 			raise ParserException("while parsing xml-file '%s': %s" % (filename, e))
-		"""
-		TODO: Validate!!
-				try:
-					import lxml.etree		# for validating
-			
-					# validate against the embedded DTD file
-					try:
-						parser = lxml.etree.XMLParser(dtd_validation=True)
-						dummy = lxml.etree.parse(filename, parser)
-					except lxml.etree.XMLSyntaxError as e:
-						raise ParserException("Validation error in '%s': %s" % (filename, e))
-					else:
-						logging.debug("Validation OK!")
-				except ImportError as e:
-					logging.warning("Warning: couldn't load 'lxml' module. No validation done!")
-		"""
-		# since we have totally "validated" our xml file (see above) we can
-		# expect that all required elements exist...
 		return xmltree
+
+	def _parseGpios(self, node):
+		ports = []
+		for c in node.iter('register'):
+			if "PORT" in c.get('name'): 
+				name = c.get('name')[-1:]
+				mask = self._maskFromRegisterNode(c)
+				for i in range(8):
+					if mask & 0x01:
+						ports.append( {'port': name, 'id': i} )
+					mask >>= 1
+		return ports
+	
+	def _maskFromRegisterNode(self, node):
+		mask = node.get('mask')
+		# some registers have bitfields instead of masks
+		# Go home Atmel, you're drunk.
+		if mask == None:
+			mask = 0
+			for c in node.iter('bitfield'):
+				field = c.get('mask')
+				if field != None:
+					field = int(field, 16)
+					mask |= field
+		else:
+			mask = int(mask, 16)
+		return mask
 
 	def __str__(self):
 		s  = "Architecture: " + self.architecture + "\n"
