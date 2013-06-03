@@ -55,7 +55,7 @@ class PartDescriptionFile:
 		self.name = self.device.get('name')
 		self.architecture = self.device.get('architecture')
 		self.family = self.device.get('family')
-		self.log.debug("Parsing AVR PDF: " + self.name)
+		self.log.info("Parsing AVR PDF: " + self.name)
 		
 		self.properties = {}
 		self.properties['interrupts'] = []
@@ -65,24 +65,35 @@ class PartDescriptionFile:
 		
 		if (self.architecture != 'AVR8' and self.architecture != 'AVR8L'):
 			self.log.error("Only ATtiny, ATmega and AT90 targets can correctly be parsed...")
-			return
+			return None
 		
+		# find the values for flash, ram and (optional) eeprom
 		for memory_segment in self.device.iter('memory-segment'):
 			name = memory_segment.get('name')
 			size = int(memory_segment.get('size'), 16)
 			if name == 'FLASH' or name == 'APP_SECTION':
 				self.properties['flash'] = size
-				self.log.debug("Flash: " + str(size))
+				self.log.debug("FLASH: " + str(size))
 			elif name == 'IRAM' or name == 'SRAM' or name == 'INTERNAL_SRAM':
 				self.properties['ram'] = size
 				self.log.debug("RAM: " + str(size))
 			elif name == 'EEPROM':
 				self.properties['eeprom'] = size
 				self.log.debug("EEPROM: " + str(size))
+		
+		# if flash or ram is missing, it is a bad thing and unsupported
+		if 'flash' not in self.properties:
+			self.log.error("No FLASH found")
+			return None
+		if 'ram' not in self.properties:
+			self.log.error("No RAM found")
+			self.log.error("XPCC does not support Assembler-only programming")
+			return None
+		# eeprom is optional on AVR and not available on ARM devices
+		if 'eeprom' not in self.properties and 'AVR' in self.architecture:
+			self.log.warn("No EEPROM found")
 			
-		for module in self.device.iter('interrupt'):
-			self.properties['interrupts'].append(module.attrib)
-			
+		
 		self.modules = node.findall('modules')[0]
 		# these modules are either too complicated or too special to bother with
 		ignore_modules = ['LOCKBIT', 'FUSE', 'EEPROM', 'CPU', 'WATCHDOG', 'BOOT_LOAD', 'PLL', 'USB_DEVICE', 'PS2']
@@ -91,10 +102,14 @@ class PartDescriptionFile:
 			name = module.get('name')
 			if name not in ignore_modules:
 				self.properties['modules'].append(name)
+			# parse the GPIOs
 			if "PORT" in name:
-				gpio = self._gpiosFromModuleNode(module)
-				self.gpios.append(gpio);
-				self.log.debug("GPIOs: " + str(gpio))
+				gpio = self._gpioFromModuleNode(module)
+				if gpio == None:
+					self.log.warn("No GPIO found for " + name)
+				else:
+					self.gpios.append(gpio);
+					self.log.debug("GPIOs: " + str(gpio))
 
 	def _openDeviceXML(self, filename):
 		try:
@@ -106,17 +121,14 @@ class PartDescriptionFile:
 			raise ParserException("while parsing xml-file '%s': %s" % (filename, e))
 		return xmltree
 
-	def _gpiosFromModuleNode(self, node):
-		ports = []
+	def _gpioFromModuleNode(self, node):
+		name = node.get('name')
+		port = name[4:5]
 		for c in node.iter('register'):
-			if "PORT" in c.get('name'): 
-				name = c.get('name')[-1:]
+			if name == c.get('name'): 
 				mask = self._maskFromRegisterNode(c)
-				for i in range(8):
-					if mask & 0x01:
-						ports.append( {'port': name, 'id': i} )
-					mask >>= 1
-		return ports
+				return {'port': port, 'mask': mask}
+		return None
 	
 	def _maskFromRegisterNode(self, node):
 		mask = node.get('mask')
