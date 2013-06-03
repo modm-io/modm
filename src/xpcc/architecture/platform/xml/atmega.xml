@@ -11,20 +11,20 @@
 		     to mean "and more" / a _-_ to mean "and less"
 		-->
 		<!-- Flash and RAM sizes -->
-		<flash device-name="48">4096</flash>
-		<flash device-name="88">8192</flash>
-		<flash device-name="168">16384</flash>
-		<flash device-name="328">32768</flash>
+		<flash size-id="4">4096</flash>
+		<flash size-id="8">8192</flash>
+		<flash size-id="16">16384</flash>
+		<flash size-id="32">32768</flash>
 		
-		<ram device-name="48">512</ram>
-		<ram device-name="88">1024</ram>
-		<ram device-name="168">1024</ram>
-		<ram device-name="328">2048</ram>
+		<ram size-id="4">512</ram>
+		<ram size-id="8">1024</ram>
+		<ram size-id="16">1024</ram>
+		<ram size-id="32">2048</ram>
 		
-		<eeprom device-name="48">256</eeprom>
-		<eeprom device-name="88">512</eeprom>
-		<eeprom device-name="168">512</eeprom>
-		<eeprom device-name="328">1024</eeprom>
+		<eeprom size-id="4">256</eeprom>
+		<eeprom size-id="8">512</eeprom>
+		<eeprom size-id="16">512</eeprom>
+		<eeprom size-id="32">1024</eeprom>
 		
 		<!-- Number of pins -->
 		<pin-count>28</pin-count>

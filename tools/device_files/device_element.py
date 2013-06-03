@@ -133,7 +133,7 @@ class DeviceString:
 		self.name     = None # e.g.   405, 16
 		self.type     = None # e.g. -----, m1
 		self.pin_id   = None # e.g.     r, -----
-		self.size_id  = None # e.g.     g, -----
+		self.size_id  = None # e.g.     g, 16
 		self.valid = False
 		# try to determine platform and to parse string accordingly
 		if string.startswith('stm32f'):
@@ -159,6 +159,9 @@ class DeviceString:
 						self.type = match.group('type').lower()
 					if match.group('package') != '':
 						self.pin_id = match.group('package').lower()
+					match = re.search("(?P<size>4|8|16|32|64|128|256)\d*", self.name)
+					if match:
+						self.size_id = match.group('size')
 				elif (self.family == "atxmega"):
 					match = re.search(self.family + self.name + "(?P<type>[A-Ea-e])(?P<package>[1-4])(?P<usb>[Bb][Uu])", string)
 					if match.group('type') != '':
