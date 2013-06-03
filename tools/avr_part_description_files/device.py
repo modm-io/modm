@@ -55,25 +55,36 @@ class PartDescriptionFile:
 		self.name = self.device.get('name')
 		self.architecture = self.device.get('architecture')
 		self.family = self.device.get('family')
+		self.log.debug("Parsing AVR PDF: " + self.name)
 		
 		self.properties = {}
+		self.properties['interrupts'] = []
+		self.properties['modules'] = []
+		self.modules = []
+		self.gpios = []
+		
+		if (self.architecture != 'AVR8' and self.architecture != 'AVR8L'):
+			self.log.error("Only ATtiny, ATmega and AT90 targets can correctly be parsed...")
+			return
+		
 		for memory_segment in self.device.iter('memory-segment'):
 			name = memory_segment.get('name')
 			size = int(memory_segment.get('size'), 16)
-			if name == 'FLASH':
+			if name == 'FLASH' or name == 'APP_SECTION':
 				self.properties['flash'] = size
-			elif name == 'IRAM' or name == 'SRAM':
+				self.log.debug("Flash: " + str(size))
+			elif name == 'IRAM' or name == 'SRAM' or name == 'INTERNAL_SRAM':
 				self.properties['ram'] = size
+				self.log.debug("RAM: " + str(size))
 			elif name == 'EEPROM':
 				self.properties['eeprom'] = size
+				self.log.debug("EEPROM: " + str(size))
 			
-		self.properties['interrupts'] = []
 		for module in self.device.iter('interrupt'):
 			self.properties['interrupts'].append(module.attrib)
 			
 		self.modules = node.findall('modules')[0]
-		self.properties['modules'] = []
-		self.gpios = []
+		# these modules are either too complicated or too special to bother with
 		ignore_modules = ['LOCKBIT', 'FUSE', 'EEPROM', 'CPU', 'WATCHDOG', 'BOOT_LOAD', 'PLL', 'USB_DEVICE', 'PS2']
 		
 		for module in self.modules.iter('module'):
@@ -81,7 +92,9 @@ class PartDescriptionFile:
 			if name not in ignore_modules:
 				self.properties['modules'].append(name)
 			if "PORT" in name:
-				self.gpios.append(self._gpiosFromModuleNode(module));
+				gpio = self._gpiosFromModuleNode(module)
+				self.gpios.append(gpio);
+				self.log.debug("GPIOs: " + str(gpio))
 
 	def _openDeviceXML(self, filename):
 		try:
