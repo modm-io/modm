@@ -36,6 +36,9 @@ from parser_exception import ParserException
 # add python module logger to path
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'logger'))
 from logger import Logger
+# add python module device files to path
+sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'device_files'))
+from device_element import DeviceString
 
 class PartDescriptionFile:
 	""" PartDescriptionFile
@@ -49,23 +52,22 @@ class PartDescriptionFile:
 			self.log = Logger()
 		else:
 			self.log = logger
-		
-		self.device = node.findall('devices')[0][0]
-		self.name = self.device.get('name')
-		self.architecture = self.device.get('architecture')
-		self.family = self.device.get('family')
-		self.log.info("Parsing AVR PDF: " + self.name)
-		
+
 		self.properties = {}
-		self.properties['interrupts'] = []
-		self.properties['modules'] = []
-		self.modules = []
-		self.gpios = []
+
+		self.device = node.findall('devices')[0][0]
+		self.name = self.device.get('name').lower()
+		self.architecture = self.device.get('architecture').lower()
+		self.family = self.device.get('family').lower()
 		
-		if (self.architecture != 'AVR8' and self.architecture != 'AVR8L'):
+		self.properties['device'] = DeviceString(self.name)
+
+		self.log.info("Parsing AVR PDF: " + self.architecture + " " + self.name)
+
+		if (self.architecture != 'avr8' and self.architecture != 'avr8l'):
 			self.log.error("Only ATtiny, ATmega and AT90 targets can correctly be parsed...")
 			return None
-		
+
 		# find the values for flash, ram and (optional) eeprom
 		for memory_segment in self.device.iter('memory-segment'):
 			name = memory_segment.get('name')
@@ -79,7 +81,7 @@ class PartDescriptionFile:
 			elif name == 'EEPROM':
 				self.properties['eeprom'] = size
 				self.log.debug("EEPROM: " + str(size))
-		
+
 		# if flash or ram is missing, it is a bad thing and unsupported
 		if 'flash' not in self.properties:
 			self.log.error("No FLASH found")
@@ -91,13 +93,14 @@ class PartDescriptionFile:
 		# eeprom is optional on AVR and not available on ARM devices
 		if 'eeprom' not in self.properties and 'AVR' in self.architecture:
 			self.log.warn("No EEPROM found")
-			
-		
-		self.modules = node.findall('modules')[0]
+
+		modules = node.findall('modules')[0]
+		self.properties['gpios'] = gpios = []
+		self.properties['modules'] = []
 		# these modules are either too complicated or too special to bother with
 		ignore_modules = ['LOCKBIT', 'FUSE', 'EEPROM', 'CPU', 'WATCHDOG', 'BOOT_LOAD', 'PLL', 'USB_DEVICE', 'PS2']
-		
-		for module in self.modules.iter('module'):
+
+		for module in modules.iter('module'):
 			name = module.get('name')
 			if name not in ignore_modules:
 				self.properties['modules'].append(name)
@@ -107,8 +110,9 @@ class PartDescriptionFile:
 				if gpio == None:
 					self.log.warn("No GPIO found for " + name)
 				else:
-					self.gpios.append(gpio);
+					gpios.append(gpio);
 					self.log.debug("GPIOs: " + str(gpio))
+
 
 	def _openDeviceXML(self, filename):
 		try:
@@ -119,6 +123,7 @@ class PartDescriptionFile:
 		except (xml.parsers.expat.ExpatError, xml.etree.ElementTree.ParseError) as e:
 			raise ParserException("while parsing xml-file '%s': %s" % (filename, e))
 		return xmltree
+
 
 	def _gpioFromModuleNode(self, node):
 		"""
@@ -133,7 +138,8 @@ class PartDescriptionFile:
 				mask = self._maskFromRegisterNode(c)
 				return {'port': port, 'mask': mask}
 		return None
-	
+
+
 	def _maskFromRegisterNode(self, node):
 		"""
 		This tries to get the mask of pins available for a given port.
