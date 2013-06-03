@@ -32,7 +32,6 @@ import xml.etree.ElementTree as et
 import xml.parsers.expat
 from string import Template
 from parser_exception import ParserException
-from device_element import DeviceElementBase, DeviceString
 
 # add python module logger to path
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'logger'))
@@ -87,7 +86,7 @@ class PartDescriptionFile:
 			return None
 		if 'ram' not in self.properties:
 			self.log.error("No RAM found")
-			self.log.error("XPCC does not support Assembler-only programming")
+			self.log.error("XPCC does not support Assembler-only programming!")
 			return None
 		# eeprom is optional on AVR and not available on ARM devices
 		if 'eeprom' not in self.properties and 'AVR' in self.architecture:
@@ -122,6 +121,11 @@ class PartDescriptionFile:
 		return xmltree
 
 	def _gpioFromModuleNode(self, node):
+		"""
+		This tries to get information about available pins in a port and
+		returns a dictionary containing the port name and available pins
+		as a bit mask.
+		"""
 		name = node.get('name')
 		port = name[4:5]
 		for c in node.iter('register'):
@@ -131,9 +135,12 @@ class PartDescriptionFile:
 		return None
 	
 	def _maskFromRegisterNode(self, node):
+		"""
+		This tries to get the mask of pins available for a given port.
+		Sometimes, instead of a mask several bitfields are given, which are
+		then merged together.
+		"""
 		mask = node.get('mask')
-		# some registers have bitfields instead of masks
-		# Go home Atmel, you're drunk.
 		if mask == None:
 			mask = 0
 			for c in node.iter('bitfield'):

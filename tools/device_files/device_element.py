@@ -146,6 +146,7 @@ class DeviceString:
 				self.size_id = string[10]
 			if len(string) >= 9:
 				self.valid = True
+
 		# AVR platform with ATmega and ATxmega family
 		elif string.startswith('at'):
 			self.platform = "avr"
@@ -153,6 +154,7 @@ class DeviceString:
 			if match:
 				self.family = match.group('family')
 				self.name = match.group('name')
+
 				if (self.family == "atmega"):
 					match = re.search(self.family + self.name + "(?P<type>\w*)-?(?P<package>\w*)", string)
 					if match.group('type') != '':
@@ -162,6 +164,7 @@ class DeviceString:
 					match = re.search("(?P<size>4|8|16|32|64|128|256)\d*", self.name)
 					if match:
 						self.size_id = match.group('size')
+
 				elif (self.family == "atxmega"):
 					match = re.search(self.family + self.name + "(?P<type>[A-Ea-e])(?P<package>[1-4])(?P<usb>[Bb][Uu])", string)
 					if match.group('type') != '':
