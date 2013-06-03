@@ -30,6 +30,7 @@
 
 import os, sys
 from device import PartDescriptionFile
+from merger import DeviceMerger
 import glob
 # add python module logger to path
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'logger'))
@@ -39,12 +40,17 @@ if __name__ == "__main__":
 	"""
 	Some test code
 	"""
-	logger = Logger('debug')
+	logger = Logger('info')
 	
 	xml_path = os.path.join(os.path.dirname(__file__), '..', '..', '..', 'AVR_devices', (sys.argv[1] + '*'))
 	files = glob.glob(xml_path)
+	devices = []
 	for file in files:
-		dev = PartDescriptionFile(file, logger)
+		devices.append(PartDescriptionFile(file, logger))
+	
+	logger.setLogLevel('debug')
+	
+	merger = DeviceMerger(devices, logger)
 	
 	
 
