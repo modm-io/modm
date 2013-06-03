@@ -28,21 +28,23 @@
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # -----------------------------------------------------------------------------
 
-import os
+import os, sys
 from device import PartDescriptionFile
 import glob
+# add python module logger to path
+sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'logger'))
+from logger import Logger
 
 if __name__ == "__main__":
 	"""
 	Some test code
 	"""
-
-	files = glob.glob(os.path.join(os.path.dirname(__file__), '..', '..', '..', 'AVR_devices') + "/ATmega32*")
+	logger = Logger('debug')
+	
+	xml_path = os.path.join(os.path.dirname(__file__), '..', '..', '..', 'AVR_devices', (sys.argv[1] + '*'))
+	files = glob.glob(xml_path)
 	for file in files:
-		dev = PartDescriptionFile(file)
-		print dev.name
-		for gpio in dev.gpios:
-			print gpio
+		dev = PartDescriptionFile(file, logger)
 	
 	
 
