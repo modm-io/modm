@@ -172,46 +172,46 @@ namespace xpcc
 			%% if af.type == "extint"
 			ALWAYS_INLINE static void enableExternalInterrupt(TriggerType trigger) {
 				EICRA |= (trigger << 2*{{af.id}});
-				EIMSK |= (1 << {{af.id}});
+				EIMSK |= (1 << INT{{af.id}});
 			}
 
 			ALWAYS_INLINE static void disableExternalInterrupt() {
 				EICRA &= ~(0x3 << 2*{{af.id}});
-				EIMSK &= ~(1 << {{af.id}});
+				EIMSK &= ~(1 << INT{{af.id}});
 			}
 
 			ALWAYS_INLINE static bool getExternalInterruptFlag() {
-				return (EIFR & (1 << {{af.id}}));
+				return (EIFR & (1 << INTF{{af.id}}));
 			}
 
 			ALWAYS_INLINE static void acknowledgeExternalInterruptFlag() {
-				EIFR |= (1 << {{af.id}});
+				EIFR |= (1 << INTF{{af.id}});
 			}
 			%% endif
 
 			%% if af.type == "pcint"
 			ALWAYS_INLINE static void enablePCInterrupt() {
 				%% if port == "B"
-				PCMSK0 |= (1 << {{pin}});
+				PCMSK0 |= (1 << PCINT{{af.id}});
 				PCICR  |= (1 << PCIE0);
 				%% elif port == "C"
-				PCMSK1 |= (1 << {{pin}});
+				PCMSK1 |= (1 << PCINT{{af.id}});
 				PCICR  |= (1 << PCIE1);
 				%% elif port == "D"
-				PCMSK2 |= (1 << {{pin}});
+				PCMSK2 |= (1 << PCINT{{af.id}});
 				PCICR  |= (1 << PCIE2);
 				%% endif
 			}
 
 			ALWAYS_INLINE static void disablePCInterrupt() {
 				%% if port == "B"
-				PCMSK0 &= ~(1 << {{pin}});
+				PCMSK0 &= ~(1 << PCINT{{af.id}});
 				if (!PCMSK0) PCICR &= ~(1 << PCIE0);
 				%% elif port == "C"
-				PCMSK1 &= ~(1 << {{pin}});
+				PCMSK1 &= ~(1 << PCINT{{af.id}});
 				if (!PCMSK1) PCICR &= ~(1 << PCIE1);
 				%% elif port == "D"
-				PCMSK2 &= ~(1 << {{pin}});
+				PCMSK2 &= ~(1 << PCINT{{af.id}});
 				if (!PCMSK2) PCICR &= ~(1 << PCIE2);
 				%% endif
 			}
