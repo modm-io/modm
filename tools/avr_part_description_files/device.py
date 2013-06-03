@@ -81,7 +81,7 @@ class PartDescriptionFile:
 			if name not in ignore_modules:
 				self.properties['modules'].append(name)
 			if "PORT" in name:
-				self.gpios.append(self._parseGpios(module));
+				self.gpios.append(self._gpiosFromModuleNode(module));
 
 	def _openDeviceXML(self, filename):
 		try:
@@ -93,7 +93,7 @@ class PartDescriptionFile:
 			raise ParserException("while parsing xml-file '%s': %s" % (filename, e))
 		return xmltree
 
-	def _parseGpios(self, node):
+	def _gpiosFromModuleNode(self, node):
 		ports = []
 		for c in node.iter('register'):
 			if "PORT" in c.get('name'): 
