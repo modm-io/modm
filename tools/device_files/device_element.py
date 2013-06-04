@@ -177,16 +177,45 @@ class DeviceString:
 			raise ParserException("Parse Error: unknown platform. Device string: %" % (string))
 
 	def getTargetDict(self):
-		dic = {'target': {}}
-		dic['target']['platform'] = self.platform
-		dic['target']['family'] = self.family
-		dic['target']['name'] = self.name
-		dic['target']['type'] = self.type
-		dic['target']['pin_id'] = self.pin_id
-		dic['target']['size_id'] = self.size_id
-		dic['target']['string'] = self.string
-		return dic
+		dict = {'target': {}}
+		dict['target']['platform'] = self.platform
+		dict['target']['family'] = self.family
+		dict['target']['name'] = self.name
+		dict['target']['type'] = self.type
+		dict['target']['pin_id'] = self.pin_id
+		dict['target']['size_id'] = self.size_id
+		dict['target']['string'] = self.string
+		return dict
+	
+	def getComparisonDict(self, other):
+		if not isinstance(other, DeviceString):
+			return None
+		tself = self.getTargetDict()['target']
+		tother = other.getTargetDict()['target']
+		dict = {'common': [], 'different': []}
+		for key in tself:
+			if tself[key] == tother[key]:
+				dict['common'].append(key)
+			else:
+				dict['different'].append(key)
+		
+		common = ""
+		if 'platform' in dict['common']:
+			if self.platform != "avr":
+				common += self.platform
+		if 'family' in dict['common']:
+			common += self.family
+		if 'name' in dict['common']:
+			common += self.name
+		if 'type' in dict['common']:
+			common += self.type
+		dict['string'] = common
+		return dict
 
 	def __str__(self):
-		s = self.string
+		s = self.platform + " " + self.family + " " + self.name
+		if self.type != None:
+			s += " " + self.type
+		if self.pin_id != None:
+			s += " " + self.pin_id
 		return s
