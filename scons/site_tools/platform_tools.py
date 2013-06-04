@@ -83,10 +83,10 @@ def platform_tools_generate(env, architecture_path):
 
 	# Check for error
 	if device_file == None:
-		emsg = "XPCC Error: Could not find xml device file." + os.linesep
-		for f in files:
-			emsg += "Tried: " + f + os.linesep
-		raise SCons.Errors.BuildError(node=target, errstr=emsg)
+		env.Error("XPCC Error: Could not find xml device file." + os.linesep)
+		# for f in files:
+		#	env.Error("Tried: " + f + os.linesep)
+		Exit(1)
 	# Now we need to parse the Xml File
 	dev = DeviceFile(device_file, env.GetLogger())
 
