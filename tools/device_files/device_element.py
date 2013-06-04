@@ -159,7 +159,7 @@ class DeviceString:
 				self.family = match.group('family')
 				self.name = match.group('name')
 
-				if (self.family == "atmega"):
+				if self.family == "atmega" or self.family == "attiny":
 					match = re.search(self.family + self.name + "(?P<type>\w*)-?(?P<package>\w*)", string)
 					if match.group('type') != '':
 						self.type = match.group('type').lower()
@@ -169,7 +169,7 @@ class DeviceString:
 					if match:
 						self.size_id = match.group('size')
 
-				elif (self.family == "atxmega"):
+				elif self.family == "atxmega":
 					match = re.search(self.family + self.name + "(?P<type>[A-Ea-e])(?P<package>[1-4])(?P<usb>[Bb][Uu])", string)
 					if match.group('type') != '':
 						self.type = match.group('type').lower()
@@ -210,7 +210,6 @@ class DeviceString:
 					setattr(device_delta, key, tother[key])
 				if tother[key] == None:
 					setattr(device_delta, key, tself[key])
-				
 		
 		common = ""
 		if 'platform' in dict['common_keys']:
