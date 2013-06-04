@@ -125,7 +125,7 @@ class DeviceString:
 	well as lpc controllers
 	"""
 
-	def __init__(self, string):
+	def __init__(self, string=None):
 		self.string = string
 		# default for properties is None
 		self.platform = None # e.g. stm32, avr
@@ -135,6 +135,10 @@ class DeviceString:
 		self.pin_id   = None # e.g.     r, -----
 		self.size_id  = None # e.g.     g, 16
 		self.valid = False
+		
+		if string == None:
+			return
+		
 		# try to determine platform and to parse string accordingly
 		if string.startswith('stm32f'):
 			self.platform = "stm32"
@@ -192,30 +196,41 @@ class DeviceString:
 			return None
 		tself = self.getTargetDict()['target']
 		tother = other.getTargetDict()['target']
-		dict = {'common': [], 'different': []}
+		dict = {'common_keys': [], 'different_keys': []}
+		device = DeviceString()
+		device_delta = DeviceString()
+		
 		for key in tself:
 			if tself[key] == tother[key]:
-				dict['common'].append(key)
+				dict['common_keys'].append(key)
+				setattr(device, key, tself[key])
 			else:
-				dict['different'].append(key)
+				dict['different_keys'].append(key)
+				if tself[key] == None:
+					setattr(device_delta, key, tother[key])
+				if tother[key] == None:
+					setattr(device_delta, key, tself[key])
+				
 		
 		common = ""
-		if 'platform' in dict['common']:
+		if 'platform' in dict['common_keys']:
 			if self.platform != "avr":
 				common += self.platform
-		if 'family' in dict['common']:
+		if 'family' in dict['common_keys']:
 			common += self.family
-		if 'name' in dict['common']:
+		if 'name' in dict['common_keys']:
 			common += self.name
-		if 'type' in dict['common']:
+		if 'type' in dict['common_keys'] and self.type != None:
 			common += self.type
-		dict['string'] = common
+		device.string = common;
+		dict['device'] = device
+		dict['device_delta'] = device_delta
 		return dict
 
+	def __repr__(self):
+		return "DeviceString(" + self.__str__() + ")"
+
 	def __str__(self):
-		s = self.platform + " " + self.family + " " + self.name
-		if self.type != None:
-			s += " " + self.type
-		if self.pin_id != None:
-			s += " " + self.pin_id
-		return s
+		target = self.getTargetDict()['target']
+		target = {o:target[o] for o in target if target[o] != None}
+		return str(target)
