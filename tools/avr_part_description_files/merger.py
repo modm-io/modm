@@ -94,6 +94,7 @@ class DeviceMerger:
 						matches.append(dev)
 			
 			for match in matches:
+				devs.remove(match)
 				current = self._mergeTwoDevices(current, match)
 
 		return devices
@@ -105,7 +106,9 @@ class DeviceMerger:
 		self.log.info("Merging " + one.properties['device'].string + " and " + two.properties['device'].string)
 		
 		diff = DictDiffer(one.properties, two.properties)
-		self.log.debug("Differences: " + str(diff.changed()))
+		# self.log.debug("Differences: " + str(diff.changed()))
+		for key in diff.changed():
+			self.log.debug("'" + key + "' differs:\n" + str(one.properties[key]) + "\n" + str(two.properties[key]))
 		# self.log.debug("Similarities: " + str(diff.unchanged()))
 		
 		return one
@@ -129,6 +132,20 @@ class DictDiffer(object):
 				set(d.keys()) for d in (current_dict, past_dict)
 			]
 		self.intersect = self.current_keys.intersection(self.past_keys)
+		
+		self.change = set()
+		for o in self.intersect:
+			if isinstance(self.past_dict[o], list):
+				same = True
+				for item in self.past_dict[o]:
+					if item not in self.current_dict[o]:
+						same = False
+				if same == False:
+					self.change.add(o)
+			else:
+				if self.past_dict[o] != self.current_dict[o]:
+					self.change.add(o)
+		self.unchange = self.intersect - self.change
 
 	def added(self):
 		return self.current_keys - self.intersect
@@ -137,9 +154,7 @@ class DictDiffer(object):
 		return self.past_keys - self.intersect
 
 	def changed(self):
-		return set(o for o in self.intersect
-					if self.past_dict[o] != self.current_dict[o])
+		return self.change
 
 	def unchanged(self):
-		return set(o for o in self.intersect
-					if self.past_dict[o] == self.current_dict[o])
+		return self.unchange

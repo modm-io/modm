@@ -186,3 +186,7 @@ class DeviceString:
 		dic['target']['size_id'] = self.size_id
 		dic['target']['string'] = self.string
 		return dic
+
+	def __str__(self):
+		s = self.string
+		return s
