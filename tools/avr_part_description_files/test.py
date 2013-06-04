@@ -29,7 +29,8 @@
 # -----------------------------------------------------------------------------
 
 import os, sys
-from device import PartDescriptionFile
+from device import AVRDevice
+from parser import PartDescriptionFile
 from merger import DeviceMerger
 import glob
 # add python module logger to path
@@ -46,11 +47,11 @@ if __name__ == "__main__":
 	files = glob.glob(xml_path)
 	devices = []
 	for file in files:
-		devices.append(PartDescriptionFile(file, logger))
+		props = PartDescriptionFile(file, logger)
+		devices.append(AVRDevice(props.properties, logger))
 	
 	logger.setLogLevel('debug')
 	
 	merger = DeviceMerger(devices, logger)
-	
 	
 

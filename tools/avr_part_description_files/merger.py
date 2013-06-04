@@ -63,9 +63,7 @@ class DeviceMerger:
 			self.log = logger
 		
 		merged = self._mergeDevicesByName(self.devices)
-		for dev in merged:
-			pass
-#			print dev.name
+		self.merged_devices = merged
 
 
 	def _mergeDevicesByName(self, devices):
@@ -95,66 +93,13 @@ class DeviceMerger:
 			
 			for match in matches:
 				devs.remove(match)
-				current = self._mergeTwoDevices(current, match)
+				current = current.getMergedDevice(match)
+			
+			merged.append(current)
+			self.log.debug("Resulting device: " + str(current))
 
-		return devices
-
-	def _mergeTwoDevices(self, one, two):
-		"""
-		Merges the values of both devices and add a dictionary of differences
-		"""
-		self.log.info("Merging " + one.properties['device'].string + " and " + two.properties['device'].string)
-		
-		diff = DictDiffer(one.properties, two.properties)
-		# self.log.debug("Differences: " + str(diff.changed()))
-		for key in diff.changed():
-			self.log.debug("'" + key + "' differs:\n" + str(one.properties[key]) + "\n" + str(two.properties[key]))
-		# self.log.debug("Similarities: " + str(diff.unchanged()))
-		
-		return one
+		return merged
 	
 #	def __str__(self):
 #		return ""
 
-
-
-class DictDiffer(object):
-	"""
-	Calculate the difference between two dictionaries as:
-	(1) items added
-	(2) items removed
-	(3) keys same in both but changed values
-	(4) keys same in both and unchanged values
-	"""
-	def __init__(self, current_dict, past_dict):
-		self.current_dict, self.past_dict = current_dict, past_dict
-		self.current_keys, self.past_keys = [
-				set(d.keys()) for d in (current_dict, past_dict)
-			]
-		self.intersect = self.current_keys.intersection(self.past_keys)
-		
-		self.change = set()
-		for o in self.intersect:
-			if isinstance(self.past_dict[o], list):
-				same = True
-				for item in self.past_dict[o]:
-					if item not in self.current_dict[o]:
-						same = False
-				if same == False:
-					self.change.add(o)
-			else:
-				if self.past_dict[o] != self.current_dict[o]:
-					self.change.add(o)
-		self.unchange = self.intersect - self.change
-
-	def added(self):
-		return self.current_keys - self.intersect
-
-	def removed(self):
-		return self.past_keys - self.intersect
-
-	def changed(self):
-		return self.change
-
-	def unchanged(self):
-		return self.unchange
