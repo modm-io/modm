@@ -32,6 +32,7 @@ import xml.etree.ElementTree as et
 import xml.parsers.expat
 from string import Template
 from parser_exception import ParserException
+from parser import PartDescriptionFile
 
 # add python module logger to path
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'logger'))
@@ -45,18 +46,21 @@ class AVRDevice:
 	Represents a device.
 	"""
 
-	def __init__(self, properties=None, logger=None):
+	def __init__(self, description_file=None, logger=None):
 		if logger == None:
 			self.log = Logger()
 		else:
 			self.log = logger
 		
-		if properties == None:
+		if description_file == None:
 			self.properties = {}
 			self.properties['similar'] = []
 			return
 		
-		self.properties = dict(properties)
+		if isinstance(description_file, PartDescriptionFile):
+			self.properties = dict(description_file.properties)
+		else:
+			self.properties = dict(description_file)
 		self.properties['similar'] = []
 
 		# if flash or ram is missing, it is a bad thing and unsupported

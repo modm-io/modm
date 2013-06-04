@@ -48,7 +48,7 @@ if __name__ == "__main__":
 	devices = []
 	for file in files:
 		props = PartDescriptionFile(file, logger)
-		devices.append(AVRDevice(props.properties, logger))
+		devices.append(AVRDevice(props, logger))
 	
 	logger.setLogLevel('debug')
 	

@@ -95,6 +95,8 @@ class DeviceMerger:
 				devs.remove(match)
 				current = current.getMergedDevice(match)
 			
+			if len(matches) == 0:
+				self.log.info("Singlular device: " + current.properties['device'].string)
 			merged.append(current)
 			self.log.debug("Resulting device: " + str(current))
 
