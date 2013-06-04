@@ -40,47 +40,24 @@ from logger import Logger
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'device_files'))
 from device_element import DeviceString
 
-class PartDescriptionFile:
-	""" PartDescriptionFile
-	Represents a device in xml format.
+class AVRDevice:
+	""" AVRDevice
+	Represents a device.
 	"""
 
-	def __init__(self, xml_file, logger=None):
-		node = self._openDeviceXML(xml_file)
-		
+	def __init__(self, properties=None, logger=None):
 		if logger == None:
 			self.log = Logger()
 		else:
 			self.log = logger
-
-		self.properties = {}
-
-		self.device = node.findall('devices')[0][0]
-		self.name = self.device.get('name').lower()
-		self.architecture = self.device.get('architecture').lower()
-		self.family = self.device.get('family').lower()
 		
-		self.properties['device'] = DeviceString(self.name)
-
-		self.log.info("Parsing AVR PDF: " + self.architecture + " " + self.name)
-
-		if (self.architecture != 'avr8' and self.architecture != 'avr8l'):
-			self.log.error("Only ATtiny, ATmega and AT90 targets can correctly be parsed...")
-			return None
-
-		# find the values for flash, ram and (optional) eeprom
-		for memory_segment in self.device.iter('memory-segment'):
-			name = memory_segment.get('name')
-			size = int(memory_segment.get('size'), 16)
-			if name == 'FLASH' or name == 'APP_SECTION':
-				self.properties['flash'] = size
-				self.log.debug("FLASH: " + str(size))
-			elif name == 'IRAM' or name == 'SRAM' or name == 'INTERNAL_SRAM':
-				self.properties['ram'] = size
-				self.log.debug("RAM: " + str(size))
-			elif name == 'EEPROM':
-				self.properties['eeprom'] = size
-				self.log.debug("EEPROM: " + str(size))
+		if properties == None:
+			self.properties = {}
+			self.properties['similar'] = []
+			return
+		
+		self.properties = dict(properties)
+		self.properties['similar'] = []
 
 		# if flash or ram is missing, it is a bad thing and unsupported
 		if 'flash' not in self.properties:
@@ -91,75 +68,82 @@ class PartDescriptionFile:
 			self.log.error("XPCC does not support Assembler-only programming!")
 			return None
 		# eeprom is optional on AVR and not available on ARM devices
-		if 'eeprom' not in self.properties and 'AVR' in self.architecture:
+		if 'eeprom' not in self.properties and 'avr' == self.properties['device'].platform:
 			self.log.warn("No EEPROM found")
 
-		modules = node.findall('modules')[0]
-		self.properties['gpios'] = gpios = []
-		self.properties['modules'] = []
-		# these modules are either too complicated or too special to bother with
-		ignore_modules = ['LOCKBIT', 'FUSE', 'EEPROM', 'CPU', 'WATCHDOG', 'BOOT_LOAD', 'PLL', 'USB_DEVICE', 'PS2']
 
-		for module in modules.iter('module'):
-			name = module.get('name')
-			if name not in ignore_modules:
-				self.properties['modules'].append(name)
-			# parse the GPIOs
-			if "PORT" in name:
-				gpio = self._gpioFromModuleNode(module)
-				if gpio == None:
-					self.log.warn("No GPIO found for " + name)
+	def getComparisonDict(self, other):
+		current_dict, past_dict = self.properties, other.properties
+		current_keys, past_keys = [
+				set(d.keys()) for d in (current_dict, past_dict)
+			]
+		intersect = current_keys.intersection(past_keys)
+
+		changed = set()
+		for o in intersect:
+			if isinstance(past_dict[o], list):
+				same = True
+				for item in past_dict[o]:
+					if item not in current_dict[o]:
+						same = False
+				if same == False:
+					changed.add(o)
+			else:
+				if past_dict[o] != current_dict[o]:
+					changed.add(o)
+		unchanged = intersect - changed
+		return {'changed': changed, 'unchanged': unchanged}
+
+
+	def getMergedDevice(self, other):
+		"""
+		Merges the values of both devices and add a dictionary of differences
+		"""
+		self.log.info("Merging " + self.properties['device'].string + " and " + other.properties['device'].string)
+
+		# calculate the difference
+		diff = self.getComparisonDict(other)
+		# they are the same device
+		if len(diff['changed']) == 0:
+			return self
+
+		comparison = self.properties['device'].getComparisonDict(other.properties['device'])
+		self.log.debug("'device' differs: " + str(comparison['different_keys']) + " " + comparison['device'].string)
+		
+		# build a new AVRDevice
+		device = AVRDevice(None, self.log)
+		device.properties['device'] = comparison['device']
+		delta = AVRDevice(None, self.log)
+		delta.properties['device'] = comparison['device_delta']
+		
+		for key in diff['unchanged']:
+			device.properties[key] = self.properties[key]
+		
+		for key in diff['changed']:
+			value1 = self.properties[key]
+			value2 = other.properties[key]
+			if key != 'device':
+				self.log.debug("'" + key + "' differs:\n" + str(value1) + "\n" + str(value2))
+				if isinstance(value1, list):
+					common = list(set(value1).intersection(value2))
+					oneMtwo = list(set(value1).difference(value2))
+					twoMone = list(set(value2).difference(value1))
+					# add the common to the device
+					device.properties[key] = common
+					delta.properties[key] = twoMone
 				else:
-					gpios.append(gpio);
-					self.log.debug("GPIOs: " + str(gpio))
+					device.properties[key] = value1
+					delta.properties[key] = value2
+		
+		device.properties['similar'].append(delta)
+		
+		return device
 
-
-	def _openDeviceXML(self, filename):
-		try:
-			# parse the xml-file
-			xmltree = et.parse(filename).getroot()
-		except OSError as e:
-			raise ParserException(e)
-		except (xml.parsers.expat.ExpatError, xml.etree.ElementTree.ParseError) as e:
-			raise ParserException("while parsing xml-file '%s': %s" % (filename, e))
-		return xmltree
-
-
-	def _gpioFromModuleNode(self, node):
-		"""
-		This tries to get information about available pins in a port and
-		returns a dictionary containing the port name and available pins
-		as a bit mask.
-		"""
-		name = node.get('name')
-		port = name[4:5]
-		for c in node.iter('register'):
-			if name == c.get('name'): 
-				mask = self._maskFromRegisterNode(c)
-				return {'port': port, 'mask': mask}
-		return None
-
-
-	def _maskFromRegisterNode(self, node):
-		"""
-		This tries to get the mask of pins available for a given port.
-		Sometimes, instead of a mask several bitfields are given, which are
-		then merged together.
-		"""
-		mask = node.get('mask')
-		if mask == None:
-			mask = 0
-			for c in node.iter('bitfield'):
-				field = c.get('mask')
-				if field != None:
-					field = int(field, 16)
-					mask |= field
-		else:
-			mask = int(mask, 16)
-		return mask
+	def __repr__(self):
+		return "AVRDevice(" + self.__str__() + ")"
 
 	def __str__(self):
-		s  = "Architecture: " + self.architecture + "\n"
-		s += "Family: " + self.family + "\n"
-		s += "Name: " + self.name
-		return s
+		s = "["
+		for key in self.properties:
+			s += "{'" + key + "': '" + str(self.properties[key]) + "'}, \n"
+		return s + "]"
