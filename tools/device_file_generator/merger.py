@@ -128,7 +128,7 @@ class DeviceMerger:
 			if len(matches) == 0:
 				self.log.info("ByName: no match for device: " + current.properties['device'].string)
 			
-			self.log.debug("ByName: Resulting device: " + str(current))
+			self.log.debug("ByName:\n\nResulting device: " + str(current))
 			merged.append(current)
 		
 		return merged
@@ -186,7 +186,7 @@ class DeviceMerger:
 			if len(matches) == 0:
 				self.log.info("ByType: No match for device: " + current.properties['device'].string)
 			
-			self.log.debug("ByType: Resulting device: " + str(current))
+			self.log.debug("ByType:\n\nResulting device: " + str(current))
 			merged.append(current)
 		
 		return merged

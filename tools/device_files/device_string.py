@@ -105,8 +105,15 @@ class DeviceString:
 		dict['type'] = self.type
 		dict['pin_id'] = self.pin_id
 		dict['size_id'] = self.size_id
-		dict['mmcu'] = self.mmcu
 		return {'target': dict}
+	
+	def isEmpty(self):
+		empty = True
+		target = self.getTargetDict()['target']
+		for key in target:
+			if target[key] != None:
+				empty = False
+		return empty
 	
 	def getComparisonDict(self, other):
 		"""
@@ -134,6 +141,8 @@ class DeviceString:
 				dict['different_keys'].append(key)
 				setattr(other_delta, key, tother[key])
 				setattr(self_delta, key, tself[key])
+				self_delta.valid = True
+				other_delta.valid = True
 		
 		string = ""
 		if 'platform' in dict['common_keys']:

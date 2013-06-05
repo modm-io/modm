@@ -171,11 +171,22 @@ class Device:
 			self_child.properties[key] = self.properties[key]
 		for key in diff['other-only']:
 			other_child.properties[key] = other.properties[key]
-
-		parent.properties['instances'].append(self_child)
-		parent.properties['instances'].append(other_child)
+		
+		parent.addInstance(self_child)
+		parent.addInstance(other_child)
 		
 		return parent
+	
+	def addInstance(self, device):
+		if device.properties['device'].isEmpty() and len(device.properties) <= 2:
+			# do not add an empty device
+			if len(device.properties['instances']) == 0:
+				return
+			
+			self.properties['instances'].extend(device.properties['instances'])
+		else:
+			self.properties['instances'].append(device)
+		
 
 	def getAttributeRecursive(self, attr):
 		# the device can already be merged!
