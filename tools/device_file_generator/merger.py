@@ -91,31 +91,44 @@ class DeviceMerger:
 			current = devs[0]
 			devs.remove(current)
 			
-			props = current.properties['device']
-			if props.valid == False:
-				continue
-			
 			matches = []
+			size_id = current.getAttributeRecursive('size_id')
 			
-			if props.size_id != None:
-				family = props.name[len(props.size_id):] 
-				self.log.debug("MergeByNameAVR: Searching for device ending in '" + family + "'")
-				for dev in devs:
-					dprops = dev.properties['device']
-					if dprops.size_id == None:
-						continue
-					dfamily = dprops.name[len(props.size_id):] 
-					if dfamily == family and props.type == dprops.type:
-						matches.append(dev)
+			if size_id != None:
+				name = current.getAttributeRecursive('name')
+				type = current.getAttributeRecursive('type')
+				family = name[len(size_id):]
+				
+				if not (family == "" and type == None):
+					type = self._getCategoryTypeAVR(current)
+					
+					string = "ByName: Searching for device ending in '" + family + "' and '" + str(type)
+					self.log.info(string + "'")
+					
+					for dev in devs:
+						dname = dev.getAttributeRecursive('name')
+						dsize_id = dev.getAttributeRecursive('size_id')
+						
+						# if they do not have a size-id they are probably unmergable
+						if dsize_id == None:
+							continue
+						dfamily = dname[len(dsize_id):]
+						
+						# perpare for type comparison
+						# we should only merge when the family is the same,
+						# and if the type is the same
+						
+						if dfamily == family and dev.getAttributeRecursive('type') in type:
+							matches.append(dev)
 				
 				for match in matches:
 					devs.remove(match)
 					current = current.getMergedDevice(match)
 			
 			if len(matches) == 0:
-				self.log.info("MergeByNameAVR: no match for device: " + current.properties['device'].string)
+				self.log.info("ByName: no match for device: " + current.properties['device'].string)
 			
-			self.log.debug("MergeByNameAVR: Resulting device: " + str(current))
+			self.log.debug("ByName: Resulting device: " + str(current))
 			merged.append(current)
 		
 		return merged
@@ -157,7 +170,10 @@ class DeviceMerger:
 				continue
 			
 			matches = []
-			suffix = [None, 'p', 'a', 'pa']
+			suffix = self._getCategoryTypeAVR(current)
+			
+			self.log.info("ByType: Searching for device ending in " + str(suffix)) 
+			
 			for dev in devs:
 				if dev.properties['device'].name == props.name:
 					if dev.properties['device'].type in suffix:
@@ -168,10 +184,31 @@ class DeviceMerger:
 				current = current.getMergedDevice(match)
 			
 			if len(matches) == 0:
-				self.log.info("MergeByTypeAVR: No match for device: " + current.properties['device'].string)
+				self.log.info("ByType: No match for device: " + current.properties['device'].string)
 			
-			self.log.debug("MergeByTypeAVR: Resulting device: " + str(current))
+			self.log.debug("ByType: Resulting device: " + str(current))
 			merged.append(current)
 		
 		return merged
 
+
+	def _getCategoryTypeAVR(self, device):
+		type = device.getAttributeRecursive('type')
+		# these are the categories of mergable types
+		cat1 = [None, 'p', 'a', 'pa']
+		cat2 = ['rfa1', 'rfa2', 'rfr1', 'rfr2']
+		cat3 = ['hva', 'hvb', 'hve2', 'hvbrevb']
+		cat4 = ['u2', 'u4', 'u6']
+		cat5 = ['m1', 'c1']
+		# make sure that only one category is used!
+		if type in cat2:
+			cat = cat2
+		elif type in cat3:
+			cat = cat3
+		elif type in cat4:
+			cat = cat4
+		elif type in cat5:
+			cat = cat5
+		else:
+			cat = cat1
+		return cat
