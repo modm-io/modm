@@ -108,36 +108,47 @@ class Device:
 			return self
 
 		comparison = self.properties['device'].getComparisonDict(other.properties['device'])
-		self.log.debug("'device' differs: " + str(comparison['different_keys']) + " " + comparison['device'].string)
+		self.log.debug("'device' differs: " + str(comparison['different_keys']) + " " + comparison['common'].string)
 		
 		# build a new parent Device, with all the common features
 		parent = Device(None, self.log)
-		parent.properties['device'] = comparison['device']
+		parent.properties['device'] = comparison['common']
 		
-		# build a new child Device, with only the delta information
-		child1 = Device(None, self.log)
-		child1.properties['device'] = comparison['device_delta']
+		# build two new child Devices, with only the delta information
+		self_child = Device(None, self.log)
+		self_child.properties['device'] = comparison['self_delta']
+		other_child = Device(None, self.log)
+		other_child.properties['device'] = comparison['other_delta']
 		
 		for key in diff['unchanged']:
 			parent.properties[key] = self.properties[key]
 		
 		for key in diff['changed']:
-			value1 = self.properties[key]
-			value2 = other.properties[key]
+			self_value = self.properties[key]
+			other_value = other.properties[key]
 			if key != 'device':
-				self.log.debug("'" + key + "' differs:\n" + str(value1) + "\n" + str(value2))
-				if isinstance(value1, list):
-					common = list(set(value1).intersection(value2))
-					oneMtwo = list(set(value1).difference(value2))
-					twoMone = list(set(value2).difference(value1))
+				self.log.debug("'" + key + "' differs:\n" + str(self_value) + "\n" + str(other_value))
+				# for lists we want the difference sets in the children devices
+				# and the common set in the parent device
+				# This code assumes, that both devices have the same dictionary structure!
+				if isinstance(self_value, list):
+					common = list(set(self_value).intersection(other_value))
+					self_minus_other = list(set(self_value).difference(other_value))
+					other_minus_self = list(set(other_value).difference(self_value))
 					# add the common to the parent
-					parent.properties[key] = common
-					child1.properties[key] = twoMone
+					if len(common) > 0:
+						parent.properties[key] = common
+					# and the differences to the children
+					if len(self_minus_other) > 0:
+						self_child.properties[key] = self_minus_other
+					if len(other_minus_self) > 0:
+						other_child.properties[key] = other_minus_self
 				else:
-					parent.properties[key] = value1
-					child1.properties[key] = value2
+					self_child.properties[key] = self_value
+					other_child.properties[key] = other_value
 		
-		parent.properties['instances'].append(child1)
+		parent.properties['instances'].append(self_child)
+		parent.properties['instances'].append(other_child)
 		
 		return parent
 

@@ -32,117 +32,126 @@
 import re
 
 class DeviceString:
-    """ DeviceString
-    A class to parse a device string, e.g. "stm32f407vg".
-    TODO: Add parsing capabilities for atmel (i.e. avr, xmega, avr32) as
-    well as lpc controllers
-    """
+	""" DeviceString
+	A class to parse a device string, e.g. "stm32f407vg".
+	TODO: Add parsing capabilities for atmel (i.e. avr, xmega, avr32) as
+	well as lpc controllers
+	"""
 
-    def __init__(self, string=None):
-        self.string = string
-        # default for properties is None
-        self.platform = None # e.g. stm32, avr
-        self.family   = None # e.g.    f4, atmega
-        self.name     = None # e.g.   405, 16
-        self.type     = None # e.g. -----, m1
-        self.pin_id   = None # e.g.     r, -----
-        self.size_id  = None # e.g.     g, 16
-        self.valid = False
-        
-        if string == None:
-            return
-        
-        # try to determine platform and to parse string accordingly
-        if string.startswith('stm32f'):
-            self.platform = "stm32"
-            self.family = string[5:7]
-            self.name = string[6:9]
-            if len(string) >= 10:
-                self.pin_id = string[9]
-            if len(string) >= 11:
-                self.size_id = string[10]
-            if len(string) >= 9:
-                self.valid = True
+	def __init__(self, string=None):
+		self.string = string
+		# default for properties is None
+		self.platform = None # e.g. stm32, avr
+		self.family   = None # e.g.	f4, atmega
+		self.name	 = None # e.g.   405, 16
+		self.type	 = None # e.g. -----, m1
+		self.pin_id   = None # e.g.	 r, -----
+		self.size_id  = None # e.g.	 g, 16
+		self.valid = False
+		
+		if string == None:
+			return
+		
+		# try to determine platform and to parse string accordingly
+		if string.startswith('stm32f'):
+			self.platform = "stm32"
+			self.family = string[5:7]
+			self.name = string[6:9]
+			if len(string) >= 10:
+				self.pin_id = string[9]
+			if len(string) >= 11:
+				self.size_id = string[10]
+			if len(string) >= 9:
+				self.valid = True
 
-        # AVR platform with ATmega and ATxmega family
-        elif string.startswith('at'):
-            self.platform = "avr"
-            match = re.search("(?P<family>attiny|atmega|atxmega)(?P<name>\d+)", string)
-            if match:
-                self.family = match.group('family')
-                self.name = match.group('name')
+		# AVR platform with ATmega and ATxmega family
+		elif string.startswith('at'):
+			self.platform = "avr"
+			match = re.search("(?P<family>attiny|atmega|atxmega)(?P<name>\d+)", string)
+			if match:
+				self.family = match.group('family')
+				self.name = match.group('name')
 
-                if self.family == "atmega" or self.family == "attiny":
-                    match = re.search(self.family + self.name + "(?P<type>\w*)-?(?P<package>\w*)", string)
-                    if match.group('type') != '':
-                        self.type = match.group('type').lower()
-                    if match.group('package') != '':
-                        self.pin_id = match.group('package').lower()
-                    match = re.search("(?P<size>4|8|16|32|64|128|256)\d*", self.name)
-                    if match:
-                        self.size_id = match.group('size')
+				if self.family == "atmega" or self.family == "attiny":
+					match = re.search(self.family + self.name + "(?P<type>\w*)-?(?P<package>\w*)", string)
+					if match.group('type') != '':
+						self.type = match.group('type').lower()
+					if match.group('package') != '':
+						self.pin_id = match.group('package').lower()
+					match = re.search("(?P<size>4|8|16|32|64|128|256)\d*", self.name)
+					if match:
+						self.size_id = match.group('size')
 
-                elif self.family == "atxmega":
-                    match = re.search(self.family + self.name + "(?P<type>[A-Ea-e])(?P<package>[1-4])(?P<usb>[Bb][Uu])", string)
-                    if match.group('type') != '':
-                        self.type = match.group('type').lower()
-                    if match.group('package') != '':
-                        self.pin_id = match.group('package').lower()
-                self.valid = True
-            
-        else:
-            raise ParserException("Parse Error: unknown platform. Device string: %" % (string))
+				elif self.family == "atxmega":
+					match = re.search(self.family + self.name + "(?P<type>[A-Ea-e])(?P<package>[1-4])(?P<usb>[Bb][Uu])", string)
+					if match.group('type') != '':
+						self.type = match.group('type').lower()
+					if match.group('package') != '':
+						self.pin_id = match.group('package').lower()
+				self.valid = True
+			
+		else:
+			raise ParserException("Parse Error: unknown platform. Device string: %" % (string))
 
-    def getTargetDict(self):
-        dict = {'target': {}}
-        dict['target']['platform'] = self.platform
-        dict['target']['family'] = self.family
-        dict['target']['name'] = self.name
-        dict['target']['type'] = self.type
-        dict['target']['pin_id'] = self.pin_id
-        dict['target']['size_id'] = self.size_id
-        dict['target']['string'] = self.string
-        return dict
-    
-    def getComparisonDict(self, other):
-        if not isinstance(other, DeviceString):
-            return None
-        tself = self.getTargetDict()['target']
-        tother = other.getTargetDict()['target']
-        dict = {'common_keys': [], 'different_keys': []}
-        device = DeviceString()
-        device_delta = DeviceString()
-        
-        for key in tself:
-            if tself[key] == tother[key]:
-                dict['common_keys'].append(key)
-                setattr(device, key, tself[key])
-            else:
-                dict['different_keys'].append(key)
-                if tself[key] == None:
-                    setattr(device_delta, key, tother[key])
-                if tother[key] == None:
-                    setattr(device_delta, key, tself[key])
-        
-        common = ""
-        if 'platform' in dict['common_keys']:
-            if self.platform != "avr":
-                common += self.platform
-        if 'family' in dict['common_keys']:
-            common += self.family
-        if 'name' in dict['common_keys']:
-            common += self.name
-        if 'type' in dict['common_keys'] and self.type != None:
-            common += self.type
-        device.string = common;
-        dict['device'] = device
-        dict['device_delta'] = device_delta
-        return dict
+	def getTargetDict(self):
+		dict = {}
+		dict['platform'] = self.platform
+		dict['family'] = self.family
+		dict['name'] = self.name
+		dict['type'] = self.type
+		dict['pin_id'] = self.pin_id
+		dict['size_id'] = self.size_id
+		dict['string'] = self.string
+		return {'target': dict}
+	
+	def getComparisonDict(self, other):
+		"""
+		This method compares its own properties with the other class and
+		generates three new Devices: a common Device with the common
+		properties of both, and two children devices _only_ with the differences.
+		Additionally, a common string in generated. 
+		"""
+		if not isinstance(other, DeviceString):
+			return None
+		
+		tself = self.getTargetDict()['target']
+		tother = other.getTargetDict()['target']
+		dict = {'common_keys': [], 'different_keys': []}
+		
+		common = DeviceString()
+		self_delta = DeviceString()
+		other_delta = DeviceString()
+		
+		for key in tself:
+			if tself[key] == tother[key]:
+				dict['common_keys'].append(key)
+				setattr(common, key, tself[key])
+			else:
+				dict['different_keys'].append(key)
+				setattr(other_delta, key, tother[key])
+				setattr(self_delta, key, tself[key])
+		
+		string = ""
+		if 'platform' in dict['common_keys']:
+			if self.platform != "avr":
+				string += self.platform
+		if 'family' in dict['common_keys']:
+			string += self.family
+		if 'name' in dict['common_keys']:
+			string += self.name
+		if 'type' in dict['common_keys'] and self.type != None:
+			string += self.type
+		common.string = string;
+		
+		dict['common'] = common
+		dict['self_delta'] = self_delta
+		dict['other_delta'] = other_delta
+		return dict
 
-    def __repr__(self):
-        return "DeviceString(" + self.__str__() + ")"
+	def __repr__(self):
+		return "DeviceString(" + self.__str__() + ")"
 
-    def __str__(self):
-        target = self.getTargetDict()['target']
-        target = {o:target[o] for o in target if target[o] != None}
-        return str(target)
+	def __str__(self):
+		target = self.getTargetDict()['target']
+		target = {o:target[o] for o in target if target[o] != None}
+		return str(target)
