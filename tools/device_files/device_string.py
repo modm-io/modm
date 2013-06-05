@@ -154,9 +154,9 @@ class DeviceString:
 		return dict
 
 	def __repr__(self):
-		return "DeviceString(" + self.__str__() + ")"
+		return self.__str__()
 
 	def __str__(self):
 		target = self.getTargetDict()['target']
 		target = {o:target[o] for o in target if target[o] != None}
-		return str(target)
+		return "DeviceString(" + str(target) + ")"
