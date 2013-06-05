@@ -58,6 +58,7 @@ class DeviceFile:
 		self.platform = node.get('platform')
 		self.family = node.get('family')
 		self.names = node.get('name').split('|')
+		self.core = node.get('core')
 
 		self.properties = []
 		self.drivers = []
@@ -122,6 +123,11 @@ class DeviceFile:
 		self.log.info("Found %s Drivers" % len(self.drivers))
 		# Checks for all Platforms
 
+		# Check Core
+		cores = ['cortex-m0', 'cortex-m3', 'cortex-m4', 'avr']
+		if self.core not in cores:
+			self.log.error("Unknown core '%s'. Supported cores are %s"
+				% (self.core, cores))
 		# Checks for STM32 Platform
 		if self.platform == 'stm32':
 			families = ['f0', 'f1', 'f2', 'f3', 'f4']
@@ -209,6 +215,7 @@ class DeviceFile:
 		for d in self.drivers:
 			if d.appliesTo(s, pin_count):
 				substitutions = s.getTargetDict()
+				substitutions['target']['core'] = self.core
 				substitutions.update(self.getSubstitutions())
 				drivers.append(d.toDict(platform_path, substitutions))
 		return drivers

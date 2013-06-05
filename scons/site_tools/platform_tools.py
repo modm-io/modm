@@ -163,10 +163,14 @@ def platform_tools_generate(env, architecture_path):
 
 ############## Template Tests #################################################
 # -----------------------------------------------------------------------------
-def test_item(dic, item_key, item_value):
-	if item_key not in dic or dic[item_key] != item_value:
+def test_item(dic, item_key, item_value, starts_with=False):
+	if item_key not in dic:
 		return False
-	return True
+	if starts_with and dic[item_key].startswith(item_value):
+		return True
+	if not starts_with and dic[item_key] == item_value:
+		return True
+	return False
 
 # -----------------------------------------------------------------------------
 ###################### Generate Platform Tools ################################
@@ -201,6 +205,23 @@ def generate(env, **kw):
 	def test_pin_id(target, pin_id):
 		return test_item(target, 'pin-id', pin_id)
 	env.AddTemplateJinja2Test('pin_id', test_pin_id)
+	def test_core(target, core, starts_with=False):
+		return test_item(target, 'core', core, starts_with)
+	env.AddTemplateJinja2Test('core', test_core)
+
+	# Core Tests
+	def test_cortex(target):
+		return test_core(target, 'cortex', True)
+	env.AddTemplateJinja2Test('cortex', test_cortex)
+	def test_cortex_m0(target):
+		return test_core(target, 'cortex_m0')
+	env.AddTemplateJinja2Test('cortex_m0', test_cortex_m0)
+	def test_cortex_m3(target):
+		return test_core(target, 'cortex_m3')
+	env.AddTemplateJinja2Test('cortex_m3', test_cortex_m3)
+	def test_cortex_m4(target):
+		return test_core(target, 'cortex_m4')
+	env.AddTemplateJinja2Test('cortex_m4', test_cortex_m4)
 
 	# Platform Tests
 	def test_is_stm32(target):

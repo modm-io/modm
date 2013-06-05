@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='UTF-8' ?>
 <!DOCTYPE rca SYSTEM "../devicefile.dtd">
 <rca version="1.0">
-	<device platform="avr" family="atmega" name="48|88|168|328">
+	<device platform="avr" family="atmega" name="48|88|168|328" core="avr8">
 		<!-- _flash_, _pin-count-, _define_, -core_ and _peripheral nodes
 		     accept pin-id/size-id properties if they only apply to a specific
 		     size/pin id

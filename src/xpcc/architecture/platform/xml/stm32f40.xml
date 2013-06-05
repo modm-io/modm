@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='UTF-8' ?>
 <!DOCTYPE rca SYSTEM "../devicefile.dtd">
 <rca version="1.0">
-	<device platform="stm32" family="f4" name="407|405"> <!-- FIXME: "name" does not sound quite right -->
+	<device platform="stm32" family="f4" name="407|405" core="cortex-m4"> <!-- FIXME: "name" does not sound quite right -->
 		<!-- _flash_, _pin-count-, _define_, -core_ and _peripheral nodes
 		     accept pin-id/size-id properties if they only apply to a specific
 		     size/pin id
@@ -35,11 +35,8 @@
 		<define>CORTEX_VECTORS_RAM = 0</define>
 		<define>CORTEX_ENABLE_HARD_FAULT_HANDLER = 0</define>
 		<define size-id="e">STM32F407XE</define> <!-- Defines can depend on pin/size ids-->
-		<!-- TODO: add linkerscript -->
 		<!-- Core Driver -->
-		<driver type="core" name="cortex">
-			<parameter name="allocator">newlib</parameter>
-		</driver>
+		<driver type="core" name="cortex-m3/generic"/> <!-- cortex-m3 driver works for cortex-m4 -->
 		<!-- Peripheral Drivers -->
 		<driver type="clock" name="stm32" /> <!-- the clock peripheral does not need the instances attribute because there is only one instance -->
 		<driver type="timer" name="stm32" instances="1,2,3,4,5,6,7,8" />
