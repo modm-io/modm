@@ -50,8 +50,7 @@ class Device:
 			self.log = logger
 		
 		if description_file == None:
-			self.properties = {}
-			self.properties['instances'] = []
+			self.properties = {'instances': []}
 			return
 		
 		# proper handling of Parsers
@@ -75,8 +74,8 @@ class Device:
 
 
 	def getComparisonDict(self, other):
-		self_keys, other_keys = [
-				set(d.keys()) for d in (self.properties, other.properties)]
+		self_keys = set(self.properties.keys())
+		other_keys = set(other.properties.keys())
 		intersect = self_keys.intersection(other_keys)
 
 		changed = set()
@@ -136,9 +135,24 @@ class Device:
 				# and the common set in the parent device
 				# This code assumes, that both devices have the same dictionary structure!
 				if isinstance(self_value, list):
-					common = list(set(self_value).intersection(other_value))
-					self_minus_other = list(set(self_value).difference(other_value))
-					other_minus_self = list(set(other_value).difference(self_value))
+					# if this is a list of dictionaries, we need to manually compare them
+					if isinstance(self_value[0], dict):
+						common = []
+						self_minus_other = []
+						other_minus_self = []
+						for sval in self_value:
+							if sval in other_value:
+								common.append(sval)
+								other_value.remove(sval)
+							else:
+								self_minus_other.append(sval)
+							self_value.remove(sval)
+						other_minus_self = list(other_value)
+					else:
+						common = list(set(self_value).intersection(other_value))
+						self_minus_other = list(set(self_value).difference(other_value))
+						other_minus_self = list(set(other_value).difference(self_value))
+						
 					# add the common to the parent
 					if len(common) > 0:
 						parent.properties[key] = common
@@ -163,10 +177,15 @@ class Device:
 		return parent
 
 	def __repr__(self):
-		return "Device(" + self.__str__() + ")"
+		return self.__str__()
 
 	def __str__(self):
-		s = "["
+		s = "Device("
+		length = len(self.properties)
+		i = 0
 		for key in self.properties:
-			s += "{'" + key + "': '" + str(self.properties[key]) + "'}, \n"
-		return s + "]"
+			s += "{'" + key + "': '" + str(self.properties[key]) + "'}"
+			if i < length-1:
+				s += ",\n"
+			i += 1
+		return s + ")"
