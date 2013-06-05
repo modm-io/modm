@@ -30,7 +30,7 @@
 
 import os, sys
 from device import Device
-from avr_parser import AVRPartDescriptionFile
+from avr_reader import AVRPartDescriptionFile
 from merger import DeviceMerger
 import glob
 # add python module logger to path

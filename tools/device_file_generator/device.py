@@ -28,7 +28,7 @@
 # -----------------------------------------------------------------------------
 
 
-from parser import XMLDeviceReader
+from reader import XMLDeviceReader
 
 import os, sys
 # add python module logger to path
