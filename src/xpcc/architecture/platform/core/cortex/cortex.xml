@@ -1,0 +1,16 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE rca SYSTEM "../../xml/driver.dtd">
+<rca version="1.0">
+	<driver type="core" name="cortex">
+		<parameter name="allocator" type="enum" values="newlib;block_allocator">
+			block_allocator
+		</parameter>
+		<template>startup.c.in</template>
+		<static>cxxabi.cpp</static>
+		<static>default_handler.sx</static>
+		<static>delay.sx</static>
+		<static>hard_fault_handler.cpp</static>
+		<static>hard_fault.sx</static>
+		<static>syscalls.cpp</static>
+	</driver>
+</rca>
