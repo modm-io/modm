@@ -79,17 +79,22 @@ class Device:
 		intersect = self_keys.intersection(other_keys)
 
 		changed = set()
+		unchanged = set()
 		for o in intersect:
 			if isinstance(other.properties[o], list):
 				same = True
 				for item in other.properties[o]:
 					if item not in self.properties[o]:
 						same = False
+				for item in self.properties[o]:
+					if item not in other.properties[o]:
+						same = False
 				if same == False:
 					changed.add(o)
 			else:
 				if other.properties[o] != self.properties[o]:
 					changed.add(o)
+		
 		unchanged = intersect - changed
 		self_only = self_keys - intersect
 		other_only = other_keys - intersect
@@ -104,8 +109,15 @@ class Device:
 
 		# calculate the difference
 		diff = self.getComparisonDict(other)
+		
+		self.log.debug("Changed: " + str(diff['changed']))
+		self.log.debug("Unchanged: " + str(diff['unchanged']))
+		self.log.debug("Self-only: " + str(diff['self-only']))
+		self.log.debug("Other-only: " + str(diff['other-only']))
+		
 		# they are the same device
 		if len(diff['changed']) == 0:
+			self.log.warn("Some device!")
 			return self
 
 		comparison = self.properties['device'].getComparisonDict(other.properties['device'])
