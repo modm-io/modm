@@ -280,6 +280,7 @@ class Driver(DeviceElementBase):
 		else:
 			self.path = os.path.join('peripheral', self.type)
 		self.path = os.path.join(self.path, os.sep.join(self.name.split('/')))
+		self.parameters = self._getParameters(node)
 		self.substitutions = self._getDriverSubstitutions(node)
 
 	def toDict(self, platform_path, substitutions):
@@ -295,6 +296,7 @@ class Driver(DeviceElementBase):
 		dic['type'] = self.type
 		dic['driver_file'] = self.getDriverFile(platform_path)
 		dic['path'] = self.path
+		dic['parameters'] = self.parameters
 		dic['substitutions'] = substitutions
 		dic['substitutions'].update(self.substitutions) # own substitutions overwrite
 		dic['instances'] = self.instances
@@ -350,6 +352,41 @@ class Driver(DeviceElementBase):
 				dic[child_name] = [] # create child list
 			dic[child_name].append(self._nodeToDict(c))
 		return dic
+
+	def _getParameters(self, node):
+		"""
+		Extracts all Parameter nodes from the driver
+		node.
+		"""
+		# Create Parameters Dictionary
+		parameters = {}
+		if len(node) <= 0: # if the node is childless
+			return parameters
+		# Loop through child nodes looking for parameters
+		for c in node:
+			if c.tag == 'parameter':
+				name = c.get('name')
+				instances = c.get('instances')
+				value = c.text
+				# Remove parameter node
+				node.remove(c)
+				if name == None:
+					self.log.error("Driver '%s'. Parameter needs a name."
+						% (self.name))
+				if value == None:
+					self.log.error("Driver '%s'. Parameter '%s' needs a value."
+						% (self.name, name))
+				if name in parameters:
+					self.log.error("Driver '%s'. Parameter '%s' connot be set mor than once!"
+						% (self.name, name))
+				if instances != None:
+					# because we need a different seperator for everything...
+					instances = instances.split(',')
+				else:
+					# Add Parameter to Dictionary
+					parameters[name] = [value, instances]
+		self.log.debug("Found Parameters: %s" % parameters)
+		return parameters
 
 	def _gpioCreateNibblePort(self, substitutions):
 		# a nibble is 4 bit, an octet is 8bit

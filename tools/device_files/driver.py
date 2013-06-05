@@ -41,13 +41,16 @@ from parser_exception import ParserException
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'logger'))
 from logger import Logger
 
-class DriverFile():
+
+class DriverFile:
 
 	def __init__(self, logger=None):
 		if logger == None:
 			self.log = Logger()
 		else:
 			self.log = logger
+		# Parameters that can be set by the user (e.g. in the project.cfg file)
+		self.user_parameters = {}
 
 	@classmethod
 	def fromDict(self, dic, logger=None):
@@ -63,6 +66,8 @@ class DriverFile():
 		d.type = dic['type']
 		d.filename = dic['driver_file']
 		d.path = dic['path']
+		# Parameters from the XML Device File
+		d.device_parameters = dic['parameters']
 		d.substitutions = dic['substitutions']
 		d.instances = dic['instances']
 		return d
@@ -116,12 +121,28 @@ class DriverFile():
 		return build
 
 	def _parseDriverXml(self, driver_node, instance_id, build_list):
+		# First parse parameters:
+		for node in driver_node:
+			if node.tag == 'parameter':
+				p = Parameter(node, self.log)
+				# 1.) search for user parameters
+				value = p.getValueFromParameterDict(self.user_parameters, instance_id)
+				# 2.) if none are found search for parameters in driver file
+				if value == None:
+					value = p.getValueFromParameterDict(self.device_parameters, instance_id)
+				# 3.) else use the default value
+				if value == None:
+					value = p.default
+				# 4.) add value found to the substitution dict
+				p.addValueToSubstitutions(self.substitutions, value)
+		# Then parse needed static/template files
 		for node in driver_node:
 			# Check if instance id fits:
 			if node.get('instances') != None and instance_id != None and instance_id != 'default':
 				if instance_id not in node.get('instances').split(','):
 					continue
 			if node.text == None or len(node.text) <= 0:
+				self.log.error("Error: Empty %s node in %s/%s driver xml." % (node.tag, self.type, self.name))
 				raise ParserException("Error: Empty %s node in %s/%s driver xml." % (node.tag, self.type, self.name))
 			if node.tag == 'static':
 				if node.text not in build_list: # if it has not been added before
@@ -148,6 +169,7 @@ class DriverFile():
 				else:
 					sub_instance_id = instance_id
 				substitutions = dict({'id': sub_instance_id}.items() + self.substitutions.items())
+				# self.log.debug("%s: substitutions: %s" % (template, substitutions))
 				template_file = [template, output, substitutions]
 				build_list.append(template_file) # always append template files since they will get a different id
 
@@ -173,3 +195,99 @@ class DriverFile():
 		path = os.sep.join(self.path.split(os.sep)[:(path_length-go_up)])
 		file_name = os.path.join(path, file_name)
 		return file_name
+
+
+class Parameter:
+	"""
+	This represents a Parameter that can be specified in a
+	XML Driver File
+	"""
+	TYPES = ['int', 'bool', 'enum']
+
+	def __init__(self, node, logger=None):
+		if logger == None:
+			self.log = Logger()
+		else:
+			self.log = logger
+
+		self.name = node.get('name')
+		self.type = node.get('type')
+		self.values = node.get('values')
+		self.instances = node.get('instances')
+		self.max = node.get('max')
+		self.min = node.get('min')
+		self.default = node.text
+
+		self._evaluate()
+
+	def getValueFromParameterDict(self, dic, instance_id):
+		if self.name in dic:
+			if dic[self.name][1] == None:
+				return dic[self.name][0]
+			elif instance_id != None and instance_id != 'default':
+				if instance_id in dic[self.name][1]:
+					return dic[self.name][0]
+		return None
+
+	def addValueToSubstitutions(self, sub_dict, value):
+		value = self.evaluateValue(value)
+		if value != None:
+			if 'parameters' not in sub_dict:
+				sub_dict['parameters'] = {}
+			sub_dict['parameters'][self.name] = value
+
+	def evaluateValue(self, value):
+		value = value.strip(' \t\n\r')
+		if self.type == 'int':
+			value = int(value)
+			if self.max != None and value > self.max:
+				self.log.error("Invalid value '%s' for %s. %s > Max(=%s)"
+					% (value, self.name, value, self.max))
+				return None
+			if self.min != None and value < self.min:
+				self.log.error("Invalid value '%s' for %s. %s < Min(=%s)"
+					% (value, self.name, value, self.min))
+				return None
+			return value
+		elif self.type == 'bool':
+			if value.lower == 'true' or value == '1':
+				return True
+			elif value.lower == 'false' or value == '0':
+				return False
+			self.log.error("Invalid value '%s' for %s." % (value, self.name))
+			return None
+		elif self.type == 'enum':
+			if value in self.values:
+				return value
+			else:
+				self.log.error("Invalid value '%s' for %s. Valid values are: %s"
+					% (value, self.name, self.values))
+				return None
+
+	def _evaluate(self):
+		if self.name == None:
+			self.log.error("<parameter> is missing the name attribute.")
+			return False
+		if self.type not in self.TYPES:
+			self.log.error("Parameter '%s' has invalid type '%s'."% (self.name, self.type))
+			self.log.info("Valid types are: %s" % str(self.TYPES))
+			return False
+		if self.type == 'int':
+			if self.max != None:
+				self.max = int(self.max)
+			if self.min != None:
+				self.min = int(self.min)
+		elif self.type == 'enum':
+			if self.values == None:
+				self.log.error("Parameter '%s': enums need a 'values' attribute that specifies valid values." % self.name)
+				return False
+			else:
+				self.values = self.values.split(';')
+		if self.instances != None:
+			self.instances = self.instances.split('|')
+		if self.default != None:
+			self.default = self.evaluateValue(self.default)
+			if self.default == None:
+				self.log.error("Parameter '%s': invalid default parameter (%s)." % (self.name, self.default))
+				return False
+		return True
