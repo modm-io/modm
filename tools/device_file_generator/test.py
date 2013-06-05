@@ -41,7 +41,7 @@ if __name__ == "__main__":
 	"""
 	Some test code
 	"""
-	logger = Logger('info')
+	logger = Logger('debug')
 	
 	xml_path = os.path.join(os.path.dirname(__file__), '..', '..', '..', 'AVR_devices', (sys.argv[1] + '*'))
 	files = glob.glob(xml_path)
@@ -50,7 +50,7 @@ if __name__ == "__main__":
 		props = AVRPartDescriptionFile(file, logger)
 		devices.append(Device(props, logger))
 	
-	logger.setLogLevel('debug')
+#	logger.setLogLevel('debug')
 	
 	merger = DeviceMerger(devices, logger)
 	
