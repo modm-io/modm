@@ -28,7 +28,7 @@
 # -----------------------------------------------------------------------------
 
 
-from parser import XMLDeviceParser
+from parser import XMLDeviceReader
 
 import os, sys
 # add python module logger to path
@@ -54,7 +54,7 @@ class Device:
 			return
 		
 		# proper handling of Parsers
-		if isinstance(description_file, XMLDeviceParser):
+		if isinstance(description_file, XMLDeviceReader):
 			self.properties = dict(description_file.properties)
 		else:
 			self.properties = dict(description_file)

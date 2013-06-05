@@ -28,7 +28,7 @@
 # -----------------------------------------------------------------------------
 
 import re
-from parser import XMLDeviceParser
+from parser import XMLDeviceReader
 
 import os, sys
 # add python module logger to path
@@ -38,13 +38,13 @@ from logger import Logger
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'device_files'))
 from device_string import DeviceString
 
-class AVRPartDescriptionFile(XMLDeviceParser):
+class AVRPartDescriptionFile(XMLDeviceReader):
 	""" AVRPartDescriptionFile
 	Represents a device in xml format.
 	"""
 
 	def __init__(self, file, logger=None):
-		XMLDeviceParser.__init__(self, file, logger)
+		XMLDeviceReader.__init__(self, file, logger)
 
 		device = self.node.findall('devices')[0][0]
 		self.name = device.get('name')

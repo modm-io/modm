@@ -36,8 +36,8 @@ import os, sys
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'logger'))
 from logger import Logger
 
-class XMLDeviceParser:
-	""" DeviceParser
+class XMLDeviceReader:
+	""" DeviceReader
 	Base class for all parsers for handling the opening of XML files etc...
 	"""
 
@@ -49,7 +49,7 @@ class XMLDeviceParser:
 		
 		self.file = path
 		self.node = self._openDeviceXML(self.file)
-		self.properties = {}
+		self.properties = {'instances': []}
 
 	def _openDeviceXML(self, filename):
 		self.log.debug("Parsing XML: " + os.path.basename(self.file))
@@ -63,7 +63,7 @@ class XMLDeviceParser:
 		return xmltree
 
 	def __repr__(self):
-		return "XMLDeviceParser(" + os.path.basename(self.file) + ")"
+		return self.__str__()
 
 	def __str__(self):
-		return "XMLParser: " + os.path.basename(self.file)
+		return "XMLDeviceParser(" + os.path.basename(self.file) + ")"
