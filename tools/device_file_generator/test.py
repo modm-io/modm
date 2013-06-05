@@ -43,15 +43,19 @@ if __name__ == "__main__":
 	"""
 	logger = Logger('info')
 	devices = []
+	level = 'info'
 	
 	for arg in sys.argv[1:]:
+		if arg in ['error', 'warn', 'info', 'debug', 'disable']:
+			level = arg
+			continue
 		xml_path = os.path.join(os.path.dirname(__file__), '..', '..', '..', 'AVR_devices', (arg + '*'))
 		files = glob.glob(xml_path)
 		for file in files:
 			part = AVRPartDescriptionFile(file, logger)
 			devices.append(Device(part, logger))
 	
-	logger.setLogLevel('debug')
+	logger.setLogLevel(level)
 	
 	merger = DeviceMerger(devices, logger)
 	
