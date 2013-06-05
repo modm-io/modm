@@ -136,7 +136,8 @@ class Device:
 				# This code assumes, that both devices have the same dictionary structure!
 				if isinstance(self_value, list):
 					# if this is a list of dictionaries, we need to manually compare them
-					if isinstance(self_value[0], dict):
+					if len(self_value) > 0 and isinstance(self_value[0], dict) or \
+						len(other_value) > 0 and isinstance(other_value[0], dict):
 						common = []
 						self_minus_other = []
 						other_minus_self = []
@@ -175,6 +176,15 @@ class Device:
 		parent.properties['instances'].append(other_child)
 		
 		return parent
+
+	def getAttributeRecursive(self, attr):
+		# the device can already be merged!
+		# so we need to take the instances into account
+		# we assume that every instance is in the same category
+		attribute = getattr(self.properties['device'], attr)
+		if attribute == None and len(self.properties['instances']) > 0:
+			attribute = getattr(self.properties['instances'][0].properties['device'], attr)
+		return attribute
 
 	def __repr__(self):
 		return self.__str__()
