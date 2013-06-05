@@ -38,8 +38,8 @@ from logger import Logger
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'device_files'))
 from device_element import DeviceString
 
-class AVRDevice:
-	""" AVRDevice
+class Device:
+	""" Device
 	Represents a device.
 	"""
 
@@ -51,14 +51,15 @@ class AVRDevice:
 		
 		if description_file == None:
 			self.properties = {}
-			self.properties['similar'] = []
+			self.properties['instances'] = []
 			return
 		
-		if isinstance(description_file, PartDescriptionFile):
+		# proper handling of Parsers
+		if isinstance(description_file, XMLDeviceParser):
 			self.properties = dict(description_file.properties)
 		else:
 			self.properties = dict(description_file)
-		self.properties['similar'] = []
+		self.properties['instances'] = []
 
 		# if flash or ram is missing, it is a bad thing and unsupported
 		if 'flash' not in self.properties:
@@ -74,23 +75,21 @@ class AVRDevice:
 
 
 	def getComparisonDict(self, other):
-		current_dict, past_dict = self.properties, other.properties
-		current_keys, past_keys = [
-				set(d.keys()) for d in (current_dict, past_dict)
-			]
-		intersect = current_keys.intersection(past_keys)
+		own_keys, other_keys = [
+				set(d.keys()) for d in (self.properties, other.properties)]
+		intersect = own_keys.intersection(other_keys)
 
 		changed = set()
 		for o in intersect:
-			if isinstance(past_dict[o], list):
+			if isinstance(other.properties[o], list):
 				same = True
-				for item in past_dict[o]:
-					if item not in current_dict[o]:
+				for item in other.properties[o]:
+					if item not in self.properties[o]:
 						same = False
 				if same == False:
 					changed.add(o)
 			else:
-				if past_dict[o] != current_dict[o]:
+				if other.properties[o] != self.properties[o]:
 					changed.add(o)
 		unchanged = intersect - changed
 		return {'changed': changed, 'unchanged': unchanged}
@@ -111,14 +110,16 @@ class AVRDevice:
 		comparison = self.properties['device'].getComparisonDict(other.properties['device'])
 		self.log.debug("'device' differs: " + str(comparison['different_keys']) + " " + comparison['device'].string)
 		
-		# build a new AVRDevice
-		device = AVRDevice(None, self.log)
-		device.properties['device'] = comparison['device']
-		delta = AVRDevice(None, self.log)
-		delta.properties['device'] = comparison['device_delta']
+		# build a new parent Device, with all the common features
+		parent = Device(None, self.log)
+		parent.properties['device'] = comparison['device']
+		
+		# build a new child Device, with only the delta information
+		child1 = Device(None, self.log)
+		child1.properties['device'] = comparison['device_delta']
 		
 		for key in diff['unchanged']:
-			device.properties[key] = self.properties[key]
+			parent.properties[key] = self.properties[key]
 		
 		for key in diff['changed']:
 			value1 = self.properties[key]
@@ -129,19 +130,19 @@ class AVRDevice:
 					common = list(set(value1).intersection(value2))
 					oneMtwo = list(set(value1).difference(value2))
 					twoMone = list(set(value2).difference(value1))
-					# add the common to the device
-					device.properties[key] = common
-					delta.properties[key] = twoMone
+					# add the common to the parent
+					parent.properties[key] = common
+					child1.properties[key] = twoMone
 				else:
-					device.properties[key] = value1
-					delta.properties[key] = value2
+					parent.properties[key] = value1
+					child1.properties[key] = value2
 		
-		device.properties['similar'].append(delta)
+		parent.properties['instances'].append(child1)
 		
-		return device
+		return parent
 
 	def __repr__(self):
-		return "AVRDevice(" + self.__str__() + ")"
+		return "Device(" + self.__str__() + ")"
 
 	def __str__(self):
 		s = "["

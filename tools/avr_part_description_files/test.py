@@ -29,7 +29,7 @@
 # -----------------------------------------------------------------------------
 
 import os, sys
-from device import AVRDevice
+from device import Device
 from avr_parser import AVRPartDescriptionFile
 from merger import DeviceMerger
 import glob
@@ -47,8 +47,8 @@ if __name__ == "__main__":
 	files = glob.glob(xml_path)
 	devices = []
 	for file in files:
-		devices.append(AVRDevice(props, logger))
 		props = AVRPartDescriptionFile(file, logger)
+		devices.append(Device(props, logger))
 	
 	logger.setLogLevel('debug')
 	
