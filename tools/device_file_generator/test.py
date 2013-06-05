@@ -41,16 +41,17 @@ if __name__ == "__main__":
 	"""
 	Some test code
 	"""
-	logger = Logger('debug')
-	
-	xml_path = os.path.join(os.path.dirname(__file__), '..', '..', '..', 'AVR_devices', (sys.argv[1] + '*'))
-	files = glob.glob(xml_path)
+	logger = Logger('info')
 	devices = []
-	for file in files:
-		props = AVRPartDescriptionFile(file, logger)
-		devices.append(Device(props, logger))
 	
-#	logger.setLogLevel('debug')
+	for arg in sys.argv[1:]:
+		xml_path = os.path.join(os.path.dirname(__file__), '..', '..', '..', 'AVR_devices', (arg + '*'))
+		files = glob.glob(xml_path)
+		for file in files:
+			part = AVRPartDescriptionFile(file, logger)
+			devices.append(Device(part, logger))
+	
+	logger.setLogLevel('debug')
 	
 	merger = DeviceMerger(devices, logger)
 	
