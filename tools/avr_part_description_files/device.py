@@ -28,11 +28,8 @@
 # -----------------------------------------------------------------------------
 
 import re, os, sys
-import xml.etree.ElementTree as et
-import xml.parsers.expat
 from string import Template
-from parser_exception import ParserException
-from parser import PartDescriptionFile
+from parser import XMLDeviceParser
 
 # add python module logger to path
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'logger'))
