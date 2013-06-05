@@ -47,7 +47,6 @@ class DeviceString:
 		self.type	 = None # e.g. -----, m1
 		self.pin_id   = None # e.g.	 r, -----
 		self.size_id  = None # e.g.	 g, 16
-		self.mmcu = None
 		self.valid = False
 		
 		if string == None:
@@ -72,13 +71,11 @@ class DeviceString:
 			if match:
 				self.family = match.group('family')
 				self.name = match.group('name')
-				self.mmcu = self.family + self.name
 
 				if self.family == "atmega" or self.family == "attiny":
 					match = re.search(self.family + self.name + "(?P<type>\w*)-?(?P<package>\w*)", string)
 					if match.group('type') != '':
 						self.type = match.group('type').lower()
-						self.mmcu += self.type
 					if match.group('package') != '':
 						self.pin_id = match.group('package').lower()
 					match = re.search("(?P<size>4|8|16|32|64|128|256)\d*", self.name)
@@ -89,7 +86,6 @@ class DeviceString:
 					match = re.search(self.family + self.name + "(?P<type>[A-Ea-e])(?P<package>[1-4])(?P<usb>[Bb][Uu])", string)
 					if match.group('type') != '':
 						self.type = match.group('type').lower()
-						self.mmcu += self.type
 					if match.group('package') != '':
 						self.pin_id = match.group('package').lower()
 				self.valid = True

@@ -51,8 +51,11 @@ class AVRDeviceReader(XMLDeviceReader):
 		architecture = device.get('architecture')
 		family = device.get('family')
 		
-		self.properties['device'] = DeviceString(self.name.lower())
-		self.properties['mmcu'] = self.properties['device'].mmcu
+		dev = DeviceString(self.name.lower())
+		self.properties['device'] = dev
+		self.properties['mmcu'] = dev.family + dev.name
+		if dev.type != None:
+			self.properties['mmcu'] += dev.type
 		self.properties['core'] = architecture.lower()
 
 		self.log.info("Parsing AVR PDF: " + architecture + " " + self.name)
