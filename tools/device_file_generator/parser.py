@@ -27,12 +27,11 @@
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # -----------------------------------------------------------------------------
 
-import re, os, sys
 import xml.etree.ElementTree as et
 import xml.parsers.expat
-from string import Template
 from parser_exception import ParserException
 
+import os, sys
 # add python module logger to path
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'logger'))
 from logger import Logger
