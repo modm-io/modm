@@ -130,7 +130,7 @@ class Device:
 			self_value = self.properties[key]
 			other_value = other.properties[key]
 			if key != 'device':
-				self.log.debug("'" + key + "' differs:\n  " + str(self_value) + "\n  " + str(other_value))
+				self.log.debug("'" + key + "' differs:\n" + str(self_value) + "\n" + str(other_value))
 				# for lists we want the difference sets in the children devices
 				# and the common set in the parent device
 				# This code assumes, that both devices have the same dictionary structure!
@@ -190,12 +190,23 @@ class Device:
 		return self.__str__()
 
 	def __str__(self):
-		s = "Device("
+		s = "\n Device("
 		length = len(self.properties)
 		i = 0
 		for key in self.properties:
-			s += "{'" + key + "': '" + str(self.properties[key]) + "'}"
+			if key == 'instances':
+				ilen = len(self.properties['instances'])
+				ii = 0
+				string = "{'instances': '["
+				for dev in self.properties['instances']:
+					string += str(dev)
+					if ii < ilen-1:
+						string +=  "', '"
+					ii += 1
+				s += string.replace("\n", "\n\t") + "]'}"
+			else:
+				s += "{'" + key + "': '" + str(self.properties[key]) + "'}"
 			if i < length-1:
-				s += ",\n"
+				s += ",\n   "
 			i += 1
 		return s + ")"
