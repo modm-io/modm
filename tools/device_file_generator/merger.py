@@ -54,11 +54,29 @@ class DeviceMerger:
 		else:
 			self.log = logger
 		
-		merged = self._mergeDevicesByName(self.devices)
-		self.merged_devices = merged
+		mergedByType = self._mergeDevicesByType(self.devices)
+		self.merged_devices = mergedByType
 
-
-	def _mergeDevicesByName(self, devices):
+	
+	def _mergeDevicesByType(self, devices):
+		"""
+		This is a simple helper method which figures out what devices can be merged how.
+		"""
+		avrDevices = []
+		stm32Devices = []
+		
+		for dev in devices:
+			if dev.properties['device'].platform == 'avr':
+				avrDevices.append(dev)
+			if dev.properties['device'].platform == 'stm32':
+				stm32Devices.append(dev)
+		
+		avrDevices = self._mergeDevicesByTypeAVR(avrDevices)
+		
+		devices = avrDevices.append(stm32Devices)
+		return devices
+	
+	def _mergeDevicesByTypeAVR(self, devices):
 		"""
 		This checks the name suffix (for example 'P', 'A', 'PA') of the
 		devices and merges them based on the observation, that the suffix

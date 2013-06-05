@@ -38,7 +38,7 @@ from logger import Logger
 
 class XMLDeviceParser:
 	""" DeviceParser
-	Base class for all parsers for handling the opening and writing of XML files etc...
+	Base class for all parsers for handling the opening of XML files etc...
 	"""
 
 	def __init__(self, path, logger=None):
