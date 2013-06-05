@@ -35,7 +35,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'logger'))
 from logger import Logger
 # add python module device files to path
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'device_files'))
-from device_element import DeviceString
+from device_string import DeviceString
 
 class AVRPartDescriptionFile(XMLDeviceParser):
 	""" AVRPartDescriptionFile
