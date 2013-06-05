@@ -30,7 +30,7 @@
 
 import os, sys
 from device import Device
-from avr_reader import AVRPartDescriptionFile
+from avr_reader import AVRDeviceReader
 from merger import DeviceMerger
 import glob
 # add python module logger to path
@@ -52,7 +52,7 @@ if __name__ == "__main__":
 		xml_path = os.path.join(os.path.dirname(__file__), '..', '..', '..', 'AVR_devices', (arg + '*'))
 		files = glob.glob(xml_path)
 		for file in files:
-			part = AVRPartDescriptionFile(file, logger)
+			part = AVRDeviceReader(file, logger)
 			devices.append(Device(part, logger))
 	
 	logger.setLogLevel(level)

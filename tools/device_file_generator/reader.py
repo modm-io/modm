@@ -38,7 +38,7 @@ from logger import Logger
 
 class XMLDeviceReader:
 	""" DeviceReader
-	Base class for all parsers for handling the opening of XML files etc...
+	Base class for all readers for handling the opening and reading of XML files etc...
 	"""
 
 	def __init__(self, path, logger=None):
@@ -52,7 +52,7 @@ class XMLDeviceReader:
 		self.properties = {'instances': []}
 
 	def _openDeviceXML(self, filename):
-		self.log.debug("Parsing XML: " + os.path.basename(self.file))
+		self.log.debug("Reading XML: " + os.path.basename(self.file))
 		try:
 			# parse the xml-file
 			xmltree = et.parse(filename).getroot()
@@ -66,4 +66,4 @@ class XMLDeviceReader:
 		return self.__str__()
 
 	def __str__(self):
-		return "XMLDeviceParser(" + os.path.basename(self.file) + ")"
+		return "XMLDeviceReader(" + os.path.basename(self.file) + ")"

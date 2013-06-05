@@ -38,7 +38,7 @@ from logger import Logger
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'device_files'))
 from device_string import DeviceString
 
-class AVRPartDescriptionFile(XMLDeviceReader):
+class AVRDeviceReader(XMLDeviceReader):
 	""" AVRPartDescriptionFile
 	Represents a device in xml format.
 	"""
@@ -129,7 +129,7 @@ class AVRPartDescriptionFile(XMLDeviceReader):
 		return mask
 
 	def __repr__(self):
-		return "AVRPartDescriptionFile(" + self.name + ")"
+		return self.__str__()
 
 	def __str__(self):
-		return "AVRParser: " + self.name
+		return "XMLReaderAVR(" + self.name + ")"
