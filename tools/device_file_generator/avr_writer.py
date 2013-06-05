@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # 
 # Copyright (c) 2013, Roboterclub Aachen e.V.
@@ -28,39 +27,38 @@
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # -----------------------------------------------------------------------------
 
+from lxml import etree
+from writer import XMLDeviceWriter
+
 import os, sys
-from device import Device
-from avr_reader import AVRDeviceReader
-from avr_writer import AVRDeviceWriter
-from merger import DeviceMerger
-import glob
 # add python module logger to path
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'logger'))
 from logger import Logger
+# add python module device files to path
+sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'device_files'))
+from device_string import DeviceString
 
-if __name__ == "__main__":
+class AVRDeviceWriter(XMLDeviceWriter):
+	""" AVRPartDescriptionFile
+	Represents a device in xml format.
 	"""
-	Some test code
-	"""
-	logger = Logger('info')
-	devices = []
-	level = 'info'
-	
-	for arg in sys.argv[1:]:
-		if arg in ['error', 'warn', 'info', 'debug', 'disable']:
-			level = arg
-			continue
-		xml_path = os.path.join(os.path.dirname(__file__), '..', '..', '..', 'AVR_devices', (arg + '*'))
-		files = glob.glob(xml_path)
-		for file in files:
-			part = AVRDeviceReader(file, logger)
-			devices.append(Device(part, logger))
-	
-	logger.setLogLevel(level)
-	
-	merger = DeviceMerger(devices, logger)
-	
-	for dev in merger.mergedDevices:
-		writer = AVRDeviceWriter(dev, logger)
-		logger.info(str(writer))
 
+	def __init__(self, device, logger=None):
+		XMLDeviceWriter.__init__(self, logger)
+		self.device = device
+		props = self.device.properties
+		dev = props['device']
+		
+		self.root.set('platform', dev.platform)
+		self.root.set('family', dev.family)
+		self.root.set('name', "|".join(self.device.getNameArray()))
+
+	def _getAttributedPortDictionary(self, port, attribute=None):
+		
+		pass
+
+	def __repr__(self):
+		return self.__str__()
+
+	def __str__(self):
+		return "XMLWriterAVR(\n" + etree.tostring(self.root, pretty_print=True) + ")"

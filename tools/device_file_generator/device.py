@@ -208,6 +208,15 @@ class Device:
 		if attribute == None and len(self.properties['instances']) > 0:
 			attribute = getattr(self.properties['instances'][0].properties['device'], attr)
 		return attribute
+	
+	def getNameArray(self):
+		names = []
+		if self.properties['device'].name != None:
+			names.append(self.properties['device'].name)
+		else:
+			for inst in self.properties['instances']:
+				names.extend(inst.getNameArray())
+		return names
 
 	def __repr__(self):
 		return self.__str__()

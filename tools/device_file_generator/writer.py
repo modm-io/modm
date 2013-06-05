@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # 
 # Copyright (c) 2013, Roboterclub Aachen e.V.
@@ -28,39 +27,43 @@
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # -----------------------------------------------------------------------------
 
+from lxml import etree
+
 import os, sys
-from device import Device
-from avr_reader import AVRDeviceReader
-from avr_writer import AVRDeviceWriter
-from merger import DeviceMerger
-import glob
 # add python module logger to path
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'logger'))
 from logger import Logger
 
-if __name__ == "__main__":
+class XMLDeviceWriter:
+	""" DeviceWriter
+	Base class for all writers for handling the opening and writing of XML files etc...
 	"""
-	Some test code
-	"""
-	logger = Logger('info')
-	devices = []
-	level = 'info'
-	
-	for arg in sys.argv[1:]:
-		if arg in ['error', 'warn', 'info', 'debug', 'disable']:
-			level = arg
-			continue
-		xml_path = os.path.join(os.path.dirname(__file__), '..', '..', '..', 'AVR_devices', (arg + '*'))
-		files = glob.glob(xml_path)
-		for file in files:
-			part = AVRDeviceReader(file, logger)
-			devices.append(Device(part, logger))
-	
-	logger.setLogLevel(level)
-	
-	merger = DeviceMerger(devices, logger)
-	
-	for dev in merger.mergedDevices:
-		writer = AVRDeviceWriter(dev, logger)
-		logger.info(str(writer))
 
+	def __init__(self, logger=None):
+		if logger == None:
+			self.log = Logger()
+		else:
+			self.log = logger
+		
+		self.file = None
+		self.root = etree.Element('device')
+
+	def writeXMLTree(self, tree):
+		pass
+
+	def _openNewXML(self, filename):
+		self.log.debug("Opening new XML file: " + os.path.basename(self.file))
+		try:
+			# parse the xml-file
+			xmltree = et.parse(filename).getroot()
+		except OSError as e:
+			raise ParserException(e)
+		except (xml.parsers.expat.ExpatError, xml.etree.ElementTree.ParseError) as e:
+			raise ParserException("while parsing xml-file '%s': %s" % (filename, e))
+		return xmltree
+
+	def __repr__(self):
+		return self.__str__()
+
+	def __str__(self):
+		return "XMLDeviceWriter(" + os.path.basename(self.file) + ")"
