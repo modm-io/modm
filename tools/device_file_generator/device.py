@@ -75,9 +75,9 @@ class Device:
 
 
 	def getComparisonDict(self, other):
-		own_keys, other_keys = [
+		self_keys, other_keys = [
 				set(d.keys()) for d in (self.properties, other.properties)]
-		intersect = own_keys.intersection(other_keys)
+		intersect = self_keys.intersection(other_keys)
 
 		changed = set()
 		for o in intersect:
@@ -92,7 +92,9 @@ class Device:
 				if other.properties[o] != self.properties[o]:
 					changed.add(o)
 		unchanged = intersect - changed
-		return {'changed': changed, 'unchanged': unchanged}
+		self_only = self_keys - intersect
+		other_only = other_keys - intersect
+		return {'changed': changed, 'unchanged': unchanged, 'self-only': self_only, 'other-only': other_only}
 
 
 	def getMergedDevice(self, other):
@@ -120,9 +122,11 @@ class Device:
 		other_child = Device(None, self.log)
 		other_child.properties['device'] = comparison['other_delta']
 		
+		# unchanged properties obviously belong into the parent
 		for key in diff['unchanged']:
 			parent.properties[key] = self.properties[key]
 		
+		# changed properties must be handled specially
 		for key in diff['changed']:
 			self_value = self.properties[key]
 			other_value = other.properties[key]
@@ -147,6 +151,12 @@ class Device:
 					self_child.properties[key] = self_value
 					other_child.properties[key] = other_value
 		
+		# self/other-only keys must be added to the children
+		for key in diff['self-only']:
+			self_child.properties[key] = self.properties[key]
+		for key in diff['other-only']:
+			other_child.properties[key] = other.properties[key]
+
 		parent.properties['instances'].append(self_child)
 		parent.properties['instances'].append(other_child)
 		
