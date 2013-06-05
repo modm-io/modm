@@ -55,26 +55,89 @@ class DeviceMerger:
 			self.log = logger
 		
 		mergedByType = self._mergeDevicesByType(self.devices)
-		self.merged_devices = mergedByType
+		mergedByName = self._mergeDevicesByName(mergedByType)
+		self.merged_devices = mergedByName
 
 	
-	def _mergeDevicesByType(self, devices):
+	def _mergeDevicesByName(self, devices):
 		"""
-		This is a simple helper method which figures out what devices can be merged how.
+		This is a simple helper method to merge devices based on name.
 		"""
 		avrDevices = []
-		stm32Devices = []
+		result = []
 		
 		for dev in devices:
 			if dev.properties['device'].platform == 'avr':
 				avrDevices.append(dev)
-			if dev.properties['device'].platform == 'stm32':
-				stm32Devices.append(dev)
+			else:
+				result.append(dev)
 		
+		avrDevices = self._mergeDevicesByNameAVR(avrDevices)
+		result.extend(avrDevices)
+		
+		return result
+	
+	def _mergeDevicesByNameAVR(self, devices):
+		"""
+		This checks the size-id and name of the devices, and merges the devices
+		based on the observation, that the size-id only influences the size of
+		memories, i.e. FLASH, RAM, and EEPROM.
+		"""
+		# copy the devices, since this array will be modified
+		devs = list(devices)
+		merged = []
+		
+		while len(devs) > 0:
+			current = devs[0]
+			devs.remove(current)
+			
+			props = current.properties['device']
+			if props.valid == False:
+				continue
+			
+			matches = []
+			
+			if props.size_id != None:
+				family = props.name[len(props.size_id):] 
+				self.log.debug("MergeByNameAVR: Searching for device ending in '" + family + "'")
+				for dev in devs:
+					dprops = dev.properties['device']
+					if dprops.size_id == None:
+						continue
+					dfamily = dprops.name[len(props.size_id):] 
+					if dfamily == family and props.type == dprops.type:
+						matches.append(dev)
+				
+				for match in matches:
+					devs.remove(match)
+					current = current.getMergedDevice(match)
+			
+			if len(matches) == 0:
+				self.log.info("MergeByNameAVR: no match for device: " + current.properties['device'].string)
+			
+			self.log.debug("MergeByNameAVR: Resulting device: " + str(current))
+			merged.append(current)
+		
+		return merged
+	
+	
+	def _mergeDevicesByType(self, devices):
+		"""
+		This is a simple helper method to merge devices based on type.
+		"""
+		avrDevices = []
+		result = []
+		
+		for dev in devices:
+			if dev.properties['device'].platform == 'avr':
+				avrDevices.append(dev)
+			else:
+				result.append(dev)
+			
 		avrDevices = self._mergeDevicesByTypeAVR(avrDevices)
+		result.extend(avrDevices)
 		
-		devices = avrDevices.append(stm32Devices)
-		return devices
+		return result
 	
 	def _mergeDevicesByTypeAVR(self, devices):
 		"""
@@ -89,15 +152,14 @@ class DeviceMerger:
 			current = devs[0]
 			devs.remove(current)
 			
-			s = current.properties['device']
-			if s.valid == False:
-				merged.append(current)
+			props = current.properties['device']
+			if props.valid == False:
 				continue
-
+			
 			matches = []
 			suffix = [None, 'p', 'a', 'pa']
 			for dev in devs:
-				if dev.properties['device'].name == current.properties['device'].name:
+				if dev.properties['device'].name == props.name:
 					if dev.properties['device'].type in suffix:
 						matches.append(dev)
 			
@@ -106,12 +168,10 @@ class DeviceMerger:
 				current = current.getMergedDevice(match)
 			
 			if len(matches) == 0:
-				self.log.info("Singlular device: " + current.properties['device'].string)
+				self.log.info("MergeByTypeAVR: No match for device: " + current.properties['device'].string)
+			
+			self.log.debug("MergeByTypeAVR: Resulting device: " + str(current))
 			merged.append(current)
-			self.log.debug("Resulting device: " + str(current))
-
+		
 		return merged
-	
-#	def __str__(self):
-#		return ""
 
