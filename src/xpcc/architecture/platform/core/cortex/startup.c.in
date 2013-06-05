@@ -40,7 +40,7 @@
 
 #include <stdint.h>
 #include <xpcc/architecture/utils.hpp>
-#include "../../../device.hpp"
+#include "../../device.hpp"
 #include "xpcc_config.hpp"
 
 // ----------------------------------------------------------------------------
