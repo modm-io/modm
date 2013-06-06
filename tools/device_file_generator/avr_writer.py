@@ -45,7 +45,8 @@ class AVRDeviceWriter(XMLDeviceWriter):
 	def __init__(self, device, logger=None):
 		XMLDeviceWriter.__init__(self, device, logger)
 		
-		self.root.setAttribute('type', "|".join(self.device.getDeviceTypes()))
+		types = self.device.getDeviceTypes()
+		self.root.setAttribute('type', "|".join(types))
 		
 		self.addDeviceAttributesToNode(self.root, 'flash')
 		self.addDeviceAttributesToNode(self.root, 'ram')
@@ -111,7 +112,10 @@ class AVRDeviceWriter(XMLDeviceWriter):
 	
 	def write(self, folder):
 		dev = self.device.properties['device']
-		name = dev.family + "_".join(self.device.getDeviceNames()) + ".xml"
+		names = self.device.getDeviceNames()
+		names.sort(key=int)
+		types = self.device.getDeviceTypes()
+		name = dev.family + "-".join(["_".join(names), "_".join(types)]) + ".xml"
 		self.writeToFolder(folder, name)
 
 	def __repr__(self):

@@ -215,7 +215,10 @@ class Device:
 		if len(attributes) == 0:
 			return [None]
 		
-		return list(set(attributes))
+		attributes = list(set(attributes))
+		attributes.sort()
+		
+		return attributes
 	
 	def getDeviceNames(self):
 		return self.getDeviceAttributes('name')
