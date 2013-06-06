@@ -45,13 +45,17 @@ class AVRDeviceWriter(XMLDeviceWriter):
 	def __init__(self, device, logger=None):
 		XMLDeviceWriter.__init__(self, device, logger)
 		
-		types = self.device.getDeviceTypes()
-		self.root.setAttribute('type', "|".join(types))
+		self.types = self.device.getDeviceTypes()
+		self.names = self.device.getDeviceNames()
+		self.names.sort(key=int)
+		
+		self.root.setAttribute('type', "|".join(self.types))
 		
 		self.addDeviceAttributesToNode(self.root, 'flash')
 		self.addDeviceAttributesToNode(self.root, 'ram')
 		self.addDeviceAttributesToNode(self.root, 'eeprom')
 		self.addDeviceAttributesToNode(self.root, 'mmcu')
+		self.addDeviceAttributesToNode(self.root, 'core')
 		
 		self.addDeviceAttributesToNode(self.root, 'define')
 		
@@ -74,8 +78,11 @@ class AVRDeviceWriter(XMLDeviceWriter):
 			target = item['device'].getTargetDict()['target']
 			dict = {}
 			for attr in target:
-				if attr in ['type', 'name'] and target[attr] != None:
-					dict[attr] = target[attr]
+				if target[attr] != None:
+					if attr == 'type' and len(self.types) > 1:
+						dict[attr] = target[attr]
+					if attr == 'name' and len(self.names) > 1:
+						dict[attr] = target[attr]
 			child.setAttributes(dict)
 			child.setValue(item['value'])
 	
@@ -89,7 +96,8 @@ class AVRDeviceWriter(XMLDeviceWriter):
 			for attr in target:
 				if attr in ['type', 'name'] and target[attr] != None:
 					dict[attr] = target[attr]
-			
+			ports = item['value']
+			ports.sort(key=lambda k: k['port'])
 			for port in item['value']:
 				gpios = self._getAttributedPortDictionary(port)
 				for gpio in gpios:
