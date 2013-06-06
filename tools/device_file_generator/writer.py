@@ -47,7 +47,9 @@ class XMLDeviceWriter:
 		
 		self.file = None
 		self.device = device
-		self.root = etree.Element('device')
+		self.tree = etree.Element('rca')
+		self.setAttribute(self.tree, 'version', '1.0')
+		self.root = self.addChild(self.tree, 'device')
 		
 		props = self.device.properties
 		dev = props['device']
@@ -82,8 +84,12 @@ class XMLDeviceWriter:
 	def setValue(self, node, value):
 		node.text = value
 
-	def writeToString(self):
-		return etree.tostring(self.root, pretty_print=True)
+	def toString(self):
+		return etree.tostring(self.tree,
+							encoding="UTF-8",
+							pretty_print=True,
+							xml_declaration=True,
+							doctype='<!DOCTYPE rca SYSTEM "../devicefile.dtd">')
 
 	def __repr__(self):
 		return self.__str__()
