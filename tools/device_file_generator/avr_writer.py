@@ -58,9 +58,11 @@ class AVRDeviceWriter(XMLDeviceWriter):
 		child = self.addChild(self.root, 'pin-count')
 		self.setValue(child, '-1')
 		
-		for header in ['avr/io.h', 'avr/interrupt.h', 'avr/sleep.h']:
+		for header in ['avr/io.h', 'avr/interrupt.h']:
 			child = self.addChild(self.root, 'header')
 			self.setValue(child, header)
+		
+		self.addGpioToNode(self.root)
 		
 
 	def addDeviceAttributesToNode(self, node, name):
@@ -74,10 +76,37 @@ class AVRDeviceWriter(XMLDeviceWriter):
 					dict[attr] = target[attr]
 			self.setAttributes(child, dict)
 			self.setValue(child, str(item['value']))
+	
+	def addGpioToNode(self, node):
+		list = self.device.getAttributes('gpios')
+		driver = self.addChild(node, 'driver')
+		self.setAttributes(driver, {'type': 'gpio', 'name': 'atmega'})
+		for item in list:
+			target = item['device'].getTargetDict()['target']
+			dict = {}
+			for attr in target:
+				if attr in ['type', 'name'] and target[attr] != None:
+					dict[attr] = target[attr]
+			
+			for port in item['value']:
+				gpios = self._getAttributedPortDictionary(port)
+				for gpio in gpios:
+					child = self.addChild(driver, 'gpio')
+					#self.setAttributes(child, dict)
+					self.setAttributes(child, gpio)
 
-	def _getAttributedPortDictionary(self, port, attribute=None):
+	def _getAttributedPortDictionary(self, port):
+		ports = []
+		mask = port['mask']
+		id = 0
 		
-		pass
+		while id < 8:
+			if mask & 0x01:
+				ports.append({'port': port['port'], 'id': str(id)})
+			mask >>= 1
+			id += 1
+		
+		return ports
 		
 
 	def __repr__(self):

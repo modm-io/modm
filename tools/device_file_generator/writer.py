@@ -74,7 +74,7 @@ class XMLDeviceWriter:
 			self.setAttribute(node, key, dict[key])
 			
 	def setAttribute(self, node, key, value):
-		node.set(key, value)
+		node.set(key, str(value))
 	
 	def addChild(self, node, name):
 		return etree.SubElement(node, name)
