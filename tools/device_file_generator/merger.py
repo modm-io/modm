@@ -126,8 +126,21 @@ class DeviceMerger:
 				names = ['4', '5', '9', '10']
 				if name in names:
 					for dev in devs:
-						if dev.properties['device'].family == "attiny" and  dev.properties['device'].name in names:
-							matches.append(dev)
+						if dev.properties['device'].family == "attiny":
+							for dname in dev.getDeviceNames():
+								if dname in names:
+									matches.append(dev)
+							
+				# Some Devices are just not in the same group
+				if name in ['28', '20', '40']:
+					# these are not the matches you are looking for *move hand*
+					matches = []
+				# these are not the devices you want to matched with
+				for match in matches:
+					if match.properties['device'].name in ['28', '20', '40']:
+						matches.remove(match)
+						break
+			
 			
 			for match in matches:
 				devs.remove(match)
