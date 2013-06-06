@@ -27,7 +27,7 @@
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # -----------------------------------------------------------------------------
 
-from writer import XMLDeviceWriter
+from writer import XMLDeviceWriter, XMLElement
 
 import os, sys
 # add python module logger to path
@@ -45,7 +45,7 @@ class AVRDeviceWriter(XMLDeviceWriter):
 	def __init__(self, device, logger=None):
 		XMLDeviceWriter.__init__(self, device, logger)
 		
-		self.setAttribute(self.root, 'type', "|".join(self.device.getDeviceTypes()))
+		self.root.setAttribute('type', "|".join(self.device.getDeviceTypes()))
 		
 		self.addDeviceAttributesToNode(self.root, 'flash')
 		self.addDeviceAttributesToNode(self.root, 'ram')
@@ -55,12 +55,12 @@ class AVRDeviceWriter(XMLDeviceWriter):
 		self.addDeviceAttributesToNode(self.root, 'define')
 		
 		# AVR specific
-		child = self.addChild(self.root, 'pin-count')
-		self.setValue(child, '-1')
+		child = self.root.addChild('pin-count')
+		child.setValue('-1')
 		
 		for header in ['avr/io.h', 'avr/interrupt.h']:
-			child = self.addChild(self.root, 'header')
-			self.setValue(child, header)
+			child = self.root.addChild('header')
+			child.setValue(header)
 		
 		# drivers
 		self.addGpioToNode(self.root)
@@ -69,19 +69,19 @@ class AVRDeviceWriter(XMLDeviceWriter):
 	def addDeviceAttributesToNode(self, node, name):
 		list = self.device.getAttributes(name)
 		for item in list:
-			child = self.addChild(node, name)
+			child = node.addChild(name)
 			target = item['device'].getTargetDict()['target']
 			dict = {}
 			for attr in target:
 				if attr in ['type', 'name'] and target[attr] != None:
 					dict[attr] = target[attr]
-			self.setAttributes(child, dict)
-			self.setValue(child, str(item['value']))
+			child.setAttributes(dict)
+			child.setValue(item['value'])
 	
 	def addGpioToNode(self, node):
 		list = self.device.getAttributes('gpios')
-		driver = self.addChild(node, 'driver')
-		self.setAttributes(driver, {'type': 'gpio', 'name': 'atmega'})
+		driver = node.addChild('driver')
+		driver.setAttributes({'type': 'gpio', 'name': 'atmega'})
 		for item in list:
 			target = item['device'].getTargetDict()['target']
 			dict = {}
@@ -92,9 +92,9 @@ class AVRDeviceWriter(XMLDeviceWriter):
 			for port in item['value']:
 				gpios = self._getAttributedPortDictionary(port)
 				for gpio in gpios:
-					child = self.addChild(driver, 'gpio')
-					#self.setAttributes(child, dict)
-					self.setAttributes(child, gpio)
+					child = driver.addChild('gpio')
+					#child.setAttributes(dict)
+					child.setAttributes(gpio)
 
 	def _getAttributedPortDictionary(self, port):
 		ports = []

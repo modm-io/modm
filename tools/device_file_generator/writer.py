@@ -47,14 +47,14 @@ class XMLDeviceWriter:
 		
 		self.file = None
 		self.device = device
-		self.tree = etree.Element('rca')
-		self.setAttribute(self.tree, 'version', '1.0')
-		self.root = self.addChild(self.tree, 'device')
-		
 		props = self.device.properties
 		dev = props['device']
 		
-		self.setAttributes(self.root, {'platform': dev.platform, 'family': dev.family, 'name': "|".join(self.device.getDeviceNames())})
+		self.tree = XMLElement('rca')
+		self.tree.setAttribute('version', '1.0')
+		
+		self.root = self.tree.addChild('device')
+		self.root.setAttributes({'platform': dev.platform, 'family': dev.family, 'name': "|".join(self.device.getDeviceNames())})
 		
 
 	def writeToFile(self, file):
@@ -75,21 +75,8 @@ class XMLDeviceWriter:
 		else:
 			self.log.error("XMLDeviceWriter: Path is not a folder! " + folder)
 
-	def setAttributes(self, node, dict):
-		for key in dict:
-			self.setAttribute(node, key, dict[key])
-			
-	def setAttribute(self, node, key, value):
-		node.set(key, str(value))
-	
-	def addChild(self, node, name):
-		return etree.SubElement(node, name)
-	
-	def setValue(self, node, value):
-		node.text = value
-
 	def toString(self):
-		return etree.tostring(self.tree,
+		return etree.tostring(self.tree.root,
 							encoding="UTF-8",
 							pretty_print=True,
 							xml_declaration=True,
@@ -100,3 +87,39 @@ class XMLDeviceWriter:
 
 	def __str__(self):
 		return "XMLDeviceWriter(" + os.path.basename(self.file) + ")"
+
+
+class XMLElement:
+	""" XMLElement
+	Helper class to wrap and extend the methods of etree.Element and etree.SubElement
+	"""
+	
+	def __init__(self, tag=None):
+		self.root = None
+		if tag != None:
+			self.root = etree.Element(tag)
+	
+	def setAttributes(self, dict):
+		for key in dict:
+			self.setAttribute(key, dict[key])
+			
+	def setAttribute(self, key, value):
+		self.root.set(key, str(value))
+	
+	def addChild(self, name):
+		element = XMLElement()
+		element.root = etree.SubElement(self.root, name)
+		return element
+	
+	def setValue(self, value):
+		self.root.text = str(value)
+	
+	def toString(self):
+		return etree.tostring(self.root, pretty_print=True)
+	
+	def __repr__(self):
+		return self.__str__()
+
+	def __str__(self):
+		return "XMLElement(\n" + self.toString() + ")"
+
