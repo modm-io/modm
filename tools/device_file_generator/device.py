@@ -200,23 +200,25 @@ class Device:
 			self.properties['instances'].append(device)
 		
 
-	def getAttributeRecursive(self, attr):
-		# the device can already be merged!
-		# so we need to take the instances into account
-		# we assume that every instance is in the same category
-		attribute = getattr(self.properties['device'], attr)
-		if attribute == None and len(self.properties['instances']) > 0:
-			attribute = getattr(self.properties['instances'][0].properties['device'], attr)
-		return attribute
-	
-	def getNameArray(self):
-		names = []
-		if self.properties['device'].name != None:
-			names.append(self.properties['device'].name)
+	def getAttributes(self, name):
+		attributes = []
+		
+		if getattr(self.properties['device'], name) != None:
+			attributes.append(getattr(self.properties['device'], name))
 		else:
 			for inst in self.properties['instances']:
-				names.extend(inst.getNameArray())
-		return names
+				attributes.extend(inst.getAttributes(name))
+		
+		if len(attributes) == 0:
+			return [None]
+		
+		return list(set(attributes))
+	
+	def getNames(self):
+		return self.getAttributes('name')
+	
+	def getTypes(self):
+		return self.getAttributes('type')
 
 	def __repr__(self):
 		return self.__str__()

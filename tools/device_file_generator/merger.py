@@ -92,11 +92,11 @@ class DeviceMerger:
 			devs.remove(current)
 			
 			matches = []
-			size_id = current.getAttributeRecursive('size_id')
+			size_id = current.getAttributes('size_id')[0]
 			
 			if size_id != None:
-				name = current.getAttributeRecursive('name')
-				type = current.getAttributeRecursive('type')
+				name = current.getAttributes('name')[0]
+				type = current.getAttributes('type')[0]
 				family = name[len(size_id):]
 				
 				if not (family == "" and type == None):
@@ -106,8 +106,8 @@ class DeviceMerger:
 					self.log.info(string + "'")
 					
 					for dev in devs:
-						dname = dev.getAttributeRecursive('name')
-						dsize_id = dev.getAttributeRecursive('size_id')
+						dname = dev.getAttributes('name')[0]
+						dsize_id = dev.getAttributes('size_id')[0]
 						
 						# if they do not have a size-id they are probably unmergable
 						if dsize_id == None:
@@ -118,7 +118,7 @@ class DeviceMerger:
 						# we should only merge when the family is the same,
 						# and if the type is the same
 						
-						if dfamily == family and dev.getAttributeRecursive('type') in type:
+						if dfamily == family and dev.getAttributes('type')[0] in type:
 							matches.append(dev)
 				
 				for match in matches:
@@ -193,7 +193,7 @@ class DeviceMerger:
 
 
 	def _getCategoryTypeAVR(self, device):
-		type = device.getAttributeRecursive('type')
+		type = device.getAttributes('type')[0]
 		# these are the categories of mergable types
 		cat1 = [None, 'p', 'a', 'pa']
 		cat2 = ['rfa1', 'rfa2', 'rfr1', 'rfr2']
