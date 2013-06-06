@@ -105,6 +105,9 @@ class Device:
 		"""
 		Merges the values of both devices and add a dictionary of differences
 		"""
+		if not isinstance(other, Device):
+			return None
+		
 		self.log.info("Merging " + self.properties['device'].string + " and " + other.properties['device'].string)
 
 		# calculate the difference
@@ -204,7 +207,7 @@ class Device:
 		attributes = []
 		
 		if getattr(self.properties['device'], name) != None:
-			attributes.append(getattr(self.properties['device'], name))
+			return [getattr(self.properties['device'], name)]
 		else:
 			for inst in self.properties['instances']:
 				attributes.extend(inst.getDeviceAttributes(name))
@@ -219,7 +222,25 @@ class Device:
 	
 	def getDeviceTypes(self):
 		return self.getDeviceAttributes('type')
-
+	
+	def getAttributes(self, name):
+		attributes = []
+		
+		if name in self.properties:
+			return [{'device': self.properties['device'], 'value': self.properties[name]}]
+		else:
+			for inst in self.properties['instances']:
+				dicts = inst.getAttributes(name)
+				for attr in dicts:
+					target = attr['device']
+					self_target = self.properties['device'].getTargetDict()['target']
+					for key in self_target:
+						if getattr(target, key) == None:
+							setattr(target, key, self_target[key])
+				attributes.extend(dicts)
+		
+		return attributes
+	
 	def __repr__(self):
 		return self.__str__()
 
