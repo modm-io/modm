@@ -39,14 +39,21 @@ class XMLDeviceWriter:
 	Base class for all writers for handling the opening and writing of XML files etc...
 	"""
 
-	def __init__(self, logger=None):
+	def __init__(self, device, logger=None):
 		if logger == None:
 			self.log = Logger()
 		else:
 			self.log = logger
 		
 		self.file = None
+		self.device = device
 		self.root = etree.Element('device')
+		
+		props = self.device.properties
+		dev = props['device']
+		
+		self.setAttributes(self.root, {'platform': dev.platform, 'family': dev.family, 'name': "|".join(self.device.getNames())})
+		
 
 	def writeXMLTree(self, tree):
 		pass
@@ -61,6 +68,19 @@ class XMLDeviceWriter:
 		except (xml.parsers.expat.ExpatError, xml.etree.ElementTree.ParseError) as e:
 			raise ParserException("while parsing xml-file '%s': %s" % (filename, e))
 		return xmltree
+
+	def setAttributes(self, node, dict):
+		for key in dict:
+			self.setAttribute(node, key, dict[key])
+			
+	def setAttribute(self, node, key, value):
+		node.set(key, value)
+	
+	def addChildToNode(self, node, name):
+		return etree.SubElement(node, name)
+
+	def writeToString(self):
+		return etree.tostring(self.root, pretty_print=True)
 
 	def __repr__(self):
 		return self.__str__()

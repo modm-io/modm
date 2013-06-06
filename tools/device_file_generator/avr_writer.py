@@ -27,7 +27,6 @@
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # -----------------------------------------------------------------------------
 
-from lxml import etree
 from writer import XMLDeviceWriter
 
 import os, sys
@@ -44,21 +43,17 @@ class AVRDeviceWriter(XMLDeviceWriter):
 	"""
 
 	def __init__(self, device, logger=None):
-		XMLDeviceWriter.__init__(self, logger)
-		self.device = device
-		props = self.device.properties
-		dev = props['device']
+		XMLDeviceWriter.__init__(self, device, logger)
 		
-		self.root.set('platform', dev.platform)
-		self.root.set('family', dev.family)
-		self.root.set('name', "|".join(self.device.getNameArray()))
+		self.setAttribute(self.root, 'type', "|".join(self.device.getTypes()))
 
 	def _getAttributedPortDictionary(self, port, attribute=None):
 		
 		pass
+		
 
 	def __repr__(self):
 		return self.__str__()
 
 	def __str__(self):
-		return "XMLWriterAVR(\n" + etree.tostring(self.root, pretty_print=True) + ")"
+		return "XMLWriterAVR(\n" + self.writeToString() + ")"
