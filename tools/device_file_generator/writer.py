@@ -61,7 +61,7 @@ class XMLDeviceWriter:
 		if os.path.exists(file):
 			self.log.warn("XMLDeviceWriter: Overwriting file '" + os.path.basename(file) + "'")
 		else:
-			self.log.debug("XMLDeviceWriter: New XML file: '" + os.path.basename(file) + "'")
+			self.log.info("XMLDeviceWriter: New XML file: '" + os.path.basename(file) + "'")
 		self.file = file 
 		
 		with open(self.file, 'w') as device_file:
