@@ -52,7 +52,7 @@ class XMLDeviceWriter:
 		props = self.device.properties
 		dev = props['device']
 		
-		self.setAttributes(self.root, {'platform': dev.platform, 'family': dev.family, 'name': "|".join(self.device.getNames())})
+		self.setAttributes(self.root, {'platform': dev.platform, 'family': dev.family, 'name': "|".join(self.device.getDeviceNames())})
 		
 
 	def writeXMLTree(self, tree):

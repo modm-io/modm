@@ -45,7 +45,7 @@ class AVRDeviceWriter(XMLDeviceWriter):
 	def __init__(self, device, logger=None):
 		XMLDeviceWriter.__init__(self, device, logger)
 		
-		self.setAttribute(self.root, 'type', "|".join(self.device.getTypes()))
+		self.setAttribute(self.root, 'type', "|".join(self.device.getDeviceTypes()))
 
 	def _getAttributedPortDictionary(self, port, attribute=None):
 		

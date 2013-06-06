@@ -200,25 +200,25 @@ class Device:
 			self.properties['instances'].append(device)
 		
 
-	def getAttributes(self, name):
+	def getDeviceAttributes(self, name):
 		attributes = []
 		
 		if getattr(self.properties['device'], name) != None:
 			attributes.append(getattr(self.properties['device'], name))
 		else:
 			for inst in self.properties['instances']:
-				attributes.extend(inst.getAttributes(name))
+				attributes.extend(inst.getDeviceAttributes(name))
 		
 		if len(attributes) == 0:
 			return [None]
 		
 		return list(set(attributes))
 	
-	def getNames(self):
-		return self.getAttributes('name')
+	def getDeviceNames(self):
+		return self.getDeviceAttributes('name')
 	
-	def getTypes(self):
-		return self.getAttributes('type')
+	def getDeviceTypes(self):
+		return self.getDeviceAttributes('type')
 
 	def __repr__(self):
 		return self.__str__()
