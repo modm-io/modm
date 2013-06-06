@@ -76,8 +76,11 @@ class XMLDeviceWriter:
 	def setAttribute(self, node, key, value):
 		node.set(key, value)
 	
-	def addChildToNode(self, node, name):
+	def addChild(self, node, name):
 		return etree.SubElement(node, name)
+	
+	def setValue(self, node, value):
+		node.text = value
 
 	def writeToString(self):
 		return etree.tostring(self.root, pretty_print=True)

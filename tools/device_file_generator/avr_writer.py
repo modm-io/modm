@@ -46,6 +46,34 @@ class AVRDeviceWriter(XMLDeviceWriter):
 		XMLDeviceWriter.__init__(self, device, logger)
 		
 		self.setAttribute(self.root, 'type', "|".join(self.device.getDeviceTypes()))
+		
+		self.addDeviceAttributesToNode(self.root, 'flash')
+		self.addDeviceAttributesToNode(self.root, 'ram')
+		self.addDeviceAttributesToNode(self.root, 'eeprom')
+		self.addDeviceAttributesToNode(self.root, 'mmcu')
+		
+		self.addDeviceAttributesToNode(self.root, 'define')
+		
+		# AVR specific
+		child = self.addChild(self.root, 'pin-count')
+		self.setValue(child, '-1')
+		
+		for header in ['avr/io.h', 'avr/interrupt.h', 'avr/sleep.h']:
+			child = self.addChild(self.root, 'header')
+			self.setValue(child, header)
+		
+
+	def addDeviceAttributesToNode(self, node, name):
+		list = self.device.getAttributes(name)
+		for item in list:
+			child = self.addChild(node, name)
+			target = item['device'].getTargetDict()['target']
+			dict = {}
+			for attr in target:
+				if attr in ['type', 'name'] and target[attr] != None:
+					dict[attr] = target[attr]
+			self.setAttributes(child, dict)
+			self.setValue(child, str(item['value']))
 
 	def _getAttributedPortDictionary(self, port, attribute=None):
 		
