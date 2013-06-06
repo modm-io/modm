@@ -53,8 +53,10 @@ if __name__ == "__main__":
 		xml_path = os.path.join(os.path.dirname(__file__), '..', '..', '..', 'AVR_devices', (arg + '*'))
 		files = glob.glob(xml_path)
 		for file in files:
-			part = AVRDeviceReader(file, logger)
-			devices.append(Device(part, logger))
+			# deal with this here, rather than rewrite half the name merging
+			if os.path.basename(file) != "ATtiny28.xml":
+				part = AVRDeviceReader(file, logger)
+				devices.append(Device(part, logger))
 	
 	logger.setLogLevel(level)
 	

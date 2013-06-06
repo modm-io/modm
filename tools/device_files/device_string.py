@@ -78,7 +78,7 @@ class DeviceString:
 						self.type = match.group('type').lower()
 					if match.group('package') != '':
 						self.pin_id = match.group('package').lower()
-					match = re.search("(?P<size>4|8|16|32|64|128|256)\d*", self.name)
+					match = re.search("(?P<size>2|4|8|16|32|64|128|256)\d*", self.name)
 					if match:
 						self.size_id = match.group('size')
 

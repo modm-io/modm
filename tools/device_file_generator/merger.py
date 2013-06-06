@@ -110,20 +110,28 @@ class DeviceMerger:
 						dsize_id = dev.getDeviceAttributes('size_id')[0]
 						
 						# if they do not have a size-id they are probably unmergable
-						if dsize_id == None:
-							continue
-						dfamily = dname[len(dsize_id):]
-						
-						# perpare for type comparison
-						# we should only merge when the family is the same,
-						# and if the type is the same
-						
-						if dfamily == family and dev.getDeviceAttributes('type')[0] in type:
+						if dsize_id != None:
+							dfamily = dname[len(dsize_id):]
+							
+							# perpare for type comparison
+							# we should only merge when the family is the same,
+							# and if the type is the same
+							
+							if dfamily == family and dev.getDeviceAttributes('type')[0] in type:
+								matches.append(dev)
+			
+			# the smallest ATtiny's have special merging rules 
+			if current.properties['device'].family == "attiny":
+				name = current.properties['device'].name
+				names = ['4', '5', '9', '10']
+				if name in names:
+					for dev in devs:
+						if dev.properties['device'].family == "attiny" and  dev.properties['device'].name in names:
 							matches.append(dev)
-				
-				for match in matches:
-					devs.remove(match)
-					current = current.getMergedDevice(match)
+			
+			for match in matches:
+				devs.remove(match)
+				current = current.getMergedDevice(match)
 			
 			if len(matches) == 0:
 				self.log.info("ByName: no match for device: " + current.properties['device'].string)
