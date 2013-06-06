@@ -195,7 +195,7 @@ class DeviceMerger:
 	def _getCategoryTypeAVR(self, device):
 		type = device.getAttributes('type')[0]
 		# these are the categories of mergable types
-		cat1 = [None, 'p', 'a', 'pa']
+		cat1 = [None, 'none', 'p', 'a', 'pa']
 		cat2 = ['rfa1', 'rfa2', 'rfr1', 'rfr2']
 		cat3 = ['hva', 'hvb', 'hve2', 'hvbrevb']
 		cat4 = ['u2', 'u4', 'u6']
