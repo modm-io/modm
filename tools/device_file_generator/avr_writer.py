@@ -46,8 +46,6 @@ class AVRDeviceWriter(XMLDeviceWriter):
 		XMLDeviceWriter.__init__(self, device, logger)
 		
 		self.types = self.device.getDeviceTypes()
-		self.names = self.device.getDeviceNames()
-		self.names.sort(key=int)
 		
 		self.root.setAttribute('type', "|".join(self.types))
 		
@@ -89,7 +87,7 @@ class AVRDeviceWriter(XMLDeviceWriter):
 	def addGpioToNode(self, node):
 		list = self.device.getAttributes('gpios')
 		driver = node.addChild('driver')
-		driver.setAttributes({'type': 'gpio', 'name': 'atmega'})
+		driver.setAttributes({'type': 'gpio', 'name': self.family})
 		for item in list:
 			target = item['device'].getTargetDict()['target']
 			dict = {}

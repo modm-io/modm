@@ -50,6 +50,11 @@ class XMLDeviceWriter:
 		props = self.device.properties
 		dev = props['device']
 		
+		self.names = self.device.getDeviceNames()
+		self.names.sort(key=int)
+		self.family = dev.family
+		self.platform = dev.platform
+		
 		self.tree = XMLElement('rca')
 		self.tree.setAttribute('version', '1.0')
 		
