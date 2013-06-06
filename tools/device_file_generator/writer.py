@@ -57,19 +57,23 @@ class XMLDeviceWriter:
 		self.setAttributes(self.root, {'platform': dev.platform, 'family': dev.family, 'name': "|".join(self.device.getDeviceNames())})
 		
 
-	def writeXMLTree(self, tree):
-		pass
-
-	def _openNewXML(self, filename):
-		self.log.debug("Opening new XML file: " + os.path.basename(self.file))
-		try:
-			# parse the xml-file
-			xmltree = et.parse(filename).getroot()
-		except OSError as e:
-			raise ParserException(e)
-		except (xml.parsers.expat.ExpatError, xml.etree.ElementTree.ParseError) as e:
-			raise ParserException("while parsing xml-file '%s': %s" % (filename, e))
-		return xmltree
+	def writeToFile(self, file):
+		if os.path.exists(file):
+			self.log.warn("XMLDeviceWriter: Overwriting file '" + os.path.basename(file) + "'")
+		else:
+			self.log.debug("XMLDeviceWriter: New XML file: '" + os.path.basename(file) + "'")
+		self.file = file 
+		
+		with open(self.file, 'w') as device_file:
+			device_file.write(self.toString())
+	
+	def writeToFolder(self, folder, name):
+		abspath = os.path.abspath(folder)
+		if os.path.isdir(abspath):
+			filename = os.path.join(folder, name)
+			self.writeToFile(filename)
+		else:
+			self.log.error("XMLDeviceWriter: Path is not a folder! " + folder)
 
 	def setAttributes(self, node, dict):
 		for key in dict:

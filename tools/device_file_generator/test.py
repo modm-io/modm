@@ -59,8 +59,10 @@ if __name__ == "__main__":
 	logger.setLogLevel(level)
 	
 	merger = DeviceMerger(devices, logger)
+#	folder = os.path.join(os.path.dirname(__file__), '..', '..', 'xpcc', 'platform', 'xml')
+	folder = os.path.expanduser("~/server_downloads/xml/")
 	
 	for dev in merger.mergedDevices:
 		writer = AVRDeviceWriter(dev, logger)
-		logger.info(str(writer))
+		writer.write(folder)
 

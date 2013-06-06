@@ -62,6 +62,7 @@ class AVRDeviceWriter(XMLDeviceWriter):
 			child = self.addChild(self.root, 'header')
 			self.setValue(child, header)
 		
+		# drivers
 		self.addGpioToNode(self.root)
 		
 
@@ -107,10 +108,14 @@ class AVRDeviceWriter(XMLDeviceWriter):
 			id += 1
 		
 		return ports
-		
+	
+	def write(self, folder):
+		dev = self.device.properties['device']
+		name = dev.family + "_".join(self.device.getDeviceNames()) + ".xml"
+		self.writeToFolder(folder, name)
 
 	def __repr__(self):
 		return self.__str__()
 
 	def __str__(self):
-		return "XMLWriterAVR(\n" + self.writeToString() + ")"
+		return "AVRDeviceWriter(\n" + self.toString() + ")"
