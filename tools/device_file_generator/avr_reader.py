@@ -46,7 +46,7 @@ class AVRDeviceReader(XMLDeviceReader):
 	def __init__(self, file, logger=None):
 		XMLDeviceReader.__init__(self, file, logger)
 
-		device = self.node.findall('devices')[0][0]
+		device = self.tree.findall('devices')[0][0]
 		self.name = device.get('name')
 		architecture = device.get('architecture')
 		family = device.get('family')
@@ -82,7 +82,7 @@ class AVRDeviceReader(XMLDeviceReader):
 				self.properties['eeprom'] = size
 				self.log.debug("EEPROM: " + str(size))
 
-		modules = self.node.findall('modules')[0]
+		modules = self.tree.findall('modules')[0]
 		self.properties['gpios'] = gpios = []
 		self.properties['modules'] = []
 		# these modules are either too complicated or too special to bother with
@@ -139,4 +139,4 @@ class AVRDeviceReader(XMLDeviceReader):
 		return self.__str__()
 
 	def __str__(self):
-		return "XMLReaderAVR(" + self.name + ")"
+		return "AVRDeviceReader(" + self.name + ")"

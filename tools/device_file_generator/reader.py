@@ -27,7 +27,7 @@
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # -----------------------------------------------------------------------------
 
-import xml.etree.ElementTree as et
+import lxml.etree as et
 import xml.parsers.expat
 from parser_exception import ParserException
 
@@ -48,7 +48,7 @@ class XMLDeviceReader:
 			self.log = logger
 		
 		self.file = path
-		self.node = self._openDeviceXML(self.file)
+		self.tree = self._openDeviceXML(self.file)
 		self.properties = {'instances': []}
 
 	def _openDeviceXML(self, filename):
