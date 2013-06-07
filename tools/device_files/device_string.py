@@ -39,7 +39,7 @@ class DeviceString:
 	"""
 
 	def __init__(self, string=None):
-		self.string = string
+		self._string = string
 		# default for properties is None
 		self.platform = None # e.g. stm32, avr
 		self.family   = None # e.g.	f4, atmega
@@ -93,7 +93,25 @@ class DeviceString:
 		else:
 			raise ParserException("Parse Error: unknown platform. Device string: %" % (string))
 
-	def getTargetDict(self):
+	@property
+	def string(self):
+		string = ""
+		if self.platform != None and self.platform != "avr":
+			string += platform
+		if self.family != None:
+			string += self.family
+		if self.name != None:
+			string += self.name
+		if self.type != None and self.platform != "stm32":
+			string += self.type
+		if self.pin_id != None and self.platform != "avr":
+			string += self.pin_id
+		if self.size_id != None and self.platform != "avr":
+			string += self.size_id
+		return string
+
+	@property
+	def properties(self):
 		dict = {}
 		dict['platform'] = self.platform
 		dict['family'] = self.family
@@ -101,11 +119,14 @@ class DeviceString:
 		dict['type'] = self.type
 		dict['pin_id'] = self.pin_id
 		dict['size_id'] = self.size_id
-		return {'target': dict}
+		return dict
+	
+	def getTargetDict(self):
+		return {'target': self.properties}
 	
 	def isEmpty(self):
 		empty = True
-		target = self.getTargetDict()['target']
+		target = self.properties
 		for key in target:
 			if target[key] != None:
 				empty = False
@@ -121,8 +142,8 @@ class DeviceString:
 		if not isinstance(other, DeviceString):
 			return None
 		
-		tself = self.getTargetDict()['target']
-		tother = other.getTargetDict()['target']
+		tself = self.properties
+		tother = other.properties
 		dict = {'common_keys': [], 'different_keys': []}
 		
 		common = DeviceString()
@@ -140,17 +161,6 @@ class DeviceString:
 				self_delta.valid = True
 				other_delta.valid = True
 		
-		string = ""
-		if 'platform' in dict['common_keys']:
-			if self.platform != "avr":
-				string += self.platform
-		if 'family' in dict['common_keys']:
-			string += self.family
-		if 'name' in dict['common_keys']:
-			string += self.name
-		if 'type' in dict['common_keys'] and self.type != None:
-			string += self.type
-		common.string = string;
 		common.valid = True
 		
 		dict['common'] = common
@@ -162,6 +172,6 @@ class DeviceString:
 		return self.__str__()
 
 	def __str__(self):
-		target = self.getTargetDict()['target']
+		target = self.properties
 		target = {o:target[o] for o in target if target[o] != None}
 		return "DeviceString(" + str(target) + ")"

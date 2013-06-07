@@ -50,7 +50,7 @@ class Device:
 			self.log = logger
 		
 		if description_file == None:
-			self.properties = {'instances': []}
+			self.properties = {'instances': [], 'id': DeviceString()}
 			return
 		
 		# proper handling of Parsers
@@ -58,7 +58,10 @@ class Device:
 			self.properties = dict(description_file.properties)
 		else:
 			self.properties = dict(description_file)
-		self.properties['instances'] = []
+		if 'id' not in self.properties:
+			self.properties['id'] = DeviceString()
+		if 'instances' not in self.properties:
+			self.instances = []
 
 		# if flash or ram is missing, it is a bad thing and unsupported
 		if 'flash' not in self.properties:
@@ -69,9 +72,22 @@ class Device:
 			self.log.error("XPCC does not support Assembler-only programming!")
 			return None
 		# eeprom is optional on AVR and not available on ARM devices
-		if 'eeprom' not in self.properties and 'avr' == self.properties['device'].platform:
+		if 'eeprom' not in self.properties and 'avr' == self.id.platform:
 			self.log.warn("No EEPROM found")
 
+	@property
+	def id(self):
+		return self.properties['id']
+	
+	@id.setter
+	def id(self, value):
+		if value == None:
+			value = DeviceString()
+		self.properties['id'] = value
+	
+	@property
+	def instances(self):
+		return self.properties['instances']
 
 	def getComparisonDict(self, other):
 		self_keys = set(self.properties.keys())
@@ -108,7 +124,7 @@ class Device:
 		if not isinstance(other, Device):
 			return None
 		
-		self.log.info("Merging " + self.properties['device'].string + " and " + other.properties['device'].string)
+		self.log.info("Merging " + self.id.string + " and " + other.id.string)
 
 		# calculate the difference
 		diff = self.getComparisonDict(other)
@@ -123,18 +139,18 @@ class Device:
 			self.log.warn("Some device!")
 			return self
 
-		comparison = self.properties['device'].getComparisonDict(other.properties['device'])
+		comparison = self.id.getComparisonDict(other.id)
 		self.log.debug("'device' differs: " + str(comparison['different_keys']) + " " + comparison['common'].string)
 		
 		# build a new parent Device, with all the common features
 		parent = Device(None, self.log)
-		parent.properties['device'] = comparison['common']
+		parent.id = comparison['common']
 		
 		# build two new child Devices, with only the delta information
 		self_child = Device(None, self.log)
-		self_child.properties['device'] = comparison['self_delta']
+		self_child.id = comparison['self_delta']
 		other_child = Device(None, self.log)
-		other_child.properties['device'] = comparison['other_delta']
+		other_child.id = comparison['other_delta']
 		
 		# unchanged properties obviously belong into the parent
 		for key in diff['unchanged']:
@@ -193,23 +209,23 @@ class Device:
 		return parent
 	
 	def addInstance(self, device):
-		if device.properties['device'].isEmpty() and len(device.properties) <= 2:
+		if device.id.isEmpty() and len(device.properties) <= 2:
 			# do not add an empty device
-			if len(device.properties['instances']) == 0:
+			if len(device.instances) == 0:
 				return
 			
-			self.properties['instances'].extend(device.properties['instances'])
+			self.instances.extend(device.instances)
 		else:
-			self.properties['instances'].append(device)
+			self.instances.append(device)
 		
 
 	def getDeviceAttributes(self, name):
 		attributes = []
 		
-		if getattr(self.properties['device'], name) != None:
-			return [getattr(self.properties['device'], name)]
+		if getattr(self.id, name) != None:
+			return [getattr(self.id, name)]
 		else:
-			for inst in self.properties['instances']:
+			for inst in self.instances:
 				attributes.extend(inst.getDeviceAttributes(name))
 		
 		if len(attributes) == 0:
@@ -230,13 +246,13 @@ class Device:
 		attributes = []
 		
 		if name in self.properties:
-			return [{'device': self.properties['device'], 'value': self.properties[name]}]
+			return [{'id': self.id, 'value': self.properties[name]}]
 		else:
-			for inst in self.properties['instances']:
+			for inst in self.instances:
 				dicts = inst.getAttributes(name)
 				for attr in dicts:
-					target = attr['device']
-					self_target = self.properties['device'].getTargetDict()['target']
+					target = attr['id']
+					self_target = self.id.properties
 					for key in self_target:
 						if getattr(target, key) == None:
 							setattr(target, key, self_target[key])
@@ -253,10 +269,10 @@ class Device:
 		i = 0
 		for key in self.properties:
 			if key == 'instances':
-				ilen = len(self.properties['instances'])
+				ilen = len(self.instances)
 				ii = 0
 				string = "{'instances': '["
-				for dev in self.properties['instances']:
+				for dev in self.instances:
 					string += str(dev)
 					if ii < ilen-1:
 						string +=  "', '"

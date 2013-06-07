@@ -52,7 +52,7 @@ class AVRDeviceReader(XMLDeviceReader):
 		family = device.get('family')
 		
 		dev = DeviceString(self.name.lower())
-		self.properties['device'] = dev
+		self.properties['id'] = dev
 		self.properties['mmcu'] = dev.family + dev.name
 		if dev.type != None:
 			self.properties['mmcu'] += dev.type

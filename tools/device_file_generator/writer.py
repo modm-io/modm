@@ -47,19 +47,17 @@ class XMLDeviceWriter:
 		
 		self.file = None
 		self.device = device
-		props = self.device.properties
-		dev = props['device']
 		
 		self.names = self.device.getDeviceNames()
 		self.names.sort(key=int)
-		self.family = dev.family
-		self.platform = dev.platform
+		self.family = self.device.id.family
+		self.platform = self.device.id.platform
 		
 		self.tree = XMLElement('rca')
 		self.tree.setAttribute('version', '1.0')
 		
 		self.root = self.tree.addChild('device')
-		self.root.setAttributes({'platform': dev.platform, 'family': dev.family, 'name': "|".join(self.device.getDeviceNames())})
+		self.root.setAttributes({'platform': self.platform, 'family': self.family, 'name': "|".join(self.names)})
 		
 
 	def writeToFile(self, file):

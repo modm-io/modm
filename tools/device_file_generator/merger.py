@@ -67,7 +67,7 @@ class DeviceMerger:
 		result = []
 		
 		for dev in devices:
-			if dev.properties['device'].platform == 'avr':
+			if dev.id.platform == 'avr':
 				avrDevices.append(dev)
 			else:
 				result.append(dev)
@@ -121,12 +121,12 @@ class DeviceMerger:
 								matches.append(dev)
 			
 			# the smallest ATtiny's have special merging rules 
-			if current.properties['device'].family == "attiny":
-				name = current.properties['device'].name
+			if current.id.family == "attiny":
+				name = current.id.name
 				names = ['4', '5', '9', '10']
 				if name in names:
 					for dev in devs:
-						if dev.properties['device'].family == "attiny":
+						if dev.id.family == "attiny":
 							for dname in dev.getDeviceNames():
 								if dname in names:
 									matches.append(dev)
@@ -137,7 +137,7 @@ class DeviceMerger:
 					matches = []
 				# these are not the devices you want to matched with
 				for match in matches:
-					if match.properties['device'].name in ['28', '20', '40']:
+					if match.id.name in ['28', '20', '40']:
 						matches.remove(match)
 						break
 			
@@ -147,7 +147,7 @@ class DeviceMerger:
 				current = current.getMergedDevice(match)
 			
 			if len(matches) == 0:
-				self.log.info("ByName: no match for device: " + current.properties['device'].string)
+				self.log.info("ByName: no match for device: " + current.id.string)
 			
 			self.log.debug("ByName:\n\nResulting device: " + str(current))
 			merged.append(current)
@@ -163,7 +163,7 @@ class DeviceMerger:
 		result = []
 		
 		for dev in devices:
-			if dev.properties['device'].platform == 'avr':
+			if dev.id.platform == 'avr':
 				avrDevices.append(dev)
 			else:
 				result.append(dev)
@@ -186,7 +186,7 @@ class DeviceMerger:
 			current = devs[0]
 			devs.remove(current)
 			
-			props = current.properties['device']
+			props = current.id
 			if props.valid == False:
 				continue
 			
@@ -196,8 +196,8 @@ class DeviceMerger:
 			self.log.info("ByType: Searching for device ending in " + str(suffix)) 
 			
 			for dev in devs:
-				if dev.properties['device'].name == props.name:
-					if dev.properties['device'].type in suffix:
+				if dev.id.name == props.name:
+					if dev.id.type in suffix:
 						matches.append(dev)
 			
 			for match in matches:
@@ -205,7 +205,7 @@ class DeviceMerger:
 				current = current.getMergedDevice(match)
 			
 			if len(matches) == 0:
-				self.log.info("ByType: No match for device: " + current.properties['device'].string)
+				self.log.info("ByType: No match for device: " + current.id.string)
 			
 			self.log.debug("ByType:\n\nResulting device: " + str(current))
 			merged.append(current)

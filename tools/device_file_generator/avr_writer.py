@@ -73,7 +73,7 @@ class AVRDeviceWriter(XMLDeviceWriter):
 		list = self.device.getAttributes(name)
 		for item in list:
 			child = node.addChild(name)
-			target = item['device'].getTargetDict()['target']
+			target = item['id'].properties
 			dict = {}
 			for attr in target:
 				if target[attr] != None:
@@ -89,7 +89,7 @@ class AVRDeviceWriter(XMLDeviceWriter):
 		driver = node.addChild('driver')
 		driver.setAttributes({'type': 'gpio', 'name': self.family})
 		for item in list:
-			target = item['device'].getTargetDict()['target']
+			target = item['id'].properties
 			dict = {}
 			for attr in target:
 				if attr in ['type', 'name'] and target[attr] != None:
@@ -117,11 +117,10 @@ class AVRDeviceWriter(XMLDeviceWriter):
 		return ports
 	
 	def write(self, folder):
-		dev = self.device.properties['device']
 		names = self.device.getDeviceNames()
 		names.sort(key=int)
 		types = self.device.getDeviceTypes()
-		name = dev.family + "-".join(["_".join(names), "_".join(types)]) + ".xml"
+		name = self.device.id.family + "-".join(["_".join(names), "_".join(types)]) + ".xml"
 		self.writeToFolder(folder, name)
 
 	def __repr__(self):
