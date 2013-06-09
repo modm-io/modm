@@ -36,7 +36,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'logger'))
 from logger import Logger
 # add python module device files to path
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'device_files'))
-from device_string import DeviceString
+from device_identifier import DeviceIdentifier
 
 class AVRDeviceReader(XMLDeviceReader):
 	""" AVRPartDescriptionFile
@@ -51,7 +51,7 @@ class AVRDeviceReader(XMLDeviceReader):
 		architecture = device.get('architecture')
 		family = device.get('family')
 		
-		dev = DeviceString(self.name.lower())
+		dev = DeviceIdentifier(self.name.lower())
 		self.properties['id'] = dev
 		self.properties['mmcu'] = dev.family + dev.name
 		if dev.type != None:

@@ -33,7 +33,7 @@ import xml.parsers.expat
 from string import Template
 from parser_exception import ParserException
 from device_element import DeviceElementBase
-from device_string import DeviceString
+from device_identifier import DeviceIdentifier
 
 # add python module logger to path
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'logger'))
@@ -157,7 +157,7 @@ class DeviceFile:
 		This is used by the Scons Platform Tools. Think before editing.
 		TODO: defines, flash and ram may depend on pin-count....
 		"""
-		s = DeviceString(device_string)
+		s = DeviceIdentifier(device_string)
 		if s.valid == False:
 			return None
 		props = {}
@@ -199,7 +199,7 @@ class DeviceFile:
 		Please note: all paths are relative to the platform_path.
 		"""
 		# Check Device string
-		s = DeviceString(device_string)
+		s = DeviceIdentifier(device_string)
 		if s.valid == False:
 			return None
 		# Check Pin Count
@@ -227,7 +227,7 @@ class DeviceFile:
 		Always returns as list if a valid device string is handed to function.
 		Set require_singelton if you need exactly one value to be returned.
 		"""
-		s = DeviceString(device_string)
+		s = DeviceIdentifier(device_string)
 		if s.valid == False:
 			return None
 		if prop_type == 'define':

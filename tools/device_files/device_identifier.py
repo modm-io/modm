@@ -31,8 +31,8 @@
 
 import re
 
-class DeviceString:
-	""" DeviceString
+class DeviceIdentifier:
+	""" DeviceIdentifier
 	A class to parse a device string, e.g. "stm32f407vg".
 	TODO: Add parsing capabilities for atmel (i.e. avr, xmega, avr32) as
 	well as lpc controllers
@@ -139,16 +139,16 @@ class DeviceString:
 		properties of both, and two children devices _only_ with the differences.
 		Additionally, a common string in generated. 
 		"""
-		if not isinstance(other, DeviceString):
-			return None
+		if not isinstance(other, DeviceIdentifier):
+			return NotImplemented
 		
 		tself = self.properties
 		tother = other.properties
 		dict = {'common_keys': [], 'different_keys': []}
 		
-		common = DeviceString()
-		self_delta = DeviceString()
-		other_delta = DeviceString()
+		common = DeviceIdentifier()
+		self_delta = DeviceIdentifier()
+		other_delta = DeviceIdentifier()
 		
 		for key in tself:
 			if tself[key] == tother[key]:
@@ -174,4 +174,4 @@ class DeviceString:
 	def __str__(self):
 		target = self.properties
 		target = {o:target[o] for o in target if target[o] != None}
-		return "DeviceString(" + str(target) + ")"
+		return "DeviceIdentifier(" + str(target) + ")"
