@@ -35,6 +35,9 @@ import os, sys
 # add python module logger to path
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'logger'))
 from logger import Logger
+# add python module device files to path
+sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'device_files'))
+from device_string import DeviceString
 
 class XMLDeviceReader:
 	""" DeviceReader
@@ -49,7 +52,7 @@ class XMLDeviceReader:
 		
 		self.file = path
 		self.tree = self._openDeviceXML(self.file)
-		self.properties = {'instances': []}
+		self.properties = {'instances': [], 'id': DeviceString()}
 
 	def _openDeviceXML(self, filename):
 		self.log.debug("Reading XML: " + os.path.basename(self.file))

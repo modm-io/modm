@@ -38,7 +38,7 @@ from logger import Logger
 
 class XMLAggregator:
 	""" XMLAggregator
-	Base class for all device aggregator which is essentially a glorified XPath wrapper.
+	Base class for all device aggregators and essentially a glorified XPath wrapper.
 	The idea is to smartly compare all devices on a node level, resulting in a compact
 	decription of the commonalities and differences between the devices.
 	"""
@@ -55,20 +55,47 @@ class XMLAggregator:
 		for dev in self.devices:
 			self.tree.append(dev.tree)
 
-	def applyQuery(self, query):
-		result = None
-		
+	def queryTree(self, tree, query):
+		"""
+		This tries to apply the query to the device trees and returns eiher
+		- an array of element nodes,
+		- an array of strings or
+		- None, if the query failed.
+		"""
+		response = None
 		try:
-			result = self.tree.xpath(query)
-			if len(result) == 0:
-				self.log.warn("XMLAggregator: No results found for '" + str(query) + "'")
+			response = tree.xpath(query)
 		except:
 			self.log.error("XMLAggregator: Query failed for '" + str(query) + "'")
 		
+		return response
+	
+	def queryDevices(self, query):
+		self.log.info("XMLAggregator: Querying for '" + str(query) + "'")
+		results = []
+		
+		for dev in self.devices:
+			dict = {'id': dev.properties['id']}
+			response = self.queryTree(dev.tree, query)
+			
+			if response != None:
+				if len(response) == 0:
+					self.log.warn("XMLAggregator: No results found for '" + dict['id'].string + "'")
+				else:
+					dict['response'] = response
+					results.append(dict)
+		
+		return results
+	
+	def compactQuery(self, query):
+		result = self.queryTree(self.tree, query)
+		if result != None:
+			result = list(set(result))
+			result.sort()
 		return result
 
 	def __repr__(self):
 		return self.__str__()
 
 	def __str__(self):
-		return "XMLAggregator(" +  + ")"
+		return "XMLAggregator(" + self.tree + ")"
