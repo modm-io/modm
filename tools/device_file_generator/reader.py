@@ -27,9 +27,7 @@
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # -----------------------------------------------------------------------------
 
-import lxml.etree as et
-import xml.parsers.expat
-from parser_exception import ParserException
+from lxml import etree
 
 import os, sys
 # add python module logger to path
@@ -55,14 +53,13 @@ class XMLDeviceReader:
 		self.properties = {'instances': [], 'id': DeviceString()}
 
 	def _openDeviceXML(self, filename):
-		self.log.debug("Reading XML: " + os.path.basename(self.file))
+		self.log.debug("XMLDeviceReader: Opening XML file '" + os.path.basename(self.file) + "'")
+		xmltree = None
 		try:
 			# parse the xml-file
-			xmltree = et.parse(filename).getroot()
-		except OSError as e:
-			raise ParserException(e)
-		except (xml.parsers.expat.ExpatError, xml.etree.ElementTree.ParseError) as e:
-			raise ParserException("while parsing xml-file '%s': %s" % (filename, e))
+			xmltree = etree.parse(filename).getroot()
+		except:
+			self.log.error("XMLDeviceReader: Failure to open XML file!")
 		return xmltree
 	
 	def queryTree(self, query):
