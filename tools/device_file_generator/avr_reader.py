@@ -100,7 +100,48 @@ class AVRDeviceReader(XMLDeviceReader):
 				else:
 					gpios.append(gpio);
 					self.log.debug("GPIOs: " + str(gpio))
+		
+		self.modules = self.compactQuery("//module/@name")
+		self.log.debug("Available Modules are:\n" + self._modulesToString())
 
+	def registersOfModule(self, module):
+		if module in self.modules:
+			devices = self.query("//register-group[@name='" + module + "']/register")
+			for dev in devices:
+				dev['module'] = module
+				transRes = []
+				for reg in dev['response']:
+					transRes.append(self._translateRegister(reg))
+				del dev['response']
+				dev['registers'] = transRes
+			return devices
+		else:
+			self.log.error("'" + module + "' not a module!")
+			self.log.error("Available modules are:\n" + self._modulesToString())
+			return None
+	
+	def _translateRegister(self, queryResult):
+		mask = queryResult.get('mask')
+		bitfields = []
+		if mask == None:
+			fields = queryResult.findall('bitfield')
+			for field in fields:
+				bitfields.append({'name': field.get('name'), 'mask': field.get('mask')})
+		else:
+			bitfields.append({'name': 'data', 'mask': mask})
+		
+		result = {'name': queryResult.get('name'), 'fields': bitfields}
+		return result
+
+	def _modulesToString(self):
+		string = ""
+		char = self.modules[0][0:1]
+		for module in self.modules:
+			if not module.startswith(char):
+				string += "\n"
+			string += module + " \t"
+			char = module[0][0:1]
+		return string
 
 	def _gpioFromModuleNode(self, node):
 		"""

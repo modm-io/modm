@@ -64,6 +64,43 @@ class XMLDeviceReader:
 		except (xml.parsers.expat.ExpatError, xml.etree.ElementTree.ParseError) as e:
 			raise ParserException("while parsing xml-file '%s': %s" % (filename, e))
 		return xmltree
+	
+	def queryTree(self, query):
+		"""
+		This tries to apply the query to the device tree and returns eiher
+		- an array of element nodes,
+		- an array of strings or
+		- None, if the query failed.
+		"""
+		response = None
+		try:
+			response = self.tree.xpath(query)
+		except:
+			self.log.error("XMLDeviceReader: Query failed for '" + str(query) + "'")
+		
+		return response
+	
+	def query(self, query):
+		"""
+		This wraps the queryTree and returns an (empty) array. 
+		"""
+		self.log.debug("XMLDeviceReader: Querying for '" + str(query) + "'")
+		response = self.queryTree(query)
+		
+		if response != None:
+			if len(response) == 0:
+				self.log.info("XMLDeviceReader: No results found for '" + dict['id'].string + "'")
+			return response
+		
+		return []
+	
+	def compactQuery(self, query):
+		result = self.queryTree(query)
+		if result != None:
+			result = list(set(result))
+			result.sort()
+		return result
+
 
 	def __repr__(self):
 		return self.__str__()

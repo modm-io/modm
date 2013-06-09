@@ -35,10 +35,9 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'logger'))
 from logger import Logger
 
 class AVRDeviceWriter(XMLDeviceWriter):
-	""" AVRPartDescriptionFile
-	Represents a device in xml format.
+	""" AVRDeviceWriter
+	Translates the Device to a XPCC specific format.
 	"""
-
 	def __init__(self, device, logger=None):
 		XMLDeviceWriter.__init__(self, device, logger)
 		
