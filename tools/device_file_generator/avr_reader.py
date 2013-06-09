@@ -82,6 +82,7 @@ class AVRDeviceReader(XMLDeviceReader):
 
 		self.properties['gpios'] = gpios = []
 		self.properties['peripherals'] = peripherals = []
+		self.properties['modules'] = modules = []
 		
 		self.modules = self.compactQuery("//module/@name")
 		self.log.debug("Available Modules are:\n" + self._modulesToString())
@@ -94,6 +95,7 @@ class AVRDeviceReader(XMLDeviceReader):
 				gpios.append(self._gpioFromModule(module))
 				
 			if any(name.startswith(per) for per in ["EXTERNAL_INT", "TWI", "USART", "SPI", "AD_CON", "USB"]):
+				modules.append(name)
 				module = self.createModule(name)
 				peripherals.append(module)
 	
