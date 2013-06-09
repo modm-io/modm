@@ -132,15 +132,13 @@ class DeviceIdentifier:
 				empty = False
 		return empty
 	
-	def getComparisonDict(self, other):
+	def getComparisonDeviceIndentifier(self, other):
 		"""
 		This method compares its own properties with the other class and
 		generates three new Devices: a common Device with the common
 		properties of both, and two children devices _only_ with the differences.
-		Additionally, a common string in generated. 
 		"""
-		if not isinstance(other, DeviceIdentifier):
-			return NotImplemented
+		assert isinstance(other, DeviceIdentifier)
 		
 		tself = self.properties
 		tother = other.properties

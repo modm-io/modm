@@ -42,9 +42,9 @@ if __name__ == "__main__":
 	"""
 	Some test code
 	"""
-	logger = Logger('info')
-	devices = []
 	level = 'info'
+	logger = Logger(level)
+	devices = []
 	
 	for arg in sys.argv[1:]:
 		if arg in ['error', 'warn', 'info', 'debug', 'disable']:

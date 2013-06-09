@@ -27,8 +27,8 @@
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # -----------------------------------------------------------------------------
 
-import re
 from reader import XMLDeviceReader
+from peripheral import DevicePeripheral
 
 import os, sys
 # add python module logger to path
@@ -39,8 +39,9 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'device_files'))
 from device_identifier import DeviceIdentifier
 
 class AVRDeviceReader(XMLDeviceReader):
-	""" AVRPartDescriptionFile
-	Represents a device in xml format.
+	""" AVRDeviceReader
+	This AVR specific part description file reader knows the structure and
+	translates the data into a platform independent format.
 	"""
 
 	def __init__(self, file, logger=None):
@@ -92,15 +93,13 @@ class AVRDeviceReader(XMLDeviceReader):
 				module = self.createModule(name)
 				gpios.append(self._gpioFromModule(module))
 				
-			if any(name.startswith(per) for per in ["EXTERNAL_INT", "TWI", "USART", "SPI", "AD_CON"]):
+			if any(name.startswith(per) for per in ["EXTERNAL_INT", "TWI", "USART", "SPI", "AD_CON", "USB"]):
 				module = self.createModule(name)
 				peripherals.append(module)
 	
 	def createModule(self, name):
 		if name in self.modules:
-			dict = {'name': name}
-			dict['registers'] = self._registersOfModule(name)
-			return dict
+			return DevicePeripheral(name, self._registersOfModule(name), self.log)
 		else:
 			self.log.error("'" + name + "' not a module!")
 			self.log.error("Available modules are:\n" + self._modulesToString())
@@ -142,25 +141,12 @@ class AVRDeviceReader(XMLDeviceReader):
 		returns a dictionary containing the port name and available pins
 		as a bit mask.
 		"""
-		name = module['name']
-		port = name[4:5]
-		for reg in module['registers']:
-			if name == reg['name']: 
-				mask = self._maskFromRegister(reg)
+		port = module.name[4:5]
+		for reg in module.registers:
+			if module.name == reg['name']: 
+				mask = module.maskFromRegister(reg)
 				return {'port': port, 'mask': mask}
 		return None
-
-
-	def _maskFromRegister(self, register):
-		"""
-		This tries to get the mask of pins available for a given port.
-		Sometimes, instead of a mask several bitfields are given, which are
-		then merged together.
-		"""
-		mask = 0
-		for field in register['fields']:
-			mask |= field['mask']
-		return mask
 
 	def __repr__(self):
 		return self.__str__()

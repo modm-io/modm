@@ -90,6 +90,7 @@ class Device:
 		return self.properties['instances']
 
 	def getComparisonDict(self, other):
+		assert isinstance(other, Device)
 		self_keys = set(self.properties.keys())
 		other_keys = set(other.properties.keys())
 		intersect = self_keys.intersection(other_keys)
@@ -109,32 +110,30 @@ class Device:
 		unchanged = intersect - changed
 		self_only = self_keys - intersect
 		other_only = other_keys - intersect
-		return {'changed': changed, 'unchanged': unchanged, 'self-only': self_only, 'other-only': other_only}
+		return {'different': changed, 'equal': unchanged, 'self-only': self_only, 'other-only': other_only}
 
 
 	def getMergedDevice(self, other):
 		"""
 		Merges the values of both devices and add a dictionary of differences
 		"""
-		if not isinstance(other, Device):
-			return None
-		
+		assert isinstance(other, Device)
 		self.log.info("Merging " + self.id.string + " and " + other.id.string)
 
 		# calculate the difference
 		diff = self.getComparisonDict(other)
 		
-		self.log.debug("Changed: " + str(diff['changed']))
-		self.log.debug("Unchanged: " + str(diff['unchanged']))
-		self.log.debug("Self-only: " + str(diff['self-only']))
+		self.log.debug("Different : " + str(diff['different']))
+		self.log.debug("Equal     : " + str(diff['equal']))
+		self.log.debug("Self-only : " + str(diff['self-only']))
 		self.log.debug("Other-only: " + str(diff['other-only']))
 		
 		# they are the same device
-		if len(diff['changed']) == 0:
+		if len(diff['different']) == 0:
 			self.log.warn("Some device!")
 			return self
 
-		comparison = self.id.getComparisonDict(other.id)
+		comparison = self.id.getComparisonDeviceIndentifier(other.id)
 		self.log.debug("'device' differs: " + str(comparison['different_keys']) + " " + comparison['common'].string)
 		
 		# build a new parent Device, with all the common features
@@ -148,11 +147,11 @@ class Device:
 		other_child.id = comparison['other_delta']
 		
 		# unchanged properties obviously belong into the parent
-		for key in diff['unchanged']:
+		for key in diff['equal']:
 			parent.properties[key] = self.properties[key]
 		
 		# changed properties must be handled specially
-		for key in diff['changed']:
+		for key in diff['different']:
 			self_value = self.properties[key]
 			other_value = other.properties[key]
 			if key != 'device':
