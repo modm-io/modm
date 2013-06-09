@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # 
 # Copyright (c) 2013, Roboterclub Aachen e.V.
@@ -29,48 +28,49 @@
 # -----------------------------------------------------------------------------
 
 from lxml import etree
-from avr_reader import AVRDeviceReader
-from avr_aggregator import AVRAggregator
-from merger import DeviceMerger
-import glob
+from aggregator import XMLAggregator
 
 import os, sys
 # add python module logger to path
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'logger'))
 from logger import Logger
 
+class AVRAggregator(XMLAggregator):
+	""" AVRAggregator
+	This AVR specific aggregator knows about the internal structure of the
+	Atmel Part Description Files and can translate to the appropriate
+	XPath query strings.
+	"""
 
-if __name__ == "__main__":
-	logger = Logger('info')
-	devices = []
-	level = 'info'
-	queryString = "./nothing"
+	def __init__(self, devices, logger=None):
+		XMLAggregator.__init__(self, devices, logger)
+		self.log.info("Loading all modules...")
+		self.modules = self.compactQuery("//module/@name")
+		self.log.debug("Modules are:\n" + self.modulesToString())
 	
-	for arg in sys.argv[1:]:
-		if arg in ['error', 'warn', 'info', 'debug', 'disable']:
-			level = arg
-			continue
-		if arg.startswith("AT"):
-			xml_path = os.path.join(os.path.dirname(__file__), '..', '..', '..', 'AVR_devices', (arg + '*'))
-			files = glob.glob(xml_path)
-			for file in files:
-				# deal with this here, rather than rewrite half the name merging
-				if os.path.basename(file) != "ATtiny28.xml":
-					part = AVRDeviceReader(file, logger)
-					devices.append(part)
+	def findallRegisters(self, module):
+		if module in self.modules:
+			return self.queryDevices("//register-group[@name='" + module + "']/register")
 		else:
-			queryString = arg
+			self.log.error("'" + module + "' not a module!")
+			self.log.error("Selectable modules are:\n" + self.modulesToString())
+			return None
 	
-	logger.setLogLevel(level)
-	
-	gator = AVRAggregator(devices, logger)
-	
-	query = gator.findallRegisters(queryString)
-	
-	for q in query:
-		for res in q['response']:
-			if isinstance(res, basestring):
-				print res
-			else:
-				print etree.tostring(res, pretty_print=True)
+	def translateRegister(self):
+		pass
 
+	def modulesToString(self):
+		string = ""
+		char = self.modules[0][0:1]
+		for module in self.modules:
+			if not module.startswith(char):
+				string += "\n"
+			string += module + " \t"
+			char = module[0][0:1]
+		return string
+
+	def __repr__(self):
+		return self.__str__()
+
+	def __str__(self):
+		return "AVRAggregator(" + self.tree + ")"
