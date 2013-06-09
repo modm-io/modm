@@ -46,7 +46,7 @@ class AVRDeviceReader(XMLDeviceReader):
 	def __init__(self, file, logger=None):
 		XMLDeviceReader.__init__(self, file, logger)
 
-		device = self.tree.findall('devices')[0][0]
+		device = self.query("//device")[0]
 		self.name = device.get('name')
 		architecture = device.get('architecture')
 		family = device.get('family')
@@ -69,56 +69,46 @@ class AVRDeviceReader(XMLDeviceReader):
 		self.properties['define'] = "__AVR_" + self.name + "__"
 
 		# find the values for flash, ram and (optional) eeprom
-		for memory_segment in device.iter('memory-segment'):
+		for memory_segment in self.query("//memory-segment"):
 			name = memory_segment.get('name')
 			size = int(memory_segment.get('size'), 16)
 			if name == 'FLASH' or name == 'APP_SECTION':
 				self.properties['flash'] = size
-				self.log.debug("FLASH: " + str(size))
 			elif name == 'IRAM' or name == 'SRAM' or name == 'INTERNAL_SRAM':
 				self.properties['ram'] = size
-				self.log.debug("RAM: " + str(size))
 			elif name == 'EEPROM':
 				self.properties['eeprom'] = size
-				self.log.debug("EEPROM: " + str(size))
 
-		modules = self.tree.findall('modules')[0]
 		self.properties['gpios'] = gpios = []
-		self.properties['modules'] = []
-		# these modules are either too complicated or too special to bother with
-		ignore_modules = ['LOCKBIT', 'FUSE', 'EEPROM', 'CPU', 'WATCHDOG', 'BOOT_LOAD', 'PLL', 'USB_DEVICE', 'PS2']
-
-		for module in modules.iter('module'):
-			name = module.get('name')
-			if name not in ignore_modules:
-				self.properties['modules'].append(name)
-			# parse the GPIOs
-			if "PORT" in name:
-				gpio = self._gpioFromModuleNode(module)
-				if gpio == None:
-					self.log.warn("No GPIO found for " + name)
-				else:
-					gpios.append(gpio);
-					self.log.debug("GPIOs: " + str(gpio))
+		self.properties['peripherals'] = []
 		
 		self.modules = self.compactQuery("//module/@name")
 		self.log.debug("Available Modules are:\n" + self._modulesToString())
 
-	def registersOfModule(self, module):
-		if module in self.modules:
-			devices = self.query("//register-group[@name='" + module + "']/register")
-			for dev in devices:
-				dev['module'] = module
-				transRes = []
-				for reg in dev['response']:
-					transRes.append(self._translateRegister(reg))
-				del dev['response']
-				dev['registers'] = transRes
-			return devices
+		for mod in self.query("//modules/module"):
+			name = mod.get('name')
+			
+			if "PORT" in name:
+				module = self.createModule(name)
+				gpios.append(self._gpioFromModule(module))
+				
+
+	def createModule(self, name):
+		if name in self.modules:
+			dict = {'name': name}
+			dict['registers'] = self._registersOfModule(name)
+			return dict
 		else:
-			self.log.error("'" + module + "' not a module!")
+			self.log.error("'" + name + "' not a module!")
 			self.log.error("Available modules are:\n" + self._modulesToString())
 			return None
+
+	def _registersOfModule(self, module):
+		results = self.query("//register-group[@name='" + module + "']/register")
+		registers = []
+		for res in results:
+			registers.append(self._translateRegister(res))
+		return registers
 	
 	def _translateRegister(self, queryResult):
 		mask = queryResult.get('mask')
@@ -126,9 +116,9 @@ class AVRDeviceReader(XMLDeviceReader):
 		if mask == None:
 			fields = queryResult.findall('bitfield')
 			for field in fields:
-				bitfields.append({'name': field.get('name'), 'mask': field.get('mask')})
+				bitfields.append({'name': field.get('name'), 'mask': int(field.get('mask'), 16)})
 		else:
-			bitfields.append({'name': 'data', 'mask': mask})
+			bitfields.append({'name': 'data', 'mask': int(mask, 16)})
 		
 		result = {'name': queryResult.get('name'), 'fields': bitfields}
 		return result
@@ -143,37 +133,30 @@ class AVRDeviceReader(XMLDeviceReader):
 			char = module[0][0:1]
 		return string
 
-	def _gpioFromModuleNode(self, node):
+	def _gpioFromModule(self, module):
 		"""
 		This tries to get information about available pins in a port and
 		returns a dictionary containing the port name and available pins
 		as a bit mask.
 		"""
-		name = node.get('name')
+		name = module['name']
 		port = name[4:5]
-		for c in node.iter('register'):
-			if name == c.get('name'): 
-				mask = self._maskFromRegisterNode(c)
+		for reg in module['registers']:
+			if name == reg['name']: 
+				mask = self._maskFromRegister(reg)
 				return {'port': port, 'mask': mask}
 		return None
 
 
-	def _maskFromRegisterNode(self, node):
+	def _maskFromRegister(self, register):
 		"""
 		This tries to get the mask of pins available for a given port.
 		Sometimes, instead of a mask several bitfields are given, which are
 		then merged together.
 		"""
-		mask = node.get('mask')
-		if mask == None:
-			mask = 0
-			for c in node.iter('bitfield'):
-				field = c.get('mask')
-				if field != None:
-					field = int(field, 16)
-					mask |= field
-		else:
-			mask = int(mask, 16)
+		mask = 0
+		for field in register['fields']:
+			mask |= field['mask']
 		return mask
 
 	def __repr__(self):

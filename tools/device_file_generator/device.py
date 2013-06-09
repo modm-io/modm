@@ -36,7 +36,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'logger'))
 from logger import Logger
 # add python module device files to path
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'device_files'))
-from device_string import DeviceIdentifier
+from device_identifier import DeviceIdentifier
 
 class Device:
 	""" Device
@@ -98,11 +98,8 @@ class Device:
 		unchanged = set()
 		for o in intersect:
 			if isinstance(other.properties[o], list):
-				same = True
-				same = all(item in self.properties[o] for item in other.properties[o])
-				for item in self.properties[o]:
-					if item not in other.properties[o]:
-						same = False
+				same = all(item in self.properties[o] for item in other.properties[o]) and \
+						all(item in other.properties[o] for item in self.properties[o])
 				if same == False:
 					changed.add(o)
 			else:
