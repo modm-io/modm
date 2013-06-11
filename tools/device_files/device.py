@@ -58,7 +58,7 @@ class DeviceFile:
 		self.platform = node.get('platform')
 		self.family = node.get('family')
 		self.names = node.get('name').split('|')
-		self.core = node.get('core')
+		self.core = None
 
 		self.properties = []
 		self.drivers = []
@@ -68,6 +68,8 @@ class DeviceFile:
 				self.properties.append(Property(self, c))
 			elif c.tag in ['driver']:
 				self.drivers.append(Driver(self, c))
+			elif c.tag in ['core']:
+				self.core = c.text
 			else:
 				raise ParserException("Parse Error: unknown tag (%s)" % (c.tag))
 		self._checkDeviceFileData(xml_file)

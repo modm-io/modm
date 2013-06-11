@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='UTF-8' ?>
 <!DOCTYPE rca SYSTEM "../devicefile.dtd">
 <rca version="1.0">
-	<device platform="stm32" family="f4" name="407|405" core="cortex-m4"> <!-- FIXME: "name" does not sound quite right -->
+	<device platform="stm32" family="f4" name="407|405"> <!-- FIXME: "name" does not sound quite right -->
 		<!-- _flash_, _pin-count-, _define_, -core_ and _peripheral nodes
 		     accept pin-id/size-id properties if they only apply to a specific
 		     size/pin id
@@ -10,6 +10,8 @@
 		     available on a device with a specific pin count. Add a _+_
 		     to mean "and more" / a _-_ to mean "and less"
 		-->
+		<!-- Core -->
+		<core>cortex-m4</core>
 		<!-- Flash and RAM sizes -->
 		<flash size-id="e">524288</flash>
 		<flash size-id="g">1048576</flash>
