@@ -73,11 +73,17 @@ def jinja2_template_action(target, source, env):
 
 	def filter_indent(value, level=0):
 		return ('\n' + '\t' * level).join(value.split('\n'))
-		
+
+	def filter_pad(value, min_width):
+		tab_width = 4
+		tab_count =  (min_width/tab_width - len(value)/tab_width) + 1
+		return value + ('\t' * tab_count)
+
 	path, filename = os.path.split(source[0].path)
 	loader = jinja2.Environment(loader = jinja2.FileSystemLoader(path), extensions=['jinja2.ext.do'])
 	loader.filters['xpcc.wordwrap'] = filter_wordwrap
 	loader.filters['xpcc.indent'] = filter_indent
+	loader.filters['xpcc.pad'] = filter_pad
 	if env['XPCC_JINJA2_TEST'] != None:
 		loader.tests = env['XPCC_JINJA2_TEST']
 	# Jinja2 Line Statements
