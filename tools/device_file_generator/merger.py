@@ -219,8 +219,9 @@ class DeviceMerger:
 		cat1 = [None, 'none', 'p', 'a', 'pa']
 		cat2 = ['rfa1', 'rfa2', 'rfr1', 'rfr2']
 		cat3 = ['hva', 'hvb', 'hve2', 'hvbrevb']
-		cat4 = ['u2', 'u4', 'u6']
-		cat5 = ['m1', 'c1']
+		cat4 = ['u2']
+		cat5 = ['u4', 'u6']
+		cat6 = ['m1', 'c1']
 		# make sure that only one category is used!
 		if type in cat2:
 			cat = cat2
@@ -230,6 +231,8 @@ class DeviceMerger:
 			cat = cat4
 		elif type in cat5:
 			cat = cat5
+		elif type in cat6:
+			cat = cat6
 		else:
 			cat = cat1
 		return cat
