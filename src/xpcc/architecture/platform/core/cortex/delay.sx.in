@@ -1,6 +1,6 @@
 // coding: utf-8
 // ----------------------------------------------------------------------------
-/* Copyright (c) 2011, Roboterclub Aachen e.V.
+/* Copyright (c) 2013, Roboterclub Aachen e.V.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -67,6 +67,18 @@
 _delay_us:
 	// Example:
 	// F_CPU / 1000000 = cycles per us => 72,000,000 / 1,000,000 = 72
+%# Different _delay_us implementations depending on core architecture
+%% if target is cortex_m0
+	// 72 / 4 cycles per loop = 18
+	movs	r1, #(F_CPU / 1000000 / 4)
+	muls	r1, r0, r1
+	beq		2f
+1:
+	subs	r1, r1, #1
+	bne		1b
+2:
+	bx		lr
+%% elif target is cortex_m3 or cortex_m4
 	// 72 / 6 cycles per loop = 12
 	mov		r1, #(F_CPU / 1000000 / 6)
 	muls	r1, r0, r1
@@ -75,6 +87,7 @@ _delay_us:
 	subsne	r1, r1, #1
 	bne		1b
 	bx		lr
+%% endif
 	.size	_delay_us, . - _delay_us
 	.endfunc
 	
@@ -96,6 +109,16 @@ _delay_us:
 	.func	_delay_ms
 _delay_ms:
 	// see _delay_us
+%# Different _delay_us implementations depending on core architecture
+%% if target is cortex_m0
+	ldr		r1, =(F_CPU / 1000 / 4)
+	muls	r1, r0, r1
+	beq		2f
+1:
+	subs	r1, r1, #1
+	bne		1b
+2:	bx		lr
+%% elif target is cortex_m3 or cortex_m4
 	ldr		r1, =(F_CPU / 1000 / 6)
 	muls	r1, r0, r1
 1:
@@ -103,7 +126,8 @@ _delay_ms:
 	subsne	r1, r1, #1
 	bne		1b
 	bx		lr
+%% endif
 	.size	_delay_ms, . - _delay_ms
 	.endfunc
-	
+
 	.end

@@ -6,11 +6,11 @@
 			block_allocator
 		</parameter>
 		<template>startup.c.in</template>
+		<template>delay.sx.in</template>
+		<template>syscalls.cpp.in</template>
 		<static>cxxabi.cpp</static>
 		<static>default_handler.sx</static>
-		<static>delay.sx</static>
 		<static>hard_fault_handler.cpp</static>
 		<static>hard_fault.sx</static>
-		<static>syscalls.cpp</static>
 	</driver>
 </rca>
