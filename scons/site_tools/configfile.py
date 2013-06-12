@@ -109,7 +109,7 @@ class FileList(list):
 class Scanner:
 	
 	HEADER = ['.h', '.hpp']
-	SOURCE = ['.cpp', '.c', '.sx', '.S']
+	SOURCE = ['.cpp', '.c', '.sx', '.S', '.s']
 	
 	def __init__(self, env, unittest=None):
 		""" Constructor
