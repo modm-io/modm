@@ -55,6 +55,11 @@
 #include <xpcc/architecture/utils.hpp>
 #include "../../device.hpp"
 #include "xpcc_config.hpp"
+%% if parameters.enable_gpio
+%%	if target is stm32f2 or target is stm32f3 or target is stm32f4
+#include "../../peripheral/gpio/stm32_af/gpio_enable.h"
+%%	endif
+%% endif
 
 // ----------------------------------------------------------------------------
 {{ platform.defines() }}
@@ -200,6 +205,11 @@ Reset_Handler(void)
 			SCB_SHCSR_BUSFAULTENA_Msk |
 			SCB_SHCSR_USGFAULTENA_Msk |
 			SCB_SHCSR_MEMFAULTENA_Msk;*/
+
+%% if parameters.enable_gpio
+	// Enable GPIO Clock
+	xpcc_gpio_enable();
+%% endif
 
 	// Call CTORS of static objects
 	__libc_init_array();

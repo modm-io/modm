@@ -5,6 +5,7 @@
 		<parameter name="allocator" type="enum" values="newlib;block_allocator">
 			block_allocator
 		</parameter>
+		<parameter name="enable_gpio" type="bool">1</parameter>
 		<template>startup.c.in</template>
 		<template>delay.sx.in</template>
 		<template>syscalls.cpp.in</template>
