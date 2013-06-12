@@ -78,7 +78,7 @@ _delay_us:
 	bne		1b
 2:
 	bx		lr
-%% elif target is cortex_m3 or cortex_m4
+%% elif target is cortex_m3 or target is cortex_m4
 	// 72 / 6 cycles per loop = 12
 	mov		r1, #(F_CPU / 1000000 / 6)
 	muls	r1, r0, r1
@@ -118,7 +118,7 @@ _delay_ms:
 	subs	r1, r1, #1
 	bne		1b
 2:	bx		lr
-%% elif target is cortex_m3 or cortex_m4
+%% elif target is cortex_m3 or target is cortex_m4
 	ldr		r1, =(F_CPU / 1000 / 6)
 	muls	r1, r0, r1
 1:
