@@ -179,9 +179,31 @@ Reset_Handler(void)
 %# Perform Platform Specific Setup
 {{ platform.startupCode() }}
 
+	// Setup NVIC
+	// Set vector table
+	const uint32_t offset = 0;
+	SCB->VTOR = 0x08000000 | (offset & 0x1FFFFF80);
+
+	// Lower priority level for all peripheral interrupts to lowest possible
+	for (uint32_t i = 0; i < NR_INTERRUPTS; i++) {
+		const uint32_t priority = 0xF;
+		NVIC->IP[i] = (priority & 0xF) << 4;
+	}
+
+	// Set the PRIGROUP[10:8] bits to
+	// - 4 bits for pre-emption priority,
+	// - 0 bits for subpriority
+	SCB->AIRCR = 0x05FA0000 | 0x300;
+
+	// Enable fault handlers
+	/*SCB->SHCSR |=
+			SCB_SHCSR_BUSFAULTENA_Msk |
+			SCB_SHCSR_USGFAULTENA_Msk |
+			SCB_SHCSR_MEMFAULTENA_Msk;*/
+
 	// Call CTORS of static objects
 	__libc_init_array();
-	
+
 	// Call the application's entry point
 	main();
 	
