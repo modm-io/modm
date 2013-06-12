@@ -182,6 +182,12 @@ def generate(env, **kw):
 	env['XPCC_PLATFORM_GENERATED_PATH'] = \
 		os.path.join(env['XPCC_LIBRARY_PATH'], 'xpcc', 'architecture', env['XPCC_PLATFORM_GENERATED_DIR'])
 
+	# Remove Generated Folder if Clean Flag is set
+	# Scons does not remove the files on its own
+	if env.GetOption('clean'):
+		env.Info("Removing %s..." % env['XPCC_PLATFORM_GENERATED_PATH'])
+		Execute(Delete(env['XPCC_PLATFORM_GENERATED_PATH']))
+
 	# Add Method to Parse XML Files, and create Template / Copy Dependencies
 	env.AddMethod(platform_tools_generate, 'GeneratePlatform')
 
