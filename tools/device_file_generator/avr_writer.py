@@ -63,6 +63,14 @@ class AVRDeviceWriter(XMLDeviceWriter):
 		
 		# drivers
 		self.addGpioToNode(self.root)
+		# UART
+		self.addUartToNode(self.root)
+		# I2C aka TWI
+		self.addI2cToNode(self.root)
+		# SPI
+		self.addSpiToNode(self.root)
+		# ADC
+		self.addAdcToNode(self.root)
 		
 
 	def addDeviceAttributesToNode(self, node, name):
@@ -80,6 +88,68 @@ class AVRDeviceWriter(XMLDeviceWriter):
 			child.setAttributes(dict)
 			child.setValue(item['value'])
 	
+	def addI2cToNode(self, node):
+		list = self.device.getAttributes('modules')
+		
+		for item in list:
+			target = item['id'].properties
+			for module in item['value']:
+				if 'TWI' in module:
+					driver = node.addChild('driver')
+					driver.setAttributes({'type': 'i2c', 'name': self.family})
+					return
+	
+	def addSpiToNode(self, node):
+		list = self.device.getAttributes('modules')
+		
+		for item in list:
+			target = item['id'].properties
+			for module in item['value']:
+				if 'SPI' in module:
+					driver = node.addChild('driver')
+					driver.setAttributes({'type': 'spi', 'name': self.family})
+					return
+	
+	def addAdcToNode(self, node):
+		list = self.device.getAttributes('modules')
+		
+		for item in list:
+			target = item['id'].properties
+			for module in item['value']:
+				if 'AD_CONVERTER' in module:
+					driver = node.addChild('driver')
+					driver.setAttributes({'type': 'adc', 'name': self.family})
+					return
+	
+	def addUartToNode(self, node):
+		list = self.device.getAttributes('modules')
+		instances = []
+		
+		for item in list:
+			target = item['id'].properties
+			for module in item['value']:
+				if 'USART' in module and 'SPI' not in module:
+					if module == 'USART':
+						instances.append('0')
+					else:
+						instances.append(module[5:6])
+		
+		instances.sort()
+		if instances != []:
+			param_tx = node.addChild('parameter')
+			param_tx.setAttributes({'name': 'tx_buffer', 'type': 'int', 'min': 0, 'max': 253})
+			param_tx.setValue(8)
+			param_rx = node.addChild('parameter')
+			param_rx.setAttributes({'name': 'rx_buffer', 'type': 'int', 'min': 0, 'max': 253})
+			param_rx.setValue(16)
+			
+			driver = node.addChild('driver')
+			driver.setAttributes({'type': 'uart', 'name': self.family, 'instances': ",".join(instances)})
+			driver_param_tx = driver.addChild('parameter')
+			driver_param_tx.setAttributes({'name': 'tx_buffer'})
+			driver_param_rx = driver.addChild('parameter')
+			driver_param_rx.setAttributes({'name': 'rx_buffer'})
+	
 	def addGpioToNode(self, node):
 		list = self.device.getAttributes('gpios')
 		driver = node.addChild('driver')
@@ -92,7 +162,7 @@ class AVRDeviceWriter(XMLDeviceWriter):
 					dict[attr] = target[attr]
 			ports = item['value']
 			ports.sort(key=lambda k: k['port'])
-			for port in item['value']:
+			for port in ports:
 				gpios = self._getAttributedPortDictionary(port)
 				for gpio in gpios:
 					child = driver.addChild('gpio')
