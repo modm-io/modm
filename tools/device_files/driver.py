@@ -117,6 +117,8 @@ class DriverFile:
 				elif os.path.splitext(source_file)[1] == '.in':
 					template = self._makeRelativeToPlatform(source_file)
 					output = self._makeRelativeToPlatform(source_file[:-3])
+					substitutions = self.substitutions
+					substitutions.update({'output': os.path.split(output)[1]})
 					build.append([template, output, self.substitutions])
 		return build
 
@@ -169,6 +171,7 @@ class DriverFile:
 				else:
 					sub_instance_id = instance_id
 				substitutions = dict({'id': sub_instance_id}.items() + self.substitutions.items())
+				substitutions.update({'output': os.path.split(output)[1]})
 				# self.log.debug("%s: substitutions: %s" % (template, substitutions))
 				template_file = [template, output, substitutions]
 				build_list.append(template_file) # always append template files since they will get a different id
@@ -237,7 +240,8 @@ class Parameter:
 			sub_dict['parameters'][self.name] = value
 
 	def evaluateValue(self, value):
-		value = value.strip(' \t\n\r')
+		if isinstance(value, str):
+			value = value.strip(' \t\n\r')
 		if self.type == 'int':
 			value = int(value)
 			if self.max != None and value > self.max:
@@ -250,6 +254,8 @@ class Parameter:
 				return None
 			return value
 		elif self.type == 'bool':
+			if isinstance(value, bool):
+				return value
 			if value.lower == 'true' or value == '1':
 				return True
 			elif value.lower == 'false' or value == '0':
