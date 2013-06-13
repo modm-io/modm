@@ -38,7 +38,7 @@ class Register():
 	and methods for smart comparison.
 	"""
 
-	def __init__(self, name=None, fields=None, logger=None):
+	def __init__(self, name=None, fields=None, size=None, logger=None):
 		if logger == None:
 			self.log = Logger()
 		else:
@@ -48,6 +48,9 @@ class Register():
 			fields = []
 		self.name = name
 		self.fields = fields
+		if size == None:
+			size = 1
+		self.size = size
 
 	def addField(self, name, mask):
 		self.fields.append({'name': name, 'mask': mask})
@@ -84,8 +87,17 @@ class Register():
 		return "Register(" + self.name + ")"
 
 	def __str__(self):
-		s = "\n Register(\n\t{'name': '" + self.name + "',\n"
-		s += "\t'fields': [\n"
-		for field in self.fields:
-			s += "\t\t" + str(field) + "\n"
-		return s + "})"
+		s = "\n Register: " + self.name
+		bW = 15
+		for ii in range(self.size):
+			s += "\n+" + ("-"*(bW-1) + "+")*8
+			values = "\n|" + (" "*(bW-1) + "|")*8
+			self.fields.sort(key=lambda k : k['mask'], reverse=True)
+			for field in self.fields:
+				mask = field['mask']
+				if mask & (0xff << (self.size-1-ii)*8):
+					for iii in range(8):
+						if mask & 2**(7-iii):
+							values = values[:2+bW*iii] + field['name'].center(bW-1) + values[1+bW*(iii+1):]
+			s = s + values + "\n+" + ("-"*(bW-1) + "+")*8
+		return s
