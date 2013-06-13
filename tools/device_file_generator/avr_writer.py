@@ -89,42 +89,27 @@ class AVRDeviceWriter(XMLDeviceWriter):
 			child.setAttributes(self._getAttributeDictionaryFromId(item['id']))
 			child.setValue(item['value'])
 	
-	def addI2cToNode(self, node):
-		list = self.device.getAttributes('modules')
-		
-		for item in list:
-			target = item['id'].properties
+	def addModuleAttributesToNode(self, node, peripheral, name):
+		attributes = self.device.getAttributes('modules')
+		for item in attributes:
+			dict = self._getAttributeDictionaryFromId(item['id'])
 			for module in item['value']:
-				if 'TWI' in module:
+				if peripheral in module:
 					driver = node.addChild('driver')
-					driver.setAttributes({'type': 'i2c', 'name': self.family})
-					return
+					driver.setAttributes(dict)
+					driver.setAttributes({'type': name, 'name': self.family})
+	
+	def addI2cToNode(self, node):
+		self.addModuleAttributesToNode(node, 'TWI', 'i2c')
 	
 	def addSpiToNode(self, node):
-		list = self.device.getAttributes('modules')
-		
-		for item in list:
-			target = item['id'].properties
-			for module in item['value']:
-				if 'SPI' in module:
-					driver = node.addChild('driver')
-					driver.setAttributes({'type': 'spi', 'name': self.family})
-					return
+		self.addModuleAttributesToNode(node, 'SPI', 'spi')
 	
 	def addAdcToNode(self, node):
-		list = self.device.getAttributes('modules')
-		
-		for item in list:
-			target = item['id'].properties
-			for module in item['value']:
-				if 'AD_CONVERTER' in module:
-					driver = node.addChild('driver')
-					driver.setAttributes({'type': 'adc', 'name': self.family})
-					return
+		self.addModuleAttributesToNode(node, 'AD_CONVERTER', 'adc')
 	
 	def addUartToNode(self, node):
 		attributes = self.device.getAttributes('modules')
-		instances = []
 		
 		for item in attributes:
 			instances = []
