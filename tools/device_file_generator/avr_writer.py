@@ -61,6 +61,15 @@ class AVRDeviceWriter(XMLDeviceWriter):
 			child = self.root.addChild('header')
 			child.setValue(header)
 		
+		# parameters
+		if self.isUartAvailable():
+			param_tx = self.root.addChild('parameter')
+			param_tx.setAttributes({'name': 'tx_buffer', 'type': 'int', 'min': 0, 'max': 253})
+			param_tx.setValue(8)
+			param_rx = self.root.addChild('parameter')
+			param_rx.setAttributes({'name': 'rx_buffer', 'type': 'int', 'min': 0, 'max': 253})
+			param_rx.setValue(16)
+
 		# drivers
 		self.addGpioToNode(self.root)
 		# UART
@@ -114,33 +123,32 @@ class AVRDeviceWriter(XMLDeviceWriter):
 					return
 	
 	def addUartToNode(self, node):
-		list = self.device.getAttributes('modules')
+		attributes = self.device.getAttributes('modules')
 		instances = []
 		
-		for item in list:
-			target = item['id'].properties
+		for item in attributes:
+			instances = []
+			dict = self._getAttributeDictionaryFromId(item['id'])
 			for module in item['value']:
 				if 'USART' in module and 'SPI' not in module:
-					if module == 'USART':
-						instances.append('0')
-					else:
-						instances.append(module[5:6])
+					# some device only have a 'USART', but we want 'USART0'
+					mod = module + '0'
+					instances.append(mod[5:6])
+			if instances != []:
+				driver = node.addChild('driver')
+				driver.setAttributes(dict)
+				driver.setAttributes({'type': 'uart', 'name': self.family, 'instances': ",".join(instances)})
+				driver_param_tx = driver.addChild('parameter')
+				driver_param_tx.setAttributes({'name': 'tx_buffer'})
+				driver_param_rx = driver.addChild('parameter')
+				driver_param_rx.setAttributes({'name': 'rx_buffer'})
 		
-		instances.sort()
-		if instances != []:
-			param_tx = node.addChild('parameter')
-			param_tx.setAttributes({'name': 'tx_buffer', 'type': 'int', 'min': 0, 'max': 253})
-			param_tx.setValue(8)
-			param_rx = node.addChild('parameter')
-			param_rx.setAttributes({'name': 'rx_buffer', 'type': 'int', 'min': 0, 'max': 253})
-			param_rx.setValue(16)
-			
-			driver = node.addChild('driver')
-			driver.setAttributes({'type': 'uart', 'name': self.family, 'instances': ",".join(instances)})
-			driver_param_tx = driver.addChild('parameter')
-			driver_param_tx.setAttributes({'name': 'tx_buffer'})
-			driver_param_rx = driver.addChild('parameter')
-			driver_param_rx.setAttributes({'name': 'rx_buffer'})
+	def isUartAvailable(self):
+		for item in  self.device.getAttributes('modules'):
+			for module in item['value']:
+				if 'USART' in module and 'SPI' not in module:
+					return True
+		return False
 	
 	def addGpioToNode(self, node):
 		list = self.device.getAttributes('gpios')
