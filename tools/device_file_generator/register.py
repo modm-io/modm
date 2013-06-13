@@ -32,46 +32,47 @@ import os, sys
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'logger'))
 from logger import Logger
 
-from register import Register
-
-class Peripheral():
-	""" Peripheral
-	Represents the names and masks of the peripherals control and data registers
+class Register():
+	""" Register
+	Represents the names and masks of the registers
 	and methods for smart comparison.
 	"""
 
-	def __init__(self, name=None, registers=None, logger=None):
+	def __init__(self, name=None, fields=None, logger=None):
 		if logger == None:
 			self.log = Logger()
 		else:
 			self.log = logger
 		
+		if fields == None:
+			fields = []
 		self.name = name
-		if registers == None:
-			registers = []
-		self.registers = registers
+		self.fields = fields
 
-	def addRegister(self, register):
-		self.registers.append(register)
-
-	def getComparisonDict(self, other):
-		pass
-
-	def getComparisonPeripheral(self, other):
-		pass
+	def addField(self, name, mask):
+		self.fields.append({'name': name, 'mask': mask})
+	
+	def maskFromRegister(self):
+		mask = 0
+		for field in self.fields:
+			mask |= field['mask']
+		return mask
 
 	def isEmpty(self):
-		return (len(self.registers) == 0 and self.name == None)
+		return (len(self.fields) == 0 and self.name == None)
 
 	def __eq__(self, other):
-		if isinstance(other, Peripheral):
+		if isinstance(other, DevicePeripheral):
 			if self.name != other.name:
 				return False
-			return True
+			if set(self.fields) != set(other.fields):
+				return False
+			return all(self.fields[key] == other.fields[key] for key in self.fields)
+			
 		return NotImplemented
 	
 	def __hash__(self):
-		return hash(self.name + str(self.registers))
+		return hash(self.name + str(self.fields))
 	
 	def __ne__(self, other):
 		result = self.__eq__(o)
@@ -80,13 +81,11 @@ class Peripheral():
 		return not result
 
 	def __repr__(self):
-		return "Peripheral(" + self.name + ")"
+		return "Register(" + self.name + ")"
 
 	def __str__(self):
-		s = "\n Peripheral(\n\t{'name': '" + self.name + "',\n"
-		s += "\t'registers': ["
-		st = ""
-		for reg in self.registers:
-			st += str(reg)
-		st = st.replace("\n", "\n\t")
-		return s + st + "]})"
+		s = "\n Register(\n\t{'name': '" + self.name + "',\n"
+		s += "\t'fields': [\n"
+		for field in self.fields:
+			s += "\t\t" + str(field) + "\n"
+		return s + "})"
