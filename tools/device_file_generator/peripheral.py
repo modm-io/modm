@@ -58,10 +58,30 @@ class Peripheral():
 		pass
 
 	def getComparisonPeripheral(self, other):
-		pass
+		assert isinstance(other, Peripheral)
+		
+		dict = {'common_keys': [], 'different_keys': []}
+		
+		common = Peripheral(self.name)
+		self_delta = Peripheral(self.name)
+		other_delta = Peripheral(self.name)
+		
+		# compare registers
+		self_regs = list(self.registers)
+		other_regs = list(other.registers)
+		
+		common.registers = list(set(self_regs).intersection(other_regs))
+		self_delta.registers = list(set(self_regs).difference(other_regs))
+		other_delta.registers = list(set(other_regs).difference(self_regs))
+		
+		dict['common'] = common
+		dict['self_delta'] = self_delta
+		dict['other_delta'] = other_delta 
+		
+		return dict
 
 	def isEmpty(self):
-		return (len(self.registers) == 0 and self.name == None)
+		return len(self.registers) == 0
 
 	def __eq__(self, other):
 		if isinstance(other, Peripheral):
@@ -80,10 +100,10 @@ class Peripheral():
 		return not result
 
 	def __repr__(self):
-		return "Peripheral(" + self.name + ")"
+		return "Peripheral(" + str(self.name) + ")"
 
 	def __str__(self):
-		s = "\n Peripheral(\n\t{'name': '" + self.name + "',\n"
+		s = "\n Peripheral(\n\t{'name': '" + str(self.name) + "',\n"
 		s += "\t'registers': ["
 		st = ""
 		for reg in self.registers:

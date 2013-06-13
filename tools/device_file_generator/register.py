@@ -62,15 +62,16 @@ class Register():
 		return mask
 
 	def isEmpty(self):
-		return (len(self.fields) == 0 and self.name == None)
+		return len(self.fields) == 0
 
 	def __eq__(self, other):
-		if isinstance(other, DevicePeripheral):
+		if isinstance(other, Register):
 			if self.name != other.name:
 				return False
-			if set(self.fields) != set(other.fields):
+			if len(self.fields) != len(other.fields):
 				return False
-			return all(self.fields[key] == other.fields[key] for key in self.fields)
+			return all(item in self.fields for item in other.fields) and \
+				all(item in other.fields for item in self.fields)
 			
 		return NotImplemented
 	
@@ -84,10 +85,10 @@ class Register():
 		return not result
 
 	def __repr__(self):
-		return "Register(" + self.name + ")"
+		return "Register(" + str(self.name) + ")"
 
 	def __str__(self):
-		s = "\n Register: " + self.name
+		s = "\n Register: " + str(self.name)
 		bW = 15
 		for ii in range(self.size):
 			s += "\n+" + ("-"*(bW-1) + "+")*8
