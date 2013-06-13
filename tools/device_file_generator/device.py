@@ -134,27 +134,28 @@ class Device:
 			return self
 
 		comparison = self.id.getComparisonDeviceIndentifier(other.id)
-		self.log.debug("'device' differs: " + str(comparison['different_keys']) + " " + comparison['common'].string)
+		self.log.debug("'id' differs: " + str(comparison['different_keys']) + " " + comparison['common'].string)
 		
 		# build a new parent Device, with all the common features
 		parent = Device(None, self.log)
-		parent.id = comparison['common']
+		parent.properties['id'] = comparison['common']
 		
 		# build two new child Devices, with only the delta information
 		self_child = Device(None, self.log)
-		self_child.id = comparison['self_delta']
+		self_child.properties['id'] = comparison['self_delta']
 		other_child = Device(None, self.log)
-		other_child.id = comparison['other_delta']
+		other_child.properties['id'] = comparison['other_delta']
 		
 		# unchanged properties obviously belong into the parent
 		for key in diff['equal']:
-			parent.properties[key] = self.properties[key]
+			if key != 'id':
+				parent.properties[key] = self.properties[key]
 		
 		# changed properties must be handled specially
 		for key in diff['different']:
 			self_value = self.properties[key]
 			other_value = other.properties[key]
-			if key != 'device':
+			if key != 'id':
 				self.log.debug("'" + key + "' differs:\n" + str(self_value) + "\n" + str(other_value))
 				# for lists we want the difference sets in the children devices
 				# and the common set in the parent device
