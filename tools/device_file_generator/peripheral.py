@@ -62,9 +62,11 @@ class Peripheral():
 		
 		dict = {'common_keys': [], 'different_keys': []}
 		
-		common = Peripheral(self.name)
+		common = Peripheral()
+		if self.name == other.name:
+			common.name == self.name
 		self_delta = Peripheral(self.name)
-		other_delta = Peripheral(self.name)
+		other_delta = Peripheral(other.name)
 		
 		# compare registers
 		self_regs = list(self.registers)
@@ -85,9 +87,10 @@ class Peripheral():
 
 	def __eq__(self, other):
 		if isinstance(other, Peripheral):
-			if self.name != other.name:
-				return False
-			return True
+			comp = self.getComparisonPeripheral(other)
+			if comp['self_delta'].isEmpty() and comp['other_delta'].isEmpty():
+				return True
+			return False
 		return NotImplemented
 	
 	def __hash__(self):
