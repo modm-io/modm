@@ -102,8 +102,7 @@ class DeviceMerger:
 				if not (family == "" and type == None):
 					type = self._getCategoryTypeAVR(current)
 					
-					string = "ByName: Searching for device ending in '" + family + "' and '" + str(type)
-					self.log.info(string + "'")
+					self.log.info("ByName: Searching for device ending in '" + family + "' and '" + str(type) + "'")
 					
 					for dev in devs:
 						dname = dev.getDeviceAttributes('name')[0]

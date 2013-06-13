@@ -28,7 +28,8 @@
 # -----------------------------------------------------------------------------
 
 from reader import XMLDeviceReader
-from peripheral import DevicePeripheral
+from peripheral import Peripheral
+from register import Register
 
 import os, sys
 # add python module logger to path
@@ -92,16 +93,18 @@ class AVRDeviceReader(XMLDeviceReader):
 			
 			if "PORT" in name:
 				module = self.createModule(name)
-				gpios.append(self._gpioFromModule(module))
-				
+				gpios.extend(self._gpioFromModule(module))
+				continue
+			
 			if any(name.startswith(per) for per in ["EXTERNAL_INT", "TWI", "USART", "SPI", "AD_CON", "USB"]):
 				modules.append(name)
 				module = self.createModule(name)
 				peripherals.append(module)
+				continue
 	
 	def createModule(self, name):
 		if name in self.modules:
-			return DevicePeripheral(name, self._registersOfModule(name), self.log)
+			return Peripheral(name, self._registersOfModule(name), self.log)
 		else:
 			self.log.error("'" + name + "' not a module!")
 			self.log.error("Available modules are:\n" + self._modulesToString())
@@ -116,16 +119,16 @@ class AVRDeviceReader(XMLDeviceReader):
 	
 	def _translateRegister(self, queryResult):
 		mask = queryResult.get('mask')
-		bitfields = []
+		register = Register(queryResult.get('name'))
+		
 		if mask == None:
 			fields = queryResult.findall('bitfield')
 			for field in fields:
-				bitfields.append({'name': field.get('name'), 'mask': int(field.get('mask'), 16)})
+				register.addField(field.get('name'), int(field.get('mask'), 16))
 		else:
-			bitfields.append({'name': 'data', 'mask': int(mask, 16)})
+			register.addField('data', int(mask, 16))
 		
-		result = {'name': queryResult.get('name'), 'fields': bitfields}
-		return result
+		return register
 
 	def _modulesToString(self):
 		string = ""
@@ -145,10 +148,23 @@ class AVRDeviceReader(XMLDeviceReader):
 		"""
 		port = module.name[4:5]
 		for reg in module.registers:
-			if module.name == reg['name']: 
-				mask = module.maskFromRegister(reg)
-				return {'port': port, 'mask': mask}
+			if module.name == reg.name: 
+				mask = reg.maskFromRegister()
+				return self._getAttributedPortDictionary({'port': port, 'mask': mask})
 		return None
+	
+	def _getAttributedPortDictionary(self, port):
+		ports = []
+		mask = port['mask']
+		id = 0
+		
+		while id < 16:
+			if mask & 0x01:
+				ports.append({'port': port['port'], 'id': str(id)})
+			mask >>= 1
+			id += 1
+		
+		return ports
 
 	def __repr__(self):
 		return self.__str__()

@@ -172,7 +172,6 @@ class Device:
 								other_value.remove(sval)
 							else:
 								self_minus_other.append(sval)
-							self_value.remove(sval)
 						other_minus_self = list(other_value)
 					else:
 						common = list(set(self_value).intersection(other_value))
@@ -240,17 +239,17 @@ class Device:
 		attributes = []
 		
 		if name in self.properties:
-			return [{'id': self.id, 'value': self.properties[name]}]
-		else:
-			for inst in self.instances:
-				dicts = inst.getAttributes(name)
-				for attr in dicts:
-					target = attr['id']
-					self_target = self.id.properties
-					for key in self_target:
-						if getattr(target, key) == None:
-							setattr(target, key, self_target[key])
-				attributes.extend(dicts)
+			attributes.append({'id': self.id, 'value': self.properties[name]})
+			
+		for inst in self.instances:
+			dicts = inst.getAttributes(name)
+			for attr in dicts:
+				target = attr['id']
+				self_target = self.id.properties
+				for key in self_target:
+					if getattr(target, key) == None:
+						setattr(target, key, self_target[key])
+			attributes.extend(dicts)
 		
 		return attributes
 	
@@ -265,13 +264,13 @@ class Device:
 			if key == 'instances':
 				ilen = len(self.instances)
 				ii = 0
-				string = "{'instances': '["
+				string = "{'instances': ["
 				for dev in self.instances:
 					string += str(dev)
 					if ii < ilen-1:
 						string +=  "', '"
 					ii += 1
-				s += string.replace("\n", "\n\t") + "]'}"
+				s += string.replace("\n", "\n\t") + "]}"
 			else:
 				s += "{'" + key + "': '" + str(self.properties[key]) + "'}"
 			if i < length-1:

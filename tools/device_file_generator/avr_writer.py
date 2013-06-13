@@ -77,15 +77,7 @@ class AVRDeviceWriter(XMLDeviceWriter):
 		list = self.device.getAttributes(name)
 		for item in list:
 			child = node.addChild(name)
-			target = item['id'].properties
-			dict = {}
-			for attr in target:
-				if target[attr] != None:
-					if attr == 'type' and len(self.types) > 1:
-						dict[attr] = target[attr]
-					if attr == 'name' and len(self.names) > 1:
-						dict[attr] = target[attr]
-			child.setAttributes(dict)
+			child.setAttributes(self._getAttributeDictionaryFromId(item['id']))
 			child.setValue(item['value'])
 	
 	def addI2cToNode(self, node):
@@ -155,19 +147,13 @@ class AVRDeviceWriter(XMLDeviceWriter):
 		driver = node.addChild('driver')
 		driver.setAttributes({'type': 'gpio', 'name': self.family})
 		for item in list:
-			target = item['id'].properties
-			dict = {}
-			for attr in target:
-				if attr in ['type', 'name'] and target[attr] != None:
-					dict[attr] = target[attr]
-			ports = item['value']
-			ports.sort(key=lambda k: k['port'])
-			for port in ports:
-				gpios = self._getAttributedPortDictionary(port)
-				for gpio in gpios:
-					child = driver.addChild('gpio')
-					#child.setAttributes(dict)
-					child.setAttributes(gpio)
+			gpios = item['value']
+			gpios.sort(key=lambda k: k['port'])
+			dict = self._getAttributeDictionaryFromId(item['id'])
+			for gpio in gpios:
+				child = driver.addChild('gpio')
+				child.setAttributes(dict)
+				child.setAttributes(gpio)
 
 	def _getAttributedPortDictionary(self, port):
 		ports = []
@@ -181,6 +167,17 @@ class AVRDeviceWriter(XMLDeviceWriter):
 			id += 1
 		
 		return ports
+	
+	def _getAttributeDictionaryFromId(self, id):
+		target = id.properties
+		dict = {}
+		for attr in target:
+			if target[attr] != None:
+				if attr == 'type' and len(self.types) > 1:
+					dict['device-type'] = target[attr]
+				if attr == 'name' and len(self.names) > 1:
+					dict['device-name'] = target[attr]
+		return dict
 	
 	def write(self, folder):
 		names = self.device.getDeviceNames()
