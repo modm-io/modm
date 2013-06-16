@@ -34,5 +34,78 @@ Use the *pin-count* atrribute to specify on which devices this gpio is
 available
 
 
+GPIO Ports
+----------
+
+Each port bit of the General Purpose IO (GPIO) Ports, can be
+individually configured by software in several modes:
+- Input floating
+- Input (with pull-up or pull-down)
+- Analog
+- Output open-drain (with pull-up or pull-down)
+- Output push-pull (with pull-up or pull-down)
+- Alternate function push-pull (with pull-up or pull-down)
+- Alternate function open-drain (with pull-up or pull-down)
+
+GPIOx_MODER (32-bit)
+  00: Input
+  01: General purpose output mode
+  10: Alternate function mode
+  11: Analog mode
+GPIOx_OTYPER (16-bit)
+  0: Output push-pull
+  1: Output open-drain
+GPIOx_OSPEEDR (32-bit)
+  00: 2 MHz
+  01: 25 MHz
+  10: 50 MHz
+  11: 100 MHz
+GPIOx_PUPDR (32-bit)
+  00: No pull-up, pull-down
+  01: Pull-up
+  10: Pull-down
+  11: Reserved
+
+GPIOx_IDR = input state (read-only) (16-bit)
+GPIOx_ODR = output state (16-bit)
+
+GPIOx_BSRR = set and reset register (32-bit)
+- BSRR(i) sets
+- BSRR(i+16) resets
+
+How To Use
+----------
+	GPIO__INPUT(Button, A, 0);
+
+	Button::setInput();
+	Button::setInput(xpcc::stm32::PULLUP);
+	Button::setInput(xpcc::stm32::PULLDOWN);
+	Button::setAnalogInput();
+	Button::setAlternateFunction();
+	Button::setAlternateFunction(xpcc::stm32::PULLDOWN);
+	if (Button::read()) {
+	    ...
+	}
+
+
+
+	GPIO__OUTPUT(Led, C, 12);
+
+	Led::setOutput();
+	Led::setOutput(xpcc::stm32::PUSH_PULL);
+	Led::setOutput(xpcc::stm32::PUSH_PULL, xpcc::stm32::SPEED_10MHZ);
+	Led::setOutput(xpcc::stm32::OPEN_DRAIN);
+
+	Led::setAlternateFunction(); 
+	Led::setAlternateFunction(xpcc::stm32::PUSH_PULL); 
+	Led::setAlternateFunction(xpcc::stm32::PUSH_PULL, xpcc::stm32::SPEED_50MHZ); 
+	Led::setAlternateFunction(xpcc::stm32::OPEN_DRAIN);
+
+	Led::set();
+	Led::reset();
+
+	Led::toggle();
+
+
 Changelog
 ---------
