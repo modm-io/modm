@@ -11,7 +11,7 @@
 		<template>syscalls.cpp.in</template>
 		<static>cxxabi.cpp</static>
 		<static>default_handler.sx</static>
-		<static>hard_fault_handler.cpp</static>
-		<static>hard_fault.sx</static>
+		<static device-core="cortex-m3|cortex-m4">hard_fault_handler.cpp</static>
+		<static device-core="cortex-m3|cortex-m4">hard_fault.sx</static>
 	</driver>
 </rca>
