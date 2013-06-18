@@ -83,14 +83,14 @@ class AVRDeviceWriter(XMLDeviceWriter):
 		
 
 	def addDeviceAttributesToNode(self, node, name):
-		list = self.device.getAttributes(name)
-		for item in list:
+		attributes = self.device.getAttributes(name)
+		for item in attributes:
 			child = node.addChild(name)
 			child.setAttributes(self._getAttributeDictionaryFromId(item['id']))
 			child.setValue(item['value'])
 	
 	def addModuleAttributesToNode(self, node, peripheral, name):
-		attributes = self.device.getAttributes('modules')
+		attributes = self._getModuleAttributes()
 		for item in attributes:
 			dict = self._getAttributeDictionaryFromId(item['id'])
 			for module in item['value']:
@@ -109,7 +109,7 @@ class AVRDeviceWriter(XMLDeviceWriter):
 		self.addModuleAttributesToNode(node, 'AD_CONVERTER', 'adc')
 	
 	def addUartToNode(self, node):
-		attributes = self.device.getAttributes('modules')
+		attributes = self._getModuleAttributes()
 		
 		for item in attributes:
 			instances = []
@@ -135,11 +135,16 @@ class AVRDeviceWriter(XMLDeviceWriter):
 					return True
 		return False
 	
+	def _getModuleAttributes(self):
+		attributes = self.device.getAttributes('modules')
+		newAttributes = attributes
+		return newAttributes
+	
 	def addGpioToNode(self, node):
-		list = self.device.getAttributes('gpios')
+		attributes = self.device.getAttributes('gpios')
 		driver = node.addChild('driver')
 		driver.setAttributes({'type': 'gpio', 'name': self.family})
-		for item in list:
+		for item in attributes:
 			gpios = item['value']
 			gpios.sort(key=lambda k: k['port'])
 			dict = self._getAttributeDictionaryFromId(item['id'])

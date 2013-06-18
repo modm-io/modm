@@ -55,8 +55,8 @@ class DeviceMerger:
 			self.log = logger
 		
 		mergedByType = self._mergeDevicesByType(self.devices)
-		mergedByName = self._mergeDevicesByName(mergedByType)
-		self.mergedDevices = mergedByName
+		#mergedByName = self._mergeDevicesByName(mergedByType)
+		self.mergedDevices = mergedByType
 
 	
 	def _mergeDevicesByName(self, devices):
@@ -215,23 +215,17 @@ class DeviceMerger:
 	def _getCategoryTypeAVR(self, device):
 		type = device.getDeviceAttributes('type')[0]
 		# these are the categories of mergable types
-		cat1 = [None, 'none', 'p', 'a', 'pa']
-		cat2 = ['rfa1', 'rfa2', 'rfr1', 'rfr2']
-		cat3 = ['hva', 'hvb', 'hve2', 'hvbrevb']
-		cat4 = ['u2']
-		cat5 = ['u4', 'u6']
-		cat6 = ['m1', 'c1']
+		categories = [ 	[None, 'none', 'p', 'a', 'pa'],
+						['rfa1', 'rfa2', 'rfr1', 'rfr2'],
+						['hvb', 'hve2', 'hvbrevb'],
+						['hva'],
+						['u2'],
+						['u4', 'u6'],
+						['m1', 'c1']
+						]
 		# make sure that only one category is used!
-		if type in cat2:
-			cat = cat2
-		elif type in cat3:
-			cat = cat3
-		elif type in cat4:
-			cat = cat4
-		elif type in cat5:
-			cat = cat5
-		elif type in cat6:
-			cat = cat6
-		else:
-			cat = cat1
-		return cat
+		for cat in categories:
+			if type in cat:
+				return cat
+		
+		return categories[0]

@@ -47,8 +47,9 @@ if __name__ == "__main__":
 	devices = []
 	
 	for arg in sys.argv[1:]:
-		if arg in ['error', 'warn', 'info', 'debug', 'disable']:
+		if arg in ['error', 'warn', 'info', 'debug', 'disabled']:
 			level = arg
+			logger.setLogLevel(level)
 			continue
 		xml_path = os.path.join(os.path.dirname(__file__), '..', '..', '..', 'AVR_devices', (arg + '*'))
 		files = glob.glob(xml_path)
@@ -57,8 +58,6 @@ if __name__ == "__main__":
 			if os.path.basename(file) != "ATtiny28.xml":
 				part = AVRDeviceReader(file, logger)
 				devices.append(Device(part, logger))
-	
-	logger.setLogLevel(level)
 	
 	merger = DeviceMerger(devices, logger)
 #	folder = os.path.join(os.path.dirname(__file__), '..', '..', 'xpcc', 'platform', 'xml')
