@@ -55,6 +55,9 @@ class XMLDeviceWriter:
 		
 		self.tree = XMLElement('rca')
 		self.tree.setAttribute('version', '1.0')
+		self.tree.addComment(' WARNING: This file is generated automatically, do not edit!\n \
+		Please modify the xpcc/tools/DeviceFileGenerator code instead and rebuild this file.\n \
+		Be aware, that regenerated files might have a different composition for technical reasons. ')
 		
 		self.root = self.tree.addChild('device')
 		self.root.setAttributes({'platform': self.platform, 'family': self.family, 'name': "|".join(self.names)})
@@ -113,6 +116,9 @@ class XMLElement:
 		element = XMLElement()
 		element.root = etree.SubElement(self.root, name)
 		return element
+	
+	def addComment(self, comment):
+		self.root.append(etree.Comment(str(comment)))
 	
 	def setValue(self, value):
 		self.root.text = str(value)
