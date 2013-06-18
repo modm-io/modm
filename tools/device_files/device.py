@@ -208,7 +208,7 @@ class DeviceFile:
 		pin_count = self.getProperty('pin-count', device_string)
 		if pin_count == None or len(pin_count) <= 0:
 			pin_count = 10000
-		elif len(pin_count) == 1:
+		elif len(pin_count) == 1: # FIXME: this seems wrong!
 			pin_count = pin_count[0]
 		else:
 			pin_count = 0
@@ -219,7 +219,7 @@ class DeviceFile:
 				substitutions = s.getTargetDict()
 				substitutions['target']['core'] = self.core
 				substitutions.update(self.getSubstitutions())
-				drivers.append(d.toDict(platform_path, substitutions))
+				drivers.append(d.toDict(platform_path, substitutions, pin_count, self.core))
 		return drivers
 
 ##-----------------------------------------------------------------------------
@@ -292,7 +292,7 @@ class Driver(DeviceElementBase):
 		self.parameters = self._getParameters(node)
 		self.substitutions = self._getDriverSubstitutions(node)
 
-	def toDict(self, platform_path, substitutions):
+	def toDict(self, platform_path, substitutions, pin_count, device_core):
 		"""
 		This is used to package information about a driver extracted from
 		a device file into a dictionary.
@@ -309,6 +309,8 @@ class Driver(DeviceElementBase):
 		dic['substitutions'] = substitutions
 		dic['substitutions'].update(self.substitutions) # own substitutions overwrite
 		dic['instances'] = self.instances
+		dic['pin_count'] = pin_count
+		dic['device_core'] = device_core
 		return dic
 
 	def getDriverFile(self, platform_path):

@@ -127,7 +127,7 @@ def platform_tools_generate(env, architecture_path):
 		ddic['name'] = d.name
 		ddic['type'] = d.type
 		ddic['headers'] = []
-		build = d.getBuildList(env['XPCC_PLATFORM_PATH'])
+		build = d.getBuildList(env['XPCC_PLATFORM_PATH'], env['XPCC_DEVICE'])
 		for f in build:
 			src = os.path.join(platform_path, f[0])
 			tar = os.path.join(generated_path, f[1])

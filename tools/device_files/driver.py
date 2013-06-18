@@ -36,6 +36,8 @@ import xml.etree.ElementTree as et
 import xml.parsers.expat
 
 from parser_exception import ParserException
+from device_identifier import DeviceIdentifier
+from device_element import DeviceElementBase
 
 # add python module logger to path
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'logger'))
@@ -70,15 +72,23 @@ class DriverFile:
 		d.device_parameters = dic['parameters']
 		d.substitutions = dic['substitutions']
 		d.instances = dic['instances']
+		d.pin_count = dic['pin_count']
+		d.device_core = dic['device_core']
+		# Debug Output
+		# d.log.debug("DriverFile.fromDict(): %s" % dic)
+		# d.log.debug("d.device_core : %s" % d.device_core)
 		return d
 
-	def getBuildList(self, platform_path, source_file_extentions = ['.cpp', '.c', '.sx', '.S', '.h', '.hpp']):
+	def getBuildList(self, platform_path, device_id = None, source_file_extentions = ['.cpp', '.c', '.sx', '.S', '.h', '.hpp']):
 		"""
 		The data is put into a list of the format:
 		[ ['static_file_name', 'static_output_file_name'],
 		['template_src_file','template_target_file',{'Dict': 'a', 'of': 'b', 'defines': 's'}]]
 		Note: all file paths are relative to the platform path.
 		"""
+		# Turn Device String into Device Identifier
+		if isinstance(device_id, str):
+			device_id = DeviceIdentifier(device_id)
 		# Initialize Return List
 		build = []
 		# Check if there is a driver file and open
@@ -102,10 +112,10 @@ class DriverFile:
 				% (self.name, node.get('name'), f))
 			# Do we only have one default instance?
 			if self.instances == None:
-				self._parseDriverXml(node, 'default', build)
+				self._parseDriverXml(device_id, node, 'default', build)
 			else: # handle several or at least one specific instance
 				for instance in self.instances:
-					self._parseDriverXml(node, instance, build)
+					self._parseDriverXml(device_id, node, instance, build)
 		else: # if no xml driver file exists, just add all files that look like source files
 			# Query all files in directory
 			for source_file in os.listdir(os.path.join(platform_path, self.path)):
@@ -122,7 +132,7 @@ class DriverFile:
 					build.append([template, output, self.substitutions])
 		return build
 
-	def _parseDriverXml(self, driver_node, instance_id, build_list):
+	def _parseDriverXml(self, device_id, driver_node, instance_id, build_list):
 		# First parse parameters:
 		for node in driver_node:
 			if node.tag == 'parameter':
@@ -139,42 +149,52 @@ class DriverFile:
 				p.addValueToSubstitutions(self.substitutions, value)
 		# Then parse needed static/template files
 		for node in driver_node:
+			# Skip PArameters:
+			if node.tag == 'parameter':
+				continue
 			# Check if instance id fits:
 			if node.get('instances') != None and instance_id != None and instance_id != 'default':
 				if instance_id not in node.get('instances').split(','):
 					continue
 			if node.text == None or len(node.text) <= 0:
-				self.log.error("Error: Empty %s node in %s/%s driver xml." % (node.tag, self.type, self.name))
+				self.log.error("Empty %s node in %s/%s driver xml." % (node.tag, self.type, self.name))
 				raise ParserException("Error: Empty %s node in %s/%s driver xml." % (node.tag, self.type, self.name))
-			if node.tag == 'static':
-				if node.text not in build_list: # if it has not been added before
-					static = node.text
+			if node.tag not in ['static', 'template']:
+				self.log.error("Unknown tag: %s in %s/%s driver xml." % (node.tag, self.type, self.name))
+				raise ParserException("Error: Unknown tag: %s in %s/%s driver xml." % (node.tag, self.type, self.name))
+			f = DeviceElementBase(self, node)
+			if not f.appliesTo(device_id, self.pin_count, self.device_core):
+				self.log.info("Tag %s does not apply to device %s. In %s/%s driver xml." % (node.tag, device_id, self.type, self.name))
+			else:
+				if node.tag == 'static':
+					if node.text not in build_list: # if it has not been added before
+						static = node.text
+						output = node.get('out')
+						if output == None or len(output) <= 0: # if no out attribute was found
+							output = static
+						static = self._makeRelativeToPlatform(static)
+						output = self._makeRelativeToPlatform(output)
+						build_list.append([static, output])# => add static file
+				elif node.tag == 'template':
+					template = node.text
 					output = node.get('out')
 					if output == None or len(output) <= 0: # if no out attribute was found
-						output = static
-					static = self._makeRelativeToPlatform(static)
+						output = template
+						if output.endswith('.in'):
+							output = output[:-3]
+					else: # replace '{{id}}' with id
+						output = output.replace('{{id}}', instance_id)
+					template = self._makeRelativeToPlatform(template)
 					output = self._makeRelativeToPlatform(output)
-					build_list.append([static, output])# => add static file
-			elif node.tag == 'template':
-				template = node.text
-				output = node.get('out')
-				if output == None or len(output) <= 0: # if no out attribute was found
-					output = template
-					if output.endswith('.in'):
-						output = output[:-3]
-				else: # replace '{{id}}' with id
-					output = output.replace('{{id}}', instance_id)
-				template = self._makeRelativeToPlatform(template)
-				output = self._makeRelativeToPlatform(output)
-				if instance_id.isdigit():
-					sub_instance_id = int(instance_id)
-				else:
-					sub_instance_id = instance_id
-				substitutions = dict({'id': sub_instance_id}.items() + self.substitutions.items())
-				substitutions.update({'output': os.path.split(output)[1]})
-				# self.log.debug("%s: substitutions: %s" % (template, substitutions))
-				template_file = [template, output, substitutions]
-				build_list.append(template_file) # always append template files since they will get a different id
+					if instance_id.isdigit():
+						sub_instance_id = int(instance_id)
+					else:
+						sub_instance_id = instance_id
+					substitutions = dict({'id': sub_instance_id}.items() + self.substitutions.items())
+					substitutions.update({'output': os.path.split(output)[1]})
+					# self.log.debug("%s: substitutions: %s" % (template, substitutions))
+					template_file = [template, output, substitutions]
+					build_list.append(template_file) # always append template files since they will get a different id
 
 	def _makeRelativeToPlatform(self, file_name):
 		"""

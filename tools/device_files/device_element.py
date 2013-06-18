@@ -50,6 +50,7 @@ class DeviceElementBase:
 		self.device_family   = node.get('device-family')   # e.g. f4
 		self.device_name     = node.get('device-name')     # e.g. 405
 		self.device_type     = node.get('device-type')     # e.g. for avr: m1
+		self.device_core     = node.get('device-core')
 		# Split Attributes that can be split
 		if self.pin_id != None:
 			self.pin_id = self.pin_id.split('|')
@@ -63,6 +64,8 @@ class DeviceElementBase:
 			self.device_name = self.device_name.split('|')
 		if self.device_type != None:
 			self.device_type = self.device_type.split('|')
+		if self.device_core != None:
+			self.device_core = self.device_core.split('|')
 		# parse pin count
 		[self.pin_count, self.pin_count_type] = self._parsePinCount(self.pin_count)
 
@@ -79,7 +82,7 @@ class DeviceElementBase:
 			raise ParserException("Pincount needs to be an integer value that can be followed by +/-: '%s' is not a valid pincount." % (pin_count))
 		return [pin_count, pin_count_type]
 
-	def appliesTo(self, device_string, pin_count=10000):
+	def appliesTo(self, device_string, pin_count=10000, core=None):
 		"""
 		checks if this property/driver applies to the device specified by the
 		device string
@@ -113,4 +116,7 @@ class DeviceElementBase:
 			elif self.pin_count_type == '-':
 				if self.pin_count < pin_count:
 					return False
+		if self.device_core != None:
+			if core == None or len(core) == 0 or core not in self.device_core:
+				return False
 		return True
