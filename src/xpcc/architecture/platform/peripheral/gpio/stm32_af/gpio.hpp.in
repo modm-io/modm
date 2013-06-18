@@ -36,44 +36,39 @@ xpcc_gpio_enable()
 {
 	// FIXME: add possibility to switch individual clocks on and off
 %% if target is stm32f2 or target is stm32f4
-	// Enable GPIO clock
-	// TODO adapt to actual pin count!
-	// GPIOA-D
-	RCC->AHB1ENR  |=   RCC_AHB1ENR_GPIOAEN   | RCC_AHB1ENR_GPIOBEN   | RCC_AHB1ENR_GPIOCEN   | RCC_AHB1ENR_GPIODEN;
-	RCC->AHB1RSTR |=   RCC_AHB1RSTR_GPIOARST | RCC_AHB1RSTR_GPIOBRST | RCC_AHB1RSTR_GPIOCRST | RCC_AHB1RSTR_GPIODRST;
-	RCC->AHB1RSTR &= ~(RCC_AHB1RSTR_GPIOARST | RCC_AHB1RSTR_GPIOBRST | RCC_AHB1RSTR_GPIOCRST | RCC_AHB1RSTR_GPIODRST);
-	// GPIOE-I
-	RCC->AHB1ENR  |=   RCC_AHB1ENR_GPIOEEN   | RCC_AHB1ENR_GPIOFEN   | RCC_AHB1ENR_GPIOGEN   | RCC_AHB1ENR_GPIOHEN   | RCC_AHB1ENR_GPIOIEN;
-	RCC->AHB1RSTR |=   RCC_AHB1RSTR_GPIOERST | RCC_AHB1RSTR_GPIOFRST | RCC_AHB1RSTR_GPIOGRST | RCC_AHB1RSTR_GPIOHRST | RCC_AHB1RSTR_GPIOIRST;
-	RCC->AHB1RSTR &= ~(RCC_AHB1RSTR_GPIOERST | RCC_AHB1RSTR_GPIOFRST | RCC_AHB1RSTR_GPIOGRST | RCC_AHB1RSTR_GPIOHRST | RCC_AHB1RSTR_GPIOIRST);
+%%	set clock_tree = 'AHB1'
 %% elif target is stm32f3
-	// Enable GPIO clock
-	// TODO adapt to actual pin count!
-	// GPIOA-F
-	RCC->AHBENR  |=
-			  RCC_AHBENR_GPIOAEN
-			| RCC_AHBENR_GPIOBEN
-			| RCC_AHBENR_GPIOCEN
-			| RCC_AHBENR_GPIODEN
-			| RCC_AHBENR_GPIOEEN
-			| RCC_AHBENR_GPIOFEN
-			;
-	RCC->AHBRSTR |=
-			  RCC_AHBRSTR_GPIOARST
-			| RCC_AHBRSTR_GPIOBRST
-			| RCC_AHBRSTR_GPIOCRST
-			| RCC_AHBRSTR_GPIODRST
-			| RCC_AHBRSTR_GPIOFRST
-			; // Reset value is 0, check if this can be left out.
-
-	RCC->AHBRSTR &=
-			~( RCC_AHBRSTR_GPIOARST
-			 | RCC_AHBRSTR_GPIOBRST
-			 | RCC_AHBRSTR_GPIOCRST
-			 | RCC_AHBRSTR_GPIODRST
-			 | RCC_AHBRSTR_GPIOFRST)
-			;
+%%	set clock_tree = 'AHB'
 %% endif
+
+	// Enable GPIO clock
+RCC->{{ clock_tree }}ENR  |=
+%% for port in gpios|xpcc.values('port')|sort
+%%	if not loop.last
+	RCC_{{ clock_tree }}ENR_GPIO{{ port }}EN |
+%%	else
+	RCC_{{ clock_tree }}ENR_GPIO{{ port }}EN;
+%%	endif
+%% endfor
+
+	// Reset GPIO peripheral
+RCC->{{ clock_tree }}RSTR |=
+%% for port in gpios|xpcc.values('port')|sort
+%%	if not loop.last
+	RCC_{{ clock_tree }}RSTR_GPIO{{ port }}RST |
+%%	else
+	RCC_{{ clock_tree }}RSTR_GPIO{{ port }}RST;
+%%	endif
+%% endfor
+
+RCC->{{ clock_tree }}RSTR &= ~(
+%% for port in gpios|xpcc.values('port')|sort
+%%	if not loop.last
+	RCC_{{ clock_tree }}RSTR_GPIO{{ port }}RST |
+%%	else
+	RCC_{{ clock_tree }}RSTR_GPIO{{ port }}RST);
+%%	endif
+%% endfor
 }
 
 

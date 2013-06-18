@@ -79,11 +79,25 @@ def jinja2_template_action(target, source, env):
 		tab_count =  (min_width/tab_width - len(value)/tab_width) + 1
 		return value + ('\t' * tab_count)
 
+	def filter_values(lst, key):
+		"""
+		Goes through the list of dictionaries and
+		adds all the values of a certain key
+		to a list which is thus returned
+		"""
+		values = []
+		for item in lst:
+			if isinstance(item, dict) and key in item:
+				if item[key] not in values:
+					values.append(item[key])
+		return values
+
 	path, filename = os.path.split(source[0].path)
 	loader = jinja2.Environment(loader = jinja2.FileSystemLoader(path), extensions=['jinja2.ext.do'])
 	loader.filters['xpcc.wordwrap'] = filter_wordwrap
 	loader.filters['xpcc.indent'] = filter_indent
 	loader.filters['xpcc.pad'] = filter_pad
+	loader.filters['xpcc.values'] = filter_values
 	if env['XPCC_JINJA2_TEST'] != None:
 		loader.tests = env['XPCC_JINJA2_TEST']
 	# Jinja2 Line Statements
