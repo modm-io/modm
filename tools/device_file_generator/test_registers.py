@@ -28,7 +28,7 @@
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # -----------------------------------------------------------------------------
 
-import os, sys
+import os, sys, re
 from device import Device
 from avr_reader import AVRDeviceReader
 import glob
@@ -44,6 +44,7 @@ if __name__ == "__main__":
 	logger = Logger(level)
 	devices = []
 	peri_name = "EXTERNAL_INTERRUPT"
+	bitfield_pattern = ""
 	
 	for arg in sys.argv[1:]:
 		if arg in ['error', 'warn', 'info', 'debug', 'disabled']:
@@ -61,7 +62,11 @@ if __name__ == "__main__":
 					devices.append(Device(part, logger))
 			continue
 		
-		peri_name = arg
+		if any(arg.startswith(per) for per in ["EXTERNAL_INT", "TWI", "USART", "SPI", "AD_CON", "USB"]):
+			peri_name = arg
+			continue
+		
+		bitfield_pattern = arg
 	
 	logger.setLogLevel('debug')
 	
@@ -100,16 +105,42 @@ if __name__ == "__main__":
 		
 		merged.append(current)
 	
+	filtered_devices = []
+	filtered_registers = []
+	
 	for dev in merged:
-		s = "Devices:\n"
-		ii = 0
-		for id in dev['ids']:
-			s += id.string.replace("at","") + " \t"
-			ii += 1
-			if ii > 7:
-				ii = 0
-				s += "\n"
-		logger.debug(s)
-		logger.info(str(dev['register']) + "\n")
+		reg = dev['register']
+		if bitfield_pattern == "":
+			s = "Devices:\n"
+			ii = 0
+			for id in dev['ids']:
+				s += id.string.replace("at","") + " \t"
+				ii += 1
+				if ii > 7:
+					ii = 0
+					s += "\n"
+			logger.debug(s)
+			logger.info(str(reg) + "\n")
 		
+		if reg.getFieldsWithPattern(bitfield_pattern) != None:
+			filtered_devices.append(dev)
+			filtered_registers.append(dev['register'].name)
+	
+	if bitfield_pattern != "":
+		logger.info("Registers containing BitField pattern '" + bitfield_pattern + "':")
+		for dev in filtered_devices:
+			s = "Devices:\n"
+			ii = 0
+			for id in dev['ids']:
+				s += id.string.replace("at","") + " \t"
+				ii += 1
+				if ii > 7:
+					ii = 0
+					s += "\n"
+			logger.debug(s)
+			logger.info(str(dev['register']) + "\n")
+		
+		logger.info("Summary registers:")
+		for name in set(filtered_registers):
+			logger.debug(name)
 

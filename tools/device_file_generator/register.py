@@ -27,7 +27,7 @@
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # -----------------------------------------------------------------------------
 
-import os, sys
+import os, sys, re
 # add python module logger to path
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'logger'))
 from logger import Logger
@@ -60,6 +60,17 @@ class Register():
 		for field in self.fields:
 			mask |= field['mask']
 		return mask
+	
+	def getFieldsWithPattern(self, pattern):
+		results = []
+		for field in self.fields:
+			match = re.search(pattern, field['name'])
+			if match:
+				results.append(field)
+		
+		if len(results) > 0:
+			return results
+		return None
 
 	def isEmpty(self):
 		return len(self.fields) == 0

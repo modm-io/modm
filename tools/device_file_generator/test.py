@@ -63,8 +63,7 @@ if __name__ == "__main__":
 	merger.mergedByType()
 	merger.mergedByName()
 	
-#	folder = os.path.join(os.path.dirname(__file__), '..', '..', 'xpcc', 'platform', 'xml')
-	folder = os.path.expanduser("~/server_downloads/xml/")
+	folder = os.path.join(os.path.dirname(__file__), '..', '..', 'src', 'xpcc', 'architecture', 'platform', 'xml', 'avr')
 	
 	for dev in merger.mergedDevices:
 		writer = AVRDeviceWriter(dev, logger)

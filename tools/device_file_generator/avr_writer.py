@@ -55,7 +55,7 @@ class AVRDeviceWriter(XMLDeviceWriter):
 		
 		# AVR specific
 		child = self.root.addChild('pin-count')
-		child.setValue('-1')
+		child.setValue('0')
 		
 		for header in ['avr/io.h', 'avr/interrupt.h']:
 			child = self.root.addChild('header')
