@@ -33,9 +33,9 @@
 
 xpcc::ChoiceMenu::ChoiceMenu(xpcc::ViewStack* stack, uint8_t identifier) :
 	xpcc::AbstractMenu(stack, identifier),
-	timer(DISPLAY_UPDATE_TIME),
+	display_update_time(500),
+	timer(display_update_time),
 	buttonAction(false),
-	newOnStack(true),
 	title(""),
 	homePosition(0),
 	position(0)
@@ -45,18 +45,14 @@ xpcc::ChoiceMenu::ChoiceMenu(xpcc::ViewStack* stack, uint8_t identifier) :
 
 xpcc::ChoiceMenu::ChoiceMenu(xpcc::ViewStack* stack, uint8_t identifier, const char* title) :
 	xpcc::AbstractMenu(stack, identifier),
-	timer(DISPLAY_UPDATE_TIME),
+	display_update_time(500),
+	timer(display_update_time),
 	buttonAction(false),
-	newOnStack(true),
 	title(title),
 	homePosition(0),
 	position(0)
 {
 	this->maximalDrawnEntrys = (getViewStack()->getDisplay().getHeight()- 16) / 8 ;
-}
-
-xpcc::ChoiceMenu::~ChoiceMenu()
-{
 }
 
 void
@@ -139,10 +135,9 @@ xpcc::ChoiceMenu::draw()
 bool
 xpcc::ChoiceMenu::hasChanged()
 {
-	if (timer.isExpired() || this->buttonAction || this->newOnStack)
+	if (timer.isExpired() || this->buttonAction)
 	{
 		if (this->buttonAction) this->buttonAction=false;
-		if (this->newOnStack) this->newOnStack=false;
 
 		return true;
 	}
