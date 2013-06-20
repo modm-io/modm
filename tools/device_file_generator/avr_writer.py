@@ -60,15 +60,6 @@ class AVRDeviceWriter(XMLDeviceWriter):
 		for header in ['avr/io.h', 'avr/interrupt.h']:
 			child = self.root.addChild('header')
 			child.setValue(header)
-		
-		# parameters
-		if self.isUartAvailable():
-			param_tx = self.root.addChild('parameter')
-			param_tx.setAttributes({'name': 'tx_buffer', 'type': 'int', 'min': 0, 'max': 253})
-			param_tx.setValue(8)
-			param_rx = self.root.addChild('parameter')
-			param_rx.setAttributes({'name': 'rx_buffer', 'type': 'int', 'min': 0, 'max': 253})
-			param_rx.setValue(16)
 
 		# drivers
 		self.addGpioToNode(self.root)
@@ -123,17 +114,6 @@ class AVRDeviceWriter(XMLDeviceWriter):
 				driver = node.addChild('driver')
 				driver.setAttributes(dict)
 				driver.setAttributes({'type': 'uart', 'name': self.family, 'instances': ",".join(instances)})
-				driver_param_tx = driver.addChild('parameter')
-				driver_param_tx.setAttributes({'name': 'tx_buffer'})
-				driver_param_rx = driver.addChild('parameter')
-				driver_param_rx.setAttributes({'name': 'rx_buffer'})
-		
-	def isUartAvailable(self):
-		for item in  self.device.getAttributes('modules'):
-			for module in item['value']:
-				if 'USART' in module and 'SPI' not in module:
-					return True
-		return False
 	
 	def _getModuleAttributes(self):
 		attributes = self.device.getAttributes('modules')
