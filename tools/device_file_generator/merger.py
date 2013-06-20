@@ -45,18 +45,19 @@ class DeviceMerger:
 	"""
 
 	def __init__(self, devices, logger=None):
-		# copy this list, since we will delete items
-		self.devices = list(devices)
-		self.mergedDevices = []
+		self.mergedDevices = list(devices)
 
 		if logger == None:
 			self.log = Logger()
 		else:
 			self.log = logger
 		
-		merged = self._mergeDevicesByType(self.devices)
-		merged = self._mergeDevicesByName(merged)
-		self.mergedDevices = merged
+
+	def mergedByType(self):
+		self.mergedDevices = self._mergeDevicesByType(self.mergedDevices)
+		
+	def mergedByName(self):
+		self.mergedDevices = self._mergeDevicesByName(self.mergedDevices)
 
 	
 	def _mergeDevicesByName(self, devices):

@@ -31,7 +31,6 @@
 import os, sys
 from device import Device
 from avr_reader import AVRDeviceReader
-from avr_writer import AVRDeviceWriter
 from merger import DeviceMerger
 import glob
 # add python module logger to path
@@ -45,28 +44,74 @@ if __name__ == "__main__":
 	level = 'info'
 	logger = Logger(level)
 	devices = []
+	peri_name = "EXTERNAL_INTERRUPT"
 	
 	for arg in sys.argv[1:]:
 		if arg in ['error', 'warn', 'info', 'debug', 'disabled']:
 			level = arg
 			logger.setLogLevel(level)
 			continue
-		xml_path = os.path.join(os.path.dirname(__file__), '..', '..', '..', 'AVR_devices', (arg + '*'))
-		files = glob.glob(xml_path)
-		for file in files:
-			# deal with this here, rather than rewrite half the name merging
-			if os.path.basename(file) != "ATtiny28.xml":
-				part = AVRDeviceReader(file, logger)
-				devices.append(Device(part, logger))
+		
+		if "ATtiny" in arg or "ATmega" in arg:
+			xml_path = os.path.join(os.path.dirname(__file__), '..', '..', '..', 'AVR_devices', (arg + '*'))
+			files = glob.glob(xml_path)
+			for file in files:
+				# deal with this here, rather than rewrite half the name merging
+				if os.path.basename(file) != "ATtiny28.xml":
+					part = AVRDeviceReader(file, logger)
+					devices.append(Device(part, logger))
+			continue
+		
+		peri_name = arg
 	
 	merger = DeviceMerger(devices, logger)
 	merger.mergedByType()
-	merger.mergedByName()
 	
-#	folder = os.path.join(os.path.dirname(__file__), '..', '..', 'xpcc', 'platform', 'xml')
-	folder = os.path.expanduser("~/server_downloads/xml/")
-	
+	peripherals = []
 	for dev in merger.mergedDevices:
-		writer = AVRDeviceWriter(dev, logger)
-		writer.write(folder)
+		attributes = dev.getAttributes('peripherals')
+		for attribute in attributes:
+			for peripheral in attribute['value']:
+				if peripheral.name == peri_name:
+					peripherals.append({'ids': [attribute['id']], 'peripheral': peripheral})
+	
+	registers = []
+	for peri in peripherals:
+		for reg in peri['peripheral'].registers:
+			registers.append({'ids': peri['ids'], 'register': reg})
+	
+	registers.sort(key=lambda k : k['register'].name)
+	merged = []
+	
+	while len(registers) > 0:
+		current = registers[0]
+		registers.remove(current)
+		
+		matches = []
+		
+		for peri in registers:
+			if current['register'] == peri['register']:
+				matches.append(peri)
+		
+		for match in matches:
+			registers.remove(match)
+			current['ids'].extend(match['ids'])
+		
+		if len(matches) == 0:
+			logger.warn("No match for register: " + current['register'].name + " of " + current['ids'][0].string)
+		
+		merged.append(current)
+	
+	for dev in merged:
+		s = "Devices:\n"
+		ii = 0
+		for id in dev['ids']:
+			s += id.string + " \t"
+			ii += 1
+			if ii > 7:
+				ii = 0
+				s += "\n"
+		logger.info(s)
+		logger.warn(str(dev['register']) + "\n")
+		
 
