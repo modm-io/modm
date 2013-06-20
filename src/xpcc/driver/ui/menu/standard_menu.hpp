@@ -40,14 +40,40 @@
 
 namespace xpcc
 {
+
+	/**
+ 	* \brief Menu Entry of Standard Menu
+	*
+	* \ingroup	display_menu
+	* \author	Thorsten Lajewski
+	*/
 	struct MenuEntry
 	{
+		/**
+		 * @brief MenuEntry constructor
+		 * @param text, name to be displayed as menu entry
+		 * @param space, available to display menu entry in number of letters
+		 * @param func  callback, which is called when entry is chosen
+		 */
 		MenuEntry(const char* text, uint16_t space, MenuEntryCallback func);
 		
 		ScrollableText text;
 		MenuEntryCallback callback;
 	};
 	
+	/**
+	* \brief StandardMenu provides a vertical list of entry.
+	*
+	*Controls:
+	*  Down - next Entry
+	*  Up  - previous Entry
+	*  Left - remove Standard Menu from stack
+	*  Right - select chosen entry.
+	*
+	* \ingroup	display_menu
+	* \author	Thorsten Lajewski
+	*/
+
 	class StandardMenu : public AbstractMenu
 	{
 	public:
@@ -58,23 +84,53 @@ namespace xpcc
 
 		StandardMenu(xpcc::ViewStack* stack, uint8_t identifier, const char* title);
 
+		/**
+		 * @brief addEntry adds a new option to the displayed list
+		 */
 		void
 		addEntry(const char* text, MenuEntryCallback func);
 
+		/**
+		 * @brief setTitle set the title of the menu displayed on top of the list
+		 */
 		void
 		setTitle(const char* text);
 
+		/**
+		 * @brief shortButtonPress handles normal button actions
+		 */
 		virtual void
 		shortButtonPress(xpcc::MenuButtons::Button button);
 
+		/**
+		 * @brief hasChanged, returns true if the screen has to be redrawn
+		 */
 		virtual bool
 		hasChanged();
 
+		/**
+		 * @brief draw the screen
+		 */
 		virtual void
 		draw();
 
+		/**
+		 * @brief selectedEntryFunction can be reimplemented to allow side effects each time one Entry
+		 *        selected. This function always gets called after Button UP or Button DOWN was pressed.
+		 * @param selected
+		 */
 		virtual void
 		selectedEntryFunction(uint8_t selected);
+
+		/**
+		 * @brief setUpdateTime changes the time for redrawing the screen, this is important for scrolling texts, because it determines the scroll speed
+		 * @param ms
+		 */
+		inline void setUpdateTime(uint16_t ms)
+		{
+			this->display_update_time = ms;
+			this->timer.restart(ms);
+		}
 
 	private:
 		uint16_t display_update_time; //after this time the display is redrawn,

@@ -49,6 +49,7 @@ namespace xpcc
 	* \ingroup	display_menu
 	* \author	Thorsten Lajewski
 	*/
+
 	class ViewStack
 	{
 	public:
