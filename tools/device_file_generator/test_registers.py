@@ -104,7 +104,7 @@ if __name__ == "__main__":
 		s = "Devices:\n"
 		ii = 0
 		for id in dev['ids']:
-			s += id.string + " \t"
+			s += id.string.replace("at","") + " \t"
 			ii += 1
 			if ii > 7:
 				ii = 0

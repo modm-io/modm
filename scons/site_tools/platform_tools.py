@@ -48,6 +48,7 @@ from configfile import Scanner # for header and source file endings
 # without polluting the site_tools directory or haveing duplicate code
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', 'tools', 'device_files'))
 from device import DeviceFile
+from device_identifier import DeviceIdentifier
 from driver import DriverFile
 
 
@@ -59,6 +60,7 @@ from driver import DriverFile
 # architecture_path for relative build paths
 def platform_tools_generate(env, architecture_path):
 	device = env['XPCC_DEVICE']
+	id = DeviceIdentifier(device)
 	env.Debug("Device String: %s" % device)
 	# Initialize Return Lists/Dicts
 	sources = []
@@ -68,17 +70,35 @@ def platform_tools_generate(env, architecture_path):
 	platform_path = os.path.join(architecture_path, 'platform')
 	generated_path = os.path.join(architecture_path, env['XPCC_PLATFORM_GENERATED_DIR'])
 	# Find Device File
-	xml_path = os.path.join(env['XPCC_PLATFORM_PATH'], 'xml')
+	xml_path = os.path.join(env['XPCC_PLATFORM_PATH'], 'xml', id.platform)
 	files = []
 	device_file = None
-	while device != None and len(device) > 0:
-		device_file = os.path.join(xml_path, device + '.xml')
-		files.append(device_file)
-		if os.path.isfile(device_file):
-			break
-		else:
-			device = device[:-1]
-			device_file = None
+	if id.platform == 'avr':
+		for file in os.listdir(xml_path):
+			if id.family in file:
+				nameString, typeString = file.replace(id.family,"").replace(".xml","").split("-")
+				names = nameString.split("_")
+				types = typeString.split("_")
+				print names, types
+				print id.name, id.type
+				
+				if id.name in names:
+					type  = id.type
+					if type == None:
+						type = 'none'
+					if type in types:
+						device_file = os.path.join(xml_path, file)
+						break
+	else:
+		while device != None and len(device) > 0:
+			device_file = os.path.join(xml_path, device + '.xml')
+			files.append(device_file)
+			if os.path.isfile(device_file):
+				break
+			else:
+				device = device[:-1]
+				device_file = None
+	
 	device = env['XPCC_DEVICE'] # restore device
 
 	# Check for error
