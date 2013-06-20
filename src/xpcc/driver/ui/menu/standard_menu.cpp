@@ -118,10 +118,9 @@ xpcc::StandardMenu::draw()
 bool
 xpcc::StandardMenu::hasChanged()
 {
-	if (timer.isExpired() || this->buttonAction || this->newOnStack)
+	if (timer.isExpired() || this->buttonAction)
 	{
 		if (this->buttonAction) this->buttonAction=false;
-		if (this->newOnStack) this->newOnStack=false;
 
 		return true;
 	}

@@ -32,7 +32,6 @@
 #define XPCC__VIRTUAL_GRAPHIC_DISPLAY
 
 #include <xpcc/driver/ui/display/graphic_display.hpp>
-#include "../hardware.hpp"
 
 namespace xpcc
 {

@@ -31,8 +31,8 @@
 #ifndef XPCC__ABSTRACT_MENU_HPP
 #define XPCC__ABSTRACT_MENU_HPP
 
-#include "view/view_stack.hpp"
-#include "view/abstract_view.hpp"
+#include "view_stack.hpp"
+#include "abstract_view.hpp"
 
 namespace xpcc{
 	
