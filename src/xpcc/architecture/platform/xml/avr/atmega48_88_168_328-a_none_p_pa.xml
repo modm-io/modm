@@ -46,7 +46,7 @@
     <define device-name="88" device-type="none">__AVR_ATmega88__</define>
     <define device-name="88" device-type="a">__AVR_ATmega88A__</define>
     <define device-name="88" device-type="pa">__AVR_ATmega88PA__</define>
-    <pin-count>-1</pin-count>
+    <pin-count>0</pin-count>
     <header>avr/io.h</header>
     <header>avr/interrupt.h</header>
     <driver type="gpio" name="atmega">

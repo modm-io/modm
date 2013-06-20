@@ -45,7 +45,7 @@ class DeviceFile:
 	This can be a microcontroller, a pc or a doxygen "fake" target.
 	"""
 
-	PROPERTY_TAGS = ['flash', 'ram', 'eeprom', 'pin-count', 'define', 'header', 'linkerscript']
+	PROPERTY_TAGS = ['flash', 'ram', 'mmcu', 'eeprom', 'pin-count', 'define', 'header', 'linkerscript']
 
 	def __init__(self, xml_file, logger=None):
 		node = self._openDeviceXML(xml_file)
@@ -126,7 +126,7 @@ class DeviceFile:
 		# Checks for all Platforms
 
 		# Check Core
-		cores = ['cortex-m0', 'cortex-m3', 'cortex-m4', 'avr']
+		cores = ['cortex-m0', 'cortex-m3', 'cortex-m4', 'avr8', 'avr8l']
 		if self.core not in cores:
 			self.log.error("Unknown core '%s'. Supported cores are %s"
 				% (self.core, cores))
@@ -166,6 +166,7 @@ class DeviceFile:
 		props['flash'] = self.getProperty('flash', device_string, True)[0]
 		props['ram'] = self.getProperty('ram', device_string, True)[0]
 		props['eeprom'] = self.getProperty('eeprom', device_string, True, 0)[0]
+		props['mmcu'] = self.getProperty('mmcu', device_string, True, "")[0]
 		props['pin-count'] = self.getProperty('pin-count', device_string, True)[0]
 		props['linkerscript'] = self.getProperty('linkerscript', device_string, True, "")[0]
 		props['defines'] = self.getProperty('define', device_string)

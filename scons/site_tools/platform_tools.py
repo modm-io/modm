@@ -79,9 +79,6 @@ def platform_tools_generate(env, architecture_path):
 				nameString, typeString = file.replace(id.family,"").replace(".xml","").split("-")
 				names = nameString.split("_")
 				types = typeString.split("_")
-				print names, types
-				print id.name, id.type
-				
 				if id.name in names:
 					type  = id.type
 					if type == None:
