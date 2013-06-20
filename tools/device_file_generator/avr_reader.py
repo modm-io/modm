@@ -132,13 +132,21 @@ class AVRDeviceReader(XMLDeviceReader):
 	def _translateRegister(self, queryResult):
 		mask = queryResult.get('mask')
 		size = queryResult.get('size')
-		register = Register(queryResult.get('name'))
+		name = queryResult.get('name')
+		register = Register(name)
 		register.size = int(size)
 		
 		if mask == None:
 			fields = queryResult.findall('bitfield')
 			for field in fields:
-				register.addField(field.get('name'), int(field.get('mask'), 16))
+				lsb = field.get('lsb')
+				if lsb == None:
+					lsb = 0
+				else:
+					lsb = int(lsb)
+				fname = field.get('name')
+				if fname != "Res":
+					register.addField(fname, int(field.get('mask'), 16), lsb)
 		else:
 			register.addField('data', int(mask, 16))
 		

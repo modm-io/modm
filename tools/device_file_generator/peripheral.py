@@ -112,4 +112,4 @@ class Peripheral():
 		for reg in self.registers:
 			st += str(reg)
 		st = st.replace("\n", "\n\t")
-		return s + st + "]})"
+		return s + st + " ]})"

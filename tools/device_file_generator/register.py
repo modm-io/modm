@@ -52,8 +52,8 @@ class Register():
 			size = 1
 		self.size = size
 
-	def addField(self, name, mask):
-		self.fields.append({'name': name, 'mask': mask})
+	def addField(self, name, mask, lsb_start=0):
+		self.fields.append({'name': name, 'mask': mask, 'lsb': lsb_start})
 	
 	def maskFromRegister(self):
 		mask = 0
@@ -94,11 +94,20 @@ class Register():
 			s += "\n+" + ("-"*(bW-1) + "+")*8
 			values = "\n|" + (" "*(bW-1) + "|")*8
 			self.fields.sort(key=lambda k : k['mask'], reverse=True)
+			
 			for field in self.fields:
 				mask = field['mask']
+				start = field['lsb']
+				do_index = bin(mask).count("1") > 1
+				
 				if mask & (0xff << (self.size-1-ii)*8):
-					for iii in range(8):
+					for iii in reversed(range(8)):
 						if mask & 2**(7-iii):
-							values = values[:2+bW*iii] + field['name'].center(bW-1) + values[1+bW*(iii+1):]
+							name = field['name']
+							if do_index:
+								name += str(start)
+							values = values[:2+bW*iii] + name.center(bW-1) + values[1+bW*(iii+1):]
+							start += 1
+			
 			s = s + values + "\n+" + ("-"*(bW-1) + "+")*8
 		return s
