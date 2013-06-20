@@ -54,9 +54,9 @@ class DeviceMerger:
 		else:
 			self.log = logger
 		
-		mergedByType = self._mergeDevicesByType(self.devices)
-		#mergedByName = self._mergeDevicesByName(mergedByType)
-		self.mergedDevices = mergedByType
+		merged = self._mergeDevicesByType(self.devices)
+		merged = self._mergeDevicesByName(merged)
+		self.mergedDevices = merged
 
 	
 	def _mergeDevicesByName(self, devices):
@@ -118,6 +118,32 @@ class DeviceMerger:
 							
 							if dfamily == family and dev.getDeviceAttributes('type')[0] in type:
 								matches.append(dev)
+			
+			# The following code is Atmel's fault with their stupid naming schemes.
+			
+			# some ATmega's have special merging rules
+			if current.id.family == "atmega":
+				name = current.id.name
+				
+				if current.getDeviceAttributes('type')[0] in [None, 'none', 'p', 'a', 'pa']:
+					# Some Devices are just not in the same group
+					if name in ['8', '16', '32', '64', '128']:
+						# these are not the matches you are looking for *move hand*
+						matches = []
+					# these are not the devices you want to matched with
+					for match in matches:
+						if match.id.name in ['8', '16', '32', '64', '128']:
+							matches.remove(match)
+							break
+					# but these are:
+					namesA = [ ['16', '32'], ['64', '128'] ]
+					for names in namesA:
+						if name in names:
+							for dev in devs:
+								if dev.id.family == "atmega" and dev.getDeviceAttributes('type')[0] in [None, 'none', 'p', 'a', 'pa']:
+									for dname in dev.getDeviceNames():
+										if dname in names:
+											matches.append(dev)
 			
 			# the smallest ATtiny's have special merging rules 
 			if current.id.family == "attiny":
@@ -217,7 +243,8 @@ class DeviceMerger:
 		# these are the categories of mergable types
 		categories = [ 	[None, 'none', 'p', 'a', 'pa'],
 						['rfa1', 'rfa2', 'rfr1', 'rfr2'],
-						['hvb', 'hve2', 'hvbrevb'],
+						['hvb', 'hvbrevb'],
+						['hve2'],
 						['hva'],
 						['u2'],
 						['u4', 'u6'],
