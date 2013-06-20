@@ -27,7 +27,7 @@
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # -----------------------------------------------------------------------------
 
-pin_interrupts = \
+pins = \
 [
 	{
 		"devices": ["atmega8", "atmega8a"],
@@ -260,7 +260,11 @@ pin_interrupts = \
 			{ "port": "D", "id": "6", "int": "22" },
 			{ "port": "D", "id": "7", "int": "23" },
 		],
-		"exti": []
+		"exti":
+		[
+			{ "port": "D", "id": "2", "int": "0" },
+			{ "port": "D", "id": "3", "int": "1" },
+		]
 	},
 	
 	{

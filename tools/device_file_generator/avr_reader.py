@@ -30,6 +30,7 @@
 from reader import XMLDeviceReader
 from peripheral import Peripheral
 from register import Register
+import avr_interrupts as interrupts
 
 import os, sys
 # add python module logger to path
@@ -101,6 +102,17 @@ class AVRDeviceReader(XMLDeviceReader):
 				module = self.createModule(name)
 				peripherals.append(module)
 				continue
+		
+		for pin_array in interrupts.pins:
+			if self.properties['mmcu'] in pin_array['devices']:
+				for pcint in pin_array['pcint']:
+					for gpio in gpios:
+						if gpio['port'] == pcint['port'] and gpio['id'] == pcint['id']:
+							gpio['pcint'] = pcint['int']
+				for pcint in pin_array['exti']:
+					for gpio in gpios:
+						if gpio['port'] == pcint['port'] and gpio['id'] == pcint['id']:
+							gpio['extint'] = pcint['int']
 	
 	def createModule(self, name):
 		if name in self.modules:

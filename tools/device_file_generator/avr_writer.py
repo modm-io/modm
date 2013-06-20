@@ -149,9 +149,15 @@ class AVRDeviceWriter(XMLDeviceWriter):
 			gpios.sort(key=lambda k: k['port'])
 			dict = self._getAttributeDictionaryFromId(item['id'])
 			for gpio in gpios:
-				child = driver.addChild('gpio')
-				child.setAttributes(dict)
-				child.setAttributes(gpio)
+				gpio_child = driver.addChild('gpio')
+				gpio_child.setAttributes(dict)
+				gpio_child.setAttributes({'port': gpio['port'], 'id': gpio['id']})
+				if 'pcint' in gpio:
+					pcint_child = gpio_child.addChild('af')
+					pcint_child.setAttributes({'type': 'pcint', 'id': gpio['pcint']})
+				if 'extint' in gpio:
+					extint_child = gpio_child.addChild('af')
+					extint_child.setAttributes({'type': 'extint', 'id': gpio['extint']})
 
 	def _getAttributedPortDictionary(self, port):
 		ports = []
