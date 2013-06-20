@@ -31,7 +31,6 @@
 import os, sys
 from device import Device
 from avr_reader import AVRDeviceReader
-from merger import DeviceMerger
 import glob
 # add python module logger to path
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'logger'))
@@ -41,7 +40,7 @@ if __name__ == "__main__":
 	"""
 	Some test code
 	"""
-	level = 'info'
+	level = 'warn'
 	logger = Logger(level)
 	devices = []
 	peri_name = "EXTERNAL_INTERRUPT"
@@ -64,11 +63,10 @@ if __name__ == "__main__":
 		
 		peri_name = arg
 	
-	merger = DeviceMerger(devices, logger)
-	merger.mergedByType()
+	logger.setLogLevel('debug')
 	
 	peripherals = []
-	for dev in merger.mergedDevices:
+	for dev in devices:
 		attributes = dev.getAttributes('peripherals')
 		for attribute in attributes:
 			for peripheral in attribute['value']:
@@ -111,7 +109,7 @@ if __name__ == "__main__":
 			if ii > 7:
 				ii = 0
 				s += "\n"
-		logger.info(s)
-		logger.warn(str(dev['register']) + "\n")
+		logger.debug(s)
+		logger.info(str(dev['register']) + "\n")
 		
 
