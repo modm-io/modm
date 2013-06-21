@@ -52,13 +52,13 @@ class Register():
 			size = 1
 		self.size = size
 
-	def addField(self, name, mask, lsb_start=0):
-		self.fields.append({'name': name, 'mask': mask, 'lsb': lsb_start})
+	def addField(self, name, index):
+		self.fields.append({'name': name, 'index': index})
 	
 	def maskFromRegister(self):
 		mask = 0
 		for field in self.fields:
-			mask |= field['mask']
+			mask |= (1 << field['index'])
 		return mask
 	
 	def getFieldsWithPattern(self, pattern):
@@ -81,19 +81,20 @@ class Register():
 				return False
 			if len(self.fields) != len(other.fields):
 				return False
-			return all(item in self.fields for item in other.fields) and \
-				all(item in other.fields for item in self.fields)
+			
+			return 	all(item in  self.fields for item in other.fields) and \
+					all(item in other.fields for item in  self.fields)
 			
 		return NotImplemented
 	
-	def __hash__(self):
-		return hash(self.name + str(self.fields))
-	
 	def __ne__(self, other):
-		result = self.__eq__(o)
+		result = self.__eq__(other)
 		if result is NotImplemented:
 			return result
 		return not result
+	
+	def __hash__(self):
+		return hash(self.name + str(self.fields))
 
 	def __repr__(self):
 		return "Register(" + str(self.name) + ")"
@@ -101,24 +102,16 @@ class Register():
 	def __str__(self):
 		s = "\n Register: " + str(self.name)
 		bW = 15
+		self.fields.sort(key=lambda k : k['index'], reverse=True)
 		for ii in range(self.size):
 			s += "\n+" + ("-"*(bW-1) + "+")*8
 			values = "\n|" + (" "*(bW-1) + "|")*8
-			self.fields.sort(key=lambda k : k['mask'], reverse=True)
 			
 			for field in self.fields:
-				mask = field['mask']
-				start = field['lsb']
-				do_index = bin(mask).count("1") > 1
-				
-				if mask & (0xff << (self.size-1-ii)*8):
-					for iii in reversed(range(8)):
-						if mask & 2**(7-iii):
-							name = field['name']
-							if do_index:
-								name += str(start)
-							values = values[:2+bW*iii] + name.center(bW-1) + values[1+bW*(iii+1):]
-							start += 1
+				index = field['index']
+				if ii*8 <= index < (ii+1)*8:
+					index -= ii*8
+					values = values[:2+bW*index] + field['name'].center(bW-1) + values[1+bW*(index+1):]
 			
 			s = s + values + "\n+" + ("-"*(bW-1) + "+")*8
 		return s

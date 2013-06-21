@@ -76,7 +76,7 @@ if __name__ == "__main__":
 		for attribute in attributes:
 			for peripheral in attribute['value']:
 				if peripheral.name == peri_name:
-					peripherals.append({'ids': [attribute['id']], 'peripheral': peripheral})
+					peripherals.append({'ids': [dev.id], 'peripheral': peripheral})
 	
 	registers = []
 	for peri in peripherals:
@@ -98,11 +98,13 @@ if __name__ == "__main__":
 		
 		for match in matches:
 			registers.remove(match)
-			current['ids'].extend(match['ids'])
+			if len(match['ids']) == 1:
+				current['ids'].extend(match['ids'])
 		
 		if len(matches) == 0:
 			logger.warn("No match for register: " + current['register'].name + " of " + current['ids'][0].string)
 		
+		current['ids'] = list(set(current['ids']))
 		merged.append(current)
 	
 	filtered_devices = []
@@ -113,7 +115,7 @@ if __name__ == "__main__":
 		if bitfield_pattern == "":
 			s = "Devices:\n"
 			ii = 0
-			for id in dev['ids']:
+			for id in set(dev['ids']):
 				s += id.string.replace("at","") + " \t"
 				ii += 1
 				if ii > 7:
@@ -131,7 +133,7 @@ if __name__ == "__main__":
 		for dev in filtered_devices:
 			s = "Devices:\n"
 			ii = 0
-			for id in dev['ids']:
+			for id in set(dev['ids']):
 				s += id.string.replace("at","") + " \t"
 				ii += 1
 				if ii > 7:

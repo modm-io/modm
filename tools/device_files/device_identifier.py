@@ -166,6 +166,9 @@ class DeviceIdentifier:
 		dict['other_delta'] = other_delta
 		return dict
 
+	def __hash__(self):
+		return hash(str(self))
+
 	def __repr__(self):
 		return self.__str__()
 

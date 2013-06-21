@@ -32,7 +32,7 @@ from peripheral import Peripheral
 from register import Register
 import avr_interrupts as interrupts
 
-import os, sys
+import os, sys, math
 # add python module logger to path
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'logger'))
 from logger import Logger
@@ -131,24 +131,48 @@ class AVRDeviceReader(XMLDeviceReader):
 	
 	def _translateRegister(self, queryResult):
 		mask = queryResult.get('mask')
-		size = queryResult.get('size')
+		size = int(queryResult.get('size'))
 		name = queryResult.get('name')
 		register = Register(name)
-		register.size = int(size)
+		register.size = size
 		
 		if mask == None:
 			fields = queryResult.findall('bitfield')
 			for field in fields:
-				lsb = field.get('lsb')
-				if lsb == None:
-					lsb = 0
-				else:
-					lsb = int(lsb)
 				fname = field.get('name')
-				if fname != "Res":
-					register.addField(fname, int(field.get('mask'), 16), lsb)
+				if fname == "Res":
+					continue
+				
+				fmask = int(field.get('mask'), 16)
+				flsb = field.get('lsb')
+				if flsb == None:
+					flsb = 0
+				else:
+					flsb = int(flsb)
+					
+				if bin(fmask).count("1") > 1:
+					start = flsb
+					for iii in reversed(range(8*size)):
+						if fmask & 2**(8*size-1-iii):
+							name = fname + str(start)
+							start += 1
+							register.addField(name, iii)
+				else:
+					register.addField(fname, int(math.log(fmask, 2)))
 		else:
-			register.addField('data', int(mask, 16))
+			fmask = int(mask, 16)
+			flsb = queryResult.get('lsb')
+			if flsb == None:
+				flsb = 0
+			else:
+				flsb = int(flsb)
+				
+			if bin(fmask).count("1") > 1:
+				start = flsb
+				for iii in reversed(range(8*size)):
+					if fmask & 2**(8*size-1-iii):
+						start += 1
+						register.addField('data'+str(start), iii)
 		
 		return register
 

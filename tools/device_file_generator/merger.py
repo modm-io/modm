@@ -222,9 +222,8 @@ class DeviceMerger:
 			self.log.info("ByType: Searching for device ending in " + str(suffix)) 
 			
 			for dev in devs:
-				if dev.id.name == props.name:
-					if dev.id.type in suffix:
-						matches.append(dev)
+				if dev.id.name == props.name and dev.id.type in suffix:
+					matches.append(dev)
 			
 			for match in matches:
 				devs.remove(match)
