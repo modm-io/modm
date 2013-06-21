@@ -168,72 +168,96 @@ namespace xpcc
 				return (PIN{{port}} & (1 << {{pin}}));
 			}
 			%% for af in gpio.afs
+			%% set af_id = af.id | int
 
 			%% if af.type == "extint"
 			ALWAYS_INLINE static void enableExternalInterrupt(TriggerType trigger) {
-				EICRA |= (trigger << 2*{{af.id}});
-				EIMSK |= (1 << INT{{af.id}});
+			%% if af_id < 4
+				EICRA |= (trigger << 2*{{af_id}});
+			%% else
+				EICRB |= (trigger << 2*{{af_id - 4}});
+			%% endif
+			#ifdef EIMSK
+				EIMSK |= (1 << INT{{af_id}});
+			#else
+				GICR |= (1 << INT{{af_id}});
+			#endif
 			}
 
 			ALWAYS_INLINE static void disableExternalInterrupt() {
-				EICRA &= ~(0x3 << 2*{{af.id}});
-				EIMSK &= ~(1 << INT{{af.id}});
+			%% if af_id < 4
+				EICRA &= ~(0x3 << 2*{{af_id}});
+			%% else
+				EICRB &= ~(0x3 << 2*{{af_id - 4}});
+			%% endif
+			#ifdef EIMSK
+				EIMSK &= ~(1 << INT{{af_id}});
+			#else
+				GICR &= ~(1 << INT{{af_id}});
+			#endif
 			}
 
 			ALWAYS_INLINE static bool getExternalInterruptFlag() {
-				return (EIFR & (1 << INTF{{af.id}}));
+			#ifdef EIFR
+				return (EIFR & (1 << INTF{{af_id}}));
+			#else
+				return (GIFR & (1 << INTF{{af_id}}));
+			#endif
 			}
 
 			ALWAYS_INLINE static void acknowledgeExternalInterruptFlag() {
-				EIFR |= (1 << INTF{{af.id}});
+			#ifdef EIFR
+				EIFR |= (1 << INTF{{af_id}});
+			#else
+				GIFR |= (1 << INTF{{af_id}});
+			#endif
 			}
 			%% endif
 
 			%% if af.type == "pcint"
+			%% set af_reg = (af_id / 8) | int
 			ALWAYS_INLINE static void enablePCInterrupt() {
-				%% if port == "B"
-				PCMSK0 |= (1 << PCINT{{af.id}});
-				PCICR  |= (1 << PCIE0);
-				%% elif port == "C"
-				PCMSK1 |= (1 << PCINT{{af.id}});
-				PCICR  |= (1 << PCIE1);
-				%% elif port == "D"
-				PCMSK2 |= (1 << PCINT{{af.id}});
-				PCICR  |= (1 << PCIE2);
-				%% endif
+				PCMSK{{af_reg}} |= (1 << PCINT{{af_id}});
+			#ifdef PCICR
+				PCICR |= (1 << PCIE{{af_reg}});
+			#elif defined EIMSK
+				EIMSK |= (1 << PCIE{{af_reg}});
+			#else
+				GICR |= (1 << PCIE{{af_reg}});
+			#endif
 			}
 
 			ALWAYS_INLINE static void disablePCInterrupt() {
-				%% if port == "B"
-				PCMSK0 &= ~(1 << PCINT{{af.id}});
-				if (!PCMSK0) PCICR &= ~(1 << PCIE0);
-				%% elif port == "C"
-				PCMSK1 &= ~(1 << PCINT{{af.id}});
-				if (!PCMSK1) PCICR &= ~(1 << PCIE1);
-				%% elif port == "D"
-				PCMSK2 &= ~(1 << PCINT{{af.id}});
-				if (!PCMSK2) PCICR &= ~(1 << PCIE2);
-				%% endif
+				PCMSK{{af_reg}} &= ~(1 << PCINT{{af_id}});
+				if (!PCMSK{{af_reg}}) {
+			#ifdef PCICR
+					PCICR &= ~(1 << PCIE{{af_reg}});
+			#elif defined EIMSK
+					EIMSK &= ~(1 << PCIE{{af_reg}});
+			#else
+					GICR &= ~(1 << PCIE{{af_reg}});
+			#endif
+				}
 			}
 
 			ALWAYS_INLINE static bool getPCInterruptFlag() {
-				%% if port == "B"
-				return (PCIFR & (1 << PCIF0));
-				%% elif port == "C"
-				return (PCIFR & (1 << PCIF1));
-				%% elif port == "D"
-				return (PCIFR & (1 << PCIF2));
-				%% endif
+			#ifdef PCIFR
+				return (PCIFR & (1 << PCIF{{af_reg}}));
+			#elif defined EIFR
+				return (EIFR & (1 << PCIF{{af_reg}}));
+			#else
+				return (GIFR & (1 << PCIF{{af_reg}}));
+			#endif
 			}
 
 			ALWAYS_INLINE static void acknowledgePCInterruptFlag() {
-				%% if port == "B"
-				PCIFR |= (1 << PCIF0);
-				%% elif port == "C"
-				PCIFR |= (1 << PCIF1);
-				%% elif port == "D"
-				PCIFR |= (1 << PCIF2);
-				%% endif
+			#ifdef PCIFR
+				PCIFR |= (1 << PCIF{{af_reg}});
+			#elif defined EIFR
+				EIFR |= (1 << PCIF{{af_reg}});
+			#else
+				GIFR |= (1 << PCIF{{af_reg}});
+			#endif
 			}
 
 			%% endif
