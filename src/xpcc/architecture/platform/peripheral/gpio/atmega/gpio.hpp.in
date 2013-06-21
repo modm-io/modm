@@ -343,4 +343,4 @@ namespace xpcc
 }
 
 
-#endif // XPCC_STM32__GPIO_HPP
+#endif // XPCC_ATMEGA__GPIO_HPP
