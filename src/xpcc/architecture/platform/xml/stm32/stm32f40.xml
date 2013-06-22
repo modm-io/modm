@@ -10,20 +10,20 @@
 		     available on a device with a specific pin count. Add a _+_
 		     to mean "and more" / a _-_ to mean "and less"
 		-->
-		<!-- Core -->
-		<core>cortex-m4</core>
 		<!-- Flash and RAM sizes -->
-		<flash size-id="e">524288</flash>
-		<flash size-id="g">1048576</flash>
+		<flash device-size-id="e">524288</flash>
+		<flash device-size-id="g">1048576</flash>
 		<ram>114688</ram>	<!--Missing id => applies to all devices-->
 		<!-- Linker Script -->
-		<linkerscript size-id="g">stm32f4xx_g.ld</linkerscript>
-		<linkerscript size-id="e">stm32f4xx_e.ld</linkerscript>
+		<linkerscript device-size-id="g">stm32f4xx_g.ld</linkerscript>
+		<linkerscript device-size-id="e">stm32f4xx_e.ld</linkerscript>
+		<!-- Core -->
+		<core>cortex-m4</core>
 		<!-- Number of pins -->
-		<pin-count pin-id="r">64</pin-count>
-		<pin-count pin-id="v">100</pin-count>
-		<pin-count pin-id="z">144</pin-count>
-		<pin-count pin-id="i">176</pin-count>
+		<pin-count device-pin-id="r">64</pin-count>
+		<pin-count device-pin-id="v">100</pin-count>
+		<pin-count device-pin-id="z">144</pin-count>
+		<pin-count device-pin-id="i">176</pin-count>
 		<!-- Headers to be included with the {{ include_device_headers }} substitution-->
 		<header>stm32f4xx.h</header>
 		<!-- Cpp Defines -->
@@ -36,7 +36,7 @@
 		<define>STM32_APB2_FREQUENCY =  84000000</define>
 		<define>CORTEX_VECTORS_RAM = 0</define>
 		<define>CORTEX_ENABLE_HARD_FAULT_HANDLER = 0</define>
-		<define size-id="e">STM32F407XE</define> <!-- Defines can depend on pin/size ids-->
+		<define device-size-id="e">STM32F407XE</define> <!-- Defines can depend on pin/size ids-->
 		<!-- Core Driver -->
 		<driver type="core" name="cortex">
 			<parameter name="allocator">newlib</parameter>
