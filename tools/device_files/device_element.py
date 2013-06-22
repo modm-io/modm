@@ -58,11 +58,13 @@ class DeviceElementBase:
 			return {'type': count[-1:], 'count': int(count[:-1])}
 		return [count]
 
-	def appliesTo(self, device_id, properties={}, matched=[]):
+	def appliesTo(self, device_id, properties={}, matched=None):
 		"""
 		checks if this property/driver applies to the device specified by the
 		device string
 		"""
+		if matched == None:
+			matched = []
 		
 		for key in self.attributes:
 			if 'device-' in key:
@@ -81,11 +83,12 @@ class DeviceElementBase:
 				props = []
 				for prop in [p for p in properties if key == p.type]:
 					# make sure we do not evaluate a circular reference
-					if str(prop.type)+str(prop.value) in matched[:-1]:
+					hash = str(prop.type)+str(prop.value)
+					if hash in matched[:-1]:
 						self.log.error("DeviceElementBase: Cannot resolve circular references!"
 									" '%s' depends on properties that reference this property." % prop.type)
 						return False
-					matched.append(str(prop.type)+str(prop.value))
+					matched.append(hash)
 					# these properties need to be evaluated recursively
 					if prop.appliesTo(device_id, properties, matched):
 						props.append(prop)
