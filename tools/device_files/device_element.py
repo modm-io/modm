@@ -42,81 +42,68 @@ class DeviceElementBase:
 		self.type = node.tag
 		self.device = device # parent
 		self.log = device.log
-		# load attributes
-		self.pin_id      = node.get('pin-id')
-		self.size_id     = node.get('size-id')
-		self.pin_count   = node.get('pin-count')
-		self.device_platform = node.get('device-platform') # e.g. stm32
-		self.device_family   = node.get('device-family')   # e.g. f4
-		self.device_name     = node.get('device-name')     # e.g. 405
-		self.device_type     = node.get('device-type')     # e.g. for avr: m1
-		self.device_core     = node.get('device-core')
-		# Split Attributes that can be split
-		if self.pin_id != None:
-			self.pin_id = self.pin_id.split('|')
-		if self.size_id != None:
-			self.size_id = self.size_id.split('|')
-		if self.device_platform != None:
-			self.device_platform = self.device_platform.split('|')
-		if self.device_family != None:
-			self.device_family = self.device_family.split('|')
-		if self.device_name != None:
-			self.device_name = self.device_name.split('|')
-		if self.device_type != None:
-			self.device_type = self.device_type.split('|')
-		if self.device_core != None:
-			self.device_core = self.device_core.split('|')
-		# parse pin count
-		[self.pin_count, self.pin_count_type] = self._parsePinCount(self.pin_count)
+		
+		# split multiple attribute values
+		self.attributes = {key : node.attrib[key].split('|') for key in node.attrib}
+		
+		# parse integer counts
+		for key in self.attributes:
+			if len(self.attributes[key]) == 1 and 'count' in key:
+				self.attributes[key] = self._parseCount(self.attributes[key][0])
 
-	def _parsePinCount(self, pin_count):
-		if pin_count == None:
-			return [None, None]
-		if pin_count.isdigit():
-			pin_count_type = '=='
-			pin_count = int(pin_count)
-		elif pin_count[:-1].isdigit() and pin_count[-1:] in ['+', '-']:
-			pin_count_type = pin_count[-1:]
-			pin_count = int(pin_count[:-1])
-		elif pin_count:
-			raise ParserException("Pincount needs to be an integer value that can be followed by +/-: '%s' is not a valid pincount." % (pin_count))
-		return [pin_count, pin_count_type]
+	def _parseCount(self, count):
+		if count.isdigit():
+			return {'type': '==', 'count': int(count)}
+		elif count[:-1].isdigit() and count[-1:] in ['+', '-']:
+			return {'type': count[-1:], 'count': int(count[:-1])}
+		return [count]
 
-	def appliesTo(self, device_string, pin_count=10000, core=None):
+	def appliesTo(self, device_id, properties={}, matched=[]):
 		"""
 		checks if this property/driver applies to the device specified by the
 		device string
 		"""
-		s = device_string
-		if self.device_platform != None:
-			if s.platform == None or s.platform not in self.device_platform:
-				return False
-		if self.device_family != None:
-			if s.family == None or s.family not in self.device_family:
-				return False
-		if self.device_name != None:
-			if s.name == None or s.name not in self.device_name:
-				return False
-		if self.device_type != None:
-			if s.type == None or s.type not in self.device_type:
-				return False
-		if self.pin_id != None:
-			if s.pin_id == None or s.pin_id not in self.pin_id:
-				return False
-		if self.size_id != None:
-			if s.size_id == None or s.size_id not in self.size_id:
-				return False
-		if self.pin_count != None and self.pin_count > 0:
-			if self.pin_count_type == '==':
-				if self.pin_count != pin_count:
+		
+		for key in self.attributes:
+			if 'device-' in key:
+				# we need to compare this attribute to the device id
+				dev_key = key.replace('device-', '').replace('-', '_')
+				props = device_id.properties
+				if dev_key in props:
+					if props[dev_key] not in self.attributes[key]:
+						return False
+				else:
+					self.log.error("DeviceElementBase: Attribute '%s' is not part of the DeviceIdentifier as '%s'."
+								" Maybe you misspelled it?" % (key, dev_key))
 					return False
-			elif self.pin_count_type == '+':
-				if self.pin_count > pin_count:
-					return False
-			elif self.pin_count_type == '-':
-				if self.pin_count < pin_count:
-					return False
-		if self.device_core != None:
-			if core == None or len(core) == 0 or core not in self.device_core:
-				return False
+			else:
+				# these are the other attributes that we need to evauate
+				props = []
+				for prop in [p for p in properties if key == p.type]:
+					# make sure we do not evaluate a circular reference
+					if str(prop.type)+str(prop.value) in matched[:-1]:
+						self.log.error("DeviceElementBase: Cannot resolve circular references!"
+									" '%s' depends on properties that reference this property." % prop.type)
+						return False
+					matched.append(str(prop.type)+str(prop.value))
+					# these properties need to be evaluated recursively
+					if prop.appliesTo(device_id, properties, matched):
+						props.append(prop)
+				
+				for prop in props:
+					attr = self.attributes[key]
+					if 'count' in key:
+						# this is a integer count
+						if attr['type'] == '==':
+							if attr['count'] != prop.value:
+								return False
+						elif attr['type'] == '+':
+							if attr['count'] > prop.value:
+								return False
+						elif attr['type'] == '-':
+							if attr['count'] < prop.value:
+								return False
+					else:
+						if prop.value not in attr:
+							return False
 		return True

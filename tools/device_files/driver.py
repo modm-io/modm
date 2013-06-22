@@ -72,8 +72,7 @@ class DriverFile:
 		d.device_parameters = dic['parameters']
 		d.substitutions = dic['substitutions']
 		d.instances = dic['instances']
-		d.pin_count = dic['pin_count']
-		d.device_core = dic['device_core']
+		d.properties = dic['properties']
 		# Debug Output
 		# d.log.debug("DriverFile.fromDict(): %s" % dic)
 		# d.log.debug("d.device_core : %s" % d.device_core)
@@ -163,7 +162,7 @@ class DriverFile:
 				self.log.error("Unknown tag: %s in %s/%s driver xml." % (node.tag, self.type, self.name))
 				raise ParserException("Error: Unknown tag: %s in %s/%s driver xml." % (node.tag, self.type, self.name))
 			f = DeviceElementBase(self, node)
-			if not f.appliesTo(device_id, self.pin_count, self.device_core):
+			if not f.appliesTo(device_id, self.properties):
 				self.log.info("Tag %s does not apply to device %s. In %s/%s driver xml." % (node.tag, device_id, self.type, self.name))
 			else:
 				if node.tag == 'static':

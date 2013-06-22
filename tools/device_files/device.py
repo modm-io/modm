@@ -64,14 +64,10 @@ class DeviceFile:
 		self.drivers = []
 
 		for c in node:
-			if c.tag in self.PROPERTY_TAGS:
-				self.properties.append(Property(self, c))
-			elif c.tag in ['driver']:
+			if c.tag in ['driver']:
 				self.drivers.append(Driver(self, c))
-			elif c.tag in ['core']:
-				self.core = c.text
 			else:
-				raise ParserException("Parse Error: unknown tag (%s)" % (c.tag))
+				self.properties.append(Property(self, c))
 		self._checkDeviceFileData(xml_file)
 
 	def _openDeviceXML(self, filename):
@@ -127,7 +123,7 @@ class DeviceFile:
 
 		# Check Core
 		cores = ['cortex-m0', 'cortex-m3', 'cortex-m4', 'avr8', 'avr8l']
-		if self.core not in cores:
+		if 'core' in self.properties and self.core not in cores:
 			self.log.error("Unknown core '%s'. Supported cores are %s"
 				% (self.core, cores))
 		# Checks for STM32 Platform
@@ -167,7 +163,6 @@ class DeviceFile:
 		props['ram'] = self.getProperty('ram', device_string, True)[0]
 		props['eeprom'] = self.getProperty('eeprom', device_string, True, 0)[0]
 		props['mmcu'] = self.getProperty('mmcu', device_string, True, "")[0]
-		props['pin-count'] = self.getProperty('pin-count', device_string, True)[0]
 		props['linkerscript'] = self.getProperty('linkerscript', device_string, True, "")[0]
 		props['defines'] = self.getProperty('define', device_string)
 		props['headers'] = self.getProperty('header', device_string)
@@ -176,10 +171,10 @@ class DeviceFile:
 		#Check Some Properties
 		if self.platform == 'stm32':
 			if props['eeprom'] != 0:
-				self.log.warn("On platform stm32 there is no eeprom.")
-		if self.platform == 'stm32':
-			if props['eeprom'] != 0:
-				self.log.warn("On platform stm32 there is no eeprom.")
+				self.log.warn("On platform 'stm32' there is no eeprom.")
+		if self.platform == 'avr':
+			if props['linkerscript'] != "":
+				self.log.warn("On platform 'avr' there is no linkerscript.")
 
 		return props
 
@@ -205,22 +200,15 @@ class DeviceFile:
 		s = DeviceIdentifier(device_string)
 		if s.valid == False:
 			return None
-		# Check Pin Count
-		pin_count = self.getProperty('pin-count', device_string)
-		if pin_count == None or len(pin_count) <= 0:
-			pin_count = 10000
-		elif len(pin_count) == 1: # FIXME: this seems wrong!
-			pin_count = pin_count[0]
-		else:
-			pin_count = 0
 		# Loop Through Drivers
 		drivers = []
 		for d in self.drivers:
-			if d.appliesTo(s, pin_count):
+			if d.appliesTo(s, self.properties):
 				substitutions = s.getTargetDict()
-				substitutions['target']['core'] = self.core
+				for prop in [p for p in self.properties if p.type == 'core']:
+					substitutions['target']['core'] = prop.value
 				substitutions.update(self.getSubstitutions())
-				drivers.append(d.toDict(platform_path, substitutions, pin_count, self.core))
+				drivers.append(d.toDict(platform_path, substitutions, self.properties))
 		return drivers
 
 ##-----------------------------------------------------------------------------
@@ -293,7 +281,7 @@ class Driver(DeviceElementBase):
 		self.parameters = self._getParameters(node)
 		self.substitutions = self._getDriverSubstitutions(node)
 
-	def toDict(self, platform_path, substitutions, pin_count, device_core):
+	def toDict(self, platform_path, substitutions, properties):
 		"""
 		This is used to package information about a driver extracted from
 		a device file into a dictionary.
@@ -310,8 +298,7 @@ class Driver(DeviceElementBase):
 		dic['substitutions'] = substitutions
 		dic['substitutions'].update(self.substitutions) # own substitutions overwrite
 		dic['instances'] = self.instances
-		dic['pin_count'] = pin_count
-		dic['device_core'] = device_core
+		dic['properties'] = properties
 		return dic
 
 	def getDriverFile(self, platform_path):
