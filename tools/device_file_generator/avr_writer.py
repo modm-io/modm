@@ -49,19 +49,33 @@ class AVRDeviceWriter(XMLDeviceWriter):
 		self.addDeviceAttributesToNode(self.root, 'ram')
 		self.addDeviceAttributesToNode(self.root, 'eeprom')
 		self.addDeviceAttributesToNode(self.root, 'mmcu')
-		self.addDeviceAttributesToNode(self.root, 'core')
-		
 		self.addDeviceAttributesToNode(self.root, 'define')
 		
-		# AVR specific
-		child = self.root.addChild('pin-count')
-		child.setValue('0')
+		self.addDeviceAttributesToNode(self.root, 'core')
 		
-		for header in ['avr/io.h', 'avr/interrupt.h']:
-			child = self.root.addChild('header')
-			child.setValue(header)
+		pin_count_child = self.root.addChild('pin-count')
+		pin_count_child.setValue(0)
+		
+		core_child = self.root.addChild('driver')
+		core_child.setAttributes({'type': 'core', 'name': 'avr'})
+		ram_sizes = self.device.getAttributes('ram')
+		for ram_size in ram_sizes:
+			size = ram_size['value']
+			# for large RAM sizes, reserve 1kB for stack
+			# for small RAM sizes, reserve half of entire size for stack
+			if size > 2048:
+				size -= 1024
+			else:
+				size /= 2 
+			ram_size_child = core_child.addChild('parameter')
+			ram_size_child.setAttributes({'device-name': ram_size['id'].name, 'name': 'ram_length'})
+			ram_size_child.setValue(size)
+		
+		for header in ['avr/io.h', 'avr/interrupt.h', 'avr/sleep.h']:
+			header_child = self.root.addChild('header')
+			header_child.setValue(header)
 
-		# drivers
+		# GPIO
 		self.addGpioToNode(self.root)
 		# UART
 		self.addUartToNode(self.root)
@@ -75,6 +89,7 @@ class AVRDeviceWriter(XMLDeviceWriter):
 
 	def addDeviceAttributesToNode(self, node, name):
 		attributes = self.device.getAttributes(name)
+		attributes.sort(key=lambda k : k['id'].name)
 		for item in attributes:
 			child = node.addChild(name)
 			child.setAttributes(self._getAttributeDictionaryFromId(item['id']))
