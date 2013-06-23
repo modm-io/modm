@@ -259,9 +259,13 @@ class Parameter:
 			sub_dict['parameters'][self.name] = value
 
 	def evaluateValue(self, value):
-		if isinstance(value, str):
+		if isinstance(value, basestring):
 			value = value.strip(' \t\n\r')
 		if self.type == 'int':
+			if isinstance(value, basestring) and not value.isdigit():
+				self.log.error("Invalid value '%s' for %s. The value is not a number!"
+					% (value, self.name))
+				return None
 			value = int(value)
 			if self.max != None and value > self.max:
 				self.log.error("Invalid value '%s' for %s. %s > Max(=%s)"
@@ -288,6 +292,7 @@ class Parameter:
 				self.log.error("Invalid value '%s' for %s. Valid values are: %s"
 					% (value, self.name, self.values))
 				return None
+		return None
 
 	def _evaluate(self):
 		if self.name == None:
