@@ -95,7 +95,7 @@ class DeviceElementBase:
 				
 				for prop in props:
 					attr = self.attributes[key]
-					if 'count' in key:
+					if '-count' in key:
 						# this is a integer count
 						if attr['type'] == '==':
 							if attr['count'] != prop.value:
