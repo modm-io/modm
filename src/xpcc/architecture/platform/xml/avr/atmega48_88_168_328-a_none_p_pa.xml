@@ -47,6 +47,12 @@
     <define device-name="88" device-type="a">__AVR_ATmega88A__</define>
     <define device-name="88" device-type="pa">__AVR_ATmega88PA__</define>
     <pin-count>0</pin-count>
+    <driver type="core" name="avr">
+      <parameter device-name="48" name="ram_length">256</parameter>
+      <parameter device-name="88" name="ram_length">512</parameter>
+      <parameter device-name="168" name="ram_length">512</parameter
+      <parameter device-name="328" name="ram_length">1024</parameter>>
+    </driver>
     <header>avr/io.h</header>
     <header>avr/interrupt.h</header>
     <driver type="gpio" name="atmega">
