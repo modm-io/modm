@@ -50,8 +50,8 @@
     <driver type="core" name="avr">
       <parameter device-name="48" name="ram_length">256</parameter>
       <parameter device-name="88" name="ram_length">512</parameter>
-      <parameter device-name="168" name="ram_length">512</parameter
-      <parameter device-name="328" name="ram_length">1024</parameter>>
+      <parameter device-name="168" name="ram_length">512</parameter>
+      <parameter device-name="328" name="ram_length">1024</parameter>
     </driver>
     <header>avr/io.h</header>
     <header>avr/interrupt.h</header>
