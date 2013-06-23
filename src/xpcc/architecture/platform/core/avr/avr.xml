@@ -1,0 +1,12 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE rca SYSTEM "../../xml/driver.dtd">
+<rca version="1.0">
+	<driver type="core" name="avr">
+		<static>cxxabi.cpp</static>
+		<static>newdelete.cpp</static>
+		<static>ram.hpp</static>
+		<template>ram.cpp.in</template>
+		<parameter name="ram_block_length" type="int" min="2" max="64">8</parameter>
+		<parameter name="ram_length" type="int" min="64" max="8192">127</parameter>
+	</driver>
+</rca>
