@@ -109,10 +109,10 @@ class AVRDeviceReader(XMLDeviceReader):
 					for gpio in gpios:
 						if gpio['port'] == pcint['port'] and gpio['id'] == pcint['id']:
 							gpio['pcint'] = pcint['int']
-				for pcint in pin_array['exti']:
+				for exti in pin_array['exti']:
 					for gpio in gpios:
-						if gpio['port'] == pcint['port'] and gpio['id'] == pcint['id']:
-							gpio['extint'] = pcint['int']
+						if gpio['port'] == exti['port'] and gpio['id'] == exti['id']:
+							gpio['extint'] = exti['int']
 	
 	def createModule(self, name):
 		if name in self.modules:
@@ -156,7 +156,7 @@ class AVRDeviceReader(XMLDeviceReader):
 						if fmask & 2**(8*size-1-iii):
 							name = fname + str(start)
 							start += 1
-							register.addField(name, iii)
+							register.addField(name, 8*size-1-iii)
 				else:
 					register.addField(fname, int(math.log(fmask, 2)))
 		else:
@@ -172,7 +172,7 @@ class AVRDeviceReader(XMLDeviceReader):
 				for iii in reversed(range(8*size)):
 					if fmask & 2**(8*size-1-iii):
 						start += 1
-						register.addField('data'+str(start), iii)
+						register.addField('data'+str(start), 8*size-1-iii)
 		
 		return register
 

@@ -81,6 +81,9 @@
       <gpio port="B" id="7">
         <af type="pcint" id="7"/>
       </gpio>
+      <gpio port="C" id="0">
+        <af type="pcint" id="8"/>
+      </gpio>
       <gpio port="C" id="1">
         <af type="pcint" id="9"/>
       </gpio>
@@ -99,7 +102,6 @@
       <gpio port="C" id="6">
         <af type="pcint" id="14"/>
       </gpio>
-      <gpio port="C" id="7"/>
       <gpio port="D" id="0">
         <af type="pcint" id="16"/>
       </gpio>
