@@ -58,7 +58,9 @@ class DeviceFile:
 		self.platform = node.get('platform')
 		self.family = node.get('family')
 		self.names = node.get('name').split('|')
-		self.core = None
+		self.types = node.get('type')
+		if self.types != None:
+			self.types = self.types.split('|')
 
 		self.properties = []
 		self.drivers = []
@@ -208,7 +210,7 @@ class DeviceFile:
 				for prop in [p for p in self.properties if p.type == 'core']:
 					substitutions['target']['core'] = prop.value
 				substitutions.update(self.getSubstitutions())
-				drivers.append(d.toDict(platform_path, substitutions, self.properties))
+				drivers.append(d.toDict(platform_path, substitutions, s, self.properties))
 		return drivers
 
 ##-----------------------------------------------------------------------------
@@ -225,13 +227,13 @@ class DeviceFile:
 			values = {}
 			for prop in self.properties:
 				if prop.type == prop_type:
-					if prop.appliesTo(s):
+					if prop.appliesTo(s, self.properties):
 						values[prop.value] = prop.content
 		else:
 			values = []
 			for prop in self.properties:
 				if prop.type == prop_type:
-					if prop.appliesTo(s):
+					if prop.appliesTo(s, self.properties):
 						values.append(prop.value)
 		if require_singelton:
 			if len(values) > 1:
@@ -267,6 +269,7 @@ class Driver(DeviceElementBase):
 
 	def __init__(self, device, node):
 		DeviceElementBase.__init__(self, device, node)
+		self.node = node
 		self.type = node.get('type') # this overwrite is somewhat unfortunate
 		self.name = node.get('name')
 		self.instances = node.get('instances')
@@ -278,10 +281,8 @@ class Driver(DeviceElementBase):
 		else:
 			self.path = os.path.join('peripheral', self.type)
 		self.path = os.path.join(self.path, os.sep.join(self.name.split('/')))
-		self.parameters = self._getParameters(node)
-		self.substitutions = self._getDriverSubstitutions(node)
 
-	def toDict(self, platform_path, substitutions, properties):
+	def toDict(self, platform_path, substitutions, device_id, properties):
 		"""
 		This is used to package information about a driver extracted from
 		a device file into a dictionary.
@@ -294,9 +295,9 @@ class Driver(DeviceElementBase):
 		dic['type'] = self.type
 		dic['driver_file'] = self.getDriverFile(platform_path)
 		dic['path'] = self.path
-		dic['parameters'] = self.parameters
+		dic['parameters'] = self.getParameters(device_id, properties)
 		dic['substitutions'] = substitutions
-		dic['substitutions'].update(self.substitutions) # own substitutions overwrite
+		dic['substitutions'].update(self.getDriverSubstitutions(device_id, properties)) # own substitutions overwrite
 		dic['instances'] = self.instances
 		dic['properties'] = properties
 		return dic
@@ -310,8 +311,9 @@ class Driver(DeviceElementBase):
 			return None
 		else:
 			return f
-
-	def _getDriverSubstitutions(self, node):
+		
+	
+	def getDriverSubstitutions(self, device_id, properties):
 		"""
 		Returns a dict containing substitution values
 		that are specific to this driver.
@@ -322,11 +324,11 @@ class Driver(DeviceElementBase):
 		# more usefull stuff that can be added here
 		substitutions['driver-name'] = self.name
 		substitutions['driver-type'] = self.type
-		if len(node) <= 0: # if the node is childless
+		if len(self.node) <= 0: # if the node is childless
 			return substitutions
 		# Now this is were it gets interesting:
 		# parsing the inner nodes of the driver node recursively:
-		substitutions = dict(self._nodeToDict(node).items() + substitutions.items())
+		substitutions = dict(self._nodeToDict(self.node, device_id, properties).items() + substitutions.items())
 		# If this is the gpio driver parse gpio nodes in order to
 		# derive nibbles and ports
 		if self.type == 'gpio':
@@ -334,7 +336,7 @@ class Driver(DeviceElementBase):
 		self.log.debug("Found substitutions: " + str(substitutions))
 		return substitutions
 
-	def _nodeToDict(self, node):
+	def _nodeToDict(self, node, device_id, properties):
 		"""
 		attribute of the node are turnded into key/value pairs
 		child nodes are added to a list which is the value
@@ -342,48 +344,53 @@ class Driver(DeviceElementBase):
 		Example:
 		TODO..
 		"""
-		# Fist add attributes
-		dic = dict(node.items())
-		# Now add children
-		for c in node:
-			child_name = c.tag + 's'
-			if child_name not in dic:
-				dic[child_name] = [] # create child list
-			dic[child_name].append(self._nodeToDict(c))
+		dev = DeviceElementBase(self.device, node)
+		dic = {}
+		if dev.appliesTo(device_id, properties):
+			# Fist add attributes
+			dic = dict(node.items())
+			# Now add children
+			for c in [c for c in node if c.tag != 'parameter']:
+				child_name = c.tag + 's'
+				if child_name not in dic:
+					dic[child_name] = [] # create child list
+				cdic = self._nodeToDict(c, device_id, properties)
+				if len(cdic) > 0:
+					dic[child_name].append(cdic)
 		return dic
 
-	def _getParameters(self, node):
+	def getParameters(self, device_id, properties):
 		"""
 		Extracts all Parameter nodes from the driver
 		node.
 		"""
 		# Create Parameters Dictionary
 		parameters = {}
-		if len(node) <= 0: # if the node is childless
+		if len(self.node) <= 0: # if the node is childless
 			return parameters
 		# Loop through child nodes looking for parameters
-		for c in node:
+		for c in self.node:
 			if c.tag == 'parameter':
-				name = c.get('name')
-				instances = c.get('instances')
-				value = c.text
-				# Remove parameter node
-				node.remove(c)
-				if name == None:
-					self.log.error("Driver '%s'. Parameter needs a name."
-						% (self.name))
-				if value == None:
-					self.log.error("Driver '%s'. Parameter '%s' needs a value."
-						% (self.name, name))
-				if name in parameters:
-					self.log.error("Driver '%s'. Parameter '%s' connot be set mor than once!"
-						% (self.name, name))
-				if instances != None:
-					# because we need a different seperator for everything...
-					instances = instances.split(',')
-				else:
-					# Add Parameter to Dictionary
-					parameters[name] = [value, instances]
+				dev = DeviceElementBase(self.device, c)
+				if dev.appliesTo(device_id, properties):
+					name = c.get('name')
+					instances = c.get('instances')
+					value = c.text
+					if name == None:
+						self.log.error("Driver '%s'. Parameter needs a name."
+							% (self.name))
+					if value == None:
+						self.log.error("Driver '%s'. Parameter '%s' needs a value."
+							% (self.name, name))
+					if name in parameters:
+						self.log.error("Driver '%s'. Parameter '%s' connot be set mor than once!"
+							% (self.name, name))
+					if instances != None:
+						# because we need a different seperator for everything...
+						instances = instances.split(',')
+					else:
+						# Add Parameter to Dictionary
+						parameters[name] = [value, instances]
 		self.log.debug("Found Parameters: %s" % parameters)
 		return parameters
 
