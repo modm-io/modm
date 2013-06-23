@@ -59,6 +59,7 @@ class AVRDeviceWriter(XMLDeviceWriter):
 		core_child = self.root.addChild('driver')
 		core_child.setAttributes({'type': 'core', 'name': 'avr'})
 		ram_sizes = self.device.getAttributes('ram')
+		ram_sizes.sort(key=lambda k : int(k['id'].name or 0))
 		for ram_size in ram_sizes:
 			size = ram_size['value']
 			# for large RAM sizes, reserve 1kB for stack
@@ -66,7 +67,7 @@ class AVRDeviceWriter(XMLDeviceWriter):
 			if size > 2048:
 				size -= 1024
 			else:
-				size /= 2 
+				size /= 2
 			ram_size_child = core_child.addChild('parameter')
 			ram_size_child.setAttributes({'device-name': ram_size['id'].name, 'name': 'ram_length'})
 			ram_size_child.setValue(size)
@@ -89,7 +90,7 @@ class AVRDeviceWriter(XMLDeviceWriter):
 
 	def addDeviceAttributesToNode(self, node, name):
 		attributes = self.device.getAttributes(name)
-		attributes.sort(key=lambda k : k['id'].name)
+		attributes.sort(key=lambda k : (int(k['id'].name or 0), k['id'].type))
 		for item in attributes:
 			child = node.addChild(name)
 			child.setAttributes(self._getAttributeDictionaryFromId(item['id']))
