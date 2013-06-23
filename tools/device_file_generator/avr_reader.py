@@ -152,11 +152,11 @@ class AVRDeviceReader(XMLDeviceReader):
 					
 				if bin(fmask).count("1") > 1:
 					start = flsb
-					for iii in reversed(range(8*size)):
-						if fmask & 2**(8*size-1-iii):
+					for iii in range(8*size):
+						if fmask & 2**(iii):
 							name = fname + str(start)
 							start += 1
-							register.addField(name, 8*size-1-iii)
+							register.addField(name, iii)
 				else:
 					register.addField(fname, int(math.log(fmask, 2)))
 		else:
@@ -169,10 +169,10 @@ class AVRDeviceReader(XMLDeviceReader):
 				
 			if bin(fmask).count("1") > 1:
 				start = flsb
-				for iii in reversed(range(8*size)):
-					if fmask & 2**(8*size-1-iii):
+				for iii in range(8*size):
+					if fmask & 2**(iii):
+						register.addField('data'+str(start), iii)
 						start += 1
-						register.addField('data'+str(start), 8*size-1-iii)
 		
 		return register
 

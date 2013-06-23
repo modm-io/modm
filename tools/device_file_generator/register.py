@@ -111,7 +111,7 @@ class Register():
 				index = field['index']
 				if ii*8 <= index < (ii+1)*8:
 					index -= ii*8
-					values = values[:2+bW*index] + field['name'].center(bW-1) + values[1+bW*(index+1):]
+					values = values[:2+bW*(7-index)] + field['name'].center(bW-1) + values[1+bW*((8-index)):]
 			
 			s = s + values + "\n+" + ("-"*(bW-1) + "+")*8
 		return s
