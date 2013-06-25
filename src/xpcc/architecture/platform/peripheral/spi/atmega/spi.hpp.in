@@ -72,7 +72,7 @@ namespace xpcc
 				%% set port = gpio.port
 				%% set id = gpio.id
 				%% set name = gpio.name | capitalize
-			static typedef ::xpcc::atmega::Gpio{{ port }}{{ id }} {{ name }};
+			typedef ::xpcc::atmega::Gpio{{ port }}{{ id }} {{ name }};
 			%% endfor
 		};
 
@@ -104,13 +104,13 @@ namespace xpcc
 				SPSR = (prescaler & 0x80) ? (1 << SPI2X) : 0;
 				%% for io in gpios
 				%% if io.name == 'miso'
-				Spi::Miso.setInput();
+				Spi::Miso::setInput();
 				%% elif io.name == 'mosi'
-				Spi::Mosi.setOutput();
+				Spi::Mosi::setOutput();
 				%% elif io.name == 'sck'
-				Spi::Sck.setOutput();
+				Spi::Sck::setOutput();
 				%% elif io.name == 'ss'
-				Spi::Ss.setOutput();
+				Spi::Ss::setOutput();
 				%% endif
 				%% endfor
 			}

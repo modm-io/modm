@@ -130,6 +130,12 @@
       </gpio>
     </driver>
     <driver instances="0" type="uart" name="atmega"/>
+    <driver type="spi" name="atmega">
+      <gpio port="B" name="miso" id="3"/>
+      <gpio port="B" name="mosi" id="4"/>
+      <gpio port="B" name="sck" id="5"/>
+      <gpio port="B" name="ss" id="2"/>
+    </driver>
     <driver type="i2c" name="atmega"/>
     <driver type="spi" name="atmega">
       <gpio port="B" name="miso" id="3"/>
