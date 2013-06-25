@@ -28,6 +28,7 @@
 # -----------------------------------------------------------------------------
 
 from writer import XMLDeviceWriter, XMLElement
+import avr_io
 
 import os, sys
 # add python module logger to path
@@ -44,6 +45,16 @@ class AVRDeviceWriter(XMLDeviceWriter):
 		self.types = self.device.getDeviceTypes()
 		
 		self.root.setAttribute('type', "|".join(self.types))
+		
+		# search the io dictionary for this device
+		# we only need one mmcu to identify the device group
+		mmcu = self.device.getAttributes('mmcu')[0]['value']
+		self.io = [a for a in avr_io.pins if mmcu in a['devices']]
+		if len(self.io) > 0:
+			self.io = self.io[0]
+		else:
+			self.io = {}
+			self.log.warn("AvrWriter: IO not found for mmcu: '%s'" % mmcu)
 		
 		self.addDeviceAttributesToNode(self.root, 'flash')
 		self.addDeviceAttributesToNode(self.root, 'ram')
@@ -96,21 +107,29 @@ class AVRDeviceWriter(XMLDeviceWriter):
 			child.setAttributes(self._getAttributeDictionaryFromId(item['id']))
 			child.setValue(item['value'])
 	
-	def addModuleAttributesToNode(self, node, peripheral, name):
+	def addModuleAttributesToNode(self, node, peripheral, name, family=None):
+		if family == None:
+			family = self.family
 		attributes = self._getModuleAttributes()
 		for item in attributes:
 			dict = self._getAttributeDictionaryFromId(item['id'])
 			for module in item['value']:
-				if peripheral in module:
+				if module.startswith(peripheral):
 					driver = node.addChild('driver')
 					driver.setAttributes(dict)
-					driver.setAttributes({'type': name, 'name': self.family})
+					driver.setAttributes({'type': name, 'name': family})
+					if name in self.io:
+						for io in self.io[name]:
+							ch = driver.addChild('gpio')
+							ch.setAttributes(io)
 	
 	def addI2cToNode(self, node):
 		self.addModuleAttributesToNode(node, 'TWI', 'i2c')
 	
 	def addSpiToNode(self, node):
-		self.addModuleAttributesToNode(node, 'SPI', 'spi')
+		# ATtiny's use the module from the ATmegas!
+		family = 'atmega' if (self.family in ['attiny']) else self.family 
+		self.addModuleAttributesToNode(node, 'SPI', 'spi', family)
 	
 	def addAdcToNode(self, node):
 		self.addModuleAttributesToNode(node, 'AD_CONVERTER', 'adc')
