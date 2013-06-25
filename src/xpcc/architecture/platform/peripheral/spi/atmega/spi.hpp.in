@@ -1,0 +1,211 @@
+// coding: utf-8
+// ----------------------------------------------------------------------------
+/* Copyright (c) 2013, Roboterclub Aachen e.V.
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ *     * Redistributions of source code must retain the above copyright
+ *       notice, this list of conditions and the following disclaimer.
+ *     * Redistributions in binary form must reproduce the above copyright
+ *       notice, this list of conditions and the following disclaimer in the
+ *       documentation and/or other materials provided with the distribution.
+ *     * Neither the name of the Roboterclub Aachen e.V. nor the
+ *       names of its contributors may be used to endorse or promote products
+ *       derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY ROBOTERCLUB AACHEN E.V. ''AS IS'' AND ANY
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL ROBOTERCLUB AACHEN E.V. BE LIABLE FOR ANY
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+ * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+// ----------------------------------------------------------------------------
+
+#ifndef XPCC__ATMEGA_SPI_HPP
+#define XPCC__ATMEGA_SPI_HPP
+
+#include "../../../device.hpp"
+#include <xpcc/architecture/peripheral/spi.hpp>
+
+namespace xpcc
+{
+	namespace atmega
+	{
+		struct Spi
+		{
+			enum Mode
+			{
+				MODE_0 = 0,				///< SCK normal, sample on rising edge
+				MODE_1 = (1 << CPHA),	///< SCK normal, sample on falling edge
+				MODE_2 = (1 << CPOL),	///< SCK inverted, sample on falling edge
+				MODE_3 = (1 << CPOL) | (1 << CPHA),	
+										///< SCK inverted, sample on rising edge
+			};
+
+			enum Prescaler
+			{
+				PRESCALER_2 = 0x80 | 0,
+				PRESCALER_4 = 0,
+				PRESCALER_8 = 0x80 | (1 << SPR0),
+				PRESCALER_16 = (1 << SPR0),
+				PRESCALER_32 = 0x80 | (1 << SPR1),
+				PRESCALER_64 = (1 << SPR1),
+				PRESCALER_128 = (1 << SPR1) | (1 << SPR0),
+			};
+
+			enum BufferOptions
+			{
+				BUFFER_TX_RX_INCREMENT = 0x03,
+				BUFFER_TX_RX_DECREMENT = 0x00,
+				BUFFER_TX_INCREMENT_RX_DECREMENT = 0x02,
+				BUFFER_TX_DECREMENT_RX_INCREMENT = 0x01
+			};
+
+			%% for gpio in gpios
+				%% set port = gpio.port
+				%% set id = gpio.id
+				%% set name = gpio.name | capitalize
+			static typedef ::xpcc::atmega::Gpio{{ port }}{{ id }} {{ name }};
+			%% endfor
+		};
+
+		/**
+		 * \brief		Spi Master
+		 *
+		 * The fast SPI clock speeds make it unreasonable to use an interrupt
+		 * based approach to shifting out each byte of the data, since the interrupt
+		 * handling might decrease performance over busy waiting especially for
+		 * low frequencies.
+		 *
+		 * Therefore the asynchronous methods are implemented synchronously.
+		 *
+		 * \ingroup		atmega
+		 * \author		Niklas Hauser
+		 */
+		class SpiMaster : public xpcc::SpiMaster
+		{
+		public:
+			/**
+			 * \brief	Initialize SPI module
+			 * 
+			 * This also sets the directions of the I/O pins.
+			 */
+			static void
+			initialize(Spi::Mode mode, Spi::Prescaler prescaler)
+			{
+				SPCR = (1 << SPE) | (1 << MSTR) | (prescaler & ~0x80) | mode;
+				SPSR = (prescaler & 0x80) ? (1 << SPI2X) : 0;
+				%% for io in gpios
+				%% if io.name == 'miso'
+				Spi::Miso.setInput();
+				%% elif io.name == 'mosi'
+				Spi::Mosi.setOutput();
+				%% elif io.name == 'sck'
+				Spi::Sck.setOutput();
+				%% elif io.name == 'ss'
+				Spi::Ss.setOutput();
+				%% endif
+				%% endfor
+			}
+
+			static uint8_t
+			writeReadBlocking(uint8_t data)
+			{
+				SPDR = data;
+
+				while(!isFinished())
+					;
+				return getResult();
+			}
+
+			static void
+			writeBlocking(uint8_t data)
+			{
+				SPDR = data;
+
+				while(!isFinished())
+					;
+			}
+
+			static ALWAYS_INLINE bool
+			write(uint8_t data)
+			{
+				if (!isFinished())
+					return false;
+
+				SPDR = data;
+				return true;
+			}
+
+			static ALWAYS_INLINE uint8_t
+			getResult()
+			{
+				uint8_t data = SPDR;
+				return data;
+			}
+
+			static ALWAYS_INLINE bool
+			isFinished()
+			{
+				return (SPSR & (1 << SPIF));
+			}
+		};
+
+		/**
+		 * \brief		Spi Master with DMA support
+		 *
+		 * Since the AVR architecture of the ATmega and ATtiny does not have DMA support,
+		 * these methods are implemented as blocking.
+		 *
+		 * \ingroup		atmega
+		 * \author		Niklas Hauser
+		 */
+		class SpiBlockMaster : public xpcc::SpiBlockMaster
+		{
+		public:
+			/**
+			 * \brief	Initialize SPI module
+			 *
+			 * This also sets the directions of the I/O pins.
+			 */
+			static ALWAYS_INLINE void
+			initialize(Spi::Mode mode, Spi::Prescaler prescaler)
+			{
+				SpiMaster::initialize(mode, prescaler);
+			}
+
+			static inline bool
+			start(uint8_t * tx, uint8_t * rx, std::size_t length, Spi::BufferOptions options=Spi::BUFFER_TX_RX_INCREMENT)
+			{
+				uint8_t tx_byte = 0xff;
+				uint8_t rx_byte;
+
+				for (std::size_t i = 0; i < length; i++)
+				{
+					if (tx) tx_byte = tx[options & 0x02 ? i : length-i-1];
+
+					rx_byte = SpiMaster::writeReadBlocking(tx_byte);
+
+					if (rx) rx[options & 0x01 ? i : length-i-1] = rx_byte;
+				}
+
+				return true;
+			}
+
+			static ALWAYS_INLINE bool
+			isFinished()
+			{
+				return true;
+			}
+		};
+	}
+}
+
+#endif // XPCC__ATMEGA_SPI_HPP
