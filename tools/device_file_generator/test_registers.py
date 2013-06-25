@@ -75,7 +75,7 @@ if __name__ == "__main__":
 		attributes = dev.getAttributes('peripherals')
 		for attribute in attributes:
 			for peripheral in attribute['value']:
-				if peripheral.name == peri_name:
+				if peripheral.name.startswith(peri_name):
 					peripherals.append({'ids': [dev.id], 'peripheral': peripheral})
 	
 	registers = []
@@ -112,17 +112,19 @@ if __name__ == "__main__":
 	
 	for dev in merged:
 		reg = dev['register']
+		dev['ids'].sort(key=lambda k : (int(k.name or 0), k.type))
 		if bitfield_pattern == "":
 			s = "Devices:\n"
 			ii = 0
-			for id in set(dev['ids']):
-				s += id.string.replace("at","") + " \t"
+			for id in dev['ids']:
+				s += id.string.replace("at","") + "  \t"
 				ii += 1
 				if ii > 7:
 					ii = 0
 					s += "\n"
 			logger.debug(s)
 			logger.info(str(reg) + "\n")
+			filtered_registers.append(dev['register'].name)
 		
 		if reg.getFieldsWithPattern(bitfield_pattern) != None:
 			filtered_devices.append(dev)
@@ -133,16 +135,16 @@ if __name__ == "__main__":
 		for dev in filtered_devices:
 			s = "Devices:\n"
 			ii = 0
-			for id in set(dev['ids']):
-				s += id.string.replace("at","") + " \t"
+			for id in dev['ids']:
+				s += id.string.replace("at","") + "  \t"
 				ii += 1
 				if ii > 7:
 					ii = 0
 					s += "\n"
 			logger.debug(s)
 			logger.info(str(dev['register']) + "\n")
-		
-		logger.info("Summary registers:")
-		for name in set(filtered_registers):
-			logger.debug(name)
+	
+	logger.info("Summary registers:")
+	for name in set(filtered_registers):
+		logger.debug(name)
 
