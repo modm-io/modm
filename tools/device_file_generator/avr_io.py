@@ -36,6 +36,13 @@ pins = \
 		[
 			{ "port": "D", "id": "2", "int": "0" },
 			{ "port": "D", "id": "3", "int": "1" }
+		],
+		"spi":
+		[
+			{ "port": "B", "id": "3", "name": "miso" },
+			{ "port": "B", "id": "4", "name": "mosi" },
+			{ "port": "B", "id": "5", "name": "sck" },
+			{ "port": "B", "id": "2", "name": "ss" }
 		]
 	},
 	
@@ -47,6 +54,13 @@ pins = \
 			{ "port": "D", "id": "2", "int": "0" },
 			{ "port": "D", "id": "3", "int": "1" },
 			{ "port": "B", "id": "2", "int": "2" }
+		],
+		"spi":
+		[
+			{ "port": "B", "id": "5", "name": "miso" },
+			{ "port": "B", "id": "6", "name": "mosi" },
+			{ "port": "B", "id": "7", "name": "sck" },
+			{ "port": "B", "id": "4", "name": "ss" }
 		]
 	},
 	
@@ -63,6 +77,13 @@ pins = \
 			{ "port": "E", "id": "5", "int": "5" },
 			{ "port": "E", "id": "6", "int": "6" },
 			{ "port": "E", "id": "7", "int": "7" }
+		],
+		"spi":
+		[
+			{ "port": "B", "id": "2", "name": "miso" },
+			{ "port": "B", "id": "3", "name": "mosi" },
+			{ "port": "B", "id": "1", "name": "sck" },
+			{ "port": "B", "id": "0", "name": "ss" }
 		]
 	},
 	
@@ -96,6 +117,13 @@ pins = \
 			{ "port": "D", "id": "5", "int": "5" },
 			{ "port": "D", "id": "6", "int": "6" },
 			{ "port": "D", "id": "7", "int": "7" }
+		],
+		"spi":
+		[
+			{ "port": "B", "id": "2", "name": "miso" },
+			{ "port": "B", "id": "3", "name": "mosi" },
+			{ "port": "B", "id": "1", "name": "sck" },
+			{ "port": "B", "id": "0", "name": "ss" }
 		]
 	},
 	
@@ -107,6 +135,13 @@ pins = \
 			{ "port": "C", "id": "0", "int": "0" },
 			{ "port": "B", "id": "2", "int": "1" },
 			{ "port": "B", "id": "3", "int": "2" },
+		],
+		"spi":
+		[
+			{ "port": "B", "id": "2", "name": "miso" },
+			{ "port": "B", "id": "3", "name": "mosi" },
+			{ "port": "B", "id": "1", "name": "sck" },
+			{ "port": "B", "id": "0", "name": "ss" }
 		]
 	},
 	
@@ -151,6 +186,13 @@ pins = \
 			{ "port": "B", "id": "2", "int": "1" },
 			{ "port": "B", "id": "5", "int": "2" },
 			{ "port": "C", "id": "0", "int": "3" },
+		],
+		"spi":
+		[
+			{ "port": "B", "id": "3", "name": "miso" },
+			{ "port": "B", "id": "2", "name": "mosi" },
+			{ "port": "B", "id": "4", "name": "sck" },
+			{ "port": "B", "id": "1", "name": "ss" }
 		]
 	},
 	
@@ -178,6 +220,13 @@ pins = \
 			{ "port": "C", "id": "1", "int": "1" },
 			{ "port": "C", "id": "2", "int": "2" },
 			{ "port": "C", "id": "3", "int": "3" },
+		],
+		"spi":
+		[
+			{ "port": "B", "id": "6", "name": "miso" },
+			{ "port": "B", "id": "7", "name": "mosi" },
+			{ "port": "B", "id": "5", "name": "sck" },
+			{ "port": "B", "id": "4", "name": "ss" }
 		]
 	},
 	
@@ -200,6 +249,13 @@ pins = \
 		"exti": 
 		[
 			{ "port": "B", "id": "7", "int": "0" },
+		],
+		"spi":
+		[
+			{ "port": "B", "id": "6", "name": "miso" },
+			{ "port": "B", "id": "7", "name": "mosi" },
+			{ "port": "B", "id": "5", "name": "sck" },
+			{ "port": "B", "id": "4", "name": "ss" }
 		]
 	},
 	
@@ -224,6 +280,13 @@ pins = \
 			{ "port": "D", "id": "3", "int": "3" },
 			
 			{ "port": "E", "id": "6", "int": "6" },
+		],
+		"spi":
+		[
+			{ "port": "B", "id": "3", "name": "miso" },
+			{ "port": "B", "id": "2", "name": "mosi" },
+			{ "port": "B", "id": "1", "name": "sck" },
+			{ "port": "B", "id": "0", "name": "ss" }
 		]
 	},
 	
@@ -264,6 +327,13 @@ pins = \
 		[
 			{ "port": "D", "id": "2", "int": "0" },
 			{ "port": "D", "id": "3", "int": "1" },
+		],
+		"spi":
+		[
+			{ "port": "B", "id": "3", "name": "miso" },
+			{ "port": "B", "id": "4", "name": "mosi" },
+			{ "port": "B", "id": "5", "name": "sck" },
+			{ "port": "B", "id": "2", "name": "ss" }
 		]
 	},
 	
@@ -294,6 +364,13 @@ pins = \
 			{ "port": "E", "id": "5", "int": "5" },
 			{ "port": "E", "id": "6", "int": "6" },
 			{ "port": "E", "id": "7", "int": "7" },
+		],
+		"spi":
+		[
+			{ "port": "B", "id": "2", "name": "miso" },
+			{ "port": "B", "id": "3", "name": "mosi" },
+			{ "port": "B", "id": "1", "name": "sck" },
+			{ "port": "B", "id": "0", "name": "ss" }
 		]
 	},
 	
@@ -324,6 +401,13 @@ pins = \
 			{ "port": "D", "id": "2", "int": "0" },
 			{ "port": "D", "id": "3", "int": "1" },
 			{ "port": "E", "id": "0", "int": "2" },
+		],
+		"spi":
+		[
+			{ "port": "B", "id": "5", "name": "miso" },
+			{ "port": "B", "id": "6", "name": "mosi" },
+			{ "port": "B", "id": "7", "name": "sck" },
+			{ "port": "B", "id": "4", "name": "ss" }
 		]
 	},
 	
@@ -375,6 +459,13 @@ pins = \
 			{ "port": "D", "id": "2", "int": "0" },
 			{ "port": "D", "id": "3", "int": "1" },
 			{ "port": "B", "id": "2", "int": "2" },
+		],
+		"spi":
+		[
+			{ "port": "B", "id": "5", "name": "miso" },
+			{ "port": "B", "id": "6", "name": "mosi" },
+			{ "port": "B", "id": "7", "name": "sck" },
+			{ "port": "B", "id": "4", "name": "ss" }
 		]
 	},
 	
@@ -408,6 +499,13 @@ pins = \
 		"exti":
 		[
 			{ "port": "D", "id": "1", "int": "0" },
+		],
+		"spi":
+		[
+			{ "port": "B", "id": "2", "name": "miso" },
+			{ "port": "B", "id": "3", "name": "mosi" },
+			{ "port": "B", "id": "1", "name": "sck" },
+			{ "port": "B", "id": "0", "name": "ss" }
 		]
 	},
 	
@@ -456,6 +554,13 @@ pins = \
 		"exti":
 		[
 			{ "port": "D", "id": "1", "int": "0" },
+		],
+		"spi":
+		[
+			{ "port": "B", "id": "2", "name": "miso" },
+			{ "port": "B", "id": "3", "name": "mosi" },
+			{ "port": "B", "id": "1", "name": "sck" },
+			{ "port": "B", "id": "0", "name": "ss" }
 		]
 	},
 	
@@ -484,6 +589,13 @@ pins = \
 			{ "port": "E", "id": "5", "int": "5" },
 			{ "port": "E", "id": "6", "int": "6" },
 			{ "port": "E", "id": "7", "int": "7" },
+		],
+		"spi":
+		[
+			{ "port": "B", "id": "2", "name": "miso" },
+			{ "port": "B", "id": "3", "name": "mosi" },
+			{ "port": "B", "id": "1", "name": "sck" },
+			{ "port": "B", "id": "0", "name": "ss" }
 		]
 	},
 	
@@ -529,6 +641,13 @@ pins = \
 			{ "port": "E", "id": "5", "int": "5" },
 			{ "port": "E", "id": "6", "int": "6" },
 			{ "port": "E", "id": "7", "int": "7" },
+		],
+		"spi":
+		[
+			{ "port": "B", "id": "2", "name": "miso" },
+			{ "port": "B", "id": "3", "name": "mosi" },
+			{ "port": "B", "id": "1", "name": "sck" },
+			{ "port": "B", "id": "0", "name": "ss" }
 		]
 	},
 	
@@ -540,6 +659,13 @@ pins = \
 			{ "port": "D", "id": "2", "int": "0" },
 			{ "port": "D", "id": "3", "int": "1" },
 			{ "port": "E", "id": "0", "int": "2" },
+		],
+		"spi":
+		[
+			{ "port": "B", "id": "5", "name": "miso" },
+			{ "port": "B", "id": "6", "name": "mosi" },
+			{ "port": "B", "id": "7", "name": "sck" },
+			{ "port": "B", "id": "4", "name": "ss" }
 		]
 	},
 	
@@ -551,6 +677,48 @@ pins = \
 			{ "port": "D", "id": "2", "int": "0" },
 			{ "port": "D", "id": "3", "int": "1" },
 			{ "port": "B", "id": "2", "int": "2" },
+		],
+		"spi":
+		[
+			{ "port": "B", "id": "5", "name": "miso" },
+			{ "port": "B", "id": "6", "name": "mosi" },
+			{ "port": "B", "id": "7", "name": "sck" },
+			{ "port": "B", "id": "4", "name": "ss" }
+		]
+	},
+	
+	{
+		"devices": ["atmega644rfr2", "atmega1284rfr2", "atmega2564rfr2"],
+		"pcint":
+		[
+			{ "port": "B", "id": "0", "int": "0" },
+			{ "port": "B", "id": "1", "int": "1" },
+			{ "port": "B", "id": "2", "int": "2" },
+			{ "port": "B", "id": "3", "int": "3" },
+			{ "port": "B", "id": "4", "int": "4" },
+			{ "port": "B", "id": "5", "int": "5" },
+			{ "port": "B", "id": "6", "int": "6" },
+			{ "port": "B", "id": "7", "int": "7" },
+			
+			{ "port": "F", "id": "0", "int": "8" },
+		],
+		"exti":
+		[
+			{ "port": "D", "id": "0", "int": "0" },
+			{ "port": "D", "id": "1", "int": "1" },
+			{ "port": "D", "id": "2", "int": "2" },
+			{ "port": "D", "id": "3", "int": "3" },
+			{ "port": "E", "id": "4", "int": "4" },
+			{ "port": "E", "id": "5", "int": "5" },
+			{ "port": "E", "id": "6", "int": "6" },
+			{ "port": "E", "id": "7", "int": "7" },
+		],
+		"spi":
+		[
+			{ "port": "B", "id": "3", "name": "miso" },
+			{ "port": "B", "id": "2", "name": "mosi" },
+			{ "port": "B", "id": "1", "name": "sck" },
+			{ "port": "B", "id": "0", "name": "ss" }
 		]
 	},
 	
@@ -572,6 +740,12 @@ pins = \
 		"exti":
 		[
 			{ "port": "B", "id": "2", "int": "0" },
+		],
+		"spi":
+		[
+			{ "port": "B", "id": "0", "name": "miso" },
+			{ "port": "B", "id": "1", "name": "mosi" },
+			{ "port": "B", "id": "2", "name": "sck" }
 		]
 	},
 	
@@ -589,7 +763,7 @@ pins = \
 		"exti":
 		[
 			{ "port": "B", "id": "1", "int": "0" },
-		]
+		],
 	},
 	
 	{
@@ -613,6 +787,13 @@ pins = \
 		"exti":
 		[
 			{ "port": "B", "id": "2", "int": "0" },
+		],
+		"spi":
+		[
+			{ "port": "A", "id": "1", "name": "miso" },
+			{ "port": "A", "id": "2", "name": "mosi" },
+			{ "port": "B", "id": "7", "name": "sck" },
+			{ "port": "B", "id": "6", "name": "ss" }
 		]
 	},
 	
@@ -639,6 +820,12 @@ pins = \
 		"exti":
 		[
 			{ "port": "B", "id": "2", "int": "0" },
+		],
+		"spi":
+		[
+			{ "port": "B", "id": "6", "name": "miso" },
+			{ "port": "B", "id": "5", "name": "mosi" },
+			{ "port": "B", "id": "4", "name": "sck" }
 		]
 	},
 	
@@ -656,6 +843,12 @@ pins = \
 		"exti":
 		[
 			{ "port": "B", "id": "2", "int": "0" },
+		],
+		"spi":
+		[
+			{ "port": "B", "id": "1", "name": "miso" },
+			{ "port": "B", "id": "2", "name": "mosi" },
+			{ "port": "B", "id": "3", "name": "sck" }
 		]
 	},
 	
@@ -710,6 +903,13 @@ pins = \
 		"exti":
 		[
 			{ "port": "C", "id": "2", "int": "0" },
+		],
+		"spi":
+		[
+			{ "port": "C", "id": "4", "name": "miso" },
+			{ "port": "C", "id": "2", "name": "mosi" },
+			{ "port": "C", "id": "1", "name": "sck" },
+			{ "port": "C", "id": "0", "name": "ss" }
 		]
 	},
 	
@@ -781,16 +981,30 @@ pins = \
 		[
 			{ "port": "D", "id": "2", "int": "0" },
 			{ "port": "D", "id": "3", "int": "1" },
+		],
+		"spi":
+		[
+			{ "port": "B", "id": "3", "name": "miso" },
+			{ "port": "B", "id": "4", "name": "mosi" },
+			{ "port": "B", "id": "5", "name": "sck" },
+			{ "port": "B", "id": "2", "name": "ss" }
 		]
 	},
 	
 	{
-		"devices": ["attiny48", "attiny88"],
+		"devices": ["attiny87", "attiny167"],
 		"pcint": [],
 		"exti":
 		[
 			{ "port": "B", "id": "6", "int": "0" },
 			{ "port": "A", "id": "3", "int": "1" },
+		],
+		"spi":
+		[
+			{ "port": "A", "id": "4", "name": "miso" },
+			{ "port": "A", "id": "2", "name": "mosi" },
+			{ "port": "A", "id": "5", "name": "sck" },
+			{ "port": "A", "id": "6", "name": "ss" }
 		]
 	},
 	
@@ -865,6 +1079,13 @@ pins = \
 		[
 			{ "port": "C", "id": "1", "int": "0" },
 			{ "port": "C", "id": "2", "int": "1" },
+		],
+		"spi":
+		[
+			{ "port": "D", "id": "0", "name": "miso" },
+			{ "port": "D", "id": "1", "name": "mosi" },
+			{ "port": "D", "id": "3", "name": "sck" },
+			{ "port": "C", "id": "0", "name": "ss" }
 		]
 	},
 	
