@@ -31,10 +31,8 @@
 #ifndef XPCC__ATMEGA_GPIO_HPP
 #define XPCC__ATMEGA_GPIO_HPP
 
-#include <xpcc/architecture/driver/gpio.hpp>
-#include <xpcc/math/utils/bit_operation.hpp>
 #include "../../../device.hpp"
-
+#include <xpcc/architecture/driver/gpio.hpp>
 
 /**
  * Macros for backwards compatibility:
@@ -113,7 +111,7 @@ namespace xpcc
 		 * Gpio Classes created from the XML Device File Gpio Description
 		 */
 		%% for gpio in gpios
-			%% set port = gpio.port|upper
+			%% set port = gpio.port | upper
 			%% set pin  = gpio.id
 			
 		%% for type in ["Output", "Input", ""]
@@ -179,8 +177,10 @@ namespace xpcc
 			%% endif
 			#ifdef EIMSK
 				EIMSK |= (1 << INT{{af_id}});
-			#else
+			#elif defined GICR
 				GICR |= (1 << INT{{af_id}});
+			#else
+			#	error "Cannot find register for setting INT{{af_id}}!"
 			#endif
 			}
 
@@ -192,24 +192,30 @@ namespace xpcc
 			%% endif
 			#ifdef EIMSK
 				EIMSK &= ~(1 << INT{{af_id}});
-			#else
+			#elif defined GICR
 				GICR &= ~(1 << INT{{af_id}});
+			#else
+			#	error "Cannot find register for clearing INT{{af_id}}!"
 			#endif
 			}
 
 			ALWAYS_INLINE static bool getExternalInterruptFlag() {
 			#ifdef EIFR
 				return (EIFR & (1 << INTF{{af_id}}));
-			#else
+			#elif defined GIFR
 				return (GIFR & (1 << INTF{{af_id}}));
+			#else
+			#	error "Cannot find register for reading INTF{{af_id}}!"
 			#endif
 			}
 
 			ALWAYS_INLINE static void acknowledgeExternalInterruptFlag() {
 			#ifdef EIFR
 				EIFR |= (1 << INTF{{af_id}});
-			#else
+			#elif defined GIFR
 				GIFR |= (1 << INTF{{af_id}});
+			#else
+			#	error "Cannot find register for setting INTF{{af_id}}!"
 			#endif
 			}
 			%% endif
@@ -222,8 +228,10 @@ namespace xpcc
 				PCICR |= (1 << PCIE{{af_reg}});
 			#elif defined EIMSK
 				EIMSK |= (1 << PCIE{{af_reg}});
-			#else
+			#elif defined GICR
 				GICR |= (1 << PCIE{{af_reg}});
+			#else
+			#	error "Cannot find register for setting PCIE{{af_reg}}!"
 			#endif
 			}
 
@@ -234,8 +242,10 @@ namespace xpcc
 					PCICR &= ~(1 << PCIE{{af_reg}});
 			#elif defined EIMSK
 					EIMSK &= ~(1 << PCIE{{af_reg}});
-			#else
+			#elif defined GICR
 					GICR &= ~(1 << PCIE{{af_reg}});
+			#else
+			#	error "Cannot find register for clearing PCIE{{af_reg}}!"
 			#endif
 				}
 			}
@@ -245,8 +255,10 @@ namespace xpcc
 				return (PCIFR & (1 << PCIF{{af_reg}}));
 			#elif defined EIFR
 				return (EIFR & (1 << PCIF{{af_reg}}));
-			#else
+			#elif defined GIFR
 				return (GIFR & (1 << PCIF{{af_reg}}));
+			#else
+			#	error "Cannot find register for reading PCIF{{af_reg}}!"
 			#endif
 			}
 
@@ -255,8 +267,10 @@ namespace xpcc
 				PCIFR |= (1 << PCIF{{af_reg}});
 			#elif defined EIFR
 				EIFR |= (1 << PCIF{{af_reg}});
-			#else
+			#elif defined GIFR
 				GIFR |= (1 << PCIF{{af_reg}});
+			#else
+			#	error "Cannot find register for setting PCIF{{af_reg}}!"
 			#endif
 			}
 
