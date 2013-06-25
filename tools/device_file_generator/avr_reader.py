@@ -30,7 +30,7 @@
 from reader import XMLDeviceReader
 from peripheral import Peripheral
 from register import Register
-import avr_interrupts as interrupts
+import avr_io as interrupts
 
 import os, sys, math
 # add python module logger to path
@@ -140,7 +140,7 @@ class AVRDeviceReader(XMLDeviceReader):
 			fields = queryResult.findall('bitfield')
 			for field in fields:
 				fname = field.get('name')
-				if fname == "Res":
+				if 'Res' in fname:
 					continue
 				
 				fmask = int(field.get('mask'), 16)
