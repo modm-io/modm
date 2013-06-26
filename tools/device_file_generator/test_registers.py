@@ -109,10 +109,13 @@ if __name__ == "__main__":
 	
 	filtered_devices = []
 	filtered_registers = []
+	all_names = []
 	
 	for dev in merged:
 		reg = dev['register']
 		dev['ids'].sort(key=lambda k : (int(k.name or 0), k.type))
+		all_names.extend([id.string for id in dev['ids']])
+		filtered_registers.append(dev['register'].name)
 		if bitfield_pattern == "":
 			s = "Devices:\n"
 			ii = 0
@@ -124,15 +127,15 @@ if __name__ == "__main__":
 					s += "\n"
 			logger.debug(s)
 			logger.info(str(reg) + "\n")
-			filtered_registers.append(dev['register'].name)
 		
 		if reg.getFieldsWithPattern(bitfield_pattern) != None:
 			filtered_devices.append(dev)
-			filtered_registers.append(dev['register'].name)
 	
+	all_filtered_names = []
 	if bitfield_pattern != "":
 		logger.info("Registers containing BitField pattern '" + bitfield_pattern + "':")
 		for dev in filtered_devices:
+			all_filtered_names.extend([id.string for id in dev['ids']])
 			s = "Devices:\n"
 			ii = 0
 			for id in dev['ids']:
@@ -144,7 +147,22 @@ if __name__ == "__main__":
 			logger.debug(s)
 			logger.info(str(dev['register']) + "\n")
 	
+	filtered_registers = list(set(filtered_registers))
+	filtered_registers.sort()
+	
 	logger.info("Summary registers:")
-	for name in set(filtered_registers):
+	for name in filtered_registers:
 		logger.debug(name)
-
+	logger.info("Remaining devices:")
+	all_names = set(all_names) - set(all_filtered_names)
+	all_names = list(all_names)
+	all_names.sort()
+	s = "\n"
+	ii = 0
+	for id in all_names:
+		s += id.replace("at","") + "  \t"
+		ii += 1
+		if ii > 7:
+			ii = 0
+			s += "\n"
+	logger.debug(s)
