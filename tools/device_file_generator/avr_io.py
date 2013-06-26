@@ -1117,7 +1117,7 @@ pins = \
 	},
 	
 	{
-		"devices": ["attiny2313", "attiny2313a"
+		"devices": ["attiny2313a", "attiny2313",
 					"attiny4313", "attiny4313a"],
 		"pcint":
 		[
