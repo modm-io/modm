@@ -29,13 +29,12 @@
 // ----------------------------------------------------------------------------
 
 #include <util/twi.h>
-
 #include "i2c_master.hpp"
 
 // uncomment to debug your driver using simple uart
 /*
 #include <xpcc/architecture/platform.hpp>
-#define DEBUG(x) xpcc::atmega::BufferedUart0::write(x)
+#define DEBUG(x) xpcc::{{target.family}}::Uart0::write(x)
 /*/
 #define DEBUG(x)
 //*/
@@ -54,7 +53,7 @@ namespace
 	
 	// delegating
 	static xpcc::i2c::Delegate *delegate(0);
-	static xpcc::atmega::I2cMaster::ErrorState errorState(xpcc::atmega::I2cMaster::NO_ERROR);
+	static xpcc::{{target.family}}::I2cMaster::ErrorState errorState(xpcc::{{target.family}}::I2cMaster::NO_ERROR);
 	static bool newSession;
 	
 	// helper functions
@@ -221,25 +220,25 @@ ISR(TWI_vect)
 			
 		case TW_MT_SLA_NACK:	// SLA+W transmitted, NACK received
 		case TW_MR_SLA_NACK:	// SLA+R transmitted, NACK received
-			errorState = xpcc::atmega::I2cMaster::ADDRESS_NACK;
+			errorState = xpcc::{{target.family}}::I2cMaster::ADDRESS_NACK;
 			DEBUG('A');
 			newSession = false;
 		case TW_MT_DATA_NACK:	// data transmitted, NACK received
-			if (newSession) errorState = xpcc::atmega::I2cMaster::DATA_NACK;
+			if (newSession) errorState = xpcc::{{target.family}}::I2cMaster::DATA_NACK;
 			DEBUG('d');
 			newSession = false;
 			// generate a stop condition
 			TWCR = (1 << TWINT) | (1 << TWSTO) | (1 << TWEN);
 		case TW_MT_ARB_LOST:	// arbitration lost in SLA+W or data
 //		case TW_MR_ARB_LOST:	// arbitration lost in SLA+R or NACK
-			if (newSession) errorState = xpcc::atmega::I2cMaster::ARBITRATION_LOST;
+			if (newSession) errorState = xpcc::{{target.family}}::I2cMaster::ARBITRATION_LOST;
 			DEBUG('d');
 			newSession = false;
 		default:
-			if (newSession) errorState = xpcc::atmega::I2cMaster::UNKNOWN_ERROR;
+			if (newSession) errorState = xpcc::{{target.family}}::I2cMaster::UNKNOWN_ERROR;
 			DEBUG('r');
 			newSession = false;
-			xpcc::atmega::I2cMaster::reset(true);
+			xpcc::{{target.family}}::I2cMaster::reset(true);
 			break;
 	}
 	DEBUG('\n');
@@ -247,7 +246,7 @@ ISR(TWI_vect)
 
 // ----------------------------------------------------------------------------
 void
-xpcc::atmega::I2cMaster::initialize(uint8_t twbr, uint8_t twps)
+xpcc::{{target.family}}::I2cMaster::initialize(uint8_t twbr, uint8_t twps)
 {
 	reset();
 	// Initialize TWI clock
@@ -260,7 +259,7 @@ xpcc::atmega::I2cMaster::initialize(uint8_t twbr, uint8_t twps)
 }
 
 void
-xpcc::atmega::I2cMaster::reset(bool error)
+xpcc::{{target.family}}::I2cMaster::reset(bool error)
 {
 	DEBUG('T');
 	writeBytesLeft = 0;
@@ -272,13 +271,13 @@ xpcc::atmega::I2cMaster::reset(bool error)
 }
 
 uint8_t
-xpcc::atmega::I2cMaster::getErrorState()
+xpcc::{{target.family}}::I2cMaster::getErrorState()
 {
 	return static_cast<uint8_t>(errorState);
 }
 
 bool
-xpcc::atmega::I2cMaster::start(xpcc::i2c::Delegate *delegate)
+xpcc::{{target.family}}::I2cMaster::start(xpcc::i2c::Delegate *delegate)
 {
 	if (!::delegate && delegate && delegate->attaching())
 	{
@@ -293,7 +292,7 @@ xpcc::atmega::I2cMaster::start(xpcc::i2c::Delegate *delegate)
 }
 
 bool
-xpcc::atmega::I2cMaster::startSync(xpcc::i2c::Delegate *delegate)
+xpcc::{{target.family}}::I2cMaster::startSync(xpcc::i2c::Delegate *delegate)
 {
 	if (!::delegate && delegate && delegate->attaching())
 	{

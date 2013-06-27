@@ -28,15 +28,15 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__ATMEGA_SPI_HPP
-#define XPCC__ATMEGA_SPI_HPP
+#ifndef XPCC_{{target.family | upper}}__SPI_HPP
+#define XPCC_{{target.family | upper}}__SPI_HPP
 
 #include "../../../device.hpp"
 #include <xpcc/architecture/peripheral/spi.hpp>
 
 namespace xpcc
 {
-	namespace atmega
+	namespace {{target.family}}
 	{
 		struct Spi
 		{
@@ -72,7 +72,7 @@ namespace xpcc
 				%% set port = gpio.port
 				%% set id = gpio.id
 				%% set name = gpio.name | capitalize
-			typedef ::xpcc::atmega::Gpio{{ port }}{{ id }} {{ name }};
+			typedef ::xpcc::{{target.family}}::Gpio{{ port }}{{ id }} {{ name }};
 			%% endfor
 		};
 
@@ -82,11 +82,11 @@ namespace xpcc
 		 * The fast SPI clock speeds make it unreasonable to use an interrupt
 		 * based approach to shifting out each byte of the data, since the interrupt
 		 * handling might decrease performance over busy waiting especially for
-		 * low frequencies.
+		 * targets operating at low CPU frequencies.
 		 *
 		 * Therefore the asynchronous methods are implemented synchronously.
 		 *
-		 * \ingroup		atmega
+		 * \ingroup		{{target.family}}
 		 * \author		Niklas Hauser
 		 */
 		class SpiMaster : public xpcc::SpiMaster
@@ -164,7 +164,7 @@ namespace xpcc
 		 * Since the AVR architecture of the ATmega and ATtiny does not have DMA support,
 		 * these methods are implemented as blocking.
 		 *
-		 * \ingroup		atmega
+		 * \ingroup		{{target.family}}
 		 * \author		Niklas Hauser
 		 */
 		class SpiBlockMaster : public xpcc::SpiBlockMaster
@@ -208,4 +208,4 @@ namespace xpcc
 	}
 }
 
-#endif // XPCC__ATMEGA_SPI_HPP
+#endif

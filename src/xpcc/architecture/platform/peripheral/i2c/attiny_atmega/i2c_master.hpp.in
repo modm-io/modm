@@ -28,15 +28,15 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_ATMEGA__TWI_MASTER_HPP
-#define XPCC_ATMEGA__TWI_MASTER_HPP
+#ifndef XPCC_{{target.family | upper}}__TWI_MASTER_HPP
+#define XPCC_{{target.family | upper}}__TWI_MASTER_HPP
 
 #include "../../../device.hpp"
 #include <xpcc/driver/connectivity/i2c/master.hpp>
 
 namespace xpcc
 {
-	namespace atmega
+	namespace {{target.family}}
 	{
 		/**
 		 * \brief	Interrupt-driven I2C master module.
@@ -44,7 +44,7 @@ namespace xpcc
 		 * Interrupts must be enabled.
 		 * 
 		 * \author Niklas Hauser
-		 * \ingroup	atmega
+		 * \ingroup	{{target.family}}
 		 * \ingroup	i2c
 		 */
 		class I2cMaster : public ::xpcc::i2c::Master
@@ -127,4 +127,4 @@ namespace xpcc
 	}
 }
 
-#endif // XPCC_ATMEGA__TWI_MASTER_HPP
+#endif

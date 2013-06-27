@@ -28,15 +28,15 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_ATMEGA__UART{{ id }}_HPP
-#define XPCC_ATMEGA__UART{{ id }}_HPP
+#ifndef XPCC_{{target.family | upper}}__UART{{ id }}_HPP
+#define XPCC_{{target.family | upper}}__UART{{ id }}_HPP
 
 #include "../../../device.hpp"
 #include <xpcc/architecture/peripheral/uart.hpp>
 
 namespace xpcc
 {
-	namespace atmega
+	namespace {{target.family}}
 	{
 		/**
 		 * \brief		UART{{ id }}
@@ -152,4 +152,4 @@ namespace xpcc
 	}
 }
 
-#endif // XPCC_ATMEGA__UART{{ id }}_HPP
+#endif // XPCC_{{target.family | upper}}__UART{{ id }}_HPP

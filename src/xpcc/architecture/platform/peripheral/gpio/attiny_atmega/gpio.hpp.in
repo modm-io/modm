@@ -28,8 +28,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__ATMEGA_GPIO_HPP
-#define XPCC__ATMEGA_GPIO_HPP
+#ifndef XPCC_{{target.family | upper}}__GPIO_HPP
+#define XPCC_{{target.family | upper}}__GPIO_HPP
 
 #include "../../../device.hpp"
 #include <xpcc/architecture/driver/gpio.hpp>
@@ -39,32 +39,32 @@
  */
 
 #define	GPIO__IO(name, port, pin) \
-typedef CONCAT3(::xpcc::atmega::Gpio, port, pin) name
+typedef CONCAT3(::xpcc::{{target.family}}::Gpio, port, pin) name
 
 #define	GPIO__OUTPUT(name, port, pin) \
-typedef CONCAT3(::xpcc::atmega::GpioOutput, port, pin) name
+typedef CONCAT3(::xpcc::{{target.family}}::GpioOutput, port, pin) name
 
 #define	GPIO__INPUT(name, port, pin) \
-typedef CONCAT3(::xpcc::atmega::GpioInput, port, pin) name
+typedef CONCAT3(::xpcc::{{target.family}}::GpioInput, port, pin) name
 
 #define	GPIO__NIBBLE_LOW(name, port) \
-typedef CONCAT(::xpcc::atmega::GpioLowNibble, port) name
+typedef CONCAT(::xpcc::{{target.family}}::GpioLowNibble, port) name
 
 #define	GPIO__NIBBLE_HIGH(name, port) \
-typedef CONCAT(::xpcc::atmega::GpioHighNibble, port) name
+typedef CONCAT(::xpcc::{{target.family}}::GpioHighNibble, port) name
 
 #define	GPIO__PORT(name, port) \
-typedef CONCAT(::xpcc::atmega::GpioPort, port) name
+typedef CONCAT(::xpcc::{{target.family}}::GpioPort, port) name
 
 
 namespace xpcc
 {
-	namespace atmega
+	namespace {{target.family}}
 	{
 		struct Gpio
 		{
 			/**
-			 * \ingroup	atmega
+			 * \ingroup	{{target.family}}
 			 */
 			enum PullType
 			{
@@ -73,7 +73,7 @@ namespace xpcc
 			};
 			
 			/**
-			 * \ingroup	atmega
+			 * \ingroup	{{target.family}}
 			 */
 			enum TriggerType
 			{
@@ -177,6 +177,8 @@ namespace xpcc
 			%% endif
 			#ifdef EIMSK
 				EIMSK |= (1 << INT{{af_id}});
+			#elif defined GIMSK
+				GIMSK |= (1 << INT{{af_id}});
 			#elif defined GICR
 				GICR |= (1 << INT{{af_id}});
 			#else
@@ -192,6 +194,8 @@ namespace xpcc
 			%% endif
 			#ifdef EIMSK
 				EIMSK &= ~(1 << INT{{af_id}});
+			#elif defined GIMSK
+				GIMSK &= ~(1 << INT{{af_id}});
 			#elif defined GICR
 				GICR &= ~(1 << INT{{af_id}});
 			#else
@@ -221,13 +225,27 @@ namespace xpcc
 			%% endif
 
 			%% if af.type == "pcint"
+			
+			{# Go home Atmel, you're drunk! #}
+			%% if target.family == 'attiny'
+			%% if (target.name == '2313' or target.name == '4313') and af_id >= 11 and af_id <= 17
+			%% set af_reg = 2
+			%% elif (target.name == '20' or target.name == '40' or target.name == '1634') and af_id >= 12 and af_id <= 17
+			%% set af_reg = 2
+			%% endif
+			%% else
 			%% set af_reg = (af_id / 8) | int
+			%% endif
+			
+			
 			ALWAYS_INLINE static void enablePCInterrupt() {
 				PCMSK{{af_reg}} |= (1 << PCINT{{af_id}});
 			#ifdef PCICR
 				PCICR |= (1 << PCIE{{af_reg}});
 			#elif defined EIMSK
 				EIMSK |= (1 << PCIE{{af_reg}});
+			#elif defined GIMSK
+				GIMSK |= (1 << PCIE{{af_reg}});
 			#elif defined GICR
 				GICR |= (1 << PCIE{{af_reg}});
 			#else
@@ -242,6 +260,8 @@ namespace xpcc
 					PCICR &= ~(1 << PCIE{{af_reg}});
 			#elif defined EIMSK
 					EIMSK &= ~(1 << PCIE{{af_reg}});
+			#elif defined GIMSK
+					GIMSK &= ~(1 << PCIE{{af_reg}});
 			#elif defined GICR
 					GICR &= ~(1 << PCIE{{af_reg}});
 			#else
@@ -357,4 +377,4 @@ namespace xpcc
 }
 
 
-#endif // XPCC_ATMEGA__GPIO_HPP
+#endif

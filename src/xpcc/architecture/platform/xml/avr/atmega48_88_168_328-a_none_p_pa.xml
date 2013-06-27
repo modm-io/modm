@@ -56,7 +56,7 @@
     <header>avr/io.h</header>
     <header>avr/interrupt.h</header>
     <header>avr/sleep.h</header>
-    <driver type="gpio" name="atmega">
+    <driver type="gpio" name="attiny_atmega">
       <gpio port="B" id="0">
         <af type="pcint" id="0"/>
       </gpio>
@@ -129,15 +129,9 @@
         <af type="pcint" id="23"/>
       </gpio>
     </driver>
-    <driver instances="0" type="uart" name="atmega"/>
-    <driver type="spi" name="atmega">
-      <gpio port="B" name="miso" id="3"/>
-      <gpio port="B" name="mosi" id="4"/>
-      <gpio port="B" name="sck" id="5"/>
-      <gpio port="B" name="ss" id="2"/>
-    </driver>
-    <driver type="i2c" name="atmega"/>
-    <driver type="spi" name="atmega">
+    <driver instances="0" type="uart" name="attiny_atmega"/>
+    <driver type="i2c" name="attiny_atmega"/>
+    <driver type="spi" name="attiny_atmega">
       <gpio port="B" name="miso" id="3"/>
       <gpio port="B" name="mosi" id="4"/>
       <gpio port="B" name="sck" id="5"/>

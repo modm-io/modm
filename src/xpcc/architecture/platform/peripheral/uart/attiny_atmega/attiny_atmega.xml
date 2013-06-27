@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='UTF-8' ?>
 <!DOCTYPE rca SYSTEM "../../xml/driver.dtd">
 <rca version="1.0">
-	<driver type="uart" name="atmega">
+	<driver type="uart" name="attiny_atmega">
 		<!-- Template: file that needs to be turned into a source file -->
 		<template instances="0,1,2,3" out="uart{{id}}.hpp">uart.hpp.in</template>
 		<template instances="0,1,2,3" out="uart{{id}}_tx.cpp">uart_tx.cpp.in</template>

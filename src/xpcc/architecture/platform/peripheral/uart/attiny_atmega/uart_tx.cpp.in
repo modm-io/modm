@@ -56,7 +56,7 @@ ISR(USART{{ id }}_UDRE_vect)
 
 // MARK: - write blocking
 void
-xpcc::atmega::Uart{{ id }}::writeBlocking(uint8_t data)
+xpcc::{{target.family}}::Uart{{ id }}::writeBlocking(uint8_t data)
 {
 	// wait until there is some place in the buffer
 	while (!write(data))
@@ -68,7 +68,7 @@ xpcc::atmega::Uart{{ id }}::writeBlocking(uint8_t data)
 }
 
 void
-xpcc::atmega::Uart{{ id }}::writeBlocking(const uint8_t *data, std::size_t length)
+xpcc::{{target.family}}::Uart{{ id }}::writeBlocking(const uint8_t *data, std::size_t length)
 {
 	// first push everything into the buffer
 	for (std::size_t i = 0; i < length; ++i)
@@ -83,7 +83,7 @@ xpcc::atmega::Uart{{ id }}::writeBlocking(const uint8_t *data, std::size_t lengt
 }
 
 void
-xpcc::atmega::Uart{{ id }}::flushWriteBuffer()
+xpcc::{{target.family}}::Uart{{ id }}::flushWriteBuffer()
 {
 	// just wait until the last byte has been sent
 	while (!isWriteFinished())
@@ -92,12 +92,12 @@ xpcc::atmega::Uart{{ id }}::flushWriteBuffer()
 
 // MARK: - write
 bool
-xpcc::atmega::Uart{{ id }}::write(uint8_t data)
+xpcc::{{target.family}}::Uart{{ id }}::write(uint8_t data)
 {
 	if (!txBuffer.push(data))
 		return false;
 	
-	atomic::Lock lock;
+	::xpcc::atomic::Lock lock;
 	
 	// enable UDRE interrupt
 	UCSR{{ id }}B |= (1 << UDRIE{{ id }});
@@ -106,7 +106,7 @@ xpcc::atmega::Uart{{ id }}::write(uint8_t data)
 }
 
 std::size_t
-xpcc::atmega::Uart{{ id }}::write(const uint8_t *data, std::size_t length)
+xpcc::{{target.family}}::Uart{{ id }}::write(const uint8_t *data, std::size_t length)
 {
 	for (std::size_t i = 0; i < length; ++i)
 	{
@@ -120,17 +120,17 @@ xpcc::atmega::Uart{{ id }}::write(const uint8_t *data, std::size_t length)
 }
 
 bool
-xpcc::atmega::Uart{{ id }}::isWriteFinished()
+xpcc::{{target.family}}::Uart{{ id }}::isWriteFinished()
 {
 	return (txBuffer.isEmpty() && !(UCSR{{ id }}B & (1 << UDRIE{{ id }})));
 }
 
 // MARK: - discard
 std::size_t
-xpcc::atmega::Uart{{ id }}::discardTransmitBuffer()
+xpcc::{{target.family}}::Uart{{ id }}::discardTransmitBuffer()
 {
 	{
-		atomic::Lock lock;
+		::xpcc::atomic::Lock lock;
 		UCSR{{ id }}B &= ~(1 << UDRIE{{ id }});
 	}
 	
