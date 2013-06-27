@@ -279,16 +279,18 @@ namespace xpcc
 				// Writing a zero is (hopefully) ignored.
 				UART5->ICR = (flags & mask);
 			#elif defined(STM32F10X) || defined(STM32F2XX) || defined(STM32F4XX)
-				// Overrun Interrupt
-				// p779: "It is cleared by a software sequence (an read to the USART_SR register followed by a read to the USART_DR register" 
+				/* Interrupts must be cleared manually by accessing SR and DR. 
+				 * Overrun Interrupt, Noise flag detected, Framing Error, Parity Error
+				 * p779: "It is cleared by a software sequence (an read to the USART_SR register followed by a read to the USART_DR register"
+				 */ 
 				if (flags & FLAG_OVERRUN_ERROR) {
 					uint32_t tmp;
 					tmp = UART5->SR;
-					tmp = UART5->DR
+					tmp = UART5->DR;
+					(void) tmp;
 				}
 				
 				(void) flags;
-				#warning resetInterruptFlags Not yet implemented
 			#else
 				#error "This file is only for STM32F{1, 2, 3, 4}"
 			#endif			
