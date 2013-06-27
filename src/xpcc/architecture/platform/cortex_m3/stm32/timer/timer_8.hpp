@@ -414,7 +414,7 @@ namespace xpcc
 			 *
 			 * This is the least typesafe way of doing this and should only
 			 * be done if it provides a necessary performance
-			 * (or more or less) lazyness benefit.
+			 * (or more or less) laziness benefit.
 			 * i.e. if you have specific mode/output uints precalculated and
 			 * just want to load them as fast as possible.
 			 *
