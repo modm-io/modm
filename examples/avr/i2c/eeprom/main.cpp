@@ -1,25 +1,28 @@
 
 #include <xpcc/architecture.hpp>
 #include <xpcc/driver/storage/i2c_eeprom.hpp>
-
 #include <xpcc/io/iostream.hpp>
 
-GPIO__IO(Scl, C, 0);
-GPIO__IO(Sda, C, 1);
+using namespace xpcc::atmega;
+
+GPIO__IO(SclPin, C, 0);
+GPIO__IO(SdaPin, C, 1);
+GpioOpenDrain< SclPin > Scl;
+GpioOpenDrain< SdaPin > Sda;
 
 // Create a new UART object and configure it to a baudrate of 9600
-xpcc::atmega::BufferedUart0 uart(9600);
+Uart0 uart(9600);
 
 //#define USE_SOFTWARE
 #define USE_HARDWARE
 
 #if defined USE_SOFTWARE
 #include <xpcc/driver/connectivity/i2c/software_i2c.hpp>
-typedef xpcc::SoftwareI2C<Scl, Sda> Twi;
+typedef xpcc::SoftwareI2C< Scl, Sda> Twi;
 #endif
 
 #if defined USE_HARDWARE
-typedef xpcc::atmega::I2cMaster Twi;
+typedef I2cMaster Twi;
 #endif
 
 void
@@ -37,7 +40,7 @@ main()
 	sei();
 	
 	// Create a IOStream for complex formatting tasks
-	xpcc::IODeviceWrapper<xpcc::atmega::BufferedUart0> device(uart);
+	xpcc::IODeviceWrapper<Uart0> device(uart);
 	xpcc::IOStream output(device);
 	
 	output << "I2C eeprom test" << xpcc::endl;

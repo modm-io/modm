@@ -1,15 +1,17 @@
 
 #include <xpcc/architecture.hpp>
 #include <xpcc/driver/temperature/ds1631.hpp>
-
-
 #include <xpcc/io/iostream.hpp>
 
-GPIO__IO(Scl, C, 0);
-GPIO__IO(Sda, C, 1);
+using namespace xpcc::atmega;
+
+GPIO__IO(SclPin, C, 0);
+GPIO__IO(SdaPin, C, 1);
+GpioOpenDrain< SclPin > Scl;
+GpioOpenDrain< SdaPin > Sda;
 
 // Create a new UART object and configure it to a baudrate of 9600
-xpcc::atmega::BufferedUart0 uart(9600);
+Uart0 uart(9600);
 
 //#define USE_SOFTWARE
 #define USE_HARDWARE
@@ -20,7 +22,7 @@ typedef xpcc::SoftwareI2C<Scl, Sda> I2C;
 #endif
 
 #if defined USE_HARDWARE
-typedef xpcc::atmega::I2cMaster I2C;
+typedef I2cMaster I2C;
 #endif
 
 void
@@ -38,7 +40,7 @@ main()
 	sei();
 	
 	// Create a IOStream for complex formatting tasks
-	xpcc::IODeviceWrapper<xpcc::atmega::BufferedUart0> device(uart);
+	xpcc::IODeviceWrapper<Uart0> device(uart);
 	xpcc::IOStream output(device);
 	
 	output << "Thermometer" << xpcc::endl;
