@@ -287,6 +287,14 @@ namespace xpcc
 				// Writing a zero is (hopefully) ignored.
 				USART3->ICR = (flags & mask);
 			#elif defined(STM32F10X) || defined(STM32F2XX) || defined(STM32F4XX)
+				// Overrun Interrupt
+				// p779: "It is cleared by a software sequence (an read to the USART_SR register followed by a read to the USART_DR register" 
+				if (flags & FLAG_OVERRUN_ERROR) {
+					uint32_t tmp;
+					tmp = USART3->SR;
+					tmp = USART3->DR
+				}
+				
 				(void) flags;
 				#warning resetInterruptFlags Not yet implemented
 			#else
