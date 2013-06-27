@@ -30,7 +30,7 @@
 from reader import XMLDeviceReader
 from peripheral import Peripheral
 from register import Register
-import avr_io as interrupts
+import avr_io
 
 import os, sys, math
 # add python module logger to path
@@ -97,22 +97,21 @@ class AVRDeviceReader(XMLDeviceReader):
 				gpios.extend(self._gpioFromModule(module))
 				continue
 			
-			if any(name.startswith(per) for per in ["EXTERNAL_INT", "TWI", "USART", "SPI", "AD_CON", "USB"]):
+			if any(name.startswith(per) for per in ["EXTERNAL_INT", "TWI", "USART", "SPI", "AD_CON", "USB", "CAN", "DA_CON", "USI", "TIMER"]):
 				modules.append(name)
 				module = self.createModule(name)
 				peripherals.append(module)
 				continue
 		
-		for pin_array in interrupts.pins:
-			if self.properties['mmcu'] in pin_array['devices']:
-				for pcint in pin_array['pcint']:
-					for gpio in gpios:
-						if gpio['port'] == pcint['port'] and gpio['id'] == pcint['id']:
-							gpio['pcint'] = pcint['int']
-				for exti in pin_array['exti']:
-					for gpio in gpios:
-						if gpio['port'] == exti['port'] and gpio['id'] == exti['id']:
-							gpio['extint'] = exti['int']
+		for pin_array in [a for a in avr_io.pins if self.properties['mmcu'] in a['devices']]:
+			for pcint in pin_array['pcint']:
+				for gpio in gpios:
+					if gpio['port'] == pcint['port'] and gpio['id'] == pcint['id']:
+						gpio['pcint'] = pcint['int']
+			for exti in pin_array['exti']:
+				for gpio in gpios:
+					if gpio['port'] == exti['port'] and gpio['id'] == exti['id']:
+						gpio['extint'] = exti['int']
 	
 	def createModule(self, name):
 		if name in self.modules:

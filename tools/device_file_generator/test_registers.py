@@ -43,7 +43,7 @@ if __name__ == "__main__":
 	level = 'warn'
 	logger = Logger(level)
 	devices = []
-	peri_name = "EXTERNAL_INTERRUPT"
+	peri_name = "all"
 	bitfield_pattern = ""
 	
 	for arg in sys.argv[1:]:
@@ -62,7 +62,7 @@ if __name__ == "__main__":
 					devices.append(Device(part, logger))
 			continue
 		
-		if any(arg.startswith(per) for per in ["EXTERNAL_INT", "TWI", "USART", "SPI", "AD_CON", "USB"]):
+		if any(arg.startswith(per) for per in ["EXTERNAL_INT", "TWI", "USART", "SPI", "AD_CON", "USB", "CAN", "DA_CON", "USI", "TIMER"]):
 			peri_name = arg
 			continue
 		
@@ -96,9 +96,14 @@ if __name__ == "__main__":
 			if current['register'] == peri['register']:
 				matches.append(peri)
 		
+		#print "\n" + "="*120
 		for match in matches:
 			registers.remove(match)
 			if len(match['ids']) == 1:
+#				s = ""
+#				for id in match['ids']:
+#					s += id.string + " "
+#				print s, match['register']
 				current['ids'].extend(match['ids'])
 		
 		if len(matches) == 0:
