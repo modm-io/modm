@@ -29,7 +29,7 @@ Documentation
 -------------------------------------------------------------------------------
 
 The main documentation is created from doxygen files in the doc-folder. It can
-be found [online here] (http://roboterclubaachen.github.com/xpcc/api/).
+be found [online here] (http://xpcc.kreatives-chaos.com/api/).
 
 
 Folder structure
@@ -45,7 +45,7 @@ Folder structure
 <dt>doc</dt>
 <dd>
   Documentation, mainly the doxygen documentation. The online documentation
-  on http://roboterclubaachen.github.com/xpcc/api/ is build by running
+  on http://xpcc.kreatives-chaos.com/api/ is build by running
   'doxygen doxyfile' in this folder.
 </dd>
 

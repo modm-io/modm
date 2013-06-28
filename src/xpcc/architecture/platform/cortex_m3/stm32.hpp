@@ -109,8 +109,8 @@
 #include "stm32/timer.hpp"
 #endif
 
-// Uart HAL tested only on STM32F3 series
-#if defined(STM32F3XX)
+// Uart HAL tested only on STM32F3 and F4 series
+#if defined(STM32F3XX) || defined(STM32F4XX)
 #include "stm32/uart/usart_hal_1.hpp"
 #include "stm32/uart/usart_hal_2.hpp"
 #include "stm32/uart/usart_hal_3.hpp"
