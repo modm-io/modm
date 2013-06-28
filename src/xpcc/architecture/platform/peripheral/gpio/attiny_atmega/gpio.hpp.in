@@ -32,6 +32,7 @@
 #define XPCC_{{target.family | upper}}__GPIO_HPP
 
 #include "../../../device.hpp"
+#include "gpio_define.h"
 #include <xpcc/architecture/driver/gpio.hpp>
 
 /**
@@ -66,34 +67,34 @@ namespace xpcc
 			/**
 			 * \ingroup	{{target.family}}
 			 */
-			enum PullType
+			enum class PullType : uint8_t
 			{
-				FLOATING,
-				PULLUP,
+				Floating,
+				PullUp,
 			};
 			
 			/**
 			 * \ingroup	{{target.family}}
 			 */
-			enum TriggerType
+			enum class TriggerType : uint8_t
 			{
-				LOW_LEVEL = 0x0,
-				ANY_CHANGE = 0x1,
-				FALLING_EDGE = 0x2,
-				RISING_EDGE = 0x3,
+				LowLevel = 0b00,
+				AnyChange = 0b01,
+				FallingEdge = 0b10,
+				RisingEdge = 0b11,
 			};
 		};
 
 		/**
 		 * Gpio OpenDrain template, which remaps the behavior of the Gpio pin to
 		 * simulate an open-drain Output.
-		 * This maps set() -> setOutput() and reset() -> setInput(PullType::PULLUP)
+		 * This maps set() -> setOutput() and reset() -> setInput(PullType::PullUp)
 		 */
 		template< class IO >
 		struct GpioOpenDrain : Gpio
 		{
 			ALWAYS_INLINE static void set() {
-				IO::setInput(PullType::PULLUP);
+				IO::setInput(PullType::PullUp);
 			}
 			ALWAYS_INLINE static void reset() {
 				IO::setOutput(::xpcc::gpio::LOW);
@@ -154,7 +155,7 @@ namespace xpcc
 			ALWAYS_INLINE static void
 			setInput(PullType type) {
 				setInput();
-				if (type == PullType::PULLUP) {
+				if (type == PullType::PullUp) {
 					PORT{{port}} |= (1 << {{pin}});
 				}
 				else {
@@ -169,11 +170,29 @@ namespace xpcc
 			%% set af_id = af.id | int
 
 			%% if af.type == "extint"
+			
+			{# Go home Atmel, you're drunk! #}
+			%% set eicra = 'EICRA'
+			%% set isc2 = ''
+			
+			%% if target.family == 'atmega' and target.name in ['8', '16', '32', '162', '8515', '8535']
+			%% set eicra = 'MCUCR'
+			%% if target.name == '162'
+			%% set isc2 = 'EMCUCR'
+			%% else
+			%% set isc2 = 'MCUCSR'
+			%% endif
+			%% endif
+			
 			ALWAYS_INLINE static void enableExternalInterrupt(TriggerType trigger) {
 			%% if af_id < 4
-				EICRA |= (trigger << 2*{{af_id}});
+			%% if isc2 != '' and af_id == 2
+				{{isc2}} |= ((static_cast<uint8_t>(trigger) & 0b01) << ISC2);
 			%% else
-				EICRB |= (trigger << 2*{{af_id - 4}});
+				{{eicra}} |= (static_cast<uint8_t>(trigger) << 2*{{af_id}});
+			%% endif
+			%% else
+				EICRB |= (static_cast<uint8_t>(trigger) << 2*{{af_id - 4}});
 			%% endif
 			#ifdef EIMSK
 				EIMSK |= (1 << INT{{af_id}});
@@ -188,7 +207,11 @@ namespace xpcc
 
 			ALWAYS_INLINE static void disableExternalInterrupt() {
 			%% if af_id < 4
-				EICRA &= ~(0x3 << 2*{{af_id}});
+			%% if isc2 != '' and af_id == 2
+				{{isc2}} &= ~(1 << ISC2);
+			%% else
+				{{eicra}} &= ~(0x3 << 2*{{af_id}});
+			%% endif
 			%% else
 				EICRB &= ~(0x3 << 2*{{af_id - 4}});
 			%% endif

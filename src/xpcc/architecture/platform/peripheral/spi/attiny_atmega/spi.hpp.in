@@ -40,39 +40,35 @@ namespace xpcc
 	{
 		struct Spi
 		{
-			enum Mode
+			enum class Mode : uint8_t
 			{
-				MODE_0 = 0,				///< SCK normal, sample on rising edge
-				MODE_1 = (1 << CPHA),	///< SCK normal, sample on falling edge
-				MODE_2 = (1 << CPOL),	///< SCK inverted, sample on falling edge
-				MODE_3 = (1 << CPOL) | (1 << CPHA),	
-										///< SCK inverted, sample on rising edge
+				Mode0 = 0,							///< SCK normal,	sample on rising edge
+				Mode1 = (1 << CPHA),				///< SCK normal,	sample on falling edge
+				Mode2 = (1 << CPOL),				///< SCK inverted,	sample on falling edge
+				Mode3 = (1 << CPOL) | (1 << CPHA),	///< SCK inverted,	sample on rising edge
 			};
 
-			enum Prescaler
+			enum class Prescaler : uint8_t
 			{
-				PRESCALER_2 = 0x80 | 0,
-				PRESCALER_4 = 0,
-				PRESCALER_8 = 0x80 | (1 << SPR0),
-				PRESCALER_16 = (1 << SPR0),
-				PRESCALER_32 = 0x80 | (1 << SPR1),
-				PRESCALER_64 = (1 << SPR1),
-				PRESCALER_128 = (1 << SPR1) | (1 << SPR0),
+				Div2 = 0x80 | 0,
+				Div4 = 0,
+				Div8 = 0x80 | (1 << SPR0),
+				Div16 = (1 << SPR0),
+				Div32 = 0x80 | (1 << SPR1),
+				Div64 = (1 << SPR1),
+				Div128 = (1 << SPR1) | (1 << SPR0),
 			};
 
-			enum BufferOptions
+			enum class BufferOptions : uint8_t
 			{
-				BUFFER_TX_RX_INCREMENT = 0x03,
-				BUFFER_TX_RX_DECREMENT = 0x00,
-				BUFFER_TX_INCREMENT_RX_DECREMENT = 0x02,
-				BUFFER_TX_DECREMENT_RX_INCREMENT = 0x01
+				TxRxIncrement = 0b11,
+				TxIncrementRxDecrement = 0b10,
+				TxDecrementRxIncrement = 0b01,
+				TxRxDecrement = 0b00,
 			};
 
 			%% for gpio in gpios
-				%% set port = gpio.port
-				%% set id = gpio.id
-				%% set name = gpio.name | capitalize
-			typedef ::xpcc::{{target.family}}::Gpio{{ port }}{{ id }} {{ name }};
+			typedef ::xpcc::{{target.family}}::Gpio{{ gpio.port }}{{ gpio.id }} {{ gpio.name | capitalize }};
 			%% endfor
 		};
 
@@ -89,7 +85,7 @@ namespace xpcc
 		 * \ingroup		{{target.family}}
 		 * \author		Niklas Hauser
 		 */
-		class SpiMaster : public xpcc::SpiMaster
+		class SpiMaster : public xpcc::SpiMaster, Spi
 		{
 		public:
 			/**
@@ -98,19 +94,19 @@ namespace xpcc
 			 * This also sets the directions of the I/O pins.
 			 */
 			static void
-			initialize(Spi::Mode mode, Spi::Prescaler prescaler)
+			initialize(Mode mode, Prescaler prescaler)
 			{
-				SPCR = (1 << SPE) | (1 << MSTR) | (prescaler & ~0x80) | mode;
-				SPSR = (prescaler & 0x80) ? (1 << SPI2X) : 0;
+				SPCR = (1 << SPE) | (1 << MSTR) | (static_cast<uint8_t>(prescaler) & ~0x80) | static_cast<uint8_t>(mode);
+				SPSR = (static_cast<uint8_t>(prescaler) & 0x80) ? (1 << SPI2X) : 0;
 				%% for io in gpios
 				%% if io.name == 'miso'
-				Spi::Miso::setInput();
+				Miso::setInput();
 				%% elif io.name == 'mosi'
-				Spi::Mosi::setOutput();
+				Mosi::setOutput();
 				%% elif io.name == 'sck'
-				Spi::Sck::setOutput();
+				Sck::setOutput();
 				%% elif io.name == 'ss'
-				Spi::Ss::setOutput();
+				Ss::setOutput();
 				%% endif
 				%% endfor
 			}
@@ -162,12 +158,12 @@ namespace xpcc
 		 * \brief		Spi Master with DMA support
 		 *
 		 * Since the AVR architecture of the ATmega and ATtiny does not have DMA support,
-		 * these methods are implemented as blocking.
+		 * these methods are implemented as blocking using busy waiting.
 		 *
 		 * \ingroup		{{target.family}}
 		 * \author		Niklas Hauser
 		 */
-		class SpiBlockMaster : public xpcc::SpiBlockMaster
+		class SpiBlockMaster : public xpcc::SpiBlockMaster, Spi
 		{
 		public:
 			/**
@@ -176,34 +172,44 @@ namespace xpcc
 			 * This also sets the directions of the I/O pins.
 			 */
 			static ALWAYS_INLINE void
-			initialize(Spi::Mode mode, Spi::Prescaler prescaler)
+			initialize(Mode mode, Prescaler prescaler)
 			{
 				SpiMaster::initialize(mode, prescaler);
+				finished = true;
 			}
 
 			static inline bool
-			start(uint8_t * tx, uint8_t * rx, std::size_t length, Spi::BufferOptions options=Spi::BUFFER_TX_RX_INCREMENT)
+			start(uint8_t * tx, uint8_t * rx, std::size_t length, BufferOptions options=BufferOptions::TxRxIncrement)
 			{
+				if (!isFinished())
+					return false;
+
+				finished = false;
+
 				uint8_t tx_byte = 0xff;
 				uint8_t rx_byte;
 
 				for (std::size_t i = 0; i < length; i++)
 				{
-					if (tx) tx_byte = tx[options & 0x02 ? i : length-i-1];
+					if (tx) tx_byte = tx[static_cast<uint8_t>(options) & 0b10 ? i : length-i-1];
 
 					rx_byte = SpiMaster::writeReadBlocking(tx_byte);
 
-					if (rx) rx[options & 0x01 ? i : length-i-1] = rx_byte;
+					if (rx) rx[static_cast<uint8_t>(options) & 0b01 ? i : length-i-1] = rx_byte;
 				}
 
+				finished = true;
 				return true;
 			}
 
 			static ALWAYS_INLINE bool
 			isFinished()
 			{
-				return true;
+				return finished;
 			}
+			
+		private:
+			static bool finished;
 		};
 	}
 }
