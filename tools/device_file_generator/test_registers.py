@@ -62,7 +62,7 @@ if __name__ == "__main__":
 					devices.append(Device(part, logger))
 			continue
 		
-		if any(arg.startswith(per) for per in ["EXTERNAL_INT", "TWI", "USART", "SPI", "AD_CON", "USB", "CAN", "DA_CON", "USI", "TIMER"]):
+		if any(arg.startswith(per) for per in ["EXT", "TWI", "USART", "SPI", "AD_CON", "USB", "CAN", "DA_CON", "USI", "TIMER"]):
 			peri_name = arg
 			continue
 		
@@ -100,7 +100,7 @@ if __name__ == "__main__":
 			registers.remove(match)
 		
 		if len(matches) == 0:
-			logger.warn("No match for register: " + current['register'].name + " of " + current['ids'])
+			logger.warn("No match for register: " + current['register'].name + " of " + str([id.string for id in current['ids']]))
 		
 		merged.append(current)
 	
