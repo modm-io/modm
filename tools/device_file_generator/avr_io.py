@@ -31,7 +31,6 @@ pins = \
 [
 	{
 		"devices": ["atmega8", "atmega8a"],
-		"pcint": [],
 		"exti": 
 		[
 			{ "port": "D", "id": "2", "int": "0" },
@@ -48,7 +47,6 @@ pins = \
 	
 	{
 		"devices": ["atmega16", "atmega16a", "atmega32", "atmega32a"],
-		"pcint": [],
 		"exti": 
 		[
 			{ "port": "D", "id": "2", "int": "0" },
@@ -66,7 +64,6 @@ pins = \
 	
 	{
 		"devices": ["atmega64", "atmega64a", "atmega128", "atmega128a"],
-		"pcint": [],
 		"exti": 
 		[
 			{ "port": "D", "id": "0", "int": "0" },
@@ -993,7 +990,6 @@ pins = \
 	
 	{
 		"devices": ["attiny87", "attiny167"],
-		"pcint": [],
 		"exti":
 		[
 			{ "port": "B", "id": "6", "int": "0" },

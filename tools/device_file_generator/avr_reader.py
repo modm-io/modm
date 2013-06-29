@@ -104,14 +104,16 @@ class AVRDeviceReader(XMLDeviceReader):
 				continue
 		
 		for pin_array in [a for a in avr_io.pins if self.properties['mmcu'] in a['devices']]:
-			for pcint in pin_array['pcint']:
-				for gpio in gpios:
-					if gpio['port'] == pcint['port'] and gpio['id'] == pcint['id']:
-						gpio['pcint'] = pcint['int']
-			for exti in pin_array['exti']:
-				for gpio in gpios:
-					if gpio['port'] == exti['port'] and gpio['id'] == exti['id']:
-						gpio['extint'] = exti['int']
+			if 'pcint' in pin_array:
+				for pcint in pin_array['pcint']:
+					for gpio in gpios:
+						if gpio['port'] == pcint['port'] and gpio['id'] == pcint['id']:
+							gpio['pcint'] = pcint['int']
+			if 'exti' in pin_array:
+				for exti in pin_array['exti']:
+					for gpio in gpios:
+						if gpio['port'] == exti['port'] and gpio['id'] == exti['id']:
+							gpio['extint'] = exti['int']
 	
 	def createModule(self, name):
 		if name in self.modules:
