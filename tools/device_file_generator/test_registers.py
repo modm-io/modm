@@ -74,14 +74,13 @@ if __name__ == "__main__":
 	for dev in devices:
 		attributes = dev.getAttributes('peripherals')
 		for attribute in attributes:
-			for peripheral in attribute['value']:
-				if peripheral.name.startswith(peri_name):
-					peripherals.append({'ids': [dev.id], 'peripheral': peripheral})
+			for peripheral in [p for p in attribute['value'] if p.name.startswith(peri_name)]:
+				peripherals.append({'ids': [dev.id], 'peripheral': peripheral})
 	
 	registers = []
 	for peri in peripherals:
 		for reg in peri['peripheral'].registers:
-			registers.append({'ids': peri['ids'], 'register': reg})
+			registers.append({'ids': list(peri['ids']), 'register': reg})
 	
 	registers.sort(key=lambda k : k['register'].name)
 	merged = []
@@ -96,20 +95,13 @@ if __name__ == "__main__":
 			if current['register'] == peri['register']:
 				matches.append(peri)
 		
-		#print "\n" + "="*120
 		for match in matches:
+			current['ids'].extend(match['ids'])
 			registers.remove(match)
-			if len(match['ids']) == 1:
-#				s = ""
-#				for id in match['ids']:
-#					s += id.string + " "
-#				print s, match['register']
-				current['ids'].extend(match['ids'])
 		
 		if len(matches) == 0:
-			logger.warn("No match for register: " + current['register'].name + " of " + current['ids'][0].string)
+			logger.warn("No match for register: " + current['register'].name + " of " + current['ids'])
 		
-		current['ids'] = list(set(current['ids']))
 		merged.append(current)
 	
 	filtered_devices = []
@@ -120,8 +112,8 @@ if __name__ == "__main__":
 		reg = dev['register']
 		dev['ids'].sort(key=lambda k : (int(k.name or 0), k.type))
 		all_names.extend([id.string for id in dev['ids']])
-		filtered_registers.append(dev['register'].name)
 		if bitfield_pattern == "":
+			filtered_registers.append(dev['register'].name)
 			s = "Devices:\n"
 			ii = 0
 			for id in dev['ids']:
@@ -134,6 +126,7 @@ if __name__ == "__main__":
 			logger.info(str(reg) + "\n")
 		
 		if reg.getFieldsWithPattern(bitfield_pattern) != None:
+			filtered_registers.append(dev['register'].name)
 			filtered_devices.append(dev)
 	
 	all_filtered_names = []
