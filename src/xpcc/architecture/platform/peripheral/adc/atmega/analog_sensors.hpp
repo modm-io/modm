@@ -31,8 +31,9 @@
 #ifndef XPCC_ATMEGA__ANALOG_SENSORS_HPP
 #define XPCC_ATMEGA__ANALOG_SENSORS_HPP
 
-#include "../../../device.hpp"
 #include <xpcc/math/utils/misc.hpp>
+#include "adc_interrupt.hpp"
+#include "../../../device.hpp"
 
 namespace xpcc
 {
@@ -60,11 +61,11 @@ namespace xpcc
 		 * \ingroup atmega
 		 * \author	Niklas Hauser
 		 *
-		 * \tparam ADConv	AdcInterrupt class
 		 * \tparam CHANNELS	number of ADC channels connected to sensor(s)
 		 * \tparam SAMPLES	2^SAMPLES number of samples to average for each channel
+		 * \tparam ADConv	AdcInterrupt class
 		 */
-		template < typename ADConv, uint8_t CHANNELS, uint8_t SAMPLES=0 >
+		template < uint8_t CHANNELS, uint8_t SAMPLES=0, class ADConv=AdcInterrupt >
 		class AnalogSensors
 		{
 		public:
@@ -74,105 +75,42 @@ namespace xpcc
 			 * \param sensorData
 			 */
 			static inline void
-			initialize(uint8_t* sensorMapping, uint16_t* sensorData)
-			{
-				map = sensorMapping;
-				data = sensorData;
-				adc.attachConversionCompleteInterrupt(sampleAdc);
-				adc.enableInterrupt();
-			}
+			initialize(uint8_t* sensorMapping, uint16_t* sensorData);
 			
 			/**
 			 * Starts the ADC readout routine and buffers the results,
 			 * sets isNewDataAvailable() to \c true.
 			 * \return \c false when a readout is in progress, \c true otherwise
 			 */
-			static inline bool
-			readSensors()
-			{
-				if (numberOfSamples > 0)
-					return false;
-				adc.startConversion(map[0]);
-				return true;
-			}
+			static ALWAYS_INLINE bool
+			readSensors();
 			
 			/**
 			 * \return pointer to first element of 16bit result array
 			 * This method resets isNewDataAvailable() to \c false.
 			 */
-			static inline uint16_t*
-			getData()
-			{
-				newData = false;
-				return readData();
-			}
+			static ALWAYS_INLINE uint16_t*
+			getData();
 			
 			/**
 			 * \return pointer to first element of 16bit result array, without
 			 * changing isNewDataAvailable()
 			 */
-			static inline uint16_t*
-			readData()
-			{
-				return &data[0];
-			}
+			static ALWAYS_INLINE uint16_t*
+			readData();
 			
 			/**
 			 * \return \c true if new data is available and has not yet been read.
 			 */
-			static inline bool
-			isNewDataAvailable()
-			{
-				return newData;
-			}
+			static ALWAYS_INLINE bool
+			isNewDataAvailable();
 			
 		private:
-			static inline void
-			sampleAdc()
-			{
-				if (SAMPLES) {
-
-					// do oversample and average
-					static uint8_t indexOfChannel(0);
-					static uint16_t sample[CHANNELS];
-					// reset array to zero at the beginning of sampling
-					if (numberOfSamples <= CHANNELS) sample[indexOfChannel] = 0;
-
-					sample[indexOfChannel] += adc.getValue();
-
-					if (++numberOfSamples <= xpcc::Pow<2,SAMPLES>::value * CHANNELS) {
-						// continue sampling on next channel
-						if (++indexOfChannel >= CHANNELS) indexOfChannel = 0;
-						adc.startConversion(map[indexOfChannel]);
-					}
-					else {
-						// stop getting values and calculate the average of the 2^N samples
-						for (uint_fast8_t i=0; i<CHANNELS; ++i) {
-							// lazy divide: (value / 2^n) => (value >> n)
-							data[i] = (sample[i] >> SAMPLES);
-						}
-						numberOfSamples = 0;
-						indexOfChannel = 0;
-						newData = true;
-					}
-
-				} else {
-
-					// just get the raw data
-					data[numberOfSamples] = adc.getValue();
-
-					if (++numberOfSamples < CHANNELS) {
-						adc.startConversion(map[numberOfSamples]);
-					} else {
-						numberOfSamples = 0;
-						newData = true;
-					}
-
-				}
-			}
+			static void
+			sampleAdc();
 			
 			static ADConv adc;
-			
+
 			static bool newData;
 			static uint8_t* map;
 			static uint16_t *data;
@@ -180,5 +118,7 @@ namespace xpcc
 		};
 	}	
 }
+
+#include "analog_sensors_impl.hpp"
 
 #endif // XPCC_ATMEGA__ANALOG_SENSORS_HPP

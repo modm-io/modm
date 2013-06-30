@@ -32,9 +32,10 @@
 #ifndef XPCC__ATMEGA_ADC_INTERRUPT_HPP
 #define XPCC__ATMEGA_ADC_INTERRUPT_HPP
 
-#include "../../../device.hpp"
 #include <xpcc/utils/dummy.hpp>
 #include "adc.hpp"
+#include "../../../device.hpp"
+
 
 namespace xpcc
 {
