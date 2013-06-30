@@ -32,6 +32,7 @@
 #define XPCC_{{target.family | upper}}__UART{{ id }}_HPP
 
 #include "../../../device.hpp"
+#include "../../../drivers.hpp"
 #include <xpcc/architecture/peripheral/uart.hpp>
 
 namespace xpcc
@@ -62,6 +63,14 @@ namespace xpcc
 		 */
 		class Uart{{ id }} : public ::xpcc::Uart
 		{
+		public:
+			
+			%% for gpio in gpios
+			%% if gpio.instance | int == id | int
+			typedef ::xpcc::{{target.family}}::Gpio{{ gpio.port }}{{ gpio.id }} {{ gpio.name | capitalize }};
+			%% endif
+			%% endfor
+			
 		public:
 			Uart{{ id }}(uint32_t baudrate)
 			{

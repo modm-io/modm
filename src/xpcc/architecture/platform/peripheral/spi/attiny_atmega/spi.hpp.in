@@ -32,6 +32,7 @@
 #define XPCC_{{target.family | upper}}__SPI_HPP
 
 #include "../../../device.hpp"
+#include "../../../drivers.hpp"
 #include <xpcc/architecture/peripheral/spi.hpp>
 
 namespace xpcc
@@ -99,13 +100,12 @@ namespace xpcc
 				SPCR = (1 << SPE) | (1 << MSTR) | (static_cast<uint8_t>(prescaler) & ~0x80) | static_cast<uint8_t>(mode);
 				SPSR = (static_cast<uint8_t>(prescaler) & 0x80) ? (1 << SPI2X) : 0;
 				%% for io in gpios
-				%% if io.name == 'miso'
-				Miso::setInput();
-				%% elif io.name == 'mosi'
+				%% if io.name == 'mosi'
 				Mosi::setOutput();
 				%% elif io.name == 'sck'
 				Sck::setOutput();
 				%% elif io.name == 'ss'
+				// this pin must not be an input and pulled low during master operation!
 				Ss::setOutput();
 				%% endif
 				%% endfor

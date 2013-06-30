@@ -113,15 +113,14 @@ class AVRDeviceWriter(XMLDeviceWriter):
 		attributes = self._getModuleAttributes()
 		for item in attributes:
 			dict = self._getAttributeDictionaryFromId(item['id'])
-			for module in item['value']:
-				if module.startswith(peripheral):
-					driver = node.addChild('driver')
-					driver.setAttributes(dict)
-					driver.setAttributes({'type': name, 'name': family})
-					if name in self.io:
-						for io in self.io[name]:
-							ch = driver.addChild('gpio')
-							ch.setAttributes(io)
+			for module in [m for m in item['value'] if m.startswith(peripheral)]:
+				driver = node.addChild('driver')
+				driver.setAttributes(dict)
+				driver.setAttributes({'type': name, 'name': family})
+				if name in self.io:
+					for io in self.io[name]:
+						ch = driver.addChild('gpio')
+						ch.setAttributes(io)
 	
 	def addI2cToNode(self, node):
 		# ATtiny's use the module from the ATmegas!
@@ -152,6 +151,14 @@ class AVRDeviceWriter(XMLDeviceWriter):
 				driver = node.addChild('driver')
 				driver.setAttributes(dict)
 				driver.setAttributes({'type': 'uart', 'name': family, 'instances': ",".join(instances)})
+				for key in [k for k in self.io if k.startswith('uart')]:
+					instance = key.replace('uart', '')
+					if instance not in instances:
+						continue
+					for io in self.io[key]:
+						ch = driver.addChild('gpio')
+						ch.setAttributes(io)
+						ch.setAttributes({'instance': instance})
 	
 	def _getModuleAttributes(self):
 		attributes = self.device.getAttributes('modules')
