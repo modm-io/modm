@@ -154,7 +154,8 @@ def platform_tools_generate(env, architecture_path):
 				res = env.Command(tar, src, Copy("$TARGET", "$SOURCE"))
 			# check if target is header file
 			if os.path.splitext(tar)[1] in Scanner.HEADER:
-				ddic['headers'].append(f[1]) # append path relative to platform dir
+				if not f[1].endswith("_impl.hpp"):
+					ddic['headers'].append(f[1]) # append path relative to platform dir
 				includes.append(os.path.dirname(tar))
 			# or source file
 			elif os.path.splitext(tar)[1] in Scanner.SOURCE:
