@@ -6,7 +6,7 @@
 using namespace xpcc::atmega;
 
 // Create a new UART object and configure it to a baudrate of 9600
-BufferedUart0 uart(9600);
+Uart0 uart(9600);
 
 int
 main()
@@ -15,7 +15,7 @@ main()
 	sei();
 	
 	// Create a IOStream for complex formatting tasks
-	xpcc::IODeviceWrapper<xpcc::atmega::BufferedUart0> device(uart);
+	xpcc::IODeviceWrapper<Uart0> device(uart);
 	xpcc::IOStream output(device);
 	
 	output << "Welcome!" << xpcc::endl;
@@ -24,8 +24,8 @@ main()
 	// With the AVR running at 14.7456Mhz and a prescaler of 128 the
 	// ADC is running at 115kHz.
 	Adc::initialize(
-			Adc::REFERENCE_INTERNAL_AVCC,
-			Adc::PRESCALER_128);
+			Adc::Reference::InternalAVcc,
+			Adc::Prescaler::Div128);
 	
 	// read the value of channel 0 (=> ADC0 => PA0) and wait until
 	// it is finished

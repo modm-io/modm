@@ -2,7 +2,7 @@
 # do not edit!
 
 # path to the xpcc root directory
-rootpath = '../../..'
+rootpath = '../../../..'
 
 env = Environment(tools = ['xpcc'], toolpath = [rootpath + '/scons/site_tools'])
 
