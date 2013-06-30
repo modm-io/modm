@@ -7,6 +7,8 @@
 #include <xpcc/driver/connectivity/can/mcp2515.hpp>
 #include <xpcc/driver/connectivity/spi/software_spi.hpp>
 
+using namespace xpcc::atmega;
+
 // set new log level
 #undef XPCC_LOG_LEVEL
 #define	XPCC_LOG_LEVEL xpcc::log::DEBUG
@@ -19,8 +21,8 @@
 // ----------------------------------------------------------------------------
 // Logging
 
-xpcc::atmega::BufferedUart0 loggerUart(115200);
-xpcc::IODeviceWrapper<xpcc::atmega::BufferedUart0> loggerDevice(loggerUart);
+Uart0 loggerUart(115200);
+xpcc::IODeviceWrapper< Uart0 > loggerDevice(loggerUart);
 
 xpcc::log::Logger xpcc::log::debug(loggerDevice);
 xpcc::log::Logger xpcc::log::info(loggerDevice);
@@ -37,8 +39,8 @@ GPIO__OUTPUT(Sclk, B, 7);
 GPIO__OUTPUT(Mosi, B, 5);
 GPIO__INPUT(Miso, B, 6);
 
-typedef xpcc::SoftwareSpi<Sclk, Mosi, Miso> Spi;
-typedef xpcc::Mcp2515<Spi, Cs, Int> CanDevice;
+typedef xpcc::SoftwareSpi< Sclk, Mosi, Miso > Spi;
+typedef xpcc::Mcp2515< Spi, Cs, Int > CanDevice;
 
 static CanDevice device;
 static xpcc::CanConnector< CanDevice > connector(&device);
@@ -75,7 +77,7 @@ MAIN_FUNCTION
 	// needed by the MCP2515
 	Spi::initialize();
 	Cs::setOutput();
-	Int::setInput(xpcc::atmega::PULLUP);
+	Int::setInput(Gpio::PullType::PullUp);
 	
 	// Configure MCP2515 and set the filters
 	device.initialize(xpcc::can::BITRATE_125_KBPS);

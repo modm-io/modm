@@ -5,10 +5,12 @@
 
 #include <xpcc/io/iostream.hpp>
 
+using namespace xpcc::atmega;
+
 GPIO__IO(OneWirePin, C, 2);
 xpcc::SoftwareOneWire<OneWirePin> ow;
 
-xpcc::atmega::BufferedUart0 uart(9600);
+Uart0 uart(9600);
 
 int
 main()
@@ -17,7 +19,7 @@ main()
 	sei();
 	
 	// Create a IOStream for complex formatting tasks
-	xpcc::IODeviceWrapper<xpcc::atmega::BufferedUart0> device(uart);
+	xpcc::IODeviceWrapper<Uart0> device(uart);
 	xpcc::IOStream output(device);
 	
 	output << "Welcome" << xpcc::endl;

@@ -16,7 +16,7 @@ namespace touch
 	GPIO__IO(Right, A, 3);
 }
 
-BufferedUart0 uart(9600);
+Uart0 uart(9600);
 
 namespace led
 {
@@ -57,7 +57,7 @@ main()
 	sei();
 	
 	// Create a IOStream for complex formatting tasks
-	xpcc::IODeviceWrapper<xpcc::atmega::BufferedUart0> device(uart);
+	xpcc::IODeviceWrapper< Uart0 > device(uart);
 	xpcc::IOStream output(device);
 	
 	output << "Welcome" << xpcc::endl;
@@ -82,8 +82,8 @@ main()
 	display.update();
 	
 	Adc::initialize(
-			Adc::REFERENCE_INTERNAL_2V56,
-			Adc::PRESCALER_64);
+			Adc::Reference::Internal2V56,
+			Adc::Prescaler::Div64);
 	
 	touch::Bottom::setInput();
 	touch::Bottom::reset();

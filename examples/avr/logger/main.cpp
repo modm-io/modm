@@ -2,9 +2,11 @@
 #include <xpcc/architecture/platform.hpp>
 #include <xpcc/debug/logger.hpp>
 
+using namespace xpcc::atmega;
+
 // Create a new UART object and configure it to a baudrate of 115200
-xpcc::atmega::BufferedUart0 uart(115200);
-xpcc::IODeviceWrapper<xpcc::atmega::BufferedUart0> loggerDevice(uart);
+Uart0 uart(115200);
+xpcc::IODeviceWrapper< Uart0 > loggerDevice(uart);
 
 // Set all four logger streams to use the UART
 xpcc::log::Logger xpcc::log::debug(loggerDevice);

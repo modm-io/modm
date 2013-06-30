@@ -6,6 +6,8 @@
 
 #include <xpcc/processing/periodic_timer.hpp>
 
+using namespace xpcc::atmega;
+
 GPIO__OUTPUT(LedGreen, B, 0);
 GPIO__OUTPUT(LedRed, B, 1);
 
@@ -36,7 +38,7 @@ FLASH_STORAGE(uint8_t canFilter[]) =
 };
 
 // Create a new UART object and configure it to a baudrate of 115200
-xpcc::atmega::BufferedUart0 uart(115200);
+Uart0 uart(115200);
 
 // timer interrupt routine
 ISR(TIMER2_COMPA_vect)
@@ -58,7 +60,7 @@ main()
 	OCR2A = 230;
 	
 	// Create a IOStream for complex formatting tasks
-	xpcc::IODeviceWrapper<xpcc::atmega::BufferedUart0> device(uart);
+	xpcc::IODeviceWrapper<Uart0> device(uart);
 	xpcc::IOStream stream(device);
 	
 	// enable interrupts
