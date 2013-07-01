@@ -33,7 +33,7 @@
 
 #include "../../../device.hpp"
 #include "gpio_define.h"
-#include <xpcc/architecture/driver/gpio.hpp>
+#include <xpcc/architecture/peripeheral/gpio.hpp>
 
 /**
  * Macros for backwards compatibility:
@@ -111,16 +111,21 @@ namespace xpcc
 		/**
 		 * Gpio Classes created from the XML Device File Gpio Description
 		 */
-		%% for gpio in gpios
-			%% set port = gpio.port | upper
-			%% set pin  = gpio.id
+%% for gpio in gpios
+	%% set port = gpio.port | upper
+	%% set pin  = gpio.id
 			
-		%% for type in ["Output", "Input", ""]
-			%% set name = "Gpio" ~ type ~ port ~ pin
+	%% for type in ["Output", "Input", ""] 
 		
-		struct {{name}} : Gpio
+		%% if type == "Output"
+		struct GpioOutput{{port ~ pin}} : Gpio, ::xpcc::GpioOutput
+		%% elif type == "Input"
+		struct GpioInput{{port ~ pin}} : Gpio, ::xpcc::GpioInput
+		%% elif type == ""
+		struct Gpio{{port ~ pin}} : Gpio, ::xpcc::GpioInput, ::xpcc::GpioOutput
+		%% endif
 		{
-			%% if type == "" or type == "Output"
+		%% if type in ["", "Output"]
 			ALWAYS_INLINE static void setOutput(bool status) {
 				set(status);
 				setOutput();
@@ -146,14 +151,14 @@ namespace xpcc
 			ALWAYS_INLINE static void toggle() {
 				PORT{{port}} ^=  (1 << {{pin}});
 			}
-			%% endif
-			%% if type == "" or type == "Input"
+		%% endif
+		%% if type in ["", "Input"]
 			ALWAYS_INLINE static void setInput() {
 				DDR{{port}} &= ~(1 << {{pin}});
 			}
 
 			ALWAYS_INLINE static void
-			setInput(PullType type) {
+			setInput(PullType type=PullType::Floating) {
 				setInput();
 				if (type == PullType::PullUp) {
 					PORT{{port}} |= (1 << {{pin}});
@@ -166,9 +171,9 @@ namespace xpcc
 			ALWAYS_INLINE static bool read() {
 				return (PIN{{port}} & (1 << {{pin}}));
 			}
-			%% for af in gpio.afs
+		%% for af in gpio.afs
 			%% set af_id = af.id | int
-
+		
 			%% if af.type == "extint"
 			
 			{# Go home Atmel, you're drunk! #}
@@ -194,15 +199,15 @@ namespace xpcc
 			%% else
 				EICRB |= (static_cast<uint8_t>(trigger) << 2*{{af_id - 4}});
 			%% endif
-			#ifdef EIMSK
+#ifdef EIMSK
 				EIMSK |= (1 << INT{{af_id}});
-			#elif defined GIMSK
+#elif defined GIMSK
 				GIMSK |= (1 << INT{{af_id}});
-			#elif defined GICR
+#elif defined GICR
 				GICR |= (1 << INT{{af_id}});
-			#else
-			#	error "Cannot find register for setting INT{{af_id}}!"
-			#endif
+#else
+#	error "Cannot find register for setting INT{{af_id}}!"
+#endif
 			}
 
 			ALWAYS_INLINE static void disableExternalInterrupt() {
@@ -215,40 +220,40 @@ namespace xpcc
 			%% else
 				EICRB &= ~(0x3 << 2*{{af_id - 4}});
 			%% endif
-			#ifdef EIMSK
+#ifdef EIMSK
 				EIMSK &= ~(1 << INT{{af_id}});
-			#elif defined GIMSK
+#elif defined GIMSK
 				GIMSK &= ~(1 << INT{{af_id}});
-			#elif defined GICR
+#elif defined GICR
 				GICR &= ~(1 << INT{{af_id}});
-			#else
-			#	error "Cannot find register for clearing INT{{af_id}}!"
-			#endif
+#else
+#	error "Cannot find register for clearing INT{{af_id}}!"
+#endif
 			}
 
 			ALWAYS_INLINE static bool getExternalInterruptFlag() {
-			#ifdef EIFR
+#ifdef EIFR
 				return (EIFR & (1 << INTF{{af_id}}));
-			#elif defined GIFR
+#elif defined GIFR
 				return (GIFR & (1 << INTF{{af_id}}));
-			#else
-			#	error "Cannot find register for reading INTF{{af_id}}!"
-			#endif
+#else
+#	error "Cannot find register for reading INTF{{af_id}}!"
+#endif
 			}
 
 			ALWAYS_INLINE static void acknowledgeExternalInterruptFlag() {
-			#ifdef EIFR
+#ifdef EIFR
 				EIFR |= (1 << INTF{{af_id}});
-			#elif defined GIFR
+#elif defined GIFR
 				GIFR |= (1 << INTF{{af_id}});
-			#else
-			#	error "Cannot find register for setting INTF{{af_id}}!"
-			#endif
+#else
+#	error "Cannot find register for setting INTF{{af_id}}!"
+#endif
 			}
 			%% endif
 
 			%% if af.type == "pcint"
-			
+
 			{# Go home Atmel, you're drunk! #}
 			%% if target.family == 'attiny'
 			%% if (target.name == '2313' or target.name == '4313') and af_id >= 11 and af_id <= 17
@@ -263,75 +268,74 @@ namespace xpcc
 			
 			ALWAYS_INLINE static void enablePCInterrupt() {
 				PCMSK{{af_reg}} |= (1 << PCINT{{af_id}});
-			#ifdef PCICR
+#ifdef PCICR
 				PCICR |= (1 << PCIE{{af_reg}});
-			#elif defined EIMSK
+#elif defined EIMSK
 				EIMSK |= (1 << PCIE{{af_reg}});
-			#elif defined GIMSK
+#elif defined GIMSK
 				GIMSK |= (1 << PCIE{{af_reg}});
-			#elif defined GICR
+#elif defined GICR
 				GICR |= (1 << PCIE{{af_reg}});
-			#else
-			#	error "Cannot find register for setting PCIE{{af_reg}}!"
-			#endif
+#else
+#	error "Cannot find register for setting PCIE{{af_reg}}!"
+#endif
 			}
 
 			ALWAYS_INLINE static void disablePCInterrupt() {
 				PCMSK{{af_reg}} &= ~(1 << PCINT{{af_id}});
 				if (!PCMSK{{af_reg}}) {
-			#ifdef PCICR
+#ifdef PCICR
 					PCICR &= ~(1 << PCIE{{af_reg}});
-			#elif defined EIMSK
+#elif defined EIMSK
 					EIMSK &= ~(1 << PCIE{{af_reg}});
-			#elif defined GIMSK
+#elif defined GIMSK
 					GIMSK &= ~(1 << PCIE{{af_reg}});
-			#elif defined GICR
+#elif defined GICR
 					GICR &= ~(1 << PCIE{{af_reg}});
-			#else
-			#	error "Cannot find register for clearing PCIE{{af_reg}}!"
-			#endif
+#else
+#	error "Cannot find register for clearing PCIE{{af_reg}}!"
+#endif
 				}
 			}
 
 			ALWAYS_INLINE static bool getPCInterruptFlag() {
-			#ifdef PCIFR
+#ifdef PCIFR
 				return (PCIFR & (1 << PCIF{{af_reg}}));
-			#elif defined EIFR
+#elif defined EIFR
 				return (EIFR & (1 << PCIF{{af_reg}}));
-			#elif defined GIFR
+#elif defined GIFR
 				return (GIFR & (1 << PCIF{{af_reg}}));
-			#else
-			#	error "Cannot find register for reading PCIF{{af_reg}}!"
-			#endif
+#else
+#	error "Cannot find register for reading PCIF{{af_reg}}!"
+#endif
 			}
 
 			ALWAYS_INLINE static void acknowledgePCInterruptFlag() {
-			#ifdef PCIFR
+#ifdef PCIFR
 				PCIFR |= (1 << PCIF{{af_reg}});
-			#elif defined EIFR
+#elif defined EIFR
 				EIFR |= (1 << PCIF{{af_reg}});
-			#elif defined GIFR
+#elif defined GIFR
 				GIFR |= (1 << PCIF{{af_reg}});
-			#else
-			#	error "Cannot find register for setting PCIF{{af_reg}}!"
-			#endif
+#else
+#	error "Cannot find register for setting PCIF{{af_reg}}!"
+#endif
 			}
 
 			%% endif
 
-			%% endfor
+		%% endfor
 
-			%% endif
+		%% endif
 		};
 
-		%% endfor
-		%% endfor
+	%% endfor
+%% endfor
 
-		%% for nibble in nibbles
-			%% set port = nibble.port|upper
+%% for nibble in nibbles
+	%% set port = nibble.port | upper
 
-			%% for id in nibble.position
-
+	%% for id in nibble.position
 		%% if id == 0
 		struct GpioLowNibble{{port}}
 		{
@@ -368,14 +372,13 @@ namespace xpcc
 		};
 		%% endif
 
-		%% endfor
-		%% endfor
+	%% endfor
+%% endfor
 
-		%% for octet in octets
-			%% set port = octet.port|upper
+%% for octet in octets
+	%% set port = octet.port | upper
 
-			%% for id in octet.position
-
+	%% for id in octet.position
 		%% if id == 0
 		struct GpioPort{{port}}
 		{
@@ -394,8 +397,8 @@ namespace xpcc
 		};
 		%% endif
 
-		%% endfor
-		%% endfor
+	%% endfor
+%% endfor
 	}
 }
 
