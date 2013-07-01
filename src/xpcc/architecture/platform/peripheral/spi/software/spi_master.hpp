@@ -28,104 +28,65 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__SOFTWARE_I2C_HPP
-#define XPCC__SOFTWARE_I2C_HPP
+#ifndef XPCC__SOFTWARE_SPI_HPP
+#define XPCC__SOFTWARE_SPI_HPP
 
+#include <stdint.h>
+#include "spi_master.hpp"
 #include <xpcc/architecture/driver/delay.hpp>
-#include <xpcc/architecture/peripheral.hpp>
 
 namespace xpcc
 {
 	/**
-	 * \brief	Software emulation of a I2C master implementation
+	 * \brief	Software emulation of a SPI Master
 	 * 
-	 * \tparam	Scl			an Open-Drain Output pin
-	 * \tparam	Sda			an Open-Drain Output pin
-	 * \tparam	Frequency	in Hz (default frequency is 100kHz)
+	 * \tparam	Clk			clock pin [output]
+	 * \tparam	Mosi		master out slave in pin [output]
+	 * \tparam	Miso		master in slave out pin [input]
+	 * \tparam	Frequency	requested SPI frequency in Hz (default = 2 MHz)
 	 * 
-	 * \ingroup	i2c
+	 * \ingroup	connectivity
 	 * \see		gpio
 	 */
-	template< typename Scl,
-			  typename Sda,
-			  int32_t Frequency = 100000 >
-	class SoftwareI2cMaster : public xpcc::I2cMaster
+	template< typename Clk,
+			  typename Mosi,
+			  typename Miso,
+			  int32_t Frequency = 2000000UL >
+	class SoftwareSpiMaster : public ::xpcc::SpiMaster
 	{
 	public:
-		enum ErrorState
-		{
-			NO_ERROR,			//!< No Error occurred
-			DATA_NACK,			//!< Data was transmitted and NACK received
-			ARBITRATION_LOST,	//!< Arbitration was lost during writing or reading
-			BUS_ERROR,			//!< Misplaced Start or Stop condition
-			UNKNOWN_ERROR		//!< Unknown error condition
-		};
-		
-		/**
-		 * \brief	Initialize the hardware
-		 */
 		static void
 		initialize();
 		
-	public:
-		static void
-		reset(bool error=false);
-		
-		static bool
-		start(xpcc::i2c::Delegate *delegate);
-		
-		static ALWAYS_INLINE bool
-		startSync(xpcc::i2c::Delegate *delegate)
-		{
-			return start(delegate);
-		};
-		
 		static uint8_t
-		getErrorState();
+		writeReadBlocking(uint8_t data);
 
-	private:
 		static void
-		error();
-		
-	private:
-		static inline void
-		startCondition();
-		
-		static inline void
-		stopCondition();
-		
-		static inline bool
+		writeBlocking(uint8_t data);
+
+		static bool
 		write(uint8_t data);
-		
-		static inline uint8_t
-		read(bool ack);
 
-	private:
-		static inline bool
-		readBit();
-		
-		static inline void
-		writeBit(bool bit);
-		
-		static inline void
-		sclSetAndWait();
+		static uint8_t
+		getResult();
 
+		static bool
+		isFinished();
+		
+	protected:
 		static ALWAYS_INLINE void
 		delay();
 		
 		// calculate the delay in microseconds needed to achieve the
 		// requested SPI frequency
-		static constexpr float delayTime = (1000000.0 / Frequency) / 2.0;
+		static const uint32_t delayTime = (1000000.0 / Frequency) / 2.0;
 		
-		static Scl scl;
-		static Sda sda;
-		
-		static xpcc::i2c::Delegate::NextOperation nextOperation;
-		static xpcc::i2c::Delegate *myDelegate;
-		static uint8_t errorState;
+		static Clk clk;
+		static Mosi mosi;
+		static Miso miso;
 	};
 }
 
-#include "software_i2c_impl.hpp"
+#include "spi_master_impl.hpp"
 
-#endif // XPCC__SOFTWARE_I2C_HPP
+#endif // XPCC__SOFTWARE_SPI_HPP

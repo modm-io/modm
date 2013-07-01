@@ -55,7 +55,7 @@ namespace xpcc
 	 * \ingroup	1-wire
 	 */
 	template <typename Pin>
-	class SoftwareOneWire
+	class SoftwareOneWireMaster
 	{
 	public:
 		/**
@@ -189,6 +189,6 @@ namespace xpcc
 	};
 }
 
-#include "software_one_wire_impl.hpp"
+#include "one_wire_master_impl.hpp"
 
 #endif // XPCC__SOFTWARE_ONE_WIRE_HPP

@@ -1,6 +1,6 @@
 // coding: utf-8
 // ----------------------------------------------------------------------------
-/* Copyright (c) 2013, Roboterclub Aachen e.V.
+/* Copyright (c) 2009, Roboterclub Aachen e.V.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -28,106 +28,105 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__SOFTWARE_SPI_HPP
-#define XPCC__SOFTWARE_SPI_HPP
+#ifndef XPCC__SOFTWARE_I2C_HPP
+#define XPCC__SOFTWARE_I2C_HPP
 
-#include "../../device.hpp"
-#include "../../drivers.hpp"
 #include <xpcc/architecture/driver/delay.hpp>
+#include <xpcc/architecture/peripheral/i2c.hpp>
+#include <xpcc/communication/i2c/delegate.hpp>
 
 namespace xpcc
 {
 	/**
-	 * \brief	Software emulation of a SPI Master
+	 * \brief	Software emulation of a I2C master implementation
 	 * 
-	 * \tparam	Clk			clock pin [output]
-	 * \tparam	Mosi		master out slave in pin [output]
-	 * \tparam	Miso		master in slave out pin [input]
-	 * \tparam	Frequency	requested SPI frequency in Hz (default = 2 MHz)
+	 * \tparam	Scl			an Open-Drain Output pin
+	 * \tparam	Sda			an Open-Drain Output pin
+	 * \tparam	Frequency	in Hz (default frequency is 100kHz)
 	 * 
-	 * \ingroup	spi
-	 * \author	Niklas Hauser
+	 * \ingroup	i2c
 	 * \see		gpio
 	 */
-	template< typename Clk,
-			  typename Mosi,
-			  typename Miso,
-			  int32_t Frequency = 2000000UL >
-	class SoftwareSpiMaster : public ::xpcc::SpiMaster
+	template< typename Scl,
+			  typename Sda,
+			  int32_t Frequency = 100000 >
+	class SoftwareI2cMaster : public xpcc::I2cMaster
 	{
 	public:
-		static inline void
+		enum ErrorState
+		{
+			NO_ERROR,			//!< No Error occurred
+			DATA_NACK,			//!< Data was transmitted and NACK received
+			ARBITRATION_LOST,	//!< Arbitration was lost during writing or reading
+			BUS_ERROR,			//!< Misplaced Start or Stop condition
+			UNKNOWN_ERROR		//!< Unknown error condition
+		};
+		
+		/**
+		 * \brief	Initialize the hardware
+		 */
+		static void
 		initialize();
 		
-		static uint8_t
-		writeReadBlocking(uint8_t data);
-
-		static ALWAYS_INLINE void
-		writeBlocking(uint8_t data);
-
-		static ALWAYS_INLINE bool
-		write(uint8_t data);
-
-		static ALWAYS_INLINE uint8_t
-		getResult();
-
-		static ALWAYS_INLINE bool
-		isFinished();
+	public:
+		static void
+		reset(bool error=false);
 		
-	protected:
+		static bool
+		start(xpcc::i2c::Delegate *delegate);
+		
+		static ALWAYS_INLINE bool
+		startSync(xpcc::i2c::Delegate *delegate)
+		{
+			return start(delegate);
+		};
+		
+		static uint8_t
+		getErrorState();
+
+	private:
+		static void
+		error();
+		
+	private:
+		static inline void
+		startCondition();
+		
+		static inline void
+		stopCondition();
+		
+		static inline bool
+		write(uint8_t data);
+		
+		static inline uint8_t
+		read(bool ack);
+
+	private:
+		static inline bool
+		readBit();
+		
+		static inline void
+		writeBit(bool bit);
+		
+		static inline void
+		sclSetAndWait();
+
 		static ALWAYS_INLINE void
 		delay();
 		
 		// calculate the delay in microseconds needed to achieve the
 		// requested SPI frequency
-		static const uint32_t delayTime = (1000000.0 / Frequency) / 2.0;
+		static constexpr float delayTime = (1000000.0 / Frequency) / 2.0;
 		
-		static Clk clk;
-		static Mosi mosi;
-		static Miso miso;
-
-		static bool finished;
-		static uint8_t result;
-	};
-
-	/**
-	 * \brief	Software emulation of a SPI Block Master
-	 *
-	 * \tparam	Clk			clock pin [output]
-	 * \tparam	Mosi		master out slave in pin [output]
-	 * \tparam	Miso		master in slave out pin [input]
-	 * \tparam	Frequency	requested SPI frequency in Hz (default = 2 MHz)
-	 *
-	 * \ingroup	spi
-	 * \author	Niklas Hauser
-	 * \see		gpio
-	 */
-	template< typename Clk,
-				  typename Mosi,
-				  typename Miso,
-				  int32_t Frequency = 2000000UL >
-	class SoftwareSpiBlockMaster : public xpcc::SpiBlockMaster
-	{
-	public:
-		/**
-		 * \brief	Initialize SPI module
-		 *
-		 * This also sets the directions of the I/O pins.
-		 */
-		static ALWAYS_INLINE void
-		initialize();
-
-		static inline bool
-		start(uint8_t * tx, uint8_t * rx, std::size_t length, BufferOptions options=BufferOptions::TxRxIncrement);
-
-		static ALWAYS_INLINE bool
-		isFinished();
-
-	private:
-		static bool finished;
+		static Scl scl;
+		static Sda sda;
+		
+		static xpcc::i2c::Delegate::NextOperation nextOperation;
+		static xpcc::i2c::Delegate *myDelegate;
+		static uint8_t errorState;
 	};
 }
 
-#include "software_spi_impl.hpp"
+#include "i2c_master_impl.hpp"
 
-#endif // XPCC__SOFTWARE_SPI_HPP
+#endif // XPCC__SOFTWARE_I2C_HPP
