@@ -1,11 +1,11 @@
 // coding: utf-8
 // ----------------------------------------------------------------------------
-/* Copyright (c) 2012, Roboterclub Aachen e.V.
+/* Copyright (c) 2013, Roboterclub Aachen e.V.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- *
+ * 
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -28,83 +28,73 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__PERIPHERAL_HPP
-#define XPCC__PERIPHERAL_HPP
+#ifndef XPCC_PERIPHERAL__I2C_MASTER_HPP
+#define XPCC_PERIPHERAL__I2C_MASTER_HPP
 
-#include <stdint.h>
-#include <cstddef>
-
-/**
- * \ingroup 	architecture
- * \defgroup	peripheral	Peripherals
- * 
- * All hardware peripherals with common interfaces.
- */
+#include "../peripheral.hpp"
 
 namespace xpcc
 {
+	namespace i2c
+	{
+		static const uint8_t WRITE = 0x00;
+		static const uint8_t READ = 0x01;
+	}
+
 	/**
-	 * \brief	Peripheral class
+	 * \brief	Interface of a I2C master
 	 *
-	 * This class defines acts as a base class for all classes describing the
-	 * public interface of common peripheral drivers.
-	 * As there is no implementation given, the classes specific to the platform
-	 * inherit from their respective base classes and must shadow the methods of
-	 * them.
+	 * Performing transfers in background allows the use of DMA etc. and
+	 * enables the program to do other things while the operation is
+	 * going on.
 	 *
-	 * The inheritance is only visible for the documenation, it is completely
-	 * removed during compile time keeping a possible error at platform level.
-	 * This is safe, because only one platform can be compiled at once.
-	 *
-	 * This way, no virtual functions are needed and no overhead is generated,
-	 * but we still have clean inheritance in the documentation.
-	 * There is no need to document the platform specific implementation, since
-	 * it is taken from the base class.
-	 *
-	 * \ingroup peripheral
-	 * \author	Niklas Hauser
+	 * \author Georgi Grinshpun
+	 * \author Niklas Hauser
+	 * \ingroup	peripheral
 	 */
-	class Peripheral
+	class I2cMaster : public ::xpcc::Peripheral
 	{
 #ifdef __DOXYGEN__
+	public:
 		/**
-		 * \brief initializes the peripheral, must be called before use.
-		 */
-		static void
-		initialize();
-
-		/**
-		 * \brief configures a peripheral for a specific purpose
-		 */
-		static void
-		configurePurpose();
-
-		/**
-		 * \brief sets a parameter
-		 */
-		static void
-		setParameter();
-
-		/**
-		 * \brief gets a parameter
-		 */
-		static void
-		getParameter();
-
-		/**
-		 * \brief acknowledges an interrupt flag
+		 * \brief	Requests bus control and starts the transfer.
 		 *
-		 * We use acknowledge here, because it describes the intention rather
-		 * than the actual implementation.
+		 * \param	delegate	object that inherits from the Delegate class.
+		 * \return	Caller gains control if \c true. Call has no effect if \c false.
+		 */
+		static bool
+		start(Delegate *delegate);
+
+		/**
+		 * \brief	Requests bus control and starts the transfer.
+		 *			Blocks until delegate is detached.
+		 *
+		 * \param	delegate	object that inherits from the Delegate class.
+		 * \return	Caller gains control if \c true. Call has no effect if \c false.
+		 */
+		static bool
+		startSync(Delegate *delegate);
+
+		/**
+		 * \brief	Perform a software reset of the driver.
+		 *
+		 * This method calls the stopped Delegate method and then detaches
+		 * the delegate.
+		 * \param error DetachCause \c ERROR_CONDITION if \c true, else \c SOFTWARE_RESET
 		 */
 		static void
-		acknowledgeInterruptFlag();
+		reset(bool error=false);
+
+		/**
+		 * \brief	Check the error state of the driver.
+		 *
+		 * Since the error states are hardware and implementation specific,
+		 * this is only the recommended interface and does not need to be implemented.
+		 */
+		static uint8_t
+		getErrorState();
 #endif
 	};
 }
 
-#include "peripheral/uart.hpp"
-#include "peripheral/spi.hpp"
-#include "peripheral/i2c.hpp"
-
-#endif	// XPCC__PERIPHERAL_HPP
+#endif // XPCC_PERIPHERAL__I2C_MASTER_HPP

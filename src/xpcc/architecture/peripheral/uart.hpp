@@ -42,7 +42,7 @@ namespace xpcc
 	 */
 	class Uart : public ::xpcc::Peripheral
 	{
-#if defined __DOXYGEN__
+#ifdef __DOXYGEN__
 	public:
 		/**
 		 * \brief	Write a single byte and wait for completion.

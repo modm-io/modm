@@ -42,7 +42,7 @@ namespace xpcc
 	 */
 	class SpiMaster : public ::xpcc::Peripheral
 	{
-#if defined __DOXYGEN__
+#ifdef __DOXYGEN__
 	public:
 		/**
 		 * \brief	Write a single byte, wait for completion.
@@ -79,13 +79,24 @@ namespace xpcc
 #endif
 	};
 	
+	struct Spi
+	{
+		enum class BufferOptions : uint8_t
+		{
+			TxRxIncrement = 0b11,
+			TxIncrementRxDecrement = 0b10,
+			TxDecrementRxIncrement = 0b01,
+			TxRxDecrement = 0b00,
+		};
+	};
+
 	/**
 	 * \brief		Spi Master with DMA support
 	 *
 	 * \ingroup		peripheral
 	 * \author		Niklas Hauser
 	 */
-	class SpiBlockMaster : public ::xpcc::Peripheral
+	class SpiBlockMaster : public ::xpcc::Peripheral, Spi
 	{
 #if defined __DOXYGEN__
 	public:
@@ -101,7 +112,7 @@ namespace xpcc
 		 *			`false` if another transfer is already progress.
 		 */
 		bool
-		start(uint8_t * tx, uint8_t * rx, std::size_t length, enum class options);
+		start(uint8_t * tx, uint8_t * rx, std::size_t length, BufferOptions options=BufferOptions::TxRxIncrement);
 		
 		/**
 		 * \return	`true` if previous transfer finished,

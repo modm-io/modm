@@ -33,7 +33,7 @@
 
 #include "../../../device.hpp"
 #include "../../../drivers.hpp"
-#include <xpcc/driver/connectivity/i2c/master.hpp>
+#include <xpcc/architecture/peripheral/i2c.hpp>
 
 namespace xpcc
 {
@@ -55,7 +55,7 @@ namespace xpcc
 		 * \ingroup	{{target.family}}
 		 * \ingroup	i2c
 		 */
-		class I2cMaster : public ::xpcc::i2c::Master, I2c
+		class I2cMaster : public ::xpcc::I2cMaster, I2c
 		{
 		public:
 			enum ErrorState

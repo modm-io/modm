@@ -60,14 +60,6 @@ namespace xpcc
 				Div128 = (1 << SPR1) | (1 << SPR0),
 			};
 
-			enum class BufferOptions : uint8_t
-			{
-				TxRxIncrement = 0b11,
-				TxIncrementRxDecrement = 0b10,
-				TxDecrementRxIncrement = 0b01,
-				TxRxDecrement = 0b00,
-			};
-
 			%% for gpio in gpios
 			typedef ::xpcc::{{target.family}}::Gpio{{ gpio.port }}{{ gpio.id }} {{ gpio.name | capitalize }};
 			%% endfor
@@ -111,7 +103,7 @@ namespace xpcc
 				%% endfor
 			}
 
-			static uint8_t
+			static ALWAYS_INLINE uint8_t
 			writeReadBlocking(uint8_t data)
 			{
 				SPDR = data;
@@ -121,7 +113,7 @@ namespace xpcc
 				return getResult();
 			}
 
-			static void
+			static ALWAYS_INLINE void
 			writeBlocking(uint8_t data)
 			{
 				SPDR = data;
