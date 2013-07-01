@@ -37,21 +37,21 @@
 #define DEBUG_SW_I2C(x)
 
 template <typename Scl, typename Sda, int32_t Frequency>
-Scl xpcc::SoftwareI2C<Scl, Sda, Frequency>::scl;
+Scl xpcc::SoftwareI2cMaster<Scl, Sda, Frequency>::scl;
 template <typename Scl, typename Sda, int32_t Frequency>
-Sda xpcc::SoftwareI2C<Scl, Sda, Frequency>::sda;
+Sda xpcc::SoftwareI2cMaster<Scl, Sda, Frequency>::sda;
 
 template <typename Scl, typename Sda, int32_t Frequency>
-xpcc::i2c::Delegate::NextOperation xpcc::SoftwareI2C<Scl, Sda, Frequency>::nextOperation;
+xpcc::i2c::Delegate::NextOperation xpcc::SoftwareI2cMaster<Scl, Sda, Frequency>::nextOperation;
 template <typename Scl, typename Sda, int32_t Frequency>
-xpcc::i2c::Delegate *xpcc::SoftwareI2C<Scl, Sda, Frequency>::myDelegate(0);
+xpcc::i2c::Delegate *xpcc::SoftwareI2cMaster<Scl, Sda, Frequency>::myDelegate(0);
 template <typename Scl, typename Sda, int32_t Frequency>
-uint8_t xpcc::SoftwareI2C<Scl, Sda, Frequency>::errorState(NO_ERROR);
+uint8_t xpcc::SoftwareI2cMaster<Scl, Sda, Frequency>::errorState(NO_ERROR);
 
 // ----------------------------------------------------------------------------
 template <typename Scl, typename Sda, int32_t Frequency>
 void
-xpcc::SoftwareI2C<Scl, Sda, Frequency>::initialize()
+xpcc::SoftwareI2cMaster<Scl, Sda, Frequency>::initialize()
 {
 	scl.set();
 	sda.set();
@@ -59,7 +59,7 @@ xpcc::SoftwareI2C<Scl, Sda, Frequency>::initialize()
 
 template <typename Scl, typename Sda, int32_t Frequency>
 void
-xpcc::SoftwareI2C<Scl, Sda, Frequency>::reset(bool error)
+xpcc::SoftwareI2cMaster<Scl, Sda, Frequency>::reset(bool error)
 {
 	if (myDelegate) myDelegate->stopped(error ? xpcc::i2c::Delegate::ERROR_CONDITION : xpcc::i2c::Delegate::SOFTWARE_RESET);
 	myDelegate = 0;
@@ -67,7 +67,7 @@ xpcc::SoftwareI2C<Scl, Sda, Frequency>::reset(bool error)
 
 template <typename Scl, typename Sda, int32_t Frequency>
 bool
-xpcc::SoftwareI2C<Scl, Sda, Frequency>::start(xpcc::i2c::Delegate *delegate)
+xpcc::SoftwareI2cMaster<Scl, Sda, Frequency>::start(xpcc::i2c::Delegate *delegate)
 {
 	if (!myDelegate && delegate && delegate->attaching())
 	{
@@ -140,7 +140,7 @@ xpcc::SoftwareI2C<Scl, Sda, Frequency>::start(xpcc::i2c::Delegate *delegate)
 
 template <typename Scl, typename Sda, int32_t Frequency>
 uint8_t
-xpcc::SoftwareI2C<Scl, Sda, Frequency>::getErrorState()
+xpcc::SoftwareI2cMaster<Scl, Sda, Frequency>::getErrorState()
 {
 	return errorState;
 }
@@ -148,7 +148,7 @@ xpcc::SoftwareI2C<Scl, Sda, Frequency>::getErrorState()
 // MARK: - private
 template <typename Scl, typename Sda, int32_t Frequency>
 void
-xpcc::SoftwareI2C<Scl, Sda, Frequency>::error()
+xpcc::SoftwareI2cMaster<Scl, Sda, Frequency>::error()
 {
 	DEBUG_SW_I2C('E');
 	stopCondition();
@@ -159,7 +159,7 @@ xpcc::SoftwareI2C<Scl, Sda, Frequency>::error()
 // MARK: bus control
 template <typename Scl, typename Sda, int32_t Frequency>
 void
-xpcc::SoftwareI2C<Scl, Sda, Frequency>::startCondition()
+xpcc::SoftwareI2cMaster<Scl, Sda, Frequency>::startCondition()
 {
 	sda.set();
 	while((sda.read() == gpio::LOW))
@@ -178,7 +178,7 @@ xpcc::SoftwareI2C<Scl, Sda, Frequency>::startCondition()
 
 template <typename Scl, typename Sda, int32_t Frequency>
 void
-xpcc::SoftwareI2C<Scl, Sda, Frequency>::stopCondition()
+xpcc::SoftwareI2cMaster<Scl, Sda, Frequency>::stopCondition()
 {
 	scl.reset();
 	sda.reset();
@@ -193,7 +193,7 @@ xpcc::SoftwareI2C<Scl, Sda, Frequency>::stopCondition()
 // MARK: byte operations
 template <typename Scl, typename Sda, int32_t Frequency>
 bool
-xpcc::SoftwareI2C<Scl, Sda, Frequency>::write(uint8_t data)
+xpcc::SoftwareI2cMaster<Scl, Sda, Frequency>::write(uint8_t data)
 {
 	for(uint8_t i = 0; i < 8; ++i)
 	{
@@ -215,7 +215,7 @@ xpcc::SoftwareI2C<Scl, Sda, Frequency>::write(uint8_t data)
 
 template <typename Scl, typename Sda, int32_t Frequency>
 uint8_t
-xpcc::SoftwareI2C<Scl, Sda, Frequency>::read(bool ack)
+xpcc::SoftwareI2cMaster<Scl, Sda, Frequency>::read(bool ack)
 {
 	sda.set();
 	
@@ -240,7 +240,7 @@ xpcc::SoftwareI2C<Scl, Sda, Frequency>::read(bool ack)
 // MARK: bit operations
 template <typename Scl, typename Sda, int32_t Frequency>
 bool
-xpcc::SoftwareI2C<Scl, Sda, Frequency>::readBit()
+xpcc::SoftwareI2cMaster<Scl, Sda, Frequency>::readBit()
 {
 	delay();
 	sclSetAndWait();
@@ -256,7 +256,7 @@ xpcc::SoftwareI2C<Scl, Sda, Frequency>::readBit()
 
 template <typename Scl, typename Sda, int32_t Frequency>
 void
-xpcc::SoftwareI2C<Scl, Sda, Frequency>::writeBit(bool bit)
+xpcc::SoftwareI2cMaster<Scl, Sda, Frequency>::writeBit(bool bit)
 {
 	if (bit) {
 		sda.set();
@@ -275,7 +275,7 @@ xpcc::SoftwareI2C<Scl, Sda, Frequency>::writeBit(bool bit)
 
 template <typename Scl, typename Sda, int32_t Frequency>
 void
-xpcc::SoftwareI2C<Scl, Sda, Frequency>::sclSetAndWait()
+xpcc::SoftwareI2cMaster<Scl, Sda, Frequency>::sclSetAndWait()
 {
 	scl.set();
 	// wait for clock stretching by slave
@@ -299,7 +299,7 @@ xpcc::SoftwareI2C<Scl, Sda, Frequency>::sclSetAndWait()
 // ----------------------------------------------------------------------------
 template <typename Scl, typename Sda, int32_t Frequency>
 void
-xpcc::SoftwareI2C<Scl, Sda, Frequency>::delay()
+xpcc::SoftwareI2cMaster<Scl, Sda, Frequency>::delay()
 {
 	xpcc::delay_us(delayTime);
 }

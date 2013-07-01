@@ -34,135 +34,149 @@
 
 // ----------------------------------------------------------------------------
 template <typename Clk, typename Mosi, typename Miso, int32_t Frequency>
-uint8_t* xpcc::SoftwareSpi<Clk, Mosi, Miso, Frequency>::transmitBuffer(0);
+Clk xpcc::SoftwareSpiMaster<Clk, Mosi, Miso, Frequency>::clk;
 
 template <typename Clk, typename Mosi, typename Miso, int32_t Frequency>
-uint8_t* xpcc::SoftwareSpi<Clk, Mosi, Miso, Frequency>::receiveBuffer(0);
+Mosi xpcc::SoftwareSpiMaster<Clk, Mosi, Miso, Frequency>::mosi;
 
 template <typename Clk, typename Mosi, typename Miso, int32_t Frequency>
-uint16_t xpcc::SoftwareSpi<Clk, Mosi, Miso, Frequency>::bufferLength(0);
-
-template <typename Clk, typename Mosi, typename Miso, int32_t Frequency>
-uint8_t xpcc::SoftwareSpi<Clk, Mosi, Miso, Frequency>::status(0);
+Miso xpcc::SoftwareSpiMaster<Clk, Mosi, Miso, Frequency>::miso;
 
 // ----------------------------------------------------------------------------
 template <typename Clk, typename Mosi, typename Miso, int32_t Frequency>
-Clk xpcc::SoftwareSpi<Clk, Mosi, Miso, Frequency>::clk;
+bool xpcc::SoftwareSpiMaster<Clk, Mosi, Miso, Frequency>::finished;
 
 template <typename Clk, typename Mosi, typename Miso, int32_t Frequency>
-Mosi xpcc::SoftwareSpi<Clk, Mosi, Miso, Frequency>::mosi;
+uint8_t xpcc::SoftwareSpiMaster<Clk, Mosi, Miso, Frequency>::result;
 
-template <typename Clk, typename Mosi, typename Miso, int32_t Frequency>
-Miso xpcc::SoftwareSpi<Clk, Mosi, Miso, Frequency>::miso;
 
 // ----------------------------------------------------------------------------
 template <typename Clk, typename Mosi, typename Miso, int32_t Frequency>
 void
-xpcc::SoftwareSpi<Clk, Mosi, Miso, Frequency>::initialize()
+xpcc::SoftwareSpiMaster<Clk, Mosi, Miso, Frequency>::initialize()
 {
 	clk.setOutput();
 	mosi.setOutput();
 	miso.setInput();
-}
-
-// ----------------------------------------------------------------------------
-template <typename Clk, typename Mosi, typename Miso, int32_t Frequency>
-bool
-xpcc::SoftwareSpi<Clk, Mosi, Miso, Frequency>::setBuffer(uint16_t length, uint8_t* transmit, uint8_t* receive, BufferIncrease bufferIncrease)
-{
-	if (!isFinished()) return false;
-	
-	transmitBuffer = transmit;
-	receiveBuffer = receive ? receive : transmit;
-	bufferLength = length;
-	status &= ~(BUFFER_TRANSMIT_INCR_bm | BUFFER_RECEIVE_INCR_bm);
-	status |= bufferIncrease;
-	
-	return true;
-}
-
-template <typename Clk, typename Mosi, typename Miso, int32_t Frequency>
-bool
-xpcc::SoftwareSpi<Clk, Mosi, Miso, Frequency>::transfer(TransferOptions options)
-{
-	if (status & BUFFER_IS_BUSY_SYNC_bm)
-		return false;
-	
-	uint8_t rx(0), tx(0xff);
-	// send the buffer out, blocking
-	status |= BUFFER_IS_BUSY_SYNC_bm;
-	// check if we have to use a dummy buffer
-	bool transmit = (options & TRANSFER_SEND_BUFFER_DISCARD_RECEIVE) & static_cast<bool>(transmitBuffer);
-	bool receive = (options & TRANSFER_SEND_DUMMY_SAVE_RECEIVE) & static_cast<bool>(receiveBuffer);
-	
-	for(uint_fast16_t i=0; i < bufferLength; ++i)
-	{
-		if (transmit) {
-			tx = transmitBuffer[(status & BUFFER_TRANSMIT_INCR_bm) ? i : bufferLength-1-i];
-		}
-		
-		rx = write(tx);
-		
-		if (receive) {
-			receiveBuffer[(status & BUFFER_RECEIVE_INCR_bm) ? i : bufferLength-1-i] = rx;
-		}
-	}
-	
-	status &= ~BUFFER_IS_BUSY_SYNC_bm;
-	
-	return true;
-}
-
-template <typename Clk, typename Mosi, typename Miso, int32_t Frequency>
-bool
-xpcc::SoftwareSpi<Clk, Mosi, Miso, Frequency>::transferSync(TransferOptions options)
-{
-	return transfer(options);
-}
-
-template <typename Clk, typename Mosi, typename Miso, int32_t Frequency>
-bool
-xpcc::SoftwareSpi<Clk, Mosi, Miso, Frequency>::isFinished()
-{
-	return !(status & BUFFER_IS_BUSY_SYNC_bm);
+	finished = true;
 }
 
 // ----------------------------------------------------------------------------
 template <typename Clk, typename Mosi, typename Miso, int32_t Frequency>
 uint8_t
-xpcc::SoftwareSpi<Clk, Mosi, Miso, Frequency>::write(uint8_t output)
+xpcc::SoftwareSpiMaster<Clk, Mosi, Miso, Frequency>::writeReadBlocking(uint8_t data)
 {
+	if (!isFinished())
+			return false;
+	finished = false;
+
 	uint8_t input = 0;
-	
+
 	clk.reset();
 	for (uint8_t i = 0; i < 8; ++i)
 	{
 		input <<= 1;
-		if (output & 0x80) {
+		if (data & 0x80) {
 			mosi.set();
 		}
 		else {
 			mosi.reset();
 		}
 		delay();
-		
+
 		clk.set();
 		delay();
-		
+
 		if (miso.read()) {
 			input |= 1;
 		}
-		output <<= 1;
-		
+		data <<= 1;
+
 		clk.reset();
 	}
+	finished = true;
 	
 	return input;
 }
 
 template <typename Clk, typename Mosi, typename Miso, int32_t Frequency>
 void
-xpcc::SoftwareSpi<Clk, Mosi, Miso, Frequency>::delay()
+xpcc::SoftwareSpiMaster<Clk, Mosi, Miso, Frequency>::writeBlocking(uint8_t data)
+{
+	writeReadBlocking(data);
+}
+
+template <typename Clk, typename Mosi, typename Miso, int32_t Frequency>
+bool
+xpcc::SoftwareSpiMaster<Clk, Mosi, Miso, Frequency>::write(uint8_t data)
+{
+	result = writeReadBlocking(data);
+	return true;
+}
+
+template <typename Clk, typename Mosi, typename Miso, int32_t Frequency>
+uint8_t
+xpcc::SoftwareSpiMaster<Clk, Mosi, Miso, Frequency>::getResult()
+{
+	return result;
+}
+
+template <typename Clk, typename Mosi, typename Miso, int32_t Frequency>
+bool
+xpcc::SoftwareSpiMaster<Clk, Mosi, Miso, Frequency>::isFinished()
+{
+	return finished;
+}
+
+template <typename Clk, typename Mosi, typename Miso, int32_t Frequency>
+void
+xpcc::SoftwareSpiMaster<Clk, Mosi, Miso, Frequency>::delay()
 {
 	xpcc::delay_us(delayTime);
+}
+
+
+// ============================================================================
+template <typename Clk, typename Mosi, typename Miso, int32_t Frequency>
+bool xpcc::SoftwareSpiBlockMaster<Clk, Mosi, Miso, Frequency>::finished;
+
+
+// ----------------------------------------------------------------------------
+template <typename Clk, typename Mosi, typename Miso, int32_t Frequency>
+void
+xpcc::SoftwareSpiBlockMaster<Clk, Mosi, Miso, Frequency>::initialize()
+{
+	SoftwareSpiMaster< Clk, Mosi, Miso, Frequency >::initialize();
+	finished = true;
+}
+
+template <typename Clk, typename Mosi, typename Miso, int32_t Frequency>
+bool
+xpcc::SoftwareSpiBlockMaster<Clk, Mosi, Miso, Frequency>::start(uint8_t * tx, uint8_t * rx, std::size_t length, BufferOptions options)
+{
+	if (!isFinished())
+		return false;
+	finished = false;
+
+	uint8_t tx_byte = 0xff;
+	uint8_t rx_byte;
+
+	for (std::size_t i = 0; i < length; i++)
+	{
+		if (tx) tx_byte = tx[static_cast<uint8_t>(options) & 0b10 ? i : length-i-1];
+
+		rx_byte = SoftwareSpiMaster< Clk, Mosi, Miso, Frequency >::writeReadBlocking(tx_byte);
+
+		if (rx) rx[static_cast<uint8_t>(options) & 0b01 ? i : length-i-1] = rx_byte;
+	}
+
+	finished = true;
+	return true;
+}
+
+template <typename Clk, typename Mosi, typename Miso, int32_t Frequency>
+bool
+xpcc::SoftwareSpiBlockMaster<Clk, Mosi, Miso, Frequency>::isFinished()
+{
+	return finished;
 }

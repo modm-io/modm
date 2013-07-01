@@ -166,7 +166,7 @@ namespace xpcc
 		static bool
 		performSearch();
 		
-		// standard delay times in Âµs
+		// standard delay times in µs
 		static const int A = 6;
 		static const int B = 64;
 		static const int C = 60;

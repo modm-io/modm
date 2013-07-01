@@ -1,11 +1,11 @@
 // coding: utf-8
 // ----------------------------------------------------------------------------
-/* Copyright (c) 2009, Roboterclub Aachen e.V.
+/* Copyright (c) 2012, Roboterclub Aachen e.V.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- *
+ * 
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -25,22 +25,32 @@
  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- * $$
  */
 // ----------------------------------------------------------------------------
 
-#include <unittest/testsuite.hpp>
+#ifndef XPCC_I2C__CONSTANTS_HPP
+#define XPCC_I2C__CONSTANTS_HPP
 
-class WriteTest : public unittest::TestSuite
+#include <stdint.h>
+
+namespace xpcc
 {
-public:
-	virtual void
-	setUp();
-	
-	void
-	testWrite();
+	/**
+	 * \brief	I2C Interface
+	 * \ingroup	i2c
+	 */
+	namespace i2c
+	{
+		namespace adapter
+		{
+			enum State
+			{
+				BUSY,
+				NO_ERROR,
+				ERROR
+			};
+		}
+	}
+}
 
-	void
-	testWriteFail();
-};
+#endif // XPCC_I2C__CONSTANTS_HPP

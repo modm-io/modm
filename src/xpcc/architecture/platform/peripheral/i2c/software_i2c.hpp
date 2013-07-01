@@ -32,7 +32,7 @@
 #define XPCC__SOFTWARE_I2C_HPP
 
 #include <xpcc/architecture/driver/delay.hpp>
-#include "master.hpp"
+#include <xpcc/architecture/peripheral.hpp>
 
 namespace xpcc
 {
@@ -49,7 +49,7 @@ namespace xpcc
 	template< typename Scl,
 			  typename Sda,
 			  int32_t Frequency = 100000 >
-	class SoftwareI2C : public i2c::Master
+	class SoftwareI2cMaster : public xpcc::I2cMaster
 	{
 	public:
 		enum ErrorState
@@ -74,7 +74,7 @@ namespace xpcc
 		static bool
 		start(xpcc::i2c::Delegate *delegate);
 		
-		static bool
+		static ALWAYS_INLINE bool
 		startSync(xpcc::i2c::Delegate *delegate)
 		{
 			return start(delegate);
@@ -88,16 +88,16 @@ namespace xpcc
 		error();
 		
 	private:
-		static void
+		static inline void
 		startCondition();
 		
-		static void
+		static inline void
 		stopCondition();
 		
-		static bool
+		static inline bool
 		write(uint8_t data);
 		
-		static uint8_t
+		static inline uint8_t
 		read(bool ack);
 
 	private:
@@ -110,7 +110,7 @@ namespace xpcc
 		static inline void
 		sclSetAndWait();
 
-		static inline void
+		static ALWAYS_INLINE void
 		delay();
 		
 		// calculate the delay in microseconds needed to achieve the

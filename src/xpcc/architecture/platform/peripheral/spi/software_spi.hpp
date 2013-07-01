@@ -1,6 +1,6 @@
 // coding: utf-8
 // ----------------------------------------------------------------------------
-/* Copyright (c) 2009, Roboterclub Aachen e.V.
+/* Copyright (c) 2013, Roboterclub Aachen e.V.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -31,8 +31,8 @@
 #ifndef XPCC__SOFTWARE_SPI_HPP
 #define XPCC__SOFTWARE_SPI_HPP
 
-#include <stdint.h>
-#include "spi_master.hpp"
+#include "../../device.hpp"
+#include "../../drivers.hpp"
 #include <xpcc/architecture/driver/delay.hpp>
 
 namespace xpcc
@@ -45,34 +45,33 @@ namespace xpcc
 	 * \tparam	Miso		master in slave out pin [input]
 	 * \tparam	Frequency	requested SPI frequency in Hz (default = 2 MHz)
 	 * 
-	 * \ingroup	connectivity
+	 * \ingroup	spi
+	 * \author	Niklas Hauser
 	 * \see		gpio
 	 */
 	template< typename Clk,
 			  typename Mosi,
 			  typename Miso,
 			  int32_t Frequency = 2000000UL >
-	class SoftwareSpi : public SpiMaster
+	class SoftwareSpiMaster : public ::xpcc::SpiMaster
 	{
 	public:
-		static void
+		static inline void
 		initialize();
 		
 		static uint8_t
+		writeReadBlocking(uint8_t data);
+
+		static ALWAYS_INLINE void
+		writeBlocking(uint8_t data);
+
+		static ALWAYS_INLINE bool
 		write(uint8_t data);
-		
-		static bool
-		setBuffer(uint16_t length,
-				  uint8_t* transmit=0, uint8_t* receive=0,
-				  BufferIncrease bufferIncrease=BUFFER_INCR_BOTH);
-		
-		static bool
-		transfer(TransferOptions options=TRANSFER_SEND_BUFFER_SAVE_RECEIVE);
-		
-		static bool
-		transferSync(TransferOptions options=TRANSFER_SEND_BUFFER_SAVE_RECEIVE);
-		
-		static bool
+
+		static ALWAYS_INLINE uint8_t
+		getResult();
+
+		static ALWAYS_INLINE bool
 		isFinished();
 		
 	protected:
@@ -86,20 +85,46 @@ namespace xpcc
 		static Clk clk;
 		static Mosi mosi;
 		static Miso miso;
-		
-		static uint8_t* transmitBuffer;
-		static uint8_t* receiveBuffer;
-		static uint16_t bufferLength;
-		enum
-		{
-			BUFFER_TRANSMIT_INCR_bm = 0x01,
-			BUFFER_RECEIVE_INCR_bm = 0x02,
-			BUFFER_TRANSMIT_IS_NOT_ZERO_bm = 0x04,
-			BUFFER_RECEIVE_IS_NOT_ZERO_bm = 0x08,
-			BUFFER_IS_DUMMY_bm = 0x10,
-			BUFFER_IS_BUSY_SYNC_bm = 0x20
-		};
-		static uint8_t status;
+
+		static bool finished;
+		static uint8_t result;
+	};
+
+	/**
+	 * \brief	Software emulation of a SPI Block Master
+	 *
+	 * \tparam	Clk			clock pin [output]
+	 * \tparam	Mosi		master out slave in pin [output]
+	 * \tparam	Miso		master in slave out pin [input]
+	 * \tparam	Frequency	requested SPI frequency in Hz (default = 2 MHz)
+	 *
+	 * \ingroup	spi
+	 * \author	Niklas Hauser
+	 * \see		gpio
+	 */
+	template< typename Clk,
+				  typename Mosi,
+				  typename Miso,
+				  int32_t Frequency = 2000000UL >
+	class SoftwareSpiBlockMaster : public xpcc::SpiBlockMaster
+	{
+	public:
+		/**
+		 * \brief	Initialize SPI module
+		 *
+		 * This also sets the directions of the I/O pins.
+		 */
+		static ALWAYS_INLINE void
+		initialize();
+
+		static inline bool
+		start(uint8_t * tx, uint8_t * rx, std::size_t length, BufferOptions options=BufferOptions::TxRxIncrement);
+
+		static ALWAYS_INLINE bool
+		isFinished();
+
+	private:
+		static bool finished;
 	};
 }
 
