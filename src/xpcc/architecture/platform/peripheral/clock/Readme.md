@@ -1,5 +1,64 @@
-# Clock Driver  Interface
+# Clock Driver Interface
 
+In addition to platform specific functions, every _clock_ driver needs to
+implement two standardized interfaces:
+* a dynamic interface that supports changing configuration and frequency during
+  runtime
+* a static interface located in the _S_ subnamespace that should be used for
+  static configurations because it supports some compile time checks
+
+## Clock Interface Basics
+
+Both, the dynamic as well as the static interface, build on the same design:
+The goal is to represent different parts of a clock tree as separate classes
+that can be connected to each other.
+In addiditon to that the user needs to be able to diable as well as enable
+these building blocks where possible.
+
+### Clock Sources
+
+On almost every controller supported by XPCC there are three different clock
+sources:
+
+1. **InternalClock**: the clock the controller runs on at startup
+2. **ExternalClock**: an active external clock source
+3. **ExternalOscillator**: an external crystal oscillator that need to be
+  driven by the controller
+
+Please note that for example on the STM32 platform the _ExternalClock_ and the
+_ExternalOscillator_ both use the same hardware. Nonetheless the two separate
+classes need to implemented in orde to provide a common interface.
+
+### PLL
+
+An important part of every clock tree is a Pll. These are used to multiply
+an input frequency. Thus the need to be connected to a Clock Source and to
+be enabled with a target frequency as an argument. If there is more than one
+Pll on yout system, they should be called: Pll, Pll2, Pll3 etc.
+
+### The System Clock
+
+The **SystemClock** basically represents the multiplexer that is used to
+change the main clock source of the controller. Most of the time it can be
+connected to a Pll or to a Clock Source directly.
+
+## The Dynamic Interface
+
+**TODO**
+
+## The Static Interface
+
+**TODO**
+
+## TODO
+
+We need to find a way to fit the F_CPU define into our clock architecture.
+If someone uses the static clock setup only, F_CPU can be specified as a macro,
+but if someone was going to dynamically change clock speeds, this would
+probably break some things (_which??_).
+For dynamic clock control one could maybe use a value in ram that contains
+the CPU speed and is updated by the dynamic clock classes. However, this
+will mean worse performance and changing a lot of code.
 
 ## Current Interfaces
 
