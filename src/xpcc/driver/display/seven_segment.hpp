@@ -21,22 +21,22 @@ namespace xpcc {
 		static const
 		uint8_t segmentLutHex[] =
 		{
-				segA | segB | segC | segD | segE | segF, // 0
-				segB | segC,                             // 1
-				segA | segB | segG | segE | segD,        // 2
-				segA | segB | segC | segD | segG,        // 3
-				segF | segG | segB | segC,               // 4
-				segA | segF | segG | segC | segD,        // 5
-				segA | segF | segG | segC | segD | segE, // 6
-				segA | segB | segC,                      // 7
-				segA | segB | segC | segD | segE | segF | segG, // 8
-				segA | segB | segC | segD        | segF | segG, // 9
-				segA | segB | segC        | segE | segF | segG, // A
-				              segC | segD | segE | segF | segG, // b
-			    segA               | segD | segE | segF,        // C
-			           segB | segC | segD | segE |        segG, // d
-			    segA |               segD | segE | segF | segG, // E
-			    segA                      | segE | segF | segG, // F
+			segA | segB | segC | segD | segE | segF, // 0
+			segB | segC,                             // 1
+			segA | segB | segG | segE | segD,        // 2
+			segA | segB | segC | segD | segG,        // 3
+			segF | segG | segB | segC,               // 4
+			segA | segF | segG | segC | segD,        // 5
+			segA | segF | segG | segC | segD | segE, // 6
+			segA | segB | segC,                      // 7
+			segA | segB | segC | segD | segE | segF | segG, // 8
+			segA | segB | segC | segD        | segF | segG, // 9
+			segA | segB | segC        | segE | segF | segG, // A
+			              segC | segD | segE | segF | segG, // b
+			segA               | segD | segE | segF,        // C
+			       segB | segC | segD | segE |        segG, // d
+			segA               | segD | segE | segF | segG, // E
+			segA                      | segE | segF | segG, // F
 		};
 
 		/**
