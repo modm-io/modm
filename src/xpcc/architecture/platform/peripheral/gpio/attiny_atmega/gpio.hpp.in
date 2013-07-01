@@ -122,7 +122,7 @@ namespace xpcc
 		%% elif type == "Input"
 		struct GpioInput{{port ~ pin}} : Gpio, ::xpcc::GpioInput
 		%% elif type == ""
-		struct Gpio{{port ~ pin}} : Gpio, ::xpcc::GpioInput, ::xpcc::GpioOutput
+		struct Gpio{{port ~ pin}} : Gpio, ::xpcc::GpioIO
 		%% endif
 		{
 		%% if type in ["", "Output"]

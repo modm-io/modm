@@ -217,6 +217,16 @@ namespace xpcc
 	};
 
 	/**
+	 * \brief	Input/Output interface of an I/O pin
+	 *
+	 * \ingroup	gpio
+	 */
+	class GpioIO : GpioOutput, GpioInput
+	{
+		// there are no new methods here
+	};
+
+	/**
 	 * \brief	Input/output interface of a set of 4 I/O pins
 	 *
 	 * This class provides the interface for 4 parallel IOs.
