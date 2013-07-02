@@ -1,8 +1,8 @@
 // coding: utf-8
 // ----------------------------------------------------------------------------
-/* Copyright (c) 2009, Roboterclub Aachen e.V.
+/* Copyright (c) 2012, Roboterclub Aachen e.V.
  * All rights reserved.
- *
+ * 
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  * 
@@ -14,7 +14,7 @@
  *     * Neither the name of the Roboterclub Aachen e.V. nor the
  *       names of its contributors may be used to endorse or promote products
  *       derived from this software without specific prior written permission.
- *
+ * 
  * THIS SOFTWARE IS PROVIDED BY ROBOTERCLUB AACHEN E.V. ''AS IS'' AND ANY
  * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -28,83 +28,92 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_ATMEGA__SPI_HPP
-#define XPCC_ATMEGA__SPI_HPP
+#ifndef	XPCC_RPR__CONSTANTS_HPP
+#define	XPCC_RPR__CONSTANTS_HPP
 
-#include <avr/io.h>
 #include <stdint.h>
-#include <xpcc/driver/connectivity/spi/spi_master.hpp>
-#include <xpcc/architecture/utils.hpp>
 
 namespace xpcc
 {
-	namespace atmega
+	namespace rpr
 	{
 		/**
-		 * \brief	SPI master module
-		 * \ingroup	atmega
+		 * \brief	Message Types
+		 * \ingroup	token
 		 */
-		class SpiMaster : public xpcc::SpiMaster
+		enum MessageType
 		{
-		public:
-			enum Mode
-			{
-				MODE_0 = 0,				///< SCK normal, sample on rising edge
-				MODE_1 = (1 << CPHA),	///< SCK normal, sample on falling edge
-				MODE_2 = (1 << CPOL),	///< SCK inverted, sample on falling edge
-				MODE_3 = (1 << CPOL) | (1 << CPHA),	
-										///< SCK inverted, sample on rising edge
-			};
-			
-			enum Prescaler
-			{
-				PRESCALER_2 = 0x80 | 0,
-				PRESCALER_4 = 0,
-				PRESCALER_8 = 0x80 | (1 << SPR0),
-				PRESCALER_16 = (1 << SPR0),
-				PRESCALER_32 = 0x80 | (1 << SPR1),
-				PRESCALER_64 = (1 << SPR1),
-				PRESCALER_128 = (1 << SPR1) | (1 << SPR0),
-			};
-			
-		public:
-			/**
-			 * \brief	Initialize SPI module
-			 * 
-			 * \warning	This won't set the directions for the I/O pins. You have
-			 * 			to do this by yourself.
-			 */
-			static void
-			initialize(Mode mode, Prescaler prescaler);
-			
-			static inline uint8_t
-			write(uint8_t data)
-			{
-				SPDR = data;
-				// wait for the transmission to complete
-				while (!(SPSR & (1 << SPIF)))
-					;
-				return SPDR;
-			}
-			
-			static bool
-			setBuffer(uint16_t length,
-					  uint8_t* transmit=0, uint8_t* receive=0,
-					  BufferIncrease bufferIncrease=BUFFER_INCR_BOTH);
-			
-			static bool
-			transfer(TransferOptions options=TRANSFER_SEND_BUFFER_SAVE_RECEIVE);
-			
-			static inline bool
-			transferSync(TransferOptions options=TRANSFER_SEND_BUFFER_SAVE_RECEIVE)
-			{
-				return transfer(options);
-			}
-			
-			static bool
-			isFinished();
+			MESSAGE_TYPE_ANY,
+			MESSAGE_TYPE_UNICAST,
+			MESSAGE_TYPE_MULTICAST,
+			MESSAGE_TYPE_BROADCAST,
 		};
+		
+		enum CommandType
+		{
+			COMMAND_ANY = 0xff,
+		};
+		
+		enum AddressType
+		{
+			ADDRESS_ANY = 0xffff,
+		};
+		
+		typedef struct
+		{
+			// Destination Address
+			MessageType type;
+			uint16_t destination;
+			
+			// Source Address
+			uint16_t source;
+			
+			// Payload
+			uint8_t command;
+			uint8_t *payload;
+			std::size_t length;
+		}
+		Message;
+		
+		typedef struct
+		{
+			Message *message;
+		}
+		ErrorMessage;
+		
+//		private: // ?
+		/**
+		 * \brief	Bit Masks for the higher address byte
+		 * \ingroup	token
+		 */
+		enum Address
+		{
+			ADDRESS_INDIVIDUAL_GROUP = 0x8000,
+			ADDRESS_BROADCAST = 0xffff,
+			ADDRESS_VALUE = 0x7fff,
+		};
+		
+		/**
+		 * \brief	Maximum length for the payload
+		 * \ingroup	token
+		 */
+		const uint8_t maxPayloadLength = 48;
+		
+		/**
+		 * \internal
+		 * \ingroup	token
+		 */
+		const uint8_t startDelimiterByte = 0x7e;
+		const uint8_t endDelimiterByte = 0x7c;
+		const uint8_t controlEscapeByte = 0x7d;
+		
+		/**
+		 * \internal
+		 * \brief	Initial value for the CRC16 calculation
+		 * \ingroup	token
+		 */
+		const uint16_t crcInitialValue = 0xffff;
 	}
 }
 
-#endif // XPCC_ATMEGA__SPI_HPP
+#endif	// XPCC_RPR__CONSTANTS_HPP
