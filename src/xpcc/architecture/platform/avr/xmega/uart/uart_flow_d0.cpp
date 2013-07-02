@@ -38,7 +38,7 @@
 #include <xpcc/architecture/driver/atomic/queue.hpp>
 #include <xpcc/architecture/driver/atomic/lock.hpp>
 
-#include <xpcc/architecture/driver/gpio.hpp>
+#include <xpcc/architecture/peripheral/gpio.hpp>
 #include <xpcc/architecture/platform/avr/xmega/gpio.hpp>
 
 #include "uart_d0.hpp"

@@ -36,7 +36,7 @@
 #include "spi_c.hpp"
 
 #include <xpcc/architecture/platform/avr/xmega.hpp>
-#include <xpcc/architecture/driver/gpio.hpp>
+#include <xpcc/architecture/peripheral/gpio.hpp>
 
 #ifdef SPIC
 

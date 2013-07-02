@@ -128,7 +128,7 @@ namespace xpcc
 	 *
 	 * Example:
 	 * \code
-	 * #include <xpcc/architecture/driver/gpio.hpp>
+	 * #include <xpcc/architecture/peripheral/gpio.hpp>
 	 * #include <xpcc/driver/software_spi.hpp>
 	 *
 	 * namespace pin

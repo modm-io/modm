@@ -39,7 +39,7 @@
 // ----------------------------------------------------------------------------
 
 #include "spi_1.hpp"
-#include <xpcc/architecture/driver/gpio.hpp>
+#include <xpcc/architecture/peripheral/gpio.hpp>
 
 #ifdef __ARM_AT91SAM7X__
 

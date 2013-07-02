@@ -34,7 +34,7 @@
 #include <cstddef>
 #include <stdint.h>
 
-#include <xpcc/driver/interface.hpp>
+#include <xpcc/communication/interface.hpp>
 #include "constants.hpp"
 
 namespace xpcc

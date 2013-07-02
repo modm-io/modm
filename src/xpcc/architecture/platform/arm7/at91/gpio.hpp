@@ -31,7 +31,7 @@
 #ifndef XPCC_AT91__GPIO_HPP
 #define XPCC_AT91__GPIO_HPP
 
-#include <xpcc/architecture/driver/gpio.hpp>
+#include <xpcc/architecture/peripheral/gpio.hpp>
 #include "../at91.hpp"
 
 namespace xpcc

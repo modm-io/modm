@@ -84,6 +84,33 @@ namespace xpcc
 		static Clk clk;
 		static Mosi mosi;
 		static Miso miso;
+		static bool finished;
+		static uint8_t result;
+	};
+
+	template< typename Clk,
+			  typename Mosi,
+			  typename Miso,
+			  int32_t Frequency = 2000000UL >
+	class SoftwareSpiBlockMaster : public xpcc::SpiBlockMaster
+	{
+	public:
+		/**
+		 * \brief	Initialize SPI module
+		 *
+		 * This also sets the directions of the I/O pins.
+		 */
+		static ALWAYS_INLINE void
+		initialize();
+
+		static inline bool
+		start(uint8_t * tx, uint8_t * rx, std::size_t length, BufferOptions options=BufferOptions::TxRxIncrement);
+
+		static ALWAYS_INLINE bool
+		isFinished();
+
+	private:
+		static bool finished;
 	};
 }
 

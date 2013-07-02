@@ -79,7 +79,7 @@ RCC->{{ clock_tree }}RSTR &= ~(
 
 
 %% if output != 'gpio_enable.h'
-#include <xpcc/architecture/driver/gpio.hpp>
+#include <xpcc/architecture/peripheral/gpio.hpp>
 
 /**
  * Macros for backwards compatibility:

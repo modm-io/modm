@@ -22,7 +22,7 @@ xpcc::log::Logger xpcc::log::warning(loggerDevice);
 xpcc::log::Logger xpcc::log::error(loggerDevice);
 // ----------------------------------------------------------------------------
 
-#include <xpcc/architecture/driver/gpio.hpp>
+#include <xpcc/architecture/peripheral/gpio.hpp>
 GPIO__IO(scl, 0, 4);
 GPIO__IO(sda, 0, 5);
 GPIO__OUTPUT(rot, 0, 6);

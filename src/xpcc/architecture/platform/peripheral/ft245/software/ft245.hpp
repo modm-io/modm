@@ -31,8 +31,8 @@
 #ifndef XPCC__FT245_HPP
 #define XPCC__FT245_HPP
 
-#include <stdint.h>
-#include <xpcc/architecture/driver/gpio.hpp>
+#include "../../../drivers.hpp"
+#include <xpcc/architecture/peripheral/gpio.hpp>
 
 
 namespace xpcc

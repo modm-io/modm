@@ -32,7 +32,7 @@
 #define XPCC__SHIFT_REGISTER_INPUT_HPP
 
 #include <xpcc/architecture/utils.hpp>
-#include <xpcc/architecture/driver/gpio.hpp>
+#include <xpcc/architecture/peripheral/gpio.hpp>
 
 namespace xpcc
 {

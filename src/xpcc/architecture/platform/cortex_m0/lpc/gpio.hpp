@@ -31,7 +31,7 @@
 #ifndef XPCC_LPC11XX__GPIO_HPP
 #define XPCC_LPC11XX__GPIO_HPP
 
-#include <xpcc/architecture/driver/gpio.hpp>
+#include <xpcc/architecture/peripheral/gpio.hpp>
 
 // All these pins are not GPIOs as default.
 // Some special handling is necessary.

@@ -2,7 +2,7 @@
 #define XPCC__SEVEN_SEGMENT_DISPLAY_HPP
 
 #include <stdint.h>
-#include <xpcc/architecture/driver/gpio.hpp>
+#include <xpcc/architecture/peripheral/gpio.hpp>
 
 namespace xpcc {
 	namespace sevenSegment {

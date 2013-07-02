@@ -31,7 +31,7 @@
 
 #include <avr/io.h>
 #include <xpcc/architecture/platform/avr/xmega.hpp>
-#include <xpcc/architecture/driver/gpio.hpp>
+#include <xpcc/architecture/peripheral/gpio.hpp>
 #include "../dma.hpp"
 #include "spi_{{ id[0].lower() }}.hpp"
 #include "xpcc_config.hpp"

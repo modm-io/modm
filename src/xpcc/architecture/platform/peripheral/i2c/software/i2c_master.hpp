@@ -32,6 +32,7 @@
 #define XPCC__SOFTWARE_I2C_HPP
 
 #include <xpcc/architecture/driver/delay.hpp>
+#include <xpcc/architecture/peripheral/gpio.hpp>
 #include <xpcc/architecture/peripheral/i2c.hpp>
 #include <xpcc/communication/i2c/delegate.hpp>
 

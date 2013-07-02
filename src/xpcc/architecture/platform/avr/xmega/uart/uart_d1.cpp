@@ -37,7 +37,7 @@
 #include <avr/interrupt.h>
 
 #include <xpcc/architecture/platform/avr/xmega.hpp>
-#include <xpcc/architecture/driver/gpio.hpp>
+#include <xpcc/architecture/peripheral/gpio.hpp>
 
 #include "uart_d1.hpp"
 

@@ -67,7 +67,7 @@ uint8_t
 xpcc::SoftwareSpiMaster<Clk, Mosi, Miso, Frequency>::writeReadBlocking(uint8_t data)
 {
 	if (!isFinished())
-			return false;
+		return 0;
 	finished = false;
 
 	uint8_t input = 0;

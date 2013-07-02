@@ -32,7 +32,7 @@
 #define XPCC__TLC594X_HPP
 
 #include <stdint.h>
-#include <xpcc/architecture/driver/gpio.hpp>
+#include <xpcc/architecture/peripheral/gpio.hpp>
 #include <xpcc/architecture/driver/delay.hpp>
 
 namespace xpcc

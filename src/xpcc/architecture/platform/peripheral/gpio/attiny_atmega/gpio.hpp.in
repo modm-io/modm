@@ -33,7 +33,7 @@
 
 #include "../../../device.hpp"
 #include "gpio_define.h"
-#include <xpcc/architecture/peripeheral/gpio.hpp>
+#include <xpcc/architecture/peripheral/gpio.hpp>
 
 /**
  * Macros for backwards compatibility:

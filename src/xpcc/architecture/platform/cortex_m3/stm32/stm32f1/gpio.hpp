@@ -31,7 +31,7 @@
 #ifndef XPCC_STM32F1__GPIO_HPP
 #define XPCC_STM32F1__GPIO_HPP
 
-#include <xpcc/architecture/driver/gpio.hpp>
+#include <xpcc/architecture/peripheral/gpio.hpp>
 
 #if defined LIBMAPLE
 #include <libmaple/gpio.h>

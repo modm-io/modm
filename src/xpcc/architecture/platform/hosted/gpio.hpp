@@ -34,7 +34,7 @@
 #ifndef __DOXYGEN__
 
 #include <xpcc/architecture/utils.hpp>
-#include <xpcc/architecture/driver/gpio.hpp>
+#include <xpcc/architecture/peripheral/gpio.hpp>
 
 // ----------------------------------------------------------------------------
 /**

@@ -31,7 +31,7 @@
 #ifndef XPCC_STM32F3__GPIO_HPP
 #define XPCC_STM32F3__GPIO_HPP
 
-#include <xpcc/architecture/driver/gpio.hpp>
+#include <xpcc/architecture/peripheral/gpio.hpp>
 #include "../device.h"
 
 /* 
