@@ -59,7 +59,7 @@ namespace xpcc
 	{
 	public:
 		/**
-		 * \todo	some helper programs/formular to choose the right
+		 * \todo	some helper programs/formula to choose the right
 		 * 			parameter values (e.g. the java tool from the last year)
 		 * 
 		 * \param	increment	=> increment per timestep

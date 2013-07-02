@@ -121,7 +121,7 @@ xpcc::SCurveController<T>::update(T error, const T& speed)
 	}
 	
 	output = std::min(outputIncrement, outputDecrement);
-	// TODO smoth breaking if the speedMaximum has changed to a lower value
+	// TODO smooth breaking if the speedMaximum has changed to a lower value
 	output = std::min(output, parameter.speedMaximum);
 	
 	if (output < parameter.speedMinimum) {

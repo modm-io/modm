@@ -23,6 +23,9 @@ namespace xpcc
 		public:
 			Uart1(uint32_t baudrate);
 
+			static void
+			initialize(uint32_t baudrate);
+
 			/**
 			 * \brief	Write a single bytes
 			 *

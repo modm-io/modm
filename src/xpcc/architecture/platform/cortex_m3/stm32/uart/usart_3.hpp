@@ -62,7 +62,7 @@ namespace xpcc
 			
 			enum Mapping
 			{
-#if defined(STM32F2XX) || defined(STM32F4XX)
+#if defined(STM32F2XX) || defined(STM32F3XX) || defined(STM32F4XX)
 				REMAP_PB10_PB11,	///< TX/PB10, RX/PB11, CK/PB12, CTS/PB13, RTS/PB14
 				REMAP_PC10_PC11,	///< TX/PC10, RX/PC11, CK/PC12, CTS/PB13, RTS/PB14
 				REMAP_PD8_PD9,		///< TX/PD8, RX/PD9, CK/PD10, CTS/PD11, RTS/PD12
@@ -161,7 +161,7 @@ namespace xpcc
 			
 			enum Mapping
 			{
-#if defined(STM32F2XX) || defined(STM32F4XX)
+#if defined(STM32F2XX) || defined(STM32F3XX) || defined(STM32F4XX)
 				REMAP_PB10_PB11,	///< TX/PB10, RX/PB11, CK/PB12, CTS/PB13, RTS/PB14
 				REMAP_PC10_PC11,	///< TX/PC10, RX/PC11, CK/PC12, CTS/PB13, RTS/PB14
 				REMAP_PD8_PD9,		///< TX/PD8, RX/PD9, CK/PD10, CTS/PD11, RTS/PD12
@@ -279,7 +279,7 @@ namespace xpcc
 			
 			enum Mapping
 			{
-#if defined(STM32F2XX) || defined(STM32F4XX)
+#if defined(STM32F2XX) || defined(STM32F3XX) || defined(STM32F4XX)
 				REMAP_PB10_PB11,	///< TX/PB10, RX/PB11, CK/PB12, CTS/PB13, RTS/PB14
 				REMAP_PC10_PC11,	///< TX/PC10, RX/PC11, CK/PC12, CTS/PB13, RTS/PB14
 				REMAP_PD8_PD9,		///< TX/PD8, RX/PD9, CK/PD10, CTS/PD11, RTS/PD12
@@ -361,8 +361,6 @@ namespace xpcc
 		/**
 		 * \brief		USART3 in SPI master mode
 		 * 
-		 * FIXME currently not working!
-		 * 
 		 * \ingroup		stm32
 		 */
 		class UsartSpi3 : public UartBase
@@ -413,7 +411,7 @@ namespace xpcc
 				REMAP_PD10,
 			};
 			
-			ALWAYS_INLINE void
+			ALWAYS_INLINE static void
 			configureTxPin(MappingTx mapping)
 			{
 				switch (mapping) {
@@ -423,7 +421,7 @@ namespace xpcc
 				}
 			}
 			
-			ALWAYS_INLINE void
+			ALWAYS_INLINE static void
 			configureRxPin(MappingRx mapping)
 			{
 				switch (mapping) {
@@ -433,7 +431,7 @@ namespace xpcc
 				}
 			}
 			
-			ALWAYS_INLINE void
+			ALWAYS_INLINE static void
 			configureCkPin(MappingCk mapping)
 			{
 				switch (mapping) {
@@ -444,9 +442,21 @@ namespace xpcc
 			}
 			
 			/**
-			 * Constructor
+			 * @brief	Initialize module in syncronous mode (SPI)
+			 * 
+			 * The bitrate is calculated in the same manner as for the
+			 * asynchronous mode and is limited.
+			 * 
+			 * @param	bitrate		Desired Frequency of the SPI clock.
+			 * @param	mode		Select the Spi Mode. Default is MODE_0.
+			 * @param	over8		Using over8 sets the Oversampling down from 16
+			 * 			to 8 however in SPI Mode this has effect on
+			 * 			sample and hold time only, since Data are sampled
+			 * 			at clock edges. Benefit of over8 is a doubled maximum
+			 * 			bitrate.
 			 */
-			UsartSpi3(uint32_t bitrate, Mode mode = MODE_0);
+			static void
+			initialize(uint32_t bitrate, Mode mode = MODE_0, bool over8 = false);
 			
 			/**
 			 * Transfer byte.

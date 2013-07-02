@@ -53,4 +53,10 @@ public:
 	
 	void
 	testIntersectionPointsLineSegment();
+	
+	void
+	testPointContainedCW();
+	
+	void
+	testPointContainedCCW();
 };

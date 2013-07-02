@@ -121,37 +121,51 @@ namespace xpcc
 	}
 }
 
+// these macros are defined like this to avoid the dangling else problem.
+// if (condition)
+// 		XPCC_LOG_DEBUG << "string";
+// else
+//		expression;
+
+/**
+ * \brief	Turn off messages print
+ * \ingroup logger
+ */
+#define XPCC_LOG_OFF \
+	if ( true ){}	\
+	else xpcc::log::debug
+
 /**
  * \brief	Output stream for debug messages
  * \ingroup logger
  */
 #define XPCC_LOG_DEBUG \
-	if (XPCC_LOG_LEVEL <= xpcc::log::DEBUG)	\
-		xpcc::log::debug
+	if (XPCC_LOG_LEVEL > xpcc::log::DEBUG){} \
+	else xpcc::log::debug
 
 /**
  * \brief	Output stream for info messages
  * \ingroup logger
  */
 #define XPCC_LOG_INFO \
-	if (XPCC_LOG_LEVEL <= xpcc::log::INFO)	\
-		xpcc::log::info
+	if (XPCC_LOG_LEVEL > xpcc::log::INFO){}	\
+	else xpcc::log::info
 
 /**
  * \brief	Output stream for warnings
  * \ingroup logger
  */
 #define XPCC_LOG_WARNING \
-	if (XPCC_LOG_LEVEL <= xpcc::log::WARNING)	\
-		xpcc::log::warning
+	if (XPCC_LOG_LEVEL > xpcc::log::WARNING){}	\
+	else xpcc::log::warning
 
 /**
  * \brief	Output stream for error messages
  * \ingroup logger
  */
 #define XPCC_LOG_ERROR \
-	if (XPCC_LOG_LEVEL <= xpcc::log::ERROR)	\
-		xpcc::log::error
+	if (XPCC_LOG_LEVEL > xpcc::log::ERROR){}	\
+	else xpcc::log::error
 
 #ifdef __DOXYGEN__
 

@@ -36,11 +36,14 @@
 
 #include <xpcc_config.hpp>
 
+{{ template.apbClkDefinitions(id) }}
+
 #if defined(STM32F2XX) || defined(STM32F4XX)
 
 // ----------------------------------------------------------------------------
-xpcc::stm32::{{ className }}Spi{{ id }}::{{ className }}Spi{{ id }}(
-		uint32_t bitrate, Mode mode)
+void
+xpcc::stm32::{{ className }}Spi{{ id }}::initialize(
+		uint32_t bitrate, Mode mode, bool over8)
 {
 	// Enable clock
 	{% if id in [1, 6] -%}
@@ -52,11 +55,14 @@ xpcc::stm32::{{ className }}Spi{{ id }}::{{ className }}Spi{{ id }}(
 	USART{{ id }}->CR1 = 0;
 	
 	// Set baudrate
-	{% if id in [1, 6] -%}
-	USART{{ id }}->BRR = calculateBaudrateSettings(STM32_APB2_FREQUENCY, bitrate);
-	{%- elif id in [2, 3] -%}
-	USART{{ id }}->BRR = calculateBaudrateSettings(STM32_APB1_FREQUENCY, bitrate);
-	{%- endif %}
+	if (over8) {
+		const uint16_t brr = calculateBaudrateSettings(apbClk, bitrate/2);
+		USART{{ id }}->CR1 |= USART_CR1_OVER8;
+		USART{{ id }}->BRR = (USART_BRR_DIV_Mantissa & brr) | ((USART_BRR_DIV_Fraction & brr)>>1);
+	}
+	else {
+		USART{{ id }}->BRR = calculateBaudrateSettings(apbClk, bitrate);
+	}
 	
 	USART{{ id }}->CR2 = USART_CR2_CLKEN | USART_CR2_LBCL | mode;
 	USART{{ id }}->CR3 = 0;
@@ -70,11 +76,11 @@ xpcc::stm32::{{ className }}Spi{{ id }}::{{ className }}Spi{{ id }}(
 uint8_t
 xpcc::stm32::{{ className }}Spi{{ id }}::write(uint8_t data)
 {
-	USART{{ id }}->DR = data;
+	USART{{ id }}->DR = __REV(__RBIT(data));
 	while (!(USART{{ id }}->SR & USART_SR_RXNE)) {
 		// wait until the transmission is finished
 	}
-	return USART{{ id }}->DR;
+	return __REV(__RBIT(USART{{ id }}->DR));
 }
 
 #endif

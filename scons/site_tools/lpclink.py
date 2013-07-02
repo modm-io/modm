@@ -27,6 +27,7 @@
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import platform
+import glob
 from SCons.Script import *
 
 # -----------------------------------------------------------------------------
@@ -57,9 +58,13 @@ def generate(env, **kw):
 		env['LPCLINK_COMSTR'] 		= "LPC-Link: program $SOURCE"
 		env['LPCLINK_DEBUG_COMSTR'] = "LPC-Link: starting debugger"
 			
-	env['LPCDFU'] = '/opt/lpcxpresso/lpcxpresso/bin/dfu-util'
-	env['LPCLINK_FIRMWARE'] = '/opt/lpcxpresso/lpcxpresso/bin/LPCXpressoWIN.enc'
-	env['LPCLINK'] = '/opt/lpcxpresso/lpcxpresso/bin/crt_emu_lpc11_13_nxp'
+	basePath = '/opt/lpcxpresso/'
+	if platform.system() == 'Darwin':
+		basePath = glob.glob('/Applications/lpcxpresso_*/')[0]
+	
+	env['LPCDFU'] = basePath + 'lpcxpresso/bin/dfu-util'
+	env['LPCLINK_FIRMWARE'] = basePath + 'lpcxpresso/bin/LPCXpressoWIN.enc'
+	env['LPCLINK'] = basePath + 'lpcxpresso/bin/crt_emu_lpc11_13_nxp'
 	env['GDB_PORT'] = '3333'
 
 	# CPU for LPCLINK must be upper-case and underscore must be replace by slash

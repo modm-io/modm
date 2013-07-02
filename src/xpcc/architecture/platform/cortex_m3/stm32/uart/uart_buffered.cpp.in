@@ -48,15 +48,38 @@ namespace
 }
 
 {{ template.pinDefinitions(id) }}
+{{ template.apbClkDefinitions(id) }}
 
 // ----------------------------------------------------------------------------
 {{ template.configurePins('Buffered'+className, id) }}
 
 // ----------------------------------------------------------------------------
+#if defined(STM32F3XX)
+	#define USART_SR_RXNE USART_ISR_RXNE
+	#define USART_SR_TXE  USART_ISR_TXE
+
+	// new register names for STM32F3 series
+	#define {{ className | upper }}{{ id }}_SR \
+		{{ className | upper }}{{ id }}->ISR
+	#define {{ className | upper }}{{ id }}_RDR \
+		{{ className | upper }}{{ id }}->RDR
+	#define {{ className | upper }}{{ id }}_TDR \
+		{{ className | upper }}{{ id }}->TDR
+
+#else
+	#define {{ className | upper }}{{ id }}_SR \
+		{{ className | upper }}{{ id }}->SR
+	#define {{ className | upper }}{{ id }}_RDR \
+		{{ className | upper }}{{ id }}->DR
+	#define {{ className | upper }}{{ id }}_TDR \
+		{{ className | upper }}{{ id }}->DR
+#endif
+
 extern "C" void
 {{ className | upper }}{{ id }}_IRQHandler()
 {
-	uint32_t state = {{ className | upper }}{{ id }}->SR;
+
+	uint32_t state = {{ className | upper }}{{ id }}_SR;
 	
 	// Read Data Register not empty 
 	if (state & USART_SR_RXNE)
@@ -65,7 +88,7 @@ extern "C" void
 		// error |= USART{{ id }}_STATUS & (USART_FERR_bm | USART_BUFOVF_bm | USART_PERR_bm);
 		
 		// Then read the buffer (read from DR clears the RXNE flag)
-		uint8_t data = {{ className | upper }}{{ id }}->DR;
+		uint8_t data = {{ className | upper }}{{ id }}_RDR;
 		
 		rxBuffer.push(data);
 	}
@@ -81,7 +104,7 @@ extern "C" void
 		else {
 			// get one byte from buffer and write it to the UART buffer
 			// which starts the transmission
-			{{ className | upper}}{{ id }}->DR = txBuffer.get();
+			{{ className | upper}}{{ id }}_TDR = txBuffer.get();
 			txBuffer.pop();
 		}
 	}

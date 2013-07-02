@@ -1,7 +1,7 @@
 // ----------------------------------------------------------------------------
 
 #ifndef CONFIG_HPP
-#define	CONFIG_HPP
+#define	 CONFIG_HPP
 
 #include <xpcc/architecture.hpp>
 #include <xpcc/driver/connectivity/spi.hpp>
@@ -76,11 +76,20 @@ namespace adc
 	// --				AD2
 	// POSITION	PIO1.2	AD3 (Servo)
 	// --		SWD		AD4
-	// POTI		PIO1.4	AD5
+	// POTI		PIO1.4	AD5 (Board)
 	// BEMF_A	PIO1.10	AD6
 	// BEMF_B	PIO1.11	AD7
 
-	typedef xpcc::lpc111x::AdcAutomaticBurst Adc;
+	typedef xpcc::lpc111x::AdcManualSingle Adc;
+
+	enum class Channel
+	{
+		BATTERY		= Adc::Channel::CHANNEL_0,
+		CURRENT 	= Adc::Channel::CHANNEL_1,
+		POSITION	= Adc::Channel::CHANNEL_3,
+		BEMF_A		= Adc::Channel::CHANNEL_6,
+		BEMF_B		= Adc::Channel::CHANNEL_7,
+	};
 }
 
 namespace servo
@@ -95,6 +104,27 @@ namespace servo
 namespace usb
 {
 	typedef xpcc::lpc::Uart1 uart;
+}
+
+namespace logger
+{
+	// Create a struct with all channels that should be
+	// observed with the logger.
+//	struct Sample
+//	{
+//		int16_t pwm;
+//		int16_t speedTicks;
+//		int16_t speedTime;
+//		int16_t current;
+//		uint8_t currentLimited;
+//	} __attribute__((packed));
+
+	struct Sample
+	{
+		int16_t current;
+		int16_t current_filtered;
+		int16_t position;
+	} __attribute__((packed));
 }
 
 #endif	// CONFIG_HPP

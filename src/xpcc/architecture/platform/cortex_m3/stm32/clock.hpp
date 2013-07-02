@@ -30,6 +30,10 @@
 
 #if defined(STM32F2XX) || defined(STM32F4XX)
 #	include "stm32f2_4/clock.hpp"
-#else
+#elif defined(STM32F3XX)
+#	include "stm32f3/clock.hpp"
+#elif defined(STM32F10X)
 #	include "stm32f1/clock.hpp"
+#else
+#error "Please be more specific about what peripheral should be included."
 #endif

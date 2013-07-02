@@ -41,7 +41,11 @@ Postman::deliverPacket(const xpcc::Header& header, const xpcc::SmartPointer& pay
 	{%- for action in component.actions %}
 				case robot::action::{{ action.name | CAMELCASE }}:
 		{%- if action.parameterType != None %}
+			{%- if action.parameterType.isBuiltIn %}
+					component::{{ component.name | camelCase }}.action{{ action.name | CamelCase }}(response, &payload.get<{{ action.parameterType.name | CamelCase }}>());
+			{%- else %}
 					component::{{ component.name | camelCase }}.action{{ action.name | CamelCase }}(response, &payload.get<robot::packet::{{ action.parameterType.name | CamelCase }}>());
+			{%- endif %}
 		{%- else %}
 					component::{{ component.name | camelCase }}.action{{ action.name | CamelCase }}(response);
 		{%- endif %}

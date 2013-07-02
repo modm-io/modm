@@ -46,7 +46,7 @@ xpcc::stm32::Clock::enableHse(HseConfig config, uint32_t waitCycles)
 	while (!(RCC->CR & RCC_CR_HSERDY) && --t) {
 	}
 
-	return RCC->CR & RCC_CR_HSERDY;
+	return (RCC->CR & RCC_CR_HSERDY);
 }
 
 // ----------------------------------------------------------------------------
