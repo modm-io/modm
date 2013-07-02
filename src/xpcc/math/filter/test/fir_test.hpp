@@ -5,7 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -27,18 +27,19 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 // ----------------------------------------------------------------------------
-/**
- * \ingroup		math
- * \defgroup	filter	Filter
- * \brief		Some filter
- *
- */
 
-#include "filter/debounce.hpp"
-#include "filter/fir.hpp"
-#include "filter/median.hpp"
-#include "filter/moving_average.hpp"
-#include "filter/pid.hpp"
-#include "filter/ramp.hpp"
-#include "filter/s_curve_controller.hpp"
-#include "filter/s_curve_generator.hpp"
+#include <unittest/testsuite.hpp>
+
+class FirTest : public unittest::TestSuite
+{
+public:
+
+	void
+	testFir();
+
+private:
+	/* Length of results array needs to be len(taps) + len(coeff) */
+	template<typename T, int N, int BLOCK_SIZE, unsigned int ScaleFactor>
+	void testFilter(const float (&coeff)[N],
+		const T taps[], int taps_length, const T results[]);
+};

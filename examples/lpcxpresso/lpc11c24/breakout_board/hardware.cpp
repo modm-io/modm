@@ -43,12 +43,31 @@ Hardware::initialize()
 	ssd::Ssel::setOutput();
 	ssd::Load::setOutput();
 
-	uint8_t mask = static_cast<uint8_t>(adc::Adc::ChannelMask::PIO1_2);
-	uint8_t interruptMask = static_cast<uint8_t>(adc::Adc::ChannelMask::PIO1_2);
+	/**
+	 * Convert
+	 *   AD1	Current
+	 *   AD3	Position
+	 *   AD6/7	BEMF
+	 */
+	uint8_t mask =
+			static_cast<uint8_t>(adc::Adc::ChannelMask::CHANNEL_1)  |
+			static_cast<uint8_t>(adc::Adc::ChannelMask::CHANNEL_3)  |
+			static_cast<uint8_t>(adc::Adc::ChannelMask::PIO1_10) |
+			static_cast<uint8_t>(adc::Adc::ChannelMask::PIO1_11);
 
 	adc::Adc::configurePins(mask);
 	adc::Adc::initialize();
-	adc::Adc::startConversion(mask, interruptMask);
+
+	// enable ADC interrupt at end of single conversion
+	uint8_t interruptMask =
+			static_cast<uint8_t>(adc::Adc::ChannelMask::CHANNEL_1) |
+			static_cast<uint8_t>(adc::Adc::ChannelMask::CHANNEL_3);
+	LPC_ADC->INTEN = 0;
+	LPC_ADC->INTEN = interruptMask;
+
+	/* Enable interrupts */
+	NVIC_EnableIRQ(ADC_IRQn);
+
 
 	// PIO1_1 is a reserved pin and must be set as a GPIO first.
 	ssd::Pwm::setOutput();
@@ -59,10 +78,8 @@ Hardware::initialize()
 
 	can::Can::initialize(xpcc::can::BITRATE_125_KBPS);
 
-	usb::uart uart(1000000);
-	usb::uart::setBaudrate(1500000);
-	uint8_t str[] = "Hello!";
-	usb::uart::write(str, 12);
+	usb::uart::initialize(3000000);
+	usb::uart::write('#'); // start char
 
 	servo::EnA::setOutput(0);
 	servo::EnB::setOutput(0);
@@ -74,6 +91,24 @@ Hardware::initialize()
 	servo::pwmTimer::setModePwm(0x03, 2000);
 	servo::pwmTimer::setMatchValue(0, 2000); // off
 	servo::pwmTimer::setMatchValue(1, 2000); // off
+
+	/**
+	 * Adjust sampling point so that the current is measured just
+	 * before the PWM is switch off.
+	 *
+	 */
+
+	// Use MAT2 Interrupt for current measurement.
+	// Adjust the sampling point just before PWM is switched off.
+	servo::pwmTimer::setMatchValue(2, 1550);
+
+	// Interrupt on cycle
+	// MR2 to call interrupt whenever the Timer Counter is reset
+	LPC_TMR16B0->MCR |= (1 << 6); // (1 << MR2I);
+
+	/* Enable interrupts */
+	NVIC_EnableIRQ(TIMER_16_0_IRQn);
+
 }
 
 // ----------------------------------------------------------------------------

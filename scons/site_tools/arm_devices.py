@@ -48,6 +48,13 @@ devices = \
 		"size": { "flash": 32768, "ram": 8192 },
 	},
 	
+	"lpc1115_303":
+	{
+		"defines": ["__ARM_LPC11XX__",],
+		"linkerscript": "cortex_m0/lpc/linker/lpc1115_303.ld",
+		"size": { "flash": 65536, "ram": 8192 },
+	},
+	
     # Integrated CAN transceiver
 	"lpc11c22_301":
 	{
