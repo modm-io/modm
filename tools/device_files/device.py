@@ -202,8 +202,22 @@ class DeviceFile:
 		s = DeviceIdentifier(device_string)
 		if s.valid == False:
 			return None
-		# Loop Through Drivers
+		
 		drivers = []
+		# find software implementations of drivers
+		# these have to be added as too
+		per_dir = os.path.join(platform_path, 'peripheral')
+		for peripheral in [p for p in os.listdir(per_dir) if os.path.isdir(os.path.join(per_dir, p))]:
+			name_dir = os.path.join(per_dir, peripheral)
+			for name in [n for n in os.listdir(name_dir) if os.path.isdir(os.path.join(name_dir, n)) and n == 'software']:
+				d = Driver(self, et.Element('driver', {'type': peripheral, 'name': 'software'}))
+				if d.appliesTo(s, self.properties):
+					substitutions = s.getTargetDict()
+					substitutions.update(self.getSubstitutions())
+					drivers.append(d.toDict(platform_path, substitutions, s, self.properties))
+		
+		
+		# Loop Through Drivers
 		for d in self.drivers:
 			if d.appliesTo(s, self.properties):
 				substitutions = s.getTargetDict()
