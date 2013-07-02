@@ -39,7 +39,6 @@ namespace xpcc {
 		 * \brief		Proviede the handling of the socket interface from TIPC.
 		 * 
 		 * \ingroup		tipc
-		 * \version		$Id: tipc_transmitter_socket.hpp 607 2011-09-13 19:51:03Z dergraaf $
 		 * \author		Carsten Schmitt < >
 		 */
 		class TransmitterSocket {

@@ -74,6 +74,8 @@ devices = [
 	{ 'path': 'release/tests/stm32',	'arch': 'cortex-m3',	'device': 'stm32f107vc',	'clock':  72000000 },	# connectivity
 	{ 'path': 'release/tests/stm32',	'arch': 'cortex-m3',	'device': 'stm32f205ve',	'clock': 120000000 },
 	{ 'path': 'release/tests/stm32',	'arch': 'cortex-m3',	'device': 'stm32f207ze',	'clock': 120000000 },
+	{ 'path': 'release/tests/stm32',	'arch': 'cortex-m4',	'device': 'stm32f303cb',	'clock':  72000000 },
+	{ 'path': 'release/tests/stm32',	'arch': 'cortex-m4',	'device': 'stm32f303cc',	'clock':  72000000 },
 	{ 'path': 'release/tests/stm32',	'arch': 'cortex-m4',	'device': 'stm32f405vg',	'clock': 168000000 },
 	{ 'path': 'release/tests/stm32',	'arch': 'cortex-m4',	'device': 'stm32f407vg',	'clock': 168000000 },
 ]
@@ -99,10 +101,6 @@ if check is not None:
 	if check in ['all', 'examples']:
 		result.append("Examples")
 		for path, directories, files in os.walk('examples'):
-			# exclude the SVN-directories
-			if '.svn' in directories:
-				directories.remove('.svn')
-		
 			if 'SConstruct' in files:
 				exitStatus = os.system("scons -Q -C %s build" % path)
 				if exitStatus == 0:
@@ -113,6 +111,9 @@ if check is not None:
 				if exitStatus != 0:
 					everythingOk = False
 	
+	# Check if the XPCC library compiles against different targets without errors. 
+	# The examples from xpcc/release/tests are compiled for all targets from the
+	# list 'devices' (at top of this file. 
 	if check in ['all', 'devices']:
 		result.append("\nDevices")
 		for device in devices:

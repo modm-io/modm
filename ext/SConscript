@@ -25,8 +25,6 @@
 # ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-# 
-# $Id$
 
 import os
 
@@ -63,6 +61,15 @@ if env['ARCHITECTURE'].startswith('cortex-m3/stm32f2'):
 		'stm32f2xx_lib/CMSIS/CM3/DeviceSupport/ST/STM32F2xx',
 		'stm32f2xx_lib/STM32F2xx_StdPeriph_Driver/inc']
 
+if env['ARCHITECTURE'].startswith('cortex-m4/stm32f3'):
+	sourcePath += [
+		'stm32f3xx_lib/STM32F3xx_StdPeriph_Driver/src',
+		]
+	globalIncludes += [
+		'stm32f3xx_lib/CMSIS/Include',
+		'stm32f3xx_lib/CMSIS/Device/ST/STM32F30x/Include',
+		'stm32f3xx_lib/STM32F30x_StdPeriph_Driver/inc',
+		]
 if env['ARCHITECTURE'].startswith('cortex-m4/stm32f4'):
 	#sourcePath += [
 	#	'stm32f4xx_lib/STM32F4xx_StdPeriph_Driver/src']

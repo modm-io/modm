@@ -34,10 +34,6 @@
 #include <xpcc/architecture/driver/delay.hpp>
 #include "master.hpp"
 
-// debugging for dummies
-//#define DEBUG_SW_I2C(x) xpcc::atxmega::BufferedUartF0::write(x)
-#define DEBUG_SW_I2C(x)
-
 namespace xpcc
 {
 	/**
@@ -112,11 +108,14 @@ namespace xpcc
 		writeBit(bool bit);
 		
 		static inline void
+		sclSetAndWait();
+
+		static inline void
 		delay();
 		
 		// calculate the delay in microseconds needed to achieve the
 		// requested SPI frequency
-		static const float delayTime = (1000000.0 / Frequency) / 2.0;
+		static constexpr float delayTime = (1000000.0 / Frequency) / 2.0;
 		
 		static Scl scl;
 		static Sda sda;

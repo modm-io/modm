@@ -40,11 +40,17 @@
 
 #include <xpcc_config.hpp>
 
+namespace
+{
+	static const uint32_t apbClk = STM32_APB2_FREQUENCY;	// APB2
+}
+
 #if defined(STM32F2XX) || defined(STM32F4XX)
 
 // ----------------------------------------------------------------------------
-xpcc::stm32::UsartSpi6::UsartSpi6(
-		uint32_t bitrate, Mode mode)
+void
+xpcc::stm32::UsartSpi6::initialize(
+		uint32_t bitrate, Mode mode, bool over8)
 {
 	// Enable clock
 	RCC->APB2ENR |= RCC_APB2ENR_USART6EN;
@@ -52,7 +58,14 @@ xpcc::stm32::UsartSpi6::UsartSpi6(
 	USART6->CR1 = 0;
 	
 	// Set baudrate
-	USART6->BRR = calculateBaudrateSettings(STM32_APB2_FREQUENCY, bitrate);
+	if (over8) {
+		const uint16_t brr = calculateBaudrateSettings(apbClk, bitrate/2);
+		USART6->CR1 |= USART_CR1_OVER8;
+		USART6->BRR = (USART_BRR_DIV_Mantissa & brr) | ((USART_BRR_DIV_Fraction & brr)>>1);
+	}
+	else {
+		USART6->BRR = calculateBaudrateSettings(apbClk, bitrate);
+	}
 	
 	USART6->CR2 = USART_CR2_CLKEN | USART_CR2_LBCL | mode;
 	USART6->CR3 = 0;
@@ -66,11 +79,11 @@ xpcc::stm32::UsartSpi6::UsartSpi6(
 uint8_t
 xpcc::stm32::UsartSpi6::write(uint8_t data)
 {
-	USART6->DR = data;
+	USART6->DR = __REV(__RBIT(data));
 	while (!(USART6->SR & USART_SR_RXNE)) {
 		// wait until the transmission is finished
 	}
-	return USART6->DR;
+	return __REV(__RBIT(USART6->DR));
 }
 
 #endif

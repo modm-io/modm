@@ -109,7 +109,7 @@ class FileList(list):
 class Scanner:
 	
 	HEADER = ['.h', '.hpp']
-	SOURCE = ['.cpp', '.c', '.sx', '.S']
+	SOURCE = ['.cpp', '.c', '.sx', '.S', '.s']
 	
 	def __init__(self, env, unittest=None):
 		""" Constructor
@@ -144,11 +144,7 @@ class Scanner:
 		
 		for basepath in pathlist:
 			for path, directories, files in os.walk(basepath):
-				# exclude the SVN-directories
-				if '.svn' in directories:
-					directories.remove('.svn')
-				
-				if os.path.normpath(path) in ignoreList:
+				if self._fileInList (path, ignoreList):
 					directories = self._excludeDirectories(directories)
 					continue
 				
@@ -234,6 +230,37 @@ class Scanner:
 		# All other platforms: check for same pathname.
 		return (os.path.normcase(os.path.abspath(src)) ==
 				os.path.normcase(os.path.abspath(dst)))
+		
+	def __str__(self):
+		string = "Source files: "
+		if self.sources:
+			for s in self.sources:
+				 string += "\n  " + str(s)
+		else:
+			string += "None"
+
+		string += "\nHeader files: "
+		if self.header:
+			string += "\nHeader files:"
+			for h in self.header:
+				 string += "\n  " + str(h)	 
+		else:
+			string += "None"
+
+		string += "\nDefines: "
+		if self.defines:
+	 		for d in self.defines:
+				 string += "\n  " + str(d)
+		else:
+			string += "None"
+		return string
+
+	def _fileInList(self, file, fileList):
+		# returns true if file (or directory) is contained in fileList
+		for f in fileList:
+			if self._samefile (file, f):
+				return True
+		return False
 
 # -----------------------------------------------------------------------------
 def generate(env, **kw):

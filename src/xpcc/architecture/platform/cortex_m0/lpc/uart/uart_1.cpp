@@ -324,6 +324,12 @@ xpcc::lpc::BufferedUart1::write(const uint8_t *buffer, uint8_t n)
 #endif
 } // write buffer
 
+bool
+xpcc::lpc::BufferedUart1::read(uint8_t & c)
+{
+	return xpcc::lpc::Uart1::read(c);
+}
+
 // ----------------------------------------------------------------------------
 
 extern "C" void

@@ -41,16 +41,20 @@
 #include <xpcc_config.hpp>
 
 #if defined(STM32F10X_HD) || defined(STM32F10X_XL) || defined(STM32F10X_CL) || \
-	defined(STM32F2XX) || defined(STM32F4XX)
+	defined(STM32F2XX) || defined(STM32F3XX) || defined(STM32F4XX)
 
 namespace
 {
+	#if defined(STM32F2XX) || defined(STM32F4XX)
 	GPIO__OUTPUT(TxdA0, A, 0);
 	GPIO__INPUT(RxdA1, A, 1);
+#endif
 	
 	GPIO__OUTPUT(TxdC10, C, 10);
 	GPIO__INPUT(RxdC11, C, 11);
-	
+}
+namespace
+{
 	static const uint32_t apbClk = STM32_APB1_FREQUENCY;	// APB1
 }
 
@@ -62,7 +66,13 @@ xpcc::stm32::Uart4::configurePins(Mapping mapping)
 	RCC->APB1ENR |= RCC_APB1ENR_UART4EN;
 	
 	// Initialize IO pins
-#if defined(STM32F2XX) || defined(STM32F4XX)
+#if defined(STM32F2XX) || defined(STM32F3XX) || defined(STM32F4XX)
+	#if defined(STM32F3XX)
+	(void) mapping;		// avoid compiler warning
+
+	TxdC10::setAlternateFunction(AF_UART4, xpcc::stm32::PUSH_PULL);
+	RxdC11::setAlternateFunction(AF_UART4);
+#else
 	if (mapping == REMAP_PA0_PA1) {
 		TxdA0::setAlternateFunction(AF_UART4, xpcc::stm32::PUSH_PULL);
 		RxdA1::setAlternateFunction(AF_UART4);
@@ -71,6 +81,7 @@ xpcc::stm32::Uart4::configurePins(Mapping mapping)
 		TxdC10::setAlternateFunction(AF_UART4, xpcc::stm32::PUSH_PULL);
 		RxdC11::setAlternateFunction(AF_UART4);
 	}
+#endif
 #else
 	(void) mapping;		// avoid compiler warning
 	
@@ -84,6 +95,9 @@ void
 xpcc::stm32::Uart4::setBaudrate(uint32_t baudrate)
 {
 	// Enable clock
+	// FIXME: there seems to be a bug in the stm32f3xxlib which does not provide
+	//        the necessary RCC_APB1ENR_UART5EN define and probably defines
+	//        RCC_APB1ENR_UART4EN incorrectly (0x00100000 instead of 0x00080000)
 	RCC->APB1ENR |= RCC_APB1ENR_UART4EN;
 	
 	UART4->CR1 = 0;
@@ -103,11 +117,19 @@ xpcc::stm32::Uart4::setBaudrate(uint32_t baudrate)
 void
 xpcc::stm32::Uart4::write(uint8_t data)
 {
+#if defined(STM32F3XX)
+	while (!(UART4->ISR & USART_ISR_TXE)) {
+		// wait until the data register becomes empty
+	}
+
+	UART4->TDR = data;
+#else
 	while (!(UART4->SR & USART_SR_TXE)) {
 		// wait until the data register becomes empty
 	}
 	
 	UART4->DR = data;
+#endif
 }
 
 // ----------------------------------------------------------------------------
@@ -123,12 +145,19 @@ xpcc::stm32::Uart4::write(const uint8_t *s, uint8_t n)
 bool
 xpcc::stm32::Uart4::read(uint8_t& c)
 {
+#if defined(STM32F3XX)
+	if (UART4->ISR & USART_ISR_RXNE)
+	{
+		c = UART4->RDR;
+		return true;
+	}
+#else
 	if (UART4->SR & USART_SR_RXNE)
 	{
 		c = UART4->DR;
 		return true;
 	}
-	
+#endif
 	return false;
 }
 

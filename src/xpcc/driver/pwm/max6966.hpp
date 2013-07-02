@@ -186,10 +186,11 @@ namespace xpcc
 		}
 		
 		
-		/// set the 8bit value of a channel
+		/// set the 8bit value of a single channel
 		static void
 		setChannel(uint16_t channel, uint8_t value);
 
+		/// set the intensity of a single channel
 		static void
 		setChannelIntensity(uint16_t channel, uint8_t intensity)
 		{

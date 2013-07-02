@@ -59,7 +59,7 @@ namespace xpcc
 	{
 	public:
 		/**
-		 * \todo	some helper programs/formular to choose the right
+		 * \todo	some helper programs/formula to choose the right
 		 * 			parameter values (e.g. the java tool from the last year)
 		 * 
 		 * \param	increment	=> increment per timestep
@@ -86,6 +86,14 @@ namespace xpcc
 		
 	public:
 		SCurveController(const Parameter& parameter);
+
+		/**
+		 * Reset the parameters of the controller.
+		 *
+		 * \param	parameter list of the controller
+		 **/
+		void
+		setParameter(const Parameter& parameter);
 		
 		inline void
 		setSpeedMaximum(const T& speed);

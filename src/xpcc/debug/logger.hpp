@@ -25,8 +25,6 @@
  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- * $hello please remove me$
  */
 // ----------------------------------------------------------------------------
 
@@ -84,7 +82,7 @@ if (XPCC_LOG_LEVEL <= xpcc::log::DEBUG)
    Call of xpcc::Logger::operator << (T) (with T = int32_t) which is inline
    - IOStream::operator << (T) (with T = int32_t) is inline
    - IOStream::writeInteger(int32_t)
--# IOStream::writeInteger(int32_t) will create the formated string via snprintf()
+-# IOStream::writeInteger(int32_t) will create the formatted string via snprintf()
 -# virtual call of IODevice::write(const char*)
 -# redirect to std::cout
 

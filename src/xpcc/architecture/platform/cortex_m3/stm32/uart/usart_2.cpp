@@ -49,7 +49,17 @@ namespace
 	
 	GPIO__OUTPUT(TxdD5, D, 5);
 	GPIO__INPUT(RxdD6, D, 6);
-	
+
+#if defined(STM32F3XX)
+	GPIO__OUTPUT(TxdA14, A, 14);
+	GPIO__INPUT(RxdA15, A, 15);
+
+	GPIO__OUTPUT(TxdB3, B, 3);
+	GPIO__INPUT(RxdB4, B, 4);
+#endif
+}
+namespace
+{
 	static const uint32_t apbClk = STM32_APB1_FREQUENCY;	// APB1
 }
 
@@ -61,16 +71,27 @@ xpcc::stm32::Usart2::configurePins(Mapping mapping)
 	RCC->APB1ENR |= RCC_APB1ENR_USART2EN;
 	
 	// Initialize IO pins
-#if defined(STM32F2XX) || defined(STM32F4XX)
+#if defined(STM32F2XX) || defined(STM32F3XX) || defined(STM32F4XX)
 	if (mapping == REMAP_PA2_PA3) {
 		TxdA2::setAlternateFunction(AF_USART2, xpcc::stm32::PUSH_PULL);
 		RxdA3::setAlternateFunction(AF_USART2);
 	}
+#if defined(STM32F3XX)
+	else if(mapping == REMAP_PA14_PA15) {
+		TxdA14::setAlternateFunction(AF_USART2, xpcc::stm32::PUSH_PULL);
+		RxdA15::setAlternateFunction(AF_USART2);
+	}
+	else if(mapping == REMAP_PB3_PB4) {
+		TxdB3::setAlternateFunction(AF_USART2, xpcc::stm32::PUSH_PULL);
+		RxdB4::setAlternateFunction(AF_USART2);
+	}
+#endif
 	else {
 		TxdD5::setAlternateFunction(AF_USART2, xpcc::stm32::PUSH_PULL);
 		RxdD6::setAlternateFunction(AF_USART2);
 	}
-#else
+#elif defined(STM32F10X) || defined(STM32F10X_HD) || defined(STM32F10X_XL) \
+	|| defined(STM32F10X_CL)
 	AFIO->MAPR = (AFIO->MAPR & ~AFIO_MAPR_USART2_REMAP) | mapping;
 	if (mapping == REMAP_PA2_PA3) {
 		TxdA2::setAlternateFunction(xpcc::stm32::PUSH_PULL);
@@ -80,6 +101,8 @@ xpcc::stm32::Usart2::configurePins(Mapping mapping)
 		TxdD5::setAlternateFunction(xpcc::stm32::PUSH_PULL);
 		RxdD6::setInput();
 	}
+#else
+#  error "Unknown CPU Type. Please define STM32F10X_.., STM32F2XX, STM32F3XX or STM32F4XX"
 #endif
 }
 
@@ -107,11 +130,19 @@ xpcc::stm32::Usart2::setBaudrate(uint32_t baudrate)
 void
 xpcc::stm32::Usart2::write(uint8_t data)
 {
+#if defined(STM32F3XX)
+	while (!(USART2->ISR & USART_ISR_TXE)) {
+		// wait until the data register becomes empty
+	}
+
+	USART2->TDR = data;
+#else
 	while (!(USART2->SR & USART_SR_TXE)) {
 		// wait until the data register becomes empty
 	}
 	
 	USART2->DR = data;
+#endif
 }
 
 // ----------------------------------------------------------------------------
@@ -127,12 +158,19 @@ xpcc::stm32::Usart2::write(const uint8_t *s, uint8_t n)
 bool
 xpcc::stm32::Usart2::read(uint8_t& c)
 {
+#if defined(STM32F3XX)
+	if (USART2->ISR & USART_ISR_RXNE)
+	{
+		c = USART2->RDR;
+		return true;
+	}
+#else
 	if (USART2->SR & USART_SR_RXNE)
 	{
 		c = USART2->DR;
 		return true;
 	}
-	
+#endif
 	return false;
 }
 

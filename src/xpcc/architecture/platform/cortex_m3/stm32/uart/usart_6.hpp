@@ -62,7 +62,7 @@ namespace xpcc
 			
 			enum Mapping
 			{
-#if defined(STM32F2XX) || defined(STM32F4XX)
+#if defined(STM32F2XX) || defined(STM32F3XX) || defined(STM32F4XX)
 				REMAP_PC6_PC7,		///< TX mapped to PC6, RX mapped to PC7 (CK/PC8)
 				REMAP_PG14_PG9,		///< TX/PG14, RX/PG9, CK/PD10, CTS/PG13,PG15, RTS/PG8,PG12
 #else
@@ -158,7 +158,7 @@ namespace xpcc
 			
 			enum Mapping
 			{
-#if defined(STM32F2XX) || defined(STM32F4XX)
+#if defined(STM32F2XX) || defined(STM32F3XX) || defined(STM32F4XX)
 				REMAP_PC6_PC7,		///< TX mapped to PC6, RX mapped to PC7 (CK/PC8)
 				REMAP_PG14_PG9,		///< TX/PG14, RX/PG9, CK/PD10, CTS/PG13,PG15, RTS/PG8,PG12
 #else
@@ -273,7 +273,7 @@ namespace xpcc
 			
 			enum Mapping
 			{
-#if defined(STM32F2XX) || defined(STM32F4XX)
+#if defined(STM32F2XX) || defined(STM32F3XX) || defined(STM32F4XX)
 				REMAP_PC6_PC7,		///< TX mapped to PC6, RX mapped to PC7 (CK/PC8)
 				REMAP_PG14_PG9,		///< TX/PG14, RX/PG9, CK/PD10, CTS/PG13,PG15, RTS/PG8,PG12
 #else
@@ -352,8 +352,6 @@ namespace xpcc
 		/**
 		 * \brief		USART6 in SPI master mode
 		 * 
-		 * FIXME currently not working!
-		 * 
 		 * \ingroup		stm32
 		 */
 		class UsartSpi6 : public UartBase
@@ -396,7 +394,7 @@ namespace xpcc
 				REMAP_PG7,
 			};
 			
-			ALWAYS_INLINE void
+			ALWAYS_INLINE static void
 			configureTxPin(MappingTx mapping)
 			{
 				switch (mapping) {
@@ -405,7 +403,7 @@ namespace xpcc
 				}
 			}
 			
-			ALWAYS_INLINE void
+			ALWAYS_INLINE static void
 			configureRxPin(MappingRx mapping)
 			{
 				switch (mapping) {
@@ -414,7 +412,7 @@ namespace xpcc
 				}
 			}
 			
-			ALWAYS_INLINE void
+			ALWAYS_INLINE static void
 			configureCkPin(MappingCk mapping)
 			{
 				switch (mapping) {
@@ -424,9 +422,21 @@ namespace xpcc
 			}
 			
 			/**
-			 * Constructor
+			 * @brief	Initialize module in syncronous mode (SPI)
+			 * 
+			 * The bitrate is calculated in the same manner as for the
+			 * asynchronous mode and is limited.
+			 * 
+			 * @param	bitrate		Desired Frequency of the SPI clock.
+			 * @param	mode		Select the Spi Mode. Default is MODE_0.
+			 * @param	over8		Using over8 sets the Oversampling down from 16
+			 * 			to 8 however in SPI Mode this has effect on
+			 * 			sample and hold time only, since Data are sampled
+			 * 			at clock edges. Benefit of over8 is a doubled maximum
+			 * 			bitrate.
 			 */
-			UsartSpi6(uint32_t bitrate, Mode mode = MODE_0);
+			static void
+			initialize(uint32_t bitrate, Mode mode = MODE_0, bool over8 = false);
 			
 			/**
 			 * Transfer byte.

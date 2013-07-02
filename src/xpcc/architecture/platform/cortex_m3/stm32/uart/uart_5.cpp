@@ -41,13 +41,17 @@
 #include <xpcc_config.hpp>
 
 #if defined(STM32F10X_HD) || defined(STM32F10X_XL) || defined(STM32F10X_CL) || \
-	defined(STM32F2XX) || defined(STM32F4XX)
+	defined(STM32F2XX) || defined(STM32F3XXV) || defined(STM32F4XX)
+// only devices with 100 pins have Port D and therefore UART5
+
 
 namespace
 {
 	GPIO__OUTPUT(TxdC12, C, 12);
 	GPIO__INPUT(RxdD2, D, 2);
-	
+}
+namespace
+{
 	static const uint32_t apbClk = STM32_APB1_FREQUENCY;	// APB1
 }
 
@@ -59,7 +63,7 @@ xpcc::stm32::Uart5::configurePins(Mapping mapping)
 	RCC->APB1ENR |= RCC_APB1ENR_UART5EN;
 	
 	// Initialize IO pins
-#if defined(STM32F2XX) || defined(STM32F4XX)
+#if defined(STM32F2XX) || defined(STM32F3XX) || defined(STM32F4XX)
 	(void) mapping;		// avoid compiler warning
 	
 	TxdC12::setAlternateFunction(AF_UART5, xpcc::stm32::PUSH_PULL);
@@ -77,6 +81,9 @@ void
 xpcc::stm32::Uart5::setBaudrate(uint32_t baudrate)
 {
 	// Enable clock
+	// FIXME: there seems to be a bug in the stm32f3xxlib which does not provide
+	//        the necessary RCC_APB1ENR_UART5EN define and probably defines
+	//        RCC_APB1ENR_UART4EN incorrectly (0x00100000 instead of 0x00080000)
 	RCC->APB1ENR |= RCC_APB1ENR_UART5EN;
 	
 	UART5->CR1 = 0;
@@ -96,11 +103,19 @@ xpcc::stm32::Uart5::setBaudrate(uint32_t baudrate)
 void
 xpcc::stm32::Uart5::write(uint8_t data)
 {
+#if defined(STM32F3XX)
+	while (!(UART5->ISR & USART_ISR_TXE)) {
+		// wait until the data register becomes empty
+	}
+
+	UART5->TDR = data;
+#else
 	while (!(UART5->SR & USART_SR_TXE)) {
 		// wait until the data register becomes empty
 	}
 	
 	UART5->DR = data;
+#endif
 }
 
 // ----------------------------------------------------------------------------
@@ -116,12 +131,19 @@ xpcc::stm32::Uart5::write(const uint8_t *s, uint8_t n)
 bool
 xpcc::stm32::Uart5::read(uint8_t& c)
 {
+#if defined(STM32F3XX)
+	if (UART5->ISR & USART_ISR_RXNE)
+	{
+		c = UART5->RDR;
+		return true;
+	}
+#else
 	if (UART5->SR & USART_SR_RXNE)
 	{
 		c = UART5->DR;
 		return true;
 	}
-	
+#endif
 	return false;
 }
 

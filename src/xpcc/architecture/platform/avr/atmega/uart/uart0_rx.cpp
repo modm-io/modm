@@ -81,9 +81,9 @@ xpcc::atmega::BufferedUart0::setBaudrateRegister(uint16_t ubrr)
 	
 	// Set frame format: asynchronous, 8data, no parity, 1stop bit
 #ifdef URSEL0
-    UCSR0C = (1 << URSEL0) | (1 << UCSZ01) | (1 << UCSZ00);
+	UCSR0C = (1 << URSEL0) | (1 << UCSZ01) | (1 << UCSZ00);
 #else
-    UCSR0C = (1 << UCSZ01) | (1 << UCSZ00);
+	UCSR0C = (1 << UCSZ01) | (1 << UCSZ00);
 #endif
 }
 

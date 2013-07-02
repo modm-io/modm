@@ -236,7 +236,9 @@ xpcc::stm32::Can2::configurePins(Mapping mapping)
 		CanRxB12::setAlternateFunction(AF_CAN2, xpcc::stm32::PULLUP);
 		CanTxB13::setAlternateFunction(AF_CAN2, xpcc::stm32::PUSH_PULL);
 	}
-#else
+#elif defined(STM32F3XX)
+	
+#elif defined(STM32F10X)
 	AFIO->MAPR = (AFIO->MAPR & ~AFIO_MAPR_CAN2_REMAP) | mapping;
 	if (mapping == REMAP_PB5_PB6) {
 		CanRxB5::setInput(xpcc::stm32::PULLUP);
@@ -246,6 +248,8 @@ xpcc::stm32::Can2::configurePins(Mapping mapping)
 		CanRxB12::setInput(xpcc::stm32::PULLUP);
 		CanTxB13::setAlternateFunction(xpcc::stm32::PUSH_PULL);
 	}
+#else
+#error "Please be more specific about the processor. "
 #endif
 }
 
@@ -351,7 +355,7 @@ xpcc::stm32::Can2::initialize(can::Bitrate bitrate,
 		default: prescaler = 16; break;		// 125 kbps
 	}
 	
-#if defined(STM32F10X)
+#if defined(STM32F10X) || defined(STM32F3XX)
 	XPCC__STATIC_ASSERT(STM32_APB1_FREQUENCY == 36000000UL,
 			"Unsupported frequency for APB1 (only 36 MHz)");
 	CAN2->BTR =
@@ -376,7 +380,7 @@ xpcc::stm32::Can2::initialize(can::Bitrate bitrate,
 			((14 - 1) << CAN_BTR_TS1_POS) |		// BS1 Samplepoint
 			(prescaler - 1);
 #else
-#	error "Unknown CPU Type. Please define STM32F10X, STM32F2XX or STM32F4XX"
+#	error "Unknown CPU Type. Please define STM32F10X, STM32F2XX, STM32F3XX or STM32F4XX"
 #endif
 	
 	// Request leave initialization

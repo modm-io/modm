@@ -1,9 +1,12 @@
 
 #include <xpcc/architecture.hpp>
 
+#if !defined(STM32F3XX)
+// Not yet implemented for STM32 F3 series
 xpcc::stm32::Usart1             uart1(115200);
 xpcc::stm32::BufferedUsart2     uart2(115200, 15);
 xpcc::stm32::BufferedFlowUsart3 uart3(115200, 15);
+#endif
 
 #if defined(STM32F10X_HD) || \
 	defined(STM32F10X_XL) || \
@@ -40,9 +43,11 @@ main(void)
 	Io::setInput();
 	Io::read();
 	
+#if !defined(STM32F3XX)
 	uart1.write('x');
 	uart2.write('x');
 	uart3.write('x');
+#endif
 
 #if defined(STM32F10X_HD) || \
 	defined(STM32F10X_XL) || \

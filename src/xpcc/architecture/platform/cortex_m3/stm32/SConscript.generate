@@ -26,16 +26,18 @@
 # ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-# 
-# $Id: SConscript.generate 683 2012-01-03 01:50:57Z dergraaf $
 # -----------------------------------------------------------------------------
 
 Import('env')
 
 generator = env['TemplateGenerator'](env, 'adc')
-for id in [1, 2, 3]:
-	generator.template('adc_%i.hpp' % id, 'adc.hpp.in', { 'id': id })
-	generator.template('adc_%i.cpp' % id, 'adc.cpp.in', { 'id': id })
+for id in [1, 2, 3, 4]:
+	if id < 3:
+		generator.template('adc_%i.hpp' % id, 'adc.hpp.in', { 'id': id, 'id_common': '12', 'id_common_u': '1_2' })
+		generator.template('adc_%i.cpp' % id, 'adc.cpp.in', { 'id': id, 'id_common': '12', 'id_common_u': '1_2' })
+	else:
+		generator.template('adc_%i.hpp' % id, 'adc.hpp.in', { 'id': id, 'id_common': '34', 'id_common_u': '3_4' })
+		generator.template('adc_%i.cpp' % id, 'adc.cpp.in', { 'id': id, 'id_common': '34', 'id_common_u': '3_4' })
 
 generator = env['TemplateGenerator'](env, 'spi')
 for id in [1, 2, 3]:
@@ -54,11 +56,15 @@ for id in [1, 2, 3, 6]:
 	env.Depends(generator.template('usart_buffered_%i.cpp'      % id, 'uart_buffered.cpp.in',      { 'id': id, 'className' : 'Usart' }), 'uart/template.cpp.macros')
 	env.Depends(generator.template('usart_buffered_flow_%i.cpp' % id, 'uart_buffered_flow.cpp.in', { 'id': id, 'className' : 'Usart' }), 'uart/template.cpp.macros')
 	env.Depends(generator.template('usart_spi_%i.cpp'           % id, 'usart_spi.cpp.in',          { 'id': id, 'className' : 'Usart' }), 'uart/template.cpp.macros')
+	env.Depends(generator.template('usart_hal_%i.hpp'               % id, 'uart_hal.hpp.in',              { 'id': id, 'className' : 'UsartHal', 'moduleName' : 'USART' }), 'uart/template.hpp.macros')
+	env.Depends(generator.template('usart_hal_%i.cpp'               % id, 'uart_hal.cpp.in',               { 'id': id, 'className' : 'UsartHal', 'moduleName' : 'USART' }), 'uart/template.cpp.macros')
 for id in [4, 5]:
 	env.Depends(generator.template('uart_%i.hpp'                % id, 'uart.hpp.in',               { 'id': id, 'className' : 'Uart'  }), 'uart/template.hpp.macros')
 	env.Depends(generator.template('uart_%i.cpp'                % id, 'uart.cpp.in',               { 'id': id, 'className' : 'Uart'  }), 'uart/template.cpp.macros')
 	env.Depends(generator.template('uart_buffered_%i.cpp'       % id, 'uart_buffered.cpp.in',      { 'id': id, 'className' : 'Uart'  }), 'uart/template.cpp.macros')
 	env.Depends(generator.template('uart_buffered_flow_%i.cpp'  % id, 'uart_buffered_flow.cpp.in', { 'id': id, 'className' : 'Uart'  }), 'uart/template.cpp.macros')
+	env.Depends(generator.template('uart_hal_%i.hpp'                % id, 'uart_hal.hpp.in',               { 'id': id, 'className' : 'UartHal' , 'moduleName' : 'UART' }), 'uart/template.hpp.macros')
+	env.Depends(generator.template('uart_hal_%i.cpp'                % id, 'uart_hal.cpp.in',               { 'id': id, 'className' : 'UartHal' , 'moduleName' : 'UART' }), 'uart/template.cpp.macros')
 
 generator = env['TemplateGenerator'](env, 'timer')
 for id in [1, 8]:
@@ -81,4 +87,7 @@ generator = env['TemplateGenerator'](env, 'can')
 for id in [1, 2]:
 	generator.template('can_%i.hpp' % id, 'can.hpp.in', { 'id': id })
 	generator.template('can_%i.cpp' % id, 'can.cpp.in', { 'id': id })
-	
+
+generator = env['TemplateGenerator'](env, 'comp')
+for id in [1, 2, 3, 4, 5, 6, 7]:
+	generator.template('comp_%i.hpp' % id, 'comp.hpp.in', { 'id': id })
