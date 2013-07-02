@@ -27,18 +27,81 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 // ----------------------------------------------------------------------------
-/**
- * \ingroup		math
- * \defgroup	filter	Filter
- * \brief		Some filter
- *
- */
 
-#include "filter/debounce.hpp"
-#include "filter/fir.hpp"
-#include "filter/median.hpp"
-#include "filter/moving_average.hpp"
-#include "filter/pid.hpp"
-#include "filter/ramp.hpp"
-#include "filter/s_curve_controller.hpp"
-#include "filter/s_curve_generator.hpp"
+#ifndef XPCC__FIR_HPP
+#define XPCC__FIR_HPP
+
+#include <stdint.h>
+
+namespace xpcc
+{
+	/**
+	 * \brief	A finit impulse response (FIR) filter implementation
+	 *
+	 * g[n] = SUM(h[k]x[n-k])
+	 * 
+	 * \todo	
+	 * 
+	 * \author	Kevin Laeufer
+	 * \ingroup	filter
+	 */
+	namespace filter
+	{
+		template<typename T, int N, int BLOCK_SIZE, signed int ScaleFactor = 1>
+		class Fir
+		{
+
+		public:
+			/**
+			 * \param	coeff	array containing the coefficients
+			 **/
+			Fir(const float (&coeff)[N]);
+		
+			/**
+			 * Reset the coefficients.
+			 *
+			 * \param	coeff	array containing the coefficients
+			 **/
+			void
+			setCoefficients(const float (&coeff)[N]);
+		
+			/**
+			 * \brief	Resets the tap buffer
+			 */
+			void
+			reset();
+
+			/**
+			 * \brief	Appends new tap
+			 */
+			void
+			append(const T& input);
+		
+			/**
+			 * \brief	Calculates g[0]
+			 * 
+			 */
+			void
+			update();
+		
+			/**
+			 * \brief	Returns g[0].
+			 */
+			inline const T&
+			getValue() const
+			{
+				return output;
+			}
+		
+		private:
+			T output;	
+			T taps[N+BLOCK_SIZE];
+			T coefficients[N];
+			int taps_index;
+		};
+	}
+}
+
+#include "fir_impl.hpp"
+
+#endif // XPCC__FIR_HPP
