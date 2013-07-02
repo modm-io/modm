@@ -49,8 +49,8 @@ ISR(TIMER2_COMPA_vect)
 int
 main()
 {
-	LedGreen::setOutput(xpcc::gpio::HIGH);
-	LedRed::setOutput(xpcc::gpio::LOW);
+	LedGreen::setOutput(xpcc::Gpio::HIGH);
+	LedRed::setOutput(xpcc::Gpio::LOW);
 	
 	// timer initialization
 	// compare-match-interrupt every 1 ms at 14.7456 MHz

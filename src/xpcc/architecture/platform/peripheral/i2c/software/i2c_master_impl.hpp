@@ -162,7 +162,7 @@ void
 xpcc::SoftwareI2cMaster<Scl, Sda, Frequency>::startCondition()
 {
 	sda.set();
-	while((sda.read() == gpio::LOW))
+	while((sda.read() == Gpio::LOW))
 		;
 	delay();
 
@@ -281,12 +281,12 @@ xpcc::SoftwareI2cMaster<Scl, Sda, Frequency>::sclSetAndWait()
 	// wait for clock stretching by slave
 	// only wait a maximum of 250 half clock cycles
 	uint_fast8_t deadlockPreventer = 250;
-	while (scl.read() == gpio::LOW && deadlockPreventer)
+	while (scl.read() == Gpio::LOW && deadlockPreventer)
 	{
 		xpcc::delay_us(delayTime/2);
 		deadlockPreventer--;
 		// double the read amount
-		if (scl.read() != gpio::LOW) return;
+		if (scl.read() != Gpio::LOW) return;
 		xpcc::delay_us(delayTime/2);
 	}
 	// if extreme clock stretching occurs, then there might be an external error

@@ -45,8 +45,8 @@ template<uint16_t CHANNELS, typename Spi, typename Xlat, typename Vprog, typenam
 void
 xpcc::TLC594X<CHANNELS, Spi, Xlat, Vprog, Xerr>::initialize(uint16_t channels, uint8_t dots, bool writeCH, bool writeDC)
 {
-	Xlat::setOutput(xpcc::gpio::LOW);
-	Vprog::setOutput(xpcc::gpio::LOW);
+	Xlat::setOutput(xpcc::Gpio::LOW);
+	Vprog::setOutput(xpcc::Gpio::LOW);
 	Xerr::setInput();
 	Spi::setBuffer(CHANNELS*3/2, gs, status);
 	

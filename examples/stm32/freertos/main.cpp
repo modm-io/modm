@@ -155,9 +155,9 @@ main(void)
 	// the STM32 run at 72 MHz.
 	initClock();
 
-	LedStat::setOutput(xpcc::gpio::HIGH);
-	Led1::setOutput(xpcc::gpio::LOW);
-	Led2::setOutput(xpcc::gpio::LOW);
+	LedStat::setOutput(xpcc::Gpio::HIGH);
+	Led1::setOutput(xpcc::Gpio::LOW);
+	Led2::setOutput(xpcc::Gpio::LOW);
 	
 	// The Button has an external Pull-Down resistor
 	ButtonWakeUp::setInput(xpcc::stm32::FLOATING);

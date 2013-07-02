@@ -43,7 +43,7 @@ MAIN_FUNCTION
 	SpiMaster1::initialize(SpiMaster1::MODE_0, SpiMaster1::PRESCALER_256);
 	xpcc::stm32::SpiMaster1::configurePins(xpcc::stm32::SpiMaster1::REMAP_PA5_PA6_PA7);
 
-	LedStat::setOutput(xpcc::gpio::HIGH);
+	LedStat::setOutput(xpcc::Gpio::HIGH);
 	
 	EncoderIndex::setInput(xpcc::stm32::PULLUP);
 	EncoderA::setInput(xpcc::stm32::PULLUP);

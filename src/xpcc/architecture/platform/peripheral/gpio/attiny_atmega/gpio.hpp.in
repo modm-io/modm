@@ -97,7 +97,7 @@ namespace xpcc
 				IO::setInput(PullType::PullUp);
 			}
 			ALWAYS_INLINE static void reset() {
-				IO::setOutput(::xpcc::gpio::LOW);
+				IO::setOutput(::xpcc::Gpio::LOW);
 			}
 			ALWAYS_INLINE static void set(bool status) {
 				if (status) { set(); }
@@ -158,7 +158,7 @@ namespace xpcc
 			}
 
 			ALWAYS_INLINE static void
-			setInput(PullType type=PullType::Floating) {
+			setInput(PullType type) {
 				setInput();
 				if (type == PullType::PullUp) {
 					PORT{{port}} |= (1 << {{pin}});

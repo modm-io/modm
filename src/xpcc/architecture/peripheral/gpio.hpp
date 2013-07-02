@@ -170,6 +170,7 @@ namespace xpcc
 	 */
 	class GpioInput
 	{
+#ifdef __DOXYGEN__
 	public:
 		/// configure pin as input
 		static void
@@ -178,6 +179,7 @@ namespace xpcc
 		/// read input
 		static bool
 		read();
+#endif
 	};
 
 	/**
@@ -190,6 +192,7 @@ namespace xpcc
 	 */
 	class GpioOutput
 	{
+#ifdef __DOXYGEN__
 	public:
 		/// configure pin as output
 		static void
@@ -214,6 +217,7 @@ namespace xpcc
 		/// toggle output level
 		static void
 		toggle();
+#endif
 	};
 
 	/**
@@ -239,6 +243,7 @@ namespace xpcc
 	 */
 	class GpioNibble
 	{
+#ifdef __DOXYGEN__
 	public:
 		static void
 		setOutput();
@@ -263,6 +268,7 @@ namespace xpcc
 		 */
 		static void
 		write(uint8_t data);
+#endif
 	};
 
 	/**
@@ -274,6 +280,7 @@ namespace xpcc
 	 */
 	class GpioOctet
 	{
+#ifdef __DOXYGEN__
 	public:
 		static void
 		setOutput();
@@ -286,6 +293,7 @@ namespace xpcc
 
 		static void
 		write(uint8_t data);
+#endif
 	};
 
 	/**
@@ -297,6 +305,7 @@ namespace xpcc
 	 */
 	class GpioWord
 	{
+#ifdef __DOXYGEN__
 	public:
 		static void
 		setOutput();
@@ -309,7 +318,7 @@ namespace xpcc
 
 		static void
 		write(uint16_t data);
-
+#endif
 	};
 }
 

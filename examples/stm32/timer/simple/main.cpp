@@ -31,7 +31,7 @@ MAIN_FUNCTION
 {
 	initClock();
 
-	LedStat::setOutput(xpcc::gpio::HIGH);
+	LedStat::setOutput(xpcc::Gpio::HIGH);
 	
 	Timer3::enable();
 	Timer3::setMode(Timer3::UP_COUNTER);

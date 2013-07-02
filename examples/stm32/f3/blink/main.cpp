@@ -30,10 +30,10 @@ MAIN_FUNCTION
 {
 	initClock();
 
-	LedOrange::setOutput(xpcc::gpio::HIGH);
-	LedGreen::setOutput(xpcc::gpio::LOW);
-	LedRed::setOutput(xpcc::gpio::HIGH);
-	LedBlue::setOutput(xpcc::gpio::HIGH);
+	LedOrange::setOutput(xpcc::Gpio::HIGH);
+	LedGreen::setOutput(xpcc::Gpio::LOW);
+	LedRed::setOutput(xpcc::Gpio::HIGH);
+	LedBlue::setOutput(xpcc::Gpio::HIGH);
 	
 	// Remap the Pins of CAN1 to PB8 and PB9.
 	// This has to be done before calling initialize()!

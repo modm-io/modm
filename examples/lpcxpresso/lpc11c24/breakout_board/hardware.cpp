@@ -19,8 +19,8 @@ Hardware::initialize()
 
 	xpcc::lpc::SysTickTimer::enable();
 
-	led::Onboard::setOutput(xpcc::gpio::HIGH);
-	led::Xpresso::setOutput(xpcc::gpio::HIGH);
+	led::Onboard::setOutput(xpcc::Gpio::HIGH);
+	led::Xpresso::setOutput(xpcc::Gpio::HIGH);
 
 	for (uint8_t i = 0; i < 7; ++i)
 	{

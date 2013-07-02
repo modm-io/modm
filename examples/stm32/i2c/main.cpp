@@ -75,7 +75,7 @@ MAIN_FUNCTION // ##############################################################
 	stream << "RESTART" << xpcc::endl;
 	
 	Button::setInput(xpcc::stm32::PULLUP);
-	LED::setOutput(xpcc::gpio::HIGH);
+	LED::setOutput(xpcc::Gpio::HIGH);
 	
 #if USE_HARDWARE_I2C
 	Twi1::configurePins(Twi1::REMAP_PB8_PB9);

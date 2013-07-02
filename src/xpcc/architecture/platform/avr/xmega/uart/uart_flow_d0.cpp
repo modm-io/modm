@@ -126,7 +126,7 @@ xpcc::xmega::BufferedUartFlowD0::initialize()
 	RXD::setInput();
 	
 	// RTS and CTS pins, ready for reception in few cycles.
-	CTS::setOutput(xpcc::gpio::LOW);
+	CTS::setOutput(xpcc::Gpio::LOW);
 	RTS::setInput(xpcc::xmega::PULLUP);
 	
 	// interrupts should be disabled during initialisation

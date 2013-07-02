@@ -81,8 +81,8 @@ void
 xpcc::xmega::UartSpiMasterE0::initialize(uint32_t const bitrate)
 {
 	RXD::setInput(PULLUP);
-	TXD::setOutput(xpcc::gpio::HIGH);
-	XCK::setOutput(xpcc::gpio::LOW);
+	TXD::setOutput(xpcc::Gpio::HIGH);
+	XCK::setOutput(xpcc::Gpio::LOW);
 	
 	uint16_t ubrr = F_CPU / (2 * bitrate) - 1;
 	if (2*bitrate >= F_CPU) ubrr = 0;

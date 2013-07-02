@@ -103,6 +103,7 @@ namespace xpcc
 	};
 }
 
+#include "peripheral/gpio.hpp"
 #include "peripheral/uart.hpp"
 #include "peripheral/spi.hpp"
 #include "peripheral/i2c.hpp"
