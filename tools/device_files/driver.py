@@ -117,7 +117,11 @@ class DriverFile:
 					self._parseDriverXml(device_id, node, instance, build)
 		else: # if no xml driver file exists, just add all files that look like source files
 			# Query all files in directory
-			for source_file in os.listdir(os.path.join(platform_path, self.path)):
+			dir = os.path.join(platform_path, self.path)
+			if not os.path.exists(dir):
+				self.log.warn("'%s' implementation for target '%s' does not exist!" % (self.path, device_id.string))
+				return build
+			for source_file in os.listdir(dir):
 				# Detect Static Source and Header Files
 				if os.path.splitext(source_file)[1] in source_file_extentions:
 					source_file = self._makeRelativeToPlatform(source_file)
