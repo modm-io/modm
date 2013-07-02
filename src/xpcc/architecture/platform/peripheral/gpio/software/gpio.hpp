@@ -145,7 +145,7 @@ namespace xpcc
 	 * \ingroup	gpio
 	 */
 	template < class Pin >
-	class GpioInvert : GpioIO
+	class GpioInverted : GpioIO
 	{
 	public:
 		ALWAYS_INLINE static void

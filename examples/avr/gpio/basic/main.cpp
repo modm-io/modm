@@ -6,7 +6,7 @@
 GPIO__OUTPUT(Led, B, 0);
 GPIO__OUTPUT(Led2, B, 1);
 
-typedef xpcc::gpio::Invert< Led2 > LedInverted;
+typedef xpcc::GpioInverted< Led2 > LedInverted;
 
 int
 main(void)
