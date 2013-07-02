@@ -1,6 +1,6 @@
 // coding: utf-8
 // ----------------------------------------------------------------------------
-/* Copyright (c) 2009, Roboterclub Aachen e.V.
+/* Copyright (c) 2013, Roboterclub Aachen e.V.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -51,15 +51,14 @@ namespace xpcc
 	 * return \c false.
 	 *
 	 * For example when
-	 * creating a software SPI with the xpcc::SoftwareSpi class and
+	 * creating a software SPI with the xpcc::SoftwareSpiMaster class and
 	 * the return channel (MISO - Master In Slave Out) is not needed, a
 	 * good way is to use this class as a parameter when defining the
 	 * SPI class.
 	 *
 	 * Example:
 	 * \code
-	 * #include <xpcc/architecture/driver/gpio.hpp>
-	 * #include <xpcc/driver/software_spi.hpp>
+	 * #include <xpcc/architecture/platform.hpp>
 	 *
 	 * namespace pin
 	 * {
@@ -67,7 +66,7 @@ namespace xpcc
 	 *     GPIO__OUTPUT(Mosi, D, 5);
 	 * }
 	 *
-	 * SoftwareSpi< pin::Clk, pin::Mosi, xpcc::GpioUnused > Spi;
+	 * SoftwareSpiMaster< pin::Clk, pin::Mosi, xpcc::GpioUnused > Spi;
 	 *
 	 * ...
 	 * Spi::write(0xaa);
