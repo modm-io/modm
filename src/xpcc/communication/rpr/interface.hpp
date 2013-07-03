@@ -37,7 +37,7 @@
 #include <xpcc/architecture/utils.hpp>
 #include <xpcc/utils/template_metaprogramming.hpp>
 #include <xpcc/container/queue.hpp>
-#include <xpcc/workflow/timeout.hpp>
+#include <xpcc/processing/timeout.hpp>
 #include <xpcc/utils/allocator/dynamic.hpp>
 
 #include "constants.hpp"

@@ -31,8 +31,8 @@
 #ifndef	XPCC__COMMUNICATABLE_TASK_HPP
 #define	XPCC__COMMUNICATABLE_TASK_HPP
 
-#include <xpcc/communication/communicatable.hpp>
-#include <xpcc/communication/communicator.hpp>
+#include <xpcc/communication/xpcc/communicatable.hpp>
+#include <xpcc/communication/xpcc/communicator.hpp>
 
 #include "task.hpp"
 

@@ -1,8 +1,8 @@
 
 #include <xpcc/architecture.hpp>
 
-#include <xpcc/driver/connectivity/can/mcp2515.hpp>
-#include <xpcc/driver/connectivity/spi/software_spi.hpp>
+#include <xpcc/communication/can/mcp2515.hpp>
+#include <xpcc/communication/spi/software_spi.hpp>
 
 #include <xpcc/processing/periodic_timer.hpp>
 

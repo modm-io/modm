@@ -4,8 +4,8 @@
 #include <xpcc/communication/backend/can/can_connector.hpp>
 #include <xpcc/debug/logger.hpp>
 
-#include <xpcc/driver/connectivity/can/mcp2515.hpp>
-#include <xpcc/driver/connectivity/spi/software_spi.hpp>
+#include <xpcc/communication/can/mcp2515.hpp>
+#include <xpcc/communication/spi/software_spi.hpp>
 
 using namespace xpcc::atmega;
 

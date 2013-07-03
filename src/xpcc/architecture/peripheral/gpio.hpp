@@ -43,9 +43,9 @@
  * parameters for miscellaneous device drivers.
  * 
  * \warning	When you use the pins directly outside any device driver class you
- * 			have to remember to initialize them first. Call configure(),
- * 			setInput() or setOutput() before the first use, otherwise the
- * 			result is undefined and most likely not what you expect!
+ * 			have to remember to initialize them first. Call setInput() or
+ * 			setOutput() before the first use, otherwise the result is undefined
+ * 			and most likely not what you expect!
  * 
  * Example:
  * \code
@@ -150,6 +150,7 @@
  * 
  * \see		driver
  * \author	Fabian Greif
+ * \author	Niklas Hauser
  */
 
 namespace xpcc

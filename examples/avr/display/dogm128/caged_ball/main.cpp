@@ -1,8 +1,8 @@
 
 #include <xpcc/architecture.hpp>
 
-#include <xpcc/driver/ui/display/ea_dog.hpp>
-#include <xpcc/driver/connectivity/spi/software_spi.hpp>
+#include <xpcc/ui/display/ea_dog.hpp>
+#include <xpcc/communication/spi/software_spi.hpp>
 
 namespace led
 {

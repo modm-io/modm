@@ -10,7 +10,7 @@ GPIO__OUTPUT(BLANK, D, 3);
 GPIO__OUTPUT(XLAT, D, 2);
 GPIO__OUTPUT(CLKOUT, C, 7);
 
-#include <xpcc/driver/ui/led.hpp>
+#include <xpcc/ui/led.hpp>
 
 typedef xpcc::xmega::UartSpiMasterD1 LedSpi;
 typedef xpcc::xmega::TimerD0 LedTimer;

@@ -32,7 +32,7 @@
 #define XPCC__SOFTWARE_SPI_HPP
 
 #include <stdint.h>
-#include "spi_master.hpp"
+#include <xpcc/architecture/peripheral/spi.hpp>
 #include <xpcc/architecture/driver/delay.hpp>
 
 namespace xpcc
@@ -92,7 +92,7 @@ namespace xpcc
 			  typename Mosi,
 			  typename Miso,
 			  int32_t Frequency = 2000000UL >
-	class SoftwareSpiBlockMaster : public xpcc::SpiBlockMaster
+	class SoftwareSpiBlockMaster : public ::xpcc::SpiBlockMaster
 	{
 	public:
 		/**

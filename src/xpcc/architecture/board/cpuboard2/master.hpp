@@ -34,12 +34,12 @@
 #include <xpcc/architecture/platform.hpp>
 #include <xpcc/architecture/driver.hpp>
 
-#include <xpcc/driver/connectivity/spi/software_spi.hpp>
-#include <xpcc/driver/connectivity/can/mcp2515.hpp>
+#include <xpcc/communication/spi/software_spi.hpp>
+#include <xpcc/communication/can/mcp2515.hpp>
 #include <xpcc/driver/storage/at45db0x1d.hpp>
 #include <xpcc/driver/storage/spi_ram.hpp>
 
-#include <xpcc/driver/connectivity/interconnect/interconnect_interface.hpp>
+#include <xpcc/communication/interconnect/interconnect_interface.hpp>
 
 namespace xpcc
 {

@@ -37,7 +37,7 @@
 
 #include "communication/packets.hpp"
 
-#include <xpcc/driver/ui/display/siemens_s65.hpp>
+#include <xpcc/ui/display/siemens_s65.hpp>
 
 namespace lcd
 {

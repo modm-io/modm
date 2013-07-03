@@ -17,7 +17,7 @@ Uart0 uart(9600);
 #define USE_HARDWARE
 
 #if defined USE_SOFTWARE
-#include <xpcc/driver/connectivity/i2c/software_i2c.hpp>
+#include <xpcc/communication/i2c/software_i2c.hpp>
 typedef xpcc::SoftwareI2C< Scl, Sda> Twi;
 #endif
 

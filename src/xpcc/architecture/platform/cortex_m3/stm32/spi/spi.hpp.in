@@ -34,7 +34,7 @@
 
 #include <stdint.h>
 #include "../device.h"
-#include <xpcc/driver/connectivity/spi/spi_master.hpp>
+#include <xpcc/communication/spi/spi_master.hpp>
 
 namespace xpcc
 {

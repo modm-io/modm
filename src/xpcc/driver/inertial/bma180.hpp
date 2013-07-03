@@ -31,7 +31,7 @@
 #ifndef XPCC__BMA180_HPP
 #define XPCC__BMA180_HPP
 
-#include <xpcc/driver/connectivity/i2c/write_read_adapter.hpp>
+#include <xpcc/communication/i2c/write_read_adapter.hpp>
 
 namespace xpcc
 {

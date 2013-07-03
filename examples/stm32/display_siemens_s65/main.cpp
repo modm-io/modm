@@ -1,7 +1,7 @@
 
 #include <xpcc/architecture.hpp>
-#include <xpcc/driver/connectivity/spi.hpp>
-#include <xpcc/driver/ui/display/siemens_s65.hpp>
+#include <xpcc/communication/spi.hpp>
+#include <xpcc/ui/display/siemens_s65.hpp>
 
 namespace lcd
 {

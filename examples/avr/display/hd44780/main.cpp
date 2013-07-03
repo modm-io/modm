@@ -1,7 +1,7 @@
 
 #include <xpcc/architecture.hpp>
 
-#include <xpcc/driver/ui/display.hpp>
+#include <xpcc/ui/display.hpp>
 
 // define the pins used by the LCD
 namespace lcd

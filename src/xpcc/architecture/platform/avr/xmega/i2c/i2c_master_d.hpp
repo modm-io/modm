@@ -37,7 +37,7 @@
 #define XPCC_ATXMEGA__I2C_MASTER_D_HPP
 
 #include <stdint.h>
-#include <xpcc/driver/connectivity/i2c/master.hpp>
+#include <xpcc/communication/i2c/master.hpp>
 
 #if defined(TWID) || defined(__DOXYGEN__)
 

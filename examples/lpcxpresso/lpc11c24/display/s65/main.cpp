@@ -7,12 +7,12 @@
  */
 
 #include <xpcc/architecture.hpp>
-#include <xpcc/driver/connectivity/spi.hpp>
+#include <xpcc/communication/spi.hpp>
 
 // How to include the defines?
 // #include "xpcc_config.hpp" does not work.
 #include "../../../../../build/lpcxpresso/lpc11c24/display_s65/libxpcc/xpcc_config.hpp"
-#include <xpcc/driver/ui/display/siemens_s65.hpp>
+#include <xpcc/ui/display/siemens_s65.hpp>
 
 #include <xpcc/processing/timeout.hpp>
 

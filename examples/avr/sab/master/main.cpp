@@ -1,6 +1,6 @@
 
 #include <xpcc/architecture/platform.hpp>
-#include <xpcc/driver/connectivity/sab/interface.hpp>
+#include <xpcc/communication/sab/interface.hpp>
 
 using namespace xpcc::atmega;
 

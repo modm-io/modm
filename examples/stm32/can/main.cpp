@@ -1,8 +1,8 @@
 
 #include <xpcc/architecture.hpp>
-#include <xpcc/driver/ui/display/ea_dog.hpp>
-#include <xpcc/driver/ui/display/font.hpp>
-#include <xpcc/driver/ui/display/image.hpp>
+#include <xpcc/ui/display/ea_dog.hpp>
+#include <xpcc/ui/display/font.hpp>
+#include <xpcc/ui/display/image.hpp>
 #include <xpcc/debug.hpp>
 
 // ----------------------------------------------------------------------------

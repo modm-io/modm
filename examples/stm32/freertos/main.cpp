@@ -4,8 +4,8 @@
 #include <xpcc/debug.hpp>
 
 #include <xpcc/driver/gpio.hpp>
-#include <xpcc/driver/ui/display/ea_dog.hpp>
-#include <xpcc/driver/ui/display/font.hpp>
+#include <xpcc/ui/display/ea_dog.hpp>
+#include <xpcc/ui/display/font.hpp>
 
 #include <xpcc/processing/rtos.hpp>
 

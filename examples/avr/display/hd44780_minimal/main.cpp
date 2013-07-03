@@ -1,6 +1,6 @@
 
 #include <xpcc/architecture.hpp>
-#include <xpcc/driver/ui/display.hpp>
+#include <xpcc/ui/display.hpp>
 
 #include "hd44780_minimal.hpp"
 

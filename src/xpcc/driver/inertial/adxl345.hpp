@@ -31,7 +31,7 @@
 #ifndef XPCC__ADXL345_HPP
 #define XPCC__ADXL345_HPP
 
-#include <xpcc/driver/connectivity/i2c/write_read_adapter.hpp>
+#include <xpcc/communication/i2c/write_read_adapter.hpp>
 
 namespace xpcc
 {

@@ -33,7 +33,7 @@
 #define XPCC_STM32__I2C_{{ id }}_HPP
 
 #include <stdint.h>
-#include <xpcc/driver/connectivity/i2c/master.hpp>
+#include <xpcc/communication/i2c/master.hpp>
 
 
 #include "../device.h"

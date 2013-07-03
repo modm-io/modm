@@ -31,7 +31,7 @@
 #ifndef XPCC_STM32__CAN_FILTER_HPP
 #define XPCC_STM32__CAN_FILTER_HPP
 
-#include <xpcc/driver/connectivity/can/message.hpp>
+#include <xpcc/communication/can/message.hpp>
 
 #include "../device.h"
 

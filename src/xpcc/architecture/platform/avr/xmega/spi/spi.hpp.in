@@ -36,7 +36,7 @@
 #include <stdint.h>
 #include <avr/io.h>
 #include "spi.hpp"
-#include <xpcc/driver/connectivity/spi/spi_master.hpp>
+#include <xpcc/communication/spi/spi_master.hpp>
 #include <xpcc/architecture/utils.hpp>
 
 namespace xpcc

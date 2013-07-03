@@ -105,6 +105,7 @@ namespace xpcc
 
 #include "peripheral/gpio.hpp"
 #include "peripheral/uart.hpp"
+#include "peripheral/one_wire.hpp"
 #include "peripheral/spi.hpp"
 #include "peripheral/i2c.hpp"
 

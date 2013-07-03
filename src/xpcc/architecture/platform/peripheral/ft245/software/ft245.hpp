@@ -47,7 +47,7 @@ namespace xpcc
 	 * 
 	 * \code
 	 * #include <xpcc/architecture.hpp>
-	 * #include <xpcc/driver/connectivity/ft245.hpp>
+	 * #include <xpcc/communication/ft245.hpp>
 	 * 
 	 * GPIO__PORT(FtPort, A);
 	 * GPIO__OUTPUT(FtRd, B, 0);

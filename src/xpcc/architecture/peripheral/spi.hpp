@@ -34,6 +34,17 @@
 
 namespace xpcc
 {
+	struct Spi
+	{
+		enum class BufferOptions : uint8_t
+		{
+			TxRxIncrement = 0b11,
+			TxIncrementRxDecrement = 0b10,
+			TxDecrementRxIncrement = 0b01,
+			TxRxDecrement = 0b00,
+		};
+	};
+
 	/**
 	 * \brief		Spi Master
 	 *
@@ -78,17 +89,6 @@ namespace xpcc
 		isFinished();
 #endif
 	};
-	
-	struct Spi
-	{
-		enum class BufferOptions : uint8_t
-		{
-			TxRxIncrement = 0b11,
-			TxIncrementRxDecrement = 0b10,
-			TxDecrementRxIncrement = 0b01,
-			TxRxDecrement = 0b00,
-		};
-	};
 
 	/**
 	 * \brief		Spi Master with DMA support
@@ -96,9 +96,9 @@ namespace xpcc
 	 * \ingroup		peripheral
 	 * \author		Niklas Hauser
 	 */
-	class SpiBlockMaster : public ::xpcc::Peripheral, Spi
+	class SpiBlockMaster : public ::xpcc::Peripheral, public Spi
 	{
-#if defined __DOXYGEN__
+#ifdef __DOXYGEN__
 	public:
 		/**
 		 * \brief	Set the data buffers and length with options and starts a transfer

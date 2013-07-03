@@ -33,7 +33,7 @@
 #define XPCC_ATXMEGA__I2C_MASTER_{{ id }}_HPP
 
 #include <stdint.h>
-#include <xpcc/driver/connectivity/i2c/master.hpp>
+#include <xpcc/communication/i2c/master.hpp>
 
 #if defined(TWI{{ id }}) || defined(__DOXYGEN__)
 

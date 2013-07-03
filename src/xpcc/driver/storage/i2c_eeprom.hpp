@@ -31,7 +31,7 @@
 #ifndef XPCC__I2C_EEPROM_HPP
 #define XPCC__I2C_EEPROM_HPP
 
-#include <xpcc/driver/connectivity/i2c/delegate.hpp>
+#include <xpcc/communication/i2c/delegate.hpp>
 
 namespace xpcc
 {

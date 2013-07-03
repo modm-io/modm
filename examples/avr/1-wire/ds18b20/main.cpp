@@ -1,6 +1,5 @@
 
 #include <xpcc/architecture.hpp>
-#include <xpcc/driver/connectivity/software_one_wire.hpp>
 #include <xpcc/driver/temperature/ds18b20.hpp>
 
 #include <xpcc/io/iostream.hpp>
@@ -8,7 +7,7 @@
 using namespace xpcc::atmega;
 
 GPIO__IO(OneWirePin, C, 2);
-xpcc::SoftwareOneWire<OneWirePin> ow;
+xpcc::SoftwareOneWireMaster<OneWirePin> ow;
 
 Uart0 uart(9600);
 
@@ -50,7 +49,7 @@ main()
 	output << "finished!" << xpcc::endl;
 	
 	// read the temperature from a connected DS18B20
-	xpcc::Ds18b20< xpcc::SoftwareOneWire<OneWirePin> > ds18b20(rom);
+	xpcc::Ds18b20< xpcc::SoftwareOneWireMaster<OneWirePin> > ds18b20(rom);
 	
 	ds18b20.startConversion();
 	

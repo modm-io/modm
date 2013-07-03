@@ -1,7 +1,7 @@
 
 #include <xpcc/architecture.hpp>
-#include <xpcc/driver/ui/display/ea_dog.hpp>
-#include <xpcc/driver/ui/display/font.hpp>
+#include <xpcc/ui/display/ea_dog.hpp>
+#include <xpcc/ui/display/font.hpp>
 
 // ----------------------------------------------------------------------------
 GPIO__OUTPUT(LedStat, C, 12);	// inverted, 0=on, 1=off

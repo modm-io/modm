@@ -78,7 +78,7 @@ namespace xpcc
 		 * \ingroup		{{target.family}}
 		 * \author		Niklas Hauser
 		 */
-		class SpiMaster : public xpcc::SpiMaster, Spi
+		class SpiMaster : public ::xpcc::SpiMaster, Spi
 		{
 		public:
 			/**
@@ -155,7 +155,7 @@ namespace xpcc
 		 * \ingroup		{{target.family}}
 		 * \author		Niklas Hauser
 		 */
-		class SpiBlockMaster : public xpcc::SpiBlockMaster, Spi
+		class SpiBlockMaster : public ::xpcc::SpiBlockMaster, Spi
 		{
 		public:
 			/**

@@ -4,8 +4,8 @@
 #define	 CONFIG_HPP
 
 #include <xpcc/architecture.hpp>
-#include <xpcc/driver/connectivity/spi.hpp>
-#include <xpcc/driver/ui/seven_segment.hpp>
+#include <xpcc/communication/spi.hpp>
+#include <xpcc/ui/seven_segment.hpp>
 
 // ----------------------------------------------------------------------------
 

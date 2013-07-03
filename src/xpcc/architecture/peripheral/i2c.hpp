@@ -48,8 +48,8 @@ namespace xpcc
 	 * enables the program to do other things while the operation is
 	 * going on.
 	 *
-	 * \author Georgi Grinshpun
-	 * \author Niklas Hauser
+	 * \author	Georgi Grinshpun
+	 * \author	Niklas Hauser
 	 * \ingroup	peripheral
 	 */
 	class I2cMaster : public ::xpcc::Peripheral

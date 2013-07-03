@@ -32,7 +32,7 @@
 #ifndef XPCC_STM32__CAN{{ id }}_HPP
 #define XPCC_STM32__CAN{{ id }}_HPP
 
-#include <xpcc/driver/connectivity/can/message.hpp>
+#include <xpcc/communication/can/message.hpp>
 
 #include "can_filter.hpp"
 #include "../device.h"

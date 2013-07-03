@@ -1,7 +1,7 @@
 #include <xpcc/architecture/platform.hpp>
 
 #include <xpcc/architecture/peripheral/gpio.hpp>
-#include <xpcc/driver/ui/button_group.hpp>
+#include <xpcc/ui/button_group.hpp>
 
 static xpcc::ButtonGroup<> buttons(0);
 

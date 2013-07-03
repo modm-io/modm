@@ -39,8 +39,8 @@
 
 #include <stdint.h>
 
-#include <xpcc/driver/ui/color.hpp>
-#include <xpcc/driver/connectivity/i2c/write_read_adapter.hpp>
+#include <xpcc/ui/color.hpp>
+#include <xpcc/communication/i2c/write_read_adapter.hpp>
 
 namespace xpcc
 {

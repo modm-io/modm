@@ -31,7 +31,7 @@
 #ifndef XPCC__LM75_HPP
 #define XPCC__LM75_HPP
 
-#include <xpcc/driver/connectivity/i2c/read_adapter.hpp>
+#include <xpcc/communication/i2c/read_adapter.hpp>
 
 namespace xpcc
 {

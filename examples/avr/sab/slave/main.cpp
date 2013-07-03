@@ -6,7 +6,7 @@
  */
 
 #include <xpcc/architecture/platform.hpp>
-#include <xpcc/driver/connectivity/sab/slave.hpp>
+#include <xpcc/communication/sab/slave.hpp>
 
 using namespace xpcc::atmega;
 

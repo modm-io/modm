@@ -31,7 +31,7 @@
 #ifndef XPCC_HCLA12X5_HPP
 #define XPCC_HCLA12X5_HPP
 
-#include <xpcc/driver/connectivity/i2c/read_adapter.hpp>
+#include <xpcc/communication/i2c/read_adapter.hpp>
 
 namespace xpcc
 {

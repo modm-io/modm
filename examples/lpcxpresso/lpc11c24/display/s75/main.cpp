@@ -11,7 +11,7 @@
 // How to include the defines?
 // #include "xpcc_config.hpp" does not work.
 #include "../../../../../build/lpcxpresso/lpc11c24/display_s75/libxpcc/xpcc_config.hpp"
-#include <xpcc/driver/ui/display/siemens_s75.hpp>
+#include <xpcc/ui/display/siemens_s75.hpp>
 
 #include <xpcc/processing/timeout.hpp>
 

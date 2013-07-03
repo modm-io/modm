@@ -9,7 +9,7 @@
 #define XPCC_LPC11__SPI_1_HPP
 
 #include <stdint.h>
-#include <xpcc/driver/connectivity/spi/spi_master.hpp>
+#include <xpcc/communication/spi/spi_master.hpp>
 
 #include "spi_registers.h"
 namespace xpcc

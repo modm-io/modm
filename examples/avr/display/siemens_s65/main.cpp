@@ -1,9 +1,9 @@
 
 #include <xpcc/architecture.hpp>
 
-#include <xpcc/driver/connectivity/spi/software_spi.hpp>
-#include <xpcc/driver/ui/display/siemens_s65.hpp>
-#include <xpcc/driver/ui/button_group.hpp>
+#include <xpcc/communication/spi/software_spi.hpp>
+#include <xpcc/ui/display/siemens_s65.hpp>
+#include <xpcc/ui/button_group.hpp>
 
 GPIO__OUTPUT(Mosi, E, 5);
 GPIO__OUTPUT(Sck, E, 7);
