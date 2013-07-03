@@ -151,7 +151,8 @@ def generate(env, **kw):
 	env['CXXFLAGS'] = [
 #		"-fverbose-asm",
 #		"-save-temps",		# save preprocessed files
-		"-std=gnu++0x",
+		"-std=c++11",
+		"-fconstexpr-depth=10000", # enable deep recursion
 		"-fno-exceptions",
 		"-fno-rtti",
 		"-fno-threadsafe-statics",
