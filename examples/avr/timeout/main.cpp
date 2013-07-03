@@ -1,7 +1,8 @@
-#include <xpcc/architecture/platform.hpp>
 
-#include <xpcc/architecture/peripheral/gpio.hpp>
+#include <xpcc/architecture/platform.hpp>
 #include <xpcc/processing/timeout.hpp>
+
+using namespace xpcc::atmega;
 
 // create a output device for the led
 GPIO__OUTPUT(Led, B, 0);
@@ -26,7 +27,7 @@ main()
 	OCR2A = 230;
 	
 	// enable interrupts
-	sei();
+	enableInterrupts();
 	
 	xpcc::Timeout<> timeout(200);
 	while (1)

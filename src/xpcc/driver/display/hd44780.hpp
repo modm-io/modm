@@ -32,7 +32,7 @@
 #define XPCC__HD44780_HPP
 
 #include <xpcc/architecture/driver.hpp>
-#include "character_display.hpp"
+#include <xpcc/ui/display/character_display.hpp>
 
 namespace xpcc
 {

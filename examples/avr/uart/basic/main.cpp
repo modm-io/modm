@@ -1,8 +1,10 @@
 
 #include <xpcc/architecture/platform.hpp>
 
+using namespace xpcc::atmega;
+
 // Create a new UART object and configure it to a baudrate of 115200
-xpcc::atmega::Uart0 uart(115200);
+Uart0 uart(115200);
 
 int
 main()

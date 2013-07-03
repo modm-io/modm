@@ -1,18 +1,16 @@
 
 #include <xpcc/architecture.hpp>
-
-#include <xpcc/communication/spi/software_spi.hpp>
-#include <xpcc/ui/display/ea_dog.hpp>
+#include <xpcc/driver/display.hpp>
 #include <xpcc/ui/button_group.hpp>
 
 GPIO__OUTPUT(Cs, E, 4);
 GPIO__OUTPUT(Mosi, E, 5);
 GPIO__OUTPUT(Sck, E, 7);
-typedef xpcc::SoftwareSpi<Sck, Mosi, xpcc::gpio::Unused> Spi;
+typedef xpcc::SoftwareSpiMaster<Sck, Mosi, xpcc::GpioUnused> SpiM;
 
 GPIO__OUTPUT(A0, F, 1);
 GPIO__OUTPUT(Reset, K, 3);
-typedef xpcc::DogM132<Spi, Cs, A0, Reset> Display;
+typedef xpcc::DogM132<SpiM, Cs, A0, Reset> Display;
 
 GPIO__OUTPUT(Backlight, F, 0);
 

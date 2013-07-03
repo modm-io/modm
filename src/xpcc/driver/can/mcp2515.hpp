@@ -35,8 +35,8 @@
 #include <xpcc/architecture/driver/accessor.hpp>
 #include <xpcc/architecture/driver/delay.hpp>
 
-#include "mcp2515/mcp2515_definitions.hpp"
-#include "message.hpp"
+#include "mcp2515_definitions.hpp"
+#include <xpcc/communication/can/message.hpp>
 
 /**
  * \defgroup	mcp2515	MCP2515
@@ -208,6 +208,6 @@ namespace xpcc
 	};
 }
 
-#include "mcp2515/mcp2515_impl.hpp"
+#include "mcp2515_impl.hpp"
 
 #endif // XPCC__MCP2515_HPP

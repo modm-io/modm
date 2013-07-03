@@ -1,9 +1,6 @@
 
 #include <xpcc/architecture.hpp>
-
-#include <xpcc/ui/display/ea_dog.hpp>
-#include <xpcc/communication/spi/software_spi.hpp>
-
+#include <xpcc/driver/display.hpp>
 #include <xpcc/io/iostream.hpp>
 
 using namespace xpcc::atmega;
@@ -35,7 +32,7 @@ namespace lcd
 	GPIO__OUTPUT(A0, D, 3);
 	GPIO__OUTPUT(Reset, D, 4);
 	
-	typedef xpcc::SoftwareSpi< Scl, Mosi, xpcc::gpio::Unused > SPI;
+	typedef xpcc::SoftwareSpiMaster< Scl, Mosi, xpcc::GpioUnused > SPI;
 }
 
 xpcc::DogM128< lcd::SPI, lcd::CS, lcd::A0, lcd::Reset, true > display;

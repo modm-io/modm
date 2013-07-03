@@ -60,7 +60,7 @@
  * GPIO__OUTPUT(LcdRs, D, 0);
  * 
  * // Create a new type for the software SPI for the display 
- * typedef xpcc::SoftwareSpi< Clk, Mosi, xpcc::gpio::Unused > SpiInterface;
+ * typedef xpcc::SoftwareSpiMaster< Clk, Mosi, xpcc::GpioUnused > SpiInterface;
  * 
  * // Create a instance of the ST7036 based display class
  * xpcc::St7036< SpiInterface,

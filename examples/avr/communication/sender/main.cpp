@@ -1,11 +1,10 @@
 
 #include <xpcc/architecture.hpp>
 #include <xpcc/communication.hpp>
-#include <xpcc/communication/backend/can/can_connector.hpp>
+#include <xpcc/communication/xpcc/backend/can/can_connector.hpp>
 #include <xpcc/debug/logger.hpp>
 
-#include <xpcc/communication/can/mcp2515.hpp>
-#include <xpcc/communication/spi/software_spi.hpp>
+#include <xpcc/driver/can/mcp2515.hpp>
 
 using namespace xpcc::atmega;
 
@@ -39,8 +38,8 @@ GPIO__OUTPUT(Sclk, B, 7);
 GPIO__OUTPUT(Mosi, B, 5);
 GPIO__INPUT(Miso, B, 6);
 
-typedef xpcc::SoftwareSpi< Sclk, Mosi, Miso > Spi;
-typedef xpcc::Mcp2515< Spi, Cs, Int > CanDevice;
+typedef xpcc::SoftwareSpiMaster< Sclk, Mosi, Miso > SpiM;
+typedef xpcc::Mcp2515< SpiM, Cs, Int > CanDevice;
 
 static CanDevice device;
 static xpcc::CanConnector< CanDevice > connector(&device);
@@ -75,7 +74,7 @@ MAIN_FUNCTION
 {
 	// Initialize SPI interface and the other pins
 	// needed by the MCP2515
-	Spi::initialize();
+	SpiM::initialize();
 	Cs::setOutput();
 	Int::setInput(Gpio::PullType::PullUp);
 	

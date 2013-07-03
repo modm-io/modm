@@ -1,18 +1,16 @@
 
 #include <xpcc/architecture.hpp>
-
-#include <xpcc/communication/spi/software_spi.hpp>
-#include <xpcc/ui/display/siemens_s65.hpp>
+#include <xpcc/driver/display.hpp>
 #include <xpcc/ui/button_group.hpp>
 
 GPIO__OUTPUT(Mosi, E, 5);
 GPIO__OUTPUT(Sck, E, 7);
-typedef xpcc::SoftwareSpi<Sck, Mosi, xpcc::gpio::Unused> Spi;
+typedef xpcc::SoftwareSpiMaster<Sck, Mosi, xpcc::GpioUnused> SPI;
 
 GPIO__OUTPUT(Cs, E, 2);
 GPIO__OUTPUT(Rs, E, 3);
 GPIO__OUTPUT(Reset, K, 3);
-typedef xpcc::SiemensS65Portrait<Spi, Cs, Rs, Reset> Display;
+typedef xpcc::SiemensS65Portrait<SPI, Cs, Rs, Reset> Display;
 
 GPIO__OUTPUT(Backlight, F, 0);
 

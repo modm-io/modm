@@ -33,7 +33,7 @@
 
 #include <xpcc/architecture/driver/delay.hpp>
 
-#include "buffered_graphic_display.hpp"
+#include <xpcc/ui/display/buffered_graphic_display.hpp>
 
 namespace xpcc
 {
@@ -75,9 +75,9 @@ namespace xpcc
 		
 	protected:
 		// Timing constants form the datasheet
-		static const float DATA_SET_UP_TIME = 0.14f;
-		static const float MIN_E_HIGH_TIME = 0.45f;
-		static const float MIN_E_LOW_TIME = 0.45f;
+		static constexpr float DATA_SET_UP_TIME = 0.14f;
+		static constexpr float MIN_E_HIGH_TIME = 0.45f;
+		static constexpr float MIN_E_LOW_TIME = 0.45f;
 		
 	protected:
 		/// Write one byte (Sets RW and E)

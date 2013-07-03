@@ -1,11 +1,7 @@
 
 #include <xpcc/architecture.hpp>
-
-#include <xpcc/ui/display/ea_dog.hpp>
+#include <xpcc/driver/display.hpp>
 #include <xpcc/ui/display/font.hpp>
-
-#include <xpcc/communication/spi/software_spi.hpp>
-#include <xpcc/driver/gpio.hpp>
 
 // Graphic LCD
 namespace lcd
@@ -18,7 +14,7 @@ namespace lcd
 	GPIO__OUTPUT(RS, D, 3);
 }
 
-typedef xpcc::SoftwareSpi< lcd::Scl, lcd::Mosi, lcd::Miso > SPI;
+typedef xpcc::SoftwareSpiMaster< lcd::Scl, lcd::Mosi, lcd::Miso > SPI;
 
 xpcc::DogM163< SPI, lcd::CS, lcd::RS > display;
 

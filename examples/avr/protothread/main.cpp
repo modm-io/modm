@@ -1,8 +1,9 @@
 
 #include <xpcc/architecture/platform.hpp>
-#include <xpcc/architecture/peripheral/gpio.hpp>
 #include <xpcc/processing/protothread.hpp>
 #include <xpcc/processing/timeout.hpp>
+
+using namespace xpcc::atmega;
 
 GPIO__OUTPUT(LedGreen, B, 0);
 GPIO__OUTPUT(LedRed, B, 1);
@@ -97,8 +98,7 @@ main()
 	TIMSK2 = (1 << OCIE2A);
 	OCR2A = 230;
 	
-	// enable interrupts
-	sei();
+	enableInterrupts();
 	
 	BlinkingLightGreen greenLight;
 	BlinkingLightRed redLight;

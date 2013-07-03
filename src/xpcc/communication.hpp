@@ -33,6 +33,6 @@
  * 
  */
 
-#include "communication/communicatable.hpp"
-#include "communication/abstract_component.hpp"
-#include "communication/dispatcher.hpp"
+#include "communication/xpcc/communicatable.hpp"
+#include "communication/xpcc/abstract_component.hpp"
+#include "communication/xpcc/dispatcher.hpp"

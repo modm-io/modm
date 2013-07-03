@@ -5,7 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -30,13 +30,17 @@
 /**
  * \defgroup	lcd		LCD
  * \brief		Liquid crystal display
- * 
- * \ingroup		ui
+ *
+ * \ingroup		driver
  */
 
-#include "display/font.hpp"
-#include "display/image.hpp"
-
-#include "display/character_display.hpp"
-#include "display/graphic_display.hpp"
-#include "display/buffered_graphic_display.hpp"
+#include "display/ea_dog.hpp"
+#include "display/hd44780.hpp"
+#include "display/ks0108.hpp"
+#include "display/nokia6610.hpp"
+#include "display/seven_segment.hpp"
+#include "display/siemens_m55.hpp"
+#include "display/siemens_s65.hpp"
+#include "display/siemens_s75.hpp"
+#include "display/st7036.hpp"
+#include "display/st7565.hpp"

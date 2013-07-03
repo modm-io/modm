@@ -33,7 +33,7 @@
 
 #include <xpcc/architecture/driver/delay.hpp>
 
-#include "buffered_graphic_display.hpp"
+#include <xpcc/ui/display/buffered_graphic_display.hpp>
 
 namespace xpcc
 {

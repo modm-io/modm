@@ -34,7 +34,7 @@
 #include <xpcc/architecture/platform.hpp>
 #include <xpcc/architecture/driver.hpp>
 
-#include <xpcc/communication/spi/software_spi.hpp>
+
 #include <xpcc/communication/can/mcp2515.hpp>
 #include <xpcc/driver/storage/at45db0x1d.hpp>
 #include <xpcc/driver/storage/spi_ram.hpp>
@@ -108,7 +108,7 @@ namespace xpcc
 		GPIO__OUTPUT(Cs, C, 4);
 		GPIO__INPUT(Int, B, 0);
 		
-		typedef xpcc::SoftwareSpi<Sck, Mosi, Miso> SpiCan;
+		typedef xpcc::SoftwareSpiMaster<Sck, Mosi, Miso> SpiCan;
 		
 		GPIO__INPUT(RxBf0, Q, 0);
 		GPIO__INPUT(RxBf1, Q, 1);
@@ -125,7 +125,7 @@ namespace xpcc
 		GPIO__INPUT(MisoFlash, F, 6);
 		GPIO__OUTPUT(SckFlash, F, 7);
 		
-		typedef xpcc::SoftwareSpi<SckFlash, MosiFlash, MisoFlash> SpiFlash;
+		typedef xpcc::SoftwareSpiMaster<SckFlash, MosiFlash, MisoFlash> SpiFlash;
 		
 	public:
 		/// Atmel DataFlash (4 MBit)

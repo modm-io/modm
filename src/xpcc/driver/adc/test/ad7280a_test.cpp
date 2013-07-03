@@ -69,7 +69,7 @@ struct Cs
 	}
 };
 
-typedef xpcc::Ad7280a<Spi, Cs, xpcc::gpio::Unused, 1> Ad7280a;
+typedef xpcc::Ad7280a<Spi, Cs, xpcc::GpioUnused, 1> Ad7280a;
 
 // ----------------------------------------------------------------------------
 void

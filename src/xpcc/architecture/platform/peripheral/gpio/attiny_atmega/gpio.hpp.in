@@ -118,11 +118,11 @@ namespace xpcc
 	%% for type in ["Output", "Input", ""] 
 		
 		%% if type == "Output"
-		struct GpioOutput{{port ~ pin}} : Gpio, ::xpcc::GpioOutput
+		struct GpioOutput{{port ~ pin}} : public Gpio, ::xpcc::GpioOutput
 		%% elif type == "Input"
-		struct GpioInput{{port ~ pin}} : Gpio, ::xpcc::GpioInput
+		struct GpioInput{{port ~ pin}} : public Gpio, ::xpcc::GpioInput
 		%% elif type == ""
-		struct Gpio{{port ~ pin}} : Gpio, ::xpcc::GpioIO
+		struct Gpio{{port ~ pin}} : public Gpio, ::xpcc::GpioIO
 		%% endif
 		{
 		%% if type in ["", "Output"]

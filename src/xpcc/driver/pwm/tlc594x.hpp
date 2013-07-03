@@ -69,8 +69,8 @@ namespace xpcc
 	 * \tparam CHANNELS	Number of channels must be multiples of 4, adjust for daisy-chained chips
 	 * \tparam	Spi		Spi interface
 	 * \tparam	Xlat	Level triggered latch pin
-	 * \tparam	Vprog	Vprog pin, use xpcc::gpio::Unused if not connected
-	 * \tparam	Xerr	Error pin, use xpcc::gpio::Unused if not connected
+	 * \tparam	Vprog	Vprog pin, use xpcc::GpioUnused if not connected
+	 * \tparam	Xerr	Error pin, use xpcc::GpioUnused if not connected
 	 * 
 	 * \author	Niklas Hauser
 	 * \ingroup	pwm
@@ -79,8 +79,8 @@ namespace xpcc
 	uint16_t CHANNELS,
 	typename Spi,
 	typename Xlat,
-	typename Vprog=xpcc::gpio::Unused,
-	typename Xerr=xpcc::gpio::Unused>
+	typename Vprog=xpcc::GpioUnused,
+	typename Xerr=xpcc::GpioUnused>
 	class TLC594X
 	{
 	public:

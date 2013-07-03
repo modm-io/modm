@@ -5,10 +5,10 @@
 
 using namespace xpcc::atmega;
 
-GPIO__IO(SclPin, C, 0);
-GPIO__IO(SdaPin, C, 1);
-GpioOpenDrain< SclPin > Scl;
-GpioOpenDrain< SdaPin > Sda;
+// the AVR GPIOs do not have real Open Drain mode
+// so we need to emulate it
+typedef GpioOpenDrain< I2c::Scl > Scl;
+typedef GpioOpenDrain< I2c::Sda > Sda;
 
 // Create a new UART object and configure it to a baudrate of 9600
 Uart0 uart(9600);
@@ -17,11 +17,8 @@ Uart0 uart(9600);
 #define USE_HARDWARE
 
 #if defined USE_SOFTWARE
-#include <xpcc/communication/i2c/software_i2c.hpp>
-typedef xpcc::SoftwareI2C< Scl, Sda> Twi;
-#endif
-
-#if defined USE_HARDWARE
+typedef xpcc::SoftwareI2cMaster< Scl, Sda > Twi;
+#elif defined USE_HARDWARE
 typedef I2cMaster Twi;
 #endif
 
