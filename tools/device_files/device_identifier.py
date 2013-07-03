@@ -64,30 +64,43 @@ class DeviceIdentifier:
 			if len(string) >= 9:
 				self.valid = True
 
-		# AVR platform with ATmega and ATxmega family
+		# AVR platform with AT90, ATtiny, ATmega and ATxmega family
 		elif string.startswith('at'):
 			self.platform = "avr"
-			match = re.search("(?P<family>attiny|atmega|atxmega)(?P<name>\d+)", string)
+			matchString = "(?P<family>attiny|atmega|atxmega)(?P<name>\d+)"
+			if string.startswith('at90'):
+				matchString = "(?P<family>at90)(?P<name>CAN|can|PWM|pwm|USB|usb)(?P<type>\d+)"
+			match = re.search(matchString, string)
 			if match:
-				self.family = match.group('family')
-				self.name = match.group('name')
+				self.family = match.group('family').lower()
+				self.name = match.group('name').lower()
 
-				if self.family == "atmega" or self.family == "attiny":
+				if self.family == 'at90':
+					self.type = match.group('type').lower()
+				elif self.family in ['attiny', 'atmega']:
 					match = re.search(self.family + self.name + "(?P<type>\w*)-?(?P<package>\w*)", string)
-					if match.group('type') != '':
-						self.type = match.group('type').lower()
-					if match.group('package') != '':
-						self.pin_id = match.group('package').lower()
+					if match:
+						if match.group('type') != '':
+							self.type = match.group('type').lower()
+						if match.group('package') != '':
+							self.pin_id = match.group('package').lower()
 					match = re.search("(?P<size>256|128|64|32|16|8|4|2)\d*", self.name)
 					if match:
 						self.size_id = match.group('size')
 
 				elif self.family == "atxmega":
-					match = re.search(self.family + self.name + "(?P<type>[A-Ea-e])(?P<package>[1-4])(?P<usb>[Bb][Uu])", string)
-					if match.group('type') != '':
-						self.type = match.group('type').lower()
-					if match.group('package') != '':
-						self.pin_id = match.group('package').lower()
+					match = re.search(self.family + self.name + "(?P<type>[A-Ea-e]?)(?P<package>[1-4]?)(?P<usb>[Bb]?[Uu]?)", string)
+					if match:
+						if match and match.group('type') != '':
+							self.type = match.group('type').lower()
+						if match and match.group('package') != '':
+							self.pin_id = match.group('package')
+					self.size_id = self.name
+					# The ATxmega is the 'extreme ATmega' and actually quite different than the ATmega.
+					# We call this the xmega, without the 'at' prefix, to remind you of the differences.
+					self.family = 'xmega'
+				
+				print self
 				self.valid = True
 			
 		else:
@@ -98,15 +111,15 @@ class DeviceIdentifier:
 		string = ""
 		if self.platform != None and self.platform != "avr":
 			string += platform
-		if self.family != None:
+		if self.family:
 			string += self.family
-		if self.name != None:
+		if self.name:
 			string += self.name
-		if self.type != None and self.platform != "stm32":
+		if self.type and self.platform != "stm32":
 			string += self.type
-		if self.pin_id != None and self.platform != "avr":
+		if self.pin_id and self.family not in ['atmega', 'attiny']:
 			string += self.pin_id
-		if self.size_id != None and self.platform != "avr":
+		if self.size_id and self.platform != "avr":
 			string += self.size_id
 		return string
 
