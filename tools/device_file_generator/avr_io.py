@@ -940,7 +940,7 @@ pins = \
 		]
 	},
 	
-	# ATtiny
+	# ATtiny devices
 	
 	{
 		"devices": ["attiny4", "attiny5", "attiny9", "attiny10"],
@@ -1453,5 +1453,206 @@ pins = \
 			{ "port": "B", "id": "5", "name": "di" }
 		]
 	},
+	
+	# AT90 devices
+	
+	{
+		"devices": ["at90can32", "at90can64", "at90can128"],
+		"exti":
+		[
+			{ "port": "D", "id": "0", "int": "0" },
+			{ "port": "D", "id": "1", "int": "1" },
+			{ "port": "D", "id": "2", "int": "2" },
+			{ "port": "D", "id": "3", "int": "3" },
+			{ "port": "E", "id": "4", "int": "4" },
+			{ "port": "E", "id": "5", "int": "5" },
+			{ "port": "E", "id": "6", "int": "6" },
+			{ "port": "E", "id": "7", "int": "7" }
+		],
+		"spi":
+		[
+			{ "port": "B", "id": "2", "name": "miso" },
+			{ "port": "B", "id": "3", "name": "mosi" },
+			{ "port": "B", "id": "1", "name": "sck" },
+			{ "port": "B", "id": "0", "name": "ss" }
+		],
+		"uart0":
+		[
+			{ "port": "E", "id": "0", "name": "rxd" },
+			{ "port": "E", "id": "1", "name": "txd" },
+			{ "port": "E", "id": "2", "name": "xck" }
+		],
+		"uart1":
+		[
+			{ "port": "D", "id": "2", "name": "rxd" },
+			{ "port": "D", "id": "3", "name": "txd" },
+			{ "port": "D", "id": "5", "name": "xck" }
+		],
+		"i2c":
+		[
+			{ "port": "D", "id": "0", "name": "scl" },
+			{ "port": "D", "id": "1", "name": "sda" }
+		],
+		"can":
+		[
+			{ "port": "D", "id": "6", "name": "rxd" },
+			{ "port": "D", "id": "5", "name": "txd" }
+		]
+	},
+	
+	{
+		"devices": ["at90pwm1",
+					"at90pwm2", "at90pwm2b", "at90pwm216"],
+		"exti":
+		[
+			{ "port": "B", "id": "6", "int": "0" },
+			{ "port": "D", "id": "2", "int": "1" },
+			{ "port": "D", "id": "5", "int": "2" }
+		],
+		"spi":
+		[
+			{ "port": "B", "id": "1", "name": "miso" },
+			{ "port": "B", "id": "0", "name": "mosi" },
+			{ "port": "B", "id": "7", "name": "sck" },
+			{ "port": "D", "id": "3", "name": "ss" }
+		],
+		"uart0":
+		[
+			{ "port": "D", "id": "4", "name": "rxd" },
+			{ "port": "D", "id": "3", "name": "txd" },
+			{ "port": "D", "id": "0", "name": "xck" }
+		]
+	},
+	
+	{
+		"devices": ["at90pwm3", "at90pwm3b", "at90pwm316"],
+		"exti":
+		[
+			{ "port": "B", "id": "6", "int": "0" },
+			{ "port": "D", "id": "2", "int": "1" },
+			{ "port": "D", "id": "5", "int": "2" },
+			{ "port": "C", "id": "0", "int": "3" }
+		],
+		"spi":
+		[
+			{ "port": "B", "id": "1", "name": "miso" },
+			{ "port": "B", "id": "0", "name": "mosi" },
+			{ "port": "B", "id": "7", "name": "sck" },
+			{ "port": "D", "id": "3", "name": "ss" }
+		],
+		"uart0":
+		[
+			{ "port": "D", "id": "4", "name": "rxd" },
+			{ "port": "D", "id": "3", "name": "txd" },
+			{ "port": "D", "id": "0", "name": "xck" }
+		]
+	},
+	
+	{
+		"devices": ["at90pwm81", "at90pwm161"],
+		"exti":
+		[
+			{ "port": "B", "id": "2", "int": "0" },
+			{ "port": "B", "id": "5", "int": "1" },
+			{ "port": "E", "id": "0", "int": "2" }
+		],
+		"spi":
+		[
+			{ "port": "B", "id": "4", "name": "miso" },
+			{ "port": "B", "id": "6", "name": "mosi" },
+			{ "port": "B", "id": "5", "name": "sck" },
+			{ "port": "D", "id": "0", "name": "ss" }
+		]
+	},
+	
+	{
+		"devices": ["at90usb82", "at90usb162"],
+		"pcint":
+		[
+			{ "port": "B", "id": "0", "int": "0" },
+			{ "port": "B", "id": "1", "int": "1" },
+			{ "port": "B", "id": "2", "int": "2" },
+			{ "port": "B", "id": "3", "int": "3" },
+			{ "port": "B", "id": "4", "int": "4" },
+			{ "port": "B", "id": "5", "int": "5" },
+			{ "port": "B", "id": "6", "int": "6" },
+			{ "port": "B", "id": "7", "int": "7" },
+			
+			{ "port": "C", "id": "6", "int": "8" },
+			{ "port": "C", "id": "5", "int": "9" },
+			{ "port": "C", "id": "4", "int": "10" },
+			{ "port": "C", "id": "2", "int": "11" },
+			{ "port": "D", "id": "5", "int": "12" }
+		],
+		"exti":
+		[
+			{ "port": "D", "id": "0", "int": "0" },
+			{ "port": "D", "id": "1", "int": "1" },
+			{ "port": "D", "id": "2", "int": "2" },
+			{ "port": "D", "id": "3", "int": "3" },
+			{ "port": "C", "id": "7", "int": "4" },
+			{ "port": "D", "id": "4", "int": "5" },
+			{ "port": "D", "id": "6", "int": "6" },
+			{ "port": "D", "id": "7", "int": "7" }
+		],
+		"spi":
+		[
+			{ "port": "B", "id": "2", "name": "miso" },
+			{ "port": "B", "id": "3", "name": "mosi" },
+			{ "port": "B", "id": "1", "name": "sck" },
+			{ "port": "D", "id": "0", "name": "ss" }
+		],
+		"uart0":
+		[
+			{ "port": "D", "id": "2", "name": "rxd" },
+			{ "port": "D", "id": "3", "name": "txd" },
+			{ "port": "D", "id": "5", "name": "xck" }
+		]
+	},
+	
+	{
+		"devices": ["at90usb646", "at90usb1286",
+					"at90usb647", "at90usb1287"],
+		"pcint":
+		[
+			{ "port": "B", "id": "0", "int": "0" },
+			{ "port": "B", "id": "1", "int": "1" },
+			{ "port": "B", "id": "2", "int": "2" },
+			{ "port": "B", "id": "3", "int": "3" },
+			{ "port": "B", "id": "4", "int": "4" },
+			{ "port": "B", "id": "5", "int": "5" },
+			{ "port": "B", "id": "6", "int": "6" },
+			{ "port": "B", "id": "7", "int": "7" }
+		],
+		"exti":
+		[
+			{ "port": "D", "id": "0", "int": "0" },
+			{ "port": "D", "id": "1", "int": "1" },
+			{ "port": "D", "id": "2", "int": "2" },
+			{ "port": "D", "id": "3", "int": "3" },
+			{ "port": "E", "id": "4", "int": "4" },
+			{ "port": "E", "id": "5", "int": "5" },
+			{ "port": "E", "id": "6", "int": "6" },
+			{ "port": "E", "id": "7", "int": "7" }
+		],
+		"spi":
+		[
+			{ "port": "B", "id": "2", "name": "miso" },
+			{ "port": "B", "id": "3", "name": "mosi" },
+			{ "port": "B", "id": "1", "name": "sck" },
+			{ "port": "D", "id": "0", "name": "ss" }
+		],
+		"uart0":
+		[
+			{ "port": "D", "id": "2", "name": "rxd" },
+			{ "port": "D", "id": "3", "name": "txd" },
+			{ "port": "D", "id": "5", "name": "xck" }
+		],
+		"i2c":
+		[
+			{ "port": "D", "id": "0", "name": "scl" },
+			{ "port": "D", "id": "1", "name": "sda" }
+		]
+	}
 ]
 

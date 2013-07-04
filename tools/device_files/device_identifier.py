@@ -69,7 +69,7 @@ class DeviceIdentifier:
 			self.platform = "avr"
 			matchString = "(?P<family>attiny|atmega|atxmega)(?P<name>\d+)"
 			if string.startswith('at90'):
-				matchString = "(?P<family>at90)(?P<name>CAN|can|PWM|pwm|USB|usb)(?P<type>\d+)"
+				matchString = "(?P<family>at90)(?P<type>CAN|can|PWM|pwm|USB|usb)(?P<name>\d+)[Bb]?"
 			match = re.search(matchString, string)
 			if match:
 				self.family = match.group('family').lower()
@@ -77,6 +77,7 @@ class DeviceIdentifier:
 
 				if self.family == 'at90':
 					self.type = match.group('type').lower()
+					self.size_id = self.name
 				elif self.family in ['attiny', 'atmega']:
 					match = re.search(self.family + self.name + "(?P<type>\w*)-?(?P<package>\w*)", string)
 					if match:
@@ -100,7 +101,6 @@ class DeviceIdentifier:
 					# We call this the xmega, without the 'at' prefix, to remind you of the differences.
 					self.family = 'xmega'
 				
-				print self
 				self.valid = True
 			
 		else:
@@ -113,10 +113,16 @@ class DeviceIdentifier:
 			string += platform
 		if self.family:
 			string += self.family
-		if self.name:
-			string += self.name
-		if self.type and self.platform != "stm32":
-			string += self.type
+		if self.family == 'at90':
+			if self.type:
+				string += self.type
+			if self.name:
+				string += self.name
+		else:
+			if self.name:
+				string += self.name
+			if self.type and self.platform != "stm32":
+				string += self.type
 		if self.pin_id and self.family not in ['atmega', 'attiny']:
 			string += self.pin_id
 		if self.size_id and self.platform != "avr":
