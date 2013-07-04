@@ -28,7 +28,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/communication/backend/can/can_connector.hpp>
+#include <xpcc/communication/xpcc/backend/can/can_connector.hpp>
 #include "can_connector_base_test.hpp"
 
 // ----------------------------------------------------------------------------

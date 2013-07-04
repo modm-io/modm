@@ -28,7 +28,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <xpcc/communication/action_callback.hpp>
+#include <xpcc/communication/xpcc/action_callback.hpp>
 
 #include "action_callback_test.hpp"
 
