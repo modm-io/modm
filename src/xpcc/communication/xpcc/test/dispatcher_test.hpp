@@ -33,7 +33,7 @@
 
 #include <unittest/testsuite.hpp>
 
-#include <xpcc/communication/dispatcher.hpp>
+#include <xpcc/communication/xpcc/dispatcher.hpp>
 
 #include "fake_backend.hpp"
 #include "fake_postman.hpp"

@@ -31,7 +31,7 @@
 #ifndef FAKE_BACKEND_HPP
 #define FAKE_BACKEND_HPP
 
-#include <xpcc/communication/backend/backend_interface.hpp>
+#include <xpcc/communication/xpcc/backend/backend_interface.hpp>
 #include <xpcc/container/linked_list.hpp>
 
 #include "message.hpp"
