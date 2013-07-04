@@ -64,9 +64,12 @@ for path in includes:
 # Update Enivronment Vars set by env.GeneratePlatform for "envOld"
 # FIXME: this is very very ugly
 # Maybe there is a better way....??
-envOld['LINKPATH'] = env['LINKPATH']
-envOld['LINKFILE'] = env['LINKFILE']
-envOld['DEVICE_SIZE'] = env['DEVICE_SIZE']
+if 'LINKPATH' in env:
+	envOld['LINKPATH'] = env['LINKPATH']
+if 'LINKFILE' in env:
+	envOld['LINKFILE'] = env['LINKFILE']
+if 'DEVICE_SIZE' in env:
+	envOld['DEVICE_SIZE'] = env['DEVICE_SIZE']
 
 library = env.Library(target = 'xpcc', source = sources)
 
