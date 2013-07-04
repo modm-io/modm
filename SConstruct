@@ -100,7 +100,11 @@ env.Alias('doc', 'doxygen')
 env.Alias('templates', 'template')
 
 env.Phony(show='@firefox doc/build/api/index.html &')
-env.Phony(unittest='@scons -Q -C src/')
+unittest_str = '@scons -Q -C src/'
+# hand values to next scons instance
+for key, value in ARGUMENTS.items():
+	unittest_str += (" %s=%s" % (key, value))
+env.Phony(unittest=unittest_str)
 
 env.Alias('all', ['doc', 'update', 'templates', 'unittest'])
 env.Default('all')
