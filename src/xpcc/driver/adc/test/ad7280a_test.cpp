@@ -29,6 +29,7 @@
 // ----------------------------------------------------------------------------
 
 #include <xpcc/driver/adc/ad7280a.hpp>
+#include <xpcc/architecture/platform/peripheral/gpio/software/gpio.hpp>
 
 #include "ad7280a_test.hpp"
 
