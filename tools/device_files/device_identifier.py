@@ -77,7 +77,9 @@ class DeviceIdentifier:
 
 				if self.family == 'at90':
 					self.type = match.group('type').lower()
-					self.size_id = self.name
+					match = re.search("(?P<size>128|64|32|16|8|4|3|2|1)\d*", self.name)
+					if match:
+						self.size_id = match.group('size')
 				elif self.family in ['attiny', 'atmega']:
 					match = re.search(self.family + self.name + "(?P<type>\w*)-?(?P<package>\w*)", string)
 					if match:
@@ -97,7 +99,7 @@ class DeviceIdentifier:
 						if match and match.group('package') != '':
 							self.pin_id = match.group('package')
 					self.size_id = self.name
-					# The ATxmega is the 'extreme ATmega' and actually quite different than the ATmega.
+					# The ATxmega is the 'extreme ATmega' and actually quite different from the ATmega.
 					# We call this the xmega, without the 'at' prefix, to remind you of the differences.
 					self.family = 'xmega'
 				

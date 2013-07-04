@@ -121,8 +121,28 @@ class DeviceMerger:
 								matches.append(dev)
 			
 			# The following code is Atmel's fault with their stupid naming schemes.
+			# the AT90's, ATmega's and ATtiny's have special merging rules 
+			if current.id.family == "at90":
+				name = current.id.name
+				
+				# Some Devices are just not in the same group
+				if name in ['1', '2', '3', '216', '316', '646', '647', '1286', '1287']:
+					# these are not the matches you are looking for *move hand*
+					matches = []
+				# these are not the devices you want to matched with
+				for match in matches:
+					if match.id.name in ['1', '2', '3', '216', '316', '646', '647', '1286', '1287']:
+						matches.remove(match)
+						break
+				# but these are:
+				namesA = [ ['1', '2', '216'], ['3', '316'], ['646', '647', '1286', '1287'] ]
+				for names in namesA:
+					if name in names:
+						for dev in [d for d in devs if dev.id.family == "at90"]:
+							for dname in dev.getDeviceNames():
+								if dname in names:
+									matches.append(dev)
 			
-			# some ATmega's have special merging rules
 			if current.id.family == "atmega":
 				name = current.id.name
 				
@@ -145,8 +165,7 @@ class DeviceMerger:
 									for dname in dev.getDeviceNames():
 										if dname in names:
 											matches.append(dev)
-			
-			# the smallest ATtiny's have special merging rules 
+				 
 			if current.id.family == "attiny":
 				name = current.id.name
 				names = ['4', '5', '9', '10']
@@ -241,14 +260,19 @@ class DeviceMerger:
 	def _getCategoryTypeAVR(self, device):
 		type = device.getDeviceAttributes('type')[0]
 		# these are the categories of mergable types
-		categories = [ 	[None, 'none', 'p', 'a', 'pa'],
+		categories = [ 	# ATmega devices
+						[None, 'none', 'p', 'a', 'pa'],
 						['rfa1', 'rfa2', 'rfr1', 'rfr2'],
 						['hvb', 'hvbrevb'],
 						['hve2'],
 						['hva'],
 						['u2'],
 						['u4', 'u6'],
-						['m1', 'c1']
+						['m1', 'c1'],
+						# AT90 devices
+						['can'],
+						['pwm'],
+						['usb'],
 						]
 		# make sure that only one category is used!
 		for cat in categories:

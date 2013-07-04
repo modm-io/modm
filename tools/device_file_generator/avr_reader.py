@@ -56,17 +56,25 @@ class AVRDeviceReader(XMLDeviceReader):
 		
 		dev = DeviceIdentifier(self.name.lower())
 		self.properties['id'] = dev
-		self.properties['mmcu'] = dev.family + dev.name
-		if dev.type != None:
-			self.properties['mmcu'] += dev.type
+		self.properties['mmcu'] = dev.family
+		
+		if dev.family == 'at90':
+			self.properties['mmcu'] += dev.type + dev.name
+		elif dev.family == 'xmega':
+			self.properties['mmcu'] = 'at' + self.properties['mmcu'] + dev.pin_id
 		else:
-			dev.type = "none"
+			self.properties['mmcu'] += dev.name
+			if dev.type:
+				self.properties['mmcu'] += dev.type
+			else:
+				dev.type = "none"
+		
 		self.properties['core'] = architecture.lower()
 
 		self.log.info("Parsing AVR PDF: " + architecture + " " + self.name)
 
-		if (architecture != 'AVR8' and architecture != 'AVR8L'):
-			self.log.error("Only ATtiny, ATmega and AT90 targets can correctly be parsed...")
+		if (architecture not in ['AVR8', 'AVR8L', 'AVR8_XMEGA']):
+			self.log.error("Sorry, only ATtiny, ATmega, ATxmega and AT90 targets can be parsed corretly.")
 			return None
 
 		self.properties['define'] = "__AVR_" + self.name + "__"

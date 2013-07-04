@@ -54,7 +54,7 @@ class AVRDeviceWriter(XMLDeviceWriter):
 			self.io = self.io[0]
 		else:
 			self.io = {}
-			self.log.warn("AvrWriter: IO not found for mmcu: '%s'" % mmcu)
+			self.log.warn("AvrWriter: IO not found for device '%s' with mmcu: '%s'" % (self.device.id.string, mmcu))
 		
 		self.addDeviceAttributesToNode(self.root, 'flash')
 		self.addDeviceAttributesToNode(self.root, 'ram')
@@ -124,19 +124,19 @@ class AVRDeviceWriter(XMLDeviceWriter):
 	
 	def addI2cToNode(self, node):
 		# ATtiny's use the module from the ATmegas!
-		family = 'attiny_atmega' if (self.family in ['attiny', 'atmega']) else self.family
+		family = 'at90_tiny_mega' if (self.family in ['at90', 'attiny', 'atmega']) else self.family
 		self.addModuleAttributesToNode(node, 'TWI', 'i2c', family)
 	
 	def addSpiToNode(self, node):
 		# ATtiny's use the module from the ATmegas!
-		family = 'attiny_atmega' if (self.family in ['attiny', 'atmega']) else self.family
+		family = 'at90_tiny_mega' if (self.family in ['at90', 'attiny', 'atmega']) else self.family
 		self.addModuleAttributesToNode(node, 'SPI', 'spi', family)
 	
 	def addAdcToNode(self, node):
 		self.addModuleAttributesToNode(node, 'AD_CONVERTER', 'adc')
 	
 	def addUartToNode(self, node):
-		family = 'attiny_atmega' if (self.family in ['attiny', 'atmega']) else self.family
+		family = 'at90_tiny_mega' if (self.family in ['at90', 'attiny', 'atmega']) else self.family
 		attributes = self._getModuleAttributes()
 		
 		for item in attributes:
@@ -166,7 +166,7 @@ class AVRDeviceWriter(XMLDeviceWriter):
 		return newAttributes
 	
 	def addGpioToNode(self, node):
-		family = 'attiny_atmega' if (self.family in ['attiny', 'atmega']) else self.family
+		family = 'at90_tiny_mega' if (self.family in ['at90', 'attiny', 'atmega']) else self.family
 		attributes = self.device.getAttributes('gpios')
 		driver = node.addChild('driver')
 		driver.setAttributes({'type': 'gpio', 'name': family})

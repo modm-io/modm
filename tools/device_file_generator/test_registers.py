@@ -52,7 +52,7 @@ if __name__ == "__main__":
 			logger.setLogLevel(level)
 			continue
 		
-		if "ATtiny" in arg or "ATmega" in arg:
+		if "ATtiny" in arg or "ATmega" in arg or 'AT90' in arg:
 			xml_path = os.path.join(os.path.dirname(__file__), '..', '..', '..', 'AVR_devices', (arg + '*'))
 			files = glob.glob(xml_path)
 			for file in files:
