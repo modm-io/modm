@@ -60,6 +60,10 @@ from driver import DriverFile
 # architecture_path for relative build paths
 def platform_tools_generate(env, architecture_path):
 	device = env['XPCC_DEVICE']
+	# Do not generate for hosted
+	# TODO: generate software peripherals for hosted
+	if device in ['darwin', 'linux', 'windows']:
+		return [], [], []
 	id = DeviceIdentifier(device)
 	env.Debug("Device String: %s" % device)
 	# Initialize Return Lists/Dicts
