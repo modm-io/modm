@@ -30,7 +30,7 @@ MAIN_FUNCTION
 	{
 		LedBlue::toggle();
 		LedGreen::toggle();
-		xpcc::delay_ms(1);
+		xpcc::delay_ms(500);
 	}
 
 	return 0;
