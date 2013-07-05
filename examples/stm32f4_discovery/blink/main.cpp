@@ -14,22 +14,12 @@ GPIO__INPUT(Button, A, 0);
 
 using namespace xpcc::stm32;
 
-static bool
-initClock()
-{
-	// use external 8MHz crystal
-	if (!Clock::enableHse(Clock::HseConfig::HSE_CRYSTAL)) {
-		return false;
-	}
-	
-	Clock::enablePll(Clock::PllSource::PLL_HSE, 4, 168);
-	return Clock::switchToPll();
-}
-
 // ----------------------------------------------------------------------------
 MAIN_FUNCTION
 {
-	initClock();
+	// New Static Clock Setup (S:: => Static)
+	StartupError err =
+		S::SystemClock<S::Pll<S::ExternalOscillator<MHz8>, MHz168, MHz48> >::enable();;
 
 	LedOrange::setOutput(xpcc::Gpio::HIGH);
 	LedGreen::setOutput(xpcc::Gpio::LOW);
@@ -40,7 +30,7 @@ MAIN_FUNCTION
 	{
 		LedBlue::toggle();
 		LedGreen::toggle();
-		xpcc::delay_ms(500);
+		xpcc::delay_ms(1);
 	}
 
 	return 0;
