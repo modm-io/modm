@@ -33,9 +33,9 @@
 
 // ----------------------------------------------------------------------------
 bool
-xpcc::stm32::Clock::enableHse(HseConfig config, uint32_t waitCycles)
+xpcc::stm32::Stm32Clock::enableHse(HseConfig config, uint32_t waitCycles)
 {
-	if (config == HseConfig::HSE_BYPASS) {
+	if (config == HseConfig::Bypass) {
 		RCC->CR |= RCC_CR_HSEBYP | RCC_CR_HSEON;
 	}
 	else {
@@ -51,8 +51,8 @@ xpcc::stm32::Clock::enableHse(HseConfig config, uint32_t waitCycles)
 
 // ----------------------------------------------------------------------------
 void
-xpcc::stm32::Clock::enablePll(PllSource source, uint8_t pllM,
-		uint16_t pllN)
+xpcc::stm32::Stm32Clock::enablePll(PllSource source, uint8_t pllM,
+	uint16_t pllN, uint8_t pllP, uint8_t pllQ)
 {
 	uint32_t tmp = 0;
 
@@ -61,7 +61,7 @@ xpcc::stm32::Clock::enablePll(PllSource source, uint8_t pllM,
 			| RCC_PLLCFGR_PLLN | RCC_PLLCFGR_PLLP | RCC_PLLCFGR_PLLQ);
 
 	// PLLSRC source for pll and for plli2s
-	tmp |= (source == PllSource::PLL_HSI) ? RCC_PLLCFGR_PLLSRC_HSI
+	tmp |= (source == PllSource::Hsi) ? RCC_PLLCFGR_PLLSRC_HSI
 			: RCC_PLLCFGR_PLLSRC_HSE;
 
 	// PLLM (0) = factor is user defined VCO input frequency must be configured to 2MHz
@@ -70,17 +70,11 @@ xpcc::stm32::Clock::enablePll(PllSource source, uint8_t pllM,
 	// PLLN (6) = factor is user defined
 	tmp |= (((uint32_t) pllN) << 6) & RCC_PLLCFGR_PLLN;
 
-%% if target is stm32f4
-	// VCO output frequency must be configured to 336MHz
-	// PLLP (16) = 0 (factor = 2) for CPU frequency = 168MHz
-	// PLLQ (24) = 7 (factor = 7) for 48MHz
-	tmp |= (7UL << 24) & RCC_PLLCFGR_PLLQ;
-%% elif target is stm32f2
-	// VCO output frequency must be configured to 240MHz
-	// PLLP (16) = 0 (factor = 2) for CPU frequency = 120MHz
-	// PLLQ (24) = 5 (factor = 5) for 48MHz
-	tmp |= (5UL << 24) & RCC_PLLCFGR_PLLQ;
-%% endif
+	// PLLP (16) divider for CPU frequency; (00: PLLP = 2, 01: PLLP = 4, etc.)
+	tmp |= (((uint32_t) (pllP / 2) - 1) << 16) & RCC_PLLCFGR_PLLP;
+
+	// PLLQ (24) divider for USB frequency; (0-15)
+	tmp |= (((uint32_t) pllQ) << 24) & RCC_PLLCFGR_PLLQ;
 
 	RCC->PLLCFGR = tmp;
 
@@ -90,7 +84,7 @@ xpcc::stm32::Clock::enablePll(PllSource source, uint8_t pllM,
 
 // ----------------------------------------------------------------------------
 bool
-xpcc::stm32::Clock::switchToPll(uint32_t waitCycles)
+xpcc::stm32::Stm32Clock::switchToPll(uint32_t waitCycles)
 {
 	uint32_t t = waitCycles;
 	while (!(RCC->CR & RCC_CR_PLLRDY)) {

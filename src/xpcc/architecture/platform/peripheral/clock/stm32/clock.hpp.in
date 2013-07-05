@@ -32,6 +32,10 @@
 #define XPCC_STM32__CLOCK_HPP
 
 #include <stdint.h>
+#include "../common/common_clock.hpp"
+// #include "static.hpp"
+
+using namespace xpcc::clock;
 
 namespace xpcc
 {
@@ -71,25 +75,30 @@ namespace xpcc
 		 * 
 		 * \ingroup	stm32f2_4
 		 */
-		class Clock
+		class Stm32Clock
 		{
 		public:
 			enum class HseConfig
 			{
-				HSE_CRYSTAL,	///< Use a crystal to generate a clock
-				HSE_BYPASS,		///< Use an external clock (e.g. a crystal oscillator)
+				Crystal,	///< Use a crystal to generate a clock
+				Bypass,		///< Use an external clock (e.g. a crystal oscillator)
 			};
 			
 			enum class PllSource
 			{
-				PLL_HSI,		///< High speed internal clock (16 MHz)
-				PLL_HSE,		///< High speed external clock (see HseConfig)
+				Hsi,		///< High speed internal clock (16 MHz)
+				Hse,		///< High speed external clock (see HseConfig)
 			};
 			
 		public:
 			static bool
 			enableHse(HseConfig config, uint32_t waitCycles = 1500);
-			
+
+			static inline bool
+			isHseEnabled()
+			{
+				return (RCC->CR & RCC_CR_HSERDY);
+			}
 			/**
 			 * Enable PLL.
 			 * 
@@ -120,7 +129,8 @@ namespace xpcc
 			 * 
 			 */
 			static void
-			enablePll(PllSource source, uint8_t pllM, uint16_t pllN);
+			enablePll(PllSource source, uint8_t pllM,
+							uint16_t pllN, uint8_t pllP, uint8_t pllQ);
 
 			static bool
 			switchToPll(uint32_t waitCycles = 1500);
@@ -129,3 +139,175 @@ namespace xpcc
 }
 
 #endif	//  XPCC_STM32__CLOCK_HPP
+
+
+
+
+
+
+// Old Code
+
+		/**
+		 * Clock management.
+		 * 
+		 * For using the internal clock (which is 16MHz) use:
+		 * \code
+		 * Pll::connect<InternalClock>();
+		 * Pll::enable(MHz120);		// for STM32F2xx
+		 * Pll::enable(MHz168);		// for STM32F4xx
+		 * SystemClock::connect<Pll>();
+		 * \endcode
+		 * 
+		 * For using an external crystal with 8 MHz use:
+		 * \code
+		 * typedef xpcc::stm32::Clock C;
+		 * if (ExternalOscillator::enable())
+		 * {
+		 *     Pll::connect<ExternalOscillator>();
+		 *     Pll::enable(MHz120);	// for STM32F2xx
+		 *     Pll::enable(MHz168);	// for STM32F4xx
+		 *     SystemClock::connect<Pll>();
+		 * }
+		 * \endcode
+		 *
+		 * For using an external oscillator with 25 MHz use:
+		 * \code
+		 * if (ExternalClock::enable())
+		 * {
+		 *     Pll::connect<ExternalClock>();
+		 *     Pll::enable(MHz120);	// for STM32F2xx
+		 *     Pll::enable(MHz168);	// for STM32F4xx
+		 *     SystemClock::connect<Pll>();
+		 * }
+		 * \endcode
+		 * 
+		 * \ingroup	stm32f2_4
+		 */
+
+		// Dynamic Clocks/Plls/Osciallators
+/*
+		class
+		InternalClock
+		{
+		public:
+			static bool
+			enable()
+			{
+				return true; // Internal Clock is always on
+			}
+		}
+
+		class
+		ExternalClock
+		{
+		public:
+			static bool
+			enable(const int frequenzy = HzDontCare,
+					const uint32_t waitCycles = 1500);
+			static bool
+			disable();
+		private:
+			static int
+			frequency;
+		}
+
+		class
+		ExternalOscillator
+		{
+		public:
+			static bool
+			enable(const int frequenzy = HzDontCare,
+					const uint32_t waitCycles = 1500);
+			static bool
+			disable();
+		}
+
+		class
+		Pll
+		{
+		public:
+			static bool
+			enable(const int frequenzy = HzDontCare,
+					const uint32_t waitCycles = 1500);
+			static bool
+			disable();
+			static bool
+			isEnabled();
+			static bool
+			isReady();
+			template<class Source>
+			static bool
+			connect();
+		}
+
+		template<class Source>
+		bool
+		Pll::connect<InternalClock>
+		{
+			return true;	// TODO: Implement
+		}
+
+		template<class Source>
+		bool
+		Pll::connect<ExternalClock>
+		{
+			return true;	// TODO: Implement
+		}
+
+		template<class Source>
+		bool
+		Pll::connect<ExternalOscillator>
+		{
+			return true;	// TODO: Implement
+		}
+
+		class
+		SystemClock
+		{
+		public:
+			template<class Source>
+			static bool
+			connect();
+		}
+
+		template<class Source>
+		bool
+		SystemClock::connect<InternalClock>
+		{
+			return true;	// TODO: Implement
+		}
+
+		template<class Source>
+		bool
+		SystemClock::connect<ExternalClock>
+		{
+			return true;	// TODO: Implement
+		}
+
+
+		template<class Source>
+		bool
+		SystemClock::connect<ExternalOscillator>
+		{
+			return true;	// TODO: Implement
+		}
+
+		template<class Source>
+		bool
+		SystemClock::connect<Pll>
+		{
+			return true;	// TODO: Implement
+		}
+
+		class
+		ClockOutput
+		{
+			static bool
+			enable();
+			static bool
+			disable();
+			template<class Source>
+			static bool
+			connect();
+		}
+*/

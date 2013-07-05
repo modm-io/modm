@@ -1,0 +1,237 @@
+// coding: utf-8
+// ----------------------------------------------------------------------------
+/* Copyright (c) 2011, Roboterclub Aachen e.V.
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ *     * Redistributions of source code must retain the above copyright
+ *       notice, this list of conditions and the following disclaimer.
+ *     * Redistributions in binary form must reproduce the above copyright
+ *       notice, this list of conditions and the following disclaimer in the
+ *       documentation and/or other materials provided with the distribution.
+ *     * Neither the name of the Roboterclub Aachen e.V. nor the
+ *       names of its contributors may be used to endorse or promote products
+ *       derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY ROBOTERCLUB AACHEN E.V. ''AS IS'' AND ANY
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL ROBOTERCLUB AACHEN E.V. BE LIABLE FOR ANY
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+ * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+// ----------------------------------------------------------------------------
+
+#ifndef XPCC_STM32__STATIC_HPP
+#define XPCC_STM32__STATIC_HPP
+
+#include <stdint.h>		// uint32_t
+#include "../../../device.hpp"
+#include "pll_calculator.hpp"
+#include "clock.hpp"
+
+using namespace xpcc::clock;
+
+namespace xpcc
+{
+	namespace stm32
+	{
+		namespace S
+		{
+
+
+		/**
+		 * Clock management.
+		 * 
+		 * For using the internal clock (which is 16MHz) use:
+		 * \code
+		 * Pll::connect(InternalClock);
+		 * Pll::enable(120);		// for STM32F2xx
+		 * Pll::enable(168);		// for STM32F4xx
+		 * SystemClock::connect(Pll);
+		 * \endcode
+		 * 
+		 * For using an external crystal with 8 MHz use:
+		 * \code
+		 * typedef xpcc::stm32::Clock C;
+		 * if (ExternalOscillator::enable())
+		 * {
+		 *     Pll::connect(ExternalOscillator);
+		 *     Pll::enable(4, 120);	// for STM32F2xx
+		 *     Pll::enable(4, 168);	// for STM32F4xx
+		 *     SystemClock::connect(Pll);
+		 * }
+		 * \endcode
+		 *
+		 * For using an external oscillator with 25 MHz use:
+		 * \code
+		 * if (ExternalClock::enable())
+		 * {
+		 *     Pll::enable(25, 120);	// for STM32F2xx
+		 *     Pll::enable(25, 168);	// for STM32F4xx
+		 *     SystemClock::connect(Pll);
+		 * }
+
+		 * \endcode
+		 * 
+		 * \ingroup	stm32f2_4
+		 */
+
+		// Static Clocks/Plls/Osciallators
+
+		template<int OutputFrequency> class InternalClock;
+
+		template<>
+		class
+		InternalClock<MHz16> // always runs at 16MHz
+		{
+		public:
+			static constexpr int
+			outputFrequency = MHz16;
+		};
+
+		template<int OutputFrequency>
+		class
+		ExternalClock
+		{
+		public:
+			static StartupError
+			enable(const uint32_t waitCycles = 1500)
+			{
+				if (Stm32Clock::enableHse(Stm32Clock::HseConfig::Bypass,
+						waitCycles))
+					return StartupError::None;
+				else
+					return StartupError::ExternalClock;
+			}
+
+			static constexpr int
+			outputFrequency = OutputFrequency;
+		};
+
+		template<int OutputFrequency>
+		class
+		ExternalOscillator
+		{
+		public:
+			static StartupError
+			enable(const uint32_t waitCycles = 1500)
+			{
+				if (Stm32Clock::enableHse(Stm32Clock::HseConfig::Crystal,
+						waitCycles))
+					return StartupError::None;
+				else
+					return StartupError::ExternalOscillator;
+			}
+
+			static constexpr int
+			outputFrequency = OutputFrequency;
+		};
+
+
+		/*
+		 * Used to setup pll with constants
+		 */
+		template<int InputFrequency, int OutputFrequency, int UsbFrequency>
+		class PllSetup
+		{
+		private:
+%% if target is stm32f2
+			typedef Stm32F2F4PllSettings<MHz64,  InputFrequency, OutputFrequency, UsbFrequency> p;
+%% elif target is stm32f4
+			typedef Stm32F2F4PllSettings<MHz192, InputFrequency, OutputFrequency, UsbFrequency> p;
+%% endif
+		public:
+			static StartupError
+			enable(Stm32Clock::PllSource src)
+			{
+				Stm32Clock::enablePll(src, p::PllM, p::PllN, p::PllP, p::PllQ);
+				return StartupError::None;
+			}
+		};
+
+
+		template<class Input, int OutputFrequency, int UsbFrequency> class Pll;
+
+		template<int InputFrequency, int OutputFrequency, int UsbFrequency>
+		class
+		Pll<InternalClock<InputFrequency>, OutputFrequency, UsbFrequency>
+		{
+		public:
+			static StartupError
+			enable(const uint32_t waitCycles = 1500)
+			{
+				return PllSetup<InputFrequency, OutputFrequency,
+						UsbFrequency>::enable(Stm32Clock::PllSource::Hsi);
+			}
+			static constexpr int
+			outputFrequency = OutputFrequency;
+		};
+
+		template<int InputFrequency, int OutputFrequency, int UsbFrequency>
+		class
+		Pll<ExternalClock<InputFrequency>, OutputFrequency, UsbFrequency>
+		{
+		public:
+			static StartupError
+			enable(const uint32_t waitCycles = 1500)
+			{
+				StartupError err = StartupError::None;
+				if(!(RCC->CR & RCC_CR_HSERDY))
+					err = ExternalClock<InputFrequency>::enable(waitCycles);
+				if (err != StartupError::None) return err;
+				return PllSetup<InputFrequency, OutputFrequency,
+						UsbFrequency>::enable(Stm32Clock::PllSource::Hse);
+			}
+			static constexpr int
+			outputFrequency = OutputFrequency;
+		};
+
+		template<int InputFrequency, int OutputFrequency, int UsbFrequency>
+		class
+		Pll<ExternalOscillator<InputFrequency>, OutputFrequency, UsbFrequency>
+		{
+		public:
+			static StartupError
+			enable(const uint32_t waitCycles = 1500)
+			{
+				StartupError err = StartupError::None;
+				if(!(RCC->CR & RCC_CR_HSERDY))
+					err = ExternalOscillator<InputFrequency>::enable(waitCycles);
+				if (err != StartupError::None) return err;
+				return PllSetup<InputFrequency, OutputFrequency,
+						UsbFrequency>::enable(Stm32Clock::PllSource::Hse);
+			}
+			static constexpr int
+			outputFrequency = OutputFrequency;
+		};
+
+		template<class Input>
+		class
+		SystemClock
+		{
+		private:
+			static_assert(Input::outputFrequency == F_CPU / 1000,
+			"Output Frequency needs to match F_CPU value form project.cfg");
+		public:
+			static StartupError
+			enable(const uint32_t waitCycles = 1500)
+			{
+				StartupError err =  Input::enable(waitCycles);
+				if (err != StartupError::None) return err;
+				if(Stm32Clock::switchToPll(waitCycles))
+					return StartupError::None;
+				return StartupError::Pll;
+			}
+		};
+		}
+	}
+}
+
+#endif	//  XPCC_STM32__STATIC_HPP
