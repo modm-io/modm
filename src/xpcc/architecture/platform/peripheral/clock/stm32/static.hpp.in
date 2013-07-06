@@ -33,6 +33,7 @@
 
 #include <stdint.h>		// uint32_t
 #include "../../../device.hpp"
+#include "../common/common_clock.hpp"
 #include "pll_calculator.hpp"
 #include "clock.hpp"
 
@@ -85,21 +86,31 @@ namespace xpcc
 
 		// Static Clocks/Plls/Osciallators
 
-		template<int OutputFrequency> class InternalClock;
+		template<int InputFrequency> class InternalClock;
 
 		template<>
 		class
 		InternalClock<MHz16> // always runs at 16MHz
 		{
 		public:
+			static StartupError
+			enable(const uint32_t waitCycles = 1500)
+			{
+				return StartupError::None;
+			}
 			static constexpr int
 			outputFrequency = MHz16;
 		};
 
-		template<int OutputFrequency>
+		template<int InputFrequency>
 		class
 		ExternalClock
 		{
+		private:
+			static_assert(InputFrequency >= MHz4,
+				"Input Frequenzy of HSE needs to be higher or equal to 4 MHz");
+			static_assert(InputFrequency <= MHz26,
+				"Input Frequenzy of HSE needs to be lower or equal to 26 MHz");
 		public:
 			static StartupError
 			enable(const uint32_t waitCycles = 1500)
@@ -112,13 +123,18 @@ namespace xpcc
 			}
 
 			static constexpr int
-			outputFrequency = OutputFrequency;
+			outputFrequency = InputFrequency;
 		};
 
-		template<int OutputFrequency>
+		template<int InputFrequency>
 		class
 		ExternalOscillator
 		{
+		private:
+			static_assert(InputFrequency >= MHz4,
+				"Input Frequenzy of HSE needs to be higher or equal to 4 MHz");
+			static_assert(InputFrequency <= MHz26,
+				"Input Frequenzy of HSE needs to be lower or equal to 26 MHz");
 		public:
 			static StartupError
 			enable(const uint32_t waitCycles = 1500)
@@ -131,7 +147,7 @@ namespace xpcc
 			}
 
 			static constexpr int
-			outputFrequency = OutputFrequency;
+			outputFrequency = InputFrequency;
 		};
 
 
@@ -212,24 +228,89 @@ namespace xpcc
 			outputFrequency = OutputFrequency;
 		};
 
-		template<class Input>
+		template<class Input> class SystemClock;
+
+		template<int InputFrequency>
 		class
-		SystemClock
+		SystemClock<InternalClock<InputFrequency> >
 		{
 		private:
-			static_assert(Input::outputFrequency == F_CPU / 1000,
-			"Output Frequency needs to match F_CPU value form project.cfg");
+			static_assert(InputFrequency == F_CPU / 1000,
+			"Output Frequency needs to match F_CPU value from project.cfg");
 		public:
 			static StartupError
 			enable(const uint32_t waitCycles = 1500)
 			{
-				StartupError err =  Input::enable(waitCycles);
+				StartupError err =  InternalClock<InputFrequency>::enable(waitCycles);
 				if (err != StartupError::None) return err;
-				if(Stm32Clock::switchToPll(waitCycles))
+				if(Stm32Clock::switchSystemClockTo(
+						Stm32Clock::SystemClockSource::Hsi, waitCycles))
+					return StartupError::None;
+				return StartupError::InternalClock;
+			}
+		};
+
+		template<int InputFrequency>
+		class
+		SystemClock<ExternalClock<InputFrequency> >
+		{
+		private:
+			static_assert(InputFrequency == F_CPU / 1000,
+			"Output Frequency needs to match F_CPU value from project.cfg");
+		public:
+			static StartupError
+			enable(const uint32_t waitCycles = 1500)
+			{
+				StartupError err =  ExternalClock<InputFrequency>::enable(waitCycles);
+				if (err != StartupError::None) return err;
+				if(Stm32Clock::switchSystemClockTo(
+						Stm32Clock::SystemClockSource::Hse, waitCycles))
+					return StartupError::None;
+				return StartupError::ExternalClock;
+			}
+		};
+
+		template<int InputFrequency>
+		class
+		SystemClock<ExternalOscillator<InputFrequency> >
+		{
+		private:
+			static_assert(InputFrequency == F_CPU / 1000,
+			"Output Frequency needs to match F_CPU value from project.cfg");
+		public:
+			static StartupError
+			enable(const uint32_t waitCycles = 1500)
+			{
+				StartupError err =  ExternalOscillator<InputFrequency>::enable(waitCycles);
+				if (err != StartupError::None) return err;
+				if(Stm32Clock::switchSystemClockTo(
+						Stm32Clock::SystemClockSource::Hse, waitCycles))
+					return StartupError::None;
+				return StartupError::ExternalOscillator;
+			}
+		};
+
+
+		template<class Input, int OutputFrequency, int UsbFrequency>
+		class
+		SystemClock<Pll<Input, OutputFrequency, UsbFrequency> >
+		{
+		private:
+			static_assert(OutputFrequency == F_CPU / 1000,
+			"Output Frequency needs to match F_CPU value from project.cfg");
+		public:
+			static StartupError
+			enable(const uint32_t waitCycles = 1500)
+			{
+				StartupError err =  Pll<Input, OutputFrequency, UsbFrequency>::enable(waitCycles);
+				if (err != StartupError::None) return err;
+				if(Stm32Clock::switchSystemClockTo(
+						Stm32Clock::SystemClockSource::Pll, waitCycles))
 					return StartupError::None;
 				return StartupError::Pll;
 			}
 		};
+
 		}
 	}
 }

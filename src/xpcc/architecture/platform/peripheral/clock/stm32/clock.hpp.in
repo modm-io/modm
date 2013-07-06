@@ -83,13 +83,19 @@ namespace xpcc
 				Crystal,	///< Use a crystal to generate a clock
 				Bypass,		///< Use an external clock (e.g. a crystal oscillator)
 			};
-			
+
 			enum class PllSource
 			{
 				Hsi,		///< High speed internal clock (16 MHz)
 				Hse,		///< High speed external clock (see HseConfig)
 			};
-			
+
+			enum class SystemClockSource : uint32_t
+			{
+				Hsi = RCC_CFGR_SW_HSI,
+				Hse = RCC_CFGR_SW_HSE,
+				Pll = RCC_CFGR_SW_PLL,
+			};
 		public:
 			static bool
 			enableHse(HseConfig config, uint32_t waitCycles = 1500);
@@ -133,7 +139,7 @@ namespace xpcc
 							uint16_t pllN, uint8_t pllP, uint8_t pllQ);
 
 			static bool
-			switchToPll(uint32_t waitCycles = 1500);
+			switchSystemClockTo(SystemClockSource src, uint32_t waitCycles = 1500);
 		};
 	}
 }

@@ -84,7 +84,7 @@ xpcc::stm32::Stm32Clock::enablePll(PllSource source, uint8_t pllM,
 
 // ----------------------------------------------------------------------------
 bool
-xpcc::stm32::Stm32Clock::switchToPll(uint32_t waitCycles)
+xpcc::stm32::Stm32Clock::switchSystemClockTo(SystemClockSource src, uint32_t waitCycles)
 {
 	uint32_t t = waitCycles;
 	while (!(RCC->CR & RCC_CR_PLLRDY)) {
@@ -95,20 +95,21 @@ xpcc::stm32::Stm32Clock::switchToPll(uint32_t waitCycles)
 
 %% if target is stm32f4
 	// APB2 84MHz, APB1 42MHz, AHB 168MHz, select PLL as source
-	RCC->CFGR =
-			(RCC->CFGR & 0xffff0000) | // Try to generate a halfword write
-			((RCC_CFGR_PPRE1_DIV4 | RCC_CFGR_PPRE2_DIV2 | RCC_CFGR_HPRE_DIV1 | RCC_CFGR_SW_PLL) & 0x0000ffff);
 %% elif target is stm32f2
 	// APB2 60MHz, APB1 30MHz, AHB 120MHz, select PLL as source
-	RCC->CFGR =
-			(RCC->CFGR & 0xffff0000) | // Try to generate a halfword write
-			((RCC_CFGR_PPRE1_DIV4 | RCC_CFGR_PPRE2_DIV2 | RCC_CFGR_HPRE_DIV1 | RCC_CFGR_SW_PLL) & 0x0000ffff);
 %% endif
 
+	RCC->CFGR =
+			(RCC->CFGR & 0xffff0000) | // Try to generate a halfword write
+			((
+			RCC_CFGR_PPRE1_DIV4 |
+			RCC_CFGR_PPRE2_DIV2 |
+			RCC_CFGR_HPRE_DIV1 |
+			static_cast<uint32_t>(src)
+			) & 0x0000ffff);
+
 	// Wait till the main PLL is used as system clock source
-	while ((RCC->CFGR & (uint32_t) RCC_CFGR_SWS) != RCC_CFGR_SWS_PLL);
-	{
-	}
+	while ((RCC->CFGR & (uint32_t) RCC_CFGR_SWS) != (static_cast<uint32_t>(src) << 2));
 
 	return true;
 }
