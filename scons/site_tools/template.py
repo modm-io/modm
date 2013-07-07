@@ -92,8 +92,20 @@ def jinja2_template_action(target, source, env):
 					values.append(item[key])
 		return values
 
-	path, filename = os.path.split(source[0].path)
-	loader = jinja2.Environment(loader = jinja2.FileSystemLoader(path), extensions=['jinja2.ext.do'])
+# Overwrite jinja2 Environment in order to enable relative paths
+# since this runs locally that should not be a security concern
+# Code from:
+# http://stackoverflow.com/questions/8512677/how-to-include-a-template-with-relative-path-in-jinja2
+	class RelEnvironment(jinja2.Environment):
+		"""Override join_path() to enable relative template paths."""
+		def join_path(self, template, parent):
+			d = os.path.join(os.path.dirname(parent), template)
+			return os.path.normpath(d)
+
+	# path, filename = os.path.split(source[0].path)
+	path = env['XPCC_LIBRARY_PATH']
+	filename = os.path.relpath(source[0].path, path)
+	loader = RelEnvironment(loader = jinja2.FileSystemLoader(path), extensions=['jinja2.ext.do'])
 	loader.filters['xpcc.wordwrap'] = filter_wordwrap
 	loader.filters['xpcc.indent'] = filter_indent
 	loader.filters['xpcc.pad'] = filter_pad
