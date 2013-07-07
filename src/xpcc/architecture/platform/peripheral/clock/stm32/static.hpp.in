@@ -28,6 +28,8 @@
  */
 // ----------------------------------------------------------------------------
 
+%%	import '../common/static.macros' as static with context
+
 #ifndef XPCC_STM32__STATIC_HPP
 #define XPCC_STM32__STATIC_HPP
 
@@ -84,71 +86,11 @@ namespace xpcc
 		 * \ingroup	stm32f2_4
 		 */
 
+
 		// Static Clocks/Plls/Osciallators
-
-		template<int InputFrequency> class InternalClock;
-
-		template<>
-		class
-		InternalClock<MHz16> // always runs at 16MHz
-		{
-		public:
-			static StartupError
-			enable(const uint32_t waitCycles = 1500)
-			{
-				return StartupError::None;
-			}
-			static constexpr int
-			outputFrequency = MHz16;
-		};
-
-		template<int InputFrequency>
-		class
-		ExternalClock
-		{
-		private:
-			static_assert(InputFrequency >= MHz4,
-				"Input Frequenzy of HSE needs to be higher or equal to 4 MHz");
-			static_assert(InputFrequency <= MHz26,
-				"Input Frequenzy of HSE needs to be lower or equal to 26 MHz");
-		public:
-			static StartupError
-			enable(const uint32_t waitCycles = 1500)
-			{
-				if (Stm32Clock::enableHse(Stm32Clock::HseConfig::Bypass,
-						waitCycles))
-					return StartupError::None;
-				else
-					return StartupError::ExternalClock;
-			}
-
-			static constexpr int
-			outputFrequency = InputFrequency;
-		};
-
-		template<int InputFrequency>
-		class
-		ExternalOscillator
-		{
-		private:
-			static_assert(InputFrequency >= MHz4,
-				"Input Frequenzy of HSE needs to be higher or equal to 4 MHz");
-			static_assert(InputFrequency <= MHz26,
-				"Input Frequenzy of HSE needs to be lower or equal to 26 MHz");
-		public:
-			static StartupError
-			enable(const uint32_t waitCycles = 1500)
-			{
-				if (Stm32Clock::enableHse(Stm32Clock::HseConfig::Crystal,
-						waitCycles))
-					return StartupError::None;
-				else
-					return StartupError::ExternalOscillator;
-			}
-
-			static constexpr int
-			outputFrequency = InputFrequency;
-		};
+		{{ static.inputSource("InternalClock", "MHz16", "MHz16", "") }}
+		{{ static.inputSource("ExternalClock", "MHz4",  "MHz26", "Stm32Clock::enableHse(Stm32Clock::HseConfig::Bypass, waitCycles)") }}
+		{{ static.inputSource("ExternalOscillator", "MHz4", "MHz26", "Stm32Clock::enableHse(Stm32Clock::HseConfig::Crystal, waitCycles)") }}
 
 
 		/*
