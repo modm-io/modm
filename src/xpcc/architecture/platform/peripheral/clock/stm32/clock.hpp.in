@@ -104,19 +104,20 @@ namespace xpcc
 				ExternalOscillator = Hse,
 			};
 
-			enum class MCO1Source
+			enum class MCO1Source : uint32_t
 			{
-				InternalClock,
-				ExternalClock,
-				ExternalOscillator,
-				Pll,
+				InternalClock = 0,
+				ExternalClock = RCC_CFGR_MCO1_1,
+				ExternalOscillator = RCC_CFGR_MCO1_1,
+				Pll = RCC_CFGR_MCO1_1 | RCC_CFGR_MCO1_0,
 			};
 
-			enum class MCO2Source
+			enum class MCO2Source : uint32_t
 			{
-				ExternalClock,
-				ExternalOscillator,
-				Pll,
+				SystemClock = 0,
+				ExternalClock = RCC_CFGR_MCO1_1,
+				ExternalOscillator = RCC_CFGR_MCO1_1,
+				Pll = RCC_CFGR_MCO1_1 | RCC_CFGR_MCO1_0,
 			};
 		public:
 			static bool
@@ -161,196 +162,34 @@ namespace xpcc
 			static void
 			connectToMCO1(MCO1Source src)
 			{
+				uint32_t tmp = RCC->CFGR & RCC_CFGR_MCO1;
+				RCC->CFGR = tmp | static_cast<uint32_t>(src);
 			}
 
 			static void
 			setMCO1Division(int div)
 			{
+				uint32_t tmp = RCC->CFGR & RCC_CFGR_MCO1PRE;
+				if (div > 1) tmp |= (div + 2) << RCC_CFGR_MCO1PRE_0;
+				RCC->CFGR = tmp;
 			}
 
 			static void
 			connectToMCO2(MCO2Source src)
 			{
+				uint32_t tmp = RCC->CFGR & RCC_CFGR_MCO2;
+				RCC->CFGR = tmp | static_cast<uint32_t>(src);
 			}
 
 			static void
 			setMCO2Division(int div)
 			{
+				uint32_t tmp = RCC->CFGR & RCC_CFGR_MCO2PRE;
+				if (div > 1) tmp |= (div + 2) << RCC_CFGR_MCO2PRE_0;
+				RCC->CFGR = tmp;
 			}
 		};
 	}
 }
 
 #endif	//  XPCC_STM32__CLOCK_HPP
-
-
-
-
-
-
-// Old Code
-
-		/**
-		 * Clock management.
-		 * 
-		 * For using the internal clock (which is 16MHz) use:
-		 * \code
-		 * Pll::connect<InternalClock>();
-		 * Pll::enable(MHz120);		// for STM32F2xx
-		 * Pll::enable(MHz168);		// for STM32F4xx
-		 * SystemClock::connect<Pll>();
-		 * \endcode
-		 * 
-		 * For using an external crystal with 8 MHz use:
-		 * \code
-		 * typedef xpcc::stm32::Clock C;
-		 * if (ExternalOscillator::enable())
-		 * {
-		 *     Pll::connect<ExternalOscillator>();
-		 *     Pll::enable(MHz120);	// for STM32F2xx
-		 *     Pll::enable(MHz168);	// for STM32F4xx
-		 *     SystemClock::connect<Pll>();
-		 * }
-		 * \endcode
-		 *
-		 * For using an external oscillator with 25 MHz use:
-		 * \code
-		 * if (ExternalClock::enable())
-		 * {
-		 *     Pll::connect<ExternalClock>();
-		 *     Pll::enable(MHz120);	// for STM32F2xx
-		 *     Pll::enable(MHz168);	// for STM32F4xx
-		 *     SystemClock::connect<Pll>();
-		 * }
-		 * \endcode
-		 * 
-		 * \ingroup	stm32f2_4
-		 */
-
-		// Dynamic Clocks/Plls/Osciallators
-/*
-		class
-		InternalClock
-		{
-		public:
-			static bool
-			enable()
-			{
-				return true; // Internal Clock is always on
-			}
-		}
-
-		class
-		ExternalClock
-		{
-		public:
-			static bool
-			enable(const int frequenzy = HzDontCare,
-					const uint32_t waitCycles = 1500);
-			static bool
-			disable();
-		private:
-			static int
-			frequency;
-		}
-
-		class
-		ExternalOscillator
-		{
-		public:
-			static bool
-			enable(const int frequenzy = HzDontCare,
-					const uint32_t waitCycles = 1500);
-			static bool
-			disable();
-		}
-
-		class
-		Pll
-		{
-		public:
-			static bool
-			enable(const int frequenzy = HzDontCare,
-					const uint32_t waitCycles = 1500);
-			static bool
-			disable();
-			static bool
-			isEnabled();
-			static bool
-			isReady();
-			template<class Source>
-			static bool
-			connect();
-		}
-
-		template<class Source>
-		bool
-		Pll::connect<InternalClock>
-		{
-			return true;	// TODO: Implement
-		}
-
-		template<class Source>
-		bool
-		Pll::connect<ExternalClock>
-		{
-			return true;	// TODO: Implement
-		}
-
-		template<class Source>
-		bool
-		Pll::connect<ExternalOscillator>
-		{
-			return true;	// TODO: Implement
-		}
-
-		class
-		SystemClock
-		{
-		public:
-			template<class Source>
-			static bool
-			connect();
-		}
-
-		template<class Source>
-		bool
-		SystemClock::connect<InternalClock>
-		{
-			return true;	// TODO: Implement
-		}
-
-		template<class Source>
-		bool
-		SystemClock::connect<ExternalClock>
-		{
-			return true;	// TODO: Implement
-		}
-
-
-		template<class Source>
-		bool
-		SystemClock::connect<ExternalOscillator>
-		{
-			return true;	// TODO: Implement
-		}
-
-		template<class Source>
-		bool
-		SystemClock::connect<Pll>
-		{
-			return true;	// TODO: Implement
-		}
-
-		class
-		ClockOutput
-		{
-			static bool
-			enable();
-			static bool
-			disable();
-			template<class Source>
-			static bool
-			connect();
-		}
-*/
