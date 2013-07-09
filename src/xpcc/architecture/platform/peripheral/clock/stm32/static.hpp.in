@@ -48,51 +48,6 @@ namespace xpcc
 		namespace S
 		{
 
-
-		/**
-		 * Clock management.
-		 * 
-		 * For using the internal clock (which is 16MHz) use:
-		 * \code
-		 * Pll::connect(InternalClock);
-		 * Pll::enable(120);		// for STM32F2xx
-		 * Pll::enable(168);		// for STM32F4xx
-		 * SystemClock::connect(Pll);
-		 * \endcode
-		 * 
-		 * For using an external crystal with 8 MHz use:
-		 * \code
-		 * typedef xpcc::stm32::Clock C;
-		 * if (ExternalOscillator::enable())
-		 * {
-		 *     Pll::connect(ExternalOscillator);
-		 *     Pll::enable(4, 120);	// for STM32F2xx
-		 *     Pll::enable(4, 168);	// for STM32F4xx
-		 *     SystemClock::connect(Pll);
-		 * }
-		 * \endcode
-		 *
-		 * For using an external oscillator with 25 MHz use:
-		 * \code
-		 * if (ExternalClock::enable())
-		 * {
-		 *     Pll::enable(25, 120);	// for STM32F2xx
-		 *     Pll::enable(25, 168);	// for STM32F4xx
-		 *     SystemClock::connect(Pll);
-		 * }
-
-		 * \endcode
-		 * 
-		 * \ingroup	stm32f2_4
-		 */
-
-
-		// Static Clocks/Plls/Osciallators
-		{{ static.inputSource("InternalClock", "MHz16", "MHz16", "") }}
-		{{ static.inputSource("ExternalClock", "MHz4",  "MHz26", "Stm32Clock::enableHse(Stm32Clock::HseConfig::Bypass, waitCycles)") }}
-		{{ static.inputSource("ExternalOscillator", "MHz4", "MHz26", "Stm32Clock::enableHse(Stm32Clock::HseConfig::Crystal, waitCycles)") }}
-
-
 		/*
 		 * Used to setup pll with constants
 		 */
@@ -107,151 +62,54 @@ namespace xpcc
 %% endif
 		public:
 			static StartupError
-			enable(Stm32Clock::PllSource src)
+			enable(ClockTree::PllSource src)
 			{
-				Stm32Clock::enablePll(src, p::PllM, p::PllN, p::PllP, p::PllQ);
+				ClockTree::enablePll(src, p::PllM, p::PllN, p::PllP, p::PllQ);
 				return StartupError::None;
 			}
 		};
 
+%% set internalClock =		{'name': "InternalClock",
+							 'fixedFrequency': "MHz16" }
+%% set externallClock =		{'name': "ExternalClock",
+							 'minFrequency': "MHz4",
+							 'maxFrequency': "MHz26" }
+%% set externalOscillator =	{'name': "ExternalOscillator",
+							 'minFrequency': "MHz4",
+							 'maxFrequency': "MHz26" }
+%% set pll =				{'name': "Pll",
+							 'setup': "PllSetup",
+							 'frequencies': ["UsbFrequency"],
+							 'sources': [internalClock,
+										externallClock, externalOscillator] }
+%% set systemClock =		{'name': "SystemClock",
+							 'minFrequency': "MHz8",
+							 'maxFrequency': "MHz168",
+							 'sources': [ internalClock, externallClock,
+										  externalOscillator, pll ] }
+%% set mco1 =				{'name': "MCO1",
+							 'sources': [internalClock, externallClock,
+										 externalOscillator, pll] }
+%#							TODO: Add more sources
+%% set mco2 =				{'name': "MCO2",
+							 'sources': [externallClock,
+										 externalOscillator, pll] }
+%#							TODO: Add more sources
 
-		template<class Input, int OutputFrequency, int UsbFrequency> class Pll;
+	// Static Clocks/Plls/Osciallators
+{{ static.source(internalClock) }}
 
-		template<int InputFrequency, int OutputFrequency, int UsbFrequency>
-		class
-		Pll<InternalClock<InputFrequency>, OutputFrequency, UsbFrequency>
-		{
-		public:
-			static StartupError
-			enable(const uint32_t waitCycles = 1500)
-			{
-				return PllSetup<InputFrequency, OutputFrequency,
-						UsbFrequency>::enable(Stm32Clock::PllSource::Hsi);
-			}
-			static constexpr int
-			outputFrequency = OutputFrequency;
-		};
+{{ static.source(externallClock) }}
 
-		template<int InputFrequency, int OutputFrequency, int UsbFrequency>
-		class
-		Pll<ExternalClock<InputFrequency>, OutputFrequency, UsbFrequency>
-		{
-		public:
-			static StartupError
-			enable(const uint32_t waitCycles = 1500)
-			{
-				StartupError err = StartupError::None;
-				if(!(RCC->CR & RCC_CR_HSERDY))
-					err = ExternalClock<InputFrequency>::enable(waitCycles);
-				if (err != StartupError::None) return err;
-				return PllSetup<InputFrequency, OutputFrequency,
-						UsbFrequency>::enable(Stm32Clock::PllSource::Hse);
-			}
-			static constexpr int
-			outputFrequency = OutputFrequency;
-		};
+{{ static.source(externalOscillator) }}
 
-		template<int InputFrequency, int OutputFrequency, int UsbFrequency>
-		class
-		Pll<ExternalOscillator<InputFrequency>, OutputFrequency, UsbFrequency>
-		{
-		public:
-			static StartupError
-			enable(const uint32_t waitCycles = 1500)
-			{
-				StartupError err = StartupError::None;
-				if(!(RCC->CR & RCC_CR_HSERDY))
-					err = ExternalOscillator<InputFrequency>::enable(waitCycles);
-				if (err != StartupError::None) return err;
-				return PllSetup<InputFrequency, OutputFrequency,
-						UsbFrequency>::enable(Stm32Clock::PllSource::Hse);
-			}
-			static constexpr int
-			outputFrequency = OutputFrequency;
-		};
+{{ static.pll(pll) }}
 
-		template<class Input> class SystemClock;
+{{ static.sink(systemClock)}}
 
-		template<int InputFrequency>
-		class
-		SystemClock<InternalClock<InputFrequency> >
-		{
-		private:
-			static_assert(InputFrequency == F_CPU / 1000,
-			"Output Frequency needs to match F_CPU value from project.cfg");
-		public:
-			static StartupError
-			enable(const uint32_t waitCycles = 1500)
-			{
-				StartupError err =  InternalClock<InputFrequency>::enable(waitCycles);
-				if (err != StartupError::None) return err;
-				if(Stm32Clock::switchSystemClockTo(
-						Stm32Clock::SystemClockSource::Hsi, waitCycles))
-					return StartupError::None;
-				return StartupError::InternalClock;
-			}
-		};
+{{ static.output(mco1)}}
 
-		template<int InputFrequency>
-		class
-		SystemClock<ExternalClock<InputFrequency> >
-		{
-		private:
-			static_assert(InputFrequency == F_CPU / 1000,
-			"Output Frequency needs to match F_CPU value from project.cfg");
-		public:
-			static StartupError
-			enable(const uint32_t waitCycles = 1500)
-			{
-				StartupError err =  ExternalClock<InputFrequency>::enable(waitCycles);
-				if (err != StartupError::None) return err;
-				if(Stm32Clock::switchSystemClockTo(
-						Stm32Clock::SystemClockSource::Hse, waitCycles))
-					return StartupError::None;
-				return StartupError::ExternalClock;
-			}
-		};
-
-		template<int InputFrequency>
-		class
-		SystemClock<ExternalOscillator<InputFrequency> >
-		{
-		private:
-			static_assert(InputFrequency == F_CPU / 1000,
-			"Output Frequency needs to match F_CPU value from project.cfg");
-		public:
-			static StartupError
-			enable(const uint32_t waitCycles = 1500)
-			{
-				StartupError err =  ExternalOscillator<InputFrequency>::enable(waitCycles);
-				if (err != StartupError::None) return err;
-				if(Stm32Clock::switchSystemClockTo(
-						Stm32Clock::SystemClockSource::Hse, waitCycles))
-					return StartupError::None;
-				return StartupError::ExternalOscillator;
-			}
-		};
-
-
-		template<class Input, int OutputFrequency, int UsbFrequency>
-		class
-		SystemClock<Pll<Input, OutputFrequency, UsbFrequency> >
-		{
-		private:
-			static_assert(OutputFrequency == F_CPU / 1000,
-			"Output Frequency needs to match F_CPU value from project.cfg");
-		public:
-			static StartupError
-			enable(const uint32_t waitCycles = 1500)
-			{
-				StartupError err =  Pll<Input, OutputFrequency, UsbFrequency>::enable(waitCycles);
-				if (err != StartupError::None) return err;
-				if(Stm32Clock::switchSystemClockTo(
-						Stm32Clock::SystemClockSource::Pll, waitCycles))
-					return StartupError::None;
-				return StartupError::Pll;
-			}
-		};
+{{ static.output(mco2)}}
 
 		}
 	}

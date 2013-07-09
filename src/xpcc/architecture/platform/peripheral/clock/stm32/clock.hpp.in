@@ -75,19 +75,23 @@ namespace xpcc
 		 * 
 		 * \ingroup	stm32f2_4
 		 */
-		class Stm32Clock
+		class ClockTree
 		{
 		public:
-			enum class HseConfig
+			enum class ClockSource
 			{
-				Crystal,	///< Use a crystal to generate a clock
-				Bypass,		///< Use an external clock (e.g. a crystal oscillator)
+				InternalClock,
+				ExternalClock,
+				ExternalOscillator,
 			};
 
 			enum class PllSource
 			{
-				Hsi,		///< High speed internal clock (16 MHz)
-				Hse,		///< High speed external clock (see HseConfig)
+				Hsi = 0,		///< High speed internal clock (16 MHz)
+				Hse = 1,		///< High speed external clock (see HseConfig)
+				InternalClock = Hsi,
+				ExternalClock = Hse,
+				ExternalOscillator = Hse,
 			};
 
 			enum class SystemClockSource : uint32_t
@@ -95,16 +99,14 @@ namespace xpcc
 				Hsi = RCC_CFGR_SW_HSI,
 				Hse = RCC_CFGR_SW_HSE,
 				Pll = RCC_CFGR_SW_PLL,
+				InternalClock = Hsi,
+				ExternalClock = Hse,
+				ExternalOscillator = Hse,
 			};
 		public:
 			static bool
-			enableHse(HseConfig config, uint32_t waitCycles = 1500);
+			enableSource(ClockSource src, uint32_t waitCycles = 1500);
 
-			static inline bool
-			isHseEnabled()
-			{
-				return (RCC->CR & RCC_CR_HSERDY);
-			}
 			/**
 			 * Enable PLL.
 			 * 

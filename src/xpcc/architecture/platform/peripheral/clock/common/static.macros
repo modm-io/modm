@@ -27,48 +27,123 @@
 %#* THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 %#*/
 
-%% macro inputSource(name, f_min="", f_max="", enable_fcn="")
-%% set fixed_frequency = (f_min == f_max)
-%%	if fixed_frequency
-	template<int InputFrequency> class {{ name }};
+
+%% macro assertFrequency(name, frequency, type, value)
+%%	if value != None and value|length > 0
+%%		if type|lower == "min"
+		static_assert({{ frequency }} >= {{ value }},
+			"{{ frequency }} of {{ name }} needs to be higher or equal to {{ value }}");
+%%		elif type|lower == "max"
+		static_assert({{ frequency }} <= {{ value }},
+			"{{ frequency }} of {{ name }} needs to be lower or equal to {{ value }}");
+%%		endif
+%%	endif
+%% endmacro
+
+%% macro source(s)
+%%	if s.fixedFrequency|length > 0
+	template<int InputFrequency> class {{ s.name }};
 	template<>
 	class
-	{{ name }}<{{ f_min }}>
+	{{ s.name }}<{{ s.fixedFrequency }}>
 %%	else
 	template<int InputFrequency>
 	class
-	{{ name }}
+	{{ s.name }}
 %%	endif
 	{
 	private:
-%%		if f_min|length > 0 and not fixed_frequency
-		static_assert(InputFrequency >= {{ f_min }},
-			"Input Frequenzy of HSE needs to be higher or equal to {{ f_min }}");
-%%		endif
-%%		if f_max|length > 0 and not fixed_frequency
-		static_assert(InputFrequency <= {{ f_max }},
-			"Input Frequenzy of HSE needs to be lower or equal to {{ f_max }}");
-%%		endif
+{{ assertFrequency("InputFrequency", "min", s.minFrequency) }}
+{{ assertFrequency("InputFrequency", "max", s.maxFrequency) }}
 	public:
 		static StartupError
 		enable(const uint32_t waitCycles = 1500)
 		{
-%%		if not 'waitCycles' in enable_fcn
-			(void)waitCycles; // avoid compiler warning
-%%		endif
-%%		if enable_fcn|length > 0
-			if (!{{ enable_fcn }})
-				return StartupError::{{ name }};
-%%		endif
-
+			if (!ClockTree::enableSource(ClockTree::ClockSource::{{ s.name }}, waitCycles))
+				return StartupError::{{ s.name }};
 			return StartupError::None;
 		}
 
 		static constexpr int
-%% if fixed_frequency
-		outputFrequency = {{ f_min }};
+%% if s.fixedFrequency|length > 0
+		outputFrequency = {{ s.fixedFrequency }};
 %% else
 		outputFrequency = InputFrequency;
 %% endif
 	};
+%% endmacro
+
+
+%% macro pll(p)
+%% if p.frequencies|length > 0
+%%		set template = ", " + p.frequencies|join(', ')
+%%		set template_type = ", int " + p.frequencies|join(', int ')
+%% else
+%%		set template = ""
+%%		set template_type = ""
+%% endif
+	template<class Input, int OutputFrequency{{ template_type }}> class Pll;
+
+%%	for src in p.sources
+	template<int InputFrequency, int OutputFrequency{{ template_type }}>
+	class
+	Pll<{{ src.name }}<InputFrequency>, OutputFrequency{{ template }}>
+	{
+	public:
+		static StartupError
+		enable(const uint32_t waitCycles = 1500)
+		{
+			StartupError err = StartupError::None;
+			err = {{ src.name }}<InputFrequency>::enable(waitCycles);
+			if (err != StartupError::None) return err;
+			return PllSetup<InputFrequency,
+					OutputFrequency{{ template }}>::enable(
+					ClockTree::PllSource::{{ src.name }});
+		}
+		static constexpr int
+		outputFrequency = OutputFrequency;
+	};
+%%	endfor
+%% endmacro
+
+%% macro sink(s)
+	template<class Input> class {{ s.name }};
+
+%%	for src in s.sources
+
+%# check if source has input
+%%	if src.sources|length > 0
+%%		set template = "Input, OutputFrequency, " + src.frequencies|join(', ')
+%%		set template_type = "class Input, int OutputFrequency, int " + src.frequencies|join(', int ')
+%%	else
+%%		set template = "OutputFrequency"
+%%		set template_type = "int OutputFrequency"
+%%	endif
+
+	template<{{ template_type }}>
+	class
+	{{ s.name }}<{{ src.name }}<{{ template }}> >
+	{
+	private:
+{{ assertFrequency(s.name, "OutputFrequency", "min", s.minFrequency) }}
+{{ assertFrequency(s.name, "OutputFrequency", "max", s.maxFrequency) }}
+%#		FIXME: make optional in order for sink to be more generic
+		static_assert(OutputFrequency == F_CPU / 1000,
+		"OutputFrequency needs to match F_CPU value from project.cfg");
+	public:
+		static StartupError
+		enable(const uint32_t waitCycles = 1500)
+		{
+			StartupError err =  {{ src.name }}<{{ template }}>::enable(waitCycles);
+			if (err != StartupError::None) return err;
+			if(ClockTree::switch{{ s.name }}To(
+					ClockTree::{{ s.name }}Source::{{ src.name }}, waitCycles))
+				return StartupError::None;
+			return StartupError::{{ src.name }};
+		}
+	};
+%%	endfor
+%% endmacro
+
+%% macro output(o)
 %% endmacro

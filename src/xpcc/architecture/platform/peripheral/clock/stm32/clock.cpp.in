@@ -33,13 +33,24 @@
 
 // ----------------------------------------------------------------------------
 bool
-xpcc::stm32::Stm32Clock::enableHse(HseConfig config, uint32_t waitCycles)
+xpcc::stm32::ClockTree::enableSource(ClockSource src, uint32_t waitCycles)
 {
-	if (config == HseConfig::Bypass) {
+	if (src == ClockSource::InternalClock)
+		return true;	// InternalClock is always on
+	if (src == ClockSource::ExternalClock) {
 		RCC->CR |= RCC_CR_HSEBYP | RCC_CR_HSEON;
+		// return if already running
+		if(RCC->CR & (RCC_CR_HSEBYP | RCC_CR_HSEON) && (RCC->CR & RCC_CR_HSERDY))
+			return true;
+	}
+	else if(src == ClockSource::ExternalOscillator) {
+		RCC->CR |= RCC_CR_HSEON;
+		// return if already running
+		if(RCC->CR & (RCC_CR_HSEON) && (RCC->CR & RCC_CR_HSERDY))
+			return true;
 	}
 	else {
-		RCC->CR |= RCC_CR_HSEON;
+		return false;	// should not get here
 	}
 
 	uint32_t t = waitCycles;
@@ -51,7 +62,7 @@ xpcc::stm32::Stm32Clock::enableHse(HseConfig config, uint32_t waitCycles)
 
 // ----------------------------------------------------------------------------
 void
-xpcc::stm32::Stm32Clock::enablePll(PllSource source, uint8_t pllM,
+xpcc::stm32::ClockTree::enablePll(PllSource source, uint8_t pllM,
 	uint16_t pllN, uint8_t pllP, uint8_t pllQ)
 {
 	uint32_t tmp = 0;
@@ -84,7 +95,7 @@ xpcc::stm32::Stm32Clock::enablePll(PllSource source, uint8_t pllM,
 
 // ----------------------------------------------------------------------------
 bool
-xpcc::stm32::Stm32Clock::switchSystemClockTo(SystemClockSource src, uint32_t waitCycles)
+xpcc::stm32::ClockTree::switchSystemClockTo(SystemClockSource src, uint32_t waitCycles)
 {
 	uint32_t t = waitCycles;
 	while (!(RCC->CR & RCC_CR_PLLRDY)) {
