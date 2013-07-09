@@ -88,10 +88,12 @@ namespace xpcc
 							 'sources': [ internalClock, externallClock,
 										  externalOscillator, pll ] }
 %% set mco1 =				{'name': "MCO1",
+							 'divisions': [1, 2, 3, 4, 5],
 							 'sources': [internalClock, externallClock,
 										 externalOscillator, pll] }
 %#							TODO: Add more sources
 %% set mco2 =				{'name': "MCO2",
+							 'divisions': [1, 2, 3, 4, 5],
 							 'sources': [externallClock,
 										 externalOscillator, pll] }
 %#							TODO: Add more sources

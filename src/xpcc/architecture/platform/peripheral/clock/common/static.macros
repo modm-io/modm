@@ -25,52 +25,57 @@
 %#* ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 %#* (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 %#* THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-%#*/
+%#
 
 
 %% macro assertFrequency(name, frequency, type, value)
 %%	if value != None and value|length > 0
 %%		if type|lower == "min"
-		static_assert({{ frequency }} >= {{ value }},
-			"{{ frequency }} of {{ name }} needs to be higher or equal to {{ value }}");
+	static_assert({{ frequency }} >= {{ value }},
+		"{{ frequency }} of {{ name }} needs to be higher or equal to {{ value }}");
 %%		elif type|lower == "max"
-		static_assert({{ frequency }} <= {{ value }},
-			"{{ frequency }} of {{ name }} needs to be lower or equal to {{ value }}");
+	static_assert({{ frequency }} <= {{ value }},
+		"{{ frequency }} of {{ name }} needs to be lower or equal to {{ value }}");
 %%		endif
 %%	endif
 %% endmacro
 
 %% macro source(s)
+typedef struct{} {{ s.name }}_TypeId;
+
 %%	if s.fixedFrequency|length > 0
-	template<int InputFrequency> class {{ s.name }};
-	template<>
-	class
-	{{ s.name }}<{{ s.fixedFrequency }}>
+template<int InputFrequency> class {{ s.name }};
+
+template<>
+class
+{{ s.name }}<{{ s.fixedFrequency }}>
 %%	else
-	template<int InputFrequency>
-	class
-	{{ s.name }}
+template<int InputFrequency>
+class
+{{ s.name }}
 %%	endif
-	{
-	private:
+{
+private:
 {{ assertFrequency("InputFrequency", "min", s.minFrequency) }}
 {{ assertFrequency("InputFrequency", "max", s.maxFrequency) }}
-	public:
-		static StartupError
-		enable(const uint32_t waitCycles = 1500)
-		{
-			if (!ClockTree::enableSource(ClockTree::ClockSource::{{ s.name }}, waitCycles))
-				return StartupError::{{ s.name }};
-			return StartupError::None;
-		}
+public:
+	static const {{ s.name }}_TypeId Id;
 
-		static constexpr int
+	static StartupError
+	enable(const uint32_t waitCycles = 1500)
+	{
+		if (!ClockTree::enableSource(ClockTree::ClockSource::{{ s.name }}, waitCycles))
+			return StartupError::{{ s.name }};
+		return StartupError::None;
+	}
+
+	static constexpr int
 %% if s.fixedFrequency|length > 0
-		outputFrequency = {{ s.fixedFrequency }};
+	outputFrequency = {{ s.fixedFrequency }};
 %% else
-		outputFrequency = InputFrequency;
+	outputFrequency = InputFrequency;
 %% endif
-	};
+};
 %% endmacro
 
 
@@ -82,32 +87,38 @@
 %%		set template = ""
 %%		set template_type = ""
 %% endif
-	template<class Input, int OutputFrequency{{ template_type }}> class Pll;
+typedef struct{} {{ p.name }}_TypeId;
+
+template<class Input, int OutputFrequency{{ template_type }}> class Pll;
 
 %%	for src in p.sources
-	template<int InputFrequency, int OutputFrequency{{ template_type }}>
-	class
-	Pll<{{ src.name }}<InputFrequency>, OutputFrequency{{ template }}>
+template<int InputFrequency, int OutputFrequency{{ template_type }}>
+class
+Pll<{{ src.name }}<InputFrequency>, OutputFrequency{{ template }}>
+{
+public:
+	static const {{ p.name }}_TypeId Id;
+
+	static StartupError
+	enable(const uint32_t waitCycles = 1500)
 	{
-	public:
-		static StartupError
-		enable(const uint32_t waitCycles = 1500)
-		{
-			StartupError err = StartupError::None;
-			err = {{ src.name }}<InputFrequency>::enable(waitCycles);
-			if (err != StartupError::None) return err;
-			return PllSetup<InputFrequency,
-					OutputFrequency{{ template }}>::enable(
-					ClockTree::PllSource::{{ src.name }});
-		}
-		static constexpr int
-		outputFrequency = OutputFrequency;
-	};
+		StartupError err = StartupError::None;
+		err = {{ src.name }}<InputFrequency>::enable(waitCycles);
+		if (err != StartupError::None) return err;
+		return PllSetup<InputFrequency,
+				OutputFrequency{{ template }}>::enable(
+				ClockTree::PllSource::{{ src.name }});
+	}
+	static constexpr int
+	outputFrequency = OutputFrequency;
+};
 %%	endfor
 %% endmacro
 
 %% macro sink(s)
-	template<class Input> class {{ s.name }};
+typedef struct{} {{ s.name }}_TypeId;
+
+template<class Input> class {{ s.name }};
 
 %%	for src in s.sources
 
@@ -120,30 +131,63 @@
 %%		set template_type = "int OutputFrequency"
 %%	endif
 
-	template<{{ template_type }}>
-	class
-	{{ s.name }}<{{ src.name }}<{{ template }}> >
-	{
-	private:
+template<{{ template_type }}>
+class
+{{ s.name }}<{{ src.name }}<{{ template }}> >
+{
+private:
 {{ assertFrequency(s.name, "OutputFrequency", "min", s.minFrequency) }}
 {{ assertFrequency(s.name, "OutputFrequency", "max", s.maxFrequency) }}
 %#		FIXME: make optional in order for sink to be more generic
-		static_assert(OutputFrequency == F_CPU,
-		"OutputFrequency needs to match F_CPU value from project.cfg");
-	public:
-		static StartupError
-		enable(const uint32_t waitCycles = 1500)
-		{
-			StartupError err =  {{ src.name }}<{{ template }}>::enable(waitCycles);
-			if (err != StartupError::None) return err;
-			if(ClockTree::switch{{ s.name }}To(
-					ClockTree::{{ s.name }}Source::{{ src.name }}, waitCycles))
-				return StartupError::None;
-			return StartupError::{{ src.name }};
-		}
-	};
+	static_assert(OutputFrequency == F_CPU,
+	"OutputFrequency needs to match F_CPU value from project.cfg");
+public:
+	static const {{ s.name }}_TypeId Id;
+
+	static StartupError
+	enable(const uint32_t waitCycles = 1500)
+	{
+		StartupError err =  {{ src.name }}<{{ template }}>::enable(waitCycles);
+		if (err != StartupError::None) return err;
+		if(ClockTree::switch{{ s.name }}To(
+				ClockTree::{{ s.name }}Source::{{ src.name }}, waitCycles))
+			return StartupError::None;
+		return StartupError::{{ src.name }};
+	}
+};
 %%	endfor
 %% endmacro
 
 %% macro output(o)
+typedef struct{} {{ o.name }}_TypeId;
+
+class {{ o.name }}
+{
+public:
+	static const {{ o.name }}_TypeId Id;
+
+%% if o.divisions|length > 0
+	enum class Division
+	{
+%%	for d in o.divisions
+		By{{ d }},
+%%	endfor
+	};
+
+	static ALWAYS_INLINE void
+	setDivision(Division d)
+	{
+		ClockTree::set{{ o.name }}Division(static_cast<int>(d));
+	}
+%% endif
+	// Connect Functions
+%% for src in o.sources
+	static ALWAYS_INLINE void
+	connect({{ src.name }}_TypeId t)
+	{
+		(void) t; // avoid compiler warning
+		ClockTree::connectTo{{ o.name }}(ClockTree::{{ o.name }}Source::{{ src.name }});
+	}
+%% endfor
+};
 %% endmacro

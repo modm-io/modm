@@ -39,7 +39,7 @@ namespace xpcc
 		 * Frequencies enum to make code more readable for common
 		 * frequencies (in kHz).
 		 */
-		enum Frequencies
+		enum Frequency
 		{
 			HzDontCare  =         -1,
 			Hz1         =          1,
@@ -65,11 +65,11 @@ namespace xpcc
 		};
 
 		static constexpr int
-		MHz(Frequency f) { if(f == HzDontCare) return f; return f / MHz1; }
+		MHz(Frequency f) { return (f == HzDontCare)? HzDontCare : (f / MHz1); }
 		static constexpr int
-		kHz(Frequency f) { if(f == HzDontCare) return f; return f / kHz1; }
+		kHz(Frequency f) { return (f == HzDontCare)? HzDontCare : (f / kHz1); }
 		static constexpr int
-		Hz(Frequency f)  { if(f == HzDontCare) return f; return f / Hz1; }
+		Hz(Frequency f)  { return (f == HzDontCare)? HzDontCare : (f / Hz1); }
 
 		/**
 		 * Errors that might prevent using a certain clock configuration

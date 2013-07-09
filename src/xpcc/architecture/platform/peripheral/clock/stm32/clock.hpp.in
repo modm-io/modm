@@ -103,6 +103,21 @@ namespace xpcc
 				ExternalClock = Hse,
 				ExternalOscillator = Hse,
 			};
+
+			enum class MCO1Source
+			{
+				InternalClock,
+				ExternalClock,
+				ExternalOscillator,
+				Pll,
+			};
+
+			enum class MCO2Source
+			{
+				ExternalClock,
+				ExternalOscillator,
+				Pll,
+			};
 		public:
 			static bool
 			enableSource(ClockSource src, uint32_t waitCycles = 1500);
@@ -142,6 +157,26 @@ namespace xpcc
 
 			static bool
 			switchSystemClockTo(SystemClockSource src, uint32_t waitCycles = 1500);
+
+			static void
+			connectToMCO1(MCO1Source src)
+			{
+			}
+
+			static void
+			setMCO1Division(int div)
+			{
+			}
+
+			static void
+			connectToMCO2(MCO2Source src)
+			{
+			}
+
+			static void
+			setMCO2Division(int div)
+			{
+			}
 		};
 	}
 }

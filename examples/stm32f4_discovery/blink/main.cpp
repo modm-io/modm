@@ -18,8 +18,12 @@ using namespace xpcc::stm32;
 MAIN_FUNCTION
 {
 	// New Static Clock Setup (S:: => Static)
+	typedef S::Pll<S::ExternalOscillator<MHz8>, MHz168, MHz48> clockSource;
 	StartupError err =
-		S::SystemClock<S::Pll<S::ExternalOscillator<MHz8>, MHz168, MHz48> >::enable();;
+		S::SystemClock<clockSource>::enable();
+
+	// Output clock source on PA8
+	S::MCO1::connect(clockSource::Id);
 
 	LedOrange::setOutput(xpcc::Gpio::HIGH);
 	LedGreen::setOutput(xpcc::Gpio::LOW);
