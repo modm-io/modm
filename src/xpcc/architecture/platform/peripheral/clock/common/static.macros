@@ -128,7 +128,7 @@
 {{ assertFrequency(s.name, "OutputFrequency", "min", s.minFrequency) }}
 {{ assertFrequency(s.name, "OutputFrequency", "max", s.maxFrequency) }}
 %#		FIXME: make optional in order for sink to be more generic
-		static_assert(OutputFrequency == F_CPU / 1000,
+		static_assert(OutputFrequency == F_CPU,
 		"OutputFrequency needs to match F_CPU value from project.cfg");
 	public:
 		static StartupError
