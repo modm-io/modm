@@ -42,30 +42,34 @@ namespace xpcc
 		enum Frequencies
 		{
 			HzDontCare  =         -1,
-			Hz          =          1,
 			Hz1         =          1,
-			kHz         = 1000 *  Hz,
-			kHz1        = 1000 *  Hz,
-			MHz         = 1000 * kHz,
-			MHz1        =    1 * MHz,
-			MHz2        =    2 * MHz,
-			MHz4        =    4 * MHz,
-			MHz8        =    8 * MHz,
-			MHz16       =   16 * MHz,
-			MHz20       =   20 * MHz,
-			MHz24       =   24 * MHz,
-			MHz25       =   25 * MHz,
-			MHz26       =   26 * MHz,
-			MHz32       =   32 * MHz,
-			MHz48       =   48 * MHz,
-			MHz50       =   50 * MHz,
-			MHz64       =   64 * MHz,
-			MHz100      =  100 * MHz,
-			MHz120      =  120 * MHz,
-			MHz168      =  168 * MHz,
-			MHz192      =  192 * MHz,
-			MHz432      =  432 * MHz,
+			kHz1        = 1000 *  Hz1,
+			MHz1        = 1000 * kHz1,
+			MHz2        =    2 * MHz1,
+			MHz4        =    4 * MHz1,
+			MHz8        =    8 * MHz1,
+			MHz16       =   16 * MHz1,
+			MHz20       =   20 * MHz1,
+			MHz24       =   24 * MHz1,
+			MHz25       =   25 * MHz1,
+			MHz26       =   26 * MHz1,
+			MHz32       =   32 * MHz1,
+			MHz48       =   48 * MHz1,
+			MHz50       =   50 * MHz1,
+			MHz64       =   64 * MHz1,
+			MHz100      =  100 * MHz1,
+			MHz120      =  120 * MHz1,
+			MHz168      =  168 * MHz1,
+			MHz192      =  192 * MHz1,
+			MHz432      =  432 * MHz1,
 		};
+
+		static constexpr int
+		MHz(Frequency f) { if(f == HzDontCare) return f; return f / MHz1; }
+		static constexpr int
+		kHz(Frequency f) { if(f == HzDontCare) return f; return f / kHz1; }
+		static constexpr int
+		Hz(Frequency f)  { if(f == HzDontCare) return f; return f / Hz1; }
 
 		/**
 		 * Errors that might prevent using a certain clock configuration
