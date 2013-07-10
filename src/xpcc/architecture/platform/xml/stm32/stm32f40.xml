@@ -66,7 +66,9 @@
 			<!-- For this proof of concept af, as well as analog are not
 				 evaluated
 				 TODO: add alternate functions as well as analog input connections -->
+			<gpio port="A" id="8"></gpio>
 			<gpio port="A" id="9"></gpio>
+			<gpio port="C" id="9"></gpio>
 			<!-- PD5 is only available on devices with 90 pins or more -->
 			<gpio port="D" id="5" pin-count="90+"></gpio>
 			<gpio port="D" id="12" pin-count="90+"></gpio>
