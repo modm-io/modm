@@ -143,14 +143,17 @@ namespace xpcc
 			}
 
 
-			static constexpr int64_t PllMVCOMHz1 = InputFrequency / MHz1;
-			static constexpr int64_t PllMVCOMHz2 = InputFrequency / MHz2;
+			// Internal Pll Constants Representation
+			static constexpr int64_t _PllM = calculatePllM(Mmin);		// TODO: remove default
+			static constexpr int64_t _PllN = calculatePllN(_PllM, Nmax);	// TODO: remove default
+			static constexpr int64_t _PllP = calculatePllP(_PllM, _PllN);
+			static constexpr int64_t _PllQ = calculatePllQ(_PllM, _PllN);
 		public:
-			// Pll Constants
-			static constexpr int64_t PllM = calculatePllM(Mmin);		// TODO: remove default
-			static constexpr int64_t PllN = calculatePllN(PllM, Nmax);	// TODO: remove default
-			static constexpr int64_t PllP = calculatePllP(PllM, PllN);
-			static constexpr int64_t PllQ = calculatePllQ(PllM, PllN);
+			// Pll Constants casted to the correct datatype
+			static constexpr uint8_t  PllM = (_PllM > 0)? static_cast<uint8_t>(_PllM)  : 0xff;
+			static constexpr uint16_t PllN = (_PllN > 0)? static_cast<uint16_t>(_PllN) : 0xffff;
+			static constexpr uint8_t  PllP = (_PllP > 0)? static_cast<uint8_t>(_PllP)  : 0xff;
+			static constexpr uint8_t  PllQ = (_PllQ > 0)? static_cast<uint8_t>(_PllQ)  : 0xff;
 			// Resulting Frequencies
 			static constexpr int64_t VCOInput    = InputFrequency / PllM;
 			static constexpr int64_t VCOOutput   = VCOInput * PllN;
