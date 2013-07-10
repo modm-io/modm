@@ -45,44 +45,44 @@ namespace xpcc
 		 * For Stm32F2 VCOOutputMinimum needs to be MHz64
 		 * For Stm32F4 VCOOutputMinimum needs to be MHz192
 		 */
-		template<int VCOOutputMinimum, int InputFrequency,
-					int SystemFrequency, int USBFrequency>
+		template<int64_t VCOOutputMinimum, int64_t InputFrequency,
+					int64_t SystemFrequency, int64_t USBFrequency>
 		class
 		Stm32F2F4PllSettings
 		{
 		private:
 			// Processor Specific Values
-			static constexpr int VCOInputMin  = MHz1;
-			static constexpr int VCOInputMax  = MHz2;
-			static constexpr int VCOOutputMin =  VCOOutputMinimum;
-			static constexpr int VCOOutputMax = MHz432;
+			static constexpr int64_t VCOInputMin  = MHz1;
+			static constexpr int64_t VCOInputMax  = MHz2;
+			static constexpr int64_t VCOOutputMin =  VCOOutputMinimum;
+			static constexpr int64_t VCOOutputMax = MHz432;
 			// Pll Constant Range
-			static constexpr int Mmin =   2;
-			static constexpr int Mmax =  63;
-			static constexpr int Nmin =  64;
-			static constexpr int Nmax = 432;
-			static constexpr int Qmin =   2;
-			static constexpr int Qmax =  15;
+			static constexpr int64_t Mmin =   2;
+			static constexpr int64_t Mmax =  63;
+			static constexpr int64_t Nmin =  64;
+			static constexpr int64_t Nmax = 432;
+			static constexpr int64_t Qmin =   2;
+			static constexpr int64_t Qmax =  15;
 
 
 //------------------------------- PllM -----------------------------------------
-			static constexpr int
-			checkM(int m)
+			static constexpr int64_t
+			checkM(int64_t m)
 			{
 				return ((InputFrequency / m) <= VCOInputMax &&
 						(InputFrequency / m) >= VCOInputMin &&
 						(calculatePllN(m) >= 0));
 			}
 
-			static constexpr int
-			calculatePllM(int m = Mmin)
+			static constexpr int64_t
+			calculatePllM(int64_t m = Mmin)
 			{
 				return checkM(m)? m : ((m < Mmax)? calculatePllM(m + 1) : -1);
 			}
 
 //------------------------------- PllN -----------------------------------------
-			static constexpr int
-			checkN(int m, int n)
+			static constexpr int64_t
+			checkN(int64_t m, int64_t n)
 			{
 				return ((InputFrequency / m * n) <= VCOOutputMax &&
 						(InputFrequency / m * n) >= VCOOutputMin &&
@@ -90,72 +90,72 @@ namespace xpcc
 						// (calculatePllQ(m, n) >= 0));
 			}
 
-			static constexpr int
-			calculatePllN(int m, int n = Nmax)
+			static constexpr int64_t
+			calculatePllN(int64_t m, int64_t n = Nmax)
 			{
 				return checkN(m, n)? n : ((n > Nmin)? calculatePllN(m, n - 1) : -1);
 			}
 
 //------------------------------- PllP -----------------------------------------
-			static constexpr int
-			pllP(int m, int n)
+			static constexpr int64_t
+			pllP(int64_t m, int64_t n)
 			{
 				// SystemFrequency = InputFrequency / PllM * PllN / PllP
 				// => PllP = InputFrequency / PllM * PllN / SystemFrequency
 				return InputFrequency * n / m / SystemFrequency;
 			}
 
-			static constexpr int
-			checkP(int m, int n, int p)
+			static constexpr int64_t
+			checkP(int64_t m, int64_t n, int64_t p)
 			{
 				// SystemFrequency = InputFrequency / PllM * PllN / PllP
 				return ((p == 2 || p == 4 || p == 6 || p == 8) &&
 						(InputFrequency / m * n / p) == SystemFrequency);
 			}
 
-			static constexpr int
-			calculatePllP(int m, int n)
+			static constexpr int64_t
+			calculatePllP(int64_t m, int64_t n)
 			{
 				return checkP(m, n, pllP(m, n))? pllP(m, n) : -1;
 			}
 
 //------------------------------- PllQ -----------------------------------------
-			static constexpr int
-			pllQ(int m, int n)
+			static constexpr int64_t
+			pllQ(int64_t m, int64_t n)
 			{
 				// USBFrequency = InputFrequency / PllM * PllN / PllQ
 				// => PllQ = InputFrequency / PllM * PllN / USBFrequency
 				return InputFrequency * n / m / USBFrequency;
 			}
 
-			static constexpr int
-			checkQ(int m, int n, int q)
+			static constexpr int64_t
+			checkQ(int64_t m, int64_t n, int64_t q)
 			{
 				// USBFrequency = InputFrequency / PllM * PllN / PllQ
 				return (q >= Qmin && q <= Qmax &&
 						(InputFrequency / m * n / q) == USBFrequency);
 			}
 
-			static constexpr int
-			calculatePllQ(int m, int n)
+			static constexpr int64_t
+			calculatePllQ(int64_t m, int64_t n)
 			{
 				return checkQ(m, n, pllQ(m, n))? pllQ(m, n) : -1;
 			}
 
 
-			static constexpr int PllMVCOMHz1 = InputFrequency / MHz1;
-			static constexpr int PllMVCOMHz2 = InputFrequency / MHz2;
+			static constexpr int64_t PllMVCOMHz1 = InputFrequency / MHz1;
+			static constexpr int64_t PllMVCOMHz2 = InputFrequency / MHz2;
 		public:
 			// Pll Constants
-			static constexpr int PllM = calculatePllM(Mmin);		// TODO: remove default
-			static constexpr int PllN = calculatePllN(PllM, Nmax);	// TODO: remove default
-			static constexpr int PllP = calculatePllP(PllM, PllN);
-			static constexpr int PllQ = calculatePllQ(PllM, PllN);
+			static constexpr int64_t PllM = calculatePllM(Mmin);		// TODO: remove default
+			static constexpr int64_t PllN = calculatePllN(PllM, Nmax);	// TODO: remove default
+			static constexpr int64_t PllP = calculatePllP(PllM, PllN);
+			static constexpr int64_t PllQ = calculatePllQ(PllM, PllN);
 			// Resulting Frequencies
-			static constexpr int VCOInput    = InputFrequency / PllM;
-			static constexpr int VCOOutput   = VCOInput * PllN;
-			static constexpr int SystemClock = VCOOutput / PllP;
-			static constexpr int USBClock    = VCOOutput / PllQ;
+			static constexpr int64_t VCOInput    = InputFrequency / PllM;
+			static constexpr int64_t VCOOutput   = VCOInput * PllN;
+			static constexpr int64_t SystemClock = VCOOutput / PllP;
+			static constexpr int64_t USBClock    = VCOOutput / PllQ;
 		private:
 			// Static Asserts
 			// Check Ranges
