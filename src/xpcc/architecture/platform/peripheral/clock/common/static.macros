@@ -170,7 +170,7 @@ public:
 	enum class Division
 	{
 %%	for d in o.divisions
-		By{{ d }},
+		By{{ d }} = {{ d }},
 %%	endfor
 	};
 

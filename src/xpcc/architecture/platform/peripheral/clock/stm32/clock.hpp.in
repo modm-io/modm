@@ -162,30 +162,30 @@ namespace xpcc
 			static void
 			connectToMCO1(MCO1Source src)
 			{
-				uint32_t tmp = RCC->CFGR & RCC_CFGR_MCO1;
+				uint32_t tmp = RCC->CFGR & ~(RCC_CFGR_MCO1);
 				RCC->CFGR = tmp | static_cast<uint32_t>(src);
 			}
 
 			static void
 			setMCO1Division(int div)
 			{
-				uint32_t tmp = RCC->CFGR & RCC_CFGR_MCO1PRE;
-				if (div > 1) tmp |= (div + 2) << RCC_CFGR_MCO1PRE_0;
+				uint32_t tmp = RCC->CFGR & ~(RCC_CFGR_MCO1PRE);
+				if (div > 1) tmp |= (div + 2) << 24;
 				RCC->CFGR = tmp;
 			}
 
 			static void
 			connectToMCO2(MCO2Source src)
 			{
-				uint32_t tmp = RCC->CFGR & RCC_CFGR_MCO2;
+				uint32_t tmp = RCC->CFGR & ~(RCC_CFGR_MCO2);
 				RCC->CFGR = tmp | static_cast<uint32_t>(src);
 			}
 
 			static void
 			setMCO2Division(int div)
 			{
-				uint32_t tmp = RCC->CFGR & RCC_CFGR_MCO2PRE;
-				if (div > 1) tmp |= (div + 2) << RCC_CFGR_MCO2PRE_0;
+				uint32_t tmp = RCC->CFGR & ~(RCC_CFGR_MCO2PRE);
+				if (div > 1) tmp |= (div + 2) << 27;
 				RCC->CFGR = tmp;
 			}
 		};
