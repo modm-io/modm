@@ -57,7 +57,9 @@ class DeviceFile:
 
 		self.platform = node.get('platform')
 		self.family = node.get('family')
-		self.names = node.get('name').split('|')
+		self.names = node.get('name')
+		if self.names != None:
+			self.names = self.names.split('|')
 		self.types = node.get('type')
 		if self.types != None:
 			self.types = self.types.split('|')
@@ -69,7 +71,7 @@ class DeviceFile:
 			if c.tag in ['driver']:
 				self.drivers.append(Driver(self, c))
 			else:
-				self.properties.append(Property(self, c))
+				self.properties.append(Property(self, c, self.log))
 		self._checkDeviceFileData(xml_file)
 
 	def _openDeviceXML(self, filename):
@@ -142,6 +144,12 @@ class DeviceFile:
 				" Valid families for this platform are: %s" %
 				(self.family, self.platform, families))
 			pass
+		elif self.platform == 'lpc':
+			families = ['11', '13', '17']
+			if self.family not in families:
+				self.log.error("Unknown family '%s' for platform %s."
+				" Valid families for this platform are: %s" %
+				(self.family, self.platform, families))
 		else:
 			self.log.error("Unknown platform '%s'" % self.platform)
 
@@ -157,7 +165,7 @@ class DeviceFile:
 		This is used by the Scons Platform Tools. Think before editing.
 		TODO: defines, flash and ram may depend on pin-count....
 		"""
-		s = DeviceIdentifier(device_string)
+		s = DeviceIdentifier(device_string, self.log)
 		if s.valid == False:
 			return None
 		props = {}
@@ -199,7 +207,7 @@ class DeviceFile:
 		Please note: all paths are relative to the platform_path.
 		"""
 		# Check Device string
-		s = DeviceIdentifier(device_string)
+		s = DeviceIdentifier(device_string, self.log)
 		if s.valid == False:
 			return None
 		
@@ -234,7 +242,7 @@ class DeviceFile:
 		Always returns as list if a valid device string is handed to function.
 		Set require_singelton if you need exactly one value to be returned.
 		"""
-		s = DeviceIdentifier(device_string)
+		s = DeviceIdentifier(device_string, self.log)
 		if s.valid == False:
 			return None
 		if prop_type == 'define':
@@ -281,7 +289,12 @@ class DeviceFile:
 ##------------- A Driver Node contains Driver and Property Nodes --------------
 class Driver(DeviceElementBase):
 
-	def __init__(self, device, node):
+	def __init__(self, device, node, logger=None):
+		if logger == None:
+			self.log = Logger()
+		else:
+			self.log = logger
+
 		DeviceElementBase.__init__(self, device, node)
 		self.node = node
 		self.type = node.get('type') # this overwrite is somewhat unfortunate
@@ -465,11 +478,16 @@ class Property(DeviceElementBase):
 	flash, ram, pin-count, define
 	"""
 
-	def __init__(self, device, node):
+	def __init__(self, device, node, logger=None):
+		if logger == None:
+			self.log = Logger()
+		else:
+			self.log = logger
+
 		DeviceElementBase.__init__(self, device, node)
 		self.value = node.text
 		self._checkValue()
-		# print "New Property of type: %s and value: %s" % (self.type, self.value)
+		self.log.debug("New Property of type: %s and value: %s" % (self.type, self.value))
 
 	def _checkValue(self):
 		if self.type in ['flash', 'ram', 'eeprom', 'pin-count']:

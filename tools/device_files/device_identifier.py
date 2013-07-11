@@ -29,7 +29,11 @@
 # -----------------------------------------------------------------------------
 #
 
-import re
+import re, sys, os
+
+# add python module logger to path
+sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'logger'))
+from logger import Logger
 
 class DeviceIdentifier:
 	""" DeviceIdentifier
@@ -38,7 +42,12 @@ class DeviceIdentifier:
 	well as lpc controllers
 	"""
 
-	def __init__(self, string=None):
+	def __init__(self, string=None, logger=None):
+		if logger == None:
+			self.log = Logger()
+		else:
+			self.log = logger
+
 		self._string = string
 		# default for properties is None
 		self.platform = None # e.g. stm32, avr
@@ -104,7 +113,14 @@ class DeviceIdentifier:
 					self.family = 'xmega'
 				
 				self.valid = True
-			
+		# LPC Platform
+		elif string.startswith('lpc'):
+			self.platform = "lpc"
+			self.family = string[3:5]
+			self.name = string[5:string.find('_')]
+			self.log.debug("TODO: Handle ending: %s" % string[string.find('_'):])
+			if len(string) >= 7:
+				self.valid = True
 		else:
 			raise ParserException("Parse Error: unknown platform. Device string: %" % (string))
 
@@ -112,7 +128,7 @@ class DeviceIdentifier:
 	def string(self):
 		string = ""
 		if self.platform != None and self.platform != "avr":
-			string += platform
+			string += self.platform
 		if self.family:
 			string += self.family
 		if self.family == 'at90':

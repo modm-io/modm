@@ -109,6 +109,7 @@ def platform_tools_generate(env, architecture_path):
 		#	env.Error("Tried: " + f + os.linesep)
 		Exit(1)
 	# Now we need to parse the Xml File
+	env.Debug("Found device file: " + device_file)
 	dev = DeviceFile(device_file, env.GetLogger())
 
 	# Parse Properties
