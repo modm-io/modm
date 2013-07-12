@@ -1,0 +1,89 @@
+%# coding: utf-8
+%# ----------------------------------------------------------------------------
+%#* Copyright (c) 2013, Roboterclub Aachen e.V.
+%#* All rights reserved.
+%#*
+%#* Redistribution and use in source and binary forms, with or without
+%#* modification, are permitted provided that the following conditions are met:
+%#*
+%#*     * Redistributions of source code must retain the above copyright
+%#*       notice, this list of conditions and the following disclaimer.
+%#*     * Redistributions in binary form must reproduce the above copyright
+%#*       notice, this list of conditions and the following disclaimer in the
+%#*       documentation and/or other materials provided with the distribution.
+%#*     * Neither the name of the Roboterclub Aachen e.V. nor the
+%#*       names of its contributors may be used to endorse or promote products
+%#*       derived from this software without specific prior written permission.
+%#*
+%#* THIS SOFTWARE IS PROVIDED BY ROBOTERCLUB AACHEN E.V. ''AS IS'' AND ANY
+%#* EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+%#* WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+%#. IN NO EVENT SHALL ROBOTERCLUB AACHEN E.V. BE LIABLE FOR ANY
+%#* DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+%#* (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+%#* LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+%#* ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+%#* (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+%#* THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+%#*/
+
+
+%# This File includes LPC specific macros for the generic cortex startup.c
+
+
+%% macro defines()
+%% endmacro
+
+
+%% macro appendInterrupts()
+
+%% do i.update({16: ["WAKEUP0_IRQHandler",  "PIO0_0  Wakeup"]})
+%% do i.update({17: ["WAKEUP1_IRQHandler",  "PIO0_1  Wakeup"]})
+%% do i.update({18: ["WAKEUP2_IRQHandler",  "PIO0_2  Wakeup"]})
+%% do i.update({19: ["WAKEUP3_IRQHandler",  "PIO0_3  Wakeup"]})
+%% do i.update({20: ["WAKEUP4_IRQHandler",  "PIO0_4  Wakeup"]})
+%% do i.update({21: ["WAKEUP5_IRQHandler",  "PIO0_5  Wakeup"]})
+%% do i.update({22: ["WAKEUP6_IRQHandler",  "PIO0_6  Wakeup"]})
+%% do i.update({23: ["WAKEUP7_IRQHandler",  "PIO0_7  Wakeup"]})
+%% do i.update({24: ["WAKEUP8_IRQHandler",  "PIO0_8  Wakeup"]})
+%% do i.update({25: ["WAKEUP9_IRQHandler",  "PIO0_9  Wakeup"]})
+%% do i.update({26: ["WAKEUP10_IRQHandler", "PIO0_10 Wakeup"]})
+%% do i.update({27: ["WAKEUP11_IRQHandler", "PIO0_11 Wakeup"]})
+%% do i.update({28: ["WAKEUP12_IRQHandler", "PIO1_0  Wakeup"]})
+%% do i.update({29: ["CAN_IRQHandler", "C_CAN Interrupt"]})
+%% do i.update({30: ["SSP1_IRQHandler", "SPI/SSP1 Interrupt"]})
+%% do i.update({31: ["I2C_IRQHandler", "I2C0"]})
+%% do i.update({32: ["TIMER16_0_IRQHandler", "CT16B0 (16-bit Timer 0)"]})
+%% do i.update({33: ["TIMER16_1_IRQHandler", "CT16B1 (16-bit Timer 1)"]})
+%% do i.update({34: ["TIMER32_0_IRQHandler", "CT32B0 (32-bit Timer 0)"]})
+%% do i.update({35: ["TIMER32_1_IRQHandler", "CT32B1 (32-bit Timer 1)"]})
+%% do i.update({36: ["SSP0_IRQHandler", "SPI/SSP0 Interrupt"]})
+%% do i.update({37: ["UART_IRQHandler", "UART0"]})
+%% do i.update({40: ["ADC_IRQHandler", "ADC (A/D Converter)"]})
+%% do i.update({41: ["WDT_IRQHandler", "WDT (Watchdog Timer)"]})
+%% do i.update({42: ["BOD_IRQHandler", "BOD (Brownout Detect)"]})
+%% do i.update({43: ["FMC_IRQHandler", "Flash Memory Controller Interrupt"]})
+%% do i.update({44: ["PIOINT3_IRQHandler", "PIO INT3"]})
+%% do i.update({45: ["PIOINT2_IRQHandler", "PIO INT2"]})
+%% do i.update({46: ["PIOINT1_IRQHandler", "PIO INT1"]})
+%% do i.update({47: ["PIOINT0_IRQHandler", "PIO INT0"]})
+
+%% endmacro
+
+
+%% macro startupCode()
+
+	// Enable AHB clock to the GPIO domain.
+	LPC_SYSCON->SYSAHBCLKCTRL |= (1 << 6); // FIXME: Move to Gpio Driver
+
+	#if CORTEX_VECTORS_RAM
+	LPC_SYSCON->SYSMEMREMAP = ((LPC_SYSCON->SYSMEMREMAP)& ~3) | 1;
+	#else
+	//	LPC_SYSCON->SYSMEMREMAP |= 3; // Map to flash
+	#endif
+
+	//#if (MEMMAP_SETUP || MEMMAP_INIT) // Memory Mapping Setup
+	//LPC_SYSCON->SYSMEMREMAP = SYSMEMREMAP_Val;
+	//#endif
+
+%% endmacro
