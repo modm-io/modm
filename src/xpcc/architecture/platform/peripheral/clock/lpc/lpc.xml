@@ -1,0 +1,9 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE rca SYSTEM "../../xml/driver.dtd">
+<rca version="1.0">
+	<driver type="clock" name="lpc">
+		<template>clock.cpp.in</template>
+		<template>clock.hpp.in</template>
+		<static>../common/common_clock.hpp</static>
+	</driver>
+</rca>

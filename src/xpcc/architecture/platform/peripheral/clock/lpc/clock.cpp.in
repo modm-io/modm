@@ -1,0 +1,122 @@
+// coding: utf-8
+// ----------------------------------------------------------------------------
+/* Copyright (c) 2013, Roboterclub Aachen e.V.
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ *     * Redistributions of source code must retain the above copyright
+ *       notice, this list of conditions and the following disclaimer.
+ *     * Redistributions in binary form must reproduce the above copyright
+ *       notice, this list of conditions and the following disclaimer in the
+ *       documentation and/or other materials provided with the distribution.
+ *     * Neither the name of the Roboterclub Aachen e.V. nor the
+ *       names of its contributors may be used to endorse or promote products
+ *       derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY ROBOTERCLUB AACHEN E.V. ''AS IS'' AND ANY
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL ROBOTERCLUB AACHEN E.V. BE LIABLE FOR ANY
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+ * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+// ----------------------------------------------------------------------------
+
+#include "../../../device.hpp"
+#include "clock.hpp"
+
+
+// TODO: Move to common file
+#define PDRUNCFG_SYSOSC_PD		(1<<5)
+#define PDRUNCFG_SYSPLL_PD		(1<<7)
+#define SYSOSCCTRL_BYPASS		(1<<0)
+#define SYSOSCCTRL_FREQRANGE	(1<<1)
+#define SYSPLLSTAT_LOCK			(1<<0)
+#define SYSAHBCLKCTRL_SYS			(1<<0)
+#define SYSAHBCLKCTRL_ROM			(1<<1)
+#define SYSAHBCLKCTRL_RAM			(1<<2)
+#define SYSAHBCLKCTRL_FLASHREG		(1<<3)
+#define SYSAHBCLKCTRL_FLASHARRAY	(1<<4)
+#define SYSAHBCLKCTRL_I2C			(1<<5)
+#define SYSAHBCLKCTRL_GPIO			(1<<6)
+#define SYSAHBCLKCTRL_CT16B0		(1<<7)
+#define SYSAHBCLKCTRL_CT16B1		(1<<8)
+#define SYSAHBCLKCTRL_CT32B0		(1<<9)
+#define SYSAHBCLKCTRL_CT32B1		(1<<10)
+#define SYSAHBCLKCTRL_SSP0			(1<<11)
+#define SYSAHBCLKCTRL_UART			(1<<12)
+#define SYSAHBCLKCTRL_ADC			(1<<13)
+#define SYSAHBCLKCTRL_WDT			(1<<15)
+#define SYSAHBCLKCTRL_IOCON			(1<<16)	// clock for io configuration block
+#define SYSAHBCLKCTRL_CAN			(1<<17)
+#define SYSAHBCLKCTRL_SSP1			(1<<18)
+
+// ----------------------------------------------------------------------------
+bool
+xpcc::lpc::ClockTree::enableSource(ClockSource src, uint32_t waitCycles)
+{
+	if (src == ClockSource::InternalClock) {
+		return true;	// InternalClock is on by default (PDRUNCFG: IRC_PD)
+	}
+	else if (src == ClockSource::ExternalClock) {
+		LPC_SYSCON->PDRUNCFG &= ~PDRUNCFG_SYSOSC_PD;	// powerup
+		LPC_SYSCON->SYSOSCCTRL |= SYSOSCCTRL_BYPASS;	// enable bypass
+	}
+	else if(src == ClockSource::ExternalOscillator) {
+		LPC_SYSCON->PDRUNCFG &= ~PDRUNCFG_SYSOSC_PD;	// powerup
+		LPC_SYSCON->SYSOSCCTRL &= ~SYSOSCCTRL_BYPASS;	// do not bypass
+		// TODO: set frequency range (1-20MHz or 15-25MHz)
+		//       probably also need to wait a little when using an oscillator
+	}
+	else {
+		return false;	// should not get here
+	}
+
+	// TODO: maybe add wait loop
+
+	return true;
+}
+
+// ----------------------------------------------------------------------------
+void
+xpcc::lpc::ClockTree::enablePll(PllSource source, uint8_t pllM, uint8_t pllP)
+{
+	// SYSPLLCLKSEL
+	LPC_SYSCON->SYSPLLCLKSEL = (LPC_SYSCON->SYSPLLCLKSEL & 0b11)
+								| static_cast<uint32_t>(source);
+	LPC_SYSCON->SYSPLLCLKUEN = 0x01;	// toggle update enable register
+	LPC_SYSCON->SYSPLLCLKUEN = 0x00;
+	LPC_SYSCON->SYSPLLCLKUEN = 0x01;
+	while (!(LPC_SYSCON->SYSPLLCLKUEN & 0x01));		// wait until updated
+	LPC_SYSCON->SYSPLLCTRL = (0x1f & pllM) | (0x60 & pllP);
+	LPC_SYSCON->PDRUNCFG &= ~PDRUNCFG_SYSPLL_PD;	// power up pll
+	while (!(LPC_SYSCON->SYSPLLSTAT & SYSPLLSTAT_LOCK));// wait for pll to be locked
+}
+
+// ----------------------------------------------------------------------------
+bool
+xpcc::lpc::ClockTree::switchSystemClockTo(SystemClockSource src, uint32_t waitCycles)
+{
+	LPC_SYSCON->MAINCLKSEL = static_cast<uint32_t>(src);
+	LPC_SYSCON->MAINCLKUEN = 0x01;	// toggle update enable register
+	LPC_SYSCON->MAINCLKUEN = 0x00;
+	LPC_SYSCON->MAINCLKUEN = 0x01;
+	while (!(LPC_SYSCON->MAINCLKUEN & 0x01));	// wait until updated
+
+	// Set AHB Frequency
+	LPC_SYSCON->SYSAHBCLKDIV  = 0x1;	// device ahb frequency by 1 (max 255)
+	// TODO: do not enable gpio clock here but in startup.c.in form gpio driver
+	LPC_SYSCON->SYSAHBCLKCTRL =   SYSAHBCLKCTRL_SYS | SYSAHBCLKCTRL_ROM
+								| SYSAHBCLKCTRL_RAM | SYSAHBCLKCTRL_FLASHREG
+								| SYSAHBCLKCTRL_FLASHARRAY | SYSAHBCLKCTRL_GPIO
+								| SYSAHBCLKCTRL_IOCON;
+	// TODO: set SSP0, UART and SSP1 prescalers in the specific driver file
+
+	return true;
+}
