@@ -124,8 +124,13 @@ template<class Input> class {{ s.name }};
 
 %# check if source has input
 %%	if src.sources|length > 0
-%%		set template = "Input, OutputFrequency, " + src.frequencies|join(', ')
-%%		set template_type = "class Input, int OutputFrequency, int " + src.frequencies|join(', int ')
+%%		if src.frequencies|length > 0
+%%			set template = "Input, OutputFrequency, " + src.frequencies|join(', ')
+%%			set template_type = "class Input, int OutputFrequency, int " + src.frequencies|join(', int ')
+%%		else
+%%			set template = "Input, OutputFrequency"
+%%			set template_type = "class Input, int OutputFrequency"
+%%		endif
 %%	else
 %%		set template = "OutputFrequency"
 %%		set template_type = "int OutputFrequency"
