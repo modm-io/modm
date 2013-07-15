@@ -98,3 +98,30 @@ PllCalculatorTest::testStm32F4()
 	testF4(MHz20, MHz64, MHz48);
 	testF4(MHz25, MHz64, MHz48);
 }
+
+#define testLPC11(in, out) \
+	xpcc::lpc::Lpc11PllSettings<in, out>::PllM
+
+void
+PllCalculatorTest::testLPC11XX()
+{
+	// Go through some common values
+	// SystemClock: 20MHz
+	testLPC11(MHz1, MHz20);
+	testLPC11(MHz8, MHz20);
+	testLPC11(MHz12, MHz20);
+	testLPC11(MHz16, MHz20);
+	testLPC11(MHz20, MHz20);
+	// SystemClock: 32MHz
+	testLPC11(MHz1, MHz32);
+	testLPC11(MHz8, MHz32);
+	testLPC11(MHz12, MHz32);
+	testLPC11(MHz16, MHz32);
+	testLPC11(MHz20, MHz32);
+	// SystemClock: 48MHz
+	testLPC11(MHz8, MHz48);
+	testLPC11(MHz12, MHz48);
+	testLPC11(MHz16, MHz48);
+	testLPC11(MHz20, MHz48);
+
+}

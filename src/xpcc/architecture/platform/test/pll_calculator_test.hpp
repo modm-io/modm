@@ -44,4 +44,7 @@ public:
 
 	void
 	testStm32F4();
+
+	void
+	testLPC11XX();
 };
