@@ -120,8 +120,13 @@ namespace xpcc
 				Pll = RCC_CFGR_MCO1_1 | RCC_CFGR_MCO1_0,
 			};
 		public:
+			/*
+			 * XPCC Static Clock Standard Interface
+			 * requires source frequency in **kHz**
+			 */
 			static bool
-			enableSource(ClockSource src, uint32_t waitCycles = 1500);
+			enableSource(ClockSource src, uint32_t kHz, uint32_t waitCycles = 1500);
+
 
 			/**
 			 * Enable PLL.
@@ -152,6 +157,7 @@ namespace xpcc
 			 * Example:
 			 * 
 			 */
+
 			static void
 			enablePll(PllSource source, uint8_t pllM,
 							uint16_t pllN, uint8_t pllP, uint8_t pllQ);

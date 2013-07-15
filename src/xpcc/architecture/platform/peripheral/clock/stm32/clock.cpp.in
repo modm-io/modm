@@ -33,8 +33,10 @@
 
 // ----------------------------------------------------------------------------
 bool
-xpcc::stm32::ClockTree::enableSource(ClockSource src, uint32_t waitCycles)
+xpcc::stm32::ClockTree::enableSource(ClockSource src, uint32_t kHz, uint32_t waitCycles)
 {
+	(void)(kHz);
+
 	if (src == ClockSource::InternalClock)
 		return true;	// InternalClock is always on
 	if (src == ClockSource::ExternalClock) {
