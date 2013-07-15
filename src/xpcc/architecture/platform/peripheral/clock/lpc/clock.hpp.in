@@ -92,7 +92,7 @@ namespace xpcc
 
 		public:
 			static bool
-			enableSource(ClockSource src, uint32_t waitCycles = 1500);
+			enableSource(ClockSource src, uint32_t kHz, uint32_t waitCycles = 1500);
 
 			/**
 			 * Enable PLL.

@@ -31,6 +31,8 @@
 #ifndef XPCC__COMMON_CLOCK_HPP
 #define XPCC__COMMON_CLOCK_HPP
 
+#include <stdint.h> // uint32_t
+
 namespace xpcc
 {
 	namespace clock
@@ -51,6 +53,7 @@ namespace xpcc
 			MHz10       =   10 * MHz1,
 			MHz12       =   12 * MHz1,
 			MHz16       =   16 * MHz1,
+			MHz17       =   17 * MHz1,
 			MHz20       =   20 * MHz1,
 			MHz24       =   24 * MHz1,
 			MHz25       =   25 * MHz1,
@@ -69,8 +72,12 @@ namespace xpcc
 
 		static constexpr int
 		MHz(int f) { return (f == HzDontCare)? HzDontCare : (f / MHz1); }
+		static constexpr uint32_t
+		u32MHz(int f) { return static_cast<uint32_t>(MHz(f)); }
 		static constexpr int
 		kHz(int f) { return (f == HzDontCare)? HzDontCare : (f / kHz1); }
+		static constexpr uint32_t
+		u32kHz(int f) { return static_cast<uint32_t>(kHz(f)); }
 		static constexpr int
 		Hz(int f)  { return (f == HzDontCare)? HzDontCare : (f / Hz1); }
 

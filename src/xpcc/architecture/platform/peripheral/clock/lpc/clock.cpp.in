@@ -59,7 +59,7 @@
 
 // ----------------------------------------------------------------------------
 bool
-xpcc::lpc::ClockTree::enableSource(ClockSource src, uint32_t waitCycles)
+xpcc::lpc::ClockTree::enableSource(ClockSource src, uint32_t f_kHz, uint32_t waitCycles)
 {
 	if (src == ClockSource::InternalClock) {
 		return true;	// InternalClock is on by default (PDRUNCFG: IRC_PD)
@@ -71,14 +71,21 @@ xpcc::lpc::ClockTree::enableSource(ClockSource src, uint32_t waitCycles)
 	else if(src == ClockSource::ExternalOscillator) {
 		LPC_SYSCON->PDRUNCFG &= ~PDRUNCFG_SYSOSC_PD;	// powerup
 		LPC_SYSCON->SYSOSCCTRL &= ~SYSOSCCTRL_BYPASS;	// do not bypass
-		// TODO: set frequency range (1-20MHz or 15-25MHz)
-		//       probably also need to wait a little when using an oscillator
+		if(f_kHz >= u32kHz(MHz1) && f_kHz <= u32kHz(MHz17)) {
+			LPC_SYSCON->SYSOSCCTRL &= ~SYSOSCCTRL_FREQRANGE; // 1-20MHz
+		}
+		else if (f_kHz >= u32kHz(MHz17) && f_kHz <= u32kHz(MHz25)) {
+			LPC_SYSCON->SYSOSCCTRL |= SYSOSCCTRL_FREQRANGE; // 15-25MHz
+		}
+		else {
+			return false;	// should not get here
+		}
 	}
 	else {
 		return false;	// should not get here
 	}
 
-	// TODO: maybe add wait loop
+	// TODO: maybe add wait loop (especially for for oscillator??)
 
 	return true;
 }

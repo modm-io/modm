@@ -29,7 +29,7 @@
 // ----------------------------------------------------------------------------
 
 #ifndef XPCC_LPC__PLL_HPP
-#define XPCC_LPC_PLL_HPP
+#define XPCC_LPC__PLL_HPP
 
 #include "../common/common_clock.hpp"
 
