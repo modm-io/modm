@@ -30,10 +30,11 @@
 
 #include "pll_calculator_test.hpp"
 #include "../peripheral/clock/stm32/pll_calculator.hpp"
+#include "../peripheral/clock/lpc/pll_calculator.hpp"
 
 	/* This file tests the various compile time
 	 * Pll constants calculators.
-	 * Sinc these use static asserts, things will
+	 * Since these use static asserts, things will
 	 * break during compile time.
 	 */
 
@@ -45,7 +46,7 @@ PllCalculatorTest::testStm32F1()
 }
 
 #define testF2(in, out, usb) \
-	xpcc::stm32::Stm32F2F4PllSettings<MHz64, in, out, usb>::PllM
+	(void)xpcc::stm32::Stm32F2F4PllSettings<MHz64, in, out, usb>::PllM
 
 void
 PllCalculatorTest::testStm32F2()
@@ -76,7 +77,7 @@ PllCalculatorTest::testStm32F3()
 }
 
 #define testF4(in, out, usb) \
-	xpcc::stm32::Stm32F2F4PllSettings<MHz192, in, out, usb>::PllM
+	(void)xpcc::stm32::Stm32F2F4PllSettings<MHz192, in, out, usb>::PllM
 
 void
 PllCalculatorTest::testStm32F4()
@@ -100,7 +101,7 @@ PllCalculatorTest::testStm32F4()
 }
 
 #define testLPC11(in, out) \
-	xpcc::lpc::Lpc11PllSettings<in, out>::PllM
+	(void)xpcc::lpc::Lpc11PllSettings<in, out>::PllM
 
 void
 PllCalculatorTest::testLPC11XX()
@@ -108,18 +109,13 @@ PllCalculatorTest::testLPC11XX()
 	// Go through some common values
 	// SystemClock: 20MHz
 	testLPC11(MHz10, MHz20);
-	testLPC11(MHz12, MHz20);
 	testLPC11(MHz16, MHz20);
 	testLPC11(MHz20, MHz20);
 	// SystemClock: 32MHz
-	testLPC11(MHz10, MHz32);
-	testLPC11(MHz12, MHz32);
 	testLPC11(MHz16, MHz32);
-	testLPC11(MHz20, MHz32);
+	// SystemClock: 36MHz
+	testLPC11(MHz12, MHz36);
 	// SystemClock: 48MHz
-	testLPC11(MHz10, MHz48);
 	testLPC11(MHz12, MHz48);
 	testLPC11(MHz16, MHz48);
-	testLPC11(MHz20, MHz48);
-
 }
