@@ -9,10 +9,11 @@ using namespace xpcc::lpc;
 // ----------------------------------------------------------------------------
 MAIN_FUNCTION
 {
-	// Setup Clock
-	ClockTree::enableSource(ClockTree::ClockSource::ExternalOscillator);
-	ClockTree::enablePll(ClockTree::PllSource::ExternalOscillator, 3, 1);
-	ClockTree::switchSystemClockTo(ClockTree::SystemClockSource::Pll);
+	// New Static Clock Setup (S:: => Static)
+	typedef S::Pll<S::ExternalOscillator<MHz12>, MHz48> clockSource;
+	// typedef S::ExternalOscillator<MHz12> clockSource;
+	StartupError err =
+		S::SystemClock<clockSource>::enable();
 
 	Led::setOutput();
 
