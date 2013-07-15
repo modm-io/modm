@@ -64,7 +64,7 @@ public:
 	static StartupError
 	enable(const uint32_t waitCycles = 1500)
 	{
-		if (!ClockTree::enableSource(ClockTree::ClockSource::{{ s.name }}, waitCycles))
+		if (!ClockTree::enableSource(ClockTree::ClockSource::{{ s.name }}, kHz(outputFrequency), waitCycles))
 			return StartupError::{{ s.name }};
 		return StartupError::None;
 	}
