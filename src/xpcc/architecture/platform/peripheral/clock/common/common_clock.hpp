@@ -65,11 +65,11 @@ namespace xpcc
 		};
 
 		static constexpr int
-		MHz(Frequency f) { return (f == HzDontCare)? HzDontCare : (f / MHz1); }
+		MHz(int f) { return (f == HzDontCare)? HzDontCare : (f / MHz1); }
 		static constexpr int
-		kHz(Frequency f) { return (f == HzDontCare)? HzDontCare : (f / kHz1); }
+		kHz(int f) { return (f == HzDontCare)? HzDontCare : (f / kHz1); }
 		static constexpr int
-		Hz(Frequency f)  { return (f == HzDontCare)? HzDontCare : (f / Hz1); }
+		Hz(int f)  { return (f == HzDontCare)? HzDontCare : (f / Hz1); }
 
 		/**
 		 * Errors that might prevent using a certain clock configuration
