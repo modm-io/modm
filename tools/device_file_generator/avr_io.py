@@ -184,34 +184,28 @@ xmega_peripheral_pins = \
 		{ "id": "6", "name": "miso" },
 		{ "id": "7", "name": "sck" }
 	],
-	"uart0":
+	"uart":
 	[
-		{ "id": "1", "name": "xck" },
-		{ "id": "2", "name": "rxd" },
-		{ "id": "3", "name": "txd" }
-	],
-	"uart1":
-	[
-		{ "id": "5", "name": "xck" },
-		{ "id": "6", "name": "rxd" },
-		{ "id": "7", "name": "txd" }
+		{ "id": "1", "name": "xck", "instance": "0" },
+		{ "id": "2", "name": "rxd", "instance": "0" },
+		{ "id": "3", "name": "txd", "instance": "0" },
+		{ "id": "5", "name": "xck", "instance": "1" },
+		{ "id": "6", "name": "rxd", "instance": "1" },
+		{ "id": "7", "name": "txd", "instance": "1" }
 	],
 	"i2c":
 	[
 		{ "id": "0", "name": "sda" },
 		{ "id": "1", "name": "scl" }
 	],
-	"timer0":
+	"timer":
 	[
-		{ "id": "0", "name": "A" },
-		{ "id": "1", "name": "B" },
-		{ "id": "2", "name": "C" },
-		{ "id": "3", "name": "D" }
-	],
-	"timer1":
-	[
-		{ "id": "4", "name": "A" },
-		{ "id": "5", "name": "B" }
+		{ "id": "0", "name": "A", "instance": "0" },
+		{ "id": "1", "name": "B", "instance": "0" },
+		{ "id": "2", "name": "C", "instance": "0" },
+		{ "id": "3", "name": "D", "instance": "0" },
+		{ "id": "4", "name": "A", "instance": "1" },
+		{ "id": "5", "name": "B", "instance": "1" }
 	],
 	"awex":
 	[
