@@ -101,11 +101,12 @@ class DeviceIdentifier:
 						self.size_id = match.group('size')
 
 				elif self.family == "atxmega":
-					match = re.search(self.family + self.name + "(?P<type>[A-Ea-e]?)(?P<package>[1-4]?)(?P<usb>[Bb]?[Uu]?)", string)
+					match = re.search(self.family + self.name + "(?P<type>[A-Ea-e]?[1-4]?)(?P<package>[Bb]?[Uu]?)", string)
+					self.pin_id = 'none'
 					if match:
-						if match and match.group('type') != '':
+						if match.group('type') != '':
 							self.type = match.group('type').lower()
-						if match and match.group('package') != '':
+						if match.group('package') != '':
 							self.pin_id = match.group('package')
 					self.size_id = self.name
 					# The ATxmega is the 'extreme ATmega' and actually quite different from the ATmega.
