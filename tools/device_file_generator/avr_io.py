@@ -27,6 +27,210 @@
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # -----------------------------------------------------------------------------
 
+xmega_pins = \
+[
+	{
+		"type": "a1",
+		"gpio":
+		[
+			{ "port": "A", "mask": 255 },
+			{ "port": "B", "mask": 255 },
+			{ "port": "C", "mask": 255 },
+			{ "port": "D", "mask": 255 },
+			{ "port": "E", "mask": 255 },
+			{ "port": "F", "mask": 255 },
+			{ "port": "H", "mask": 255 },
+			{ "port": "J", "mask": 255 },
+			{ "port": "K", "mask": 255 },
+			
+			{ "port": "Q", "mask": 15 },
+			{ "port": "R", "mask": 3 }
+		]
+	},
+	
+	{
+		"type": "a3",
+		"gpio":
+		[
+			{ "port": "A", "mask": 255 },
+			{ "port": "B", "mask": 255 },
+			{ "port": "C", "mask": 255 },
+			{ "port": "D", "mask": 255 },
+			{ "port": "E", "mask": 255 },
+			{ "port": "F", "mask": 255 },
+			
+			{ "port": "R", "mask": 3 }
+		]
+	},
+	
+	{
+		"type": "a4",
+		"gpio":
+		[
+			{ "port": "A", "mask": 255 },
+			{ "port": "B", "mask": 15 },
+			{ "port": "C", "mask": 255 },
+			{ "port": "D", "mask": 255 },
+			{ "port": "E", "mask": 15 },
+			
+			{ "port": "R", "mask": 3 }
+		]
+	},
+	
+	{
+		"type": "b1",
+		"gpio":
+		[
+			{ "port": "A", "mask": 255 },
+			{ "port": "B", "mask": 255 },
+			{ "port": "C", "mask": 255 },
+			{ "port": "D", "mask": 7 },
+			{ "port": "E", "mask": 255 },
+			
+			{ "port": "R", "mask": 3 }
+		]
+	},
+	
+	{
+		"type": "b3",
+		"gpio":
+		[
+			{ "port": "B", "mask": 255 },
+			{ "port": "C", "mask": 255 },
+			{ "port": "D", "mask": 3 },
+			
+			{ "port": "R", "mask": 3 }
+		]
+	},
+	
+	{
+		"type": "c3",
+		"gpio":
+		[
+			{ "port": "A", "mask": 255 },
+			{ "port": "B", "mask": 255 },
+			{ "port": "C", "mask": 255 },
+			{ "port": "D", "mask": 255 },
+			{ "port": "E", "mask": 255 },
+			{ "port": "F", "mask": 255 },
+			
+			{ "port": "R", "mask": 3 }
+		]
+	},
+	
+	{
+		"type": "c4",
+		"gpio":
+		[
+			{ "port": "A", "mask": 255 },
+			{ "port": "B", "mask": 15 },
+			{ "port": "C", "mask": 255 },
+			{ "port": "D", "mask": 255 },
+			{ "port": "E", "mask": 15 },
+			
+			{ "port": "R", "mask": 3 }
+		]
+	},
+	
+	{
+		"type": "d3",
+		"gpio":
+		[
+			{ "port": "A", "mask": 255 },
+			{ "port": "B", "mask": 255 },
+			{ "port": "C", "mask": 255 },
+			{ "port": "D", "mask": 255 },
+			{ "port": "E", "mask": 255 },
+			{ "port": "F", "mask": 255 },
+			
+			{ "port": "R", "mask": 3 }
+		]
+	},
+	
+	{
+		"type": "d4",
+		"gpio":
+		[
+			{ "port": "A", "mask": 255 },
+			{ "port": "B", "mask": 15 },
+			{ "port": "C", "mask": 255 },
+			{ "port": "D", "mask": 255 },
+			{ "port": "E", "mask": 15 },
+			
+			{ "port": "R", "mask": 3 }
+		]
+	},
+	
+	{
+		"type": "e5",
+		"gpio":
+		[
+			{ "port": "A", "mask": 255 },
+			{ "port": "C", "mask": 255 },
+			{ "port": "D", "mask": 255 },
+			
+			{ "port": "R", "mask": 3 }
+		]
+	}
+]
+
+# the pins of the peripherals are always on the same pins on all ports	
+xmega_peripheral_pins = \
+{
+	"spi":
+	[
+		{ "id": "4", "name": "ss" },
+		{ "id": "5", "name": "mosi" },
+		{ "id": "6", "name": "miso" },
+		{ "id": "7", "name": "sck" }
+	],
+	"uart0":
+	[
+		{ "id": "1", "name": "xck" },
+		{ "id": "2", "name": "rxd" },
+		{ "id": "3", "name": "txd" }
+	],
+	"uart1":
+	[
+		{ "id": "5", "name": "xck" },
+		{ "id": "6", "name": "rxd" },
+		{ "id": "7", "name": "txd" }
+	],
+	"i2c":
+	[
+		{ "id": "0", "name": "sda" },
+		{ "id": "1", "name": "scl" }
+	],
+	"timer0":
+	[
+		{ "id": "0", "name": "A" },
+		{ "id": "1", "name": "B" },
+		{ "id": "2", "name": "C" },
+		{ "id": "3", "name": "D" }
+	],
+	"timer1":
+	[
+		{ "id": "4", "name": "A" },
+		{ "id": "5", "name": "B" }
+	],
+	"awex":
+	[
+		{ "id": "0", "name": "ALS" },
+		{ "id": "1", "name": "AHS" },
+		{ "id": "2", "name": "BLS" },
+		{ "id": "3", "name": "BHS" },
+		{ "id": "4", "name": "CLS" },
+		{ "id": "5", "name": "CHS" },
+		{ "id": "6", "name": "DLS" },
+		{ "id": "7", "name": "DHS" }
+	],
+	"usb":
+	[
+		{ "id": "0", "name": "DM" },
+		{ "id": "1", "name": "DP" }
+	]
+}
+
 pins = \
 [
 	{
