@@ -101,7 +101,7 @@ class DeviceIdentifier:
 						self.size_id = match.group('size')
 
 				elif self.family == "atxmega":
-					match = re.search(self.family + self.name + "(?P<type>[A-Ea-e]?[1-4]?)(?P<package>[Bb]?[Uu]?)", string)
+					match = re.search(self.family + self.name + "(?P<type>[A-Ea-e]?[1-5]?)(?P<package>[Bb]?[Uu]?)", string)
 					self.pin_id = 'none'
 					if match:
 						if match.group('type') != '':
