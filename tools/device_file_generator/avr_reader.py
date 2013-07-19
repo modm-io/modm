@@ -61,7 +61,10 @@ class AVRDeviceReader(XMLDeviceReader):
 		if dev.family == 'at90':
 			self.properties['mmcu'] += dev.type + dev.name
 		elif dev.family == 'xmega':
-			self.properties['mmcu'] = 'at' + self.properties['mmcu'] + dev.pin_id
+			self.properties['mmcu'] = 'atxmega' + dev.name
+			self.properties['mmcu'] += dev.type
+			if dev.pin_id != None:
+				self.properties['mmcu'] += dev.pin_id
 		else:
 			self.properties['mmcu'] += dev.name
 			if dev.type:
@@ -71,7 +74,7 @@ class AVRDeviceReader(XMLDeviceReader):
 		
 		self.properties['core'] = architecture.lower()
 
-		self.log.info("Parsing AVR PDF: " + architecture + " " + self.name)
+		self.log.info("Parsing AVR PDF: %s %s" % (architecture, self.name))
 
 		if (architecture not in ['AVR8', 'AVR8L', 'AVR8_XMEGA']):
 			self.log.error("Sorry, only ATtiny, ATmega, ATxmega and AT90 targets can be parsed corretly.")
@@ -94,22 +97,38 @@ class AVRDeviceReader(XMLDeviceReader):
 		self.properties['peripherals'] = peripherals = []
 		self.properties['modules'] = modules = []
 		
-		self.modules = self.compactQuery("//module/@name")
+		self.modules = self.compactQuery("//peripherals/module/instance/@name")
 		self.log.debug("Available Modules are:\n" + self._modulesToString())
 
-		for mod in self.query("//modules/module"):
-			name = mod.get('name')
+		if dev.family == 'xmega':
 			
-			if "PORT" in name:
-				module = self.createModule(name)
-				gpios.extend(self._gpioFromModule(module))
-				continue
+			for dev in [d for d in avr_io.xmega_pins if d['type'] == dev.type]:
+				for port in d['gpio']:
+					port_dict = self._getAttributedPortDictionary(port)
+					print port, port_dict
+					gpios.extend(port_dict)
+				
 			
-			if any(name.startswith(per) for per in ["EXTERNAL_INT", "TWI", "USART", "SPI", "AD_CON", "USB", "CAN", "DA_CON", "USI", "TIMER"]):
-				modules.append(name)
-				module = self.createModule(name)
-				peripherals.append(module)
-				continue
+			for mod in self.query("//peripherals/module/instance"):
+				name = mod.get('name')
+				
+				if any(name.startswith(per) for per in ["TWI", "USART", "SPI", "ADC", "USB", "DAC", "TC"]):
+					modules.append(name)
+					continue
+		else:
+			for mod in self.query("//modules/module"):
+				name = mod.get('name')
+				
+				if "PORT" in name:
+					module = self.createModule(name)
+					gpios.extend(self._gpioFromModule(module))
+					continue
+				
+				if any(name.startswith(per) for per in ["EXTERNAL_INT", "TWI", "USART", "SPI", "AD_CON", "USB", "CAN", "DA_CON", "USI", "TIMER"]):
+					modules.append(name)
+					module = self.createModule(name)
+					peripherals.append(module)
+					continue
 		
 		for pin_array in [a for a in avr_io.pins if self.properties['mmcu'] in a['devices']]:
 			if 'pcint' in pin_array:

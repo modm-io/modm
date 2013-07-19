@@ -43,6 +43,7 @@ class AVRDeviceWriter(XMLDeviceWriter):
 		XMLDeviceWriter.__init__(self, device, logger)
 		
 		self.types = self.device.getDeviceTypes()
+		self.pin_ids = self.device.getDeviceAttributes('pin_id')
 		
 		self.root.setAttribute('type', "|".join(self.types))
 		
@@ -97,6 +98,8 @@ class AVRDeviceWriter(XMLDeviceWriter):
 		self.addSpiToNode(self.root)
 		# ADC
 		self.addAdcToNode(self.root)
+		# DAC
+		self.addDacToNode(self.root)
 		
 
 	def addDeviceAttributesToNode(self, node, name):
@@ -111,16 +114,27 @@ class AVRDeviceWriter(XMLDeviceWriter):
 		if family == None:
 			family = self.family
 		attributes = self._getModuleAttributes()
+		
 		for item in attributes:
+			instances = []
 			dict = self._getAttributeDictionaryFromId(item['id'])
-			for module in [m for m in item['value'] if m.startswith(peripheral)]:
-				driver = node.addChild('driver')
-				driver.setAttributes(dict)
-				driver.setAttributes({'type': name, 'name': family})
-				if name in self.io:
-					for io in self.io[name]:
-						ch = driver.addChild('gpio')
-						ch.setAttributes(io)
+			if self.family == 'xmega':
+				for module in [m for m in item['value'] if m.startswith(peripheral)]:
+					instances.append(module[len(peripheral):])
+				
+				if instances != []:
+					driver = node.addChild('driver')
+					driver.setAttributes(dict)
+					driver.setAttributes({'type': name, 'name': family, 'instances': ",".join(instances)})
+			else:
+				for module in [m for m in item['value'] if m.startswith(peripheral)]:
+					driver = node.addChild('driver')
+					driver.setAttributes(dict)
+					driver.setAttributes({'type': name, 'name': family})
+					if name in self.io:
+						for io in self.io[name]:
+							ch = driver.addChild('gpio')
+							ch.setAttributes(io)
 	
 	def addI2cToNode(self, node):
 		# ATtiny's use the module from the ATmegas!
@@ -133,7 +147,10 @@ class AVRDeviceWriter(XMLDeviceWriter):
 		self.addModuleAttributesToNode(node, 'SPI', 'spi', family)
 	
 	def addAdcToNode(self, node):
-		self.addModuleAttributesToNode(node, 'AD_CONVERTER', 'adc')
+		self.addModuleAttributesToNode(node, 'ADC' if self.family == 'xmega' else 'AD_CONVERTER', 'adc')
+	
+	def addDacToNode(self, node):
+		self.addModuleAttributesToNode(node, 'DAC' if self.family == 'xmega' else 'DA_CONVERTER', 'dac')
 	
 	def addUartToNode(self, node):
 		family = 'at90_tiny_mega' if (self.family in ['at90', 'attiny', 'atmega']) else self.family
@@ -144,9 +161,12 @@ class AVRDeviceWriter(XMLDeviceWriter):
 			dict = self._getAttributeDictionaryFromId(item['id'])
 			for module in item['value']:
 				if 'USART' in module and 'SPI' not in module:
-					# some device only have a 'USART', but we want 'USART0'
-					mod = module + '0'
-					instances.append(mod[5:6])
+					if self.family == 'xmega':
+						instances.append(module[5:7])
+					else:
+						# some device only have a 'USART', but we want 'USART0'
+						mod = module + '0'
+						instances.append(mod[5:6])
 			if instances != []:
 				driver = node.addChild('driver')
 				driver.setAttributes(dict)
@@ -208,6 +228,8 @@ class AVRDeviceWriter(XMLDeviceWriter):
 					dict['device-type'] = target[attr]
 				if attr == 'name' and len(self.names) > 1:
 					dict['device-name'] = target[attr]
+				if attr == 'pin_id' and len(self.pin_ids) > 1:
+					dict['device-pin-id'] = target[attr]
 		return dict
 	
 	def write(self, folder):

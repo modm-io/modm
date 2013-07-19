@@ -65,18 +65,66 @@ class DeviceMerger:
 		This is a simple helper method to merge devices based on name.
 		"""
 		avrDevices = []
+		xmegaDevices = []
 		result = []
 		
 		for dev in devices:
 			if dev.id.platform == 'avr':
-				avrDevices.append(dev)
+				if dev.id.family == 'xmega':
+					xmegaDevices.append(dev)
+				else:
+					avrDevices.append(dev)
 			else:
 				result.append(dev)
 		
 		avrDevices = self._mergeDevicesByNameAVR(avrDevices)
+		xmegaDevices = self._mergeDevicesByNameXMEGA(xmegaDevices)
 		result.extend(avrDevices)
+		result.extend(xmegaDevices)
 		
 		return result
+	
+	def _mergeDevicesByNameXMEGA(self, devices):
+		"""
+		This checks the size-id and name of the devices, and merges the devices
+		based on the observation, that the size-id only influences the size of
+		memories, i.e. FLASH, RAM, and EEPROM.
+		"""
+		# copy the devices, since this array will be modified
+		devs = list(devices)
+		merged = []
+		
+		while len(devs) > 0:
+			current = devs[0]
+			devs.remove(current)
+			
+			matches = []
+			type = current.getDeviceAttributes('type')[0]
+			
+			if type != None:
+				name = current.getDeviceAttributes('name')[0]
+				
+				self.log.info("ByName: Searching for device with type '%s'" % type)
+				
+				for dev in devs:
+					# perpare for type comparison
+					# we should only merge when the family is the same,
+					# and if the type is the same
+					
+					if dev.getDeviceAttributes('type')[0] == type:
+						matches.append(dev)
+			
+			for match in matches:
+				devs.remove(match)
+				current = current.getMergedDevice(match)
+			
+			if len(matches) == 0:
+				self.log.info("ByName: no match for device: " + current.id.string)
+			
+			self.log.debug("ByName:\n\nResulting device: " + str(current))
+			merged.append(current)
+		
+		return merged
 	
 	def _mergeDevicesByNameAVR(self, devices):
 		"""
@@ -208,7 +256,7 @@ class DeviceMerger:
 		result = []
 		
 		for dev in devices:
-			if dev.id.platform == 'avr':
+			if dev.id.platform == 'avr' and dev.id.family != 'xmega':
 				avrDevices.append(dev)
 			else:
 				result.append(dev)
