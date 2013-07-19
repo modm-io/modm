@@ -46,6 +46,8 @@ class AVRDeviceWriter(XMLDeviceWriter):
 		self.pin_ids = self.device.getDeviceAttributes('pin_id')
 		
 		self.root.setAttribute('type', "|".join(self.types))
+		if self.family == 'xmega':
+			self.root.setAttribute('pin-id', "|".join(self.pin_ids))
 		
 		# search the io dictionary for this device
 		# we only need one mmcu to identify the device group
@@ -55,7 +57,8 @@ class AVRDeviceWriter(XMLDeviceWriter):
 			self.io = self.io[0]
 		else:
 			self.io = {}
-			self.log.warn("AvrWriter: IO not found for device '%s' with mmcu: '%s'" % (self.device.id.string, mmcu))
+			if self.family != 'xmega':
+				self.log.warn("AvrWriter: IO not found for device '%s' with mmcu: '%s'" % (self.device.id.string, mmcu))
 		
 		self.addDeviceAttributesToNode(self.root, 'flash')
 		self.addDeviceAttributesToNode(self.root, 'ram')
@@ -66,7 +69,11 @@ class AVRDeviceWriter(XMLDeviceWriter):
 		self.addDeviceAttributesToNode(self.root, 'core')
 		
 		pin_count_child = self.root.addChild('pin-count')
-		pin_count_child.setValue(0)
+		if self.family == 'xmega':
+			pins = [0, 100, 0, 64, 44, 32]
+			pin_count_child.setValue(pins[int(self.types[0][1:])])
+		else:
+			pin_count_child.setValue(0)
 		
 		core_child = self.root.addChild('driver')
 		core_child.setAttributes({'type': 'core', 'name': 'avr'})
@@ -123,9 +130,14 @@ class AVRDeviceWriter(XMLDeviceWriter):
 					instances.append(module[len(peripheral):])
 				
 				if instances != []:
+					instances.sort()
 					driver = node.addChild('driver')
 					driver.setAttributes(dict)
 					driver.setAttributes({'type': name, 'name': family, 'instances': ",".join(instances)})
+					for peri in [p for p in avr_io.xmega_peripheral_pins if name in p]:
+						for io in avr_io.xmega_peripheral_pins[peri]:
+							ch = driver.addChild('gpio')
+							ch.setAttributes(io)
 			else:
 				for module in [m for m in item['value'] if m.startswith(peripheral)]:
 					driver = node.addChild('driver')
@@ -168,17 +180,23 @@ class AVRDeviceWriter(XMLDeviceWriter):
 						mod = module + '0'
 						instances.append(mod[5:6])
 			if instances != []:
+				instances.sort()
 				driver = node.addChild('driver')
 				driver.setAttributes(dict)
 				driver.setAttributes({'type': 'uart', 'name': family, 'instances': ",".join(instances)})
-				for key in [k for k in self.io if k.startswith('uart')]:
-					instance = key.replace('uart', '')
-					if instance not in instances:
-						continue
-					for io in self.io[key]:
+				if self.family == 'xmega':
+					for io in avr_io.xmega_peripheral_pins['uart']:
 						ch = driver.addChild('gpio')
 						ch.setAttributes(io)
-						ch.setAttributes({'instance': instance})
+				else:
+					for key in [k for k in self.io if k.startswith('uart')]:
+						instance = key.replace('uart', '')
+						if instance not in instances:
+							continue
+						for io in self.io[key]:
+							ch = driver.addChild('gpio')
+							ch.setAttributes(io)
+							ch.setAttributes({'instance': instance})
 	
 	def _getModuleAttributes(self):
 		attributes = self.device.getAttributes('modules')
@@ -237,6 +255,8 @@ class AVRDeviceWriter(XMLDeviceWriter):
 		names.sort(key=int)
 		types = self.device.getDeviceTypes()
 		name = self.device.id.family + "-".join(["_".join(names), "_".join(types)]) + ".xml"
+		if self.family == 'xmega' and self.pin_ids[0] != 'none':
+			name = name[:-4] + self.pin_ids[0] + ".xml"
 		self.writeToFolder(folder, name)
 
 	def __repr__(self):

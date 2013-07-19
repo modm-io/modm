@@ -63,7 +63,7 @@ class AVRDeviceReader(XMLDeviceReader):
 		elif dev.family == 'xmega':
 			self.properties['mmcu'] = 'atxmega' + dev.name
 			self.properties['mmcu'] += dev.type
-			if dev.pin_id != None:
+			if dev.pin_id != 'none':
 				self.properties['mmcu'] += dev.pin_id
 		else:
 			self.properties['mmcu'] += dev.name
@@ -101,14 +101,11 @@ class AVRDeviceReader(XMLDeviceReader):
 		self.log.debug("Available Modules are:\n" + self._modulesToString())
 
 		if dev.family == 'xmega':
-			
 			for dev in [d for d in avr_io.xmega_pins if d['type'] == dev.type]:
 				for port in d['gpio']:
 					port_dict = self._getAttributedPortDictionary(port)
-					print port, port_dict
 					gpios.extend(port_dict)
 				
-			
 			for mod in self.query("//peripherals/module/instance"):
 				name = mod.get('name')
 				

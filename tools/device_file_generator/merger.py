@@ -103,15 +103,12 @@ class DeviceMerger:
 			
 			if type != None:
 				name = current.getDeviceAttributes('name')[0]
+				pin_id = current.getDeviceAttributes('pin_id')[0]
 				
 				self.log.info("ByName: Searching for device with type '%s'" % type)
 				
 				for dev in devs:
-					# perpare for type comparison
-					# we should only merge when the family is the same,
-					# and if the type is the same
-					
-					if dev.getDeviceAttributes('type')[0] == type:
+					if dev.getDeviceAttributes('type')[0] == type and dev.getDeviceAttributes('pin_id')[0] == pin_id:
 						matches.append(dev)
 			
 			for match in matches:
