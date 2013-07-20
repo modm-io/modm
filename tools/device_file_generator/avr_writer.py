@@ -70,9 +70,12 @@ class AVRDeviceWriter(XMLDeviceWriter):
 		
 		pin_count_child = self.root.addChild('pin-count')
 		if self.family == 'xmega':
+			# the int in the type is the package id
+			# ie. A1, B1 = 100 pins, A3, C3 = 64 pins, etc...
 			pins = [0, 100, 0, 64, 44, 32]
 			pin_count_child.setValue(pins[int(self.types[0][1:])])
 		else:
+			# the AT90, ATtiny and ATmega have very wierd pin counts, with so many different packages
 			pin_count_child.setValue(0)
 		
 		core_child = self.root.addChild('driver')
@@ -134,10 +137,6 @@ class AVRDeviceWriter(XMLDeviceWriter):
 					driver = node.addChild('driver')
 					driver.setAttributes(dict)
 					driver.setAttributes({'type': name, 'name': family, 'instances': ",".join(instances)})
-					for peri in [p for p in avr_io.xmega_peripheral_pins if name in p]:
-						for io in avr_io.xmega_peripheral_pins[peri]:
-							ch = driver.addChild('gpio')
-							ch.setAttributes(io)
 			else:
 				for module in [m for m in item['value'] if m.startswith(peripheral)]:
 					driver = node.addChild('driver')
@@ -184,19 +183,14 @@ class AVRDeviceWriter(XMLDeviceWriter):
 				driver = node.addChild('driver')
 				driver.setAttributes(dict)
 				driver.setAttributes({'type': 'uart', 'name': family, 'instances': ",".join(instances)})
-				if self.family == 'xmega':
-					for io in avr_io.xmega_peripheral_pins['uart']:
+				for key in [k for k in self.io if k.startswith('uart')]:
+					instance = key.replace('uart', '')
+					if instance not in instances:
+						continue
+					for io in self.io[key]:
 						ch = driver.addChild('gpio')
 						ch.setAttributes(io)
-				else:
-					for key in [k for k in self.io if k.startswith('uart')]:
-						instance = key.replace('uart', '')
-						if instance not in instances:
-							continue
-						for io in self.io[key]:
-							ch = driver.addChild('gpio')
-							ch.setAttributes(io)
-							ch.setAttributes({'instance': instance})
+						ch.setAttributes({'instance': instance})
 	
 	def _getModuleAttributes(self):
 		attributes = self.device.getAttributes('modules')
