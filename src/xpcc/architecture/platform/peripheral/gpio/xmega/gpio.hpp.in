@@ -1,0 +1,317 @@
+// coding: utf-8
+// ----------------------------------------------------------------------------
+/* Copyright (c) 2013, Roboterclub Aachen e.V.
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ *     * Redistributions of source code must retain the above copyright
+ *       notice, this list of conditions and the following disclaimer.
+ *     * Redistributions in binary form must reproduce the above copyright
+ *       notice, this list of conditions and the following disclaimer in the
+ *       documentation and/or other materials provided with the distribution.
+ *     * Neither the name of the Roboterclub Aachen e.V. nor the
+ *       names of its contributors may be used to endorse or promote products
+ *       derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY ROBOTERCLUB AACHEN E.V. ''AS IS'' AND ANY
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL ROBOTERCLUB AACHEN E.V. BE LIABLE FOR ANY
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+ * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+// ----------------------------------------------------------------------------
+
+#ifndef XPCC_XMEGA__GPIO_HPP
+#define XPCC_XMEGA__GPIO_HPP
+
+#include "../../../device.hpp"
+#include "../../../core/avr/interrupts.hpp"
+#include <xpcc/architecture/peripheral/gpio.hpp>
+
+/**
+ * Macros for backwards compatibility:
+ */
+
+#define	GPIO__IO(name, port, pin) \
+typedef CONCAT3(::xpcc::xmega::Gpio, port, pin) name
+
+#define	GPIO__OUTPUT(name, port, pin) \
+typedef CONCAT3(::xpcc::xmega::GpioOutput, port, pin) name
+
+#define	GPIO__INPUT(name, port, pin) \
+typedef CONCAT3(::xpcc::xmega::GpioInput, port, pin) name
+
+#define	GPIO__NIBBLE_LOW(name, port) \
+typedef CONCAT(::xpcc::xmega::GpioLowNibble, port) name
+
+#define	GPIO__NIBBLE_HIGH(name, port) \
+typedef CONCAT(::xpcc::xmega::GpioHighNibble, port) name
+
+#define	GPIO__PORT(name, port) \
+typedef CONCAT(::xpcc::xmega::GpioPort, port) name
+
+
+namespace xpcc
+{
+	namespace xmega
+	{
+		struct Gpio
+		{
+			/**
+			 * \ingroup	xmega
+			 */
+			enum class Configuration : uint8_t
+			{
+				Floating = PORT_OPC_TOTEM_gc,
+				PullDown = PORT_OPC_PULLDOWN_gc,
+				PullUp = PORT_OPC_PULLUP_gc,
+				BusKeeper = PORT_OPC_BUSKEEPER_gc,
+				WiredOr = PORT_OPC_WIREDOR_gc,
+				WiredAnd = PORT_OPC_WIREDAND_gc,
+				WiredOrWithPullUp = PORT_OPC_WIREDORPULL_gc,
+				WiredAndWithPullUp = PORT_OPC_WIREDANDPULL_gc,
+				// this is just a shortcut, not everyone knows that OpenDrain is equal to WiredAnd
+				OpenDrain = PORT_OPC_WIREDAND_gc,
+				OpenDrainWithPullUp = PORT_OPC_WIREDANDPULL_gc,
+			};
+			
+			/**
+			 * \ingroup	xmega
+			 */
+			enum class InputTrigger : uint8_t
+			{
+				BothEdges = PORT_ISC_BOTHEDGES_gc,
+				RisingEdge = PORT_ISC_RISING_gc,  
+				FallingEdge = PORT_ISC_FALLING_gc, 
+				Level = PORT_ISC_LEVEL_gc,  
+				Disabled = PORT_ISC_INPUT_DISABLE_gc,
+			};
+			
+			/**
+			 * \ingroup xmega
+			 */
+			enum class Inverted : bool
+			{
+				No = false,
+				Yes = true,
+			};
+		};
+
+		/**
+		 * Gpio Classes created from the XML Device File Gpio Description
+		 */
+%% for gpio in gpios
+	%% set port = gpio.port | upper
+	%% set pin  = gpio.id
+			
+	%% for type in ["Output", "Input", ""] 
+		
+		%% if type == "Output"
+		struct GpioOutput{{port ~ pin}} : public Gpio, ::xpcc::GpioOutput
+		%% elif type == "Input"
+		struct GpioInput{{port ~ pin}} : public Gpio, ::xpcc::GpioInput
+		%% elif type == ""
+		struct Gpio{{port ~ pin}} : public Gpio, ::xpcc::GpioIO
+		%% endif
+		{
+			static constexpr uint8_t mask = (1 << {{pin}});
+			static constexpr uint8_t eventChannelMuxInput =
+				reinterpret_cast<uint16_t>(&getPort() - 0x0600)/4 + 0x50 + {{pin}};
+			static constexpr uint16_t = interrupt0VectorNumber = PORT{{port}}_INT0_vect_num;
+			static constexpr uint16_t = interrupt1VectorNumber = PORT{{port}}_INT1_vect_num;
+			
+			ALWAYS_INLINE static void configure(Configuration config,
+												Inverted invert = Inverted::No) {
+				PORT{{port}}_PIN{{pin}}CTRL = static_cast<uint8_t>(config) | ((invert == Inverted::Yes) ? PORT_INVEN_bm : 0);
+			}
+		%% if type in ["", "Output"]
+			ALWAYS_INLINE static void setOutput(bool status) {
+				set(status);
+				setOutput();
+			}
+			
+			ALWAYS_INLINE static void setOutput(Configuration config,
+												Inverted invert = Inverted::No) {
+				setOutput();
+				configure(config, invert);
+			}
+
+			ALWAYS_INLINE static void setOutput() {
+				PORT{{port}}_DIRSET = mask;
+			}
+
+			ALWAYS_INLINE static void set() {
+				PORT{{port}}_OUTSET = mask;
+			}
+			
+			ALWAYS_INLINE static void set(bool status) {
+				if (status) { set(); }
+				else { reset(); }
+			}
+
+			ALWAYS_INLINE static void reset() {
+				PORT{{port}}_OUTCLR = mask;
+			}
+
+			ALWAYS_INLINE static void toggle() {
+				PORT{{port}}_OUTTGL = mask;
+			}
+		%% endif
+		%% if type in ["", "Input"]
+			ALWAYS_INLINE static void setInput(Configuration config,
+												Inverted invert = Inverted::No) {
+				setInput();
+				configure(config, invert);
+			}
+
+			ALWAYS_INLINE static void
+			setInput() {
+				 PORT{{port}}_DIRCLR = mask; 
+			}
+
+			ALWAYS_INLINE static bool read() {
+				return (PORT{{port}}_IN & mask);
+			}
+			
+			ALWAYS_INLINE static void setInputTrigger(InputTrigger trigger) {
+				PORT{{port}}_PIN{{pin}}CTRL = (PORT{{port}}_PIN{{pin}}CTRL & ~PORT_ISC_gm) | static_cast<uint8_t>(trigger);
+			}
+			
+			ALWAYS_INLINE static void enableExternalInterrupt0(InterruptLevel level) {
+				PORT{{port}}_INT0MASK |= mask;
+				PORT{{port}}_INTCTRL = (PORT{{port}}_INTCTRL & ~PORT_INT0LVL_gm) | (static_cast<uint8_t>(level) & PORT_INT0LVL_gm);
+			}
+			
+			ALWAYS_INLINE static void enableExternalInterrupt1(InterruptLevel level) {
+				PORT{{port}}_INT1MASK |= mask;
+				PORT{{port}}_INTCTRL = (PORT{{port}}_INTCTRL & ~PORT_INT1LVL_gm) | ((static_cast<uint8_t>(level) << 2) & PORT_INT1LVL_gm);
+			}
+
+			ALWAYS_INLINE static void disableExternalInterrupt0() {
+				PORT{{port}}_INT0MASK &= ~mask;
+			}
+			
+			ALWAYS_INLINE static void disableExternalInterrupt1() {
+				PORT{{port}}_INT1MASK &= ~mask;
+			}
+
+			ALWAYS_INLINE static bool readExternalInterruptFlag0() {
+				return (PORT{{port}}_INTFLAGS & PORT_INT0IF_bm);
+			}
+
+			ALWAYS_INLINE static bool readExternalInterruptFlag1() {
+				return (PORT{{port}}_INTFLAGS & PORT_INT1IF_bm);
+			}
+
+			ALWAYS_INLINE static void acknowledgeExternalInterruptFlag0() {
+				PORT{{port}}_INTFLAGS |= PORT_INT0IF_bm;
+			}
+
+			ALWAYS_INLINE static void acknowledgeExternalInterruptFlag1() {
+				PORT{{port}}_INTFLAGS |= PORT_INT1IF_bm;
+			}
+		%% endif
+			// these are some special things
+			ALWAYS_INLINE static PORT_t& getPort() {
+				return PORT{{port}};
+			}
+		};
+
+	%% endfor
+%% endfor
+
+%% for nibble in nibbles
+	%% set port = nibble.port | upper
+
+	%% for id in nibble.position
+		%% if id == 0
+		struct GpioLowNibble{{port}} : public Gpio, ::xpcc::GpioNibble
+		{
+			ALWAYS_INLINE static void setOutput() {
+				PORT{{port}}_DIRSET = 0x0f;
+			}
+			ALWAYS_INLINE static void setInput() {
+				PORT{{port}}_DIRCLR = 0x0f;
+			}
+			ALWAYS_INLINE static void configure(Configuration config,
+												Inverted invert = Inverted::No) {
+				PORTCFG.MPCMASK = 0x0f;
+				PORT{{port}}_PIN0CTRL = static_cast<uint8_t>(config) | ((invert == Inverted::Yes) ? PORT_INVEN_bm : 0);
+			}
+			ALWAYS_INLINE static uint8_t read() {
+				return (PORT{{port}}_IN & 0x0f);
+			}
+			ALWAYS_INLINE static void write(uint8_t data) {
+				PORT{{port}}_OUTSET =   data & 0x0f;
+				PORT{{port}}_OUTCLR = ~(data & 0x0f);
+			}
+		};
+		%% elif id == 1
+		struct GpioHighNibble{{port}} : public Gpio, ::xpcc::GpioNibble
+		{
+			ALWAYS_INLINE static void setOutput() {
+				PORT{{port}}_DIRSET = 0xf0;
+			}
+			ALWAYS_INLINE static void setInput() {
+				PORT{{port}}_DIRCLR = 0xf0;
+			}
+			ALWAYS_INLINE static void configure(Configuration config,
+												Inverted invert = Inverted::No) {
+				PORTCFG.MPCMASK = 0xf0;
+				PORT{{port}}_PIN7CTRL = static_cast<uint8_t>(config) | ((invert == Inverted::Yes) ? PORT_INVEN_bm : 0);
+			}
+			ALWAYS_INLINE static uint8_t read() {
+				return ((PORT{{port}}_IN & 0xf0) >> 4);
+			}
+			ALWAYS_INLINE static void write(uint8_t data) {
+				data <<= 4;
+				PORT{{port}}_OUTSET =   data & 0xf0;
+				PORT{{port}}_OUTCLR = ~(data & 0xf0);
+			}
+		};
+		%% endif
+
+	%% endfor
+%% endfor
+
+%% for octet in octets
+	%% set port = octet.port | upper
+
+	%% for id in octet.position
+		%% if id == 0
+		struct GpioPort{{port}} : public Gpio, ::xpcc::GpioOctet
+		{
+			ALWAYS_INLINE static void setOutput() {
+				PORT{{port}}_DIRSET = 0xff;
+			}
+			ALWAYS_INLINE static void setInput() {
+				PORT{{port}}_DIRCLR = 0xff;
+			}
+			ALWAYS_INLINE static void configure(Configuration config,
+												Inverted invert = Inverted::No) {
+				PORTCFG.MPCMASK = 0xff;
+				PORT{{port}}_PIN0CTRL = static_cast<uint8_t>(config) | ((invert == Inverted::Yes) ? PORT_INVEN_bm : 0);
+			}
+			ALWAYS_INLINE static uint8_t read() {
+				return PORT{{port}}_IN;
+			}
+			ALWAYS_INLINE static void write(uint8_t data) {
+				PORT{{port}}_OUT = data;
+			}
+		};
+		%% endif
+
+	%% endfor
+%% endfor
+	}
+}
+
+
+#endif

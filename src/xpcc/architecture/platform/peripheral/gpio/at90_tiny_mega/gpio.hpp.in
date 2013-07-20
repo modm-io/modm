@@ -125,6 +125,7 @@ namespace xpcc
 		struct Gpio{{port ~ pin}} : public Gpio, ::xpcc::GpioIO
 		%% endif
 		{
+			static constexpr uint8_t mask = (1 << {{pin}});
 		%% if type in ["", "Output"]
 			ALWAYS_INLINE static void setOutput(bool status) {
 				set(status);
@@ -132,11 +133,11 @@ namespace xpcc
 			}
 
 			ALWAYS_INLINE static void setOutput() {
-				DDR{{port}} |= (1 << {{pin}});
+				DDR{{port}} |= mask;
 			}
 
 			ALWAYS_INLINE static void set() {
-				PORT{{port}} |=  (1 << {{pin}});
+				PORT{{port}} |= mask;
 			}
 			
 			ALWAYS_INLINE static void set(bool status) {
@@ -145,31 +146,31 @@ namespace xpcc
 			}
 
 			ALWAYS_INLINE static void reset() {
-				PORT{{port}} &= ~(1 << {{pin}});
+				PORT{{port}} &= ~mask;
 			}
 
 			ALWAYS_INLINE static void toggle() {
-				PORT{{port}} ^=  (1 << {{pin}});
+				PORT{{port}} ^= mask;
 			}
 		%% endif
 		%% if type in ["", "Input"]
 			ALWAYS_INLINE static void setInput() {
-				DDR{{port}} &= ~(1 << {{pin}});
+				DDR{{port}} &= ~mask;
 			}
 
 			ALWAYS_INLINE static void
 			setInput(Configuration type) {
 				setInput();
 				if (type == Configuration::PullUp) {
-					PORT{{port}} |= (1 << {{pin}});
+					PORT{{port}} |= mask;
 				}
 				else {
-					PORT{{port}} &= ~(1 << {{pin}});
+					PORT{{port}} &= ~mask;
 				}
 			}
 
 			ALWAYS_INLINE static bool read() {
-				return (PIN{{port}} & (1 << {{pin}}));
+				return (PIN{{port}} & mask);
 			}
 		%% for af in gpio.afs
 			%% set af_id = af.id | int
@@ -189,7 +190,7 @@ namespace xpcc
 			%% endif
 			%% endif
 			
-			ALWAYS_INLINE static void setExternalInterruptTrigger(InputTrigger trigger) {
+			ALWAYS_INLINE static void setInputTrigger(InputTrigger trigger) {
 			%% if af_id < 4
 				%% if isc2 != '' and af_id == 2
 				{{isc2}} |= ((static_cast<uint8_t>(trigger) & 0b01) << ISC2);
@@ -331,7 +332,7 @@ namespace xpcc
 
 	%% for id in nibble.position
 		%% if id == 0
-		struct GpioLowNibble{{port}}
+		struct GpioLowNibble{{port}} : ::xpcc::GpioNibble
 		{
 			ALWAYS_INLINE static void setOutput() {
 				DDR{{port}} |= 0x0f;
@@ -347,7 +348,7 @@ namespace xpcc
 			}
 		};
 		%% elif id == 1
-		struct GpioHighNibble{{port}}
+		struct GpioHighNibble{{port}} : ::xpcc::GpioNibble
 		{
 			ALWAYS_INLINE static void setOutput() {
 				DDR{{port}} |= 0xf0;
@@ -374,7 +375,7 @@ namespace xpcc
 
 	%% for id in octet.position
 		%% if id == 0
-		struct GpioPort{{port}}
+		struct GpioPort{{port}} : ::xpcc::GpioOctet
 		{
 			ALWAYS_INLINE static void setOutput() {
 				DDR{{port}} = 0xff;
