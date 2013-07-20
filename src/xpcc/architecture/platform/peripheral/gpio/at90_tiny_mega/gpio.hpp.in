@@ -79,7 +79,7 @@ namespace xpcc
 			enum class InputTrigger : uint8_t
 			{
 				LowLevel = 0b00,
-				AnyChange = 0b01,
+				BothEdges = 0b01,
 				FallingEdge = 0b10,
 				RisingEdge = 0b11,
 			};
@@ -189,16 +189,19 @@ namespace xpcc
 			%% endif
 			%% endif
 			
-			ALWAYS_INLINE static void enableExternalInterrupt(InputTrigger trigger) {
+			ALWAYS_INLINE static void setExternalInterruptTrigger(InputTrigger trigger) {
 			%% if af_id < 4
-			%% if isc2 != '' and af_id == 2
+				%% if isc2 != '' and af_id == 2
 				{{isc2}} |= ((static_cast<uint8_t>(trigger) & 0b01) << ISC2);
-			%% else
+				%% else
 				{{eicra}} |= (static_cast<uint8_t>(trigger) << 2*{{af_id}});
-			%% endif
+				%% endif
 			%% else
 				EICRB |= (static_cast<uint8_t>(trigger) << 2*{{af_id - 4}});
 			%% endif
+			}
+			
+			ALWAYS_INLINE static void enableExternalInterrupt() {
 #ifdef EIMSK
 				EIMSK |= (1 << INT{{af_id}});
 #elif defined GIMSK
@@ -211,15 +214,6 @@ namespace xpcc
 			}
 
 			ALWAYS_INLINE static void disableExternalInterrupt() {
-			%% if af_id < 4
-			%% if isc2 != '' and af_id == 2
-				{{isc2}} &= ~(1 << ISC2);
-			%% else
-				{{eicra}} &= ~(0x3 << 2*{{af_id}});
-			%% endif
-			%% else
-				EICRB &= ~(0x3 << 2*{{af_id - 4}});
-			%% endif
 #ifdef EIMSK
 				EIMSK &= ~(1 << INT{{af_id}});
 #elif defined GIMSK
@@ -231,7 +225,7 @@ namespace xpcc
 #endif
 			}
 
-			ALWAYS_INLINE static bool getExternalInterruptFlag() {
+			ALWAYS_INLINE static bool readExternalInterruptFlag() {
 #ifdef EIFR
 				return (EIFR & (1 << INTF{{af_id}}));
 #elif defined GIFR
@@ -298,7 +292,7 @@ namespace xpcc
 				}
 			}
 
-			ALWAYS_INLINE static bool getPCInterruptFlag() {
+			ALWAYS_INLINE static bool readPCInterruptFlag() {
 #ifdef PCIFR
 				return (PCIFR & (1 << PCIF{{af_reg}}));
 #elif defined EIFR
