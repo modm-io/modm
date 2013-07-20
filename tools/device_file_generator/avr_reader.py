@@ -104,7 +104,7 @@ class AVRDeviceReader(XMLDeviceReader):
 
 		if dev.family == 'xmega':
 			for dev in [d for d in avr_io.xmega_pins if d['type'] == dev.type]:
-				for port in d['gpio']:
+				for port in dev['gpio']:
 					port_dict = self._getAttributedPortDictionary(port)
 					gpios.extend(port_dict)
 				
