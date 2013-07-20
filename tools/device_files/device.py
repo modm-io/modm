@@ -138,7 +138,7 @@ class DeviceFile:
 				" Valid families for this platform are: %s" %
 				(self.family, self.platform, families))
 		elif self.platform == 'avr':
-			families = ['at90','attiny', 'atmega', 'atxmega']
+			families = ['at90','attiny', 'atmega', 'xmega']
 			if self.family not in families:
 				self.log.error("Unknown family '%s' for platform %s."
 				" Valid families for this platform are: %s" %

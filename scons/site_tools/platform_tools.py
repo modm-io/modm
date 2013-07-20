@@ -80,14 +80,17 @@ def platform_tools_generate(env, architecture_path):
 	if id.platform == 'avr':
 		for file in os.listdir(xml_path):
 			if id.family in file:
-				nameString, typeString = file.replace(id.family,"").replace(".xml","").split("-")
-				names = nameString.split("_")
-				types = typeString.split("_")
+				fileArray = file.replace(id.family,"").replace(".xml","").split("-")
+				names = fileArray[0].split("_")
+				types = fileArray[1].split("_")
+				pinIdString = fileArray[2] if len(fileArray) > 2 else None
 				if id.name in names:
 					type  = id.type
 					if type == None:
 						type = 'none'
 					if type in types:
+						if id.family == 'xmega' and id.pin_id != pinIdString:
+							continue
 						device_file = os.path.join(xml_path, file)
 						break
 	else:

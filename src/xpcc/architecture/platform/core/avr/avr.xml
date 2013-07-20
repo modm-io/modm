@@ -8,6 +8,6 @@
 		<template>ram.cpp.in</template>
 		<template>interrupts.hpp.in</template>
 		<parameter name="ram_block_length" type="int" min="2" max="64">8</parameter>
-		<parameter name="ram_length" type="int" min="64" max="8192">127</parameter>
+		<parameter name="ram_length" type="int" min="64" max="32768">1024</parameter>
 	</driver>
 </rca>

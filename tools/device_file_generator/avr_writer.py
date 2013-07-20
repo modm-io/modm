@@ -256,7 +256,7 @@ class AVRDeviceWriter(XMLDeviceWriter):
 		types = self.device.getDeviceTypes()
 		name = self.device.id.family + "-".join(["_".join(names), "_".join(types)]) + ".xml"
 		if self.family == 'xmega' and self.pin_ids[0] != 'none':
-			name = name[:-4] + self.pin_ids[0] + ".xml"
+			name = name[:-4] + "-" + self.pin_ids[0] + ".xml"
 		self.writeToFolder(folder, name)
 
 	def __repr__(self):
