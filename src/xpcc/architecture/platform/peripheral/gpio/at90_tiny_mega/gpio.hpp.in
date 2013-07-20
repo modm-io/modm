@@ -67,7 +67,7 @@ namespace xpcc
 			/**
 			 * \ingroup	{{target.family}}
 			 */
-			enum class PullType : uint8_t
+			enum class Configuration : uint8_t
 			{
 				Floating,
 				PullUp,
@@ -76,7 +76,7 @@ namespace xpcc
 			/**
 			 * \ingroup	{{target.family}}
 			 */
-			enum class TriggerType : uint8_t
+			enum class InputTrigger : uint8_t
 			{
 				LowLevel = 0b00,
 				AnyChange = 0b01,
@@ -88,13 +88,13 @@ namespace xpcc
 		/**
 		 * Gpio OpenDrain template, which remaps the behavior of the Gpio pin to
 		 * simulate an open-drain Output.
-		 * This maps set() -> setOutput() and reset() -> setInput(PullType::PullUp)
+		 * This maps set() -> setOutput() and reset() -> setInput(Configuration::PullUp)
 		 */
 		template< class IO >
 		struct GpioOpenDrain : Gpio
 		{
 			ALWAYS_INLINE static void set() {
-				IO::setInput(PullType::PullUp);
+				IO::setInput(Configuration::PullUp);
 			}
 			ALWAYS_INLINE static void reset() {
 				IO::setOutput(::xpcc::Gpio::LOW);
@@ -158,9 +158,9 @@ namespace xpcc
 			}
 
 			ALWAYS_INLINE static void
-			setInput(PullType type) {
+			setInput(Configuration type) {
 				setInput();
-				if (type == PullType::PullUp) {
+				if (type == Configuration::PullUp) {
 					PORT{{port}} |= (1 << {{pin}});
 				}
 				else {
@@ -189,7 +189,7 @@ namespace xpcc
 			%% endif
 			%% endif
 			
-			ALWAYS_INLINE static void enableExternalInterrupt(TriggerType trigger) {
+			ALWAYS_INLINE static void enableExternalInterrupt(InputTrigger trigger) {
 			%% if af_id < 4
 			%% if isc2 != '' and af_id == 2
 				{{isc2}} |= ((static_cast<uint8_t>(trigger) & 0b01) << ISC2);
