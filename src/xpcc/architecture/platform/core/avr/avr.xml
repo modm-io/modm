@@ -5,6 +5,8 @@
 		<static>cxxabi.cpp</static>
 		<static>newdelete.cpp</static>
 		<static>ram.hpp</static>
+		<static device-family="xmega">utils.hpp</static>
+		<static device-family="xmega">utils.cpp</static>
 		<template>ram.cpp.in</template>
 		<template>interrupts.hpp.in</template>
 		<parameter name="ram_block_length" type="int" min="2" max="64">8</parameter>
