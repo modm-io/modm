@@ -58,22 +58,20 @@ namespace xpcc
 %% if target.family == 'xmega'
 		/// Used to set the interrupt level of all modules.
 		/// @ingroup	xmega
-		enum InterruptLevel
+		enum class InterruptLevel : uint8_t
 		{
-			INTERRUPT_LEVEL_OFF = 0x00,
-			INTERRUPT_LEVEL_LOW = 0x01,
-			INTERRUPT_LEVEL_MEDIUM = 0x02,
-			INTERRUPT_LEVEL_HIGH = 0x03,
+			Off = 0x00,
+			Low = 0x01,
+			Medium = 0x02,
+			High = 0x03,
 		};
 
-		enum InterruptControlLevel
+		enum class InterruptControlLevel : uint8_t
 		{
-			INTERRUPT_CONTROL_LEVEL_LOW = PMIC_LOLVLEN_bm,
-			INTERRUPT_CONTROL_LEVEL_MEDIUM = PMIC_MEDLVLEN_bm,
-			INTERRUPT_CONTROL_LEVEL_HIGH = PMIC_HILVLEN_bm,
-
-			/// Enable all Interrupt levels
-			INTERRUPT_CONTROL_LEVEL_ALL = PMIC_HILVLEN_bm | PMIC_MEDLVLEN_bm | PMIC_LOLVLEN_bm,
+			Low = PMIC_LOLVLEN_bm,
+			Medium = PMIC_MEDLVLEN_bm,
+			High = PMIC_HILVLEN_bm,
+			All = PMIC_HILVLEN_bm | PMIC_MEDLVLEN_bm | PMIC_LOLVLEN_bm,
 		};
 
 		/**
@@ -85,17 +83,21 @@ namespace xpcc
 		 *
 		 * Example:
 		 * \code
-		 * // Enable all interrupt levels
-		 * xpcc::xmega::enableInterrupts();
-		 * xpcc::xmega::enableInterruptLevel(xpcc::xmega::INTERRUPT_LEVEL_ALL);
+		 * using namespace xpcc::xmega;
+		 * // reset all interrupt levels
+		 * resetInterruptLevel(InterruptControlLevel::All);
+		 * // set only High and Medium
+		 * setInterruptLevel(InterruptControlLevel::High);
+		 * setInterruptLevel(InterruptControlLevel::Medium);
+		 * enableInterrupts();
 		 * \endcode
 		 *
 		 * @ingroup	xmega
 		 */
 		static inline void
-		enableInterruptLevel(InterruptControlLevel level)
+		setInterruptLevel(InterruptControlLevel level)
 		{
-			PMIC_CTRL |= level;
+			PMIC_CTRL |= static_cast<uint8_t>(level);
 		}
 
 		/**
@@ -104,9 +106,9 @@ namespace xpcc
 		 * @ingroup	xmega
 		 */
 		static inline void
-		disableInterruptLevel(InterruptControlLevel level)
+		resetInterruptLevel(InterruptControlLevel level)
 		{
-			PMIC_CTRL &= ~level;
+			PMIC_CTRL &= ~static_cast<uint8_t>(level);
 		}
 %% endif
 	}
@@ -114,3 +116,4 @@ namespace xpcc
 
 
 #endif	// XPCC__AVR_INTERRUPTS_HPP
+ 
