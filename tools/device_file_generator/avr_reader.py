@@ -63,14 +63,16 @@ class AVRDeviceReader(XMLDeviceReader):
 		elif dev.family == 'xmega':
 			self.properties['mmcu'] = 'atxmega' + dev.name
 			self.properties['mmcu'] += dev.type
-			if dev.pin_id != 'none':
+			if dev.pin_id:
 				self.properties['mmcu'] += dev.pin_id
+			else:
+				dev.pin_id = 'none'
 		else:
 			self.properties['mmcu'] += dev.name
 			if dev.type:
 				self.properties['mmcu'] += dev.type
 			else:
-				dev.type = "none"
+				dev.type = 'none'
 		
 		self.properties['core'] = architecture.lower()
 
@@ -86,9 +88,9 @@ class AVRDeviceReader(XMLDeviceReader):
 		for memory_segment in self.query("//memory-segment"):
 			name = memory_segment.get('name')
 			size = int(memory_segment.get('size'), 16)
-			if name == 'FLASH' or name == 'APP_SECTION':
+			if name in ['FLASH', 'APP_SECTION']:
 				self.properties['flash'] = size
-			elif name == 'IRAM' or name == 'SRAM' or name == 'INTERNAL_SRAM':
+			elif name in ['IRAM', 'SRAM', 'INTERNAL_SRAM']:
 				self.properties['ram'] = size
 			elif name == 'EEPROM':
 				self.properties['eeprom'] = size
