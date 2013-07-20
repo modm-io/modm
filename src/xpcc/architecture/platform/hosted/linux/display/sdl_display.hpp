@@ -35,6 +35,17 @@
 
 namespace xpcc
 {
+
+     /**
+     * @brief The SDLDisplay class provides a visualisaiton of
+     *        the GraphicDisplay on the PC. It can be used to
+     *        test the code without the need of any hardware.
+     *
+     * \author Thorsten Lajewski
+     *
+     * \warning SDL_Init( SDL_INIT_EVERYTHING ); needs to be  called, before
+     *          any instance of the SDLDisplay can be used
+     */
 	class SDLDisplay: public xpcc::GraphicDisplay
 	{
 	public:
