@@ -237,9 +237,12 @@ namespace xpcc
 			//! Alternate Function register mask.
 			static constexpr uint32_t af_mask  = 0xf << af_offset;
 
+
 			//! TODO: Document
 			ALWAYS_INLINE static void
 			setAlternateFunction(AlternateFunction alt) {
+				{{reg}}->MODER = ({{reg}}->MODER   & ~mask2)
+									| (i(Mode::AlternateFunction) << (pin * 2));
 				{{reg}}->AFR[af_id] = ({{reg}}->AFR[af_id] & ~af_mask)
 										| (i(alt) << af_offset);
 			}
