@@ -80,6 +80,7 @@ RCC->{{ clock_tree }}RSTR &= ~(
 
 %% if output != 'gpio_enable.h'
 #include <xpcc/architecture/peripheral/gpio.hpp>
+#include "../../../type_ids.hpp"
 
 /**
  * Macros for backwards compatibility:
@@ -254,7 +255,6 @@ namespace xpcc
 			/** @name Output
 			 * @{
 			 */
-
 			//! Initialze pin to be used as output and set initial state.
 			ALWAYS_INLINE static void setOutput(bool status) {
 				set(status);
@@ -313,7 +313,6 @@ namespace xpcc
 			/** @name Input
 			 * @{
 			 */
-
 			//! Initialze pin to be used as input.
 			ALWAYS_INLINE static void
 			setInput(PullType pull = FLOATING) {
@@ -328,10 +327,37 @@ namespace xpcc
 			//! Read digital input.
 			ALWAYS_INLINE static bool read() {
 				return {{reg}}->IDR & mask;
-
-			//! @}
 			}
+			//! @}
 	%% endif
+
+			/** @name Connect Functions
+			 * @{
+			 */
+	%% if type != "Output" and gpio.analog
+	%% 	for analog_ip in gpio.analog|split(",")
+			//! Connect to {{ analog_ip }}.
+			ALWAYS_INLINE static void
+			connect(TypeId::{{ analog_ip }} t) {
+				(void) t; // avoid compiler warning
+				setAnalogInput();
+			}
+	%% 	endfor
+	%% endif
+
+	%% for af in gpio.afs
+	%%	set use = not (	(af.type|lower == "input"  and type == "Output") or
+						(af.type|lower == "output" and type == "Input" ))
+	%%	if use
+			//! Connect {{name}} as {{af.description}} to {{af.peripheral}}.
+			ALWAYS_INLINE static void
+			connect(TypeId::{{ af.peripheral }} t) {
+				(void) t; // avoid compiler warning
+				setAlternateFunction(AlternateFunction::AF_{{ af.id }});
+			}
+	%%	endif
+	%% endfor
+			//! @}
 		};
 %% endfor
 %% endfor

@@ -28,12 +28,14 @@ MAIN_FUNCTION
 		S::SystemClock<clockSource>::enable();
 
 	// Output clock source on PA8
-	ClockOut::setAlternateFunction(Gpio::AF_0, Gpio::PUSH_PULL);
+	ClockOut::setOutput(Gpio::PUSH_PULL);
+	ClockOut::connect(S::MCO1::Id);
 	S::MCO1::setDivision(S::MCO1::Division::By1);
 	S::MCO1::connect(clockSource::Id);
 
 	// Output SystemClock on PC9
-	SystemClockOut::setAlternateFunction(Gpio::AF_0, Gpio::PUSH_PULL);
+	SystemClockOut::setOutput(Gpio::PUSH_PULL);
+	SystemClockOut::connect(S::MCO2::Id);
 	S::MCO2::setDivision(S::MCO2::Division::By1);
 	S::MCO2::connect(S::SystemClock<clockSource>::Id);
 

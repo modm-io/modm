@@ -49,26 +49,26 @@
 		<driver type="gpio" name="stm32_af">
 			<!-- separate field for port and id are needed because
 				 e.g. on the lpc platform both are a number -->
-			<gpio port="A" id="0" analog="Adc0,Adc1,Adc2">
-				<!-- This makes the GPIO connect to all peripheral drivers
-					 of a certain kind. For example Uart as well as UartHAL
-					 driver for the stm32 platform are both of the type uart
-					 and thus use the same alternate function -->
-				<af id="1" peripheral-type="timer" peripheral-id="2"/>
-				<af id="2" peripheral-type="timer" peripheral-id="5"/>
-				<af id="3" peripheral-type="timer" peripheral-id="8"/>
-				<!-- According to the development summit 2012 the driver
-					 directory is called uart thus the type will always be
-					 called uart and never usart! -->
-				<af id="7" peripheral-type="uart" peripheral-id="2"/>
-				<af id="8" peripheral-type="uart" peripheral-id="4"/>
+			<!-- <gpio port="A" id="0" analog="Adc0,Adc1,Adc2"> -->
+			<gpio port="A" id="0">
+				<!-- This makes the GPIO connect to specific peripheral
+					 drivers. -->
+				<af id="1" peripheral="Timer2" description="Channel1, ETR"/>
+				<af id="2" peripheral="Timer5" description="Channel1"/>
+				<af id="3" peripheral="Timer8" description="ETR"/>
+				<!-- <af id="7" peripheral="Usart2" description="CTS"/> -->
+				<!-- <af id="8" peripheral="Uart4" type="Output" description="TX"/> -->
 			</gpio>
 			<!-- For this proof of concept af, as well as analog are not
 				 evaluated
 				 TODO: add alternate functions as well as analog input connections -->
-			<gpio port="A" id="8"></gpio>
+			<gpio port="A" id="8">
+				<af id="0" peripheral="MCO1" description="Clock Output"/>
+			</gpio>
 			<gpio port="A" id="9"></gpio>
-			<gpio port="C" id="9"></gpio>
+			<gpio port="C" id="9">
+				<af id="0" peripheral="MCO2" description="Clock Output"/>
+			</gpio>
 			<!-- PD5 is only available on devices with 90 pins or more -->
 			<gpio port="D" id="5" pin-count="90+"></gpio>
 			<gpio port="D" id="12" pin-count="90+"></gpio>
