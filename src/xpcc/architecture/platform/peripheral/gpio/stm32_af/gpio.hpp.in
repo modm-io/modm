@@ -194,16 +194,16 @@ namespace xpcc
 			/** @name Enum Class To Integer helper functions.
 			 * @{
 			 */
-			static constexpr uint8_t
-			i(PullType pull) { return static_cast<uint8_t>(pull); }
-			static constexpr uint8_t
-			i(OutputType out) { return static_cast<uint8_t>(out); }
-			static constexpr uint8_t
-			i(OutputSpeed speed) { return static_cast<uint8_t>(speed); }
-			static constexpr uint8_t
-			i(Mode mode) { return static_cast<uint8_t>(mode); }
-			static constexpr uint8_t
-			i(AlternateFunction af) { return static_cast<uint8_t>(af); }
+						static constexpr uint32_t
+			i(PullType pull) { return static_cast<uint32_t>(pull); }
+			static constexpr uint32_t
+			i(OutputType out) { return static_cast<uint32_t>(out); }
+			static constexpr uint32_t
+			i(OutputSpeed speed) { return static_cast<uint32_t>(speed); }
+			static constexpr uint32_t
+			i(Mode mode) { return static_cast<uint32_t>(mode); }
+			static constexpr uint32_t
+			i(AlternateFunction af) { return static_cast<uint32_t>(af); }
 			 //! @}
 		};
 
@@ -247,7 +247,7 @@ namespace xpcc
 			//! Enable Analog Mode which is needed to use this pin as an ADC input.
 			ALWAYS_INLINE static void
 			setAnalogInput() {
-				{{reg}}->MODER |= i(Mode::Analog) << pin;
+				{{reg}}->MODER |= i(Mode::Analog) << (pin * 2);
 			}
 
 		public:
@@ -265,7 +265,7 @@ namespace xpcc
 			ALWAYS_INLINE static void
 			setOutput(OutputType out = PUSH_PULL,
 				OutputSpeed speed = SPEED_50MHZ, PullType pull = FLOATING) { 
-				{{reg}}->MODER   = ({{reg}}->MODER   & ~mask2) | (i(Mode::Output)<< pin);
+				{{reg}}->MODER   = ({{reg}}->MODER   & ~mask2) | (i(Mode::Output)<< pin * 2);
 				{{reg}}->OTYPER  = ({{reg}}->OTYPER  & ~mask)  | (i(out) << pin);
 				{{reg}}->OSPEEDR = ({{reg}}->OSPEEDR & ~mask2) | (i(speed) << (pin * 2));
 				{{reg}}->PUPDR   = ({{reg}}->PUPDR   & ~mask2) | (i(pull)  << (pin * 2));
