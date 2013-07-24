@@ -74,7 +74,7 @@ namespace xpcc
 	 *
 	 * \ingroup	gpio
 	 */
-	class GpioUnused : GpioInput, GpioOutput
+	class GpioUnused : GpioIO
 	{
 	public:
 		ALWAYS_INLINE static void
@@ -248,10 +248,10 @@ namespace xpcc
 		static void
 		write(uint8_t data)
 		{
-			if (data & 0b1000) { T3::set(); } else { T3::reset(); }
-			if (data & 0b0100) { T2::set(); } else { T2::reset(); }
-			if (data & 0b0010) { T1::set(); } else { T1::reset(); }
-			if (data & 0b0001) { T0::set(); } else { T0::reset(); }
+			T3::set(data & 0b1000);
+			T2::set(data & 0b0100);
+			T1::set(data & 0b0010);
+			T0::set(data & 0b0001);
 		}
 	};
 
@@ -329,14 +329,14 @@ namespace xpcc
 		static void
 		write(uint8_t data)
 		{
-			if (data & 0b10000000) { T7::set(); } else { T7::reset(); }
-			if (data & 0b01000000) { T6::set(); } else { T6::reset(); }
-			if (data & 0b00100000) { T5::set(); } else { T5::reset(); }
-			if (data & 0b00010000) { T4::set(); } else { T4::reset(); }
-			if (data & 0b00001000) { T3::set(); } else { T3::reset(); }
-			if (data & 0b00000100) { T2::set(); } else { T2::reset(); }
-			if (data & 0b00000010) { T1::set(); } else { T1::reset(); }
-			if (data & 0b00000001) { T0::set(); } else { T0::reset(); }
+			T7::set(data & 0b10000000);
+			T6::set(data & 0b01000000);
+			T5::set(data & 0b00100000);
+			T4::set(data & 0b00010000);
+			T3::set(data & 0b00001000);
+			T2::set(data & 0b00000100);
+			T1::set(data & 0b00000010);
+			T0::set(data & 0b00000001);
 		}
 	};
 
@@ -446,22 +446,22 @@ namespace xpcc
 		static void
 		write(uint16_t data)
 		{
-			if (data & 0b1000000000000000) { T15::set(); } else { T15::reset(); }
-			if (data & 0b0100000000000000) { T14::set(); } else { T14::reset(); }
-			if (data & 0b0010000000000000) { T13::set(); } else { T13::reset(); }
-			if (data & 0b0001000000000000) { T12::set(); } else { T12::reset(); }
-			if (data & 0b0000100000000000) { T11::set(); } else { T11::reset(); }
-			if (data & 0b0000010000000000) { T10::set(); } else { T10::reset(); }
-			if (data & 0b0000001000000000) { T9::set();  } else { T9::reset();  }
-			if (data & 0b0000000100000000) { T8::set();  } else { T8::reset();  }
-			if (data & 0b0000000010000000) { T7::set();  } else { T7::reset();  }
-			if (data & 0b0000000001000000) { T6::set();  } else { T6::reset();  }
-			if (data & 0b0000000000100000) { T5::set();  } else { T5::reset();  }
-			if (data & 0b0000000000010000) { T4::set();  } else { T4::reset();  }
-			if (data & 0b0000000000001000) { T3::set();  } else { T3::reset();  }
-			if (data & 0b0000000000000100) { T2::set();  } else { T2::reset();  }
-			if (data & 0b0000000000000010) { T1::set();  } else { T1::reset();  }
-			if (data & 0b0000000000000001) { T0::set();  } else { T0::reset();  }
+			T15::set(data & 0b1000000000000000);
+			T14::set(data & 0b0100000000000000);
+			T13::set(data & 0b0010000000000000);
+			T12::set(data & 0b0001000000000000);
+			T11::set(data & 0b0000100000000000);
+			T10::set(data & 0b0000010000000000);
+			T9::set (data & 0b0000001000000000);
+			T8::set (data & 0b0000000100000000);
+			T7::set (data & 0b0000000010000000);
+			T6::set (data & 0b0000000001000000);
+			T5::set (data & 0b0000000000100000);
+			T4::set (data & 0b0000000000010000);
+			T3::set (data & 0b0000000000001000);
+			T2::set (data & 0b0000000000000100);
+			T1::set (data & 0b0000000000000010);
+			T0::set (data & 0b0000000000000001);
 		}
 	};
 }
