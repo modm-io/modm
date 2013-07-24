@@ -122,10 +122,9 @@ namespace xpcc
 		%% endif
 		{
 			static constexpr uint8_t mask = (1 << {{pin}});
-			static constexpr uint8_t eventChannelMuxInput =
-				reinterpret_cast<uint16_t>(&getPort() - 0x0600)/4 + 0x50 + {{pin}};
-			static constexpr uint16_t = interrupt0VectorNumber = PORT{{port}}_INT0_vect_num;
-			static constexpr uint16_t = interrupt1VectorNumber = PORT{{port}}_INT1_vect_num;
+			static constexpr uint8_t eventChannelMuxInput = reinterpret_cast<uint16_t>(&getPort() - 0x0600)/4 + 0x50 + {{pin}};
+			static constexpr uint16_t interrupt0VectorNumber = PORT{{port}}_INT0_vect_num;
+			static constexpr uint16_t interrupt1VectorNumber = PORT{{port}}_INT1_vect_num;
 			
 			ALWAYS_INLINE static void configure(Configuration config,
 												Inverted invert = Inverted::No) {
