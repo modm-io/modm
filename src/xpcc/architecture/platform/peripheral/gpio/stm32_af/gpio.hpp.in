@@ -139,9 +139,38 @@ namespace xpcc
 			/**
 			 * \ingroup	stm32{{ target.family }}
 			 */
+			static void
+			enable()
+			{
+				xpcc_gpio_enable();
+			}
+
+			/**
+			 * \ingroup	stm32{{ target.family }}
+			 */
+			static void
+			disable()
+			{
+				// FIXME: Implement
+			}
+
+		protected:
+			//! I/O Direction Mode values for this specific pin.
+			enum class Mode : uint32_t
+			{
+				Input  = 0x0,
+				Output = 0x1,
+				AlternateFunction = 0x2,
+				Analog = 0x3,
+				Mask   = 0x3,
+			};
+
+			/**
+			 * \ingroup	stm32{{ target.family }}
+			 */
 			// 0..7 = AFRL[31:0]
 			// 8..15 = AFRH[31:0]
-			enum AlternateFunction
+			enum class AlternateFunction
 			{
 				AF_0 = 0x00,		///< System
 				AF_1 = 0x01,		///< TIM1/2
@@ -161,45 +190,20 @@ namespace xpcc
 				AF_15 = 0x0f,		///< EVENTOUT
 			};
 
-			/**
-			 * \ingroup	stm32{{ target.family }}
+			/** @name Enum Class To Integer helper functions.
+			 * @{
 			 */
-			static void
-			enable()
-			{
-				xpcc_gpio_enable();
-			}
-
-			/**
-			 * \ingroup	stm32{{ target.family }}
-			 */
-			static void
-			disable()
-			{
-				// FIXME: Implement
-			}
-
-			/** \internal */
-			template<unsigned int P, unsigned char N, bool = (N >= 8)>
-			struct AlternateMode {
-				ALWAYS_INLINE static void setMode(AlternateFunction m) {
-					uint32_t tmp = reinterpret_cast<GPIO_TypeDef*>(P)->AFR[1];
-					tmp &= ~(0xf << ((N - 8) * 4));
-					tmp |= (m << ((N - 8) * 4));
-					reinterpret_cast<GPIO_TypeDef*>(P)->AFR[1] = tmp;
-				}
-			};
-
-			/** \internal */
-			template<unsigned int P, unsigned char N>
-			struct AlternateMode<P, N, false> {
-				ALWAYS_INLINE static void setMode(AlternateFunction m) {
-					uint32_t tmp = reinterpret_cast<GPIO_TypeDef*>(P)->AFR[0];
-					tmp &= ~(0xf << (N * 4));
-					tmp |= m << (N * 4);
-					reinterpret_cast<GPIO_TypeDef*>(P)->AFR[0] = tmp;
-				}
-			};
+			static constexpr uint8_t
+			i(PullType pull) { return static_cast<uint8_t>(pull); }
+			static constexpr uint8_t
+			i(OutputType out) { return static_cast<uint8_t>(out); }
+			static constexpr uint8_t
+			i(OutputSpeed speed) { return static_cast<uint8_t>(speed); }
+			static constexpr uint8_t
+			i(Mode mode) { return static_cast<uint8_t>(mode); }
+			static constexpr uint8_t
+			i(AlternateFunction af) { return static_cast<uint8_t>(af); }
+			 //! @}
 		};
 
 		/**
@@ -217,80 +221,115 @@ namespace xpcc
 		 */
 		struct {{name}} : Gpio
 		{
+		private:
+			//! Pin Number.
+			static constexpr uint8_t pin = {{pin}};
+			//! Bitmask for registers that contain a 1bit value for every pin.
+			static constexpr uint16_t mask  = 0x1 << pin;
+			//! Bitmask for registers that contain a 2bit value for every pin.
+			static constexpr uint32_t mask2 = 0x3 << (pin * 2);
+			//! Alternate Function register id. 0 for pin 0-7. 1 for pin 8-15.
+			static constexpr uint8_t af_id  = pin / 8;
+			//! Alternate Function offset. This depends on the af_id.
+			static constexpr uint8_t af_offset =
+									(af_id == 0)? (pin * 4) : ((pin - 8) * 4);
+			//! Alternate Function register mask.
+			static constexpr uint32_t af_mask  = 0xf << af_offset;
+
+			//! TODO: Document
+			ALWAYS_INLINE static void
+			setAlternateFunction(AlternateFunction alt) {
+				{{reg}}->AFR[af_id] = ({{reg}}->AFR[af_id] & ~af_mask)
+										| (i(alt) << af_offset);
+			}
+
+			//! Enable Analog Mode which is needed to use this pin as an ADC input.
+			ALWAYS_INLINE static void
+			setAnalogInput() {
+				{{reg}}->MODER |= i(Mode::Analog) << pin;
+			}
+
+		public:
 	%% if type == "" or type == "Output"
+			/** @name Output
+			 * @{
+			 */
+
+			//! Initialze pin to be used as output and set initial state.
 			ALWAYS_INLINE static void setOutput(bool status) {
 				set(status);
 				setOutput();
 			}
 
+			//! Initialze pin to be used as output.
 			ALWAYS_INLINE static void
 			setOutput(OutputType out = PUSH_PULL,
 				OutputSpeed speed = SPEED_50MHZ, PullType pull = FLOATING) { 
-				{{reg}}->MODER   = ({{reg}}->MODER   & ~(0x3 << ({{pin}} * 2))) | (0x1 << ({{pin}} * 2));
-				{{reg}}->OTYPER  = ({{reg}}->OTYPER  & ~(1 << {{pin}})) | (out << {{pin}});
-				{{reg}}->OSPEEDR = ({{reg}}->OSPEEDR & ~(0x3 << ({{pin}} * 2))) | (speed << ({{pin}} * 2));
-				{{reg}}->PUPDR   = ({{reg}}->PUPDR   & ~(0x3 << ({{pin}} * 2))) | (pull << ({{pin}} * 2));
+				{{reg}}->MODER   = ({{reg}}->MODER   & ~mask2) | (i(Mode::Output)<< pin);
+				{{reg}}->OTYPER  = ({{reg}}->OTYPER  & ~mask)  | (i(out) << pin);
+				{{reg}}->OSPEEDR = ({{reg}}->OSPEEDR & ~mask2) | (i(speed) << (pin * 2));
+				{{reg}}->PUPDR   = ({{reg}}->PUPDR   & ~mask2) | (i(pull)  << (pin * 2));
 			}
 
+			//! Set pin high.
 			ALWAYS_INLINE static void set() {
 		%% if target is stm32f2 or target is stm32f4
-				{{reg}}->BSRRL = (1 << {{pin}});
+				{{reg}}->BSRRL = mask;
 		%% elif target is stm32f3
-				{{reg}}->BSRR = (1 << {{pin}});
+				{{reg}}->BSRR = mask;
 		%% endif
 			}
 
+			//! Set pin status: \b high (\c true), \b low (\c false).
 			ALWAYS_INLINE static void set(bool status) {
-				if (status) { set(); }
-				else { reset(); }
+				if (status) {
+					set();
+				} else {
+					reset();
+				}
 			}
 
+			//! Set pin low.
 			ALWAYS_INLINE static void reset() {
 		%% if target is stm32f2 or target is stm32f4
-				{{reg}}->BSRRH = (1 << {{pin}});
+				{{reg}}->BSRRH = mask;
 		%% elif target is stm32f3
-				{{reg}}->BRR = (1 << {{pin}});
+				{{reg}}->BRR = mask;
 		%% endif
 			}
 
+			//! Toggle pin.
 			ALWAYS_INLINE static void toggle() {
-				if ({{reg}}->ODR & (1 << {{pin}})) { reset(); }
-				else { set(); }
+				if ({{reg}}->ODR & mask) {
+					reset();
+				} else {
+					set();
+				}
 			}
+			//! @}
 
-			ALWAYS_INLINE static void
-			setAlternateFunction(AlternateFunction alt, OutputType out,
-				OutputSpeed speed = SPEED_50MHZ, PullType pull = FLOATING) {
-				{{reg}}->MODER   = ({{reg}}->MODER   & ~(0x3 << ({{pin}} * 2))) | (0x2 << ({{pin}} * 2));
-				AlternateMode<{{reg}}_BASE, {{pin}}>::setMode(alt);
-				{{reg}}->OTYPER  = ({{reg}}->OTYPER  & ~(1 << {{pin}})) | (out << {{pin}});
-				{{reg}}->OSPEEDR = ({{reg}}->OSPEEDR & ~(0x3 << ({{pin}} * 2))) | (speed << ({{pin}} * 2));
-				{{reg}}->PUPDR   = ({{reg}}->PUPDR   & ~(0x3 << ({{pin}} * 2))) | (pull << ({{pin}} * 2));
-			}
 	%% endif
 	%% if type == "" or type == "Input"
+			/** @name Input
+			 * @{
+			 */
+
+			//! Initialze pin to be used as input.
 			ALWAYS_INLINE static void
-			setInput(PullType type = FLOATING) {
-				{{reg}}->MODER &= ~(0x3 << ({{pin}} * 2));
-				{{reg}}->PUPDR = ({{reg}}->PUPDR & ~(0x3 << ({{pin}} * 2))) | (type << ({{pin}} * 2));
+			setInput(PullType pull = FLOATING) {
+				{{reg}}->MODER   &= ~mask2;
+				// reset output type and speed
+				{{reg}}->OTYPER  &= ~mask;
+				{{reg}}->OSPEEDR &= ~mask2;
+				// set pullup type
+				{{reg}}->PUPDR = ({{reg}}->PUPDR & ~mask2) | (i(pull) << (pin * 2));
 			}
 
-			ALWAYS_INLINE static void
-			setAnalogInput() {
-				{{reg}}->MODER |= 0x3 << ({{pin}} * 2);
-			}
-
+			//! Read digital input.
 			ALWAYS_INLINE static bool read() {
-				return {{reg}}->IDR & (1 << {{pin}});
-			}
+				return {{reg}}->IDR & mask;
 
-			ALWAYS_INLINE static void
-			setAlternateFunction(AlternateFunction alt, PullType pull) {
-				{{reg}}->MODER   = ({{reg}}->MODER   & ~(0x3 << ({{pin}} * 2))) | (0x2 << ({{pin}} * 2));
-				AlternateMode<{{reg}}_BASE, {{pin}}>::setMode(alt);
-				{{reg}}->OTYPER  = ({{reg}}->OTYPER  & ~(1 << {{pin}})) | (PUSH_PULL << {{pin}});
-				{{reg}}->OSPEEDR = ({{reg}}->OSPEEDR & ~(0x3 << ({{pin}} * 2))) | (SPEED_2MHZ << ({{pin}} * 2));
-				{{reg}}->PUPDR   = ({{reg}}->PUPDR   & ~(0x3 << ({{pin}} * 2))) | (pull << ({{pin}} * 2));
+			//! @}
 			}
 	%% endif
 		};
