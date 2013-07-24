@@ -27,17 +27,24 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 // ----------------------------------------------------------------------------
+#ifndef XPCC__STM32_CLOCK_TYPE_IDS_HPP
+#define XPCC__STM32_CLOCK_TYPE_IDS_HPP
 
-#ifndef XPCC__DRIVERS_HPP
-#define XPCC__DRIVERS_HPP
+namespace xpcc
+{
+	namespace stm32
+	{
+		namespace TypeId
+		{
+			typedef struct{} InternalClock;
+			typedef struct{} ExternalClock;
+			typedef struct{} ExternalOscillator;
+			typedef struct{} Pll;
+			typedef struct{} SystemClock;
+			typedef struct{} MCO1;
+			typedef struct{} MCO2;
+		}
+	}
+}
 
-// Include driver header files
-%% for driver in drivers
-// {{driver.type}}/{{driver.name}}
-%% for header in driver.headers
-#include "{{header}}"
-%% endfor
-%% endfor
-
-#endif	// XPCC__DRIVERS_HPP
-
+#endif /* XPCC__STM32_CLOCK_TYPE_IDS_HPP */

@@ -143,8 +143,8 @@ def platform_tools_generate(env, architecture_path):
 		env['LINKFILE'] = ""
 
 	# Loop through Drivers
-	device_substitutions = {} # Substitutions for the drivers.hpp.in file
-	device_substitutions['drivers'] = []
+	driver_list = []
+	type_id_headers = []
 	drivers = dev.getDriverList(device, env['XPCC_PLATFORM_PATH'])
 	for driver in drivers:
 		ddic = {} # create dictionary describing the driver
@@ -168,7 +168,10 @@ def platform_tools_generate(env, architecture_path):
 			# or source file
 			elif os.path.splitext(tar)[1] in Scanner.SOURCE:
 				sources.append(res)
-		device_substitutions['drivers'].append(ddic)
+			# check if target is "type_ids.hpp"
+			if os.path.basename(tar) == "type_ids.hpp":
+				type_id_headers.append(f[1]) # append path relative to platform dir
+		driver_list.append(ddic)
 
 	####### Generate Header Templates #########################################
 	# Show SCons how to build the architecture/platform.hpp file:
@@ -179,11 +182,17 @@ def platform_tools_generate(env, architecture_path):
 	# Show SCons how to build the drivers.hpp.in file:
 	src = os.path.join(platform_path, 'drivers.hpp.in')
 	tar = os.path.join(generated_path, 'drivers.hpp')
-	env.Jinja2Template(target = tar, source = src, substitutions = device_substitutions)
+	sub = {'drivers': driver_list}
+	env.Jinja2Template(target = tar, source = src, substitutions = sub)
 	# Show SCons how to build device.hpp.in file:
 	src = os.path.join(platform_path, 'device.hpp.in')
 	tar = os.path.join(generated_path, 'device.hpp')
 	sub = {'headers': device_headers}
+	env.Jinja2Template(target = tar, source = src, substitutions = sub)
+	# Show SCons how to build type_ids.hpp.in file:
+	src = os.path.join(platform_path, 'type_ids.hpp.in')
+	tar = os.path.join(generated_path, 'type_ids.hpp')
+	sub = {'headers': type_id_headers}
 	env.Jinja2Template(target = tar, source = src, substitutions = sub)
 	return sources, defines, includes
 

@@ -40,8 +40,7 @@
 %%	endif
 %% endmacro
 
-%% macro source(s)
-typedef struct{} {{ s.name }}_TypeId;
+%% macro source(s, type_id_namespace)
 
 %%	if s.fixedFrequency|length > 0
 template<int InputFrequency> class {{ s.name }};
@@ -59,7 +58,7 @@ private:
 {{ assertFrequency("InputFrequency", "min", s.minFrequency) }}
 {{ assertFrequency("InputFrequency", "max", s.maxFrequency) }}
 public:
-	static const {{ s.name }}_TypeId Id;
+	static const ::{{type_id_namespace}}::TypeId::{{ s.name }} Id;
 
 	static StartupError
 	enable(const uint32_t waitCycles = 1500)
@@ -79,7 +78,7 @@ public:
 %% endmacro
 
 
-%% macro pll(p)
+%% macro pll(p,type_id_namespace)
 %% if p.frequencies|length > 0
 %%		set template = ", " + p.frequencies|join(', ')
 %%		set template_type = ", int " + p.frequencies|join(', int ')
@@ -87,7 +86,6 @@ public:
 %%		set template = ""
 %%		set template_type = ""
 %% endif
-typedef struct{} {{ p.name }}_TypeId;
 
 template<class Input, int OutputFrequency{{ template_type }}> class Pll;
 
@@ -97,7 +95,7 @@ class
 Pll<{{ src.name }}<InputFrequency>, OutputFrequency{{ template }}>
 {
 public:
-	static const {{ p.name }}_TypeId Id;
+	static const ::{{type_id_namespace}}::TypeId::{{ p.name }} Id;
 
 	static StartupError
 	enable(const uint32_t waitCycles = 1500)
@@ -115,8 +113,7 @@ public:
 %%	endfor
 %% endmacro
 
-%% macro sink(s)
-typedef struct{} {{ s.name }}_TypeId;
+%% macro sink(s, type_id_namespace)
 
 template<class Input> class {{ s.name }};
 
@@ -147,7 +144,7 @@ private:
 	static_assert(OutputFrequency == F_CPU,
 	"OutputFrequency needs to match F_CPU value from project.cfg");
 public:
-	static const {{ s.name }}_TypeId Id;
+	static const ::{{type_id_namespace}}::TypeId::{{ s.name }} Id;
 
 	static StartupError
 	enable(const uint32_t waitCycles = 1500)
@@ -163,13 +160,11 @@ public:
 %%	endfor
 %% endmacro
 
-%% macro output(o)
-typedef struct{} {{ o.name }}_TypeId;
-
+%% macro output(o, type_id_namespace)
 class {{ o.name }}
 {
 public:
-	static const {{ o.name }}_TypeId Id;
+	static const ::{{type_id_namespace}}::TypeId::{{ o.name }} Id;
 
 %% if o.divisions|length > 0
 	enum class Division
@@ -188,7 +183,7 @@ public:
 	// Connect Functions
 %% for src in o.sources
 	static ALWAYS_INLINE void
-	connect({{ src.name }}_TypeId t)
+	connect(::{{type_id_namespace}}::TypeId::{{ src.name }} t)
 	{
 		(void) t; // avoid compiler warning
 		ClockTree::connectTo{{ o.name }}(ClockTree::{{ o.name }}Source::{{ src.name }});

@@ -28,16 +28,12 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__DRIVERS_HPP
-#define XPCC__DRIVERS_HPP
+#ifndef XPCC__TYPE_IDS_HPP
+#define XPCC__TYPE_IDS_HPP
 
-// Include driver header files
-%% for driver in drivers
-// {{driver.type}}/{{driver.name}}
-%% for header in driver.headers
+%% for header in headers
 #include "{{header}}"
 %% endfor
-%% endfor
 
-#endif	// XPCC__DRIVERS_HPP
+#endif	// XPCC__TYPE_IDS_HPP
 

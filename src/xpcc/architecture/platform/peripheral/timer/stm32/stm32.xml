@@ -11,6 +11,7 @@
 		<template instances="2,3,4,5" out="timer_{{id}}.hpp">general_purpose.hpp.in</template>
 		<!-- Static: files that just need to be copied to the generated dir-->
 		<static>timer_base.hpp</static>
+		<static>type_ids.hpp</static>
 		<!-- Empty/No 'instances' attribute defaults to all instances -->
 		<!-- Dependancies: static files that are shared between drivers -->
 		<!-- Dependancies need to be located in the platform directory!! -->

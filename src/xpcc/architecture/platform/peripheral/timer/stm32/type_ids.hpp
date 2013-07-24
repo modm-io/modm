@@ -27,17 +27,25 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 // ----------------------------------------------------------------------------
+#ifndef XPCC__STM32_TIMER_TYPE_IDS_HPP
+#define XPCC__STM32_TIMER_TYPE_IDS_HPP
 
-#ifndef XPCC__DRIVERS_HPP
-#define XPCC__DRIVERS_HPP
+namespace xpcc
+{
+	namespace stm32
+	{
+		namespace TypeId
+		{
+			typedef struct{} Timer1;
+			typedef struct{} Timer2;
+			typedef struct{} Timer3;
+			typedef struct{} Timer4;
+			typedef struct{} Timer5;
+			typedef struct{} Timer6;
+			typedef struct{} Timer7;
+			typedef struct{} Timer8;
+		}
+	}
+}
 
-// Include driver header files
-%% for driver in drivers
-// {{driver.type}}/{{driver.name}}
-%% for header in driver.headers
-#include "{{header}}"
-%% endfor
-%% endfor
-
-#endif	// XPCC__DRIVERS_HPP
-
+#endif /* XPCC__STM32_TIMER_TYPE_IDS_HPP */
