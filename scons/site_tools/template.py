@@ -79,6 +79,9 @@ def jinja2_template_action(target, source, env):
 		tab_count =  (min_width/tab_width - len(value)/tab_width) + 1
 		return value + ('\t' * tab_count)
 
+	def filter_split(value, delimiter):
+		return value.split(delimiter)
+
 	def filter_values(lst, key):
 		"""
 		Goes through the list of dictionaries and
@@ -110,6 +113,7 @@ def jinja2_template_action(target, source, env):
 	loader.filters['xpcc.indent'] = filter_indent
 	loader.filters['xpcc.pad'] = filter_pad
 	loader.filters['xpcc.values'] = filter_values
+	loader.filters['split'] = filter_split	# not XPCC specific
 	if env['XPCC_JINJA2_TEST'] != None:
 		loader.tests = env['XPCC_JINJA2_TEST']
 	# Jinja2 Line Statements
