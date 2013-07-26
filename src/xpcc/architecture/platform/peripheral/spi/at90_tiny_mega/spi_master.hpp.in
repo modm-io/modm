@@ -41,14 +41,10 @@ namespace xpcc
 	{
 		struct Spi
 		{
-			enum class Mode : uint8_t
-			{
-				Mode0 = 0,							///< SCK normal,	sample on rising edge
-				Mode1 = (1 << CPHA),				///< SCK normal,	sample on falling edge
-				Mode2 = (1 << CPOL),				///< SCK inverted,	sample on falling edge
-				Mode3 = (1 << CPOL) | (1 << CPHA),	///< SCK inverted,	sample on rising edge
-			};
-
+			%% for gpio in gpios
+			typedef ::xpcc::{{target.family}}::Gpio{{ gpio.port }}{{ gpio.id }} {{ gpio.name | capitalize }};
+			%% endfor
+			
 			enum class Prescaler : uint8_t
 			{
 				Div2 = 0x80 | 0,
@@ -59,12 +55,8 @@ namespace xpcc
 				Div64 = (1 << SPR1),
 				Div128 = (1 << SPR1) | (1 << SPR0),
 			};
-
-			%% for gpio in gpios
-			typedef ::xpcc::{{target.family}}::Gpio{{ gpio.port }}{{ gpio.id }} {{ gpio.name | capitalize }};
-			%% endfor
 		};
-
+		
 		/**
 		 * \brief		Spi Master
 		 *
@@ -87,9 +79,11 @@ namespace xpcc
 			 * This also sets the directions of the I/O pins.
 			 */
 			static void
-			initialize(Mode mode, Prescaler prescaler)
+			initialize(Prescaler prescaler, Mode mode=Mode::Mode0)
 			{
-				SPCR = (1 << SPE) | (1 << MSTR) | (static_cast<uint8_t>(prescaler) & ~0x80) | static_cast<uint8_t>(mode);
+				SPCR = (1 << SPE) | (1 << MSTR) | (static_cast<uint8_t>(prescaler) & ~0x80);
+				if (static_cast<uint8_t>(mode) & 0b01) SPCR |= (1 << CPHA);
+				if (static_cast<uint8_t>(mode) & 0b10) SPCR |= (1 << CPOL);
 				SPSR = (static_cast<uint8_t>(prescaler) & 0x80) ? (1 << SPI2X) : 0;
 				%% for io in gpios
 				%% if io.name == 'mosi'
@@ -164,9 +158,9 @@ namespace xpcc
 			 * This also sets the directions of the I/O pins.
 			 */
 			static ALWAYS_INLINE void
-			initialize(Mode mode, Prescaler prescaler)
+			initialize(Prescaler prescaler, Mode mode=Mode::Mode0)
 			{
-				SpiMaster::initialize(mode, prescaler);
+				SpiMaster::initialize(prescaler, mode);
 				finished = true;
 			}
 

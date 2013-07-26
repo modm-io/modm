@@ -43,6 +43,14 @@ namespace xpcc
 			TxDecrementRxIncrement = 0b01,
 			TxRxDecrement = 0b00,
 		};
+
+		enum class Mode : uint8_t
+		{
+			Mode0 = 0b00,	///< SCK normal,	sample on rising edge
+			Mode1 = 0b01,	///< SCK normal,	sample on falling edge
+			Mode2 = 0b10,	///< SCK inverted,	sample on falling edge
+			Mode3 = 0b11,	///< SCK inverted,	sample on rising edge
+		};
 	};
 
 	/**
@@ -51,7 +59,7 @@ namespace xpcc
 	 * \ingroup		peripheral
 	 * \author		Niklas Hauser
 	 */
-	class SpiMaster : public ::xpcc::Peripheral
+	class SpiMaster : public ::xpcc::Peripheral, public Spi
 	{
 #ifdef __DOXYGEN__
 	public:
