@@ -43,7 +43,7 @@
 namespace
 {
 	// parameter advice
-	static xpcc::i2c::Delegate::NextOperation nextOperation;
+	static xpcc::I2c::Operation nextOperation;
 	
 	// buffer management
 	static uint8_t *readPointer;
@@ -52,37 +52,37 @@ namespace
 	static std::size_t writeBytesLeft;
 	
 	// delegating
-	static xpcc::i2c::Delegate *delegate(0);
-	static xpcc::{{target.family}}::I2cMaster::ErrorState errorState(xpcc::{{target.family}}::I2cMaster::NO_ERROR);
+	static xpcc::I2cDelegate *delegate(0);
+	static xpcc::I2cMaster::Error errorState(xpcc::I2cMaster::Error::NoError);
 	static bool newSession;
 	
 	// helper functions
 	static ALWAYS_INLINE void
-	initializeWrite(xpcc::i2c::Delegate::Writing w) {
+	initializeWrite(xpcc::I2cDelegate::Writing w) {
 		writePointer = w.buffer;
 		writeBytesLeft = w.size;
-		nextOperation = static_cast<xpcc::i2c::Delegate::NextOperation>(w.next);
+		nextOperation = static_cast<xpcc::I2c::Operation>(w.next);
 	}
 	
 	static ALWAYS_INLINE void
-	initializeRead(xpcc::i2c::Delegate::Reading r) {
+	initializeRead(xpcc::I2cDelegate::Reading r) {
 		readPointer = r.buffer;
 		readBytesLeft = r.size;
-		nextOperation = static_cast<xpcc::i2c::Delegate::NextOperation>(r.next);
+		nextOperation = static_cast<xpcc::I2c::Operation>(r.next);
 	}
 	
 	static ALWAYS_INLINE void
 	initializeStopAfterAddress() {
 		//writePointer = ..;
 		writeBytesLeft = 0;
-		nextOperation = xpcc::i2c::Delegate::STOP_OP;
+		nextOperation = xpcc::I2c::Operation::Stop;
 	}
 	
 	static ALWAYS_INLINE void
 	initializeRestartAfterAddress() {
 		//writePointer = ..;
 		writeBytesLeft = 0;
-		nextOperation = xpcc::i2c::Delegate::RESTART_OP;
+		nextOperation = xpcc::I2c::Operation::Restart;
 	}
 }
 
@@ -99,28 +99,28 @@ ISR(TWI_vect)
 			{
 				DEBUG('s');
 				// REPEATED START has been transmitted
-				xpcc::i2c::Delegate::Starting s = delegate->starting();
+				xpcc::I2cDelegate::Starting s = delegate->starting();
 				uint8_t address;
 				switch (s.next)
 				{
-					case xpcc::i2c::Delegate::READ_OP:
-						address = (s.address & 0xfe) | xpcc::i2c::READ;
+					case xpcc::I2c::Operation::Read:
+						address = (s.address & 0xfe) | xpcc::I2c::READ;
 						initializeRead(delegate->reading());
 						break;
 						
-					case xpcc::i2c::Delegate::WRITE_OP:
-						address = (s.address & 0xfe) | xpcc::i2c::WRITE;
+					case xpcc::I2c::Operation::Write:
+						address = (s.address & 0xfe) | xpcc::I2c::WRITE;
 						initializeWrite(delegate->writing());
 						break;
 						
 					default:
-					case xpcc::i2c::Delegate::STOP_OP:
-						address = (s.address & 0xfe) | xpcc::i2c::WRITE;
+					case xpcc::I2c::Operation::Stop:
+						address = (s.address & 0xfe) | xpcc::I2c::WRITE;
 						initializeStopAfterAddress();
 						break;
 						
-					case xpcc::i2c::Delegate::RESTART_OP:
-						address = (s.address & 0xfe) | xpcc::i2c::WRITE;
+					case xpcc::I2c::Operation::Restart:
+						address = (s.address & 0xfe) | xpcc::I2c::WRITE;
 						initializeRestartAfterAddress();
 						break;
 				}
@@ -149,7 +149,7 @@ ISR(TWI_vect)
 			{
 				switch (nextOperation)
 				{
-					case xpcc::i2c::Delegate::WRITE_OP:
+					case xpcc::I2c::Operation::Write:
 						DEBUG('C');
 						initializeWrite(delegate->writing());
 						TWDR = *writePointer++;
@@ -158,7 +158,7 @@ ISR(TWI_vect)
 						DEBUG('A');
 						break;
 						
-					case xpcc::i2c::Delegate::RESTART_OP:
+					case xpcc::I2c::Operation::Restart:
 						DEBUG('R');
 						TWCR = (1 << TWINT) | (1 << TWSTA) | (1 << TWEN) | (1 << TWIE);
 						break;
@@ -166,7 +166,7 @@ ISR(TWI_vect)
 					default:
 						DEBUG('S');
 						TWCR = (1 << TWINT) | (1 << TWSTO) | (1 << TWEN);
-						delegate->stopped(xpcc::i2c::Delegate::NORMAL_STOP);
+						delegate->stopped(xpcc::I2c::DetachCause::NormalStop);
 						delegate = 0;
 						break;
 				}
@@ -203,16 +203,16 @@ ISR(TWI_vect)
 			
 			switch (nextOperation)
 			{
-				case xpcc::i2c::Delegate::RESTART_OP:
+				case xpcc::I2c::Operation::Restart:
 					DEBUG('r');
 					TWCR = (1 << TWINT) | (1 << TWSTA) | (1 << TWEN) | (1 << TWIE);
 					break;
 					
 				default:
-				case xpcc::i2c::Delegate::STOP_OP:
+				case xpcc::I2c::Operation::Stop:
 					DEBUG('S');
 					TWCR = (1 << TWINT) | (1 << TWSTO) | (1 << TWEN);
-					delegate->stopped(xpcc::i2c::Delegate::NORMAL_STOP);
+					delegate->stopped(xpcc::I2c::DetachCause::NormalStop);
 					delegate = 0;
 					break;
 			}
@@ -220,25 +220,25 @@ ISR(TWI_vect)
 			
 		case TW_MT_SLA_NACK:	// SLA+W transmitted, NACK received
 		case TW_MR_SLA_NACK:	// SLA+R transmitted, NACK received
-			errorState = xpcc::{{target.family}}::I2cMaster::ADDRESS_NACK;
+			errorState = xpcc::{{target.family}}::I2cMaster::Error::AddressNack;
 			DEBUG('A');
 			newSession = false;
 		case TW_MT_DATA_NACK:	// data transmitted, NACK received
-			if (newSession) errorState = xpcc::{{target.family}}::I2cMaster::DATA_NACK;
+			if (newSession) errorState = xpcc::{{target.family}}::I2cMaster::Error::DataNack;
 			DEBUG('d');
 			newSession = false;
 			// generate a stop condition
 			TWCR = (1 << TWINT) | (1 << TWSTO) | (1 << TWEN);
 		case TW_MT_ARB_LOST:	// arbitration lost in SLA+W or data
 //		case TW_MR_ARB_LOST:	// arbitration lost in SLA+R or NACK
-			if (newSession) errorState = xpcc::{{target.family}}::I2cMaster::ARBITRATION_LOST;
+			if (newSession) errorState = xpcc::{{target.family}}::I2cMaster::Error::ArbitrationLost;
 			DEBUG('d');
 			newSession = false;
 		default:
-			if (newSession) errorState = xpcc::{{target.family}}::I2cMaster::UNKNOWN_ERROR;
+			if (newSession) errorState = xpcc::{{target.family}}::I2cMaster::Error::UnknownError;
 			DEBUG('r');
 			newSession = false;
-			xpcc::{{target.family}}::I2cMaster::reset(true);
+			xpcc::{{target.family}}::I2cMaster::reset(xpcc::I2c::DetachCause::ErrorCondition);
 			break;
 	}
 	DEBUG('\n');
@@ -246,12 +246,51 @@ ISR(TWI_vect)
 
 // ----------------------------------------------------------------------------
 void
-xpcc::{{target.family}}::I2cMaster::initialize(uint8_t twbr, uint8_t twps)
+xpcc::{{target.family}}::I2cMaster::initialize(DataRate rate)
 {
 	reset();
-	// Initialize TWI clock
-	TWBR = twbr;
-	TWSR = twps & 0x03;
+	/*
+	 * Sets the SCL frequency. The CPU clock frequency in the master must
+	 * be at least 16 times higher than the SCL frequency. Note that
+	 * slaves may prolong the SCL low period, thereby reducing the average
+	 * TWI bus clock period. The SCL frequency is generated according to
+	 * the following equation:
+	 * 
+	 * f_scl = f_cpu / (16 + 2 * twbr * 4 ^ twps)
+	 *       = f_cpu / (16 + 2 * twbr * prescaler)
+	 * 
+	 * twbr = (f_cpu / f_scl - 16) / (2 * prescaler)
+	 * 
+	 * with:
+	 *		twbr in range 0..255
+	 *		twps in range 0..3
+	 * 
+	 *  twps | prescaler
+	 * ------+-----------
+	 *   0   |     1
+	 *   1   |     4
+	 *   2   |    16
+	 *   3   |    64
+	 * 
+	 * Examples:
+	 *   f_cpu  | f_scl |   settings
+	 *   [MHz]  | [kHz] | twbr | twps
+	 * ---------+-------+------+------
+ 	 *  20.0000 |  400  |   17 |   0
+	 *          |  100  |   92 |   0
+	 *  16.0000 |  400  |   12 |   0
+	 *          |  100  |   72 |   0
+	 *  14.7456 |  400  |   10 |   0
+	 *          |  100  |   65 |   0
+	 *   8.0000 |  400  |    2 |   0
+	 *          |  100  |   32 |   0
+	 */
+	XPCC__STATIC_ASSERT(static_cast<uint32_t>(rate) <= 400000, "The {{ target.family }} does not support High I2C baudrate.")
+	XPCC__STATIC_ASSERT(static_cast<uint32_t>(rate) * 16 >= F_CPU, "The CPU frequency must be 16x higher than I2C baudrate");
+	uint8_t baud = (F_CPU / static_cast<uint32_t>(rate) - 16) / 2
+	TWBR = baud;
+	// No prescaler needed, unless we go significantly slower than standard Speed
+	TWSR = 0;
 	// Load data register with default content; release SDA
 	TWDR = 0xff;
 	// Enable TWI peripheral with interrupt disabled
@@ -265,19 +304,19 @@ xpcc::{{target.family}}::I2cMaster::reset(bool error)
 	writeBytesLeft = 0;
 	readBytesLeft = 0;
 	if (delegate) delegate->stopped(
-			error ?	xpcc::i2c::Delegate::ERROR_CONDITION :
-					xpcc::i2c::Delegate::SOFTWARE_RESET);
+			error ?	xpcc::I2c::DetachCause::ErrorCondition :
+					xpcc::I2c::DetachCause::SoftwareReset);
 	delegate = 0;
 }
 
-uint8_t
+xpcc::I2cMaster::Error
 xpcc::{{target.family}}::I2cMaster::getErrorState()
 {
-	return static_cast<uint8_t>(errorState);
+	return errorState;
 }
 
 bool
-xpcc::{{target.family}}::I2cMaster::start(xpcc::i2c::Delegate *delegate)
+xpcc::{{target.family}}::I2cMaster::start(xpcc::I2cDelegate *delegate)
 {
 	if (!::delegate && delegate && delegate->attaching())
 	{
@@ -292,7 +331,7 @@ xpcc::{{target.family}}::I2cMaster::start(xpcc::i2c::Delegate *delegate)
 }
 
 bool
-xpcc::{{target.family}}::I2cMaster::startSync(xpcc::i2c::Delegate *delegate)
+xpcc::{{target.family}}::I2cMaster::startSync(xpcc::I2cDelegate *delegate)
 {
 	if (!::delegate && delegate && delegate->attaching())
 	{

@@ -34,7 +34,6 @@
 #include <xpcc/architecture/driver/delay.hpp>
 #include <xpcc/architecture/peripheral/gpio.hpp>
 #include <xpcc/architecture/peripheral/i2c.hpp>
-#include <xpcc/communication/i2c/delegate.hpp>
 
 namespace xpcc
 {
@@ -54,35 +53,28 @@ namespace xpcc
 	class SoftwareI2cMaster : public xpcc::I2cMaster
 	{
 	public:
-		enum ErrorState
-		{
-			NO_ERROR,			//!< No Error occurred
-			DATA_NACK,			//!< Data was transmitted and NACK received
-			ARBITRATION_LOST,	//!< Arbitration was lost during writing or reading
-			BUS_ERROR,			//!< Misplaced Start or Stop condition
-			UNKNOWN_ERROR		//!< Unknown error condition
-		};
-		
 		/**
 		 * \brief	Initialize the hardware
+		 *
+		 * \param	rate	this will not set the data rate, use the Frequency template parameter for that
 		 */
 		static void
-		initialize();
+		initialize(DataRate rate=DataRate::Standard);
 		
 	public:
 		static void
-		reset(bool error=false);
+		reset(DetachCause cause=DetachCause::SoftwareReset);
 		
 		static bool
-		start(xpcc::i2c::Delegate *delegate);
+		start(xpcc::I2cDelegate *delegate);
 		
 		static ALWAYS_INLINE bool
-		startSync(xpcc::i2c::Delegate *delegate)
+		startSync(xpcc::I2cDelegate *delegate)
 		{
 			return start(delegate);
 		};
 		
-		static uint8_t
+		static Error
 		getErrorState();
 
 	private:
@@ -122,9 +114,9 @@ namespace xpcc
 		static Scl scl;
 		static Sda sda;
 		
-		static xpcc::i2c::Delegate::NextOperation nextOperation;
-		static xpcc::i2c::Delegate *myDelegate;
-		static uint8_t errorState;
+		static xpcc::I2c::Operation nextOperation;
+		static xpcc::I2cDelegate *delegate;
+		static Error errorState;
 	};
 }
 

@@ -42,16 +42,16 @@ template <typename Scl, typename Sda, int32_t Frequency>
 Sda xpcc::SoftwareI2cMaster<Scl, Sda, Frequency>::sda;
 
 template <typename Scl, typename Sda, int32_t Frequency>
-xpcc::i2c::Delegate::NextOperation xpcc::SoftwareI2cMaster<Scl, Sda, Frequency>::nextOperation;
+xpcc::I2c::Operation xpcc::SoftwareI2cMaster<Scl, Sda, Frequency>::nextOperation;
 template <typename Scl, typename Sda, int32_t Frequency>
-xpcc::i2c::Delegate *xpcc::SoftwareI2cMaster<Scl, Sda, Frequency>::myDelegate(0);
+xpcc::I2cDelegate *xpcc::SoftwareI2cMaster<Scl, Sda, Frequency>::myDelegate(0);
 template <typename Scl, typename Sda, int32_t Frequency>
-uint8_t xpcc::SoftwareI2cMaster<Scl, Sda, Frequency>::errorState(NO_ERROR);
+xpcc::I2cMaster::Error xpcc::SoftwareI2cMaster<Scl, Sda, Frequency>::errorState(xpcc::I2cMaster::Error::NoError);
 
 // ----------------------------------------------------------------------------
 template <typename Scl, typename Sda, int32_t Frequency>
 void
-xpcc::SoftwareI2cMaster<Scl, Sda, Frequency>::initialize()
+xpcc::SoftwareI2cMaster<Scl, Sda, Frequency>::initialize(DataRate /*rate*/)
 {
 	scl.set();
 	sda.set();
@@ -59,15 +59,15 @@ xpcc::SoftwareI2cMaster<Scl, Sda, Frequency>::initialize()
 
 template <typename Scl, typename Sda, int32_t Frequency>
 void
-xpcc::SoftwareI2cMaster<Scl, Sda, Frequency>::reset(bool error)
+xpcc::SoftwareI2cMaster<Scl, Sda, Frequency>::reset(DetachCause cause)
 {
-	if (myDelegate) myDelegate->stopped(error ? xpcc::i2c::Delegate::ERROR_CONDITION : xpcc::i2c::Delegate::SOFTWARE_RESET);
+	if (myDelegate) myDelegate->stopped(cause);
 	myDelegate = 0;
 }
 
 template <typename Scl, typename Sda, int32_t Frequency>
 bool
-xpcc::SoftwareI2cMaster<Scl, Sda, Frequency>::start(xpcc::i2c::Delegate *delegate)
+xpcc::SoftwareI2cMaster<Scl, Sda, Frequency>::start(xpcc::I2cDelegate *delegate)
 {
 	if (!myDelegate && delegate && delegate->attaching())
 	{
@@ -79,24 +79,24 @@ xpcc::SoftwareI2cMaster<Scl, Sda, Frequency>::start(xpcc::i2c::Delegate *delegat
 			DEBUG_SW_I2C('s');
 			startCondition();
 
-			xpcc::i2c::Delegate::Starting s = myDelegate->starting();
+			xpcc::I2cDelegate::Starting s = myDelegate->starting();
 			uint8_t address = s.address;
 			
 			address &= 0xfe;
-			if (s.next == xpcc::i2c::Delegate::READ_OP)
-				address |= xpcc::i2c::READ;
+			if (s.next == xpcc::I2c::Operation::Read)
+				address |= xpcc::I2c::READ;
 			
 			if (!write(address))
 				return true;
-			if (nextOperation == xpcc::i2c::Delegate::RESTART_OP) {DEBUG_SW_I2C('R');}
+			if (nextOperation == xpcc::I2c::Operation::Restart) {DEBUG_SW_I2C('R');}
 			nextOperation = s.next;
 			
 			do {
 				switch (nextOperation)
 				{
-					case xpcc::i2c::Delegate::READ_OP:
+					case xpcc::I2c::Operation::Read:
 					{
-						xpcc::i2c::Delegate::Reading r = myDelegate->reading();
+						xpcc::I2cDelegate::Reading r = myDelegate->reading();
 						for (uint8_t i=0; i < r.size-1; ++i) {
 							*r.buffer++ = read(true);
 							DEBUG_SW_I2C('\n');
@@ -105,26 +105,26 @@ xpcc::SoftwareI2cMaster<Scl, Sda, Frequency>::start(xpcc::i2c::Delegate *delegat
 						*r.buffer = read(false);
 						DEBUG_SW_I2C('\n');
 						DEBUG_SW_I2C('n');
-						nextOperation = static_cast<xpcc::i2c::Delegate::NextOperation>(r.next);
+						nextOperation = static_cast<xpcc::I2c::Operation>(r.next);
 					}
 						break;
 						
-					case xpcc::i2c::Delegate::WRITE_OP:
+					case xpcc::I2c::Operation::Write:
 					{
-						xpcc::i2c::Delegate::Writing w = myDelegate->writing();
+						xpcc::I2cDelegate::Writing w = myDelegate->writing();
 						for (uint8_t i=0; i < w.size; ++i) {
 							if (!write(*w.buffer++))
 								return true;
 							DEBUG_SW_I2C('\n');
 							DEBUG_SW_I2C('A');
 						}
-						nextOperation = static_cast<xpcc::i2c::Delegate::NextOperation>(w.next);
+						nextOperation = static_cast<xpcc::I2cDelegate::Operation>(w.next);
 					}
 						break;
 					
-					case xpcc::i2c::Delegate::STOP_OP:
+					case xpcc::I2c::Operation::Stop:
 						DEBUG_SW_I2C('S');
-						myDelegate->stopped(xpcc::i2c::Delegate::NORMAL_STOP);
+						myDelegate->stopped(xpcc::I2c::DetachCause::NormalStop);
 						myDelegate = 0;
 						stopCondition();
 						return true;
@@ -132,14 +132,14 @@ xpcc::SoftwareI2cMaster<Scl, Sda, Frequency>::start(xpcc::i2c::Delegate *delegat
 					default:
 						break;
 				}
-			} while (nextOperation != xpcc::i2c::Delegate::RESTART_OP);
+			} while (nextOperation != xpcc::I2c::Operation::Restart);
 		}
 	}
 	return false;
 }
 
 template <typename Scl, typename Sda, int32_t Frequency>
-uint8_t
+xpcc::I2cMaster::Error
 xpcc::SoftwareI2cMaster<Scl, Sda, Frequency>::getErrorState()
 {
 	return errorState;
@@ -152,7 +152,7 @@ xpcc::SoftwareI2cMaster<Scl, Sda, Frequency>::error()
 {
 	DEBUG_SW_I2C('E');
 	stopCondition();
-	errorState = DATA_NACK;
+	errorState = Error::DataNack;
 	reset(true);
 }
 
