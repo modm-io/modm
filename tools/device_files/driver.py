@@ -156,7 +156,7 @@ class DriverFile:
 			if node.tag == 'parameter':
 				continue
 			# Check if instance id fits:
-			if node.get('instances') != None and instance_id != None and instance_id != 'default':
+			if node.get('instances') != None and instance_id != None:
 				if instance_id not in node.get('instances').split(','):
 					continue
 			if node.text == None or len(node.text) <= 0:
