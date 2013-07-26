@@ -1,0 +1,9 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE rca SYSTEM "../../xml/driver.dtd">
+<rca version="1.0">
+	<driver type="spi" name="at90_tiny_mega">
+		<!-- Template: file that needs to be turned into a source file -->
+		<template instances="0,1,2,3" out="uart_spi_master{{id}}.hpp">uart_spi_master.hpp.in</template>
+		<template>spi_master.hpp.in</template>
+	</driver>
+</rca>
