@@ -112,8 +112,9 @@ class AVRDeviceReader(XMLDeviceReader):
 				name = mod.get('name')
 				
 				if any(name.startswith(per) for per in ["TWI", "USART", "SPI", "ADC", "USB", "DAC", "TC"]):
-					modules.append(name)
-					continue
+					if not name.endswith("SPI"):
+						modules.append(name)
+						continue
 		else:
 			for mod in self.query("//modules/module"):
 				name = mod.get('name')
