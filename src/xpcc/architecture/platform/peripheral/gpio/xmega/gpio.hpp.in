@@ -27,6 +27,7 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 // ----------------------------------------------------------------------------
+{{ generation_block }}
 
 #ifndef XPCC_XMEGA__GPIO_HPP
 #define XPCC_XMEGA__GPIO_HPP

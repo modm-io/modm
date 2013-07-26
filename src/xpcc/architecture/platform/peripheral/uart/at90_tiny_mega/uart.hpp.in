@@ -27,6 +27,7 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 // ----------------------------------------------------------------------------
+{{ generation_block }}
 
 #ifndef XPCC_{{target.family | upper}}__UART{{ id }}_HPP
 #define XPCC_{{target.family | upper}}__UART{{ id }}_HPP
