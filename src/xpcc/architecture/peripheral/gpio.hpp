@@ -201,16 +201,25 @@ namespace xpcc
 
 		/// configure pin as output and set high or low
 		static void
-		setOutput(bool value);
+		setOutput(bool status);
 
 		/// set output to high level
 		static void
 		set();
-
+#endif
 		/// set output to high or low level
-		static void
-		set(bool value);
+		static ALWAYS_INLINE void
+		set(bool status)
+		{
+			if (status) {
+				set();
+			}
+			else {
+				reset();
+			}
+		}
 
+#ifdef __DOXYGEN__
 		/// set output to low level
 		static void
 		reset();

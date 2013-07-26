@@ -149,11 +149,6 @@ namespace xpcc
 			ALWAYS_INLINE static void set() {
 				PORT{{port}}_OUTSET = mask;
 			}
-			
-			ALWAYS_INLINE static void set(bool status) {
-				if (status) { set(); }
-				else { reset(); }
-			}
 
 			ALWAYS_INLINE static void reset() {
 				PORT{{port}}_OUTCLR = mask;
