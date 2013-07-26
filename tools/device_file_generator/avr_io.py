@@ -357,12 +357,13 @@ pins = \
 			{ "port": "B", "id": "1", "name": "sck" },
 			{ "port": "B", "id": "0", "name": "ss" }
 		],
-		"uart1":
+		"uart0":
 		[
 			{ "port": "D", "id": "2", "name": "rxd" },
 			{ "port": "D", "id": "3", "name": "txd" },
 			{ "port": "D", "id": "5", "name": "xck" }
-		]
+		],
+		"uartspi": []
 	},
 	
 	{
@@ -556,7 +557,8 @@ pins = \
 		[
 			{ "port": "D", "id": "0", "name": "scl" },
 			{ "port": "D", "id": "1", "name": "sda" }
-		]
+		],
+		"uartspi": []
 	},
 	
 	{
@@ -614,7 +616,8 @@ pins = \
 		[
 			{ "port": "C", "id": "5", "name": "scl" },
 			{ "port": "C", "id": "4", "name": "sda" }
-		]
+		],
+		"uartspi": []
 	},
 	
 	{
@@ -666,7 +669,8 @@ pins = \
 		[
 			{ "port": "D", "id": "0", "name": "scl" },
 			{ "port": "D", "id": "1", "name": "sda" }
-		]
+		],
+		"uartspi": []
 	},
 	
 	{
@@ -790,7 +794,8 @@ pins = \
 		[
 			{ "port": "C", "id": "0", "name": "scl" },
 			{ "port": "C", "id": "1", "name": "sda" }
-		]
+		],
+		"uartspi": []
 	},
 	
 	{
@@ -955,7 +960,8 @@ pins = \
 		[
 			{ "port": "D", "id": "0", "name": "scl" },
 			{ "port": "D", "id": "1", "name": "sda" }
-		]
+		],
+		"uartspi": []
 	},
 	
 	{
@@ -1030,7 +1036,8 @@ pins = \
 		[
 			{ "port": "D", "id": "0", "name": "scl" },
 			{ "port": "D", "id": "1", "name": "sda" }
-		]
+		],
+		"uartspi": []
 	},
 	
 	{
@@ -1135,7 +1142,8 @@ pins = \
 		[
 			{ "port": "D", "id": "0", "name": "scl" },
 			{ "port": "D", "id": "1", "name": "sda" }
-		]
+		],
+		"uartspi": []
 	},
 	
 	# ATtiny devices
@@ -1567,7 +1575,8 @@ pins = \
 		[
 			{ "port": "D", "id": "3", "name": "scl" },
 			{ "port": "D", "id": "0", "name": "sda" }
-		]
+		],
+		"uartspi": []
 	},
 	
 	{
@@ -1605,7 +1614,8 @@ pins = \
 			{ "port": "B", "id": "1", "name": "usck" },
 			{ "port": "B", "id": "2", "name": "do" },
 			{ "port": "C", "id": "1", "name": "di" }
-		]
+		],
+		"uartspi": []
 	},
 	
 	{
@@ -1649,7 +1659,8 @@ pins = \
 			{ "port": "B", "id": "7", "name": "usck" },
 			{ "port": "B", "id": "6", "name": "do" },
 			{ "port": "B", "id": "5", "name": "di" }
-		]
+		],
+		"uartspi": []
 	},
 	
 	# AT90 devices
@@ -1805,7 +1816,8 @@ pins = \
 			{ "port": "D", "id": "2", "name": "rxd" },
 			{ "port": "D", "id": "3", "name": "txd" },
 			{ "port": "D", "id": "5", "name": "xck" }
-		]
+		],
+		"uartspi": []
 	},
 	
 	{
@@ -1850,7 +1862,8 @@ pins = \
 		[
 			{ "port": "D", "id": "0", "name": "scl" },
 			{ "port": "D", "id": "1", "name": "sda" }
-		]
+		],
+		"uartspi": []
 	}
 ]
 
