@@ -129,10 +129,15 @@
         <af type="pcint" id="23"/>
       </gpio>
     </driver>
-    <driver instances="0" type="uart" name="at90_tiny_mega">
+    <driver type="uart" name="at90_tiny_mega" instances="0">
       <gpio port="D" name="rxd" id="0" instance="0"/>
       <gpio port="D" name="txd" id="1" instance="0"/>
       <gpio port="D" name="xck" id="4" instance="0"/>
+    </driver>
+    <driver type="spi" name="at90_tiny_mega" instances="0">
+      <gpio id="0" port="D" name="miso" instance="0"/>
+      <gpio id="1" port="D" name="mosi" instance="0"/>
+      <gpio id="4" port="D" name="sck" instance="0"/>
     </driver>
     <driver type="i2c" name="at90_tiny_mega">
       <gpio port="C" name="scl" id="5"/>
@@ -145,5 +150,6 @@
       <gpio port="B" name="ss" id="2"/>
     </driver>
     <driver type="adc" name="atmega"/>
+    <driver type="timer" name="atmega" instances="0,1,2"/>
   </device>
 </rca>

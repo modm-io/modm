@@ -102,6 +102,8 @@ class AVRDeviceWriter(XMLDeviceWriter):
 		self.addGpioToNode(self.root)
 		# UART
 		self.addUartToNode(self.root)
+		# USI
+		self.addUsiToNode(self.root)
 		# I2C aka TWI
 		self.addI2cToNode(self.root)
 		# SPI
@@ -110,6 +112,8 @@ class AVRDeviceWriter(XMLDeviceWriter):
 		self.addAdcToNode(self.root)
 		# DAC
 		self.addDacToNode(self.root)
+		# Timer
+		self.addTimerToNode(self.root)
 		
 
 	def addDeviceAttributesToNode(self, node, name):
@@ -127,69 +131,130 @@ class AVRDeviceWriter(XMLDeviceWriter):
 		
 		for item in attributes:
 			instances = []
-			dict = self._getAttributeDictionaryFromId(item['id'])
-			if self.family == 'xmega':
-				for module in [m for m in item['value'] if m.startswith(peripheral)]:
-					instances.append(module[len(peripheral):])
+			attr = self._getAttributeDictionaryFromId(item['id'])
+			if any(m for m in item['value'] if m.startswith(peripheral)):
+				driver = node.addChild('driver')
+				driver.setAttributes(attr)
+				driver.setAttributes({'type': name, 'name': family})
 				
-				if instances != []:
-					instances.sort()
-					driver = node.addChild('driver')
-					driver.setAttributes(dict)
-					driver.setAttributes({'type': name, 'name': family, 'instances': ",".join(instances)})
-			else:
-				for module in [m for m in item['value'] if m.startswith(peripheral)]:
-					driver = node.addChild('driver')
-					driver.setAttributes(dict)
-					driver.setAttributes({'type': name, 'name': family})
-					if name in self.io:
-						for io in self.io[name]:
-							ch = driver.addChild('gpio')
-							ch.setAttributes(io)
+				if name in self.io:
+					for io in self.io[name]:
+						ch = driver.addChild('gpio')
+						ch.setAttributes(io)
 	
-	def addI2cToNode(self, node):
-		# ATtiny's use the module from the ATmegas!
-		family = 'at90_tiny_mega' if (self.family in ['at90', 'attiny', 'atmega']) else self.family
-		self.addModuleAttributesToNode(node, 'TWI', 'i2c', family)
-	
-	def addSpiToNode(self, node):
-		# ATtiny's use the module from the ATmegas!
-		family = 'at90_tiny_mega' if (self.family in ['at90', 'attiny', 'atmega']) else self.family
-		self.addModuleAttributesToNode(node, 'SPI', 'spi', family)
-	
-	def addAdcToNode(self, node):
-		self.addModuleAttributesToNode(node, 'ADC' if self.family == 'xmega' else 'AD_CONVERTER', 'adc')
-	
-	def addDacToNode(self, node):
-		self.addModuleAttributesToNode(node, 'DAC' if self.family == 'xmega' else 'DA_CONVERTER', 'dac')
-	
-	def addUartToNode(self, node):
-		family = 'at90_tiny_mega' if (self.family in ['at90', 'attiny', 'atmega']) else self.family
+	def addModuleInstancesAttributesToNode(self, node, peripheral, name, family=None):
+		if family == None:
+			family = self.family
 		attributes = self._getModuleAttributes()
 		
 		for item in attributes:
 			instances = []
-			dict = self._getAttributeDictionaryFromId(item['id'])
-			for module in item['value']:
-				if 'USART' in module and 'SPI' not in module:
-					if self.family == 'xmega':
-						instances.append(module[5:7])
-					else:
-						# some device only have a 'USART', but we want 'USART0'
-						mod = module + '0'
-						instances.append(mod[5:6])
+			attr = self._getAttributeDictionaryFromId(item['id'])
+			for module in [m for m in item['value'] if m.startswith(peripheral)]:
+				instances.append(module[len(peripheral):])
+			
+			if len(instances) == 0:
+				continue
+			instances.sort()
+			
+			driver = node.addChild('driver')
+			driver.setAttributes(attr)
+			driver.setAttributes({'type': name, 'name': family})
+			
+			if len(instances) > 0:
+				driver.setAttribute('instances', ",".join(instances))
+			
+			if name in self.io:
+				for io in self.io[name]:
+					ch = driver.addChild('gpio')
+					ch.setAttributes(io)
+	
+	def addI2cToNode(self, node):
+		family = 'at90_tiny_mega' if (self.family in ['at90', 'attiny', 'atmega']) else self.family
+		if self.family == 'xmega':
+			self.addModuleInstancesAttributesToNode(node, 'TWI', 'i2c', family)
+		else:
+			self.addModuleAttributesToNode(node, 'TWI', 'i2c', family)
+	
+	def addSpiToNode(self, node):
+		family = 'at90_tiny_mega' if (self.family in ['at90', 'attiny', 'atmega']) else self.family
+		if self.family == 'xmega':
+			self.addModuleInstancesAttributesToNode(node, 'SPI', 'spi', family)
+		else:
+			self.addModuleAttributesToNode(node, 'SPI', 'spi', family)
+	
+	def addAdcToNode(self, node):
+		if self.family == 'xmega':
+			self.addModuleInstancesAttributesToNode(node, 'ADC', 'adc')
+		else:
+			self.addModuleAttributesToNode(node, 'AD_CONVERTER', 'adc')
+	
+	def addDacToNode(self, node):
+		if self.family == 'xmega':
+			self.addModuleInstancesAttributesToNode(node, 'DAC', 'dac')
+		else:
+			self.addModuleAttributesToNode(node, 'DA_CONVERTER', 'dac')
+		
+	def addUsiToNode(self, node):
+		if self.family != 'xmega':
+			family = 'at90_tiny_mega' if (self.family in ['at90', 'attiny', 'atmega']) else self.family
+			self.addModuleAttributesToNode(node, 'USI', 'usi', family)
+	
+	def addTimerToNode(self, node):
+		if self.family == 'xmega':
+			self.addModuleInstancesAttributesToNode(node, 'TC', 'timer')
+		else:
+			self.addModuleInstancesAttributesToNode(node, 'TIMER_COUNTER_', 'timer')
+	
+	def addUartToNode(self, node):
+		family = 'at90_tiny_mega' if (self.family in ['at90', 'attiny', 'atmega']) else self.family
+		# this is special, some AT90_Tiny_Megas can put their USART into SPI mode
+		# we have to parse this specially.
+		uartSpi = 'uartspi' in self.io
+		attributes = self._getModuleAttributes()
+		
+		for item in attributes:
+			instances = []
+			attr = self._getAttributeDictionaryFromId(item['id'])
+			for module in [m for m in item['value'] if m.startswith('USART')]:
+				if self.family == 'xmega':
+					instances.append(module[5:7])
+				else:
+					# some device only have a 'USART', but we want 'USART0'
+					mod = module + '0'
+					instances.append(mod[5:6])
+			
+			instances = list(set(instances))
+			instances.sort()
+			driver = node.addChild('driver')
+			driver.setAttributes(attr)
+			driver.setAttributes({'type': 'uart', 'name': family})
+			if uartSpi:
+				spiDriver = node.addChild('driver')
+				spiDriver.setAttributes(attr)
+				spiDriver.setAttributes({'type': 'spi', 'name': family})
+			
 			if instances != []:
-				instances.sort()
-				driver = node.addChild('driver')
-				driver.setAttributes(dict)
-				driver.setAttributes({'type': 'uart', 'name': family, 'instances': ",".join(instances)})
-				for key in [k for k in self.io if k.startswith('uart')]:
-					instance = key.replace('uart', '')
-					if instance not in instances:
-						continue
+				driver.setAttribute('instances', ",".join(instances))
+				if uartSpi:
+					spiDriver.setAttribute('instances', ",".join(instances))
+			
+			# Add IO for AT90, ATtiny, ATmega
+			for key in [k for k in self.io if k.startswith('uart')]:
+				instance = key.replace('uart', '')
+				if instance not in instances:
+					continue
+				for io in self.io[key]:
+					ch = driver.addChild('gpio')
+					ch.setAttributes(io)
+					ch.setAttributes({'instance': instance})
+				if uartSpi:
 					for io in self.io[key]:
-						ch = driver.addChild('gpio')
-						ch.setAttributes(io)
+						ch = spiDriver.addChild('gpio')
+						replacements = {'txd': 'mosi', 'rxd': 'miso', 'xck': 'sck'}
+						spiIO = dict(io)
+						spiIO.update({'name': replacements[io['name']]})
+						ch.setAttributes(spiIO)
 						ch.setAttributes({'instance': instance})
 	
 	def _getModuleAttributes(self):
