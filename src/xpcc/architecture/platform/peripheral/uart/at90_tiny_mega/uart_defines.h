@@ -28,8 +28,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	XPCC_ATTINY_ATMEGA__UART_DEFINES_H
-#define	XPCC_ATTINY_ATMEGA__UART_DEFINES_H
+#ifndef	XPCC_AT90_ATTINY_ATMEGA__UART_DEFINES_H
+#define	XPCC_AT90_ATTINY_ATMEGA__UART_DEFINES_H
 
 // Atmel made a mess with the register names for UART0 between the "old" devices.
 // To avoid to much conditional compiling we try to mimic the new names for
@@ -76,5 +76,5 @@
 #	define USART0_TX_vect		USART_TXC_vect
 #endif
 
-#endif	// XPCC_ATTINY_ATMEGA__UART_DEFINES_H
+#endif	// XPCC_AT90_ATTINY_ATMEGA__UART_DEFINES_H
 

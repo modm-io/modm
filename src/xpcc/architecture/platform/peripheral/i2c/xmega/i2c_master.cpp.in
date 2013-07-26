@@ -255,7 +255,7 @@ void
 xpcc::xmega::I2cMaster{{ id }}::initialize(DataRate rate)
 {
 	XPCC__STATIC_ASSERT(static_cast<uint32_t>(rate) <= 400000, "The Xmega does not support High I2C baudrate.")
-	XPCC__STATIC_ASSERT(static_cast<uint32_t>(rate) * 10 >= F_CPU, "The CPU frequency needs to be at least 10x higher than I2c baudrate.")
+	XPCC__STATIC_ASSERT(static_cast<uint32_t>(rate) * 10 >= F_CPU, "The CPU frequency needs to be 10x higher than I2C baudrate.")
 
 	reset(xpcc::I2c::DetachCause::SoftwareReset);
 	
