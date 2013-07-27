@@ -35,6 +35,7 @@
 
 #include <stdint.h>		// uint32_t
 #include "../../../device.hpp"
+#include "../../../type_ids.hpp"
 #include "../common/common_clock.hpp"
 #include "pll_calculator.hpp"
 #include "clock.hpp"
@@ -88,17 +89,17 @@ namespace xpcc
 										 externalOscillator, systemClock] }
 
 	// Static Clocks/Plls/Osciallators
-{{ static.source(internalClock) }}
+{{ static.source(internalClock, "xpcc::lpc") }}
 
-{{ static.source(externallClock) }}
+{{ static.source(externallClock, "xpcc::lpc") }}
 
-{{ static.source(externalOscillator) }}
+{{ static.source(externalOscillator, "xpcc::lpc") }}
 
-{{ static.pll(pll) }}
+{{ static.pll(pll, "xpcc::lpc") }}
 
-{{ static.sink(systemClock)}}
+{{ static.sink(systemClock, "xpcc::lpc")}}
 
-{{ static.output(clockOut)}}
+{{ static.output(clockOut, "xpcc::lpc")}}
 
 
 
