@@ -35,27 +35,32 @@
 
 namespace xpcc
 {
+	/// @ingroup	i2c
 	struct I2c
 	{
-		static constexpr uint8_t WRITE = 0x00;	//!< Add the Write bit to the slave addres
-		static constexpr uint8_t READ = 0x01;	//!< Add the Read bit to the slave address
+		static constexpr uint8_t WRITE = 0x00;	///< Add the Write bit to the slave addres
+		static constexpr uint8_t READ = 0x01;	///< Add the Read bit to the slave address
 
-		/// This tells the \c xpcc::i2c::Delegate why it was detached
+		/// This tells the `I2cDelegate` why it was detached
+		/// @see I2cDelegate
 		enum class DetachCause : uint8_t
 		{
-			NormalStop,		//!< All operations finished normally
-			ErrorCondition,	//!< A bus error occured and the bus was reset
-			SoftwareReset	//!< The master in initializing itself
+			NormalStop,		///< All operations finished normally
+			ErrorCondition,	///< A bus error occured and the bus was reset
+			SoftwareReset	///< The master in initializing itself
 		};
 
+		///@{
+		/// I2C Operations that the `I2cDelegate` can give the master on callback
+		/// @see I2cDelegate
+
 		/// Operations after a start or restart condition.
-		/// @see \c xpcc::I2cDelegate
 		enum class Operation
 		{
-			Stop = 0,		//!< Generate a Stop Condition
-			Restart = 1,	//!< Generate a Restart
-			Write = 2,		//!< Write data to the slave
-			Read = 3,		//!< Read data from the slave
+			Stop = 0,		///< Generate a Stop Condition
+			Restart = 1,	///< Generate a Restart
+			Write = 2,		///< Write data to the slave
+			Read = 3,		///< Read data from the slave
 		};
 
 		/// Further operations after write operation.
@@ -72,72 +77,74 @@ namespace xpcc
 			Stop = 0,
 			Restart = 1,
 		};
+		///@}
 
 		/// State of a Delegate Adapter
 		enum class AdapterState
 		{
-			NoError,
-			Busy,
-			Error
+			NoError,	///< No error occured, detached normally
+			Busy,		///< The adapter is busy with data transfer
+			Error		///< An error occured, check the masters @c getErrorCode()
 		};
 	};
 
 	/**
-	 * \brief	Interface of a I2C master
+	 * @brief	Interface of a I2C master
 	 *
 	 * Performing transfers in background allows the use of DMA etc. and
 	 * enables the program to do other things while the operation is
 	 * going on.
 	 *
-	 * \author	Georgi Grinshpun
-	 * \author	Niklas Hauser
-	 * \ingroup	peripheral
-	 * \ingroup i2c
+	 * @author	Georgi Grinshpun
+	 * @author	Niklas Hauser
+	 * @ingroup	peripheral
+	 * @ingroup i2c
 	 */
-	class I2cMaster : public ::xpcc::Peripheral, I2c
+	class I2cMaster : public ::xpcc::Peripheral, public I2c
 	{
+	public:
 		/// Errors that can happen during master operation
 		enum class Error : uint8_t
 		{
-			NoError,			//!< No Error occurred
-			AddressNack,		//!< Address was transmitted and NACK received
-			DataNack,			//!< Data was transmitted and NACK received
-			ArbitrationLost,	//!< Arbitration was lost during writing or reading
-			BusCondition,		//!< Misplaced Start or Stop condition
-			Unknown				//!< Unknown error condition
+			NoError,			///< No Error occurred
+			AddressNack,		///< Address was transmitted and NACK received
+			DataNack,			///< Data was transmitted and NACK received
+			ArbitrationLost,	///< Arbitration was lost during writing or reading
+			BusCondition,		///< Misplaced Start or Stop condition
+			Unknown				///< Unknown error condition
 		};
 
 		/// Baudrate of the I2C bus. Most slaves only work in Standard or Fast mode.
 		enum class DataRate : uint32_t
 		{
-			Standard = 100000,	//!< Standard datarate of 100kHz
-			Fast = 400000,		//!< Fast datarate of 400kHz
-			High = 1700000		//!< High datarate of 1.7Mhz
+			Standard = 100000,	///< Standard datarate of 100kHz
+			Fast = 400000,		///< Fast datarate of 400kHz
+			High = 1700000		///< High datarate of 1.7Mhz
 		};
 
 #ifdef __DOXYGEN__
 	public:
 		/**
-		 * \brief	Requests bus control and starts the transfer.
+		 * @brief	Requests bus control and starts the transfer.
 		 *
-		 * \param	delegate	object that inherits from the I2cDelegate class.
-		 * \return	Caller gains control if \c true. Call has no effect if \c false.
+		 * @param	delegate	object that inherits from the I2cDelegate class.
+		 * @return	Caller gains control if @c true. Call has no effect if @c false.
 		 */
 		static bool
 		start(I2cDelegate *delegate);
 
 		/**
-		 * \brief	Requests bus control and starts the transfer.
+		 * @brief	Requests bus control and starts the transfer.
 		 *			Blocks until delegate is detached.
 		 *
-		 * \param	delegate	object that inherits from the I2cDelegate class.
-		 * \return	Caller gains control if \c true. Call has no effect if \c false.
+		 * @param	delegate	object that inherits from the I2cDelegate class.
+		 * @return	Caller gains control if @c true. Call has no effect if @c false.
 		 */
 		static bool
 		startSync(I2cDelegate *delegate);
 
 		/**
-		 * \brief	Perform a software reset of the driver in case of an error.
+		 * @brief	Perform a software reset of the driver in case of an error.
 		 *
 		 * This method calls the stopped Delegate method and then detaches
 		 * the delegate.
@@ -146,7 +153,7 @@ namespace xpcc
 		reset(DetachCause cause=DetachCause::SoftwareReset);
 
 		/**
-		 * \brief	Check the error state of the driver.
+		 * @brief	Check the error state of the driver.
 		 *
 		 * Since the error states are hardware and implementation specific,
 		 * this is only the recommended interface and does not need to be implemented.
@@ -157,73 +164,86 @@ namespace xpcc
 	};
 
 	/**
-	 * \brief	Abstract class for delegation
+	 * @brief	Abstract class for delegation
 	 *
 	 * For true asynchronous operation, the communication driver should
 	 * inherit from this class, allowing multistage driver design and
 	 * performance gain by premature data evaluation.
 	 * Be aware the methods may or may not be called during the I2C
 	 * interrupt even before returning from initiating function.
-	 * This Delegate will stay attached to I2C during whole operation.
+	 * This Delegate will stay attached to the `I2cMaster` during whole operation.
 	 *
-	 * \author	Georgi Grinshpun
-	 * \author	Niklas Hauser
-	 * \ingroup	i2c
+	 * @see I2cMaster
+	 *
+	 * @author	Georgi Grinshpun
+	 * @author	Niklas Hauser
+	 * @ingroup	i2c
 	 */
 	class I2cDelegate : public I2c
 	{
 	public:
+		/// Contains the information required to begin an I2C transfer
 		struct Starting {
-			Operation next;
-			uint8_t address;
+			uint8_t address;	///< the slave address excluding read/write bit
+			Operation next;		///< operation following the successful addressing of the slave
 		};
 
-		struct Reading {
-			OperationAfterRead next;
-			uint8_t *buffer;
-			std::size_t size;
-		};
-
+		/// Contains the information required to begin a write operation
 		struct Writing {
-			OperationAfterWrite next;
-			const uint8_t *buffer;
-			std::size_t size;
+			OperationAfterWrite next;	///< operation following the successful writing to the slave
+			const uint8_t *buffer;		///< buffer containing the data to write to the slave
+			std::size_t size;			///< number of bytes to be written
 		};
 
+		/// Contains the information required to begin a read operation
+		struct Reading {
+			OperationAfterRead next;	///< operation following the reading
+			uint8_t *buffer;			///< buffer to be filled with the bytes received from the slave
+			std::size_t size;			///< number of bytes to be read
+		};
+
+	public:
 		/*
-		 * Is called one time while attaching signaling this module
-		 * that it is being attached to the driver.
-		 * \return if this delegate is able to be attached. Returning
-		 * false the attaching will not be performed. After returning
-		 * true, this delegate will be attached and stays so until stopped
-		 * is called.
+		 * @brief	This method is called when the I2cMaster is not currently
+		 *			in use by another delegate and can be attached.
+		 *
+		 * @return	`true` if the I2cMaster should attach this delegate,
+		 * 			`false` if it should not attach it.
 		 */
 		virtual bool
 		attaching() = 0;
 
 		/*
-		 * Is called at least one time after attaching returned true. Will
-		 * also be called while restart.
+		 * @brief	This is called when the I2cMaster is ready to (re-)start
+		 * 			an operation.
+		 *
+		 * @return	the `Starting` struct containing slave address and the next operation
 		 */
 		virtual Starting
 		starting() = 0;
 
 		/**
-		 * Before a read operation starts is called to retrieve the buffer
-		 * where incoming data to place to.
-		 */
-		virtual Reading
-		reading() = 0;
-
-		/**
-		 * Before a write operation starts is called to retrieve buffer
-		 * which contains the data to write.
+		 * @brief This is called before the I2cMaster begins a write operation.
+		 *
+		 * @return	the `Writing` struct containg the write buffer and size and next operation
 		 */
 		virtual Writing
 		writing() = 0;
 
 		/**
-		 * Is called just before (or just after) this delegate is detached from i2c.
+		 * @brief	This is called before the I2cMaster begins a read operation.
+		 *
+		 * @return	the `Reading` struct containg the read buffer and size and next operation
+		 */
+		virtual Reading
+		reading() = 0;
+
+		/**
+		 * @brief	This is called when the I2cMaster stops the operation and detached the delegate.
+		 *
+		 * @param	cause	specifies whether the detachment was expected (`NormalStop`),
+		 * 					or a error occurred (`ErrorCondition`), which can, but does not need
+		 * 					to be reacted upon.
 		 */
 		virtual void
 		stopped(DetachCause cause) = 0;
