@@ -36,22 +36,25 @@ testXpccLogger(void);
 
 extern xpcc::lpc::BufferedUart1 uart;
 
+using namespace xpcc::lpc;
+
 int
 main(void)
 {
-	SystemInit();
-	
+	StartupError err =
+		S::SystemClock<S::Pll<S::ExternalOscillator<MHz12>, MHz48> >::enable();
+
 	// Initialize 32-bit timer 0. TIME_INTERVAL is defined as 10mS
 	// You may also want to use the Cortex SysTick timer to do this
-	init_timer32(0, TIME_INTERVAL);
-	
+	// init_timer32(0, TIME_INTERVAL);
+
 	// Enable timer 0. Our interrupt handler will begin incrementing
 	// the TimeTick global each time timer 0 matches and resets.
-	enable_timer32(0);
-	
+	// enable_timer32(0);
+
 	// Set LED port pin to output
 	Led::setOutput();
-	
+
 	xpcc::lpc::Uart1 uart(115200);
 
 	xpcc::delay_ms(100); // glitch ?
