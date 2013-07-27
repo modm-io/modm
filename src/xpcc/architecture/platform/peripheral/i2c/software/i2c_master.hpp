@@ -115,7 +115,7 @@ namespace xpcc
 		static Sda sda;
 		
 		static xpcc::I2c::Operation nextOperation;
-		static xpcc::I2cDelegate *delegate;
+		static xpcc::I2cDelegate *myDelegate;
 		static Error errorState;
 	};
 }
