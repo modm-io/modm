@@ -210,7 +210,7 @@ class AVRDeviceWriter(XMLDeviceWriter):
 		family = 'at90_tiny_mega' if (self.family in ['at90', 'attiny', 'atmega']) else self.family
 		# this is special, some AT90_Tiny_Megas can put their USART into SPI mode
 		# we have to parse this specially.
-		uartSpi = 'uartspi' in self.io
+		uartSpi = 'uartspi' in self.io or self.family == 'xmega'
 		attributes = self._getModuleAttributes()
 		
 		for item in attributes:
