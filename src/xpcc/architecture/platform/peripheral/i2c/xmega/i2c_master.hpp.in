@@ -36,35 +36,63 @@
 #include "../../../drivers.hpp"
 #include <xpcc/architecture/peripheral/i2c.hpp>
 
+/// Error messages for linker.
+extern void dummy_HIGH_DATARATE_IS_NOT_SUPPORTED(void);
+extern void dummy_YOUR_DATARATE_IS_TOO_HIGH_FOR_CPU_FREQUENCY(void);
+
 namespace xpcc
 {
 	namespace xmega
 	{
+		/// @ingroup	xmega
+		/// @ingroup	i2c
 		struct I2c{{ id }}
 		{
+			///@{
+			/// GPIOs for the I2C pins
 			typedef ::xpcc::xmega::Gpio{{ id }}0 Sda;
 			typedef ::xpcc::xmega::Gpio{{ id }}1 Scl;
+			///@}
 		};
 		
-		
 		/**
-		 * \brief	Asynchronous I2C master module for Port {{ id }}
+		 * @brief	Asynchronous I2C master module for Port {{ id }}
 		 *
 		 * Interrupts must be enabled.
 		 * 
-		 * \author Niklas Hauser
-		 * \ingroup	xmega
+		 * @author Niklas Hauser
+		 * @ingroup	xmega
+		 * @ingroup	i2c
 		 */
-		class I2cMaster{{ id }} : ::xpcc::I2cMaster, I2c{{ id }}
+		class I2cMaster{{ id }} : ::xpcc::I2cMaster, public I2c{{ id }}
 		{
 		public:
 			/**
-			 * \brief	set up the I2C module for master operation
+			 * @brief	Set up the I2C module for master operation
 			 *
-			 * \param	rate	\c Standard or \c Fast, \c High Speed is not supported by the Xmega
+			 * @param	rate	`Standard` or `Fast`, `High` datarate is not supported by the Xmega
 			 */
-			static void
-			initialize(DataRate rate=DataRate::Standard);
+			static ALWAYS_INLINE void
+			initialize(DataRate rate=DataRate::Standard)
+			{
+				if (rawRate > 400000)
+				{
+					dummy_HIGH_DATARATE_IS_NOT_SUPPORTED();
+				}
+				
+				if ((F_CPU / 10) < rawRate)
+				{
+					dummy_YOUR_DATARATE_IS_TOO_HIGH_FOR_CPU_FREQUENCY();
+				}
+				
+				// I'm too stupid for static_assert.
+				//static_assert(static_cast<uint32_t>(rate) <= 400000, "The Xmega does not support High I2C baudrate.");
+				//static_assert(static_cast<uint32_t>(rate) * 10 >= F_CPU, "The CPU frequency needs to be 10x higher than I2C baudrate.");
+				
+				// set the baud rate register
+				uint8_t baud = (F_CPU / ( 2 * static_cast<uint32_t>(rate))) - 5;
+				initializeWithBaud(baud);
+			}
 			
 			static void
 			reset(DetachCause cause=DetachCause::SoftwareReset);
@@ -78,6 +106,10 @@ namespace xpcc
 			
 			static Error
 			getErrorState();
+		
+		private:
+			static void
+			initializeWithBaud(uint8_t baud);
 		};
 	}
 }

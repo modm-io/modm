@@ -235,7 +235,7 @@ ISR(TWI_vect)
 			DEBUG('d');
 			newSession = false;
 		default:
-			if (newSession) errorState = xpcc::{{target.family}}::I2cMaster::Error::UnknownError;
+			if (newSession) errorState = xpcc::{{target.family}}::I2cMaster::Error::Unknown;
 			DEBUG('r');
 			newSession = false;
 			xpcc::{{target.family}}::I2cMaster::reset(xpcc::I2c::DetachCause::ErrorCondition);
@@ -246,48 +246,9 @@ ISR(TWI_vect)
 
 // ----------------------------------------------------------------------------
 void
-xpcc::{{target.family}}::I2cMaster::initialize(DataRate rate)
+xpcc::{{target.family}}::I2cMaster::initializeWithBaud(uint8_t baud)
 {
-	reset();
-	/*
-	 * Sets the SCL frequency. The CPU clock frequency in the master must
-	 * be at least 16 times higher than the SCL frequency. Note that
-	 * slaves may prolong the SCL low period, thereby reducing the average
-	 * TWI bus clock period. The SCL frequency is generated according to
-	 * the following equation:
-	 * 
-	 * f_scl = f_cpu / (16 + 2 * twbr * 4 ^ twps)
-	 *       = f_cpu / (16 + 2 * twbr * prescaler)
-	 * 
-	 * twbr = (f_cpu / f_scl - 16) / (2 * prescaler)
-	 * 
-	 * with:
-	 *		twbr in range 0..255
-	 *		twps in range 0..3
-	 * 
-	 *  twps | prescaler
-	 * ------+-----------
-	 *   0   |     1
-	 *   1   |     4
-	 *   2   |    16
-	 *   3   |    64
-	 * 
-	 * Examples:
-	 *   f_cpu  | f_scl |   settings
-	 *   [MHz]  | [kHz] | twbr | twps
-	 * ---------+-------+------+------
- 	 *  20.0000 |  400  |   17 |   0
-	 *          |  100  |   92 |   0
-	 *  16.0000 |  400  |   12 |   0
-	 *          |  100  |   72 |   0
-	 *  14.7456 |  400  |   10 |   0
-	 *          |  100  |   65 |   0
-	 *   8.0000 |  400  |    2 |   0
-	 *          |  100  |   32 |   0
-	 */
-	XPCC__STATIC_ASSERT(static_cast<uint32_t>(rate) <= 400000, "The {{ target.family }} does not support High I2C baudrate.")
-	XPCC__STATIC_ASSERT(static_cast<uint32_t>(rate) * 16 >= F_CPU, "The CPU frequency must be 16x higher than I2C baudrate");
-	uint8_t baud = (F_CPU / static_cast<uint32_t>(rate) - 16) / 2
+	reset(xpcc::I2c::DetachCause::SoftwareReset);
 	TWBR = baud;
 	// No prescaler needed, unless we go significantly slower than standard Speed
 	TWSR = 0;
@@ -298,14 +259,12 @@ xpcc::{{target.family}}::I2cMaster::initialize(DataRate rate)
 }
 
 void
-xpcc::{{target.family}}::I2cMaster::reset(bool error)
+xpcc::{{target.family}}::I2cMaster::reset(DetachCause cause)
 {
 	DEBUG('T');
 	writeBytesLeft = 0;
 	readBytesLeft = 0;
-	if (delegate) delegate->stopped(
-			error ?	xpcc::I2c::DetachCause::ErrorCondition :
-					xpcc::I2c::DetachCause::SoftwareReset);
+	if (delegate) delegate->stopped(cause);
 	delegate = 0;
 }
 

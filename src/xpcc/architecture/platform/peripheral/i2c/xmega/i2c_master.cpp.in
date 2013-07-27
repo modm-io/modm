@@ -252,11 +252,8 @@ ISR(TWI{{ id }}_TWIM_vect)
 
 // ----------------------------------------------------------------------------
 void
-xpcc::xmega::I2cMaster{{ id }}::initialize(DataRate rate)
+xpcc::xmega::I2cMaster{{ id }}::initializeWithBaud(uint8_t baud)
 {
-	XPCC__STATIC_ASSERT(static_cast<uint32_t>(rate) <= 400000, "The Xmega does not support High I2C baudrate.")
-	XPCC__STATIC_ASSERT(static_cast<uint32_t>(rate) * 10 >= F_CPU, "The CPU frequency needs to be 10x higher than I2C baudrate.")
-
 	reset(xpcc::I2c::DetachCause::SoftwareReset);
 	
 	Sda::setInput();
@@ -265,8 +262,6 @@ xpcc::xmega::I2cMaster{{ id }}::initialize(DataRate rate)
 	// SDA Hold Time and External Driver Interface disabled
 	TWI{{ id }}_CTRL = 0;
 	
-	// set the baud rate register
-	const uint8_t baud = (F_CPU / ( 2 * static_cast<uint32_t>(rate))) - 5;
 	TWI{{ id }}_MASTER_BAUD = baud;
 	
 	// Enable the Master, and the interrupts
