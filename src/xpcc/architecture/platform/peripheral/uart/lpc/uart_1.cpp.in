@@ -42,12 +42,12 @@ namespace
 {
 // If requested buffer size is larger than hardware buffer size create a
 // software queue for the remaining bytes.
-#if (LPC11_UART1_RX_BUFFER_SIZE > 16)
+%% if parameters.rx_buffer > 16
 	static xpcc::atomic::Queue<uint8_t, LPC11_UART1_RX_BUFFER_SIZE - 16> rxBuffer;
-#endif
-#if (LPC11_UART1_TX_BUFFER_SIZE > 16)
+%% endif
+%% if parameters.tx_buffer > 16
 	static xpcc::atomic::Queue<uint8_t, LPC11_UART1_TX_BUFFER_SIZE - 16> txBuffer;
-#endif
+%% endif
 
 	static bool isBlocking = true;
 
@@ -183,28 +183,28 @@ xpcc::lpc::BufferedUart1::BufferedUart1(uint32_t baudrate)
 		regVal = LPC_UART->RBR;	/* Dump data from RX FIFO */
 	}
 
-#if (LPC11_UART1_TX_BUFFER_SIZE > 16) && (LPC11_UART1_RX_BUFFER_SIZE <= 16)
+%% if parameters.tx_buffer > 16 and parameters.rx_buffer <= 16
 	/* If TX buffering with more than 16 bytes is requested a software queue
 	 * must be used for sending. This involves the Tx Interrupt only. */
 	LPC_UART->IER = IER_THREIE;
-#endif
+%% endif
 
-#if (LPC11_UART1_TX_BUFFER_SIZE <= 16) && (LPC11_UART1_RX_BUFFER_SIZE > 16)
+%% if parameters.tx_buffer <= 16 and parameters.rx_buffer > 16
 	/* If RX buffering with more than 16 bytes is requested a software queue
 	 * must be used for receiving. This involves the Rx Interrupt only. */
 	LPC_UART->IER = IER_RBRIE;
-#endif
+%% endif
 
-#if (LPC11_UART1_TX_BUFFER_SIZE > 16) && (LPC11_UART1_RX_BUFFER_SIZE > 16)
+%% if parameters.tx_buffer > 16 and parameters.rx_buffer > 16
 	/* If both Rx and Tx buffering with more than 16 bytes is requested
 	 * two software queues muste be used. This involves the Rx and Tx interrupt. */
 	LPC_UART->IER = IER_RBRIE | IER_THREIE;
-#endif
+%% endif
 
-#if (LPC11_UART1_TX_BUFFER_SIZE > 16) || (LPC11_UART1_RX_BUFFER_SIZE > 16)
+%% if parameters.tx_buffer > 16 or parameters.rx_buffer > 16
 	/* Enable the UART Interrupt */
 	NVIC_EnableIRQ(UART_IRQn);
-#endif
+%% endif
 
 	// TODO Care about Line status and its interrupt.
 } // BufferedUart1 constructor
@@ -219,7 +219,7 @@ xpcc::lpc::BufferedUart1::write(uint8_t data)
 		charsLeft = 16;
 	}
 
-#if (LPC11_UART1_TX_BUFFER_SIZE <= 16)
+%% if parameters.tx_buffer <= 16
 	// No software buffer necessary, use hardware buffer only.
 	if (charsLeft > 0) {
 		// There is at least charsLeft bytes free in the FIFO
@@ -245,7 +245,7 @@ xpcc::lpc::BufferedUart1::write(uint8_t data)
 		LPC_UART->THR = data;
 		--charsLeft;
 	}
-#else
+%% else
 	// Use hardware buffer and additional software buffer.
 
 	if (txBuffer.isEmpty()) {
@@ -277,7 +277,7 @@ xpcc::lpc::BufferedUart1::write(uint8_t data)
 		}
 		return; // success
 	} // if(txBuffer.empty())
-#endif
+%% endif
 } // write
 
 // ----------------------------------------------------------------------------
@@ -290,7 +290,7 @@ xpcc::lpc::BufferedUart1::write(const uint8_t *buffer, uint8_t n)
 		charsLeft = 16;
 	}
 
-	#if (LPC11_UART1_TX_BUFFER_SIZE <= 16)
+%% if parameters.tx_buffer <= 16
 	// No software buffer necessary, use hardware buffer only.
 
 	while (n > 0) {
@@ -318,7 +318,7 @@ xpcc::lpc::BufferedUart1::write(const uint8_t *buffer, uint8_t n)
 
 	// Fine, everything put into FIFO
 	return;
-#else
+%% else
 	// Use hardware buffer and additional software buffer.
 
 	if (txBuffer.isEmpty()) {
@@ -350,7 +350,7 @@ xpcc::lpc::BufferedUart1::write(const uint8_t *buffer, uint8_t n)
 
 	// All data put into Hardware and Software buffers
 	return;
-#endif
+%% endif
 } // write buffer
 
 bool
@@ -370,7 +370,7 @@ UART_IRQHandler()
 	switch (IIRValue)
 	{
 	case IIR_INTID_RDA:
-#if (LPC11_UART1_RX_BUFFER_SIZE > 16)
+%% if parameters.rx_buffer > 16
 		// Receive data available: Move data to queue.
 		// As the Rx Interrupt is disabled when the rxBuffer is full it should
 		// never happen that this is called with rxBuffer full.
@@ -381,10 +381,10 @@ UART_IRQHandler()
 			// Enable Rx Interrupt in read() as soon as rxBuffer is not full anymore.
 			LPC_UART->IER &= ~(IER_RBRIE);
 		}
-#endif
+%% endif
 		break;
 	case IIR_INTID_THRE:
-#if (LPC11_UART1_TX_BUFFER_SIZE > 16)
+%% if parameters.tx_buffer > 16
 		// Transmit Holding Register Empty == FIFO completly empty.
 		// Write up to 16 bytes to FIFO.
 		charsLeft = 16;
@@ -400,7 +400,7 @@ UART_IRQHandler()
 			LPC_UART->THR = txBuffer.get();
 			txBuffer.pop();
 		}
-#endif
+%% endif
 		break;
 	case IIR_INTID_CTI:
 		// Character Time-out
