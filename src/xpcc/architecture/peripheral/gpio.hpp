@@ -35,20 +35,20 @@
 #include <xpcc/architecture/utils.hpp>
 
 /**
- * \ingroup		peripheral
- * \defgroup	gpio	General purpose input and/or output pins (GPIO)
+ * @ingroup		peripheral
+ * @defgroup	gpio	General purpose input and/or output pins (GPIO)
  * 
  * These classes are used to create architecture independent
  * definitions for hardware pins which then can be used as template
  * parameters for miscellaneous device drivers.
  * 
- * \warning	When you use the pins directly outside any device driver class you
+ * @warning	When you use the pins directly outside any device driver class you
  * 			have to remember to initialize them first. Call setInput() or
  * 			setOutput() before the first use, otherwise the result is undefined
  * 			and most likely not what you expect!
  * 
  * Example:
- * \code
+ * @code
  * #include <xpcc/architecture/platform.hpp>
  * #include <xpcc/driver/software_spi.hpp>
  * #include <xpcc/driver/lcd/st7036.hpp>
@@ -71,17 +71,17 @@
  * display.initialize();
  * display.setPosition(0, 0);
  * display.write("Hallo Welt!");
- * \endcode
+ * @endcode
  * 
  * This example can be compiled for every AVR device without any change!
  * 
  * The pins don't need to initialized here because the initialize()
  * method of the display does this for us.
  * 
- * \see xpcc::St7036
+ * @see xpcc::St7036
  * 
  * Creating a simple flashing light:
- * \code
+ * @code
  * #include <xpcc/architecture/platform.hpp>
  * #include <xpcc/architecture/driver/delay.hpp>
  * 
@@ -99,14 +99,14 @@
  *         xpcc::delay_ms(500);
  *     }
  * }
- * \endcode
+ * @endcode
  * 
- * This will generate nearly optimal code. As all methods are \c static and
- * \c inline no function call is generated but the call is mapped directly
- * to a \c sbi assembler instruction!
+ * This will generate nearly optimal code. As all methods are `static` and
+ * `inline` no function call is generated but the call is mapped directly
+ * to a `sbi` assembler instruction!
  * 
  * The generated code for the example above (ATmega8):
- * \verbatim
+ * @verbatim
  ...
 82: 20 9a          sbi  0x04, 0        ; Led::setOutput();
 84: 28 9a          sbi  0x05, 0        ; Led::set();
@@ -124,10 +124,10 @@
 96: f1 f7          brne .-4            ; 0x94 <main+0x12>
 
 98: f9 cf          rjmp .-14           ; 0x8c <main+0xa>
-\endverbatim
+@endverbatim
  * 
  * Or for the ATxmega128a1:
- * \verbatim
+ * @verbatim
  ...
 22e: 81 e0         ldi  r24, 0x01
 230: 80 93 21 06   sts  0x0621, r24    ; Led::setOutput();
@@ -144,30 +144,36 @@
 246: f1 f7         brne .-4            ; 0x244 <main+0x16>
 
 248: fa cf         rjmp .-12           ; 0x23e <main+0x10>
-\endverbatim
+@endverbatim
  * 
  * As you can see, no function call whatsoever is involved!
  * 
- * \see		driver
- * \author	Fabian Greif
- * \author	Niklas Hauser
+ * @see		driver
+ * @author	Fabian Greif
+ * @author	Niklas Hauser
  */
 
 namespace xpcc
 {
 	struct Gpio
 	{
+		/**
+		 * These constants refer to the *logical* state of the GPIO.
+		 * The physical state is determined by the pins configuration and external connection.
+		 * @{
+		 */
 		static const bool LOW = false;
 		static const bool HIGH = true;
+		/// }@
 	};
 
 	/**
-	 * \brief	Input interface of an I/O pin
+	 * @brief	Input interface of an I/O pin
 	 *
 	 * Even if the wrapped pin can only be used as input it isn't configured that
-	 * way from the beginning. So remember to call \b setInput() after startup!
+	 * way from the beginning. So remember to call @b setInput() after startup!
 	 *
-	 * \ingroup	gpio
+	 * @ingroup	gpio
 	 */
 	class GpioInput
 	{
@@ -184,12 +190,12 @@ namespace xpcc
 	};
 
 	/**
-	 * \brief	Output interface of an I/O pin
+	 * @brief	Output interface of an I/O pin
 	 *
 	 * Even if the pin can only be used as output it isn't configured that
-	 * way from the beginning. So remember to call \b setOutput() after startup!
+	 * way from the beginning. So remember to call @b setOutput() after startup!
 	 *
-	 * \ingroup	gpio
+	 * @ingroup	gpio
 	 */
 	class GpioOutput
 	{
@@ -222,9 +228,9 @@ namespace xpcc
 	};
 
 	/**
-	 * \brief	Input/Output interface of an I/O pin
+	 * @brief	Input/Output interface of an I/O pin
 	 *
-	 * \ingroup	gpio
+	 * @ingroup	gpio
 	 */
 	class GpioIO : GpioOutput, GpioInput
 	{
@@ -232,7 +238,7 @@ namespace xpcc
 	};
 
 	/**
-	 * \brief	Input/output interface of a set of 4 I/O pins
+	 * @brief	Input/output interface of a set of 4 I/O pins
 	 *
 	 * This class provides the interface for 4 parallel IOs.
 	 * Be aware that the interface is the same regardless of the actual
@@ -240,7 +246,7 @@ namespace xpcc
 	 * For example, when a high nibble (0xf0) is physically configured, the
 	 * data will still be written and read as a low nibble (0x0f).
 	 *
-	 * \ingroup	gpio
+	 * @ingroup	gpio
 	 */
 	class GpioNibble
 	{
@@ -253,7 +259,7 @@ namespace xpcc
 		setInput();
 
 		/**
-		 * \brief	Read data
+		 * @brief	Read data
 		 * 
 		 * Only the lower four bits are used, the higher four bits will
 		 * always be zero.
@@ -262,7 +268,7 @@ namespace xpcc
 		read();
 		
 		/**
-		 * \brief	Write data
+		 * @brief	Write data
 		 * 
 		 * Only the lower four bits are written. The upper bits of data will
 		 * be discarded.
@@ -273,11 +279,11 @@ namespace xpcc
 	};
 
 	/**
-	 * \brief	Input/output interface of a set of 8 I/O pins
+	 * @brief	Input/output interface of a set of 8 I/O pins
 	 *
 	 * This class provides the interface for 8 parallel IOs.
 	 *
-	 * \ingroup	gpio
+	 * @ingroup	gpio
 	 */
 	class GpioOctet
 	{
@@ -298,11 +304,11 @@ namespace xpcc
 	};
 
 	/**
-	 * \brief	Input/output interface of a set of 16 I/O pins
+	 * @brief	Input/output interface of a set of 16 I/O pins
 	 *
 	 * This class provides the interface for 16 parallel IOs.
 	 *
-	 * \ingroup	gpio
+	 * @ingroup	gpio
 	 */
 	class GpioWord
 	{

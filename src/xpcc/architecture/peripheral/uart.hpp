@@ -35,29 +35,29 @@
 namespace xpcc
 {
 	/**
-	 * \brief		Uart
+	 * @brief		Uart
 	 *
-	 * \ingroup		peripheral
-	 * \author		Niklas Hauser
+	 * @ingroup		peripheral
+	 * @author		Niklas Hauser
 	 */
 	class Uart : public ::xpcc::Peripheral
 	{
 #ifdef __DOXYGEN__
 	public:
 		/**
-		 * \brief	Write a single byte and wait for completion.
+		 * @brief	Write a single byte and wait for completion.
 		 */
 		static void
 		writeBlocking(uint8_t data);
 		
 		/**
-		 * \brief	Write a block of bytes and wait for completion.
+		 * @brief	Write a block of bytes and wait for completion.
 		 */
 		static void
 		writeBlocking(const uint8_t *data, std::size_t length);
 		
 		/**
-		 * \brief Flush the write buffer, waits in a while loop until
+		 * @brief Flush the write buffer, waits in a while loop until
 		 *			isWriteFinished() returns `true`
 		 */
 		static void
@@ -65,63 +65,63 @@ namespace xpcc
 		
 		
 		/**
-		 * \brief	Pushes a single byte into the buffer
+		 * @brief	Pushes a single byte into the buffer
 		 *
-		 * \return	`true` if data has been buffered, `false` if buffer is full
+		 * @return	`true` if data has been buffered, `false` if buffer is full
 		 */
 		static bool
 		write(uint8_t data);
 		
 		/**
-		 * \brief	Pushes a block of bytes into the buffer
+		 * @brief	Pushes a block of bytes into the buffer
 		 *
-		 * \param	*buffer	Pointer to a buffer big enough to store \a length bytes
-		 * \param	length	Number of bytes to be written
+		 * @param	*buffer	Pointer to a buffer big enough to store @a length bytes
+		 * @param	length	Number of bytes to be written
 		 *
-		 * \return	the number of bytes pushed into the buffer, maximal \a length
+		 * @return	the number of bytes pushed into the buffer, maximal @a length
 		 */
 		static std::size_t
 		write(const uint8_t *data, std::size_t length);
 		
 		/**
-		 * \return	`true` if the buffer is empty and the last byte has been sent
+		 * @return	`true` if the buffer is empty and the last byte has been sent
 		 */
 		static bool
 		isWriteFinished();
 		
 		/**
-		 * \brief	Read a single byte
+		 * @brief	Read a single byte
 		 *
-		 * \param	&data	Byte read, if any
+		 * @param[out]	&data	Byte read, if any
 		 *
-		 * \return	\n true if a byte was received, \n false otherwise
+		 * @return	`true` if a byte was received, `false` otherwise
 		 */
 		static bool
 		read(uint8_t &data);
 		
 		/**
-		 * \brief	Read a block of bytes
+		 * @brief	Read a block of bytes
 		 *
-		 * \param	*buffer	Pointer to a buffer big enough to store \a n bytes
-		 * \param	n		Number of bytes to be read
+		 * @param[out]	buffer	Pointer to a buffer big enough to store @a n bytes
+		 * @param		length	Number of bytes to be read
 		 *
-		 * \return	Number of bytes which could be read, maximal \a n
+		 * @return	Number of bytes which could be read, maximal @a n
 		 */
 		static std::size_t
 		read(uint8_t *buffer, std::size_t length);
 		
 		/**
-		 * \brief	Empty the receive software and hardware buffer.
+		 * @brief	Empty the receive software and hardware buffer.
 		 *
-		 * \return	the size of the deleted FIFO queue.
+		 * @return	the size of the deleted FIFO queue.
 		 */
 		static std::size_t
 		discardReceiveBuffer();
 		
 		/**
-		 * \brief	Empty the transmit FIFO queue and UART buffer.
+		 * @brief	Empty the transmit FIFO queue and UART buffer.
 		 *
-		 * \return	the size of the deleted FIFO queue.
+		 * @return	the size of the deleted FIFO queue.
 		 */
 		static std::size_t
 		discardTransmitBuffer();
