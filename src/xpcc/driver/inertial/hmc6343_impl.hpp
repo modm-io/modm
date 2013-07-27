@@ -298,7 +298,7 @@ bool
 xpcc::Hmc6343<I2cMaster>::writeCommand(hmc6343::Command command)
 {
 	// busy waiting
-	while(!timeout.isExpired() || adapter.getState() == xpcc::i2c::adapter::BUSY)
+	while(!timeout.isExpired() || adapter.getState() == xpcc::I2c::AdapterState::Busy)
 		;
 
 	buffer[0] = command;
@@ -315,7 +315,7 @@ bool
 xpcc::Hmc6343<I2cMaster>::writeRegister(hmc6343::Register reg, uint8_t value)
 {
 	// busy waiting
-	while(!timeout.isExpired() || adapter.getState() == xpcc::i2c::adapter::BUSY)
+	while(!timeout.isExpired() || adapter.getState() == xpcc::I2c::AdapterState::Busy)
 		;
 
 	buffer[0] = hmc6343::COMMAND_WRITE_EEPROM;
@@ -336,7 +336,7 @@ uint8_t
 xpcc::Hmc6343<I2cMaster>::readRegister(hmc6343::Register reg)
 {
 	// busy waiting
-	while(!timeout.isExpired() || adapter.getState() == xpcc::i2c::adapter::BUSY)
+	while(!timeout.isExpired() || adapter.getState() == xpcc::I2c::AdapterState::Busy)
 		;
 
 	buffer[0] = hmc6343::COMMAND_READ_EEPROM;
@@ -360,7 +360,7 @@ xpcc::Hmc6343<I2cMaster>::update()
 {
 	if (running != NOTHING_RUNNING)
 	{
-		if (adapter.getState() == xpcc::i2c::adapter::NO_ERROR)
+		if (adapter.getState() == xpcc::I2c::AdapterState::NoError)
 		{
 			switch (running)
 			{
@@ -382,7 +382,7 @@ xpcc::Hmc6343<I2cMaster>::update()
 			}
 			running = NOTHING_RUNNING;
 		}
-		if (adapter.getState() == xpcc::i2c::adapter::ERROR)
+		if (adapter.getState() == xpcc::I2c::AdapterState::Error)
 		{
 			running = NOTHING_RUNNING;
 		}

@@ -31,7 +31,7 @@
 #ifndef XPCC__I2C_EEPROM_HPP
 #define XPCC__I2C_EEPROM_HPP
 
-#include <xpcc/communication/i2c/delegate.hpp>
+#include <xpcc/architecture/peripheral/i2c.hpp>
 
 namespace xpcc
 {
@@ -47,7 +47,7 @@ namespace xpcc
 	 * \author	Niklas Hauser
 	 */
 	template <typename I2cMaster>
-	class I2cEeprom : public xpcc::i2c::Delegate
+	class I2cEeprom : public xpcc::I2cDelegate
 	{
 	public:
 		I2cEeprom(uint8_t address);
@@ -121,7 +121,7 @@ namespace xpcc
 		const uint8_t *writeBuffer;
 		const uint8_t *auxWriteBuffer;
 		bool twoBuffers;
-		volatile xpcc::i2c::adapter::State state;
+		volatile xpcc::I2c::AdapterState state;
 		bool isReading;
 		
 		uint8_t buffer[3];

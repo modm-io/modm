@@ -126,6 +126,7 @@ namespace xpcc
 			return false;
 		}
 
+	private:
 		///@{
 		/// @internal
 		virtual bool
@@ -259,6 +260,7 @@ namespace xpcc
 			return false;
 		}
 
+	private:
 		/// @internal
 		///@{
 		virtual bool
@@ -308,7 +310,7 @@ namespace xpcc
 	};
 
 	/**
-	 * This class is an implementation of xpcc::i2c::Delegate which,
+	 * This class is an implementation of xpcc::I2cDelegate which,
 	 * when passed to an i2c driver, performs the sequence:
 	 * start - address - read - stop.
 	 *
@@ -325,7 +327,7 @@ namespace xpcc
 	private:
 		uint8_t address;
 		uint8_t size;
-		const uint8_t *buffer;
+		uint8_t *buffer;
 		volatile AdapterState state;
 
 	public:
@@ -385,6 +387,7 @@ namespace xpcc
 			return false;
 		}
 
+	private:
 		///@{
 		/// @internal
 		virtual bool

@@ -86,7 +86,7 @@ namespace xpcc
 		update()
 		{
 			if (status & READ_TEMPERATURE_RUNNING &&
-				adapter.getState() == xpcc::i2c::adapter::NO_ERROR) {
+				adapter.getState() == xpcc::I2c::AdapterState::NoError) {
 				status &= ~READ_TEMPERATURE_RUNNING;
 				status |= NEW_TEMPERATURE_DATA;
 			}

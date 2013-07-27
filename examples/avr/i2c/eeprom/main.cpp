@@ -42,14 +42,8 @@ main()
 	
 	output << "I2C eeprom test" << xpcc::endl;
 	
-#if defined USE_SOFTWARE
 	// Initialize the I2C interface.
-	Twi::initialize();
-#endif
-
-#if defined USE_HARDWARE
-	Twi::initialize(65, 0);
-#endif
+	Twi::initialize(xpcc::I2cMaster::DataRate::Standard);
 
 	// Create a wrapper object for an 24C256 (32K I2C eeprom) connected
 	// at address 0xA0

@@ -51,6 +51,6 @@
  * 		http://en.wikipedia.org/wiki/I2c</a>
  */
 
-// TODO: Add detailed usage description of xpcc::i2c::Delegate
+// TODO: Add detailed usage description of xpcc::I2cDelegate
 
 

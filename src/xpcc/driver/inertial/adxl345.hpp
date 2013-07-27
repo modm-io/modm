@@ -31,7 +31,7 @@
 #ifndef XPCC__ADXL345_HPP
 #define XPCC__ADXL345_HPP
 
-#include <xpcc/communication/i2c/write_read_adapter.hpp>
+#include <xpcc/architecture/peripheral/i2c_adapter.hpp>
 
 namespace xpcc
 {
@@ -238,7 +238,7 @@ namespace xpcc
 		uint8_t
 		readRegister(adxl345::Register reg);
 		
-		xpcc::i2c::WriteReadAdapter adapter;
+		xpcc::I2cWriteReadAdapter adapter;
 		
 		enum Status {
 			READ_ACCELEROMETER_PENDING = 0x01,

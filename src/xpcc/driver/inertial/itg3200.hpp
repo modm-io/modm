@@ -31,7 +31,7 @@
 #ifndef XPCC__ITG3200_HPP
 #define XPCC__ITG3200_HPP
 
-#include <xpcc/communication/i2c/write_read_adapter.hpp>
+#include <xpcc/architecture/peripheral/i2c_adapter.hpp>
 
 namespace xpcc
 {
@@ -212,7 +212,7 @@ namespace xpcc
 		uint8_t
 		readRegister(itg3200::Register reg);
 		
-		xpcc::i2c::WriteReadAdapter adapter;
+		xpcc::I2cWriteReadAdapter adapter;
 		
 		enum Running {
 			NOTHING_RUNNING,

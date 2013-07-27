@@ -31,7 +31,7 @@
 #ifndef XPCC__DS1631_HPP
 #define XPCC__DS1631_HPP
 
-#include <xpcc/communication/i2c/write_read_adapter.hpp>
+#include <xpcc/architecture/peripheral/i2c_adapter.hpp>
 
 namespace xpcc
 {
@@ -140,7 +140,7 @@ namespace xpcc
 		getTemperature();
 		
 	private:
-		xpcc::i2c::WriteReadAdapter adapter;
+		xpcc::I2cWriteReadAdapter adapter;
 		
 		enum Running {
 			NOTHING_RUNNING,

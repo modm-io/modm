@@ -86,7 +86,7 @@ void
 xpcc::Adxl345<I2cMaster>::update()
 {
 	if (status & READ_ACCELEROMETER_RUNNING &&
-		adapter.getState() == xpcc::i2c::adapter::NO_ERROR) {
+		adapter.getState() == xpcc::I2c::AdapterState::NoError) {
 		status &= ~READ_ACCELEROMETER_RUNNING;
 		status |= NEW_ACCELEROMETER_DATA;
 	}
@@ -107,7 +107,7 @@ template < typename I2cMaster >
 bool
 xpcc::Adxl345<I2cMaster>::writeRegister(adxl345::Register reg, uint8_t value)
 {
-	while (adapter.getState() == xpcc::i2c::adapter::BUSY)
+	while (adapter.getState() == xpcc::I2c::AdapterState::Busy)
 		;
 	buffer[0] = reg;
 	buffer[1] = value;
@@ -120,7 +120,7 @@ template < typename I2cMaster >
 uint8_t
 xpcc::Adxl345<I2cMaster>::readRegister(adxl345::Register reg)
 {
-	while (adapter.getState() == xpcc::i2c::adapter::BUSY)
+	while (adapter.getState() == xpcc::I2c::AdapterState::Busy)
 		;
 	buffer[0] = reg;
 	adapter.initialize(buffer, 1, buffer, 1);

@@ -1,5 +1,5 @@
 
-#include <xpcc/architecture.hpp>
+#include <xpcc/architecture/platform.hpp>
 #include <xpcc/driver/temperature/ds1631.hpp>
 #include <xpcc/io/iostream.hpp>
 
@@ -40,14 +40,8 @@ main()
 	
 	output << "Thermometer" << xpcc::endl;
 	
-#if defined USE_SOFTWARE
 	// Initialize the I2C interface.
-	Twi::initialize();
-#endif
-
-#if defined USE_HARDWARE
-	Twi::initialize(65, 0);
-#endif
+	Twi::initialize(xpcc::I2cMaster::DataRate::Standard);
 	
 	uint8_t data[2];
 	xpcc::Ds1631< Twi > ds1631(data, 0x90);

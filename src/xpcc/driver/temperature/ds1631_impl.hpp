@@ -127,12 +127,12 @@ xpcc::Ds1631<I2cMaster>::update()
 	{
 		switch (adapter.getState())
 		{
-			case xpcc::i2c::adapter::NO_ERROR:
+			case xpcc::I2c::AdapterState::NoError:
 				if (running == READ_TEMPERATURE_RUNNING) {
 					status |= NEW_TEMPERATURE_DATA;
 				}
 				
-			case xpcc::i2c::adapter::ERROR:
+			case xpcc::I2c::AdapterState::Error:
 				running = NOTHING_RUNNING;
 				
 			default:
