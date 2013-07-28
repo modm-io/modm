@@ -87,9 +87,9 @@ namespace xpcc
 		/// State of a Delegate Adapter
 		enum class AdapterState
 		{
-			NoError,	///< No error occured, detached normally
-			Busy,		///< The adapter is busy with data transfer
-			Error		///< An error occured, check the masters @c getErrorCode()
+			Idle,	///< No error occured, detached normally
+			Busy,	///< The adapter is busy with data transfer
+			Error	///< An error occured, check the masters `getErrorCode()`
 		};
 	};
 

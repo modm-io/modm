@@ -234,7 +234,7 @@ xpcc::Bmp085<I2cMaster>::update()
 	{
 		switch (adapter.getState())
 		{
-			case xpcc::I2c::AdapterState::NoError:
+			case xpcc::I2c::AdapterState::Idle:
 				if (running == READ_TEMPERATURE_RUNNING) {
 					status |= NEW_TEMPERATURE_DATA;
 					calculation |= TEMPERATURE_NEEDS_UPDATE;

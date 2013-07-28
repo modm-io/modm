@@ -61,7 +61,7 @@ namespace xpcc
 
 	public:
 		I2cWriteReadAdapter()
-		:	state(AdapterState::NoError)
+		:	state(AdapterState::Idle)
 		{
 		}
 
@@ -177,7 +177,7 @@ namespace xpcc
 		stopped(DetachCause cause)
 		{
 			isReading = false;
-			state = (cause == DetachCause::NormalStop) ? AdapterState::NoError : AdapterState::Error;
+			state = (cause == DetachCause::NormalStop) ? AdapterState::Idle : AdapterState::Error;
 		}
 		///@}
 	};
@@ -205,7 +205,7 @@ namespace xpcc
 
 	public:
 		I2cWriteAdapter()
-		:	state(AdapterState::NoError)
+		:	state(AdapterState::Idle)
 		{
 		}
 
@@ -304,7 +304,7 @@ namespace xpcc
 		virtual void
 		stopped(DetachCause cause)
 		{
-			state = (cause == DetachCause::NormalStop) ? AdapterState::NoError : AdapterState::Error;
+			state = (cause == DetachCause::NormalStop) ? AdapterState::Idle : AdapterState::Error;
 		}
 		///@}
 	};
@@ -332,7 +332,7 @@ namespace xpcc
 
 	public:
 		I2cReadAdapter()
-		:	state(AdapterState::NoError)
+		:	state(AdapterState::Idle)
 		{
 		}
 
@@ -431,7 +431,7 @@ namespace xpcc
 		virtual void
 		stopped(DetachCause cause)
 		{
-			state = (cause == DetachCause::NormalStop) ? AdapterState::NoError : AdapterState::Error;
+			state = (cause == DetachCause::NormalStop) ? AdapterState::Idle : AdapterState::Error;
 		}
 		///@}
 	};

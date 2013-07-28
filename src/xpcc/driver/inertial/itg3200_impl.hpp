@@ -129,7 +129,7 @@ xpcc::Itg3200<I2cMaster>::update()
 	{
 		switch (adapter.getState())
 		{
-			case xpcc::I2c::AdapterState::NoError:
+			case xpcc::I2c::AdapterState::Idle:
 				if (running == READ_BOTH_RUNNING) {
 					status |= NEW_GYROSCOPE_DATA | NEW_TEMPERATURE_DATA;
 				}

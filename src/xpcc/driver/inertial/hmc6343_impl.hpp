@@ -360,7 +360,7 @@ xpcc::Hmc6343<I2cMaster>::update()
 {
 	if (running != NOTHING_RUNNING)
 	{
-		if (adapter.getState() == xpcc::I2c::AdapterState::NoError)
+		if (adapter.getState() == xpcc::I2c::AdapterState::Idle)
 		{
 			switch (running)
 			{

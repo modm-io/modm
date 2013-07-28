@@ -86,7 +86,7 @@ void
 xpcc::Bma180<I2cMaster>::update()
 {
 	if (status & READ_ACCELEROMETER_RUNNING &&
-		adapter.getState() == xpcc::I2c::AdapterState::NoError) {
+		adapter.getState() == xpcc::I2c::AdapterState::Idle) {
 		status &= ~READ_ACCELEROMETER_RUNNING;
 		status |= NEW_ACCELEROMETER_DATA;
 	}

@@ -113,7 +113,7 @@ void
 xpcc::Hmc58<I2cMaster>::update()
 {
 	if (status & READ_MAGNETOMETER_RUNNING &&
-		adapter.getState() == xpcc::I2c::AdapterState::NoError) {
+		adapter.getState() == xpcc::I2c::AdapterState::Idle) {
 		status &= ~READ_MAGNETOMETER_RUNNING;
 		status |= NEW_MAGNETOMETER_DATA;
 	}

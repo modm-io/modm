@@ -35,7 +35,7 @@
 // ----------------------------------------------------------------------------
 template <typename I2cMaster>
 xpcc::I2cEeprom<I2cMaster>::I2cEeprom(uint8_t address)
-:	address(address << 1), state(xpcc::I2c::AdapterState::NoError)
+:	address(address << 1), state(xpcc::I2c::AdapterState::Idle)
 {
 	initialize(0, 0, 0, 0);
 }
@@ -110,7 +110,7 @@ xpcc::I2cEeprom<I2cMaster>::isAvailable()
 	
 	if (I2cMaster::startSync(this))
 	{
-		return (state == xpcc::I2c::AdapterState::NoError);
+		return (state == xpcc::I2c::AdapterState::Idle);
 	}
 	return false;
 }
@@ -217,5 +217,5 @@ xpcc::I2cEeprom<I2cMaster>::stopped(DetachCause cause)
 {
 	isReading = false;
 	twoBuffers = false;
-	state = (cause == DetachCause::NormalStop) ? AdapterState::NoError : AdapterState::Error;
+	state = (cause == DetachCause::NormalStop) ? AdapterState::Idle : AdapterState::Error;
 }
