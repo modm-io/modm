@@ -1,0 +1,10 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE rca SYSTEM "../../xml/driver.dtd">
+<rca version="1.0">
+	<driver type="timer" name="lpc">
+		<static>timer_registers.hpp</static>
+		<template instances="16_0,16_1,32_0,32_1" out="timer_{{id}}.hpp">
+			timer.hpp.in
+		</template>
+	</driver>
+</rca>

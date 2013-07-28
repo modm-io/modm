@@ -5,8 +5,8 @@
 #include <xpcc/utils.hpp>
 
 #include "timer_registers.hpp"
+#include "../../../device.hpp"
 
-#include "../device.h"
 
 namespace xpcc
 {

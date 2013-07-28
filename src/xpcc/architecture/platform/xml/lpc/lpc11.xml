@@ -30,6 +30,7 @@
 		</driver>
 		<!-- Peripheral Drivers -->
 		<driver type="clock" name="lpc" />
+		<driver type="timer" instances="16_0" name="lpc" />
 		<driver type="uart" name="lpc" />
 		<driver type="gpio" name="lpc">
 			<gpio port="0" id="7" func="pin,uart" bits="mode,hys,od" />
