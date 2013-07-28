@@ -169,9 +169,10 @@ class DriverFile:
 			if not f.appliesTo(device_id, self.properties):
 				self.log.info("Tag %s does not apply to device %s. In %s/%s driver xml." % (node.tag, device_id, self.type, self.name))
 			else:
+				file_name = node.text.strip()
 				if node.tag == 'static':
-					if node.text not in build_list: # if it has not been added before
-						static = node.text
+					if file_name not in build_list: # if it has not been added before
+						static = file_name
 						output = node.get('out')
 						if output == None or len(output) <= 0: # if no out attribute was found
 							output = static
@@ -179,7 +180,7 @@ class DriverFile:
 						output = self._makeRelativeToPlatform(output)
 						build_list.append([static, output])# => add static file
 				elif node.tag == 'template':
-					template = node.text
+					template = file_name
 					output = node.get('out')
 					if output == None or len(output) <= 0: # if no out attribute was found
 						output = template
