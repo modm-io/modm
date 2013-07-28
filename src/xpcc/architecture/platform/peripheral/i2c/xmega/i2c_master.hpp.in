@@ -36,10 +36,6 @@
 #include "../../../drivers.hpp"
 #include <xpcc/architecture/peripheral/i2c.hpp>
 
-/// Error messages for linker.
-extern void dummy_HIGH_DATARATE_IS_NOT_SUPPORTED(void);
-extern void dummy_YOUR_DATARATE_IS_TOO_HIGH_FOR_CPU_FREQUENCY(void);
-
 namespace xpcc
 {
 	namespace xmega
@@ -56,7 +52,7 @@ namespace xpcc
 		};
 		
 		/**
-		 * @brief	Asynchronous I2C master module for Port {{ id }}
+		 * Asynchronous I2C master module for Port {{ id }}
 		 *
 		 * Interrupts must be enabled.
 		 * 
@@ -68,29 +64,21 @@ namespace xpcc
 		{
 		public:
 			/**
-			 * @brief	Set up the I2C module for master operation
+			 * Set up the I2C module for master operation
 			 *
-			 * @param	rate	`Standard` or `Fast`, `High` datarate is not supported by the Xmega
+			 * @param	rate
+			 *		`Standard` or `Fast`, `High` datarate is not supported by the Xmega
 			 */
+			template<DataRate rate=DataRate::Standard>
 			static ALWAYS_INLINE void
-			initialize(DataRate rate=DataRate::Standard)
+			initialize()
 			{
-				if (rawRate > 400000)
-				{
-					dummy_HIGH_DATARATE_IS_NOT_SUPPORTED();
-				}
-				
-				if ((F_CPU / 10) < rawRate)
-				{
-					dummy_YOUR_DATARATE_IS_TOO_HIGH_FOR_CPU_FREQUENCY();
-				}
-				
-				// I'm too stupid for static_assert.
-				//static_assert(static_cast<uint32_t>(rate) <= 400000, "The Xmega does not support High I2C baudrate.");
-				//static_assert(static_cast<uint32_t>(rate) * 10 >= F_CPU, "The CPU frequency needs to be 10x higher than I2C baudrate.");
+				constexpr uint32_t rawRate = static_cast<uint32_t>(rate);
+				static_assert(rawRate <= 400000, "The Xmega does not support High I2C baudrate.");
+				static_assert(F_CPU/10 >= rawRate, "The CPU frequency needs to be 10x higher than I2C baudrate.");
 				
 				// set the baud rate register
-				uint8_t baud = (F_CPU / ( 2 * static_cast<uint32_t>(rate))) - 5;
+				constexpr uint8_t baud = (F_CPU / ( 2 * rawRate)) - 5;
 				initializeWithBaud(baud);
 			}
 			

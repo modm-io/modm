@@ -41,7 +41,7 @@ main()
 	output << "Thermometer" << xpcc::endl;
 	
 	// Initialize the I2C interface.
-	Twi::initialize(xpcc::I2cMaster::DataRate::Standard);
+	Twi::initialize<xpcc::I2cMaster::DataRate::Standard>();
 	
 	uint8_t data[2];
 	xpcc::Ds1631< Twi > ds1631(data, 0x90);

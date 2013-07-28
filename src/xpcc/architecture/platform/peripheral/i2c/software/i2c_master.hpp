@@ -58,8 +58,9 @@ namespace xpcc
 		 *
 		 * \param	rate	this will not set the data rate, use the Frequency template parameter for that
 		 */
+		template<DataRate rate=DataRate::Standard>
 		static void
-		initialize(DataRate rate=DataRate::Standard);
+		initialize();
 		
 	public:
 		static void

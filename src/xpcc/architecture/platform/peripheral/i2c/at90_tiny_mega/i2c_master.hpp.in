@@ -55,7 +55,7 @@ namespace xpcc
 		};
 		
 		/**
-		 * @brief	Interrupt-driven I2C master module.
+		 * Interrupt-driven I2C master module.
 		 *
 		 * Interrupts must be enabled.
 		 * 
@@ -65,8 +65,9 @@ namespace xpcc
 		class I2cMaster : public ::xpcc::I2cMaster, public I2c
 		{
 		public:
+			template<DataRate rate=DataRate::Standard>
 			static ALWAYS_INLINE void
-			initialize(DataRate rate=DataRate::Standard)
+			initialize()
 			{
 				/*
 				 * Sets the SCL frequency. The CPU clock frequency in the master must
@@ -104,21 +105,11 @@ namespace xpcc
 				 *   8.0000 |  400  |    2 |   0
 				 *          |  100  |   32 |   0
 				 */
-				uint32_t rawRate = static_cast<uint32_t>(rate);
+				constexpr uint32_t rawRate = static_cast<uint32_t>(rate);
+				static_assert(rawRate <= 400000, "The {{ target.family }} does not support High I2C baudrate.");
+				static_assert(F_CPU/16 >= rawRate, "The CPU frequency must be at least 16x higher than I2C baudrate.");
 				
-				if (rawRate > 400000)
-				{
-					dummy_HIGH_DATARATE_IS_NOT_SUPPORTED();
-				}
-				
-				if ((F_CPU / 16) < rawRate)
-				{
-					dummy_YOUR_DATARATE_IS_TOO_HIGH_FOR_CPU_FREQUENCY();
-				}
-				
-				//static_assert(rawRate <= 400000, "The {{ target.family }} does not support High I2C baudrate.");
-				//static_assert(rawRate * 16 >= F_CPU, "The CPU frequency must be 16x higher than I2C baudrate.");
-				uint8_t baud = (F_CPU / static_cast<uint32_t>(rate) - 16) / 2;
+				constexpr uint8_t baud = ((F_CPU / rawRate) - 16) / 2;
 				initializeWithBaud(baud);
 			};
 			

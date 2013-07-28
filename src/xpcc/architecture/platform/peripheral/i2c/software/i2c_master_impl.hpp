@@ -50,8 +50,9 @@ xpcc::I2cMaster::Error xpcc::SoftwareI2cMaster<Scl, Sda, Frequency>::errorState(
 
 // ----------------------------------------------------------------------------
 template <typename Scl, typename Sda, int32_t Frequency>
+template <xpcc::I2cMaster::DataRate rate>
 void
-xpcc::SoftwareI2cMaster<Scl, Sda, Frequency>::initialize(DataRate /*rate*/)
+xpcc::SoftwareI2cMaster<Scl, Sda, Frequency>::initialize()
 {
 	scl.set();
 	sda.set();
