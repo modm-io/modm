@@ -32,40 +32,41 @@
 
 #include "../peripheral.hpp"
 
+/**
+ * @ingroup 	peripheral
+ * @defgroup	uart	Universal Asynchronous Receiver/Transmitter (UART)
+ */
+
 namespace xpcc
 {
 	/**
-	 * @brief		Uart
+	 * Interface of an Uart.
 	 *
-	 * @ingroup		peripheral
-	 * @author		Niklas Hauser
+	 * Asynchronous and synchronous, buffered access to the Uart.
+	 *
+	 * @author	Niklas Hauser
+	 * @ingroup	peripheral
+	 * @ingroup	uart
 	 */
 	class Uart : public ::xpcc::Peripheral
 	{
 #ifdef __DOXYGEN__
 	public:
-		/**
-		 * @brief	Write a single byte and wait for completion.
-		 */
+		/// Write a single byte and wait for completion.
 		static void
 		writeBlocking(uint8_t data);
 		
-		/**
-		 * @brief	Write a block of bytes and wait for completion.
-		 */
+		/// Write a block of bytes and wait for completion.
 		static void
 		writeBlocking(const uint8_t *data, std::size_t length);
 		
-		/**
-		 * @brief Flush the write buffer, waits in a while loop until
-		 *			isWriteFinished() returns `true`
-		 */
+		/// Flush the write buffer, waits in a while loop until `isWriteFinished()` returns `true`
 		static void
 		flushWriteBuffer();
 		
 		
 		/**
-		 * @brief	Pushes a single byte into the buffer
+		 * Pushes a single byte into the buffer.
 		 *
 		 * @return	`true` if data has been buffered, `false` if buffer is full
 		 */
@@ -73,26 +74,27 @@ namespace xpcc
 		write(uint8_t data);
 		
 		/**
-		 * @brief	Pushes a block of bytes into the buffer
+		 * Pushes a block of bytes into the buffer.
 		 *
-		 * @param	*buffer	Pointer to a buffer big enough to store @a length bytes
-		 * @param	length	Number of bytes to be written
+		 * @param	data
+		 *		Pointer to a buffer big enough to store `length` bytes
+		 * @param	length
+		 * 		Number of bytes to be written
 		 *
-		 * @return	the number of bytes pushed into the buffer, maximal @a length
+		 * @return	the number of bytes pushed into the buffer, maximal `length`
 		 */
 		static std::size_t
 		write(const uint8_t *data, std::size_t length);
 		
-		/**
-		 * @return	`true` if the buffer is empty and the last byte has been sent
-		 */
+		/// @return	`true` if the buffer is empty and the last byte has been sent
 		static bool
 		isWriteFinished();
 		
 		/**
-		 * @brief	Read a single byte
+		 * Read a single byte.
 		 *
-		 * @param[out]	&data	Byte read, if any
+		 * @param[out]	data
+		 *		Byte read, if any
 		 *
 		 * @return	`true` if a byte was received, `false` otherwise
 		 */
@@ -100,18 +102,20 @@ namespace xpcc
 		read(uint8_t &data);
 		
 		/**
-		 * @brief	Read a block of bytes
+		 * Read a block of bytes.
 		 *
-		 * @param[out]	buffer	Pointer to a buffer big enough to store @a n bytes
-		 * @param		length	Number of bytes to be read
+		 * @param[out]	buffer
+		 *		Pointer to a buffer big enough to store `length` bytes
+		 * @param		length
+		 *		Number of bytes to be read
 		 *
-		 * @return	Number of bytes which could be read, maximal @a n
+		 * @return	Number of bytes which could be read, maximal `length`
 		 */
 		static std::size_t
 		read(uint8_t *buffer, std::size_t length);
 		
 		/**
-		 * @brief	Empty the receive software and hardware buffer.
+		 * Empty the receive FIFO queue and hardware buffer.
 		 *
 		 * @return	the size of the deleted FIFO queue.
 		 */
@@ -119,7 +123,7 @@ namespace xpcc
 		discardReceiveBuffer();
 		
 		/**
-		 * @brief	Empty the transmit FIFO queue and UART buffer.
+		 * Empty the transmit FIFO queue and hardware buffer.
 		 *
 		 * @return	the size of the deleted FIFO queue.
 		 */

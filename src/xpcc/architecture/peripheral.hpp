@@ -35,8 +35,8 @@
 #include <cstddef>
 
 /**
- * \ingroup 	architecture
- * \defgroup	peripheral	Peripherals
+ * @ingroup 	architecture
+ * @defgroup	peripheral	Peripherals
  * 
  * All hardware peripherals with common interfaces.
  */
@@ -44,7 +44,7 @@
 namespace xpcc
 {
 	/**
-	 * \brief	Peripheral class
+	 * Peripheral class
 	 *
 	 * This class defines acts as a base class for all classes describing the
 	 * public interface of common peripheral drivers.
@@ -61,40 +61,41 @@ namespace xpcc
 	 * There is no need to document the platform specific implementation, since
 	 * it is taken from the base class.
 	 *
-	 * \ingroup peripheral
-	 * \author	Niklas Hauser
+	 * @ingroup peripheral
+	 * @author	Niklas Hauser
 	 */
 	class Peripheral
 	{
 #ifdef __DOXYGEN__
-		/**
-		 * \brief initializes the peripheral, must be called before use.
-		 */
+		/// initializes the peripheral, must be called before use.
 		static void
 		initialize();
 
-		/**
-		 * \brief configures a peripheral for a specific purpose
-		 */
+		/// configures a peripheral for a specific purpose
 		static void
 		configurePurpose();
 
-		/**
-		 * \brief sets a parameter
-		 */
+		/// sets a parameter
 		static void
 		setParameter();
 
-		/**
-		 * \brief gets a parameter
-		 */
+		/// returns a parameter
 		static void
 		getParameter();
 
 		/**
-		 * \brief acknowledges an interrupt flag
+		 * Read an interrupt flag.
 		 *
-		 * We use acknowledge here, because it describes the intention rather
+		 * We use read here, as a reminder that flags are hardware and cannot
+		 * be written like a another parameter.
+		 */
+		static void
+		readInterruptFlag();
+
+		/**
+		 * Acknowledge an interrupt flag.
+		 *
+		 * We use acknowledge here, since it describes the intention rather
 		 * than the actual implementation.
 		 */
 		static void

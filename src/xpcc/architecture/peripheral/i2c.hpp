@@ -33,6 +33,11 @@
 
 #include "../peripheral.hpp"
 
+/**
+ * @ingroup 	peripheral
+ * @defgroup	i2c		Inter-Integrated Circuit (I2C)
+ */
+
 namespace xpcc
 {
 	/// @ingroup	i2c
@@ -89,7 +94,7 @@ namespace xpcc
 	};
 
 	/**
-	 * @brief	Interface of a I2C master
+	 * Interface of a I2C master.
 	 *
 	 * Performing transfers in background allows the use of DMA etc. and
 	 * enables the program to do other things while the operation is
@@ -125,26 +130,27 @@ namespace xpcc
 #ifdef __DOXYGEN__
 	public:
 		/**
-		 * @brief	Requests bus control and starts the transfer.
+		 * Requests bus control and starts the transfer.
 		 *
-		 * @param	delegate	object that inherits from the I2cDelegate class.
-		 * @return	Caller gains control if @c true. Call has no effect if @c false.
+		 * @param	delegate
+		 *		object that inherits from the I2cDelegate class.
+		 * @return	Caller gains control if `true`. Call has no effect if `false`.
 		 */
 		static bool
 		start(I2cDelegate *delegate);
 
 		/**
-		 * @brief	Requests bus control and starts the transfer.
-		 *			Blocks until delegate is detached.
+		 * Requests bus control and starts the transfer, blocks until delegate is detached.
 		 *
-		 * @param	delegate	object that inherits from the I2cDelegate class.
-		 * @return	Caller gains control if @c true. Call has no effect if @c false.
+		 * @param	delegate
+		 *		object that inherits from the I2cDelegate class.
+		 * @return	Caller gains control if `true`. Call has no effect if `false`.
 		 */
 		static bool
 		startSync(I2cDelegate *delegate);
 
 		/**
-		 * @brief	Perform a software reset of the driver in case of an error.
+		 * Perform a software reset of the driver in case of an error.
 		 *
 		 * This method calls the stopped Delegate method and then detaches
 		 * the delegate.
@@ -153,7 +159,7 @@ namespace xpcc
 		reset(DetachCause cause=DetachCause::SoftwareReset);
 
 		/**
-		 * @brief	Check the error state of the driver.
+		 * Check the error state of the driver.
 		 *
 		 * Since the error states are hardware and implementation specific,
 		 * this is only the recommended interface and does not need to be implemented.
@@ -164,7 +170,7 @@ namespace xpcc
 	};
 
 	/**
-	 * @brief	Abstract class for delegation
+	 * Abstract class for delegation
 	 *
 	 * For true asynchronous operation, the communication driver should
 	 * inherit from this class, allowing multistage driver design and

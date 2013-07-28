@@ -32,6 +32,11 @@
 
 #include "../peripheral.hpp"
 
+/**
+ * @ingroup 	peripheral
+ * @defgroup	spi	Serial Peripheral Interface (SPI)
+ */
+
 namespace xpcc
 {
 	struct Spi
@@ -57,7 +62,7 @@ namespace xpcc
 	};
 
 	/**
-	 * @brief	Spi Master
+	 * Interface for a Spi Master with single byte access.
 	 *
 	 * @author	Niklas Hauser
 	 * @ingroup	peripheral
@@ -68,18 +73,19 @@ namespace xpcc
 #ifdef __DOXYGEN__
 	public:
 		/**
-		 * @brief	Write a single byte, wait for completion.
+		 * Write a single byte, wait for completion.
+		 *
 		 * @return	received byte.
 		 */
 		static uint8_t
 		writeReadBlocking(uint8_t data);
 		
-		/// @brief	Write a single byte, wait for completion and discard received byte.
+		/// Write a single byte, wait for completion and discard received byte.
 		static void
 		writeBlocking(uint8_t data);
 		
 		/**
-		 * @brief	Write a single byte, and return immediately.
+		 * Write a single byte, and return immediately.
 		 *
 		 * @return	`true` if data has been sent, `false` if buffer is full
 		 */
@@ -97,22 +103,27 @@ namespace xpcc
 	};
 
 	/**
-	 * @brief		Spi Master with DMA support
+	 * Spi Master with DMA support.
 	 *
-	 * @author		Niklas Hauser
-	 * @ingroup		peripheral
+	 * @author	Niklas Hauser
+	 * @ingroup	peripheral
+	 * @ingroup	spi
 	 */
 	class SpiBlockMaster : public ::xpcc::Peripheral, public Spi
 	{
 #ifdef __DOXYGEN__
 	public:
 		/**
-		 * @brief	Set the data buffers and length with options and starts a transfer
+		 * Set the data buffers and length with options and starts a transfer
 		 *
-		 * @param[in]	tx			pointer to transmit buffer, set to zero to send dummy bytes
-		 * @param[out]	rx			pointer to receive buffer, set to zero to discard received bytes
-		 * @param		length		length of buffer or number of dummy bytes to be send
-		 * @param		options		buffer options
+		 * @param[in]	tx
+		 *		pointer to transmit buffer, set to `0` to send dummy bytes
+		 * @param[out]	rx
+		 *		pointer to receive buffer, set to `0` to discard received bytes
+		 * @param		length
+		 *		number of bytes to be shifted out
+		 * @param		options
+		 * 		buffer options, @see BufferOptions
 		 *
 		 * @return	`true`	if transfer request was successfully serviced,
 		 *			`false` if another transfer is already progress.
