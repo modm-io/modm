@@ -414,15 +414,15 @@ namespace xpcc
 		 * \see		GPIO__PORT(), GPIO__OCTET()
 		 * \ingroup	gpio
 		 */
-		template <typename T7 = GpioUnused,
-				  typename T6 = GpioUnused,
-				  typename T5 = GpioUnused,
-				  typename T4 = GpioUnused,
-				  typename T3 = GpioUnused,
-				  typename T2 = GpioUnused,
-				  typename T1 = GpioUnused,
-				  typename T0 = GpioUnused>
-		class SoftwareGpioOctet : GpioOctet
+		template <typename T7 = Unused,
+				  typename T6 = Unused,
+				  typename T5 = Unused,
+				  typename T4 = Unused,
+				  typename T3 = Unused,
+				  typename T2 = Unused,
+				  typename T1 = Unused,
+				  typename T0 = Unused>
+		class Port
 		{
 		public:
 			static void
@@ -499,23 +499,23 @@ namespace xpcc
 		 * \see		GPIO__PORT()
 		 * \ingroup	gpio
 		 */
-		template <typename T15 = GpioUnused,
-				  typename T14 = GpioUnused,
-				  typename T13 = GpioUnused,
-				  typename T12 = GpioUnused,
-				  typename T11 = GpioUnused,
-				  typename T10 = GpioUnused,
-				  typename T9  = GpioUnused,
-				  typename T8  = GpioUnused,
-				  typename T7  = GpioUnused,
-				  typename T6  = GpioUnused,
-				  typename T5  = GpioUnused,
-				  typename T4  = GpioUnused,
-				  typename T3  = GpioUnused,
-				  typename T2  = GpioUnused,
-				  typename T1  = GpioUnused,
-				  typename T0  = GpioUnused>
-		class SoftwareGpioWord : GpioWord
+		template <typename T15 = Unused,
+				  typename T14 = Unused,
+				  typename T13 = Unused,
+				  typename T12 = Unused,
+				  typename T11 = Unused,
+				  typename T10 = Unused,
+				  typename T9  = Unused,
+				  typename T8  = Unused,
+				  typename T7  = Unused,
+				  typename T6  = Unused,
+				  typename T5  = Unused,
+				  typename T4  = Unused,
+				  typename T3  = Unused,
+				  typename T2  = Unused,
+				  typename T1  = Unused,
+				  typename T0  = Unused>
+		class DoublePort
 		{
 		public:
 			static void
