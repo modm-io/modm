@@ -83,11 +83,19 @@ namespace xpcc
 							 'frequencies': ["UsbFrequency"],
 							 'sources': [internalClock,
 										externallClock, externalOscillator] }
+%% if target is stm32f2 or target is stm32f4
 %% set systemClock =		{'name': "SystemClock",
 							 'minFrequency': "MHz8",
 							 'maxFrequency': "MHz168",
 							 'sources': [ internalClock, externallClock,
 										  externalOscillator, pll ] }
+%% elif target is stm32f3
+%% set systemClock =		{'name': "SystemClock",
+							 'minFrequency': "MHz16",
+							 'maxFrequency': "MHz72",
+							 'sources': [ internalClock, externallClock,
+										  externalOscillator, pll ] }
+%% endif
 %% set mco1 =				{'name': "MCO1",
 							 'divisions': [1, 2, 3, 4, 5],
 							 'sources': [internalClock, externallClock,

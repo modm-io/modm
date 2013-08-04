@@ -69,11 +69,59 @@ PllCalculatorTest::testStm32F2()
 	testF2(MHz25, MHz48, MHz48);
 }
 
+#define testF3HSE(in, out) \
+	(void)xpcc::stm32::Stm32F3PllSettings<in, out, false>::PllMul
+#define testF3HSI(out) \
+	(void)xpcc::stm32::Stm32F3PllSettings<MHz8, out, true>::PllMul
+
 void
 PllCalculatorTest::testStm32F3()
 {
 	// Go through some common values
-
+	// For HSE a 1-16 prediv can be selected
+	// SystemClock: 72MHz
+	testF3HSE(MHz8,  MHz72);
+	testF3HSE(MHz12, MHz72);
+	testF3HSE(MHz16, MHz72);
+	testF3HSE(MHz18, MHz72);
+	testF3HSE(MHz24, MHz72);
+	testF3HSE(MHz32, MHz72);
+	const bool CanUseUSB72MHz =
+				xpcc::stm32::Stm32F3PllSettings<MHz32, MHz72, false>::CanUseUSB;
+	TEST_ASSERT_EQUALS(CanUseUSB72MHz, true);
+	// SystemClock: 64MHz
+	testF3HSE(MHz8,  MHz64);
+	testF3HSE(MHz12, MHz64);
+	testF3HSE(MHz16, MHz64);
+	testF3HSE(MHz24, MHz64);
+	testF3HSE(MHz32, MHz64);
+	const bool CanUseUSB64MHz =
+				xpcc::stm32::Stm32F3PllSettings<MHz32, MHz64, false>::CanUseUSB;
+	TEST_ASSERT_EQUALS(CanUseUSB64MHz, false);
+	// SystemClock: 48MHz
+	testF3HSE(MHz8,  MHz48);
+	testF3HSE(MHz12, MHz48);
+	testF3HSE(MHz16, MHz48);
+	testF3HSE(MHz24, MHz48);
+	testF3HSE(MHz32, MHz48);
+	const bool CanUseUSB48MHz =
+				xpcc::stm32::Stm32F3PllSettings<MHz32, MHz48, false>::CanUseUSB;
+	TEST_ASSERT_EQUALS(CanUseUSB48MHz, true);
+	// SystemClock: 32MHz
+	testF3HSE(MHz8,  MHz32);
+	testF3HSE(MHz12, MHz32);
+	testF3HSE(MHz16, MHz32);
+	testF3HSE(MHz24, MHz32);
+	testF3HSE(MHz32, MHz32);
+	const bool CanUseUSB32MHz =
+				xpcc::stm32::Stm32F3PllSettings<MHz32, MHz32, false>::CanUseUSB;
+	TEST_ASSERT_EQUALS(CanUseUSB32MHz, false);
+	// Source HSI/2
+	// SystemClock: 32MHz
+	testF3HSI(MHz64);
+	testF3HSI(MHz48);
+	testF3HSI(MHz32);
+	testF3HSI(MHz16);
 }
 
 #define testF4(in, out, usb) \
