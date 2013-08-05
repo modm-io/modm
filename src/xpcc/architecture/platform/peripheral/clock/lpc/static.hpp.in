@@ -46,9 +46,6 @@ namespace xpcc
 {
 	namespace lpc
 	{
-		namespace S
-		{
-
 		/*
 		 * Used to setup pll with constants
 		 */
@@ -101,9 +98,6 @@ namespace xpcc
 
 {{ static.output(clockOut, "xpcc::lpc")}}
 
-
-
-		}
 	}
 }
 

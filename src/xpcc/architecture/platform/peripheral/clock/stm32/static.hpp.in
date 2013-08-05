@@ -46,9 +46,8 @@ namespace xpcc
 {
 	namespace stm32
 	{
-		namespace S
-		{
 
+%% if target is stm32f2 or target is stm32f4
 		/*
 		 * Used to setup pll with constants
 		 */
@@ -69,33 +68,46 @@ namespace xpcc
 				return StartupError::None;
 			}
 		};
+%% elif target is stm32f3
+		/*
+		 * Used to setup pll with constants
+		 */
+		template<int InputFrequency, int OutputFrequency>
+		class PllSetup
+		{
+		private:
+	# warning "TODO: add switch for different sources..."
+			typedef Stm32F3PllSettings<InputFrequency, OutputFrequency, false> p;
+		public:
+			static StartupError
+			enable(ClockTree::PllSource src)
+			{
+				ClockTree::enablePll(src, p::PllMul, p::PllPrediv);
+				return StartupError::None;
+			}
+		};
+%% endif
+
 
 %% set internalClock =		{'name': "InternalClock",
-							 'fixedFrequency': "MHz16" }
+							 'fixedFrequency': "MHz8" }
 %% set externallClock =		{'name': "ExternalClock",
 							 'minFrequency': "MHz4",
-							 'maxFrequency': "MHz26" }
+							 'maxFrequency': "MHz32" }
 %% set externalOscillator =	{'name': "ExternalOscillator",
 							 'minFrequency': "MHz4",
-							 'maxFrequency': "MHz26" }
+							 'maxFrequency': "MHz32" }
+%% if target is stm32f2 or target is stm32f4
 %% set pll =				{'name': "Pll",
 							 'setup': "PllSetup",
 							 'frequencies': ["UsbFrequency"],
 							 'sources': [internalClock,
 										externallClock, externalOscillator] }
-%% if target is stm32f2 or target is stm32f4
 %% set systemClock =		{'name': "SystemClock",
 							 'minFrequency': "MHz8",
 							 'maxFrequency': "MHz168",
 							 'sources': [ internalClock, externallClock,
 										  externalOscillator, pll ] }
-%% elif target is stm32f3
-%% set systemClock =		{'name': "SystemClock",
-							 'minFrequency': "MHz16",
-							 'maxFrequency': "MHz72",
-							 'sources': [ internalClock, externallClock,
-										  externalOscillator, pll ] }
-%% endif
 %% set mco1 =				{'name': "MCO1",
 							 'divisions': [1, 2, 3, 4, 5],
 							 'sources': [internalClock, externallClock,
@@ -106,6 +118,22 @@ namespace xpcc
 							 'sources': [systemClock, externallClock,
 										 externalOscillator, pll] }
 %#							TODO: Add more sources
+%% elif target is stm32f3
+%% set pll =				{'name': "Pll",
+							 'setup': "PllSetup",
+							 'sources': [internalClock,
+										externallClock, externalOscillator] }
+%% set systemClock =		{'name': "SystemClock",
+							 'minFrequency': "MHz16",
+							 'maxFrequency': "MHz72",
+							 'sources': [ internalClock, externallClock,
+										  externalOscillator, pll ] }
+%% set mco1 =				{'name': "MCO",
+							 'divisions': [1, 2, 3, 4, 5],
+							 'sources': [internalClock, externallClock,
+										 externalOscillator, pll, systemClock] }
+%% endif
+
 
 	// Static Clocks/Plls/Osciallators
 {{ static.source(internalClock, "xpcc::stm32") }}
@@ -120,10 +148,9 @@ namespace xpcc
 
 {{ static.output(mco1, "xpcc::stm32")}}
 
+%% if target is stm32f2 or target is stm32f4
 {{ static.output(mco2, "xpcc::stm32")}}
-
-
-		}
+%% endif
 	}
 }
 

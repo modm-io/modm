@@ -15,22 +15,12 @@ GPIO__INPUT(Button, A, 0);
 
 using namespace xpcc::stm32;
 
-static bool
-initClock()
-{
-	// use external 8MHz clock from ST-LINK
-	if (!Clock::enableHse(Clock::HseConfig::HSE_BYPASS)) {
-		return false;
-	}
-	
-	Clock::enablePll(Clock::PllSource::PLL_HSE, Clock::PllMul::MUL_9);
-	return Clock::switchToPll();
-}
-
 // ----------------------------------------------------------------------------
 MAIN_FUNCTION
 {
-	initClock();
+	typedef S::Pll<S::ExternalOscillator<MHz8>, MHz72> clockSource;
+	StartupError err =
+		S::SystemClock<clockSource>::enable();
 
 	LedNorth::setOutput(xpcc::Gpio::LOW);
 	LedNorthEast::setOutput(xpcc::Gpio::HIGH);

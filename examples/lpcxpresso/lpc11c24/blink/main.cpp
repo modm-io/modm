@@ -9,11 +9,11 @@ using namespace xpcc::lpc;
 // ----------------------------------------------------------------------------
 MAIN_FUNCTION
 {
-	// New Static Clock Setup (S:: => Static)
-	typedef S::Pll<S::ExternalOscillator<MHz12>, MHz48> clockSource;
-	// typedef S::ExternalOscillator<MHz12> clockSource;
+	// New Static Clock Setup ( => Static)
+	typedef Pll<ExternalOscillator<MHz12>, MHz48> clockSource;
+	// typedef ExternalOscillator<MHz12> clockSource;
 	StartupError err =
-		S::SystemClock<clockSource>::enable();
+		SystemClock<clockSource>::enable();
 
 	Led::setOutput();
 
