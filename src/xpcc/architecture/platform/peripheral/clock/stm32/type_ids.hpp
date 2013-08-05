@@ -41,6 +41,7 @@ namespace xpcc
 			typedef struct{} ExternalOscillator;
 			typedef struct{} Pll;
 			typedef struct{} SystemClock;
+			typedef struct{} MCO;
 			typedef struct{} MCO1;
 			typedef struct{} MCO2;
 		}

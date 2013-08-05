@@ -87,8 +87,17 @@ namespace xpcc
 
 			enum class PllSource
 			{
-				Hsi = 0,		///< High speed internal clock (16 MHz)
-				Hse = 1,		///< High speed external clock (see HseConfig)
+%% if target is stm32f2 or target is stm32f4
+				/// High speed internal clock (16 MHz)
+				Hsi = RCC_PLLCFGR_PLLSRC_HSI,
+				/// High speed external clock (see HseConfig)
+				Hse = RCC_PLLCFGR_PLLSRC_HSE,
+%% elif target is stm32f3
+				/// High speed internal clock (16 MHz)
+				Hsi = RCC_CFGR_PLLSRC_HSI_Div2,
+				/// High speed external clock (see HseConfig)
+				Hse = RCC_CFGR_PLLSRC_PREDIV1,
+%% endif
 				InternalClock = Hsi,
 				ExternalClock = Hse,
 				ExternalOscillator = Hse,
@@ -103,7 +112,7 @@ namespace xpcc
 				ExternalClock = Hse,
 				ExternalOscillator = Hse,
 			};
-
+%% if target is stm32f2 or target is stm32f4
 			enum class MCO1Source : uint32_t
 			{
 				InternalClock = 0,
@@ -119,6 +128,24 @@ namespace xpcc
 				ExternalOscillator = RCC_CFGR_MCO1_1,
 				Pll = RCC_CFGR_MCO1_1 | RCC_CFGR_MCO1_0,
 			};
+%% endif
+
+%% if target is stm32f3
+			enum class MCOSource : uint32_t
+			{
+				SystemClock   = RCC_CFGR_MCO_SYSCLK,
+				InternalClock = RCC_CFGR_MCO_HSI,
+				ExternalClock = RCC_CFGR_MCO_HSE,
+				ExternalOscillator = RCC_CFGR_MCO_HSE,
+				Pll = RCC_CFGR_MCO_PLL,	///< divided by 2
+			};
+
+			enum class UsbPrescaler : uint32_t
+			{
+				DivideBy1Point5 = RCC_CFGR_USBPRE,
+				DoNotDivide     = 0,
+			};
+%% endif
 		public:
 			/*
 			 * XPCC Static Clock Standard Interface
@@ -127,7 +154,7 @@ namespace xpcc
 			static inline bool
 			enableSource(ClockSource src, uint32_t kHz, uint32_t waitCycles = 1500);
 
-
+%% if target is stm32f2 or target is stm32f4
 			/**
 			 * Enable PLL.
 			 * 
@@ -157,14 +184,19 @@ namespace xpcc
 			 * Example:
 			 * 
 			 */
-
 			static inline void
 			enablePll(PllSource source, uint8_t pllM,
 							uint16_t pllN, uint8_t pllP, uint8_t pllQ);
+%% elif target is stm32f3
+			static inline void
+			enablePll(PllSource source, UsbPrescaler usb,
+						uint8_t pllMul, uint8_t pllPrediv);
+%% endif
 
 			static inline bool
 			switchSystemClockTo(SystemClockSource src, uint32_t waitCycles = 1500);
 
+%% if target is stm32f2 or target is stm32f4
 			static inline void
 			connectToMCO1(MCO1Source src)
 			{
@@ -194,6 +226,21 @@ namespace xpcc
 				if (div > 1) tmp |= (div + 2) << 27;
 				RCC->CFGR = tmp;
 			}
+%% elif target is stm32f3
+			static inline void
+			connectToMCO(MCOSource src)
+			{
+				uint32_t tmp = RCC->CFGR & ~(RCC_CFGR_MCO);
+				RCC->CFGR = tmp | static_cast<uint32_t>(src);
+			}
+
+			static inline void
+			setMCODivision(int div)
+			{
+				(void)div; // avoid compiler warning
+				// Division can not be changed. This is only a placeholder.
+			}
+%% endif
 		};
 	}
 }

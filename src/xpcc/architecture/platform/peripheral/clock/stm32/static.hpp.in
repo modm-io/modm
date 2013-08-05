@@ -60,9 +60,6 @@ namespace xpcc
 			typedef Stm32F2F4PllSettings<MHz64,  InputFrequency, OutputFrequency, UsbFrequency> p;
 %% elif target is stm32f4
 			typedef Stm32F2F4PllSettings<MHz192, InputFrequency, OutputFrequency, UsbFrequency> p;
-%% elif target is stm32f3
-			typedef Stm32F3PllSettings<InputFrequency, OutputFrequency,
-									(Source == ClockTree::PllSource::Hsi)> p;
 %% endif
 		public:
 			static StartupError
@@ -76,17 +73,22 @@ namespace xpcc
 		/*
 		 * Used to setup pll with constants
 		 */
-		template<int InputFrequency, int OutputFrequency>
+		template<int InputFrequency, int OutputFrequency,
+		ClockTree::PllSource Source>
 		class PllSetup
 		{
 		private:
-	# warning "TODO: add switch for different sources..."
-			typedef Stm32F3PllSettings<InputFrequency, OutputFrequency, false> p;
+			typedef Stm32F3PllSettings<InputFrequency, OutputFrequency,
+									(Source == ClockTree::PllSource::Hsi)> p;
 		public:
 			static StartupError
-			enable(ClockTree::PllSource src)
+			enable()
 			{
-				ClockTree::enablePll(src, p::PllMul, p::PllPrediv);
+				constexpr ClockTree::UsbPrescaler usb =
+							(p::CanUseUSB && (OutputFrequency == MHz72))?
+							ClockTree::UsbPrescaler::DivideBy1Point5 :
+							ClockTree::UsbPrescaler::DoNotDivide;
+				ClockTree::enablePll(Source, usb, p::PllMul, p::PllPrediv);
 				return StartupError::None;
 			}
 		};
