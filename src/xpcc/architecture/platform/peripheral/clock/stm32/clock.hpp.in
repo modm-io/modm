@@ -124,7 +124,7 @@ namespace xpcc
 			 * XPCC Static Clock Standard Interface
 			 * requires source frequency in **kHz**
 			 */
-			static bool
+			static inline bool
 			enableSource(ClockSource src, uint32_t kHz, uint32_t waitCycles = 1500);
 
 
@@ -158,21 +158,21 @@ namespace xpcc
 			 * 
 			 */
 
-			static void
+			static inline void
 			enablePll(PllSource source, uint8_t pllM,
 							uint16_t pllN, uint8_t pllP, uint8_t pllQ);
 
-			static bool
+			static inline bool
 			switchSystemClockTo(SystemClockSource src, uint32_t waitCycles = 1500);
 
-			static void
+			static inline void
 			connectToMCO1(MCO1Source src)
 			{
 				uint32_t tmp = RCC->CFGR & ~(RCC_CFGR_MCO1);
 				RCC->CFGR = tmp | static_cast<uint32_t>(src);
 			}
 
-			static void
+			static inline void
 			setMCO1Division(int div)
 			{
 				uint32_t tmp = RCC->CFGR & ~(RCC_CFGR_MCO1PRE);
@@ -180,14 +180,14 @@ namespace xpcc
 				RCC->CFGR = tmp;
 			}
 
-			static void
+			static inline void
 			connectToMCO2(MCO2Source src)
 			{
 				uint32_t tmp = RCC->CFGR & ~(RCC_CFGR_MCO2);
 				RCC->CFGR = tmp | static_cast<uint32_t>(src);
 			}
 
-			static void
+			static inline void
 			setMCO2Division(int div)
 			{
 				uint32_t tmp = RCC->CFGR & ~(RCC_CFGR_MCO2PRE);
@@ -197,5 +197,7 @@ namespace xpcc
 		};
 	}
 }
+
+#include "clock_impl.hpp"
 
 #endif	//  XPCC_STM32__CLOCK_HPP

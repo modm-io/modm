@@ -3,7 +3,7 @@
 <rca version="1.0">
 	<driver type="clock" name="stm32">
 		<template>static.hpp.in</template>
-		<template>clock.cpp.in</template>
+		<template>clock_impl.hpp.in</template>
 		<template>clock.hpp.in</template>
 		<static>pll_calculator.hpp</static>
 		<static>type_ids.hpp</static>
