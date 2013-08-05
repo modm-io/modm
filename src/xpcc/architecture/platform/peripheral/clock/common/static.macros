@@ -104,8 +104,8 @@ public:
 		err = {{ src.name }}<InputFrequency>::enable(waitCycles);
 		if (err != StartupError::None) return err;
 		return PllSetup<InputFrequency,
-				OutputFrequency{{ template }}>::enable(
-				ClockTree::PllSource::{{ src.name }});
+				OutputFrequency{{ template }},
+				ClockTree::PllSource::{{ src.name }}>::enable();
 	}
 	static constexpr int
 	outputFrequency = OutputFrequency;

@@ -51,7 +51,8 @@ namespace xpcc
 		/*
 		 * Used to setup pll with constants
 		 */
-		template<int InputFrequency, int OutputFrequency, int UsbFrequency>
+		template<int InputFrequency, int OutputFrequency, int UsbFrequency,
+		ClockTree::PllSource Source>
 		class PllSetup
 		{
 		private:
@@ -59,12 +60,15 @@ namespace xpcc
 			typedef Stm32F2F4PllSettings<MHz64,  InputFrequency, OutputFrequency, UsbFrequency> p;
 %% elif target is stm32f4
 			typedef Stm32F2F4PllSettings<MHz192, InputFrequency, OutputFrequency, UsbFrequency> p;
+%% elif target is stm32f3
+			typedef Stm32F3PllSettings<InputFrequency, OutputFrequency,
+									(Source == ClockTree::PllSource::Hsi)> p;
 %% endif
 		public:
 			static StartupError
-			enable(ClockTree::PllSource src)
+			enable()
 			{
-				ClockTree::enablePll(src, p::PllM, p::PllN, p::PllP, p::PllQ);
+				ClockTree::enablePll(Source, p::PllM, p::PllN, p::PllP, p::PllQ);
 				return StartupError::None;
 			}
 		};
