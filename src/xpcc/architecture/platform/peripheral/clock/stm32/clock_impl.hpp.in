@@ -113,7 +113,7 @@ xpcc::stm32::ClockTree::enablePll(PllSource source, UsbPrescaler usb,
 	tmp |= static_cast<uint32_t>(usb);
 
 	// Pll multiplication factor
-	tmp |= static_cast<uint32_t>(pllMul - 2) & RCC_CFGR_PLLMULL;
+	tmp |= (static_cast<uint32_t>(pllMul - 2) << 18) & RCC_CFGR_PLLMULL;
 
 	RCC->CFGR = tmp;
 
