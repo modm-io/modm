@@ -19,25 +19,25 @@ using namespace xpcc::stm32;
 // ----------------------------------------------------------------------------
 MAIN_FUNCTION
 {
-	// New Static Clock Setup (S:: => Static)
-	//typedef S::Pll<S::ExternalOscillator<MHz8>, MHz168, MHz48> clockSource;
-	// typedef S::Pll<S::InternalClock<MHz16>, MHz168, MHz48> clockSource;
-	typedef S::ExternalOscillator<MHz8> clockSource;
-	// typedef S::InternalClock<MHz16> clockSource;
+	// New Static Clock Setup
+	//typedef Pll<ExternalOscillator<MHz8>, MHz168, MHz48> clockSource;
+	// typedef Pll<InternalClock<MHz16>, MHz168, MHz48> clockSource;
+	typedef ExternalOscillator<MHz8> clockSource;
+	// typedef InternalClock<MHz16> clockSource;
 	StartupError err =
-		S::SystemClock<clockSource>::enable();
+		SystemClock<clockSource>::enable();
 
 	// Output clock source on PA8
 	ClockOut::setOutput(Gpio::PUSH_PULL);
-	ClockOut::connect(S::MCO1::Id);
-	S::MCO1::setDivision(S::MCO1::Division::By1);
-	S::MCO1::connect(clockSource::Id);
+	ClockOut::connect(MCO1::Id);
+	MCO1::setDivision(MCO1::Division::By1);
+	MCO1::connect(clockSource::Id);
 
 	// Output SystemClock on PC9
 	SystemClockOut::setOutput(Gpio::PUSH_PULL);
-	SystemClockOut::connect(S::MCO2::Id);
-	S::MCO2::setDivision(S::MCO2::Division::By1);
-	S::MCO2::connect(S::SystemClock<clockSource>::Id);
+	SystemClockOut::connect(MCO2::Id);
+	MCO2::setDivision(MCO2::Division::By1);
+	MCO2::connect(SystemClock<clockSource>::Id);
 
 	LedOrange::setOutput(xpcc::Gpio::HIGH);
 	LedGreen::setOutput(xpcc::Gpio::LOW);

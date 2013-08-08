@@ -11,6 +11,8 @@ GPIO__OUTPUT(LedSouthWest, E, 14); // LD8
 GPIO__OUTPUT(LedWest,      E, 15); // LD6
 GPIO__OUTPUT(LedNorthWest, E,  8); // LD4
 
+GPIO__OUTPUT(ClockOut, A,  8);
+
 GPIO__INPUT(Button, A, 0);
 
 using namespace xpcc::stm32;
@@ -18,9 +20,9 @@ using namespace xpcc::stm32;
 // ----------------------------------------------------------------------------
 MAIN_FUNCTION
 {
-	typedef S::Pll<S::ExternalOscillator<MHz8>, MHz72> clockSource;
+	typedef Pll<ExternalOscillator<MHz8>, MHz72> clockSource;
 	StartupError err =
-		S::SystemClock<clockSource>::enable();
+		SystemClock<clockSource>::enable();
 
 	LedNorth::setOutput(xpcc::Gpio::LOW);
 	LedNorthEast::setOutput(xpcc::Gpio::HIGH);
@@ -30,7 +32,12 @@ MAIN_FUNCTION
 	LedSouthWest::setOutput(xpcc::Gpio::HIGH);
 	LedWest::setOutput(xpcc::Gpio::HIGH);
 	LedNorthWest::setOutput(xpcc::Gpio::HIGH);
-	
+
+	// Output SystemClock on PA8
+	ClockOut::setOutput(Gpio::PUSH_PULL);
+	ClockOut::connect(MCO::Id);
+	MCO::connect(clockSource::Id);
+
 	while (1)
 	{
 		LedNorth::toggle();
