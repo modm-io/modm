@@ -137,21 +137,32 @@
 
 %% macro startupCode()
 
-%% if target is stm32f4
-	// prepare flash latency for working at 168MHz and supply voltage > 2.7
-	FLASH->ACR = (FLASH->ACR & ~FLASH_ACR_LATENCY) | FLASH_WAIT_STATE_5;
-%% elif target is stm32f2
+// TODO: check F_CPU to determine flash latency
+%% if target is stm32f2
 	// prepare flash latency for working at 120MHz and supply voltage > 2.7
 	FLASH->ACR = (FLASH->ACR & ~FLASH_ACR_LATENCY) | FLASH_WAIT_STATE_3;
+%% elif target is stm32f3
+	// prepare flash latency for working at 72MHz and supply voltage > 2.7
+	FLASH->ACR = (FLASH->ACR & ~FLASH_ACR_LATENCY) | FLASH_ACR_LATENCY_1;
+%% elif target is stm32f4
+	// prepare flash latency for working at 168MHz and supply voltage > 2.7
+	FLASH->ACR = (FLASH->ACR & ~FLASH_ACR_LATENCY) | FLASH_WAIT_STATE_5;
 %% endif
 
+%% if target is stm32f2 or target is stm32f4
 	// enable flash prefetch
 	FLASH->ACR |= FLASH_ACR_PRFTEN | FLASH_ACR_DCEN | FLASH_ACR_ICEN;
+%% elif target is stm32f3
+	// enable flash prefetch
+	FLASH->ACR |= FLASH_ACR_PRFTBE;
+%% endif
 
-%% if target is stm32f4
+%% if target is stm32f3 or target is stm32f4
 	// Enable FPU in privileged and user mode
 	SCB->CPACR |= ((3UL << 10*2) | (3UL << 11*2));  // set CP10 and CP11 Full Access
-	
+%% endif
+
+%% if target is stm32f4
 	// Enable Core Coupled Memory (CCM)
 	RCC->AHB1ENR |= RCC_AHB1ENR_CCMDATARAMEN;
 %% endif
