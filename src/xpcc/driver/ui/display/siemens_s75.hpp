@@ -99,6 +99,11 @@ namespace xpcc
 			public BufferedGraphicDisplay<WIDTH, HEIGHT>
 	{
 	public:
+		SiemensS75Common(MEMORY& interface) :
+			interface(interface)
+		{
+		}
+
 		void
 		update(void);
 
@@ -111,6 +116,9 @@ namespace xpcc
 
 		ALWAYS_INLINE void
 		lcdSettings();
+
+	private:
+		MEMORY& interface;
 	};
 
 	template <typename MEMORY, typename RESET>
@@ -135,12 +143,18 @@ namespace xpcc
 	class SiemensS75LandscapeLeft :
 		public SiemensS75Common<MEMORY, RESET, 176, 136, xpcc::Orientation::LandscapeLeft>
 	{
+	public:
+		explicit SiemensS75LandscapeLeft(MEMORY& interface) :
+		SiemensS75Common<MEMORY, RESET, 176, 136, xpcc::Orientation::LandscapeLeft>(interface) { }
 	};
 
 	template <typename MEMORY, typename RESET>
 	class SiemensS75LandscapeRight :
 		public SiemensS75Common<MEMORY, RESET, 176, 136, xpcc::Orientation::LandscapeRight>
 	{
+	public:
+		explicit SiemensS75LandscapeRight(MEMORY& interface) :
+		SiemensS75Common<MEMORY, RESET, 176, 136, xpcc::Orientation::LandscapeRight>(interface) { }
 	};
 }
 

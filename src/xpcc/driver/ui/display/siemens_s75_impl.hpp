@@ -47,7 +47,7 @@ xpcc::SiemensS75Common<MEMORY, RESET, WIDTH, HEIGHT, ORIENTATION>::update()
 	case xpcc::Orientation::LandscapeRight:
 	{
 		// Set CGRAM Address to height - 1 = upper left corner
-		MEMORY::writeRegister(0x21, 0xAF00);
+		interface.writeRegister(0x21, 0xAF00);
 		// size of the XPCC Display buffer, not the hardware pixels
 		width  = 176;
 		height = 136 / 8; // Display is only 132 pixels high.
@@ -56,14 +56,14 @@ xpcc::SiemensS75Common<MEMORY, RESET, WIDTH, HEIGHT, ORIENTATION>::update()
 	case xpcc::Orientation::Portrait:
 	{
 		// Set CGRAM Address to 0 = upper left corner
-		MEMORY::writeRegister(0x21, 0x0000);
+		interface.writeRegister(0x21, 0x0000);
 		width  = 132;
 		height = 176 / 8;
 	}
 	break;
 	case xpcc::Orientation::PortraitUpsideDown:
 	{
-		MEMORY::writeRegister(0x21, 131);
+		interface.writeRegister(0x21, 131);
 		width  = 132;
 		height = 176 / 8;
 	}
@@ -71,16 +71,10 @@ xpcc::SiemensS75Common<MEMORY, RESET, WIDTH, HEIGHT, ORIENTATION>::update()
 	}
 
 	// Set instruction register to "RAM Data write"
-	MEMORY::writeIndex(0x22);
+	interface.writeIndex(0x22);
 
 	const uint16_t maskBlank  = 0x0000; // RRRR RGGG GGGB BBBB
 	const uint16_t maskFilled = 0x37e0; // RRRR RGGG GGGB BBBB
-
-	const uint8_t fill_h = maskFilled >> 8;
-	const uint8_t fill_l = maskFilled & 0xff;
-
-	const uint8_t blank_h = maskBlank >> 8;
-	const uint8_t blank_l = maskBlank & 0xff;
 
 	for (int_fast16_t x = 0; x < width; ++x)
 	{
@@ -88,7 +82,7 @@ xpcc::SiemensS75Common<MEMORY, RESET, WIDTH, HEIGHT, ORIENTATION>::update()
 		{
 			// group of 8 black-and-white pixels
 			uint_fast8_t group = this->buffer[x][y];
-			uint8_t PortBuffer[16];
+			uint16_t PortBuffer[8];
 			uint_fast8_t PortIdx = 0;
 
 			uint_fast8_t pixels;
@@ -108,17 +102,15 @@ xpcc::SiemensS75Common<MEMORY, RESET, WIDTH, HEIGHT, ORIENTATION>::update()
 
 			for (uint_fast8_t pix = 0; pix < pixels; ++pix, group >>= 1) {
 				if (group & 1) {
-					PortBuffer[PortIdx++] = fill_h;
-					PortBuffer[PortIdx++] = fill_l;
+					PortBuffer[PortIdx++] = maskFilled;
 				}
 				else {
-					PortBuffer[PortIdx++] = blank_h;
-					PortBuffer[PortIdx++] = blank_l;
+					PortBuffer[PortIdx++] = maskBlank;
 				}
 			} // pix
 
 			for (uint_fast16_t ii = 0; ii < PortIdx; ++ii) {
-				MEMORY::writeData(PortBuffer[ii]);
+				interface.writeData(PortBuffer[ii]);
 			}
 		} // y
 	} // x
@@ -142,14 +134,14 @@ void
 xpcc::SiemensS75Common<MEMORY, RESET, WIDTH, HEIGHT, ORIENTATION>::lcdCls(const uint16_t colour)
 {
 	// Set CGRAM Address to 0 = upper left corner
-	MEMORY::writeRegister(0x21, 0x0000);
+	interface.writeRegister(0x21, 0x0000);
 
 	// Set instruction register to "RAM Data write"
-	MEMORY::writeIndex(0x22);
+	interface.writeIndex(0x22);
 
 	// Write all pixels to the same colour
 	for (uint_fast16_t ii = 0; ii < 132 * 176; ++ii) {
-		MEMORY::writeData(colour);
+		interface.writeData(colour);
 	}
 }
 
@@ -162,18 +154,18 @@ xpcc::SiemensS75Common<MEMORY, RESET, WIDTH, HEIGHT, ORIENTATION>::lcdSettings()
 	RESET::set();
 	xpcc::delay_ms(50);
 
-	MEMORY::writeRegister(0x00, 0x0001); // R00: Start oscillation
+	interface.writeRegister(0x00, 0x0001); // R00: Start oscillation
 	xpcc::delay_ms(10);
 
 	//power on sequence
-	MEMORY::writeRegister(0x10, 0x1f92);	// R10: Power Control 1
-	MEMORY::writeRegister(0x11, 0x0014);	// R11: Power Control 2
-	MEMORY::writeRegister(0x00, 0x0001);	// R00: Start oscillation
-	MEMORY::writeRegister(0x10, 0x1f92);	// R10: Power Control 1
-	MEMORY::writeRegister(0x11, 0x001c); // R11: Power Control 2
-	MEMORY::writeRegister(0x28, 0x0006);	// R28: VCOM OTP (1)
-	MEMORY::writeRegister(0x02, 0x0000);	// R02: LCD drive AC control
-	MEMORY::writeRegister(0x12, 0x040f); // R12: Power Control 2
+	interface.writeRegister(0x10, 0x1f92);	// R10: Power Control 1
+	interface.writeRegister(0x11, 0x0014);	// R11: Power Control 2
+	interface.writeRegister(0x00, 0x0001);	// R00: Start oscillation
+	interface.writeRegister(0x10, 0x1f92);	// R10: Power Control 1
+	interface.writeRegister(0x11, 0x001c);	// R11: Power Control 2
+	interface.writeRegister(0x28, 0x0006);	// R28: VCOM OTP (1)
+	interface.writeRegister(0x02, 0x0000);	// R02: LCD drive AC control
+	interface.writeRegister(0x12, 0x040f);	// R12: Power Control 2
 
 	xpcc::delay_ms(100);
 
@@ -181,16 +173,16 @@ xpcc::SiemensS75Common<MEMORY, RESET, WIDTH, HEIGHT, ORIENTATION>::lcdSettings()
 	switch(ORIENTATION)
 	{
 	case xpcc::Orientation::LandscapeLeft:
-		MEMORY::writeRegister(0x03, 0x7820);
+		interface.writeRegister(0x03, 0x7820);
 		break;
 	case xpcc::Orientation::LandscapeRight:
-		MEMORY::writeRegister(0x03, 0x7810);
+		interface.writeRegister(0x03, 0x7810);
 		break;
 	case xpcc::Orientation::Portrait:
-		MEMORY::writeRegister(0x03, 0x7838);
+		interface.writeRegister(0x03, 0x7838);
 		break;
 	case xpcc::Orientation::PortraitUpsideDown:
-		MEMORY::writeRegister(0x03, 0x7808);
+		interface.writeRegister(0x03, 0x7808);
 		break;
 	}
 
@@ -208,11 +200,11 @@ xpcc::SiemensS75Common<MEMORY, RESET, WIDTH, HEIGHT, ORIENTATION>::lcdSettings()
 	 * 0x7800
 	 */
 
-	MEMORY::writeRegister(0x01, 0x31af);	// R01: Driver output control
-	MEMORY::writeRegister(0x07, 0x0033);	// R07: Display Control
+	interface.writeRegister(0x01, 0x31af);	// R01: Driver output control
+	interface.writeRegister(0x07, 0x0033);	// R07: Display Control
 
-	MEMORY::writeRegister(0x44, 0x8300); // Horizontal RAM Address
-	MEMORY::writeRegister(0x45, 0xaf00); // Vertical RAM Address
+	interface.writeRegister(0x44, 0x8300); // Horizontal RAM Address
+	interface.writeRegister(0x45, 0xaf00); // Vertical RAM Address
 	xpcc::delay_ms(10);
 
 	// colourful test
