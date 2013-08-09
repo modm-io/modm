@@ -79,7 +79,7 @@ xpcc::BlockAllocator<T, BLOCK_SIZE>::initialize(void * heapStart, void * heapEnd
 {
 	start = alignPointer(heapStart);
 	
-	// 2 bytes needed for the management data at the end
+	// 2(4) bytes needed for the management data at the end
 	uintptr_t memory = (uintptr_t) heapEnd - (uintptr_t) start - sizeof(T);
 	
 	// integer division which will automatically round down
@@ -160,16 +160,20 @@ xpcc::BlockAllocator<T, BLOCK_SIZE>::free(void *ptr)
 	T freeSlots = slots;
 	
 	// check whether the slots above are free
-	slots = *(p + slots * BLOCK_SIZE);
-	if (slots < 0) {
-		freeSlots += -slots;
+	if (p + slots * BLOCK_SIZE < end) {
+		slots = *(p + slots * BLOCK_SIZE);
+		if (slots < 0) {
+			freeSlots += -slots;
+		}
 	}
 	
 	// check the slots below
-	slots = *(p - 1);
-	if (slots < 0) {
-		p += slots * BLOCK_SIZE;
-		freeSlots += -slots;
+	if (p - 1 >= start) {
+		slots = *(p - 1);
+		if (slots < 0) {
+			p += slots * BLOCK_SIZE;
+			freeSlots += -slots;
+		}
 	}
 	
 	// write the markers
@@ -225,7 +229,11 @@ xpcc::BlockAllocator<T, BLOCK_SIZE>::alignPointer(void * ptr) const
 {
 	// (XPCC__ALIGNMENT - 1) is used as a bitmask
 	std::size_t misalignment = ((uintptr_t) ptr & (XPCC__ALIGNMENT - 1));
+#if XPCC__ALIGNMENT == 8
+	const uint8_t offset[8] = { 6, 5, 4, 3, 2, 1, 0, 7 };
+#else
 	const uint8_t offset[4] = { 2, 1, 0, 3 };
+#endif
 	
 	return (T *) (((uintptr_t) ptr) + offset[misalignment]);
 }

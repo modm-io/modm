@@ -445,9 +445,9 @@ namespace xpcc
 			 * @param	bitrate		Desired Frequency of the SPI clock.
 			 * @param	mode		Select the Spi Mode. Default is MODE_0.
 			 * @param	over8		Using over8 sets the Oversampling down from 16
-			 * 			to 8 hovewer in SPI Mode this should have effect on
-			 * 			sample and hold type only, since Data are sampled
-			 * 			at clock edges. Benefit of over8 is a doubled maximal
+			 * 			to 8 however in SPI Mode this has effect on
+			 * 			sample and hold time only, since Data are sampled
+			 * 			at clock edges. Benefit of over8 is a doubled maximum
 			 * 			bitrate.
 			 */
 			static void

@@ -89,6 +89,12 @@ xpcc::lpc::Uart1::read(uint8_t *buffer, uint8_t n)
 
 xpcc::lpc::Uart1::Uart1(uint32_t baudrate)
 {
+	initialize(baudrate);
+} // Uart1 constructor
+
+void
+xpcc::lpc::Uart1::initialize(uint32_t baudrate)
+{
 	/*  UART I/O config. PIO1_6 and PIO1_7 are always Rx/Tx */
 	LPC_IOCON->PIO1_6 &= ~0x07;
 	LPC_IOCON->PIO1_6 |= 0x01;     /* UART RXD */
@@ -115,7 +121,7 @@ xpcc::lpc::Uart1::Uart1(uint32_t baudrate)
 		regVal = LPC_UART->RBR;	/* Dump data from RX FIFO */
 	}
 
-} // Uart1 constructor
+} // Uart1 initialize
 
 // ----------------------------------------------------------------------------
 // ----------------------------------------------------------------------------
@@ -317,6 +323,12 @@ xpcc::lpc::BufferedUart1::write(const uint8_t *buffer, uint8_t n)
 	return;
 #endif
 } // write buffer
+
+bool
+xpcc::lpc::BufferedUart1::read(uint8_t & c)
+{
+	return xpcc::lpc::Uart1::read(c);
+}
 
 // ----------------------------------------------------------------------------
 

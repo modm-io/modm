@@ -45,6 +45,9 @@
 #define PIO1_2		R_PIO1_2
 #define PIO1_3		SWDIO_PIO1_3
 
+
+#define IOCON_ADMODE_DIGITAL (1<<7)	// Set Pin to Digital Mode
+
 /*
  * 12-bit ports.
  */
@@ -89,12 +92,12 @@ namespace xpcc
 		} \
 		ALWAYS_INLINE static void \
 		setOutput(::xpcc::lpc::OutputType type = ::xpcc::lpc::PUSH_PULL) { \
-			LPC_IOCON->CONCAT4(PIO, port, _, pin) = type; \
+			LPC_IOCON->CONCAT4(PIO, port, _, pin) = type | IOCON_ADMODE_DIGITAL; \
 			CONCAT(LPC_GPIO, port)->DIR |= 1 << pin; \
 		} \
 		ALWAYS_INLINE static void \
 		setInput(::xpcc::lpc::InputType type = ::xpcc::lpc::FLOATING) { \
-			LPC_IOCON->CONCAT4(PIO, port, _, pin)  =       type ; \
+			LPC_IOCON->CONCAT4(PIO, port, _, pin)  =       type | IOCON_ADMODE_DIGITAL; \
 			CONCAT(LPC_GPIO, port)->DIR           &= ~(1 << pin); \
 		} \
 		ALWAYS_INLINE static void set()    { CONCAT(LPC_GPIO, port)->MASKED_ACCESS[1 << pin] = (1 << pin); } \
@@ -133,7 +136,7 @@ namespace xpcc
 		} \
 		ALWAYS_INLINE static void \
 		setOutput(::xpcc::lpc::OutputType type = ::xpcc::lpc::PUSH_PULL) { \
-			LPC_IOCON->CONCAT4(PIO, port, _, pin) = type; \
+			LPC_IOCON->CONCAT4(PIO, port, _, pin) = type | IOCON_ADMODE_DIGITAL; \
 			CONCAT(LPC_GPIO, port)->DIR |= 1 << pin; \
 		} \
 		ALWAYS_INLINE static void set()            { CONCAT(LPC_GPIO, port)->MASKED_ACCESS[1 << pin] = (1 << pin); } \
@@ -170,7 +173,7 @@ namespace xpcc
 	struct name { \
 		ALWAYS_INLINE static void \
 		setInput(::xpcc::lpc::InputType type = ::xpcc::lpc::FLOATING) { \
-			LPC_IOCON->CONCAT4(PIO, port, _, pin)  =       type ; \
+			LPC_IOCON->CONCAT4(PIO, port, _, pin)  =       type | IOCON_ADMODE_DIGITAL; \
 			CONCAT(LPC_GPIO, port)->DIR           &= ~(1 << pin); \
 		} \
 		ALWAYS_INLINE static bool \

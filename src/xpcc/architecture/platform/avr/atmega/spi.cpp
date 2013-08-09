@@ -101,27 +101,11 @@ xpcc::atmega::SpiMaster::transfer(TransferOptions options)
 	return true;
 }
 
-bool
-xpcc::atmega::SpiMaster::transferSync(TransferOptions options)
-{
-	return transfer(options);
-}
 
 bool
 xpcc::atmega::SpiMaster::isFinished()
 {
 	return !(status & BUFFER_IS_BUSY_SYNC_bm);
-}
-
-// ----------------------------------------------------------------------------
-uint8_t
-xpcc::atmega::SpiMaster::write(uint8_t data)
-{
-	SPDR = data;
-	while (!(SPSR & (1 << SPIF))) {
-		// wait for the transmission to complete
-	}
-	return SPDR;
 }
 
 #endif

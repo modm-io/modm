@@ -68,7 +68,7 @@ public:
 		this->bytesWritten = 0;
 	}
 	
-	char buffer[20];
+	char buffer[100];
 	int bytesWritten;
 };
 
@@ -92,12 +92,12 @@ IoStreamTest::tearDown()
 void
 IoStreamTest::testString()
 {
-	char string[] = "abc";
+	char string[] = "abc d ";
 	
 	(*stream) << string;
 	
-	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 3);
-	TEST_ASSERT_EQUALS(device.bytesWritten, 3);
+	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 6);
+	TEST_ASSERT_EQUALS(device.bytesWritten, 6);
 }
 
 FLASH_STORAGE_STRING(flashString) = "abc";
@@ -363,4 +363,57 @@ IoStreamTest::testHex4()
 
 	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 8);
 	TEST_ASSERT_EQUALS(device.bytesWritten, 8);
+}
+
+// ----------------------------------------------------------------------------
+void
+IoStreamTest::testBin1()
+{
+	char string[] = "00010010";
+
+	char c = 0x12;
+
+	(*stream) << xpcc::bin << c;
+
+	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 8);
+	TEST_ASSERT_EQUALS(device.bytesWritten, 8);
+}
+
+void
+IoStreamTest::testBin2()
+{
+	char string[] = "0100100001100001011011000110110001101111";
+
+	char s[] = "Hallo";
+
+	(*stream) << xpcc::bin << s;
+
+	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 40);
+	TEST_ASSERT_EQUALS(device.bytesWritten, 40);
+}
+
+void
+IoStreamTest::testBin3()
+{
+	char string[] = "0000000100100011";
+
+	int16_t i = 0x0123;
+
+	(*stream) << xpcc::bin << i;
+
+	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 16);
+	TEST_ASSERT_EQUALS(device.bytesWritten, 16);
+}
+
+void
+IoStreamTest::testBin4()
+{
+	char string[] = "00010010001101000101011001000101";
+
+	int32_t i = 0x12345645;
+
+	(*stream) << xpcc::bin << i;
+
+	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 32);
+	TEST_ASSERT_EQUALS(device.bytesWritten, 32);
 }

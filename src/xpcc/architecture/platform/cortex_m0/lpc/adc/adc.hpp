@@ -67,7 +67,7 @@ namespace xpcc {
 		 * TOOD:
 		 * - Overrun flag support
 		 * - Enable/Disable/Test Interrupts
-		 * - Clock setting dependig on the CPU frequency. 48 MHz is used now.
+		 * - Clock setting depending on the CPU frequency. 48 MHz is used now.
 		 */
 		class Adc
 		{
@@ -135,20 +135,16 @@ namespace xpcc {
 			configurePins(uint8_t channelBitmask = 0xff)
 			{
 				  if (channelBitmask & 0x01) {
-					  LPC_IOCON->R_PIO0_11 &= ~0x8F; /*  ADC I/O config */
-					  LPC_IOCON->R_PIO0_11 |= 0x02;  /* ADC IN0 */
+					  LPC_IOCON->R_PIO0_11 = 0x02;  /* ADC IN0 */
 				  }
 				  if (channelBitmask & 0x02) {
-					  LPC_IOCON->R_PIO1_0  &= ~0x8F;
-					  LPC_IOCON->R_PIO1_0  |= 0x02;  /* ADC IN1 */
+					  LPC_IOCON->R_PIO1_0  = 0x02;  /* ADC IN1 */
 				  }
 				  if (channelBitmask & 0x04) {
-					  LPC_IOCON->R_PIO1_1  &= ~0x8F;
-					  LPC_IOCON->R_PIO1_1  |= 0x02;  /* ADC IN2 */
+					  LPC_IOCON->R_PIO1_1  = 0x02;  /* ADC IN2 */
 				  }
 				  if (channelBitmask & 0x08) {
-					  LPC_IOCON->R_PIO1_2 &= ~0x8F;
-					  LPC_IOCON->R_PIO1_2 |= 0x02;	/* ADC IN3 */
+					  LPC_IOCON->R_PIO1_2 = 0x02;	/* ADC IN3 */
 				  }
 //				  if (channelBitmask & 0x10) {}
 				  if (channelBitmask & 0x20) {
@@ -161,6 +157,18 @@ namespace xpcc {
 					  LPC_IOCON->PIO1_11   = 0x01;	// Select AD7 pin function
 				  }
 			}
+
+		protected:
+			/**
+			 * \brief	Read a ADC data register. Clears DONE and OVERRUN flags.
+			 */
+			static inline uint32_t
+			getAdcRegister(Channel channel)
+			{
+				return (*(volatile unsigned long *)
+						(LPC_ADC_BASE + ADC_OFFSET + ADC_INDEX * static_cast<uint8_t>(channel)));
+			}
+
 		};
 
 		/**
@@ -241,14 +249,23 @@ namespace xpcc {
 			}
 
 			/**
-			 * \brief	Get the latest value from the ADC
+			 * \brief	Get the latest value from the ADC from the global data register
 			 */
 			static inline uint16_t
 			getValue()
 			{
-				// Result is left adjuste to a 16 bit boundary
+				// Result is left adjusted to a 16 bit boundary
 				// Convert to right adjusted value.
 				return ((LPC_ADC->GDR & 0xffff) >> 6);
+			}
+
+			/**
+			 * \brief	Get the latest value from the ADC from the channel register. Clear the interrupt flag.
+			 */
+			static inline uint16_t
+			getValue(Channel channel)
+			{
+				return ((getAdcRegister(channel) & 0xffff) >> 6);
 			}
 
 			static inline bool
@@ -261,6 +278,16 @@ namespace xpcc {
 				else {
 					return false;
 				}
+			}
+
+			/**
+			 * Clear the interrupt flag of the given channel.
+			 */
+			static inline void
+			clearInterruptFlag(Channel channel)
+			{
+				// just read to clear flag
+				getAdcRegister(channel);
 			}
 		};
 
@@ -324,6 +351,7 @@ namespace xpcc {
 			startConversion(uint8_t channelMask, uint8_t interruptMask = 0)
 			{
 				// clear and then set the interrupt Mask, ADGINEN is cleared, too.
+				LPC_ADC->INTEN = 0;
 				LPC_ADC->INTEN = interruptMask;
 
 				// clear and then select channel bits
@@ -377,17 +405,6 @@ namespace xpcc {
 				else {
 					return false;
 				}
-			}
-
-		protected:
-			/**
-			 * \brief	Read a ADC data register. Clears DONE and OVERRUN flags.
-			 */
-			static inline uint32_t
-			getAdcRegister(Channel channel)
-			{
-				return (*(volatile unsigned long *)
-						(LPC_ADC_BASE + ADC_OFFSET + ADC_INDEX * static_cast<uint8_t>(channel)));
 			}
 
 		};

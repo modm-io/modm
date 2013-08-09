@@ -35,6 +35,7 @@
  */
 
 #include "filter/debounce.hpp"
+#include "filter/fir.hpp"
 #include "filter/median.hpp"
 #include "filter/moving_average.hpp"
 #include "filter/pid.hpp"
