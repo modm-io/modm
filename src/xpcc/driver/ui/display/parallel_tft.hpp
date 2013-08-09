@@ -37,55 +37,6 @@
 namespace xpcc
 {
 	/**
-	 * 
-	 * @author	Fabian Greif
-	 */
-	struct TftMemoryBus
-	{
-		TftMemoryBus(volatile uint16_t * index,
-				volatile uint16_t * data) :
-			ptrIndex(index), ptrData(data)
-		{
-		}
-		
-		ALWAYS_INLINE void
-		writeIndex(uint16_t index)
-		{
-			*ptrIndex = index;
-		}
-		
-		ALWAYS_INLINE void
-		writeData(uint16_t data)
-		{
-			*ptrData = data;
-		}
-		
-		ALWAYS_INLINE uint16_t
-		readData()
-		{
-			return *ptrData;
-		}
-		
-		ALWAYS_INLINE void
-		writeRegister(uint16_t reg, uint16_t value)
-		{
-			writeIndex(reg);
-			writeData(value);
-		}
-		
-		ALWAYS_INLINE uint16_t
-		readRegister(uint16_t reg)
-		{
-			writeIndex(reg);
-			return readData();
-		}
-		
-	private:
-		volatile uint16_t * const ptrIndex;
-		volatile uint16_t * const ptrData;
-	};
-	
-	/**
 	 * TFT display connected to a 16 bit parallel bus
 	 * 
 	 * Supports (among others) the following displays:

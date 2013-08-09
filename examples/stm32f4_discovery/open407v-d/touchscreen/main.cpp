@@ -1,7 +1,8 @@
 
 #include <xpcc/architecture.hpp>
 
-#include "parallel_tft.hpp"
+#include <xpcc/driver/ui/display/parallel_tft.hpp>
+#include <xpcc/driver/ui/display/tft_memory_bus.hpp>
 #include <xpcc/driver/ui/display/image.hpp>
 #include <xpcc/driver/ui/touchscreen/ads7843.hpp>
 
@@ -46,11 +47,11 @@ GPIO__OUTPUT(NWE, D, 5);
 
 GPIO__OUTPUT(CS, D, 7);
 
-xpcc::TftMemoryBus parallelBus(
+xpcc::TftMemoryBus16Bit parallelBus(
 		(volatile uint16_t *) 0x60000000,
 		(volatile uint16_t *) 0x60020000);
 
-xpcc::ParallelTft<xpcc::TftMemoryBus> tft(parallelBus);
+xpcc::ParallelTft<xpcc::TftMemoryBus16Bit> tft(parallelBus);
 
 // ----------------------------------------------------------------------------
 // Touchscreen
