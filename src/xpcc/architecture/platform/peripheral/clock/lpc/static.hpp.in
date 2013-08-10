@@ -49,16 +49,17 @@ namespace xpcc
 		/*
 		 * Used to setup pll with constants
 		 */
-		template<int InputFrequency, int OutputFrequency>
+		template<int InputFrequency, int OutputFrequency,
+		ClockTree::PllSource Source>
 		class PllSetup
 		{
 		private:
 			typedef Lpc11PllSettings<InputFrequency, OutputFrequency> p;
 		public:
 			static StartupError
-			enable(ClockTree::PllSource src)
+			enable()
 			{
-				ClockTree::enablePll(src, p::PllM, p::PllP);
+				ClockTree::enablePll(Source, p::PllM, p::PllP);
 				return StartupError::None;
 			}
 		};
