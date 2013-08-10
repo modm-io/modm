@@ -174,6 +174,9 @@ def platform_tools_generate(env, architecture_path):
 		driver_list.append(ddic)
 
 	####### Generate Header Templates #########################################
+	# Remove architecture/platform.hpp file
+	# if it is not removed an old platform file from a different build might be used
+	os.remove(os.path.join(architecture_path, 'platform.hpp'))
 	# Show SCons how to build the architecture/platform.hpp file:
 	src = os.path.join(platform_path, 'platform.hpp.in')
 	tar = os.path.join(architecture_path, 'platform.hpp')
