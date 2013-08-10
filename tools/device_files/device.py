@@ -422,6 +422,9 @@ class Driver(DeviceElementBase):
 		return parameters
 
 	def _gpioCreateNibblePort(self, substitutions):
+		# TODO: this is only kept for legacy reasons.
+		# as soon as the drivers relying on this are fixed
+		# this should be removed
 		# a nibble is 4 bit, an octet is 8bit
 		# a port is either 8 bit for AVR or 16 bit for ARM
 		gpios = substitutions['gpios']

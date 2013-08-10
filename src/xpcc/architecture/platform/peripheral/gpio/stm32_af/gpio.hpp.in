@@ -364,6 +364,12 @@ namespace xpcc
 		};
 %% endfor
 %% endfor
+
+%# Ports
+%% set ports = gpios|getPorts
+
+
+
 	} /* namespace stm32 */
 } /* xpcc */
 

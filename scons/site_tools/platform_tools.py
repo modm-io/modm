@@ -211,6 +211,37 @@ def test_item(dic, item_key, item_value, starts_with=False):
 		return True
 	return False
 
+############## Template Filters ###############################################
+# -----------------------------------------------------------------------------
+def filter_get_ports(gpios):
+	"""
+	This filter accepts a list of gpios as e.g. used by the stm32af driver
+	and tried to extract information about port which is returned as a list
+	of dictionaries with the following strcture:
+	{'name': "PortC", 'startPinId': 0, 'width': 16}
+	"""
+	# collect information on available gpios
+	port_ids = {}
+	for gpio in gpios:
+		if not gpio['port'] in port_ids:
+			port_ids[gpio['port']] = [0] * 16
+		port_ids[gpio['port']][int(gpio['id'])] = 1
+	# create port list
+	ports = []
+	for name, ids in port_ids.iteritems():
+		# if the port consists of at least one gpio pin
+		if 1 in ids:
+			port = {}
+			port['name'] = "Port%s" % name
+			# find start pin as well as width
+			ii = ids.index(1)
+			port['startPinId'] = ii
+			while ii < 16 and ids[ii] == 1:
+				ii = ii + 1
+			port['width'] = ii - port['startPinId']
+			ports.append(port)
+	return ports
+
 # -----------------------------------------------------------------------------
 ###################### Generate Platform Tools ################################
 def generate(env, **kw):
@@ -229,6 +260,9 @@ def generate(env, **kw):
 
 	# Add Method to Parse XML Files, and create Template / Copy Dependencies
 	env.AddMethod(platform_tools_generate, 'GeneratePlatform')
+
+	# Add Filter for Gpio Drivers to Template Engine
+	env.AddTemplateJinja2Filter('getPorts', filter_get_ports)
 
 	########## Add Template Tests #############################################
 	# Generaic Tests (they accept a string)
