@@ -147,6 +147,39 @@ def template_add_filter(env, filter_name, filter_function, alias='template_add_f
 	env['XPCC_JINJA2_FILTER'][filter_name] = filter_function
 
 # -----------------------------------------------------------------------------
+includeExpression = re.compile(r"(\{%|%%)\s+(import|include)\s+'(?P<file>\S+)'")
+
+def find_includes(file):
+	""" Find include directives in an .in file """
+	files = []
+	for line in open(file).readlines():
+		match = includeExpression.search(line)
+		if match:
+			filename = match.group('file')
+			if not os.path.isabs(filename):
+				filename = os.path.join(os.path.dirname(os.path.abspath(file)), filename)
+			files.append(filename)
+	return files
+
+def in_include_scanner(node, env, path, arg=None):
+	""" Generates the dependencies for the .in files """
+	abspath, targetFilename = os.path.split(node.get_abspath())
+
+	stack = [targetFilename]
+	dependencies = [targetFilename]
+
+	while stack:
+		nextFile = stack.pop()
+		files = find_includes(os.path.join(abspath, nextFile))
+		for file in files:
+			if file not in dependencies:
+				stack.append(file)
+				# env.Debug(".in include scanner found %s" % file)
+		dependencies.extend(files)
+
+	dependencies.remove(targetFilename)
+	return dependencies
+# -----------------------------------------------------------------------------
 def generate(env, **kw):
 	env.Append(
 		BUILDERS = {
@@ -154,6 +187,10 @@ def generate(env, **kw):
 			action = env.Action(template_action, template_string),
 			emitter = template_emitter,
 			src_suffix = '.in',
+			source_scanner =
+				SCons.Script.Scanner(
+					function = in_include_scanner,
+					skeys = ['.in']),
 			single_source = True
 		),
 		
@@ -161,6 +198,10 @@ def generate(env, **kw):
 			action = env.Action(jinja2_template_action, template_string),
 			emitter = template_emitter,
 			src_suffix = '.in',
+			source_scanner =
+				SCons.Script.Scanner(
+					function = in_include_scanner,
+					skeys = ['.in']),
 			single_source = True
 		),
 	})
