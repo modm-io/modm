@@ -32,14 +32,14 @@
 %% set i = {}
 %# Generate Cortex Interrupts
 %% if target is cortex_m3 or target is cortex_m4
-%% 	do i.update({4:  ["MemManage_Handler", "MPU Fault Handler"]})
-%% 	do i.update({5:  ["BusFault_Handler", "Bus Fault Handler"]})
-%% 	do i.update({6:  ["UsageFault_Handler", "Usage Fault Handler"]})
-%% 	do i.update({12: ["DebugMon_Handler", "Debug Monitor Handler"]})
+%% 	do i.update({-12:  ["MemManage_Handler", "MPU Fault Handler"]})
+%% 	do i.update({-11:  ["BusFault_Handler", "Bus Fault Handler"]})
+%% 	do i.update({-10:  ["UsageFault_Handler", "Usage Fault Handler"]})
+%% 	do i.update({ -4: ["DebugMon_Handler", "Debug Monitor Handler"]})
 %% endif
-%% do i.update({11: ["SVC_Handler", "SVCall Handler"]})
-%% do i.update({14: ["PendSV_Handler", "PendSV Handler"]})
-%% do i.update({15: ["SysTick_Handler", "SysTick Handler"]})
+%% do i.update({-5: ["SVC_Handler", "SVCall Handler"]})
+%% do i.update({-2: ["PendSV_Handler", "PendSV Handler"]})
+%% do i.update({-1: ["SysTick_Handler", "SysTick Handler"]})
 %# Include Target Specific Files
 %% if target is stm32
 %%	import 'stm32/stm32.macros' as platform with context
@@ -111,11 +111,11 @@ FunctionPointer ramVectors[] __attribute__ ((section(".vectors"))) =
 FunctionPointer flashVectors[] __attribute__ ((section(".reset"))) =
 #endif
 {
-	(FunctionPointer) &__stack_end,		// 0: stack pointer
-	Reset_Handler,						// 1: code entry point
-	NMI_Handler,						// 2: NMI handler
-	HardFault_Handler,					// 3: hard fault handler
-%% for addr in range(4, number_of_interrupts + 1)
+	(FunctionPointer) &__stack_end,		// -16: stack pointer
+	Reset_Handler,						// -15: code entry point
+	NMI_Handler,						// -14: Non Maskable Interrupt handler
+	HardFault_Handler,					// -13: hard fault handler
+%% for addr in range(4 - 16, number_of_interrupts + 1)
 %% 	if addr in i
 	{{ (i[addr][0] + ",") | xpcc.pad(32) }}// {{addr}}: {{i[addr][1]}}
 %% 	else
