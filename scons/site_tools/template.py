@@ -110,14 +110,16 @@ def jinja2_template_action(target, source, env):
 	filename = os.path.relpath(source[0].path, path)
 	loader = RelEnvironment(loader = jinja2.FileSystemLoader(path), extensions=['jinja2.ext.do'])
 	if 'XPCC_JINJA2_FILTER' in env:
-		loader.filters = env['XPCC_JINJA2_FILTER']
+		loader.filters = dict(loader.filters.items() +
+								env['XPCC_JINJA2_FILTER'].items())
 	loader.filters['xpcc.wordwrap'] = filter_wordwrap
 	loader.filters['xpcc.indent'] = filter_indent
 	loader.filters['xpcc.pad'] = filter_pad
 	loader.filters['xpcc.values'] = filter_values
 	loader.filters['split'] = filter_split	# not XPCC specific
 	if 'XPCC_JINJA2_TEST' in env:
-		loader.tests = env['XPCC_JINJA2_TEST']
+		loader.tests = dict(loader.tests.items() +
+								env['XPCC_JINJA2_TEST'].items())
 	# Jinja2 Line Statements
 	loader.line_statement_prefix = '%%'
 	loader.line_comment_prefix = '%#'
