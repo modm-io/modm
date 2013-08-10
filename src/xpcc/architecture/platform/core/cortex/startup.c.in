@@ -80,8 +80,13 @@ void HardFault_Handler(void);
 %# for cortex m0 no hard fault handler is implemented
 void HardFault_Handler(void)			__attribute__ ((weak, alias("defaultHandler")));
 %% endif
+%# Remember declarations to avoid redeclarations
+%% set declarations = []
 %% for addr, interrupt in i.iteritems()
+%% 	if interrupt[0] not in declarations
+%%	do declarations.append(interrupt[0])
 {{ ("void " + interrupt[0] + "(void)") | xpcc.pad(36)}}__attribute__ ((weak, alias("defaultHandler")));
+%% endif
 %% endfor
 // ----------------------------------------------------------------------------
 // Interrupt vectors
@@ -110,7 +115,7 @@ FunctionPointer flashVectors[] __attribute__ ((section(".reset"))) =
 	Reset_Handler,						// 1: code entry point
 	NMI_Handler,						// 2: NMI handler
 	HardFault_Handler,					// 3: hard fault handler
-%% for addr in range(4, number_of_interrupts)
+%% for addr in range(4, number_of_interrupts + 1)
 %% 	if addr in i
 	{{ (i[addr][0] + ",") | xpcc.pad(32) }}// {{addr}}: {{i[addr][1]}}
 %% 	else
