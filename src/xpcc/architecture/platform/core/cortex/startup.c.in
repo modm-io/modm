@@ -42,9 +42,9 @@
 %% do i.update({15: ["SysTick_Handler", "SysTick Handler"]})
 %# Include Target Specific Files
 %% if target is stm32
-%%	import 'stm32.macros' as platform with context
+%%	import 'stm32/stm32.macros' as platform with context
 %% elif target is lpc
-%%	import 'lpc.macros' as platform with context
+%%	import 'lpc/lpc.macros' as platform with context
 %% endif
 %# Set peripheralInterrupts variable that contains device specific interrupts
 {{ platform.appendInterrupts() }}
