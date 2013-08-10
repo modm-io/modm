@@ -109,12 +109,14 @@ def jinja2_template_action(target, source, env):
 	path = env['XPCC_LIBRARY_PATH']
 	filename = os.path.relpath(source[0].path, path)
 	loader = RelEnvironment(loader = jinja2.FileSystemLoader(path), extensions=['jinja2.ext.do'])
+	if 'XPCC_JINJA2_FILTER' in env:
+		loader.filters = env['XPCC_JINJA2_FILTER']
 	loader.filters['xpcc.wordwrap'] = filter_wordwrap
 	loader.filters['xpcc.indent'] = filter_indent
 	loader.filters['xpcc.pad'] = filter_pad
 	loader.filters['xpcc.values'] = filter_values
 	loader.filters['split'] = filter_split	# not XPCC specific
-	if env['XPCC_JINJA2_TEST'] != None:
+	if 'XPCC_JINJA2_TEST' in env:
 		loader.tests = env['XPCC_JINJA2_TEST']
 	# Jinja2 Line Statements
 	loader.line_statement_prefix = '%%'
@@ -137,6 +139,11 @@ def template_add_test(env, test_name, test_function, alias='template_add_test'):
 		env['XPCC_JINJA2_TEST'] = {}
 	env['XPCC_JINJA2_TEST'][test_name] = test_function
 
+def template_add_filter(env, filter_name, filter_function, alias='template_add_filter'):
+	if 'XPCC_JINJA2_FILTER' not in env:
+		env['XPCC_JINJA2_FILTER'] = {}
+	env['XPCC_JINJA2_FILTER'][filter_name] = filter_function
+
 # -----------------------------------------------------------------------------
 def generate(env, **kw):
 	env.Append(
@@ -156,6 +163,7 @@ def generate(env, **kw):
 		),
 	})
 	env.AddMethod(template_add_test, 'AddTemplateJinja2Test')
+	env.AddMethod(template_add_filter, 'AddTemplateJinja2Filter')
 
 def exists(env):
 	return True
