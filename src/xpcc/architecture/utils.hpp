@@ -131,6 +131,25 @@
 
 	#define XPCC__ARRAY_SIZE(x)	(sizeof(x) / sizeof(x[0]))
 
+	/**
+	 * Makes it possible to use enum classes as bit flags.
+	 * This disables some typesafety introduced by the enum class feature
+	 * but it should still be more typesafe than using the traditional
+	 * enum type.
+	 * Use (for public enum classes after class definition) like this:
+	 * ENUM_CLASS_FLAG(Adc{{ id }}::InterruptFlag)
+	 */
+	#define ENUM_CLASS_FLAG(name) \
+	inline name operator|(name a, name b) \
+	{return static_cast<name>(static_cast<uint32_t>(a) | static_cast<uint32_t>(b));} \
+	inline uint32_t operator&(name a, name b) \
+	{return (static_cast<uint32_t>(a) & static_cast<uint32_t>(b));} \
+	inline uint32_t operator&(uint32_t a, name b) \
+	{return ((a) & static_cast<uint32_t>(b));} \
+	inline uint32_t operator&(name a, uint32_t b) \
+	{return (static_cast<uint32_t>(a) & (b));}
+
+
 #endif	// !__DOXYGEN__
 
 #endif	// XPCC__UTILS_HPP

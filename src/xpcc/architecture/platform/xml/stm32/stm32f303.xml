@@ -33,6 +33,7 @@
 		</driver>
 		<!-- Peripheral Drivers -->
 		<driver type="clock" name="stm32" /> <!-- the clock peripheral does not need the instances attribute because there is only one instance -->
+		<driver type="uart" name="stm32" instances="1,2,3,4,5" />
 		<!-- <driver type="timer" name="stm32" instances="1,2,3,4,8" /> -->
 		<driver type="gpio" name="stm32_af">
 			<gpio port="A" id="0"></gpio>
