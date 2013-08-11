@@ -43,8 +43,13 @@ buildIncludes = []
 globalIncludes = []
 
 # -----------------------------------------------------------------------------
-
+env.Debug("env['ARCHITECTURE']: %s" % env['ARCHITECTURE'])
 # Add the STM32 Standard Peripheral Library
+if env['ARCHITECTURE'].startswith('cortex-m0/stm32f0'):
+	globalIncludes += [
+		'stm32f0xx_lib/CMSIS/Include',
+		'stm32f0xx_lib/CMSIS/Device/ST/STM32F0xx/Include',
+		]
 if env['ARCHITECTURE'].startswith('cortex-m3/stm32f10'):
 	sourcePath += [
 		'stm32f10x_lib/STM32F10x_StdPeriph_Driver/src']
@@ -78,7 +83,7 @@ if env['ARCHITECTURE'].startswith('cortex-m4/stm32f4'):
 		'stm32f4xx_lib/CMSIS/Device/ST/STM32F4xx/Include',
 		'stm32f4xx_lib/STM32F4xx_StdPeriph_Driver/inc']
 
-if 'stm32f' in env['ARCHITECTURE']:
+if 'stm32f' in env['ARCHITECTURE'] and not env['ARCHITECTURE'].startswith('cortex-m0/stm32f0'):
 	sourcePath += ['freertos']		# FreeRTOS for STM32
 	sourcePath += ['fatfs']			# FatFS
 
