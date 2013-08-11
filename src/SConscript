@@ -70,6 +70,7 @@ if 'LINKFILE' in env:
 	envOld['LINKFILE'] = env['LINKFILE']
 if 'DEVICE_SIZE' in env:
 	envOld['DEVICE_SIZE'] = env['DEVICE_SIZE']
+envOld.Append(CPPDEFINES = p_defines)
 
 library = env.Library(target = 'xpcc', source = sources)
 
