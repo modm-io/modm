@@ -42,7 +42,7 @@ xpcc_gpio_enable()
 	// FIXME: add possibility to switch individual clocks on and off
 %% if target is stm32f2 or target is stm32f4
 %%	set clock_tree = 'AHB1'
-%% elif target is stm32f3
+%% elif target is stm32f0 or target is stm32f3
 %%	set clock_tree = 'AHB'
 %% endif
 
@@ -130,7 +130,7 @@ namespace xpcc
 				SPEED_25MHZ  = 0x1,
 				SPEED_50MHZ  = 0x1,
 				SPEED_100MHZ = 0x3,
-		%% elif target is stm32f3
+		%% elif target is stm32f0 or target is stm32f3
 				SPEED_2MHZ  = 0x0,
 				SPEED_10MHZ = 0x1,
 				SPEED_50MHZ = 0x3,
@@ -278,7 +278,7 @@ namespace xpcc
 			ALWAYS_INLINE static void set() {
 		%% if target is stm32f2 or target is stm32f4
 				{{reg}}->BSRRL = mask;
-		%% elif target is stm32f3
+		%% elif target is stm32f0 or target is stm32f3
 				{{reg}}->BSRR = mask;
 		%% endif
 			}
@@ -296,7 +296,7 @@ namespace xpcc
 			ALWAYS_INLINE static void reset() {
 		%% if target is stm32f2 or target is stm32f4
 				{{reg}}->BSRRH = mask;
-		%% elif target is stm32f3
+		%% elif target is stm32f0 or target is stm32f3
 				{{reg}}->BRR = mask;
 		%% endif
 			}
