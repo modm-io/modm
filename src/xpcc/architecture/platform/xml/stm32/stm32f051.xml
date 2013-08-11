@@ -1,0 +1,49 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE rca SYSTEM "../devicefile.dtd">
+<rca version="1.0">
+	<device platform="stm32" family="f0" name="051">
+		<!-- Flash and RAM sizes -->
+		<flash device-size-id="4">16384</flash>
+		<flash device-size-id="6">32768</flash>
+		<flash device-size-id="8">65536</flash>
+		<ram>8192</ram>
+		<!-- Linker Script -->
+		<linkerscript device-size-id="4">stm32f0xx_4.ld</linkerscript>
+		<linkerscript device-size-id="6">stm32f0xx_6.ld</linkerscript>
+		<linkerscript device-size-id="8">stm32f0xx_8.ld</linkerscript>
+		<!-- Core -->
+		<core>cortex-m0</core>
+		<!-- Number of pins -->
+		<pin-count device-pin-id="k">32</pin-count>
+		<pin-count device-pin-id="c">48</pin-count>
+		<pin-count device-pin-id="r">64</pin-count>
+		<!-- Headers to be included with the {{ include_device_headers }} substitution-->
+		<header>stm32f0xx.h</header>
+		<!-- Cpp Defines -->
+		<define>__ARM_STM32__</define>
+		<define>STM32F0XX</define>
+		<define>STM32F05X</define>
+		<define>__STM32F051__</define>
+<!--
+		<define>STM32_AHB_FREQUENCY  = 72000000</define>
+		<define>STM32_APB1_FREQUENCY = 36000000</define>
+		<define>STM32_APB2_FREQUENCY = 72000000</define>
+-->
+		<define>CORTEX_VECTORS_RAM = 0</define>
+		<define>CORTEX_ENABLE_HARD_FAULT_HANDLER = 0</define>
+		<!-- Core Driver -->
+		<driver type="core" name="cortex">
+			<parameter name="allocator">block_allocator</parameter>
+		</driver>
+		<!-- Peripheral Drivers -->
+		<!--<driver type="clock" name="stm32" /> -->
+		<driver type="gpio" name="stm32_af">
+			<gpio port="A" id="0"></gpio>
+			<gpio port="A" id="8">
+				<!--<af id="0" peripheral="MCO" description="Clock Output"/>-->
+			</gpio>
+			<gpio port="C" id="8"></gpio>
+			<gpio port="C" id="9"></gpio>
+		</driver>
+	</device>
+</rca>
