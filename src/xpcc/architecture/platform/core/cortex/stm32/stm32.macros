@@ -32,7 +32,7 @@
 
 
 %% macro defines()
-
+%#
 #define FLASH_WAIT_STATE_0		0x0
 #define FLASH_WAIT_STATE_1		0x1
 #define FLASH_WAIT_STATE_2		0x2
@@ -43,12 +43,16 @@
 #define FLASH_WAIT_STATE_7		0x7
 
 #define NR_INTERRUPTS 82
-
+%#
 %% endmacro
 
 
 %% macro appendInterrupts()
-
+%#
+%% if target is stm32f0
+%%	include 'stm32f0_ivectors.macros' with context
+%% else
+%#
 %% do i.update({ 0: ["WWDG_IRQHandler", "Window Watchdog"]})
 %% do i.update({ 1: ["PVD_IRQHandler", "PVD through EXTI Line detect"]})
 %% do i.update({ 2: ["TAMP_STAMP_IRQHandler", "Tamper and TimeStamps through the EXTI line"]})
@@ -166,12 +170,15 @@
 %% 	do i.update({80: ["HASH_RNG_IRQHandler", "Hash and Random Number Generator"]})
 %% endif
 %% do i.update({81: ["FPU_IRQHandler", "FPU"]})
-
+%#
+%% endif
+%# (target is stm32f0)
+%#
 %% endmacro
 
 
 %% macro startupCode()
-
+%#
 // TODO: check F_CPU to determine flash latency
 %% if target is stm32f2
 	// prepare flash latency for working at 120MHz and supply voltage > 2.7
@@ -201,5 +208,5 @@
 	// Enable Core Coupled Memory (CCM)
 	RCC->AHB1ENR |= RCC_AHB1ENR_CCMDATARAMEN;
 %% endif
-
+%#
 %% endmacro
