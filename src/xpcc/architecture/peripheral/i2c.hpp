@@ -44,15 +44,16 @@ namespace xpcc
 	struct I2c
 	{
 		static constexpr uint8_t WRITE = 0x00;	///< Add the Write bit to the slave addres
-		static constexpr uint8_t READ = 0x01;	///< Add the Read bit to the slave address
+		static constexpr uint8_t READ  = 0x01;	///< Add the Read bit to the slave address
 
 		/// This tells the `I2cDelegate` why it was detached
 		/// @see I2cDelegate
-		enum class DetachCause : uint8_t
+		enum class
+		DetachCause : uint8_t
 		{
 			NormalStop,		///< All operations finished normally
 			ErrorCondition,	///< A bus error occured and the bus was reset
-			SoftwareReset	///< The master in initializing itself
+			SoftwareReset	///< The master is initializing itself
 		};
 
 		///@{
@@ -60,7 +61,8 @@ namespace xpcc
 		/// @see I2cDelegate
 
 		/// Operations after a start or restart condition.
-		enum class Operation
+		enum class
+		Operation
 		{
 			Stop = 0,		///< Generate a Stop Condition
 			Restart = 1,	///< Generate a Restart
@@ -69,7 +71,8 @@ namespace xpcc
 		};
 
 		/// Further operations after write operation.
-		enum class OperationAfterWrite
+		enum class
+		OperationAfterWrite
 		{
 			Stop = 0,
 			Restart = 1,
@@ -77,7 +80,8 @@ namespace xpcc
 		};
 
 		/// Further operations after read operation.
-		enum class OperationAfterRead
+		enum class
+		OperationAfterRead
 		{
 			Stop = 0,
 			Restart = 1,
@@ -85,7 +89,8 @@ namespace xpcc
 		///@}
 
 		/// State of a Delegate Adapter
-		enum class AdapterState
+		enum class
+		AdapterState
 		{
 			Idle,	///< No error occured, detached normally
 			Busy,	///< The adapter is busy with data transfer
@@ -109,7 +114,8 @@ namespace xpcc
 	{
 	public:
 		/// Errors that can happen during master operation
-		enum class Error : uint8_t
+		enum class
+		Error : uint8_t
 		{
 			NoError,			///< No Error occurred
 			AddressNack,		///< Address was transmitted and NACK received
@@ -120,7 +126,8 @@ namespace xpcc
 		};
 
 		/// Baudrate of the I2C bus. Most slaves only work in Standard or Fast mode.
-		enum class DataRate : uint32_t
+		enum class
+		DataRate : uint32_t
 		{
 			Standard = 100000,	///< Standard datarate of 100kHz
 			Fast = 400000,		///< Fast datarate of 400kHz
@@ -147,7 +154,7 @@ namespace xpcc
 		 * @return	Caller gains control if `true`. Call has no effect if `false`.
 		 */
 		static bool
-		startSync(I2cDelegate *delegate);
+		startBlocking(I2cDelegate *delegate);
 
 		/**
 		 * Perform a software reset of the driver in case of an error.
@@ -156,7 +163,7 @@ namespace xpcc
 		 * the delegate.
 		 */
 		static void
-		reset(DetachCause cause=DetachCause::SoftwareReset);
+		reset(DetachCause cause = DetachCause::SoftwareReset);
 
 		/**
 		 * Check the error state of the driver.
@@ -170,7 +177,7 @@ namespace xpcc
 	};
 
 	/**
-	 * Abstract class for delegation
+	 * Abstract class for delegation.
 	 *
 	 * For true asynchronous operation, the communication driver should
 	 * inherit from this class, allowing multistage driver design and
@@ -209,9 +216,9 @@ namespace xpcc
 		};
 
 	public:
-		/*
-		 * @brief	This method is called when the I2cMaster is not currently
-		 *			in use by another delegate and can be attached.
+		/**
+		 * This method is called when the I2cMaster is not currently
+		 * in use by another delegate and can be attached.
 		 *
 		 * @return	`true` if the I2cMaster should attach this delegate,
 		 * 			`false` if it should not attach it.
@@ -219,9 +226,8 @@ namespace xpcc
 		virtual bool
 		attaching() = 0;
 
-		/*
-		 * @brief	This is called when the I2cMaster is ready to (re-)start
-		 * 			an operation.
+		/**
+		 * This is called when the I2cMaster is ready to (re-)start an operation.
 		 *
 		 * @return	the `Starting` struct containing slave address and the next operation
 		 */
@@ -229,7 +235,7 @@ namespace xpcc
 		starting() = 0;
 
 		/**
-		 * @brief This is called before the I2cMaster begins a write operation.
+		 * This is called before the I2cMaster begins a write operation.
 		 *
 		 * @return	the `Writing` struct containg the write buffer and size and next operation
 		 */
@@ -237,7 +243,7 @@ namespace xpcc
 		writing() = 0;
 
 		/**
-		 * @brief	This is called before the I2cMaster begins a read operation.
+		 * This is called before the I2cMaster begins a read operation.
 		 *
 		 * @return	the `Reading` struct containg the read buffer and size and next operation
 		 */
@@ -245,7 +251,7 @@ namespace xpcc
 		reading() = 0;
 
 		/**
-		 * @brief	This is called when the I2cMaster stops the operation and detached the delegate.
+		 * This is called when the I2cMaster stops the operation and detached the delegate.
 		 *
 		 * @param	cause	specifies whether the detachment was expected (`NormalStop`),
 		 * 					or a error occurred (`ErrorCondition`), which can, but does not need
@@ -254,6 +260,7 @@ namespace xpcc
 		virtual void
 		stopped(DetachCause cause) = 0;
 	};
+
 }
 
 #endif // XPCC_PERIPHERAL__I2C_MASTER_HPP
