@@ -37,7 +37,7 @@
 /**
  * @ingroup 	architecture
  * @defgroup	peripheral	Peripherals
- * 
+ *
  * All hardware peripherals with common interfaces.
  */
 
@@ -52,7 +52,7 @@ namespace xpcc
 	 * inherit from their respective base classes and must shadow the methods of
 	 * them.
 	 *
-	 * The inheritance is only visible for the documenation, it is completely
+	 * The inheritance is only visible for the documenation, It is completely
 	 * removed during compile time keeping a possible error at platform level.
 	 * This is safe, because only one platform can be compiled at once.
 	 *
@@ -83,14 +83,9 @@ namespace xpcc
 		static void
 		getParameter();
 
-		/**
-		 * Read an interrupt flag.
-		 *
-		 * We use read here, as a reminder that flags are hardware and cannot
-		 * be written like a another parameter.
-		 */
-		static void
-		readInterruptFlag();
+		/// Read an interrupt flag.
+		static bool
+		getInterruptFlag();
 
 		/**
 		 * Acknowledge an interrupt flag.

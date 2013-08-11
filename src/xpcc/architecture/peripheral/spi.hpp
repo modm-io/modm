@@ -34,111 +34,216 @@
 
 /**
  * @ingroup 	peripheral
- * @defgroup	spi	Serial Peripheral Interface (SPI)
+ * @defgroup	spi		Serial Peripheral Interface (SPI)
  */
 
 namespace xpcc
 {
-	struct Spi
-	{
-		/// transfer options for the receive and transmit buffers
-		/// @see SpiBlockMaster
-		enum class BufferOptions : uint8_t
-		{
-			TxRxIncrement = 0b11,			///< Increments both Tx and Rx buffer
-			TxIncrementRxDecrement = 0b10,	///< Increments Tx, but decrements Rx buffer
-			TxDecrementRxIncrement = 0b01,	///< Decrements Tx, but increments Rx buffer
-			TxRxDecrement = 0b00,			///< Decrements both Tx and Rx buffer
-		};
 
-		/// Spi Clock Mode, Mode0 is the most used mode
-		enum class Mode : uint8_t
-		{
-			Mode0 = 0b00,	///< SCK normal,	sample on rising edge
-			Mode1 = 0b01,	///< SCK normal,	sample on falling edge
-			Mode2 = 0b10,	///< SCK inverted,	sample on falling edge
-			Mode3 = 0b11,	///< SCK inverted,	sample on rising edge
-		};
+struct Spi
+{
+	/// Spi Clock Mode, Mode0 is the most used mode
+	enum class
+	Mode : uint8_t
+	{
+		Mode0 = 0b00,	///< SCK normal,	sample on rising edge
+		Mode1 = 0b01,	///< SCK normal,	sample on falling edge
+		Mode2 = 0b10,	///< SCK inverted,	sample on falling edge
+		Mode3 = 0b11,	///< SCK inverted,	sample on rising edge
 	};
+
+	/// This tells the `SpiDelegate` why it was detached
+	/// @see SpiDelegate
+	enum class
+	DetachCause : uint8_t
+	{
+		NormalStop,		///< All operations finished normally
+		ErrorCondition,	///< A bus error occured and the bus was reset
+		SoftwareReset	///< The master is initializing itself
+	};
+
+	/// Operations after a transmission.
+	enum class
+	Operation
+	{
+		Stop = 0,		///< Stop after this transmission
+		Transmit = 1,	///< start another transmission after this one
+	};
+};
+
+/**
+ * Interface for a simple SPI without resource management.
+ * This interface should be more efficient than the SpiMaster, but it does not
+ * synchronize multiple hardware access.
+ * Use this interface if you need the *fastest possible* data transfer and only
+ * have one slave on the bus or implement the resource management yourself.
+ *
+ * @author	Niklas Hauser
+ * @ingroup	peripheral
+ * @ingroup	spi
+ */
+class SimpleSpi : public ::xpcc::Peripheral, public Spi
+{
+#ifdef __DOXYGEN__
+public:
+	// synchronous
+	/**
+	 * Write a single byte, wait for completion.
+	 *
+	 * @return	received byte.
+	 */
+	static uint8_t
+	writeReadBlocking(uint8_t data);
+
+	/// Write a single byte, wait for completion and discard received byte.
+	static void
+	writeBlocking(uint8_t data);
+
+	// asynchronous
+	/**
+	 * Write a single byte, and return immediately.
+	 *
+	 * @return	`true` if data has been sent, `false` if buffer is full
+	 */
+	static bool
+	write(uint8_t data);
+
+	/// @return	last byte that has been received.
+	static uint8_t
+	getResult();
+
+    /**
+     * Set the data buffers and length with options and starts a transfer.
+     * This may be hardware accelerated (DMA or Interrupt), but not guaranteed.
+     *
+     * @param[in]   tx
+     *      pointer to transmit buffer, set to `0` to send dummy bytes
+     * @param[out]  rx
+     *      pointer to receive buffer, set to `0` to discard received bytes
+     * @param       length
+     *      number of bytes to be shifted out
+     * @param       options
+     *      buffer options, @see BufferOptions
+     *
+     * @return  `true`  if transfer request was successfully serviced,
+     *          `false` if another transfer is already progress.
+     */
+    static bool
+    transfer(uint8_t * tx, uint8_t * rx, std::size_t length, BufferOptions options=BufferOptions::TxRxIncrement);
+
+	/// @return	`true` if last byte has been sent and the swapped byte can be read.
+	static bool
+	isFinished();
+#endif
+};
+
+/**
+ * Interface for a SPI master.
+ *
+ * In order to allow resource management the SPI hardware, the selection of
+ * the (active low) Slave Select pin must also be part of this management.
+ * This will remove the need to synchronize hardware access on device driver
+ * level while also providing asynchronous and, if available, DMA supported
+ * data transfer.
+ *
+ * @author	Niklas Hauser
+ * @ingroup	peripheral
+ * @ingroup	spi
+ */
+class SpiMaster : public ::xpcc::Peripheral, public Spi
+{
+#ifdef __DOXYGEN__
+public:
+	/**
+	 * Requests bus control and starts the transfer.
+	 *
+	 * @param	delegate
+	 * 		object that inherits from the SpiDelegate class.
+	 *
+	 * @return	Caller gains control if `true`. Call has no effect if `false`.
+	 */
+	static bool
+	start(SpiDelegate *delegate);
 
 	/**
-	 * Interface for a Spi Master with single byte access.
+	 * Requests bus control and starts the transfer, blocks until delegate is detached.
 	 *
-	 * @author	Niklas Hauser
-	 * @ingroup	peripheral
-	 * @ingroup	spi
+	 * @param	delegate
+	 * 		object that inherits from the SpiDelegate class.
+	 *
+	 * @return	Caller gains control if `true`. Call has no effect if `false`.
 	 */
-	class SpiMaster : public ::xpcc::Peripheral, public Spi
-	{
-#ifdef __DOXYGEN__
-	public:
-		/**
-		 * Write a single byte, wait for completion.
-		 *
-		 * @return	received byte.
-		 */
-		static uint8_t
-		writeReadBlocking(uint8_t data);
-		
-		/// Write a single byte, wait for completion and discard received byte.
-		static void
-		writeBlocking(uint8_t data);
-		
-		/**
-		 * Write a single byte, and return immediately.
-		 *
-		 * @return	`true` if data has been sent, `false` if buffer is full
-		 */
-		static bool
-		write(uint8_t data);
-		
-		/// @return	last byte that has been received.
-		static uint8_t
-		getResult();
-		
-		/// @return	`true` if last byte has been sent and the swapped byte can be read.
-		static bool
-		isFinished();
-#endif
-	};
+	static bool
+	startBlocking(SpiDelegate *delegate);
 
 	/**
-	 * Spi Master with DMA support.
+	 * Perform a software reset of the driver in case of an error.
 	 *
-	 * @author	Niklas Hauser
-	 * @ingroup	peripheral
-	 * @ingroup	spi
+	 * This method calls the stopped Delegate method and then detaches
+	 * the delegate.
 	 */
-	class SpiBlockMaster : public ::xpcc::Peripheral, public Spi
-	{
-#ifdef __DOXYGEN__
-	public:
-		/**
-		 * Set the data buffers and length with options and starts a transfer
-		 *
-		 * @param[in]	tx
-		 *		pointer to transmit buffer, set to `0` to send dummy bytes
-		 * @param[out]	rx
-		 *		pointer to receive buffer, set to `0` to discard received bytes
-		 * @param		length
-		 *		number of bytes to be shifted out
-		 * @param		options
-		 * 		buffer options, @see BufferOptions
-		 *
-		 * @return	`true`	if transfer request was successfully serviced,
-		 *			`false` if another transfer is already progress.
-		 */
-		static bool
-		start(uint8_t * tx, uint8_t * rx, std::size_t length, BufferOptions options=BufferOptions::TxRxIncrement);
-		
-		/**
-		 * @return	`true` if previous transfer finished,
-		 *			`false` if a transfer is in progress.
-		 */
-		static bool
-		isFinished();
+	static void
+	reset();
 #endif
+};
+
+/**
+ * Abstract class for delegation.
+ *
+ * For true asynchronous operation, the communication driver should
+ * inherit from this class, allowing resource control of the hardware.
+ * This Delegate will stay attached to the `SpiMaster` during the operation.
+ *
+ * @see SpiMaster
+ *
+ * @author	Niklas Hauser
+ * @ingroup	spi
+ */
+class SpiDelegate : public Spi
+{
+public:
+	/// Contains the information required to make a SPI transfer
+	struct Transmission {
+		const uint8_t *writeBuffer;	///< data to write, set to `0` to transmit dummy bytes
+		uint8_t *readBuffer;		///< data to read, set `0` to discard received bytes
+		std::size_t size;			///< number of bytes to be transmitted
+		BufferOptions options;		///< buffer options, @see BufferOptions
+		Operation next;				///< operation following the transmission
 	};
+
+public:
+	/**
+	 * This method is called when the SpiMaster is not currently
+	 * in use by another delegate and can be attached.
+	 * Use this callback to pull the Slave Select pin low.
+	 *
+	 * @return	`true` if the SpiMaster should attach this delegate,
+	 * 			`false` if it should not attach it.
+	 */
+	virtual bool
+	attaching() = 0;
+
+	/**
+	 * This is called when the SpiMaster is ready to start a transmission.
+	 *
+	 * @return	the `Transmission` struct
+	 */
+	virtual Transmission
+	transmitting() = 0;
+
+	/**
+	 * This is called when the transmission finished and delegate is about to
+	 * be detached. The SpiMaster will not be free until this method returns.
+	 * Use this callback to pull the Slave Select pin high.
+	 *
+	 * @param	cause	specifies whether the detachment was expected (`NormalStop`),
+	 * 					or a error occurred (`ErrorCondition`), which can, but does not need
+	 * 					to be reacted upon.
+	 */
+	virtual void
+	detaching(DetachCause cause) = 0;
+};
+
 }
 
 #endif // XPCC_PERIPHERAL__SPI_HPP
