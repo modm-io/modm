@@ -1,78 +1,57 @@
 // coding: utf-8
-// ----------------------------------------------------------------------------
 /* Copyright (c) 2013, Roboterclub Aachen e.V.
- * All rights reserved.
+ * All Rights Reserved.
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- * 
- *     * Redistributions of source code must retain the above copyright
- *       notice, this list of conditions and the following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright
- *       notice, this list of conditions and the following disclaimer in the
- *       documentation and/or other materials provided with the distribution.
- *     * Neither the name of the Roboterclub Aachen e.V. nor the
- *       names of its contributors may be used to endorse or promote products
- *       derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY ROBOTERCLUB AACHEN E.V. ''AS IS'' AND ANY
- * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL ROBOTERCLUB AACHEN E.V. BE LIABLE FOR ANY
- * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * The file is part of the xpcc library and is released under the 3-clause BSD
+ * license. See the file `LICENSE` for the full license governing this code.
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__SOFTWARE_GPIO_HPP
-#define XPCC__SOFTWARE_GPIO_HPP
+#ifndef XPCC_SOFTWARE_GPIO_HPP
+#define XPCC_SOFTWARE_GPIO_HPP
 
 #include <xpcc/architecture/utils.hpp>
 #include <xpcc/architecture/peripheral/gpio.hpp>
+#include <xpcc/utils/template_metaprogramming.hpp>
 
 /**
- * 
- * \see		driver
- * \author	Fabian Greif
- * \author	Niklas Hauser
+ * Some useful implementation of GPIO in software.
+ *
+ * @author	Fabian Greif
+ * @author	Niklas Hauser
  */
 
 namespace xpcc
 {
 	/**
-	 * \brief	Dummy implementation of an I/O pin
+	 * Dummy implementation of an I/O pin.
 	 *
 	 * This class can be used when a pin is not required. All functions
-	 * are dummy functions which do nothing. Unused::read() will always
-	 * return \c false.
+	 * are dummy functions which do nothing. `read()` will always
+	 * return `false`.
 	 *
-	 * For example when
-	 * creating a software SPI with the xpcc::SoftwareSpiMaster class and
-	 * the return channel (MISO - Master In Slave Out) is not needed, a
-	 * good way is to use this class as a parameter when defining the
+	 * For example when creating a software SPI with the xpcc::SoftwareSimpleSpi
+	 * class and the return channel (MISO - Master In Slave Out) is not needed,
+	 * a good way is to use this class as a parameter when defining the
 	 * SPI class.
 	 *
 	 * Example:
-	 * \code
+	 * @code
 	 * #include <xpcc/architecture/platform.hpp>
 	 *
 	 * namespace pin
 	 * {
-	 *     GPIO__OUTPUT(Clk, D, 7);
-	 *     GPIO__OUTPUT(Mosi, D, 5);
+	 *     typedef GpioOutputD7 Clk;
+	 *     typedef GpioOutputD5 Mosi;
 	 * }
 	 *
-	 * SoftwareSpiMaster< pin::Clk, pin::Mosi, xpcc::GpioUnused > Spi;
+	 * SoftwareSimpleSpi< pin::Clk, pin::Mosi, xpcc::GpioUnused > Spi;
 	 *
 	 * ...
 	 * Spi::write(0xaa);
-	 * \endcode
+	 * @endcode
 	 *
-	 * \ingroup	gpio
+	 * @ingroup	gpio
 	 */
 	class GpioUnused : GpioIO
 	{
@@ -112,7 +91,7 @@ namespace xpcc
 		{
 		}
 
-		/// Returns \c false
+		/// Always returns `false`
 		ALWAYS_INLINE static bool
 		read()
 		{
@@ -121,28 +100,27 @@ namespace xpcc
 	};
 
 	/**
-	 * \brief	Invert a pin
+	 * Invert a pin in software.
 	 *
 	 * This template can be used the invert the logic level of a normal
 	 * pin template.
 	 *
 	 * Example:
-	 * \code
-	 * #include <xpcc/architecture/peripheral/gpio.hpp>
-	 * #include <xpcc/driver/software_spi.hpp>
+	 * @code
+	 * #include <xpcc/architecture/platform.hpp>
 	 *
 	 * namespace pin
 	 * {
-	 *     GPIO__OUTPUT(Led, B, 0);
+	 *     typedef GpioOutputB0 Led;
 	 * }
 	 *
-	 * typedef xpcc::gpio::Invert< pin::Led > Led;
+	 * typedef xpcc::GpioInverted< pin::Led > Led;
 	 *
 	 * ...
 	 * Led::reset();
-	 * \endcode
+	 * @endcode
 	 *
-	 * \ingroup	gpio
+	 * @ingroup	gpio
 	 */
 	template < class Pin >
 	class GpioInverted : GpioIO
@@ -198,65 +176,7 @@ namespace xpcc
 	};
 
 	/**
-	 * \brief	Generic implementation of a Nibble composed of four
-	 * 			independent pins.
-	 *
-	 * When possible preferred the GPIO__NIBBLE_LOW() or GPIO__NIBBLE_HIGH()
-	 * macros over this class as they are much faster and require less code.
-	 *
-	 * \see		GPIO__NIBBLE_LOW(), GPIO__NIBBLE_HIGH()
-	 * \ingroup	gpio
-	 */
-	template < class T3 = GpioUnused,
-			   class T2 = GpioUnused,
-			   class T1 = GpioUnused,
-			   class T0 = GpioUnused >
-	class SoftwareGpioNibble : GpioNibble
-	{
-	public:
-		ALWAYS_INLINE static void
-		setOutput()
-		{
-			T3::setOutput();
-			T2::setOutput();
-			T1::setOutput();
-			T0::setOutput();
-		}
-
-		ALWAYS_INLINE static void
-		setInput()
-		{
-			T3::setInput();
-			T2::setInput();
-			T1::setInput();
-			T0::setInput();
-		}
-
-		static uint8_t
-		read()
-		{
-			uint8_t value = 0;
-			
-			if (T3::read()) { value |= 0b1000; }
-			if (T2::read()) { value |= 0b0100; }
-			if (T1::read()) { value |= 0b0010; }
-			if (T0::read()) { value |= 0b0001; }
-			
-			return value;
-		}
-
-		static void
-		write(uint8_t data)
-		{
-			T3::set(data & 0b1000);
-			T2::set(data & 0b0100);
-			T1::set(data & 0b0010);
-			T0::set(data & 0b0001);
-		}
-	};
-
-	/**
-	 * \brief	Create a 8-bit port from arbitrary pins.
+	 * Create a 8-bit port from arbitrary pins.
 	 *
 	 * Be aware that this method is slow, because for every write or read
 	 * cycle, every of the eight pins have to be read/written
@@ -266,22 +186,32 @@ namespace xpcc
 	 * for example when connecting a LCD where speed is not the main
 	 * concern.
 	 *
-	 * When possible preferred the GPIO__PORT() or GPIO__OCTET()
-	 * macros over this class as they are much faster and require less code.
+	 * When possible prefer the native `GpioPort` implementations
+	 * over this class as they are much faster and require less code.
 	 *
-	 * \see		GPIO__PORT(), GPIO__OCTET()
-	 * \ingroup	gpio
+	 * @ingroup	gpio
 	 */
-	template <typename T7 = GpioUnused,
-			  typename T6 = GpioUnused,
-			  typename T5 = GpioUnused,
-			  typename T4 = GpioUnused,
-			  typename T3 = GpioUnused,
-			  typename T2 = GpioUnused,
+	template <typename T0 = GpioUnused,
 			  typename T1 = GpioUnused,
-			  typename T0 = GpioUnused>
+			  typename T2 = GpioUnused,
+			  typename T3 = GpioUnused,
+			  typename T4 = GpioUnused,
+			  typename T5 = GpioUnused,
+			  typename T6 = GpioUnused,
+			  typename T7 = GpioUnused>
 	class SoftwareGpioOctet : GpioOctet
 	{
+	public:
+		static constexpr uint8_t width =
+			(xpcc::tmp::SameType<T0, GpioUnused>::value ? 0 : 1) +
+			(xpcc::tmp::SameType<T1, GpioUnused>::value ? 0 : 1) +
+			(xpcc::tmp::SameType<T2, GpioUnused>::value ? 0 : 1) +
+			(xpcc::tmp::SameType<T3, GpioUnused>::value ? 0 : 1) +
+			(xpcc::tmp::SameType<T4, GpioUnused>::value ? 0 : 1) +
+			(xpcc::tmp::SameType<T5, GpioUnused>::value ? 0 : 1) +
+			(xpcc::tmp::SameType<T6, GpioUnused>::value ? 0 : 1) +
+			(xpcc::tmp::SameType<T7, GpioUnused>::value ? 0 : 1);
+
 	public:
 		static void
 		setOutput()
@@ -308,12 +238,12 @@ namespace xpcc
 			T1::setInput();
 			T0::setInput();
 		}
-		
+
 		static uint8_t
 		read()
 		{
 			uint8_t value = 0;
-			
+
 			if (T7::read()) { value |= 0b10000000; }
 			if (T6::read()) { value |= 0b01000000; }
 			if (T5::read()) { value |= 0b00100000; }
@@ -322,10 +252,10 @@ namespace xpcc
 			if (T2::read()) { value |= 0b00000100; }
 			if (T1::read()) { value |= 0b00000010; }
 			if (T0::read()) { value |= 0b00000001; }
-			
+
 			return value;
 		}
-		
+
 		static void
 		write(uint8_t data)
 		{
@@ -341,7 +271,7 @@ namespace xpcc
 	};
 
 	/**
-	 * \brief	Create a 16-bit port from arbitrary pins.
+	 * Create a 16-bit port from arbitrary pins.
 	 *
 	 * Be aware that this method is slow, because for every write or read
 	 * cycle, every of the sixteen (!) pins have to be read/written
@@ -351,30 +281,48 @@ namespace xpcc
 	 * for example when connecting a LCD where speed is not the main
 	 * concern.
 	 *
-	 * When possible preferred the GPIO__PORT()
-	 * macros over this class as they are much faster and require less code.
+	 * When possible prefer the native `GpioPort` implementations
+	 * over this class as they are much faster and require less code.
 	 *
-	 * \see		GPIO__PORT()
-	 * \ingroup	gpio
+	 * @ingroup	gpio
 	 */
-	template <typename T15 = GpioUnused,
-			  typename T14 = GpioUnused,
-			  typename T13 = GpioUnused,
-			  typename T12 = GpioUnused,
-			  typename T11 = GpioUnused,
-			  typename T10 = GpioUnused,
-			  typename T9  = GpioUnused,
-			  typename T8  = GpioUnused,
-			  typename T7  = GpioUnused,
-			  typename T6  = GpioUnused,
-			  typename T5  = GpioUnused,
-			  typename T4  = GpioUnused,
-			  typename T3  = GpioUnused,
-			  typename T2  = GpioUnused,
+	template <typename T0  = GpioUnused,
 			  typename T1  = GpioUnused,
-			  typename T0  = GpioUnused>
+			  typename T2  = GpioUnused,
+			  typename T3  = GpioUnused,
+			  typename T4  = GpioUnused,
+			  typename T5  = GpioUnused,
+			  typename T6  = GpioUnused,
+			  typename T7  = GpioUnused,
+			  typename T8  = GpioUnused,
+			  typename T9  = GpioUnused,
+			  typename T10 = GpioUnused,
+			  typename T11 = GpioUnused,
+			  typename T12 = GpioUnused,
+			  typename T13 = GpioUnused,
+			  typename T14 = GpioUnused,
+			  typename T15 = GpioUnused>
 	class SoftwareGpioWord : GpioWord
 	{
+	public:
+		static constexpr uint16_t width =
+			(xpcc::tmp::SameType<T0,  GpioUnused>::value ? 0 : 1) +
+			(xpcc::tmp::SameType<T1,  GpioUnused>::value ? 0 : 1) +
+			(xpcc::tmp::SameType<T2,  GpioUnused>::value ? 0 : 1) +
+			(xpcc::tmp::SameType<T3,  GpioUnused>::value ? 0 : 1) +
+			(xpcc::tmp::SameType<T4,  GpioUnused>::value ? 0 : 1) +
+			(xpcc::tmp::SameType<T5,  GpioUnused>::value ? 0 : 1) +
+			(xpcc::tmp::SameType<T6,  GpioUnused>::value ? 0 : 1) +
+			(xpcc::tmp::SameType<T7,  GpioUnused>::value ? 0 : 1) +
+			(xpcc::tmp::SameType<T8,  GpioUnused>::value ? 0 : 1) +
+			(xpcc::tmp::SameType<T9,  GpioUnused>::value ? 0 : 1) +
+			(xpcc::tmp::SameType<T10, GpioUnused>::value ? 0 : 1) +
+			(xpcc::tmp::SameType<T11, GpioUnused>::value ? 0 : 1) +
+			(xpcc::tmp::SameType<T12, GpioUnused>::value ? 0 : 1) +
+			(xpcc::tmp::SameType<T13, GpioUnused>::value ? 0 : 1) +
+			(xpcc::tmp::SameType<T14, GpioUnused>::value ? 0 : 1) +
+			(xpcc::tmp::SameType<T15, GpioUnused>::value ? 0 : 1);
+
 	public:
 		static void
 		setOutput()
@@ -466,4 +414,4 @@ namespace xpcc
 	};
 }
 
-#endif // XPCC__SOFTWARE_GPIO_HPP
+#endif // XPCC_SOFTWARE_GPIO_HPP

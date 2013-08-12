@@ -63,7 +63,9 @@ struct Gpio
 /**
  * Gpio OpenDrain template, which remaps the behavior of the Gpio pin to
  * simulate an open-drain Output.
+ * You must use this class for `SoftwareI2cMaster`!
  *
+ * @see ::xpcc::SoftwareI2cMaster
  * @ingroup	{{target.family}}
  */
 template< class IO >
@@ -314,21 +316,23 @@ public:
 %% endfor
 
 %# Ports
-%% for port in gpios|getPorts
+%% for port in gpios | getPorts
 
+/// @ingroup {{target.family}}
 template< uint8_t START_PIN, uint8_t WIDTH >
 class GpioPort{{port.name}} : ::xpcc::GpioOctet
 {
-	static constexpr uint8_t startPin = {{port.startPin}};
-	static constexpr uint8_t width = {{port.width}};
-	
-	static_assert(START_PIN >= startPin, "START_PIN too small, minimum {{port.startPin}}.");
-	static_assert(START_PIN < startPin + width, "START_PIN too large, maximum {{port.startPin + port.width}}.");
-	static_assert(WIDTH <= width, "WIDTH too large, maximum {{port.width}}.");
-	static_assert(START_PIN + WIDTH <= startPin + width, "START_PIN + WIDTH too large, maximum {{port.startPin + port.width}}.");
+	static_assert(START_PIN >= {{port.startPin}}, "START_PIN too small, minimum {{port.startPin}}.");
+	static_assert(START_PIN < {{port.startPin + port.width}}, "START_PIN too large, maximum {{port.startPin + port.width}}.");
+	static_assert(WIDTH <= {{port.width}}, "WIDTH too large, maximum {{port.width}}.");
+	static_assert(START_PIN + WIDTH <= {{port.startPin + port.width}}, "START_PIN + WIDTH too large, maximum {{port.startPin + port.width}}.");
 	
 	static constexpr uint8_t dataMask = (1 << WIDTH) - 1;
 	static constexpr uint8_t portMask = dataMask << START_PIN;
+
+public:
+	static constexpr uint8_t width = WIDTH;
+	
 public:
 	ALWAYS_INLINE static void setOutput() {
 		DDR{{port.name}} |= portMask;

@@ -1,13 +1,26 @@
+// coding: utf-8
+/* Copyright (c) 2013, Roboterclub Aachen e.V.
+ * All Rights Reserved.
+ *
+ * The file is part of the xpcc library and is released under the 3-clause BSD
+ * license. See the file `LICENSE` for the full license governing this code.
+ */
+// ----------------------------------------------------------------------------
 
-#include <xpcc/architecture.hpp>
+#include <xpcc/architecture/platform.hpp>
 
 using namespace xpcc::atmega;
 
 typedef GpioOutputB0 Led;
 typedef GpioOutputB1 Led2;
-typedef GpioPortD<4, 4> Data;
 
 typedef xpcc::GpioInverted< Led2 > LedInverted;
+
+typedef GpioPortD<4, 4> Data;
+typedef xpcc::SoftwareGpioOctet<GpioC1, GpioC4, GpioB6, GpioB3, GpioB5> Data2;
+
+static_assert(Data::width == 4, "Data::wdith is not 4");
+static_assert(Data2::width == 5, "Data2::wdith is not 5");
 
 int
 main(void)
@@ -15,7 +28,10 @@ main(void)
 	Led::setOutput();
 	Led::set();
 	Data::setOutput();
-	Data::write(0x02);
+	Data::write(0x0f);
+
+	Data2::setOutput();
+	Data2::write(0x1f);
 
 	LedInverted::setOutput();
 	LedInverted::reset();

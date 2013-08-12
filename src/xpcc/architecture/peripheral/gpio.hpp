@@ -29,17 +29,16 @@
  * Example:
  * @code
  * #include <xpcc/architecture/platform.hpp>
- * #include <xpcc/driver/software_spi.hpp>
  * #include <xpcc/driver/lcd/st7036.hpp>
  *
- * GPIO__OUTPUT(Clk, D, 7);
- * GPIO__OUTPUT(Mosi, D, 5);
+ * typedef GpioOutputD7 Clk;
+ * typedef GpioOutputD5 Mosi;
  *
- * GPIO__OUTPUT(LcdCs, D, 4);
- * GPIO__OUTPUT(LcdRs, D, 0);
+ * typedef GpioOutputD4 LcdCs;
+ * typedef GpioOutputD0 LcdRs;
  *
  * // Create a new type for the software SPI for the display
- * typedef xpcc::SoftwareSpiMaster< Clk, Mosi, xpcc::GpioUnused > SpiInterface;
+ * typedef xpcc::SoftwareSimpleSpi< Clk, Mosi > SpiInterface;
  *
  * // Create a instance of the ST7036 based display class
  * xpcc::St7036< SpiInterface,
@@ -64,7 +63,7 @@
  * #include <xpcc/architecture/platform.hpp>
  * #include <xpcc/architecture/driver/delay.hpp>
  *
- * GPIO__OUTPUT(Led, B, 0);
+ * typedef GpioOutputB0 Led;
  *
  * int
  * main(void)
@@ -208,7 +207,7 @@ public:
 };
 
 /**
- * @brief	Input/Output interface of an I/O pin
+ * Input/Output interface of an I/O pin.
  *
  * @ingroup	gpio
  */
@@ -223,14 +222,18 @@ class GpioIO : GpioOutput, GpioInput
  * This class provides the interface for up to 8 parallel IOs.
  * Be aware that the interface is the same regardless of the actual
  * mapping of the IOs.
- * For example, when a high nibble (0xf0) is physically configured, the
- * data will still be written and read as a low nibble (0x0f).
+ * For example, when a high nibble (0xe0) is physically configured, the
+ * data will still be written and read as a low nibble (0x0e).
+ *
+ * This class is only used on 8bit platforms.
  *
  * @ingroup	gpio
  */
 class GpioOctet
 {
 #ifdef __DOXYGEN__
+	/// this can be used in drivers to assert the correct requirements
+	static constexpr uint8_t width;
 public:
 	static void
 	setOutput();
@@ -238,11 +241,11 @@ public:
 	static void
 	setInput();
 
-	/// The read data is alsways right-aligned regardless of pysical mapping.
+	/// The read data is always right-aligned regardless of physical mapping.
 	static uint8_t
 	read();
 
-	/// The write data is alsways right-aligned regardless of pysical mapping.
+	/// The write data is always right-aligned regardless of physical mapping.
 	static void
 	write(uint8_t data);
 #endif
@@ -254,8 +257,8 @@ public:
  * This class provides the interface for up to 16 parallel IOs.
  * Be aware that the interface is the same regardless of the actual
  * mapping of the IOs.
- * For example, when a high octet (0xff00) is physically configured, the
- * data will still be written and read as a low octet (0x00ff).
+ * For example, when a high octet (0xf400) is physically configured, the
+ * data will still be written and read as a low octet (0x00f4).
  *
  * @ingroup	gpio
  */
@@ -263,17 +266,20 @@ class GpioWord
 {
 #ifdef __DOXYGEN__
 public:
+	/// this can be used in drivers to assert the correct requirements
+	static constexpr uint16_t width;
+public:
 	static void
 	setOutput();
 
 	static void
 	setInput();
 
-	/// The read data is alsways right-aligned regardless of pysical mapping.
+	/// The read data is always right-aligned regardless of physical mapping.
 	static uint16_t
 	read();
 
-	/// The write data is alsways right-aligned regardless of pysical mapping.
+	/// The write data is always right-aligned regardless of physical mapping.
 	static void
 	write(uint16_t data);
 #endif
