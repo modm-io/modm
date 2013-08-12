@@ -7,5 +7,6 @@
 		<template instances="4,5" out="uart_hal_{{id}}.hpp">uart_hal.hpp.in</template>
 		<template instances="4,5" out="uart_hal_{{id}}_impl.hpp">uart_hal_impl.hpp.in</template>
 		<template>uart_hal_base.hpp.in</template>
+		<static>type_ids.hpp</static>
 	</driver>
 </rca>

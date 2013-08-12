@@ -40,6 +40,18 @@
 			<gpio port="A" id="8">
 				<af id="0" peripheral="MCO" description="Clock Output"/>
 			</gpio>
+			<gpio port="A" id="2">
+				<af id="7" peripheral="UsartHal2" description="Tx" type="output"/>
+			</gpio>
+			<gpio port="A" id="3">
+				<af id="7" peripheral="UsartHal2" description="Rx" type="input"/>
+			</gpio>
+			<gpio port="B" id="10">
+				<af id="7" peripheral="UsartHal3" description="Tx" type="output"/>
+			</gpio>
+			<gpio port="B" id="11">
+				<af id="7" peripheral="UsartHal3" description="Rx" type="input"/>
+			</gpio>
 			<gpio port="E" id="8"  pin-count="100+"></gpio>
 			<gpio port="E" id="9"  pin-count="100+"></gpio>
 			<gpio port="E" id="10" pin-count="100+"></gpio>

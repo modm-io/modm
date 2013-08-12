@@ -18,6 +18,7 @@
 #define XPCC_STM32_{{ uart | upper }}HAL_{{ id }}_HPP
 
 #include <stdint.h>
+#include "../../../type_ids.hpp"
 #include "uart_hal_base.hpp"
 
 namespace xpcc
@@ -66,6 +67,9 @@ private:	// This methods can only be executed while UART is
 	setParity(const Parity parity);
 
 public:
+
+	/// TypeId used to connect GPIO pins to this peripheral.
+	static const TypeId::{{ uart ~ "Hal" ~ id }} Id;
 
 	/// Enables the clock, resets the hardware and sets the UE bit
 	static inline void
