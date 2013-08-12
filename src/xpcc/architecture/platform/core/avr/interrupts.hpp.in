@@ -1,119 +1,110 @@
 // coding: utf-8
-// ----------------------------------------------------------------------------
 /* Copyright (c) 2013, Roboterclub Aachen e.V.
- * All rights reserved.
+ * All Rights Reserved.
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- *     * Redistributions of source code must retain the above copyright
- *       notice, this list of conditions and the following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright
- *       notice, this list of conditions and the following disclaimer in the
- *       documentation and/or other materials provided with the distribution.
- *     * Neither the name of the Roboterclub Aachen e.V. nor the
- *       names of its contributors may be used to endorse or promote products
- *       derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY ROBOTERCLUB AACHEN E.V. ''AS IS'' AND ANY
- * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL ROBOTERCLUB AACHEN E.V. BE LIABLE FOR ANY
- * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * The file is part of the xpcc library and is released under the 3-clause BSD
+ * license. See the file `LICENSE` for the full license governing this code.
  */
 // ----------------------------------------------------------------------------
+{{ generation_block }}
 
-#ifndef XPCC__AVR_INTERRUPTS_HPP
-#define XPCC__AVR_INTERRUPTS_HPP
+#ifndef XPCC_AVR_INTERRUPTS_HPP
+#define XPCC_AVR_INTERRUPTS_HPP
 
 #include "../../device.hpp"
 
 namespace xpcc
 {
-	namespace {{ target.family }}
-	{
-		/**
-		 * \ingroup	avr
-		 */
-		static ALWAYS_INLINE void
-		enableInterrupts()
-		{
-			sei();
-		}
 
-		/**
-		 * \ingroup	avr
-		 */
-		static ALWAYS_INLINE void
-		disableInterrupts()
-		{
-			cli();
-		}
+namespace {{ target.family }}
+{
 
-%% if target.family == 'xmega'
-		/// Used to set the interrupt level of all modules.
-		/// @ingroup	xmega
-		enum class InterruptLevel : uint8_t
-		{
-			Off = 0x00,
-			Low = 0x01,
-			Medium = 0x02,
-			High = 0x03,
-		};
-
-		enum class InterruptControlLevel : uint8_t
-		{
-			Low = PMIC_LOLVLEN_bm,
-			Medium = PMIC_MEDLVLEN_bm,
-			High = PMIC_HILVLEN_bm,
-			All = PMIC_HILVLEN_bm | PMIC_MEDLVLEN_bm | PMIC_LOLVLEN_bm,
-		};
-
-		/**
-		 * Enable one or more of the three Interrupt levels.
-		 *
-		 * In order to work with interrupts on a xMEGA you need to enable
-		 * interrupts in general (enableInterrupts()) and enable the
-		 * level you wont to work with.
-		 *
-		 * Example:
-		 * \code
-		 * using namespace xpcc::xmega;
-		 * // reset all interrupt levels
-		 * resetInterruptLevel(InterruptControlLevel::All);
-		 * // set only High and Medium
-		 * setInterruptLevel(InterruptControlLevel::High);
-		 * setInterruptLevel(InterruptControlLevel::Medium);
-		 * enableInterrupts();
-		 * \endcode
-		 *
-		 * @ingroup	xmega
-		 */
-		static inline void
-		setInterruptLevel(InterruptControlLevel level)
-		{
-			PMIC_CTRL |= static_cast<uint8_t>(level);
-		}
-
-		/**
-		 * Disable interrupt levels.
-		 *
-		 * @ingroup	xmega
-		 */
-		static inline void
-		resetInterruptLevel(InterruptControlLevel level)
-		{
-			PMIC_CTRL &= ~static_cast<uint8_t>(level);
-		}
-%% endif
-	}
+/// @ingroup	{{ target.family }}
+static ALWAYS_INLINE void
+enableInterrupts()
+{
+	sei();
 }
 
+/// @ingroup	{{ target.family }}
+static ALWAYS_INLINE void
+disableInterrupts()
+{
+	cli();
+}
 
-#endif	// XPCC__AVR_INTERRUPTS_HPP
+%% if target.family == 'xmega'
+/// Used to set the interrupt level of all modules.
+/// @ingroup	xmega
+enum class
+InterruptLevel : uint8_t
+{
+	Off = 0x00,
+	Low = 0x01,
+	Medium = 0x02,
+	High = 0x03,
+};
+
+/// @ingroup	xmega
+enum class
+InterruptControlLevel : uint8_t
+{
+	Low = PMIC_LOLVLEN_bm,
+	Medium = PMIC_MEDLVLEN_bm,
+	High = PMIC_HILVLEN_bm,
+	All = PMIC_HILVLEN_bm | PMIC_MEDLVLEN_bm | PMIC_LOLVLEN_bm,
+};
+
+/// @private
+/// @{
+static constexpr uint8_t
+i(InterruptLevel level) { return static_cast<uint8_t>(level); }
+static constexpr uint8_t
+i(InterruptControlLevel level) { return static_cast<uint8_t>(level); }
+/// @}
+
+/**
+ * Enable one or more of the three Interrupt levels.
+ *
+ * In order to work with interrupts on a xMEGA you need to enable
+ * interrupts in general (enableInterrupts()) and enable the
+ * level you wont to work with.
+ *
+ * Example:
+ * \code
+ * using namespace xpcc::xmega;
+ * // reset all interrupt levels
+ * resetInterruptLevel(InterruptControlLevel::All);
+ * // set only High and Medium
+ * setInterruptLevel(InterruptControlLevel::High);
+ * setInterruptLevel(InterruptControlLevel::Medium);
+ * enableInterrupts();
+ * \endcode
+ *
+ * @ingroup	xmega
+ */
+static inline void
+setInterruptLevel(InterruptControlLevel level)
+{
+	PMIC_CTRL |= i(level);
+}
+
+/**
+ * Disable interrupt levels.
+ *
+ * @ingroup	xmega
+ */
+static inline void
+resetInterruptLevel(InterruptControlLevel level)
+{
+	PMIC_CTRL &= ~i(level);
+}
+%% endif
+
+}	// namespace {{ target.family }}
+
+}	// namespace xpcc
+
+
+#endif	// XPCC_AVR_INTERRUPTS_HPP
  
