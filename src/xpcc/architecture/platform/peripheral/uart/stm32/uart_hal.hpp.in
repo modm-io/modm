@@ -19,6 +19,7 @@
 
 #include <stdint.h>
 #include "../../../type_ids.hpp"
+#include "../../../device.hpp"
 #include "uart_hal_base.hpp"
 
 namespace xpcc

@@ -24,11 +24,9 @@
 		<define>STM32F0XX</define>
 		<define>STM32F05X</define>
 		<define>__STM32F051__</define>
-<!--
-		<define>STM32_AHB_FREQUENCY  = 72000000</define>
-		<define>STM32_APB1_FREQUENCY = 36000000</define>
-		<define>STM32_APB2_FREQUENCY = 72000000</define>
--->
+		<define>STM32_AHB_FREQUENCY  = 8000000</define>
+		<define>STM32_APB1_FREQUENCY = 8000000</define>
+		<define>STM32_APB2_FREQUENCY = 8000000</define>
 		<define>CORTEX_VECTORS_RAM = 0</define>
 		<define>CORTEX_ENABLE_HARD_FAULT_HANDLER = 0</define>
 		<!-- Core Driver -->
@@ -37,8 +35,15 @@
 		</driver>
 		<!-- Peripheral Drivers -->
 		<!--<driver type="clock" name="stm32" /> -->
+		<driver type="uart" name="stm32" instances="1,2" />
 		<driver type="gpio" name="stm32_af">
 			<gpio port="A" id="0"></gpio>
+			<gpio port="A" id="2">
+				<af id="1" peripheral="UsartHal2" description="Tx" type="output"/>
+			</gpio>
+			<gpio port="A" id="3">
+				<af id="1" peripheral="UsartHal2" description="Rx" type="input"/>
+			</gpio>
 			<gpio port="A" id="8">
 				<!--<af id="0" peripheral="MCO" description="Clock Output"/>-->
 			</gpio>
