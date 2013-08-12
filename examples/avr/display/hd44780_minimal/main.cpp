@@ -7,18 +7,12 @@
 // define the pins used by the LCD
 namespace lcd
 {
-	GPIO__OUTPUT(E, C, 6);
-	GPIO__OUTPUT(Rw, C, 5);
-	GPIO__OUTPUT(Rs, C, 4);
-	
-	GPIO__IO(Data0, A, 4);
-	GPIO__IO(Data1, B, 1);
-	GPIO__IO(Data2, C, 7);
-	GPIO__IO(Data3, D, 2);
-	
-	typedef xpcc::gpio::Nibble<Data3, Data2, Data1, Data0> Data;
-	
-	//GPIO__NIBBLE_LOW(Data, C);
+	typedef GpioOutputC6 E;
+	typedef GpioOutputC5 Rw;
+	typedef GpioOutputC4 Rs;
+
+	typedef xpcc::SoftwareGpioNibble<GpioD2, GpioC7, GpioB1, GpioA4> Data;
+	//typedef GpioLowNibbleC Data;
 }
 
 // create a LCD object
@@ -30,13 +24,13 @@ main()
 	// The LCD needs at least 50ms after power-up until it can be
 	// initialized.
 	xpcc::delay_ms(50);
-	
+
 	display.initialize();
 	display.setCursor(0, 0);
-	
+
 	// write the standard welcome message ;-)
 	display.write("Hello World!\n");
-	
+
 	while (1)
 	{
 	}

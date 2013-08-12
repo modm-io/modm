@@ -15,25 +15,25 @@
 
 namespace led
 {
-	GPIO__OUTPUT(R, D, 7);
-	GPIO__OUTPUT(G, D, 6);
-	GPIO__OUTPUT(B, D, 5);
+	typedef GpioOutputD7 R;
+	typedef GpioOutputD6 G;
+	typedef GpioOutputD5 B;
 }
 
 // define the pins used by the LCD
 namespace lcd
 {
-	GPIO__OUTPUT(Scl, B, 7);
-	GPIO__OUTPUT(Mosi, B, 5);
-	
-	GPIO__OUTPUT(CS, D, 2);
-	GPIO__OUTPUT(A0, D, 3);
-	GPIO__OUTPUT(Reset, D, 4);
-	
+	typedef GpioOutputB7 Scl;
+	typedef GpioOutputB5 Mosi;
+
+	typedef GpioOutputD2 Cs;
+	typedef GpioOutputD3 A0;
+	typedef GpioOutputD4 Reset;
+
 	typedef xpcc::SoftwareSpiMaster< Scl, Mosi, xpcc::GpioUnused, 10000000UL > SPI;
 }
 
-xpcc::DogM128< lcd::SPI, lcd::CS, lcd::A0, lcd::Reset, true > display;
+xpcc::DogM128< lcd::SPI, lcd::Cs, lcd::A0, lcd::Reset, true > display;
 
 FLASH_STORAGE(uint8_t bootscreen[]) =
 {
@@ -188,18 +188,18 @@ main()
 	led::R::set();
 	led::G::set();
 	led::B::reset();
-	
+
 	led::R::setOutput();
 	led::G::setOutput();
 	led::B::setOutput();
-	
+
 	display.initialize();
-	
+
 	display.drawImage(xpcc::glcd::Point(0, 0), xpcc::accessor::asFlash(bootscreen));
 	display.update();
-	
+
 	xpcc::delay_ms(1500);
-	
+
 	uint8_t units = 0;
 	uint8_t tens = 0;
 	while (1)
@@ -212,11 +212,11 @@ main()
 				tens = 0;
 			}
 		}
-		
+
 		drawNumber(xpcc::glcd::Point(0, 0), tens);
 		drawNumber(xpcc::glcd::Point(64, 0), units);
 		display.update();
-		
+
 		xpcc::delay_ms(200);
 	}
 }

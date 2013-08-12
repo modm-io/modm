@@ -34,14 +34,14 @@ int
 main()
 {
 	// Enable interrupts, this is needed for every buffered UART
-	sei();
-	
+	enableInterrupts();
+
 	// Create a IOStream for complex formatting tasks
 	xpcc::IODeviceWrapper<Uart0> device(uart);
 	xpcc::IOStream output(device);
-	
+
 	output << "I2C eeprom test" << xpcc::endl;
-	
+
 	// Initialize the I2C interface.
 	Twi::initialize<>();
 

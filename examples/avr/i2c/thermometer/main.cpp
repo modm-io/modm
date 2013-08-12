@@ -32,17 +32,17 @@ int
 main()
 {
 	// Enable interrupts, this is needed for every buffered UART
-	sei();
-	
+	enableInterrupts();
+
 	// Create a IOStream for complex formatting tasks
 	xpcc::IODeviceWrapper<Uart0> device(uart);
 	xpcc::IOStream output(device);
-	
+
 	output << "Thermometer" << xpcc::endl;
-	
+
 	// Initialize the I2C interface.
 	Twi::initialize<xpcc::I2cMaster::DataRate::Standard>();
-	
+
 	uint8_t data[2];
 	xpcc::Ds1631< Twi > ds1631(data, 0x90);
 

@@ -2,14 +2,14 @@
 /* Copyright (c) 2013, Roboterclub Aachen e.V.
  * All Rights Reserved.
  *
- * The file is part for the xpcc library and is released under the 3-clause BSD
+ * The file is part of the xpcc library and is released under the 3-clause BSD
  * license. See the file `LICENSE` for the full license governing this code.
  */
 // ----------------------------------------------------------------------------
 {{ generation_block }}
 
-#ifndef XPCC_XMEGA__GPIO_HPP
-#define XPCC_XMEGA__GPIO_HPP
+#ifndef XPCC_XMEGA_GPIO_HPP
+#define XPCC_XMEGA_GPIO_HPP
 
 #include "../../../device.hpp"
 #include "../../../core/avr/interrupts.hpp"

@@ -1,14 +1,14 @@
 
 #include <xpcc/architecture.hpp>
 
-GPIO__OUTPUT(Led, B, 0);
+typedef GpioOutputB0 Led;
 
 int
 main(void)
 {
 	Led::setOutput();
 	Led::set();
-	
+
 	while (1)
 	{
 		Led::toggle();

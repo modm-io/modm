@@ -31,15 +31,15 @@ xpcc::log::Logger xpcc::log::error(loggerDevice);
 // ----------------------------------------------------------------------------
 // CAN communication
 
-GPIO__OUTPUT(Cs, B, 4);
-GPIO__INPUT(Int, B, 2);
+typedef GpioOutputB4 Cs;
+typedef GpioInputB2 Int;
 
-GPIO__OUTPUT(Sclk, B, 7);
-GPIO__OUTPUT(Mosi, B, 5);
-GPIO__INPUT(Miso, B, 6);
+typedef GpioOutputB7 Sclk;
+typedef GpioOutputB5 Mosi;
+typedef GpioInputB6 Miso;
 
-typedef xpcc::SoftwareSpiMaster< Sclk, Mosi, Miso > SpiM;
-typedef xpcc::Mcp2515< SpiM, Cs, Int > CanDevice;
+typedef xpcc::SoftwareSpiMaster< Sclk, Mosi, Miso > SPI;
+typedef xpcc::Mcp2515< SPI, Cs, Int > CanDevice;
 
 static CanDevice device;
 static xpcc::CanConnector< CanDevice > connector(&device);
@@ -74,26 +74,26 @@ MAIN_FUNCTION
 {
 	// Initialize SPI interface and the other pins
 	// needed by the MCP2515
-	SpiM::initialize();
+	SPI::initialize();
 	Cs::setOutput();
 	Int::setInput(Gpio::PullType::PullUp);
-	
+
 	// Configure MCP2515 and set the filters
 	device.initialize(xpcc::can::BITRATE_125_KBPS);
 	device.setFilter(xpcc::accessor::asFlash(canFilter));
-	
+
 	// Enable Interrupts
 	sei();
-	
-	XPCC_LOG_INFO << "Welcome to the communication test!" << xpcc::endl; 
-	
+
+	XPCC_LOG_INFO << "Welcome to the communication test!" << xpcc::endl;
+
 	while (1)
 	{
 		// deliver received messages
 		dispatcher.update();
-		
+
 		component::receiver.update();
-		
+
 		xpcc::delay_us(100);
 	}
 }
