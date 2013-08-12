@@ -19,10 +19,29 @@
 #include "{{ uart | lower }}_hal_{{ id }}.hpp"
 #include "{{ uart | lower }}_{{ id }}.hpp"
 
+%% if parameters.buffered
+namespace
+{
+	static xpcc::atomic::Queue<char, {{ parameters.rx_buffer }}> rxBuffer;
+	static xpcc::atomic::Queue<char, {{ parameters.tx_buffer }}> txBuffer;
+	static bool isBlocking = true;
+}
+%% endif
+
 void
+%% if parameters.buffered
+xpcc::stm32::{{ name }}::initialize(uint32_t baudrate,
+					uint32_t interruptPriority, bool blocking, Parity parity)
+%% else
 xpcc::stm32::{{ name }}::initialize(uint32_t baudrate, Parity parity)
+%% endif
 {
 	{{ hal }}::initialize(baudrate, parity);
+%% if parameters.buffered
+	{{ hal }}::enableInterruptVector(true, interruptPriority);
+	{{ hal }}::enableInterrupt(Interrupt::RxNotEmpty);
+	isBlocking = blocking;
+%% endif
 	{{ hal }}::setTransmitterEnable(true);
 	{{ hal }}::setReceiverEnable(true);
 }
@@ -45,45 +64,88 @@ xpcc::stm32::{{ name }}::writeBlocking(const uint8_t *data, std::size_t n)
 bool
 xpcc::stm32::{{ name }}::read(uint8_t &data)
 {
+%% if parameters.buffered
+	if (rxBuffer.isEmpty()) {
+		return false;
+	} else {
+		data = rxBuffer.get();
+		rxBuffer.pop();
+		return true;
+	}
+%% else
 	if({{ hal }}::isReceiveRegisterNotEmpty()) {
 		data = {{ hal }}::read();
 		return true;
 	} else {
 		return false;
 	}
+%% endif
 }
 
 std::size_t
 xpcc::stm32::{{ name }}::read(uint8_t *data, std::size_t n)
 {
+%% if parameters.buffered
+	uint32_t i = 0;
+	for (; i < n; ++i)
+	{
+		if (rxBuffer.isEmpty()) {
+			return i;
+		} else {
+			*buffer++ = rxBuffer.get();
+			rxBuffer.pop();
+		}
+	}
+	return i;
+%% else
 	(void)n; // avoid compiler warning
 	if(read(*data)) {
 		return 1;
 	} else {
 		return 0;
 	}
+%% endif
 }
 
 bool
 xpcc::stm32::{{ name }}::write(uint8_t data)
 {
+%% if parameters.buffered
+	if(txBuffer.isEmpty() && {{ hal }}::isTransmitRegisterEmpty()) {
+		{{ hal }}::write(data);
+		return true;
+	} else {
+		while (!txBuffer.push(c)) {
+			if (!isBlocking) {	// if queue is full => block
+				return false;	// if not supposed ot block return false
+			}
+		}
+		// Disable interrupts while enabling the transmit interrupt
+		atomic::Lock lock;
+		// Transmit Data Register Empty Interrupt Enable
+		{{ hal }}::enableInterrupt(Interrupt::TxEmpty);
+	}
+%% else
 	if({{ hal }}::isTransmitRegisterEmpty()) {
 		{{ hal }}::write(data);
 		return true;
 	} else {
 		return false;
 	}
+%% endif
 }
 
 std::size_t
 xpcc::stm32::{{ name }}::write(const uint8_t *data, std::size_t n)
 {
-	(void)n; // avoid compiler warning
-	if(write(*data)) {
-		return 1;
-	} else {
-		return 0;
+	uint32_t i = 0;
+	for (; i < n; ++i)
+	{
+		if (!write(*data++)) {
+			return i;
+		}
 	}
+	return i;
 }
 
 bool
@@ -91,3 +153,25 @@ xpcc::stm32::{{ name }}::isWriteFinished()
 {
 	return {{ hal }}::isTransmitRegisterEmpty();
 }
+
+%% if parameters.buffered
+extern "C" void
+{{ uart | upper ~ id }}_IRQHandler()
+{
+	if ({{ hal }}::isReceiveRegisterNotEmpty()) {
+		// TODO: save the errors
+		uint8_t data = {{ hal }}::read();
+		rxBuffer.push(data);
+	}
+	if ({{ hal }}::isTransmitRegisterEmpty()) {
+		if (txBuffer.isEmpty()) {
+			// transmission finished, disable TxEmpty interrupt
+			{{ hal }}::disableInterrupt(Interrupt::TxEmpty);
+		}
+		else {
+			{{ hal }}::write(txBuffer.get());
+			txBuffer.pop();
+		}
+	}
+}
+%% endif

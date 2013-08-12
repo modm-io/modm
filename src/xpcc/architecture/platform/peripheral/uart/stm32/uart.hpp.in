@@ -38,7 +38,12 @@ public:
 	static const TypeId::{{ uart ~ "Hal" ~ id }} Id;
 
 	static void
+%% if parameters.buffered
+	initialize(uint32_t baudrate, uint32_t interruptPriority,
+				bool blocking = true, Parity parity = Parity::Disabled);
+%% else
 	initialize(uint32_t baudrate, Parity parity = Parity::Disabled);
+%% endif
 
 	static void
 	writeBlocking(uint8_t data);
