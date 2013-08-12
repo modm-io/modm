@@ -284,9 +284,9 @@ class Parameter:
 		elif self.type == 'bool':
 			if isinstance(value, bool):
 				return value
-			if value.lower == 'true' or value == '1':
+			if value.lower() == 'true' or value == '1':
 				return True
-			elif value.lower == 'false' or value == '0':
+			elif value.lower() == 'false' or value == '0':
 				return False
 			self.log.error("Invalid value '%s' for %s." % (value, self.name))
 			return None
