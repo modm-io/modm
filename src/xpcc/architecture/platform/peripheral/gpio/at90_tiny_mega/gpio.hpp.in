@@ -313,72 +313,40 @@ public:
 	%% endfor
 %% endfor
 
-%% for nibble in nibbles
-	%% set port = nibble.port | upper
+%# Ports
+%% for port in gpios|getPorts
 
-	%% for id in nibble.position
-		%% if id == 0
-struct GpioLowNibble{{port}} : ::xpcc::GpioNibble
+template< uint8_t START_PIN, uint8_t WIDTH >
+class GpioPort{{port.name}} : ::xpcc::GpioOctet
 {
+	static constexpr uint8_t startPin = {{port.startPin}};
+	static constexpr uint8_t width = {{port.width}};
+	
+	static_assert(START_PIN >= startPin, "START_PIN too small, minimum {{port.startPin}}.");
+	static_assert(START_PIN < startPin + width, "START_PIN too large, maximum {{port.startPin + port.width}}.");
+	static_assert(WIDTH <= width, "WIDTH too large, maximum {{port.width}}.");
+	static_assert(START_PIN + WIDTH <= startPin + width, "START_PIN + WIDTH too large, maximum {{port.startPin + port.width}}.");
+	
+	static constexpr uint8_t dataMask = (1 << WIDTH) - 1;
+	static constexpr uint8_t portMask = dataMask << START_PIN;
+public:
 	ALWAYS_INLINE static void setOutput() {
-		DDR{{port}} |= 0x0f;
+		DDR{{port.name}} |= portMask;
 	}
 	ALWAYS_INLINE static void setInput() {
-		DDR{{port}} &= ~0x0f;
+		DDR{{port.name}} &= ~portMask;
 	}
 	ALWAYS_INLINE static uint8_t read() {
-		return (PIN{{port}} & 0x0f);
+		uint8_t data = PIN{{port.name}} & portMask;
+		return (data >> START_PIN);
 	}
 	ALWAYS_INLINE static void write(uint8_t data) {
-		PORT{{port}} = (data & 0x0f) | (PORT{{port}} & 0xf0);
+		data <<= START_PIN;
+		PORT{{port.name}} &= ~portMask;
+		PORT{{port.name}} |= data & portMask;
 	}
 };
-		%% elif id == 1
-struct GpioHighNibble{{port}} : ::xpcc::GpioNibble
-{
-	ALWAYS_INLINE static void setOutput() {
-		DDR{{port}} |= 0xf0;
-	}
-	ALWAYS_INLINE static void setInput() {
-		DDR{{port}} &= ~0xf0;
-	}
-	ALWAYS_INLINE static uint8_t read() {
-		uint8_t data = PIN{{port}};
-		return (data >> 4);
-	}
-	ALWAYS_INLINE static void write(uint8_t data) {
-		data <<= 4;
-		PORT{{port}} = data | (PORT{{port}} & 0x0f);
-	}
-};
-		%% endif
 
-	%% endfor
-%% endfor
-
-%% for octet in octets
-	%% set port = octet.port | upper
-
-	%% for id in octet.position
-		%% if id == 0
-struct GpioPort{{port}} : ::xpcc::GpioOctet
-{
-	ALWAYS_INLINE static void setOutput() {
-		DDR{{port}} = 0xff;
-	}
-	ALWAYS_INLINE static void setInput() {
-		DDR{{port}} = 0;
-	}
-	ALWAYS_INLINE static uint8_t read() {
-		return PIN{{port}};
-	}
-	ALWAYS_INLINE static void write(uint8_t data) {
-		PORT{{port}} = data;
-	}
-};
-		%% endif
-
-	%% endfor
 %% endfor
 
 }	// namespace {{target.family}}

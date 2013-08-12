@@ -232,13 +232,13 @@ def filter_get_ports(gpios):
 		# if the port consists of at least one gpio pin
 		if 1 in ids:
 			port = {}
-			port['name'] = "Port%s" % name
+			port['name'] = name
 			# find start pin as well as width
 			ii = ids.index(1)
-			port['startPinId'] = ii
+			port['startPin'] = ii
 			while ii < 16 and ids[ii] == 1:
 				ii = ii + 1
-			port['width'] = ii - port['startPinId']
+			port['width'] = ii - port['startPin']
 			ports.append(port)
 	return ports
 
