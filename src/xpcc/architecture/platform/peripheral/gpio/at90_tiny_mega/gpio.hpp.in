@@ -1,30 +1,9 @@
 // coding: utf-8
-// ----------------------------------------------------------------------------
 /* Copyright (c) 2013, Roboterclub Aachen e.V.
- * All rights reserved.
+ * All Rights Reserved.
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- *     * Redistributions of source code must retain the above copyright
- *       notice, this list of conditions and the following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright
- *       notice, this list of conditions and the following disclaimer in the
- *       documentation and/or other materials provided with the distribution.
- *     * Neither the name of the Roboterclub Aachen e.V. nor the
- *       names of its contributors may be used to endorse or promote products
- *       derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY ROBOTERCLUB AACHEN E.V. ''AS IS'' AND ANY
- * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL ROBOTERCLUB AACHEN E.V. BE LIABLE FOR ANY
- * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * The file is part for the xpcc library and is released under the 3-clause BSD
+ * license. See the file `LICENSE` for the full license governing this code.
  */
 // ----------------------------------------------------------------------------
 {{ generation_block }}
@@ -36,82 +15,75 @@
 #include "gpio_define.h"
 #include <xpcc/architecture/peripheral/gpio.hpp>
 
-/**
- * Macros for backwards compatibility:
- */
-
-#define	GPIO__IO(name, port, pin) \
-typedef CONCAT3(::xpcc::{{target.family}}::Gpio, port, pin) name
-
-#define	GPIO__OUTPUT(name, port, pin) \
-typedef CONCAT3(::xpcc::{{target.family}}::GpioOutput, port, pin) name
-
-#define	GPIO__INPUT(name, port, pin) \
-typedef CONCAT3(::xpcc::{{target.family}}::GpioInput, port, pin) name
-
-#define	GPIO__NIBBLE_LOW(name, port) \
-typedef CONCAT(::xpcc::{{target.family}}::GpioLowNibble, port) name
-
-#define	GPIO__NIBBLE_HIGH(name, port) \
-typedef CONCAT(::xpcc::{{target.family}}::GpioHighNibble, port) name
-
-#define	GPIO__PORT(name, port) \
-typedef CONCAT(::xpcc::{{target.family}}::GpioPort, port) name
-
 
 namespace xpcc
 {
-	namespace {{target.family}}
+
+namespace {{target.family}}
+{
+
+struct Gpio
+{
+	/**
+	 * Each Pin can be configured in one of these states.
+	 * Only available for Pins configured as inputs!
+	 *
+	 * @ingroup	{{target.family}}
+	 */
+	enum class
+	Configuration : uint8_t
 	{
-		struct Gpio
-		{
-			/**
-			 * \ingroup	{{target.family}}
-			 */
-			enum class Configuration : uint8_t
-			{
-				Floating,
-				PullUp,
-			};
-			
-			/**
-			 * \ingroup	{{target.family}}
-			 */
-			enum class InputTrigger : uint8_t
-			{
-				LowLevel = 0b00,
-				BothEdges = 0b01,
-				FallingEdge = 0b10,
-				RisingEdge = 0b11,
-			};
-		};
+		Floating,	///< The input pin is left floating
+		PullUp,		///< The input pin is pulled to Vcc
+	};
+	
+	/**
+	 * Each External Interrupt can be configured to trigger on these conditions.
+	 *
+	 * @ingroup	{{target.family}}
+	 */
+	enum class
+	InputTrigger : uint8_t
+	{
+		LowLevel = 0b00,	///< triggers **continously** during low level
+		BothEdges = 0b01,	///< triggers on both rising and falling edge
+		FallingEdge = 0b10,	///< triggers on falling edge
+		RisingEdge = 0b11,	///< triggers on rising edge
+	};
+};
 
-		/**
-		 * Gpio OpenDrain template, which remaps the behavior of the Gpio pin to
-		 * simulate an open-drain Output.
-		 * This maps set() -> setOutput() and reset() -> setInput(Configuration::PullUp)
-		 */
-		template< class IO >
-		struct GpioOpenDrain : Gpio
-		{
-			ALWAYS_INLINE static void set() {
-				IO::setInput(Configuration::PullUp);
-			}
-			ALWAYS_INLINE static void reset() {
-				IO::setOutput(::xpcc::Gpio::LOW);
-			}
-			ALWAYS_INLINE static void set(bool status) {
-				if (status) { set(); }
-				else { reset(); }
-			}
-			ALWAYS_INLINE static bool read() {
-				return IO::read();
-			}
-		};
+/**
+ * Gpio OpenDrain template, which remaps the behavior of the Gpio pin to
+ * simulate an open-drain Output.
+ *
+ * @ingroup	{{target.family}}
+ */
+template< class IO >
+class GpioOpenDrain : Gpio
+{
+public:
+	/// maps to `setInput(Configuration::PullUp)` 
+	ALWAYS_INLINE static void set() {
+		IO::setInput(Configuration::PullUp);
+	}
+	/// maps to `setOutput(::xpcc::Gpio::LOW)`
+	ALWAYS_INLINE static void reset() {
+		IO::setOutput(::xpcc::Gpio::LOW);
+	}
+	ALWAYS_INLINE static void set(bool status) {
+		if (status) { set(); }
+		else { reset(); }
+	}
+	ALWAYS_INLINE static bool read() {
+		return IO::read();
+	}
+};
 
-		/**
-		 * Gpio Classes created from the XML Device File Gpio Description
-		 */
+/**
+ * Gpio Classes created from the XML Device File Gpio Description
+ *
+ * @ingroup	{{target.family}}
+ */
 %% for gpio in gpios
 	%% set port = gpio.port | upper
 	%% set pin  = gpio.id
@@ -119,60 +91,68 @@ namespace xpcc
 	%% for type in ["Output", "Input", ""] 
 		
 		%% if type == "Output"
-		struct GpioOutput{{port ~ pin}} : public Gpio, ::xpcc::GpioOutput
+class GpioOutput{{port ~ pin}} : public Gpio, ::xpcc::GpioOutput
 		%% elif type == "Input"
-		struct GpioInput{{port ~ pin}} : public Gpio, ::xpcc::GpioInput
+class GpioInput{{port ~ pin}} : public Gpio, ::xpcc::GpioInput
 		%% elif type == ""
-		struct Gpio{{port ~ pin}} : public Gpio, ::xpcc::GpioIO
+class Gpio{{port ~ pin}} : public Gpio, ::xpcc::GpioIO
 		%% endif
-		{
-			static constexpr uint8_t mask = (1 << {{pin}});
+{
+public:
+	static constexpr uint8_t pin = {{pin}};		///< the pin number of this GPIO
+	static constexpr uint8_t mask = (1 << pin);	///< the mask of this GPIO
+	
 		%% if type in ["", "Output"]
-			ALWAYS_INLINE static void setOutput(bool status) {
-				set(status);
-				setOutput();
-			}
+	ALWAYS_INLINE static void setOutput(bool status) {
+		set(status);
+		setOutput();
+	}
 
-			ALWAYS_INLINE static void setOutput() {
-				DDR{{port}} |= mask;
-			}
+	ALWAYS_INLINE static void setOutput() {
+		DDR{{port}} |= mask;
+	}
 
-			ALWAYS_INLINE static void set() {
-				PORT{{port}} |= mask;
-			}
-			
-			ALWAYS_INLINE static void set(bool status) {
-				if (status) { set(); }
-				else { reset(); }
-			}
+	ALWAYS_INLINE static void set() {
+		PORT{{port}} |= mask;
+	}
+	
+	ALWAYS_INLINE static void set(bool status) {
+		if (status) { set(); }
+		else { reset(); }
+	}
 
-			ALWAYS_INLINE static void reset() {
-				PORT{{port}} &= ~mask;
-			}
+	ALWAYS_INLINE static void reset() {
+		PORT{{port}} &= ~mask;
+	}
 
-			ALWAYS_INLINE static void toggle() {
-				PORT{{port}} ^= mask;
-			}
+	ALWAYS_INLINE static void toggle() {
+		PORT{{port}} ^= mask;
+	}
 		%% endif
 		%% if type in ["", "Input"]
-			ALWAYS_INLINE static void setInput() {
-				DDR{{port}} &= ~mask;
-			}
+	/// call `setInput()` before calling this method
+	ALWAYS_INLINE static void configure(Configuration config) {
+		if (config == Configuration::PullUp) {
+			PORT{{port}} |= mask;
+		}
+		else {
+			PORT{{port}} &= ~mask;
+		}
+	}
 
-			ALWAYS_INLINE static void
-			setInput(Configuration type) {
-				setInput();
-				if (type == Configuration::PullUp) {
-					PORT{{port}} |= mask;
-				}
-				else {
-					PORT{{port}} &= ~mask;
-				}
-			}
+	ALWAYS_INLINE static void setInput() {
+		DDR{{port}} &= ~mask;
+	}
 
-			ALWAYS_INLINE static bool read() {
-				return (PIN{{port}} & mask);
-			}
+	ALWAYS_INLINE static void
+	setInput(Configuration config) {
+		setInput();
+		configure(config);
+	}
+
+	ALWAYS_INLINE static bool read() {
+		return (PIN{{port}} & mask);
+	}
 		%% for af in gpio.afs
 			%% set af_id = af.id | int
 		
@@ -191,61 +171,61 @@ namespace xpcc
 			%% endif
 			%% endif
 			
-			ALWAYS_INLINE static void setInputTrigger(InputTrigger trigger) {
+	ALWAYS_INLINE static void setInputTrigger(InputTrigger trigger) {
 			%% if af_id < 4
 				%% if isc2 != '' and af_id == 2
-				{{isc2}} |= ((static_cast<uint8_t>(trigger) & 0b01) << ISC2);
+		{{isc2}} |= ((static_cast<uint8_t>(trigger) & 0b01) << ISC2);
 				%% else
-				{{eicra}} |= (static_cast<uint8_t>(trigger) << 2*{{af_id}});
+		{{eicra}} |= (static_cast<uint8_t>(trigger) << 2*{{af_id}});
 				%% endif
 			%% else
-				EICRB |= (static_cast<uint8_t>(trigger) << 2*{{af_id - 4}});
+		EICRB |= (static_cast<uint8_t>(trigger) << 2*{{af_id - 4}});
 			%% endif
-			}
+	}
 			
-			ALWAYS_INLINE static void enableExternalInterrupt() {
+	ALWAYS_INLINE static void enableExternalInterrupt() {
 #ifdef EIMSK
-				EIMSK |= (1 << INT{{af_id}});
+		EIMSK |= (1 << INT{{af_id}});
 #elif defined GIMSK
-				GIMSK |= (1 << INT{{af_id}});
+		GIMSK |= (1 << INT{{af_id}});
 #elif defined GICR
-				GICR |= (1 << INT{{af_id}});
+		GICR |= (1 << INT{{af_id}});
 #else
 #	error "Cannot find register for setting INT{{af_id}}!"
 #endif
-			}
+	}
 
-			ALWAYS_INLINE static void disableExternalInterrupt() {
+	ALWAYS_INLINE static void disableExternalInterrupt() {
 #ifdef EIMSK
-				EIMSK &= ~(1 << INT{{af_id}});
+		EIMSK &= ~(1 << INT{{af_id}});
 #elif defined GIMSK
-				GIMSK &= ~(1 << INT{{af_id}});
+		GIMSK &= ~(1 << INT{{af_id}});
 #elif defined GICR
-				GICR &= ~(1 << INT{{af_id}});
+		GICR &= ~(1 << INT{{af_id}});
 #else
 #	error "Cannot find register for clearing INT{{af_id}}!"
 #endif
-			}
+	}
 
-			ALWAYS_INLINE static bool readExternalInterruptFlag() {
+	ALWAYS_INLINE static bool readExternalInterruptFlag() {
 #ifdef EIFR
-				return (EIFR & (1 << INTF{{af_id}}));
+		return (EIFR & (1 << INTF{{af_id}}));
 #elif defined GIFR
-				return (GIFR & (1 << INTF{{af_id}}));
+		return (GIFR & (1 << INTF{{af_id}}));
 #else
 #	error "Cannot find register for reading INTF{{af_id}}!"
 #endif
-			}
+	}
 
-			ALWAYS_INLINE static void acknowledgeExternalInterruptFlag() {
+	ALWAYS_INLINE static void acknowledgeExternalInterruptFlag() {
 #ifdef EIFR
-				EIFR |= (1 << INTF{{af_id}});
+		EIFR |= (1 << INTF{{af_id}});
 #elif defined GIFR
-				GIFR |= (1 << INTF{{af_id}});
+		GIFR |= (1 << INTF{{af_id}});
 #else
 #	error "Cannot find register for setting INTF{{af_id}}!"
 #endif
-			}
+	}
 			%% endif
 
 			%% if af.type == "pcint"
@@ -262,68 +242,68 @@ namespace xpcc
 			%% endif
 			
 			
-			ALWAYS_INLINE static void enablePCInterrupt() {
-				PCMSK{{af_reg}} |= (1 << PCINT{{af_id}});
+	ALWAYS_INLINE static void enablePCInterrupt() {
+		PCMSK{{af_reg}} |= (1 << PCINT{{af_id}});
 #ifdef PCICR
-				PCICR |= (1 << PCIE{{af_reg}});
+		PCICR |= (1 << PCIE{{af_reg}});
 #elif defined EIMSK
-				EIMSK |= (1 << PCIE{{af_reg}});
+		EIMSK |= (1 << PCIE{{af_reg}});
 #elif defined GIMSK
-				GIMSK |= (1 << PCIE{{af_reg}});
+		GIMSK |= (1 << PCIE{{af_reg}});
 #elif defined GICR
-				GICR |= (1 << PCIE{{af_reg}});
+		GICR |= (1 << PCIE{{af_reg}});
 #else
 #	error "Cannot find register for setting PCIE{{af_reg}}!"
 #endif
-			}
+	}
 
-			ALWAYS_INLINE static void disablePCInterrupt() {
-				PCMSK{{af_reg}} &= ~(1 << PCINT{{af_id}});
-				if (!PCMSK{{af_reg}}) {
+	ALWAYS_INLINE static void disablePCInterrupt() {
+		PCMSK{{af_reg}} &= ~(1 << PCINT{{af_id}});
+		if (!PCMSK{{af_reg}}) {
 #ifdef PCICR
-					PCICR &= ~(1 << PCIE{{af_reg}});
+			PCICR &= ~(1 << PCIE{{af_reg}});
 #elif defined EIMSK
-					EIMSK &= ~(1 << PCIE{{af_reg}});
+			EIMSK &= ~(1 << PCIE{{af_reg}});
 #elif defined GIMSK
-					GIMSK &= ~(1 << PCIE{{af_reg}});
+			GIMSK &= ~(1 << PCIE{{af_reg}});
 #elif defined GICR
-					GICR &= ~(1 << PCIE{{af_reg}});
+			GICR &= ~(1 << PCIE{{af_reg}});
 #else
 #	error "Cannot find register for clearing PCIE{{af_reg}}!"
 #endif
-				}
-			}
+		}
+	}
 
-			ALWAYS_INLINE static bool readPCInterruptFlag() {
+	ALWAYS_INLINE static bool readPCInterruptFlag() {
 #ifdef PCIFR
-				return (PCIFR & (1 << PCIF{{af_reg}}));
+		return (PCIFR & (1 << PCIF{{af_reg}}));
 #elif defined EIFR
-				return (EIFR & (1 << PCIF{{af_reg}}));
+		return (EIFR & (1 << PCIF{{af_reg}}));
 #elif defined GIFR
-				return (GIFR & (1 << PCIF{{af_reg}}));
+		return (GIFR & (1 << PCIF{{af_reg}}));
 #else
 #	error "Cannot find register for reading PCIF{{af_reg}}!"
 #endif
-			}
+	}
 
-			ALWAYS_INLINE static void acknowledgePCInterruptFlag() {
+	ALWAYS_INLINE static void acknowledgePCInterruptFlag() {
 #ifdef PCIFR
-				PCIFR |= (1 << PCIF{{af_reg}});
+		PCIFR |= (1 << PCIF{{af_reg}});
 #elif defined EIFR
-				EIFR |= (1 << PCIF{{af_reg}});
+		EIFR |= (1 << PCIF{{af_reg}});
 #elif defined GIFR
-				GIFR |= (1 << PCIF{{af_reg}});
+		GIFR |= (1 << PCIF{{af_reg}});
 #else
 #	error "Cannot find register for setting PCIF{{af_reg}}!"
 #endif
-			}
+	}
 
 			%% endif
 
 		%% endfor
 
 		%% endif
-		};
+};
 
 	%% endfor
 %% endfor
@@ -333,39 +313,39 @@ namespace xpcc
 
 	%% for id in nibble.position
 		%% if id == 0
-		struct GpioLowNibble{{port}} : ::xpcc::GpioNibble
-		{
-			ALWAYS_INLINE static void setOutput() {
-				DDR{{port}} |= 0x0f;
-			}
-			ALWAYS_INLINE static void setInput() {
-				DDR{{port}} &= ~0x0f;
-			}
-			ALWAYS_INLINE static uint8_t read() {
-				return (PIN{{port}} & 0x0f);
-			}
-			ALWAYS_INLINE static void write(uint8_t data) {
-				PORT{{port}} = (data & 0x0f) | (PORT{{port}} & 0xf0);
-			}
-		};
+struct GpioLowNibble{{port}} : ::xpcc::GpioNibble
+{
+	ALWAYS_INLINE static void setOutput() {
+		DDR{{port}} |= 0x0f;
+	}
+	ALWAYS_INLINE static void setInput() {
+		DDR{{port}} &= ~0x0f;
+	}
+	ALWAYS_INLINE static uint8_t read() {
+		return (PIN{{port}} & 0x0f);
+	}
+	ALWAYS_INLINE static void write(uint8_t data) {
+		PORT{{port}} = (data & 0x0f) | (PORT{{port}} & 0xf0);
+	}
+};
 		%% elif id == 1
-		struct GpioHighNibble{{port}} : ::xpcc::GpioNibble
-		{
-			ALWAYS_INLINE static void setOutput() {
-				DDR{{port}} |= 0xf0;
-			}
-			ALWAYS_INLINE static void setInput() {
-				DDR{{port}} &= ~0xf0;
-			}
-			ALWAYS_INLINE static uint8_t read() {
-				uint8_t data = PIN{{port}};
-				return (data >> 4);
-			}
-			ALWAYS_INLINE static void write(uint8_t data) {
-				data <<= 4;
-				PORT{{port}} = data | (PORT{{port}} & 0x0f);
-			}
-		};
+struct GpioHighNibble{{port}} : ::xpcc::GpioNibble
+{
+	ALWAYS_INLINE static void setOutput() {
+		DDR{{port}} |= 0xf0;
+	}
+	ALWAYS_INLINE static void setInput() {
+		DDR{{port}} &= ~0xf0;
+	}
+	ALWAYS_INLINE static uint8_t read() {
+		uint8_t data = PIN{{port}};
+		return (data >> 4);
+	}
+	ALWAYS_INLINE static void write(uint8_t data) {
+		data <<= 4;
+		PORT{{port}} = data | (PORT{{port}} & 0x0f);
+	}
+};
 		%% endif
 
 	%% endfor
@@ -376,26 +356,28 @@ namespace xpcc
 
 	%% for id in octet.position
 		%% if id == 0
-		struct GpioPort{{port}} : ::xpcc::GpioOctet
-		{
-			ALWAYS_INLINE static void setOutput() {
-				DDR{{port}} = 0xff;
-			}
-			ALWAYS_INLINE static void setInput() {
-				DDR{{port}} = 0;
-			}
-			ALWAYS_INLINE static uint8_t read() {
-				return PIN{{port}};
-			}
-			ALWAYS_INLINE static void write(uint8_t data) {
-				PORT{{port}} = data;
-			}
-		};
+struct GpioPort{{port}} : ::xpcc::GpioOctet
+{
+	ALWAYS_INLINE static void setOutput() {
+		DDR{{port}} = 0xff;
+	}
+	ALWAYS_INLINE static void setInput() {
+		DDR{{port}} = 0;
+	}
+	ALWAYS_INLINE static uint8_t read() {
+		return PIN{{port}};
+	}
+	ALWAYS_INLINE static void write(uint8_t data) {
+		PORT{{port}} = data;
+	}
+};
 		%% endif
 
 	%% endfor
 %% endfor
-	}
+
+}
+
 }
 
 
