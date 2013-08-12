@@ -1,11 +1,9 @@
 // coding: utf-8
-/*
-* Copyright (c) 2013, Roboterclub Aachen e.V.
+/* Copyright (c) 2013, Roboterclub Aachen e.V.
 * All Rights Reserved.
 *
-* The file is part for the xpcc library and is released under the
-* 3-clause BSD license. See the file `LICENSE` for the full license
-* governing this code.
+* The file is part of the xpcc library and is released under the 3-clause BSD
+* license. See the file `LICENSE` for the full license governing this code.
 */
 // ----------------------------------------------------------------------------
 %% if id in [1, 2, 3, 6]
@@ -125,7 +123,7 @@ public:
 	static inline bool
 	isTransmitRegisterEmpty();
 
-	static void
+	static inline void
 	enableInterruptVector(bool enable, uint32_t priority);
 
 	static inline void

@@ -42,6 +42,12 @@ namespace xpcc
 			typedef struct{} UartHal4;
 			typedef struct{} UartHal5;
 			typedef struct{} UsartHal6;
+			typedef struct{} Usart1;
+			typedef struct{} Usart2;
+			typedef struct{} Usart3;
+			typedef struct{} Uart4;
+			typedef struct{} Uart5;
+			typedef struct{} Usart6;
 		}
 	}
 }

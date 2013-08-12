@@ -40,9 +40,11 @@
 			<gpio port="A" id="0"></gpio>
 			<gpio port="A" id="2">
 				<af id="1" peripheral="UsartHal2" description="Tx" type="output"/>
+				<af id="1" peripheral="Usart2" description="Tx" type="output"/>
 			</gpio>
 			<gpio port="A" id="3">
 				<af id="1" peripheral="UsartHal2" description="Rx" type="input"/>
+				<af id="1" peripheral="Usart2" description="Rx" type="input"/>
 			</gpio>
 			<gpio port="A" id="8">
 				<!--<af id="0" peripheral="MCO" description="Clock Output"/>-->

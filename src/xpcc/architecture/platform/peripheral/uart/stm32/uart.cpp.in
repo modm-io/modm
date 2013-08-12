@@ -1,63 +1,93 @@
 // coding: utf-8
+/* Copyright (c) 2013, Roboterclub Aachen e.V.
+* All Rights Reserved.
+*
+* The file is part of the xpcc library and is released under the 3-clause BSD
+* license. See the file `LICENSE` for the full license governing this code.
+*/
 // ----------------------------------------------------------------------------
-/* Copyright (c) 2011, Roboterclub Aachen e.V.
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- * 
- *     * Redistributions of source code must retain the above copyright
- *       notice, this list of conditions and the following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright
- *       notice, this list of conditions and the following disclaimer in the
- *       documentation and/or other materials provided with the distribution.
- *     * Neither the name of the Roboterclub Aachen e.V. nor the
- *       names of its contributors may be used to endorse or promote products
- *       derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY ROBOTERCLUB AACHEN E.V. ''AS IS'' AND ANY
- * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL ROBOTERCLUB AACHEN E.V. BE LIABLE FOR ANY
- * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
-// ----------------------------------------------------------------------------
-{{ generation_block }}
-{% import 'template.cpp.macros' as template %}
-#include "../gpio.hpp"
-#include "../device.h"
+%% if id in [1, 2, 3, 6]
+%%	set uart = "Usart"
+%% elif id in [4, 5]
+%%	set uart = "Uart"
+%% endif
+%#
+%% set name = uart ~ id
+%% set hal = uart ~ "Hal" ~ id
 
-#include "{{ className | lower }}_{{ id }}.hpp"
+#include "../../../device.hpp"
+#include "{{ uart | lower }}_hal_{{ id }}.hpp"
+#include "{{ uart | lower }}_{{ id }}.hpp"
 
-#include <xpcc_config.hpp>
+void
+xpcc::stm32::{{ name }}::initialize(uint32_t baudrate, Parity parity)
+{
+	{{ hal }}::initialize(baudrate, parity);
+	{{ hal }}::setTransmitterEnable(true);
+	{{ hal }}::setReceiverEnable(true);
+}
 
-{{ template.excludeDeclarationsStart(id) }}
+void
+xpcc::stm32::{{ name }}::writeBlocking(uint8_t data)
+{
+	while(!{{ hal }}::isTransmitRegisterEmpty());
+	{{ hal }}::write(data);
+}
 
-{{ template.pinDefinitions(id) }}
-{{ template.apbClkDefinitions(id) }}
+void
+xpcc::stm32::{{ name }}::writeBlocking(const uint8_t *data, std::size_t n)
+{
+	while (n-- != 0) {
+		writeBlocking(*data++);
+	}
+}
 
-// ----------------------------------------------------------------------------
-{{ template.configurePins(className, id) }}
+bool
+xpcc::stm32::{{ name }}::read(uint8_t &data)
+{
+	if({{ hal }}::isReceiveRegisterNotEmpty()) {
+		data = {{ hal }}::read();
+		return true;
+	} else {
+		return false;
+	}
+}
 
-// ----------------------------------------------------------------------------
-{{ template.setBaudrate(className, id, className | upper) }}
+std::size_t
+xpcc::stm32::{{ name }}::read(uint8_t *data, std::size_t n)
+{
+	(void)n; // avoid compiler warning
+	if(read(*data)) {
+		return 1;
+	} else {
+		return 0;
+	}
+}
 
-// ----------------------------------------------------------------------------
-{{ template.write(className, id, className | upper) }}
+bool
+xpcc::stm32::{{ name }}::write(uint8_t data)
+{
+	if({{ hal }}::isTransmitRegisterEmpty()) {
+		{{ hal }}::write(data);
+		return true;
+	} else {
+		return false;
+	}
+}
 
-// ----------------------------------------------------------------------------
-{{ template.writeBlock(className, id) }}
+std::size_t
+xpcc::stm32::{{ name }}::write(const uint8_t *data, std::size_t n)
+{
+	(void)n; // avoid compiler warning
+	if(write(*data)) {
+		return 1;
+	} else {
+		return 0;
+	}
+}
 
-// ----------------------------------------------------------------------------
-{{ template.read(className, id, className | upper) }}
-
-// ----------------------------------------------------------------------------
-{{ template.readBlock(className, id) }}
-
-{{ template.excludeDeclarationsEnd(id) }}
-
+bool
+xpcc::stm32::{{ name }}::isWriteFinished()
+{
+	return {{ hal }}::isTransmitRegisterEmpty();
+}
