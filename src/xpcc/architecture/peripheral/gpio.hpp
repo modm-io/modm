@@ -1,35 +1,14 @@
 // coding: utf-8
-// ----------------------------------------------------------------------------
 /* Copyright (c) 2013, Roboterclub Aachen e.V.
- * All rights reserved.
+ * All Rights Reserved.
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- * 
- *     * Redistributions of source code must retain the above copyright
- *       notice, this list of conditions and the following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright
- *       notice, this list of conditions and the following disclaimer in the
- *       documentation and/or other materials provided with the distribution.
- *     * Neither the name of the Roboterclub Aachen e.V. nor the
- *       names of its contributors may be used to endorse or promote products
- *       derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY ROBOTERCLUB AACHEN E.V. ''AS IS'' AND ANY
- * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL ROBOTERCLUB AACHEN E.V. BE LIABLE FOR ANY
- * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * The file is part of the xpcc library and is released under the 3-clause BSD
+ * license. See the file `LICENSE` for the full license governing this code.
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__GPIO_HPP
-#define XPCC__GPIO_HPP
+#ifndef XPCC_GPIO_HPP
+#define XPCC_GPIO_HPP
 
 #include <stdint.h>
 #include <xpcc/architecture/utils.hpp>
@@ -37,62 +16,62 @@
 /**
  * @ingroup		peripheral
  * @defgroup	gpio	General purpose input and/or output pins (GPIO)
- * 
+ *
  * These classes are used to create architecture independent
  * definitions for hardware pins which then can be used as template
  * parameters for miscellaneous device drivers.
- * 
+ *
  * @warning	When you use the pins directly outside any device driver class you
  * 			have to remember to initialize them first. Call setInput() or
  * 			setOutput() before the first use, otherwise the result is undefined
  * 			and most likely not what you expect!
- * 
+ *
  * Example:
  * @code
  * #include <xpcc/architecture/platform.hpp>
  * #include <xpcc/driver/software_spi.hpp>
  * #include <xpcc/driver/lcd/st7036.hpp>
- * 
+ *
  * GPIO__OUTPUT(Clk, D, 7);
  * GPIO__OUTPUT(Mosi, D, 5);
- *     
+ *
  * GPIO__OUTPUT(LcdCs, D, 4);
  * GPIO__OUTPUT(LcdRs, D, 0);
- * 
- * // Create a new type for the software SPI for the display 
+ *
+ * // Create a new type for the software SPI for the display
  * typedef xpcc::SoftwareSpiMaster< Clk, Mosi, xpcc::GpioUnused > SpiInterface;
- * 
+ *
  * // Create a instance of the ST7036 based display class
  * xpcc::St7036< SpiInterface,
  *               LcdCs,
  *               LcdRs > display;
- * 
+ *
  * ...
  * display.initialize();
  * display.setPosition(0, 0);
  * display.write("Hallo Welt!");
  * @endcode
- * 
+ *
  * This example can be compiled for every AVR device without any change!
- * 
+ *
  * The pins don't need to initialized here because the initialize()
  * method of the display does this for us.
- * 
+ *
  * @see xpcc::St7036
- * 
+ *
  * Creating a simple flashing light:
  * @code
  * #include <xpcc/architecture/platform.hpp>
  * #include <xpcc/architecture/driver/delay.hpp>
- * 
+ *
  * GPIO__OUTPUT(Led, B, 0);
- * 
+ *
  * int
  * main(void)
  * {
  *     Led::setOutput();
  *     Led::set();
- *     
+ *
  *     while (1)
  *     {
  *         Led::toggle();
@@ -100,11 +79,11 @@
  *     }
  * }
  * @endcode
- * 
+ *
  * This will generate nearly optimal code. As all methods are `static` and
  * `inline` no function call is generated but the call is mapped directly
  * to a `sbi` assembler instruction!
- * 
+ *
  * The generated code for the example above (ATmega8):
  * @verbatim
  ...
@@ -125,7 +104,7 @@
 
 98: f9 cf          rjmp .-14           ; 0x8c <main+0xa>
 @endverbatim
- * 
+ *
  * Or for the ATxmega128a1:
  * @verbatim
  ...
@@ -145,9 +124,9 @@
 
 248: fa cf         rjmp .-12           ; 0x23e <main+0x10>
 @endverbatim
- * 
+ *
  * As you can see, no function call whatsoever is involved!
- * 
+ *
  * @see		driver
  * @author	Fabian Greif
  * @author	Niklas Hauser
@@ -155,178 +134,151 @@
 
 namespace xpcc
 {
-	struct Gpio
-	{
-		/**
-		 * These constants refer to the *logical* state of the GPIO.
-		 * The physical state is determined by the pins configuration and external connection.
-		 * @{
-		 */
-		static const bool LOW = false;
-		static const bool HIGH = true;
-		/// }@
-	};
 
+struct Gpio
+{
 	/**
-	 * @brief	Input interface of an I/O pin
-	 *
-	 * Even if the wrapped pin can only be used as input it isn't configured that
-	 * way from the beginning. So remember to call @b setInput() after startup!
-	 *
-	 * @ingroup	gpio
+	 * These constants refer to the *logical* state of the GPIO.
+	 * The physical state is determined by the configuration and external connection.
+	 * @{
 	 */
-	class GpioInput
-	{
+	static const bool LOW = false;
+	static const bool HIGH = true;
+	/// }@
+};
+
+/**
+ * Input interface of an I/O pin.
+ *
+ * Even if the wrapped pin can only be used as input it is not configured that
+ * way from the beginning. So remember to call `setInput()` after startup!
+ *
+ * @ingroup	gpio
+ */
+class GpioInput
+{
 #ifdef __DOXYGEN__
-	public:
-		/// configure pin as input
-		static void
-		setInput();
+public:
+	/// configure pin as input
+	static void
+	setInput();
 
-		/// read input
-		static bool
-		read();
+	/// read input
+	static bool
+	read();
 #endif
-	};
+};
 
-	/**
-	 * @brief	Output interface of an I/O pin
-	 *
-	 * Even if the pin can only be used as output it isn't configured that
-	 * way from the beginning. So remember to call @b setOutput() after startup!
-	 *
-	 * @ingroup	gpio
-	 */
-	class GpioOutput
-	{
+/**
+ * Output interface of an I/O pin.
+ *
+ * Even if the pin can only be used as output it is not configured that
+ * way from the beginning. So remember to call `setOutput()` after startup!
+ *
+ * @ingroup	gpio
+ */
+class GpioOutput
+{
 #ifdef __DOXYGEN__
-	public:
-		/// configure pin as output
-		static void
-		setOutput();
+public:
+	/// configure pin as output
+	static void
+	setOutput();
 
-		/// configure pin as output and set high or low
-		static void
-		setOutput(bool value);
+	/// configure pin as output and set high or low
+	static void
+	setOutput(bool value);
 
-		/// set output to high level
-		static void
-		set();
+	/// set output to high level
+	static void
+	set();
 
-		/// set output to high or low level
-		static void
-		set(bool value);
+	/// set output to high or low level
+	static void
+	set(bool value);
 
-		/// set output to low level
-		static void
-		reset();
+	/// set output to low level
+	static void
+	reset();
 
-		/// toggle output level
-		static void
-		toggle();
+	/// toggle output level
+	static void
+	toggle();
 #endif
-	};
+};
 
-	/**
-	 * @brief	Input/Output interface of an I/O pin
-	 *
-	 * @ingroup	gpio
-	 */
-	class GpioIO : GpioOutput, GpioInput
-	{
-		// there are no new methods here
-	};
+/**
+ * @brief	Input/Output interface of an I/O pin
+ *
+ * @ingroup	gpio
+ */
+class GpioIO : GpioOutput, GpioInput
+{
+	// there are no new methods here
+};
 
-	/**
-	 * @brief	Input/output interface of a set of 4 I/O pins
-	 *
-	 * This class provides the interface for 4 parallel IOs.
-	 * Be aware that the interface is the same regardless of the actual
-	 * mapping of the IOs.
-	 * For example, when a high nibble (0xf0) is physically configured, the
-	 * data will still be written and read as a low nibble (0x0f).
-	 *
-	 * @ingroup	gpio
-	 */
-	class GpioNibble
-	{
+/**
+ * Input/output interface of a set of up to 8 I/O pins.
+ *
+ * This class provides the interface for up to 8 parallel IOs.
+ * Be aware that the interface is the same regardless of the actual
+ * mapping of the IOs.
+ * For example, when a high nibble (0xf0) is physically configured, the
+ * data will still be written and read as a low nibble (0x0f).
+ *
+ * @ingroup	gpio
+ */
+class GpioOctet
+{
 #ifdef __DOXYGEN__
-	public:
-		static void
-		setOutput();
+public:
+	static void
+	setOutput();
 
-		static void
-		setInput();
+	static void
+	setInput();
 
-		/**
-		 * @brief	Read data
-		 * 
-		 * Only the lower four bits are used, the higher four bits will
-		 * always be zero.
-		 */
-		static uint8_t
-		read();
-		
-		/**
-		 * @brief	Write data
-		 * 
-		 * Only the lower four bits are written. The upper bits of data will
-		 * be discarded.
-		 */
-		static void
-		write(uint8_t data);
+	/// The read data is alsways right-aligned regardless of pysical mapping.
+	static uint8_t
+	read();
+
+	/// The write data is alsways right-aligned regardless of pysical mapping.
+	static void
+	write(uint8_t data);
 #endif
-	};
+};
 
-	/**
-	 * @brief	Input/output interface of a set of 8 I/O pins
-	 *
-	 * This class provides the interface for 8 parallel IOs.
-	 *
-	 * @ingroup	gpio
-	 */
-	class GpioOctet
-	{
+/**
+ * Input/output interface of a set of up to 16 I/O pins.
+ *
+ * This class provides the interface for up to 16 parallel IOs.
+ * Be aware that the interface is the same regardless of the actual
+ * mapping of the IOs.
+ * For example, when a high octet (0xff00) is physically configured, the
+ * data will still be written and read as a low octet (0x00ff).
+ *
+ * @ingroup	gpio
+ */
+class GpioWord
+{
 #ifdef __DOXYGEN__
-	public:
-		static void
-		setOutput();
+public:
+	static void
+	setOutput();
 
-		static void
-		setInput();
+	static void
+	setInput();
 
-		static uint8_t
-		read();
+	/// The read data is alsways right-aligned regardless of pysical mapping.
+	static uint16_t
+	read();
 
-		static void
-		write(uint8_t data);
+	/// The write data is alsways right-aligned regardless of pysical mapping.
+	static void
+	write(uint16_t data);
 #endif
-	};
+};
 
-	/**
-	 * @brief	Input/output interface of a set of 16 I/O pins
-	 *
-	 * This class provides the interface for 16 parallel IOs.
-	 *
-	 * @ingroup	gpio
-	 */
-	class GpioWord
-	{
-#ifdef __DOXYGEN__
-	public:
-		static void
-		setOutput();
-
-		static void
-		setInput();
-
-		static uint16_t
-		read();
-
-		static void
-		write(uint16_t data);
-#endif
-	};
-}
+} // namespace xpcc
 
 #endif // XPCC__GPIO_HPP
