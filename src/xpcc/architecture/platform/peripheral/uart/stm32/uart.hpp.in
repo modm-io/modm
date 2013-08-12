@@ -18,7 +18,7 @@
 #include <cstddef>	// for std::size_t
 #include <stdint.h>
 #include "../../../type_ids.hpp"
-#include "uart_hal_base.hpp"
+#include "uart_base.hpp"
 
 namespace xpcc
 {
@@ -30,7 +30,7 @@ namespace stm32
  * @author		Kevin Laeufer
  * @ingroup		stm32
  */
-class {{ uart ~ id }} : public UartHalBase
+class {{ uart ~ id }} : public UartBase
 {
 public:
 

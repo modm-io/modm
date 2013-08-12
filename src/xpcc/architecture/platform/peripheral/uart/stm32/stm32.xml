@@ -12,7 +12,7 @@
 		<template instances="1,2,3,6" out="usart_{{id}}.cpp">uart.cpp.in</template>
 		<template instances="4,5" out="uart_{{id}}.hpp">uart.hpp.in</template>
 		<template instances="4,5" out="uart_{{id}}.cpp">uart.cpp.in</template>
-		<template>uart_hal_base.hpp.in</template>
+		<template>uart_base.hpp.in</template>
 		<static>type_ids.hpp</static>
 	</driver>
 </rca>

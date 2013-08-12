@@ -9,8 +9,8 @@
 */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_STM32_UART_HAL_BASE_HPP
-#define XPCC_STM32_UART_HAL_BASE_HPP
+#ifndef XPCC_STM32_UART_BASE_HPP
+#define XPCC_STM32_UART_BASE_HPP
 
 #include <stdint.h>
 #include "../../../device.hpp"
@@ -20,7 +20,7 @@ namespace xpcc
 namespace stm32
 {
 /**
- * Base class for the UART Hal classes
+ * Base class for the UART classes
  *
  * Provides some common enum that do not depend on the specific UART.
  *
@@ -28,7 +28,7 @@ namespace stm32
  * @internal
  * @ingroup		stm32
  */
-class UartHalBase
+class UartBase
 {
 
 public:
@@ -95,9 +95,9 @@ protected:
 	}
 
 };
-ENUM_CLASS_FLAG(UartHalBase::Interrupt)
-ENUM_CLASS_FLAG(UartHalBase::InterruptFlag)
+ENUM_CLASS_FLAG(UartBase::Interrupt)
+ENUM_CLASS_FLAG(UartBase::InterruptFlag)
 }
 }
 
-#endif // XPCC_STM32_UART_HAL_BASE_HPP
+#endif // XPCC_STM32_UART_BASE_HPP
