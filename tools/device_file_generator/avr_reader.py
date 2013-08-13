@@ -131,16 +131,32 @@ class AVRDeviceReader(XMLDeviceReader):
 					continue
 		
 		for pin_array in [a for a in avr_io.pins if self.properties['mmcu'] in a['devices']]:
-			if 'pcint' in pin_array:
-				for pcint in pin_array['pcint']:
-					for gpio in gpios:
-						if gpio['port'] == pcint['port'] and gpio['id'] == pcint['id']:
-							gpio['pcint'] = pcint['int']
-			if 'exti' in pin_array:
-				for exti in pin_array['exti']:
-					for gpio in gpios:
-						if gpio['port'] == exti['port'] and gpio['id'] == exti['id']:
-							gpio['extint'] = exti['int']
+			for name in ['pcint', 'extint', 'spi', 'i2c', 'usi']:
+				if name in pin_array:
+					for module in pin_array[name]:
+						for gpio in [g for g in gpios if g['port'] == module['port'] and g['id'] == module['id']]:
+							af = {'peripheral': name}
+							mod = dict(module)
+							mod.pop('port', None)
+							mod.pop('id', None)
+							af.update(mod)
+							gpio['af'].append(af)
+			
+			for name in ['uart0', 'uart1', 'uart2', 'uart3']:
+				if name in pin_array:
+					for module in pin_array[name]:
+						for gpio in [g for g in gpios if g['port'] == module['port'] and g['id'] == module['id']]:
+							af = {'peripheral': 'uart', 'instance': name[4:]}
+							mod = dict(module)
+							mod.pop('port', None)
+							mod.pop('id', None)
+							af.update(mod)
+							gpio['af'].append(af)
+							if 'uartspi' in pin_array:
+								repl = {'txd': 'mosi', 'rxd': 'miso', 'xck': 'sck'}
+								af2 = dict(af)
+								af2.update({'peripheral': 'spi', 'name': repl[af2['name']]})
+								gpio['af'].append(af2)
 	
 	def createModule(self, name):
 		if name in self.modules:
@@ -234,7 +250,7 @@ class AVRDeviceReader(XMLDeviceReader):
 		
 		while id < 16:
 			if mask & 0x01:
-				ports.append({'port': port['port'], 'id': str(id)})
+				ports.append({'port': port['port'], 'id': str(id), 'af': []})
 			mask >>= 1
 			id += 1
 		

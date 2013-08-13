@@ -276,12 +276,10 @@ class AVRDeviceWriter(XMLDeviceWriter):
 				gpio_child = driver.addChild('gpio')
 				gpio_child.setAttributes(dict)
 				gpio_child.setAttributes({'port': gpio['port'], 'id': gpio['id']})
-				if 'pcint' in gpio:
-					pcint_child = gpio_child.addChild('af')
-					pcint_child.setAttributes({'type': 'pcint', 'id': gpio['pcint']})
-				if 'extint' in gpio:
-					extint_child = gpio_child.addChild('af')
-					extint_child.setAttributes({'type': 'extint', 'id': gpio['extint']})
+				for af in gpio['af']:
+					af_child = gpio_child.addChild('af')
+					af_child.setAttributes(af)
+
 
 	def _getAttributedPortDictionary(self, port):
 		ports = []

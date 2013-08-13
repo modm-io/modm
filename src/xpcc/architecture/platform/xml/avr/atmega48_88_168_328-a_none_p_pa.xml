@@ -58,96 +58,108 @@
     <header>avr/sleep.h</header>
     <driver type="gpio" name="at90_tiny_mega">
       <gpio port="B" id="0">
-        <af type="pcint" id="0"/>
+        <af int="0" peripheral="pcint"/>
       </gpio>
       <gpio port="B" id="1">
-        <af type="pcint" id="1"/>
+        <af int="1" peripheral="pcint"/>
       </gpio>
       <gpio port="B" id="2">
-        <af type="pcint" id="2"/>
+        <af int="2" peripheral="pcint"/>
+        <af peripheral="spi" type="input" name="ss"/>
       </gpio>
       <gpio port="B" id="3">
-        <af type="pcint" id="3"/>
+        <af int="3" peripheral="pcint"/>
+        <af peripheral="spi" type="input" name="miso"/>
       </gpio>
       <gpio port="B" id="4">
-        <af type="pcint" id="4"/>
+        <af int="4" peripheral="pcint"/>
+        <af peripheral="spi" type="output" name="mosi"/>
       </gpio>
       <gpio port="B" id="5">
-        <af type="pcint" id="5"/>
+        <af int="5" peripheral="pcint"/>
+        <af peripheral="spi" type="output" name="sck"/>
       </gpio>
       <gpio port="B" id="6">
-        <af type="pcint" id="6"/>
+        <af int="6" peripheral="pcint"/>
       </gpio>
       <gpio port="B" id="7">
-        <af type="pcint" id="7"/>
+        <af int="7" peripheral="pcint"/>
       </gpio>
       <gpio port="C" id="0">
-        <af type="pcint" id="8"/>
+        <af int="8" peripheral="pcint"/>
       </gpio>
       <gpio port="C" id="1">
-        <af type="pcint" id="9"/>
+        <af int="9" peripheral="pcint"/>
       </gpio>
       <gpio port="C" id="2">
-        <af type="pcint" id="10"/>
+        <af int="10" peripheral="pcint"/>
       </gpio>
       <gpio port="C" id="3">
-        <af type="pcint" id="11"/>
+        <af int="11" peripheral="pcint"/>
       </gpio>
       <gpio port="C" id="4">
-        <af type="pcint" id="12"/>
+        <af int="12" peripheral="pcint"/>
+        <af peripheral="i2c" type="io" name="sda"/>
       </gpio>
       <gpio port="C" id="5">
-        <af type="pcint" id="13"/>
+        <af int="13" peripheral="pcint"/>
+        <af peripheral="i2c" type="output" name="scl"/>
       </gpio>
       <gpio port="C" id="6">
-        <af type="pcint" id="14"/>
+        <af int="14" peripheral="pcint"/>
       </gpio>
       <gpio port="D" id="0">
-        <af type="pcint" id="16"/>
+        <af int="16" peripheral="pcint"/>
+        <af instance="0" peripheral="uart" type="input" name="rxd"/>
+        <af instance="0" name="miso" peripheral="spi" type="input"/>
       </gpio>
       <gpio port="D" id="1">
-        <af type="pcint" id="17"/>
+        <af int="17" peripheral="pcint"/>
+        <af instance="0" peripheral="uart" type="output" name="txd"/>
+        <af instance="0" name="mosi" peripheral="spi" type="output"/>
       </gpio>
       <gpio port="D" id="2">
-        <af type="pcint" id="18"/>
-        <af type="extint" id="0"/>
+        <af int="18" peripheral="pcint"/>
+        <af int="0" peripheral="extint"/>
       </gpio>
       <gpio port="D" id="3">
-        <af type="pcint" id="19"/>
-        <af type="extint" id="1"/>
+        <af int="19" peripheral="pcint"/>
+        <af int="1" peripheral="extint"/>
       </gpio>
       <gpio port="D" id="4">
-        <af type="pcint" id="20"/>
+        <af int="20" peripheral="pcint"/>
+        <af instance="0" peripheral="uart" type="output" name="xck"/>
+        <af instance="0" name="sck" peripheral="spi" type="output"/>
       </gpio>
       <gpio port="D" id="5">
-        <af type="pcint" id="21"/>
+        <af int="21" peripheral="pcint"/>
       </gpio>
       <gpio port="D" id="6">
-        <af type="pcint" id="22"/>
+        <af int="22" peripheral="pcint"/>
       </gpio>
       <gpio port="D" id="7">
-        <af type="pcint" id="23"/>
+        <af int="23" peripheral="pcint"/>
       </gpio>
     </driver>
     <driver type="uart" name="at90_tiny_mega" instances="0">
-      <gpio port="D" name="rxd" id="0" instance="0"/>
-      <gpio port="D" name="txd" id="1" instance="0"/>
-      <gpio port="D" name="xck" id="4" instance="0"/>
+      <gpio type="input" port="D" name="rxd" id="0" instance="0"/>
+      <gpio type="output" port="D" name="txd" id="1" instance="0"/>
+      <gpio type="output" port="D" name="xck" id="4" instance="0"/>
     </driver>
     <driver type="spi" name="at90_tiny_mega" instances="0">
-      <gpio id="0" port="D" name="miso" instance="0"/>
-      <gpio id="1" port="D" name="mosi" instance="0"/>
-      <gpio id="4" port="D" name="sck" instance="0"/>
+      <gpio id="0" type="input" port="D" name="miso" instance="0"/>
+      <gpio id="1" type="output" port="D" name="mosi" instance="0"/>
+      <gpio id="4" type="output" port="D" name="sck" instance="0"/>
     </driver>
     <driver type="i2c" name="at90_tiny_mega">
-      <gpio port="C" name="scl" id="5"/>
-      <gpio port="C" name="sda" id="4"/>
+      <gpio type="output" port="C" name="scl" id="5"/>
+      <gpio type="io" port="C" name="sda" id="4"/>
     </driver>
     <driver type="spi" name="at90_tiny_mega">
-      <gpio port="B" name="miso" id="3"/>
-      <gpio port="B" name="mosi" id="4"/>
-      <gpio port="B" name="sck" id="5"/>
-      <gpio port="B" name="ss" id="2"/>
+      <gpio type="input" port="B" name="miso" id="3"/>
+      <gpio type="output" port="B" name="mosi" id="4"/>
+      <gpio type="output" port="B" name="sck" id="5"/>
+      <gpio type="input" port="B" name="ss" id="2"/>
     </driver>
     <driver type="adc" name="atmega"/>
     <driver type="timer" name="atmega" instances="0,1,2"/>
