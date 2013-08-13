@@ -12,6 +12,7 @@
 #define XPCC_{{target.family | upper}}_GPIO_HPP
 
 #include "../../../device.hpp"
+#include "../../../type_ids.hpp"
 #include "gpio_define.h"
 #include <xpcc/architecture/peripheral/gpio.hpp>
 
@@ -62,14 +63,35 @@ struct Gpio
 
 /**
  * Gpio OpenDrain template, which remaps the behavior of the Gpio pin to
- * simulate an open-drain Output.
+ * simulate an open-drain Output (with internal pullups if you need it).
  * You must use this class for `SoftwareI2cMaster`!
  *
  * @see ::xpcc::SoftwareI2cMaster
  * @ingroup	{{target.family}}
+ * @{
  */
 template< class IO >
 class GpioOpenDrain : Gpio
+{
+public:
+	/// maps to `setInput(Configuration::Floating)` 
+	ALWAYS_INLINE static void set() {
+		IO::setInput(Configuration::Floating);
+	}
+	/// maps to `setOutput(::xpcc::Gpio::LOW)`
+	ALWAYS_INLINE static void reset() {
+		IO::setOutput(::xpcc::Gpio::LOW);
+	}
+	ALWAYS_INLINE static void set(bool status) {
+		if (status) { set(); }
+		else { reset(); }
+	}
+	ALWAYS_INLINE static bool read() {
+		return IO::read();
+	}
+};
+template< class IO >
+class GpioOpenDrainWithPullUp : Gpio
 {
 public:
 	/// maps to `setInput(Configuration::PullUp)` 
@@ -88,6 +110,7 @@ public:
 		return IO::read();
 	}
 };
+/// @}
 
 /**
  * Gpio Classes created from the XML Device File Gpio Description
@@ -140,7 +163,7 @@ public:
 	}
 		%% endif
 		%% if type in ["", "Input"]
-	/// call `setInput()` before calling this method
+
 	ALWAYS_INLINE static void configure(Configuration config) {
 		if (config == Configuration::PullUp) {
 			PORT{{port}} |= mask;
@@ -164,9 +187,8 @@ public:
 		return (PIN{{port}} & mask);
 	}
 		%% for af in gpio.afs
-			%% set af_id = af.id | int
-
-			%% if af.type == "extint"
+			%% if af.peripheral == "extint"
+			%% set af_id = af.int | int
 
 				%# Go home Atmel, you're drunk!
 				%% set eicra = 'EICRA'
@@ -236,9 +258,8 @@ public:
 #	error "Cannot find register for setting INTF{{af_id}}!"
 #endif
 	}
-			%% endif
-
-			%% if af.type == "pcint"
+			%% elif af.peripheral == "pcint"
+			%% set af_id = af.int | int
 
 				%# Go home Atmel, you're drunk!
 				%% if target.family == 'attiny'
@@ -309,6 +330,31 @@ public:
 	}
 			%% endif
 		%% endfor
+		
+		%% for af in gpio.afs
+			%% if af.peripheral != "extint" and af.peripheral != "pcint"
+				%% if af.type|lower|capitalize == type or af.type == 'io' or type == ""
+					%% set peripheral = af.peripheral|capitalize
+					%% if "instance" in af
+						%% if peripheral == "Spi"
+							%% set peripheral = "UartSpi"
+						%% endif
+						%% set peripheral = peripheral ~ af.instance
+					%% endif
+
+	/// Connect {{port~pin}} as {{af.name|capitalize}} to {{peripheral}}.
+	ALWAYS_INLINE static void
+	connect(TypeId::{{ peripheral }}) {
+		%% if af.type|lower == "output"
+		setOutput();
+		%% elif af.type|lower == "input"
+		setInput();
+		%% endif
+	}
+				%% endif
+			%% endif
+		%% endfor
+		
 		%% endif
 };
 
@@ -320,11 +366,12 @@ public:
 
 /// @ingroup {{target.family}}
 template< uint8_t START_PIN, uint8_t WIDTH >
-class GpioPort{{port.name}} : ::xpcc::GpioOctet
+class GpioPort{{port.name}} : public ::xpcc::GpioOctet, public Gpio
 {
 	static_assert(START_PIN >= {{port.startPin}}, "START_PIN too small, minimum {{port.startPin}}.");
 	static_assert(START_PIN < {{port.startPin + port.width}}, "START_PIN too large, maximum {{port.startPin + port.width}}.");
 	static_assert(WIDTH <= {{port.width}}, "WIDTH too large, maximum {{port.width}}.");
+	static_assert(WIDTH > 0, "WIDTH should be at least 1.");
 	static_assert(START_PIN + WIDTH <= {{port.startPin + port.width}}, "START_PIN + WIDTH too large, maximum {{port.startPin + port.width}}.");
 	
 	static constexpr uint8_t dataMask = (1 << WIDTH) - 1;
