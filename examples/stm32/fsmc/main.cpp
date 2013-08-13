@@ -18,26 +18,32 @@ using namespace xpcc::stm32::fsmc;
 
 namespace lcd
 {
-	GPIO__OUTPUT(D0,   D, 14);
-	GPIO__OUTPUT(D1,   D, 15);
-	GPIO__OUTPUT(D2,   D,  0);
-	GPIO__OUTPUT(D3,   D,  1);
-	GPIO__OUTPUT(D4,   E,  7);
-	GPIO__OUTPUT(D5,   E,  8);
-	GPIO__OUTPUT(D6,   E,  9);
-	GPIO__OUTPUT(D7,   E, 10);
+	GPIO__IO(D0,   D, 14);
+	GPIO__IO(D1,   D, 15);
+	GPIO__IO(D2,   D,  0);
+	GPIO__IO(D3,   D,  1);
+	GPIO__IO(D4,   E,  7);
+	GPIO__IO(D5,   E,  8);
+	GPIO__IO(D6,   E,  9);
+	GPIO__IO(D7,   E, 10);
 
 	// The Command / Data Pin is mapped to an address pin of the FSMC.
-	//	GPIO__OUTPUT(Cd,    D, 11);	// Command / Data,  FSMC: A16
+	// GPIO__OUTPUT(Cd,    D, 11);	// Command / Data,  FSMC: A16
 	GPIO__OUTPUT(Cd,    E,  2);		// Command / Data,  FSMC: A23
 
 	GPIO__OUTPUT(Cs,    D,  7);		// Chip Select,     FSMC: NE1
 	GPIO__OUTPUT(Wr,    D,  5);		// Write operation, FSMC: NWE
 
-	GPIO__OUTPUT(Reset, E,  3);     // Reset, not FSMC
+	GPIO__OUTPUT(Reset, E,  3);     // Reset, not part of FSMC
 
-	typedef xpcc::TftMemoryBus8Bit ParallelBus;
+	// FSMC
+	// typedef xpcc::TftMemoryBus8Bit ParallelBus;
 
+	// non-FSMC: GPIO
+	typedef xpcc::gpio::Port<D7, D6, D5, D4, D3, D2, D1, D0> Port;
+	typedef xpcc::TftMemoryBus8BitGpio<Port, Cs, xpcc::gpio::Unused, Wr, Cd> ParallelBus;
+
+	// Display
 	typedef xpcc::SiemensS75LandscapeRight<lcd::ParallelBus, lcd::Reset> Display;
 }
 
@@ -46,10 +52,13 @@ namespace lcd
  * Offset for A16 : (1 << 16)
  * Offset for A23 : (1 << 23)
  */
+//lcd::ParallelBus
+//parallelBus(
+//		(volatile uint8_t *)  0x60000000,
+//		(volatile uint8_t *) (0x60000000 + (1 << 23)));
+
 lcd::ParallelBus
-parallelBus(
-		(volatile uint8_t *)  0x60000000,
-		(volatile uint8_t *) (0x60000000 + (1 << 23)));
+parallelBus;
 
 lcd::Display display(parallelBus);
 
@@ -68,49 +77,68 @@ MAIN_FUNCTION
 
 	//------------------------------------------------------
 
-	xpcc::stm32::Fsmc::initialize();
+	// FSMC
+//	xpcc::stm32::Fsmc::initialize();
+//
+//	// A16
+//	lcd::Cd::setAlternateFunction(xpcc::stm32::AF_FSMC, xpcc::stm32::PUSH_PULL, xpcc::stm32::SPEED_100MHZ, xpcc::stm32::PULLUP);
+//
+//	// FSMC_NE1
+//	lcd::Cs::setAlternateFunction(xpcc::stm32::AF_FSMC, xpcc::stm32::PUSH_PULL, xpcc::stm32::SPEED_100MHZ, xpcc::stm32::PULLUP);
+//
+//	// FSMC_NWE
+//	lcd::Wr::setAlternateFunction(xpcc::stm32::AF_FSMC, xpcc::stm32::PUSH_PULL, xpcc::stm32::SPEED_100MHZ, xpcc::stm32::PULLUP);
+//
+//	lcd::D0::setAlternateFunction(xpcc::stm32::AF_FSMC, xpcc::stm32::PUSH_PULL, xpcc::stm32::SPEED_100MHZ, xpcc::stm32::PULLUP);
+//	lcd::D1::setAlternateFunction(xpcc::stm32::AF_FSMC, xpcc::stm32::PUSH_PULL, xpcc::stm32::SPEED_100MHZ, xpcc::stm32::PULLUP);
+//	lcd::D2::setAlternateFunction(xpcc::stm32::AF_FSMC, xpcc::stm32::PUSH_PULL, xpcc::stm32::SPEED_100MHZ, xpcc::stm32::PULLUP);
+//	lcd::D3::setAlternateFunction(xpcc::stm32::AF_FSMC, xpcc::stm32::PUSH_PULL, xpcc::stm32::SPEED_100MHZ, xpcc::stm32::PULLUP);
+//	lcd::D4::setAlternateFunction(xpcc::stm32::AF_FSMC, xpcc::stm32::PUSH_PULL, xpcc::stm32::SPEED_100MHZ, xpcc::stm32::PULLUP);
+//	lcd::D5::setAlternateFunction(xpcc::stm32::AF_FSMC, xpcc::stm32::PUSH_PULL, xpcc::stm32::SPEED_100MHZ, xpcc::stm32::PULLUP);
+//	lcd::D6::setAlternateFunction(xpcc::stm32::AF_FSMC, xpcc::stm32::PUSH_PULL, xpcc::stm32::SPEED_100MHZ, xpcc::stm32::PULLUP);
+//	lcd::D7::setAlternateFunction(xpcc::stm32::AF_FSMC, xpcc::stm32::PUSH_PULL, xpcc::stm32::SPEED_100MHZ, xpcc::stm32::PULLUP);
+//
+//	xpcc::stm32::fsmc::NorSram::AsynchronousTiming timing = {
+//		// read
+//		0,	// readAddressSetup
+//		15,	// readAddressHold
+//		0,	// readDataPhase
+//
+//		// write
+//		0,	// writeAddressSetup
+//		0,	// writeAddressHold
+//		6,	// writeDataPhase
+//
+//		// bus turn around
+//		0
+//	};
+//
+//	xpcc::stm32::fsmc::NorSram::configureAsynchronousRegion(
+//			xpcc::stm32::fsmc::NorSram::CHIP_SELECT_1, /* NE1 */
+//			xpcc::stm32::fsmc::NorSram::NO_MULTIPLEX_8BIT,
+//			xpcc::stm32::fsmc::NorSram::SRAM_ROM,
+//			xpcc::stm32::fsmc::NorSram::MODE_A,
+//			timing);
+//
+//	xpcc::stm32::fsmc::NorSram::enableRegion(xpcc::stm32::fsmc::NorSram::CHIP_SELECT_1);
 
-	// A16
-	lcd::Cd::setAlternateFunction(xpcc::stm32::AF_FSMC, xpcc::stm32::PUSH_PULL, xpcc::stm32::SPEED_100MHZ, xpcc::stm32::PULLUP);
+	//------------------------------------------------------
 
-	// FSMC_NE1
-	lcd::Cs::setAlternateFunction(xpcc::stm32::AF_FSMC, xpcc::stm32::PUSH_PULL, xpcc::stm32::SPEED_100MHZ, xpcc::stm32::PULLUP);
+	// non-FSMC: GPIO
+	lcd::Cd::setOutput();
+	lcd::Cs::setOutput();
+	lcd::Wr::setOutput();
 
-	// FSMC_NWE
-	lcd::Wr::setAlternateFunction(xpcc::stm32::AF_FSMC, xpcc::stm32::PUSH_PULL, xpcc::stm32::SPEED_100MHZ, xpcc::stm32::PULLUP);
+	lcd::D0::setInput();
+	lcd::D1::setInput();
+	lcd::D2::setInput();
+	lcd::D3::setInput();
+	lcd::D4::setInput();
+	lcd::D5::setInput();
+	lcd::D6::setInput();
+	lcd::D7::setInput();
 
-	lcd::D0::setAlternateFunction(xpcc::stm32::AF_FSMC, xpcc::stm32::PUSH_PULL, xpcc::stm32::SPEED_100MHZ, xpcc::stm32::PULLUP);
-	lcd::D1::setAlternateFunction(xpcc::stm32::AF_FSMC, xpcc::stm32::PUSH_PULL, xpcc::stm32::SPEED_100MHZ, xpcc::stm32::PULLUP);
-	lcd::D2::setAlternateFunction(xpcc::stm32::AF_FSMC, xpcc::stm32::PUSH_PULL, xpcc::stm32::SPEED_100MHZ, xpcc::stm32::PULLUP);
-	lcd::D3::setAlternateFunction(xpcc::stm32::AF_FSMC, xpcc::stm32::PUSH_PULL, xpcc::stm32::SPEED_100MHZ, xpcc::stm32::PULLUP);
-	lcd::D4::setAlternateFunction(xpcc::stm32::AF_FSMC, xpcc::stm32::PUSH_PULL, xpcc::stm32::SPEED_100MHZ, xpcc::stm32::PULLUP);
-	lcd::D5::setAlternateFunction(xpcc::stm32::AF_FSMC, xpcc::stm32::PUSH_PULL, xpcc::stm32::SPEED_100MHZ, xpcc::stm32::PULLUP);
-	lcd::D6::setAlternateFunction(xpcc::stm32::AF_FSMC, xpcc::stm32::PUSH_PULL, xpcc::stm32::SPEED_100MHZ, xpcc::stm32::PULLUP);
-	lcd::D7::setAlternateFunction(xpcc::stm32::AF_FSMC, xpcc::stm32::PUSH_PULL, xpcc::stm32::SPEED_100MHZ, xpcc::stm32::PULLUP);
-
-	xpcc::stm32::fsmc::NorSram::AsynchronousTiming timing = {
-		// read
-		0,	// readAddressSetup
-		15,	// readAddressHold
-		0,	// readDataPhase
-
-		// write
-		0,	// writeAddressSetup
-		0,	// writeAddressHold
-		6,	// writeDataPhase
-
-		// bus turn around
-		0
-	};
-
-	xpcc::stm32::fsmc::NorSram::configureAsynchronousRegion(
-			xpcc::stm32::fsmc::NorSram::CHIP_SELECT_1, /* NE1 */
-			xpcc::stm32::fsmc::NorSram::NO_MULTIPLEX_8BIT,
-			xpcc::stm32::fsmc::NorSram::SRAM_ROM,
-			xpcc::stm32::fsmc::NorSram::MODE_A,
-			timing);
-
-	xpcc::stm32::fsmc::NorSram::enableRegion(xpcc::stm32::fsmc::NorSram::CHIP_SELECT_1);
+	lcd::ParallelBus::initialize();
 
 	//------------------------------------------------------
 
@@ -127,7 +155,6 @@ MAIN_FUNCTION
 		display << "World! abcdefghijk";
 
 		// finished, copy to LCD
-		// Drawingtime with FSMC: 14 msec
 		Led::set();
 		display.update();
 		Led::reset();
