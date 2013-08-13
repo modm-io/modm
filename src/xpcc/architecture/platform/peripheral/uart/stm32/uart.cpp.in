@@ -20,6 +20,8 @@
 #include "{{ uart | lower }}_{{ id }}.hpp"
 
 %% if parameters.buffered
+#include <xpcc/architecture/driver/atomic.hpp>
+
 namespace
 {
 	static xpcc::atomic::Queue<char, {{ parameters.rx_buffer }}> rxBuffer;
@@ -92,7 +94,7 @@ xpcc::stm32::{{ name }}::read(uint8_t *data, std::size_t n)
 		if (rxBuffer.isEmpty()) {
 			return i;
 		} else {
-			*buffer++ = rxBuffer.get();
+			*data++ = rxBuffer.get();
 			rxBuffer.pop();
 		}
 	}
@@ -113,9 +115,8 @@ xpcc::stm32::{{ name }}::write(uint8_t data)
 %% if parameters.buffered
 	if(txBuffer.isEmpty() && {{ hal }}::isTransmitRegisterEmpty()) {
 		{{ hal }}::write(data);
-		return true;
 	} else {
-		while (!txBuffer.push(c)) {
+		while (!txBuffer.push(data)) {
 			if (!isBlocking) {	// if queue is full => block
 				return false;	// if not supposed ot block return false
 			}
@@ -125,6 +126,7 @@ xpcc::stm32::{{ name }}::write(uint8_t data)
 		// Transmit Data Register Empty Interrupt Enable
 		{{ hal }}::enableInterrupt(Interrupt::TxEmpty);
 	}
+	return true;
 %% else
 	if({{ hal }}::isTransmitRegisterEmpty()) {
 		{{ hal }}::write(data);
@@ -155,6 +157,7 @@ xpcc::stm32::{{ name }}::isWriteFinished()
 }
 
 %% if parameters.buffered
+%% set hal = "xpcc::stm32::" ~ hal
 extern "C" void
 {{ uart | upper ~ id }}_IRQHandler()
 {
@@ -166,7 +169,7 @@ extern "C" void
 	if ({{ hal }}::isTransmitRegisterEmpty()) {
 		if (txBuffer.isEmpty()) {
 			// transmission finished, disable TxEmpty interrupt
-			{{ hal }}::disableInterrupt(Interrupt::TxEmpty);
+			{{ hal }}::disableInterrupt({{ hal }}::Interrupt::TxEmpty);
 		}
 		else {
 			{{ hal }}::write(txBuffer.get());
