@@ -65,7 +65,7 @@ namespace xpcc
 	 *  9      VLED +     Supply Backlight
 	 * 10      VLED -     Supply Backlight
 	 * 11      GND        Supply
-	 * 12  IN  RD         Read Strobe.         Unused.
+	 * 12  IN  RD         Read Strobe.         Must be tied high.
 	 * 13  IN  WR         Write Strobe.        High-to-Low strobe write data to display memory.
 	 * 14  IN  D1         Bit 1 of parallel data.
 	 * 15  IN  D2         Bit 2 of parallel data.
@@ -74,6 +74,8 @@ namespace xpcc
 	 * 18  IN  D5         Bit 5 of parallel data.
 	 * 19  IN  D6         Bit 6 of parallel data.
 	 * 20  IN  D7         Bit 7 of parallel data.
+	 *
+	 * Pin 1 is unmarked. Pin 5 can be recognised by a thicker trace which is GND.
 	 *
 	 * The backlight (VLED +, VLED -) consists of four white
 	 * LEDs in series. The forward voltage is about 12 volts.
