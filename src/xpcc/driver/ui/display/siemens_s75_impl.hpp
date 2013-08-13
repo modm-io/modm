@@ -86,7 +86,8 @@ xpcc::SiemensS75Common<MEMORY, RESET, WIDTH, HEIGHT, ORIENTATION>::update()
 			uint_fast8_t PortIdx = 0;
 
 			uint_fast8_t pixels;
-			if ((ORIENTATION == xpcc::Orientation::LandscapeLeft) || (ORIENTATION == xpcc::Orientation::LandscapeRight))
+			if ((ORIENTATION == xpcc::Orientation::LandscapeLeft) ||
+				(ORIENTATION == xpcc::Orientation::LandscapeRight))
 			{
 				// Only 4 pixels at the lower end of the display in landscape mode
 				if (y == (height - 1)) {
