@@ -109,7 +109,12 @@ private:
  *
  * @author	strongly-typed
  */
-template <typename PORT, typename CS, typename RD, typename WR>
+template <
+	typename PORT,	/* Port */
+	typename CS,	/* Chip select  */
+	typename RD,	/* Read strobe  */
+	typename WR		/* Write strobe */
+	>
 class MemoryBus
 {
 public:
@@ -166,11 +171,11 @@ public:
 };
 
 template <
-	typename PORT,
-	typename CS,
-	typename RD,
-	typename WR,
-	typename CD /* command/data */
+	typename PORT,	/* Port */
+	typename CS,	/* Chip select */
+	typename RD,	/* Read strobe */
+	typename WR,	/* Write strobe */
+	typename CD		/* command/data */
 	>
 class TftMemoryBus8BitGpio
 {
