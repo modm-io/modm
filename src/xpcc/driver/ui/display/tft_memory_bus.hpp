@@ -104,6 +104,128 @@ private:
 	volatile uint8_t * const ptrData;
 };
 
+/**
+ * 8080-style parallel bus made of a parallel PORT, chip select CS, read strobe RD and write strobe WR
+ *
+ * @author	strongly-typed
+ */
+template <typename PORT, typename CS, typename RD, typename WR>
+class MemoryBus
+{
+public:
+	static ALWAYS_INLINE void
+	initialize()
+	{
+		CS::set();
+		WR::set();
+		RD::set();
+		PORT::setInput();
+	}
+
+	static ALWAYS_INLINE void
+	write(const uint8_t data)
+	{
+		CS::reset();
+		RD::set();
+
+		PORT::setOutput();
+		PORT::write(data);
+
+		// t_AS
+		xpcc::delay_us(1);
+		WR::reset();
+
+		xpcc::delay_us(1);
+		WR::set();
+
+		xpcc::delay_us(1);
+		PORT::setInput();
+
+		CS::set();
+	}
+
+	static ALWAYS_INLINE uint8_t
+	read()
+	{
+		uint8_t ret;
+		CS::reset();
+		WR::set();
+
+		xpcc::delay_us(1);
+
+		RD::reset();
+
+		xpcc::delay_us(1);
+		ret = PORT::read();
+
+		RD::set();
+		CS::set();
+
+		return ret;
+	}
+};
+
+template <
+	typename PORT,
+	typename CS,
+	typename RD,
+	typename WR,
+	typename CD /* command/data */
+	>
+class TftMemoryBus8BitGpio
+{
+public:
+	typedef MemoryBus<PORT, CS, RD, WR> BUS;
+
+	static ALWAYS_INLINE void
+	initialize()
+	{
+		BUS::initialize();
+	}
+
+	static ALWAYS_INLINE void
+	writeIndex(uint8_t index)
+	{
+		// *ptrIndex = 0;
+		CD::reset();
+		BUS::write(0);
+
+		// *ptrIndex = index;
+		BUS::write(index);
+	}
+
+	static ALWAYS_INLINE void
+	writeData(uint16_t data)
+	{
+		// *ptrData = data >> 8;
+		CD::set();
+		BUS::write(data >> 8);
+
+		// *ptrData = data & 0xff;
+		BUS::write(data & 0xff);
+	}
+
+//	static ALWAYS_INLINE uint16_t
+//	readData()
+//	{
+//		return *ptrData;
+//	}
+
+	static ALWAYS_INLINE void
+	writeRegister(uint8_t reg, uint16_t value)
+	{
+		writeIndex(reg);
+		writeData(value);
+	}
+
+//	static ALWAYS_INLINE uint16_t
+//	readRegister(uint16_t reg)
+//	{
+//		writeIndex(reg);
+//		return readData();
+//	}
+};
+
 }
 
 #endif /* TFT_MEMORY_BUS_HPP_ */
