@@ -356,10 +356,6 @@ class Driver(DeviceElementBase):
 		# Now this is were it gets interesting:
 		# parsing the inner nodes of the driver node recursively:
 		substitutions = dict(self._nodeToDict(self.node, device_id, properties).items() + substitutions.items())
-		# If this is the gpio driver parse gpio nodes in order to
-		# derive nibbles and ports
-		if self.type == 'gpio':
-			self._gpioCreateNibblePort(substitutions)
 		self.log.debug("Found substitutions: " + str(substitutions))
 		return substitutions
 
@@ -420,60 +416,6 @@ class Driver(DeviceElementBase):
 						parameters[name] = [value, instances]
 		self.log.debug("Found Parameters: %s" % parameters)
 		return parameters
-
-	def _gpioCreateNibblePort(self, substitutions):
-		# TODO: this is only kept for legacy reasons.
-		# as soon as the drivers relying on this are fixed
-		# this should be removed
-		# a nibble is 4 bit, an octet is 8bit
-		# a port is either 8 bit for AVR or 16 bit for ARM
-		gpios = substitutions['gpios']
-		if gpios != None:
-			# unique port list
-			ports = {v['port'] for v in gpios}
-			portArrays = []
-			for port in ports:
-				ids = [0] * 16
-				for gpio in gpios:
-					if gpio['port'] == port:
-						ids[int(gpio['id'])] = 1
-				# lets find some nibbles
-				nibbles = [1] * 4
-				for nibble in range(4):
-					for id in range(4):
-						if ids[nibble*4+id] == 0:
-							nibbles[nibble] = 0
-				# lets find some ports
-				octets = [1] * 2
-				for octet in range(2):
-					for nibble in range(2):
-						if nibbles[octet*2+nibble] == 0:
-							octets[octet] = 0
-
-				portArrays.append( {'port': port, 'nibbles': nibbles, 'octets': octets} )
-
-			# reduce the arrays and create two of them
-			nibbleSub = []
-			octetSub = []
-
-			for port in portArrays:
-				nibbles = []
-				for nibble in range(4):
-					if port['nibbles'][nibble] == 1:
-						nibbles.append(nibble)
-				octets = []
-				for octet in range(2):
-					if port['octets'][octet] == 1:
-						octets.append(octet)
-				if len(nibbles) > 0:
-					nibbleSub.append( {'port': port['port'], 'position': nibbles} )
-				if len(octets) > 0:
-					octetSub.append( {'port': port['port'], 'position': octets} )
-
-			substitutions['nibbles'] = nibbleSub
-			substitutions['octets'] = octetSub
-
-
 
 class Property(DeviceElementBase):
 	""" Property
