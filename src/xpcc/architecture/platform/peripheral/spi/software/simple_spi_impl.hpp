@@ -12,16 +12,16 @@
 #endif
 
 template <typename Clk, typename Mosi, typename Miso, uint32_t Frequency>
-bool xpcc::SoftwareSpi<Clk, Mosi, Miso, Frequency>::finished;
+bool xpcc::SoftwareSimpleSpi<Clk, Mosi, Miso, Frequency>::finished;
 
 template <typename Clk, typename Mosi, typename Miso, uint32_t Frequency>
-uint8_t xpcc::SoftwareSpi<Clk, Mosi, Miso, Frequency>::result;
+uint8_t xpcc::SoftwareSimpleSpi<Clk, Mosi, Miso, Frequency>::result;
 
 
 // ----------------------------------------------------------------------------
 template <typename Clk, typename Mosi, typename Miso, uint32_t Frequency>
 void
-xpcc::SoftwareSpi<Clk, Mosi, Miso, Frequency>::initialize()
+xpcc::SoftwareSimpleSpi<Clk, Mosi, Miso, Frequency>::initialize()
 {
 	Clk::setOutput();
 	Mosi::setOutput();
@@ -31,10 +31,10 @@ xpcc::SoftwareSpi<Clk, Mosi, Miso, Frequency>::initialize()
 
 template <typename Clk, typename Mosi, typename Miso, uint32_t Frequency>
 uint8_t
-xpcc::SoftwareSpi<Clk, Mosi, Miso, Frequency>::writeReadBlocking(uint8_t data)
+xpcc::SoftwareSimpleSpi<Clk, Mosi, Miso, Frequency>::writeReadBlocking(uint8_t data)
 {
-	while (!isFinished())
-		;
+	if (!isFinished())
+		return 0;
 	finished = false;
 
 	uint8_t input = 0;
@@ -68,46 +68,43 @@ xpcc::SoftwareSpi<Clk, Mosi, Miso, Frequency>::writeReadBlocking(uint8_t data)
 
 template <typename Clk, typename Mosi, typename Miso, uint32_t Frequency>
 void
-xpcc::SoftwareSpi<Clk, Mosi, Miso, Frequency>::writeBlocking(uint8_t data)
+xpcc::SoftwareSimpleSpi<Clk, Mosi, Miso, Frequency>::writeBlocking(uint8_t data)
 {
 	writeReadBlocking(data);
 }
 
 template <typename Clk, typename Mosi, typename Miso, uint32_t Frequency>
 bool
-xpcc::SoftwareSpi<Clk, Mosi, Miso, Frequency>::write(uint8_t data)
+xpcc::SoftwareSimpleSpi<Clk, Mosi, Miso, Frequency>::write(uint8_t data)
 {
-	if (!isFinished())
-		return false;
-
 	result = writeReadBlocking(data);
 	return true;
 }
 
 template <typename Clk, typename Mosi, typename Miso, uint32_t Frequency>
 uint8_t
-xpcc::SoftwareSpi<Clk, Mosi, Miso, Frequency>::getResult()
+xpcc::SoftwareSimpleSpi<Clk, Mosi, Miso, Frequency>::getResult()
 {
 	return result;
 }
 
 template <typename Clk, typename Mosi, typename Miso, uint32_t Frequency>
 bool
-xpcc::SoftwareSpi<Clk, Mosi, Miso, Frequency>::isFinished()
+xpcc::SoftwareSimpleSpi<Clk, Mosi, Miso, Frequency>::isFinished()
 {
 	return finished;
 }
 
 template <typename Clk, typename Mosi, typename Miso, uint32_t Frequency>
 void
-xpcc::SoftwareSpi<Clk, Mosi, Miso, Frequency>::delay()
+xpcc::SoftwareSimpleSpi<Clk, Mosi, Miso, Frequency>::delay()
 {
 	xpcc::delay_us(delayTime);
 }
 
 template <typename Clk, typename Mosi, typename Miso, uint32_t Frequency>
 bool
-xpcc::SoftwareSpi<Clk, Mosi, Miso, Frequency>::transfer(uint8_t *tx, uint8_t *rx, std::size_t length, BufferOptions options)
+xpcc::SoftwareSimpleSpi<Clk, Mosi, Miso, Frequency>::transfer(uint8_t *tx, uint8_t *rx, std::size_t length, BufferOptions options)
 {
 	if (!isFinished())
 		return false;

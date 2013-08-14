@@ -33,7 +33,7 @@ template< typename Clk,
 		  typename Mosi,
 		  typename Miso = GpioUnused,
 		  uint32_t Frequency = 2000000UL >
-class SoftwareSpi : public ::xpcc::SimpleSpi
+class SoftwareSimpleSpi : public ::xpcc::SimpleSpi
 {
 public:
 	static const TypeId::SoftwareSpiMaster Id;
@@ -59,7 +59,7 @@ public:
 	static ALWAYS_INLINE bool
 	isFinished();
 
-private:
+protected:
 	static ALWAYS_INLINE void
 	delay();
 
