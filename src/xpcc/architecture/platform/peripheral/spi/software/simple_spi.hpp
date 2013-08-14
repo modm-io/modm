@@ -19,7 +19,7 @@ namespace xpcc
 {
 
 /**
- * Software emulation of a Simple Spi
+ * Software emulation of a Simple Spi.
  *
  * @tparam	Clk			clock pin [output]
  * @tparam	Mosi		master out slave in pin [output]
@@ -27,6 +27,7 @@ namespace xpcc
  * @tparam	Frequency	requested SPI frequency in Hz (default = 2 MHz)
  *
  * @ingroup	spi
+ * @author	Niklas Hauser
  * @see		gpio
  */
 template< typename Clk,

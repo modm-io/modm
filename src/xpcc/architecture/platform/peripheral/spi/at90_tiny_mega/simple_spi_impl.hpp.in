@@ -1,0 +1,89 @@
+// coding: utf-8
+/* Copyright (c) 2013, Roboterclub Aachen e.V.
+ * All Rights Reserved.
+ *
+ * The file is part of the xpcc library and is released under the 3-clause BSD
+ * license. See the file `LICENSE` for the full license governing this code.
+ */
+// ----------------------------------------------------------------------------
+
+#ifndef XPCC_{{target.family | upper}}_SIMPLE_SPI_HPP
+#	error	"Don't include this file directly, use 'simple_spi.hpp' instead!"
+#endif
+
+// ----------------------------------------------------------------------------
+void
+xpcc::{{target.family}}::SimpleSpi::initialize(Prescaler prescaler, Mode mode)
+{
+	SPCR = (1 << SPE) | (1 << MSTR) | (static_cast<uint8_t>(prescaler) & ~0x80);
+	if (static_cast<uint8_t>(mode) & 0b01) SPCR |= (1 << CPHA);
+	if (static_cast<uint8_t>(mode) & 0b10) SPCR |= (1 << CPOL);
+	SPSR = (static_cast<uint8_t>(prescaler) & 0x80) ? (1 << SPI2X) : 0;
+	finished = true;
+}
+
+uint8_t
+xpcc::{{target.family}}::SimpleSpi::writeReadBlocking(uint8_t data)
+{
+	writeBlocking(data);
+
+	while(!isFinished())
+		;
+	return getResult();
+}
+
+void
+xpcc::{{target.family}}::SimpleSpi::writeBlocking(uint8_t data)
+{
+	while(!isFinished())
+		;
+	SPDR = data;
+}
+
+bool
+xpcc::{{target.family}}::SimpleSpi::write(uint8_t data)
+{
+	if (!isFinished())
+		return false;
+
+	SPDR = data;
+	return true;
+}
+
+uint8_t
+xpcc::{{target.family}}::SimpleSpi::getResult()
+{
+	uint8_t data = SPDR;
+	return data;
+}
+
+bool
+xpcc::{{target.family}}::SimpleSpi::transfer(uint8_t *tx, uint8_t *rx,
+		std::size_t length, BufferOptions options)
+{
+	if (!isFinished())
+		return false;
+
+	finished = false;
+
+	uint8_t tx_byte = 0xff;
+	uint8_t rx_byte;
+
+	for (std::size_t i = 0; i < length; i++)
+	{
+		if (tx) tx_byte = tx[static_cast<uint8_t>(options) & 0b10 ? i : length-i-1];
+
+		rx_byte = writeReadBlocking(tx_byte);
+
+		if (rx) rx[static_cast<uint8_t>(options) & 0b01 ? i : length-i-1] = rx_byte;
+	}
+
+	finished = true;
+	return true;
+}
+
+bool
+xpcc::{{target.family}}::SimpleSpi::isFinished()
+{
+	return (SPSR & (1 << SPIF)) && finished;
+}

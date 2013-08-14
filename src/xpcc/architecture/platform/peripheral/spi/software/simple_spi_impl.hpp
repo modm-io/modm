@@ -33,8 +33,8 @@ template <typename Clk, typename Mosi, typename Miso, uint32_t Frequency>
 uint8_t
 xpcc::SoftwareSimpleSpi<Clk, Mosi, Miso, Frequency>::writeReadBlocking(uint8_t data)
 {
-	if (!isFinished())
-		return 0;
+	while (!isFinished())
+		;
 	finished = false;
 
 	uint8_t input = 0;

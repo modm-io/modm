@@ -1,0 +1,39 @@
+// coding: utf-8
+/* Copyright (c) 2013, Roboterclub Aachen e.V.
+ * All Rights Reserved.
+ *
+ * The file is part of the xpcc library and is released under the 3-clause BSD
+ * license. See the file `LICENSE` for the full license governing this code.
+ */
+// ----------------------------------------------------------------------------
+{{ generation_block }}
+
+#ifndef XPCC_{{target.family | upper}}_SPI_TYPE_IDS_HPP
+#define XPCC_{{target.family | upper}}_SPI_TYPE_IDS_HPP
+
+namespace xpcc
+{
+
+namespace {{target.family}}
+{
+
+namespace TypeId
+{
+	typedef struct{} SpiMaster;
+	typedef struct{} UartSpiMaster0;
+	typedef struct{} UartSpiMaster1;
+	typedef struct{} UartSpiMaster2;
+	typedef struct{} UartSpiMaster3;
+	
+	typedef struct{} SpiSlave;
+	typedef struct{} UartSpiSlave0;
+	typedef struct{} UartSpiSlave1;
+	typedef struct{} UartSpiSlave2;
+	typedef struct{} UartSpiSlave3;
+}
+
+} // namespace {{target.family}}
+
+} // namespace xpcc
+
+#endif // XPCC_{{target.family | upper}}_SPI_TYPE_IDS_HPP
