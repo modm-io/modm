@@ -20,6 +20,7 @@
 namespace xpcc
 {
 
+/// @ingroup spi
 struct Spi
 {
 	/// Spi Clock Mode, Mode0 is the most used mode

@@ -13,6 +13,7 @@
 #include <stdint.h>
 #include <xpcc/architecture/peripheral/spi.hpp>
 #include <xpcc/architecture/driver/delay.hpp>
+#include "type_ids.hpp"
 
 namespace xpcc
 {
@@ -35,6 +36,8 @@ template< typename Clk,
 class SoftwareSimpleSpi : public ::xpcc::SimpleSpi
 {
 public:
+	static const TypeId::SoftwareSpiMaster Id;
+
 	static void
 	initialize();
 

@@ -12,9 +12,8 @@
 #define XPCC_{{target.family | upper}}__UART{{ id }}_HPP
 
 #include "../../../device.hpp"
-#include "../../../drivers.hpp"
-#include "../../../type_ids.hpp"
 #include <xpcc/architecture/peripheral/uart.hpp>
+#include "type_ids.hpp"
 
 namespace xpcc
 {
@@ -23,7 +22,7 @@ namespace {{target.family}}
 {
 
 /**
- * 	(Non-)Buffered Uart{{ id }}
+ * (Non-)Buffered Uart{{ id }}
  * 
  * This implementation uses a ringbuffer. The size of the ringbuffer
  * can be changed in the @c project.cfg file.
@@ -42,18 +41,18 @@ namespace {{target.family}}
  * 
  * @author	Fabian Greif
  * @author	Niklas Hauser
- * @ingroup		{{target.family}}
+ * @ingroup	{{target.family}}
  */
 class Uart{{ id }} : public ::xpcc::Uart
 {
 public:
 	
 	%% for gpio in gpios
-	%% if gpio.instance | int == id | int
-	typedef ::xpcc::{{target.family}}::Gpio{{ gpio.port }}{{ gpio.id }} {{ gpio.name | capitalize }};
-	%% endif
+		%% if gpio.instance | int == id | int
+	// typedef Gpio{{ gpio.port }}{{ gpio.id }} {{ gpio.name | capitalize }};
+		%% endif
 	%% endfor
-	typedef ::xpcc::{{target.family}}::TypeId::Uart{{ id }} Id;
+	static const TypeId::Uart{{ id }} Id;
 	
 public:
 	/**

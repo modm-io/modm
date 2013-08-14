@@ -1,35 +1,14 @@
 // coding: utf-8
-// ----------------------------------------------------------------------------
 /* Copyright (c) 2009, Roboterclub Aachen e.V.
- * All rights reserved.
+ * All Rights Reserved.
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- * 
- *     * Redistributions of source code must retain the above copyright
- *       notice, this list of conditions and the following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright
- *       notice, this list of conditions and the following disclaimer in the
- *       documentation and/or other materials provided with the distribution.
- *     * Neither the name of the Roboterclub Aachen e.V. nor the
- *       names of its contributors may be used to endorse or promote products
- *       derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY ROBOTERCLUB AACHEN E.V. ''AS IS'' AND ANY
- * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL ROBOTERCLUB AACHEN E.V. BE LIABLE FOR ANY
- * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * The file is part of the xpcc library and is released under the 3-clause BSD
+ * license. See the file `LICENSE` for the full license governing this code.
  */
 // ----------------------------------------------------------------------------
 
 #ifndef XPCC__SOFTWARE_I2C_HPP
-#	error	"Don't include this file directly, use 'software_i2c.hpp' instead!"
+#	error	"Don't include this file directly, use 'i2c_master.hpp' instead!"
 #endif
 
 // debugging for serious dummies
@@ -73,7 +52,7 @@ xpcc::SoftwareI2cMaster<Scl, Sda, Frequency>::start(xpcc::I2cDelegate *delegate)
 	if (!myDelegate && delegate && delegate->attaching())
 	{
 		myDelegate = delegate;
-		
+
 		while(1)
 		{
 			DEBUG_SW_I2C('\n');
@@ -82,16 +61,16 @@ xpcc::SoftwareI2cMaster<Scl, Sda, Frequency>::start(xpcc::I2cDelegate *delegate)
 
 			xpcc::I2cDelegate::Starting s = myDelegate->starting();
 			uint8_t address = s.address;
-			
+
 			address &= 0xfe;
 			if (s.next == xpcc::I2c::Operation::Read)
 				address |= xpcc::I2c::READ;
-			
+
 			if (!write(address))
 				return true;
 			if (nextOperation == xpcc::I2c::Operation::Restart) {DEBUG_SW_I2C('R');}
 			nextOperation = s.next;
-			
+
 			do {
 				switch (nextOperation)
 				{
@@ -109,7 +88,7 @@ xpcc::SoftwareI2cMaster<Scl, Sda, Frequency>::start(xpcc::I2cDelegate *delegate)
 						nextOperation = static_cast<xpcc::I2c::Operation>(r.next);
 					}
 						break;
-						
+
 					case xpcc::I2c::Operation::Write:
 					{
 						xpcc::I2cDelegate::Writing w = myDelegate->writing();
@@ -122,14 +101,14 @@ xpcc::SoftwareI2cMaster<Scl, Sda, Frequency>::start(xpcc::I2cDelegate *delegate)
 						nextOperation = static_cast<xpcc::I2cDelegate::Operation>(w.next);
 					}
 						break;
-					
+
 					case xpcc::I2c::Operation::Stop:
 						DEBUG_SW_I2C('S');
 						myDelegate->stopped(xpcc::I2c::DetachCause::NormalStop);
 						myDelegate = 0;
 						stopCondition();
 						return true;
-						
+
 					default:
 						break;
 				}
@@ -183,7 +162,7 @@ xpcc::SoftwareI2cMaster<Scl, Sda, Frequency>::stopCondition()
 {
 	scl.reset();
 	sda.reset();
-	
+
 	delay();
 	sclSetAndWait();
 	delay();
@@ -201,10 +180,10 @@ xpcc::SoftwareI2cMaster<Scl, Sda, Frequency>::write(uint8_t data)
 		writeBit(data & 0x80);
 		data <<= 1;
 	}
-	
+
 	// release sda
 	sda.set();
-	
+
 	// return acknowledge bit
 	if (readBit()) {
 		DEBUG_SW_I2C('N');
@@ -219,7 +198,7 @@ uint8_t
 xpcc::SoftwareI2cMaster<Scl, Sda, Frequency>::read(bool ack)
 {
 	sda.set();
-	
+
 	uint8_t data = 0;
 	for(uint8_t i = 0; i < 8; ++i)
 	{
@@ -228,13 +207,13 @@ xpcc::SoftwareI2cMaster<Scl, Sda, Frequency>::read(bool ack)
 			data |= 0x01;
 		}
 	}
-	
+
 	// generate acknowledge bit
 	writeBit(!ack);
-	
+
 	// release sda
 	sda.set();
-	
+
 	return data;
 }
 
@@ -245,13 +224,13 @@ xpcc::SoftwareI2cMaster<Scl, Sda, Frequency>::readBit()
 {
 	delay();
 	sclSetAndWait();
-	
+
 	delay();
 
 	bool bit = sda.read();
-	
+
 	scl.reset;
-	
+
 	return bit;
 }
 
@@ -266,9 +245,9 @@ xpcc::SoftwareI2cMaster<Scl, Sda, Frequency>::writeBit(bool bit)
 		sda.reset();
 	}
 	delay();
-	
+
 	sclSetAndWait();
-	
+
 	delay();
 
 	scl.reset();
