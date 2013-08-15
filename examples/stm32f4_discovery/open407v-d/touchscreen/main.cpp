@@ -40,7 +40,6 @@ GPIO__IO(D14, D, 9);
 GPIO__IO(D15, D, 10);
 
 GPIO__OUTPUT(A16, D, 11);
-GPIO__OUTPUT(A23, E, 2);
 
 GPIO__OUTPUT(NOE, D, 4);
 GPIO__OUTPUT(NWE, D, 5);
@@ -97,7 +96,6 @@ initDisplay()
 	D15::setAlternateFunction(AF_FSMC, PUSH_PULL, SPEED_100MHZ);
 	
 	A16::setAlternateFunction(AF_FSMC, PUSH_PULL, SPEED_100MHZ);
-	A23::setAlternateFunction(AF_FSMC, PUSH_PULL, SPEED_100MHZ);
 	
 	NOE::setAlternateFunction(AF_FSMC, PUSH_PULL, SPEED_100MHZ);
 	NWE::setAlternateFunction(AF_FSMC, PUSH_PULL, SPEED_100MHZ);
