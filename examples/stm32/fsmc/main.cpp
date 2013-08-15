@@ -1,9 +1,41 @@
 /**
- * Example of Siemens S75 Display connected to STM32's FSMC bus.
+ * Display with parallel port on FSMC
+ * ==================================
  *
- * Board used:	stm32f407_breakout
+ * This example is to demonstrate a display with a parallel data bus connected
+ * to the flexible static memory controller (FSMC).
  *
- * See pinout of S75 in siemens_s75.hpp
+ * Using the FSMC will show the highest performance in updating the display
+ * content.
+ *
+ * Hardware used
+ * -------------
+ *  o STM32F4 breakout board (stm32f407_breakout.brd)
+ *  o Siemens S75 Display
+ *
+ * Connection
+ * ----------
+ * See siemens_s75.hpp for the connection between the display and the STM32.
+ * As the FSMC pins must be used there is no choice for D0 to D7, Cs and Wr.
+ *
+ * Reset can be connected to any GPIO. Cd can be connected to any of the
+ * FSMC Address pins (A0 .. A25) when the address of TftMemoryBus8Bit is
+ * adjusted.
+ *
+ * Expected outcome
+ * ----------------
+ * Whe the program runs a "Hello world" should marquee over the screen.
+ *
+ * Alternative use
+ * ---------------
+ * The S75 display driver works with any parallel bus. To demonstrate this
+ * feature the FSMC is not used and a parallel bus is constructed from
+ * GPIOs.
+ *
+ * See also
+ * --------
+ * examples/lpcxpresso/lpc11c24/display/s75
+ *
  */
 
 #include <xpcc/architecture.hpp>
