@@ -275,7 +275,9 @@ class AVRDeviceWriter(XMLDeviceWriter):
 			for gpio in gpios:
 				gpio_child = driver.addChild('gpio')
 				gpio_child.setAttributes(dict)
-				gpio_child.setAttributes({'port': gpio['port'], 'id': gpio['id']})
+				for name in ['port', 'id', 'pcint', 'extint']:
+					if name in gpio:
+						gpio_child.setAttribute(name, gpio[name])
 				for af in gpio['af']:
 					af_child = gpio_child.addChild('af')
 					af_child.setAttributes(af)

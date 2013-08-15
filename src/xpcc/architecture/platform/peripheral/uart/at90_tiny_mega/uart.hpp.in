@@ -25,7 +25,7 @@ namespace {{target.family}}
  * (Non-)Buffered Uart{{ id }}
  * 
  * This implementation uses a ringbuffer. The size of the ringbuffer
- * can be changed in the @c project.cfg file.
+ * can be changed in the `project.cfg` file.
  * 
  * Just add add a value for `Uart{{ id }}.tx_buffer` and/or 
  * `Uart{{ id }}.rx_buffer` in the `defines` section. The size can

@@ -131,7 +131,13 @@ class AVRDeviceReader(XMLDeviceReader):
 					continue
 		
 		for pin_array in [a for a in avr_io.pins if self.properties['mmcu'] in a['devices']]:
-			for name in ['pcint', 'extint', 'spi', 'i2c', 'usi']:
+			for name in ['pcint', 'extint']:
+				if name in pin_array:
+					for module in pin_array[name]:
+						for gpio in [g for g in gpios if g['port'] == module['port'] and g['id'] == module['id']]:
+							gpio[name] = module['int']
+
+			for name in ['spi', 'i2c', 'usi']:
 				if name in pin_array:
 					for module in pin_array[name]:
 						for gpio in [g for g in gpios if g['port'] == module['port'] and g['id'] == module['id']]:

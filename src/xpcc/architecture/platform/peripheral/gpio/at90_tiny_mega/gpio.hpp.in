@@ -186,9 +186,8 @@ public:
 	ALWAYS_INLINE static bool read() {
 		return (PIN{{port}} & mask);
 	}
-		%% for af in gpio.afs
-			%% if af.peripheral == "extint"
-			%% set af_id = af.int | int
+		%% if 'extint' in gpio
+			%% set af_id = gpio.extint | int
 
 				%# Go home Atmel, you're drunk!
 				%% set eicra = 'EICRA'
@@ -258,8 +257,9 @@ public:
 #	error "Cannot find register for setting INTF{{af_id}}!"
 #endif
 	}
-			%% elif af.peripheral == "pcint"
-			%% set af_id = af.int | int
+		%% endif
+		%% if 'pcint' in gpio
+			%% set af_id = gpio.pcint | int
 
 				%# Go home Atmel, you're drunk!
 				%% if target.family == 'attiny'
@@ -328,8 +328,7 @@ public:
 #	error "Cannot find register for setting PCIF{{af_reg}}!"
 #endif
 	}
-			%% endif
-		%% endfor
+		%% endif
 
 		%% for af in gpio.afs
 			%% if af.peripheral != "extint" and af.peripheral != "pcint"
