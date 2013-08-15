@@ -2,8 +2,9 @@
 <!DOCTYPE rca SYSTEM "../../xml/driver.dtd">
 <rca version="1.0">
 	<driver type="spi" name="at90_tiny_mega">
-		<!-- Template: file that needs to be turned into a source file
-		<template instances="0,1,2,3" out="uart_spi_master{{id}}.hpp">uart_spi_master.hpp.in</template> -->
+		<!-- Template: file that needs to be turned into a source file -->
+		<template instances="0,1,2,3" out="uart_simple_spi{{id}}.hpp">uart_simple_spi.hpp.in</template>
+		<template instances="0,1,2,3" out="uart_simple_spi{{id}}_impl.hpp">uart_simple_spi_impl.hpp.in</template>
 		<template>simple_spi.hpp.in</template>
 		<template>simple_spi_impl.hpp.in</template>
 		<template>type_ids.hpp.in</template>

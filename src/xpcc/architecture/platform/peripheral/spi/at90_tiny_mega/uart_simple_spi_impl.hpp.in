@@ -14,16 +14,16 @@
 // ----------------------------------------------------------------------------
 template< uint32_t baudrate >
 void
-xpcc::{{target.family}}::UartSimpleSpi::initialize(Mode mode)
+xpcc::{{target.family}}::UartSimpleSpi{{id}}::initialize(Mode mode)
 {
 	constexpr uint16_t prescaler = (F_CPU / ( 2 * baudrate )) - 1;
 	static_assert(2 * baudrate <= F_CPU, "SPI baudrate is too high for CPU frequency.");
 	static_assert(prescaler < (1 << 12), "SPI baudrate is too low for CPU frequency.");
-	intialize(prescaler, mode);
+	initialize(prescaler, mode);
 }
 
 void
-xpcc::{{target.family}}::UartSimpleSpi::initialize(uint16_t prescaler, Mode mode)
+xpcc::{{target.family}}::UartSimpleSpi{{id}}::initialize(uint16_t prescaler, Mode mode)
 {
 	UBRR{{ id }} = 0;
 	// set MSPI mode of operation and SPI data mode
@@ -37,7 +37,7 @@ xpcc::{{target.family}}::UartSimpleSpi::initialize(uint16_t prescaler, Mode mode
 }
 
 uint8_t
-xpcc::{{target.family}}::UartSimpleSpi::writeReadBlocking(uint8_t data)
+xpcc::{{target.family}}::UartSimpleSpi{{id}}::writeReadBlocking(uint8_t data)
 {
 	writeBlocking(data);
 
@@ -47,7 +47,7 @@ xpcc::{{target.family}}::UartSimpleSpi::writeReadBlocking(uint8_t data)
 }
 
 void
-xpcc::{{target.family}}::UartSimpleSpi::writeBlocking(uint8_t data)
+xpcc::{{target.family}}::UartSimpleSpi{{id}}::writeBlocking(uint8_t data)
 {
 	while(!isFinished())
 		;
@@ -55,7 +55,7 @@ xpcc::{{target.family}}::UartSimpleSpi::writeBlocking(uint8_t data)
 }
 
 bool
-xpcc::{{target.family}}::UartSimpleSpi::write(uint8_t data)
+xpcc::{{target.family}}::UartSimpleSpi{{id}}::write(uint8_t data)
 {
 	if (!isFinished())
 		return false;
@@ -65,14 +65,14 @@ xpcc::{{target.family}}::UartSimpleSpi::write(uint8_t data)
 }
 
 uint8_t
-xpcc::{{target.family}}::UartSimpleSpi::getResult()
+xpcc::{{target.family}}::UartSimpleSpi{{id}}::getResult()
 {
 	uint8_t data = UDR{{id}};
 	return data;
 }
 
 bool
-xpcc::{{target.family}}::UartSimpleSpi::transfer(uint8_t *tx, uint8_t *rx,
+xpcc::{{target.family}}::UartSimpleSpi{{id}}::transfer(uint8_t *tx, uint8_t *rx,
 		std::size_t length, BufferOptions options)
 {
 	if (!isFinished())
@@ -97,7 +97,7 @@ xpcc::{{target.family}}::UartSimpleSpi::transfer(uint8_t *tx, uint8_t *rx,
 }
 
 bool
-xpcc::{{target.family}}::UartSimpleSpi::isFinished()
+xpcc::{{target.family}}::UartSimpleSpi{{id}}::isFinished()
 {
 	return ( (UCSR{{id}}A & ((1 << UDRE{{id}}) | (1 << RXC{{id}})) ) ==
 			((1 << UDRE{{id}}) | (1 << RXC{{id}})) ) && finished;
