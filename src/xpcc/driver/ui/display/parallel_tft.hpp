@@ -1,8 +1,8 @@
 // coding: utf-8
 // ----------------------------------------------------------------------------
-/* Copyright (c) 2009, Roboterclub Aachen e.V.
+/* Copyright (c) 2013, Roboterclub Aachen e.V.
  * All rights reserved.
- *
+ * 
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  * 
@@ -28,72 +28,70 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__BUFFERED_GRAPHIC_DISPLAY_HPP
-#define XPCC__BUFFERED_GRAPHIC_DISPLAY_HPP
+#ifndef XPCC__PARALLEL_TFT_HPP
+#define XPCC__PARALLEL_TFT_HPP
 
-#include <stdlib.h>
-#include "graphic_display.hpp"
+#include <xpcc/architecture/driver/delay.hpp>
+#include <xpcc/driver/ui/display/graphic_display.hpp>
 
 namespace xpcc
 {
 	/**
-	 * Base class for graphical displays with a RAM buffer.
+	 * TFT display connected to a 16 bit parallel bus
 	 * 
-	 * Every operation works on the internal RAM buffer, therefore the content
-	 * of the real display is not changed until a call of update().
+	 * Supports (among others) the following displays:
+	 * - WaveShare 3,2" TFT (Model B), Controller SSD1289
 	 * 
-	 * \tparam	Width	Width of the display.
-	 * \tparam	Height	Height of the display. Must be a multiple of 8!
-	 * 
-	 * \author	Fabian Greif
-	 * \ingroup	lcd
+	 * @author	Fabian Greif
 	 */
-	template <uint16_t Width, uint16_t Height>
-	class BufferedGraphicDisplay : public GraphicDisplay
+	template <typename INTERFACE>
+	class ParallelTft : public GraphicDisplay
 	{
-		// Height must be a multiple of 8
-		XPCC__STATIC_ASSERT((Height % 8) == 0, "height must be a multiple of 8");
-		
 	public:
-		virtual
-		~BufferedGraphicDisplay()
-		{
-		}
+		ParallelTft(INTERFACE& interface);
 		
-		virtual  inline uint16_t
-		getWidth() const
-		{
-			return Width;
-		}
-
-		virtual inline uint16_t
-		getHeight() const
-		{
-			return Height;
-		}
-
-		/**
-		 * \brief	Clear the complete screen
-		 * 
-		 * Use fillRectangle() to clear certain areas of the screen.
-		 */
+		void
+		initialize();
+		
+		// see GraphicDisplay::getWidth()
+		virtual uint16_t
+		getWidth() const;
+	
+		// see GraphicDisplay::getHeight()
+		virtual uint16_t
+		getHeight() const;
+	
+		// set GraphicDisplay::clear()
 		virtual void
 		clear();
 		
-		// Faster version adapted for the RAM buffer
+		/**
+		 * Not used here as all operations are performed directly
+		 * on the display.
+		 */
 		virtual void
-		drawImageRaw(glcd::Point upperLeft,
-				uint16_t width, uint16_t height,
-				xpcc::accessor::Flash<uint8_t> data);
+		update()
+		{
+		}
 		
-	protected:
-		// Faster version adapted for the RAM buffer
-		virtual void
-		drawHorizontalLine(glcd::Point start, uint16_t length);
-		
-		// TODO Faster version adapted for the RAM buffer
-		//virtual void
-		//drawVerticalLine(glcd::Point start, uint8_t length);
+	private:
+		enum class Device
+		{
+			ILI9320,	// device code = 0x9320
+			ILI9325,	// device code = 0x9325
+			ILI9328,	// device code = 0x9328
+			ILI9331,	// device code = 0x9331
+			SSD1298,	// device code = 0x8999
+			SSD1289,	// device code = 0x8989
+			ST7781,		// device code = 0x7783
+			LGDP4531,	// device code = 0x4531
+			SPFD5408B,	// device code = 0x5408
+			R61505U,	// device code = 0x1505 or 0x0505	   
+			//HX8347D,	// device code = 0x0047
+			//HX8347A,	// device code = 0x0047	
+			LGDP4535,	// device code = 0x4535  
+			//SSD2119,	// 3.5 LCD, device code = 0x9919
+		};
 		
 		virtual void
 		setPixel(int16_t x, int16_t y);
@@ -104,10 +102,17 @@ namespace xpcc
 		virtual bool
 		getPixel(int16_t x, int16_t y);
 		
-		uint8_t buffer[Width][Height / 8];
+		void
+		writeCursor(uint16_t x, uint16_t y);
+		
+		void
+		writeRegister(uint16_t reg, uint16_t value);
+		
+		INTERFACE& interface;
+		Device deviceCode;
 	};
 }
 
-#include "buffered_graphic_display_impl.hpp"
+#include "parallel_tft_impl.hpp"
 
-#endif	// XPCC__GRAPHIC_DISPLAY_HPP
+#endif // XPCC__PARALLEL_TFT_HPP

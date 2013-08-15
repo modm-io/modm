@@ -33,26 +33,31 @@
 // ----------------------------------------------------------------------------
 void
 xpcc::GraphicDisplay::fillRectangle(glcd::Point upperLeft,
-		uint8_t width, uint8_t height)
+		uint16_t width, uint16_t height)
 {
-	for (uint8_t i = upperLeft.getX(); (i < upperLeft.getX() + width) && (i < 128); i++) {
-		for (uint8_t k = upperLeft.getY(); (k < upperLeft.getY() + height) && (k < 64); k++) {
+	for (uint16_t i = upperLeft.getX();
+			(i < upperLeft.getX() + width) && (i < getWidth());
+			++i)
+	{
+		for (uint16_t k = upperLeft.getY();
+				(k < upperLeft.getY() + height) && (k < getHeight());
+				++k)
+		{
 			(this->*draw)(i, k);
 		}
 	}
 }
 
 void
-xpcc::GraphicDisplay::fillCircle(glcd::Point center, uint8_t radius)
+xpcc::GraphicDisplay::fillCircle(glcd::Point center, uint16_t radius)
 {
-	int8_t f = 1 - radius;
-	int8_t ddF_x = 0;
-	int8_t ddF_y = -2 * radius;
-	uint8_t x = 0;
-	uint8_t y = radius;
+	int16_t f = 1 - radius;
+	int16_t ddF_x = 0;
+	int16_t ddF_y = -2 * radius;
+	uint16_t x = 0;
+	uint16_t y = radius;
 	
 	this->drawVerticalLine(glcd::Point(center.getX(), center.getY() - radius), 2 * radius);
-	//this->drawHorizontalLine(center.getX() - radius, center.getY(), 2* radius);
 	
 	while(x < y)
 	{

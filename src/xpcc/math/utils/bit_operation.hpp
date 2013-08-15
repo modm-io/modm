@@ -110,6 +110,14 @@ namespace xpcc
 #endif
 	}
 	
+	ALWAYS_INLINE void
+	swap(int16_t& a, int16_t& b)
+	{
+		int16_t temp = a;
+		a = b;
+		b = temp;
+	}
+	
 	// --------------------------------------------------------------------
 	/**
 	 * \brief	Reverse the bits in a byte

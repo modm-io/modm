@@ -76,8 +76,8 @@ if env['ARCHITECTURE'].startswith('cortex-m4/stm32f3'):
 		'stm32f3xx_lib/STM32F30x_StdPeriph_Driver/inc',
 		]
 if env['ARCHITECTURE'].startswith('cortex-m4/stm32f4'):
-	#sourcePath += [
-	#	'stm32f4xx_lib/STM32F4xx_StdPeriph_Driver/src']
+	sourcePath += [
+		'stm32f4xx_lib/STM32F4xx_StdPeriph_Driver/src']
 	globalIncludes += [
 		'stm32f4xx_lib/CMSIS/Include',
 		'stm32f4xx_lib/CMSIS/Device/ST/STM32F4xx/Include',

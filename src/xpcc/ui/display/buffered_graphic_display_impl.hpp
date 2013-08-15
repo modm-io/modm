@@ -33,12 +33,12 @@
 #endif
 
 // ----------------------------------------------------------------------------
-template <uint8_t Width, uint8_t Height>
+template <uint16_t Width, uint16_t Height>
 void
 xpcc::BufferedGraphicDisplay<Width, Height>::clear()
 {
-	for (uint8_t y = 0; y < Height / 8; ++y) {
-		for (uint8_t x = 0; x < Width; ++x) {
+	for (uint_fast16_t y = 0; y < Height / 8; ++y) {
+		for (uint_fast16_t x = 0; x < Width; ++x) {
 			this->buffer[x][y] = 0;
 		}
 	}
@@ -48,18 +48,18 @@ xpcc::BufferedGraphicDisplay<Width, Height>::clear()
 }
 
 // ----------------------------------------------------------------------------
-template <uint8_t Width, uint8_t Height>
+template <uint16_t Width, uint16_t Height>
 void
 xpcc::BufferedGraphicDisplay<Width, Height>::drawHorizontalLine(
 		glcd::Point start,
-		uint8_t length)
+		uint16_t length)
 {
-	const uint8_t y = start.getY() / 8;
+	const uint16_t y = start.getY() / 8;
 	
-	if (this->color == glcd::BLACK)
+	if (this->foregroundColor == glcd::Color::black())
 	{
 		const uint8_t mask = 1 << (start.getY() & 0x07);
-		for (uint8_t x = start.getX(); x < start.getX() + length; ++x) {
+		for (uint_fast16_t x = start.getX(); x < static_cast<uint16_t>(start.getX() + length); ++x) {
 			if( x < Width && y < Height ) {
 				this->buffer[x][y] |= mask;
 			}
@@ -67,7 +67,7 @@ xpcc::BufferedGraphicDisplay<Width, Height>::drawHorizontalLine(
 	}
 	else {
 		const uint8_t mask = ~(1 << (start.getY() & 0x07));
-		for (uint8_t x = start.getX(); x < start.getX() + length; ++x) {
+		for (uint_fast16_t x = start.getX(); x < static_cast<uint16_t>(start.getX() + length); ++x) {
 			if( x < Width && y < Height ) {
 				this->buffer[x][y] &= mask;
 			}
@@ -76,25 +76,25 @@ xpcc::BufferedGraphicDisplay<Width, Height>::drawHorizontalLine(
 }
 
 // ----------------------------------------------------------------------------
-template <uint8_t Width, uint8_t Height>
+template <uint16_t Width, uint16_t Height>
 void
 xpcc::BufferedGraphicDisplay<Width, Height>::drawImageRaw(glcd::Point upperLeft,
-		uint8_t width, uint8_t height,
+		uint16_t width, uint16_t height,
 		xpcc::accessor::Flash<uint8_t> data)
 {
 	if ((upperLeft.getY() & 0x07) == 0)
 	{
-		uint8_t row = upperLeft.getY() / 8;
-		uint8_t rowCount = (height + 7) / 8;	// always round up
+		uint16_t row = upperLeft.getY() / 8;
+		uint16_t rowCount = (height + 7) / 8;	// always round up
 		
 		if ((height & 0x07) == 0)
 		{
-			for (uint8_t i = 0; i < width; i++)
+			for (uint_fast16_t i = 0; i < width; i++)
 			{
-				for (uint8_t k = 0; k < rowCount; k++)
+				for (uint_fast16_t k = 0; k < rowCount; k++)
 				{
-					uint8_t x = upperLeft.getX() + i;
-					uint8_t y = k + row;
+					uint16_t x = upperLeft.getX() + i;
+					uint16_t y = k + row;
 
 					if( x < Width && y < Height ) {
 						this->buffer[x][y] = data[i + k * width];
@@ -109,29 +109,29 @@ xpcc::BufferedGraphicDisplay<Width, Height>::drawImageRaw(glcd::Point upperLeft,
 }
 
 // ----------------------------------------------------------------------------
-template <uint8_t Width, uint8_t Height>
+template <uint16_t Width, uint16_t Height>
 void
-xpcc::BufferedGraphicDisplay<Width, Height>::setPixel(uint8_t x, uint8_t y)
+xpcc::BufferedGraphicDisplay<Width, Height>::setPixel(int16_t x, int16_t y)
 {
-	if( x < Width && y < Height ) {
+	if (static_cast<uint16_t>(x) < Width && static_cast<uint16_t>(y) < Height) {
 		this->buffer[x][y / 8] |= (1 << (y & 0x07));
 	}
 }
 
-template <uint8_t Width, uint8_t Height>
+template <uint16_t Width, uint16_t Height>
 void
-xpcc::BufferedGraphicDisplay<Width, Height>::clearPixel(uint8_t x, uint8_t y)
+xpcc::BufferedGraphicDisplay<Width, Height>::clearPixel(int16_t x, int16_t y)
 {
-	if( x < Width && y < Height ) {
+	if (static_cast<uint16_t>(x) < Width && static_cast<uint16_t>(y) < Height) {
 		this->buffer[x][y / 8] &= ~(1 << (y & 0x07));
 	}
 }
 
-template <uint8_t Width, uint8_t Height>
+template <uint16_t Width, uint16_t Height>
 bool
-xpcc::BufferedGraphicDisplay<Width, Height>::getPixel(uint8_t x, uint8_t y)
+xpcc::BufferedGraphicDisplay<Width, Height>::getPixel(int16_t x, int16_t y)
 {
-	if( x < Width && y < Height ) {
+	if (static_cast<uint16_t>(x) < Width && static_cast<uint16_t>(y) < Height) {
 		return (this->buffer[x][y / 8] & (1 << (y & 0x07)));
 	}
 	else {
