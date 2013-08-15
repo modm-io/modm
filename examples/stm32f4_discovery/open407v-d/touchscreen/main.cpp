@@ -46,6 +46,19 @@ GPIO__OUTPUT(NWE, D, 5);
 
 GPIO__OUTPUT(CS, D, 7);
 
+/** Use A16 as Command / Data pin
+ * 0x60000000 is the base address for FSMC's first memory bank.
+ * When accessing 0x60000000 A16 is low.
+ *
+ * Why offset +0x20000 for A16?
+ * (1 << 16) is 0x10000.
+ *
+ * But the TftMemoryBus16Bit uses the FSMC in 16 bit mode.
+ * Then, according to Table 184 (External memory address) of
+ * reference manual (p1317) address HADDR[25:1] >> 1 are issued to
+ * the address pins A24:A0.
+ * So when writing to offset +((1 << 16) << 1) pin A16 is high.
+ */
 xpcc::TftMemoryBus16Bit parallelBus(
 		(volatile uint16_t *) 0x60000000,
 		(volatile uint16_t *) 0x60020000);
