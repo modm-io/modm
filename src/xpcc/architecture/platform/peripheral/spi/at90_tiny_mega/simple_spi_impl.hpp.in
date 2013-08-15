@@ -12,6 +12,40 @@
 #endif
 
 // ----------------------------------------------------------------------------
+template< uint32_t baudrate >
+void
+xpcc::{{target.family}}::SimpleSpi::initialize(Mode mode)
+{
+	static_assert(2 * baudrate <= F_CPU, "SPI baudrate is too high for CPU frequency.");
+	static_assert(128 * baudrate >= F_CPU, "SPI baudrate is too low for CPU frequency.");
+	
+	constexpr uint16_t pre_raw = (F_CPU / baudrate);
+	Prescaler prescaler = Prescaler::Div128;
+	if (pre_raw >= 128) {
+		prescaler = Prescaler::Div128;
+	}
+	else if (pre_raw >= 64) {
+		prescaler = Prescaler::Div64;
+	}
+	else if (pre_raw >= 32) {
+		prescaler = Prescaler::Div32;
+	}
+	else if (pre_raw >= 16) {
+		prescaler = Prescaler::Div16;
+	}
+	else if (pre_raw >= 8) {
+		prescaler = Prescaler::Div8;
+	}
+	else if (pre_raw >= 4) {
+		prescaler = Prescaler::Div4;
+	}
+	else {
+		prescaler = Prescaler::Div2;
+	}
+
+	initialize(prescaler, mode);
+}
+
 void
 xpcc::{{target.family}}::SimpleSpi::initialize(Prescaler prescaler, Mode mode)
 {

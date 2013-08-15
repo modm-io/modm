@@ -70,6 +70,9 @@ struct Spi
  * Use this interface if you need the *fastest possible* data transfer and only
  * have one slave on the bus or implement the resource management yourself.
  *
+ * @warning	You can only either use the `SimpleSpi` or `SpiMaster` driver on
+ * 			the same hardware at the same time.
+ *
  * @author	Niklas Hauser
  * @ingroup	peripheral
  * @ingroup	spi
@@ -130,13 +133,16 @@ public:
 };
 
 /**
- * Interface for a SPI master.
+ * Interface for a SPI master with resource management.
  *
  * In order to allow resource management the SPI hardware, the selection of
  * the (active low) Slave Select pin must also be part of this management.
  * This will remove the need to synchronize hardware access on device driver
  * level while also providing asynchronous and, if available, DMA supported
  * data transfer.
+ *
+ * @warning	You can only either use the `SimpleSpi` or `SpiMaster` driver on
+ * 			the same hardware at the same time.
  *
  * @author	Niklas Hauser
  * @ingroup	peripheral

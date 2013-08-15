@@ -35,7 +35,6 @@ struct Spi
 		Div32 = 0x80 | (1 << SPR1),
 		Div64 = (1 << SPR1),
 		Div128 = (1 << SPR1) | (1 << SPR0),
-		Div256 = 0x80 | (1 << SPR1) | (1 << SPR0),
 	};
 };
 
