@@ -218,7 +218,7 @@ def filter_get_ports(gpios):
 	This filter accepts a list of gpios as e.g. used by the stm32af driver
 	and tried to extract information about port which is returned as a list
 	of dictionaries with the following strcture:
-	{'name': "PortC", 'startPinId': 0, 'width': 16}
+	{'name': "C", 'startPin': 0, 'width': 16}
 	"""
 	# collect information on available gpios
 	port_ids = {}

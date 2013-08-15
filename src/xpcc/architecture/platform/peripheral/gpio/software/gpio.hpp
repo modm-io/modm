@@ -199,7 +199,7 @@ namespace xpcc
 			  typename T5 = GpioUnused,
 			  typename T6 = GpioUnused,
 			  typename T7 = GpioUnused>
-	class SoftwareGpioOctet : GpioOctet
+	class SoftwareGpioOctet : public GpioOctet
 	{
 	public:
 		static constexpr uint8_t width =
@@ -302,7 +302,7 @@ namespace xpcc
 			  typename T13 = GpioUnused,
 			  typename T14 = GpioUnused,
 			  typename T15 = GpioUnused>
-	class SoftwareGpioWord : GpioWord
+	class SoftwareGpioWord : public GpioWord
 	{
 	public:
 		static constexpr uint16_t width =

@@ -71,7 +71,7 @@ i(InterruptControlLevel level) { return static_cast<uint8_t>(level); }
  * level you wont to work with.
  *
  * Example:
- * \code
+ * @code
  * using namespace xpcc::xmega;
  * // reset all interrupt levels
  * resetInterruptLevel(InterruptControlLevel::All);
@@ -79,12 +79,12 @@ i(InterruptControlLevel level) { return static_cast<uint8_t>(level); }
  * setInterruptLevel(InterruptControlLevel::High);
  * setInterruptLevel(InterruptControlLevel::Medium);
  * enableInterrupts();
- * \endcode
+ * @endcode
  *
  * @ingroup	xmega
  */
 static inline void
-setInterruptLevel(InterruptControlLevel level)
+enableInterruptLevel(InterruptControlLevel level)
 {
 	PMIC_CTRL |= i(level);
 }
@@ -95,7 +95,7 @@ setInterruptLevel(InterruptControlLevel level)
  * @ingroup	xmega
  */
 static inline void
-resetInterruptLevel(InterruptControlLevel level)
+disableInterruptLevel(InterruptControlLevel level)
 {
 	PMIC_CTRL &= ~i(level);
 }

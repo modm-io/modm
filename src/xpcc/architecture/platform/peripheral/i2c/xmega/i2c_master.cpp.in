@@ -1,36 +1,15 @@
 // coding: utf-8
-// ----------------------------------------------------------------------------
 /* Copyright (c) 2013, Roboterclub Aachen e.V.
- * All rights reserved.
+ * All Rights Reserved.
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- * 
- *     * Redistributions of source code must retain the above copyright
- *       notice, this list of conditions and the following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright
- *       notice, this list of conditions and the following disclaimer in the
- *       documentation and/or other materials provided with the distribution.
- *     * Neither the name of the Roboterclub Aachen e.V. nor the
- *       names of its contributors may be used to endorse or promote products
- *       derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY ROBOTERCLUB AACHEN E.V. ''AS IS'' AND ANY
- * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL ROBOTERCLUB AACHEN E.V. BE LIABLE FOR ANY
- * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * The file is part of the xpcc library and is released under the 3-clause BSD
+ * license. See the file `LICENSE` for the full license governing this code.
  */
 // ----------------------------------------------------------------------------
 {{ generation_block }}
 
 #include <xpcc/architecture/driver/atomic/lock.hpp>
-#include "i2c_master_{{ id.lower() }}.hpp"
+#include "i2c_master_{{ id }}.hpp"
 
 // uncomment to debug your driver using simple uart
 /*
@@ -148,7 +127,7 @@ ISR(TWI{{ id }}_TWIM_vect)
 				if (TWI{{ id }}_MASTER_STATUS & TWI_MASTER_RXACK_bm)
 				{
 					DEBUG('N');
-					errorState = xpcc::I2c::Error::DataNack;
+					errorState = xpcc::I2cMaster::Error::DataNack;
 					TWI{{ id }}_MASTER_CTRLC = TWI_MASTER_ACKACT_bm | TWI_MASTER_CMD_STOP_gc;
 					xpcc::xmega::I2cMaster{{ id }}::reset(xpcc::I2c::DetachCause::ErrorCondition);
 					// (M2)
@@ -240,7 +219,7 @@ ISR(TWI{{ id }}_TWIM_vect)
 			// cancel all pending messages
 			DEBUG('E');
 			
-			errorState = xpcc::I2cError::ArbitrationLost;
+			errorState = xpcc::I2cMaster::Error::ArbitrationLost;
 			xpcc::xmega::I2cMaster{{ id }}::reset(xpcc::I2c::DetachCause::ErrorCondition);
 			
 		default:
@@ -256,8 +235,8 @@ xpcc::xmega::I2cMaster{{ id }}::initializeWithBaud(uint8_t baud)
 {
 	reset(xpcc::I2c::DetachCause::SoftwareReset);
 	
-	Sda::setInput();
-	Scl::setOutput();
+//	Sda::setInput();
+//	Scl::setOutput();
 	
 	// SDA Hold Time and External Driver Interface disabled
 	TWI{{ id }}_CTRL = 0;
@@ -305,7 +284,7 @@ xpcc::xmega::I2cMaster{{ id }}::start(xpcc::I2cDelegate *delegate)
 }
 
 bool
-xpcc::xmega::I2cMaster{{ id }}::startSync(xpcc::I2cDelegate *delegate)
+xpcc::xmega::I2cMaster{{ id }}::startBlocking(xpcc::I2cDelegate *delegate)
 {
 	if (!::delegate && delegate && delegate->attaching())
 	{
@@ -319,5 +298,3 @@ xpcc::xmega::I2cMaster{{ id }}::startSync(xpcc::I2cDelegate *delegate)
 	}
 	return false;
 }
-
-#endif

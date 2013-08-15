@@ -12,7 +12,7 @@
 
 #include <stddef.h>		// for offsetof()
 #include <xpcc/architecture/utils.hpp>
-#include <xpcc/architecture/platform/avr/xmega.hpp>
+#include "../../device.hpp"
 
 namespace xpcc
 {
