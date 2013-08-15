@@ -20,7 +20,7 @@ MAIN_FUNCTION
 	Usart2::initialize(115200);
 
 	// If you want to output strings more comfortably
-	// have a look at the iostream example.
+	// have a look at the logger example.
 	// Write Single Bytes
 	Usart2::writeBlocking('H');
 	Usart2::writeBlocking('e');
