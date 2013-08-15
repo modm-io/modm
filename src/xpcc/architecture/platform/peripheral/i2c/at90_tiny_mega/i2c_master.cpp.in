@@ -290,7 +290,7 @@ xpcc::{{target.family}}::I2cMaster::start(xpcc::I2cDelegate *delegate)
 }
 
 bool
-xpcc::{{target.family}}::I2cMaster::startSync(xpcc::I2cDelegate *delegate)
+xpcc::{{target.family}}::I2cMaster::startBlocking(xpcc::I2cDelegate *delegate)
 {
 	if (!::delegate && delegate && delegate->attaching())
 	{

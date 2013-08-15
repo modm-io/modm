@@ -19,8 +19,8 @@ void
 xpcc::{{target.family}}::UartSimpleSpi{{id}}::initialize(Mode mode)
 {
 	constexpr uint16_t prescaler = (F_CPU / ( 2 * baudrate )) - 1;
-	static_assert(2 * baudrate <= F_CPU, "SPI baudrate is too high for CPU frequency.");
-	static_assert(prescaler < (1 << 12), "SPI baudrate is too low for CPU frequency.");
+	static_assert(F_CPU/2 >= baudrate, "The CPU frequency must be at least 2x higher than SPI baudrate.");
+	static_assert(prescaler + 1 < (1 << 12) + 1, "SPI baudrate is too slow for CPU frequency (Prescaler out of bounds).");
 	initialize(prescaler, mode);
 }
 

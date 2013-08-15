@@ -61,25 +61,26 @@ public:
 	 * This function is called with a constant value as template parameter
 	 * so all the calculation is done by the compiler.
 	 *
-	 * @tparam	baudrate	desired baud rate
+	 * @tparam	baudrate
+	 *		desired baud rate
 	 */
 	template< uint32_t baudrate >
 	static ALWAYS_INLINE void
 	initialize()
 	{
-		static_assert(baudrate * 8l <= F_CPU, "Uart baudrate is too high for CPU frequency.");
+		static_assert(F_CPU/8l >= baudrate, "The CPU frequency must be at least 8x higher than UART baudrate.");
+		static_assert((F_CPU / (16l * baudrate)) < (1 << 12), "UART baudrate is too slow for CPU frequency (Prescaler out of bounds).");
 		
 		uint16_t ubrr;
 		// use double speed when necessary
 		if (baudrate * 16l > F_CPU)
 		{
-			ubrr = (F_CPU / (baudrate * 8l)) - 1;
-			ubrr |= 0x8000;
+			ubrr = 0x8000 | static_cast<uint16_t>((F_CPU / (8l * baudrate)) - 1);
 		}
 		else {
-			ubrr = (F_CPU / (baudrate * 16l)) - 1;
+			ubrr = static_cast<uint16_t>((F_CPU / (16l * baudrate)) - 1);
 		}
-		setBaudrateRegister(ubrr);
+		initializeWithBaud(ubrr);
 	}
 	
 	// start documentation inherited
@@ -122,7 +123,7 @@ public:
 	/**
 	 * Check whether any errors occurred during receiving.
 	 * Be aware that these indicate an error that occurred somewhere
-	 * since resetting the Error Flags (with `resetErrorFlags()`), so
+	 * since resetting the Error Flags (with `acknowledgeErrorFlags()`), so
 	 * you cannot tell which byte had the error.
 	 *
 	 * @return	`0` if no errors occurred, otherwise a value that
@@ -131,12 +132,13 @@ public:
 	static uint8_t
 	getErrorFlags();
 	
+	/// Clears the error flags.
 	static void
 	acknowledgeErrorFlags();
 	
 protected:
 	static void
-	setBaudrateRegister(uint16_t ubrr);
+	initializeWithBaud(uint16_t ubrr);
 };
 
 } // namespace {{target.family}}

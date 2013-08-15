@@ -19,6 +19,7 @@ namespace {{target.family}}
 
 namespace TypeId
 {
+	typedef struct{} Usi;
 	typedef struct{} Uart0;
 	typedef struct{} Uart1;
 	typedef struct{} Uart2;

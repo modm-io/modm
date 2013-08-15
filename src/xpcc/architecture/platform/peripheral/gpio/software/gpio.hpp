@@ -213,7 +213,7 @@ namespace xpcc
 			(xpcc::tmp::SameType<T7, GpioUnused>::value ? 0 : 1);
 
 	public:
-		static void
+		static inline void
 		setOutput()
 		{
 			T7::setOutput();
@@ -226,7 +226,7 @@ namespace xpcc
 			T0::setOutput();
 		}
 
-		static void
+		static inline void
 		setInput()
 		{
 			T7::setInput();
@@ -239,7 +239,7 @@ namespace xpcc
 			T0::setInput();
 		}
 
-		static uint8_t
+		static inline uint8_t
 		read()
 		{
 			uint8_t value = 0;
@@ -256,7 +256,7 @@ namespace xpcc
 			return value;
 		}
 
-		static void
+		static inline void
 		write(uint8_t data)
 		{
 			T7::set(data & 0b10000000);

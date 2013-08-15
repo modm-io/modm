@@ -37,7 +37,7 @@ struct Gpio
 		Floating,	///< The input pin is left floating
 		PullUp,		///< The input pin is pulled to Vcc
 	};
-	
+
 	/**
 	 * Each External Interrupt can be configured to trigger on these conditions.
 	 *
@@ -51,7 +51,7 @@ struct Gpio
 		FallingEdge = 0b10,	///< triggers on falling edge
 		RisingEdge = 0b11,	///< triggers on rising edge
 	};
-	
+
 	/// @private
 	/// @{
 	static constexpr uint8_t
@@ -120,9 +120,9 @@ public:
 %% for gpio in gpios
 	%% set port = gpio.port | upper
 	%% set pin  = gpio.id
-			
+
 	%% for type in ["Output", "Input", ""] 
-		
+
 		%% if type == "Output"
 class GpioOutput{{port ~ pin}} : public Gpio, ::xpcc::GpioOutput
 		%% elif type == "Input"
@@ -134,7 +134,7 @@ class Gpio{{port ~ pin}} : public Gpio, ::xpcc::GpioIO
 public:
 	static constexpr uint8_t pin = {{pin}};		///< the pin number of this GPIO
 	static constexpr uint8_t mask = (1 << pin);	///< the mask of this GPIO
-	
+
 		%% if type in ["", "Output"]
 	ALWAYS_INLINE static void setOutput(bool status) {
 		set(status);
@@ -202,7 +202,7 @@ public:
 						%% set isc2 = 'MCUCSR'
 					%% endif
 				%% endif
-			
+
 	ALWAYS_INLINE static void setInputTrigger(InputTrigger trigger) {
 				%% if af_id < 4
 					%% if isc2 != '' and af_id == 2
@@ -214,7 +214,7 @@ public:
 		EICRB |= (i(trigger) << 2*{{af_id - 4}});
 				%% endif
 	}
-			
+
 	ALWAYS_INLINE static void enableExternalInterrupt() {
 #ifdef EIMSK
 		EIMSK |= (1 << INT{{af_id}});
@@ -271,8 +271,8 @@ public:
 				%% else
 					%% set af_reg = (af_id / 8) | int
 				%% endif
-			
-			
+
+
 	ALWAYS_INLINE static void enablePCInterrupt() {
 		PCMSK{{af_reg}} |= (1 << PCINT{{af_id}});
 #ifdef PCICR
@@ -330,7 +330,7 @@ public:
 	}
 			%% endif
 		%% endfor
-		
+
 		%% for af in gpio.afs
 			%% if af.peripheral != "extint" and af.peripheral != "pcint"
 				%% if af.type|lower|capitalize == type or af.type == 'io' or type == ""
@@ -357,7 +357,7 @@ public:
 				%% endif
 			%% endif
 		%% endfor
-		
+
 		%% for peripheral in ['SoftwareSpiMaster', 'SoftwareI2cMaster']
 	/// Connect to `{{peripheral}}`.
 	ALWAYS_INLINE static void
@@ -380,13 +380,13 @@ class GpioPort{{port.name}} : public ::xpcc::GpioOctet, public Gpio
 	static_assert(WIDTH <= {{port.width}}, "WIDTH too large, maximum {{port.width}}.");
 	static_assert(WIDTH > 0, "WIDTH should be at least 1.");
 	static_assert(START_PIN + WIDTH <= {{port.startPin + port.width}}, "START_PIN + WIDTH too large, maximum {{port.startPin + port.width}}.");
-	
+
 	static constexpr uint8_t dataMask = (1 << WIDTH) - 1;
 	static constexpr uint8_t portMask = dataMask << START_PIN;
 
 public:
 	static constexpr uint8_t width = WIDTH;
-	
+
 public:
 	ALWAYS_INLINE static void setOutput() {
 		DDR{{port.name}} |= portMask;
@@ -409,13 +409,13 @@ class GpioPort{{port.name}}< 0, 8 > : public ::xpcc::GpioOctet, public Gpio
 {
 public:
 	static constexpr uint8_t width = 8;
-	
+
 public:
 	ALWAYS_INLINE static void setOutput() {
-		DDR{{port.name}} |= 0xff;
+		DDR{{port.name}} = 0xff;
 	}
 	ALWAYS_INLINE static void setInput() {
-		DDR{{port.name}} &= ~0xff;
+		DDR{{port.name}} = 0;
 	}
 	ALWAYS_INLINE static uint8_t read() {
 		return PIN{{port.name}};

@@ -31,7 +31,7 @@ ISR(USART{{ id }}_RX_vect)
 
 // ----------------------------------------------------------------------------
 void
-xpcc::{{target.family}}::Uart{{ id }}::setBaudrateRegister(uint16_t ubrr)
+xpcc::{{target.family}}::Uart{{ id }}::initializeWithBaud(uint16_t ubrr)
 {
 	// Set baud rate
 	if (ubrr & 0x8000) {

@@ -58,6 +58,7 @@ public:
 	static inline void
 	initialize(Mode mode=Mode::Mode0);
 
+	// start documentation inherited
 	static ALWAYS_INLINE uint8_t
 	writeReadBlocking(uint8_t data);
 
@@ -76,6 +77,7 @@ public:
 
 	static ALWAYS_INLINE bool
 	isFinished();
+	// end documentation inherited
 	
 protected:
 	static inline void
