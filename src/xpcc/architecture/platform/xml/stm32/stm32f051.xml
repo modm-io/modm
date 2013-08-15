@@ -46,6 +46,14 @@
 				<af id="1" peripheral="UsartHal2" description="Rx" type="input"/>
 				<af id="1" peripheral="Usart2" description="Rx" type="input"/>
 			</gpio>
+			<gpio port="A" id="9">
+				<af id="1" peripheral="UsartHal1" description="Tx" type="output"/>
+				<af id="1" peripheral="Usart1" description="Tx" type="output"/>
+			</gpio>
+			<gpio port="A" id="10">
+				<af id="1" peripheral="UsartHal1" description="Rx" type="input"/>
+				<af id="1" peripheral="Usart1" description="Rx" type="input"/>
+			</gpio>
 			<gpio port="A" id="8">
 				<!--<af id="0" peripheral="MCO" description="Clock Output"/>-->
 			</gpio>
