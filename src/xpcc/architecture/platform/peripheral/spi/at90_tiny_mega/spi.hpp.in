@@ -21,10 +21,6 @@ namespace {{target.family}}
 
 struct Spi
 {
-	%% for gpio in gpios
-	//typedef Gpio{{ gpio.port }}{{ gpio.id }} {{ gpio.name | capitalize }};
-	%% endfor
-	
 	enum class
 	Prescaler : uint8_t
 	{

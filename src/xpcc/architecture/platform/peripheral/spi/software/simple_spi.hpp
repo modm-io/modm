@@ -21,27 +21,31 @@ namespace xpcc
 /**
  * Software emulation of a Simple Spi.
  *
- * @tparam	Clk			clock pin [output]
- * @tparam	Mosi		master out slave in pin [output]
- * @tparam	Miso		master in slave out pin [input]
+ * @tparam	SCK			clock pin [output]
+ * @tparam	MOSI		master out slave in pin [output]
+ * @tparam	MISO		master in slave out pin [input]
  * @tparam	Frequency	requested SPI frequency in Hz (default = 2 MHz)
  *
  * @ingroup	spi
  * @author	Niklas Hauser
  * @see		gpio
  */
-template< typename Clk,
-		  typename Mosi,
-		  typename Miso = GpioUnused,
+template< typename SCK,
+		  typename MOSI,
+		  typename MISO = GpioUnused,
 		  uint32_t Frequency = 2000000UL >
 class SoftwareSimpleSpi : public ::xpcc::SimpleSpi
 {
 public:
-	static const TypeId::SoftwareSpiMaster Id;
+	static const TypeId::SoftwareSpiMasterMosi Mosi;
+	static const TypeId::SoftwareSpiMasterMiso Miso;
+	static const TypeId::SoftwareSpiMasterSck  Sck;
 
+public:
 	static void
 	initialize();
 
+	// start documentation inherited
 	static uint8_t
 	writeReadBlocking(uint8_t data);
 
@@ -59,6 +63,7 @@ public:
 
 	static ALWAYS_INLINE bool
 	isFinished();
+	// end documentation inherited
 
 protected:
 	static ALWAYS_INLINE void

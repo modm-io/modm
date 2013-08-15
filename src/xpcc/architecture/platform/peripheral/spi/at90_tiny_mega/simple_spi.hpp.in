@@ -12,7 +12,6 @@
 #define XPCC_{{target.family | upper}}_SIMPLE_SPI_HPP
 
 #include "../../../device.hpp"
-//#include "../../../drivers.hpp"
 #include <xpcc/architecture/peripheral/spi.hpp>
 #include "type_ids.hpp"
 #include "spi.hpp"
@@ -42,8 +41,11 @@ namespace {{target.family}}
 class SimpleSpi : public ::xpcc::SimpleSpi, Spi
 {
 public:
-	static const TypeId::SpiMaster Id;
-	
+	static const TypeId::SpiMasterMosi Mosi;
+	static const TypeId::SpiMasterMiso Miso;
+	static const TypeId::SpiMasterSck  Sck;
+	static const TypeId::SpiMasterSs   Ss;
+
 public:
 	/**
 	 * Enable and initialize the SPI hardware.
@@ -78,11 +80,11 @@ public:
 	static ALWAYS_INLINE bool
 	isFinished();
 	// end documentation inherited
-	
+
 protected:
 	static inline void
 	initialize(Prescaler prescaler, Mode mode=Mode::Mode0);
-	
+
 private:
 	static bool finished;
 };

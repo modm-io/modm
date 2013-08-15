@@ -46,13 +46,8 @@ namespace {{target.family}}
 class Uart{{ id }} : public ::xpcc::Uart
 {
 public:
-	
-	%% for gpio in gpios
-		%% if gpio.instance | int == id | int
-	// typedef Gpio{{ gpio.port }}{{ gpio.id }} {{ gpio.name | capitalize }};
-		%% endif
-	%% endfor
-	static const TypeId::Uart{{ id }} Id;
+	static const TypeId::Uart{{ id }}Txd Tx;
+	static const TypeId::Uart{{ id }}Rxd Rx;
 	
 public:
 	/**

@@ -141,28 +141,42 @@ class AVRDeviceReader(XMLDeviceReader):
 				if name in pin_array:
 					for module in pin_array[name]:
 						for gpio in [g for g in gpios if g['port'] == module['port'] and g['id'] == module['id']]:
-							af = {'peripheral': name}
-							mod = dict(module)
-							mod.pop('port', None)
-							mod.pop('id', None)
-							af.update(mod)
-							gpio['af'].append(af)
+							if name == 'i2c':
+								af = {'peripheral' : 'I2cMaster',
+									  'name': module['name'].capitalize(),
+									  'type': module['dir']}
+								gpio['af'].append(af)
+							elif name == 'spi':
+								af = {'peripheral' : 'SpiMaster',
+									  'name': module['name'].capitalize(),
+									  'type': module['dir']}
+								gpio['af'].append(af)
+								negate = {'in': 'out', 'out': 'in', 'io': 'io'}
+								repl = {'mosi': 'simo', 'miso': 'somi', 'sck': 'sck', 'ss': 'ss'}
+								af2 = {'peripheral' : 'SpiSlave',
+									  'name': repl[module['name']].capitalize(),
+									  'type': negate[module['dir']]}
+								gpio['af'].append(af2)
+							elif name == 'usi':
+								af = {'peripheral' : 'Usi',
+									  'name': module['name'].capitalize(),
+									  'type': module['dir']}
+								gpio['af'].append(af)
 			
 			for name in ['uart0', 'uart1', 'uart2', 'uart3']:
 				if name in pin_array:
 					for module in pin_array[name]:
 						for gpio in [g for g in gpios if g['port'] == module['port'] and g['id'] == module['id']]:
-							af = {'peripheral': 'uart', 'instance': name[4:]}
-							mod = dict(module)
-							mod.pop('port', None)
-							mod.pop('id', None)
-							af.update(mod)
+							af = {'peripheral' : name.capitalize(),
+								  'name': module['name'].capitalize(),
+								  'type': module['dir']}
 							gpio['af'].append(af)
 							if 'uartspi' in pin_array:
 								repl = {'txd': 'mosi', 'rxd': 'miso', 'xck': 'sck'}
-								af2 = dict(af)
-								af2.update({'peripheral': 'spi', 'name': repl[af2['name']]})
-								gpio['af'].append(af2)
+								af = {'peripheral' : 'UartSpiMaster'+name[4:],
+									  'name': repl[module['name']].capitalize(),
+									  'type': module['dir']}
+								gpio['af'].append(af)
 	
 	def createModule(self, name):
 		if name in self.modules:

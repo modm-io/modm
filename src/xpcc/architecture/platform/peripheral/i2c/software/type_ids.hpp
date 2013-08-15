@@ -15,7 +15,8 @@ namespace xpcc
 
 namespace TypeId
 {
-	typedef struct{} SoftwareI2cMaster;
+	typedef struct{} SoftwareI2cMasterSda;
+	typedef struct{} SoftwareI2cMasterScl;
 }
 
 } // namespace xpcc

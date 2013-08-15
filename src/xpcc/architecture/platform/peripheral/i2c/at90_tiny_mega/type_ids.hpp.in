@@ -19,7 +19,8 @@ namespace {{target.family}}
 
 namespace TypeId
 {
-	typedef struct{} I2c;
+	typedef struct{} I2cMasterSda;
+	typedef struct{} I2cMasterScl;
 }
 
 } // namespace {{target.family}}

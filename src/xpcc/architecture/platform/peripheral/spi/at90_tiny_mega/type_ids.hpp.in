@@ -19,17 +19,32 @@ namespace {{target.family}}
 
 namespace TypeId
 {
-	typedef struct{} SpiMaster;
-	typedef struct{} UartSpiMaster0;
-	typedef struct{} UartSpiMaster1;
-	typedef struct{} UartSpiMaster2;
-	typedef struct{} UartSpiMaster3;
-	
-	typedef struct{} SpiSlave;
-	typedef struct{} UartSpiSlave0;
-	typedef struct{} UartSpiSlave1;
-	typedef struct{} UartSpiSlave2;
-	typedef struct{} UartSpiSlave3;
+	typedef struct{} SpiMasterMosi;
+	typedef struct{} SpiMasterMiso;
+	typedef struct{} SpiMasterSck;
+	typedef struct{} SpiMasterSs;
+
+	typedef struct{} SpiSlaveSimo;
+	typedef struct{} SpiSlaveSomi;
+	typedef struct{} SpiSlaveSck;
+	typedef struct{} SpiSlaveSs;
+
+
+	typedef struct{} UartSpiMaster0Mosi;
+	typedef struct{} UartSpiMaster0Miso;
+	typedef struct{} UartSpiMaster0Sck;
+
+	typedef struct{} UartSpiMaster1Mosi;
+	typedef struct{} UartSpiMaster1Miso;
+	typedef struct{} UartSpiMaster1Sck;
+
+	typedef struct{} UartSpiMaster2Mosi;
+	typedef struct{} UartSpiMaster2Miso;
+	typedef struct{} UartSpiMaster2Sck;
+
+	typedef struct{} UartSpiMaster3Mosi;
+	typedef struct{} UartSpiMaster3Miso;
+	typedef struct{} UartSpiMaster3Sck;
 }
 
 } // namespace {{target.family}}

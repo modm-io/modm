@@ -12,22 +12,15 @@
 #define XPCC_{{target.family | upper}}_SIMPLE_UART_SPI{{id}}_HPP
 
 #include "../../../device.hpp"
-//#include "../../../drivers.hpp"
 #include "../../uart/at90_tiny_mega/uart_defines.h"
 #include <xpcc/architecture/peripheral/spi.hpp>
 #include "type_ids.hpp"
 
 namespace xpcc
 {
+
 namespace {{target.family}}
 {
-	
-struct Spi{{id}}
-{
-%% for gpio in gpios
-//typedef ::xpcc::{{target.family}}::Gpio{{ gpio.port }}{{ gpio.id }} {{ gpio.name | capitalize }};
-%% endfor
-};
 
 /**
  * Implementation of the SimpleSpi of the Uart in Spi Master mode.
@@ -38,13 +31,15 @@ struct Spi{{id}}
  * targets operating at low CPU frequencies.
  * Therefore the asynchronous methods are implemented synchronously.
  *
- * \ingroup		{{target.family}}
- * \author		Niklas Hauser
+ * @ingroup		{{target.family}}
+ * @author		Niklas Hauser
  */
-class UartSimpleSpi{{id}} : public ::xpcc::SimpleSpi, Spi{{id}}
+class UartSimpleSpi{{id}} : public ::xpcc::SimpleSpi
 {
 public:
-	static const TypeId::UartSpiMaster{{ id }} Id;
+	static const TypeId::UartSpiMaster{{ id }}Mosi Mosi;
+	static const TypeId::UartSpiMaster{{ id }}Miso Miso;
+	static const TypeId::UartSpiMaster{{ id }}Sck  Sck;
 	
 public:
 	/**

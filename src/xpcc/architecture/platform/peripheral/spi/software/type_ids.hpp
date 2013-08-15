@@ -15,7 +15,9 @@ namespace xpcc
 
 namespace TypeId
 {
-	typedef struct{} SoftwareSpiMaster;
+	typedef struct{} SoftwareSpiMasterMosi;
+	typedef struct{} SoftwareSpiMasterMiso;
+	typedef struct{} SoftwareSpiMasterSck;
 }
 
 } // namespace xpcc

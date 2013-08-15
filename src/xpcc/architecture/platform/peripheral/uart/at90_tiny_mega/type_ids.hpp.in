@@ -19,11 +19,26 @@ namespace {{target.family}}
 
 namespace TypeId
 {
-	typedef struct{} Usi;
-	typedef struct{} Uart0;
-	typedef struct{} Uart1;
-	typedef struct{} Uart2;
-	typedef struct{} Uart3;
+	typedef struct{} UsiDo;
+	typedef struct{} UsiDi;
+	typedef struct{} UsiUsck;
+
+
+	typedef struct{} Uart0Rxd;
+	typedef struct{} Uart0Txd;
+	typedef struct{} Uart0Xck;
+
+	typedef struct{} Uart1Rxd;
+	typedef struct{} Uart1Txd;
+	typedef struct{} Uart1Xck;
+
+	typedef struct{} Uart2Rxd;
+	typedef struct{} Uart2Txd;
+	typedef struct{} Uart2Xck;
+
+	typedef struct{} Uart3Rxd;
+	typedef struct{} Uart3Txd;
+	typedef struct{} Uart3Xck;
 }
 
 } // namespace {{target.family}}

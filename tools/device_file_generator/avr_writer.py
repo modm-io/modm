@@ -136,11 +136,6 @@ class AVRDeviceWriter(XMLDeviceWriter):
 				driver = node.addChild('driver')
 				driver.setAttributes(attr)
 				driver.setAttributes({'type': name, 'name': family})
-				
-				if name in self.io:
-					for io in self.io[name]:
-						ch = driver.addChild('gpio')
-						ch.setAttributes(io)
 	
 	def addModuleInstancesAttributesToNode(self, node, peripheral, name, family=None):
 		if family == None:
@@ -238,24 +233,6 @@ class AVRDeviceWriter(XMLDeviceWriter):
 				driver.setAttribute('instances', ",".join(instances))
 				if uartSpi:
 					spiDriver.setAttribute('instances', ",".join(instances))
-			
-			# Add IO for AT90, ATtiny, ATmega
-			for key in [k for k in self.io if k.startswith('uart')]:
-				instance = key.replace('uart', '')
-				if instance not in instances:
-					continue
-				for io in self.io[key]:
-					ch = driver.addChild('gpio')
-					ch.setAttributes(io)
-					ch.setAttributes({'instance': instance})
-				if uartSpi:
-					for io in self.io[key]:
-						ch = spiDriver.addChild('gpio')
-						replacements = {'txd': 'mosi', 'rxd': 'miso', 'xck': 'sck'}
-						spiIO = dict(io)
-						spiIO.update({'name': replacements[io['name']]})
-						ch.setAttributes(spiIO)
-						ch.setAttributes({'instance': instance})
 	
 	def _getModuleAttributes(self):
 		attributes = self.device.getAttributes('modules')

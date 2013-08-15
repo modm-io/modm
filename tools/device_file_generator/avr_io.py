@@ -179,24 +179,24 @@ xmega_peripheral_pins = \
 {
 	"spi":
 	[
-		{ "id": "4", "name": "ss", "type": "input" },
-		{ "id": "5", "name": "mosi", "type": "output" },
-		{ "id": "6", "name": "miso", "type": "input" },
-		{ "id": "7", "name": "sck", "type": "output" }
+		{ "id": "4", "name": "ss", "dir": "out" },
+		{ "id": "5", "name": "mosi", "dir": "out" },
+		{ "id": "6", "name": "miso", "dir": "in" },
+		{ "id": "7", "name": "sck", "dir": "out" }
 	],
 	"uart":
 	[
-		{ "id": "1", "name": "xck", "type": "output", "instance": "0" },
-		{ "id": "2", "name": "rxd", "type": "input", "instance": "0" },
-		{ "id": "3", "name": "txd", "type": "output", "instance": "0" },
-		{ "id": "5", "name": "xck", "type": "output", "instance": "1" },
-		{ "id": "6", "name": "rxd", "type": "input", "instance": "1" },
-		{ "id": "7", "name": "txd", "type": "output", "instance": "1" }
+		{ "id": "1", "name": "xck", "dir": "out", "instance": "0" },
+		{ "id": "2", "name": "rxd", "dir": "in", "instance": "0" },
+		{ "id": "3", "name": "txd", "dir": "out", "instance": "0" },
+		{ "id": "5", "name": "xck", "dir": "out", "instance": "1" },
+		{ "id": "6", "name": "rxd", "dir": "in", "instance": "1" },
+		{ "id": "7", "name": "txd", "dir": "out", "instance": "1" }
 	],
 	"i2c":
 	[
-		{ "id": "0", "name": "sda", "type": "io" },
-		{ "id": "1", "name": "scl", "type": "output" }
+		{ "id": "0", "name": "sda", "dir": "io" },
+		{ "id": "1", "name": "scl", "dir": "out" }
 	],
 	"timer":
 	[
@@ -236,20 +236,20 @@ pins = \
 		],
 		"spi":
 		[
-			{ "port": "B", "id": "3", "name": "miso", "type": "input" },
-			{ "port": "B", "id": "4", "name": "mosi", "type": "output" },
-			{ "port": "B", "id": "5", "name": "sck", "type": "output" },
-			{ "port": "B", "id": "2", "name": "ss", "type": "input" }
+			{ "port": "B", "id": "3", "name": "miso", "dir": "in" },
+			{ "port": "B", "id": "4", "name": "mosi", "dir": "out" },
+			{ "port": "B", "id": "5", "name": "sck", "dir": "out" },
+			{ "port": "B", "id": "2", "name": "ss", "dir": "out" }
 		],
 		"uart0":
 		[
-			{ "port": "D", "id": "0", "name": "rxd", "type": "input" },
-			{ "port": "D", "id": "1", "name": "txd", "type": "output" }
+			{ "port": "D", "id": "0", "name": "rxd", "dir": "in" },
+			{ "port": "D", "id": "1", "name": "txd", "dir": "out" }
 		],
 		"i2c":
 		[
-			{ "port": "C", "id": "5", "name": "scl", "type": "output" },
-			{ "port": "C", "id": "4", "name": "sda", "type": "io" }
+			{ "port": "C", "id": "5", "name": "scl", "dir": "out" },
+			{ "port": "C", "id": "4", "name": "sda", "dir": "io" }
 		]
 	},
 	
@@ -263,20 +263,20 @@ pins = \
 		],
 		"spi":
 		[
-			{ "port": "B", "id": "5", "name": "miso", "type": "input" },
-			{ "port": "B", "id": "6", "name": "mosi", "type": "output" },
-			{ "port": "B", "id": "7", "name": "sck", "type": "output" },
-			{ "port": "B", "id": "4", "name": "ss", "type": "input" }
+			{ "port": "B", "id": "5", "name": "miso", "dir": "in" },
+			{ "port": "B", "id": "6", "name": "mosi", "dir": "out" },
+			{ "port": "B", "id": "7", "name": "sck", "dir": "out" },
+			{ "port": "B", "id": "4", "name": "ss", "dir": "out" }
 		],
 		"uart0":
 		[
-			{ "port": "D", "id": "0", "name": "rxd", "type": "input" },
-			{ "port": "D", "id": "1", "name": "txd", "type": "output" }
+			{ "port": "D", "id": "0", "name": "rxd", "dir": "in" },
+			{ "port": "D", "id": "1", "name": "txd", "dir": "out" }
 		],
 		"i2c":
 		[
-			{ "port": "C", "id": "0", "name": "scl", "type": "output" },
-			{ "port": "C", "id": "1", "name": "sda", "type": "io" }
+			{ "port": "C", "id": "0", "name": "scl", "dir": "out" },
+			{ "port": "C", "id": "1", "name": "sda", "dir": "io" }
 		]
 	},
 	
@@ -295,27 +295,27 @@ pins = \
 		],
 		"spi":
 		[
-			{ "port": "B", "id": "2", "name": "miso", "type": "input" },
-			{ "port": "B", "id": "3", "name": "mosi", "type": "output" },
-			{ "port": "B", "id": "1", "name": "sck", "type": "output" },
-			{ "port": "B", "id": "0", "name": "ss", "type": "input" }
+			{ "port": "B", "id": "2", "name": "miso", "dir": "in" },
+			{ "port": "B", "id": "3", "name": "mosi", "dir": "out" },
+			{ "port": "B", "id": "1", "name": "sck", "dir": "out" },
+			{ "port": "B", "id": "0", "name": "ss", "dir": "out" }
 		],
 		"uart0":
 		[
-			{ "port": "E", "id": "0", "name": "rxd", "type": "input" },
-			{ "port": "E", "id": "1", "name": "txd", "type": "output" },
-			{ "port": "E", "id": "2", "name": "xck", "type": "output" }
+			{ "port": "E", "id": "0", "name": "rxd", "dir": "in" },
+			{ "port": "E", "id": "1", "name": "txd", "dir": "out" },
+			{ "port": "E", "id": "2", "name": "xck", "dir": "out" }
 		],
 		"uart1":
 		[
-			{ "port": "D", "id": "2", "name": "rxd", "type": "input" },
-			{ "port": "D", "id": "3", "name": "txd", "type": "output" },
-			{ "port": "D", "id": "5", "name": "xck", "type": "output" }
+			{ "port": "D", "id": "2", "name": "rxd", "dir": "in" },
+			{ "port": "D", "id": "3", "name": "txd", "dir": "out" },
+			{ "port": "D", "id": "5", "name": "xck", "dir": "out" }
 		],
 		"i2c":
 		[
-			{ "port": "D", "id": "0", "name": "scl", "type": "output" },
-			{ "port": "D", "id": "1", "name": "sda", "type": "io" }
+			{ "port": "D", "id": "0", "name": "scl", "dir": "out" },
+			{ "port": "D", "id": "1", "name": "sda", "dir": "io" }
 		]
 	},
 	
@@ -352,16 +352,16 @@ pins = \
 		],
 		"spi":
 		[
-			{ "port": "B", "id": "2", "name": "miso", "type": "input" },
-			{ "port": "B", "id": "3", "name": "mosi", "type": "output" },
-			{ "port": "B", "id": "1", "name": "sck", "type": "output" },
-			{ "port": "B", "id": "0", "name": "ss", "type": "input" }
+			{ "port": "B", "id": "2", "name": "miso", "dir": "in" },
+			{ "port": "B", "id": "3", "name": "mosi", "dir": "out" },
+			{ "port": "B", "id": "1", "name": "sck", "dir": "out" },
+			{ "port": "B", "id": "0", "name": "ss", "dir": "out" }
 		],
 		"uart0":
 		[
-			{ "port": "D", "id": "2", "name": "rxd", "type": "input" },
-			{ "port": "D", "id": "3", "name": "txd", "type": "output" },
-			{ "port": "D", "id": "5", "name": "xck", "type": "output" }
+			{ "port": "D", "id": "2", "name": "rxd", "dir": "in" },
+			{ "port": "D", "id": "3", "name": "txd", "dir": "out" },
+			{ "port": "D", "id": "5", "name": "xck", "dir": "out" }
 		],
 		"uartspi": []
 	},
@@ -377,15 +377,15 @@ pins = \
 		],
 		"spi":
 		[
-			{ "port": "B", "id": "2", "name": "miso", "type": "input" },
-			{ "port": "B", "id": "3", "name": "mosi", "type": "output" },
-			{ "port": "B", "id": "1", "name": "sck", "type": "output" },
-			{ "port": "B", "id": "0", "name": "ss", "type": "input" }
+			{ "port": "B", "id": "2", "name": "miso", "dir": "in" },
+			{ "port": "B", "id": "3", "name": "mosi", "dir": "out" },
+			{ "port": "B", "id": "1", "name": "sck", "dir": "out" },
+			{ "port": "B", "id": "0", "name": "ss", "dir": "out" }
 		],
 		"uart0":
 		[
-			{ "port": "C", "id": "0", "name": "rxd", "type": "input" },
-			{ "port": "C", "id": "0", "name": "txd", "type": "output" }
+			{ "port": "C", "id": "0", "name": "rxd", "dir": "in" },
+			{ "port": "C", "id": "0", "name": "txd", "dir": "out" }
 		]
 	},
 	
@@ -433,15 +433,15 @@ pins = \
 		],
 		"spi":
 		[
-			{ "port": "B", "id": "3", "name": "miso", "type": "input" },
-			{ "port": "B", "id": "2", "name": "mosi", "type": "output" },
-			{ "port": "B", "id": "4", "name": "sck", "type": "output" },
-			{ "port": "B", "id": "1", "name": "ss", "type": "input" }
+			{ "port": "B", "id": "3", "name": "miso", "dir": "in" },
+			{ "port": "B", "id": "2", "name": "mosi", "dir": "out" },
+			{ "port": "B", "id": "4", "name": "sck", "dir": "out" },
+			{ "port": "B", "id": "1", "name": "ss", "dir": "out" }
 		],
 		"uart0":
 		[
-			{ "port": "D", "id": "4", "name": "rxd", "type": "input" },
-			{ "port": "D", "id": "3", "name": "txd", "type": "output" }
+			{ "port": "D", "id": "4", "name": "rxd", "dir": "in" },
+			{ "port": "D", "id": "3", "name": "txd", "dir": "out" }
 		]
 	},
 	
@@ -472,15 +472,15 @@ pins = \
 		],
 		"spi":
 		[
-			{ "port": "B", "id": "6", "name": "miso", "type": "input" },
-			{ "port": "B", "id": "7", "name": "mosi", "type": "output" },
-			{ "port": "B", "id": "5", "name": "sck", "type": "output" },
-			{ "port": "B", "id": "4", "name": "ss", "type": "input" }
+			{ "port": "B", "id": "6", "name": "miso", "dir": "in" },
+			{ "port": "B", "id": "7", "name": "mosi", "dir": "out" },
+			{ "port": "B", "id": "5", "name": "sck", "dir": "out" },
+			{ "port": "B", "id": "4", "name": "ss", "dir": "out" }
 		],
 		"i2c":
 		[
-			{ "port": "C", "id": "4", "name": "scl", "type": "output" },
-			{ "port": "C", "id": "3", "name": "sda", "type": "io" }
+			{ "port": "C", "id": "4", "name": "scl", "dir": "out" },
+			{ "port": "C", "id": "3", "name": "sda", "dir": "io" }
 		]
 	},
 	
@@ -506,15 +506,15 @@ pins = \
 		],
 		"spi":
 		[
-			{ "port": "B", "id": "6", "name": "miso", "type": "input" },
-			{ "port": "B", "id": "7", "name": "mosi", "type": "output" },
-			{ "port": "B", "id": "5", "name": "sck", "type": "output" },
-			{ "port": "B", "id": "4", "name": "ss", "type": "input" }
+			{ "port": "B", "id": "6", "name": "miso", "dir": "in" },
+			{ "port": "B", "id": "7", "name": "mosi", "dir": "out" },
+			{ "port": "B", "id": "5", "name": "sck", "dir": "out" },
+			{ "port": "B", "id": "4", "name": "ss", "dir": "out" }
 		],
 		"uart0":
 		[
-			{ "port": "B", "id": "1", "name": "rxd", "type": "input" },
-			{ "port": "B", "id": "3", "name": "txd", "type": "output" }
+			{ "port": "B", "id": "1", "name": "rxd", "dir": "in" },
+			{ "port": "B", "id": "3", "name": "txd", "dir": "out" }
 		]
 	},
 	
@@ -542,21 +542,21 @@ pins = \
 		],
 		"spi":
 		[
-			{ "port": "B", "id": "3", "name": "miso", "type": "input" },
-			{ "port": "B", "id": "2", "name": "mosi", "type": "output" },
-			{ "port": "B", "id": "1", "name": "sck", "type": "output" },
-			{ "port": "B", "id": "0", "name": "ss", "type": "input" }
+			{ "port": "B", "id": "3", "name": "miso", "dir": "in" },
+			{ "port": "B", "id": "2", "name": "mosi", "dir": "out" },
+			{ "port": "B", "id": "1", "name": "sck", "dir": "out" },
+			{ "port": "B", "id": "0", "name": "ss", "dir": "out" }
 		],
 		"uart1":
 		[
-			{ "port": "D", "id": "2", "name": "rxd", "type": "input" },
-			{ "port": "D", "id": "3", "name": "txd", "type": "output" },
-			{ "port": "D", "id": "5", "name": "xck", "type": "output" }
+			{ "port": "D", "id": "2", "name": "rxd", "dir": "in" },
+			{ "port": "D", "id": "3", "name": "txd", "dir": "out" },
+			{ "port": "D", "id": "5", "name": "xck", "dir": "out" }
 		],
 		"i2c":
 		[
-			{ "port": "D", "id": "0", "name": "scl", "type": "output" },
-			{ "port": "D", "id": "1", "name": "sda", "type": "io" }
+			{ "port": "D", "id": "0", "name": "scl", "dir": "out" },
+			{ "port": "D", "id": "1", "name": "sda", "dir": "io" }
 		],
 		"uartspi": []
 	},
@@ -601,21 +601,21 @@ pins = \
 		],
 		"spi":
 		[
-			{ "port": "B", "id": "3", "name": "miso", "type": "input" },
-			{ "port": "B", "id": "4", "name": "mosi", "type": "output" },
-			{ "port": "B", "id": "5", "name": "sck", "type": "output" },
-			{ "port": "B", "id": "2", "name": "ss", "type": "input" }
+			{ "port": "B", "id": "3", "name": "miso", "dir": "in" },
+			{ "port": "B", "id": "4", "name": "mosi", "dir": "out" },
+			{ "port": "B", "id": "5", "name": "sck", "dir": "out" },
+			{ "port": "B", "id": "2", "name": "ss", "dir": "out" }
 		],
 		"uart0":
 		[
-			{ "port": "D", "id": "0", "name": "rxd", "type": "input" },
-			{ "port": "D", "id": "1", "name": "txd", "type": "output" },
-			{ "port": "D", "id": "4", "name": "xck", "type": "output" }
+			{ "port": "D", "id": "0", "name": "rxd", "dir": "in" },
+			{ "port": "D", "id": "1", "name": "txd", "dir": "out" },
+			{ "port": "D", "id": "4", "name": "xck", "dir": "out" }
 		],
 		"i2c":
 		[
-			{ "port": "C", "id": "5", "name": "scl", "type": "output" },
-			{ "port": "C", "id": "4", "name": "sda", "type": "io" }
+			{ "port": "C", "id": "5", "name": "scl", "dir": "out" },
+			{ "port": "C", "id": "4", "name": "sda", "dir": "io" }
 		],
 		"uartspi": []
 	},
@@ -650,25 +650,25 @@ pins = \
 		],
 		"spi":
 		[
-			{ "port": "B", "id": "2", "name": "miso", "type": "input" },
-			{ "port": "B", "id": "3", "name": "mosi", "type": "output" },
-			{ "port": "B", "id": "1", "name": "sck", "type": "output" },
-			{ "port": "B", "id": "0", "name": "ss", "type": "input" }
+			{ "port": "B", "id": "2", "name": "miso", "dir": "in" },
+			{ "port": "B", "id": "3", "name": "mosi", "dir": "out" },
+			{ "port": "B", "id": "1", "name": "sck", "dir": "out" },
+			{ "port": "B", "id": "0", "name": "ss", "dir": "out" }
 		],
 		"uart0":
 		[
-			{ "port": "E", "id": "0", "name": "rxd", "type": "input" },
-			{ "port": "E", "id": "1", "name": "txd", "type": "output" }
+			{ "port": "E", "id": "0", "name": "rxd", "dir": "in" },
+			{ "port": "E", "id": "1", "name": "txd", "dir": "out" }
 		],
 		"uart1":
 		[
-			{ "port": "D", "id": "2", "name": "rxd", "type": "input" },
-			{ "port": "D", "id": "3", "name": "txd", "type": "output" }
+			{ "port": "D", "id": "2", "name": "rxd", "dir": "in" },
+			{ "port": "D", "id": "3", "name": "txd", "dir": "out" }
 		],
 		"i2c":
 		[
-			{ "port": "D", "id": "0", "name": "scl", "type": "output" },
-			{ "port": "D", "id": "1", "name": "sda", "type": "io" }
+			{ "port": "D", "id": "0", "name": "scl", "dir": "out" },
+			{ "port": "D", "id": "1", "name": "sda", "dir": "io" }
 		],
 		"uartspi": []
 	},
@@ -703,22 +703,22 @@ pins = \
 		],
 		"spi":
 		[
-			{ "port": "B", "id": "5", "name": "miso", "type": "input" },
-			{ "port": "B", "id": "6", "name": "mosi", "type": "output" },
-			{ "port": "B", "id": "7", "name": "sck", "type": "output" },
-			{ "port": "B", "id": "4", "name": "ss", "type": "input" }
+			{ "port": "B", "id": "5", "name": "miso", "dir": "in" },
+			{ "port": "B", "id": "6", "name": "mosi", "dir": "out" },
+			{ "port": "B", "id": "7", "name": "sck", "dir": "out" },
+			{ "port": "B", "id": "4", "name": "ss", "dir": "out" }
 		],
 		"uart0":
 		[
-			{ "port": "D", "id": "0", "name": "rxd", "type": "input" },
-			{ "port": "D", "id": "1", "name": "txd", "type": "output" },
-			{ "port": "D", "id": "4", "name": "xck", "type": "output" }
+			{ "port": "D", "id": "0", "name": "rxd", "dir": "in" },
+			{ "port": "D", "id": "1", "name": "txd", "dir": "out" },
+			{ "port": "D", "id": "4", "name": "xck", "dir": "out" }
 		],
 		"uart1":
 		[
-			{ "port": "B", "id": "2", "name": "rxd", "type": "input" },
-			{ "port": "B", "id": "3", "name": "txd", "type": "output" },
-			{ "port": "D", "id": "2", "name": "xck", "type": "output" }
+			{ "port": "B", "id": "2", "name": "rxd", "dir": "in" },
+			{ "port": "B", "id": "3", "name": "txd", "dir": "out" },
+			{ "port": "D", "id": "2", "name": "xck", "dir": "out" }
 		]
 	},
 	
@@ -773,27 +773,27 @@ pins = \
 		],
 		"spi":
 		[
-			{ "port": "B", "id": "5", "name": "miso", "type": "input" },
-			{ "port": "B", "id": "6", "name": "mosi", "type": "output" },
-			{ "port": "B", "id": "7", "name": "sck", "type": "output" },
-			{ "port": "B", "id": "4", "name": "ss", "type": "input" }
+			{ "port": "B", "id": "5", "name": "miso", "dir": "in" },
+			{ "port": "B", "id": "6", "name": "mosi", "dir": "out" },
+			{ "port": "B", "id": "7", "name": "sck", "dir": "out" },
+			{ "port": "B", "id": "4", "name": "ss", "dir": "out" }
 		],
 		"uart0":
 		[
-			{ "port": "D", "id": "0", "name": "rxd", "type": "input" },
-			{ "port": "D", "id": "1", "name": "txd", "type": "output" },
-			{ "port": "B", "id": "0", "name": "xck", "type": "output" }
+			{ "port": "D", "id": "0", "name": "rxd", "dir": "in" },
+			{ "port": "D", "id": "1", "name": "txd", "dir": "out" },
+			{ "port": "B", "id": "0", "name": "xck", "dir": "out" }
 		],
 		"uart1":
 		[
-			{ "port": "D", "id": "2", "name": "rxd", "type": "input" },
-			{ "port": "D", "id": "3", "name": "txd", "type": "output" },
-			{ "port": "D", "id": "4", "name": "xck", "type": "output" }
+			{ "port": "D", "id": "2", "name": "rxd", "dir": "in" },
+			{ "port": "D", "id": "3", "name": "txd", "dir": "out" },
+			{ "port": "D", "id": "4", "name": "xck", "dir": "out" }
 		],
 		"i2c":
 		[
-			{ "port": "C", "id": "0", "name": "scl", "type": "output" },
-			{ "port": "C", "id": "1", "name": "sda", "type": "io" }
+			{ "port": "C", "id": "0", "name": "scl", "dir": "out" },
+			{ "port": "C", "id": "1", "name": "sda", "dir": "io" }
 		],
 		"uartspi": []
 	},
@@ -831,22 +831,22 @@ pins = \
 		],
 		"spi":
 		[
-			{ "port": "B", "id": "2", "name": "miso", "type": "input" },
-			{ "port": "B", "id": "3", "name": "mosi", "type": "output" },
-			{ "port": "B", "id": "1", "name": "sck", "type": "output" },
-			{ "port": "B", "id": "0", "name": "ss", "type": "input" }
+			{ "port": "B", "id": "2", "name": "miso", "dir": "in" },
+			{ "port": "B", "id": "3", "name": "mosi", "dir": "out" },
+			{ "port": "B", "id": "1", "name": "sck", "dir": "out" },
+			{ "port": "B", "id": "0", "name": "ss", "dir": "out" }
 		],
 		"uart0":
 		[
-			{ "port": "E", "id": "0", "name": "rxd", "type": "input" },
-			{ "port": "E", "id": "1", "name": "txd", "type": "output" },
-			{ "port": "E", "id": "2", "name": "xck", "type": "output" }
+			{ "port": "E", "id": "0", "name": "rxd", "dir": "in" },
+			{ "port": "E", "id": "1", "name": "txd", "dir": "out" },
+			{ "port": "E", "id": "2", "name": "xck", "dir": "out" }
 		],
 		"usi":
 		[
-			{ "port": "E", "id": "4", "name": "usck", "type": "output" },
-			{ "port": "E", "id": "6", "name": "do", "type": "output" },
-			{ "port": "E", "id": "5", "name": "di", "type": "input" }
+			{ "port": "E", "id": "4", "name": "usck", "dir": "out" },
+			{ "port": "E", "id": "6", "name": "do", "dir": "out" },
+			{ "port": "E", "id": "5", "name": "di", "dir": "in" }
 		]
 	},
 	
@@ -898,22 +898,22 @@ pins = \
 		],
 		"spi":
 		[
-			{ "port": "B", "id": "2", "name": "miso", "type": "input" },
-			{ "port": "B", "id": "3", "name": "mosi", "type": "output" },
-			{ "port": "B", "id": "1", "name": "sck", "type": "output" },
-			{ "port": "B", "id": "0", "name": "ss", "type": "input" }
+			{ "port": "B", "id": "2", "name": "miso", "dir": "in" },
+			{ "port": "B", "id": "3", "name": "mosi", "dir": "out" },
+			{ "port": "B", "id": "1", "name": "sck", "dir": "out" },
+			{ "port": "B", "id": "0", "name": "ss", "dir": "out" }
 		],
 		"uart0":
 		[
-			{ "port": "E", "id": "0", "name": "rxd", "type": "input" },
-			{ "port": "E", "id": "1", "name": "txd", "type": "output" },
-			{ "port": "E", "id": "2", "name": "xck", "type": "output" }
+			{ "port": "E", "id": "0", "name": "rxd", "dir": "in" },
+			{ "port": "E", "id": "1", "name": "txd", "dir": "out" },
+			{ "port": "E", "id": "2", "name": "xck", "dir": "out" }
 		],
 		"usi":
 		[
-			{ "port": "E", "id": "4", "name": "usck", "type": "output" },
-			{ "port": "E", "id": "6", "name": "do", "type": "output" },
-			{ "port": "E", "id": "5", "name": "di", "type": "input" }
+			{ "port": "E", "id": "4", "name": "usck", "dir": "out" },
+			{ "port": "E", "id": "6", "name": "do", "dir": "out" },
+			{ "port": "E", "id": "5", "name": "di", "dir": "in" }
 		]
 	},
 	
@@ -945,21 +945,21 @@ pins = \
 		],
 		"spi":
 		[
-			{ "port": "B", "id": "2", "name": "miso", "type": "input" },
-			{ "port": "B", "id": "3", "name": "mosi", "type": "output" },
-			{ "port": "B", "id": "1", "name": "sck", "type": "output" },
-			{ "port": "B", "id": "0", "name": "ss", "type": "input" }
+			{ "port": "B", "id": "2", "name": "miso", "dir": "in" },
+			{ "port": "B", "id": "3", "name": "mosi", "dir": "out" },
+			{ "port": "B", "id": "1", "name": "sck", "dir": "out" },
+			{ "port": "B", "id": "0", "name": "ss", "dir": "out" }
 		],
 		"uart1":
 		[
-			{ "port": "D", "id": "2", "name": "rxd", "type": "input" },
-			{ "port": "D", "id": "3", "name": "txd", "type": "output" },
-			{ "port": "D", "id": "5", "name": "xck", "type": "output" }
+			{ "port": "D", "id": "2", "name": "rxd", "dir": "in" },
+			{ "port": "D", "id": "3", "name": "txd", "dir": "out" },
+			{ "port": "D", "id": "5", "name": "xck", "dir": "out" }
 		],
 		"i2c":
 		[
-			{ "port": "D", "id": "0", "name": "scl", "type": "output" },
-			{ "port": "D", "id": "1", "name": "sda", "type": "io" }
+			{ "port": "D", "id": "0", "name": "scl", "dir": "out" },
+			{ "port": "D", "id": "1", "name": "sda", "dir": "io" }
 		],
 		"uartspi": []
 	},
@@ -1009,33 +1009,33 @@ pins = \
 		],
 		"spi":
 		[
-			{ "port": "B", "id": "2", "name": "miso", "type": "input" },
-			{ "port": "B", "id": "3", "name": "mosi", "type": "output" },
-			{ "port": "B", "id": "1", "name": "sck", "type": "output" },
-			{ "port": "B", "id": "0", "name": "ss", "type": "input" }
+			{ "port": "B", "id": "2", "name": "miso", "dir": "in" },
+			{ "port": "B", "id": "3", "name": "mosi", "dir": "out" },
+			{ "port": "B", "id": "1", "name": "sck", "dir": "out" },
+			{ "port": "B", "id": "0", "name": "ss", "dir": "out" }
 		],
 		"uart1":
 		[
-			{ "port": "D", "id": "2", "name": "rxd", "type": "input" },
-			{ "port": "D", "id": "3", "name": "txd", "type": "output" },
-			{ "port": "D", "id": "5", "name": "xck", "type": "output" }
+			{ "port": "D", "id": "2", "name": "rxd", "dir": "in" },
+			{ "port": "D", "id": "3", "name": "txd", "dir": "out" },
+			{ "port": "D", "id": "5", "name": "xck", "dir": "out" }
 		],
 		"uart2":
 		[
-			{ "port": "H", "id": "0", "name": "rxd", "type": "input" },
-			{ "port": "H", "id": "1", "name": "txd", "type": "output" },
-			{ "port": "H", "id": "2", "name": "xck", "type": "output" }
+			{ "port": "H", "id": "0", "name": "rxd", "dir": "in" },
+			{ "port": "H", "id": "1", "name": "txd", "dir": "out" },
+			{ "port": "H", "id": "2", "name": "xck", "dir": "out" }
 		],
 		"uart3":
 		[
-			{ "port": "J", "id": "0", "name": "rxd", "type": "input" },
-			{ "port": "J", "id": "1", "name": "txd", "type": "output" },
-			{ "port": "J", "id": "2", "name": "xck", "type": "output" }
+			{ "port": "J", "id": "0", "name": "rxd", "dir": "in" },
+			{ "port": "J", "id": "1", "name": "txd", "dir": "out" },
+			{ "port": "J", "id": "2", "name": "xck", "dir": "out" }
 		],
 		"i2c":
 		[
-			{ "port": "D", "id": "0", "name": "scl", "type": "output" },
-			{ "port": "D", "id": "1", "name": "sda", "type": "io" }
+			{ "port": "D", "id": "0", "name": "scl", "dir": "out" },
+			{ "port": "D", "id": "1", "name": "sda", "dir": "io" }
 		],
 		"uartspi": []
 	},
@@ -1051,16 +1051,16 @@ pins = \
 		],
 		"spi":
 		[
-			{ "port": "B", "id": "5", "name": "miso", "type": "input" },
-			{ "port": "B", "id": "6", "name": "mosi", "type": "output" },
-			{ "port": "B", "id": "7", "name": "sck", "type": "output" },
-			{ "port": "B", "id": "4", "name": "ss", "type": "input" }
+			{ "port": "B", "id": "5", "name": "miso", "dir": "in" },
+			{ "port": "B", "id": "6", "name": "mosi", "dir": "out" },
+			{ "port": "B", "id": "7", "name": "sck", "dir": "out" },
+			{ "port": "B", "id": "4", "name": "ss", "dir": "out" }
 		],
 		"uart0":
 		[
-			{ "port": "D", "id": "01", "name": "rxd", "type": "input" },
-			{ "port": "D", "id": "1", "name": "txd", "type": "output" },
-			{ "port": "D", "id": "4", "name": "xck", "type": "output" }
+			{ "port": "D", "id": "01", "name": "rxd", "dir": "in" },
+			{ "port": "D", "id": "1", "name": "txd", "dir": "out" },
+			{ "port": "D", "id": "4", "name": "xck", "dir": "out" }
 		]
 	},
 	
@@ -1075,21 +1075,21 @@ pins = \
 		],
 		"spi":
 		[
-			{ "port": "B", "id": "5", "name": "miso", "type": "input" },
-			{ "port": "B", "id": "6", "name": "mosi", "type": "output" },
-			{ "port": "B", "id": "7", "name": "sck", "type": "output" },
-			{ "port": "B", "id": "4", "name": "ss", "type": "input" }
+			{ "port": "B", "id": "5", "name": "miso", "dir": "in" },
+			{ "port": "B", "id": "6", "name": "mosi", "dir": "out" },
+			{ "port": "B", "id": "7", "name": "sck", "dir": "out" },
+			{ "port": "B", "id": "4", "name": "ss", "dir": "out" }
 		],
 		"uart0":
 		[
-			{ "port": "D", "id": "0", "name": "rxd", "type": "input" },
-			{ "port": "D", "id": "1", "name": "txd", "type": "output" },
-			{ "port": "B", "id": "0", "name": "xck", "type": "output" }
+			{ "port": "D", "id": "0", "name": "rxd", "dir": "in" },
+			{ "port": "D", "id": "1", "name": "txd", "dir": "out" },
+			{ "port": "B", "id": "0", "name": "xck", "dir": "out" }
 		],
 		"i2c":
 		[
-			{ "port": "C", "id": "0", "name": "scl", "type": "output" },
-			{ "port": "C", "id": "1", "name": "sda", "type": "io" }
+			{ "port": "C", "id": "0", "name": "scl", "dir": "out" },
+			{ "port": "C", "id": "1", "name": "sda", "dir": "io" }
 		]
 	},
 	
@@ -1121,27 +1121,27 @@ pins = \
 		],
 		"spi":
 		[
-			{ "port": "B", "id": "3", "name": "miso", "type": "input" },
-			{ "port": "B", "id": "2", "name": "mosi", "type": "output" },
-			{ "port": "B", "id": "1", "name": "sck", "type": "output" },
-			{ "port": "B", "id": "0", "name": "ss", "type": "input" }
+			{ "port": "B", "id": "3", "name": "miso", "dir": "in" },
+			{ "port": "B", "id": "2", "name": "mosi", "dir": "out" },
+			{ "port": "B", "id": "1", "name": "sck", "dir": "out" },
+			{ "port": "B", "id": "0", "name": "ss", "dir": "out" }
 		],
 		"uart0":
 		[
-			{ "port": "E", "id": "0", "name": "rxd", "type": "input" },
-			{ "port": "E", "id": "1", "name": "txd", "type": "output" },
-			{ "port": "E", "id": "2", "name": "xck", "type": "output" }
+			{ "port": "E", "id": "0", "name": "rxd", "dir": "in" },
+			{ "port": "E", "id": "1", "name": "txd", "dir": "out" },
+			{ "port": "E", "id": "2", "name": "xck", "dir": "out" }
 		],
 		"uart1":
 		[
-			{ "port": "D", "id": "2", "name": "rxd", "type": "input" },
-			{ "port": "D", "id": "3", "name": "txd", "type": "output" },
-			{ "port": "D", "id": "5", "name": "xck", "type": "output" }
+			{ "port": "D", "id": "2", "name": "rxd", "dir": "in" },
+			{ "port": "D", "id": "3", "name": "txd", "dir": "out" },
+			{ "port": "D", "id": "5", "name": "xck", "dir": "out" }
 		],
 		"i2c":
 		[
-			{ "port": "D", "id": "0", "name": "scl", "type": "output" },
-			{ "port": "D", "id": "1", "name": "sda", "type": "io" }
+			{ "port": "D", "id": "0", "name": "scl", "dir": "out" },
+			{ "port": "D", "id": "1", "name": "sda", "dir": "io" }
 		],
 		"uartspi": []
 	},
@@ -1167,9 +1167,9 @@ pins = \
 		],
 		"spi":
 		[
-			{ "port": "B", "id": "0", "name": "miso", "type": "input" },
-			{ "port": "B", "id": "1", "name": "mosi", "type": "output" },
-			{ "port": "B", "id": "2", "name": "sck", "type": "output" }
+			{ "port": "B", "id": "0", "name": "miso", "dir": "in" },
+			{ "port": "B", "id": "1", "name": "mosi", "dir": "out" },
+			{ "port": "B", "id": "2", "name": "sck", "dir": "out" }
 		]
 	},
 	
@@ -1214,15 +1214,15 @@ pins = \
 		],
 		"spi":
 		[
-			{ "port": "A", "id": "1", "name": "miso", "type": "input" },
-			{ "port": "A", "id": "2", "name": "mosi", "type": "output" },
-			{ "port": "B", "id": "7", "name": "sck", "type": "output" },
-			{ "port": "B", "id": "6", "name": "ss", "type": "input" }
+			{ "port": "A", "id": "1", "name": "miso", "dir": "in" },
+			{ "port": "A", "id": "2", "name": "mosi", "dir": "out" },
+			{ "port": "B", "id": "7", "name": "sck", "dir": "out" },
+			{ "port": "B", "id": "6", "name": "ss", "dir": "out" }
 		],
 		"i2c":
 		[
-			{ "port": "A", "id": "7", "name": "scl", "type": "output" },
-			{ "port": "B", "id": "1", "name": "sda", "type": "io" }
+			{ "port": "A", "id": "7", "name": "scl", "dir": "out" },
+			{ "port": "B", "id": "1", "name": "sda", "dir": "io" }
 		]
 	},
 	
@@ -1252,15 +1252,15 @@ pins = \
 		],
 		"spi":
 		[
-			{ "port": "B", "id": "6", "name": "miso", "type": "input" },
-			{ "port": "B", "id": "5", "name": "mosi", "type": "output" },
-			{ "port": "B", "id": "4", "name": "sck", "type": "output" }
+			{ "port": "B", "id": "6", "name": "miso", "dir": "in" },
+			{ "port": "B", "id": "5", "name": "mosi", "dir": "out" },
+			{ "port": "B", "id": "4", "name": "sck", "dir": "out" }
 		],
 		"usi":
 		[
-			{ "port": "A", "id": "4", "name": "usck", "type": "output" },
-			{ "port": "A", "id": "5", "name": "do", "type": "output" },
-			{ "port": "A", "id": "6", "name": "di", "type": "input" }
+			{ "port": "A", "id": "4", "name": "usck", "dir": "out" },
+			{ "port": "A", "id": "5", "name": "do", "dir": "out" },
+			{ "port": "A", "id": "6", "name": "di", "dir": "in" }
 		]
 	},
 	
@@ -1281,15 +1281,15 @@ pins = \
 		],
 		"spi":
 		[
-			{ "port": "B", "id": "1", "name": "miso", "type": "input" },
-			{ "port": "B", "id": "2", "name": "mosi", "type": "output" },
-			{ "port": "B", "id": "3", "name": "sck", "type": "output" }
+			{ "port": "B", "id": "1", "name": "miso", "dir": "in" },
+			{ "port": "B", "id": "2", "name": "mosi", "dir": "out" },
+			{ "port": "B", "id": "3", "name": "sck", "dir": "out" }
 		],
 		"usi":
 		[
-			{ "port": "B", "id": "2", "name": "usck", "type": "output" },
-			{ "port": "B", "id": "1", "name": "do", "type": "output" },
-			{ "port": "B", "id": "0", "name": "di", "type": "input" }
+			{ "port": "B", "id": "2", "name": "usck", "dir": "out" },
+			{ "port": "B", "id": "1", "name": "do", "dir": "out" },
+			{ "port": "B", "id": "0", "name": "di", "dir": "in" }
 		]
 	},
 	
@@ -1316,9 +1316,9 @@ pins = \
 		],
 		"usi":
 		[
-			{ "port": "B", "id": "2", "name": "usck", "type": "output" },
-			{ "port": "B", "id": "1", "name": "do", "type": "output" },
-			{ "port": "B", "id": "0", "name": "di", "type": "input" }
+			{ "port": "B", "id": "2", "name": "usck", "dir": "out" },
+			{ "port": "B", "id": "1", "name": "do", "dir": "out" },
+			{ "port": "B", "id": "0", "name": "di", "dir": "in" }
 		]
 	},
 	
@@ -1353,15 +1353,15 @@ pins = \
 		],
 		"spi":
 		[
-			{ "port": "C", "id": "4", "name": "miso", "type": "input" },
-			{ "port": "C", "id": "2", "name": "mosi", "type": "output" },
-			{ "port": "C", "id": "1", "name": "sck", "type": "output" },
-			{ "port": "C", "id": "0", "name": "ss", "type": "input" }
+			{ "port": "C", "id": "4", "name": "miso", "dir": "in" },
+			{ "port": "C", "id": "2", "name": "mosi", "dir": "out" },
+			{ "port": "C", "id": "1", "name": "sck", "dir": "out" },
+			{ "port": "C", "id": "0", "name": "ss", "dir": "out" }
 		],
 		"i2c":
 		[
-			{ "port": "C", "id": "1", "name": "scl", "type": "output" },
-			{ "port": "C", "id": "4", "name": "sda", "type": "io" }
+			{ "port": "C", "id": "1", "name": "scl", "dir": "out" },
+			{ "port": "C", "id": "4", "name": "sda", "dir": "io" }
 		]
 	},
 	
@@ -1393,9 +1393,9 @@ pins = \
 		],
 		"usi":
 		[
-			{ "port": "B", "id": "6", "name": "usck", "type": "output" },
-			{ "port": "B", "id": "5", "name": "do", "type": "output" },
-			{ "port": "B", "id": "4", "name": "di", "type": "input" }
+			{ "port": "B", "id": "6", "name": "usck", "dir": "out" },
+			{ "port": "B", "id": "5", "name": "do", "dir": "out" },
+			{ "port": "B", "id": "4", "name": "di", "dir": "in" }
 		]
 	},
 	
@@ -1442,15 +1442,15 @@ pins = \
 		],
 		"spi":
 		[
-			{ "port": "B", "id": "3", "name": "miso", "type": "input" },
-			{ "port": "B", "id": "4", "name": "mosi", "type": "output" },
-			{ "port": "B", "id": "5", "name": "sck", "type": "output" },
-			{ "port": "B", "id": "2", "name": "ss", "type": "input" }
+			{ "port": "B", "id": "3", "name": "miso", "dir": "in" },
+			{ "port": "B", "id": "4", "name": "mosi", "dir": "out" },
+			{ "port": "B", "id": "5", "name": "sck", "dir": "out" },
+			{ "port": "B", "id": "2", "name": "ss", "dir": "out" }
 		],
 		"i2c":
 		[
-			{ "port": "C", "id": "5", "name": "scl", "type": "output" },
-			{ "port": "C", "id": "4", "name": "sda", "type": "io" }
+			{ "port": "C", "id": "5", "name": "scl", "dir": "out" },
+			{ "port": "C", "id": "4", "name": "sda", "dir": "io" }
 		]
 	},
 	
@@ -1463,21 +1463,21 @@ pins = \
 		],
 		"spi":
 		[
-			{ "port": "A", "id": "4", "name": "miso", "type": "input" },
-			{ "port": "A", "id": "2", "name": "mosi", "type": "output" },
-			{ "port": "A", "id": "5", "name": "sck", "type": "output" },
-			{ "port": "A", "id": "6", "name": "ss", "type": "input" }
+			{ "port": "A", "id": "4", "name": "miso", "dir": "in" },
+			{ "port": "A", "id": "2", "name": "mosi", "dir": "out" },
+			{ "port": "A", "id": "5", "name": "sck", "dir": "out" },
+			{ "port": "A", "id": "6", "name": "ss", "dir": "out" }
 		],
 		"uart0":
 		[
-			{ "port": "A", "id": "0", "name": "rxd", "type": "input" },
-			{ "port": "A", "id": "1", "name": "txd", "type": "output" }
+			{ "port": "A", "id": "0", "name": "rxd", "dir": "in" },
+			{ "port": "A", "id": "1", "name": "txd", "dir": "out" }
 		],
 		"usi":
 		[
-			{ "port": "B", "id": "2", "name": "usck", "type": "output" },
-			{ "port": "B", "id": "1", "name": "do", "type": "output" },
-			{ "port": "B", "id": "0", "name": "di", "type": "input" }
+			{ "port": "B", "id": "2", "name": "usck", "dir": "out" },
+			{ "port": "B", "id": "1", "name": "do", "dir": "out" },
+			{ "port": "B", "id": "0", "name": "di", "dir": "in" }
 		]
 	},
 	
@@ -1512,9 +1512,9 @@ pins = \
 		],
 		"usi":
 		[
-			{ "port": "B", "id": "2", "name": "usck", "type": "output" },
-			{ "port": "B", "id": "1", "name": "do", "type": "output" },
-			{ "port": "B", "id": "0", "name": "di", "type": "input" }
+			{ "port": "B", "id": "2", "name": "usck", "dir": "out" },
+			{ "port": "B", "id": "1", "name": "do", "dir": "out" },
+			{ "port": "B", "id": "0", "name": "di", "dir": "in" }
 		]
 	},
 	
@@ -1561,20 +1561,20 @@ pins = \
 		],
 		"spi":
 		[
-			{ "port": "D", "id": "0", "name": "miso", "type": "input" },
-			{ "port": "D", "id": "1", "name": "mosi", "type": "output" },
-			{ "port": "D", "id": "3", "name": "sck", "type": "output" },
-			{ "port": "C", "id": "0", "name": "ss", "type": "input" }
+			{ "port": "D", "id": "0", "name": "miso", "dir": "in" },
+			{ "port": "D", "id": "1", "name": "mosi", "dir": "out" },
+			{ "port": "D", "id": "3", "name": "sck", "dir": "out" },
+			{ "port": "C", "id": "0", "name": "ss", "dir": "out" }
 		],
 		"uart0":
 		[
-			{ "port": "C", "id": "2", "name": "rxd", "type": "input" },
-			{ "port": "C", "id": "3", "name": "txd", "type": "output" }
+			{ "port": "C", "id": "2", "name": "rxd", "dir": "in" },
+			{ "port": "C", "id": "3", "name": "txd", "dir": "out" }
 		],
 		"i2c":
 		[
-			{ "port": "D", "id": "3", "name": "scl", "type": "output" },
-			{ "port": "D", "id": "0", "name": "sda", "type": "io" }
+			{ "port": "D", "id": "3", "name": "scl", "dir": "out" },
+			{ "port": "D", "id": "0", "name": "sda", "dir": "io" }
 		],
 		"uartspi": []
 	},
@@ -1606,14 +1606,14 @@ pins = \
 		],
 		"uart0":
 		[
-			{ "port": "A", "id": "7", "name": "rxd", "type": "input" },
-			{ "port": "B", "id": "0", "name": "txd", "type": "output" }
+			{ "port": "A", "id": "7", "name": "rxd", "dir": "in" },
+			{ "port": "B", "id": "0", "name": "txd", "dir": "out" }
 		],
 		"usi":
 		[
-			{ "port": "B", "id": "1", "name": "usck", "type": "output" },
-			{ "port": "B", "id": "2", "name": "do", "type": "output" },
-			{ "port": "C", "id": "1", "name": "di", "type": "input" }
+			{ "port": "B", "id": "1", "name": "usck", "dir": "out" },
+			{ "port": "B", "id": "2", "name": "do", "dir": "out" },
+			{ "port": "C", "id": "1", "name": "di", "dir": "in" }
 		],
 		"uartspi": []
 	},
@@ -1651,14 +1651,14 @@ pins = \
 		],
 		"uart0":
 		[
-			{ "port": "D", "id": "0", "name": "rxd", "type": "input" },
-			{ "port": "D", "id": "1", "name": "txd", "type": "output" }
+			{ "port": "D", "id": "0", "name": "rxd", "dir": "in" },
+			{ "port": "D", "id": "1", "name": "txd", "dir": "out" }
 		],
 		"usi":
 		[
-			{ "port": "B", "id": "7", "name": "usck", "type": "output" },
-			{ "port": "B", "id": "6", "name": "do", "type": "output" },
-			{ "port": "B", "id": "5", "name": "di", "type": "input" }
+			{ "port": "B", "id": "7", "name": "usck", "dir": "out" },
+			{ "port": "B", "id": "6", "name": "do", "dir": "out" },
+			{ "port": "B", "id": "5", "name": "di", "dir": "in" }
 		],
 		"uartspi": []
 	},
@@ -1680,32 +1680,32 @@ pins = \
 		],
 		"spi":
 		[
-			{ "port": "B", "id": "2", "name": "miso", "type": "input" },
-			{ "port": "B", "id": "3", "name": "mosi", "type": "output" },
-			{ "port": "B", "id": "1", "name": "sck", "type": "output" },
-			{ "port": "B", "id": "0", "name": "ss", "type": "input" }
+			{ "port": "B", "id": "2", "name": "miso", "dir": "in" },
+			{ "port": "B", "id": "3", "name": "mosi", "dir": "out" },
+			{ "port": "B", "id": "1", "name": "sck", "dir": "out" },
+			{ "port": "B", "id": "0", "name": "ss", "dir": "out" }
 		],
 		"uart0":
 		[
-			{ "port": "E", "id": "0", "name": "rxd", "type": "input" },
-			{ "port": "E", "id": "1", "name": "txd", "type": "output" },
-			{ "port": "E", "id": "2", "name": "xck", "type": "output" }
+			{ "port": "E", "id": "0", "name": "rxd", "dir": "in" },
+			{ "port": "E", "id": "1", "name": "txd", "dir": "out" },
+			{ "port": "E", "id": "2", "name": "xck", "dir": "out" }
 		],
 		"uart1":
 		[
-			{ "port": "D", "id": "2", "name": "rxd", "type": "input" },
-			{ "port": "D", "id": "3", "name": "txd", "type": "output" },
-			{ "port": "D", "id": "5", "name": "xck", "type": "output" }
+			{ "port": "D", "id": "2", "name": "rxd", "dir": "in" },
+			{ "port": "D", "id": "3", "name": "txd", "dir": "out" },
+			{ "port": "D", "id": "5", "name": "xck", "dir": "out" }
 		],
 		"i2c":
 		[
-			{ "port": "D", "id": "0", "name": "scl", "type": "output" },
-			{ "port": "D", "id": "1", "name": "sda", "type": "io" }
+			{ "port": "D", "id": "0", "name": "scl", "dir": "out" },
+			{ "port": "D", "id": "1", "name": "sda", "dir": "io" }
 		],
 		"can":
 		[
-			{ "port": "D", "id": "6", "name": "rxd", "type": "input" },
-			{ "port": "D", "id": "5", "name": "txd", "type": "output" }
+			{ "port": "D", "id": "6", "name": "rxd", "dir": "in" },
+			{ "port": "D", "id": "5", "name": "txd", "dir": "out" }
 		]
 	},
 	
@@ -1720,16 +1720,16 @@ pins = \
 		],
 		"spi":
 		[
-			{ "port": "B", "id": "1", "name": "miso", "type": "input" },
-			{ "port": "B", "id": "0", "name": "mosi", "type": "output" },
-			{ "port": "B", "id": "7", "name": "sck", "type": "output" },
-			{ "port": "D", "id": "3", "name": "ss", "type": "input" }
+			{ "port": "B", "id": "1", "name": "miso", "dir": "in" },
+			{ "port": "B", "id": "0", "name": "mosi", "dir": "out" },
+			{ "port": "B", "id": "7", "name": "sck", "dir": "out" },
+			{ "port": "D", "id": "3", "name": "ss", "dir": "out" }
 		],
 		"uart0":
 		[
-			{ "port": "D", "id": "4", "name": "rxd", "type": "input" },
-			{ "port": "D", "id": "3", "name": "txd", "type": "output" },
-			{ "port": "D", "id": "0", "name": "xck", "type": "output" }
+			{ "port": "D", "id": "4", "name": "rxd", "dir": "in" },
+			{ "port": "D", "id": "3", "name": "txd", "dir": "out" },
+			{ "port": "D", "id": "0", "name": "xck", "dir": "out" }
 		]
 	},
 	
@@ -1744,16 +1744,16 @@ pins = \
 		],
 		"spi":
 		[
-			{ "port": "B", "id": "1", "name": "miso", "type": "input" },
-			{ "port": "B", "id": "0", "name": "mosi", "type": "output" },
-			{ "port": "B", "id": "7", "name": "sck", "type": "output" },
-			{ "port": "D", "id": "3", "name": "ss", "type": "input" }
+			{ "port": "B", "id": "1", "name": "miso", "dir": "in" },
+			{ "port": "B", "id": "0", "name": "mosi", "dir": "out" },
+			{ "port": "B", "id": "7", "name": "sck", "dir": "out" },
+			{ "port": "D", "id": "3", "name": "ss", "dir": "out" }
 		],
 		"uart0":
 		[
-			{ "port": "D", "id": "4", "name": "rxd", "type": "input" },
-			{ "port": "D", "id": "3", "name": "txd", "type": "output" },
-			{ "port": "D", "id": "0", "name": "xck", "type": "output" }
+			{ "port": "D", "id": "4", "name": "rxd", "dir": "in" },
+			{ "port": "D", "id": "3", "name": "txd", "dir": "out" },
+			{ "port": "D", "id": "0", "name": "xck", "dir": "out" }
 		]
 	},
 	
@@ -1767,10 +1767,10 @@ pins = \
 		],
 		"spi":
 		[
-			{ "port": "B", "id": "4", "name": "miso", "type": "input" },
-			{ "port": "B", "id": "6", "name": "mosi", "type": "output" },
-			{ "port": "B", "id": "5", "name": "sck", "type": "output" },
-			{ "port": "D", "id": "0", "name": "ss", "type": "input" }
+			{ "port": "B", "id": "4", "name": "miso", "dir": "in" },
+			{ "port": "B", "id": "6", "name": "mosi", "dir": "out" },
+			{ "port": "B", "id": "5", "name": "sck", "dir": "out" },
+			{ "port": "D", "id": "0", "name": "ss", "dir": "out" }
 		]
 	},
 	
@@ -1806,16 +1806,16 @@ pins = \
 		],
 		"spi":
 		[
-			{ "port": "B", "id": "2", "name": "miso", "type": "input" },
-			{ "port": "B", "id": "3", "name": "mosi", "type": "output" },
-			{ "port": "B", "id": "1", "name": "sck", "type": "output" },
-			{ "port": "D", "id": "0", "name": "ss", "type": "input" }
+			{ "port": "B", "id": "2", "name": "miso", "dir": "in" },
+			{ "port": "B", "id": "3", "name": "mosi", "dir": "out" },
+			{ "port": "B", "id": "1", "name": "sck", "dir": "out" },
+			{ "port": "D", "id": "0", "name": "ss", "dir": "out" }
 		],
 		"uart0":
 		[
-			{ "port": "D", "id": "2", "name": "rxd", "type": "input" },
-			{ "port": "D", "id": "3", "name": "txd", "type": "output" },
-			{ "port": "D", "id": "5", "name": "xck", "type": "output" }
+			{ "port": "D", "id": "2", "name": "rxd", "dir": "in" },
+			{ "port": "D", "id": "3", "name": "txd", "dir": "out" },
+			{ "port": "D", "id": "5", "name": "xck", "dir": "out" }
 		],
 		"uartspi": []
 	},
@@ -1847,21 +1847,21 @@ pins = \
 		],
 		"spi":
 		[
-			{ "port": "B", "id": "2", "name": "miso", "type": "input" },
-			{ "port": "B", "id": "3", "name": "mosi", "type": "output" },
-			{ "port": "B", "id": "1", "name": "sck", "type": "output" },
-			{ "port": "D", "id": "0", "name": "ss", "type": "input" }
+			{ "port": "B", "id": "2", "name": "miso", "dir": "in" },
+			{ "port": "B", "id": "3", "name": "mosi", "dir": "out" },
+			{ "port": "B", "id": "1", "name": "sck", "dir": "out" },
+			{ "port": "D", "id": "0", "name": "ss", "dir": "out" }
 		],
 		"uart0":
 		[
-			{ "port": "D", "id": "2", "name": "rxd", "type": "input" },
-			{ "port": "D", "id": "3", "name": "txd", "type": "output" },
-			{ "port": "D", "id": "5", "name": "xck", "type": "output" }
+			{ "port": "D", "id": "2", "name": "rxd", "dir": "in" },
+			{ "port": "D", "id": "3", "name": "txd", "dir": "out" },
+			{ "port": "D", "id": "5", "name": "xck", "dir": "out" }
 		],
 		"i2c":
 		[
-			{ "port": "D", "id": "0", "name": "scl", "type": "output" },
-			{ "port": "D", "id": "1", "name": "sda", "type": "io" }
+			{ "port": "D", "id": "0", "name": "scl", "dir": "out" },
+			{ "port": "D", "id": "1", "name": "sda", "dir": "io" }
 		],
 		"uartspi": []
 	}

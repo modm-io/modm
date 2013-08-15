@@ -331,33 +331,46 @@ public:
 		%% endif
 
 		%% for af in gpio.afs
-			%% if af.peripheral != "extint" and af.peripheral != "pcint"
-				%% if af.type|lower|capitalize == type or af.type == 'io' or type == ""
-					%% set peripheral = af.peripheral|capitalize
-					%% if peripheral == "Spi"
-						%% set peripheral = "SpiMaster"
-					%% endif
-					%% if "instance" in af
-						%% if peripheral == "SpiMaster"
-							%% set peripheral = "UartSpiMaster"
-						%% endif
-						%% set peripheral = peripheral ~ af.instance
-					%% endif
+			{% if af.type == 'in' and type == 'Input' or
+			 af.type == 'out' and type == 'Output' or
+			 af.type == 'io' or type == "" %}
 
-	/// Connect `{{port~pin}}` as `{{af.name|capitalize}}` to `{{peripheral}}`.
+	/// Connect `{{port~pin}}` as `{{af.name}}` to `{{af.peripheral}}`.
 	ALWAYS_INLINE static void
-	connect(TypeId::{{ peripheral }}) {
-					%% if af.type|lower == "output"
-		setOutput();
-					%% elif af.type|lower == "input"
-		setInput();
-					%% endif
-	}
+	connect(TypeId::{{ af.peripheral }}{{ af.name }}) {
+				%% if af.name == "Txd"
+		set();
 				%% endif
+				%% if af.type == "out"
+		setOutput();
+				%% elif af.type== "in"
+		setInput();
+				%% endif
+	}
 			%% endif
 		%% endfor
 
-		%% for peripheral in ['SoftwareSpiMaster', 'SoftwareI2cMaster']
+		%% if type in ['', 'Output']
+			%% for peripheral in   ['SoftwareSpiMasterMosi',
+									'SoftwareSpiMasterSck',
+									'SoftwareI2cMasterScl']
+	/// Connect to `{{peripheral}}`.
+	ALWAYS_INLINE static void
+	connect(::xpcc::TypeId::{{ peripheral }}) {
+		setOutput();
+	}
+			%% endfor
+		%% endif
+		%% if type in ['', 'Input']
+			%% for peripheral in ['SoftwareSpiMasterMiso']
+	/// Connect to `{{peripheral}}`.
+	ALWAYS_INLINE static void
+	connect(::xpcc::TypeId::{{ peripheral }}) {
+		setInput();
+	}
+			%% endfor
+		%% endif
+		%% for peripheral in ['SoftwareI2cMasterSda']
 	/// Connect to `{{peripheral}}`.
 	ALWAYS_INLINE static void
 	connect(::xpcc::TypeId::{{ peripheral }}) {}

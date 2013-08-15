@@ -11,27 +11,27 @@
 #	error	"Don't include this file directly, use 'simple_spi.hpp' instead!"
 #endif
 
-template <typename Clk, typename Mosi, typename Miso, uint32_t Frequency>
-bool xpcc::SoftwareSimpleSpi<Clk, Mosi, Miso, Frequency>::finished;
+template <typename SCK, typename MOSI, typename MISO, uint32_t Frequency>
+bool xpcc::SoftwareSimpleSpi<SCK, MOSI, MISO, Frequency>::finished;
 
-template <typename Clk, typename Mosi, typename Miso, uint32_t Frequency>
-uint8_t xpcc::SoftwareSimpleSpi<Clk, Mosi, Miso, Frequency>::result;
+template <typename SCK, typename MOSI, typename MISO, uint32_t Frequency>
+uint8_t xpcc::SoftwareSimpleSpi<SCK, MOSI, MISO, Frequency>::result;
 
 
 // ----------------------------------------------------------------------------
-template <typename Clk, typename Mosi, typename Miso, uint32_t Frequency>
+template <typename SCK, typename MOSI, typename MISO, uint32_t Frequency>
 void
-xpcc::SoftwareSimpleSpi<Clk, Mosi, Miso, Frequency>::initialize()
+xpcc::SoftwareSimpleSpi<SCK, MOSI, MISO, Frequency>::initialize()
 {
-	Clk::setOutput();
-	Mosi::setOutput();
-	Miso::setInput();
+	SCK::setOutput();
+	MOSI::setOutput();
+	MISO::setInput();
 	finished = true;
 }
 
-template <typename Clk, typename Mosi, typename Miso, uint32_t Frequency>
+template <typename SCK, typename MOSI, typename MISO, uint32_t Frequency>
 uint8_t
-xpcc::SoftwareSimpleSpi<Clk, Mosi, Miso, Frequency>::writeReadBlocking(uint8_t data)
+xpcc::SoftwareSimpleSpi<SCK, MOSI, MISO, Frequency>::writeReadBlocking(uint8_t data)
 {
 	while (!isFinished())
 		;
@@ -39,72 +39,72 @@ xpcc::SoftwareSimpleSpi<Clk, Mosi, Miso, Frequency>::writeReadBlocking(uint8_t d
 
 	uint8_t input = 0;
 
-	Clk::reset();
+	SCK::reset();
 	for (uint_fast8_t ii = 0; ii < 8; ++ii)
 	{
 		input <<= 1;
 		if (data & 0x80) {
-			Mosi::set();
+			MOSI::set();
 		}
 		else {
-			Mosi::reset();
+			MOSI::reset();
 		}
 		delay();
 
-		Clk::set();
+		SCK::set();
 		delay();
 
-		if (Miso::read()) {
+		if (MISO::read()) {
 			input |= 1;
 		}
 		data <<= 1;
 
-		Clk::reset();
+		SCK::reset();
 	}
 	finished = true;
 
 	return input;
 }
 
-template <typename Clk, typename Mosi, typename Miso, uint32_t Frequency>
+template <typename SCK, typename MOSI, typename MISO, uint32_t Frequency>
 void
-xpcc::SoftwareSimpleSpi<Clk, Mosi, Miso, Frequency>::writeBlocking(uint8_t data)
+xpcc::SoftwareSimpleSpi<SCK, MOSI, MISO, Frequency>::writeBlocking(uint8_t data)
 {
 	writeReadBlocking(data);
 }
 
-template <typename Clk, typename Mosi, typename Miso, uint32_t Frequency>
+template <typename SCK, typename MOSI, typename MISO, uint32_t Frequency>
 bool
-xpcc::SoftwareSimpleSpi<Clk, Mosi, Miso, Frequency>::write(uint8_t data)
+xpcc::SoftwareSimpleSpi<SCK, MOSI, MISO, Frequency>::write(uint8_t data)
 {
 	result = writeReadBlocking(data);
 	return true;
 }
 
-template <typename Clk, typename Mosi, typename Miso, uint32_t Frequency>
+template <typename SCK, typename MOSI, typename MISO, uint32_t Frequency>
 uint8_t
-xpcc::SoftwareSimpleSpi<Clk, Mosi, Miso, Frequency>::getResult()
+xpcc::SoftwareSimpleSpi<SCK, MOSI, MISO, Frequency>::getResult()
 {
 	return result;
 }
 
-template <typename Clk, typename Mosi, typename Miso, uint32_t Frequency>
+template <typename SCK, typename MOSI, typename MISO, uint32_t Frequency>
 bool
-xpcc::SoftwareSimpleSpi<Clk, Mosi, Miso, Frequency>::isFinished()
+xpcc::SoftwareSimpleSpi<SCK, MOSI, MISO, Frequency>::isFinished()
 {
 	return finished;
 }
 
-template <typename Clk, typename Mosi, typename Miso, uint32_t Frequency>
+template <typename SCK, typename MOSI, typename MISO, uint32_t Frequency>
 void
-xpcc::SoftwareSimpleSpi<Clk, Mosi, Miso, Frequency>::delay()
+xpcc::SoftwareSimpleSpi<SCK, MOSI, MISO, Frequency>::delay()
 {
 	xpcc::delay_us(delayTime);
 }
 
-template <typename Clk, typename Mosi, typename Miso, uint32_t Frequency>
+template <typename SCK, typename MOSI, typename MISO, uint32_t Frequency>
 bool
-xpcc::SoftwareSimpleSpi<Clk, Mosi, Miso, Frequency>::transfer(uint8_t *tx, uint8_t *rx, std::size_t length, BufferOptions options)
+xpcc::SoftwareSimpleSpi<SCK, MOSI, MISO, Frequency>::transfer(uint8_t *tx, uint8_t *rx, std::size_t length, BufferOptions options)
 {
 	if (!isFinished())
 		return false;

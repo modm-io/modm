@@ -21,13 +21,6 @@ namespace xpcc
 namespace {{target.family}}
 {
 
-struct I2c
-{
-	%% for gpio in gpios
-	//typedef ::xpcc::{{target.family}}::Gpio{{ gpio.port }}{{ gpio.id }} {{ gpio.name | capitalize }};
-	%% endfor
-};
-
 /**
  * Interrupt-driven I2C master module.
  *
@@ -36,10 +29,11 @@ struct I2c
  * @author Niklas Hauser
  * @ingroup	{{target.family}}
  */
-class I2cMaster : public ::xpcc::I2cMaster, public I2c
+class I2cMaster : public ::xpcc::I2cMaster
 {
 public:
-	static const TypeId::I2c Id;
+	static const TypeId::I2cMasterSda Sda;
+	static const TypeId::I2cMasterScl Scl;
 	
 	template<DataRate rate=DataRate::Standard>
 	static ALWAYS_INLINE void

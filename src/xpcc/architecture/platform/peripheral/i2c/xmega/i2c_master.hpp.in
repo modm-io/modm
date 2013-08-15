@@ -18,6 +18,7 @@
 
 namespace xpcc
 {
+
 namespace xmega
 {
 
@@ -56,22 +57,22 @@ public:
 		constexpr uint32_t rawRate = static_cast<uint32_t>(rate);
 		static_assert(rawRate <= 400000, "The Xmega does not support High I2C baudrate.");
 		static_assert(F_CPU/10 >= rawRate, "The CPU frequency needs to be at least 10x higher than I2C baudrate.");
-		
+
 		// set the baud rate register
 		constexpr uint8_t baud = (F_CPU / (2 * rawRate)) - 5;
 		initializeWithBaud(baud);
 	}
-	
+
 	// start documentation inherited
 	static bool
 	start(xpcc::I2cDelegate *delegate);
-	
+
 	static bool
 	startBlocking(xpcc::I2cDelegate *delegate);
-	
+
 	static Error
 	getErrorState();
-	
+
 	static void
 	reset(DetachCause cause=DetachCause::SoftwareReset);
 	// end documentation inherited
