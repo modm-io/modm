@@ -40,7 +40,7 @@ FLASH_STORAGE(uint16_t base[]) = { 10, 100, 1000, 10000 };
 // ----------------------------------------------------------------------------
 xpcc::IOStream::IOStream(IODevice& outputDevice) :
 	device(&outputDevice),
-	mode(ASCII)
+	mode(Mode::Ascii)
 {
 }
 

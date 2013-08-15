@@ -72,31 +72,31 @@ namespace xpcc
 		flush()
 		{
 			this->device->flush();
-			this->mode = ASCII;
+			this->mode = Mode::Ascii;
 			return *this;
 		}
 		
-		/// set the output mode to BIN style for \c char and \c char*
+		/// set the output mode to Mode::Binary style for \c char and \c char*
 		ALWAYS_INLINE IOStream&
 		bin()
 		{
-			this->mode = BIN;
+			this->mode = Mode::Binary;
 			return *this;
 		}
 
-		/// set the output mode to HEX style for \c char and \c char*
+		/// set the output mode to Mode::Hexadecimal style for \c char and \c char*
 		ALWAYS_INLINE IOStream&
 		hex()
 		{
-			this->mode = HEX;
+			this->mode = Mode::Hexadecimal;
 			return *this;
 		}
 
-		/// set the output mode to ASCII style for \c char and \c char*
+		/// set the output mode to Mode::Ascii style for \c char and \c char*
 		ALWAYS_INLINE IOStream&
 		ascii()
 		{
-			this->mode = ASCII;
+			this->mode = Mode::Ascii;
 			return *this;
 		}
 		
@@ -104,10 +104,10 @@ namespace xpcc
 		IOStream&
 		operator << (const unsigned char& v)
 		{
-			if (this->mode == ASCII) {
+			if (this->mode == Mode::Ascii) {
 				this->writeInteger(static_cast<uint16_t>(v));
 			}
-			else if (this->mode == BIN) {
+			else if (this->mode == Mode::Binary) {
 				this->writeBin(v);
 			}
 			else {
@@ -119,10 +119,10 @@ namespace xpcc
 		IOStream&
 		operator << (const char& v)
 		{
-			if (this->mode == ASCII) {
+			if (this->mode == Mode::Ascii) {
 				this->device->write(v);
 			}
-			else if (this->mode == BIN) {
+			else if (this->mode == Mode::Binary) {
 				this->writeBin(v);
 			}
 			else {
@@ -134,10 +134,10 @@ namespace xpcc
 		ALWAYS_INLINE IOStream&
 		operator << (const uint16_t& v)
 		{
-			if (this->mode == ASCII) {
+			if (this->mode == Mode::Ascii) {
 				this->writeInteger(v);
 			}
-			else if (this->mode == BIN) {
+			else if (this->mode == Mode::Binary) {
 				this->writeBin(static_cast<uint8_t>(v >> 8));
 				this->writeBin(static_cast<uint8_t>(v & 0xff));
 			}
@@ -151,10 +151,10 @@ namespace xpcc
 		ALWAYS_INLINE IOStream&
 		operator << (const int16_t& v)
 		{
-			if (this->mode == ASCII) {
+			if (this->mode == Mode::Ascii) {
 				this->writeInteger(v);
 			}
-			else if (this->mode == BIN) {
+			else if (this->mode == Mode::Binary) {
 				this->writeBin(static_cast<uint8_t>(v >> 8));
 				this->writeBin(static_cast<uint8_t>(v & 0xff));
 			}
@@ -168,10 +168,10 @@ namespace xpcc
 		ALWAYS_INLINE IOStream&
 		operator << (const uint32_t& v)
 		{
-			if (this->mode == ASCII) {
+			if (this->mode == Mode::Ascii) {
 				this->writeInteger(v);
 			}
-			else if (this->mode == BIN) {
+			else if (this->mode == Mode::Binary) {
 				this->writeBin(static_cast<uint8_t>(v >> 24));
 				this->writeBin(static_cast<uint8_t>(v >> 16));
 				this->writeBin(static_cast<uint8_t>(v >> 8));
@@ -189,10 +189,10 @@ namespace xpcc
 		ALWAYS_INLINE IOStream&
 		operator << (const int32_t& v)
 		{
-			if (this->mode == ASCII) {
+			if (this->mode == Mode::Ascii) {
 				this->writeInteger(v);
 			}
-			else if (this->mode == BIN) {
+			else if (this->mode == Mode::Binary) {
 				this->writeBin(static_cast<uint8_t>(v >> 24));
 				this->writeBin(static_cast<uint8_t>(v >> 16));
 				this->writeBin(static_cast<uint8_t>(v >> 8));
@@ -284,10 +284,10 @@ namespace xpcc
 		IOStream&
 		operator << (const char* s)
 		{
-			if( this->mode == ASCII ) {
+			if( this->mode == Mode::Ascii ) {
 				this->device->write(s);
 			}
-			else if( this->mode == BIN ) {
+			else if( this->mode == Mode::Binary ) {
 				this->writeBin(s);
 			}
 			else {
@@ -431,11 +431,12 @@ namespace xpcc
 #endif
 
 	private :
-		enum Mode
+		enum class
+		Mode
 		{
-			ASCII,
-			HEX,
-			BIN
+			Ascii,
+			Hexadecimal,
+			Binary
 		};
 		
 		IOStream(const IOStream&);
@@ -472,7 +473,7 @@ namespace xpcc
 	}
 
 	/**
-	 * \brief  set the output mode to BIN style for \b char and \b char*
+	 * \brief  set the output mode to Mode::Binary style for \b char and \b char*
 	 *
 	 * \ingroup io
 	 */
@@ -483,7 +484,7 @@ namespace xpcc
 	}
 
 	/**
-	 * \brief  set the output mode to HEX style for \b char and \b char*
+	 * \brief  set the output mode to Mode::Hexadecimal style for \b char and \b char*
 	 *
 	 * \ingroup io
 	 */
@@ -494,7 +495,7 @@ namespace xpcc
 	}
 
 	/**
-	 * \brief  set the output mode to ASCII style for \b char and \b char*
+	 * \brief  set the output mode to Mode::Ascii style for \b char and \b char*
 	 *
 	 * \ingroup io
 	 */
