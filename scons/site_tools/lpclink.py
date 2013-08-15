@@ -60,7 +60,11 @@ def generate(env, **kw):
 			
 	basePath = '/opt/lpcxpresso/'
 	if platform.system() == 'Darwin':
-		basePath = glob.glob('/Applications/lpcxpresso_*/')[0]
+		basePath = glob.glob('/Applications/lpcxpresso_*/')
+        if basePath != []:
+            basePath = basePath[0]
+        else:
+            basePath = ""
 	
 	env['LPCDFU'] = basePath + 'lpcxpresso/bin/dfu-util'
 	env['LPCLINK_FIRMWARE'] = basePath + 'lpcxpresso/bin/LPCXpressoWIN.enc'

@@ -35,6 +35,12 @@
 
 #include "buffered_graphic_display.hpp"
 
+// to enable this define add it to your ``project.cfg`` and
+// include <xpcc_config.hpp> before including this file.
+#ifndef S65_LPC_ACCELERATED
+#	define S65_LPC_ACCELERATED 0
+#endif
+
 namespace xpcc
 {
 	/**

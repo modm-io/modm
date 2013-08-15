@@ -1,11 +1,11 @@
 // coding: utf-8
 // ----------------------------------------------------------------------------
-/* Copyright (c) 2009, Roboterclub Aachen e.V.
+/* Copyright (c) 2012, Roboterclub Aachen e.V.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -28,86 +28,71 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__BUFFERED_GRAPHIC_DISPLAY_HPP
-#define XPCC__BUFFERED_GRAPHIC_DISPLAY_HPP
+#ifndef XPCC__ADS7843_HPP
+#define XPCC__ADS7843_HPP
 
-#include <stdlib.h>
-#include "graphic_display.hpp"
+#include <stdint.h>
+#include <xpcc/driver/ui/display/graphic_display.hpp>
 
 namespace xpcc
 {
 	/**
-	 * Base class for graphical displays with a RAM buffer.
+	 * ADS7843 Touch Screen Controller.
 	 * 
-	 * Every operation works on the internal RAM buffer, therefore the content
-	 * of the real display is not changed until a call of update().
+	 * The ADS7843 by Texas Instruments is the de-facto standard for cheap
+	 * resistive touch screens.
 	 * 
-	 * \tparam	Width	Width of the display.
-	 * \tparam	Height	Height of the display. Must be a multiple of 8!
+	 * There are many compatible devices from other manufacturers available,
+	 * such as the UH7843 by Zilltek, the TSC2046 and the XPT2046 by XPTEK.
+	 * All of these are 100% compatible with the ADS7843. 
 	 * 
-	 * \author	Fabian Greif
-	 * \ingroup	lcd
+	 * @author	Fabian Greif <fabian.greif@rwth-aachen.de>
 	 */
-	template <uint16_t Width, uint16_t Height>
-	class BufferedGraphicDisplay : public GraphicDisplay
+	template <typename Spi, typename Cs, typename Int>
+	class Ads7843
 	{
-		// Height must be a multiple of 8
-		XPCC__STATIC_ASSERT((Height % 8) == 0, "height must be a multiple of 8");
-		
 	public:
-		virtual
-		~BufferedGraphicDisplay()
-		{
-		}
+		static void
+		initialize();
 		
-		virtual  inline uint16_t
-		getWidth() const
-		{
-			return Width;
-		}
-
-		virtual inline uint16_t
-		getHeight() const
-		{
-			return Height;
-		}
-
 		/**
-		 * \brief	Clear the complete screen
+		 * Get the smoothed (x,y) position.
 		 * 
-		 * Use fillRectangle() to clear certain areas of the screen.
+		 * @param	point
+		 * 		(x,y) position on the pressed touchscreen
+		 * 
+		 * @return	`true` if the touchscreen is pressed and the value is
+		 * 			stable enough to provide a reading, otherwise `false`.
 		 */
-		virtual void
-		clear();
+		static bool
+		read(xpcc::glcd::Point * point);
 		
-		// Faster version adapted for the RAM buffer
-		virtual void
-		drawImageRaw(glcd::Point upperLeft,
-				uint16_t width, uint16_t height,
-				xpcc::accessor::Flash<uint8_t> data);
+		static inline uint16_t
+		readX()
+		{
+			return readData(CHX);
+		}
 		
-	protected:
-		// Faster version adapted for the RAM buffer
-		virtual void
-		drawHorizontalLine(glcd::Point start, uint16_t length);
+		static inline uint16_t
+		readY()
+		{
+			return readData(CHY);
+		}
 		
-		// TODO Faster version adapted for the RAM buffer
-		//virtual void
-		//drawVerticalLine(glcd::Point start, uint8_t length);
+	private:
+		static const uint8_t CHX = 0x90;
+		static const uint8_t CHY = 0xd0;
 		
-		virtual void
-		setPixel(int16_t x, int16_t y);
+		static const uint16_t threshold = 2;
 		
-		virtual void
-		clearPixel(int16_t x, int16_t y);
+		static bool
+		getAverage(uint16_t * buffer, int16_t & value);
 		
-		virtual bool
-		getPixel(int16_t x, int16_t y);
-		
-		uint8_t buffer[Width][Height / 8];
+		static uint16_t
+		readData(uint8_t command);
 	};
 }
 
-#include "buffered_graphic_display_impl.hpp"
+#include "ads7843_impl.hpp"
 
-#endif	// XPCC__GRAPHIC_DISPLAY_HPP
+#endif // XPCC__ADS7843_HPP
