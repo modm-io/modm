@@ -376,7 +376,6 @@ public:
 template< uint8_t START_PIN, uint8_t WIDTH >
 class GpioPort{{port.name}} : public ::xpcc::GpioOctet, public Gpio
 {
-	static_assert(START_PIN >= {{port.startPin}}, "START_PIN too small, minimum {{port.startPin}}.");
 	static_assert(START_PIN < {{port.startPin + port.width}}, "START_PIN too large, maximum {{port.startPin + port.width}}.");
 	static_assert(WIDTH <= {{port.width}}, "WIDTH too large, maximum {{port.width}}.");
 	static_assert(WIDTH > 0, "WIDTH should be at least 1.");
@@ -401,8 +400,28 @@ public:
 	}
 	ALWAYS_INLINE static void write(uint8_t data) {
 		data <<= START_PIN;
-		PORT{{port.name}} &= ~portMask;
-		PORT{{port.name}} |= data & portMask;
+		PORT{{port.name}} = (PORT{{port.name}} & ~portMask) | (data & portMask);
+	}
+};
+
+template<>
+class GpioPort{{port.name}}< 0, 8 > : public ::xpcc::GpioOctet, public Gpio
+{
+public:
+	static constexpr uint8_t width = 8;
+	
+public:
+	ALWAYS_INLINE static void setOutput() {
+		DDR{{port.name}} |= 0xff;
+	}
+	ALWAYS_INLINE static void setInput() {
+		DDR{{port.name}} &= ~0xff;
+	}
+	ALWAYS_INLINE static uint8_t read() {
+		return PIN{{port.name}};
+	}
+	ALWAYS_INLINE static void write(uint8_t data) {
+		PORT{{port.name}} = data;
 	}
 };
 
