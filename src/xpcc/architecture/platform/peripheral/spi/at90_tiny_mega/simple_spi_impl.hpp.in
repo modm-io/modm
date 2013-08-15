@@ -11,6 +11,8 @@
 #	error	"Don't include this file directly, use 'simple_spi.hpp' instead!"
 #endif
 
+bool xpcc::{{target.family}}::SimpleSpi::finished;
+
 // ----------------------------------------------------------------------------
 template< uint32_t baudrate >
 void
