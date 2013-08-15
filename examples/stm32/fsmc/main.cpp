@@ -69,11 +69,11 @@ namespace lcd
 	GPIO__OUTPUT(Reset, E,  3);     // Reset, not part of FSMC
 
 	// FSMC
-	// typedef xpcc::TftMemoryBus8Bit ParallelBus;
+	typedef xpcc::TftMemoryBus8Bit ParallelBus;
 
 	// non-FSMC: GPIO
-	typedef xpcc::gpio::Port<D7, D6, D5, D4, D3, D2, D1, D0> Port;
-	typedef xpcc::TftMemoryBus8BitGpio<Port, Cs, xpcc::gpio::Unused, Wr, Cd> ParallelBus;
+//	typedef xpcc::gpio::Port<D7, D6, D5, D4, D3, D2, D1, D0> Port;
+//	typedef xpcc::TftMemoryBus8BitGpio<Port, Cs, xpcc::gpio::Unused, Wr, Cd> ParallelBus;
 
 	// Display
 	typedef xpcc::SiemensS75LandscapeRight<lcd::ParallelBus, lcd::Reset> Display;
@@ -84,13 +84,14 @@ namespace lcd
  * Offset for A16 : (1 << 16)
  * Offset for A23 : (1 << 23)
  */
-//lcd::ParallelBus
-//parallelBus(
-//		(volatile uint8_t *)  0x60000000,
-//		(volatile uint8_t *) (0x60000000 + (1 << 23)));
-
 lcd::ParallelBus
-parallelBus;
+parallelBus(
+		(volatile uint8_t *)  0x60000000,
+		(volatile uint8_t *) (0x60000000 + (1 << 23)));
+
+// non-FSMC: GPIO
+//lcd::ParallelBus
+//parallelBus;
 
 lcd::Display display(parallelBus);
 
@@ -110,67 +111,67 @@ MAIN_FUNCTION
 	//------------------------------------------------------
 
 	// FSMC
-//	xpcc::stm32::Fsmc::initialize();
-//
-//	// A16
-//	lcd::Cd::setAlternateFunction(xpcc::stm32::AF_FSMC, xpcc::stm32::PUSH_PULL, xpcc::stm32::SPEED_100MHZ, xpcc::stm32::PULLUP);
-//
-//	// FSMC_NE1
-//	lcd::Cs::setAlternateFunction(xpcc::stm32::AF_FSMC, xpcc::stm32::PUSH_PULL, xpcc::stm32::SPEED_100MHZ, xpcc::stm32::PULLUP);
-//
-//	// FSMC_NWE
-//	lcd::Wr::setAlternateFunction(xpcc::stm32::AF_FSMC, xpcc::stm32::PUSH_PULL, xpcc::stm32::SPEED_100MHZ, xpcc::stm32::PULLUP);
-//
-//	lcd::D0::setAlternateFunction(xpcc::stm32::AF_FSMC, xpcc::stm32::PUSH_PULL, xpcc::stm32::SPEED_100MHZ, xpcc::stm32::PULLUP);
-//	lcd::D1::setAlternateFunction(xpcc::stm32::AF_FSMC, xpcc::stm32::PUSH_PULL, xpcc::stm32::SPEED_100MHZ, xpcc::stm32::PULLUP);
-//	lcd::D2::setAlternateFunction(xpcc::stm32::AF_FSMC, xpcc::stm32::PUSH_PULL, xpcc::stm32::SPEED_100MHZ, xpcc::stm32::PULLUP);
-//	lcd::D3::setAlternateFunction(xpcc::stm32::AF_FSMC, xpcc::stm32::PUSH_PULL, xpcc::stm32::SPEED_100MHZ, xpcc::stm32::PULLUP);
-//	lcd::D4::setAlternateFunction(xpcc::stm32::AF_FSMC, xpcc::stm32::PUSH_PULL, xpcc::stm32::SPEED_100MHZ, xpcc::stm32::PULLUP);
-//	lcd::D5::setAlternateFunction(xpcc::stm32::AF_FSMC, xpcc::stm32::PUSH_PULL, xpcc::stm32::SPEED_100MHZ, xpcc::stm32::PULLUP);
-//	lcd::D6::setAlternateFunction(xpcc::stm32::AF_FSMC, xpcc::stm32::PUSH_PULL, xpcc::stm32::SPEED_100MHZ, xpcc::stm32::PULLUP);
-//	lcd::D7::setAlternateFunction(xpcc::stm32::AF_FSMC, xpcc::stm32::PUSH_PULL, xpcc::stm32::SPEED_100MHZ, xpcc::stm32::PULLUP);
-//
-//	xpcc::stm32::fsmc::NorSram::AsynchronousTiming timing = {
-//		// read
-//		0,	// readAddressSetup
-//		15,	// readAddressHold
-//		0,	// readDataPhase
-//
-//		// write
-//		0,	// writeAddressSetup
-//		0,	// writeAddressHold
-//		6,	// writeDataPhase
-//
-//		// bus turn around
-//		0
-//	};
-//
-//	xpcc::stm32::fsmc::NorSram::configureAsynchronousRegion(
-//			xpcc::stm32::fsmc::NorSram::CHIP_SELECT_1, /* NE1 */
-//			xpcc::stm32::fsmc::NorSram::NO_MULTIPLEX_8BIT,
-//			xpcc::stm32::fsmc::NorSram::SRAM_ROM,
-//			xpcc::stm32::fsmc::NorSram::MODE_A,
-//			timing);
-//
-//	xpcc::stm32::fsmc::NorSram::enableRegion(xpcc::stm32::fsmc::NorSram::CHIP_SELECT_1);
+	xpcc::stm32::Fsmc::initialize();
+
+	// A16
+	lcd::Cd::setAlternateFunction(xpcc::stm32::AF_FSMC, xpcc::stm32::PUSH_PULL, xpcc::stm32::SPEED_100MHZ, xpcc::stm32::PULLUP);
+
+	// FSMC_NE1
+	lcd::Cs::setAlternateFunction(xpcc::stm32::AF_FSMC, xpcc::stm32::PUSH_PULL, xpcc::stm32::SPEED_100MHZ, xpcc::stm32::PULLUP);
+
+	// FSMC_NWE
+	lcd::Wr::setAlternateFunction(xpcc::stm32::AF_FSMC, xpcc::stm32::PUSH_PULL, xpcc::stm32::SPEED_100MHZ, xpcc::stm32::PULLUP);
+
+	lcd::D0::setAlternateFunction(xpcc::stm32::AF_FSMC, xpcc::stm32::PUSH_PULL, xpcc::stm32::SPEED_100MHZ, xpcc::stm32::PULLUP);
+	lcd::D1::setAlternateFunction(xpcc::stm32::AF_FSMC, xpcc::stm32::PUSH_PULL, xpcc::stm32::SPEED_100MHZ, xpcc::stm32::PULLUP);
+	lcd::D2::setAlternateFunction(xpcc::stm32::AF_FSMC, xpcc::stm32::PUSH_PULL, xpcc::stm32::SPEED_100MHZ, xpcc::stm32::PULLUP);
+	lcd::D3::setAlternateFunction(xpcc::stm32::AF_FSMC, xpcc::stm32::PUSH_PULL, xpcc::stm32::SPEED_100MHZ, xpcc::stm32::PULLUP);
+	lcd::D4::setAlternateFunction(xpcc::stm32::AF_FSMC, xpcc::stm32::PUSH_PULL, xpcc::stm32::SPEED_100MHZ, xpcc::stm32::PULLUP);
+	lcd::D5::setAlternateFunction(xpcc::stm32::AF_FSMC, xpcc::stm32::PUSH_PULL, xpcc::stm32::SPEED_100MHZ, xpcc::stm32::PULLUP);
+	lcd::D6::setAlternateFunction(xpcc::stm32::AF_FSMC, xpcc::stm32::PUSH_PULL, xpcc::stm32::SPEED_100MHZ, xpcc::stm32::PULLUP);
+	lcd::D7::setAlternateFunction(xpcc::stm32::AF_FSMC, xpcc::stm32::PUSH_PULL, xpcc::stm32::SPEED_100MHZ, xpcc::stm32::PULLUP);
+
+	xpcc::stm32::fsmc::NorSram::AsynchronousTiming timing = {
+		// read
+		0,	// readAddressSetup
+		15,	// readAddressHold
+		0,	// readDataPhase
+
+		// write
+		0,	// writeAddressSetup
+		0,	// writeAddressHold
+		6,	// writeDataPhase
+
+		// bus turn around
+		0
+	};
+
+	xpcc::stm32::fsmc::NorSram::configureAsynchronousRegion(
+			xpcc::stm32::fsmc::NorSram::CHIP_SELECT_1, /* NE1 */
+			xpcc::stm32::fsmc::NorSram::NO_MULTIPLEX_8BIT,
+			xpcc::stm32::fsmc::NorSram::SRAM_ROM,
+			xpcc::stm32::fsmc::NorSram::MODE_A,
+			timing);
+
+	xpcc::stm32::fsmc::NorSram::enableRegion(xpcc::stm32::fsmc::NorSram::CHIP_SELECT_1);
 
 	//------------------------------------------------------
 
 	// non-FSMC: GPIO
-	lcd::Cd::setOutput();
-	lcd::Cs::setOutput();
-	lcd::Wr::setOutput();
-
-	lcd::D0::setInput();
-	lcd::D1::setInput();
-	lcd::D2::setInput();
-	lcd::D3::setInput();
-	lcd::D4::setInput();
-	lcd::D5::setInput();
-	lcd::D6::setInput();
-	lcd::D7::setInput();
-
-	lcd::ParallelBus::initialize();
+//	lcd::Cd::setOutput();
+//	lcd::Cs::setOutput();
+//	lcd::Wr::setOutput();
+//
+//	lcd::D0::setInput();
+//	lcd::D1::setInput();
+//	lcd::D2::setInput();
+//	lcd::D3::setInput();
+//	lcd::D4::setInput();
+//	lcd::D5::setInput();
+//	lcd::D6::setInput();
+//	lcd::D7::setInput();
+//
+//	lcd::ParallelBus::initialize();
 
 	//------------------------------------------------------
 
