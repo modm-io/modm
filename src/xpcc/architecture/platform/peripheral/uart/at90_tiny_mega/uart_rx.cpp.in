@@ -18,14 +18,13 @@ static xpcc::atomic::Queue<uint8_t, {{parameters.rx_buffer}}> rxBuffer;
 static uint8_t error;
 
 // ----------------------------------------------------------------------------
-// called when the UART has received a character
-// 
 ISR(USART{{ id }}_RX_vect)
 {
-	// read error flags
+	// first save the errors
 	error |= UCSR{{ id }}A & ((1 << FE{{ id }}) | (1 << DOR{{ id }}));
-	
+	// then read the buffer
 	uint8_t data = UDR{{ id }};
+	// push it into the buffer
 	rxBuffer.push(data);
 }
 
@@ -71,7 +70,7 @@ xpcc::{{target.family}}::Uart{{ id }}::read(uint8_t& data)
 std::size_t
 xpcc::{{target.family}}::Uart{{ id }}::read(uint8_t *buffer, std::size_t length)
 {
-	for (uint8_t i = 0; i < length; ++i)
+	for (std::size_t i = 0; i < length; ++i)
 	{
 		if (rxBuffer.isEmpty()) {
 			return length;
@@ -89,7 +88,7 @@ xpcc::{{target.family}}::Uart{{ id }}::read(uint8_t *buffer, std::size_t length)
 std::size_t
 xpcc::{{target.family}}::Uart{{ id }}::discardReceiveBuffer()
 {
-	uint8_t i(0);
+	std::size_t i(0);
 	while(!rxBuffer.isEmpty())
 	{
 		rxBuffer.pop();

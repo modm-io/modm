@@ -17,8 +17,6 @@
 static xpcc::atomic::Queue<uint8_t, {{parameters.tx_buffer}}> txBuffer;
 
 // ----------------------------------------------------------------------------
-// called when the UART is ready to transmit the next byte
-// 
 ISR(USART{{ id }}_UDRE_vect)
 {
 	if (txBuffer.isEmpty())
@@ -41,7 +39,7 @@ xpcc::{{target.family}}::Uart{{ id }}::writeBlocking(uint8_t data)
 	// wait until there is some place in the buffer
 	while (!write(data))
 		;
-	
+
 	// wait until everything has been sent
 	while (!isWriteFinished())
 		;
@@ -56,7 +54,7 @@ xpcc::{{target.family}}::Uart{{ id }}::writeBlocking(const uint8_t *data, std::s
 		while (!write(*data++))
 			;
 	}
-	
+
 	// then wait
 	while (!isWriteFinished())
 		;
@@ -76,12 +74,12 @@ xpcc::{{target.family}}::Uart{{ id }}::write(uint8_t data)
 {
 	if (!txBuffer.push(data))
 		return false;
-	
+
 	::xpcc::atomic::Lock lock;
-	
+
 	// enable UDRE interrupt
 	UCSR{{ id }}B |= (1 << UDRIE{{ id }});
-	
+
 	return true;
 }
 
@@ -95,7 +93,7 @@ xpcc::{{target.family}}::Uart{{ id }}::write(const uint8_t *data, std::size_t le
 			return i;
 		}
 	}
-	
+
 	return length;
 }
 
@@ -113,7 +111,7 @@ xpcc::{{target.family}}::Uart{{ id }}::discardTransmitBuffer()
 		::xpcc::atomic::Lock lock;
 		UCSR{{ id }}B &= ~(1 << UDRIE{{ id }});
 	}
-	
+
 	std::size_t i = 0;
 	while(!txBuffer.isEmpty())
 	{
