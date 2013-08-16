@@ -15,8 +15,7 @@
 #ifndef XPCC_STM32_{{ uart | upper }}_{{ id }}_HPP
 #define XPCC_STM32_{{ uart | upper }}_{{ id }}_HPP
 
-#include <cstddef>	// for std::size_t
-#include <stdint.h>
+#include <xpcc/architecture/peripheral/uart.hpp>
 #include "../../../type_ids.hpp"
 #include "uart_base.hpp"
 
@@ -30,7 +29,7 @@ namespace stm32
  * @author		Kevin Laeufer
  * @ingroup		stm32
  */
-class {{ uart ~ id }} : public UartBase
+class {{ uart ~ id }} : public UartBase, public ::xpcc::Uart
 {
 public:
 
@@ -45,80 +44,33 @@ public:
 	initialize(uint32_t baudrate, Parity parity = Parity::Disabled);
 %% endif
 
-	/// Write a single byte and wait for completion.
 	static void
 	writeBlocking(uint8_t data);
 
-	/// Write a block of bytes and wait for completion.
 	static void
 	writeBlocking(const uint8_t *data, std::size_t length);
 
-	/// Flush the write buffer, waits in a while loop until `isWriteFinished()` returns `true`
 	static void
 	flushWriteBuffer();
 
-	/**
-	 * Pushes a single byte into the buffer.
-	 *
-	 * @return	`true` if data has been buffered, `false` if buffer is full
-	 */
 	static bool
 	write(uint8_t data);
 
-	/**
-	 * Pushes a block of bytes into the buffer.
-	 *
-	 * @param	data
-	 *		Pointer to a buffer big enough to store `length` bytes
-	 * @param	length
-	 * 		Number of bytes to be written
-	 *
-	 * @return	the number of bytes pushed into the buffer, maximal `length`
-	 */
 	static std::size_t
 	write(const uint8_t *data, std::size_t length);
 
-	/// @return	`true` if the buffer is empty and the last byte has been sent
 	static bool
 	isWriteFinished();
 
-	/**
-	 * Empty the transmit FIFO queue and hardware buffer.
-	 *
-	 * @return	the size of the deleted FIFO queue.
-	 */
 	static std::size_t
 	discardTransmitBuffer();
 
-	/**
-	 * Read a single byte.
-	 *
-	 * @param[out]	data
-	 *		Byte read, if any
-	 *
-	 * @return	`true` if a byte was received, `false` otherwise
-	 */
 	static bool
 	read(uint8_t &data);
 
-	/**
-	 * Read a block of bytes.
-	 *
-	 * @param[out]	buffer
-	 *		Pointer to a buffer big enough to store `length` bytes
-	 * @param		length
-	 *		Number of bytes to be read
-	 *
-	 * @return	Number of bytes which could be read, maximal `length`
-	 */
 	static std::size_t
 	read(uint8_t *buffer, std::size_t length);
 
-	/**
-	 * Empty the receive FIFO queue and hardware buffer.
-	 *
-	 * @return	the size of the deleted FIFO queue.
-	 */
 	static std::size_t
 	discardReceiveBuffer();
 };
