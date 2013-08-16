@@ -66,10 +66,12 @@ private:	// This methods can only be executed while UART is
 	setParity(const Parity parity);
 
 public:
+	/// TypeId used to connect GPIO pins to this peripheral's rx.
+	static const TypeId::{{ uart ~ "Hal" ~ id }}Rx Rx;
+	/// TypeId used to connect GPIO pins to this peripheral's tx.
+	static const TypeId::{{ uart ~ "Hal" ~ id }}Tx Tx;
 
-	/// TypeId used to connect GPIO pins to this peripheral.
-	static const TypeId::{{ uart ~ "Hal" ~ id }} Id;
-
+public:
 	/// Enables the clock, resets the hardware and sets the UE bit
 	static inline void
 	enable();

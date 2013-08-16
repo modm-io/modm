@@ -32,10 +32,12 @@ namespace stm32
 class {{ uart ~ id }} : public UartBase, public ::xpcc::Uart
 {
 public:
+	/// TypeId used to connect GPIO pins to this peripheral's rx.
+	static const TypeId::{{ uart ~ id }}Rx Rx;
+	/// TypeId used to connect GPIO pins to this peripheral's tx.
+	static const TypeId::{{ uart ~ id }}Tx Tx;
 
-	/// TypeId used to connect GPIO pins to this peripheral.
-	static const TypeId::{{ uart ~ "Hal" ~ id }} Id;
-
+public:
 	static void
 %% if parameters.buffered
 	initialize(uint32_t baudrate, uint32_t interruptPriority,

@@ -53,9 +53,9 @@
 			<gpio port="A" id="0">
 				<!-- This makes the GPIO connect to specific peripheral
 					 drivers. -->
-				<af id="1" peripheral="Timer2" description="Channel1, ETR"/>
-				<af id="2" peripheral="Timer5" description="Channel1"/>
-				<af id="3" peripheral="Timer8" description="ETR"/>
+				<af id="1" peripheral="Timer2" name="Channel1"/>
+				<af id="2" peripheral="Timer5" name="Channel1"/>
+				<af id="3" peripheral="Timer8" name="ETR"/>
 				<!-- <af id="7" peripheral="Usart2" description="CTS"/> -->
 				<!-- <af id="8" peripheral="Uart4" type="Output" description="TX"/> -->
 			</gpio>

@@ -41,24 +41,24 @@
 				<af id="0" peripheral="MCO" description="Clock Output"/>
 			</gpio>
 			<gpio port="A" id="2">
-				<af id="7" peripheral="UsartHal2" description="Tx" type="output"/>
+				<af id="7" peripheral="UsartHal2" name="Tx" type="output"/>
 			</gpio>
 			<gpio port="A" id="3">
-				<af id="7" peripheral="UsartHal2" description="Rx" type="input"/>
+				<af id="7" peripheral="UsartHal2" name="Rx" type="input"/>
 			</gpio>
 			<gpio port="A" id="9">
-				<af id="7" peripheral="UsartHal1" description="Tx" type="output"/>
-				<af id="7" peripheral="Usart1" description="Tx" type="output"/>
+				<af id="7" peripheral="UsartHal1" name="Tx" type="output"/>
+				<af id="7" peripheral="Usart1" name="Tx" type="output"/>
 			</gpio>
 			<gpio port="A" id="10">
-				<af id="7" peripheral="UsartHal1" description="Rx" type="input"/>
-				<af id="7" peripheral="Usart1" description="Rx" type="input"/>
+				<af id="7" peripheral="UsartHal1" name="Rx" type="input"/>
+				<af id="7" peripheral="Usart1" name="Rx" type="input"/>
 			</gpio>
 			<gpio port="B" id="10">
-				<af id="7" peripheral="UsartHal3" description="Tx" type="output"/>
+				<af id="7" peripheral="UsartHal3" name="Tx" type="output"/>
 			</gpio>
 			<gpio port="B" id="11">
-				<af id="7" peripheral="UsartHal3" description="Rx" type="input"/>
+				<af id="7" peripheral="UsartHal3" name="Rx" type="input"/>
 			</gpio>
 			<gpio port="E" id="8"  pin-count="100+"></gpio>
 			<gpio port="E" id="9"  pin-count="100+"></gpio>

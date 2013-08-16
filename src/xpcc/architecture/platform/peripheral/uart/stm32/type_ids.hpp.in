@@ -32,24 +32,23 @@
 
 namespace xpcc
 {
-	namespace stm32
-	{
-		namespace TypeId
-		{
-			typedef struct{} UsartHal1;
-			typedef struct{} UsartHal2;
-			typedef struct{} UsartHal3;
-			typedef struct{} UartHal4;
-			typedef struct{} UartHal5;
-			typedef struct{} UsartHal6;
-			typedef struct{} Usart1;
-			typedef struct{} Usart2;
-			typedef struct{} Usart3;
-			typedef struct{} Uart4;
-			typedef struct{} Uart5;
-			typedef struct{} Usart6;
-		}
-	}
+namespace stm32
+{
+namespace TypeId
+{
+%% for id in [1,2,3,4,5,6]
+	%% if id in [1, 2, 3, 6]
+	%%	set uart = "Usart"
+	%% elif id in [4, 5]
+	%%	set uart = "Uart"
+	%% endif
+	typedef struct{} {{ uart }}Hal{{ id }}Rx;
+	typedef struct{} {{ uart }}Hal{{ id }}Tx;
+	typedef struct{} {{ uart }}{{ id }}Rx;
+	typedef struct{} {{ uart }}{{ id }}Tx;
+%% endfor
+}
+}
 }
 
 #endif /* XPCC__STM32_TIMER_TYPE_IDS_HPP */

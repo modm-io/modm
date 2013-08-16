@@ -352,9 +352,9 @@ namespace xpcc
 	%%	set use = not (	(af.type|lower == "input"  and type == "Output") or
 						(af.type|lower == "output" and type == "Input" ))
 	%%	if use
-			//! Connect {{name}} as {{af.description}} to {{af.peripheral}}.
+			//! Connect {{name}} as {{af.name}} to {{af.peripheral}}.
 			ALWAYS_INLINE static void
-			connect(TypeId::{{ af.peripheral }} t) {
+			connect(TypeId::{{ af.peripheral }}{{ af.name }} t) {
 				(void) t; // avoid compiler warning
 				setAlternateFunction(AlternateFunction::AF_{{ af.id }});
 			}

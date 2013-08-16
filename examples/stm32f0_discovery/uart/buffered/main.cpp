@@ -27,13 +27,13 @@ MAIN_FUNCTION
 	//	SystemClock<Pll<ExternalOscillator<MHz8>, MHz48>>::enable();
 
 	// Initialize Usart1 (which needs to be buffered)
-	UART1_TX::connect(Usart1::Id);
-	UART1_RX::connect(Usart1::Id);
+	UART1_TX::connect(Usart1::Tx);
+	UART1_RX::connect(Usart1::Rx);
 	Usart1::initialize(115200, 12);
 
 	// Initialize Usart2
-	UART2_TX::connect(Usart2::Id);
-	UART2_RX::connect(Usart2::Id);
+	UART2_TX::connect(Usart2::Tx);
+	UART2_RX::connect(Usart2::Rx);
 	Usart2::initialize(115200, 13);
 
 	// Test Blocks

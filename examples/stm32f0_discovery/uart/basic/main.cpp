@@ -15,8 +15,8 @@ MAIN_FUNCTION
 	//	SystemClock<Pll<ExternalOscillator<MHz8>, MHz48>>::enable();
 
 	// Initialize Usart
-	UART2_TX::connect(Usart2::Id);
-	UART2_RX::connect(Usart2::Id);
+	UART2_TX::connect(Usart2::Tx);
+	UART2_RX::connect(Usart2::Rx);
 	Usart2::initialize(115200);
 
 	// If you want to output strings more comfortably

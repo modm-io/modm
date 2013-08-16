@@ -15,8 +15,8 @@ MAIN_FUNCTION
 	//	SystemClock<Pll<ExternalOscillator<MHz8>, MHz48>>::enable();
 
 	// Initialize Usart Hal
-	UART2_TX::connect(UsartHal2::Id);
-	UART2_RX::connect(UsartHal2::Id);
+	UART2_TX::connect(UsartHal2::Tx);
+	UART2_RX::connect(UsartHal2::Rx);
 	UsartHal2::initialize(115200, UsartHal2::Parity::Odd);
 	UsartHal2::enableInterruptVector(true, 14);
 	UsartHal2::enableInterrupt(UsartHal2::Interrupt::TxEmpty);
