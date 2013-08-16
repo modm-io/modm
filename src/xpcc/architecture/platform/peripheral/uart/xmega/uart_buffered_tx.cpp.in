@@ -1,0 +1,123 @@
+// coding: utf-8
+/* Copyright (c) 2009, Roboterclub Aachen e.V.
+ * All Rights Reserved.
+ *
+ * The file is part of the xpcc library and is released under the 3-clause BSD
+ * license. See the file `LICENSE` for the full license governing this code.
+ */
+// ----------------------------------------------------------------------------
+{{ generation_block }}
+
+#include <xpcc/architecture/driver/atomic/queue.hpp>
+#include <xpcc/architecture/driver/atomic/lock.hpp>
+
+#include "uart_{{ id.lower() }}.hpp"
+
+static xpcc::atomic::Queue<uint8_t, {{parameters.tx_buffer}}> txBuffer;
+
+// ----------------------------------------------------------------------------
+ISR(USART{{ id }}_DRE_vect)
+{
+	if (txBuffer.isEmpty())
+	{
+		// transmission finished, disable DRE interrupt
+		USART{{ id }}_CTRLA = USART_RXCINTLVL_MED_gc;
+	}
+	else {
+		// get one byte from buffer and write it to the UART buffer
+		// which starts the transmission
+		USART{{ id }}_DATA = txBuffer.get();
+		txBuffer.pop();
+	}
+}
+
+// MARK: - write blocking
+void
+xpcc::xmega::Uart{{ id }}::writeBlocking(uint8_t data)
+{
+	// wait until there is some place in the buffer
+	while (!write(data))
+		;
+
+	// wait until everything has been sent
+	while (!isWriteFinished())
+		;
+}
+
+void
+xpcc::xmega::Uart{{ id }}::writeBlocking(const uint8_t *data, std::size_t length)
+{
+	// first push everything into the buffer
+	for (std::size_t i = 0; i < length; ++i)
+	{
+		while (!write(*data++))
+			;
+	}
+
+	// then wait
+	while (!isWriteFinished())
+		;
+}
+
+void
+xpcc::xmega::Uart{{ id }}::flushWriteBuffer()
+{
+	// just wait until the last byte has been sent
+	while (!isWriteFinished())
+		;
+}
+
+// MARK: - write
+bool
+xpcc::xmega::Uart{{ id }}::write(uint8_t data)
+{
+	if (!txBuffer.push(data))
+		return false;
+	
+	::xpcc::atomic::Lock lock;
+	
+	// enable DRE interrupt
+	USART{{ id }}_CTRLA = USART_RXCINTLVL_MED_gc | USART_DREINTLVL_MED_gc;
+	
+	return true;
+}
+
+std::size_t
+xpcc::xmega::Uart{{ id }}::write(const uint8_t *data, std::size_t length)
+{
+	for (std::size_t i = 0; i < length; ++i)
+	{
+		if (!write(*data++))
+		{
+			return i;
+		}
+	}
+
+	return length;
+}
+
+bool
+xpcc::xmega::Uart{{ id }}::isWriteFinished()
+{
+	return (txBuffer.isEmpty() && (USART{{ id }}_STATUS & USART_DREIF_bm));
+}
+
+// MARK: - discard
+std::size_t
+xpcc::xmega::Uart{{ id }}::discardTransmitBuffer()
+{
+	{
+		::xpcc::atomic::Lock lock;
+		USART{{ id }}_CTRLA = USART_RXCINTLVL_MED_gc;
+	}
+
+	std::size_t i = 0;
+	while(!txBuffer.isEmpty())
+	{
+		txBuffer.pop();
+		++i;
+	}
+
+	return i;
+}
+
