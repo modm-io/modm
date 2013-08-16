@@ -187,7 +187,7 @@ class DriverFile:
 						if output.endswith('.in'):
 							output = output[:-3]
 					else: # replace '{{id}}' with id
-						output = output.replace('{{id}}', instance_id)
+						output = output.replace('{{id}}', instance_id.lower())
 					template = self._makeRelativeToPlatform(template)
 					output = self._makeRelativeToPlatform(output)
 					if instance_id.isdigit():
