@@ -9,7 +9,7 @@
 {{ generation_block }}
 
 #include <xpcc/architecture/driver/atomic/lock.hpp>
-#include "i2c_master_{{ id }}.hpp"
+#include "i2c_master_{{ id.lower() }}.hpp"
 
 // uncomment to debug your driver using simple uart
 /*

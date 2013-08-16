@@ -18,10 +18,17 @@ namespace xmega
 
 namespace TypeId
 {
-	typedef struct{} I2cC;
-	typedef struct{} I2cD;
-	typedef struct{} I2cE;
-	typedef struct{} I2cF;
+	typedef struct{} I2cMasterCSda;
+	typedef struct{} I2cMasterCScl;
+
+	typedef struct{} I2cMasterDSda;
+	typedef struct{} I2cMasterDScl;
+
+	typedef struct{} I2cMasterESda;
+	typedef struct{} I2cMasterEScl;
+
+	typedef struct{} I2cMasterFSda;
+	typedef struct{} I2cMasterFScl;
 }
 
 } // namespace xmega
