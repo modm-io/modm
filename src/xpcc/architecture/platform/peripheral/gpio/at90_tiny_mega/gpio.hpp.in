@@ -401,7 +401,7 @@ public:
 
 /// @ingroup {{target.family}}
 template< uint8_t START_PIN, uint8_t WIDTH >
-class GpioPort{{port.name}} : public ::xpcc::GpioOctet, public Gpio
+class GpioPort{{port.name}} : public ::xpcc::GpioPort, public Gpio
 {
 	static_assert(START_PIN < {{port.startPin + port.width}}, "START_PIN too large, maximum {{port.startPin + port.width}}.");
 	static_assert(WIDTH <= {{port.width}}, "WIDTH too large, maximum {{port.width}}.");
@@ -432,7 +432,7 @@ public:
 };
 
 template<>
-class GpioPort{{port.name}}< 0, 8 > : public ::xpcc::GpioOctet, public Gpio
+class GpioPort{{port.name}}< 0, 8 > : public ::xpcc::GpioPort, public Gpio
 {
 public:
 	static constexpr uint8_t width = 8;

@@ -18,7 +18,7 @@ typedef xpcc::GpioInverted< Led2 > LedInverted;
 
 typedef GpioPortD<0, 8> Data;
 typedef GpioPortD<2, 5> Data3;
-typedef xpcc::SoftwareGpioOctet<GpioC1, GpioC4, GpioB6, GpioB3, GpioB5> Data2;
+typedef xpcc::SoftwareGpioPort<GpioC1, GpioC4, GpioB6, GpioB3, GpioB5> Data2;
 
 static_assert(Data::width == 8, "Data::width is not 8");
 static_assert(Data2::width == 5, "Data2::width is not 5");
