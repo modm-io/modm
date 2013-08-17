@@ -260,6 +260,7 @@ public:
 	}
 
 	ALWAYS_INLINE static bool read() {
+		(void) {{pin}};
 		return (PORT{{port}}_IN & mask);
 	}
 	%# end documentation inherited
@@ -323,7 +324,7 @@ public:
 
 /// @ingroup xmega
 template< uint8_t START_PIN, uint8_t WIDTH >
-class GpioPort{{port.name}} : public ::xpcc::GpioOctet, public Gpio
+class GpioPort{{port.name}} : public ::xpcc::GpioPort, public Gpio
 {
 	static_assert(START_PIN >= {{port.startPin}}, "START_PIN too small, minimum {{port.startPin}}.");
 	static_assert(START_PIN < {{port.startPin + port.width}}, "START_PIN too large, maximum {{port.startPin + port.width}}.");

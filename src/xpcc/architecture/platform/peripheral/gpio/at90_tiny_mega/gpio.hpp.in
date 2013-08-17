@@ -89,6 +89,14 @@ public:
 	ALWAYS_INLINE static bool read() {
 		return IO::read();
 	}
+	ALWAYS_INLINE static void
+	connect(::xpcc::TypeId::SoftwareI2cMasterSda) {
+		set();
+	}
+	ALWAYS_INLINE static void
+	connect(::xpcc::TypeId::SoftwareI2cMasterScl) {
+		set();
+	}
 };
 template< class IO >
 class GpioOpenDrainWithPullUp : Gpio
@@ -108,6 +116,14 @@ public:
 	}
 	ALWAYS_INLINE static bool read() {
 		return IO::read();
+	}
+	ALWAYS_INLINE static void
+	connect(::xpcc::TypeId::SoftwareI2cMasterSda) {
+		set();
+	}
+	ALWAYS_INLINE static void
+	connect(::xpcc::TypeId::SoftwareI2cMasterScl) {
+		set();
 	}
 };
 /// @}
@@ -352,8 +368,7 @@ public:
 
 		%% if type in ['', 'Output']
 			%% for peripheral in   ['SoftwareSpiMasterMosi',
-									'SoftwareSpiMasterSck',
-									'SoftwareI2cMasterScl']
+									'SoftwareSpiMasterSck']
 	/// Connect to `{{peripheral}}`.
 	ALWAYS_INLINE static void
 	connect(::xpcc::TypeId::{{ peripheral }}) {
@@ -370,7 +385,7 @@ public:
 	}
 			%% endfor
 		%% endif
-		%% for peripheral in ['SoftwareI2cMasterSda']
+		%% for peripheral in []
 	/// Connect to `{{peripheral}}`.
 	ALWAYS_INLINE static void
 	connect(::xpcc::TypeId::{{ peripheral }}) {}

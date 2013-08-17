@@ -175,99 +175,92 @@ namespace xpcc
 		}
 	};
 
+
 	/**
-	 * Create a 8-bit port from arbitrary pins.
+	 * Create an up to 16-bit port from arbitrary pins.
 	 *
 	 * Be aware that this method is slow, because for every write or read
-	 * cycle, every of the eight pins have to be read/written
-	 * individually.
+	 * cycle, every of the eight pins have to be read/written individually.
 	 *
 	 * This class is included here because it can be very useful sometimes,
-	 * for example when connecting a LCD where speed is not the main
-	 * concern.
+	 * for example when connecting a LCD where speed is not the main concern.
 	 *
-	 * When possible prefer the native `GpioPort` implementations
+	 * Whenever possible prefer the native `GpioPort` implementations
 	 * over this class as they are much faster and require less code.
+	 *
+	 * This class optimizes the type size for the `read()` and `write()`
+	 * methods.
+	 * Supplying up to 8 Gpios will use `uint8_t`, up to 16 Gpios will use
+	 * `uint16_t`.
 	 *
 	 * @ingroup	gpio
 	 */
-	template <typename T0 = GpioUnused,
-			  typename T1 = GpioUnused,
-			  typename T2 = GpioUnused,
-			  typename T3 = GpioUnused,
-			  typename T4 = GpioUnused,
-			  typename T5 = GpioUnused,
-			  typename T6 = GpioUnused,
-			  typename T7 = GpioUnused>
-	class SoftwareGpioOctet : public GpioOctet
+	template<typename... Gpios>
+	class SoftwareGpioPort : public GpioPort {};
+
+	/// @private
+	template<typename Gpio, typename... Gpios>
+	class SoftwareGpioPort<Gpio, Gpios...> : private SoftwareGpioPort<Gpios...>
 	{
 	public:
-		static constexpr uint8_t width =
-			(xpcc::tmp::SameType<T0, GpioUnused>::value ? 0 : 1) +
-			(xpcc::tmp::SameType<T1, GpioUnused>::value ? 0 : 1) +
-			(xpcc::tmp::SameType<T2, GpioUnused>::value ? 0 : 1) +
-			(xpcc::tmp::SameType<T3, GpioUnused>::value ? 0 : 1) +
-			(xpcc::tmp::SameType<T4, GpioUnused>::value ? 0 : 1) +
-			(xpcc::tmp::SameType<T5, GpioUnused>::value ? 0 : 1) +
-			(xpcc::tmp::SameType<T6, GpioUnused>::value ? 0 : 1) +
-			(xpcc::tmp::SameType<T7, GpioUnused>::value ? 0 : 1);
+		static constexpr uint8_t width = 1 + SoftwareGpioPort<Gpios...>::width;
+	private:
+		typedef typename xpcc::tmp::Select< (width > 8),
+											uint16_t,
+											uint8_t >::Result Index;
+		typedef Index Size;
 
 	public:
-		static inline void
+		static void
 		setOutput()
 		{
-			T7::setOutput();
-			T6::setOutput();
-			T5::setOutput();
-			T4::setOutput();
-			T3::setOutput();
-			T2::setOutput();
-			T1::setOutput();
-			T0::setOutput();
+			Gpio::setOutput();
+			SoftwareGpioPort<Gpios...>::setOutput();
 		}
 
-		static inline void
+		static void
 		setInput()
 		{
-			T7::setInput();
-			T6::setInput();
-			T5::setInput();
-			T4::setInput();
-			T3::setInput();
-			T2::setInput();
-			T1::setInput();
-			T0::setInput();
+			Gpio::setInput();
+			SoftwareGpioPort<Gpios...>::setInput();
 		}
 
-		static inline uint8_t
+		static Size
 		read()
 		{
-			uint8_t value = 0;
-
-			if (T7::read()) { value |= 0b10000000; }
-			if (T6::read()) { value |= 0b01000000; }
-			if (T5::read()) { value |= 0b00100000; }
-			if (T4::read()) { value |= 0b00010000; }
-			if (T3::read()) { value |= 0b00001000; }
-			if (T2::read()) { value |= 0b00000100; }
-			if (T1::read()) { value |= 0b00000010; }
-			if (T0::read()) { value |= 0b00000001; }
-
-			return value;
+			Size data = SoftwareGpioPort<Gpios...>::read();
+			if (Gpio::read()) {
+				data |= (1 << (width-1));
+			}
+			return data;
 		}
 
-		static inline void
-		write(uint8_t data)
+		static void
+		write(Size data)
 		{
-			T7::set(data & 0b10000000);
-			T6::set(data & 0b01000000);
-			T5::set(data & 0b00100000);
-			T4::set(data & 0b00010000);
-			T3::set(data & 0b00001000);
-			T2::set(data & 0b00000100);
-			T1::set(data & 0b00000010);
-			T0::set(data & 0b00000001);
+			Gpio::set(data & (1 << (width-1)));
+			SoftwareGpioPort<Gpios...>::write(data);
 		}
+	};
+
+	/// @private
+	template<>
+	class SoftwareGpioPort<>
+	{
+	public:
+		static constexpr uint8_t width = 0;
+
+		static void
+		setOutput() {}
+
+		static void
+		setInput() {}
+
+		static uint16_t
+		read() { return 0; }
+
+		static void
+		write(uint16_t /*data*/) {}
 	};
 
 	/**
@@ -302,10 +295,10 @@ namespace xpcc
 			  typename T13 = GpioUnused,
 			  typename T14 = GpioUnused,
 			  typename T15 = GpioUnused>
-	class SoftwareGpioWord : public GpioWord
+	class SoftwareGpioWord : public GpioPort
 	{
 	public:
-		static constexpr uint16_t width =
+		static constexpr uint8_t width =
 			(xpcc::tmp::SameType<T0,  GpioUnused>::value ? 0 : 1) +
 			(xpcc::tmp::SameType<T1,  GpioUnused>::value ? 0 : 1) +
 			(xpcc::tmp::SameType<T2,  GpioUnused>::value ? 0 : 1) +
@@ -322,6 +315,11 @@ namespace xpcc
 			(xpcc::tmp::SameType<T13, GpioUnused>::value ? 0 : 1) +
 			(xpcc::tmp::SameType<T14, GpioUnused>::value ? 0 : 1) +
 			(xpcc::tmp::SameType<T15, GpioUnused>::value ? 0 : 1);
+	private:
+		typedef typename xpcc::tmp::Select< (width > 8),
+											uint16_t,
+											uint8_t >::Result Index;
+		typedef Index Size;
 
 	public:
 		static void
@@ -366,10 +364,10 @@ namespace xpcc
 			T0::setInput();
 		}
 
-		static uint16_t
+		static Size
 		read()
 		{
-			uint16_t value = 0;
+			Size value = 0;
 
 			if (T15::read()) { value |= 0b1000000000000000; }
 			if (T14::read()) { value |= 0b0100000000000000; }
@@ -392,7 +390,7 @@ namespace xpcc
 		}
 
 		static void
-		write(uint16_t data)
+		write(Size data)
 		{
 			T15::set(data & 0b1000000000000000);
 			T14::set(data & 0b0100000000000000);

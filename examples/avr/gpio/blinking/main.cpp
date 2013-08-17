@@ -11,28 +11,67 @@
 using namespace xpcc::xmega;
 
 typedef GpioOutputB0 Led;
-typedef GpioOutputB1 Led2;
 
-typedef xpcc::GpioInverted< Led2 > LedInverted;
+typedef xpcc::SoftwareGpioPort<GpioB6, GpioB5, GpioB4, GpioB3, GpioB2, GpioB1, GpioB0> Data3;
+typedef xpcc::SoftwareGpioWord<GpioB0, GpioB1, GpioB2, GpioB3, GpioB4, GpioB5, GpioB6> Data4;
 
-typedef GpioPortD<0, 8> Data;
-typedef GpioPortD<2, 5> Data2;
-typedef xpcc::SoftwareGpioOctet<GpioC1, GpioC4, GpioB6, GpioB3, GpioB5> Data3;
+/*
+#define USE_TEMPLATES
+
+#ifdef USE_TEMPLATES
+
+// Interrupt Handler
+template<void (*interruptFunction)(void)>
+class UartHandler
+{
+	static void
+	Handler(void) __asm__(STRINGIFY(USARTF0_RXC_vect)) __attribute__((__signal__, __used__, __externally_visible__));
+};
+
+template<void (*interruptFunction)(void)>
+void
+UartHandler<interruptFunction>::Handler(void)
+{
+	Led::set();
+}
+
+void hello() {
+	Led::reset();
+}
+
+template class UartHandler<hello>;
+
+#else
+
+class UartHandler
+{
+	static void
+	Handler(void) __asm__(STRINGIFY(USARTF0_RXC_vect)) __attribute__((__signal__, __used__, __externally_visible__));
+};
+
+void
+UartHandler::Handler(void)
+{
+	Led::set();
+}
+#endif//*/
 
 int
 main(void)
 {
-	Led::setOutput();
-	Led::set();
+	Data3::setOutput();
 
-	Led2::setOutput();
+	volatile uint8_t write = 0xff;
+	volatile uint8_t read = 0;
 
-	Data::setOutput();
-	Data::write(0x0f);
+	Data3::write(write);
+	Data4::write(write);
 
-	while (1)
-	{
-		Led::toggle();
-		xpcc::delay_ms(500);
-	}
+	read = Data3::read();
+	read = Data4::read();
+	(void) read;
+
+	while(1)
+		;
 }
+

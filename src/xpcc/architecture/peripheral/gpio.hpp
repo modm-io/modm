@@ -217,41 +217,6 @@ class GpioIO : GpioOutput, GpioInput
 };
 
 /**
- * Input/output interface of a set of up to 8 I/O pins.
- *
- * This class provides the interface for up to 8 parallel IOs.
- * Be aware that the interface is the same regardless of the actual
- * mapping of the IOs.
- * For example, when a high nibble (0xe0) is physically configured, the
- * data will still be written and read as a low nibble (0x0e).
- *
- * This class is only used on 8bit platforms.
- *
- * @ingroup	gpio
- */
-class GpioOctet
-{
-#ifdef __DOXYGEN__
-	/// this can be used in drivers to assert the correct requirements
-	static constexpr uint8_t width;
-public:
-	static void
-	setOutput();
-
-	static void
-	setInput();
-
-	/// The read data is always right-aligned regardless of physical mapping.
-	static uint8_t
-	read();
-
-	/// The write data is always right-aligned regardless of physical mapping.
-	static void
-	write(uint8_t data);
-#endif
-};
-
-/**
  * Input/output interface of a set of up to 16 I/O pins.
  *
  * This class provides the interface for up to 16 parallel IOs.
@@ -262,7 +227,7 @@ public:
  *
  * @ingroup	gpio
  */
-class GpioWord
+class GpioPort
 {
 #ifdef __DOXYGEN__
 public:
