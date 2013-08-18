@@ -148,16 +148,10 @@ public:
 	}
 	
 	/// @warning some Xmegas output only channel 7 regardless of selection
-	ALWAYS_INLINE static void enableEventChannelOutput(Output output, uint8_t
-#ifdef PORTCFG_EVCTRL
-	channel
-#endif
-	) {
+	ALWAYS_INLINE static void enableEventChannelOutput(Output output, uint8_t channel) {
 		PORTCFG_CLKEVOUT = (PORTCFG_CLKEVOUT & ~(PORTCFG_CLKEVPIN_bm | PORTCFG_EVOUT_gm)) |
 				(i(output) & (PORTCFG_CLKEVPIN_bm | PORTCFG_EVOUT_gm));
-#ifdef PORTCFG_EVCTRL
-		PORTCFG_EVCTRL = (PORTCFG_EVCTRL & ~0x07) | (channel & 0x07);
-#endif
+		PORTCFG_EVOUTSEL = (PORTCFG_EVOUTSEL & ~PORTCFG_EVOUTSEL_gm) | (channel & PORTCFG_EVOUTSEL_gm);
 	}
 	ALWAYS_INLINE static void disableEventChannelOutput() {
 		PORTCFG_CLKEVOUT &= ~PORTCFG_EVOUT_gm;
@@ -178,9 +172,7 @@ public:
 %% for gpio in gpios
 	%% set port = gpio.port | upper
 	%% set pin  = gpio.id
-			
 	%% for type in ["Output", "Input", ""] 
-		
 		%% if type == "Output"
 class GpioOutput{{port ~ pin}} : public Gpio, ::xpcc::GpioOutput
 		%% elif type == "Input"
@@ -202,20 +194,18 @@ public:
 		PORT{{port}}_PIN{{pin}}CTRL = (PORT{{port}}_PIN{{pin}}CTRL & ~(PORT_OPC_gm | PORT_INVEN_bm)) |
 				i(config) | (invert == Inverted::Yes) ? PORT_INVEN_bm : 0;
 	}
-	%# OUTPUT
 		%% if type in ["", "Output"]
+	// GpioInput
 	ALWAYS_INLINE static void setOutput(bool status) {
 		set(status);
 		setOutput();
 	}
-	
 	ALWAYS_INLINE static void setOutput(Configuration config,
 										Inverted invert = Inverted::No) {
 		configure(config, invert);
 		setOutput();
 	}
-	
-	%# start documentation inherited
+	// start documentation inherited
 	ALWAYS_INLINE static void setOutput() {
 		PORT{{port}}_DIRSET = mask;
 	}
@@ -232,8 +222,7 @@ public:
 	ALWAYS_INLINE static void toggle() {
 		PORT{{port}}_OUTTGL = mask;
 	}
-	%# end documentation inherited
-	
+	// end documentation inherited
 	ALWAYS_INLINE static void enableSlewRateLimit() {
 		PORT{{port}}_PIN{{pin}}CTRL |= PORT_SRLEN_bm;
 	}
@@ -241,15 +230,14 @@ public:
 		PORT{{port}}_PIN{{pin}}CTRL &= ~PORT_SRLEN_bm;
 	}
 		%% endif
-	%# INPUT
 		%% if type in ["", "Input"]
+	// GpioInput
 	ALWAYS_INLINE static void setInput(Configuration config,
 										Inverted invert = Inverted::No) {
 		setInput();
 		configure(config, invert);
 	}
-
-	%# start documentation inherited
+	// start documentation inherited
 	ALWAYS_INLINE static void
 	setInput() {
 		 PORT{{port}}_DIRCLR = mask; 
@@ -258,8 +246,7 @@ public:
 		(void) {{pin}};
 		return (PORT{{port}}_IN & mask);
 	}
-	%# end documentation inherited
-	
+	// end documentation inherited
 	ALWAYS_INLINE static void setInputTrigger(InputTrigger trigger) {
 		PORT{{port}}_PIN{{pin}}CTRL = (PORT{{port}}_PIN{{pin}}CTRL & ~PORT_ISC_gm) | i(trigger);
 	}
@@ -299,11 +286,36 @@ public:
 	}
 			%% endif
 		%% endif
+	// connect: Hardware Gpio
 		%% for af in gpio.afs
 			{% if af.type == 'in' and type == 'Input' or
 			 af.type == 'out' and type == 'Output' or
 			 af.type == 'io' or type == "" %}
 	/// Connect `{{port~pin}}` as `{{af.name}}` to `{{af.peripheral}}`.
+				%% if 'remap' in af
+					%% if af.peripheral.startswith('Spi')
+	/// This method remaps the following SpiMaster connections: 
+						%% if af.remap == 'True'
+	/// Mosi to pin 7 to and Sck to pin 5.
+						%% else
+	/// Mosi to pin 5 to and Sck to pin 7.
+						%% endif
+					%% elif af.peripheral.startswith('UartSpi')
+	/// This method remaps the following UartSpiMaster 0 connections:
+						%% if af.remap == 'True'
+	/// Sck to pin 5, Miso/Somi to pin 6 and Mosi/Simo to pin 7.
+						%% else
+	/// Sck to pin 1, Miso/Somi to pin 2 and Mosi/Simo to pin 3.
+						%% endif
+					%% elif af.peripheral.startswith('TimerCounter')
+						%% set inst = af.name[2:]|upper
+						%% if af.remap == 'True' and inst in ['A', 'B']
+	/// This method remaps the Output Compare {{inst}} of TimerCounter 0
+	/// onto the Output Compare {{inst}} of TimerCounter 1.
+	/// The resulting PWM will be an OR-modulation between the two PWM outputs.
+						%% endif
+					%% endif
+				%% endif
 	ALWAYS_INLINE static void
 	connect(TypeId::{{ af.peripheral }}{{ af.name }}) {
 				%% if 'remap' in af
@@ -331,7 +343,7 @@ public:
 	}
 			%% endif
 		%% endfor
-	%# Software Gpio
+	// connect: Software Gpio
 		%% if type in ['', 'Output']
 			%% for peripheral in   ['SoftwareSpiMasterMosi',
 									'SoftwareSpiMasterSck']
