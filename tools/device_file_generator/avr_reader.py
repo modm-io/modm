@@ -115,6 +115,66 @@ class AVRDeviceReader(XMLDeviceReader):
 					if not name.endswith("SPI"):
 						modules.append(name)
 						continue
+			
+			for peripheral in modules:
+				base = None
+				for per in ["TWI", "USART", "SPI", "ADC", "USB", "DAC", "TC"]:
+					if peripheral.startswith(per):
+						base = per
+						break
+				if base:
+					port = peripheral.replace(base, "")
+					base = base.lower()
+					instance = None
+					if len(port) == 2:
+						instance = port[1:]
+						port = port[:1]
+					if base in avr_io.xmega_peripheral_pins:
+						module = list(avr_io.xmega_peripheral_pins[base])
+						for pin in [p for p in module if instance == None or instance == p["instance"]]:
+							for gpio in [g for g in gpios if g['port'] == port and g['id'] == pin['id']]:
+								if base == 'twi':
+									af = {'peripheral' : 'I2cMaster' + port,
+										  'name': pin['name'].capitalize(),
+										  'type': pin['dir']}
+									gpio['af'].append(af)
+								elif base == 'spi':
+									af = {'peripheral' : 'SpiMaster' + port,
+										  'name': pin['name'].capitalize(),
+										  'type': pin['dir']}
+									if 'remap' in pin:
+										af.update({'remap': pin['remap']})
+									gpio['af'].append(af)
+									negate = {'in': 'out', 'out': 'in', 'io': 'io'}
+									repl = {'mosi': 'simo', 'miso': 'somi', 'sck': 'sck', 'ss': 'ss'}
+									af2 = {'peripheral' : 'SpiSlave' + port,
+										  'name': repl[pin['name']].capitalize(),
+										  'type': negate[pin['dir']]}
+									if 'remap' in pin:
+										af2.update({'remap': pin['remap']})
+									gpio['af'].append(af2)
+								elif base == 'usart':
+									af = {'peripheral' : 'Uart' + port + instance,
+										  'name': pin['name'].capitalize(),
+										  'type': pin['dir']}
+									if 'remap' in pin:
+										af.update({'remap': pin['remap']})
+									gpio['af'].append(af)
+									repl = {'txd': 'mosi', 'rxd': 'miso', 'xck': 'sck'}
+									af = {'peripheral' : 'UartSpiMaster' + port + instance,
+										  'name': repl[pin['name']].capitalize(),
+										  'type': pin['dir']}
+									if 'remap' in pin:
+										af.update({'remap': pin['remap']})
+									gpio['af'].append(af)
+								elif base == 'tc':
+									af = {'peripheral' : 'TimerCounter' + port + instance,
+										  'name': pin['name'].capitalize(),
+										  'type': pin['dir']}
+									if 'remap' in pin:
+										af.update({'remap': pin['remap']})
+									gpio['af'].append(af)
+			
 		else:
 			for mod in self.query("//modules/module"):
 				name = mod.get('name')
@@ -130,53 +190,53 @@ class AVRDeviceReader(XMLDeviceReader):
 					peripherals.append(module)
 					continue
 		
-		for pin_array in [a for a in avr_io.pins if self.properties['mmcu'] in a['devices']]:
-			for name in ['pcint', 'extint']:
-				if name in pin_array:
-					for module in pin_array[name]:
-						for gpio in [g for g in gpios if g['port'] == module['port'] and g['id'] == module['id']]:
-							gpio[name] = module['int']
-
-			for name in ['spi', 'i2c', 'usi']:
-				if name in pin_array:
-					for module in pin_array[name]:
-						for gpio in [g for g in gpios if g['port'] == module['port'] and g['id'] == module['id']]:
-							if name == 'i2c':
-								af = {'peripheral' : 'I2cMaster',
+			for pin_array in [a for a in avr_io.pins if self.properties['mmcu'] in a['devices']]:
+				for name in ['pcint', 'extint']:
+					if name in pin_array:
+						for module in pin_array[name]:
+							for gpio in [g for g in gpios if g['port'] == module['port'] and g['id'] == module['id']]:
+								gpio[name] = module['int']
+	
+				for name in ['spi', 'i2c', 'usi']:
+					if name in pin_array:
+						for module in pin_array[name]:
+							for gpio in [g for g in gpios if g['port'] == module['port'] and g['id'] == module['id']]:
+								if name == 'i2c':
+									af = {'peripheral' : 'I2cMaster',
+										  'name': module['name'].capitalize(),
+										  'type': module['dir']}
+									gpio['af'].append(af)
+								elif name == 'spi':
+									af = {'peripheral' : 'SpiMaster',
+										  'name': module['name'].capitalize(),
+										  'type': module['dir']}
+									gpio['af'].append(af)
+									negate = {'in': 'out', 'out': 'in', 'io': 'io'}
+									repl = {'mosi': 'simo', 'miso': 'somi', 'sck': 'sck', 'ss': 'ss'}
+									af2 = {'peripheral' : 'SpiSlave',
+										  'name': repl[module['name']].capitalize(),
+										  'type': negate[module['dir']]}
+									gpio['af'].append(af2)
+								elif name == 'usi':
+									af = {'peripheral' : 'Usi',
+										  'name': module['name'].capitalize(),
+										  'type': module['dir']}
+									gpio['af'].append(af)
+				
+				for name in ['uart0', 'uart1', 'uart2', 'uart3']:
+					if name in pin_array:
+						for module in pin_array[name]:
+							for gpio in [g for g in gpios if g['port'] == module['port'] and g['id'] == module['id']]:
+								af = {'peripheral' : name.capitalize(),
 									  'name': module['name'].capitalize(),
 									  'type': module['dir']}
 								gpio['af'].append(af)
-							elif name == 'spi':
-								af = {'peripheral' : 'SpiMaster',
-									  'name': module['name'].capitalize(),
-									  'type': module['dir']}
-								gpio['af'].append(af)
-								negate = {'in': 'out', 'out': 'in', 'io': 'io'}
-								repl = {'mosi': 'simo', 'miso': 'somi', 'sck': 'sck', 'ss': 'ss'}
-								af2 = {'peripheral' : 'SpiSlave',
-									  'name': repl[module['name']].capitalize(),
-									  'type': negate[module['dir']]}
-								gpio['af'].append(af2)
-							elif name == 'usi':
-								af = {'peripheral' : 'Usi',
-									  'name': module['name'].capitalize(),
-									  'type': module['dir']}
-								gpio['af'].append(af)
-			
-			for name in ['uart0', 'uart1', 'uart2', 'uart3']:
-				if name in pin_array:
-					for module in pin_array[name]:
-						for gpio in [g for g in gpios if g['port'] == module['port'] and g['id'] == module['id']]:
-							af = {'peripheral' : name.capitalize(),
-								  'name': module['name'].capitalize(),
-								  'type': module['dir']}
-							gpio['af'].append(af)
-							if 'uartspi' in pin_array:
-								repl = {'txd': 'mosi', 'rxd': 'miso', 'xck': 'sck'}
-								af = {'peripheral' : 'UartSpiMaster'+name[4:],
-									  'name': repl[module['name']].capitalize(),
-									  'type': module['dir']}
-								gpio['af'].append(af)
+								if 'uartspi' in pin_array:
+									repl = {'txd': 'mosi', 'rxd': 'miso', 'xck': 'sck'}
+									af = {'peripheral' : 'UartSpiMaster'+name[4:],
+										  'name': repl[module['name']].capitalize(),
+										  'type': module['dir']}
+									gpio['af'].append(af)
 	
 	def createModule(self, name):
 		if name in self.modules:

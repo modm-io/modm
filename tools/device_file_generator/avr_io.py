@@ -180,48 +180,65 @@ xmega_peripheral_pins = \
 	"spi":
 	[
 		{ "id": "4", "name": "ss", "dir": "out" },
-		{ "id": "5", "name": "mosi", "dir": "out" },
+		{ "id": "5", "name": "mosi", "dir": "out", "remap": False },
 		{ "id": "6", "name": "miso", "dir": "in" },
-		{ "id": "7", "name": "sck", "dir": "out" }
+		{ "id": "7", "name": "sck", "dir": "out", "remap": False },
+		
+		{ "id": "7", "name": "mosi", "dir": "out", "remap": True },
+		{ "id": "5", "name": "sck", "dir": "out", "remap": True }
 	],
-	"uart":
+	"usart":
 	[
-		{ "id": "1", "name": "xck", "dir": "out", "instance": "0" },
-		{ "id": "2", "name": "rxd", "dir": "in", "instance": "0" },
-		{ "id": "3", "name": "txd", "dir": "out", "instance": "0" },
+		{ "id": "1", "name": "xck", "dir": "out", "instance": "0", "remap": False },
+		{ "id": "2", "name": "rxd", "dir": "in", "instance": "0", "remap": False },
+		{ "id": "3", "name": "txd", "dir": "out", "instance": "0", "remap": False },
+		
+		{ "id": "5", "name": "xck", "dir": "out", "instance": "0", "remap": True },
+		{ "id": "6", "name": "rxd", "dir": "in", "instance": "0", "remap": True },
+		{ "id": "7", "name": "txd", "dir": "out", "instance": "0", "remap": True },
+		
 		{ "id": "5", "name": "xck", "dir": "out", "instance": "1" },
 		{ "id": "6", "name": "rxd", "dir": "in", "instance": "1" },
 		{ "id": "7", "name": "txd", "dir": "out", "instance": "1" }
 	],
-	"i2c":
+	"twi":
 	[
 		{ "id": "0", "name": "sda", "dir": "io" },
 		{ "id": "1", "name": "scl", "dir": "out" }
 	],
-	"timer":
+	"tc":
 	[
-		{ "id": "0", "name": "A", "instance": "0" },
-		{ "id": "1", "name": "B", "instance": "0" },
-		{ "id": "2", "name": "C", "instance": "0" },
-		{ "id": "3", "name": "D", "instance": "0" },
-		{ "id": "4", "name": "A", "instance": "1" },
-		{ "id": "5", "name": "B", "instance": "1" }
+		{ "id": "0", "name": "OCA", "dir": "out", "instance": "0", "remap": False },
+		{ "id": "1", "name": "OCB", "dir": "out", "instance": "0", "remap": False },
+		{ "id": "2", "name": "OCC", "dir": "out", "instance": "0", "remap": False },
+		{ "id": "3", "name": "OCD", "dir": "out", "instance": "0", "remap": False },
+		
+		{ "id": "4", "name": "OCA", "dir": "out", "instance": "0", "remap": True },
+		{ "id": "5", "name": "OCB", "dir": "out", "instance": "0", "remap": True },
+		{ "id": "6", "name": "OCC", "dir": "out", "instance": "0", "remap": True },
+		{ "id": "7", "name": "OCD", "dir": "out", "instance": "0", "remap": True },
+		
+		{ "id": "4", "name": "OCA", "dir": "out", "instance": "1" },
+		{ "id": "5", "name": "OCB", "dir": "out", "instance": "1" }
 	],
 	"awex":
 	[
-		{ "id": "0", "name": "ALS" },
-		{ "id": "1", "name": "AHS" },
-		{ "id": "2", "name": "BLS" },
-		{ "id": "3", "name": "BHS" },
-		{ "id": "4", "name": "CLS" },
-		{ "id": "5", "name": "CHS" },
-		{ "id": "6", "name": "DLS" },
-		{ "id": "7", "name": "DHS" }
+		{ "id": "0", "name": "ALS", "dir": "out" },
+		{ "id": "1", "name": "AHS", "dir": "out" },
+		
+		{ "id": "2", "name": "BLS", "dir": "out" },
+		{ "id": "3", "name": "BHS", "dir": "out" },
+		
+		{ "id": "4", "name": "CLS", "dir": "out" },
+		{ "id": "5", "name": "CHS", "dir": "out" },
+		
+		{ "id": "6", "name": "DLS", "dir": "out" },
+		{ "id": "7", "name": "DHS", "dir": "out" }
 	],
 	"usb":
 	[
-		{ "id": "0", "name": "DM" },
-		{ "id": "1", "name": "DP" }
+		{ "id": "0", "name": "DM", "dir": "io" },
+		{ "id": "1", "name": "DP", "dir": "io" }
 	]
 }
 
