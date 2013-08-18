@@ -14,6 +14,7 @@
 #include "../../../device.hpp"
 #include "../../../core/avr/interrupts.hpp"
 #include <xpcc/architecture/peripheral/gpio.hpp>
+#include "../../../type_ids.hpp"
 
 namespace xpcc
 {
@@ -210,28 +211,24 @@ public:
 	
 	ALWAYS_INLINE static void setOutput(Configuration config,
 										Inverted invert = Inverted::No) {
-		setOutput();
 		configure(config, invert);
+		setOutput();
 	}
 	
 	%# start documentation inherited
 	ALWAYS_INLINE static void setOutput() {
 		PORT{{port}}_DIRSET = mask;
 	}
-
 	ALWAYS_INLINE static void set() {
 		PORT{{port}}_OUTSET = mask;
 	}
-	
 	ALWAYS_INLINE static void set(bool status) {
 		if (status) { set(); }
 		else { reset(); }
 	}
-
 	ALWAYS_INLINE static void reset() {
 		PORT{{port}}_OUTCLR = mask;
 	}
-
 	ALWAYS_INLINE static void toggle() {
 		PORT{{port}}_OUTTGL = mask;
 	}
@@ -240,7 +237,6 @@ public:
 	ALWAYS_INLINE static void enableSlewRateLimit() {
 		PORT{{port}}_PIN{{pin}}CTRL |= PORT_SRLEN_bm;
 	}
-	
 	ALWAYS_INLINE static void disableSlewRateLimit() {
 		PORT{{port}}_PIN{{pin}}CTRL &= ~PORT_SRLEN_bm;
 	}
@@ -258,7 +254,6 @@ public:
 	setInput() {
 		 PORT{{port}}_DIRCLR = mask; 
 	}
-
 	ALWAYS_INLINE static bool read() {
 		(void) {{pin}};
 		return (PORT{{port}}_IN & mask);
@@ -268,51 +263,106 @@ public:
 	ALWAYS_INLINE static void setInputTrigger(InputTrigger trigger) {
 		PORT{{port}}_PIN{{pin}}CTRL = (PORT{{port}}_PIN{{pin}}CTRL & ~PORT_ISC_gm) | i(trigger);
 	}
-	
 	ALWAYS_INLINE static void enableExternalInterrupt0(InterruptLevel level) {
 		PORT{{port}}_INT0MASK |= mask;
 		PORT{{port}}_INTCTRL = (PORT{{port}}_INTCTRL & ~PORT_INT0LVL_gm) | (::xpcc::xmega::i(level) & PORT_INT0LVL_gm);
 	}
-	
 	ALWAYS_INLINE static void enableExternalInterrupt1(InterruptLevel level) {
 		PORT{{port}}_INT1MASK |= mask;
 		PORT{{port}}_INTCTRL = (PORT{{port}}_INTCTRL & ~PORT_INT1LVL_gm) | ((::xpcc::xmega::i(level) << 2) & PORT_INT1LVL_gm);
 	}
-
 	ALWAYS_INLINE static void disableExternalInterrupt0() {
 		PORT{{port}}_INT0MASK &= ~mask;
 	}
-	
 	ALWAYS_INLINE static void disableExternalInterrupt1() {
 		PORT{{port}}_INT1MASK &= ~mask;
 	}
-
 	ALWAYS_INLINE static bool getExternalInterruptFlag0() {
 		return (PORT{{port}}_INTFLAGS & PORT_INT0IF_bm);
 	}
-
 	ALWAYS_INLINE static bool getExternalInterruptFlag1() {
 		return (PORT{{port}}_INTFLAGS & PORT_INT1IF_bm);
 	}
-
 	ALWAYS_INLINE static void acknowledgeExternalInterruptFlag0() {
 		PORT{{port}}_INTFLAGS |= PORT_INT0IF_bm;
 	}
-
 	ALWAYS_INLINE static void acknowledgeExternalInterruptFlag1() {
 		PORT{{port}}_INTFLAGS |= PORT_INT1IF_bm;
 	}
-	
 			%% if port in ['A', 'B', 'C', 'D', 'E', 'F']
 	ALWAYS_INLINE static void enableInputBuffer() {
 		PORT{{port}}_PIN{{pin}}CTRL &= ~PORT_ISC_gm;
 	}
-	
 	/// disables the input buffer, when using this pin as analog input
 	ALWAYS_INLINE static void disableInputBuffer() {
 		PORT{{port}}_PIN{{pin}}CTRL = (PORT{{port}}_PIN{{pin}}CTRL & ~PORT_ISC_gm) | PORT_ISC_INPUT_DISABLE_gc;
 	}
 			%% endif
+		%% endif
+		%% for af in gpio.afs
+			{% if af.type == 'in' and type == 'Input' or
+			 af.type == 'out' and type == 'Output' or
+			 af.type == 'io' or type == "" %}
+	/// Connect `{{port~pin}}` as `{{af.name}}` to `{{af.peripheral}}`.
+	ALWAYS_INLINE static void
+	connect(TypeId::{{ af.peripheral }}{{ af.name }}) {
+				%% if 'remap' in af
+					%% if af.peripheral.startswith('Spi')
+						%% set bitmask = 'PORT_SPI_bm'
+					%% elif af.peripheral.startswith('Uart')
+						%% set bitmask = 'PORT_USART0_bm'
+					%% elif af.peripheral.startswith('TimerCounter')
+						%% set bitmask = 'PORT_TC'+af.peripheral[-1:]+af.name[2:].upper()+"_bm"
+					%% endif
+					%% if af.remap == 'True'
+		PORT{{port}}_REMAP |= {{bitmask}};
+					%% else
+		PORT{{port}}_REMAP &= ~{{bitmask}};
+					%% endif
+				%% endif
+				%% if af.name == "Txd"
+		set();
+				%% endif
+				%% if af.type == "out"
+		setOutput();
+				%% elif af.type== "in"
+		setInput();
+				%% endif
+	}
+			%% endif
+		%% endfor
+	%# Software Gpio
+		%% if type in ['', 'Output']
+			%% for peripheral in   ['SoftwareSpiMasterMosi',
+									'SoftwareSpiMasterSck']
+	/// Connect to `{{peripheral}}`.
+	ALWAYS_INLINE static void
+	connect(::xpcc::TypeId::{{ peripheral }}) {
+		configure(Configuration::Floating);
+		setOutput();
+		set();
+	}
+			%% endfor
+			%% for peripheral in   ['SoftwareI2cMasterSda',
+									'SoftwareI2cMasterScl']
+	/// Connect to `{{peripheral}}`.
+	ALWAYS_INLINE static void
+	connect(::xpcc::TypeId::{{ peripheral }}) {
+		configure(Configuration::OpenDrain);
+		setOutput();
+		set();
+	}
+			%% endfor
+		%% endif
+		%% if type in ['', 'Input']
+			%% for peripheral in ['SoftwareSpiMasterMiso']
+	/// Connect to `{{peripheral}}`.
+	ALWAYS_INLINE static void
+	connect(::xpcc::TypeId::{{ peripheral }}) {
+		configure(Configuration::Floating);
+		setInput();
+	}
+			%% endfor
 		%% endif
 };
 
