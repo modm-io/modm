@@ -1,0 +1,45 @@
+// coding: utf-8
+/* Copyright (c) 2013, Roboterclub Aachen e.V.
+ * All Rights Reserved.
+ *
+ * The file is part of the xpcc library and is released under the 3-clause BSD
+ * license. See the file `LICENSE` for the full license governing this code.
+ */
+// ----------------------------------------------------------------------------
+
+#ifndef XPCC_XMEGA_SPI_TYPE_IDS_HPP
+#define XPCC_XMEGA_SPI_TYPE_IDS_HPP
+
+namespace xpcc
+{
+
+namespace xmega
+{
+
+namespace TypeId
+{
+%% for id in ['C', 'D', 'E', 'F']
+	typedef struct{} SpiMaster{{id}}Mosi;
+	typedef struct{} SpiMaster{{id}}Miso;
+	typedef struct{} SpiMaster{{id}}Sck;
+	typedef struct{} SpiMaster{{id}}Ss;
+	
+	typedef struct{} SpiSlave{{id}}Simo;
+	typedef struct{} SpiSlave{{id}}Somi;
+	typedef struct{} SpiSlave{{id}}Sck;
+	typedef struct{} SpiSlave{{id}}Ss;
+
+%% endfor
+%% for id in ['C0','C1','D0','D1','E0','E1','F0','F1']
+	typedef struct{} UartSpiMaster{{id}}Mosi;
+	typedef struct{} UartSpiMaster{{id}}Miso;
+	typedef struct{} UartSpiMaster{{id}}Sck;
+	
+%% endfor
+}
+
+} // namespace xmega
+
+} // namespace xpcc
+
+#endif // XPCC_XMEGA_SPI_TYPE_IDS_HPP
