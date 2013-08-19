@@ -1,22 +1,16 @@
 
 #include <xpcc/architecture.hpp>
 
-// ----------------------------------------------------------------------------
 using namespace xpcc::stm32;
 
-// Usart 3 Pins
-typedef GpioOutputA2 UART2_TX;
-typedef GpioInputA3 UART2_RX;
-
-// ----------------------------------------------------------------------------
 MAIN_FUNCTION
 {
 	StartupError err =
 		SystemClock<Pll<ExternalOscillator<MHz8>, MHz72>>::enable();
 
 	// Initialize Usart Hal
-	UART2_TX::connect(UsartHal2::Id);
-	UART2_RX::connect(UsartHal2::Id);
+	GpioOutputA2::connect(UsartHal2::Tx);
+	GpioInputA3::connect(UsartHal2::Rx);
 	UsartHal2::initialize(115200, UsartHal2::Parity::Odd);
 	UsartHal2::enableInterruptVector(true, 14);
 	UsartHal2::enableInterrupt(UsartHal2::Interrupt::TxEmpty);
