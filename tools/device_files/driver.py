@@ -111,10 +111,12 @@ class DriverFile:
 				% (self.name, node.get('name'), f))
 			# Do we only have one default instance?
 			if self.instances == None:
-				self._parseDriverXml(device_id, node, 'default', build)
+				self._parseDriverXml(device_id, node, 'default', build, {})
 			else: # handle several or at least one specific instance
+				# Initialize Internal Target File Dictionary
+				targets = {}
 				for instance in self.instances:
-					self._parseDriverXml(device_id, node, instance, build)
+					self._parseDriverXml(device_id, node, instance, build, targets)
 		else: # if no xml driver file exists, just add all files that look like source files
 			# Query all files in directory
 			dir = os.path.join(platform_path, self.path)
@@ -135,7 +137,7 @@ class DriverFile:
 					build.append([template, output, self.substitutions])
 		return build
 
-	def _parseDriverXml(self, device_id, driver_node, instance_id, build_list):
+	def _parseDriverXml(self, device_id, driver_node, instance_id, build_list, targets):
 		# First parse parameters:
 		for node in driver_node:
 			if node.tag == 'parameter':
@@ -178,7 +180,8 @@ class DriverFile:
 							output = static
 						static = self._makeRelativeToPlatform(static)
 						output = self._makeRelativeToPlatform(output)
-						build_list.append([static, output])# => add static file
+						if self._checkTarget([static, output], targets):
+							build_list.append([static, output])# => add static file
 				elif node.tag == 'template':
 					template = file_name
 					output = node.get('out')
@@ -194,11 +197,31 @@ class DriverFile:
 						sub_instance_id = int(instance_id)
 					else:
 						sub_instance_id = instance_id
-					substitutions = dict({'id': sub_instance_id}.items() + self.substitutions.items())
+					substitutions = self.substitutions
+					if node.get('instances') != None:
+						substitutions = dict({'id': sub_instance_id}.items() + substitutions.items())
 					substitutions.update({'output': os.path.split(output)[1]})
 					# self.log.debug("%s: substitutions: %s" % (template, substitutions))
 					template_file = [template, output, substitutions]
-					build_list.append(template_file) # always append template files since they will get a different id
+					if self._checkTarget([template, output, substitutions], targets):
+						build_list.append(template_file) # always append template files since they will get a different id
+
+	def _checkTarget(self, build, targets):
+		"""
+		Checks if this target file has already been added to the build list.
+		Returns false if the target has already bean added which means
+		that you should not add it again.
+		If a different build was specified before for the same target name
+		a warning is generated.
+		"""
+		if build[1] not in targets.keys():
+			targets[build[1]] = build
+			return True
+		else:
+			if targets[build[1]] != build:
+				self.log.warn("To different builds for %s specified! "
+					"%s will be built while %s will be ignored." % (build[1], targets[build[1]], build))
+			return False
 
 	def _makeRelativeToPlatform(self, file_name):
 		"""
