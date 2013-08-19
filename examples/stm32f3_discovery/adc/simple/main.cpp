@@ -1,91 +1,46 @@
-
 #include <xpcc/architecture.hpp>
 #include <xpcc/debug/logger.hpp>
 
-
 // ----------------------------------------------------------------------------
-GPIO__OUTPUT(LedNorth,     E,  9); // LD3
-GPIO__OUTPUT(LedNorthEast, E, 10); // LD5
-GPIO__OUTPUT(LedEast,      E, 11); // LD7
-GPIO__OUTPUT(LedSouthEast, E, 12); // LD9
-GPIO__OUTPUT(LedSouth,     E, 13); // LD10
-GPIO__OUTPUT(LedSouthWest, E, 14); // LD8
-GPIO__OUTPUT(LedWest,      E, 15); // LD6
-GPIO__OUTPUT(LedNorthWest, E,  8); // LD4
-
-GPIO__INPUT(AdcIn0, B,  12);
-
-GPIO__INPUT(Button, A, 0);
-
-
 // Set the log level
 #undef	XPCC_LOG_LEVEL
-#define	XPCC_LOG_LEVEL xpcc::log::DEBUG
+#define	XPCC_LOG_LEVEL xpcc::log::INFO
 
 using namespace xpcc::stm32;
 
-xpcc::IODeviceWrapper<Usart3> loggerDevice;
-xpcc::log::Logger xpcc::log::debug(loggerDevice);
+typedef GpioInputB12 AdcIn0;
+
+xpcc::IODeviceWrapper<Usart2> loggerDevice;
 xpcc::log::Logger xpcc::log::info(loggerDevice);
-xpcc::log::Logger xpcc::log::warning(loggerDevice);
-xpcc::log::Logger xpcc::log::error(loggerDevice);
-
-
-static void
-printAdc()
-{
-	const float maxVoltage = 3.3;
-	float voltage = 0.0;
-	int adcValue = 0;
-	adcValue = Adc4::getValue();
-	XPCC_LOG_DEBUG << "adcValue=" << adcValue;
-	voltage = adcValue * maxVoltage / 0xfff;
-	XPCC_LOG_DEBUG << " voltage=" << voltage << xpcc::endl;
-}
-
-static bool
-initClock()
-{
-	// use external 8MHz clock from ST-LINK
-	if (!Clock::enableHse(Clock::HseConfig::HSE_BYPASS)) {
-		return false;
-	}
-	
-	Clock::enablePll(Clock::PllSource::PLL_HSE, Clock::PllMul::MUL_9);
-	return Clock::switchToPll();
-}
 
 // ----------------------------------------------------------------------------
 MAIN_FUNCTION
 {
+	StartupError err =
+		SystemClock<Pll<ExternalOscillator<MHz8>, MHz72>>::enable();
 
+	// initialize Uart2 for XPCC_LOG_INFO
+	GpioOutputA2::connect(Usart2::Tx);
+	GpioInputA3::connect(Usart2::Rx);
+	Usart3::initialize(115200, 12);
 
-	initClock();
-
-	LedNorth::setOutput(xpcc::Gpio::LOW);
-	LedNorthEast::setOutput(xpcc::Gpio::LOW);
-	LedEast::setOutput(xpcc::Gpio::LOW);
-	LedSouthEast::setOutput(xpcc::Gpio::LOW);
-	LedSouth::setOutput(xpcc::Gpio::LOW);
-	LedSouthWest::setOutput(xpcc::Gpio::LOW);
-	LedWest::setOutput(xpcc::Gpio::LOW);
-	LedNorthWest::setOutput(xpcc::Gpio::LOW);
-
-	Usart3::configurePins(Usart3::Mapping::REMAP_PB10_PB11);
-	Usart3::setBaudrate(115200);
-
+	// initialize Adc4
 	Adc4::initialize(Adc4::ClockMode::Asynchronous, Adc4::Prescaler::Div256,
 					Adc4::CalibrationMode::SingleEndedInputsMode, true);
 
-
-	AdcIn0::setAnalogInput();
-	Adc4::setChannel(Adc4::Channel::PinB12, Adc4::SampleTime::Cycles182);
+	AdcIn0::connect(Adc4::Channel3);
+	Adc4::setChannel(AdcIn0::Adc4Channel, Adc4::SampleTime::Cycles182);
 
 	while (1)
 	{
 		Adc4::startConversion();
+		// wait for conversion to finish
 		while(!Adc4::isConversionFinished);
-		printAdc();
+		// print result
+		int adcValue = Adc4::getValue();
+		XPCC_LOG_INFO << "adcValue=" << adcValue;
+		float voltage = adcValue * 3.3 / 0xfff;
+		XPCC_LOG_INFO << " voltage=" << voltage << xpcc::endl;
 		xpcc::delay_ms(500);
 	}
 
