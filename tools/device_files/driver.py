@@ -197,11 +197,12 @@ class DriverFile:
 						sub_instance_id = int(instance_id)
 					else:
 						sub_instance_id = instance_id
-					substitutions = self.substitutions
 					if node.get('instances') != None:
-						substitutions = dict({'id': sub_instance_id}.items() + substitutions.items())
+						substitutions = dict({'id': sub_instance_id}.items() + self.substitutions.items())
+					else:
+						substitutions = dict(self.substitutions.items())
 					substitutions.update({'output': os.path.split(output)[1]})
-					# self.log.debug("%s: substitutions: %s" % (template, substitutions))
+					# self.log.debug("%s->%s: substitutions: %s" % (template, output, substitutions))
 					template_file = [template, output, substitutions]
 					if self._checkTarget([template, output, substitutions], targets):
 						build_list.append(template_file) # always append template files since they will get a different id
