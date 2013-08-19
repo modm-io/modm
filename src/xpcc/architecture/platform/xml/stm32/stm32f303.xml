@@ -33,7 +33,8 @@
 		</driver>
 		<!-- Peripheral Drivers -->
 		<driver type="clock" name="stm32" /> <!-- the clock peripheral does not need the instances attribute because there is only one instance -->
-		<driver type="uart" name="stm32" instances="1,2,3,4,5" />
+		<driver type="uart" name="stm32"   instances="1,2,3,4,5" />
+		<driver type="adc"  name="stm32f3" instances="1,2,3,4" />
 		<!-- <driver type="timer" name="stm32" instances="1,2,3,4,8" /> -->
 		<driver type="gpio" name="stm32_af">
 			<gpio port="A" id="0"></gpio>
@@ -42,9 +43,11 @@
 			</gpio>
 			<gpio port="A" id="2">
 				<af id="7" peripheral="UsartHal2" name="Tx" type="output"/>
+				<af id="7" peripheral="Usart2" name="Tx" type="output"/>
 			</gpio>
 			<gpio port="A" id="3">
 				<af id="7" peripheral="UsartHal2" name="Rx" type="input"/>
+				<af id="7" peripheral="Usart2" name="Rx" type="input"/>
 			</gpio>
 			<gpio port="A" id="9">
 				<af id="7" peripheral="UsartHal1" name="Tx" type="output"/>
@@ -56,9 +59,14 @@
 			</gpio>
 			<gpio port="B" id="10">
 				<af id="7" peripheral="UsartHal3" name="Tx" type="output"/>
+				<af id="7" peripheral="Usart3" name="Tx" type="output"/>
 			</gpio>
 			<gpio port="B" id="11">
 				<af id="7" peripheral="UsartHal3" name="Rx" type="input"/>
+				<af id="7" peripheral="Usart3" name="Rx" type="input"/>
+			</gpio>
+			<gpio port="B" id="12">
+				<af peripheral="Adc4" name="Channel3" type="analog"/>
 			</gpio>
 			<gpio port="E" id="8"  pin-count="100+"></gpio>
 			<gpio port="E" id="9"  pin-count="100+"></gpio>

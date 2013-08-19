@@ -49,7 +49,6 @@
 		<driver type="gpio" name="stm32_af">
 			<!-- separate field for port and id are needed because
 				 e.g. on the lpc platform both are a number -->
-			<!-- <gpio port="A" id="0" analog="Adc0,Adc1,Adc2"> -->
 			<gpio port="A" id="0">
 				<!-- This makes the GPIO connect to specific peripheral
 					 drivers. -->

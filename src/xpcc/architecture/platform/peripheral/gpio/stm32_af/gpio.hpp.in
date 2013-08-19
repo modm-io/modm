@@ -78,6 +78,8 @@ RCC->{{ clock_tree }}RSTR &= ~(
 
 
 
+// output = {{output}}
+
 %% if output != 'gpio_enable.h'
 #include <xpcc/architecture/peripheral/gpio.hpp>
 #include "../../../type_ids.hpp"
@@ -254,6 +256,15 @@ namespace xpcc
 			}
 
 		public:
+	%% for af in gpio.afs
+		%% if af.type|lower == "analog"
+			/// {{name}} connects to {{af.name}} of {{af.peripheral}}
+			static const ::xpcc::stm32::{{af.peripheral}}::Channel
+			{{af.peripheral}}Channel = ::xpcc::stm32::{{af.peripheral}}::Channel::{{ af.name }};
+		%% endif
+	%% endfor
+
+		public:
 	%% if type == "" or type == "Output"
 			/** @name Output
 			 * @{
@@ -337,28 +348,21 @@ namespace xpcc
 			/** @name Connect Functions
 			 * @{
 			 */
-	%% if type != "Output" and gpio.analog
-	%% 	for analog_ip in gpio.analog|split(",")
-			//! Connect to {{ analog_ip }}.
-			ALWAYS_INLINE static void
-			connect(TypeId::{{ analog_ip }} t) {
-				(void) t; // avoid compiler warning
-				setAnalogInput();
-			}
-	%% 	endfor
-	%% endif
-
 	%% for af in gpio.afs
-	%%	set use = not (	(af.type|lower == "input"  and type == "Output") or
-						(af.type|lower == "output" and type == "Input" ))
-	%%	if use
+		%% set use = not (	(af.type|lower == "input"  and type == "Output") or
+							(af.type|lower == "analog" and type == "Output") or
+							(af.type|lower == "output" and type == "Input" ))
+		%% if use
 			//! Connect {{name}} as {{af.name}} to {{af.peripheral}}.
 			ALWAYS_INLINE static void
-			connect(TypeId::{{ af.peripheral }}{{ af.name }} t) {
-				(void) t; // avoid compiler warning
+			connect(TypeId::{{ af.peripheral }}{{ af.name }} /* t */) {
+			%% if af.type|lower == "analog"
+				setAnalogInput();
+			%% else
 				setAlternateFunction(AlternateFunction::AF_{{ af.id }});
+			%% endif
 			}
-	%%	endif
+		%% endif
 	%% endfor
 			//! @}
 		};
