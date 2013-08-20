@@ -98,8 +98,6 @@ class AVRDeviceWriter(XMLDeviceWriter):
 			header_child = self.root.addChild('header')
 			header_child.setValue(header)
 
-		# GPIO
-		self.addGpioToNode(self.root)
 		# UART
 		self.addUartToNode(self.root)
 		# USI
@@ -114,6 +112,8 @@ class AVRDeviceWriter(XMLDeviceWriter):
 		self.addDacToNode(self.root)
 		# Timer
 		self.addTimerToNode(self.root)
+		# GPIO
+		self.addGpioToNode(self.root)
 		
 
 	def addDeviceAttributesToNode(self, node, name):

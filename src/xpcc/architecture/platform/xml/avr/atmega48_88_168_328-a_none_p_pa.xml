@@ -56,6 +56,12 @@
     <header>avr/io.h</header>
     <header>avr/interrupt.h</header>
     <header>avr/sleep.h</header>
+    <driver type="uart" name="at90_tiny_mega" instances="0"/>
+    <driver type="spi" name="at90_tiny_mega" instances="0"/>
+    <driver type="i2c" name="at90_tiny_mega"/>
+    <driver type="spi" name="at90_tiny_mega"/>
+    <driver type="adc" name="atmega"/>
+    <driver type="timer" name="atmega" instances="0,1,2"/>
     <driver type="gpio" name="at90_tiny_mega">
       <gpio port="B" id="0" pcint="0"/>
       <gpio port="B" id="1" pcint="1"/>
@@ -106,11 +112,5 @@
       <gpio port="D" id="6" pcint="22"/>
       <gpio port="D" id="7" pcint="23"/>
     </driver>
-    <driver type="uart" name="at90_tiny_mega" instances="0"/>
-    <driver type="spi" name="at90_tiny_mega" instances="0"/>
-    <driver type="i2c" name="at90_tiny_mega"/>
-    <driver type="spi" name="at90_tiny_mega"/>
-    <driver type="adc" name="atmega"/>
-    <driver type="timer" name="atmega" instances="0,1,2"/>
   </device>
 </rca>

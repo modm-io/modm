@@ -23,6 +23,13 @@
     <header>avr/io.h</header>
     <header>avr/interrupt.h</header>
     <header>avr/sleep.h</header>
+    <driver type="uart" name="xmega" instances="C0,C1,D0,D1,E0,E1,F0,F1"/>
+    <driver type="spi" name="xmega" instances="C0,C1,D0,D1,E0,E1,F0,F1"/>
+    <driver type="i2c" name="xmega" instances="C,D,E,F"/>
+    <driver type="spi" name="xmega" instances="C,D,E,F"/>
+    <driver type="adc" name="xmega" instances="A,B"/>
+    <driver type="dac" name="xmega" instances="A,B"/>
+    <driver type="timer" name="xmega" instances="C0,C1,C2,D0,D1,D2,E0,E1,E2,F0,F1,F2"/>
     <driver type="gpio" name="xmega">
       <gpio port="A" id="0"/>
       <gpio port="A" id="1"/>
@@ -303,12 +310,5 @@
       <gpio port="R" id="0"/>
       <gpio port="R" id="1"/>
     </driver>
-    <driver type="uart" name="xmega" instances="C0,C1,D0,D1,E0,E1,F0,F1"/>
-    <driver type="spi" name="xmega" instances="C0,C1,D0,D1,E0,E1,F0,F1"/>
-    <driver type="i2c" name="xmega" instances="C,D,E,F"/>
-    <driver type="spi" name="xmega" instances="C,D,E,F"/>
-    <driver type="adc" name="xmega" instances="A,B"/>
-    <driver type="dac" name="xmega" instances="A,B"/>
-    <driver type="timer" name="xmega" instances="C0,C1,C2,D0,D1,D2,E0,E1,E2,F0,F1,F2"/>
   </device>
 </rca>
