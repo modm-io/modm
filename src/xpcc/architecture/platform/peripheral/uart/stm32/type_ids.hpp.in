@@ -27,8 +27,8 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 // ----------------------------------------------------------------------------
-#ifndef XPCC__STM32_TIMER_TYPE_IDS_HPP
-#define XPCC__STM32_TIMER_TYPE_IDS_HPP
+#ifndef XPCC__STM32_UART_TYPE_IDS_HPP
+#define XPCC__STM32_UART_TYPE_IDS_HPP
 
 namespace xpcc
 {
@@ -51,4 +51,4 @@ namespace TypeId
 }
 }
 
-#endif /* XPCC__STM32_TIMER_TYPE_IDS_HPP */
+#endif /* XPCC__STM32_UART_TYPE_IDS_HPP */
