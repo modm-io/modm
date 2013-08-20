@@ -1,0 +1,10 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE rca SYSTEM "../../xml/driver.dtd">
+<rca version="1.0">
+	<driver type="i2c" name="stm32">
+		<!-- Template: file that needs to be turned into a source file -->
+		<template instances="1,2,3" out="i2c_master_{{id}}.hpp">i2c_master.hpp.in</template>
+		<template instances="1,2,3" out="i2c_master_{{id}}.cpp">i2c_master.cpp.in</template>
+		<static>type_ids.hpp</static>
+	</driver>
+</rca>

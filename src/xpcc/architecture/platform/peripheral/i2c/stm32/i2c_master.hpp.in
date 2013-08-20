@@ -1,0 +1,108 @@
+// coding: utf-8
+/* Copyright (c) 2011, Roboterclub Aachen e.V.
+ * All Rights Reserved.
+ *
+ * The file is part of the xpcc library and is released under the 3-clause BSD
+ * license. See the file `LICENSE` for the full license governing this code.
+ */
+// ----------------------------------------------------------------------------
+{{ generation_block }}
+
+#ifndef XPCC_STM32_I2C_{{ id }}_HPP
+#define XPCC_STM32_I2C_{{ id }}_HPP
+
+#include "../../../device.hpp"
+#include <xpcc/architecture/peripheral/i2c.hpp>
+#include "type_ids.hpp"
+
+namespace xpcc
+{
+
+namespace stm32
+{
+
+/**
+ * I2cMaster implementation of I2C{{ id }} module.
+ *
+ * Interrupts must be enabled.
+ * 
+ * @author		Georgi Grinshpun
+ * @author		Niklas Hauser
+ * @ingroup		stm32
+ */
+class I2cMaster{{ id }} : ::xpcc::I2cMaster
+{
+public:
+	static const TypeId::I2cMaster{{ id }}Sda Sda;
+	static const TypeId::I2cMaster{{ id }}Scl Scl;
+
+public:
+	enum Mapping
+	{
+#if defined(STM32F2XX) || defined(STM32F4XX)
+		{% if id == 1 -%}
+		REMAP_PB6_PB7,		///< SCL mapped to PB6, SDA mapped to PB7
+		REMAP_PB8_PB9,		///< SCL mapped to PB8, SDA mapped to PB9
+		{%- elif id == 2 -%}
+		REMAP_PB10_PB11,	///< SCL mapped to PB10, SDA mapped to PB11
+		REMAP_PF1_PF0,		///< SCL mapped to PF1, SDA mapped to PF0
+		REMAP_PH4_PH5,		///< SCL mapped to PH4, SDA mapped to PH5
+		{%- elif id == 3 -%}
+		REMAP_PA8_PC9,		///< SCL mapped to PA8, SDA mapped to PC9
+		REMAP_PH7_PH8,		///< SCL mapped to PH7, SDA mapped to PH8
+		{%- endif %}
+#else
+		{% if id == 1 -%}
+		REMAP_PB6_PB7 = 0,						///< SCL mapped to PB6, SDA mapped to PB7
+		REMAP_PB8_PB9 = AFIO_MAPR_I2C1_REMAP,	///< SCL mapped to PB8, SDA mapped to PB9
+		{%- elif id == 2 -%}
+		REMAP_PB10_PB11,						///< SCL mapped to PB10, SDA mapped to PB11
+		{%- endif %}
+#endif
+	};
+	
+public:
+	/**
+	 * Set up the I2C module for master operation.
+	 *
+	 * @param	rate
+	 *		`Standard` or `Fast`, `High` datarate is not supported
+	 */
+	template<DataRate rate=DataRate::Standard>
+	static ALWAYS_INLINE void
+	initialize()
+	{
+		constexpr uint32_t rawRate = static_cast<uint32_t>(rate);
+		static_assert(rawRate <= 400000, "The STM32 does not support High I2C baudrate.");
+		static_assert(STM32_APB1_FREQUENCY/2 >= rawRate, "The APB1 frequency needs to be at least 2x higher than I2C baudrate.");
+
+		// set the prescaler rate register
+		// ccrPrescaler = STM32_APB1_FREQUENCY / (2 * I2CFrequency)
+		constexpr uint16_t prescaler = STM32_APB1_FREQUENCY / (2 * rawRate);
+		initializeWithPrescaler(prescaler);
+	}
+
+	// start documentation inherited
+	static bool
+	start(xpcc::I2cDelegate *delegate);
+
+	static bool
+	startBlocking(xpcc::I2cDelegate *delegate);
+
+	static Error
+	getErrorState();
+
+	static void
+	reset(DetachCause cause=DetachCause::SoftwareReset);
+	// end documentation inherited
+
+private:
+	static void
+	initializeWithPrescaler(uint16_t baud);
+};
+
+} // namespace stm32
+
+} // namespace xpcc
+
+#endif // XPCC_STM32_I2C_{{ id }}_HPP

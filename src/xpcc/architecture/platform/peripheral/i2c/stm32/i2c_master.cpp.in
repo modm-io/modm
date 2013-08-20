@@ -1,35 +1,12 @@
 // coding: utf-8
-// ----------------------------------------------------------------------------
 /* Copyright (c) 2011, Roboterclub Aachen e.V.
- * All rights reserved.
+ * All Rights Reserved.
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- *     * Redistributions of source code must retain the above copyright
- *       notice, this list of conditions and the following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright
- *       notice, this list of conditions and the following disclaimer in the
- *       documentation and/or other materials provided with the distribution.
- *     * Neither the name of the Roboterclub Aachen e.V. nor the
- *       names of its contributors may be used to endorse or promote products
- *       derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY ROBOTERCLUB AACHEN E.V. ''AS IS'' AND ANY
- * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL ROBOTERCLUB AACHEN E.V. BE LIABLE FOR ANY
- * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * The file is part of the xpcc library and is released under the 3-clause BSD
+ * license. See the file `LICENSE` for the full license governing this code.
  */
 // ----------------------------------------------------------------------------
 {{ generation_block }}
-
-#include <xpcc_config.hpp>
 
 /*
  * This driver was not so straight forward to implement, because the official
@@ -166,11 +143,11 @@
 
 #if SERIAL_DEBUGGING
 #	include "../uart/uart_5.hpp"
-	typedef xpcc::stm32::BufferedUart5 DebugUart;
+	typedef xpcc::stm32::Uart5 DebugUart;
 #	include <xpcc/io/iostream.hpp>
 	extern xpcc::IOStream stream;
 #	define DEBUG_STREAM(x) //stream << x << "\n"
-#	define DEBUG(x) xpcc::stm32::BufferedUart5::write(x)
+#	define DEBUG(x) xpcc::stm32::Uart5::write(x)
 #else
 #	define DEBUG_STREAM(x)
 #	define DEBUG(x)
@@ -188,45 +165,11 @@
 #define WAIT_FOR_STOP_LOW 0
 
 #include "i2c_master_{{ id }}.hpp"
-#include "../gpio.hpp"
-
-{% if id == 2 %}
-#if !defined(STM32F10X_LD)
-{% elif id == 3 %}
-#if defined(STM32F2XX) || defined(STM32F4XX)
-{% endif %}
-namespace
-{
-	{% if id == 1 -%}
-	GPIO__IO(SclB6, B, 6);
-	GPIO__IO(SdaB7, B, 7);
-	
-	GPIO__IO(SclB8, B, 8);
-	GPIO__IO(SdaB9, B, 9);
-	{%- elif id == 2 -%}
-	GPIO__IO(SclB10, B, 10);
-	GPIO__IO(SdaB11, B, 11);
-	
-#if defined(STM32F2XX) || defined(STM32F4XX)
-	GPIO__IO(SclF1, F, 1);
-	GPIO__IO(SdaF0, F, 0);
-	
-	GPIO__IO(SclH4, H, 4);
-	GPIO__IO(SdaH5, H, 5);
-#endif
-	{%- elif id == 3 -%}
-	GPIO__IO(SclA8, A, 8);
-	GPIO__IO(SdaC9, C, 9);
-	
-	GPIO__IO(SclH7, H, 7);
-	GPIO__IO(SdaH8, H, 8);
-	{%- endif %}
-}
 	
 namespace
 {
 	// parameter advice
-	static xpcc::i2c::Delegate::NextOperation nextOperation;
+	static xpcc::I2c::Operation nextOperation;
 	enum CheckNextOperation
 	{
 		CHECK_NEXT_OPERATION_NO,
@@ -244,44 +187,44 @@ namespace
 	static std::size_t writeBytesLeft = 0;
 	
 	// delegating
-	static xpcc::i2c::Delegate *delegate = 0;
-	static xpcc::stm32::I2cMaster{{ id }}::ErrorState errorState(xpcc::stm32::I2cMaster{{ id }}::NO_ERROR);
+	static xpcc::I2cDelegate *delegate = 0;
+	static xpcc::I2cMaster::Error error(xpcc::I2cMaster::Error::NoError);
 	
-	static void
-	initializeWrite(xpcc::i2c::Delegate::Writing w)
+	static inline void
+	initializeWrite(xpcc::I2cDelegate::Writing w)
 	{
 		writePointer = w.buffer;
 		writeBytesLeft = w.size;
 		readBytesLeft = 0;
-		nextOperation = static_cast<xpcc::i2c::Delegate::NextOperation>(w.next);
+		nextOperation = static_cast<xpcc::I2c::Operation>(w.next);
 	}
 	
-	static void
-	initializeRead(xpcc::i2c::Delegate::Reading r)
+	static inline void
+	initializeRead(xpcc::I2cDelegate::Reading r)
 	{
 		readPointer = r.buffer;
 		readBytesLeft = r.size;
 		writeBytesLeft = 0;
-		nextOperation = static_cast<xpcc::i2c::Delegate::NextOperation>(r.next);
+		nextOperation = static_cast<xpcc::I2c::Operation>(r.next);
 	}
 	
-	static void
+	static inline void
 	initializeStopAfterAddress()
 	{
 		writeBytesLeft = 0;
 		readBytesLeft = 0;
-		nextOperation = xpcc::i2c::Delegate::STOP_OP;
+		nextOperation = xpcc::I2c::Operation::Stop;
 	}
 	
-	static void
+	static inline void
 	initializeRestartAfterAddress()
 	{
 		writeBytesLeft = 0;
 		readBytesLeft = 0;
-		nextOperation = xpcc::i2c::Delegate::RESTART_OP;
+		nextOperation = xpcc::I2c::Operation::Restart;
 	}
 	
-	void
+	static inline void
 	callStarting()
 	{
 		DEBUG_STREAM("callStarting");
@@ -314,13 +257,13 @@ I2C{{ id }}_EV_IRQHandler(void)
 		// EV5: SB=1, cleared by reading SR1 register followed by writing DR register with Address.
 		DEBUG_STREAM("startbit set");
 		
-		xpcc::i2c::Delegate::Starting s = delegate->starting();
+		xpcc::I2cDelegate::Starting s = delegate->starting();
 		uint8_t address;
 		
 		switch (s.next)
 		{
-			case xpcc::i2c::Delegate::READ_OP:
-				address = (s.address & 0xfe) | xpcc::i2c::READ;
+			case xpcc::I2c::Operation::Read:
+				address = (s.address & 0xfe) | xpcc::I2c::READ;
 				initializeRead(delegate->reading());
 				if (readBytesLeft <= 2)
 				{
@@ -340,21 +283,21 @@ I2C{{ id }}_EV_IRQHandler(void)
 				DEBUG_STREAM("read op: reading=" << readBytesLeft);
 				break;
 				
-			case xpcc::i2c::Delegate::WRITE_OP:
-				address = (s.address & 0xfe) | xpcc::i2c::WRITE;
+			case xpcc::I2c::Operation::Write:
+				address = (s.address & 0xfe) | xpcc::I2c::WRITE;
 				initializeWrite(delegate->writing());
 				DEBUG_STREAM("write op: writing=" << writeBytesLeft);
 				break;
 				
-			case xpcc::i2c::Delegate::RESTART_OP:
-				address = (s.address & 0xfe) | xpcc::i2c::WRITE;
+			case xpcc::I2c::Operation::Restart:
+				address = (s.address & 0xfe) | xpcc::I2c::WRITE;
 				initializeRestartAfterAddress();
 				DEBUG_STREAM("restart op");
 				break;
 				
 			default:
-			case xpcc::i2c::Delegate::STOP_OP:
-				address = (s.address & 0xfe) | xpcc::i2c::WRITE;
+			case xpcc::I2c::Operation::Stop:
+				address = (s.address & 0xfe) | xpcc::I2c::WRITE;
 				initializeStopAfterAddress();
 				DEBUG_STREAM("stop op");
 				break;
@@ -513,7 +456,7 @@ I2C{{ id }}_EV_IRQHandler(void)
 	{
 		switch (nextOperation)
 		{
-			case xpcc::i2c::Delegate::WRITE_OP:
+			case xpcc::I2c::Operation::Write:
 				if (checkNextOperation != CHECK_NEXT_OPERATION_YES_NO_STOP_BIT)
 				{
 					initializeWrite(delegate->writing());
@@ -523,7 +466,7 @@ I2C{{ id }}_EV_IRQHandler(void)
 				}
 				break;
 				
-			case xpcc::i2c::Delegate::RESTART_OP:
+			case xpcc::I2c::Operation::Restart:
 				callStarting();
 				DEBUG_STREAM("restart op");
 				break;
@@ -537,7 +480,7 @@ I2C{{ id }}_EV_IRQHandler(void)
 				
 				DEBUG_STREAM("disable interrupts");
 				I2C{{ id }}->CR2 &= ~(I2C_CR2_ITEVTEN | I2C_CR2_ITBUFEN | I2C_CR2_ITERREN);
-				if (delegate) delegate->stopped(xpcc::i2c::Delegate::NORMAL_STOP);
+				if (delegate) delegate->stopped(xpcc::I2c::DetachCause::NormalStop);
 				delegate = 0;
 				DEBUG_STREAM("write finished");
 				break;
@@ -557,29 +500,29 @@ I2C{{ id }}_ER_IRQHandler(void)
 	{
 		DEBUG_STREAM("BUS ERROR");
 		I2C{{ id }}->CR1 |= I2C_CR1_STOP;
-		errorState = xpcc::stm32::I2cMaster{{ id }}::BUS_ERROR;
+		error = xpcc::I2cMaster::Error::BusCondition;
 	}
 	else if (sr1 & I2C_SR1_AF)
 	{	// acknowledge fail
 		I2C{{ id }}->CR1 |= I2C_CR1_STOP;
 		DEBUG_STREAM("ACK FAIL");
 		 // may also be ADDRESS_NACK
-		errorState = xpcc::stm32::I2cMaster{{ id }}::DATA_NACK;
+		error = xpcc::I2cMaster::Error::DataNack;
 	}
 	else if (sr1 & I2C_SR1_ARLO)
 	{	// arbitration lost
 		DEBUG_STREAM("ARBITRATION LOST");
-		errorState = xpcc::stm32::I2cMaster{{ id }}::ARBITRATION_LOST;
+		error = xpcc::I2cMaster::Error::ArbitrationLost;
 	}
 	else
 	{
 		DEBUG_STREAM("UNKNOWN");
-		errorState = xpcc::stm32::I2cMaster{{ id }}::UNKNOWN_ERROR;
+		error = xpcc::I2cMaster::Error::Unknown;
 	}
 	
 	if (delegate)
 	{
-		delegate->stopped(xpcc::i2c::Delegate::ERROR_CONDITION);
+		delegate->stopped(xpcc::I2c::DetachCause::ErrorCondition);
 		delegate = 0;
 	}
 	
@@ -598,68 +541,9 @@ I2C{{ id }}_ER_IRQHandler(void)
 }
 	
 // ----------------------------------------------------------------------------
-void
-xpcc::stm32::I2cMaster{{ id }}::configurePins(Mapping mapping)
-{
-	// Enable clock
-	RCC->APB1ENR |= RCC_APB1ENR_I2C{{ id }}EN;
-	
-	// Initialize IO pins
-#if defined(STM32F2XX) || defined(STM32F4XX)
-	{% if id == 1 -%}
-	if (mapping == REMAP_PB8_PB9) {
-		SclB8::setAlternateFunction(AF_I2C1, xpcc::stm32::OPEN_DRAIN);
-		SdaB9::setAlternateFunction(AF_I2C1, xpcc::stm32::OPEN_DRAIN);
-	}
-	else {
-		SclB6::setAlternateFunction(AF_I2C1, xpcc::stm32::OPEN_DRAIN);
-		SdaB7::setAlternateFunction(AF_I2C1, xpcc::stm32::OPEN_DRAIN);
-	}
-	{%- elif id == 2 -%}
-	if (mapping == REMAP_PB10_PB11) {
-		SclB10::setAlternateFunction(AF_I2C2, xpcc::stm32::OPEN_DRAIN);
-		SdaB11::setAlternateFunction(AF_I2C2, xpcc::stm32::OPEN_DRAIN);
-	}
-	if (mapping == REMAP_PF1_PF0) {
-		SclF1::setAlternateFunction(AF_I2C2, xpcc::stm32::OPEN_DRAIN);
-		SdaF0::setAlternateFunction(AF_I2C2, xpcc::stm32::OPEN_DRAIN);
-	}
-	else {
-		SclH4::setAlternateFunction(AF_I2C2, xpcc::stm32::OPEN_DRAIN);
-		SdaH5::setAlternateFunction(AF_I2C2, xpcc::stm32::OPEN_DRAIN);
-	}
-	{%- elif id == 3 -%}
-	if (mapping == REMAP_PA8_PC9) {
-		SclA8::setAlternateFunction(AF_I2C3, xpcc::stm32::OPEN_DRAIN);
-		SdaC9::setAlternateFunction(AF_I2C3, xpcc::stm32::OPEN_DRAIN);
-	}
-	else {
-		SclH7::setAlternateFunction(AF_I2C3, xpcc::stm32::OPEN_DRAIN);
-		SdaH8::setAlternateFunction(AF_I2C3, xpcc::stm32::OPEN_DRAIN);
-	}
-	{%- endif %}
-#else
-	{% if id == 1 -%}
-	AFIO->MAPR = (AFIO->MAPR & ~AFIO_MAPR_I2C1_REMAP) | mapping;
-	if (mapping == REMAP_PB8_PB9) {
-		SclB8::setAlternateFunction(xpcc::stm32::OPEN_DRAIN);
-		SdaB9::setAlternateFunction(xpcc::stm32::OPEN_DRAIN);
-	}
-	else {
-		SclB6::setAlternateFunction(xpcc::stm32::OPEN_DRAIN);
-		SdaB7::setAlternateFunction(xpcc::stm32::OPEN_DRAIN);
-	}
-	{%- elif id == 2 -%}
-	(void) mapping;		// avoid compiler warning
-	
-	SclB10::setAlternateFunction(xpcc::stm32::OPEN_DRAIN);
-	SdaB11::setAlternateFunction(xpcc::stm32::OPEN_DRAIN);
-	{%- endif %}
-#endif
-}
 	
 void
-xpcc::stm32::I2cMaster{{ id }}::initialize(uint16_t ccrPrescaler)
+xpcc::stm32::I2cMaster{{ id }}::initializeWithPrescaler(uint16_t ccrPrescaler)
 {
 	reset();
 	// Enable clock
@@ -680,17 +564,17 @@ xpcc::stm32::I2cMaster{{ id }}::initialize(uint16_t ccrPrescaler)
 }
 	
 void
-xpcc::stm32::I2cMaster{{ id }}::reset(bool error)
+xpcc::stm32::I2cMaster{{ id }}::reset(DetachCause cause)
 {
 	readBytesLeft = 0;
 	writeBytesLeft = 0;
-	if (delegate) delegate->stopped(error ? xpcc::i2c::Delegate::ERROR_CONDITION : xpcc::i2c::Delegate::SOFTWARE_RESET);
+	if (delegate) delegate->stopped(cause);
 	delegate = 0;
 }
 	
 // MARK: - ownership
 bool
-xpcc::stm32::I2cMaster{{ id }}::start(xpcc::i2c::Delegate *delegate)
+xpcc::stm32::I2cMaster{{ id }}::start(xpcc::I2cDelegate *delegate)
 {
 	if (!::delegate && delegate && delegate->attaching())
 	{
@@ -702,9 +586,9 @@ xpcc::stm32::I2cMaster{{ id }}::start(xpcc::i2c::Delegate *delegate)
 	}
 	return false;
 }
-	
+
 bool
-xpcc::stm32::I2cMaster{{ id }}::startSync(xpcc::i2c::Delegate *delegate)
+xpcc::stm32::I2cMaster{{ id }}::startBlocking(xpcc::I2cDelegate *delegate)
 {
 	if (!::delegate && delegate && delegate->attaching())
 	{
@@ -723,14 +607,9 @@ xpcc::stm32::I2cMaster{{ id }}::startSync(xpcc::i2c::Delegate *delegate)
 	return false;
 }
 	
-uint8_t
+xpcc::I2cMaster::Error
 xpcc::stm32::I2cMaster{{ id }}::getErrorState()
 {
-	return errorState;
+	return error;
 }
-	
-{% if id == 2 %}
-#endif
-{% elif id == 3 %}
-#endif
-{% endif %}
+
