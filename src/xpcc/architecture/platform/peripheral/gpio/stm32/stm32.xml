@@ -4,6 +4,6 @@
 	<driver type="gpio" name="stm32">
 		<!-- Template: file that needs to be turned into a source file -->
 		<template>gpio.hpp.in</template>
-		<template out="gpio_enable.h">gpio.hpp.in</template>
+		<template>gpio_enable.h.in</template>
 	</driver>
 </rca>
