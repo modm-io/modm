@@ -152,34 +152,32 @@ public:
 	static constexpr uint8_t mask = (1 << pin);	///< the mask of this GPIO
 
 		%% if type in ["", "Output"]
+	// GpioOutput
 	ALWAYS_INLINE static void setOutput(bool status) {
 		set(status);
 		setOutput();
 	}
-
+	// start documentation inherited
 	ALWAYS_INLINE static void setOutput() {
 		DDR{{port}} |= mask;
 	}
-
 	ALWAYS_INLINE static void set() {
 		PORT{{port}} |= mask;
 	}
-	
 	ALWAYS_INLINE static void set(bool status) {
 		if (status) { set(); }
 		else { reset(); }
 	}
-
 	ALWAYS_INLINE static void reset() {
 		PORT{{port}} &= ~mask;
 	}
-
 	ALWAYS_INLINE static void toggle() {
 		PORT{{port}} ^= mask;
 	}
+	// end documentation inherited
 		%% endif
 		%% if type in ["", "Input"]
-
+	// GpioInput
 	ALWAYS_INLINE static void configure(Configuration config) {
 		if (config == Configuration::PullUp) {
 			PORT{{port}} |= mask;
@@ -188,27 +186,24 @@ public:
 			PORT{{port}} &= ~mask;
 		}
 	}
-
-	ALWAYS_INLINE static void setInput() {
-		DDR{{port}} &= ~mask;
-	}
-
 	ALWAYS_INLINE static void
 	setInput(Configuration config) {
 		setInput();
 		configure(config);
 	}
-
+	// start documentation inherited
+	ALWAYS_INLINE static void setInput() {
+		DDR{{port}} &= ~mask;
+	}
 	ALWAYS_INLINE static bool read() {
 		return (PIN{{port}} & mask);
 	}
-		%% if 'extint' in gpio
-			%% set af_id = gpio.extint | int
-
-				%# Go home Atmel, you're drunk!
+	// end documentation inherited
+			%% if 'extint' in gpio
+				%% set af_id = gpio.extint | int
+				%#- Go home Atmel, you're drunk!
 				%% set eicra = 'EICRA'
 				%% set isc2 = ''
-
 				%% if target.family == 'atmega' and target.name in ['8', '16', '32', '162', '8515', '8535']
 					%% set eicra = 'MCUCR'
 					%% if target.name == '162'
@@ -217,7 +212,6 @@ public:
 						%% set isc2 = 'MCUCSR'
 					%% endif
 				%% endif
-
 	ALWAYS_INLINE static void setInputTrigger(InputTrigger trigger) {
 				%% if af_id < 4
 					%% if isc2 != '' and af_id == 2
@@ -229,7 +223,6 @@ public:
 		EICRB |= (i(trigger) << 2*{{af_id - 4}});
 				%% endif
 	}
-
 	ALWAYS_INLINE static void enableExternalInterrupt() {
 #ifdef EIMSK
 		EIMSK |= (1 << INT{{af_id}});
@@ -241,7 +234,6 @@ public:
 #	error "Cannot find register for setting INT{{af_id}}!"
 #endif
 	}
-
 	ALWAYS_INLINE static void disableExternalInterrupt() {
 #ifdef EIMSK
 		EIMSK &= ~(1 << INT{{af_id}});
@@ -253,8 +245,7 @@ public:
 #	error "Cannot find register for clearing INT{{af_id}}!"
 #endif
 	}
-
-	ALWAYS_INLINE static bool readExternalInterruptFlag() {
+	ALWAYS_INLINE static bool getExternalInterruptFlag() {
 #ifdef EIFR
 		return (EIFR & (1 << INTF{{af_id}}));
 #elif defined GIFR
@@ -263,7 +254,6 @@ public:
 #	error "Cannot find register for reading INTF{{af_id}}!"
 #endif
 	}
-
 	ALWAYS_INLINE static void acknowledgeExternalInterruptFlag() {
 #ifdef EIFR
 		EIFR |= (1 << INTF{{af_id}});
@@ -273,11 +263,10 @@ public:
 #	error "Cannot find register for setting INTF{{af_id}}!"
 #endif
 	}
-		%% endif
-		%% if 'pcint' in gpio
-			%% set af_id = gpio.pcint | int
-
-				%# Go home Atmel, you're drunk!
+			%% endif
+			%% if 'pcint' in gpio
+				%% set af_id = gpio.pcint | int
+				%#- Go home Atmel, you're drunk!
 				%% if target.family == 'attiny'
 					%% if (target.name == '2313' or target.name == '4313') and af_id >= 11 and af_id <= 17
 						%% set af_reg = 2
@@ -286,9 +275,7 @@ public:
 					%% endif
 				%% else
 					%% set af_reg = (af_id / 8) | int
-				%% endif
-
-
+					%% endif
 	ALWAYS_INLINE static void enablePCInterrupt() {
 		PCMSK{{af_reg}} |= (1 << PCINT{{af_id}});
 #ifdef PCICR
@@ -303,7 +290,6 @@ public:
 #	error "Cannot find register for setting PCIE{{af_reg}}!"
 #endif
 	}
-
 	ALWAYS_INLINE static void disablePCInterrupt() {
 		PCMSK{{af_reg}} &= ~(1 << PCINT{{af_id}});
 		if (!PCMSK{{af_reg}}) {
@@ -320,7 +306,6 @@ public:
 #endif
 		}
 	}
-
 	ALWAYS_INLINE static bool readPCInterruptFlag() {
 #ifdef PCIFR
 		return (PCIFR & (1 << PCIF{{af_reg}}));
@@ -332,7 +317,6 @@ public:
 #	error "Cannot find register for reading PCIF{{af_reg}}!"
 #endif
 	}
-
 	ALWAYS_INLINE static void acknowledgePCInterruptFlag() {
 #ifdef PCIFR
 		PCIFR |= (1 << PCIF{{af_reg}});
@@ -345,12 +329,11 @@ public:
 #endif
 	}
 		%% endif
-
+	// connect: Hardware Gpio
 		%% for af in gpio.afs
-			{% if af.type == 'in' and type == 'Input' or
-			 af.type == 'out' and type == 'Output' or
-			 af.type == 'io' or type == "" %}
-
+			%% if (	(af.type == 'in' and type == 'Input') or
+					(af.type == 'out' and type == 'Output') or
+					(af.type == 'io' or type == "")	)
 	/// Connect `{{port~pin}}` as `{{af.name}}` to `{{af.peripheral}}`.
 	ALWAYS_INLINE static void
 	connect(TypeId::{{ af.peripheral }}{{ af.name }}) {
@@ -365,7 +348,7 @@ public:
 	}
 			%% endif
 		%% endfor
-
+	// connect: Software Gpio
 		%% if type in ['', 'Output']
 			%% for peripheral in   ['SoftwareSpiMasterMosi',
 									'SoftwareSpiMasterSck']
@@ -430,7 +413,7 @@ public:
 		PORT{{port.name}} = (PORT{{port.name}} & ~portMask) | (data & portMask);
 	}
 };
-
+	%% if port.width == 8
 template<>
 class GpioPort{{port.name}}< 0, 8 > : public ::xpcc::GpioPort, public Gpio
 {
@@ -451,6 +434,7 @@ public:
 		PORT{{port.name}} = data;
 	}
 };
+	%% endif
 
 %% endfor
 
