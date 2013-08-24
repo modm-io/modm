@@ -51,7 +51,7 @@ xpcc::Bmp085<I2cMaster>::configure(bmp085::Mode mode)
 	adapter.initialize(buffer, 1, reinterpret_cast<uint8_t*>(&calibration), 22);
 	status |= NEW_CALIBRATION_DATA;
 	
-	return I2cMaster::startSync(&adapter);
+	return I2cMaster::startBlocking(&adapter);
 }
 
 template < typename I2cMaster >

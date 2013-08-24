@@ -50,7 +50,7 @@ xpcc::Tmp102<I2cMaster>::configure(tmp102::Config2 lsb, tmp102::Config1 msb)
 	buffer[2] = lsb;
 	adapter.initialize(buffer, 3, data, 0);
 	
-	return I2cMaster::startSync(&adapter);
+	return I2cMaster::startBlocking(&adapter);
 }
 
 template < typename I2cMaster >

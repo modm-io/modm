@@ -304,7 +304,7 @@ xpcc::Hmc6343<I2cMaster>::writeCommand(hmc6343::Command command)
 	buffer[0] = command;
 	adapter.initialize(buffer, 1, 0, 0);
 
-	while(!I2cMaster::startSync(&adapter))
+	while(!I2cMaster::startBlocking(&adapter))
 		;
 
 	return true;
@@ -323,7 +323,7 @@ xpcc::Hmc6343<I2cMaster>::writeRegister(hmc6343::Register reg, uint8_t value)
 	buffer[2] = value;
 	adapter.initialize(buffer, 3, 0, 0);
 
-	while(!I2cMaster::startSync(&adapter))
+	while(!I2cMaster::startBlocking(&adapter))
 		;
 	// 10ms timing delay
 	timeout.restart(10);
@@ -343,7 +343,7 @@ xpcc::Hmc6343<I2cMaster>::readRegister(hmc6343::Register reg)
 	buffer[1] = reg;
 	adapter.initialize(buffer, 2, buffer, 1);
 
-	while(!I2cMaster::startSync(&adapter))
+	while(!I2cMaster::startBlocking(&adapter))
 		;
 
 	// 10ms timing delay

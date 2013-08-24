@@ -49,7 +49,7 @@ xpcc::Ds1631<I2cMaster>::configure(ds1631::Resolution resolution, bool continuou
 	buffer[1] = resolution | (continuousMode ? 0 : 0x01);
 	adapter.initialize(buffer, 3, data, 0);
 	
-	return I2cMaster::startSync(&adapter);
+	return I2cMaster::startBlocking(&adapter);
 }
 
 template <typename I2cMaster>
@@ -106,7 +106,7 @@ xpcc::Ds1631<I2cMaster>::isConversionDone()
 		buffer[0] = 0xac;
 		adapter.initialize(buffer, 1, buffer, 1);
 
-		if (I2cMaster::startSync(&adapter))
+		if (I2cMaster::startBlocking(&adapter))
 			return (buffer[0] & 0x80);
 	}
 	return false;

@@ -53,7 +53,7 @@ xpcc::Itg3200<I2cMaster>::configure(uint8_t divider, itg3200::Filter filter, boo
 	buffer[3] = interrupt ? itg3200::INTERRUPT_RAW_RDY_EN : 0;
 	adapter.initialize(buffer, 4, data, 0);
 	
-	return I2cMaster::startSync(&adapter);
+	return I2cMaster::startBlocking(&adapter);
 }
 
 template < typename I2cMaster >
@@ -178,7 +178,7 @@ xpcc::Itg3200<I2cMaster>::writeRegister(itg3200::Register reg, uint8_t value)
 	buffer[1] = value;
 	adapter.initialize(buffer, 2, data, 0);
 	
-	return I2cMaster::startSync(&adapter);
+	return I2cMaster::startBlocking(&adapter);
 }
 
 template < typename I2cMaster >
@@ -190,7 +190,7 @@ xpcc::Itg3200<I2cMaster>::readRegister(itg3200::Register reg)
 	buffer[0] = reg;
 	adapter.initialize(buffer, 1, buffer, 1);
 	
-	while (!I2cMaster::startSync(&adapter))
+	while (!I2cMaster::startBlocking(&adapter))
 		;
 	return buffer[0];
 }

@@ -50,7 +50,7 @@ xpcc::I2cEeprom<I2cMaster>::writeByte(uint16_t address, uint8_t data)
 	buffer[2] = data;
 	initialize(buffer, 3, 0, 0);
 	
-	return I2cMaster::startSync(this);
+	return I2cMaster::startBlocking(this);
 }
 
 template <typename I2cMaster>
@@ -61,7 +61,7 @@ xpcc::I2cEeprom<I2cMaster>::write(uint16_t address, const uint8_t *data, uint8_t
 	buffer[1] = address;
 	initialize(buffer, 2, data, bytes, 0, 0);
 	
-	return I2cMaster::startSync(this);
+	return I2cMaster::startBlocking(this);
 }
 
 template <typename I2cMaster> template <typename T>
@@ -80,7 +80,7 @@ xpcc::I2cEeprom<I2cMaster>::readByte(uint16_t address, uint8_t &data)
 	buffer[1] = address;
 	initialize(buffer, 2, &data, 1);
 	
-	return I2cMaster::startSync(this);
+	return I2cMaster::startBlocking(this);
 }
 
 template <typename I2cMaster>
@@ -91,7 +91,7 @@ xpcc::I2cEeprom<I2cMaster>::read(uint16_t address, uint8_t *data, uint8_t bytes)
 	buffer[1] = address;
 	initialize(buffer, 2, data, bytes);
 	
-	return I2cMaster::startSync(this);
+	return I2cMaster::startBlocking(this);
 }
 
 template <typename I2cMaster> template <typename T>
@@ -108,7 +108,7 @@ xpcc::I2cEeprom<I2cMaster>::isAvailable()
 {
 	initialize(0, 0, 0, 0);
 	
-	if (I2cMaster::startSync(this))
+	if (I2cMaster::startBlocking(this))
 	{
 		return (state == xpcc::I2c::AdapterState::Idle);
 	}

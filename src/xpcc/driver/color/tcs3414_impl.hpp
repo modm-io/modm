@@ -36,7 +36,7 @@ xpcc::tcs3414::OperationSuccess xpcc::Tcs3414<I2cMaster>::writeRegister(
 			|	static_cast<uint8_t>(address);	// at this address
 	buffer_write[2] = value;
 	i2cWRadapter.initialize(ADDRESS, buffer_write, 3, NULL, 0);
-	if(!I2cMaster::startSync(&i2cWRadapter))
+	if(!I2cMaster::startBlocking(&i2cWRadapter))
 		return false;
 	if(i2cWRadapter.getState() != xpcc::i2c::adapter::State::NO_ERROR)
 		return false;
@@ -51,7 +51,7 @@ xpcc::tcs3414::OperationSuccess xpcc::Tcs3414<I2cMaster>::readRegisters(
 			|	static_cast<uint8_t>(0x40)		// with SMB read/write protocol
 			|	static_cast<uint8_t>(address);	// at this address
 	i2cWRadapter.initialize(&buffer_write, 1, values, count);	// read registers
-	if(!I2cMaster::startSync(&i2cWRadapter))
+	if(!I2cMaster::startBlocking(&i2cWRadapter))
 		return false;
 	if(i2cWRadapter.getState() != xpcc::i2c::adapter::State::NO_ERROR)
 		return false;

@@ -113,7 +113,7 @@ xpcc::Adxl345<I2cMaster>::writeRegister(adxl345::Register reg, uint8_t value)
 	buffer[1] = value;
 	adapter.initialize(buffer, 2, data, 0);
 	
-	return I2cMaster::startSync(&adapter);
+	return I2cMaster::startBlocking(&adapter);
 }
 
 template < typename I2cMaster >
@@ -125,7 +125,7 @@ xpcc::Adxl345<I2cMaster>::readRegister(adxl345::Register reg)
 	buffer[0] = reg;
 	adapter.initialize(buffer, 1, buffer, 1);
 	
-	while (!I2cMaster::startSync(&adapter))
+	while (!I2cMaster::startBlocking(&adapter))
 		;
 	return buffer[0];
 }

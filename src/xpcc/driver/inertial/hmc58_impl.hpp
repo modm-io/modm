@@ -53,7 +53,7 @@ xpcc::Hmc58<I2cMaster>::configure(uint8_t dataOutputRate)
 	buffer[3] = hmc58::OPERATION_MODE_CONTINUOUS;
 	adapter.initialize(buffer, 4, data, 0);
 	
-	return I2cMaster::startSync(&adapter);
+	return I2cMaster::startBlocking(&adapter);
 }
 
 template < typename I2cMaster >
@@ -140,7 +140,7 @@ xpcc::Hmc58<I2cMaster>::writeRegister(hmc58::Register reg, uint8_t value)
 	buffer[1] = value;
 	adapter.initialize(buffer, 2, data, 0);
 	
-	return I2cMaster::startSync(&adapter);
+	return I2cMaster::startBlocking(&adapter);
 }
 
 template < typename I2cMaster >
@@ -152,7 +152,7 @@ xpcc::Hmc58<I2cMaster>::readRegister(hmc58::Register reg)
 	buffer[0] = reg;
 	adapter.initialize(buffer, 1, buffer, 1);
 	
-	while (!I2cMaster::startSync(&adapter))
+	while (!I2cMaster::startBlocking(&adapter))
 		;
 	return buffer[0];
 }
