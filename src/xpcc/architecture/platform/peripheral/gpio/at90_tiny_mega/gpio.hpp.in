@@ -172,7 +172,15 @@ public:
 		PORT{{port}} &= ~mask;
 	}
 	ALWAYS_INLINE static void toggle() {
+			%% if ((target.family == 'atmega' and
+					target.name in ['8', '16', '32', '64', '128', '162', '8515', '8535'] and
+					target.type in ['a', 'none'] ) or (
+					target.family == 'attiny' and
+					target.name in ['26']))
+		PORT{{port}} ^= mask;
+			%% else
 		PIN{{port}} = mask;
+			%% endif
 	}
 	// end documentation inherited
 		%% endif
