@@ -1,0 +1,141 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE rca SYSTEM "../devicefile.dtd">
+<rca version="1.0">
+  <!-- WARNING: This file is generated automatically, do not edit!
+ 		Please modify the xpcc/tools/DeviceFileGenerator code instead and rebuild this file.
+ 		Be aware, that regenerated files might have a different composition for technical reasons. -->
+  <device platform="avr" name="164|324|644|1284" family="atmega" type="a|none|p|pa">
+    <flash device-name="164">16384</flash>
+    <flash device-name="324">32768</flash>
+    <flash device-name="644">65536</flash>
+    <flash device-name="1284">131072</flash>
+    <ram device-name="164">1024</ram>
+    <ram device-name="324">2048</ram>
+    <ram device-name="644">4096</ram>
+    <ram device-name="1284">16384</ram>
+    <eeprom device-name="164">512</eeprom>
+    <eeprom device-name="324">1024</eeprom>
+    <eeprom device-name="644">2048</eeprom>
+    <eeprom device-name="1284">4096</eeprom>
+    <mmcu device-name="164" device-type="a">atmega164a</mmcu>
+    <mmcu device-name="164" device-type="p">atmega164p</mmcu>
+    <mmcu device-name="164" device-type="pa">atmega164pa</mmcu>
+    <mmcu device-name="324" device-type="a">atmega324a</mmcu>
+    <mmcu device-name="324" device-type="p">atmega324p</mmcu>
+    <mmcu device-name="324" device-type="pa">atmega324pa</mmcu>
+    <mmcu device-name="644" device-type="a">atmega644a</mmcu>
+    <mmcu device-name="644" device-type="none">atmega644</mmcu>
+    <mmcu device-name="644" device-type="p">atmega644p</mmcu>
+    <mmcu device-name="644" device-type="pa">atmega644pa</mmcu>
+    <mmcu device-name="1284" device-type="none">atmega1284</mmcu>
+    <mmcu device-name="1284" device-type="p">atmega1284p</mmcu>
+    <define device-name="164" device-type="a">__AVR_ATmega164A__</define>
+    <define device-name="164" device-type="p">__AVR_ATmega164P__</define>
+    <define device-name="164" device-type="pa">__AVR_ATmega164PA__</define>
+    <define device-name="324" device-type="a">__AVR_ATmega324A__</define>
+    <define device-name="324" device-type="p">__AVR_ATmega324P__</define>
+    <define device-name="324" device-type="pa">__AVR_ATmega324PA__</define>
+    <define device-name="644" device-type="a">__AVR_ATmega644A__</define>
+    <define device-name="644" device-type="none">__AVR_ATmega644__</define>
+    <define device-name="644" device-type="p">__AVR_ATmega644P__</define>
+    <define device-name="644" device-type="pa">__AVR_ATmega644PA__</define>
+    <define device-name="1284" device-type="none">__AVR_ATmega1284__</define>
+    <define device-name="1284" device-type="p">__AVR_ATmega1284P__</define>
+    <core>avr8</core>
+    <pin-count>0</pin-count>
+    <driver type="core" name="avr">
+      <parameter device-name="164" name="ram_length">512</parameter>
+      <parameter device-name="324" name="ram_length">1024</parameter>
+      <parameter device-name="644" name="ram_length">3072</parameter>
+      <parameter device-name="1284" name="ram_length">15360</parameter>
+    </driver>
+    <header>avr/io.h</header>
+    <header>avr/interrupt.h</header>
+    <header>avr/sleep.h</header>
+    <driver type="uart" name="at90_tiny_mega" instances="0"/>
+    <driver type="spi" name="at90_tiny_mega" instances="0"/>
+    <driver device-name="164|324|1284" type="uart" name="at90_tiny_mega"/>
+    <driver device-name="164|324|1284" type="spi" name="at90_tiny_mega"/>
+    <driver device-name="644" device-type="a|p|pa" type="uart" name="at90_tiny_mega" instances="1"/>
+    <driver device-name="644" device-type="a|p|pa" type="spi" name="at90_tiny_mega" instances="1"/>
+    <driver type="i2c" name="at90_tiny_mega"/>
+    <driver type="spi" name="at90_tiny_mega"/>
+    <driver type="adc" name="atmega"/>
+    <driver type="timer" name="atmega" instances="0,1,2"/>
+    <driver device-name="1284" type="timer" name="atmega" instances="3"/>
+    <driver type="gpio" name="at90_tiny_mega">
+      <gpio port="A" id="0" pcint="0"/>
+      <gpio port="A" id="1" pcint="1"/>
+      <gpio port="A" id="2" pcint="2"/>
+      <gpio port="A" id="3" pcint="3"/>
+      <gpio port="A" id="4" pcint="4"/>
+      <gpio port="A" id="5" pcint="5"/>
+      <gpio port="A" id="6" pcint="6"/>
+      <gpio port="A" id="7" pcint="7"/>
+      <gpio port="B" id="0" pcint="8">
+        <af peripheral="Uart0" type="out" name="Xck"/>
+        <af peripheral="UartSpiMaster0" type="out" name="Sck"/>
+      </gpio>
+      <gpio port="B" id="1" pcint="9"/>
+      <gpio port="B" id="2" pcint="10" extint="2"/>
+      <gpio port="B" id="3" pcint="11"/>
+      <gpio port="B" id="4" pcint="12">
+        <af peripheral="SpiMaster" type="out" name="Ss"/>
+        <af peripheral="SpiSlave" type="in" name="Ss"/>
+      </gpio>
+      <gpio port="B" id="5" pcint="13">
+        <af peripheral="SpiMaster" type="in" name="Miso"/>
+        <af peripheral="SpiSlave" type="out" name="Somi"/>
+      </gpio>
+      <gpio port="B" id="6" pcint="14">
+        <af peripheral="SpiMaster" type="out" name="Mosi"/>
+        <af peripheral="SpiSlave" type="in" name="Simo"/>
+      </gpio>
+      <gpio port="B" id="7" pcint="15">
+        <af peripheral="SpiMaster" type="out" name="Sck"/>
+        <af peripheral="SpiSlave" type="in" name="Sck"/>
+      </gpio>
+      <gpio port="C" id="0" pcint="16">
+        <af peripheral="I2cMaster" type="out" name="Scl"/>
+      </gpio>
+      <gpio port="C" id="1" pcint="17">
+        <af peripheral="I2cMaster" type="io" name="Sda"/>
+      </gpio>
+      <gpio port="C" id="2" pcint="18"/>
+      <gpio port="C" id="3" pcint="19"/>
+      <gpio port="C" id="4" pcint="20"/>
+      <gpio port="C" id="5" pcint="21"/>
+      <gpio port="C" id="6" pcint="22"/>
+      <gpio port="C" id="7" pcint="23"/>
+      <gpio port="D" id="0" pcint="24">
+        <af peripheral="Uart0" type="in" name="Rxd"/>
+        <af peripheral="UartSpiMaster0" type="in" name="Miso"/>
+      </gpio>
+      <gpio port="D" id="1" pcint="25">
+        <af peripheral="Uart0" type="out" name="Txd"/>
+        <af peripheral="UartSpiMaster0" type="out" name="Mosi"/>
+      </gpio>
+      <gpio port="D" id="2" pcint="26" extint="0">
+        <af device-name="164|324|1284" peripheral="Uart1" type="in" name="Rxd"/>
+        <af device-name="164|324|1284" peripheral="UartSpiMaster1" type="in" name="Miso"/>
+        <af device-name="644" device-type="a|p|pa" peripheral="Uart1" type="in" name="Rxd"/>
+        <af device-name="644" device-type="a|p|pa" peripheral="UartSpiMaster1" type="in" name="Miso"/>
+      </gpio>
+      <gpio port="D" id="3" pcint="27" extint="1">
+        <af device-name="164|324|1284" peripheral="Uart1" type="out" name="Txd"/>
+        <af device-name="164|324|1284" peripheral="UartSpiMaster1" type="out" name="Mosi"/>
+        <af device-name="644" device-type="a|p|pa" peripheral="Uart1" type="out" name="Txd"/>
+        <af device-name="644" device-type="a|p|pa" peripheral="UartSpiMaster1" type="out" name="Mosi"/>
+      </gpio>
+      <gpio port="D" id="4" pcint="28">
+        <af device-name="164|324|1284" peripheral="Uart1" type="out" name="Xck"/>
+        <af device-name="164|324|1284" peripheral="UartSpiMaster1" type="out" name="Sck"/>
+        <af device-name="644" device-type="a|p|pa" peripheral="Uart1" type="out" name="Xck"/>
+        <af device-name="644" device-type="a|p|pa" peripheral="UartSpiMaster1" type="out" name="Sck"/>
+      </gpio>
+      <gpio port="D" id="5" pcint="29"/>
+      <gpio port="D" id="6" pcint="30"/>
+      <gpio port="D" id="7" pcint="31"/>
+    </driver>
+  </device>
+</rca>
