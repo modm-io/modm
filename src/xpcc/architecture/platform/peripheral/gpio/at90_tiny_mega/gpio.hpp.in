@@ -172,7 +172,7 @@ public:
 		PORT{{port}} &= ~mask;
 	}
 	ALWAYS_INLINE static void toggle() {
-		PORT{{port}} ^= mask;
+		PIN{{port}} = mask;
 	}
 	// end documentation inherited
 		%% endif
