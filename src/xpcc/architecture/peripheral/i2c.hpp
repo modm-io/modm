@@ -111,7 +111,8 @@ public:
 	{
 		Standard = 100000,	///< Standard datarate of 100kHz
 		Fast = 400000,		///< Fast datarate of 400kHz
-		High = 1700000		///< High datarate of 1.7Mhz
+		High = 1700000,		///< High datarate of 1.7MHz (rarely supported)
+		Super = 3400000		///< Super datarate of 3.4MHz (rarely supported)
 	};
 
 #ifdef __DOXYGEN__
