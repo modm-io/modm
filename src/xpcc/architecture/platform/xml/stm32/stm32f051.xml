@@ -36,7 +36,7 @@
 		<!-- Peripheral Drivers -->
 		<!--<driver type="clock" name="stm32" /> -->
 		<driver type="uart" name="stm32" instances="1,2" />
-		<driver type="gpio" name="stm32_af">
+		<driver type="gpio" name="stm32">
 			<gpio port="A" id="0"></gpio>
 			<gpio port="A" id="2">
 				<af id="1" peripheral="UsartHal2" name="Tx" type="output"/>

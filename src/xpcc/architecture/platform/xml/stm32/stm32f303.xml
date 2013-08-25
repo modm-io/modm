@@ -35,8 +35,8 @@
 		<driver type="clock" name="stm32" /> <!-- the clock peripheral does not need the instances attribute because there is only one instance -->
 		<driver type="uart" name="stm32"   instances="1,2,3,4,5" />
 		<driver type="adc"  name="stm32f3" instances="1,2,3,4" />
-		<!-- <driver type="timer" name="stm32" instances="1,2,3,4,8" /> -->
-		<driver type="gpio" name="stm32_af">
+		<driver type="timer" name="stm32" instances="1,2,3,4,8" />
+		<driver type="gpio" name="stm32">
 			<gpio port="A" id="0"></gpio>
 			<gpio port="A" id="8">
 				<af id="0" peripheral="MCO" description="Clock Output"/>
@@ -68,8 +68,12 @@
 			<gpio port="B" id="12">
 				<af peripheral="Adc4" name="Channel3" type="analog"/>
 			</gpio>
-			<gpio port="E" id="8"  pin-count="100+"></gpio>
-			<gpio port="E" id="9"  pin-count="100+"></gpio>
+			<gpio port="E" id="8"  pin-count="100+">
+				<af id="2" peripheral="Timer1" name="Channel1N"/>
+			</gpio>
+			<gpio port="E" id="9"  pin-count="100+">
+				<af id="2" peripheral="Timer1" name="Channel1"/>
+			</gpio>
 			<gpio port="E" id="10" pin-count="100+"></gpio>
 			<gpio port="E" id="11" pin-count="100+"></gpio>
 			<gpio port="E" id="12" pin-count="100+"></gpio>
