@@ -177,11 +177,17 @@ def platform_tools_generate(env, architecture_path):
 	# Show SCons how to build the architecture/platform.hpp file:
 	src = os.path.join(platform_path, 'platform.hpp.in')
 	tar = os.path.join(architecture_path, 'platform.hpp')
-	# Remove architecture/platform.hpp file
-	# if it is not removed an old platform file from a different build might be used
+	platform_include_path = 'generated_platform_' + device + '/drivers.hpp'
+	# Check if architecture/platform.hpp already exists
 	if os.path.exists(tar):
-		os.remove(tar)
-	sub = {'device': device}
+		f = open(tar, 'r')
+		content = f.read()
+		f.close()
+		# Check if architecture/platform.hpp file points to the correct directory
+		if platform_include_path not in content:
+			# if not, remove in order to use the correct generated directory
+			os.remove(tar)
+	sub = {'include_path': platform_include_path}
 	env.Template(target = tar, source = src, substitutions = sub)
 	# Show SCons how to build the drivers.hpp.in file:
 	src = os.path.join(platform_path, 'drivers.hpp.in')
