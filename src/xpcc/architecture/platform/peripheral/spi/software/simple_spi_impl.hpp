@@ -11,34 +11,40 @@
 #	error	"Don't include this file directly, use 'simple_spi.hpp' instead!"
 #endif
 
-#include <xpcc/architecture/driver/atomic.hpp>
+template <typename SCK, typename MOSI, typename MISO, uint32_t Baudrate>
+uint8_t xpcc::SoftwareSimpleSpi<SCK, MOSI, MISO, Baudrate>::timingMode(0);
 
-template <typename SCK, typename MOSI, typename MISO, uint32_t Frequency>
-uint8_t xpcc::SoftwareSimpleSpi<SCK, MOSI, MISO, Frequency>::timingMode(0);
+template <typename SCK, typename MOSI, typename MISO, uint32_t Baudrate>
+bool xpcc::SoftwareSimpleSpi<SCK, MOSI, MISO, Baudrate>::finished;
 
-template <typename SCK, typename MOSI, typename MISO, uint32_t Frequency>
-bool xpcc::SoftwareSimpleSpi<SCK, MOSI, MISO, Frequency>::finished;
-
-template <typename SCK, typename MOSI, typename MISO, uint32_t Frequency>
-uint8_t xpcc::SoftwareSimpleSpi<SCK, MOSI, MISO, Frequency>::result;
+template <typename SCK, typename MOSI, typename MISO, uint32_t Baudrate>
+uint8_t xpcc::SoftwareSimpleSpi<SCK, MOSI, MISO, Baudrate>::result;
 
 
 // ----------------------------------------------------------------------------
-template <typename SCK, typename MOSI, typename MISO, uint32_t Frequency>
+template <typename SCK, typename MOSI, typename MISO, uint32_t Baudrate>
 template< uint32_t baudrate >
 void
-xpcc::SoftwareSimpleSpi<SCK, MOSI, MISO, Frequency>::initialize(Mode mode)
+xpcc::SoftwareSimpleSpi<SCK, MOSI, MISO, Baudrate>::initialize()
 {
-	xpcc::atomic::Lock lock;
-	timingMode = static_cast<uint8_t>(mode);
-	SCK::set(timingMode & 0b10);
+	SCK::reset();
 	MOSI::reset();
 	finished = true;
 }
 
-template <typename SCK, typename MOSI, typename MISO, uint32_t Frequency>
+
+template <typename SCK, typename MOSI, typename MISO, uint32_t Baudrate>
+void
+xpcc::SoftwareSimpleSpi<SCK, MOSI, MISO, Baudrate>::setMode(Mode mode)
+{
+	timingMode = static_cast<uint8_t>(mode);
+	SCK::set(timingMode & 0b10);
+}
+// ----------------------------------------------------------------------------
+
+template <typename SCK, typename MOSI, typename MISO, uint32_t Baudrate>
 uint8_t
-xpcc::SoftwareSimpleSpi<SCK, MOSI, MISO, Frequency>::writeReadBlocking(uint8_t data)
+xpcc::SoftwareSimpleSpi<SCK, MOSI, MISO, Baudrate>::writeReadBlocking(uint8_t data)
 {
 	while (!isFinished())
 		;
@@ -88,45 +94,45 @@ xpcc::SoftwareSimpleSpi<SCK, MOSI, MISO, Frequency>::writeReadBlocking(uint8_t d
 	return input;
 }
 
-template <typename SCK, typename MOSI, typename MISO, uint32_t Frequency>
+template <typename SCK, typename MOSI, typename MISO, uint32_t Baudrate>
 void
-xpcc::SoftwareSimpleSpi<SCK, MOSI, MISO, Frequency>::writeBlocking(uint8_t data)
+xpcc::SoftwareSimpleSpi<SCK, MOSI, MISO, Baudrate>::writeBlocking(uint8_t data)
 {
 	writeReadBlocking(data);
 }
 
-template <typename SCK, typename MOSI, typename MISO, uint32_t Frequency>
+template <typename SCK, typename MOSI, typename MISO, uint32_t Baudrate>
 bool
-xpcc::SoftwareSimpleSpi<SCK, MOSI, MISO, Frequency>::write(uint8_t data)
+xpcc::SoftwareSimpleSpi<SCK, MOSI, MISO, Baudrate>::write(uint8_t data)
 {
 	result = writeReadBlocking(data);
 	return true;
 }
 
-template <typename SCK, typename MOSI, typename MISO, uint32_t Frequency>
+template <typename SCK, typename MOSI, typename MISO, uint32_t Baudrate>
 uint8_t
-xpcc::SoftwareSimpleSpi<SCK, MOSI, MISO, Frequency>::getResult()
+xpcc::SoftwareSimpleSpi<SCK, MOSI, MISO, Baudrate>::getResult()
 {
 	return result;
 }
 
-template <typename SCK, typename MOSI, typename MISO, uint32_t Frequency>
+template <typename SCK, typename MOSI, typename MISO, uint32_t Baudrate>
 bool
-xpcc::SoftwareSimpleSpi<SCK, MOSI, MISO, Frequency>::isFinished()
+xpcc::SoftwareSimpleSpi<SCK, MOSI, MISO, Baudrate>::isFinished()
 {
 	return finished;
 }
 
-template <typename SCK, typename MOSI, typename MISO, uint32_t Frequency>
+template <typename SCK, typename MOSI, typename MISO, uint32_t Baudrate>
 void
-xpcc::SoftwareSimpleSpi<SCK, MOSI, MISO, Frequency>::delay()
+xpcc::SoftwareSimpleSpi<SCK, MOSI, MISO, Baudrate>::delay()
 {
 	xpcc::delay_us(delayTime);
 }
 
-template <typename SCK, typename MOSI, typename MISO, uint32_t Frequency>
+template <typename SCK, typename MOSI, typename MISO, uint32_t Baudrate>
 bool
-xpcc::SoftwareSimpleSpi<SCK, MOSI, MISO, Frequency>::transfer(uint8_t *tx, uint8_t *rx, std::size_t length, BufferOptions options)
+xpcc::SoftwareSimpleSpi<SCK, MOSI, MISO, Baudrate>::transfer(uint8_t *tx, uint8_t *rx, std::size_t length, BufferOptions options)
 {
 	if (!isFinished())
 		return false;

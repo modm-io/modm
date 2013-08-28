@@ -16,26 +16,41 @@ bool xpcc::{{target.family}}::UartSimpleSpi{{id}}::finished;
 // ----------------------------------------------------------------------------
 template< uint32_t baudrate >
 void
-xpcc::{{target.family}}::UartSimpleSpi{{id}}::initialize(Mode mode)
+xpcc::{{target.family}}::UartSimpleSpi{{id}}::initialize()
 {
 	constexpr uint16_t prescaler = (F_CPU / ( 2 * baudrate )) - 1;
+
 	static_assert(F_CPU/2 >= baudrate, "The CPU frequency must be at least 2x higher than SPI baudrate.");
 	static_assert(prescaler + 1 < (1 << 12) + 1, "SPI baudrate is too slow for CPU frequency (Prescaler out of bounds).");
-	initialize(prescaler, mode);
+
+	initialize(prescaler);
 }
 
 void
-xpcc::{{target.family}}::UartSimpleSpi{{id}}::initialize(uint16_t prescaler, Mode mode)
+xpcc::{{target.family}}::UartSimpleSpi{{id}}::initialize(uint16_t prescaler)
 {
 	UBRR{{ id }} = 0;
 	// set MSPI mode of operation and SPI data mode
 	UCSR{{ id }}C = (1 << UMSEL{{id}}1) | (1 << UMSEL{{id}}0);
-	if (static_cast<uint8_t>(mode) & 0b01) UCSR{{ id }}C |= (1 << UCPHA{{id}});
-	if (static_cast<uint8_t>(mode) & 0b10) UCSR{{ id }}C |= (1 << UCPOL{{id}});
 	// enable receiver and transmitter
 	UCSR{{ id }}B = (1 << RXEN{{id}}) | (1 << TXEN{{id}});
 	// set baudrate _after_ enabling transmitter
 	UBRR{{ id }} = prescaler;
+}
+
+void
+xpcc::{{target.family}}::UartSimpleSpi{{id}}::setMode(Mode mode)
+{
+%# Go home Atmel, you're drunk
+%% if  ( target.family == 'atmega' and
+		(target.name in ['48', '88', '168', '328'] and
+		 target.type == 'p') or
+		(target.name in ['64', '128', '256'] and
+		 target.type in ['rfr1', 'rfr2']) )
+	UCSR{{ id }}C = (UCSR{{ id }}C & ~0b11) | static_cast<uint8_t>(mode);
+%% else
+	UCSR{{ id }}C = (UCSR{{ id }}C & ~0b01) | (static_cast<uint8_t>(mode) & 0b01);
+%% endif
 }
 
 uint8_t

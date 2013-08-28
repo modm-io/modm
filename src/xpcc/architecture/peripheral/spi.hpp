@@ -23,14 +23,14 @@ namespace xpcc
 /// @ingroup spi
 struct Spi
 {
-	/// Spi Clock Mode, Mode0 is the most used mode
+	/// Spi Clock Mode, Mode0 is the most common mode
 	enum class
 	Mode : uint8_t
 	{
-		Mode0 = 0b00,	///< SCK normal,	sample on rising edge
-		Mode1 = 0b01,	///< SCK normal,	sample on falling edge
-		Mode2 = 0b10,	///< SCK inverted,	sample on falling edge
-		Mode3 = 0b11,	///< SCK inverted,	sample on rising edge
+		Mode0 = 0b00,	///< clock normal,   sample on rising  edge
+		Mode1 = 0b01,	///< clock normal,   sample on falling edge
+		Mode2 = 0b10,	///< clock inverted, sample on rising  edge
+		Mode3 = 0b11,	///< clock inverted, sample on falling edge
 	};
 
 	/// This tells the `SpiDelegate` why it was detached
@@ -81,6 +81,23 @@ class SimpleSpi : public ::xpcc::Peripheral, public Spi
 {
 #ifdef __DOXYGEN__
 public:
+	/**
+	 * Initialize the hardware and sets the baudrate.
+	 *
+	 * @tparam	baudrate	the desired baudrate in Hz
+	 */
+	template< uint32_t baudrate >
+	static void
+	initialize();
+
+	/**
+	 * Sets a new timing mode.
+	 *
+	 * @param	mode
+	 */
+	static void
+	setMode(Mode mode);
+
 	// synchronous
 	/**
 	 * Write a single byte, wait for completion.
@@ -153,6 +170,15 @@ class SpiMaster : public ::xpcc::Peripheral, public Spi
 #ifdef __DOXYGEN__
 public:
 	/**
+	 * Initialize the hardware and sets the baudrate.
+	 *
+	 * @tparam	baudrate	the desired baudrate in Hz
+	 */
+	template< uint32_t baudrate >
+	static void
+	initialize();
+
+	/**
 	 * Requests bus control and starts the transfer.
 	 *
 	 * @param	delegate
@@ -177,11 +203,11 @@ public:
 	/**
 	 * Perform a software reset of the driver in case of an error.
 	 *
-	 * This method calls the stopped Delegate method and then detaches
+	 * This method calls the `detaching()` Delegate method and then detaches
 	 * the delegate.
 	 */
 	static void
-	reset();
+	reset(DetachCause cause = DetachCause::SoftwareReset);
 #endif
 };
 
@@ -202,6 +228,7 @@ class SpiDelegate : public Spi
 public:
 	/// Contains the information required to make a SPI transfer
 	struct Transmission {
+		Mode mode;					///< timing mode for this transfer
 		const uint8_t *writeBuffer;	///< data to write, set to `0` to transmit dummy bytes
 		uint8_t *readBuffer;		///< data to read, set `0` to discard received bytes
 		std::size_t size;			///< number of bytes to be transmitted

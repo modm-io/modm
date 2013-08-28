@@ -42,20 +42,14 @@ public:
 	static const TypeId::UartSpiMaster{{ id }}Sck  Sck;
 	
 public:
-	/**
-	 * Enable and initialize the SPI hardware.
-	 * The prescaler is calculated as best effort with possible error.
-	 *
-	 * @tparam	baudrate
-	 *		baudrate in Hz
-	 * @param	mode
-	 *		operation mode
-	 */
+	// start documentation inherited
 	template< uint32_t baudrate >
 	static inline void
-	initialize(Mode mode=Mode::Mode0);
+	initialize();
 
-	// start documentation inherited
+	static void
+	setMode(Mode mode);
+
 	static ALWAYS_INLINE uint8_t
 	writeReadBlocking(uint8_t data);
 
@@ -78,7 +72,7 @@ public:
 
 protected:
 	static inline void
-	initialize(uint16_t prescaler, Mode mode=Mode::Mode0);
+	initialize(uint16_t prescaler);
 
 private:
 	static bool finished;

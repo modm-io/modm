@@ -45,11 +45,11 @@ MAIN_FUNCTION
 	LedInverted::setOutput();
 	LedInverted::reset();
 
-	GpioD0::connect(Uart0::Rx);
-	GpioD1::connect(Uart0::Tx);
+	GpioD0::connect(UART::Rx);
+	GpioD1::connect(UART::Tx);
 
-	SPI::initialize<2000000>(SimpleSpi::Mode::Mode3);
-	SPI2::initialize<1000000>(SimpleSpi::Mode::Mode0);
+	SPI::initialize<2000000>();
+	SPI2::initialize<1000000>();
 	UART::initialize<38400>();
 
 	while (1)

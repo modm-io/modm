@@ -33,7 +33,7 @@ namespace xpcc
 template< typename SCK,
 		  typename MOSI,
 		  typename MISO = GpioUnused,
-		  uint32_t Frequency = 2000000UL >
+		  uint32_t Baudrate = 2000000UL >
 class SoftwareSimpleSpi : public ::xpcc::SimpleSpi
 {
 public:
@@ -42,11 +42,14 @@ public:
 	static const TypeId::SoftwareSpiMasterSck  Sck;
 
 public:
+	// start documentation inherited
 	template< uint32_t baudrate >
 	static inline void
-	initialize(Mode mode=Mode::Mode0);
+	initialize();
 
-	// start documentation inherited
+	static inline void
+	setMode(Mode mode);
+
 	static uint8_t
 	writeReadBlocking(uint8_t data);
 
@@ -70,7 +73,7 @@ private:
 	static inline void
 	delay();
 
-	static constexpr uint32_t delayTime = (1000000.0 / Frequency) / 2.0;
+	static constexpr uint32_t delayTime = (1000000.0 / Baudrate) / 2.0;
 
 	static uint8_t timingMode;
 	static bool finished;
