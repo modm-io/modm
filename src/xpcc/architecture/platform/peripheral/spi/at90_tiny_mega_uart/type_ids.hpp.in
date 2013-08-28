@@ -1,0 +1,43 @@
+// coding: utf-8
+/* Copyright (c) 2013, Roboterclub Aachen e.V.
+ * All Rights Reserved.
+ *
+ * The file is part of the xpcc library and is released under the 3-clause BSD
+ * license. See the file `LICENSE` for the full license governing this code.
+ */
+// ----------------------------------------------------------------------------
+{{ generation_block }}
+
+#ifndef XPCC_{{target.family | upper}}_UART_SPI_TYPE_IDS_HPP
+#define XPCC_{{target.family | upper}}_UART_SPI_TYPE_IDS_HPP
+
+namespace xpcc
+{
+
+namespace {{target.family}}
+{
+
+namespace TypeId
+{
+	typedef struct{} UartSpiMaster0Mosi;
+	typedef struct{} UartSpiMaster0Miso;
+	typedef struct{} UartSpiMaster0Sck;
+
+	typedef struct{} UartSpiMaster1Mosi;
+	typedef struct{} UartSpiMaster1Miso;
+	typedef struct{} UartSpiMaster1Sck;
+
+	typedef struct{} UartSpiMaster2Mosi;
+	typedef struct{} UartSpiMaster2Miso;
+	typedef struct{} UartSpiMaster2Sck;
+
+	typedef struct{} UartSpiMaster3Mosi;
+	typedef struct{} UartSpiMaster3Miso;
+	typedef struct{} UartSpiMaster3Sck;
+}
+
+} // namespace {{target.family}}
+
+} // namespace xpcc
+
+#endif // XPCC_{{target.family | upper}}_UART_SPI_TYPE_IDS_HPP

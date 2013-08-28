@@ -227,7 +227,7 @@ class AVRDeviceWriter(XMLDeviceWriter):
 			if uartSpi:
 				spiDriver = node.addChild('driver')
 				spiDriver.setAttributes(attr)
-				spiDriver.setAttributes({'type': 'spi', 'name': family})
+				spiDriver.setAttributes({'type': 'spi', 'name': family + "_uart"})
 			
 			if instances != []:
 				driver.setAttribute('instances', ",".join(instances))
