@@ -7,19 +7,20 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_SOFTWARE_SIMPLE_SPI_HPP
-#define XPCC_SOFTWARE_SIMPLE_SPI_HPP
+#ifndef XPCC_SOFTWARE_SPI_MASTER_HPP
+#define XPCC_SOFTWARE_SPI_MASTER_HPP
 
 #include <stdint.h>
 #include <xpcc/architecture/peripheral/spi.hpp>
 #include <xpcc/architecture/driver/delay.hpp>
 #include "type_ids.hpp"
+#include "simple_spi.hpp"
 
 namespace xpcc
 {
 
 /**
- * Software emulation of a Simple Spi.
+ * Software emulation of a Spi Master.
  *
  * @tparam	SCK			clock pin [output]
  * @tparam	MOSI		master out slave in pin [output]
@@ -34,7 +35,7 @@ template< typename SCK,
 		  typename MOSI,
 		  typename MISO = GpioUnused,
 		  uint32_t Frequency = 2000000UL >
-class SoftwareSimpleSpi : public ::xpcc::SimpleSpi
+class SoftwareSpiMaster : public ::xpcc::SpiMaster
 {
 public:
 	static const TypeId::SoftwareSpiMasterMosi Mosi;
@@ -47,38 +48,31 @@ public:
 	initialize(Mode mode=Mode::Mode0);
 
 	// start documentation inherited
-	static uint8_t
-	writeReadBlocking(uint8_t data);
-
-	static ALWAYS_INLINE void
-	writeBlocking(uint8_t data);
-
 	static ALWAYS_INLINE bool
-	write(uint8_t data);
+	start(SpiDelegate *delegate);
 
-	static ALWAYS_INLINE uint8_t
-	getResult();
+	static bool
+	startBlocking(SpiDelegate *delegate);
 
-	static inline bool
-	transfer(uint8_t *tx, uint8_t *rx, std::size_t length, BufferOptions options=BufferOptions::TxRxIncrement);
-
-	static ALWAYS_INLINE bool
-	isFinished();
+	static inline void
+	reset(DetachCause cause = DetachCause::SoftwareReset);
 	// end documentation inherited
 
 private:
 	static inline void
 	delay();
 
-	static constexpr uint32_t delayTime = (1000000.0 / Frequency) / 2.0;
+	static uint8_t
+	writeReadBlocking(uint8_t data);
 
+	static constexpr uint32_t delayTime = (1000000.0 / Frequency) / 2.0;
 	static uint8_t timingMode;
-	static bool finished;
-	static uint8_t result;
+
+	static xpcc::SpiDelegate *myDelegate;
 };
 
 } // namespace xpcc
 
-#include "simple_spi_impl.hpp"
+#include "spi_master_impl.hpp"
 
-#endif // XPCC_SOFTWARE_SIMPLE_SPI_HPP
+#endif // XPCC_SOFTWARE_SPI_MASTER_HPP

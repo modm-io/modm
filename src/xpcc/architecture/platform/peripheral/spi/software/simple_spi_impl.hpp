@@ -11,6 +11,11 @@
 #	error	"Don't include this file directly, use 'simple_spi.hpp' instead!"
 #endif
 
+#include <xpcc/architecture/driver/atomic.hpp>
+
+template <typename SCK, typename MOSI, typename MISO, uint32_t Frequency>
+uint8_t xpcc::SoftwareSimpleSpi<SCK, MOSI, MISO, Frequency>::timingMode(0);
+
 template <typename SCK, typename MOSI, typename MISO, uint32_t Frequency>
 bool xpcc::SoftwareSimpleSpi<SCK, MOSI, MISO, Frequency>::finished;
 
@@ -20,12 +25,14 @@ uint8_t xpcc::SoftwareSimpleSpi<SCK, MOSI, MISO, Frequency>::result;
 
 // ----------------------------------------------------------------------------
 template <typename SCK, typename MOSI, typename MISO, uint32_t Frequency>
+template< uint32_t baudrate >
 void
-xpcc::SoftwareSimpleSpi<SCK, MOSI, MISO, Frequency>::initialize()
+xpcc::SoftwareSimpleSpi<SCK, MOSI, MISO, Frequency>::initialize(Mode mode)
 {
-	SCK::setOutput();
-	MOSI::setOutput();
-	MISO::setInput();
+	xpcc::atomic::Lock lock;
+	timingMode = static_cast<uint8_t>(mode);
+	SCK::set(timingMode & 0b10);
+	MOSI::reset();
 	finished = true;
 }
 
@@ -42,6 +49,10 @@ xpcc::SoftwareSimpleSpi<SCK, MOSI, MISO, Frequency>::writeReadBlocking(uint8_t d
 	SCK::reset();
 	for (uint_fast8_t ii = 0; ii < 8; ++ii)
 	{
+		// CPHA=1, sample on falling edge
+		if (timingMode & 0b01)
+			delay();
+
 		input <<= 1;
 		if (data & 0x80) {
 			MOSI::set();
@@ -49,17 +60,28 @@ xpcc::SoftwareSimpleSpi<SCK, MOSI, MISO, Frequency>::writeReadBlocking(uint8_t d
 		else {
 			MOSI::reset();
 		}
-		delay();
+		// CPHA=0, sample on rising edge
+		if (!(timingMode & 0b01))
+			delay();
 
-		SCK::set();
-		delay();
+		// CPOL=0 -> High, CPOL=1 -> High
+		SCK::set(!(timingMode & 0b10));
+
+		// CPHA=1, sample on falling edge
+		if (timingMode & 0b01)
+			delay();
 
 		if (MISO::read()) {
 			input |= 1;
 		}
 		data <<= 1;
 
-		SCK::reset();
+		// CPHA=0, sample on rising edge
+		if (!(timingMode & 0b01))
+			delay();
+
+		// CPOL=0 -> Low, CPOL=1 -> High
+		SCK::set(timingMode & 0b10);
 	}
 	finished = true;
 
