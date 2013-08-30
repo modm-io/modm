@@ -41,11 +41,11 @@ namespace xpcc
 {
 	/**
 	 * \brief	Exchange the two nibbles of a byte
-	 * 
+	 *
 	 * \code
 	 * 0xab => 0xba
 	 * \endcode
-	 * 
+	 *
 	 * \ingroup	math
 	 */
 	ALWAYS_INLINE uint8_t
@@ -64,10 +64,10 @@ namespace xpcc
 		return n;
 #endif
 	}
-	
+
 	/**
 	 * \brief	Exchange two byte
-	 * 
+	 *
 	 * \ingroup	math
 	 */
 	ALWAYS_INLINE void
@@ -77,14 +77,14 @@ namespace xpcc
 		a = b;
 		b = temp;
 	}
-	
+
 	/**
 	 * \brief	Exchange the two bytes of a 16-bit integer
-	 * 
+	 *
 	 * \code
 	 * 0xabcd => 0xcdab
 	 * \endcode
-	 * 
+	 *
 	 * \ingroup	math
 	 */
 	ALWAYS_INLINE uint16_t
@@ -109,7 +109,27 @@ namespace xpcc
 		return n;
 #endif
 	}
-	
+
+	/**
+	 * \brief	Exchange the four bytes of a 32-bit integer
+	 *
+	 * \code
+	 * 0xabcdefgh => 0xghefcdab
+	 * \endcode
+	 *
+	 * \ingroup	math
+	 */
+	ALWAYS_INLINE uint32_t
+	swap(uint32_t n)
+	{
+#ifdef __ARM__
+		return __REV(__RBIT(n));
+#else
+		n = (n << 24) | ((n << 8) & 0xff0000) | ((n >> 8) & 0xff00) | (n >> 24);
+		return n;
+#endif
+	}
+
 	ALWAYS_INLINE void
 	swap(int16_t& a, int16_t& b)
 	{
@@ -117,62 +137,62 @@ namespace xpcc
 		a = b;
 		b = temp;
 	}
-	
+
 	// --------------------------------------------------------------------
 	/**
 	 * \brief	Reverse the bits in a byte
-	 * 
+	 *
 	 * \code
 	 * 0b01110100 => 0b00101110
 	 * \endcode
-	 * 
+	 *
 	 * 15 clock cycles on an AVR, without call + return.
-	 * 
+	 *
 	 * \ingroup	math
 	 */
 	uint8_t
 	bitReverse(uint8_t n);
-	
+
 	/**
 	 * \brief	Reverse the bits in a 16-bit integer
-	 * 
+	 *
 	 * \ingroup	math
 	 */
 	uint16_t
 	bitReverse(uint16_t n);
-	
+
 	/**
 	 * \brief	Reverse the bits in a 32-bit integer
-	 * 
+	 *
 	 * \ingroup	math
 	 */
 	uint32_t
 	bitReverse(uint32_t n);
-	
+
 	// --------------------------------------------------------------------
 	/**
 	 * \brief	Count the number of bits set
-	 * 
+	 *
 	 * 16 clock cycles on an AVR, without call + return.
-	 * 
+	 *
 	 * \ingroup	math
 	 */
 	std::size_t
 	bitCount(uint8_t n);
-	
+
 	/**
 	 * \brief	Count the number of bits set
-	 * 
+	 *
 	 * 33 clock cycles on an AVR, without call + return.
-	 * 
+	 *
 	 * \ingroup	math
 	 */
 	std::size_t
 	bitCount(uint16_t n);
-	
+
 	/**
 	 * \brief	Count the number of bits set
-	 * 
+	 *
 	 * \ingroup	math
 	 */
 	std::size_t
