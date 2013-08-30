@@ -1,23 +1,18 @@
-
 #include <xpcc/architecture.hpp>
-
-// ----------------------------------------------------------------------------
-GPIO__OUTPUT(LedNorth,     E,  9); // LD3
-GPIO__OUTPUT(LedNorthEast, E, 10); // LD5
-GPIO__OUTPUT(LedEast,      E, 11); // LD7
-GPIO__OUTPUT(LedSouthEast, E, 12); // LD9
-GPIO__OUTPUT(LedSouth,     E, 13); // LD10
-GPIO__OUTPUT(LedSouthWest, E, 14); // LD8
-GPIO__OUTPUT(LedWest,      E, 15); // LD6
-GPIO__OUTPUT(LedNorthWest, E,  8); // LD4
-
-GPIO__OUTPUT(ClockOut, A,  8);
-
-GPIO__INPUT(Button, A, 0);
 
 using namespace xpcc::stm32;
 
-// ----------------------------------------------------------------------------
+typedef GpioOutputE9  LedNorth;
+typedef GpioOutputE10 LedNorthEast;
+typedef GpioOutputE11 LedEast;
+typedef GpioOutputE12 LedSouthEast;
+typedef GpioOutputE13 LedSouth;
+typedef GpioOutputE14 LedSouthWest;
+typedef GpioOutputE15 LedWest;
+typedef GpioOutputE8  LedNorthWest;
+typedef GpioOutputA8  ClockOut;
+typedef GpioInputA0   Button;
+
 MAIN_FUNCTION
 {
 	typedef Pll<ExternalOscillator<MHz8>, MHz72> clockSource;
@@ -34,7 +29,7 @@ MAIN_FUNCTION
 	LedNorthWest::setOutput(xpcc::Gpio::HIGH);
 
 	// Output SystemClock on PA8
-	ClockOut::setOutput(Gpio::PUSH_PULL);
+	ClockOut::setOutput();
 	ClockOut::connect(MCO::Id);
 	MCO::connect(clockSource::Id);
 
