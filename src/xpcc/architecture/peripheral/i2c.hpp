@@ -87,7 +87,6 @@ struct I2c
  *
  * @author	Georgi Grinshpun
  * @author	Niklas Hauser
- * @ingroup	peripheral
  * @ingroup i2c
  */
 class I2cMaster : public ::xpcc::Peripheral, public I2c

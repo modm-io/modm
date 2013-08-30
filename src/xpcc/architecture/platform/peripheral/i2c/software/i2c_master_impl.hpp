@@ -7,7 +7,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__SOFTWARE_I2C_HPP
+#ifndef XPCC_SOFTWARE_I2C_HPP
 #	error	"Don't include this file directly, use 'i2c_master.hpp' instead!"
 #endif
 

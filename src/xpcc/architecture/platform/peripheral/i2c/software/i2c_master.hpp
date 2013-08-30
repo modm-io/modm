@@ -7,8 +7,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__SOFTWARE_I2C_HPP
-#define XPCC__SOFTWARE_I2C_HPP
+#ifndef XPCC_SOFTWARE_I2C_HPP
+#define XPCC_SOFTWARE_I2C_HPP
 
 #include <xpcc/architecture/driver/delay.hpp>
 #include <xpcc/architecture/peripheral/gpio.hpp>
@@ -112,4 +112,4 @@ private:
 
 #include "i2c_master_impl.hpp"
 
-#endif // XPCC__SOFTWARE_I2C_HPP
+#endif // XPCC_SOFTWARE_I2C_HPP
