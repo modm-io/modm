@@ -16,23 +16,8 @@ namespace stm32
 namespace TypeId
 {
 %% for id in [1,2,3,4,5,8]
-	%% if id in [1, 8]
-	%# Advanced Timer
-		%% set connectors = ["Channel1", "Channel1N", "Channel2", "Channel2N",
-							 "Channel3", "Channel3N", "Channel4", "Channel4N",
-							 "ExternalTrigger", "BreakIn"]
-	%% elif id in [2, 3, 4, 5]
-	%# General Purpose Timer
-		%% set connectors = ["Channel1", "Channel2", "Channel3", "Channel4",
-							 "ExternalTrigger"]
-	%% elif id in [9, 12]
-	%# General Purpose Timer
-		%% set connectors = ["Channel1", "Channel2"]
-	%% elif id in [10, 11, 13, 14]
-	%# General Purpose Timer
-		%% set connectors = ["Channel1"]
-	%% endif
-	%#
+	%% set connectors = []
+	%% import 'connectors.macros' as cons with context
 	%% for connector in connectors
 	typedef struct{} Timer{{ id ~ connector}};
 	%% endfor

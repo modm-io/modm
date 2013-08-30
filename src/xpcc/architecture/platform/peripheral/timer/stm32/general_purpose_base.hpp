@@ -1,0 +1,238 @@
+// coding: utf-8
+/* Copyright (c) 2013, Roboterclub Aachen e.V.
+ * All Rights Reserved.
+ *
+ * The file is part of the xpcc library and is released under the 3-clause BSD
+ * license. See the file `LICENSE` for the full license governing this code.
+ */
+// ----------------------------------------------------------------------------
+
+#ifndef XPCC_STM32_TIMER_GP_BASE_HPP
+#define XPCC_STM32_TIMER_GP_BASE_HPP
+
+#include "basic_base.hpp"
+
+namespace xpcc
+{
+
+namespace stm32
+{
+
+class GeneralPurposeTimer : public BasicTimer
+{
+public:
+	enum class DmaRequestEnable : uint32_t
+	{
+		Update = TIM_DIER_UDE,
+		CaptureCompare1 = TIM_DIER_CC1DE,
+		CaptureCompare2 = TIM_DIER_CC2DE,
+		CaptureCompare3 = TIM_DIER_CC3DE,
+		CaptureCompare4 = TIM_DIER_CC4DE,
+		COM = TIM_DIER_COMDE,
+		Trigger = TIM_DIER_TDE,
+	};
+
+	enum class Interrupt : uint32_t
+	{
+		Update = TIM_DIER_UIE,
+		CaptureCompare1 = TIM_DIER_CC1IE,
+		CaptureCompare2 = TIM_DIER_CC2IE,
+		CaptureCompare3 = TIM_DIER_CC3IE,
+		CaptureCompare4= TIM_DIER_CC4IE,
+		COM = TIM_DIER_COMIE,
+		Trigger = TIM_DIER_TIE,
+		Break = TIM_DIER_BIE,
+	};
+
+	enum class InterruptFlag : uint32_t
+	{
+		Update = TIM_SR_UIF,
+		CaptureCompare1 = TIM_SR_CC1IF,
+		CaptureCompare2 = TIM_SR_CC2IF,
+		CaptureCompare3 = TIM_SR_CC3IF,
+		CaptureCompare4 = TIM_SR_CC4IF,
+		COM = TIM_SR_COMIF,
+		Trigger = TIM_SR_TIF,
+		Break = TIM_SR_BIF,
+		Overcapture1 = TIM_SR_CC1OF,
+		Overcapture2 = TIM_SR_CC2OF,
+		Overcapture3 = TIM_SR_CC3OF,
+		Overcapture4 = TIM_SR_CC4OF,
+	};
+
+	enum class SlaveModeTrigger : uint32_t
+	{
+	};
+
+	enum class SlaveMode : uint32_t
+	{
+		Disabled = 0,
+	};
+
+	enum class Mode : uint32_t
+	{
+		UpCounter = 0,
+		DownCounter = TIM_CR1_DIR,
+		OneShotUpCounter = TIM_CR1_OPM,
+		OneShotDownCounter = TIM_CR1_DIR | TIM_CR1_OPM,
+		// Counter counts up and down alternatively
+		CenterAligned1 =                 TIM_CR1_CMS_0,	///< Output compare flags only set when counting down
+		CenterAligned2 = TIM_CR1_CMS_1, 					///< Output compare flags only set when counting up
+		CenterAligned3 = TIM_CR1_CMS_1 | TIM_CR1_CMS_0,	///< Output compare flags set when counting up and down (default)
+	};
+
+	enum class OutputCompareMode : uint32_t
+	{
+		/// Output is independent from the compare result
+		Inactive = 0,
+		/// Output is forced high on match
+		HighOnMatch = TIM_CCMR1_OC1M_0,
+		/// Output is forced low on match
+		LowOnMatch = TIM_CCMR1_OC1M_1,
+		/// Output is toggled on match
+		Toggle = TIM_CCMR1_OC1M_1 | TIM_CCMR1_OC1M_0,
+		/// Output is forced low
+		ForceLow = TIM_CCMR1_OC1M_2,
+		/// Output is forced high
+		ForceHigh = TIM_CCMR1_OC1M_2 | TIM_CCMR1_OC1M_0,
+
+		/**
+		 * PWM Mode 1.
+		 *
+		 * While up-counting, channel is active as long as
+		 * count is less than channel capture/compare register, else
+		 * inactive.
+		 * In downcounting, channel is	inactive as long as count exceeds
+		 * capture/compare register, else active
+		 */
+		Pwm1 = TIM_CCMR1_OC1M_2 | TIM_CCMR1_OC1M_1,
+
+		/**
+		 * PWM mode 2.
+		 *
+		 * In upcounting, channel is inactive as long as
+		 * count is less than capture/compare register, else active.
+		 * In downcounting, channel is active as long as count exceeds
+		 * capture/compare	register, else inactive.
+		 */
+		Pwm2 = TIM_CCMR1_OC1M_2 | TIM_CCMR1_OC1M_1 | TIM_CCMR1_OC1M_0,
+	};
+
+	enum class OutputComparePreload : uint32_t
+	{
+		Disable = 0,
+		Enable  = TIM_CCMR1_OC1PE,
+	};
+
+
+	enum class OutputComparePolarity : uint32_t
+	{
+		ActiveHigh = 0,
+		ActiveLow = TIM_CCER_CC1P,
+	};
+
+	/**
+	 * If more than one Compare Channel is available they are always paired.
+	 * 		(A channel with an odd number is paired with the next even numbered channel)
+	 * It is possible to choose as trigger for the input capture functionality either
+	 * the own timer input or the input associated with the paired channel.
+	 *
+	 * For working with Internal Triggers, TRC can also be selected.
+	 */
+	enum class InputCaptureMapping : uint32_t
+	{
+		InputOwn 			= 1,
+		InputOther			= 2,
+		InternalTrigger 	= 3,
+	};
+
+	enum class InputCapturePolarity : uint32_t
+	{
+		Rising	= 0,
+		Falling	= TIM_CCER_CC1P,
+		Both	= TIM_CCER_CC1NP | TIM_CCER_CC1P,
+	};
+
+	enum class InputCapturePrescaler : uint32_t
+	{
+		Div1	= 0,
+		Div2	= 1,
+		Div4	= 2,
+		Div8	= 3,
+	};
+
+	enum class PinState : uint32_t
+	{
+		Disable = 0,
+		Enable = 1,
+	};
+
+	/* Different Resolution Depending on DeadTime[7:5]: */
+	enum class DeadTimeResolution : uint32_t
+	{
+		From0With125nsStep = 0,									//0xx
+		From16usWith250nsStep = TIM_BDTR_DTG_7,					//10x
+		From32usWith1usStep   = TIM_BDTR_DTG_7 | TIM_BDTR_DTG_6,	//110
+		From64usWith2usStep  = TIM_BDTR_DTG_7 | TIM_BDTR_DTG_6	//111
+											| TIM_BDTR_DTG_5,
+	};
+
+public:
+	/**
+	 * Set operation mode of the timer
+	 *
+	 * In Encoder mode the encoder channels A and B must be connected
+	 * to channel 1 and 2 of the timer (e.g. TIM2_CH1 and TIM2_CH2).
+	 */
+	static void
+	setMode(Mode mode, SlaveMode slaveMode = SlaveMode::Disabled,
+			SlaveModeTrigger slaveModeTrigger = (SlaveModeTrigger) 0);
+	
+public:
+	/**
+	 * TODO Description
+	 */
+	void
+	configureInputChannel(uint32_t channel, InputCaptureMapping input,
+			InputCapturePrescaler prescaler, InputCapturePolarity polarity, uint8_t filter);
+
+	/**
+	 * Configure output channel 1..4.
+	 *
+	 * @param	channel			[1..4]
+	 * @param	mode			Output compare mode
+	 * @param	compareValue	Preloaded output compare value (can be
+	 * 							changed later via setCompareValue())
+	 */
+	static void
+	configureOutputChannel(uint32_t channel, OutputCompareMode mode,
+			uint16_t compareValue);
+
+	/**
+	 * Set compare value for channel 1..4.
+	 *
+	 * @param	channel	[1..4]
+	 * @param	value	Compare value
+	 */
+	static inline void
+	setCompareValue(uint32_t channel, uint16_t value);
+
+	/**
+	 * Read compare value for channel 1..4.
+	 *
+	 * @param	channel	[1..4]
+	 * @return	Current compare value
+	 */
+	static inline uint16_t
+	getCompareValue(uint32_t channel);
+};
+
+ENUM_CLASS_FLAG(GeneralPurposeTimer::Interrupt)
+ENUM_CLASS_FLAG(GeneralPurposeTimer::InterruptFlag)
+ENUM_CLASS_FLAG(GeneralPurposeTimer::OutputCompareMode)
+
+} // namespace stm32
+
+} // namespace xpcc
+
+#endif // XPCC_STM32_TIMER_GP_BASE_HPP

@@ -32,7 +32,7 @@
 #ifndef XPCC_STM32__TIMER_{{ id }}_HPP
 #define XPCC_STM32__TIMER_{{ id }}_HPP
 
-
+#include "../../../type_ids.hpp"
 #include "timer_base.hpp"
 
 {% if id == 4 %}
