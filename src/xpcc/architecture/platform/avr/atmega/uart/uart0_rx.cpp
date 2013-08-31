@@ -47,7 +47,7 @@
 #include "uart0.hpp"
 
 static xpcc::atomic::Queue<uint8_t, UART0_RX_BUFFER_SIZE> rxBuffer;
-static uint8_t error;
+static volatile uint8_t error;
 
 // ----------------------------------------------------------------------------
 // called when the UART has received a character
@@ -106,7 +106,7 @@ xpcc::atmega::BufferedUart0::read(uint8_t& c)
 uint8_t
 xpcc::atmega::BufferedUart0::read(uint8_t *buffer, uint8_t n)
 {
-	for (uint8_t i = 0; i < n; ++i)
+	for (uint_fast8_t i = 0; i < n; ++i)
 	{
 		if (rxBuffer.isEmpty()) {
 			return n;
@@ -135,16 +135,15 @@ xpcc::atmega::BufferedUart0::resetErrorFlags()
 uint8_t
 xpcc::atmega::BufferedUart0::flushReceiveBuffer()
 {
-	uint8_t i(0);
-	while(!rxBuffer.isEmpty()) {
+	uint8_t i = 0;
+	while (!rxBuffer.isEmpty()) {
 		rxBuffer.pop();
 		++i;
 	}
 	
 #if defined (RXC0)
-	uint8_t c;
 	while (UCSR0A & (1 << RXC0)) {
-		c = UDR0;
+		(void) UDR0;
 	}
 #endif
 	
