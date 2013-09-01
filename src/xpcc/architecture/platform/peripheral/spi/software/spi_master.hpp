@@ -14,7 +14,6 @@
 #include <xpcc/architecture/peripheral/spi.hpp>
 #include <xpcc/architecture/driver/delay.hpp>
 #include "type_ids.hpp"
-#include "simple_spi.hpp"
 
 namespace xpcc
 {
@@ -25,7 +24,7 @@ namespace xpcc
  * @tparam	SCK			clock pin [output]
  * @tparam	MOSI		master out slave in pin [output]
  * @tparam	MISO		master in slave out pin [input]
- * @tparam	Frequency	requested SPI frequency in Hz (default = 2 MHz)
+ * @tparam	Baudrate	requested SPI baudrate in Hz (default = 2 MHz)
  *
  * @ingroup	spi
  * @author	Niklas Hauser
@@ -49,10 +48,14 @@ public:
 	initialize();
 
 	static ALWAYS_INLINE bool
-	start(SpiDelegate *delegate);
+	start(SpiDelegate *delegate,
+			DataMode mode=DataMode::Mode0,
+			DataOrder order=DataOrder::MsbFirst);
 
 	static bool
-	startBlocking(SpiDelegate *delegate);
+	startBlocking(SpiDelegate *delegate,
+			DataMode mode=DataMode::Mode0,
+			DataOrder order=DataOrder::MsbFirst);
 
 	static inline void
 	reset(DetachCause cause = DetachCause::SoftwareReset);
@@ -66,7 +69,7 @@ private:
 	writeReadBlocking(uint8_t data);
 
 	static constexpr uint32_t delayTime = (1000000.0 / Baudrate) / 2.0;
-	static uint8_t timingMode;
+	static uint8_t operationMode;
 
 	static xpcc::SpiDelegate *myDelegate;
 };

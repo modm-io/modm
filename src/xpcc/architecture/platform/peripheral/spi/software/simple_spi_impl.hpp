@@ -12,7 +12,7 @@
 #endif
 
 template <typename SCK, typename MOSI, typename MISO, uint32_t Baudrate>
-uint8_t xpcc::SoftwareSimpleSpi<SCK, MOSI, MISO, Baudrate>::timingMode(0);
+uint8_t xpcc::SoftwareSimpleSpi<SCK, MOSI, MISO, Baudrate>::operationMode(0);
 
 template <typename SCK, typename MOSI, typename MISO, uint32_t Baudrate>
 bool xpcc::SoftwareSimpleSpi<SCK, MOSI, MISO, Baudrate>::finished;
@@ -32,13 +32,21 @@ xpcc::SoftwareSimpleSpi<SCK, MOSI, MISO, Baudrate>::initialize()
 	finished = true;
 }
 
+template <typename SCK, typename MOSI, typename MISO, uint32_t Baudrate>
+void
+xpcc::SoftwareSimpleSpi<SCK, MOSI, MISO, Baudrate>::setDataMode(DataMode mode)
+{
+	operationMode = static_cast<uint8_t>(mode);
+	SCK::set(operationMode & 0b10);
+}
 
 template <typename SCK, typename MOSI, typename MISO, uint32_t Baudrate>
 void
-xpcc::SoftwareSimpleSpi<SCK, MOSI, MISO, Baudrate>::setMode(Mode mode)
+xpcc::SoftwareSimpleSpi<SCK, MOSI, MISO, Baudrate>::setDataOrder(DataOrder order)
 {
-	timingMode = static_cast<uint8_t>(mode);
-	SCK::set(timingMode & 0b10);
+	operationMode &= ~0b100;
+	if (order == DataOrder::LsbFirst)
+		operationMode |= 0b100;
 }
 // ----------------------------------------------------------------------------
 
@@ -52,43 +60,52 @@ xpcc::SoftwareSimpleSpi<SCK, MOSI, MISO, Baudrate>::writeReadBlocking(uint8_t da
 
 	uint8_t input = 0;
 
-	SCK::reset();
 	for (uint_fast8_t ii = 0; ii < 8; ++ii)
 	{
 		// CPHA=1, sample on falling edge
-		if (timingMode & 0b01)
+		if (operationMode & 0b01)
 			delay();
 
-		input <<= 1;
-		if (data & 0x80) {
-			MOSI::set();
+		// if LSB first
+		if (operationMode & 0b100) {
+			input >>= 1;
+			MOSI::set(data & 0x01);
 		}
 		else {
-			MOSI::reset();
+			input <<= 1;
+			MOSI::set(data & 0x80);
 		}
+
 		// CPHA=0, sample on rising edge
-		if (!(timingMode & 0b01))
+		if (!(operationMode & 0b01))
 			delay();
 
-		// CPOL=0 -> High, CPOL=1 -> High
-		SCK::set(!(timingMode & 0b10));
+		// CPOL=0 -> High, CPOL=1 -> Low
+		SCK::set(!(operationMode & 0b10));
 
 		// CPHA=1, sample on falling edge
-		if (timingMode & 0b01)
+		if (operationMode & 0b01)
 			delay();
 
-		if (MISO::read()) {
-			input |= 1;
+		// if LSB first
+		if (operationMode & 0b100) {
+			if (MISO::read()) input |= 0x80;
+			data >>= 1;
 		}
-		data <<= 1;
+		else {
+			if (MISO::read()) input |= 0x01;
+			data <<= 1;
+		}
 
 		// CPHA=0, sample on rising edge
-		if (!(timingMode & 0b01))
+		if (!(operationMode & 0b01))
 			delay();
 
 		// CPOL=0 -> Low, CPOL=1 -> High
-		SCK::set(timingMode & 0b10);
+		SCK::set(operationMode & 0b10);
 	}
+
+	result = input;
 	finished = true;
 
 	return input;
@@ -105,7 +122,7 @@ template <typename SCK, typename MOSI, typename MISO, uint32_t Baudrate>
 bool
 xpcc::SoftwareSimpleSpi<SCK, MOSI, MISO, Baudrate>::write(uint8_t data)
 {
-	result = writeReadBlocking(data);
+	writeReadBlocking(data);
 	return true;
 }
 

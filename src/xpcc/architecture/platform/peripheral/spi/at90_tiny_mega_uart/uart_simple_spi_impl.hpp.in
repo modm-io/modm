@@ -11,6 +11,9 @@
 #	error	"Don't include this file directly, use 'uart_simple_spi.hpp' instead!"
 #endif
 
+#include <xpcc/architecture/driver/atomic.hpp>
+#include <xpcc/processing/math/utils/bit_operation.hpp>
+
 bool xpcc::{{target.family}}::UartSimpleSpi{{id}}::finished;
 
 // ----------------------------------------------------------------------------
@@ -29,6 +32,8 @@ xpcc::{{target.family}}::UartSimpleSpi{{id}}::initialize()
 void
 xpcc::{{target.family}}::UartSimpleSpi{{id}}::initialize(uint16_t prescaler)
 {
+	xpcc::atomic::Lock lock;
+	
 	UBRR{{ id }} = 0;
 	// set MSPI mode of operation and SPI data mode
 	UCSR{{ id }}C = (1 << UMSEL{{id}}1) | (1 << UMSEL{{id}}0);
@@ -36,23 +41,32 @@ xpcc::{{target.family}}::UartSimpleSpi{{id}}::initialize(uint16_t prescaler)
 	UCSR{{ id }}B = (1 << RXEN{{id}}) | (1 << TXEN{{id}});
 	// set baudrate _after_ enabling transmitter
 	UBRR{{ id }} = prescaler;
+%% if extended is not defined
+	dataOrder = DataOrder::MsbFirst;
+%% endif
 }
 
 void
-xpcc::{{target.family}}::UartSimpleSpi{{id}}::setMode(Mode mode)
+xpcc::{{target.family}}::UartSimpleSpi{{id}}::setDataMode(DataMode mode)
 {
-%# Go home Atmel, you're drunk
-%% if  ( target.family == 'atmega' and
-		(target.name in ['48', '88', '168', '328'] and
-		 target.type == 'p') or
-		(target.name in ['64', '128', '256'] and
-		 target.type in ['rfr1', 'rfr2']) )
+%% if extended is defined
 	UCSR{{ id }}C = (UCSR{{ id }}C & ~0b11) | static_cast<uint8_t>(mode);
 %% else
 	UCSR{{ id }}C = (UCSR{{ id }}C & ~0b01) | (static_cast<uint8_t>(mode) & 0b01);
 %% endif
 }
 
+void
+xpcc::{{target.family}}::UartSimpleSpi{{id}}::setDataOrder(DataOrder order)
+{
+%% if extended is defined
+	UCSR{{id}}C = (UCSR{{id}}C & ~(1 << UDORD{{id}})) | (order == DataOrder::LsbFirst ? (1 << UDORD{{id}}) : 0);
+%% else
+	dataOrder = order;
+%% endif
+}
+
+// ----------------------------------------------------------------------------
 uint8_t
 xpcc::{{target.family}}::UartSimpleSpi{{id}}::writeReadBlocking(uint8_t data)
 {
@@ -66,6 +80,11 @@ xpcc::{{target.family}}::UartSimpleSpi{{id}}::writeReadBlocking(uint8_t data)
 void
 xpcc::{{target.family}}::UartSimpleSpi{{id}}::writeBlocking(uint8_t data)
 {
+%% if extended is not defined
+	if (dataOrder == DataOrder::LsbFirst) {
+		data = xpcc::bitReverse(data);
+	}
+%% endif
 	while(!isFinished())
 		;
 	UDR{{id}} = data;
@@ -74,6 +93,11 @@ xpcc::{{target.family}}::UartSimpleSpi{{id}}::writeBlocking(uint8_t data)
 bool
 xpcc::{{target.family}}::UartSimpleSpi{{id}}::write(uint8_t data)
 {
+%% if extended is not defined
+	if (dataOrder == DataOrder::LsbFirst) {
+		data = xpcc::bitReverse(data);
+	}
+%% endif
 	if (!isFinished())
 		return false;
 
@@ -85,6 +109,11 @@ uint8_t
 xpcc::{{target.family}}::UartSimpleSpi{{id}}::getResult()
 {
 	uint8_t data = UDR{{id}};
+%% if extended is not defined
+	if (dataOrder == DataOrder::LsbFirst) {
+		data = xpcc::bitReverse(data);
+	}
+%% endif
 	return data;
 }
 

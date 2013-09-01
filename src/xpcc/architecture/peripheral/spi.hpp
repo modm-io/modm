@@ -23,14 +23,22 @@ namespace xpcc
 /// @ingroup spi
 struct Spi
 {
-	/// Spi Clock Mode, Mode0 is the most common mode
+	/// Spi Data Mode, Mode0 is the most common mode
 	enum class
-	Mode : uint8_t
+	DataMode : uint8_t
 	{
 		Mode0 = 0b00,	///< clock normal,   sample on rising  edge
 		Mode1 = 0b01,	///< clock normal,   sample on falling edge
 		Mode2 = 0b10,	///< clock inverted, sample on rising  edge
 		Mode3 = 0b11,	///< clock inverted, sample on falling edge
+	};
+
+	/// Spi Data Order, Mode0 is the most common mode
+	enum class
+	DataOrder : uint8_t
+	{
+		MsbFirst = 0b0,
+		LsbFirst = 0b1,
 	};
 
 	/// This tells the `SpiDelegate` why it was detached
@@ -74,7 +82,6 @@ struct Spi
  * 			the same hardware at the same time.
  *
  * @author	Niklas Hauser
- * @ingroup	peripheral
  * @ingroup	spi
  */
 class SimpleSpi : public ::xpcc::Peripheral, public Spi
@@ -90,13 +97,13 @@ public:
 	static void
 	initialize();
 
-	/**
-	 * Sets a new timing mode.
-	 *
-	 * @param	mode
-	 */
+	/// Sets a new data mode.
 	static void
-	setMode(Mode mode);
+	setDataMode(DataMode mode);
+
+	/// Sets a new data order.
+	static void
+	setDataOrder(DataOrder order);
 
 	// synchronous
 	/**
@@ -162,7 +169,6 @@ public:
  * 			the same hardware at the same time.
  *
  * @author	Niklas Hauser
- * @ingroup	peripheral
  * @ingroup	spi
  */
 class SpiMaster : public ::xpcc::Peripheral, public Spi
@@ -183,22 +189,34 @@ public:
 	 *
 	 * @param	delegate
 	 * 		object that inherits from the SpiDelegate class.
+	 * @param	mode
+	 * 		desired data mode for this transfer
+	 * @param	order
+	 * 		desired data order for this transfer
 	 *
 	 * @return	Caller gains control if `true`. Call has no effect if `false`.
 	 */
 	static bool
-	start(SpiDelegate *delegate);
+	start(SpiDelegate *delegate,
+			DataMode mode=DataMode::Mode0,
+			DataOrder order=DataOrder::MsbFirst);
 
 	/**
 	 * Requests bus control and starts the transfer, blocks until delegate is detached.
 	 *
 	 * @param	delegate
 	 * 		object that inherits from the SpiDelegate class.
+	 * @param	mode
+	 * 		desired timing mode for this transfer
+	 * @param	order
+	 * 		desired data order for this transfer
 	 *
 	 * @return	Caller gains control if `true`. Call has no effect if `false`.
 	 */
 	static bool
-	startBlocking(SpiDelegate *delegate);
+	startBlocking(SpiDelegate *delegate,
+			DataMode mode=DataMode::Mode0,
+			DataOrder order=DataOrder::MsbFirst);
 
 	/**
 	 * Perform a software reset of the driver in case of an error.
@@ -228,7 +246,6 @@ class SpiDelegate : public Spi
 public:
 	/// Contains the information required to make a SPI transfer
 	struct Transmission {
-		Mode mode;					///< timing mode for this transfer
 		const uint8_t *writeBuffer;	///< data to write, set to `0` to transmit dummy bytes
 		uint8_t *readBuffer;		///< data to read, set `0` to discard received bytes
 		std::size_t size;			///< number of bytes to be transmitted

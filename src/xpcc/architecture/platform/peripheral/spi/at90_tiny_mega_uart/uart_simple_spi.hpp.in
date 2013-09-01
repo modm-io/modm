@@ -47,8 +47,23 @@ public:
 	static inline void
 	initialize();
 
+%% if extended is not defined
+	/// @warning 	Mode 2 and 3 are not supported on this target, they will be
+	///				treated as Mode 0 and 1, respectively.
+%% endif
 	static void
-	setMode(Mode mode);
+	setDataMode(DataMode mode);
+
+%% if extended is not defined
+	/// @warning 	On this target, only `DataOrder::MsbFirst` is natively
+	///				supported!
+	///				`DataOrder::LsbFirst` is reimplemented in software, which is
+	///				quite costly.
+	/// @see	xpcc::bitReverse()
+%% endif
+	static void
+	setDataOrder(DataOrder order);
+
 
 	static ALWAYS_INLINE uint8_t
 	writeReadBlocking(uint8_t data);
@@ -76,6 +91,9 @@ protected:
 
 private:
 	static bool finished;
+%% if extended is not defined
+	DataOrder dataOrder;
+%% endif
 };
 
 } // namespace {{target.family}}

@@ -24,7 +24,7 @@ namespace xpcc
  * @tparam	SCK			clock pin [output]
  * @tparam	MOSI		master out slave in pin [output]
  * @tparam	MISO		master in slave out pin [input]
- * @tparam	Frequency	requested SPI frequency in Hz (default = 2 MHz)
+ * @tparam	Baudrate	requested SPI baudrate in Hz (default = 2 MHz)
  *
  * @ingroup	spi
  * @author	Niklas Hauser
@@ -47,8 +47,11 @@ public:
 	static inline void
 	initialize();
 
-	static inline void
-	setMode(Mode mode);
+	static void
+	setDataMode(DataMode mode);
+
+	static void
+	setDataOrder(DataOrder order);
 
 	static uint8_t
 	writeReadBlocking(uint8_t data);
@@ -75,7 +78,7 @@ private:
 
 	static constexpr uint32_t delayTime = (1000000.0 / Baudrate) / 2.0;
 
-	static uint8_t timingMode;
+	static uint8_t operationMode;
 	static bool finished;
 	static uint8_t result;
 };
