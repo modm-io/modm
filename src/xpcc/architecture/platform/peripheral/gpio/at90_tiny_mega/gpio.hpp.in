@@ -70,42 +70,22 @@ struct Gpio
  * @ingroup	{{target.family}}
  * @{
  */
+%% for name in ['GpioOpenDrain', 'GpioOpenDrainWithPullUp']
 template< class IO >
-class GpioOpenDrain : Gpio
+class {{name}} : Gpio
 {
 public:
+	%% if name == 'GpioOpenDrain'
 	/// maps to `setInput(Configuration::Floating)` 
 	ALWAYS_INLINE static void set() {
 		IO::setInput(Configuration::Floating);
 	}
-	/// maps to `setOutput(::xpcc::Gpio::LOW)`
-	ALWAYS_INLINE static void reset() {
-		IO::setOutput(::xpcc::Gpio::LOW);
-	}
-	ALWAYS_INLINE static void set(bool status) {
-		if (status) { set(); }
-		else { reset(); }
-	}
-	ALWAYS_INLINE static bool read() {
-		return IO::read();
-	}
-	ALWAYS_INLINE static void
-	connect(::xpcc::TypeId::SoftwareI2cMasterSda) {
-		set();
-	}
-	ALWAYS_INLINE static void
-	connect(::xpcc::TypeId::SoftwareI2cMasterScl) {
-		set();
-	}
-};
-template< class IO >
-class GpioOpenDrainWithPullUp : Gpio
-{
-public:
+	%% else
 	/// maps to `setInput(Configuration::PullUp)` 
 	ALWAYS_INLINE static void set() {
 		IO::setInput(Configuration::PullUp);
 	}
+	%% endif
 	/// maps to `setOutput(::xpcc::Gpio::LOW)`
 	ALWAYS_INLINE static void reset() {
 		IO::setOutput(::xpcc::Gpio::LOW);
@@ -126,26 +106,20 @@ public:
 		set();
 	}
 };
+%% endfor
 /// @}
 
-/**
- * Gpio Classes created from the XML Device File Gpio Description
- *
- * @ingroup	{{target.family}}
- */
 %% for gpio in gpios
 	%% set port = gpio.port | upper
 	%% set pin  = gpio.id
 
-	%% for type in ["Output", "Input", ""] 
+	%% for type in ["Output", "Input", ""]
+		%% set name = "Gpio" ~ type ~ port ~ pin
+		%% set superclass = "Gpio" ~ (type if type != "" else "IO")
 
-		%% if type == "Output"
-class GpioOutput{{port ~ pin}} : public Gpio, ::xpcc::GpioOutput
-		%% elif type == "Input"
-class GpioInput{{port ~ pin}} : public Gpio, ::xpcc::GpioInput
-		%% elif type == ""
-class Gpio{{port ~ pin}} : public Gpio, ::xpcc::GpioIO
-		%% endif
+/// {{type if type != "" else "IO"}} class for Pin {{port ~ pin}}
+/// @ingroup	atmega
+struct {{name}} : public Gpio, ::xpcc::{{superclass}}
 {
 public:
 	static constexpr uint8_t pin = {{pin}};		///< the pin number of this GPIO
@@ -172,11 +146,7 @@ public:
 		PORT{{port}} &= ~mask;
 	}
 	ALWAYS_INLINE static void toggle() {
-			%% if ((target.family == 'atmega' and
-					target.name in ['8', '16', '32', '64', '128', '162', '8515', '8535'] and
-					target.type in ['a', 'none'] ) or (
-					target.family == 'attiny' and
-					target.name in ['26']))
+			%% if notoggle is defined
 		PORT{{port}} ^= mask;
 			%% else
 		PIN{{port}} = mask;
@@ -209,26 +179,18 @@ public:
 	// end documentation inherited
 			%% if 'extint' in gpio
 				%% set af_id = gpio.extint | int
-				%#- Go home Atmel, you're drunk!
-				%% set eicra = 'EICRA'
-				%% set isc2 = ''
-				%% if target.family == 'atmega' and target.name in ['8', '16', '32', '162', '8515', '8535']
-					%% set eicra = 'MCUCR'
-					%% if target.name == '162'
-						%% set isc2 = 'EMCUCR'
-					%% else
-						%% set isc2 = 'MCUCSR'
-					%% endif
+				%% if eicra is not defined
+					%% set eicra = 'EICRA'
 				%% endif
 	ALWAYS_INLINE static void setInputTrigger(InputTrigger trigger) {
 				%% if af_id < 4
-					%% if isc2 != '' and af_id == 2
-		{{isc2}} |= ((i(trigger) & 0b01) << ISC2);
+					%% if isc2 is defined and af_id == 2
+		{{isc2}} = ({{isc2}} & ~(1 << ISC2)) | ((i(trigger) & 0b01) << ISC2);
 					%% else
-		{{eicra}} |= (i(trigger) << 2*{{af_id}});
+		{{eicra}} = ({{eicra}} & ~(0b11 << 2*{{af_id}})) | (i(trigger) << 2*{{af_id}});
 					%% endif
 				%% else
-		EICRB |= (i(trigger) << 2*{{af_id - 4}});
+		EICRB = (EICRB & ~(0b11 << 2*{{af_id - 4}})) | (i(trigger) << 2*{{af_id - 4}});
 				%% endif
 	}
 	ALWAYS_INLINE static void enableExternalInterrupt() {
@@ -276,9 +238,9 @@ public:
 				%% set af_id = gpio.pcint | int
 				%#- Go home Atmel, you're drunk!
 				%% if target.family == 'attiny'
-					%% if (target.name == '2313' or target.name == '4313') and af_id >= 11 and af_id <= 17
+					%% if (target.name in ['2313', '4313']) and af_id >= 11 and af_id <= 17
 						%% set af_reg = 2
-					%% elif (target.name == '20' or target.name == '40' or target.name == '1634') and af_id >= 12 and af_id <= 17
+					%% elif (target.name in ['20', '40', '1634']) and af_id >= 12 and af_id <= 17
 						%% set af_reg = 2
 					%% endif
 				%% else

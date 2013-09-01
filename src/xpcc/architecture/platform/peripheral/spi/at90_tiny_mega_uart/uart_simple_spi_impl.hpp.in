@@ -12,7 +12,7 @@
 #endif
 
 #include <xpcc/architecture/driver/atomic.hpp>
-#include <xpcc/processing/math/utils/bit_operation.hpp>
+#include <xpcc/math/utils/bit_operation.hpp>
 
 bool xpcc::{{target.family}}::UartSimpleSpi{{id}}::finished;
 
@@ -33,7 +33,7 @@ void
 xpcc::{{target.family}}::UartSimpleSpi{{id}}::initialize(uint16_t prescaler)
 {
 	xpcc::atomic::Lock lock;
-	
+
 	UBRR{{ id }} = 0;
 	// set MSPI mode of operation and SPI data mode
 	UCSR{{ id }}C = (1 << UMSEL{{id}}1) | (1 << UMSEL{{id}}0);
