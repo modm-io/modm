@@ -333,7 +333,7 @@ class Driver(DeviceElementBase):
 		"""
 		Returns None if file does not exist
 		"""
-		f = os.path.join(self.path, self.name.split('/')[-1:][0] + '.xml')
+		f = os.path.join(self.path, 'driver.xml')
 		if not os.path.isfile(os.path.join(platform_path, f)):
 			return None
 		else:
@@ -406,7 +406,7 @@ class Driver(DeviceElementBase):
 						self.log.error("Driver '%s'. Parameter '%s' needs a value."
 							% (self.name, name))
 					if name in parameters:
-						self.log.error("Driver '%s'. Parameter '%s' connot be set mor than once!"
+						self.log.error("Driver '%s'. Parameter '%s' cannot be set more than once!"
 							% (self.name, name))
 					if instances != None:
 						# because we need a different seperator for everything...
