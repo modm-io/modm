@@ -152,26 +152,34 @@ class DriverFile:
 					value = p.default
 				# 4.) add value found to the substitution dict
 				p.addValueToSubstitutions(self.substitutions, value)
+			
+			elif node.tag not in ['static', 'template']:
+				f = DeviceElementBase(self, node)
+				if f.appliesTo(device_id, self.properties):
+					self.log.debug("Found driver file substitution '%s' with value '%s'. In '%s/%s' driver xml" % (node.tag, node.text, self.type, self.name))
+					self.substitutions.update({node.tag: node.text})
+		
 		# Then parse needed static/template files
 		for node in driver_node:
 			# Skip PArameters:
 			if node.tag == 'parameter':
 				continue
+			
 			# Check if instance id fits:
 			if node.get('instances') != None and instance_id != None:
 				if instance_id not in node.get('instances').split(','):
 					continue
+			
 			if node.text == None or len(node.text) <= 0:
-				self.log.error("Empty %s node in %s/%s driver xml." % (node.tag, self.type, self.name))
-				raise ParserException("Error: Empty %s node in %s/%s driver xml." % (node.tag, self.type, self.name))
-			if node.tag not in ['static', 'template']:
-				self.log.error("Unknown tag: %s in %s/%s driver xml." % (node.tag, self.type, self.name))
-				raise ParserException("Error: Unknown tag: %s in %s/%s driver xml." % (node.tag, self.type, self.name))
+				self.log.error("Empty '%s' node in '%s/%s' driver xml." % (node.tag, self.type, self.name))
+				raise ParserException("Error: Empty '%s' node in '%s/%s' driver xml." % (node.tag, self.type, self.name))
+			
 			f = DeviceElementBase(self, node)
 			if not f.appliesTo(device_id, self.properties):
-				self.log.info("Tag %s does not apply to device %s. In %s/%s driver xml." % (node.tag, device_id, self.type, self.name))
+				self.log.info("Tag '%s' does not apply to target '%s'. In '%s/%s' driver xml." % (node.tag, device_id.string, self.type, self.name))
 			else:
 				file_name = node.text.strip()
+				
 				if node.tag == 'static':
 					if file_name not in build_list: # if it has not been added before
 						static = file_name
@@ -182,6 +190,7 @@ class DriverFile:
 						output = self._makeRelativeToPlatform(output)
 						if self._checkTarget([static, output], targets):
 							build_list.append([static, output])# => add static file
+				
 				elif node.tag == 'template':
 					template = file_name
 					output = node.get('out')
@@ -220,8 +229,8 @@ class DriverFile:
 			return True
 		else:
 			if targets[build[1]] != build:
-				self.log.warn("To different builds for %s specified! "
-					"%s will be built while %s will be ignored." % (build[1], targets[build[1]], build))
+				self.log.warn("Two different builds for '%s' specified! "
+					"'%s' will be built while '%s' will be ignored." % (build[1], targets[build[1]], build))
 			return False
 
 	def _makeRelativeToPlatform(self, file_name):
