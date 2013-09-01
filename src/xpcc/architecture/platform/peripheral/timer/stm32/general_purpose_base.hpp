@@ -105,7 +105,7 @@ public:
 		 * In downcounting, channel is	inactive as long as count exceeds
 		 * capture/compare register, else active
 		 */
-		Pwm1 = TIM_CCMR1_OC1M_2 | TIM_CCMR1_OC1M_1,
+		Pwm = TIM_CCMR1_OC1M_2 | TIM_CCMR1_OC1M_1,
 
 		/**
 		 * PWM mode 2.
