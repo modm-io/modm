@@ -14,16 +14,21 @@ public class Packets
 	/** Every packet has to implement this interface */
 	public interface Packet
 	{
-		/** Get the size of the underlaying native struct in bytes */
+		/** Get the size of the underlying native struct in bytes 
+		 * @return size in bytes */
 		int getSize();
 		
 		/** 
-		 * @brief	Get a byte array containing the values of attributes
-		 * 			of the class
+		 * Get a byte array containing the values of attributes
+		 * of the class
+		 * @return array of bytes
 		 */
 		byte[] getBytes();
 		
-		/** Convert attributes of the class to a byte buffer */
+		/** Puts (which means appends) attributes of the class to given byte buffer.
+		 * @param buffer It must have enough space for this packet.
+		 * @return passed buffer
+		 * @see ByteBuffer#put(byte)*/
 		abstract ByteBuffer toBuffer(ByteBuffer buffer);
 	}
 	
