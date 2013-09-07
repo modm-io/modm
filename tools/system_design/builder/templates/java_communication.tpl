@@ -15,6 +15,9 @@ public class Communication {
 	private final Identifier.Component me;
 	private final Sender sender;
 	
+	/** Using this member you can publish events.*/
+	public final EventPublisher eventPublisher = new EventPublisher();
+	
 	{% for component in components.iter() %}
 	{% if component.description %}/** {{ component.description | xpcc.wordwrap(72) | xpcc.indent(1) }} */{% endif %}
 	public final {{ component.name | typeName }} {{ component.name | variableName }} = new {{ component.name | typeName }}();
@@ -23,6 +26,34 @@ public class Communication {
 	public Communication(Identifier.Component me, Sender sender) {
 		this.me = me;
 		this.sender = sender;
+	}
+	
+	/** Using this class you can publish events.*/
+	public class EventPublisher {
+		private EventPublisher() {
+		}
+		
+	{%- for event in events.iter() %}
+		{% if event.type -%}
+		{% if event.description %}/** {{ event.description | xpcc.wordwrap(72) | xpcc.indent(1) }}
+		* @param packet {@link Packets.{{ event.type.name | typeObjectName -}} }*/{% endif %}
+		public void {{ event.name | variableName }}(Packets.{{ event.type.name | typeObjectName }} packet) {
+			Header header = new Header(HeaderType.REQUEST, false, Identifier.Component.BROADCAST.id, me.id, Identifier.Event.{{ event.name | enumElement }}.id);
+			DefaultXpccMessage message = new DefaultXpccMessage(header, packet.getBytes());
+			sender.sendPacket(message);
+		}
+		{% else -%}
+		{% if event.description %}/** {{ event.description | xpcc.wordwrap(72) | xpcc.indent(1) }}*/{% endif %}
+		public void {{ event.name | variableName }}() {
+			Header header = new Header(HeaderType.REQUEST, false, Identifier.Component.BROADCAST.id, me.id, Identifier.Event.{{ event.name | enumElement }}.id);
+			DefaultXpccMessage message = new DefaultXpccMessage(header, null);
+			sender.sendPacket(message);
+		}
+		public void {{ event.name | variableName }}(Packets.Void packet) {
+			{{ event.name | variableName }}();
+		}
+		{% endif -%}
+	{% endfor %}
 	}
 
 	/** Every component has to extend this class */
