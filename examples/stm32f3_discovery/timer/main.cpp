@@ -21,21 +21,25 @@ MAIN_FUNCTION
 	Timer1::enable();
 	//Timer1::setMode(Timer1::Mode::CenterAligned3);
 	Timer1::setMode(Timer1::Mode::UpCounter);
-	Timer1::setOverflow(0x8ff);
+	Timer1::setOverflow(0xff);
 	//Timer1::setPeriod(4);
 	Timer1::applyAndReset();
 	Timer1::start();
 
 	LedNorth::connect(Timer1::Channel1);
 	LedNorthWest::connect(Timer1::Channel1N);
-	Timer1::setCompareValue(1, 0x80);
+	Timer1::setCompareValue(1, 0);
 	Timer1::configureOutputChannel(1,
-			static_cast<uint32_t>(Timer1::OutputCompareMode::Pwm) | 0b1101);
+			static_cast<uint32_t>(Timer1::OutputCompareMode::Pwm) | 0b0101);
 	Timer1::setDeadTime(7);
 
 	Timer1::enableOutput();
 
-	while (1){}
+	uint8_t i = 0;
+	while (1){
+		Timer1::setCompareValue(1, ++i);
+		xpcc::delay_ms(10);
+	}
 
 	return 0;
 }
