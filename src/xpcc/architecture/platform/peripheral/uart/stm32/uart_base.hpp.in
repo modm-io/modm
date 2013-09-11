@@ -56,8 +56,6 @@ public:
 		CharacterMatch	= USART_{{reg}}_CMF,
 %% elif target is stm32f2 or target is stm32f4
 %%	set reg = "SR"
-		/// Set if a framing error was detected.
-		FramingError		= USART_{{reg}}_FE,
 %% endif
 		/// Set if the transmit data register is empty.
 		TxEmpty			= USART_{{reg}}_TXE,
