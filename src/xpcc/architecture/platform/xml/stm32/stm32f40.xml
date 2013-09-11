@@ -46,7 +46,9 @@
 		<driver type="timer" name="stm32" instances="1,2,3,4,5,6,7,8" />
 		<!-- for testing: some imaginary driver that should never be used because of the high pin count -->
 		<driver type="magic" name="unicorn" instances="1,2,3,4,5,6,7,8" pin-count="500+"/>
+		<driver type="uart" name="stm32" instances="1,2,3,4,5" />
 		<driver type="i2c" name="stm32" instances="1,2,3"/>
+		<driver type="can" name="stm32" instances="1,2"/>
 		<driver type="gpio" name="stm32">
 			<!-- separate field for port and id are needed because
 				 e.g. on the lpc platform both are a number -->
@@ -56,16 +58,35 @@
 				<af id="1" peripheral="Timer2" name="Channel1"/>
 				<af id="2" peripheral="Timer5" name="Channel1"/>
 				<af id="3" peripheral="Timer8" name="ExternalTrigger"/>
-				<!-- <af id="7" peripheral="Usart2" description="CTS"/> -->
-				<!-- <af id="8" peripheral="Uart4" type="Output" description="TX"/> -->
 			</gpio>
-			<!-- For this proof of concept af, as well as analog are not
-				 evaluated
-				 TODO: add alternate functions as well as analog input connections -->
 			<gpio port="A" id="8">
 				<af id="0" peripheral="MCO1" description="Clock Output"/>
 			</gpio>
+			<gpio port="A" id="2">
+				<af id="7" peripheral="Usart2" name="Tx"/>
+			</gpio>
+			<gpio port="A" id="3">
+				<af id="7" peripheral="Usart2" name="Rx"/>
+			</gpio>
 			<gpio port="A" id="9"></gpio>
+			<gpio port="A" id="11">
+				<af id="9" peripheral="Can1" name="Rx"/>
+			</gpio>
+			<gpio port="A" id="12">
+				<af id="9" peripheral="Can1" name="Tx"/>
+			</gpio>
+			<gpio port="B" id="5">
+				<af id="9" peripheral="Can2" name="Rx"/>
+			</gpio>
+			<gpio port="B" id="6">
+				<af id="9" peripheral="Can2" name="Tx"/>
+			</gpio>
+			<gpio port="B" id="8">
+				<af id="9" peripheral="Can1" name="Rx"/>
+			</gpio>
+			<gpio port="B" id="9">
+				<af id="9" peripheral="Can1" name="Tx"/>
+			</gpio>
 			<gpio port="C" id="9">
 				<af id="0" peripheral="MCO2" description="Clock Output"/>
 			</gpio>

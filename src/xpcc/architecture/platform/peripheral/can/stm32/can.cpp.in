@@ -1,47 +1,19 @@
 // coding: utf-8
+/* Copyright (c) 2011-2013, Roboterclub Aachen e.V.
+* All Rights Reserved.
+*
+* The file is part of the xpcc library and is released under the 3-clause BSD
+* license. See the file `LICENSE` for the full license governing this code.
+*/
 // ----------------------------------------------------------------------------
-/* Copyright (c) 2011, Roboterclub Aachen e.V.
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- *     * Redistributions of source code must retain the above copyright
- *       notice, this list of conditions and the following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright
- *       notice, this list of conditions and the following disclaimer in the
- *       documentation and/or other materials provided with the distribution.
- *     * Neither the name of the Roboterclub Aachen e.V. nor the
- *       names of its contributors may be used to endorse or promote products
- *       derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY ROBOTERCLUB AACHEN E.V. ''AS IS'' AND ANY
- * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL ROBOTERCLUB AACHEN E.V. BE LIABLE FOR ANY
- * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
-// ----------------------------------------------------------------------------
-{{ generation_block }}
 
 #include <xpcc/debug/error_report.hpp>
 #include <xpcc/architecture/driver/atomic/queue.hpp>
 #include <xpcc/utils.hpp>
 
-#include "../gpio.hpp"
-#include "../error_code.hpp"
-
 #include "can_{{ id }}.hpp"
 #include <xpcc_config.hpp>
 
-{% if id == 2 %}
-#if defined(STM32F10X_CL) || defined(STM32F4XX)
-{% endif %}
 
 // ----------------------------------------------------------------------------
 // CAN bit timing register (CAN_BTR)
@@ -49,45 +21,20 @@
 #define CAN_BTR_TS2_POS		20
 #define CAN_BTR_TS1_POS		16
 
-{% if id == 1 %}
-#if defined(STM32F10X_LD) || defined(STM32F10X_MD) || \
-	defined(STM32F10X_HD) || defined(STM32F10X_XL) || \
-	defined(STM32F3XX)
+%% if target is stm32f0 or target is stm32f3
 #	define	CAN1_TX_IRQHandler		USB_HP_CAN1_TX_IRQHandler
 #	define	CAN1_RX0_IRQHandler		USB_LP_CAN1_RX0_IRQHandler
-
 #	define	CAN1_TX_IRQn			USB_HP_CAN1_TX_IRQn
 #	define	CAN1_RX0_IRQn			USB_LP_CAN1_RX0_IRQn
-#endif
-{% endif %}
-// ----------------------------------------------------------------------------
-namespace
-{
-	{% if id == 1 -%}
-	GPIO__INPUT(CanRxA11, A, 11);
-	GPIO__OUTPUT(CanTxA12, A, 12);
-	
-	GPIO__INPUT(CanRxB8, B, 8);
-	GPIO__OUTPUT(CanTxB9, B, 9);
-	
-	GPIO__INPUT(CanRxD0, D, 0);
-	GPIO__OUTPUT(CanTxD1, D, 1);
-	{%- else -%}
-	GPIO__INPUT(CanRxB12, B, 12);
-	GPIO__OUTPUT(CanTxB13, B, 13);
-	
-	GPIO__INPUT(CanRxB5, B, 5);
-	GPIO__OUTPUT(CanTxB6, B, 6);
-	{%- endif %}
-}
+%% endif
 
 // ----------------------------------------------------------------------------
-#if STM32_CAN{{ id }}_TX_BUFFER_SIZE > 0
-xpcc::atomic::Queue<xpcc::can::Message, STM32_CAN{{ id }}_TX_BUFFER_SIZE> txQueue;
-#endif
-#if STM32_CAN{{ id }}_RX_BUFFER_SIZE > 0
-xpcc::atomic::Queue<xpcc::can::Message, STM32_CAN{{ id }}_RX_BUFFER_SIZE> rxQueue;
-#endif
+%% if parameters.tx_buffer > 0
+xpcc::atomic::Queue<xpcc::can::Message, {{ parameters.tx_buffer }}> txQueue;
+%% endif
+%% if parameters.rx_buffer > 0
+xpcc::atomic::Queue<xpcc::can::Message, {{ parameters.rx_buffer }}> rxQueue;
+%% endif
 
 // ----------------------------------------------------------------------------
 // Configure the mailbox to send a CAN message.
@@ -154,7 +101,7 @@ readMailbox(xpcc::can::Message& message, uint32_t mailboxId)
 extern "C" void
 CAN{{ id }}_TX_IRQHandler()
 {
-#if STM32_CAN{{ id }}_TX_BUFFER_SIZE > 0
+%% if parameters.tx_buffer > 0
 	uint32_t mailbox;
 	uint32_t tsr = CAN{{ id }}->TSR;
 	
@@ -176,7 +123,7 @@ CAN{{ id }}_TX_IRQHandler()
 		sendMailbox(txQueue.get(), mailbox);
 		txQueue.pop();
 	}
-#endif
+%% endif
 }
 
 // ----------------------------------------------------------------------------
@@ -195,7 +142,7 @@ CAN{{ id }}_RX0_IRQHandler()
 		CAN{{ id }}->RF0R = CAN_RF0R_FOVR0 | CAN_RF0R_RFOM0;
 	}
 	
-#if STM32_CAN{{ id }}_RX_BUFFER_SIZE > 0
+%% if parameters.rx_buffer > 0
 	xpcc::can::Message message;
 	readMailbox(message, 0);
 	
@@ -205,7 +152,7 @@ CAN{{ id }}_RX0_IRQHandler()
 	if (!rxQueue.push(message)) {
 		xpcc::ErrorReport::report(xpcc::stm32::CAN{{ id }}_FIFO0_OVERFLOW);
 	}
-#endif
+%% endif
 }
 
 // ----------------------------------------------------------------------------
@@ -223,7 +170,7 @@ CAN{{ id }}_RX1_IRQHandler()
 		CAN{{ id }}->RF1R = CAN_RF1R_FOVR1 | CAN_RF1R_RFOM1;
 	}
 	
-#if STM32_CAN{{ id }}_RX_BUFFER_SIZE > 0
+%% if parameters.rx_buffer > 0
 	xpcc::can::Message message;
 	readMailbox(message, 1);
 	
@@ -233,88 +180,7 @@ CAN{{ id }}_RX1_IRQHandler()
 	if (!rxQueue.push(message)) {
 		xpcc::ErrorReport::report(xpcc::stm32::CAN{{ id }}_FIFO1_OVERFLOW);
 	}
-#endif
-}
-
-// ----------------------------------------------------------------------------
-void
-xpcc::stm32::Can{{ id }}::configurePins(Mapping mapping)
-{
-	// Enable clock
-	RCC->APB1ENR |= RCC_APB1ENR_CAN{{ id }}EN;
-	
-	// Initialize IO pins
-#if defined(STM32F2XX) || defined(STM32F4XX)
-	{% if id == 1 -%}
-	if (mapping == REMAP_PB8_PB9) {
-		CanRxB8::setAlternateFunction(AF_CAN1, xpcc::stm32::PULLUP);
-		CanTxB9::setAlternateFunction(AF_CAN1, xpcc::stm32::PUSH_PULL);
-	}
-	else if (mapping == REMAP_PD0_PD1) {
-		CanRxD0::setAlternateFunction(AF_CAN1, xpcc::stm32::PULLUP);
-		CanTxD1::setAlternateFunction(AF_CAN1, xpcc::stm32::PUSH_PULL);
-	}
-	else {
-		CanRxA11::setAlternateFunction(AF_CAN1, xpcc::stm32::PULLUP);
-		CanTxA12::setAlternateFunction(AF_CAN1, xpcc::stm32::PUSH_PULL);
-	}
-	{%- else -%}
-	if (mapping == REMAP_PB5_PB6) {
-		CanRxB5::setAlternateFunction(AF_CAN2, xpcc::stm32::PULLUP);
-		CanTxB6::setAlternateFunction(AF_CAN2, xpcc::stm32::PUSH_PULL);
-	}
-	else {
-		CanRxB12::setAlternateFunction(AF_CAN2, xpcc::stm32::PULLUP);
-		CanTxB13::setAlternateFunction(AF_CAN2, xpcc::stm32::PUSH_PULL);
-	}
-	{%- endif %}
-#elif defined(STM32F3XX)
-	{% if id == 1 -%}
-	if (mapping == REMAP_PB8_PB9) {
-		CanRxB8::setAlternateFunction(AF_CAN, xpcc::stm32::PULLUP);
-		CanTxB9::setAlternateFunction(AF_CAN, xpcc::stm32::PUSH_PULL);
-	}
-#if defined(STM32F3XXV)
-	// only devices with 100 pins have Port D
-	else if (mapping == REMAP_PD0_PD1) {
-		CanRxD0::setAlternateFunction(AF_CAN_D, xpcc::stm32::PULLUP);
-		CanTxD1::setAlternateFunction(AF_CAN_D, xpcc::stm32::PUSH_PULL);
-	}
-#endif
-	else {
-		CanRxA11::setAlternateFunction(AF_CAN, xpcc::stm32::PULLUP);
-		CanTxA12::setAlternateFunction(AF_CAN, xpcc::stm32::PUSH_PULL);
-	}
-	{%- endif %}
-#elif defined(STM32F10X)
-	{% if id == 1 -%}
-	AFIO->MAPR = (AFIO->MAPR & ~AFIO_MAPR_CAN_REMAP) | mapping;
-	if (mapping == REMAP_PB8_PB9) {
-		CanRxB8::setInput(xpcc::stm32::PULLUP);
-		CanTxB9::setAlternateFunction(xpcc::stm32::PUSH_PULL);
-	}
-	else if (mapping == REMAP_PD0_PD1) {
-		CanRxD0::setInput(xpcc::stm32::PULLUP);
-		CanTxD1::setAlternateFunction(xpcc::stm32::PUSH_PULL);
-	}
-	else {
-		CanRxA11::setInput(xpcc::stm32::PULLUP);
-		CanTxA12::setAlternateFunction(xpcc::stm32::PUSH_PULL);
-	}
-	{%- else -%}
-	AFIO->MAPR = (AFIO->MAPR & ~AFIO_MAPR_CAN2_REMAP) | mapping;
-	if (mapping == REMAP_PB5_PB6) {
-		CanRxB5::setInput(xpcc::stm32::PULLUP);
-		CanTxB6::setAlternateFunction(xpcc::stm32::PUSH_PULL);
-	}
-	else {
-		CanRxB12::setInput(xpcc::stm32::PULLUP);
-		CanTxB13::setAlternateFunction(xpcc::stm32::PUSH_PULL);
-	}
-	{%- endif %}
-#else
-#error "Please be more specific about the processor. "
-#endif
+%% endif
 }
 
 // ----------------------------------------------------------------------------
@@ -380,15 +246,15 @@ xpcc::stm32::Can{{ id }}::initialize(can::Bitrate bitrate,
 	nvicEnableInterrupt(CAN{{ id }}_RX0_IRQn);
 	nvicEnableInterrupt(CAN{{ id }}_RX1_IRQn);
 	
-#if STM32_CAN{{ id }}_TX_BUFFER_SIZE > 0
+%% if parameters.tx_buffer > 0
 	CAN{{ id }}->IER |= CAN_IER_TMEIE;
 	nvicEnableInterrupt(CAN{{ id }}_TX_IRQn);
 	NVIC_SetPriority(CAN{{ id }}_TX_IRQn, interruptPriority);
-#endif
-	
-#if STM32_CAN{{ id }}_RX_BUFFER_SIZE > 0
+%% endif
+
+%% if parameters.rx_buffer > 0
 	CAN{{ id }}->IER |= CAN_IER_FMPIE1 | CAN_IER_FMPIE0;
-#endif
+%% endif
 	
 	/* Example for CAN bit timing:
 	 *   CLK on APB1 = 36 MHz
@@ -418,8 +284,8 @@ xpcc::stm32::Can{{ id }}::initialize(can::Bitrate bitrate,
 		case can::BITRATE_1_MBPS:	prescaler =   2; break;
 		default: prescaler = 16; break;		// 125 kbps
 	}
-	
-#if defined(STM32F10X) || defined(STM32F3XX)
+
+%% if target is stm32f1 or target is stm32f3
 	XPCC__STATIC_ASSERT(STM32_APB1_FREQUENCY == 36000000UL,
 			"Unsupported frequency for APB1 (only 36 MHz)");
 	CAN{{ id }}->BTR =
@@ -427,7 +293,7 @@ xpcc::stm32::Can{{ id }}::initialize(can::Bitrate bitrate,
 			 ((5 - 1) << CAN_BTR_TS2_POS) |		// BS2 Samplepoint
 			((12 - 1) << CAN_BTR_TS1_POS) |		// BS1 Samplepoint
 			(prescaler - 1);
-#elif defined(STM32F2XX)
+%% elif target is stm32f2
 	XPCC__STATIC_ASSERT(STM32_APB1_FREQUENCY == 30000000UL,
 			"Unsupported frequency for APB1 (only 30 MHz)");
 	CAN{{ id }}->BTR =
@@ -435,7 +301,7 @@ xpcc::stm32::Can{{ id }}::initialize(can::Bitrate bitrate,
 			 ((4 - 1) << CAN_BTR_TS2_POS) |		// BS2 Samplepoint
 			((10 - 1) << CAN_BTR_TS1_POS) |		// BS1 Samplepoint
 			(prescaler - 1);
-#elif defined(STM32F4XX)
+%% elif target is stm32f4
 	XPCC__STATIC_ASSERT(STM32_APB1_FREQUENCY == 42000000UL,
 			"Unsupported frequency for APB1 (only 42 MHz)");
 	CAN{{ id }}->BTR =
@@ -443,10 +309,8 @@ xpcc::stm32::Can{{ id }}::initialize(can::Bitrate bitrate,
 			 ((6 - 1) << CAN_BTR_TS2_POS) |		// BS2 Samplepoint
 			((14 - 1) << CAN_BTR_TS1_POS) |		// BS1 Samplepoint
 			(prescaler - 1);
-#else
-#	error "Unknown CPU Type. Please define STM32F10X, STM32F2XX, STM32F3XX or STM32F4XX"
-#endif
-	
+%% endif
+
 	// Request leave initialization
 	CAN{{ id }}->MCR &= ~(uint32_t)CAN_MCR_INRQ;
 	while ((CAN{{ id }}->MSR & CAN_MSR_INAK) == CAN_MSR_INAK) {
@@ -490,19 +354,19 @@ xpcc::stm32::Can{{ id }}::setMode(can::Mode mode)
 bool
 xpcc::stm32::Can{{ id }}::isMessageAvailable()
 {
-#if STM32_CAN{{ id }}_RX_BUFFER_SIZE > 0
+%% if parameters.rx_buffer > 0
 	return !rxQueue.isEmpty();
-#else
+%% else
 	// Check if there are any messages pending in the receive registers
 	return ((CAN{{ id }}->RF0R & CAN_RF0R_FMP0) > 0 || (CAN{{ id }}->RF1R & CAN_RF1R_FMP1) > 0);
-#endif
+%% endif
 }
 
 // ----------------------------------------------------------------------------
 bool
 xpcc::stm32::Can{{ id }}::getMessage(can::Message& message)
 {
-#if STM32_CAN{{ id }}_RX_BUFFER_SIZE > 0
+%% if parameters.rx_buffer > 0
 	if (rxQueue.isEmpty())
 	{
 		// no message in the receive buffer
@@ -513,7 +377,7 @@ xpcc::stm32::Can{{ id }}::getMessage(can::Message& message)
 		rxQueue.pop();
 		return true;
 	}
-#else
+%% else
 	if ((CAN{{ id }}->RF0R & CAN_RF0R_FMP0) > 0)
 	{
 		readMailbox(message, 0);
@@ -531,18 +395,18 @@ xpcc::stm32::Can{{ id }}::getMessage(can::Message& message)
 		return true;
 	}
 	return false;
-#endif
+%% endif
 }
 
 // ----------------------------------------------------------------------------
 bool
 xpcc::stm32::Can{{ id }}::isReadyToSend()
 {
-#if STM32_CAN{{ id }}_TX_BUFFER_SIZE > 0
+%% if parameters.tx_buffer > 0
 	return !txQueue.isFull();
-#else
+%% else
 	return ((CAN{{ id }}->TSR & (CAN_TSR_TME0 | CAN_TSR_TME1 | CAN_TSR_TME1)) != 0);
-#endif
+%% endif
 }
 
 // ----------------------------------------------------------------------------
@@ -555,15 +419,15 @@ xpcc::stm32::Can{{ id }}::sendMessage(const can::Message& message)
 	if ((CAN{{ id }}->TSR & (CAN_TSR_TME0 | CAN_TSR_TME1 | CAN_TSR_TME1)) == 0)
 	{
 		// All mailboxes used at the moment
-#if STM32_CAN{{ id }}_TX_BUFFER_SIZE > 0
+%% if parameters.tx_buffer > 0
 		if (!txQueue.push(message)) {
 			xpcc::ErrorReport::report(xpcc::stm32::CAN{{ id }}_TX_OVERFLOW);
 			return false;
 		}
 		return true;
-#else
+%% else
 		return false;
-#endif
+%% endif
 	}
 	else {
 		// Get number of the first free mailbox
@@ -603,7 +467,3 @@ xpcc::stm32::Can{{ id }}::enableStatusChangeInterrupt(
 	
 	CAN{{ id }}->IER = interruptEnable | (CAN{{ id }}->IER & 0x000000ff);
 }
-
-{% if id == 2 %}
-#endif
-{% endif %}
