@@ -113,13 +113,13 @@ namespace xpcc
 			static inline void
 			enableInterrupt(Interrupt interrupt)
 			{
-				TIM{{ id }}->DIER |= interrupt;
+				TIM{{ id }}->DIER |= static_cast<uint32_t>(interrupt);
 			}
 			
 			static inline void
 			disableInterrupt(Interrupt interrupt)
 			{
-				TIM{{ id }}->DIER &= ~interrupt;
+				TIM{{ id }}->DIER &= ~static_cast<uint32_t>(interrupt);
 			}
 			
 			static inline InterruptFlag
@@ -133,7 +133,7 @@ namespace xpcc
 			{
 				// Flags are cleared by writing a zero to the flag position.
 				// Writing a one is ignored.
-				TIM{{ id }}->SR = ~interrupt;
+				TIM{{ id }}->SR = ~static_cast<uint32_t>(interrupt);
 			}
 		};
 	}

@@ -1,44 +1,14 @@
 // coding: utf-8
-// ----------------------------------------------------------------------------
-/* Copyright (c) 2011, Roboterclub Aachen e.V.
- * All rights reserved.
+/* Copyright (c) 2013, Roboterclub Aachen e.V.
+ * All Rights Reserved.
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- * 
- *     * Redistributions of source code must retain the above copyright
- *       notice, this list of conditions and the following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright
- *       notice, this list of conditions and the following disclaimer in the
- *       documentation and/or other materials provided with the distribution.
- *     * Neither the name of the Roboterclub Aachen e.V. nor the
- *       names of its contributors may be used to endorse or promote products
- *       derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY ROBOTERCLUB AACHEN E.V. ''AS IS'' AND ANY
- * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL ROBOTERCLUB AACHEN E.V. BE LIABLE FOR ANY
- * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * The file is part of the xpcc library and is released under the 3-clause BSD
+ * license. See the file `LICENSE` for the full license governing this code.
  */
 // ----------------------------------------------------------------------------
-{{ generation_block }}
-
-#include "../../../device.hpp"
-
-#include "timer_{{ id }}.hpp"
 
 #include <xpcc_config.hpp>
-{% if id == 4 %}
-#if !defined (STM32F10X_LD)
-{% elif id == 5 %}
-#if !defined (STM32F10X_LD) && !defined (STM32F10X_MD) && !defined(STM32F3XX)
-{% endif %}
+#include "timer_{{ id }}.hpp"
 
 // ----------------------------------------------------------------------------
 void
@@ -46,7 +16,7 @@ xpcc::stm32::Timer{{ id }}::enable()
 {
 	// enable clock
 	RCC->APB1ENR  |=  RCC_APB1ENR_TIM{{ id }}EN;
-	
+
 	// reset timer
 	RCC->APB1RSTR |=  RCC_APB1RSTR_TIM{{ id }}RST;
 	RCC->APB1RSTR &= ~RCC_APB1RSTR_TIM{{ id }}RST;
@@ -57,7 +27,7 @@ xpcc::stm32::Timer{{ id }}::disable()
 {
 	// disable clock
 	RCC->APB1ENR &= ~RCC_APB1ENR_TIM{{ id }}EN;
-	
+
 	TIM{{ id }}->CR1 = 0;
 	TIM{{ id }}->DIER = 0;
 	TIM{{ id }}->CCER = 0;
@@ -72,22 +42,26 @@ xpcc::stm32::Timer{{ id }}::setMode(Mode mode, SlaveMode slaveMode,
 	// disable timer
 	TIM{{ id }}->CR1 = 0;
 	TIM{{ id }}->CR2 = 0;
-	
-	if (slaveMode == SLAVE_ENCODER_1 || \
-		slaveMode == SLAVE_ENCODER_2 || \
-		slaveMode == SLAVE_ENCODER_3)
+
+	if (slaveMode == SlaveMode::Encoder1 || \
+		slaveMode == SlaveMode::Encoder2 || \
+		slaveMode == SlaveMode::Encoder3)
 	{
 		// Prescaler has to be 1 when using the quadrature decoder
 		setPrescaler(1);
 	}
-	
+
 	// ARR Register is buffered, only Under/Overflow generates update interrupt
-	if(enableOnePulseMode)
-		TIM{{ id }}->CR1 = TIM_CR1_ARPE | TIM_CR1_URS | TIM_CR1_OPM | mode;
-	else
-		TIM{{ id }}->CR1 = TIM_CR1_ARPE | TIM_CR1_URS | mode;
-	TIM{{ id }}->CR2 = masterMode;
-	TIM{{ id }}->SMCR = slaveMode | slaveModeTrigger;
+	if(enableOnePulseMode) {
+		TIM{{ id }}->CR1 = TIM_CR1_ARPE | TIM_CR1_URS | TIM_CR1_OPM
+										| static_cast<uint32_t>(mode);
+	} else {
+		TIM{{ id }}->CR1 = TIM_CR1_ARPE | TIM_CR1_URS
+										| static_cast<uint32_t>(mode);
+	}
+	TIM{{ id }}->CR2 = static_cast<uint32_t>(masterMode);
+	TIM{{ id }}->SMCR = static_cast<uint32_t>(slaveMode)
+						| static_cast<uint32_t>(slaveModeTrigger);
 }
 
 // ----------------------------------------------------------------------------
@@ -101,17 +75,17 @@ xpcc::stm32::Timer{{ id }}::setPeriod(uint32_t microseconds, bool autoApply)
 					STM32_APB1_FREQUENCY / 1000000UL);
 	uint16_t prescaler = (cycles + 65535) / 65536;	// always round up
 	Value overflow = cycles / prescaler;
-	
+
 	overflow = overflow - 1;	// e.g. 36000 cycles are from 0 to 35999
-	
+
 	setPrescaler(prescaler);
 	setOverflow(overflow);
-	
+
 	if (autoApply) {
 		// Generate Update Event to apply the new settings for ARR
 		TIM{{ id }}->EGR |= TIM_EGR_UG;
 	}
-	
+
 	return overflow;
 }
 
@@ -127,9 +101,9 @@ xpcc::stm32::Timer{{ id }}::configureInputChannel(uint32_t channel,
 	// disable channel
 	TIM{{ id }}->CCER &= ~((TIM_CCER_CC1NP | TIM_CCER_CC1P | TIM_CCER_CC1E) << (channel * 4));
 
-	uint32_t flags = input;
-	flags |= ((uint32_t)prescaler) << 2;
-	flags |= ((uint32_t)(filter&0xf)) << 4;
+	uint32_t flags = static_cast<uint32_t>(input);
+	flags |= static_cast<uint32_t>(prescaler) << 2;
+	flags |= (static_cast<uint32_t>(filter) & 0xf) << 4;
 	
 	if (channel <= 1)
 	{
@@ -155,8 +129,9 @@ xpcc::stm32::Timer{{ id }}::configureInputChannel(uint32_t channel,
 
 		TIM{{ id }}->CCMR2 = flags; 
 	}
-	
-	TIM{{ id }}->CCER |= (TIM_CCER_CC1E | polarity) << (channel * 4);
+
+	TIM{{ id }}->CCER |=
+		(TIM_CCER_CC1E | static_cast<uint32_t>(polarity)) << (channel * 4);
 }
 
 // ----------------------------------------------------------------------------
@@ -172,7 +147,7 @@ xpcc::stm32::Timer{{ id }}::configureOutputChannel(uint32_t channel,
 	setCompareValue(channel + 1, compareValue);
 	
 	// enable preload (the compare value is loaded at each update event)
-	uint32_t flags = mode | TIM_CCMR1_OC1PE;
+	uint32_t flags = static_cast<uint32_t>(mode) | TIM_CCMR1_OC1PE;
 	
 	if (channel <= 1)
 	{
@@ -192,7 +167,7 @@ xpcc::stm32::Timer{{ id }}::configureOutputChannel(uint32_t channel,
 		TIM{{ id }}->CCMR2 = flags; 
 	}
 	
-	if (mode != OUTPUT_INACTIVE && out == ENABLE) {
+	if (mode != OutputCompareMode::Inactive && out == PinState::Enable) {
 		TIM{{ id }}->CCER |= (TIM_CCER_CC1E) << (channel * 4);
 	}
 }
@@ -212,7 +187,3 @@ xpcc::stm32::Timer{{ id }}::enableInterruptVector(bool enable, uint32_t priority
 		NVIC_DisableIRQ(TIM{{ id }}_IRQn);
 	}
 }
-
-{% if id == 4 or id == 5 %}
-#endif
-{% endif %}

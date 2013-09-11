@@ -55,7 +55,7 @@
 					 drivers. -->
 				<af id="1" peripheral="Timer2" name="Channel1"/>
 				<af id="2" peripheral="Timer5" name="Channel1"/>
-				<af id="3" peripheral="Timer8" name="ETR"/>
+				<af id="3" peripheral="Timer8" name="ExternalTrigger"/>
 				<!-- <af id="7" peripheral="Usart2" description="CTS"/> -->
 				<!-- <af id="8" peripheral="Uart4" type="Output" description="TX"/> -->
 			</gpio>
