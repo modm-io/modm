@@ -130,7 +130,10 @@ class DeviceIdentifier:
 		if self.platform != None and self.platform != "avr":
 			string += self.platform
 		if self.family:
-			string += self.family
+			if self.platform != "stm32":
+				string += self.family
+			else:
+				string += 'f'
 		if self.family == 'at90':
 			if self.type:
 				string += self.type
