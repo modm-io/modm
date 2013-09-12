@@ -29,13 +29,13 @@
 
 from lxml import etree
 
-import os, sys
+import os, sys, re
 # add python module logger to path
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'logger'))
 from logger import Logger
 # add python module device files to path
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'device_files'))
-from device_string import DeviceString
+from device_identifier import DeviceIdentifier
 
 class XMLDeviceReader:
 	""" DeviceReader
@@ -50,14 +50,16 @@ class XMLDeviceReader:
 		
 		self.file = path
 		self.tree = self._openDeviceXML(self.file)
-		self.properties = {'instances': [], 'id': DeviceString()}
+		self.properties = {'instances': [], 'id': DeviceIdentifier()}
 
 	def _openDeviceXML(self, filename):
-		self.log.debug("XMLDeviceReader: Opening XML file '" + os.path.basename(self.file) + "'")
+		self.log.debug("XMLDeviceReader: Opening XML file '%s'" % os.path.basename(self.file))
+		file = open(filename, 'r').read()
+		file = re.sub(' xmlns="[^"]+"', '', file, count=1)
 		xmltree = None
 		try:
 			# parse the xml-file
-			xmltree = etree.parse(filename).getroot()
+			xmltree = etree.fromstring(file)
 		except:
 			self.log.error("XMLDeviceReader: Failure to open XML file!")
 		return xmltree
@@ -73,7 +75,7 @@ class XMLDeviceReader:
 		try:
 			response = self.tree.xpath(query)
 		except:
-			self.log.error("XMLDeviceReader: Query failed for '" + str(query) + "'")
+			self.log.error("XMLDeviceReader: Query failed for '%s'" % str(query))
 		
 		return response
 	
@@ -81,12 +83,12 @@ class XMLDeviceReader:
 		"""
 		This wraps the queryTree and returns an (empty) array. 
 		"""
-		self.log.debug("XMLDeviceReader: Querying for '" + str(query) + "'")
+		self.log.debug("XMLDeviceReader: Querying for '%s'" % str(query))
 		response = self.queryTree(query)
 		
 		if response != None:
 			if len(response) == 0:
-				self.log.info("XMLDeviceReader: No results found for '" + dict['id'].string + "'")
+				self.log.warn("XMLDeviceReader: No results found for '%s'" % str(query))
 			return response
 		
 		return []
@@ -103,4 +105,4 @@ class XMLDeviceReader:
 		return self.__str__()
 
 	def __str__(self):
-		return "XMLDeviceReader(" + os.path.basename(self.file) + ")"
+		return "XMLDeviceReader(%s)" % os.path.basename(self.file)
