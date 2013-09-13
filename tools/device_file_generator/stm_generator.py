@@ -31,7 +31,7 @@
 import os, sys
 from device import Device
 from stm_reader import STMDeviceReader
-#from stm_writer import STMDeviceWriter
+from stm_writer import STMDeviceWriter
 from merger import DeviceMerger
 import glob
 # add python module logger to path
@@ -57,13 +57,14 @@ if __name__ == "__main__":
 			part = STMDeviceReader(file, logger)
 			devices.append(Device(part, logger))
 	
-#	merger = DeviceMerger(devices, logger)
-#	merger.mergedByType()
-#	merger.mergedByName()
+	merger = DeviceMerger(devices, logger)
+	merger.mergedByType()
+	merger.mergedByName()
 	
 	folder = os.path.join(os.path.dirname(__file__), '..', '..', 'src', 'xpcc', 'architecture', 'platform', 'xml', 'stm32')
 	
-#	for dev in merger.mergedDevices:
-#		writer = STMDeviceWriter(dev, logger)
-#		writer.write(folder)
+	for dev in merger.mergedDevices:
+#		print dev
+		writer = STMDeviceWriter(dev, logger)
+		writer.write(folder)
 
