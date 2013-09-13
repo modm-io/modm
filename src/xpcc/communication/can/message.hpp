@@ -1,30 +1,10 @@
-// coding: utf-8
 // ----------------------------------------------------------------------------
-/* Copyright (c) 2009, Roboterclub Aachen e.V.
- * All rights reserved.
+// coding: utf-8
+/* Copyright (c) 2009, 2013, Roboterclub Aachen e.V.
+ * All Rights Reserved.
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- * 
- *     * Redistributions of source code must retain the above copyright
- *       notice, this list of conditions and the following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright
- *       notice, this list of conditions and the following disclaimer in the
- *       documentation and/or other materials provided with the distribution.
- *     * Neither the name of the Roboterclub Aachen e.V. nor the
- *       names of its contributors may be used to endorse or promote products
- *       derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY ROBOTERCLUB AACHEN E.V. ''AS IS'' AND ANY
- * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL ROBOTERCLUB AACHEN E.V. BE LIABLE FOR ANY
- * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * The file is part of the xpcc library and is released under the 3-clause BSD
+ * license. See the file `LICENSE` for the full license governing this code.
  */
 // ----------------------------------------------------------------------------
 
@@ -41,54 +21,6 @@ namespace xpcc
 	 */
 	namespace can
 	{
-		/**
-		 * \brief	Supported CAN bitrates
-		 * \ingroup	can
-		 */
-		enum Bitrate
-		{
-			BITRATE_10_KBPS	= 0,
-			BITRATE_20_KBPS	= 1,
-			BITRATE_50_KBPS	= 2,
-			BITRATE_100_KBPS = 3,
-			BITRATE_125_KBPS = 4,
-			BITRATE_250_KBPS = 5,
-			BITRATE_500_KBPS = 6,
-			BITRATE_1_MBPS = 7,
-		};
-		
-		/**
-		 * \brief	Possible modes of the CAN controller
-		 * 
-		 * NORMAL is the standard operation mode, in LISTEN_ONLY mode it is
-		 * only possible to receive messages and in LOOPBACK mode all messages
-		 * send are not send to the CAN bus but are received immediately by
-		 * the own controller. 
-		 */
-		enum Mode
-		{
-			NORMAL,
-			LISTEN_ONLY,
-			LOOPBACK,
-		};
-		
-		enum BusState
-		{
-			CONNECTED,
-
-			// This bit is set by hardware when the warning limit has been
-			// reached (Receive Error Counter or Transmit Error Counter ≥ 96).
-			ERROR_WARNING,
-
-			// This bit is set by hardware when the Error Passive limit has
-			// been reached (Receive Error Counter or Transmit Error Counter > 127).
-			ERROR_PASSIVE,
-
-			// This bit is set by hardware when it enters the bus-off state.
-			// The bus-off state is entered on TEC overflow, greater than 255
-			BUS_OFF,
-		};
-
 		/**
 		 * \brief	Representation of a CAN message
 		 * \ingroup	can
