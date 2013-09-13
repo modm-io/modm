@@ -48,19 +48,19 @@ class XMLDeviceWriter:
 		self.file = None
 		self.device = device
 		
-		self.names = self.device.getDeviceNames()
-		self.names.sort(key=int)
-		self.family = self.device.id.family
-		self.platform = self.device.id.platform
-		
 		self.tree = XMLElement('rca')
 		self.tree.setAttribute('version', '1.0')
 		self.tree.addComment(' WARNING: This file is generated automatically, do not edit!\n \
 		Please modify the xpcc/tools/DeviceFileGenerator code instead and rebuild this file.\n \
 		Be aware, that regenerated files might have a different composition for technical reasons. ')
 		
+		props = self.device.id.properties
+		props = {p : props[p] for p in props if props[p] != None}
 		self.root = self.tree.addChild('device')
-		self.root.setAttributes({'platform': self.platform, 'family': self.family, 'name': "|".join(self.names)})
+		# Force an order onto a dictionary in the most stupid way I could think of
+		for name in ['platform', 'family', 'name', 'pin_id', 'size_id', 'type']:
+			if name in props:
+				self.root.setAttribute(name, props[name])
 		
 
 	def writeToFile(self, file):
