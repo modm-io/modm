@@ -261,6 +261,23 @@ public:
 		setAlternateFunction(AlternateFunction::AF_{{ af.id }});
 				%% endif
 	}
+				%% if af.type|lower in ['', 'output'] and type != "Input"
+	/// Connect {{name}} as {{af.name}} to {{af.peripheral}}.
+	ALWAYS_INLINE static void
+	connect(TypeId::{{ af.peripheral }}{{ af.name }} /* t */,
+		OutputType type, OutputSpeed speed = OutputSpeed::MHz50) {
+		configure(type, speed);
+		setAlternateFunction(AlternateFunction::AF_{{ af.id }});
+	}
+				%% endif
+				%% if af.type|lower in ['', 'input'] and type != "Output"
+	/// Connect {{name}} as {{af.name}} to {{af.peripheral}}.
+	ALWAYS_INLINE static void
+	connect(TypeId::{{ af.peripheral }}{{ af.name }} /* t */, InputType type) {
+		configure(type);
+		setAlternateFunction(AlternateFunction::AF_{{ af.id }});
+	}
+				%% endif
 			%% endif
 		%% endfor
 	// connect: Software Gpio
