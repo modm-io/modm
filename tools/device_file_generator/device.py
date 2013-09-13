@@ -215,9 +215,10 @@ class Device:
 
 	def getDeviceAttributes(self, name):
 		attributes = []
+		attr = getattr(self.id, name)
 		
-		if getattr(self.id, name) != None:
-			return [getattr(self.id, name)]
+		if attr != None and '|' not in attr:
+			return [attr]
 		else:
 			for inst in self.instances:
 				attributes.extend(inst.getDeviceAttributes(name))
@@ -251,7 +252,7 @@ class Device:
 					if getattr(target, key) == None:
 						setattr(target, key, self_target[key])
 			attributes.extend(dicts)
-		
+
 		return attributes
 	
 	def __repr__(self):

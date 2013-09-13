@@ -127,26 +127,26 @@ class DeviceIdentifier:
 	@property
 	def string(self):
 		string = ""
-		if self.platform != None and self.platform != "avr":
+		if self.platform != None and '|' not in self.platform and self.platform != "avr":
 			string += self.platform
-		if self.family:
+		if self.family != None and '|' not in self.family:
 			if self.platform != "stm32":
 				string += self.family
 			else:
 				string += 'f'
 		if self.family == 'at90':
-			if self.type:
+			if self.type and '|' not in self.type:
 				string += self.type
-			if self.name:
+			if self.name and '|' not in self.name:
 				string += self.name
 		else:
-			if self.name:
+			if self.name and '|' not in self.name:
 				string += self.name
-			if self.type and self.platform != "stm32":
+			if self.type and '|' not in self.type and self.platform != "stm32":
 				string += self.type
-		if self.pin_id and self.family not in ['atmega', 'attiny']:
+		if self.pin_id and '|' not in self.pin_id and self.family not in ['atmega', 'attiny']:
 			string += self.pin_id
-		if self.size_id and self.platform != "avr":
+		if self.size_id and '|' not in self.size_id and self.platform != "avr":
 			string += self.size_id
 		return string
 
@@ -194,6 +194,16 @@ class DeviceIdentifier:
 				setattr(common, key, tself[key])
 			else:
 				dict['different_keys'].append(key)
+				common_array = getattr(common, key)
+				if common_array != None:
+					common_array = common_array.split('|')
+				else:
+					common_array = []
+				common_array.extend(tother[key].split('|'))
+				common_array.extend(tself[key].split('|'))
+				common_array = list(set(common_array))
+				common_array.sort()
+				setattr(common, key, '|'.join(common_array))
 				setattr(other_delta, key, tother[key])
 				setattr(self_delta, key, tself[key])
 				self_delta.valid = True
