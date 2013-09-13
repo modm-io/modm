@@ -9,10 +9,9 @@
 from reader import XMLDeviceReader
 from peripheral import Peripheral
 from register import Register
-import glob
 from lxml import etree
 
-import os, sys, math
+import os, sys, math, glob, re
 # add python module logger to path
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'logger'))
 from logger import Logger
@@ -80,7 +79,6 @@ class STMDeviceReader(XMLDeviceReader):
 				self.properties['define'] = cdef
 		
 		self.properties['id'] = dev
-		self.properties['mmcu'] = dev.string
 		self.properties['core'] = core
 		self.properties['architecture'] = architecture
 
@@ -100,6 +98,13 @@ class STMDeviceReader(XMLDeviceReader):
 
 		self.modules = self.query("//IP/@InstanceName")
 		self.log.debug("Available Modules are:\n" + self._modulesToString())
+		package = self.query("/Mcu/@Package")[0]
+		self.properties['pin-count'] = re.findall('[0-9]+', package)[0]
+		self.properties['package']   = re.findall('[A-Z]+', package)[0]
+		
+		for m in self.modules:
+			if any(m.startswith(per) for per in ['TIM', 'UART', 'USART', 'ADC', 'DAC', 'CAN', 'SPI', 'I2C']):
+				modules.append(m)
 
 		for pin in self.query("//Pin[@Type='I/O']"):
 			name = pin.get('Name')
@@ -110,6 +115,59 @@ class STMDeviceReader(XMLDeviceReader):
 			
 			gpio = {'port': name[1:2], 'id': name[2:], 'af': []}
 			
+			for signal in [s.get('Name') for s in pin if s.get('Name') != 'GPIO']:
+				raw_names = signal.split('_')
+				instance = raw_names[0][-1]
+				name = raw_names[1].lower()
+				invertMode = {'out': 'in', 'in': 'out', 'io': 'io'}
+				nameToMode = {'rx': 'in', 'tx': 'out', 'cts': 'in', 'rts': 'out', 'ck': 'out',	# Uart
+							 'miso': 'in', 'mosi': 'out', 'nss': 'io', 'sck': 'out',	# Spi
+							 'scl': 'out', 'sda': 'io'}	# I2c
+				
+				if signal.startswith('USART') or signal.startswith('UART'):
+					af = {'peripheral' : 'Uart' + instance,
+						  'name': name.capitalize(),
+						  'type': nameToMode[name]}
+					gpio['af'].append(af)
+				
+				elif signal.startswith('SPI'):
+					af = {'peripheral' : 'SpiMaster' + instance,
+						  'name': name.capitalize(),
+						  'type': nameToMode[name]}
+					gpio['af'].append(af)
+					invertName = {'miso': 'somi', 'mosi': 'simo', 'nss': 'nss', 'sck': 'sck'}
+					af2 = {'peripheral' : 'SpiSlave' + instance,
+						  'name': invertName[name].capitalize(),
+						  'type': invertMode[nameToMode[name]]}
+					gpio['af'].append(af2)
+				
+				if signal.startswith('CAN'):
+					af = {'peripheral' : 'Can' + instance,
+						  'name': name.capitalize(),
+						  'type': nameToMode[name]}
+					gpio['af'].append(af)
+				
+				if signal.startswith('I2C'):
+					if name in ['scl', 'sda']:
+						af = {'peripheral' : 'I2cMaster' + instance,
+							  'name': name.capitalize(),
+							  'type': nameToMode[name]}
+						gpio['af'].append(af)
+				
+				if signal.startswith('TIM'):
+					for tname in raw_names[1:]:
+						print tname
+						nice_name = 'ExternalTrigger'
+						output_type = 'in'
+						if 'CH' in tname:
+							nice_name = tname.replace('CH', 'Channel')
+							output_type = 'io'
+						elif 'BKIN' in tname:
+							nice_name = 'BreakIn'
+						af = {'peripheral' : 'Timer' + instance,
+							  'name': nice_name,
+							  'type': output_type}
+						gpio['af'].append(af)
 			
 			gpios.append(gpio)
 
@@ -127,4 +185,4 @@ class STMDeviceReader(XMLDeviceReader):
 		return self.__str__()
 
 	def __str__(self):
-		return "AVRDeviceReader(" + self.name + ")"
+		return "STMDeviceReader(" + self.name + ")"
