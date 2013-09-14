@@ -56,7 +56,6 @@ class STMDeviceWriter(XMLDeviceWriter):
 			seen = set()
 			attributes = [a for a in attributes if a['value'] not in seen and not seen.add(a['value'])]
 		attributes.sort(key=lambda k : (int(k['id'].name or 0), k['id'].size_id))
-		print attributes
 		for item in attributes:
 			props = item['id'].properties
 			if name == 'flash':
@@ -156,4 +155,4 @@ class STMDeviceWriter(XMLDeviceWriter):
 		return self.__str__()
 
 	def __str__(self):
-		return "AVRDeviceWriter(\n" + self.toString() + ")"
+		return "STMDeviceWriter(\n" + self.toString() + ")"

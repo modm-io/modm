@@ -105,6 +105,25 @@ class STMDeviceReader(XMLDeviceReader):
 		for m in self.modules:
 			if any(m.startswith(per) for per in ['TIM', 'UART', 'USART', 'ADC', 'DAC', 'CAN', 'SPI', 'I2C']):
 				modules.append(m)
+		
+		invertMode = {'out': 'in', 'in': 'out', 'io': 'io'}
+		nameToMode = {'rx': 'in', 'tx': 'out', 'cts': 'in', 'rts': 'out', 'ck': 'out',	# Uart
+					 'miso': 'in', 'mosi': 'out', 'nss': 'io', 'sck': 'out',	# Spi
+					 'scl': 'out', 'sda': 'io'}	# I2c
+		nameToAf = {'SYS': '0',
+					'TIM1': '1', 'TIM2': '1',
+					'TIM3': '2', 'TIM4': '2', 'TIM5': '2',
+					'TIM8': '3', 'TIM9': '3', 'TIM10': '3', 'TIM11': '3',
+					'I2C1': '4', 'I2C2': '4', 'I2C3': '4',
+					'SPI1': '5', 'SPI2': '5',
+					'SPI3': '6',
+					'USART1': '7', 'USART2': '7', 'USART3': '7',
+					'UART4': '8', 'UART5': '8', 'USART6': '8',
+					'CAN1': '9', 'CAN2': '9', 'TIM12': '9', 'TIM13': '9', 'TIM14': '9',
+					'OTG_FS': '10',
+					'ETH_MII': '11', 'ETH_RMII': '11',
+					'FSMC_NAND16': '12', 'FSMC_NOR_MUX': '12', 'SDIO': '12', 'OTG_HS_FS': '12',
+					'DCMI': '13'}
 
 		for pin in self.query("//Pin[@Type='I/O']"):
 			name = pin.get('Name')
@@ -119,44 +138,44 @@ class STMDeviceReader(XMLDeviceReader):
 				raw_names = signal.split('_')
 				instance = raw_names[0][-1]
 				name = raw_names[1].lower()
-				invertMode = {'out': 'in', 'in': 'out', 'io': 'io'}
-				nameToMode = {'rx': 'in', 'tx': 'out', 'cts': 'in', 'rts': 'out', 'ck': 'out',	# Uart
-							 'miso': 'in', 'mosi': 'out', 'nss': 'io', 'sck': 'out',	# Spi
-							 'scl': 'out', 'sda': 'io'}	# I2c
 				
 				if signal.startswith('USART') or signal.startswith('UART'):
 					af = {'peripheral' : 'Uart' + instance,
 						  'name': name.capitalize(),
-						  'type': nameToMode[name]}
+						  'type': nameToMode[name],
+						  'id': nameToAf[raw_names[0]]}
 					gpio['af'].append(af)
 				
 				elif signal.startswith('SPI'):
 					af = {'peripheral' : 'SpiMaster' + instance,
 						  'name': name.capitalize(),
-						  'type': nameToMode[name]}
+						  'type': nameToMode[name],
+						  'id': nameToAf[raw_names[0]]}
 					gpio['af'].append(af)
 					invertName = {'miso': 'somi', 'mosi': 'simo', 'nss': 'nss', 'sck': 'sck'}
 					af2 = {'peripheral' : 'SpiSlave' + instance,
 						  'name': invertName[name].capitalize(),
-						  'type': invertMode[nameToMode[name]]}
+						  'type': invertMode[nameToMode[name]],
+						  'id': nameToAf[raw_names[0]]}
 					gpio['af'].append(af2)
 				
 				if signal.startswith('CAN'):
 					af = {'peripheral' : 'Can' + instance,
 						  'name': name.capitalize(),
-						  'type': nameToMode[name]}
+						  'type': nameToMode[name],
+						  'id': nameToAf[raw_names[0]]}
 					gpio['af'].append(af)
 				
 				if signal.startswith('I2C'):
 					if name in ['scl', 'sda']:
 						af = {'peripheral' : 'I2cMaster' + instance,
 							  'name': name.capitalize(),
-							  'type': nameToMode[name]}
+							  'type': nameToMode[name],
+							  'id': nameToAf[raw_names[0]]}
 						gpio['af'].append(af)
 				
 				if signal.startswith('TIM'):
 					for tname in raw_names[1:]:
-						print tname
 						nice_name = 'ExternalTrigger'
 						output_type = 'in'
 						if 'CH' in tname:
@@ -166,7 +185,15 @@ class STMDeviceReader(XMLDeviceReader):
 							nice_name = 'BreakIn'
 						af = {'peripheral' : 'Timer' + instance,
 							  'name': nice_name,
-							  'type': output_type}
+							  'type': output_type,
+							  'id': nameToAf[raw_names[0]]}
+						gpio['af'].append(af)
+				
+				if signal.startswith('ADC'):
+					if 'exti' not in name:
+						af = {'peripheral' : 'Adc' + instance,
+							  'name': name.replace('in', 'Channel').capitalize(),
+							  'type': 'in'}
 						gpio['af'].append(af)
 			
 			gpios.append(gpio)
