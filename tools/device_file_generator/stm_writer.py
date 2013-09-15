@@ -32,7 +32,10 @@ class STMDeviceWriter(XMLDeviceWriter):
 		core_child.setAttributes({'type': 'core', 'name': 'cortex'})
 		
 		header_child = self.root.addChild('header')
-		header_child.setValue('stm32%sxx.h' % self.device.id.family)
+		famname = '4x' if self.device.id.family == 'f4' else self.device.id.name[:2]
+		famname = '2x' if self.device.id.family == 'f2' else famname
+		famname = '0x' if self.device.id.family == 'f0' else famname
+		header_child.setValue('stm32f%sx.h' % famname)
 
 		# UART
 		self.addUartToNode(self.root)
@@ -52,14 +55,16 @@ class STMDeviceWriter(XMLDeviceWriter):
 
 	def addDeviceAttributesToNode(self, node, name):
 		attributes = self.device.getAttributes(name)
-		if name == 'flash':
+		if name in ['flash', 'ram', 'pin-count']:
 			seen = set()
 			attributes = [a for a in attributes if a['value'] not in seen and not seen.add(a['value'])]
 		attributes.sort(key=lambda k : (int(k['id'].name or 0), k['id'].size_id))
 		for item in attributes:
 			props = item['id'].properties
-			if name == 'flash':
+			if name  in ['flash', 'ram']:
 				props['pin_id'] = None
+			if name  in ['pin-count']:
+				props['size_id'] = None
 			child = node.addChild(name)
 			child.setAttributes(self._getAttributeDictionaryFromId(props))
 			child.setValue(item['value'])
@@ -149,7 +154,10 @@ class STMDeviceWriter(XMLDeviceWriter):
 		return dict
 	
 	def write(self, folder):
-		self.writeToFolder(folder, self.device.id.string + '.xml')
+		file_name = 'stm32f' + self.device.id.name.replace('|', '_')
+		file_name += '-' + self.device.id.pin_id.replace('|', '_')
+		file_name += '-' + self.device.id.size_id.replace('|', '_')
+		self.writeToFolder(folder, file_name + '.xml')
 
 	def __repr__(self):
 		return self.__str__()

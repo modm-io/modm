@@ -105,7 +105,7 @@ class STMDeviceReader(XMLDeviceReader):
 		self.log.debug("Available Modules are:\n" + self._modulesToString())
 		package = self.query("/Mcu/@Package")[0]
 		self.properties['pin-count'] = re.findall('[0-9]+', package)[0]
-		self.properties['package']   = re.findall('[A-Z]+', package)[0]
+		self.properties['package']   = re.findall('[A-Za-z\.]+', package)[0]
 		
 		for m in self.modules:
 			if any(m.startswith(per) for per in ['TIM', 'UART', 'USART', 'ADC', 'DAC', 'CAN', 'SPI', 'I2C']):
@@ -115,6 +115,7 @@ class STMDeviceReader(XMLDeviceReader):
 		nameToMode = {'rx': 'in', 'tx': 'out', 'cts': 'in', 'rts': 'out', 'ck': 'out',	# Uart
 					 'miso': 'in', 'mosi': 'out', 'nss': 'io', 'sck': 'out',	# Spi
 					 'scl': 'out', 'sda': 'io'}	# I2c
+		# this look up table is only used for chips using the STM32F417 GPIO IP
 		nameToAf = {'RTC_50Hz': '0', 'MCO': '0', 'TAMPER': '0', 'SWJ': '0', 'TRACE': '0',
 					'TIM1': '1', 'TIM2': '1',
 					'TIM3': '2', 'TIM4': '2', 'TIM5': '2',
@@ -139,7 +140,6 @@ class STMDeviceReader(XMLDeviceReader):
 			# for some reason, the 417 series GPIO has no direct AF number mapping
 			if '417' in ip_file:
 				altFunctions = { a : nameToAf[altFunctions[a]] for a in altFunctions }
-			print name, altFunctions
 			
 			if '-' in name:
 				name = name.split('-')[0]
@@ -156,36 +156,41 @@ class STMDeviceReader(XMLDeviceReader):
 				if signal.startswith('USART') or signal.startswith('UART'):
 					af = {'peripheral' : 'Uart' + instance,
 						  'name': name.capitalize(),
-						  'type': nameToMode[name],
-						  'id': altFunctions[signal]}
+						  'type': nameToMode[name]}
+					if signal in altFunctions:
+						af.update({'id': altFunctions[signal]})
 					gpio['af'].append(af)
 				
 				elif signal.startswith('SPI'):
 					af = {'peripheral' : 'SpiMaster' + instance,
 						  'name': name.capitalize(),
-						  'type': nameToMode[name],
-						  'id': altFunctions[signal]}
+						  'type': nameToMode[name]}
+					if signal in altFunctions:
+						af.update({'id': altFunctions[signal]})
 					gpio['af'].append(af)
 					invertName = {'miso': 'somi', 'mosi': 'simo', 'nss': 'nss', 'sck': 'sck'}
 					af2 = {'peripheral' : 'SpiSlave' + instance,
 						  'name': invertName[name].capitalize(),
-						  'type': invertMode[nameToMode[name]],
-						  'id': altFunctions[signal]}
+						  'type': invertMode[nameToMode[name]]}
+					if signal in altFunctions:
+						af2.update({'id': altFunctions[signal]})
 					gpio['af'].append(af2)
 				
 				if signal.startswith('CAN'):
 					af = {'peripheral' : 'Can' + instance,
 						  'name': name.capitalize(),
-						  'type': nameToMode[name],
-						  'id': altFunctions[signal]}
+						  'type': nameToMode[name]}
+					if signal in altFunctions:
+						af.update({'id': altFunctions[signal]})
 					gpio['af'].append(af)
 				
 				if signal.startswith('I2C'):
 					if name in ['scl', 'sda']:
 						af = {'peripheral' : 'I2cMaster' + instance,
 							  'name': name.capitalize(),
-							  'type': nameToMode[name],
-							  'id': altFunctions[signal]}
+							  'type': nameToMode[name]}
+						if signal in altFunctions:
+							af.update({'id': altFunctions[signal]})
 						gpio['af'].append(af)
 				
 				if signal.startswith('TIM'):
@@ -200,8 +205,9 @@ class STMDeviceReader(XMLDeviceReader):
 							nice_name = 'BreakIn'
 						af = {'peripheral' : 'Timer' + tinstance,
 							  'name': nice_name,
-							  'type': output_type,
-							  'id': altFunctions[signal]}
+							  'type': output_type}
+						if signal in altFunctions:
+							af.update({'id': altFunctions[signal]})
 						gpio['af'].append(af)
 				
 				if signal.startswith('ADC'):

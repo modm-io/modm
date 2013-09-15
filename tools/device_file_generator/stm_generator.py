@@ -58,8 +58,7 @@ if __name__ == "__main__":
 			devices.append(Device(part, logger))
 	
 	merger = DeviceMerger(devices, logger)
-	merger.mergedByType()
-	merger.mergedByName()
+	merger.mergedByPlatform('stm32')
 	
 	folder = os.path.join(os.path.dirname(__file__), '..', '..', 'src', 'xpcc', 'architecture', 'platform', 'xml', 'stm32')
 	
