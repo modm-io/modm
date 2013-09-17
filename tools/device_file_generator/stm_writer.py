@@ -30,6 +30,13 @@ class STMDeviceWriter(XMLDeviceWriter):
 		
 		core_child = self.root.addChild('driver')
 		core_child.setAttributes({'type': 'core', 'name': 'cortex'})
+		param_name_value = {'enable_hardfault_handler': 'false',
+							'vector_table_in_ram': 'false',
+							'allocator': 'newlib'}
+		for param_name in param_name_value:
+			param_core_child = core_child.addChild('parameter')
+			param_core_child.setAttributes({'name': param_name})
+			param_core_child.setValue(param_name_value[param_name])
 		
 		header_child = self.root.addChild('header')
 		famname = '4x' if self.device.id.family == 'f4' else self.device.id.name[:2]
@@ -37,18 +44,24 @@ class STMDeviceWriter(XMLDeviceWriter):
 		famname = '0x' if self.device.id.family == 'f0' else famname
 		header_child.setValue('stm32f%sx.h' % famname)
 
-		# UART
-		self.addUartToNode(self.root)
-		# I2C aka TWI
-		self.addI2cToNode(self.root)
-		# SPI
-		self.addSpiToNode(self.root)
 		# ADC
-		self.addAdcToNode(self.root)
+		self.addModuleAttributesToNode(self.root, 'ADC', 'adc')
+		# CAN
+		self.addModuleAttributesToNode(self.root, 'CAN', 'can')
+		# Clock
+		clock_child = self.root.addChild('driver')
+		clock_child.setAttributes({'type': 'clock', 'name': 'stm32'})
 		# DAC
-		self.addDacToNode(self.root)
+		self.addModuleAttributesToNode(self.root, 'DAC', 'dac')
+		# I2C
+		self.addModuleAttributesToNode(self.root, 'I2C', 'i2c')
+		# SPI
+		self.addModuleAttributesToNode(self.root, 'SPI', 'spi')
+		self.addModuleAttributesToNode(self.root, ['UART', 'USART'], 'spi', 'stm32_uart')
 		# Timer
-		self.addTimerToNode(self.root)
+		self.addModuleAttributesToNode(self.root, 'TIM', 'timer')
+		# UART
+		self.addModuleAttributesToNode(self.root, ['UART', 'USART'], 'uart')
 		# GPIO
 		self.addGpioToNode(self.root)
 		
@@ -96,25 +109,6 @@ class STMDeviceWriter(XMLDeviceWriter):
 			
 			if len(instances) > 0:
 				driver.setAttribute('instances', ",".join(instances))
-
-	def addI2cToNode(self, node):
-		self.addModuleAttributesToNode(node, 'I2C', 'i2c')
-
-	def addSpiToNode(self, node):
-		self.addModuleAttributesToNode(node, 'SPI', 'spi')
-
-	def addAdcToNode(self, node):
-		self.addModuleAttributesToNode(node, 'ADC', 'adc')
-
-	def addDacToNode(self, node):
-		self.addModuleAttributesToNode(node, 'DAC', 'dac')
-
-	def addTimerToNode(self, node):
-		self.addModuleAttributesToNode(node, 'TIM', 'timer')
-
-	def addUartToNode(self, node):
-		self.addModuleAttributesToNode(node, ['UART', 'USART'], 'uart')
-		self.addModuleAttributesToNode(node, ['UART', 'USART'], 'spi', 'stm32_uart')
 	
 	def _getModuleAttributes(self):
 		attributes = self.device.getAttributes('modules')
@@ -138,7 +132,9 @@ class STMDeviceWriter(XMLDeviceWriter):
 						gpio_child.setAttribute(name, gpio[name])
 				for af in gpio['af']:
 					af_child = gpio_child.addChild('af')
-					af_child.setAttributes(af)
+					for id in ['id', 'peripheral', 'name', 'type']:
+						if id in af:
+							af_child.setAttribute(id, af[id])
 	
 	def _getAttributeDictionaryFromId(self, props):
 		target = props
