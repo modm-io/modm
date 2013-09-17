@@ -93,6 +93,16 @@ def platform_tools_generate(env, architecture_path):
 							continue
 						device_file = os.path.join(xml_path, file)
 						break
+	elif id.platform == 'stm32':
+		for file in os.listdir(xml_path):
+			if 'stm32'+id.family in file:
+				fileArray = file.replace('stm32'+id.family[0],'').replace('.xml','').split("-")
+				names = fileArray[0].split("_")
+				pins = fileArray[1].split("_")
+				sizes = fileArray[2].split("_")
+				if id.name in names and id.pin_id in pins and id.size_id in sizes:
+					device_file = os.path.join(xml_path, file)
+					break
 	else:
 		while device != None and len(device) > 0:
 			device_file = os.path.join(xml_path, device + '.xml')
