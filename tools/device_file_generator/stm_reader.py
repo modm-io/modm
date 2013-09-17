@@ -225,7 +225,7 @@ class STMDeviceReader(XMLDeviceReader):
 					if 'exti' not in name:
 						af = {'peripheral' : 'Adc' + instance,
 							  'name': name.replace('in', 'Channel').capitalize(),
-							  'type': 'in'}
+							  'type': 'analog'}
 						gpio_afs.append(af)
 			
 			# sort after key id and then add all without ids
