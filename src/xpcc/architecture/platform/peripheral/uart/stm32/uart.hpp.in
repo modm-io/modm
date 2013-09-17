@@ -33,9 +33,9 @@ class {{ uart ~ id }} : public UartBase, public ::xpcc::Uart
 {
 public:
 	/// TypeId used to connect GPIO pins to this peripheral's rx.
-	static const TypeId::{{ uart ~ id }}Rx Rx;
+	static const TypeId::Uart{{ id }}Rx Rx;
 	/// TypeId used to connect GPIO pins to this peripheral's tx.
-	static const TypeId::{{ uart ~ id }}Tx Tx;
+	static const TypeId::Uart{{ id }}Tx Tx;
 
 public:
 	static void
