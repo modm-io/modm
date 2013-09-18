@@ -1,0 +1,208 @@
+// coding: utf-8
+/* Copyright (c) 2012-2013, Roboterclub Aachen e.V.
+* All Rights Reserved.
+*
+* The file is part of the xpcc library and is released under the 3-clause BSD
+* license. See the file `LICENSE` for the full license governing this code.
+*/
+// ----------------------------------------------------------------------------
+%#
+%% if target is stm32f2 or target is stm32f4 or (target is stm32f1 and id == 1)
+	%% set temperature_available = true
+%% else
+	%% set temperature_available = false
+%% endif
+%#
+#ifndef XPCC_STM32_ADC{{ id }}_HPP
+#	error 	"Don't include this file directly, use 'adc_{{ id }}.hpp' instead!"
+#endif
+
+void
+xpcc::stm32::Adc{{ id }}::initialize(Prescaler prescaler)
+{
+	// Initialize ADC
+	RCC->APB2ENR |= RCC_APB2ENR_ADC{{ id }}EN;	// start ADC Clock
+	ADC{{ id }}->CR2 |= ADC_CR2_ADON;			// switch on ADC
+	setPrescaler(prescaler);
+}
+
+void
+xpcc::stm32::Adc{{ id }}::setPrescaler(const Prescaler prescaler)
+{
+%% if target is stm32f2 or target is stm32f4
+	ADC->CCR &= ~(0b11 << 17);								// clear prescaler
+	ADC->CCR |= static_cast<uint32_t>(prescaler) << 17;		// set prescaler
+%% elif target is stm32f1
+	RCC->CFGR &= ~(0b11 << 14);								// clear prescaler
+	RCC->CFGR |= static_cast<uint32_t>(prescaler) << 14;	// set prescaler
+%% endif
+}
+
+%% if temperature_available
+void
+xpcc::stm32::Adc{{ id }}::enableTemperatureRefVMeasurement(void)
+{
+	%% if target is stm32f2 or target is stm32f4
+	ADC->CCR |= ADC_CCR_TSVREFE;
+	%% elif target is stm32f1
+	ADC{{ id }}->CR2 |= ADC_CR2_TSVREFE;
+	%% endif
+}
+
+void
+xpcc::stm32::Adc{{ id }}::disableTemperatureRefVMeasurement(void)
+{
+	%% if target is stm32f2 or target is stm32f4
+	ADC->CCR &= ~ADC_CCR_TSVREFE;
+	%% elif target is stm32f1
+	ADC{{ id }}->CR2 &= ~ADC_CR2_TSVREFE;
+	%% endif
+}
+%% endif
+
+void
+xpcc::stm32::Adc{{ id }}::setLeftAdjustResult(const bool enable)
+{
+	if (enable) {
+		ADC{{ id }}->CR2 |= ADC_CR2_ALIGN;
+	}
+	else {
+		ADC{{ id }}->CR2 &= ~ADC_CR2_ALIGN;
+	}
+}
+
+void
+xpcc::stm32::Adc{{ id }}::setChannel(const Channel channel,
+									 const SampleTime sampleTime)
+{
+	// clear number of conversions in the sequence
+	// and set number of conversions to 1
+	ADC{{ id }}->SQR1 = 0;
+	ADC{{ id }}->SQR3 = static_cast<uint32_t>(channel) & 0b11111;
+
+	if (static_cast<uint32_t>(channel) < 10) {
+		ADC{{ id }}->SMPR2 |= static_cast<uint32_t>(sampleTime)
+								<< (static_cast<uint32_t>(channel) * 3);
+	}
+	else {
+		ADC{{ id }}->SMPR1 |= static_cast<uint32_t>(sampleTime)
+								<< ((static_cast<uint32_t>(channel)-10) * 3);
+	}
+}
+
+void
+xpcc::stm32::Adc{{ id }}::enableFreeRunningMode(void)
+{
+	ADC{{ id }}->CR2 |= ADC_CR2_CONT;	// set to continuous mode
+}
+
+void
+xpcc::stm32::Adc{{ id }}::disableFreeRunningMode(void)
+{
+	ADC{{ id }}->CR2 &= ~ADC_CR2_CONT;		// set to single mode
+}
+
+void
+xpcc::stm32::Adc{{ id }}::shutdownAdc(void)
+{
+	ADC{{ id }}->CR2 &= ~(ADC_CR2_ADON);		// switch off ADC
+	RCC->APB2ENR &= ~RCC_APB2ENR_ADC{{ id }}EN; // stop ADC Clock
+}
+
+void
+xpcc::stm32::Adc{{ id }}::startConversion(void)
+{
+	acknowledgeInterruptFlag(InterruptFlag::All);
+%% if target is stm32f1
+	// select the SWSTART event used to trigger the start of
+	// conversion of a regular group
+	ADC{{ id }}->CR2 |= ADC_CR2_EXTTRIG | ADC_CR2_EXTSEL_0 |
+			ADC_CR2_EXTSEL_1 | ADC_CR2_EXTSEL_2;
+%% endif
+	// starts single conversion for the regular group
+	ADC{{ id }}->CR2 |= ADC_CR2_SWSTART;
+}
+
+bool
+xpcc::stm32::Adc{{ id }}::isConversionFinished(void)
+{
+	return (ADC{{ id }}->SR & ADC_SR_EOC);
+}
+
+uint16_t
+xpcc::stm32::Adc{{ id }}::getValue(void)
+{
+	return ADC{{ id }}->DR;
+}
+
+// ----------------------------------------------------------------------------
+// TODO: move this to some shared header for all cortex m3 platforms
+// Re-implemented here to save some code space. As all arguments in the calls
+// below are constant the compiler is able to calculate everything at
+// compile time.
+
+#ifndef XPCC_CUSTOM_NVIC_FUNCTIONS
+#define XPCC_CUSTOM_NVIC_FUNCTIONS
+
+static ALWAYS_INLINE void
+nvicEnableInterrupt(const IRQn_Type IRQn)
+{
+	NVIC->ISER[(static_cast<uint32_t>(IRQn) >> 5)] =
+								(1 << ((uint32_t)(IRQn) & 0x1F));
+}
+
+static ALWAYS_INLINE void
+nvicDisableInterrupt(IRQn_Type IRQn)
+{
+	NVIC_DisableIRQ(IRQn);
+}
+
+#endif // XPCC_CUSTOM_NVIC_FUNCTIONS
+
+void
+xpcc::stm32::Adc{{ id }}::enableInterruptVector(const uint32_t priority,
+												const bool enable)
+{
+%% if target is stm32f2 or target is stm32f4
+	const IRQn_Type InterruptVector = ADC_IRQn;
+%% elif target is stm32f1
+	%% if id < 3
+	const IRQn_Type InterruptVector = ADC1_2_IRQn;
+	%% elif id == 3
+	const IRQn_Type InterruptVector = ADC3_IRQn;
+	%% endif
+%% endif
+
+	if (enable) {
+		NVIC_SetPriority(InterruptVector, priority);
+		nvicEnableInterrupt(InterruptVector);
+	} else {
+		NVIC_DisableIRQ(InterruptVector);
+	}
+}
+
+void
+xpcc::stm32::Adc{{ id }}::enableInterrupt(const Interrupt interrupt)
+{
+	ADC{{ id }}->CR1 |= static_cast<uint32_t>(interrupt);
+}
+
+void
+xpcc::stm32::Adc{{ id }}::disableInterrupt(const Interrupt interrupt)
+{
+	ADC{{ id }}->CR1 &= ~static_cast<uint32_t>(interrupt);
+}
+
+xpcc::stm32::Adc{{ id }}::InterruptFlag
+xpcc::stm32::Adc{{ id }}::getInterruptFlags()
+{
+	return static_cast<InterruptFlag>(ADC{{ id }}->SR);
+}
+
+void
+xpcc::stm32::Adc{{ id }}::acknowledgeInterruptFlag(const InterruptFlag flags)
+{
+	// Flags are cleared by writing a one to the flag position.
+	// Writing a zero is ignored.
+	ADC{{ id }}->SR = static_cast<uint32_t>(flags);
+}
