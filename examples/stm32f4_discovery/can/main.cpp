@@ -40,10 +40,6 @@ displayMessage(const xpcc::can::Message& message)
 	{
 		XPCC_LOG_INFO << "data=";
 		for (uint32_t i = 0; i < message.getLength(); ++i) {
-			if (i == 4) {
-				// wrap around to the next line
-				XPCC_LOG_INFO<< xpcc::endl;
-			}
 			XPCC_LOG_INFO<< xpcc::hex << message.data[i] << xpcc::ascii << ' ';
 		}
 		XPCC_LOG_INFO<< xpcc::endl;
@@ -56,34 +52,73 @@ MAIN_FUNCTION
 {
 	SystemClock<Pll<ExternalOscillator<MHz8>, MHz168, MHz48> >::enable();
 
+	LedOrange::setOutput(xpcc::Gpio::HIGH);
+
 	// Initialize Usart
 	GpioOutputA2::connect(Usart2::Tx);
 	GpioInputA3::connect(Usart2::Rx);
 	Usart2::initialize(115200, 10);
 
-	// Initialize CAN
-	GpioInputB8::connect(Can1::Rx);
-	GpioOutputB9::connect(Can1::Tx);
-	Can1::initialize(xpcc::can::BITRATE_125_KBPS, 9);
+	XPCC_LOG_INFO << "CAN Test Program" << xpcc::endl;
 
+	XPCC_LOG_INFO << "Dividing filter bank..." << xpcc::endl;
+	CanFilter::setStartFilterBankForCan2(14);
+
+	XPCC_LOG_INFO << "Initializing Can1..." << xpcc::endl;
+	// Initialize Can1
+	GpioInputB8::configure(GpioInputB8::InputType::PullUp);
+	GpioInputB8::connect(Can1::Rx);
+	GpioOutputB9::configure(GpioOutputB9::OutputType::PushPull);
+	GpioOutputB9::connect(Can1::Tx);
+	Can1::initialize(xpcc::can::BITRATE_125_KBPS, 9);//, true, Can1::LoopBackMode::Enable);
+
+	XPCC_LOG_INFO << "Setting up Filter for Can1..." << xpcc::endl;
 	// Receive every message
 	CanFilter::setFilter(0, CanFilter::FIFO0,
 			CanFilter::ExtendedIdentifier(0),
 			CanFilter::ExtendedFilterMask(0));
 
+	XPCC_LOG_INFO << "Initializing Can2..." << xpcc::endl;
+	// Initialize Can2
+	GpioInputB5::configure(GpioInputB5::InputType::PullUp);
+	GpioInputB5::connect(Can2::Rx);
+	GpioOutputB6::configure(GpioOutputB6::OutputType::PushPull);
+	GpioOutputB6::connect(Can2::Tx);
+	Can2::initialize(xpcc::can::BITRATE_125_KBPS, 12);//, true, Can2::LoopBackMode::Enable);
+
+	XPCC_LOG_INFO << "Setting up Filter for Can2..." << xpcc::endl;
+	// Receive every message
+	CanFilter::setFilter(14, CanFilter::FIFO0,
+			CanFilter::ExtendedIdentifier(0),
+			CanFilter::ExtendedFilterMask(0));
+
 	// Send a message
-	XPCC_LOG_INFO << "Sending message..." << xpcc::endl;
-	xpcc::can::Message msg1(1, 0);
+	XPCC_LOG_INFO << "Sending message on Can1..." << xpcc::endl;
+	xpcc::can::Message msg1(1, 1);
 	msg1.setExtended(true);
+	msg1.data[0] = 0x11;
 	Can1::sendMessage(msg1);
+
+	// Send a message
+	XPCC_LOG_INFO << "Sending message on Can2..." << xpcc::endl;
+	msg1.data[0] = 0x22;
+	Can2::sendMessage(msg1);
+
 
 	while (1)
 	{
 		if (Can1::isMessageAvailable())
 		{
-			XPCC_LOG_INFO << "Message is available..." << xpcc::endl;
+			XPCC_LOG_INFO << "Can1: Message is available..." << xpcc::endl;
 			xpcc::can::Message message;
 			Can1::getMessage(message);
+			displayMessage(message);
+		}
+		if (Can2::isMessageAvailable())
+		{
+			XPCC_LOG_INFO << "Can2: Message is available..." << xpcc::endl;
+			xpcc::can::Message message;
+			Can2::getMessage(message);
 			displayMessage(message);
 		}
 	}
