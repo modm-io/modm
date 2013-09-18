@@ -27,10 +27,10 @@ class Can : public ::xpcc::Peripheral
 	enum class
 	Mode : uint8_t
 	{
-		Normal 		= 0b00,	///< standard operation mode
-		ListenOnly 	= 0b01,	///< only possible to receive messages
-		LoopBack 	= 0b10,	///< messages sent are immediately received by own controller
-		ListenOnlyLoopBack 	= 0b11,	///< combination of both modes
+		Normal		= 0b00,	///< standard operation mode
+		ListenOnly	= 0b01,	///< only possible to receive messages
+		LoopBack	= 0b10,	///< messages sent are immediately received by own controller
+		ListenOnlyLoopBack	= 0b11,	///< combination of both modes
 	};
 
 	/// Supported CAN bitrates; maybe different on a per device basis
@@ -51,16 +51,16 @@ class Can : public ::xpcc::Peripheral
 	BusState : uint8_t
 	{
 		Connected = 0,
-		/// This bit is set by hardware when the warning limit has been
-		/// reached (Receive Error Counter or Transmit Error Counter ≥ 96).
+		///< This bit is set by hardware when the warning limit has been
+		///< reached (Receive Error Counter or Transmit Error Counter ≥ 96).
 		ErrorWarning = 1,
-		/// This bit is set by hardware when the Error Passive limit has
-		/// been reached (Receive Error Counter or Transmit Error Counter > 127).
+		///< This bit is set by hardware when the Error Passive limit has
+		///< been reached (Receive Error Counter or Transmit Error Counter > 127).
 		ErrorPassive = 2,
-		/// This bit is set by hardware when it enters the bus-off state.
-		/// The bus-off state is entered on TEC overflow, greater than 255
+		///< This bit is set by hardware when it enters the bus-off state.
+		///< The bus-off state is entered on TEC overflow, greater than 255
 		Off = 3,
-	}
+	};
 #ifdef __DOXYGEN__
 public:
 	/**
