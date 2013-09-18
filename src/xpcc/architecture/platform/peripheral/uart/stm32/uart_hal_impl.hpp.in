@@ -25,12 +25,6 @@
 
 // ----------------------------------------------------------------------------
 void
-xpcc::stm32::{{ name }}::setBaudrate(uint32_t baudrate)
-{
-	{{ peripheral }}->BRR = calculateBaudrateSettings(peripheralFrequency, baudrate);
-}
-
-void
 xpcc::stm32::{{ name }}::setParity(const Parity parity)
 {
 	uint32_t flags = {{ peripheral }}->CR1;
@@ -82,14 +76,16 @@ xpcc::stm32::{{ name }}::disable()
 %% endif
 }
 
+template<class clockSource, uint32_t baudrate>
 void
-xpcc::stm32::{{ name }}::initialize(uint32_t baudrate, Parity parity)
+xpcc::stm32::{{ name }}::initialize(Parity parity)
 {
 	enable();
 	// DIRTY HACK: disable and reenable uart to be able to set
 	//             baud rate as well as parity
 	{{ peripheral }}->CR1 &= ~USART_CR1_UE;	// Uart Disable
-	setBaudrate(baudrate);
+	// set baudrate
+	{{ peripheral }}->BRR = calculateBaudrateSettings(clockSource::{{ name }}, baudrate);
 	setParity(parity);
 	{{ peripheral }}->CR1 |=  USART_CR1_UE;	// Uart Reenable
 }

@@ -37,24 +37,7 @@ namespace stm32
  */
 class {{ uart ~ "Hal" ~ id }} : public UartBase
 {
-private:	// This methods can only be executed while UART is
-			// disabled.
-			// At the moment this is only the case in the initialize
-			// method.
-%% if id in [1, 6]
-	static constexpr uint32_t peripheralFrequency = STM32_APB2_FREQUENCY;
-%% elif id in [2, 3, 4, 5]
-	static constexpr uint32_t peripheralFrequency = STM32_APB1_FREQUENCY;
-%% endif
-
-	/**
-	 * Set Baudrate
-	 *
-	 * Remember to enable the clock but not the UART peripheral
-	 * before setting the baudrate.
-	 */
-	static inline void
-	setBaudrate(uint32_t baudrate);
+private:
 	/**
 	 * Disable Parity or Enable Odd/Even Parity
 	 *
@@ -86,8 +69,9 @@ public:
 	 * Enables clocks, the UART peripheral (but neither TX nor RX)
 	 * Sets baudrate and parity.
 	 */
+	template<class clockSource, uint32_t baudrate>
 	static inline void
-	initialize(uint32_t baudrate, Parity parity = Parity::Disabled);
+	initialize(Parity parity = Parity::Disabled);
 
 	/**
 	 * \brief	Write a single byte to the transmit register
