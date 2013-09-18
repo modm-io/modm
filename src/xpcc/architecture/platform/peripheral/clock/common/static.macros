@@ -113,6 +113,24 @@ public:
 %%	endfor
 %% endmacro
 
+%% macro _subsink(sink, parent)
+	%% set str = "static constexpr int "
+	%% if sink.name|length > 0
+		%% set str =  str ~ sink.name ~ " = " ~ parent
+		%% if sink.prescaler
+			%% set str = str ~ " * (" ~ sink.prescaler ~ ")"
+		%% endif
+	%% else
+		%% set str = str ~ sink ~ " = " ~ parent
+	%% endif
+	{{ str ~ ";" }}
+	%% if sink.name|length > 0 and sink.sinks|length > 0
+		%% for subsink in sink.sinks
+{{ _subsink(subsink, sink.name) }}
+		%% endfor
+	%% endif
+%% endmacro
+
 %% macro sink(s, type_id_namespace)
 
 template<class Input> class {{ s.name }};
@@ -144,7 +162,14 @@ private:
 	static_assert(OutputFrequency == F_CPU,
 	"OutputFrequency needs to match F_CPU value from project.cfg");
 public:
+	/// TypeId to connect an Output to {{ s.name }}
 	static const ::{{type_id_namespace}}::TypeId::{{ s.name }} Id;
+
+	// Frequencies
+	static constexpr int {{ s.name }} = OutputFrequency;
+	%% for subsink in s.sinks
+{{ _subsink(subsink, s.name) }}
+	%% endfor
 
 	static StartupError
 	enable(const uint32_t waitCycles = 1500)
