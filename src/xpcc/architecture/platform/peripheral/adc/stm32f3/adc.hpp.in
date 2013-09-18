@@ -22,8 +22,8 @@
 %% endif
 %#
 
-#ifndef XPCC_STM32_ADC{{ id }}_HPP
-#define XPCC_STM32_ADC{{ id }}_HPP
+#ifndef XPCC_STM32F3_ADC{{ id }}_HPP
+#define XPCC_STM32F3_ADC{{ id }}_HPP
 
 #include <stdint.h>
 #include "../../../type_ids.hpp"
@@ -54,6 +54,7 @@ public:
 	/// TypeId used to connect GPIO pins to this adc's Channel{{ channel }}.
 	static const TypeId::Adc{{ id }}Channel{{ channel }} Channel{{ channel }};
 %% endfor
+
 public:
 	/// Channels, which can be used with this ADC.
 	enum class Channel : uint8_t	// TODO: What is the best type?
@@ -334,10 +335,12 @@ public:
 };
 ENUM_CLASS_FLAG(Adc{{ id }}::Interrupt)
 ENUM_CLASS_FLAG(Adc{{ id }}::InterruptFlag)
+
 }
+
 }
 
 #include "adc_{{ id }}_impl.hpp"
 
-#endif	// XPCC_STM32_ADC{{ id }}_HPP
+#endif	// XPCC_STM32F3_ADC{{ id }}_HPP
 

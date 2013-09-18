@@ -7,7 +7,7 @@
 */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_STM32_ADC{{ id }}_HPP
+#ifndef XPCC_STM32F3_ADC{{ id }}_HPP
 #	error 	"Don't include this file directly, use 'adc_{{ id }}.hpp' instead!"
 #endif
 %#
