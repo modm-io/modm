@@ -166,9 +166,9 @@ public:
 	static const ::{{type_id_namespace}}::TypeId::{{ s.name }} Id;
 
 	// Frequencies
-	static constexpr int {{ s.name }} = OutputFrequency;
+	static constexpr int Frequency = OutputFrequency;
 	%% for subsink in s.sinks
-{{ _subsink(subsink, s.name) }}
+{{ _subsink(subsink, "Frequency") }}
 	%% endfor
 
 	static StartupError
