@@ -1,99 +1,150 @@
 // coding: utf-8
-// ----------------------------------------------------------------------------
-/* Copyright (c) 2012, Roboterclub Aachen e.V.
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- *     * Redistributions of source code must retain the above copyright
- *       notice, this list of conditions and the following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright
- *       notice, this list of conditions and the following disclaimer in the
- *       documentation and/or other materials provided with the distribution.
- *     * Neither the name of the Roboterclub Aachen e.V. nor the
- *       names of its contributors may be used to endorse or promote products
- *       derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY ROBOTERCLUB AACHEN E.V. ''AS IS'' AND ANY
- * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL ROBOTERCLUB AACHEN E.V. BE LIABLE FOR ANY
- * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
+/* Copyright (c) 2011, Roboterclub Aachen e.V.
+* All Rights Reserved.
+*
+* The file is part of the xpcc library and is released under the 3-clause BSD
+* license. See the file `LICENSE` for the full license governing this code.
+*/
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__LED_LED_HPP
-#define XPCC__LED_LED_HPP
+#ifndef XPCC_UI_LED_HPP
+#define XPCC_UI_LED_HPP
 
 #include <stdint.h>
 #include "tables.hpp"
+#include <xpcc/processing/periodic_timer.hpp>
+#include <xpcc/architecture/driver/accessor/flash.hpp>
 
 namespace xpcc
 {
-	namespace led
+
+namespace ui
+{
+
+/**
+ * LED Interface.
+ *
+ * This class supplies a basic interface to fade an LED to any
+ * brightness level.
+ * A lookup-table should be used to store the alpha corrected PWM
+ * values, so that no calculation has to be done at run time.
+ *
+ * @author	Niklas Hauser
+ * @ingroup led
+ */
+class Led
+{
+	uint16_t currentValue;
+
+	float deltaValue;
+	float startValue;
+	uint16_t endValue;
+	uint16_t fadeTime;
+
+	xpcc::PeriodicTimer<> timer;
+	std::size_t const tableSize;
+
+	/// This method is specific to the implementation and must be overwritten.
+	virtual void
+	setValue(uint16_t /*brightness*/)
 	{
-		/**
-		 * \brief LED Interface.
-		 *
-		 * This class supplies a basic interface to fade an LED to any
-		 * brightness level.
-		 * A lookup-table should be used to store the alpha corrected PWM
-		 * values, so that no calculation has to be done at run time.
-		 *
-		 * \author	Niklas Hauser
-		 * \ingroup led
-		 */
-		class Led
-		{
-		public:
-#ifdef __DOXYGEN__
-			/// the constructor must not take any arguments.
-			Led();
-#endif
-			
-			/// \param brightness of the LED between 0 and length of lookup-table
-			virtual void
-			setBrightness(uint16_t brightness) = 0;
-			
-			/// \return brightness of the LED
-			virtual uint16_t
-			getBrightness() = 0;
-			
-			/// \return \c true if LED is currently fading to another brightness,
-			///			\c false if otherwise
-			virtual bool
-			isFading() = 0;
-			
-			/// Fade from the current brightness to a new brightness in the specified ms.
-			virtual void
-			fadeTo(uint16_t time, uint16_t brightness) = 0;
-			
-			/**
-			 * Mimmics the behaviour of normal lamps, which take a small amount
-			 * of time until achiving full brightness.
-			 * \param time	specify the fade up time in ms, 0 turn the LED on instantly
-			 */
-			virtual void
-			on(uint16_t time=7) = 0;
-			
-			/**
-			 * Mimmics the behaviour of normal lamps, which take a small amount
-			 * of time until fully extinguishing.
-			 * \param time	specify the fade up time in ms, 0 turn the LED off instantly
-			 */
-			virtual void
-			off(uint16_t time=7) = 0;
-			
-			virtual void
-			run() = 0;
-		};
 	}
+
+public:
+	/// the constructor must not take any arguments.
+	Led(std::size_t const tableSize=256)
+	:	currentValue(0), deltaValue(0), startValue(0), endValue(0), fadeTime(0),
+	 	timer(1), tableSize(tableSize)
+	{
+		setValue(0);
+	}
+
+	/// @param	brightness
+	///		between 0 and length of lookup-table
+	virtual void
+	setBrightness(uint16_t brightness)
+	{
+		fadeTime = 0;
+		if (brightness > tableSize-1) brightness = tableSize-1;
+		currentValue = brightness;
+
+		setValue(currentValue);
+	}
+
+	/// @return brightness of the LED
+	virtual uint16_t
+	getBrightness()
+	{
+		return currentValue;
+	}
+
+	/// @return `true` if LED is currently fading to another brightness,
+	///			`false` if otherwise
+	virtual bool
+	isFading()
+	{
+		return static_cast<bool>(fadeTime);
+	}
+
+	/// Fade from the current brightness to a new brightness in the specified ms.
+	virtual void
+	fadeTo(uint16_t time, uint16_t brightness)
+	{
+		if (brightness == currentValue) return;
+		if (brightness > tableSize-1) brightness = tableSize-1;
+		if (!time) {
+			currentValue = brightness;
+			setValue(currentValue);
+		}
+		else {
+			startValue = currentValue;
+			endValue = brightness;
+			deltaValue = (endValue - startValue) / static_cast<float>(time);
+		}
+		fadeTime = time;
+	}
+
+	/**
+	 * Mimmics the behaviour of normal lamps, which take a small amount
+	 * of time until achiving full brightness.
+	 * @param	time
+	 * 		specify the fade up time in ms, 0 turn the LED on instantly
+	 */
+	virtual void
+	on(uint16_t time=7)
+	{
+		fadeTo(time, tableSize-1);
+	}
+
+	/**
+	 * Mimmics the behaviour of normal lamps, which take a small amount
+	 * of time until fully extinguishing.
+	 * @param	time
+	 * 		specify the fade up time in ms, 0 turn the LED off instantly
+	 */
+	virtual void
+	off(uint16_t time=10)
+	{
+		fadeTo(time, 0);
+	}
+
+	/// must be called at least every ms.
+	virtual void
+	run()
+	{
+		if (timer.isExpired() && fadeTime)
+		{
+			startValue += deltaValue;
+			currentValue = static_cast<uint16_t>(startValue);
+			if (!--fadeTime) currentValue = endValue;
+
+			setValue(currentValue);
+		}
+	}
+};
+
 }
 
-#endif	// XPCC__LED_LED_HPP
+}
+
+#endif	// XPCC_UI_LED_HPP
