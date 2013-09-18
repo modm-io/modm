@@ -175,7 +175,7 @@ public:
 		{{reg}}->PUPDR   = ({{reg}}->PUPDR   & ~mask2) | (i(type)  << (pin * 2));
 	}
 		%% for af in gpio.afs
-			%% if af.type|lower == "analog"
+			%% if af.type == "analog"
 	/// {{name}} connects to {{af.name}} of {{af.peripheral}}
 	static const ::xpcc::stm32::{{af.peripheral}}::Channel
 	{{af.peripheral}}Channel = ::xpcc::stm32::{{af.peripheral}}::Channel::{{ af.name }};
@@ -248,20 +248,20 @@ public:
 		%% endif
 	// connect: Hardware Gpio
 		%% for af in gpio.afs
-			%% set use = not (	(af.type|lower == "input"  and type == "Output") or
-								(af.type|lower == "analog" and type == "Output") or
-								(af.type|lower == "output" and type == "Input" ))
+			%% set use = not (	(af.type == "in"  and type == "Output") or
+								(af.type == "analog" and type == "Output") or
+								(af.type == "out" and type == "Input" ))
 			%% if use
 	/// Connect {{name}} as {{af.name}} to {{af.peripheral}}.
 	ALWAYS_INLINE static void
 	connect(TypeId::{{ af.peripheral }}{{ af.name }} /* t */) {
-				%% if af.type|lower == "analog"
+				%% if af.type == "analog"
 		setAnalogInput();
 				%% else
 		setAlternateFunction(AlternateFunction::AF_{{ af.id }});
 				%% endif
 	}
-				%% if af.type|lower in ['', 'output'] and type != "Input"
+				%% if af.type in ['', 'out'] and type != "Input"
 	/// Connect {{name}} as {{af.name}} to {{af.peripheral}}.
 	ALWAYS_INLINE static void
 	connect(TypeId::{{ af.peripheral }}{{ af.name }} /* t */,
@@ -270,7 +270,7 @@ public:
 		setAlternateFunction(AlternateFunction::AF_{{ af.id }});
 	}
 				%% endif
-				%% if af.type|lower in ['', 'input'] and type != "Output"
+				%% if af.type in ['', 'in'] and type != "Output"
 	/// Connect {{name}} as {{af.name}} to {{af.peripheral}}.
 	ALWAYS_INLINE static void
 	connect(TypeId::{{ af.peripheral }}{{ af.name }} /* t */, InputType type) {
