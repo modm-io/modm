@@ -38,37 +38,6 @@ xpcc::stm32::Timer{{ id }}::setMode(Mode mode)
 	TIM{{ id }}->CR2 = 0;
 }
 
-uint16_t
-xpcc::stm32::Timer{{ id }}::setPeriod(uint32_t microseconds, bool autoApply)
-{
-	// This will be inaccurate for non-smooth frequencies (last six digits
-	// unequal to zero)
-%% if target is stm32f2
-#warning "Check if these values are correct!"
-	uint32_t cycles = microseconds * 60;	// APB1 clock * 2 in MHz = 30 * 2 = 60
-%% elif target is stm32f4
-	uint32_t cycles = microseconds * 84;	// APB1 clock * 2 in MHz = 42 * 2 = 84
-%% elif target is stm32f1
-	uint32_t cycles = microseconds * (
-		((STM32_APB1_FREQUENCY == STM32_AHB_FREQUENCY) ? 1 : 2) * 
-			STM32_APB1_FREQUENCY / 1000000UL);
-%% endif
-
-	uint16_t prescaler = (cycles + 65535) / 65536;	// always round up
-	uint16_t overflow = cycles / prescaler;
-
-	overflow = overflow - 1;	// e.g. 36000 cycles are from 0 to 35999
-	setPrescaler(prescaler);
-	setOverflow(overflow);
-
-	if (autoApply) {
-		// Generate Update Event to apply the new settings for ARR
-		TIM{{ id }}->EGR |= TIM_EGR_UG;
-	}
-
-	return overflow;
-}
-
 %% if id == 6 and target is stm32f2 or target is stm32f3 or target is stm32f4
 	%% set interrupt_vector = "TIM6_DAC_IRQn"
 %% else

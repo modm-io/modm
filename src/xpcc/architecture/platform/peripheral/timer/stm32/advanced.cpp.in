@@ -66,31 +66,6 @@ xpcc::stm32::Timer{{ id }}::setMode(Mode mode, SlaveMode slaveMode,
 }
 
 // ----------------------------------------------------------------------------
-uint16_t
-xpcc::stm32::Timer{{ id }}::setPeriod(uint32_t microseconds, bool autoApply)
-{
-	// This will be inaccurate for non-smooth frequencies (last six digits
-	// unequal to zero)
-	uint32_t cycles = microseconds * (
-			((STM32_APB2_FREQUENCY==STM32_AHB_FREQUENCY)?1:2) * 
-			STM32_APB2_FREQUENCY / 1000000UL);
-	uint16_t prescaler = (cycles + 65535) / 65536;	// always round up
-	uint16_t overflow = cycles / prescaler;
-	
-	overflow = overflow - 1;	// e.g. 36000 cycles are from 0 to 35999
-	
-	setPrescaler(prescaler);
-	setOverflow(overflow);
-	
-	if (autoApply) {
-		// Generate Update Event to apply the new settings for ARR
-		TIM{{ id }}->EGR |= TIM_EGR_UG;
-	}
-	
-	return overflow;
-}
-
-// ----------------------------------------------------------------------------
 void
 xpcc::stm32::Timer{{ id }}::configureInputChannel(uint32_t channel,
 		InputCaptureMapping input, InputCapturePrescaler prescaler,

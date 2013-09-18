@@ -149,8 +149,28 @@ public:
 		TIM{{ id }}->ARR = overflow;
 	}
 
+	template<class clockSource>
 	static Value
-	setPeriod(uint32_t microseconds, bool autoApply = true);
+	setPeriod(uint32_t microseconds, bool autoApply = true)
+	{
+		// This will be inaccurate for non-smooth frequencies (last six digits
+		// unequal to zero)
+		uint32_t cycles = microseconds * (clockSource::Timer{{ id }} / 1000000UL);
+		uint16_t prescaler = (cycles + 65535) / 65536;	// always round up
+		Value overflow = cycles / prescaler;
+
+		overflow = overflow - 1;	// e.g. 36000 cycles are from 0 to 35999
+
+		setPrescaler(prescaler);
+		setOverflow(overflow);
+
+		if (autoApply) {
+			// Generate Update Event to apply the new settings for ARR
+			TIM{{ id }}->EGR |= TIM_EGR_UG;
+		}
+
+		return overflow;
+	}
 
 	static inline void
 	applyAndReset()
