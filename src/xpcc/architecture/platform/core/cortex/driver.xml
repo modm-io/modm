@@ -5,13 +5,15 @@
 		<parameter name="allocator" type="enum" values="newlib;block_allocator">
 			block_allocator
 		</parameter>
-		<parameter name="enable_gpio" type="bool">1</parameter>
+		<parameter name="enable_gpio" type="bool">true</parameter>
+		<parameter name="vector_table_in_ram" type="bool">false</parameter>
+		<parameter name="enable_hardfault_handler_log" type="bool">false</parameter>
 		<template>startup.c.in</template>
 		<template>delay.sx.in</template>
 		<template>syscalls.cpp.in</template>
 		<static>cxxabi.cpp</static>
 		<static>default_handler.sx</static>
-		<static core="cortex-m3|cortex-m4">hard_fault_handler.cpp</static>
+		<template core="cortex-m3|cortex-m4">hard_fault_handler.cpp.in</template>
 		<static core="cortex-m3|cortex-m4">hard_fault.sx</static>
 	</driver>
 </rca>

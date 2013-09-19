@@ -95,7 +95,7 @@ typedef void (* const FunctionPointer)(void);
 // defined in the linkerscript
 extern uint32_t __stack_end;
 
-#if CORTEX_VECTORS_RAM
+%% if parameters.vector_table_in_ram
 // Define the vector table
 FunctionPointer flashVectors[4] 
 __attribute__ ((section(".reset"))) =
@@ -107,9 +107,9 @@ __attribute__ ((section(".reset"))) =
 };
 
 FunctionPointer ramVectors[] __attribute__ ((section(".vectors"))) =
-#else
+%% else
 FunctionPointer flashVectors[] __attribute__ ((section(".reset"))) =
-#endif
+%% endif
 {
 	(FunctionPointer) &__stack_end,		// -16: stack pointer
 	Reset_Handler,						// -15: code entry point

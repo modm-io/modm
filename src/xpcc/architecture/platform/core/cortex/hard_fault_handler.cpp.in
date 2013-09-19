@@ -38,7 +38,7 @@ extern "C"
 void
 _hardFaultHandler(const uint32_t * ctx)
 {
-#if CORTEX_ENABLE_HARD_FAULT_HANDLER != 0
+%% if parameters.enable_hardfault_handler_log
 #undef XPCC_LOG_LEVEL
 #define XPCC_LOG_LEVEL	xpcc::log::ERROR
 	
@@ -68,9 +68,9 @@ _hardFaultHandler(const uint32_t * ctx)
 	XPCC_LOG_ERROR.printf("HFSR : 0x%08lx\n", hfsr);
 	XPCC_LOG_ERROR.printf("DFSR : 0x%08lx\n", dfsr);
 	XPCC_LOG_ERROR.printf("AFSR : 0x%08lx\n", afsr);
-#else
+%% else
 	(void) ctx;	// avoid warning
-#endif
+%% endif
 	
 	// Infinite loop
 	while (1)
