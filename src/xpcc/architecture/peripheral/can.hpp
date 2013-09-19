@@ -23,6 +23,7 @@ namespace xpcc
 /// @ingroup can
 class Can : public ::xpcc::Peripheral
 {
+public:
 	/// Possible modes of the CAN controller
 	enum class
 	Mode : uint8_t
@@ -66,18 +67,14 @@ public:
 	/**
 	 * Enables the clock for the CAN controller and resets all settings
 	 *
+	 * @param clockSource
+	 *			nomally the SystemClock<...> that you enable on startup
 	 * @param bitrate
 	 * 			CAN bitrate
-	 * @param startupMode
-	 * 			Mode in which CAN should be started
 	 */
-	template< Bitrate bitrate >
+	template< class clockSource, Bitrate bitrate = Bitrate::kBps125>
 	static void
 	initialize(Mode startupMode);
-
-	/// Change the operating mode.
-	static void
-	setMode(Mode mode);
 
 	/// Returns true if a message can be retrieved by calling @c getMessage.
 	static bool
@@ -101,6 +98,8 @@ public:
 	static bool
 	sendMessage(const can::Message& message);
 
+	// Optional
+#if 0
 	/// Get Receive Error Counter.
 	static uint8_t
 	getReceiveErrorCounter();
@@ -111,6 +110,7 @@ public:
 
 	static BusState
 	getBusState();
+#endif // if 0
 #endif
 };
 
