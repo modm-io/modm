@@ -24,10 +24,12 @@ namespace TypeId
 	%% endif
 	typedef struct{} {{ uart }}Hal{{ id }}Rx;
 	typedef struct{} {{ uart }}Hal{{ id }}Tx;
+	typedef struct{} {{ uart }}Hal{{ id }}Ck;
 	typedef struct{} {{ uart }}Hal{{ id }}Rts;
 	typedef struct{} {{ uart }}Hal{{ id }}Cts;
 	typedef struct{} Uart{{ id }}Rx;
 	typedef struct{} Uart{{ id }}Tx;
+	typedef struct{} Uart{{ id }}Ck;
 	typedef struct{} Uart{{ id }}Rts;
 	typedef struct{} Uart{{ id }}Cts;
 %% endfor

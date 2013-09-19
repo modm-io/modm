@@ -227,6 +227,13 @@ class STMDeviceReader(XMLDeviceReader):
 							  'name': name.replace('in', 'Channel').capitalize(),
 							  'type': 'analog'}
 						gpio_afs.append(af)
+				
+				if signal.startswith('SYS'):
+					if 'mco' in name:
+						af = {'peripheral' : signal.replace('SYS', '').replace('_', ''),
+							  'type': 'out',
+							  'id': '0'}
+						gpio_afs.append(af)
 			
 			# sort after key id and then add all without ids
 			gpio['af'] = [a for a in gpio_afs if 'id' in a]
