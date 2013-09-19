@@ -276,7 +276,7 @@ CAN{{ id }}_RX1_IRQHandler()
 
 // ----------------------------------------------------------------------------
 void
-xpcc::stm32::Can{{ id }}::setMode(can::Mode mode)
+xpcc::stm32::Can{{ id }}::setMode(Mode mode)
 {
 	// Request initialization
 	CAN{{ id }}->MCR |= CAN_MCR_INRQ;
@@ -286,7 +286,7 @@ xpcc::stm32::Can{{ id }}::setMode(can::Mode mode)
 		// or reception) is completed before entering the initialization mode.
 	}
 
-	CAN{{ id }}->BTR = CAN{{ id }}->BTR & ~(CAN_BTR_SILM | CAN_BTR_LBKM)
+	CAN{{ id }}->BTR = (CAN{{ id }}->BTR & ~(CAN_BTR_SILM | CAN_BTR_LBKM))
 						| static_cast<uint32_t>(mode);
 
 	// Leave initialization mode
@@ -382,20 +382,20 @@ xpcc::stm32::Can{{ id }}::sendMessage(const can::Message& message)
 }
 
 // ----------------------------------------------------------------------------
-xpcc::can::BusState
+xpcc::stm32::Can{{ id }}::BusState
 xpcc::stm32::Can{{ id }}::getBusState()
 {
 	if (CAN{{ id }}->ESR & CAN_ESR_BOFF) {
-		return can::BUS_OFF;
+		return BusState::Off;
 	}
 	else if (CAN{{ id }}->ESR & CAN_ESR_BOFF) {
-		return can::ERROR_PASSIVE;
+		return BusState::ErrorPassive;
 	}
 	else if (CAN{{ id }}->ESR & CAN_ESR_EWGF) {
-		return can::ERROR_WARNING;
+		return BusState::ErrorWarning;
 	}
 	else {
-		return can::CONNECTED;
+		return BusState::Connected;
 	}
 }
 
