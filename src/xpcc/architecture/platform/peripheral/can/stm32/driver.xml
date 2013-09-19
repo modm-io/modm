@@ -8,6 +8,7 @@
 		<static>can_filter.cpp</static>
 		<static>error_code.hpp</static>
 		<static>type_ids.hpp</static>
+		<static>../../clock/common/common_clock.hpp</static>
 		<parameter name="tx_buffer" type="int" min="0" max="254">0</parameter>
 		<parameter name="rx_buffer" type="int" min="0" max="254">0</parameter>
 	</driver>
