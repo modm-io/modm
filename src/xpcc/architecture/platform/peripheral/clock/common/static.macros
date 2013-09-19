@@ -118,7 +118,7 @@ public:
 	%% if sink.name|length > 0
 		%% set str =  str ~ sink.name ~ " = " ~ parent
 		%% if sink.prescaler
-			%% set str = str ~ " * (" ~ sink.prescaler ~ ")"
+			%% set str = str ~ " * " ~ sink.prescaler
 		%% endif
 	%% else
 		%% set str = str ~ sink ~ " = " ~ parent
