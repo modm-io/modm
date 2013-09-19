@@ -22,27 +22,24 @@ class STMDeviceWriter(XMLDeviceWriter):
 		
 		self.addDeviceAttributesToNode(self.root, 'flash')
 		self.addDeviceAttributesToNode(self.root, 'ram')
-		self.addDeviceAttributesToNode(self.root, 'define')
-		
+		self.addDeviceAttributesToNode(self.root, 'linkerscript')
 		self.addDeviceAttributesToNode(self.root, 'core')
 		
 		self.addDeviceAttributesToNode(self.root, 'pin-count')
 		
+		self.addDeviceAttributesToNode(self.root, 'header')
+		self.addDeviceAttributesToNode(self.root, 'define')
+		
 		core_child = self.root.addChild('driver')
 		core_child.setAttributes({'type': 'core', 'name': 'cortex'})
-		param_name_value = {'enable_hardfault_handler': 'false',
-							'vector_table_in_ram': 'false',
+		param_name_value = {
+#							'enable_hardfault_handler': 'false',
+#							'vector_table_in_ram': 'false',
 							'allocator': 'newlib'}
 		for param_name in param_name_value:
 			param_core_child = core_child.addChild('parameter')
 			param_core_child.setAttributes({'name': param_name})
 			param_core_child.setValue(param_name_value[param_name])
-		
-		header_child = self.root.addChild('header')
-		famname = '4x' if self.device.id.family == 'f4' else self.device.id.name[:2]
-		famname = '2x' if self.device.id.family == 'f2' else famname
-		famname = '0x' if self.device.id.family == 'f0' else famname
-		header_child.setValue('stm32f%sx.h' % famname)
 
 		# ADC
 		self.addModuleAttributesToNode(self.root, 'ADC', 'adc')
@@ -68,13 +65,13 @@ class STMDeviceWriter(XMLDeviceWriter):
 
 	def addDeviceAttributesToNode(self, node, name):
 		attributes = self.device.getAttributes(name)
-		if name in ['flash', 'ram', 'pin-count']:
+		if name in ['flash', 'ram', 'pin-count', 'linkerscript']:
 			seen = set()
 			attributes = [a for a in attributes if a['value'] not in seen and not seen.add(a['value'])]
 		attributes.sort(key=lambda k : (int(k['id'].name or 0), k['id'].size_id))
 		for item in attributes:
 			props = item['id'].properties
-			if name  in ['flash', 'ram']:
+			if name  in ['flash', 'ram', 'linkerscript']:
 				props['pin_id'] = None
 			if name  in ['pin-count']:
 				props['size_id'] = None

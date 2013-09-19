@@ -8,19 +8,17 @@
     <flash device-size-id="e">524288</flash>
     <flash device-size-id="g">1048576</flash>
     <ram>196608</ram>
-    <linkerscript device-size-id="g">stm32f4xx_g.ld</linkerscript>
     <linkerscript device-size-id="e">stm32f4xx_e.ld</linkerscript>
-    <define>STM32F4XX</define>
+    <linkerscript device-size-id="g">stm32f4xx_g.ld</linkerscript>
     <core>cortex-m4</core>
     <pin-count device-pin-id="v">100</pin-count>
     <pin-count device-pin-id="z">144</pin-count>
     <pin-count device-pin-id="i">176</pin-count>
+    <header>stm32f4xx.h</header>
+    <define>STM32F4XX</define>
     <driver type="core" name="cortex">
-      <parameter name="vector_table_in_ram">false</parameter>
-      <parameter name="enable_hardfault_handler">false</parameter>
       <parameter name="allocator">newlib</parameter>
     </driver>
-    <header>stm32f4xx.h</header>
     <driver type="adc" name="stm32" instances="1,2,3"/>
     <driver type="can" name="stm32" instances="1,2"/>
     <driver type="clock" name="stm32"/>

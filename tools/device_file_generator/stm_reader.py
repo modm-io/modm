@@ -82,10 +82,14 @@ class STMDeviceReader(XMLDeviceReader):
 			cdef = define.get('name')
 			if cdef.startswith('STM32'):
 				self.properties['define'] = cdef
+				break
 		
 		self.properties['id'] = dev
 		self.properties['core'] = core
 		self.properties['architecture'] = architecture
+		
+		self.properties['header'] = self.properties['define'].lower() + '.h'
+		self.properties['linkerscript'] = "%s_%s.ld" % (self.properties['define'].lower(), dev.size_id)
 
 		flash = memoryFile.query("//MemorySegment[@name='FLASH']")[0].get('size')
 		ram = memoryFile.query("//MemorySegment[@name='RAM']")[0].get('size')
