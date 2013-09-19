@@ -8,6 +8,8 @@
     <flash device-size-id="e">524288</flash>
     <flash device-size-id="g">1048576</flash>
     <ram>196608</ram>
+    <linkerscript device-size-id="g">stm32f4xx_g.ld</linkerscript>
+    <linkerscript device-size-id="e">stm32f4xx_e.ld</linkerscript>
     <define>STM32F4XX</define>
     <core>cortex-m4</core>
     <pin-count device-pin-id="v">100</pin-count>
