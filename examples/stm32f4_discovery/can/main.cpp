@@ -50,7 +50,8 @@ displayMessage(const xpcc::can::Message& message)
 // ----------------------------------------------------------------------------
 MAIN_FUNCTION
 {
-	SystemClock<Pll<ExternalOscillator<MHz8>, MHz168, MHz48> >::enable();
+	typedef SystemClock<Pll<ExternalOscillator<MHz8>, MHz168, MHz48> > systemClock;
+	systemClock::enable();
 
 	LedOrange::setOutput(xpcc::Gpio::HIGH);
 
@@ -70,7 +71,7 @@ MAIN_FUNCTION
 	GpioInputB8::connect(Can1::Rx);
 	GpioOutputB9::configure(GpioOutputB9::OutputType::PushPull);
 	GpioOutputB9::connect(Can1::Tx);
-	Can1::initialize(xpcc::can::BITRATE_125_KBPS, 9);//, true, Can1::LoopBackMode::Enable);
+	Can1::initialize<systemClock, Can1::Bitrate::kBps125>(9);
 
 	XPCC_LOG_INFO << "Setting up Filter for Can1..." << xpcc::endl;
 	// Receive every message
@@ -84,7 +85,7 @@ MAIN_FUNCTION
 	GpioInputB5::connect(Can2::Rx);
 	GpioOutputB6::configure(GpioOutputB6::OutputType::PushPull);
 	GpioOutputB6::connect(Can2::Tx);
-	Can2::initialize(xpcc::can::BITRATE_125_KBPS, 12);//, true, Can2::LoopBackMode::Enable);
+	Can2::initialize<systemClock, Can2::Bitrate::kBps125>(12);
 
 	XPCC_LOG_INFO << "Setting up Filter for Can2..." << xpcc::endl;
 	// Receive every message
