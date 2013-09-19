@@ -32,10 +32,10 @@ namespace ui
 class Indicator
 {
 	Led* led;
-	uint16_t const on;
-	uint16_t const off;
-	uint8_t const onFade;
-	uint8_t const offFade;
+	uint16_t on;
+	uint16_t off;
+	uint8_t onFade;
+	uint8_t offFade;
 	uint8_t counter;
 	bool blinkDirection;
 	bool isBlinking;
@@ -56,11 +56,19 @@ public:
 	 * @param	offFade
 	 * 		time in ms until the LED is fully off
 	 */
-	Indicator(Led* led, uint16_t const period=1000, float const dutyCycle=0.45f,
-			  uint8_t const onFade=75, uint8_t const offFade=110)
+	Indicator(Led* led, uint16_t period=1000, float dutyCycle=0.45f,
+			  uint8_t onFade=75, uint8_t offFade=110)
 	:	led(led), on(period * dutyCycle), off(period - on), onFade(onFade), offFade(offFade),
 	counter(0), blinkDirection(true), isBlinking(false), isCounting(false)
 	{
+	}
+
+	/// set new period
+	inline void
+	setPeriod(uint16_t period, float dutyCycle=0.45f)
+	{
+		on = period * dutyCycle;
+		off = period - on;
 	}
 
 	/// start indicating for ever

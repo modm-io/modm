@@ -29,7 +29,7 @@ namespace ui
 class Pulse
 {
 	Led* led;
-	uint16_t const halfPeriod;
+	uint16_t halfPeriod;
 	uint8_t counter;
 	bool pulseDirection;
 	bool isPulsing;
@@ -42,10 +42,17 @@ public:
 	 * @param	period
 	 *		pulse cycle period in ms.
 	 */
-	Pulse(Led* led, uint16_t const period=1000)
+	Pulse(Led* led, uint16_t period=1000)
 	:	led(led), halfPeriod(period/2), counter(0),
 		pulseDirection(false), isPulsing(false), isCounting(false)
 	{
+	}
+
+	/// set new period
+	inline void
+	setPeriod(uint16_t period)
+	{
+		halfPeriod = period / 2;
 	}
 
 	/// start pulsing forever

@@ -29,12 +29,12 @@ class DoubleIndicator
 {
 	xpcc::Timeout<> timer;
 	Led* led;
-	uint16_t const on1;
-	uint16_t const pause1;
-	uint16_t const on2;
-	uint16_t const pause2;
-	uint8_t const onFade;
-	uint8_t const offFade;
+	uint16_t on1;
+	uint16_t pause1;
+	uint16_t on2;
+	uint16_t pause2;
+	uint8_t onFade;
+	uint8_t offFade;
 	uint8_t counter;
 	bool isBlinking;
 	bool isCounting;
@@ -64,14 +64,25 @@ public:
 	 * @param	offFade
 	 * 		time in ms until the LED is fully off
 	 */
-	DoubleIndicator(Led* led, uint16_t const period=1000, float const on1=0.1f,
-					float const pause=0.2f, float const on2=0.1f,
-					uint8_t const onFade=60, uint8_t const offFade=90)
+	DoubleIndicator(Led* led, uint16_t period=1000, float on1=0.1f,
+					float pause=0.2f, float on2=0.1f,
+					uint8_t onFade=60, uint8_t offFade=90)
 	:	led(led), on1(period * on1), pause1(period * pause),
 	on2(period * on2), pause2(period - on1 - pause1 - on2),
 	onFade(onFade), offFade(offFade), counter(0),
 	isBlinking(false), isCounting(false), state(FIRST_FLASH)
 	{
+	}
+
+	/// set new period
+	inline void
+	setPeriod(uint16_t period, float on1=0.1f,
+			float pause=0.2f, float on2=0.1f)
+	{
+		this->on1 = period * on1;
+		this->pause1 = period * pause;
+		this->on2 = period * on2;
+		this->pause2 = period - this->on1 - this->pause1 - this->on2;
 	}
 
 	/// start indicating for ever
