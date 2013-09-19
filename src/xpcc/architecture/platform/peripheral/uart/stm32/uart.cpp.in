@@ -30,23 +30,16 @@ namespace
 }
 %% endif
 
+%% if parameters.buffered
 void
-%% if parameters.buffered
-xpcc::stm32::{{ name }}::initialize(uint32_t baudrate,
-					uint32_t interruptPriority, bool blocking, Parity parity)
-%% else
-xpcc::stm32::{{ name }}::initialize(uint32_t baudrate, Parity parity)
-%% endif
+xpcc::stm32::{{ name }}::initializeBuffered(uint32_t interruptPriority,
+											bool blocking)
 {
-	{{ hal }}::initialize(baudrate, parity);
-%% if parameters.buffered
 	{{ hal }}::enableInterruptVector(true, interruptPriority);
 	{{ hal }}::enableInterrupt(Interrupt::RxNotEmpty);
 	isBlocking = blocking;
-%% endif
-	{{ hal }}::setTransmitterEnable(true);
-	{{ hal }}::setReceiverEnable(true);
 }
+%% endif
 
 void
 xpcc::stm32::{{ name }}::writeBlocking(uint8_t data)
