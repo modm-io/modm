@@ -15,6 +15,9 @@
 #include <xpcc/math/utils/bit_operation.hpp>
 
 bool xpcc::{{target.family}}::UartSimpleSpi{{id}}::finished;
+%% if extended is not defined
+xpcc::SimpleSpi::DataOrder xpcc::{{target.family}}::UartSimpleSpi{{id}}::dataOrder;
+%% endif
 
 // ----------------------------------------------------------------------------
 template< uint32_t baudrate >

@@ -33,7 +33,7 @@ struct Spi
 		Mode3 = 0b11,	///< clock inverted, sample on falling edge
 	};
 
-	/// Spi Data Order, Mode0 is the most common mode
+	/// Spi Data Order, MsbFirst is the most common mode
 	enum class
 	DataOrder : uint8_t
 	{
@@ -51,16 +51,16 @@ struct Spi
 		SoftwareReset	///< The master is initializing itself
 	};
 
-    /// transfer options for the receive and transmit buffers
-    /// @see SpiBlockMaster
-    enum class
-    BufferOptions : uint8_t
-    {
-        TxRxIncrement = 0b11,           ///< Increments both Tx and Rx buffer
-        TxIncrementRxDecrement = 0b10,  ///< Increments Tx, but decrements Rx buffer
-        TxDecrementRxIncrement = 0b01,  ///< Decrements Tx, but increments Rx buffer
-        TxRxDecrement = 0b00,           ///< Decrements both Tx and Rx buffer
-    };
+	/// transfer options for the receive and transmit buffers
+	/// @see SpiBlockMaster
+	enum class
+	BufferOptions : uint8_t
+	{
+		TxRxIncrement = 0b11,           ///< Increments both Tx and Rx buffer
+		TxIncrementRxDecrement = 0b10,  ///< Increments Tx, but decrements Rx buffer
+		TxDecrementRxIncrement = 0b01,  ///< Decrements Tx, but increments Rx buffer
+		TxRxDecrement = 0b00,           ///< Decrements both Tx and Rx buffer
+	};
 
 	/// Operations after a transmission.
 	enum class
@@ -89,9 +89,10 @@ class SimpleSpi : public ::xpcc::Peripheral, public Spi
 #ifdef __DOXYGEN__
 public:
 	/**
-	 * Initialize the hardware and sets the baudrate.
+	 * Initializes the hardware and sets the baudrate.
 	 *
-	 * @tparam	baudrate	the desired baudrate in Hz
+	 * @tparam	baudrate
+	 * 		the desired baudrate in Hz
 	 */
 	template< uint32_t baudrate >
 	static void

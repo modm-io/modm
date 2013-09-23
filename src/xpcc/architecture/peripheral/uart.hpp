@@ -26,13 +26,22 @@ namespace xpcc
  * Asynchronous and synchronous, buffered access to the Uart.
  *
  * @author	Niklas Hauser
- * @ingroup	peripheral
  * @ingroup	uart
  */
 class Uart : public ::xpcc::Peripheral
 {
 #ifdef __DOXYGEN__
 public:
+	/**
+	 * Initializes the hardware and sets the baudrate.
+	 *
+	 * @tparam	baudrate
+	 *		desired baud rate in Hz
+	 */
+	template< uint32_t baudrate >
+	static void
+	initialize();
+
 	/// Write a single byte and wait for completion.
 	static void
 	writeBlocking(uint8_t data);

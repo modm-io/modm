@@ -141,8 +141,8 @@ struct Gpio
 	 * The physical state is determined by the configuration and external connection.
 	 * @{
 	 */
-	static const bool LOW = false;
-	static const bool HIGH = true;
+	static constexpr bool LOW = false;
+	static constexpr bool HIGH = true;
 	/// }@
 };
 

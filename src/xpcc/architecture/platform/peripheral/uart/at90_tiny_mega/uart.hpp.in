@@ -50,22 +50,14 @@ public:
 	static const TypeId::Uart{{ id }}Rxd Rx;
 	
 public:
-	/**
-	 * Sets the baudrate.
-	 *
-	 * This function is called with a constant value as template parameter
-	 * so all the calculation is done by the compiler.
-	 *
-	 * @tparam	baudrate
-	 *		desired baud rate
-	 */
+	// start documentation inherited
 	template< uint32_t baudrate >
 	static ALWAYS_INLINE void
 	initialize()
 	{
-		static_assert(F_CPU/8l >= baudrate, "The CPU frequency must be at least 8x higher than UART baudrate.");
+		static_assert(F_CPU / 8l >= baudrate, "The CPU frequency must be at least 8x higher than UART baudrate.");
 		static_assert((F_CPU / (16l * baudrate)) < (1 << 12), "UART baudrate is too slow for CPU frequency (Prescaler out of bounds).");
-		
+
 		uint16_t ubrr;
 		// use double speed when necessary
 		if (baudrate * 16l > F_CPU)
@@ -75,10 +67,10 @@ public:
 		else {
 			ubrr = static_cast<uint16_t>((F_CPU / (16l * baudrate)) - 1);
 		}
+
 		initializeWithBaud(ubrr);
 	}
 	
-	// start documentation inherited
 	// MARK: write blocking
 	static void
 	writeBlocking(uint8_t data);

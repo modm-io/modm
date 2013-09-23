@@ -128,8 +128,8 @@ public:
 		%% if type in ["", "Output"]
 	// GpioOutput
 	ALWAYS_INLINE static void setOutput(bool status) {
-		set(status);
 		setOutput();
+		set(status);
 	}
 	// start documentation inherited
 	ALWAYS_INLINE static void setOutput() {
@@ -245,7 +245,7 @@ public:
 					%% endif
 				%% else
 					%% set af_reg = (af_id / 8) | int
-					%% endif
+				%% endif
 	ALWAYS_INLINE static void enablePCInterrupt() {
 		PCMSK{{af_reg}} |= (1 << PCINT{{af_id}});
 #ifdef PCICR
@@ -383,7 +383,7 @@ public:
 		PORT{{port.name}} = (PORT{{port.name}} & ~portMask) | (data & portMask);
 	}
 };
-	%% if port.width == 8
+	%% if port.startPin == 0 and port.width == 8
 template<>
 class GpioPort{{port.name}}< 0, 8 > : public ::xpcc::GpioPort, public Gpio
 {

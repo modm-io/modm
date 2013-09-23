@@ -32,6 +32,7 @@ ISR(USART{{ id }}_RX_vect)
 void
 xpcc::{{target.family}}::Uart{{ id }}::initializeWithBaud(uint16_t ubrr)
 {
+	atomic::Lock lock;
 	// Set baud rate
 	if (ubrr & 0x8000) {
 		UCSR{{ id }}A = (1 << U2X{{ id }});  //Enable 2x speed 
