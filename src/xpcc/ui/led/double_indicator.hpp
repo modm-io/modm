@@ -28,7 +28,7 @@ namespace ui
 class DoubleIndicator
 {
 	xpcc::Timeout<> timer;
-	Led* led;
+	Led& led;
 	uint16_t on1;
 	uint16_t pause1;
 	uint16_t on2;
@@ -64,7 +64,7 @@ public:
 	 * @param	offFade
 	 * 		time in ms until the LED is fully off
 	 */
-	DoubleIndicator(Led* led, uint16_t period=1000, float on1=0.1f,
+	DoubleIndicator(Led& led, uint16_t period=1000, float on1=0.1f,
 					float pause=0.2f, float on2=0.1f,
 					uint8_t onFade=60, uint8_t offFade=90)
 	:	led(led), on1(period * on1), pause1(period * pause),
@@ -122,28 +122,28 @@ public:
 	void
 	run()
 	{
-		led->run();
+		led.run();
 
 		if (timer.isExpired() && (isBlinking || state == FIRST_BREAK || state == SECOND_BREAK))
 		{
 			switch (state)
 			{
 				case FIRST_FLASH:
-					led->on(onFade);
+					led.on(onFade);
 
 					timer.restart(on1);
 					state = FIRST_BREAK;
 					break;
 
 				case FIRST_BREAK:
-					led->off(offFade);
+					led.off(offFade);
 
 					timer.restart(pause1);
 					state = SECOND_FLASH;
 					break;
 
 				case SECOND_FLASH:
-					led->on(onFade);
+					led.on(onFade);
 
 					if (isCounting && !--counter) {
 						isBlinking = false;
@@ -155,7 +155,7 @@ public:
 					break;
 
 				case SECOND_BREAK:
-					led->off(offFade);
+					led.off(offFade);
 
 					timer.restart(pause2);
 

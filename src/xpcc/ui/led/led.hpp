@@ -51,9 +51,9 @@ class Led
 	}
 
 public:
-	/// the constructor must not take any arguments.
+	///
 	Led(std::size_t const tableSize=256)
-	:	currentValue(0), deltaValue(0), startValue(0), endValue(0), fadeTime(0),
+	:	currentValue(0), deltaValue(0), startValue(0), endValue(0), fadeTime(1),
 	 	timer(1), tableSize(tableSize)
 	{
 		setValue(0);
@@ -61,7 +61,7 @@ public:
 
 	/// @param	brightness
 	///		between 0 and length of lookup-table
-	virtual void
+	void
 	setBrightness(uint16_t brightness)
 	{
 		fadeTime = 0;
@@ -72,7 +72,7 @@ public:
 	}
 
 	/// @return brightness of the LED
-	virtual uint16_t
+	uint16_t
 	getBrightness()
 	{
 		return currentValue;
@@ -80,14 +80,14 @@ public:
 
 	/// @return `true` if LED is currently fading to another brightness,
 	///			`false` if otherwise
-	virtual bool
+	bool
 	isFading()
 	{
 		return static_cast<bool>(fadeTime);
 	}
 
 	/// Fade from the current brightness to a new brightness in the specified ms.
-	virtual void
+	void
 	fadeTo(uint16_t time, uint16_t brightness)
 	{
 		if (brightness == currentValue) return;
@@ -110,7 +110,7 @@ public:
 	 * @param	time
 	 * 		specify the fade up time in ms, 0 turn the LED on instantly
 	 */
-	virtual void
+	void
 	on(uint16_t time=7)
 	{
 		fadeTo(time, tableSize-1);
@@ -122,14 +122,14 @@ public:
 	 * @param	time
 	 * 		specify the fade up time in ms, 0 turn the LED off instantly
 	 */
-	virtual void
+	void
 	off(uint16_t time=10)
 	{
 		fadeTo(time, 0);
 	}
 
 	/// must be called at least every ms.
-	virtual void
+	void
 	run()
 	{
 		if (timer.isExpired() && fadeTime)

@@ -28,7 +28,7 @@ namespace ui
  */
 class Pulse
 {
-	Led* led;
+	Led& led;
 	uint16_t halfPeriod;
 	uint8_t counter;
 	bool pulseDirection;
@@ -42,7 +42,7 @@ public:
 	 * @param	period
 	 *		pulse cycle period in ms.
 	 */
-	Pulse(Led* led, uint16_t period=1000)
+	Pulse(Led& led, uint16_t period=1000)
 	:	led(led), halfPeriod(period/2), counter(0),
 		pulseDirection(false), isPulsing(false), isCounting(false)
 	{
@@ -92,12 +92,12 @@ public:
 	void
 	run()
 	{
-		led->run();
+		led.run();
 
-		if (!led->isFading() && (isPulsing || !pulseDirection))
+		if (!led.isFading() && (isPulsing || !pulseDirection))
 		{
 			if (pulseDirection) {
-				led->on(halfPeriod);
+				led.on(halfPeriod);
 
 				if (isCounting && !--counter) {
 					isPulsing = false;
@@ -105,7 +105,7 @@ public:
 				}
 			}
 			else {
-				led->off(halfPeriod);
+				led.off(halfPeriod);
 			}
 			pulseDirection = !pulseDirection;
 		}

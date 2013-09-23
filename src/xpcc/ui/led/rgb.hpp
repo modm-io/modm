@@ -29,9 +29,9 @@ namespace ui
  */
 class RgbLed
 {
-	Led* red;
-	Led* green;
-	Led* blue;
+	Led& red;
+	Led& green;
+	Led& blue;
 
 public:
 	enum class
@@ -43,7 +43,7 @@ public:
 	};
 
 public:
-	RgbLed(Led* red, Led* green, Led* blue)
+	RgbLed(Led& red, Led& green, Led& blue)
 	:	red(red), green(green), blue(blue)
 	{
 	}
@@ -51,9 +51,9 @@ public:
 	inline void
 	setBrightness(uint16_t redValue, uint16_t greenValue, uint16_t blueValue)
 	{
-		red->setBrightness(redValue);
-		green->setBrightness(greenValue);
-		blue->setBrightness(blueValue);
+		red.setBrightness(redValue);
+		green.setBrightness(greenValue);
+		blue.setBrightness(blueValue);
 	}
 
 	inline uint16_t
@@ -61,11 +61,11 @@ public:
 	{
 		switch (color) {
 			case Color::Red:
-				return red->getBrightness();
+				return red.getBrightness();
 			case Color::Green:
-				return green->getBrightness();
+				return green.getBrightness();
 			case Color::Blue:
-				return blue->getBrightness();
+				return blue.getBrightness();
 			default:
 				return 0;
 		}
@@ -74,26 +74,26 @@ public:
 	inline bool
 	isFading()
 	{
-		return (red->isFading() ||
-				green->isFading() ||
-				blue->isFading());
+		return (red.isFading() ||
+				green.isFading() ||
+				blue.isFading());
 	}
 
 	inline void
 	fadeTo(uint16_t time, uint16_t redValue, uint16_t greenValue, uint16_t blueValue)
 	{
-		red->fadeTo(time, redValue);
-		green->fadeTo(time, greenValue);
-		blue->fadeTo(time, blueValue);
+		red.fadeTo(time, redValue);
+		green.fadeTo(time, greenValue);
+		blue.fadeTo(time, blueValue);
 	}
 
 	/// Must be called at least every ms
 	inline void
 	run()
 	{
-		red->run();
-		green->run();
-		blue->run();
+		red.run();
+		green.run();
+		blue.run();
 	}
 };
 

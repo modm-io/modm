@@ -31,7 +31,7 @@ namespace ui
  */
 class Indicator
 {
-	Led* led;
+	Led& led;
 	uint16_t on;
 	uint16_t off;
 	uint8_t onFade;
@@ -56,7 +56,7 @@ public:
 	 * @param	offFade
 	 * 		time in ms until the LED is fully off
 	 */
-	Indicator(Led* led, uint16_t period=1000, float dutyCycle=0.45f,
+	Indicator(Led& led, uint16_t period=1000, float dutyCycle=0.45f,
 			  uint8_t onFade=75, uint8_t offFade=110)
 	:	led(led), on(period * dutyCycle), off(period - on), onFade(onFade), offFade(offFade),
 	counter(0), blinkDirection(true), isBlinking(false), isCounting(false)
@@ -107,13 +107,13 @@ public:
 	void
 	run()
 	{
-		led->run();
+		led.run();
 
 		if (timer.isExpired() && (isBlinking || !blinkDirection))
 		{
 			if (blinkDirection)
 			{
-				led->on(onFade);
+				led.on(onFade);
 
 				if (isCounting && !--counter) {
 					isBlinking = false;
@@ -124,7 +124,7 @@ public:
 			}
 			else
 			{
-				led->off(offFade);
+				led.off(offFade);
 
 				timer.restart(off);
 			}
