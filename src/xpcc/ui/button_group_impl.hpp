@@ -5,7 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -28,7 +28,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__BUTTON_GROUP_HPP
+#ifndef XPCC_BUTTON_GROUP_HPP
 	#error	"Don't include this file directly, use 'button_group.hpp' instead!"
 #endif
 
@@ -45,7 +45,7 @@ T
 xpcc::ButtonGroup<T>::getState(T mask) const
 {
 	atomic::Lock lock;
-	
+
 	return mask & state;
 }
 
@@ -55,10 +55,11 @@ T
 xpcc::ButtonGroup<T>::isReleased(T mask)
 {
 	atomic::Lock lock;
-	
+
 	mask &= releaseState;
-	releaseState ^= mask;	// clear releaseState bits
-	
+	// clear releaseState bits
+	releaseState ^= mask;
+
 	return mask;
 }
 
@@ -68,10 +69,11 @@ T
 xpcc::ButtonGroup<T>::isPressed(T mask)
 {
 	atomic::Lock lock;
-	
+
 	mask &= pressState;
-	pressState ^= mask;		// clear pressState bits
-	
+	// clear pressState bits
+	pressState ^= mask;
+
 	return mask;
 }
 
@@ -80,10 +82,11 @@ T
 xpcc::ButtonGroup<T>::isRepeated(T mask)
 {
 	atomic::Lock lock;
-	
+
 	mask &= repeatState;
-	repeatState ^= mask;	// clear repeatState bits
-	
+	// clear repeatState bits
+	repeatState ^= mask;
+
 	return mask;
 }
 
@@ -93,13 +96,13 @@ T
 xpcc::ButtonGroup<T>::isPressedShort(T mask)
 {
 	atomic::Lock lock;
-	
+
 	// get all keys which were pressed but are currently not pressed. This
 	// must be a short press then, otherwise the isPressedLong() method
 	// would have reseted pressState.
 	mask = mask & pressState & ~state;
 	pressState ^= mask;
-	
+
 	return mask;
 }
 
@@ -108,13 +111,43 @@ T
 xpcc::ButtonGroup<T>::isPressedLong(T mask)
 {
 	atomic::Lock lock;
-	
+
 	// get all keys which are long enough pressState so that the repeatState
 	// variable was set
 	mask = mask & repeatState;
 	repeatState ^= mask;
 	mask = mask & pressState;
 	pressState ^= mask;
-	
+
 	return mask;
+}
+
+// ----------------------------------------------------------------------------
+template <typename T>
+void
+xpcc::ButtonGroup<T>::update(T input)
+{
+	// key changed?
+	T i = state ^ ~input;
+	// reset or count ct0
+	ct0 = ~(ct0 & i);
+	// reset or count ct1
+	ct1 = ct0 ^ (ct1 & i);
+	// count until roll over?
+	i &= ct0 & ct1;
+
+	// then toggle debounced state
+	state ^= i;
+	// 0->1: key press detected
+	pressState |= state & i;
+	// 0->1: key release detected
+	releaseState |= ~state & i;
+
+	if ((state & repeatMask) == 0) {
+		repeatCounter = timeout;
+	}
+	if (--repeatCounter == 0) {
+		repeatCounter = interval;
+		repeatState |= state & repeatMask;
+	}
 }
