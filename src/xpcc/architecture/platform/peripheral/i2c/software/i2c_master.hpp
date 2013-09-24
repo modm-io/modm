@@ -54,7 +54,7 @@ public:
 	start(xpcc::I2cDelegate *delegate);
 
 	static ALWAYS_INLINE bool
-	startSync(xpcc::I2cDelegate *delegate)
+	startBlocking(xpcc::I2cDelegate *delegate)
 	{
 		return start(delegate);
 	};

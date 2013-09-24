@@ -133,7 +133,7 @@ xpcc::SoftwareI2cMaster<SCL, SDA, Frequency>::error()
 	DEBUG_SW_I2C('E');
 	stopCondition();
 	errorState = Error::DataNack;
-	reset(true);
+	reset(DetachCause::ErrorCondition);
 }
 
 // MARK: bus control
@@ -229,7 +229,7 @@ xpcc::SoftwareI2cMaster<SCL, SDA, Frequency>::readBit()
 
 	bool bit = sda.read();
 
-	scl.reset;
+	scl.reset();
 
 	return bit;
 }

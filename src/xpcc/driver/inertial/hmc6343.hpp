@@ -5,7 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -132,6 +132,12 @@ namespace xpcc
 	public:
 		/// \brief	Constructor, requires pointer to 20 byte array, sets address to default of 0x19
 		Hmc6343(uint8_t* data, uint8_t address=0x19);
+
+		bool
+		sendPing();
+
+		bool
+		checkCommunication();
 
 		/**
 		 * Configures the sensor to normal orientation mode with 10Hz data rate.
@@ -279,10 +285,11 @@ namespace xpcc
 		/**
 		 * reads a 8bit register, blocking!
 		 * \param reg the 8bit register to read
-		 * \return 8bit content
+		 * \param data 8bit content
+		 * \return `true` if successful
 		 */
-		uint8_t
-		readRegister(hmc6343::Register reg);
+		bool
+		readRegister(hmc6343::Register reg, uint8_t &data);
 
 	private:
 		xpcc::I2cWriteReadAdapter adapter;
