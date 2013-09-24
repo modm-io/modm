@@ -382,6 +382,13 @@ public:
 		data <<= START_PIN;
 		PORT{{port.name}} = (PORT{{port.name}} & ~portMask) | (data & portMask);
 	}
+	ALWAYS_INLINE static void toggle() {
+	%% if notoggle is defined
+		PORT{{port.name}} ^= portMask;
+	%% else
+		PIN{{port.name}} = portMask;
+	%% endif
+	}
 };
 	%% if port.startPin == 0 and port.width == 8
 template<>
@@ -402,6 +409,13 @@ public:
 	}
 	ALWAYS_INLINE static void write(uint8_t data) {
 		PORT{{port.name}} = data;
+	}
+	ALWAYS_INLINE static void toggle() {
+		%% if notoggle is defined
+		PORT{{port.name}} ^= 0xff;
+		%% else
+		PIN{{port.name}} = 0xff;
+		%% endif
 	}
 };
 	%% endif

@@ -247,6 +247,10 @@ public:
 	/// The write data is always right-aligned regardless of physical mapping.
 	static void
 	write(uint16_t data);
+
+	/// Toggle the output states of all pins
+	static void
+	toggle();
 #endif
 };
 

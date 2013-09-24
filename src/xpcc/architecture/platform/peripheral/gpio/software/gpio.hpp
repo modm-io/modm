@@ -239,6 +239,13 @@ public:
 		Gpio::set(data & (1 << (width-1)));
 		SoftwareGpioPort<Gpios...>::write(data);
 	}
+
+	static void
+	toggle()
+	{
+		Gpio::toggle();
+		SoftwareGpioPort<Gpios...>::toggle();
+	}
 };
 
 /// @private
@@ -259,6 +266,9 @@ public:
 
 	static void
 	write(uint8_t /*data*/) {}
+
+	static void
+	toggle() {}
 };
 }
 
