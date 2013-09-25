@@ -11,9 +11,7 @@
 #define XPCC_UI_LED_HPP
 
 #include <stdint.h>
-#include "tables.hpp"
 #include <xpcc/processing/periodic_timer.hpp>
-#include <xpcc/architecture/driver/accessor/flash.hpp>
 
 namespace xpcc
 {
@@ -34,75 +32,34 @@ namespace ui
  */
 class Led
 {
-	uint16_t currentValue;
-
-	float deltaValue;
-	float startValue;
-	uint16_t endValue;
-	uint16_t fadeTime;
-
-	xpcc::PeriodicTimer<> timer;
-	std::size_t const tableSize;
-
 	/// This method is specific to the implementation and must be overwritten.
 	virtual void
-	setValue(uint16_t /*brightness*/)
+	setValue(uint8_t /*brightness*/)
 	{
 	}
 
 public:
-	///
-	Led(std::size_t const tableSize=256)
-	:	currentValue(0), deltaValue(0), startValue(0), endValue(0), fadeTime(1),
-	 	timer(1), tableSize(tableSize)
-	{
-		setValue(0);
-	}
+	Led();
 
 	/// @param	brightness
 	///		between 0 and length of lookup-table
-	void
-	setBrightness(uint16_t brightness)
-	{
-		fadeTime = 0;
-		if (brightness > tableSize-1) brightness = tableSize-1;
-		currentValue = brightness;
-
-		setValue(currentValue);
-	}
+	inline void
+	setBrightness(uint8_t brightness);
 
 	/// @return brightness of the LED
-	uint16_t
-	getBrightness()
-	{
-		return currentValue;
-	}
+	ALWAYS_INLINE uint8_t
+	getBrightness();
 
 	/// @return `true` if LED is currently fading to another brightness,
 	///			`false` if otherwise
-	bool
-	isFading()
-	{
-		return static_cast<bool>(fadeTime);
-	}
+	ALWAYS_INLINE bool
+	isFading();
 
 	/// Fade from the current brightness to a new brightness in the specified ms.
+	/// Fading times of more than 25.5s are not possible, you must control
+	/// fading externally in that case.
 	void
-	fadeTo(uint16_t time, uint16_t brightness)
-	{
-		if (brightness == currentValue) return;
-		if (brightness > tableSize-1) brightness = tableSize-1;
-		if (!time) {
-			currentValue = brightness;
-			setValue(currentValue);
-		}
-		else {
-			startValue = currentValue;
-			endValue = brightness;
-			deltaValue = (endValue - startValue) / static_cast<float>(time);
-		}
-		fadeTime = time;
-	}
+	fadeTo(uint16_t time, uint8_t brightness);
 
 	/**
 	 * Mimmics the behaviour of normal lamps, which take a small amount
@@ -110,11 +67,8 @@ public:
 	 * @param	time
 	 * 		specify the fade up time in ms, 0 turn the LED on instantly
 	 */
-	void
-	on(uint16_t time=7)
-	{
-		fadeTo(time, tableSize-1);
-	}
+	ALWAYS_INLINE void
+	on(uint16_t time=9);
 
 	/**
 	 * Mimmics the behaviour of normal lamps, which take a small amount
@@ -122,29 +76,29 @@ public:
 	 * @param	time
 	 * 		specify the fade up time in ms, 0 turn the LED off instantly
 	 */
-	void
-	off(uint16_t time=10)
-	{
-		fadeTo(time, 0);
-	}
+	ALWAYS_INLINE void
+	off(uint16_t time=12);
 
 	/// must be called at least every ms.
-	void
-	run()
-	{
-		if (timer.isExpired() && fadeTime)
-		{
-			startValue += deltaValue;
-			currentValue = static_cast<uint16_t>(startValue);
-			if (!--fadeTime) currentValue = endValue;
+	inline void
+	run();
 
-			setValue(currentValue);
-		}
-	}
+protected:
+	uint8_t currentValue;
+
+	uint16_t startValue;
+	uint8_t endValue;
+
+	int16_t deltaValue;
+	uint16_t fadeTime;
+
+	xpcc::PeriodicTimer<> timer;
 };
 
 }
 
 }
+
+#include "led_impl.hpp"
 
 #endif	// XPCC_UI_LED_HPP

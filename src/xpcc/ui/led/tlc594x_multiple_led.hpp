@@ -28,7 +28,7 @@ namespace ui
  * \ingroup led
  */
 template< typename PwmController >
-class TLC594XMultipleLed : virtual public Led
+class TLC594XMultipleLed : public Led
 {
 	const uint8_t *channels;
 	uint8_t channelSize;
@@ -44,8 +44,8 @@ class TLC594XMultipleLed : virtual public Led
 	}
 
 public:
-	TLC594XMultipleLed(const uint8_t* channels, uint8_t const channelSize, const uint16_t* table=led::table12_256, uint16_t const tableSize=256)
-	:	Led(tableSize), channels(channels), channelSize(channelSize), table(table)
+	TLC594XMultipleLed(const uint8_t* channels, uint8_t const channelSize, const uint16_t* table=led::table12_256)
+	:	Led(), channels(channels), channelSize(channelSize), table(table)
 	{
 	}
 };

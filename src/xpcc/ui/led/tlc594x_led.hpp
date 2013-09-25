@@ -28,20 +28,20 @@ namespace ui
  * @ingroup led
  */
 template< typename PwmController >
-class TLC594XLed : virtual public Led
+class TLC594XLed : public Led
 {
 	const uint8_t channel;
 	xpcc::accessor::Flash<uint16_t> table;
 
 	virtual void
-	setValue(uint16_t brightness)
+	setValue(uint8_t brightness)
 	{
 		PwmController::setChannel(channel, table[brightness]);
 	}
 
 public:
-	TLC594XLed(const uint8_t channel, const uint16_t* table=led::table12_256, std::size_t const tableSize=256)
-	:	Led(tableSize), table(table), currentValue(0)
+	TLC594XLed(const uint8_t channel, const uint16_t* table=led::table12_256)
+	:	Led(), channel(channel), table(table), currentValue(0)
 	{
 	}
 };
