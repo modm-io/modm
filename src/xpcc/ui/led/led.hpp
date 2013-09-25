@@ -34,9 +34,7 @@ class Led
 {
 	/// This method is specific to the implementation and must be overwritten.
 	virtual void
-	setValue(uint8_t /*brightness*/)
-	{
-	}
+	setValue(uint8_t brightness) = 0;
 
 public:
 	Led();

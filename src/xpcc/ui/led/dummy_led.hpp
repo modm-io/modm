@@ -32,6 +32,11 @@ class DummyLed : public Led
 {
 	xpcc::Timeout<> timeout;
 
+	virtual void
+	setValue(uint8_t /*brightness*/)
+	{
+	}
+
 public:
 	DummyLed()
 	:	Led(), timeout(0)
