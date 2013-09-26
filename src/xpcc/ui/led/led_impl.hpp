@@ -13,7 +13,7 @@
 
 // ----------------------------------------------------------------------------
 xpcc::ui::Led::Led()
-:	currentValue(0), startValue(0), endValue(0), deltaValue(0), fadeTime(0),
+:	currentValue(0), startValue(0), endValue(0), deltaValue(0), fadeTime(1),
 	timer(1)
 {
 }
@@ -52,8 +52,9 @@ xpcc::ui::Led::fadeTo(uint16_t time, uint8_t brightness)
 	else {
 		startValue = static_cast<uint16_t>(currentValue)*100;
 		endValue = brightness;
-		deltaValue = (static_cast<int16_t>(endValue) - currentValue)*100 / static_cast<int16_t>(time);
-		if (deltaValue == 0) deltaValue = 1;
+		int16_t delta = (static_cast<int16_t>(endValue) - currentValue)*100;
+		deltaValue = delta / static_cast<int16_t>(time);
+		if (deltaValue == 0) deltaValue = delta > 0 ? 1 : -1;
 	}
 	fadeTime = time;
 }
@@ -78,6 +79,7 @@ xpcc::ui::Led::run()
 		startValue += deltaValue;
 		currentValue = startValue/100;
 		if (--fadeTime == 0) currentValue = endValue;
+		if (currentValue == endValue) deltaValue = 0;
 
 		setValue(currentValue);
 	}
