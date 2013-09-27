@@ -21,10 +21,10 @@ xpcc::Tmp102<I2cMaster>::Tmp102(uint8_t* data, uint8_t address)
 
 template < typename I2cMaster >
 bool
-xpcc::Tmp102<I2cMaster>::configure(tmp102::Config2 lsb, tmp102::Config1 msb)
+xpcc::Tmp102<I2cMaster>::configure(uint8_t lsb, uint8_t msb)
 {
 	config = msb;
-	buffer[0] = tmp102::REGISTER_CONFIGURATION;
+	buffer[0] = static_cast<uint8_t>(tmp102::Register::Configuration);
 	buffer[1] = msb;
 	buffer[2] = lsb;
 	adapter.initialize(buffer, 3, data, 0);
@@ -97,7 +97,7 @@ xpcc::Tmp102<I2cMaster>::update()
 	else  {
 		if (status.startConversionPending)
 		{
-			buffer[0] = tmp102::REGISTER_CONFIGURATION;
+			buffer[0] = static_cast<uint8_t>(tmp102::Register::Configuration);
 			buffer[1] = config & tmp102::CONFIGURATION_ONE_SHOT;
 			adapter.initialize(buffer, 2, data, 0);
 
@@ -108,7 +108,7 @@ xpcc::Tmp102<I2cMaster>::update()
 		}
 		else if (status.readTemperaturePending)
 		{
-			buffer[0] = tmp102::REGISTER_TEMPERATURE;
+			buffer[0] = static_cast<uint8_t>(tmp102::Register::Temperature);
 			adapter.initialize(buffer, 1, data, 2);
 
 			if (I2cMaster::start(&adapter)) {

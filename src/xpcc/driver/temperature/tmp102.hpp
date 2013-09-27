@@ -16,18 +16,15 @@
 namespace xpcc
 {
 
-/**
- * @see		TMP102
- * @ingroup	temperature
- */
 namespace tmp102
 {
-	enum Register
+	enum class
+	Register
 	{
-		REGISTER_TEMPERATURE = 0x00,
-		REGISTER_CONFIGURATION = 0x01,
-		REGISTER_T_LOW = 0x02,
-		REGISTER_T_HIGH = 0x03
+		Temperature = 0x00,
+		Configuration = 0x01,
+		LowTemperature = 0x02,
+		HighTemperature = 0x03
 	};
 
 	enum Temperature
@@ -35,7 +32,7 @@ namespace tmp102
 		TEMPERATURE_EXTENDED_MODE = 0x01
 	};
 
-	enum Config1
+	enum Configuration
 	{// first byte
 		CONFIGURATION_SHUTDOWN_MODE = 0x01,
 		CONFIGURATION_THERMOSTAT_MODE = 0x02,
@@ -50,7 +47,7 @@ namespace tmp102
 		CONFIGURATION_ONE_SHOT = 0x80
 	};
 
-	enum Config2
+	enum ConfigurationExtended
 	{// second byte
 		CONFIGURATION_EXTENDED_MODE = 0x10,
 		CONFIGURATION_ALERT = 0x20,
@@ -98,8 +95,8 @@ public:
 	Tmp102(uint8_t* data, uint8_t address=0x48);
 
 	bool
-	configure(tmp102::Config2 lsb=tmp102::CONFIGURATION_CONVERSION_RATE_4HZ,
-			  tmp102::Config1 msb=tmp102::CONFIGURATION_CONVERTER_RESOLUTION_12BIT);
+	configure(uint8_t lsb=tmp102::CONFIGURATION_CONVERSION_RATE_4HZ,
+			  uint8_t msb=tmp102::CONFIGURATION_CONVERTER_RESOLUTION_12BIT);
 
 	/// starts a temperature conversion right now
 	ALWAYS_INLINE void
@@ -107,14 +104,14 @@ public:
 
 	/**
 	 * read the Temperature registers and buffer the results
-	 * sets isNewDataAvailable() to @c true
+	 * sets isNewDataAvailable() to `true`
 	 */
 	ALWAYS_INLINE void
 	readTemperature();
 
 	/**
-	 * @c true, when new data has been read from the sensor and is buffered,
-	 * @c false, when the data has been accessed
+	 * `true`, when new data has been read from the sensor and is buffered,
+	 * `false`, when the data has been accessed
 	 */
 	ALWAYS_INLINE bool
 	isNewDataAvailable();
