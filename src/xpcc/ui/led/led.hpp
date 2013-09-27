@@ -12,6 +12,7 @@
 
 #include <stdint.h>
 #include <xpcc/processing/periodic_timer.hpp>
+#include <xpcc/architecture/driver/clock.hpp>
 
 namespace xpcc
 {
@@ -91,6 +92,7 @@ protected:
 	uint16_t fadeTime;
 
 	xpcc::PeriodicTimer<> timer;
+	xpcc::Timestamp stamp;
 };
 
 }

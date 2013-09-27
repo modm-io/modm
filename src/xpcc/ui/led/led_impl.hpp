@@ -48,15 +48,16 @@ xpcc::ui::Led::fadeTo(uint16_t time, uint8_t brightness)
 	if (time == 0) {
 		currentValue = brightness;
 		setValue(currentValue);
+		return;
 	}
-	else {
-		startValue = static_cast<uint16_t>(currentValue)*100;
-		endValue = brightness;
-		int16_t delta = (static_cast<int16_t>(endValue) - currentValue)*100;
-		deltaValue = delta / static_cast<int16_t>(time);
-		if (deltaValue == 0) deltaValue = delta > 0 ? 1 : -1;
-	}
+
+	startValue = static_cast<uint16_t>(currentValue)*100;
+	endValue = brightness;
+	int16_t delta = (static_cast<int16_t>(endValue) - currentValue)*100;
+	deltaValue = delta / static_cast<int16_t>(time);
+	if (deltaValue == 0) deltaValue = delta > 0 ? 1 : -1;
 	fadeTime = time;
+	stamp = xpcc::Clock::now();
 }
 
 void
@@ -74,13 +75,18 @@ xpcc::ui::Led::off(uint16_t time)
 void
 xpcc::ui::Led::run()
 {
-	if (timer.isExpired() && fadeTime)
+	if (fadeTime && timer.isExpired())
 	{
-		startValue += deltaValue;
-		currentValue = startValue/100;
-		if (--fadeTime == 0) currentValue = endValue;
-		if (currentValue == endValue) deltaValue = 0;
+		uint8_t delta = (xpcc::Clock::now() - stamp).getTime();
+		while (delta-- && fadeTime)
+		{
+			startValue += deltaValue;
+			currentValue = startValue/100;
+			if (--fadeTime == 0) currentValue = endValue;
+			if (currentValue == endValue) deltaValue = 0;
+		}
 
+		stamp = xpcc::Clock::now();
 		setValue(currentValue);
 	}
 }
