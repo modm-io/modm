@@ -18,7 +18,7 @@
 		<linkerscript device-size-id="g">stm32f4xx_g.ld</linkerscript>
 		<linkerscript device-size-id="e">stm32f4xx_e.ld</linkerscript>
 		<!-- Core -->
-		<core>cortex-m4</core>
+		<core>cortex-m4f</core>
 		<!-- Number of pins -->
 		<pin-count device-pin-id="r">64</pin-count>
 		<pin-count device-pin-id="v">100</pin-count>

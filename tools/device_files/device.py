@@ -126,7 +126,7 @@ class DeviceFile:
 		# Checks for all Platforms
 
 		# Check Core
-		cores = ['cortex-m0', 'cortex-m3', 'cortex-m4', 'avr8', 'avr8l']
+		cores = ['cortex-m0', 'cortex-m3', 'cortex-m4', 'cortex-m4f', 'avr8', 'avr8l']
 		if 'core' in self.properties and self.core not in cores:
 			self.log.error("Unknown core '%s'. Supported cores are %s"
 				% (self.core, cores))
