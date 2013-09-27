@@ -176,6 +176,7 @@ class DeviceFile:
 		props['linkerscript'] = self.getProperty('linkerscript', device_string, True, "")[0]
 		props['defines'] = self.getProperty('define', device_string)
 		props['headers'] = self.getProperty('header', device_string)
+		props['core'] = self.getProperty('core', device_string, True)[0]
 		props.update(s.getTargetDict())
 
 		#Check Some Properties

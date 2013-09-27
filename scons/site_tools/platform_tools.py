@@ -54,25 +54,16 @@ from driver import DriverFile
 
 #------------------------------------------------------------------------------
 #
-#
-#
-# env['XPCC_PLATFORM_PATH'] is used for abolute paths
-# architecture_path for relative build paths
-def platform_tools_generate(env, architecture_path):
+def platform_tools_find_device_file(env):
+	architecture_path = os.path.join(env['XPCC_LIBRARY_PATH'], 'xpcc', 'architecture')
 	device = env['XPCC_DEVICE']
 	# Do not generate for hosted
 	# TODO: generate software peripherals for hosted
 	if device in ['darwin', 'linux', 'windows']:
-		return [], [], []
+		env['ARCHITECTURE'] = 'hosted'
+		return
 	id = DeviceIdentifier(device)
 	env.Debug("Device String: %s" % device)
-	# Initialize Return Lists/Dicts
-	sources = []
-	defines = {}
-	includes = []
-	# make paths
-	platform_path = os.path.join(architecture_path, 'platform')
-	generated_path = os.path.join(architecture_path, env['XPCC_PLATFORM_GENERATED_DIR'])
 	# Find Device File
 	xml_path = os.path.join(env['XPCC_PLATFORM_PATH'], 'xml', id.platform)
 	files = []
@@ -112,8 +103,6 @@ def platform_tools_generate(env, architecture_path):
 			else:
 				device = device[:-1]
 				device_file = None
-	
-	device = env['XPCC_DEVICE'] # restore device
 
 	# Check for error
 	if device_file == None:
@@ -123,7 +112,29 @@ def platform_tools_generate(env, architecture_path):
 		Exit(1)
 	# Now we need to parse the Xml File
 	env.Debug("Found device file: " + device_file)
-	dev = DeviceFile(device_file, env.GetLogger())
+	env['XPCC_DEVICE_FILE'] = DeviceFile(device_file, env.GetLogger())
+	# for microcontrollers architecture = core
+	env['ARCHITECTURE'] = env['XPCC_DEVICE_FILE'].getProperties(device)['core']
+
+#------------------------------------------------------------------------------
+# env['XPCC_PLATFORM_PATH'] is used for abolute paths
+# architecture_path for relative build paths
+def platform_tools_generate(env, architecture_path):
+	device = env['XPCC_DEVICE']
+	# Do not generate for hosted
+	# TODO: generate software peripherals for hosted
+	if device in ['darwin', 'linux', 'windows']:
+		return [], {}, []
+
+	# Initialize Return Lists/Dicts
+	sources = []
+	defines = {}
+	includes = []
+	# make paths
+	platform_path = os.path.join(architecture_path, 'platform')
+	generated_path = os.path.join(architecture_path, env['XPCC_PLATFORM_GENERATED_DIR'])
+
+	dev = env['XPCC_DEVICE_FILE']
 
 	# Parse Properties
 	prop = dev.getProperties(device)
@@ -134,6 +145,7 @@ def platform_tools_generate(env, architecture_path):
 	# xpp_config.hpp and which via a command line option
 	env.Append(CPPDEFINES = defines)
 	device_headers = prop['headers']
+
 	# Set Size
 	env['DEVICE_SIZE'] = { "flash": prop['flash'], "ram": prop['ram'], "eeprom": prop['eeprom'] }
 	if (prop['linkerscript'] != ""):
@@ -276,6 +288,7 @@ def generate(env, **kw):
 
 	# Add Method to Parse XML Files, and create Template / Copy Dependencies
 	env.AddMethod(platform_tools_generate, 'GeneratePlatform')
+	env.AddMethod(platform_tools_find_device_file, 'FindDeviceFile')
 
 	# Add Filter for Gpio Drivers to Template Engine
 	env.AddTemplateJinja2Filter('getPorts', filter_get_ports)
