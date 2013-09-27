@@ -261,7 +261,11 @@ def generate(env, **kw):
 
 		projectName = parser.get('general', 'name')
 
-		buildpath = parser.get('build', 'buildpath', 'default')
+		buildpath = env.get('buildpath')
+		# put together build path
+		if buildpath is None:
+			buildpath = parser.get('build', 'buildpath', os.path.join(os.curdir, 'build/'))
+
 	except configparser.ParserException, msg:
 		env.Error("Error parsing file configuration file '%s':\n%s" % (configfile, str(msg)))
 		Exit(1)
@@ -277,7 +281,6 @@ def generate(env, **kw):
 	env['XPCC_ROOTPATH'] = rootpath			# xpcc rootpath
 	env['XPCC_BASEPATH'] = os.curdir		# path of the current project
 	env['XPCC_LIBRARY_PATH'] = os.path.join(rootpath, 'src')
-	env['XPCC_BUILDPATH'] = buildpath
 	env['XPCC_CONFIG'] = configuration
 	env['XPCC_CONFIG_FILE'] = os.path.abspath(configfile)
 	env['XPCC_SYSTEM_BUILDER'] = os.path.join(rootpath, 'tools', 'system_design', 'builder')
@@ -294,10 +297,6 @@ def generate(env, **kw):
 
 	env.FindDeviceFile()
 
-	# put together build path
-	if buildpath is 'default':
-		buildpath = parser.get('build', 'buildpath', os.path.join(os.curdir, 'build/'))
-		env.Info("No build path specified, falling back to %s" % buildpath)
 	buildpath = string.Template(buildpath).safe_substitute({
 				'arch': env['ARCHITECTURE'],
 				'device': device,
@@ -307,6 +306,7 @@ def generate(env, **kw):
 	buildpath = os.path.abspath(buildpath)
 	# exclude the buildpath from the FileScanner
 	exclude_from_scanner(buildpath)
+	env['XPCC_BUILDPATH'] = buildpath
 
 	env['LIBS'] = ['']
 	env['LIBPATH'] = []
