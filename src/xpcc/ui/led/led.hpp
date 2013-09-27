@@ -46,12 +46,12 @@ public:
 
 	/// @return brightness of the LED
 	ALWAYS_INLINE uint8_t
-	getBrightness();
+	getBrightness() const;
 
 	/// @return `true` if LED is currently fading to another brightness,
 	///			`false` if otherwise
 	ALWAYS_INLINE bool
-	isFading();
+	isFading() const;
 
 	/// Fade from the current brightness to a new brightness in the specified ms.
 	/// Fading times of more than 25.5s are not possible, you must control

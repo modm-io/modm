@@ -55,6 +55,16 @@ namespace xpcc
 			UnderlyingType green;
 			UnderlyingType blue;
 
+			RgbT(UnderlyingType red, UnderlyingType green, UnderlyingType blue)
+			:	red(red), green(green), blue(blue)
+			{
+			}
+
+			RgbT()
+			:	red(0), green(0), blue(0)
+			{
+			}
+
 			template<typename IntermediateType__ = float, unsigned int multiplier__ = 100, typename ReturnType__ = UnderlyingType>
 			inline ReturnType__ getRelative(const UnderlyingType color) const
 			{
@@ -85,10 +95,11 @@ namespace xpcc
 			template<typename IntermediateType = float, unsigned int multiplier = 100, typename ReturnType = UnderlyingType>
 			inline RgbT<ReturnType> getRelativeColors() const
 			{
-				return {
+				return RgbT<ReturnType>(
 					getRelativeRed	<IntermediateType, multiplier, ReturnType>(),
 					getRelativeGreen<IntermediateType, multiplier, ReturnType>(),
-					getRelativeBlue	<IntermediateType, multiplier, ReturnType>()};
+					getRelativeBlue	<IntermediateType, multiplier, ReturnType>()
+				);
 			}
 
 			template<typename T> void
@@ -106,13 +117,23 @@ namespace xpcc
 		class HsvT
 		{
 		public:
-			template<typename T=UnderlyingType>
-			void
-			toRgb(RgbT<T>* color) const;
-
 			UnderlyingType hue;
 			UnderlyingType saturation;
 			UnderlyingType value;
+
+			HsvT(UnderlyingType hue, UnderlyingType saturation, UnderlyingType value)
+			:	hue(hue), saturation(saturation), value(value)
+			{
+			}
+
+			HsvT()
+			:	hue(0), saturation(0), value(0)
+			{
+			}
+
+			template<typename T=UnderlyingType>
+			void
+			toRgb(RgbT<T>* color) const;
 		};
 
 		typedef HsvT<>	Hsv;

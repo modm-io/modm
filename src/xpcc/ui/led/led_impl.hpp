@@ -28,13 +28,13 @@ xpcc::ui::Led::setBrightness(uint8_t brightness)
 }
 
 uint8_t
-xpcc::ui::Led::getBrightness()
+xpcc::ui::Led::getBrightness() const
 {
 	return currentValue;
 }
 
 bool
-xpcc::ui::Led::isFading()
+xpcc::ui::Led::isFading() const
 {
 	return static_cast<bool>(fadeTime != 0);
 }

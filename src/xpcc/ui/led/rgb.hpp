@@ -12,6 +12,7 @@
 
 #include <stdint.h>
 #include "led.hpp"
+#include "../color.hpp"
 
 namespace xpcc
 {
@@ -33,42 +34,41 @@ class RgbLed
 	Led& green;
 	Led& blue;
 
-public:
-	enum class
-	Color
-	{
-		Red,
-		Green,
-		Blue
-	};
+	::xpcc::color::Rgb absolute;
+	::xpcc::color::Rgb relative;
 
 public:
 	RgbLed(Led& red, Led& green, Led& blue)
-	:	red(red), green(green), blue(blue)
+	:	red(red), green(green), blue(blue), absolute(), relative()
 	{
 	}
 
 	inline void
-	setBrightness(uint16_t redValue, uint16_t greenValue, uint16_t blueValue)
+	setColor(::xpcc::color::Rgb color)
 	{
-		red.setBrightness(redValue);
-		green.setBrightness(greenValue);
-		blue.setBrightness(blueValue);
+		absolute = color;
+		relative = absolute.getRelativeColors<uint16_t, 255>();
+
+		red.setBrightness(relative.red);
+		green.setBrightness(relative.green);
+		blue.setBrightness(relative.blue);
 	}
 
-	inline uint16_t
-	getBrightness(Color color)
+	inline void
+	setColor(::xpcc::color::Hsv color)
 	{
-		switch (color) {
-			case Color::Red:
-				return red.getBrightness();
-			case Color::Green:
-				return green.getBrightness();
-			case Color::Blue:
-				return blue.getBrightness();
-			default:
-				return 0;
-		}
+		color.toRgb(&absolute);
+		setColor(absolute);
+	}
+
+	inline ::xpcc::color::Rgb
+	getColor()
+	{
+		return ::xpcc::color::Rgb(
+			red.getBrightness(),
+			green.getBrightness(),
+			blue.getBrightness()
+		);
 	}
 
 	inline bool
@@ -80,11 +80,21 @@ public:
 	}
 
 	inline void
-	fadeTo(uint16_t time, uint16_t redValue, uint16_t greenValue, uint16_t blueValue)
+	fadeTo(uint16_t time, ::xpcc::color::Rgb color)
 	{
-		red.fadeTo(time, redValue);
-		green.fadeTo(time, greenValue);
-		blue.fadeTo(time, blueValue);
+		absolute = color;
+		relative = absolute.getRelativeColors<uint16_t, 255>();
+
+		red.fadeTo(time, relative.red);
+		green.fadeTo(time, relative.green);
+		blue.fadeTo(time, relative.blue);
+	}
+
+	inline void
+	fadeTo(uint16_t time, ::xpcc::color::Hsv color)
+	{
+		color.toRgb(&absolute);
+		fadeTo(time, absolute);
 	}
 
 	/// Must be called at least every ms
