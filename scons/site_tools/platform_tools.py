@@ -104,6 +104,9 @@ def platform_tools_find_device_file(env):
 				device = device[:-1]
 				device_file = None
 
+	# Restore Device
+	device = env['XPCC_DEVICE']
+
 	# Check for error
 	if device_file == None:
 		env.Error("XPCC Error: Could not find xml device file." + os.linesep)
