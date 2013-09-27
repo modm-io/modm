@@ -372,8 +372,11 @@ def generate(env, **kw):
 		env['ENV'] = os.environ
 		
 		env.Tool('hosted')
-	elif env['ARCHITECTURE'] in ['arm7tdmi', 'cortex-m0', 'cortex-m3', 'cortex-m4']:
-		env['ARM_ARCH'] = env['ARCHITECTURE']
+	elif env['ARCHITECTURE'] in ['arm7tdmi', 'cortex-m0', 'cortex-m3', 'cortex-m4', 'cortex-m4f']:
+		if env['ARCHITECTURE'] == 'cortex-m4f':
+			env['ARM_ARCH'] = 'cortex-m4'
+		else:
+			env['ARM_ARCH'] = env['ARCHITECTURE']
 		env['ARM_DEVICE'] = device
 		env['ARM_CLOCK'] = clock
 		

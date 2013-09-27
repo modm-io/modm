@@ -331,7 +331,7 @@ def generate(env, **kw):
 		return test_core(target, 'cortex-m3')
 	env.AddTemplateJinja2Test('cortex_m3', test_cortex_m3)
 	def test_cortex_m4(target):
-		return test_core(target, 'cortex-m4')
+		return test_core(target, 'cortex-m4', True)
 	env.AddTemplateJinja2Test('cortex_m4', test_cortex_m4)
 
 	# Platform Tests

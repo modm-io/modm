@@ -92,8 +92,8 @@ def generate(env, **kw):
 		# predefined functions from the standard libraries.
 		# (for example __libc_init_array())
 		env['THUMB_LINKER'] = '-mthumb'
-	
-	if env['ARM_ARCH'] == 'cortex-m4f':
+
+	if env['ARCHITECTURE'] == 'cortex-m4f':
 		# Options for '-mfloat-abi='
 		# - soft: Full software floating point.
 		# - softfp: Use the FPU, but remain compatible with soft-float code.
