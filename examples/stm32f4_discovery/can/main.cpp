@@ -58,7 +58,7 @@ MAIN_FUNCTION
 	// Initialize Usart
 	GpioOutputA2::connect(Usart2::Tx);
 	GpioInputA3::connect(Usart2::Rx);
-	Usart2::initialize(115200, 10);
+	Usart2::initialize<systemClock, 115200>(10);
 
 	XPCC_LOG_INFO << "CAN Test Program" << xpcc::endl;
 
