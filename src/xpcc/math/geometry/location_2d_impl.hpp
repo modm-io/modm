@@ -157,7 +157,7 @@ template<typename T> template<typename U>
 xpcc::Location2D<U>
 xpcc::Location2D<T>::convert() const
 {
-	return Location2D<U>(this->position.convert<U>(), this->orientation);
+	return Location2D<U>(this->position.template convert<U>(), this->orientation);
 }
 
 // ----------------------------------------------------------------------------

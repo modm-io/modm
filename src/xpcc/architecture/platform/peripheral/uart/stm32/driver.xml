@@ -1,0 +1,22 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE rca SYSTEM "../../xml/driver.dtd">
+<rca version="1.0">
+	<driver type="uart" name="stm32">
+		<!-- UartHal -->
+		<template instances="1,2,3,6" out="usart_hal_{{id}}.hpp">uart_hal.hpp.in</template>
+		<template instances="1,2,3,6" out="usart_hal_{{id}}_impl.hpp">uart_hal_impl.hpp.in</template>
+		<template instances="4,5" out="uart_hal_{{id}}.hpp">uart_hal.hpp.in</template>
+		<template instances="4,5" out="uart_hal_{{id}}_impl.hpp">uart_hal_impl.hpp.in</template>
+		<!-- Uart -->
+		<template instances="1,2,3,6" out="usart_{{id}}.hpp">uart.hpp.in</template>
+		<template instances="1,2,3,6" out="usart_{{id}}.cpp">uart.cpp.in</template>
+		<template instances="4,5" out="uart_{{id}}.hpp">uart.hpp.in</template>
+		<template instances="4,5" out="uart_{{id}}.cpp">uart.cpp.in</template>
+		<template>uart_base.hpp.in</template>
+		<template>type_ids.hpp.in</template>
+		<parameter name="buffered" type="bool">true</parameter>
+		<parameter name="flow" type="bool">false</parameter>
+		<parameter name="tx_buffer" type="int" min="1" max="254">8</parameter>
+		<parameter name="rx_buffer" type="int" min="1" max="254">8</parameter>
+	</driver>
+</rca>

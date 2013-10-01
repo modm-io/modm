@@ -3,7 +3,7 @@
 #define INTRO_HPP
 
 #include <xpcc/driver/lcd/graphic_display.hpp>
-#include <xpcc/workflow.hpp>
+#include <xpcc/processing.hpp>
 
 #include "intro/monster.hpp"
 #include "intro/monster_ship.hpp"

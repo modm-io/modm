@@ -1,0 +1,393 @@
+// coding: utf-8
+/* Copyright (c) 2013, Roboterclub Aachen e.V.
+ * All Rights Reserved.
+ *
+ * The file is part of the xpcc library and is released under the 3-clause BSD
+ * license. See the file `LICENSE` for the full license governing this code.
+ */
+// ----------------------------------------------------------------------------
+#ifndef XPCC_STM32_GPIO_HPP
+#define XPCC_STM32_GPIO_HPP
+
+#include "../../../device.hpp"
+#include "../../../type_ids.hpp"
+#include <xpcc/architecture/peripheral/gpio.hpp>
+#include "gpio_enable.h"
+
+namespace xpcc
+{
+
+namespace stm32
+{
+
+struct Gpio
+{
+	/// @ingroup	stm32{{ target.family }}
+	enum class
+	InputType
+	{
+		Floating = 0x0,	///< floating on input
+		PullUp = 0x1,	///< pull-up on input
+		PullDown = 0x2,	///< pull-down on input
+	};
+
+	/// @ingroup	stm32{{ target.family }}
+	enum class
+	OutputType
+	{
+		PushPull = 0x0,		///< push-pull on output
+		OpenDrain = 0x1,	///< open-drain on output
+	};
+
+	/// @ingroup	stm32{{ target.family }}
+	enum class
+	OutputSpeed
+	{
+		MHz2 = 0,		///< Low speed
+		%% if target is stm32f2 or target is stm32f4
+		MHz25 = 0x1,	///< Medium speed
+		MHz50 = 0x2,	///< Fast speed
+		MHz100 = 0x3,	///< High speed on 30 pF (80 MHz Output max speed on 15 pF)
+		%% elif target is stm32f0 or target is stm32f3
+		MHz10 = 0x1,	///< Medium speed
+		MHz50 = 0x03,	///< Fast speed
+		%% endif
+	};
+
+	/// @ingroup	stm32{{ target.family }}
+	static void
+	enable()
+	{
+		xpcc_gpio_enable();
+	}
+
+	/// @ingroup	stm32{{ target.family }}
+	static void
+	disable()
+	{
+		// FIXME: Implement
+	}
+
+protected:
+	/// I/O Direction Mode values for this specific pin.
+	enum class
+	Mode : uint32_t
+	{
+		Input  = 0x0,
+		Output = 0x1,
+		AlternateFunction = 0x2,
+		Analog = 0x3,
+		Mask   = 0x3,
+	};
+
+	/// @ingroup	stm32{{ target.family }}
+	// 0..7 = AFRL[31:0]
+	// 8..15 = AFRH[31:0]
+	enum class
+	AlternateFunction
+	{
+		AF_0 = 0x00,		///< System
+		AF_1 = 0x01,		///< TIM1/2
+		AF_2 = 0x02,		///< TIM3..5
+		AF_3 = 0x03,		///< TIM8...11
+		AF_4 = 0x04,		///< I2C1..3
+		AF_5 = 0x05,		///< SPI1/2
+		AF_6 = 0x06,		///< SPI3
+		AF_7 = 0x07,		///< USART1..3
+		AF_8 = 0x08,		///< USART4..6
+		AF_9 = 0x09,		///< CAN1/2, TIM12..14
+		AF_10 = 0x0a,		///< OTG_FS, OTG_HS
+		AF_11 = 0x0b,		///< ETH
+		AF_12 = 0x0c,		///< FSMC, SDIO, OTG_HS (configured as FS)
+		AF_13 = 0x0d,		///< DCMI
+		AF_14 = 0x0e,		///< Reserved
+		AF_15 = 0x0f,		///< EVENTOUT
+	};
+
+	/// @private Enum Class To Integer helper functions.
+	/// @{
+	static constexpr uint32_t
+	i(InputType pull) { return static_cast<uint32_t>(pull); }
+	static constexpr uint32_t
+	i(OutputType out) { return static_cast<uint32_t>(out); }
+	static constexpr uint32_t
+	i(OutputSpeed speed) { return static_cast<uint32_t>(speed); }
+	static constexpr uint32_t
+	i(Mode mode) { return static_cast<uint32_t>(mode); }
+	static constexpr uint32_t
+	i(AlternateFunction af) { return static_cast<uint32_t>(af); }
+	/// @}
+};
+
+// Gpio Classes created from the XML Device File Gpio Description
+%% for gpio in gpios
+	%% set reg  = "GPIO" ~ gpio.port|upper
+	%% set pin  = gpio.id
+
+	%% for type in ["Output", "Input", ""]
+		%% set name = "Gpio" ~ type ~ gpio.port|upper ~ gpio.id
+		%% set superclass = "Gpio" ~ (type if type != "" else "IO")
+
+/// {{type if type != "" else "IO"}} class for Pin {{gpio.port|upper ~ pin}}
+/// {{gpio.port|upper}}{{gpio.id}} {{type}}
+/// @ingroup	stm32
+struct {{name}} : public Gpio, ::xpcc::{{superclass}}
+{
+private:
+	/// Pin Number.
+	static constexpr uint8_t pin = {{pin}};
+	/// Bitmask for registers that contain a 1bit value for every pin.
+	static constexpr uint16_t mask  = 0x1 << pin;
+	/// Bitmask for registers that contain a 2bit value for every pin.
+	static constexpr uint32_t mask2 = 0x3 << (pin * 2);
+	/// Alternate Function register id. 0 for pin 0-7. 1 for pin 8-15.
+	static constexpr uint8_t af_id  = pin / 8;
+	/// Alternate Function offset. This depends on the af_id.
+	static constexpr uint8_t af_offset =
+							(af_id == 0)? (pin * 4) : ((pin - 8) * 4);
+	/// Alternate Function register mask.
+	static constexpr uint32_t af_mask  = 0xf << af_offset;
+
+
+	/// TODO: Document
+	ALWAYS_INLINE static void
+	setAlternateFunction(AlternateFunction alt) {
+		{{reg}}->MODER = ({{reg}}->MODER   & ~mask2)
+							| (i(Mode::AlternateFunction) << (pin * 2));
+		{{reg}}->AFR[af_id] = ({{reg}}->AFR[af_id] & ~af_mask)
+								| (i(alt) << af_offset);
+	}
+
+	/// Enable Analog Mode which is needed to use this pin as an ADC input.
+	ALWAYS_INLINE static void
+	setAnalogInput() {
+		{{reg}}->MODER |= i(Mode::Analog) << (pin * 2);
+	}
+
+public:
+	ALWAYS_INLINE static void
+	configure(OutputType type,
+			  OutputSpeed speed = OutputSpeed::MHz50) {
+		{{reg}}->OTYPER  = ({{reg}}->OTYPER  & ~mask)  | (i(type) << pin);
+		{{reg}}->OSPEEDR = ({{reg}}->OSPEEDR & ~mask2) | (i(speed) << (pin * 2));
+	}
+	ALWAYS_INLINE static void configure(InputType type) {
+		{{reg}}->PUPDR   = ({{reg}}->PUPDR   & ~mask2) | (i(type)  << (pin * 2));
+	}
+		%% for af in gpio.afs
+			%% if af.type == "analog"
+	/// {{name}} connects to {{af.name}} of {{af.peripheral}}
+	static const ::xpcc::stm32::{{af.peripheral}}::Channel
+	{{af.peripheral}}Channel = ::xpcc::stm32::{{af.peripheral}}::Channel::{{ af.name }};
+			%% endif
+		%% endfor
+		%% if type in ["" , "Output"]
+	// GpioOutput
+	// start documentation inherited
+	ALWAYS_INLINE static void setOutput() {
+		{{reg}}->MODER   = ({{reg}}->MODER   & ~mask2) | (i(Mode::Output)<< pin * 2);
+	}
+	ALWAYS_INLINE static void setOutput(bool status) {
+		set(status);
+		setOutput();
+	}
+	ALWAYS_INLINE static void set() {
+			%% if target is stm32f2 or target is stm32f4
+		{{reg}}->BSRRL = mask;
+			%% elif target is stm32f0 or target is stm32f3
+		{{reg}}->BSRR = mask;
+			%% endif
+	}
+	ALWAYS_INLINE static void set(bool status) {
+		if (status) {
+			set();
+		} else {
+			reset();
+		}
+	}
+	ALWAYS_INLINE static void reset() {
+			%% if target is stm32f2 or target is stm32f4
+		{{reg}}->BSRRH = mask;
+			%% elif target is stm32f0 or target is stm32f3
+		{{reg}}->BRR = mask;
+			%% endif
+	}
+	ALWAYS_INLINE static void toggle() {
+		if ({{reg}}->ODR & mask) {
+			reset();
+		} else {
+			set();
+		}
+	}
+	// stop documentation inherited
+	ALWAYS_INLINE static void
+	setOutput(OutputType type,
+			  OutputSpeed speed = OutputSpeed::MHz50) {
+		configure(type, speed);
+		setOutput();
+	}
+		%% endif
+		%% if type in ["", "Input"]
+	// GpioInput
+	// start documentation inherited
+	ALWAYS_INLINE static void
+	setInput() {
+		{{reg}}->MODER   &= ~mask2;
+		// reset output type and speed
+		{{reg}}->OTYPER  &= ~mask;
+		{{reg}}->OSPEEDR &= ~mask2;
+	}
+	ALWAYS_INLINE static bool read() {
+		return {{reg}}->IDR & mask;
+	}
+	// end documentation inherited
+	ALWAYS_INLINE static void setInput(InputType type) {
+		configure(type);
+		setInput();
+	}
+		%% endif
+	// connect: Hardware Gpio
+		%% for af in gpio.afs
+			%% set use = not (	(af.type == "in"  and type == "Output") or
+								(af.type == "analog" and type == "Output") or
+								(af.type == "out" and type == "Input" ))
+			%% if use
+	/// Connect {{name}} as {{af.name}} to {{af.peripheral}}.
+	ALWAYS_INLINE static void
+	connect(TypeId::{{ af.peripheral }}{{ af.name }} /* t */) {
+				%% if af.type == "analog"
+		setAnalogInput();
+				%% else
+		setAlternateFunction(AlternateFunction::AF_{{ af.id }});
+				%% endif
+	}
+				%% if af.type in ['', 'out'] and type != "Input"
+	/// Connect {{name}} as {{af.name}} to {{af.peripheral}}.
+	ALWAYS_INLINE static void
+	connect(TypeId::{{ af.peripheral }}{{ af.name }} /* t */,
+		OutputType type, OutputSpeed speed = OutputSpeed::MHz50) {
+		configure(type, speed);
+		setAlternateFunction(AlternateFunction::AF_{{ af.id }});
+	}
+				%% endif
+				%% if af.type in ['', 'in'] and type != "Output"
+	/// Connect {{name}} as {{af.name}} to {{af.peripheral}}.
+	ALWAYS_INLINE static void
+	connect(TypeId::{{ af.peripheral }}{{ af.name }} /* t */, InputType type) {
+		configure(type);
+		setAlternateFunction(AlternateFunction::AF_{{ af.id }});
+	}
+				%% endif
+			%% endif
+		%% endfor
+	// connect: Software Gpio
+		%% if type in ['', 'Output']
+			%% for peripheral in   ['SoftwareSpiMasterMosi',
+									'SoftwareSpiMasterSck']
+	/// Connect to `{{peripheral}}`.
+	ALWAYS_INLINE static void
+	connect(::xpcc::TypeId::{{ peripheral }}) {
+		configure(OutputType::PushPull);
+		setOutput();
+		set();
+	}
+			%% endfor
+			%% for peripheral in   ['SoftwareI2cMasterSda',
+									'SoftwareI2cMasterScl']
+	/// Connect to `{{peripheral}}`.
+	ALWAYS_INLINE static void
+	connect(::xpcc::TypeId::{{ peripheral }}) {
+		configure(OutputType::OpenDrain);
+		setOutput();
+		set();
+	}
+			%% endfor
+		%% endif
+		%% if type in ['', 'Input']
+			%% for peripheral in ['SoftwareSpiMasterMiso']
+	/// Connect to `{{peripheral}}`.
+	ALWAYS_INLINE static void
+	connect(::xpcc::TypeId::{{ peripheral }}) {
+		configure(InputType::Floating);
+		setInput();
+	}
+			%% endfor
+		%% endif
+};
+
+	%% endfor
+%% endfor
+
+// {{gpios | getPorts}}
+%% for port in gpios | getPorts
+/// Hardware access for port {{port.name}}. 
+/// @ingroup stm32
+template< uint8_t START_PIN, uint8_t WIDTH >
+class GpioPort{{port.name}} : public ::xpcc::GpioPort, public Gpio
+{
+	static_assert(START_PIN >= {{port.startPin}}, "START_PIN too small, minimum {{port.startPin}}.");
+	static_assert(START_PIN < {{port.startPin + port.width}}, "START_PIN too large, maximum {{port.startPin + port.width-1}}.");
+	static_assert(WIDTH <= {{port.width}}, "WIDTH too large, maximum {{port.width}}.");
+	static_assert(WIDTH > 0, "WIDTH should be at least 1.");
+	static_assert(START_PIN + WIDTH <= {{port.startPin + port.width}}, "START_PIN + WIDTH too large, maximum {{port.startPin + port.width}}.");
+	
+	static constexpr uint16_t dataMask = (1 << WIDTH) - 1;
+	static constexpr uint16_t portMask = dataMask << START_PIN;
+	static constexpr uint32_t portMask2 = portMask | (portMask << WIDTH);
+	static constexpr uint32_t port01 = 0x55555555 & portMask2;
+	static constexpr uint32_t port10 = 0xAAAAAAAA & portMask2;
+
+public:
+	static constexpr uint8_t width = WIDTH;
+	
+public:
+	ALWAYS_INLINE static void setOutput() {
+		GPIO{{port.name}}->MODER |= port01;
+	}
+	ALWAYS_INLINE static void setInput() {
+		GPIO{{port.name}}->MODER &= ~portMask2;
+	}
+	ALWAYS_INLINE static void
+	configure(OutputType type,
+			  OutputSpeed speed = OutputSpeed::MHz50) {
+		GPIO{{port.name}}->OTYPER = (GPIO{{port.name}}->OTYPER & ~portMask) | ((type == OutputType::OpenDrain) ? portMask : 0);
+		GPIO{{port.name}}->OSPEEDR &= ~portMask2;
+		if (i(speed) == 0x01) {
+			GPIO{{port.name}}->OSPEEDR |= port01;
+		} else if (i(speed) == 0x10) {
+			GPIO{{port.name}}->OSPEEDR |= port10;
+		} else if (i(speed) == 0x11) {
+			GPIO{{port.name}}->OSPEEDR |= portMask2;
+		}
+	}
+	ALWAYS_INLINE static void configure(InputType type) {
+		GPIO{{port.name}}->PUPDR &= ~portMask2;
+		if (i(type) == 0x01) {
+			GPIO{{port.name}}->PUPDR |= port01;
+		} else if (i(type) == 0x10) {
+			GPIO{{port.name}}->PUPDR |= port10;
+		}
+	}
+	ALWAYS_INLINE static uint16_t read() {
+		uint16_t data = GPIO{{port.name}}->IDR & portMask;
+		return (data >> START_PIN);
+	}
+	ALWAYS_INLINE static void write(uint16_t data) {
+		data <<= START_PIN;
+	%% if target is stm32f2 or target is stm32f4
+		GPIO{{port.name}}->BSRRH |= portMask;
+		GPIO{{port.name}}->BSRRL |= (data & portMask);
+	%% elif target is stm32f0 or target is stm32f3
+		GPIO{{port.name}}->BRR  |= portMask;
+		GPIO{{port.name}}->BSRR |= (data & portMask);
+	%% endif
+	}
+};
+
+%% endfor
+
+} // namespace stm32
+
+} // namespace xpcc
+
+#endif // XPCC_STM32_GPIO_HPP

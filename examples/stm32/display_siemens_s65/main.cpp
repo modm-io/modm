@@ -1,7 +1,7 @@
 
 #include <xpcc/architecture.hpp>
-#include <xpcc/driver/connectivity/spi.hpp>
-#include <xpcc/driver/ui/display/siemens_s65.hpp>
+#include <xpcc/communication/spi.hpp>
+#include <xpcc/ui/display/siemens_s65.hpp>
 
 namespace lcd
 {
@@ -52,7 +52,7 @@ MAIN_FUNCTION
 	display.setFont(xpcc::font::Assertion);
 
 
-	LedStat::setOutput(xpcc::gpio::HIGH);
+	LedStat::setOutput(xpcc::Gpio::HIGH);
 	//lcd::Cs::setOutput();
 	//spi::Mosi::setOutput();
 

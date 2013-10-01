@@ -22,7 +22,7 @@ xpcc::log::Logger xpcc::log::warning(loggerDevice);
 xpcc::log::Logger xpcc::log::error(loggerDevice);
 // ----------------------------------------------------------------------------
 
-#include <xpcc/architecture/driver/gpio.hpp>
+#include <xpcc/architecture/peripheral/gpio.hpp>
 GPIO__IO(scl, 0, 4);
 GPIO__IO(sda, 0, 5);
 GPIO__OUTPUT(rot, 0, 6);
@@ -31,7 +31,7 @@ GPIO__OUTPUT(gelb, 0, 8);
 GPIO__OUTPUT(gruen, 2, 8);
 GPIO__OUTPUT(weiss, 2, 6);
 
-#include <xpcc/driver/connectivity/i2c/software_i2c.hpp>
+#include <xpcc/communication/i2c/software_i2c.hpp>
 typedef xpcc::SoftwareI2C<scl, sda> i2c;
 typedef xpcc::Tcs3414<i2c> tcs;
 // ----------------------------------------------------------------------------

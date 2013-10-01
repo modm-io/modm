@@ -1,0 +1,114 @@
+#ifndef XPCC_LPC11__TIMER_{{ id }}_HPP
+#define XPCC_LPC11__TIMER_{{ id }}_HPP
+
+#include <stdint.h>
+#include <xpcc/utils.hpp>
+
+#include "timer_registers.hpp"
+#include "../../../device.hpp"
+
+%% set name = id|replace('_', 'B')
+%% set reg = "LPC_TMR" ~ name
+
+namespace xpcc
+{
+	namespace lpc
+	{
+		/**
+		 * \ingroup	lpc1100
+		 */
+		class Timer{{ id }}
+		{
+		public:
+			typedef uint16_t Value;
+
+			static void
+			enable() {
+				// provide clock
+				LPC_SYSCON->SYSAHBCLKCTRL |= (1<<7);
+
+				// Set enable, reset reset.
+				{{reg}}->TCR = TCR_CEn;
+			}
+
+			static void
+			disable() {
+				// Reset enable
+				{{reg}}->TCR = 0;
+			}
+
+			static void
+			pause();
+
+			static void
+			start();
+
+			static void
+			setModePwm(uint8_t matchEnable, Value period) {
+				// use channel 3 to set the PWM period
+				{{reg}}->PWMC = (1<<3)|(matchEnable);
+
+				{{reg}}->MR3 	= period;
+
+				// Initial value: 0% PWM
+				{{reg}}->MR0	= 0;
+				{{reg}}->MR1	= 0;
+				{{reg}}->MR2	= 0;
+
+				/* Set match control register */
+				// Reset on MR3: the TC will be reset if MR3 matches it.
+				{{reg}}->MCR = (1 << 10);// | 1<<9;				/* Reset on MR3 */
+			}
+
+			static void
+			setPrescaler(Value prescaler) {
+				{{reg}}->PR = prescaler;
+			}
+
+			static void
+			setOverflow(Value overflow);
+
+			static void
+			configureOutputChannel(uint32_t channel);
+
+			static inline void
+			setMatchValue(uint32_t channel, uint16_t value)
+			{
+				switch (channel)
+				{
+				case 0:
+					{{reg}}->MR0	= value;
+					break;
+				case 1:
+					{{reg}}->MR1	= value;
+					break;
+				case 2:
+					{{reg}}->MR2	= value;
+					break;
+				default:
+					break;
+				}
+			}
+
+			static inline void
+			applyAndReset() {
+				// TODO: what does this do?
+				// Doesn't this just put the timer into reset??
+				{{reg}}->TCR = TCR_CRst;
+			}
+
+			static ALWAYS_INLINE Value
+			getValue() {
+				return {{reg}}->TC;
+			}
+
+			static ALWAYS_INLINE void
+			setValue(uint16_t value) {
+				{{reg}}->TC = value;
+			}
+		};
+
+	}
+}
+
+#endif // XPCC_LPC11__TIMER_{{ id }}_HPP

@@ -1,0 +1,15 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE rca SYSTEM "../../xml/driver.dtd">
+<rca version="1.0">
+	<driver type="uart" name="at90_tiny_mega">
+		<!-- Template: file that needs to be turned into a source file -->
+		<template instances="0,1,2,3" out="uart{{id}}.hpp">uart.hpp.in</template>
+		<template instances="0,1,2,3" out="uart{{id}}_tx.cpp">uart_tx.cpp.in</template>
+		<template instances="0,1,2,3" out="uart{{id}}_rx.cpp">uart_rx.cpp.in</template>
+		<template>type_ids.hpp.in</template>
+		<!-- Static: files that just need to be copied to the generated dir-->
+		<static>uart_defines.h</static>
+		<parameter name="tx_buffer" type="int" min="1" max="254">8</parameter>
+		<parameter name="rx_buffer" type="int" min="1" max="254">4</parameter>
+	</driver>
+</rca>

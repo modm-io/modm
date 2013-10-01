@@ -72,7 +72,7 @@ namespace xpcc
 #if defined XPCC__CPU_ATMEGA
 #	include "avr/atmega.hpp"
 #elif defined XPCC__CPU_ATXMEGA
-#	include "avr/atxmega.hpp"
+#	include "avr/xmega.hpp"
 #elif defined XPCC__CPU_ATTINY
 #	include "avr/attiny.hpp"
 #endif

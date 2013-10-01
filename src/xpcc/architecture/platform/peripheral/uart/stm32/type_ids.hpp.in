@@ -1,0 +1,42 @@
+// coding: utf-8
+/* Copyright (c) 2013, Roboterclub Aachen e.V.
+* All Rights Reserved.
+*
+* The file is part of the xpcc library and is released under the 3-clause BSD
+* license. See the file `LICENSE` for the full license governing this code.
+*/
+// ----------------------------------------------------------------------------
+#ifndef XPCC_STM32_UART_TYPE_IDS_HPP
+#define XPCC_STM32_UART_TYPE_IDS_HPP
+
+namespace xpcc
+{
+
+namespace stm32
+{
+
+namespace TypeId
+{
+%% for id in [1,2,3,4,5,6]
+	%% set uart = "Usart"
+	%% if id in [4, 5]
+		%% set uart = "Uart"
+	%% endif
+	typedef struct{} {{ uart }}Hal{{ id }}Rx;
+	typedef struct{} {{ uart }}Hal{{ id }}Tx;
+	typedef struct{} {{ uart }}Hal{{ id }}Ck;
+	typedef struct{} {{ uart }}Hal{{ id }}Rts;
+	typedef struct{} {{ uart }}Hal{{ id }}Cts;
+	typedef struct{} Uart{{ id }}Rx;
+	typedef struct{} Uart{{ id }}Tx;
+	typedef struct{} Uart{{ id }}Ck;
+	typedef struct{} Uart{{ id }}Rts;
+	typedef struct{} Uart{{ id }}Cts;
+%% endfor
+}
+
+}
+
+}
+
+#endif // XPCC_STM32_UART_TYPE_IDS_HPP

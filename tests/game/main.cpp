@@ -11,7 +11,7 @@
 #include <xpcc/driver/software_spi.hpp>
 #include <xpcc/driver/gpio.hpp>
 
-#include <xpcc/workflow.hpp>
+#include <xpcc/processing.hpp>
 
 #include "intro.hpp"
 
@@ -35,7 +35,7 @@ namespace lcd
 	GPIO__OUTPUT(Reset, D, 4);
 }
 
-typedef xpcc::SoftwareSpi< lcd::Scl, lcd::Mosi, lcd::Miso, 1000000UL > SPI;
+typedef xpcc::SoftwareSpiMaster< lcd::Scl, lcd::Mosi, lcd::Miso, 1000000UL > SPI;
 
 xpcc::St7565< SPI, lcd::CS, lcd::A0, lcd::Reset > display;
 xpcc::IOStream displayStream(display);

@@ -38,9 +38,9 @@ void
 xpcc::AD840x<Spi, Cs, Rs, Shdn>::initialize()
 {
 //	Spi::initialize();
-	Cs::setOutput(xpcc::gpio::HIGH);
-	Rs::setOutput(xpcc::gpio::HIGH);
-	Shdn::setOutput(xpcc::gpio::HIGH);
+	Cs::setOutput(xpcc::Gpio::HIGH);
+	Rs::setOutput(xpcc::Gpio::HIGH);
+	Shdn::setOutput(xpcc::Gpio::HIGH);
 }
 
 // ----------------------------------------------------------------------------

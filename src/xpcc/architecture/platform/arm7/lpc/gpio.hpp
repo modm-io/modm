@@ -31,7 +31,7 @@
 #ifndef XPCC_LPC__GPIO_HPP
 #define XPCC_LPC__GPIO_HPP
 
-#include <xpcc/architecture/driver/gpio.hpp>
+#include <xpcc/architecture/peripheral/gpio.hpp>
 #include "../lpc.hpp"
 
 namespace xpcc
@@ -39,7 +39,7 @@ namespace xpcc
 	namespace gpio
 	{
 		/**
-		 * \ingroup	lpc2000
+		 * \ingroup	lpc
 		 */
 		enum Configuration
 		{
@@ -134,7 +134,7 @@ str     r2, [r3, #-207] ; Led2::set()
  *   can wake the chip from power down mode.
  * 
  * \hideinitializer
- * \ingroup	lpc2000
+ * \ingroup	lpc
  */
 
 #ifdef __ARM_LPC23_24__

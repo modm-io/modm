@@ -59,9 +59,9 @@ def jinja2_template_action(target, source, env):
 	try:
 		import jinja2
 	except ImportError:
-		print "To use this functionality you need to install the jinja2 template engine"
+		env.Error("To use this functionality you need to install the jinja2 template engine")
 		Exit(1)
-	
+
 	globals = {
 		'time': time.strftime("%d %b %Y, %H:%M:%S", time.localtime()),
 		'match': re.match,
@@ -73,18 +73,60 @@ def jinja2_template_action(target, source, env):
 
 	def filter_indent(value, level=0):
 		return ('\n' + '\t' * level).join(value.split('\n'))
-		
-	path, filename = os.path.split(source[0].path)
-	loader = jinja2.Environment(loader = jinja2.FileSystemLoader(path))
+
+	def filter_pad(value, min_width):
+		tab_width = 4
+		tab_count =  (min_width/tab_width - len(value)/tab_width) + 1
+		return value + ('\t' * tab_count)
+
+	def filter_split(value, delimiter):
+		return value.split(delimiter)
+
+	def filter_values(lst, key):
+		"""
+		Goes through the list of dictionaries and
+		adds all the values of a certain key
+		to a list which is thus returned
+		"""
+		values = []
+		for item in lst:
+			if isinstance(item, dict) and key in item:
+				if item[key] not in values:
+					values.append(item[key])
+		return values
+
+# Overwrite jinja2 Environment in order to enable relative paths
+# since this runs locally that should not be a security concern
+# Code from:
+# http://stackoverflow.com/questions/8512677/how-to-include-a-template-with-relative-path-in-jinja2
+	class RelEnvironment(jinja2.Environment):
+		"""Override join_path() to enable relative template paths."""
+		def join_path(self, template, parent):
+			d = os.path.join(os.path.dirname(parent), template)
+			return os.path.normpath(d)
+
+	# path, filename = os.path.split(source[0].path)
+	path = env['XPCC_LIBRARY_PATH']
+	filename = os.path.relpath(source[0].path, path)
+	loader = RelEnvironment(loader = jinja2.FileSystemLoader(path), extensions=['jinja2.ext.do'])
+	if 'XPCC_JINJA2_FILTER' in env:
+		loader.filters = dict(loader.filters.items() +
+								env['XPCC_JINJA2_FILTER'].items())
 	loader.filters['xpcc.wordwrap'] = filter_wordwrap
 	loader.filters['xpcc.indent'] = filter_indent
+	loader.filters['xpcc.pad'] = filter_pad
+	loader.filters['xpcc.values'] = filter_values
+	loader.filters['split'] = filter_split	# not XPCC specific
+	if 'XPCC_JINJA2_TEST' in env:
+		loader.tests = dict(loader.tests.items() +
+								env['XPCC_JINJA2_TEST'].items())
 	# Jinja2 Line Statements
 	loader.line_statement_prefix = '%%'
 	loader.line_comment_prefix = '%#'
 
 	template = loader.get_template(filename, globals=globals)
-	
-	output = template.render(env['substitutions'])
+
+	output = template.render(env['substitutions']).encode('utf-8')
 	open(target[0].path, 'w').write(output)
 
 def template_emitter(target, source, env):
@@ -94,6 +136,49 @@ def template_emitter(target, source, env):
 def template_string(target, source, env):
 	return "Template: '%s' to '%s'" % (str(source[0]), str(target[0]))
 
+def template_add_test(env, test_name, test_function, alias='template_add_test'):
+	if 'XPCC_JINJA2_TEST' not in env:
+		env['XPCC_JINJA2_TEST'] = {}
+	env['XPCC_JINJA2_TEST'][test_name] = test_function
+
+def template_add_filter(env, filter_name, filter_function, alias='template_add_filter'):
+	if 'XPCC_JINJA2_FILTER' not in env:
+		env['XPCC_JINJA2_FILTER'] = {}
+	env['XPCC_JINJA2_FILTER'][filter_name] = filter_function
+
+# -----------------------------------------------------------------------------
+includeExpression = re.compile(r"(\{%|%%)\s+(import|include)\s+'(?P<file>\S+)'")
+
+def find_includes(file):
+	""" Find include directives in an .in file """
+	files = []
+	for line in open(file).readlines():
+		match = includeExpression.search(line)
+		if match:
+			filename = match.group('file')
+			if not os.path.isabs(filename):
+				filename = os.path.join(os.path.dirname(os.path.abspath(file)), filename)
+			files.append(filename)
+	return files
+
+def in_include_scanner(node, env, path, arg=None):
+	""" Generates the dependencies for the .in files """
+	abspath, targetFilename = os.path.split(node.get_abspath())
+
+	stack = [targetFilename]
+	dependencies = [targetFilename]
+
+	while stack:
+		nextFile = stack.pop()
+		files = find_includes(os.path.join(abspath, nextFile))
+		for file in files:
+			if file not in dependencies:
+				stack.append(file)
+				# env.Debug(".in include scanner found %s" % file)
+		dependencies.extend(files)
+
+	dependencies.remove(targetFilename)
+	return dependencies
 # -----------------------------------------------------------------------------
 def generate(env, **kw):
 	env.Append(
@@ -102,6 +187,10 @@ def generate(env, **kw):
 			action = env.Action(template_action, template_string),
 			emitter = template_emitter,
 			src_suffix = '.in',
+			source_scanner =
+				SCons.Script.Scanner(
+					function = in_include_scanner,
+					skeys = ['.in']),
 			single_source = True
 		),
 		
@@ -109,9 +198,15 @@ def generate(env, **kw):
 			action = env.Action(jinja2_template_action, template_string),
 			emitter = template_emitter,
 			src_suffix = '.in',
+			source_scanner =
+				SCons.Script.Scanner(
+					function = in_include_scanner,
+					skeys = ['.in']),
 			single_source = True
 		),
 	})
+	env.AddMethod(template_add_test, 'AddTemplateJinja2Test')
+	env.AddMethod(template_add_filter, 'AddTemplateJinja2Filter')
 
 def exists(env):
 	return True

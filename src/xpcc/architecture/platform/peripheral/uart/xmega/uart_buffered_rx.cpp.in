@@ -1,0 +1,112 @@
+// coding: utf-8
+/* Copyright (c) 2009, Roboterclub Aachen e.V.
+ * All Rights Reserved.
+ *
+ * The file is part of the xpcc library and is released under the 3-clause BSD
+ * license. See the file `LICENSE` for the full license governing this code.
+ */
+// ----------------------------------------------------------------------------
+{{ generation_block }}
+
+#include <xpcc/architecture/driver/atomic/queue.hpp>
+#include <xpcc/architecture/driver/atomic/lock.hpp>
+
+#include "uart_{{ id.lower() }}.hpp"
+
+static xpcc::atomic::Queue<uint8_t, {{parameters.rx_buffer}}> rxBuffer;
+static uint8_t error;
+
+// ----------------------------------------------------------------------------
+ISR(USART{{ id }}_RXC_vect)
+{		
+	// first save the errors
+	error |= USART{{ id }}_STATUS & (USART_FERR_bm | USART_BUFOVF_bm | USART_PERR_bm);
+	// then read the buffer
+	uint8_t data = USART{{ id }}_DATA;
+	// push it into the buffer
+	rxBuffer.push(data);
+}
+
+// ----------------------------------------------------------------------------
+void
+xpcc::xmega::Uart{{ id }}::initializeWithFractionalBaudrate(uint16_t bsel, uint8_t bscale)
+{
+	atomic::Lock lock;
+	
+	USART{{ id }}.BAUDCTRLA = static_cast<uint8_t>(bsel & 0xff);
+	USART{{ id }}.BAUDCTRLB = static_cast<uint8_t>((bscale << USART_BSCALE0_bp) | (bsel >> 8));
+		
+	// enable receive complete interrupt
+	USART{{ id }}.CTRLA = USART_RXCINTLVL_MED_gc;
+	
+	// setting the frame size to 8 bit
+	USART{{ id }}.CTRLC = USART_CHSIZE_8BIT_gc;
+	
+	// enable both, receiver and transmitter
+	USART{{ id }}.CTRLB |= USART_RXEN_bm | USART_TXEN_bm;
+}
+
+// MARK: - read
+bool
+xpcc::xmega::Uart{{ id }}::read(uint8_t& data)
+{
+	if (rxBuffer.isEmpty())
+		return false;
+	
+	data = rxBuffer.get();
+	rxBuffer.pop();
+	
+	return true;
+}
+
+std::size_t
+xpcc::xmega::Uart{{ id }}::read(uint8_t *buffer, std::size_t length)
+{
+	for (std::size_t i = 0; i < length; ++i)
+	{
+		if (rxBuffer.isEmpty()) {
+			return length;
+		}
+		else {
+			*buffer++ = rxBuffer.get();
+			rxBuffer.pop();
+		}
+	}
+	
+	return length;
+}
+
+// MARK: - discard
+std::size_t
+xpcc::xmega::Uart{{ id }}::discardReceiveBuffer()
+{
+	std::size_t i(0);
+	while(!rxBuffer.isEmpty())
+	{
+		rxBuffer.pop();
+		++i;
+	}
+	
+	uint8_t c;
+	while (USART{{ id }}_STATUS & USART_RXCIF_bm)
+	{
+		c = USART{{ id }}_DATA;
+		(void) c;
+	}
+	
+	return i;
+}
+
+// MARK: - error
+uint8_t
+xpcc::xmega::Uart{{ id }}::getErrorFlags()
+{
+	return error;
+}
+
+void
+xpcc::xmega::Uart{{ id }}::acknowledgeErrorFlags()
+{
+	error = 0;
+}
+

@@ -23,7 +23,7 @@ xpcc::IOStream stream(device);
 #if USE_HARDWARE_I2C
 typedef xpcc::stm32::I2cMaster1 Twi1;
 #else
-#include <xpcc/driver/connectivity/i2c/software_i2c.hpp>
+#include <xpcc/communication/i2c/software_i2c.hpp>
 typedef xpcc::SoftwareI2C< SCL, SDA > Twi1;
 #endif
 
@@ -75,7 +75,7 @@ MAIN_FUNCTION // ##############################################################
 	stream << "RESTART" << xpcc::endl;
 	
 	Button::setInput(xpcc::stm32::PULLUP);
-	LED::setOutput(xpcc::gpio::HIGH);
+	LED::setOutput(xpcc::Gpio::HIGH);
 	
 #if USE_HARDWARE_I2C
 	Twi1::configurePins(Twi1::REMAP_PB8_PB9);

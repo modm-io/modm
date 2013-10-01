@@ -24,7 +24,7 @@
 #include <xpcc/driver/ui/display/tft_memory_bus.hpp>
 #include <xpcc/driver/ui/display/siemens_s75.hpp>
 
-#include <xpcc/workflow/timeout.hpp>
+#include <xpcc/processing/timeout.hpp>
 
 namespace lcd
 {
@@ -66,7 +66,7 @@ main(void)
 {
 	SystemInit();
 	
-	xpcc::lpc11::SysTickTimer::enable();
+	xpcc::lpc::SysTickTimer::enable();
 
 	// Set LED port pin to output
 	Led::setOutput();

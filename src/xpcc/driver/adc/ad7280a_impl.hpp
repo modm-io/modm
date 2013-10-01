@@ -160,8 +160,8 @@ xpcc::Ad7280a<Spi, Cs, Cnvst, N>::initialize(ad7280a::Average average)
 	
 	controlHighByte = average;
 	
-	Cs::setOutput(xpcc::gpio::HIGH);
-	Cnvst::setOutput(xpcc::gpio::HIGH);
+	Cs::setOutput(xpcc::Gpio::HIGH);
+	Cnvst::setOutput(xpcc::Gpio::HIGH);
 }
 
 // ----------------------------------------------------------------------------

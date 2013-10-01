@@ -5,7 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -66,6 +66,8 @@ xpcc::Hmc6343<I2cMaster>::setDeviationAngle(int16_t angle)
 {
 	bool ok = writeRegister(hmc6343::EEPROM_DEVIATION_ANGLE_LSB, angle & 0xff);
 	if (ok) {
+		while (!timeout.isExpired())
+			;
 		ok &= writeRegister(hmc6343::EEPROM_DEVIATION_ANGLE_MSB, angle >> 8);
 	}
 	return ok;
@@ -77,6 +79,8 @@ xpcc::Hmc6343<I2cMaster>::setVariationAngle(int16_t angle)
 {
 	bool ok = writeRegister(hmc6343::EEPROM_VARIATION_ANGLE_LSB, angle & 0xff);
 	if (ok) {
+		while (!timeout.isExpired())
+			;
 		ok &= writeRegister(hmc6343::EEPROM_VARIATION_ANGLE_MSB, angle >> 8);
 	}
 	return ok;
@@ -131,6 +135,7 @@ template < typename I2cMaster >
 bool
 xpcc::Hmc6343<I2cMaster>::enterUserCalibrationMode()
 {
+//	return false;
 	return writeCommand(hmc6343::COMMAND_ENTER_USER_CALIBRATION);
 }
 
@@ -225,8 +230,9 @@ template < typename I2cMaster >
 uint16_t
 xpcc::Hmc6343<I2cMaster>::getDeviceID()
 {
-	uint8_t lsb = readRegister(hmc6343::EEPROM_DEVICE_SERIAL_LSB);
-	uint8_t msb = readRegister(hmc6343::EEPROM_DEVICE_SERIAL_MSB);
+	uint8_t lsb, msb;
+	readRegister(hmc6343::EEPROM_DEVICE_SERIAL_LSB, lsb);
+	readRegister(hmc6343::EEPROM_DEVICE_SERIAL_MSB, msb);
 
 	return (msb << 8) | lsb;
 }
@@ -291,6 +297,30 @@ xpcc::Hmc6343<I2cMaster>::getData()
 	return data;
 }
 
+template < typename I2cMaster >
+bool
+xpcc::Hmc6343<I2cMaster>::sendPing()
+{
+	// busy waiting
+	if(adapter.getState() == xpcc::I2c::AdapterState::Busy)
+		return false;
+
+	adapter.initialize(0, 0, 0, 0);
+
+	if(!I2cMaster::start(&adapter))
+		return false;
+
+	return true;
+}
+
+template < typename I2cMaster >
+bool
+xpcc::Hmc6343<I2cMaster>::checkCommunication()
+{
+	return (adapter.getState() != xpcc::I2c::AdapterState::Error &&
+			adapter.getState() != xpcc::I2c::AdapterState::Busy);
+}
+
 // MARK: - register access
 
 template < typename I2cMaster >
@@ -298,14 +328,14 @@ bool
 xpcc::Hmc6343<I2cMaster>::writeCommand(hmc6343::Command command)
 {
 	// busy waiting
-	while(!timeout.isExpired() || adapter.getState() == xpcc::i2c::adapter::BUSY)
-		;
+	if(!timeout.isExpired() || adapter.getState() == xpcc::I2c::AdapterState::Busy)
+		return false;
 
 	buffer[0] = command;
 	adapter.initialize(buffer, 1, 0, 0);
 
-	while(!I2cMaster::startSync(&adapter))
-		;
+	if(!I2cMaster::start(&adapter))
+		return false;
 
 	return true;
 }
@@ -315,16 +345,17 @@ bool
 xpcc::Hmc6343<I2cMaster>::writeRegister(hmc6343::Register reg, uint8_t value)
 {
 	// busy waiting
-	while(!timeout.isExpired() || adapter.getState() == xpcc::i2c::adapter::BUSY)
-		;
+	if(!timeout.isExpired() || adapter.getState() == xpcc::I2c::AdapterState::Busy)
+		return false;
 
 	buffer[0] = hmc6343::COMMAND_WRITE_EEPROM;
 	buffer[1] = reg;
 	buffer[2] = value;
 	adapter.initialize(buffer, 3, 0, 0);
 
-	while(!I2cMaster::startSync(&adapter))
-		;
+	if(!I2cMaster::start(&adapter))
+		return false;
+
 	// 10ms timing delay
 	timeout.restart(10);
 
@@ -332,24 +363,25 @@ xpcc::Hmc6343<I2cMaster>::writeRegister(hmc6343::Register reg, uint8_t value)
 }
 
 template < typename I2cMaster >
-uint8_t
-xpcc::Hmc6343<I2cMaster>::readRegister(hmc6343::Register reg)
+bool
+xpcc::Hmc6343<I2cMaster>::readRegister(hmc6343::Register reg, uint8_t &data)
 {
 	// busy waiting
-	while(!timeout.isExpired() || adapter.getState() == xpcc::i2c::adapter::BUSY)
-		;
+	if(!timeout.isExpired() || adapter.getState() == xpcc::I2c::AdapterState::Busy)
+		return false;
 
 	buffer[0] = hmc6343::COMMAND_READ_EEPROM;
 	buffer[1] = reg;
 	adapter.initialize(buffer, 2, buffer, 1);
 
-	while(!I2cMaster::startSync(&adapter))
-		;
+	if(!I2cMaster::startBlocking(&adapter))
+		return false;
 
 	// 10ms timing delay
 	timeout.restart(10);
 
-	return buffer[0];
+	data = buffer[0];
+	return true;
 }
 
 // MARK: - update
@@ -360,7 +392,7 @@ xpcc::Hmc6343<I2cMaster>::update()
 {
 	if (running != NOTHING_RUNNING)
 	{
-		if (adapter.getState() == xpcc::i2c::adapter::NO_ERROR)
+		if (adapter.getState() == xpcc::I2c::AdapterState::Idle)
 		{
 			switch (running)
 			{
@@ -382,7 +414,7 @@ xpcc::Hmc6343<I2cMaster>::update()
 			}
 			running = NOTHING_RUNNING;
 		}
-		if (adapter.getState() == xpcc::i2c::adapter::ERROR)
+		if (adapter.getState() == xpcc::I2c::AdapterState::Error)
 		{
 			running = NOTHING_RUNNING;
 		}

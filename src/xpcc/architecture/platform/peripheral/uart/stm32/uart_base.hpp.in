@@ -1,0 +1,101 @@
+// coding: utf-8
+/*
+* Copyright (c) 2013, Roboterclub Aachen e.V.
+* All Rights Reserved.
+*
+* The file is part for the xpcc library and is released under the
+* 3-clause BSD license. See the file `LICENSE` for the full license
+* governing this code.
+*/
+// ----------------------------------------------------------------------------
+
+#ifndef XPCC_STM32_UART_BASE_HPP
+#define XPCC_STM32_UART_BASE_HPP
+
+#include <stdint.h>
+#include "../../../device.hpp"
+
+namespace xpcc
+{
+namespace stm32
+{
+/**
+ * Base class for the UART classes
+ *
+ * Provides some common enum that do not depend on the specific UART.
+ *
+ * @author Kevin Laeufer
+ * @internal
+ * @ingroup		stm32
+ */
+class UartBase
+{
+
+public:
+	enum class Interrupt : uint32_t
+	{
+%% if target is stm32f0 or target is stm32f3
+		/// A USART interrupt is generated when match character is received.
+		CharacterMatch = USART_CR1_CMIE,
+%% endif
+		/// Call interrupt when a parity error occurred.
+		ParityError	= USART_CR1_PEIE,
+		/// Call interrupt when transmit register is empty (i.e. the byte has been transfered to the shift out register
+		TxEmpty		= USART_CR1_TXEIE,
+		/// Called when the byte was completely transmitted
+		TxComplete	= USART_CR1_TCIE,
+		/// Call interrupt when char received (RXNE) or overrun occurred (ORE)
+		RxNotEmpty	= USART_CR1_RXNEIE,
+	};
+
+	enum class InterruptFlag : uint32_t
+	{
+%% if target is stm32f0 or target is stm32f3
+%%	set reg = "ISR"
+		/// Set if match character is received.
+		CharacterMatch	= USART_{{reg}}_CMF,
+%% elif target is stm32f2 or target is stm32f4
+%%	set reg = "SR"
+%% endif
+		/// Set if the transmit data register is empty.
+		TxEmpty			= USART_{{reg}}_TXE,
+		/// Set if the transmission is complete.
+		TxComplete		= USART_{{reg}}_TC,
+		/// Set if the receive data register is not empty.
+		RxNotEmpty		= USART_{{reg}}_RXNE,
+		/// Set if receive register was not cleared.
+		OverrunError	= USART_{{reg}}_ORE,
+		/// Set if a de-synchronization, excessive noise or a break character is detected
+		FramingError 	= USART_{{reg}}_FE,
+		/// Set if a parity error was detected.
+		ParityError		= USART_{{reg}}_PE,
+	};
+
+	enum class Parity : uint32_t
+	{
+		Disabled 	= 0,
+		Even 		= USART_CR1_PCE,
+		Odd  		= USART_CR1_PCE | USART_CR1_PS,
+	};
+
+protected:
+	/**
+	 * Calculate settings for the UBR register
+	 *
+	 * @param	sabclk		Clock frequency of the USART.
+	 * @param	baudrate	Requested baudrate
+	 */
+	static ALWAYS_INLINE uint16_t
+	calculateBaudrateSettings(uint32_t sabclk, uint32_t baudrate)
+	{
+		// see http://www.mikrocontroller.net/topic/143715
+		return ((2 * sabclk) / baudrate + 1) / 2;
+	}
+
+};
+ENUM_CLASS_FLAG(UartBase::Interrupt)
+ENUM_CLASS_FLAG(UartBase::InterruptFlag)
+}
+}
+
+#endif // XPCC_STM32_UART_BASE_HPP

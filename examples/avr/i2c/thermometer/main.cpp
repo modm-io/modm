@@ -1,26 +1,23 @@
 
-#include <xpcc/architecture.hpp>
+#include <xpcc/architecture/platform.hpp>
 #include <xpcc/driver/temperature/ds1631.hpp>
-
-
 #include <xpcc/io/iostream.hpp>
 
-GPIO__IO(Scl, C, 0);
-GPIO__IO(Sda, C, 1);
+using namespace xpcc::atmega;
+
+typedef GpioOpenDrain< I2c::Scl > Scl;
+typedef GpioOpenDrain< I2c::Sda > Sda;
 
 // Create a new UART object and configure it to a baudrate of 9600
-xpcc::atmega::BufferedUart0 uart(9600);
+Uart0 uart(9600);
 
 //#define USE_SOFTWARE
 #define USE_HARDWARE
 
 #if defined USE_SOFTWARE
-#include <xpcc/driver/connectivity/i2c/software_i2c.hpp>
-typedef xpcc::SoftwareI2C<Scl, Sda> I2C;
-#endif
-
-#if defined USE_HARDWARE
-typedef xpcc::atmega::I2cMaster I2C;
+typedef xpcc::SoftwareI2cMaster<Scl, Sda> Twi;
+#elif defined USE_HARDWARE
+typedef I2cMaster Twi;
 #endif
 
 void
@@ -35,25 +32,19 @@ int
 main()
 {
 	// Enable interrupts, this is needed for every buffered UART
-	sei();
-	
-	// Create a IOStream for complex formatting tasks
-	xpcc::IODeviceWrapper<xpcc::atmega::BufferedUart0> device(uart);
-	xpcc::IOStream output(device);
-	
-	output << "Thermometer" << xpcc::endl;
-	
-#if defined USE_SOFTWARE
-	// Initialize the I2C interface.
-	I2C::initialize();
-#endif
+	enableInterrupts();
 
-#if defined USE_HARDWARE
-	I2C::initialize(65, 0);
-#endif
-	
+	// Create a IOStream for complex formatting tasks
+	xpcc::IODeviceWrapper<Uart0> device(uart);
+	xpcc::IOStream output(device);
+
+	output << "Thermometer" << xpcc::endl;
+
+	// Initialize the I2C interface.
+	Twi::initialize<xpcc::I2cMaster::DataRate::Standard>();
+
 	uint8_t data[2];
-	xpcc::Ds1631< I2C > ds1631(data, 0x90);
+	xpcc::Ds1631< Twi > ds1631(data, 0x90);
 
 	// Enable the 12 bit resolution
 	ds1631.configure(xpcc::ds1631::RESOLUTION_12BIT, false);

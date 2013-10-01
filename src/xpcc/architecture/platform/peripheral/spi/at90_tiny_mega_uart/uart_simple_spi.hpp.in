@@ -1,0 +1,105 @@
+// coding: utf-8
+/* Copyright (c) 2013, Roboterclub Aachen e.V.
+ * All Rights Reserved.
+ *
+ * The file is part of the xpcc library and is released under the 3-clause BSD
+ * license. See the file `LICENSE` for the full license governing this code.
+ */
+// ----------------------------------------------------------------------------
+{{ generation_block }}
+
+#ifndef XPCC_{{target.family | upper}}_SIMPLE_UART_SPI{{id}}_HPP
+#define XPCC_{{target.family | upper}}_SIMPLE_UART_SPI{{id}}_HPP
+
+#include "../../../device.hpp"
+#include "../../uart/at90_tiny_mega/uart_defines.h"
+#include <xpcc/architecture/peripheral/spi.hpp>
+#include "type_ids.hpp"
+
+namespace xpcc
+{
+
+namespace {{target.family}}
+{
+
+/**
+ * Implementation of the SimpleSpi of the Uart in Spi Master mode.
+ *
+ * The fast SPI clock speeds make it unreasonable to use an interrupt
+ * based approach to shifting out each byte of the data, since the interrupt
+ * handling might decrease performance over busy waiting especially for
+ * targets operating at low CPU frequencies.
+ * Therefore the asynchronous methods are implemented synchronously.
+ *
+ * @ingroup		{{target.family}}
+ * @author		Niklas Hauser
+ */
+class UartSimpleSpi{{id}} : public ::xpcc::SimpleSpi
+{
+public:
+	static const TypeId::UartSpiMaster{{ id }}Mosi Mosi;
+	static const TypeId::UartSpiMaster{{ id }}Miso Miso;
+	static const TypeId::UartSpiMaster{{ id }}Sck  Sck;
+	
+public:
+	// start documentation inherited
+	template< uint32_t baudrate >
+	static inline void
+	initialize();
+
+%% if extended is not defined
+	/// @warning 	Mode 2 and 3 are not supported on this target, they will be
+	///				treated as Mode 0 and 1, respectively.
+%% endif
+	static void
+	setDataMode(DataMode mode);
+
+%% if extended is not defined
+	/// @warning 	On this target, only `DataOrder::MsbFirst` is natively
+	///				supported!
+	///				`DataOrder::LsbFirst` is reimplemented in software using
+	///				xpcc::bitReverse(), which is quite costly.
+	/// @see	xpcc::bitReverse()
+%% endif
+	static void
+	setDataOrder(DataOrder order);
+
+
+	static ALWAYS_INLINE uint8_t
+	writeReadBlocking(uint8_t data);
+
+	static ALWAYS_INLINE void
+	writeBlocking(uint8_t data);
+
+	static ALWAYS_INLINE bool
+	write(uint8_t data);
+
+	static ALWAYS_INLINE uint8_t
+	getResult();
+
+	static inline bool
+	transfer(uint8_t *tx, uint8_t *rx, std::size_t length,
+			 BufferOptions options=BufferOptions::TxRxIncrement);
+
+	static ALWAYS_INLINE bool
+	isFinished();
+	// end documentation inherited
+
+protected:
+	static inline void
+	initialize(uint16_t prescaler);
+
+private:
+	static bool finished;
+%% if extended is not defined
+	static DataOrder dataOrder;
+%% endif
+};
+
+} // namespace {{target.family}}
+
+} // namespace xpcc
+
+#include "uart_simple_spi{{id}}_impl.hpp"
+
+#endif // XPCC_{{target.family | upper}}_SIMPLE_UART_SPI{{id}}_HPP

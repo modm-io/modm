@@ -1,0 +1,96 @@
+// coding: utf-8
+/* Copyright (c) 2013, Roboterclub Aachen e.V.
+ * All Rights Reserved.
+ *
+ * The file is part of the xpcc library and is released under the 3-clause BSD
+ * license. See the file `LICENSE` for the full license governing this code.
+ */
+// ----------------------------------------------------------------------------
+{{ generation_block }}
+
+#ifndef XPCC_{{target.family | upper}}_SIMPLE_SPI_HPP
+#define XPCC_{{target.family | upper}}_SIMPLE_SPI_HPP
+
+#include "../../../device.hpp"
+#include <xpcc/architecture/peripheral/spi.hpp>
+#include "type_ids.hpp"
+#include "spi.hpp"
+
+namespace xpcc
+{
+
+namespace {{target.family}}
+{
+
+/**
+ * Implementation of the SimpleSpi.
+ *
+ * The fast SPI clock speeds make it unreasonable to use an interrupt
+ * based approach to shifting out each byte of the data, since the interrupt
+ * handling might decrease performance over busy waiting especially for
+ * targets operating at low CPU frequencies.
+ * Therefore the asynchronous methods are implemented synchronously.
+ *
+ * @warning	When the !SS pin is configured in input mode and pulled low, the
+ *			hardware will switch into SPI slave mode. It is therefore necessary
+ *			to configure the pin either in output mode or to pull it high.
+ *
+ * @ingroup		{{target.family}}
+ * @author		Niklas Hauser
+ */
+class SimpleSpi : public ::xpcc::SimpleSpi, Spi
+{
+public:
+	static const TypeId::SpiMasterMosi Mosi;
+	static const TypeId::SpiMasterMiso Miso;
+	static const TypeId::SpiMasterSck  Sck;
+	static const TypeId::SpiMasterSs   Ss;
+
+public:
+	// start documentation inherited
+	template< uint32_t baudrate >
+	static inline void
+	initialize();
+
+	static void
+	setDataMode(DataMode mode);
+
+	static void
+	setDataOrder(DataOrder order);
+
+
+	static ALWAYS_INLINE uint8_t
+	writeReadBlocking(uint8_t data);
+
+	static ALWAYS_INLINE void
+	writeBlocking(uint8_t data);
+
+	static ALWAYS_INLINE bool
+	write(uint8_t data);
+
+	static ALWAYS_INLINE uint8_t
+	getResult();
+
+	static inline bool
+	transfer(uint8_t * tx, uint8_t * rx, std::size_t length,
+			 BufferOptions options=BufferOptions::TxRxIncrement);
+
+	static ALWAYS_INLINE bool
+	isFinished();
+	// end documentation inherited
+
+protected:
+	static inline void
+	initialize(Prescaler prescaler);
+
+private:
+	static bool finished;
+};
+
+} // namespace {{target.family}}
+
+} // namespace xpcc
+
+#include "simple_spi_impl.hpp"
+
+#endif // XPCC_{{target.family | upper}}_SIMPLE_SPI_HPP

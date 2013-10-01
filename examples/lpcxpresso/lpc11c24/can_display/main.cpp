@@ -1,8 +1,8 @@
 
 #include <xpcc/architecture.hpp>
-#include <xpcc/driver/connectivity/can/message.hpp>
-#include <xpcc/workflow/periodic_timer.hpp>
-#include <xpcc/driver/ui/display/siemens_s65.hpp>
+#include <xpcc/communication/can/message.hpp>
+#include <xpcc/processing/periodic_timer.hpp>
+#include <xpcc/ui/display/siemens_s65.hpp>
 
 #define LED_TOGGLE_TICKS 150		// 100 ticks = 1 Hz flash rate
 #define COUNT_MAX		3			// how high to count on the LED display
@@ -24,7 +24,7 @@ int
 main(void)
 {
 	SystemInit();
-	xpcc::lpc11::SysTickTimer::enable();
+	xpcc::lpc::SysTickTimer::enable();
 
 	// Initialize 32-bit timer 0. TIME_INTERVAL is defined as 10mS
 	// You may also want to use the Cortex SysTick timer to do this

@@ -1,46 +1,38 @@
-
 #include <xpcc/architecture.hpp>
-
-// ----------------------------------------------------------------------------
-GPIO__OUTPUT(LedNorth,     E,  9); // LD3
-GPIO__OUTPUT(LedNorthEast, E, 10); // LD5
-GPIO__OUTPUT(LedEast,      E, 11); // LD7
-GPIO__OUTPUT(LedSouthEast, E, 12); // LD9
-GPIO__OUTPUT(LedSouth,     E, 13); // LD10
-GPIO__OUTPUT(LedSouthWest, E, 14); // LD8
-GPIO__OUTPUT(LedWest,      E, 15); // LD6
-GPIO__OUTPUT(LedNorthWest, E,  8); // LD4
-
-GPIO__INPUT(Button, A, 0);
 
 using namespace xpcc::stm32;
 
-static bool
-initClock()
-{
-	// use external 8MHz clock from ST-LINK
-	if (!Clock::enableHse(Clock::HseConfig::HSE_BYPASS)) {
-		return false;
-	}
-	
-	Clock::enablePll(Clock::PllSource::PLL_HSE, Clock::PllMul::MUL_9);
-	return Clock::switchToPll();
-}
+typedef GpioOutputE9  LedNorth;
+typedef GpioOutputE10 LedNorthEast;
+typedef GpioOutputE11 LedEast;
+typedef GpioOutputE12 LedSouthEast;
+typedef GpioOutputE13 LedSouth;
+typedef GpioOutputE14 LedSouthWest;
+typedef GpioOutputE15 LedWest;
+typedef GpioOutputE8  LedNorthWest;
+typedef GpioOutputA8  ClockOut;
+typedef GpioInputA0   Button;
 
-// ----------------------------------------------------------------------------
 MAIN_FUNCTION
 {
-	initClock();
+	typedef Pll<ExternalOscillator<MHz8>, MHz72> clockSource;
+	StartupError err =
+		SystemClock<clockSource>::enable();
 
-	LedNorth::setOutput(xpcc::gpio::LOW);
-	LedNorthEast::setOutput(xpcc::gpio::HIGH);
-	LedEast::setOutput(xpcc::gpio::HIGH);
-	LedSouthEast::setOutput(xpcc::gpio::HIGH);
-	LedSouth::setOutput(xpcc::gpio::HIGH);
-	LedSouthWest::setOutput(xpcc::gpio::HIGH);
-	LedWest::setOutput(xpcc::gpio::HIGH);
-	LedNorthWest::setOutput(xpcc::gpio::HIGH);
-	
+	LedNorth::setOutput(xpcc::Gpio::LOW);
+	LedNorthEast::setOutput(xpcc::Gpio::HIGH);
+	LedEast::setOutput(xpcc::Gpio::HIGH);
+	LedSouthEast::setOutput(xpcc::Gpio::HIGH);
+	LedSouth::setOutput(xpcc::Gpio::HIGH);
+	LedSouthWest::setOutput(xpcc::Gpio::HIGH);
+	LedWest::setOutput(xpcc::Gpio::HIGH);
+	LedNorthWest::setOutput(xpcc::Gpio::HIGH);
+
+	// Output SystemClock on PA8
+	ClockOut::setOutput();
+	ClockOut::connect(MCO::Id);
+	MCO::connect(clockSource::Id);
+
 	while (1)
 	{
 		LedNorth::toggle();

@@ -83,14 +83,14 @@ MAIN_FUNCTION
 
 	initClock();
 
-	LedNorth::setOutput(xpcc::gpio::LOW);
-	LedNorthEast::setOutput(xpcc::gpio::LOW);
-	LedEast::setOutput(xpcc::gpio::LOW);
-	LedSouthEast::setOutput(xpcc::gpio::LOW);
-	LedSouth::setOutput(xpcc::gpio::LOW);
-	LedSouthWest::setOutput(xpcc::gpio::LOW);
-	LedWest::setOutput(xpcc::gpio::LOW);
-	LedNorthWest::setOutput(xpcc::gpio::LOW);
+	LedNorth::setOutput(xpcc::Gpio::LOW);
+	LedNorthEast::setOutput(xpcc::Gpio::LOW);
+	LedEast::setOutput(xpcc::Gpio::LOW);
+	LedSouthEast::setOutput(xpcc::Gpio::LOW);
+	LedSouth::setOutput(xpcc::Gpio::LOW);
+	LedSouthWest::setOutput(xpcc::Gpio::LOW);
+	LedWest::setOutput(xpcc::Gpio::LOW);
+	LedNorthWest::setOutput(xpcc::Gpio::LOW);
 
 	Usart3::configurePins(Usart3::Mapping::REMAP_PB10_PB11);
 	Usart3::setBaudrate(115200);

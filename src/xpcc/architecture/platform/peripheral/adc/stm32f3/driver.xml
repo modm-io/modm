@@ -1,0 +1,9 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE rca SYSTEM "../../xml/driver.dtd">
+<rca version="1.0">
+	<driver type="adc" name="stm32f3">
+		<template instances="1,2,3,4" out="adc_{{id}}.hpp">adc.hpp.in</template>
+		<template instances="1,2,3,4" out="adc_{{id}}_impl.hpp">adc_impl.hpp.in</template>
+		<template>type_ids.hpp.in</template>
+	</driver>
+</rca>

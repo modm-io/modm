@@ -1,0 +1,36 @@
+// coding: utf-8
+/* Copyright (c) 2013, Roboterclub Aachen e.V.
+* All Rights Reserved.
+*
+* The file is part of the xpcc library and is released under the 3-clause BSD
+* license. See the file `LICENSE` for the full license governing this code.
+*/
+// ----------------------------------------------------------------------------
+#ifndef XPCC_STM32_SPI_TYPE_IDS_HPP
+#define XPCC_STM32_SPI_TYPE_IDS_HPP
+
+namespace xpcc
+{
+
+namespace stm32
+{
+
+namespace TypeId
+{
+%% for id in [1,2,3]
+	%% for name in ['Nss', 'Sck', 'Miso', 'Mosi']
+	typedef struct{} SpiMaster{{ id ~ name}};
+	%% endfor
+	
+	%% for name in ['Nss', 'Sck', 'Somi', 'Simo']
+	typedef struct{} SpiSlave{{ id ~ name}};
+	%% endfor
+	
+%% endfor
+}
+
+}
+
+}
+
+#endif // XPCC_STM32_SPI_TYPE_IDS_HPP

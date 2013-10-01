@@ -7,14 +7,14 @@
  */
 
 #include <xpcc/architecture.hpp>
-#include <xpcc/driver/connectivity/spi.hpp>
+#include <xpcc/communication/spi.hpp>
 
 // How to include the defines?
 // #include "xpcc_config.hpp" does not work.
 #include "../../../../../build/lpcxpresso/lpc11c24/display_s65/libxpcc/xpcc_config.hpp"
-#include <xpcc/driver/ui/display/siemens_s65.hpp>
+#include <xpcc/ui/display/siemens_s65.hpp>
 
-#include <xpcc/workflow/timeout.hpp>
+#include <xpcc/processing/timeout.hpp>
 
 #define USE_HARDWARE_SPI
 
@@ -35,7 +35,7 @@ namespace spi
 #ifdef USE_HARDWARE_SPI
 typedef xpcc::lpc::SpiMaster0 SpiDisplay;
 #else
-typedef xpcc::SoftwareSpi<spi::Sck, spi::Mosi, xpcc::gpio::Unused, 2000000> SpiDisplay;
+typedef xpcc::SoftwareSpiMaster<spi::Sck, spi::Mosi, xpcc::GpioUnused, 2000000> SpiDisplay;
 #endif
 
 //typedef xpcc::SiemensS65Portrait<SpiDisplay, lcd::Cs, lcd::Rs, lcd::Reset> Display;
@@ -53,7 +53,7 @@ main(void)
 {
 	SystemInit();
 	
-	xpcc::lpc11::SysTickTimer::enable();
+	xpcc::lpc::SysTickTimer::enable();
 
 	// Initialize 32-bit timer 0. TIME_INTERVAL is defined as 10mS
 	// You may also want to use the Cortex SysTick timer to do this

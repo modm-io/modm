@@ -1,7 +1,7 @@
 
 #include <xpcc/architecture.hpp>
 
-xpcc::atxmega::BufferedUartD0 uart(9600);
+xpcc::xmega::BufferedUartD0 uart(9600);
 
 GPIO__OUTPUT(Out, A, 0);
 GPIO__INPUT(In, A, 1);

@@ -139,7 +139,7 @@ uart1_interrupt(void)
 
 // ----------------------------------------------------------------------------
 void
-xpcc::lpc2000::Uart1::initialize(uint8_t level)
+xpcc::lpc::Uart1::initialize(uint8_t level)
 {
 	// Turn power on
 	PCONP_p->peripheral.UART1 = 1;
@@ -177,7 +177,7 @@ xpcc::lpc2000::Uart1::initialize(uint8_t level)
 
 // ----------------------------------------------------------------------------
 bool
-xpcc::lpc2000::Uart1::write(uint8_t c, bool blocking)
+xpcc::lpc::Uart1::write(uint8_t c, bool blocking)
 {
 	while (!(U1LSR & UART_TX_BUFFER_FREE))
 	{
@@ -195,13 +195,13 @@ xpcc::lpc2000::Uart1::write(uint8_t c, bool blocking)
 
 // ----------------------------------------------------------------------------
 bool
-xpcc::lpc2000::Uart1::isCharacterAvailable()
+xpcc::lpc::Uart1::isCharacterAvailable()
 {
 	return !receiveQueue.isEmpty();
 }
 
 bool
-xpcc::lpc2000::Uart1::read(uint8_t &c, bool blocking)
+xpcc::lpc::Uart1::read(uint8_t &c, bool blocking)
 {
 	do
 	{

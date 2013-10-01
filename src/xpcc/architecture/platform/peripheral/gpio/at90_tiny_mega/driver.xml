@@ -1,0 +1,15 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE rca SYSTEM "../../xml/driver.dtd">
+<rca version="1.0">
+	<driver type="gpio" name="at90_tiny_mega">
+		<template>gpio.hpp.in</template>
+		<static>gpio_define.h</static>
+
+		<notoggle device-family="atmega" device-name="8|16|32|64|128|162|8515|8535" device-type="a|none">True</notoggle>
+		<notoggle device-family="attiny" device-name="26">True</notoggle>
+
+		<eicra device-family="atmega" device-name="8|16|32|162|8515|8535">MCUCR</eicra>
+		<isc2 device-family="atmega" device-name="8|16|32|8515|8535">MCUCSR</isc2>
+		<isc2 device-family="atmega" device-name="162">EMCUCR</isc2>
+	</driver>
+</rca>

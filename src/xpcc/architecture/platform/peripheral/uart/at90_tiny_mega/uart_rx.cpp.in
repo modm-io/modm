@@ -1,0 +1,123 @@
+// coding: utf-8
+/* Copyright (c) 2009, Roboterclub Aachen e.V.
+ * All Rights Reserved.
+ *
+ * The file is part of the xpcc library and is released under the 3-clause BSD
+ * license. See the file `LICENSE` for the full license governing this code.
+ */
+// ----------------------------------------------------------------------------
+{{ generation_block }}
+
+#include <xpcc/architecture/driver/atomic/queue.hpp>
+#include <xpcc/architecture/driver/atomic/lock.hpp>
+
+#include "uart_defines.h"
+#include "uart{{ id }}.hpp"
+
+static xpcc::atomic::Queue<uint8_t, {{parameters.rx_buffer}}> rxBuffer;
+static uint8_t error;
+
+// ----------------------------------------------------------------------------
+ISR(USART{{ id }}_RX_vect)
+{
+	// first save the errors
+	error |= UCSR{{ id }}A & ((1 << FE{{ id }}) | (1 << DOR{{ id }}));
+	// then read the buffer
+	uint8_t data = UDR{{ id }};
+	// push it into the buffer
+	rxBuffer.push(data);
+}
+
+// ----------------------------------------------------------------------------
+void
+xpcc::{{target.family}}::Uart{{ id }}::initializeWithBaud(uint16_t ubrr)
+{
+	atomic::Lock lock;
+	// Set baud rate
+	if (ubrr & 0x8000) {
+		UCSR{{ id }}A = (1 << U2X{{ id }});  //Enable 2x speed 
+		ubrr &= ~0x8000;
+	}
+	else {
+		UCSR{{ id }}A = 0;
+	}
+	UBRR{{ id }}L = (uint8_t)  ubrr;
+	UBRR{{ id }}H = (uint8_t) (ubrr >> 8);
+	
+	// Enable USART receiver and transmitter and receive complete interrupt
+	UCSR{{ id }}B = (1 << RXCIE{{ id }}) | (1 << RXEN{{ id }}) | (1 << TXEN{{ id }});
+	
+	// Set frame format: asynchronous, 8data, no parity, 1stop bit
+#ifdef URSEL{{ id }}
+	UCSR{{ id }}C = (1 << UCSZ{{ id }}1) | (1 << UCSZ{{ id }}0) | (1 << URSEL{{ id }});
+#else
+	UCSR{{ id }}C = (1 << UCSZ{{ id }}1) | (1 << UCSZ{{ id }}0);
+#endif
+}
+
+// MARK: - read
+bool
+xpcc::{{target.family}}::Uart{{ id }}::read(uint8_t& data)
+{
+	if (rxBuffer.isEmpty())
+		return false;
+	
+	data = rxBuffer.get();
+	rxBuffer.pop();
+	
+	return true;
+}
+
+std::size_t
+xpcc::{{target.family}}::Uart{{ id }}::read(uint8_t *buffer, std::size_t length)
+{
+	for (std::size_t i = 0; i < length; ++i)
+	{
+		if (rxBuffer.isEmpty()) {
+			return length;
+		}
+		else {
+			*buffer++ = rxBuffer.get();
+			rxBuffer.pop();
+		}
+	}
+	
+	return length;
+}
+
+// MARK: - discard
+std::size_t
+xpcc::{{target.family}}::Uart{{ id }}::discardReceiveBuffer()
+{
+	std::size_t i(0);
+	while(!rxBuffer.isEmpty())
+	{
+		rxBuffer.pop();
+		++i;
+	}
+	
+#if defined (RXC{{ id }})
+	uint8_t c;
+	while (UCSR{{ id }}A & (1 << RXC{{ id }}))
+	{
+		c = UDR{{ id }};
+		(void) c;
+	}
+#endif
+	
+	return i;
+}
+
+// MARK: - error
+uint8_t
+xpcc::{{target.family}}::Uart{{ id }}::getErrorFlags()
+{
+	return error;
+}
+
+void
+xpcc::{{target.family}}::Uart{{ id }}::acknowledgeErrorFlags()
+{
+	error = 0;
+}
+

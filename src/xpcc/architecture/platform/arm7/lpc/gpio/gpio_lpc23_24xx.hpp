@@ -80,7 +80,7 @@
  * \brief	Create a output pin type
  *
  * \hideinitializer
- * \ingroup	lpc2000
+ * \ingroup	lpc
  */
 #define	GPIO__OUTPUT(name, port, pin) \
 	struct name { \
@@ -108,7 +108,7 @@
  * \brief	Create a input type
  *
  * \hideinitializer
- * \ingroup	lpc2000
+ * \ingroup	lpc
  */
 #define GPIO__INPUT(name, port, pin) \
 	struct name { \

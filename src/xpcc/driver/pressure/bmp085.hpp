@@ -31,8 +31,8 @@
 #ifndef XPCC__BMP085_HPP
 #define XPCC__BMP085_HPP
 
-#include <xpcc/driver/connectivity/i2c/write_read_adapter.hpp>
-#include <xpcc/workflow/timeout.hpp>
+#include <xpcc/architecture/peripheral/i2c_adapter.hpp>
+#include <xpcc/processing/timeout.hpp>
 
 namespace xpcc
 {
@@ -158,7 +158,7 @@ namespace xpcc
 		update();
 		
 	private:
-		xpcc::i2c::WriteReadAdapter adapter;
+		xpcc::I2cWriteReadAdapter adapter;
 		xpcc::Timeout<> timeout;
 		
 		enum Running {

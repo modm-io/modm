@@ -86,7 +86,7 @@ void
 xpcc::Bma180<I2cMaster>::update()
 {
 	if (status & READ_ACCELEROMETER_RUNNING &&
-		adapter.getState() == xpcc::i2c::adapter::NO_ERROR) {
+		adapter.getState() == xpcc::I2c::AdapterState::Idle) {
 		status &= ~READ_ACCELEROMETER_RUNNING;
 		status |= NEW_ACCELEROMETER_DATA;
 	}
@@ -122,25 +122,25 @@ template < typename I2cMaster >
 bool
 xpcc::Bma180<I2cMaster>::writeRegister(bma180::Register reg, uint8_t value)
 {
-	while (adapter.getState() == xpcc::i2c::adapter::BUSY)
+	while (adapter.getState() == xpcc::I2c::AdapterState::Busy)
 		;
 	buffer[0] = reg;
 	buffer[1] = value;
 	adapter.initialize(buffer, 2, data, 0);
 	
-	return I2cMaster::startSync(&adapter);
+	return I2cMaster::startBlocking(&adapter);
 }
 
 template < typename I2cMaster >
 uint8_t
 xpcc::Bma180<I2cMaster>::readRegister(bma180::Register reg)
 {
-	while (adapter.getState() == xpcc::i2c::adapter::BUSY)
+	while (adapter.getState() == xpcc::I2c::AdapterState::Busy)
 		;
 	buffer[0] = reg;
 	adapter.initialize(buffer, 1, buffer, 1);
 	
-	while (!I2cMaster::startSync(&adapter))
+	while (!I2cMaster::startBlocking(&adapter))
 		;
 	return buffer[0];
 }

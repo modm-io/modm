@@ -6,7 +6,9 @@
  */
 
 #include <xpcc/architecture/platform.hpp>
-#include <xpcc/driver/connectivity/sab/slave.hpp>
+#include <xpcc/communication/sab/slave.hpp>
+
+using namespace xpcc::atmega;
 
 // ----------------------------------------------------------------------------
 // wrapper class for the A/D converter
@@ -16,14 +18,14 @@ public:
 	AnalogDigital()
 	{
 		// initialize the analog to digital converter
-		xpcc::atmega::Adc::initialize(
-				xpcc::atmega::Adc::REFERENCE_INTERNAL_AVCC, xpcc::atmega::Adc::PRESCALER_64);
+		Adc::initialize(
+				Adc::Reference::InternalAVcc, Adc::Prescaler::Div64);
 	}
     
 	void
 	readChannel(xpcc::sab::Response& response, const uint8_t *channel)
 	{
-		uint16_t value = xpcc::atmega::Adc::readChannel(*channel);
+		uint16_t value = Adc::readChannel(*channel);
 		response.send(value);
 	}
 };
@@ -73,7 +75,7 @@ FLASH_STORAGE(xpcc::sab::Action actionList[]) =
 };
 
 // wrap the type definition inside a typedef to make the code more readable
-typedef xpcc::sab::Slave< xpcc::sab::Interface< xpcc::atmega::BufferedUart0 > > Slave;
+typedef xpcc::sab::Slave< xpcc::sab::Interface< Uart0 > > Slave;
 
 // ----------------------------------------------------------------------------
 MAIN_FUNCTION

@@ -1,0 +1,217 @@
+// coding: utf-8
+/*
+* Copyright (c) 2013, Roboterclub Aachen e.V.
+* All Rights Reserved.
+*
+* The file is part for the xpcc library and is released under the
+* 3-clause BSD license. See the file `LICENSE` for the full license
+* governing this code.
+*/
+// ----------------------------------------------------------------------------
+%#
+%% if id in [1, 2, 3, 6]
+%%	set uart = "Usart"
+%% elif id in [4, 5]
+%%	set uart = "Uart"
+%% endif
+%#
+%% set name = uart ~ "Hal" ~ id
+%% set peripheral = uart | upper ~ id
+
+#ifndef XPCC_STM32_{{ uart | upper }}HAL_{{ id }}_HPP
+#	error 	"Don't include this file directly, use" \
+#			"'{{ uart | lower }}_hal_{{ id }}.hpp' instead!"
+#endif
+
+// ----------------------------------------------------------------------------
+void
+xpcc::stm32::{{ name }}::setParity(const Parity parity)
+{
+	uint32_t flags = {{ peripheral }}->CR1;
+	flags &= ~(USART_CR1_PCE | USART_CR1_PS | USART_CR1_M);
+	flags |= static_cast<uint32_t>(parity);
+	if (parity != Parity::Disabled) {
+		// Parity Bit counts as 9th bit -> enable 9 data bits
+		flags |= USART_CR1_M;
+	}
+	{{ peripheral }}->CR1 = flags;
+}
+
+void
+xpcc::stm32::{{ name }}::enable()
+{
+%% if id in [1, 6]
+	// enable clock
+	RCC->APB2ENR |= RCC_APB2ENR_{{ peripheral }}EN;
+	// reset timer
+	RCC->APB2RSTR |=  RCC_APB2RSTR_{{ peripheral }}RST;
+	RCC->APB2RSTR &= ~RCC_APB2RSTR_{{ peripheral }}RST;
+%% elif id in [2, 3, 4, 5]
+	// FIXME: there seems to be a bug in the stm32f3xxlib which does not provide
+	//        the necessary RCC_APB1ENR_UART5EN define and probably defines
+	//        RCC_APB1ENR_UART4EN incorrectly (0x00100000 instead of 0x00080000)
+	// enable clock
+	RCC->APB1ENR |= RCC_APB1ENR_{{ peripheral }}EN;
+	// reset uart
+	RCC->APB1RSTR |=  RCC_APB1RSTR_{{ peripheral }}RST;
+	RCC->APB1RSTR &= ~RCC_APB1RSTR_{{ peripheral }}RST;
+%% endif
+	{{ peripheral }}->CR1 |= USART_CR1_UE;		// Uart Enable
+}
+
+void
+xpcc::stm32::{{ name }}::disable()
+{
+	// TX, RX, Uart, etc. Disable
+	{{ peripheral }}->CR1 = 0;
+%% if id in [1, 6]
+	// disable clock
+	RCC->APB2ENR &= ~RCC_APB2ENR_{{ peripheral }}EN;
+%% elif id in [2, 3, 4, 5]
+	// FIXME: there seems to be a bug in the stm32f3xxlib which does not provide
+	//        the necessary RCC_APB1ENR_UART5EN define and probably defines
+	//        RCC_APB1ENR_UART4EN incorrectly (0x00100000 instead of 0x00080000)
+	// disable clock
+	RCC->APB1ENR &= ~RCC_APB1ENR_{{ peripheral }}EN;
+%% endif
+}
+
+template<class clockSource, uint32_t baudrate>
+void
+xpcc::stm32::{{ name }}::initialize(Parity parity)
+{
+	enable();
+	// DIRTY HACK: disable and reenable uart to be able to set
+	//             baud rate as well as parity
+	{{ peripheral }}->CR1 &= ~USART_CR1_UE;	// Uart Disable
+	// set baudrate
+	{{ peripheral }}->BRR = calculateBaudrateSettings(clockSource::{{ name }}, baudrate);
+	setParity(parity);
+	{{ peripheral }}->CR1 |=  USART_CR1_UE;	// Uart Reenable
+}
+
+void
+xpcc::stm32::{{ name }}::write(uint8_t data)
+{
+%% if target is stm32f0 or target is stm32f3
+	{{ peripheral }}->TDR = data;
+%% elif target is stm32f2 or target is stm32f4
+	{{ peripheral }}->DR = data;
+%% endif
+}
+
+uint8_t
+xpcc::stm32::{{ name }}::read()
+{
+%% if target is stm32f0 or target is stm32f3
+	return {{ peripheral }}->RDR;
+%% elif target is stm32f2 or target is stm32f4
+	return {{ peripheral }}->DR;
+%% endif
+}
+
+void
+xpcc::stm32::{{ name }}::setTransmitterEnable(const bool enable)
+{
+	if (enable) {
+		{{ peripheral }}->CR1 |=  USART_CR1_TE;
+	} else {
+		{{ peripheral }}->CR1 &= ~USART_CR1_TE;
+	}
+}
+
+void
+xpcc::stm32::{{ name }}::setReceiverEnable(bool enable)
+{
+	if (enable) {
+		{{ peripheral }}->CR1 |=  USART_CR1_RE;
+	} else {
+		{{ peripheral }}->CR1 &= ~USART_CR1_RE;
+	}
+}
+
+bool
+xpcc::stm32::{{ name }}::isReceiveRegisterNotEmpty()
+{
+%% if target is stm32f0 or target is stm32f3
+	return {{ peripheral }}->ISR & USART_ISR_RXNE;
+%% elif target is stm32f2 or target is stm32f4
+	return {{ peripheral }}->SR & USART_SR_RXNE;
+%% endif
+}
+
+bool
+xpcc::stm32::{{ name }}::isTransmitRegisterEmpty()
+{
+%% if target is stm32f0 or target is stm32f3
+	return {{ peripheral }}->ISR & USART_ISR_TXE;
+%% elif target is stm32f2 or target is stm32f4
+	return {{ peripheral }}->SR & USART_SR_TXE;
+%% endif
+}
+
+void
+xpcc::stm32::{{ name }}::enableInterruptVector(bool enable, uint32_t priority)
+{
+	if (enable) {
+		// Set priority for the interrupt vector
+		NVIC_SetPriority({{ peripheral }}_IRQn, priority);
+		
+		// register IRQ at the NVIC
+		NVIC_EnableIRQ({{ peripheral }}_IRQn);
+	}
+	else {
+		NVIC_DisableIRQ({{ peripheral }}_IRQn);
+	}
+}
+
+void
+xpcc::stm32::{{ name }}::enableInterrupt(Interrupt interrupt)
+{
+	{{ peripheral }}->CR1 |= static_cast<uint32_t>(interrupt);
+}
+
+void
+xpcc::stm32::{{ name }}::disableInterrupt(Interrupt interrupt)
+{
+	{{ peripheral }}->CR1 &= ~static_cast<uint32_t>(interrupt);
+}
+
+xpcc::stm32::{{ name }}::InterruptFlag
+xpcc::stm32::{{ name }}::getInterruptFlags()
+{
+%% if target is stm32f0 or target is stm32f3
+	return static_cast<InterruptFlag>( {{ peripheral }}->ISR );
+%% elif target is stm32f2 or target is stm32f4
+	return static_cast<InterruptFlag>( {{ peripheral }}->SR );
+%% endif
+}
+
+void
+xpcc::stm32::{{ name }}::resetInterruptFlags(InterruptFlag flags)
+{
+%% if target is stm32f0 or target is stm32f3
+	// Not all flags can be cleared by writing to this reg
+	const uint32_t mask = USART_ICR_PECF  | USART_ICR_FECF   |
+		USART_ICR_NCF   | USART_ICR_ORECF | USART_ICR_IDLECF |
+		USART_ICR_TCCF  | USART_ICR_LBDCF | USART_ICR_CTSCF  |
+		USART_ICR_RTOCF | USART_ICR_EOBCF | USART_ICR_CMCF   |
+		USART_ICR_WUCF;
+	// Flags are cleared by writing a one to the flag position.
+	// Writing a zero is (hopefully) ignored.
+	{{ peripheral }}->ICR = (flags & mask);
+%% elif target is stm32f2 or target is stm32f4
+	/* Interrupts must be cleared manually by accessing SR and DR. 
+	 * Overrun Interrupt, Noise flag detected, Framing Error, Parity Error
+	 * p779: "It is cleared by a software sequence (an read to the
+	 * USART_SR register followed by a read to the USART_DR register"
+	 */ 
+	if (flags & InterruptFlag::OverrunError) {
+		uint32_t tmp;
+		tmp = {{ peripheral }}->SR;
+		tmp = {{ peripheral }}->DR;
+		(void) tmp;
+	}
+	(void) flags;	// avoid compiler warning
+%% endif
+}

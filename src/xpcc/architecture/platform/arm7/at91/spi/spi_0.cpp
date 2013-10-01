@@ -39,7 +39,7 @@
 // ----------------------------------------------------------------------------
 
 #include "spi_0.hpp"
-#include <xpcc/architecture/driver/gpio.hpp>
+#include <xpcc/architecture/peripheral/gpio.hpp>
 
 
 

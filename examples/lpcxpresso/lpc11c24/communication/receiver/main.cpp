@@ -57,7 +57,7 @@ MAIN_FUNCTION
 {
 	SystemInit();
 
-	xpcc::lpc11::SysTickTimer::enable();
+	xpcc::lpc::SysTickTimer::enable();
 
 	xpcc::lpc::Uart1 loggerUart(115200);
 
@@ -66,23 +66,23 @@ MAIN_FUNCTION
 
 	// FIFO of 4 MOBs (0 to 3) for extended messages with XPCC destination RECEIVER
 
-	xpcc::lpc11c::CanFilter::setFilter(
-			xpcc::lpc11c::CanFilter::ExtendedIdentifier(
+	xpcc::lpc::CanFilter::setFilter(
+			xpcc::lpc::CanFilter::ExtendedIdentifier(
 					XPCC_CAN_PACKET_DESTINATION(robot::component::RECEIVER),
-					xpcc::lpc11c::CanFilter::NO_RTR),
-			xpcc::lpc11c::CanFilter::ExtendedFilterMask(
+					xpcc::lpc::CanFilter::NO_RTR),
+			xpcc::lpc::CanFilter::ExtendedFilterMask(
 					XPCC_CAN_PACKET_DESTINATION_MASK,
-					xpcc::lpc11c::CanFilter::RTR_MATCH),
+					xpcc::lpc::CanFilter::RTR_MATCH),
 			0, 4);
 
 	// FIFO of 8 MOBs (4 to 11) for extended messages for XPCC events.
-	xpcc::lpc11c::CanFilter::setFilter(
-			xpcc::lpc11c::CanFilter::ExtendedIdentifier(
+	xpcc::lpc::CanFilter::setFilter(
+			xpcc::lpc::CanFilter::ExtendedIdentifier(
 					XPCC_CAN_PACKET_EVENT,
-					xpcc::lpc11c::CanFilter::NO_RTR),
-			xpcc::lpc11c::CanFilter::ExtendedFilterMask(
+					xpcc::lpc::CanFilter::NO_RTR),
+			xpcc::lpc::CanFilter::ExtendedFilterMask(
 					XPCC_CAN_PACKET_DESTINATION_MASK,
-					xpcc::lpc11c::CanFilter::RTR_MATCH),
+					xpcc::lpc::CanFilter::RTR_MATCH),
 			4, 8);
 
 	

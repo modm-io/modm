@@ -3,7 +3,7 @@
 
 GPIO__OUTPUT(Led, 0, 7);
 
-typedef xpcc::lpc11::Timer16_0 myTimer;
+typedef xpcc::lpc::Timer16_0 myTimer;
 
 int
 main(void)

@@ -1,0 +1,153 @@
+// coding: utf-8
+/* Copyright (c) 2013, Roboterclub Aachen e.V.
+ * All Rights Reserved.
+ *
+ * The file is part of the xpcc library and is released under the 3-clause BSD
+ * license. See the file `LICENSE` for the full license governing this code.
+ */
+// ----------------------------------------------------------------------------
+
+#ifndef XPCC_{{target.family | upper}}_SIMPLE_UART_SPI{{id}}_HPP
+#	error	"Don't include this file directly, use 'uart_simple_spi.hpp' instead!"
+#endif
+
+#include <xpcc/architecture/driver/atomic.hpp>
+#include <xpcc/math/utils/bit_operation.hpp>
+
+bool xpcc::{{target.family}}::UartSimpleSpi{{id}}::finished;
+%% if extended is not defined
+xpcc::SimpleSpi::DataOrder xpcc::{{target.family}}::UartSimpleSpi{{id}}::dataOrder;
+%% endif
+
+// ----------------------------------------------------------------------------
+template< uint32_t baudrate >
+void
+xpcc::{{target.family}}::UartSimpleSpi{{id}}::initialize()
+{
+	constexpr uint16_t prescaler = (F_CPU / ( 2 * baudrate )) - 1;
+
+	static_assert(F_CPU/2 >= baudrate, "The CPU frequency must be at least 2x higher than SPI baudrate.");
+	static_assert(prescaler + 1 < (1 << 12) + 1, "SPI baudrate is too slow for CPU frequency (Prescaler out of bounds).");
+
+	initialize(prescaler);
+}
+
+void
+xpcc::{{target.family}}::UartSimpleSpi{{id}}::initialize(uint16_t prescaler)
+{
+	xpcc::atomic::Lock lock;
+
+	UBRR{{ id }} = 0;
+	// set MSPI mode of operation and SPI data mode
+	UCSR{{ id }}C = (1 << UMSEL{{id}}1) | (1 << UMSEL{{id}}0);
+	// enable receiver and transmitter
+	UCSR{{ id }}B = (1 << RXEN{{id}}) | (1 << TXEN{{id}});
+	// set baudrate _after_ enabling transmitter
+	UBRR{{ id }} = prescaler;
+%% if extended is not defined
+	dataOrder = DataOrder::MsbFirst;
+%% endif
+}
+
+void
+xpcc::{{target.family}}::UartSimpleSpi{{id}}::setDataMode(DataMode mode)
+{
+%% if extended is defined
+	UCSR{{ id }}C = (UCSR{{ id }}C & ~0b11) | static_cast<uint8_t>(mode);
+%% else
+	UCSR{{ id }}C = (UCSR{{ id }}C & ~0b01) | (static_cast<uint8_t>(mode) & 0b01);
+%% endif
+}
+
+void
+xpcc::{{target.family}}::UartSimpleSpi{{id}}::setDataOrder(DataOrder order)
+{
+%% if extended is defined
+	UCSR{{id}}C = (UCSR{{id}}C & ~(1 << UDORD{{id}})) | (order == DataOrder::LsbFirst ? (1 << UDORD{{id}}) : 0);
+%% else
+	dataOrder = order;
+%% endif
+}
+
+// ----------------------------------------------------------------------------
+uint8_t
+xpcc::{{target.family}}::UartSimpleSpi{{id}}::writeReadBlocking(uint8_t data)
+{
+	writeBlocking(data);
+
+	while(!isFinished())
+		;
+	return getResult();
+}
+
+void
+xpcc::{{target.family}}::UartSimpleSpi{{id}}::writeBlocking(uint8_t data)
+{
+%% if extended is not defined
+	if (dataOrder == DataOrder::LsbFirst) {
+		data = xpcc::bitReverse(data);
+	}
+%% endif
+	while(!isFinished())
+		;
+	UDR{{id}} = data;
+}
+
+bool
+xpcc::{{target.family}}::UartSimpleSpi{{id}}::write(uint8_t data)
+{
+%% if extended is not defined
+	if (dataOrder == DataOrder::LsbFirst) {
+		data = xpcc::bitReverse(data);
+	}
+%% endif
+	if (!isFinished())
+		return false;
+
+	UDR{{id}} = data;
+	return true;
+}
+
+uint8_t
+xpcc::{{target.family}}::UartSimpleSpi{{id}}::getResult()
+{
+	uint8_t data = UDR{{id}};
+%% if extended is not defined
+	if (dataOrder == DataOrder::LsbFirst) {
+		data = xpcc::bitReverse(data);
+	}
+%% endif
+	return data;
+}
+
+bool
+xpcc::{{target.family}}::UartSimpleSpi{{id}}::transfer(uint8_t *tx, uint8_t *rx,
+		std::size_t length, BufferOptions options)
+{
+	if (!isFinished())
+		return false;
+
+	finished = false;
+
+	uint8_t tx_byte = 0xff;
+	uint8_t rx_byte;
+
+	for (std::size_t i = 0; i < length; i++)
+	{
+		if (tx) tx_byte = tx[static_cast<uint8_t>(options) & 0b10 ? i : length-i-1];
+
+		rx_byte = writeReadBlocking(tx_byte);
+
+		if (rx) rx[static_cast<uint8_t>(options) & 0b01 ? i : length-i-1] = rx_byte;
+	}
+
+	finished = true;
+	return true;
+}
+
+bool
+xpcc::{{target.family}}::UartSimpleSpi{{id}}::isFinished()
+{
+	return ( (UCSR{{id}}A & ((1 << UDRE{{id}}) | (1 << RXC{{id}})) ) ==
+			((1 << UDRE{{id}}) | (1 << RXC{{id}})) ) && finished;
+}

@@ -1,0 +1,33 @@
+// coding: utf-8
+/* Copyright (c) 2013, Roboterclub Aachen e.V.
+* All Rights Reserved.
+*
+* The file is part of the xpcc library and is released under the 3-clause BSD
+* license. See the file `LICENSE` for the full license governing this code.
+*/
+// ----------------------------------------------------------------------------
+#ifndef XPCC_STM32_TIMER_TYPE_IDS_HPP
+#define XPCC_STM32_TIMER_TYPE_IDS_HPP
+
+namespace xpcc
+{
+
+namespace stm32
+{
+
+namespace TypeId
+{
+%% for id in [1,2,3,4,5,8,9,10,11,12,13,14]
+	%% set connectors = []
+	%% import 'connectors.macros' as cons with context
+	%% for connector in connectors
+	typedef struct{} Timer{{ id ~ connector}};
+	%% endfor
+%% endfor
+}
+
+}
+
+}
+
+#endif // XPCC_STM32_TIMER_TYPE_IDS_HPP

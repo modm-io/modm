@@ -51,7 +51,7 @@ xpcc::Bmp085<I2cMaster>::configure(bmp085::Mode mode)
 	adapter.initialize(buffer, 1, reinterpret_cast<uint8_t*>(&calibration), 22);
 	status |= NEW_CALIBRATION_DATA;
 	
-	return I2cMaster::startSync(&adapter);
+	return I2cMaster::startBlocking(&adapter);
 }
 
 template < typename I2cMaster >
@@ -234,7 +234,7 @@ xpcc::Bmp085<I2cMaster>::update()
 	{
 		switch (adapter.getState())
 		{
-			case xpcc::i2c::adapter::NO_ERROR:
+			case xpcc::I2c::AdapterState::Idle:
 				if (running == READ_TEMPERATURE_RUNNING) {
 					status |= NEW_TEMPERATURE_DATA;
 					calculation |= TEMPERATURE_NEEDS_UPDATE;
@@ -244,7 +244,7 @@ xpcc::Bmp085<I2cMaster>::update()
 					calculation |= PRESSURE_NEEDS_UPDATE;
 				}
 				
-			case xpcc::i2c::adapter::ERROR:
+			case xpcc::I2c::AdapterState::Error:
 				running = NOTHING_RUNNING;
 				
 			default:

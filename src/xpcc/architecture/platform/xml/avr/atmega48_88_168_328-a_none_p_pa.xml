@@ -1,0 +1,116 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE rca SYSTEM "../devicefile.dtd">
+<rca version="1.0">
+  <!-- WARNING: This file is generated automatically, do not edit!
+ 		Please modify the xpcc/tools/DeviceFileGenerator code instead and rebuild this file.
+ 		Be aware, that regenerated files might have a different composition for technical reasons. -->
+  <device platform="avr" name="48|88|168|328" family="atmega" type="a|none|p|pa">
+    <flash device-name="48">4096</flash>
+    <flash device-name="88">8192</flash>
+    <flash device-name="168">16384</flash>
+    <flash device-name="328">32768</flash>
+    <ram device-name="48">512</ram>
+    <ram device-name="88">1024</ram>
+    <ram device-name="168">1024</ram>
+    <ram device-name="328">2048</ram>
+    <eeprom device-name="48">256</eeprom>
+    <eeprom device-name="88">512</eeprom>
+    <eeprom device-name="168">512</eeprom>
+    <eeprom device-name="328">1024</eeprom>
+    <mmcu device-name="48" device-type="a">atmega48a</mmcu>
+    <mmcu device-name="48" device-type="none">atmega48</mmcu>
+    <mmcu device-name="48" device-type="p">atmega48p</mmcu>
+    <mmcu device-name="48" device-type="pa">atmega48pa</mmcu>
+    <mmcu device-name="88" device-type="a">atmega88a</mmcu>
+    <mmcu device-name="88" device-type="none">atmega88</mmcu>
+    <mmcu device-name="88" device-type="p">atmega88p</mmcu>
+    <mmcu device-name="88" device-type="pa">atmega88pa</mmcu>
+    <mmcu device-name="168" device-type="a">atmega168a</mmcu>
+    <mmcu device-name="168" device-type="none">atmega168</mmcu>
+    <mmcu device-name="168" device-type="p">atmega168p</mmcu>
+    <mmcu device-name="168" device-type="pa">atmega168pa</mmcu>
+    <mmcu device-name="328" device-type="none">atmega328</mmcu>
+    <mmcu device-name="328" device-type="p">atmega328p</mmcu>
+    <define device-name="48" device-type="a">__AVR_ATmega48A__</define>
+    <define device-name="48" device-type="none">__AVR_ATmega48__</define>
+    <define device-name="48" device-type="p">__AVR_ATmega48P__</define>
+    <define device-name="48" device-type="pa">__AVR_ATmega48PA__</define>
+    <define device-name="88" device-type="a">__AVR_ATmega88A__</define>
+    <define device-name="88" device-type="none">__AVR_ATmega88__</define>
+    <define device-name="88" device-type="p">__AVR_ATmega88P__</define>
+    <define device-name="88" device-type="pa">__AVR_ATmega88PA__</define>
+    <define device-name="168" device-type="a">__AVR_ATmega168A__</define>
+    <define device-name="168" device-type="none">__AVR_ATmega168__</define>
+    <define device-name="168" device-type="p">__AVR_ATmega168P__</define>
+    <define device-name="168" device-type="pa">__AVR_ATmega168PA__</define>
+    <define device-name="328" device-type="none">__AVR_ATmega328__</define>
+    <define device-name="328" device-type="p">__AVR_ATmega328P__</define>
+    <core>avr8</core>
+    <pin-count>0</pin-count>
+    <driver type="core" name="avr">
+      <parameter device-name="48" name="ram_length">256</parameter>
+      <parameter device-name="88" name="ram_length">512</parameter>
+      <parameter device-name="168" name="ram_length">512</parameter>
+      <parameter device-name="328" name="ram_length">1024</parameter>
+    </driver>
+    <header>avr/io.h</header>
+    <header>avr/interrupt.h</header>
+    <header>avr/sleep.h</header>
+    <driver type="uart" name="at90_tiny_mega" instances="0"/>
+    <driver type="spi" name="at90_tiny_mega_uart" instances="0"/>
+    <driver type="i2c" name="at90_tiny_mega"/>
+    <driver type="spi" name="at90_tiny_mega"/>
+    <driver type="adc" name="atmega"/>
+    <driver type="timer" name="atmega" instances="0,1,2"/>
+    <driver type="gpio" name="at90_tiny_mega">
+      <gpio port="B" id="0" pcint="0"/>
+      <gpio port="B" id="1" pcint="1"/>
+      <gpio port="B" id="2" pcint="2">
+        <af peripheral="SpiMaster" type="out" name="Ss"/>
+        <af peripheral="SpiSlave" type="in" name="Ss"/>
+      </gpio>
+      <gpio port="B" id="3" pcint="3">
+        <af peripheral="SpiMaster" type="in" name="Miso"/>
+        <af peripheral="SpiSlave" type="out" name="Somi"/>
+      </gpio>
+      <gpio port="B" id="4" pcint="4">
+        <af peripheral="SpiMaster" type="out" name="Mosi"/>
+        <af peripheral="SpiSlave" type="in" name="Simo"/>
+      </gpio>
+      <gpio port="B" id="5" pcint="5">
+        <af peripheral="SpiMaster" type="out" name="Sck"/>
+        <af peripheral="SpiSlave" type="in" name="Sck"/>
+      </gpio>
+      <gpio port="B" id="6" pcint="6"/>
+      <gpio port="B" id="7" pcint="7"/>
+      <gpio port="C" id="0" pcint="8"/>
+      <gpio port="C" id="1" pcint="9"/>
+      <gpio port="C" id="2" pcint="10"/>
+      <gpio port="C" id="3" pcint="11"/>
+      <gpio port="C" id="4" pcint="12">
+        <af peripheral="I2cMaster" type="io" name="Sda"/>
+      </gpio>
+      <gpio port="C" id="5" pcint="13">
+        <af peripheral="I2cMaster" type="out" name="Scl"/>
+      </gpio>
+      <gpio port="C" id="6" pcint="14"/>
+      <gpio port="D" id="0" pcint="16">
+        <af peripheral="Uart0" type="in" name="Rxd"/>
+        <af peripheral="UartSpiMaster0" type="in" name="Miso"/>
+      </gpio>
+      <gpio port="D" id="1" pcint="17">
+        <af peripheral="Uart0" type="out" name="Txd"/>
+        <af peripheral="UartSpiMaster0" type="out" name="Mosi"/>
+      </gpio>
+      <gpio port="D" id="2" pcint="18" extint="0"/>
+      <gpio port="D" id="3" pcint="19" extint="1"/>
+      <gpio port="D" id="4" pcint="20">
+        <af peripheral="Uart0" type="out" name="Xck"/>
+        <af peripheral="UartSpiMaster0" type="out" name="Sck"/>
+      </gpio>
+      <gpio port="D" id="5" pcint="21"/>
+      <gpio port="D" id="6" pcint="22"/>
+      <gpio port="D" id="7" pcint="23"/>
+    </driver>
+  </device>
+</rca>

@@ -34,8 +34,6 @@
 import os
 from SCons.Script import *
 
-import arm_devices as device_list
-
 # -----------------------------------------------------------------------------
 def generate(env, **kw):
 	env.Append(ENV = {'PATH' : os.environ['PATH']})
@@ -73,32 +71,12 @@ def generate(env, **kw):
 		env['HEXCOMSTR'] = "Creating load file for Flash: $TARGET"
 		env['BINCOMSTR'] = "Creating load file for Flash: $TARGET"
 		env['LSSCOMSTR'] = "Creating Extended Listing: $TARGET"
-	
-	# import device specific settings
-	device = env['ARM_DEVICE']
-	if device.startswith('stm32f'):
-		# The first character after the number specifies the package. As this
-		# is not important for the memory map of the device we replace it with
-		# an underscore when selecting the linkerscript.
-		device = device[0:9] + '_' + device[10:]
-	
-	try:
-		defines = device_list.devices[device]['defines']
-		linkerscript = device_list.devices[device]['linkerscript']
-		
-		# For the env.Size() command. See helper.py
-		env['DEVICE_SIZE'] = device_list.devices[device]['size']
-	except KeyError as e:
-		print "Unknown device '%s'. Please check the spelling or add the device " \
-				"in scons/site_tools/arm_devices.py" % env['ARM_DEVICE']
-		env.Exit(1)
-	
+
 	# Add a empty dict to define the internal type of CPPDEFINES. This way
 	# we can later add lists or dicts. When starting with a list only other
 	# lists will work afterwards.
 	env.Append(CPPDEFINES = {})
 	env.Append(CPPDEFINES = ["__ARM_%s__" % env['ARM_DEVICE'].upper()])
-	env.Append(CPPDEFINES = defines)
 	
 	# If nothing else has been selected enable Thumb-Mode for AT91SAM devices
 	# as it will be most likely faster.
@@ -114,8 +92,8 @@ def generate(env, **kw):
 		# predefined functions from the standard libraries.
 		# (for example __libc_init_array())
 		env['THUMB_LINKER'] = '-mthumb'
-	
-	if env['ARM_ARCH'] == 'cortex-m4':
+
+	if env['ARCHITECTURE'] == 'cortex-m4f':
 		# Options for '-mfloat-abi='
 		# - soft: Full software floating point.
 		# - softfp: Use the FPU, but remain compatible with soft-float code.
@@ -173,7 +151,8 @@ def generate(env, **kw):
 	env['CXXFLAGS'] = [
 #		"-fverbose-asm",
 #		"-save-temps",		# save preprocessed files
-		"-std=gnu++0x",
+		"-std=c++11",
+		"-fconstexpr-depth=10000", # enable deep recursion
 		"-fno-exceptions",
 		"-fno-rtti",
 		"-fno-threadsafe-statics",
@@ -197,9 +176,10 @@ def generate(env, **kw):
 	]
 	
 	# these values can be overwritten by the user
-	linkdir, linkfile = os.path.split(linkerscript)
-	env['LINKPATH'] = "${XPCC_ROOTPATH}/src/xpcc/architecture/platform/%s" % linkdir
-	env['LINKFILE'] = "%s" % linkfile
+	# now set in platform_tools.py
+	# linkdir, linkfile = os.path.split(linkerscript)
+	# env['LINKPATH'] = "${XPCC_ROOTPATH}/src/xpcc/architecture/platform/%s" % linkdir
+	# env['LINKFILE'] = "%s" % linkfile
 	
 	env['LINKFLAGS'] = [
 		"-mcpu=$ARM_ARCH",

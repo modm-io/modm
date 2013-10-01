@@ -1,0 +1,435 @@
+// coding: utf-8
+/* Copyright (c) 2013, Roboterclub Aachen e.V.
+ * All Rights Reserved.
+ *
+ * The file is part of the xpcc library and is released under the 3-clause BSD
+ * license. See the file `LICENSE` for the full license governing this code.
+ */
+// ----------------------------------------------------------------------------
+{{ generation_block }}
+
+#ifndef XPCC_XMEGA_GPIO_HPP
+#define XPCC_XMEGA_GPIO_HPP
+
+#include "../../../device.hpp"
+#include "../../../core/avr/interrupts.hpp"
+#include <xpcc/architecture/peripheral/gpio.hpp>
+#include "../../../type_ids.hpp"
+
+namespace xpcc
+{
+
+namespace xmega
+{
+
+struct Gpio
+{
+	/**
+	 * Each Pin can be configured in one of these states.
+	 * `OpenDrain` is the same as `WiredOr`, it is listed only for completion. 
+	 *
+	 * @ingroup	xmega
+	 */
+	enum class
+	Configuration : uint8_t
+	{
+		Floating = PORT_OPC_TOTEM_gc,		///< push-pull on output, floating on input
+		PullDown = PORT_OPC_PULLDOWN_gc,	///< push-pull on output, pull-down on input
+		PullUp = PORT_OPC_PULLUP_gc,		///< push-pull on output, pull-up on input
+		BusKeeper = PORT_OPC_BUSKEEPER_gc,	///< push-pull on output, keeps last input
+		WiredOr = PORT_OPC_WIREDOR_gc,		///< pin is driven high on output, externally pulled down or floating on input
+		WiredAnd = PORT_OPC_WIREDAND_gc,	///< pin is driven low on output, externally pulled down or floating on input
+		WiredOrWithPullDown = PORT_OPC_WIREDORPULL_gc,	///< pin is driven high on output, internally pulled down on input
+		WiredAndWithPullUp = PORT_OPC_WIREDANDPULL_gc,	///< pin is driven low on output, internally pulled high on input
+		// this is just a shortcut, not everyone knows that OpenDrain is equal to WiredAnd
+		OpenDrain = WiredAnd,	///< shortcut for `WiredAnd` with external pullup (like in I2C)
+		OpenDrainWithPullUp = WiredAndWithPullUp,	///< shortcut for `WiredAnd` with internal pullup
+	};
+
+	/// Each pin can be configured to trigger an interrupt on these conditions.
+	/// @ingroup	xmega
+	enum class
+	InputTrigger : uint8_t
+	{
+		LowLevel = PORT_ISC_LEVEL_gc,			///< triggers **continously** during low level
+		BothEdges = PORT_ISC_BOTHEDGES_gc,		///< triggers on both rising and falling edge
+		FallingEdge = PORT_ISC_FALLING_gc,		///< triggers on falling edge
+		RisingEdge = PORT_ISC_RISING_gc,		///< triggers on rising edge
+	};
+
+	/// Indicates whether the pin is inverted in hardware.
+	/// @ingroup	xmega
+	enum class
+	Inverted : bool
+	{
+		No = false,
+		Yes = true,
+	};
+
+	/// All ports that exist on this Xmega.
+	/// @ingroup	xmega
+	enum class
+	Port : uint8_t
+	{
+%% for port in gpios | xpcc.values('port') | sort
+		Port{{port}} = PORTCFG_VP13MAP_PORT{{port}}_gc | PORTCFG_VP02MAP_PORT{{port}}_gc,
+%% endfor
+	};
+
+protected:
+	/// Helper functions for casting enum classes into uint8_t.
+	/// @{
+	static constexpr uint8_t
+	i(Configuration config) { return static_cast<uint8_t>(config); }
+	static constexpr uint8_t
+	i(InputTrigger trigger) { return static_cast<uint8_t>(trigger); }
+	static constexpr uint8_t
+	i(Port port) { return static_cast<uint8_t>(port); }
+	/// @}
+};
+
+/**
+ * This class allows the mapping of virtual ports and clock and event outputs
+ * on certain GPIOs.
+ *
+ * @ingroup	xmega
+ */
+class PortConfiguration : public Gpio
+{
+public:
+	/// All Gpios that can output Gpio Peripheral Clock or Event Channel 0-7.
+	enum class
+	Output : uint8_t
+	{
+%% for port in gpios | xpcc.values('port') | sort
+	%% if port in ['C', 'D', 'E']
+		Gpio{{port}}4 = PORTCFG_CLKEVPIN_bm | PORTCFG_EVOUT_P{{port}}7_gc | PORTCFG_CLKOUT_P{{port}}7_gc,
+		Gpio{{port}}7 = PORTCFG_EVOUT_P{{port}}7_gc | PORTCFG_CLKOUT_P{{port}}7_gc,
+	%% endif
+%% endfor
+	};
+
+	/// Peripheral clock multipliers
+	enum class
+	ClockMultiplier : uint8_t
+	{
+		Mult1X = PORTCFG_CLKOUTSEL_CLK1X_gc,
+		Mult2X = PORTCFG_CLKOUTSEL_CLK2X_gc,
+		Mult4X = PORTCFG_CLKOUTSEL_CLK4X_gc,
+	};
+
+	ALWAYS_INLINE static void setVirtualPort0(Port port) {
+		PORTCFG_VPCTRLA = (PORTCFG_VPCTRLA & ~PORTCFG_VP0MAP_gm) | (static_cast<uint8_t>(port) & PORTCFG_VP0MAP_gm);
+	}
+	ALWAYS_INLINE static void setVirtualPort1(Port port) {
+		PORTCFG_VPCTRLA = (PORTCFG_VPCTRLA & ~PORTCFG_VP1MAP_gm) | (static_cast<uint8_t>(port) & PORTCFG_VP1MAP_gm);
+	}
+	ALWAYS_INLINE static void setVirtualPort2(Port port) {
+		PORTCFG_VPCTRLB = (PORTCFG_VPCTRLB & ~PORTCFG_VP2MAP_gm) | (static_cast<uint8_t>(port) & PORTCFG_VP2MAP_gm);
+	}
+	ALWAYS_INLINE static void setVirtualPort3(Port port) {
+		PORTCFG_VPCTRLB = (PORTCFG_VPCTRLB & ~PORTCFG_VP3MAP_gm) | (static_cast<uint8_t>(port) & PORTCFG_VP3MAP_gm);
+	}
+	
+	/// enables RTC output on `GpioC6`
+	ALWAYS_INLINE static void enableRTC_Output() {
+		PORTCFG_CLKEVOUT |= PORTCFG_RTCOUT_bm;
+	}
+	/// disables RTC output on `GpioC6`
+	ALWAYS_INLINE static void disableRTC_Output() {
+		PORTCFG_CLKEVOUT &= ~PORTCFG_RTCOUT_bm;
+	}
+	
+	/// @warning some Xmegas output only channel 7 regardless of selection
+	ALWAYS_INLINE static void enableEventChannelOutput(Output output, uint8_t channel) {
+		PORTCFG_CLKEVOUT = (PORTCFG_CLKEVOUT & ~(PORTCFG_CLKEVPIN_bm | PORTCFG_EVOUT_gm)) |
+				(i(output) & (PORTCFG_CLKEVPIN_bm | PORTCFG_EVOUT_gm));
+		PORTCFG_EVOUTSEL = (PORTCFG_EVOUTSEL & ~PORTCFG_EVOUTSEL_gm) | (channel & PORTCFG_EVOUTSEL_gm);
+	}
+	ALWAYS_INLINE static void disableEventChannelOutput() {
+		PORTCFG_CLKEVOUT &= ~PORTCFG_EVOUT_gm;
+	}
+	
+	/// @warning this overrides the output of `enableEventChannelOutput()`!
+	ALWAYS_INLINE static void enablePeripheralClockOutput(Output output,
+			ClockMultiplier multiplier = ClockMultiplier::Mult1X) {
+		PORTCFG_CLKEVOUT = (PORTCFG_CLKEVOUT & ~(PORTCFG_CLKEVPIN_bm | PORTCFG_CLKOUT_gm | PORTCFG_CLKOUTSEL_gm)) |
+				(i(output) & (PORTCFG_CLKEVPIN_bm | PORTCFG_CLKOUT_gm)) | i(multiplier);
+	}
+	ALWAYS_INLINE static void enablePeripheralClockOutput() {
+		PORTCFG_CLKEVOUT &= ~PORTCFG_CLKOUT_gm;
+	}
+	
+protected:
+	/// Enum class to integer helper functions
+	/// @{
+	static constexpr uint8_t
+	i(Output output) { return static_cast<uint8_t>(output); }
+	static constexpr uint8_t
+	i(ClockMultiplier mult) { return static_cast<uint8_t>(mult); }
+	/// @}
+};
+
+
+%% for gpio in gpios
+	%% set port = gpio.port | upper
+	%% set pin  = gpio.id
+	%% for type in ["Output", "Input", ""]
+		%% set name = "Gpio" ~ type ~ port ~ pin
+		%% set superclass = "Gpio" ~ (type if type != "" else "IO")
+/// {{type if type != "" else "IO"}} class for Pin {{port ~ pin}}
+/// @ingroup	xmega
+class {{name}} : public Gpio, ::xpcc::{{superclass}}
+{
+private:
+	static constexpr uint8_t pin = {{pin}};
+	static constexpr uint8_t mask = (1 << pin);
+
+	static constexpr PORT_t *port = &PORT{{port}};
+	static constexpr uint8_t eventChannelMuxInput = static_cast<uint8_t>((reinterpret_cast<uint16_t>(&PORT{{port}}) - 0x0600)/4 + 0x50 + {{pin}});
+	static constexpr uint16_t interrupt0VectorNumber = PORT{{port}}_INT0_vect_num;
+	static constexpr uint16_t interrupt1VectorNumber = PORT{{port}}_INT1_vect_num;
+
+public:
+	ALWAYS_INLINE static void
+	configure(Configuration config,
+			  Inverted invert = Inverted::No) {
+		PORT{{port}}_PIN{{pin}}CTRL = (PORT{{port}}_PIN{{pin}}CTRL & ~(PORT_OPC_gm | PORT_INVEN_bm)) |
+				i(config) | (invert == Inverted::Yes) ? PORT_INVEN_bm : 0;
+	}
+		%% if type in ["", "Output"]
+	// GpioOutput
+	// start documentation inherited
+	ALWAYS_INLINE static void setOutput() {
+		PORT{{port}}_DIRSET = mask;
+	}
+	ALWAYS_INLINE static void setOutput(bool value) {
+		set(value);
+		setOutput();
+	}
+	ALWAYS_INLINE static void set() {
+		PORT{{port}}_OUTSET = mask;
+	}
+	ALWAYS_INLINE static void set(bool status) {
+		if (status) { set(); }
+		else { reset(); }
+	}
+	ALWAYS_INLINE static void reset() {
+		PORT{{port}}_OUTCLR = mask;
+	}
+	ALWAYS_INLINE static void toggle() {
+		PORT{{port}}_OUTTGL = mask;
+	}
+	// end documentation inherited
+	ALWAYS_INLINE static void setOutput(Configuration config,
+										Inverted invert = Inverted::No) {
+		configure(config, invert);
+		setOutput();
+	}
+	ALWAYS_INLINE static void enableSlewRateLimit() {
+		PORT{{port}}_PIN{{pin}}CTRL |= PORT_SRLEN_bm;
+	}
+	ALWAYS_INLINE static void disableSlewRateLimit() {
+		PORT{{port}}_PIN{{pin}}CTRL &= ~PORT_SRLEN_bm;
+	}
+		%% endif
+		%% if type in ["", "Input"]
+	// GpioInput
+	// start documentation inherited
+	ALWAYS_INLINE static void
+	setInput() {
+		 PORT{{port}}_DIRCLR = mask; 
+	}
+	ALWAYS_INLINE static bool read() {
+		(void) {{pin}};
+		return (PORT{{port}}_IN & mask);
+	}
+	// end documentation inherited
+	ALWAYS_INLINE static void setInput(Configuration config,
+										Inverted invert = Inverted::No) {
+		setInput();
+		configure(config, invert);
+	}
+	ALWAYS_INLINE static void setInputTrigger(InputTrigger trigger) {
+		PORT{{port}}_PIN{{pin}}CTRL = (PORT{{port}}_PIN{{pin}}CTRL & ~PORT_ISC_gm) | i(trigger);
+	}
+	ALWAYS_INLINE static void enableExternalInterrupt0(InterruptLevel level) {
+		PORT{{port}}_INT0MASK |= mask;
+		PORT{{port}}_INTCTRL = (PORT{{port}}_INTCTRL & ~PORT_INT0LVL_gm) | (::xpcc::xmega::i(level) & PORT_INT0LVL_gm);
+	}
+	ALWAYS_INLINE static void enableExternalInterrupt1(InterruptLevel level) {
+		PORT{{port}}_INT1MASK |= mask;
+		PORT{{port}}_INTCTRL = (PORT{{port}}_INTCTRL & ~PORT_INT1LVL_gm) | ((::xpcc::xmega::i(level) << 2) & PORT_INT1LVL_gm);
+	}
+	ALWAYS_INLINE static void disableExternalInterrupt0() {
+		PORT{{port}}_INT0MASK &= ~mask;
+	}
+	ALWAYS_INLINE static void disableExternalInterrupt1() {
+		PORT{{port}}_INT1MASK &= ~mask;
+	}
+	ALWAYS_INLINE static bool getExternalInterruptFlag0() {
+		return (PORT{{port}}_INTFLAGS & PORT_INT0IF_bm);
+	}
+	ALWAYS_INLINE static bool getExternalInterruptFlag1() {
+		return (PORT{{port}}_INTFLAGS & PORT_INT1IF_bm);
+	}
+	ALWAYS_INLINE static void acknowledgeExternalInterruptFlag0() {
+		PORT{{port}}_INTFLAGS |= PORT_INT0IF_bm;
+	}
+	ALWAYS_INLINE static void acknowledgeExternalInterruptFlag1() {
+		PORT{{port}}_INTFLAGS |= PORT_INT1IF_bm;
+	}
+			%% if port in ['A', 'B', 'C', 'D', 'E', 'F']
+	ALWAYS_INLINE static void enableInputBuffer() {
+		PORT{{port}}_PIN{{pin}}CTRL &= ~PORT_ISC_gm;
+	}
+	/// disables the input buffer, when using this pin as analog input
+	ALWAYS_INLINE static void disableInputBuffer() {
+		PORT{{port}}_PIN{{pin}}CTRL = (PORT{{port}}_PIN{{pin}}CTRL & ~PORT_ISC_gm) | PORT_ISC_INPUT_DISABLE_gc;
+	}
+			%% endif
+		%% endif
+	// connect: Hardware Gpio
+		%% for af in gpio.afs
+			%% if (	(af.type == 'in' and type == 'Input') or
+					(af.type == 'out' and type == 'Output') or
+					(af.type == 'io' or type == "")	)
+	/// Connect `{{port~pin}}` as `{{af.name}}` to `{{af.peripheral}}`.
+				%% if 'remap' in af
+					%% if af.peripheral.startswith('Spi')
+	/// This method remaps the following SpiMaster connections: 
+						%% if af.remap == 'True'
+	/// Mosi to pin 7 to and Sck to pin 5.
+						%% else
+	/// Mosi to pin 5 to and Sck to pin 7.
+						%% endif
+					%% elif af.peripheral.startswith('UartSpi')
+	/// This method remaps the following UartSpiMaster 0 connections:
+						%% if af.remap == 'True'
+	/// Sck to pin 5, Miso/Somi to pin 6 and Mosi/Simo to pin 7.
+						%% else
+	/// Sck to pin 1, Miso/Somi to pin 2 and Mosi/Simo to pin 3.
+						%% endif
+					%% elif af.peripheral.startswith('TimerCounter')
+						%% set inst = af.name[2:]|upper
+						%% if af.remap == 'True' and inst in ['A', 'B']
+	/// This method remaps the Output Compare {{inst}} of TimerCounter 0
+	/// onto the Output Compare {{inst}} of TimerCounter 1.
+	/// The resulting PWM will be an OR-modulation between the two PWM outputs.
+						%% endif
+					%% endif
+				%% endif
+	ALWAYS_INLINE static void
+	connect(TypeId::{{ af.peripheral }}{{ af.name }}) {
+				%% if 'remap' in af
+					%% if af.peripheral.startswith('Spi')
+						%% set bitmask = 'PORT_SPI_bm'
+					%% elif af.peripheral.startswith('Uart')
+						%% set bitmask = 'PORT_USART0_bm'
+					%% elif af.peripheral.startswith('TimerCounter')
+						%% set bitmask = 'PORT_TC'+af.peripheral[-1:]+af.name[2:].upper()+"_bm"
+					%% endif
+					%% if af.remap == 'True'
+		PORT{{port}}_REMAP |= {{bitmask}};
+					%% else
+		PORT{{port}}_REMAP &= ~{{bitmask}};
+					%% endif
+				%% endif
+				%% if af.name == "Txd"
+		set();
+				%% endif
+				%% if af.type == "out"
+		setOutput();
+				%% elif af.type== "in"
+		setInput();
+				%% endif
+	}
+			%% endif
+		%% endfor
+	// connect: Software Gpio
+		%% if type in ['', 'Output']
+			%% for peripheral in   ['SoftwareSpiMasterMosi',
+									'SoftwareSpiMasterSck']
+	/// Connect to `{{peripheral}}`.
+	ALWAYS_INLINE static void
+	connect(::xpcc::TypeId::{{ peripheral }}) {
+		configure(Configuration::Floating);
+		setOutput();
+		set();
+	}
+			%% endfor
+			%% for peripheral in   ['SoftwareI2cMasterSda',
+									'SoftwareI2cMasterScl']
+	/// Connect to `{{peripheral}}`.
+	ALWAYS_INLINE static void
+	connect(::xpcc::TypeId::{{ peripheral }}) {
+		configure(Configuration::OpenDrain);
+		setOutput();
+		set();
+	}
+			%% endfor
+		%% endif
+		%% if type in ['', 'Input']
+			%% for peripheral in ['SoftwareSpiMasterMiso']
+	/// Connect to `{{peripheral}}`.
+	ALWAYS_INLINE static void
+	connect(::xpcc::TypeId::{{ peripheral }}) {
+		configure(Configuration::Floating);
+		setInput();
+	}
+			%% endfor
+		%% endif
+};
+
+	%% endfor
+%% endfor
+
+%% for port in gpios | getPorts
+/// Hardware access for port {{port.name}}.
+/// @ingroup xmega
+template< uint8_t START_PIN, uint8_t WIDTH >
+class GpioPort{{port.name}} : public ::xpcc::GpioPort, public Gpio
+{
+	static_assert(START_PIN >= {{port.startPin}}, "START_PIN too small, minimum {{port.startPin}}.");
+	static_assert(START_PIN < {{port.startPin + port.width}}, "START_PIN too large, maximum {{port.startPin + port.width-1}}.");
+	static_assert(WIDTH <= {{port.width}}, "WIDTH too large, maximum {{port.width}}.");
+	static_assert(WIDTH > 0, "WIDTH should be at least 1.");
+	static_assert(START_PIN + WIDTH <= {{port.startPin + port.width}}, "START_PIN + WIDTH too large, maximum {{port.startPin + port.width}}.");
+	
+	static constexpr uint8_t dataMask = (1 << WIDTH) - 1;
+	static constexpr uint8_t portMask = dataMask << START_PIN;
+
+public:
+	static constexpr uint8_t width = WIDTH;
+	
+public:
+	ALWAYS_INLINE static void setOutput() {
+		PORT{{port.name}}_DIRSET |= portMask;
+	}
+	ALWAYS_INLINE static void setInput() {
+		PORT{{port.name}}_DIRCLR |= portMask;
+	}
+	ALWAYS_INLINE static void configure(Configuration config,
+										Inverted invert = Inverted::No) {
+		PORTCFG_MPCMASK = portMask;
+		*(&PORT{{port.name}}_PIN0CTRL + START_PIN) = i(config) | ((invert == Inverted::Yes) ? PORT_INVEN_bm : 0);
+	}
+	ALWAYS_INLINE static uint8_t read() {
+		uint8_t data = PORT{{port.name}}_IN & portMask;
+		return (data >> START_PIN);
+	}
+	ALWAYS_INLINE static void write(uint8_t data) {
+		data <<= START_PIN;
+		PORT{{port.name}}_OUTCLR |= portMask;
+		PORT{{port.name}}_OUTSET |= (data & portMask);
+	}
+};
+
+%% endfor
+
+}	// namespace xmega
+
+}	// namespace xpcc
+
+#endif
+

@@ -1,0 +1,216 @@
+// coding: utf-8
+/* Copyright (c) 2013, Roboterclub Aachen e.V.
+* All Rights Reserved.
+*
+* The file is part of the xpcc library and is released under the 3-clause BSD
+* license. See the file `LICENSE` for the full license governing this code.
+*/
+// ----------------------------------------------------------------------------
+%% if id in [1, 2, 3, 6]
+%%	set uart = "Usart"
+%% elif id in [4, 5]
+%%	set uart = "Uart"
+%% endif
+%#
+%% set name = uart ~ id
+%% set hal = uart ~ "Hal" ~ id
+
+#include "../../../device.hpp"
+#include "{{ uart | lower }}_hal_{{ id }}.hpp"
+#include "{{ uart | lower }}_{{ id }}.hpp"
+
+%% if parameters.buffered
+#include <xpcc/architecture/driver/atomic.hpp>
+
+namespace
+{
+	static xpcc::atomic::Queue<char, {{ parameters.rx_buffer }}> rxBuffer;
+	static xpcc::atomic::Queue<char, {{ parameters.tx_buffer }}> txBuffer;
+	static bool isBlocking = true;
+}
+%% endif
+
+%% if parameters.buffered
+void
+xpcc::stm32::{{ name }}::initializeBuffered(uint32_t interruptPriority,
+											bool blocking)
+{
+	{{ hal }}::enableInterruptVector(true, interruptPriority);
+	{{ hal }}::enableInterrupt(Interrupt::RxNotEmpty);
+	isBlocking = blocking;
+}
+%% endif
+
+void
+xpcc::stm32::{{ name }}::writeBlocking(uint8_t data)
+{
+	while(!{{ hal }}::isTransmitRegisterEmpty());
+	{{ hal }}::write(data);
+}
+
+void
+xpcc::stm32::{{ name }}::writeBlocking(const uint8_t *data, std::size_t length)
+{
+	while (length-- != 0) {
+		writeBlocking(*data++);
+	}
+}
+
+void
+xpcc::stm32::{{ name }}::flushWriteBuffer()
+{
+%% if parameters.buffered
+	while(!isWriteFinished());
+%% else
+	return;
+%% endif
+}
+
+bool
+xpcc::stm32::{{ name }}::write(uint8_t data)
+{
+%% if parameters.buffered
+	if(txBuffer.isEmpty() && {{ hal }}::isTransmitRegisterEmpty()) {
+		{{ hal }}::write(data);
+	} else {
+		while (!txBuffer.push(data)) {
+			if (!isBlocking) {	// if queue is full => block
+				return false;	// if not supposed ot block return false
+			}
+		}
+		// Disable interrupts while enabling the transmit interrupt
+		atomic::Lock lock;
+		// Transmit Data Register Empty Interrupt Enable
+		{{ hal }}::enableInterrupt(Interrupt::TxEmpty);
+	}
+	return true;
+%% else
+	if({{ hal }}::isTransmitRegisterEmpty()) {
+		{{ hal }}::write(data);
+		return true;
+	} else {
+		return false;
+	}
+%% endif
+}
+
+std::size_t
+xpcc::stm32::{{ name }}::write(const uint8_t *data, std::size_t length)
+{
+	uint32_t i = 0;
+	for (; i < length; ++i)
+	{
+		if (!write(*data++)) {
+			return i;
+		}
+	}
+	return i;
+}
+
+bool
+xpcc::stm32::{{ name }}::isWriteFinished()
+{
+	return txBuffer.isEmpty() && {{ hal }}::isTransmitRegisterEmpty();
+}
+
+std::size_t
+xpcc::stm32::{{ name }}::discardTransmitBuffer()
+{
+%% if parameters.buffered
+	std::size_t count = 0;
+	// disable interrupt since buffer will be cleared
+	{{ hal }}::disableInterrupt({{ hal }}::Interrupt::TxEmpty);
+	while(!txBuffer.isEmpty()) {
+		++count;
+		txBuffer.pop();
+	}
+	return count;
+%% else
+	return 0;
+%% endif
+}
+
+bool
+xpcc::stm32::{{ name }}::read(uint8_t &data)
+{
+%% if parameters.buffered
+	if (rxBuffer.isEmpty()) {
+		return false;
+	} else {
+		data = rxBuffer.get();
+		rxBuffer.pop();
+		return true;
+	}
+%% else
+	if({{ hal }}::isReceiveRegisterNotEmpty()) {
+		data = {{ hal }}::read();
+		return true;
+	} else {
+		return false;
+	}
+%% endif
+}
+
+std::size_t
+xpcc::stm32::{{ name }}::read(uint8_t *data, std::size_t length)
+{
+%% if parameters.buffered
+	uint32_t i = 0;
+	for (; i < length; ++i)
+	{
+		if (rxBuffer.isEmpty()) {
+			return i;
+		} else {
+			*data++ = rxBuffer.get();
+			rxBuffer.pop();
+		}
+	}
+	return i;
+%% else
+	(void)n; // avoid compiler warning
+	if(read(*data)) {
+		return 1;
+	} else {
+		return 0;
+	}
+%% endif
+}
+
+std::size_t
+xpcc::stm32::{{ name }}::discardReceiveBuffer()
+{
+%% if parameters.buffered
+	std::size_t count = 0;
+	while(!rxBuffer.isEmpty()) {
+		++count;
+		rxBuffer.pop();
+	}
+	return count;
+%% else
+	return 0;
+%% endif
+}
+
+
+%% if parameters.buffered
+%% set hal = "xpcc::stm32::" ~ hal
+extern "C" void
+{{ uart | upper ~ id }}_IRQHandler()
+{
+	if ({{ hal }}::isReceiveRegisterNotEmpty()) {
+		// TODO: save the errors
+		uint8_t data = {{ hal }}::read();
+		rxBuffer.push(data);
+	}
+	if ({{ hal }}::isTransmitRegisterEmpty()) {
+		if (txBuffer.isEmpty()) {
+			// transmission finished, disable TxEmpty interrupt
+			{{ hal }}::disableInterrupt({{ hal }}::Interrupt::TxEmpty);
+		}
+		else {
+			{{ hal }}::write(txBuffer.get());
+			txBuffer.pop();
+		}
+	}
+}
+%% endif

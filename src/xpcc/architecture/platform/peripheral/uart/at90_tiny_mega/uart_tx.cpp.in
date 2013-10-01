@@ -1,0 +1,124 @@
+// coding: utf-8
+/* Copyright (c) 2009, Roboterclub Aachen e.V.
+ * All Rights Reserved.
+ *
+ * The file is part of the xpcc library and is released under the 3-clause BSD
+ * license. See the file `LICENSE` for the full license governing this code.
+ */
+// ----------------------------------------------------------------------------
+{{ generation_block }}
+
+#include <xpcc/architecture/driver/atomic/queue.hpp>
+#include <xpcc/architecture/driver/atomic/lock.hpp>
+
+#include "uart_defines.h"
+#include "uart{{ id }}.hpp"
+
+static xpcc::atomic::Queue<uint8_t, {{parameters.tx_buffer}}> txBuffer;
+
+// ----------------------------------------------------------------------------
+ISR(USART{{ id }}_UDRE_vect)
+{
+	if (txBuffer.isEmpty())
+	{
+		// transmission finished, disable UDRE interrupt
+		UCSR{{ id }}B &= ~(1 << UDRIE{{ id }});
+	}
+	else {
+		// get one byte from buffer and write it to the UART buffer
+		// which starts the transmission
+		UDR{{ id }} = txBuffer.get();
+		txBuffer.pop();
+	}
+}
+
+// MARK: - write blocking
+void
+xpcc::{{target.family}}::Uart{{ id }}::writeBlocking(uint8_t data)
+{
+	// wait until there is some place in the buffer
+	while (!write(data))
+		;
+
+	// wait until everything has been sent
+	while (!isWriteFinished())
+		;
+}
+
+void
+xpcc::{{target.family}}::Uart{{ id }}::writeBlocking(const uint8_t *data, std::size_t length)
+{
+	// first push everything into the buffer
+	for (std::size_t i = 0; i < length; ++i)
+	{
+		while (!write(*data++))
+			;
+	}
+
+	// then wait
+	while (!isWriteFinished())
+		;
+}
+
+void
+xpcc::{{target.family}}::Uart{{ id }}::flushWriteBuffer()
+{
+	// just wait until the last byte has been sent
+	while (!isWriteFinished())
+		;
+}
+
+// MARK: - write
+bool
+xpcc::{{target.family}}::Uart{{ id }}::write(uint8_t data)
+{
+	if (!txBuffer.push(data))
+		return false;
+
+	::xpcc::atomic::Lock lock;
+
+	// enable UDRE interrupt
+	UCSR{{ id }}B |= (1 << UDRIE{{ id }});
+
+	return true;
+}
+
+std::size_t
+xpcc::{{target.family}}::Uart{{ id }}::write(const uint8_t *data, std::size_t length)
+{
+	for (std::size_t i = 0; i < length; ++i)
+	{
+		if (!write(*data++))
+		{
+			return i;
+		}
+	}
+
+	return length;
+}
+
+bool
+xpcc::{{target.family}}::Uart{{ id }}::isWriteFinished()
+{
+	return (txBuffer.isEmpty() && !(UCSR{{ id }}B & (1 << UDRIE{{ id }})));
+}
+
+// MARK: - discard
+std::size_t
+xpcc::{{target.family}}::Uart{{ id }}::discardTransmitBuffer()
+{
+	{
+		::xpcc::atomic::Lock lock;
+		UCSR{{ id }}B &= ~(1 << UDRIE{{ id }});
+	}
+
+	std::size_t i = 0;
+	while(!txBuffer.isEmpty())
+	{
+		txBuffer.pop();
+		++i;
+	}
+
+	return i;
+}
+

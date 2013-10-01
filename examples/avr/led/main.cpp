@@ -1,21 +1,30 @@
 // coding: utf-8
 #include <xpcc/architecture/platform.hpp>
 
+using namespace xpcc::xmega;
+
 // LED FADER ##################################################################
 #include <xpcc/driver/pwm/tlc594x.hpp>
 #include <xpcc/driver/pwm/max6966.hpp>
+
+typedef GpioOutputD4 Vprog;
+typedef GpioinputD1 Xerr;
+typedef GpioOutputD3 Blank;
+typedef GpioOutputD2 Xlat;
+typedef GpioOutputC7 Clkout;
+
 GPIO__OUTPUT(VPROG, D, 4);
 GPIO__INPUT(XERR, D, 1);
 GPIO__OUTPUT(BLANK, D, 3);
 GPIO__OUTPUT(XLAT, D, 2);
 GPIO__OUTPUT(CLKOUT, C, 7);
 
-#include <xpcc/driver/ui/led.hpp>
+#include <xpcc/ui/led.hpp>
 
-typedef xpcc::atxmega::UartSpiMasterD1 LedSpi;
-typedef xpcc::atxmega::TimerD0 LedTimer;
-typedef xpcc::TLC594X< 16, LedSpi, XLAT, VPROG, XERR > ledController;
-typedef xpcc::MAX6966< LedSpi, XLAT, 4 > ledController2;
+typedef xpcc::xmega::UartSpiMasterD1 LedSpi;
+typedef xpcc::xmega::TimerD0 LedTimer;
+typedef xpcc::TLC594X< 16, LedSpi, Xlat, Vprog, Xerr > ledController;
+typedef xpcc::MAX6966< LedSpi, Xlat, 4 > ledController2;
 
 xpcc::led::TLC594XLed< ledController > red(2);
 xpcc::led::TLC594XLed< ledController > green(3);
@@ -32,36 +41,36 @@ xpcc::led::DoubleIndicator strobe(&red);
 ISR(TCC1_OVF_vect)
 {
 	xpcc::Clock::increment();
-	
+
 	ledController::writeChannels();
 }
 
 MAIN_FUNCTION // FINALLY ######################################################
 {	// INIT BASICS
 	// Switch main clock to 32 MHz
-	xpcc::atxmega::enableExternalOscillator(OSC_FRQRANGE_2TO9_gc, OSC_XOSCSEL_XTAL_256CLK_gc);
-	xpcc::atxmega::enablePll(OSC_PLLSRC_XOSC_gc, 4);
-	xpcc::atxmega::setSystemClockPrescaler(CLK_PSADIV_1_gc, CLK_PSBCDIV_1_1_gc);
-	xpcc::atxmega::selectSystemClockSource(CLK_SCLKSEL_PLL_gc);
-	
-	xpcc::atxmega::TimerC1::setMsTimer();
-	
+	xpcc::xmega::enableExternalOscillator(OSC_FRQRANGE_2TO9_gc, OSC_XOSCSEL_XTAL_256CLK_gc);
+	xpcc::xmega::enablePll(OSC_PLLSRC_XOSC_gc, 4);
+	xpcc::xmega::setSystemClockPrescaler(CLK_PSADIV_1_gc, CLK_PSBCDIV_1_1_gc);
+	xpcc::xmega::selectSystemClockSource(CLK_SCLKSEL_PLL_gc);
+
+	xpcc::xmega::TimerC1::setMsTimer();
+
 	// LED FADER **************************************************************
-	xpcc::atxmega::DmaController::initialize();
+	xpcc::xmega::DmaController::initialize();
 	LedSpi::initialize(F_CPU/2);
-	XERR::setInput(xpcc::atxmega::PULLUP);
-	BLANK::setOutput(xpcc::gpio::LOW);
-	
+	Xerr::setInput(Configuration::PullUp);
+	Blank::setOutput(xpcc::Gpio::LOW);
+
 	// initialize the tlc5940
 	ledController::initialize(0, 63, true, false);
 	ledController::setDotCorrection(3, 10);
 	ledController::setDotCorrection(4, 20);
 	ledController::writeDotCorrection();
-	
+
 	// GSCLK, 32MHz Grayscale clock
 	CLKOUT::setOutput();
-	PORTCFG.CLKEVOUT = PORTCFG_CLKOUT_PC7_gc;
-	
+	PortConfiguration::enablePeripheralClockOutput(PortConfiguration::Output::GpioC7);
+
 	// the Grayscale counter needs to be manually reset to 0
 	// This happens at 32000kHz/4096 = 7.8125kHz
 	// So we need to set and reset the BLANK pin at a slightly lower frequency
@@ -72,20 +81,20 @@ MAIN_FUNCTION // FINALLY ######################################################
 	LedTimer::enableCompareCapture(TC0_CCDEN_bm);
 	LedTimer::getModuleBase().CCD = 1;
 	LedTimer::getModuleBase().PER = 513;
-	
-	// The MAX6966 requires a bit less external hardware 
+
+	// The MAX6966 requires a bit less external hardware
 	ledController2::initialize(xpcc::max6966::CURRENT_20mA);
-	
+
 	// INTERRUPTS *************************************************************
-	xpcc::atxmega::enableInterruptLevel(xpcc::atxmega::INTERRUPT_CONTROL_LEVEL_ALL);
-	xpcc::atxmega::enableInterrupts();
-	
+	xpcc::xmega::enableInterruptLevel(xpcc::xmega::INTERRUPT_CONTROL_LEVEL_ALL);
+	xpcc::xmega::enableInterrupts();
+
 	pulse.pulse(20);
 	indicator.indicate(200);
 	strobe.indicate(20);
-	
+
 	ledController2::setChannel(17, 200);
-	
+
 	while (1)
 	{
 		pulse.run();

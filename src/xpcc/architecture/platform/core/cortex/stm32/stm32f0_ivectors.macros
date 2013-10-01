@@ -1,0 +1,59 @@
+%# coding: utf-8
+%# ----------------------------------------------------------------------------
+%#* Copyright (c) 2013, Roboterclub Aachen e.V.
+%#* All rights reserved.
+%#*
+%#* Redistribution and use in source and binary forms, with or without
+%#* modification, are permitted provided that the following conditions are met:
+%#* 
+%#*     * Redistributions of source code must retain the above copyright
+%#*       notice, this list of conditions and the following disclaimer.
+%#*     * Redistributions in binary form must reproduce the above copyright
+%#*       notice, this list of conditions and the following disclaimer in the
+%#*       documentation and/or other materials provided with the distribution.
+%#*     * Neither the name of the Roboterclub Aachen e.V. nor the
+%#*       names of its contributors may be used to endorse or promote products
+%#*       derived from this software without specific prior written permission.
+%#*
+%#* THIS SOFTWARE IS PROVIDED BY ROBOTERCLUB AACHEN E.V. ''AS IS'' AND ANY
+%#* EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+%#* WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+%#. IN NO EVENT SHALL ROBOTERCLUB AACHEN E.V. BE LIABLE FOR ANY
+%#* DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+%#* (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+%#* LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+%#* ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+%#* (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+%#* THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+%#*/
+
+%% do i.update({ 0: ["WWDG_IRQHandler", "Window Watchdog"]})
+%% do i.update({ 1: ["PVD_IRQHandler", "PVD through EXTI Line detect"]})
+%% do i.update({ 2: ["RTC_IRQHandler", "RTC through EXTI Line"]})
+%% do i.update({ 3: ["FLASH_IRQHandler", ""]})
+%% do i.update({ 4: ["RCC_IRQHandler", ""]})
+%% do i.update({ 5: ["EXTI0_1_IRQHandler", "EXTI Line 0 and 1 "]})
+%% do i.update({ 6: ["EXTI2_3_IRQHandler", "EXTI Line 2 and 3"]})
+%% do i.update({ 7: ["EXTI4_15_IRQHandler", "EXTI Line 4 to 15"]})
+%% do i.update({ 8: ["TS_IRQHandler", ""]})
+%% do i.update({ 9: ["DMA1_Channel1_IRQHandler", "DMA1 Channel 1"]})
+%% do i.update({10: ["DMA1_Channel2_3_IRQHandler", "DMA1 Channel 2 and Channel 3"]})
+%% do i.update({11: ["DMA1_Channel4_5_IRQHandler", "DMA1 Channel 4 and Channel 5"]})
+%% do i.update({12: ["ADC1_COMP_IRQHandler", "Adc1, Comp1, Comp2"]})
+%% do i.update({13: ["TIM1_BRK_UP_TRG_COM_IRQHandler", "Timer1 Break, Update, Trigger and Commutation "]})
+%% do i.update({14: ["TIM1_CC_IRQHandler", "Timer1 Capture Compare"]})
+%% do i.update({15: ["TIM2_IRQHandler", "Timer2"]})
+%% do i.update({16: ["TIM3_IRQHandler", "Timer3"]})
+%% do i.update({17: ["TIM6_DAC_IRQHandler", "Timer6"]})
+%% do i.update({19: ["TIM14_IRQHandler", "Timer14"]})
+%% do i.update({20: ["TIM15_IRQHandler", "Timer15"]})
+%% do i.update({21: ["TIM16_IRQHandler", "Timer16"]})
+%% do i.update({22: ["TIM17_IRQHandler", "Timer17"]})
+%% do i.update({23: ["I2C1_IRQHandler", "I2c1"]})
+%% do i.update({24: ["I2C2_IRQHandler", "I2c2"]})
+%% do i.update({25: ["SPI1_IRQHandler", "Spi1"]})
+%% do i.update({26: ["SPI2_IRQHandler", "Spi2"]})
+%% do i.update({27: ["USART1_IRQHandler", "Usart1"]})
+%% do i.update({28: ["USART2_IRQHandler", "Usart2"]})
+%% do i.update({30: ["CEC_IRQHandler", "CEC"]})
+

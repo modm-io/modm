@@ -34,11 +34,11 @@
 #include <xpcc/architecture.hpp>
 
 #include <xpcc/communication/abstract_component.hpp>
-#include <xpcc/workflow/periodic_timer.hpp>
+#include <xpcc/processing/periodic_timer.hpp>
 
 #include "communication/packets.hpp"
 
-typedef xpcc::lpc111x::AdcAutomaticBurst Adc;
+typedef xpcc::lpc::AdcAutomaticBurst Adc;
 
 namespace component
 {

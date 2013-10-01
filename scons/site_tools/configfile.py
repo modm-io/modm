@@ -93,13 +93,13 @@ class FileList(list):
 	def __append(self, item):
 		if not isinstance(item, SCons.Node.Node):
 			item = SCons.Node.FS.default_fs.File(str(item))
-			print dir(item)
+			# print dir(item)
 		if not self.__contains__(item):
 			list.append(self, item)
 	
 	def extend(self, l):
 		for item in l:
-			self.__append(item)
+			self.append(item)
 	
 	def __iadd__(self, item):
 		self.append(item)

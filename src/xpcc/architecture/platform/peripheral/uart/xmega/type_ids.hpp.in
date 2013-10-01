@@ -1,0 +1,33 @@
+// coding: utf-8
+/* Copyright (c) 2013, Roboterclub Aachen e.V.
+ * All Rights Reserved.
+ *
+ * The file is part of the xpcc library and is released under the 3-clause BSD
+ * license. See the file `LICENSE` for the full license governing this code.
+ */
+// ----------------------------------------------------------------------------
+
+#ifndef XPCC_XMEGA_UART_TYPE_IDS_HPP
+#define XPCC_XMEGA_UART_TYPE_IDS_HPP
+
+namespace xpcc
+{
+
+namespace xmega
+{
+
+namespace TypeId
+{
+%% for id in ['C0','C1','D0','D1','E0','E1','F0','F1']
+	typedef struct{} Uart{{id}}Rxd;
+	typedef struct{} Uart{{id}}Txd;
+	typedef struct{} Uart{{id}}Xck;
+
+%% endfor
+}
+
+} // namespace xmega
+
+} // namespace xpcc
+
+#endif // XPCC_XMEGA_UART_TYPE_IDS_HPP

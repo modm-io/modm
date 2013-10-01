@@ -1,0 +1,49 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE rca SYSTEM "../devicefile.dtd">
+<rca version="1.0">
+	<device platform="lpc" family="11" name="c24">
+		<!-- Flash and RAM sizes -->
+		<flash device-name="c24">32768</flash>
+		<ram>8192</ram>
+		<!-- Linker Script -->
+		<linkerscript device-name="c24">lpc11c24.ld</linkerscript>
+		<!-- Core -->
+		<core>cortex-m0</core>
+		<!-- Number of pins -->
+		<pin-count device-name="c24">64</pin-count>
+		<!-- Headers to be included with the {{ include_device_headers }} substitution-->
+		<header>lpc11xx/cmsis/LPC11xx.h</header>
+		<header>lpc11xx/cmsis/core_cm0.h</header>
+		<header>lpc11xx/cmsis/system_LPC11xx.h</header>
+		<!-- Cpp Defines -->
+		<define>CORTEX_VECTORS_RAM = 0</define>
+		<!-- set to a value > 0 to enable software buffering of CAN messages -->
+		<define>LPC11C_CAN_TX_BUFFER_SIZE = 0</define>
+		<define>LPC11C_CAN_RX_BUFFER_SIZE = 0</define>
+		<!-- The UART is already hardware buffered with a 16 bytes FIFO. -->
+		<!-- If you need a longer queue interrupts are used -->
+		<define>LPC11_UART1_TX_BUFFER_SIZE = 16</define>
+		<define>LPC11_UART1_RX_BUFFER_SIZE = 16</define>
+		<!-- Core Driver -->
+		<driver type="core" name="cortex">
+			<parameter name="allocator">block_allocator</parameter>
+		</driver>
+		<!-- Peripheral Drivers -->
+		<driver type="clock" name="lpc" />
+		<driver type="timer" instances="16_0" name="lpc" />
+		<driver type="uart" name="lpc" />
+		<driver type="gpio" name="lpc">
+			<!--<gpio port="0" id="0" func="Reset,Gpio" bits="mode,hys,od"/>-->
+			<gpio port="0" id="1" func="Gpio,ClockOut,Timer32_0" bits="mode,hys,od"/>
+			<gpio port="0" id="2" func="Gpio,Spi0,Timer16_0" bits="mode,hys,od"/>
+			<gpio port="0" id="3" func="Gpio" bits="mode,hys,od"/>
+			<gpio port="0" id="4" func="Gpio," bits="mode,hys,od"/>
+			<gpio port="0" id="5" func="Gpio,Uart" bits="mode,hys,od"/>
+			<gpio port="0" id="6" func="Gpio,Uart" bits="mode,hys,od"/>
+			<gpio port="0" id="7" func="Gpio,Uart" bits="mode,hys,od"/>
+			<gpio port="0" id="8" func="Gpio,Uart" bits="mode,hys,od"/>
+			<gpio port="0" id="9" func="Gpio,Uart" bits="mode,hys,od"/>
+			<gpio port="3" id="1" />
+		</driver>
+	</device>
+</rca>

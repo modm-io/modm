@@ -43,12 +43,34 @@ scan = env.FindFiles(path = '.', unittest=False)
 sources = scan.sources
 defines = scan.defines
 
+# Platform Files
+architecture_path = os.path.join('.', 'xpcc', 'architecture')
+p_sources, p_defines, p_includes = env.GeneratePlatform(architecture_path)
+
+sources.append(p_sources)
+defines.update(p_defines)
+
+for path in p_includes:
+	envOld.AppendUnique(CPPPATH = path)
+
+
 sources, defines, includes = env.SConscript(
 		os.path.join(env['XPCC_ROOTPATH'], 'ext', 'SConscript'),
 		exports = 'env sources defines')
 
 for path in includes:
 	envOld.AppendUnique(CPPPATH = os.path.join(env['XPCC_ROOTPATH'], 'ext', path))
+
+# Update Enivronment Vars set by env.GeneratePlatform for "envOld"
+# FIXME: this is very very ugly
+# Maybe there is a better way....??
+if 'LINKPATH' in env:
+	envOld['LINKPATH'] = env['LINKPATH']
+if 'LINKFILE' in env:
+	envOld['LINKFILE'] = env['LINKFILE']
+if 'DEVICE_SIZE' in env:
+	envOld['DEVICE_SIZE'] = env['DEVICE_SIZE']
+envOld.Append(CPPDEFINES = p_defines)
 
 library = env.Library(target = 'xpcc', source = sources)
 

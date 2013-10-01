@@ -1,6 +1,6 @@
 
 #include <xpcc/architecture.hpp>
-#include <xpcc/workflow/timeout.hpp>
+#include <xpcc/processing/timeout.hpp>
 #include <xpcc/math.hpp>
 
 #include "hardware.hpp"

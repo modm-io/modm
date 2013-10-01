@@ -74,7 +74,7 @@ namespace mcp2515
 	GPIO__OUTPUT(MOSI, B, 5);
 	GPIO__INPUT(MISO, B, 6);
 
-	typedef xpcc::SoftwareSpi<SCLK, MOSI, MISO> Spi;
+	typedef xpcc::SoftwareSpiMaster<SCLK, MOSI, MISO> Spi;
 	typedef xpcc::Mcp2515< Spi, mcp2515::CS, mcp2515::INT > Mcp;
 }
 

@@ -1,10 +1,12 @@
 
 #include <xpcc/architecture/platform.hpp>
-#include <xpcc/driver/connectivity/sab/interface.hpp>
+#include <xpcc/communication/sab/interface.hpp>
+
+using namespace xpcc::atmega;
 
 MAIN_FUNCTION
 {
-	xpcc::sab::Interface< xpcc::atmega::BufferedUart0 > interface;
+	xpcc::sab::Interface< Uart0 > interface;
 	
 	// set baudrate etc.
 	interface.initialize();

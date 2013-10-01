@@ -1,0 +1,218 @@
+%# coding: utf-8
+%# ----------------------------------------------------------------------------
+%#* Copyright (c) 2011, Roboterclub Aachen e.V.
+%#* All rights reserved.
+%#*
+%#* Redistribution and use in source and binary forms, with or without
+%#* modification, are permitted provided that the following conditions are met:
+%#* 
+%#*     * Redistributions of source code must retain the above copyright
+%#*       notice, this list of conditions and the following disclaimer.
+%#*     * Redistributions in binary form must reproduce the above copyright
+%#*       notice, this list of conditions and the following disclaimer in the
+%#*       documentation and/or other materials provided with the distribution.
+%#*     * Neither the name of the Roboterclub Aachen e.V. nor the
+%#*       names of its contributors may be used to endorse or promote products
+%#*       derived from this software without specific prior written permission.
+%#*
+%#* THIS SOFTWARE IS PROVIDED BY ROBOTERCLUB AACHEN E.V. ''AS IS'' AND ANY
+%#* EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+%#* WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+%#. IN NO EVENT SHALL ROBOTERCLUB AACHEN E.V. BE LIABLE FOR ANY
+%#* DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+%#* (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+%#* LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+%#* ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+%#* (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+%#* THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+%#
+
+
+%% macro assertFrequency(name, frequency, type, value)
+%%	if value != None and value|length > 0
+%%		if type|lower == "min"
+	static_assert({{ frequency }} >= {{ value }},
+		"{{ frequency }} of {{ name }} needs to be higher or equal to {{ value }}");
+%%		elif type|lower == "max"
+	static_assert({{ frequency }} <= {{ value }},
+		"{{ frequency }} of {{ name }} needs to be lower or equal to {{ value }}");
+%%		endif
+%%	endif
+%% endmacro
+
+%% macro source(s, type_id_namespace)
+
+%%	if s.fixedFrequency|length > 0
+template<int InputFrequency> class {{ s.name }};
+
+template<>
+class
+{{ s.name }}<{{ s.fixedFrequency }}>
+%%	else
+template<int InputFrequency>
+class
+{{ s.name }}
+%%	endif
+{
+private:
+{{ assertFrequency("InputFrequency", "min", s.minFrequency) }}
+{{ assertFrequency("InputFrequency", "max", s.maxFrequency) }}
+public:
+	static const ::{{type_id_namespace}}::TypeId::{{ s.name }} Id;
+
+	static StartupError
+	enable(const uint32_t waitCycles = 1500)
+	{
+		if (!ClockTree::enableSource(ClockTree::ClockSource::{{ s.name }}, kHz(outputFrequency), waitCycles))
+			return StartupError::{{ s.name }};
+		return StartupError::None;
+	}
+
+	static constexpr int
+%% if s.fixedFrequency|length > 0
+	outputFrequency = {{ s.fixedFrequency }};
+%% else
+	outputFrequency = InputFrequency;
+%% endif
+};
+%% endmacro
+
+
+%% macro pll(p,type_id_namespace)
+%% if p.frequencies|length > 0
+%%		set template = ", " + p.frequencies|join(', ')
+%%		set template_type = ", int " + p.frequencies|join(', int ')
+%% else
+%%		set template = ""
+%%		set template_type = ""
+%% endif
+
+template<class Input, int OutputFrequency{{ template_type }}> class Pll;
+
+%%	for src in p.sources
+template<int InputFrequency, int OutputFrequency{{ template_type }}>
+class
+Pll<{{ src.name }}<InputFrequency>, OutputFrequency{{ template }}>
+{
+public:
+	static const ::{{type_id_namespace}}::TypeId::{{ p.name }} Id;
+
+	static StartupError
+	enable(const uint32_t waitCycles = 1500)
+	{
+		StartupError err = StartupError::None;
+		err = {{ src.name }}<InputFrequency>::enable(waitCycles);
+		if (err != StartupError::None) return err;
+		return PllSetup<InputFrequency,
+				OutputFrequency{{ template }},
+				ClockTree::PllSource::{{ src.name }}>::enable();
+	}
+	static constexpr int
+	outputFrequency = OutputFrequency;
+};
+%%	endfor
+%% endmacro
+
+%% macro _subsink(sink, parent)
+	%% set str = "static constexpr int "
+	%% if sink.name|length > 0
+		%% set str =  str ~ sink.name ~ " = " ~ parent
+		%% if sink.prescaler
+			%% set str = str ~ " * " ~ sink.prescaler
+		%% endif
+	%% else
+		%% set str = str ~ sink ~ " = " ~ parent
+	%% endif
+	{{ str ~ ";" }}
+	%% if sink.name|length > 0 and sink.sinks|length > 0
+		%% for subsink in sink.sinks
+{{ _subsink(subsink, sink.name) }}
+		%% endfor
+	%% endif
+%% endmacro
+
+%% macro sink(s, type_id_namespace)
+
+template<class Input> class {{ s.name }};
+
+%%	for src in s.sources
+
+%# check if source has input
+%%	if src.sources|length > 0
+%%		if src.frequencies|length > 0
+%%			set template = "Input, OutputFrequency, " + src.frequencies|join(', ')
+%%			set template_type = "class Input, int OutputFrequency, int " + src.frequencies|join(', int ')
+%%		else
+%%			set template = "Input, OutputFrequency"
+%%			set template_type = "class Input, int OutputFrequency"
+%%		endif
+%%	else
+%%		set template = "OutputFrequency"
+%%		set template_type = "int OutputFrequency"
+%%	endif
+
+template<{{ template_type }}>
+class
+{{ s.name }}<{{ src.name }}<{{ template }}> >
+{
+private:
+{{ assertFrequency(s.name, "OutputFrequency", "min", s.minFrequency) }}
+{{ assertFrequency(s.name, "OutputFrequency", "max", s.maxFrequency) }}
+%#		FIXME: make optional in order for sink to be more generic
+	static_assert(OutputFrequency == F_CPU,
+	"OutputFrequency needs to match F_CPU value from project.cfg");
+public:
+	/// TypeId to connect an Output to {{ s.name }}
+	static const ::{{type_id_namespace}}::TypeId::{{ s.name }} Id;
+
+	// Frequencies
+	static constexpr int Frequency = OutputFrequency;
+	%% for subsink in s.sinks
+{{ _subsink(subsink, "Frequency") }}
+	%% endfor
+
+	static StartupError
+	enable(const uint32_t waitCycles = 1500)
+	{
+		StartupError err =  {{ src.name }}<{{ template }}>::enable(waitCycles);
+		if (err != StartupError::None) return err;
+		if(ClockTree::switch{{ s.name }}To(
+				ClockTree::{{ s.name }}Source::{{ src.name }}, waitCycles))
+			return StartupError::None;
+		return StartupError::{{ src.name }};
+	}
+};
+%%	endfor
+%% endmacro
+
+%% macro output(o, type_id_namespace)
+class {{ o.name }}
+{
+public:
+	static const ::{{type_id_namespace}}::TypeId::{{ o.name }} Id;
+
+%% if o.divisions|length > 0
+	enum class Division
+	{
+%%	for d in o.divisions
+		By{{ d }} = {{ d }},
+%%	endfor
+	};
+
+	static ALWAYS_INLINE void
+	setDivision(Division d)
+	{
+		ClockTree::set{{ o.name }}Division(static_cast<int>(d));
+	}
+%% endif
+	// Connect Functions
+%% for src in o.sources
+	static ALWAYS_INLINE void
+	connect(::{{type_id_namespace}}::TypeId::{{ src.name }} t)
+	{
+		(void) t; // avoid compiler warning
+		ClockTree::connectTo{{ o.name }}(ClockTree::{{ o.name }}Source::{{ src.name }});
+	}
+%% endfor
+};
+%% endmacro

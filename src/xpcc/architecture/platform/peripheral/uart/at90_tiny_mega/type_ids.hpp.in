@@ -1,0 +1,48 @@
+// coding: utf-8
+/* Copyright (c) 2013, Roboterclub Aachen e.V.
+ * All Rights Reserved.
+ *
+ * The file is part of the xpcc library and is released under the 3-clause BSD
+ * license. See the file `LICENSE` for the full license governing this code.
+ */
+// ----------------------------------------------------------------------------
+{{ generation_block }}
+
+#ifndef XPCC_{{target.family | upper}}_UART_TYPE_IDS_HPP
+#define XPCC_{{target.family | upper}}_UART_TYPE_IDS_HPP
+
+namespace xpcc
+{
+
+namespace {{target.family}}
+{
+
+namespace TypeId
+{
+	typedef struct{} UsiDo;
+	typedef struct{} UsiDi;
+	typedef struct{} UsiUsck;
+
+
+	typedef struct{} Uart0Rxd;
+	typedef struct{} Uart0Txd;
+	typedef struct{} Uart0Xck;
+
+	typedef struct{} Uart1Rxd;
+	typedef struct{} Uart1Txd;
+	typedef struct{} Uart1Xck;
+
+	typedef struct{} Uart2Rxd;
+	typedef struct{} Uart2Txd;
+	typedef struct{} Uart2Xck;
+
+	typedef struct{} Uart3Rxd;
+	typedef struct{} Uart3Txd;
+	typedef struct{} Uart3Xck;
+}
+
+} // namespace {{target.family}}
+
+} // namespace xpcc
+
+#endif // XPCC_{{target.family | upper}}_UART_TYPE_IDS_HPP

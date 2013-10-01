@@ -4,8 +4,8 @@
 #define	 CONFIG_HPP
 
 #include <xpcc/architecture.hpp>
-#include <xpcc/driver/connectivity/spi.hpp>
-#include <xpcc/driver/ui/seven_segment.hpp>
+#include <xpcc/communication/spi.hpp>
+#include <xpcc/ui/seven_segment.hpp>
 
 // ----------------------------------------------------------------------------
 
@@ -50,7 +50,7 @@ namespace ssd
 	GPIO__OUTPUT(Pwm,  1, 1);
 
 	// software SPI, write only
-//	typedef xpcc::SoftwareSpi<spi::Sck, spi::Mosi, xpcc::gpio::Unused, 2000000> Spi;
+//	typedef xpcc::SoftwareSpiMaster<spi::Sck, spi::Mosi, xpcc::GpioUnused, 2000000> Spi;
 
 	// Hardware SPI1
 	typedef xpcc::lpc::SpiMaster1 Spi;
@@ -80,7 +80,7 @@ namespace adc
 	// BEMF_A	PIO1.10	AD6
 	// BEMF_B	PIO1.11	AD7
 
-	typedef xpcc::lpc111x::AdcManualSingle Adc;
+	typedef xpcc::lpc::AdcManualSingle Adc;
 
 	enum class Channel
 	{
@@ -94,7 +94,7 @@ namespace adc
 
 namespace servo
 {
-	typedef xpcc::lpc11::Timer16_0 pwmTimer;
+	typedef xpcc::lpc::Timer16_0 pwmTimer;
 	GPIO__OUTPUT(EnA,  2, 11);
 	GPIO__OUTPUT(EnB,  0,  2);
 	GPIO__OUTPUT(PwmA, 0,  8);

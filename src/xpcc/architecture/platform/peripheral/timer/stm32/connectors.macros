@@ -1,0 +1,24 @@
+%# coding: utf-8
+%# Copyright (c) 2013, Roboterclub Aachen e.V.
+%# All Rights Reserved.
+%#
+%# The file is part of the xpcc library and is released under the 3-clause BSD
+%# license. See the file `LICENSE` for the full license governing this code.
+
+	%% if id in [1, 8]
+	%# Advanced Timer
+		%% do connectors.extend(
+			["Channel1", "Channel1N", "Channel2", "Channel2N",
+			 "Channel3", "Channel3N", "Channel4", "Channel4N",
+			 "ExternalTrigger", "BreakIn"])
+	%% elif id in [2, 3, 4, 5]
+	%# General Purpose Timer
+		%% do connectors.extend(
+			["Channel1", "Channel2", "Channel3", "Channel4", "ExternalTrigger"])
+	%% elif id in [9, 12]
+	%# General Purpose Timer
+		%% do connectors.extend(["Channel1", "Channel2"])
+	%% elif id in [10, 11, 13, 14]
+	%# General Purpose Timer
+		%% do connectors.extend(["Channel1"])
+	%% endif

@@ -1,25 +1,25 @@
 
 #include <xpcc/architecture.hpp>
 #include <xpcc/driver/storage/i2c_eeprom.hpp>
-
 #include <xpcc/io/iostream.hpp>
 
-GPIO__IO(Scl, C, 0);
-GPIO__IO(Sda, C, 1);
+using namespace xpcc::atmega;
+
+// the AVR GPIOs do not have real Open Drain mode
+// so we need to emulate it
+typedef GpioOpenDrain< I2c::Scl > Scl;
+typedef GpioOpenDrain< I2c::Sda > Sda;
 
 // Create a new UART object and configure it to a baudrate of 9600
-xpcc::atmega::BufferedUart0 uart(9600);
+Uart0 uart(9600);
 
 //#define USE_SOFTWARE
 #define USE_HARDWARE
 
 #if defined USE_SOFTWARE
-#include <xpcc/driver/connectivity/i2c/software_i2c.hpp>
-typedef xpcc::SoftwareI2C<Scl, Sda> Twi;
-#endif
-
-#if defined USE_HARDWARE
-typedef xpcc::atmega::I2cMaster Twi;
+typedef xpcc::SoftwareI2cMaster< Scl, Sda > Twi;
+#elif defined USE_HARDWARE
+typedef I2cMaster Twi;
 #endif
 
 void
@@ -34,22 +34,16 @@ int
 main()
 {
 	// Enable interrupts, this is needed for every buffered UART
-	sei();
-	
-	// Create a IOStream for complex formatting tasks
-	xpcc::IODeviceWrapper<xpcc::atmega::BufferedUart0> device(uart);
-	xpcc::IOStream output(device);
-	
-	output << "I2C eeprom test" << xpcc::endl;
-	
-#if defined USE_SOFTWARE
-	// Initialize the I2C interface.
-	Twi::initialize();
-#endif
+	enableInterrupts();
 
-#if defined USE_HARDWARE
-	Twi::initialize(65, 0);
-#endif
+	// Create a IOStream for complex formatting tasks
+	xpcc::IODeviceWrapper<Uart0> device(uart);
+	xpcc::IOStream output(device);
+
+	output << "I2C eeprom test" << xpcc::endl;
+
+	// Initialize the I2C interface.
+	Twi::initialize<>();
 
 	// Create a wrapper object for an 24C256 (32K I2C eeprom) connected
 	// at address 0xA0

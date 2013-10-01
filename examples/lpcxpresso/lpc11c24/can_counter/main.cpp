@@ -1,6 +1,6 @@
 
 #include <xpcc/architecture.hpp>
-#include <xpcc/driver/connectivity/can/message.hpp>
+#include <xpcc/communication/can/message.hpp>
 #include <xpcc/workflow/periodic_timer.hpp>
 
 // ----------------------------------------------------------------------------

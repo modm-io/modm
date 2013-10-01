@@ -1,7 +1,7 @@
 #ifndef	XPCC__CLOCK_DUMMY_HPP
 #define XPCC__CLOCK_DUMMY_HPP
 
-#include <xpcc/workflow/timestamp.hpp>
+#include <xpcc/processing/timestamp.hpp>
 
 namespace xpcc
 {

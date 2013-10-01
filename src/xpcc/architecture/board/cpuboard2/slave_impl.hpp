@@ -61,10 +61,10 @@ void
 xpcc::CpuBoard2Slave<Transmit, Receive>::enableExternalClock()
 {
 	// select external clock with 8MHz as clock source and set PLL source to XOSC & factor to x4
-	xpcc::atxmega::enableExternalClock(OSC_FRQRANGE_2TO9_gc);
-	xpcc::atxmega::enablePll(OSC_PLLSRC_XOSC_gc, 4);
+	xpcc::xmega::enableExternalClock(OSC_FRQRANGE_2TO9_gc);
+	xpcc::xmega::enablePll(OSC_PLLSRC_XOSC_gc, 4);
 	
 	// set up prescalers (=1) and select PLL as clock source (4 x 8MHz)
-	xpcc::atxmega::setSystemClockPrescaler();
-	xpcc::atxmega::selectSystemClockSource(CLK_SCLKSEL_PLL_gc);
+	xpcc::xmega::setSystemClockPrescaler();
+	xpcc::xmega::selectSystemClockSource(CLK_SCLKSEL_PLL_gc);
 }

@@ -32,6 +32,14 @@ from SCons.Script import *
 
 # -----------------------------------------------------------------------------
 def generate(env, **kw):
+	c = env['XPCC_COMPILER']
+	if c in ['clang', 'clang++']:
+		c_compiler = 'clang'
+		cpp_compiler = 'clang++'
+	else:
+		c_compiler = 'gcc'
+		cpp_compiler = 'g++'
+
 	if platform.system() == 'Windows':
 		env.Append(ENV = {'PATH' : os.environ['PATH']})
 		env.Tool('default')
@@ -47,6 +55,9 @@ def generate(env, **kw):
 	
 		env['NM'] = "nm"
 		env['SIZE'] = "du -s -h"
+		
+		env['CC'] = c_compiler
+		env['CXX'] = cpp_compiler
 		
 		# build messages
 		if ARGUMENTS.get('verbose') != '1':
@@ -64,17 +75,19 @@ def generate(env, **kw):
 		# flags for C and C++
 		env['CCFLAGS'] = [
 			"-funsigned-char",
-			"-funsigned-bitfields",
 			"-Wall",
 			"-Wextra",
 			"-Wundef",
 			"-ggdb",
 			"-DBASENAME=${SOURCE.file}",
 		]
+
+		#if c_compiler == 'clang':
+		#	env['CCFLAGS'].append("-funsigned-bitfields")
 		
 		# C++ flags
 		env['CXXFLAGS'] = [
-			"-std=gnu++0x",
+			"-std=c++11",
 	#		"-Weffc++",
 			"-Woverloaded-virtual",
 		]

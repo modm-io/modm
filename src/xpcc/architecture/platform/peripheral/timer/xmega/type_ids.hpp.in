@@ -1,0 +1,38 @@
+// coding: utf-8
+/* Copyright (c) 2013, Roboterclub Aachen e.V.
+ * All Rights Reserved.
+ *
+ * The file is part of the xpcc library and is released under the 3-clause BSD
+ * license. See the file `LICENSE` for the full license governing this code.
+ */
+// ----------------------------------------------------------------------------
+
+#ifndef XPCC_XMEGA_TIMER_TYPE_IDS_HPP
+#define XPCC_XMEGA_TIMER_TYPE_IDS_HPP
+
+namespace xpcc
+{
+
+namespace xmega
+{
+
+namespace TypeId
+{
+%% for id in ['C0','C1','D0','D1','E0','E1','F0','F1']
+	typedef struct{} TimerCounter{{id}}Oca;
+	typedef struct{} TimerCounter{{id}}Ocb;
+	%% if id[1:] == '0'
+	typedef struct{} TimerCounter{{id}}Occ;
+	typedef struct{} TimerCounter{{id}}Ocd;
+	%% endif
+
+%% endfor
+%% for id in ['C2','D2','E2','F2']
+%% endfor
+}
+
+} // namespace xmega
+
+} // namespace xpcc
+
+#endif // XPCC_XMEGA_TIMER_TYPE_IDS_HPP

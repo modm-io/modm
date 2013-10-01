@@ -1,0 +1,101 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE rca SYSTEM "../devicefile.dtd">
+<rca version="1.0">
+	<device platform="stm32" family="f4" name="407|405"> <!-- FIXME: "name" does not sound quite right -->
+		<!-- _flash_, _pin-count-, _define_, -core_ and _peripheral nodes
+		     accept pin-id/size-id properties if they only apply to a specific
+		     size/pin id
+		     Furthermore for _define_, _peripheral_ and _gpio_
+		     nodes you can use the pin-copunt property if they are only
+		     available on a device with a specific pin count. Add a _+_
+		     to mean "and more" / a _-_ to mean "and less"
+		-->
+		<!-- Flash and RAM sizes -->
+		<flash device-size-id="e">524288</flash>
+		<flash device-size-id="g">1048576</flash>
+		<ram>114688</ram>	<!--Missing id => applies to all devices-->
+		<!-- Linker Script -->
+		<linkerscript device-size-id="g">stm32f4xx_g.ld</linkerscript>
+		<linkerscript device-size-id="e">stm32f4xx_e.ld</linkerscript>
+		<!-- Core -->
+		<core>cortex-m4f</core>
+		<!-- Number of pins -->
+		<pin-count device-pin-id="r">64</pin-count>
+		<pin-count device-pin-id="v">100</pin-count>
+		<pin-count device-pin-id="z">144</pin-count>
+		<pin-count device-pin-id="i">176</pin-count>
+		<!-- Headers to be included with the {{ include_device_headers }} substitution-->
+		<header>stm32f4xx.h</header>
+		<!-- Cpp Defines -->
+		<define>__ARM_STM32__</define> <!-- just a name implies a value of 1 -->
+		<define>STM32F4XX</define>
+		<define device-name="407">__STM32F407__</define>
+		<define device-name="405">__STM32F405__</define>
+		<define>STM32_AHB_FREQUENCY  = 168000000</define>
+		<define>STM32_APB1_FREQUENCY =  42000000</define>
+		<define>STM32_APB2_FREQUENCY =  84000000</define>
+		<define>CORTEX_VECTORS_RAM = 0</define>
+		<define>CORTEX_ENABLE_HARD_FAULT_HANDLER = 0</define>
+		<define device-size-id="e">STM32F407XE</define> <!-- Defines can depend on pin/size ids-->
+		<!-- Core Driver -->
+		<driver type="core" name="cortex">
+			<parameter name="allocator">newlib</parameter>
+		</driver>
+		<!-- Peripheral Drivers -->
+		<driver type="clock" name="stm32" /> <!-- the clock peripheral does not need the instances attribute because there is only one instance -->
+		<driver type="timer" name="stm32" instances="1,2,3,4,5,6,7,8" />
+		<!-- for testing: some imaginary driver that should never be used because of the high pin count -->
+		<driver type="magic" name="unicorn" instances="1,2,3,4,5,6,7,8" pin-count="500+"/>
+		<driver type="uart" name="stm32" instances="1,2,3,4,5" />
+		<driver type="i2c" name="stm32" instances="1,2,3"/>
+		<driver type="can" name="stm32" instances="1,2"/>
+		<driver type="gpio" name="stm32">
+			<!-- separate field for port and id are needed because
+				 e.g. on the lpc platform both are a number -->
+			<gpio port="A" id="0">
+				<!-- This makes the GPIO connect to specific peripheral
+					 drivers. -->
+				<af id="1" peripheral="Timer2" name="Channel1"/>
+				<af id="2" peripheral="Timer5" name="Channel1"/>
+				<af id="3" peripheral="Timer8" name="ExternalTrigger"/>
+			</gpio>
+			<gpio port="A" id="8">
+				<af id="0" peripheral="MCO1" description="Clock Output"/>
+			</gpio>
+			<gpio port="A" id="2">
+				<af id="7" peripheral="Usart2" name="Tx"/>
+			</gpio>
+			<gpio port="A" id="3">
+				<af id="7" peripheral="Usart2" name="Rx"/>
+			</gpio>
+			<gpio port="A" id="9"></gpio>
+			<gpio port="A" id="11">
+				<af id="9" peripheral="Can1" name="Rx"/>
+			</gpio>
+			<gpio port="A" id="12">
+				<af id="9" peripheral="Can1" name="Tx"/>
+			</gpio>
+			<gpio port="B" id="5">
+				<af id="9" peripheral="Can2" name="Rx"/>
+			</gpio>
+			<gpio port="B" id="6">
+				<af id="9" peripheral="Can2" name="Tx"/>
+			</gpio>
+			<gpio port="B" id="8">
+				<af id="9" peripheral="Can1" name="Rx"/>
+			</gpio>
+			<gpio port="B" id="9">
+				<af id="9" peripheral="Can1" name="Tx"/>
+			</gpio>
+			<gpio port="C" id="9">
+				<af id="0" peripheral="MCO2" description="Clock Output"/>
+			</gpio>
+			<!-- PD5 is only available on devices with 90 pins or more -->
+			<gpio port="D" id="5" pin-count="90+"></gpio>
+			<gpio port="D" id="12" pin-count="90+"></gpio>
+			<gpio port="D" id="13" pin-count="100+"></gpio>
+			<gpio port="D" id="14" pin-count="90+"></gpio>
+			<gpio port="D" id="15" pin-count="90+"></gpio>
+		</driver>
+	</device>
+</rca>

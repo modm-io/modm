@@ -113,6 +113,9 @@ def xpcc_library(env, buildpath=None):
 	
 	# exclude the buildpath from the FileScanner
 	exclude_from_scanner(env['XPCC_BUILDPATH'])
+
+	# exclude the generated path from the FileScanner
+	exclude_from_scanner(env['XPCC_PLATFORM_GENERATED_PATH'])
 	
 	# build the library
 	library, defines = env.SConscript(
@@ -134,7 +137,6 @@ def xpcc_library(env, buildpath=None):
 		'defines': '\n'.join(define_list),
 		'name': env['XPCC_CONFIG']['general']['name']
 	}
-	#print os.path.join(env['XPCC_BUILDPATH'], 'xpcc_config.hpp')
 
 	file = env.Template(
 			target = os.path.join(env['XPCC_BUILDPATH'], 'xpcc_config.hpp'),
@@ -186,7 +188,24 @@ def generate(env, **kw):
 	# features from this version like os.path.relpath() are used.
 	EnsurePythonVersion(2, 6)
 	EnsureSConsVersion(1, 0)
-	
+
+	# Import Logger Tool
+	env.Tool('logger_tools')
+	log_level = ARGUMENTS.get('LOG_LEVEL', None)
+	if log_level == None:
+		log_level = ARGUMENTS.get('ll', None)
+	if log_level == None:
+		log_level = 'warn'
+	env.SetLogLevel(log_level)
+
+	# Chose Compiler
+	c = ARGUMENTS.get('COMPILER', None)
+	if c == None:
+		c = ARGUMENTS.get('compiler', None)
+	if c == None:
+		c = ARGUMENTS.get('c', None)
+	env['XPCC_COMPILER'] = c
+
 	# detect the rootpath to the xpcc folder
 	rootpath = env.get('rootpath')
 	
@@ -194,8 +213,8 @@ def generate(env, **kw):
 		# Check if a global environment variable exists that point to
 		# the root of the xpcc-folder
 		rootpath = ARGUMENTS.get('XPCC_HOME', None)
-		if rootpath is not None and ARGUMENTS.get('verbose') == '1':
-			print "Use path from 'XPCC_HOME': '%s'" % rootpath
+		if rootpath is not None:
+			env.Info("Use path from 'XPCC_HOME': '%s'" % rootpath)
 	
 	if rootpath is None:
 		# try to detect the rootpath
@@ -212,13 +231,12 @@ def generate(env, **kw):
 				# name check if at least a 'src' directory exists 
 				if os.path.exists(os.path.join(p, 'src')):
 					rootpath = p
-					if ARGUMENTS.get('verbose') == '1':
-						print "Extracted path from tool path: '%s'" % rootpath
+					env.Info("Extracted path from tool path: '%s'" % rootpath)
 					break
 		
 		if rootpath is None:
-			print "Could not detect the path to the xpcc-library. Use " \
-				  "'Environment(rootpath=...)' to set the path to the root folder of xpcc."
+			env.Error("Could not detect the path to the xpcc-library. Use " \
+				  "'Environment(rootpath=...)' to set the path to the root folder of xpcc.")
 			env.Exit(1)
 	rootpath = os.path.abspath(rootpath)
 	
@@ -227,89 +245,81 @@ def generate(env, **kw):
 	try:
 		parser = configparser.Parser()
 		parser.read(configfile)
-		
-		architecture = parser.get('build', 'architecture')
-		if architecture == 'hosted':
-			try:
-				defaultDevice = {
-					'Darwin': 'darwin',
-					'Linux': 'linux',
-					'Windows': 'windows' }[platform.system()]
-				device = parser.get('build', 'device', defaultDevice)
-			except KeyError, msg:
-				print "Error: unknown platform: '%s' " % msg
-			clock = ''
-		# TODO what is the allowed architecture?
-		elif architecture in ['atmega', 'atxmega', 'avr']:
-			device = parser.get('build', 'device')
-			clock = parser.get('build', 'clock')
-		elif architecture in ['arm7tdmi', 'cortex-m0', 'cortex-m3', 'cortex-m4']:
-			device = parser.get('build', 'device')
-			clock = parser.get('build', 'clock')
-		elif architecture in ['avr32', ]:
-			device = parser.get('build', 'device')
-			clock  = parser.get('build', 'clock')
-		else:
-			print "xpcc Error: unknown architecture: '%s'!" % architecture
-			Exit(1)
-		
+
+		device = parser.get('build', 'device')
+
+		hosted_device = {'Darwin': 'darwin', 'Linux': 'linux',
+						 'Windows': 'windows' }[platform.system()]
+		device = string.Template(device).safe_substitute({'hosted': hosted_device})
+
+		clock  = parser.get('build', 'clock', 'NaN')
+
+		architecture_derecated = parser.get('build', 'architecture', 'deprecated')
+		if architecture_derecated != "deprecated":
+			env.Warn("Specifying architecture is deprecated and replaced only by the Device ID.")
+
 		projectName = parser.get('general', 'name')
-		
+
 		buildpath = env.get('buildpath')
+		# put together build path
 		if buildpath is None:
 			buildpath = parser.get('build', 'buildpath', os.path.join(os.curdir, 'build/'))
-		
-		buildpath = string.Template(buildpath).safe_substitute({
-					'arch': architecture,
-					'device': device,
-					'name': projectName,
-					'xpccpath': rootpath
-				})
-		buildpath = os.path.abspath(buildpath)
-		
-		# exclude the buildpath from the FileScanner
-		exclude_from_scanner(buildpath)
+
 	except configparser.ParserException, msg:
-		print "Error parsing file configuration file '%s':\n%s" % (configfile, str(msg))
+		env.Error("Error parsing file configuration file '%s':\n%s" % (configfile, str(msg)))
 		Exit(1)
-	
+
 	configuration = { 'defines': {}, 'environment': {} }
 	for section in parser.sections():
 		s = {}
 		for option in parser.options(section):
 			s[option] = parser.get(section, option)
 		configuration[section] = s
-	
-	
+
+
 	env['XPCC_ROOTPATH'] = rootpath			# xpcc rootpath
 	env['XPCC_BASEPATH'] = os.curdir		# path of the current project
 	env['XPCC_LIBRARY_PATH'] = os.path.join(rootpath, 'src')
-	env['XPCC_BUILDPATH'] = buildpath
 	env['XPCC_CONFIG'] = configuration
 	env['XPCC_CONFIG_FILE'] = os.path.abspath(configfile)
 	env['XPCC_SYSTEM_BUILDER'] = os.path.join(rootpath, 'tools', 'system_design', 'builder')
-	
+	env['XPCC_DEVICE'] = device 			# needed by the platform tools
+
 	# tools which are used independently of the architecture
-	env.Tool('template')
+	env.Tool('template') # needs to be added before platform_tools
 	env.Tool('unittest')
 	env.Tool('configfile')
 	env.Tool('helper')
 	env.Tool('system_design')
-	
+	# Will validate the env['XPCC_DEVICE'] and set env['ARCHITECTURE']
+	env.Tool('platform_tools')
+
+	env.FindDeviceFile()
+
+	buildpath = string.Template(buildpath).safe_substitute({
+				'arch': env['ARCHITECTURE'],
+				'device': device,
+				'name': projectName,
+				'xpccpath': rootpath
+			})
+	buildpath = os.path.abspath(buildpath)
+	# exclude the buildpath from the FileScanner
+	exclude_from_scanner(buildpath)
+	env['XPCC_BUILDPATH'] = buildpath
+
 	env['LIBS'] = ['']
 	env['LIBPATH'] = []
 	env['CPPPATH'] = []
-	
+
 	# architecture specific settings and tools
-	env['ARCHITECTURE'] = architecture + '/' + device
-	if architecture == 'avr':
+	if env['ARCHITECTURE'] == 'avr8':
 		env['AVR_DEVICE'] = device
 		env['AVR_CLOCK'] = clock
 		env['LIBS'] = ['']
 		env['LIBPATH'] = []
-		
+
 		env.Tool('avr')
-		
+
 		if parser.has_section('avrdude'):
 			env.Tool('avrdude')
 			env['AVRDUDE_PROGRAMMER'] = parser.get('avrdude', 'programmer')
@@ -323,38 +333,37 @@ def generate(env, **kw):
 				if key == 'options':
 					env['AVRDUDE_OPTIONS'] = value
 			env['AVR_FUSEBITS'] = []
-			
+
 			if 'fusebits' in configuration:
 				if device.startswith('atmega') or device.startswith('attiny') or device.startswith('at90can'):
 					fuses = ['lfuse', 'hfuse', 'efuse']
 					for key, value in configuration['fusebits'].items():
 						if key not in fuses:
-							print "Unknown fusebit '%s'! Allowed values are '%s'!" % \
-									(key, "', '".join(fuses))
+							env.Error("Unknown fusebit '%s'! Allowed values are '%s'!" % \
+									(key, "', '".join(fuses)))
 							Exit(1)
 						env.Append(AVR_FUSEBITS = {key: value} )
 				elif device.startswith('atxmega'):
 					fuses = ['fuse0', 'fuse1', 'fuse2', 'fuse4', 'fuse5']
 					for key, value in configuration['fusebits'].items():
 						if key not in fuses:
-							print "Unknown fusebit '%s'! Allowed values are '%s'!" % \
-									(key, "', '".join(fuses))
+							env.Error("Unknown fusebit '%s'! Allowed values are '%s'!" % \
+									(key, "', '".join(fuses)))
 							Exit(1)
 						env.Append(AVR_FUSEBITS = {key: value} )
 				else:
-					print "Ignoring 'fusebit' section in project configuration. Unknown device %s" % device
-		
+					env.Warn("Ignoring 'fusebit' section in project configuration. Unknown device %s" % device)
+
 		# path to the headers of a very small and incomplete libstdc++ implementation
 		env.Append(CPPPATH = [os.path.join(rootpath, 'src', 'stdc++')])
-		
-	elif architecture == 'hosted':
+
+	elif env['ARCHITECTURE'] == 'hosted':
 		if device == 'linux':
 			libs = ['boost_thread-mt', 'boost_system']
 			libpath = ['/usr/lib/']
 		else:
 			libs = []
 			libpath = []
-		
 		env['CXXCOM'] = []
 		env['LINKCOM'] = []
 		env['LIBS'] = libs
@@ -362,8 +371,11 @@ def generate(env, **kw):
 		env['ENV'] = os.environ
 		
 		env.Tool('hosted')
-	elif architecture in ['arm7tdmi', 'cortex-m0', 'cortex-m3', 'cortex-m4']:
-		env['ARM_ARCH'] = architecture
+	elif env['ARCHITECTURE'] in ['arm7tdmi', 'cortex-m0', 'cortex-m3', 'cortex-m4', 'cortex-m4f']:
+		if env['ARCHITECTURE'] == 'cortex-m4f':
+			env['ARM_ARCH'] = 'cortex-m4'
+		else:
+			env['ARM_ARCH'] = env['ARCHITECTURE']
 		env['ARM_DEVICE'] = device
 		env['ARM_CLOCK'] = clock
 		
@@ -384,7 +396,7 @@ def generate(env, **kw):
 					#env['OPENOCD_CONFIGFILE'] = parser.get('openocd', 'configfile')
 					#env['OPENOCD_COMMANDS'] = parser.get('openocd', 'commands')
 			except configparser.ParserException as e:
-				print "Error in Configuration: %s" % e
+				env.Error("Error in Configuration: %s" % e)
 				Exit(1)
 		if parser.has_section('debug'):
 			try:
@@ -392,22 +404,19 @@ def generate(env, **kw):
 					env['GDB_PORT'] = parser.get('debug', 'gdbport')
 					env.Tool('gdb')
 			except configparser.ParserException as e:
-				print "Error in Configuration: %s" % e
+				env.Error("Error in Configuration: %s" % e)
 				Exit(1)			
-	elif architecture == 'avr32':
+	elif env['ARCHITECTURE'] == 'avr32':
 		env['AVR32_DEVICE'] = device
 		env['AVR32_CLOCK']  = clock
 		env['LIBS']         = ['']
 		env['LIBPATH']      = []
-
 		env.Tool('avr32')
-
 		env.Tool('dfu-programmer')
-
 	else:
-		print "xpcc Error: Unknown architecture '%s'!" % architecture
+		env.Error("xpcc Error: Unknown architecture '%s'!" % env['ARCHITECTURE'])
 		Exit(1)
-	
+
 	# append all values from environment section to the real environment
 	for key, value in configuration['environment'].iteritems():
 		if key.endswith('*'):

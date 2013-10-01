@@ -1,0 +1,314 @@
+// coding: utf-8
+// ----------------------------------------------------------------------------
+/* Copyright (c) 2012, Roboterclub Aachen e.V.
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ * 
+ *     * Redistributions of source code must retain the above copyright
+ *       notice, this list of conditions and the following disclaimer.
+ *     * Redistributions in binary form must reproduce the above copyright
+ *       notice, this list of conditions and the following disclaimer in the
+ *       documentation and/or other materials provided with the distribution.
+ *     * Neither the name of the Roboterclub Aachen e.V. nor the
+ *       names of its contributors may be used to endorse or promote products
+ *       derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY ROBOTERCLUB AACHEN E.V. ''AS IS'' AND ANY
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL ROBOTERCLUB AACHEN E.V. BE LIABLE FOR ANY
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+ * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+// ----------------------------------------------------------------------------
+
+#include <util/twi.h>
+#include "i2c_master.hpp"
+
+// uncomment to debug your driver using simple uart
+/*
+#include <xpcc/architecture/platform.hpp>
+#define DEBUG(x) xpcc::{{target.family}}::Uart0::write(x)
+/*/
+#define DEBUG(x)
+//*/
+
+// ----------------------------------------------------------------------------
+namespace
+{
+	// parameter advice
+	static xpcc::I2c::Operation nextOperation;
+	
+	// buffer management
+	static uint8_t *readPointer;
+	static const uint8_t *writePointer;
+	static std::size_t readBytesLeft;
+	static std::size_t writeBytesLeft;
+	
+	// delegating
+	static xpcc::I2cDelegate *delegate(0);
+	static xpcc::I2cMaster::Error errorState(xpcc::I2cMaster::Error::NoError);
+	static bool newSession;
+	
+	// helper functions
+	static ALWAYS_INLINE void
+	initializeWrite(xpcc::I2cDelegate::Writing w) {
+		writePointer = w.buffer;
+		writeBytesLeft = w.size;
+		nextOperation = static_cast<xpcc::I2c::Operation>(w.next);
+	}
+	
+	static ALWAYS_INLINE void
+	initializeRead(xpcc::I2cDelegate::Reading r) {
+		readPointer = r.buffer;
+		readBytesLeft = r.size;
+		nextOperation = static_cast<xpcc::I2c::Operation>(r.next);
+	}
+	
+	static ALWAYS_INLINE void
+	initializeStopAfterAddress() {
+		//writePointer = ..;
+		writeBytesLeft = 0;
+		nextOperation = xpcc::I2c::Operation::Stop;
+	}
+	
+	static ALWAYS_INLINE void
+	initializeRestartAfterAddress() {
+		//writePointer = ..;
+		writeBytesLeft = 0;
+		nextOperation = xpcc::I2c::Operation::Restart;
+	}
+}
+
+// ----------------------------------------------------------------------------
+/// TWI state machine interrupt handler
+ISR(TWI_vect)
+{
+	switch(TW_STATUS)
+	{
+		case TW_START:
+			// START has been transmitted
+			// Fall through...
+		case TW_REP_START:
+			{
+				DEBUG('s');
+				// REPEATED START has been transmitted
+				xpcc::I2cDelegate::Starting s = delegate->starting();
+				uint8_t address;
+				switch (s.next)
+				{
+					case xpcc::I2c::Operation::Read:
+						address = (s.address & 0xfe) | xpcc::I2c::READ;
+						initializeRead(delegate->reading());
+						break;
+						
+					case xpcc::I2c::Operation::Write:
+						address = (s.address & 0xfe) | xpcc::I2c::WRITE;
+						initializeWrite(delegate->writing());
+						break;
+						
+					default:
+					case xpcc::I2c::Operation::Stop:
+						address = (s.address & 0xfe) | xpcc::I2c::WRITE;
+						initializeStopAfterAddress();
+						break;
+						
+					case xpcc::I2c::Operation::Restart:
+						address = (s.address & 0xfe) | xpcc::I2c::WRITE;
+						initializeRestartAfterAddress();
+						break;
+				}
+			
+				// Load data register with TWI slave address
+				TWDR = address;
+				// clear interrupt flag to send address
+				TWCR = (1 << TWINT) | (1 << TWEN) | (1 << TWIE);
+			}
+			break;
+			
+		case TW_MT_SLA_ACK:
+			// SLA+W has been transmitted and ACK received
+			// Fall through...
+		case TW_MT_DATA_ACK:
+			// Data byte has been transmitted and ACK received
+			if (writeBytesLeft != 0)
+			{
+				TWDR = *writePointer++;
+				DEBUG('0' + writeBytesLeft);
+				--writeBytesLeft;
+				TWCR = (1 << TWINT) | (1 << TWEN) | (1 << TWIE);
+				DEBUG('A');
+			}
+			else
+			{
+				switch (nextOperation)
+				{
+					case xpcc::I2c::Operation::Write:
+						DEBUG('C');
+						initializeWrite(delegate->writing());
+						TWDR = *writePointer++;
+						--writeBytesLeft;
+						TWCR = (1 << TWINT) | (1 << TWEN) | (1 << TWIE);
+						DEBUG('A');
+						break;
+						
+					case xpcc::I2c::Operation::Restart:
+						DEBUG('R');
+						TWCR = (1 << TWINT) | (1 << TWSTA) | (1 << TWEN) | (1 << TWIE);
+						break;
+						
+					default:
+						DEBUG('S');
+						TWCR = (1 << TWINT) | (1 << TWSTO) | (1 << TWEN);
+						delegate->stopped(xpcc::I2c::DetachCause::NormalStop);
+						delegate = 0;
+						break;
+				}
+			}
+			break;
+			
+		case TW_MR_DATA_ACK:
+			*readPointer++ = TWDR;
+			DEBUG('0' + readBytesLeft);
+			--readBytesLeft;
+			
+			// Fall through...
+		case TW_MR_SLA_ACK:
+			// SLA+R has been transmitted and ACK received
+			// See if last expected byte will be received ...
+			if (readBytesLeft > 0) {
+				// Send ACK after reception
+				TWCR = (1 << TWINT) | (1 << TWEA) | (1 << TWEN) | (1 << TWIE);
+				DEBUG('a');
+			}
+			else {
+				// Send NACK after next reception
+				TWCR = (1 << TWINT) | (1 << TWEN) | (1 << TWIE);
+				DEBUG('n');
+			}
+			break;
+			
+		case TW_MR_DATA_NACK:
+			// Data byte has been received and NACK transmitted
+			// => Transfer finished
+			*readPointer++ = TWDR;
+			DEBUG('0' + readBytesLeft);
+			--readBytesLeft;
+			
+			switch (nextOperation)
+			{
+				case xpcc::I2c::Operation::Restart:
+					DEBUG('r');
+					TWCR = (1 << TWINT) | (1 << TWSTA) | (1 << TWEN) | (1 << TWIE);
+					break;
+					
+				default:
+				case xpcc::I2c::Operation::Stop:
+					DEBUG('S');
+					TWCR = (1 << TWINT) | (1 << TWSTO) | (1 << TWEN);
+					delegate->stopped(xpcc::I2c::DetachCause::NormalStop);
+					delegate = 0;
+					break;
+			}
+			break;
+			
+		case TW_MT_SLA_NACK:	// SLA+W transmitted, NACK received
+		case TW_MR_SLA_NACK:	// SLA+R transmitted, NACK received
+			errorState = xpcc::{{target.family}}::I2cMaster::Error::AddressNack;
+			DEBUG('A');
+			newSession = false;
+		case TW_MT_DATA_NACK:	// data transmitted, NACK received
+			if (newSession) errorState = xpcc::{{target.family}}::I2cMaster::Error::DataNack;
+			DEBUG('d');
+			newSession = false;
+			// generate a stop condition
+			TWCR = (1 << TWINT) | (1 << TWSTO) | (1 << TWEN);
+		case TW_MT_ARB_LOST:	// arbitration lost in SLA+W or data
+//		case TW_MR_ARB_LOST:	// arbitration lost in SLA+R or NACK
+			if (newSession) errorState = xpcc::{{target.family}}::I2cMaster::Error::ArbitrationLost;
+			DEBUG('d');
+			newSession = false;
+		default:
+			if (newSession) errorState = xpcc::{{target.family}}::I2cMaster::Error::Unknown;
+			DEBUG('r');
+			newSession = false;
+			xpcc::{{target.family}}::I2cMaster::reset(xpcc::I2c::DetachCause::ErrorCondition);
+			break;
+	}
+	DEBUG('\n');
+}
+
+// ----------------------------------------------------------------------------
+void
+xpcc::{{target.family}}::I2cMaster::initializeWithBaud(uint8_t baud)
+{
+	reset(xpcc::I2c::DetachCause::SoftwareReset);
+	TWBR = baud;
+	// No prescaler needed, unless we go significantly slower than standard Speed
+	TWSR = 0;
+	// Load data register with default content; release SDA
+	TWDR = 0xff;
+	// Enable TWI peripheral with interrupt disabled
+	TWCR = (1 << TWEN);
+}
+
+void
+xpcc::{{target.family}}::I2cMaster::reset(DetachCause cause)
+{
+	DEBUG('T');
+	writeBytesLeft = 0;
+	readBytesLeft = 0;
+	if (delegate) delegate->stopped(cause);
+	delegate = 0;
+}
+
+xpcc::I2cMaster::Error
+xpcc::{{target.family}}::I2cMaster::getErrorState()
+{
+	return errorState;
+}
+
+bool
+xpcc::{{target.family}}::I2cMaster::start(xpcc::I2cDelegate *delegate)
+{
+	if (!::delegate && delegate && delegate->attaching())
+	{
+		::delegate = delegate;
+		newSession = true;
+		DEBUG('Y');
+		TWCR = (1 << TWINT) | (1 << TWSTA) | (1 << TWEN) | (1 << TWIE);
+		
+		return true;
+	}
+	return false;
+}
+
+bool
+xpcc::{{target.family}}::I2cMaster::startBlocking(xpcc::I2cDelegate *delegate)
+{
+	if (!::delegate && delegate && delegate->attaching())
+	{
+		::delegate = delegate;
+		newSession = true;
+		DEBUG('Y');
+		TWCR = (1 << TWINT) | (1 << TWSTA) | (1 << TWEN) | (1 << TWIE);
+		
+		// the compiler generates out of order code here
+		// so we introduce a memory barrier
+		// to make sure, ::delegate is set _before_ entering a deadlock
+		__asm__ volatile ("" ::: "memory");
+		
+		while (::delegate)
+			;
+		DEBUG('f');
+		
+		return true;
+	}
+	return false;
+}

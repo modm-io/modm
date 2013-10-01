@@ -77,23 +77,14 @@ class Generator:
 
 env['TemplateGenerator'] = Generator
 
-# Generate driver classes with static methods for the microcontroller peripherals
-# from template files
-env.SConscript('src/xpcc/architecture/platform/avr/atmega/SConscript.generate',  exports='env')
-env.SConscript('src/xpcc/architecture/platform/avr/atxmega/SConscript.generate', exports='env')
-env.SConscript('src/xpcc/architecture/platform/arm7/at91/SConscript.generate', exports='env')
-env.SConscript('src/xpcc/architecture/platform/arm7/lpc/SConscript.generate', exports='env')
-env.SConscript('src/xpcc/architecture/platform/cortex_m0/lpc/SConscript.generate', exports='env')
-env.SConscript('src/xpcc/architecture/platform/cortex_m3/stm32/SConscript.generate', exports='env')
-
 # Generate C++ arrays for gamma corrected led brightness lookup tables
-env.SConscript('src/xpcc/driver/ui/led/tables/SConscript.generate', exports='env')
+env.SConscript('src/xpcc/ui/led/tables/SConscript.generate', exports='env')
 
 # Generate C++ arrays from the font definition files
-env.SConscript('src/xpcc/driver/ui/display/font/SConscript.generate', exports='env')
+env.SConscript('src/xpcc/ui/display/font/SConscript.generate', exports='env')
 
 # Generate C++ arrays from the image files
-env.SConscript('src/xpcc/driver/ui/display/image/SConscript.generate', exports='env')
+env.SConscript('src/xpcc/ui/display/image/SConscript.generate', exports='env')
 
 # Generate SConstruct files for all projects in the example/ and tests/ folders
 env.SConscript('SConscript.generate', exports='env')
@@ -109,7 +100,11 @@ env.Alias('doc', 'doxygen')
 env.Alias('templates', 'template')
 
 env.Phony(show='@firefox doc/build/api/index.html &')
-env.Phony(unittest='@scons -Q -C src/')
+unittest_str = '@scons -Q -C src/'
+# hand values to next scons instance
+for key, value in ARGUMENTS.items():
+	unittest_str += (" %s=%s" % (key, value))
+env.Phony(unittest=unittest_str)
 
 env.Alias('all', ['doc', 'update', 'templates', 'unittest'])
 env.Default('all')

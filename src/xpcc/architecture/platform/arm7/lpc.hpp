@@ -29,7 +29,7 @@
 // ----------------------------------------------------------------------------
 /**
  * \ingroup		arm7
- * \defgroup	lpc2000		LPC2xxx
+ * \defgroup	lpc		LPC2xxx
  * 
  * <h2>Features:</h2>
  * 

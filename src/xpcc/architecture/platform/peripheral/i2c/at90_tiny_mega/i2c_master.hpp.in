@@ -1,0 +1,73 @@
+// coding: utf-8
+/* Copyright (c) 2009, Roboterclub Aachen e.V.
+ * All Rights Reserved.
+ *
+ * The file is part of the xpcc library and is released under the 3-clause BSD
+ * license. See the file `LICENSE` for the full license governing this code.
+ */
+// ----------------------------------------------------------------------------
+{{ generation_block }}
+
+#ifndef XPCC_{{target.family | upper}}_I2C_MASTER_HPP
+#define XPCC_{{target.family | upper}}_I2C_MASTER_HPP
+
+#include "../../../device.hpp"
+#include <xpcc/architecture/peripheral/i2c.hpp>
+#include "type_ids.hpp"
+
+namespace xpcc
+{
+
+namespace {{target.family}}
+{
+
+/**
+ * Interrupt-driven I2C master module.
+ *
+ * Interrupts must be enabled.
+ * 
+ * @author Niklas Hauser
+ * @ingroup	{{target.family}}
+ */
+class I2cMaster : public ::xpcc::I2cMaster
+{
+public:
+	static const TypeId::I2cMasterSda Sda;
+	static const TypeId::I2cMasterScl Scl;
+	
+	template<DataRate rate=DataRate::Standard>
+	static ALWAYS_INLINE void
+	initialize()
+	{
+		constexpr uint32_t rawRate = static_cast<uint32_t>(rate);
+		static_assert(rawRate <= 400000, "The {{target.family|capitalize}} does not support High I2C baudrate.");
+		static_assert(F_CPU/16 >= rawRate, "The CPU frequency must be at least 16x higher than I2C baudrate.");
+
+		constexpr uint8_t baud = ((F_CPU / rawRate) - 16) / 2;
+		initializeWithBaud(baud);
+	};
+
+	// start documentation inherited
+	static bool
+	start(xpcc::I2cDelegate *delegate);
+
+	static bool
+	startBlocking(xpcc::I2cDelegate *delegate);
+
+	static Error
+	getErrorState();
+
+	static void
+	reset(DetachCause cause=DetachCause::SoftwareReset);
+	// end documentation inherited
+
+private:
+	static void
+	initializeWithBaud(uint8_t baud);
+};
+
+} // namespace {{target.family}}
+
+} // namespace xpcc
+
+#endif // XPCC_{{target.family | upper}}_I2C_MASTER_HPP

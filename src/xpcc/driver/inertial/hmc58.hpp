@@ -31,7 +31,7 @@
 #ifndef XPCC__HMC58_HPP
 #define XPCC__HMC58_HPP
 
-#include <xpcc/driver/connectivity/i2c/write_read_adapter.hpp>
+#include <xpcc/architecture/peripheral/i2c_adapter.hpp>
 
 namespace xpcc
 {
@@ -196,7 +196,7 @@ namespace xpcc
 		uint8_t
 		readRegister(hmc58::Register reg);
 		
-		xpcc::i2c::WriteReadAdapter adapter;
+		xpcc::I2cWriteReadAdapter adapter;
 		
 		enum Status {
 			READ_MAGNETOMETER_PENDING = 0x01,

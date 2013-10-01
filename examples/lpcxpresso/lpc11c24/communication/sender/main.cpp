@@ -47,7 +47,7 @@ MAIN_FUNCTION
 {
 	SystemInit();
 
-	xpcc::lpc11::SysTickTimer::enable();
+	xpcc::lpc::SysTickTimer::enable();
 
 	xpcc::lpc::Uart1 loggerUart(115200);
 

@@ -22,7 +22,7 @@ main(void)
 {
 	initClock();
 
-	LedStat::setOutput(xpcc::gpio::HIGH);
+	LedStat::setOutput(xpcc::Gpio::HIGH);
 	
 	while (1)
 	{

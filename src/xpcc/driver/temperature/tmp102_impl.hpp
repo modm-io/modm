@@ -1,70 +1,49 @@
 // coding: utf-8
-// ----------------------------------------------------------------------------
 /* Copyright (c) 2011, Roboterclub Aachen e.V.
- * All rights reserved.
+ * All Rights Reserved.
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- * 
- *     * Redistributions of source code must retain the above copyright
- *       notice, this list of conditions and the following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright
- *       notice, this list of conditions and the following disclaimer in the
- *       documentation and/or other materials provided with the distribution.
- *     * Neither the name of the Roboterclub Aachen e.V. nor the
- *       names of its contributors may be used to endorse or promote products
- *       derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY ROBOTERCLUB AACHEN E.V. ''AS IS'' AND ANY
- * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL ROBOTERCLUB AACHEN E.V. BE LIABLE FOR ANY
- * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * The file is part of the xpcc library and is released under the 3-clause BSD
+ * license. See the file `LICENSE` for the full license governing this code.
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__TMP102_HPP
+#ifndef XPCC_TMP102_HPP
 #	error  "Don't include this file directly, use 'tmp102.hpp' instead!"
 #endif
 
 // ----------------------------------------------------------------------------
 template < typename I2cMaster >
 xpcc::Tmp102<I2cMaster>::Tmp102(uint8_t* data, uint8_t address)
-:	running(NOTHING_RUNNING), status(0), config(0), data(data)
+:	running(Running::Nothing), config(0), data(data)
 {
 	adapter.initialize(address << 1, buffer, 0, data, 0);
 }
 
 template < typename I2cMaster >
 bool
-xpcc::Tmp102<I2cMaster>::configure(tmp102::Config2 lsb, tmp102::Config1 msb)
+xpcc::Tmp102<I2cMaster>::configure(uint8_t lsb, uint8_t msb)
 {
 	config = msb;
-	buffer[0] = tmp102::REGISTER_CONFIGURATION;
+	buffer[0] = static_cast<uint8_t>(tmp102::Register::Configuration);
 	buffer[1] = msb;
 	buffer[2] = lsb;
 	adapter.initialize(buffer, 3, data, 0);
-	
-	return I2cMaster::startSync(&adapter);
+
+	return I2cMaster::startBlocking(&adapter);
 }
 
 template < typename I2cMaster >
 void
 xpcc::Tmp102<I2cMaster>::startConversion()
 {
-	status |= START_CONVERSION_PENDING;
+	status.startConversionPending = true;
 }
 
 template < typename I2cMaster >
 void
 xpcc::Tmp102<I2cMaster>::readTemperature()
 {
-	status |= READ_TEMPERATURE_PENDING;
+	status.readTemperaturePending = true;
 }
 
 template < typename I2cMaster >
@@ -84,14 +63,14 @@ template < typename I2cMaster >
 bool
 xpcc::Tmp102<I2cMaster>::isNewDataAvailable()
 {
-	return status & NEW_TEMPERATURE_DATA;
+	return status.newTemperatureData;
 }
 
 template < typename I2cMaster >
 uint8_t*
 xpcc::Tmp102<I2cMaster>::getData()
 {
-	status &= ~NEW_TEMPERATURE_DATA;
+	status.newTemperatureData = false;
 	return data;
 }
 
@@ -99,42 +78,42 @@ template < typename I2cMaster >
 void
 xpcc::Tmp102<I2cMaster>::update()
 {
-	if (running != NOTHING_RUNNING)
+	if (running != Running::Nothing)
 	{
 		switch (adapter.getState())
 		{
-			case xpcc::i2c::adapter::NO_ERROR:
-				if (running == READ_TEMPERATURE_RUNNING) {
-					status |= NEW_TEMPERATURE_DATA;
+			case xpcc::I2c::AdapterState::Idle:
+				if (running == Running::ReadTemperature) {
+					status.newTemperatureData = true;
 				}
-				
-			case xpcc::i2c::adapter::ERROR:
-				running = NOTHING_RUNNING;
-				
+
+			case xpcc::I2c::AdapterState::Error:
+				running = Running::Nothing;
+
 			default:
 				break;
 		}
 	}
 	else  {
-		if (status & START_CONVERSION_PENDING)
+		if (status.startConversionPending)
 		{
-			buffer[0] = tmp102::REGISTER_CONFIGURATION;
+			buffer[0] = static_cast<uint8_t>(tmp102::Register::Configuration);
 			buffer[1] = config & tmp102::CONFIGURATION_ONE_SHOT;
 			adapter.initialize(buffer, 2, data, 0);
-			
+
 			if (I2cMaster::start(&adapter)) {
-				status &= ~START_CONVERSION_PENDING;
-				running = START_CONVERSION_RUNNING;
+				status.startConversionPending = false;
+				running = Running::StartConversion;
 			}
 		}
-		else if (status & READ_TEMPERATURE_PENDING)
+		else if (status.readTemperaturePending)
 		{
-			buffer[0] = tmp102::REGISTER_TEMPERATURE;
+			buffer[0] = static_cast<uint8_t>(tmp102::Register::Temperature);
 			adapter.initialize(buffer, 1, data, 2);
-			
+
 			if (I2cMaster::start(&adapter)) {
-				status &= ~READ_TEMPERATURE_PENDING;
-				running = READ_TEMPERATURE_RUNNING;
+				status.readTemperaturePending = false;
+				running = Running::ReadTemperature;
 			}
 		}
 	}

@@ -1,7 +1,7 @@
 
 #include <xpcc/architecture.hpp>
-#include <xpcc/driver/ui/display/ea_dog.hpp>
-#include <xpcc/driver/ui/display/font.hpp>
+#include <xpcc/driver/display.hpp>
+#include <xpcc/ui/display/font.hpp>
 
 // ----------------------------------------------------------------------------
 GPIO__OUTPUT(LedStat, C, 12);	// inverted, 0=on, 1=off
@@ -43,7 +43,7 @@ MAIN_FUNCTION
 	SpiMaster1::initialize(SpiMaster1::MODE_0, SpiMaster1::PRESCALER_256);
 	xpcc::stm32::SpiMaster1::configurePins(xpcc::stm32::SpiMaster1::REMAP_PA5_PA6_PA7);
 
-	LedStat::setOutput(xpcc::gpio::HIGH);
+	LedStat::setOutput(xpcc::Gpio::HIGH);
 	
 	EncoderIndex::setInput(xpcc::stm32::PULLUP);
 	EncoderA::setInput(xpcc::stm32::PULLUP);

@@ -29,6 +29,7 @@
 // ----------------------------------------------------------------------------
 
 #include <xpcc/driver/adc/ad7280a.hpp>
+#include <xpcc/architecture/platform/peripheral/gpio/software/gpio.hpp>
 
 #include "ad7280a_test.hpp"
 
@@ -69,7 +70,7 @@ struct Cs
 	}
 };
 
-typedef xpcc::Ad7280a<Spi, Cs, xpcc::gpio::Unused, 1> Ad7280a;
+typedef xpcc::Ad7280a<Spi, Cs, xpcc::GpioUnused, 1> Ad7280a;
 
 // ----------------------------------------------------------------------------
 void
