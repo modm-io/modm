@@ -85,7 +85,7 @@ xpcc::stm32::{{ name }}::initialize(Parity parity)
 	//             baud rate as well as parity
 	{{ peripheral }}->CR1 &= ~USART_CR1_UE;	// Uart Disable
 	// set baudrate
-	{{ peripheral }}->BRR = calculateBaudrateSettings(clockSource::{{ name }}, baudrate);
+	{{ peripheral }}->BRR = calculateBaudrateSettings(clockSource::{{ uart ~ id }}, baudrate);
 	setParity(parity);
 	{{ peripheral }}->CR1 |=  USART_CR1_UE;	// Uart Reenable
 }
