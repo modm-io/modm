@@ -77,6 +77,7 @@ class JavaCommunicationBuilder(builder_base.Builder):
 		substitutions = {
 			'package' : self.options.package,
 			'components': components,
+			'events': self.tree.events,
 		}
 		
 		file = os.path.join(self.options.outpath, 'Communication.java')
