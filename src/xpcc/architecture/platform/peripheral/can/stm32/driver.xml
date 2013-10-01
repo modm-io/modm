@@ -4,8 +4,8 @@
 	<driver type="can" name="stm32">
 		<template instances="1,2" out="can_{{id}}.hpp">can.hpp.in</template>
 		<template instances="1,2" out="can_{{id}}.cpp">can.cpp.in</template>
-		<static>can_filter.hpp</static>
-		<static>can_filter.cpp</static>
+		<template>can_filter.hpp.in</template>
+		<template>can_filter.cpp.in</template>
 		<static>error_code.hpp</static>
 		<static>type_ids.hpp</static>
 		<static>../../clock/common/common_clock.hpp</static>

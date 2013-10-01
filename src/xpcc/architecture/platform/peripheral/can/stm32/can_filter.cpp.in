@@ -68,7 +68,7 @@ xpcc::stm32::CanFilter::disableFilter(uint8_t id)
 }
 
 // ----------------------------------------------------------------------------
-#if defined(STM32F10X_CL)
+%% if target is stm32f1 or target is stm32f4
 void
 xpcc::stm32::CanFilter::setStartFilterBankForCan2(uint8_t startBank)
 {
@@ -80,4 +80,4 @@ xpcc::stm32::CanFilter::setStartFilterBankForCan2(uint8_t startBank)
 	// Leave the initialization mode for the filter
 	CAN1->FMR &= ~CAN_FMR_FINIT;
 }
-#endif
+%% endif
