@@ -32,8 +32,8 @@
 #define XPCC__VIEWSTACK_HPP
 
 #include "../display/graphic_display.hpp"
-#include "../../../container/stack.hpp"
-#include "../../../container/linked_list.hpp"
+#include "../../container/stack.hpp"
+#include "../../container/linked_list.hpp"
 #include "menu_buttons.hpp"
 #include "abstract_view.hpp"
 
