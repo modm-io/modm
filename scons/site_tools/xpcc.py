@@ -256,8 +256,7 @@ def generate(env, **kw):
 
 		architecture_derecated = parser.get('build', 'architecture', 'deprecated')
 		if architecture_derecated != "deprecated":
-			env.Warn("Specifying architecture is deprecated."
-			"Just set the corect device id and architecture will be deduced.")
+			env.Warn("Specifying architecture is deprecated and replaced only by the Device ID.")
 
 		projectName = parser.get('general', 'name')
 
@@ -313,7 +312,7 @@ def generate(env, **kw):
 	env['CPPPATH'] = []
 
 	# architecture specific settings and tools
-	if env['ARCHITECTURE'] == 'avr':
+	if env['ARCHITECTURE'] == 'avr8':
 		env['AVR_DEVICE'] = device
 		env['AVR_CLOCK'] = clock
 		env['LIBS'] = ['']
