@@ -183,3 +183,4 @@ inline void xpcc::color::RgbT<UnderlyingType>::toHsv(HsvT<T>* color) const
 }
 
 #endif // XPCC__COLOR_HPP
+
