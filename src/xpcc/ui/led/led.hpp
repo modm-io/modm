@@ -91,7 +91,6 @@ protected:
 	int16_t deltaValue;
 	uint16_t fadeTime;
 
-	xpcc::PeriodicTimer<> timer;
 	xpcc::Timestamp stamp;
 };
 

@@ -14,7 +14,7 @@
 // ----------------------------------------------------------------------------
 xpcc::ui::Led::Led()
 :	currentValue(0), startValue(0), endValue(0), deltaValue(0), fadeTime(1),
-	timer(1)
+	stamp(0)
 {
 }
 
@@ -75,18 +75,31 @@ xpcc::ui::Led::off(uint16_t time)
 void
 xpcc::ui::Led::run()
 {
-	if (fadeTime && timer.isExpired())
+	// this should be called exactly once every 1 ms
+	// but if the clock gets incremented by more than 1 ms, or the main loop is
+	// busy, then we need to count these "missing" steps and apply them.
+
+	if (fadeTime)
 	{
 		uint8_t delta = (xpcc::Clock::now() - stamp).getTime();
-		while (delta-- && fadeTime)
+		if (delta)
 		{
-			startValue += deltaValue;
-			currentValue = startValue/100;
-			if (--fadeTime == 0) currentValue = endValue;
-			if (currentValue == endValue) deltaValue = 0;
-		}
+			while (delta--)
+			{
+				startValue += deltaValue;
+				currentValue = startValue/100;
 
-		stamp = xpcc::Clock::now();
-		setValue(currentValue);
+				if (--fadeTime == 0) {
+					currentValue = endValue;
+					break;
+				}
+				if (currentValue == endValue) {
+					deltaValue = 0;
+				}
+			}
+
+			stamp = xpcc::Clock::now();
+			setValue(currentValue);
+		}
 	}
 }
