@@ -1,0 +1,120 @@
+// coding: utf-8
+/*
+* Copyright (c) 2013, Roboterclub Aachen e.V.
+* All Rights Reserved.
+*
+* The file is part for the xpcc library and is released under the
+* 3-clause BSD license. See the file `LICENSE` for the full license
+* governing this code.
+*/
+// ----------------------------------------------------------------------------
+
+#ifndef XPCC_STM32_SPI_BASE_HPP
+#define XPCC_STM32_SPI_BASE_HPP
+
+#include <stdint.h>
+#include "../../../device.hpp"
+
+namespace xpcc
+{
+namespace stm32
+{
+/**
+ * Base class for the SPI classes
+ *
+ * Provides some common enum that do not depend on the specific SPI.
+ *
+ * @author Kevin Laeufer
+ * @internal
+ * @ingroup		stm32
+ */
+class SpiBase
+{
+
+public:
+	enum class
+	Interrupt : uint32_t
+	{
+		RxBufferNotEmpty	= SPI_CR2_RXNEIE,
+		TxBufferEmpty		= SPI_CR2_TXEIE,
+		Error				= SPI_CR2_ERRIE,
+	};
+
+	enum class
+	InterruptFlag : uint32_t
+	{
+		TxBufferEmpty		= SPI_SR_RXNE,
+		RxBufferNotEmpty	= SPI_SR_TXE,
+		CrcError			= SPI_SR_CRCERR,
+		ModeFaultError		= SPI_SR_MODF,
+		OverrunError		= SPI_SR_OVR,
+		Busy				= SPI_SR_BSY,
+%% if target is stm32f0 or target is stm32f3
+		FrameFormatError	= SPI_SR_FRE,
+%% endif
+	};
+
+	enum class
+	MasterSelection : uint32_t
+	{
+		Slave 	= 0,			///< Configure SPI as Slave
+		Master 	= SPI_CR1_MSTR,	///< Configure SPI as Master
+		All 	= Master,
+	};
+
+	enum class
+	DataOrder : uint32_t
+	{
+		MsbFirst = 0b0,
+		LsbFirst = SPI_CR1_LSBFIRST,
+		All = LsbFirst,
+	};
+
+	enum class
+	DataSize : uint32_t
+	{
+%% if target is stm32f0 or target is stm32f3
+		Bit4  = SPI_CR2_DS_1 | SPI_CR2_DS_0,				///< 0b0011
+		Bit5  = SPI_CR2_DS_2,								///< 0b0100
+		Bit6  = SPI_CR2_DS_2 | SPI_CR2_DS_0,				///< 0b0101
+		Bit7  = SPI_CR2_DS_2 | SPI_CR2_DS_1,				///< 0b0110
+		Bit8  = SPI_CR2_DS_2 | SPI_CR2_DS_1 | SPI_CR2_DS_0,	///< 0b0111
+		Bit9  = SPI_CR2_DS_3,								///< 0b1000
+		Bit10 = SPI_CR2_DS_3 | SPI_CR2_DS_0,				///< 0b1001
+		Bit11 = SPI_CR2_DS_3 | SPI_CR2_DS_1,				///< 0b1010
+		Bit12 = SPI_CR2_DS_3 | SPI_CR2_DS_1 | SPI_CR2_DS_0,	///< 0b1011
+		Bit13 = SPI_CR2_DS_3 | SPI_CR2_DS_2,				///< 0b1100
+		Bit14 = SPI_CR2_DS_3 | SPI_CR2_DS_2 | SPI_CR2_DS_0,	///< 0b1101
+		Bit15 = SPI_CR2_DS_3 | SPI_CR2_DS_2 | SPI_CR2_DS_1,	///< 0b1110
+		Bit16 = SPI_CR2_DS_3 | SPI_CR2_DS_2 | SPI_CR2_DS_1 | SPI_CR2_DS_0,///< 0b1111
+		All   = Bit16,
+%% elif target is stm32f1 or target is stm32f2 or target is stm32f4
+		Bit8  = 0,
+		Bit16 = SPI_CR1_DFF,
+		All   = Bit16,
+%% endif
+	};
+
+	enum class
+	Prescaler : uint32_t
+	{
+		Div2 	= 0,
+		Div4 	= SPI_CR1_BR_0,
+		Div8 	= SPI_CR1_BR_1,
+		Div16 	= SPI_CR1_BR_1 | SPI_CR1_BR_0,
+		Div32 	= SPI_CR1_BR_2,
+		Div64 	= SPI_CR1_BR_2 | SPI_CR1_BR_0,
+		Div128 	= SPI_CR1_BR_2 | SPI_CR1_BR_1,
+		Div256 	= SPI_CR1_BR_2 | SPI_CR1_BR_1 | SPI_CR1_BR_0,
+	};
+
+};
+
+ENUM_CLASS_FLAG(SpiBase::Interrupt)
+ENUM_CLASS_FLAG(SpiBase::InterruptFlag)
+
+}
+
+}
+
+#endif // XPCC_STM32_SPI_BASE_HPP

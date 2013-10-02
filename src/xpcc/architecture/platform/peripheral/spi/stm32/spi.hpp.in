@@ -1,150 +1,78 @@
 // coding: utf-8
+/* Copyright (c) 2013, Roboterclub Aachen e.V.
+* All Rights Reserved.
+*
+* The file is part of the xpcc library and is released under the 3-clause BSD
+* license. See the file `LICENSE` for the full license governing this code.
+*/
 // ----------------------------------------------------------------------------
-/* Copyright (c) 2011, Roboterclub Aachen e.V.
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- * 
- *     * Redistributions of source code must retain the above copyright
- *       notice, this list of conditions and the following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright
- *       notice, this list of conditions and the following disclaimer in the
- *       documentation and/or other materials provided with the distribution.
- *     * Neither the name of the Roboterclub Aachen e.V. nor the
- *       names of its contributors may be used to endorse or promote products
- *       derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY ROBOTERCLUB AACHEN E.V. ''AS IS'' AND ANY
- * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL ROBOTERCLUB AACHEN E.V. BE LIABLE FOR ANY
- * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
-// ----------------------------------------------------------------------------
-{{ generation_block }}
 
-#ifndef XPCC_STM32__SPI_{{ id }}_HPP
-#define XPCC_STM32__SPI_{{ id }}_HPP
+#ifndef XPCC_STM32_SPI_{{ id }}_HPP
+#define XPCC_STM32_SPI_{{ id }}_HPP
 
-#include <stdint.h>
-#include "../device.h"
-#include <xpcc/communication/spi/spi_master.hpp>
+#include <xpcc/architecture/peripheral/spi.hpp>
+#include "spi_hal_{{ id }}.hpp"
 
 namespace xpcc
 {
-	namespace stm32
+
+namespace stm32
+{
+
+/**
+ * @brief		Serial peripheral interface (SPI{{ id }})
+ * 
+ * Simple unbuffered implementation.
+ * @ingroup		stm32
+ */
+class SimpleSpiMaster{{ id }} : public xpcc::SimpleSpi
+{
+public:
+	enum class
+	DataMode : uint32_t
 	{
-		/**
-		 * @brief		Serial peripheral interface (SPI{{ id }})
-		 * 
-		 * Simple unbuffered implementation.
-		 * 
-		 * STM32F10x:
-		 * - SPI1 (APB2) at 72MHz
-		 * - SPI2 and SPI3 (APB1) at 36MHz.
-		 * 
-		 * STM32F2:
-		 * - TODO
-		 * 
-		 * STM32F4xx:
-		 * - SPI1 (APB2) at 84MHz
-		 * - SPI2, SPI3 (APB1) at 42MHz
-		 * 
-		 * @ingroup		stm32
-		 */
-		class SpiMaster{{ id }} : public xpcc::SpiMaster
-		{
-		public:
-			enum Mode
-			{
-				MODE_0 = 0,								///< SCK normal, sample on rising edge
-				MODE_1 = SPI_CR1_CPHA,					///< SCK normal, sample on falling edge
-				MODE_2 = SPI_CR1_CPOL,					///< SCK inverted, sample on falling edge
-				MODE_3 = SPI_CR1_CPOL | SPI_CR1_CPHA,	///< SCK inverted, sample on rising edge
-			};
-			
-			enum Prescaler
-			{
-				PRESCALER_2 = 0,
-				PRESCALER_4 = SPI_CR1_BR_0,
-				PRESCALER_8 = SPI_CR1_BR_1,
-				PRESCALER_16 = SPI_CR1_BR_1 | SPI_CR1_BR_0,
-				PRESCALER_32 = SPI_CR1_BR_2,
-				PRESCALER_64 = SPI_CR1_BR_2 | SPI_CR1_BR_0,
-				PRESCALER_128 = SPI_CR1_BR_2 | SPI_CR1_BR_1,
-				PRESCALER_256 = SPI_CR1_BR_2 | SPI_CR1_BR_1 | SPI_CR1_BR_0,
-			};
-			
-			enum Mapping
-			{
-#if defined(STM32F2XX) || defined(STM32F4XX)
-				{% if id == 1 -%}
-				REMAP_PA5_PA6_PA7,		///< SCK/PA5, MISO/PA6, MOSI/PA7, NSS/PA4 
-				REMAP_PB3_PB4_PB5,		///< SCK/PB3, MISO/PB4, MOSI/PB5, NSS/PA15
-				{%- elif id == 2 -%}
-				REMAP_PB13_PB14_PB15,	///< SCK/PB13, MISO/PB14, MOSI/PB15, NSS/PB12
-				
-				// TODO PB9..15, PC2..3
-				//REMAP_PI1_PI2_PI3,		///< SCK/PI1, MISO/PI2, MOSI/PI3, NSS/PI0
-				{%- elif id == 3 -%}
-				REMAP_PB3_PB4_PB5,		///< SCK/PB3, MISO/PB4, MOSI/PB5, NSS/PA15
-				REMAP_PC10_PC11_PC12,	///< SCK/PC10, MISO/PC11, MOSI/PC12, NSS/PA4
-				{%- endif %}
-#else
-				{% if id == 1 -%}
-				REMAP_PA5_PA6_PA7 = 0,							///< SCK/PA5, MISO/PA6, MOSI/PA7, NSS/PA4 
-				REMAP_PB3_PB4_PB5 = AFIO_MAPR_SPI1_REMAP,		///< SCK/PB3, MISO/PB4, MOSI/PB5, NSS/PA15
-				{%- elif id == 2 -%}
-				REMAP_PB13_PB14_PB15,							///< SCK/PB13, MISO/PB14, MOSI/PB15, NSS/PB12
-				{%- elif id == 3 -%}
-				REMAP_PB3_PB4_PB5 = 0,							///< SCK/PB3, MISO/PB4, MOSI/PB5, NSS/PA15
-#	if defined(STM32F10X_CL) 
-				REMAP_PC10_PC11_PC12 = AFIO_MAPR_SPI3_REMAP,	///< SCK/PC10, MISO/PC11, MOSI/PC12, NSS/PA4
-#	endif
-				{%- endif %}
-#endif
-			};
-			
-			/**
-			 * Configure the IO Pins for SPI{{ id }}
-			 * 
-			 * \warning	NSS is not configured and has to be handled
-			 * 			by the user!
-			 */
-			static void
-			configurePins(Mapping mapping);
-			
-		public:
-			/**
-			 * @brief	Initialize SPI module
-			 */
-			static void
-			initialize(Mode mode = MODE_0, Prescaler prescaler = PRESCALER_64);
-			
-			static uint8_t
-			write(uint8_t data);
-			
-			static bool
-			setBuffer(uint16_t length,
-					  uint8_t* transmit=0, uint8_t* receive=0,
-					  BufferIncrease bufferIncrease=BUFFER_INCR_BOTH);
-			
-			static bool
-			transfer(TransferOptions options=TRANSFER_SEND_BUFFER_SAVE_RECEIVE);
-			
-			static ALWAYS_INLINE bool
-			transferSync(TransferOptions options=TRANSFER_SEND_BUFFER_SAVE_RECEIVE);
-			
-			static bool
-			isFinished();
-		};
+		Mode0 = 0b00,			///< clock normal,   sample on rising  edge
+		Mode1 = SPI_CR1_CPHA,	///< clock normal,   sample on falling edge
+		Mode2 = SPI_CR1_CPOL,	///< clock inverted, sample on falling  edge
+		/// clock inverted, sample on rising edge
+		Mode3 = SPI_CR1_CPOL | SPI_CR1_CPHA,
+		All = Mode3,
+	};
+public:
+
+	template< class clockSource, uint32_t baudrate >
+	static void
+	initialize()
+	{
 	}
+
+	static void
+	setDataMode(DataMode mode);
+
+	static void
+	setDataOrder(DataOrder order);
+
+	static uint8_t
+	writeReadBlocking(uint8_t data);
+
+	static void
+	writeBlocking(uint8_t data);
+
+	static bool
+	write(uint8_t data);
+
+	static uint8_t
+	getResult();
+
+	static bool
+	transfer(uint8_t * tx, uint8_t * rx, std::size_t length, BufferOptions options=BufferOptions::TxRxIncrement);
+
+	static bool
+	isFinished();
+};
+
 }
 
-#endif // XPCC_STM32__SPI_{{ id }}_HPP
+}
+
+#endif // XPCC_STM32_SPI_{{ id }}_HPP

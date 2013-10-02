@@ -1,0 +1,161 @@
+// coding: utf-8
+/* Copyright (c) 2013, Roboterclub Aachen e.V.
+* All Rights Reserved.
+*
+* The file is part of the xpcc library and is released under the 3-clause BSD
+* license. See the file `LICENSE` for the full license governing this code.
+*/
+// ----------------------------------------------------------------------------
+
+
+#ifndef XPCC_STM32_SPI_HAL_{{ id }}_HPP
+#define XPCC_STM32_SPI_HAL_{{ id }}_HPP
+
+#include "../../../type_ids.hpp"
+#include "../../clock/common/common_clock.hpp"
+
+#include "spi_base.hpp"
+
+namespace xpcc
+{
+namespace stm32
+{
+/**
+ * Serial peripheral interface (SPI{{ id }})
+ *
+ *
+ * Very basic implementation that exposes more hardware features than
+ * the regular Spi classes.
+ *
+ * @author		Kevin Laeufer
+ * @ingroup		stm32
+ */
+class Spi{{ id }} : public SpiBase
+{
+public:
+	enum class
+	DataMode : uint32_t
+	{
+		Mode0 = 0b00,			///< clock normal,   sample on rising  edge
+		Mode1 = SPI_CR1_CPHA,	///< clock normal,   sample on falling edge
+		Mode2 = SPI_CR1_CPOL,	///< clock inverted, sample on falling  edge
+		/// clock inverted, sample on rising edge
+		Mode3 = SPI_CR1_CPOL | SPI_CR1_CPHA,
+		All = Mode3,
+	};
+
+public:
+%% for name in ['Nss', 'Sck', 'Miso', 'Mosi']
+	/// TypeId used to connect GPIO pins to this peripheral's {{ name }}.
+	static const TypeId::Spi{{ id ~ name}} {{ name }};
+%% endfor
+
+public:
+	/// Enables the clock, resets the hardware and sets the SPE bit
+	static inline void
+	enable();
+
+	/// Disables the hw module (by disabling its clock line)
+	static inline void
+	disable();
+
+	/**
+	 * Initialize Spi Peripheral
+	 *
+	 * Enables clocks, the UART peripheral
+	 * Sets baudrate and parity.
+	 */
+	static inline void
+	initialize(	Prescaler prescaler,
+				MasterSelection masterSelection = MasterSelection::Master,
+				DataMode dataMode   = DataMode::Mode0,
+				DataOrder dataOrder = DataOrder::MsbFirst,
+				DataSize  dataSize  = DataSize::Bit8);
+
+	static inline void
+	setDataMode(DataMode dataMode);
+
+	static inline void
+	setDataOrder(DataOrder dataOrder);
+
+	static inline void
+	setDataSize(DataSize dataSize);
+
+	static inline void
+	setMasterSelection(MasterSelection masterSelection);
+
+	/// Returns true if data has been received
+	static inline bool
+	isReceiveRegisterNotEmpty();
+
+	/// Returns true if data can be written
+	static inline bool
+	isTransmitRegisterEmpty();
+
+	/**
+	 * \brief	Write a single byte to the data register
+	 *
+	 * @warning 	This method does NOT do any sanity checks!!
+	 *				It is your responsibility to check if the register
+	 *				is empty!
+	 */
+	static inline void
+	write(uint8_t data);
+
+	/**
+	 * \brief	Write a two bytes to the data register
+	 *
+	 * @warning 	This method does NOT do any sanity checks!!
+	 *				It is your responsibility to check if the register
+	 *				is empty!
+	 */
+	static inline void
+	write(uint16_t data);
+
+	/**
+	 * Returns the value of the data register
+	 *
+	 * @warning 	This method does NOT do any sanity checks!!
+	 *				It is your responsibility to check if the register
+	 *				contains something useful!
+	 */
+	static inline void
+	read(uint8_t &data);
+
+	/**
+	 * Returns the value of the data register
+	 *
+	 * @warning 	This method does NOT do any sanity checks!!
+	 *				It is your responsibility to check if the register
+	 *				contains something useful!
+	 */
+	static inline void
+	read(uint16_t &data);
+
+
+	static inline void
+	enableInterruptVector(bool enable, uint32_t priority);
+
+	static inline void
+	enableInterrupt(Interrupt interrupt);
+
+	static inline void
+	disableInterrupt(Interrupt interrupt);
+
+	static inline InterruptFlag
+	getInterruptFlags();
+
+	/**
+	 * 
+	 *
+	 * @warning 	Not all InterruptFlags can be cleared this way.
+	 */
+	static inline void
+	acknowledgeInterruptFlag(InterruptFlag flags);
+};
+}
+}
+
+#include "spi_hal_{{ id }}_impl.hpp"
+
+#endif // XPCC_STM32_SPI_HAL_{{ id }}_HPP

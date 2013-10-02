@@ -1,270 +1,104 @@
 // coding: utf-8
+/* Copyright (c) 2013, Roboterclub Aachen e.V.
+* All Rights Reserved.
+*
+* The file is part of the xpcc library and is released under the 3-clause BSD
+* license. See the file `LICENSE` for the full license governing this code.
+*/
 // ----------------------------------------------------------------------------
-/* Copyright (c) 2011, Roboterclub Aachen e.V.
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- * 
- *     * Redistributions of source code must retain the above copyright
- *       notice, this list of conditions and the following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright
- *       notice, this list of conditions and the following disclaimer in the
- *       documentation and/or other materials provided with the distribution.
- *     * Neither the name of the Roboterclub Aachen e.V. nor the
- *       names of its contributors may be used to endorse or promote products
- *       derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY ROBOTERCLUB AACHEN E.V. ''AS IS'' AND ANY
- * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL ROBOTERCLUB AACHEN E.V. BE LIABLE FOR ANY
- * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
-// ----------------------------------------------------------------------------
-{{ generation_block }}
-
-#include "../gpio.hpp"
 #include "spi_{{ id }}.hpp"
-{% if id == 3 %}
-#if !defined(STM32F10X_LD) && !defined(STM32F10X_MD)
-{% endif %}
-namespace
-{
-	{% if id == 1 -%}
-	GPIO__OUTPUT(SckA5, A, 5);
-	GPIO__INPUT(MisoA6, A, 6);
-	GPIO__OUTPUT(MosiA7, A, 7);
-	
-	GPIO__OUTPUT(SckB3, B, 3);
-	GPIO__INPUT(MisoB4, B, 4);
-	GPIO__OUTPUT(MosiB5, B, 5);
-	{%- elif id == 2 -%}
-	GPIO__OUTPUT(SckB13, B, 13);
-	GPIO__INPUT(MisoB14, B, 14);
-	GPIO__OUTPUT(MosiB15, B, 15);
-	{%- elif id == 3 -%}
-	GPIO__OUTPUT(SckB3, B, 3);
-	GPIO__INPUT(MisoB4, B, 4);
-	GPIO__OUTPUT(MosiB5, B, 5);
-	
-	GPIO__OUTPUT(SckC10, C, 10);
-	GPIO__INPUT(MisoC11, C, 11);
-	GPIO__OUTPUT(MosiC12, C, 12);
-	{%- endif %}
-	
-	static uint8_t* transmitBuffer(0);
-	static uint8_t* receiveBuffer(0);
-	static uint16_t bufferLength(0);
-	enum
-	{
-		BUFFER_TRANSMIT_INCR_bm = 0x01,
-		BUFFER_RECEIVE_INCR_bm = 0x02,
-		BUFFER_TRANSMIT_IS_NOT_ZERO_bm = 0x04,
-		BUFFER_RECEIVE_IS_NOT_ZERO_bm = 0x08,
-		BUFFER_IS_DUMMY_bm = 0x10,
-		BUFFER_IS_BUSY_SYNC_bm = 0x20
-	};
-	static uint8_t status(0);
-}
 
-// ----------------------------------------------------------------------------
 void
-xpcc::stm32::SpiMaster{{ id }}::configurePins(Mapping mapping)
+xpcc::stm32::SimpleSpiMaster{{ id }}::setDataMode(DataMode mode)
 {
-	// Enable clock
-	{% if id == 1 -%}
-	RCC->APB2ENR |= RCC_APB2ENR_SPI1EN;
-	{%- elif id == 2 or id == 3 -%}
-	RCC->APB1ENR |= RCC_APB1ENR_SPI{{ id }}EN;
-	{%- endif %}
-	
-	// Initialize IO pins
-#if defined(STM32F2XX) || defined(STM32F4XX)
-	{% if id == 1 -%}
-	if (mapping == REMAP_PA5_PA6_PA7) {
-		SckA5::setAlternateFunction(AF_SPI1, xpcc::stm32::PUSH_PULL);
-		MisoA6::setAlternateFunction(AF_SPI1);
-		MosiA7::setAlternateFunction(AF_SPI1, xpcc::stm32::PUSH_PULL);
-	}
-	else {
-		SckB3::setAlternateFunction(AF_SPI1, xpcc::stm32::PUSH_PULL);
-		MisoB4::setAlternateFunction(AF_SPI1);
-		MosiB5::setAlternateFunction(AF_SPI1, xpcc::stm32::PUSH_PULL);
-	}
-	{%- elif id == 2 -%}
-	(void) mapping;		// avoid compiler warning
-	
-	SckB13::setAlternateFunction(AF_SPI2, xpcc::stm32::PUSH_PULL);
-	MisoB14::setAlternateFunction(AF_SPI2);
-	MosiB15::setAlternateFunction(AF_SPI2, xpcc::stm32::PUSH_PULL);
-	{%- elif id == 3 -%}
-	if (mapping == REMAP_PB3_PB4_PB5) {
-		SckB3::setAlternateFunction(AF_SPI3, xpcc::stm32::PUSH_PULL);
-		MisoB4::setAlternateFunction(AF_SPI3);
-		MosiB5::setAlternateFunction(AF_SPI3, xpcc::stm32::PUSH_PULL);
-	}
-	else {
-		SckC10::setAlternateFunction(AF_SPI3, xpcc::stm32::PUSH_PULL);
-		MisoC11::setAlternateFunction(AF_SPI3);
-		MosiC12::setAlternateFunction(AF_SPI3, xpcc::stm32::PUSH_PULL);
-	}
-	{%- endif %}
-#else
-	{% if id == 1 -%}
-	AFIO->MAPR = (AFIO->MAPR & ~AFIO_MAPR_SPI{{ id }}_REMAP) | mapping;
-	if (mapping == REMAP_PA5_PA6_PA7) {
-		SckA5::setAlternateFunction(xpcc::stm32::PUSH_PULL);
-		MisoA6::setInput(xpcc::stm32::FLOATING);
-		MosiA7::setAlternateFunction(xpcc::stm32::PUSH_PULL);
-	}
-	else {
-		SckB3::setAlternateFunction(xpcc::stm32::PUSH_PULL);
-		MisoB4::setInput(xpcc::stm32::FLOATING);
-		MosiB5::setAlternateFunction(xpcc::stm32::PUSH_PULL);
-	}
-	{%- elif id == 2 -%}
-	(void) mapping;		// avoid compiler warning
-	
-	SckB13::setAlternateFunction(xpcc::stm32::PUSH_PULL);
-	MisoB14::setInput(xpcc::stm32::FLOATING);
-	MosiB15::setAlternateFunction(xpcc::stm32::PUSH_PULL);
-	{%- elif id == 3 -%}
-	(void) mapping;		// avoid compiler warning
-	
-#if defined(STM32F10X_CL)
-	AFIO->MAPR = (AFIO->MAPR & ~AFIO_MAPR_SPI{{ id }}_REMAP) | mapping;
-	if (mapping == REMAP_PB3_PB4_PB5) {
-#endif
-		SckB3::setAlternateFunction(xpcc::stm32::PUSH_PULL);
-		MisoB4::setInput(xpcc::stm32::FLOATING);
-		MosiB5::setAlternateFunction(xpcc::stm32::PUSH_PULL);
-#if defined(STM32F10X_CL)
-	}
-	else {
-		SckC10::setAlternateFunction(xpcc::stm32::PUSH_PULL);
-		MisoC11::setInput(xpcc::stm32::FLOATING);
-		MosiC12::setAlternateFunction(xpcc::stm32::PUSH_PULL);
-	}
-#endif
-	{%- endif %}
-#endif
+	Spi{{ id }}::setDataMode(static_cast<Spi{{ id }}::DataMode>(mode));
 }
 
-
-// ----------------------------------------------------------------------------
 void
-xpcc::stm32::SpiMaster{{ id }}::initialize(Mode mode, Prescaler prescaler)
+xpcc::stm32::SimpleSpiMaster{{ id }}::setDataOrder(DataOrder order)
 {
-	{% if id == 1 -%}
-	RCC->APB2ENR |= RCC_APB2ENR_SPI1EN;
-	
-	RCC->APB2RSTR |=  RCC_APB2RSTR_SPI1RST;
-	RCC->APB2RSTR &= ~RCC_APB2RSTR_SPI1RST;
-	{%- elif id == 2 or id == 3 -%}
-	RCC->APB1ENR |= RCC_APB1ENR_SPI{{ id }}EN;
-	
-	RCC->APB1RSTR |=  RCC_APB1RSTR_SPI{{ id }}RST;
-	RCC->APB1RSTR &= ~RCC_APB1RSTR_SPI{{ id }}RST;
-	{%- endif %}
-	
-	// disable all interrupts
-	SPI{{ id }}->CR2 &= ~(SPI_CR2_TXEIE  | SPI_CR2_RXNEIE  | SPI_CR2_ERRIE);
-	
-	// disable peripheral
-	SPI{{ id }}->CR1 &= ~SPI_CR1_SPE;
-	
-	// set new mode
-	SPI{{ id }}->CR1 = prescaler | mode | SPI_CR1_MSTR | SPI_CR1_SSM | SPI_CR1_SSI;
-	    
-	// reenable peripheral
-	SPI{{ id }}->CR1 |= SPI_CR1_SPE;
-}
-	
-// ----------------------------------------------------------------------------
-bool
-xpcc::stm32::SpiMaster{{ id }}::setBuffer(uint16_t length, uint8_t* transmit, uint8_t* receive, BufferIncrease bufferIncrease)
-{
-	if (!isFinished()) {
-		return false;
+	if(order == DataOrder::MsbFirst) {
+		Spi{{ id }}::setDataOrder(Spi{{ id }}::DataOrder::MsbFirst);
+	} else {
+		Spi{{ id }}::setDataOrder(Spi{{ id }}::DataOrder::LsbFirst);
 	}
-	
-	transmitBuffer = transmit;
-	receiveBuffer = receive ? receive : transmit;
-	bufferLength = length;
-	
-	status &= ~(BUFFER_TRANSMIT_INCR_bm | BUFFER_RECEIVE_INCR_bm);
-	status |= bufferIncrease;
-	
-	return true;
 }
 
-bool
-xpcc::stm32::SpiMaster{{ id }}::transfer(TransferOptions options)
-{
-	if (status & BUFFER_IS_BUSY_SYNC_bm) {
-		return false;
-	}
-	
-	uint8_t rx(0), tx(0xff);
-	// send the buffer out, blocking
-	status |= BUFFER_IS_BUSY_SYNC_bm;
-	// check if we have to use a dummy buffer
-	bool transmit = (options & TRANSFER_SEND_BUFFER_DISCARD_RECEIVE) & static_cast<bool>(transmitBuffer);
-	bool receive = (options & TRANSFER_SEND_DUMMY_SAVE_RECEIVE) & static_cast<bool>(receiveBuffer);
-	
-	for(uint_fast16_t i=0; i < bufferLength; ++i)
-	{
-		if (transmit) {
-			tx = transmitBuffer[(status & BUFFER_TRANSMIT_INCR_bm) ? i : bufferLength-1-i];
-		}
-		
-		rx = write(tx);
-		
-		if (receive) {
-			receiveBuffer[(status & BUFFER_RECEIVE_INCR_bm) ? i : bufferLength-1-i] = rx;
-		}
-	}
-	
-	status &= ~BUFFER_IS_BUSY_SYNC_bm;
-	
-	return true;
-}
-
-bool
-xpcc::stm32::SpiMaster{{ id }}::transferSync(TransferOptions options)
-{
-	return transfer(options);
-}
-
-bool
-xpcc::stm32::SpiMaster{{ id }}::isFinished()
-{
-	return !(status & BUFFER_IS_BUSY_SYNC_bm);
-}
-
-// ----------------------------------------------------------------------------
 uint8_t
-xpcc::stm32::SpiMaster{{ id }}::write(uint8_t data)
+xpcc::stm32::SimpleSpiMaster{{ id }}::writeReadBlocking(uint8_t data)
 {
-	while (!(SPI{{ id }}->SR & SPI_SR_TXE)) {
-		// wait until the previous transmission is finished
-	}
-	
-	SPI{{ id }}->DR = data;
-	
-	while (!(SPI{{ id }}->SR & SPI_SR_RXNE)) {
-		// wait until the data is received
-	}
-	
-	return SPI{{ id }}->DR;
+	writeBlocking(data);
+	while(!Spi{{ id }}::isReceiveRegisterNotEmpty());
+	return getResult();
 }
 
-{% if id == 3 -%}
-#endif
-{%- endif %}
+void
+xpcc::stm32::SimpleSpiMaster{{ id }}::writeBlocking(uint8_t data)
+{
+	while(!Spi{{ id }}::isTransmitRegisterEmpty());
+	Spi{{ id }}::write(data);
+}
+
+bool
+xpcc::stm32::SimpleSpiMaster{{ id }}::write(uint8_t data)
+{
+	if(Spi{{ id }}::isTransmitRegisterEmpty()){
+		Spi{{ id }}::write(data);
+		return true;
+	} else {
+		return false;
+	}
+}
+
+uint8_t
+xpcc::stm32::SimpleSpiMaster{{ id }}::getResult()
+{
+	uint8_t data;
+	Spi{{ id }}::read(data);
+	return data;
+}
+
+bool
+xpcc::stm32::SimpleSpiMaster{{ id }}::transfer(uint8_t * tx, uint8_t * rx, std::size_t length, BufferOptions options )
+{
+	int_fast8_t tx_step, rx_step;
+	switch(options)
+	{
+	case BufferOptions::TxRxIncrement:
+		tx_step =  1;
+		rx_step =  1;
+		break;
+	case BufferOptions::TxIncrementRxDecrement:
+		tx_step =  1;
+		rx_step = -1;
+		break;
+	case BufferOptions::TxDecrementRxIncrement:
+		tx_step = -1;
+		rx_step =  1;
+		break;
+	case BufferOptions::TxRxDecrement:
+		tx_step = -1;
+		rx_step = -1;
+		break;
+	default:
+		tx_step =  1;
+		rx_step =  1;
+		break;
+	}
+
+	uint8_t * tx_stop = tx + (length * tx_step);
+
+	while(tx != tx_stop){
+		*rx = writeReadBlocking(*tx);
+		tx += tx_step;
+		rx += rx_step;
+	}
+
+	return true;
+}
+
+bool
+xpcc::stm32::SimpleSpiMaster{{ id }}::isFinished()
+{
+	return Spi{{ id }}::isTransmitRegisterEmpty();
+}

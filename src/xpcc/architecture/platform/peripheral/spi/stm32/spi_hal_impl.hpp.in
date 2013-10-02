@@ -1,0 +1,181 @@
+// coding: utf-8
+/*
+* Copyright (c) 2013, Roboterclub Aachen e.V.
+* All Rights Reserved.
+*
+* The file is part for the xpcc library and is released under the
+* 3-clause BSD license. See the file `LICENSE` for the full license
+* governing this code.
+*/
+// ----------------------------------------------------------------------------
+
+#ifndef XPCC_STM32_SPI_HAL_{{ id }}_HPP
+#	error 	"Don't include this file directly, use" \
+#			"'spi_hal_{{ id }}.hpp' instead!"
+#endif
+
+void
+xpcc::stm32::Spi{{ id }}::enable()
+{
+%% if id == 1
+	// enable clock
+	RCC->APB2ENR |= RCC_APB2ENR_SPI{{ id }}EN;
+	// reset spi
+	RCC->APB2RSTR |=  RCC_APB2RSTR_SPI{{ id }}RST;
+	RCC->APB2RSTR &= ~RCC_APB2RSTR_SPI{{ id }}RST;
+%% elif id in [2, 3]
+	// enable clock
+	RCC->APB1ENR |= RCC_APB1ENR_SPI{{ id }}EN;
+	// reset spi
+	RCC->APB1RSTR |=  RCC_APB1RSTR_SPI{{ id }}RST;
+	RCC->APB1RSTR &= ~RCC_APB1RSTR_SPI{{ id }}RST;
+%% endif
+	SPI{{ id }}->CR1 |= SPI_CR1_SPE;		// SPI Enable
+}
+
+void
+xpcc::stm32::Spi{{ id }}::disable()
+{
+	// disable clock
+%% if id == 1
+	RCC->APB2ENR &= ~RCC_APB2ENR_SPI{{ id }}EN;
+%% elif id in [2, 3]
+	RCC->APB1ENR &= ~RCC_APB1ENR_SPI{{ id }}EN;
+%% endif
+}
+
+void
+xpcc::stm32::Spi{{ id }}::initialize(Prescaler prescaler,
+		MasterSelection masterSelection, DataMode dataMode,
+		DataOrder dataOrder, DataSize dataSize)
+{
+	enable();
+	// disable peripheral
+	SPI{{ id }}->CR1 &= ~SPI_CR1_SPE;
+	// set parameters
+	SPI{{ id }}->CR1 = 	  static_cast<uint32_t>(dataMode)
+						| static_cast<uint32_t>(dataOrder)
+						| static_cast<uint32_t>(dataSize)
+						| static_cast<uint32_t>(masterSelection)
+%% if target is stm32f1 or target is stm32f2 or target is stm32f4
+						| static_cast<uint32_t>(prescaler);
+%% elif target is stm32f0 or target is stm32f3
+						;
+	SPI{{ id }}->CR2 = static_cast<uint32_t>(prescaler);
+%% endif
+	if(masterSelection == MasterSelection::Master) {
+		SPI{{ id }}->CR2 |=  SPI_CR2_SSOE; // for master mode
+	}
+	// reenable peripheral
+	SPI{{ id }}->CR1 |= SPI_CR1_SPE;
+}
+
+void
+xpcc::stm32::Spi{{ id }}::setDataMode(DataMode dataMode)
+{
+	SPI{{ id }}->CR1 = (SPI{{ id }}->CR1 & static_cast<uint32_t>(DataMode::All))
+										 | static_cast<uint32_t>(dataMode);
+}
+
+void
+xpcc::stm32::Spi{{ id }}::setDataOrder(DataOrder dataOrder)
+{
+	SPI{{ id }}->CR1 = (SPI{{ id }}->CR1 & static_cast<uint32_t>(DataOrder::All))
+										 | static_cast<uint32_t>(dataOrder);
+}
+
+void
+xpcc::stm32::Spi{{ id }}::setDataSize(DataSize dataSize)
+{
+%% if target is stm32f0 or target is stm32f3
+	SPI{{ id }}->CR2 = (SPI{{ id }}->CR2 & static_cast<uint32_t>(DataSize::All))
+										 | static_cast<uint32_t>(dataSize);
+%% elif target is stm32f1 or target is stm32f2 or target is stm32f4
+	// TODO: implement as set/reset bit
+	SPI{{ id }}->CR1 = (SPI{{ id }}->CR1 & static_cast<uint32_t>(DataSize::All))
+										 | static_cast<uint32_t>(dataSize);
+%% endif
+}
+
+void
+xpcc::stm32::Spi{{ id }}::setMasterSelection(MasterSelection masterSelection)
+{
+	// TODO: implement as set/reset bit
+	SPI{{ id }}->CR1 = (SPI{{ id }}->CR1 & static_cast<uint32_t>(MasterSelection::All))
+										 | static_cast<uint32_t>(masterSelection);
+}
+
+bool
+xpcc::stm32::Spi{{ id }}::isReceiveRegisterNotEmpty()
+{
+	return getInterruptFlags() & InterruptFlag::RxBufferNotEmpty;
+}
+
+bool
+xpcc::stm32::Spi{{ id }}::isTransmitRegisterEmpty()
+{
+	return getInterruptFlags() & InterruptFlag::TxBufferEmpty;
+}
+
+void
+xpcc::stm32::Spi{{ id }}::write(uint8_t data)
+{
+	SPI{{ id }}->DR = static_cast<uint16_t>(data);
+}
+
+void
+xpcc::stm32::Spi{{ id }}::write(uint16_t data)
+{
+	SPI{{ id }}->DR = data;
+}
+
+void
+xpcc::stm32::Spi{{ id }}::read(uint8_t &data)
+{
+	data = static_cast<uint8_t>(SPI{{ id }}->DR);
+}
+
+void
+xpcc::stm32::Spi{{ id }}::read(uint16_t &data)
+{
+	data = static_cast<uint16_t>(SPI{{ id }}->DR);
+}
+
+void
+xpcc::stm32::Spi{{ id }}::enableInterruptVector(bool enable, uint32_t priority)
+{
+	if (enable) {
+		// Set priority for the interrupt vector
+		NVIC_SetPriority(SPI{{ id }}_IRQn, priority);
+		// register IRQ at the NVIC
+		NVIC_EnableIRQ(SPI{{ id }}_IRQn);
+	}
+	else {
+		NVIC_DisableIRQ(SPI{{ id }}_IRQn);
+	}
+}
+
+void
+xpcc::stm32::Spi{{ id }}::enableInterrupt(Interrupt interrupt)
+{
+	SPI{{ id }}->CR2 |= static_cast<uint32_t>(interrupt);
+}
+
+void
+xpcc::stm32::Spi{{ id }}::disableInterrupt(Interrupt interrupt)
+{
+	SPI{{ id }}->CR2 &= ~static_cast<uint32_t>(interrupt);
+}
+
+xpcc::stm32::Spi{{ id }}::InterruptFlag
+xpcc::stm32::Spi{{ id }}::getInterruptFlags()
+{
+	return static_cast<InterruptFlag>(SPI{{ id }}->SR );
+}
+
+void
+xpcc::stm32::Spi{{ id }}::acknowledgeInterruptFlag(InterruptFlag flags)
+{
+	// TODO: implement; see STM32F3 reference manual p. 736
+	// SPI{{ id }}->SR =  static_cast<InterruptFlag>(flags);
+}
