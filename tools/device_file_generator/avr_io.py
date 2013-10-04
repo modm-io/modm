@@ -618,8 +618,8 @@ pins = \
 		],
 		"spi":
 		[
-			{ "port": "B", "id": "3", "name": "miso", "dir": "in" },
-			{ "port": "B", "id": "4", "name": "mosi", "dir": "out" },
+			{ "port": "B", "id": "3", "name": "mosi", "dir": "out" },
+			{ "port": "B", "id": "4", "name": "miso", "dir": "in" },
 			{ "port": "B", "id": "5", "name": "sck", "dir": "out" },
 			{ "port": "B", "id": "2", "name": "ss", "dir": "out" }
 		],

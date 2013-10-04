@@ -70,12 +70,12 @@
         <af peripheral="SpiSlave" type="in" name="Ss"/>
       </gpio>
       <gpio port="B" id="3" pcint="3">
-        <af peripheral="SpiMaster" type="in" name="Miso"/>
-        <af peripheral="SpiSlave" type="out" name="Somi"/>
-      </gpio>
-      <gpio port="B" id="4" pcint="4">
         <af peripheral="SpiMaster" type="out" name="Mosi"/>
         <af peripheral="SpiSlave" type="in" name="Simo"/>
+      </gpio>
+      <gpio port="B" id="4" pcint="4">
+        <af peripheral="SpiMaster" type="in" name="Miso"/>
+        <af peripheral="SpiSlave" type="out" name="Somi"/>
       </gpio>
       <gpio port="B" id="5" pcint="5">
         <af peripheral="SpiMaster" type="out" name="Sck"/>
