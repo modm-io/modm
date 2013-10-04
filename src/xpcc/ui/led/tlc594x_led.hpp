@@ -12,6 +12,8 @@
 
 #include <stdint.h>
 #include "led.hpp"
+#include "tables.hpp"
+#include <xpcc/architecture/driver/accessor.hpp>
 #include <xpcc/driver/pwm/tlc594x.hpp>
 
 
@@ -40,14 +42,14 @@ class TLC594XLed : public Led
 	}
 
 public:
-	TLC594XLed(const uint8_t channel, const uint16_t* table=led::table12_256)
-	:	Led(), channel(channel), table(table), currentValue(0)
+	TLC594XLed(const uint8_t channel, const uint16_t* table=table12_256)
+	:	Led(), channel(channel), table(table)
 	{
 	}
 };
 
-}
+} // namespace ui
 
-}
+} // namespace xpcc
 
 #endif	// XPCC_UI_TLC594X_LED_HPP

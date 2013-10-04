@@ -82,8 +82,11 @@ xpcc::ui::Led::run()
 	if (fadeTime)
 	{
 		uint8_t delta = (xpcc::Clock::now() - stamp).getTime();
+
 		if (delta)
 		{
+			stamp = xpcc::Clock::now();
+
 			while (delta--)
 			{
 				startValue += deltaValue;
@@ -98,7 +101,6 @@ xpcc::ui::Led::run()
 				}
 			}
 
-			stamp = xpcc::Clock::now();
 			setValue(currentValue);
 		}
 	}
