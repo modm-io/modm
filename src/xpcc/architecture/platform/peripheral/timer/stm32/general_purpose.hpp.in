@@ -42,6 +42,15 @@ class Timer{{ id }} : public GeneralPurposeTimer
 {
 public:
 
+%% set connectors = []
+%% import 'connectors.macros' as cons with context
+%% for c in connectors
+	/// TypeId used to connect GPIO pins to this peripheral's {{ c }}.
+	static const TypeId::Timer{{ id ~ c}} {{ c }};
+%% endfor
+
+public:
+
 	enum class MasterMode : uint32_t
 	{
 		Reset 			= 0,							// 0b000
