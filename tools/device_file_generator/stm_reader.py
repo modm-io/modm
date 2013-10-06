@@ -77,6 +77,8 @@ class STMDeviceReader(XMLDeviceReader):
 		propertyGroup = XMLDeviceReader(os.path.join(os.path.dirname(file), 'propertyGroups.xml'), self.log)
 		architecture = propertyGroup.query("//groupEntry[@name='%s']/property[@name='arm_architecture']" % name)[0].get('value').lower()
 		core = propertyGroup.query("//groupEntry[@name='%s']/property[@name='arm_core_type']" % name)[0].get('value').lower()
+		if len(propertyGroup.query("//groupEntry[@name='%s']/property[@name='arm_fpu_type']" % name)) > 0:
+			core += 'f'
 		defines = propertyGroup.query("//groupEntry[@name='%s']/cdefine" % name)
 		for define in defines:
 			cdef = define.get('name')
