@@ -179,6 +179,11 @@
 
 %% macro startupCode()
 %#
+%% if target is stm32f3
+	// Remap USB Interrupts
+	SYSCFG->CFGR1 |= SYSCFG_CFGR1_USB_IT_RMP;
+%% endif
+
 // TODO: check F_CPU to determine flash latency
 %% if target is stm32f2
 	// prepare flash latency for working at 120MHz and supply voltage > 2.7
