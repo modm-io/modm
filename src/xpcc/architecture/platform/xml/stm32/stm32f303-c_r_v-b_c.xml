@@ -33,6 +33,7 @@
 		</driver>
 		<!-- Peripheral Drivers -->
 		<driver type="clock" name="stm32" /> <!-- the clock peripheral does not need the instances attribute because there is only one instance -->
+		<driver type="usb" name="stm32_fs" />
 		<driver type="uart" name="stm32"   instances="1,2,3,4,5" />
 		<!--<driver type="adc"  name="stm32f3" instances="1,2,3,4" />
 		<driver type="timer" name="stm32" instances="1,2,3,4,8" />-->
@@ -57,6 +58,12 @@
 			<gpio port="A" id="10">
 				<af id="7" peripheral="UsartHal1" name="Rx" type="input"/>
 				<af id="7" peripheral="Uart1" name="Rx" type="input"/>
+			</gpio>
+			<gpio port="A" id="11">
+				<af id="14" peripheral="Usb" name="Dm" />
+			</gpio>
+			<gpio port="A" id="12">
+				<af id="14" peripheral="Usb" name="Dp" />
 			</gpio>
 			<gpio port="B" id="10">
 				<af id="7" peripheral="UsartHal3" name="Tx" type="output"/>
