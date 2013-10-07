@@ -180,6 +180,8 @@
 %% macro startupCode()
 %#
 %% if target is stm32f3
+	// enable clock
+	RCC->APB2ENR |= RCC_APB2ENR_SYSCFGEN;
 	// Remap USB Interrupts
 	SYSCFG->CFGR1 |= SYSCFG_CFGR1_USB_IT_RMP;
 %% endif
