@@ -12,20 +12,20 @@
 #endif
 
 template <typename SCK, typename MOSI, typename MISO, uint32_t Baudrate>
-uint8_t xpcc::SoftwareSimpleSpi<SCK, MOSI, MISO, Baudrate>::operationMode(0);
+uint8_t xpcc::SoftwareSpiSimpleMaster<SCK, MOSI, MISO, Baudrate>::operationMode(0);
 
 template <typename SCK, typename MOSI, typename MISO, uint32_t Baudrate>
-bool xpcc::SoftwareSimpleSpi<SCK, MOSI, MISO, Baudrate>::finished;
+bool xpcc::SoftwareSpiSimpleMaster<SCK, MOSI, MISO, Baudrate>::finished;
 
 template <typename SCK, typename MOSI, typename MISO, uint32_t Baudrate>
-uint8_t xpcc::SoftwareSimpleSpi<SCK, MOSI, MISO, Baudrate>::result;
+uint8_t xpcc::SoftwareSpiSimpleMaster<SCK, MOSI, MISO, Baudrate>::result;
 
 
 // ----------------------------------------------------------------------------
 template <typename SCK, typename MOSI, typename MISO, uint32_t Baudrate>
 template< uint32_t baudrate >
 void
-xpcc::SoftwareSimpleSpi<SCK, MOSI, MISO, Baudrate>::initialize()
+xpcc::SoftwareSpiSimpleMaster<SCK, MOSI, MISO, Baudrate>::initialize()
 {
 	SCK::reset();
 	MOSI::reset();
@@ -34,7 +34,7 @@ xpcc::SoftwareSimpleSpi<SCK, MOSI, MISO, Baudrate>::initialize()
 
 template <typename SCK, typename MOSI, typename MISO, uint32_t Baudrate>
 void
-xpcc::SoftwareSimpleSpi<SCK, MOSI, MISO, Baudrate>::setDataMode(DataMode mode)
+xpcc::SoftwareSpiSimpleMaster<SCK, MOSI, MISO, Baudrate>::setDataMode(DataMode mode)
 {
 	operationMode = static_cast<uint8_t>(mode);
 	SCK::set(operationMode & 0b10);
@@ -42,7 +42,7 @@ xpcc::SoftwareSimpleSpi<SCK, MOSI, MISO, Baudrate>::setDataMode(DataMode mode)
 
 template <typename SCK, typename MOSI, typename MISO, uint32_t Baudrate>
 void
-xpcc::SoftwareSimpleSpi<SCK, MOSI, MISO, Baudrate>::setDataOrder(DataOrder order)
+xpcc::SoftwareSpiSimpleMaster<SCK, MOSI, MISO, Baudrate>::setDataOrder(DataOrder order)
 {
 	operationMode &= ~0b100;
 	if (order == DataOrder::LsbFirst)
@@ -52,7 +52,7 @@ xpcc::SoftwareSimpleSpi<SCK, MOSI, MISO, Baudrate>::setDataOrder(DataOrder order
 
 template <typename SCK, typename MOSI, typename MISO, uint32_t Baudrate>
 uint8_t
-xpcc::SoftwareSimpleSpi<SCK, MOSI, MISO, Baudrate>::writeReadBlocking(uint8_t data)
+xpcc::SoftwareSpiSimpleMaster<SCK, MOSI, MISO, Baudrate>::writeReadBlocking(uint8_t data)
 {
 	while (!isFinished())
 		;
@@ -113,14 +113,14 @@ xpcc::SoftwareSimpleSpi<SCK, MOSI, MISO, Baudrate>::writeReadBlocking(uint8_t da
 
 template <typename SCK, typename MOSI, typename MISO, uint32_t Baudrate>
 void
-xpcc::SoftwareSimpleSpi<SCK, MOSI, MISO, Baudrate>::writeBlocking(uint8_t data)
+xpcc::SoftwareSpiSimpleMaster<SCK, MOSI, MISO, Baudrate>::writeBlocking(uint8_t data)
 {
 	writeReadBlocking(data);
 }
 
 template <typename SCK, typename MOSI, typename MISO, uint32_t Baudrate>
 bool
-xpcc::SoftwareSimpleSpi<SCK, MOSI, MISO, Baudrate>::write(uint8_t data)
+xpcc::SoftwareSpiSimpleMaster<SCK, MOSI, MISO, Baudrate>::write(uint8_t data)
 {
 	writeReadBlocking(data);
 	return true;
@@ -128,28 +128,28 @@ xpcc::SoftwareSimpleSpi<SCK, MOSI, MISO, Baudrate>::write(uint8_t data)
 
 template <typename SCK, typename MOSI, typename MISO, uint32_t Baudrate>
 uint8_t
-xpcc::SoftwareSimpleSpi<SCK, MOSI, MISO, Baudrate>::getResult()
+xpcc::SoftwareSpiSimpleMaster<SCK, MOSI, MISO, Baudrate>::getResult()
 {
 	return result;
 }
 
 template <typename SCK, typename MOSI, typename MISO, uint32_t Baudrate>
 bool
-xpcc::SoftwareSimpleSpi<SCK, MOSI, MISO, Baudrate>::isFinished()
+xpcc::SoftwareSpiSimpleMaster<SCK, MOSI, MISO, Baudrate>::isFinished()
 {
 	return finished;
 }
 
 template <typename SCK, typename MOSI, typename MISO, uint32_t Baudrate>
 void
-xpcc::SoftwareSimpleSpi<SCK, MOSI, MISO, Baudrate>::delay()
+xpcc::SoftwareSpiSimpleMaster<SCK, MOSI, MISO, Baudrate>::delay()
 {
 	xpcc::delay_us(delayTime);
 }
 
 template <typename SCK, typename MOSI, typename MISO, uint32_t Baudrate>
 bool
-xpcc::SoftwareSimpleSpi<SCK, MOSI, MISO, Baudrate>::transfer(uint8_t *tx, uint8_t *rx, std::size_t length, BufferOptions options)
+xpcc::SoftwareSpiSimpleMaster<SCK, MOSI, MISO, Baudrate>::transfer(uint8_t *tx, uint8_t *rx, std::size_t length)
 {
 	if (!isFinished())
 		return false;
@@ -160,11 +160,11 @@ xpcc::SoftwareSimpleSpi<SCK, MOSI, MISO, Baudrate>::transfer(uint8_t *tx, uint8_
 
 	for (std::size_t i = 0; i < length; i++)
 	{
-		if (tx) tx_byte = tx[static_cast<uint8_t>(options) & 0b10 ? i : length-i-1];
+		if (tx) tx_byte = tx[i];
 
 		rx_byte = writeReadBlocking(tx_byte);
 
-		if (rx) rx[static_cast<uint8_t>(options) & 0b01 ? i : length-i-1] = rx_byte;
+		if (rx) rx[i] = rx_byte;
 	}
 
 	finished = true;

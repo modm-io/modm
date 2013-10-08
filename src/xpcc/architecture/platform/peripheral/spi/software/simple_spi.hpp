@@ -34,7 +34,7 @@ template< typename SCK,
 		  typename MOSI,
 		  typename MISO = GpioUnused,
 		  uint32_t Baudrate = 2000000UL >
-class SoftwareSimpleSpi : public ::xpcc::SimpleSpi
+class SoftwareSpiSimpleMaster : public ::xpcc::SpiSimpleMaster
 {
 public:
 	static const TypeId::SoftwareSpiMasterMosi Mosi;
@@ -66,7 +66,7 @@ public:
 	getResult();
 
 	static inline bool
-	transfer(uint8_t *tx, uint8_t *rx, std::size_t length, BufferOptions options=BufferOptions::TxRxIncrement);
+	transfer(uint8_t *tx, uint8_t *rx, std::size_t length);
 
 	static ALWAYS_INLINE bool
 	isFinished();

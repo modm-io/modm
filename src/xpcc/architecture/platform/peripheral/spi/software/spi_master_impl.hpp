@@ -67,14 +67,14 @@ xpcc::SoftwareSpiMaster<SCK, MOSI, MISO, Baudrate>::startBlocking(xpcc::SpiDeleg
 				uint8_t tx_byte = 0xff;
 				uint8_t rx_byte;
 
-				for (std::size_t ii = 0; ii < t.size; ii++)
+				for (std::size_t ii = 0; ii < t.length; ii++)
 				{
-					if (t.writeBuffer) tx_byte = t.writeBuffer[static_cast<uint8_t>(t.options) & 0b10 ? ii : t.size-ii-1];
+					if (t.writeBuffer) tx_byte = t.writeBuffer[ii];
 
 					rx_byte = writeReadBlocking(tx_byte);
 					DEBUG_SW_SPI('w');
 
-					if (t.readBuffer) t.readBuffer[static_cast<uint8_t>(t.options) & 0b01 ? ii : t.size-ii-1] = rx_byte;
+					if (t.readBuffer) t.readBuffer[ii] = rx_byte;
 				}
 				DEBUG_SW_SPI(' ');
 

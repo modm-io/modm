@@ -9,13 +9,13 @@
 #include "spi_{{ id }}.hpp"
 
 void
-xpcc::stm32::SimpleSpiMaster{{ id }}::setDataMode(DataMode mode)
+xpcc::stm32::SpiSimpleMaster{{ id }}::setDataMode(DataMode mode)
 {
 	Spi{{ id }}::setDataMode(static_cast<Spi{{ id }}::DataMode>(mode));
 }
 
 void
-xpcc::stm32::SimpleSpiMaster{{ id }}::setDataOrder(DataOrder order)
+xpcc::stm32::SpiSimpleMaster{{ id }}::setDataOrder(DataOrder order)
 {
 	if(order == DataOrder::MsbFirst) {
 		Spi{{ id }}::setDataOrder(Spi{{ id }}::DataOrder::MsbFirst);
@@ -25,7 +25,7 @@ xpcc::stm32::SimpleSpiMaster{{ id }}::setDataOrder(DataOrder order)
 }
 
 uint8_t
-xpcc::stm32::SimpleSpiMaster{{ id }}::writeReadBlocking(uint8_t data)
+xpcc::stm32::SpiSimpleMaster{{ id }}::writeReadBlocking(uint8_t data)
 {
 	writeBlocking(data);
 	while(!Spi{{ id }}::isReceiveRegisterNotEmpty());
@@ -33,14 +33,14 @@ xpcc::stm32::SimpleSpiMaster{{ id }}::writeReadBlocking(uint8_t data)
 }
 
 void
-xpcc::stm32::SimpleSpiMaster{{ id }}::writeBlocking(uint8_t data)
+xpcc::stm32::SpiSimpleMaster{{ id }}::writeBlocking(uint8_t data)
 {
 	while(!Spi{{ id }}::isTransmitRegisterEmpty());
 	Spi{{ id }}::write(data);
 }
 
 bool
-xpcc::stm32::SimpleSpiMaster{{ id }}::write(uint8_t data)
+xpcc::stm32::SpiSimpleMaster{{ id }}::write(uint8_t data)
 {
 	if(Spi{{ id }}::isTransmitRegisterEmpty()){
 		Spi{{ id }}::write(data);
@@ -51,7 +51,7 @@ xpcc::stm32::SimpleSpiMaster{{ id }}::write(uint8_t data)
 }
 
 uint8_t
-xpcc::stm32::SimpleSpiMaster{{ id }}::getResult()
+xpcc::stm32::SpiSimpleMaster{{ id }}::getResult()
 {
 	uint8_t data;
 	Spi{{ id }}::read(data);
@@ -59,46 +59,32 @@ xpcc::stm32::SimpleSpiMaster{{ id }}::getResult()
 }
 
 bool
-xpcc::stm32::SimpleSpiMaster{{ id }}::transfer(uint8_t * tx, uint8_t * rx, std::size_t length, BufferOptions options )
+xpcc::stm32::SpiSimpleMaster{{ id }}::transfer(uint8_t * tx, uint8_t * rx,
+		std::size_t length)
 {
-	int_fast8_t tx_step, rx_step;
-	switch(options)
+	if (!isFinished())
+		return false;
+
+	finished = false;
+
+	uint_fast8_t tx_byte = 0xff;
+	uint_fast8_t rx_byte;
+
+	for (std::size_t i = 0; i < length; i++)
 	{
-	case BufferOptions::TxRxIncrement:
-		tx_step =  1;
-		rx_step =  1;
-		break;
-	case BufferOptions::TxIncrementRxDecrement:
-		tx_step =  1;
-		rx_step = -1;
-		break;
-	case BufferOptions::TxDecrementRxIncrement:
-		tx_step = -1;
-		rx_step =  1;
-		break;
-	case BufferOptions::TxRxDecrement:
-		tx_step = -1;
-		rx_step = -1;
-		break;
-	default:
-		tx_step =  1;
-		rx_step =  1;
-		break;
+		if (tx) tx_byte = tx[i];
+
+		rx_byte = writeReadBlocking(tx_byte);
+
+		if (rx) rx[i] = rx_byte;
 	}
 
-	uint8_t * tx_stop = tx + (length * tx_step);
-
-	while(tx != tx_stop){
-		*rx = writeReadBlocking(*tx);
-		tx += tx_step;
-		rx += rx_step;
-	}
-
+	finished = true;
 	return true;
 }
 
 bool
-xpcc::stm32::SimpleSpiMaster{{ id }}::isFinished()
+xpcc::stm32::SpiSimpleMaster{{ id }}::isFinished()
 {
 	return Spi{{ id }}::isTransmitRegisterEmpty();
 }

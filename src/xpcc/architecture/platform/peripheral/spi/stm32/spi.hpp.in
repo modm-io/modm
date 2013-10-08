@@ -25,7 +25,7 @@ namespace stm32
  * Simple unbuffered implementation.
  * @ingroup		stm32
  */
-class SimpleSpiMaster{{ id }} : public xpcc::SimpleSpi
+class SpiSimpleMaster{{ id }} : public xpcc::SpiSimpleMaster
 {
 public:
 	enum class
@@ -65,7 +65,7 @@ public:
 	getResult();
 
 	static bool
-	transfer(uint8_t * tx, uint8_t * rx, std::size_t length, BufferOptions options=BufferOptions::TxRxIncrement);
+	transfer(uint8_t * tx, uint8_t * rx, std::size_t length);
 
 	static bool
 	isFinished();
