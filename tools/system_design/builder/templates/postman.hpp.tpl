@@ -8,7 +8,7 @@
 #ifndef	POSTMAN_HPP
 #define	POSTMAN_HPP
 
-#include <xpcc/communication/postman/postman.hpp>
+#include <xpcc/communication/xpcc/postman/postman.hpp>
 
 class Postman : public xpcc::Postman
 {
