@@ -54,6 +54,13 @@ struct Gpio
 		%% endif
 	};
 
+	enum class InputTrigger : uint8_t
+	{
+		Rising,
+		Falling,
+		RisingFalling,
+	};
+
 	/// @ingroup	stm32{{ target.family }}
 	static void
 	enable()
@@ -147,7 +154,18 @@ private:
 							(af_id == 0)? (pin * 4) : ((pin - 8) * 4);
 	/// Alternate Function register mask.
 	static constexpr uint32_t af_mask  = 0xf << af_offset;
-
+	/// ExternalInterruptIRQ
+%% if pin|int in range(0,5)
+	%% if target is stm32f3 and pin|int == 2
+	static constexpr IRQn_Type ExternalInterruptIRQ = EXTI2_TS_IRQn;
+	%% else
+	static constexpr IRQn_Type ExternalInterruptIRQ = EXTI{{pin}}_IRQn;
+	%% endif
+%% elif pin|int in range(5,10)
+	static constexpr IRQn_Type ExternalInterruptIRQ = EXTI9_5_IRQn;
+%% elif pin|int in range(10,16)
+	static constexpr IRQn_Type ExternalInterruptIRQ = EXTI15_10_IRQn;
+%% endif
 
 	/// TODO: Document
 	ALWAYS_INLINE static void
@@ -244,6 +262,74 @@ public:
 	ALWAYS_INLINE static void setInput(InputType type) {
 		configure(type);
 		setInput();
+	}
+	// External Interrupts
+	ALWAYS_INLINE static void
+	enableExternalInterrupt()
+	{
+		// PA[x], x =  0 ..  3 maps to EXTICR[0]
+		// PA[x], x =  4 ..  7 maps to EXTICR[1]
+		// PA[x], x =  8 .. 11 maps to EXTICR[2]
+		// PA[x], x = 12 .. 15 maps to EXTICR[3]
+		constexpr uint_fast8_t idx 	= (pin & 0x0f) >> 2;
+		constexpr uint16_t mask 	= ((pin & 0xf0) >> 4) << ( (pin & 0x03)  << 2);
+%% if target is stm32f1
+		// Enable AFIO
+		RCC->APB2ENR |= RCC_APB2ENR_AFIOEN;
+		AFIO->EXTICR[idx] |= mask;
+%% elif target is stm32f2 or target is stm32f3 or target is stm32f4
+		// Enable SYSCFG
+		RCC->APB2ENR |= RCC_APB2ENR_SYSCFGEN;
+		SYSCFG->EXTICR[idx] |= mask;
+%% endif
+		EXTI->IMR |= mask;
+	}
+	ALWAYS_INLINE static void
+	disableExternalInterrupt()
+	{
+		EXTI->IMR &= ~mask;
+	}
+	ALWAYS_INLINE static void
+	enableExternalInterruptVector(const uint32_t priority)
+	{
+		NVIC_SetPriority(ExternalInterruptIRQ, priority);
+		NVIC_EnableIRQ(ExternalInterruptIRQ);
+	}
+	ALWAYS_INLINE static void
+	disableExternalInterruptVector()
+	{
+		NVIC_DisableIRQ(ExternalInterruptIRQ);
+	}
+	ALWAYS_INLINE static void
+	setInputTrigger(const InputTrigger trigger)
+	{
+		switch (trigger)
+		{
+		case InputTrigger::Rising:
+			EXTI->RTSR |=  (mask);
+			EXTI->FTSR &= ~(mask);
+			break;
+		case InputTrigger::Falling:
+			EXTI->RTSR &= ~(mask);
+			EXTI->FTSR |=  (mask);
+			break;
+		case InputTrigger::RisingFalling:
+			EXTI->RTSR |=  (mask);
+			EXTI->FTSR |=  (mask);
+			break;
+		}
+	}
+	ALWAYS_INLINE static bool
+	getExternalInterruptFlag()
+	{
+		return (EXTI->PR & mask);
+	}
+	/**	\brief	Reset the interrupt flag in the interrupt routine. */
+	ALWAYS_INLINE static void
+	acknowledgeExternalInterruptFlag()
+	{
+		// Flags are cleared by writing a one to the flag position.
+		EXTI->PR |= mask;
 	}
 		%% endif
 	// connect: Hardware Gpio
