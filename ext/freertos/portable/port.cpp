@@ -59,7 +59,7 @@
 #include "../FreeRTOS.h"
 #include "../task.h"
 
-#include <xpcc/architecture/platform/cortex_m3/stm32/systick_timer.hpp>
+#include <xpcc/architecture/platform.hpp>
 
 /* For backward compatibility, ensure configKERNEL_INTERRUPT_PRIORITY is
 defined.  The value should also ensure backward compatibility.
@@ -143,8 +143,8 @@ portBASE_TYPE xPortStartScheduler( void )
 	*(portNVIC_SYSPRI2) |= portNVIC_PENDSV_PRI;
 	*(portNVIC_SYSPRI2) |= portNVIC_SYSTICK_PRI;
 
-	xpcc::stm32::SysTickTimer::attachInterrupt(vPortSysTickHandler);
-	xpcc::stm32::SysTickTimer::enable();
+	xpcc::cortex::SysTickTimer::attachInterrupt(vPortSysTickHandler);
+	xpcc::cortex::SysTickTimer::enable();
 
 	/* Initialize the critical nesting count ready for the first task. */
 	uxCriticalNesting = 0;

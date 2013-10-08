@@ -11,7 +11,7 @@
 #include <xpcc/architecture/driver/clock.hpp>
 #include <xpcc/utils/dummy.hpp>
 
-#include "device.h"
+#include "../../../device.hpp"
 #include "systick_timer.hpp"
 
 
