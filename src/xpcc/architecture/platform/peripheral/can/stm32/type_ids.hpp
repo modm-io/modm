@@ -23,6 +23,10 @@ namespace TypeId
 
 	typedef struct{} Can2Rx;
 	typedef struct{} Can2Tx;
+
+	// for STM32F3
+	typedef struct{} CanNRx;
+	typedef struct{} CanNTx;
 }
 
 } // namespace stm32

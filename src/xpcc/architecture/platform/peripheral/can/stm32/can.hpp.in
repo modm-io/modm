@@ -74,10 +74,17 @@ public:
 	};
 
 public:
+%% if target is stm32f3
+	/// TypeId used to connect GPIO pins to this peripheral's rx.
+	static const TypeId::CanNRx Rx;
+	/// TypeId used to connect GPIO pins to this peripheral's tx.
+	static const TypeId::CanNTx Tx;
+%% else
 	/// TypeId used to connect GPIO pins to this peripheral's rx.
 	static const TypeId::Can{{ id }}Rx Rx;
 	/// TypeId used to connect GPIO pins to this peripheral's tx.
 	static const TypeId::Can{{ id }}Tx Tx;
+%% endif
 private:
 	/// Private Initializer with computed prescaler and timing constants
 	static void
