@@ -21,4 +21,7 @@
 	%% elif id in [10, 11, 13, 14]
 	%# General Purpose Timer
 		%% do connectors.extend(["Channel1"])
+	%% elif id in [15, 16, 17]
+	%# General Purpose Timer
+		%% do connectors.extend(["Channel1", "Channel1N", "Channel2", "BreakIn"])
 	%% endif
