@@ -114,10 +114,12 @@ class STMDeviceReader(XMLDeviceReader):
 		self.properties['package']   = re.findall('[A-Za-z\.]+', package)[0]
 		
 		for m in self.modules:
-			if any(m.startswith(per) for per in ['TIM', 'UART', 'USART', 'ADC', 'DAC', 'CAN', 'SPI', 'I2C']):
+			if any(m.startswith(per) for per in ['TIM', 'UART', 'USART', 'ADC', 'DAC', 'CAN', 'SPI', 'I2C', 'OTG', 'USB']):
 				if m.startswith('ADC') and '_' in m:
 					for a in m.replace('ADC','').split('_'):
 						modules.append('ADC'+a)
+				elif m.startswith('USB') or m.startswith('OTG_FS'):
+					modules.append('USB')
 				else:
 					modules.append(m)
 		
@@ -244,6 +246,24 @@ class STMDeviceReader(XMLDeviceReader):
 							  'type': 'out',
 							  'id': '0'}
 						gpio_afs.append(af)
+				
+				if signal.startswith('OTG_FS') and raw_names[2] in ['DM', 'DP']:
+					af = {'peripheral' : 'Usb',
+						  'name': raw_names[2].capitalize()}
+					if mode:
+						af.update({'type': mode})
+					if af_id:
+						af.update({'id': af_id})
+					gpio_afs.append(af)
+				
+				if signal.startswith('USB'):
+					af = {'peripheral' : 'Usb',
+						  'name': name.capitalize()}
+					if mode:
+						af.update({'type': mode})
+					if af_id:
+						af.update({'id': af_id})
+					gpio_afs.append(af)
 			
 			# sort after key id and then add all without ids
 			gpio['af'] = [a for a in gpio_afs if 'id' in a]
