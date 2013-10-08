@@ -5,7 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -40,25 +40,25 @@ namespace xpcc
 	/**
 	 * \brief		Wrapper to use any peripheral device that supports static
 	 * 				put() and get() as an IODevice
-	 * 
+	 *
 	 * \tparam		T	Peripheral which should be wrapped
-	 * 
+	 *
 	 * Example:
 	 * \code
 	 * // configure a UART
-	 * xpcc::BufferedUart0 uart(9600);
-	 * 
+	 * xpcc::Uart0 uart;
+	 *
 	 * // wrap it into an IODevice
-	 * xpcc::IODeviceWrapper<xpcc::BufferedUart0> device(uart);
-	 * 
+	 * xpcc::IODeviceWrapper<xpcc::Uart0> device;
+	 *
 	 * // use this device to print a message
 	 * device.write("Hello");
-	 * 
+	 *
 	 * // or create a IOStream and use the stream to print something
 	 * xpcc::IOStream stream(device);
 	 * stream << " World!";
 	 * \endcode
-	 * 
+	 *
 	 * \ingroup		io
 	 */
 	template<typename T>
@@ -70,35 +70,35 @@ namespace xpcc
 		 *
 		 * \param	device	configured object
 		 */
-		IODeviceWrapper(const T& device)
+		IODeviceWrapper(const T& /*device*/)
 		{
-			// get rid of the warning about an unused parameter
-			(void) device;
 		}
 		IODeviceWrapper()
 		{
 		}
-		
+
 		virtual void
 		write(char c)
 		{
-			T::write(c);
+			while(!T::write(c))
+				;
 		}
-		
+
 		virtual void
 		write(const char *s)
 		{
 			char c;
 			while ((c = *s++)) {
-				T::write(static_cast<uint8_t>(c));
+				while(!T::write(static_cast<uint8_t>(c)))
+					;
 			}
 		}
-		
+
 		virtual void
 		flush()
 		{
 		}
-		
+
 		virtual bool
 		read(char& c)
 		{
