@@ -67,13 +67,13 @@ struct Spi
  * Use this interface if you need the *fastest possible* data transfer and only
  * have one slave on the bus or implement the resource management yourself.
  *
- * @warning	You can only either use the `SimpleSpi` or `SpiMaster` driver on
+ * @warning	You can only either use the `SpiSimpleMaster` or `SpiMaster` driver on
  * 			the same hardware at the same time.
  *
  * @author	Niklas Hauser
  * @ingroup	spi
  */
-class SimpleSpi : public ::xpcc::Peripheral, public Spi
+class SpiSimpleMaster : public ::xpcc::Peripheral, public Spi
 {
 #ifdef __DOXYGEN__
 public:
@@ -236,7 +236,7 @@ public:
 	struct Transmission {
 		const uint8_t *writeBuffer;	///< data to write, set to `0` to transmit dummy bytes
 		uint8_t *readBuffer;		///< data to read, set `0` to discard received bytes
-		std::size_t size;			///< number of bytes to be transmitted
+		std::size_t length;			///< number of bytes to be transmitted
 		Operation next;				///< operation following the transmission
 	};
 
