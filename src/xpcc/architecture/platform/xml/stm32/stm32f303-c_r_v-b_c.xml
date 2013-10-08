@@ -29,7 +29,7 @@
     <driver type="spi" name="stm32_uart" instances="1,2,3,4,5"/>
     <driver type="timer" name="stm32" instances="1,2,3,4,6,7,8,15,16,17"/>
     <driver type="uart" name="stm32" instances="1,2,3,4,5"/>
-    <driver type="usb" name="stm32"/>
+    <driver type="usb" name="stm32_fs"/>
     <driver type="gpio" name="stm32">
       <gpio port="A" id="0">
         <af id="1" peripheral="Timer2" name="Channel1"/>
