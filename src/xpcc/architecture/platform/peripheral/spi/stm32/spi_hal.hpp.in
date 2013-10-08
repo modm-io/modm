@@ -30,7 +30,7 @@ namespace stm32
  * @author		Kevin Laeufer
  * @ingroup		stm32
  */
-class Spi{{ id }} : public SpiBase
+class SpiHal{{ id }} : public SpiBase
 {
 public:
 	enum class
@@ -93,17 +93,7 @@ public:
 	isTransmitRegisterEmpty();
 
 	/**
-	 * \brief	Write a single byte to the data register
-	 *
-	 * @warning 	This method does NOT do any sanity checks!!
-	 *				It is your responsibility to check if the register
-	 *				is empty!
-	 */
-	static inline void
-	write(uint8_t data);
-
-	/**
-	 * \brief	Write a two bytes to the data register
+	 * \brief	Write up to 16 Bit to the data register
 	 *
 	 * @warning 	This method does NOT do any sanity checks!!
 	 *				It is your responsibility to check if the register
@@ -131,7 +121,6 @@ public:
 	 */
 	static inline void
 	read(uint16_t &data);
-
 
 	static inline void
 	enableInterruptVector(bool enable, uint32_t priority);

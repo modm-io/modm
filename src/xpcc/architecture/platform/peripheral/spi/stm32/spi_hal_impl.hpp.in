@@ -15,7 +15,7 @@
 #endif
 
 void
-xpcc::stm32::Spi{{ id }}::enable()
+xpcc::stm32::SpiHal{{ id }}::enable()
 {
 %% if id == 1
 	// enable clock
@@ -34,7 +34,7 @@ xpcc::stm32::Spi{{ id }}::enable()
 }
 
 void
-xpcc::stm32::Spi{{ id }}::disable()
+xpcc::stm32::SpiHal{{ id }}::disable()
 {
 	// disable clock
 %% if id == 1
@@ -45,7 +45,7 @@ xpcc::stm32::Spi{{ id }}::disable()
 }
 
 void
-xpcc::stm32::Spi{{ id }}::initialize(Prescaler prescaler,
+xpcc::stm32::SpiHal{{ id }}::initialize(Prescaler prescaler,
 		MasterSelection masterSelection, DataMode dataMode,
 		DataOrder dataOrder, DataSize dataSize)
 {
@@ -71,21 +71,21 @@ xpcc::stm32::Spi{{ id }}::initialize(Prescaler prescaler,
 }
 
 void
-xpcc::stm32::Spi{{ id }}::setDataMode(DataMode dataMode)
+xpcc::stm32::SpiHal{{ id }}::setDataMode(DataMode dataMode)
 {
 	SPI{{ id }}->CR1 = (SPI{{ id }}->CR1 & static_cast<uint32_t>(DataMode::All))
 										 | static_cast<uint32_t>(dataMode);
 }
 
 void
-xpcc::stm32::Spi{{ id }}::setDataOrder(DataOrder dataOrder)
+xpcc::stm32::SpiHal{{ id }}::setDataOrder(DataOrder dataOrder)
 {
 	SPI{{ id }}->CR1 = (SPI{{ id }}->CR1 & static_cast<uint32_t>(DataOrder::All))
 										 | static_cast<uint32_t>(dataOrder);
 }
 
 void
-xpcc::stm32::Spi{{ id }}::setDataSize(DataSize dataSize)
+xpcc::stm32::SpiHal{{ id }}::setDataSize(DataSize dataSize)
 {
 %% if target is stm32f0 or target is stm32f3
 	SPI{{ id }}->CR2 = (SPI{{ id }}->CR2 & static_cast<uint32_t>(DataSize::All))
@@ -98,7 +98,7 @@ xpcc::stm32::Spi{{ id }}::setDataSize(DataSize dataSize)
 }
 
 void
-xpcc::stm32::Spi{{ id }}::setMasterSelection(MasterSelection masterSelection)
+xpcc::stm32::SpiHal{{ id }}::setMasterSelection(MasterSelection masterSelection)
 {
 	// TODO: implement as set/reset bit
 	SPI{{ id }}->CR1 = (SPI{{ id }}->CR1 & static_cast<uint32_t>(MasterSelection::All))
@@ -106,43 +106,37 @@ xpcc::stm32::Spi{{ id }}::setMasterSelection(MasterSelection masterSelection)
 }
 
 bool
-xpcc::stm32::Spi{{ id }}::isReceiveRegisterNotEmpty()
+xpcc::stm32::SpiHal{{ id }}::isReceiveRegisterNotEmpty()
 {
 	return getInterruptFlags() & InterruptFlag::RxBufferNotEmpty;
 }
 
 bool
-xpcc::stm32::Spi{{ id }}::isTransmitRegisterEmpty()
+xpcc::stm32::SpiHal{{ id }}::isTransmitRegisterEmpty()
 {
 	return getInterruptFlags() & InterruptFlag::TxBufferEmpty;
 }
 
 void
-xpcc::stm32::Spi{{ id }}::write(uint8_t data)
-{
-	SPI{{ id }}->DR = static_cast<uint16_t>(data);
-}
-
-void
-xpcc::stm32::Spi{{ id }}::write(uint16_t data)
+xpcc::stm32::SpiHal{{ id }}::write(uint16_t data)
 {
 	SPI{{ id }}->DR = data;
 }
 
 void
-xpcc::stm32::Spi{{ id }}::read(uint8_t &data)
+xpcc::stm32::SpiHal{{ id }}::read(uint8_t &data)
 {
 	data = static_cast<uint8_t>(SPI{{ id }}->DR);
 }
 
 void
-xpcc::stm32::Spi{{ id }}::read(uint16_t &data)
+xpcc::stm32::SpiHal{{ id }}::read(uint16_t &data)
 {
 	data = static_cast<uint16_t>(SPI{{ id }}->DR);
 }
 
 void
-xpcc::stm32::Spi{{ id }}::enableInterruptVector(bool enable, uint32_t priority)
+xpcc::stm32::SpiHal{{ id }}::enableInterruptVector(bool enable, uint32_t priority)
 {
 	if (enable) {
 		// Set priority for the interrupt vector
@@ -156,25 +150,25 @@ xpcc::stm32::Spi{{ id }}::enableInterruptVector(bool enable, uint32_t priority)
 }
 
 void
-xpcc::stm32::Spi{{ id }}::enableInterrupt(Interrupt interrupt)
+xpcc::stm32::SpiHal{{ id }}::enableInterrupt(Interrupt interrupt)
 {
 	SPI{{ id }}->CR2 |= static_cast<uint32_t>(interrupt);
 }
 
 void
-xpcc::stm32::Spi{{ id }}::disableInterrupt(Interrupt interrupt)
+xpcc::stm32::SpiHal{{ id }}::disableInterrupt(Interrupt interrupt)
 {
 	SPI{{ id }}->CR2 &= ~static_cast<uint32_t>(interrupt);
 }
 
-xpcc::stm32::Spi{{ id }}::InterruptFlag
-xpcc::stm32::Spi{{ id }}::getInterruptFlags()
+xpcc::stm32::SpiHal{{ id }}::InterruptFlag
+xpcc::stm32::SpiHal{{ id }}::getInterruptFlags()
 {
 	return static_cast<InterruptFlag>(SPI{{ id }}->SR );
 }
 
 void
-xpcc::stm32::Spi{{ id }}::acknowledgeInterruptFlag(InterruptFlag flags)
+xpcc::stm32::SpiHal{{ id }}::acknowledgeInterruptFlag(InterruptFlag /*flags*/)
 {
 	// TODO: implement; see STM32F3 reference manual p. 736
 	// SPI{{ id }}->SR =  static_cast<InterruptFlag>(flags);
