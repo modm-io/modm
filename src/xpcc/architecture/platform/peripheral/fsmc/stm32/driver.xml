@@ -1,0 +1,9 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE rca SYSTEM "../../xml/driver.dtd">
+<rca version="1.0">
+	<driver type="fsmc" name="stm32">
+		<template>fsmc.hpp.in</template>
+		<template>fsmc.cpp.in</template>
+		<template>type_ids.hpp.in</template>
+	</driver>
+</rca>
