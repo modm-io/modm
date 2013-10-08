@@ -31,6 +31,8 @@ import string
 import time
 import re
 from SCons.Script import *
+import posixpath
+import traceback
 
 generationBlockString = """/*
  * WARNING: This file is generated automatically, do not edit!
@@ -100,10 +102,13 @@ def jinja2_template_action(target, source, env):
 # Code from:
 # http://stackoverflow.com/questions/8512677/how-to-include-a-template-with-relative-path-in-jinja2
 	class RelEnvironment(jinja2.Environment):
-		"""Override join_path() to enable relative template paths."""
+		"""Override join_path() to enable relative template paths.
+		Take care of pathes. Jinja seems to use '/' as path separator in
+		templates.
+		"""
 		def join_path(self, template, parent):
-			d = os.path.join(os.path.dirname(parent), template)
-			return os.path.normpath(d)
+			d = posixpath.join(posixpath.dirname(parent), template)
+			return posixpath.normpath(d)
 
 	# path, filename = os.path.split(source[0].path)
 	path = env['XPCC_LIBRARY_PATH']
@@ -124,7 +129,19 @@ def jinja2_template_action(target, source, env):
 	loader.line_statement_prefix = '%%'
 	loader.line_comment_prefix = '%#'
 
-	template = loader.get_template(filename, globals=globals)
+
+	try:
+		#convert native path format of filename into '/' separated jinja relative path
+		template = loader.get_template(filename.replace('\\', '/'), globals=globals)
+	except Exception as e:
+		#jinja may generate an TemplateNotFound error, which is a subclass of EnvironmentError, but the variable e.errno will be None
+		#in SCons/Errors.py in method convert_to_BuildError exceptions which are instance of EnvironmentError are
+		#special handled, but need the variable errno be not zero. My guess is, that system generated Environment Errors have errno set to any non zero value.
+		#This leads in SCons/Action.py in method __call__ the variable stat.status, s and afterwards the returned result be none and Exception lost.
+		#Solution rase Exception, which is not a subclass of EnvironmentError
+		#because python cannot chain exceptions e is printed
+		traceback.print_exc()
+		raise Exception('Failed to retrieve Template',e)
 
 	output = template.render(env['substitutions']).encode('utf-8')
 	open(target[0].path, 'w').write(output)
