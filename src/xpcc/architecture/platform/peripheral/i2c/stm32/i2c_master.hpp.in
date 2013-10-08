@@ -37,31 +37,6 @@ public:
 	static const TypeId::I2cMaster{{ id }}Scl Scl;
 
 public:
-	enum Mapping
-	{
-#if defined(STM32F2XX) || defined(STM32F4XX)
-		{% if id == 1 -%}
-		REMAP_PB6_PB7,		///< SCL mapped to PB6, SDA mapped to PB7
-		REMAP_PB8_PB9,		///< SCL mapped to PB8, SDA mapped to PB9
-		{%- elif id == 2 -%}
-		REMAP_PB10_PB11,	///< SCL mapped to PB10, SDA mapped to PB11
-		REMAP_PF1_PF0,		///< SCL mapped to PF1, SDA mapped to PF0
-		REMAP_PH4_PH5,		///< SCL mapped to PH4, SDA mapped to PH5
-		{%- elif id == 3 -%}
-		REMAP_PA8_PC9,		///< SCL mapped to PA8, SDA mapped to PC9
-		REMAP_PH7_PH8,		///< SCL mapped to PH7, SDA mapped to PH8
-		{%- endif %}
-#else
-		{% if id == 1 -%}
-		REMAP_PB6_PB7 = 0,						///< SCL mapped to PB6, SDA mapped to PB7
-		REMAP_PB8_PB9 = AFIO_MAPR_I2C1_REMAP,	///< SCL mapped to PB8, SDA mapped to PB9
-		{%- elif id == 2 -%}
-		REMAP_PB10_PB11,						///< SCL mapped to PB10, SDA mapped to PB11
-		{%- endif %}
-#endif
-	};
-	
-public:
 	/**
 	 * Set up the I2C module for master operation.
 	 *
