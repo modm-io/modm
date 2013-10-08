@@ -51,17 +51,6 @@ struct Spi
 		SoftwareReset	///< The master is initializing itself
 	};
 
-	/// transfer options for the receive and transmit buffers
-	/// @see SpiBlockMaster
-	enum class
-	BufferOptions : uint8_t
-	{
-		TxRxIncrement = 0b11,           ///< Increments both Tx and Rx buffer
-		TxIncrementRxDecrement = 0b10,  ///< Increments Tx, but decrements Rx buffer
-		TxDecrementRxIncrement = 0b01,  ///< Decrements Tx, but increments Rx buffer
-		TxRxDecrement = 0b00,           ///< Decrements both Tx and Rx buffer
-	};
-
 	/// Operations after a transmission.
 	enum class
 	Operation
@@ -142,14 +131,12 @@ public:
      *      pointer to receive buffer, set to `0` to discard received bytes
      * @param       length
      *      number of bytes to be shifted out
-     * @param       options
-     *      buffer options, @see BufferOptions
      *
      * @return  `true`  if transfer request was successfully serviced,
      *          `false` if another transfer is already progress.
      */
     static bool
-    transfer(uint8_t * tx, uint8_t * rx, std::size_t length, BufferOptions options=BufferOptions::TxRxIncrement);
+    transfer(uint8_t * tx, uint8_t * rx, std::size_t length);
 
 	/// @return	`true` if last byte has been sent and the swapped byte can be read.
 	static bool
@@ -250,7 +237,6 @@ public:
 		const uint8_t *writeBuffer;	///< data to write, set to `0` to transmit dummy bytes
 		uint8_t *readBuffer;		///< data to read, set `0` to discard received bytes
 		std::size_t size;			///< number of bytes to be transmitted
-		BufferOptions options;		///< buffer options, @see BufferOptions
 		Operation next;				///< operation following the transmission
 	};
 
