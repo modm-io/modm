@@ -7,8 +7,8 @@
 */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_STM32_SPI_{{ id }}_HPP
-#define XPCC_STM32_SPI_{{ id }}_HPP
+#ifndef XPCC_STM32_SIMPLE_SPI{{ id }}_HPP
+#define XPCC_STM32_SIMPLE_SPI{{ id }}_HPP
 
 #include <xpcc/architecture/peripheral/spi.hpp>
 #include "spi_hal_{{ id }}.hpp"
@@ -34,16 +34,18 @@ public:
 		Mode0 = 0b00,			///< clock normal,   sample on rising  edge
 		Mode1 = SPI_CR1_CPHA,	///< clock normal,   sample on falling edge
 		Mode2 = SPI_CR1_CPOL,	///< clock inverted, sample on falling  edge
-		/// clock inverted, sample on rising edge
 		Mode3 = SPI_CR1_CPOL | SPI_CR1_CPHA,
-		All = Mode3,
+		///< clock inverted, sample on rising edge
 	};
-public:
 
+public:
 	template< class clockSource, uint32_t baudrate >
 	static void
 	initialize()
 	{
+		// FIXME: add code to generate correct prescaler
+		SpiHal{{ id }}::initialize(SpiBase::Prescaler::Div2);
+		finished = true;
 	}
 
 	static void
@@ -69,10 +71,15 @@ public:
 
 	static bool
 	isFinished();
+
+private:
+	static bool finished;
 };
 
-}
+} // namespace stm32
 
-}
+} // namespace xpcc
 
-#endif // XPCC_STM32_SPI_{{ id }}_HPP
+#include "simple_spi{{id}}_impl.hpp"
+
+#endif // XPCC_STM32_SIMPLE_SPI{{ id }}_HPP

@@ -6,8 +6,14 @@
 * license. See the file `LICENSE` for the full license governing this code.
 */
 // ----------------------------------------------------------------------------
-#include "spi_{{ id }}.hpp"
 
+#ifndef XPCC_STM32_SIMPLE_SPI{{ id }}_HPP
+#	error	"Don't include this file directly, use 'simple_spi.hpp' instead!"
+#endif
+
+bool xpcc::stm32::SpiSimpleMaster{{ id }}::finished;
+
+// ----------------------------------------------------------------------------
 void
 xpcc::stm32::SpiSimpleMaster{{ id }}::setDataMode(DataMode mode)
 {
@@ -88,5 +94,5 @@ xpcc::stm32::SpiSimpleMaster{{ id }}::transfer(uint8_t * tx, uint8_t * rx,
 bool
 xpcc::stm32::SpiSimpleMaster{{ id }}::isFinished()
 {
-	return SpiHal{{ id }}::isTransmitRegisterEmpty();
+	return SpiHal{{ id }}::isTransmitRegisterEmpty() && finished;
 }
