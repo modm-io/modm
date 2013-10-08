@@ -142,8 +142,8 @@ namespace xpcc
 
 			enum class UsbPrescaler : uint32_t
 			{
-				DivideBy1Point5 = RCC_CFGR_USBPRE,
-				DoNotDivide     = 0,
+				DivideBy1Point5 = 0,
+				DoNotDivide     = RCC_CFGR_USBPRE,
 			};
 %% endif
 		public:
