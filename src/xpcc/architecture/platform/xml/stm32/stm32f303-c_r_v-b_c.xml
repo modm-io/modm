@@ -9,8 +9,8 @@
     <flash device-size-id="c">262144</flash>
     <ram device-size-id="b">32768</ram>
     <ram device-size-id="c">40960</ram>
-    <linkerscript device-size-id="b">stm32f30x_b.ld</linkerscript>
-    <linkerscript device-size-id="c">stm32f30x_c.ld</linkerscript>
+    <linkerscript device-size-id="b">stm32f3xx_b.ld</linkerscript>
+    <linkerscript device-size-id="c">stm32f3xx_c.ld</linkerscript>
     <core>cortex-m4f</core>
     <pin-count device-pin-id="r">64</pin-count>
     <pin-count device-pin-id="v">100</pin-count>
@@ -20,7 +20,7 @@
     <driver type="core" name="cortex">
       <parameter name="allocator">newlib</parameter>
     </driver>
-    <driver type="adc" name="stm32" instances="1,2,3,4"/>
+    <driver type="adc" name="stm32f3" instances="1,2,3,4"/>
     <driver type="can" name="stm32"/>
     <driver type="clock" name="stm32"/>
     <driver type="dac" name="stm32"/>
