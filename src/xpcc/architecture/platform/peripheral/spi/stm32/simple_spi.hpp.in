@@ -28,6 +28,10 @@ namespace stm32
 class SpiSimpleMaster{{ id }} : public xpcc::SpiSimpleMaster
 {
 public:
+	static const TypeId::SpiMaster{{ id }}Sck  Sck;
+	static const TypeId::SpiMaster{{ id }}Miso Miso;
+	static const TypeId::SpiMaster{{ id }}Mosi Mosi;
+
 	enum class
 	DataMode : uint32_t
 	{

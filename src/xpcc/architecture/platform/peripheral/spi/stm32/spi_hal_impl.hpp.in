@@ -7,9 +7,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_STM32_SPI_HAL_{{ id }}_HPP
-#	error 	"Don't include this file directly, use" \
-#			"'spi_hal_{{ id }}.hpp' instead!"
+#ifndef XPCC_STM32_SPI_HAL{{ id }}_HPP
+#	error 	"Don't include this file directly, use 'spi_hal{{ id }}.hpp' instead!"
 #endif
 
 void

@@ -7,22 +7,20 @@
  */
 // ----------------------------------------------------------------------------
 
+#ifndef XPCC_STM32_SPI_HAL{{ id }}_HPP
+#define XPCC_STM32_SPI_HAL{{ id }}_HPP
 
-#ifndef XPCC_STM32_SPI_HAL_{{ id }}_HPP
-#define XPCC_STM32_SPI_HAL_{{ id }}_HPP
-
-#include "../../../type_ids.hpp"
 #include "../../clock/common/common_clock.hpp"
-
 #include "spi_base.hpp"
 
 namespace xpcc
 {
+
 namespace stm32
 {
+
 /**
  * Serial peripheral interface (SPI{{ id }})
- *
  *
  * Very basic implementation that exposes more hardware features than
  * the regular Spi classes.
@@ -32,24 +30,6 @@ namespace stm32
  */
 class SpiHal{{ id }} : public SpiBase
 {
-public:
-	enum class
-	DataMode : uint32_t
-	{
-		Mode0 = 0b00,			///< clock normal,   sample on rising  edge
-		Mode1 = SPI_CR1_CPHA,	///< clock normal,   sample on falling edge
-		Mode2 = SPI_CR1_CPOL,	///< clock inverted, sample on falling  edge
-		/// clock inverted, sample on rising edge
-		Mode3 = SPI_CR1_CPOL | SPI_CR1_CPHA,
-		All = Mode3,
-	};
-
-public:
-%% for name in ['Nss', 'Sck', 'Miso', 'Mosi']
-	/// TypeId used to connect GPIO pins to this peripheral's {{ name }}.
-	static const TypeId::Spi{{ id ~ name}} {{ name }};
-%% endfor
-
 public:
 	/// Enables the clock, resets the hardware and sets the SPE bit
 	static inline void
@@ -142,9 +122,11 @@ public:
 	static inline void
 	acknowledgeInterruptFlag(InterruptFlag flags);
 };
-}
-}
 
-#include "spi_hal_{{ id }}_impl.hpp"
+} // namespace stm32
 
-#endif // XPCC_STM32_SPI_HAL_{{ id }}_HPP
+} // namespace xpcc
+
+#include "spi_hal{{ id }}_impl.hpp"
+
+#endif // XPCC_STM32_SPI_HAL{{ id }}_HPP

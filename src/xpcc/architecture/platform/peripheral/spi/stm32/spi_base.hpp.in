@@ -11,12 +11,14 @@
 #define XPCC_STM32_SPI_BASE_HPP
 
 #include <stdint.h>
-#include "../../../device.hpp"
+//#include "../../../device.hpp"
 
 namespace xpcc
 {
+
 namespace stm32
 {
+
 /**
  * Base class for the SPI classes
  *
@@ -58,6 +60,17 @@ public:
 		Slave 	= 0,			///< Configure SPI as Slave
 		Master 	= SPI_CR1_MSTR,	///< Configure SPI as Master
 		All 	= Master,
+	};
+
+	enum class
+	DataMode : uint32_t
+	{
+		Mode0 = 0b00,			///< clock normal,   sample on rising  edge
+		Mode1 = SPI_CR1_CPHA,	///< clock normal,   sample on falling edge
+		Mode2 = SPI_CR1_CPOL,	///< clock inverted, sample on falling  edge
+		Mode3 = SPI_CR1_CPOL | SPI_CR1_CPHA,
+		///< clock inverted, sample on rising edge
+		All = Mode3
 	};
 
 	enum class
@@ -111,8 +124,8 @@ public:
 ENUM_CLASS_FLAG(SpiBase::Interrupt)
 ENUM_CLASS_FLAG(SpiBase::InterruptFlag)
 
-}
+} // namespace stm32
 
-}
+} // namespace xpcc
 
 #endif // XPCC_STM32_SPI_BASE_HPP
