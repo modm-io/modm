@@ -37,7 +37,7 @@ public:
 	static void
 	initialize()
 	{
-		finished = true;
+//		finished = true;
 	}
 
 	static void
@@ -65,7 +65,7 @@ public:
 	isFinished();
 
 private:
-	static bool finished;
+//	static bool finished;
 };
 
 } // namespace stm32

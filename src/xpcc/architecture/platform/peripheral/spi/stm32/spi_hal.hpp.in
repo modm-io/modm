@@ -73,7 +73,7 @@ public:
 	isTransmitRegisterEmpty();
 
 	/**
-	 * \brief	Write up to 16 Bit to the data register
+	 * Write up to 16 Bit to the data register
 	 *
 	 * @warning 	This method does NOT do any sanity checks!!
 	 *				It is your responsibility to check if the register
@@ -127,6 +127,6 @@ public:
 
 } // namespace xpcc
 
-#include "spi_hal{{ id }}_impl.hpp"
+#include "spi_hal_{{ id }}_impl.hpp"
 
 #endif // XPCC_STM32_SPI_HAL{{ id }}_HPP

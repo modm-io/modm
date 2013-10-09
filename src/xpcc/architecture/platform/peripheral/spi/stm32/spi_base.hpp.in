@@ -30,7 +30,6 @@ namespace stm32
  */
 class SpiBase
 {
-
 public:
 	enum class
 	Interrupt : uint32_t

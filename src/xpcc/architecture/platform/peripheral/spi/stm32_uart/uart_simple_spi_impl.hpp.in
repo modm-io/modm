@@ -11,7 +11,7 @@
 #	error	"Don't include this file directly, use 'uart_simple_spi{{ id }}.hpp' instead!"
 #endif
 
-bool xpcc::stm32::UartSpiSimpleMaster{{ id }}::finished;
+//bool xpcc::stm32::UartSpiSimpleMaster{{ id }}::finished;
 
 // ----------------------------------------------------------------------------
 void
@@ -57,7 +57,7 @@ xpcc::stm32::UartSpiSimpleMaster{{ id }}::transfer(uint8_t * tx, uint8_t * rx,
 	if (!isFinished())
 		return false;
 
-	finished = false;
+//	finished = false;
 
 	uint_fast8_t tx_byte = 0xff;
 	uint_fast8_t rx_byte;
@@ -71,12 +71,12 @@ xpcc::stm32::UartSpiSimpleMaster{{ id }}::transfer(uint8_t * tx, uint8_t * rx,
 		if (rx) rx[i] = rx_byte;
 	}
 
-	finished = true;
+//	finished = true;
 	return true;
 }
 
 bool
 xpcc::stm32::UartSpiSimpleMaster{{ id }}::isFinished()
 {
-	return finished;
+	return true;
 }

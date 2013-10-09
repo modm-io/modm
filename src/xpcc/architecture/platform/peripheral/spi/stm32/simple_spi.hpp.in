@@ -44,7 +44,7 @@ public:
 
 public:
 	template< class clockSource, uint32_t baudrate >
-	static void
+	static inline void
 	initialize()
 	{
 		// FIXME: add code to generate correct prescaler
@@ -52,28 +52,28 @@ public:
 		finished = true;
 	}
 
-	static void
+	static inline void
 	setDataMode(DataMode mode);
 
-	static void
+	static inline void
 	setDataOrder(DataOrder order);
 
-	static uint8_t
+	static inline uint8_t
 	writeReadBlocking(uint8_t data);
 
-	static void
+	static inline void
 	writeBlocking(uint8_t data);
 
-	static bool
+	static inline bool
 	write(uint8_t data);
 
-	static uint8_t
+	static inline uint8_t
 	getResult();
 
-	static bool
+	static inline bool
 	transfer(uint8_t * tx, uint8_t * rx, std::size_t length);
 
-	static bool
+	static inline bool
 	isFinished();
 
 private:
@@ -84,6 +84,6 @@ private:
 
 } // namespace xpcc
 
-#include "simple_spi{{id}}_impl.hpp"
+#include "simple_spi_{{id}}_impl.hpp"
 
 #endif // XPCC_STM32_SIMPLE_SPI{{ id }}_HPP
