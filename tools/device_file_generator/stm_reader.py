@@ -180,6 +180,16 @@ class STMDeviceReader(XMLDeviceReader):
 					if af_id:
 						af.update({'id': af_id})
 					gpio_afs.append(af)
+					
+					mapName = {'rx': 'miso', 'tx': 'mosi', 'ck': 'sck'}
+					if signal.startswith('USART') and name in mapName:
+						af = {'peripheral' : 'UartSpiMaster' + instance,
+							  'name': mapName[name].capitalize()}
+						if mode:
+							af.update({'type': mode})
+						if af_id:
+							af.update({'id': af_id})
+						gpio_afs.append(af)
 				
 				elif signal.startswith('SPI'):
 					af = {'peripheral' : 'SpiMaster' + instance,
