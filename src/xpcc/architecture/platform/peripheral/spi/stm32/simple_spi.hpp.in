@@ -12,6 +12,7 @@
 
 #include <xpcc/architecture/peripheral/spi.hpp>
 #include "spi_hal_{{ id }}.hpp"
+#include "type_ids.hpp"
 
 namespace xpcc
 {
@@ -27,6 +28,8 @@ namespace stm32
  */
 class SpiSimpleMaster{{ id }} : public xpcc::SpiSimpleMaster
 {
+private:
+	static bool finished;
 public:
 	static const TypeId::SpiMaster{{ id }}Sck  Sck;
 	static const TypeId::SpiMaster{{ id }}Miso Miso;
@@ -44,7 +47,7 @@ public:
 
 public:
 	template< class clockSource, uint32_t baudrate >
-	static inline void
+	static ALWAYS_INLINE void
 	initialize()
 	{
 		// FIXME: add code to generate correct prescaler
@@ -52,38 +55,33 @@ public:
 		finished = true;
 	}
 
-	static inline void
+	static void
 	setDataMode(DataMode mode);
 
-	static inline void
+	static void
 	setDataOrder(DataOrder order);
 
-	static inline uint8_t
+	static uint8_t
 	writeReadBlocking(uint8_t data);
 
-	static inline void
+	static void
 	writeBlocking(uint8_t data);
 
-	static inline bool
+	static bool
 	write(uint8_t data);
 
-	static inline uint8_t
+	static uint8_t
 	getResult();
 
-	static inline bool
+	static bool
 	transfer(uint8_t * tx, uint8_t * rx, std::size_t length);
 
-	static inline bool
+	static bool
 	isFinished();
-
-private:
-	static bool finished;
 };
 
 } // namespace stm32
 
 } // namespace xpcc
-
-#include "simple_spi_{{id}}_impl.hpp"
 
 #endif // XPCC_STM32_SIMPLE_SPI{{ id }}_HPP

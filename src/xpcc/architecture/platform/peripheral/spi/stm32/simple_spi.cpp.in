@@ -7,11 +7,9 @@
 */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_STM32_SIMPLE_SPI{{ id }}_HPP
-#	error	"Don't include this file directly, use 'simple_spi_{{id}}.hpp' instead!"
-#endif
+#include "simple_spi_{{id}}.hpp"
 
-bool xpcc::stm32::SpiSimpleMaster{{ id }}::finished;
+bool xpcc::stm32::SpiSimpleMaster{{ id }}::finished = true;
 
 // ----------------------------------------------------------------------------
 void

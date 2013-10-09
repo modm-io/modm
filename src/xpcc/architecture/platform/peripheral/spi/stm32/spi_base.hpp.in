@@ -11,7 +11,7 @@
 #define XPCC_STM32_SPI_BASE_HPP
 
 #include <stdint.h>
-//#include "../../../device.hpp"
+#include "../../../device.hpp"
 
 namespace xpcc
 {

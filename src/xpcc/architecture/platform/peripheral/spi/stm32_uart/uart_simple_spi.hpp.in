@@ -27,6 +27,8 @@ namespace stm32
  */
 class UartSpiSimpleMaster{{ id }} : public xpcc::SpiSimpleMaster
 {
+private:
+	static bool finished;
 public:
 	static const TypeId::UartSpiMaster{{ id }}Sck  Sck;
 	static const TypeId::UartSpiMaster{{ id }}Miso Miso;
@@ -34,10 +36,10 @@ public:
 
 public:
 	template< class clockSource, uint32_t baudrate >
-	static void
+	static ALWAYS_INLINE void
 	initialize()
 	{
-//		finished = true;
+		finished = true;
 	}
 
 	static void
@@ -63,15 +65,10 @@ public:
 
 	static bool
 	isFinished();
-
-private:
-//	static bool finished;
 };
 
 } // namespace stm32
 
 } // namespace xpcc
-
-#include "uart_simple_spi{{id}}_impl.hpp"
 
 #endif // XPCC_STM32_UART_SIMPLE_SPI{{ id }}_HPP

@@ -7,11 +7,9 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_STM32_UART_SIMPLE_SPI{{ id }}_HPP
-#	error	"Don't include this file directly, use 'uart_simple_spi{{ id }}.hpp' instead!"
-#endif
+#include "uart_simple_spi_{{id}}.hpp"
 
-//bool xpcc::stm32::UartSpiSimpleMaster{{ id }}::finished;
+bool xpcc::stm32::UartSpiSimpleMaster{{ id }}::finished = true;
 
 // ----------------------------------------------------------------------------
 void
@@ -51,27 +49,9 @@ xpcc::stm32::UartSpiSimpleMaster{{ id }}::getResult()
 }
 
 bool
-xpcc::stm32::UartSpiSimpleMaster{{ id }}::transfer(uint8_t * tx, uint8_t * rx,
-		std::size_t length)
+xpcc::stm32::UartSpiSimpleMaster{{ id }}::transfer(uint8_t */*tx*/, uint8_t */*rx*/,
+		std::size_t /*length*/)
 {
-	if (!isFinished())
-		return false;
-
-//	finished = false;
-
-	uint_fast8_t tx_byte = 0xff;
-	uint_fast8_t rx_byte;
-
-	for (std::size_t i = 0; i < length; i++)
-	{
-		if (tx) tx_byte = tx[i];
-
-		rx_byte = writeReadBlocking(tx_byte);
-
-		if (rx) rx[i] = rx_byte;
-	}
-
-//	finished = true;
 	return true;
 }
 
