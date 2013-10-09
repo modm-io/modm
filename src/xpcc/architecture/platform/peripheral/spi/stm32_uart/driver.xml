@@ -1,0 +1,9 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE rca SYSTEM "../../xml/driver.dtd">
+<rca version="1.0">
+	<driver type="spi" name="stm32_uart">
+		<template instances="1,2,3,4,5,6" out="uart_simple_spi{{id}}.hpp">uart_simple_spi.hpp.in</template>
+		<template instances="1,2,3,4,5,6" out="uart_simple_spi{{id}}_impl.hpp">uart_simple_spi_impl.hpp.in</template>
+		<template>type_ids.hpp.in</template>
+	</driver>
+</rca>
