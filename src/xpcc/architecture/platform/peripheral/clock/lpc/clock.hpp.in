@@ -54,7 +54,7 @@ namespace xpcc
 			{
 				InternalClock,		/* IRC Oscillator (12MHz) */
 				ExternalClock,		/* System Oscillator */
-				ExternalOscillator,
+				ExternalCrystal,
 			};
 
 			enum class PllSource
@@ -63,7 +63,7 @@ namespace xpcc
 				SystemOscillator = 1,
 				InternalClock = IRC,
 				ExternalClock = SystemOscillator,
-				ExternalOscillator = SystemOscillator,
+				ExternalCrystal = SystemOscillator,
 			};
 
 			enum class SystemClockSource : uint32_t
@@ -74,7 +74,7 @@ namespace xpcc
 				SystemPllOutput = 0x3,
 				InternalClock = IRC,
 				ExternalClock = SystemPllInput, // FIXME: not quite hitting it
-				ExternalOscillator = ExternalClock,
+				ExternalCrystal = ExternalClock,
 				Pll = SystemPllOutput,
 			};
 
@@ -86,7 +86,7 @@ namespace xpcc
 				MainClock = 0x3,
 				InternalClock = IRC,
 				ExternalClock = SystemOscillator,
-				ExternalOscillator = SystemOscillator,
+				ExternalCrystal = SystemOscillator,
 				SystemClock = MainClock,
 			};
 

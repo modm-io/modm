@@ -68,7 +68,7 @@ xpcc::lpc::ClockTree::enableSource(ClockSource src, uint32_t f_kHz, uint32_t wai
 		LPC_SYSCON->PDRUNCFG &= ~PDRUNCFG_SYSOSC_PD;	// powerup
 		LPC_SYSCON->SYSOSCCTRL |= SYSOSCCTRL_BYPASS;	// enable bypass
 	}
-	else if(src == ClockSource::ExternalOscillator) {
+	else if(src == ClockSource::ExternalCrystal) {
 		LPC_SYSCON->PDRUNCFG &= ~PDRUNCFG_SYSOSC_PD;	// powerup
 		LPC_SYSCON->SYSOSCCTRL &= ~SYSOSCCTRL_BYPASS;	// do not bypass
 		if(f_kHz >= u32kHz(MHz1) && f_kHz <= u32kHz(MHz17)) {

@@ -38,7 +38,7 @@ namespace xpcc
 		{
 			typedef struct{} InternalClock;
 			typedef struct{} ExternalClock;
-			typedef struct{} ExternalOscillator;
+			typedef struct{} ExternalCrystal;
 			typedef struct{} Pll;
 			typedef struct{} SystemClock;
 			typedef struct{} ClockOut;

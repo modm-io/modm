@@ -100,7 +100,7 @@ namespace xpcc
 %% set externallClock =		{'name': "ExternalClock",
 							 'minFrequency': "MHz4",
 							 'maxFrequency': "MHz32" }
-%% set externalOscillator =	{'name': "ExternalOscillator",
+%% set externalCrystal =	{'name': "ExternalCrystal",
 							 'minFrequency': "MHz4",
 							 'maxFrequency': "MHz32" }
 %% if target is stm32f2 or target is stm32f4
@@ -134,22 +134,22 @@ namespace xpcc
 							 'setup': "PllSetup",
 							 'frequencies': ["UsbFrequency"],
 							 'sources': [internalClock,
-										externallClock, externalOscillator] }
+										externallClock, externalCrystal] }
 	%% set systemClock =	{'name': "SystemClock",
 							 'minFrequency': "MHz8",
 							 'maxFrequency': "MHz168",
 							 'sources': [ internalClock, externallClock,
-										  externalOscillator, pll ],
+										  externalCrystal, pll ],
 							 'sinks': [ ahb1, ahb3 ] }
 	%% set mco1 =			{'name': "MCO1",
 							 'divisions': [1, 2, 3, 4, 5],
 							 'sources': [internalClock, externallClock,
-										 externalOscillator, pll] }
+										 externalCrystal, pll] }
 							%# TODO: Add more sources
 	%% set mco2 =			{'name': "MCO2",
 							 'divisions': [1, 2, 3, 4, 5],
 							 'sources': [systemClock, externallClock,
-										 externalOscillator, pll] }
+										 externalCrystal, pll] }
 							%# TODO: Add more sources
 %% elif target is stm32f3
 	%% set sys_timer = 	{'name': "SystemTimer",
@@ -171,17 +171,17 @@ namespace xpcc
 	%% set pll =			{'name': "Pll",
 							 'setup': "PllSetup",
 							 'sources': [internalClock,
-										externallClock, externalOscillator] }
+										externallClock, externalCrystal] }
 	%% set systemClock =	{'name': "SystemClock",
 							 'minFrequency': "MHz16",
 							 'maxFrequency': "MHz72",
 							 'sources': [ internalClock, externallClock,
-										  externalOscillator, pll ],
+										  externalCrystal, pll ],
 							 'sinks': [ ahb ] }
 	%% set mco1 =			{'name': "MCO",
 							 'divisions': [1, 2, 3, 4, 5],
 							 'sources': [internalClock, externallClock,
-										 externalOscillator, pll, systemClock] }
+										 externalCrystal, pll, systemClock] }
 %% endif
 
 
@@ -190,7 +190,7 @@ namespace xpcc
 
 {{ static.source(externallClock, "xpcc::stm32") }}
 
-{{ static.source(externalOscillator, "xpcc::stm32") }}
+{{ static.source(externalCrystal, "xpcc::stm32") }}
 
 {{ static.pll(pll, "xpcc::stm32") }}
 

@@ -82,7 +82,7 @@ namespace xpcc
 			{
 				InternalClock,
 				ExternalClock,
-				ExternalOscillator,
+				ExternalCrystal,
 			};
 
 			enum class PllSource
@@ -100,7 +100,7 @@ namespace xpcc
 %% endif
 				InternalClock = Hsi,
 				ExternalClock = Hse,
-				ExternalOscillator = Hse,
+				ExternalCrystal = Hse,
 			};
 
 			enum class SystemClockSource : uint32_t
@@ -110,14 +110,14 @@ namespace xpcc
 				Pll = RCC_CFGR_SW_PLL,
 				InternalClock = Hsi,
 				ExternalClock = Hse,
-				ExternalOscillator = Hse,
+				ExternalCrystal = Hse,
 			};
 %% if target is stm32f2 or target is stm32f4
 			enum class MCO1Source : uint32_t
 			{
 				InternalClock = 0,
 				ExternalClock = RCC_CFGR_MCO1_1,
-				ExternalOscillator = RCC_CFGR_MCO1_1,
+				ExternalCrystal = RCC_CFGR_MCO1_1,
 				Pll = RCC_CFGR_MCO1_1 | RCC_CFGR_MCO1_0,
 			};
 
@@ -125,7 +125,7 @@ namespace xpcc
 			{
 				SystemClock = 0,
 				ExternalClock = RCC_CFGR_MCO1_1,
-				ExternalOscillator = RCC_CFGR_MCO1_1,
+				ExternalCrystal = RCC_CFGR_MCO1_1,
 				Pll = RCC_CFGR_MCO1_1 | RCC_CFGR_MCO1_0,
 			};
 %% endif
@@ -136,7 +136,7 @@ namespace xpcc
 				SystemClock   = RCC_CFGR_MCO_SYSCLK,
 				InternalClock = RCC_CFGR_MCO_HSI,
 				ExternalClock = RCC_CFGR_MCO_HSE,
-				ExternalOscillator = RCC_CFGR_MCO_HSE,
+				ExternalCrystal = RCC_CFGR_MCO_HSE,
 				Pll = RCC_CFGR_MCO_PLL,	///< divided by 2
 			};
 

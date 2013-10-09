@@ -69,29 +69,29 @@ namespace xpcc
 %% set externallClock =		{'name': "ExternalClock",
 							 'minFrequency': "MHz1",
 							 'maxFrequency': "MHz25" }
-%% set externalOscillator =	{'name': "ExternalOscillator",
+%% set externalCrystal =	{'name': "ExternalCrystal",
 							 'minFrequency': "MHz1",
 							 'maxFrequency': "MHz25" }
 %% set pll =				{'name': "Pll",
 							 'setup': "PllSetup",
 							 'sources': [internalClock,
-										externallClock, externalOscillator] }
+										externallClock, externalCrystal] }
 %% set systemClock =		{'name': "SystemClock",
 							 'minFrequency': "MHz1",
 							 'maxFrequency': "MHz48",
 							 'sources': [ internalClock, externallClock,
-										  externalOscillator, pll ] }
+										  externalCrystal, pll ] }
 %% set clockOut =			{'name': "ClockOut",
 							 'divisions': range(1,255),
 							 'sources': [externallClock,
-										 externalOscillator, systemClock] }
+										 externalCrystal, systemClock] }
 
 	// Static Clocks/Plls/Osciallators
 {{ static.source(internalClock, "xpcc::lpc") }}
 
 {{ static.source(externallClock, "xpcc::lpc") }}
 
-{{ static.source(externalOscillator, "xpcc::lpc") }}
+{{ static.source(externalCrystal, "xpcc::lpc") }}
 
 {{ static.pll(pll, "xpcc::lpc") }}
 

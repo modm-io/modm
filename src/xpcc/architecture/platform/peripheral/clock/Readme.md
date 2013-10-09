@@ -22,11 +22,11 @@ sources:
 
 1. **InternalClock**: the clock the controller runs on at startup
 2. **ExternalClock**: an active external clock source
-3. **ExternalOscillator**: an external crystal oscillator that need to be
+3. **ExternalCrystal**: an external crystal oscillator that need to be
   driven by the controller
 
 Please note that for example on the STM32 platform the _ExternalClock_ and the
-_ExternalOscillator_ both use the same hardware. Nonetheless the two separate
+_ExternalCrystal_ both use the same hardware. Nonetheless the two separate
 classes need to implemented in orde to provide a common interface.
 
 ### PLL
