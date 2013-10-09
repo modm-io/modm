@@ -6,7 +6,7 @@ using namespace xpcc::stm32;
 MAIN_FUNCTION
 {
 	StartupError err =
-		SystemClock<Pll<ExternalOscillator<MHz8>, MHz72>>::enable();
+		SystemClock<Pll<ExternalClock<MHz8>, MHz72>>::enable();
 
 	// Initialize Usart Hal
 	GpioOutputA2::connect(UsartHal2::Tx);

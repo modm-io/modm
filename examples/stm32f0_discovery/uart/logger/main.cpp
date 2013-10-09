@@ -25,7 +25,7 @@ xpcc::log::Logger xpcc::log::error(loggerDevice);
 MAIN_FUNCTION
 {
 	//StartupError err =
-	//	SystemClock<Pll<ExternalOscillator<MHz8>, MHz48>>::enable();
+	//	SystemClock<Pll<ExternalClock<MHz8>, MHz48>>::enable();
 
 	// Initialize Usart
 	UART2_TX::connect(Usart2::Tx);

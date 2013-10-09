@@ -17,7 +17,7 @@ xpcc::log::Logger xpcc::log::info(loggerDevice);
 MAIN_FUNCTION
 {
 	StartupError err =
-		SystemClock<Pll<ExternalOscillator<MHz8>, MHz72>>::enable();
+		SystemClock<Pll<ExternalClock<MHz8>, MHz72>>::enable();
 
 	// initialize Uart2 for XPCC_LOG_INFO
 	GpioOutputA2::connect(Usart2::Tx);

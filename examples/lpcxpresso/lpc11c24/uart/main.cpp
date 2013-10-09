@@ -42,7 +42,7 @@ int
 main(void)
 {
 	StartupError err =
-		S::SystemClock<S::Pll<S::ExternalOscillator<MHz12>, MHz48> >::enable();
+		S::SystemClock<S::Pll<S::ExternalCrystal<MHz12>, MHz48> >::enable();
 
 	// Initialize 32-bit timer 0. TIME_INTERVAL is defined as 10mS
 	// You may also want to use the Cortex SysTick timer to do this

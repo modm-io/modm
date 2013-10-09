@@ -24,7 +24,7 @@ typedef GpioInputA10 UART1_RX;
 MAIN_FUNCTION
 {
 	//StartupError err =
-	//	SystemClock<Pll<ExternalOscillator<MHz8>, MHz48>>::enable();
+	//	SystemClock<Pll<ExternalClock<MHz8>, MHz48>>::enable();
 
 	// Initialize Usart1 (which needs to be buffered)
 	UART1_TX::connect(Usart1::Tx);

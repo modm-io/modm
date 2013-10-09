@@ -19,9 +19,9 @@ typedef GpioOutputC9 SystemClockOut;
 MAIN_FUNCTION
 {
 	// New Static Clock Setup
-	//typedef Pll<ExternalOscillator<MHz8>, MHz168, MHz48> clockSource;
+	//typedef Pll<ExternalCrystal<MHz8>, MHz168, MHz48> clockSource;
 	// typedef Pll<InternalClock<MHz16>, MHz168, MHz48> clockSource;
-	typedef ExternalOscillator<MHz8> clockSource;
+	typedef ExternalCrystal<MHz8> clockSource;
 	// typedef InternalClock<MHz16> clockSource;
 	StartupError err =
 		SystemClock<clockSource>::enable();

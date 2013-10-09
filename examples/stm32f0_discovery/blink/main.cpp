@@ -14,7 +14,7 @@ typedef GpioOutputC9 LedGreen;
 // ----------------------------------------------------------------------------
 MAIN_FUNCTION
 {
-	//typedef Pll<ExternalOscillator<MHz8>, MHz72> clockSource;
+	//typedef Pll<ExternalClock<MHz8>, MHz72> clockSource;
 	//StartupError err =
 	//	SystemClock<clockSource>::enable();
 

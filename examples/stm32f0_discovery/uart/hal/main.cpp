@@ -12,7 +12,7 @@ typedef GpioInputA3 UART2_RX;
 MAIN_FUNCTION
 {
 	//StartupError err =
-	//	SystemClock<Pll<ExternalOscillator<MHz8>, MHz48>>::enable();
+	//	SystemClock<Pll<ExternalClock<MHz8>, MHz48>>::enable();
 
 	// Initialize Usart Hal
 	UART2_TX::connect(UsartHal2::Tx);

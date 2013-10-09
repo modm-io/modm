@@ -50,7 +50,7 @@ displayMessage(const xpcc::can::Message& message)
 // ----------------------------------------------------------------------------
 MAIN_FUNCTION
 {
-	typedef SystemClock<Pll<ExternalOscillator<MHz8>, MHz168, MHz48> > systemClock;
+	typedef SystemClock<Pll<ExternalCrystal<MHz8>, MHz168, MHz48> > systemClock;
 	systemClock::enable();
 
 	LedOrange::setOutput(xpcc::Gpio::HIGH);

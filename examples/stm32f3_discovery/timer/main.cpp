@@ -12,7 +12,7 @@ typedef GpioOutputE8 LedNorthWest;
 MAIN_FUNCTION
 {
 	StartupError err =
-		SystemClock<Pll<ExternalOscillator<MHz8>, MHz72>>::enable();
+		SystemClock<Pll<ExternalClock<MHz8>, MHz72>>::enable();
 
 	LedNorth::setOutput(xpcc::Gpio::HIGH);
 	LedNorthWest::setOutput(xpcc::Gpio::LOW);

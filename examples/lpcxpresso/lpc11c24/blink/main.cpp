@@ -10,7 +10,7 @@ using namespace xpcc::lpc;
 MAIN_FUNCTION
 {
 	// New Static Clock Setup ( => Static)
-	typedef Pll<ExternalOscillator<MHz12>, MHz48> clockSource;
+	typedef Pll<ExternalCrystal<MHz12>, MHz48> clockSource;
 	// typedef ExternalOscillator<MHz12> clockSource;
 	StartupError err =
 		SystemClock<clockSource>::enable();
