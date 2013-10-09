@@ -50,15 +50,16 @@ struct Gpio
 		MHz100 = 0x3,	///< High speed on 30 pF (80 MHz Output max speed on 15 pF)
 		%% elif target is stm32f0 or target is stm32f3
 		MHz10 = 0x1,	///< Medium speed
-		MHz50 = 0x03,	///< Fast speed
+		MHz50 = 0x3,	///< Fast speed
 		%% endif
 	};
 
-	enum class InputTrigger : uint8_t
+	enum class
+	InputTrigger
 	{
-		Rising,
-		Falling,
-		RisingFalling,
+		RisingEdge,
+		FallingEdge,
+		BothEdges,
 	};
 
 	/// @ingroup	stm32{{ target.family }}
@@ -78,7 +79,7 @@ struct Gpio
 protected:
 	/// I/O Direction Mode values for this specific pin.
 	enum class
-	Mode : uint32_t
+	Mode
 	{
 		Input  = 0x0,
 		Output = 0x1,
@@ -151,7 +152,7 @@ private:
 	static constexpr uint8_t af_id  = pin / 8;
 	/// Alternate Function offset. This depends on the af_id.
 	static constexpr uint8_t af_offset =
-							(af_id == 0)? (pin * 4) : ((pin - 8) * 4);
+							(af_id == 0) ? (pin * 4) : ((pin - 8) * 4);
 	/// Alternate Function register mask.
 	static constexpr uint32_t af_mask  = 0xf << af_offset;
 	/// ExternalInterruptIRQ
@@ -305,15 +306,15 @@ public:
 	{
 		switch (trigger)
 		{
-		case InputTrigger::Rising:
+		case InputTrigger::RisingEdge:
 			EXTI->RTSR |=  (mask);
 			EXTI->FTSR &= ~(mask);
 			break;
-		case InputTrigger::Falling:
+		case InputTrigger::FallingEdge:
 			EXTI->RTSR &= ~(mask);
 			EXTI->FTSR |=  (mask);
 			break;
-		case InputTrigger::RisingFalling:
+		case InputTrigger::BothEdges:
 			EXTI->RTSR |=  (mask);
 			EXTI->FTSR |=  (mask);
 			break;
