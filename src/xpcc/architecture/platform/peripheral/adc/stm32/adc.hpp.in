@@ -1,10 +1,10 @@
 // coding: utf-8
 /* Copyright (c) 2012-2013, Roboterclub Aachen e.V.
-* All Rights Reserved.
-*
-* The file is part of the xpcc library and is released under the 3-clause BSD
-* license. See the file `LICENSE` for the full license governing this code.
-*/
+ * All Rights Reserved.
+ *
+ * The file is part of the xpcc library and is released under the 3-clause BSD
+ * license. See the file `LICENSE` for the full license governing this code.
+ */
 // ----------------------------------------------------------------------------
 %#
 %#
@@ -232,11 +232,11 @@ public:
 %% if temperature_available
 	/// Switch on temperature- and V_REF measurement.
 	static inline void
-	enableTemperatureRefVMeasurement(void);
+	enableTemperatureRefVMeasurement();
 
 	/// Switch on temperature- and V_REF measurement.
 	static inline void
-	disableTemperatureRefVMeasurement(void);
+	disableTemperatureRefVMeasurement();
 %% endif
 
 	/**
@@ -269,7 +269,7 @@ public:
 	 * @pre The ADC clock must be started and the ADC switched on with 
 	 * 		initialize()
 	 */
-	static void
+	static inline void
 	setChannel(const Channel channel,
 		const SampleTime sampleTime = static_cast<SampleTime>(0b000));
 
@@ -283,7 +283,7 @@ public:
 	 * 		initialize()
 	 */
 	static inline void
-	enableFreeRunningMode(void);
+	enableFreeRunningMode();
 
 	/**
 	 * Disables free running mode
@@ -295,13 +295,13 @@ public:
 	 * 		initialize()
 	 */
 	static inline void
-	disableFreeRunningMode(void);
+	disableFreeRunningMode();
 
 	/**
 	 * Turns off the ADC and its clock.
 	 */
 	static inline void
-	shutdownAdc(void);
+	shutdownAdc();
 	/**
 	 * Start a new conversion or continuous conversions.
 	 * 
@@ -315,14 +315,14 @@ public:
 	 * 	(RM0008) ADC_CR2_ADON. 
 	 */
 	static inline void
-	startConversion(void);
+	startConversion();
 
 	/** 
 	 * @return If the conversion is finished.
 	 * @pre A conversion should have been started with startConversion()
 	 */
 	static inline bool
-	isConversionFinished(void);
+	isConversionFinished();
 
 	/**
 	 * @return The most recent 16bit result of the ADC conversion.
@@ -337,9 +337,9 @@ public:
 		@endcode
 	 */
 	static inline uint16_t
-	getValue(void);
+	getValue();
 
-	static void
+	static inline void
 	enableInterruptVector(const uint32_t priority, const bool enable = true);
 
 	/**
@@ -360,13 +360,13 @@ public:
 	 * 	vector. ADC3 interrupts are mapped onto a separate interrupt 
 	 * 	vector.
 	 */
-	static void
+	static inline void
 	enableInterrupt(const Interrupt interrupt);
 
 	/**
 	 * Disables the ADC Conversion Complete Interrupt.
 	 */
-	static void
+	static inline void
 	disableInterrupt(const Interrupt interrupt);
 
 	/**
@@ -390,14 +390,15 @@ public:
 	static inline void
 	acknowledgeInterruptFlag(const InterruptFlag flags);
 };
+
 ENUM_CLASS_FLAG(Adc{{ id }}::Interrupt)
 ENUM_CLASS_FLAG(Adc{{ id }}::InterruptFlag)
 
-}
+} // namespace stm32
 
-}
+} // namespace xpcc
 
 #include "adc_{{ id }}_impl.hpp"
 
-#endif	// XPCC_STM32__ADC{{ id }}_HPP
+#endif	// XPCC_STM32_ADC{{ id }}_HPP
 
