@@ -1,0 +1,98 @@
+// coding: utf-8
+/* Copyright (c) 2013, Roboterclub Aachen e.V.
+ * All Rights Reserved.
+ *
+ * The file is part of the xpcc library and is released under the 3-clause BSD
+ * license. See the file `LICENSE` for the full license governing this code.
+ */
+// ----------------------------------------------------------------------------
+
+#include "uart_simple_spi_{{ id }}.hpp"
+#include <xpcc/architecture/driver/atomic.hpp>
+#include <xpcc/math/utils/bit_operation.hpp>
+
+bool xpcc::{{target.family}}::UartSpiSimpleMaster{{id}}::finished = true;
+%% if extended is not defined
+xpcc::{{target.family}}::UartSpiSimpleMaster{{id}}::DataOrder
+xpcc::{{target.family}}::UartSpiSimpleMaster{{id}}::dataOrder = DataOrder::MsbFirst;
+%% endif
+
+void
+xpcc::{{target.family}}::UartSpiSimpleMaster{{id}}::initialize(uint16_t prescaler)
+{
+	xpcc::atomic::Lock lock;
+
+	UBRR{{ id }} = 0;
+	// set MSPI mode of operation and SPI data mode
+	UCSR{{ id }}C = (1 << UMSEL{{id}}1) | (1 << UMSEL{{id}}0);
+	// enable receiver and transmitter
+	UCSR{{ id }}B = (1 << RXEN{{id}}) | (1 << TXEN{{id}});
+	// set baudrate _after_ enabling transmitter
+	UBRR{{ id }} = prescaler;
+	finished = true;
+%% if extended is not defined
+	dataOrder = DataOrder::MsbFirst;
+%% endif
+}
+
+// ----------------------------------------------------------------------------
+%% if extended is not defined
+void
+xpcc::{{target.family}}::UartSpiSimpleMaster{{id}}::writeBlocking(uint8_t data)
+{
+	if (dataOrder == DataOrder::LsbFirst) {
+		data = xpcc::bitReverse(data);
+	}
+	while(!isFinished())
+		;
+	UDR{{id}} = data;
+}
+
+bool
+xpcc::{{target.family}}::UartSpiSimpleMaster{{id}}::write(uint8_t data)
+{
+	if (dataOrder == DataOrder::LsbFirst) {
+		data = xpcc::bitReverse(data);
+	}
+	if (!isFinished())
+		return false;
+
+	UDR{{id}} = data;
+	return true;
+}
+
+uint8_t
+xpcc::{{target.family}}::UartSpiSimpleMaster{{id}}::getResult()
+{
+	uint8_t data = UDR{{id}};
+	if (dataOrder == DataOrder::LsbFirst) {
+		data = xpcc::bitReverse(data);
+	}
+	return data;
+}
+%% endif
+
+bool
+xpcc::{{target.family}}::UartSpiSimpleMaster{{id}}::transfer(uint8_t *tx, uint8_t *rx,
+		std::size_t length)
+{
+	if (!isFinished())
+		return false;
+
+	finished = false;
+
+	uint8_t tx_byte = 0xff;
+	uint8_t rx_byte;
+
+	for (std::size_t i = 0; i < length; i++)
+	{
+		if (tx) tx_byte = tx[i];
+
+		rx_byte = writeReadBlocking(tx_byte);
+
+		if (rx) rx[i] = rx_byte;
+	}
+
+	finished = true;
+	return true;
+}

@@ -12,58 +12,6 @@
 bool xpcc::stm32::SpiSimpleMaster{{ id }}::finished = true;
 
 // ----------------------------------------------------------------------------
-void
-xpcc::stm32::SpiSimpleMaster{{ id }}::setDataMode(DataMode mode)
-{
-	SpiHal{{ id }}::setDataMode(static_cast<SpiHal{{ id }}::DataMode>(mode));
-}
-
-void
-xpcc::stm32::SpiSimpleMaster{{ id }}::setDataOrder(DataOrder order)
-{
-	if(order == DataOrder::MsbFirst) {
-		SpiHal{{ id }}::setDataOrder(SpiHal{{ id }}::DataOrder::MsbFirst);
-	} else {
-		SpiHal{{ id }}::setDataOrder(SpiHal{{ id }}::DataOrder::LsbFirst);
-	}
-}
-
-uint8_t
-xpcc::stm32::SpiSimpleMaster{{ id }}::writeReadBlocking(uint8_t data)
-{
-	writeBlocking(data);
-	while(!SpiHal{{ id }}::isReceiveRegisterNotEmpty())
-		;
-	return getResult();
-}
-
-void
-xpcc::stm32::SpiSimpleMaster{{ id }}::writeBlocking(uint8_t data)
-{
-	while(!SpiHal{{ id }}::isTransmitRegisterEmpty())
-		;
-	SpiHal{{ id }}::write(data);
-}
-
-bool
-xpcc::stm32::SpiSimpleMaster{{ id }}::write(uint8_t data)
-{
-	if(SpiHal{{ id }}::isTransmitRegisterEmpty()){
-		SpiHal{{ id }}::write(data);
-		return true;
-	} else {
-		return false;
-	}
-}
-
-uint8_t
-xpcc::stm32::SpiSimpleMaster{{ id }}::getResult()
-{
-	uint8_t data;
-	SpiHal{{ id }}::read(data);
-	return data;
-}
-
 bool
 xpcc::stm32::SpiSimpleMaster{{ id }}::transfer(uint8_t * tx, uint8_t * rx,
 		std::size_t length)
@@ -87,10 +35,4 @@ xpcc::stm32::SpiSimpleMaster{{ id }}::transfer(uint8_t * tx, uint8_t * rx,
 
 	finished = true;
 	return true;
-}
-
-bool
-xpcc::stm32::SpiSimpleMaster{{ id }}::isFinished()
-{
-	return SpiHal{{ id }}::isTransmitRegisterEmpty() && finished;
 }

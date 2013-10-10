@@ -38,7 +38,7 @@ namespace {{target.family}}
  * @ingroup		{{target.family}}
  * @author		Niklas Hauser
  */
-class SpiSimpleMaster : public ::xpcc::SpiSimpleMaster, Spi
+class SpiSimpleMaster : public ::xpcc::SpiSimpleMaster, private Spi
 {
 public:
 	static const TypeId::SpiMasterMosi Mosi;
@@ -52,12 +52,11 @@ public:
 	static inline void
 	initialize();
 
-	static void
+	static inline void
 	setDataMode(DataMode mode);
 
-	static void
+	static inline void
 	setDataOrder(DataOrder order);
-
 
 	static ALWAYS_INLINE uint8_t
 	writeReadBlocking(uint8_t data);
@@ -71,7 +70,7 @@ public:
 	static ALWAYS_INLINE uint8_t
 	getResult();
 
-	static inline bool
+	static bool
 	transfer(uint8_t * tx, uint8_t * rx, std::size_t length);
 
 	static ALWAYS_INLINE bool

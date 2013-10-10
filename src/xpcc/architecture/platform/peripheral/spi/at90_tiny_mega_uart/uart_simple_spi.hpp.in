@@ -40,6 +40,37 @@ public:
 	static const TypeId::UartSpiMaster{{ id }}Mosi Mosi;
 	static const TypeId::UartSpiMaster{{ id }}Miso Miso;
 	static const TypeId::UartSpiMaster{{ id }}Sck  Sck;
+
+	/// Spi Data Mode, Mode0 is the most common mode
+%% if extended is not defined
+	/// @warning 	Only Mode 0 and 2 are available, Mode 1 and 3 are not 
+	///				supported on this target.
+%% endif
+	enum class
+	DataMode : uint8_t
+	{
+		Mode0 = 0,	///< clock normal,   sample on rising  edge
+%% if extended is defined
+		Mode1 = (1 << UCPHA{{ id }}),	///< clock normal,   sample on falling edge
+%% endif
+		Mode2 = (1 << UCPOL{{ id }}),	///< clock inverted, sample on falling edge
+%% if extended is defined
+		Mode3 = (1 << UCPOL{{ id }}) | (1 << UCPHA{{ id }}),
+		///< clock inverted, sample on rising edge
+%% endif
+	};
+
+	/// Spi Data Order, MsbFirst is the most common mode
+	enum class
+	DataOrder : uint8_t
+	{
+		MsbFirst = 0,
+%% if extended is defined
+		LsbFirst = (1 << UDORD{{ id }}),
+%% else
+		LsbFirst = 1,
+%% endif
+	};
 	
 public:
 	// start documentation inherited
@@ -47,11 +78,7 @@ public:
 	static inline void
 	initialize();
 
-%% if extended is not defined
-	/// @warning 	Mode 2 and 3 are not supported on this target, they will be
-	///				treated as Mode 0 and 1, respectively.
-%% endif
-	static void
+	static inline void
 	setDataMode(DataMode mode);
 
 %% if extended is not defined
@@ -61,13 +88,14 @@ public:
 	///				xpcc::bitReverse(), which is quite costly.
 	/// @see	xpcc::bitReverse()
 %% endif
-	static void
+	static inline void
 	setDataOrder(DataOrder order);
 
 
 	static ALWAYS_INLINE uint8_t
 	writeReadBlocking(uint8_t data);
 
+%% if extended is defined
 	static ALWAYS_INLINE void
 	writeBlocking(uint8_t data);
 
@@ -76,8 +104,18 @@ public:
 
 	static ALWAYS_INLINE uint8_t
 	getResult();
+%% else
+	static void
+	writeBlocking(uint8_t data);
 
-	static inline bool
+	static bool
+	write(uint8_t data);
+
+	static uint8_t
+	getResult();
+%% endif
+
+	static bool
 	transfer(uint8_t *tx, uint8_t *rx, std::size_t length);
 
 	static ALWAYS_INLINE bool
@@ -85,7 +123,7 @@ public:
 	// end documentation inherited
 
 protected:
-	static inline void
+	static void
 	initialize(uint16_t prescaler);
 
 private:
@@ -99,6 +137,6 @@ private:
 
 } // namespace xpcc
 
-#include "uart_simple_spi{{id}}_impl.hpp"
+#include "uart_simple_spi_{{id}}_impl.hpp"
 
 #endif // XPCC_{{target.family | upper}}_SIMPLE_UART_SPI{{id}}_HPP

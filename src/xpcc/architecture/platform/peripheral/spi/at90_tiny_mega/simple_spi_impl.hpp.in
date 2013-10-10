@@ -11,8 +11,6 @@
 #	error	"Don't include this file directly, use 'simple_spi.hpp' instead!"
 #endif
 
-bool xpcc::{{target.family}}::SpiSimpleMaster::finished;
-
 // ----------------------------------------------------------------------------
 template< uint32_t baudrate >
 void
@@ -102,31 +100,6 @@ xpcc::{{target.family}}::SpiSimpleMaster::getResult()
 {
 	uint8_t data = SPDR;
 	return data;
-}
-
-bool
-xpcc::{{target.family}}::SpiSimpleMaster::transfer(uint8_t *tx, uint8_t *rx,
-		std::size_t length)
-{
-	if (!isFinished())
-		return false;
-
-	finished = false;
-
-	uint8_t tx_byte = 0xff;
-	uint8_t rx_byte;
-
-	for (std::size_t i = 0; i < length; i++)
-	{
-		if (tx) tx_byte = tx[i];
-
-		rx_byte = writeReadBlocking(tx_byte);
-
-		if (rx) rx[i] = rx_byte;
-	}
-
-	finished = true;
-	return true;
 }
 
 bool

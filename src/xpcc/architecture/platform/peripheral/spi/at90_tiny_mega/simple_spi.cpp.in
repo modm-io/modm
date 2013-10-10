@@ -1,0 +1,37 @@
+// coding: utf-8
+/* Copyright (c) 2013, Roboterclub Aachen e.V.
+ * All Rights Reserved.
+ *
+ * The file is part of the xpcc library and is released under the 3-clause BSD
+ * license. See the file `LICENSE` for the full license governing this code.
+ */
+// ----------------------------------------------------------------------------
+
+#include "simple_spi.hpp"
+
+bool xpcc::{{target.family}}::SpiSimpleMaster::finished;
+
+bool
+xpcc::{{target.family}}::SpiSimpleMaster::transfer(uint8_t *tx, uint8_t *rx,
+		std::size_t length)
+{
+	if (!isFinished())
+		return false;
+
+	finished = false;
+
+	uint8_t tx_byte = 0xff;
+	uint8_t rx_byte;
+
+	for (std::size_t i = 0; i < length; i++)
+	{
+		if (tx) tx_byte = tx[i];
+
+		rx_byte = writeReadBlocking(tx_byte);
+
+		if (rx) rx[i] = rx_byte;
+	}
+
+	finished = true;
+	return true;
+}

@@ -21,67 +21,74 @@ namespace stm32
 {
 
 /**
- * @brief		Serial peripheral interface (SPI{{ id }})
+ * Serial peripheral interface (SPI{{ id }}).
  * 
  * Simple unbuffered implementation.
- * @ingroup		stm32
+ * @ingroup	stm32
  */
 class SpiSimpleMaster{{ id }} : public xpcc::SpiSimpleMaster
 {
-private:
-	static bool finished;
 public:
 	static const TypeId::SpiMaster{{ id }}Sck  Sck;
 	static const TypeId::SpiMaster{{ id }}Miso Miso;
 	static const TypeId::SpiMaster{{ id }}Mosi Mosi;
 
+	/// Spi Data Mode, Mode0 is the most common mode
 	enum class
 	DataMode : uint32_t
 	{
 		Mode0 = 0b00,			///< clock normal,   sample on rising  edge
 		Mode1 = SPI_CR1_CPHA,	///< clock normal,   sample on falling edge
 		Mode2 = SPI_CR1_CPOL,	///< clock inverted, sample on falling  edge
-		Mode3 = SPI_CR1_CPOL | SPI_CR1_CPHA,
+		Mode3 = SPI_CR1_CPOL | SPI_CR1_CPHA
 		///< clock inverted, sample on rising edge
+	};
+	
+	/// Spi Data Order, MsbFirst is the most common mode
+	enum class
+	DataOrder : uint32_t
+	{
+		MsbFirst = 0b0,
+		LsbFirst = SPI_CR1_LSBFIRST
 	};
 
 public:
 	template< class clockSource, uint32_t baudrate >
 	static ALWAYS_INLINE void
-	initialize()
-	{
-		// FIXME: add code to generate correct prescaler
-		SpiHal{{ id }}::initialize(SpiBase::Prescaler::Div2);
-		finished = true;
-	}
+	initialize();
 
-	static void
+	static ALWAYS_INLINE void
 	setDataMode(DataMode mode);
 
-	static void
+	static ALWAYS_INLINE void
 	setDataOrder(DataOrder order);
 
-	static uint8_t
+	static ALWAYS_INLINE uint8_t
 	writeReadBlocking(uint8_t data);
 
-	static void
+	static ALWAYS_INLINE void
 	writeBlocking(uint8_t data);
 
-	static bool
+	static ALWAYS_INLINE bool
 	write(uint8_t data);
 
-	static uint8_t
+	static ALWAYS_INLINE uint8_t
 	getResult();
 
 	static bool
 	transfer(uint8_t * tx, uint8_t * rx, std::size_t length);
 
-	static bool
+	static ALWAYS_INLINE bool
 	isFinished();
+
+private:
+	static bool finished;
 };
 
 } // namespace stm32
 
 } // namespace xpcc
+
+#include "simple_spi_{{ id }}_impl.hpp"
 
 #endif // XPCC_STM32_SIMPLE_SPI{{ id }}_HPP

@@ -1,0 +1,74 @@
+// coding: utf-8
+/* Copyright (c) 2013, Roboterclub Aachen e.V.
+* All Rights Reserved.
+*
+* The file is part of the xpcc library and is released under the 3-clause BSD
+* license. See the file `LICENSE` for the full license governing this code.
+*/
+// ----------------------------------------------------------------------------
+
+#ifndef XPCC_STM32_SIMPLE_SPI{{ id }}_HPP
+#	error	"Don't include this file directly, use 'simple_spi.hpp' instead!"
+#endif
+
+// ----------------------------------------------------------------------------
+template< class clockSource, uint32_t baudrate >
+void
+xpcc::stm32::SpiSimpleMaster{{ id }}::initialize()
+{
+	SpiHal{{ id }}::initialize(SpiHal{{ id }}::Prescaler::Div2);
+	finished = true;
+}
+
+void
+xpcc::stm32::SpiSimpleMaster{{ id }}::setDataMode(DataMode mode)
+{
+	SpiHal{{ id }}::setDataMode(static_cast<SpiHal{{ id }}::DataMode>(mode));
+}
+
+void
+xpcc::stm32::SpiSimpleMaster{{ id }}::setDataOrder(DataOrder order)
+{
+	SpiHal{{ id }}::setDataOrder(static_cast<SpiHal{{ id }}::DataOrder>(order));
+}
+
+uint8_t
+xpcc::stm32::SpiSimpleMaster{{ id }}::writeReadBlocking(uint8_t data)
+{
+	writeBlocking(data);
+	while(!SpiHal{{ id }}::isReceiveRegisterNotEmpty())
+		;
+	return getResult();
+}
+
+void
+xpcc::stm32::SpiSimpleMaster{{ id }}::writeBlocking(uint8_t data)
+{
+	while(!isFinished())
+		;
+	SpiHal{{ id }}::write(data);
+}
+
+bool
+xpcc::stm32::SpiSimpleMaster{{ id }}::write(uint8_t data)
+{
+	if(!isFinished())
+		return false;
+	
+	SpiHal{{ id }}::write(data);
+	return true;
+}
+
+uint8_t
+xpcc::stm32::SpiSimpleMaster{{ id }}::getResult()
+{
+	uint8_t data;
+	SpiHal{{ id }}::read(data);
+	return data;
+}
+
+bool
+xpcc::stm32::SpiSimpleMaster{{ id }}::isFinished()
+{
+	return SpiHal{{ id }}::isTransmitRegisterEmpty() && finished;
+}
