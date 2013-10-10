@@ -52,7 +52,11 @@ xpcc::stm32::{{ name }}::getBaudrateSettings()
 		// see http://www.mikrocontroller.net/topic/143715
 		uint16_t brr = ((2 * clockSource::{{ uart ~ id }}) / (baudrate / 2) + 1) / 2;
 		// correct baudrate
+%% if target is stm32f1 or target is stm32f2 or target is stm32f4
 		return (USART_BRR_DIV_Mantissa & brr) | ((USART_BRR_DIV_Fraction & brr)>>1);
+%% elif target is stm32f3 or target is stm32f0
+		return (USART_BRR_DIV_MANTISSA & brr) | ((USART_BRR_DIV_FRACTION & brr)>>1);
+%% endif
 	}
 }
 
