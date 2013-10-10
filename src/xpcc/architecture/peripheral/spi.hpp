@@ -80,10 +80,12 @@ public:
 	/**
 	 * Initializes the hardware and sets the baudrate.
 	 *
+	 * @tparam	clockSource
+	 * 		the targets sytem clock
 	 * @tparam	baudrate
 	 * 		the desired baudrate in Hz
 	 */
-	template< uint32_t baudrate >
+	template< class clockSource, uint32_t baudrate >
 	static void
 	initialize();
 
@@ -95,7 +97,7 @@ public:
 	static void
 	setDataOrder(DataOrder order);
 
-	// synchronous
+	// blocking
 	/**
 	 * Write a single byte, wait for completion.
 	 *
@@ -108,7 +110,7 @@ public:
 	static void
 	writeBlocking(uint8_t data);
 
-	// asynchronous
+	// non-blocking
 	/**
 	 * Write a single byte, and return immediately.
 	 *
@@ -117,9 +119,16 @@ public:
 	static bool
 	write(uint8_t data);
 
-	/// @return	last byte that has been received.
-	static uint8_t
-	getResult();
+	/**
+	 * Get the last byte that was received.
+	 *
+	 * @param[out]	data
+	 *		Byte read, if any
+	 *
+	 * @return	`true` if receive buffer is valid, `false` if not
+	 */
+	static bool
+	getResult(uint8_t &data);
 
     /**
      * Set the data buffers and length with options and starts a transfer.
