@@ -35,6 +35,27 @@ xpcc::stm32::{{ name }}::setParity(const Parity parity)
 	{{ peripheral }}->CR1 = flags;
 }
 
+template<class clockSource, uint32_t baudrate, xpcc::stm32::{{ name }}::OversamplingMode oversample>
+uint16_t
+xpcc::stm32::{{ name }}::getBaudrateSettings()
+{
+	if(oversample == OversamplingMode::By16){
+		static_assert((oversample != OversamplingMode::By16) ||
+			(baudrate <= clockSource::{{ uart ~ id }} / 16),
+			"Baudrate must be less or equal to the PeripheralClock divided by 16.");
+		// see http://www.mikrocontroller.net/topic/143715
+		return ((2 * clockSource::{{ uart ~ id }}) / baudrate + 1) / 2;
+	} else {
+		static_assert((oversample != OversamplingMode::By8) ||
+			(baudrate <= clockSource::{{ uart ~ id }} / 8),
+			"Baudrate must be less or equal to the PeripheralClock divided by 8.");
+		// see http://www.mikrocontroller.net/topic/143715
+		uint16_t brr = ((2 * clockSource::{{ uart ~ id }}) / (baudrate / 2) + 1) / 2;
+		// correct baudrate
+		return (USART_BRR_DIV_Mantissa & brr) | ((USART_BRR_DIV_Fraction & brr)>>1);
+	}
+}
+
 void
 xpcc::stm32::{{ name }}::enable()
 {
@@ -74,7 +95,7 @@ xpcc::stm32::{{ name }}::disable()
 %% endif
 }
 
-template<class clockSource, uint32_t baudrate>
+template<class clockSource, uint32_t baudrate, xpcc::stm32::{{ name }}::OversamplingMode oversample>
 void
 xpcc::stm32::{{ name }}::initialize(Parity parity)
 {
@@ -83,10 +104,52 @@ xpcc::stm32::{{ name }}::initialize(Parity parity)
 	//             baud rate as well as parity
 	{{ peripheral }}->CR1 &= ~USART_CR1_UE;	// Uart Disable
 	// set baudrate
-	{{ peripheral }}->BRR = calculateBaudrateSettings(clockSource::{{ uart ~ id }}, baudrate);
+	{{ peripheral }}->BRR = getBaudrateSettings<clockSource, baudrate, oversample>();
 	setParity(parity);
+	setOversamplingMode(oversample);
 	{{ peripheral }}->CR1 |=  USART_CR1_UE;	// Uart Reenable
 }
+
+
+void
+xpcc::stm32::{{ name }}::setOversamplingMode(OversamplingMode mode)
+{
+	if(mode == OversamplingMode::By16) {
+		{{ peripheral }}->CR1 &= ~static_cast<uint32_t>(OversamplingMode::By8);
+	} else {
+		{{ peripheral }}->CR1 |=  static_cast<uint32_t>(OversamplingMode::By8);
+	}
+}
+%% if id in [1, 2, 3, 6]
+
+void
+xpcc::stm32::{{ name }}::setSpiClock(SpiClock clk)
+{
+	if(clk == SpiClock::Disabled) {
+		{{ peripheral }}->CR2 &= ~static_cast<uint32_t>(SpiClock::Enabled);
+	} else {
+		{{ peripheral }}->CR2 |=  static_cast<uint32_t>(SpiClock::Enabled);
+	}
+}
+
+void
+xpcc::stm32::{{ name }}::setSpiDataMode(SpiDataMode mode)
+{
+	{{ peripheral }}->CR2 =
+		({{ peripheral }}->CR2 & ~static_cast<uint32_t>(SpiDataMode::Mode3))
+		| static_cast<uint32_t>(mode);
+}
+
+void
+xpcc::stm32::{{ name }}::setLastBitClockPulse(LastBitClockPulse pulse)
+{
+	if(pulse == LastBitClockPulse::DoNotOutput) {
+		{{ peripheral }}->CR2 &= ~static_cast<uint32_t>(LastBitClockPulse::Output);
+	} else {
+		{{ peripheral }}->CR2 |=  static_cast<uint32_t>(LastBitClockPulse::Output);
+	}
+}
+%% endif
 
 void
 xpcc::stm32::{{ name }}::write(uint8_t data)
@@ -98,13 +161,13 @@ xpcc::stm32::{{ name }}::write(uint8_t data)
 %% endif
 }
 
-uint8_t
-xpcc::stm32::{{ name }}::read()
+void
+xpcc::stm32::{{ name }}::read(uint8_t &data)
 {
 %% if target is stm32f0 or target is stm32f3
-	return {{ peripheral }}->RDR;
+	data = {{ peripheral }}->RDR;
 %% elif target is stm32f2 or target is stm32f4
-	return {{ peripheral }}->DR;
+	data = {{ peripheral }}->DR;
 %% endif
 }
 

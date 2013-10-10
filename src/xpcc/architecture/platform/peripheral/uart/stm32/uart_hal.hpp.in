@@ -48,6 +48,11 @@ private:
 	static inline void
 	setParity(const Parity parity);
 
+	/// Calculate settings for the UBR register
+	template<class clockSource, uint32_t baudrate, OversamplingMode>
+	static inline uint16_t
+	getBaudrateSettings();
+
 public:
 	/// TypeId used to connect GPIO pins to this peripheral's rx.
 	static const TypeId::{{ uart ~ "Hal" ~ id }}Rx Rx;
@@ -69,10 +74,25 @@ public:
 	 * Enables clocks, the UART peripheral (but neither TX nor RX)
 	 * Sets baudrate and parity.
 	 */
-	template<class clockSource, uint32_t baudrate>
+	template<	class clockSource, uint32_t baudrate,
+				OversamplingMode oversample = OversamplingMode::By16>
 	static inline void
-	initialize(Parity parity = Parity::Disabled);
+	initialize(	Parity parity = Parity::Disabled);
 
+	/// Choose if you want to oversample by 16 (_default_) or by 8
+	static inline void
+	setOversamplingMode(OversamplingMode mode);
+%% if id in [1, 2, 3, 6]
+	// Methods needed to use this Usart Peripheral for SPI
+	static inline void
+	setSpiClock(SpiClock clk);
+
+	static inline void
+	setSpiDataMode(SpiDataMode mode);
+
+	static inline void
+	setLastBitClockPulse(LastBitClockPulse pulse);
+%% endif
 	/**
 	 * \brief	Write a single byte to the transmit register
 	 *
@@ -84,14 +104,14 @@ public:
 	write(uint8_t data);
 
 	/**
-	 * Returns the value of the receive register
+	 * Saves the value of the receive register to data
 	 *
 	 * @warning 	This method does NOT do any sanity checks!!
 	 *				It is your responsibility to check if the register
 	 *				contains something useful!
 	 */
-	static inline uint8_t
-	read();
+	static inline void
+	read(uint8_t &data);
 
 	/// Enable/Disable Transmitter
 	static inline void
