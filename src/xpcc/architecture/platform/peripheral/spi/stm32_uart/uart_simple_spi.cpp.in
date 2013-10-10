@@ -7,56 +7,91 @@
  */
 // ----------------------------------------------------------------------------
 
+#include <xpcc/math/utils/bit_operation.hpp>
 #include "uart_simple_spi_{{id}}.hpp"
 
 bool xpcc::stm32::UartSpiSimpleMaster{{ id }}::finished = true;
+xpcc::stm32::UartSpiSimpleMaster{{ id }}::DataOrder
+	xpcc::stm32::UartSpiSimpleMaster{{ id }}::dataOrder =
+	xpcc::stm32::UartSpiSimpleMaster{{ id }}::DataOrder::MsbFirst;
 
 // ----------------------------------------------------------------------------
 void
-xpcc::stm32::UartSpiSimpleMaster{{ id }}::setDataMode(DataMode /*mode*/)
+xpcc::stm32::UartSpiSimpleMaster{{ id }}::setDataMode(DataMode mode)
 {
-	
+	UsartHal{{ id }}::setSpiDataMode(static_cast<UartBase::SpiDataMode>(mode));
 }
 
 void
-xpcc::stm32::UartSpiSimpleMaster{{ id }}::setDataOrder(DataOrder /*order*/)
+xpcc::stm32::UartSpiSimpleMaster{{ id }}::setDataOrder(DataOrder order)
 {
-	
+	dataOrder = order;
 }
 
 uint8_t
-xpcc::stm32::UartSpiSimpleMaster{{ id }}::writeReadBlocking(uint8_t /*data*/)
+xpcc::stm32::UartSpiSimpleMaster{{ id }}::writeReadBlocking(uint8_t data)
 {
-	return 0;
+	writeBlocking(data);
+	while(!getResult(data));
+	return data;
 }
 
 void
-xpcc::stm32::UartSpiSimpleMaster{{ id }}::writeBlocking(uint8_t /*data*/)
+xpcc::stm32::UartSpiSimpleMaster{{ id }}::writeBlocking(uint8_t data)
 {
-	
+	while(!isFinished());
+	write(data);
 }
 
 bool
-xpcc::stm32::UartSpiSimpleMaster{{ id }}::write(uint8_t /*data*/)
+xpcc::stm32::UartSpiSimpleMaster{{ id }}::write(uint8_t data)
 {
-	return true;
-}
-
-uint8_t
-xpcc::stm32::UartSpiSimpleMaster{{ id }}::getResult()
-{
-	return 0;
+	if(!isFinished()) {
+		return false;
+	} else {
+		if(dataOrder == DataOrder::LsbFirst) {
+			data = ::xpcc::bitReverse(data);
+		}
+		UsartHal{{ id }}::write(data);
+		return true;
+	}
 }
 
 bool
-xpcc::stm32::UartSpiSimpleMaster{{ id }}::transfer(uint8_t */*tx*/, uint8_t */*rx*/,
-		std::size_t /*length*/)
+xpcc::stm32::UartSpiSimpleMaster{{ id }}::getResult(uint8_t &data)
 {
-	return true;
+	bool data_valid = UsartHal{{ id }}::isReceiveRegisterNotEmpty();
+	UsartHal{{ id }}::read(data);
+	return data_valid;
 }
 
 bool
 xpcc::stm32::UartSpiSimpleMaster{{ id }}::isFinished()
 {
+	return UsartHal{{ id }}::isTransmitRegisterEmpty() && finished;
+}
+
+bool
+xpcc::stm32::UartSpiSimpleMaster{{ id }}::transfer(uint8_t *tx, uint8_t *rx,
+		std::size_t length)
+{
+	if (!isFinished())
+		return false;
+
+	finished = false;
+
+	uint_fast8_t tx_byte = 0xff;
+	uint_fast8_t rx_byte;
+
+	for (std::size_t i = 0; i < length; i++)
+	{
+		if (tx) tx_byte = tx[i];
+
+		rx_byte = writeReadBlocking(tx_byte);
+
+		if (rx) rx[i] = rx_byte;
+	}
+
+	finished = true;
 	return true;
 }

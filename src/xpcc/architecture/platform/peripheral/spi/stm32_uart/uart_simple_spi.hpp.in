@@ -11,6 +11,7 @@
 #define XPCC_STM32_UART_SIMPLE_SPI{{ id }}_HPP
 
 #include <xpcc/architecture/peripheral/spi.hpp>
+#include "../../uart/stm32/usart_hal_{{ id }}.hpp"
 #include "type_ids.hpp"
 
 namespace xpcc
@@ -25,20 +26,38 @@ namespace stm32
  * Simple unbuffered implementation.
  * @ingroup		stm32
  */
-class UartSpiSimpleMaster{{ id }} : public xpcc::SpiSimpleMaster
+class UartSpiSimpleMaster{{ id }} : public xpcc::SpiSimpleMaster, public UartBase
 {
 private:
 	static bool finished;
+	static DataOrder dataOrder;
 public:
 	static const TypeId::UartSpiMaster{{ id }}Sck  Sck;
 	static const TypeId::UartSpiMaster{{ id }}Miso Miso;
 	static const TypeId::UartSpiMaster{{ id }}Mosi Mosi;
 
 public:
-	template< class clockSource, uint32_t baudrate >
+	enum class
+	DataMode : uint32_t
+	{
+		Mode0 = 0b00,			///< clock normal,   sample on rising  edge
+		Mode1 = USART_CR2_CPHA,	///< clock normal,   sample on falling edge
+		Mode2 = USART_CR2_CPOL,	///< clock inverted, sample on falling  edge
+		Mode3 = USART_CR2_CPOL | USART_CR2_CPHA
+		///< clock inverted, sample on rising edge
+	};
+
+public:
+	template< 	class clockSource, uint32_t baudrate,
+				OversamplingMode oversample = OversamplingMode::By8>
 	static ALWAYS_INLINE void
 	initialize()
 	{
+		UsartHal{{ id }}::initialize<clockSource, baudrate, oversample>();
+		UsartHal{{ id }}::setLastBitClockPulse(UsartHal{{ id }}::LastBitClockPulse::Output);
+		UsartHal{{ id }}::setSpiClock(UsartHal{{ id }}::SpiClock::Enabled);
+		UsartHal{{ id }}::setTransmitterEnable(true);
+		UsartHal{{ id }}::setReceiverEnable(true);
 		finished = true;
 	}
 
@@ -57,8 +76,8 @@ public:
 	static bool
 	write(uint8_t data);
 
-	static uint8_t
-	getResult();
+	static bool
+	getResult(uint8_t &data);
 
 	static bool
 	transfer(uint8_t * tx, uint8_t * rx, std::size_t length);
