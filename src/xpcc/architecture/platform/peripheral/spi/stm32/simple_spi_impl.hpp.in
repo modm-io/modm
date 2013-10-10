@@ -16,7 +16,39 @@ template< class clockSource, uint32_t baudrate >
 void
 xpcc::stm32::SpiSimpleMaster{{ id }}::initialize()
 {
-	SpiHal{{ id }}::initialize(SpiHal{{ id }}::Prescaler::Div2);
+	static_assert(clockSource::Spi{{ id }}/2 >= baudrate,
+		"The peripheral frequency must be at least 2x higher than SPI baudrate.");
+	static_assert(clockSource::Spi{{ id }}/256 <= baudrate,
+		"The SPI baudrate must be at most 256x lower than peripheral frequency.");
+
+	constexpr uint16_t pre_raw = (clockSource::Spi{{ id }} / baudrate);
+	SpiHal{{ id }}::Prescaler prescaler = SpiHal{{ id }}::Prescaler::Div256;
+	if (pre_raw >= 256) {
+		prescaler = SpiHal{{ id }}::Prescaler::Div256;
+	}
+	else if (pre_raw >= 128) {
+		prescaler = SpiHal{{ id }}::Prescaler::Div128;
+	}
+	else if (pre_raw >= 64) {
+		prescaler = SpiHal{{ id }}::Prescaler::Div64;
+	}
+	else if (pre_raw >= 32) {
+		prescaler = SpiHal{{ id }}::Prescaler::Div32;
+	}
+	else if (pre_raw >= 16) {
+		prescaler = SpiHal{{ id }}::Prescaler::Div16;
+	}
+	else if (pre_raw >= 8) {
+		prescaler = SpiHal{{ id }}::Prescaler::Div8;
+	}
+	else if (pre_raw >= 4) {
+		prescaler = SpiHal{{ id }}::Prescaler::Div4;
+	}
+	else {
+		prescaler = SpiHal{{ id }}::Prescaler::Div2;
+	}
+
+	SpiHal{{ id }}::initialize(prescaler);
 	finished = true;
 }
 
