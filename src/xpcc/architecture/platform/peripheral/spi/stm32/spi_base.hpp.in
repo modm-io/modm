@@ -42,8 +42,8 @@ public:
 	enum class
 	InterruptFlag : uint32_t
 	{
-		TxBufferEmpty		= SPI_SR_RXNE,
-		RxBufferNotEmpty	= SPI_SR_TXE,
+		TxBufferEmpty		= SPI_SR_TXE,
+		RxBufferNotEmpty	= SPI_SR_RXNE,
 		CrcError			= SPI_SR_CRCERR,
 		ModeFaultError		= SPI_SR_MODF,
 		OverrunError		= SPI_SR_OVR,
