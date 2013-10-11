@@ -29,6 +29,7 @@ namespace stm32
 class SpiSimpleMaster{{ id }} : public xpcc::SpiSimpleMaster
 {
 public:
+	static const TypeId::SpiMaster{{ id }}Nss  Nss;
 	static const TypeId::SpiMaster{{ id }}Sck  Sck;
 	static const TypeId::SpiMaster{{ id }}Miso Miso;
 	static const TypeId::SpiMaster{{ id }}Mosi Mosi;
