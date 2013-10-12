@@ -335,6 +335,9 @@ def generate(env, **kw):
 	def test_cortex_m4(target):
 		return test_core(target, 'cortex-m4', True)
 	env.AddTemplateJinja2Test('cortex_m4', test_cortex_m4)
+	def test_cortex_m4f(target):
+		return test_core(target, 'cortex-m4f')
+	env.AddTemplateJinja2Test('cortex_m4f', test_cortex_m4f)
 
 	# Platform Tests
 	def test_is_stm32(target):
