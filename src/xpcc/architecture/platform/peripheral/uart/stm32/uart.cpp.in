@@ -110,7 +110,11 @@ xpcc::stm32::{{ name }}::write(const uint8_t *data, std::size_t length)
 bool
 xpcc::stm32::{{ name }}::isWriteFinished()
 {
-	return txBuffer.isEmpty() && {{ hal }}::isTransmitRegisterEmpty();
+%% if parameters.buffered
+	return txBuffer.isEmpty() && UartHal{{ id }}::isTransmitRegisterEmpty();
+%% else
+	return UartHal{{ id }}::isTransmitRegisterEmpty();
+%% endif
 }
 
 std::size_t
@@ -167,7 +171,7 @@ xpcc::stm32::{{ name }}::read(uint8_t *data, std::size_t length)
 	}
 	return i;
 %% else
-	(void)n; // avoid compiler warning
+	(void)length; // avoid compiler warning
 	if(read(*data)) {
 		return 1;
 	} else {
