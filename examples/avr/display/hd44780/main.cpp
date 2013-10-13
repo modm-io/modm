@@ -2,6 +2,8 @@
 #include <xpcc/architecture.hpp>
 #include <xpcc/driver/display.hpp>
 
+using namespace xpcc::atmega;
+
 // define the pins used by the LCD
 namespace lcd
 {
@@ -9,11 +11,20 @@ namespace lcd
 	typedef GpioOutputC6 E;
 	typedef GpioOutputC5 Rw;
 	typedef GpioOutputC4 Rs;
-	typedef GpioLowNibbleC Data;
+	// note: an 8bit data port
+	typedef GpioPortC<0,8> Data8Bit;
+	// and a 4 bit data port
+	typedef GpioPortC<4,4> Data4Bit;
 }
 
-// create a LCD object
-xpcc::Hd44780< lcd::E, lcd::Rw, lcd::Rs, lcd::Data > display(20, 4);
+// You can choose either port width simply by using it.
+// The driver will handle it internally.
+
+// create a LCD object with an 8bit data port
+xpcc::Hd44780< lcd::Data8Bit, lcd::Rw, lcd::Rs, lcd::E > display(20, 4);
+
+// create a LCD object with an 4bit data port
+//xpcc::Hd44780< lcd::Data4Bit, lcd::Rw, lcd::Rs, lcd::E > display(20, 4);
 
 int
 main()
@@ -36,7 +47,7 @@ main()
 	{
 		// Go to the beginning of the second line of the display and
 		// write the value of 'counter'
-		display.setCursor(1, 0);
+		display.setCursor(0, 1);
 		display << counter << "   ";
 
 		counter++;
