@@ -208,7 +208,7 @@ xpcc::TLC594X<CHANNELS, Spi, Xlat, Vprog, Xerr>::writeChannels(bool flush)
 {
 	if (flush)
 	{
-		if (!Spi::transfer(gs, status, CHANNELS*3/2, xpcc::Spi::BufferOptions::TxRxIncrement))
+		if (!Spi::transfer(gs, status, CHANNELS*3/2))
 			return false;
 
 		while(!Spi::isFinished())
@@ -218,7 +218,7 @@ xpcc::TLC594X<CHANNELS, Spi, Xlat, Vprog, Xerr>::writeChannels(bool flush)
 		return true;
 	}
 
-	return Spi::transfer(gs, status, CHANNELS*3/2, xpcc::Spi::BufferOptions::TxRxIncrement);
+	return Spi::transfer(gs, status, CHANNELS*3/2);
 }
 
 template<uint16_t CHANNELS, typename Spi, typename Xlat, typename Vprog, typename Xerr>
@@ -228,7 +228,7 @@ xpcc::TLC594X<CHANNELS, Spi, Xlat, Vprog, Xerr>::writeDotCorrection()
 	Vprog::set();
 
 	// transfer
-	if (!Spi::transfer(dc, 0, CHANNELS*3/4, xpcc::Spi::BufferOptions::TxRxIncrement))
+	if (!Spi::transfer(dc, 0, CHANNELS*3/4))
 	{
 		Vprog::reset();
 		return false;
