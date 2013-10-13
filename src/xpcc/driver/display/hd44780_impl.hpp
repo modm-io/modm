@@ -39,11 +39,11 @@ template <typename DATA, typename RW, typename RS, typename E>
 void
 xpcc::Hd44780<DATA, RW, RS, E>::setCursor(uint8_t column, uint8_t line)
 {
-	this->column = column;
-	this->line = line;
+	this->column = (column <= this->lineWidth ? column : this->lineWidth);
+	this->line = (line <= this->lineCount ? line : this->lineCount);
 
-	uint8_t address = column + 0x40 * line;
-	if (line >= 2) {
+	uint8_t address = this->column + 0x40 * this->line;
+	if (this->line >= 2) {
 		address += 20;
 	}
 	while(!driver::writeAddress(address))
@@ -101,12 +101,12 @@ template <typename DATA, typename RW, typename RS, typename E1, typename E2>
 void
 xpcc::Hd44780Dual<DATA, RW, RS, E1, E2>::setCursor(uint8_t column, uint8_t line)
 {
-	this->column = column;
-	this->line = line;
+	this->column = (column <= this->lineWidth ? column : this->lineWidth);
+	this->line = (line <= this->lineCount ? line : this->lineCount);
 
-	uint8_t address = column;
+	uint8_t address = this->column;
 	if (this->line & 0x01) {
-		address += 40;
+		address += 0x40;
 	}
 
 	if (this->line < 2) {
