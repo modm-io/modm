@@ -361,7 +361,13 @@ public:
 template< Gpio::Port Port, uint8_t StartPin, uint8_t Width>
 class GpioPortBase;
 
-/// @ingroup {{target.family}}
+/**
+ * Creates a hardware port with StartPin as LSB and with Width.
+ *
+ * @tparam	StartPin	a Gpio pin
+ * @tparam	Width		required width of the port (up to 8)
+ * @ingroup {{target.family}}
+ */
 template< typename StartPin, uint8_t Width >
 class GpioPort : public ::xpcc::GpioPort, public GpioPortBase< StartPin::port, StartPin::pin, Width>
 {};
