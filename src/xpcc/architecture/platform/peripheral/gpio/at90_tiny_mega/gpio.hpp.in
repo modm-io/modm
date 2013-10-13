@@ -27,7 +27,7 @@ struct Gpio
 {
 	/**
 	 * Each Pin can be configured in one of these states.
-	 * Only available for Pins configured as inputs!
+	 * @warning Only available for Pins configured as inputs!
 	 *
 	 * @ingroup	{{target.family}}
 	 */
@@ -38,11 +38,8 @@ struct Gpio
 		PullUp,		///< The input pin is pulled to Vcc
 	};
 
-	/**
-	 * Each External Interrupt can be configured to trigger on these conditions.
-	 *
-	 * @ingroup	{{target.family}}
-	 */
+	/// Each External Interrupt can be configured to trigger on these conditions.
+	/// @ingroup	{{target.family}}
 	enum class
 	InputTrigger : uint8_t
 	{
@@ -52,6 +49,15 @@ struct Gpio
 		RisingEdge = 0b11,	///< triggers on rising edge
 	};
 
+	enum class
+	Port
+	{
+%% for port in gpios | getPorts
+		{{ port.name | upper }},
+%% endfor
+	};
+
+protected:
 	/// @private
 	/// @{
 	static constexpr uint8_t
@@ -63,7 +69,7 @@ struct Gpio
 
 /**
  * Gpio OpenDrain template, which remaps the behavior of the Gpio pin to
- * simulate an open-drain Output (with internal pullups if you need it).
+ * simulate an open-drain Output (with internal pullups if needed).
  * You must use this class for `SoftwareI2cMaster`!
  *
  * @see ::xpcc::SoftwareI2cMaster
@@ -122,7 +128,8 @@ public:
 struct {{name}} : public Gpio, ::xpcc::{{superclass}}
 {
 public:
-	static constexpr uint8_t pin = {{pin}};		///< the pin number of this GPIO
+	static constexpr Port port = Port::{{port}};		///< the port of this GPIO
+	static constexpr uint8_t pin = {{pin}};			///< the pin  of this GPIO
 	static constexpr uint8_t mask = (1 << pin);	///< the mask of this GPIO
 
 		%% if type in ["", "Output"]
@@ -350,22 +357,35 @@ public:
 %% endfor
 
 %# Ports
-%% for port in gpios | getPorts
+/// @private
+template< Gpio::Port Port, uint8_t StartPin, uint8_t Width>
+class GpioPortBase;
 
 /// @ingroup {{target.family}}
-template< uint8_t START_PIN, uint8_t WIDTH >
-class GpioPort{{port.name}} : public ::xpcc::GpioPort, public Gpio
-{
-	static_assert(START_PIN < {{port.startPin + port.width}}, "START_PIN too large, maximum {{port.startPin + port.width}}.");
-	static_assert(WIDTH <= {{port.width}}, "WIDTH too large, maximum {{port.width}}.");
-	static_assert(WIDTH > 0, "WIDTH should be at least 1.");
-	static_assert(START_PIN + WIDTH <= {{port.startPin + port.width}}, "START_PIN + WIDTH too large, maximum {{port.startPin + port.width}}.");
+template< typename StartPin, uint8_t Width >
+class GpioPort : public ::xpcc::GpioPort, public GpioPortBase< StartPin::port, StartPin::pin, Width>
+{};
 
-	static constexpr uint8_t dataMask = (1 << WIDTH) - 1;
-	static constexpr uint8_t portMask = dataMask << START_PIN;
+
+%% for port in gpios | getPorts
+/// @private 
+template< uint8_t StartPin, uint8_t Width >
+class GpioPortBase<Gpio::Port::{{port.name}}, StartPin, Width> : public Gpio
+{
+	static_assert(StartPin < {{port.startPin + port.width}},
+			"StartPin too large, maximum {{port.startPin + port.width}}.");
+	static_assert(Width <= {{port.width}},
+			"Width too large, maximum {{port.width}}.");
+	static_assert(Width > 0,
+			"Width should be at least 1.");
+	static_assert(StartPin + Width <= {{port.startPin + port.width}},
+			"StartPin + Width too large, maximum {{port.startPin + port.width}}.");
+
+	static constexpr uint8_t dataMask = (1 << Width) - 1;
+	static constexpr uint8_t portMask = dataMask << StartPin;
 
 public:
-	static constexpr uint8_t width = WIDTH;
+	static constexpr uint8_t width = Width;
 
 public:
 	ALWAYS_INLINE static void setOutput() {
@@ -376,10 +396,10 @@ public:
 	}
 	ALWAYS_INLINE static uint8_t read() {
 		uint8_t data = PIN{{port.name}} & portMask;
-		return (data >> START_PIN);
+		return (data >> StartPin);
 	}
 	ALWAYS_INLINE static void write(uint8_t data) {
-		data <<= START_PIN;
+		data <<= StartPin;
 		PORT{{port.name}} = (PORT{{port.name}} & ~portMask) | (data & portMask);
 	}
 	ALWAYS_INLINE static void toggle() {
@@ -392,7 +412,7 @@ public:
 };
 	%% if port.startPin == 0 and port.width == 8
 template<>
-class GpioPort{{port.name}}< 0, 8 > : public ::xpcc::GpioPort, public Gpio
+class GpioPortBase<Gpio::Port::{{port.name}}, 0, 8 > : public Gpio
 {
 public:
 	static constexpr uint8_t width = 8;
@@ -421,6 +441,7 @@ public:
 	%% endif
 
 %% endfor
+
 
 }	// namespace {{target.family}}
 
