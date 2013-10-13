@@ -43,7 +43,7 @@ xpcc::{{target.family}}::UartSpiSimpleMaster{{id}}::writeBlocking(uint8_t data)
 	if (dataOrder == DataOrder::LsbFirst) {
 		data = xpcc::bitReverse(data);
 	}
-	while(!isFinished())
+	while(!((UCSR{{id}}A & (1 << UDRE{{id}}) && finished)))
 		;
 	UDR{{id}} = data;
 }
@@ -51,20 +51,28 @@ xpcc::{{target.family}}::UartSpiSimpleMaster{{id}}::writeBlocking(uint8_t data)
 bool
 xpcc::{{target.family}}::UartSpiSimpleMaster{{id}}::write(uint8_t data)
 {
+	if (!finished)
+		return false;
+
 	if (dataOrder == DataOrder::LsbFirst) {
 		data = xpcc::bitReverse(data);
 	}
-	if (!isFinished())
+
+	if (!(UCSR{{id}}A & (1 << UDRE{{id}})))
 		return false;
 
 	UDR{{id}} = data;
 	return true;
 }
 
-uint8_t
-xpcc::{{target.family}}::UartSpiSimpleMaster{{id}}::getResult()
+bool
+xpcc::{{target.family}}::UartSpiSimpleMaster{{id}}::getResult(uint8_t &data)
 {
-	uint8_t data = UDR{{id}};
+	if (!((UCSR{{id}}A & (1 << RXC{{id}})) && finished))
+		return false;
+
+	data = UDR{{id}};
+
 	if (dataOrder == DataOrder::LsbFirst) {
 		data = xpcc::bitReverse(data);
 	}

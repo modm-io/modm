@@ -46,6 +46,16 @@ public:
 	static const TypeId::SpiMasterSck  Sck;
 	static const TypeId::SpiMasterSs   Ss;
 
+	/// Spi Data Mode, Mode0 is the most common mode
+	enum class
+	DataMode : uint8_t
+	{
+		Mode0 = 0,	///< clock normal,   sample on rising  edge
+		Mode1 = (1 << CPOL),	///< clock normal,   sample on falling edge
+		Mode2 = (1 << CPHA),	///< clock inverted, sample on rising  edge
+		Mode3 = (1 << CPOL) | (1 << CPHA),	///< clock inverted, sample on falling edge
+	};
+
 public:
 	// start documentation inherited
 	template< uint32_t baudrate >
@@ -67,8 +77,8 @@ public:
 	static ALWAYS_INLINE bool
 	write(uint8_t data);
 
-	static ALWAYS_INLINE uint8_t
-	getResult();
+	static ALWAYS_INLINE bool
+	getResult(uint8_t &data);
 
 	static bool
 	transfer(uint8_t * tx, uint8_t * rx, std::size_t length);

@@ -67,8 +67,8 @@ struct Spi
  * Use this interface if you need the *fastest possible* data transfer and only
  * have one slave on the bus or implement the resource management yourself.
  *
- * @warning	You can only either use the `SpiSimpleMaster` or `SpiMaster` driver on
- * 			the same hardware at the same time.
+ * @warning	You can only either use the `SpiSimpleMaster` or `SpiMaster` driver
+ * 			on the same hardware at the same time.
  *
  * @author	Niklas Hauser
  * @ingroup	spi
@@ -162,8 +162,8 @@ public:
  * level while also providing asynchronous and, if available, DMA supported
  * data transfer.
  *
- * @warning	You can only either use the `SimpleSpi` or `SpiMaster` driver on
- * 			the same hardware at the same time.
+ * @warning	You can only either use the `SpiSimpleMaster` or `SpiMaster` driver
+ * 			on the same hardware at the same time.
  *
  * @author	Niklas Hauser
  * @ingroup	spi
@@ -173,11 +173,14 @@ class SpiMaster : public ::xpcc::Peripheral, public Spi
 #ifdef __DOXYGEN__
 public:
 	/**
-	 * Initialize the hardware and sets the baudrate.
+	 * Initializes the hardware and sets the baudrate.
 	 *
-	 * @tparam	baudrate	the desired baudrate in Hz
+	 * @tparam	clockSource
+	 * 		the targets sytem clock
+	 * @tparam	baudrate
+	 * 		the desired baudrate in Hz
 	 */
-	template< uint32_t baudrate >
+	template< class clockSource, uint32_t baudrate >
 	static void
 	initialize();
 

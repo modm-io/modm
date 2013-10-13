@@ -102,8 +102,8 @@ public:
 	static ALWAYS_INLINE bool
 	write(uint8_t data);
 
-	static ALWAYS_INLINE uint8_t
-	getResult();
+	static ALWAYS_INLINE bool
+	getResult(uint8_t &data);
 %% else
 	static void
 	writeBlocking(uint8_t data);
@@ -111,8 +111,8 @@ public:
 	static bool
 	write(uint8_t data);
 
-	static uint8_t
-	getResult();
+	static bool
+	getResult(uint8_t &data);
 %% endif
 
 	static bool

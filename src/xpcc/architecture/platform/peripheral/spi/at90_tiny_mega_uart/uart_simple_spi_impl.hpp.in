@@ -18,8 +18,10 @@ xpcc::{{target.family}}::UartSpiSimpleMaster{{id}}::initialize()
 {
 	constexpr uint16_t prescaler = (F_CPU / ( 2 * baudrate )) - 1;
 
-	static_assert(F_CPU/2 >= baudrate, "The CPU frequency must be at least 2x higher than SPI baudrate.");
-	static_assert(prescaler + 1 < (1 << 12) + 1, "SPI baudrate is too slow for CPU frequency (Prescaler out of bounds).");
+	static_assert(F_CPU/2 >= baudrate,
+			"The CPU frequency must be at least 2x higher than SPI baudrate.");
+	static_assert(prescaler + 1 < (1 << 12) + 1,
+			"SPI baudrate is too slow for CPU frequency (Prescaler out of bounds).");
 
 	initialize(prescaler);
 }
@@ -27,7 +29,11 @@ xpcc::{{target.family}}::UartSpiSimpleMaster{{id}}::initialize()
 void
 xpcc::{{target.family}}::UartSpiSimpleMaster{{id}}::setDataMode(DataMode mode)
 {
+%% if extended is defined
 	UCSR{{ id }}C = (UCSR{{ id }}C & ~((1 << UCPOL{{ id }}) | (1 << UCPHA{{ id }}))) | static_cast<uint8_t>(mode);
+%% else
+	UCSR{{ id }}C = (UCSR{{ id }}C & ~(1 << UCPOL{{ id }})) | static_cast<uint8_t>(mode);
+%% endif
 }
 
 void
@@ -46,35 +52,39 @@ xpcc::{{target.family}}::UartSpiSimpleMaster{{id}}::writeReadBlocking(uint8_t da
 {
 	writeBlocking(data);
 
-	while(!isFinished())
+	uint8_t rData;
+	while(!getResult(rData))
 		;
-	return getResult();
+
+	return rData;
 }
 
 %% if extended is defined
 void
 xpcc::{{target.family}}::UartSpiSimpleMaster{{id}}::writeBlocking(uint8_t data)
 {
-	while(!isFinished())
+	while(!write(data))
 		;
-	UDR{{id}} = data;
 }
 
 bool
 xpcc::{{target.family}}::UartSpiSimpleMaster{{id}}::write(uint8_t data)
 {
-	if (!isFinished())
+	if (!((UCSR{{id}}A & (1 << UDRE{{id}}) && finished)))
 		return false;
 
 	UDR{{id}} = data;
 	return true;
 }
 
-uint8_t
-xpcc::{{target.family}}::UartSpiSimpleMaster{{id}}::getResult()
+bool
+xpcc::{{target.family}}::UartSpiSimpleMaster{{id}}::getResult(uint8_t &data)
 {
-	uint8_t data = UDR{{id}};
-	return data;
+	if (!(UCSR{{id}}A & (1 << RXC{{id}})))
+		return false;
+
+	data = UDR{{id}};
+	return true;
 }
 %% endif
 

@@ -16,8 +16,10 @@ template< uint32_t baudrate >
 void
 xpcc::{{target.family}}::SpiSimpleMaster::initialize()
 {
-	static_assert(F_CPU/2 >= baudrate, "The CPU frequency must be at least 2x higher than SPI baudrate.");
-	static_assert(F_CPU/128 <= baudrate, "The SPI baudrate must be at most 128x lower than CPU frequency.");
+	static_assert(F_CPU/2 >= baudrate,
+			"The CPU frequency must be at least 2x higher than SPI baudrate.");
+	static_assert(F_CPU/128 <= baudrate,
+			"The SPI baudrate must be at most 128x lower than CPU frequency.");
 	
 	constexpr uint16_t pre_raw = (F_CPU / baudrate);
 	Prescaler prescaler = Prescaler::Div128;
@@ -57,13 +59,17 @@ xpcc::{{target.family}}::SpiSimpleMaster::initialize(Prescaler prescaler)
 void
 xpcc::{{target.family}}::SpiSimpleMaster::setDataMode(DataMode mode)
 {
-	SPCR = (SPCR & ~0b1100) | (static_cast<uint8_t>(mode) << 2);
+	SPCR = (SPCR & ~((1 << CPOL) | (1 << CPHA))) | static_cast<uint8_t>(mode);
 }
 
 void
 xpcc::{{target.family}}::SpiSimpleMaster::setDataOrder(DataOrder order)
 {
-	SPCR = (SPCR & ~(1 << DORD)) | (order == DataOrder::LsbFirst ? (1 << DORD) : 0);
+	if (order == DataOrder::LsbFirst) {
+		SPCR |= (1 << DORD);
+	} else {
+		SPCR &= ~(1 << DORD);
+	}
 }
 // ----------------------------------------------------------------------------
 
@@ -72,17 +78,18 @@ xpcc::{{target.family}}::SpiSimpleMaster::writeReadBlocking(uint8_t data)
 {
 	writeBlocking(data);
 
-	while(!isFinished())
+	uint8_t rData;
+	while(!getResult(rData))
 		;
-	return getResult();
+
+	return rData;
 }
 
 void
 xpcc::{{target.family}}::SpiSimpleMaster::writeBlocking(uint8_t data)
 {
-	while(!isFinished())
+	while(!write(data))
 		;
-	SPDR = data;
 }
 
 bool
@@ -95,11 +102,14 @@ xpcc::{{target.family}}::SpiSimpleMaster::write(uint8_t data)
 	return true;
 }
 
-uint8_t
-xpcc::{{target.family}}::SpiSimpleMaster::getResult()
+bool
+xpcc::{{target.family}}::SpiSimpleMaster::getResult(uint8_t &data)
 {
-	uint8_t data = SPDR;
-	return data;
+	if (!isFinished())
+		return false;
+
+	data = SPDR;
+	return true;
 }
 
 bool
