@@ -111,9 +111,9 @@ bool
 xpcc::stm32::{{ name }}::isWriteFinished()
 {
 %% if parameters.buffered
-	return txBuffer.isEmpty() && UartHal{{ id }}::isTransmitRegisterEmpty();
+	return txBuffer.isEmpty() && {{ hal }}::isTransmitRegisterEmpty();
 %% else
-	return UartHal{{ id }}::isTransmitRegisterEmpty();
+	return {{ hal }}::isTransmitRegisterEmpty();
 %% endif
 }
 
