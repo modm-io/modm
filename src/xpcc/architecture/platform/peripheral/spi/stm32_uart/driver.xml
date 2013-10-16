@@ -3,6 +3,7 @@
 <rca version="1.0">
 	<driver type="spi" name="stm32_uart">
 		<template instances="1,2,3,6" out="uart_simple_spi_{{id}}.hpp">uart_simple_spi.hpp.in</template>
+		<template instances="1,2,3,6" out="uart_simple_spi_{{id}}_impl.hpp">uart_simple_spi_impl.hpp.in</template>
 		<template instances="1,2,3,6" out="uart_simple_spi_{{id}}.cpp">uart_simple_spi.cpp.in</template>
 		<!-- UartHal -->
 		<!-- TODO: dependency tracking without scons warnings -->

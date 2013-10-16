@@ -51,43 +51,37 @@ public:
 	template< 	class clockSource, uint32_t baudrate,
 				OversamplingMode oversample = OversamplingMode::By8>
 	static ALWAYS_INLINE void
-	initialize()
-	{
-		UsartHal{{ id }}::initialize<clockSource, baudrate, oversample>();
-		UsartHal{{ id }}::setLastBitClockPulse(UsartHal{{ id }}::LastBitClockPulse::Output);
-		UsartHal{{ id }}::setSpiClock(UsartHal{{ id }}::SpiClock::Enabled);
-		UsartHal{{ id }}::setTransmitterEnable(true);
-		UsartHal{{ id }}::setReceiverEnable(true);
-		finished = true;
-	}
+	initialize();
 
-	static void
+	static inline void
 	setDataMode(DataMode mode);
 
-	static void
+	static inline void
 	setDataOrder(DataOrder order);
 
-	static uint8_t
+	static inline uint8_t
 	writeReadBlocking(uint8_t data);
 
-	static void
+	static inline void
 	writeBlocking(uint8_t data);
 
-	static bool
+	static inline bool
 	write(uint8_t data);
 
-	static bool
+	static inline bool
 	getResult(uint8_t &data);
 
 	static bool
 	transfer(uint8_t * tx, uint8_t * rx, std::size_t length);
 
-	static bool
+	static inline bool
 	isFinished();
 };
 
 } // namespace stm32
 
 } // namespace xpcc
+
+#include "uart_simple_spi_{{id}}_impl.hpp"
 
 #endif // XPCC_STM32_UART_SIMPLE_SPI{{ id }}_HPP
