@@ -90,7 +90,9 @@ namespace xpcc
 	ALWAYS_INLINE uint16_t
 	swap(uint16_t n)
 	{
-#ifdef __AVR__
+#ifdef __ARM__
+		return __REV16(n);
+#elif defined __AVR__
 		if (__builtin_constant_p(n)) {
 			n = (n << 8) | (n >> 8);
 		}
@@ -123,7 +125,7 @@ namespace xpcc
 	swap(uint32_t n)
 	{
 #ifdef __ARM__
-		return __REV(__RBIT(n));
+		return __REV(n);
 #else
 		n = (n << 24) | ((n << 8) & 0xff0000) | ((n >> 8) & 0xff00) | (n >> 24);
 		return n;
