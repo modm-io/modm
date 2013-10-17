@@ -5,7 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -41,30 +41,30 @@ xpcc::At45db0x1d<Spi, Cs>::initialize()
 {
 	Cs::set();
 	Cs::setOutput();
-	
+
 	uint8_t status = readStatus();
 	if (status == 0xff || status == 0) {
 		// no device present
 		return false;
 	}
-	
+
 	if ((status & PAGE_SIZE) == 0)
 	{
 		// Page size is 264 (the default)
 		// => set page size from 264 to 256 bytes
 		Cs::reset();
-		
+
 		// send page size change sequence (fixed sequence)
-		Spi::write(0x3d);
-		Spi::write(0x2a);
-		Spi::write(0x80);
-		Spi::write(0xa6);
-		
+		Spi::writeReadBlocking(0x3d);
+		Spi::writeReadBlocking(0x2a);
+		Spi::writeReadBlocking(0x80);
+		Spi::writeReadBlocking(0xa6);
+
 		Cs::set();
 	}
-	
+
 	waitUntilReady();
-	
+
 	return true;
 }
 
@@ -74,19 +74,19 @@ void
 xpcc::At45db0x1d<Spi, Cs>::copyPageToBuffer(uint16_t pageAddress, at45db::Buffer buffer)
 {
 	Cs::reset();
-	
+
 	if (buffer == at45db::BUFFER_0) {
-		Spi::write(MAIN_MEMORY_PAGE_TO_BUFFER_1_TRANSFER);
+		Spi::writeReadBlocking(MAIN_MEMORY_PAGE_TO_BUFFER_1_TRANSFER);
 	}
 	else {
-		Spi::write(MAIN_MEMORY_PAGE_TO_BUFFER_2_TRANSFER);
+		Spi::writeReadBlocking(MAIN_MEMORY_PAGE_TO_BUFFER_2_TRANSFER);
 	}
-	
+
 	// set address
-	Spi::write(pageAddress >> 8);
-	Spi::write(pageAddress & 0xff);
-	Spi::write(0);
-	
+	Spi::writeReadBlocking(pageAddress >> 8);
+	Spi::writeReadBlocking(pageAddress & 0xff);
+	Spi::writeReadBlocking(0);
+
 	Cs::set();
 }
 
@@ -96,19 +96,19 @@ void
 xpcc::At45db0x1d<Spi, Cs>::comparePageToBuffer(uint16_t pageAddress, at45db::Buffer buffer)
 {
 	Cs::reset();
-	
+
 	if (buffer == at45db::BUFFER_0) {
-		Spi::write(MAIN_MEMORY_PAGE_TO_BUFFER_1_COMPARE);
+		Spi::writeReadBlocking(MAIN_MEMORY_PAGE_TO_BUFFER_1_COMPARE);
 	}
 	else {
-		Spi::write(MAIN_MEMORY_PAGE_TO_BUFFER_2_COMPARE);
+		Spi::writeReadBlocking(MAIN_MEMORY_PAGE_TO_BUFFER_2_COMPARE);
 	}
-	
+
 	// set address
-	Spi::write(pageAddress >> 8);
-	Spi::write(pageAddress & 0xff);
-	Spi::write(0);
-	
+	Spi::writeReadBlocking(pageAddress >> 8);
+	Spi::writeReadBlocking(pageAddress & 0xff);
+	Spi::writeReadBlocking(0);
+
 	Cs::set();
 }
 
@@ -126,19 +126,19 @@ void
 xpcc::At45db0x1d<Spi, Cs>::copyBufferToPage(at45db::Buffer buffer, uint16_t pageAddress)
 {
 	Cs::reset();
-	
+
 	if (buffer == at45db::BUFFER_0) {
-		Spi::write(BUFFER_1_TO_MAIN_MEMORY_PAGE_PROGRAM_WITH_ERASE);
+		Spi::writeReadBlocking(BUFFER_1_TO_MAIN_MEMORY_PAGE_PROGRAM_WITH_ERASE);
 	}
 	else {
-		Spi::write(BUFFER_2_TO_MAIN_MEMORY_PAGE_PROGRAM_WITH_ERASE);
+		Spi::writeReadBlocking(BUFFER_2_TO_MAIN_MEMORY_PAGE_PROGRAM_WITH_ERASE);
 	}
-	
+
 	// set address
-	Spi::write(pageAddress >> 8);
-	Spi::write(pageAddress & 0xff);
-	Spi::write(0);
-	
+	Spi::writeReadBlocking(pageAddress >> 8);
+	Spi::writeReadBlocking(pageAddress & 0xff);
+	Spi::writeReadBlocking(0);
+
 	Cs::set();
 }
 
@@ -148,19 +148,19 @@ void
 xpcc::At45db0x1d<Spi, Cs>::copyBufferToPageWithoutErase(at45db::Buffer buffer, uint16_t pageAddress)
 {
 	Cs::reset();
-	
+
 	if (buffer == at45db::BUFFER_0) {
-		Spi::write(BUFFER_1_TO_MAIN_MEMORY_PAGE_PROGRAM_WITHOUT_ERASE);
+		Spi::writeReadBlocking(BUFFER_1_TO_MAIN_MEMORY_PAGE_PROGRAM_WITHOUT_ERASE);
 	}
 	else {
-		Spi::write(BUFFER_2_TO_MAIN_MEMORY_PAGE_PROGRAM_WITHOUT_ERASE);
+		Spi::writeReadBlocking(BUFFER_2_TO_MAIN_MEMORY_PAGE_PROGRAM_WITHOUT_ERASE);
 	}
-	
+
 	// set address
-	Spi::write(pageAddress >> 8);
-	Spi::write(pageAddress & 0xff);
-	Spi::write(0);
-	
+	Spi::writeReadBlocking(pageAddress >> 8);
+	Spi::writeReadBlocking(pageAddress & 0xff);
+	Spi::writeReadBlocking(0);
+
 	Cs::set();
 }
 
@@ -172,22 +172,22 @@ xpcc::At45db0x1d<Spi, Cs>::readFromBuffer(at45db::Buffer buffer,
 {
 	Cs::reset();
 	if (buffer == at45db::BUFFER_0) {
-		Spi::write(BUFFER_1_READ);
+		Spi::writeReadBlocking(BUFFER_1_READ);
 	}
 	else {
-		Spi::write(BUFFER_2_READ);
+		Spi::writeReadBlocking(BUFFER_2_READ);
 	}
-	
+
 	// set address
-	Spi::write(0);
-	Spi::write(0);
-	Spi::write(address);
-	
+	Spi::writeReadBlocking(0);
+	Spi::writeReadBlocking(0);
+	Spi::writeReadBlocking(address);
+
 	// don't care byte
-	Spi::write(0);
-	
+	Spi::writeReadBlocking(0);
+
 	for (std::size_t i = 0; i < size; ++i) {
-		*data++ = Spi::write(0);
+		*data++ = Spi::writeReadBlocking(0);
 	}
 	Cs::set();
 }
@@ -200,19 +200,19 @@ xpcc::At45db0x1d<Spi, Cs>::writeToBuffer(at45db::Buffer buffer,
 {
 	Cs::reset();
 	if (buffer == at45db::BUFFER_0) {
-		Spi::write(BUFFER_1_WRITE);
+		Spi::writeReadBlocking(BUFFER_1_WRITE);
 	}
 	else {
-		Spi::write(BUFFER_2_WRITE);
+		Spi::writeReadBlocking(BUFFER_2_WRITE);
 	}
-	
+
 	// set address
-	Spi::write(0);
-	Spi::write(0);
-	Spi::write(address);
-	
+	Spi::writeReadBlocking(0);
+	Spi::writeReadBlocking(0);
+	Spi::writeReadBlocking(address);
+
 	for (std::size_t i = 0; i < size; ++i) {
-		Spi::write(*data++);
+		Spi::writeReadBlocking(*data++);
 	}
 	Cs::set();
 }
@@ -223,40 +223,40 @@ void
 xpcc::At45db0x1d<Spi, Cs>::readFromMemory(uint32_t address, uint8_t *data, std::size_t size)
 {
 	Cs::reset();
-	Spi::write(CONTINOUS_ARRAY_READ);
-	
+	Spi::writeReadBlocking(CONTINOUS_ARRAY_READ);
+
 	// set address
-	Spi::write(address >> 16);
-	Spi::write(address >> 8);
-	Spi::write(address);
-	
+	Spi::writeReadBlocking(address >> 16);
+	Spi::writeReadBlocking(address >> 8);
+	Spi::writeReadBlocking(address);
+
 	for (std::size_t i = 0; i < size; ++i) {
-		*data++ = Spi::write(0);
+		*data++ = Spi::writeReadBlocking(0);
 	}
 	Cs::set();
 }
-		
+
 // ----------------------------------------------------------------------------
 template <typename Spi, typename Cs>
 void
 xpcc::At45db0x1d<Spi, Cs>::readPageFromMemory(uint32_t address, uint8_t *data, std::size_t size)
 {
 	Cs::reset();
-	Spi::write(MAIN_MEMORY_PAGE_READ);
-	
+	Spi::writeReadBlocking(MAIN_MEMORY_PAGE_READ);
+
 	// set address
-	Spi::write(address >> 16);
-	Spi::write(address >> 8);
-	Spi::write(address);
-	
+	Spi::writeReadBlocking(address >> 16);
+	Spi::writeReadBlocking(address >> 8);
+	Spi::writeReadBlocking(address);
+
 	// don't care
-	Spi::write(0);
-	Spi::write(0);
-	Spi::write(0);
-	Spi::write(0);
-	
+	Spi::writeReadBlocking(0);
+	Spi::writeReadBlocking(0);
+	Spi::writeReadBlocking(0);
+	Spi::writeReadBlocking(0);
+
 	for (std::size_t i = 0; i < size; ++i) {
-		*data++ = Spi::write(0);
+		*data++ = Spi::writeReadBlocking(0);
 	}
 	Cs::set();
 }
@@ -267,14 +267,14 @@ void
 xpcc::At45db0x1d<Spi, Cs>::pageErase(uint16_t pageAddress)
 {
 	waitUntilReady();
-	
+
 	Cs::reset();
-	
+
 	// set address
-	Spi::write(pageAddress >> 8);
-	Spi::write(pageAddress & 0xff);
-	Spi::write(0);
-	
+	Spi::writeReadBlocking(pageAddress >> 8);
+	Spi::writeReadBlocking(pageAddress & 0xff);
+	Spi::writeReadBlocking(0);
+
 	Cs::set();
 }
 
@@ -284,19 +284,19 @@ void
 xpcc::At45db0x1d<Spi, Cs>::pageRewrite(uint16_t pageAddress, at45db::Buffer buffer)
 {
 	Cs::reset();
-	
+
 	if (buffer == at45db::BUFFER_0) {
-		Spi::write(BUFFER_1_PAGE_REWRITE);
+		Spi::writeReadBlocking(BUFFER_1_PAGE_REWRITE);
 	}
 	else {
-		Spi::write(BUFFER_2_PAGE_REWRITE);
+		Spi::writeReadBlocking(BUFFER_2_PAGE_REWRITE);
 	}
-	
+
 	// set address
-	Spi::write(pageAddress >> 8);
-	Spi::write(pageAddress & 0xff);
-	Spi::write(0);
-	
+	Spi::writeReadBlocking(pageAddress >> 8);
+	Spi::writeReadBlocking(pageAddress & 0xff);
+	Spi::writeReadBlocking(0);
+
 	Cs::set();
 }
 
@@ -306,14 +306,14 @@ void
 xpcc::At45db0x1d<Spi, Cs>::blockErase(uint16_t blockAddress)
 {
 	waitUntilReady();
-	
+
 	Cs::reset();
-	
+
 	// set address
-	Spi::write(blockAddress >> 8);
-	Spi::write(blockAddress & 0xf8);
-	Spi::write(0);
-	
+	Spi::writeReadBlocking(blockAddress >> 8);
+	Spi::writeReadBlocking(blockAddress & 0xf8);
+	Spi::writeReadBlocking(0);
+
 	Cs::set();
 }
 
@@ -323,15 +323,15 @@ void
 xpcc::At45db0x1d<Spi, Cs>::chipErase()
 {
 	waitUntilReady();
-	
+
 	Cs::reset();
-	
+
 	// send chip erase sequence (fixed sequence)
-	Spi::write(0xc7);
-	Spi::write(0x94);
-	Spi::write(0x80);
-	Spi::write(0x9a);
-	
+	Spi::writeReadBlocking(0xc7);
+	Spi::writeReadBlocking(0x94);
+	Spi::writeReadBlocking(0x80);
+	Spi::writeReadBlocking(0x9a);
+
 	Cs::set();
 }
 
@@ -359,9 +359,9 @@ uint8_t
 xpcc::At45db0x1d<Spi, Cs>::readStatus()
 {
 	Cs::reset();
-	Spi::write(READ_STATUS_REGISTER);
-	uint8_t result = Spi::write(0);		// dummy write to get result
+	Spi::writeReadBlocking(READ_STATUS_REGISTER);
+	uint8_t result = Spi::writeReadBlocking(0);		// dummy write to get result
 	Cs::set();
-	
+
 	return result;
 }
