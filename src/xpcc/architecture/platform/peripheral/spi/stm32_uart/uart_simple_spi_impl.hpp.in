@@ -20,6 +20,7 @@ xpcc::stm32::UartSpiSimpleMaster{{ id }}::initialize()
 	UsartHal{{ id }}::setTransmitterEnable(true);
 	UsartHal{{ id }}::setReceiverEnable(true);
 	finished = true;
+	dataOrder = DataOrder::MsbFirst;
 }
 
 void
@@ -38,37 +39,44 @@ uint8_t
 xpcc::stm32::UartSpiSimpleMaster{{ id }}::writeReadBlocking(uint8_t data)
 {
 	writeBlocking(data);
-	while(!getResult(data));
+	while(!getResult(data))
+		;
 	return data;
 }
 
 void
 xpcc::stm32::UartSpiSimpleMaster{{ id }}::writeBlocking(uint8_t data)
 {
-	while(!isFinished());
-	write(data);
+	while(!write(data))
+		;
 }
 
 bool
 xpcc::stm32::UartSpiSimpleMaster{{ id }}::write(uint8_t data)
 {
-	if(!isFinished()) {
+	if(!isFinished())
 		return false;
-	} else {
-		if(dataOrder == DataOrder::LsbFirst) {
-			data = ::xpcc::bitReverse(data);
-		}
-		UsartHal{{ id }}::write(data);
-		return true;
+
+	// the USART can only send LSB out first
+	if(dataOrder == DataOrder::MsbFirst) {
+		data = ::xpcc::bitReverse(data);
 	}
+	UsartHal{{ id }}::write(data);
+	return true;
 }
 
 bool
 xpcc::stm32::UartSpiSimpleMaster{{ id }}::getResult(uint8_t &data)
 {
-	bool data_valid = UsartHal{{ id }}::isReceiveRegisterNotEmpty();
+	if (!UsartHal{{ id }}::isReceiveRegisterNotEmpty())
+		return false;
+
 	UsartHal{{ id }}::read(data);
-	return data_valid;
+	// the USART can only send LSB out first
+	if(dataOrder == DataOrder::MsbFirst) {
+		data = ::xpcc::bitReverse(data);
+	}
+	return true;
 }
 
 bool
