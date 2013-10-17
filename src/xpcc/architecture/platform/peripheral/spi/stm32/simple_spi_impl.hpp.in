@@ -68,9 +68,8 @@ uint8_t
 xpcc::stm32::SpiSimpleMaster{{ id }}::writeReadBlocking(uint8_t data)
 {
 	writeBlocking(data);
-	while(!SpiHal{{ id }}::isReceiveRegisterNotEmpty())
-		;
-	return getResult();
+	while(!getResult(data))
+	return data;
 }
 
 void
@@ -86,17 +85,19 @@ xpcc::stm32::SpiSimpleMaster{{ id }}::write(uint8_t data)
 {
 	if(!isFinished())
 		return false;
-	
+
 	SpiHal{{ id }}::write(data);
 	return true;
 }
 
-uint8_t
-xpcc::stm32::SpiSimpleMaster{{ id }}::getResult()
+bool
+xpcc::stm32::SpiSimpleMaster{{ id }}::getResult(uint8_t &data)
 {
-	uint8_t data;
+	if (!SpiHal{{ id }}::isReceiveRegisterNotEmpty())
+		return false;
+
 	SpiHal{{ id }}::read(data);
-	return data;
+	return true;
 }
 
 bool
