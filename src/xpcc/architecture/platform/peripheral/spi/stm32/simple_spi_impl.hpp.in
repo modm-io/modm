@@ -69,6 +69,7 @@ xpcc::stm32::SpiSimpleMaster{{ id }}::writeReadBlocking(uint8_t data)
 {
 	writeBlocking(data);
 	while(!getResult(data))
+		;
 	return data;
 }
 
