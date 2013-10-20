@@ -12,13 +12,11 @@ template <	typename Cclk,
 			typename ProgB,
 			typename InitB,
 			typename Done,
-			typename DataSource,
-			typename Led0,
-			typename Led1 >
-void
-xpcc::XilinxSpartan3<Cclk, Din, ProgB, InitB, Done, DataSource, Led0, Led1>::displayResult(bool result)
+			typename DataSource >
+bool
+xpcc::XilinxSpartan3<Cclk, Din, ProgB, InitB, Done, DataSource>::configure()
 {
-
+	return true;
 }
 
 #endif /* XILINX_SPARTAN3_IMPL_HPP_ */

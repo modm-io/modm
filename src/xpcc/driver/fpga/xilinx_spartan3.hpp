@@ -19,9 +19,7 @@ template <	typename Cclk,			///< Clock output to FPGA
 			typename ProgB,			///< ProgB output to FPGA
 			typename InitB,			///< InitB input from FPGA
 			typename Done,			///< Done input from FPGA. FPGA signalises end of configuration.
-			typename DataSource,	///< Source of configuration data, e.g. serial external flash.
-			typename Led0 = xpcc::GpioUnused,
-			typename Led1 = xpcc::GpioUnused >
+			typename DataSource	>	///< Source of configuration data, e.g. serial external flash.
 class XilinxSpartan3
 {
 public:
@@ -29,14 +27,12 @@ public:
 	initialize();
 
 	static bool
-	configureFpga();
+	configure();
 
 	static bool
 	reconfigureFpga();
 
 protected:
-	static void
-	displayResult(bool result);
 
 
 };
