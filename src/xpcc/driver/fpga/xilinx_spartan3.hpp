@@ -1,6 +1,8 @@
 #ifndef XPCC__XILINX_SPARTAN_3
 #define XPCC__XILINX_SPARTAN_3
 
+#include <xpcc/architecture.hpp>
+#include <xpcc/architecture/peripheral/gpio.hpp>
 
 namespace xpcc
 {
@@ -11,7 +13,8 @@ namespace xpcc
  * in using the synchronous serial interface.
  *
  * The configuration data is read from @param DataSource which must provide a
- * readPage() method.
+ * readPageFromMemory(pos, buffer, sizeof(buffer) method.
+ * Appropriate data sources can be external SPI flashes.
  *
  */
 template <	typename Cclk,			///< Clock output to FPGA
@@ -33,6 +36,13 @@ public:
 	reconfigureFpga();
 
 protected:
+	/**
+	 * Set used pins to input / output and speed.
+	 *
+	 * This can be platform specific ?!
+	 */
+	static void
+	configurePins();
 
 
 };
