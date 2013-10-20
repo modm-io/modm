@@ -495,13 +495,7 @@ public:
 	}
 	ALWAYS_INLINE static void write(uint16_t data) {
 		data <<= StartPin;
-	%% if target is stm32f2 or target is stm32f4
-		GPIO{{port.name}}->BSRRH |= portMask;
-		GPIO{{port.name}}->BSRRL |= (data & portMask);
-	%% elif target is stm32f0 or target is stm32f3
-		GPIO{{port.name}}->BRR  |= portMask;
-		GPIO{{port.name}}->BSRR |= (data & portMask);
-	%% endif
+		GPIO{{port.name}}->ODR = (GPIO{{port.name}}->ODR & ~portMask) | data;
 	}
 };
 
