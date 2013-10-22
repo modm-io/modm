@@ -13,7 +13,7 @@
 
 // ----------------------------------------------------------------------------
 template< class clockSource, uint32_t baudrate >
-void
+void ALWAYS_INLINE
 xpcc::stm32::SpiSimpleMaster{{ id }}::initialize()
 {
 	static_assert(clockSource::Spi{{ id }}/2 >= baudrate,
@@ -52,19 +52,19 @@ xpcc::stm32::SpiSimpleMaster{{ id }}::initialize()
 	finished = true;
 }
 
-void
+void ALWAYS_INLINE
 xpcc::stm32::SpiSimpleMaster{{ id }}::setDataMode(DataMode mode)
 {
 	SpiHal{{ id }}::setDataMode(static_cast<SpiHal{{ id }}::DataMode>(mode));
 }
 
-void
+void ALWAYS_INLINE
 xpcc::stm32::SpiSimpleMaster{{ id }}::setDataOrder(DataOrder order)
 {
 	SpiHal{{ id }}::setDataOrder(static_cast<SpiHal{{ id }}::DataOrder>(order));
 }
 
-uint8_t
+uint8_t ALWAYS_INLINE
 xpcc::stm32::SpiSimpleMaster{{ id }}::writeReadBlocking(uint8_t data)
 {
 	writeBlocking(data);
@@ -73,7 +73,7 @@ xpcc::stm32::SpiSimpleMaster{{ id }}::writeReadBlocking(uint8_t data)
 	return data;
 }
 
-void
+void ALWAYS_INLINE
 xpcc::stm32::SpiSimpleMaster{{ id }}::writeBlocking(uint8_t data)
 {
 	while(!isFinished())
@@ -81,7 +81,7 @@ xpcc::stm32::SpiSimpleMaster{{ id }}::writeBlocking(uint8_t data)
 	SpiHal{{ id }}::write(data);
 }
 
-bool
+bool ALWAYS_INLINE
 xpcc::stm32::SpiSimpleMaster{{ id }}::write(uint8_t data)
 {
 	if(!isFinished())
@@ -91,7 +91,7 @@ xpcc::stm32::SpiSimpleMaster{{ id }}::write(uint8_t data)
 	return true;
 }
 
-bool
+bool ALWAYS_INLINE
 xpcc::stm32::SpiSimpleMaster{{ id }}::getResult(uint8_t &data)
 {
 	if (!SpiHal{{ id }}::isReceiveRegisterNotEmpty())
@@ -101,7 +101,7 @@ xpcc::stm32::SpiSimpleMaster{{ id }}::getResult(uint8_t &data)
 	return true;
 }
 
-bool
+bool ALWAYS_INLINE
 xpcc::stm32::SpiSimpleMaster{{ id }}::isFinished()
 {
 	return SpiHal{{ id }}::isTransmitRegisterEmpty() && finished;

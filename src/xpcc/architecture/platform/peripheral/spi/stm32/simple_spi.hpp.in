@@ -55,31 +55,31 @@ public:
 
 public:
 	template< class clockSource, uint32_t baudrate >
-	static ALWAYS_INLINE void
+	static void
 	initialize();
 
-	static ALWAYS_INLINE void
+	static void
 	setDataMode(DataMode mode);
 
-	static ALWAYS_INLINE void
+	static void
 	setDataOrder(DataOrder order);
 
-	static ALWAYS_INLINE uint8_t
+	static uint8_t
 	writeReadBlocking(uint8_t data);
 
-	static ALWAYS_INLINE void
+	static void
 	writeBlocking(uint8_t data);
 
-	static ALWAYS_INLINE bool
+	static bool
 	write(uint8_t data);
 
-	static ALWAYS_INLINE bool
+	static bool
 	getResult(uint8_t &data);
 
 	static bool
 	transfer(uint8_t * tx, uint8_t * rx, std::size_t length);
 
-	static ALWAYS_INLINE bool
+	static bool
 	isFinished();
 
 private:

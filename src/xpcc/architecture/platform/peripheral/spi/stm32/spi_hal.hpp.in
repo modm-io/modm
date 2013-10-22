@@ -32,11 +32,11 @@ class SpiHal{{ id }} : public SpiBase
 {
 public:
 	/// Enables the clock, resets the hardware and sets the SPE bit
-	static inline void
+	static void
 	enable();
 
 	/// Disables the hw module (by disabling its clock line)
-	static inline void
+	static void
 	disable();
 
 	/**
@@ -45,31 +45,31 @@ public:
 	 * Enables clocks, the UART peripheral
 	 * Sets baudrate and parity.
 	 */
-	static inline void
+	static void
 	initialize(	Prescaler prescaler,
 				MasterSelection masterSelection = MasterSelection::Master,
 				DataMode dataMode   = DataMode::Mode0,
 				DataOrder dataOrder = DataOrder::MsbFirst,
 				DataSize  dataSize  = DataSize::Bit8);
 
-	static inline void
+	static void
 	setDataMode(DataMode dataMode);
 
-	static inline void
+	static void
 	setDataOrder(DataOrder dataOrder);
 
-	static inline void
+	static void
 	setDataSize(DataSize dataSize);
 
-	static inline void
+	static void
 	setMasterSelection(MasterSelection masterSelection);
 
 	/// Returns true if data has been received
-	static inline bool
+	static bool
 	isReceiveRegisterNotEmpty();
 
 	/// Returns true if data can be written
-	static inline bool
+	static bool
 	isTransmitRegisterEmpty();
 
 	/**
@@ -79,7 +79,7 @@ public:
 	 *				It is your responsibility to check if the register
 	 *				is empty!
 	 */
-	static inline void
+	static void
 	write(uint16_t data);
 
 	/**
@@ -89,7 +89,7 @@ public:
 	 *				It is your responsibility to check if the register
 	 *				contains something useful!
 	 */
-	static inline void
+	static void
 	read(uint8_t &data);
 
 	/**
@@ -99,19 +99,19 @@ public:
 	 *				It is your responsibility to check if the register
 	 *				contains something useful!
 	 */
-	static inline void
+	static void
 	read(uint16_t &data);
 
-	static inline void
+	static void
 	enableInterruptVector(bool enable, uint32_t priority);
 
-	static inline void
+	static void
 	enableInterrupt(Interrupt interrupt);
 
-	static inline void
+	static void
 	disableInterrupt(Interrupt interrupt);
 
-	static inline InterruptFlag
+	static InterruptFlag
 	getInterruptFlags();
 
 	/**
@@ -119,7 +119,7 @@ public:
 	 *
 	 * @warning 	Not all InterruptFlags can be cleared this way.
 	 */
-	static inline void
+	static void
 	acknowledgeInterruptFlag(InterruptFlag flags);
 };
 
