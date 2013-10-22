@@ -45,7 +45,7 @@ template <	typename Cclk,
 			typename Done,
 			typename DataSource >
 bool
-xpcc::XilinxSpartan3<Cclk, Din, ProgB, InitB, Done, DataSource>::configure()
+xpcc::XilinxSpartan3<Cclk, Din, ProgB, InitB, Done, DataSource>::configure(const FpgaType fpgaType)
 {
 
 	configurePins();
@@ -141,7 +141,8 @@ xpcc::XilinxSpartan3<Cclk, Din, ProgB, InitB, Done, DataSource>::configure()
 
 		if (pos > 212392+100) {
 			// More bits written than available
-			XPCC_LOG_DEBUG << "FPGA configuration failed!" << xpcc::endl;
+			XPCC_LOG_ERROR << XPCC_FILE_INFO;
+			XPCC_LOG_ERROR << "FPGA configuration failed!" << xpcc::endl;
 			return false;
 		}
 	} while (Done::read() == xpcc::Gpio::LOW);

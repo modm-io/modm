@@ -3,6 +3,7 @@
 
 #include <xpcc/architecture.hpp>
 #include <xpcc/architecture/peripheral/gpio.hpp>
+#include "fpga_type.hpp"
 
 namespace xpcc
 {
@@ -23,17 +24,11 @@ template <	typename Cclk,			///< Clock output to FPGA
 			typename InitB,			///< InitB input from FPGA
 			typename Done,			///< Done input from FPGA. FPGA signalises end of configuration.
 			typename DataSource	>	///< Source of configuration data, e.g. serial external flash.
-class XilinxSpartan3
+class XilinxSpartan3 : public Xilinx
 {
 public:
 	static bool
-	initialize();
-
-	static bool
-	configure();
-
-	static bool
-	reconfigureFpga();
+	configure(FpgaType fpgaType);
 
 protected:
 	/**
@@ -43,7 +38,6 @@ protected:
 	 */
 	static void
 	configurePins();
-
 
 };
 
