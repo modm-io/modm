@@ -139,7 +139,7 @@ xpcc::XilinxSpartan3<Cclk, Din, ProgB, InitB, Done, DataSource>::configure(const
 			// Led3::toggle();
 		}
 
-		if (pos > 212392+100) {
+		if (pos > static_cast<uint32_t>(fpgaType) + 100) {
 			// More bits written than available
 			XPCC_LOG_ERROR << XPCC_FILE_INFO;
 			XPCC_LOG_ERROR << "FPGA configuration failed!" << xpcc::endl;
