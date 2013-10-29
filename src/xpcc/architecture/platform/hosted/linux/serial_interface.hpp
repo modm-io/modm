@@ -89,7 +89,7 @@ namespace xpcc
 			/**
 			 * 	@brief	Destroy the interface.
 			 * 
-			 * Make shure to
+			 * Make sure to
 			 */
 			~SerialInterface();
 			
