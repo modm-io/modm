@@ -80,12 +80,15 @@ public:
 	/**
 	 * Initializes the hardware and sets the baudrate.
 	 *
-	 * @tparam	clockSource
-	 * 		the targets sytem clock
+	 * @tparam	SystemClock
+	 * 		the targets system clock
 	 * @tparam	baudrate
 	 * 		the desired baudrate in Hz
+	 * @tparam	tolerance
+	 * 		the allowed absolute tolerance for the resulting baudrate
 	 */
-	template< class clockSource, uint32_t baudrate >
+	template< class SystemClock, uint32_t baudrate,
+			Tolerance tolerance = Tolerance::FivePercent >
 	static void
 	initialize();
 
@@ -99,37 +102,16 @@ public:
 
 	// blocking
 	/**
-	 * Write a single byte, wait for completion.
+	 * Swap a single byte and wait for completion.
 	 *
-	 * @return	received byte.
+	 * @param	data
+	 * 		data to be sent
+	 * @return	received data
 	 */
 	static uint8_t
-	writeReadBlocking(uint8_t data);
-
-	/// Write a single byte, wait for completion and discard received byte.
-	static void
-	writeBlocking(uint8_t data);
+	writeRead(uint8_t data);
 
 	// non-blocking
-	/**
-	 * Write a single byte, and return immediately.
-	 *
-	 * @return	`true` if data has been sent, `false` if buffer is full
-	 */
-	static bool
-	write(uint8_t data);
-
-	/**
-	 * Get the last byte that was received.
-	 *
-	 * @param[out]	data
-	 *		Byte read, if any
-	 *
-	 * @return	`true` if receive buffer is valid, `false` if not
-	 */
-	static bool
-	getResult(uint8_t &data);
-
     /**
      * Set the data buffers and length with options and starts a transfer.
      * This may be hardware accelerated (DMA or Interrupt), but not guaranteed.
@@ -145,7 +127,7 @@ public:
      *          `false` if another transfer is already progress.
      */
     static bool
-    transfer(uint8_t * tx, uint8_t * rx, std::size_t length);
+    transfer(uint8_t *tx, uint8_t *rx, std::size_t length);
 
 	/// @return	`true` if last byte has been sent and the swapped byte can be read.
 	static bool

@@ -24,6 +24,22 @@ namespace xpcc
 {
 
 /**
+ * Useful tolerance values
+ *
+ * This can be used to guarantee the quality of certain parameters,
+ * mostly baudrate or datarate.
+ */
+enum class
+Tolerance : uint8_t
+{
+	Exact = 0,
+	OnePercent = 1,
+	TwoPercent = 2,
+	FivePercent = 5,
+	DontCare = 100
+};
+
+/**
  * Peripheral class
  *
  * This class defines acts as a base class for all classes describing the

@@ -117,6 +117,21 @@ public:
 #ifdef __DOXYGEN__
 public:
 	/**
+	 * Initializes the hardware and sets the datarate.
+	 *
+	 * @tparam	SystemClock
+	 * 		the targets system clock
+	 * @tparam	baudrate
+	 * 		the desired baudrate in Hz
+	 * @tparam	tolerance
+	 * 		the allowed absolute tolerance for the resulting baudrate
+	 */
+	template< class SystemClock, DataRate rate=DataRate::Standard,
+			Tolerance tolerance = Tolerance::FivePercent >
+	static void
+	initialize();
+
+	/**
 	 * Requests bus control and starts the transfer.
 	 *
 	 * @param	delegate

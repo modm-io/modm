@@ -65,14 +65,17 @@ public:
 #ifdef __DOXYGEN__
 public:
 	/**
-	 * Enables the clock for the CAN controller and resets all settings
+	 * Initializes the hardware and sets the baudrate.
 	 *
 	 * @param clockSource
-	 *			nomally the SystemClock<...> that you enable on startup
+	 *		the targets system clock
 	 * @param bitrate
-	 * 			CAN bitrate
+	 * 		the desired bitrate
+	 * @tparam	tolerance
+	 * 		the allowed absolute tolerance for the resulting baudrate
 	 */
-	template< class clockSource, Bitrate bitrate = Bitrate::kBps125>
+	template< class clockSource, Bitrate bitrate = Bitrate::kBps125,
+			Tolerance tolerance = Tolerance::OnePercent >
 	static void
 	initialize(Mode startupMode);
 
