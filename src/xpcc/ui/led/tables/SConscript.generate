@@ -33,7 +33,8 @@ Import('env')
 
 generator = env['TemplateGenerator'](env, './')
 
-table = [(2.0,  8, 256),
+table = [(2.0,  7, 256),
+		 (2.0,  8, 256),
 		 (2.0, 10, 256),
 		 (2.0, 12, 256),
 		 (2.0, 16, 256)]
