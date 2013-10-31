@@ -9,7 +9,7 @@ namespace bitmap
 	/**
 	 * \brief	Generated bitmap
 	 * 
-	 * Generated from file "src/xpcc/driver/ui/display/image/logo_rca_90x64.pbm".
+	 * Generated from file "src/xpcc/ui/display/image/logo_rca_90x64.pbm".
 	 * 
 	 * - Width  : 90
 	 * - Height : 64
