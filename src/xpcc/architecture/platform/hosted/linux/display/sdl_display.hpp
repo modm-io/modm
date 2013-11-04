@@ -30,7 +30,7 @@
 #ifndef XPCC__SDL_DISPLAY_HPP
 #define XPCC__SDL_DISPLAY_HPP
 
-#include <xpcc/driver/ui/display/graphic_display.hpp>
+#include <xpcc/ui/display/graphic_display.hpp>
 #include <SDL/SDL.h>
 
 namespace xpcc
