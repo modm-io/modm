@@ -357,7 +357,7 @@ def generate(env, **kw):
 		# path to the headers of a very small and incomplete libstdc++ implementation
 		env.Append(CPPPATH = [os.path.join(rootpath, 'src', 'stdc++')])
 
-	elif env['ARCHITECTURE'] == 'hosted':
+	elif env['ARCHITECTURE'].startswith('hosted'):
 		if device == 'linux':
 			libs = ['boost_thread-mt', 'boost_system']
 			libpath = ['/usr/lib/']
