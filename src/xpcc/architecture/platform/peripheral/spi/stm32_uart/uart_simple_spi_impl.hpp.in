@@ -9,7 +9,7 @@
 
 #include <xpcc/math/utils/bit_operation.hpp>
 
-template<class clockSource, uint32_t baudrate,
+template<class clockSource, uint32_t baudrate, xpcc::Tolerance tolerance,
 		xpcc::stm32::UartBase::OversamplingMode oversample>
 void
 xpcc::stm32::UartSpiSimpleMaster{{ id }}::initialize()

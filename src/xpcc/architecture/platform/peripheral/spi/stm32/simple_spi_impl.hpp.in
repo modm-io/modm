@@ -12,7 +12,7 @@
 #endif
 
 // ----------------------------------------------------------------------------
-template< class clockSource, uint32_t baudrate >
+template< class clockSource, uint32_t baudrate, xpcc::Tolerance tolerance >
 void ALWAYS_INLINE
 xpcc::stm32::SpiSimpleMaster{{ id }}::initialize()
 {
@@ -22,31 +22,23 @@ xpcc::stm32::SpiSimpleMaster{{ id }}::initialize()
 		"The SPI baudrate must be at most 256x lower than peripheral frequency.");
 
 	constexpr uint16_t pre_raw = (clockSource::Spi{{ id }} / baudrate);
-	SpiHal{{ id }}::Prescaler prescaler = SpiHal{{ id }}::Prescaler::Div256;
-	if (pre_raw >= 256) {
-		prescaler = SpiHal{{ id }}::Prescaler::Div256;
-	}
-	else if (pre_raw >= 128) {
-		prescaler = SpiHal{{ id }}::Prescaler::Div128;
-	}
-	else if (pre_raw >= 64) {
-		prescaler = SpiHal{{ id }}::Prescaler::Div64;
-	}
-	else if (pre_raw >= 32) {
-		prescaler = SpiHal{{ id }}::Prescaler::Div32;
-	}
-	else if (pre_raw >= 16) {
-		prescaler = SpiHal{{ id }}::Prescaler::Div16;
-	}
-	else if (pre_raw >= 8) {
-		prescaler = SpiHal{{ id }}::Prescaler::Div8;
-	}
-	else if (pre_raw >= 4) {
-		prescaler = SpiHal{{ id }}::Prescaler::Div4;
-	}
-	else {
-		prescaler = SpiHal{{ id }}::Prescaler::Div2;
-	}
+	// check if within baudrate tolerance
+	constexpr uint32_t generated_baudrate = clockSource::Spi{{ id }} / pre_raw;
+	constexpr uint32_t error = baudrate - generated_baudrate;
+	static_assert(error <= baudrate * (static_cast<float>(tolerance) / 100),
+			"The generated SPI baudrate is outside of specified tolerance.");
+
+	// constexpr has some limitations, this is a compact if else tree
+	constexpr SpiHal{{ id }}::Prescaler prescaler = (
+			(pre_raw >= 256) ? SpiHal{{ id }}::Prescaler::Div256 : (
+			(pre_raw >= 128) ? SpiHal{{ id }}::Prescaler::Div128 : (
+			(pre_raw >=  64) ? SpiHal{{ id }}::Prescaler::Div64  : (
+			(pre_raw >=  32) ? SpiHal{{ id }}::Prescaler::Div32  : (
+			(pre_raw >=  16) ? SpiHal{{ id }}::Prescaler::Div16  : (
+			(pre_raw >=   8) ? SpiHal{{ id }}::Prescaler::Div8   : (
+			(pre_raw >=   4) ? SpiHal{{ id }}::Prescaler::Div4   :
+			SpiHal{{ id }}::Prescaler::Div2
+			)))))));
 
 	SpiHal{{ id }}::initialize(prescaler);
 	finished = true;

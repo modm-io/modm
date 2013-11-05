@@ -49,6 +49,7 @@ public:
 
 public:
 	template< 	class clockSource, uint32_t baudrate,
+				xpcc::Tolerance tolerance = xpcc::Tolerance::FivePercent
 				OversamplingMode oversample = OversamplingMode::By8>
 	static ALWAYS_INLINE void
 	initialize();
