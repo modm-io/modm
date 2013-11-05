@@ -23,7 +23,7 @@ uint8_t xpcc::SoftwareSpiSimpleMaster<SCK, MOSI, MISO, Baudrate>::result;
 
 // ----------------------------------------------------------------------------
 template <typename SCK, typename MOSI, typename MISO, uint32_t Baudrate>
-template< uint32_t baudrate >
+template< class clockSource, uint32_t baudrate, xpcc::Tolerance tolerance >
 void
 xpcc::SoftwareSpiSimpleMaster<SCK, MOSI, MISO, Baudrate>::initialize()
 {

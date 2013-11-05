@@ -24,7 +24,7 @@ xpcc::SpiDelegate *xpcc::SoftwareSpiMaster<SCK, MOSI, MISO, Baudrate>::myDelegat
 
 // ----------------------------------------------------------------------------
 template <typename SCK, typename MOSI, typename MISO, uint32_t Baudrate>
-template <uint32_t datarate>
+template< class clockSource, uint32_t baudrate, xpcc::Tolerance tolerance >
 void
 xpcc::SoftwareSpiMaster<SCK, MOSI, MISO, Baudrate>::initialize()
 {
