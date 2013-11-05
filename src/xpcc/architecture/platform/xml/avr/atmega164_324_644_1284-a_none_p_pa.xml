@@ -52,15 +52,16 @@
     <header>avr/io.h</header>
     <header>avr/interrupt.h</header>
     <header>avr/sleep.h</header>
-    <driver type="uart" name="at90_tiny_mega" instances="0"/>
-    <driver type="spi" name="at90_tiny_mega_uart" instances="0"/>
-    <driver device-name="164|324|1284" type="uart" name="at90_tiny_mega" instances="1"/>
-    <driver device-name="164|324|1284" type="spi" name="at90_tiny_mega_uart" instances="1"/>
-    <driver device-name="644" device-type="a|p|pa" type="uart" name="at90_tiny_mega" instances="1"/>
-    <driver device-name="644" device-type="a|p|pa" type="spi" name="at90_tiny_mega_uart" instances="1"/>
-    <driver type="i2c" name="at90_tiny_mega"/>
-    <driver type="spi" name="at90_tiny_mega"/>
     <driver type="adc" name="atmega"/>
+    <driver type="clock" name="avr"/>
+    <driver type="i2c" name="at90_tiny_mega"/>
+    <driver type="uart" name="at90_tiny_mega" instances="0"/>
+    <driver device-name="644" device-type="a|p|pa" type="uart" name="at90_tiny_mega" instances="1"/>
+    <driver device-name="164|324|1284" type="uart" name="at90_tiny_mega" instances="1"/>
+    <driver type="spi" name="at90_tiny_mega"/>
+    <driver type="spi" name="at90_tiny_mega_uart" instances="0"/>
+    <driver device-name="644" device-type="a|p|pa" type="spi" name="at90_tiny_mega_uart" instances="1"/>
+    <driver device-name="164|324|1284" type="spi" name="at90_tiny_mega_uart" instances="1"/>
     <driver type="timer" name="atmega" instances="0,1,2"/>
     <driver device-name="1284" type="timer" name="atmega" instances="3"/>
     <driver type="gpio" name="at90_tiny_mega">
