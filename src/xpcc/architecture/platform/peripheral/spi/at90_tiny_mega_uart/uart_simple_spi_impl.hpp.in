@@ -12,16 +12,22 @@
 #endif
 
 // ----------------------------------------------------------------------------
-template< uint32_t baudrate >
+template< class clockSource, uint32_t baudrate, xpcc::Tolerance tolerance >
 void
 xpcc::{{target.family}}::UartSpiSimpleMaster{{id}}::initialize()
 {
-	constexpr uint16_t prescaler = (F_CPU / ( 2 * baudrate )) - 1;
+	constexpr uint16_t prescaler = (clockSource::UsartSpi / ( 2 * baudrate )) - 1;
 
-	static_assert(F_CPU/2 >= baudrate,
+	static_assert(clockSource::UsartSpi/2 >= baudrate,
 			"The CPU frequency must be at least 2x higher than SPI baudrate.");
 	static_assert(prescaler + 1 < (1 << 12) + 1,
 			"SPI baudrate is too slow for CPU frequency (Prescaler out of bounds).");
+
+	// check if within baudrate tolerance
+	constexpr uint32_t generated_baudrate = clockSource::UsartSpi / ( 2 * prescaler + 1);
+	constexpr uint32_t error = baudrate - generated_baudrate;
+	static_assert(error <= baudrate * (static_cast<float>(tolerance) / 100),
+			"The generated SPI baudrate is outside of specified tolerance.");
 
 	initialize(prescaler);
 }

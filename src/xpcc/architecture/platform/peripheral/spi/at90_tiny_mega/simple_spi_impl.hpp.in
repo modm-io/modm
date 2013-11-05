@@ -12,38 +12,31 @@
 #endif
 
 // ----------------------------------------------------------------------------
-template< uint32_t baudrate >
+template< class clockSource, uint32_t baudrate, xpcc::Tolerance tolerance >
 void
 xpcc::{{target.family}}::SpiSimpleMaster::initialize()
 {
-	static_assert(F_CPU/2 >= baudrate,
+	static_assert(clockSource::Spi/2 >= baudrate,
 			"The CPU frequency must be at least 2x higher than SPI baudrate.");
-	static_assert(F_CPU/128 <= baudrate,
+	static_assert(clockSource::Spi/128 <= baudrate,
 			"The SPI baudrate must be at most 128x lower than CPU frequency.");
+
+	constexpr uint16_t pre_raw = (clockSource::Spi / baudrate);
+	// check if within baudrate tolerance
+	constexpr uint32_t generated_baudrate = clockSource::Spi / pre_raw;
+	constexpr uint32_t error = baudrate - generated_baudrate;
+	static_assert(error <= baudrate * (static_cast<float>(tolerance) / 100),
+			"The generated SPI baudrate is outside of specified tolerance.");
 	
-	constexpr uint16_t pre_raw = (F_CPU / baudrate);
-	Prescaler prescaler = Prescaler::Div128;
-	if (pre_raw >= 128) {
-		prescaler = Prescaler::Div128;
-	}
-	else if (pre_raw >= 64) {
-		prescaler = Prescaler::Div64;
-	}
-	else if (pre_raw >= 32) {
-		prescaler = Prescaler::Div32;
-	}
-	else if (pre_raw >= 16) {
-		prescaler = Prescaler::Div16;
-	}
-	else if (pre_raw >= 8) {
-		prescaler = Prescaler::Div8;
-	}
-	else if (pre_raw >= 4) {
-		prescaler = Prescaler::Div4;
-	}
-	else {
-		prescaler = Prescaler::Div2;
-	}
+	// constexpr has some limitations, this is a compact if else tree
+	constexpr Prescaler prescaler = (
+			(pre_raw >= 128) ? Prescaler::Div128 : (
+			(pre_raw >=  64) ? Prescaler::Div64  : (
+			(pre_raw >=  32) ? Prescaler::Div32  : (
+			(pre_raw >=  16) ? Prescaler::Div16  : (
+			(pre_raw >=   8) ? Prescaler::Div8   : (
+			(pre_raw >=   4) ? Prescaler::Div4   : Prescaler::Div2
+			))))));
 
 	initialize(prescaler);
 }
