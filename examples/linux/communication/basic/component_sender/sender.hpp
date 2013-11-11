@@ -31,7 +31,7 @@
 #ifndef COMPONENT__SENDER_HPP
 #define COMPONENT__SENDER_HPP
 
-#include <xpcc/communication/abstract_component.hpp>
+#include <xpcc/communication/xpcc/abstract_component.hpp>
 #include <xpcc/processing/periodic_timer.hpp>
 
 #include "communication/packets.hpp"

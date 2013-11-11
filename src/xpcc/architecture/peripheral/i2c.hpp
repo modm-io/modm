@@ -32,7 +32,7 @@ struct I2c
 	DetachCause : uint8_t
 	{
 		NormalStop,		///< All operations finished normally
-		ErrorCondition,	///< A bus error occured and the bus was reset
+		ErrorCondition,	///< A bus error occurred and the bus was reset
 		SoftwareReset	///< The master is initializing itself
 	};
 
@@ -72,9 +72,9 @@ struct I2c
 	enum class
 	AdapterState
 	{
-		Idle,	///< No error occured, detached normally
+		Idle,	///< No error occurred, detached normally
 		Busy,	///< The adapter is busy with data transfer
-		Error	///< An error occured, check the masters `getErrorCode()`
+		Error	///< An error occurred, check the masters `getErrorCode()`
 	};
 };
 

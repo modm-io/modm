@@ -2,7 +2,7 @@
 #include <xpcc/architecture.hpp>
 
 #include <xpcc/communication.hpp>
-#include <xpcc/communication/backend/tipc/tipc.hpp>
+#include <xpcc/communication/xpcc/backend/tipc/tipc.hpp>
 
 #include <xpcc/debug/logger.hpp>
 

@@ -47,7 +47,7 @@ struct Spi
 	DetachCause : uint8_t
 	{
 		NormalStop,		///< All operations finished normally
-		ErrorCondition,	///< A bus error occured and the bus was reset
+		ErrorCondition,	///< A bus error occurred and the bus was reset
 		SoftwareReset	///< The master is initializing itself
 	};
 
