@@ -1,5 +1,5 @@
 // coding: utf-8
-/* Copyright (c) 2012, Roboterclub Aachen e.V.
+/* Copyright (c) 2013, Roboterclub Aachen e.V.
  * All Rights Reserved.
  *
  * The file is part of the xpcc library and is released under the 3-clause BSD
@@ -12,6 +12,7 @@
 
 #include <stdint.h>
 #include <cstddef>
+#include <xpcc/math/tolerance.hpp>
 
 /**
  * @ingroup 	architecture
@@ -24,25 +25,9 @@ namespace xpcc
 {
 
 /**
- * Useful tolerance values
- *
- * This can be used to guarantee the quality of certain parameters,
- * mostly baudrate or datarate.
- */
-enum class
-Tolerance : uint8_t
-{
-	Exact = 0,
-	OnePercent = 1,
-	TwoPercent = 2,
-	FivePercent = 5,
-	DontCare = 100
-};
-
-/**
  * Peripheral class
  *
- * This class defines acts as a base class for all classes describing the
+ * This class acts as a base class for all classes describing the
  * public interface of common peripheral drivers.
  * As there is no implementation given, the classes specific to the platform
  * inherit from their respective base classes and must shadow the methods of
