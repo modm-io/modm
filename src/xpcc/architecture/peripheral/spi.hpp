@@ -109,7 +109,7 @@ public:
 	 * @return	received data
 	 */
 	static uint8_t
-	writeRead(uint8_t data);
+	writeReadBlocking(uint8_t data);
 
 	// non-blocking
     /**
@@ -122,16 +122,9 @@ public:
      *      pointer to receive buffer, set to `0` to discard received bytes
      * @param       length
      *      number of bytes to be shifted out
-     *
-     * @return  `true`  if transfer request was successfully serviced,
-     *          `false` if another transfer is already progress.
      */
-    static bool
-    transfer(uint8_t *tx, uint8_t *rx, std::size_t length);
-
-	/// @return	`true` if last byte has been sent and the swapped byte can be read.
-	static bool
-	isFinished();
+    static void
+    transferBlocking(uint8_t *tx, uint8_t *rx, std::size_t length);
 #endif
 };
 
