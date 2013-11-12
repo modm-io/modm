@@ -12,36 +12,43 @@
 #endif
 
 // ----------------------------------------------------------------------------
-template< class clockSource, uint32_t baudrate, xpcc::Tolerance tolerance >
+template< class clockSource, uint32_t baudrate, uint8_t tolerance >
 void ALWAYS_INLINE
 xpcc::stm32::SpiSimpleMaster{{ id }}::initialize()
 {
-	static_assert(clockSource::Spi{{ id }}/2 >= baudrate,
-		"The peripheral frequency must be at least 2x higher than SPI baudrate.");
-	static_assert(clockSource::Spi{{ id }}/256 <= baudrate,
-		"The SPI baudrate must be at most 256x lower than peripheral frequency.");
-
-	constexpr uint16_t pre_raw = (clockSource::Spi{{ id }} / baudrate);
-	// check if within baudrate tolerance
-	constexpr uint32_t generated_baudrate = clockSource::Spi{{ id }} / pre_raw;
-	constexpr uint32_t error = baudrate - generated_baudrate;
-	static_assert(error <= baudrate * (static_cast<float>(tolerance) / 100),
-			"The generated SPI baudrate is outside of specified tolerance.");
-
-	// constexpr has some limitations, this is a compact if else tree
-	constexpr SpiHal{{ id }}::Prescaler prescaler = (
-			(pre_raw >= 256) ? SpiHal{{ id }}::Prescaler::Div256 : (
-			(pre_raw >= 128) ? SpiHal{{ id }}::Prescaler::Div128 : (
-			(pre_raw >=  64) ? SpiHal{{ id }}::Prescaler::Div64  : (
-			(pre_raw >=  32) ? SpiHal{{ id }}::Prescaler::Div32  : (
-			(pre_raw >=  16) ? SpiHal{{ id }}::Prescaler::Div16  : (
-			(pre_raw >=   8) ? SpiHal{{ id }}::Prescaler::Div8   : (
-			(pre_raw >=   4) ? SpiHal{{ id }}::Prescaler::Div4   :
-			SpiHal{{ id }}::Prescaler::Div2
+	// calculate the nearest prescaler from the baudrate
+	constexpr float pre_raw = (static_cast<float>(clockSource::Spi{{ id }}) / baudrate);
+	constexpr uint16_t pre = (
+			(pre_raw >= (128+256)/2) ? 256 : (
+			(pre_raw >= ( 64+128)/2) ? 128 : (
+			(pre_raw >= ( 32+ 64)/2) ?  64 : (
+			(pre_raw >= ( 16+ 32)/2) ?  32 : (
+			(pre_raw >= (  8+ 16)/2) ?  16 : (
+			(pre_raw >= (  4+  8)/2) ?   8 : (
+			(pre_raw >= (  2+  4)/2) ?   4 :
+										 2
 			)))))));
 
+	// check if we found a prescaler which generates a baudrate within the tolerance
+	xpcc::Tolerance::checkValueInTolerance<
+			/* nearest possible value */ clockSource::Spi{{ id }} / pre,
+			/* desired = */ baudrate,
+			tolerance >();
+
+	// translate the prescaler into the bitmapping
+	constexpr SpiHal{{ id }}::Prescaler prescaler = (
+			(pre >= 256) ? SpiHal{{ id }}::Prescaler::Div256 : (
+			(pre >= 128) ? SpiHal{{ id }}::Prescaler::Div128 : (
+			(pre >=  64) ? SpiHal{{ id }}::Prescaler::Div64  : (
+			(pre >=  32) ? SpiHal{{ id }}::Prescaler::Div32  : (
+			(pre >=  16) ? SpiHal{{ id }}::Prescaler::Div16  : (
+			(pre >=   8) ? SpiHal{{ id }}::Prescaler::Div8   : (
+			(pre >=   4) ? SpiHal{{ id }}::Prescaler::Div4   :
+						   SpiHal{{ id }}::Prescaler::Div2
+			)))))));
+
+	// initialize the Spi
 	SpiHal{{ id }}::initialize(prescaler);
-	finished = true;
 }
 
 void ALWAYS_INLINE
@@ -56,45 +63,34 @@ xpcc::stm32::SpiSimpleMaster{{ id }}::setDataOrder(DataOrder order)
 	SpiHal{{ id }}::setDataOrder(static_cast<SpiHal{{ id }}::DataOrder>(order));
 }
 
+// MARK: data transfers
 uint8_t ALWAYS_INLINE
 xpcc::stm32::SpiSimpleMaster{{ id }}::writeReadBlocking(uint8_t data)
 {
-	writeBlocking(data);
-	while(!getResult(data))
+	while(!SpiHal{{ id }}::isTransmitRegisterEmpty())
 		;
+	SpiHal{{ id }}::write(data);
+
+	while(!SpiHal{{ id }}::isReceiveRegisterNotEmpty())
+		;
+	SpiHal{{ id }}::read(data);
+
 	return data;
 }
 
-void ALWAYS_INLINE
-xpcc::stm32::SpiSimpleMaster{{ id }}::writeBlocking(uint8_t data)
+void inline
+xpcc::stm32::SpiSimpleMaster{{ id }}::transferBlocking(
+		uint8_t * tx, uint8_t * rx, std::size_t length)
 {
-	while(!isFinished())
-		;
-	SpiHal{{ id }}::write(data);
-}
+	uint_fast8_t tx_byte = 0xff;
+	uint_fast8_t rx_byte;
 
-bool ALWAYS_INLINE
-xpcc::stm32::SpiSimpleMaster{{ id }}::write(uint8_t data)
-{
-	if(!isFinished())
-		return false;
+	for (std::size_t i = 0; i < length; i++)
+	{
+		if (tx) tx_byte = tx[i];
 
-	SpiHal{{ id }}::write(data);
-	return true;
-}
+		rx_byte = writeReadBlocking(tx_byte);
 
-bool ALWAYS_INLINE
-xpcc::stm32::SpiSimpleMaster{{ id }}::getResult(uint8_t &data)
-{
-	if (!SpiHal{{ id }}::isReceiveRegisterNotEmpty())
-		return false;
-
-	SpiHal{{ id }}::read(data);
-	return true;
-}
-
-bool ALWAYS_INLINE
-xpcc::stm32::SpiSimpleMaster{{ id }}::isFinished()
-{
-	return SpiHal{{ id }}::isTransmitRegisterEmpty() && finished;
+		if (rx) rx[i] = rx_byte;
+	}
 }
