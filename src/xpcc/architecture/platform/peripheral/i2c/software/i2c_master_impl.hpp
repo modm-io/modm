@@ -29,7 +29,7 @@ xpcc::I2cMaster::Error xpcc::SoftwareI2cMaster<SCL, SDA, Frequency>::errorState(
 
 // ----------------------------------------------------------------------------
 template <typename SCL, typename SDA, int32_t Frequency>
-template <xpcc::I2cMaster::DataRate rate>
+template <class SystemClock, xpcc::I2cMaster::DataRate rate, uint8_t tolerance>
 void
 xpcc::SoftwareI2cMaster<SCL, SDA, Frequency>::initialize()
 {

@@ -44,7 +44,8 @@ public:
 	 *
 	 * @param	rate	this will not set the data rate, use the Frequency template parameter for that
 	 */
-	template<DataRate rate=DataRate::Standard>
+	template< class SystemClock, DataRate rate=DataRate::Standard,
+			uint8_t tolerance = Tolerance::FivePercent >
 	static void
 	initialize();
 

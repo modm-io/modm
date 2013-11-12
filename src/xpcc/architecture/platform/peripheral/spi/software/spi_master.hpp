@@ -14,6 +14,7 @@
 #include <xpcc/architecture/peripheral/spi.hpp>
 #include <xpcc/architecture/driver/delay.hpp>
 #include "type_ids.hpp"
+#include "../../gpio/software/gpio.hpp"
 
 namespace xpcc
 {
@@ -44,7 +45,7 @@ public:
 public:
 	// start documentation inherited
 	template< class clockSource, uint32_t baudrate,
-			xpcc::Tolerance tolerance = xpcc::Tolerance::FivePercent >
+			uint8_t tolerance = xpcc::Tolerance::FivePercent >
 	static inline void
 	initialize();
 
