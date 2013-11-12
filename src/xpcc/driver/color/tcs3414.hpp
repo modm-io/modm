@@ -40,7 +40,7 @@
 #include <stdint.h>
 
 #include <xpcc/ui/color.hpp>
-#include <xpcc/communication/i2c/write_read_adapter.hpp>
+#include <xpcc/architecture/peripheral/i2c_adapter.hpp>
 
 namespace xpcc
 {
@@ -295,7 +295,7 @@ namespace xpcc
 		}
 
 		static constexpr uint8_t ADDRESS = 0b0111001 << 1; // The address needs to be shifted by one the the left for the xpcc::i2c::WriteReadAdapter
-		static i2c::WriteReadAdapter i2cWRadapter;
+		static I2cWriteReadAdapter i2cWRadapter;
 		
 		class uint16_t_LOW_HIGH
 		{
