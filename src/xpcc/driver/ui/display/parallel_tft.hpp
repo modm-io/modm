@@ -32,7 +32,7 @@
 #define XPCC__PARALLEL_TFT_HPP
 
 #include <xpcc/architecture/driver/delay.hpp>
-#include <xpcc/driver/ui/display/graphic_display.hpp>
+#include <xpcc/ui/display/graphic_display.hpp>
 
 namespace xpcc
 {
