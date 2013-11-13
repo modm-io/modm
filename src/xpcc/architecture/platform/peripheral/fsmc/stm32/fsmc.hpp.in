@@ -12,6 +12,7 @@
 
 #include <stdint.h>
 #include "../../../device.hpp"
+#include "../../../type_ids.hpp"
 
 
 namespace xpcc
@@ -270,6 +271,18 @@ namespace xpcc
 		 */
 		class Fsmc
 		{
+		public:
+		%% for ii in range(0, 16)
+			/// TypeId used to connect GPIO pins to the FsmcD{{ ii }}.
+			static const TypeId::FsmcD{{ ii }} D{{ ii }};
+		%% endfor
+			/// TypeId used to connect GPIO pins to the FsmcA16.
+			static const TypeId::FsmcA16 A16;
+			/// TypeId used to connect GPIO pins to the FsmcNoe.
+			static const TypeId::FsmcNoe Noe;
+			/// TypeId used to connect GPIO pins to the FsmcNwe.
+			static const TypeId::FsmcNwe Nwe;
+		
 		public:
 			/**
 			 * Reset all NAND/NOR/SRAM/... settings
