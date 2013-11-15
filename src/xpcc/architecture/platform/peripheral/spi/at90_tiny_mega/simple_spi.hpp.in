@@ -59,7 +59,7 @@ public:
 public:
 	// start documentation inherited
 	template< class clockSource, uint32_t baudrate,
-			xpcc::Tolerance tolerance = xpcc::Tolerance::FivePercent >
+			uint16_t tolerance = xpcc::Tolerance::FivePercent >
 	static inline void
 	initialize();
 
@@ -72,28 +72,13 @@ public:
 	static ALWAYS_INLINE uint8_t
 	writeReadBlocking(uint8_t data);
 
-	static ALWAYS_INLINE void
-	writeBlocking(uint8_t data);
-
-	static ALWAYS_INLINE bool
-	write(uint8_t data);
-
-	static ALWAYS_INLINE bool
-	getResult(uint8_t &data);
-
 	static bool
-	transfer(uint8_t * tx, uint8_t * rx, std::size_t length);
-
-	static ALWAYS_INLINE bool
-	isFinished();
+	transferBlocking(uint8_t * tx, uint8_t * rx, std::size_t length);
 	// end documentation inherited
 
 protected:
 	static inline void
 	initialize(Prescaler prescaler);
-
-private:
-	static bool finished;
 };
 
 } // namespace {{target.family}}
