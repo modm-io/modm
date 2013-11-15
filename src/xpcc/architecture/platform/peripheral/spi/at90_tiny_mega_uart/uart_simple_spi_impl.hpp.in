@@ -12,7 +12,7 @@
 #endif
 
 // ----------------------------------------------------------------------------
-template< class clockSource, uint32_t baudrate, xpcc::Tolerance tolerance >
+template< class clockSource, uint32_t baudrate, uint16_t tolerance >
 void
 xpcc::{{target.family}}::UartSpiSimpleMaster{{id}}::initialize()
 {

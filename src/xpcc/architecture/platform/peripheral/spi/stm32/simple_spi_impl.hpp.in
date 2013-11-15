@@ -12,7 +12,7 @@
 #endif
 
 // ----------------------------------------------------------------------------
-template< class clockSource, uint32_t baudrate, uint8_t tolerance >
+template< class clockSource, uint32_t baudrate, uint16_t tolerance >
 void ALWAYS_INLINE
 xpcc::stm32::SpiSimpleMaster{{ id }}::initialize()
 {
