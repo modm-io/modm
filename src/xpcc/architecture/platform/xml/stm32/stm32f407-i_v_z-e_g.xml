@@ -242,6 +242,7 @@
         <af id="4" peripheral="I2cMaster1" name="Sda"/>
         <af id="7" peripheral="Uart1" name="Rx" type="in"/>
         <af id="7" peripheral="UartSpiMaster1" name="Miso" type="in"/>
+        <af id="12" peripheral="Fsmc" name="Nl"/>
       </gpio>
       <gpio port="B" id="8">
         <af id="2" peripheral="Timer4" name="Channel3"/>
@@ -402,6 +403,7 @@
       <gpio port="D" id="7">
         <af id="7" peripheral="Uart2" name="Ck" type="out"/>
         <af id="7" peripheral="UartSpiMaster2" name="Sck" type="out"/>
+        <af id="12" peripheral="Fsmc" name="Ne1"/>
       </gpio>
       <gpio port="E" id="2"/>
       <gpio port="E" id="3"/>
