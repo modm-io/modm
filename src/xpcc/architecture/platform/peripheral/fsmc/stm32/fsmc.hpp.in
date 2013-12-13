@@ -12,6 +12,7 @@
 
 #include <stdint.h>
 #include "../../../device.hpp"
+#include "../../../type_ids.hpp"
 
 
 namespace xpcc
@@ -127,6 +128,12 @@ namespace xpcc
 					MODE_C = FSMC_BTR1_ACCMOD_1, ///< access mode C
 					MODE_D = FSMC_BTR1_ACCMOD_0 | FSMC_BTR1_ACCMOD_1 ///< access mode D
 				};
+
+				enum class ExtendedMode : uint32_t
+				{
+					Disable = 0,
+					Enable  = FSMC_BCR1_EXTMOD,
+				};
 				
 				/**
 				 * Timing for asynchronous access
@@ -200,7 +207,8 @@ namespace xpcc
 						BusType multiplex,
 						MemoryType memoryType,
 						AccessMode accessMode,
-						AsynchronousTiming timing);
+						AsynchronousTiming timing,
+						 ExtendedMode extended = ExtendedMode::Enable);
 				
 				static inline void
 				enableAsynchronousWait(Region region,
@@ -270,6 +278,22 @@ namespace xpcc
 		 */
 		class Fsmc
 		{
+		public:
+		%% for ii in range(0, 16)
+			/// TypeId used to connect GPIO pins to the FsmcD{{ ii }}.
+			static const TypeId::FsmcD{{ ii }} D{{ ii }};
+		%% endfor
+			/// TypeId used to connect GPIO pins to the FsmcA16.
+			static const TypeId::FsmcA16 A16;
+			/// TypeId used to connect GPIO pins to the FsmcNoe.
+			static const TypeId::FsmcNoe Noe;
+			/// TypeId used to connect GPIO pins to the FsmcNwe.
+			static const TypeId::FsmcNwe Nwe;
+			/// TypeId used to connect GPIO pins to the FsmcNl.
+			static const TypeId::FsmcNl Nl;
+			/// TypeId used to connect GPIO pins to the FsmcNe1.
+			static const TypeId::FsmcNe1 Ne1;
+		
 		public:
 			/**
 			 * Reset all NAND/NOR/SRAM/... settings

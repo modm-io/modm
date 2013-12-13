@@ -35,11 +35,10 @@ class RgbLed
 	Led& blue;
 
 	::xpcc::color::Rgb absolute;
-	::xpcc::color::Rgb relative;
 
 public:
 	RgbLed(Led& red, Led& green, Led& blue)
-	:	red(red), green(green), blue(blue), absolute(), relative()
+	:	red(red), green(green), blue(blue), absolute()
 	{
 	}
 
@@ -47,11 +46,10 @@ public:
 	setColor(::xpcc::color::Rgb color)
 	{
 		absolute = color;
-		relative = absolute.getRelativeColors<uint16_t, 255>();
 
-		red.setBrightness(relative.red);
-		green.setBrightness(relative.green);
-		blue.setBrightness(relative.blue);
+		red.setBrightness(absolute.red);
+		green.setBrightness(absolute.green);
+		blue.setBrightness(absolute.blue);
 	}
 
 	inline void
@@ -83,11 +81,10 @@ public:
 	fadeTo(uint16_t time, ::xpcc::color::Rgb color)
 	{
 		absolute = color;
-		relative = absolute.getRelativeColors<uint16_t, 255>();
 
-		red.fadeTo(time, relative.red);
-		green.fadeTo(time, relative.green);
-		blue.fadeTo(time, relative.blue);
+		red.fadeTo(time, absolute.red);
+		green.fadeTo(time, absolute.green);
+		blue.fadeTo(time, absolute.blue);
 	}
 
 	inline void

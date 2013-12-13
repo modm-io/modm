@@ -60,7 +60,7 @@ def platform_tools_find_device_file(env):
 	# Do not generate for hosted
 	# TODO: generate software peripherals for hosted
 	if device in ['darwin', 'linux', 'windows']:
-		env['ARCHITECTURE'] = 'hosted'
+		env['ARCHITECTURE'] = 'hosted/'+device
 		return
 	id = DeviceIdentifier(device)
 	env.Debug("Device String: %s" % device)

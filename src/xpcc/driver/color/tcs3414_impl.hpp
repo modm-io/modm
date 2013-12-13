@@ -9,7 +9,7 @@
 #endif
 
 template<typename I2cMaster>
-xpcc::i2c::WriteReadAdapter xpcc::Tcs3414<I2cMaster>::i2cWRadapter;
+xpcc::I2cWriteReadAdapter xpcc::Tcs3414<I2cMaster>::i2cWRadapter;
 
 template<typename I2cMaster>
 typename xpcc::Tcs3414<I2cMaster>::Data xpcc::Tcs3414<I2cMaster>::data;
@@ -38,7 +38,7 @@ xpcc::tcs3414::OperationSuccess xpcc::Tcs3414<I2cMaster>::writeRegister(
 	i2cWRadapter.initialize(ADDRESS, buffer_write, 3, NULL, 0);
 	if(!I2cMaster::startBlocking(&i2cWRadapter))
 		return false;
-	if(i2cWRadapter.getState() != xpcc::i2c::adapter::State::NO_ERROR)
+	if(i2cWRadapter.getState() != xpcc::I2cWriteReadAdapter::AdapterState::Idle)
 		return false;
 	return true;
 }
@@ -53,7 +53,7 @@ xpcc::tcs3414::OperationSuccess xpcc::Tcs3414<I2cMaster>::readRegisters(
 	i2cWRadapter.initialize(&buffer_write, 1, values, count);	// read registers
 	if(!I2cMaster::startBlocking(&i2cWRadapter))
 		return false;
-	if(i2cWRadapter.getState() != xpcc::i2c::adapter::State::NO_ERROR)
+	if(i2cWRadapter.getState() != xpcc::I2cWriteReadAdapter::AdapterState::Idle)
 		return false;
 	return true;
 }
