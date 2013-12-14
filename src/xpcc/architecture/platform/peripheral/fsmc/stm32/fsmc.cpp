@@ -97,12 +97,17 @@ xpcc::stm32::fsmc::NorSram::configureSynchronousRegion(Region region,
 void
 xpcc::stm32::fsmc::NorSram::configureAsynchronousRegion(Region region,
 		BusType busType, MemoryType memoryType, AccessMode accessMode,
-		AsynchronousTiming timing)
+		AsynchronousTiming timing, ExtendedMode extended)
 {
+	// dirty hack to make "Muxed Mode" (reference manual p. 1340) work
+	uint8_t FACCEN = (	busType == ADDRESS_DATA_MULIPLEX_16BIT &&
+						memoryType == NOR && accessMode == MODE_A)?
+						(1 << 6) : 0;
 	// NOR/PSRAM chip-select control register (BCR)
 	FSMC_Bank1->BTCR[region*2] =
-			FSMC_BCR1_EXTMOD |	// Enable extended mode, this allows different timings for read and write
+			static_cast<uint32_t>(extended) |	// Enable extended mode, this allows different timings for read and write
 			FSMC_BCR1_WREN |	// enable write
+			FACCEN |
 			(1 << 7) |			// FWPRLVL (unknown, should be kept at reset level (=1)) 
 			memoryType |
 			busType;

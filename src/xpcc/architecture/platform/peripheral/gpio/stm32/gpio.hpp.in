@@ -284,15 +284,15 @@ public:
 		// PA[x], x =  8 .. 11 maps to EXTICR[2]
 		// PA[x], x = 12 .. 15 maps to EXTICR[3]
 		constexpr uint_fast8_t idx 	= (pin & 0x0f) >> 2;
-		constexpr uint16_t mask 	= ((pin & 0xf0) >> 4) << ( (pin & 0x03)  << 2);
+		constexpr uint16_t syscfg_mask 	= ((pin & 0xf0) >> 4) << ( (pin & 0x03)  << 2);
 %% if target is stm32f1
 		// Enable AFIO
 		RCC->APB2ENR |= RCC_APB2ENR_AFIOEN;
-		AFIO->EXTICR[idx] |= mask;
+		AFIO->EXTICR[idx] |= syscfg_mask;
 %% elif target is stm32f2 or target is stm32f3 or target is stm32f4
 		// Enable SYSCFG
 		RCC->APB2ENR |= RCC_APB2ENR_SYSCFGEN;
-		SYSCFG->EXTICR[idx] |= mask;
+		SYSCFG->EXTICR[idx] |= syscfg_mask;
 %% endif
 		EXTI->IMR |= mask;
 	}
