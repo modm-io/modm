@@ -100,7 +100,7 @@ namespace xpcc
 			None,				// all went well
 			InternalClock,		// was not able to start the internal clock
 			ExternalClock,		// was not able to start the external clock
-			ExternalCrystal,	// was not able to start the external oscialltor
+			ExternalCrystal,	// was not able to start the external oscillator
 			Pll,				// was not able to start the PLL
 			SystemClock,		// was not able to switch system clock input
 		};
