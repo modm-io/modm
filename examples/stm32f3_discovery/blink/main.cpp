@@ -1,17 +1,7 @@
 #include <xpcc/architecture.hpp>
+#include "../stm32f3_discovery.hpp"
 
 using namespace xpcc::stm32;
-
-typedef GpioOutputE9  LedNorth;
-typedef GpioOutputE10 LedNorthEast;
-typedef GpioOutputE11 LedEast;
-typedef GpioOutputE12 LedSouthEast;
-typedef GpioOutputE13 LedSouth;
-typedef GpioOutputE14 LedSouthWest;
-typedef GpioOutputE15 LedWest;
-typedef GpioOutputE8  LedNorthWest;
-typedef GpioOutputA8  ClockOut;
-typedef GpioInputA0   Button;
 
 MAIN_FUNCTION
 {
