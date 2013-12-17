@@ -32,10 +32,10 @@ MAIN_FUNCTION
 {
 	initClock();
 
-	LedOrange::setOutput(xpcc::Gpio::HIGH);
-	LedGreen::setOutput(xpcc::Gpio::LOW);
-	LedRed::setOutput(xpcc::Gpio::HIGH);
-	LedBlue::setOutput(xpcc::Gpio::HIGH);
+	LedOrange::setOutput(xpcc::Gpio::High);
+	LedGreen::setOutput(xpcc::Gpio::Low);
+	LedRed::setOutput(xpcc::Gpio::High);
+	LedBlue::setOutput(xpcc::Gpio::High);
 	
 	while (1)
 	{

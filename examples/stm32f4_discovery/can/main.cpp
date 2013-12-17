@@ -53,7 +53,7 @@ MAIN_FUNCTION
 	typedef SystemClock<Pll<ExternalCrystal<MHz8>, MHz168, MHz48> > systemClock;
 	systemClock::enable();
 
-	LedOrange::setOutput(xpcc::Gpio::HIGH);
+	LedOrange::setOutput(xpcc::Gpio::High);
 
 	// Initialize Usart
 	GpioOutputA2::connect(Usart2::Tx);

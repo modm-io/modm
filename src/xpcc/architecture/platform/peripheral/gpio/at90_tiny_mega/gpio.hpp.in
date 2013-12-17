@@ -91,9 +91,9 @@ public:
 		IO::setInput(InputType::PullUp);
 	}
 	%% endif
-	/// maps to `setOutput(::xpcc::Gpio::LOW)`
+	/// maps to `setOutput(::xpcc::Gpio::Low)`
 	ALWAYS_INLINE static void reset() {
-		IO::setOutput(::xpcc::Gpio::LOW);
+		IO::setOutput(::xpcc::Gpio::Low);
 	}
 	ALWAYS_INLINE static void set(bool status) {
 		if (status) { set(); }

@@ -56,8 +56,8 @@ MAIN_FUNCTION
 
 	uint16_t * const out = reinterpret_cast<uint16_t*>(fsmc::NorSram::getRegionPointer(fsmc::NorSram::CHIP_SELECT_1));
 
-	LedOrange::setOutput(xpcc::Gpio::HIGH);
-	LedGreen::setOutput(xpcc::Gpio::LOW);
+	LedOrange::setOutput(xpcc::Gpio::High);
+	LedGreen::setOutput(xpcc::Gpio::Low);
 
 	while(!Button::read());
 

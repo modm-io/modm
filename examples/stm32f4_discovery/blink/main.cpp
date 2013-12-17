@@ -38,10 +38,10 @@ MAIN_FUNCTION
 	MCO2::setDivision(MCO2::Division::By1);
 	MCO2::connect(SystemClock<clockSource>::Id);
 
-	LedOrange::setOutput(xpcc::Gpio::HIGH);
-	LedGreen::setOutput(xpcc::Gpio::LOW);
-	LedRed::setOutput(xpcc::Gpio::HIGH);
-	LedBlue::setOutput(xpcc::Gpio::HIGH);
+	LedOrange::setOutput(xpcc::Gpio::High);
+	LedGreen::setOutput(xpcc::Gpio::Low);
+	LedRed::setOutput(xpcc::Gpio::High);
+	LedBlue::setOutput(xpcc::Gpio::High);
 
 	while (1)
 	{
