@@ -73,7 +73,7 @@ xpcc::ui::Led::off(uint16_t time)
 }
 
 void
-xpcc::ui::Led::run()
+xpcc::ui::Led::update()
 {
 	// this should be called exactly once every 1 ms
 	// but if the clock gets incremented by more than 1 ms, or the main loop is

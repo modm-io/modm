@@ -92,7 +92,7 @@ public:
 	void
 	run()
 	{
-		led.run();
+		led.update();
 
 		if (!led.isFading() && (isPulsing || !pulseDirection))
 		{

@@ -94,13 +94,13 @@ public:
 		fadeTo(time, absolute);
 	}
 
-	/// Must be called at least every ms
+	/// should be called every 1ms or more.
 	inline void
-	run()
+	update()
 	{
-		red.run();
-		green.run();
-		blue.run();
+		red.update();
+		green.update();
+		blue.update();
 	}
 };
 
