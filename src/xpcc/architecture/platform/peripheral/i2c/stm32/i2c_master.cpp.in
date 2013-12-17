@@ -263,7 +263,7 @@ I2C{{ id }}_EV_IRQHandler(void)
 		switch (s.next)
 		{
 			case xpcc::I2c::Operation::Read:
-				address = (s.address & 0xfe) | xpcc::I2c::READ;
+				address = (s.address & 0xfe) | xpcc::I2c::Read;
 				initializeRead(delegate->reading());
 				if (readBytesLeft <= 2)
 				{
@@ -284,20 +284,20 @@ I2C{{ id }}_EV_IRQHandler(void)
 				break;
 				
 			case xpcc::I2c::Operation::Write:
-				address = (s.address & 0xfe) | xpcc::I2c::WRITE;
+				address = (s.address & 0xfe) | xpcc::I2c::Write;
 				initializeWrite(delegate->writing());
 				DEBUG_STREAM("write op: writing=" << writeBytesLeft);
 				break;
 				
 			case xpcc::I2c::Operation::Restart:
-				address = (s.address & 0xfe) | xpcc::I2c::WRITE;
+				address = (s.address & 0xfe) | xpcc::I2c::Write;
 				initializeRestartAfterAddress();
 				DEBUG_STREAM("restart op");
 				break;
 				
 			default:
 			case xpcc::I2c::Operation::Stop:
-				address = (s.address & 0xfe) | xpcc::I2c::WRITE;
+				address = (s.address & 0xfe) | xpcc::I2c::Write;
 				initializeStopAfterAddress();
 				DEBUG_STREAM("stop op");
 				break;

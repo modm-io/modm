@@ -64,7 +64,7 @@ xpcc::SoftwareI2cMaster<SCL, SDA, Frequency>::start(xpcc::I2cDelegate *delegate)
 
 			address &= 0xfe;
 			if (s.next == xpcc::I2c::Operation::Read)
-				address |= xpcc::I2c::READ;
+				address |= xpcc::I2c::Read;
 
 			if (!write(address))
 				return true;
