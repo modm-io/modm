@@ -23,8 +23,8 @@ namespace xpcc
 /// @ingroup	i2c
 struct I2c
 {
-	static constexpr uint8_t WRITE = 0x00;	///< Add the Write bit to the slave addres
-	static constexpr uint8_t READ  = 0x01;	///< Add the Read bit to the slave address
+	static constexpr uint8_t Write = 0x00;	///< Add the Write bit to the slave address
+	static constexpr uint8_t Read  = 0x01;	///< Add the Read bit to the slave address
 
 	/// This tells the `I2cDelegate` why it was detached
 	/// @see I2cDelegate

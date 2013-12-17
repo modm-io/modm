@@ -122,7 +122,7 @@ public:
 	void
 	run()
 	{
-		led.run();
+		led.update();
 
 		if (timer.isExpired() && (isBlinking || state == FIRST_BREAK || state == SECOND_BREAK))
 		{

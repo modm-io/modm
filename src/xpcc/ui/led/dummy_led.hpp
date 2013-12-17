@@ -63,7 +63,7 @@ public:
 	}
 
 	inline void
-	run()
+	update()
 	{
 	}
 };
