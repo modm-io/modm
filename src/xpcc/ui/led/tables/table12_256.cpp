@@ -17,7 +17,7 @@
 namespace xpcc
 {
 
-namespace led
+namespace ui
 {
 
 FLASH_STORAGE(uint16_t table12_256[]) =
