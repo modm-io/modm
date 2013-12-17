@@ -47,10 +47,7 @@ template <typename Spi, typename Cs, typename Int>
 void
 xpcc::Mcp23s17<Spi, Cs, Int>::initialize()
 {
-	spi.initialize();
 	cs.set();
-	cs.setOutput();
-	interrupt.setInput();
 	
 	xpcc::delay_us(0.1);
 	
