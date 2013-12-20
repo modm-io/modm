@@ -28,8 +28,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_PC__SERIAL_PORT_HPP
-#define XPCC_PC__SERIAL_PORT_HPP
+#ifndef XPCC_HOSTED_SERIAL_PORT_HPP
+#define XPCC_HOSTED_SERIAL_PORT_HPP
 
 #include <string>
 #include <queue>
@@ -42,7 +42,7 @@
 
 namespace xpcc
 {
-	namespace pc
+	namespace hosted
 	{
 		/**
 		 * \brief	Output on Serial Port
@@ -130,4 +130,4 @@ namespace xpcc
 	}
 }
 
-#endif // XPCC_PC__SERIAL_PORT_HPP
+#endif // XPCC_HOSTED_SERIAL_PORT_HPP

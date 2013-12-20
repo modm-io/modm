@@ -380,6 +380,7 @@ def generate(env, **kw):
 		env['ARM_CLOCK'] = clock
 		
 		env.Tool('arm')
+		env.Tool('dfu_stm32_programmer')
 		
 		# load openocd tool if required
 		if parser.has_section('program'):

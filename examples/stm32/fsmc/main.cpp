@@ -104,9 +104,9 @@ MAIN_FUNCTION
 		Clock::switchToPll();
 	}
 	
-	Led::setOutput(xpcc::gpio::LOW);
+	Led::setOutput(xpcc::Gpio::Low);
 
-	lcd::Reset::setOutput(xpcc::gpio::LOW);
+	lcd::Reset::setOutput(xpcc::Gpio::Low);
 
 	//------------------------------------------------------
 

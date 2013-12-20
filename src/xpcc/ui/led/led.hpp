@@ -78,9 +78,9 @@ public:
 	ALWAYS_INLINE void
 	off(uint16_t time=12);
 
-	/// must be called at least every ms.
+	/// should be called every 1ms or more.
 	inline void
-	run();
+	update();
 
 protected:
 	uint8_t currentValue;

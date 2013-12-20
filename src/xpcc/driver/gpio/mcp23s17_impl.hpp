@@ -47,20 +47,17 @@ template <typename Spi, typename Cs, typename Int>
 void
 xpcc::Mcp23s17<Spi, Cs, Int>::initialize()
 {
-	spi.initialize();
 	cs.set();
-	cs.setOutput();
-	interrupt.setInput();
 	
 	xpcc::delay_us(0.1);
 	
 	// Disable address pins (as they are by default) and enable the
 	// open-drain output from the interrupt line. INTA and INTB mirrored.
 	cs.reset();
-	spi.write(deviceAddress | WRITE);
-	spi.write(MCP_IOCON);
-	spi.write((1 << 6) | (1 << 2));
-	spi.write((1 << 6) | (1 << 2));
+	spi.writeReadBlocking(deviceAddress | WRITE);
+	spi.writeReadBlocking(MCP_IOCON);
+	spi.writeReadBlocking((1 << 6) | (1 << 2));
+	spi.writeReadBlocking((1 << 6) | (1 << 2));
 	cs.set();
 	
 	xpcc::delay_us(0.1);
@@ -71,19 +68,19 @@ void
 xpcc::Mcp23s17<Spi, Cs, Int>::configure(uint16_t inputMask, uint16_t pullupMask)
 {
 	cs.reset();
-	spi.write(deviceAddress | WRITE);
-	spi.write(MCP_IODIR);
-	spi.write(inputMask & 0xff);
-	spi.write(inputMask >> 8);
+	spi.writeReadBlocking(deviceAddress | WRITE);
+	spi.writeReadBlocking(MCP_IODIR);
+	spi.writeReadBlocking(inputMask & 0xff);
+	spi.writeReadBlocking(inputMask >> 8);
 	cs.set();
 	
 	xpcc::delay_us(0.1);
 	
 	cs.reset();
-	spi.write(deviceAddress | WRITE);
-	spi.write(MCP_GPPU);
-	spi.write(pullupMask & 0xff);
-	spi.write(pullupMask >> 8);
+	spi.writeReadBlocking(deviceAddress | WRITE);
+	spi.writeReadBlocking(MCP_GPPU);
+	spi.writeReadBlocking(pullupMask & 0xff);
+	spi.writeReadBlocking(pullupMask >> 8);
 	cs.set();
 	
 	xpcc::delay_us(0.1);
@@ -98,11 +95,11 @@ uint16_t
 xpcc::Mcp23s17<Spi, Cs, Int>::read()
 {
 	cs.reset();
-	spi.write(deviceAddress | READ);
-	spi.write(MCP_GPIO);
+	spi.writeReadBlocking(deviceAddress | READ);
+	spi.writeReadBlocking(MCP_GPIO);
 	
-	uint16_t value = spi.write(0x00);
-	value |= spi.write(0x00) << 8;
+	uint16_t value = spi.writeReadBlocking(0x00);
+	value |= spi.writeReadBlocking(0x00) << 8;
 	cs.set();
 	
 	xpcc::delay_us(0.1);
@@ -115,10 +112,10 @@ void
 xpcc::Mcp23s17<Spi, Cs, Int>::write(uint16_t output)
 {
 	cs.reset();
-	spi.write(deviceAddress | WRITE);
-	spi.write(MCP_GPIO);
-	spi.write(output & 0xff);
-	spi.write(output >> 8);
+	spi.writeReadBlocking(deviceAddress | WRITE);
+	spi.writeReadBlocking(MCP_GPIO);
+	spi.writeReadBlocking(output & 0xff);
+	spi.writeReadBlocking(output >> 8);
 	cs.set();
 	
 	xpcc::delay_us(0.1);

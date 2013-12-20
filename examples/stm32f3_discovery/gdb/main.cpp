@@ -117,14 +117,14 @@ MAIN_FUNCTION
 {
 	initClock();
 
-	LedNorth::setOutput(xpcc::Gpio::LOW);
-	LedNorthEast::setOutput(xpcc::Gpio::HIGH);
-	LedEast::setOutput(xpcc::Gpio::HIGH);
-	LedSouthEast::setOutput(xpcc::Gpio::HIGH);
-	LedSouth::setOutput(xpcc::Gpio::HIGH);
-	LedSouthWest::setOutput(xpcc::Gpio::HIGH);
-	LedWest::setOutput(xpcc::Gpio::HIGH);
-	LedNorthWest::setOutput(xpcc::Gpio::HIGH);
+	LedNorth::setOutput(xpcc::Gpio::Low);
+	LedNorthEast::setOutput(xpcc::Gpio::High);
+	LedEast::setOutput(xpcc::Gpio::High);
+	LedSouthEast::setOutput(xpcc::Gpio::High);
+	LedSouth::setOutput(xpcc::Gpio::High);
+	LedSouthWest::setOutput(xpcc::Gpio::High);
+	LedWest::setOutput(xpcc::Gpio::High);
+	LedNorthWest::setOutput(xpcc::Gpio::High);
 
 	int a = 30;
 	

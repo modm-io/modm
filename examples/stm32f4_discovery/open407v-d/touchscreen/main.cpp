@@ -197,8 +197,8 @@ MAIN_FUNCTION
 {
 	systemClock::enable();
 
-	LedOrange::setOutput(xpcc::Gpio::HIGH);
-	LedGreen::setOutput(xpcc::Gpio::LOW);
+	LedOrange::setOutput(xpcc::Gpio::High);
+	LedGreen::setOutput(xpcc::Gpio::Low);
 
 	Button::setInput();
 	
