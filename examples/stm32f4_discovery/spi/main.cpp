@@ -8,10 +8,10 @@ MAIN_FUNCTION
 	typedef SystemClock<Pll<ExternalClock<MHz8>, MHz168, MHz48> > systemClock;
 	systemClock::enable();
 
-	LedOrange::setOutput(xpcc::Gpio::HIGH);
-	LedGreen::setOutput(xpcc::Gpio::LOW);
-	LedRed::setOutput(xpcc::Gpio::HIGH);
-	LedBlue::setOutput(xpcc::Gpio::HIGH);
+	LedOrange::setOutput(xpcc::Gpio::High);
+	LedGreen::setOutput(xpcc::Gpio::Low);
+	LedRed::setOutput(xpcc::Gpio::High);
+	LedBlue::setOutput(xpcc::Gpio::High);
 
 	// Enable SPI 2
 	GpioOutputB12::connect(SpiSimpleMaster2::Nss);

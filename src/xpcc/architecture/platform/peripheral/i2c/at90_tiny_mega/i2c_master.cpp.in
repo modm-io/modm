@@ -104,23 +104,23 @@ ISR(TWI_vect)
 				switch (s.next)
 				{
 					case xpcc::I2c::Operation::Read:
-						address = (s.address & 0xfe) | xpcc::I2c::READ;
+						address = (s.address & 0xfe) | xpcc::I2c::Read;
 						initializeRead(delegate->reading());
 						break;
 						
 					case xpcc::I2c::Operation::Write:
-						address = (s.address & 0xfe) | xpcc::I2c::WRITE;
+						address = (s.address & 0xfe) | xpcc::I2c::Write;
 						initializeWrite(delegate->writing());
 						break;
 						
 					default:
 					case xpcc::I2c::Operation::Stop:
-						address = (s.address & 0xfe) | xpcc::I2c::WRITE;
+						address = (s.address & 0xfe) | xpcc::I2c::Write;
 						initializeStopAfterAddress();
 						break;
 						
 					case xpcc::I2c::Operation::Restart:
-						address = (s.address & 0xfe) | xpcc::I2c::WRITE;
+						address = (s.address & 0xfe) | xpcc::I2c::Write;
 						initializeRestartAfterAddress();
 						break;
 				}

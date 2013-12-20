@@ -52,7 +52,7 @@ MAIN_FUNCTION
 	display.setFont(xpcc::font::Assertion);
 
 
-	LedStat::setOutput(xpcc::Gpio::HIGH);
+	LedStat::setOutput(xpcc::Gpio::High);
 	//lcd::Cs::setOutput();
 	//spi::Mosi::setOutput();
 

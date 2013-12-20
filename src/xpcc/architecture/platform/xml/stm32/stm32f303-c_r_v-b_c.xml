@@ -21,7 +21,7 @@
       <parameter name="allocator">newlib</parameter>
     </driver>
     <driver type="adc" name="stm32f3" instances="1,2,3,4"/>
-    <driver type="can" name="stm32"/>
+    <driver type="can" name="stm32"   instances="1"/>
     <driver type="clock" name="stm32"/>
     <driver type="dac" name="stm32"/>
     <driver type="i2c" name="stm32" instances="1,2"/>

@@ -21,6 +21,8 @@ namespace TypeId
 	typedef struct{} FsmcA16;
 	typedef struct{} FsmcNoe;
 	typedef struct{} FsmcNwe;
+	typedef struct{} FsmcNl;
+	typedef struct{} FsmcNe1;
 %% for ii in range(0, 16)
 	typedef struct{} FsmcD{{ ii }};
 %% endfor

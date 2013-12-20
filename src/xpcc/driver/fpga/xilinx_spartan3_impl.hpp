@@ -58,8 +58,8 @@ xpcc::XilinxSpartan3<Cclk, Din, ProgB, InitB, Done, DataSource>::configure(const
 	{
 		// wait until InitB and Done go low
 		uint32_t counter = 0;
-		while (InitB::read() == xpcc::Gpio::HIGH ||
-				Done::read() == xpcc::Gpio::HIGH)
+		while (InitB::read() == xpcc::Gpio::High ||
+				Done::read() == xpcc::Gpio::High)
 		{
 			xpcc::delay_us(1);
 			if (counter++ > 1000) {
@@ -77,7 +77,7 @@ xpcc::XilinxSpartan3<Cclk, Din, ProgB, InitB, Done, DataSource>::configure(const
 
 	// Wait until INIT_B goes high
 	uint32_t counter = 0;
-	while (InitB::read() == xpcc::Gpio::LOW)
+	while (InitB::read() == xpcc::Gpio::Low)
 	{
 		xpcc::delay_us(1);
 		if (counter++ > 1000) {
@@ -116,13 +116,13 @@ xpcc::XilinxSpartan3<Cclk, Din, ProgB, InitB, Done, DataSource>::configure(const
 			Cclk::set();
 			Cclk::reset();
 
-			if (Done::read() == xpcc::Gpio::HIGH) {
+			if (Done::read() == xpcc::Gpio::High) {
 				XPCC_LOG_DEBUG << "FPGA configuration successful" << xpcc::endl;
 				XPCC_LOG_ERROR << "addr=" << pos << xpcc::endl;
 				break;
 			}
 
-			if (InitB::read() == xpcc::Gpio::LOW) {
+			if (InitB::read() == xpcc::Gpio::Low) {
 				// error in configuration
 				XPCC_LOG_ERROR << "FPGA configuration aborted!" << xpcc::endl;
 				XPCC_LOG_ERROR << "addr=" << pos << xpcc::endl;
@@ -145,7 +145,7 @@ xpcc::XilinxSpartan3<Cclk, Din, ProgB, InitB, Done, DataSource>::configure(const
 			XPCC_LOG_ERROR << "FPGA configuration failed!" << xpcc::endl;
 			return false;
 		}
-	} while (Done::read() == xpcc::Gpio::LOW);
+	} while (Done::read() == xpcc::Gpio::Low);
 	// Led3::reset();
 
 	// TODO see Xilinx UG332 if there are more clock cycles needed

@@ -37,7 +37,7 @@ template<typename Spi, typename Cs, uint8_t DRIVERS>
 void
 xpcc::MAX6966<Spi, Cs, DRIVERS>::initialize(max6966::Current current, uint8_t config)
 {
-	Cs::setOutput(xpcc::Gpio::HIGH);
+	Cs::setOutput(xpcc::Gpio::High);
 	
 	setAllConfiguration(config | max6966::CONFIG_RUN_MODE);
 	setAllCurrent(current);

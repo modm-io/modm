@@ -39,8 +39,8 @@ xpcc::Mcp4922<Spi, Cs, Ldac>::initialize()
 {
 	//spi.initialize();
 	
-	Cs::setOutput(xpcc::Gpio::HIGH);
-	Ldac::setOutput(xpcc::Gpio::HIGH);
+	Cs::setOutput(xpcc::Gpio::High);
+	Ldac::setOutput(xpcc::Gpio::High);
 }
 
 // ----------------------------------------------------------------------------

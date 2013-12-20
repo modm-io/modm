@@ -41,8 +41,8 @@ xpcc::XilinxSpartan6Parallel<Cclk, DataLow, DataHigh, ProgB, InitB, Done, DataSo
 	{
 		// wait until InitB and Done go low
 		uint32_t counter = 0;
-		while (InitB::read() == xpcc::Gpio::HIGH ||
-				Done::read() == xpcc::Gpio::HIGH)
+		while (InitB::read() == xpcc::Gpio::High ||
+				Done::read() == xpcc::Gpio::High)
 		{
 			xpcc::delay_us(1);
 			if (counter++ > 1000) {
@@ -69,7 +69,7 @@ xpcc::XilinxSpartan6Parallel<Cclk, DataLow, DataHigh, ProgB, InitB, Done, DataSo
 
 	// Wait until INIT_B goes high
 	uint32_t counter = 0;
-	while (InitB::read() == xpcc::Gpio::LOW)
+	while (InitB::read() == xpcc::Gpio::Low)
 	{
 		xpcc::delay_us(1);
 		if (counter++ > 1000) {
@@ -172,12 +172,12 @@ xpcc::XilinxSpartan6Parallel<Cclk, DataLow, DataHigh, ProgB, InitB, Done, DataSo
 
 		writeWord(first, second);
 
-		if (Done::read() == xpcc::Gpio::HIGH) {
+		if (Done::read() == xpcc::Gpio::High) {
 			writePageState.state = WritePageState::CONFIG_DONE;
 			break;
 		}
 
-		if (InitB::read() == xpcc::Gpio::LOW) {
+		if (InitB::read() == xpcc::Gpio::Low) {
 			writePageState.state = WritePageState::CONFIG_CRC_ERROR;
 		}
 	}

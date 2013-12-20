@@ -24,8 +24,8 @@ template<uint16_t CHANNELS, typename Spi, typename Xlat, typename Vprog, typenam
 void
 xpcc::TLC594X<CHANNELS, Spi, Xlat, Vprog, Xerr>::initialize(uint16_t channels, uint8_t dots, bool writeCH, bool writeDC)
 {
-	Xlat::setOutput(xpcc::Gpio::LOW);
-	Vprog::setOutput(xpcc::Gpio::LOW);
+	Xlat::setOutput(xpcc::Gpio::Low);
+	Vprog::setOutput(xpcc::Gpio::Low);
 	Xerr::setInput();
 
 	if (dots != 0xff) setAllDotCorrection(dots, writeDC);
