@@ -224,5 +224,10 @@ class DeviceIdentifier:
 
 	def __str__(self):
 		target = self.properties
-		target = {o:target[o] for o in target if target[o] != None}
+		#target = {o:target[o] for o in target if target[o] != None}
+		t = {}
+		for o in target:
+			if target[o] != None:
+				t[o] = target[o]
+		target = t
 		return "DeviceIdentifier(" + str(target) + ")"

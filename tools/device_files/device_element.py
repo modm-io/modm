@@ -44,7 +44,10 @@ class DeviceElementBase:
 		self.log = device.log
 		
 		# split multiple attribute values
-		self.attributes = {key : node.attrib[key].split('|') for key in node.attrib}
+		#self.attributes = {key : node.attrib[key].split('|') for key in node.attrib}
+		self.attributes = {}
+		for key in node.attrib:
+			self.attributes[key] = node.attrib[key].split('|')
 		
 		# parse integer counts
 		for key in self.attributes:
