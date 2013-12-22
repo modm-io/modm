@@ -30,8 +30,8 @@ class XMLDeviceWriter:
 		self.tree = XMLElement('rca')
 		self.tree.setAttribute('version', '1.0')
 		self.tree.addComment(' WARNING: This file is generated automatically, do not edit!\n \
-		Please modify the xpcc/tools/DeviceFileGenerator code instead and rebuild this file.\n \
-		Be aware, that regenerated files might have a different composition for technical reasons. ')
+		Please modify the xpcc/tools/device_file_generator code instead and rebuild this file.\n \
+		Be aware, that regenerated files might have a different composition due to technical reasons. ')
 		
 		props = self.device.id.properties
 		props = {p : props[p] for p in props if props[p] != None}

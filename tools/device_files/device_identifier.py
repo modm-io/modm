@@ -43,6 +43,18 @@ class DeviceIdentifier:
 	"""
 
 	def __init__(self, string=None, logger=None):
+		# quick'n'dirty copy constructor
+		if isinstance(string, DeviceIdentifier):
+			self.log      = string.log
+			self.platform = string.platform
+			self.family   = string.family
+			self.name	  = string.name
+			self.type	  = string.type
+			self.pin_id   = string.pin_id
+			self.size_id  = string.size_id
+			self.valid    = string.valid
+			return
+		
 		if logger == None:
 			self.log = Logger()
 		else:
@@ -165,56 +177,32 @@ class DeviceIdentifier:
 		return {'target': self.properties}
 	
 	def isEmpty(self):
-		empty = True
 		target = self.properties
 		for key in target:
 			if target[key] != None:
-				empty = False
-		return empty
+				return False
+		return True
 	
-	def getComparisonDeviceIndentifier(self, other):
-		"""
-		This method compares its own properties with the other class and
-		generates three new Devices: a common Device with the common
-		properties of both, and two children devices _only_ with the differences.
-		"""
-		assert isinstance(other, DeviceIdentifier)
-		
-		tself = self.properties
-		tother = other.properties
-		dict = {'common_keys': [], 'different_keys': []}
-		
-		common = DeviceIdentifier()
-		self_delta = DeviceIdentifier()
-		other_delta = DeviceIdentifier()
-		
-		for key in tself:
-			if tself[key] == tother[key]:
-				dict['common_keys'].append(key)
-				setattr(common, key, tself[key])
-			else:
-				dict['different_keys'].append(key)
-				common_array = getattr(common, key)
-				if common_array != None:
-					common_array = common_array.split('|')
-				else:
-					common_array = []
-				common_array.extend(tother[key].split('|'))
-				common_array.extend(tself[key].split('|'))
-				common_array = list(set(common_array))
-				common_array.sort()
-				setattr(common, key, '|'.join(common_array))
-				setattr(other_delta, key, tother[key])
-				setattr(self_delta, key, tself[key])
-				self_delta.valid = True
-				other_delta.valid = True
-		
-		common.valid = True
-		
-		dict['common'] = common
-		dict['self_delta'] = self_delta
-		dict['other_delta'] = other_delta
-		return dict
+	def intersectionWithDeviceIdentifier(self, other):
+		dev = DeviceIdentifier(self)
+		for attr in dev.properties:
+			if dev.properties[attr] != other.properties[attr]:
+					setattr(dev, attr, None)
+		return dev
+	
+	def unionWithDeviceIdentifier(self, other):
+		dev = DeviceIdentifier(self)
+		for attr in dev.properties:
+			props = [None]
+			if (dev.properties[attr] != None):
+				props = dev.properties[attr].split("|")
+			if (other.properties[attr] != None):
+				props.extend(other.properties[attr].split("|"))
+			props = list(set(props))
+			props = [p for p in props if p != None]
+			props.sort()
+			setattr(dev, attr, "|".join(props) if len(props) else None)
+		return dev
 
 	def __hash__(self):
 		return hash(str(self))

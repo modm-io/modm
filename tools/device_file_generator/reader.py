@@ -7,6 +7,7 @@
 # -----------------------------------------------------------------------------
 
 from lxml import etree
+from property import Property
 
 import os, sys, re
 # add python module logger to path
@@ -29,7 +30,8 @@ class XMLDeviceReader:
 		
 		self.file = path
 		self.tree = self._openDeviceXML(self.file)
-		self.properties = {'instances': [], 'id': DeviceIdentifier()}
+		self.id = DeviceIdentifier()
+		self.properties = []
 
 	def _openDeviceXML(self, filename):
 		self.log.debug("XMLDeviceReader: Opening XML file '%s'" % os.path.basename(self.file))
@@ -45,7 +47,7 @@ class XMLDeviceReader:
 	
 	def queryTree(self, query):
 		"""
-		This tries to apply the query to the device tree and returns eiher
+		This tries to apply the query to the device tree and returns either
 		- an array of element nodes,
 		- an array of strings or
 		- None, if the query failed.
@@ -71,6 +73,9 @@ class XMLDeviceReader:
 			return response
 		
 		return []
+	
+	def addProperty(self, name, value):
+		self.properties.append(Property(self.id, name, value, self.log))
 	
 	def compactQuery(self, query):
 		result = self.queryTree(query)
