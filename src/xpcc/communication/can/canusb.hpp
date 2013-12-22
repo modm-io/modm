@@ -102,7 +102,7 @@ namespace xpcc
 		Mutex readBufferLock;
 		bool active;
 		
-		xpcc::pc::SerialPort serialPort;
+		xpcc::hosted::SerialPort serialPort;
 		
 		std::string tmpRead;
 		std::queue<can::Message> readBuffer;
