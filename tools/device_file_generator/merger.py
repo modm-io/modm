@@ -62,12 +62,12 @@ class DeviceMerger:
 		result = []
 
 		for dev in devices:
-			if dev.id.platform == 'avr':
-				if dev.id.family == 'xmega':
+			if dev.ids.intersection.platform == 'avr':
+				if dev.ids.intersection.family == 'xmega':
 					xmegaDevices.append(dev)
 				else:
 					avrDevices.append(dev)
-			if dev.id.platform == 'stm32' and dev.id.name != '051':
+			elif dev.ids.intersection.platform == 'stm32' and dev.ids.intersection.name != '051':
 				stm32Devices.append(dev)
 			else:
 				result.append(dev)
@@ -98,11 +98,11 @@ class DeviceMerger:
 
 			matches = []
 
-			name = current.getDeviceAttributes('name')[0]
+			name = current.ids.getAttribute('name')[0]
 			self.log.info("ByName: Searching for device with name '%s'" % name)
 
 			for dev in devs:
-				if dev.getDeviceAttributes('name')[0] == name:
+				if dev.ids.getAttribute('name')[0] == name:
 					matches.append(dev)
 
 			matches.sort(key=lambda k : int(k.getAttributes('pin-count')[0]['value']), reverse=True)
@@ -114,7 +114,7 @@ class DeviceMerger:
 			if len(matches) == 0:
 				self.log.info("ByName: no match for device: " + current.id.string)
 
-			self.log.debug("ByName:\n\nResulting device: " + str(current))
+			self.log.debug("ByName:\nResulting device:\n" + str(current))
 			merged.append(current)
 
 		return merged
@@ -134,16 +134,16 @@ class DeviceMerger:
 			devs.remove(current)
 
 			matches = []
-			type = current.getDeviceAttributes('type')[0]
+			type = current.ids.getAttribute('type')[0]
 
 			if type != None:
-				#name = current.getDeviceAttributes('name')[0]
-				pin_id = current.getDeviceAttributes('pin_id')[0]
+				#name = current.ids.getAttribute('name')[0]
+				pin_id = current.ids.getAttribute('pin_id')[0]
 
 				self.log.info("ByName: Searching for device with type '%s'" % type)
 
 				for dev in devs:
-					if dev.getDeviceAttributes('type')[0] == type and dev.getDeviceAttributes('pin_id')[0] == pin_id:
+					if dev.ids.getAttribute('type')[0] == type and dev.ids.getAttribute('pin_id')[0] == pin_id:
 						matches.append(dev)
 
 			for match in matches:
@@ -153,7 +153,7 @@ class DeviceMerger:
 			if len(matches) == 0:
 				self.log.info("ByName: no match for device: " + current.id.string)
 
-			self.log.debug("ByName:\n\nResulting device: " + str(current))
+			self.log.debug("ByName:\nResulting device:\n" + str(current))
 			merged.append(current)
 
 		return merged
@@ -173,11 +173,11 @@ class DeviceMerger:
 			devs.remove(current)
 
 			matches = []
-			size_id = current.getDeviceAttributes('size_id')[0]
+			size_id = current.ids.getAttribute('size_id')[0]
 
 			if size_id != None:
-				name = current.getDeviceAttributes('name')[0]
-				type = current.getDeviceAttributes('type')[0]
+				name = current.ids.getAttribute('name')[0]
+				type = current.ids.getAttribute('type')[0]
 				family = name[len(size_id):]
 
 				if not (family == "" and type == None):
@@ -186,8 +186,8 @@ class DeviceMerger:
 					self.log.info("ByName: Searching for device ending in '" + family + "' and '" + str(type) + "'")
 
 					for dev in devs:
-						dname = dev.getDeviceAttributes('name')[0]
-						dsize_id = dev.getDeviceAttributes('size_id')[0]
+						dname = dev.ids.getAttribute('name')[0]
+						dsize_id = dev.ids.getAttribute('size_id')[0]
 
 						# if they do not have a size-id they are probably unmergable
 						if dsize_id != None:
@@ -197,7 +197,7 @@ class DeviceMerger:
 							# we should only merge when the family is the same,
 							# and if the type is the same
 
-							if dfamily == family and dev.getDeviceAttributes('type')[0] in type:
+							if dfamily == family and dev.ids.getAttribute('type')[0] in type:
 								matches.append(dev)
 
 			# The following code is Atmel's fault with their stupid naming schemes.
@@ -226,12 +226,12 @@ class DeviceMerger:
 			if current.id.family == "atmega":
 				name = current.id.name
 
-				if current.getDeviceAttributes('type')[0] in [None, 'none', 'p', 'a', 'pa']:
+				if current.ids.getAttribute('type')[0] in [None, 'none', 'p', 'a', 'pa']:
 					# Some Devices are just not in the same group
 					if name in ['8', '16', '32', '64', '128']:
 						# these are not the matches you are looking for *move hand*
 						matches = []
-					# these are not the devices you want to matched with
+					# these are not the devices you want to be matched with
 					for match in matches:
 						if match.id.name in ['8', '16', '32', '64', '128']:
 							matches.remove(match)
@@ -241,7 +241,7 @@ class DeviceMerger:
 					for names in namesA:
 						if name in names:
 							for dev in devs:
-								if dev.id.family == "atmega" and dev.getDeviceAttributes('type')[0] in [None, 'none', 'p', 'a', 'pa']:
+								if dev.id.family == "atmega" and dev.ids.getAttribute('type')[0] in [None, 'none', 'p', 'a', 'pa']:
 									for dname in dev.getDeviceNames():
 										if dname in names:
 											matches.append(dev)
@@ -273,7 +273,7 @@ class DeviceMerger:
 			if len(matches) == 0:
 				self.log.info("ByName: no match for device: " + current.id.string)
 
-			self.log.debug("ByName:\n\nResulting device: " + str(current))
+			self.log.debug("ByName:\nResulting device:\n" + str(current))
 			merged.append(current)
 
 		return merged
@@ -314,13 +314,13 @@ class DeviceMerger:
 			matches = []
 
 			size_ids = self._getCategorySizeSTM32(current)
-			name = current.getDeviceAttributes('name')[0]
-			pin_id = current.getDeviceAttributes('pin_id')[0]
+			name = current.ids.getAttribute('name')[0]
+			pin_id = current.ids.getAttribute('pin_id')[0]
 			self.log.info("BySize: Searching for device with size-id '%s'" % size_ids)
 
 			for dev in devs:
-				if dev.getDeviceAttributes('name')[0] == name and \
-					dev.getDeviceAttributes('size_id')[0] in size_ids:
+				if dev.ids.getAttribute('name')[0] == name and \
+					dev.ids.getAttribute('size_id')[0] in size_ids:
 					matches.append(dev)
 
 			matches.sort(key=lambda k : int(k.getAttributes('pin-count')[0]['value']), reverse=True)
@@ -331,13 +331,13 @@ class DeviceMerger:
 			if len(matches) == 0:
 				self.log.info("BySize: no match for device: " + current.id.string)
 
-			self.log.debug("BySize:\n\nResulting device: " + str(current))
+			self.log.debug("BySize:\nResulting device:\n" + str(current))
 			merged.append(current)
 
 		return merged
 	
 	def _getCategorySizeSTM32(self, device):
-		size_ids = device.getDeviceAttributes('size_id')
+		size_ids = device.ids.getAttribute('size_id')
 		name = device.id.name
 		# these categories are dependent on name
 		# these are the categories of mergable size-ids
@@ -396,15 +396,15 @@ class DeviceMerger:
 
 			matches = []
 
-			pin_id = current.getDeviceAttributes('pin_id')[0]
-			size_id = current.getDeviceAttributes('size_id')
-			name = current.getDeviceAttributes('name')[0]
+			pin_id = current.ids.getAttribute('pin_id')[0]
+			size_id = current.ids.getAttribute('size_id')
+			name = current.ids.getAttribute('name')[0]
 			self.log.info("ByPin: Searching for device with pin-id '%s'" % pin_id)
 
 			for dev in devs:
-				if dev.getDeviceAttributes('name')[0] == name and \
-					dev.getDeviceAttributes('size_id')[0] == size_id and \
-					dev.getDeviceAttributes('pin_id')[0] == pin_id:
+				if dev.ids.getAttribute('name')[0] == name and \
+					dev.ids.getAttribute('size_id')[0] == size_id and \
+					dev.ids.getAttribute('pin_id')[0] == pin_id:
 					matches.append(dev)
 
 			for match in matches:
@@ -414,7 +414,7 @@ class DeviceMerger:
 			if len(matches) == 0:
 				self.log.info("ByPin: no match for device: " + current.id.string)
 
-			self.log.debug("ByPin:\n\nResulting device: " + str(current))
+			self.log.debug("ByPin:\nResulting device:\n" + str(current))
 			merged.append(current)
 
 		return merged
@@ -470,13 +470,13 @@ class DeviceMerger:
 			if len(matches) == 0:
 				self.log.info("ByType: No match for device: " + current.id.string)
 
-			self.log.debug("ByType:\n\nResulting device: " + str(current))
+			self.log.debug("ByType:\nResulting device:\n" + str(current))
 			merged.append(current)
 
 		return merged
 
 	def _getCategoryTypeAVR(self, device):
-		type = device.getDeviceAttributes('type')[0]
+		type = device.ids.getAttribute('type')[0]
 		# these are the categories of mergable types
 		categories = [ 	# ATmega devices
 						[None, 'none', 'p', 'a', 'pa'],

@@ -36,14 +36,14 @@ if __name__ == "__main__":
 			# deal with this here, rather than rewrite half the name merging
 			if os.path.basename(file) != "ATtiny28.xml":
 				part = AVRDeviceReader(file, logger)
-				devices.append(Device(part, logger))
+				device = Device(part, logger)
+				devices.append(device)
 	
 	merger = DeviceMerger(devices, logger)
-	merger.mergedByType()
-	merger.mergedByName()
+	merger.mergedByPlatform('avr')
 	
 	folder = os.path.join(os.path.dirname(__file__), '..', '..', 'src', 'xpcc', 'architecture', 'platform', 'xml', 'avr')
-	
+ 	
 	for dev in merger.mergedDevices:
 		writer = AVRDeviceWriter(dev, logger)
 		writer.write(folder)
