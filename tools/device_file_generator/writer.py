@@ -33,7 +33,7 @@ class XMLDeviceWriter:
 		Please modify the xpcc/tools/device_file_generator code instead and rebuild this file.\n \
 		Be aware, that regenerated files might have a different composition due to technical reasons. ')
 		
-		props = self.device.id.properties
+		props = self.device.ids.union.properties
 		props = {p : props[p] for p in props if props[p] != None}
 		self.root = self.tree.addChild('device')
 		# Force an order onto a dictionary in the most stupid way I could think of

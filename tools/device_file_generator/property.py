@@ -30,7 +30,7 @@ class Property:
 			self.log = logger
 		
 		self.name = name
-		self.values = [PropertyValue(id, value)]
+		self.values = [PropertyValue(id, value, self.log)]
 	
 	def addValue(self, other):
 		if isinstance(other.value, list):
@@ -59,8 +59,8 @@ class Property:
 		assert isinstance(other, Property)
 		assert other.name == self.name
 		
-		for other_value in other.values:
-			self.addValue(other_value)
+		for value in other.values:
+			self.addValue(value)
 		
 		return self
 	
@@ -84,7 +84,7 @@ class PropertyValue:
 		else:
 			self.log = logger
 		
-		self.ids = Identifiers(id)
+		self.ids = Identifiers(id, self.log)
 		self.value = value
 	
 	@property

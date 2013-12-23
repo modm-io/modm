@@ -242,7 +242,7 @@ class DeviceMerger:
 						if name in names:
 							for dev in devs:
 								if dev.id.family == "atmega" and dev.ids.getAttribute('type')[0] in [None, 'none', 'p', 'a', 'pa']:
-									for dname in dev.getDeviceNames():
+									for dname in dev.ids.getAttribute('name'):
 										if dname in names:
 											matches.append(dev)
 

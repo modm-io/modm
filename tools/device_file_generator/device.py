@@ -30,30 +30,32 @@ class Device:
 			self.log = logger
 		
 		self.ids = None
+		self.properties = []
 		if description_file == None:
-			self.ids = Identifiers()
+			self.ids = Identifiers(None, self.log)
 			return
 		
 		# proper handling of Parsers
 		if isinstance(description_file, XMLDeviceReader):
-			self.ids = Identifiers(description_file.id)
 			self.properties = list(description_file.properties)
+			self.log = description_file.log
+			self.ids = Identifiers(description_file.id, self.log)
 		else:
 			self.properties = list(description_file)
 		
 		if self.ids == None:
-			self.ids = Identifiers()
+			self.ids = Identifiers(None, self.log)
 
 		# if flash or ram is missing, it is a bad thing and unsupported
-		if 'flash' not in self.properties:
+		if self.getProperty('flash') == None:
 			self.log.error("No FLASH found")
 			return None
-		if 'ram' not in self.properties:
+		if self.getProperty('ram') == None:
 			self.log.error("No RAM found")
 			self.log.error("XPCC does not support Assembler-only programming!")
 			return None
 		# eeprom is optional on AVR and not available on ARM devices
-		if 'eeprom' not in self.properties and 'avr' == self.id.platform:
+		if (self.getProperty('eeprom') == None) and ('avr' == self.id.platform):
 			self.log.warn("No EEPROM found")
 
 	def getMergedDevice(self, other):

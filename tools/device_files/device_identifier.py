@@ -183,6 +183,55 @@ class DeviceIdentifier:
 				return False
 		return True
 	
+	def __contains__(self, id):
+		assert isinstance(id, DeviceIdentifier)
+		# simple check uses hash
+		if id == self:
+			return True
+		
+		for attr in self.properties:
+			id_prop = id.properties[attr]
+			self_prop = self.properties[attr]
+			# simple check if they are equal
+			if id_prop == self_prop:
+				continue
+			# they are not equal, maybe one of them is None?
+			if (id_prop == None or self_prop == None):
+				return False
+			
+			# they are not equal, but both have valid attributes
+			
+			# id is a union, but self is not a union
+			# self can obviously only contain on item then
+			if '|' in id_prop and '|' not in self_prop:
+				return False
+			
+			# both of them are unions, check for containment
+			# we need to check if all types of id are in self
+			# not the other way around
+			if '|' in id_prop and '|' in self_prop:
+				# if any attribute in id is not in the attribute list of self
+				# id is not contained in self
+				if any(item not in self_prop.split('|') for item in id_prop.split('|')):
+					return False
+				# this attribute is contained in self, check the others
+				continue
+			
+			# self is a union, but id is not
+			# we need to check if the id attribute is in self
+			if '|' not in id_prop and '|' in self_prop:
+				# if id_prop is not in there, they are not equal
+				if id_prop not in self_prop.split('|'):
+					return False
+				# this attribute is contained in self, check the others
+				continue
+			
+			# neither of them is a union, but they cannot be equal anyway
+			return False
+		
+		return True
+		
+	
 	def intersectionWithDeviceIdentifier(self, other):
 		dev = DeviceIdentifier(self)
 		for attr in dev.properties:
@@ -194,14 +243,22 @@ class DeviceIdentifier:
 		dev = DeviceIdentifier(self)
 		for attr in dev.properties:
 			props = [None]
+			
 			if (dev.properties[attr] != None):
 				props = dev.properties[attr].split("|")
 			if (other.properties[attr] != None):
 				props.extend(other.properties[attr].split("|"))
+				
 			props = list(set(props))
 			props = [p for p in props if p != None]
-			props.sort()
+			
+			if all(p.isdigit() for p in props):
+				props.sort(key=int)
+			else:
+				props.sort()
+				
 			setattr(dev, attr, "|".join(props) if len(props) else None)
+			
 		return dev
 
 	def __hash__(self):

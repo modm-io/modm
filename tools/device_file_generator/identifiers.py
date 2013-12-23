@@ -23,7 +23,8 @@ class Identifiers:
 	def __init__(self, id=None, logger=None):
 		if isinstance(id, Identifiers):
 			self.log = id.log
-			self.ids = id.ids
+			# please deep copy this list
+			self.ids = [DeviceIdentifier(dev, self.log) for dev in id.ids]
 			return
 			
 		if logger == None:
@@ -31,7 +32,14 @@ class Identifiers:
 		else:
 			self.log = logger
 		
-		self.ids = [DeviceIdentifier(id)]
+		if isinstance(id, list):
+			# please deep copy this list
+			self.ids = [DeviceIdentifier(dev, self.log) for dev in id]
+			return
+		
+		self.ids = []
+		if id != None:
+			self.ids.append(DeviceIdentifier(id, self.log))
 	
 	def append(self, id):
 		assert isinstance(id, DeviceIdentifier)
@@ -42,6 +50,7 @@ class Identifiers:
 		
 	def extend(self, ids):
 		assert isinstance(ids, Identifiers)
+		
 		for id in ids.ids:
 			self.ids.append(id)
 		self.ids = list(set(self.ids))
@@ -49,26 +58,111 @@ class Identifiers:
 	
 	def differenceFromIds(self, ids):
 		assert isinstance(ids, Identifiers)
+		
 		# list all other ids that are not part of our ids
-		other_ids = [DeviceIdentifier(id) for id in ids.ids if id not in self.ids]
+		other_ids = Identifiers(None, self.log)
+		for id in ids:
+			if id.string not in self.getAttribute('string'):
+				other_ids.append(DeviceIdentifier(id))
+		
+		# our devices are equal to the input
+		if (len(other_ids) == 0):
+			return Identifiers(DeviceIdentifier(None, self.log), self.log)
+		
 		
 		# create the intersection of all ids
-		intersection_id = DeviceIdentifier(ids[0])
-		for id in ids[1:]:
-			intersection_id = intersection_id.intersectionWithDeviceIdentifier(id)
+		intersection_id = ids.intersection
 		
-		# strip this information from remaining ids
+		# strip the intersecting attributes from a copy of my own ids
+		own_ids = Identifiers(self)
+		for id in own_ids:
+			for attr in id.properties:
+				if id.properties[attr] == intersection_id.properties[attr]:
+					setattr(id, attr, None)
+		
+		# if we only have one id we can stop here
+		if len(own_ids) == 1:
+			return Identifiers(own_ids[0], self.log)
+		
+		
+		# strip the intersecting attributes from other_ids
 		for id in other_ids:
 			for attr in id.properties:
 				if id.properties[attr] == intersection_id.properties[attr]:
 					setattr(id, attr, None)
 		
-# 		print other_ids
+		own_union = own_ids.union
+		# check which attributes are the same in my own ids
+		same_attr = [ attr for attr in \
+					[p for p in own_union.properties if own_union.properties[p] != None] \
+					if '|' not in str(own_union.properties[attr]) ]
 		
-		return self.union
+		# filter out these attributes from all the other ids
+		if len(same_attr) and all(own_union.properties[attr] not in other_ids.getAttribute(attr) \
+				for attr in same_attr):
+			# there are no other ids that have the same common attributes
+			# so we can forget the uncommon ones (like type)
+			for attr in [p for p in own_union.properties if p not in same_attr]:
+				setattr(own_union, attr, None)
+			return Identifiers(own_union, self.log)
+		
+		
+		# create sublists by filtering by name
+		groups = [own_ids.filterForAttribute('name', name) for name in own_ids.getAttribute('name')]
+		union_groups = [group.union for group in groups]
+		
+		# merge the ids in the list until we cannot anymore
+# 		devs = Identifiers(own_ids)
+		devs = Identifiers(union_groups, self.log)
+		
+		print devs
+		unmergables = Identifiers()
+		while(len(devs) > 0):
+			current = devs[0]
+			devs.remove(current)
+			
+			for dev in devs:
+				union = current.unionWithDeviceIdentifier(dev)
+				if all(id not in union for id in other_ids):
+					devs.remove(dev)
+					current = union
+			
+			self.log.debug("Unmergable: %s" % current)
+			unmergables.append(current)
+		
+		# strip the unifying attributes from unmergables
+		other_ids_union = other_ids.union
+		for id in unmergables:
+			for attr in id.properties:
+				if id.properties[attr] == other_ids_union.properties[attr]:
+					setattr(id, attr, None)
+		
+		return unmergables
+	
+	def filterForAttribute(self, name, value):
+		ids = Identifiers()
+		
+		for id in self.ids:
+			if value == id.properties[name]:
+				ids.append(DeviceIdentifier(id, self.log))
+		
+		return ids
+	
+	def remove(self, id):
+		self.ids.remove(id)
+	
+	def __contains__(self, id):
+		return any(id in dev for dev in self.ids)
+	
+	def __iter__(self):
+		for id in self.ids:
+			yield id
 	
 	def __getitem__(self, index):
 		return self.ids[index]
+	
+	def __len__(self):
+		return len(self.ids)
 	
 	def getAttribute(self, name):
 		attributes = []
@@ -86,14 +180,14 @@ class Identifiers:
 	
 	@property
 	def intersection(self):
-		dev = DeviceIdentifier(self.ids[0])
+		dev = DeviceIdentifier(self.ids[0], self.log)
 		for id in self.ids[1:]:
 			dev = dev.intersectionWithDeviceIdentifier(id)
 		return dev
 	
 	@property
 	def union(self):
-		dev = DeviceIdentifier()
+		dev = DeviceIdentifier(logger=self.log)
 		for id in self.ids:
 			dev = dev.unionWithDeviceIdentifier(id)
 		return dev
