@@ -236,7 +236,7 @@ class AVRDeviceWriter(XMLDeviceWriter):
 		
 		for prop in props.values:
 			gpios = prop.value
-			gpios.sort(key=lambda k: k['port'])
+			gpios.sort(key=lambda k: (k['port'], k['id']))
 			for id in prop.ids.differenceFromIds(self.device.ids):
 				dict = self._getAttributeDictionaryFromId(id)
 				for gpio in gpios:

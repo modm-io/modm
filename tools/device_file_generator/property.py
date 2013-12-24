@@ -36,13 +36,27 @@ class Property:
 		if isinstance(other.value, list):
 			for prop in self.values:
 				# create intersection of both lists
-				intersection = [val for val in other.value if val in prop.value]
-				# if the intersection includes at least on item in other.value
-				# add the id and continue
-				if len(intersection) > 0:
+				intersection_value = [val for val in other.value if val in prop.value]
+				# what are the differences in both lists?
+				self_diff = [val for val in prop.value if val not in intersection_value]
+				other_diff = [val for val in other.value if val not in intersection_value]
+				
+				# if there is an intersection, we can add the other.ids here
+				if len(intersection_value) > 0:
+					# if this value has more items than the intersection
+					if len(self_diff) > 0:
+						# set it to only the intersecting items
+						prop.value = intersection_value
+						# and add a new PropertyValue with only the differences
+						self.values.append(PropertyValue(prop.ids, self_diff, self.log))
+					# add the other.ids to this value
 					prop.ids.extend(other.ids)
-					# remove items from other_value that are also in the intersection
-					other.value = [v for v in other.value if v not in intersection]
+					# continue looking with the differences of other
+					other.value = other_diff
+				
+				# order is important
+				prop.value.sort()
+				# no more values to add, we can stop looking now
 				if len(other.value) == 0:
 					return
 			
@@ -52,8 +66,8 @@ class Property:
 					prop.ids.extend(other.ids)
 					return
 		
+		# apparently this value does not exist yet, so add it
 		self.values.append(other)
-		self.values.sort(key=lambda k : k.value)
 	
 	def getMergedProperty(self, other):
 		assert isinstance(other, Property)
@@ -62,7 +76,16 @@ class Property:
 		for value in other.values:
 			self.addValue(value)
 		
+		self.values.sort(key=lambda k : k.value)
+		
 		return self
+	
+	def getValues(self):
+		value_list = []
+		for value in self.values:
+			value_list.append(value.value)
+		
+		return value_list
 	
 	def __repr__(self):
 		return self.__str__()
@@ -84,8 +107,13 @@ class PropertyValue:
 		else:
 			self.log = logger
 		
-		self.ids = Identifiers(id, self.log)
+		if isinstance(id, list):
+			self.ids = list(id)
+		else:
+			self.ids = Identifiers(id, self.log)
 		self.value = value
+		if isinstance(self.value, list):
+			self.value.sort()
 	
 	@property
 	def id(self):
@@ -95,4 +123,4 @@ class PropertyValue:
 		return self.__str__()
 
 	def __str__(self):
-		return ("PropertyValue(value='%s', ids= %s )" % (self.value, self.ids))
+		return ("PropertyValue(value='%s',\nids= %s )" % (self.value, self.ids)).replace('\n', '\n\t')

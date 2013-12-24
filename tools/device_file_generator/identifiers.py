@@ -112,10 +112,8 @@ class Identifiers:
 		union_groups = [group.union for group in groups]
 		
 		# merge the ids in the list until we cannot anymore
-# 		devs = Identifiers(own_ids)
+		#devs = Identifiers(own_ids)
 		devs = Identifiers(union_groups, self.log)
-		
-		print devs
 		unmergables = Identifiers()
 		while(len(devs) > 0):
 			current = devs[0]
@@ -131,7 +129,7 @@ class Identifiers:
 			unmergables.append(current)
 		
 		# strip the unifying attributes from unmergables
-		other_ids_union = other_ids.union
+		other_ids_union = ids.union
 		for id in unmergables:
 			for attr in id.properties:
 				if id.properties[attr] == other_ids_union.properties[attr]:

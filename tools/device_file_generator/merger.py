@@ -219,7 +219,7 @@ class DeviceMerger:
 				for names in namesA:
 					if name in names:
 						for dev in [d for d in devs if dev.id.family == "at90"]:
-							for dname in dev.getDeviceNames():
+							for dname in dev.ids.getAttribute('name'):
 								if dname in names:
 									matches.append(dev)
 
@@ -252,7 +252,7 @@ class DeviceMerger:
 				if name in names:
 					for dev in devs:
 						if dev.id.family == "attiny":
-							for dname in dev.getDeviceNames():
+							for dname in dev.ids.getAttribute('name'):
 								if dname in names:
 									matches.append(dev)
 
