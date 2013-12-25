@@ -28,10 +28,6 @@ class AVRDeviceWriter(XMLDeviceWriter):
 		self.names = self.device.ids.getAttribute('name')
 		self.family = self.device.ids.intersection.family
 		
-		self.root.setAttribute('type', "|".join(self.types))
-		if self.device.id.family == 'xmega':
-			self.root.setAttribute('pin-id', "|".join(self.pin_ids))
-		
 		# search the io dictionary for this device
 		# we only need one mmcu to identify the device group
 		mmcu = self.device.getProperty('mmcu').values[0].value
@@ -231,6 +227,7 @@ class AVRDeviceWriter(XMLDeviceWriter):
 	def addGpioToNode(self, node):
 		family = 'at90_tiny_mega' if (self.family in ['at90', 'attiny', 'atmega']) else self.family
 		props = self.device.getProperty('gpios')
+		
 		driver = node.addChild('driver')
 		driver.setAttributes({'type': 'gpio', 'name': family})
 		
@@ -248,31 +245,17 @@ class AVRDeviceWriter(XMLDeviceWriter):
 					for af in gpio['af']:
 						af_child = gpio_child.addChild('af')
 						af_child.setAttributes(af)
-
-
-	def _getAttributedPortDictionary(self, port):
-		ports = []
-		mask = port['mask']
-		id = 0
-		
-		while id < 8:
-			if mask & 0x01:
-				ports.append({'port': port['port'], 'id': str(id)})
-			mask >>= 1
-			id += 1
-		
-		return ports
 	
 	def _getAttributeDictionaryFromId(self, id):
 		target = id.properties
 		dict = {}
 		for attr in target:
 			if target[attr] != None:
-				if attr == 'type' and len(self.types) > 1:
+				if attr == 'type':
 					dict['device-type'] = target[attr]
-				if attr == 'name' and len(self.names) > 1:
+				if attr == 'name':
 					dict['device-name'] = target[attr]
-				if attr == 'pin_id' and len(self.pin_ids) > 1:
+				if attr == 'pin_id':
 					dict['device-pin-id'] = target[attr]
 		return dict
 	
