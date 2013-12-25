@@ -143,8 +143,14 @@ class DeviceMerger:
 				self.log.info("ByName: Searching for device with type '%s'" % type)
 
 				for dev in devs:
-					if dev.ids.getAttribute('type')[0] == type and dev.ids.getAttribute('pin_id')[0] == pin_id:
-						matches.append(dev)
+					if dev.ids.getAttribute('type')[0] == type:
+						# A3 none|b and bu|u are different enough to warrant
+						# a new device file
+						if type == 'a3':
+							if dev.ids.getAttribute('pin_id')[0] in self._getCategoryPinIdAVR(current):
+								matches.append(dev)
+						else:
+							matches.append(dev)
 
 			for match in matches:
 				devs.remove(match)
@@ -474,6 +480,20 @@ class DeviceMerger:
 			merged.append(current)
 
 		return merged
+
+	def _getCategoryPinIdAVR(self, device):
+		type = device.ids.getAttribute('pin_id')[0]
+		# these are the categories of mergable types
+		categories = [	# Xmega devices
+						[None, 'none', 'b'],
+						['bu', 'u'],
+						]
+		# make sure that only one category is used!
+		for cat in categories:
+			if type in cat:
+				return cat
+
+		return categories[0]
 
 	def _getCategoryTypeAVR(self, device):
 		type = device.ids.getAttribute('type')[0]
