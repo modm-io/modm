@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # Copyright (c) 2013, Roboterclub Aachen e.V.
 # All rights reserved.
@@ -50,9 +51,9 @@ if __name__ == "__main__":
 	
 	peripherals = []
 	for dev in devices:
-		attributes = dev.getAttributes('peripherals')
-		for attribute in attributes:
-			for peripheral in [p for p in attribute['value'] if p.name.startswith(peri_name)]:
+		attributes = dev.getProperty('peripherals')
+		for attribute in attributes.values:
+			for peripheral in [p for p in attribute.value if p.name.startswith(peri_name)]:
 				peripherals.append({'ids': [dev.id], 'peripheral': peripheral})
 	
 	registers = []
