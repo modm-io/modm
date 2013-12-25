@@ -243,14 +243,15 @@ public:
 			%% if 'pcint' in gpio
 				%% set af_id = gpio.pcint | int
 				%#- Go home Atmel, you're drunk!
+				%% set af_reg = (af_id / 8) | int
 				%% if target.family == 'attiny'
 					%% if (target.name in ['2313', '4313']) and af_id >= 11 and af_id <= 17
 						%% set af_reg = 2
 					%% elif (target.name in ['20', '40', '1634']) and af_id >= 12 and af_id <= 17
 						%% set af_reg = 2
+					%% elif (target.name in ['13', '25', '45', '85', '2313', '4313'])
+						%% set af_reg = ""
 					%% endif
-				%% else
-					%% set af_reg = (af_id / 8) | int
 				%% endif
 	ALWAYS_INLINE static void enablePCInterrupt() {
 		PCMSK{{af_reg}} |= (1 << PCINT{{af_id}});
