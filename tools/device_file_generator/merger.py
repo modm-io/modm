@@ -329,7 +329,7 @@ class DeviceMerger:
 					dev.ids.getAttribute('size_id')[0] in size_ids:
 					matches.append(dev)
 
-			matches.sort(key=lambda k : int(k.getAttributes('pin-count')[0]['value']), reverse=True)
+			matches.sort(key=lambda k : int(k.getProperty('pin-count').values[0].value), reverse=True)
 			for match in matches:
 				devs.remove(match)
 				current = current.getMergedDevice(match)

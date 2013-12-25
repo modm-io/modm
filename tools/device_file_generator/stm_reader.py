@@ -26,7 +26,7 @@ class STMDeviceReader(XMLDeviceReader):
 	"""
 
 	def __init__(self, file, logger=None):
-		# we need to combile several xml files
+		# we need to combine several xml files
 		
 		# The memory files are actually the best starting point, since they
 		# are named most specifically after the device
@@ -66,6 +66,7 @@ class STMDeviceReader(XMLDeviceReader):
 		# this peripheral file is the actual, important file to work with
 		XMLDeviceReader.__init__(self, device, logger)
 		self.name = name
+		self.id = dev
 		
 		# lets load additional information about the GPIO IP
 		ip_file = self.query("//IP[@Name='GPIO']")[0].get('Version')
@@ -83,15 +84,14 @@ class STMDeviceReader(XMLDeviceReader):
 		for define in defines:
 			cdef = define.get('name')
 			if cdef.startswith('STM32'):
-				self.properties['define'] = cdef
+				self.addProperty('define', cdef)
 				break
 		
-		self.properties['id'] = dev
-		self.properties['core'] = core
-		self.properties['architecture'] = architecture
+		self.addProperty('core', core)
+		self.addProperty('architecture', architecture)
 		
-		self.properties['header'] = self.properties['define'].lower() + '.h'
-		self.properties['linkerscript'] = "%s_%s.ld" % (self.properties['define'].lower(), dev.size_id)
+		self.addProperty('header', cdef.lower() + '.h')
+		self.addProperty('linkerscript', "%s_%s.ld" % (cdef.lower(), dev.size_id))
 
 		flash = memoryFile.query("//MemorySegment[@name='FLASH']")[0].get('size')
 		ram = memoryFile.query("//MemorySegment[@name='RAM']")[0].get('size')
@@ -100,18 +100,21 @@ class STMDeviceReader(XMLDeviceReader):
 			data_sram = memoryFile.query("//MemorySegment[@name='DATA_SRAM']")[0].get('size')
 		else:
 			data_sram = '0'
-		self.properties['flash'] = int(flash, 16)
-		self.properties['ram'] = int(ram, 16) + int(data_sram, 16)
+		self.addProperty('flash', int(flash, 16))
+		self.addProperty('ram', int(ram, 16) + int(data_sram, 16))
 
-		self.properties['gpios'] = gpios = []
-		self.properties['peripherals'] = peripherals = []
-		self.properties['modules'] = modules = []
+		gpios = []
+		self.addProperty('gpios', gpios)
+		peripherals = []
+		self.addProperty('peripherals', peripherals)
+		modules = []
+		self.addProperty('modules', modules)
 
 		self.modules = memoryFile.query("//RegisterGroup/@name")
 		self.log.debug("Available Modules are:\n" + self._modulesToString())
 		package = self.query("/Mcu/@Package")[0]
-		self.properties['pin-count'] = re.findall('[0-9]+', package)[0]
-		self.properties['package']   = re.findall('[A-Za-z\.]+', package)[0]
+		self.addProperty('pin-count', re.findall('[0-9]+', package)[0])
+		self.addProperty('package', re.findall('[A-Za-z\.]+', package)[0])
 		
 		for m in self.modules:
 			if any(m.startswith(per) for per in ['TIM', 'UART', 'USART', 'ADC', 'DAC', 'CAN', 'SPI', 'I2C', 'OTG', 'USB']):

@@ -66,80 +66,81 @@ class STMDeviceWriter(XMLDeviceWriter):
 		
 
 	def addDeviceAttributesToNode(self, node, name):
-		attributes = self.device.getAttributes(name)
-		if name in ['flash', 'ram', 'pin-count', 'linkerscript']:
-			seen = set()
-			attributes = [a for a in attributes if a['value'] not in seen and not seen.add(a['value'])]
-		attributes.sort(key=lambda k : (int(k['id'].name or 0), k['id'].size_id))
-		for item in attributes:
-			props = item['id'].properties
-			if name  in ['flash', 'ram', 'linkerscript']:
-				props['pin_id'] = None
-			if name  in ['pin-count']:
-				props['size_id'] = None
-			child = node.addChild(name)
-			child.setAttributes(self._getAttributeDictionaryFromId(props))
-			child.setValue(item['value'])
+		properties = self.device.getProperty(name)
+		
+		if properties == None:
+			return
+		
+		for prop in properties.values:
+			for id in prop.ids.differenceFromIds(self.device.ids):
+				attr = self._getAttributeDictionaryFromId(id)
+				child = node.addChild(name)
+				child.setAttributes(attr)
+				child.setValue(prop.value)
 	
 	def addModuleAttributesToNode(self, node, peripheral, name, family=None):
 		if family == None:
 			family = 'stm32'
-		attributes = self._getModuleAttributes()
+		modules = self.device.getProperty('modules')
+		
 		peripherals = []
 		if isinstance(peripheral, list):
 			peripherals.extend(peripheral)
 		else:
 			peripherals.append(peripheral)
 
-		for item in attributes:
+		for prop in modules.values:
 			instances = []
-			attr = self._getAttributeDictionaryFromId(item['id'].properties)
 			for p in peripherals:
-				for module in [m for m in item['value'] if m.startswith(p)]:
+				for module in [m for m in prop.value if m.startswith(p)]:
 					inst = module[len(p):]
-					if inst != '':
+					if inst != '' and inst.isdigit():
 						instances.append(inst)
 			
+			if len(instances) == 0:
+				continue
 			instances.sort(key=int)
 			
-			driver = node.addChild('driver')
-			driver.setAttributes(attr)
-			driver.setAttributes({'type': name, 'name': family})
+			for id in prop.ids.differenceFromIds(self.device.ids):
+				attr = self._getAttributeDictionaryFromId(id)
 			
-			if len(instances) > 0:
-				driver.setAttribute('instances', ",".join(instances))
-	
-	def _getModuleAttributes(self):
-		attributes = self.device.getAttributes('modules')
-		newAttributes = attributes
-		return newAttributes
+				driver = node.addChild('driver')
+				driver.setAttributes(attr)
+				driver.setAttributes({'type': name, 'name': family})
+				
+				if len(instances) > 0:
+					driver.setAttribute('instances', ",".join(instances))
+					
 	
 	def addGpioToNode(self, node):
-		attributes = self.device.getAttributes('gpios')
+		props = self.device.getProperty('gpios')
+		
 		driver = node.addChild('driver')
 		driver.setAttributes({'type': 'gpio', 'name': 'stm32'})
 		
-		for item in attributes:
-			gpios = item['value']
-			gpios.sort(key=lambda k: k['port'])
-			dict = self._getAttributeDictionaryFromId(item['id'].properties)
-			for gpio in gpios:
-				gpio_child = driver.addChild('gpio')
-				gpio_child.setAttributes(dict)
-				for name in ['port', 'id']:
-					if name in gpio:
-						gpio_child.setAttribute(name, gpio[name])
-				for af in gpio['af']:
-					af_child = gpio_child.addChild('af')
-					for id in ['id', 'peripheral', 'name', 'type']:
-						if id in af:
-							af_child.setAttribute(id, af[id])
+		for prop in props.values:
+			gpios = prop.value
+			gpios.sort(key=lambda k: (k['port'],int(k['id'])))
+			
+			for id in prop.ids.differenceFromIds(self.device.ids):
+				dict = self._getAttributeDictionaryFromId(id)
+				for gpio in gpios:
+					gpio_child = driver.addChild('gpio')
+					gpio_child.setAttributes(dict)
+					for name in ['port', 'id']:
+						if name in gpio:
+							gpio_child.setAttribute(name, gpio[name])
+					for af in gpio['af']:
+						af_child = gpio_child.addChild('af')
+						for id in ['id', 'peripheral', 'name', 'type']:
+							if id in af:
+								af_child.setAttribute(id, af[id])
 	
-	def _getAttributeDictionaryFromId(self, props):
-		target = props
+	def _getAttributeDictionaryFromId(self, id):
+		target = id.properties
 		dict = {}
 		for attr in target:
-			if target[attr] != None and target[attr] != self.device.id.properties[attr]:
+			if target[attr] != None:
 				if attr == 'size_id':
 					dict['device-size-id'] = target[attr]
 				if attr == 'name':
@@ -149,9 +150,9 @@ class STMDeviceWriter(XMLDeviceWriter):
 		return dict
 	
 	def write(self, folder):
-		file_name = 'stm32f' + self.device.id.name.replace('|', '_')
-		file_name += '-' + self.device.id.pin_id.replace('|', '_')
-		file_name += '-' + self.device.id.size_id.replace('|', '_')
+		file_name = 'stm32f' + '_'.join(self.device.ids.getAttribute('name'))
+		file_name += '-' + '_'.join(self.device.ids.getAttribute('pin_id'))
+		file_name += '-' + '_'.join(self.device.ids.getAttribute('size_id'))
 		self.writeToFolder(folder, file_name + '.xml')
 
 	def __repr__(self):
