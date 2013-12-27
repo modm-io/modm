@@ -149,7 +149,7 @@ xpcc::SoftwareI2cMaster<SCL, SDA, Frequency>::startCondition()
 	sclSetAndWait();
 	delay();
 
-	// here both pins are HIGH, ready for start
+	// here both pins are High, ready for start
 	sda.reset();
 	delay();
 	scl.reset();
