@@ -346,7 +346,7 @@ class DeviceMerger:
 		size_ids = device.ids.getAttribute('size_id')
 		name = device.id.name
 		# these categories are dependent on name
-		# these are the categories of mergable size-ids
+		# these are the categories of mergeable size-ids
 		categories = [	['4', '6'],
 						['8', 'b'],
 						['c', 'd', 'e'],

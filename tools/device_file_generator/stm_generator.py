@@ -42,7 +42,6 @@ if __name__ == "__main__":
 	folder = os.path.join(os.path.dirname(__file__), '..', '..', 'src', 'xpcc', 'architecture', 'platform', 'xml', 'stm32')
 	
 	for dev in merger.mergedDevices:
-#		print dev
 		writer = STMDeviceWriter(dev, logger)
 		writer.write(folder)
 

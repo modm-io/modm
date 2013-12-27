@@ -102,6 +102,12 @@ class XMLElement:
 	def setValue(self, value):
 		self.root.text = str(value)
 	
+	def sort(self, key=None):
+		if key == None:
+			self.root[:] = sorted(self.root)
+		else:
+			self.root[:] = sorted(self.root, key=key)
+	
 	def toString(self):
 		return etree.tostring(self.root, pretty_print=True)
 	

@@ -37,6 +37,9 @@ class STMDeviceReader(XMLDeviceReader):
 		# the device identifier parses it
 		dev = DeviceIdentifier(name.lower())
 		
+		if logger:
+			logger.info("Parsing STM32 PDF: %s" % dev.string)
+		
 		# now we have to search the correct peripheral configuration files
 		# they use the same file for several size_ids, therefore we have to
 		# filter them manually
@@ -91,7 +94,11 @@ class STMDeviceReader(XMLDeviceReader):
 		self.addProperty('architecture', architecture)
 		
 		self.addProperty('header', cdef.lower() + '.h')
-		self.addProperty('linkerscript', "%s_%s.ld" % (cdef.lower(), dev.size_id))
+		if self.id.family == 'f3':
+			linkerscript = "%s_%s.ld" % ('stm32f3xx', dev.size_id)
+		else:
+			linkerscript = "%s_%s.ld" % (cdef.lower(), dev.size_id)
+		self.addProperty('linkerscript', linkerscript)
 
 		flash = memoryFile.query("//MemorySegment[@name='FLASH']")[0].get('size')
 		ram = memoryFile.query("//MemorySegment[@name='RAM']")[0].get('size')
@@ -117,12 +124,10 @@ class STMDeviceReader(XMLDeviceReader):
 		self.addProperty('package', re.findall('[A-Za-z\.]+', package)[0])
 		
 		for m in self.modules:
-			if any(m.startswith(per) for per in ['TIM', 'UART', 'USART', 'ADC', 'DAC', 'CAN', 'SPI', 'I2C', 'OTG', 'USB']):
+			if any(m.startswith(per) for per in ['TIM', 'UART', 'USART', 'ADC', 'DAC', 'CAN', 'SPI', 'I2C', 'OTG', 'USB', 'FSMC']):
 				if m.startswith('ADC') and '_' in m:
 					for a in m.replace('ADC','').split('_'):
 						modules.append('ADC'+a)
-				elif m.startswith('USB') or m.startswith('OTG_FS'):
-					modules.append('USB')
 				else:
 					modules.append(m)
 		
@@ -130,16 +135,16 @@ class STMDeviceReader(XMLDeviceReader):
 		nameToMode = {'rx': 'in', 'tx': 'out', 'cts': 'in', 'rts': 'out', 'ck': 'out',	# Uart
 					 'miso': 'in', 'mosi': 'out', 'nss': 'io', 'sck': 'out',	# Spi
 					 'scl': 'out', 'sda': 'io'}	# I2c
-		# this look up table is only used for chips using the STM32F417 GPIO IP
+		# this look up table is only used for chips using the STM32Fxx7 GPIO IP
 		nameToAf = {'RTC_50Hz': '0', 'MCO': '0', 'TAMPER': '0', 'SWJ': '0', 'TRACE': '0',
 					'TIM1': '1', 'TIM2': '1',
 					'TIM3': '2', 'TIM4': '2', 'TIM5': '2',
 					'TIM8': '3', 'TIM9': '3', 'TIM10': '3', 'TIM11': '3',
 					'I2C1': '4', 'I2C2': '4', 'I2C3': '4',
-					'SPI1': '5', 'SPI2': '5',
-					'SPI3': '6',
+					'SPI1': '5', 'SPI2': '5', 'SPI4': '5', 'SPI5': '5', 'SPI6': '5',
+					'SPI3': '6', 
 					'USART1': '7', 'USART2': '7', 'USART3': '7', 'I2S3ext': '7',
-					'UART4': '8', 'UART5': '8', 'USART6': '8',
+					'UART4': '8', 'UART5': '8', 'USART6': '8', 'UART7': '8', 'UART8': '8',
 					'CAN1': '9', 'CAN2': '9', 'TIM12': '9', 'TIM13': '9', 'TIM14': '9',
 					'OTG_FS': '10', 'OTG_HS': '10',
 					'ETH': '11',
@@ -152,8 +157,8 @@ class STMDeviceReader(XMLDeviceReader):
 			name = pin.get('Name')
 			altFunctions = gpioFile.compactQuery("//GPIO_Pin[@Name='%s']/PinSignal/SpecificParameter[@Name='GPIO_AF']/.." % name)
 			altFunctions = { a.get('Name') : a[0][0].text.replace('GPIO_AF_', '') for a in altFunctions }
-			# for some reason, the 417 series GPIO has no direct AF number mapping
-			if '417' in ip_file:
+			# for some reason, the 417 and 427 series GPIO has no direct AF number mapping
+			if any(name in ip_file for name in ['217', '407', '417', '427']):
 				altFunctions = { a : nameToAf[altFunctions[a]] for a in altFunctions }
 			
 			if '-' in name:
@@ -263,8 +268,6 @@ class STMDeviceReader(XMLDeviceReader):
 				if signal.startswith('OTG_FS') and raw_names[2] in ['DM', 'DP']:
 					af = {'peripheral' : 'Usb',
 						  'name': raw_names[2].capitalize()}
-					if mode:
-						af.update({'type': mode})
 					if af_id:
 						af.update({'id': af_id})
 					gpio_afs.append(af)
@@ -277,10 +280,17 @@ class STMDeviceReader(XMLDeviceReader):
 					if af_id:
 						af.update({'id': af_id})
 					gpio_afs.append(af)
+					
+				if signal.startswith('FSMC_NOR_MUX_'):
+					af = {'peripheral' : 'Fsmc',
+						  'name': raw_names[3].capitalize().replace('Da','D')}
+					if af_id:
+						af.update({'id': af_id})
+					gpio_afs.append(af)
 			
 			# sort after key id and then add all without ids
 			gpio['af'] = [a for a in gpio_afs if 'id' in a]
-			gpio['af'].sort(key=lambda k: k['id'])
+			gpio['af'].sort(key=lambda k: (int(k['id']), k['peripheral']))
 			gpio['af'].extend([a for a in gpio_afs if 'id' not in a])
 			
 			gpios.append(gpio)

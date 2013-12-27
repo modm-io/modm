@@ -42,7 +42,7 @@ class STMDeviceWriter(XMLDeviceWriter):
 			param_core_child.setValue(param_name_value[param_name])
 
 		# ADC
-		self.addModuleAttributesToNode(self.root, 'ADC', 'adc')
+		self.addModuleAttributesToNode(self.root, 'ADC', 'adc', 'stm32f3' if self.device.id.family == 'f3' else 'stm32')
 		# CAN
 		self.addModuleAttributesToNode(self.root, 'CAN', 'can')
 		# Clock
@@ -50,6 +50,8 @@ class STMDeviceWriter(XMLDeviceWriter):
 		clock_child.setAttributes({'type': 'clock', 'name': 'stm32'})
 		# DAC
 		self.addModuleAttributesToNode(self.root, 'DAC', 'dac')
+		# FSMC
+		self.addModuleAttributesToNode(self.root, 'FSMC', 'fsmc')
 		# I2C
 		self.addModuleAttributesToNode(self.root, 'I2C', 'i2c')
 		# SPI
@@ -60,7 +62,7 @@ class STMDeviceWriter(XMLDeviceWriter):
 		# UART
 		self.addModuleAttributesToNode(self.root, ['UART', 'USART'], 'uart')
 		# USB
-		self.addModuleAttributesToNode(self.root, 'USB', 'usb', 'stm32_fs')
+		self.addModuleAttributesToNode(self.root, ['OTG_FS_DEVICE', 'USB_FS'], 'usb', 'stm32_fs')
 		# GPIO
 		self.addGpioToNode(self.root)
 		
@@ -91,13 +93,15 @@ class STMDeviceWriter(XMLDeviceWriter):
 
 		for prop in modules.values:
 			instances = []
+			found = False
 			for p in peripherals:
 				for module in [m for m in prop.value if m.startswith(p)]:
+					found = True
 					inst = module[len(p):]
 					if inst != '' and inst.isdigit():
 						instances.append(inst)
 			
-			if len(instances) == 0:
+			if not found:
 				continue
 			instances.sort(key=int)
 			
@@ -120,7 +124,6 @@ class STMDeviceWriter(XMLDeviceWriter):
 		
 		for prop in props.values:
 			gpios = prop.value
-			gpios.sort(key=lambda k: (k['port'],int(k['id'])))
 			
 			for id in prop.ids.differenceFromIds(self.device.ids):
 				dict = self._getAttributeDictionaryFromId(id)
@@ -135,6 +138,8 @@ class STMDeviceWriter(XMLDeviceWriter):
 						for id in ['id', 'peripheral', 'name', 'type']:
 							if id in af:
 								af_child.setAttribute(id, af[id])
+		# sort the node children by port and id
+		driver.sort(key=lambda k : (k.get('port'), int(k.get('id'))) )
 	
 	def _getAttributeDictionaryFromId(self, id):
 		target = id.properties
