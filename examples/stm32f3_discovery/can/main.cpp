@@ -3,8 +3,6 @@
 #include <xpcc/debug/logger.hpp>
 #include "../stm32f3_discovery.hpp"
 
-using namespace xpcc::stm32;
-
 /**
  * Example of CAN Hardware on STM32 F3 Discovery Board.
  *
@@ -59,17 +57,16 @@ displayMessage(const xpcc::can::Message& message)
 // ----------------------------------------------------------------------------
 MAIN_FUNCTION
 {
-  typedef SystemClock< Pll<ExternalClock<MHz8>, MHz72> > systemClock;
-  StartupError err = systemClock::enable();
+	defaultSystemClock::enable();
 
-  xpcc::cortex::SysTickTimer::enable();
+	xpcc::cortex::SysTickTimer::enable();
 
-  LedNorth::setOutput(xpcc::Gpio::HIGH);
+	LedNorth::setOutput(xpcc::Gpio::High);
 
 	// Initialize Usart
 	GpioOutputA2::connect(Usart2::Tx);
 	GpioInputA3::connect(Usart2::Rx);
-	Usart2::initialize<systemClock, 115200>(10);
+	Usart2::initialize<defaultSystemClock, 115200>(10);
 
 	XPCC_LOG_INFO << "CAN Test Program" << xpcc::endl;
 
@@ -79,7 +76,7 @@ MAIN_FUNCTION
 	GpioInputB8::connect(Can1::Rx);
 	GpioOutputB9::configure(GpioOutputB9::OutputType::PushPull);
 	GpioOutputB9::connect(Can1::Tx);
-	Can1::initialize<systemClock, Can1::Bitrate::kBps125>(9);
+	Can1::initialize<defaultSystemClock, Can1::Bitrate::kBps125>(9);
 
 	XPCC_LOG_INFO << "Setting up Filter for Can ..." << xpcc::endl;
 	// Receive every message
@@ -107,15 +104,15 @@ MAIN_FUNCTION
 		}
 
 		if (pTimer.isExpired()) {
-		  LedNorth::toggle();
+			LedNorth::toggle();
 
-		  static uint8_t idx = 0;
-		  xpcc::can::Message msg1(1, 1);
-		  msg1.setExtended(true);
-		  msg1.data[0] = idx;
-		  Can1::sendMessage(msg1);
+			static uint8_t idx = 0;
+			xpcc::can::Message msg1(1, 1);
+			msg1.setExtended(true);
+			msg1.data[0] = idx;
+			Can1::sendMessage(msg1);
 
-		  ++idx;
+			++idx;
 		}
 	}
 

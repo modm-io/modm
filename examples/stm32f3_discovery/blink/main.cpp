@@ -1,13 +1,9 @@
 #include <xpcc/architecture.hpp>
 #include "../stm32f3_discovery.hpp"
 
-using namespace xpcc::stm32;
-
 MAIN_FUNCTION
 {
-	typedef Pll<ExternalClock<MHz8>, MHz72> clockSource;
-	StartupError err =
-		SystemClock<clockSource>::enable();
+	defaultSystemClock::enable();
 
 	LedNorth::setOutput(xpcc::Gpio::Low);
 	LedNorthEast::setOutput(xpcc::Gpio::High);
@@ -17,11 +13,6 @@ MAIN_FUNCTION
 	LedSouthWest::setOutput(xpcc::Gpio::High);
 	LedWest::setOutput(xpcc::Gpio::High);
 	LedNorthWest::setOutput(xpcc::Gpio::High);
-
-	// Output SystemClock on PA8
-	ClockOut::setOutput();
-	ClockOut::connect(MCO::Id);
-	MCO::connect(clockSource::Id);
 
 	while (1)
 	{
