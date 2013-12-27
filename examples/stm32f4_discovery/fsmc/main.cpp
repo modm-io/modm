@@ -7,12 +7,10 @@
  * see STM32F4 reference manual p. 1340
  */
 
-typedef SystemClock<Pll<ExternalCrystal<MHz8>, MHz168, MHz48> > systemClock;
-
 // ----------------------------------------------------------------------------
 MAIN_FUNCTION
 {
-	systemClock::enable();
+	defaultSystemClock::enable();
 
 	// Initialize FSMC
 	Fsmc::initialize();

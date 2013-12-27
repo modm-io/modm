@@ -1,12 +1,10 @@
-
 #include <xpcc/architecture/platform.hpp>
 #include "../stm32f4_discovery.hpp"
 
 
 MAIN_FUNCTION
 {
-	typedef SystemClock<Pll<ExternalClock<MHz8>, MHz168, MHz48> > systemClock;
-	systemClock::enable();
+	defaultSystemClock::enable();
 
 	LedOrange::setOutput(xpcc::Gpio::High);
 	LedGreen::setOutput(xpcc::Gpio::Low);
@@ -18,7 +16,7 @@ MAIN_FUNCTION
 	GpioOutputB15::connect(SpiSimpleMaster2::Mosi);
 	GpioInputB14::connect(SpiSimpleMaster2::Miso);
 	GpioOutputB13::connect(SpiSimpleMaster2::Sck);
-	SpiSimpleMaster2::initialize<systemClock, MHz20>();
+	SpiSimpleMaster2::initialize<defaultSystemClock, MHz20>();
 
 	while (1)
 	{
