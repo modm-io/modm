@@ -120,6 +120,7 @@ class STMDeviceReader(XMLDeviceReader):
 		self.addProperty('modules', modules)
 
 		self.modules = memoryFile.query("//RegisterGroup/@name")
+		self.modules = self.query("//IP/@InstanceName")
 		self.log.debug("Available Modules are:\n" + self._modulesToString())
 		package = self.query("/Mcu/@Package")[0]
 		self.addProperty('pin-count', re.findall('[0-9]+', package)[0])
@@ -293,6 +294,8 @@ class STMDeviceReader(XMLDeviceReader):
 					afs.append(af)
 			
 			# sort after key id and then add all without ids
+			# this sorting only affect the way the debug information is displayed
+			# in stm_writer the AFs are sorted again anyway
 			sorted_afs = [a for a in afs if 'id' in a]
 			sorted_afs.sort(key=lambda k: (int(k['id']), k['peripheral']))
 			sorted_afs.extend([a for a in afs if 'id' not in a])

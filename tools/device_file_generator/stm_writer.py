@@ -51,7 +51,7 @@ class STMDeviceWriter(XMLDeviceWriter):
 		# DAC
 		self.addModuleAttributesToNode(self.root, 'DAC', 'dac')
 		# FSMC
-		self.addModuleAttributesToNode(self.root, 'FSMC', 'fsmc')
+		self.addModuleAttributesToNode(self.root, 'FSMC_NOR_MUX', 'fsmc')
 		# I2C
 		self.addModuleAttributesToNode(self.root, 'I2C', 'i2c')
 		# SPI
@@ -62,7 +62,7 @@ class STMDeviceWriter(XMLDeviceWriter):
 		# UART
 		self.addModuleAttributesToNode(self.root, ['UART', 'USART'], 'uart')
 		# USB
-		self.addModuleAttributesToNode(self.root, ['OTG_FS_DEVICE', 'USB_FS'], 'usb', 'stm32_fs')
+		self.addModuleAttributesToNode(self.root, ['OTG_FS_DEVICE', 'USB_FS', 'USB'], 'usb', 'stm32_fs')
 		# GPIO
 		self.addGpioToNode(self.root)
 		
@@ -138,7 +138,6 @@ class STMDeviceWriter(XMLDeviceWriter):
 							if af['gpio_port'] == gpio['port'] and af['gpio_id'] == gpio['id']:
 								differences = af_property.ids.differenceFromIds(prop.ids)
 								matches.append({'af': dict(af), 'differences': differences})
-					print matches
 					for af_dict in matches:
 						for af_id in af_dict['differences']:
 							af_attr = self._getAttributeDictionaryFromId(af_id)

@@ -48,10 +48,10 @@ class Identifiers:
 		self.ids = list(set(self.ids))
 		self.ids.sort(key=lambda k : k.string)
 		
-	def extend(self, ids):
-		assert isinstance(ids, Identifiers)
+	def extend(self, identifiers):
+		assert isinstance(identifiers, Identifiers)
 		
-		for id in ids.ids:
+		for id in identifiers:
 			self.ids.append(id)
 		self.ids = list(set(self.ids))
 		self.ids.sort(key=lambda k : k.string)
@@ -84,7 +84,6 @@ class Identifiers:
 		if len(own_ids) == 1:
 			return Identifiers(own_ids[0], self.log)
 		
-		
 		# strip the intersecting attributes from other_ids
 		for id in other_ids:
 			for attr in id.properties:
@@ -107,25 +106,31 @@ class Identifiers:
 			return Identifiers(own_union, self.log)
 		
 		
-		# create sublists by filtering by name
-		groups = [own_ids.filterForAttribute('name', name) for name in own_ids.getAttribute('name')]
-		union_groups = [group.union for group in groups]
-		
 		# merge the ids in the list until we cannot anymore
-		#devs = Identifiers(own_ids)
-		devs = Identifiers(union_groups, self.log)
+		devs = Identifiers(own_ids)
 		unmergables = Identifiers()
 		while(len(devs) > 0):
 			current = devs[0]
-			devs.remove(current)
 			
-			for dev in devs:
+			if current in unmergables:
+				devs.remove(current)
+				continue
+			
+			remove_devs = [current]
+			for dev in devs[1:]:
+				if (dev in unmergables):
+					remove_devs.append(dev)
+					continue
+				
 				union = current.unionWithDeviceIdentifier(dev)
 				if all(id not in union for id in other_ids):
-					devs.remove(dev)
+					remove_devs.append(dev)
 					current = union
 			
-			self.log.debug("Unmergable: %s" % current)
+			for dev in remove_devs:
+				devs.remove(dev)
+			
+			#self.log.debug("\nUnmergable: %s" % current)
 			unmergables.append(current)
 		
 		# strip the unifying attributes from unmergables
@@ -198,9 +203,4 @@ class Identifiers:
 		return self.__str__()
 
 	def __str__(self):
-		return ("Identifiers(\n\t%s )" % \
-					",\n\t".join(str(id) for id in self.ids))
-		# this is a much less verbose version, for better readibiliy
-		# but it does not show the intersection patterns so well
- 		#return ("PropertyValue(value='%s',\n\tids=[ %s ])" % (self.value, \
- 		#						self.devices))
+		return ("Identifiers( %s )" % self.string )
