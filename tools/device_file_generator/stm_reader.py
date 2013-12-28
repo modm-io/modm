@@ -112,6 +112,8 @@ class STMDeviceReader(XMLDeviceReader):
 
 		gpios = []
 		self.addProperty('gpios', gpios)
+		gpio_afs = []
+		self.addProperty('gpio_afs', gpio_afs)
 		peripherals = []
 		self.addProperty('peripherals', peripherals)
 		modules = []
@@ -167,7 +169,9 @@ class STMDeviceReader(XMLDeviceReader):
 				name = name.split('/')[0]
 			
 			gpio = {'port': name[1:2], 'id': name[2:]}
-			gpio_afs = []
+			gpios.append(gpio)
+			
+			afs = []
 			
 			for signal in [s.get('Name') for s in pin if s.get('Name') != 'GPIO']:
 				raw_names = signal.split('_')
@@ -187,7 +191,7 @@ class STMDeviceReader(XMLDeviceReader):
 						af.update({'type': mode})
 					if af_id:
 						af.update({'id': af_id})
-					gpio_afs.append(af)
+					afs.append(af)
 					
 					mapName = {'rx': 'miso', 'tx': 'mosi', 'ck': 'sck'}
 					if signal.startswith('USART') and name in mapName:
@@ -197,7 +201,7 @@ class STMDeviceReader(XMLDeviceReader):
 							af.update({'type': mode})
 						if af_id:
 							af.update({'id': af_id})
-						gpio_afs.append(af)
+						afs.append(af)
 				
 				elif signal.startswith('SPI'):
 					af = {'peripheral' : 'SpiMaster' + instance,
@@ -206,13 +210,13 @@ class STMDeviceReader(XMLDeviceReader):
 						af.update({'type': mode})
 					if af_id:
 						af.update({'id': af_id})
-					gpio_afs.append(dict(af))
+					afs.append(dict(af))
 					invertName = {'miso': 'somi', 'mosi': 'simo', 'nss': 'nss', 'sck': 'sck'}
 					af.update({	'peripheral' : 'SpiSlave' + instance,
 								'name': invertName[name].capitalize()})
 					if mode:
 						af.update({'type': invertMode[nameToMode[name]]})
-					gpio_afs.append(af)
+					afs.append(af)
 				
 				if signal.startswith('CAN'):
 					af = {'peripheral' : 'Can' + instance,
@@ -221,7 +225,7 @@ class STMDeviceReader(XMLDeviceReader):
 						af.update({'type': mode})
 					if af_id:
 						af.update({'id': af_id})
-					gpio_afs.append(af)
+					afs.append(af)
 				
 				if signal.startswith('I2C'):
 					if name in ['scl', 'sda']:
@@ -231,7 +235,7 @@ class STMDeviceReader(XMLDeviceReader):
 							af.update({'type': mode})
 						if af_id:
 							af.update({'id': af_id})
-						gpio_afs.append(af)
+						afs.append(af)
 				
 				if signal.startswith('TIM'):
 					for tname in raw_names[1:]:
@@ -249,28 +253,28 @@ class STMDeviceReader(XMLDeviceReader):
 							af.update({'type': output_type})
 						if af_id:
 							af.update({'id': af_id})
-						gpio_afs.append(af)
+						afs.append(af)
 				
 				if signal.startswith('ADC'):
 					if 'exti' not in name:
 						af = {'peripheral' : 'Adc' + instance,
 							  'name': name.replace('in', 'Channel').capitalize(),
 							  'type': 'analog'}
-						gpio_afs.append(af)
+						afs.append(af)
 				
 				if signal.startswith('SYS'):
 					if 'mco' in name:
 						af = {'peripheral' : signal.replace('SYS', '').replace('_', ''),
 							  'type': 'out',
 							  'id': '0'}
-						gpio_afs.append(af)
+						afs.append(af)
 				
 				if signal.startswith('OTG_FS') and raw_names[2] in ['DM', 'DP']:
 					af = {'peripheral' : 'Usb',
 						  'name': raw_names[2].capitalize()}
 					if af_id:
 						af.update({'id': af_id})
-					gpio_afs.append(af)
+					afs.append(af)
 				
 				if signal.startswith('USB'):
 					af = {'peripheral' : 'Usb',
@@ -279,21 +283,24 @@ class STMDeviceReader(XMLDeviceReader):
 						af.update({'type': mode})
 					if af_id:
 						af.update({'id': af_id})
-					gpio_afs.append(af)
+					afs.append(af)
 					
 				if signal.startswith('FSMC_NOR_MUX_'):
 					af = {'peripheral' : 'Fsmc',
 						  'name': raw_names[3].capitalize().replace('Da','D')}
 					if af_id:
 						af.update({'id': af_id})
-					gpio_afs.append(af)
+					afs.append(af)
 			
 			# sort after key id and then add all without ids
-			gpio['af'] = [a for a in gpio_afs if 'id' in a]
-			gpio['af'].sort(key=lambda k: (int(k['id']), k['peripheral']))
-			gpio['af'].extend([a for a in gpio_afs if 'id' not in a])
+			sorted_afs = [a for a in afs if 'id' in a]
+			sorted_afs.sort(key=lambda k: (int(k['id']), k['peripheral']))
+			sorted_afs.extend([a for a in afs if 'id' not in a])
 			
-			gpios.append(gpio)
+			for af in sorted_afs:
+				af['gpio_port'] = gpio['port']
+				af['gpio_id'] = gpio['id']
+				gpio_afs.append(af)
 
 	def _modulesToString(self):
 		string = ""

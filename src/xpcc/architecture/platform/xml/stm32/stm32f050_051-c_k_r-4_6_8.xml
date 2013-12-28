@@ -32,7 +32,7 @@
     <driver type="uart" name="stm32" instances="1,2"/>
     <driver type="gpio" name="stm32">
       <gpio port="A" id="0">
-        <af device-name="051" device-size-id="6|8"  id="1" peripheral="Uart2" name="Cts" type="in"/>
+        <af device-name="051" device-size-id="6|8" id="1" peripheral="Uart2" name="Cts" type="in"/>
         <af id="2" peripheral="Timer2" name="Channel1"/>
         <af id="2" peripheral="Timer2" name="ExternalTrigger" type="in"/>
         <af peripheral="AdcC" name="Channel0" type="analog"/>

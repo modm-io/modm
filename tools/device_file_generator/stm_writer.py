@@ -126,18 +126,28 @@ class STMDeviceWriter(XMLDeviceWriter):
 			gpios = prop.value
 			
 			for id in prop.ids.differenceFromIds(self.device.ids):
-				dict = self._getAttributeDictionaryFromId(id)
+				attr = self._getAttributeDictionaryFromId(id)
 				for gpio in gpios:
 					gpio_child = driver.addChild('gpio')
-					gpio_child.setAttributes(dict)
-					for name in ['port', 'id']:
-						if name in gpio:
-							gpio_child.setAttribute(name, gpio[name])
-					for af in gpio['af']:
-						af_child = gpio_child.addChild('af')
-						for id in ['id', 'peripheral', 'name', 'type']:
-							if id in af:
-								af_child.setAttribute(id, af[id])
+					gpio_child.setAttributes(attr)
+					gpio_child.setAttributes(gpio)
+					# search for alternate functions
+					matches = []
+					for af_property in self.device.getProperty('gpio_afs').values:
+						for af in af_property.value:
+							if af['gpio_port'] == gpio['port'] and af['gpio_id'] == gpio['id']:
+								differences = af_property.ids.differenceFromIds(prop.ids)
+								matches.append({'af': dict(af), 'differences': differences})
+					print matches
+					for af_dict in matches:
+						for af_id in af_dict['differences']:
+							af_attr = self._getAttributeDictionaryFromId(af_id)
+							af_child = gpio_child.addChild('af')
+							af_child.setAttributes(af_attr)
+							for key in ['id', 'peripheral', 'name', 'type']	:
+								if key in af_dict['af']:
+									af_child.setAttribute(key, af_dict['af'][key])
+					gpio_child.sort(key=lambda k : (int(k.get('id') or 1e6), k.get('peripheral')))
 		# sort the node children by port and id
 		driver.sort(key=lambda k : (k.get('port'), int(k.get('id'))) )
 	
