@@ -54,10 +54,10 @@
     </driver>
     <driver type="uart" name="at90_tiny_mega" instances="0"/>
     <driver type="spi" name="at90_tiny_mega_uart" instances="0"/>
-    <driver device-name="164|1284" type="uart" name="at90_tiny_mega" instances="1"/>
-    <driver device-name="164|1284" type="spi" name="at90_tiny_mega_uart" instances="1"/>
-    <driver device-name="324|644" device-type="a|p|pa" type="uart" name="at90_tiny_mega" instances="1"/>
-    <driver device-name="324|644" device-type="a|p|pa" type="spi" name="at90_tiny_mega_uart" instances="1"/>
+    <driver device-name="164|324|1284" type="uart" name="at90_tiny_mega" instances="1"/>
+    <driver device-name="164|324|1284" type="spi" name="at90_tiny_mega_uart" instances="1"/>
+    <driver device-name="644" device-type="a|p|pa" type="uart" name="at90_tiny_mega" instances="1"/>
+    <driver device-name="644" device-type="a|p|pa" type="spi" name="at90_tiny_mega_uart" instances="1"/>
     <driver type="i2c" name="at90_tiny_mega"/>
     <driver type="spi" name="at90_tiny_mega"/>
     <driver type="adc" name="atmega"/>

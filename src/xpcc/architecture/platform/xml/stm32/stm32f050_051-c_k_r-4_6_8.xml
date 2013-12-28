@@ -7,16 +7,16 @@
   <device platform="stm32" family="f0" name="050|051" pin_id="c|k|r" size_id="4|6|8">
     <flash device-size-id="4">16384</flash>
     <flash device-size-id="6">32768</flash>
-    <flash device-size-id="8">65536</flash>
+    <flash device-name="051" device-size-id="8">65536</flash>
     <ram device-size-id="4|6">4096</ram>
-    <ram device-size-id="8">8192</ram>
+    <ram device-name="051" device-size-id="8">8192</ram>
     <linkerscript device-size-id="4">stm32f0xx_4.ld</linkerscript>
     <linkerscript device-size-id="6">stm32f0xx_6.ld</linkerscript>
-    <linkerscript device-size-id="8">stm32f0xx_8.ld</linkerscript>
+    <linkerscript device-name="051" device-size-id="8">stm32f0xx_8.ld</linkerscript>
     <core>cortex-m0f</core>
     <pin-count device-pin-id="k">32</pin-count>
     <pin-count device-pin-id="c">48</pin-count>
-    <pin-count device-pin-id="r">64</pin-count>
+    <pin-count device-name="051" device-pin-id="r">64</pin-count>
     <header>stm32f0xx.h</header>
     <define>STM32F0XX</define>
     <driver type="core" name="cortex">
@@ -24,12 +24,17 @@
     </driver>
     <driver type="adc" name="stm32"/>
     <driver type="clock" name="stm32"/>
-    <driver type="dac" name="stm32"/>
-    <driver type="i2c" name="stm32" instances="1,2"/>
-    <driver type="spi" name="stm32" instances="1,2"/>
-    <driver type="spi" name="stm32_uart" instances="1,2"/>
-    <driver type="timer" name="stm32" instances="1,2,3,6,14,15,16,17"/>
-    <driver type="uart" name="stm32" instances="1,2"/>
+    <driver device-name="051" type="dac" name="stm32" instances="1"/>
+    <driver type="i2c" name="stm32" instances="1"/>
+    <driver device-name="051" device-size-id="8" device-pin-id="c|r" type="i2c" name="stm32" instances="2"/>
+    <driver type="spi" name="stm32" instances="1"/>
+    <driver device-name="051" device-size-id="8" device-pin-id="c|r" type="spi" name="stm32" instances="2"/>
+    <driver type="spi" name="stm32_uart" instances="1"/>
+    <driver device-name="051" device-size-id="6|8" type="spi" name="stm32_uart" instances="2"/>
+    <driver type="timer" name="stm32" instances="1,2,3,14,16,17"/>
+    <driver device-name="051" type="timer" name="stm32" instances="15"/>
+    <driver type="uart" name="stm32" instances="1"/>
+    <driver device-name="051" device-size-id="6|8" type="uart" name="stm32" instances="2"/>
     <driver type="gpio" name="stm32">
       <gpio port="A" id="0">
         <af device-name="051" device-size-id="6|8" id="1" peripheral="Uart2" name="Cts" type="in"/>
