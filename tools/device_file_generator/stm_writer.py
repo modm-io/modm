@@ -62,7 +62,7 @@ class STMDeviceWriter(XMLDeviceWriter):
 		# UART
 		self.addModuleAttributesToNode(self.root, ['UART', 'USART'], 'uart')
 		# USB
-		self.addModuleAttributesToNode(self.root, ['OTG_FS_DEVICE', 'USB_FS', 'USB'], 'usb', 'stm32_fs')
+		self.addModuleAttributesToNode(self.root, ['OTG_FS_DEVICE', 'USB_FS', 'OTG_FS', 'USB'], 'usb', 'stm32_fs')
 		# GPIO
 		self.addGpioToNode(self.root)
 		
