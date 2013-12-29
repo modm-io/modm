@@ -17,14 +17,19 @@ namespace stm32
 
 namespace TypeId
 {
-
-	typedef struct{} FsmcA16;
 	typedef struct{} FsmcNoe;
 	typedef struct{} FsmcNwe;
 	typedef struct{} FsmcNl;
+	typedef struct{} FsmcNbl0;
+	typedef struct{} FsmcNbl1;
 	typedef struct{} FsmcNe1;
+	typedef struct{} FsmcNwait;
+	typedef struct{} FsmcClk;
 %% for ii in range(0, 16)
 	typedef struct{} FsmcD{{ ii }};
+%% endfor
+%% for ii in range(16, 24)
+	typedef struct{} FsmcA{{ ii }};
 %% endfor
 }
 
