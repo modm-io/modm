@@ -1,30 +1,9 @@
 # -*- coding: utf-8 -*-
-# 
 # Copyright (c) 2013, Roboterclub Aachen e.V.
 # All rights reserved.
 # 
-# Redistribution and use in source and binary forms, with or without
-# modification, are permitted provided that the following conditions are met:
-# 
-#  * Redistributions of source code must retain the above copyright
-#    notice, this list of conditions and the following disclaimer.
-#  * Redistributions in binary form must reproduce the above copyright
-#    notice, this list of conditions and the following disclaimer in the
-#    documentation and/or other materials provided with the distribution.
-#  * Neither the name of the Roboterclub Aachen e.V. nor the
-#    names of its contributors may be used to endorse or promote products
-#    derived from this software without specific prior written permission.
-# 
-# THIS SOFTWARE IS PROVIDED BY ROBOTERCLUB AACHEN E.V. ''AS IS'' AND ANY
-# EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-# DISCLAIMED. IN NO EVENT SHALL ROBOTERCLUB AACHEN E.V. BE LIABLE FOR ANY
-# DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-# (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-# ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
-# THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+# The file is part of the xpcc library and is released under the 3-clause BSD
+# license. See the file `LICENSE` for the full license governing this code.
 # -----------------------------------------------------------------------------
 
 from reader import XMLDeviceReader
@@ -54,50 +33,54 @@ class AVRDeviceReader(XMLDeviceReader):
 		architecture = device.get('architecture')
 		family = device.get('family')
 		
+		self.log.info("Parsing AVR PDF: %s %s" % (architecture, self.name))
+		
 		dev = DeviceIdentifier(self.name.lower())
-		self.properties['id'] = dev
-		self.properties['mmcu'] = dev.family
+		self.id = dev
+		mmcu = dev.family
 		
 		if dev.family == 'at90':
-			self.properties['mmcu'] += dev.type + dev.name
+			mmcu += dev.type + dev.name
 		elif dev.family == 'xmega':
-			self.properties['mmcu'] = 'atxmega' + dev.name
-			self.properties['mmcu'] += dev.type
+			mmcu = 'atxmega' + dev.name
+			mmcu += dev.type
 			if dev.pin_id:
-				self.properties['mmcu'] += dev.pin_id
+				mmcu += dev.pin_id
 			else:
 				dev.pin_id = 'none'
 		else:
-			self.properties['mmcu'] += dev.name
+			mmcu += dev.name
 			if dev.type:
-				self.properties['mmcu'] += dev.type
+				mmcu += dev.type
 			else:
 				dev.type = 'none'
 		
-		self.properties['core'] = architecture.lower()
-
-		self.log.info("Parsing AVR PDF: %s %s" % (architecture, self.name))
+		self.addProperty('mmcu', mmcu)
+		self.addProperty('core', architecture.lower())
 
 		if (architecture not in ['AVR8', 'AVR8L', 'AVR8_XMEGA']):
 			self.log.error("Sorry, only ATtiny, ATmega, ATxmega and AT90 targets can be parsed corretly.")
 			return None
-
-		self.properties['define'] = "__AVR_" + self.name + "__"
+		
+		self.addProperty('define', '__AVR_' + self.name + '__')
 
 		# find the values for flash, ram and (optional) eeprom
-		for memory_segment in self.query("//memory-segment"):
+		for memory_segment in self.query('//memory-segment'):
 			name = memory_segment.get('name')
 			size = int(memory_segment.get('size'), 16)
 			if name in ['FLASH', 'APP_SECTION']:
-				self.properties['flash'] = size
+				self.addProperty('flash', size)
 			elif name in ['IRAM', 'SRAM', 'INTERNAL_SRAM']:
-				self.properties['ram'] = size
+				self.addProperty('ram', size)
 			elif name == 'EEPROM':
-				self.properties['eeprom'] = size
+				self.addProperty('eeprom', size)
 
-		self.properties['gpios'] = gpios = []
-		self.properties['peripherals'] = peripherals = []
-		self.properties['modules'] = modules = []
+		gpios = []
+		self.addProperty('gpios', gpios)
+		peripherals = []
+		self.addProperty('peripherals', peripherals)
+		modules = []
+		self.addProperty('modules', modules)
 		
 		self.modules = self.compactQuery("//peripherals/module/instance/@name")
 		self.log.debug("Available Modules are:\n" + self._modulesToString())
@@ -190,7 +173,7 @@ class AVRDeviceReader(XMLDeviceReader):
 					peripherals.append(module)
 					continue
 		
-			for pin_array in [a for a in avr_io.pins if self.properties['mmcu'] in a['devices']]:
+			for pin_array in [a for a in avr_io.pins if mmcu in a['devices']]:
 				for name in ['pcint', 'extint']:
 					if name in pin_array:
 						for module in pin_array[name]:

@@ -8,20 +8,10 @@
  */
 
 #include <xpcc/architecture.hpp>
+#include "../stm32f4_discovery.hpp"
 
-// ----------------------------------------------------------------------------
-GPIO__OUTPUT(LedOrange, D, 13);		// User LED 3
-GPIO__OUTPUT(LedGreen, D, 12);		// User LED 4
-GPIO__OUTPUT(LedRed, D, 14);		// User LED 5
-GPIO__OUTPUT(LedBlue, D, 15);		// User LED 6
+typedef GpioInputE11 Irq;
 
-GPIO__OUTPUT(VBusPresent, A, 9);		// green LED (LD7)
-GPIO__OUTPUT(VBusOvercurrent, D, 5);	// red LED   (LD8)
-
-GPIO__INPUT(Button, A, 0);
-GPIO__INPUT(Irq, E, 11);
-
-using namespace xpcc::stm32;
 
 /* When you choose a different pin you must choose the corresponding
  * interrupt handler: (x in A, B, C, D, E, F, G, H, I)
@@ -37,42 +27,28 @@ extern "C" void
 //EXTI15_10_IRQHandler(void)
 EXTI0_IRQHandler(void)
 {
-	ExtInt::resetInterruptFlag(ExtInt::Pin::PA0);
-
+	Irq::acknowledgeExternalInterruptFlag();
 	LedBlue::set();
 	xpcc::delay_us(1000);
 	LedBlue::reset();
 }
 
-static bool
-initClock()
-{
-	// use external 8MHz crystal
-	if (!Clock::enableHse(Clock::HseConfig::HSE_CRYSTAL)) {
-		return false;
-	}
-	
-	Clock::enablePll(Clock::PllSource::PLL_HSE, 4, 168);
-	return Clock::switchToPll();
-}
-
 // ----------------------------------------------------------------------------
 MAIN_FUNCTION
 {
-	initClock();
+	defaultSystemClock::enable();
 
-	LedOrange::setOutput(xpcc::Gpio::HIGH);
-	LedGreen::setOutput(xpcc::Gpio::LOW);
-	LedRed::setOutput(xpcc::Gpio::HIGH);
-	LedBlue::setOutput(xpcc::Gpio::LOW);
-	
+	LedOrange::setOutput(xpcc::Gpio::High);
+	LedGreen::setOutput(xpcc::Gpio::Low);
+	LedRed::setOutput(xpcc::Gpio::High);
+	LedBlue::setOutput(xpcc::Gpio::Low);
+
 	Button::setInput();
 	Irq::setInput();
 
-	ExtInt::enable(ExtInt::Pin::PA0);
-	ExtInt::setMode(ExtInt::Pin::PA0, ExtInt::Mode::Rising);
-	ExtInt::enableInterrupt(ExtInt::Pin::PA0);
-	ExtInt::enableInterruptVector(ExtInt::Pin::PA0, 14);
+	Irq::setInputTrigger(Irq::InputTrigger::RisingEdge);
+	Irq::enableExternalInterrupt();
+	Irq::enableExternalInterruptVector(14);
 
 	while (1)
 	{

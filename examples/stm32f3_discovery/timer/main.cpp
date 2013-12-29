@@ -1,21 +1,12 @@
-
 #include <xpcc/architecture.hpp>
+#include "../stm32f3_discovery.hpp"
 
-// ----------------------------------------------------------------------------
-using namespace xpcc::stm32;
-
-typedef GpioOutputE9 LedNorth;
-typedef GpioOutputE8 LedNorthWest;
-
-
-// ----------------------------------------------------------------------------
 MAIN_FUNCTION
 {
-	StartupError err =
-		SystemClock<Pll<ExternalClock<MHz8>, MHz72>>::enable();
+	defaultSystemClock::enable();
 
-	LedNorth::setOutput(xpcc::Gpio::HIGH);
-	LedNorthWest::setOutput(xpcc::Gpio::LOW);
+	LedNorth::setOutput(xpcc::Gpio::High);
+	LedNorthWest::setOutput(xpcc::Gpio::Low);
 
 
 	Timer1::enable();

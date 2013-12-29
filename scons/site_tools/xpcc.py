@@ -256,7 +256,7 @@ def generate(env, **kw):
 
 		architecture_derecated = parser.get('build', 'architecture', 'deprecated')
 		if architecture_derecated != "deprecated":
-			env.Warn("Specifying architecture is deprecated and replaced only by the Device ID.")
+			env.Warn("Specifying architecture is deprecated and replaced by only the Device ID ('device=...'.")
 
 		projectName = parser.get('general', 'name')
 
@@ -380,6 +380,7 @@ def generate(env, **kw):
 		env['ARM_CLOCK'] = clock
 		
 		env.Tool('arm')
+		env.Tool('dfu_stm32_programmer')
 		
 		# load openocd tool if required
 		if parser.has_section('program'):

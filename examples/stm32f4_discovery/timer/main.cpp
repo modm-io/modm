@@ -1,60 +1,36 @@
-
-#include <xpcc/architecture.hpp>
-#include <xpcc/workflow.hpp>
-
-// ----------------------------------------------------------------------------
-GPIO__OUTPUT(LedOrange, D, 13);		// User LED 3
-GPIO__OUTPUT(LedGreen, D, 12);		// User LED 4
-GPIO__OUTPUT(LedRed, D, 14);		// User LED 5
-GPIO__OUTPUT(LedBlue, D, 15);		// User LED 6
-
-GPIO__OUTPUT(VBusPresent, A, 9);		// green LED (LD7)
-GPIO__OUTPUT(VBusOvercurrent, D, 5);	// red LED   (LD8)
-
-GPIO__INPUT(Button, A, 0);
-
-using namespace xpcc::stm32;
-
-static bool
-initClock()
-{
-	// use external 8MHz crystal
-	if (!Clock::enableHse(Clock::HseConfig::HSE_CRYSTAL)) {
-		return false;
-	}
-	
-	Clock::enablePll(Clock::PllSource::PLL_HSE, 4, 168);
-	return Clock::switchToPll();
-}
+#include <xpcc/architecture/platform.hpp>
+#include <xpcc/processing.hpp>
+#include "../stm32f4_discovery.hpp"
 
 // ----------------------------------------------------------------------------
 MAIN_FUNCTION
 {
-	initClock();
+	defaultSystemClock::enable();
 
-	LedOrange::setAlternateFunction(AF_TIM4, PUSH_PULL);
-	LedGreen::setAlternateFunction(AF_TIM4, PUSH_PULL);
-	LedRed::setAlternateFunction(AF_TIM4, PUSH_PULL);
-	LedBlue::setAlternateFunction(AF_TIM4, PUSH_PULL);
-		
+	LedOrange::connect(Timer4::Channel2);
+	LedGreen::connect(Timer4::Channel1);
+	LedRed::connect(Timer4::Channel3);
+	LedBlue::connect(Timer4::Channel4);
+
 	Timer4::enable();
-	Timer4::setMode(Timer4::UP_COUNTER);
-	
+	Timer4::setMode(Timer4::Mode::UpCounter);
+
 	// 42 MHz / 2 / 2^16 ~ 320 Hz
 	Timer4::setPrescaler(2);
 	Timer4::setOverflow(65535);
-	
-	Timer4::configureOutputChannel(1, Timer2::OUTPUT_PWM, 32768);
-	Timer4::configureOutputChannel(2, Timer2::OUTPUT_PWM, 32768);
-	Timer4::configureOutputChannel(3, Timer2::OUTPUT_PWM, 32768);
-	Timer4::configureOutputChannel(4, Timer2::OUTPUT_PWM, 32768);
+
+	Timer4::configureOutputChannel(1, Timer2::OutputCompareMode::Pwm, 32768);
+	Timer4::configureOutputChannel(2, Timer2::OutputCompareMode::Pwm, 32768);
+	Timer4::configureOutputChannel(3, Timer2::OutputCompareMode::Pwm, 32768);
+	Timer4::configureOutputChannel(4, Timer2::OutputCompareMode::Pwm, 32768);
 	Timer4::applyAndReset();
-	
+
 	Timer4::start();
-	
+
 	// Start the systick timer to generate a 1ms systemclock
-	SysTickTimer::enable();
-	
+	// this is needed for the xpcc::PeriodicTimer to function
+	xpcc::cortex::SysTickTimer::enable();
+
 	uint16_t pwm[4] = { 0, 64, 128, 192 };
 	bool up[4] = { true, true, true, true };
 	xpcc::PeriodicTimer<> timer(5);

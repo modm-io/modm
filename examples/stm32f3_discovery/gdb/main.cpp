@@ -1,31 +1,5 @@
-
 #include <xpcc/architecture.hpp>
-
-// ----------------------------------------------------------------------------
-GPIO__OUTPUT(LedNorth,     E,  9); // LD3
-GPIO__OUTPUT(LedNorthEast, E, 10); // LD5
-GPIO__OUTPUT(LedEast,      E, 11); // LD7
-GPIO__OUTPUT(LedSouthEast, E, 12); // LD9
-GPIO__OUTPUT(LedSouth,     E, 13); // LD10
-GPIO__OUTPUT(LedSouthWest, E, 14); // LD8
-GPIO__OUTPUT(LedWest,      E, 15); // LD6
-GPIO__OUTPUT(LedNorthWest, E,  8); // LD4
-
-GPIO__INPUT(Button, A, 0);
-
-using namespace xpcc::stm32;
-
-static bool
-initClock()
-{
-	// use external 8MHz clock from ST-LINK
-	if (!Clock::enableHse(Clock::HseConfig::HSE_BYPASS)) {
-		return false;
-	}
-	
-	Clock::enablePll(Clock::PllSource::PLL_HSE, Clock::PllMul::MUL_9);
-	return Clock::switchToPll();
-}
+#include "../stm32f3_discovery.hpp"
 
 int global_a = 1;
 int global_b = 2;
@@ -112,19 +86,18 @@ void rec_itr()
 	i = pow(2, 30);	// = (1<<30)
 }
 
-// ----------------------------------------------------------------------------
 MAIN_FUNCTION
 {
-	initClock();
+	defaultSystemClock::enable();
 
-	LedNorth::setOutput(xpcc::Gpio::LOW);
-	LedNorthEast::setOutput(xpcc::Gpio::HIGH);
-	LedEast::setOutput(xpcc::Gpio::HIGH);
-	LedSouthEast::setOutput(xpcc::Gpio::HIGH);
-	LedSouth::setOutput(xpcc::Gpio::HIGH);
-	LedSouthWest::setOutput(xpcc::Gpio::HIGH);
-	LedWest::setOutput(xpcc::Gpio::HIGH);
-	LedNorthWest::setOutput(xpcc::Gpio::HIGH);
+	LedNorth::setOutput(xpcc::Gpio::Low);
+	LedNorthEast::setOutput(xpcc::Gpio::High);
+	LedEast::setOutput(xpcc::Gpio::High);
+	LedSouthEast::setOutput(xpcc::Gpio::High);
+	LedSouth::setOutput(xpcc::Gpio::High);
+	LedSouthWest::setOutput(xpcc::Gpio::High);
+	LedWest::setOutput(xpcc::Gpio::High);
+	LedNorthWest::setOutput(xpcc::Gpio::High);
 
 	int a = 30;
 	

@@ -55,9 +55,9 @@ private:
 
 public:
 	/// TypeId used to connect GPIO pins to this peripheral's rx.
-	static const TypeId::{{ uart ~ "Hal" ~ id }}Rx Rx;
+	static const TypeId::Uart{{ id }}Rx Rx;
 	/// TypeId used to connect GPIO pins to this peripheral's tx.
-	static const TypeId::{{ uart ~ "Hal" ~ id }}Tx Tx;
+	static const TypeId::Uart{{ id }}Tx Tx;
 
 public:
 	/// Enables the clock, resets the hardware and sets the UE bit

@@ -107,7 +107,7 @@ public:
 	void
 	run()
 	{
-		led.run();
+		led.update();
 
 		if (timer.isExpired() && (isBlinking || !blinkDirection))
 		{

@@ -33,7 +33,7 @@ namespace xpcc
  * inherit from their respective base classes and must shadow the methods of
  * them.
  *
- * The inheritance is only visible for the documenation, It is completely
+ * The inheritance is only visible for the documentation, it is completely
  * removed during compile time keeping a possible error at platform level.
  * This is safe, because only one platform can be compiled at once.
  *

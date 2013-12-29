@@ -43,14 +43,6 @@ typedef GpioInputC5  IntTouchscreen;
 xpcc::Ads7843<SpiSimpleMaster2, CsTouchscreen, IntTouchscreen> ads7843;
 xpcc::TouchscreenCalibrator touchscreen;
 
-// ----------------------------------------------------------------------------
-
-/* System clock */
-
-typedef SystemClock<Pll<ExternalClock<MHz8>, MHz168, MHz48> > systemClock;
-
-// ----------------------------------------------------------------------------
-
 typedef GpioOutputD7 CS;
 
 static void
@@ -123,7 +115,7 @@ initTouchscreen()
 	GpioInputB14::connect(SpiSimpleMaster2::Miso);
 	GpioOutputB15::connect(SpiSimpleMaster2::Mosi);
 
-	SpiSimpleMaster2::initialize<systemClock, MHz1>();
+	SpiSimpleMaster2::initialize<defaultSystemClock, MHz1>();
 	SpiSimpleMaster2::setDataMode(SpiSimpleMaster2::DataMode::Mode0);
 
 }
@@ -195,10 +187,10 @@ drawPoint(xpcc::GraphicDisplay& display, xpcc::glcd::Point point)
 // ----------------------------------------------------------------------------
 MAIN_FUNCTION
 {
-	systemClock::enable();
+	defaultSystemClock::enable();
 
-	LedOrange::setOutput(xpcc::Gpio::HIGH);
-	LedGreen::setOutput(xpcc::Gpio::LOW);
+	LedOrange::setOutput(xpcc::Gpio::High);
+	LedGreen::setOutput(xpcc::Gpio::Low);
 
 	Button::setInput();
 	

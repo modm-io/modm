@@ -2,34 +2,39 @@
 <!DOCTYPE rca SYSTEM "../devicefile.dtd">
 <rca version="1.0">
   <!-- WARNING: This file is generated automatically, do not edit!
- 		Please modify the xpcc/tools/DeviceFileGenerator code instead and rebuild this file.
- 		Be aware, that regenerated files might have a different composition for technical reasons. -->
-  <device platform="avr" name="64|128" family="xmega" type="a1" pin-id="u">
+ 		Please modify the xpcc/tools/device_file_generator code instead and rebuild this file.
+ 		Be aware, that regenerated files might have a different composition due to technical reasons. -->
+  <device platform="avr" family="xmega" name="64|128" pin_id="none|u" size_id="64|128" type="a1">
     <flash device-name="64">65536</flash>
     <flash device-name="128">131072</flash>
     <ram device-name="64">4096</ram>
     <ram device-name="128">8192</ram>
     <eeprom>2048</eeprom>
-    <mmcu device-name="64">atxmega64a1u</mmcu>
-    <mmcu device-name="128">atxmega128a1u</mmcu>
-    <define device-name="64">__AVR_ATxmega64A1U__</define>
-    <define device-name="128">__AVR_ATxmega128A1U__</define>
+    <mmcu device-name="128" device-pin-id="none">atxmega128a1</mmcu>
+    <mmcu device-name="128" device-pin-id="u">atxmega128a1u</mmcu>
+    <mmcu device-name="64" device-pin-id="none">atxmega64a1</mmcu>
+    <mmcu device-name="64" device-pin-id="u">atxmega64a1u</mmcu>
     <core>avr8_xmega</core>
     <pin-count>100</pin-count>
+    <header>avr/io.h</header>
+    <header>avr/interrupt.h</header>
+    <header>avr/sleep.h</header>
+    <define device-name="128" device-pin-id="u">__AVR_ATxmega128A1U__</define>
+    <define device-name="128" device-pin-id="none">__AVR_ATxmega128A1__</define>
+    <define device-name="64" device-pin-id="u">__AVR_ATxmega64A1U__</define>
+    <define device-name="64" device-pin-id="none">__AVR_ATxmega64A1__</define>
     <driver type="core" name="avr">
       <parameter device-name="64" name="ram_length">3072</parameter>
       <parameter device-name="128" name="ram_length">7168</parameter>
     </driver>
-    <header>avr/io.h</header>
-    <header>avr/interrupt.h</header>
-    <header>avr/sleep.h</header>
     <driver type="uart" name="xmega" instances="C0,C1,D0,D1,E0,E1,F0,F1"/>
-    <driver type="spi" name="xmega" instances="C0,C1,D0,D1,E0,E1,F0,F1"/>
+    <driver type="spi" name="xmega_uart" instances="C0,C1,D0,D1,E0,E1,F0,F1"/>
     <driver type="i2c" name="xmega" instances="C,D,E,F"/>
     <driver type="spi" name="xmega" instances="C,D,E,F"/>
     <driver type="adc" name="xmega" instances="A,B"/>
     <driver type="dac" name="xmega" instances="A,B"/>
-    <driver type="timer" name="xmega" instances="C0,C1,C2,D0,D1,D2,E0,E1,E2,F0,F1,F2"/>
+    <driver type="timer" name="xmega" instances="C0,C1,D0,D1,E0,E1,F0,F1"/>
+    <driver device-pin-id="u" type="timer" name="xmega" instances="C2,D2,E2,F2"/>
     <driver type="gpio" name="xmega">
       <gpio port="A" id="0"/>
       <gpio port="A" id="1"/>

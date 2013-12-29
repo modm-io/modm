@@ -43,6 +43,18 @@ class DeviceIdentifier:
 	"""
 
 	def __init__(self, string=None, logger=None):
+		# quick'n'dirty copy constructor
+		if isinstance(string, DeviceIdentifier):
+			self.log      = string.log
+			self.platform = string.platform
+			self.family   = string.family
+			self.name	  = string.name
+			self.type	  = string.type
+			self.pin_id   = string.pin_id
+			self.size_id  = string.size_id
+			self.valid    = string.valid
+			return
+		
 		if logger == None:
 			self.log = Logger()
 		else:
@@ -165,56 +177,89 @@ class DeviceIdentifier:
 		return {'target': self.properties}
 	
 	def isEmpty(self):
-		empty = True
 		target = self.properties
 		for key in target:
 			if target[key] != None:
-				empty = False
-		return empty
+				return False
+		return True
 	
-	def getComparisonDeviceIndentifier(self, other):
-		"""
-		This method compares its own properties with the other class and
-		generates three new Devices: a common Device with the common
-		properties of both, and two children devices _only_ with the differences.
-		"""
-		assert isinstance(other, DeviceIdentifier)
+	def __contains__(self, id):
+		assert isinstance(id, DeviceIdentifier)
+		# simple check uses hash
+		if id == self:
+			return True
 		
-		tself = self.properties
-		tother = other.properties
-		dict = {'common_keys': [], 'different_keys': []}
+		for attr in self.properties:
+			id_prop = id.properties[attr]
+			self_prop = self.properties[attr]
+			# simple check if they are equal
+			if id_prop == self_prop:
+				continue
+			# they are not equal, maybe one of them is None?
+			if (id_prop == None or self_prop == None):
+				return False
+			
+			# they are not equal, but both have valid attributes
+			
+			# id is a union, but self is not a union
+			# self can obviously only contain on item then
+			if '|' in id_prop and '|' not in self_prop:
+				return False
+			
+			# both of them are unions, check for containment
+			# we need to check if all types of id are in self
+			# not the other way around
+			if '|' in id_prop and '|' in self_prop:
+				# if any attribute in id is not in the attribute list of self
+				# id is not contained in self
+				if any(item not in self_prop.split('|') for item in id_prop.split('|')):
+					return False
+				# this attribute is contained in self, check the others
+				continue
+			
+			# self is a union, but id is not
+			# we need to check if the id attribute is in self
+			if '|' not in id_prop and '|' in self_prop:
+				# if id_prop is not in there, they are not equal
+				if id_prop not in self_prop.split('|'):
+					return False
+				# this attribute is contained in self, check the others
+				continue
+			
+			# neither of them is a union, but they cannot be equal anyway
+			return False
 		
-		common = DeviceIdentifier()
-		self_delta = DeviceIdentifier()
-		other_delta = DeviceIdentifier()
+		return True
 		
-		for key in tself:
-			if tself[key] == tother[key]:
-				dict['common_keys'].append(key)
-				setattr(common, key, tself[key])
+	
+	def intersectionWithDeviceIdentifier(self, other):
+		dev = DeviceIdentifier(self)
+		for attr in dev.properties:
+			if dev.properties[attr] != other.properties[attr]:
+					setattr(dev, attr, None)
+		return dev
+	
+	def unionWithDeviceIdentifier(self, other):
+		dev = DeviceIdentifier(self)
+		for attr in dev.properties:
+			props = [None]
+			
+			if (dev.properties[attr] != None):
+				props = dev.properties[attr].split("|")
+			if (other.properties[attr] != None):
+				props.extend(other.properties[attr].split("|"))
+				
+			props = list(set(props))
+			props = [p for p in props if p != None]
+			
+			if all(p.isdigit() for p in props):
+				props.sort(key=int)
 			else:
-				dict['different_keys'].append(key)
-				common_array = getattr(common, key)
-				if common_array != None:
-					common_array = common_array.split('|')
-				else:
-					common_array = []
-				common_array.extend(tother[key].split('|'))
-				common_array.extend(tself[key].split('|'))
-				common_array = list(set(common_array))
-				common_array.sort()
-				setattr(common, key, '|'.join(common_array))
-				setattr(other_delta, key, tother[key])
-				setattr(self_delta, key, tself[key])
-				self_delta.valid = True
-				other_delta.valid = True
-		
-		common.valid = True
-		
-		dict['common'] = common
-		dict['self_delta'] = self_delta
-		dict['other_delta'] = other_delta
-		return dict
+				props.sort()
+				
+			setattr(dev, attr, "|".join(props) if len(props) else None)
+			
+		return dev
 
 	def __hash__(self):
 		return hash(str(self))
@@ -224,5 +269,10 @@ class DeviceIdentifier:
 
 	def __str__(self):
 		target = self.properties
-		target = {o:target[o] for o in target if target[o] != None}
+		#target = {o:target[o] for o in target if target[o] != None}
+		t = {}
+		for o in target:
+			if target[o] != None:
+				t[o] = target[o]
+		target = t
 		return "DeviceIdentifier(" + str(target) + ")"

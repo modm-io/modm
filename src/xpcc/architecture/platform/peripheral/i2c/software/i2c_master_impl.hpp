@@ -64,7 +64,7 @@ xpcc::SoftwareI2cMaster<SCL, SDA, Frequency>::start(xpcc::I2cDelegate *delegate)
 
 			address &= 0xfe;
 			if (s.next == xpcc::I2c::Operation::Read)
-				address |= xpcc::I2c::READ;
+				address |= xpcc::I2c::Read;
 
 			if (!write(address))
 				return true;
@@ -142,14 +142,14 @@ void
 xpcc::SoftwareI2cMaster<SCL, SDA, Frequency>::startCondition()
 {
 	sda.set();
-	while((sda.read() == Gpio::LOW))
+	while((sda.read() == xpcc::Gpio::Low))
 		;
 	delay();
 
 	sclSetAndWait();
 	delay();
 
-	// here both pins are HIGH, ready for start
+	// here both pins are High, ready for start
 	sda.reset();
 	delay();
 	scl.reset();
@@ -261,12 +261,12 @@ xpcc::SoftwareI2cMaster<SCL, SDA, Frequency>::sclSetAndWait()
 	// wait for clock stretching by slave
 	// only wait a maximum of 250 half clock cycles
 	uint_fast8_t deadlockPreventer = 250;
-	while (scl.read() == Gpio::LOW && deadlockPreventer)
+	while (scl.read() == xpcc::Gpio::Low && deadlockPreventer)
 	{
 		xpcc::delay_us(delayTime/2);
 		deadlockPreventer--;
 		// double the read amount
-		if (scl.read() != Gpio::LOW) return;
+		if (scl.read() != xpcc::Gpio::Low) return;
 		xpcc::delay_us(delayTime/2);
 	}
 	// if extreme clock stretching occurs, then there might be an external error

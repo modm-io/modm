@@ -6,7 +6,7 @@
 #undef	XPCC_LOG_LEVEL
 #define	XPCC_LOG_LEVEL xpcc::log::INFO
 
-using namespace xpcc::stm32;
+#include "../../stm32f3_discovery.hpp"
 
 typedef GpioInputB12 AdcIn0;
 
@@ -16,18 +16,16 @@ xpcc::log::Logger xpcc::log::info(loggerDevice);
 // ----------------------------------------------------------------------------
 MAIN_FUNCTION
 {
-	StartupError err =
-		SystemClock<Pll<ExternalClock<MHz8>, MHz72>>::enable();
+	defaultSystemClock::enable();
 
 	// initialize Uart2 for XPCC_LOG_INFO
 	GpioOutputA2::connect(Usart2::Tx);
 	GpioInputA3::connect(Usart2::Rx);
-	Usart3::initialize(115200, 12);
+	Usart2::initialize<defaultSystemClock, 115200>(12);
 
 	// initialize Adc4
 	Adc4::initialize(Adc4::ClockMode::Asynchronous, Adc4::Prescaler::Div256,
 					Adc4::CalibrationMode::SingleEndedInputsMode, true);
-
 	AdcIn0::connect(Adc4::Channel3);
 	Adc4::setChannel(AdcIn0::Adc4Channel, Adc4::SampleTime::Cycles182);
 

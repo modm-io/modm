@@ -29,4 +29,8 @@ typedef GpioOutputE8  LedNorthWest;
 typedef GpioOutputA8  ClockOut;
 typedef GpioInputA0   Button;
 
+/// STM32F3 running at 72MHz generated from the external 8MHz clock
+/// supplied by the on-board st-link
+typedef SystemClock<Pll<ExternalClock<MHz8>, MHz72> > defaultSystemClock;
+
 #endif	// XPCC_STM32_F3_DISCOVERY_HPP

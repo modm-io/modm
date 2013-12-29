@@ -51,8 +51,8 @@ template <typename PORT, typename RD, typename WR, typename RXF, typename TXE>
 void
 xpcc::Ft245<PORT, RD, WR, RXF, TXE>::initialize()
 {
-	rd.setOutput(xpcc::Gpio::HIGH);
-	wr.setOutput(xpcc::Gpio::HIGH);
+	rd.setOutput(xpcc::Gpio::High);
+	wr.setOutput(xpcc::Gpio::High);
 	//rxf.setInput(xpcc::Gpio::PullType::PullUp);
 	//txe.setInput(xpcc::Gpio::PullType::PullUp);
 	//port.setInput(xpcc::Gpio::PullType::PullUp);
