@@ -11,6 +11,34 @@ import java.lang.reflect.Method;
 
 public class Identifier
 {
+	public static enum Domain
+	{
+	{%- for item in containers.iter() %}
+	{%- if item.id != None %}
+		{{ item.name | enumElement }}({{ item.id }}){% if loop.last %};{% else %},{% endif %}
+	{%- endif -%}
+	{%- endfor %}
+		;
+		
+		public final int id;
+		private Domain(int id) {
+			this.id = id;
+		}
+
+		public static Domain get(int id){
+			switch (id){
+			{%- for item in containers.iter() %}
+			{%- if item.id != None %}
+				case {{ item.id }}:
+					return {{ item.name | enumElement }};
+			{%- endif -%}
+			{%- endfor %}
+				default:
+					return null;
+			}
+		}
+	}
+
 	public static enum Component
 	{
 	{%- for component in components.iter() %}

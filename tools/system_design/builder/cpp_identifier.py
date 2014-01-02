@@ -41,12 +41,17 @@ class IdentifierBuilder(builder_base.Builder):
 			raise builder_base.BuilderException("You need to provide an output path!")
 		
 		template = self.template('templates/robot_identifier.tpl')
-		
+
+		containers = []
+		for container in self.tree.container.iter():
+			containers.append(container)
+
 		components = []
 		for component in self.tree.components.iter(abstract=False):
 			components.append(component.flattened())
 		
 		substitutions = {
+			'containers' : containers,
 			'components': components,
 			'actions': self.tree.components.actions,
 			'events': self.tree.events

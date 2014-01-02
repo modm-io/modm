@@ -55,7 +55,7 @@ namespace xpcc
 	class TipcConnector : public BackendInterface
 	{
 	public :
-		TipcConnector();
+		TipcConnector(unsigned int domainId=tipc::Header::DOMAIN_ID_UNDEFINED);
 		
 		~TipcConnector();
 		
