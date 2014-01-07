@@ -36,8 +36,8 @@
 // error message!!!!
 
 // ----------------------------------------------------------------------------
-xpcc::tipc::Transmitter::Transmitter( ) :
-	tipcTransmitterSocket_()
+xpcc::tipc::Transmitter::Transmitter( unsigned int domainId ) :
+	domainId_( domainId )
 {
 }
 
@@ -54,7 +54,8 @@ xpcc::tipc::Transmitter::transmitRequest( uint8_t destination, const SmartPointe
 			REQUEST_OFFSET + destination + TYPE_ID_OFFSET,
 			0,
 			payload.getPointer(),
-			payload.getSize() );
+			payload.getSize(),
+			this->domainId_);
 }
 
 // ----------------------------------------------------------------------------
@@ -65,7 +66,8 @@ xpcc::tipc::Transmitter::transmitEvent( uint8_t event, const SmartPointer& paylo
 			EVENT_OFFSET + event + TYPE_ID_OFFSET,
 			0,
 			payload.getPointer(),
-			payload.getSize() );
+			payload.getSize(),
+			this->domainId_);
 }
 
 // ----------------------------------------------------------------------------

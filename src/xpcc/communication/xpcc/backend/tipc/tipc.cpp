@@ -34,9 +34,9 @@
 #define XPCC_LOG_LEVEL xpcc::log::WARNING
 
 // ----------------------------------------------------------------------------
-xpcc::TipcConnector::TipcConnector() :
-	transmitter(),
-	receiver(this->transmitter.getPortId())
+xpcc::TipcConnector::TipcConnector( unsigned int domainId ) :
+	transmitter( domainId ),
+	receiver(this->transmitter.getPortId(), domainId)
 {
 }
 

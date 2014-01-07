@@ -65,6 +65,7 @@ class JavaIdentifierBuilder(builder_base.Builder):
 		template = self.template('templates/java_identifier.tpl', filter=javaFilter)
 		
 		substitutions = {
+			'domains' : self.tree.domains,
 			'package' : self.options.package,
 			'components': self.tree.components,
 			'actions': self.tree.components.actions,
