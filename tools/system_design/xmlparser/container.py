@@ -41,8 +41,6 @@ class Container:
 			bootloader = bootloader.attrib
 		self.bootloader = bootloader
 		
-		self.id = xml_utils.get_identifier(node)
-		
 		self.description = xml_utils.get_description(node)
 		
 		self.components = utils.SingleAssignDictionary("component")
@@ -95,7 +93,4 @@ class Container:
 		return str[:-1]
 	
 	def __str__(self):
-		if self.id != None :
-			return "[%02x] %s" % (self.id, self.name)
-		else:
-			return "[  ] %s" % (self.name)
+		return self.name

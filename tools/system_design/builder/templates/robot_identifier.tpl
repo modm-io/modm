@@ -14,7 +14,7 @@ namespace robot
 	{
 		enum Identifier
 		{
-		{%- for item in containers -%}
+		{%- for item in domains -%}
 		{%- if item.id != None %}
 			{{ item.name | upper | replace(' ', '_') }} = {{ item.id }},
 		{%- endif -%}
@@ -26,7 +26,7 @@ namespace robot
 		{
 			switch (e)
 			{
-			{%- for item in containers %}
+			{%- for item in domains %}
 			{%- if item.id != None %}
 				case {{ item.name | upper | replace(' ', '_') }}: return "{{ item.name | upper | replace(' ', '_') }}";
 			{%- endif -%}

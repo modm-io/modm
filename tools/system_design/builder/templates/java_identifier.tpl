@@ -13,10 +13,8 @@ public class Identifier
 {
 	public static enum Domain
 	{
-	{%- for item in containers.iter() %}
-	{%- if item.id != None %}
+	{%- for item in domains.iter() %}
 		{{ item.name | enumElement }}({{ item.id }}){% if loop.last %};{% else %},{% endif %}
-	{%- endif -%}
 	{%- endfor %}
 		;
 		
@@ -27,11 +25,9 @@ public class Identifier
 
 		public static Domain get(int id){
 			switch (id){
-			{%- for item in containers.iter() %}
-			{%- if item.id != None %}
+			{%- for item in domains.iter() %}
 				case {{ item.id }}:
 					return {{ item.name | enumElement }};
-			{%- endif -%}
 			{%- endfor %}
 				default:
 					return null;
