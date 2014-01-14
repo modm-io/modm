@@ -39,7 +39,7 @@ def generate(env, **kw):
 	env['ENV'] = os.environ
 
 	if env['HOSTED_DEVICE'] == 'linux':
-		env['LIBS'] == ['boost_thread', 'boost_system']
+		env['LIBS'] = ['boost_thread', 'boost_system']
 
 	c = env['XPCC_COMPILER']
 	if c in ['clang', 'clang++']:
