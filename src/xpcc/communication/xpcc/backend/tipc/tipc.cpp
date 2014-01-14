@@ -34,15 +34,22 @@
 #define XPCC_LOG_LEVEL xpcc::log::WARNING
 
 // ----------------------------------------------------------------------------
-xpcc::TipcConnector::TipcConnector( unsigned int domainId ) :
-	transmitter( domainId ),
-	receiver(this->transmitter.getPortId(), domainId)
+xpcc::TipcConnector::TipcConnector() :
+	receiver(this->transmitter.getPortId())
 {
 }
 
 // ----------------------------------------------------------------------------
 xpcc::TipcConnector::~TipcConnector()
 {
+}
+
+// ----------------------------------------------------------------------------
+void
+xpcc::TipcConnector::setDomainId(unsigned int domainId)
+{
+	this->transmitter.setDomainId( domainId );
+	this->receiver.setDomainId( domainId );
 }
 
 // ----------------------------------------------------------------------------

@@ -53,9 +53,12 @@ namespace xpcc
 		class Transmitter
 		{
 		public:
-			Transmitter( unsigned int domainId = Header::DOMAIN_ID_UNDEFINED );
+			Transmitter( );
 
 			~Transmitter();
+
+			void
+			setDomainId( unsigned int id );
 	
 			void 
 			transmitRequest( uint8_t destination, const SmartPointer& payload );
@@ -68,7 +71,7 @@ namespace xpcc
 	
 		private:
 			TransmitterSocket 	tipcTransmitterSocket_;
-			const unsigned int 	domainId_;
+			unsigned int 	domainId_;
 		};
 	}
 }

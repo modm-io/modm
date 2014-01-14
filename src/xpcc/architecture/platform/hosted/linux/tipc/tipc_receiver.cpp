@@ -39,11 +39,10 @@
 
 // ----------------------------------------------------------------------------
 xpcc::tipc::Receiver::Receiver(
-		uint32_t ignoreTipcPortId,
-		unsigned int domainId) :
+		uint32_t ignoreTipcPortId) :
 	tipcReceiverSocket_(),
 	ignoreTipcPortId_(ignoreTipcPortId),
-	domainId_( domainId ),
+	domainId_( tipc::Header::DOMAIN_ID_UNDEFINED ),
 	packetQueue_(),
 	receiverThread_(),
 	receiverSocketLock_(),
@@ -59,6 +58,13 @@ xpcc::tipc::Receiver::~Receiver()
 {
 	this->isAlive_ = false;
 	this->receiverThread_->join();
+}
+
+// ----------------------------------------------------------------------------
+void
+xpcc::tipc::Receiver::setDomainId( unsigned int domainId )
+{
+	this->domainId_ = domainId;
 }
 
 // ----------------------------------------------------------------------------

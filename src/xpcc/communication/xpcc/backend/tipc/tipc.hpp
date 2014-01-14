@@ -55,10 +55,16 @@ namespace xpcc
 	class TipcConnector : public BackendInterface
 	{
 	public :
-		TipcConnector(unsigned int domainId=tipc::Header::DOMAIN_ID_UNDEFINED);
+		TipcConnector();
 		
 		~TipcConnector();
 		
+		/**
+		 * \brief	Change the domain id during runtime
+		 */
+		void
+		setDomainId(unsigned int domainId);
+
 		/**
 		 * \brief	Add a new event to receive
 		 * 

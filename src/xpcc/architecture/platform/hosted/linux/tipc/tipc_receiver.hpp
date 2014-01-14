@@ -60,12 +60,13 @@ namespace xpcc
 			 * \param ignoreTipcPortId from this port all messages will be ignored, use this to ignore own transmitted messanges
 			 *
 			 * \see TransmitterSocket::getPortId
-			 *
-			 * \param limit domain of received messages to a domain (the transmitter has to be member of the domain)
 			 */
-			Receiver(uint32_t ignoreTipcPortId, unsigned int domainId = Header::DOMAIN_ID_UNDEFINED);
+			Receiver(uint32_t ignoreTipcPortId);
 
 			~Receiver();
+
+			void
+			setDomainId(unsigned int id);
 
 			void
 			addEventId(uint8_t id);
@@ -110,7 +111,7 @@ namespace xpcc
 			
 			ReceiverSocket tipcReceiverSocket_;
 			uint32_t ignoreTipcPortId_;	// the tipc port ID from that all messages will be ignored
-			const unsigned int domainId_;
+			unsigned int domainId_;
 			
 			std::queue<Payload>	packetQueue_;
 			

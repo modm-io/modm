@@ -36,8 +36,8 @@
 // error message!!!!
 
 // ----------------------------------------------------------------------------
-xpcc::tipc::Transmitter::Transmitter( unsigned int domainId ) :
-	domainId_( domainId )
+xpcc::tipc::Transmitter::Transmitter( ) :
+	domainId_( xpcc::tipc::Header::DOMAIN_ID_UNDEFINED )
 {
 }
 
@@ -45,6 +45,14 @@ xpcc::tipc::Transmitter::Transmitter( unsigned int domainId ) :
 xpcc::tipc::Transmitter::~Transmitter()
 {
 }
+
+// ----------------------------------------------------------------------------
+void
+xpcc::tipc::Transmitter::setDomainId(unsigned int id)
+{
+	this->domainId_ = id;
+}
+
 
 // ----------------------------------------------------------------------------
 void 
