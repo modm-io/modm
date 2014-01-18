@@ -358,18 +358,7 @@ def generate(env, **kw):
 		env.Append(CPPPATH = [os.path.join(rootpath, 'src', 'stdc++')])
 
 	elif env['ARCHITECTURE'].startswith('hosted'):
-		if device == 'linux':
-			libs = ['boost_thread-mt', 'boost_system']
-			libpath = ['/usr/lib/']
-		else:
-			libs = []
-			libpath = []
-		env['CXXCOM'] = []
-		env['LINKCOM'] = []
-		env['LIBS'] = libs
-		env['LIBPATH'] = libpath
-		env['ENV'] = os.environ
-		
+		env['HOSTED_DEVICE'] = device
 		env.Tool('hosted')
 	elif env['ARCHITECTURE'] in ['arm7tdmi', 'cortex-m0', 'cortex-m3', 'cortex-m4', 'cortex-m4f']:
 		if env['ARCHITECTURE'] == 'cortex-m4f':

@@ -57,14 +57,17 @@ namespace xpcc
 		{
 		public:
 			/**
-			 * \param ignoreTipcPortId from this port all messages will be ignored
+			 * \param ignoreTipcPortId from this port all messages will be ignored, use this to ignore own transmitted messanges
 			 *
 			 * \see TransmitterSocket::getPortId
 			 */
 			Receiver(uint32_t ignoreTipcPortId);
 
 			~Receiver();
-			
+
+			void
+			setDomainId(unsigned int id);
+
 			void
 			addEventId(uint8_t id);
 			
@@ -107,7 +110,8 @@ namespace xpcc
 			update();
 			
 			ReceiverSocket tipcReceiverSocket_;
-			uint32_t ignoreTipcPortId_;	// the port ID from that all messages will be ignored
+			uint32_t ignoreTipcPortId_;	// the tipc port ID from that all messages will be ignored
+			unsigned int domainId_;
 			
 			std::queue<Payload>	packetQueue_;
 			
@@ -116,6 +120,7 @@ namespace xpcc
 			mutable Mutex packetQueueLock_;
 			
 			bool isAlive_;
+
 		};
 	}
 }

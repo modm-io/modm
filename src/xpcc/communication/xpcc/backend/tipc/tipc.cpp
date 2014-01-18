@@ -35,7 +35,6 @@
 
 // ----------------------------------------------------------------------------
 xpcc::TipcConnector::TipcConnector() :
-	transmitter(),
 	receiver(this->transmitter.getPortId())
 {
 }
@@ -43,6 +42,14 @@ xpcc::TipcConnector::TipcConnector() :
 // ----------------------------------------------------------------------------
 xpcc::TipcConnector::~TipcConnector()
 {
+}
+
+// ----------------------------------------------------------------------------
+void
+xpcc::TipcConnector::setDomainId(unsigned int domainId)
+{
+	this->transmitter.setDomainId( domainId );
+	this->receiver.setDomainId( domainId );
 }
 
 // ----------------------------------------------------------------------------

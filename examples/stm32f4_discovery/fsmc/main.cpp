@@ -52,7 +52,7 @@ MAIN_FUNCTION
 
 	fsmc::NorSram::enableRegion(fsmc::NorSram::CHIP_SELECT_1);
 
-	uint16_t * const out = reinterpret_cast<uint16_t*>(fsmc::NorSram::getRegionPointer(fsmc::NorSram::CHIP_SELECT_1));
+	volatile uint16_t * const out = fsmc::NorSram::getRegionPointer<uint16_t>(fsmc::NorSram::CHIP_SELECT_1);
 
 	LedOrange::setOutput(xpcc::Gpio::High);
 	LedGreen::setOutput(xpcc::Gpio::Low);

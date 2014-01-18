@@ -37,7 +37,7 @@
 
 // ----------------------------------------------------------------------------
 xpcc::tipc::Transmitter::Transmitter( ) :
-	tipcTransmitterSocket_()
+	domainId_( xpcc::tipc::Header::DOMAIN_ID_UNDEFINED )
 {
 }
 
@@ -47,6 +47,14 @@ xpcc::tipc::Transmitter::~Transmitter()
 }
 
 // ----------------------------------------------------------------------------
+void
+xpcc::tipc::Transmitter::setDomainId(unsigned int id)
+{
+	this->domainId_ = id;
+}
+
+
+// ----------------------------------------------------------------------------
 void 
 xpcc::tipc::Transmitter::transmitRequest( uint8_t destination, const SmartPointer& payload )
 {
@@ -54,7 +62,8 @@ xpcc::tipc::Transmitter::transmitRequest( uint8_t destination, const SmartPointe
 			REQUEST_OFFSET + destination + TYPE_ID_OFFSET,
 			0,
 			payload.getPointer(),
-			payload.getSize() );
+			payload.getSize(),
+			this->domainId_);
 }
 
 // ----------------------------------------------------------------------------
@@ -65,7 +74,8 @@ xpcc::tipc::Transmitter::transmitEvent( uint8_t event, const SmartPointer& paylo
 			EVENT_OFFSET + event + TYPE_ID_OFFSET,
 			0,
 			payload.getPointer(),
-			payload.getSize() );
+			payload.getSize(),
+			this->domainId_);
 }
 
 // ----------------------------------------------------------------------------

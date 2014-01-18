@@ -28,7 +28,6 @@
 // ----------------------------------------------------------------------------
 
 #include "tipc_transmitter_socket.hpp"
-#include "header.hpp"
 
 #include <sys/socket.h>
 #include <unistd.h> // close()
@@ -61,7 +60,8 @@ xpcc::tipc::TransmitterSocket::transmitPayload(
 		unsigned int typeId,
 		unsigned int instanceId,
 		const uint8_t* packet,
-		size_t length)
+		size_t length,
+		unsigned int domainId)
 {
 	int sendToResult	=	0;
 	
@@ -78,8 +78,7 @@ xpcc::tipc::TransmitterSocket::transmitPayload(
 
 
 	// In the following section the payload will be connected to the tipc-header
-	Header header;
-	header.size = length;
+	Header header(length, domainId);
 
 	// Allocate memory for whole packet (header plus payload)
 	xpcc::SmartPointer tipcPacketPointer ( sizeof(Header) + length );
@@ -95,11 +94,12 @@ xpcc::tipc::TransmitterSocket::transmitPayload(
 								(struct sockaddr*)&tipcToAddresse,
 								(size_t)sizeof(tipcToAddresse));
 
-//	XPCC_LOG_DEBUG << XPCC_FILE_INFO
-//			<< " tid=" << (int)typeId
-//			<< " iid=" << (int)instanceId
-//			<< " value=" << tipcPacketPointer;
-//	XPCC_LOG_DEBUG << xpcc::flush;
+	XPCC_LOG_DEBUG << XPCC_FILE_INFO
+			<< " tid=" << (int)typeId
+			<< " iid=" << (int)instanceId
+			<< " domain=" << (int)domainId
+			<< " value=" << tipcPacketPointer;
+	XPCC_LOG_DEBUG << xpcc::flush;
 
 	// Check if the sending failed
 	if (sendToResult < 0) {

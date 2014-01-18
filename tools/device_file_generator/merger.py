@@ -121,7 +121,8 @@ class DeviceMerger:
 		family = device.id.family
 		
 		if family == 'f0':
-			categories = [	['050', '051']  ]
+			categories = [	['050', '051'],
+							['030']  ]
 		elif family == 'f1':
 			categories = [	['100', '102', '101', '103'],
 							['105', '107']  ]
@@ -131,8 +132,9 @@ class DeviceMerger:
 			categories = [	['302', '303'],
 							['372', '373']  ]
 		elif family == 'f4':
-			categories = [	['405', '415', '407', '417'],
-							['427', '437']  ]
+			categories = [	['401'],
+							['405', '415', '407', '417'],
+							['427', '437', '429', '439']  ]
 			
 		# make sure that only one category is used!
 		for cat in categories:
@@ -383,7 +385,8 @@ class DeviceMerger:
 		elif family == 'f3':
 			categories = [	['8', 'b', 'c']  ]
 		elif family == 'f4':
-			categories = [	['e', 'g', 'i']  ]
+			categories = [	['c'],
+							['e', 'g', 'i']  ]
 		# make sure that only one category is used!
 		for cat in categories:
 			if size_ids[0] in cat:

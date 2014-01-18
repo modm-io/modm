@@ -60,6 +60,12 @@ namespace xpcc
 		~TipcConnector();
 		
 		/**
+		 * \brief	Change the domain id during runtime
+		 */
+		void
+		setDomainId(unsigned int domainId);
+
+		/**
 		 * \brief	Add a new event to receive
 		 * 
 		 * Call this method for every event you want to receive.
