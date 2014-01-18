@@ -60,7 +60,7 @@ class AVRDeviceReader(XMLDeviceReader):
 
 		if (architecture not in ['AVR8', 'AVR8L', 'AVR8_XMEGA']):
 			self.log.error("Sorry, only ATtiny, ATmega, ATxmega and AT90 targets can be parsed corretly.")
-			return None
+			exit()
 		
 		self.addProperty('define', '__AVR_' + self.name + '__')
 
