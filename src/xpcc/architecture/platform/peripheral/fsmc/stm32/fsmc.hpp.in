@@ -226,16 +226,14 @@ namespace xpcc
 				 * 
 				 * Each region is 64 MB in size.
 				 */
-				static inline void*
+				template<typename T>
+				static constexpr inline T*
 				getRegionPointer(Region region) {
-					void *ptr;
-					switch (region) {
-						case CHIP_SELECT_1: ptr = (void *)(0x60000000); break;
-						case CHIP_SELECT_2: ptr = (void *)(0x64000000); break;
-						case CHIP_SELECT_3: ptr = (void *)(0x68000000); break;
-						case CHIP_SELECT_4: ptr = (void *)(0x6C000000); break;
-					}
-					return ptr;
+					return 	(region == CHIP_SELECT_1)? (T *)(0x60000000) :
+							(region == CHIP_SELECT_2)? (T *)(0x64000000) :
+							(region == CHIP_SELECT_3)? (T *)(0x68000000) :
+							(region == CHIP_SELECT_4)? (T *)(0x6C000000) :
+															(0x00000000);
 				}
 			};
 			
