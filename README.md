@@ -31,6 +31,18 @@ Documentation
 The main documentation is created from doxygen files in the doc-folder. It can
 be found [online here] (http://xpcc.kreatives-chaos.com/api/).
 
+Development Model
+-------------------------------------------------------------------------------
+The new things we are working on are created on feature branches, and as
+soon as they compile, merged into the `develop` branch.
+We do annual releases on our `master` branch. They contain the code that has
+been tested on our robot for the past season.
+So if you want to have a somewhat stable and tested codebase and you are
+satisfied with the features it contains, we recommend you use one of our
+releases. On the other hand, if you want to use the most recent code
+(and don't mind us breaking APIs now and then), or if you want
+to develop for xpcc, you should use the `develop` branch.
+
 
 Folder structure
 -------------------------------------------------------------------------------
