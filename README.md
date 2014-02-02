@@ -115,14 +115,21 @@ How can I contribute?
 Use the library and give us some feedback. That's the easiest way for you and
 the best way for us to see if something is unclear or missing.
 
+There is a mailing list: [xpcc-dev](http://mailman.rwth-aachen.de/mailman/listinfo/xpcc-dev)
+
 If you need a specific feature just drop us a mail and we will look into it.
 But don't expect a quick response, we are always busy building robots ;-)
 
 If you want to change the library be sure to read the developer section, to
-familiarize yourself with the coding convention, design decisions etc. The
-source code is freely available, so feel free to adapt it to your needs. The only
-thing we ask you to do is to contribute your changes back. That way everybody
-can profit from it.
+familiarize yourself with
+[the](https://github.com/roboterclubaachen/xpcc-doc/blob/master/source/developer/coding_conventions.rst)
+[coding](https://github.com/roboterclubaachen/xpcc-doc/blob/master/source/developer/coding_conventions.cpp)
+[convention](https://github.com/roboterclubaachen/xpcc-doc/blob/master/source/developer/coding_conventions.hpp),
+[design decisions](https://github.com/roboterclubaachen/xpcc-doc/blob/master/source/developer/design_decisions.rst)
+etc.
+The source code is freely available, so feel free to adapt it to your needs.
+The only thing we ask you to do is to contribute your changes back.
+That way everybody can profit from it.
 
 Have fun!
 
