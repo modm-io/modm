@@ -31,6 +31,18 @@ Documentation
 The main documentation is created from doxygen files in the doc-folder. It can
 be found [online here] (http://xpcc.kreatives-chaos.com/api/).
 
+Development Model
+-------------------------------------------------------------------------------
+The new things we are working on are created on feature branches, and as
+soon as they compile, merged into the `develop` branch.
+We do annual releases on our `master` branch. They contain the code that has
+been tested on our robot for the past season.
+So if you want to have a somewhat stable and tested codebase and you are
+satisfied with the features it contains, we recommend you use one of our
+releases. On the other hand, if you want to use the most recent code
+(and don't mind us breaking APIs now and then), or if you want
+to develop for xpcc, you should use the `develop` branch.
+
 
 Folder structure
 -------------------------------------------------------------------------------
@@ -103,14 +115,21 @@ How can I contribute?
 Use the library and give us some feedback. That's the easiest way for you and
 the best way for us to see if something is unclear or missing.
 
+There is a mailing list: [xpcc-dev](http://mailman.rwth-aachen.de/mailman/listinfo/xpcc-dev)
+
 If you need a specific feature just drop us a mail and we will look into it.
 But don't expect a quick response, we are always busy building robots ;-)
 
 If you want to change the library be sure to read the developer section, to
-familiarize yourself with the coding convention, design decisions etc. The
-source code is freely available, so feel free to adapt it to your needs. The only
-thing we ask you to do is to contribute your changes back. That way everybody
-can profit from it.
+familiarize yourself with
+[the](https://github.com/roboterclubaachen/xpcc-doc/blob/master/source/developer/coding_conventions.rst)
+[coding](https://github.com/roboterclubaachen/xpcc-doc/blob/master/source/developer/coding_conventions.cpp)
+[convention](https://github.com/roboterclubaachen/xpcc-doc/blob/master/source/developer/coding_conventions.hpp),
+[design decisions](https://github.com/roboterclubaachen/xpcc-doc/blob/master/source/developer/design_decisions.rst)
+etc.
+The source code is freely available, so feel free to adapt it to your needs.
+The only thing we ask you to do is to contribute your changes back.
+That way everybody can profit from it.
 
 Have fun!
 
