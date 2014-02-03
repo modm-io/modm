@@ -85,7 +85,7 @@ if 'stm32f' in env['XPCC_DEVICE'] and not env['XPCC_DEVICE'].startswith('stm32f0
 	sourcePath += ['fatfs']			# FatFS
 
 if env['XPCC_DEVICE'].startswith('lpc11'):
-	sourcePath += ['lpc11xx/cmsis', 'lpc11xx/driver']
+	#sourcePath += ['lpc11xx/cmsis', 'lpc11xx/driver']
 	globalIncludes += [
 		'lpc11xx/cmsis']
 
