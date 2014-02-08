@@ -96,10 +96,10 @@ namespace xpcc
 			return c.getFront();
 		}
 		
-		inline bool
+		inline void
 		push(const T& value)
 		{
-			return c.append(value);
+			c.append(value);
 		}
 		
 		inline void
