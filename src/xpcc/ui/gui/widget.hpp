@@ -18,6 +18,7 @@ namespace gui {
 	public:
 
 		Widget() :
+			dimension(Dimension(0,0)),
 			activated(false),
 			cb_activate(NULL),
 			cb_deactivate(NULL),
@@ -26,10 +27,6 @@ namespace gui {
 		{
 			// assign unique id
 			uid = uid_global++;
-
-			// preliminary set the dimension to standard 100x30
-			width = 100;
-			height = 60;
 		}
 
 		virtual
@@ -73,13 +70,13 @@ namespace gui {
 		uint16_t
 		getWidth()
 		{
-			return this->width;
+			return this->dimension.width;
 		}
 
 		uint16_t
 		getHeight()
 		{
-			return this->height;
+			return this->dimension.height;
 		}
 
 	public:
@@ -87,7 +84,7 @@ namespace gui {
 		int16_t uid;
 
 		// dimensions
-		uint16_t width, height;
+		Dimension dimension;
 
 		// where this widget is active or not (e.g. clicked)
 		bool activated;
@@ -108,8 +105,17 @@ namespace gui {
 
 	public:
 
-		ButtonWidget(char* lbl) : label(lbl)
+		ButtonWidget(char* lbl, Dimension d) :
+			label(lbl)
 		{
+			this->dimension = d;
+		}
+
+		ButtonWidget(char* lbl, uint16_t width, uint16_t height) :
+			label(lbl)
+		{
+			this->dimension.width = width;
+			this->dimension.height = height;
 		}
 
 		void

@@ -342,8 +342,8 @@ MAIN_FUNCTION
 
 	xpcc::gui::View *myView = new xpcc::gui::View(&tft, colorpalette, &input_queue);
 
-	xpcc::gui::Widget *toggleLedButton = new xpcc::gui::ButtonWidget((char*)"Toggle Green");
-	xpcc::gui::Widget *doNothingButton = new xpcc::gui::ButtonWidget((char*)"Do nothing");
+	xpcc::gui::Widget *toggleLedButton = new xpcc::gui::ButtonWidget((char*)"Toggle Green", xpcc::gui::Dimension(100, 50));
+	xpcc::gui::Widget *doNothingButton = new xpcc::gui::ButtonWidget((char*)"Do nothing", xpcc::gui::Dimension(40, 40));
 
 
 	/*

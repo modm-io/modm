@@ -9,8 +9,6 @@ void xpcc::gui::ButtonWidget::draw(View* view)
 	if(view == NULL)
 		return;
 
-	int16_t x, y, width, height;
-
 	// output device of view
 	xpcc::GraphicDisplay *out = view->display;
 
@@ -18,10 +16,10 @@ void xpcc::gui::ButtonWidget::draw(View* view)
 	ColorPalette *cp = this->color_palette;
 
 	// position and dimensions
-	x = this->position.x;
-	y = this->position.y;
-	width	= this->getWidth();
-	height	= this->getHeight();
+	const uint16_t x = this->position.x;
+	const uint16_t y = this->position.y;
+	const uint16_t width = this->getWidth();
+	const uint16_t height = this->getHeight();
 
 	/*
 	 * choose color depending on button state
@@ -44,8 +42,12 @@ void xpcc::gui::ButtonWidget::draw(View* view)
 	 * draw button text
 	 * TODO: center text
 	 */
+
+	const uint16_t stringWidth = out->getStringWidth(this->label);
+	const uint16_t stringHeight = out->getFontHeight();
+
 	out->setColor(cp[Color::TEXT]);
-	out->setCursor(x + 5, y + (this->getHeight() / 2));
+	out->setCursor(x + (width - stringWidth) / 2, y + (height - stringHeight) / 2);
 	*out << this->label;
 
 }

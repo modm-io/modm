@@ -42,6 +42,11 @@ namespace gui {
 	// Callback when an event happend
 	typedef void (*eventCallback)(const InputEvent&, Widget*);
 
+	typedef struct Dimension {
+		Dimension(uint16_t w, uint16_t h) : width(w), height(h) {}
+		uint16_t width, height;
+	} Dimension;
+
 }
 }
 
