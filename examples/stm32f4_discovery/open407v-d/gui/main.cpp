@@ -1,6 +1,6 @@
 
 #include <xpcc/architecture.hpp>
-
+#include <xpcc/debug/logger.hpp>
 #include <xpcc/driver/ui/display/parallel_tft.hpp>
 #include <xpcc/driver/ui/display/tft_memory_bus.hpp>
 #include <xpcc/ui/display/image.hpp>
@@ -13,7 +13,40 @@
 #include "../../stm32f4_discovery.hpp"
 
 
+// ----------------------------------------------------------------------------
+/*
+ * Setup UART Logger
+ */
 
+// Set the log level
+#undef	XPCC_LOG_LEVEL
+#define	XPCC_LOG_LEVEL xpcc::log::DEBUG
+
+// Create an IODeviceWrapper around the Uart Peripheral we want to use
+xpcc::IODeviceWrapper< Usart2 > loggerDevice;
+
+// Set all four logger streams to use the UART
+xpcc::log::Logger xpcc::log::debug(loggerDevice);
+xpcc::log::Logger xpcc::log::info(loggerDevice);
+xpcc::log::Logger xpcc::log::warning(loggerDevice);
+xpcc::log::Logger xpcc::log::error(loggerDevice);
+
+
+void
+initLogger()
+{
+	GpioOutputA2::connect(Usart2::Tx);
+	GpioInputA3::connect(Usart2::Rx);
+	Usart2::initialize<defaultSystemClock, 115200>(12);
+
+	// Use the logging streams to print some messages.
+	// Change XPCC_LOG_LEVEL above to enable or disable these messages
+	XPCC_LOG_DEBUG   << "debug"   << xpcc::endl;
+	XPCC_LOG_INFO    << "info"    << xpcc::endl;
+	XPCC_LOG_WARNING << "warning" << xpcc::endl;
+	XPCC_LOG_ERROR   << "error"   << xpcc::endl;
+
+}
 
 // ----------------------------------------------------------------------------
 
@@ -157,29 +190,38 @@ drawCross(xpcc::GraphicDisplay& display, xpcc::glcd::Point center)
 }
 
 static void
-calibrateTouchscreen(xpcc::GraphicDisplay& display)
+calibrateTouchscreen(xpcc::GraphicDisplay& display, xpcc::glcd::Point *fixed_samples = NULL)
 {
 	xpcc::glcd::Point calibrationPoint[3] = { { 45, 45 }, { 270, 90 }, { 100, 190 } };
 	xpcc::glcd::Point sample[3];
 	
-	for (uint8_t i = 0; i < 3; i++)
-	{
-		display.clear();
-		
-		display.setColor(xpcc::glcd::Color::yellow());
-		display.setCursor(50, 5);
-		display << "Touch crosshair to calibrate";
-		
-		drawCross(display, calibrationPoint[i]);
-		xpcc::delay_ms(500);
-		
-		while (!ads7843.read(&sample[i])) {
-			// wait until a valid sample can be taken
+	XPCC_LOG_ERROR << "Hello from calibration" << xpcc::endl;
+
+	if(!fixed_samples) {
+		for (uint8_t i = 0; i < 3; i++)
+		{
+			display.clear();
+
+			display.setColor(xpcc::glcd::Color::yellow());
+			display.setCursor(50, 5);
+			display << "Touch crosshair to calibrate";
+
+			drawCross(display, calibrationPoint[i]);
+			xpcc::delay_ms(500);
+
+			while (!ads7843.read(&sample[i])) {
+				// wait until a valid sample can be taken
+			}
+
+			XPCC_LOG_DEBUG << "calibration point: (" << sample[i].x << " | " << sample[i].y << ")" << xpcc::endl;
 		}
+
+		touchscreen.calibrate(calibrationPoint, sample);
+
+	} else {
+		touchscreen.calibrate(calibrationPoint, fixed_samples);
 	}
-	
-	touchscreen.calibrate(calibrationPoint, sample);
-	
+
 	display.clear();
 }
 
@@ -311,6 +353,11 @@ xpcc::gui::ColorPalette colorpalette[xpcc::gui::Color::PALETTE_SIZE] = {
 
 };
 
+/*
+ * empirically found calibration points
+ */
+xpcc::glcd::Point calibration[] = {{3339, 3046},{931, 2428},{2740, 982}};
+
 // ----------------------------------------------------------------------------
 MAIN_FUNCTION
 {
@@ -323,12 +370,18 @@ MAIN_FUNCTION
 
 	Button::setInput();
 
+	initLogger();
 
 	initDisplay();
 	initTouchscreen();
 
-	calibrateTouchscreen(tft);
+	/*
+	 * calibrate touchscreen with already found calibration points
+	 */
+
+	calibrateTouchscreen(tft, calibration);
 	
+
 	/*
 	 * manipulate the color palette
 	 */
