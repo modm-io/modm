@@ -2,13 +2,19 @@
 # path to the xpcc root directory
 rootpath = '../../../..'
 
-env = Environment(tools = ['xpcc'], toolpath = [rootpath + '/scons/site_tools'])
+env = Environment(tools = ['xpcc', 'bitmap'], toolpath = [rootpath + '/scons/site_tools'])
 
 # find all source files
 files = env.FindFiles('.')
 
+# create cpp files from the images
+for image in Glob('images/*.pbm'):
+  files += env.Bitmap(image)
+
+
 # build the program
 program = env.Program(target = env['XPCC_CONFIG']['general']['name'], source = files.sources)
+
 
 # build the xpcc library
 env.XpccLibrary()

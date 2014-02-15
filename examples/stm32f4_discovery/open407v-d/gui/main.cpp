@@ -11,7 +11,7 @@
 #include "touchscreen_calibrator.hpp"
 
 #include "../../stm32f4_discovery.hpp"
-
+#include "images/bluetooth_12x16.hpp"
 
 // ----------------------------------------------------------------------------
 /*
@@ -38,14 +38,6 @@ initLogger()
 	GpioOutputA2::connect(Usart2::Tx);
 	GpioInputA3::connect(Usart2::Rx);
 	Usart2::initialize<defaultSystemClock, 115200>(12);
-
-	// Use the logging streams to print some messages.
-	// Change XPCC_LOG_LEVEL above to enable or disable these messages
-	XPCC_LOG_DEBUG   << "debug"   << xpcc::endl;
-	XPCC_LOG_INFO    << "info"    << xpcc::endl;
-	XPCC_LOG_WARNING << "warning" << xpcc::endl;
-	XPCC_LOG_ERROR   << "error"   << xpcc::endl;
-
 }
 
 // ----------------------------------------------------------------------------
@@ -195,8 +187,6 @@ calibrateTouchscreen(xpcc::GraphicDisplay& display, xpcc::glcd::Point *fixed_sam
 	xpcc::glcd::Point calibrationPoint[3] = { { 45, 45 }, { 270, 90 }, { 100, 190 } };
 	xpcc::glcd::Point sample[3];
 	
-	XPCC_LOG_ERROR << "Hello from calibration" << xpcc::endl;
-
 	if(!fixed_samples) {
 		for (uint8_t i = 0; i < 3; i++)
 		{
@@ -372,6 +362,8 @@ MAIN_FUNCTION
 
 	initLogger();
 
+	XPCC_LOG_DEBUG << "Hello from xpcc gui example!" << xpcc::endl;
+
 	initDisplay();
 	initTouchscreen();
 
@@ -393,25 +385,25 @@ MAIN_FUNCTION
 	 * Create a view and some widgets
 	 */
 
-	xpcc::gui::View *myView = new xpcc::gui::View(&tft, colorpalette, &input_queue);
+	xpcc::gui::View myView(&tft, colorpalette, &input_queue);
 
-	xpcc::gui::Widget *toggleLedButton = new xpcc::gui::ButtonWidget((char*)"Toggle Green", xpcc::gui::Dimension(100, 50));
-	xpcc::gui::Widget *doNothingButton = new xpcc::gui::ButtonWidget((char*)"Do nothing", xpcc::gui::Dimension(40, 40));
+	xpcc::gui::ButtonWidget toggleLedButton((char*)"Toggle Green", xpcc::gui::Dimension(100, 50));
+	xpcc::gui::ButtonWidget doNothingButton((char*)"Do nothing", xpcc::gui::Dimension(100, 50));
 
 
 	/*
 	 * connect callbacks to widgets
 	 */
 
-	toggleLedButton->cb_activate = &test_callback;
+	toggleLedButton.cb_activate = &test_callback;
 
 
 	/*
 	 * place widgets in view
 	 */
 
-	myView->pack(toggleLedButton, xpcc::glcd::Point(110, 40));
-	myView->pack(doNothingButton, xpcc::glcd::Point(110, 140));
+	myView.pack(&toggleLedButton, xpcc::glcd::Point(110, 40));
+	myView.pack(&doNothingButton, xpcc::glcd::Point(110, 140));
 
 
 	/*
@@ -420,7 +412,12 @@ MAIN_FUNCTION
 	while(true) {
 
 		gatherInput();
-		myView->run();
+		myView.run();
+
+		/*
+		 * display an arbitrary image
+		 */
+		tft.drawImage(xpcc::glcd::Point(304, 3),xpcc::accessor::asFlash(bitmap::bluetooth_12x16));
 
 	}
 
