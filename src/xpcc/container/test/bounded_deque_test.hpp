@@ -47,4 +47,8 @@ public:
 	
 	void
 	testConstIterator();
+
+	// Test if append() fails when the queue is full
+	void
+	testFull();
 };
