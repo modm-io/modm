@@ -1,0 +1,61 @@
+
+# path to the xpcc root directory
+rootpath = '../../..'
+
+# default target is 'stm'
+target = ARGUMENTS.get('target', 'stm')
+
+configfile = 'project_hosted.cfg'
+ignorePath = ['hardware/robot']
+
+
+env = Environment(tools = ['xpcc', 'bitmap'], toolpath = [rootpath + '/scons/site_tools'], configfile = configfile)
+
+
+# find all source files
+files = env.FindFiles('.')
+
+# create cpp files from the images
+for image in Glob('images/*.pbm'):
+  files += env.Bitmap(image)
+
+
+# build the program
+program = env.Program(target = env['XPCC_CONFIG']['general']['name'], source = files.sources)
+
+
+# build the xpcc library
+env.XpccLibrary()
+
+# create a file called 'defines.hpp' with all preprocessor defines if necessary
+env.Defines()
+
+env.Alias('size', env.Size(program))
+env.Alias('symbols', env.Symbols(program))
+env.Alias('defines', env.ShowDefines())
+
+dir(env)
+
+#if env.CheckArchitecture('hosted'):
+env.Alias('build', program)
+env.Alias('run', env.Run(program))
+env.Alias('all', ['build'])
+    #pass
+#elif env.CheckArchitecture('cortex'):
+#    hexfile = env.Hex(program)
+#    env.Alias('program', env.OpenOcd(program))
+#    env.Alias('build', [hexfile, env.Listing(program)])
+#    env.Alias('all', ['build', 'size'])
+env.Default('all')
+
+"""
+hexfile = env.Hex(program)
+
+env.Alias('program', env.OpenOcd(program))
+env.Alias('build', [hexfile, env.Listing(program)])
+env.Alias('all', ['build', 'size'])
+
+env.Default('all')
+"""
+env['CXXFLAGS'].append("-O0")	# no optimizations
+env['CXXFLAGS'].append("-g")	# include debug symbols
