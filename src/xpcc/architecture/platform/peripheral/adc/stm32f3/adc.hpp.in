@@ -204,13 +204,13 @@ public:
 	 * 		This parameter is only taken into account
 	 * 		if clk == ClockMode::Asynchronous.
 	 */
-	static void
+	static inline void
 	initialize(	const ClockMode clk = ClockMode::DoNotChange,
 				const Prescaler pre = Prescaler::Disabled,
 				const CalibrationMode cal = CalibrationMode::DoNotCalibrate,
 				const bool blocking = true);
 
-	static void inline
+	static inline void
 	disable(const bool blocking = true);
 
 	/**
@@ -318,7 +318,7 @@ public:
 		return ADC{{ id }}->DR;
 	}
 
-	static void
+	static inline void
 	enableInterruptVector(const uint32_t priority, const bool enable = true);
 
 	static inline void
