@@ -1,6 +1,7 @@
 #ifndef TYPES_HPP_
 #define TYPES_HPP_
 
+#include <xpcc/ui/display.hpp>
 #include <xpcc/container/dynamic_array.hpp>
 #include <xpcc/container/linked_list.hpp>
 #include <xpcc/container/queue.hpp>
