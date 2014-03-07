@@ -1,0 +1,177 @@
+// coding: utf-8
+/* Copyright (c) 2013, Roboterclub Aachen e.V.
+* All Rights Reserved.
+*
+* The file is part of the xpcc library and is released under the 3-clause BSD
+* license. See the file `LICENSE` for the full license governing this code.
+*/
+// ----------------------------------------------------------------------------
+
+#ifndef XPCC_STM32F3_DMA_BASE_HPP
+#define XPCC_STM32F3_DMA_BASE_HPP
+
+#include <stdint.h>
+#include "../../../type_ids.hpp"
+#include "../../../device.hpp"
+
+%% if target is stm32f4
+	%% set reg_prefix = "DMA_SxCR"
+%% elif target is stm32f3
+	%% set reg_prefix = "DMA_CCR"
+%% endif
+
+namespace xpcc
+{
+namespace stm32
+{
+/**
+ * DMA
+ *
+ * \author	Kevin Laeufer
+ * \ingroup	stm32
+ */
+class DmaBase
+{
+public:
+	// Enums
+%% if target is stm32f4
+	enum class
+	Channel : uint32_t
+	{
+		Channel0 = 0,
+		Channel1 = DMA_SxCR_CHSEL_0,
+		Channel2 = DMA_SxCR_CHSEL_1,
+		Channel3 = DMA_SxCR_CHSEL_1 | DMA_SxCR_CHSEL_0,
+		Channel4 = DMA_SxCR_CHSEL_2,
+		Channel5 = DMA_SxCR_CHSEL_2 | DMA_SxCR_CHSEL_0,
+		Channel6 = DMA_SxCR_CHSEL_2 | DMA_SxCR_CHSEL_1,
+		Channel7 = DMA_SxCR_CHSEL_2 | DMA_SxCR_CHSEL_1 | DMA_SxCR_CHSEL_0,
+	};
+
+	enum class
+	MemoryBurstTransfer : uint32_t
+	{
+		Single 		= 0,
+		Increment4 	= DMA_SxCR_MBURST_0,
+		Increment8 	= DMA_SxCR_MBURST_1,
+		Increment16 = DMA_SxCR_MBURST_1 | DMA_SxCR_MBURST_0,
+	};
+
+	enum class
+	PeripheralBurstTransfer : uint32_t
+	{
+		Single 		= 0,
+		Increment4 	= DMA_SxCR_PBURST_0,
+		Increment8 	= DMA_SxCR_PBURST_1,
+		Increment16 = DMA_SxCR_PBURST_1 | DMA_SxCR_PBURST_0,
+	};
+
+	enum class
+	FlowControl : uint32_t
+	{
+		Dma 		= 0,
+		Peripheral 	= DMA_SxCR_PFCTRL, ///< the peripheral is the flow controller
+	};
+%% endif
+
+	enum class
+	Priority : uint32_t
+	{
+		Low 		= 0,
+		Medium  	= {{ reg_prefix }}_PL_0,
+		High 		= {{ reg_prefix }}_PL_1,
+		VeryHigh 	= {{ reg_prefix }}_PL_1 | {{ reg_prefix }}_PL_0,
+	};
+
+	/// In direct mode (if the FIFO is not used)
+	/// MSIZE is forced by hardware to the same value as PSIZE
+	enum class
+	MemoryDataSize : uint32_t
+	{
+		Byte 		= 0,
+		Bit8 		= Byte,
+		HalfWord 	= {{ reg_prefix }}_MSIZE_0,
+		Bit16 		= HalfWord,
+		Word 		= {{ reg_prefix }}_MSIZE_1,
+		Bit32 		= Word,
+	};
+
+	enum class
+	PeripheralDataSize : uint32_t
+	{
+		Byte 		= 0,
+		Bit8 		= Byte,
+		HalfWord 	= {{ reg_prefix }}_PSIZE_0,
+		Bit16 		= HalfWord,
+		Word 		= {{ reg_prefix }}_PSIZE_1,
+		Bit32 		= Word,
+	};
+
+	enum class
+	MemoryIncrementMode : uint32_t
+	{
+		Fixed 		= 0,
+		Increment 	= {{ reg_prefix }}_MINC, ///< incremented according to MemoryDataSize
+	};
+
+	enum class
+	PeripheralIncrementMode : uint32_t
+	{
+		Fixed 		= 0,
+		Increment 	= {{ reg_prefix }}_PINC, ///< incremented according to PeripheralDataSize
+	};
+
+	enum class
+	DataTransferDirection : uint32_t
+	{
+%% if target is stm32f4
+		/// Source: DMA_SxPAR; Sink: DMA_SxM0AR
+		PeripheralToMemory 	= 0,
+		/// Source: DMA_SxM0AR; Sink: DMA_SxPAR
+		MemoryToPeripheral 	= DMA_SxCR_DIR_0,
+		/// Source: DMA_SxPAR; Sink: DMA_SxM0AR
+		MemoryToMemory 		= DMA_SxCR_DIR_1,
+%% elif target is stm32f3
+		/// Source: DMA_CPARx; Sink: DMA_CMARx
+		PeripheralToMemory 	= 0,
+		/// Source: DMA_CMARx; Sink: DMA_CPARx
+		MemoryToPeripheral 	= DMA_CCR_DIR,
+		/// Source: DMA_CPARx; Sink: DMA_CMARx
+		MemoryToMemory 		= DMA_CCR_MEM2MEM,
+%% endif
+	};
+
+protected:
+%% if target is stm32f4
+	static constexpr uint32_t memoryMask =
+			DMA_SxCR_MBURST_1 | DMA_SxCR_MBURST_0 |	// MemoryBurstTransfer
+			DMA_SxCR_MSIZE_0  | DMA_SxCR_MSIZE_1  |	// MemoryDataSize
+			DMA_SxCR_MINC                         |	// MemoryIncrementMode
+			DMA_SxCR_DIR_0    | DMA_SxCR_DIR_1;    	// DataTransferDirection
+	static constexpr uint32_t peripheralMask =
+			DMA_SxCR_PBURST_1 | DMA_SxCR_PBURST_0 |	// PeripheralBurstTransfer
+			DMA_SxCR_PSIZE_0  | DMA_SxCR_PSIZE_1  |	// PeripheralDataSize
+			DMA_SxCR_PINC                         |	// PeripheralIncrementMode
+			DMA_SxCR_DIR_0    | DMA_SxCR_DIR_1;    	// DataTransferDirection
+	static constexpr uint32_t configmask =
+			DMA_SxCR_CHSEL_2 | DMA_SxCR_CHSEL_1 | DMA_SxCR_CHSEL_0 |	// Channel
+			DMA_SxCR_PL_1    | DMA_SxCR_PL_0    |						// Priority
+			DMA_SxCR_PFCTRL;											// FlowControl
+%% elif target is stm32f3
+	static constexpr uint32_t memoryMask =
+			DMA_CCR_MSIZE_0  | DMA_CCR_MSIZE_1  |	// MemoryDataSize
+			DMA_CCR_MINC                        |	// MemoryIncrementMode
+			DMA_CCR_DIR      | DMA_CCR_MEM2MEM; 	// DataTransferDirection
+	static constexpr uint32_t peripheralMask =
+			DMA_CCR_PSIZE_0  | DMA_CCR_PSIZE_1  |	// PeripheralDataSize
+			DMA_CCR_PINC                        |	// PeripheralIncrementMode
+			DMA_CCR_DIR      | DMA_CCR_MEM2MEM;  	// DataTransferDirection
+	static constexpr uint32_t configmask =
+			DMA_CCR_PL_1 | DMA_CCR_PL_0;			// Priority
+%% endif
+
+};
+}
+}
+#endif	// XPCC_STM32F3_DMA_BASE_HPP
+

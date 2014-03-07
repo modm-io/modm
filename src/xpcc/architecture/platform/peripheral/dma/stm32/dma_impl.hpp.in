@@ -7,77 +7,116 @@
 */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_STM32_ADC{{ id }}_HPP
-#	error 	"Don't include this file directly, use 'adc_{{ id }}.hpp' instead!"
+#ifndef XPCC_STM32_DMA{{ id }}_HPP
+#	error 	"Don't include this file directly, use 'dma_{{ id }}.hpp' instead!"
 #endif
 
-
+%% if target is stm32f4
+	%% set streams = range(0,8)
+%% elif target is stm32f3
+	%% if id == 1
+		%% set streams = range(1,7)
+	%% elif id == 2
+		%% set streams = range(1,5)
+	%% endif
+%% endif
 
 void
 xpcc::stm32::Dma{{ id }}::enable()
 {
-	RCC->AHB1ENR |= RCC_AHB1ENR_DMA{{ id }}EN;
-	// reset DMA
+%% if target is stm32f4
+	RCC->AHB1ENR  |= RCC_AHB1ENR_DMA{{ id }}EN;
 	RCC->AHB1RSTR |=  RCC_AHB1RSTR_DMA{{ id }}RST;
 	RCC->AHB1RSTR &= ~RCC_AHB1RSTR_DMA{{ id }}RST;
+%% elif target is stm32f3
+	RCC->AHBENR  |= RCC_AHBENR_DMA{{ id }}EN;
+%% endif
 }
 
 void
 xpcc::stm32::Dma{{ id }}::disable()
 {
+%% if target is stm32f4
 	RCC->AHB1ENR &= ~RCC_AHB1ENR_DMA{{ id }}EN;
+%% elif target is stm32f3
+	RCC->AHBENR &= ~RCC_AHBENR_DMA{{ id }}EN;
+%% endif
+
 }
 
 
-%% for stream_id in range(0,8)
-%% set stream = "DMA" ~ id ~ "_Stream" ~ stream_id
+%% for stream_id in streams
+
+%% if target is stm32f4
+	%% set stream = "DMA" ~ id ~ "_Stream" ~ stream_id
+	%% set reg = stream ~ "->CR"
+	%% set mem = stream ~ "->M0AR"
+	%% set per = stream ~ "->PAR"
+	%% set length = stream ~ "->NDTR"
+	%% set prefix = "DMA_SxCR"
+%% elif target is stm32f3
+	%% set channel = "DMA" ~ id ~ "_Channel" ~ stream_id
+	%% set reg = channel ~ "->CCR"
+	%% set mem = channel ~ "->CMAR"
+	%% set per = channel ~ "->CPAR"
+	%% set length = channel ~ "->CNDTR"
+	%% set prefix = "DMA_CCR"
+%% endif
 
 %% set pointer_types = [8, 16, 32]
 %% for type in pointer_types
 void
 xpcc::stm32::Dma{{ id }}::Stream{{ stream_id }}::setMemorySource(uint{{type}}_t* address,
-	MemoryIncrementMode inc, MemoryBurstTransfer transfer)
+	MemoryIncrementMode inc
+%% if target is stm32f4
+, MemoryBurstTransfer transfer)
+%% else
+)
+%% endif
 {
 	//stop();
 	static constexpr MemoryDataSize size = MemoryDataSize::Bit{{type}};
-	static constexpr uint32_t mask =
-				DMA_SxCR_MBURST_1 | DMA_SxCR_MBURST_0 |	// MemoryBurstTransfer
-				DMA_SxCR_MSIZE_0  | DMA_SxCR_MSIZE_1  |	// MemoryDataSize
-				DMA_SxCR_MINC                         |	// MemoryIncrementMode
-				DMA_SxCR_DIR_0    | DMA_SxCR_DIR_1;    	// DataTransferDirection
 	// a memory source could mean that either a memory-to-peripheral or a
 	// memory-to-memory transfer is intended
 	// we'll use the current transfer mode to determine what to do
 	DataTransferDirection dir;
 	if(getDataTransferDirection() == DataTransferDirection::MemoryToPeripheral) {
 		dir = DataTransferDirection::MemoryToPeripheral;
-		{{ stream }}->M0AR = reinterpret_cast<uint32_t>(address);
+		{{ mem }} = reinterpret_cast<uint32_t>(address);
 
 	} else {
 		dir = DataTransferDirection::MemoryToMemory;
-		{{ stream }}->PAR = reinterpret_cast<uint32_t>(address);
+		{{ per }} = reinterpret_cast<uint32_t>(address);
 	}
-	{{ stream }}->CR = ({{ stream }}->CR & ~mask)
-		| static_cast<uint32_t>(transfer) | static_cast<uint32_t>(size)
+	{{ reg }} = ({{ reg }} & ~memoryMask) | static_cast<uint32_t>(size)
 		| static_cast<uint32_t>(inc)      | static_cast<uint32_t>(dir);
+%% if target is stm32f4
+		| static_cast<uint32_t>(transfer);
+%% else
+		;
+%% endif
 }
 
 void
 xpcc::stm32::Dma{{ id }}::Stream{{ stream_id }}::setPeripheralSource(uint{{type}}_t* address,
-	PeripheralIncrementMode inc, PeripheralBurstTransfer transfer)
+	PeripheralIncrementMode inc
+%% if target is stm32f4
+, PeripheralBurstTransfer transfer)
+%% else
+)
+%% endif
 {
 	//stop();
 	static constexpr PeripheralDataSize size = PeripheralDataSize::Bit{{type}};
-	static constexpr uint32_t mask =
-				DMA_SxCR_PBURST_1 | DMA_SxCR_PBURST_0 |	// PeripheralBurstTransfer
-				DMA_SxCR_PSIZE_0  | DMA_SxCR_PSIZE_1  |	// PeripheralDataSize
-				DMA_SxCR_PINC                         |	// PeripheralIncrementMode
-				DMA_SxCR_DIR_0    | DMA_SxCR_DIR_1;    	// DataTransferDirection
 	static constexpr DataTransferDirection dir = DataTransferDirection::PeripheralToMemory;
-	{{ stream }}->PAR = reinterpret_cast<uint32_t>(address);
-	{{ stream }}->CR = ({{ stream }}->CR & ~mask)
-		| static_cast<uint32_t>(transfer) | static_cast<uint32_t>(size)
-		| static_cast<uint32_t>(inc)      | static_cast<uint32_t>(dir);
+	{{ per }} = reinterpret_cast<uint32_t>(address);
+	{{ reg }} = ({{ reg }} & ~peripheralMask) | static_cast<uint32_t>(size)
+		| static_cast<uint32_t>(inc)          | static_cast<uint32_t>(dir);
+%% if target is stm32f4
+		| static_cast<uint32_t>(transfer);
+%% else
+		;
+%% endif
 }
 %% endfor
 
@@ -85,90 +124,122 @@ xpcc::stm32::Dma{{ id }}::Stream{{ stream_id }}::setPeripheralSource(uint{{type}
 
 void
 xpcc::stm32::Dma{{ id }}::Stream{{ stream_id }}::setMemoryDestination(uint{{type}}_t* address,
-	MemoryIncrementMode inc, MemoryBurstTransfer transfer)
+	MemoryIncrementMode inc
+%% if target is stm32f4
+, MemoryBurstTransfer transfer)
+%% else
+)
+%% endif
 {
 	//stop();
 	static constexpr MemoryDataSize size = MemoryDataSize::Bit{{type}};
-	static constexpr uint32_t mask =
-				DMA_SxCR_MBURST_1 | DMA_SxCR_MBURST_0 |	// MemoryBurstTransfer
-				DMA_SxCR_MSIZE_0  | DMA_SxCR_MSIZE_1  |	// MemoryDataSize
-				DMA_SxCR_MINC                         |	// MemoryIncrementMode
-				DMA_SxCR_DIR_0    | DMA_SxCR_DIR_1;    	// DataTransferDirection
 	// a memory source could mean that either a memory-to-peripheral or a
 	// memory-to-memory transfer is intended
 	// we'll use the current transfer mode to determine what to do
 	DataTransferDirection dir;
 	if(getDataTransferDirection() == DataTransferDirection::PeripheralToMemory) {
 		dir = DataTransferDirection::PeripheralToMemory;
-		{{ stream }}->M0AR = reinterpret_cast<uint32_t>(address);
+		{{ mem }} = reinterpret_cast<uint32_t>(address);
 	} else {
 		dir = DataTransferDirection::MemoryToMemory;
-		{{ stream }}->M0AR = reinterpret_cast<uint32_t>(address);
+		{{ mem }} = reinterpret_cast<uint32_t>(address);
 	}
-	{{ stream }}->CR = ({{ stream }}->CR & ~mask)
-		| static_cast<uint32_t>(transfer) | static_cast<uint32_t>(size)
+	{{ reg }} = ({{ reg }} & ~memoryMask) | static_cast<uint32_t>(size)
 		| static_cast<uint32_t>(inc)      | static_cast<uint32_t>(dir);
+%% if target is stm32f4
+		| static_cast<uint32_t>(transfer);
+%% else
+		;
+%% endif
 }
 
 
 void
 xpcc::stm32::Dma{{ id }}::Stream{{ stream_id }}::setPeripheralDestination(uint{{type}}_t* address,
-	PeripheralIncrementMode inc, PeripheralBurstTransfer transfer)
+	PeripheralIncrementMode inc
+%% if target is stm32f4
+, PeripheralBurstTransfer transfer)
+%% else
+)
+%% endif
 {
 	//stop();
 	static constexpr PeripheralDataSize size = PeripheralDataSize::Bit{{type}};
-	static constexpr uint32_t mask =
-				DMA_SxCR_PBURST_1 | DMA_SxCR_PBURST_0 |	// PeripheralBurstTransfer
-				DMA_SxCR_PSIZE_0  | DMA_SxCR_PSIZE_1  |	// PeripheralDataSize
-				DMA_SxCR_PINC                         |	// PeripheralIncrementMode
-				DMA_SxCR_DIR_0    | DMA_SxCR_DIR_1;    	// DataTransferDirection
 	static constexpr DataTransferDirection dir = DataTransferDirection::MemoryToPeripheral;
-	{{ stream }}->PAR = reinterpret_cast<uint32_t>(address);
-	{{ stream }}->CR = ({{ stream }}->CR & ~mask)
-		| static_cast<uint32_t>(transfer) | static_cast<uint32_t>(size)
-		| static_cast<uint32_t>(inc)      | static_cast<uint32_t>(dir);
+	{{ per }} = reinterpret_cast<uint32_t>(address);
+	{{ reg }} = ({{ reg }} & ~peripheralMask) | static_cast<uint32_t>(size)
+		| static_cast<uint32_t>(inc)          | static_cast<uint32_t>(dir);
+%% if target is stm32f4
+		| static_cast<uint32_t>(transfer);
+%% else
+		;
+%% endif
 }
 %% endfor
 
 void
 xpcc::stm32::Dma{{ id }}::Stream{{ stream_id }}::stop()
 {
-	{{ stream }}->CR &= ~DMA_SxCR_EN;
-	while({{ stream }}->CR & DMA_SxCR_EN); // wait for stream to be stopped
+%% if target is stm32f4
+	{{ reg }} &= ~DMA_SxCR_EN;
+	while({{ reg }} & DMA_SxCR_EN); // wait for stream to be stopped
+%% else
+	{{ reg }} &= ~DMA_CCR_EN;
+	while({{ reg }} & DMA_CCR_EN); // wait for stream to be stopped
+%% endif
 }
 
 void
-xpcc::stm32::Dma{{ id }}::Stream{{ stream_id }}::configure(Channel channel,
-	uint16_t sample_length, Priority priority, FlowControl flow)
+xpcc::stm32::Dma{{ id }}::Stream{{ stream_id }}::configure(
+%% if target is stm32f4
+	Channel channel,
+%% endif
+	uint16_t sample_length, Priority priority
+%% if target is stm32f4
+	, FlowControl flow)
+%% elif target is stm32f3
+	)
+%% endif
 {
 	//stop();
-	static constexpr uint32_t mask =
-		DMA_SxCR_CHSEL_2 | DMA_SxCR_CHSEL_1 | DMA_SxCR_CHSEL_0 |	// Channel
-		DMA_SxCR_PL_1    | DMA_SxCR_PL_0 |							// Priority
-		DMA_SxCR_PFCTRL;											// FlowControl
-	{{ stream }}->CR = ({{ stream }}->CR & ~mask)
-		| static_cast<uint32_t>(channel) | static_cast<uint32_t>(priority)
-		| static_cast<uint32_t>(flow);
-	{{ stream }}->NDTR = sample_length;
+	{{ reg }} = ({{ reg }} & ~configmask) | static_cast<uint32_t>(priority)
+%% if target is stm32f4
+		| static_cast<uint32_t>(channel) | static_cast<uint32_t>(flow);
+%% else
+		;
+%% endif
+	{{ length }} = sample_length;
 }
 
 void
 xpcc::stm32::Dma{{ id }}::Stream{{ stream_id }}::start()
 {
-	{{ stream }}->CR |= DMA_SxCR_EN;
+%% if target is stm32f4
+	{{ reg }} |= DMA_SxCR_EN;
+%% else
+	{{ reg }} |= DMA_CCR_EN;
+%% endif
 }
 
 bool
 xpcc::stm32::Dma{{ id }}::Stream{{ stream_id }}::isFinished()
 {
-	return !({{ stream }}->CR & DMA_SxCR_EN);
+%% if target is stm32f4
+	return !({{ reg }} & DMA_SxCR_EN);
+%% else
+	return !({{ reg }} & DMA_CCR_EN);
+%% endif
 }
 
 xpcc::stm32::Dma{{ id }}::Stream{{ stream_id }}::DataTransferDirection
 xpcc::stm32::Dma{{ id }}::Stream{{ stream_id }}::getDataTransferDirection()
 {
 	return static_cast<DataTransferDirection>(
-		{{ stream }}->CR & (DMA_SxCR_DIR_0 | DMA_SxCR_DIR_1));
+%% if target is stm32f4
+		{{ reg }} & (DMA_SxCR_DIR_0 | DMA_SxCR_DIR_1));
+%% else
+		{{ reg }} & (DMA_CCR_MEM2MEM | DMA_CCR_DIR));
+%% endif
 }
 
 %% endfor

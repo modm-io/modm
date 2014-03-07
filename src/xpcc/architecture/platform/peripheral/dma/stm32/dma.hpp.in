@@ -7,12 +7,22 @@
 */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_STM32F3_DMA{{ id }}_HPP
-#define XPCC_STM32F3_DMA{{ id }}_HPP
+#ifndef XPCC_STM32_DMA{{ id }}_HPP
+#define XPCC_STM32_DMA{{ id }}_HPP
 
 #include <stdint.h>
 #include "../../../type_ids.hpp"
 #include "../../../device.hpp"
+
+%% if target is stm32f4
+	%% set streams = range(0,8)
+%% elif target is stm32f3
+	%% if id == 1
+		%% set streams = range(1,7)
+	%% elif id == 2
+		%% set streams = range(1,5)
+	%% endif
+%% endif
 
 namespace xpcc
 {
@@ -37,7 +47,7 @@ public:
 
 
 public:
-%% for stream in range(0,8)
+%% for stream in streams
 	class Stream{{ stream }} : public DmaBase
 	{
 	public:
@@ -46,28 +56,44 @@ public:
 		/// will disable the stream
 		static inline void
 		setMemorySource(uint{{type}}_t* address,
-			MemoryIncrementMode inc = MemoryIncrementMode::Increment,
-			MemoryBurstTransfer transfer = MemoryBurstTransfer::Single);
+			MemoryIncrementMode inc = MemoryIncrementMode::Increment
+		%% if target is stm32f4
+			, MemoryBurstTransfer transfer = MemoryBurstTransfer::Single);
+		%% elif target is stm32f3
+			);
+		%% endif
 
 		/// will disable the stream
 		static inline void
 		setPeripheralSource(uint{{type}}_t* address,
-			PeripheralIncrementMode inc = PeripheralIncrementMode::Fixed,
-			PeripheralBurstTransfer transfer = PeripheralBurstTransfer::Single);
+			PeripheralIncrementMode inc = PeripheralIncrementMode::Fixed
+		%% if target is stm32f4
+			, PeripheralBurstTransfer transfer = PeripheralBurstTransfer::Single);
+		%% elif target is stm32f3
+			);
+		%% endif
 	%% endfor
 
 	%% for type in pointer_types
 		/// will disable the stream
 		static inline void
 		setMemoryDestination(uint{{type}}_t* address,
-			MemoryIncrementMode inc = MemoryIncrementMode::Increment,
-			MemoryBurstTransfer transfer = MemoryBurstTransfer::Single);
+			MemoryIncrementMode inc = MemoryIncrementMode::Increment
+		%% if target is stm32f4
+			, MemoryBurstTransfer transfer = MemoryBurstTransfer::Single);
+		%% elif target is stm32f3
+			);
+		%% endif
 
 		/// will disable the stream
 		static inline void
 		setPeripheralDestination(uint{{type}}_t* address,
-			PeripheralIncrementMode inc = PeripheralIncrementMode::Fixed,
-			PeripheralBurstTransfer transfer = PeripheralBurstTransfer::Single);
+			PeripheralIncrementMode inc = PeripheralIncrementMode::Fixed
+		%% if target is stm32f4
+			, PeripheralBurstTransfer transfer = PeripheralBurstTransfer::Single);
+		%% elif target is stm32f3
+			);
+		%% endif
 	%% endfor
 
 		static inline void
@@ -75,8 +101,17 @@ public:
 
 		/// will disable the stream
 		static inline void
-		configure(Channel channel, uint16_t sample_length,
-			Priority priority = Priority::Medium, FlowControl flow = FlowControl::Dma);
+		configure(
+		%% if target is stm32f4
+			Channel channel,
+		%% endif
+			uint16_t sample_length,
+			Priority priority = Priority::Medium
+		%% if target is stm32f4
+			, FlowControl flow = FlowControl::Dma);
+		%% elif target is stm32f3
+			);
+		%% endif
 
 		static inline void
 		start();
@@ -94,5 +129,5 @@ public:
 
 #include "dma_{{ id }}_impl.hpp"
 
-#endif	// XPCC_STM32F3_DMA{{ id }}_HPP
+#endif	// XPCC_STM32_DMA{{ id }}_HPP
 

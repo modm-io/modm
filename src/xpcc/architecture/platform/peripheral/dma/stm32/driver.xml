@@ -2,7 +2,7 @@
 <!DOCTYPE rca SYSTEM "../../xml/driver.dtd">
 <rca version="1.0">
 	<driver type="dma" name="stm32">
-		<static>dma_base.hpp</static>
+		<template>dma_base.hpp.in</template>
 		<template instances="1,2" out="dma_{{id}}.hpp">dma.hpp.in</template>
 		<template instances="1,2" out="dma_{{id}}_impl.hpp">dma_impl.hpp.in</template>
 		<static>type_ids.hpp</static>
