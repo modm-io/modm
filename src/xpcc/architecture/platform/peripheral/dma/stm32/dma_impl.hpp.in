@@ -217,6 +217,11 @@ xpcc::stm32::Dma{{ id }}::Stream{{ stream_id }}::start()
 %% if target is stm32f4
 	{{ reg }} |= DMA_SxCR_EN;
 %% else
+	// clear interrupt flags
+	DMA{{ id }}->ISR |= DMA_ISR_TEIF{{ stream_id }} |
+						DMA_ISR_TCIF{{ stream_id }} |
+						DMA_ISR_HTIF{{ stream_id }} |
+						DMA_ISR_GIF{{ stream_id }};
 	{{ reg }} |= DMA_CCR_EN;
 %% endif
 }
@@ -227,7 +232,7 @@ xpcc::stm32::Dma{{ id }}::Stream{{ stream_id }}::isFinished()
 %% if target is stm32f4
 	return !({{ reg }} & DMA_SxCR_EN);
 %% else
-	return !({{ reg }} & DMA_CCR_EN);
+	return (DMA{{ id }}->ISR & DMA_ISR_TCIF{{ stream_id }});
 %% endif
 }
 
