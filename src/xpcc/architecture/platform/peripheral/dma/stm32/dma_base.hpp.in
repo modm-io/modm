@@ -122,6 +122,13 @@ public:
 	};
 
 	enum class
+	CircularMode : uint32_t
+	{
+		Disabled 	= 0,
+		Enabled 	= {{ reg_prefix }}_CIRC, ///< circular mode
+	};
+
+	enum class
 	DataTransferDirection : uint32_t
 	{
 %% if target is stm32f4
@@ -156,6 +163,7 @@ protected:
 	static constexpr uint32_t configmask =
 			DMA_SxCR_CHSEL_2 | DMA_SxCR_CHSEL_1 | DMA_SxCR_CHSEL_0 |	// Channel
 			DMA_SxCR_PL_1    | DMA_SxCR_PL_0    |						// Priority
+			DMA_SxCR_CIRC    |											// CircularMode
 			DMA_SxCR_PFCTRL;											// FlowControl
 %% elif target is stm32f3
 	static constexpr uint32_t memoryMask =
@@ -167,7 +175,8 @@ protected:
 			DMA_CCR_PINC                        |	// PeripheralIncrementMode
 			DMA_CCR_DIR      | DMA_CCR_MEM2MEM;  	// DataTransferDirection
 	static constexpr uint32_t configmask =
-			DMA_CCR_PL_1 | DMA_CCR_PL_0;			// Priority
+			DMA_CCR_CIRC     |						// CircularMode
+			DMA_CCR_PL_1     | DMA_CCR_PL_0;		// Priority
 %% endif
 
 };

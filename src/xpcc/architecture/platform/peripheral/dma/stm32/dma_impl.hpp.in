@@ -89,7 +89,7 @@ xpcc::stm32::Dma{{ id }}::Stream{{ stream_id }}::setMemorySource(uint{{type}}_t*
 		{{ per }} = reinterpret_cast<uint32_t>(address);
 	}
 	{{ reg }} = ({{ reg }} & ~memoryMask) | static_cast<uint32_t>(size)
-		| static_cast<uint32_t>(inc)      | static_cast<uint32_t>(dir);
+		| static_cast<uint32_t>(inc)      | static_cast<uint32_t>(dir)
 %% if target is stm32f4
 		| static_cast<uint32_t>(transfer);
 %% else
@@ -111,7 +111,7 @@ xpcc::stm32::Dma{{ id }}::Stream{{ stream_id }}::setPeripheralSource(uint{{type}
 	static constexpr DataTransferDirection dir = DataTransferDirection::PeripheralToMemory;
 	{{ per }} = reinterpret_cast<uint32_t>(address);
 	{{ reg }} = ({{ reg }} & ~peripheralMask) | static_cast<uint32_t>(size)
-		| static_cast<uint32_t>(inc)          | static_cast<uint32_t>(dir);
+		| static_cast<uint32_t>(inc)          | static_cast<uint32_t>(dir)
 %% if target is stm32f4
 		| static_cast<uint32_t>(transfer);
 %% else
@@ -145,7 +145,7 @@ xpcc::stm32::Dma{{ id }}::Stream{{ stream_id }}::setMemoryDestination(uint{{type
 		{{ mem }} = reinterpret_cast<uint32_t>(address);
 	}
 	{{ reg }} = ({{ reg }} & ~memoryMask) | static_cast<uint32_t>(size)
-		| static_cast<uint32_t>(inc)      | static_cast<uint32_t>(dir);
+		| static_cast<uint32_t>(inc)      | static_cast<uint32_t>(dir)
 %% if target is stm32f4
 		| static_cast<uint32_t>(transfer);
 %% else
@@ -165,10 +165,17 @@ xpcc::stm32::Dma{{ id }}::Stream{{ stream_id }}::setPeripheralDestination(uint{{
 {
 	//stop();
 	static constexpr PeripheralDataSize size = PeripheralDataSize::Bit{{type}};
+	// if memory-to-memory mode was selected, the memory source
+	// will have been saved in the Peripheral Register
+	// in memory-to-peripheral mode, the memory source will
+	// need to be saved in the Memory Register
+	if(getDataTransferDirection() == DataTransferDirection::MemoryToMemory) {
+		{{ mem }} = {{ per }};
+	}
 	static constexpr DataTransferDirection dir = DataTransferDirection::MemoryToPeripheral;
 	{{ per }} = reinterpret_cast<uint32_t>(address);
 	{{ reg }} = ({{ reg }} & ~peripheralMask) | static_cast<uint32_t>(size)
-		| static_cast<uint32_t>(inc)          | static_cast<uint32_t>(dir);
+		| static_cast<uint32_t>(inc)          | static_cast<uint32_t>(dir)
 %% if target is stm32f4
 		| static_cast<uint32_t>(transfer);
 %% else
@@ -194,7 +201,7 @@ xpcc::stm32::Dma{{ id }}::Stream{{ stream_id }}::configure(
 %% if target is stm32f4
 	Channel channel,
 %% endif
-	uint16_t sample_length, Priority priority
+	uint16_t sample_length, Priority priority, CircularMode circular
 %% if target is stm32f4
 	, FlowControl flow)
 %% elif target is stm32f3
@@ -203,6 +210,7 @@ xpcc::stm32::Dma{{ id }}::Stream{{ stream_id }}::configure(
 {
 	//stop();
 	{{ reg }} = ({{ reg }} & ~configmask) | static_cast<uint32_t>(priority)
+										  | static_cast<uint32_t>(circular)
 %% if target is stm32f4
 		| static_cast<uint32_t>(channel) | static_cast<uint32_t>(flow);
 %% else

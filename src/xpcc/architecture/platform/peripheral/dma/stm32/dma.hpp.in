@@ -106,7 +106,8 @@ public:
 			Channel channel,
 		%% endif
 			uint16_t sample_length,
-			Priority priority = Priority::Medium
+			Priority priority = Priority::Medium,
+			CircularMode circular = CircularMode::Disabled
 		%% if target is stm32f4
 			, FlowControl flow = FlowControl::Dma);
 		%% elif target is stm32f3
