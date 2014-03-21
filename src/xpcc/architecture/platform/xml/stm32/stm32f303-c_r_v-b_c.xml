@@ -24,6 +24,7 @@
     <driver type="can" name="stm32"   instances="1"/>
     <driver type="clock" name="stm32"/>
     <driver type="dac" name="stm32"/>
+    <driver type="dma" name="stm32" instances="1,2"/>
     <driver type="i2c" name="stm32" instances="1,2"/>
     <driver type="spi" name="stm32" instances="1,2,3"/>
     <driver type="spi" name="stm32_uart" instances="1,2,3,4,5"/>
