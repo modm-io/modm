@@ -1,5 +1,5 @@
 #include <xpcc/architecture.hpp>
-#include "../stm32f3_discovery.hpp"
+#include "../../stm32f3_discovery.hpp"
 
 MAIN_FUNCTION
 {
