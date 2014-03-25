@@ -359,7 +359,7 @@ public:
 		setAlternateFunction(AlternateFunction::AF_{{ af.id }});
 				%% endif
 	}
-				%% if af.type in ['', 'out'] and type != "Input"
+				%% if af.type|string in ['', 'out'] and type != "Input"
 	/// Connect {{name}} as {{af.name}} to {{af.peripheral}}.
 	ALWAYS_INLINE static void
 	connect(TypeId::{{ af.peripheral }}{{ af.name }} /* t */,
@@ -368,7 +368,7 @@ public:
 		setAlternateFunction(AlternateFunction::AF_{{ af.id }});
 	}
 				%% endif
-				%% if af.type in ['', 'in'] and type != "Output"
+				%% if af.type|string in ['', 'in'] and type != "Output"
 	/// Connect {{name}} as {{af.name}} to {{af.peripheral}}.
 	ALWAYS_INLINE static void
 	connect(TypeId::{{ af.peripheral }}{{ af.name }} /* t */, InputType type) {
