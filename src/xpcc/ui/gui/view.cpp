@@ -8,7 +8,7 @@ xpcc::gui::View::pack(Widget *w, const xpcc::glcd::Point &coord)
 		return false;
 
 	w->setPosition(coord);
-	w->color_palette = this->color_palette;
+	w->setColorPalette(this->color_palette);
 
 	this->widgets.append(w);
 
@@ -47,9 +47,11 @@ xpcc::gui::View::run()
 			if((position.x < ev.coord.x) && ((position.x + (*it)->getWidth())  > ev.coord.x) &&
 			   (position.y < ev.coord.y) && ((position.y + (*it)->getHeight()) > ev.coord.y))
 			{
-				(*it)->activate(ev);
-			} else {
-				(*it)->deactivate(ev);
+				if(ev.direction == xpcc::gui::InputEvent::Direction::DOWN) {
+					(*it)->activate(ev, NULL);
+				} else if(ev.direction == xpcc::gui::InputEvent::Direction::UP) {
+					(*it)->deactivate(ev, NULL);
+				}
 			}
 		}
 

@@ -33,6 +33,7 @@ namespace gui {
 		};
 
 		Type type;
+		Direction direction;
 
 		xpcc::glcd::Point coord;
 	};
@@ -41,7 +42,7 @@ namespace gui {
 
 
 	// Callback when an event happend
-	typedef void (*eventCallback)(const InputEvent&, Widget*);
+	typedef void (*eventCallback)(const InputEvent&, Widget*, void*);
 
 	typedef struct Dimension {
 		Dimension(uint16_t w, uint16_t h) : width(w), height(h) {}

@@ -129,7 +129,22 @@ pollSDL()
 				xpcc::gui::InputEvent in_ev;
 
 				in_ev.type = xpcc::gui::InputEvent::Type::TOUCH;
-				//in_ev.direction = InputEvent::Direction::DOWN;
+				in_ev.direction = xpcc::gui::InputEvent::Direction::DOWN;
+
+				in_ev.coord = xpcc::glcd::Point(event.button.x, event.button.y);
+				//in_ev.x = point.x;
+				//in_ev.y = point.y;
+
+				input_queue.push(in_ev);
+				break;
+			}
+
+			case SDL_MOUSEBUTTONUP:
+			{
+				xpcc::gui::InputEvent in_ev;
+
+				in_ev.type = xpcc::gui::InputEvent::Type::TOUCH;
+				in_ev.direction = xpcc::gui::InputEvent::Direction::UP;
 
 				in_ev.coord = xpcc::glcd::Point(event.button.x, event.button.y);
 				//in_ev.x = point.x;
@@ -227,7 +242,7 @@ gatherInput()
 // ----------------------------------------------------------------------------
 
 void
-test_callback(const xpcc::gui::InputEvent& ev, xpcc::gui::Widget* w)
+test_callback(const xpcc::gui::InputEvent& ev, xpcc::gui::Widget* w, void* data)
 {
 	// avoid warnings
 	(void) ev;
@@ -284,6 +299,9 @@ MAIN_FUNCTION
 	xpcc::gui::ButtonWidget toggleLedButton((char*)"Toggle Green", xpcc::gui::Dimension(100, 50));
 	xpcc::gui::ButtonWidget doNothingButton((char*)"Do nothing", xpcc::gui::Dimension(100, 50));
 
+	xpcc::gui::IntegerRocker rocker1(100, 50, xpcc::gui::Dimension(200, 30));
+
+
 
 	/*
 	 * connect callbacks to widgets
@@ -296,9 +314,9 @@ MAIN_FUNCTION
 	 * place widgets in view
 	 */
 
-	myView.pack(&toggleLedButton, xpcc::glcd::Point(110, 40));
-	myView.pack(&doNothingButton, xpcc::glcd::Point(110, 140));
-
+	myView.pack(&toggleLedButton, xpcc::glcd::Point(110, 10));
+	myView.pack(&doNothingButton, xpcc::glcd::Point(110, 80));
+	myView.pack(&rocker1, xpcc::glcd::Point(60, 200));
 
 	//display->setBackgroundColor(xpcc::glcd::Color::green());
 	//display->setColor(xpcc::glcd::Color::blue());
