@@ -253,7 +253,7 @@ xpcc::stm32::{{ name }}::getInterruptFlags()
 }
 
 void
-xpcc::stm32::{{ name }}::resetInterruptFlags(InterruptFlag flags)
+xpcc::stm32::{{ name }}::acknowledgeInterruptFlags(InterruptFlag flags)
 {
 %% if target is stm32f0 or target is stm32f3
 	// Not all flags can be cleared by writing to this reg
