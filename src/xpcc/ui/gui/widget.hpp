@@ -229,7 +229,7 @@ namespace gui {
 	private:
 		int16_t value;
 		int16_t step;
-		ArrowButton button_decrease, button_increase;
+		ArrowButton button_increase, button_decrease;
 		IntegerField int_field;
 
 	};
