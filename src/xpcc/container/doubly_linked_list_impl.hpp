@@ -209,3 +209,29 @@ xpcc::DoublyLinkedList<T, Allocator>::end() const
 {
 	return const_iterator(0);
 }
+
+template <typename T, typename Allocator>
+typename xpcc::DoublyLinkedList<T, Allocator>::iterator
+xpcc::DoublyLinkedList<T, Allocator>::erase(iterator position)
+{
+
+	if(position.node->previous == 0) {
+		this->removeFront();
+		return this->begin();
+	}
+
+	if(position.node->next == 0) {
+		this->removeBack();
+		return this->end();
+	}
+
+	position.node->previous->next = position.node->next;
+
+	Node* next = position.node->next;
+
+	Allocator::destroy(&(position.node->value));
+	this->nodeAllocator.deallocate(position.node);
+
+	return iterator(next);
+
+}

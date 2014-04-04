@@ -5,6 +5,9 @@
 #include <xpcc/driver/ui/display/tft_memory_bus.hpp>
 #include <xpcc/ui/display/image.hpp>
 #include <xpcc/driver/ui/touchscreen/ads7843.hpp>
+#include <xpcc/processing.hpp>
+#include <xpcc/container.hpp>
+#include <xpcc/utils/allocator.hpp>
 
 #include <xpcc/ui/gui.hpp>
 
@@ -69,6 +72,7 @@ constexpr uint8_t TP_TOLERANCE = 30;
 
 xpcc::gui::inputQueue input_queue;
 xpcc::glcd::Point last_point;
+xpcc::DoublyLinkedList<xpcc::gui::AsyncEvent*> async_events;
 
 // ----------------------------------------------------------------------------
 // Touchscreen
@@ -166,7 +170,7 @@ drawCross(xpcc::GraphicDisplay& display, xpcc::glcd::Point center)
 	display.drawLine(center.x + 2, center.y, center.x + 15, center.y);
 	display.drawLine(center.x, center.y - 15, center.x, center.y - 2);
 	display.drawLine(center.x, center.y + 2, center.x, center.y + 15);
-
+	typedef void (*genericCallback)(void*);
 	display.setColor(xpcc::glcd::Color::white());
 	display.drawLine(center.x - 15, center.y + 15, center.x - 7, center.y + 15);
 	display.drawLine(center.x - 15, center.y + 7, center.x - 15, center.y + 15);
@@ -293,6 +297,21 @@ debounceTouch(xpcc::glcd::Point *out, xpcc::glcd::Point *old)
 }
 
 void
+touchUp(void* data)
+{
+	xpcc::gui::InputEvent* ev = static_cast<xpcc::gui::InputEvent*>(data);
+
+	XPCC_LOG_DEBUG << "touchUp:" << xpcc::endl;
+	XPCC_LOG_DEBUG << "ev.coord.x: " << ev->coord.x << xpcc::endl;
+	XPCC_LOG_DEBUG << "ev.coord.y: " << ev->coord.y << xpcc::endl;
+
+	input_queue.push(*ev);
+
+	//delete ev;
+}
+
+
+void
 gatherInput()
 {
 
@@ -302,27 +321,42 @@ gatherInput()
 		xpcc::gui::InputEvent in_ev;
 
 		in_ev.type = xpcc::gui::InputEvent::Type::TOUCH;
-		//in_ev.direction = InputEvent::Direction::DOWN;
+		in_ev.direction = xpcc::gui::InputEvent::Direction::DOWN;
 
 		in_ev.coord = point;
 		//in_ev.x = point.x;
 		//in_ev.y = point.y;
 
+		XPCC_LOG_DEBUG << "touch x: " << point.x << xpcc::endl;
+		XPCC_LOG_DEBUG << "touch y: " << point.y << xpcc::endl;
+
+
 		input_queue.push(in_ev);
 
+		auto up_point = new xpcc::glcd::Point(point.x, point.y);
 
+		auto up_ev = new xpcc::gui::InputEvent;
+		up_ev->type = xpcc::gui::InputEvent::Type::TOUCH;
+		up_ev->direction = xpcc::gui::InputEvent::Direction::UP;
+		up_ev->coord = *up_point;
+
+		auto async_ev = new xpcc::gui::AsyncEvent(300, &touchUp, (void*)(up_ev));
+
+		async_events.append(async_ev);
 
 	}
 }
 
+
 // ----------------------------------------------------------------------------
 
 void
-test_callback(const xpcc::gui::InputEvent& ev, xpcc::gui::Widget* w)
+test_callback(const xpcc::gui::InputEvent& ev, xpcc::gui::Widget* w, void* data)
 {
 	// avoid warnings
 	(void) ev;
 	(void) w;
+	(void) data;
 
 	LedGreen::toggle();
 }
@@ -352,6 +386,8 @@ xpcc::glcd::Point calibration[] = {{3339, 3046},{931, 2428},{2740, 982}};
 MAIN_FUNCTION
 {
 	defaultSystemClock::enable();
+
+	xpcc::cortex::SysTickTimer::enable();
 
 
 	LedOrange::setOutput(xpcc::Gpio::Low);
@@ -384,11 +420,39 @@ MAIN_FUNCTION
 	/*
 	 * Create a view and some widgets
 	 */
+/*
+	xpcc::gui::View myView(&tft, colorpalette, &input_queue);
+
+	xpcc::gui::ButtonWidget toggleLedButton((char*)"Toggle Green", xpcc::gui::Dimension(100, 50));
+	xpcc::gui::ButtonWidget doNothingButton((char*)"Do nothing", xpcc::gui::Dimension(100, 50));
+*/
+
+	/*
+	 * connect callbacks to widgets
+	 */
+
+	//toggleLedButton.cb_activate = &test_callback;
+
+
+	/*
+	 * place widgets in view
+	 */
+
+	//myView.pack(&toggleLedButton, xpcc::glcd::Point(110, 40));
+	//myView.pack(&doNothingButton, xpcc::glcd::Point(110, 140));
+
+
+
+
+
 
 	xpcc::gui::View myView(&tft, colorpalette, &input_queue);
 
 	xpcc::gui::ButtonWidget toggleLedButton((char*)"Toggle Green", xpcc::gui::Dimension(100, 50));
 	xpcc::gui::ButtonWidget doNothingButton((char*)"Do nothing", xpcc::gui::Dimension(100, 50));
+
+	xpcc::gui::IntegerRocker rocker1(100, 50, xpcc::gui::Dimension(200, 30));
+
 
 
 	/*
@@ -402,22 +466,46 @@ MAIN_FUNCTION
 	 * place widgets in view
 	 */
 
-	myView.pack(&toggleLedButton, xpcc::glcd::Point(110, 40));
-	myView.pack(&doNothingButton, xpcc::glcd::Point(110, 140));
+	myView.pack(&toggleLedButton, xpcc::glcd::Point(110, 10));
+	myView.pack(&doNothingButton, xpcc::glcd::Point(110, 80));
+	myView.pack(&rocker1, xpcc::glcd::Point(60, 200));
+
+
+
+
+
+
+
 
 
 	/*
 	 * main loop
 	 */
+
 	while(true) {
 
 		gatherInput();
+
+		//XPCC_LOG_DEBUG << "async_events.length = " << async_events.getSize() << xpcc::endl;
+
+		for(auto iter = async_events.begin(); iter != async_events.end(); ++iter)
+		{
+			if((*iter)->is_expired()) {
+				//async_events.erase(iter);
+				// delete node
+				//iter.node->previous->next = iter.node->next;
+				//delete iter.node;
+				//Allocator::destroy(iter->node->value);
+				//this->nodeAllocator.deallocate(node);
+			}
+		}
+
 		myView.run();
 
 		/*
 		 * display an arbitrary image
 		 */
-		tft.drawImage(xpcc::glcd::Point(304, 3),xpcc::accessor::asFlash(bitmap::bluetooth_12x16));
+		//tft.drawImage(xpcc::glcd::Point(304, 3),xpcc::accessor::asFlash(bitmap::bluetooth_12x16));
 
 	}
 

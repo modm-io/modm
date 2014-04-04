@@ -5,6 +5,7 @@
 #include <xpcc/container/dynamic_array.hpp>
 #include <xpcc/container/linked_list.hpp>
 #include <xpcc/container/queue.hpp>
+#include <xpcc/processing.hpp>
 
 namespace xpcc {
 
@@ -18,6 +19,7 @@ namespace gui {
 	// Container used in view to store widgets
 	typedef xpcc::DynamicArray<Widget*> WidgetContainer;
 
+	typedef void (*genericCallback)(void*);
 
 	// Input event that is collected when some input happens. Will be proccessed by View
 	struct InputEvent {
@@ -38,8 +40,45 @@ namespace gui {
 		xpcc::glcd::Point coord;
 	};
 
-	typedef xpcc::Queue<InputEvent, xpcc::LinkedList<InputEvent> > inputQueue;
+	class AsyncEvent
+	{
+	public:
+		AsyncEvent(uint16_t delay_ms, genericCallback cb, void* cb_data) :
+			delay_ms(delay_ms),
+			cb(cb),
+			cb_data(cb_data),
+			timeout(delay_ms),
+			already_run(false)
+		{
 
+		}
+
+		bool is_expired()
+		{
+			if(timeout.isExpired()) {
+				if(!already_run && ( cb != NULL )) {
+					already_run = true;
+					cb(cb_data);
+				}
+
+				return true;
+
+			} else {
+
+				return false;
+
+			}
+		}
+
+	private:
+		uint16_t delay_ms;
+		genericCallback cb;
+		void* cb_data;
+		xpcc::Timeout<> timeout;
+		bool already_run;
+	};
+
+	typedef xpcc::Queue<InputEvent, xpcc::LinkedList<InputEvent> > inputQueue;
 
 	// Callback when an event happend
 	typedef void (*eventCallback)(const InputEvent&, Widget*, void*);

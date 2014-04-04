@@ -213,6 +213,9 @@ namespace xpcc
 		const_iterator
 		end() const;
 		
+		iterator
+		erase(iterator position);
+
 	private:
 		friend class const_iterator;
 		friend class iterator;		
