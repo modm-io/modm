@@ -226,6 +226,7 @@ xpcc::DoublyLinkedList<T, Allocator>::erase(iterator position)
 	}
 
 	position.node->previous->next = position.node->next;
+	position.node->next->previous = position.node->previous;
 
 	Node* next = position.node->next;
 
