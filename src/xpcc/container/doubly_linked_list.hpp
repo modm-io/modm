@@ -216,6 +216,8 @@ namespace xpcc
 		/**
 		 * Deletes element pointed to by iterator and returns an iterator
 		 * to the next element behind the deleted one.
+		 *
+		 * Warning: you must not use the iterator after calling erase()
 		 */
 		iterator
 		erase(iterator position);
