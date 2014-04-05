@@ -176,17 +176,24 @@ void xpcc::gui::WidgetGroup::setPosition(const xpcc::glcd::Point& pos)
 
 void xpcc::gui::IntegerRocker::activate(const InputEvent& ev, void* data)
 {
+	(void) data;
+
 	this->handleInputEvent(ev);
 }
 
 void xpcc::gui::IntegerRocker::deactivate(const InputEvent& ev, void* data)
 {
+	(void) data;
+
 	this->handleInputEvent(ev);
 }
 
 void xpcc::gui::IntegerRocker::increase_cb(const xpcc::gui::InputEvent& ev,
 		xpcc::gui::Widget* w, void* data)
 {
+	(void) ev;
+	(void) w;
+
 	IntegerRocker *rocker = static_cast<IntegerRocker*>(data);
 
 	rocker->increase();
@@ -195,6 +202,9 @@ void xpcc::gui::IntegerRocker::increase_cb(const xpcc::gui::InputEvent& ev,
 void xpcc::gui::IntegerRocker::decrease_cb(const xpcc::gui::InputEvent& ev,
 		xpcc::gui::Widget* w, void* data)
 {
+	(void) ev;
+	(void) w;
+
 	IntegerRocker *rocker = static_cast<IntegerRocker*>(data);
 
 	rocker->decrease();

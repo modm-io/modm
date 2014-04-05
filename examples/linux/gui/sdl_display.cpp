@@ -46,6 +46,8 @@ xpcc::SDLDisplay::clearPixel(int16_t x, int16_t y)
 bool
 xpcc::SDLDisplay::getPixel(int16_t x, int16_t y)
 {
+	(void) x;
+	(void) y;
 	//return this->memory[y*this->width+x];
 	return false;
 }
