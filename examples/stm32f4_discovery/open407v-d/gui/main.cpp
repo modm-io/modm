@@ -68,11 +68,13 @@ xpcc::ParallelTft<xpcc::TftMemoryBus16Bit> tft(parallelBus);
 
 // ----------------------------------------------------------------------------
 
-constexpr uint8_t TP_TOLERANCE = 30;
+constexpr uint8_t 	TP_TOLERANCE 		= 	30;		// in pixels
+constexpr uint16_t	TOUCH_REPEAT_RATE	=	600;	// in ms, 0 to disable
+
 
 xpcc::gui::inputQueue input_queue;
+xpcc::gui::AsyncEventList async_events;
 xpcc::glcd::Point last_point;
-xpcc::DoublyLinkedList<xpcc::gui::AsyncEvent*> async_events;
 
 // ----------------------------------------------------------------------------
 // Touchscreen
@@ -263,6 +265,12 @@ touchActive()
 	return (m1 || m2);
 }
 
+void
+resetTouchLock(void* data)
+{
+	last_point = xpcc::glcd::Point(-400, -400);
+}
+
 bool
 debounceTouch(xpcc::glcd::Point *out, xpcc::glcd::Point *old)
 {
@@ -287,6 +295,13 @@ debounceTouch(xpcc::glcd::Point *out, xpcc::glcd::Point *old)
 			// new touch point
 			*old = point;
 			*out = point;
+
+			// schedule a reset for debounce lock, so that holding the finger fires repeated touch events
+			if(TOUCH_REPEAT_RATE)
+			{
+				async_events.append(new xpcc::gui::AsyncEvent(TOUCH_REPEAT_RATE, &resetTouchLock, NULL));
+			}
+
 			return true;
 		}
 	} else {
@@ -301,13 +316,12 @@ touchUp(void* data)
 {
 	xpcc::gui::InputEvent* ev = static_cast<xpcc::gui::InputEvent*>(data);
 
-	XPCC_LOG_DEBUG << "touchUp:" << xpcc::endl;
-	XPCC_LOG_DEBUG << "ev.coord.x: " << ev->coord.x << xpcc::endl;
-	XPCC_LOG_DEBUG << "ev.coord.y: " << ev->coord.y << xpcc::endl;
+	XPCC_LOG_DEBUG << "asynchronous UP-event:" << xpcc::endl;
+	XPCC_LOG_DEBUG << "x: " << ev->coord.x << xpcc::endl;
+	XPCC_LOG_DEBUG << "y: " << ev->coord.y << xpcc::endl;
 
-	input_queue.push(*ev);
-
-	//delete ev;
+	// queue UP-event as new input event
+	input_queue.push(ev);
 }
 
 
@@ -318,32 +332,41 @@ gatherInput()
 	xpcc::glcd::Point point;
 
 	if (debounceTouch(&point, &last_point)) {
-		xpcc::gui::InputEvent in_ev;
 
-		in_ev.type = xpcc::gui::InputEvent::Type::TOUCH;
-		in_ev.direction = xpcc::gui::InputEvent::Direction::DOWN;
+		auto ev_down = new xpcc::gui::InputEvent(point,
+											 	 xpcc::gui::InputEvent::Type::TOUCH,
+											 	 xpcc::gui::InputEvent::Direction::DOWN);
 
-		in_ev.coord = point;
-		//in_ev.x = point.x;
-		//in_ev.y = point.y;
+		auto ev_up = new xpcc::gui::InputEvent( point,
+												xpcc::gui::InputEvent::Type::TOUCH,
+												xpcc::gui::InputEvent::Direction::UP);
 
-		XPCC_LOG_DEBUG << "touch x: " << point.x << xpcc::endl;
-		XPCC_LOG_DEBUG << "touch y: " << point.y << xpcc::endl;
+		// queue down event
+		input_queue.push(ev_down);
 
-
-		input_queue.push(in_ev);
-
-		auto up_point = new xpcc::glcd::Point(point.x, point.y);
-
-		auto up_ev = new xpcc::gui::InputEvent;
-		up_ev->type = xpcc::gui::InputEvent::Type::TOUCH;
-		up_ev->direction = xpcc::gui::InputEvent::Direction::UP;
-		up_ev->coord = *up_point;
-
-		auto async_ev = new xpcc::gui::AsyncEvent(300, &touchUp, (void*)(up_ev));
-
+		// create an asynchronous event with Direction::UP and 200ms delay
+		auto async_ev = new xpcc::gui::AsyncEvent(500, &touchUp, (void*)(ev_up));
 		async_events.append(async_ev);
 
+		XPCC_LOG_DEBUG << "touch down x: " << point.x << xpcc::endl;
+		XPCC_LOG_DEBUG << "touch down y: " << point.y << xpcc::endl;
+
+	}
+}
+
+inline void
+updateAsyncEvents()
+{
+	auto iter = async_events.begin();
+
+	while(iter != async_events.end())
+	{
+		if((*iter)->is_expired()) {
+			iter = async_events.erase(iter);
+		} else
+		{
+			++iter;
+		}
 	}
 }
 
@@ -387,6 +410,7 @@ MAIN_FUNCTION
 {
 	defaultSystemClock::enable();
 
+	// needed for AsyncEvent (using xpcc::Timeout)
 	xpcc::cortex::SysTickTimer::enable();
 
 
@@ -420,31 +444,6 @@ MAIN_FUNCTION
 	/*
 	 * Create a view and some widgets
 	 */
-/*
-	xpcc::gui::View myView(&tft, colorpalette, &input_queue);
-
-	xpcc::gui::ButtonWidget toggleLedButton((char*)"Toggle Green", xpcc::gui::Dimension(100, 50));
-	xpcc::gui::ButtonWidget doNothingButton((char*)"Do nothing", xpcc::gui::Dimension(100, 50));
-*/
-
-	/*
-	 * connect callbacks to widgets
-	 */
-
-	//toggleLedButton.cb_activate = &test_callback;
-
-
-	/*
-	 * place widgets in view
-	 */
-
-	//myView.pack(&toggleLedButton, xpcc::glcd::Point(110, 40));
-	//myView.pack(&doNothingButton, xpcc::glcd::Point(110, 140));
-
-
-
-
-
 
 	xpcc::gui::View myView(&tft, colorpalette, &input_queue);
 
@@ -452,7 +451,6 @@ MAIN_FUNCTION
 	xpcc::gui::ButtonWidget doNothingButton((char*)"Do nothing", xpcc::gui::Dimension(100, 50));
 
 	xpcc::gui::IntegerRocker rocker1(100, 50, xpcc::gui::Dimension(200, 30));
-
 
 
 	/*
@@ -470,14 +468,6 @@ MAIN_FUNCTION
 	myView.pack(&doNothingButton, xpcc::glcd::Point(110, 80));
 	myView.pack(&rocker1, xpcc::glcd::Point(60, 200));
 
-
-
-
-
-
-
-
-
 	/*
 	 * main loop
 	 */
@@ -486,20 +476,10 @@ MAIN_FUNCTION
 
 		gatherInput();
 
-		//XPCC_LOG_DEBUG << "async_events.length = " << async_events.getSize() << xpcc::endl;
+		// process asynchronous events
+		updateAsyncEvents();
 
-		for(auto iter = async_events.begin(); iter != async_events.end(); ++iter)
-		{
-			if((*iter)->is_expired()) {
-				//async_events.erase(iter);
-				// delete node
-				//iter.node->previous->next = iter.node->next;
-				//delete iter.node;
-				//Allocator::destroy(iter->node->value);
-				//this->nodeAllocator.deallocate(node);
-			}
-		}
-
+		// update view
 		myView.run();
 
 		/*

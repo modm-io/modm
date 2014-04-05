@@ -4,12 +4,14 @@
 
 #include <xpcc/ui/display/image.hpp>
 #include <xpcc/ui/gui.hpp>
+#include <xpcc/container.hpp>
 
 #include "sdl_display.hpp"
 
+#include <stdlib.h>
+
 #include <SDL/SDL.h>
 
-//#include "images/bluetooth_12x16.hpp"
 
 // ----------------------------------------------------------------------------
 /*
@@ -22,8 +24,8 @@
 
 // ----------------------------------------------------------------------------
 
+xpcc::gui::AsyncEventList async_events;
 xpcc::gui::inputQueue input_queue;
-xpcc::glcd::Point last_point;
 
 xpcc::GraphicDisplay *display;
 
@@ -86,6 +88,16 @@ handleKeyDownEvent(SDL_Event& event)
 		{
 			teamRedKeyWasPressed = true;
 			break;
+		}for(auto iter = async_events.begin(); iter != async_events.end(); ++iter)
+		{timerfd_create()
+			if((*iter)->is_expired()) {
+				//async_events.erase(iter);
+				// delete node
+				//iter.node->previous->next = iter.node->next;
+				//delete iter.node;
+				//Allocator::destroy(iter->node->value);
+				//this->nodeAllocator.deallocate(node);
+			}
 		}
 		case SDLK_b:
 		{
@@ -115,6 +127,7 @@ handleKeyDownEvent(SDL_Event& event)
 	}
 }
 
+
 void
 pollSDL()
 {
@@ -126,31 +139,26 @@ pollSDL()
 
 			case SDL_MOUSEBUTTONDOWN:
 			{
-				xpcc::gui::InputEvent in_ev;
+				auto ev_down = new xpcc::gui::InputEvent(xpcc::glcd::Point(event.button.x, event.button.y),
+													 	 xpcc::gui::InputEvent::Type::TOUCH,
+													 	 xpcc::gui::InputEvent::Direction::DOWN);
 
-				in_ev.type = xpcc::gui::InputEvent::Type::TOUCH;
-				in_ev.direction = xpcc::gui::InputEvent::Direction::DOWN;
+				// queue down event
+				input_queue.push(ev_down);
 
-				in_ev.coord = xpcc::glcd::Point(event.button.x, event.button.y);
-				//in_ev.x = point.x;
-				//in_ev.y = point.y;
-
-				input_queue.push(in_ev);
 				break;
 			}
 
 			case SDL_MOUSEBUTTONUP:
 			{
-				xpcc::gui::InputEvent in_ev;
 
-				in_ev.type = xpcc::gui::InputEvent::Type::TOUCH;
-				in_ev.direction = xpcc::gui::InputEvent::Direction::UP;
+				auto ev_up = new xpcc::gui::InputEvent(xpcc::glcd::Point(event.button.x, event.button.y),
+													   xpcc::gui::InputEvent::Type::TOUCH,
+													   xpcc::gui::InputEvent::Direction::UP);
 
-				in_ev.coord = xpcc::glcd::Point(event.button.x, event.button.y);
-				//in_ev.x = point.x;
-				//in_ev.y = point.y;
+				// queue up event
+				input_queue.push(ev_up);
 
-				input_queue.push(in_ev);
 				break;
 			}
 
@@ -177,66 +185,22 @@ pollSDL()
 	}
 }
 
-// ----------------------------------------------------------------------------
-/* screen calibration  */
-static void
-drawCross(xpcc::GraphicDisplay& display, xpcc::glcd::Point center)
+
+inline void
+updateAsyncEvents()
 {
-	display.setColor(xpcc::glcd::Color::red());
-	display.drawLine(center.x - 15, center.y, center.x - 2, center.y);
-	display.drawLine(center.x + 2, center.y, center.x + 15, center.y);
-	display.drawLine(center.x, center.y - 15, center.x, center.y - 2);
-	display.drawLine(center.x, center.y + 2, center.x, center.y + 15);
 
-	display.setColor(xpcc::glcd::Color::white());
-	display.drawLine(center.x - 15, center.y + 15, center.x - 7, center.y + 15);
-	display.drawLine(center.x - 15, center.y + 7, center.x - 15, center.y + 15);
+	auto iter = async_events.begin();
 
-	display.drawLine(center.x - 15, center.y - 15, center.x - 7, center.y - 15);
-	display.drawLine(center.x - 15, center.y - 7, center.x - 15, center.y - 15);
-
-	display.drawLine(center.x + 7, center.y + 15, center.x + 15, center.y + 15);
-	display.drawLine(center.x + 15, center.y + 7, center.x + 15, center.y + 15);
-
-	display.drawLine(center.x + 7, center.y - 15, center.x + 15, center.y - 15);
-	display.drawLine(center.x + 15, center.y - 15, center.x + 15, center.y - 7);
-}
-
-void
-drawPoint(xpcc::GraphicDisplay& display, xpcc::glcd::Point point)
-{
-	if (point.x < 0 || point.y < 0) {
-		return;
+	while(iter != async_events.end())
+	{
+		if((*iter)->is_expired()) {
+			iter = async_events.erase(iter);
+		} else
+		{
+			++iter;
+		}
 	}
-	
-	display.drawPixel(point.x, point.y);
-	display.drawPixel(point.x + 1, point.y);
-	display.drawPixel(point.x, point.y + 1);
-	display.drawPixel(point.x + 1, point.y + 1);
-}
-
-void
-gatherInput()
-{
-
-	xpcc::glcd::Point point;
-/*
-	if (debounceTouch(&point, &last_point)) {
-		xpcc::gui::InputEvent in_ev;
-
-		in_ev.type = xpcc::gui::InputEvent::Type::TOUCH;
-		//in_ev.direction = InputEvent::Direction::DOWN;
-
-		in_ev.coord = point;
-		//in_ev.x = point.x;
-		//in_ev.y = point.y;
-
-		input_queue.push(in_ev);
-
-
-
-	}
-	*/
 }
 
 // ----------------------------------------------------------------------------
@@ -247,8 +211,7 @@ test_callback(const xpcc::gui::InputEvent& ev, xpcc::gui::Widget* w, void* data)
 	// avoid warnings
 	(void) ev;
 	(void) w;
-
-	//LedGreen::toggle();
+	(void) data;
 
 	XPCC_LOG_DEBUG << "Hello from callback" << xpcc::endl;
 }
@@ -266,20 +229,16 @@ xpcc::gui::ColorPalette colorpalette[xpcc::gui::Color::PALETTE_SIZE] = {
 	xpcc::glcd::Color::black(),		// BACKGROUND
 	xpcc::glcd::Color::red(),		// ACTIVATED
 	xpcc::glcd::Color::blue(),		// DEACTIVATED
-
 };
 
-/*
- * empirically found calibration points
- */
-xpcc::glcd::Point calibration[] = {{3339, 3046},{931, 2428},{2740, 982}};
 
 // ----------------------------------------------------------------------------
 MAIN_FUNCTION
 {
+	(void) argc;
+	(void) argv;
 
 	XPCC_LOG_DEBUG << "Hello from xpcc gui example!" << xpcc::endl;
-
 
 	initSDL();
 
@@ -302,7 +261,6 @@ MAIN_FUNCTION
 	xpcc::gui::IntegerRocker rocker1(100, 50, xpcc::gui::Dimension(200, 30));
 
 
-
 	/*
 	 * connect callbacks to widgets
 	 */
@@ -318,28 +276,27 @@ MAIN_FUNCTION
 	myView.pack(&doNothingButton, xpcc::glcd::Point(110, 80));
 	myView.pack(&rocker1, xpcc::glcd::Point(60, 200));
 
-	//display->setBackgroundColor(xpcc::glcd::Color::green());
-	//display->setColor(xpcc::glcd::Color::blue());
 
 	/*
 	 * main loop
 	 */
 	while(true) {
 
+		// gather input events
 		pollSDL();
+
+		// process asynchronous events
+		updateAsyncEvents();
+
+		// update view
+		myView.run();
+
+		// update display
+		display->update();
+
 
 		if(quit)
 			break;
-
-		myView.run();
-
-		display->update();
-
-		/*
-		 * display an arbitrary image
-		 */
-		//tft.drawImage(xpcc::glcd::Point(304, 3),xpcc::accessor::asFlash(bitmap::bluetooth_12x16));
-
 	}
 
 	quitSDL();
