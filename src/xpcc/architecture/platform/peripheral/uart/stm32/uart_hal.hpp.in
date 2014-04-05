@@ -147,7 +147,7 @@ public:
 	 * @warning 	Not all InterruptFlags can be cleared this way.
 	 */
 	static inline void
-	resetInterruptFlags(InterruptFlag flags);
+	acknowledgeInterruptFlags(InterruptFlag flags);
 };
 }
 }
