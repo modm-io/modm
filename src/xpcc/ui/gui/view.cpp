@@ -29,7 +29,7 @@ xpcc::gui::View::run()
 		PT_WAIT_UNTIL(!this->input_queue->isEmpty());
 
 		// pop input event
-		InputEvent ev = this->input_queue->get();
+		InputEvent* ev = this->input_queue->get();
 		this->input_queue->pop();
 
 
@@ -44,16 +44,19 @@ xpcc::gui::View::run()
 
 			position = (*it)->getPosition();
 
-			if((position.x < ev.coord.x) && ((position.x + (*it)->getWidth())  > ev.coord.x) &&
-			   (position.y < ev.coord.y) && ((position.y + (*it)->getHeight()) > ev.coord.y))
+			if((position.x < ev->coord.x) && ((position.x + (*it)->getWidth())  > ev->coord.x) &&
+			   (position.y < ev->coord.y) && ((position.y + (*it)->getHeight()) > ev->coord.y))
 			{
-				if(ev.direction == xpcc::gui::InputEvent::Direction::DOWN) {
-					(*it)->activate(ev, NULL);
-				} else if(ev.direction == xpcc::gui::InputEvent::Direction::UP) {
-					(*it)->deactivate(ev, NULL);
+				if(ev->direction == xpcc::gui::InputEvent::Direction::DOWN) {
+					(*it)->activate(*ev, NULL);
+				} else if(ev->direction == xpcc::gui::InputEvent::Direction::UP) {
+					(*it)->deactivate(*ev, NULL);
 				}
 			}
 		}
+
+		// delete InputEvent, we don't need it anymore
+		delete ev;
 
 		// draw view
 		this->render();
