@@ -205,12 +205,6 @@ namespace gui {
 
 		}
 
-		static void
-		increase_cb(const xpcc::gui::InputEvent& ev, xpcc::gui::Widget* w, void* data);
-
-		static void
-		decrease_cb(const xpcc::gui::InputEvent& ev, xpcc::gui::Widget* w, void* data);
-
 		void
 		increase();
 
@@ -225,6 +219,13 @@ namespace gui {
 
 		void
 		handleInputEvent(const InputEvent& ev);
+
+	private:
+		static void
+		increase_cb(const xpcc::gui::InputEvent& ev, xpcc::gui::Widget* w, void* data);
+
+		static void
+		decrease_cb(const xpcc::gui::InputEvent& ev, xpcc::gui::Widget* w, void* data);
 
 	private:
 		int16_t value;
@@ -265,6 +266,35 @@ namespace gui {
 
 	};
 
+	class CheckboxWidget : public Widget {
+
+	public:
+
+		CheckboxWidget(bool initial, Dimension d) :
+			state(initial)
+		{
+			this->dimension = d;
+
+			this->cb_activate = &click_cb;
+		}
+
+		void
+		draw(View* view);
+
+		bool
+		getState() { return this->state; }
+
+		void
+		setState(bool s) { this->state = s; }
+
+	private:
+		static void
+		click_cb(const xpcc::gui::InputEvent& ev, xpcc::gui::Widget* w, void* data);
+
+	private:
+		bool state;
+
+	};
 }
 }
 
