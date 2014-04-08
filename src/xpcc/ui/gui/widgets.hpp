@@ -4,7 +4,7 @@
 #include "widgets/widget.hpp"
 #include "widgets/button.hpp"
 #include "widgets/checkbox.hpp"
-#include "widgets/integerfield.hpp"
+#include "widgets/numberfield.hpp"
 #include "widgets/numberrocker.hpp"
 
 #endif /* WIDGETS_HPP_ */

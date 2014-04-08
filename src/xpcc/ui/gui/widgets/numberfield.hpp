@@ -7,11 +7,12 @@ namespace xpcc {
 
 namespace gui {
 
-class IntegerField : public Widget {
+template<typename T>
+class NumberField : public Widget {
 
 public:
 
-	IntegerField(int16_t default_value, Dimension d) :
+	NumberField(T default_value, Dimension d) :
 		value(default_value)
 	{
 		this->dimension = d;
@@ -21,16 +22,27 @@ public:
 	draw(View* view);
 
 	void
-	setValue(int16_t value)
+	setValue(T value)
 	{
 		this->value = value;
 	}
 
+	T
+	getValue()
+	{
+		return this->value;
+	}
+
 private:
-	int16_t value;
+	T value;
 };
+
+typedef NumberField<int16_t> IntegerField;
+typedef NumberField<float> FloatField;
 
 }
 }
+
+#include "numberfield_impl.hpp"
 
 #endif /* INTEGERFIELD_HPP_ */

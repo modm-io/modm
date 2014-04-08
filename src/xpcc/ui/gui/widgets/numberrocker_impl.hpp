@@ -1,32 +1,41 @@
+#ifndef INTEGEROCKER_HPP_
+	#error	"Don't include this file directly, use 'button_group.hpp' instead!"
+#endif
+
 #include "numberrocker.hpp"
 
-void xpcc::gui::NumberRocker::increase()
+template<typename T>
+void xpcc::gui::NumberRocker<T>::increase()
 {
 	this->value += this->step;
-	this->int_field.setValue(this->value);
+	this->num_field.setValue(this->value);
 }
 
-void xpcc::gui::NumberRocker::decrease()
+template<typename T>
+void xpcc::gui::NumberRocker<T>::decrease()
 {
 	this->value -= this->step;
-	this->int_field.setValue(this->value);
+	this->num_field.setValue(this->value);
 }
 
-void xpcc::gui::NumberRocker::activate(const InputEvent& ev, void* data)
+template<typename T>
+void xpcc::gui::NumberRocker<T>::activate(const InputEvent& ev, void* data)
 {
 	(void) data;
 
 	this->handleInputEvent(ev);
 }
 
-void xpcc::gui::NumberRocker::deactivate(const InputEvent& ev, void* data)
+template<typename T>
+void xpcc::gui::NumberRocker<T>::deactivate(const InputEvent& ev, void* data)
 {
 	(void) data;
 
 	this->handleInputEvent(ev);
 }
 
-void xpcc::gui::NumberRocker::increase_cb(const InputEvent& ev, Widget* w, void* data)
+template<typename T>
+void xpcc::gui::NumberRocker<T>::increase_cb(const InputEvent& ev, Widget* w, void* data)
 {
 	(void) ev;
 	(void) w;
@@ -36,7 +45,8 @@ void xpcc::gui::NumberRocker::increase_cb(const InputEvent& ev, Widget* w, void*
 	rocker->increase();
 }
 
-void xpcc::gui::NumberRocker::decrease_cb(const InputEvent& ev, Widget* w, void* data)
+template<typename T>
+void xpcc::gui::NumberRocker<T>::decrease_cb(const InputEvent& ev, Widget* w, void* data)
 {
 	(void) ev;
 	(void) w;
@@ -46,7 +56,8 @@ void xpcc::gui::NumberRocker::decrease_cb(const InputEvent& ev, Widget* w, void*
 	rocker->decrease();
 }
 
-void xpcc::gui::NumberRocker::handleInputEvent(const InputEvent& ev)
+template<typename T>
+void xpcc::gui::NumberRocker<T>::handleInputEvent(const InputEvent& ev)
 {
 	// convert to relative coordinate
 	uint16_t ev_x = ev.coord.x - this->position.x;

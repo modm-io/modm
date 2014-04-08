@@ -3,23 +3,24 @@
 
 #include "widget.hpp"
 #include "button.hpp"
-#include "integerfield.hpp"
+#include "numberfield.hpp"
 
 namespace xpcc {
 
 namespace gui {
 
+template<typename T = int16_t>
 class NumberRocker : public WidgetGroup {
 
 public:
 
-	NumberRocker(int16_t default_value, int16_t step, Dimension d) :
+	NumberRocker(T default_value, T step, Dimension d) :
 		WidgetGroup(d),
 		value(default_value),
 		step(step),
 		button_increase(true, Dimension(d.height, d.height)),
 		button_decrease(false, Dimension(d.height, d.height)),
-		int_field(default_value, Dimension(d.width - 2*d.height, d.height))
+		num_field(default_value, Dimension(d.width - 2*d.height, d.height))
 	{
 		this->dimension = d;
 
@@ -28,7 +29,7 @@ public:
 
 		this->pack(&button_decrease, xpcc::glcd::Point(0,0));
 		this->pack(&button_increase, xpcc::glcd::Point(d.width - d.height,0));
-		this->pack(&int_field, xpcc::glcd::Point(d.height, 0));
+		this->pack(&num_field, xpcc::glcd::Point(d.height, 0));
 
 	}
 
@@ -55,14 +56,20 @@ private:
 	decrease_cb(const InputEvent& ev, Widget* w, void* data);
 
 private:
-	int16_t value;
-	int16_t step;
+	T value;
+	T step;
 	ArrowButton button_increase, button_decrease;
-	IntegerField int_field;
+	NumberField<T> num_field;
 
 };
 
+typedef NumberRocker<int16_t> IntegerRocker;
+typedef NumberRocker<float> FloatRocker;
+
+
 }
 }
+
+#include "numberrocker_impl.hpp"
 
 #endif /* INTEGEROCKER_HPP_ */

@@ -1,9 +1,12 @@
-#include "integerfield.hpp"
+#ifndef INTEGERFIELD_HPP_
+	#error	"Don't include this file directly, use 'button_group.hpp' instead!"
+#endif
 
-void xpcc::gui::IntegerField::draw(View* view)
+template<typename T>
+void xpcc::gui::NumberField<T>::draw(View* view)
 {
 
-	if(view == NULL)
+	if(view == 0)
 		return;
 
 	// output device of view
