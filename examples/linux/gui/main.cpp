@@ -258,7 +258,7 @@ MAIN_FUNCTION
 	xpcc::gui::ButtonWidget toggleLedButton((char*)"Toggle Green", xpcc::gui::Dimension(100, 50));
 	xpcc::gui::ButtonWidget doNothingButton((char*)"Do nothing", xpcc::gui::Dimension(100, 50));
 
-	xpcc::gui::IntegerRocker rocker1(100, 50, xpcc::gui::Dimension(200, 30));
+	xpcc::gui::NumberRocker rocker1(100, 50, xpcc::gui::Dimension(200, 30));
 
 	xpcc::gui::CheckboxWidget checkbox1(true, xpcc::gui::Dimension(30, 30));
 

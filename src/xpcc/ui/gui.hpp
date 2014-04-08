@@ -7,7 +7,7 @@
 
 #include <xpcc/ui/gui/types.hpp>
 #include <xpcc/ui/gui/view.hpp>
-#include <xpcc/ui/gui/widget.hpp>
+#include <xpcc/ui/gui/widgets.hpp>
 
 
 #endif /* GUI_H_ */
