@@ -1,7 +1,7 @@
 #ifndef BUTTON_HPP_
 #define BUTTON_HPP_
 
-#include <xpcc/ui/gui/widgets/widget.hpp>
+#include "widget.hpp"
 
 namespace xpcc {
 
@@ -25,7 +25,7 @@ public:
 	}
 
 	void
-	draw(View* view);
+	draw(AbstractView* view);
 
 	void
 	setLabel(char* lbl)
@@ -49,7 +49,7 @@ public:
 	}
 
 	void
-	draw(View* view);
+	draw(AbstractView* view);
 
 private:
 	// Orientation of the arrow. false: left | true: right

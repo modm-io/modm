@@ -1,7 +1,7 @@
 #ifndef INTEGERFIELD_HPP_
 #define INTEGERFIELD_HPP_
 
-#include <xpcc/ui/gui/widgets/widget.hpp>
+#include "widget.hpp"
 
 namespace xpcc {
 
@@ -19,7 +19,7 @@ public:
 	}
 
 	void
-	draw(View* view);
+	draw(AbstractView* view);
 
 	void
 	setValue(T value)

@@ -1,13 +1,13 @@
 #include "button.hpp"
 
-void xpcc::gui::ButtonWidget::draw(View* view)
+void xpcc::gui::ButtonWidget::draw(AbstractView* view)
 {
 
 	if(view == NULL)
 		return;
 
 	// output device of view
-	xpcc::GraphicDisplay *out = view->display;
+	xpcc::GraphicDisplay* out = &view->display();
 
 	// color palette of view
 	ColorPalette *cp = this->color_palette;
@@ -49,13 +49,13 @@ void xpcc::gui::ButtonWidget::draw(View* view)
 
 }
 
-void xpcc::gui::ArrowButton::draw(View* view)
+void xpcc::gui::ArrowButton::draw(AbstractView* view)
 {
 	if(view == NULL)
 		return;
 
 	// output device of view
-	xpcc::GraphicDisplay *out = view->display;
+	xpcc::GraphicDisplay* out = &view->display();
 
 	// color palette of view
 	ColorPalette *cp = this->color_palette;

@@ -18,6 +18,7 @@ namespace gui {
 		RED,
 		GREEN,
 		BLUE,
+		YELLOW,
 		BORDER,
 		TEXT,
 		BACKGROUND,
@@ -29,6 +30,10 @@ namespace gui {
 
 	typedef xpcc::glcd::Color ColorPalette;
 
+	/*
+	 * TODO: make DEFAULT_COLORPALETTE const or even better constexpr
+	 */
+	extern ColorPalette DEFAULT_COLORPALETTE[xpcc::gui::Color::PALETTE_SIZE];
 
 }
 }

@@ -4,7 +4,8 @@
 #include <xpcc/ui/display/graphic_display.hpp>
 #include <xpcc/ui/gui/colorpalette.hpp>
 #include <xpcc/ui/gui/types.hpp>
-#include <xpcc/ui/gui/view.hpp>
+
+#include "../abstract_view.hpp"
 
 #include <xpcc/debug/logger.hpp>
 
@@ -14,6 +15,8 @@ namespace xpcc {
 namespace gui {
 
 static int16_t uid_global = 0;
+
+class AbstractView;
 
 class Widget {
 
@@ -35,7 +38,7 @@ public:
 	~Widget() {}
 
 	virtual void
-	draw(View* view) = 0;
+	draw(AbstractView* view) = 0;
 
 	virtual void
 	activate(const InputEvent& ev, void* data) {
@@ -129,7 +132,7 @@ public:
 	pack(Widget* w, const xpcc::glcd::Point &coord);
 
 	void
-	draw(View* view);
+	draw(AbstractView* view);
 
 	void
 	setColorPalette(ColorPalette* cb);

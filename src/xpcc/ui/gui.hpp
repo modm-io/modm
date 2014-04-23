@@ -5,9 +5,11 @@
  * Include this file to use GUI framework in xpcc
  */
 
-#include <xpcc/ui/gui/types.hpp>
-#include <xpcc/ui/gui/view.hpp>
-#include <xpcc/ui/gui/widgets.hpp>
+#include "gui/types.hpp"
+#include "gui/colorpalette.hpp"
+#include "gui/view_stack.hpp"
+#include "gui/abstract_view.hpp"
+#include "gui/widgets.hpp"
 
 
 #endif /* GUI_H_ */

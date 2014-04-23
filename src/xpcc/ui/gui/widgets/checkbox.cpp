@@ -1,7 +1,7 @@
 #include "checkbox.hpp"
 
 
-void xpcc::gui::CheckboxWidget::draw(View* view)
+void xpcc::gui::CheckboxWidget::draw(AbstractView* view)
 {
 	if(view == NULL)
 			return;
@@ -9,7 +9,7 @@ void xpcc::gui::CheckboxWidget::draw(View* view)
 	constexpr uint16_t padding = 5;
 
 	// output device of view
-	xpcc::GraphicDisplay *out = view->display;
+	xpcc::GraphicDisplay* out = &view->display();
 
 	// color palette of view
 	ColorPalette *cp = this->color_palette;

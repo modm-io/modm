@@ -3,14 +3,14 @@
 #endif
 
 template<typename T>
-void xpcc::gui::NumberField<T>::draw(View* view)
+void xpcc::gui::NumberField<T>::draw(AbstractView* view)
 {
 
 	if(view == 0)
 		return;
 
 	// output device of view
-	xpcc::GraphicDisplay *out = view->display;
+	xpcc::GraphicDisplay* out = &view->display();
 
 	// color palette of view
 	ColorPalette *cp = this->color_palette;

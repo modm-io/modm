@@ -6,6 +6,8 @@
 #include <xpcc/ui/gui.hpp>
 #include <xpcc/container.hpp>
 
+#include "homeview.hpp"
+
 #include "sdl_display.hpp"
 
 #include <stdlib.h>
@@ -224,6 +226,7 @@ xpcc::gui::ColorPalette colorpalette[xpcc::gui::Color::PALETTE_SIZE] = {
 	xpcc::glcd::Color::red(),
 	xpcc::glcd::Color::green(),
 	xpcc::glcd::Color::blue(),
+	xpcc::glcd::Color::yellow(),
 	xpcc::glcd::Color::blue(),		// BORDER
 	xpcc::glcd::Color::red(),		// TEXT
 	xpcc::glcd::Color::black(),		// BACKGROUND
@@ -253,7 +256,9 @@ MAIN_FUNCTION
 	 * Create a view and some widgets
 	 */
 
-	xpcc::gui::View myView(display, colorpalette, &input_queue);
+	xpcc::gui::ViewStack myViewStack(display, &input_queue);
+
+	HomeView myView(&myViewStack, 1);
 
 	xpcc::gui::ButtonWidget toggleLedButton((char*)"Toggle Green", xpcc::gui::Dimension(100, 50));
 	xpcc::gui::ButtonWidget doNothingButton((char*)"Do nothing", xpcc::gui::Dimension(100, 50));
@@ -279,6 +284,8 @@ MAIN_FUNCTION
 	myView.pack(&rocker1, xpcc::glcd::Point(60, 200));
 
 
+	myViewStack.push(&myView);
+
 	/*
 	 * main loop
 	 */
@@ -291,7 +298,9 @@ MAIN_FUNCTION
 		updateAsyncEvents();
 
 		// update view
-		myView.run();
+//		myView.run();
+
+		myViewStack.update();
 
 		// update display
 		display->update();
