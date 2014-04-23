@@ -45,7 +45,7 @@ MAIN_FUNCTION
 	LedInverted::setOutput();
 	LedInverted::reset();
 
-	GpioD0::connect(UART::Rx);
+	GpioD0::connect(UART::Rx, Gpio::InputType::PullUp);
 	GpioD1::connect(UART::Tx);
 
 	SPI::initialize<2000000>();

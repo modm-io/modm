@@ -50,7 +50,7 @@ MAIN_FUNCTION
 
 	// initialize Uart2 for XPCC_LOG_INFO
 	GpioOutputA2::connect(Usart2::Tx);
-	GpioInputA3::connect(Usart2::Rx);
+	GpioInputA3::connect(Usart2::Rx, Gpio::InputType::PullUp);
 	Usart2::initialize<defaultSystemClock, 115200>(12);
 
 	// initialize Adc
