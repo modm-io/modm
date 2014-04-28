@@ -265,6 +265,9 @@ def generate(env, **kw):
 		if buildpath is None:
 			buildpath = parser.get('build', 'buildpath', os.path.join(os.curdir, 'build/'))
 
+		# load parameters if available
+		env['XPCC_USER_PARAMETERS'] = parser.items('parameters')
+
 	except configparser.ParserException, msg:
 		env.Error("Error parsing file configuration file '%s':\n%s" % (configfile, str(msg)))
 		Exit(1)

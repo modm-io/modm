@@ -50,6 +50,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', 'tools', 'de
 from device import DeviceFile
 from device_identifier import DeviceIdentifier
 from driver import DriverFile
+from parameters import ParameterDB
 
 
 #------------------------------------------------------------------------------
@@ -284,6 +285,9 @@ def generate(env, **kw):
 	env['XPCC_PLATFORM_GENERATED_DIR'] = 'generated_platform_' + env['XPCC_DEVICE']
 	env['XPCC_PLATFORM_GENERATED_PATH'] = \
 		os.path.join(env['XPCC_LIBRARY_PATH'], 'xpcc', 'architecture', env['XPCC_PLATFORM_GENERATED_DIR'])
+
+	# Create Parameter DB and parse User parameters
+	env['XPCC_PARAMETER_DB'] = ParameterDB(env['XPCC_USER_PARAMETERS'], env.GetLogger())
 
 	# Remove Generated Folder if Clean Flag is set
 	# Scons does not remove the files on its own
