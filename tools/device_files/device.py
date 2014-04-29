@@ -34,6 +34,7 @@ from string import Template
 from parser_exception import ParserException
 from device_element import DeviceElementBase
 from device_identifier import DeviceIdentifier
+from parameters import ParameterDB
 
 # add python module logger to path
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'logger'))
@@ -189,7 +190,7 @@ class DeviceFile:
 
 		return props
 
-	def getDriverList(self, device_string, platform_path):
+	def getDriverList(self, device_string, platform_path, parameter_db_dict):
 		"""
 		This function uses data gathered from the device file to generate
 		a list fo drivers that need to be built.
@@ -207,11 +208,12 @@ class DeviceFile:
 		'instances': list of instances that will be created of this driver
 		Please note: all paths are relative to the platform_path.
 		"""
+		# generate ParameterDB from dict
+		parameters = ParameterDB.fromDictionary(parameter_db_dict, self.log)
 		# Check Device string
 		s = DeviceIdentifier(device_string, self.log)
 		if s.valid == False:
 			return None
-		
 		drivers = []
 		# find software implementations of drivers
 		# these have to be added as too
@@ -224,8 +226,6 @@ class DeviceFile:
 					substitutions = s.getTargetDict()
 					substitutions.update(self.getSubstitutions())
 					drivers.append(d.toDict(platform_path, substitutions, s, self.properties))
-		
-		
 		# Loop Through Drivers
 		for d in self.drivers:
 			if d.appliesTo(s, self.properties):
@@ -290,7 +290,7 @@ class DeviceFile:
 ##------------- A Driver Node contains Driver and Property Nodes --------------
 class Driver(DeviceElementBase):
 
-	def __init__(self, device, node, logger=None):
+	def __init__(self, device, node, parameters, logger=None):
 		if logger == None:
 			self.log = Logger()
 		else:

@@ -173,7 +173,7 @@ def platform_tools_generate(env, architecture_path):
 	# Loop through Drivers
 	driver_list = []
 	type_id_headers = []
-	drivers = dev.getDriverList(device, env['XPCC_PLATFORM_PATH'])
+	drivers = dev.getDriverList(device, env['XPCC_PLATFORM_PATH'], env['XPCC_PARAMETER_DB'])
 	for driver in drivers:
 		ddic = {} # create dictionary describing the driver
 		d = DriverFile.fromDict(driver, env.GetLogger())
@@ -287,7 +287,7 @@ def generate(env, **kw):
 		os.path.join(env['XPCC_LIBRARY_PATH'], 'xpcc', 'architecture', env['XPCC_PLATFORM_GENERATED_DIR'])
 
 	# Create Parameter DB and parse User parameters
-	env['XPCC_PARAMETER_DB'] = ParameterDB(env['XPCC_USER_PARAMETERS'], env.GetLogger())
+	env['XPCC_PARAMETER_DB'] = ParameterDB(env['XPCC_USER_PARAMETERS'], env.GetLogger()).toDictionary()
 
 	# Remove Generated Folder if Clean Flag is set
 	# Scons does not remove the files on its own
