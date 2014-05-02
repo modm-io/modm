@@ -24,7 +24,7 @@ MAIN_FUNCTION
 
 	// initialize Uart2 for XPCC_LOG_
 	GpioOutputA2::connect(Usart2::Tx);
-	GpioInputA3::connect(Usart2::Rx);
+	GpioInputA3::connect(Usart2::Rx, Gpio::InputType::PullUp);
 	Usart2::initialize<defaultSystemClock, 115200>(12);
 
 	// Use the logging streams to print some messages.
