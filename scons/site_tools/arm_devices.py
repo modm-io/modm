@@ -2,7 +2,7 @@
 #
 #   THIS FILE IS NO LONGER IN USE
 #
-#   However it is keep as long as it takes to tranfere the data contained
+#   However it is keep as long as it takes to transfer the data contained
 #   to xml device files
 #
 
