@@ -30,6 +30,7 @@
 
 #include <stdint.h>
 
+#include <xpcc/architecture.hpp>
 #include <xpcc/debug/logger.hpp>
 #include <xpcc_config.hpp>
 
@@ -63,11 +64,13 @@ _hardFaultHandler(const uint32_t * ctx)
 	XPCC_LOG_ERROR.printf("r1 : 0x%08lx   lr  : 0x%08lx\n", stacked_r1, stacked_lr);
 	XPCC_LOG_ERROR.printf("r2 : 0x%08lx   pc  : 0x%08lx\n", stacked_r2, stacked_pc);
 	XPCC_LOG_ERROR.printf("r3 : 0x%08lx   psr : 0x%08lx\n", stacked_r3, stacked_psr);
-	XPCC_LOG_ERROR.printf("BFAR : 0x%08lx\n", bfar);
-	XPCC_LOG_ERROR.printf("CFSR : 0x%08lx\n", cfsr);
-	XPCC_LOG_ERROR.printf("HFSR : 0x%08lx\n", hfsr);
-	XPCC_LOG_ERROR.printf("DFSR : 0x%08lx\n", dfsr);
-	XPCC_LOG_ERROR.printf("AFSR : 0x%08lx\n", afsr);
+	XPCC_LOG_ERROR.printf("BFAR  : 0x%08lx\n", bfar);
+	XPCC_LOG_ERROR.printf("CFSR  : 0x%08lx\n", cfsr);
+	XPCC_LOG_ERROR.printf("HFSR  : 0x%08lx\n", hfsr);
+	XPCC_LOG_ERROR.printf("DFSR  : 0x%08lx\n", dfsr);
+	XPCC_LOG_ERROR.printf("AFSR  : 0x%08lx\n", afsr);
+	XPCC_LOG_ERROR.printf("SHCSR : 0x%08lx\n", SCB->SHCSR);
+	
 %% else
 	(void) ctx;	// avoid warning
 %% endif

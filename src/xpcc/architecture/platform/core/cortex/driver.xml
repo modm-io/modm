@@ -7,7 +7,7 @@
 		</parameter>
 		<parameter name="enable_gpio" type="bool">true</parameter>
 		<parameter name="vector_table_in_ram" type="bool">false</parameter>
-		<parameter name="enable_hardfault_handler_log" type="bool">false</parameter>
+		<parameter name="enable_hardfault_handler_log" type="bool">true</parameter>
 		<template>startup.c.in</template>
 		<template>delay.sx.in</template>
 		<template>syscalls.cpp.in</template>
