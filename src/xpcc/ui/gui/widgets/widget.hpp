@@ -28,7 +28,8 @@ public:
 		cb_activate(NULL),
 		cb_deactivate(NULL),
 		color_palette(NULL),
-		position(xpcc::glcd::Point(0,0))
+		position(xpcc::glcd::Point(0,0)),
+		dirty(true)
 	{
 		// assign unique id
 		uid = uid_global++;
@@ -44,6 +45,7 @@ public:
 	activate(const InputEvent& ev, void* data) {
 
 		this->activated = true;
+		this->dirty = true;
 
 		// call callback when set
 		if(cb_activate != NULL)
@@ -54,6 +56,7 @@ public:
 	deactivate(const InputEvent& ev, void* data) {
 
 		this->activated = false;
+		this->dirty = true;
 
 		// call callback when set
 		if(cb_deactivate != NULL)
@@ -96,6 +99,18 @@ public:
 		return this->dimension.height;
 	}
 
+	bool
+	isDirty()
+	{
+		return this->dirty;
+	}
+
+	void
+	markDrawn()
+	{
+		this->dirty = false;
+	}
+
 public:
 	// Unique id for every widget
 	int16_t uid;
@@ -114,6 +129,8 @@ public:
 
 	// position on screen (absolute)
 	xpcc::glcd::Point position;
+
+	bool dirty;
 
 };
 
