@@ -99,13 +99,13 @@ public:
 		return this->dimension.height;
 	}
 
-	bool
+	virtual bool
 	isDirty()
 	{
 		return this->dirty;
 	}
 
-	void
+	virtual void
 	markDrawn()
 	{
 		this->dirty = false;
@@ -156,6 +156,26 @@ public:
 
 	void
 	setPosition(const xpcc::glcd::Point& pos);
+
+	bool
+	isDirty()
+	{
+		for(auto iter = widgets.begin(); iter != widgets.end(); ++iter)
+		{
+			if((*iter)->isDirty())
+				return true;
+		}
+		return false;
+	}
+
+	void
+	markDrawn()
+	{
+		for(auto iter = widgets.begin(); iter != widgets.end(); ++iter)
+		{
+			(*iter)->markDrawn();
+		}
+	}
 
 private:
 	WidgetContainer widgets;
