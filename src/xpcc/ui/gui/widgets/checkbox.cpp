@@ -21,10 +21,10 @@ void xpcc::gui::CheckboxWidget::draw(AbstractView* view)
 
 	// draw box
 	out->setColor(cp[Color::BORDER]);
-	out->drawLine(box_x, box_y, box_x, box_y + box_height);
-	out->drawLine(box_x, box_y, box_x + box_width, box_y);
-	out->drawLine(box_x, box_y + box_height, box_x + box_width, box_y + box_height);
-	out->drawLine(box_x + box_width, box_y, box_x + box_width, box_y + box_height);
+	out->drawLine(box_x, box_y, box_x + box_width - 1, box_y);
+	out->drawLine(box_x, box_y, box_x, box_y + box_height - 1);
+	out->drawLine(box_x + box_width - 1, box_y + box_height - 1, box_x + box_width - 1, box_y);
+	out->drawLine(box_x + box_width, box_y + box_height - 1, box_x, box_y + box_height - 1);
 
 	if(state) {
 

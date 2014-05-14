@@ -30,10 +30,10 @@ void xpcc::gui::ButtonWidget::draw(AbstractView* view)
 	/*
 	 * draw button outline
 	 */
-	out->drawLine(x, y, x + width, y);
-	out->drawLine(x, y, x, y + height);
-	out->drawLine(x + width, y + height, x + width, y);
-	out->drawLine(x + width, y + height, x, y + height);
+	out->drawLine(x, y, x + width - 1, y);
+	out->drawLine(x, y, x, y + height - 1);
+	out->drawLine(x + width - 1, y + height - 1, x + width - 1, y);
+	out->drawLine(x + width, y + height - 1, x, y + height - 1);
 
 	/*
 	 * draw button text
@@ -96,9 +96,9 @@ void xpcc::gui::ArrowButton::draw(AbstractView* view)
 
 	// draw box
 	//out->setColor(cp[Color::BORDER]);
-	out->drawLine(x, y, x + width, y);
-	out->drawLine(x, y, x, y + height);
-	out->drawLine(x + width, y + height, x + width, y);
-	out->drawLine(x + width, y + height, x, y + height);
+	out->drawLine(x, y, x + width - 1, y);
+	out->drawLine(x, y, x, y + height - 1);
+	out->drawLine(x + width - 1, y + height - 1, x + width - 1, y);
+	out->drawLine(x + width, y + height - 1, x, y + height - 1);
 
 }
