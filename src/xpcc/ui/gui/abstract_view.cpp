@@ -133,23 +133,16 @@ void xpcc::gui::AbstractView::draw()
 {
 	auto display = &this->stack->getDisplay();
 
-	// clear screen
-	display->setBackgroundColor(this->colorpalette[Color::BACKGROUND]);
-
-
-	bool drawing = false;
-
 	for(auto iter = widgets.begin(); iter != widgets.end(); ++iter)
 	{
-		if(!drawing && (*iter)->isDirty()) {
-			drawing = true;
-			iter = widgets.begin();
-			display->clear();
-		}
-
-		if(drawing)
+		/* Only redraw when widget is dirty */
+		if((*iter)->isDirty())
 		{
-			// iterate over all widgets and draw each
+			/* first clear widget area with background color */
+			display->setColor(this->colorpalette[xpcc::gui::BACKGROUND]);
+			display->fillRectangle((*iter)->getPosition(), (*iter)->getDimension().width, (*iter)->getDimension().height);
+
+			/* draw widget */
 			(*iter)->draw(this);
 			(*iter)->markDrawn();
 		}

@@ -81,19 +81,25 @@ public:
 		this->position = pos;
 	}
 
-	xpcc::glcd::Point
+	inline xpcc::glcd::Point
 	getPosition()
 	{
 		return this->position;
 	}
 
-	uint16_t
+	inline xpcc::gui::Dimension
+	getDimension()
+	{
+		return this->dimension;
+	}
+
+	inline uint16_t
 	getWidth()
 	{
 		return this->dimension.width;
 	}
 
-	uint16_t
+	inline uint16_t
 	getHeight()
 	{
 		return this->dimension.height;
