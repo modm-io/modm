@@ -367,7 +367,7 @@ namespace xpcc
 		{
 			this->font = xpcc::accessor::asFlash(newFont);
 		}
-		
+
 		/**
 		 * Get the height of a character.
 		 */
@@ -378,7 +378,7 @@ namespace xpcc
 		* Get the width of (null terminated) string.
 		*/
 		uint16_t
-		getStringWidth(char* s) const;
+		getStringWidth(const char* s) const;
 
 		/**
 		 * Set the cursor for text drawing.

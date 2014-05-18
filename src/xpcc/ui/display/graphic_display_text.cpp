@@ -42,7 +42,7 @@ xpcc::GraphicDisplay::getFontHeight() const
 
 // ----------------------------------------------------------------------------
 uint16_t
-xpcc::GraphicDisplay::getStringWidth(char* s) const
+xpcc::GraphicDisplay::getStringWidth(const char* s) const
 {
 	if (!this->font.isValid())
 		return 0;
