@@ -10,6 +10,11 @@
 
 #include <xpcc/debug/logger.hpp>
 
+/* Eclipse needs this to resolve NULL*/
+#ifndef NULL
+#define NULL 0
+#endif
+
 namespace xpcc {
 
 namespace gui {

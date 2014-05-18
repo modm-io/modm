@@ -22,14 +22,15 @@ class Widget {
 
 public:
 
-	Widget() :
-		dimension(Dimension(0,0)),
+	Widget(Dimension &dimension, bool is_interactive) :
+		dimension(dimension),
 		activated(false),
 		cb_activate(NULL),
 		cb_deactivate(NULL),
 		color_palette(NULL),
 		position(xpcc::glcd::Point(0,0)),
-		dirty(true)
+		dirty(true),
+		is_interactive(is_interactive)
 	{
 		// assign unique id
 		uid = uid_global++;
@@ -111,6 +112,12 @@ public:
 		return this->dirty;
 	}
 
+	bool
+	isInteractive()
+	{
+		return this->is_interactive;
+	}
+
 	virtual void
 	markDrawn()
 	{
@@ -136,7 +143,11 @@ public:
 	// position on screen (absolute)
 	xpcc::glcd::Point position;
 
+	// has changes to be drawed
 	bool dirty;
+
+	// whether widget will receive events
+	bool is_interactive;
 
 };
 
@@ -145,9 +156,10 @@ class WidgetGroup : public Widget {
 
 public:
 
-	WidgetGroup(Dimension d)
+	WidgetGroup(Dimension d) :
+		Widget(d, true),
+		widgets()
 	{
-		this->dimension = d;
 	}
 
 	// packs widgets inside WidgetGroup (relative coordinates!)

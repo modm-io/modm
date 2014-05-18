@@ -22,8 +22,6 @@ public:
 		button_decrease(false, Dimension(d.height, d.height)),
 		num_field(default_value, Dimension(d.width - 2*d.height, d.height))
 	{
-		this->dimension = d;
-
 		button_decrease.cb_activate = &decrease_cb;
 		button_increase.cb_activate = &increase_cb;
 

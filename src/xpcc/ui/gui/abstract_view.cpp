@@ -74,10 +74,14 @@ xpcc::gui::AbstractView::update()
 			   ((position.x + (*iter)->getWidth()) > ev->coord.x) &&
 			   ((position.y + (*iter)->getHeight()) > ev->coord.y))
 			{
-				if(ev->direction == xpcc::gui::InputEvent::Direction::DOWN) {
-					(*iter)->activate(*ev, NULL);
-				} else if(ev->direction == xpcc::gui::InputEvent::Direction::UP) {
-					(*iter)->deactivate(*ev, NULL);
+				/* check if widget has interaction */
+				if((*iter)->isInteractive())
+				{
+					if(ev->direction == xpcc::gui::InputEvent::Direction::DOWN) {
+						(*iter)->activate(*ev, NULL);
+					} else if(ev->direction == xpcc::gui::InputEvent::Direction::UP) {
+						(*iter)->deactivate(*ev, NULL);
+					}
 				}
 			}
 		}

@@ -12,10 +12,9 @@ class CheckboxWidget : public Widget {
 public:
 
 	CheckboxWidget(bool initial, Dimension d) :
+		Widget(d, true),
 		state(initial)
 	{
-		this->dimension = d;
-
 		this->cb_activate = &click_cb;
 	}
 

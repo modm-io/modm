@@ -12,16 +12,9 @@ class ButtonWidget : public Widget {
 public:
 
 	ButtonWidget(char* lbl, Dimension d) :
+		Widget(d, true),
 		label(lbl)
 	{
-		this->dimension = d;
-	}
-
-	ButtonWidget(char* lbl, uint16_t width, uint16_t height) :
-		label(lbl)
-	{
-		this->dimension.width = width;
-		this->dimension.height = height;
 	}
 
 	void
@@ -43,9 +36,9 @@ class ArrowButton : public Widget {
 
 public:
 	ArrowButton(bool orientation, Dimension d) :
+		Widget(d, true),
 		orientation(orientation)
 	{
-		this->dimension = d;
 	}
 
 	void
