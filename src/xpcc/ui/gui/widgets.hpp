@@ -6,5 +6,6 @@
 #include "widgets/checkbox.hpp"
 #include "widgets/numberfield.hpp"
 #include "widgets/numberrocker.hpp"
+#include "widgets/label.hpp"
 
 #endif /* WIDGETS_HPP_ */
