@@ -18,7 +18,7 @@ public:
 	}
 
 	void
-	draw(AbstractView* view);
+	render(AbstractView* view);
 
 	void
 	setLabel(char* lbl)
@@ -57,6 +57,7 @@ private:
 	const char* label;
 
 };
+
 
 class InteractiveLabel : public Label {
 

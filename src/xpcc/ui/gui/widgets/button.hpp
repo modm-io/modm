@@ -19,7 +19,7 @@ public:
 	}
 
 	void
-	draw(AbstractView* view);
+	render(AbstractView* view);
 
 	void
 	setLabel(char* lbl)
@@ -42,13 +42,42 @@ public:
 	}
 
 	void
-	draw(AbstractView* view);
+	render(AbstractView* view);
 
 private:
 	// Orientation of the arrow. false: left | true: right
 	bool orientation;
 
 
+};
+
+
+class FilledAreaButton : public Widget {
+
+public:
+	FilledAreaButton(xpcc::gui::Color color, Dimension d) :
+		Widget(d, true),
+		color(color)
+	{
+	}
+
+	void
+	setColor(xpcc::gui::Color color)
+	{
+		this->color = color;
+	}
+
+	xpcc::gui::Color
+	getColor() const
+	{
+		return this->color;
+	}
+
+	void
+	render(AbstractView* view);
+
+public:
+	xpcc::gui::Color color;
 };
 
 }

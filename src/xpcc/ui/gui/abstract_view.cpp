@@ -35,9 +35,10 @@
 xpcc::gui::AbstractView::AbstractView(xpcc::gui::ViewStack* stack, uint8_t identifier, xpcc::gui::Dimension dimension) :
 	stack(stack),
 	identifier(identifier),
-	colorpalette(DEFAULT_COLORPALETTE),
 	alive(true),
-	dimension(dimension)
+	dimension(dimension),
+	colorpalette(DEFAULT_COLORPALETTE)
+
 {
 }
 
@@ -115,6 +116,18 @@ xpcc::gui::AbstractView::pack(Widget *w, const xpcc::glcd::Point &coord)
 
 	this->widgets.append(w);
 
+	/* Check if there are other widgets on top of this one, 'on top' means
+	 * that they were 'packed' later, so they are located at an higher index
+	 * in the WidgetContainer this->widgets
+	 * */
+	for(auto iter = widgets.begin(); iter != widgets.end(); ++iter)
+	{
+		// TODO:
+		// this is really ugly and may have quite some perfomance impact when
+		// there are a lot of widgets
+		(*iter)->updateIntersections(&(this->widgets));
+	}
+
 	return true;
 }
 
@@ -135,20 +148,18 @@ xpcc::gui::AbstractView::remove()
 // ----------------------------------------------------------------------------
 void xpcc::gui::AbstractView::draw()
 {
-	auto display = &this->stack->getDisplay();
+//	auto display = &this->stack->getDisplay();
 
 	for(auto iter = widgets.begin(); iter != widgets.end(); ++iter)
 	{
 		/* Only redraw when widget is dirty */
 		if((*iter)->isDirty())
 		{
-			/* first clear widget area with background color */
-			display->setColor(this->colorpalette[xpcc::gui::BACKGROUND]);
-			display->fillRectangle((*iter)->getPosition(), (*iter)->getDimension().width, (*iter)->getDimension().height);
-
-			/* draw widget */
+			/* draw widget
+			 * redrawing widgets on top, that would be overdrawn, is handled
+			 * inside Widget::draw()
+			 * */
 			(*iter)->draw(this);
-			(*iter)->markDrawn();
 		}
 	}
 }

@@ -41,7 +41,33 @@ public:
 	~Widget() {}
 
 	virtual void
-	draw(AbstractView* view) = 0;
+	render(AbstractView* view) = 0;
+
+	void
+	draw(AbstractView *view)
+	{
+
+		// render widget on screen
+		this->render(view);
+		this->markDrawn();
+
+		// if there are widgets on top, redraw them
+		if(this->hasIntersections()) {
+			for(auto iter = this->intersecting_widgets.begin(); iter != this->intersecting_widgets.end(); ++iter)
+			{
+				(*iter)->draw(view);
+			}
+		}
+	}
+
+	bool
+	checkIntersection(Widget* w);
+
+	void
+	updateIntersections(WidgetContainer *widgets);
+
+	bool
+	hasIntersections();
 
 	virtual void
 	activate(const InputEvent& ev, void* data) {
@@ -165,6 +191,9 @@ public:
 	// widget specific font
 	xpcc::accessor::Flash<uint8_t> font;
 
+	// list of widgets that intersect with this widget
+	WidgetContainer intersecting_widgets;
+
 };
 
 
@@ -183,7 +212,7 @@ public:
 	pack(Widget* w, const xpcc::glcd::Point &coord);
 
 	void
-	draw(AbstractView* view);
+	render(AbstractView* view);
 
 	void
 	setColorPalette(ColorPalette* cb);

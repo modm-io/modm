@@ -19,7 +19,7 @@ public:
 	}
 
 	void
-	draw(AbstractView* view);
+	render(AbstractView* view);
 
 	void
 	setValue(T value)

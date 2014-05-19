@@ -14,13 +14,13 @@ bool xpcc::gui::WidgetGroup::pack(Widget* w, const xpcc::glcd::Point& coord)
 	return true;
 }
 
-void xpcc::gui::WidgetGroup::draw(AbstractView* view)
+void xpcc::gui::WidgetGroup::render(AbstractView* view)
 {
 	// draw all widgets
 	WidgetContainer::iterator it;
 
 	for(it = widgets.begin(); it != widgets.end(); ++it) {
-		(*it)->draw(view);
+		(*it)->render(view);
 	}
 }
 
@@ -49,4 +49,58 @@ void xpcc::gui::WidgetGroup::setPosition(const xpcc::glcd::Point& pos)
 
 		(*it)->setPosition(absolute_coord);
 	}
+}
+
+void xpcc::gui::Widget::updateIntersections(WidgetContainer *widgets)
+{
+	/* clear list, but keep size. it won't shrink unless widgets will be removed */
+	this->intersecting_widgets.removeAll();
+
+	/* check every widget if it intersects with this one */
+	for(auto iter = widgets->find(this); iter != widgets->end(); ++iter)
+	{
+		/* don't test against yourself */
+		if((*iter)->uid == this->uid)
+			continue;
+
+		if(this->checkIntersection((*iter)))
+		{
+			/* intersection found, so append to intersecting list */
+			this->intersecting_widgets.append((*iter));
+		}
+	}
+}
+
+bool xpcc::gui::Widget::hasIntersections()
+{
+	return !this->intersecting_widgets.isEmpty();
+}
+
+bool xpcc::gui::Widget::checkIntersection(Widget* w)
+{
+	/* intersection with itself makes no sense */
+	if(w->uid == this->uid)
+		return false;
+
+	/* coordinates of upper left and lower right corner of this widget */
+	auto upper_left = this->getPosition();
+	auto lower_right = xpcc::glcd::Point(upper_left.x + this->getWidth(), upper_left.y + this->getHeight());
+
+	/* coordinates of upper left and lower right corner of the argument Widget* w */
+	auto upper_left2 = w->getPosition();
+	auto lower_right2 = xpcc::glcd::Point(upper_left2.x + w->getWidth(), upper_left2.y + w->getHeight());
+
+	/* check if rectangles contituted by precedingly defined
+	 * coordinates DON'T overlap
+	 * */
+	if(upper_left.x > lower_right2.x ||
+	   upper_left2.x > lower_right.x ||
+	   upper_left.y > lower_right2.y ||
+	   upper_left2.y > lower_right.y
+	  )
+	{
+		return false;
+	}
+
+	return true;
 }

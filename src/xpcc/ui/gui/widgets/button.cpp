@@ -1,6 +1,6 @@
 #include "button.hpp"
 
-void xpcc::gui::ButtonWidget::draw(AbstractView* view)
+void xpcc::gui::ButtonWidget::render(AbstractView* view)
 {
 
 	if(view == NULL)
@@ -52,7 +52,7 @@ void xpcc::gui::ButtonWidget::draw(AbstractView* view)
 
 }
 
-void xpcc::gui::ArrowButton::draw(AbstractView* view)
+void xpcc::gui::ArrowButton::render(AbstractView* view)
 {
 	if(view == NULL)
 		return;
@@ -104,4 +104,25 @@ void xpcc::gui::ArrowButton::draw(AbstractView* view)
 	out->drawLine(x + width - 1, y + height - 1, x + width - 1, y);
 	out->drawLine(x + width, y + height - 1, x, y + height - 1);
 
+}
+
+void xpcc::gui::FilledAreaButton::render(AbstractView* view)
+{
+	if(view == NULL)
+		return;
+
+	// output device of view
+	xpcc::GraphicDisplay* out = &view->display();
+
+	// color palette of view
+	ColorPalette *cp = this->color_palette;
+
+	// position and dimensions
+	const uint16_t x = this->position.x;
+	const uint16_t y = this->position.y;
+	const uint16_t width = this->getWidth();
+	const uint16_t height = this->getHeight();
+
+	out->setColor(cp[this->color]);
+	out->fillRectangle(x, y, width, height);
 }

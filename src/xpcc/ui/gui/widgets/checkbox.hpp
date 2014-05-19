@@ -19,7 +19,7 @@ public:
 	}
 
 	void
-	draw(AbstractView* view);
+	render(AbstractView* view);
 
 	bool
 	getState() { return this->state; }

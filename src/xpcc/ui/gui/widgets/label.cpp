@@ -1,7 +1,7 @@
 #include "label.hpp"
 #include <xpcc/ui/gui/colorpalette.hpp>
 
-void xpcc::gui::Label::draw(AbstractView* view)
+void xpcc::gui::Label::render(AbstractView* view)
 {
 	if(view == NULL)
 		return;
