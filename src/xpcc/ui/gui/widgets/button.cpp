@@ -43,6 +43,9 @@ void xpcc::gui::ButtonWidget::draw(AbstractView* view)
 	const uint16_t stringWidth = xpcc::GraphicDisplay::getStringWidth(this->label, &(this->font));
 	const uint16_t stringHeight = xpcc::GraphicDisplay::getFontHeight(&(this->font));
 
+	if(this->font.isValid())
+		out->setFont(&(this->font));
+
 	out->setColor(cp[Color::TEXT]);
 	out->setCursor(x + (width - stringWidth) / 2, y + (height - stringHeight) / 2);
 	*out << this->label;

@@ -1,6 +1,7 @@
 #ifndef BUTTON_HPP_
 #define BUTTON_HPP_
 
+#include <xpcc/ui/display/font.hpp>
 #include "widget.hpp"
 
 namespace xpcc {

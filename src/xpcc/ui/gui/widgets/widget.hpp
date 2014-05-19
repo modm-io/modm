@@ -22,7 +22,7 @@ class Widget {
 
 public:
 
-	Widget(Dimension &dimension, bool is_interactive) :
+	Widget(Dimension dimension, bool is_interactive) :
 		dimension(dimension),
 		activated(false),
 		cb_activate(NULL),
@@ -30,7 +30,8 @@ public:
 		color_palette(NULL),
 		position(xpcc::glcd::Point(0,0)),
 		dirty(true),
-		is_interactive(is_interactive)
+		is_interactive(is_interactive),
+		font(xpcc::accessor::asFlash(xpcc::font::FixedWidth5x8))
 	{
 		// assign unique id
 		uid = uid_global++;
@@ -124,6 +125,18 @@ public:
 		this->dirty = false;
 	}
 
+	virtual void
+	setFont(const uint8_t *newFont)
+	{
+		this->font = xpcc::accessor::asFlash(newFont);
+	}
+
+	virtual void
+	setFont(const xpcc::accessor::Flash<uint8_t> *font)
+	{
+		this->font = *font;
+	}
+
 public:
 	// Unique id for every widget
 	int16_t uid;
@@ -148,6 +161,9 @@ public:
 
 	// whether widget will receive events
 	bool is_interactive;
+
+	// widget specific font
+	xpcc::accessor::Flash<uint8_t> font;
 
 };
 
