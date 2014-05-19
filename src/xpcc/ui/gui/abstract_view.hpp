@@ -152,13 +152,15 @@ namespace gui
 			return stack;
 		}
 		
-	private:
+
+
+	protected:
 		xpcc::gui::ViewStack* stack;
 		const uint8_t identifier;
-		xpcc::gui::ColorPalette* colorpalette;
 		bool alive;
 		Dimension dimension;
 		WidgetContainer widgets;
+		xpcc::gui::ColorPalette* colorpalette;
 	};
 }
 }
