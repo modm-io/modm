@@ -339,7 +339,7 @@ xpcc::GraphicDisplay::drawImageRaw(glcd::Point upperLeft,
 					this->setPixel(upperLeft.getX() + i, upperLeft.getY() + k * 8 + j);
 				}
 				else {
-					this->clearPixel(upperLeft.getX() + i, upperLeft.getY() + k * 8 + j);
+//					this->clearPixel(upperLeft.getX() + i, upperLeft.getY() + k * 8 + j);
 				}
 				byte >>= 1;
 			}
