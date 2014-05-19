@@ -10,7 +10,7 @@ namespace gui {
 class Label : public Widget {
 
 public:
-	Label(char* lbl) :
+	Label(const char* lbl) :
 		Widget(Dimension(0,0), false),
 		label(lbl)
 	{
@@ -54,14 +54,14 @@ private:
 	}
 
 private:
-	char* label;
+	const char* label;
 
 };
 
 class InteractiveLabel : public Label {
 
 public:
-	InteractiveLabel(char* lbl, Dimension d) :
+	InteractiveLabel(const char* lbl) :
 		Label(lbl)
 	{
 		this->is_interactive = true;
