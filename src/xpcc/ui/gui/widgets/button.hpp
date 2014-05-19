@@ -11,7 +11,7 @@ class ButtonWidget : public Widget {
 
 public:
 
-	ButtonWidget(char* lbl, Dimension d) :
+	ButtonWidget(const char* lbl, Dimension d) :
 		Widget(d, true),
 		label(lbl)
 	{
@@ -26,9 +26,8 @@ public:
 		this->label = lbl;
 	}
 
-public:
-	char *label;
-
+private:
+	const char *label;
 };
 
 

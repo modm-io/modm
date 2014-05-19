@@ -40,8 +40,8 @@ void xpcc::gui::ButtonWidget::draw(AbstractView* view)
 	 * TODO: center text
 	 */
 
-	const uint16_t stringWidth = out->getStringWidth(this->label);
-	const uint16_t stringHeight = out->getFontHeight();
+	const uint16_t stringWidth = xpcc::GraphicDisplay::getStringWidth(this->label, &(this->font));
+	const uint16_t stringHeight = xpcc::GraphicDisplay::getFontHeight(&(this->font));
 
 	out->setColor(cp[Color::TEXT]);
 	out->setCursor(x + (width - stringWidth) / 2, y + (height - stringHeight) / 2);
