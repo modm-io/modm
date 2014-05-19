@@ -194,6 +194,25 @@ xpcc::DynamicArray<T, Allocator>::iterator::operator != (
 }
 
 template <typename T, typename Allocator>
+bool
+xpcc::DynamicArray<T, Allocator>::iterator::operator < (
+		const iterator& other) const
+{
+	return ((parent == other.parent) &&
+			(index < other.index));
+}
+
+template <typename T, typename Allocator>
+bool
+xpcc::DynamicArray<T, Allocator>::iterator::operator > (
+		const iterator& other) const
+{
+	return ((parent == other.parent) &&
+			(index > other.index));
+}
+
+
+template <typename T, typename Allocator>
 T&
 xpcc::DynamicArray<T, Allocator>::iterator::operator * ()
 {
