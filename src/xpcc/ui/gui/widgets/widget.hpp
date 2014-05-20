@@ -23,6 +23,7 @@ class Widget {
 public:
 
 	Widget(Dimension dimension, bool is_interactive) :
+		parent(NULL),
 		dimension(dimension),
 		activated(false),
 		cb_activate(NULL),
@@ -40,9 +41,16 @@ public:
 	virtual
 	~Widget() {}
 
+	/**
+	 * Draws the widget on screen. Each widget need to implement this.
+	 */
 	virtual void
 	render(AbstractView* view) = 0;
 
+	/**
+	 * Interface for drawing widgets. Basically calls render(), but has some
+	 * logic that needs to be executed before and after rendering a widget
+	 */
 	void
 	draw(AbstractView *view)
 	{
@@ -60,15 +68,37 @@ public:
 		}
 	}
 
+	/**
+	 * Handles InputEvents and calls activate/deactivate if event coordinates
+	 * are within widgets dimensions. Returning true means, that the event
+	 * was inside these dimensions, false if not.
+	 */
+	virtual bool
+	handleInputEvent(const InputEvent* ev);
+
+	/**
+	 * Check if given Widget w overlaps *on top*. For widgets overlapping below
+	 * this function also returns false.
+	 */
 	bool
 	checkIntersection(Widget* w);
 
+	/**
+	 * Clear old list of intersecting widgets and rebuild on the basis of the
+	 * given widgets container.
+	 */
 	void
 	updateIntersections(WidgetContainer *widgets);
 
+	/**
+	 * Whether there are other widgets overlapping this one *on top*
+	 */
 	bool
 	hasIntersections();
 
+	/**
+	 * Interface for activating widget. Calls callback function if specified.
+	 */
 	virtual void
 	activate(const InputEvent& ev, void* data) {
 
@@ -80,6 +110,9 @@ public:
 			this->cb_activate(ev, this, data);
 	};
 
+	/**
+	 * Interface for deactivating widget. Calls callback function if specified.
+	 */
 	virtual void
 	deactivate(const InputEvent& ev, void* data) {
 
@@ -91,77 +124,126 @@ public:
 			this->cb_deactivate(ev, this, data);
 	};
 
+	/**
+	 * Get widget-specific color palette. NOT YET USED
+	 */
 	ColorPalette*
 	getColorPalette()
 	{
 		return this->color_palette;
 	}
 
+	/**
+	 * Set widget-specific color palette. NOT YET USED
+	 */
 	virtual void
 	setColorPalette(ColorPalette* cb)
 	{
 		this->color_palette = cb;
 	}
 
+	/**
+	 * Set position of widget on screen.
+	 */
 	virtual void
 	setPosition(const xpcc::glcd::Point& pos)
 	{
 		this->position = pos;
 	}
 
+	/**
+	 * Get position of widget on screen.
+	 */
 	inline xpcc::glcd::Point
 	getPosition()
 	{
 		return this->position;
 	}
 
+	/**
+	 * Get dimension of widget.
+	 */
 	inline xpcc::gui::Dimension
 	getDimension()
 	{
 		return this->dimension;
 	}
 
+	/**
+	 * Get width of widget. Shortcut for getDimension().width
+	 */
 	inline uint16_t
 	getWidth()
 	{
 		return this->dimension.width;
 	}
 
+	/**
+	 * Get height of widget. Shortcut for getDimension().height
+	 */
 	inline uint16_t
 	getHeight()
 	{
 		return this->dimension.height;
 	}
 
+	/**
+	 * Whether widget needs to be redrawn or not.
+	 */
 	virtual bool
 	isDirty()
 	{
 		return this->dirty;
 	}
 
+	/**
+	 * Whether widget can handle input events.
+	 */
 	bool
 	isInteractive()
 	{
 		return this->is_interactive;
 	}
 
+	/**
+	 * Mark widget, that it doesn't need to be redrawn anymore.
+	 */
 	virtual void
 	markDrawn()
 	{
 		this->dirty = false;
 	}
 
+	/**
+	 * Mark widget, that it needs to be redrawn.
+	 */
+	virtual void
+	markDirty()
+	{
+		this->dirty = true;
+	}
+
+	/**
+	 * Set widget-specific font. Use xpcc::font::FontName as argument.
+	 */
 	virtual void
 	setFont(const uint8_t *newFont)
 	{
 		this->font = xpcc::accessor::asFlash(newFont);
 	}
 
+	/**
+	 * Set widget-specific font. Use pointer to Flash as argument.
+	 */
 	virtual void
 	setFont(const xpcc::accessor::Flash<uint8_t> *font)
 	{
 		this->font = *font;
 	}
+
+public:
+	// Parent widget, NULL when there's no parent
+	Widget *parent;
 
 public:
 	// Unique id for every widget
@@ -213,6 +295,9 @@ public:
 
 	void
 	render(AbstractView* view);
+
+	bool
+	handleInputEvent(const InputEvent* ev);
 
 	void
 	setColorPalette(ColorPalette* cb);

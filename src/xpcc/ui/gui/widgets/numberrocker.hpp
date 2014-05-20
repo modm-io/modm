@@ -43,9 +43,6 @@ public:
 	void
 	deactivate(const InputEvent& ev, void* data);
 
-	void
-	handleInputEvent(const InputEvent& ev);
-
 private:
 	static void
 	increase_cb(const InputEvent& ev, Widget* w, void* data);

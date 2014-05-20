@@ -8,6 +8,7 @@ bool xpcc::gui::WidgetGroup::pack(Widget* w, const xpcc::glcd::Point& coord)
 	// preliminary set relative position. will be translated to absolute coordinates
 	// when WidgetGroup will be packed to a view
 	w->setPosition(coord);
+	w->parent = this;
 
 	this->widgets.append(w);
 
@@ -16,11 +17,12 @@ bool xpcc::gui::WidgetGroup::pack(Widget* w, const xpcc::glcd::Point& coord)
 
 void xpcc::gui::WidgetGroup::render(AbstractView* view)
 {
-	// draw all widgets
-	WidgetContainer::iterator it;
-
-	for(it = widgets.begin(); it != widgets.end(); ++it) {
-		(*it)->render(view);
+	/* draw all widgets */
+	for(auto iter = widgets.begin(); iter != widgets.end(); ++iter) {
+		if((*iter)->isDirty())
+		{
+			(*iter)->draw(view);
+		}
 	}
 }
 
@@ -103,4 +105,46 @@ bool xpcc::gui::Widget::checkIntersection(Widget* w)
 	}
 
 	return true;
+}
+
+bool xpcc::gui::Widget::handleInputEvent(const InputEvent* ev)
+{
+	/* absolute position of widget */
+	auto position = this->getPosition();
+
+	/* check if event is within area */
+	if((position.x < ev->coord.x) &&
+	   (position.y < ev->coord.y) &&
+	   ((position.x + this->getWidth()) > ev->coord.x) &&
+	   ((position.y + this->getHeight()) > ev->coord.y))
+	{
+		/* check if widget has interaction */
+		if(this->isInteractive())
+		{
+			if(ev->direction == xpcc::gui::InputEvent::Direction::DOWN) {
+				this->activate(*ev, NULL);
+			} else if(ev->direction == xpcc::gui::InputEvent::Direction::UP) {
+				this->deactivate(*ev, NULL);
+			}
+		}
+		/* event was meant for this widget, so return true regardless of interaction */
+		return true;
+	}
+
+	return false;
+}
+
+bool xpcc::gui::WidgetGroup::handleInputEvent(const InputEvent* ev)
+{
+
+	for(auto iter = widgets.begin(); iter != widgets.end(); ++iter)
+	{
+		if((*iter)->handleInputEvent(ev))
+		{
+			/* event was meant for this widget, so we can break here */
+			return true;
+		}
+	}
+
+	return false;
 }

@@ -67,23 +67,10 @@ xpcc::gui::AbstractView::update()
 			/*
 			 * TODO: implement efficient algorithm here (note: segment tree)
 			 */
-
-			auto position = (*iter)->getPosition();
-
-			if((position.x < ev->coord.x) &&
-			   (position.y < ev->coord.y) &&
-			   ((position.x + (*iter)->getWidth()) > ev->coord.x) &&
-			   ((position.y + (*iter)->getHeight()) > ev->coord.y))
+			if((*iter)->handleInputEvent(ev))
 			{
-				/* check if widget has interaction */
-				if((*iter)->isInteractive())
-				{
-					if(ev->direction == xpcc::gui::InputEvent::Direction::DOWN) {
-						(*iter)->activate(*ev, NULL);
-					} else if(ev->direction == xpcc::gui::InputEvent::Direction::UP) {
-						(*iter)->deactivate(*ev, NULL);
-					}
-				}
+				/* we found the widget that this event was meant for*/
+				break;
 			}
 		}
 
