@@ -18,6 +18,10 @@ void xpcc::gui::ButtonWidget::render(AbstractView* view)
 	const uint16_t width = this->getWidth();
 	const uint16_t height = this->getHeight();
 
+	// clear background
+	out->setColor(cp[Color::BACKGROUND]);
+	out->fillRectangle(this->getPosition(), this->getWidth(), this->getHeight());
+
 	/*
 	 * choose color depending on button state
 	 */
@@ -25,7 +29,6 @@ void xpcc::gui::ButtonWidget::render(AbstractView* view)
 		out->setColor(cp[Color::ACTIVATED]);
 	else
 		out->setColor(cp[Color::DEACTIVATED]);
-
 
 	/*
 	 * draw button outline

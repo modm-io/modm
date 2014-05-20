@@ -20,6 +20,10 @@ void xpcc::gui::NumberField<T>::render(AbstractView* view)
 	const uint16_t box_x = this->position.x + 2;
 	const uint16_t box_y = this->position.y;
 
+	// clear background
+	out->setColor(cp[Color::BACKGROUND]);
+	out->fillRectangle(this->getPosition(), this->getWidth(), this->getHeight());
+
 	// draw box
 	out->setColor(cp[Color::BORDER]);
 	out->drawLine(box_x, box_y, box_x + box_width - 1, box_y);
