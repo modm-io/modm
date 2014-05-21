@@ -8,4 +8,6 @@
 #include "widgets/numberrocker.hpp"
 #include "widgets/label.hpp"
 
+#include "widgets/composed_widgets/tab_panel.hpp"
+
 #endif /* WIDGETS_HPP_ */

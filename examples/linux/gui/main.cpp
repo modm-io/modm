@@ -8,6 +8,8 @@
 
 #include "screens/homeview.hpp"
 #include "screens/choose_color.hpp"
+#include "screens/overview.hpp"
+
 
 #include "sdl_display.hpp"
 
@@ -261,33 +263,14 @@ MAIN_FUNCTION
 
 	ChooseColorView startView(&myViewStack, 1);
 
-//	HomeView myView(&myViewStack, 1);
-//
-//	xpcc::gui::ButtonWidget toggleLedButton((char*)"Toggle Green", xpcc::gui::Dimension(100, 50));
-//	xpcc::gui::ButtonWidget doNothingButton((char*)"Do nothing", xpcc::gui::Dimension(100, 50));
-//
-//	xpcc::gui::NumberRocker<int16_t> rocker1(100, 50, xpcc::gui::Dimension(200, 30));
-//
-//	xpcc::gui::CheckboxWidget checkbox1(true, xpcc::gui::Dimension(30, 30));
-//
-//	/*
-//	 * connect callbacks to widgets
-//	 */
-//
-//	toggleLedButton.cb_activate = &test_callback;
-//
-//
-//	/*
-//	 * place widgets in view
-//	 */
-//
-//	myView.pack(&toggleLedButton, xpcc::glcd::Point(110, 10));
-//	myView.pack(&doNothingButton, xpcc::glcd::Point(110, 80));
-//	myView.pack(&checkbox1, xpcc::glcd::Point(60, 140));
-//	myView.pack(&rocker1, xpcc::glcd::Point(60, 200));
+	Overview overview(&myViewStack, 2);
+
+	HomeView homeview(&myViewStack, 1);
 
 
-	myViewStack.push(&startView);
+//	myViewStack.push(&startView);
+	myViewStack.push(&overview);
+//	myViewStack.push(&homeview);
 
 	/*
 	 * main loop

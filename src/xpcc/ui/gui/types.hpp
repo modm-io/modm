@@ -111,6 +111,11 @@ namespace gui {
 	typedef struct Dimension {
 		Dimension(uint16_t w, uint16_t h) : width(w), height(h) {}
 		uint16_t width, height;
+		bool operator == (const Dimension& other) const
+		{
+			return (width == other.width) && (height == other.height);
+		}
+
 	} Dimension;
 
 }
