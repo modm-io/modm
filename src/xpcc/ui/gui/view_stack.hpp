@@ -28,8 +28,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__VIEWSTACK_HPP
-#define XPCC__VIEWSTACK_HPP
+#ifndef XPCC__GUI_VIEWSTACK_HPP
+#define XPCC__GUI_VIEWSTACK_HPP
 
 #include "../display/graphic_display.hpp"
 #include "../../container/stack.hpp"
@@ -134,4 +134,4 @@ namespace gui
 }
 }
 
-#endif // XPCC__VIEWSTACK_HPP
+#endif // XPCC__GUI_VIEWSTACK_HPP
