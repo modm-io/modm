@@ -55,29 +55,24 @@ private:
 class FilledAreaButton : public Widget {
 
 public:
-	FilledAreaButton(xpcc::gui::Color color, Dimension d) :
+	FilledAreaButton(xpcc::glcd::Color color, Dimension d) :
 		Widget(d, true),
 		color(color)
 	{
 	}
 
 	void
-	setColor(xpcc::gui::Color color)
+	setBackgroundColor(xpcc::glcd::Color color)
 	{
 		this->color = color;
-	}
-
-	xpcc::gui::Color
-	getColor() const
-	{
-		return this->color;
 	}
 
 	void
 	render(AbstractView* view);
 
-public:
-	xpcc::gui::Color color;
+private:
+	xpcc::glcd::Color color;
+
 };
 
 }

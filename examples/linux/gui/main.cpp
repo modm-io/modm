@@ -222,20 +222,20 @@ test_callback(const xpcc::gui::InputEvent& ev, xpcc::gui::Widget* w, void* data)
 }
 
 
-xpcc::gui::ColorPalette colorpalette[xpcc::gui::Color::PALETTE_SIZE] = {
-	xpcc::glcd::Color::black(),
-	xpcc::glcd::Color::white(),
-	xpcc::glcd::Color::gray(),
-	xpcc::glcd::Color::red(),
-	xpcc::glcd::Color::green(),
-	xpcc::glcd::Color::blue(),
-	xpcc::glcd::Color::yellow(),
-	xpcc::glcd::Color::blue(),		// BORDER
-	xpcc::glcd::Color::red(),		// TEXT
-	xpcc::glcd::Color::black(),		// BACKGROUND
-	xpcc::glcd::Color::red(),		// ACTIVATED
-	xpcc::glcd::Color::blue(),		// DEACTIVATED
-};
+//xpcc::gui::ColorPalette colorpalette[xpcc::gui::Color::PALETTE_SIZE] = {
+//	xpcc::glcd::Color::black(),
+//	xpcc::glcd::Color::white(),
+//	xpcc::glcd::Color::gray(),
+//	xpcc::glcd::Color::red(),
+//	xpcc::glcd::Color::green(),
+//	xpcc::glcd::Color::blue(),
+//	xpcc::glcd::Color::yellow(),
+//	xpcc::glcd::Color::blue(),		// BORDER
+//	xpcc::glcd::Color::yellow(),	// TEXT
+//	xpcc::glcd::Color::black(),		// BACKGROUND
+//	xpcc::glcd::Color::red(),		// ACTIVATED
+//	xpcc::glcd::Color::blue(),		// DEACTIVATED
+//};
 
 
 // ----------------------------------------------------------------------------
@@ -252,7 +252,7 @@ MAIN_FUNCTION
 	 * manipulate the color palette
 	 */
 
-	colorpalette[xpcc::gui::Color::TEXT] = xpcc::glcd::Color::yellow();
+//	colorpalette[xpcc::gui::Color::TEXT] = xpcc::glcd::Color::yellow();
 
 
 	/*
@@ -261,15 +261,15 @@ MAIN_FUNCTION
 
 	xpcc::gui::ViewStack myViewStack(display, &input_queue);
 
-	ChooseColorView startView(&myViewStack, 1);
+	ChooseColorView colorchoose(&myViewStack, 1);
 
-	Overview overview(&myViewStack, 2);
+//	Overview overview(&myViewStack, 2);
 
-	HomeView homeview(&myViewStack, 1);
+//	HomeView homeview(&myViewStack, 1);
 
 
-//	myViewStack.push(&startView);
-	myViewStack.push(&overview);
+	myViewStack.push(&colorchoose);
+//	myViewStack.push(&overview);
 //	myViewStack.push(&homeview);
 
 	/*

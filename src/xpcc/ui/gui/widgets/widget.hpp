@@ -28,7 +28,7 @@ public:
 		activated(false),
 		cb_activate(NULL),
 		cb_deactivate(NULL),
-		color_palette(NULL),
+		color_palette(DEFAULT_COLORPALETTE),
 		position(xpcc::glcd::Point(0,0)),
 		dirty(true),
 		is_interactive(is_interactive),
@@ -127,19 +127,27 @@ public:
 	/**
 	 * Get widget-specific color palette. NOT YET USED
 	 */
-	ColorPalette*
+	ColorPalette&
 	getColorPalette()
 	{
 		return this->color_palette;
 	}
 
 	/**
-	 * Set widget-specific color palette. NOT YET USED
+	 * Set widget-specific color palette.
 	 */
 	virtual void
-	setColorPalette(ColorPalette* cb)
+	setColorPalette(ColorPalette& cb)
 	{
 		this->color_palette = cb;
+		this->markDirty();
+	}
+
+	void
+	setColor(xpcc::gui::Color color, xpcc::glcd::Color value)
+	{
+		this->color_palette[color] = value;
+		this->markDirty();
 	}
 
 	/**
@@ -259,7 +267,7 @@ public:
 	eventCallback cb_activate, cb_deactivate;
 
 	// for now unused, maybe needed later for custom styles
-	ColorPalette *color_palette;
+	ColorPalette color_palette;
 
 	// position on screen (absolute)
 	xpcc::glcd::Point position;
@@ -300,7 +308,7 @@ public:
 	handleInputEvent(const InputEvent* ev);
 
 	void
-	setColorPalette(ColorPalette* cb);
+	setColorPalette(ColorPalette& cb);
 
 	void
 	setPosition(const xpcc::glcd::Point& pos);

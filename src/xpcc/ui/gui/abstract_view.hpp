@@ -119,13 +119,16 @@ namespace gui
 		 * @brief set color palette for every contained widget
 		 */
 		void
-		setColorPalette(ColorPalette *cp);
+		setColorPalette(ColorPalette& cp);
 
-		ColorPalette*
+		ColorPalette&
 		getColorPalette()
 		{
 			return this->colorpalette;
 		}
+
+		void
+		markDirty();
 
 		/**
 		 * @brief getIdentifier of the view.
@@ -160,7 +163,7 @@ namespace gui
 		bool alive;
 		Dimension dimension;
 		WidgetContainer widgets;
-		xpcc::gui::ColorPalette* colorpalette;
+		xpcc::gui::ColorPalette colorpalette;
 	};
 }
 }

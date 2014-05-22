@@ -12,7 +12,7 @@ void xpcc::gui::CheckboxWidget::render(AbstractView* view)
 	xpcc::GraphicDisplay* out = &view->display();
 
 	// color palette of view
-	ColorPalette *cp = this->color_palette;
+	ColorPalette cp = this->color_palette;
 
 	const uint16_t box_width = this->dimension.width;
 	const uint16_t box_height = this->dimension.height;

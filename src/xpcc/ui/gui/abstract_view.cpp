@@ -30,6 +30,7 @@
 
 #include "view_stack.hpp"
 #include "abstract_view.hpp"
+#include "types.hpp"
 
 // ----------------------------------------------------------------------------
 xpcc::gui::AbstractView::AbstractView(xpcc::gui::ViewStack* stack, uint8_t identifier, xpcc::gui::Dimension dimension) :
@@ -40,6 +41,7 @@ xpcc::gui::AbstractView::AbstractView(xpcc::gui::ViewStack* stack, uint8_t ident
 	colorpalette(DEFAULT_COLORPALETTE)
 
 {
+	this->display().clear();
 }
 
 // ----------------------------------------------------------------------------
@@ -99,7 +101,7 @@ xpcc::gui::AbstractView::pack(Widget *w, const xpcc::glcd::Point &coord)
 	}
 
 	w->setPosition(coord);
-	w->setColorPalette(this->colorpalette);
+//	w->setColorPalette(this->colorpalette);
 
 	this->widgets.append(w);
 
@@ -167,18 +169,32 @@ xpcc::gui::AbstractView::display()
 
 // ----------------------------------------------------------------------------
 void
-xpcc::gui::AbstractView::setColorPalette(ColorPalette* cp)
+xpcc::gui::AbstractView::setColorPalette(ColorPalette& cp)
 {
 
 	this->colorpalette = cp;
+	this->display().setBackgroundColor(cp[Color::BACKGROUND]);
 
 	/*
 	 * widget specific color palette disabled for now, so this isn't really needed
 	 */
 
+	this->display().clear();
+
 	for(auto iter = widgets.begin(); iter != widgets.end(); ++iter)
 	{
-		(*iter)->color_palette = cp;
+		(*iter)->setColorPalette(cp);
+		(*iter)->markDirty();
 	}
 
 }
+
+void xpcc::gui::AbstractView::markDirty()
+{
+	for(auto iter = widgets.begin(); iter != widgets.end(); ++iter)
+	{
+		(*iter)->markDirty();
+	}
+}
+
+

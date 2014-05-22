@@ -10,7 +10,7 @@ void xpcc::gui::ButtonWidget::render(AbstractView* view)
 	xpcc::GraphicDisplay* out = &view->display();
 
 	// color palette of view
-	ColorPalette *cp = this->color_palette;
+	ColorPalette cp = this->color_palette;
 
 	// position and dimensions
 	const uint16_t x = this->position.x;
@@ -64,7 +64,7 @@ void xpcc::gui::ArrowButton::render(AbstractView* view)
 	xpcc::GraphicDisplay* out = &view->display();
 
 	// color palette of view
-	ColorPalette *cp = this->color_palette;
+	ColorPalette cp = this->color_palette;
 
 	// position and dimensions
 	const uint16_t x = this->position.x;
@@ -101,7 +101,6 @@ void xpcc::gui::ArrowButton::render(AbstractView* view)
 		out->setColor(cp[Color::BORDER]);
 
 	// draw box
-	//out->setColor(cp[Color::BORDER]);
 	out->drawLine(x, y, x + width - 1, y);
 	out->drawLine(x, y, x, y + height - 1);
 	out->drawLine(x + width - 1, y + height - 1, x + width - 1, y);
@@ -118,7 +117,7 @@ void xpcc::gui::FilledAreaButton::render(AbstractView* view)
 	xpcc::GraphicDisplay* out = &view->display();
 
 	// color palette of view
-	ColorPalette *cp = this->color_palette;
+	ColorPalette cp = this->color_palette;
 
 	// position and dimensions
 	const uint16_t x = this->position.x;
@@ -126,6 +125,6 @@ void xpcc::gui::FilledAreaButton::render(AbstractView* view)
 	const uint16_t width = this->getWidth();
 	const uint16_t height = this->getHeight();
 
-	out->setColor(cp[this->color]);
+	out->setColor(color);
 	out->fillRectangle(x, y, width, height);
 }

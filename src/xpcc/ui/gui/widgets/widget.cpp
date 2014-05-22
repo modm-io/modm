@@ -26,7 +26,7 @@ void xpcc::gui::WidgetGroup::render(AbstractView* view)
 	}
 }
 
-void xpcc::gui::WidgetGroup::setColorPalette(ColorPalette* cb)
+void xpcc::gui::WidgetGroup::setColorPalette(ColorPalette& cb)
 {
 	this->color_palette = cb;
 

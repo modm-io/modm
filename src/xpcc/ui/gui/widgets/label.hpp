@@ -10,15 +10,22 @@ namespace gui {
 class Label : public Widget {
 
 public:
-	Label(const char* lbl) :
+	Label(const char* lbl, xpcc::glcd::Color color) :
 		Widget(Dimension(0,0), false),
-		label(lbl)
+		label(lbl),
+		color(color)
 	{
 		this->updateDimension();
 	}
 
 	void
 	render(AbstractView* view);
+
+	void
+	setColor(xpcc::glcd::Color color)
+	{
+		this->color = color;
+	}
 
 	void
 	setLabel(char* lbl)
@@ -55,19 +62,20 @@ private:
 
 private:
 	const char* label;
+	xpcc::glcd::Color color;
 
 };
 
-
-class InteractiveLabel : public Label {
-
-public:
-	InteractiveLabel(const char* lbl) :
-		Label(lbl)
-	{
-		this->is_interactive = true;
-	}
-};
+//
+//class InteractiveLabel : public Label {
+//
+//public:
+//	InteractiveLabel(const char* lbl) :
+//		Label(lbl)
+//	{
+//		this->is_interactive = true;
+//	}
+//};
 
 }
 }
