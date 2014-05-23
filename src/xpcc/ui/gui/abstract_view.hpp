@@ -76,6 +76,16 @@ namespace gui
 		virtual void
 		update();
 
+		virtual void
+		preUpdate()
+		{
+		}
+
+		virtual void
+		postUpdate()
+		{
+		}
+
 		/**
 		 * @brief hasChanged indicates the current displayed view has changed.
 		 *        This function prevents unnecessary drawing of the display

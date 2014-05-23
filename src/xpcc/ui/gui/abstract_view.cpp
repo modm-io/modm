@@ -54,6 +54,8 @@ void
 xpcc::gui::AbstractView::update()
 {
 
+	preUpdate();
+
 	InputEvent* ev;
 
 	xpcc::gui::inputQueue* input_queue = this->stack->getInputQueue();
@@ -79,6 +81,8 @@ xpcc::gui::AbstractView::update()
 		// delete InputEvent, we don't need it anymore
 		delete ev;
 	}
+
+	postUpdate();
 }
 
 // ----------------------------------------------------------------------------
@@ -204,4 +208,3 @@ void xpcc::gui::AbstractView::markDrawn()
 		(*iter)->markDrawn();
 	}
 }
-
