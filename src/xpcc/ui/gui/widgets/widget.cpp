@@ -122,9 +122,9 @@ bool xpcc::gui::Widget::handleInputEvent(const InputEvent* ev)
 		if(this->isInteractive())
 		{
 			if(ev->direction == xpcc::gui::InputEvent::Direction::DOWN) {
-				this->activate(*ev, NULL);
+				this->activate(*ev, this->cbData);
 			} else if(ev->direction == xpcc::gui::InputEvent::Direction::UP) {
-				this->deactivate(*ev, NULL);
+				this->deactivate(*ev, this->cbData);
 			}
 		}
 		/* event was meant for this widget, so return true regardless of interaction */

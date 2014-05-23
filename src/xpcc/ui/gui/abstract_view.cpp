@@ -197,4 +197,11 @@ void xpcc::gui::AbstractView::markDirty()
 	}
 }
 
+void xpcc::gui::AbstractView::markDrawn()
+{
+	for(auto iter = widgets.begin(); iter != widgets.end(); ++iter)
+	{
+		(*iter)->markDrawn();
+	}
+}
 

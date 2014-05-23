@@ -26,6 +26,7 @@ public:
 		parent(NULL),
 		dimension(dimension),
 		activated(false),
+		cbData(NULL),
 		cb_activate(NULL),
 		cb_deactivate(NULL),
 		color_palette(DEFAULT_COLORPALETTE),
@@ -249,6 +250,12 @@ public:
 		this->font = *font;
 	}
 
+	void
+	setCallbackData(void* data)
+	{
+		this->cbData = data;
+	}
+
 public:
 	// Parent widget, NULL when there's no parent
 	Widget *parent;
@@ -262,6 +269,9 @@ public:
 
 	// where this widget is active or not (e.g. clicked)
 	bool activated;
+
+	// arbitrary data that is passed to callbacks
+	void* cbData;
 
 	// callbacks for activation and deactivation event
 	eventCallback cb_activate, cb_deactivate;

@@ -130,6 +130,9 @@ namespace gui
 		void
 		markDirty();
 
+		void
+		markDrawn();
+
 		/**
 		 * @brief getIdentifier of the view.
 		 */
@@ -140,6 +143,12 @@ namespace gui
 		xpcc::GraphicDisplay&
 		display();
 		
+		inline xpcc::gui::ViewStack*
+		getViewStack()
+		{
+			return stack;
+		}
+
 	protected:
 
 		/**
@@ -148,13 +157,6 @@ namespace gui
 		 */
 		virtual void
 		onRemove();
-		
-		inline xpcc::gui::ViewStack*
-		getViewStack()
-		{
-			return stack;
-		}
-		
 
 
 	protected:
