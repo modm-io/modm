@@ -43,6 +43,12 @@ public:
 	void
 	deactivate(const InputEvent& ev, void* data);
 
+	T
+	getValue()
+	{
+		return this->value;
+	}
+
 private:
 	static void
 	increase_cb(const InputEvent& ev, Widget* w, void* data);

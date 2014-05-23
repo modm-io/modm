@@ -10,6 +10,12 @@ void xpcc::gui::NumberRocker<T>::increase()
 	this->value += this->step;
 	this->num_field.setValue(this->value);
 	this->num_field.markDirty();
+
+	if(cb_activate != NULL)
+	{
+		cb_activate(InputEvent(), this, cbData);
+	}
+
 }
 
 template<typename T>
@@ -18,6 +24,11 @@ void xpcc::gui::NumberRocker<T>::decrease()
 	this->value -= this->step;
 	this->num_field.setValue(this->value);
 	this->num_field.markDirty();
+
+	if(cb_activate != NULL)
+	{
+		cb_activate(InputEvent(), this, cbData);
+	}
 }
 
 template<typename T>
