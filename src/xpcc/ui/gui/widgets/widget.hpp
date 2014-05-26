@@ -30,7 +30,8 @@ public:
 		cb_activate(NULL),
 		cb_deactivate(NULL),
 		color_palette(DEFAULT_COLORPALETTE),
-		position(xpcc::glcd::Point(0,0)),
+		position(xpcc::glcd::Point(-10,-10)),
+		relative_position(xpcc::glcd::Point(-10,-10)),
 		dirty(true),
 		is_interactive(is_interactive),
 		font(xpcc::accessor::asFlash(xpcc::font::FixedWidth5x8))
@@ -152,21 +153,70 @@ public:
 	}
 
 	/**
-	 * Set position of widget on screen.
+	 * Set position of widget relative to its parent. Also updates the absolute
+	 * position by looping through parents.
 	 */
 	virtual void
 	setPosition(const xpcc::glcd::Point& pos)
 	{
-		this->position = pos;
+		this->setRelativePosition(pos);
+
+		this->updatePosition();
 	}
 
 	/**
-	 * Get position of widget on screen.
+	 * Get absolute position of widget on screen.
 	 */
 	inline xpcc::glcd::Point
 	getPosition()
 	{
 		return this->position;
+	}
+
+	/**
+	 * Get position of widget relative to its parent.
+	 */
+	inline xpcc::glcd::Point
+	getRelativePosition()
+	{
+		return this->relative_position;
+	}
+
+	/**
+	 * Only set the relative position.
+	 */
+	inline void
+	setRelativePosition(const xpcc::glcd::Point& pos)
+	{
+		this->relative_position = pos;
+	}
+
+	/**
+	 * Updates the absolute position by looping through all parents and adding
+	 * up their relative positions.
+	 */
+	void
+	updatePosition()
+	{
+		this->position = this->getRelativePosition();
+
+		Widget* w = this;
+
+		while(w->parent != NULL)
+		{
+			this->position += w->parent->getRelativePosition();
+			w = w->parent;
+		}
+	}
+
+	/**
+	 * Set parent for widget, updates the absolute position afterwards.
+	 */
+	inline void
+	setParent(Widget* parent)
+	{
+		this->parent = parent;
+		this->updatePosition();
 	}
 
 	/**
@@ -279,8 +329,12 @@ public:
 	// for now unused, maybe needed later for custom styles
 	ColorPalette color_palette;
 
-	// position on screen (absolute)
+	// position on screen (used for rendering), may be recomputed based on
+	// relative position
 	xpcc::glcd::Point position;
+
+	// relative position inside a WidgetGroup for exemple
+	xpcc::glcd::Point relative_position;
 
 	// has changes to be drawed
 	bool dirty;

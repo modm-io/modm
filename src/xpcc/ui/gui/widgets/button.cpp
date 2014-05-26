@@ -13,8 +13,8 @@ void xpcc::gui::ButtonWidget::render(AbstractView* view)
 	ColorPalette cp = this->color_palette;
 
 	// position and dimensions
-	const uint16_t x = this->position.x;
-	const uint16_t y = this->position.y;
+	const uint16_t x = this->getPosition().x;
+	const uint16_t y = this->getPosition().y;
 	const uint16_t width = this->getWidth();
 	const uint16_t height = this->getHeight();
 
@@ -67,8 +67,8 @@ void xpcc::gui::ArrowButton::render(AbstractView* view)
 	ColorPalette cp = this->color_palette;
 
 	// position and dimensions
-	const uint16_t x = this->position.x;
-	const uint16_t y = this->position.y;
+	const uint16_t x = this->getPosition().x;
+	const uint16_t y = this->getPosition().y;
 	const uint16_t width = this->getWidth();
 	const uint16_t height = this->getHeight();
 
@@ -116,12 +116,9 @@ void xpcc::gui::FilledAreaButton::render(AbstractView* view)
 	// output device of view
 	xpcc::GraphicDisplay* out = &view->display();
 
-	// color palette of view
-	ColorPalette cp = this->color_palette;
-
 	// position and dimensions
-	const uint16_t x = this->position.x;
-	const uint16_t y = this->position.y;
+	const uint16_t x = this->getPosition().x;
+	const uint16_t y = this->getPosition().y;
 	const uint16_t width = this->getWidth();
 	const uint16_t height = this->getHeight();
 

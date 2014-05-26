@@ -9,9 +9,6 @@ void xpcc::gui::Label::render(AbstractView* view)
 	// output device of view
 	xpcc::GraphicDisplay* out = &view->display();
 
-	// color palette of view
-	ColorPalette cp = this->getColorPalette();
-
 	out->setColor(color);
 
 	if(this->font.isValid())
@@ -19,6 +16,6 @@ void xpcc::gui::Label::render(AbstractView* view)
 		out->setFont(&(this->font));
 	}
 
-	out->setCursor(this->position.x, this->position.y);
+	out->setCursor(this->getPosition().x, this->getPosition().y);
 	*out << this->label;
 }
