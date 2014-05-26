@@ -1,6 +1,6 @@
 
 # path to the xpcc root directory
-rootpath = '../../..'
+rootpath = '../../../..'
 
 # default target is 'stm'
 target = ARGUMENTS.get('target', 'stm')
