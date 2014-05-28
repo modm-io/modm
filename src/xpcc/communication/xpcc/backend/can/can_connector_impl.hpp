@@ -76,7 +76,7 @@ xpcc::CanConnector<Driver>::sendPacket(const Header &header, SmartPointer payloa
 {
 	bool successful = false;
 	bool fragmented = (payload.getSize() > 8);
-	
+
 	uint32_t identifier = convertToIdentifier(header, fragmented);
 	if (!fragmented && this->canDriver->isReadyToSend())
 	{
@@ -84,7 +84,7 @@ xpcc::CanConnector<Driver>::sendPacket(const Header &header, SmartPointer payloa
 		successful = this->sendMessage(identifier,
 				payload.getPointer(), payload.getSize());
 	}
-	
+
 	if (!successful)
 	{
 		// append the message to the list of waiting messages
@@ -119,10 +119,10 @@ xpcc::CanConnector<Driver>::sendMessage(const uint32_t & identifier,
 		const uint8_t *data, uint8_t size)
 {
 	xpcc::can::Message message(identifier, size);
-	
+
 	// copy payload data
 	std::memcpy(message.data, data, size);
-	
+
 	return this->canDriver->sendMessage(message);
 }
 
@@ -134,18 +134,25 @@ xpcc::CanConnector<Driver>::sendWaitingMessages()
 		// no message in the queue
 		return;
 	}
-	
+	else if (canDriver->getBusState() != can::CONNECTED) {
+		// No connection to the CAN bus, drop all messages which should be send
+		while (!sendList.isEmpty()) {
+			sendList.removeFront();
+		}
+		return;
+	}
+
 	SendListItem& message = this->sendList.getFront();
-	
+
 	uint8_t messageSize = message.payload.getSize();
 	if (messageSize > 8)
 	{
 		// fragmented message
 		uint8_t data[8];
-		
+
 		data[0] = message.fragmentIndex | (this->messageCounter & 0xf0);
 		data[1] = messageSize; 	// size of the complete message
-		
+
 		bool sendFinished = true;
 		uint8_t offset = message.fragmentIndex * 6;
 		uint8_t fragmentSize = messageSize - offset;
@@ -158,7 +165,7 @@ xpcc::CanConnector<Driver>::sendWaitingMessages()
 		// fragment is about to be sent.
 
 		memcpy(data + 2, message.payload.getPointer() + offset, fragmentSize);
-		
+
 		if (sendMessage(message.identifier, data, fragmentSize + 2))
 		{
 			message.fragmentIndex++;
@@ -190,7 +197,7 @@ xpcc::CanConnector<Driver>::retrieveMessage()
 	{
 		xpcc::Header header;
 		bool isFragment = convertToHeader(message.identifier, header);
-		
+
 		if (!isFragment)
 		{
 			this->receivedMessages.append(ReceiveListItem(message.length, header));
@@ -204,10 +211,10 @@ xpcc::CanConnector<Driver>::retrieveMessage()
 			const uint8_t fragmentIndex = message.data[0] & 0x0f;
 			const uint8_t counter = message.data[0] & 0xf0;
 			const uint8_t messageSize = message.data[1];
-			
+
 			// calculate the number of messages need to send messageSize-bytes
 			uint8_t numberOfFragments = this->getNumberOfFragments(messageSize);
-			
+
 			if (message.length < 3 || messageSize > 48 ||
 					fragmentIndex >= numberOfFragments)
 			{
@@ -236,7 +243,7 @@ xpcc::CanConnector<Driver>::retrieveMessage()
 				// illegal format
 				return false;
 			}
-			
+
 			// Check if other parts of this message are already in the
 			// list of receiving messages.
 			typename ReceiveList::iterator packet = this->pendingMessages.begin();
@@ -248,14 +255,14 @@ xpcc::CanConnector<Driver>::retrieveMessage()
 					break;
 				}
 			}
-			
+
 			if (packet == this->pendingMessages.end()) {
 				// message not found => first part of this message,
 				// prepend it to the list
 				this->pendingMessages.prepend(ReceiveListItem(messageSize, header, counter));
 				packet = this->pendingMessages.begin();
 			}
-			
+
 			// create a marker for the currently received fragment and
 			// test if the fragment was already received
 			const uint8_t currentFragment = (1 << fragmentIndex);
@@ -266,11 +273,11 @@ xpcc::CanConnector<Driver>::retrieveMessage()
 				packet->receivedFragments = 0;
 			}
 			packet->receivedFragments |= currentFragment;
-			
+
 			std::memcpy(packet->payload.getPointer() + offset,
 					message.data + 2,
 					message.length - 2);
-			
+
 			// test if this was the last segment, otherwise we have to wait
 			// for more messages
 			if (xpcc::bitCount(packet->receivedFragments) == numberOfFragments)
@@ -279,7 +286,7 @@ xpcc::CanConnector<Driver>::retrieveMessage()
 				this->pendingMessages.remove(packet);
 			}
 		}
-		
+
 		return true;
 	}
 	else {
