@@ -68,7 +68,7 @@ namespace xpcc
 		 * 			Timed interval in millisecond resolution (depends on
 		 * 			xpcc::Clock). Set to zero to create a stopped timer.
 		 */
-		PeriodicTimer(const Timestamp interval);
+		PeriodicTimer(const Timestamp interval = 0);
 		
 		/// Stop the timer
 		inline void
