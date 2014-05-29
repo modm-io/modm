@@ -9,7 +9,6 @@
 
 #include "uart_simple_spi_{{id}}.hpp"
 
-bool xpcc::stm32::UartSpiSimpleMaster{{ id }}::finished = true;
 xpcc::stm32::UartSpiSimpleMaster{{ id }}::DataOrder
 	xpcc::stm32::UartSpiSimpleMaster{{ id }}::dataOrder =
 	xpcc::stm32::UartSpiSimpleMaster{{ id }}::DataOrder::MsbFirst;
@@ -19,11 +18,6 @@ bool
 xpcc::stm32::UartSpiSimpleMaster{{ id }}::transfer(uint8_t *tx, uint8_t *rx,
 		std::size_t length)
 {
-	if (!isFinished())
-		return false;
-
-	finished = false;
-
 	uint_fast8_t tx_byte = 0xff;
 	uint_fast8_t rx_byte;
 
@@ -36,6 +30,5 @@ xpcc::stm32::UartSpiSimpleMaster{{ id }}::transfer(uint8_t *tx, uint8_t *rx,
 		if (rx) rx[i] = rx_byte;
 	}
 
-	finished = true;
 	return true;
 }

@@ -29,7 +29,6 @@ namespace stm32
 class UartSpiSimpleMaster{{ id }} : public xpcc::SpiSimpleMaster, public UartBase
 {
 private:
-	static bool finished;
 	static DataOrder dataOrder;
 public:
 	static const TypeId::UartSpiMaster{{ id }}Sck  Sck;
@@ -74,9 +73,6 @@ public:
 
 	static bool
 	transfer(uint8_t * tx, uint8_t * rx, std::size_t length);
-
-	static inline bool
-	isFinished();
 };
 
 } // namespace stm32

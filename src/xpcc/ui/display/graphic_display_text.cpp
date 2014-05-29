@@ -41,6 +41,28 @@ xpcc::GraphicDisplay::getFontHeight() const
 }
 
 // ----------------------------------------------------------------------------
+uint16_t
+xpcc::GraphicDisplay::getStringWidth(char* s) const
+{
+	if (!this->font.isValid())
+		return 0;
+
+	const uint8_t offsetWidthTable 	= 8;
+	const uint8_t vspace 			= this->font[5];
+	const uint8_t first 			= this->font[6];
+
+	uint16_t width = 0;
+
+	while(*s) {
+		width += this->font[offsetWidthTable + (static_cast<uint8_t>(*s) - first)];
+		width += vspace;
+		s++;
+	}
+
+	return width;
+}
+
+// ----------------------------------------------------------------------------
 void
 xpcc::GraphicDisplay::write(char c)
 {

@@ -72,7 +72,7 @@ public:
 	static ALWAYS_INLINE uint8_t
 	writeReadBlocking(uint8_t data);
 
-	static bool
+	static void
 	transferBlocking(uint8_t * tx, uint8_t * rx, std::size_t length);
 	// end documentation inherited
 

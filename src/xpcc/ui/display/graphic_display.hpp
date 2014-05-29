@@ -375,6 +375,12 @@ namespace xpcc
 		getFontHeight() const;
 		
 		/**
+		* Get the width of (null terminated) string.
+		*/
+		uint16_t
+		getStringWidth(char* s) const;
+
+		/**
 		 * Set the cursor for text drawing.
 		 * 
 		 * \param	position	Cursor position

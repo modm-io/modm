@@ -21,7 +21,7 @@ from SCons.Script import *
 def dfu_stm32_programmer_flash(env, source, alias='dfu_stm32_program'):
 	# dfu-util  -v -d 0483:df11 -i 0 -a 0 -s 0x08000000 -D build/iobox-stm32/iobox-stm32.bin
 	# 0483:df11 is for STM32 F4 only
-	actionString  = '$DFU_STM32_PROGRAMMER -v -d 0483:df11 -i 0 -a 0 -s 0x08000000 -D $SOURCE'
+	actionString  = '$DFU_STM32_PROGRAMMER -v -d 0483:df11 -i 0 -a 0 -s 0x08000000:leave -D $SOURCE'
 
 	action = Action(actionString, cmdstr = "$DFU_STM32_PROGRAMMER_COMSTR")
 	return env.AlwaysBuild(env.Alias(alias, source, action))

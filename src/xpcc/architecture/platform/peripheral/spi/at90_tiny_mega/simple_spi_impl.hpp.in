@@ -53,7 +53,6 @@ xpcc::{{target.family}}::SpiSimpleMaster::initialize(Prescaler prescaler)
 {
 	SPCR = (1 << SPE) | (1 << MSTR) | (static_cast<uint8_t>(prescaler) & ~0x80);
 	SPSR = (static_cast<uint8_t>(prescaler) & 0x80) ? (1 << SPI2X) : 0;
-	finished = true;
 }
 
 void
@@ -91,7 +90,6 @@ void
 xpcc::{{target.family}}::SpiSimpleMaster::transferBlocking(
 		uint8_t *tx, uint8_t *rx, std::size_t length)
 {
-
 	uint8_t tx_byte = 0xff;
 	uint8_t rx_byte;
 
@@ -103,6 +101,4 @@ xpcc::{{target.family}}::SpiSimpleMaster::transferBlocking(
 
 		if (rx) rx[i] = rx_byte;
 	}
-
-	return true;
 }

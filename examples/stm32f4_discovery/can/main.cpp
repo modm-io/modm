@@ -48,7 +48,7 @@ MAIN_FUNCTION
 
 	// Initialize Usart
 	GpioOutputA2::connect(Usart2::Tx);
-	GpioInputA3::connect(Usart2::Rx);
+	GpioInputA3::connect(Usart2::Rx, Gpio::InputType::PullUp);
 	Usart2::initialize<defaultSystemClock, 115200>(10);
 
 	XPCC_LOG_INFO << "CAN Test Program" << xpcc::endl;
@@ -58,10 +58,8 @@ MAIN_FUNCTION
 
 	XPCC_LOG_INFO << "Initializing Can1..." << xpcc::endl;
 	// Initialize Can1
-	GpioInputB8::configure(GpioInputB8::InputType::PullUp);
-	GpioInputB8::connect(Can1::Rx);
-	GpioOutputB9::configure(GpioOutputB9::OutputType::PushPull);
-	GpioOutputB9::connect(Can1::Tx);
+	GpioInputB8::connect(Can1::Rx, Gpio::InputType::PullUp);
+	GpioOutputB9::connect(Can1::Tx, Gpio::OutputType::PushPull);
 	Can1::initialize<defaultSystemClock, Can1::Bitrate::kBps125>(9);
 
 	XPCC_LOG_INFO << "Setting up Filter for Can1..." << xpcc::endl;
@@ -72,10 +70,8 @@ MAIN_FUNCTION
 
 	XPCC_LOG_INFO << "Initializing Can2..." << xpcc::endl;
 	// Initialize Can2
-	GpioInputB5::configure(GpioInputB5::InputType::PullUp);
-	GpioInputB5::connect(Can2::Rx);
-	GpioOutputB6::configure(GpioOutputB6::OutputType::PushPull);
-	GpioOutputB6::connect(Can2::Tx);
+	GpioInputB5::connect(Can2::Rx, Gpio::InputType::PullUp);
+	GpioOutputB6::connect(Can2::Tx, Gpio::OutputType::PushPull);
 	Can2::initialize<defaultSystemClock, Can2::Bitrate::kBps125>(12);
 
 	XPCC_LOG_INFO << "Setting up Filter for Can2..." << xpcc::endl;

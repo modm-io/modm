@@ -228,3 +228,14 @@ BoundedDequeTest::testConstIterator()
 	
 	TEST_ASSERT_FALSE(it != deque.end());
 }
+
+void
+BoundedDequeTest::testFull()
+{
+	xpcc::BoundedDeque<int16_t, 3> deque;
+
+	TEST_ASSERT_TRUE(deque.append(3));
+	TEST_ASSERT_TRUE(deque.append(4));
+	TEST_ASSERT_TRUE(deque.append(5));
+	TEST_ASSERT_FALSE(deque.append(6));
+}

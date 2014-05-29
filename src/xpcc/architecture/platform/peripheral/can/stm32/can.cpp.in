@@ -30,10 +30,10 @@
 
 // ----------------------------------------------------------------------------
 %% if parameters.tx_buffer > 0
-xpcc::atomic::Queue<xpcc::can::Message, {{ parameters.tx_buffer }}> txQueue;
+static xpcc::atomic::Queue<xpcc::can::Message, {{ parameters.tx_buffer }}> txQueue;
 %% endif
 %% if parameters.rx_buffer > 0
-xpcc::atomic::Queue<xpcc::can::Message, {{ parameters.rx_buffer }}> rxQueue;
+static xpcc::atomic::Queue<xpcc::can::Message, {{ parameters.rx_buffer }}> rxQueue;
 %% endif
 
 

@@ -78,7 +78,7 @@ namespace xpcc
 		prepend(const T& value);
 
 		/// Insert at the end of the list
-		void
+		bool
 		append(const T& value);
 		
 		/// Remove the first entry

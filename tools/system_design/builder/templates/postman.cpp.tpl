@@ -42,11 +42,14 @@ Postman::deliverPacket(const xpcc::Header& header, const xpcc::SmartPointer& pay
 				case robot::action::{{ action.name | CAMELCASE }}:
 		{%- if action.parameterType != None %}
 			{%- if action.parameterType.isBuiltIn %}
+					// void action{{ action.name | CamelCase }}(const xpcc::ResponseHandle& responseHandle, const {{ action.parameterType.name | CamelCase }} *payload );
 					component::{{ component.name | camelCase }}.action{{ action.name | CamelCase }}(response, &payload.get<{{ action.parameterType.name | CamelCase }}>());
 			{%- else %}
+					// void action{{ action.name | CamelCase }}(const xpcc::ResponseHandle& responseHandle, const robot::packet::{{ action.parameterType.name | CamelCase }} *payload );
 					component::{{ component.name | camelCase }}.action{{ action.name | CamelCase }}(response, &payload.get<robot::packet::{{ action.parameterType.name | CamelCase }}>());
 			{%- endif %}
 		{%- else %}
+					// void action{{ action.name | CamelCase }}(const xpcc::ResponseHandle& responseHandle);
 					component::{{ component.name | camelCase }}.action{{ action.name | CamelCase }}(response);
 		{%- endif %}
 					return OK;
@@ -67,8 +70,10 @@ Postman::deliverPacket(const xpcc::Header& header, const xpcc::SmartPointer& pay
 				case robot::event::{{ event.name | CAMELCASE }}:
 	{%- for component in eventSubscriptions[event.name] %}
 		{%- if events[event.name].type != None %}
+					// void event{{ event.name | CamelCase }}(const xpcc::Header& header, const robot::packet::{{ events[event.name].type.name | CamelCase }} *payload);
 					component::{{ component.name | camelCase }}.event{{ event.name | CamelCase }}(header, &payload.get<robot::packet::{{ events[event.name].type.name | CamelCase }}>());
 		{%- else %}
+					// void event{{ event.name | CamelCase }}(const xpcc::Header& header);
 					component::{{ component.name | camelCase }}.event{{ event.name | CamelCase }}(header);
 		{%- endif %}
 	{%- endfor %}
