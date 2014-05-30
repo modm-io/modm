@@ -28,7 +28,7 @@ void xpcc::gui::ButtonWidget::render(AbstractView* view)
 	if(this->activated)
 		out->setColor(cp[Color::ACTIVATED]);
 	else
-		out->setColor(cp[Color::DEACTIVATED]);
+		out->setColor(cp[Color::BORDER]);
 
 	/*
 	 * draw button outline
