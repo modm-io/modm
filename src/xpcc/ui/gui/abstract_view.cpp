@@ -41,6 +41,7 @@ xpcc::gui::AbstractView::AbstractView(xpcc::gui::ViewStack* stack, uint8_t ident
 	colorpalette(DEFAULT_COLORPALETTE)
 
 {
+	this->setColorPalette(DEFAULT_COLORPALETTE);
 	this->display().clear();
 }
 
