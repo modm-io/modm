@@ -418,7 +418,13 @@ def generate(env, **kw):
 		if key.upper() == "CPPPATH":
 			value = value.split(':')
 		env.Append(**{ key.upper(): value } )
-	
+
+	# append defines from user config
+	user_conf = {}
+	for key,value in configuration['defines'].items():
+		user_conf[key.upper()] = value
+	env.Append(CPPDEFINES = user_conf)
+
 	# These emitters are used to build everything not in place but in a
 	# separate build-directory.
 	def defaultEmitter(target, source, env):
