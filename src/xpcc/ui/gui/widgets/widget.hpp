@@ -195,7 +195,7 @@ public:
 	 * Updates the absolute position by looping through all parents and adding
 	 * up their relative positions.
 	 */
-	void
+	virtual void
 	updatePosition()
 	{
 		this->position = this->getRelativePosition();
@@ -397,7 +397,16 @@ public:
 		}
 	}
 
-private:
+	void
+	updatePosition()
+	{
+		for(auto iter = widgets.begin(); iter != widgets.end(); ++iter)
+		{
+			(*iter)->updatePosition();
+		}
+	}
+
+protected:
 	WidgetContainer widgets;
 };
 
