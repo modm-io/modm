@@ -62,10 +62,10 @@ public:
 
 	template< uint32_t reference, uint32_t actual, uint16_t tolerance >
 	static void
-	checkValueInTolerance()
+	assertValueInTolerance()
 	{
 		static_assert(isValueInTolerance(reference, actual, tolerance),
-				"The actual value is exceeding the tolerance of reference!");
+				"The actual value exceeds the tolerance of reference!");
 	}
 };
 
