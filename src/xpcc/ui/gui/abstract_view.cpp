@@ -67,12 +67,15 @@ xpcc::gui::AbstractView::update()
 		ev = input_queue->get();
 		input_queue->pop();
 
-		// start event handling
-		for(auto iter = widgets.begin(); iter != widgets.end(); ++iter) {
+		/* Start event handling, go through array in reverse order because
+		 * later added (higher index) widgets will be rendered on top of
+		 * the other widgets, so they will also catch the input event with
+		 * heigher precendence. */
+		for(int16_t i = widgets.getSize()-1; i >= 0; i--) {
 			/*
 			 * TODO: implement efficient algorithm here (note: segment tree)
 			 */
-			if((*iter)->handleInputEvent(ev))
+			if((widgets[i])->handleInputEvent(ev))
 			{
 				/* we found the widget that this event was meant for*/
 				break;
