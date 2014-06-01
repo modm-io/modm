@@ -68,9 +68,6 @@ public:
 
 	static inline bool
 	transfer(uint8_t *tx, uint8_t *rx, std::size_t length);
-
-	static ALWAYS_INLINE bool
-	isFinished();
 	// end documentation inherited
 
 private:
@@ -80,7 +77,6 @@ private:
 	static constexpr uint32_t delayTime = (1000000.0 / Baudrate) / 2.0;
 
 	static uint8_t operationMode;
-	static bool finished;
 	static uint8_t result;
 };
 

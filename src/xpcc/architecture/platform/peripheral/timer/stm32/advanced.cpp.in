@@ -199,32 +199,33 @@ uint32_t modeOutputPorts)
 {
 	channel -= 1;	// 1..4 -> 0..3
 
-	// disable output
-	TIM{{ id }}->CCER &= ~(0xf << (channel * 4));
-
-	uint32_t flags = modeOutputPorts & (0x70);
-
-	if (channel <= 1)
 	{
-		uint32_t offset = 8 * channel;
+		uint32_t flags = modeOutputPorts & (0x70);
 
-		flags <<= offset;
-		flags |= TIM{{ id }}->CCMR1 & ~(TIM_CCMR1_OC1M << offset);
-		TIM{{ id }}->CCMR1 = flags;
-	}
-	else {
-		uint32_t offset = 8 * (channel - 2);
+		if (channel <= 1)
+		{
+			uint32_t offset = 8 * channel;
 
-		flags <<= offset;
-		flags |= TIM{{ id }}->CCMR2 & ~(TIM_CCMR1_OC1M << offset);
+			flags <<= offset;
+			flags |= TIM{{ id }}->CCMR1 & ~(TIM_CCMR1_OC1M << offset);
+			TIM{{ id }}->CCMR1 = flags;
+		}
+		else {
+			uint32_t offset = 8 * (channel - 2);
 
-		TIM{{ id }}->CCMR2 = flags; 
+			flags <<= offset;
+			flags |= TIM{{ id }}->CCMR2 & ~(TIM_CCMR1_OC1M << offset);
+
+			TIM{{ id }}->CCMR2 = flags;
+		}
 	}
 
 	// Disable Repetition Counter (FIXME has to be done here for some unknown reason)
 	TIM{{ id }}->RCR = 0;
 
-	TIM{{ id }}->CCER |= (modeOutputPorts & (0xf)) << (channel * 4);
+	uint32_t flags = (modeOutputPorts & (0xf)) << (channel * 4);
+	flags |= TIM{{ id }}->CCER & ~(0xf << (channel * 4));
+	TIM{{ id }}->CCER = flags;
 }
 
 // ----------------------------------------------------------------------------

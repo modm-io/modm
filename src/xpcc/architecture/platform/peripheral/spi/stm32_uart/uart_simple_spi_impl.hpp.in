@@ -19,7 +19,6 @@ xpcc::stm32::UartSpiSimpleMaster{{ id }}::initialize()
 	UsartHal{{ id }}::setSpiClock(UsartHal{{ id }}::SpiClock::Enabled);
 	UsartHal{{ id }}::setTransmitterEnable(true);
 	UsartHal{{ id }}::setReceiverEnable(true);
-	finished = true;
 	dataOrder = DataOrder::MsbFirst;
 }
 
@@ -54,9 +53,6 @@ xpcc::stm32::UartSpiSimpleMaster{{ id }}::writeBlocking(uint8_t data)
 bool
 xpcc::stm32::UartSpiSimpleMaster{{ id }}::write(uint8_t data)
 {
-	if(!isFinished())
-		return false;
-
 	// the USART can only send LSB out first
 	if(dataOrder == DataOrder::MsbFirst) {
 		data = ::xpcc::bitReverse(data);
@@ -77,10 +73,4 @@ xpcc::stm32::UartSpiSimpleMaster{{ id }}::getResult(uint8_t &data)
 		data = ::xpcc::bitReverse(data);
 	}
 	return true;
-}
-
-bool
-xpcc::stm32::UartSpiSimpleMaster{{ id }}::isFinished()
-{
-	return UsartHal{{ id }}::isTransmitRegisterEmpty() && finished;
 }

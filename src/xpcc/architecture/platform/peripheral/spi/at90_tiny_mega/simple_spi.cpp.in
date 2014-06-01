@@ -9,17 +9,10 @@
 
 #include "simple_spi.hpp"
 
-bool xpcc::{{target.family}}::SpiSimpleMaster::finished;
-
 bool
 xpcc::{{target.family}}::SpiSimpleMaster::transfer(uint8_t *tx, uint8_t *rx,
 		std::size_t length)
 {
-	if (!isFinished())
-		return false;
-
-	finished = false;
-
 	uint8_t tx_byte = 0xff;
 	uint8_t rx_byte;
 
@@ -32,6 +25,5 @@ xpcc::{{target.family}}::SpiSimpleMaster::transfer(uint8_t *tx, uint8_t *rx,
 		if (rx) rx[i] = rx_byte;
 	}
 
-	finished = true;
 	return true;
 }

@@ -78,12 +78,6 @@ public:
 
 	static bool
 	transfer(uint8_t * tx, uint8_t * rx, std::size_t length);
-
-	static bool
-	isFinished();
-
-private:
-	static bool finished;
 };
 
 } // namespace stm32
