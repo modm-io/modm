@@ -47,7 +47,7 @@ public:
 	// start documentation inherited
 	template< class clockSource, uint32_t baudrate,
 			uint8_t tolerance = xpcc::Tolerance::FivePercent >
-	static inline void
+	static void
 	initialize();
 
 	static void
@@ -59,27 +59,17 @@ public:
 	static uint8_t
 	writeReadBlocking(uint8_t data);
 
-	static ALWAYS_INLINE void
-	writeBlocking(uint8_t data);
-
-	static ALWAYS_INLINE bool
-	write(uint8_t data);
-
-	static ALWAYS_INLINE uint8_t
-	getResult();
-
-	static inline bool
-	transfer(uint8_t *tx, uint8_t *rx, std::size_t length);
+	static void
+	transferBlocking(uint8_t *tx, uint8_t *rx, std::size_t length);
 	// end documentation inherited
 
 private:
-	static inline void
+	static void
 	delay();
 
 	static constexpr uint32_t delayTime = (1000000.0 / Baudrate) / 2.0;
 
 	static uint8_t operationMode;
-	static uint8_t result;
 };
 
 } // namespace xpcc

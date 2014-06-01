@@ -14,14 +14,11 @@
 template <typename SCK, typename MOSI, typename MISO, uint32_t Baudrate>
 uint8_t xpcc::SoftwareSpiSimpleMaster<SCK, MOSI, MISO, Baudrate>::operationMode(0);
 
-template <typename SCK, typename MOSI, typename MISO, uint32_t Baudrate>
-uint8_t xpcc::SoftwareSpiSimpleMaster<SCK, MOSI, MISO, Baudrate>::result;
-
 
 // ----------------------------------------------------------------------------
 template <typename SCK, typename MOSI, typename MISO, uint32_t Baudrate>
 template< class clockSource, uint32_t baudrate, uint8_t tolerance >
-void
+void ALWAYS_INLINE
 xpcc::SoftwareSpiSimpleMaster<SCK, MOSI, MISO, Baudrate>::initialize()
 {
 	SCK::reset();
@@ -97,43 +94,19 @@ xpcc::SoftwareSpiSimpleMaster<SCK, MOSI, MISO, Baudrate>::writeReadBlocking(uint
 		SCK::set(operationMode & 0b10);
 	}
 
-	result = input;
-
 	return input;
 }
 
 template <typename SCK, typename MOSI, typename MISO, uint32_t Baudrate>
-void
-xpcc::SoftwareSpiSimpleMaster<SCK, MOSI, MISO, Baudrate>::writeBlocking(uint8_t data)
-{
-	writeReadBlocking(data);
-}
-
-template <typename SCK, typename MOSI, typename MISO, uint32_t Baudrate>
-bool
-xpcc::SoftwareSpiSimpleMaster<SCK, MOSI, MISO, Baudrate>::write(uint8_t data)
-{
-	writeReadBlocking(data);
-	return true;
-}
-
-template <typename SCK, typename MOSI, typename MISO, uint32_t Baudrate>
-uint8_t
-xpcc::SoftwareSpiSimpleMaster<SCK, MOSI, MISO, Baudrate>::getResult()
-{
-	return result;
-}
-
-template <typename SCK, typename MOSI, typename MISO, uint32_t Baudrate>
-void
+void ALWAYS_INLINE
 xpcc::SoftwareSpiSimpleMaster<SCK, MOSI, MISO, Baudrate>::delay()
 {
 	xpcc::delay_us(delayTime);
 }
 
 template <typename SCK, typename MOSI, typename MISO, uint32_t Baudrate>
-bool
-xpcc::SoftwareSpiSimpleMaster<SCK, MOSI, MISO, Baudrate>::transfer(uint8_t *tx, uint8_t *rx, std::size_t length)
+void inline
+xpcc::SoftwareSpiSimpleMaster<SCK, MOSI, MISO, Baudrate>::transferBlocking(uint8_t *tx, uint8_t *rx, std::size_t length)
 {
 	uint8_t tx_byte = 0xff;
 	uint8_t rx_byte;
@@ -146,6 +119,4 @@ xpcc::SoftwareSpiSimpleMaster<SCK, MOSI, MISO, Baudrate>::transfer(uint8_t *tx, 
 
 		if (rx) rx[i] = rx_byte;
 	}
-
-	return true;
 }

@@ -100,7 +100,6 @@ public:
 	static void
 	setDataOrder(DataOrder order);
 
-	// blocking
 	/**
 	 * Swap a single byte and wait for completion.
 	 *
@@ -111,7 +110,6 @@ public:
 	static uint8_t
 	writeReadBlocking(uint8_t data);
 
-	// non-blocking
     /**
      * Set the data buffers and length with options and starts a transfer.
      * This may be hardware accelerated (DMA or Interrupt), but not guaranteed.

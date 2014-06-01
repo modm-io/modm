@@ -25,12 +25,6 @@ namespace {{target.family}}
 /**
  * Implementation of the SimpleSpi of the Uart in Spi Master mode.
  *
- * The fast SPI clock speeds make it unreasonable to use an interrupt
- * based approach to shifting out each byte of the data, since the interrupt
- * handling might decrease performance over busy waiting especially for
- * targets operating at low CPU frequencies.
- * Therefore the asynchronous methods are implemented synchronously.
- *
  * @ingroup		{{target.family}}
  * @author		Niklas Hauser
  */
@@ -43,7 +37,7 @@ public:
 
 	/// Spi Data Mode, Mode0 is the most common mode
 %% if extended is not defined
-	/// @warning 	Only Mode 0 and 2 are available, Mode 1 and 3 are not 
+	/// @warning 	Only Mode 0 and 2 are available, Mode 1 and 3 are not
 	///				supported on this target.
 %% endif
 	enum class
@@ -71,7 +65,7 @@ public:
 		LsbFirst = 1,
 %% endif
 	};
-	
+
 public:
 	// start documentation inherited
 	template< class clockSource, uint32_t baudrate,
@@ -92,35 +86,11 @@ public:
 	static inline void
 	setDataOrder(DataOrder order);
 
-
 	static ALWAYS_INLINE uint8_t
 	writeReadBlocking(uint8_t data);
 
-%% if extended is defined
-	static ALWAYS_INLINE void
-	writeBlocking(uint8_t data);
-
-	static ALWAYS_INLINE bool
-	write(uint8_t data);
-
-	static ALWAYS_INLINE bool
-	getResult(uint8_t &data);
-%% else
-	static void
-	writeBlocking(uint8_t data);
-
 	static bool
-	write(uint8_t data);
-
-	static bool
-	getResult(uint8_t &data);
-%% endif
-
-	static bool
-	transfer(uint8_t *tx, uint8_t *rx, std::size_t length);
-
-	static ALWAYS_INLINE bool
-	isFinished();
+	transferBlocking(uint8_t *tx, uint8_t *rx, std::size_t length);
 	// end documentation inherited
 
 protected:

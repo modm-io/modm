@@ -53,50 +53,20 @@ xpcc::{{target.family}}::UartSpiSimpleMaster{{id}}::setDataOrder(DataOrder order
 }
 
 // ----------------------------------------------------------------------------
+%% if extended is defined
 uint8_t
 xpcc::{{target.family}}::UartSpiSimpleMaster{{id}}::writeReadBlocking(uint8_t data)
 {
-	writeBlocking(data);
-
-	uint8_t rData;
-	while(!getResult(rData))
+	while(!((UCSR{{id}}A & (1 << UDRE{{id}}))))
 		;
-
-	return rData;
-}
-
-%% if extended is defined
-void
-xpcc::{{target.family}}::UartSpiSimpleMaster{{id}}::writeBlocking(uint8_t data)
-{
-	while(!write(data))
-		;
-}
-
-bool
-xpcc::{{target.family}}::UartSpiSimpleMaster{{id}}::write(uint8_t data)
-{
-	if (!((UCSR{{id}}A & (1 << UDRE{{id}}))))
-		return false;
 
 	UDR{{id}} = data;
-	return true;
-}
 
-bool
-xpcc::{{target.family}}::UartSpiSimpleMaster{{id}}::getResult(uint8_t &data)
-{
-	if (!(UCSR{{id}}A & (1 << RXC{{id}})))
-		return false;
+	while (!((UCSR{{id}}A & (1 << RXC{{id}}))))
+		;
 
 	data = UDR{{id}};
-	return true;
+
+	return data;
 }
 %% endif
-
-bool
-xpcc::{{target.family}}::UartSpiSimpleMaster{{id}}::isFinished()
-{
-	return ( (UCSR{{id}}A & ((1 << UDRE{{id}}) | (1 << RXC{{id}})) ) ==
-			((1 << UDRE{{id}}) | (1 << RXC{{id}})) );
-}

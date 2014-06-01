@@ -15,6 +15,13 @@
 #include <stdint.h>
 #include "../../../device.hpp"
 
+%% if target is stm32f1 or target is stm32f2 or target is stm32f4
+// STM has some weird ideas about continuity
+#define	USART_BRR_DIV_MANTISSA	USART_BRR_DIV_Mantissa
+#define	USART_BRR_DIV_FRACTION	USART_BRR_DIV_Fraction
+%% endif
+
+
 namespace xpcc
 {
 namespace stm32
