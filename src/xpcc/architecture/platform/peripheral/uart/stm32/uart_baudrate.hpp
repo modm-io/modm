@@ -104,7 +104,7 @@ public:
 		constexpr float uartdiv = ((brrValue & USART_BRR_DIV_MANTISSA) >> 4) + (brrValue & USART_BRR_DIV_FRACTION) / 8.f;
 		constexpr uint32_t baud_raw = static_cast<uint32_t>(clockrate / (uartdiv * (oversample == UartBase::OversamplingMode::By16 ? 16 : 8)));
 		// check if we found a prescaler which generates a baudrate within the tolerance
-		xpcc::Tolerance::assertValueInTolerance<
+		xpcc::Tolerance::assertBaudrateInTolerance<
 				/* nearest possible value */ baud_raw,
 				/* desired = */ baudrate,
 				tolerance >();
@@ -132,7 +132,7 @@ public:
 		constexpr float uartdiv = ((brrValue & USART_BRR_DIV_MANTISSA) >> 4) + (brrValue & USART_BRR_DIV_FRACTION) / 8.f;
 		constexpr uint32_t baud_raw = static_cast<uint32_t>(clockrate / (uartdiv * (oversamplingMode(clockrate, baudrate) == UartBase::OversamplingMode::By16 ? 16 : 8)));
 		// check if we found a prescaler which generates a baudrate within the tolerance
-		xpcc::Tolerance::assertValueInTolerance<
+		xpcc::Tolerance::assertBaudrateInTolerance<
 				/* nearest possible value */ baud_raw,
 				/* desired = */ baudrate,
 				tolerance >();
