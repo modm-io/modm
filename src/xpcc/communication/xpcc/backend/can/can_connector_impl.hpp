@@ -134,7 +134,7 @@ xpcc::CanConnector<Driver>::sendWaitingMessages()
 		// no message in the queue
 		return;
 	}
-	else if (canDriver->getBusState() != can::CONNECTED) {
+	else if (canDriver->getBusState() != Driver::BusState::Connected) {
 		// No connection to the CAN bus, drop all messages which should be send
 		while (!sendList.isEmpty()) {
 			sendList.removeFront();
