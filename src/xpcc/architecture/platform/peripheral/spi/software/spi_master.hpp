@@ -46,7 +46,7 @@ public:
 public:
 	// start documentation inherited
 	template< class clockSource, uint32_t baudrate,
-			uint8_t tolerance = xpcc::Tolerance::FivePercent >
+			uint16_t tolerance = xpcc::Tolerance::FivePercent >
 	static inline void
 	initialize();
 

@@ -7,8 +7,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_AVR_STATIC_HPP
-#define XPCC_AVR_STATIC_HPP
+#ifndef XPCC_AVR_CLOCK_HPP
+#define XPCC_AVR_CLOCK_HPP
 
 #include <stdint.h>
 #include "../common/common_clock.hpp"
@@ -55,4 +55,4 @@ public:
 
 } // namespace xpcc
 
-#endif	//  XPCC_AVR_STATIC_HPP
+#endif	//  XPCC_AVR_CLOCK_HPP

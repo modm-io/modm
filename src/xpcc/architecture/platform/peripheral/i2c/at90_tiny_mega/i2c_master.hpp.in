@@ -25,7 +25,7 @@ namespace {{target.family}}
  * Interrupt-driven I2C master module.
  *
  * Interrupts must be enabled.
- * 
+ *
  * @author Niklas Hauser
  * @ingroup	{{target.family}}
  */
@@ -34,16 +34,23 @@ class I2cMaster : public ::xpcc::I2cMaster
 public:
 	static const TypeId::I2cMasterSda Sda;
 	static const TypeId::I2cMasterScl Scl;
-	
-	template<DataRate rate=DataRate::Standard>
+
+	template< class clockSource, DataRate rate=DataRate::Standard,
+			uint16_t tolerance = xpcc::Tolerance::FivePercent >
 	static ALWAYS_INLINE void
 	initialize()
 	{
 		constexpr uint32_t rawRate = static_cast<uint32_t>(rate);
 		static_assert(rawRate <= 400000, "The {{target.family|capitalize}} does not support High I2C baudrate.");
-		static_assert(F_CPU/16 >= rawRate, "The CPU frequency must be at least 16x higher than I2C baudrate.");
+		static_assert(clockSource::I2c/16 >= rawRate, "The CPU frequency must be at least 16x higher than I2C baudrate.");
 
-		constexpr uint8_t baud = ((F_CPU / rawRate) - 16) / 2;
+		// TODO: Implement prescalers for significantly lower baudrates.
+		constexpr uint8_t baud = ((clockSource::I2c / rawRate) - 16) / 2;
+		xpcc::Tolerance::assertBaudrateInTolerance<
+				/* clostest available baudrate */ (clockSource::I2c / (16 + 2 * baud)),
+				/* desired baudrate */ rawRate,
+				tolerance >();
+
 		initializeWithBaud(baud);
 	};
 

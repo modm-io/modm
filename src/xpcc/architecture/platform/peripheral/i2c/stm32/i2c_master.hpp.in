@@ -25,7 +25,7 @@ namespace stm32
  * I2cMaster implementation of I2C{{ id }} module.
  *
  * Interrupts must be enabled.
- * 
+ *
  * @author		Georgi Grinshpun
  * @author		Niklas Hauser
  * @ingroup		stm32
@@ -43,35 +43,27 @@ public:
 	 * @param	rate
 	 *		`Standard` or `Fast`, `High` datarate is not supported
 	 */
-	template<class clockSource, DataRate rate=DataRate::Standard>
+	template<class clockSource, DataRate rate=DataRate::Standard
+			uint16_t tolerance = xpcc::Tolerance::FivePercent >
 	static ALWAYS_INLINE void
 	initialize()
 	{
-		constexpr int peripheralFrequency = clockSource::I2c{{ id }};
 		constexpr uint32_t rawRate = static_cast<uint32_t>(rate);
-		static_assert(rawRate <= 400000, "The STM32 does not support High I2C baudrate.");
-		static_assert(peripheralFrequency/2 >= rawRate, "The APB1 frequency needs to be at least 2x higher than I2C baudrate.");
+		static_assert(rawRate <= 400000,
+				"The STM32 does not support I2C baudrates above 400kHz.");
+		static_assert(clockSource::I2c{{ id }}/2 >= rawRate,
+				"The APB1 frequency needs to be at least 2x higher than I2C baudrate.");
 
 		// set the prescaler rate register
 		// ccrPrescaler = peripheralFrequency / (2 * I2CFrequency)
-		constexpr uint16_t prescaler = peripheralFrequency / (2 * rawRate);
+		constexpr uint16_t prescaler = clockSource::I2c{{ id }} / (2 * rawRate);
 
-		reset();
-		// Enable clock
-		RCC->APB1ENR |= RCC_APB1ENR_I2C{{ id }}EN;
+		xpcc::Tolerance::assertBaudrateInTolerance<
+				/* clostest available baudrate */ (clockSource::I2c{{ id }} / (2 * prescaler)),
+				/* desired baudrate */ rawRate,
+				tolerance >();
 
-		I2C{{ id }}->CR1 = I2C_CR1_SWRST; 		// reset module
-		I2C{{ id }}->CR1 = 0;
-
-		NVIC_EnableIRQ(I2C{{ id }}_ER_IRQn);
-		NVIC_EnableIRQ(I2C{{ id }}_EV_IRQn);
-
-		I2C{{ id }}->CR2 = static_cast<uint32_t>(peripheralFrequency) / 1000000;
-		I2C{{ id }}->CCR = prescaler;
-		// DEBUG_STREAM("ccrPrescaler=" << prescaler);
-		I2C{{ id }}->TRISE = 0x09;
-
-		I2C{{ id }}->CR1 |= I2C_CR1_PE; // Enable peripheral
+		initializeWithPrescaler(static_cast<uint8_t>(clockSource::I2c{{ id }} / 1000000), prescaler);
 	}
 
 	// start documentation inherited
@@ -90,7 +82,7 @@ public:
 
 private:
 	static void
-	initializeWithPrescaler(uint16_t baud);
+	initializeWithPrescaler(uint8_t peripheralFrequency, uint16_t prescaler);
 };
 
 } // namespace stm32
