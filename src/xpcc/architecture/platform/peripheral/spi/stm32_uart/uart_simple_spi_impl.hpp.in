@@ -15,11 +15,11 @@ template<class clockSource, uint32_t baudrate, uint16_t tolerance >
 void ALWAYS_INLINE
 xpcc::stm32::UartSpiSimpleMaster{{ id }}::initialize()
 {
-	uint16_t brr = UartBaudrate::brr< clockSource::Usart{{ id }}, baudrate, tolerance >();
+	uint16_t brr = UartBaudrate::getBrr< clockSource::Usart{{ id }}, baudrate, tolerance >();
 
 	UsartHal{{ id }}::initializeWithBrr(brr,
 			UsartHal{{ id }}::Parity::Disabled,
-			UartBaudrate::oversamplingMode(clockSource::Usart{{ id }}, baudrate));
+			UartBaudrate::getOversamplingMode(clockSource::Usart{{ id }}, baudrate));
 	UsartHal{{ id }}::setLastBitClockPulse(UsartHal{{ id }}::LastBitClockPulse::Output);
 	UsartHal{{ id }}::setSpiClock(UsartHal{{ id }}::SpiClock::Enabled);
 	UsartHal{{ id }}::setTransmitterEnable(true);

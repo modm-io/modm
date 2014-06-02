@@ -41,7 +41,7 @@ public:
 	 * Returns the highest Oversampling Mode that is possible for this configuration.
 	 */
 	static constexpr UartBase::OversamplingMode
-	oversamplingMode(uint32_t clockrate, uint32_t baudrate)
+	getOversamplingMode(uint32_t clockrate, uint32_t baudrate)
 	{
 		return (baudrate <= clockrate / 16) ? UartBase::OversamplingMode::By16 : UartBase::OversamplingMode::By8;
 	}
@@ -55,9 +55,9 @@ public:
 	 * 		Desired baud rate.
 	 */
 	static constexpr uint16_t
-	brr(uint32_t clockrate, uint32_t baudrate)
+	getBrr(uint32_t clockrate, uint32_t baudrate)
 	{
-		return brr(clockrate, baudrate,
+		return getBrr(clockrate, baudrate,
 				(baudrate <= clockrate / 16) ? UartBase::OversamplingMode::By16 : UartBase::OversamplingMode::By8);
 	}
 
@@ -72,13 +72,21 @@ public:
 	 * 		Either 8 or 16 oversamples.
 	 */
 	static constexpr uint16_t
-	brr(uint32_t clockrate, uint32_t baudrate, UartBase::OversamplingMode oversample)
+	getBrr(uint32_t clockrate, uint32_t baudrate, UartBase::OversamplingMode oversample)
 	{
 		return (oversample == UartBase::OversamplingMode::By16) ?
 				(((2 * clockrate) / baudrate + 1) / 2) :
 				// By8: bit DIV_fraction[3] must be kept cleared
 				((USART_BRR_DIV_MANTISSA & (((2 * clockrate) / (baudrate / 2) + 1) / 2)) |
 						((USART_BRR_DIV_FRACTION & (((2 * clockrate) / (baudrate / 2) + 1) / 2)) >> 1));
+	}
+
+	static constexpr uint32_t
+	getBaudrate(uint32_t clockrate, uint16_t brr, UartBase::OversamplingMode oversample)
+	{
+		return static_cast<uint32_t>(clockrate /
+				((((brr & USART_BRR_DIV_MANTISSA) >> 4) + (brr & USART_BRR_DIV_FRACTION) / 8.f) *
+						(oversample == UartBase::OversamplingMode::By16 ? 16 : 8)));
 	}
 
 	/**
@@ -96,20 +104,18 @@ public:
 	template<uint32_t clockrate, uint32_t baudrate, uint16_t tolerance,
 			UartBase::OversamplingMode oversample >
 	static uint16_t ALWAYS_INLINE
-	brr()
+	getBrr()
 	{
 		static_assert((baudrate <= clockrate / 8),
 				"Baudrate must be less or equal to the PeripheralClock divided by 8.");
-		constexpr uint16_t brrValue = brr(clockrate, baudrate, oversample);
-		constexpr float uartdiv = ((brrValue & USART_BRR_DIV_MANTISSA) >> 4) + (brrValue & USART_BRR_DIV_FRACTION) / 8.f;
-		constexpr uint32_t baud_raw = static_cast<uint32_t>(clockrate / (uartdiv * (oversample == UartBase::OversamplingMode::By16 ? 16 : 8)));
+		constexpr uint16_t brr = getBrr(clockrate, baudrate, oversample);
 		// check if we found a prescaler which generates a baudrate within the tolerance
 		xpcc::Tolerance::assertBaudrateInTolerance<
-				/* nearest possible value */ baud_raw,
+				/* nearest possible value */ getBaudrate(clockrate, brr, oversample),
 				/* desired = */ baudrate,
 				tolerance >();
 
-		return brrValue;
+		return brr;
 	}
 
 	/**
@@ -124,22 +130,10 @@ public:
 	 */
 	template<uint32_t clockrate, uint32_t baudrate, uint16_t tolerance>
 	static uint16_t ALWAYS_INLINE
-	brr()
+	getBrr()
 	{
-		static_assert((baudrate <= clockrate / 8),
-				"Baudrate must be less or equal to the PeripheralClock divided by 8.");
-		constexpr uint16_t brrValue = brr(clockrate, baudrate);
-		constexpr float uartdiv = ((brrValue & USART_BRR_DIV_MANTISSA) >> 4) + (brrValue & USART_BRR_DIV_FRACTION) / 8.f;
-		constexpr uint32_t baud_raw = static_cast<uint32_t>(clockrate / (uartdiv * (oversamplingMode(clockrate, baudrate) == UartBase::OversamplingMode::By16 ? 16 : 8)));
-		// check if we found a prescaler which generates a baudrate within the tolerance
-		xpcc::Tolerance::assertBaudrateInTolerance<
-				/* nearest possible value */ baud_raw,
-				/* desired = */ baudrate,
-				tolerance >();
-
-		return brrValue;
+		return getBrr< clockrate, baudrate, tolerance, getOversamplingMode(clockrate, baudrate) >();
 	}
-
 
 };
 

@@ -47,8 +47,9 @@ private:
 %% endif
 
 public:
-	template<class clockSource, uint32_t baudrate>
-	static inline void
+template< 	class clockSource, uint32_t baudrate,
+		uint16_t tolerance = xpcc::Tolerance::OnePercent >
+	static void ALWAYS_INLINE
 %% if parameters.buffered
 	initialize(uint32_t interruptPriority, bool blocking = true,
 				Parity parity = Parity::Disabled)
@@ -56,7 +57,10 @@ public:
 	initialize(Parity parity = Parity::Disabled)
 %% endif
 	{
-		{{ hal }}::initialize<clockSource, baudrate>(parity);
+		uint16_t brr = UartBaudrate::getBrr< clockSource::{{ uart ~ id }}, baudrate, tolerance >();
+		{{ hal }}::initializeWithBrr(brr,
+				parity,
+				UartBaudrate::getOversamplingMode(clockSource::{{ uart ~ id }}, baudrate));
 %% if parameters.buffered
 		initializeBuffered(interruptPriority, blocking);
 %% endif
@@ -95,7 +99,8 @@ public:
 	discardReceiveBuffer();
 };
 
-}
-}
+}	// stm32 namespace
+
+}	// xpcc namespace
 
 #endif // XPCC_STM32_{{ uart | upper }}_{{ id }}_HPP
