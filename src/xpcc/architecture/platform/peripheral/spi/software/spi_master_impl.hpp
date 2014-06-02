@@ -16,25 +16,21 @@
 #define DEBUG_SW_SPI(x)
 
 template <typename SCK, typename MOSI, typename MISO, uint32_t Baudrate>
-uint8_t xpcc::SoftwareSpiMaster<SCK, MOSI, MISO, Baudrate>::operationMode(0);
-
-template <typename SCK, typename MOSI, typename MISO, uint32_t Baudrate>
 xpcc::SpiDelegate *xpcc::SoftwareSpiMaster<SCK, MOSI, MISO, Baudrate>::myDelegate(0);
 
 
 // ----------------------------------------------------------------------------
 template <typename SCK, typename MOSI, typename MISO, uint32_t Baudrate>
-template< class clockSource, uint32_t baudrate, uint8_t tolerance >
-void
+template< class clockSource, uint32_t baudrate, uint16_t tolerance >
+void ALWAYS_INLINE
 xpcc::SoftwareSpiMaster<SCK, MOSI, MISO, Baudrate>::initialize()
 {
-	SCK::reset();
-	MOSI::reset();
+	SoftwareSpiSimpleMaster<SCK, MOSI, MISO, Baudrate>::template initialize< clockSource, baudrate, tolerance >();
 }
 // ----------------------------------------------------------------------------
 
 template <typename SCK, typename MOSI, typename MISO, uint32_t Baudrate>
-bool
+bool ALWAYS_INLINE
 xpcc::SoftwareSpiMaster<SCK, MOSI, MISO, Baudrate>::start(xpcc::SpiDelegate *delegate,
 		DataMode mode,
 		DataOrder order)
@@ -50,9 +46,8 @@ xpcc::SoftwareSpiMaster<SCK, MOSI, MISO, Baudrate>::startBlocking(xpcc::SpiDeleg
 {
 	if (!myDelegate && delegate)
 	{
-		operationMode = static_cast<uint8_t>(mode);
-		SCK::set(operationMode & 0b10);
-		if (order == DataOrder::LsbFirst) operationMode |= 0b100;
+		SoftwareSpiSimpleMaster<SCK, MOSI, MISO, Baudrate>::setOperationMode(mode);
+		SoftwareSpiSimpleMaster<SCK, MOSI, MISO, Baudrate>::setDataOrder(order);
 
 		if (delegate->attaching())
 		{
@@ -71,7 +66,7 @@ xpcc::SoftwareSpiMaster<SCK, MOSI, MISO, Baudrate>::startBlocking(xpcc::SpiDeleg
 				{
 					if (t.writeBuffer) tx_byte = t.writeBuffer[ii];
 
-					rx_byte = writeReadBlocking(tx_byte);
+					rx_byte = SoftwareSpiSimpleMaster<SCK, MOSI, MISO, Baudrate>::writeReadBlocking(tx_byte);
 					DEBUG_SW_SPI('w');
 
 					if (t.readBuffer) t.readBuffer[ii] = rx_byte;
@@ -92,72 +87,10 @@ xpcc::SoftwareSpiMaster<SCK, MOSI, MISO, Baudrate>::startBlocking(xpcc::SpiDeleg
 }
 
 template <typename SCK, typename MOSI, typename MISO, uint32_t Baudrate>
-void
+void inline
 xpcc::SoftwareSpiMaster<SCK, MOSI, MISO, Baudrate>::reset(DetachCause cause)
 {
 	if (myDelegate) myDelegate->detaching(cause);
 	myDelegate = 0;
 }
 //-----------------------------------------------------------------------------
-
-template <typename SCK, typename MOSI, typename MISO, uint32_t Baudrate>
-uint8_t
-xpcc::SoftwareSpiMaster<SCK, MOSI, MISO, Baudrate>::writeReadBlocking(uint8_t data)
-{
-	uint8_t input = 0;
-
-	for (uint_fast8_t ii = 0; ii < 8; ++ii)
-	{
-		// CPHA=1, sample on falling edge
-		if (operationMode & 0b01)
-			delay();
-
-		// if LSB first
-		if (operationMode & 0b100) {
-			input >>= 1;
-			MOSI::set(data & 0x01);
-		}
-		else {
-			input <<= 1;
-			MOSI::set(data & 0x80);
-		}
-
-		// CPHA=0, sample on rising edge
-		if (!(operationMode & 0b01))
-			delay();
-
-		// CPOL=0 -> High, CPOL=1 -> Low
-		SCK::set(!(operationMode & 0b10));
-
-		// CPHA=1, sample on falling edge
-		if (operationMode & 0b01)
-			delay();
-
-		// if LSB first
-		if (operationMode & 0b100) {
-			if (MISO::read()) input |= 0x80;
-			data >>= 1;
-		}
-		else {
-			if (MISO::read()) input |= 0x01;
-			data <<= 1;
-		}
-
-		// CPHA=0, sample on rising edge
-		if (!(operationMode & 0b01))
-			delay();
-
-		// CPOL=0 -> Low, CPOL=1 -> High
-		SCK::set(operationMode & 0b10);
-	}
-
-	return input;
-}
-
-
-template <typename SCK, typename MOSI, typename MISO, uint32_t Baudrate>
-void
-xpcc::SoftwareSpiMaster<SCK, MOSI, MISO, Baudrate>::delay()
-{
-	xpcc::delay_us(delayTime);
-}

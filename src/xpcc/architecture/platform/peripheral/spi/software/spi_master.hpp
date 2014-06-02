@@ -13,9 +13,9 @@
 #include <stdint.h>
 #include <xpcc/architecture/peripheral/spi.hpp>
 #include <xpcc/architecture/driver/delay.hpp>
+#include "simple_spi.hpp"
 #include "../../gpio/software/gpio.hpp"
 #include "type_ids.hpp"
-#include "../../gpio/software/gpio.hpp"
 
 namespace xpcc
 {
@@ -46,11 +46,11 @@ public:
 public:
 	// start documentation inherited
 	template< class clockSource, uint32_t baudrate,
-			uint16_t tolerance = xpcc::Tolerance::FivePercent >
-	static inline void
+			uint16_t tolerance = Tolerance::FivePercent >
+	static void
 	initialize();
 
-	static ALWAYS_INLINE bool
+	static bool
 	start(SpiDelegate *delegate,
 			DataMode mode=DataMode::Mode0,
 			DataOrder order=DataOrder::MsbFirst);
@@ -60,21 +60,14 @@ public:
 			DataMode mode=DataMode::Mode0,
 			DataOrder order=DataOrder::MsbFirst);
 
-	static inline void
+	static void
 	reset(DetachCause cause = DetachCause::SoftwareReset);
 	// end documentation inherited
 
 private:
-	static inline void
-	delay();
-
-	static uint8_t
-	writeReadBlocking(uint8_t data);
-
-	static constexpr uint32_t delayTime = (1000000.0 / Baudrate) / 2.0;
-	static uint8_t operationMode;
-
 	static xpcc::SpiDelegate *myDelegate;
+
+//	typedef SoftwareSpiSimpleMaster<SCK, MOSI, MISO, Baudrate> SimpleSpiMaster;
 };
 
 } // namespace xpcc

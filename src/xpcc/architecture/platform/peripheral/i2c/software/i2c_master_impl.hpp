@@ -15,39 +15,39 @@
 //#define DEBUG_SW_I2C(x) xpcc::lpc::BufferedUart1::write(x)
 #define DEBUG_SW_I2C(x)
 
-template <typename SCL, typename SDA, int32_t Frequency>
-SCL xpcc::SoftwareI2cMaster<SCL, SDA, Frequency>::scl;
-template <typename SCL, typename SDA, int32_t Frequency>
-SDA xpcc::SoftwareI2cMaster<SCL, SDA, Frequency>::sda;
+template <typename SCL, typename SDA, uint32_t Baudrate>
+SCL xpcc::SoftwareI2cMaster<SCL, SDA, Baudrate>::scl;
+template <typename SCL, typename SDA, uint32_t Baudrate>
+SDA xpcc::SoftwareI2cMaster<SCL, SDA, Baudrate>::sda;
 
-template <typename SCL, typename SDA, int32_t Frequency>
-xpcc::I2c::Operation xpcc::SoftwareI2cMaster<SCL, SDA, Frequency>::nextOperation;
-template <typename SCL, typename SDA, int32_t Frequency>
-xpcc::I2cDelegate *xpcc::SoftwareI2cMaster<SCL, SDA, Frequency>::myDelegate(0);
-template <typename SCL, typename SDA, int32_t Frequency>
-xpcc::I2cMaster::Error xpcc::SoftwareI2cMaster<SCL, SDA, Frequency>::errorState(xpcc::I2cMaster::Error::NoError);
+template <typename SCL, typename SDA, uint32_t Baudrate>
+xpcc::I2c::Operation xpcc::SoftwareI2cMaster<SCL, SDA, Baudrate>::nextOperation;
+template <typename SCL, typename SDA, uint32_t Baudrate>
+xpcc::I2cDelegate *xpcc::SoftwareI2cMaster<SCL, SDA, Baudrate>::myDelegate(0);
+template <typename SCL, typename SDA, uint32_t Baudrate>
+xpcc::I2cMaster::Error xpcc::SoftwareI2cMaster<SCL, SDA, Baudrate>::errorState(xpcc::I2cMaster::Error::NoError);
 
 // ----------------------------------------------------------------------------
-template <typename SCL, typename SDA, int32_t Frequency>
-template <class clockSource, xpcc::I2cMaster::DataRate rate, uint16_t tolerance>
+template <typename SCL, typename SDA, uint32_t Baudrate>
+template <class clockSource, uint32_t baudrate, uint16_t tolerance>
 void
-xpcc::SoftwareI2cMaster<SCL, SDA, Frequency>::initialize()
+xpcc::SoftwareI2cMaster<SCL, SDA, Baudrate>::initialize()
 {
 	scl.set();
 	sda.set();
 }
 
-template <typename SCL, typename SDA, int32_t Frequency>
+template <typename SCL, typename SDA, uint32_t Baudrate>
 void
-xpcc::SoftwareI2cMaster<SCL, SDA, Frequency>::reset(DetachCause cause)
+xpcc::SoftwareI2cMaster<SCL, SDA, Baudrate>::reset(DetachCause cause)
 {
 	if (myDelegate) myDelegate->stopped(cause);
 	myDelegate = 0;
 }
 
-template <typename SCL, typename SDA, int32_t Frequency>
+template <typename SCL, typename SDA, uint32_t Baudrate>
 bool
-xpcc::SoftwareI2cMaster<SCL, SDA, Frequency>::start(xpcc::I2cDelegate *delegate)
+xpcc::SoftwareI2cMaster<SCL, SDA, Baudrate>::start(xpcc::I2cDelegate *delegate)
 {
 	if (!myDelegate && delegate && delegate->attaching())
 	{
@@ -118,17 +118,17 @@ xpcc::SoftwareI2cMaster<SCL, SDA, Frequency>::start(xpcc::I2cDelegate *delegate)
 	return false;
 }
 
-template <typename SCL, typename SDA, int32_t Frequency>
+template <typename SCL, typename SDA, uint32_t Baudrate>
 xpcc::I2cMaster::Error
-xpcc::SoftwareI2cMaster<SCL, SDA, Frequency>::getErrorState()
+xpcc::SoftwareI2cMaster<SCL, SDA, Baudrate>::getErrorState()
 {
 	return errorState;
 }
 
 // MARK: - private
-template <typename SCL, typename SDA, int32_t Frequency>
+template <typename SCL, typename SDA, uint32_t Baudrate>
 void
-xpcc::SoftwareI2cMaster<SCL, SDA, Frequency>::error()
+xpcc::SoftwareI2cMaster<SCL, SDA, Baudrate>::error()
 {
 	DEBUG_SW_I2C('E');
 	stopCondition();
@@ -137,9 +137,9 @@ xpcc::SoftwareI2cMaster<SCL, SDA, Frequency>::error()
 }
 
 // MARK: bus control
-template <typename SCL, typename SDA, int32_t Frequency>
+template <typename SCL, typename SDA, uint32_t Baudrate>
 void
-xpcc::SoftwareI2cMaster<SCL, SDA, Frequency>::startCondition()
+xpcc::SoftwareI2cMaster<SCL, SDA, Baudrate>::startCondition()
 {
 	sda.set();
 	while((sda.read() == xpcc::Gpio::Low))
@@ -156,9 +156,9 @@ xpcc::SoftwareI2cMaster<SCL, SDA, Frequency>::startCondition()
 	delay();
 }
 
-template <typename SCL, typename SDA, int32_t Frequency>
+template <typename SCL, typename SDA, uint32_t Baudrate>
 void
-xpcc::SoftwareI2cMaster<SCL, SDA, Frequency>::stopCondition()
+xpcc::SoftwareI2cMaster<SCL, SDA, Baudrate>::stopCondition()
 {
 	scl.reset();
 	sda.reset();
@@ -171,9 +171,9 @@ xpcc::SoftwareI2cMaster<SCL, SDA, Frequency>::stopCondition()
 }
 
 // MARK: byte operations
-template <typename SCL, typename SDA, int32_t Frequency>
+template <typename SCL, typename SDA, uint32_t Baudrate>
 bool
-xpcc::SoftwareI2cMaster<SCL, SDA, Frequency>::write(uint8_t data)
+xpcc::SoftwareI2cMaster<SCL, SDA, Baudrate>::write(uint8_t data)
 {
 	for(uint8_t i = 0; i < 8; ++i)
 	{
@@ -193,9 +193,9 @@ xpcc::SoftwareI2cMaster<SCL, SDA, Frequency>::write(uint8_t data)
 	return true;
 }
 
-template <typename SCL, typename SDA, int32_t Frequency>
+template <typename SCL, typename SDA, uint32_t Baudrate>
 uint8_t
-xpcc::SoftwareI2cMaster<SCL, SDA, Frequency>::read(bool ack)
+xpcc::SoftwareI2cMaster<SCL, SDA, Baudrate>::read(bool ack)
 {
 	sda.set();
 
@@ -218,9 +218,9 @@ xpcc::SoftwareI2cMaster<SCL, SDA, Frequency>::read(bool ack)
 }
 
 // MARK: bit operations
-template <typename SCL, typename SDA, int32_t Frequency>
+template <typename SCL, typename SDA, uint32_t Baudrate>
 bool
-xpcc::SoftwareI2cMaster<SCL, SDA, Frequency>::readBit()
+xpcc::SoftwareI2cMaster<SCL, SDA, Baudrate>::readBit()
 {
 	delay();
 	sclSetAndWait();
@@ -234,9 +234,9 @@ xpcc::SoftwareI2cMaster<SCL, SDA, Frequency>::readBit()
 	return bit;
 }
 
-template <typename SCL, typename SDA, int32_t Frequency>
+template <typename SCL, typename SDA, uint32_t Baudrate>
 void
-xpcc::SoftwareI2cMaster<SCL, SDA, Frequency>::writeBit(bool bit)
+xpcc::SoftwareI2cMaster<SCL, SDA, Baudrate>::writeBit(bool bit)
 {
 	if (bit) {
 		sda.set();
@@ -253,9 +253,9 @@ xpcc::SoftwareI2cMaster<SCL, SDA, Frequency>::writeBit(bool bit)
 	scl.reset();
 }
 
-template <typename SCL, typename SDA, int32_t Frequency>
+template <typename SCL, typename SDA, uint32_t Baudrate>
 void
-xpcc::SoftwareI2cMaster<SCL, SDA, Frequency>::sclSetAndWait()
+xpcc::SoftwareI2cMaster<SCL, SDA, Baudrate>::sclSetAndWait()
 {
 	scl.set();
 	// wait for clock stretching by slave
@@ -277,9 +277,9 @@ xpcc::SoftwareI2cMaster<SCL, SDA, Frequency>::sclSetAndWait()
 }
 
 // ----------------------------------------------------------------------------
-template <typename SCL, typename SDA, int32_t Frequency>
+template <typename SCL, typename SDA, uint32_t Baudrate>
 void
-xpcc::SoftwareI2cMaster<SCL, SDA, Frequency>::delay()
+xpcc::SoftwareI2cMaster<SCL, SDA, Baudrate>::delay()
 {
 	xpcc::delay_us(delayTime);
 }
