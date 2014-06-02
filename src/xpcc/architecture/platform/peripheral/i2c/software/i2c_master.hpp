@@ -23,7 +23,7 @@ namespace xpcc
  *
  * @tparam	SCL			an Open-Drain Output pin
  * @tparam	SDA			an Open-Drain Output pin
- * @tparam	Frequency	in Hz (default frequency is 100kHz)
+ * @tparam	Baudrate	in Hz (default frequency is 100kHz)
  *
  * @ingroup	i2c
  * @author	Niklas Hauser
@@ -31,7 +31,7 @@ namespace xpcc
  */
 template< typename SCL,
 		  typename SDA,
-		  int32_t Frequency = 100000 >
+		  uint32_t Baudrate = xpcc::I2cMaster::DataRate::Standard >
 class SoftwareI2cMaster : public xpcc::I2cMaster
 {
 public:
@@ -42,10 +42,11 @@ public:
 	/**
 	 * @brief	Initialize the hardware
 	 *
-	 * @param	rate	this will not set the data rate, use the Frequency template parameter for that
+	 * @warning	this call cannot modify the baudrate anymore, since it is defined
+	 * 			by the template parameter Baudrate.
 	 */
-	template< class SystemClock, DataRate rate=DataRate::Standard,
-			uint8_t tolerance = Tolerance::FivePercent >
+	template< class clockSource, uint32_t baudrate=DataRate::Standard,
+			uint16_t tolerance = xpcc::Tolerance::FivePercent >
 	static void
 	initialize();
 
@@ -99,7 +100,7 @@ private:
 
 	// calculate the delay in microseconds needed to achieve the
 	// requested SPI frequency
-	static constexpr float delayTime = (1000000.0 / Frequency) / 2.0;
+	static constexpr float delayTime = (1000000.0 / Baudrate) / 2.0;
 
 	static SCL scl;
 	static SDA sda;

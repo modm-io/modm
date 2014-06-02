@@ -105,8 +105,8 @@ public:
 	};
 
 	/// Baudrate of the I2C bus. Most slaves only work in Standard or Fast mode.
-	enum class
-	DataRate : uint32_t
+	enum
+	DataRate
 	{
 		Standard = 100000,	///< Standard datarate of 100kHz
 		Fast = 400000,		///< Fast datarate of 400kHz
@@ -119,14 +119,14 @@ public:
 	/**
 	 * Initializes the hardware and sets the datarate.
 	 *
-	 * @tparam	SystemClock
-	 * 		the targets system clock
+	 * @tparam	clockSource
+	 * 		the currently active system clock
 	 * @tparam	baudrate
 	 * 		the desired baudrate in Hz
 	 * @tparam	tolerance
 	 * 		the allowed absolute tolerance for the resulting baudrate
 	 */
-	template< class SystemClock, DataRate rate=DataRate::Standard,
+	template< class clockSource, uint32_t baudrate=DataRate::Standard,
 			Tolerance tolerance = Tolerance::FivePercent >
 	static void
 	initialize();
@@ -163,8 +163,7 @@ public:
 	/**
 	 * Check the error state of the driver.
 	 *
-	 * Since the error states are hardware and implementation specific,
-	 * this is only the recommended interface and does not need to be implemented.
+	 * The error states are hardware and implementation specific.
 	 */
 	static Error
 	getErrorState();
@@ -175,7 +174,7 @@ public:
  * Abstract class for delegation.
  *
  * For true asynchronous operation, the communication driver should
- * inherit from this class, allowing multistage driver design and
+ * inherit from this class, allowing multi-stage driver design and
  * performance gain by premature data evaluation.
  * Be aware the methods may or may not be called during the I2C
  * interrupt even before returning from initiating function.
