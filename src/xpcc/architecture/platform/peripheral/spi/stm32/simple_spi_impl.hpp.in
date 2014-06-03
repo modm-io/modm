@@ -75,6 +75,8 @@ xpcc::stm32::SpiSimpleMaster{{ id }}::writeReadBlocking(uint8_t data)
 void ALWAYS_INLINE
 xpcc::stm32::SpiSimpleMaster{{ id }}::writeBlocking(uint8_t data)
 {
+	while( !SpiHal{{ id }}::isTransmitRegisterEmpty() )
+		{};
 	SpiHal{{ id }}::write(data);
 }
 
