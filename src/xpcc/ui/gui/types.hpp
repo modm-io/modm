@@ -118,6 +118,8 @@ namespace gui {
 
 	} Dimension;
 
+	typedef xpcc::glcd::Point Point;
+
 }
 }
 

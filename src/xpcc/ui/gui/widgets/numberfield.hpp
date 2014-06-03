@@ -38,7 +38,17 @@ private:
 };
 
 typedef NumberField<int16_t> IntegerField;
-typedef NumberField<float> FloatField;
+
+
+class FloatField : public NumberField<float>
+{
+public:
+	FloatField(float value, Dimension d);
+
+	void
+	render(AbstractView* view);
+};
+
 
 }
 }
