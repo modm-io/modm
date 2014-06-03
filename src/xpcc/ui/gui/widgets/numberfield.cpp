@@ -1,3 +1,5 @@
+#include <math.h>
+
 #include "numberfield.hpp"
 
 xpcc::gui::FloatField::FloatField(float value, Dimension d) :
@@ -38,8 +40,8 @@ void xpcc::gui::FloatField::render(AbstractView* view)
 	out->setColor(cp[Color::TEXT]);
 	out->setCursor(box_x + 10, box_y + (box_height - stringHeight) / 2);
 
-	int32_t beforeComma = static_cast<int32_t>(this->getValue());
-	uint32_t afterComma = static_cast<uint32_t>((this->getValue() - beforeComma) * 1000);
+	int beforeComma = static_cast<int>(this->getValue());
+	int afterComma = std::abs(static_cast<int>((this->getValue() - beforeComma) * 1000));
 
 	*out << beforeComma << ".";
 	out->printf("%03ld", afterComma);

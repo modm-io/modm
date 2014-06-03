@@ -24,7 +24,10 @@ public:
 	void
 	setValue(T value)
 	{
+		if(this->value == value)
+			return;
 		this->value = value;
+		this->markDirty();
 	}
 
 	T
