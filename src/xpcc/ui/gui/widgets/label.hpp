@@ -25,6 +25,7 @@ public:
 	setColor(xpcc::glcd::Color color)
 	{
 		this->color = color;
+		this->markDirty();
 	}
 
 	void
@@ -32,6 +33,7 @@ public:
 	{
 		this->label = lbl;
 		this->updateDimension();
+		this->markDirty();
 	}
 
 	void
