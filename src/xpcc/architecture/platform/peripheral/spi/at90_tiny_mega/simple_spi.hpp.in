@@ -83,16 +83,11 @@ public:
 	static bool
 	transfer(uint8_t * tx, uint8_t * rx, std::size_t length);
 
-	static ALWAYS_INLINE bool
-	isFinished();
 	// end documentation inherited
 
 protected:
 	static inline void
 	initialize(Prescaler prescaler);
-
-private:
-	static bool finished;
 };
 
 } // namespace {{target.family}}

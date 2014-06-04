@@ -15,9 +15,6 @@ template <typename SCK, typename MOSI, typename MISO, uint32_t Baudrate>
 uint8_t xpcc::SoftwareSpiSimpleMaster<SCK, MOSI, MISO, Baudrate>::operationMode(0);
 
 template <typename SCK, typename MOSI, typename MISO, uint32_t Baudrate>
-bool xpcc::SoftwareSpiSimpleMaster<SCK, MOSI, MISO, Baudrate>::finished;
-
-template <typename SCK, typename MOSI, typename MISO, uint32_t Baudrate>
 uint8_t xpcc::SoftwareSpiSimpleMaster<SCK, MOSI, MISO, Baudrate>::result;
 
 
@@ -29,7 +26,6 @@ xpcc::SoftwareSpiSimpleMaster<SCK, MOSI, MISO, Baudrate>::initialize()
 {
 	SCK::reset();
 	MOSI::reset();
-	finished = true;
 }
 
 template <typename SCK, typename MOSI, typename MISO, uint32_t Baudrate>
@@ -54,10 +50,6 @@ template <typename SCK, typename MOSI, typename MISO, uint32_t Baudrate>
 uint8_t
 xpcc::SoftwareSpiSimpleMaster<SCK, MOSI, MISO, Baudrate>::writeReadBlocking(uint8_t data)
 {
-	while (!isFinished())
-		;
-	finished = false;
-
 	uint8_t input = 0;
 
 	for (uint_fast8_t ii = 0; ii < 8; ++ii)
@@ -106,7 +98,6 @@ xpcc::SoftwareSpiSimpleMaster<SCK, MOSI, MISO, Baudrate>::writeReadBlocking(uint
 	}
 
 	result = input;
-	finished = true;
 
 	return input;
 }
@@ -134,13 +125,6 @@ xpcc::SoftwareSpiSimpleMaster<SCK, MOSI, MISO, Baudrate>::getResult()
 }
 
 template <typename SCK, typename MOSI, typename MISO, uint32_t Baudrate>
-bool
-xpcc::SoftwareSpiSimpleMaster<SCK, MOSI, MISO, Baudrate>::isFinished()
-{
-	return finished;
-}
-
-template <typename SCK, typename MOSI, typename MISO, uint32_t Baudrate>
 void
 xpcc::SoftwareSpiSimpleMaster<SCK, MOSI, MISO, Baudrate>::delay()
 {
@@ -151,10 +135,6 @@ template <typename SCK, typename MOSI, typename MISO, uint32_t Baudrate>
 bool
 xpcc::SoftwareSpiSimpleMaster<SCK, MOSI, MISO, Baudrate>::transfer(uint8_t *tx, uint8_t *rx, std::size_t length)
 {
-	if (!isFinished())
-		return false;
-	finished = false;
-
 	uint8_t tx_byte = 0xff;
 	uint8_t rx_byte;
 
@@ -167,6 +147,5 @@ xpcc::SoftwareSpiSimpleMaster<SCK, MOSI, MISO, Baudrate>::transfer(uint8_t *tx, 
 		if (rx) rx[i] = rx_byte;
 	}
 
-	finished = true;
 	return true;
 }
