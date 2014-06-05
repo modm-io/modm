@@ -61,6 +61,52 @@ struct Gpio
 	};
 };
 
+
+/**
+ * Gpio OpenDrain template, which remaps the behavior of the Gpio pin to
+ * simulate an open-drain Output (with internal pullups if needed).
+ * You must use this class for `SoftwareI2cMaster`!
+ *
+ * @see ::xpcc::SoftwareI2cMaster
+ * @ingroup	{{target.family}}
+ * @{
+ */
+template< class IO >
+class GpioOpenDrain : Gpio
+{
+public:
+	/// calls set
+	ALWAYS_INLINE static void set() {
+		IO::set();
+	}
+	/// calls reset
+	ALWAYS_INLINE static void reset() {
+		IO::reset();
+	}
+	ALWAYS_INLINE static void set(bool status) {
+		if (status) { set(); }
+		else { reset(); }
+	}
+	ALWAYS_INLINE static bool read() {
+		bool lastOutput = IO::read();
+		IO::setInput();
+		bool read = IO::read();
+		IO::setOutput(lastOutput);
+		return read;
+	}
+	ALWAYS_INLINE static void
+	connect(::xpcc::TypeId::SoftwareI2cMasterSda) {
+		IO::setOutput();
+		IO::set();
+	}
+	ALWAYS_INLINE static void
+	connect(::xpcc::TypeId::SoftwareI2cMasterScl) {
+		IO::setOutput();
+		IO::set();
+	}
+};
+/// @}
+
 /**
  * Gpio Classes created from the XML Device File Gpio Description
  */
@@ -237,20 +283,6 @@ public:
 		configure(OutputType::PushPull);
 				%% elif "i2c_mode" in bits
 		configure(I2cMode::StandardIO);	// still open drain, but best be can do
-				%% endif
-		setOutput();
-		set();
-	}
-			%% endfor
-			%% for peripheral in   ['SoftwareI2cMasterSda',
-									'SoftwareI2cMasterScl']
-	/// Connect to `{{peripheral}}`.
-	ALWAYS_INLINE static void
-	connect(::xpcc::TypeId::{{ peripheral }}) {
-				%% if "mode" in bits
-		configure(OutputType::OpenDrain);
-				%% elif "i2c_mode" in bits
-		configure(I2cMode::StandardMode);
 				%% endif
 		setOutput();
 		set();
