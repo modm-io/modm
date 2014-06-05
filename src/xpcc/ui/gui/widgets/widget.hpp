@@ -389,6 +389,15 @@ public:
 	}
 
 	void
+	markDirty()
+	{
+		for(auto iter = widgets.begin(); iter != widgets.end(); ++iter)
+		{
+			(*iter)->markDirty();
+		}
+	}
+
+	void
 	markDrawn()
 	{
 		for(auto iter = widgets.begin(); iter != widgets.end(); ++iter)
@@ -400,6 +409,17 @@ public:
 	void
 	updatePosition()
 	{
+
+		this->position = this->getRelativePosition();
+
+		Widget* w = this;
+
+		while(w->parent != NULL)
+		{
+			this->position += w->parent->getRelativePosition();
+			w = w->parent;
+		}
+
 		for(auto iter = widgets.begin(); iter != widgets.end(); ++iter)
 		{
 			(*iter)->updatePosition();
