@@ -2,6 +2,7 @@
 #define XPCC_LPC11C__C_CAN_HPP
 
 #include <xpcc/communication/can/message.hpp>
+#include <xpcc/architecture/peripheral/can.hpp>
 
 #define CONFIG_ENABLE_DRIVER_ROMCAN   1
 #define CONFIG_ENABLE_DRIVER_ROMUSB   0
@@ -44,7 +45,7 @@ namespace lpc
  * \author	strongly-typed
  * \ingroup	lpc
  */
-class Can
+class Can : public ::xpcc::Can
 {
 public:
 	enum class
@@ -153,6 +154,9 @@ public:
 	 */
 	static bool
 	sendMessage(const can::Message& message);
+
+	static BusState
+	getBusState();
 
 public:
 	static constexpr

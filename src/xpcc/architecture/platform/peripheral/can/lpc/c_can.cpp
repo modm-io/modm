@@ -106,6 +106,30 @@ readMessageObject(xpcc::can::Message & message, uint8_t messageObjectId)
 }
 
 
+#define STAT_LEC		(0x7 << 0)
+#define STAT_TXOK		(1 << 3)
+#define STAT_RXOK		(1 << 4)
+#define STAT_EPASS		(1 << 5)
+#define STAT_EWARN		(1 << 6)
+#define STAT_BOFF		(1 << 7)
+
+xpcc::lpc::Can::BusState
+xpcc::lpc::Can::getBusState()
+{
+	if (LPC_CAN->STAT & STAT_BOFF) {
+		return BusState::Off;
+	}
+	else if (LPC_CAN->STAT & STAT_EPASS) {
+		return BusState::ErrorPassive;
+	}
+	else if (LPC_CAN->STAT & STAT_EWARN) {
+		return BusState::ErrorWarning;
+	}
+	else {
+		return BusState::Connected;
+	}
+}
+
 // ----------------------------------------------------------------------------
 
 /**
