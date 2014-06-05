@@ -9,5 +9,6 @@
 #include "widgets/label.hpp"
 
 #include "widgets/composed_widgets/tab_panel.hpp"
+#include "widgets/composed_widgets/stringrocker.hpp"
 
 #endif /* WIDGETS_HPP_ */
