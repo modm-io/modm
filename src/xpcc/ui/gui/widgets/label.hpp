@@ -29,7 +29,7 @@ public:
 	}
 
 	void
-	setLabel(char* lbl)
+	setLabel(const char* lbl)
 	{
 		this->label = lbl;
 		this->updateDimension();
