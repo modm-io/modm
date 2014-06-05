@@ -1,38 +1,19 @@
 // coding: utf-8
-// ----------------------------------------------------------------------------
 /* Copyright (c) 2013, Roboterclub Aachen e.V.
- * All rights reserved.
+ * All Rights Reserved.
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- *     * Redistributions of source code must retain the above copyright
- *       notice, this list of conditions and the following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright
- *       notice, this list of conditions and the following disclaimer in the
- *       documentation and/or other materials provided with the distribution.
- *     * Neither the name of the Roboterclub Aachen e.V. nor the
- *       names of its contributors may be used to endorse or promote products
- *       derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY ROBOTERCLUB AACHEN E.V. ''AS IS'' AND ANY
- * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL ROBOTERCLUB AACHEN E.V. BE LIABLE FOR ANY
- * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * The file is part of the xpcc library and is released under the 3-clause BSD
+ * license. See the file `LICENSE` for the full license governing this code.
  */
-#ifndef XPCC_LPC__GPIO_HPP
-#define XPCC_LPC__GPIO_HPP
+// ----------------------------------------------------------------------------
+#ifndef XPCC_LPC_GPIO_HPP
+#define XPCC_LPC_GPIO_HPP
 
 #include "../../../device.hpp"
 
 // TODO: Move to common file
-#define SYSAHBCLKCTRL_GPIO			(1<<6)
+#define SYSAHBCLKCTRL_GPIO		(1<<6)
+#define IOCON_ADMODE_DIGITAL	(1<<7)
 
 
 static void
@@ -46,114 +27,255 @@ xpcc_gpio_enable()
 %% if output != 'gpio_enable.h'
 #include <xpcc/architecture/peripheral/gpio.hpp>
 
-/**
- * Macros for backwards compatibility:
- */
-#define	GPIO__IO(name, port, pin) \
-typedef CONCAT4(::xpcc::lpc::Gpio, port, _, pin) name
-
-#define	GPIO__OUTPUT(name, port, pin) \
-typedef CONCAT4(::xpcc::lpc::GpioOutput, port, _, pin) name
-
-#define	GPIO__INPUT(name, port, pin) \
-typedef CONCAT4(::xpcc::lpc::GpioInput, port, _, pin) name
-
-
 namespace xpcc
 {
-	namespace lpc
+namespace lpc
+{
+struct Gpio
+{
+	/// @ingroup	lpc11xx
+	enum class
+	InputType
 	{
-		struct Gpio
-		{
-			/**
-			 * \ingroup	lpc11xx
-			 */
-			enum InputType
-			{
-				FLOATING = (0 << 3),
-				PULLDOWN = (1 << 3),
-				PULLUP   = (2 << 3),
-				REPEATER = (3 << 3),
-			};
+		Floating = (0 << 3),
+		PullDown = (1 << 3),
+		PullUp   = (2 << 3),
+		Repeater = (3 << 3),
+	};
 
-			/**
-			 * \ingroup	lpc11xx
-			 */
-			enum OutputType
-			{
-				PUSH_PULL  = (0 << 10),
-				OPEN_DRAIN = (1 << 10),
-			};
-		};
+	/// @ingroup	lpc11xx
+	enum class
+	OutputType
+	{
+		PushPull  = (0 << 10),
+		OpenDrain = (1 << 10),
+	};
 
-		/**
-		 * Gpio Classes created from the XML Device File Gpio Description
-		 */
+	/// @ingroup	lpc11xx
+	enum class
+	I2cMode
+	{
+		StandardMode = (0<<8),
+		StandardIO   = (1<<8),
+		FastMode     = (2<<8),
+	};
+};
+
+/**
+ * Gpio Classes created from the XML Device File Gpio Description
+ */
 %% for gpio in gpios
+	%% set functions = gpio.func|split(',')
+	%% set bits      = gpio.bits|split(',')
 	%% set pin  = gpio.id
-	%% set conf_reg  = "LPC_IOCON->PIO" ~ gpio.port ~ "_" ~ pin
+	%% if gpio.define
+		%% set conf_reg  = "LPC_IOCON->" ~ gpio.define
+	%% elif functions[0]|lower == 'reserved'
+		%% set conf_reg  = "LPC_IOCON->R_PIO" ~ gpio.port ~ "_" ~ pin
+	%% else
+		%% set conf_reg  = "LPC_IOCON->PIO" ~ gpio.port ~ "_" ~ pin
+	%% endif
 	%% set gpio_reg  = "LPC_GPIO" ~ gpio.port
 
-%% for type in ["Output", "Input", ""]
-	%% set name = "Gpio" ~ type ~ gpio.port ~ "_" ~ gpio.id
+	%% for type in ["Output", "Input", ""]
+		%% set name = "Gpio" ~ type ~ gpio.port ~ "_" ~ gpio.id
 
-		/** \brief		{{gpio.port|upper}}{{gpio.id}} {{type}}
-		 *  \ingroup	stm32
-		 */
-		struct {{name}} : Gpio
-		{
-		// TODO: Add connect method in order to set function
-	%% if type == "" or type == "Output"
-			ALWAYS_INLINE static void setOutput(bool status) {
-				setOutput();
-				set(status);
-			}
+/** \brief		{{gpio.port|upper}}{{gpio.id}} {{type}}
+ *  \ingroup	lpc11
+ */
+class {{name}} : Gpio
+{
+// TODO: Add connect method in order to set function
+public:
+	enum class
+	Function
+	{
+		%% for f in functions
+		{{ f }} = ({{ loop.index - 1 }}<<0),
+		%% endfor
+	};
 
-			ALWAYS_INLINE static void
-			setOutput(OutputType type = PUSH_PULL) {
-				{{ conf_reg }} = type;
-				// TODO: only needed for some specific pins: | IOCON_ADMODE_DIGITAL;
-				{{ gpio_reg }}->DIR |= (1 << {{ pin}});
-			}
+	/// change the function of the pin
+	ALWAYS_INLINE static void
+	selectFunction(Function f){
+		uint32_t temp;
+		temp = {{ conf_reg }} & ~(7<<0);	// FUNC REG is 3 bits wide
+		temp |= static_cast<uint32_t>(f);
+		{{ conf_reg }} = temp;
+	}
 
-			ALWAYS_INLINE static void set() {
-				{{ gpio_reg }}->MASKED_ACCESS[1 << {{ pin }}] = (1 << {{pin}});
-			}
+public:
+		%% if "i2c_mode" in bits
+	ALWAYS_INLINE static void
+	configure(I2cMode mode) {
+		uint32_t temp;
+		temp = {{ conf_reg }} & ~(3<<8);
+		temp |= static_cast<uint32_t>(mode);
+		{{ conf_reg }} = temp;
+	}
+		%% endif
 
-			ALWAYS_INLINE static void set(bool status) {
-				if (status) { set(); }
-				else { reset(); }
-			}
+		%% if type == "" or type == "Output"
 
-			ALWAYS_INLINE static void reset() {
-				{{ gpio_reg }}->MASKED_ACCESS[1 << {{ pin }}] = 0;
-			}
+			%% if "od" in bits
+	ALWAYS_INLINE static void
+	configure(OutputType type) {
+		if(type == OutputType::PushPull) {
+			{{ conf_reg }} &= ~static_cast<uint32_t>(OutputType::OpenDrain);
+		} else {
+			{{ conf_reg }} |=  static_cast<uint32_t>(OutputType::OpenDrain);
+		}
+	}
+			%% endif
 
-			ALWAYS_INLINE static void toggle() {
-				if (({{ gpio_reg }}->MASKED_ACCESS[1 << {{ pin }}]) >> {{ pin }})
-				{ reset(); } else { set(); }
-			}
-	%% endif
-	%% if type == "" or type == "Input"
-			ALWAYS_INLINE static void
-			setInput(InputType type = FLOATING) {
-				// Open Drain or not?
-				// TODO:
-				{{ conf_reg }} = type;
-				// TODO: only needed for some specific pins: | IOCON_ADMODE_DIGITAL;
-				{{ gpio_reg }}->DIR &= ~(1 << {{ pin}});
-			}
+	ALWAYS_INLINE static void
+	setOutput() {
+			%% if "admode" in bits
+		{{ conf_reg }} |= IOCON_ADMODE_DIGITAL;	// configure as digital pin
+			%% endif
+		selectFunction(Function::Gpio);
+		{{ gpio_reg }}->DIR |= (1 << {{ pin}});
+	}
 
-			ALWAYS_INLINE static bool read() {
-				return ({{ gpio_reg }}->MASKED_ACCESS[1 << {{ pin }}]) >> {{ pin }};
-			}
-	%% endif
-		};
+	ALWAYS_INLINE static void
+	setOutput(bool status) {
+		setOutput();
+		set(status);
+	}
+
+			%% if "od" in bits
+	ALWAYS_INLINE static void
+	setOutput(OutputType type) {
+		configure(type);
+		setOutput();
+	}
+			%% endif
+
+			%% if "i2c_mode" in bits
+	ALWAYS_INLINE static void
+	setOutput(I2cMode type) {
+		configure(type);
+		setOutput();
+	}
+			%% endif
+
+	ALWAYS_INLINE static void
+	set() {
+		{{ gpio_reg }}->MASKED_ACCESS[1 << {{ pin }}] = (1 << {{pin}});
+	}
+
+	ALWAYS_INLINE static void
+	set(bool status) {
+		if (status) { set(); }
+		else { reset(); }
+	}
+
+	ALWAYS_INLINE static void
+	reset() {
+		{{ gpio_reg }}->MASKED_ACCESS[1 << {{ pin }}] = 0;
+	}
+
+	ALWAYS_INLINE static void
+	toggle() {
+		if (({{ gpio_reg }}->MASKED_ACCESS[1 << {{ pin }}]) >> {{ pin }})
+		{ reset(); } else { set(); }
+	}
+		%% endif
+		%% if type == "" or type == "Input"
+
+			%% if "mode" in bits
+	ALWAYS_INLINE static void
+	configure(InputType type) {
+		uint32_t temp;
+		temp = {{ conf_reg }} & ~static_cast<uint32_t>(InputType::Repeater);
+		temp |= static_cast<uint32_t>(type);
+		{{ conf_reg }} = temp;
+	}
+			%% endif
+
+
+	ALWAYS_INLINE static void
+	setInput() {
+			%% if "admode" in bits
+		{{ conf_reg }} |= IOCON_ADMODE_DIGITAL;	// configure as digital pin
+			%% endif
+		selectFunction(Function::Gpio);
+		{{ gpio_reg }}->DIR &= ~(1 << {{ pin}});
+	}
+
+	ALWAYS_INLINE static bool
+	read() {
+		return ({{ gpio_reg }}->MASKED_ACCESS[1 << {{ pin }}]) >> {{ pin }};
+	}
+
+			%% if "mode" in bits
+	ALWAYS_INLINE static void
+	setInput(InputType type) {
+		configure(type);
+		setInput();
+	}
+			%% endif
+
+			%% if "i2c_mode" in bits
+	ALWAYS_INLINE static void
+	setInput(I2cMode type) {
+		configure(type);
+		setInput();
+	}
+			%% endif
+
+		%% endif
+
+	// connect: Software Gpio
+		%% if type in ['', 'Output']
+			%% for peripheral in   ['SoftwareSpiMasterMosi',
+									'SoftwareSpiMasterSck']
+	/// Connect to `{{peripheral}}`.
+	ALWAYS_INLINE static void
+	connect(::xpcc::TypeId::{{ peripheral }}) {
+				%% if "mode" in bits
+		configure(OutputType::PushPull);
+				%% elif "i2c_mode" in bits
+		configure(I2cMode::StandardIO);	// still open drain, but best be can do
+				%% endif
+		setOutput();
+		set();
+	}
+			%% endfor
+			%% for peripheral in   ['SoftwareI2cMasterSda',
+									'SoftwareI2cMasterScl']
+	/// Connect to `{{peripheral}}`.
+	ALWAYS_INLINE static void
+	connect(::xpcc::TypeId::{{ peripheral }}) {
+				%% if "mode" in bits
+		configure(OutputType::OpenDrain);
+				%% elif "i2c_mode" in bits
+		configure(I2cMode::StandardMode);
+				%% endif
+		setOutput();
+		set();
+	}
+			%% endfor
+		%% endif
+		%% if type in ['', 'Input']
+			%% for peripheral in ['SoftwareSpiMasterMiso']
+	/// Connect to `{{peripheral}}`.
+	ALWAYS_INLINE static void
+	connect(::xpcc::TypeId::{{ peripheral }}) {
+				%% if "mode" in bits
+		configure(InputType::Floating);
+				%% endif
+		setInput();
+	}
+			%% endfor
+		%% endif
+
+};
+		%% endfor
 %% endfor
-%% endfor
-	} /* namespace lpc */
+} /* namespace lpc */
 } /* xpcc */
 
 %% endif
 
-#endif // XPCC_LPC__GPIO_HPP
+#endif // XPCC_LPC_GPIO_HPP
