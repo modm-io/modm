@@ -1,6 +1,6 @@
 
 #include "c_can_filter.hpp"
-
+#include "../../../device.hpp"
 // ----------------------------------------------------------------------------
 void
 xpcc::lpc::CanFilter::setFilter(
