@@ -30,10 +30,14 @@
 
 import os
 import builder_base
-import filter.java as filter
+import filter.cpp as filter
 
 # -----------------------------------------------------------------------------
-class JavaCommunicationBuilder(builder_base.Builder):
+def filter_lower(value):
+	return value.lower().replace(" ", "_")
+
+# -----------------------------------------------------------------------------
+class CppCommunicationBuilder(builder_base.Builder):
 	"""
 	Generate the whole communication tree. The Output is a class named
 	Communication, which contains all concrete Components. They all contain
@@ -47,42 +51,34 @@ class JavaCommunicationBuilder(builder_base.Builder):
 	VERSION = "0.1"
 	
 	def setup(self, optparser):
-		optparser.add_option(
-				"--package",
-				dest = "package",
-				default = '',
-				help = "name of package")
+		pass
 				
 	def generate(self):
 		# check the commandline options
 		if not self.options.outpath:
 			raise builder_base.BuilderException("You need to provide an output path!")
 		
-		javaFilter = {
-			'enumElement': filter.enumElement,
-			'typeName': filter.typeName,
-			'typeObjectName': filter.typeObjectName,
-			'variableName': filter.variableName,
+		cppFilter = {
+			'camelcase': filter_lower,
+			'camelCase': filter.variableName,
+			'CamelCase': filter.typeName,
+			'CAMELCASE': filter.enumElement,
 		}
-		template = self.template('templates/java_communication.tpl',
-								filter = javaFilter)
+		template = self.template('templates/cpp_communication.tpl',
+								filter = cppFilter)
 		
 		# Bool has a special status because its primitive but user generated
 		# and the only not numerical type
 		components = self.tree.components
 		
-		primitives = filter.PRIMITIVES.values()
-		primitives.sort()
-		
 		substitutions = {
-			'package' : self.options.package,
 			'components': components,
 			'events': self.tree.events,
 		}
 		
-		file = os.path.join(self.options.outpath, 'Communication.java')
+		file = os.path.join(self.options.outpath, 'communication.hpp')
 		self.write(file, template.render(substitutions))
 
 # -----------------------------------------------------------------------------
 if __name__ == '__main__':
-	JavaCommunicationBuilder().run()
+	CppCommunicationBuilder().run()

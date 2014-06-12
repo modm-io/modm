@@ -4,81 +4,58 @@
  */
 // ----------------------------------------------------------------------------
 
-package {{ package }};
+#include "identifier.hpp"
+#include "packets.hpp"
+#include <xpcc/communication/xpcc/communicator.hpp>
 
-import xpcc.DefaultXpccMessage;
-import xpcc.Header;
-import xpcc.HeaderType;
-import xpcc.Sender;
+namespace robot
+{
 
-public class Communication {
-	private final Identifier.Component me;
-	private final Sender sender;
-	
-	/** Using this member you can publish events.*/
-	public final EventPublisher eventPublisher = new EventPublisher();
-	
-	{% for component in components.iter() %}
-	{% if component.description %}/** {{ component.description | xpcc.wordwrap(72) | xpcc.indent(1) }} */{% endif %}
-	public final {{ component.name | typeName }} {{ component.name | variableName }} = new {{ component.name | typeName }}();
-	{% endfor %}
-
-	public Communication(Identifier.Component me, Sender sender) {
-		this.me = me;
-		this.sender = sender;
-	}
-	
 	/** Using this class you can publish events.*/
-	public class EventPublisher {
-		private EventPublisher() {
-		}
+	class EventPublisher
+	{
+	public:
 		
 	{%- for event in events.iter() %}
 		{% if event.type -%}
-		{% if event.description %}/** {{ event.description | xpcc.wordwrap(72) | xpcc.indent(1) }}
-		* @param packet {@link Packets.{{ event.type.name | typeObjectName -}} }*/{% endif %}
-		public void {{ event.name | variableName }}(Packets.{{ event.type.name | typeObjectName }} packet) {
-			Header header = new Header(HeaderType.REQUEST, false, Identifier.Component.BROADCAST.id, me.id, Identifier.Event.{{ event.name | enumElement }}.id);
-			DefaultXpccMessage message = new DefaultXpccMessage(header, packet.getBytes());
-			sender.sendPacket(message);
+		{% if event.description %}/** {{ event.description | xpcc.wordwrap(72) | xpcc.indent(2) }}
+		* \param const robot::packet::{{ event.type.name | CamelCase -}}& */{% endif %}
+		static inline void
+		{{ event.name | camelCase }}(
+				xpcc::Communicator *communicator,
+				
+				{%- if event.type.isBuiltIn %}
+				const {{ event.type.name | CamelCase }}& packet)
+				{%- else %}
+				const robot::packet::{{ event.type.name | CamelCase }}& packet)
+				{%- endif %}
+		{
+			communicator->publishEvent(
+				robot::event::Identifier::{{ event.name | CAMELCASE }},
+				packet);
 		}
 		{% else -%}
-		{% if event.description %}/** {{ event.description | xpcc.wordwrap(72) | xpcc.indent(1) }}*/{% endif %}
-		public void {{ event.name | variableName }}() {
-			Header header = new Header(HeaderType.REQUEST, false, Identifier.Component.BROADCAST.id, me.id, Identifier.Event.{{ event.name | enumElement }}.id);
-			DefaultXpccMessage message = new DefaultXpccMessage(header, null);
-			sender.sendPacket(message);
-		}
-		public void {{ event.name | variableName }}(Packets.Void packet) {
-			{{ event.name | variableName }}();
+		{% if event.description %}/** {{ event.description | xpcc.wordwrap(72) | xpcc.indent(2) }}*/{% endif %}
+		static inline void
+		{{ event.name | camelCase }}(xpcc::Communicator *communicator) {
+			communicator->publishEvent(
+				robot::event::Identifier::{{ event.name | CAMELCASE }});
 		}
 		{% endif -%}
 	{% endfor %}
-	}
+	};
 
-	/** Every component has to extend this class */
-	public abstract class Component{
-		/** The Identifier of Component */
-		public final Identifier.Component id;
-		
-		private Component(Identifier.Component id) {
-			this.id = id;
-		}
-	}
-	
 {%- for component in components.iter() %}
 	
-	{% if component.description %}/** {{ component.description | xpcc.wordwrap(72) | xpcc.indent(1) }} */{% endif %}
-	public class {{ component.name | typeName }} extends Component {
-		private {{ component.name | typeName }}() {
-			super (Identifier.Component.{{ component.flattened().name | enumElement }});
-		}
-		
+	{% if component.description %}/** {{ component.description | xpcc.wordwrap(72) | xpcc.indent(2) }} */{% endif %}
+	class {{ component.name | CamelCase }}
+	{
+	public:
 		{% for action in component.flattened().actions %}
 		{% if action.description -%}
 		{% if action.parameterType -%}
 		/** {{ action.description | xpcc.wordwrap(72) | xpcc.indent(2) }}
-		@param packet Packets.{{ action.parameterType.flattened().name | typeObjectName }}
+		\param packet robot::packet::{{ action.parameterType.flattened().name | CamelCase }}&
 		 */
 		{% else -%}
 		/** {{ action.description | xpcc.wordwrap(72) | xpcc.indent(2) }} */
@@ -86,32 +63,61 @@ public class Communication {
 		{% else -%}
 		{% if action.parameterType -%}
 		/**
-		@param packet Packets.{{ action.parameterType.flattened().name | typeObjectName }}
+		\param packet robot::packet::{{ action.parameterType.flattened().name | CamelCase }}&
 		 */
 		{% endif -%}
 		{% endif -%}
 		{% if action.parameterType -%}
-		public void {{ action.name | variableName }} (Packets.{{ action.parameterType.flattened().name | typeObjectName }} packet) {
-			Header header = new Header(HeaderType.REQUEST, false, this.id.id, me.id, Identifier.Action.{{ action.name | enumElement }}.id);
-			
-			DefaultXpccMessage message = new DefaultXpccMessage(header, packet.getBytes());
-			sender.sendPacket(message);
+		static inline void
+		{{ action.name | camelCase }} (
+				xpcc::Communicator *communicator,
+				{%- if action.parameterType.isBuiltIn %}
+				const {{ action.parameterType.name | CamelCase }}& packet)
+				{%- else %}
+				const robot::packet::{{ action.parameterType.name | CamelCase }}& packet)
+				{%- endif %}
+		{
+			communicator->callAction(
+				robot::component::Identifier::{{ component.name | CAMELCASE }},
+				robot::action::Identifier::{{ action.name | CAMELCASE }},
+				packet);
+		}
+		static inline void
+		{{ action.name | camelCase }} (
+				xpcc::Communicator *communicator,
+				{%- if action.parameterType.isBuiltIn %}
+				const {{ action.parameterType.name | CamelCase }}& packet,
+				{%- else %}
+				const robot::packet::{{ action.parameterType.name | CamelCase }}& packet,
+				{%- endif %}
+				xpcc::ResponseCallback& responseCallback)
+		{
+			communicator->callAction(
+				robot::component::Identifier::{{ component.name | CAMELCASE }},
+				robot::action::Identifier::{{ action.name | CAMELCASE }},
+				packet,
+				responseCallback);
 		}
 		{% else -%}
-		public void {{ action.name | variableName }} () {
-			Header header = new Header(HeaderType.REQUEST, false, this.id.id, me.id, Identifier.Action.{{ action.name | enumElement }}.id);
-			
-			DefaultXpccMessage message = new DefaultXpccMessage(header, null);
-			sender.sendPacket(message);
+		static inline void
+		{{ action.name | camelCase }} (xpcc::Communicator *communicator) {
+			communicator->callAction(
+				robot::component::Identifier::{{ component.name | CAMELCASE }},
+				robot::action::Identifier::{{ action.name | CAMELCASE }});
 		}
-		public void {{ action.name | variableName }} (Packets.Void packet) {
-			{{ action.name | variableName }}();
+		static inline void
+		{{ action.name | camelCase }} (xpcc::Communicator *communicator, xpcc::ResponseCallback& responseCallback) {
+			communicator->callAction(
+				robot::component::Identifier::{{ component.name | CAMELCASE }},
+				robot::action::Identifier::{{ action.name | CAMELCASE }},
+				responseCallback);
 		}
 		{% endif %}
 		{%- endfor %}
 		
-	}
+	};
 
 	
 {%- endfor %}
-}
+
+} // namespace robot
