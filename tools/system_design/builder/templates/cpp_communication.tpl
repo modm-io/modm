@@ -4,6 +4,9 @@
  */
 // ----------------------------------------------------------------------------
 
+#ifndef ROBOT__CPP_COMMUNICATION_HPP
+#define ROBOT__CPP_COMMUNICATION_HPP
+
 #include "identifier.hpp"
 #include "packets.hpp"
 #include <xpcc/communication/xpcc/communicator.hpp>
@@ -121,3 +124,5 @@ namespace robot
 {%- endfor %}
 
 } // namespace robot
+
+#endif // ROBOT__CPP_COMMUNICATION_HPP
