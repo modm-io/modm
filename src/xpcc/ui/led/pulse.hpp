@@ -90,7 +90,7 @@ public:
 
 	/// Must be called at least every ms
 	void
-	run()
+	update()
 	{
 		led.update();
 

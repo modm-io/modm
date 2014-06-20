@@ -42,16 +42,16 @@ public:
 
 	/// @param	brightness
 	///		between 0 and length of lookup-table
-	inline void
+	void
 	setBrightness(uint8_t brightness);
 
 	/// @return brightness of the LED
-	ALWAYS_INLINE uint8_t
+	uint8_t
 	getBrightness() const;
 
 	/// @return `true` if LED is currently fading to another brightness,
 	///			`false` if otherwise
-	ALWAYS_INLINE bool
+	bool
 	isFading() const;
 
 	/// Fade from the current brightness to a new brightness in the specified ms.
@@ -66,7 +66,7 @@ public:
 	 * @param	time
 	 * 		specify the fade up time in ms, 0 turn the LED on instantly
 	 */
-	ALWAYS_INLINE void
+	void
 	on(uint16_t time=9);
 
 	/**
@@ -75,11 +75,12 @@ public:
 	 * @param	time
 	 * 		specify the fade up time in ms, 0 turn the LED off instantly
 	 */
-	ALWAYS_INLINE void
+	void
 	off(uint16_t time=12);
 
-	/// should be called every 1ms or more.
-	inline void
+	/// Can be called at a interval of 1ms or less.
+	/// If you do not need 1ms response time (e.g. for on(), off()), you can calls this at larger intervals.
+	void
 	update();
 
 protected:
@@ -91,7 +92,7 @@ protected:
 	int16_t deltaValue;
 	uint16_t fadeTime;
 
-	xpcc::Timestamp stamp;
+	xpcc::Timestamp previous;
 };
 
 }
