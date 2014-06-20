@@ -43,7 +43,7 @@ public:
 	 * @param	rate
 	 *		`Standard` or `Fast`, `High` datarate is not supported
 	 */
-	template<class clockSource, uint32_t rate=DataRate::Standard
+	template<class clockSource, uint32_t rate=DataRate::Standard,
 			uint16_t tolerance = xpcc::Tolerance::FivePercent >
 	static ALWAYS_INLINE void
 	initialize()
