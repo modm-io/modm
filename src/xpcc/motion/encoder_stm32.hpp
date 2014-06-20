@@ -26,6 +26,8 @@
  * 	run()
  *
  */
+namespace xpcc {
+namespace motion {
 template < typename TIMER, typename GPIO_A, typename GPIO_B >
 class EncoderStm32
 {
@@ -64,7 +66,10 @@ private:
 };
 
 template < typename TIMER, typename GPIO_A, typename GPIO_B >
-EncoderT
+typename EncoderStm32<TIMER, GPIO_A, GPIO_B>::EncoderT
 EncoderStm32<TIMER, GPIO_A, GPIO_B>::encoderRaw;
+
+}
+}
 
 #endif /* XPCC_MOTION__ENCODER_STM32_HPP */

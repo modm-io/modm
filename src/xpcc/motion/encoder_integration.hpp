@@ -3,6 +3,9 @@
 
 #include <stdint.h>
 
+namespace xpcc {
+namespace motion {
+
 // Signature for all valid template params
 typedef uint16_t(*getEncoderRaw)(void);
 
@@ -83,5 +86,8 @@ int16_t EncoderIntegration< GER, REVERSED >::encoderSteps = 0;
 
 template < getEncoderRaw GER, bool REVERSED >
 uint16_t EncoderIntegration< GER, REVERSED >::encoderLast = 0;
+
+}
+}
 
 #endif // XPCC_MOTION__ENCODER_INTEGRATION_HPP
