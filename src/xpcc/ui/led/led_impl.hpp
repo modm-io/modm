@@ -14,11 +14,11 @@
 // ----------------------------------------------------------------------------
 xpcc::ui::Led::Led()
 :	currentValue(0), startValue(0), endValue(0), deltaValue(0), fadeTime(1),
-	stamp(0)
+	 previous(0)
 {
 }
 
-void
+void inline
 xpcc::ui::Led::setBrightness(uint8_t brightness)
 {
 	fadeTime = 0;
@@ -27,16 +27,16 @@ xpcc::ui::Led::setBrightness(uint8_t brightness)
 	setValue(currentValue);
 }
 
-uint8_t
+uint8_t ALWAYS_INLINE
 xpcc::ui::Led::getBrightness() const
 {
 	return currentValue;
 }
 
-bool
+bool ALWAYS_INLINE
 xpcc::ui::Led::isFading() const
 {
-	return static_cast<bool>(fadeTime != 0);
+	return (fadeTime != 0);
 }
 
 void
@@ -46,27 +46,27 @@ xpcc::ui::Led::fadeTo(uint16_t time, uint8_t brightness)
 		return;
 
 	if (time == 0) {
-		currentValue = brightness;
-		setValue(currentValue);
+		setBrightness(brightness);
 		return;
 	}
 
 	startValue = static_cast<uint16_t>(currentValue)*100;
 	endValue = brightness;
 	int16_t delta = (static_cast<int16_t>(endValue) - currentValue)*100;
-	deltaValue = delta / static_cast<int16_t>(time);
-	if (deltaValue == 0) deltaValue = delta > 0 ? 1 : -1;
+	deltaValue = delta / time;
+	if (deltaValue == 0)
+		deltaValue = delta > 0 ? 1 : -1;
 	fadeTime = time;
-	stamp = xpcc::Clock::now();
+	previous = xpcc::Clock::now();
 }
 
-void
+void ALWAYS_INLINE
 xpcc::ui::Led::on(uint16_t time)
 {
 	fadeTo(time, 255);
 }
 
-void
+void ALWAYS_INLINE
 xpcc::ui::Led::off(uint16_t time)
 {
 	fadeTo(time, 0);
@@ -81,11 +81,12 @@ xpcc::ui::Led::update()
 
 	if (fadeTime)
 	{
-		uint8_t delta = (xpcc::Clock::now() - stamp).getTime();
+		xpcc::Timestamp now = xpcc::Clock::now();
+		uint8_t delta = (now - previous).getTime();
 
 		if (delta)
 		{
-			stamp = xpcc::Clock::now();
+			previous = now;
 
 			while (delta--)
 			{
