@@ -149,7 +149,7 @@ private:
 
 	// check correct Bus width
 	static_assert(DATA::width == 8 || DATA::width == 4,
-			"This driver only works with a 4bit or 8bit data bus!");
+			"This driver only works with 4bit or 8bit data bus width!");
 
 	/**
 	 *  Bus class for accessing the bus with either 4bit or 8bit width.
