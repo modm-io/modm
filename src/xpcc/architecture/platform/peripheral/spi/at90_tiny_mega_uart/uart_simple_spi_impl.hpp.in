@@ -25,7 +25,7 @@ xpcc::{{target.family}}::UartSpiSimpleMaster{{id}}::initialize()
 
 	// check if within baudrate tolerance
 	constexpr uint32_t generated_baudrate = clockSource::UsartSpi / ( 2 * prescaler + 1);
-	xpcc::Tolerance::assertBaudrateInTolerance<
+	assertBaudrateInTolerance<
 		/* clostest available baudrate */ generated_baudrate,
 		/* desired baudrate */ baudrate,
 		tolerance >();

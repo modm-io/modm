@@ -67,14 +67,6 @@ public:
 		static_assert(isValueInTolerance(reference, actual, tolerance),
 				"The actual value exceeds the tolerance of reference!");
 	}
-
-	template< uint32_t available, uint32_t requested, uint16_t tolerance >
-	static void
-	assertBaudrateInTolerance()
-	{
-		static_assert(isValueInTolerance(requested, available, tolerance),
-				"The closest available baudrate exceeds the tolerance of the requested baudrate!");
-	}
 };
 
 } // namespace xpcc

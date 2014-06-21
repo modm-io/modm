@@ -52,7 +52,7 @@ public:
 
 		// set the baud rate register
 		constexpr uint8_t baud = (F_CPU / (2 * baudrate)) - 5;
-		xpcc::Tolerance::assertBaudrateInTolerance<
+		assertBaudrateInTolerance<
 				/* clostest available baudrate */ (F_CPU / (2*(baud + 5))),
 				/* desired baudrate */ baudrate,
 				tolerance >();

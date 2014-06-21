@@ -57,7 +57,7 @@ public:
 		// ccrPrescaler = peripheralFrequency / (2 * I2CFrequency)
 		constexpr uint16_t prescaler = clockSource::I2c{{ id }} / (2 * rate);
 
-		xpcc::Tolerance::assertBaudrateInTolerance<
+		assertBaudrateInTolerance<
 				/* clostest available baudrate */ (clockSource::I2c{{ id }} / (2 * prescaler)),
 				/* desired baudrate */ rate,
 				tolerance >();

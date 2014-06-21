@@ -45,7 +45,7 @@ public:
 
 		// TODO: Implement prescalers for significantly lower baudrates.
 		constexpr uint8_t baud = ((clockSource::I2c / baudrate) - 16) / 2;
-		xpcc::Tolerance::assertBaudrateInTolerance<
+		assertBaudrateInTolerance<
 				/* clostest available baudrate */ (clockSource::I2c / (16 + 2 * baud)),
 				/* desired baudrate */ baudrate,
 				tolerance >();

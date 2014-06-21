@@ -11,7 +11,7 @@
 #define XPCC_STM32_UART_BAUDRATE_HPP
 
 #include "uart_base.hpp"
-#include <xpcc/math/tolerance.hpp>
+#include <xpcc/architecture/peripheral.hpp>
 
 namespace xpcc
 {
@@ -110,7 +110,7 @@ public:
 				"Baudrate must be less or equal to the PeripheralClock divided by 8.");
 		constexpr uint16_t brr = getBrr(clockrate, baudrate, oversample);
 		// check if we found a prescaler which generates a baudrate within the tolerance
-		xpcc::Tolerance::assertBaudrateInTolerance<
+		xpcc::Peripheral::assertBaudrateInTolerance<
 				/* nearest possible value */ getBaudrate(clockrate, brr, oversample),
 				/* desired = */ baudrate,
 				tolerance >();

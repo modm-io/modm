@@ -30,7 +30,7 @@ xpcc::stm32::SpiSimpleMaster{{ id }}::initialize()
 			)))))));
 
 	// check if we found a prescaler which generates a baudrate within the tolerance
-	xpcc::Tolerance::assertBaudrateInTolerance<
+	assertBaudrateInTolerance<
 			/* nearest possible value */ clockSource::Spi{{ id }} / pre,
 			/* desired = */ baudrate,
 			tolerance >();
