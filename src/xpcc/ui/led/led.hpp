@@ -13,6 +13,7 @@
 #include <stdint.h>
 #include <xpcc/processing/periodic_timer.hpp>
 #include <xpcc/architecture/driver/clock.hpp>
+#include <xpcc/ui/animation/linear.hpp>
 
 namespace xpcc
 {
@@ -35,7 +36,7 @@ class Led
 {
 	/// This method is specific to the implementation and must be overwritten.
 	virtual void
-	setValue(uint8_t brightness) = 0;
+	setValue(uint8_t /*brightness*/) = 0;
 
 public:
 	Led();
@@ -55,7 +56,7 @@ public:
 	isFading() const;
 
 	/// Fade from the current brightness to a new brightness in the specified ms.
-	/// Fading times of more than 25.5s are not possible, you must control
+	/// Fading times of more than ~32s are not possible. You must control
 	/// fading externally in that case.
 	void
 	fadeTo(uint16_t time, uint8_t brightness);
@@ -84,20 +85,14 @@ public:
 	update();
 
 protected:
-	uint8_t currentValue;
+	uint8_t currentBrightness;
 
-	uint16_t startValue;
-	uint8_t endValue;
-
-	int16_t deltaValue;
-	uint16_t fadeTime;
-
-	xpcc::Timestamp previous;
+	LinearAnimation<uint8_t> animation;
 };
 
-}
+}	// namespace ui
 
-}
+}	// namespace xpcc
 
 #include "led_impl.hpp"
 
