@@ -229,13 +229,14 @@ Reset_Handler(void)
 	xpcc_gpio_enable();
 %% endif
 
-	// Call CTORS of static objects
-	__libc_init_array();
-
 	%% if parameters.allocator == "block_allocator"
 	// initialize xpcc block allocator
+	// needs to be done before calling the CTORS of static objects
 	__xpcc_initialize_memory();
 	%% endif
+
+	// Call CTORS of static objects
+	__libc_init_array();
 
 	// Call the application's entry point
 	main();

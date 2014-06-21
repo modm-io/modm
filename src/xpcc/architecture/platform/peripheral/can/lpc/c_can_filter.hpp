@@ -3,7 +3,6 @@
 
 #include <xpcc/communication/can/message.hpp>
 
-#include "../device.h"
 #include "c_can_registers.h"
 
 namespace xpcc

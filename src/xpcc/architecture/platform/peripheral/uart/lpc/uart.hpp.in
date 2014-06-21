@@ -60,8 +60,8 @@ namespace xpcc
 			 *
 			 * \param	data	Data to be written
 			 */
-			static void
-			write(uint8_t data);
+			static bool
+			write(uint8_t data);;
 
 			/**
 			 * \brief	Write a block of bytes

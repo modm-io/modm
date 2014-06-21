@@ -211,9 +211,6 @@ xpcc::TLC594X<CHANNELS, Spi, Xlat, Vprog, Xerr>::writeChannels(bool flush)
 		if (!Spi::transfer(gs, status, CHANNELS*3/2))
 			return false;
 
-		while(!Spi::isFinished())
-			;
-
 		latch();
 		return true;
 	}
@@ -233,9 +230,6 @@ xpcc::TLC594X<CHANNELS, Spi, Xlat, Vprog, Xerr>::writeDotCorrection()
 		Vprog::reset();
 		return false;
 	}
-
-	while(!Spi::isFinished())
-		;
 
 	latch();
 

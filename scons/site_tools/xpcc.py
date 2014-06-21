@@ -155,6 +155,7 @@ def xpcc_library(env, buildpath=None):
 def xpcc_communication_header(env, xmlfile, path='.'):
 	files  = env.SystemCppPackets(xmlfile, path=path)
 	files += env.SystemCppIdentifier(xmlfile, path=path)
+	files += env.SystemCppCommunication(xmlfile, path=path)
 	if 'communication' in env['XPCC_CONFIG']:
 		files += env.SystemCppPostman(
 				target='postman',
