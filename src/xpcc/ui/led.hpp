@@ -16,7 +16,6 @@
 
 #include "led/tables.hpp"
 #include "led/led.hpp"
-#include "led/dummy_led.hpp"
 #include "led/tlc594x_led.hpp"
 #include "led/tlc594x_multiple_led.hpp"
 #include "led/double_indicator.hpp"
