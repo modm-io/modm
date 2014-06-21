@@ -45,11 +45,11 @@ MAIN_FUNCTION
 	xpcc::cortex::SysTickTimer::enable();
 
 	// set these animations to expire after x loops
-	pulse.pulse(20);
-	indicator.indicate(200);
-	strobe.indicate(20);
+	pulse.start();
+	indicator.start();
+	strobe.start();
 	// fade this led for 15s
-	green.fadeTo(15000, 255);
+	green.fadeTo(32000, 255);
 
 	while (1)
 	{
