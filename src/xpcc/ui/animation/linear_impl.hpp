@@ -41,8 +41,16 @@ xpcc::ui::LinearAnimation<T>::isAnimating() const
 }
 
 template< typename T >
+void ALWAYS_INLINE
+xpcc::ui::LinearAnimation<T>::stop()
+{
+	animationTime = 0;
+	endValue = currentValue;
+}
+
+template< typename T >
 bool
-xpcc::ui::LinearAnimation<T>::animateTo(uint16_t time, T value)
+xpcc::ui::LinearAnimation<T>::animateTo(TimeType time, T value)
 {
 	// if the time is zero, or the value is already reached, set the value immediately
 	if (time == 0 || value == currentValue) {

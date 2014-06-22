@@ -17,7 +17,7 @@ xpcc::ui::Led::Led()
 {
 }
 
-void ALWAYS_INLINE
+void inline
 xpcc::ui::Led::setBrightness(uint8_t brightness)
 {
 	animation.setValue(brightness);
@@ -36,7 +36,7 @@ xpcc::ui::Led::isFading() const
 	return animation.isAnimating();
 }
 
-void ALWAYS_INLINE
+void inline
 xpcc::ui::Led::fadeTo(uint16_t time, uint8_t brightness)
 {
 	if (!animation.animateTo(time, brightness))
@@ -57,7 +57,7 @@ xpcc::ui::Led::off(uint16_t time)
 	fadeTo(time, 0);
 }
 
-void ALWAYS_INLINE
+void inline
 xpcc::ui::Led::update()
 {
 	if (animation.update())

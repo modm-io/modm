@@ -14,6 +14,7 @@
 #include <xpcc/processing/periodic_timer.hpp>
 #include <xpcc/architecture/driver/clock.hpp>
 #include <xpcc/utils/arithmetic_traits.hpp>
+#include <xpcc/utils/template_metaprogramming.hpp>
 
 namespace xpcc
 {
@@ -24,15 +25,17 @@ namespace ui
 /**
  * This class allows the linear animation of one value over time.
  *
- * The types int8_t/uint8_t and int16_t/uint16_t use a fast fixed-point
+ * All integer types use binary scaling through a fixed-point
  * arithmetic, however, all other types default to floating-point
  * arithmetic with casting between types.
  *
- * @warning	Be aware that the algortihm for 8bit types limits the animation length
- * 			to `128ms * value_difference`, which is about 32s over the full 8bit range.
- * 			If you specify a longer time in this case, the animation simply finishes before.
- * 			If this is a problem, consider using a 16bit type, which does not have
- * 			this limitation.
+ * Be aware that the algortihm for 8bit types is optimized for low computational costs,
+ * developed for fast LED fading (@see xpcc::ui::Led).
+ * Therefore the animation length is limited to `128ms * value_difference`, which is
+ * about 32s over the full 8bit range.
+ * If you specify a longer time in this case, the animation simply finishes before.
+ * If this is a problem, consider using a 16bit type, which does not have
+ * this limitation.
  *
  * @author	Niklas Hauser
  * @ingroup ui
@@ -40,6 +43,15 @@ namespace ui
 template< typename T = uint8_t >
 class LinearAnimation
 {
+private:
+	typedef typename xpcc::ArithmeticTraits<T>::UnsignedType UnsignedType;
+	// for (u)int8_t types, the time is limited to ~32s anyway,
+	// so we do not need uint32_t for the time, but we can use uint16_t
+	typedef typename xpcc::tmp::Select<
+			xpcc::tmp::SameType<UnsignedType, uint8_t>::value,
+			uint16_t,
+			uint32_t >::Result TimeType;
+
 public:
 	LinearAnimation(T &value);
 
@@ -55,13 +67,15 @@ public:
 	bool
 	isAnimating() const;
 
+	/// stops the current running animation.
+	void
+	stop();
+
 	/// Animate from the current value to a new value in the specified ms.
-	/// Animation times are limited to ~32s.
-	/// If you require a slower animation, you need to do this externally.
 	/// @return `true` if animation started,
 	///			`false` if otherwise
 	bool
-	animateTo(uint16_t time, T value);
+	animateTo(TimeType time, T value);
 
 	/// Can be called at a interval of 1ms or less.
 	/// If you do not need 1ms response time , you can calls this at larger intervals.
@@ -73,13 +87,8 @@ public:
 private:
 	T &currentValue;
 	T endValue;
-	uint16_t animationTime;
+	TimeType animationTime;
 	xpcc::Timestamp previous;
-
-	typedef typename xpcc::ArithmeticTraits<T>::WideType WideType;
-	typedef typename xpcc::ArithmeticTraits<T>::UnsignedType UnsignedType;
-	typedef typename xpcc::ArithmeticTraits<T>::SignedType SignedType;
-	typedef typename xpcc::ArithmeticTraits<SignedType>::WideType SignedWideType;
 
 	// the default implementation uses floating-point arithmetic
 	template< typename Type, typename Unsigned >
@@ -90,9 +99,9 @@ private:
 
 	public:
 		void inline
-		initialize(Type currentValue, Type endValue, uint16_t time)
+		initialize(Type currentValue, Type endValue, uint32_t time)
 		{
-			accumulatedValue = currentValue;
+			accumulatedValue = static_cast<float>(currentValue);
 			float delta = (static_cast<float>(endValue) - currentValue);
 			deltaValue = delta / time;
 			if (deltaValue == 0)
@@ -115,14 +124,14 @@ private:
 	template< typename Type >
 	struct Computations <Type, uint8_t>
 	{
-		WideType accumulatedValue;
-		SignedWideType deltaValue;
+		uint16_t accumulatedValue;
+		int16_t deltaValue;
 
 		void inline
 		initialize(Type currentValue, Type endValue, uint16_t time)
 		{
-			accumulatedValue = static_cast<WideType>(currentValue) << 7;
-			SignedWideType delta = (static_cast<SignedWideType>(endValue) - currentValue) << 7;
+			accumulatedValue = static_cast<uint16_t>(currentValue) << 7;
+			int16_t delta = (static_cast<int16_t>(endValue) - currentValue) << 7;
 			deltaValue = delta / time;
 			if (deltaValue == 0)
 				deltaValue = delta > 0 ? 1 : -1;
@@ -144,15 +153,15 @@ private:
 	template< typename Type >
 	struct Computations <Type, uint16_t>
 	{
-		WideType accumulatedValue;
-		SignedWideType deltaValue;
+		uint32_t accumulatedValue;
+		int32_t deltaValue;
 
 		void inline
-		initialize(Type currentValue, Type endValue, uint16_t time)
+		initialize(Type currentValue, Type endValue, uint32_t time)
 		{
-			accumulatedValue = static_cast<WideType>(currentValue) << 15;
-			SignedWideType delta = (static_cast<SignedWideType>(endValue) - currentValue) << 15;
-			deltaValue = delta / time;
+			accumulatedValue = static_cast<uint32_t>(currentValue) << 15;
+			int32_t delta = (static_cast<int32_t>(endValue) - currentValue) << 15;
+			deltaValue = delta / static_cast<int32_t>(time);
 			if (deltaValue == 0)
 				deltaValue = delta > 0 ? 1 : -1;
 		}
@@ -164,6 +173,41 @@ private:
 			return static_cast<Type>(accumulatedValue >> 15);
 		}
 	};
+
+	// On the AVR 64bit variables do not exits, therefore this must be excluded,
+	// so that it may revert back to using floats.
+	// It's not pretty, but neither is using uint32_t on an 8bit CPU to begin with.
+#if !defined(XPCC__CPU_AVR)
+
+	// uint32_t implementation using signed 32.15 fixed point arithmetic.
+	// The maximum change can be +-2^32 since the value type is 32 bit wide.
+	// The remaining 15 bits are used for fractional delta time:
+	// 1 step can take at most 32768ms, which is equivalent to about 24 days
+	// over the whole range.
+	template< typename Type >
+	struct Computations <Type, uint32_t>
+	{
+		uint64_t accumulatedValue;
+		int64_t deltaValue;
+
+		void inline
+		initialize(Type currentValue, Type endValue, uint32_t time)
+		{
+			accumulatedValue = static_cast<uint64_t>(currentValue) << 15;
+			int64_t delta = (static_cast<int64_t>(endValue) - currentValue) << 15;
+			deltaValue = delta / static_cast<int32_t>(time);
+			if (deltaValue == 0)
+				deltaValue = delta > 0 ? 1 : -1;
+		}
+
+		Type inline
+		step()
+		{
+			accumulatedValue += deltaValue;
+			return static_cast<Type>(accumulatedValue >> 15);
+		}
+	};
+#endif
 
 	// create an instance of the calculation helper
 	Computations<T, UnsignedType> computations;
