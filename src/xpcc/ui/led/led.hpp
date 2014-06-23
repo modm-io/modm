@@ -13,7 +13,7 @@
 #include <stdint.h>
 #include <xpcc/processing/periodic_timer.hpp>
 #include <xpcc/architecture/driver/clock.hpp>
-#include <xpcc/ui/animation/linear.hpp>
+#include <xpcc/ui/animation.hpp>
 
 namespace xpcc
 {
@@ -68,7 +68,7 @@ public:
 	 * 		specify the fade up time in ms, 0 turn the LED on instantly
 	 */
 	void
-	on(uint16_t time=9);
+	on(uint16_t time=75);
 
 	/**
 	 * Mimmics the behaviour of normal lamps, which take a small amount
@@ -77,17 +77,17 @@ public:
 	 * 		specify the fade up time in ms, 0 turn the LED off instantly
 	 */
 	void
-	off(uint16_t time=12);
+	off(uint16_t time=120);
 
 	/// Can be called at a interval of 1ms or less.
 	/// If you do not need 1ms response time (e.g. for on(), off()), you can calls this at larger intervals.
 	void
 	update();
 
-protected:
-	uint8_t currentBrightness;
+	Animation<uint8_t> brightnessAnimation;
 
-	LinearAnimation<uint8_t> animation;
+private:
+	uint8_t currentBrightness;
 };
 
 }	// namespace ui
