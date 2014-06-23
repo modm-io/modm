@@ -8,7 +8,7 @@
 // ----------------------------------------------------------------------------
 
 #ifndef XPCC_UI_LINEAR_ANIMATION_HPP
-#	error	"Don't include this file directly, use 'xpcc/ui/animation/linear.hpp' instead!"
+#	error	"Don't include this file directly, use 'xpcc/ui/animation/base.hpp' instead!"
 #endif
 // ----------------------------------------------------------------------------
 
