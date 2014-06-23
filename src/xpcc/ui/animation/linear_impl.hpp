@@ -13,14 +13,14 @@
 // ----------------------------------------------------------------------------
 
 template< typename T >
-xpcc::ui::LinearAnimation<T>::LinearAnimation(T &value)
+xpcc::ui::Animation<T>::Animation(T &value)
 :	currentValue(value), endValue(0), animationTime(0), previous(0)
 {
 }
 
 template< typename T >
 void inline
-xpcc::ui::LinearAnimation<T>::setValue(T value)
+xpcc::ui::Animation<T>::setValue(T value)
 {
 	animationTime = 0;
 	currentValue = value;
@@ -28,29 +28,30 @@ xpcc::ui::LinearAnimation<T>::setValue(T value)
 
 template< typename T >
 T ALWAYS_INLINE
-xpcc::ui::LinearAnimation<T>::getValue() const
+xpcc::ui::Animation<T>::getValue() const
 {
 	return currentValue;
 }
 
 template< typename T >
 bool ALWAYS_INLINE
-xpcc::ui::LinearAnimation<T>::isAnimating() const
+xpcc::ui::Animation<T>::isAnimating() const
 {
-	return (animationTime != 0);
+	return (animationTime > 0);
 }
 
 template< typename T >
 void ALWAYS_INLINE
-xpcc::ui::LinearAnimation<T>::stop()
+xpcc::ui::Animation<T>::stop()
 {
 	animationTime = 0;
 	endValue = currentValue;
+	computations.deltaValue = 0;
 }
 
 template< typename T >
 bool
-xpcc::ui::LinearAnimation<T>::animateTo(TimeType time, T value)
+xpcc::ui::Animation<T>::animateTo(TimeType time, T value)
 {
 	// if the time is zero, or the value is already reached, set the value immediately
 	if (time == 0 || value == currentValue) {
@@ -67,14 +68,14 @@ xpcc::ui::LinearAnimation<T>::animateTo(TimeType time, T value)
 
 template< typename T >
 bool
-xpcc::ui::LinearAnimation<T>::update()
+xpcc::ui::Animation<T>::update()
 {
 	// this should be called exactly once every 1 ms
 	// but if the clock gets incremented by more than 1 ms, or the main loop is
 	// busy, then we need to count these "missing" steps and apply them.
 
 	// if we are not fading at the moment, we do not need to check anything
-	if (animationTime)
+	if (animationTime > 0)
 	{
 		// buffer the delta time
 		xpcc::Timestamp now = xpcc::Clock::now();
@@ -93,6 +94,7 @@ xpcc::ui::LinearAnimation<T>::update()
 			while (delta--)
 			{
 				if (--animationTime == 0) {
+					animationTime = 0;
 					currentValue = endValue;
 					break;
 				}

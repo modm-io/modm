@@ -11,7 +11,6 @@
 #define XPCC_UI_LINEAR_ANIMATION_HPP
 
 #include <stdint.h>
-#include <xpcc/processing/periodic_timer.hpp>
 #include <xpcc/architecture/driver/clock.hpp>
 #include <xpcc/utils/arithmetic_traits.hpp>
 #include <xpcc/utils/template_metaprogramming.hpp>
@@ -41,19 +40,19 @@ namespace ui
  * @ingroup ui
  */
 template< typename T = uint8_t >
-class LinearAnimation
+class Animation
 {
 private:
 	typedef typename xpcc::ArithmeticTraits<T>::UnsignedType UnsignedType;
 	// for (u)int8_t types, the time is limited to ~32s anyway,
 	// so we do not need uint32_t for the time, but we can use uint16_t
+public:
 	typedef typename xpcc::tmp::Select<
 			xpcc::tmp::SameType<UnsignedType, uint8_t>::value,
 			uint16_t,
 			uint32_t >::Result TimeType;
 
-public:
-	LinearAnimation(T &value);
+	Animation(T &value);
 
 	void
 	setValue(T value);
@@ -77,7 +76,7 @@ public:
 	bool
 	animateTo(TimeType time, T value);
 
-	/// Can be called at a interval of 1ms or less.
+	/// Can be called at an interval of 1ms or less.
 	/// If you do not need 1ms response time , you can calls this at larger intervals.
 	/// @return	`true` if the value has been changed,
 	///			`false` otherwise
@@ -85,6 +84,7 @@ public:
 	update();
 
 private:
+
 	T &currentValue;
 	T endValue;
 	TimeType animationTime;
@@ -179,11 +179,13 @@ private:
 	// It's not pretty, but neither is using uint32_t on an 8bit CPU to begin with.
 #if !defined(XPCC__CPU_AVR)
 
-	// uint32_t implementation using signed 32.15 fixed point arithmetic.
+	// uint32_t implementation using signed 32.16 fixed point arithmetic.
 	// The maximum change can be +-2^32 since the value type is 32 bit wide.
-	// The remaining 15 bits are used for fractional delta time:
-	// 1 step can take at most 32768ms, which is equivalent to about 24 days
+	// The remaining 16 bits are used for fractional delta time:
+	// 1 step can take at most 65356ms, which is equivalent to about 8900 years
 	// over the whole range.
+	// Note: we use 16 bits for the fractionals here, so that it is byte-aligned.
+	// This should allow CPUs without a barrelshifter to copy the value instead of shifting it.
 	template< typename Type >
 	struct Computations <Type, uint32_t>
 	{
@@ -193,8 +195,8 @@ private:
 		void inline
 		initialize(Type currentValue, Type endValue, uint32_t time)
 		{
-			accumulatedValue = static_cast<uint64_t>(currentValue) << 15;
-			int64_t delta = (static_cast<int64_t>(endValue) - currentValue) << 15;
+			accumulatedValue = static_cast<uint64_t>(currentValue) << 16;
+			int64_t delta = (static_cast<int64_t>(endValue) - currentValue) << 16;
 			deltaValue = delta / static_cast<int32_t>(time);
 			if (deltaValue == 0)
 				deltaValue = delta > 0 ? 1 : -1;
@@ -204,7 +206,7 @@ private:
 		step()
 		{
 			accumulatedValue += deltaValue;
-			return static_cast<Type>(accumulatedValue >> 15);
+			return static_cast<Type>(accumulatedValue >> 16);
 		}
 	};
 #endif
@@ -217,6 +219,6 @@ private:
 
 }	// namespace xpcc
 
-#include "linear_impl.hpp"
+#include "base_impl.hpp"
 
 #endif	// XPCC_UI_LINEAR_ANIMATION_HPP
