@@ -60,7 +60,7 @@ public:
 	start(uint8_t repeat=-1);
 
 	void
-	end();
+	stop();
 
 	void
 	cancel();

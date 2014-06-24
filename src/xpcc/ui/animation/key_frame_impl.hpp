@@ -37,7 +37,7 @@ xpcc::ui::KeyFrameAnimation<T>::start(uint8_t repeat)
 
 template< typename T >
 void
-xpcc::ui::KeyFrameAnimation<T>::end()
+xpcc::ui::KeyFrameAnimation<T>::stop()
 {
 	if (keyFrames) {
 		animator.setValue(keyFrames[(mode & reversedMask) ? 0 : numberOfFrames].value);
@@ -129,7 +129,7 @@ xpcc::ui::KeyFrameAnimation<T>::getKeyFrames() const {
 template< typename T >
 void
 xpcc::ui::KeyFrameAnimation<T>::setKeyFrames(KeyFrame<T> *frames, uint8_t numberOfFrames) {
-	end();
+	cancel();
 	this->keyFrames = frames;
 	this->numberOfFrames = numberOfFrames;
 }
