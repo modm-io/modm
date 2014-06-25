@@ -28,10 +28,10 @@ namespace ui
  * @ingroup led
  */
 template< typename T = uint8_t >
-class Pulsar
+class Pulse
 {
 public:
-	Pulsar(Animation<T> &animator)
+	Pulse(Animation<T> &animator)
 	:	animator(animator), frames{
 			xpcc::ui::KeyFrame<T>(500, xpcc::ArithmeticTraits<T>::max()),
 			xpcc::ui::KeyFrame<T>(500, xpcc::ArithmeticTraits<T>::min())
