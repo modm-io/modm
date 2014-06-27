@@ -13,6 +13,8 @@
 #include <stdint.h>
 #include "../common/common_clock.hpp"
 
+using namespace xpcc::clock;
+
 namespace xpcc
 {
 
@@ -24,23 +26,23 @@ SystemClock
 {
 public:
 	// Frequencies
-	static constexpr int Frequency = F_CPU;
+	static constexpr uint32_t Frequency = F_CPU;
 
-	static constexpr int Timer = Frequency;
+	static constexpr uint32_t Timer = Frequency;
 
-	static constexpr int Dac = Frequency;
+	static constexpr uint32_t Dac = Frequency;
 
-	static constexpr int Can = Frequency;
+	static constexpr uint32_t Can = Frequency;
 
-	static constexpr int I2c = Frequency;
+	static constexpr uint32_t I2c = Frequency;
 
-	static constexpr int Spi = Frequency;
+	static constexpr uint32_t Spi = Frequency;
 
-	static constexpr int UsartSpi = Frequency;
+	static constexpr uint32_t UsartSpi = Frequency;
 
-	static constexpr int Uart = Frequency;
+	static constexpr uint32_t Uart = Frequency;
 
-	static constexpr int Adc = Frequency;
+	static constexpr uint32_t Adc = Frequency;
 
 	static StartupError
 	enable()

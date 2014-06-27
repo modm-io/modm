@@ -37,6 +37,7 @@
       <parameter device-name="84" name="ram_length">256</parameter>
     </driver>
     <driver type="adc" name="attiny"/>
+    <driver type="clock" name="avr"/>
     <driver type="timer" name="attiny" instances="0,1"/>
     <driver type="gpio" name="at90_tiny_mega">
       <gpio port="A" id="0" pcint="0"/>
