@@ -348,7 +348,7 @@ xpcc::stm32::Can{{ id }}::isReadyToSend()
 %% if parameters.tx_buffer > 0
 	return !txQueue.isFull();
 %% else
-	return ((CAN{{ id }}->TSR & (CAN_TSR_TME0 | CAN_TSR_TME1 | CAN_TSR_TME1)) != 0);
+	return ((CAN{{ id }}->TSR & (CAN_TSR_TME0 | CAN_TSR_TME1 | CAN_TSR_TME2)) != 0);
 %% endif
 }
 
@@ -359,7 +359,7 @@ xpcc::stm32::Can{{ id }}::sendMessage(const can::Message& message)
 	// This function is not reentrant. If one of the mailboxes is empty it
 	// means that the software buffer is empty too. Therefore the mailbox
 	// will stay empty and won't be taken by an interrupt.
-	if ((CAN{{ id }}->TSR & (CAN_TSR_TME0 | CAN_TSR_TME1 | CAN_TSR_TME1)) == 0)
+	if ((CAN{{ id }}->TSR & (CAN_TSR_TME0 | CAN_TSR_TME1 | CAN_TSR_TME2)) == 0)
 	{
 		// All mailboxes used at the moment
 %% if parameters.tx_buffer > 0
