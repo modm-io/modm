@@ -169,7 +169,7 @@ private:
 	/// ExternalInterruptIRQ
 %% if pin|int in range(0,5)
 	%% if target is stm32f3 and pin|int == 2
-	static constexpr IRQn_Type ExternalInterruptIRQ = EXTI2_TS_IRQn;
+	static constexpr IRQn_Type ExternalInterruptIRQ = EXTI2_TSC_IRQn;
 	%% else
 	static constexpr IRQn_Type ExternalInterruptIRQ = EXTI{{pin}}_IRQn;
 	%% endif
@@ -222,11 +222,7 @@ public:
 		setOutput();
 	}
 	ALWAYS_INLINE static void set() {
-			%% if target is stm32f2 or target is stm32f4
 		{{reg}}->BSRRL = mask;
-			%% elif target is stm32f0 or target is stm32f3
-		{{reg}}->BSRR = mask;
-			%% endif
 	}
 	ALWAYS_INLINE static void set(bool status) {
 		if (status) {
@@ -236,11 +232,7 @@ public:
 		}
 	}
 	ALWAYS_INLINE static void reset() {
-			%% if target is stm32f2 or target is stm32f4
 		{{reg}}->BSRRH = mask;
-			%% elif target is stm32f0 or target is stm32f3
-		{{reg}}->BRR = mask;
-			%% endif
 	}
 	ALWAYS_INLINE static void toggle() {
 		if ({{reg}}->ODR & mask) {
