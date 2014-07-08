@@ -19,6 +19,12 @@
 #include "error_code.hpp"
 #include "can_filter.hpp"
 
+%% if target is stm32f3
+	%% set reg = 'CAN'
+%% else
+	%% set reg = 'CAN' ~ id
+%% endif
+
 using namespace xpcc::clock; // for MHzxx
 
 namespace xpcc
@@ -179,7 +185,7 @@ public:
 	static inline uint8_t
 	getReceiveErrorCounter()
 	{
-		return (CAN{{ id }}->ESR & CAN_ESR_REC) >> 24;
+		return ({{ reg }}->ESR & CAN_ESR_REC) >> 24;
 	}
 
 	/**
@@ -189,7 +195,7 @@ public:
 	static inline uint8_t
 	getTransmitErrorCounter()
 	{
-		return (CAN{{ id }}->ESR & CAN_ESR_TEC) >> 16;
+		return ({{ reg }}->ESR & CAN_ESR_TEC) >> 16;
 	}
 
 	static BusState
