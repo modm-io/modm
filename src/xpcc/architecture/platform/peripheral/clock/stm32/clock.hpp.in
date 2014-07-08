@@ -94,9 +94,9 @@ namespace xpcc
 				Hse = RCC_PLLCFGR_PLLSRC_HSE,
 %% elif target is stm32f3
 				/// High speed internal clock (16 MHz)
-				Hsi = RCC_CFGR_PLLSRC_HSI_Div2,
+				Hsi = RCC_CFGR_PLLSRC_HSI_DIV2,
 				/// High speed external clock (see HseConfig)
-				Hse = RCC_CFGR_PLLSRC_PREDIV1,
+				Hse = RCC_CFGR_PLLSRC_HSE_PREDIV,
 %% endif
 				InternalClock = Hsi,
 				ExternalClock = Hse,
