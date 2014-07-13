@@ -132,7 +132,7 @@ private:
 		{
 			accumulatedValue = static_cast<uint16_t>(currentValue) << 7;
 			int16_t delta = (static_cast<int16_t>(endValue) - currentValue) << 7;
-			deltaValue = delta / time;
+			deltaValue = delta / static_cast<int16_t>(time);
 			if (deltaValue == 0)
 				deltaValue = delta > 0 ? 1 : -1;
 		}
