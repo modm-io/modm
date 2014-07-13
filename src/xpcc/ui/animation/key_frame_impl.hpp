@@ -11,8 +11,6 @@
 #	error	"Don't include this file directly, use 'xpcc/ui/animator/key_frame.hpp' instead!"
 #endif
 
-#include <xpcc/architecture/platform.hpp>
-
 // ----------------------------------------------------------------------------
 template< typename T >
 xpcc::ui::KeyFrameAnimation<T>::KeyFrameAnimation(Animation<T> &animator)
@@ -29,7 +27,7 @@ xpcc::ui::KeyFrameAnimation<T>::start(uint8_t repeat)
 	if (keyFrames && numberOfFrames > 0) {
 		cancel();
 		currentFrame = 0;
-		this->repeat = repeat;
+		this->repeat = repeat - 1;
 		return true;
 	}
 	return false;
@@ -64,42 +62,47 @@ xpcc::ui::KeyFrameAnimation<T>::isAnimating() const
 
 template< typename T >
 void
-xpcc::ui::KeyFrameAnimation<T>::update()
-{
+xpcc::ui::KeyFrameAnimation<T>::update() {
 	if (currentFrame != static_cast<uint8_t>(-1))
 	{
 		if (!animator.isAnimating() && timeout.isExpired())
 		{
+			if (!animator.animateTo(keyFrames[currentFrame].time, keyFrames[currentFrame].value))
+			{
+				timeout.restart(keyFrames[currentFrame].time);
+			}
+
 			if (mode & modeCycleMask)
 			{
-				if (currentFrame == numberOfFrames - 1) {
+				if (currentFrame == numberOfFrames - 1)
+				{
 					if (!checkRepeat()) return;
 					currentFrame = 0;
 				}
 				else currentFrame++;
 			}
-			else {
-				if (!(mode & reversedMask)) {
-					if (currentFrame == numberOfFrames - 1) {
+			else
+			{
+				if (!(mode & reversedMask))
+				{
+					if (currentFrame == numberOfFrames - 1)
+					{
 						if (!checkRepeat()) return;
 						currentFrame = numberOfFrames - 2;
 						mode &= ~reversedMask;
 					}
 					else currentFrame++;
 				}
-				else {
-					if (currentFrame == 0) {
+				else
+				{
+					if (currentFrame == 0)
+					{
 						if (!checkRepeat()) return;
 						currentFrame = 1;
 						mode |= reversedMask;
 					}
 					else currentFrame--;
 				}
-			}
-
-			if (!animator.animateTo(keyFrames[currentFrame].time, keyFrames[currentFrame].value))
-			{
-				timeout.restart(keyFrames[currentFrame].time);
 			}
 		}
 	}
@@ -108,8 +111,11 @@ xpcc::ui::KeyFrameAnimation<T>::update()
 template< typename T >
 bool
 xpcc::ui::KeyFrameAnimation<T>::checkRepeat() {
-	if (repeat != static_cast<uint8_t>(-1)) {
-		if (repeat == 0) {
+	if (repeat != static_cast<uint8_t>(-1))
+	{
+		if (repeat == 0)
+		{
+            repeat = 0;
 			currentFrame = -1;
 			return false;
 		}

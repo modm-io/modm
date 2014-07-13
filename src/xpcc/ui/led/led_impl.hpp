@@ -41,7 +41,7 @@ xpcc::ui::Led::fadeTo(uint16_t time, uint8_t brightness)
 {
 	if (!brightnessAnimation.animateTo(time, brightness))
 	{
-		setValue(currentBrightness);
+		setValue(brightness);
 	}
 }
 
