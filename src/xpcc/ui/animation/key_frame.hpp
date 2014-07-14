@@ -26,23 +26,39 @@ KeyFrameAnimationMode
 	Reverse = 0b10		///< reverse through keyframes
 };
 
-/**
- * This struct specifies one key frame of an animation.
- *
- * @author	Niklas Hauser
- * @ingroup ui
- */
-template< typename T = uint8_t >
-struct KeyFrame
+
+template<typename T, typename... Args>
+struct KeyFrameBase
 {
-	KeyFrame(typename Animation<T>::TimeType time, T value)
-	:	time(time), value(value)
-	{
-	}
+	static constexpr std::size_t size = sizeof...(Args);
 
 	typename Animation<T>::TimeType time;
-	T value;
+	T value[size];
+
+	KeyFrameBase(typename Animation<T>::TimeType time, Args... values) : time(time), value{values...} {}
 };
+
+template<typename T, int rem, typename... Args>
+struct KeyFrameHelper
+{
+	typedef typename KeyFrameHelper<T, rem - 1, T, Args...>::type type;
+};
+
+template<typename T, typename... Args>
+struct KeyFrameHelper<T, 0, Args...>
+{
+	typedef KeyFrameBase<T, Args...> type;
+};
+
+/**
+* This struct specifies one key frame of an animation.
+*
+* @author	Niklas Hauser
+* @ingroup ui
+*/
+template<typename T = uint8_t, uint8_t N = 1>
+using KeyFrame = typename KeyFrameHelper<T, N>::type;
+
 
 /**
 * This class takes an array of keyframes and applies them to an animation.
@@ -50,11 +66,13 @@ struct KeyFrame
 * @author	Niklas Hauser
 * @ingroup ui
 */
-template< typename T = uint8_t >
-class KeyFrameAnimation
+template< typename T, class... Args >
+class KeyFrameAnimationBase
 {
+	static constexpr std::size_t size = sizeof...(Args);
+
 public:
-	KeyFrameAnimation(Animation<T> &animator);
+	KeyFrameAnimationBase(Animation<Args>&... animator);
 
 	bool
 	start(uint8_t repeat=-1);
@@ -71,11 +89,11 @@ public:
 	void
 	update();
 
-	KeyFrame<T> *
+	KeyFrame<T, size> *
 	getKeyFrames() const;
 
 	void
-	setKeyFrames(KeyFrame<T> *frames, uint8_t numberOfFrames);
+	setKeyFrames(KeyFrame<T, size> *frames, uint8_t numberOfFrames);
 
 	uint8_t
 	getNumberOfFrames() const;
@@ -90,8 +108,8 @@ private:
 	bool
 	checkRepeat();
 
-	Animation<T> &animator;
-	KeyFrame<T> *keyFrames;
+	Animation<T> *animator[size];
+	KeyFrame<T, size> *keyFrames;
 	uint8_t numberOfFrames;
 	uint8_t currentFrame;
 	uint8_t repeat;
@@ -103,6 +121,27 @@ private:
 	static constexpr uint8_t modeCycleMask = static_cast<uint8_t>(KeyFrameAnimationMode::Cycle);
 	static constexpr uint8_t modeReverseMask = static_cast<uint8_t>(KeyFrameAnimationMode::Reverse);
 };
+
+template<typename T, int rem, class... Args>
+struct KeyFrameAnimationHelper
+{
+	typedef typename KeyFrameAnimationHelper<T, rem - 1, T, Args...>::type type;
+};
+
+template<typename T, class... Args>
+struct KeyFrameAnimationHelper<T, 0, Args...>
+{
+	typedef KeyFrameAnimationBase<T, Args...> type;
+};
+
+/**
+* This class takes an array of keyframes and applies them to an animation.
+*
+* @author	Niklas Hauser
+* @ingroup ui
+*/
+template<typename T = uint8_t, uint8_t N = 1>
+using KeyFrameAnimation = typename KeyFrameAnimationHelper<T, N>::type;
 
 }	// namespace ui
 

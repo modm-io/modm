@@ -12,16 +12,16 @@
 #endif
 
 // ----------------------------------------------------------------------------
-template< typename T >
-xpcc::ui::KeyFrameAnimation<T>::KeyFrameAnimation(Animation<T> &animator)
-:	animator(animator), keyFrames(0), numberOfFrames(0), currentFrame(-1),
+template< typename T, class... Args >
+xpcc::ui::KeyFrameAnimationBase<T, Args...>::KeyFrameAnimationBase(Animation<Args>&... animator)
+:	animator{(&animator)...}, keyFrames(0), numberOfFrames(0), currentFrame(-1),
 	repeat(-1), mode(modeCycleMask)
 {
 }
 
-template< typename T >
+template< typename T, class... Args >
 bool
-xpcc::ui::KeyFrameAnimation<T>::start(uint8_t repeat)
+xpcc::ui::KeyFrameAnimationBase<T, Args...>::start(uint8_t repeat)
 {
 	// there must exist a keyframe array with at least one frame
 	if (keyFrames && numberOfFrames > 0) {
@@ -33,43 +33,54 @@ xpcc::ui::KeyFrameAnimation<T>::start(uint8_t repeat)
 	return false;
 }
 
-template< typename T >
+template< typename T, class... Args >
 void
-xpcc::ui::KeyFrameAnimation<T>::stop()
+xpcc::ui::KeyFrameAnimationBase<T, Args...>::stop()
 {
-	if (keyFrames) {
-		animator.setValue(keyFrames[(mode & reversedMask) ? 0 : numberOfFrames].value);
+	if (keyFrames)
+	{
+		for (uint_fast8_t ii = 0; ii < size; ii++)
+		{
+			animator[ii]->setValue(keyFrames[(mode & reversedMask) ? 0 : numberOfFrames].value[0]);
+		}
 	}
 	cancel();
 }
 
-template< typename T >
+template< typename T, class... Args >
 void
-xpcc::ui::KeyFrameAnimation<T>::cancel()
+xpcc::ui::KeyFrameAnimationBase<T, Args...>::cancel()
 {
 	currentFrame = -1;
 	mode &= ~reversedMask;
-	animator.stop();
+	for (uint_fast8_t ii = 0; ii < size; ii++)
+	{
+		animator[ii]->stop();
+	}
 	timeout.stop();
 }
 
-template< typename T >
+template< typename T, class... Args >
 bool
-xpcc::ui::KeyFrameAnimation<T>::isAnimating() const
+xpcc::ui::KeyFrameAnimationBase<T, Args...>::isAnimating() const
 {
 	return (currentFrame != static_cast<uint8_t>(-1));
 }
 
-template< typename T >
+template< typename T, class... Args >
 void
-xpcc::ui::KeyFrameAnimation<T>::update() {
+xpcc::ui::KeyFrameAnimationBase<T, Args...>::update()
+{
 	if (currentFrame != static_cast<uint8_t>(-1))
 	{
-		if (!animator.isAnimating() && timeout.isExpired())
+		if (!animator[0]->isAnimating() && timeout.isExpired())
 		{
-			if (!animator.animateTo(keyFrames[currentFrame].time, keyFrames[currentFrame].value))
+			for (uint_fast8_t ii = 0; ii < size; ii++)
 			{
-				timeout.restart(keyFrames[currentFrame].time);
+				if (!animator[ii]->animateTo(keyFrames[currentFrame].time, keyFrames[currentFrame].value[ii]))
+				{
+					timeout.restart(keyFrames[currentFrame].time);
+				}
 			}
 
 			if (mode & modeCycleMask)
@@ -108,9 +119,10 @@ xpcc::ui::KeyFrameAnimation<T>::update() {
 	}
 }
 
-template< typename T >
+template< typename T, class... Args >
 bool
-xpcc::ui::KeyFrameAnimation<T>::checkRepeat() {
+xpcc::ui::KeyFrameAnimationBase<T, Args...>::checkRepeat()
+{
 	if (repeat != static_cast<uint8_t>(-1))
 	{
 		if (repeat == 0)
@@ -126,35 +138,40 @@ xpcc::ui::KeyFrameAnimation<T>::checkRepeat() {
 
 // MARK: getters and setters
 
-template< typename T >
-xpcc::ui::KeyFrame<T> *
-xpcc::ui::KeyFrameAnimation<T>::getKeyFrames() const {
+template< typename T, class... Args >
+xpcc::ui::KeyFrame<T, xpcc::ui::KeyFrameAnimationBase<T, Args...>::size> *
+xpcc::ui::KeyFrameAnimationBase<T, Args...>::getKeyFrames() const
+{
 	return keyFrames;
 }
 
-template< typename T >
+template< typename T, class... Args >
 void
-xpcc::ui::KeyFrameAnimation<T>::setKeyFrames(KeyFrame<T> *frames, uint8_t numberOfFrames) {
+xpcc::ui::KeyFrameAnimationBase<T, Args...>::setKeyFrames(KeyFrame<T, size> *frames, uint8_t numberOfFrames)
+{
 	cancel();
 	this->keyFrames = frames;
 	this->numberOfFrames = numberOfFrames;
 }
 
-template< typename T >
+template< typename T, class... Args >
 uint8_t
-xpcc::ui::KeyFrameAnimation<T>::getNumberOfFrames() const {
+xpcc::ui::KeyFrameAnimationBase<T, Args...>::getNumberOfFrames() const
+{
 	return numberOfFrames;
 }
 
-template< typename T >
+template< typename T, class... Args >
 xpcc::ui::KeyFrameAnimationMode const &
-xpcc::ui::KeyFrameAnimation<T>::getMode() const {
+xpcc::ui::KeyFrameAnimationBase<T, Args...>::getMode() const
+{
 	return mode;
 }
 
-template< typename T >
+template< typename T, class... Args >
 void
-xpcc::ui::KeyFrameAnimation<T>::setMode(KeyFrameAnimationMode const &mode) {
+xpcc::ui::KeyFrameAnimationBase<T, Args...>::setMode(KeyFrameAnimationMode const &mode)
+{
 	// this clears the reversed bit mask!
 	this->mode = static_cast<uint8_t>(mode);
 }
