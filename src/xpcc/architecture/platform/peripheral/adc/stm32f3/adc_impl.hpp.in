@@ -13,10 +13,10 @@
 %#
 %% if id in [1,2]
 	%% set id_common = '12'
-	%% set id_common_u = '1_2'
+	%% set id_common_u = '1_2_COMMON'
 %% elif id in [3,4]
 	%% set id_common = '34'
-	%% set id_common_u = '3_4'
+	%% set id_common_u = '3_4_COMMON'
 %% endif
 %#
 

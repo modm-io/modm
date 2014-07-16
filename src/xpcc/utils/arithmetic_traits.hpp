@@ -5,7 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -48,7 +48,7 @@ namespace xpcc
 	 *
 	 * - \c	WideType		Type that can holds the doubled length of data.
 	 * 						May be used to hold the result of a multiplication.
-	 * - \c	SignedType		Signed type for the given type. It applies 
+	 * - \c	SignedType		Signed type for the given type. It applies
 	 * 						<i>T == SignedType</i> if T is already signed.
 	 * - \c	UnsignedType	Some as SignedType only for unsigned types
 	 * - \c	min()			smallest value.
@@ -57,7 +57,7 @@ namespace xpcc
 	 * - \c	isFloatingPoint	is this a floating point type
 	 * - \c	isInteger		is this a integer type
 	 * - \c	decimalDigits	count of digits to display this type in decimal
-	 * 
+	 *
 	 * \section usage	Usage
 	 * \code
 	 * typedef typename xpcc::ArithmeticTraits<T>::WideType T_DOUBLE;
@@ -65,7 +65,7 @@ namespace xpcc
 	 * T min = xpcc::ArithmeticTraits<T>::min();
 	 * T max = xpcc::ArithmeticTraits<T>::max();
 	 * \endcode
-	 * 
+	 *
 	 * \author	Martin Rosekeit <martin.rosekeit@rwth-aachen.de>
 	 * \author	Fabian Greif <fabian.greif@rwth-aachen.de>
 	 */
@@ -75,7 +75,7 @@ namespace xpcc
 	struct ArithmeticTraits
 	{
 	};
-	
+
 	// ------------------------------------------------------------------------
 
 	template<>
@@ -84,7 +84,7 @@ namespace xpcc
 		typedef int16_t WideType;
 		typedef signed char SignedType;
 		typedef unsigned char UnsignedType;
-		
+
 		static const unsigned char decimalDigits = 4; // inc sign
 		static const bool isFloatingPoint = false;
 		static const bool isInteger = true;
@@ -109,7 +109,7 @@ namespace xpcc
 		{
 			return -127 - 1;
 		}
-		
+
 		static ALWAYS_INLINE signed char
 		max()
 		{
@@ -129,13 +129,13 @@ namespace xpcc
 		static const bool isSigned = false;
 		static const bool isFloatingPoint = false;
 		static const bool isInteger = true;
-		
+
 		static ALWAYS_INLINE unsigned char
 		min()
 		{
 			return 0;
 		}
-		
+
 		static ALWAYS_INLINE unsigned char
 		max()
 		{
@@ -155,13 +155,13 @@ namespace xpcc
 		static const bool isSigned = true;
 		static const bool isFloatingPoint = false;
 		static const bool isInteger = true;
-		
+
 		static ALWAYS_INLINE int16_t
 		min()
 		{
 			return -32767 - 1;
 		}
-		
+
 		static ALWAYS_INLINE int16_t
 		max()
 		{
@@ -176,8 +176,8 @@ namespace xpcc
 		typedef uint32_t WideType;
 		typedef int16_t SignedType;
 		typedef uint16_t UnsignedType;
-		
-		static const uint8_t decimalDigits = 6;
+
+		static const uint8_t decimalDigits = 5;
 		static const bool isSigned = false;
 		static const bool isFloatingPoint = false;
 		static const bool isInteger = true;
@@ -187,14 +187,14 @@ namespace xpcc
 		{
 			return 0;
 		}
-		
+
 		static ALWAYS_INLINE uint16_t
 		max()
 		{
 			return 65535;
 		}
 	};
-	
+
 	// ------------------------------------------------------------------------
 	template<>
 	struct ArithmeticTraits<int32_t>
@@ -217,14 +217,14 @@ namespace xpcc
 		{
 			return -2147483647L - 1;
 		}
-		
+
 		static ALWAYS_INLINE int32_t
 		max()
 		{
 			return 2147483647L;
 		}
 	};
-	
+
 	// ------------------------------------------------------------------------
 	template<>
 	struct ArithmeticTraits<uint32_t>
@@ -247,14 +247,14 @@ namespace xpcc
 		{
 			return 0;
 		}
-		
+
 		static ALWAYS_INLINE uint32_t
 		max()
 		{
 			return 4294967295UL;
 		}
 	};
-	
+
 #if defined(XPCC__CPU_ARM)
 	// ------------------------------------------------------------------------
 	// For ARM 'int32_t' is of type 'long'. Therefore there is no
@@ -276,14 +276,14 @@ namespace xpcc
 		{
 			return -2147483647L - 1;
 		}
-		
+
 		static ALWAYS_INLINE int32_t
 		max()
 		{
 			return 2147483647L;
 		}
 	};
-	
+
 	template<>
 	struct ArithmeticTraits<unsigned int>
 	{
@@ -301,7 +301,7 @@ namespace xpcc
 		{
 			return 0;
 		}
-		
+
 		static ALWAYS_INLINE uint32_t
 		max()
 		{
@@ -309,7 +309,7 @@ namespace xpcc
 		}
 	};
 #endif
-	
+
 	// ------------------------------------------------------------------------
 	template<>
 	struct ArithmeticTraits<int64_t>
@@ -328,14 +328,14 @@ namespace xpcc
 		{
 			return -9223372036854775807LL - 1;
 		}
-		
+
 		static ALWAYS_INLINE uint64_t
 		max()
 		{
 			return 9223372036854775807LL;
 		}
 	};
-	
+
 	// ------------------------------------------------------------------------
 	template<>
 	struct ArithmeticTraits<uint64_t>
@@ -354,14 +354,14 @@ namespace xpcc
 		{
 			return 0;
 		}
-		
+
 		static ALWAYS_INLINE uint64_t
 		max()
 		{
 			return 18446744073709551615ULL;
 		}
 	};
-	
+
 	// ------------------------------------------------------------------------
 	template<>
 	struct ArithmeticTraits<float>
@@ -369,7 +369,7 @@ namespace xpcc
 		typedef float WideType;
 		typedef float SignedType;
 		typedef float UnsignedType;
-		
+
 		static const bool isSigned = true;
 		static const bool isFloatingPoint = true;
 		static const bool isInteger = false;
@@ -379,20 +379,20 @@ namespace xpcc
 		{
 			return __FLT_MIN__;
 		}
-		
+
 		static ALWAYS_INLINE float
 		max()
 		{
 			return __FLT_MAX__;
 		}
-		
+
 		static ALWAYS_INLINE float
 		epsilon()
 		{
 			return __FLT_EPSILON__;
 		}
 	};
-	
+
 	// ------------------------------------------------------------------------
 	template<>
 	struct ArithmeticTraits<double>
@@ -400,23 +400,23 @@ namespace xpcc
 		typedef double WideType;
 		typedef double SignedType;
 		typedef double UnsignedType;
-		
+
 		static const bool isSigned = true;
 		static const bool isFloatingPoint = true;
 		static const bool isInteger = false;
-		
+
 		static ALWAYS_INLINE double
 		min()
 		{
 			return __DBL_MIN__;
 		}
-		
+
 		static ALWAYS_INLINE double
 		max()
 		{
 			return __DBL_MAX__;
 		}
-		
+
 		static ALWAYS_INLINE double
 		epsilon()
 		{

@@ -79,6 +79,8 @@ public:
 protected:
 	static inline void
 	initialize(Prescaler prescaler);
+
+    static bool transferInProgress;
 };
 
 } // namespace {{target.family}}

@@ -10,9 +10,9 @@ GreenLed green;
 BlueLed blue;
 
 // apply some animations to the leds
-xpcc::ui::Pulse pulse(orange);
-xpcc::ui::Indicator indicator(blue);
-xpcc::ui::DoubleIndicator strobe(red);
+xpcc::ui::Pulse<uint8_t> pulse(red.brightnessAnimation);
+xpcc::ui::Indicator<uint8_t> indicator(blue.brightnessAnimation);
+xpcc::ui::Strobe<uint8_t> strobe(green.brightnessAnimation);
 
 // ----------------------------------------------------------------------------
 MAIN_FUNCTION
@@ -45,11 +45,11 @@ MAIN_FUNCTION
 	xpcc::cortex::SysTickTimer::enable();
 
 	// set these animations to expire after x loops
-	pulse.pulse(20);
-	indicator.indicate(200);
-	strobe.indicate(20);
+	pulse.start();
+	indicator.start();
+	strobe.start();
 	// fade this led for 15s
-	green.fadeTo(15000, 255);
+	orange.fadeTo(32000, 255);
 
 	while (1)
 	{
@@ -57,6 +57,10 @@ MAIN_FUNCTION
 		pulse.update();
 		indicator.update();
 		strobe.update();
+
+		blue.update();
+		red.update();
+		orange.update();
 		green.update();
 	}
 

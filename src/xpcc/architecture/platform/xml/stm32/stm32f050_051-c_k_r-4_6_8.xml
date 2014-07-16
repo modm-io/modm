@@ -13,17 +13,16 @@
     <linkerscript device-size-id="4">stm32f0xx_4.ld</linkerscript>
     <linkerscript device-size-id="6">stm32f0xx_6.ld</linkerscript>
     <linkerscript device-name="051" device-size-id="8">stm32f0xx_8.ld</linkerscript>
-    <core>cortex-m0f</core>
+    <core>cortex-m0</core>
     <pin-count device-pin-id="k">32</pin-count>
     <pin-count device-pin-id="c">48</pin-count>
     <pin-count device-name="051" device-pin-id="r">64</pin-count>
-    <header>stm32f0xx.h</header>
+    <header>stm32f051x8.h</header>
     <define>STM32F0XX</define>
     <driver type="core" name="cortex">
       <parameter name="allocator">newlib</parameter>
     </driver>
     <driver type="adc" name="stm32"/>
-    <driver type="clock" name="stm32"/>
     <driver device-name="051" type="dac" name="stm32" instances="1"/>
     <driver type="i2c" name="stm32" instances="1"/>
     <driver device-name="051" device-size-id="8" device-pin-id="c|r" type="i2c" name="stm32" instances="2"/>

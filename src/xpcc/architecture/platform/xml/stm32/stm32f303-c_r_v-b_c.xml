@@ -15,7 +15,7 @@
     <pin-count device-pin-id="v">100</pin-count>
     <pin-count device-pin-id="c">48</pin-count>
     <pin-count device-pin-id="r">64</pin-count>
-    <header>stm32f30x.h</header>
+    <header>stm32f303xc.h</header>
     <define>STM32F30X</define>
     <driver type="core" name="cortex">
       <parameter name="allocator">newlib</parameter>

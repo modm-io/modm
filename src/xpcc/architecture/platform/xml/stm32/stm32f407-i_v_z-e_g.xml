@@ -14,7 +14,7 @@
     <pin-count device-pin-id="v">100</pin-count>
     <pin-count device-pin-id="z">144</pin-count>
     <pin-count device-pin-id="i">176</pin-count>
-    <header>stm32f4xx.h</header>
+    <header>stm32f407xx.h</header>
     <define>STM32F4XX</define>
     <driver type="core" name="cortex">
       <parameter name="allocator">newlib</parameter>
