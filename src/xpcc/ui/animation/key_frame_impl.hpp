@@ -41,7 +41,7 @@ xpcc::ui::KeyFrameAnimationBase<T, Args...>::stop()
 	{
 		for (uint_fast8_t ii = 0; ii < size; ii++)
 		{
-			animator[ii]->setValue(keyFrames[(mode & reversedMask) ? 0 : numberOfFrames].value[0]);
+			animator[ii]->setValue(keyFrames[(mode & reversedMask) ? 0 : numberOfFrames-1].value[ii]);
 		}
 	}
 	cancel();
