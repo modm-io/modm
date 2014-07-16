@@ -27,24 +27,24 @@ xpcc::ui::Animation<T>::setValue(T value)
 }
 
 template< typename T >
-T ALWAYS_INLINE
+T inline
 xpcc::ui::Animation<T>::getValue() const
 {
 	return currentValue;
 }
 
 template< typename T >
-bool ALWAYS_INLINE
+bool inline
 xpcc::ui::Animation<T>::isAnimating() const
 {
 	return (animationTime > 0);
 }
 
 template< typename T >
-void ALWAYS_INLINE
+void inline
 xpcc::ui::Animation<T>::stop()
 {
-	animationTime = 0;
+	animationTime = -1;
 	endValue = currentValue;
 	computations.deltaValue = 0;
 }
@@ -53,10 +53,16 @@ template< typename T >
 bool
 xpcc::ui::Animation<T>::animateTo(TimeType time, T value)
 {
-	// if the time is zero, or the value is already reached, set the value immediately
-	if (time == 0 || value == currentValue) {
-		setValue(value);
+	if (value == currentValue) {
+		animationTime = -1;
 		return false;
+	}
+
+	// if the time is zero, or the value is already reached, set the value immediately
+	if (time == 0) {
+		setValue(value);
+		animationTime = -1;
+		return true;
 	}
 
 	endValue = value;
@@ -68,13 +74,17 @@ xpcc::ui::Animation<T>::animateTo(TimeType time, T value)
 
 template< typename T >
 bool
-xpcc::ui::Animation<T>::update()
-{
+xpcc::ui::Animation<T>::update() {
 	// this should be called exactly once every 1 ms
 	// but if the clock gets incremented by more than 1 ms, or the main loop is
 	// busy, then we need to count these "missing" steps and apply them.
 
 	// if we are not fading at the moment, we do not need to check anything
+	if (animationTime == static_cast<TimeType>(-1)) {
+		animationTime = 0;
+		return true;
+	}
+
 	if (animationTime > 0)
 	{
 		// buffer the delta time
@@ -96,7 +106,7 @@ xpcc::ui::Animation<T>::update()
 				if (--animationTime == 0) {
 					animationTime = 0;
 					currentValue = endValue;
-					return true;
+                    return true;
 				}
 
 				currentValue = computations.step();
