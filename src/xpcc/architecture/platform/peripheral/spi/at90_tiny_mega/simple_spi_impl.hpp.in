@@ -97,7 +97,6 @@ xpcc::{{target.family}}::SpiSimpleMaster::transferBlocking(
 	uint8_t tx_byte = 0xff;
 	uint8_t rx_byte;
 
-<<<<<<< HEAD
 	for (std::size_t i = 0; i < length; i++)
 	{
 		if (tx) tx_byte = tx[i];
@@ -106,26 +105,4 @@ xpcc::{{target.family}}::SpiSimpleMaster::transferBlocking(
 
 		if (rx) rx[i] = rx_byte;
 	}
-=======
-bool
-xpcc::{{target.family}}::SpiSimpleMaster::write(uint8_t data)
-{
-    if (transferInProgress && !(SPSR & (1 << SPIF)))
-        return false;
-
-    transferInProgress = true;
-	SPDR = data;
-	return true;
-}
-
-bool
-xpcc::{{target.family}}::SpiSimpleMaster::getResult(uint8_t &data)
-{
-    if (transferInProgress && !(SPSR & (1 << SPIF)))
-        return false;
-
-    transferInProgress = false;
-	data = SPDR;
-	return true;
->>>>>>> develop
 }
