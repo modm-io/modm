@@ -51,23 +51,18 @@ public:
 	initialize();
 
 	static bool
-	start(SpiDelegate *delegate,
-			DataMode mode=DataMode::Mode0,
-			DataOrder order=DataOrder::MsbFirst);
+	start(SpiTransaction *transaction);
 
 	static bool
-	startBlocking(SpiDelegate *delegate,
-			DataMode mode=DataMode::Mode0,
-			DataOrder order=DataOrder::MsbFirst);
+	startBlocking(SpiTransaction *transaction);
 
 	static void
 	reset(DetachCause cause = DetachCause::SoftwareReset);
 	// end documentation inherited
 
 private:
-	static xpcc::SpiDelegate *myDelegate;
-
-//	typedef SoftwareSpiSimpleMaster<SCK, MOSI, MISO, Baudrate> SimpleSpiMaster;
+	static xpcc::SpiTransaction *delegate;
+	static xpcc::SpiTransaction::Transmission transmission;
 };
 
 } // namespace xpcc

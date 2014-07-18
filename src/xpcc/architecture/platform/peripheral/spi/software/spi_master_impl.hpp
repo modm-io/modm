@@ -16,8 +16,10 @@
 #define DEBUG_SW_SPI(x)
 
 template <typename SCK, typename MOSI, typename MISO, uint32_t Baudrate>
-xpcc::SpiDelegate *xpcc::SoftwareSpiMaster<SCK, MOSI, MISO, Baudrate>::myDelegate(0);
+xpcc::SpiTransaction *xpcc::SoftwareSpiMaster<SCK, MOSI, MISO, Baudrate>::delegate(0);
 
+template <typename SCK, typename MOSI, typename MISO, uint32_t Baudrate>
+xpcc::SpiTransaction::Transmission xpcc::SoftwareSpiMaster<SCK, MOSI, MISO, Baudrate>::transmission;
 
 // ----------------------------------------------------------------------------
 template <typename SCK, typename MOSI, typename MISO, uint32_t Baudrate>
@@ -31,55 +33,47 @@ xpcc::SoftwareSpiMaster<SCK, MOSI, MISO, Baudrate>::initialize()
 
 template <typename SCK, typename MOSI, typename MISO, uint32_t Baudrate>
 bool ALWAYS_INLINE
-xpcc::SoftwareSpiMaster<SCK, MOSI, MISO, Baudrate>::start(xpcc::SpiDelegate *delegate,
-		DataMode mode,
-		DataOrder order)
+xpcc::SoftwareSpiMaster<SCK, MOSI, MISO, Baudrate>::start(xpcc::SpiTransaction *transaction)
 {
-	return startBlocking(delegate, mode, order);
+	return startBlocking(transaction);
 }
 
 template <typename SCK, typename MOSI, typename MISO, uint32_t Baudrate>
 bool
-xpcc::SoftwareSpiMaster<SCK, MOSI, MISO, Baudrate>::startBlocking(xpcc::SpiDelegate *delegate,
-		DataMode mode,
-		DataOrder order)
+xpcc::SoftwareSpiMaster<SCK, MOSI, MISO, Baudrate>::startBlocking(xpcc::SpiTransaction *transaction)
 {
-	if (!myDelegate && delegate)
+	if (!delegate && transaction && transaction->attaching())
 	{
-		SoftwareSpiSimpleMaster<SCK, MOSI, MISO, Baudrate>::setOperationMode(mode);
-		SoftwareSpiSimpleMaster<SCK, MOSI, MISO, Baudrate>::setDataOrder(order);
+		delegate = transaction;
+		DEBUG_SW_SPI('\n');
+		DEBUG_SW_SPI('A');
 
-		if (delegate->attaching())
+		while(1)
 		{
-			myDelegate = delegate;
-			DEBUG_SW_SPI('\n');
-			DEBUG_SW_SPI('A');
+			transmission.length = 0;
+			transmission.next = xpcc::Spi::Operation::Stop;
+			delegate->transmitting(transmission);
 
-			while(1)
+			uint8_t tx_byte = 0xff;
+			uint8_t rx_byte;
+
+			while(transmission.length-- > 0)
 			{
-				xpcc::SpiDelegate::Transmission t = myDelegate->transmitting();
+				if (transmission.writeBuffer) tx_byte = *transmission.writeBuffer++;
 
-				uint8_t tx_byte = 0xff;
-				uint8_t rx_byte;
+				rx_byte = SoftwareSpiSimpleMaster<SCK, MOSI, MISO, Baudrate>::writeReadBlocking(tx_byte);
+				DEBUG_SW_SPI('w');
 
-				for (std::size_t ii = 0; ii < t.length; ii++)
-				{
-					if (t.writeBuffer) tx_byte = t.writeBuffer[ii];
+				if (transmission.readBuffer) *transmission.readBuffer++ = rx_byte;
+			}
+			DEBUG_SW_SPI(' ');
 
-					rx_byte = SoftwareSpiSimpleMaster<SCK, MOSI, MISO, Baudrate>::writeReadBlocking(tx_byte);
-					DEBUG_SW_SPI('w');
-
-					if (t.readBuffer) t.readBuffer[ii] = rx_byte;
-				}
-				DEBUG_SW_SPI(' ');
-
-				if (t.next == xpcc::Spi::Operation::Stop)
-				{
-					DEBUG_SW_SPI('D');
-					myDelegate->detaching(xpcc::Spi::DetachCause::NormalStop);
-					myDelegate = 0;
-					return true;
-				}
+			if (transmission.next == xpcc::Spi::Operation::Stop)
+			{
+				DEBUG_SW_SPI('D');
+				delegate->detaching(xpcc::Spi::DetachCause::NormalStop);
+				delegate = 0;
+				return true;
 			}
 		}
 	}
@@ -90,7 +84,7 @@ template <typename SCK, typename MOSI, typename MISO, uint32_t Baudrate>
 void inline
 xpcc::SoftwareSpiMaster<SCK, MOSI, MISO, Baudrate>::reset(DetachCause cause)
 {
-	if (myDelegate) myDelegate->detaching(cause);
-	myDelegate = 0;
+	if (delegate) delegate->detaching(cause);
+	delegate = 0;
 }
 //-----------------------------------------------------------------------------

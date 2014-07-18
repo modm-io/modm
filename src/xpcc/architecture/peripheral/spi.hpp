@@ -170,9 +170,7 @@ public:
 	 * @return	Caller gains control if `true`. Call has no effect if `false`.
 	 */
 	static bool
-	start(SpiDelegate *delegate,
-			DataMode mode=DataMode::Mode0,
-			DataOrder order=DataOrder::MsbFirst);
+	start(SpiTransaction *delegate);
 
 	/**
 	 * Requests bus control and starts the transfer, blocks until delegate is detached.
@@ -187,9 +185,7 @@ public:
 	 * @return	Caller gains control if `true`. Call has no effect if `false`.
 	 */
 	static bool
-	startBlocking(SpiDelegate *delegate,
-			DataMode mode=DataMode::Mode0,
-			DataOrder order=DataOrder::MsbFirst);
+	startBlocking(SpiTransaction *delegate);
 
 	/**
 	 * Perform a software reset of the driver in case of an error.
@@ -214,7 +210,7 @@ public:
  * @author	Niklas Hauser
  * @ingroup	spi
  */
-class SpiDelegate : public Spi
+class SpiTransaction : public Spi
 {
 public:
 	/// Contains the information required to make a SPI transfer
@@ -242,8 +238,8 @@ public:
 	 *
 	 * @return	the `Transmission` struct
 	 */
-	virtual Transmission
-	transmitting() = 0;
+	virtual void
+	transmitting(Transmission &transmission) = 0;
 
 	/**
 	 * This is called when the transmission finished and delegate is about to
