@@ -26,6 +26,7 @@ static_assert(Data2::width == 5, "Data2::width is not 5");
 typedef SpiSimpleMaster SPI;
 typedef UartSpiSimpleMaster0 SPI2;
 typedef Uart0 UART;
+typedef xpcc::avr::SystemClock systemClock;
 
 MAIN_FUNCTION
 {
@@ -43,12 +44,12 @@ MAIN_FUNCTION
 	LedInverted::setOutput();
 	LedInverted::reset();
 
-	GpioD0::connect(UART::Rx /* Gpio::InputType::PullUp */);
+	GpioD0::connect(UART::Rx);
 	GpioD1::connect(UART::Tx);
 
-	SPI::initialize<2000000>();
-	SPI2::initialize<1000000>();
-	UART::initialize<38400>();
+	SPI::initialize<systemClock, 7372800>();
+	SPI2::initialize<systemClock, 7372800>();
+	UART::initialize<systemClock, 225>();
 
 	while (1)
 	{

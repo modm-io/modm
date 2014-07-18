@@ -23,22 +23,22 @@ namespace {{target.family}}
 
 /**
  * (Non-)Buffered Uart{{ id }}
- * 
+ *
  * This implementation uses a ringbuffer. The size of the ringbuffer
  * can be changed in the `project.cfg` file.
- * 
- * Just add add a value for `Uart{{ id }}.tx_buffer` and/or 
+ *
+ * Just add add a value for `Uart{{ id }}.tx_buffer` and/or
  * `Uart{{ id }}.rx_buffer` in the `defines` section. The size can
  * be any value between 1 and 254 for buffered and 0 for
  * non-buffered operation.
- * 
+ *
  * Example:
  * @code
  * [defines]
  * Uart{{ id }}.tx_buffer = 20
  * Uart{{ id }}.rx_buffer = 30
  * @endcode
- * 
+ *
  * @author	Fabian Greif
  * @author	Niklas Hauser
  * @ingroup	{{target.family}}
@@ -48,64 +48,81 @@ class Uart{{ id }} : public ::xpcc::Uart
 public:
 	static const TypeId::Uart{{ id }}Txd Tx;
 	static const TypeId::Uart{{ id }}Rxd Rx;
-	
+
 public:
 	// start documentation inherited
-	template< uint32_t baudrate >
+	template< class clockSource, uint32_t baudrate,
+			uint16_t tolerance = xpcc::Tolerance::FivePercent >
 	static ALWAYS_INLINE void
 	initialize()
 	{
-		static_assert(F_CPU / 8l >= baudrate, "The CPU frequency must be at least 8x higher than UART baudrate.");
-		static_assert((F_CPU / (16l * baudrate)) < (1 << 12), "UART baudrate is too slow for CPU frequency (Prescaler out of bounds).");
-
-		uint16_t ubrr;
 		// use double speed when necessary
-		if (baudrate * 16l > F_CPU)
-		{
-			ubrr = 0x8000 | static_cast<uint16_t>((F_CPU / (8l * baudrate)) - 1);
-		}
-		else {
-			ubrr = static_cast<uint16_t>((F_CPU / (16l * baudrate)) - 1);
-		}
+		constexpr uint32_t scalar = (baudrate * 16l > clockSource::Uart) ? 8 : 16;
 
-		initializeWithBaud(ubrr);
+		// calculate the fractional prescaler value
+		constexpr float pre_raw = static_cast<float>(clockSource::Uart) / ( scalar * baudrate );
+		// respect the prescaler range of 0 to 4095
+		constexpr uint32_t pre_ceil = std::ceil(pre_raw) > 4096 ? 4096 : std::ceil(pre_raw);
+		constexpr uint32_t pre_floor = std::floor(pre_raw) < 1 ? 1 : std::floor(pre_raw);
+
+		// calculate the possible baudrates above and below the requested baudrate
+		constexpr uint32_t baud_lower = clockSource::Uart / ( scalar * pre_ceil );
+		constexpr uint32_t baud_upper = clockSource::Uart / ( scalar * pre_floor );
+
+		// calculate the fractional prescaler value corresponding to the baudrate exactly
+		// between the upper and lower baudrate
+		constexpr float pre_middle = static_cast<float>(clockSource::Uart) /
+				( scalar * ((baud_upper - baud_lower) / 2.f + baud_lower) );
+		// decide which prescaler value is closer to a possible baudrate
+		constexpr uint32_t prescaler = (pre_raw >= pre_middle) ? pre_ceil : pre_floor;
+
+		// check if within baudrate tolerance
+		constexpr uint32_t generated_baudrate = clockSource::Uart / ( scalar * prescaler );
+		assertBaudrateInTolerance<
+				/* clostest available baudrate */ generated_baudrate,
+				/* desired baudrate */ baudrate,
+				tolerance >();
+
+		constexpr uint16_t ubrr = (prescaler - 1) | ((scalar == 8) ? 0x80 : 0);
+
+		initialize(ubrr);
 	}
-	
+
 	// MARK: write blocking
 	static void
 	writeBlocking(uint8_t data);
-	
+
 	static void
 	writeBlocking(const uint8_t *data, std::size_t length);
-	
+
 	static void
 	flushWriteBuffer();
-	
+
 	// MARK: write
 	static bool
 	write(uint8_t data);
-	
+
 	static std::size_t
 	write(const uint8_t *data, std::size_t length);
-	
+
 	static bool
 	isWriteFinished();
-	
+
 	// MARK: read
 	static bool
 	read(uint8_t& data);
-	
+
 	static std::size_t
 	read(uint8_t *buffer, std::size_t length);
-	
+
 	// MARK: discard
 	static std::size_t
 	discardReceiveBuffer();
-	
+
 	static std::size_t
 	discardTransmitBuffer();
 	// end documentation inherited
-	
+
 	// MARK: error
 	/**
 	 * Check whether any errors occurred during receiving.
@@ -118,14 +135,14 @@ public:
 	 */
 	static uint8_t
 	getErrorFlags();
-	
+
 	/// Clears the error flags.
 	static void
 	acknowledgeErrorFlags();
-	
+
 protected:
 	static void
-	initializeWithBaud(uint16_t ubrr);
+	initialize(uint16_t ubrr);
 };
 
 } // namespace {{target.family}}

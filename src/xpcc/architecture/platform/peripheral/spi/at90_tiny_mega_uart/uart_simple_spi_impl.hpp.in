@@ -16,26 +16,30 @@ template< class clockSource, uint32_t baudrate, uint16_t tolerance >
 void
 xpcc::{{target.family}}::UartSpiSimpleMaster{{id}}::initialize()
 {
+	// calculate the fractional prescaler value
 	constexpr float pre_raw = static_cast<float>(clockSource::UsartSpi) / ( 2 * baudrate );
-	constexpr uint32_t baud_lower = clockSource::UsartSpi / ( 2 * (std::ceil(pre_raw)));
-	constexpr uint32_t baud_upper = clockSource::UsartSpi / ( 2 * (std::floor(pre_raw)));
-	constexpr float pre_middle = static_cast<float>(clockSource::UsartSpi) / ( 2 * ((baud_upper - baud_lower) / 2.f + baud_lower) );
-	constexpr uint16_t prescaler = (pre_raw >= pre_middle) ? std::ceil(pre_raw) : std::floor(pre_raw);
+	constexpr uint32_t pre_ceil = std::ceil(pre_raw) > 4096 ? 4096 : std::ceil(pre_raw);
+	constexpr uint32_t pre_floor = std::floor(pre_raw) < 1 ? 1 : std::floor(pre_raw);
 
-	static_assert(clockSource::UsartSpi/2 >= baudrate,
-			"The CPU frequency must be at least 2x higher than SPI baudrate.");
-	static_assert(prescaler < (1 << 12),
-			"SPI baudrate is too slow for CPU frequency (Prescaler out of bounds).");
+	// calculate the possible baudrates above and below the requested baudrate
+	constexpr uint32_t baud_lower = clockSource::UsartSpi / ( 2 * pre_ceil );
+	constexpr uint32_t baud_upper = clockSource::UsartSpi / ( 2 * pre_floor );
+
+	// calculate the fractional prescaler value corresponding to the baudrate exactly
+	// between the upper and lower baudrate
+	constexpr float pre_middle = static_cast<float>(clockSource::UsartSpi) /
+			( 2 * ((baud_upper - baud_lower) / 2.f + baud_lower) );
+	// decide which prescaler value is closer to a possible baudrate
+	constexpr uint16_t prescaler = (pre_raw >= pre_middle) ? pre_ceil : pre_floor;
 
 	// check if within baudrate tolerance
-	constexpr uint32_t generated_baudrate = clockSource::UsartSpi / ( 2 * (prescaler));
+	constexpr uint32_t generated_baudrate = clockSource::UsartSpi / (2 * prescaler);
 	assertBaudrateInTolerance<
 		/* clostest available baudrate */ generated_baudrate,
 		/* desired baudrate */ baudrate,
 		tolerance >();
 
-
-	initialize(prescaler-1);
+	initialize(prescaler - 1);
 }
 
 void
