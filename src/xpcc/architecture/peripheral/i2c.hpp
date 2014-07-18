@@ -139,7 +139,7 @@ public:
 	 * @return	Caller gains control if `true`. Call has no effect if `false`.
 	 */
 	static bool
-	start(I2cDelegate *delegate);
+	start(I2cTransaction *delegate);
 
 	/**
 	 * Requests bus control and starts the transfer, blocks until delegate is detached.
@@ -149,7 +149,7 @@ public:
 	 * @return	Caller gains control if `true`. Call has no effect if `false`.
 	 */
 	static bool
-	startBlocking(I2cDelegate *delegate);
+	startBlocking(I2cTransaction *delegate);
 
 	/**
 	 * Perform a software reset of the driver in case of an error.
@@ -186,7 +186,7 @@ public:
  * @author	Niklas Hauser
  * @ingroup	i2c
  */
-class I2cDelegate : public I2c
+class I2cTransaction : public I2c
 {
 public:
 	/// Contains the information required to begin an I2C transfer
@@ -197,16 +197,16 @@ public:
 
 	/// Contains the information required to begin a write operation
 	struct Writing {
-		OperationAfterWrite next;	///< operation following the successful writing to the slave
 		const uint8_t *buffer;		///< buffer containing the data to write to the slave
-		std::size_t size;			///< number of bytes to be written
+		std::size_t length;			///< number of bytes to be written
+		OperationAfterWrite next;	///< operation following the successful writing to the slave
 	};
 
 	/// Contains the information required to begin a read operation
 	struct Reading {
-		OperationAfterRead next;	///< operation following the reading
 		uint8_t *buffer;			///< buffer to be filled with the bytes received from the slave
-		std::size_t size;			///< number of bytes to be read
+		std::size_t length;			///< number of bytes to be read
+		OperationAfterRead next;	///< operation following the reading
 	};
 
 public:
@@ -225,24 +225,24 @@ public:
 	 *
 	 * @return	the `Starting` struct containing slave address and the next operation
 	 */
-	virtual Starting
-	starting() = 0;
+	virtual void
+	starting(Starting &starting) = 0;
 
 	/**
 	 * This is called before the I2cMaster begins a write operation.
 	 *
 	 * @return	the `Writing` struct containg the write buffer and size and next operation
 	 */
-	virtual Writing
-	writing() = 0;
+	virtual void
+	writing(Writing &writing) = 0;
 
 	/**
 	 * This is called before the I2cMaster begins a read operation.
 	 *
 	 * @return	the `Reading` struct containg the read buffer and size and next operation
 	 */
-	virtual Reading
-	reading() = 0;
+	virtual void
+	reading(Reading &reading) = 0;
 
 	/**
 	 * This is called when the I2cMaster stops the operation and detached the delegate.
@@ -252,7 +252,7 @@ public:
 	 * 					to be reacted upon.
 	 */
 	virtual void
-	stopped(DetachCause cause) = 0;
+	detaching(DetachCause cause) = 0;
 };
 
 }	// namespace xpcc

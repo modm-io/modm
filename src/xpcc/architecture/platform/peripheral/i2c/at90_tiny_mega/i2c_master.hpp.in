@@ -55,10 +55,10 @@ public:
 
 	// start documentation inherited
 	static bool
-	start(xpcc::I2cDelegate *delegate);
+	start(xpcc::I2cTransaction *transaction);
 
 	static bool
-	startBlocking(xpcc::I2cDelegate *delegate);
+	startBlocking(xpcc::I2cTransaction *transaction);
 
 	static Error
 	getErrorState();

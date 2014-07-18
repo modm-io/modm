@@ -28,7 +28,7 @@ namespace xpcc
  * @author	Niklas Hauser
  * @ingroup	i2c
  */
-class I2cWriteReadAdapter : public I2cDelegate
+class I2cWriteReadAdapter : public I2cTransaction
 {
 private:
 	uint8_t address;
@@ -118,43 +118,37 @@ private:
 		return true;
 	}
 
-	virtual Starting
-	starting()
+	virtual void
+	starting(Starting &starting)
 	{
-		Starting s;
-		s.address = address;
+		starting.address = address;
 		if (isReading) {
-			s.next = readSize ? Operation::Read : Operation::Stop;
+			starting.next = readSize ? Operation::Read : Operation::Stop;
 		}
 		else {
-			s.next = writeSize ? Operation::Write : Operation::Stop;
+			starting.next = writeSize ? Operation::Write : Operation::Stop;
 		}
 		isReading = !isReading;
-		return s;
-	}
-
-	virtual Writing
-	writing()
-	{
-		Writing w;
-		w.buffer = writeBuffer;
-		w.size = writeSize;
-		w.next = readSize ? OperationAfterWrite::Restart : OperationAfterWrite::Stop;
-		return w;
-	}
-
-	virtual Reading
-	reading()
-	{
-		Reading r;
-		r.buffer = readBuffer;
-		r.size = readSize;
-		r.next = OperationAfterRead::Stop;
-		return r;
 	}
 
 	virtual void
-	stopped(DetachCause cause)
+	writing(Writing &writing)
+	{
+		writing.buffer = writeBuffer;
+		writing.length = writeSize;
+		writing.next = readSize ? OperationAfterWrite::Restart : OperationAfterWrite::Stop;
+	}
+
+	virtual void
+	reading(Reading &reading)
+	{
+		reading.buffer = readBuffer;
+		reading.length = readSize;
+		reading.next = OperationAfterRead::Stop;
+	}
+
+	virtual void
+	detaching(DetachCause cause)
 	{
 		isReading = false;
 		state = (cause == DetachCause::NormalStop) ? AdapterState::Idle : AdapterState::Error;
@@ -175,7 +169,7 @@ private:
  * @author	Niklas Hauser
  * @ingroup	i2c
  */
-class I2cWriteAdapter : public I2cDelegate
+class I2cWriteAdapter : public I2cTransaction
 {
 private:
 	uint8_t address;
@@ -252,37 +246,31 @@ private:
 		return true;
 	}
 
-	virtual Starting
-	starting()
+	virtual void
+	starting(Starting &starting)
 	{
-		Starting s;
-		s.address = address;
-		s.next = size ? Operation::Write : Operation::Stop;
-		return s;
-	}
-
-	virtual Reading
-	reading()
-	{
-		Reading r;
-		r.buffer = 0;
-		r.size = 0;
-		r.next = OperationAfterRead::Stop;
-		return r;
-	}
-
-	virtual Writing
-	writing()
-	{
-		Writing w;
-		w.buffer = buffer;
-		w.size = size;
-		w.next = OperationAfterWrite::Stop;
-		return w;
+		starting.address = address;
+		starting.next = size ? Operation::Write : Operation::Stop;
 	}
 
 	virtual void
-	stopped(DetachCause cause)
+	reading(Reading &reading)
+	{
+		reading.buffer = 0;
+		reading.length = 0;
+		reading.next = OperationAfterRead::Stop;
+	}
+
+	virtual void
+	writing(Writing &writing)
+	{
+		writing.buffer = buffer;
+		writing.length = size;
+		writing.next = OperationAfterWrite::Stop;
+	}
+
+	virtual void
+	detaching(DetachCause cause)
 	{
 		state = (cause == DetachCause::NormalStop) ? AdapterState::Idle : AdapterState::Error;
 	}
@@ -302,7 +290,7 @@ private:
  * @author	Niklas Hauser
  * @ingroup	i2c
  */
-class I2cReadAdapter : public I2cDelegate
+class I2cReadAdapter : public I2cTransaction
 {
 private:
 	uint8_t address;
@@ -379,37 +367,31 @@ private:
 		return true;
 	}
 
-	virtual Starting
-	starting()
+	virtual void
+	starting(Starting &starting)
 	{
-		Starting s;
-		s.address = address;
-		s.next = size ? Operation::Read : Operation::Stop;
-		return s;
-	}
-
-	virtual Reading
-	reading()
-	{
-		Reading r;
-		r.buffer = buffer;
-		r.size = size;
-		r.next = OperationAfterRead::Stop;
-		return r;
-	}
-
-	virtual Writing
-	writing()
-	{
-		Writing w;
-		w.buffer = 0;
-		w.size = 0;
-		w.next = OperationAfterWrite::Stop;
-		return w;
+		starting.address = address;
+		starting.next = size ? Operation::Read : Operation::Stop;
 	}
 
 	virtual void
-	stopped(DetachCause cause)
+	reading(Reading &reading)
+	{
+		reading.buffer = buffer;
+		reading.length = size;
+		reading.next = OperationAfterRead::Stop;
+	}
+
+	virtual void
+	writing(Writing &writing)
+	{
+		writing.buffer = 0;
+		writing.length = 0;
+		writing.next = OperationAfterWrite::Stop;
+	}
+
+	virtual void
+	detaching(DetachCause cause)
 	{
 		state = (cause == DetachCause::NormalStop) ? AdapterState::Idle : AdapterState::Error;
 	}

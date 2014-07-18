@@ -45,45 +45,14 @@ namespace
 	// parameter advice
 	static xpcc::I2c::Operation nextOperation;
 	
-	// buffer management
-	static uint8_t *readPointer;
-	static const uint8_t *writePointer;
-	static std::size_t readBytesLeft;
-	static std::size_t writeBytesLeft;
-	
 	// delegating
-	static xpcc::I2cDelegate *delegate(0);
+	static xpcc::I2cTransaction *delegate(0);
 	static xpcc::I2cMaster::Error errorState(xpcc::I2cMaster::Error::NoError);
 	static bool newSession;
-	
-	// helper functions
-	static ALWAYS_INLINE void
-	initializeWrite(xpcc::I2cDelegate::Writing w) {
-		writePointer = w.buffer;
-		writeBytesLeft = w.size;
-		nextOperation = static_cast<xpcc::I2c::Operation>(w.next);
-	}
-	
-	static ALWAYS_INLINE void
-	initializeRead(xpcc::I2cDelegate::Reading r) {
-		readPointer = r.buffer;
-		readBytesLeft = r.size;
-		nextOperation = static_cast<xpcc::I2c::Operation>(r.next);
-	}
-	
-	static ALWAYS_INLINE void
-	initializeStopAfterAddress() {
-		//writePointer = ..;
-		writeBytesLeft = 0;
-		nextOperation = xpcc::I2c::Operation::Stop;
-	}
-	
-	static ALWAYS_INLINE void
-	initializeRestartAfterAddress() {
-		//writePointer = ..;
-		writeBytesLeft = 0;
-		nextOperation = xpcc::I2c::Operation::Restart;
-	}
+
+	static xpcc::I2cTransaction::Starting starting;
+	static xpcc::I2cTransaction::Writing writing;
+	static xpcc::I2cTransaction::Reading reading;
 }
 
 // ----------------------------------------------------------------------------
@@ -99,34 +68,43 @@ ISR(TWI_vect)
 			{
 				DEBUG('s');
 				// REPEATED START has been transmitted
-				xpcc::I2cDelegate::Starting s = delegate->starting();
-				uint8_t address;
-				switch (s.next)
+
+				starting.address = 0;
+				starting.next = xpcc::I2c::Operation::Stop;
+				delegate->starting(starting);
+				uint8_t addressMode = xpcc::I2c::Write;
+
+				switch (starting.next)
 				{
 					case xpcc::I2c::Operation::Read:
-						address = (s.address & 0xfe) | xpcc::I2c::Read;
-						initializeRead(delegate->reading());
+						addressMode = xpcc::I2c::Read;
+						reading.length = 0;
+						reading.next = xpcc::I2c::OperationAfterRead::Stop;
+						delegate->reading(reading);
+						nextOperation = static_cast<xpcc::I2c::Operation>(reading.next);
 						break;
 						
 					case xpcc::I2c::Operation::Write:
-						address = (s.address & 0xfe) | xpcc::I2c::Write;
-						initializeWrite(delegate->writing());
+						writing.length = 0;
+						writing.next = xpcc::I2c::OperationAfterWrite::Stop;
+						delegate->writing(writing);
+						nextOperation = static_cast<xpcc::I2c::Operation>(writing.next);
 						break;
 						
 					default:
 					case xpcc::I2c::Operation::Stop:
-						address = (s.address & 0xfe) | xpcc::I2c::Write;
-						initializeStopAfterAddress();
+						writing.length = 0;
+						nextOperation = xpcc::I2c::Operation::Stop;
 						break;
 						
 					case xpcc::I2c::Operation::Restart:
-						address = (s.address & 0xfe) | xpcc::I2c::Write;
-						initializeRestartAfterAddress();
+						writing.length = 0;
+						nextOperation = xpcc::I2c::Operation::Restart;
 						break;
 				}
 			
 				// Load data register with TWI slave address
-				TWDR = address;
+				TWDR = addressMode | (starting.address & 0xfe);
 				// clear interrupt flag to send address
 				TWCR = (1 << TWINT) | (1 << TWEN) | (1 << TWIE);
 			}
@@ -137,11 +115,11 @@ ISR(TWI_vect)
 			// Fall through...
 		case TW_MT_DATA_ACK:
 			// Data byte has been transmitted and ACK received
-			if (writeBytesLeft != 0)
+			if (writing.length > 0)
 			{
-				TWDR = *writePointer++;
-				DEBUG('0' + writeBytesLeft);
-				--writeBytesLeft;
+				TWDR = *writing.buffer++;
+				DEBUG('0' + writing.length);
+				--writing.length;
 				TWCR = (1 << TWINT) | (1 << TWEN) | (1 << TWIE);
 				DEBUG('A');
 			}
@@ -151,9 +129,12 @@ ISR(TWI_vect)
 				{
 					case xpcc::I2c::Operation::Write:
 						DEBUG('C');
-						initializeWrite(delegate->writing());
-						TWDR = *writePointer++;
-						--writeBytesLeft;
+						writing.length = 0;
+						writing.next = xpcc::I2c::OperationAfterWrite::Stop;
+						delegate->writing(writing);
+						nextOperation = static_cast<xpcc::I2c::Operation>(writing.next);
+						TWDR = *writing.buffer++;
+						--writing.length;
 						TWCR = (1 << TWINT) | (1 << TWEN) | (1 << TWIE);
 						DEBUG('A');
 						break;
@@ -166,7 +147,7 @@ ISR(TWI_vect)
 					default:
 						DEBUG('S');
 						TWCR = (1 << TWINT) | (1 << TWSTO) | (1 << TWEN);
-						delegate->stopped(xpcc::I2c::DetachCause::NormalStop);
+						delegate->detaching(xpcc::I2c::DetachCause::NormalStop);
 						delegate = 0;
 						break;
 				}
@@ -174,15 +155,15 @@ ISR(TWI_vect)
 			break;
 			
 		case TW_MR_DATA_ACK:
-			*readPointer++ = TWDR;
-			DEBUG('0' + readBytesLeft);
-			--readBytesLeft;
+			*reading.buffer++ = TWDR;
+			DEBUG('0' + reading.length);
+			--reading.length;
 			
 			// Fall through...
 		case TW_MR_SLA_ACK:
 			// SLA+R has been transmitted and ACK received
 			// See if last expected byte will be received ...
-			if (readBytesLeft > 0) {
+			if (reading.length > 0) {
 				// Send ACK after reception
 				TWCR = (1 << TWINT) | (1 << TWEA) | (1 << TWEN) | (1 << TWIE);
 				DEBUG('a');
@@ -197,9 +178,9 @@ ISR(TWI_vect)
 		case TW_MR_DATA_NACK:
 			// Data byte has been received and NACK transmitted
 			// => Transfer finished
-			*readPointer++ = TWDR;
-			DEBUG('0' + readBytesLeft);
-			--readBytesLeft;
+			*reading.buffer++ = TWDR;
+			DEBUG('0' + reading.length);
+			--reading.length;
 			
 			switch (nextOperation)
 			{
@@ -212,7 +193,7 @@ ISR(TWI_vect)
 				case xpcc::I2c::Operation::Stop:
 					DEBUG('S');
 					TWCR = (1 << TWINT) | (1 << TWSTO) | (1 << TWEN);
-					delegate->stopped(xpcc::I2c::DetachCause::NormalStop);
+					delegate->detaching(xpcc::I2c::DetachCause::NormalStop);
 					delegate = 0;
 					break;
 			}
@@ -262,9 +243,9 @@ void
 xpcc::{{target.family}}::I2cMaster::reset(DetachCause cause)
 {
 	DEBUG('T');
-	writeBytesLeft = 0;
-	readBytesLeft = 0;
-	if (delegate) delegate->stopped(cause);
+	writing.length = 0;
+	reading.length = 0;
+	if (delegate) delegate->detaching(cause);
 	delegate = 0;
 }
 
@@ -275,11 +256,11 @@ xpcc::{{target.family}}::I2cMaster::getErrorState()
 }
 
 bool
-xpcc::{{target.family}}::I2cMaster::start(xpcc::I2cDelegate *delegate)
+xpcc::{{target.family}}::I2cMaster::start(xpcc::I2cTransaction *transaction)
 {
-	if (!::delegate && delegate && delegate->attaching())
+	if (!delegate && transaction && transaction->attaching())
 	{
-		::delegate = delegate;
+		delegate = transaction;
 		newSession = true;
 		DEBUG('Y');
 		TWCR = (1 << TWINT) | (1 << TWSTA) | (1 << TWEN) | (1 << TWIE);
@@ -290,11 +271,11 @@ xpcc::{{target.family}}::I2cMaster::start(xpcc::I2cDelegate *delegate)
 }
 
 bool
-xpcc::{{target.family}}::I2cMaster::startBlocking(xpcc::I2cDelegate *delegate)
+xpcc::{{target.family}}::I2cMaster::startBlocking(xpcc::I2cTransaction *transaction)
 {
-	if (!::delegate && delegate && delegate->attaching())
+	if (!delegate && transaction && transaction->attaching())
 	{
-		::delegate = delegate;
+		delegate = transaction;
 		newSession = true;
 		DEBUG('Y');
 		TWCR = (1 << TWINT) | (1 << TWSTA) | (1 << TWEN) | (1 << TWIE);

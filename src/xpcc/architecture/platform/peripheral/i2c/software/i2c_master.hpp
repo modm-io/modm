@@ -53,12 +53,12 @@ public:
 public:
 	// start documentation inherited
 	static bool
-	start(xpcc::I2cDelegate *delegate);
+	start(xpcc::I2cTransaction *transaction);
 
 	static ALWAYS_INLINE bool
-	startBlocking(xpcc::I2cDelegate *delegate)
+	startBlocking(xpcc::I2cTransaction *transaction)
 	{
-		return start(delegate);
+		return start(transaction);
 	};
 
 	static Error
@@ -106,8 +106,12 @@ private:
 	static SDA sda;
 
 	static xpcc::I2c::Operation nextOperation;
-	static xpcc::I2cDelegate *myDelegate;
+	static xpcc::I2cTransaction *delegate;
 	static Error errorState;
+
+	static xpcc::I2cTransaction::Starting starting;
+	static xpcc::I2cTransaction::Writing writing;
+	static xpcc::I2cTransaction::Reading reading;
 };
 
 } // namespace xpcc

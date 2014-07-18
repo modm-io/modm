@@ -23,9 +23,16 @@ SDA xpcc::SoftwareI2cMaster<SCL, SDA, Baudrate>::sda;
 template <typename SCL, typename SDA, uint32_t Baudrate>
 xpcc::I2c::Operation xpcc::SoftwareI2cMaster<SCL, SDA, Baudrate>::nextOperation;
 template <typename SCL, typename SDA, uint32_t Baudrate>
-xpcc::I2cDelegate *xpcc::SoftwareI2cMaster<SCL, SDA, Baudrate>::myDelegate(0);
+xpcc::I2cTransaction *xpcc::SoftwareI2cMaster<SCL, SDA, Baudrate>::delegate(0);
 template <typename SCL, typename SDA, uint32_t Baudrate>
 xpcc::I2cMaster::Error xpcc::SoftwareI2cMaster<SCL, SDA, Baudrate>::errorState(xpcc::I2cMaster::Error::NoError);
+
+template <typename SCL, typename SDA, uint32_t Baudrate>
+xpcc::I2cTransaction::Starting xpcc::SoftwareI2cMaster<SCL, SDA, Baudrate>::starting;
+template <typename SCL, typename SDA, uint32_t Baudrate>
+xpcc::I2cTransaction::Writing xpcc::SoftwareI2cMaster<SCL, SDA, Baudrate>::writing;
+template <typename SCL, typename SDA, uint32_t Baudrate>
+xpcc::I2cTransaction::Reading xpcc::SoftwareI2cMaster<SCL, SDA, Baudrate>::reading;
 
 // ----------------------------------------------------------------------------
 template <typename SCL, typename SDA, uint32_t Baudrate>
@@ -41,17 +48,17 @@ template <typename SCL, typename SDA, uint32_t Baudrate>
 void
 xpcc::SoftwareI2cMaster<SCL, SDA, Baudrate>::reset(DetachCause cause)
 {
-	if (myDelegate) myDelegate->stopped(cause);
-	myDelegate = 0;
+	if (delegate) delegate->detaching(cause);
+	delegate = 0;
 }
 
 template <typename SCL, typename SDA, uint32_t Baudrate>
 bool
-xpcc::SoftwareI2cMaster<SCL, SDA, Baudrate>::start(xpcc::I2cDelegate *delegate)
+xpcc::SoftwareI2cMaster<SCL, SDA, Baudrate>::start(xpcc::I2cTransaction *transaction)
 {
-	if (!myDelegate && delegate && delegate->attaching())
+	if (!delegate && transaction && transaction->attaching())
 	{
-		myDelegate = delegate;
+		delegate = transaction;
 
 		while(1)
 		{
@@ -59,58 +66,63 @@ xpcc::SoftwareI2cMaster<SCL, SDA, Baudrate>::start(xpcc::I2cDelegate *delegate)
 			DEBUG_SW_I2C('s');
 			startCondition();
 
-			xpcc::I2cDelegate::Starting s = myDelegate->starting();
-			uint8_t address = s.address;
+			starting.address = 0;
+			starting.next = xpcc::I2c::Operation::Stop;
+			delegate->starting(starting);
+			uint8_t address = (starting.address & 0xfe);
 
-			address &= 0xfe;
-			if (s.next == xpcc::I2c::Operation::Read)
+			if (starting.next == xpcc::I2c::Operation::Read)
 				address |= xpcc::I2c::Read;
 
 			if (!write(address))
 				return true;
 			if (nextOperation == xpcc::I2c::Operation::Restart) {DEBUG_SW_I2C('R');}
-			nextOperation = s.next;
+			nextOperation = starting.next;
 
 			do {
 				switch (nextOperation)
 				{
 					case xpcc::I2c::Operation::Read:
 					{
-						xpcc::I2cDelegate::Reading r = myDelegate->reading();
-						for (uint8_t i=0; i < r.size-1; ++i) {
-							*r.buffer++ = read(true);
+						reading.length = 0;
+						reading.next = xpcc::I2c::OperationAfterRead::Stop;
+						delegate->reading(reading);
+						while(reading.length > 1) {
+							*reading.buffer++ = read(true);
+							--reading.length;
 							DEBUG_SW_I2C('\n');
 							DEBUG_SW_I2C('a');
 						}
-						*r.buffer = read(false);
+						*reading.buffer = read(false);
 						DEBUG_SW_I2C('\n');
 						DEBUG_SW_I2C('n');
-						nextOperation = static_cast<xpcc::I2c::Operation>(r.next);
+						nextOperation = static_cast<xpcc::I2c::Operation>(reading.next);
 					}
 						break;
 
 					case xpcc::I2c::Operation::Write:
 					{
-						xpcc::I2cDelegate::Writing w = myDelegate->writing();
-						for (uint8_t i=0; i < w.size; ++i) {
-							if (!write(*w.buffer++))
+						writing.length = 0;
+						writing.next = xpcc::I2c::OperationAfterWrite::Stop;
+						delegate->writing(writing);
+						while(writing.length > 0) {
+							if (!write(*writing.buffer++))
 								return true;
+							--writing.length;
 							DEBUG_SW_I2C('\n');
 							DEBUG_SW_I2C('A');
 						}
-						nextOperation = static_cast<xpcc::I2cDelegate::Operation>(w.next);
+						nextOperation = static_cast<xpcc::I2c::Operation>(writing.next);
 					}
 						break;
 
+					default:
 					case xpcc::I2c::Operation::Stop:
 						DEBUG_SW_I2C('S');
-						myDelegate->stopped(xpcc::I2c::DetachCause::NormalStop);
-						myDelegate = 0;
+						delegate->detaching(xpcc::I2c::DetachCause::NormalStop);
+						delegate = 0;
 						stopCondition();
 						return true;
-
-					default:
-						break;
 				}
 			} while (nextOperation != xpcc::I2c::Operation::Restart);
 		}
@@ -184,8 +196,15 @@ xpcc::SoftwareI2cMaster<SCL, SDA, Baudrate>::write(uint8_t data)
 	// release sda
 	sda.set();
 
+	delay();
+	sclSetAndWait();
+
+	bool bit = sda.read();
+
+	delay();
+
 	// return acknowledge bit
-	if (readBit()) {
+	if (bit) {
 		DEBUG_SW_I2C('N');
 		error();
 		return false;
