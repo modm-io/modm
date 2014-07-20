@@ -31,7 +31,7 @@ namespace xpcc
  */
 template< typename SCL,
 		  typename SDA,
-		  uint32_t Baudrate = xpcc::I2cMaster::DataRate::Standard >
+		  uint32_t BaudRate = xpcc::I2cMaster::Baudrate::Standard >
 class SoftwareI2cMaster : public xpcc::I2cMaster
 {
 public:
@@ -45,7 +45,7 @@ public:
 	 * @warning	this call cannot modify the baudrate anymore, since it is defined
 	 * 			by the template parameter Baudrate.
 	 */
-	template< class clockSource, uint32_t baudrate=DataRate::Standard,
+	template< class clockSource, uint32_t baudrate=Baudrate::Standard,
 			uint16_t tolerance = xpcc::Tolerance::FivePercent >
 	static void
 	initialize();
@@ -100,7 +100,7 @@ private:
 
 	// calculate the delay in microseconds needed to achieve the
 	// requested SPI frequency
-	static constexpr float delayTime = (1000000.0 / Baudrate) / 2.0;
+	static constexpr float delayTime = (1000000.0 / BaudRate) / 2.0;
 
 	static SCL scl;
 	static SDA sda;

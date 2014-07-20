@@ -18,6 +18,7 @@ xpcc::{{target.family}}::UartSpiSimpleMaster{{id}}::initialize()
 {
 	// calculate the fractional prescaler value
 	constexpr float pre_raw = static_cast<float>(clockSource::UsartSpi) / ( 2 * baudrate );
+	// respect the prescaler range of 1 to 4096
 	constexpr uint32_t pre_ceil = std::ceil(pre_raw) > 4096 ? 4096 : std::ceil(pre_raw);
 	constexpr uint32_t pre_floor = std::floor(pre_raw) < 1 ? 1 : std::floor(pre_raw);
 

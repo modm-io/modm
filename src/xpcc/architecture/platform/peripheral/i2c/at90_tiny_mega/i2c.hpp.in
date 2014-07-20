@@ -1,0 +1,36 @@
+// coding: utf-8
+/* Copyright (c) 2013, Roboterclub Aachen e.V.
+ * All Rights Reserved.
+ *
+ * The file is part of the xpcc library and is released under the 3-clause BSD
+ * license. See the file `LICENSE` for the full license governing this code.
+ */
+// ----------------------------------------------------------------------------
+{{ generation_block }}
+
+#ifndef XPCC_{{target.family | upper}}_I2C_HPP
+#define XPCC_{{target.family | upper}}_I2C_HPP
+
+namespace xpcc
+{
+
+namespace {{target.family}}
+{
+
+struct I2c
+{
+	enum class
+	Prescaler : uint8_t
+	{
+		Div1 = 0,
+		Div4 = (1 << TWPS0),
+		Div16 = (1 << TWPS1),
+		Div64 = (1 << TWPS1) | (1 << TWPS0)
+	};
+};
+
+} // namespace {{target.family}}
+
+} // namespace xpcc
+
+#endif	// XPCC_{{target.family | upper}}_I2C_HPP

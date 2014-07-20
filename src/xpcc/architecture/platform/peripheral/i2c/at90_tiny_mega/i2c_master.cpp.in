@@ -48,7 +48,6 @@ namespace
 	// delegating
 	static xpcc::I2cTransaction *delegate(0);
 	static xpcc::I2cMaster::Error errorState(xpcc::I2cMaster::Error::NoError);
-	static bool newSession;
 
 	static xpcc::I2cTransaction::Starting starting;
 	static xpcc::I2cTransaction::Writing writing;
@@ -201,24 +200,28 @@ ISR(TWI_vect)
 			
 		case TW_MT_SLA_NACK:	// SLA+W transmitted, NACK received
 		case TW_MR_SLA_NACK:	// SLA+R transmitted, NACK received
-			errorState = xpcc::{{target.family}}::I2cMaster::Error::AddressNack;
+			if (errorState != xpcc::{{target.family}}::I2cMaster::Error::NoError) {
+				errorState = xpcc::{{target.family}}::I2cMaster::Error::AddressNack;
+			}
 			DEBUG('A');
-			newSession = false;
 		case TW_MT_DATA_NACK:	// data transmitted, NACK received
-			if (newSession) errorState = xpcc::{{target.family}}::I2cMaster::Error::DataNack;
+			if (errorState != xpcc::{{target.family}}::I2cMaster::Error::NoError) {
+				errorState = xpcc::{{target.family}}::I2cMaster::Error::DataNack;
+			}
 			DEBUG('d');
-			newSession = false;
 			// generate a stop condition
 			TWCR = (1 << TWINT) | (1 << TWSTO) | (1 << TWEN);
 		case TW_MT_ARB_LOST:	// arbitration lost in SLA+W or data
 //		case TW_MR_ARB_LOST:	// arbitration lost in SLA+R or NACK
-			if (newSession) errorState = xpcc::{{target.family}}::I2cMaster::Error::ArbitrationLost;
+			if (errorState != xpcc::{{target.family}}::I2cMaster::Error::NoError) {
+				errorState = xpcc::{{target.family}}::I2cMaster::Error::ArbitrationLost;
+			}
 			DEBUG('d');
-			newSession = false;
 		default:
-			if (newSession) errorState = xpcc::{{target.family}}::I2cMaster::Error::Unknown;
+			if (errorState != xpcc::{{target.family}}::I2cMaster::Error::NoError) {
+				errorState = xpcc::{{target.family}}::I2cMaster::Error::Unknown;
+			}
 			DEBUG('r');
-			newSession = false;
 			xpcc::{{target.family}}::I2cMaster::reset(xpcc::I2c::DetachCause::ErrorCondition);
 			break;
 	}
@@ -227,12 +230,12 @@ ISR(TWI_vect)
 
 // ----------------------------------------------------------------------------
 void
-xpcc::{{target.family}}::I2cMaster::initializeWithBaud(uint8_t baud)
+xpcc::{{target.family}}::I2cMaster::initialize(uint8_t twbr, Prescaler prescaler)
 {
 	reset(xpcc::I2c::DetachCause::SoftwareReset);
-	TWBR = baud;
+	TWBR = twbr;
 	// No prescaler needed, unless we go significantly slower than standard Speed
-	TWSR = 0;
+	TWSR = static_cast<uint8_t>(prescaler);
 	// Load data register with default content; release SDA
 	TWDR = 0xff;
 	// Enable TWI peripheral with interrupt disabled
@@ -261,7 +264,7 @@ xpcc::{{target.family}}::I2cMaster::start(xpcc::I2cTransaction *transaction)
 	if (!delegate && transaction && transaction->attaching())
 	{
 		delegate = transaction;
-		newSession = true;
+		errorState = xpcc::{{target.family}}::I2cMaster::Error::NoError;
 		DEBUG('Y');
 		TWCR = (1 << TWINT) | (1 << TWSTA) | (1 << TWEN) | (1 << TWIE);
 		
@@ -276,7 +279,7 @@ xpcc::{{target.family}}::I2cMaster::startBlocking(xpcc::I2cTransaction *transact
 	if (!delegate && transaction && transaction->attaching())
 	{
 		delegate = transaction;
-		newSession = true;
+		errorState = xpcc::{{target.family}}::I2cMaster::Error::NoError;
 		DEBUG('Y');
 		TWCR = (1 << TWINT) | (1 << TWSTA) | (1 << TWEN) | (1 << TWIE);
 		
