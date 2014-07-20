@@ -19,14 +19,14 @@ xpcc::stm32::SpiSimpleMaster{{ id }}::initialize()
 	// calculate the nearest prescaler from the baudrate
 	constexpr float pre_raw = (static_cast<float>(clockSource::Spi{{ id }}) / baudrate);
 	constexpr uint16_t pre = (
-			(pre_raw >= (128+256)/2) ? 256 : (
-			(pre_raw >= ( 64+128)/2) ? 128 : (
-			(pre_raw >= ( 32+ 64)/2) ?  64 : (
-			(pre_raw >= ( 16+ 32)/2) ?  32 : (
-			(pre_raw >= (  8+ 16)/2) ?  16 : (
-			(pre_raw >= (  4+  8)/2) ?   8 : (
-			(pre_raw >= (  2+  4)/2) ?   4 :
-										 2
+			(pre_raw >= (128 * 4.f/3)) ? 256 : (
+			(pre_raw >= ( 64 * 4.f/3)) ? 128 : (
+			(pre_raw >= ( 32 * 4.f/3)) ?  64 : (
+			(pre_raw >= ( 16 * 4.f/3)) ?  32 : (
+			(pre_raw >= (  8 * 4.f/3)) ?  16 : (
+			(pre_raw >= (  4 * 4.f/3)) ?   8 : (
+			(pre_raw >= (  2 * 4.f/3)) ?   4 :
+										   2
 			)))))));
 
 	// check if we found a prescaler which generates a baudrate within the tolerance
