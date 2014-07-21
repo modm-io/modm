@@ -23,6 +23,7 @@ env.Alias('defines', env.ShowDefines())
 hexfile = env.Hex(program)
 
 env.Alias('program', env.OpenOcd(program))
+env.Alias('remote', env.OpenOcdRemote(hexfile))
 env.Alias('build', [hexfile, env.Listing(program)])
 env.Alias('all', ['build', 'size'])
 
