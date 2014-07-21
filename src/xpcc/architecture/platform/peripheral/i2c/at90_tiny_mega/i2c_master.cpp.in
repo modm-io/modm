@@ -49,6 +49,7 @@ namespace
 	static xpcc::I2cTransaction *delegate(0);
 	static xpcc::I2cMaster::Error errorState(xpcc::I2cMaster::Error::NoError);
 
+	// buffer management
 	static xpcc::I2cTransaction::Starting starting;
 	static xpcc::I2cTransaction::Writing writing;
 	static xpcc::I2cTransaction::Reading reading;
@@ -93,11 +94,13 @@ ISR(TWI_vect)
 					default:
 					case xpcc::I2c::Operation::Stop:
 						writing.length = 0;
+						reading.length = 0;
 						nextOperation = xpcc::I2c::Operation::Stop;
 						break;
 						
 					case xpcc::I2c::Operation::Restart:
 						writing.length = 0;
+						reading.length = 0;
 						nextOperation = xpcc::I2c::Operation::Restart;
 						break;
 				}

@@ -31,7 +31,7 @@
  *	- check BTF bit
  *	- if no bytes left, check for next operation
  *
- * It if important to note, that we wait for the last byte transfer to complete
+ * It is important to note, that we wait for the last byte transfer to complete
  * before checking the next operation.
  *
  *
@@ -126,7 +126,7 @@
  *	- check for next operation
  *
  * Please read the documentation of the driver before you attempt to fix this
- * driver. I strongly recommend the use of an logic analizer or oscilloscope,
+ * driver. I strongly recommend the use of an logic analyzer or oscilloscope,
  * to confirm the drivers behavior.
  * The event states are labeled as 'EVn_m' in reference to the manual.
  */
@@ -180,50 +180,16 @@ namespace
 	};
 	CheckNextOperation checkNextOperation = CHECK_NEXT_OPERATION_NO;
 
-	// buffer management
-	static uint8_t *readPointer;
-	static const uint8_t *writePointer;
-	static std::size_t readBytesLeft = 0;
-	static std::size_t writeBytesLeft = 0;
-
 	// delegating
-	static xpcc::I2cDelegate *delegate = 0;
+	static xpcc::I2cTransaction *delegate(0);
 	static xpcc::I2cMaster::Error error(xpcc::I2cMaster::Error::NoError);
 
-	static inline void
-	initializeWrite(xpcc::I2cDelegate::Writing w)
-	{
-		writePointer = w.buffer;
-		writeBytesLeft = w.size;
-		readBytesLeft = 0;
-		nextOperation = static_cast<xpcc::I2c::Operation>(w.next);
-	}
+	// buffer management
+	static xpcc::I2cTransaction::Starting starting;
+	static xpcc::I2cTransaction::Writing writing;
+	static xpcc::I2cTransaction::Reading reading;
 
-	static inline void
-	initializeRead(xpcc::I2cDelegate::Reading r)
-	{
-		readPointer = r.buffer;
-		readBytesLeft = r.size;
-		writeBytesLeft = 0;
-		nextOperation = static_cast<xpcc::I2c::Operation>(r.next);
-	}
-
-	static inline void
-	initializeStopAfterAddress()
-	{
-		writeBytesLeft = 0;
-		readBytesLeft = 0;
-		nextOperation = xpcc::I2c::Operation::Stop;
-	}
-
-	static inline void
-	initializeRestartAfterAddress()
-	{
-		writeBytesLeft = 0;
-		readBytesLeft = 0;
-		nextOperation = xpcc::I2c::Operation::Restart;
-	}
-
+	// helper functions
 	static inline void
 	callStarting()
 	{
@@ -257,15 +223,21 @@ I2C{{ id }}_EV_IRQHandler(void)
 		// EV5: SB=1, cleared by reading SR1 register followed by writing DR register with Address.
 		DEBUG_STREAM("startbit set");
 
-		xpcc::I2cDelegate::Starting s = delegate->starting();
-		uint8_t address;
+		starting.address = 0;
+		starting.next = xpcc::I2c::Operation::Stop;
+		delegate->starting(starting);
+		uint8_t addressMode = xpcc::I2c::Write;
 
-		switch (s.next)
+		switch (starting.next)
 		{
 			case xpcc::I2c::Operation::Read:
-				address = (s.address & 0xfe) | xpcc::I2c::Read;
-				initializeRead(delegate->reading());
-				if (readBytesLeft <= 2)
+				addressMode = xpcc::I2c::Read;
+				reading.length = 0;
+				reading.next = xpcc::I2c::OperationAfterRead::Stop;
+				delegate->reading(reading);
+				nextOperation = static_cast<xpcc::I2c::Operation>(reading.next);
+
+				if (reading.length <= 2)
 				{
 					DEBUG_STREAM("NACK");
 					I2C{{ id }}->CR1 &= ~I2C_CR1_ACK;
@@ -275,35 +247,42 @@ I2C{{ id }}_EV_IRQHandler(void)
 					DEBUG_STREAM("ACK");
 					I2C{{ id }}->CR1 |= I2C_CR1_ACK;
 				}
-				if (readBytesLeft == 2)
+				if (reading.length == 2)
 				{
 					DEBUG_STREAM("POS");
 					I2C{{ id }}->CR1 |= I2C_CR1_POS;
 				}
-				DEBUG_STREAM("read op: reading=" << readBytesLeft);
+				DEBUG_STREAM("read op: reading=" << reading.length);
 				break;
 
 			case xpcc::I2c::Operation::Write:
-				address = (s.address & 0xfe) | xpcc::I2c::Write;
-				initializeWrite(delegate->writing());
-				DEBUG_STREAM("write op: writing=" << writeBytesLeft);
+				writing.length = 0;
+				writing.next = xpcc::I2c::OperationAfterWrite::Stop;
+				delegate->writing(writing);
+				nextOperation = static_cast<xpcc::I2c::Operation>(writing.next);
+
+				DEBUG_STREAM("write op: writing=" << writing.length);
 				break;
 
 			case xpcc::I2c::Operation::Restart:
-				address = (s.address & 0xfe) | xpcc::I2c::Write;
-				initializeRestartAfterAddress();
+				writing.length = 0;
+				reading.length = 0;
+				nextOperation = xpcc::I2c::Operation::Stop;
+
 				DEBUG_STREAM("restart op");
 				break;
 
 			default:
 			case xpcc::I2c::Operation::Stop:
-				address = (s.address & 0xfe) | xpcc::I2c::Write;
-				initializeStopAfterAddress();
+				writing.length = 0;
+				reading.length = 0;
+				nextOperation = xpcc::I2c::Operation::Restart;
+
 				DEBUG_STREAM("stop op");
 				break;
 		}
 
-		I2C{{ id }}->DR = address;
+		I2C{{ id }}->DR = addressMode | (starting.address & 0xfe);
 	}
 
 
@@ -312,26 +291,27 @@ I2C{{ id }}_EV_IRQHandler(void)
 	{
 		// EV6: ADDR=1, cleared by reading SR1 register followed by reading SR2.
 		DEBUG_STREAM("address sent");
-		DEBUG_STREAM("writeBytesLeft=" << writeBytesLeft);
-		DEBUG_STREAM("readBytesLeft=" << readBytesLeft);
+		DEBUG_STREAM("writing.length=" << writing.length);
+		DEBUG_STREAM("reading.length=" << reading.length);
 
-		if (writeBytesLeft > 0 || readBytesLeft > 3)
+		if (writing.length > 0 || reading.length > 3)
 		{
 			DEBUG_STREAM("enable buffers");
 			I2C{{ id }}->CR2 |= I2C_CR2_ITBUFEN;
 		}
-		if (!readBytesLeft && !writeBytesLeft)
+		if (!reading.length && !writing.length)
 		{
 			checkNextOperation = CHECK_NEXT_OPERATION_YES;
 		}
 
 
 		DEBUG_STREAM("clearing ADDR");
-		uint16_t sr2 = I2C{{ id }}->SR2;
-		(void) sr2;
+		(void) I2C{{ id }}->SR2;
+//		uint16_t sr2 = I2C{{ id }}->SR2;
+//		(void) sr2;
 
 
-		if (readBytesLeft == 1)
+		if (reading.length == 1)
 		{
 			DEBUG_STREAM("STOP");
 			I2C{{ id }}->CR1 |= I2C_CR1_STOP;
@@ -343,8 +323,8 @@ I2C{{ id }}_EV_IRQHandler(void)
 #endif
 
 			uint16_t dr = I2C{{ id }}->DR;
-			*readPointer++ = dr & 0xff;
-			readBytesLeft = 0;
+			*reading.buffer++ = dr & 0xff;
+			reading.length = 0;
 			checkNextOperation = CHECK_NEXT_OPERATION_YES_NO_STOP_BIT;
 		}
 	}
@@ -355,18 +335,18 @@ I2C{{ id }}_EV_IRQHandler(void)
 	{
 		// EV8_1: TxE=1, shift register empty, data register empty, write Data1 in DR
 		// EV8: TxE=1, shift register not empty, data register empty, cleared by writing DR
-		if (writeBytesLeft > 0)
+		if (writing.length > 0)
 		{
 			DEBUG_STREAM("tx more bytes");
-			I2C{{ id }}->DR = *writePointer++; // write data
-			writeBytesLeft--;
+			I2C{{ id }}->DR = *writing.buffer++; // write data
+			--writing.length;
 
-			DEBUG_STREAM("TXE: writeBytesLeft=" << writeBytesLeft);
+			DEBUG_STREAM("TXE: writing.length=" << writing.length);
 
 			checkNextOperation = CHECK_NEXT_OPERATION_NO_WAIT_FOR_BTF;
 		}
 		// no else!
-		if (writeBytesLeft == 0)
+		if (writing.length == 0)
 		{
 			// disable TxE, and wait for EV8_2
 			DEBUG_STREAM("last byte transmitted, wait for btf");
@@ -378,17 +358,17 @@ I2C{{ id }}_EV_IRQHandler(void)
 
 	else if (sr1 & I2C_SR1_RXNE)
 	{
-		if (readBytesLeft > 3)
+		if (reading.length > 3)
 		{
 			// EV7: RxNE=1, cleared by reading DR register
 			uint16_t dr = I2C{{ id }}->DR;
-			*readPointer++ = dr & 0xff;
-			readBytesLeft--;
+			*reading.buffer++ = dr & 0xff;
+			--reading.length;
 
-			DEBUG_STREAM("RXNE: readBytesLeft=" << readBytesLeft);
+			DEBUG_STREAM("RXNE: reading.length=" << reading.length);
 		}
 
-		if (readBytesLeft <= 3)
+		if (reading.length <= 3)
 		{
 			// disable RxNE, and wait for BTF
 			DEBUG_STREAM("fourth last byte received, wait for btf");
@@ -403,7 +383,7 @@ I2C{{ id }}_EV_IRQHandler(void)
 		// EV8_2
 		DEBUG_STREAM("BTF");
 
-		if (readBytesLeft == 2)
+		if (reading.length == 2)
 		{
 			// EV7_1: RxNE=1, cleared by reading DR register, programming STOP=1
 			DEBUG_STREAM("STOP");
@@ -411,7 +391,7 @@ I2C{{ id }}_EV_IRQHandler(void)
 
 			DEBUG_STREAM("reading data1");
 			uint16_t dr = I2C{{ id }}->DR;
-			*readPointer++ = dr & 0xff;
+			*reading.buffer++ = dr & 0xff;
 
 #if WAIT_FOR_STOP_LOW
 			DEBUG_STREAM("waiting for stop");
@@ -421,27 +401,27 @@ I2C{{ id }}_EV_IRQHandler(void)
 
 			DEBUG_STREAM("reading data2");
 			dr = I2C{{ id }}->DR;
-			*readPointer++ = dr & 0xff;
+			*reading.buffer++ = dr & 0xff;
 
-			readBytesLeft = 0;
+			reading.length = 0;
 			checkNextOperation = CHECK_NEXT_OPERATION_YES_NO_STOP_BIT;
 		}
 
-		if (readBytesLeft == 3)
+		if (reading.length == 3)
 		{
 			// EV7_1: RxNE=1, cleared by reading DR register, programming ACK=0
 			I2C{{ id }}->CR1 &= ~I2C_CR1_ACK;
 			DEBUG_STREAM("NACK");
 
 			uint16_t dr = I2C{{ id }}->DR;
-			*readPointer++ = dr & 0xff;
-			readBytesLeft--;
+			*reading.buffer++ = dr & 0xff;
+			reading.length--;
 
-			DEBUG_STREAM("BTF: readBytesLeft=2");
+			DEBUG_STREAM("BTF: reading.length=2");
 		}
 
 		if (checkNextOperation == CHECK_NEXT_OPERATION_NO_WAIT_FOR_BTF
-			&& writeBytesLeft == 0)
+			&& writing.length == 0)
 		{
 			// EV8_2: TxE=1, BTF = 1, Program Stop request.
 			// TxE and BTF are cleared by hardware by the Stop condition
@@ -459,7 +439,10 @@ I2C{{ id }}_EV_IRQHandler(void)
 			case xpcc::I2c::Operation::Write:
 				if (checkNextOperation != CHECK_NEXT_OPERATION_YES_NO_STOP_BIT)
 				{
-					initializeWrite(delegate->writing());
+					writing.length = 0;
+					writing.next = xpcc::I2c::OperationAfterWrite::Stop;
+					delegate->writing(writing);
+					nextOperation = static_cast<xpcc::I2c::Operation>(writing.next);
 					// reenable TXE
 					I2C{{ id }}->CR2 |= I2C_CR2_ITBUFEN;
 					DEBUG_STREAM("write op");
@@ -480,7 +463,7 @@ I2C{{ id }}_EV_IRQHandler(void)
 
 				DEBUG_STREAM("disable interrupts");
 				I2C{{ id }}->CR2 &= ~(I2C_CR2_ITEVTEN | I2C_CR2_ITBUFEN | I2C_CR2_ITERREN);
-				if (delegate) delegate->stopped(xpcc::I2c::DetachCause::NormalStop);
+				if (delegate) delegate->detaching(xpcc::I2c::DetachCause::NormalStop);
 				delegate = 0;
 				DEBUG_STREAM("write finished");
 				break;
@@ -522,7 +505,7 @@ I2C{{ id }}_ER_IRQHandler(void)
 
 	if (delegate)
 	{
-		delegate->stopped(xpcc::I2c::DetachCause::ErrorCondition);
+		delegate->detaching(xpcc::I2c::DetachCause::ErrorCondition);
 		delegate = 0;
 	}
 
@@ -532,8 +515,8 @@ I2C{{ id }}_ER_IRQHandler(void)
 	I2C{{ id }}->CR1 &= ~I2C_CR1_POS;
 	I2C{{ id }}->SR1 = 0;
 	I2C{{ id }}->SR2 = 0;
-	writeBytesLeft = 0;
-	readBytesLeft = 0;
+	writing.length = 0;
+	reading.length = 0;
 	checkNextOperation = CHECK_NEXT_OPERATION_NO;
 
 	DEBUG_STREAM("disable interrupts");
@@ -566,20 +549,20 @@ xpcc::stm32::I2cMaster{{ id }}::initializeWithPrescaler(uint8_t peripheralFreque
 void
 xpcc::stm32::I2cMaster{{ id }}::reset(DetachCause cause)
 {
-	readBytesLeft = 0;
-	writeBytesLeft = 0;
-	if (delegate) delegate->stopped(cause);
+	reading.length = 0;
+	writing.length = 0;
+	if (delegate) delegate->detaching(cause);
 	delegate = 0;
 }
 
 // MARK: - ownership
 bool
-xpcc::stm32::I2cMaster{{ id }}::start(xpcc::I2cDelegate *delegate)
+xpcc::stm32::I2cMaster{{ id }}::start(xpcc::I2cTransaction *transaction)
 {
-	if (!::delegate && delegate && delegate->attaching())
+	if (!::delegate && transaction && transaction->attaching())
 	{
 		DEBUG_STREAM("\n###\n");
-		::delegate = delegate;
+		::delegate = transaction;
 		callStarting();
 
 		return true;
@@ -588,12 +571,12 @@ xpcc::stm32::I2cMaster{{ id }}::start(xpcc::I2cDelegate *delegate)
 }
 
 bool
-xpcc::stm32::I2cMaster{{ id }}::startBlocking(xpcc::I2cDelegate *delegate)
+xpcc::stm32::I2cMaster{{ id }}::startBlocking(xpcc::I2cTransaction *transaction)
 {
-	if (!::delegate && delegate && delegate->attaching())
+	if (!::delegate && transaction && transaction->attaching())
 	{
 		DEBUG_STREAM("\n###\n");
-		::delegate = delegate;
+		::delegate = transaction;
 		callStarting();
 
 		// memory barrier, yes you really need it

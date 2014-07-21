@@ -43,7 +43,7 @@ public:
 	 * @param	rate
 	 *		`Standard` or `Fast`, `High` datarate is not supported
 	 */
-	template<class clockSource, uint32_t rate=DataRate::Standard,
+	template<class clockSource, uint32_t rate=Baudrate::Standard,
 			uint16_t tolerance = xpcc::Tolerance::FivePercent >
 	static ALWAYS_INLINE void
 	initialize()
@@ -67,10 +67,10 @@ public:
 
 	// start documentation inherited
 	static bool
-	start(xpcc::I2cDelegate *delegate);
+	start(xpcc::I2cTransaction *transaction);
 
 	static bool
-	startBlocking(xpcc::I2cDelegate *delegate);
+	startBlocking(xpcc::I2cTransaction *transaction);
 
 	static Error
 	getErrorState();
