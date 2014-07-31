@@ -28,6 +28,7 @@
  */
 namespace xpcc {
 namespace motion {
+
 template < typename TIMER, typename GPIO_A, typename GPIO_B >
 class EncoderStm32
 {
