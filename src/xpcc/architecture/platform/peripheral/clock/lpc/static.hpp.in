@@ -80,7 +80,8 @@ namespace xpcc
 							 'minFrequency': "MHz1",
 							 'maxFrequency': "MHz48",
 							 'sources': [ internalClock, externallClock,
-										  externalCrystal, pll ] }
+										  externalCrystal, pll ],
+							 'sinks': ["Can"] }
 %% set clockOut =			{'name': "ClockOut",
 							 'divisions': range(1,255),
 							 'sources': [externallClock,

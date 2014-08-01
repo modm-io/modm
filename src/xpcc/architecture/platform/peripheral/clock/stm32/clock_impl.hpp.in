@@ -104,7 +104,7 @@ xpcc::stm32::ClockTree::enablePll(PllSource source, UsbPrescaler usb,
 	uint32_t tmp = 0;
 
 	// Read reserved values and clear all other values
-	tmp = RCC->CFGR & ~(RCC_CFGR_USBPRE | RCC_CFGR_PLLMULL | RCC_CFGR_PLLSRC);
+	tmp = RCC->CFGR & ~(RCC_CFGR_USBPRE | RCC_CFGR_PLLMUL | RCC_CFGR_PLLSRC);
 
 	// PLLSRC source for pll
 	tmp |= static_cast<uint32_t>(source);
@@ -113,13 +113,13 @@ xpcc::stm32::ClockTree::enablePll(PllSource source, UsbPrescaler usb,
 	tmp |= static_cast<uint32_t>(usb);
 
 	// Pll multiplication factor
-	tmp |= (static_cast<uint32_t>(pllMul - 2) << 18) & RCC_CFGR_PLLMULL;
+	tmp |= (static_cast<uint32_t>(pllMul - 2) << 18) & RCC_CFGR_PLLMUL;
 
 	RCC->CFGR = tmp;
 
 	// HSE PREDIV division factor
-	RCC->CFGR2 = (RCC->CFGR2 & ~(RCC_CFGR2_PREDIV1)) |
-					(static_cast<uint32_t>(pllPrediv - 1) & RCC_CFGR2_PREDIV1);
+	RCC->CFGR2 = (RCC->CFGR2 & ~(RCC_CFGR2_PREDIV)) |
+					(static_cast<uint32_t>(pllPrediv - 1) & RCC_CFGR2_PREDIV);
 
 	// enable pll
 	RCC->CR |= RCC_CR_PLLON;

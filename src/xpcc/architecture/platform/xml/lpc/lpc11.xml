@@ -10,7 +10,7 @@
 		<!-- Core -->
 		<core>cortex-m0</core>
 		<!-- Number of pins -->
-		<pin-count device-name="c24">64</pin-count>
+		<pin-count device-name="c24">48</pin-count>
 		<!-- Headers to be included with the {{ include_device_headers }} substitution-->
 		<header>lpc11xx/cmsis/LPC11xx.h</header>
 		<header>lpc11xx/cmsis/core_cm0.h</header>
@@ -18,8 +18,8 @@
 		<!-- Cpp Defines -->
 		<define>CORTEX_VECTORS_RAM = 0</define>
 		<!-- set to a value > 0 to enable software buffering of CAN messages -->
-		<define>LPC11C_CAN_TX_BUFFER_SIZE = 0</define>
-		<define>LPC11C_CAN_RX_BUFFER_SIZE = 0</define>
+		<define>LPC11C_CAN_TX_BUFFER_SIZE = 16</define>
+		<define>LPC11C_CAN_RX_BUFFER_SIZE = 16</define>
 		<!-- The UART is already hardware buffered with a 16 bytes FIFO. -->
 		<!-- If you need a longer queue interrupts are used -->
 		<define>LPC11_UART1_TX_BUFFER_SIZE = 16</define>
@@ -31,19 +31,46 @@
 		<!-- Peripheral Drivers -->
 		<driver type="clock" name="lpc" />
 		<driver type="timer" instances="16_0" name="lpc" />
-		<driver type="uart" name="lpc" />
+		<driver type="uart" name="lpc" instances="1"/>
+		<driver type="can"  name="lpc" instances="1"/>
 		<driver type="gpio" name="lpc">
 			<!--<gpio port="0" id="0" func="Reset,Gpio" bits="mode,hys,od"/>-->
-			<gpio port="0" id="1" func="Gpio,ClockOut,Timer32_0" bits="mode,hys,od"/>
-			<gpio port="0" id="2" func="Gpio,Spi0,Timer16_0" bits="mode,hys,od"/>
-			<gpio port="0" id="3" func="Gpio" bits="mode,hys,od"/>
-			<gpio port="0" id="4" func="Gpio," bits="mode,hys,od"/>
-			<gpio port="0" id="5" func="Gpio,Uart" bits="mode,hys,od"/>
-			<gpio port="0" id="6" func="Gpio,Uart" bits="mode,hys,od"/>
-			<gpio port="0" id="7" func="Gpio,Uart" bits="mode,hys,od"/>
-			<gpio port="0" id="8" func="Gpio,Uart" bits="mode,hys,od"/>
-			<gpio port="0" id="9" func="Gpio,Uart" bits="mode,hys,od"/>
-			<gpio port="3" id="1" />
+			<gpio port="0" id="1"  func="Gpio,ClockOut,Timer32_0" bits="mode,hys,od"/>
+			<gpio port="0" id="2"  func="Gpio,Spi0,Timer16_0"     bits="mode,hys,od"/>
+			<gpio port="0" id="3"  func="Gpio"                    bits="mode,hys,od"/>
+			<gpio port="0" id="4"  func="Gpio,I2c"                bits="i2c_mode"/>
+			<gpio port="0" id="5"  func="Gpio,I2c"                bits="i2c_mode"/>
+			<gpio port="0" id="6"  func="Gpio,Reserved,Spi0"      bits="mode,hys,od"/>
+			<gpio port="0" id="7"  func="Gpio,Uart"               bits="mode,hys,od"/> <!-- What peripheral does CTS (=FUNC 0x1) belong to? -->
+			<gpio port="0" id="8"  func="Gpio,Spi0,Timer16_0"     bits="mode,hys,od"/>
+			<gpio port="0" id="9"  func="Gpio,Spi0,Timer16_0"     bits="mode,hys,od"/>
+			<gpio port="0" id="10" func="Swd,Gpio,Spi0,Timer16_0" bits="mode,hys,od" define="SWCLK_PIO0_10" />
+			<gpio port="0" id="11" func="Reserved,Gpio,Adc,Timer32_0" bits="mode,hys,admode,od"/>
+			<gpio port="1" id="0"  func="Reserved,Gpio,Adc,Timer32_1" bits="mode,hys,admode,od"/>
+			<gpio port="1" id="1"  func="Reserved,Gpio,Adc,Timer32_1" bits="mode,hys,admode,od"/>
+			<gpio port="1" id="2"  func="Reserved,Gpio,Adc,Timer32_1" bits="mode,hys,admode,od"/>
+			<gpio port="1" id="3"  func="Swd,Gpio,Adc,Timer32_1"      bits="mode,hys,admode,od" define="SWDIO_PIO1_3" />
+			<gpio port="1" id="4"  func="Gpio,Adc,Timer32_1"          bits="mode,hys,admode,od"/>
+			<gpio port="1" id="5"  func="Gpio,Uart,Timer32_0"         bits="mode,hys,od"/>
+			<gpio port="1" id="6"  func="Gpio,Uart,Timer32_0"         bits="mode,hys,od"/>
+			<gpio port="1" id="7"  func="Gpio,Uart,Timer32_0"         bits="mode,hys,od"/>
+			<gpio port="1" id="8"  func="Gpio,Timer16_1"              bits="mode,hys,od"/>
+			<gpio port="1" id="9"  func="Gpio,Timer16_1"              bits="mode,hys,od"/>
+			<gpio port="1" id="10" func="Gpio,Adc,Timer16_1"          bits="mode,hys,admode,od"/>
+			<gpio port="1" id="11" func="Gpio,Adc"                    bits="mode,hys,admode,od"/>
+			<gpio port="2" id="0"  func="Gpio,Uart,Spi1" bits="mode,hys,od"/>
+			<gpio port="2" id="1"  func="Gpio,Uart,Spi1" bits="mode,hys,od"/>
+			<gpio port="2" id="2"  func="Gpio,Uart,Spi1" bits="mode,hys,od"/>
+			<gpio port="2" id="3"  func="Gpio,Uart,Spi1" bits="mode,hys,od"/>
+			<gpio port="2" id="4"  func="Gpio"           bits="mode,hys,od"/>
+			<gpio port="2" id="5"  func="Gpio"           bits="mode,hys,od"/>
+			<gpio port="2" id="6"  func="Gpio"           bits="mode,hys,od"/>
+			<gpio port="2" id="7"  func="Gpio"           bits="mode,hys,od"/>
+			<gpio port="2" id="8"  func="Gpio"           bits="mode,hys,od"/>
+			<gpio port="2" id="9"  func="Gpio"           bits="mode,hys,od"/>
+			<gpio port="2" id="10" func="Gpio"           bits="mode,hys,od"/>
+
+			<gpio port="3" id="1" func="Gpio"           bits="mode,hys,od"/>
 		</driver>
 	</device>
 </rca>

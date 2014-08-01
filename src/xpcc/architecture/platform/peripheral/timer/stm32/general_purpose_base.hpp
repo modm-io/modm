@@ -67,6 +67,12 @@ public:
 	enum class SlaveMode : uint32_t
 	{
 		Disabled = 0,
+		/// Counter counts up/down on TI2FP2 edge depending on TI1FP1 level.
+		Encoder1	= TIM_SMCR_SMS_0,
+		/// Counter counts up/down on TI1FP1 edge depending on TI2FP2 level.
+		Encoder2	= TIM_SMCR_SMS_1,
+		/// Counter counts up/down on both TI1FP1 and TI2FP2 edges depending on the level of the other input.
+		Encoder3	= TIM_SMCR_SMS_1 | TIM_SMCR_SMS_0,
 	};
 
 	enum class Mode : uint32_t

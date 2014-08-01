@@ -101,7 +101,7 @@ xpcc::lpc::ClockTree::enablePll(PllSource source, uint8_t pllM, uint8_t pllP)
 	LPC_SYSCON->SYSPLLCLKUEN = 0x00;
 	LPC_SYSCON->SYSPLLCLKUEN = 0x01;
 	while (!(LPC_SYSCON->SYSPLLCLKUEN & 0x01));		// wait until updated
-	LPC_SYSCON->SYSPLLCTRL = (0x1f & pllM) | (0x60 & pllP);
+	LPC_SYSCON->SYSPLLCTRL = (0x1f & (pllM-1)) | (0x60 & pllP);
 	LPC_SYSCON->PDRUNCFG &= ~PDRUNCFG_SYSPLL_PD;	// power up pll
 	while (!(LPC_SYSCON->SYSPLLSTAT & SYSPLLSTAT_LOCK));// wait for pll to be locked
 }

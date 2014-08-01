@@ -11,11 +11,6 @@
 
 #include "../../../device.hpp"
 
-%% if target is stm32f3
-// Define missing from the CMSIS lib
-#define  RCC_AHBRSTR_GPIOERST ((uint32_t)(1<<21))
-%% endif
-
 static void
 xpcc_gpio_enable(void)
 {

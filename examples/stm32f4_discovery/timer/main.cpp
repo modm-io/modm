@@ -1,22 +1,35 @@
 #include <xpcc/architecture/platform.hpp>
 #include <xpcc/processing.hpp>
 #include "../stm32f4_discovery.hpp"
+#include "leds.hpp"
+
+// create the leds
+OrangeLed orange;
+RedLed red;
+GreenLed green;
+BlueLed blue;
+
+// apply some animations to the leds
+xpcc::ui::Pulse<uint8_t> pulse(red.brightnessAnimation);
+xpcc::ui::Indicator<uint8_t> indicator(blue.brightnessAnimation);
+xpcc::ui::Strobe<uint8_t> strobe(green.brightnessAnimation);
 
 // ----------------------------------------------------------------------------
 MAIN_FUNCTION
 {
 	defaultSystemClock::enable();
 
-	LedOrange::connect(Timer4::Channel2);
+	// connect the Timer Channels to the LEDs
 	LedGreen::connect(Timer4::Channel1);
+	LedOrange::connect(Timer4::Channel2);
 	LedRed::connect(Timer4::Channel3);
 	LedBlue::connect(Timer4::Channel4);
 
 	Timer4::enable();
 	Timer4::setMode(Timer4::Mode::UpCounter);
 
-	// 42 MHz / 2 / 2^16 ~ 320 Hz
-	Timer4::setPrescaler(2);
+	// 42 MHz / 1 / 2^16 ~ 640 Hz refresh rate
+	Timer4::setPrescaler(1);
 	Timer4::setOverflow(65535);
 
 	Timer4::configureOutputChannel(1, Timer2::OutputCompareMode::Pwm, 32768);
@@ -31,34 +44,24 @@ MAIN_FUNCTION
 	// this is needed for the xpcc::PeriodicTimer to function
 	xpcc::cortex::SysTickTimer::enable();
 
-	uint16_t pwm[4] = { 0, 64, 128, 192 };
-	bool up[4] = { true, true, true, true };
-	xpcc::PeriodicTimer<> timer(5);
+	// set these animations to expire after x loops
+	pulse.start();
+	indicator.start();
+	strobe.start();
+	// fade this led for 15s
+	orange.fadeTo(32000, 255);
+
 	while (1)
 	{
-		if (timer.isExpired())
-		{
-			// Let the LEDs fade up and down
-			for (std::size_t i = 0; i < 4; ++i) {
-				if (up[i]) {
-					pwm[i] += 1;
-					if (pwm[i] >= 255) {
-						up[i] = false;
-					}
-				}
-				else {
-					pwm[i] -= 1;
-					if (pwm[i] <= 0) {
-						up[i] = true;
-					}
-				}
-			}
-			
-			Timer4::setCompareValue(1, pwm[0] * pwm[0]);
-			Timer4::setCompareValue(2, pwm[1] * pwm[1]);
-			Timer4::setCompareValue(3, pwm[2] * pwm[2]);
-			Timer4::setCompareValue(4, pwm[3] * pwm[3]);
-		}
+		// update all
+		pulse.update();
+		indicator.update();
+		strobe.update();
+
+		blue.update();
+		red.update();
+		orange.update();
+		green.update();
 	}
 
 	return 0;

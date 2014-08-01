@@ -37,9 +37,11 @@ xpcc::lpc::UartBase::setBaudrate(uint32_t baudrate)
 {
 	LPC_UART->LCR = LCR_DLAB;             /* DLAB = 1 */
 	uint32_t regVal = LPC_SYSCON->UARTCLKDIV;
-	uint32_t   Fdiv = (((SystemCoreClock * LPC_SYSCON->SYSAHBCLKDIV)/regVal)/16)/baudrate ;	/*baud rate */
+	uint32_t   Fdiv = (((F_CPU * LPC_SYSCON->SYSAHBCLKDIV)/regVal)/16)/baudrate ; //390;
 	LPC_UART->DLM = Fdiv >>    8;
 	LPC_UART->DLL = Fdiv  & 0xff;
+	//LPC_UART->DLM = 0;
+	//LPC_UART->DLL = 26;
 
 	LPC_UART->LCR = LCR_WLS_8_BIT;		/* 8 bits, no Parity, 1 Stop bit, DLAB = 0 */
 }

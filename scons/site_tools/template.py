@@ -36,7 +36,7 @@ import traceback
 
 generationBlockString = """/*
  * WARNING: This file is generated automatically, do not edit!
- * Please modify the corresponding *.in file instead and rebuild this file. 
+ * Please modify the corresponding *.in file instead and rebuild this file.
  */
 // ----------------------------------------------------------------------------"""
 
