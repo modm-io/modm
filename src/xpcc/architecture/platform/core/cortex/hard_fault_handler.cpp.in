@@ -30,7 +30,7 @@
 
 #include <stdint.h>
 
-#include <xpcc/architecture.hpp>
+#include "../../device.hpp"
 #include <xpcc/debug/logger.hpp>
 #include <xpcc_config.hpp>
 
