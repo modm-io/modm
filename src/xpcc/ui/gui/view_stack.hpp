@@ -37,7 +37,6 @@
 #include "../menu/menu_buttons.hpp"
 #include "abstract_view.hpp"
 #include "types.hpp"
-#include "colorpalette.hpp"
 
 namespace xpcc
 {
