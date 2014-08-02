@@ -8,7 +8,7 @@
 #include "gui/types.hpp"
 #include "gui/colorpalette.hpp"
 #include "gui/view_stack.hpp"
-#include "gui/abstract_view.hpp"
+#include "gui/view.hpp"
 #include "gui/widgets.hpp"
 
 

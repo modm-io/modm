@@ -35,7 +35,7 @@
 #include "../../container/stack.hpp"
 #include "../../container/linked_list.hpp"
 #include "../menu/menu_buttons.hpp"
-#include "abstract_view.hpp"
+#include "view.hpp"
 #include "types.hpp"
 
 namespace xpcc

@@ -5,7 +5,7 @@
 #include <xpcc/ui/gui/colorpalette.hpp>
 #include <xpcc/ui/gui/types.hpp>
 
-#include "../abstract_view.hpp"
+#include "../view.hpp"
 
 #include <xpcc/debug/logger.hpp>
 
