@@ -44,7 +44,7 @@ namespace xpcc
 namespace gui
 {
 	// forward declaration
-	class ViewStack;
+	class GuiViewStack;
 	
 	/**
 	 * @brief The View class is the base class for all screens
@@ -56,7 +56,7 @@ namespace gui
 
 	class View
 	{
-		friend class ViewStack;
+		friend class GuiViewStack;
 		
 	public:
 		/**
@@ -64,13 +64,13 @@ namespace gui
 		 * @param identifier can be used to determine which screen is the currently
 		 *        displayed on the graphicDisplay
 		 */
-		View(xpcc::gui::ViewStack* stack, uint8_t identifier, xpcc::gui::Dimension dimension);
+		View(xpcc::gui::GuiViewStack* stack, uint8_t identifier, xpcc::gui::Dimension dimension);
 		
 		virtual ~View() = 0;
 
 		/**
 		 * @brief May be called as often as possible. Handles input events
-		 *        located in the parent ViewStack
+		 *        located in the parent GuiViewStack
 		 */
 		virtual void
 		update();
@@ -112,7 +112,7 @@ namespace gui
 		shortButtonPress(xpcc::MenuButtons::Button button);
 
 		/**
-		 * @brief isAlive tells the ViewStack if it should remove this screen.
+		 * @brief isAlive tells the GuiViewStack if it should remove this screen.
 		 * @return
 		 */
 		bool
@@ -152,7 +152,7 @@ namespace gui
 		xpcc::GraphicDisplay&
 		display();
 		
-		inline xpcc::gui::ViewStack*
+		inline xpcc::gui::GuiViewStack*
 		getViewStack()
 		{
 			return stack;
@@ -169,7 +169,7 @@ namespace gui
 
 
 	protected:
-		xpcc::gui::ViewStack* stack;
+		xpcc::gui::GuiViewStack* stack;
 		const uint8_t identifier;
 		bool alive;
 		Dimension dimension;

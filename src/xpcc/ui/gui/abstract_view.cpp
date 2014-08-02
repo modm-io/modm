@@ -33,7 +33,7 @@
 #include "types.hpp"
 
 // ----------------------------------------------------------------------------
-xpcc::gui::View::View(xpcc::gui::ViewStack* stack, uint8_t identifier, xpcc::gui::Dimension dimension) :
+xpcc::gui::View::View(xpcc::gui::GuiViewStack* stack, uint8_t identifier, xpcc::gui::Dimension dimension) :
 	stack(stack),
 	identifier(identifier),
 	alive(true),

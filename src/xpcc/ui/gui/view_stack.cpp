@@ -31,19 +31,19 @@
 #include "view_stack.hpp"
 
 // ----------------------------------------------------------------------------
-xpcc::gui::ViewStack::ViewStack(xpcc::GraphicDisplay* display, xpcc::gui::inputQueue* queue) :
+xpcc::gui::GuiViewStack::GuiViewStack(xpcc::GraphicDisplay* display, xpcc::gui::inputQueue* queue) :
 	display(display), input_queue(queue)
 {
 }
 
 // ----------------------------------------------------------------------------
-xpcc::gui::ViewStack::~ViewStack()
+xpcc::gui::GuiViewStack::~GuiViewStack()
 {
 }
 
 // ----------------------------------------------------------------------------
 void
-xpcc::gui::ViewStack::pop()
+xpcc::gui::GuiViewStack::pop()
 {
 	xpcc::gui::View *topElement = this->stack.get();
 	this->stack.pop();
@@ -53,7 +53,7 @@ xpcc::gui::ViewStack::pop()
 
 // ----------------------------------------------------------------------------
 void
-xpcc::gui::ViewStack::update()
+xpcc::gui::GuiViewStack::update()
 {
 	xpcc::gui::View* top = this->get();
 
@@ -87,7 +87,7 @@ xpcc::gui::ViewStack::update()
 
 // ----------------------------------------------------------------------------
 void
-xpcc::gui::ViewStack::shortButtonPress(xpcc::MenuButtons::Button button)
+xpcc::gui::GuiViewStack::shortButtonPress(xpcc::MenuButtons::Button button)
 {
 	xpcc::gui::View* top = this->get();
 	top->shortButtonPress(button);

@@ -53,12 +53,12 @@ namespace gui
 	* \author	Thorsten Lajewski
 	*/
 
-	class ViewStack
+	class GuiViewStack
 	{
 	public:
-		ViewStack(xpcc::GraphicDisplay* display, xpcc::gui::inputQueue* queue);
+		GuiViewStack(xpcc::GraphicDisplay* display, xpcc::gui::inputQueue* queue);
 		
-		virtual ~ViewStack();
+		virtual ~GuiViewStack();
 		
 		/**
 		 * @brief get the top view from the stack
@@ -98,7 +98,7 @@ namespace gui
 		}
 		
 		/**
-		 * @brief get event input queue from ViewStack
+		 * @brief get event input queue from GuiViewStack
 		 */
 		inline xpcc::gui::inputQueue*
 		getInputQueue()
