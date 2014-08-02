@@ -33,7 +33,6 @@
 
 #include "../display/graphic_display.hpp"
 
-
 #include "types.hpp"
 #include "widgets/widget.hpp"
 #include "colorpalette.hpp"
@@ -48,14 +47,14 @@ namespace gui
 	class ViewStack;
 	
 	/**
-	 * @brief The AbstractView class is the base class for all screens
+	 * @brief The View class is the base class for all screens
 	 *        handled by the ViewStack class
 	 *
 	 *\author Thorsten Lajewski
 	 *\ingroup display_menu
 	 */
 
-	class AbstractView
+	class View
 	{
 		friend class ViewStack;
 		
@@ -65,9 +64,9 @@ namespace gui
 		 * @param identifier can be used to determine which screen is the currently
 		 *        displayed on the graphicDisplay
 		 */
-		AbstractView(xpcc::gui::ViewStack* stack, uint8_t identifier, xpcc::gui::Dimension dimension);
+		View(xpcc::gui::ViewStack* stack, uint8_t identifier, xpcc::gui::Dimension dimension);
 		
-		virtual ~AbstractView() = 0;
+		virtual ~View() = 0;
 
 		/**
 		 * @brief May be called as often as possible. Handles input events

@@ -19,7 +19,7 @@ public:
 	}
 
 	void
-	render(AbstractView* view);
+	render(View* view);
 
 	void
 	setColor(xpcc::glcd::Color color)

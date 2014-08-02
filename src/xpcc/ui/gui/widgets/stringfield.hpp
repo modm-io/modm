@@ -19,7 +19,7 @@ public:
 	}
 
 	void
-	render(AbstractView* view);
+	render(View* view);
 
 	void
 	setValue(const char* value)

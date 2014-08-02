@@ -16,7 +16,7 @@ namespace gui {
 
 static int16_t uid_global = 0;
 
-class AbstractView;
+class View;
 
 class Widget {
 
@@ -47,14 +47,14 @@ public:
 	 * Draws the widget on screen. Each widget need to implement this.
 	 */
 	virtual void
-	render(AbstractView* view) = 0;
+	render(View* view) = 0;
 
 	/**
 	 * Interface for drawing widgets. Basically calls render(), but has some
 	 * logic that needs to be executed before and after rendering a widget
 	 */
 	void
-	draw(AbstractView *view)
+	draw(View *view)
 	{
 
 		// render widget on screen
@@ -366,7 +366,7 @@ public:
 	pack(Widget* w, const xpcc::glcd::Point &coord);
 
 	void
-	render(AbstractView* view);
+	render(View* view);
 
 	bool
 	handleInputEvent(const InputEvent* ev);

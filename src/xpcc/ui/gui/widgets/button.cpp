@@ -1,6 +1,6 @@
 #include "button.hpp"
 
-void xpcc::gui::ButtonWidget::render(AbstractView* view)
+void xpcc::gui::ButtonWidget::render(View* view)
 {
 
 	if(view == NULL)
@@ -55,7 +55,7 @@ void xpcc::gui::ButtonWidget::render(AbstractView* view)
 
 }
 
-void xpcc::gui::ArrowButton::render(AbstractView* view)
+void xpcc::gui::ArrowButton::render(View* view)
 {
 	if(view == NULL)
 		return;
@@ -108,7 +108,7 @@ void xpcc::gui::ArrowButton::render(AbstractView* view)
 
 }
 
-void xpcc::gui::FilledAreaButton::render(AbstractView* view)
+void xpcc::gui::FilledAreaButton::render(View* view)
 {
 	if(view == NULL)
 		return;

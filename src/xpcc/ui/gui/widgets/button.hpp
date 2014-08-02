@@ -19,7 +19,7 @@ public:
 	}
 
 	void
-	render(AbstractView* view);
+	render(View* view);
 
 	void
 	setLabel(char* lbl)
@@ -42,7 +42,7 @@ public:
 	}
 
 	void
-	render(AbstractView* view);
+	render(View* view);
 
 private:
 	// Orientation of the arrow. false: left | true: right
@@ -68,7 +68,7 @@ public:
 	}
 
 	void
-	render(AbstractView* view);
+	render(View* view);
 
 private:
 	xpcc::glcd::Color color;

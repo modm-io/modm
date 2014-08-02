@@ -65,7 +65,7 @@ namespace gui
 		 * @return pointer to view from stack
 		 */
 
-		inline xpcc::gui::AbstractView*
+		inline xpcc::gui::View*
 		get()
 		{
 			return this->stack.get();
@@ -79,11 +79,11 @@ namespace gui
 		 * @param view next displayed view
 		 */
 		inline void
-		push(xpcc::gui::AbstractView* view)
+		push(xpcc::gui::View* view)
 		{
 			this->stack.push(view);
 			this->getDisplay().clear();
-			xpcc::gui::AbstractView* top = this->get();
+			xpcc::gui::View* top = this->get();
 			top->draw();
 			this->display->update();
 		}
@@ -127,7 +127,7 @@ namespace gui
 
 	private:
 		xpcc::GraphicDisplay* display;
-		xpcc::Stack< xpcc::gui::AbstractView* , xpcc::LinkedList< xpcc::gui::AbstractView* > > stack;
+		xpcc::Stack< xpcc::gui::View* , xpcc::LinkedList< xpcc::gui::View* > > stack;
 		xpcc::gui::inputQueue *input_queue;
 	};
 }

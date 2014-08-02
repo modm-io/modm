@@ -33,7 +33,7 @@
 #include "types.hpp"
 
 // ----------------------------------------------------------------------------
-xpcc::gui::AbstractView::AbstractView(xpcc::gui::ViewStack* stack, uint8_t identifier, xpcc::gui::Dimension dimension) :
+xpcc::gui::View::View(xpcc::gui::ViewStack* stack, uint8_t identifier, xpcc::gui::Dimension dimension) :
 	stack(stack),
 	identifier(identifier),
 	alive(true),
@@ -46,13 +46,13 @@ xpcc::gui::AbstractView::AbstractView(xpcc::gui::ViewStack* stack, uint8_t ident
 }
 
 // ----------------------------------------------------------------------------
-xpcc::gui::AbstractView::~AbstractView()
+xpcc::gui::View::~View()
 {
 }
 
 // ----------------------------------------------------------------------------
 void
-xpcc::gui::AbstractView::update()
+xpcc::gui::View::update()
 {
 
 	preUpdate();
@@ -91,14 +91,14 @@ xpcc::gui::AbstractView::update()
 
 // ----------------------------------------------------------------------------
 void
-xpcc::gui::AbstractView::shortButtonPress(xpcc::MenuButtons::Button /*button*/)
+xpcc::gui::View::shortButtonPress(xpcc::MenuButtons::Button /*button*/)
 {
 	//nothing to be done
 }
 
 // ----------------------------------------------------------------------------
 bool
-xpcc::gui::AbstractView::pack(Widget *w, const xpcc::glcd::Point &coord)
+xpcc::gui::View::pack(Widget *w, const xpcc::glcd::Point &coord)
 {
 	if(coord.x >= this->dimension.width ||
 	   coord.y >= this->dimension.height ||
@@ -130,20 +130,20 @@ xpcc::gui::AbstractView::pack(Widget *w, const xpcc::glcd::Point &coord)
 
 // ----------------------------------------------------------------------------
 bool
-xpcc::gui::AbstractView::isAlive() const
+xpcc::gui::View::isAlive() const
 {
 	return this->alive;
 }
 
 // ----------------------------------------------------------------------------
 void
-xpcc::gui::AbstractView::remove()
+xpcc::gui::View::remove()
 {
 	this->alive = false;
 }
 
 // ----------------------------------------------------------------------------
-void xpcc::gui::AbstractView::draw()
+void xpcc::gui::View::draw()
 {
 //	auto display = &this->stack->getDisplay();
 
@@ -163,21 +163,21 @@ void xpcc::gui::AbstractView::draw()
 
 // ----------------------------------------------------------------------------
 void
-xpcc::gui::AbstractView::onRemove()
+xpcc::gui::View::onRemove()
 {
 	//nothing to be done here
 }
 
 // ----------------------------------------------------------------------------
 xpcc::GraphicDisplay&
-xpcc::gui::AbstractView::display()
+xpcc::gui::View::display()
 {
 	return stack->getDisplay();
 }
 
 // ----------------------------------------------------------------------------
 void
-xpcc::gui::AbstractView::setColorPalette(ColorPalette& cp)
+xpcc::gui::View::setColorPalette(ColorPalette& cp)
 {
 
 	this->colorpalette = cp;
@@ -197,7 +197,7 @@ xpcc::gui::AbstractView::setColorPalette(ColorPalette& cp)
 
 }
 
-void xpcc::gui::AbstractView::markDirty()
+void xpcc::gui::View::markDirty()
 {
 	for(auto iter = widgets.begin(); iter != widgets.end(); ++iter)
 	{
@@ -205,7 +205,7 @@ void xpcc::gui::AbstractView::markDirty()
 	}
 }
 
-void xpcc::gui::AbstractView::markDrawn()
+void xpcc::gui::View::markDrawn()
 {
 	for(auto iter = widgets.begin(); iter != widgets.end(); ++iter)
 	{

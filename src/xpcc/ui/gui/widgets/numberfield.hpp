@@ -19,7 +19,7 @@ public:
 	}
 
 	void
-	render(AbstractView* view);
+	render(View* view);
 
 	void
 	setValue(T value)
@@ -49,7 +49,7 @@ public:
 	FloatField(float value, Dimension d);
 
 	void
-	render(AbstractView* view);
+	render(View* view);
 };
 
 

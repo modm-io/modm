@@ -3,7 +3,7 @@
 #endif
 
 template<typename T>
-void xpcc::gui::NumberField<T>::render(AbstractView* view)
+void xpcc::gui::NumberField<T>::render(View* view)
 {
 
 	if(view == 0)

@@ -19,7 +19,7 @@ bool xpcc::gui::WidgetGroup::pack(Widget* w, const xpcc::glcd::Point& coord)
 	return true;
 }
 
-void xpcc::gui::WidgetGroup::render(AbstractView* view)
+void xpcc::gui::WidgetGroup::render(View* view)
 {
 	/* draw all widgets */
 	for(auto iter = widgets.begin(); iter != widgets.end(); ++iter) {

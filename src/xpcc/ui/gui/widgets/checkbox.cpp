@@ -1,7 +1,7 @@
 #include "checkbox.hpp"
 
 
-void xpcc::gui::CheckboxWidget::render(AbstractView* view)
+void xpcc::gui::CheckboxWidget::render(View* view)
 {
 	if(view == NULL)
 			return;

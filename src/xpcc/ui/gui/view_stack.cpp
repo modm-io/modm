@@ -45,7 +45,7 @@ xpcc::gui::ViewStack::~ViewStack()
 void
 xpcc::gui::ViewStack::pop()
 {
-	xpcc::gui::AbstractView *topElement = this->stack.get();
+	xpcc::gui::View *topElement = this->stack.get();
 	this->stack.pop();
 	
 	delete topElement;
@@ -55,7 +55,7 @@ xpcc::gui::ViewStack::pop()
 void
 xpcc::gui::ViewStack::update()
 {
-	xpcc::gui::AbstractView* top = this->get();
+	xpcc::gui::View* top = this->get();
 
 	if(top == NULL)
 		return;
@@ -89,6 +89,6 @@ xpcc::gui::ViewStack::update()
 void
 xpcc::gui::ViewStack::shortButtonPress(xpcc::MenuButtons::Button button)
 {
-	xpcc::gui::AbstractView* top = this->get();
+	xpcc::gui::View* top = this->get();
 	top->shortButtonPress(button);
 }
