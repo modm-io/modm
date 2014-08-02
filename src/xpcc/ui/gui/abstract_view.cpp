@@ -36,8 +36,6 @@
 xpcc::gui::View::View(xpcc::gui::GuiViewStack* stack, uint8_t identifier, xpcc::gui::Dimension dimension) :
 	AbstractView(stack, identifier),
 	stack(stack),
-	identifier(identifier),
-	alive(true),
 	dimension(dimension),
 	colorpalette(DEFAULT_COLORPALETTE)
 
@@ -91,13 +89,6 @@ xpcc::gui::View::update()
 }
 
 // ----------------------------------------------------------------------------
-void
-xpcc::gui::View::shortButtonPress(xpcc::MenuButtons::Button /*button*/)
-{
-	//nothing to be done
-}
-
-// ----------------------------------------------------------------------------
 bool
 xpcc::gui::View::pack(Widget *w, const xpcc::glcd::Point &coord)
 {
@@ -130,13 +121,6 @@ xpcc::gui::View::pack(Widget *w, const xpcc::glcd::Point &coord)
 }
 
 // ----------------------------------------------------------------------------
-bool
-xpcc::gui::View::isAlive() const
-{
-	return this->alive;
-}
-
-// ----------------------------------------------------------------------------
 void
 xpcc::gui::View::remove()
 {
@@ -160,20 +144,6 @@ void xpcc::gui::View::draw()
 			(*iter)->draw(this);
 		}
 	}
-}
-
-// ----------------------------------------------------------------------------
-void
-xpcc::gui::View::onRemove()
-{
-	//nothing to be done here
-}
-
-// ----------------------------------------------------------------------------
-xpcc::GraphicDisplay&
-xpcc::gui::View::display()
-{
-	return stack->getDisplay();
 }
 
 // ----------------------------------------------------------------------------

@@ -107,19 +107,6 @@ namespace gui
 		pack(Widget *w, const xpcc::glcd::Point &coord);
 
 		/**
-		 * @brief shortButtonPress handle the action for the pressed button
-		 */
-		virtual void 
-		shortButtonPress(xpcc::MenuButtons::Button button);
-
-		/**
-		 * @brief isAlive tells the GuiViewStack if it should remove this screen.
-		 * @return
-		 */
-		bool
-		isAlive() const;
-
-		/**
 		 * @brief remove the view from the screen. The viewStack handles the deletion.
 		 */
 		void
@@ -142,16 +129,6 @@ namespace gui
 
 		void
 		markDrawn();
-
-		/**
-		 * @brief getIdentifier of the view.
-		 */
-		inline uint8_t getIdentifier(){
-			return this->identifier;
-		}
-
-		xpcc::GraphicDisplay&
-		display();
 		
 		inline xpcc::gui::GuiViewStack*
 		getViewStack()
@@ -160,19 +137,7 @@ namespace gui
 		}
 
 	protected:
-
-		/**
-		 * @brief onRemove will be called right before the view gets deleted,
-		 *        can be reimplemented to reset external data.
-		 */
-		virtual void
-		onRemove();
-
-
-	protected:
 		xpcc::gui::GuiViewStack* stack;
-		const uint8_t identifier;
-		bool alive;
 		Dimension dimension;
 		WidgetContainer widgets;
 		xpcc::gui::ColorPalette colorpalette;
