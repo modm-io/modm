@@ -84,14 +84,6 @@ namespace gui
 		postUpdate()
 		{
 		}
-
-		/**
-		 * @brief hasChanged indicates the current displayed view has changed.
-		 *        This function prevents unnecessary drawing of the display
-		 * @return if true the display has to be redrawn.
-		 */
-		virtual bool
-		hasChanged() = 0;
 		
 		/**
 		 * @brief draw determine the output on the Graphic Display
