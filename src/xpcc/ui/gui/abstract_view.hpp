@@ -38,7 +38,6 @@
 #include "colorpalette.hpp"
 
 #include "../menu/abstract_view.hpp"
-#include "../menu/menu_buttons.hpp"
 
 namespace xpcc
 {
@@ -144,7 +143,5 @@ namespace gui
 	};
 }
 }
-
-#include "view_stack.hpp"
 
 #endif // XPCC__GUI_ABSTRACT_VIEW_HPP
