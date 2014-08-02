@@ -69,7 +69,7 @@ xpcc::gui::View::update()
 		/* Start event handling, go through array in reverse order because
 		 * later added (higher index) widgets will be rendered on top of
 		 * the other widgets, so they will also catch the input event with
-		 * heigher precendence. */
+		 * higher precedence. */
 		for(int16_t i = widgets.getSize()-1; i >= 0; i--) {
 			/*
 			 * TODO: implement efficient algorithm here (note: segment tree)
