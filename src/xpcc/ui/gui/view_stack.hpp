@@ -117,14 +117,6 @@ namespace gui
 		virtual void
 		update();
 
-		/**
-		 * @brief shortButtonPress pass the button press to the current top view
-		 * @param button the pressed button
-		 */
-		
-		void
-		shortButtonPress(xpcc::MenuButtons::Button button);
-
 	private:
 		xpcc::Stack< xpcc::gui::View* , xpcc::LinkedList< xpcc::gui::View* > > stack;
 		xpcc::gui::inputQueue *input_queue;

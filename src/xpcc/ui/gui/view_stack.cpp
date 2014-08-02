@@ -85,11 +85,3 @@ xpcc::gui::GuiViewStack::update()
 		this->display->update();
 	}
 }
-
-// ----------------------------------------------------------------------------
-void
-xpcc::gui::GuiViewStack::shortButtonPress(xpcc::MenuButtons::Button button)
-{
-	xpcc::gui::View* top = this->get();
-	top->shortButtonPress(button);
-}
