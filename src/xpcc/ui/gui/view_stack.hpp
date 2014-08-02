@@ -87,15 +87,6 @@ namespace gui
 			top->draw();
 			this->display->update();
 		}
-
-		/**
-		 * @brief getDisplay access underlying GraphicDisplay
-		 */
-		inline xpcc::GraphicDisplay&
-		getDisplay()
-		{
-			return *this->display;
-		}
 		
 		/**
 		 * @brief get event input queue from GuiViewStack
