@@ -78,7 +78,7 @@ xpcc::gui::GuiViewStack::update()
 		
 		// Get new screen
 		top = this->get();
-		top->markDirty();
+		top->markDirty();	// Only difference to xpcc::ViewStack::update()
 		top->update();
 		this->display->clear();
 		top->draw();
