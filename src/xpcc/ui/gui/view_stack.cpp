@@ -33,7 +33,7 @@
 // ----------------------------------------------------------------------------
 xpcc::gui::GuiViewStack::GuiViewStack(xpcc::GraphicDisplay* display, xpcc::gui::inputQueue* queue) :
 	ViewStack(display),
-	display(display), input_queue(queue)
+	input_queue(queue)
 {
 }
 

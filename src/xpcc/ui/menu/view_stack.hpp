@@ -113,7 +113,7 @@ namespace xpcc
 		void
 		shortButtonPress(xpcc::MenuButtons::Button button);
 
-	private:
+	protected:
 		xpcc::GraphicDisplay* display;
 		xpcc::Stack< xpcc::AbstractView* , xpcc::LinkedList< xpcc::AbstractView* > > stack;
 	};

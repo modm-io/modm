@@ -126,7 +126,6 @@ namespace gui
 		shortButtonPress(xpcc::MenuButtons::Button button);
 
 	private:
-		xpcc::GraphicDisplay* display;
 		xpcc::Stack< xpcc::gui::View* , xpcc::LinkedList< xpcc::gui::View* > > stack;
 		xpcc::gui::inputQueue *input_queue;
 	};
