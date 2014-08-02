@@ -53,7 +53,7 @@ namespace gui
 	* \author	Thorsten Lajewski
 	*/
 
-	class GuiViewStack
+	class GuiViewStack : public xpcc::ViewStack
 	{
 	public:
 		GuiViewStack(xpcc::GraphicDisplay* display, xpcc::gui::inputQueue* queue);

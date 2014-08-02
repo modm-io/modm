@@ -37,6 +37,7 @@
 #include "widgets/widget.hpp"
 #include "colorpalette.hpp"
 
+#include "../menu/abstract_view.hpp"
 #include "../menu/menu_buttons.hpp"
 
 namespace xpcc
@@ -54,7 +55,7 @@ namespace gui
 	 *\ingroup display_menu
 	 */
 
-	class View
+	class View : public xpcc::AbstractView
 	{
 		friend class GuiViewStack;
 		

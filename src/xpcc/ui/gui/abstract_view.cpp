@@ -34,6 +34,7 @@
 
 // ----------------------------------------------------------------------------
 xpcc::gui::View::View(xpcc::gui::GuiViewStack* stack, uint8_t identifier, xpcc::gui::Dimension dimension) :
+	AbstractView(stack, identifier),
 	stack(stack),
 	identifier(identifier),
 	alive(true),
