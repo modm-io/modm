@@ -110,6 +110,10 @@ def communication_emitter(target, source, env):
 
 # -----------------------------------------------------------------------------
 def generate(env, **kw):
+	env.SetDefault(XPCC_SYSTEM_DESIGN_SCANNERS = {})
+	env['XPCC_SYSTEM_DESIGN_SCANNERS']['XML'] = SCons.Script.Scanner(
+					function = xml_include_scanner,
+					skeys = ['.xml'])
 	env['BUILDERS']['SystemCppPackets'] = \
 		SCons.Script.Builder(
 			action = SCons.Action.Action(
@@ -119,10 +123,7 @@ def generate(env, **kw):
 					'$SOURCE',
 				cmdstr="$SYSTEM_CPP_PACKETS_COMSTR"),
 			emitter = packet_emitter,
-			source_scanner =
-				SCons.Script.Scanner(
-					function = xml_include_scanner,
-					skeys = ['.xml']),
+			source_scanner = env['XPCC_SYSTEM_DESIGN_SCANNERS']['XML'],
 			single_source = True,
 			target_factory = env.fs.Entry,
 			src_suffix = ".xml")
@@ -135,10 +136,7 @@ def generate(env, **kw):
 					'$SOURCE',
 				cmdstr="$SYSTEM_CPP_IDENTIFIER_COMSTR"),
 			emitter = identifier_emitter,
-			source_scanner =
-				SCons.Script.Scanner(
-					function = xml_include_scanner,
-					skeys = ['.xml']),
+			source_scanner = env['XPCC_SYSTEM_DESIGN_SCANNERS']['XML'],
 			single_source = True,
 			target_factory = env.fs.Entry,
 			src_suffix = ".xml")
@@ -152,10 +150,7 @@ def generate(env, **kw):
 					'$SOURCE',
 				cmdstr="$SYSTEM_CPP_POSTMAN_COMSTR"),
 			emitter = postman_emitter,
-			source_scanner =
-				SCons.Script.Scanner(
-					function = xml_include_scanner,
-					skeys = ['.xml']),
+			source_scanner = env['XPCC_SYSTEM_DESIGN_SCANNERS']['XML'],
 			single_source = True,
 			target_factory = env.fs.Entry,
 			src_suffix = ".xml")
@@ -168,10 +163,7 @@ def generate(env, **kw):
 					'$SOURCE',
 				cmdstr="$SYSTEM_CPP_COMMUNICATION_COMSTR"),
 			emitter = communication_emitter,
-			source_scanner =
-				SCons.Script.Scanner(
-					function = xml_include_scanner,
-					skeys = ['.xml']),
+			source_scanner = env['XPCC_SYSTEM_DESIGN_SCANNERS']['XML'],
 			single_source = True,
 			target_factory = env.fs.Entry,
 			src_suffix = ".xml")
