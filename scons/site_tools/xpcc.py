@@ -398,14 +398,7 @@ def generate(env, **kw):
 					env.Tool('gdb')
 			except configparser.ParserException as e:
 				env.Error("Error in Configuration: %s" % e)
-				Exit(1)			
-	elif env['ARCHITECTURE'] == 'avr32':
-		env['AVR32_DEVICE'] = device
-		env['AVR32_CLOCK']  = clock
-		env['LIBS']         = ['']
-		env['LIBPATH']      = []
-		env.Tool('avr32')
-		env.Tool('dfu-programmer')
+				Exit(1)
 	else:
 		env.Error("xpcc Error: Unknown architecture '%s'!" % env['ARCHITECTURE'])
 		Exit(1)

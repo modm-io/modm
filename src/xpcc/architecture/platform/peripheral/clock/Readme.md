@@ -79,23 +79,6 @@ from _platform/avr/atxmega/clock.hpp_:
 		CLK_PSBCDIV_t prescalerBC = CLK_PSBCDIV_1_1_gc);
 
 
-### AVR32
-
-from _platform/avr32/uc3b/clock.hpp_
-
-	enableOsc(OscConfig mode);
-	startOsc(StartupConfig startup = StartupConfig::CYCLES_2048);
-	switchToClock(ClockSource source);
-	pllSetup(Pll pll, Mul mul, Div div, Osc osc,
-		uint8_t lockcount, Range range, OutputDivider div2);
-	pllEnable(Pll pll);
-	selectClock(bool pbadiv, uint8_t pbasel, bool pbbdiv,
-		uint8_t pbbsel, bool cpudiv, uint8_t cpusel);
-	gcSetup(GenericClock gc, GenericClockSource source,
-		bool diven, uint8_t div = 0);
-	gcEnable(GenericClock gc);
-	enableUsbClock(void);
-
 
 ### LPC2xxx
 
