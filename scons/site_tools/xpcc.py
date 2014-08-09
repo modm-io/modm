@@ -381,6 +381,7 @@ def generate(env, **kw):
 					env['OPENOCD_CONFIGFILE'] = parser.get('openocd', 'configfile')
 					env['OPENOCD_COMMANDS'] = parser.get('openocd', 'commands')
 					env['OPENOCD_REMOTE_HOST'] = parser.get('openocd', 'remote_host', 'localhost')
+					env['OPENOCD_REMOTE_USER'] = parser.get('openocd', 'remote_user', 'pi')
 				if parser.get('program', 'tool') == 'stlink':
 					env.Tool('stlink')
 				if parser.get('program', 'tool') == 'lpclink':
