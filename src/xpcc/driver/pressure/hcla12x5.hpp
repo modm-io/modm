@@ -42,7 +42,7 @@ namespace xpcc
 	 * \author	Niklas Hauser
 	 */
 	template < typename I2cMaster >
-	class Hcla12x5 : private xpcc::I2cReadAdapter
+	class Hcla12x5 : protected xpcc::I2cReadAdapter
 	{
 	public:
 		/**

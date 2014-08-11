@@ -127,7 +127,7 @@ namespace xpcc
 	 * \tparam I2cMaster Asynchronous Two Wire interface
 	 */
 	template < typename I2cMaster >
-	class Hmc6343 : private xpcc::I2cWriteReadAdapter
+	class Hmc6343 : protected xpcc::I2cWriteReadAdapter
 	{
 	public:
 		/// \brief	Constructor, requires pointer to 20 byte array, sets address to default of 0x19

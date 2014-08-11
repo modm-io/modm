@@ -59,7 +59,7 @@ namespace xpcc
 	 * \author	Fabian Greif
 	 */
 	template < typename I2cMaster >
-	class Ds1631 : private xpcc::I2cWriteReadAdapter
+	class Ds1631 : protected xpcc::I2cWriteReadAdapter
 	{
 	public:
 		/**

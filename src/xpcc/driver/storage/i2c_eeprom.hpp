@@ -47,7 +47,7 @@ namespace xpcc
 	 * \author	Niklas Hauser
 	 */
 	template <typename I2cMaster>
-	class I2cEeprom : public xpcc::I2cTransaction
+	class I2cEeprom : protected xpcc::I2cTransaction
 	{
 	public:
 		I2cEeprom(uint8_t address);

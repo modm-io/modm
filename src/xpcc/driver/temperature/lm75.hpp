@@ -42,7 +42,7 @@ namespace xpcc
 	 * \author	Fabian Greif
 	 */
 	template <typename I2cMaster >
-	class Lm75 : private xpcc::I2cWriteReadAdapter
+	class Lm75 : protected xpcc::I2cWriteReadAdapter
 	{
 	public:
 		/**

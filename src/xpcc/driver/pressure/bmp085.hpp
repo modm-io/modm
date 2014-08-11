@@ -98,7 +98,7 @@ namespace xpcc
 	 * \tparam I2cMaster I2C interface
 	 */
 	template < typename I2cMaster >
-	class Bmp085 : private xpcc::I2cWriteReadAdapter
+	class Bmp085 : protected xpcc::I2cWriteReadAdapter
 	{
 	public:
 		/**

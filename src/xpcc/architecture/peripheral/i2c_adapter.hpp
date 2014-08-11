@@ -28,29 +28,29 @@ namespace xpcc
  * @author	Niklas Hauser
  * @ingroup	i2c
  */
-class I2cWriteReadAdapter : private I2cTransaction
+class I2cWriteReadAdapter : protected I2cTransaction
 {
-private:
 	uint8_t address;
 	uint8_t readSize;
 	uint8_t writeSize;
 	uint8_t *readBuffer;
 	const uint8_t *writeBuffer;
-	volatile AdapterState state;
+	volatile AdapterState adapterState;
 	bool isReading;
 
 public:
 	I2cWriteReadAdapter(uint8_t address)
-	:	state(AdapterState::Idle), address(address << 1)
+	:	address(address << 1), adapterState(AdapterState::Idle)
 	{
 	}
 
+protected:
 	/// @return `Busy` while an I2C operation is ongoing. Reinitialization
 	///			is not permitted during this phase.
 	AdapterState inline
 	getAdapterState()
 	{
-		return state;
+		return adapterState;
 	}
 
 	/**
@@ -67,7 +67,7 @@ public:
 	bool inline
 	configureWriteRead(const uint8_t *writeBuffer, uint8_t writeSize, uint8_t *readBuffer, uint8_t readSize)
 	{
-		if (state != AdapterState::Busy)
+		if (adapterState != AdapterState::Busy)
 		{
 			this->readBuffer = readBuffer;
 			this->readSize = readBuffer ? readSize : 0;
@@ -79,15 +79,14 @@ public:
 		return false;
 	}
 
-private:
 	///@{
 	/// @internal
 	virtual bool
 	attaching()
 	{
-		if (state == AdapterState::Busy)
+		if (adapterState == AdapterState::Busy)
 			return false;
-		state = AdapterState::Busy;
+		adapterState = AdapterState::Busy;
 		return true;
 	}
 
@@ -124,7 +123,7 @@ private:
 	detaching(DetachCause cause)
 	{
 		isReading = false;
-		state = (cause == DetachCause::NormalStop) ? AdapterState::Idle : AdapterState::Error;
+		adapterState = (cause == DetachCause::NormalStop) ? AdapterState::Idle : AdapterState::Error;
 	}
 	///@}
 };
@@ -142,26 +141,26 @@ private:
  * @author	Niklas Hauser
  * @ingroup	i2c
  */
-class I2cWriteAdapter : private I2cTransaction
+class I2cWriteAdapter : protected I2cTransaction
 {
-private:
 	uint8_t address;
 	uint8_t size;
 	const uint8_t *buffer;
-	volatile AdapterState state;
+	volatile AdapterState adapterState;
 
 public:
 	I2cWriteAdapter(uint8_t address)
-	:	state(AdapterState::Idle), address(address << 1)
+	:	address(address << 1), adapterState(AdapterState::Idle)
 	{
 	}
 
+protected:
 	/// @return `Busy` while an I2C operation is ongoing. Reinitialization
 	///			is not permitted during this phase.
 	AdapterState inline
 	getAdapterState()
 	{
-		return state;
+		return adapterState;
 	}
 
 	/**
@@ -178,7 +177,7 @@ public:
 	bool inline
 	configureWrite(const uint8_t *buffer, uint8_t size)
 	{
-		if (state != AdapterState::Busy)
+		if (adapterState != AdapterState::Busy)
 		{
 			this->buffer = buffer;
 			this->size = buffer ? size : 0;
@@ -187,15 +186,14 @@ public:
 		return false;
 	}
 
-private:
 	/// @internal
 	///@{
 	virtual bool
 	attaching()
 	{
-		if (state == AdapterState::Busy)
+		if (adapterState == AdapterState::Busy)
 			return false;
-		state = AdapterState::Busy;
+		adapterState = AdapterState::Busy;
 		return true;
 	}
 
@@ -225,7 +223,7 @@ private:
 	virtual void
 	detaching(DetachCause cause)
 	{
-		state = (cause == DetachCause::NormalStop) ? AdapterState::Idle : AdapterState::Error;
+		adapterState = (cause == DetachCause::NormalStop) ? AdapterState::Idle : AdapterState::Error;
 	}
 	///@}
 };
@@ -243,26 +241,26 @@ private:
  * @author	Niklas Hauser
  * @ingroup	i2c
  */
-class I2cReadAdapter : private I2cTransaction
+class I2cReadAdapter : protected I2cTransaction
 {
-private:
 	uint8_t address;
 	uint8_t size;
 	uint8_t *buffer;
-	volatile AdapterState state;
+	volatile AdapterState adapterState;
 
 public:
 	I2cReadAdapter(uint8_t address)
-	:	state(AdapterState::Idle), address(address << 1)
+	:	address(address << 1), adapterState(AdapterState::Idle)
 	{
 	}
 
+protected:
 	/// @return `Busy` while an I2C operation is ongoing. Reinitialization
 	///			is not permitted during this phase.
 	AdapterState inline
 	getAdapterState()
 	{
-		return state;
+		return adapterState;
 	}
 
 	/**
@@ -279,7 +277,7 @@ public:
 	bool inline
 	configureRead(uint8_t * buffer, uint8_t size)
 	{
-		if (state != AdapterState::Busy)
+		if (adapterState != AdapterState::Busy)
 		{
 			this->buffer = buffer;
 			this->size = buffer ? size : 0;
@@ -288,15 +286,14 @@ public:
 		return false;
 	}
 
-private:
 	///@{
 	/// @internal
 	virtual bool
 	attaching()
 	{
-		if (state == AdapterState::Busy)
+		if (adapterState == AdapterState::Busy)
 			return false;
-		state = AdapterState::Busy;
+		adapterState = AdapterState::Busy;
 		return true;
 	}
 
@@ -326,7 +323,7 @@ private:
 	virtual void
 	detaching(DetachCause cause)
 	{
-		state = (cause == DetachCause::NormalStop) ? AdapterState::Idle : AdapterState::Error;
+		adapterState = (cause == DetachCause::NormalStop) ? AdapterState::Idle : AdapterState::Error;
 	}
 	///@}
 };

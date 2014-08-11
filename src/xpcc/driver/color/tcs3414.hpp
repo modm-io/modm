@@ -163,7 +163,7 @@ namespace xpcc
 	 * \ingroup	driver_other
 	 */
 	template<typename I2cMaster>
-	class Tcs3414 : private xpcc::I2cWriteReadAdapter
+	class Tcs3414 : protected xpcc::I2cWriteReadAdapter
 	{
 	public:
 		Tcs3414()

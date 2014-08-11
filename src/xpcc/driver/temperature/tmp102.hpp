@@ -85,7 +85,7 @@ namespace tmp102
  * @tparam I2cMaster Asynchronous Interface
  */
 template < typename I2cMaster >
-class Tmp102 : private xpcc::I2cWriteReadAdapter
+class Tmp102 : protected xpcc::I2cWriteReadAdapter
 {
 public:
 	/**

@@ -409,7 +409,7 @@ namespace xpcc
 	 * \tparam I2cMaster Asynchronous Two Wire interface
 	 */
 	template < typename I2cMaster >
-	class Bma180 : private xpcc::I2cWriteReadAdapter
+	class Bma180 : protected xpcc::I2cWriteReadAdapter
 	{
 	public:
 		/**

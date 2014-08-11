@@ -123,7 +123,7 @@ namespace xpcc
 	 * \tparam I2cMaster Asynchronous Two Wire interface
 	 */
 	template < typename I2cMaster >
-	class Hmc58 : private xpcc::I2cWriteReadAdapter
+	class Hmc58 : protected xpcc::I2cWriteReadAdapter
 	{
 	public:
 		/// \brief	Constructor, sets address to default of 0x1e
