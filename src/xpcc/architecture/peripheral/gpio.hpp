@@ -233,6 +233,7 @@ class GpioPort
 public:
 	/// this can be used in drivers to assert the correct requirements
 	static constexpr uint16_t width;
+
 public:
 	static void
 	setOutput();

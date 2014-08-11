@@ -11,6 +11,7 @@
 #define XPCC_PERIPHERAL_CAN_HPP
 
 #include "../peripheral.hpp"
+#include <xpcc/communication/can/message.hpp>
 
 /**
  * @ingroup 	peripheral
@@ -35,17 +36,19 @@ public:
 	};
 
 	/// Supported CAN bitrates; maybe different on a per device basis
-	enum class
-	Bitrate : uint8_t
+	struct Bitrate
 	{
-		kBps10	= 0,
-		kBps20	= 1,
-		kBps50	= 2,
-		kBps100	= 3,
-		kBps125	= 4,
-		kBps250	= 5,
-		kBps500	= 6,
-		MBps1	= 7,
+		enum
+		{
+			kBps10  =   10000,
+			kBps20  =   20000,
+			kBps50  =   50000,
+			kBps100 =  100000,
+			kBps125 =  125000,
+			kBps250 =  250000,
+			kBps500 =  500000,
+			MBps1   = 1000000,
+		};
 	};
 
 	enum class
@@ -67,14 +70,14 @@ public:
 	/**
 	 * Initializes the hardware and sets the baudrate.
 	 *
-	 * @param clockSource
+	 * @tparam clockSource
 	 *		the targets system clock
-	 * @param bitrate
-	 * 		the desired bitrate
+	 * @tparam bitrate
+	 * 		the desired bitrate in Hz
 	 * @tparam	tolerance
-	 * 		the allowed absolute tolerance for the resulting baudrate
+	 * 		the allowed relative tolerance for the resulting baudrate
 	 */
-	template< class clockSource, Bitrate bitrate = Bitrate::kBps125,
+	template< class clockSource, uint32_t bitrate = Bitrate::kBps125,
 			Tolerance tolerance = Tolerance::OnePercent >
 	static void
 	initialize(Mode startupMode);
@@ -102,7 +105,6 @@ public:
 	sendMessage(const can::Message& message);
 
 	// Optional
-#if 0
 	/// Get Receive Error Counter.
 	static uint8_t
 	getReceiveErrorCounter();
@@ -113,10 +115,9 @@ public:
 
 	static BusState
 	getBusState();
-#endif // if 0
 #endif
 };
 
 } // namespace xpcc
 
-#endif // XPCC_PERIPHERAL_SPI_HPP
+#endif // XPCC_PERIPHERAL_CAN_HPP
