@@ -16,7 +16,7 @@ namespace xpcc
 {
 
 /**
- * This class is an implementation of xpcc::I2cDelegate which,
+ * This class is an implementation of xpcc::I2cTransaction which,
  * when passed to an i2c driver, performs the sequence:
  * start - address - write - restart - address - read - stop.
  *
@@ -28,7 +28,7 @@ namespace xpcc
  * @author	Niklas Hauser
  * @ingroup	i2c
  */
-class I2cWriteReadAdapter : public I2cTransaction
+class I2cWriteReadAdapter : private I2cTransaction
 {
 private:
 	uint8_t address;
@@ -40,66 +40,39 @@ private:
 	bool isReading;
 
 public:
-	I2cWriteReadAdapter()
-	:	state(AdapterState::Idle)
+	I2cWriteReadAdapter(uint8_t address)
+	:	state(AdapterState::Idle), address(address << 1)
 	{
 	}
 
 	/// @return `Busy` while an I2C operation is ongoing. Reinitialization
 	///			is not permitted during this phase.
-	AdapterState
-	getState()
+	AdapterState inline
+	getAdapterState()
 	{
 		return state;
 	}
 
 	/**
-	 * @brief	Initializes the adapter with the slave address and the required information for a write/read operation
-	 *
-	 * Call this method during the drivers initialize method and give it the slave address,
-	 * so you do not need to keep track of it externally.
-	 *
-	 * @param		address		the slave address excluding read/write bit
-	 * @param[in] 	writeBuffer	buffer to be written to the slave
-	 * @param		writeSize	number of bytes to be written, set to `0` to write nothing
-	 * @param[out]	readBuffer	buffer to write the read bytes from the slave
-	 * @param		readSize	number of bytes to be read, set to `0` to read nothing
-	 */
-	bool
-	initialize(uint8_t address, const uint8_t * writeBuffer, uint8_t writeSize, uint8_t * readBuffer, uint8_t readSize)
-	{
-		if (state != AdapterState::Busy)
-		{
-			this->address = address;
-			this->readBuffer = readBuffer;
-			this->readSize = readSize;
-			this->writeBuffer = writeBuffer;
-			this->writeSize = writeSize;
-			isReading = writeSize ? false : true;
-			return true;
-		}
-		return false;
-	}
-
-	/**
-	 * @brief	Initializes the adapter with the required information for a write/read operation
-	 *
-	 * The slave address is not configured, so use this method during normal operation to change buffers.
+	 * Initializes the adapter with the required information for a write/read operation.
 	 *
 	 * @param[in] 	writeBuffer	buffer to be written to the slave
 	 * @param		writeSize	number of bytes to be written, set to `0` to write nothing
 	 * @param[out]	readBuffer	buffer to write the read bytes from the slave
 	 * @param		readSize	number of bytes to be read, set to `0` to read nothing
+     *
+     * @return  `true` if adapter was not busy and accepted the information,
+     *          `false` otherwise
 	 */
-	bool
-	initialize(const uint8_t * writeBuffer, uint8_t writeSize, uint8_t * readBuffer, uint8_t readSize)
+	bool inline
+	configureWriteRead(const uint8_t *writeBuffer, uint8_t writeSize, uint8_t *readBuffer, uint8_t readSize)
 	{
 		if (state != AdapterState::Busy)
 		{
 			this->readBuffer = readBuffer;
-			this->readSize = readSize;
+			this->readSize = readBuffer ? readSize : 0;
 			this->writeBuffer = writeBuffer;
-			this->writeSize = writeSize;
+			this->writeSize = writeBuffer ? writeSize : 0;
 			isReading = writeSize ? false : true;
 			return true;
 		}
@@ -157,7 +130,7 @@ private:
 };
 
 /**
- * This class is an implementation of xpcc::I2cDelegate which,
+ * This class is an implementation of xpcc::I2cTransaction which,
  * when passed to an i2c driver, performs the sequence:
  * start - address - write - stop.
  *
@@ -169,7 +142,7 @@ private:
  * @author	Niklas Hauser
  * @ingroup	i2c
  */
-class I2cWriteAdapter : public I2cTransaction
+class I2cWriteAdapter : private I2cTransaction
 {
 private:
 	uint8_t address;
@@ -178,57 +151,37 @@ private:
 	volatile AdapterState state;
 
 public:
-	I2cWriteAdapter()
-	:	state(AdapterState::Idle)
+	I2cWriteAdapter(uint8_t address)
+	:	state(AdapterState::Idle), address(address << 1)
 	{
 	}
 
 	/// @return `Busy` while an I2C operation is ongoing. Reinitialization
 	///			is not permitted during this phase.
-	AdapterState
-	getState()
+	AdapterState inline
+	getAdapterState()
 	{
 		return state;
 	}
 
 	/**
-	 * @brief	Initializes the adapter with the slave address and the required information for a write operation
-	 *
-	 * Call this method during the drivers initialize method and give it the slave address,
-	 * so you do not need to keep track of it externally.
-	 *
-	 * @param		address	the slave address excluding read/write bit
-	 * @param[in] 	buffer	buffer to be written to the slave
-	 * @param		size	number of bytes to be written, set to `0` to write nothing
-	 */
-	bool
-	initialize(uint8_t address, const uint8_t * buffer, uint8_t size)
-	{
-		if (state != AdapterState::Busy)
-		{
-			this->address = address;
-			this->buffer = buffer;
-			this->size = size;
-			return true;
-		}
-		return false;
-	}
-
-	/**
-	 * @brief	Initializes the adapter with the required information for a write operation
+	 * Initializes the adapter with the required information for a write operation
 	 *
 	 * The slave address is not configured, so use this method during normal operation to change buffers.
 	 *
 	 * @param[in] 	buffer	buffer to be written to the slave
 	 * @param		size	number of bytes to be written, set to `0` to write nothing
+     *
+     * @return  `true` if adapter was not busy and accepted the information,
+     *          `false` otherwise
 	 */
-	bool
-	initialize(const uint8_t * buffer, uint8_t size)
+	bool inline
+	configureWrite(const uint8_t *buffer, uint8_t size)
 	{
 		if (state != AdapterState::Busy)
 		{
 			this->buffer = buffer;
-			this->size = size;
+			this->size = buffer ? size : 0;
 			return true;
 		}
 		return false;
@@ -278,7 +231,7 @@ private:
 };
 
 /**
- * This class is an implementation of xpcc::I2cDelegate which,
+ * This class is an implementation of xpcc::I2cTransaction which,
  * when passed to an i2c driver, performs the sequence:
  * start - address - read - stop.
  *
@@ -290,7 +243,7 @@ private:
  * @author	Niklas Hauser
  * @ingroup	i2c
  */
-class I2cReadAdapter : public I2cTransaction
+class I2cReadAdapter : private I2cTransaction
 {
 private:
 	uint8_t address;
@@ -299,57 +252,37 @@ private:
 	volatile AdapterState state;
 
 public:
-	I2cReadAdapter()
-	:	state(AdapterState::Idle)
+	I2cReadAdapter(uint8_t address)
+	:	state(AdapterState::Idle), address(address << 1)
 	{
 	}
 
 	/// @return `Busy` while an I2C operation is ongoing. Reinitialization
 	///			is not permitted during this phase.
-	AdapterState
-	getState()
+	AdapterState inline
+	getAdapterState()
 	{
 		return state;
 	}
 
 	/**
-	 * @brief	Initializes the adapter with the slave address and the required information for a read operation
-	 *
-	 * Call this method during the drivers initialize method and give it the slave address,
-	 * so you do not need to keep track of it externally.
-	 *
-	 * @param		address	the slave address excluding read/write bit
-	 * @param[out] 	buffer	buffer to be read from the slave
-	 * @param		size	number of bytes to be read, set to `0` to read nothing
-	 */
-	bool
-	initialize(uint8_t address, uint8_t * buffer, uint8_t size)
-	{
-		if (state != AdapterState::Busy)
-		{
-			this->address = address;
-			this->buffer = buffer;
-			this->size = size;
-			return true;
-		}
-		return false;
-	}
-
-	/**
-	 * @brief	Initializes the adapter with the required information for a read operation
+	 * Initializes the adapter with the required information for a read operation
 	 *
 	 * The slave address is not configured, so use this method during normal operation to change buffers.
 	 *
 	 * @param[out] 	buffer	buffer to be read from the slave
 	 * @param		size	number of bytes to be read, set to `0` to read nothing
+     *
+     * @return  `true` if adapter was not busy and accepted the information,
+     *          `false` otherwise
 	 */
-	bool
-	initialize(uint8_t * buffer, uint8_t size)
+	bool inline
+	configureRead(uint8_t * buffer, uint8_t size)
 	{
 		if (state != AdapterState::Busy)
 		{
 			this->buffer = buffer;
-			this->size = size;
+			this->size = buffer ? size : 0;
 			return true;
 		}
 		return false;

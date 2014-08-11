@@ -26,8 +26,8 @@ struct I2c
 	static constexpr uint8_t Write = 0x00;	///< Add the Write bit to the slave address
 	static constexpr uint8_t Read  = 0x01;	///< Add the Read bit to the slave address
 
-	/// This tells the `I2cDelegate` why it was detached
-	/// @see I2cDelegate
+	/// This tells the `I2cTransaction` why it was detached
+	/// @see I2cTransaction
 	enum class
 	DetachCause : uint8_t
 	{
@@ -37,10 +37,10 @@ struct I2c
 	};
 
 	///@{
-	/// I2C Operations that the `I2cDelegate` can give the master on callback
-	/// @see I2cDelegate
+	/// I2C Operations that the `I2cTransaction` can give the master on callback
+	/// @see I2cTransaction
 
-	/// Operations after a start or restart condition.
+	/// Operations after a start or restart condition and slave addressing.
 	enum class
 	Operation
 	{
@@ -54,21 +54,21 @@ struct I2c
 	enum class
 	OperationAfterWrite
 	{
-		Stop = 0,
-		Restart = 1,
-		Write = 2,
+		Stop = 0,		///< Generate a Stop Condition
+		Restart = 1,	///< Generate a Restart
+		Write = 2,		///< Write data to the slave
 	};
 
 	/// Further operations after read operation.
 	enum class
 	OperationAfterRead
 	{
-		Stop = 0,
-		Restart = 1,
+		Stop = 0,		///< Generate a Stop Condition
+		Restart = 1,	///< Generate a Restart
 	};
 	///@}
 
-	/// State of a Delegate Adapter
+	/// State of a Transaction Adapter
 	enum class
 	AdapterState
 	{
@@ -109,10 +109,10 @@ public:
 	{
 		enum
 		{
-			Standard = 100000,	///< Standard datarate of 100kHz
-			Fast = 400000,		///< Fast datarate of 400kHz
-			High = 1700000,		///< High datarate of 1.7MHz (rarely supported)
-			Super = 3400000		///< Super datarate of 3.4MHz (rarely supported)
+			Standard =  100000,	///< Standard datarate of 100kHz
+			Fast     =  400000,	///< Fast datarate of 400kHz
+			High     = 1700000,	///< High datarate of 1.7MHz (rarely supported)
+			Super    = 3400000	///< Super datarate of 3.4MHz (rarely supported)
 		};
 	};
 
@@ -128,7 +128,7 @@ public:
 	 * @tparam	tolerance
 	 * 		the allowed absolute tolerance for the resulting baudrate
 	 */
-	template< class clockSource, uint32_t baudrate=DataRate::Standard,
+	template< class clockSource, uint32_t baudrate=Baudrate::Standard,
 			Tolerance tolerance = Tolerance::FivePercent >
 	static void
 	initialize();
@@ -136,28 +136,26 @@ public:
 	/**
 	 * Requests bus control and starts the transfer.
 	 *
-	 * @param	delegate
-	 *		object that inherits from the I2cDelegate class.
+	 * @param	transaction
+	 *		object that inherits from the I2cTransaction class.
 	 * @return	Caller gains control if `true`. Call has no effect if `false`.
 	 */
 	static bool
-	start(I2cTransaction *delegate);
+	start(I2cTransaction *transaction);
 
 	/**
-	 * Requests bus control and starts the transfer, blocks until delegate is detached.
+	 * Requests bus control and starts the transfer, blocks until the transaction completes.
 	 *
-	 * @param	delegate
-	 *		object that inherits from the I2cDelegate class.
+	 * @param	transaction
+	 *		object that inherits from the I2cTransaction class.
 	 * @return	Caller gains control if `true`. Call has no effect if `false`.
 	 */
 	static bool
-	startBlocking(I2cTransaction *delegate);
+	startBlocking(I2cTransaction *transaction);
 
 	/**
-	 * Perform a software reset of the driver in case of an error.
-	 *
-	 * This method calls the stopped Delegate method and then detaches
-	 * the delegate.
+	 * Perform a software reset of the driver in case of an error and detache
+     * the transaction object.
 	 */
 	static void
 	reset(DetachCause cause = DetachCause::SoftwareReset);
@@ -173,14 +171,12 @@ public:
 };
 
 /**
- * Abstract class for delegation.
+ * Abstract class for transactions.
  *
  * For true asynchronous operation, the communication driver should
  * inherit from this class, allowing multi-stage driver design and
  * performance gain by premature data evaluation.
- * Be aware the methods may or may not be called during the I2C
- * interrupt even before returning from initiating function.
- * This Delegate will stay attached to the `I2cMaster` during whole operation.
+ * This transaction object will stay attached to the `I2cMaster` during whole operation.
  *
  * @see I2cMaster
  *
@@ -193,8 +189,8 @@ class I2cTransaction : public I2c
 public:
 	/// Contains the information required to begin an I2C transfer
 	struct Starting {
-		uint8_t address;	///< the slave address excluding read/write bit
-		Operation next;		///< operation following the successful addressing of the slave
+		uint8_t address;            ///< the slave address excluding read/write bit
+		Operation next;				///< operation following the successful addressing of the slave
 	};
 
 	/// Contains the information required to begin a write operation
@@ -214,40 +210,41 @@ public:
 public:
 	/**
 	 * This method is called when the I2cMaster is not currently
-	 * in use by another delegate and can be attached.
+	 * in use by another transaction and can be attached.
 	 *
-	 * @return	`true` if the I2cMaster should attach this delegate,
+	 * @return	`true` if the I2cMaster should attach this transaction,
 	 * 			`false` if it should not attach it.
 	 */
 	virtual bool
 	attaching() = 0;
 
 	/**
-	 * This is called when the I2cMaster is ready to (re-)start an operation.
+	 * This method is called when the I2cMaster is ready to (re-)start an operation.
 	 *
-	 * @return	the `Starting` struct containing slave address and the next operation
+	 * @param[out]  starting    the `Starting` struct containing slave address and the next operation
 	 */
 	virtual void
 	starting(Starting &starting) = 0;
 
 	/**
-	 * This is called before the I2cMaster begins a write operation.
+	 * This method is called before the I2cMaster begins a write operation.
 	 *
-	 * @return	the `Writing` struct containg the write buffer and size and next operation
+	 * @param[out]  writing the `Writing` struct containing the write buffer and size and next operation
 	 */
 	virtual void
 	writing(Writing &writing) = 0;
 
 	/**
-	 * This is called before the I2cMaster begins a read operation.
+	 * This method is called before the I2cMaster begins a read operation.
 	 *
-	 * @return	the `Reading` struct containg the read buffer and size and next operation
+	 * @param[out]  reading the `Reading` struct containing the read buffer and size and next operation
 	 */
 	virtual void
 	reading(Reading &reading) = 0;
 
 	/**
-	 * This is called when the I2cMaster stops the operation and detached the delegate.
+	 * This is called when all transmissions finished and transaction object is about to
+	 * be detached. The I2cMaster will not be free until this method returns.
 	 *
 	 * @param	cause	specifies whether the detachment was expected (`NormalStop`),
 	 * 					or a error occurred (`ErrorCondition`), which can, but does not need
