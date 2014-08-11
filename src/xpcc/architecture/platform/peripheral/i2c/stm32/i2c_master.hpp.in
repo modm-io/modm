@@ -48,11 +48,6 @@ public:
 	static ALWAYS_INLINE void
 	initialize()
 	{
-		static_assert(rate <= 400000,
-				"The STM32 does not support I2C baudrates above 400kHz.");
-		static_assert(clockSource::I2c{{ id }}/2 >= rate,
-				"The APB1 frequency needs to be at least 2x higher than I2C baudrate.");
-
 		// set the prescaler rate register
 		// ccrPrescaler = peripheralFrequency / (2 * I2CFrequency)
 		constexpr uint16_t prescaler = clockSource::I2c{{ id }} / (2 * rate);

@@ -267,7 +267,7 @@ I2C{{ id }}_EV_IRQHandler(void)
 			case xpcc::I2c::Operation::Restart:
 				writing.length = 0;
 				reading.length = 0;
-				nextOperation = xpcc::I2c::Operation::Stop;
+				nextOperation = xpcc::I2c::Operation::Restart;
 
 				DEBUG_STREAM("restart op");
 				break;
@@ -276,7 +276,7 @@ I2C{{ id }}_EV_IRQHandler(void)
 			case xpcc::I2c::Operation::Stop:
 				writing.length = 0;
 				reading.length = 0;
-				nextOperation = xpcc::I2c::Operation::Restart;
+				nextOperation = xpcc::I2c::Operation::Stop;
 
 				DEBUG_STREAM("stop op");
 				break;
@@ -432,7 +432,7 @@ I2C{{ id }}_EV_IRQHandler(void)
 
 
 
-	if (checkNextOperation > CHECK_NEXT_OPERATION_NO_WAIT_FOR_BTF)
+	if (checkNextOperation >= CHECK_NEXT_OPERATION_YES)
 	{
 		switch (nextOperation)
 		{
@@ -528,7 +528,8 @@ I2C{{ id }}_ER_IRQHandler(void)
 void
 xpcc::stm32::I2cMaster{{ id }}::initializeWithPrescaler(uint8_t peripheralFrequency, uint16_t prescaler)
 {
-	reset();
+	// no reset, since we want to keep the delegate attached!
+
 	// Enable clock
 	RCC->APB1ENR |= RCC_APB1ENR_I2C{{ id }}EN;
 

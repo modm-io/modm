@@ -235,7 +235,7 @@ ISR(TWI_vect)
 void
 xpcc::{{target.family}}::I2cMaster::initialize(uint8_t twbr, Prescaler prescaler)
 {
-	reset(xpcc::I2c::DetachCause::SoftwareReset);
+	// no reset, since we want to keep the delegate attached!
 	TWBR = twbr;
 	// No prescaler needed, unless we go significantly slower than standard Speed
 	TWSR = static_cast<uint8_t>(prescaler);
