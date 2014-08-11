@@ -21,29 +21,85 @@ xpcc::Tmp102<I2cMaster>::Tmp102(uint8_t* data, uint8_t address)
 
 template < typename I2cMaster >
 bool
-xpcc::Tmp102<I2cMaster>::configure(uint8_t lsb, uint8_t msb)
+xpcc::Tmp102<I2cMaster>::startConfigure(uint8_t lsb, uint8_t msb)
 {
-	config = msb;
-	buffer[0] = static_cast<uint8_t>(tmp102::Register::Configuration);
-	buffer[1] = msb;
-	buffer[2] = lsb;
-	configureWriteRead(buffer, 3, data, 0);
+	if (running == Running::Nothing)
+	{
+		config = msb;
+		buffer[0] = static_cast<uint8_t>(tmp102::Register::Configuration);
+		buffer[1] = msb;
+		buffer[2] = lsb;
 
-	return I2cMaster::startBlocking(this);
+		if (configureWriteRead(buffer, 3, data, 0) && I2cMaster::start(this))
+		{
+			running = Running::Configuration;
+			return true;
+		}
+	}
+	return false;
 }
 
 template < typename I2cMaster >
-void
+bool
+xpcc::Tmp102<I2cMaster>::runConfigure()
+{
+	return (running == Running::Configuration);
+}
+
+template < typename I2cMaster >
+bool inline
 xpcc::Tmp102<I2cMaster>::startConversion()
 {
-	status.startConversionPending = true;
+	if (running == Running::Nothing)
+	{
+		buffer[0] = static_cast<uint8_t>(tmp102::Register::Configuration);
+		buffer[1] = config | tmp102::CONFIGURATION_ONE_SHOT;
+
+		if (configureWriteRead(buffer, 2, data, 0) && I2cMaster::start(this))
+		{
+			running = Running::StartConversion;
+			return true;
+		}
+	}
+	return false;
 }
 
 template < typename I2cMaster >
-void
-xpcc::Tmp102<I2cMaster>::readTemperature()
+bool
+xpcc::Tmp102<I2cMaster>::runConversion()
 {
-	status.readTemperaturePending = true;
+	return (running == Running::StartConversion);
+}
+
+template < typename I2cMaster >
+bool
+xpcc::Tmp102<I2cMaster>::startReadTemperature()
+{
+	if (running == Running::Nothing)
+	{
+		buffer[0] = static_cast<uint8_t>(tmp102::Register::Temperature);
+
+		if (configureWriteRead(buffer, 1, data, 2) && I2cMaster::start(this))
+		{
+			running = Running::ReadTemperature;
+			return true;
+		}
+	}
+	return false;
+}
+
+template < typename I2cMaster >
+bool
+xpcc::Tmp102<I2cMaster>::runReadTemperature()
+{
+	return (running == Running::ReadTemperature);
+}
+
+template < typename I2cMaster >
+bool
+xpcc::Tmp102<I2cMaster>::isSuccessful()
+{
+	return (getAdapterState() != AdapterState::Error);
 }
 
 template < typename I2cMaster >
@@ -54,69 +110,20 @@ xpcc::Tmp102<I2cMaster>::getTemperature()
 	if (data[1] & tmp102::TEMPERATURE_EXTENDED_MODE) {
 		return (temp>>3)/16.f;
 	}
-	else {
-		return (temp>>4)/16.f;
-	}
-}
-
-template < typename I2cMaster >
-bool
-xpcc::Tmp102<I2cMaster>::isNewDataAvailable()
-{
-	return status.newTemperatureData;
+	return (temp>>4)/16.f;
 }
 
 template < typename I2cMaster >
 uint8_t*
 xpcc::Tmp102<I2cMaster>::getData()
 {
-	status.newTemperatureData = false;
 	return data;
 }
 
 template < typename I2cMaster >
 void
-xpcc::Tmp102<I2cMaster>::update()
+xpcc::Tmp102<I2cMaster>::detaching(DetachCause cause)
 {
-	if (running != Running::Nothing)
-	{
-		switch (getAdapterState())
-		{
-			case xpcc::I2c::AdapterState::Idle:
-				if (running == Running::ReadTemperature) {
-					status.newTemperatureData = true;
-				}
-
-			case xpcc::I2c::AdapterState::Error:
-				running = Running::Nothing;
-
-			default:
-				break;
-		}
-	}
-	else  {
-		if (status.startConversionPending)
-		{
-			buffer[0] = static_cast<uint8_t>(tmp102::Register::Configuration);
-			buffer[1] = config & tmp102::CONFIGURATION_ONE_SHOT;
-			configureWriteRead(buffer, 2, data, 0);
-
-			if (I2cMaster::start(this)) {
-				status.startConversionPending = false;
-				running = Running::StartConversion;
-			}
-		}
-		else if (status.readTemperaturePending)
-		{
-			buffer[0] = static_cast<uint8_t>(tmp102::Register::Temperature);
-			configureWriteRead(buffer, 1, data, 2);
-
-			if (I2cMaster::start(this)) {
-				status.readTemperaturePending = false;
-				running = Running::ReadTemperature;
-			}
-		}
-	}
+	I2cWriteReadAdapter::detaching(cause);
+	running = Running::Nothing;
 }
-
-

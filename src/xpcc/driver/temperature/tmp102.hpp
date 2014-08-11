@@ -94,56 +94,61 @@ public:
 	 */
 	Tmp102(uint8_t* data, uint8_t address=0x48);
 
+	/// @return pointer to 8bit array containing temperature as big endian int16_t
+	uint8_t* ALWAYS_INLINE
+	getData();
+
+	// MARK: Tasks
 	bool
-	configure(uint8_t lsb=tmp102::CONFIGURATION_CONVERSION_RATE_4HZ,
-			  uint8_t msb=tmp102::CONFIGURATION_CONVERTER_RESOLUTION_12BIT);
+	startConfigure(uint8_t lsb=tmp102::CONFIGURATION_CONVERSION_RATE_4HZ,
+				   uint8_t msb=tmp102::CONFIGURATION_CONVERTER_RESOLUTION_12BIT);
+
+	bool ALWAYS_INLINE
+	runConfigure();
 
 	/// starts a temperature conversion right now
-	ALWAYS_INLINE void
+	bool
 	startConversion();
+
+	/// runs the temperature conversion
+	bool ALWAYS_INLINE
+	runConversion();
 
 	/**
 	 * read the Temperature registers and buffer the results
 	 * sets isNewDataAvailable() to `true`
 	 */
-	ALWAYS_INLINE void
-	readTemperature();
+	bool
+	startReadTemperature();
 
-	/**
-	 * `true`, when new data has been read from the sensor and is buffered,
-	 * `false`, when the data has been accessed
-	 */
-	ALWAYS_INLINE bool
-	isNewDataAvailable();
+	bool ALWAYS_INLINE
+	runReadTemperature();
 
-	/// @return pointer to 8bit array containing temperature as big endian int16_t
-	uint8_t*
-	getData();
+	// MARK: Results
+	bool ALWAYS_INLINE
+	isSuccessful();
 
 	/// @return the temperature as a signed float in Celcius
 	float
 	getTemperature();
 
-	void
-	update();
-
 private:
-	enum class
+	volatile enum class
 	Running {
 		Nothing,
 		ReadTemperature,
-		StartConversion
+		StartConversion,
+		Configuration
 	} running;
-
-	struct Status {
-		bool startConversionPending	: 1;
-		bool readTemperaturePending	: 1;
-		bool newTemperatureData		: 1;
-	} status;
 
 	uint8_t config;
 	uint8_t* data;
 	uint8_t buffer[3];
+
+protected:
+	// we overwrite the detaching callback to reset running to Nothing
+	virtual void
+	detaching(DetachCause cause);
 };
 
 } // namespace xpcc
