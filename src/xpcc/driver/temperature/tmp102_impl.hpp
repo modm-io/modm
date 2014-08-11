@@ -55,7 +55,7 @@ xpcc::Tmp102<I2cMaster>::startConversion()
 		buffer[0] = static_cast<uint8_t>(tmp102::Register::Configuration);
 		buffer[1] = config | tmp102::CONFIGURATION_ONE_SHOT;
 
-		if (configureWriteRead(buffer, 2, data, 0) && I2cMaster::start(this))
+		if (configureWrite(buffer, 2) && I2cMaster::start(this))
 		{
 			running = Running::StartConversion;
 			return true;

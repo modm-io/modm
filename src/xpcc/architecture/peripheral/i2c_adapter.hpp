@@ -79,6 +79,40 @@ protected:
 		return false;
 	}
 
+	/**
+	 * Initializes the adapter with the required information for a write operation
+	 *
+	 * The slave address is not configured, so use this method during normal operation to change buffers.
+	 *
+	 * @param[in] 	buffer	buffer to be written to the slave
+	 * @param		size	number of bytes to be written, set to `0` to write nothing
+	 *
+	 * @return  `true` if adapter was not busy and accepted the information,
+	 *          `false` otherwise
+	 */
+	bool ALWAYS_INLINE
+	configureWrite(const uint8_t *buffer, uint8_t size)
+	{
+		return configureWriteRead(buffer, size, NULL, 0);
+	}
+
+	/**
+	 * Initializes the adapter with the required information for a read operation
+	 *
+	 * The slave address is not configured, so use this method during normal operation to change buffers.
+	 *
+	 * @param[out] 	buffer	buffer to be read from the slave
+	 * @param		size	number of bytes to be read, set to `0` to read nothing
+	 *
+	 * @return  `true` if adapter was not busy and accepted the information,
+	 *          `false` otherwise
+	 */
+	bool ALWAYS_INLINE
+	configureRead(uint8_t *buffer, uint8_t size)
+	{
+		return configureWriteRead(NULL, 0, buffer, size);
+	}
+
 	///@{
 	/// @internal
 	virtual bool

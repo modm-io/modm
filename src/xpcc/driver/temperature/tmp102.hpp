@@ -95,7 +95,7 @@ public:
 	Tmp102(uint8_t* data, uint8_t address=0x48);
 
 	/// @return pointer to 8bit array containing temperature as big endian int16_t
-	uint8_t* ALWAYS_INLINE
+	ALWAYS_INLINE uint8_t*
 	getData();
 
 	// MARK: Tasks
