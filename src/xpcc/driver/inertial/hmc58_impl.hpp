@@ -35,9 +35,9 @@
 // ----------------------------------------------------------------------------
 template < typename I2cMaster >
 xpcc::Hmc58<I2cMaster>::Hmc58(uint8_t* data, uint8_t address)
-:	status(0), data(data)
+:	I2cWriteReadAdapter(address), status(0), data(data)
 {
-	adapter.initialize(address << 1, buffer, 0, data, 0);
+	configureWriteRead(buffer, 0, data, 0);
 }
 
 template < typename I2cMaster >
@@ -51,9 +51,9 @@ xpcc::Hmc58<I2cMaster>::configure(uint8_t dataOutputRate)
 	buffer[2] = 0x20; /* default gain of ~1Gs */
 	// mode register
 	buffer[3] = hmc58::OPERATION_MODE_CONTINUOUS;
-	adapter.initialize(buffer, 4, data, 0);
+	configureWriteRead(buffer, 4, data, 0);
 	
-	return I2cMaster::startBlocking(&adapter);
+	return I2cMaster::startBlocking(this);
 }
 
 template < typename I2cMaster >
@@ -113,16 +113,16 @@ void
 xpcc::Hmc58<I2cMaster>::update()
 {
 	if (status & READ_MAGNETOMETER_RUNNING &&
-		adapter.getState() == xpcc::I2c::AdapterState::Idle) {
+		getAdapterState() == xpcc::I2c::AdapterState::Idle) {
 		status &= ~READ_MAGNETOMETER_RUNNING;
 		status |= NEW_MAGNETOMETER_DATA;
 	}
 	else if (status & READ_MAGNETOMETER_PENDING) 
 	{
 		buffer[0] = hmc58::REGISTER_DATA_X0;
-		adapter.initialize(buffer, 1, data, 6);
+		configureWriteRead(buffer, 1, data, 6);
 		
-		if (I2cMaster::start(&adapter)) {
+		if (I2cMaster::start(this)) {
 			status &= ~READ_MAGNETOMETER_PENDING;
 			status |= READ_MAGNETOMETER_RUNNING;
 		}
@@ -134,25 +134,25 @@ template < typename I2cMaster >
 bool
 xpcc::Hmc58<I2cMaster>::writeRegister(hmc58::Register reg, uint8_t value)
 {
-	while (adapter.getState() == xpcc::I2c::AdapterState::Busy)
+	while (getAdapterState() == xpcc::I2c::AdapterState::Busy)
 		;
 	buffer[0] = reg;
 	buffer[1] = value;
-	adapter.initialize(buffer, 2, data, 0);
+	configureWriteRead(buffer, 2, data, 0);
 	
-	return I2cMaster::startBlocking(&adapter);
+	return I2cMaster::startBlocking(this);
 }
 
 template < typename I2cMaster >
 uint8_t
 xpcc::Hmc58<I2cMaster>::readRegister(hmc58::Register reg)
 {
-	while (adapter.getState() == xpcc::I2c::AdapterState::Busy)
+	while (getAdapterState() == xpcc::I2c::AdapterState::Busy)
 		;
 	buffer[0] = reg;
-	adapter.initialize(buffer, 1, buffer, 1);
+	configureWriteRead(buffer, 1, buffer, 1);
 	
-	while (!I2cMaster::startBlocking(&adapter))
+	while (!I2cMaster::startBlocking(this))
 		;
 	return buffer[0];
 }

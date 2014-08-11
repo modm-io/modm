@@ -37,9 +37,9 @@
 // ----------------------------------------------------------------------------
 template < typename I2cMaster >
 xpcc::Hmc6343<I2cMaster>::Hmc6343(uint8_t* data, uint8_t address)
-:	timeout(500), running(RESET_PROCESSOR_RUNNING), status(0), pending(0), data(data)
+:	I2cWriteReadAdapter(address), timeout(500), running(RESET_PROCESSOR_RUNNING), status(0), pending(0), data(data)
 {
-	adapter.initialize(address << 1, buffer, 0, data, 0);
+	configureWriteRead(buffer, 0, data, 0);
 }
 
 // MARK: - configuration
@@ -302,12 +302,12 @@ bool
 xpcc::Hmc6343<I2cMaster>::sendPing()
 {
 	// busy waiting
-	if(adapter.getState() == xpcc::I2c::AdapterState::Busy)
+	if(getAdapterState() == xpcc::I2c::AdapterState::Busy)
 		return false;
 
-	adapter.initialize(0, 0, 0, 0);
+	configureWriteRead(0, 0, 0, 0);
 
-	if(!I2cMaster::start(&adapter))
+	if(!I2cMaster::start(this))
 		return false;
 
 	return true;
@@ -317,8 +317,8 @@ template < typename I2cMaster >
 bool
 xpcc::Hmc6343<I2cMaster>::checkCommunication()
 {
-	return (adapter.getState() != xpcc::I2c::AdapterState::Error &&
-			adapter.getState() != xpcc::I2c::AdapterState::Busy);
+	return (getAdapterState() != xpcc::I2c::AdapterState::Error &&
+			getAdapterState() != xpcc::I2c::AdapterState::Busy);
 }
 
 // MARK: - register access
@@ -328,13 +328,13 @@ bool
 xpcc::Hmc6343<I2cMaster>::writeCommand(hmc6343::Command command)
 {
 	// busy waiting
-	if(!timeout.isExpired() || adapter.getState() == xpcc::I2c::AdapterState::Busy)
+	if(!timeout.isExpired() || getAdapterState() == xpcc::I2c::AdapterState::Busy)
 		return false;
 
 	buffer[0] = command;
-	adapter.initialize(buffer, 1, 0, 0);
+	configureWriteRead(buffer, 1, 0, 0);
 
-	if(!I2cMaster::start(&adapter))
+	if(!I2cMaster::start(this))
 		return false;
 
 	return true;
@@ -345,15 +345,15 @@ bool
 xpcc::Hmc6343<I2cMaster>::writeRegister(hmc6343::Register reg, uint8_t value)
 {
 	// busy waiting
-	if(!timeout.isExpired() || adapter.getState() == xpcc::I2c::AdapterState::Busy)
+	if(!timeout.isExpired() || getAdapterState() == xpcc::I2c::AdapterState::Busy)
 		return false;
 
 	buffer[0] = hmc6343::COMMAND_WRITE_EEPROM;
 	buffer[1] = reg;
 	buffer[2] = value;
-	adapter.initialize(buffer, 3, 0, 0);
+	configureWriteRead(buffer, 3, 0, 0);
 
-	if(!I2cMaster::start(&adapter))
+	if(!I2cMaster::start(this))
 		return false;
 
 	// 10ms timing delay
@@ -367,14 +367,14 @@ bool
 xpcc::Hmc6343<I2cMaster>::readRegister(hmc6343::Register reg, uint8_t &data)
 {
 	// busy waiting
-	if(!timeout.isExpired() || adapter.getState() == xpcc::I2c::AdapterState::Busy)
+	if(!timeout.isExpired() || getAdapterState() == xpcc::I2c::AdapterState::Busy)
 		return false;
 
 	buffer[0] = hmc6343::COMMAND_READ_EEPROM;
 	buffer[1] = reg;
-	adapter.initialize(buffer, 2, buffer, 1);
+	configureWriteRead(buffer, 2, buffer, 1);
 
-	if(!I2cMaster::startBlocking(&adapter))
+	if(!I2cMaster::startBlocking(this))
 		return false;
 
 	// 10ms timing delay
@@ -392,7 +392,7 @@ xpcc::Hmc6343<I2cMaster>::update()
 {
 	if (running != NOTHING_RUNNING)
 	{
-		if (adapter.getState() == xpcc::I2c::AdapterState::Idle)
+		if (getAdapterState() == xpcc::I2c::AdapterState::Idle)
 		{
 			switch (running)
 			{
@@ -414,7 +414,7 @@ xpcc::Hmc6343<I2cMaster>::update()
 			}
 			running = NOTHING_RUNNING;
 		}
-		if (adapter.getState() == xpcc::I2c::AdapterState::Error)
+		if (getAdapterState() == xpcc::I2c::AdapterState::Error)
 		{
 			running = NOTHING_RUNNING;
 		}
@@ -425,9 +425,9 @@ xpcc::Hmc6343<I2cMaster>::update()
 		if (pending & START_ACCELERATION_PENDING)
 		{
 			buffer[0] = hmc6343::COMMAND_POST_ACCEL_DATA;
-			adapter.initialize(buffer, 1, 0, 0);
+			configureWriteRead(buffer, 1, 0, 0);
 
-			if (I2cMaster::start(&adapter))
+			if (I2cMaster::start(this))
 			{
 				pending &= ~START_ACCELERATION_PENDING;
 				pending |= READ_ACCELERATION_PENDING;
@@ -437,9 +437,9 @@ xpcc::Hmc6343<I2cMaster>::update()
 		else if (pending & START_MAGNETOMETER_PENDING)
 		{
 			buffer[0] = hmc6343::COMMAND_POST_MAG_DATA;
-			adapter.initialize(buffer, 1, 0, 0);
+			configureWriteRead(buffer, 1, 0, 0);
 
-			if (I2cMaster::start(&adapter))
+			if (I2cMaster::start(this))
 			{
 				pending &= ~START_MAGNETOMETER_PENDING;
 				pending |= READ_MAGNETOMETER_PENDING;
@@ -449,9 +449,9 @@ xpcc::Hmc6343<I2cMaster>::update()
 		else if (pending & START_ATTITUDE_PENDING)
 		{
 			buffer[0] = hmc6343::COMMAND_POST_HEADING_DATA;
-			adapter.initialize(buffer, 1, 0, 0);
+			configureWriteRead(buffer, 1, 0, 0);
 
-			if (I2cMaster::start(&adapter))
+			if (I2cMaster::start(this))
 			{
 				pending &= ~START_ATTITUDE_PENDING;
 				pending |= READ_ATTITUDE_PENDING;
@@ -461,9 +461,9 @@ xpcc::Hmc6343<I2cMaster>::update()
 		else if (pending & START_TEMPERATURE_PENDING)
 		{
 			buffer[0] = hmc6343::COMMAND_POST_TILT_DATA;
-			adapter.initialize(buffer, 1, 0, 0);
+			configureWriteRead(buffer, 1, 0, 0);
 
-			if (I2cMaster::start(&adapter))
+			if (I2cMaster::start(this))
 			{
 				pending &= ~START_TEMPERATURE_PENDING;
 				pending |= READ_TEMPERATURE_PENDING;
@@ -473,9 +473,9 @@ xpcc::Hmc6343<I2cMaster>::update()
 		// reading
 		else if (pending & READ_ACCELERATION_PENDING)
 		{
-			adapter.initialize(buffer, 0, data, 6);
+			configureWriteRead(buffer, 0, data, 6);
 
-			if (I2cMaster::start(&adapter))
+			if (I2cMaster::start(this))
 			{
 				pending &= ~READ_ACCELERATION_PENDING;
 				running = READ_ACCELERATION_RUNNING;
@@ -483,9 +483,9 @@ xpcc::Hmc6343<I2cMaster>::update()
 		}
 		else if (pending & READ_MAGNETOMETER_PENDING)
 		{
-			adapter.initialize(buffer, 0, data+6, 6);
+			configureWriteRead(buffer, 0, data+6, 6);
 
-			if (I2cMaster::start(&adapter))
+			if (I2cMaster::start(this))
 			{
 				pending &= ~READ_MAGNETOMETER_PENDING;
 				running = READ_MAGNETOMETER_RUNNING;
@@ -493,9 +493,9 @@ xpcc::Hmc6343<I2cMaster>::update()
 		}
 		else if (pending & READ_ATTITUDE_PENDING)
 		{
-			adapter.initialize(buffer, 0, data+12, 6);
+			configureWriteRead(buffer, 0, data+12, 6);
 
-			if (I2cMaster::start(&adapter))
+			if (I2cMaster::start(this))
 			{
 				pending &= ~READ_ATTITUDE_PENDING;
 				running = READ_ATTITUDE_RUNNING;
@@ -503,9 +503,9 @@ xpcc::Hmc6343<I2cMaster>::update()
 		}
 		else if (pending & READ_TEMPERATURE_PENDING)
 		{
-			adapter.initialize(buffer, 0, data+14, 6);
+			configureWriteRead(buffer, 0, data+14, 6);
 
-			if (I2cMaster::start(&adapter))
+			if (I2cMaster::start(this))
 			{
 				pending &= ~READ_TEMPERATURE_PENDING;
 				running = READ_TEMPERATURE_RUNNING;

@@ -123,7 +123,7 @@ namespace xpcc
 	 * \tparam I2cMaster Asynchronous Two Wire interface
 	 */
 	template < typename I2cMaster >
-	class Hmc58
+	class Hmc58 : private xpcc::I2cWriteReadAdapter
 	{
 	public:
 		/// \brief	Constructor, sets address to default of 0x1e
@@ -179,7 +179,6 @@ namespace xpcc
 		setGain(uint8_t gain=0x20);
 		
 	private:
-		
 		/**
 		 * writes 8bit data to a register, blocking!
 		 * \param reg register address
@@ -195,8 +194,6 @@ namespace xpcc
 		 */
 		uint8_t
 		readRegister(hmc58::Register reg);
-		
-		xpcc::I2cWriteReadAdapter adapter;
 		
 		enum Status {
 			READ_MAGNETOMETER_PENDING = 0x01,

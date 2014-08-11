@@ -42,7 +42,7 @@ namespace xpcc
 	 * \author	Niklas Hauser
 	 */
 	template < typename I2cMaster >
-	class Hcla12x5
+	class Hcla12x5 : private xpcc::I2cReadAdapter
 	{
 	public:
 		/**
@@ -54,9 +54,9 @@ namespace xpcc
 		 *      You have to use a MUX or two seperate TWI busses.
 		 */
 		Hcla12x5(uint8_t *data, uint8_t address=0x78)
-		:	data(data), newData(false);
+		:	I2cReadAdapter(address), data(data), newData(false);
 		{
-			reader.initialize(address << 1, data, 2);
+			configureRead(data, 2);
 		}
 		
 		/**
@@ -66,7 +66,7 @@ namespace xpcc
 		inline bool
 		readPressure()
 		{
-			if (I2cMaster::start(&reader)) {
+			if (I2cMaster::start(this)) {
 				newData = true;
 				return true;
 			}
@@ -79,7 +79,7 @@ namespace xpcc
 		inline bool
 		isNewDataAvailable()
 		{
-			return (newData && reader.getState() == xpcc::i2c::ReadAdapter::NO_ERROR)
+			return (newData && getAdapterState() == xpcc::i2c::ReadAdapter::NO_ERROR)
 		}
 		
 		/// \return pointer to 8bit array containing pressure
@@ -91,7 +91,6 @@ namespace xpcc
 		}
 		
 	private:
-		xpcc::i2c::ReadAdapter reader;
 		uint8_t *data;
 		bool newData;
 	};

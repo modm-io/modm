@@ -59,7 +59,7 @@ namespace xpcc
 	 * \author	Fabian Greif
 	 */
 	template < typename I2cMaster >
-	class Ds1631
+	class Ds1631 : private xpcc::I2cWriteReadAdapter
 	{
 	public:
 		/**
@@ -140,8 +140,6 @@ namespace xpcc
 		getTemperature();
 		
 	private:
-		xpcc::I2cWriteReadAdapter adapter;
-		
 		enum Running {
 			NOTHING_RUNNING,
 			READ_TEMPERATURE_RUNNING,

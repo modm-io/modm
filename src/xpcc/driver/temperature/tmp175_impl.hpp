@@ -14,9 +14,9 @@
 // ----------------------------------------------------------------------------
 template < typename I2cMaster >
 xpcc::Tmp175<I2cMaster>::Tmp175(uint8_t* data, uint8_t address)
-:	running(Running::Nothing), config(0), data(data)
+:	I2cWriteReadAdapter(address), running(Running::Nothing), config(0), data(data)
 {
-	adapter.initialize(address << 1, buffer, 0, data, 0);
+	configureWriteRead(buffer, 0, data, 0);
 }
 
 template < typename I2cMaster >
@@ -26,9 +26,9 @@ xpcc::Tmp175<I2cMaster>::configure(tmp175::Config1 msb)
 	config = msb;
 	buffer[0] = tmp175::REGISTER_CONFIGURATION;
 	buffer[1] = msb;
-	adapter.initialize(buffer, 2, data, 0);
+	configureWriteRead(buffer, 2, data, 0);
 
-	return I2cMaster::startBlocking(&adapter);
+	return I2cMaster::startBlocking(this);
 }
 
 template < typename I2cMaster >
@@ -79,7 +79,7 @@ xpcc::Tmp175<I2cMaster>::update()
 {
 	if (running != Running::Nothing)
 	{
-		switch (adapter.getState())
+		switch (getAdapterState())
 		{
 			case xpcc::I2c::AdapterState::Idle:
 				if (running == Running::ReadTemperature) {
@@ -98,9 +98,9 @@ xpcc::Tmp175<I2cMaster>::update()
 		{
 			buffer[0] = tmp175::REGISTER_CONFIGURATION;
 			buffer[1] = config & tmp175::CONFIGURATION_ONE_SHOT;
-			adapter.initialize(buffer, 2, data, 0);
+			configureWriteRead(buffer, 2, data, 0);
 
-			if (I2cMaster::start(&adapter)) {
+			if (I2cMaster::start(this)) {
 				status.startConversionPending = false;
 				running = Running::StartConversion;
 			}
@@ -108,9 +108,9 @@ xpcc::Tmp175<I2cMaster>::update()
 		else if (status.readTemperaturePending)
 		{
 			buffer[0] = tmp175::REGISTER_TEMPERATURE;
-			adapter.initialize(buffer, 1, data, 2);
+			configureWriteRead(buffer, 1, data, 2);
 
-			if (I2cMaster::start(&adapter)) {
+			if (I2cMaster::start(this)) {
 				status.readTemperaturePending = false;
 				running = Running::ReadTemperature;
 			}

@@ -98,7 +98,7 @@ namespace xpcc
 	 * \tparam I2cMaster I2C interface
 	 */
 	template < typename I2cMaster >
-	class Bmp085
+	class Bmp085 : private xpcc::I2cWriteReadAdapter
 	{
 	public:
 		/**
@@ -158,7 +158,6 @@ namespace xpcc
 		update();
 		
 	private:
-		xpcc::I2cWriteReadAdapter adapter;
 		xpcc::Timeout<> timeout;
 		
 		enum Running {
