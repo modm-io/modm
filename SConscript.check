@@ -34,9 +34,6 @@ import string
 Import('env')
 
 devices = [
-#	{ 'path': 'release/tests/lpc',		'arch': 'arm7tdmi',		'device': 'lpc2129',		'clock':  60000000 },
-#	{ 'path': 'release/tests/lpc',		'arch': 'arm7tdmi',		'device': 'lpc2368',		'clock': 100000000 },
-#	{ 'path': 'release/tests/lpc',		'arch': 'arm7tdmi',		'device': 'lpc2468',		'clock': 100000000 },
 	{ 'path': 'release/tests/atmega',	'arch': 'avr',			'device': 'atmega16',		'clock':   1000000 },
 	{ 'path': 'release/tests/atmega',	'arch': 'avr',			'device': 'atmega16a',		'clock':   1000000 },
 	{ 'path': 'release/tests/atmega',	'arch': 'avr',			'device': 'atmega644',		'clock':   1000000 },
@@ -60,13 +57,6 @@ devices = [
 #	{ 'path': 'release/tests/lpc',		'arch': 'cortex-m0',	'device': 'lpc11c24_301',	'clock':  48000000 },
 #	{ 'path': 'release/tests/lpc',		'arch': 'cortex-m3',	'device': 'lpc1343',		'clock':  12000000 },
 #	{ 'path': 'release/tests/lpc',		'arch': 'cortex-m3',	'device': 'lpc1769',		'clock':   8000000 },
-##	{ 'path': 'release/tests/at91',		'arch': 'arm7tdmi',		'device': 'at91sam7s32',	'clock':  48054857 },
-##	{ 'path': 'release/tests/at91',		'arch': 'arm7tdmi',		'device': 'at91sam7s321',	'clock':  48054857 },
-	{ 'path': 'release/tests/at91',		'arch': 'arm7tdmi',		'device': 'at91sam7s64',	'clock':  48054857 },
-	{ 'path': 'release/tests/at91',		'arch': 'arm7tdmi',		'device': 'at91sam7s128',	'clock':  48054857 },
-	{ 'path': 'release/tests/at91',		'arch': 'arm7tdmi',		'device': 'at91sam7s256',	'clock':  48054857 },
-##	{ 'path': 'release/tests/at91',		'arch': 'arm7tdmi',		'device': 'at91sam7s512',	'clock':  48054857 },
-##	{ 'path': 'release/tests/at91',		'arch': 'arm7tdmi',		'device': 'at91sam7x512',	'clock':   1000000 },
 ##	{ 'path': 'release/tests/stm32',	'arch': 'cortex-m3',	'device': 'stm32f103t4',	'clock':  72000000 },	# low density
 	{ 'path': 'release/tests/stm32',	'arch': 'cortex-m3',	'device': 'stm32f103rb',	'clock':  72000000 },	# medium density
 	{ 'path': 'release/tests/stm32',	'arch': 'cortex-m3',	'device': 'stm32f103ze',	'clock':  72000000 },	# high density

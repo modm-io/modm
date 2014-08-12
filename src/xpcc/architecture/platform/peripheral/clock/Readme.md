@@ -80,14 +80,6 @@ from _platform/avr/atxmega/clock.hpp_:
 
 
 
-### LPC2xxx
-
-from _platform/arm7/lpc/clock.hpp_
-
-	initialize()
-	getPllMultiplier()
-
-
 ### STM32F1
 
 from _platform/cortex_m3/stm32/stm32f1/clock.hpp_
