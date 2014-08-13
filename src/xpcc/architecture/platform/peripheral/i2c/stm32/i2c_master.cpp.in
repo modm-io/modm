@@ -165,20 +165,35 @@
 #define WAIT_FOR_STOP_LOW 0
 
 #include "i2c_master_{{ id }}.hpp"
+#include <xpcc/architecture/driver/accessor.hpp>
+#include <xpcc/container.hpp>
 
 namespace
 {
 	// parameter advice
 	static xpcc::I2c::Operation nextOperation;
-	enum CheckNextOperation
+	static enum CheckNextOperation
 	{
 		CHECK_NEXT_OPERATION_NO,
 		CHECK_NEXT_OPERATION_NO_WAIT_FOR_BTF,
 		CHECK_NEXT_OPERATION_YES,
 		CHECK_NEXT_OPERATION_YES_NO_STOP_BIT,
 
+	} checkNextOperation = CHECK_NEXT_OPERATION_NO;
+
+	struct ConfiguredTransaction
+	{
+		ConfiguredTransaction()
+		:	transaction(nullptr), configuration(nullptr) {}
+
+		ConfiguredTransaction(xpcc::I2cTransaction *transaction, xpcc::I2c::Configuration_t configuration)
+		:	transaction(transaction), configuration(configuration) {}
+
+		xpcc::I2cTransaction *transaction;
+		xpcc::I2c::Configuration_t configuration;
 	};
-	CheckNextOperation checkNextOperation = CHECK_NEXT_OPERATION_NO;
+
+	static xpcc::BoundedQueue<ConfiguredTransaction, {{ parameters.transaction_buffer }}> queue;
 
 	// delegating
 	static xpcc::I2cTransaction *transaction(nullptr);
@@ -207,6 +222,29 @@ namespace
 		DEBUG_STREAM("enable interrupts");
 		I2C{{ id }}->CR2 &= ~I2C_CR2_ITBUFEN;
 		I2C{{ id }}->CR2 |= I2C_CR2_ITEVTEN | I2C_CR2_ITERREN;
+	}
+
+	static inline void
+	callNextTransaction()
+	{
+		if (!queue.isEmpty())
+		{
+			// wait until the stop condition has been generated
+			uint_fast32_t deadlockPreventer = 50000;
+			while (I2C{{ id }}->CR1 & I2C_CR1_STOP && deadlockPreventer-- > 0)
+				;
+
+			ConfiguredTransaction next = queue.get();
+			queue.pop();
+			// configure the perihperal
+			if (next.configuration)
+				next.configuration();
+
+			DEBUG_STREAM("\n###\n");
+			::transaction = next.transaction;
+			// start the transaction
+			callStarting();
+		}
 	}
 }
 
@@ -449,7 +487,8 @@ I2C{{ id }}_EV_IRQHandler(void)
 				I2C{{ id }}->CR2 &= ~(I2C_CR2_ITEVTEN | I2C_CR2_ITBUFEN | I2C_CR2_ITERREN);
 				if (transaction) transaction->detaching(xpcc::I2c::DetachCause::NormalStop);
 				transaction = nullptr;
-				DEBUG_STREAM("write finished");
+				DEBUG_STREAM("transaction finished");
+				callNextTransaction();
 				break;
 		}
 		checkNextOperation = CHECK_NEXT_OPERATION_NO;
@@ -505,6 +544,7 @@ I2C{{ id }}_ER_IRQHandler(void)
 
 	DEBUG_STREAM("disable interrupts");
 	I2C{{ id }}->CR2 &= ~(I2C_CR2_ITEVTEN | I2C_CR2_ITBUFEN | I2C_CR2_ITERREN);
+	callNextTransaction();
 }
 
 // ----------------------------------------------------------------------------
@@ -538,24 +578,42 @@ xpcc::stm32::I2cMaster{{ id }}::reset(DetachCause cause)
 	writing.length = 0;
 	if (transaction) transaction->detaching(cause);
 	transaction = nullptr;
+	// remove all queued transactions
+	while(!queue.isEmpty())
+	{
+		ConfiguredTransaction next = queue.get();
+		if (next.transaction) next.transaction->detaching(cause);
+		queue.pop();
+	}
 }
 
 // MARK: - ownership
 bool
 xpcc::stm32::I2cMaster{{ id }}::start(I2cTransaction *transaction, Configuration_t configuration)
 {
-	if (!::transaction && transaction)
+	// if we have a place in the queue and the transaction object is valid
+	if (!queue.isFull() && transaction)
 	{
+		// if the transaction object wants to attach to the queue
 		if (transaction->attaching())
 		{
-			if (configuration)
-				configuration();
+			// if no current transaction is taking place
+			if (!xpcc::accessor::asVolatile(::transaction))
+			{
+				// configure the perihperal
+				if (configuration)
+					configuration();
 
-			DEBUG_STREAM("\n###\n");
-			::transaction = transaction;
-
-			callStarting();
-
+				DEBUG_STREAM("\n###\n");
+				::transaction = transaction;
+				// start the transaction
+				callStarting();
+			}
+			else
+			{
+				// queue the transaction for later execution
+				queue.push(ConfiguredTransaction(transaction, configuration));
+			}
 			return true;
 		}
 		else {
@@ -573,7 +631,11 @@ xpcc::stm32::I2cMaster{{ id }}::startBlocking(I2cTransaction *transaction, Confi
 		// memory barrier, yes you really need it
 		__asm__ volatile ("dmb" ::: "memory");
 
-		while(::transaction)
+		// busy wait until this transaction is being executed
+		while(xpcc::accessor::asVolatile(::transaction) != transaction)
+			;
+		// busy wait while this transaction is being executed
+		while(xpcc::accessor::asVolatile(::transaction) == transaction)
 			;
 
 		return true;
