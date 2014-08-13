@@ -542,7 +542,7 @@ xpcc::stm32::I2cMaster{{ id }}::reset(DetachCause cause)
 
 // MARK: - ownership
 bool
-xpcc::stm32::I2cMaster{{ id }}::start(xpcc::I2cTransaction *transaction, Configuration_t *configuration)
+xpcc::stm32::I2cMaster{{ id }}::start(I2cTransaction *transaction, Configuration_t configuration)
 {
 	if (!::transaction && transaction)
 	{
@@ -566,7 +566,7 @@ xpcc::stm32::I2cMaster{{ id }}::start(xpcc::I2cTransaction *transaction, Configu
 }
 
 bool
-xpcc::stm32::I2cMaster{{ id }}::startBlocking(xpcc::I2cTransaction *transaction, Configuration_t *configuration)
+xpcc::stm32::I2cMaster{{ id }}::startBlocking(I2cTransaction *transaction, Configuration_t configuration)
 {
 	if (start(transaction, configuration))
 	{

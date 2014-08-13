@@ -81,7 +81,7 @@ public:
 	 * @return	Caller gains control if `true`. Call has no effect if `false`.
 	 */
 	static bool
-	start(I2cTransaction *transaction, Configuration_t *configuration = nullptr);
+	start(I2cTransaction *transaction, Configuration_t configuration = nullptr);
 
 	/**
 	 * Requests transaction attachment and blocks until the transaction completes.
@@ -93,7 +93,7 @@ public:
 	 * @return	Caller gains control if `true`. Call has no effect if `false`.
 	 */
 	static bool
-	startBlocking(I2cTransaction *transaction, Configuration_t *configuration = nullptr);
+	startBlocking(I2cTransaction *transaction, Configuration_t configuration = nullptr);
 
 	/**
 	 * Perform a software reset of the driver in case of an error and detache

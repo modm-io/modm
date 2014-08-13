@@ -246,7 +246,7 @@ xpcc::{{target.family}}::I2cMaster::getErrorState()
 }
 
 bool
-xpcc::{{target.family}}::I2cMaster::start(xpcc::I2cTransaction *transaction, xpcc::I2c::Configuration_t *configuration)
+xpcc::{{target.family}}::I2cMaster::start(I2cTransaction *transaction, Configuration_t configuration)
 {
 	if (!::transaction && transaction)
 	{
@@ -270,7 +270,7 @@ xpcc::{{target.family}}::I2cMaster::start(xpcc::I2cTransaction *transaction, xpc
 }
 
 bool
-xpcc::{{target.family}}::I2cMaster::startBlocking(xpcc::I2cTransaction *transaction, xpcc::I2c::Configuration_t *configuration)
+xpcc::{{target.family}}::I2cMaster::startBlocking(I2cTransaction *transaction, Configuration_t configuration)
 {
 	if (start(transaction, configuration))
 	{

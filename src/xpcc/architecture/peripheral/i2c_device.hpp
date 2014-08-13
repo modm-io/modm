@@ -29,7 +29,7 @@ namespace xpcc
 template < class I2cMaster >
 class I2cDevice
 {
-	I2c::Configuration_t *configuration;
+	I2c::Configuration_t configuration;
 
 public:
 	I2cDevice()
@@ -38,7 +38,7 @@ public:
 	}
 
 	void inline
-	attachPeripheralConfiguration(I2c::Configuration_t *configuration)
+	attachPeripheralConfiguration(I2c::Configuration_t configuration)
 	{
 		this->configuration = configuration;
 	}

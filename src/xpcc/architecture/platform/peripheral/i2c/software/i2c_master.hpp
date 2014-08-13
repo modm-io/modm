@@ -53,10 +53,10 @@ public:
 public:
 	// start documentation inherited
 	static bool
-	start(xpcc::I2cTransaction *transaction, Configuration_t *configuration = nullptr);
+	start(I2cTransaction *transaction, Configuration_t configuration = nullptr);
 
 	static ALWAYS_INLINE bool
-	startBlocking(xpcc::I2cTransaction *transaction, Configuration_t *configuration = nullptr)
+	startBlocking(I2cTransaction *transaction, Configuration_t configuration = nullptr)
 	{
 		return start(transaction, configuration);
 	};

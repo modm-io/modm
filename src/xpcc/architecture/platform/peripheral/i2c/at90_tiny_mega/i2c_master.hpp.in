@@ -87,10 +87,10 @@ public:
 
 	// start documentation inherited
 	static bool
-	start(xpcc::I2cTransaction *transaction, xpcc::I2c::Configuration_t *configuration);
+	start(I2cTransaction *transaction, Configuration_t configuration);
 
 	static bool
-	startBlocking(xpcc::I2cTransaction *transaction, xpcc::I2c::Configuration_t *configuration);
+	startBlocking(I2cTransaction *transaction, Configuration_t configuration);
 
 	static Error
 	getErrorState();

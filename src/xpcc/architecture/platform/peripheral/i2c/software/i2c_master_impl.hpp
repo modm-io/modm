@@ -54,7 +54,7 @@ xpcc::SoftwareI2cMaster<SCL, SDA, BaudRate>::reset(DetachCause cause)
 
 template <typename SCL, typename SDA, uint32_t BaudRate>
 bool
-xpcc::SoftwareI2cMaster<SCL, SDA, BaudRate>::start(xpcc::I2cTransaction *transaction, Configuration_t *configuration)
+xpcc::SoftwareI2cMaster<SCL, SDA, BaudRate>::start(xpcc::I2cTransaction *transaction, Configuration_t configuration)
 {
 	if (!delegate && transaction)
 	{
