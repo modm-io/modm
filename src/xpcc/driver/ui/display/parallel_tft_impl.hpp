@@ -33,9 +33,9 @@
 #endif
 
 //#define DISP_ORIENTATION					0
-#define DISP_ORIENTATION					90
+//#define DISP_ORIENTATION					90
 //#define DISP_ORIENTATION					180
-//#define DISP_ORIENTATION					270
+#define DISP_ORIENTATION					270
 
 /* Private define ------------------------------------------------------------*/
 
@@ -188,7 +188,8 @@ template <typename INTERFACE>
 void
 xpcc::ParallelTft<INTERFACE>::writeCursor(uint16_t x, uint16_t y)
 {
-#if  ( DISP_ORIENTATION == 90 ) || ( DISP_ORIENTATION == 270 )
+
+#if ( DISP_ORIENTATION == 90 )
 
 	uint16_t temp;
 	y = (MAX_Y - 1) - y;
@@ -196,11 +197,24 @@ xpcc::ParallelTft<INTERFACE>::writeCursor(uint16_t x, uint16_t y)
 	y = x;
 	x = temp;
 
-#elif  ( DISP_ORIENTATION == 0 ) || ( DISP_ORIENTATION == 180 )
+#elif ( DISP_ORIENTATION == 270 )
+
+	uint16_t temp;
+	x = (MAX_X -1) - x;
+	temp = y;
+	y = x;
+	x = temp;
+
+#elif ( DISP_ORIENTATION == 0 )
+
+
+#elif ( DISP_ORIENTATION == 180 )
 
 	y = ( MAX_Y - 1 ) - y;
+	x = (MAX_X -1) - x;
 
 #endif
+
 	
 	switch (deviceCode)
 	{

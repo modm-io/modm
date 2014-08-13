@@ -69,8 +69,12 @@
 			<gpio port="2" id="8"  func="Gpio"           bits="mode,hys,od"/>
 			<gpio port="2" id="9"  func="Gpio"           bits="mode,hys,od"/>
 			<gpio port="2" id="10" func="Gpio"           bits="mode,hys,od"/>
-
-			<gpio port="3" id="1" func="Gpio"           bits="mode,hys,od"/>
+			<gpio port="3" id="0"  func="Gpio,Uart"      bits="mode,hys,od"/>
+			<gpio port="3" id="1"  func="Gpio,Uart"      bits="mode,hys,od"/>
+			<gpio port="3" id="2"  func="Gpio,Uart"      bits="mode,hys,od"/>
+			<gpio port="3" id="3"  func="Gpio,Uart"      bits="mode,hys,od"/>
+			<gpio port="3" id="4"  func="Gpio"           bits="mode,hys,od"/>
+			<gpio port="3" id="5"  func="Gpio"           bits="mode,hys,od"/>
 		</driver>
 	</device>
 </rca>

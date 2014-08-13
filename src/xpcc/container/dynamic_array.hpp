@@ -173,7 +173,7 @@ namespace xpcc
 		 */
 		void
 		removeAll();
-		
+
 		/**
 		 * \brief	Access element
 		 *
@@ -278,6 +278,8 @@ namespace xpcc
 			iterator& operator -- ();
 			bool operator == (const iterator& other) const;
 			bool operator != (const iterator& other) const;
+			bool operator <  (const iterator& other) const;
+			bool operator >  (const iterator& other) const;
 			T& operator * ();
 			T* operator -> ();
 			
@@ -358,6 +360,22 @@ namespace xpcc
 		const_iterator
 		end() const;
 		
+		/**
+		 * Returns a read/write iterator that points to the first element
+		 * that contains value. If value is not found, it points to the
+		 * last element.
+		 */
+		iterator
+		find(const T& value);
+
+		/**
+		 * Returns a read-only (constant) iterator that points to the first
+		 * element that contains value. If value is not found, it points to
+		 * the last element.
+		 */
+		const_iterator
+		find(const T& value) const;
+
 	private:
 		friend class const_iterator;
 		friend class iterator;	

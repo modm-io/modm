@@ -1,6 +1,0 @@
-#ifndef XPCC_AVR32__TIMER_1_HPP
-#define XPCC_AVR32__TIMER_1_HPP
-
-
-
-#endif // XPCC_AVR32__TIMER_1_HPP
