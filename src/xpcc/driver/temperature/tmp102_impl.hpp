@@ -14,9 +14,8 @@
 // ----------------------------------------------------------------------------
 template < typename I2cMaster >
 xpcc::Tmp102<I2cMaster>::Tmp102(uint8_t* data, uint8_t address)
-:	I2cWriteReadAdapter(address), running(Running::Nothing), config(0), data(data)
+:	I2cDevice<I2cMaster>(), running(Running::Nothing), config(0), data(data), adapter(address, this)
 {
-	configureWriteRead(buffer, 0, data, 0);
 }
 
 template < typename I2cMaster >
@@ -30,7 +29,7 @@ xpcc::Tmp102<I2cMaster>::startConfigure(uint8_t lsb, uint8_t msb)
 		buffer[1] = msb;
 		buffer[2] = lsb;
 
-		if (configureWriteRead(buffer, 3, data, 0) && I2cMaster::start(this))
+		if (adapter.configureWrite(buffer, 3) && this->startTransaction(&adapter))
 		{
 			running = Running::Configuration;
 			return true;
@@ -55,7 +54,7 @@ xpcc::Tmp102<I2cMaster>::startConversion()
 		buffer[0] = static_cast<uint8_t>(tmp102::Register::Configuration);
 		buffer[1] = config | tmp102::CONFIGURATION_ONE_SHOT;
 
-		if (configureWrite(buffer, 2) && I2cMaster::start(this))
+		if (adapter.configureWrite(buffer, 2) && this->startTransaction(&adapter))
 		{
 			running = Running::StartConversion;
 			return true;
@@ -79,7 +78,7 @@ xpcc::Tmp102<I2cMaster>::startReadTemperature()
 	{
 		buffer[0] = static_cast<uint8_t>(tmp102::Register::Temperature);
 
-		if (configureWriteRead(buffer, 1, data, 2) && I2cMaster::start(this))
+		if (adapter.configureWriteRead(buffer, 1, data, 2) && this->startTransaction(&adapter))
 		{
 			running = Running::ReadTemperature;
 			return true;
@@ -99,7 +98,7 @@ template < typename I2cMaster >
 bool
 xpcc::Tmp102<I2cMaster>::isSuccessful()
 {
-	return (getAdapterState() != AdapterState::Error);
+	return (adapter.getState() != xpcc::I2c::AdapterState::Error);
 }
 
 template < typename I2cMaster >
@@ -122,8 +121,8 @@ xpcc::Tmp102<I2cMaster>::getData()
 
 template < typename I2cMaster >
 void
-xpcc::Tmp102<I2cMaster>::detaching(DetachCause cause)
+xpcc::Tmp102<I2cMaster>::Adapter::detaching(DetachCause cause)
 {
 	I2cWriteReadAdapter::detaching(cause);
-	running = Running::Nothing;
+	parent->running = Running::Nothing;
 }

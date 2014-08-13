@@ -11,7 +11,8 @@
 #define XPCC_TMP102_HPP
 
 #include <stdint.h>
-#include <xpcc/architecture/peripheral/i2c_adapter.hpp>
+#include <xpcc/architecture/peripheral/i2c_device.hpp>
+#include <xpcc/architecture/peripheral/i2c_transaction.hpp>
 
 namespace xpcc
 {
@@ -84,8 +85,8 @@ namespace tmp102
  *
  * @tparam I2cMaster Asynchronous Interface
  */
-template < typename I2cMaster >
-class Tmp102 : protected xpcc::I2cWriteReadAdapter
+template < class I2cMaster >
+class Tmp102 : public xpcc::I2cDevice<I2cMaster>
 {
 public:
 	/**
@@ -134,7 +135,8 @@ public:
 
 private:
 	volatile enum class
-	Running {
+	Running : uint8_t
+	{
 		Nothing,
 		ReadTemperature,
 		StartConversion,
@@ -145,10 +147,19 @@ private:
 	uint8_t* data;
 	uint8_t buffer[3];
 
-protected:
-	// we overwrite the detaching callback to reset running to Nothing
-	virtual void
-	detaching(DetachCause cause);
+	class Adapter : public xpcc::I2cWriteReadAdapter
+	{
+		Tmp102<I2cMaster> *parent;
+
+	public:
+		Adapter(uint8_t address, Tmp102<I2cMaster> *parent)
+		:	I2cWriteReadAdapter(address), parent(parent) {}
+
+	private:
+		// we overwrite the detaching callback to reset running to Nothing
+		virtual void
+		detaching(DetachCause cause);
+	} adapter;
 };
 
 } // namespace xpcc
