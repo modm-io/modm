@@ -181,13 +181,13 @@ namespace
 	CheckNextOperation checkNextOperation = CHECK_NEXT_OPERATION_NO;
 
 	// delegating
-	static xpcc::I2cTransaction *delegate(0);
+	static xpcc::I2cTransaction *transaction(nullptr);
 	static xpcc::I2cMaster::Error error(xpcc::I2cMaster::Error::NoError);
 
 	// buffer management
-	static xpcc::I2cTransaction::Starting starting;
-	static xpcc::I2cTransaction::Writing writing;
-	static xpcc::I2cTransaction::Reading reading;
+	static xpcc::I2cTransaction::Starting starting(0, xpcc::I2c::OperationAfterStart::Stop);
+	static xpcc::I2cTransaction::Writing writing(nullptr, 0, xpcc::I2c::OperationAfterWrite::Stop);
+	static xpcc::I2cTransaction::Reading reading(nullptr, 0, xpcc::I2c::OperationAfterRead::Stop);
 
 	// helper functions
 	static inline void
@@ -223,18 +223,14 @@ I2C{{ id }}_EV_IRQHandler(void)
 		// EV5: SB=1, cleared by reading SR1 register followed by writing DR register with Address.
 		DEBUG_STREAM("startbit set");
 
-		starting.address = 0;
-		starting.next = xpcc::I2c::Operation::Stop;
-		delegate->starting(starting);
+		starting = transaction->starting();
 		uint8_t addressMode = xpcc::I2c::Write;
 
 		switch (starting.next)
 		{
-			case xpcc::I2c::Operation::Read:
+			case xpcc::I2c::OperationAfterStart::Read:
 				addressMode = xpcc::I2c::Read;
-				reading.length = 0;
-				reading.next = xpcc::I2c::OperationAfterRead::Stop;
-				delegate->reading(reading);
+				reading = transaction->reading();
 				nextOperation = static_cast<xpcc::I2c::Operation>(reading.next);
 
 				if (reading.length <= 2)
@@ -255,25 +251,15 @@ I2C{{ id }}_EV_IRQHandler(void)
 				DEBUG_STREAM("read op: reading=" << reading.length);
 				break;
 
-			case xpcc::I2c::Operation::Write:
-				writing.length = 0;
-				writing.next = xpcc::I2c::OperationAfterWrite::Stop;
-				delegate->writing(writing);
+			case xpcc::I2c::OperationAfterStart::Write:
+				writing = transaction->writing();
 				nextOperation = static_cast<xpcc::I2c::Operation>(writing.next);
 
 				DEBUG_STREAM("write op: writing=" << writing.length);
 				break;
 
-			case xpcc::I2c::Operation::Restart:
-				writing.length = 0;
-				reading.length = 0;
-				nextOperation = xpcc::I2c::Operation::Restart;
-
-				DEBUG_STREAM("restart op");
-				break;
-
 			default:
-			case xpcc::I2c::Operation::Stop:
+			case xpcc::I2c::OperationAfterStart::Stop:
 				writing.length = 0;
 				reading.length = 0;
 				nextOperation = xpcc::I2c::Operation::Stop;
@@ -439,9 +425,7 @@ I2C{{ id }}_EV_IRQHandler(void)
 			case xpcc::I2c::Operation::Write:
 				if (checkNextOperation != CHECK_NEXT_OPERATION_YES_NO_STOP_BIT)
 				{
-					writing.length = 0;
-					writing.next = xpcc::I2c::OperationAfterWrite::Stop;
-					delegate->writing(writing);
+					writing = transaction->writing();
 					nextOperation = static_cast<xpcc::I2c::Operation>(writing.next);
 					// reenable TXE
 					I2C{{ id }}->CR2 |= I2C_CR2_ITBUFEN;
@@ -463,8 +447,8 @@ I2C{{ id }}_EV_IRQHandler(void)
 
 				DEBUG_STREAM("disable interrupts");
 				I2C{{ id }}->CR2 &= ~(I2C_CR2_ITEVTEN | I2C_CR2_ITBUFEN | I2C_CR2_ITERREN);
-				if (delegate) delegate->detaching(xpcc::I2c::DetachCause::NormalStop);
-				delegate = 0;
+				if (transaction) transaction->detaching(xpcc::I2c::DetachCause::NormalStop);
+				transaction = nullptr;
 				DEBUG_STREAM("write finished");
 				break;
 		}
@@ -503,10 +487,10 @@ I2C{{ id }}_ER_IRQHandler(void)
 		error = xpcc::I2cMaster::Error::Unknown;
 	}
 
-	if (delegate)
+	if (transaction)
 	{
-		delegate->detaching(xpcc::I2c::DetachCause::ErrorCondition);
-		delegate = 0;
+		transaction->detaching(xpcc::I2c::DetachCause::ErrorCondition);
+		transaction = nullptr;
 	}
 
 	// Overrun error is not handled here separately
@@ -528,7 +512,7 @@ I2C{{ id }}_ER_IRQHandler(void)
 void
 xpcc::stm32::I2cMaster{{ id }}::initializeWithPrescaler(uint8_t peripheralFrequency, uint16_t prescaler)
 {
-	// no reset, since we want to keep the delegate attached!
+	// no reset, since we want to keep the transaction attached!
 
 	// Enable clock
 	RCC->APB1ENR |= RCC_APB1ENR_I2C{{ id }}EN;
@@ -552,38 +536,44 @@ xpcc::stm32::I2cMaster{{ id }}::reset(DetachCause cause)
 {
 	reading.length = 0;
 	writing.length = 0;
-	if (delegate) delegate->detaching(cause);
-	delegate = 0;
+	if (transaction) transaction->detaching(cause);
+	transaction = nullptr;
 }
 
 // MARK: - ownership
 bool
-xpcc::stm32::I2cMaster{{ id }}::start(xpcc::I2cTransaction *transaction)
+xpcc::stm32::I2cMaster{{ id }}::start(xpcc::I2cTransaction *transaction, Configuration_t *configuration)
 {
-	if (!::delegate && transaction && transaction->attaching())
+	if (!::transaction && transaction)
 	{
-		DEBUG_STREAM("\n###\n");
-		::delegate = transaction;
-		callStarting();
+		if (transaction->attaching())
+		{
+			if (configuration)
+				configuration();
 
-		return true;
+			DEBUG_STREAM("\n###\n");
+			::transaction = transaction;
+
+			callStarting();
+
+			return true;
+		}
+		else {
+			transaction->detaching(xpcc::I2c::DetachCause::FailedToAttach);
+		}
 	}
 	return false;
 }
 
 bool
-xpcc::stm32::I2cMaster{{ id }}::startBlocking(xpcc::I2cTransaction *transaction)
+xpcc::stm32::I2cMaster{{ id }}::startBlocking(xpcc::I2cTransaction *transaction, Configuration_t *configuration)
 {
-	if (!::delegate && transaction && transaction->attaching())
+	if (start(transaction, configuration))
 	{
-		DEBUG_STREAM("\n###\n");
-		::delegate = transaction;
-		callStarting();
-
 		// memory barrier, yes you really need it
 		__asm__ volatile ("dmb" ::: "memory");
 
-		while(::delegate != 0)
+		while(::transaction)
 			;
 
 		return true;

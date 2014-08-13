@@ -23,7 +23,7 @@ SDA xpcc::SoftwareI2cMaster<SCL, SDA, BaudRate>::sda;
 template <typename SCL, typename SDA, uint32_t BaudRate>
 xpcc::I2c::Operation xpcc::SoftwareI2cMaster<SCL, SDA, BaudRate>::nextOperation;
 template <typename SCL, typename SDA, uint32_t BaudRate>
-xpcc::I2cTransaction *xpcc::SoftwareI2cMaster<SCL, SDA, BaudRate>::delegate(0);
+xpcc::I2cTransaction *xpcc::SoftwareI2cMaster<SCL, SDA, BaudRate>::delegate(nullptr);
 template <typename SCL, typename SDA, uint32_t BaudRate>
 xpcc::I2cMaster::Error xpcc::SoftwareI2cMaster<SCL, SDA, BaudRate>::errorState(xpcc::I2cMaster::Error::NoError);
 
@@ -49,82 +49,84 @@ void
 xpcc::SoftwareI2cMaster<SCL, SDA, BaudRate>::reset(DetachCause cause)
 {
 	if (delegate) delegate->detaching(cause);
-	delegate = 0;
+	delegate = nullptr;
 }
 
 template <typename SCL, typename SDA, uint32_t BaudRate>
 bool
-xpcc::SoftwareI2cMaster<SCL, SDA, BaudRate>::start(xpcc::I2cTransaction *transaction)
+xpcc::SoftwareI2cMaster<SCL, SDA, BaudRate>::start(xpcc::I2cTransaction *transaction, Configuration_t *configuration)
 {
-	if (!delegate && transaction && transaction->attaching())
+	if (!delegate && transaction)
 	{
-		delegate = transaction;
+		if (transaction->attaching()) {
+			if (configuration)
+				configuration();
 
-		while(1)
-		{
-			DEBUG_SW_I2C('\n');
-			DEBUG_SW_I2C('s');
-			startCondition();
+			delegate = transaction;
 
-			starting.address = 0;
-			starting.next = xpcc::I2c::Operation::Stop;
-			delegate->starting(starting);
-			uint8_t address = (starting.address & 0xfe);
+			while (1)
+			{
+				DEBUG_SW_I2C('\n');
+				DEBUG_SW_I2C('s');
+				startCondition();
 
-			if (starting.next == xpcc::I2c::Operation::Read)
-				address |= xpcc::I2c::Read;
+				starting = delegate->starting();
+				uint8_t address = (starting.address & 0xfe);
 
-			if (!write(address))
-				return true;
-			if (nextOperation == xpcc::I2c::Operation::Restart) {DEBUG_SW_I2C('R');}
-			nextOperation = starting.next;
+				if (starting.next == xpcc::I2c::OperationAfterStart::Read)
+					address |= xpcc::I2c::Read;
 
-			do {
-				switch (nextOperation)
+				if (!write(address))
+					return true;
+				if (nextOperation == xpcc::I2c::Operation::Restart) {DEBUG_SW_I2C('R');}
+				nextOperation = static_cast<xpcc::I2c::Operation>(starting.next);
+
+				do
 				{
-					case xpcc::I2c::Operation::Read:
+					switch (nextOperation)
 					{
-						reading.length = 0;
-						reading.next = xpcc::I2c::OperationAfterRead::Stop;
-						delegate->reading(reading);
-						while(reading.length > 1) {
-							*reading.buffer++ = read(true);
-							--reading.length;
+						case xpcc::I2c::Operation::Read:
+							reading = delegate->reading();
+							while (reading.length > 1)
+							{
+								*reading.buffer++ = read(true);
+								--reading.length;
+								DEBUG_SW_I2C('\n');
+								DEBUG_SW_I2C('a');
+							}
+							*reading.buffer = read(false);
 							DEBUG_SW_I2C('\n');
-							DEBUG_SW_I2C('a');
-						}
-						*reading.buffer = read(false);
-						DEBUG_SW_I2C('\n');
-						DEBUG_SW_I2C('n');
-						nextOperation = static_cast<xpcc::I2c::Operation>(reading.next);
-					}
-						break;
+							DEBUG_SW_I2C('n');
+							nextOperation = static_cast<xpcc::I2c::Operation>(reading.next);
+							break;
 
-					case xpcc::I2c::Operation::Write:
-					{
-						writing.length = 0;
-						writing.next = xpcc::I2c::OperationAfterWrite::Stop;
-						delegate->writing(writing);
-						while(writing.length > 0) {
-							if (!write(*writing.buffer++))
-								return true;
-							--writing.length;
-							DEBUG_SW_I2C('\n');
-							DEBUG_SW_I2C('A');
-						}
-						nextOperation = static_cast<xpcc::I2c::Operation>(writing.next);
-					}
-						break;
+						case xpcc::I2c::Operation::Write:
+							writing = delegate->writing();
+							while (writing.length > 0)
+							{
+								if (!write(*writing.buffer++))
+									return true;
+								--writing.length;
+								DEBUG_SW_I2C('\n');
+								DEBUG_SW_I2C('A');
+							}
+							nextOperation = static_cast<xpcc::I2c::Operation>(writing.next);
+							break;
 
-					default:
-					case xpcc::I2c::Operation::Stop:
-						DEBUG_SW_I2C('S');
-						delegate->detaching(xpcc::I2c::DetachCause::NormalStop);
-						delegate = 0;
-						stopCondition();
-						return true;
+						default:
+						case xpcc::I2c::Operation::Stop:
+							DEBUG_SW_I2C('S');
+							delegate->detaching(xpcc::I2c::DetachCause::NormalStop);
+							delegate = nullptr;
+							stopCondition();
+							return true;
+					}
 				}
-			} while (nextOperation != xpcc::I2c::Operation::Restart);
+				while (nextOperation != xpcc::I2c::Operation::Restart);
+			}
+		}
+		else {
+			transaction->detaching(xpcc::I2c::DetachCause::FailedToAttach);
 		}
 	}
 	return false;

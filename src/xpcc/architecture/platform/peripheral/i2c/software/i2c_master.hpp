@@ -12,7 +12,7 @@
 
 #include <xpcc/architecture/driver/delay.hpp>
 #include <xpcc/architecture/peripheral/gpio.hpp>
-#include <xpcc/architecture/peripheral/i2c.hpp>
+#include <xpcc/architecture/peripheral/i2c_master.hpp>
 #include "type_ids.hpp"
 
 namespace xpcc
@@ -53,12 +53,12 @@ public:
 public:
 	// start documentation inherited
 	static bool
-	start(xpcc::I2cTransaction *transaction);
+	start(xpcc::I2cTransaction *transaction, Configuration_t *configuration = nullptr);
 
 	static ALWAYS_INLINE bool
-	startBlocking(xpcc::I2cTransaction *transaction)
+	startBlocking(xpcc::I2cTransaction *transaction, Configuration_t *configuration = nullptr)
 	{
-		return start(transaction);
+		return start(transaction, configuration);
 	};
 
 	static Error

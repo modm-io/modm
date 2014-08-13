@@ -12,8 +12,8 @@
 #define XPCC_STM32_I2C_{{ id }}_HPP
 
 #include "../../../device.hpp"
-#include <xpcc/architecture/peripheral/i2c.hpp>
 #include "type_ids.hpp"
+#include <xpcc/architecture/peripheral/i2c_master.hpp>
 
 namespace xpcc
 {
@@ -62,10 +62,10 @@ public:
 
 	// start documentation inherited
 	static bool
-	start(xpcc::I2cTransaction *transaction);
+	start(xpcc::I2cTransaction *transaction, Configuration_t *configuration = nullptr);
 
 	static bool
-	startBlocking(xpcc::I2cTransaction *transaction);
+	startBlocking(xpcc::I2cTransaction *transaction, Configuration_t *configuration = nullptr);
 
 	static Error
 	getErrorState();
