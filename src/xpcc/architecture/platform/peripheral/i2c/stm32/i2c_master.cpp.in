@@ -166,6 +166,7 @@
 
 #include "i2c_master_{{ id }}.hpp"
 #include <xpcc/architecture/driver/accessor.hpp>
+#include <xpcc/architecture/driver/atomic.hpp>
 #include <xpcc/container.hpp>
 
 namespace
@@ -591,6 +592,7 @@ xpcc::stm32::I2cMaster{{ id }}::reset(DetachCause cause)
 bool
 xpcc::stm32::I2cMaster{{ id }}::start(I2cTransaction *transaction, Configuration_t configuration)
 {
+	xpcc::atomic::Lock lock;
 	// if we have a place in the queue and the transaction object is valid
 	if (!queue.isFull() && transaction)
 	{
