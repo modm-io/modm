@@ -26,7 +26,7 @@ namespace
 {
 	static xpcc::atomic::Queue<char, {{ parameters.rx_buffer }}> rxBuffer;
 	static xpcc::atomic::Queue<char, {{ parameters.tx_buffer }}> txBuffer;
-	static bool isBlocking = true;
+	static bool isBlocking = false; // Remove this. The interface is non-blocking by design.
 }
 %% endif
 

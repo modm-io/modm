@@ -19,6 +19,8 @@
 #include <xpcc/architecture/peripheral/uart.hpp>
 #include "../../../type_ids.hpp"
 #include "uart_base.hpp"
+#include "uart_baudrate.hpp"
+#include "{{ uart | lower }}_hal_{{ id }}.hpp"
 
 namespace xpcc
 {
