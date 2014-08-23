@@ -158,6 +158,7 @@ class I2cWriteReadAdapter : public I2cTransaction
 	bool isReading;
 
 public:
+	///	@param	address	the slave address not yet shifted right (address < 128).
 	I2cWriteReadAdapter(uint8_t address)
 	:	address(address << 1), readSize(0), writeSize(0),
 		readBuffer(nullptr), writeBuffer(nullptr),
@@ -174,6 +175,18 @@ public:
 	}
 
 	/**
+	 * Initializes the adapter to only send the address without payload.
+	 *
+	 * @return  `true` if adapter was not in use and accepted the information,
+	 *          `false` otherwise
+	 */
+	bool ALWAYS_INLINE
+	configurePing()
+	{
+		return configureWriteRead(nullptr, 0, nullptr, 0);
+	}
+
+	/**
 	 * Initializes the adapter with the required information for a write/read operation.
 	 *
 	 * @param[in] 	writeBuffer	buffer to be written to the slave
@@ -181,7 +194,7 @@ public:
 	 * @param[out]	readBuffer	buffer to write the read bytes from the slave
 	 * @param		readSize	number of bytes to be read, set to `0` to read nothing
 	 *
-	 * @return  `true` if adapter was not busy and accepted the information,
+	 * @return  `true` if adapter was not in use and accepted the information,
 	 *          `false` otherwise
 	 */
 	bool inline
@@ -207,7 +220,7 @@ public:
 	 * @param[in] 	buffer	buffer to be written to the slave
 	 * @param		size	number of bytes to be written, set to `0` to write nothing
 	 *
-	 * @return  `true` if adapter was not busy and accepted the information,
+	 * @return  `true` if adapter was not in use and accepted the information,
 	 *          `false` otherwise
 	 */
 	bool ALWAYS_INLINE
@@ -224,7 +237,7 @@ public:
 	 * @param[out] 	buffer	buffer to be read from the slave
 	 * @param		size	number of bytes to be read, set to `0` to read nothing
 	 *
-	 * @return  `true` if adapter was not busy and accepted the information,
+	 * @return  `true` if adapter was not in use and accepted the information,
 	 *          `false` otherwise
 	 */
 	bool ALWAYS_INLINE
@@ -303,6 +316,7 @@ class I2cWriteAdapter : public I2cTransaction
 	volatile AdapterState state;
 
 public:
+	///	@param	address	the slave address not yet shifted right (address < 128).
 	I2cWriteAdapter(uint8_t address)
 	:	address(address << 1), size(0), buffer(nullptr), state(AdapterState::Idle)
 	{
@@ -317,6 +331,18 @@ public:
 	}
 
 	/**
+	 * Initializes the adapter to only send the address without payload.
+	 *
+	 * @return  `true` if adapter was not in use and accepted the information,
+	 *          `false` otherwise
+	 */
+	bool ALWAYS_INLINE
+	configurePing()
+	{
+		return configureWrite(nullptr, 0);
+	}
+
+	/**
 	 * Initializes the adapter with the required information for a write operation
 	 *
 	 * The slave address is not configured, so use this method during normal operation to change buffers.
@@ -324,7 +350,7 @@ public:
 	 * @param[in] 	buffer	buffer to be written to the slave
 	 * @param		size	number of bytes to be written, set to `0` to write nothing
 	 *
-	 * @return  `true` if adapter was not busy and accepted the information,
+	 * @return  `true` if adapter was not in use and accepted the information,
 	 *          `false` otherwise
 	 */
 	bool inline
@@ -398,6 +424,7 @@ class I2cReadAdapter : public I2cTransaction
 	volatile AdapterState state;
 
 public:
+	///	@param	address	the slave address not yet shifted right (address < 128).
 	I2cReadAdapter(uint8_t address)
 	:	address(address << 1), size(0), buffer(nullptr), state(AdapterState::Idle)
 	{
@@ -412,6 +439,18 @@ public:
 	}
 
 	/**
+	 * Initializes the adapter to only send the address without payload.
+	 *
+	 * @return  `true` if adapter was not in use and accepted the information,
+	 *          `false` otherwise
+	 */
+	bool ALWAYS_INLINE
+	configurePing()
+	{
+		return configureRead(nullptr, 0);
+	}
+
+	/**
 	 * Initializes the adapter with the required information for a read operation
 	 *
 	 * The slave address is not configured, so use this method during normal operation to change buffers.
@@ -419,7 +458,7 @@ public:
 	 * @param[out] 	buffer	buffer to be read from the slave
 	 * @param		size	number of bytes to be read, set to `0` to read nothing
 	 *
-	 * @return  `true` if adapter was not busy and accepted the information,
+	 * @return  `true` if adapter was not in use and accepted the information,
 	 *          `false` otherwise
 	 */
 	bool inline
