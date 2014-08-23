@@ -218,24 +218,127 @@ namespace nrf24
 
 
 template <typename Spi, typename Csn, typename Ce>
-class Nrf24
+class Nrf24Hal
 {
 
 public:
 	static void
-	initialize();
+	initialize()
+	{
+		// intialize with dynamic payload length
+		payload_length = 0;
+	}
+
+
+	/** @brief Read simple 8 bit register
+	 *
+	 * To read addresses use specific function.
+	 * @return Register content
+	 */
+	static uint8_t
+	readRegister(nrf24::Register);
+
+	/** @brief Write simple 8 bit register
+	 *
+	 * To set addresses use specific function
+	 */
+	static void
+	writeRegister(nrf24::Register, uint8_t data);
+
+	/** @brief Read received payload
+	 *
+	 * Used in RX mode.
+	 * Payload is deleted from FIFO after it is read.
+	 *
+	 *	@param buffer buffer where to put payload, should be be 32 byte wide
+	 *	@return length of received payload
+	 */
+	static uint8_t
+	readRxPayload(uint8_t* buffer);
+
+	/** @brief Write payload to be send
+	 *
+	 */
+	static void
+	writeTxPayload(uint8_t* buffer, uint8_t len);
+
+	static void
+	writeTxPayloadNoAck();
+
+	/**@brief Flush Tx Fifo
+	 *
+	 * Used in Tx mode
+	 */
+	static void
+	flushTxFifo();
+
+	/** @brief Flush Rx Fifo
+	 *
+	 * Used in Rx mode
+	 */
+	static void
+	flushRxFifo();
+
+	/** @brief Reuse last transmitted payload
+	 *
+	 * Used in PTX mode.
+	 * TX payload reuse is active until W_TX_PAYLOAD or FLUSH TX is
+	 * executed. TX payload reuse must not be activated or deactivated
+	 * during package transmission.
+	 */
+	static void
+	reuseTxPayload();
+
+	/** @brief Read Rx payload width for top of Rx Fifo
+	 *
+	 * Note: Flush RX FIFO if the read value is larger than 32 bytes.
+	 */
+	static uint8_t
+	readRxPayloadWidth();
+
+	/** @brief Write Payload to be transmitted together with ACK packet
+	 *
+	 * Used in RX mode..
+	 * Maximum three ACK packet payloads can be pending. Payloads with
+	 * same Pipe are handled using first in - first out principle. Write
+	 * payload: 1– 32 bytes. A write operation always starts at byte 0.
+	 */
+	static void
+	writeAckPayload(uint8_t pipe);
+
+	/** @brief Read new status
+	 *
+	 * Note: status will be automatically updated every time a command is
+	 *       issued, so it might not be necessary to call this explicitly.
+	 */
+	static uint8_t
+	updateStatus();
+
 
 
 private:
+	static uint8_t
+	writeCommandSingleData(nrf24::Command cmd, uint8_t data);
 
 	static void
-	writeRegister(nrf24::Register, uint8_t& data, uint8_t length);
+	writeCommandNoData(nrf24::Command cmd);
 
-	static uint8_t
-	writeCommand(nrf24::Command, uint8_t& data, uint8_t length);
+	static void
+	writeCommandMultiData(nrf24::Command cmd, uint8_t* argv, uint8_t* retv, uint8_t argc);
+
 
 private:
 	static uint8_t status;
+
+	/* Buffers that can be used for command execution */
+	static uint8_t retBuffer[32];
+	static uint8_t argBuffer[32];
+
+	static uint8_t rxBuffer[32];
+	static uint8_t txBuffer[32];
+
+	/* Length of payload in bytes. 0 means dynamic payload*/
+	static uint8_t payload_length;
 
 };
 
