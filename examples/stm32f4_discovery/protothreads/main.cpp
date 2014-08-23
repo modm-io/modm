@@ -101,7 +101,7 @@ struct DeviceConfiguration
 
 	/// 100kHz I2C configuration
 	static void
-	standard_configuration()
+	slow_configuration()
 	{
 		if (tag != 's') {
 			stream << "config: 20kHz" << xpcc::endl;
@@ -131,7 +131,7 @@ public:
 	:	temperature(temperatureData, 0x48)
 	{
 		// this i2c device will be driven with only 20kHz
-		temperature.attachPeripheralConfiguration(DeviceConfiguration::standard_configuration);
+		temperature.attachPeripheralConfiguration(DeviceConfiguration::slow_configuration);
 	}
 
 	bool
@@ -139,11 +139,30 @@ public:
 	{
 		PT_BEGIN();
 
-		// we need to configure the device before we can use it
-		// so we wait until the task started
-		PT_WAIT_UNTIL(temperature.startConfigure());
-		// and we wait until it finished
-		PT_WAIT_UNTIL(temperature.runConfigure());
+		// ping the device until it responds
+		while(true)
+		{
+			// we wait until the task started
+			PT_WAIT_UNTIL(temperature.startPing());
+			// we wait until the task finished
+			PT_WAIT_UNTIL(temperature.runPing());
+			// if the device responds to the ping, break
+			if (temperature.isPingSuccessful())
+				break;
+			// otherwise, try again in 100ms
+			this->timer.restart(100);
+			PT_WAIT_UNTIL(this->timer.isExpired());
+		}
+
+		do
+		{
+			// we need to configure the device before we can use it
+			// so we wait until the task started
+			PT_WAIT_UNTIL(temperature.startConfiguration());
+			// and we wait until it finished
+			PT_WAIT_UNTIL(temperature.runConfiguration());
+		}
+		while(temperature.isConfigurationSuccessful());
 
 		while (true)
 		{
@@ -152,10 +171,12 @@ public:
 			// and until this task finishes
 			PT_WAIT_UNTIL(temperature.runReadTemperature());
 			// did we succeed with the readout?
-			if (temperature.isSuccessful()) {
+			if (temperature.isReadTemperatureSuccessful())
+			{
 				tf = temperature.getTemperature();
 				stream << "t1: " << (int)tf << xpcc::endl;
-			} else {
+			}
+			else {
 				tf = NAN;
 				stream << "t1: NACK"<< xpcc::endl;
 			}
@@ -191,17 +212,19 @@ public:
 	{
 		PT_BEGIN();
 
-		PT_WAIT_UNTIL(temperature.startConfigure());
-		PT_WAIT_UNTIL(temperature.runConfigure());
+		PT_WAIT_UNTIL(temperature.startConfiguration());
+		PT_WAIT_UNTIL(temperature.runConfiguration());
 
 		while (true)
 		{
 			PT_WAIT_UNTIL(temperature.startReadTemperature());
 			PT_WAIT_UNTIL(temperature.runReadTemperature());
-			if (temperature.isSuccessful()) {
+			if (temperature.isReadTemperatureSuccessful())
+			{
 				tf = temperature.getTemperature();
 				stream << "t2: " << (int)tf << xpcc::endl;
-			} else {
+			}
+			else {
 				tf = NAN;
 				stream << "t2: NACK"<< xpcc::endl;
 			}
