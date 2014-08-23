@@ -19,45 +19,42 @@ namespace xpcc
 
 namespace tmp102
 {
-	enum class
-	Register
-	{
-		Temperature = 0x00,
-		Configuration = 0x01,
-		LowTemperature = 0x02,
-		HighTemperature = 0x03
-	};
 
-	enum Temperature
-	{
-		TEMPERATURE_EXTENDED_MODE = 0x01
-	};
+enum class
+Register : uint8_t
+{
+	Temperature = 0x00,
+	Configuration = 0x01,
+	LowTemperature = 0x02,
+	HighTemperature = 0x03
+};
 
-	enum Configuration
-	{// first byte
-		CONFIGURATION_SHUTDOWN_MODE = 0x01,
-		CONFIGURATION_THERMOSTAT_MODE = 0x02,
-		CONFIGURATION_POLARITY = 0x04,
-		CONFIGURATION_FAULT_QUEUE = 0x18,
-		CONFIGURATION_FAULT_QUEUE_1 = 0x00,
-		CONFIGURATION_FAULT_QUEUE_2 = 0x08,
-		CONFIGURATION_FAULT_QUEUE_4 = 0x10,
-		CONFIGURATION_FAULT_QUEUE_6 = 0x18,
-		CONFIGURATION_CONVERTER_RESOLUTION = 0x60,
-		CONFIGURATION_CONVERTER_RESOLUTION_12BIT = 0x60,
-		CONFIGURATION_ONE_SHOT = 0x80
-	};
+enum Configuration
+{// first byte
+	CONFIGURATION_SHUTDOWN_MODE = 0x01,
+	CONFIGURATION_THERMOSTAT_MODE = 0x02,
+	CONFIGURATION_POLARITY = 0x04,
+	CONFIGURATION_FAULT_QUEUE = 0x18,
+	CONFIGURATION_FAULT_QUEUE_1 = 0x00,
+	CONFIGURATION_FAULT_QUEUE_2 = 0x08,
+	CONFIGURATION_FAULT_QUEUE_4 = 0x10,
+	CONFIGURATION_FAULT_QUEUE_6 = 0x18,
+	CONFIGURATION_CONVERTER_RESOLUTION = 0x60,
+	CONFIGURATION_CONVERTER_RESOLUTION_12BIT = 0x60,
+	CONFIGURATION_ONE_SHOT = 0x80
+};
 
-	enum ConfigurationExtended
-	{// second byte
-		CONFIGURATION_EXTENDED_MODE = 0x10,
-		CONFIGURATION_ALERT = 0x20,
-		CONFIGURATION_CONVERSION_RATE = 0xc0,
-		CONFIGURATION_CONVERSION_RATE_0_25HZ = 0x00,
-		CONFIGURATION_CONVERSION_RATE_1HZ = 0x40,
-		CONFIGURATION_CONVERSION_RATE_4HZ = 0x80,
-		CONFIGURATION_CONVERSION_RATE_8HZ = 0xc0
-	};
+enum ConfigurationExtended
+{// second byte
+	CONFIGURATION_EXTENDED_MODE = 0x10,
+	CONFIGURATION_ALERT = 0x20,
+	CONFIGURATION_CONVERSION_RATE = 0xc0,
+	CONFIGURATION_CONVERSION_RATE_0_25HZ = 0x00,
+	CONFIGURATION_CONVERSION_RATE_1HZ = 0x40,
+	CONFIGURATION_CONVERSION_RATE_4HZ = 0x80,
+	CONFIGURATION_CONVERSION_RATE_8HZ = 0xc0
+};
+
 }
 
 /**
@@ -86,7 +83,7 @@ namespace tmp102
  * @tparam I2cMaster Asynchronous Interface
  */
 template < class I2cMaster >
-class Tmp102 : public xpcc::I2cDevice<I2cMaster>
+class Tmp102 : public xpcc::I2cDevice< I2cMaster >
 {
 public:
 	/**
@@ -99,13 +96,27 @@ public:
 	ALWAYS_INLINE uint8_t*
 	getData();
 
-	// MARK: Tasks
+	// MARK: - Tasks
+	/// pings the sensor
 	bool
-	startConfigure(uint8_t lsb=tmp102::CONFIGURATION_CONVERSION_RATE_4HZ,
-				   uint8_t msb=tmp102::CONFIGURATION_CONVERTER_RESOLUTION_12BIT);
+	startPing();
 
 	bool ALWAYS_INLINE
-	runConfigure();
+	runPing();
+
+	bool ALWAYS_INLINE
+	isPingSuccessful();
+
+	/// sets the LSB and MSB of the sensor
+	bool
+	startConfiguration(uint8_t lsb=tmp102::CONFIGURATION_CONVERSION_RATE_4HZ,
+					   uint8_t msb=tmp102::CONFIGURATION_CONVERTER_RESOLUTION_12BIT);
+
+	bool ALWAYS_INLINE
+	runConfiguration();
+
+	bool ALWAYS_INLINE
+	isConfigurationSuccessful();
 
 	/// starts a temperature conversion right now
 	bool
@@ -115,51 +126,44 @@ public:
 	bool ALWAYS_INLINE
 	runConversion();
 
-	/**
-	 * read the Temperature registers and buffer the results
-	 * sets isNewDataAvailable() to `true`
-	 */
+	bool ALWAYS_INLINE
+	isConversionSuccessful();
+
+	/// read the Temperature registers and buffer the results
 	bool
 	startReadTemperature();
 
 	bool ALWAYS_INLINE
 	runReadTemperature();
 
-	// MARK: Results
 	bool ALWAYS_INLINE
-	isSuccessful();
+	isReadTemperatureSuccessful();
 
+	// MARK: - utility
 	/// @return the temperature as a signed float in Celcius
 	float
 	getTemperature();
 
 private:
-	volatile enum class
-	Running : uint8_t
+	struct Task
 	{
-		Nothing,
-		ReadTemperature,
-		StartConversion,
-		Configuration
-	} running;
+		enum
+		{
+			Idle = 0,
+			ReadTemperature,
+			StartConversion,
+			Configuration,
+			Ping
+		};
+	};
 
+	volatile uint8_t task;
+	volatile uint8_t success;
 	uint8_t config;
 	uint8_t* data;
 	uint8_t buffer[3];
 
-	class Adapter : public xpcc::I2cWriteReadAdapter
-	{
-		Tmp102<I2cMaster> *parent;
-
-	public:
-		Adapter(uint8_t address, Tmp102<I2cMaster> *parent)
-		:	I2cWriteReadAdapter(address), parent(parent) {}
-
-	private:
-		// we overwrite the detaching callback to reset running to Nothing
-		virtual void
-		detaching(DetachCause cause);
-	} adapter;
+	xpcc::I2cTagAdapter< xpcc::I2cWriteReadAdapter > adapter;
 };
 
 } // namespace xpcc
