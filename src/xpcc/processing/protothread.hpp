@@ -64,4 +64,5 @@
  */
 
 #include "protothread/protothread.hpp"
+#include "protothread/nested_protothread.hpp"
 #include "protothread/semaphore.hpp"
