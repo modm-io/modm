@@ -145,26 +145,6 @@ namespace xpcc
 			::_delay_ms(ms);
 		}
 	}
-	
-#elif defined(XPCC__CPU_AVR32)
-	namespace xpcc
-	{
-		static inline void
-		delay_us(uint32_t /*us*/)
-		{
-	#warning Implement delay_us
-			//		::_delay_us(us);
-		}
-
-		static inline void
-		delay_ms(uint32_t /*ms*/)
-		{
-	#warning Implement delay_ms
-	//		::_delay_ms(ms);
-		}
-
-	} // namespace xpcc
-
 #else
 	#error "Unknown architecture, please add some specific delay functions!"
 #endif
