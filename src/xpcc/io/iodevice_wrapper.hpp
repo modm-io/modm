@@ -80,8 +80,7 @@ namespace xpcc
 		virtual void
 		write(char c)
 		{
-			while(!T::write(c))
-				;
+			T::write(c);
 		}
 
 		virtual void
@@ -89,8 +88,7 @@ namespace xpcc
 		{
 			char c;
 			while ((c = *s++)) {
-				while(!T::write(static_cast<uint8_t>(c)))
-					;
+				T::write(static_cast<uint8_t>(c));
 			}
 		}
 
