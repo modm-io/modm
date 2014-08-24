@@ -20,7 +20,7 @@ xpcc::color::RgbT<UnderlyingType>::toHsv(HsvT<T>* color) const
 {
 	using namespace std;
 	typedef float CalcType;
-	const CalcType maxValue = xpcc::ArithmeticTraits<T>::max();
+	const CalcType maxValue = xpcc::ArithmeticTraits<T>::max;
 	const CalcType _red		= static_cast<CalcType>(red) / maxValue;
 	const CalcType _blue	= static_cast<CalcType>(blue) / maxValue;
 	const CalcType _green	= static_cast<CalcType>(green) / maxValue;

@@ -105,7 +105,7 @@ private:
 			float delta = (static_cast<float>(endValue) - currentValue);
 			deltaValue = delta / time;
 			if (deltaValue == 0)
-				deltaValue = delta > 0 ? xpcc::ArithmeticTraits<float>::epsilon() : -xpcc::ArithmeticTraits<float>::epsilon();
+				deltaValue = delta > 0 ? xpcc::ArithmeticTraits<float>::epsilon : -xpcc::ArithmeticTraits<float>::epsilon;
 		}
 
 		Type inline

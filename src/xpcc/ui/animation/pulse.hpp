@@ -33,8 +33,8 @@ class Pulse
 public:
 	Pulse(Animation<T> &animator)
 	:	animator(animator), frames{
-			xpcc::ui::KeyFrame<T>(500, xpcc::ArithmeticTraits<T>::max()),
-			xpcc::ui::KeyFrame<T>(500, xpcc::ArithmeticTraits<T>::min())
+			xpcc::ui::KeyFrame<T>(500, xpcc::ArithmeticTraits<T>::max),
+			xpcc::ui::KeyFrame<T>(500, xpcc::ArithmeticTraits<T>::min)
 		}
 	{
 		this->animator.setKeyFrames(frames, 2);

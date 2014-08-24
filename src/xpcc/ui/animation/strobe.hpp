@@ -36,14 +36,14 @@ class Strobe
 public:
 	Strobe(Animation<T> &animator)
 	:	animator(animator), frames{
-			xpcc::ui::KeyFrame<T>(60, xpcc::ArithmeticTraits<T>::max()),
-			xpcc::ui::KeyFrame<T>(40, xpcc::ArithmeticTraits<T>::max()),
-			xpcc::ui::KeyFrame<T>(90, xpcc::ArithmeticTraits<T>::min()),
-			xpcc::ui::KeyFrame<T>(110, xpcc::ArithmeticTraits<T>::min()),
-			xpcc::ui::KeyFrame<T>(60, xpcc::ArithmeticTraits<T>::max()),
-			xpcc::ui::KeyFrame<T>(40, xpcc::ArithmeticTraits<T>::max()),
-			xpcc::ui::KeyFrame<T>(90, xpcc::ArithmeticTraits<T>::min()),
-			xpcc::ui::KeyFrame<T>(510, xpcc::ArithmeticTraits<T>::min()),
+			xpcc::ui::KeyFrame<T>(60, xpcc::ArithmeticTraits<T>::max),
+			xpcc::ui::KeyFrame<T>(40, xpcc::ArithmeticTraits<T>::max),
+			xpcc::ui::KeyFrame<T>(90, xpcc::ArithmeticTraits<T>::min),
+			xpcc::ui::KeyFrame<T>(110, xpcc::ArithmeticTraits<T>::min),
+			xpcc::ui::KeyFrame<T>(60, xpcc::ArithmeticTraits<T>::max),
+			xpcc::ui::KeyFrame<T>(40, xpcc::ArithmeticTraits<T>::max),
+			xpcc::ui::KeyFrame<T>(90, xpcc::ArithmeticTraits<T>::min),
+			xpcc::ui::KeyFrame<T>(510, xpcc::ArithmeticTraits<T>::min),
 		}
 	{
 		this->animator.setKeyFrames(frames, 8);

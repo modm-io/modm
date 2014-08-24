@@ -43,8 +43,8 @@ namespace xpcc
  * @code
  * typedef typename xpcc::ArithmeticTraits<T>::WideType T_DOUBLE;
  *
- * T min = xpcc::ArithmeticTraits<T>::min();
- * T max = xpcc::ArithmeticTraits<T>::max();
+ * T min = xpcc::ArithmeticTraits<T>::min;
+ * T max = xpcc::ArithmeticTraits<T>::max;
  * @endcode
  *
  * @author	Martin Rosekeit <martin.rosekeit@rwth-aachen.de>
@@ -86,17 +86,8 @@ struct ArithmeticTraits<signed char>
 	static constexpr bool isFloatingPoint = false;
 	static constexpr bool isInteger = true;
 
-	static constexpr signed char
-	min()
-	{
-		return -127 - 1;
-	}
-
-	static constexpr signed char
-	max()
-	{
-		return 127;
-	}
+	static constexpr signed char min = -127 - 1;
+	static constexpr signed char max = 127;
 };
 
 // ------------------------------------------------------------------------
@@ -112,17 +103,8 @@ struct ArithmeticTraits<unsigned char>
 	static constexpr bool isFloatingPoint = false;
 	static constexpr bool isInteger = true;
 
-	static constexpr unsigned char
-	min()
-	{
-		return 0;
-	}
-
-	static constexpr unsigned char
-	max()
-	{
-		return 255;
-	}
+	static constexpr unsigned char min = 0;
+	static constexpr unsigned char max = 255;
 };
 
 // ------------------------------------------------------------------------
@@ -138,17 +120,8 @@ struct ArithmeticTraits<int16_t>
 	static constexpr bool isFloatingPoint = false;
 	static constexpr bool isInteger = true;
 
-	static constexpr int16_t
-	min()
-	{
-		return -32767 - 1;
-	}
-
-	static constexpr int16_t
-	max()
-	{
-		return 32767;
-	}
+	static constexpr int16_t min = -32767 - 1;
+	static constexpr int16_t max = 32767;
 };
 
 // ------------------------------------------------------------------------
@@ -164,17 +137,8 @@ struct ArithmeticTraits<uint16_t>
 	static constexpr bool isFloatingPoint = false;
 	static constexpr bool isInteger = true;
 
-	static constexpr uint16_t
-	min()
-	{
-		return 0;
-	}
-
-	static constexpr uint16_t
-	max()
-	{
-		return 65535;
-	}
+	static constexpr uint16_t min = 0;
+	static constexpr uint16_t max = 65535;
 };
 
 // ------------------------------------------------------------------------
@@ -194,17 +158,8 @@ struct ArithmeticTraits<int32_t>
 	static constexpr bool isFloatingPoint = false;
 	static constexpr bool isInteger = true;
 
-	static constexpr int32_t
-	min()
-	{
-		return -2147483647L - 1;
-	}
-
-	static constexpr int32_t
-	max()
-	{
-		return 2147483647L;
-	}
+	static constexpr int32_t min = -2147483647L - 1;
+	static constexpr int32_t max = 2147483647L;
 };
 
 // ------------------------------------------------------------------------
@@ -224,17 +179,8 @@ struct ArithmeticTraits<uint32_t>
 	static constexpr bool isFloatingPoint = false;
 	static constexpr bool isInteger = true;
 
-	static constexpr uint32_t
-	min()
-	{
-		return 0;
-	}
-
-	static constexpr uint32_t
-	max()
-	{
-		return 4294967295UL;
-	}
+	static constexpr uint32_t min = 0;
+	static constexpr uint32_t max = 4294967295UL;
 };
 
 #if defined(XPCC__CPU_ARM)
@@ -253,17 +199,8 @@ struct ArithmeticTraits<int>
 	static constexpr bool isFloatingPoint = false;
 	static constexpr bool isInteger = true;
 
-	static constexpr int32_t
-	min()
-	{
-		return -2147483647L - 1;
-	}
-
-	static constexpr int32_t
-	max()
-	{
-		return 2147483647L;
-	}
+	static constexpr int32_t min = -2147483647L - 1;
+	static constexpr int32_t max = 2147483647L;
 };
 
 template<>
@@ -278,17 +215,8 @@ struct ArithmeticTraits<unsigned int>
 	static constexpr bool isFloatingPoint = false;
 	static constexpr bool isInteger = true;
 
-	static constexpr uint32_t
-	min()
-	{
-		return 0;
-	}
-
-	static constexpr uint32_t
-	max()
-	{
-		return 4294967295UL;
-	}
+	static constexpr uint32_t min = 0;
+	static constexpr uint32_t max = 4294967295UL;
 };
 #endif
 
@@ -305,17 +233,8 @@ struct ArithmeticTraits<int64_t>
 	static constexpr bool isFloatingPoint = false;
 	static constexpr bool isInteger = true;
 
-	static constexpr int64_t
-	min()
-	{
-		return -9223372036854775807LL - 1;
-	}
-
-	static constexpr uint64_t
-	max()
-	{
-		return 9223372036854775807LL;
-	}
+	static constexpr int64_t min = -9223372036854775807LL - 1;
+	static constexpr uint64_t max = 9223372036854775807LL;
 };
 
 // ------------------------------------------------------------------------
@@ -331,17 +250,8 @@ struct ArithmeticTraits<uint64_t>
 	static constexpr bool isFloatingPoint = false;
 	static constexpr bool isInteger = true;
 
-	static constexpr uint64_t
-	min()
-	{
-		return 0;
-	}
-
-	static constexpr uint64_t
-	max()
-	{
-		return 18446744073709551615ULL;
-	}
+	static constexpr uint64_t min = 0;
+	static constexpr uint64_t max = 18446744073709551615ULL;
 };
 
 // ------------------------------------------------------------------------
@@ -356,23 +266,9 @@ struct ArithmeticTraits<float>
 	static constexpr bool isFloatingPoint = true;
 	static constexpr bool isInteger = false;
 
-	static constexpr float
-	min()
-	{
-		return __FLT_MIN__;
-	}
-
-	static constexpr float
-	max()
-	{
-		return __FLT_MAX__;
-	}
-
-	static constexpr float
-	epsilon()
-	{
-		return __FLT_EPSILON__;
-	}
+	static constexpr float min = __FLT_MIN__;
+	static constexpr float max = __FLT_MAX__;
+	static constexpr float epsilon = __FLT_EPSILON__;
 };
 
 // ------------------------------------------------------------------------
@@ -387,23 +283,9 @@ struct ArithmeticTraits<double>
 	static constexpr bool isFloatingPoint = true;
 	static constexpr bool isInteger = false;
 
-	static constexpr double
-	min()
-	{
-		return __DBL_MIN__;
-	}
-
-	static constexpr double
-	max()
-	{
-		return __DBL_MAX__;
-	}
-
-	static constexpr double
-	epsilon()
-	{
-		return __DBL_EPSILON__;
-	}
+	static constexpr double min = __DBL_MIN__;
+	static constexpr double max = __DBL_MAX__;
+	static constexpr double epsilon = __DBL_EPSILON__;
 };
 
 //// @}
