@@ -67,9 +67,9 @@ struct ArithmeticTraits<char>
 	typedef signed char SignedType;
 	typedef unsigned char UnsignedType;
 
-	static const unsigned char decimalDigits = 4; // inc sign
-	static const bool isFloatingPoint = false;
-	static const bool isInteger = true;
+	static constexpr unsigned char decimalDigits = 4; // inc sign
+	static constexpr bool isFloatingPoint = false;
+	static constexpr bool isInteger = true;
 };
 
 // ------------------------------------------------------------------------
@@ -81,18 +81,18 @@ struct ArithmeticTraits<signed char>
 	typedef int8_t SignedType;
 	typedef uint8_t UnsignedType;
 
-	static const unsigned char decimalDigits = 4; // inc sign
-	static const bool isSigned = true;
-	static const bool isFloatingPoint = false;
-	static const bool isInteger = true;
+	static constexpr unsigned char decimalDigits = 4; // inc sign
+	static constexpr bool isSigned = true;
+	static constexpr bool isFloatingPoint = false;
+	static constexpr bool isInteger = true;
 
-	static ALWAYS_INLINE signed char
+	static constexpr signed char
 	min()
 	{
 		return -127 - 1;
 	}
 
-	static ALWAYS_INLINE signed char
+	static constexpr signed char
 	max()
 	{
 		return 127;
@@ -107,18 +107,18 @@ struct ArithmeticTraits<unsigned char>
 	typedef int8_t SignedType;
 	typedef uint8_t UnsignedType;
 
-	static const uint8_t decimalDigits = 3;
-	static const bool isSigned = false;
-	static const bool isFloatingPoint = false;
-	static const bool isInteger = true;
+	static constexpr uint8_t decimalDigits = 3;
+	static constexpr bool isSigned = false;
+	static constexpr bool isFloatingPoint = false;
+	static constexpr bool isInteger = true;
 
-	static ALWAYS_INLINE unsigned char
+	static constexpr unsigned char
 	min()
 	{
 		return 0;
 	}
 
-	static ALWAYS_INLINE unsigned char
+	static constexpr unsigned char
 	max()
 	{
 		return 255;
@@ -133,18 +133,18 @@ struct ArithmeticTraits<int16_t>
 	typedef int16_t SignedType;
 	typedef uint16_t UnsignedType;
 
-	static const uint8_t decimalDigits = 6; // inc. sign
-	static const bool isSigned = true;
-	static const bool isFloatingPoint = false;
-	static const bool isInteger = true;
+	static constexpr uint8_t decimalDigits = 6; // inc. sign
+	static constexpr bool isSigned = true;
+	static constexpr bool isFloatingPoint = false;
+	static constexpr bool isInteger = true;
 
-	static ALWAYS_INLINE int16_t
+	static constexpr int16_t
 	min()
 	{
 		return -32767 - 1;
 	}
 
-	static ALWAYS_INLINE int16_t
+	static constexpr int16_t
 	max()
 	{
 		return 32767;
@@ -159,18 +159,18 @@ struct ArithmeticTraits<uint16_t>
 	typedef int16_t SignedType;
 	typedef uint16_t UnsignedType;
 
-	static const uint8_t decimalDigits = 5;
-	static const bool isSigned = false;
-	static const bool isFloatingPoint = false;
-	static const bool isInteger = true;
+	static constexpr uint8_t decimalDigits = 5;
+	static constexpr bool isSigned = false;
+	static constexpr bool isFloatingPoint = false;
+	static constexpr bool isInteger = true;
 
-	static ALWAYS_INLINE uint16_t
+	static constexpr uint16_t
 	min()
 	{
 		return 0;
 	}
 
-	static ALWAYS_INLINE uint16_t
+	static constexpr uint16_t
 	max()
 	{
 		return 65535;
@@ -189,18 +189,18 @@ struct ArithmeticTraits<int32_t>
 	typedef int32_t SignedType;
 	typedef uint32_t UnsignedType;
 
-	static const uint8_t decimalDigits = 11; // inc. sign
-	static const bool isSigned = true;
-	static const bool isFloatingPoint = false;
-	static const bool isInteger = true;
+	static constexpr uint8_t decimalDigits = 11; // inc. sign
+	static constexpr bool isSigned = true;
+	static constexpr bool isFloatingPoint = false;
+	static constexpr bool isInteger = true;
 
-	static ALWAYS_INLINE int32_t
+	static constexpr int32_t
 	min()
 	{
 		return -2147483647L - 1;
 	}
 
-	static ALWAYS_INLINE int32_t
+	static constexpr int32_t
 	max()
 	{
 		return 2147483647L;
@@ -219,18 +219,18 @@ struct ArithmeticTraits<uint32_t>
 	typedef int32_t SignedType;
 	typedef uint32_t UnsignedType;
 
-	static const uint8_t decimalDigits = 10;
-	static const bool isSigned = false;
-	static const bool isFloatingPoint = false;
-	static const bool isInteger = true;
+	static constexpr uint8_t decimalDigits = 10;
+	static constexpr bool isSigned = false;
+	static constexpr bool isFloatingPoint = false;
+	static constexpr bool isInteger = true;
 
-	static ALWAYS_INLINE uint32_t
+	static constexpr uint32_t
 	min()
 	{
 		return 0;
 	}
 
-	static ALWAYS_INLINE uint32_t
+	static constexpr uint32_t
 	max()
 	{
 		return 4294967295UL;
@@ -248,18 +248,18 @@ struct ArithmeticTraits<int>
 	typedef int32_t SignedType;
 	typedef uint32_t UnsignedType;
 
-	static const uint8_t decimalDigits = 11; // inc. sign
-	static const bool isSigned = true;
-	static const bool isFloatingPoint = false;
-	static const bool isInteger = true;
+	static constexpr uint8_t decimalDigits = 11; // inc. sign
+	static constexpr bool isSigned = true;
+	static constexpr bool isFloatingPoint = false;
+	static constexpr bool isInteger = true;
 
-	static ALWAYS_INLINE int32_t
+	static constexpr int32_t
 	min()
 	{
 		return -2147483647L - 1;
 	}
 
-	static ALWAYS_INLINE int32_t
+	static constexpr int32_t
 	max()
 	{
 		return 2147483647L;
@@ -273,18 +273,18 @@ struct ArithmeticTraits<unsigned int>
 	typedef int32_t SignedType;
 	typedef uint32_t UnsignedType;
 
-	static const uint8_t decimalDigits = 10;
-	static const bool isSigned = false;
-	static const bool isFloatingPoint = false;
-	static const bool isInteger = true;
+	static constexpr uint8_t decimalDigits = 10;
+	static constexpr bool isSigned = false;
+	static constexpr bool isFloatingPoint = false;
+	static constexpr bool isInteger = true;
 
-	static ALWAYS_INLINE uint32_t
+	static constexpr uint32_t
 	min()
 	{
 		return 0;
 	}
 
-	static ALWAYS_INLINE uint32_t
+	static constexpr uint32_t
 	max()
 	{
 		return 4294967295UL;
@@ -300,18 +300,18 @@ struct ArithmeticTraits<int64_t>
 	typedef int64_t SignedType;
 	typedef uint64_t UnsignedType;
 
-	static const uint8_t decimalDigits = 20; // inc. sign
-	static const bool isSigned = true;
-	static const bool isFloatingPoint = false;
-	static const bool isInteger = true;
+	static constexpr uint8_t decimalDigits = 20; // inc. sign
+	static constexpr bool isSigned = true;
+	static constexpr bool isFloatingPoint = false;
+	static constexpr bool isInteger = true;
 
-	static ALWAYS_INLINE int64_t
+	static constexpr int64_t
 	min()
 	{
 		return -9223372036854775807LL - 1;
 	}
 
-	static ALWAYS_INLINE uint64_t
+	static constexpr uint64_t
 	max()
 	{
 		return 9223372036854775807LL;
@@ -326,18 +326,18 @@ struct ArithmeticTraits<uint64_t>
 	typedef int64_t SignedType;
 	typedef uint64_t UnsignedType;
 
-	static const uint8_t decimalDigits = 20;
-	static const bool isSigned = false;
-	static const bool isFloatingPoint = false;
-	static const bool isInteger = true;
+	static constexpr uint8_t decimalDigits = 20;
+	static constexpr bool isSigned = false;
+	static constexpr bool isFloatingPoint = false;
+	static constexpr bool isInteger = true;
 
-	static ALWAYS_INLINE uint64_t
+	static constexpr uint64_t
 	min()
 	{
 		return 0;
 	}
 
-	static ALWAYS_INLINE uint64_t
+	static constexpr uint64_t
 	max()
 	{
 		return 18446744073709551615ULL;
@@ -352,23 +352,23 @@ struct ArithmeticTraits<float>
 	typedef float SignedType;
 	typedef float UnsignedType;
 
-	static const bool isSigned = true;
-	static const bool isFloatingPoint = true;
-	static const bool isInteger = false;
+	static constexpr bool isSigned = true;
+	static constexpr bool isFloatingPoint = true;
+	static constexpr bool isInteger = false;
 
-	static ALWAYS_INLINE float
+	static constexpr float
 	min()
 	{
 		return __FLT_MIN__;
 	}
 
-	static ALWAYS_INLINE float
+	static constexpr float
 	max()
 	{
 		return __FLT_MAX__;
 	}
 
-	static ALWAYS_INLINE float
+	static constexpr float
 	epsilon()
 	{
 		return __FLT_EPSILON__;
@@ -383,23 +383,23 @@ struct ArithmeticTraits<double>
 	typedef double SignedType;
 	typedef double UnsignedType;
 
-	static const bool isSigned = true;
-	static const bool isFloatingPoint = true;
-	static const bool isInteger = false;
+	static constexpr bool isSigned = true;
+	static constexpr bool isFloatingPoint = true;
+	static constexpr bool isInteger = false;
 
-	static ALWAYS_INLINE double
+	static constexpr double
 	min()
 	{
 		return __DBL_MIN__;
 	}
 
-	static ALWAYS_INLINE double
+	static constexpr double
 	max()
 	{
 		return __DBL_MAX__;
 	}
 
-	static ALWAYS_INLINE double
+	static constexpr double
 	epsilon()
 	{
 		return __DBL_EPSILON__;
