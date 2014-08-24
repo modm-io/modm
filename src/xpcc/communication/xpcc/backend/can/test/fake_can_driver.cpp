@@ -75,3 +75,21 @@ FakeCanDriver::sendMessage(const xpcc::can::Message& message)
 		return false;
 	}
 }
+
+uint8_t
+FakeCanDriver::getReceiveErrorCounter()
+{
+	return 0;
+}
+
+uint8_t
+FakeCanDriver::getTransmitErrorCounter()
+{
+	return 0;
+}
+
+xpcc::Can::BusState
+FakeCanDriver::getBusState()
+{
+	return xpcc::Can::BusState::Connected;
+}
