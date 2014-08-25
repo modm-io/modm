@@ -183,7 +183,7 @@ xpcc::Hmc6343<I2cMaster>::startWrite16BitRegister(Register16 reg, uint16_t value
 	if (task == Task::Idle && adapter.setPreserveTag() && startWriteRegisterIgnoreTaskCheck(reg, value >> 8))
 	{
 		registerBufferLSB = value;
-		this->callTask(NPtTask::Write16BitRegister);
+		this->startTask(NPtTask::Write16BitRegister);
 		return true;
 	}
 	return false;
@@ -237,7 +237,7 @@ xpcc::Hmc6343<I2cMaster>::startReadRegisterIgnoreTaskCheck(Register reg)
 			task = static_cast<uint8_t>(reg) + Task::PostEepromBase;
 			// 10ms timing delay when writing to the chips EEPROM
 			timeout.restart(10);
-			this->callTask(NPtTask::ReadEeprom);
+			this->startTask(NPtTask::ReadEeprom);
 			return true;
 		}
 	}
@@ -288,7 +288,7 @@ xpcc::Hmc6343<I2cMaster>::startRead16BitRegister(Register16 reg, uint16_t value)
 	if (task == Task::Idle && adapter.setPreserveTag() &&
 			startReadRegisterIgnoreTaskCheck(static_cast<Register>(static_cast<uint8_t>(reg)+1)))
 	{
-		this->callTask(Task::Read16BitRegister);
+		this->startTask(Task::Read16BitRegister);
 		return true;
 	}
 	return false;
@@ -335,7 +335,7 @@ xpcc::Hmc6343<I2cMaster>::startReadPostData(Command command)
 	if (task == Task::Idle && static_cast<uint8_t>(command) <= 0x65 &&
 			adapter.setPreserveTag() && startWriteCommand(command, 1))
 	{
-		this->callTask(NPtTask::ReadPostData);
+		this->startTask(NPtTask::ReadPostData);
 		return true;
 	}
 	return false;
