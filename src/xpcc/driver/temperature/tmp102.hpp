@@ -17,45 +17,43 @@
 namespace xpcc
 {
 
-namespace tmp102
+struct tmp102
 {
+	enum class
+	Register : uint8_t
+	{
+		Temperature = 0x00,
+		Configuration = 0x01,
+		LowTemperature = 0x02,
+		HighTemperature = 0x03
+	};
 
-enum class
-Register : uint8_t
-{
-	Temperature = 0x00,
-	Configuration = 0x01,
-	LowTemperature = 0x02,
-	HighTemperature = 0x03
+	enum Configuration
+	{// first byte
+		CONFIGURATION_SHUTDOWN_MODE = 0x01,
+		CONFIGURATION_THERMOSTAT_MODE = 0x02,
+		CONFIGURATION_POLARITY = 0x04,
+		CONFIGURATION_FAULT_QUEUE = 0x18,
+		CONFIGURATION_FAULT_QUEUE_1 = 0x00,
+		CONFIGURATION_FAULT_QUEUE_2 = 0x08,
+		CONFIGURATION_FAULT_QUEUE_4 = 0x10,
+		CONFIGURATION_FAULT_QUEUE_6 = 0x18,
+		CONFIGURATION_CONVERTER_RESOLUTION = 0x60,
+		CONFIGURATION_CONVERTER_RESOLUTION_12BIT = 0x60,
+		CONFIGURATION_ONE_SHOT = 0x80
+	};
+
+	enum ConfigurationExtended
+	{// second byte
+		CONFIGURATION_EXTENDED_MODE = 0x10,
+		CONFIGURATION_ALERT = 0x20,
+		CONFIGURATION_CONVERSION_RATE = 0xc0,
+		CONFIGURATION_CONVERSION_RATE_0_25HZ = 0x00,
+		CONFIGURATION_CONVERSION_RATE_1HZ = 0x40,
+		CONFIGURATION_CONVERSION_RATE_4HZ = 0x80,
+		CONFIGURATION_CONVERSION_RATE_8HZ = 0xc0
+	};
 };
-
-enum Configuration
-{// first byte
-	CONFIGURATION_SHUTDOWN_MODE = 0x01,
-	CONFIGURATION_THERMOSTAT_MODE = 0x02,
-	CONFIGURATION_POLARITY = 0x04,
-	CONFIGURATION_FAULT_QUEUE = 0x18,
-	CONFIGURATION_FAULT_QUEUE_1 = 0x00,
-	CONFIGURATION_FAULT_QUEUE_2 = 0x08,
-	CONFIGURATION_FAULT_QUEUE_4 = 0x10,
-	CONFIGURATION_FAULT_QUEUE_6 = 0x18,
-	CONFIGURATION_CONVERTER_RESOLUTION = 0x60,
-	CONFIGURATION_CONVERTER_RESOLUTION_12BIT = 0x60,
-	CONFIGURATION_ONE_SHOT = 0x80
-};
-
-enum ConfigurationExtended
-{// second byte
-	CONFIGURATION_EXTENDED_MODE = 0x10,
-	CONFIGURATION_ALERT = 0x20,
-	CONFIGURATION_CONVERSION_RATE = 0xc0,
-	CONFIGURATION_CONVERSION_RATE_0_25HZ = 0x00,
-	CONFIGURATION_CONVERSION_RATE_1HZ = 0x40,
-	CONFIGURATION_CONVERSION_RATE_4HZ = 0x80,
-	CONFIGURATION_CONVERSION_RATE_8HZ = 0xc0
-};
-
-}
 
 /**
  * @brief	TMP102 digital temperature sensor driver
@@ -83,7 +81,7 @@ enum ConfigurationExtended
  * @tparam I2cMaster Asynchronous Interface
  */
 template < class I2cMaster >
-class Tmp102 : public xpcc::I2cDevice< I2cMaster >
+class Tmp102 : public xpcc::I2cDevice< I2cMaster >, public tmp102
 {
 public:
 	/**
@@ -93,7 +91,7 @@ public:
 	Tmp102(uint8_t* data, uint8_t address=0x48);
 
 	/// @return pointer to 8bit array containing temperature as big endian int16_t
-	ALWAYS_INLINE uint8_t*
+	ALWAYS_INLINE uint8_t* const
 	getData();
 
 	// MARK: - Tasks
@@ -101,21 +99,21 @@ public:
 	bool
 	startPing();
 
-	bool ALWAYS_INLINE
+	bool ALWAYS_INLINE const
 	runPing();
 
-	bool ALWAYS_INLINE
+	bool ALWAYS_INLINE const
 	isPingSuccessful();
 
 	/// sets the LSB and MSB of the sensor
 	bool
-	startConfiguration(uint8_t lsb=tmp102::CONFIGURATION_CONVERSION_RATE_4HZ,
-					   uint8_t msb=tmp102::CONFIGURATION_CONVERTER_RESOLUTION_12BIT);
+	startConfiguration(uint8_t lsb=CONFIGURATION_CONVERSION_RATE_4HZ,
+					   uint8_t msb=CONFIGURATION_CONVERTER_RESOLUTION_12BIT);
 
-	bool ALWAYS_INLINE
+	bool ALWAYS_INLINE const
 	runConfiguration();
 
-	bool ALWAYS_INLINE
+	bool ALWAYS_INLINE const
 	isConfigurationSuccessful();
 
 	/// starts a temperature conversion right now
@@ -123,25 +121,25 @@ public:
 	startConversion();
 
 	/// runs the temperature conversion
-	bool ALWAYS_INLINE
+	bool ALWAYS_INLINE const
 	runConversion();
 
-	bool ALWAYS_INLINE
+	bool ALWAYS_INLINE const
 	isConversionSuccessful();
 
 	/// read the Temperature registers and buffer the results
 	bool
 	startReadTemperature();
 
-	bool ALWAYS_INLINE
+	bool ALWAYS_INLINE const
 	runReadTemperature();
 
-	bool ALWAYS_INLINE
+	bool ALWAYS_INLINE const
 	isReadTemperatureSuccessful();
 
 	// MARK: - utility
 	/// @return the temperature as a signed float in Celcius
-	float
+	float const
 	getTemperature();
 
 private:

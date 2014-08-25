@@ -62,7 +62,7 @@ xpcc::Tmp102<I2cMaster>::startConfiguration(uint8_t lsb, uint8_t msb)
 	if (task == Task::Idle)
 	{
 		config = msb;
-		buffer[0] = static_cast<uint8_t>(tmp102::Register::Configuration);
+		buffer[0] = static_cast<uint8_t>(Register::Configuration);
 		buffer[1] = msb;
 		buffer[2] = lsb;
 
@@ -96,8 +96,8 @@ xpcc::Tmp102<I2cMaster>::startConversion()
 {
 	if (task == Task::Idle)
 	{
-		buffer[0] = static_cast<uint8_t>(tmp102::Register::Configuration);
-		buffer[1] = config | tmp102::CONFIGURATION_ONE_SHOT;
+		buffer[0] = static_cast<uint8_t>(Register::Configuration);
+		buffer[1] = config | CONFIGURATION_ONE_SHOT;
 
 		if (adapter.configureWrite(buffer, 2) && this->startTransaction(&adapter))
 		{
@@ -129,7 +129,7 @@ xpcc::Tmp102<I2cMaster>::startReadTemperature()
 {
 	if (task == Task::Idle)
 	{
-		buffer[0] = static_cast<uint8_t>(tmp102::Register::Temperature);
+		buffer[0] = static_cast<uint8_t>(Register::Temperature);
 
 		if (adapter.configureWriteRead(buffer, 1, data, 2) && this->startTransaction(&adapter))
 		{
