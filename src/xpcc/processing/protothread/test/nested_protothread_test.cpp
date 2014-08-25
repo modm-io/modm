@@ -39,12 +39,12 @@ public:
 	{
 		NPT_BEGIN(Task::Empty0Task1);
 
-		this->state = 1;
-		this->depth = this->getTaskDepth();
+		state = 1;
+		depth = getTaskDepth();
 
 		NPT_YIELD();
 
-		this->state = 2;
+		state = 2;
 
 		NPT_END();
 	}
@@ -54,7 +54,7 @@ public:
 	{
 		NPT_BEGIN(Task::Empty0Task2);
 
-		this->state = 3;
+		state = 3;
 
 		NPT_END();
 	}
@@ -76,11 +76,11 @@ public:
 	{
 		NPT_BEGIN(Task::Empty1Task1);
 
-		this->state = 1;
+		state = 1;
 
 		NPT_YIELD();
 
-		this->state = 2;
+		state = 2;
 
 		NPT_END();
 	}
@@ -90,7 +90,7 @@ public:
 	{
 		NPT_BEGIN(Task::Empty1Task2);
 
-		this->state = 3;
+		state = 3;
 
 		NPT_END();
 	}
@@ -111,11 +111,11 @@ public:
 	{
 		NPT_BEGIN(Task::Empty2Task1);
 
-		this->state = 1;
+		state = 1;
 
 		NPT_YIELD();
 
-		this->state = 2;
+		state = 2;
 
 		NPT_END();
 	}
@@ -125,7 +125,7 @@ public:
 	{
 		NPT_BEGIN(Task::Empty2Task2);
 
-		this->state = 3;
+		state = 3;
 
 		NPT_END();
 	}
@@ -286,30 +286,34 @@ public:
 	}
 
 	bool
+	startTask1()
+	{ return startTask(Task::NestingTask1); }
+
+	bool
 	runTask1()
 	{
 		NPT_BEGIN(Task::NestingTask1);
 
-		this->state1 = 1;
+		state1 = 1;
 
-		NPT_WAIT_UNTIL(this->condition1);
+		NPT_WAIT_UNTIL(condition1);
 
-		this->state1 = 2;
-		this->callResult1 = this->startTask(Task::NestingTask2);
-		this->callResult1Retry = this->startTask(Task::NestingTask2);
-		this->stopTask();
-		this->callResult1AfterStop = this->startTask(Task::NestingTask2);
-		this->depth1 = this->getTaskDepth();
+		state1 = 2;
+		callResult1 = startTask(Task::NestingTask2);
+		callResult1Retry = startTask(Task::NestingTask2);
+		stopTask();
+		callResult1AfterStop = startTask(Task::NestingTask2);
+		depth1 = getTaskDepth();
 
 		NPT_YIELD();
 
 		NPT_WAIT_WHILE(runTask2());
 
-		this->state1 = 3;
+		state1 = 3;
 
 		NPT_YIELD();
 
-		this->state1 = 4;
+		state1 = 4;
 
 		NPT_END();
 	}
@@ -319,7 +323,7 @@ public:
 //	{
 //		for (uint8_t ii = 0; ii < 2; ii++)
 //		{
-//			std::cout << this->nptStateArray[ii] << " ";
+//			std::cout << nptStateArray[ii] << " ";
 //		}
 //		std::cout << std::endl;
 //	}
@@ -330,23 +334,23 @@ protected:
 	{
 		NPT_BEGIN(Task::NestingTask2);
 
-		this->state2 = 1;
+		state2 = 1;
 
-		NPT_WAIT_UNTIL(this->condition2);
+		NPT_WAIT_UNTIL(condition2);
 
-		this->state2 = 2;
-		this->callResult2 = this->startTask(Task::NestingTask3);
-		this->depth2 = this->getTaskDepth();
+		state2 = 2;
+		callResult2 = startTask(Task::NestingTask3);
+		depth2 = getTaskDepth();
 
 		NPT_YIELD();
 
 		NPT_WAIT_WHILE(runTask3());
 
-		this->state2 = 3;
+		state2 = 3;
 
 		NPT_YIELD();
 
-		this->state2 = 4;
+		state2 = 4;
 
 		NPT_END();
 	}
@@ -356,26 +360,26 @@ protected:
 	{
 		NPT_BEGIN(Task::NestingTask3);
 
-		this->state3 = 1;
+		state3 = 1;
 
-		NPT_WAIT_UNTIL(this->condition3);
+		NPT_WAIT_UNTIL(condition3);
 
-		this->state3 = 2;
+		state3 = 2;
 		// this must return false, since there is no more space
 		// to buffer the next nested local continuation anymore!
-		this->callResult3 = this->startTask(Task::NestingTask4);
-		this->callResult3Retry = this->startTask(Task::NestingTask4);
-		this->stopTask();
-		this->callResult3AfterStop = this->startTask(Task::NestingTask4);
-		this->depth3 = this->getTaskDepth();
+		callResult3 = startTask(Task::NestingTask4);
+		callResult3Retry = startTask(Task::NestingTask4);
+		stopTask();
+		callResult3AfterStop = startTask(Task::NestingTask4);
+		depth3 = getTaskDepth();
 
 		NPT_YIELD();
 
-		this->state3 = 3;
+		state3 = 3;
 
 		NPT_YIELD();
 
-		this->state3 = 4;
+		state3 = 4;
 
 		NPT_END();
 	}
