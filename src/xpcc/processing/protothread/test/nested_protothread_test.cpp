@@ -272,7 +272,8 @@ public:
 	TestingNestedThread()
 	:	state1(0), state2(0), state3(0),
 		condition1(false), condition2(false), condition3(false),
-		callResult1(false), callResult2(false), callResult3(false)
+		callResult1(false), callResult2(false), callResult3(false),
+		callResult1Retry(false), callResult1AfterStop(false)
 	{
 	}
 
@@ -286,7 +287,10 @@ public:
 		NPT_WAIT_UNTIL(this->condition1);
 
 		this->state1 = 2;
-		this->callResult1 = this->callTask(Task::NestingTask2);
+		this->callResult1 = this->startTask(Task::NestingTask2);
+		this->callResult1Retry = this->startTask(Task::NestingTask2);
+		this->stopTask();
+		this->callResult1AfterStop = this->startTask(Task::NestingTask2);
 
 		NPT_YIELD();
 
@@ -312,7 +316,7 @@ protected:
 		NPT_WAIT_UNTIL(this->condition2);
 
 		this->state2 = 2;
-		this->callResult2 = this->callTask(Task::NestingTask3);
+		this->callResult2 = this->startTask(Task::NestingTask3);
 
 		NPT_YIELD();
 
@@ -339,7 +343,7 @@ protected:
 		this->state3 = 2;
 		// this must return false, since there is no more space
 		// to buffer the next nested local continuation anymore!
-		this->callResult3 = this->callTask(Task::NestingTask4);
+		this->callResult3 = this->startTask(Task::NestingTask4);
 
 		NPT_YIELD();
 
@@ -362,6 +366,8 @@ public:
 	bool callResult1;
 	bool callResult2;
 	bool callResult3;
+	bool callResult1Retry;
+	bool callResult1AfterStop;
 };
 
 void
@@ -392,6 +398,10 @@ NestedProtothreadTest::testNesting()
 	TEST_ASSERT_EQUALS(thread.state2, 0);
 	// the callResult1 should be true
 	TEST_ASSERT_TRUE(thread.callResult1);
+	// retry should be false
+	TEST_ASSERT_FALSE(thread.callResult1Retry);
+	// retry after stop should be true
+	TEST_ASSERT_TRUE(thread.callResult1AfterStop);
 
 	// task2 should be called internally now
 	TEST_ASSERT_TRUE(thread.runTask1());

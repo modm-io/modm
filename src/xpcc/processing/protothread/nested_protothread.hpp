@@ -86,7 +86,7 @@ namespace pt
  *     {
  *         NPT_BEGIN(TASK_WAIT_FOR_TIMER);
  *
- *         this->callTask(TASK_SET_TIMER);
+ *         this->startTask(TASK_SET_TIMER);
  *         NPT_WAIT_UNTIL(runTaskSetTimer(100));
  *
  *         NPT_WAIT_UNTIL(this->timer.isExpired());
@@ -146,34 +146,36 @@ public:
 		stopTask();
 	}
 
-	/// Start a specific task.
-	/// @return	`true` if successful, `false` if another task is already running.
+	/// Start a specific task at the current nesting level
+	/// @return	`true` if successful, `false` if the nesting is too deep
 	inline bool
 	startTask(uint8_t task)
 	{
-		if (isTaskRunning())
-			return false;
-
-		nptStateArray[0] = stateFromTask(task);
-		return true;
+		if ((nptState < nptStateArray + Depth + 1) && (*nptState == NPtInvalid))
+		{
+			*nptState = stateFromTask(task);
+			return true;
+		}
+		return false;
 	}
 
-	/// Force the task to stop running.
+	/// Force the task to stop running at the current nesting level
 	/// @warning	This will not allow the task to clean itself up!
 	inline void
 	stopTask()
 	{
-		for (uint_fast8_t ii = 0; ii < Depth + 1; ++ii)
+		NPtState *state = nptState;
+		while(state < nptStateArray + Depth + 1)
 		{
-			nptStateArray[ii] = NPtInvalid;
+			*state++ = NPtInvalid;
 		}
 	}
 
-	/// @return	`true` if a task is running, else `false`
+	/// @return	`true` if a task is running at the current nesting level, else `false`
 	inline bool
 	isTaskRunning() const
 	{
-		return (nptStateArray[0] != NPtInvalid);
+		return (*nptState != NPtInvalid);
 	}
 
 #ifdef __DOXYGEN__
@@ -197,19 +199,6 @@ public:
 #endif
 
 protected:
-	/// Call a task inside another task
-	/// @return	`true` if successful, `false` if the nesting is too deep
-	inline bool
-	callTask(uint8_t task)
-	{
-		if ((nptState < nptStateArray + Depth + 1) && (*nptState == NPtInvalid))
-		{
-			*nptState = stateFromTask(task);
-			return true;
-		}
-		return false;
-	}
-
 	/// @internal
 	/// @{
 
@@ -300,14 +289,6 @@ public:
 	}
 
 protected:
-	// Yeah, that's right!
-	// You cannot use a nesting protothread call with a nesting depth of 0!
-	// Wadda gonna do now, huh?
-	// What's that? You're "just going to increase nesting depth"?
-	// Yeah, good luck with that!
-	bool
-	callTask(uint8_t task);
-
 	/// @internal
 	/// @{
 	NPtState ALWAYS_INLINE
