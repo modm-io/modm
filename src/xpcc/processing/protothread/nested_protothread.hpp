@@ -141,7 +141,7 @@ protected:
 public:
 	/// Construct a new nested protothread which will be stopped
 	NestedProtothread()
-	:	nptState(nptStateArray)
+	:	nptLevel(0)
 	{
 		stopTask();
 	}
@@ -151,9 +151,9 @@ public:
 	inline bool
 	startTask(uint8_t task)
 	{
-		if ((nptState < nptStateArray + Depth + 1) && (*nptState == NPtInvalid))
+		if ((nptLevel < Depth + 1) && (nptStateArray[nptLevel] == NPtInvalid))
 		{
-			*nptState = stateFromTask(task);
+			nptStateArray[nptLevel] = stateFromTask(task);
 			return true;
 		}
 		return false;
@@ -164,18 +164,18 @@ public:
 	inline void
 	stopTask()
 	{
-		NPtState *state = nptState;
-		while(state < nptStateArray + Depth + 1)
+		uint8_t level = nptLevel;
+		while(level < Depth + 1)
 		{
-			*state++ = NPtInvalid;
+			nptStateArray[level++] = NPtInvalid;
 		}
 	}
 
 	/// @return	`true` if a task is running at the current nesting level, else `false`
-	inline bool
+	bool ALWAYS_INLINE
 	isTaskRunning() const
 	{
-		return (*nptState != NPtInvalid);
+		return (nptStateArray[nptLevel] != NPtInvalid);
 	}
 
 #ifdef __DOXYGEN__
@@ -198,6 +198,13 @@ public:
 	runTask();
 #endif
 
+	/// @return the nesting depth at the function call
+	uint8_t ALWAYS_INLINE
+	getNestingDepth()
+	{
+		return nptLevel ? nptLevel - 1 : 0;
+	}
+
 protected:
 	/// @internal
 	/// @{
@@ -207,7 +214,7 @@ protected:
 	NPtState ALWAYS_INLINE
 	pushNPt()
 	{
-		return *nptState++;
+		return nptStateArray[nptLevel++];
 	}
 
 	// always call this before returning from the run function!
@@ -215,7 +222,7 @@ protected:
 	void ALWAYS_INLINE
 	popNPt()
 	{
-		nptState--;
+		nptLevel--;
 	}
 
 	// invalidates the parent nesting level
@@ -223,7 +230,7 @@ protected:
 	void ALWAYS_INLINE
 	invalidateNPt()
 	{
-		*(nptState-1) = NPtInvalid;
+		nptStateArray[nptLevel-1] = NPtInvalid;
 	}
 
 	// sets the state of the parent nesting level
@@ -231,7 +238,7 @@ protected:
 	void ALWAYS_INLINE
 	setNPt(NPtState state)
 	{
-		*(nptState-1) = state;
+		nptStateArray[nptLevel-1] = state;
 	}
 
 	// the task will be subtracted from the maximum of the NPtState
@@ -248,7 +255,7 @@ protected:
 
 private:
 	static const NPtState NPtInvalid = static_cast<NPtState>(xpcc::ArithmeticTraits<NPtState>::max);
-	NPtState *nptState;
+	uint8_t nptLevel;
 	NPtState nptStateArray[Depth+1];
 };
 
@@ -266,7 +273,7 @@ public:
 	{
 	}
 
-	bool
+	inline bool
 	startTask(uint8_t task)
 	{
 		if (nptState != NPtInvalid)
@@ -276,16 +283,22 @@ public:
 		return true;
 	}
 
-	inline void
+	void ALWAYS_INLINE
 	stopTask()
 	{
 		nptState = NPtInvalid;
 	}
 
-	inline bool
+	bool ALWAYS_INLINE
 	isTaskRunning() const
 	{
 		return (nptState != NPtInvalid);
+	}
+
+	uint8_t ALWAYS_INLINE
+	getNestingDepth()
+	{
+		return 0;
 	}
 
 protected:

@@ -8,6 +8,7 @@
 // ----------------------------------------------------------------------------
 
 #include <xpcc/processing/protothread.hpp>
+#include <iostream>
 
 #include "nested_protothread_test.hpp"
 
@@ -268,12 +269,15 @@ namespace Task
 // ----------------------------------------------------------------------------
 class TestingNestedThread : public xpcc::pt::NestedProtothread<2>
 {
+	friend class xpcc::pt::NestedProtothread<2>;
 public:
 	TestingNestedThread()
-	:	state1(0), state2(0), state3(0),
+	:	depth1(0), depth2(0), depth3(0),
+		state1(0), state2(0), state3(0),
 		condition1(false), condition2(false), condition3(false),
 		callResult1(false), callResult2(false), callResult3(false),
-		callResult1Retry(false), callResult1AfterStop(false)
+		callResult1Retry(false), callResult1AfterStop(false),
+		callResult3Retry(false), callResult3AfterStop(false)
 	{
 	}
 
@@ -291,6 +295,7 @@ public:
 		this->callResult1Retry = this->startTask(Task::NestingTask2);
 		this->stopTask();
 		this->callResult1AfterStop = this->startTask(Task::NestingTask2);
+		this->depth1 = this->getNestingDepth();
 
 		NPT_YIELD();
 
@@ -305,6 +310,16 @@ public:
 		NPT_END();
 	}
 
+//	void
+//	printStateArray()
+//	{
+//		for (uint8_t ii = 0; ii < 2; ii++)
+//		{
+//			std::cout << this->nptStateArray[ii] << " ";
+//		}
+//		std::cout << std::endl;
+//	}
+
 protected:
 	bool
 	runTask2()
@@ -317,6 +332,7 @@ protected:
 
 		this->state2 = 2;
 		this->callResult2 = this->startTask(Task::NestingTask3);
+		this->depth2 = this->getNestingDepth();
 
 		NPT_YIELD();
 
@@ -344,6 +360,10 @@ protected:
 		// this must return false, since there is no more space
 		// to buffer the next nested local continuation anymore!
 		this->callResult3 = this->startTask(Task::NestingTask4);
+		this->callResult3Retry = this->startTask(Task::NestingTask4);
+		this->stopTask();
+		this->callResult3AfterStop = this->startTask(Task::NestingTask4);
+		this->depth3 = this->getNestingDepth();
 
 		NPT_YIELD();
 
@@ -357,6 +377,9 @@ protected:
 	}
 
 public:
+	uint8_t depth1;
+	uint8_t depth2;
+	uint8_t depth3;
 	uint8_t state1;
 	uint8_t state2;
 	uint8_t state3;
@@ -368,6 +391,8 @@ public:
 	bool callResult3;
 	bool callResult1Retry;
 	bool callResult1AfterStop;
+	bool callResult3Retry;
+	bool callResult3AfterStop;
 };
 
 void
@@ -380,6 +405,7 @@ NestedProtothreadTest::testNesting()
 	TEST_ASSERT_FALSE(thread.runTask1());
 	TEST_ASSERT_EQUALS(thread.state1, 0);
 	TEST_ASSERT_FALSE(thread.isTaskRunning());
+	TEST_ASSERT_EQUALS(thread.getNestingDepth(), 0);
 
 	// lets start the first task
 	TEST_ASSERT_TRUE(thread.startTask(Task::NestingTask1));
@@ -402,6 +428,8 @@ NestedProtothreadTest::testNesting()
 	TEST_ASSERT_FALSE(thread.callResult1Retry);
 	// retry after stop should be true
 	TEST_ASSERT_TRUE(thread.callResult1AfterStop);
+	// depth should be 0
+	TEST_ASSERT_EQUALS(thread.depth1, 0);
 
 	// task2 should be called internally now
 	TEST_ASSERT_TRUE(thread.runTask1());
@@ -423,6 +451,8 @@ NestedProtothreadTest::testNesting()
 	TEST_ASSERT_EQUALS(thread.state2, 2);
 	// the callResult2 should be true
 	TEST_ASSERT_TRUE(thread.callResult2);
+	// depth should be 1
+	TEST_ASSERT_EQUALS(thread.depth2, 1);
 
 	// task3 should be called internally now
 	TEST_ASSERT_TRUE(thread.runTask1());
@@ -448,6 +478,12 @@ NestedProtothreadTest::testNesting()
 	TEST_ASSERT_EQUALS(thread.state3, 2);
 	// the callResult3 should be false
 	TEST_ASSERT_FALSE(thread.callResult3);
+	// retry should be false
+	TEST_ASSERT_FALSE(thread.callResult3Retry);
+	// retry after stop should still be false
+	TEST_ASSERT_FALSE(thread.callResult3AfterStop);
+	// depth should be 2
+	TEST_ASSERT_EQUALS(thread.depth3, 2);
 
 	// task1 should continue
 	TEST_ASSERT_TRUE(thread.runTask1());
