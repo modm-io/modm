@@ -1,30 +1,9 @@
 // coding: utf-8
-// ----------------------------------------------------------------------------
 /* Copyright (c) 2013, Roboterclub Aachen e.V.
- * All rights reserved.
+ * All Rights Reserved.
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- *     * Redistributions of source code must retain the above copyright
- *       notice, this list of conditions and the following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright
- *       notice, this list of conditions and the following disclaimer in the
- *       documentation and/or other materials provided with the distribution.
- *     * Neither the name of the Roboterclub Aachen e.V. nor the
- *       names of its contributors may be used to endorse or promote products
- *       derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY ROBOTERCLUB AACHEN E.V. ''AS IS'' AND ANY
- * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL ROBOTERCLUB AACHEN E.V. BE LIABLE FOR ANY
- * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * The file is part of the xpcc library and is released under the 3-clause BSD
+ * license. See the file `LICENSE` for the full license governing this code.
  */
 // ----------------------------------------------------------------------------
 
@@ -32,308 +11,604 @@
 #define XPCC__HMC6343_HPP
 
 #include <xpcc/architecture/peripheral/i2c_adapter.hpp>
+#include <xpcc/architecture/peripheral/i2c_device.hpp>
+#include <xpcc/processing/protothread.hpp>
+#import "i2c_transaction.hpp"
+#import "i2c.hpp"
 
 namespace xpcc
 {
-	namespace hmc6343
+
+struct hmc6343
+{
+	enum class
+	Register : uint8_t
 	{
-		enum Register
-		{
-			EEPROM_SLAVE_ADDRESS,		//!< I2C Slave Address
-			EEPROM_RESERVED1,
-			EEPROM_SOFTWARE_VERSION,	//!< Software Version Number
-			EEPROM_RESERVED2,
-			EEPROM_OPERATION_MODE_1,	//!< Operation Mode Register 1
-			EEPROM_OPERATION_MODE_2,	//!< Operation Mode Register 2
-			EEPROM_DEVICE_SERIAL_LSB,	//!< Device Serial Number
-			EEPROM_DEVICE_SERIAL_MSB,	//!< Device Serial Number
-			EEPROM_DATE_CODE_YEAR,		//!< Package Date Code: Last two digits of the year
-			EEPROM_DATE_CODE_WEEK,		//!< Package Date Code: Fiscal Week
-			EEPROM_DEVIATION_ANGLE_LSB,	//!< Deviation Angle (+-1800) in tenth of a degree
-			EEPROM_DEVIATION_ANGLE_MSB,	//!< Deviation Angle (+-1800) in tenth of a degree
-			EEPROM_VARIATION_ANGLE_LSB,	//!< Variation Angle (+-1800) in tenth of a degree
-			EEPROM_VARIATION_ANGLE_MSB,	//!< Variation Angle (+-1800) in tenth of a degree
-			EEPROM_X_OFFSET_LSB,		//!< Hard-Iron Calibration Offset for the X-axis
-			EEPROM_X_OFFSET_MSB,		//!< Hard-Iron Calibration Offset for the X-axis
-			EEPROM_Y_OFFSET_LSB,		//!< Hard-Iron Calibration Offset for the Y-axis
-			EEPROM_Y_OFFSET_MSB,		//!< Hard-Iron Calibration Offset for the Y-axis
-			EEPROM_Z_OFFSET_LSB,		//!< Hard-Iron Calibration Offset for the Z-axis
-			EEPROM_Z_OFFSET_MSB,		//!< Hard-Iron Calibration Offset for the Z-axis
-			EEPROM_FILTER_LSB,			//!< Heading IIR Filter (0x00 to 0x0F typical)
-			EEPROM_FILTER_MSB,			//!< Heading IIR Filter (set at zero)
-		};
+		SlaveAddress = 0x00,		//!< I2C Slave Address
+		SoftwareVersion = 0x02,		//!< Software Version Number
+		OperationMode1 = 0x04,		//!< Operation Mode Register 1
+		OperationMode2 = 0x05,		//!< Operation Mode Register 2
+		DeviceSerialLsb = 0x06,		//!< Device Serial Number
+		DeviceSerialMsb = 0x07,		//!< Device Serial Number
+		DateCodeYear = 0x08,		//!< Package Date Code: Last two digits of the year
+		DateCodeWeek = 0x09,		//!< Package Date Code: Fiscal Week
+		DeviationAngleLsb = 0x0A,	//!< Deviation Angle (+-1800) in tenth of a degree
+		DeviationAngleMsb = 0x0B,	//!< Deviation Angle (+-1800) in tenth of a degree
+		VariationAngleLsb = 0x0C,	//!< Variation Angle (+-1800) in tenth of a degree
+		VariationAngleMsb = 0x0D,	//!< Variation Angle (+-1800) in tenth of a degree
+		X_OffsetLsb = 0x0E,			//!< Hard-Iron Calibration Offset for the X-axis
+		X_OffsetMsb = 0x0F,			//!< Hard-Iron Calibration Offset for the X-axis
+		Y_OffsetLsb = 0x10,			//!< Hard-Iron Calibration Offset for the Y-axis
+		Y_OffsetMsb = 0x11,			//!< Hard-Iron Calibration Offset for the Y-axis
+		Z_OffsetLsb = 0x12,			//!< Hard-Iron Calibration Offset for the Z-axis
+		Z_OffsetMsb = 0x13,			//!< Hard-Iron Calibration Offset for the Z-axis
+		FilterLsb = 0x14,			//!< Heading IIR Filter (0x00 to 0x0F typical)
+		FilterMsb = 0x15,			//!< Heading IIR Filter (set at zero)
+	};
 
-		enum Command
-		{
-			COMMAND_POST_ACCEL_DATA = 0x40,			//!< Post Accel Data. AxMSB, AxLSB, AyMSB, AyLSB, AzMSB, AzLSB
-			COMMAND_POST_MAG_DATA = 0x45,			//!< Post Mag Data. MxMSB, MxLSB, MyMSB, MyLSB, MzMSB, MzLSB
-			COMMAND_POST_HEADING_DATA = 0x50,		//!< Post Heading Data. HeadMSB, HeadLSB, PitchMSB, PitchLSB, RollMSB, RollLSB
-			COMMAND_POST_TILT_DATA = 0x55,			//!< Post Tilt Data. PitchMSB, PitchLSB, RollMSB, RollLSB, TempMSB, TempLSB
-			COMMAND_READ_OPERATION_MODE_1 = 0x65,
-			COMMAND_ENTER_USER_CALIBRATION = 0x71,
-			COMMAND_LEVEL_ORIENTATION = 0x72,
-			COMMAND_UPRIGHT_SIDEWAYS_ORIENTATION = 0x73,
-			COMMAND_UPRIGHT_FLAT_FRONT_ORIENTATION = 0x74,
-			COMMAND_ENTER_RUN_MODE = 0x75,
-			COMMAND_ENTER_STANDBY_MODE = 0x76,
-			COMMAND_EXIT_USER_CALIBRATION_MODE = 0x7E,
-			COMMAND_RESET_PROCESSOR = 0x82,
-			COMMAND_ENTER_SLEEP_MODE = 0x83,
-			COMMAND_EXIT_SLEEP_MODE = 0x84,
-			COMMAND_READ_EEPROM = 0xE1,
-			COMMAND_WRITE_EEPROM = 0xF1,
-		};
+	enum class
+	Register16 : uint8_t
+	{
+		DeviceSerial = Register::DeviceSerialLsb,		//!< Device Serial Number
+		DeviationAngle = Register::DeviationAngleLsb,	//!< Deviation Angle (+-1800) in tenth of a degree
+		VariationAngle = Register::VariationAngleLsb ,	//!< Variation Angle (+-1800) in tenth of a degree
+		X_Offset = Register::X_OffsetLsb,				//!< Hard-Iron Calibration Offset for the X-axis
+		Y_Offset = Register::Y_OffsetLsb,				//!< Hard-Iron Calibration Offset for the Y-axis
+		Z_Offset = Register::Z_OffsetLsb,				//!< Hard-Iron Calibration Offset for the Z-axis
+	};
 
-		enum Orientation
-		{
-			ORIENTATION_LEVEL = COMMAND_LEVEL_ORIENTATION,
-			ORIENTATION_UPRIGHT_SIDEWAYS = COMMAND_UPRIGHT_SIDEWAYS_ORIENTATION,
-			ORIENTATION_UPRIGHT_FLAT_FRONT = COMMAND_UPRIGHT_FLAT_FRONT_ORIENTATION,
-		};
+	enum class
+	Command : uint8_t
+	{
+		PostAccelData = 0x40,		//!< Post Accel Data. AxMSB, AxLSB, AyMSB, AyLSB, AzMSB, AzLSB
+		PostMagData = 0x45,			//!< Post Mag Data. MxMSB, MxLSB, MyMSB, MyLSB, MzMSB, MzLSB
+		PostHeadingData = 0x50,		//!< Post Heading Data. HeadMSB, HeadLSB, PitchMSB, PitchLSB, RollMSB, RollLSB
+		PostTiltData = 0x55,		//!< Post Tilt Data. PitchMSB, PitchLSB, RollMSB, RollLSB, TempMSB, TempLSB
+		PostOperationMode = 0x65,
+		EnterUserCalibration = 0x71,
+		LevelOrientation = 0x72,
+		UprightSidewaysOrientation = 0x73,
+		UprightFlatFrontOrientation = 0x74,
+		EnterRunMode = 0x75,
+		EnterStandbyMode = 0x76,
+		ExitUserCalibrationMode = 0x7E,
+		ResetProcessor = 0x82,
+		EnterSleepMode = 0x83,
+		ExitSleepMode = 0x84,
+		ReadEeprom = 0xE1,
+		WriteEeprom = 0xF1,
+	};
 
-		enum OperationMode1
-		{
-			OPERATION_MODE_COMP = 0x80,					//!< Calculating compass data if set. (read only)
-			OPERATION_MODE_CAL = 0x40,					//!< Calculating calibration offsets if set. (read only)
-			OPERATION_MODE_FILTER = 0x20,				//!< IIR Heading Filter used if set.
-			OPERATION_MODE_RUN = 0x10,					//!< Run Mode if set.
-			OPERATION_MODE_STANDBY = 0x08,				//!< Standby Mode if set.
-			OPERATION_MODE_UF_ORIENTATION = 0x04,		//!< Upright Front Orientation if set.
-			OPERATION_MODE_UE_ORIENTATION = 0x02,		//!< Upright Edge Orientation if set.
-			OPERATION_MODE_LEVEL_ORIENTATION = 0x01,	//!< Level Orientation if set
-		};
+	enum class
+	Orientation : uint8_t
+	{
+		Level = 0x72,
+		UprightSideways = 0x73,
+		UprightFlatFront = 0x74
+	};
 
-		enum MeasurementRate
+	struct OperationMode
+	{
+		enum
 		{
-			MEASUREMENT_RATE_1HZ,
-			MEASUREMENT_RATE_5HZ,
-			MEASUREMENT_RATE_10HZ,
+			Comp = 0x80,					//!< Calculating compass data if set. (read only)
+			Cal = 0x40,						//!< Calculating calibration offsets if set. (read only)
+			Filter = 0x20,					//!< IIR Heading Filter used if set.
+			Run = 0x10,						//!< Run Mode if set.
+			Standby = 0x08,					//!< Standby Mode if set.
+			UprightFrontOrientation = 0x04,	//!< Upright Front Orientation if set.
+			UprightEdgeOrientation = 0x02,	//!< Upright Edge Orientation if set.
+			LevelOrientation = 0x01,		//!< Level Orientation if set
 		};
-	}
+	};
+
+	enum class
+	MeasurementRate : uint8_t
+	{
+		Hz1 = 0x00,
+		Hz5 = 0x01,
+		Hz10 = 0x02,
+	};
+} // namespace hmc6343
+
+/**
+ * \brief	HMC6343 3-Axis Compass with algorithms driver.
+ *
+ * The Honeywell HMC6343 is a fully integrated compass module that
+ * includes firmware for heading computation and calibration for
+ * magnetic distortions. The module combines 3-axis magneto-resistive
+ * sensors and 3-axis MEMS accelerometers, analog and digital
+ * support circuits, microprocessor and algorithms required for
+ * heading computation.
+ *
+ * \ingroup inertial
+ * \author	Niklas Hauser
+ *
+ * \tparam I2cMaster Asynchronous Two Wire interface
+ */
+template < typename I2cMaster >
+class Hmc6343 : public xpcc::I2cDevice< I2cMaster >, public hmc6343, private xpcc::pt::NestedProtoface<1>
+{
+public:
+	/// \brief	Constructor, requires pointer to 21 byte array, sets address to default of 0x19
+	Hmc6343(uint8_t* data, uint8_t address=0x19);
 
 	/**
-	 * \brief	HMC6343 3-Axis Compass with algorithms driver.
-	 *
-	 * The Honeywell HMC6343 is a fully integrated compass module that
-	 * includes firmware for heading computation and calibration for
-	 * magnetic distortions. The module combines 3-axis magneto-resistive
-	 * sensors and 3-axis MEMS accelerometers, analog and digital
-	 * support circuits, microprocessor and algorithms required for
-	 * heading computation.
-	 *
-	 * \ingroup inertial
-	 * \author	Niklas Hauser
-	 *
-	 * \tparam I2cMaster Asynchronous Two Wire interface
+	 * @return pointer to 8bit array containing Axyz Mxyz Heading Pitch Roll Temperature.
+	 * Be aware that the array is in BIG ENDIAN format, so you cannot
+	 * simply reinterpret the result as int16_t!!
 	 */
-	template < typename I2cMaster >
-	class Hmc6343 : protected xpcc::I2cWriteReadAdapter
+	ALWAYS_INLINE uint8_t*
+	getData() { return data; }
+
+	// MARK: Tasks
+	/// pings the sensor
+	bool
+	startPing();
+
+	bool ALWAYS_INLINE const
+	runPing();
+
+	bool ALWAYS_INLINE const
+	isPingSuccessful();
+
+
+
+	// READING RAM
+	bool ALWAYS_INLINE
+	startReadOperationMode()
+	{ return startReadPostData(Command::PostOperationMode); }
+
+	bool ALWAYS_INLINE
+	runReadOperationMode()
+	{ return runReadPostData(Command::PostOperationMode, 20, 1); }
+
+	bool ALWAYS_INLINE
+	isReadOperationModeSuccessful()
+	{ return isReadPostDataSuccessful(Command::PostOperationMode); }
+
+	uint8_t ALWAYS_INLINE
+	getOperationMode() { return data[20]; }
+
+
+
+	// WRITING EEPROM
+	/// Configures the sensor to normal orientation mode with 10Hz data rate.
+	bool ALWAYS_INLINE
+	startSetMeasurmentRate(MeasurementRate measurementRate=MeasurementRate::Hz10)
+	{ return startWriteRegister(Register::OperationMode2, static_cast<uint8_t>(measurementRate)); }
+
+	bool ALWAYS_INLINE const
+	runSetMeasurmentRate()
+	{ return runWriteRegister(Register::OperationMode2); }
+
+	bool ALWAYS_INLINE const
+	isSetMeasurmentRateSuccessful()
+	{ return isWriteRegisterSuccessful(Register::OperationMode2); }
+
+
+	/// sets a new deviation angle in eeprom
+	bool inline
+	startSetDeviationAngle(int16_t angle)
+	{ return startWrite16BitRegister(Register::DeviationAngle, static_cast<uint16_t>(angle)); }
+
+	bool ALWAYS_INLINE
+	runSetDeviationAngle()
+	{ return runWrite16BitRegister(Register::DeviationAngle); }
+
+	bool ALWAYS_INLINE const
+	isSetDeviationAngleSuccessful()
+	{ return isWrite16BitRegisterSuccessful(Register::DeviationAngle); }
+
+
+	/// sets a new variation angle in eeprom
+	bool inline
+	startSetVariationAngle(int16_t angle)
+	{ return startWrite16BitRegister(Register::VariationAngle, static_cast<uint16_t>(angle)); }
+
+	bool ALWAYS_INLINE
+	runSetVariationAngle()
+	{ return runWrite16BitRegister(Register::VariationAngle); }
+
+	bool ALWAYS_INLINE const
+	isSetVariationAngleSuccessful()
+	{ return isWrite16BitRegisterSuccessful(Register::VariationAngle); }
+
+
+	/// sets a new IIR filter in eeprom
+	bool ALWAYS_INLINE
+	startSetIIR_Filter(uint8_t filter)
+	{ return startWriteRegister(Register::FilterLsb, filter & 0x0f); }
+
+	bool ALWAYS_INLINE const
+	runSetIIR_Filter()
+	{ return runWriteRegister(Register::FilterLsb); }
+
+	bool ALWAYS_INLINE const
+	isSetIIR_FilterSuccessful()
+	{ return isWriteRegisterSuccessful(Register::FilterLsb); }
+
+
+
+	// READING EEPROM
+	/// reads the device id from eeprom
+	bool ALWAYS_INLINE
+	startReadDeviceId()
+	{ return startRead16BitRegister(Register16::DeviceSerial); }
+
+	bool ALWAYS_INLINE
+	runReadDeviceId()
+	{ return runRead16BitRegister(Register16::DeviceSerial); }
+
+	bool ALWAYS_INLINE const
+	isReadDeviceIdSuccessful()
+	{ return isRead16BitRegisterSuccessful(Register16::DeviceSerial); }
+
+	uint16_t ALWAYS_INLINE
+	getReadDeviceId() { return getRead16BitRegister(); }
+
+
+
+	// COMMANDS
+	/// Sets the specified orientation
+	bool ALWAYS_INLINE
+	startSetOrientation(Orientation orientation=Orientation::Level);
+
+	bool ALWAYS_INLINE const
+	runSetOrientation();
+
+	bool ALWAYS_INLINE const
+	isSetOrientationSuccessful();
+
+	/// enters run mode
+	bool ALWAYS_INLINE
+	startEnterRunMode()
+	{ return startWriteCommand(Command::EnterRunMode); }
+
+	bool ALWAYS_INLINE const
+	runEnterRunMode()
+	{ return runWriteCommand(Command::EnterRunMode); }
+
+	bool ALWAYS_INLINE const
+	isEnterRunModeSuccessful()
+	{ return isWriteCommandSuccessful(Command::EnterRunMode); }
+
+	/// enters standby mode
+	bool ALWAYS_INLINE
+	startEnterStandByMode()
+	{ return startWriteCommand(Command:EnterStandbyMode); }
+
+	bool ALWAYS_INLINE const
+	runEnterStandbyMode()
+	{ return runWriteCommand(Command::EnterStandbyMode); }
+
+	bool ALWAYS_INLINE const
+	isEnterStandbyModeSuccessful()
+	{ return isWriteCommandSuccessful(Command::EnterStandbyMode); }
+
+	/// enters sleep mode
+	bool ALWAYS_INLINE
+	startEnterSleepMode()
+	{ return startWriteCommand(Command::EnterSleepMode); }
+
+	bool ALWAYS_INLINE const
+	runEnterSleepMode()
+	{ return runWriteCommand(Command::EnterSleepMode); }
+
+	bool ALWAYS_INLINE const
+	isEnterSleepModeSuccessful()
+	{ return isWriteCommandSuccessful(Command::EnterSleepMode); }
+
+	/// exit sleep mode
+	bool ALWAYS_INLINE
+	startExitSleepMode()
+	{ return startWriteCommand(Command::ExitSleepMode, 20); }
+
+	bool ALWAYS_INLINE const
+	runExitSleepMode()
+	{ return runWriteCommand(Command::ExitSleepMode); }
+
+	bool ALWAYS_INLINE const
+	isExitSleepModeSuccessful()
+	{ return isWriteCommandSuccessful(Command::ExitSleepMode); }
+
+	/// enters user calibration mode
+	bool ALWAYS_INLINE
+	startEnterUserCalibrationMode()
+	{ return startWriteCommand(Command::EnterUserCalibrationMode); }
+
+	bool ALWAYS_INLINE const
+	runEnterUserCalibrationMode()
+	{ return runWriteCommand(Command::EnterUserCalibrationMode); }
+
+	bool ALWAYS_INLINE const
+	isEnterUserCalibrationSuccessful()
+	{ return isWriteCommandSuccessful(Command::EnterUserCalibrationMode); }
+
+	/// exit user calibration mode
+	bool ALWAYS_INLINE
+	startExitUserCalibrationMode()
+	{ return startWriteCommand(Command::ExitUserCalibrationMode, 50); }
+
+	bool ALWAYS_INLINE const
+	runExitUserCalibrationMode()
+	{ return runWriteCommand(Command::ExitUserCalibrationMode); }
+
+	bool ALWAYS_INLINE const
+	isExitUserCalibrationModeSuccessful()
+	{ return isWriteCommandSuccessful(Command::ExitUserCalibrationMode); }
+
+	/// resets the processor, any new command is delayed by 500ms
+	bool ALWAYS_INLINE
+	startResetProcessor()
+	{ return startWriteCommand(Command::ResetProcessor, 500); }
+
+	bool ALWAYS_INLINE const
+	runResetProcessor()
+	{ return runWriteCommand(Command::ResetProcessor); }
+
+	bool ALWAYS_INLINE const
+	isResetProcessorSuccessful()
+	{ return isWriteCommandSuccessful(Command::ResetProcessor); }
+
+
+
+	// DATA REQUESTS
+	/**
+	 * reads the Acceleration registers and buffer the results
+	 * sets `isNewAccelerationDataAvailable()` to `true`
+	 */
+	bool ALWAYS_INLINE
+	startReadAcceleration()
+	{ return startReadPostData(Command::PostAccelData); }
+
+	bool ALWAYS_INLINE
+	runReadAcceleration()
+	{ return runReadPostData(Command::PostAccelData, 0, 6); }
+
+	bool ALWAYS_INLINE const
+	isReadAccelerationSuccessful()
+	{ return isReadPostDataSuccessful(Command::PostAccelData); }
+
+	/// returns the x-acceleration in unknown units
+	inline int16_t
+	getAccelerationX() { return swapData(0); }
+
+	/// returns the y-acceleration in unknown units
+	inline int16_t
+	getAccelerationY() { return swapData(1); }
+
+	/// returns the z-acceleration in unknown units
+	inline int16_t
+	getAccelerationZ() { return swapData(2); }
+
+	/**
+	 * reads the Magnetometer registers and buffer the results
+	 * sets `isNewMagnetometerDataAvailable()` to `true`
+	 */
+	bool ALWAYS_INLINE
+	startReadMagneticField()
+	{ return startReadPostData(Command::PostMagData); }
+
+	bool ALWAYS_INLINE
+	runReadMagneticField()
+	{ return runReadPostData(Command::PostMagData, 6, 6); }
+
+	bool ALWAYS_INLINE const
+	isReadMagneticFieldSuccessful()
+	{ return isReadPostDataSuccessful(Command::PostMagData); }
+
+	/// returns the x-acceleration in unknown units
+	inline int16_t
+	getMagneticFieldX() { return swapData(3); }
+
+	/// returns the y-acceleration in unknown units
+	inline int16_t
+	getMagneticFieldY() { return swapData(4); }
+
+	/// returns the z-acceleration in unknown units
+	inline int16_t
+	getMagneticFieldZ() { return swapData(5); }
+
+	/**
+	* reads the Heading registers and buffer the results
+	* sets `isNewHeadingDataAvailable()` to `true`
+	*/
+	bool ALWAYS_INLINE
+	startReadHeading()
+	{ return startReadPostData(Command::PostHeadingData); }
+
+	bool ALWAYS_INLINE
+	runReadHeading()
+	{ return runReadPostData(Command::PostHeadingData, 12, 6); }
+
+	bool ALWAYS_INLINE const
+	isReadHeadingSuccessful()
+	{ return isReadPostDataSuccessful(Command::PostHeadingData); }
+
+	/// returns the heading in tenth of degrees (0 -> 3600)
+	inline int16_t
+	getHeading() { return swapData(6); }
+
+	/**
+	 * reads the Tilt registers and buffer the results
+	 * sets `isNewTiltDataAvailable()` to `true`
+	 */
+	bool ALWAYS_INLINE
+	startReadTilt()
+	{ return startReadPostData(Command::PostTiltData); }
+
+	bool ALWAYS_INLINE
+	runReadTilt()
+	{ return runReadPostData(Command::PostTiltData, 14, 6); }
+
+	bool ALWAYS_INLINE const
+	isReadTiltSuccessful()
+	{ return isReadPostDataSuccessful(Command::PostTiltData); }
+
+	/// returns the Pitch in tenth of degrees (-900 -> 0 -> 900)
+	inline int16_t
+	getPitch() { return swapData(7); }
+
+	/// returns the Roll in tenth of degrees (-900 -> 0 -> 900)
+	inline int16_t
+	getRoll() { return swapData(8); }
+
+	/// returns the temperature in unknown format (was not specified in datasheet)
+	inline int16_t
+	getTemperature() { return swapData(9); }
+
+private:
+	uint16_t ALWAYS_INLINE
+	swapData(uint8_t index);
+
+
+protected:
+	bool
+	startWriteCommand(Command command, uint16_t timeout = 1);
+
+	bool ALWAYS_INLINE const
+	runWriteCommand(Command command);
+
+	bool ALWAYS_INLINE const
+	isWriteCommandSuccessful(Command command);
+
+	/**
+	 * writes 8bit data to a register
+	 * @param	reg		register address
+	 * @param	data	8bit data to write
+	 */
+	bool inline
+	startWriteRegister(Register reg, uint8_t value);
+
+private:
+	bool
+	startWriteRegisterIgnoreTaskCheck(Register reg, uint8_t value);
+
+protected:
+	bool ALWAYS_INLINE const
+	runWriteRegister(Register reg);
+
+	bool ALWAYS_INLINE const
+	isWriteRegisterSuccessful(Register reg);
+
+	/**
+	 * writes 16bit data to a register
+	 * @param	reg		register address
+	 * @param	data	16bit data to write
+	 */
+	bool
+	startWrite16BitRegister(Register16 reg, uint16_t value);
+
+	bool ALWAYS_INLINE
+	runWrite16BitRegister(Register16 reg);
+
+	bool ALWAYS_INLINE const
+	isWrite16BitRegisterSuccessful(Register16 reg);
+
+	/**
+	 * reads a 8bit register
+	 * @param	reg		register address
+	 * @return `true` if successful
+	 */
+	bool inline
+	startReadRegister(Register reg);
+
+private:
+	bool
+	startReadRegisterIgnoreTaskCheck(Register reg);
+
+protected:
+	bool ALWAYS_INLINE const
+	runReadRegister(Register reg);
+
+	bool ALWAYS_INLINE const
+	isReadRegisterSuccessful(Register reg);
+
+	uint8_t ALWAYS_INLINE const
+	getReadRegister();
+
+	/**
+	 * reads a 16bit register
+	 * @param	reg		register address
+	 * @return `true` if successful
+	 */
+	bool
+	startRead16BitRegister(Register16 reg);
+
+	bool ALWAYS_INLINE
+	runRead16BitRegister(Register16 reg);
+
+	bool ALWAYS_INLINE const
+	isRead16BitRegisterSuccessful(Register16 reg);
+
+	uint16_t ALWAYS_INLINE const
+	getRead16BitRegister();
+
+	/**
+	 * reads
+	 * @param	reg		post command
+	 * @return `true` if successful
+	 */
+	bool
+	startReadPostData(Command command);
+
+	bool ALWAYS_INLINE
+	runReadPostData(Command command, uint8_t offset);
+
+	bool ALWAYS_INLINE const
+	isReadPostDataSuccessful(Command command);
+
+private:
+	xpcc::Timeout<> timeout;
+
+	struct Task
 	{
-	public:
-		/// \brief	Constructor, requires pointer to 20 byte array, sets address to default of 0x19
-		Hmc6343(uint8_t* data, uint8_t address=0x19);
-
-		bool
-		sendPing();
-
-		bool
-		checkCommunication();
-
-		/**
-		 * Configures the sensor to normal orientation mode with 10Hz data rate.
-		 */
-		bool
-		configure(hmc6343::MeasurementRate measurementRate=hmc6343::MEASUREMENT_RATE_10HZ);
-
-		/// Sets the specified orientation
-		bool
-		setOrientation(hmc6343::Orientation orientation=hmc6343::ORIENTATION_LEVEL);
-
-		bool
-		setDeviationAngle(int16_t angle);
-
-		bool
-		setVariationAngle(int16_t angle);
-
-		bool
-		setIIRFilter(uint8_t filter);
-
-		// User modes
-		ALWAYS_INLINE bool
-		enterRunMode();
-
-		ALWAYS_INLINE bool
-		enterStandByMode();
-
-		ALWAYS_INLINE bool
-		enterSleepMode();
-
-		inline bool
-		exitSleepMode();
-
-		ALWAYS_INLINE bool
-		enterUserCalibrationMode();
-
-		inline bool
-		exitUserCalibrationMode();
-
-		/// resets the processor, any new command is delayed by 500ms
-		inline bool
-		resetProcessor();
-
-		// data management
-		/**
-		 * reads the Acceleration registers and buffer the results
-		 * sets isNewAccelerationDataAvailable() to \c true
-		 */
-		ALWAYS_INLINE void
-		readAcceleration();
-
-		/**
-		 * reads the Magnetometer registers and buffer the results
-		 * sets isNewMagnetometerDataAvailable() to \c true
-		 */
-		ALWAYS_INLINE void
-		readMagnetometer();
-
-		/**
-		 * reads the Attitude registers and buffer the results
-		 * sets isNewAttitudeDataAvailable() to \c true
-		 */
-		ALWAYS_INLINE void
-		readAttitude();
-
-		/**
-		 * reads the Temperature registers and buffer the results
-		 * sets isNewTemperatureDataAvailable() to \c true
-		 */
-		ALWAYS_INLINE void
-		readTemperature();
-
-		ALWAYS_INLINE bool
-		isNewAccelerationDataAvailable();
-
-		ALWAYS_INLINE bool
-		isNewMagnetometerDataAvailable();
-
-		ALWAYS_INLINE bool
-		isNewAttitudeDataAvailable();
-
-		ALWAYS_INLINE bool
-		isNewTemperatureDataAvailable();
-
-		// access to data
-		uint16_t
-		getDeviceID();
-
-		/**
-		 * \return pointer to 8bit array containing 3 16bit Axyz values.
-		 * Be aware that the array is in BIG ENDIAN format, so you cannot
-		 * simply reinterpret the result as int16_t!!
-		 */
-		inline uint8_t*
-		getAcceleration();
-
-		/**
-		 * \return pointer to 8bit array containing 3 16bit Mxyz values.
-		 * Be aware that the array is in BIG ENDIAN format, so you cannot
-		 * simply reinterpret the result as int16_t!!
-		 */
-		inline uint8_t*
-		getMagnetometer();
-
-		/// returns the heading in tenth of degrees (0 -> 3600)
-		inline uint16_t
-		getHeading();
-
-		/// returns the Pitch in tenth of degrees (-900 -> 0 -> 900)
-		inline int16_t
-		getPitch();
-
-		/// returns the Roll in tenth of degrees (-900 -> 0 -> 900)
-		inline int16_t
-		getRoll();
-
-		/// returns the temperature in unknown format (was not specified in datasheet)
-		inline int16_t
-		getTemperature();
-
-		/**
-		 * \return pointer to 8bit array containing Axyz Mxyz Heading Pitch Roll Temperature.
-		 * Be aware that the array is in BIG ENDIAN format, so you cannot
-		 * simply reinterpret the result as int16_t!!
-		 */
-		ALWAYS_INLINE uint8_t*
-		getData();
-
-
-		void
-		update();
-
-	public:
-		bool
-		writeCommand(hmc6343::Command command);
-
-		/**
-		 * writes 8bit data to a register, blocking!
-		 * \param reg register address
-		 * \param data 8bit data to write
-		 */
-		bool
-		writeRegister(hmc6343::Register reg, uint8_t value);
-
-		/**
-		 * reads a 8bit register, blocking!
-		 * \param reg the 8bit register to read
-		 * \param data 8bit content
-		 * \return `true` if successful
-		 */
-		bool
-		readRegister(hmc6343::Register reg, uint8_t &data);
-
-	private:
-		xpcc::Timeout<> timeout;
-
-		enum Running
+		enum
 		{
-			NOTHING_RUNNING,
-			READ_ACCELERATION_RUNNING,
-			READ_MAGNETOMETER_RUNNING,
-			READ_ATTITUDE_RUNNING,
-			READ_TEMPERATURE_RUNNING,
+			Idle = 0,
 
-			EXIT_USER_CALIBRATION_MODE_RUNNING,
-			EXIT_SLEEP_MODE_RUNNING,
-			RESET_PROCESSOR_RUNNING,
+			// insert all registers from 0x00 to 0x15 for writing (+0x01)
+			WriteEepromBase = 0x01,
+			// insert all registers from 0x00 to 0x15 for posting (+0x17)
+			PostEepromBase = 0x17,
+			// insert all registers from 0x00 to 0x15 for reading (+0x2C)
+			ReadEepromBase = 0x2C,
+
+			// insert all post commands from 0x40 to 0x65 for writing (+0x02)
+			PostCommandBase = 0x02,
+			// insert all post commands from 0x40 to 0x65 for reading (+0x03)
+			ReadCommandBase = 0x03,
+			// insert all remaining commands from 0x71 to 0xF1 (+0x02)
+			WriteCommandBase = PostCommandBase,
+
+			// ping \o/
+			Ping = 0xFF
 		};
-		enum Status
-		{
-			NEW_ACCELERATION_DATA = 0x10,
-			NEW_MAGNETOMETER_DATA = 0x20,
-			NEW_ATTITUDE_DATA = 0x40,
-			NEW_TEMPERATURE_DATA = 0x80,
-		};
-		enum Pending
-		{
-			START_ACCELERATION_PENDING = 0x01,
-			START_MAGNETOMETER_PENDING = 0x02,
-			START_ATTITUDE_PENDING = 0x04,
-			START_TEMPERATURE_PENDING = 0x08,
-
-			READ_ACCELERATION_PENDING = 0x10,
-			READ_MAGNETOMETER_PENDING = 0x20,
-			READ_ATTITUDE_PENDING = 0x40,
-			READ_TEMPERATURE_PENDING = 0x80,
-		};
-
-		Running running;
-
-		uint8_t status;
-		uint8_t pending;
-		uint8_t* data;
-		uint8_t buffer[3];
 	};
-}
+
+	struct NPtTask
+	{
+		enum
+		{
+			ReadEeprom,
+			ReadPostData,
+			Read16BitRegister,
+			Write16BitRegister,
+		};
+	};
+
+	volatile uint8_t task;
+	volatile uint8_t success;
+	uint8_t* data;
+	uint8_t buffer[3];
+	uint8_t registerBufferLSB;
+	uint8_t registerBufferMSB;
+
+	xpcc::I2cTagAdapter<xpcc::I2cWriteReadAdapter> adapter;
+};
+
+} // namespace xpcc
 
 #include "hmc6343_impl.hpp"
 

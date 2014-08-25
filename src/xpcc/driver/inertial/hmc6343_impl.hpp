@@ -1,30 +1,9 @@
 // coding: utf-8
-// ----------------------------------------------------------------------------
 /* Copyright (c) 2013, Roboterclub Aachen e.V.
- * All rights reserved.
+ * All Rights Reserved.
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- *     * Redistributions of source code must retain the above copyright
- *       notice, this list of conditions and the following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright
- *       notice, this list of conditions and the following disclaimer in the
- *       documentation and/or other materials provided with the distribution.
- *     * Neither the name of the Roboterclub Aachen e.V. nor the
- *       names of its contributors may be used to endorse or promote products
- *       derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY ROBOTERCLUB AACHEN E.V. ''AS IS'' AND ANY
- * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL ROBOTERCLUB AACHEN E.V. BE LIABLE FOR ANY
- * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * The file is part of the xpcc library and is released under the 3-clause BSD
+ * license. See the file `LICENSE` for the full license governing this code.
  */
 // ----------------------------------------------------------------------------
 
@@ -32,100 +11,29 @@
 #	error  "Don't include this file directly, use 'hmc6343.hpp' instead!"
 #endif
 #include <xpcc/math/utils/operator.hpp>
-#include <xpcc/math/utils/bit_operation.hpp>
+#include <xpcc/math/utils/endianess.hpp>
+#import "hmc6343.hpp"
+#import "macros.hpp"
+#import "i2c.hpp"
 
 // ----------------------------------------------------------------------------
 template < typename I2cMaster >
 xpcc::Hmc6343<I2cMaster>::Hmc6343(uint8_t* data, uint8_t address)
-:	I2cWriteReadAdapter(address), timeout(500), running(RESET_PROCESSOR_RUNNING), status(0), pending(0), data(data)
+:	I2cDevice<I2cMaster>(), Protoface(), timeout(500), task(Task::Idle), success(0),
+	data(data), adapter(address, task, success)
 {
-	configureWriteRead(buffer, 0, data, 0);
 }
 
-// MARK: - configuration
-
+// MARK: - tasks
+// MARK: ping
 template < typename I2cMaster >
 bool
-xpcc::Hmc6343<I2cMaster>::configure(hmc6343::MeasurementRate measurementRate)
+xpcc::Hmc6343<I2cMaster>::startPing()
 {
-	bool ok = true;
-	ok &= writeRegister(hmc6343::EEPROM_OPERATION_MODE_2, measurementRate);
-	return ok;
-}
-
-template < typename I2cMaster >
-bool
-xpcc::Hmc6343<I2cMaster>::setOrientation(hmc6343::Orientation orientation)
-{
-	return writeCommand(static_cast<hmc6343::Command>(orientation));
-}
-
-template < typename I2cMaster >
-bool
-xpcc::Hmc6343<I2cMaster>::setDeviationAngle(int16_t angle)
-{
-	bool ok = writeRegister(hmc6343::EEPROM_DEVIATION_ANGLE_LSB, angle & 0xff);
-	if (ok) {
-		while (!timeout.isExpired())
-			;
-		ok &= writeRegister(hmc6343::EEPROM_DEVIATION_ANGLE_MSB, angle >> 8);
-	}
-	return ok;
-}
-
-template < typename I2cMaster >
-bool
-xpcc::Hmc6343<I2cMaster>::setVariationAngle(int16_t angle)
-{
-	bool ok = writeRegister(hmc6343::EEPROM_VARIATION_ANGLE_LSB, angle & 0xff);
-	if (ok) {
-		while (!timeout.isExpired())
-			;
-		ok &= writeRegister(hmc6343::EEPROM_VARIATION_ANGLE_MSB, angle >> 8);
-	}
-	return ok;
-}
-
-template < typename I2cMaster >
-bool
-xpcc::Hmc6343<I2cMaster>::setIIRFilter(uint8_t filter)
-{
-	// only 0 to 15 (0x0f) values allowed
-	return writeRegister(hmc6343::EEPROM_FILTER_LSB, filter & 0x0f);
-}
-
-// MARK: - modes
-
-template < typename I2cMaster >
-bool
-xpcc::Hmc6343<I2cMaster>::enterRunMode()
-{
-	return writeCommand(hmc6343::COMMAND_ENTER_RUN_MODE);
-}
-
-template < typename I2cMaster >
-bool
-xpcc::Hmc6343<I2cMaster>::enterStandByMode()
-{
-	return writeCommand(hmc6343::COMMAND_ENTER_STANDBY_MODE);
-}
-
-template < typename I2cMaster >
-bool
-xpcc::Hmc6343<I2cMaster>::enterSleepMode()
-{
-	return writeCommand(hmc6343::COMMAND_ENTER_SLEEP_MODE);
-}
-
-template < typename I2cMaster >
-bool
-xpcc::Hmc6343<I2cMaster>::exitSleepMode()
-{
-	if (writeCommand(hmc6343::COMMAND_EXIT_SLEEP_MODE))
+	if (task == Task::Idle && timeout.isExpired() &&
+		adapter.configurePing() && this->startTransaction(&adapter))
 	{
-		// response delay time 20ms
-		timeout.restart(20);
-//		running = EXIT_SLEEP_MODE_RUNNING;
+		task = Task::Ping;
 		return true;
 	}
 	return false;
@@ -133,383 +41,338 @@ xpcc::Hmc6343<I2cMaster>::exitSleepMode()
 
 template < typename I2cMaster >
 bool
-xpcc::Hmc6343<I2cMaster>::enterUserCalibrationMode()
+xpcc::Hmc6343<I2cMaster>::runPing()
 {
-//	return false;
-	return writeCommand(hmc6343::COMMAND_ENTER_USER_CALIBRATION);
+	return (task == Task::Ping);
 }
 
 template < typename I2cMaster >
 bool
-xpcc::Hmc6343<I2cMaster>::exitUserCalibrationMode()
+xpcc::Hmc6343<I2cMaster>::isPingSuccessful()
 {
-	if (writeCommand(hmc6343::COMMAND_EXIT_USER_CALIBRATION_MODE))
-	{
-		// response delay time 50ms
-		timeout.restart(50);
-//		running = EXIT_USER_CALIBRATION_MODE_RUNNING;
-		return true;
-	}
-	return false;
+	return (success == Task::Ping);
+}
+
+// COMMANDS ----------------------------------------------------------------------------
+// MARK: set orientation
+template < typename I2cMaster >
+bool
+xpcc::Hmc6343<I2cMaster>::startSetOrientation(Orientation orientation)
+{ return startWriteCommand(static_cast<Command>(orientation));
 }
 
 template < typename I2cMaster >
 bool
-xpcc::Hmc6343<I2cMaster>::resetProcessor()
+xpcc::Hmc6343<I2cMaster>::runSetOrientation()
 {
-	if (writeCommand(hmc6343::COMMAND_RESET_PROCESSOR))
-	{
-		// response delay time 500ms
-		timeout.restart(500);
-//		running = RESET_PROCESSOR_RUNNING;
-		return true;
-	}
-	return false;
-}
-
-// MARK: data requests
-
-template < typename I2cMaster >
-void
-xpcc::Hmc6343<I2cMaster>::readAcceleration()
-{
-	pending |= START_ACCELERATION_PENDING;
-}
-
-template < typename I2cMaster >
-void
-xpcc::Hmc6343<I2cMaster>::readMagnetometer()
-{
-	pending |= START_MAGNETOMETER_PENDING;
-}
-
-template < typename I2cMaster >
-void
-xpcc::Hmc6343<I2cMaster>::readAttitude()
-{
-	pending |= START_ATTITUDE_PENDING;
-}
-
-template < typename I2cMaster >
-void
-xpcc::Hmc6343<I2cMaster>::readTemperature()
-{
-	pending |= START_TEMPERATURE_PENDING;
+	// we don't want to remember the orientation that the user picked, so we check for all
+	return (runWriteCommand(Command::LevelOrientation) ||
+			runWriteCommand(Command::UprightSidewaysOrientation) ||
+			runWriteCommand(Command::UprightFlatFrontOrientation));
 }
 
 template < typename I2cMaster >
 bool
-xpcc::Hmc6343<I2cMaster>::isNewAccelerationDataAvailable()
+xpcc::Hmc6343<I2cMaster>::isSetOrientationSuccessful()
 {
-	return status & NEW_ACCELERATION_DATA;
+	// we don't want to remember the orientation that the user picked, so we check for all
+	return (isWriteCommandSuccessful(Command::LevelOrientation) ||
+			isWriteCommandSuccessful(Command::UprightSidewaysOrientation) ||
+			isWriteCommandSuccessful(Command::UprightFlatFrontOrientation));
 }
 
-template < typename I2cMaster >
-bool
-xpcc::Hmc6343<I2cMaster>::isNewMagnetometerDataAvailable()
-{
-	return status & NEW_MAGNETOMETER_DATA;
-}
-
-template < typename I2cMaster >
-bool
-xpcc::Hmc6343<I2cMaster>::isNewAttitudeDataAvailable()
-{
-	return status & NEW_ATTITUDE_DATA;
-}
-
-template < typename I2cMaster >
-bool
-xpcc::Hmc6343<I2cMaster>::isNewTemperatureDataAvailable()
-{
-	return status & NEW_TEMPERATURE_DATA;
-}
-
+// ----------------------------------------------------------------------------
 // MARK: - data access
 template < typename I2cMaster >
-uint16_t
-xpcc::Hmc6343<I2cMaster>::getDeviceID()
-{
-	uint8_t lsb, msb;
-	readRegister(hmc6343::EEPROM_DEVICE_SERIAL_LSB, lsb);
-	readRegister(hmc6343::EEPROM_DEVICE_SERIAL_MSB, msb);
-
-	return (msb << 8) | lsb;
-}
-
-
-template < typename I2cMaster >
-uint8_t*
-xpcc::Hmc6343<I2cMaster>::getAcceleration()
-{
-	status &= ~NEW_ACCELERATION_DATA;
-	return data;
-}
-
-template < typename I2cMaster >
-uint8_t*
-xpcc::Hmc6343<I2cMaster>::getMagnetometer()
-{
-	status &= ~NEW_MAGNETOMETER_DATA;
-	return data+6;
-}
-
-template < typename I2cMaster >
-uint16_t
-xpcc::Hmc6343<I2cMaster>::getHeading()
-{
-	uint16_t* rawData = reinterpret_cast<uint16_t*>(data);
-	status &= ~NEW_ATTITUDE_DATA;
-	return xpcc::swap(rawData[6]);
-}
-
-template < typename I2cMaster >
 int16_t
-xpcc::Hmc6343<I2cMaster>::getPitch()
+xpcc::Hmc6343<I2cMaster>::swapData(uint8_t index)
 {
 	uint16_t* rawData = reinterpret_cast<uint16_t*>(data);
-	status &= ~NEW_ATTITUDE_DATA;
-	return static_cast<int16_t>(xpcc::swap(rawData[7]));
+	return static_cast<int16_t>(xpcc::bigEndianToHost(rawData[index]));
 }
 
-template < typename I2cMaster >
-int16_t
-xpcc::Hmc6343<I2cMaster>::getRoll()
-{
-	uint16_t* rawData = reinterpret_cast<uint16_t*>(data);
-	status &= ~NEW_ATTITUDE_DATA;
-	return static_cast<int16_t>(xpcc::swap(rawData[8]));
-}
-
-template < typename I2cMaster >
-int16_t
-xpcc::Hmc6343<I2cMaster>::getTemperature()
-{
-	uint16_t* rawData = reinterpret_cast<uint16_t*>(data);
-	status &= ~NEW_TEMPERATURE_DATA;
-	return static_cast<int16_t>(xpcc::swap(rawData[9]));
-}
-
-template < typename I2cMaster >
-uint8_t*
-xpcc::Hmc6343<I2cMaster>::getData()
-{
-	return data;
-}
-
-template < typename I2cMaster >
-bool
-xpcc::Hmc6343<I2cMaster>::sendPing()
-{
-	// busy waiting
-	if(getAdapterState() == xpcc::I2c::AdapterState::Busy)
-		return false;
-
-	configureWriteRead(0, 0, 0, 0);
-
-	if(!I2cMaster::start(this))
-		return false;
-
-	return true;
-}
-
-template < typename I2cMaster >
-bool
-xpcc::Hmc6343<I2cMaster>::checkCommunication()
-{
-	return (getAdapterState() != xpcc::I2c::AdapterState::Error &&
-			getAdapterState() != xpcc::I2c::AdapterState::Busy);
-}
-
+// ----------------------------------------------------------------------------
 // MARK: - register access
-
+// MARK: write command
 template < typename I2cMaster >
 bool
-xpcc::Hmc6343<I2cMaster>::writeCommand(hmc6343::Command command)
+xpcc::Hmc6343<I2cMaster>::startWriteCommand(Command command, uint16_t timeout)
 {
-	// busy waiting
-	if(!timeout.isExpired() || getAdapterState() == xpcc::I2c::AdapterState::Busy)
-		return false;
-
-	buffer[0] = command;
-	configureWriteRead(buffer, 1, 0, 0);
-
-	if(!I2cMaster::start(this))
-		return false;
-
-	return true;
-}
-
-template < typename I2cMaster >
-bool
-xpcc::Hmc6343<I2cMaster>::writeRegister(hmc6343::Register reg, uint8_t value)
-{
-	// busy waiting
-	if(!timeout.isExpired() || getAdapterState() == xpcc::I2c::AdapterState::Busy)
-		return false;
-
-	buffer[0] = hmc6343::COMMAND_WRITE_EEPROM;
-	buffer[1] = reg;
-	buffer[2] = value;
-	configureWriteRead(buffer, 3, 0, 0);
-
-	if(!I2cMaster::start(this))
-		return false;
-
-	// 10ms timing delay
-	timeout.restart(10);
-
-	return true;
-}
-
-template < typename I2cMaster >
-bool
-xpcc::Hmc6343<I2cMaster>::readRegister(hmc6343::Register reg, uint8_t &data)
-{
-	// busy waiting
-	if(!timeout.isExpired() || getAdapterState() == xpcc::I2c::AdapterState::Busy)
-		return false;
-
-	buffer[0] = hmc6343::COMMAND_READ_EEPROM;
-	buffer[1] = reg;
-	configureWriteRead(buffer, 2, buffer, 1);
-
-	if(!I2cMaster::startBlocking(this))
-		return false;
-
-	// 10ms timing delay
-	timeout.restart(10);
-
-	data = buffer[0];
-	return true;
-}
-
-// MARK: - update
-
-template < typename I2cMaster >
-void
-xpcc::Hmc6343<I2cMaster>::update()
-{
-	if (running != NOTHING_RUNNING)
+	if(task == Task::Idle && this->timeout.isExpired())
 	{
-		if (getAdapterState() == xpcc::I2c::AdapterState::Idle)
-		{
-			switch (running)
-			{
-				case READ_ACCELERATION_RUNNING:
-					status |= NEW_ACCELERATION_DATA;
-					break;
-				case READ_MAGNETOMETER_RUNNING:
-					status |= NEW_MAGNETOMETER_DATA;
-					break;
-				case READ_ATTITUDE_RUNNING:
-					status |= NEW_ATTITUDE_DATA;
-					break;
-				case READ_TEMPERATURE_RUNNING:
-					status |= NEW_TEMPERATURE_DATA;
-					break;
+		buffer[0] = static_cast<uint8_t>(command);
 
-				default:
-					break;
-			}
-			running = NOTHING_RUNNING;
-		}
-		if (getAdapterState() == xpcc::I2c::AdapterState::Error)
+		if (adapter.configureWrite(buffer, 1) && this->startTransaction(&adapter))
 		{
-			running = NOTHING_RUNNING;
+			task = static_cast<uint8_t>(command) + Task::PostCommandBase;
+			// 10ms timing delay when writing to the chips EEPROM
+			this->timeout.restart(timeout);
+			return true;
 		}
 	}
-	else if (timeout.isExpired())
+	return false;
+}
+
+template < typename I2cMaster >
+bool
+xpcc::Hmc6343<I2cMaster>::runWriteCommand(Command command)
+{
+	return (task == (static_cast<uint8_t>(command) + Task::PostCommandBase));
+}
+
+template < typename I2cMaster >
+bool
+xpcc::Hmc6343<I2cMaster>::isWriteCommandSuccessful(Command command)
+{
+	return (success == (static_cast<uint8_t>(command) + Task::PostCommandBase));
+}
+
+// MARK: write register
+template < typename I2cMaster >
+bool
+xpcc::Hmc6343<I2cMaster>::startWriteRegister(Register reg, uint8_t value)
+{
+	if(task == Task::Idle)
 	{
-		// starting
-		if (pending & START_ACCELERATION_PENDING)
-		{
-			buffer[0] = hmc6343::COMMAND_POST_ACCEL_DATA;
-			configureWriteRead(buffer, 1, 0, 0);
+		return startWriteRegisterIgnoreTaskCheck(reg, value);
+	}
+	return false;
+}
 
-			if (I2cMaster::start(this))
-			{
-				pending &= ~START_ACCELERATION_PENDING;
-				pending |= READ_ACCELERATION_PENDING;
-				timeout.restart(1);
-			}
-		}
-		else if (pending & START_MAGNETOMETER_PENDING)
-		{
-			buffer[0] = hmc6343::COMMAND_POST_MAG_DATA;
-			configureWriteRead(buffer, 1, 0, 0);
+template < typename I2cMaster >
+bool
+xpcc::Hmc6343<I2cMaster>::startWriteRegisterIgnoreTaskCheck(Register reg, uint8_t value)
+{
+	if(timeout.isExpired())
+	{
+		buffer[0] = static_cast<uint8_t>(Command::WriteEeprom);
+		buffer[1] = static_cast<uint8_t>(reg);
+		buffer[2] = value;
 
-			if (I2cMaster::start(this))
-			{
-				pending &= ~START_MAGNETOMETER_PENDING;
-				pending |= READ_MAGNETOMETER_PENDING;
-				timeout.restart(1);
-			}
-		}
-		else if (pending & START_ATTITUDE_PENDING)
+		if (adapter.configureWrite(buffer, 3) && this->startTransaction(&adapter))
 		{
-			buffer[0] = hmc6343::COMMAND_POST_HEADING_DATA;
-			configureWriteRead(buffer, 1, 0, 0);
-
-			if (I2cMaster::start(this))
-			{
-				pending &= ~START_ATTITUDE_PENDING;
-				pending |= READ_ATTITUDE_PENDING;
-				timeout.restart(1);
-			}
-		}
-		else if (pending & START_TEMPERATURE_PENDING)
-		{
-			buffer[0] = hmc6343::COMMAND_POST_TILT_DATA;
-			configureWriteRead(buffer, 1, 0, 0);
-
-			if (I2cMaster::start(this))
-			{
-				pending &= ~START_TEMPERATURE_PENDING;
-				pending |= READ_TEMPERATURE_PENDING;
-				timeout.restart(1);
-			}
-		}
-		// reading
-		else if (pending & READ_ACCELERATION_PENDING)
-		{
-			configureWriteRead(buffer, 0, data, 6);
-
-			if (I2cMaster::start(this))
-			{
-				pending &= ~READ_ACCELERATION_PENDING;
-				running = READ_ACCELERATION_RUNNING;
-			}
-		}
-		else if (pending & READ_MAGNETOMETER_PENDING)
-		{
-			configureWriteRead(buffer, 0, data+6, 6);
-
-			if (I2cMaster::start(this))
-			{
-				pending &= ~READ_MAGNETOMETER_PENDING;
-				running = READ_MAGNETOMETER_RUNNING;
-			}
-		}
-		else if (pending & READ_ATTITUDE_PENDING)
-		{
-			configureWriteRead(buffer, 0, data+12, 6);
-
-			if (I2cMaster::start(this))
-			{
-				pending &= ~READ_ATTITUDE_PENDING;
-				running = READ_ATTITUDE_RUNNING;
-			}
-		}
-		else if (pending & READ_TEMPERATURE_PENDING)
-		{
-			configureWriteRead(buffer, 0, data+14, 6);
-
-			if (I2cMaster::start(this))
-			{
-				pending &= ~READ_TEMPERATURE_PENDING;
-				running = READ_TEMPERATURE_RUNNING;
-			}
+			task = static_cast<uint8_t>(reg) + Task::WriteEepromBase;
+			// 10ms timing delay when writing to the chips EEPROM
+			timeout.restart(10);
+			return true;
 		}
 	}
+	return false;
 }
+
+template < typename I2cMaster >
+bool
+xpcc::Hmc6343<I2cMaster>::runWriteRegister(Register reg)
+{
+	return (task == (static_cast<uint8_t>(reg) + Task::WriteEepromBase));
+}
+
+template < typename I2cMaster >
+bool
+xpcc::Hmc6343<I2cMaster>::isWriteRegisterSuccessful(Register reg)
+{
+	return (success == (static_cast<uint8_t>(reg) + Task::WriteEepromBase));
+}
+
+// MARK: write 16bit register
+template < typename I2cMaster >
+bool
+xpcc::Hmc6343<I2cMaster>::startWrite16BitRegister(Register16 reg, uint16_t value)
+{
+	// write MSB first, then LSB
+	if (task == Task::Idle && adapter.setPreserveTag() && startWriteRegisterIgnoreTaskCheck(reg, value >> 8))
+	{
+		registerBufferLSB = value;
+		this->callTask(NPtTask::Write16BitRegister);
+		return true;
+	}
+	return false;
+}
+
+template < typename I2cMaster >
+bool
+xpcc::Hmc6343<I2cMaster>::runWrite16BitRegister(Register16 reg)
+{
+	NPT_BEGIN(NPtTask::Write16BitRegister);
+
+	NPT_WAIT_UNTIL(adapter.getState() != xpcc::I2c::AdapterState::Busy);
+	if (isWriteRegisterSuccessful(static_cast<Register>(static_cast<uint8_t>(reg)+1)))
+	{
+		NPT_WAIT_UNTIL(startWriteRegisterIgnoreTaskCheck(static_cast<Register>(reg),registerBufferLSB));
+		NPT_WAIT_WHILE(runWriteRegister(static_cast<Register>(reg));
+	}
+
+	NPT_END();
+}
+
+template < typename I2cMaster >
+bool
+xpcc::Hmc6343<I2cMaster>::isWrite16BitRegisterSuccessful(Register16 reg)
+{ return isWriteRegisterSuccessful(static_cast<Register>(reg));
+}
+
+// MARK: read register
+template < typename I2cMaster >
+bool
+xpcc::Hmc6343<I2cMaster>::startReadRegister(Register reg)
+{
+	if(task == Task::Idle)
+	{
+		return startReadRegisterIgnoreTaskCheck(reg);
+	}
+	return false;
+}
+
+template < typename I2cMaster >
+bool
+xpcc::Hmc6343<I2cMaster>::startReadRegisterIgnoreTaskCheck(Register reg)
+{
+	if(timeout.isExpired())
+	{
+		buffer[0] = static_cast<uint8_t>(Command::ReadEeprom);
+		buffer[1] = static_cast<uint8_t>(reg);
+
+		if (adapter.configureWrite(buffer, 2) && adapter.setPreserveTag() && this->startTransaction(&adapter))
+		{
+			task = static_cast<uint8_t>(reg) + Task::PostEepromBase;
+			// 10ms timing delay when writing to the chips EEPROM
+			timeout.restart(10);
+			this->callTask(NPtTask::ReadEeprom);
+			return true;
+		}
+	}
+	return false;
+}
+
+template < typename I2cMaster >
+bool
+xpcc::Hmc6343<I2cMaster>::runReadRegister(Register reg)
+{
+	NPT_BEGIN(NPtTask::ReadEeprom);
+
+	NPT_WAIT_UNTIL(adapter.getState() != xpcc::I2c::AdapterState::Busy);
+
+	if (success == (static_cast<uint8_t>(reg) + Task::PostEepromBase))
+	{
+		NPT_WAIT_UNTIL(timeout.isExpired());
+		NPT_WAIT_UNTIL(adapter.configureRead(&registerBufferLSB, 1) &&
+				this->startTransaction(&adapter));
+		task = static_cast<uint8_t>(reg) + Task::ReadEepromBase;
+
+		NPT_WAIT_WHILE(task == (static_cast<uint8_t>(reg) + Task::ReadEepromBase));
+	}
+
+	NPT_END();
+}
+
+template < typename I2cMaster >
+bool
+xpcc::Hmc6343<I2cMaster>::isReadRegisterSuccessful(Register reg)
+{
+	return (success == (static_cast<uint8_t>(reg) + Task::ReadEepromBase));
+}
+
+template < typename I2cMaster >
+uint8_t
+xpcc::Hmc6343<I2cMaster>::getReadRegister()
+{
+	return registerBufferLSB;
+}
+
+// MARK: read 16bit register
+template < typename I2cMaster >
+bool
+xpcc::Hmc6343<I2cMaster>::startRead16BitRegister(Register16 reg, uint16_t value)
+{
+	// first read MSB, then read LSB
+	if (task == Task::Idle && adapter.setPreserveTag() &&
+			startReadRegisterIgnoreTaskCheck(static_cast<Register>(static_cast<uint8_t>(reg)+1)))
+	{
+		this->callTask(Task::Read16BitRegister);
+		return true;
+	}
+	return false;
+}
+
+template < typename I2cMaster >
+bool
+xpcc::Hmc6343<I2cMaster>::runRead16BitRegister(Register16 reg)
+{
+	NPT_BEGIN(NPtTask::Read16BitRegister);
+
+	// wait for the adapter to finish
+	NPT_WAIT_UNTIL(adapter.getState() != xpcc::I2c::AdapterState::Busy);
+	// check
+	if (isReadRegisterSuccessful(static_cast<Register>(static_cast<uint8_t>(reg)+1)))
+	{
+		registerBufferMSB = getReadRegister();
+		NPT_WAIT_UNTIL(startReadRegisterIgnoreTaskCheck(static_cast<Register>(reg)));
+		NPT_WAIT_WHILE(runReadRegister(static_cast<Register>(reg)));
+	}
+
+	NPT_END();
+}
+
+template < typename I2cMaster >
+bool
+xpcc::Hmc6343<I2cMaster>::isRead16BitRegisterSuccessful(Register16 reg)
+{ return isReadRegisterSuccessful(static_cast<Register>(reg));
+}
+
+template < typename I2cMaster >
+uint16_t
+xpcc::Hmc6343<I2cMaster>::getRead16BitRegister()
+{
+	return (registerBufferMSB << 8) | registerBufferLSB;
+}
+
+// MARK: read 6 bytes data
+template < typename I2cMaster >
+bool
+xpcc::Hmc6343<I2cMaster>::startReadPostData(Command command)
+{
+	// sanity check
+	if (task == Task::Idle && static_cast<uint8_t>(command) <= 0x65 &&
+			adapter.setPreserveTag() && startWriteCommand(command, 1))
+	{
+		this->callTask(NPtTask::ReadPostData);
+		return true;
+	}
+	return false;
+}
+
+template < typename I2cMaster >
+bool
+xpcc::Hmc6343<I2cMaster>::runReadPostData(Command command, uint8_t offset, uint8_t readSize)
+{
+	// sanity check
+	if (static_cast<uint8_t>(command) > 0x65 || offset > 4*6 + 1 || readSize > 6)
+		return false;
+
+	NPT_BEGIN(NPtTask::ReadPostData);
+
+	NPT_WAIT_UNTIL(adapter.getState() != xpcc::I2c::AdapterState::Busy);
+
+	if (isWriteCommandSuccessful(command))
+	{
+		NPT_WAIT_UNTIL(timeout.isExpired());
+
+		NPT_WAIT_UNTIL(adapter.configureRead(buffer + offset, readSize) && this->startTransaction(&adapter));
+
+		task = static_cast<uint8_t>(command) + Task::ReadCommandBase;
+
+		NPT_WAIT_WHILE(task == (static_cast<uint8_t>(command) + Task::ReadCommandBase));
+	}
+
+	NPT_END();
+}
+
+template < typename I2cMaster >
+bool
+xpcc::Hmc6343<I2cMaster>::isReadPostDataSuccessful(Command command)
+{
+	// sanity check
+	return (static_cast<uint8_t>(command) <= 0x65 &&
+			success == (static_cast<uint8_t>(command) + Task::ReadCommandBase));
+}
+
