@@ -128,7 +128,7 @@ namespace pt
  *
  * @ingroup	protothread
  * @author	Niklas Hauser
- * @tparam	Depth	the nesting depth: the maximum of tasks that are called within tasks.
+ * @tparam	Depth	the nesting depth: the maximum of tasks that are called within tasks (should be < 128).
  */
 template< uint8_t Depth = 0 >
 class NestedProtothread
@@ -178,6 +178,13 @@ public:
 		return (nptStateArray[nptLevel] != NPtInvalid);
 	}
 
+	/// @return the nesting depth in the current task, or -1 if called outside a task
+	int8_t ALWAYS_INLINE
+	getTaskDepth()
+	{
+		return static_cast<int8_t>(nptLevel - 1);
+	}
+
 #ifdef __DOXYGEN__
 	/**
 	 * Run the task.
@@ -197,13 +204,6 @@ public:
 	bool
 	runTask();
 #endif
-
-	/// @return the nesting depth at the function call
-	uint8_t ALWAYS_INLINE
-	getNestingDepth()
-	{
-		return nptLevel ? nptLevel - 1 : 0;
-	}
 
 protected:
 	/// @internal
@@ -295,10 +295,10 @@ public:
 		return (nptState != NPtInvalid);
 	}
 
-	uint8_t ALWAYS_INLINE
-	getNestingDepth()
+	int8_t ALWAYS_INLINE
+	getTaskDepth()
 	{
-		return 0;
+		return inNPt ? 0 : -1;
 	}
 
 protected:
@@ -307,13 +307,14 @@ protected:
 	NPtState ALWAYS_INLINE
 	pushNPt()
 	{
+		inNPt = true;
 		return nptState;
 	}
 
 	void ALWAYS_INLINE
 	popNPt()
 	{
-		// do nothing
+		inNPt = false;
 	}
 
 	void ALWAYS_INLINE
@@ -337,6 +338,7 @@ protected:
 
 private:
 	static constexpr NPtState NPtInvalid = static_cast<NPtState>(xpcc::ArithmeticTraits<NPtState>::max);
+	bool inNPt;
 	NPtState nptState;
 };
 /// @endcond

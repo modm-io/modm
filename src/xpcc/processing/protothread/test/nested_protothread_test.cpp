@@ -30,7 +30,7 @@ class TestingEmptyThread0 : public xpcc::pt::NestedProtothread<0>
 {
 public:
 	TestingEmptyThread0()
-	:	state(0)
+	:	state(0), depth(0)
 	{
 	}
 
@@ -40,6 +40,7 @@ public:
 		NPT_BEGIN(Task::Empty0Task1);
 
 		this->state = 1;
+		this->depth = this->getTaskDepth();
 
 		NPT_YIELD();
 
@@ -59,6 +60,7 @@ public:
 	}
 
 	uint8_t state;
+	int8_t depth;
 };
 
 class TestingEmptyThread1 : public xpcc::pt::NestedProtothread<1>
@@ -138,11 +140,13 @@ NestedProtothreadTest::testClassMethods()
 	TestingEmptyThread0 thread0;
 	// these threads don't start themselves
 	TEST_ASSERT_FALSE(thread0.isTaskRunning());
+	TEST_ASSERT_EQUALS(thread0.getTaskDepth(), -1);
 	// calling run() should return false
 	TEST_ASSERT_FALSE(thread0.runTask1());
 	TEST_ASSERT_FALSE(thread0.runTask2());
 	// calling run() should not have modified anything
 	TEST_ASSERT_EQUALS(thread0.state, 0);
+	TEST_ASSERT_EQUALS(thread0.depth, 0);
 	// still not running
 	TEST_ASSERT_FALSE(thread0.isTaskRunning());
 
@@ -295,7 +299,7 @@ public:
 		this->callResult1Retry = this->startTask(Task::NestingTask2);
 		this->stopTask();
 		this->callResult1AfterStop = this->startTask(Task::NestingTask2);
-		this->depth1 = this->getNestingDepth();
+		this->depth1 = this->getTaskDepth();
 
 		NPT_YIELD();
 
@@ -332,7 +336,7 @@ protected:
 
 		this->state2 = 2;
 		this->callResult2 = this->startTask(Task::NestingTask3);
-		this->depth2 = this->getNestingDepth();
+		this->depth2 = this->getTaskDepth();
 
 		NPT_YIELD();
 
@@ -363,7 +367,7 @@ protected:
 		this->callResult3Retry = this->startTask(Task::NestingTask4);
 		this->stopTask();
 		this->callResult3AfterStop = this->startTask(Task::NestingTask4);
-		this->depth3 = this->getNestingDepth();
+		this->depth3 = this->getTaskDepth();
 
 		NPT_YIELD();
 
@@ -377,9 +381,9 @@ protected:
 	}
 
 public:
-	uint8_t depth1;
-	uint8_t depth2;
-	uint8_t depth3;
+	int8_t depth1;
+	int8_t depth2;
+	int8_t depth3;
 	uint8_t state1;
 	uint8_t state2;
 	uint8_t state3;
@@ -405,7 +409,7 @@ NestedProtothreadTest::testNesting()
 	TEST_ASSERT_FALSE(thread.runTask1());
 	TEST_ASSERT_EQUALS(thread.state1, 0);
 	TEST_ASSERT_FALSE(thread.isTaskRunning());
-	TEST_ASSERT_EQUALS(thread.getNestingDepth(), 0);
+	TEST_ASSERT_EQUALS(thread.getTaskDepth(), -1);
 
 	// lets start the first task
 	TEST_ASSERT_TRUE(thread.startTask(Task::NestingTask1));
