@@ -54,7 +54,7 @@ namespace pt
  *
  * typedef GpioOutputB0 Led;
  *
- * class BlinkingLight : public xpcc::pt::Protothread, public xpcc::pt::NestedProtothread<1>
+ * class BlinkingLight : public xpcc::pt::Protothread, private xpcc::pt::NestedProtothread<1>
  * {
  * public:
  *     bool
@@ -151,7 +151,7 @@ public:
 	inline bool
 	startTask(uint8_t task)
 	{
-		if (nptStateArray[0] != NPtInvalid)
+		if (isTaskRunning())
 			return false;
 
 		nptStateArray[0] = stateFromTask(task);
@@ -192,7 +192,6 @@ public:
 	 *
 	 * @return	`true` if still running, `false` if it has finished.
 	 */
-
 	bool
 	runTask();
 #endif
@@ -239,7 +238,7 @@ protected:
 	}
 
 	// sets the state of the parent nesting level
-	// @warning	be aware in which nesting level you call this!
+	// @warning	be aware in which nesting level you call this! (before popNPt()!)
 	void ALWAYS_INLINE
 	setNPt(NPtState state)
 	{
@@ -249,8 +248,8 @@ protected:
 	// the task will be subtracted from the maximum of the NPtState
 	// and with this being an uint16_t, you would have to have a file
 	// with more than 65.000 lines to come into trouble here.
-	// Also if you have more than 255 tasks, there is something wrong
-	// with your concept
+	// Also if you have more than 255 tasks in the same class, there
+	// is something wrong with your concept...
 	static constexpr NPtState
 	stateFromTask(uint8_t task)
 	{
