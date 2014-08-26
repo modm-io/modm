@@ -1,7 +1,7 @@
 #include "homeview.hpp"
 
-HomeView::HomeView(xpcc::gui::ViewStack* stack, uint8_t identifier) :
-	AbstractView(stack, identifier, xpcc::gui::Dimension(320, 240)),
+HomeView::HomeView(xpcc::gui::GuiViewStack* stack, uint8_t identifier) :
+	View(stack, identifier, xpcc::gui::Dimension(320, 240)),
 	toggleLedButton((char*)"Win Eurobot", xpcc::gui::Dimension(100, 50)),
 	doNothingButton((char*)"Delete XPCC", xpcc::gui::Dimension(100, 50)),
 	rocker1(100, 50, xpcc::gui::Dimension(200, 30)),

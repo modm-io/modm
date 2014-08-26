@@ -1,8 +1,8 @@
 #include "choose_color.hpp"
 
-ChooseColorView::ChooseColorView(xpcc::gui::ViewStack* stack,
+ChooseColorView::ChooseColorView(xpcc::gui::GuiViewStack* stack,
 		uint8_t identifier) :
-		AbstractView(stack, identifier, xpcc::gui::Dimension(320, 240)),
+		View(stack, identifier, xpcc::gui::Dimension(320, 240)),
 //		button1("Test", xpcc::gui::Dimension(80, 30)),
 		lbl_yellow("YELLOW", colorpalette[xpcc::gui::Color::BLACK]),
 		lbl_red("RED", colorpalette[xpcc::gui::Color::BLACK]),

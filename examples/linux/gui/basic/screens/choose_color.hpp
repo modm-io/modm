@@ -2,18 +2,18 @@
 #define CHOOSE_COLOR_HPP_
 
 
-#include <xpcc/ui/gui/abstract_view.hpp>
+#include <xpcc/ui/gui/view.hpp>
 #include <xpcc/ui/gui/view_stack.hpp>
 
 #include <xpcc/ui/gui.hpp>
 
 using namespace xpcc::gui;
 
-class ChooseColorView : public xpcc::gui::AbstractView
+class ChooseColorView : public xpcc::gui::View
 {
 public:
 
-	ChooseColorView(xpcc::gui::ViewStack* stack, uint8_t identifier);
+	ChooseColorView(xpcc::gui::GuiViewStack* stack, uint8_t identifier);
 
 	~ChooseColorView() {}
 

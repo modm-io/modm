@@ -2,18 +2,18 @@
 #define OVERVIEW_HPP_
 
 
-#include <xpcc/ui/gui/abstract_view.hpp>
+#include <xpcc/ui/gui/view.hpp>
 #include <xpcc/ui/gui/view_stack.hpp>
 
 #include <xpcc/ui/gui.hpp>
 
 using namespace xpcc::gui;
 
-class Overview : public xpcc::gui::AbstractView
+class Overview : public xpcc::gui::View
 {
 public:
 
-	Overview(xpcc::gui::ViewStack* stack, uint8_t identifier);
+	Overview(xpcc::gui::GuiViewStack* stack, uint8_t identifier);
 
 	~Overview() {}
 

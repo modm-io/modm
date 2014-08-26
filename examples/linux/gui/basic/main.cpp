@@ -259,7 +259,7 @@ MAIN_FUNCTION
 	 * Create a view and some widgets
 	 */
 
-	xpcc::gui::ViewStack myViewStack(display, &input_queue);
+	xpcc::gui::GuiViewStack myViewStack(display, &input_queue);
 
 	ChooseColorView colorchoose(&myViewStack, 1);
 

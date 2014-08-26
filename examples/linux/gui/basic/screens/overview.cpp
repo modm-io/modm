@@ -4,8 +4,8 @@
 
 using namespace xpcc::gui;
 
-Overview::Overview(xpcc::gui::ViewStack* stack, uint8_t identifier) :
-	AbstractView(stack, identifier, Dimension(320, 240)),
+Overview::Overview(xpcc::gui::GuiViewStack* stack, uint8_t identifier) :
+	View(stack, identifier, Dimension(320, 240)),
 	tabpanel(Dimension(320, 240), 0.2),
 	buttonLeft("Back", tabpanel.buttonDimension),
 	buttonMiddle("change", tabpanel.buttonDimension),
