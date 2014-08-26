@@ -6,39 +6,31 @@
  * the LED2 is switched off.
  *
  * Tested in hardware 2012-08-08 by strongly-typed.
+ * Tested again 2014-08-01.
  */
 
 #include <xpcc/architecture.hpp>
-
-GPIO__OUTPUT(Led, 0, 7);
-GPIO__INPUT(But, 3, 2);
+#include "../lpcxpresso11c24.hpp"
 
 int
 main(void)
 {
-	SystemInit();
-	
-	// Initialize 32-bit timer 0. TIME_INTERVAL is defined as 10mS
-	// You may also want to use the Cortex SysTick timer to do this
-	init_timer32(0, TIME_INTERVAL);
-	
-	// Enable timer 0. Our interrupt handler will begin incrementing
-	// the TimeTick global each time timer 0 matches and resets.
-	enable_timer32(0);
-	
+	defaultSystemClock::enable();
+	SysTickTimer::enable();		// will generate one interrupt every millisecond
+
 	// Set LED port pin to output
 	Led::setOutput();
-	But::setInput(xpcc::lpc::PULLUP);
-	
+	Button::setInput(Gpio::InputType::PullUp);
+
 	while (1)
 	{
 		// Each time we wake up...
-		Led::setOutput(But::read());
-
+		Led::set(Button::read());
 		// Go to sleep to save power between timer interrupts
 		__WFI();
 	}
 
+/*
 	// Use all other defines once to verify that it is compilable
 	But::setInput();
 	But::setInput(xpcc::lpc::FLOATING);
@@ -72,4 +64,5 @@ main(void)
 	Io::set(true);
 	Io::set(false);
 	Led::set(Io::read());
+*/
 }

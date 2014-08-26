@@ -33,8 +33,9 @@
 
 #include <xpcc/communication/can/message.hpp>
 #include <xpcc/container/linked_list.hpp>
+#include <xpcc/architecture/peripheral/can.hpp>
 
-class FakeCanDriver
+class FakeCanDriver : public xpcc::Can
 {
 public:
 	FakeCanDriver();
@@ -50,6 +51,15 @@ public:
 	
 	bool
 	sendMessage(const xpcc::can::Message& message);
+
+	static uint8_t
+	getReceiveErrorCounter();
+
+	static uint8_t
+	getTransmitErrorCounter();
+
+	static BusState
+	getBusState();
 	
 public:
 	/// Messages which should be received

@@ -38,10 +38,10 @@ class Indicator
 public:
 	Indicator(Animation<T> &animator)
 	:	animator(animator), frames{
-			xpcc::ui::KeyFrame<T>(75, xpcc::ArithmeticTraits<T>::max()),
-			xpcc::ui::KeyFrame<T>(375, xpcc::ArithmeticTraits<T>::max()),
-			xpcc::ui::KeyFrame<T>(115, xpcc::ArithmeticTraits<T>::min()),
-			xpcc::ui::KeyFrame<T>(435, xpcc::ArithmeticTraits<T>::min())
+			xpcc::ui::KeyFrame<T>(75, xpcc::ArithmeticTraits<T>::max),
+			xpcc::ui::KeyFrame<T>(375, xpcc::ArithmeticTraits<T>::max),
+			xpcc::ui::KeyFrame<T>(115, xpcc::ArithmeticTraits<T>::min),
+			xpcc::ui::KeyFrame<T>(435, xpcc::ArithmeticTraits<T>::min)
 		}
 	{
 		this->animator.setKeyFrames(frames, 4);

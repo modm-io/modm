@@ -312,6 +312,32 @@ IoStreamTest::testFloat4()
 	TEST_ASSERT_EQUALS(device.bytesWritten, 12);
 }
 
+void
+IoStreamTest::testBool1()
+{
+	char string[] = "true";
+
+	bool boo = true;
+
+	(*stream) << boo;
+
+	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 4);
+	TEST_ASSERT_EQUALS(device.bytesWritten, 4);
+}
+
+void
+IoStreamTest::testBool2()
+{
+	char string[] = "false";
+
+	bool boo = false;
+
+	(*stream) << boo;
+
+	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 5);
+	TEST_ASSERT_EQUALS(device.bytesWritten, 5);
+}
+
 // ----------------------------------------------------------------------------
 void
 IoStreamTest::testHex1()
@@ -365,6 +391,22 @@ IoStreamTest::testHex4()
 	TEST_ASSERT_EQUALS(device.bytesWritten, 8);
 }
 
+void
+IoStreamTest::testHex5()
+{
+	char string[] = "0100";
+
+	bool boo = true;
+
+	(*stream) << xpcc::hex << boo;
+
+	boo = false;
+	(*stream) << xpcc::hex << boo;
+
+	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 4);
+	TEST_ASSERT_EQUALS(device.bytesWritten, 4);
+}
+
 // ----------------------------------------------------------------------------
 void
 IoStreamTest::testBin1()
@@ -416,4 +458,20 @@ IoStreamTest::testBin4()
 
 	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 32);
 	TEST_ASSERT_EQUALS(device.bytesWritten, 32);
+}
+
+void
+IoStreamTest::testBin5()
+{
+	char string[] = "0000000100000000";
+
+	bool boo = true;
+
+	(*stream) << xpcc::bin << boo;
+
+	boo = false;
+	(*stream) << xpcc::bin << boo;
+
+	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 16);
+	TEST_ASSERT_EQUALS(device.bytesWritten, 16);
 }

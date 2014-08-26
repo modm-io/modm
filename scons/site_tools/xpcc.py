@@ -361,7 +361,7 @@ def generate(env, **kw):
 	elif env['ARCHITECTURE'].startswith('hosted'):
 		env['HOSTED_DEVICE'] = device
 		env.Tool('hosted')
-	elif env['ARCHITECTURE'] in ['arm7tdmi', 'cortex-m0', 'cortex-m3', 'cortex-m4', 'cortex-m4f']:
+	elif env['ARCHITECTURE'] in ['cortex-m0', 'cortex-m3', 'cortex-m4', 'cortex-m4f']:
 		if env['ARCHITECTURE'] == 'cortex-m4f':
 			env['ARM_ARCH'] = 'cortex-m4'
 		else:
@@ -381,6 +381,7 @@ def generate(env, **kw):
 					env['OPENOCD_CONFIGFILE'] = parser.get('openocd', 'configfile')
 					env['OPENOCD_COMMANDS'] = parser.get('openocd', 'commands')
 					env['OPENOCD_REMOTE_HOST'] = parser.get('openocd', 'remote_host', 'localhost')
+					env['OPENOCD_REMOTE_USER'] = parser.get('openocd', 'remote_user', 'pi')
 				if parser.get('program', 'tool') == 'stlink':
 					env.Tool('stlink')
 				if parser.get('program', 'tool') == 'lpclink':
@@ -398,14 +399,7 @@ def generate(env, **kw):
 					env.Tool('gdb')
 			except configparser.ParserException as e:
 				env.Error("Error in Configuration: %s" % e)
-				Exit(1)			
-	elif env['ARCHITECTURE'] == 'avr32':
-		env['AVR32_DEVICE'] = device
-		env['AVR32_CLOCK']  = clock
-		env['LIBS']         = ['']
-		env['LIBPATH']      = []
-		env.Tool('avr32')
-		env.Tool('dfu-programmer')
+				Exit(1)
 	else:
 		env.Error("xpcc Error: Unknown architecture '%s'!" % env['ARCHITECTURE'])
 		Exit(1)

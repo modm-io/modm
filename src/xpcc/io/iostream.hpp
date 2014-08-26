@@ -5,7 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -51,9 +51,9 @@ namespace xpcc
 	public :
 		/**
 		 * \brief	Constructor
-		 * 
+		 *
 		 * \param	device	device to write the stream to
-		 * 
+		 *
 		 * \code
 		 *	MyIODevice device;
 		 *	IOStream stream( device );
@@ -67,7 +67,7 @@ namespace xpcc
 			this->device->write(c);
 			return *this;
 		}
-		
+
 		inline IOStream&
 		flush()
 		{
@@ -75,7 +75,7 @@ namespace xpcc
 			this->mode = Mode::Ascii;
 			return *this;
 		}
-		
+
 		/// set the output mode to Mode::Binary style for \c char and \c char*
 		ALWAYS_INLINE IOStream&
 		bin()
@@ -99,8 +99,8 @@ namespace xpcc
 			this->mode = Mode::Ascii;
 			return *this;
 		}
-		
-		
+
+
 		IOStream&
 		operator << (const unsigned char& v)
 		{
@@ -112,6 +112,33 @@ namespace xpcc
 			}
 			else {
 				this->writeHex(v);
+			}
+			return *this;
+		}
+
+		IOStream&
+		operator << (const bool& v)
+		{
+			switch (this->mode)
+			{
+				case Mode::Ascii:
+					this->device->write(v ? "true" : "false");
+					break;
+				case Mode::Binary:
+					// upper nibble
+					this->device->write('0');
+					this->device->write('0');
+					this->device->write('0');
+					this->device->write('0');
+
+					// lower nibble
+					this->device->write('0');
+					this->device->write('0');
+					// fallthrough
+				case Mode::Hexadecimal:
+					this->device->write('0');
+					this->device->write(v ? '1' : '0');
+					break;
 			}
 			return *this;
 		}
@@ -130,7 +157,7 @@ namespace xpcc
 			}
 			return *this;
 		}
-		
+
 		ALWAYS_INLINE IOStream&
 		operator << (const uint16_t& v)
 		{
@@ -206,7 +233,7 @@ namespace xpcc
 			}
 			return *this;
 		}
-		
+
 #if defined(XPCC__OS_OSX)
 		// For APPLE 'int64_t' is of type 'int'. Therefore there is no
 		// function here for the default type 'long int'. As 'long int' has the same
@@ -217,7 +244,7 @@ namespace xpcc
 			this->writeInteger(static_cast<int64_t>(v));
 			return *this;
 		}
-		
+
 		ALWAYS_INLINE IOStream&
 		operator << (const long unsigned int& v)
 		{
@@ -225,7 +252,7 @@ namespace xpcc
 			return *this;
 		}
 #endif
-		
+
 #if defined(XPCC__CPU_ARM) || defined(XPCC__CPU_AVR32)
 		// For ARM 'int32_t' is of type 'long'. Therefore there is no
 		// function here for the default type 'int'. As 'int' has the same
@@ -236,7 +263,7 @@ namespace xpcc
 			this->writeInteger(static_cast<int32_t>(v));
 			return *this;
 		}
-		
+
 		ALWAYS_INLINE IOStream&
 		operator << (const unsigned int& v)
 		{
@@ -244,7 +271,7 @@ namespace xpcc
 			return *this;
 		}
 #endif
-		
+
 // The 64-bit types on the AVR are extremely slow and are
 // therefore excluded here
 #if !defined(XPCC__CPU_AVR)
@@ -254,7 +281,7 @@ namespace xpcc
 			this->writeInteger(v);
 			return *this;
 		}
-		
+
 		ALWAYS_INLINE IOStream&
 		operator << (const int64_t& v)
 		{
@@ -262,7 +289,7 @@ namespace xpcc
 			return *this;
 		}
 #endif
-		
+
 		ALWAYS_INLINE IOStream&
 		operator << (const float& v)
 		{
@@ -295,20 +322,20 @@ namespace xpcc
 			}
 			return *this;
 		}
-		
+
 		// write the hex value of a pointer
 		IOStream&
 		operator << (const void* p);
-		
+
 		ALWAYS_INLINE IOStream&
 		operator << (IOStream& (*function)(IOStream&))
 		{
 			return function(*this);
 		}
-		
+
 		/**
 		 * @brief	Simple printf() implemenation
-		 * 
+		 *
 		 * The format string is composed of zero or more directives: ordinary
 		 * characters (not %), which are copied unchanged to the output stream;
 		 * and conversion specifications, each of which results in fetching zero
@@ -316,7 +343,7 @@ namespace xpcc
 		 * introduced by the % character. The arguments must properly correspond
 		 * (after type promotion) with the conversion specifier. After the %,
 		 * the following appear in sequence:
-		 * 
+		 *
 		 * - Zero or more of the following flags:
 		 *   - \c - A negative field width flag; the converted value is to be
 		 *     left adjusted on the field boundary. The converted value is
@@ -333,7 +360,7 @@ namespace xpcc
 		 *   - An optional h, l or ll length modifier, that specifies that the argument
 		 *     for the d, u, or x conversion is a 8-bit ("h"), 32-bit ("l") or
 		 *     64-bit ("ll") rather than 16-bit.
-		 * 
+		 *
 		 * The conversion specifiers and their meanings are:
 		 * - \c c	char (8-bit)
 		 * - \c s	string (char *)
@@ -342,7 +369,7 @@ namespace xpcc
 		 * - \c u	unsigned decimal
 		 * - \c x	hex
 		 * - \c %	%
-		 * 
+		 *
 		 * Combined with the length modifiers you get:
 		 * - \c d	signed 16-bit
 		 * - \c ld	signed 32-bit
@@ -354,21 +381,21 @@ namespace xpcc
 		 * - \c x	16-bit hex
 		 * - \c lx	32-bit hex
 		 * - \c llx	64-bit hex (not yet)
-		 * 
+		 *
 		 * Examples, given \c -100 as argument in the right type:
 		 * \code
-		 * %c:  
-		 * %s:  
+		 * %c:
+		 * %s:
 		 * %p:  0x0100
 		 * %d:  -100
 		 * %ld: -100
 		 * %u:  65436
-		 * %lu: 
+		 * %lu:
 		 * %hx: 0x9c
 		 * %x:  0xff9c
 		 * %lx: 0xffffff9c
 		 * \endcode
-		 * 
+		 *
 		 * - \c s The "char *" argument is expected to be a pointer to an array
 		 *   of character type (pointer to a string). Characters from the array
 		 *   are written up to (but not including) a terminating NULL character;
@@ -378,53 +405,53 @@ namespace xpcc
 		 *   the array, the array must contain a terminating NULL character.
 		 * - \c % A % is written. No argument is converted. The complete conversion
 		 *   specification is "%%".
-		 * 
+		 *
 		 * In no case does a non-existent or small field width cause truncation
 		 * of a numeric field; if the result of a conversion is wider than the
 		 * field width, the field is expanded to contain the conversion result.
-		 * 
+		 *
 		 * @param	fmt		Format string
 		 */
 		IOStream&
 		printf(const char* fmt, ...);
-		
+
 	protected :
 		void
 		writeInteger(int16_t value);
-		
+
 		void
 		writeInteger(uint16_t value);
-		
+
 		void
 		writeInteger(int32_t value);
-		
+
 		void
 		writeInteger(uint32_t value);
-		
+
 		void
 		writeInteger(int64_t value);
-		
+
 		void
 		writeInteger(uint64_t value);
-		
+
 		void
 		writeHex(const char* s);
-		
+
 		void
 		writeBin(const char* s);
 
 		void
 		writeHexNibble(uint8_t nibble);
-		
+
 		void
 		writeHex(uint8_t value);
-		
+
 		void
 		writeBin(uint8_t value);
 
 		void
 		writeFloat(const float& value);
-		
+
 #if !defined(XPCC__CPU_AVR)
 		void
 		writeDouble(const double& value);
@@ -438,17 +465,17 @@ namespace xpcc
 			Hexadecimal,
 			Binary
 		};
-		
+
 		IOStream(const IOStream&);
 
 		IOStream&
 		operator =(const IOStream&);
-		
+
 	private:
 		IODevice* const	device;
 		Mode mode;
 	};
-	
+
 	/**
 	 * \brief  Flushes the output stream.
 	 *
@@ -460,7 +487,7 @@ namespace xpcc
 	{
 		return ios.flush();
 	}
-	
+
 	/**
 	 * \brief  Write a newline and flush the stream.
 	 *

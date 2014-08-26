@@ -60,7 +60,7 @@ xpcc::log::Style<STYLE>::~Style()
 
 template < typename STYLE >
 void
-xpcc::log::Style<STYLE>::parseArg( int argc, char * argv )
+xpcc::log::Style<STYLE>::parseArg( int /*argc*/, char * /*argv*/ )
 {
 }
 

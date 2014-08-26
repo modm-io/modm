@@ -71,7 +71,7 @@ TimeoutTest::testDefaultConstructor()
 void
 TimeoutTest::testTimeOverflow()
 {
-	xpcc::Timestamp::Type time = xpcc::ArithmeticTraits<xpcc::Timestamp::Type>::max();
+	xpcc::Timestamp::Type time = xpcc::ArithmeticTraits<xpcc::Timestamp::Type>::max;
 	
 	// overflow after 65535 for uint16_t => 32767+100 = 32867
 	xpcc::ClockDummy::setTime(time / 2 + 100);
