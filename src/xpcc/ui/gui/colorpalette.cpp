@@ -1,6 +1,6 @@
 #include "colorpalette.hpp"
 
-xpcc::gui::ColorPalette xpcc::gui::DEFAULT_COLORPALETTE = {{
+xpcc::gui::ColorPalette xpcc::gui::DEFAULT_COLORPALETTE = {
 	xpcc::glcd::Color::black(),		// BLACK
 	xpcc::glcd::Color::white(),		// WHITE
 	xpcc::glcd::Color::gray(),		// GRAY
@@ -13,4 +13,4 @@ xpcc::gui::ColorPalette xpcc::gui::DEFAULT_COLORPALETTE = {{
 	xpcc::glcd::Color::black(),		// BACKGROUND
 	xpcc::glcd::Color::red(),		// ACTIVATED
 	xpcc::glcd::Color::blue(),		// DEACTIVATED
-}};
+};

@@ -3,7 +3,6 @@
 
 #include <xpcc/ui/display/graphic_display.hpp>
 
-#include <array>
 
 namespace xpcc {
 
@@ -30,14 +29,24 @@ namespace gui {
 	};
 
 
+	typedef xpcc::glcd::Color ColorPalette [Color::PALETTE_SIZE];
+
 //	typedef xpcc::glcd::Color ColorPalette;
-	typedef std::array<xpcc::glcd::Color, Color::PALETTE_SIZE> ColorPalette;
+//	typedef std::array<xpcc::glcd::Color, Color::PALETTE_SIZE> ColorPalette;
 
 
 	/*
 	 * TODO: make DEFAULT_COLORPALETTE const or even better constexpr
 	 */
 	extern ColorPalette DEFAULT_COLORPALETTE; //[xpcc::gui::Color::PALETTE_SIZE];
+
+	static inline void
+	copyColorPalette(ColorPalette& src, ColorPalette& dest)
+	{
+		for(int ii = 0; ii < Color::PALETTE_SIZE; ++ii){
+			dest[ii] = src[ii];
+		}
+	}
 
 }
 }

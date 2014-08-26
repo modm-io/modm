@@ -30,12 +30,12 @@ void xpcc::gui::WidgetGroup::render(View* view)
 	}
 }
 
-void xpcc::gui::WidgetGroup::setColorPalette(ColorPalette& cb)
+void xpcc::gui::WidgetGroup::setColorPalette(ColorPalette& cp)
 {
-	this->color_palette = cb;
+	copyColorPalette(cp, this->color_palette);
 
 	for(auto iter = widgets.begin(); iter != widgets.end(); ++iter) {
-		(*iter)->setColorPalette(cb);
+		(*iter)->setColorPalette(cp);
 	}
 }
 

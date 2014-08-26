@@ -139,9 +139,9 @@ public:
 	 * Set widget-specific color palette.
 	 */
 	virtual void
-	setColorPalette(ColorPalette& cb)
+	setColorPalette(ColorPalette& cp)
 	{
-		this->color_palette = cb;
+		copyColorPalette(cp, this->color_palette);
 		this->markDirty();
 	}
 

@@ -151,7 +151,7 @@ void
 xpcc::gui::View::setColorPalette(ColorPalette& cp)
 {
 
-	this->colorpalette = cp;
+	copyColorPalette(cp, this->colorpalette);
 	this->display().setBackgroundColor(cp[Color::BACKGROUND]);
 
 	/*
