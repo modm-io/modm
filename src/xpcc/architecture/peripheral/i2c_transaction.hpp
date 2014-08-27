@@ -149,14 +149,6 @@ public:
  */
 class I2cWriteReadAdapter : public I2cTransaction
 {
-	uint8_t address;
-	uint8_t readSize;
-	uint8_t writeSize;
-	uint8_t *readBuffer;
-	const uint8_t *writeBuffer;
-	volatile AdapterState state;
-	bool isReading;
-
 public:
 	///	@param	address	the slave address not yet shifted right (address < 128).
 	I2cWriteReadAdapter(uint8_t address)
@@ -172,6 +164,13 @@ public:
 	getState()
 	{
 		return state;
+	}
+
+	/// @return true while adapter is busy
+	bool inline
+	isBusy()
+	{
+		return (state == AdapterState::Busy);
 	}
 
 	/**
@@ -198,7 +197,8 @@ public:
 	 *          `false` otherwise
 	 */
 	bool inline
-	configureWriteRead(const uint8_t *writeBuffer, uint8_t writeSize, uint8_t *readBuffer, uint8_t readSize)
+	configureWriteRead(const uint8_t *writeBuffer, std::size_t writeSize,
+			uint8_t *readBuffer, std::size_t readSize)
 	{
 		if (state != AdapterState::Busy)
 		{
@@ -224,7 +224,7 @@ public:
 	 *          `false` otherwise
 	 */
 	bool ALWAYS_INLINE
-	configureWrite(const uint8_t *buffer, uint8_t size)
+	configureWrite(const uint8_t *buffer, std::size_t size)
 	{
 		return configureWriteRead(buffer, size, nullptr, 0);
 	}
@@ -241,14 +241,12 @@ public:
 	 *          `false` otherwise
 	 */
 	bool ALWAYS_INLINE
-	configureRead(uint8_t *buffer, uint8_t size)
+	configureRead(uint8_t *buffer, std::size_t size)
 	{
 		return configureWriteRead(nullptr, 0, buffer, size);
 	}
 
 protected:
-	///@{
-	/// @internal
 	virtual bool
 	attaching()
 	{
@@ -292,7 +290,14 @@ protected:
 		isReading = false;
 		state = (cause == DetachCause::NormalStop) ? AdapterState::Idle : AdapterState::Error;
 	}
-	///@}
+
+	uint8_t address;
+	std::size_t readSize;
+	std::size_t writeSize;
+	uint8_t *readBuffer;
+	const uint8_t *writeBuffer;
+	volatile AdapterState state;
+	bool isReading;
 };
 
 /**
@@ -310,11 +315,6 @@ protected:
  */
 class I2cWriteAdapter : public I2cTransaction
 {
-	uint8_t address;
-	uint8_t size;
-	const uint8_t *buffer;
-	volatile AdapterState state;
-
 public:
 	///	@param	address	the slave address not yet shifted right (address < 128).
 	I2cWriteAdapter(uint8_t address)
@@ -328,6 +328,13 @@ public:
 	getState()
 	{
 		return state;
+	}
+
+	/// @return true while adapter is busy
+	bool inline
+	isBusy()
+	{
+		return (state == AdapterState::Busy);
 	}
 
 	/**
@@ -354,7 +361,7 @@ public:
 	 *          `false` otherwise
 	 */
 	bool inline
-	configureWrite(const uint8_t *buffer, uint8_t size)
+	configureWrite(const uint8_t *buffer, std::size_t size)
 	{
 		if (state != AdapterState::Busy)
 		{
@@ -366,8 +373,6 @@ public:
 	}
 
 protected:
-	/// @internal
-	///@{
 	virtual bool
 	attaching()
 	{
@@ -400,7 +405,11 @@ protected:
 	{
 		state = (cause == DetachCause::NormalStop) ? AdapterState::Idle : AdapterState::Error;
 	}
-	///@}
+
+	uint8_t address;
+	std::size_t size;
+	const uint8_t *buffer;
+	volatile AdapterState state;
 };
 
 /**
@@ -418,11 +427,6 @@ protected:
  */
 class I2cReadAdapter : public I2cTransaction
 {
-	uint8_t address;
-	uint8_t size;
-	uint8_t *buffer;
-	volatile AdapterState state;
-
 public:
 	///	@param	address	the slave address not yet shifted right (address < 128).
 	I2cReadAdapter(uint8_t address)
@@ -436,6 +440,13 @@ public:
 	getState()
 	{
 		return state;
+	}
+
+	/// @return true while adapter is busy
+	bool inline
+	isBusy()
+	{
+		return (state == AdapterState::Busy);
 	}
 
 	/**
@@ -462,7 +473,7 @@ public:
 	 *          `false` otherwise
 	 */
 	bool inline
-	configureRead(uint8_t * buffer, uint8_t size)
+	configureRead(uint8_t * buffer, std::size_t size)
 	{
 		if (state != AdapterState::Busy)
 		{
@@ -474,8 +485,6 @@ public:
 	}
 
 protected:
-	///@{
-	/// @internal
 	virtual bool
 	attaching()
 	{
@@ -508,7 +517,11 @@ protected:
 	{
 		state = (cause == DetachCause::NormalStop) ? AdapterState::Idle : AdapterState::Error;
 	}
-	///@}
+
+	uint8_t address;
+	std::size_t size;
+	uint8_t *buffer;
+	volatile AdapterState state;
 };
 
 /**
@@ -553,7 +566,7 @@ public:
 	bool ALWAYS_INLINE
 	setPreserveTag()
 	{
-		if (I2cAdapter::getState() != xpcc::I2c::AdapterState::Busy)
+		if (!I2cAdapter::isBusy())
 		{
 			preserveTag = true;
 			return true;
