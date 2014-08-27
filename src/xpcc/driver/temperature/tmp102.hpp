@@ -91,7 +91,7 @@ public:
 	Tmp102(uint8_t* data, uint8_t address=0x48);
 
 	/// @return pointer to 8bit array containing temperature as big endian int16_t
-	ALWAYS_INLINE uint8_t* const
+	ALWAYS_INLINE uint8_t*
 	getData();
 
 	// MARK: - Tasks
@@ -99,10 +99,10 @@ public:
 	bool
 	startPing();
 
-	bool ALWAYS_INLINE const
+	bool ALWAYS_INLINE
 	runPing();
 
-	bool ALWAYS_INLINE const
+	bool ALWAYS_INLINE
 	isPingSuccessful();
 
 	/// sets the LSB and MSB of the sensor
@@ -110,10 +110,10 @@ public:
 	startConfiguration(uint8_t lsb=CONFIGURATION_CONVERSION_RATE_4HZ,
 					   uint8_t msb=CONFIGURATION_CONVERTER_RESOLUTION_12BIT);
 
-	bool ALWAYS_INLINE const
+	bool ALWAYS_INLINE
 	runConfiguration();
 
-	bool ALWAYS_INLINE const
+	bool ALWAYS_INLINE
 	isConfigurationSuccessful();
 
 	/// starts a temperature conversion right now
@@ -121,25 +121,25 @@ public:
 	startConversion();
 
 	/// runs the temperature conversion
-	bool ALWAYS_INLINE const
+	bool ALWAYS_INLINE
 	runConversion();
 
-	bool ALWAYS_INLINE const
+	bool ALWAYS_INLINE
 	isConversionSuccessful();
 
 	/// read the Temperature registers and buffer the results
 	bool
 	startReadTemperature();
 
-	bool ALWAYS_INLINE const
+	bool ALWAYS_INLINE
 	runReadTemperature();
 
-	bool ALWAYS_INLINE const
+	bool ALWAYS_INLINE
 	isReadTemperatureSuccessful();
 
 	// MARK: - utility
 	/// @return the temperature as a signed float in Celcius
-	float const
+	float
 	getTemperature();
 
 private:
