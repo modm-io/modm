@@ -99,7 +99,7 @@ struct DeviceConfiguration
 	// so we do not need to configure it unnecessarily.
 	static char tag;
 
-	/// 100kHz I2C configuration
+	/// 20kHz I2C configuration
 	static void
 	slow_configuration()
 	{
@@ -110,7 +110,7 @@ struct DeviceConfiguration
 		}
 	}
 
-	/// 400kHz I2C configuration
+	/// 100kHz I2C configuration
 	static void
 	fast_configuration()
 	{
@@ -145,7 +145,7 @@ public:
 			// we wait until the task started
 			PT_WAIT_UNTIL(temperature.startPing());
 			// we wait until the task finished
-			PT_WAIT_UNTIL(temperature.runPing());
+			PT_WAIT_WHILE(temperature.runPing());
 			// if the device responds to the ping, break
 			if (temperature.isPingSuccessful())
 				break;
@@ -160,16 +160,16 @@ public:
 			// so we wait until the task started
 			PT_WAIT_UNTIL(temperature.startConfiguration());
 			// and we wait until it finished
-			PT_WAIT_UNTIL(temperature.runConfiguration());
+			PT_WAIT_WHILE(temperature.runConfiguration());
 		}
-		while(temperature.isConfigurationSuccessful());
+		while(!temperature.isConfigurationSuccessful());
 
 		while (true)
 		{
 			// lets wait until we can read out the device
 			PT_WAIT_UNTIL(temperature.startReadTemperature());
 			// and until this task finishes
-			PT_WAIT_UNTIL(temperature.runReadTemperature());
+			PT_WAIT_WHILE(temperature.runReadTemperature());
 			// did we succeed with the readout?
 			if (temperature.isReadTemperatureSuccessful())
 			{
@@ -212,13 +212,35 @@ public:
 	{
 		PT_BEGIN();
 
-		PT_WAIT_UNTIL(temperature.startConfiguration());
-		PT_WAIT_UNTIL(temperature.runConfiguration());
+		// ping the device until it responds
+		while(true)
+		{
+			// we wait until the task started
+			PT_WAIT_UNTIL(temperature.startPing());
+			// we wait until the task finished
+			PT_WAIT_WHILE(temperature.runPing());
+			// if the device responds to the ping, break
+			if (temperature.isPingSuccessful())
+				break;
+			// otherwise, try again in 100ms
+			this->timer.restart(100);
+			PT_WAIT_UNTIL(this->timer.isExpired());
+		}
+
+		do
+		{
+			// we need to configure the device before we can use it
+			// so we wait until the task started
+			PT_WAIT_UNTIL(temperature.startConfiguration());
+			// and we wait until it finished
+			PT_WAIT_WHILE(temperature.runConfiguration());
+		}
+		while(!temperature.isConfigurationSuccessful());
 
 		while (true)
 		{
 			PT_WAIT_UNTIL(temperature.startReadTemperature());
-			PT_WAIT_UNTIL(temperature.runReadTemperature());
+			PT_WAIT_WHILE(temperature.runReadTemperature());
 			if (temperature.isReadTemperatureSuccessful())
 			{
 				tf = temperature.getTemperature();
