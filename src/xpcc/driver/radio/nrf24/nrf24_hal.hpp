@@ -61,7 +61,7 @@ enum Register : uint8_t
 };
 
 /* CONFIG register */
-enum class Config : uint8_t
+enum Config : uint8_t
 {
 	PRIM_RX      = Bit0,
 	PWR_UP       = Bit1,
@@ -276,12 +276,35 @@ public:
 	writeRegister(nrf24::Register, uint8_t data);
 
 
+	/** @brief Set bits inside a register
+	 *
+	 * Only set individual bits and leave the rest untouched
+	 *
+	 * @param reg	Register where to set bits
+	 * @param flags	Which bits to set
+	 */
+	static void
+	setBits(nrf24::Register reg, uint8_t flags);
+
+
+	/** @brief Clear bits inside a register
+	 *
+	 * Only clear individual bits and leave the rest untouched.
+	 *
+	 * Note: To clear RX_DR, TX_DS, MAX_RT you must use setBits() !
+	 *
+	 * @param reg	Register where to clear bits
+	 * @param flags Which bits to set
+	 */
+	static void
+	clearBits(nrf24::Register reg, uint8_t flags);
+
 	/** @brief Read received payload
 	 *
 	 * Used in RX mode.
 	 * Payload is deleted from FIFO after it is read.
 	 *
-	 *	@param buffer 	buffer where to put payload, should be be 32 byte wide
+	 *	@param buffer 	buffer where to put payload, should be 32 byte wide
 	 *	@return 		length of received payload
 	 */
 	static uint8_t
@@ -452,7 +475,7 @@ private:
 
 
 private:
-	static constexpr uint8_t max_payload_length = 23;
+	static constexpr uint8_t max_payload_length = 32;
 	static constexpr uint8_t address_size = 5;			/** Size of Rx/Tx addresses in bytes */
 	static constexpr uint8_t rx_pipe_count = 6;			/** Number of Rx pipes (0 to 5) */
 	static uint8_t status;

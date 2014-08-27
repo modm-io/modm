@@ -109,6 +109,28 @@ xpcc::Nrf24Hal<Spi, Csn>::writeRegister(nrf24::Register reg, uint8_t data)
 
 template<typename Spi, typename Csn>
 void
+xpcc::Nrf24Hal<Spi, Csn>::setBits(nrf24::Register reg, uint8_t flags)
+{
+	uint8_t old = readRegister(reg);
+
+	writeRegister(reg, old | flags);
+}
+
+// --------------------------------------------------------------------------------------------------------------------
+
+template<typename Spi, typename Csn>
+void
+xpcc::Nrf24Hal<Spi, Csn>::clearBits(nrf24::Register reg, uint8_t flags)
+{
+	uint8_t old = readRegister(reg);
+
+	writeRegister(reg, old & ~flags);
+}
+
+// --------------------------------------------------------------------------------------------------------------------
+
+template<typename Spi, typename Csn>
+void
 xpcc::Nrf24Hal<Spi, Csn>::flushTxFifo()
 {
 	writeCommandNoData(nrf24::Command::FLUSH_TX);
