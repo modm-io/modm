@@ -57,8 +57,8 @@ enum State
  *
  * @code
  * #include <xpcc/architecture.hpp>
- * #include <xpcc/utils/protothread.hpp>
- * #include <xpcc/utils/timeout.hpp>
+ * #include <xpcc/processing/protothread.hpp>
+ * #include <xpcc/processing/timeout.hpp>
  *
  * typedef GpioOutputB0 Led;
  *
