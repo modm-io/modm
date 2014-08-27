@@ -37,7 +37,7 @@ public:
 	bool
 	runTask1()
 	{
-		NPT_BEGIN(Task::Empty0Task1);
+		NPT_BEGIN_TASK(Task::Empty0Task1);
 
 		state = 1;
 		depth = getTaskDepth();
@@ -52,7 +52,7 @@ public:
 	bool
 	runTask2()
 	{
-		NPT_BEGIN(Task::Empty0Task2);
+		NPT_BEGIN_TASK(Task::Empty0Task2);
 
 		state = 3;
 
@@ -74,7 +74,7 @@ public:
 	bool
 	runTask1()
 	{
-		NPT_BEGIN(Task::Empty1Task1);
+		NPT_BEGIN_TASK(Task::Empty1Task1);
 
 		state = 1;
 
@@ -88,7 +88,7 @@ public:
 	bool
 	runTask2()
 	{
-		NPT_BEGIN(Task::Empty1Task2);
+		NPT_BEGIN_TASK(Task::Empty1Task2);
 
 		state = 3;
 
@@ -109,7 +109,7 @@ public:
 	bool
 	runTask1()
 	{
-		NPT_BEGIN(Task::Empty2Task1);
+		NPT_BEGIN_TASK(Task::Empty2Task1);
 
 		state = 1;
 
@@ -123,7 +123,7 @@ public:
 	bool
 	runTask2()
 	{
-		NPT_BEGIN(Task::Empty2Task2);
+		NPT_BEGIN_TASK(Task::Empty2Task2);
 
 		state = 3;
 
@@ -273,7 +273,6 @@ namespace Task
 // ----------------------------------------------------------------------------
 class TestingNestedThread : public xpcc::pt::NestedProtothread<2>
 {
-	friend class xpcc::pt::NestedProtothread<2>;
 public:
 	TestingNestedThread()
 	:	depth1(0), depth2(0), depth3(0),
@@ -292,7 +291,7 @@ public:
 	bool
 	runTask1()
 	{
-		NPT_BEGIN(Task::NestingTask1);
+		NPT_BEGIN_TASK(Task::NestingTask1);
 
 		state1 = 1;
 
@@ -318,21 +317,11 @@ public:
 		NPT_END();
 	}
 
-//	void
-//	printStateArray()
-//	{
-//		for (uint8_t ii = 0; ii < 2; ii++)
-//		{
-//			std::cout << nptStateArray[ii] << " ";
-//		}
-//		std::cout << std::endl;
-//	}
-
 protected:
 	bool
 	runTask2()
 	{
-		NPT_BEGIN(Task::NestingTask2);
+		NPT_BEGIN_TASK(Task::NestingTask2);
 
 		state2 = 1;
 
@@ -358,7 +347,7 @@ protected:
 	bool
 	runTask3()
 	{
-		NPT_BEGIN(Task::NestingTask3);
+		NPT_BEGIN_TASK(Task::NestingTask3);
 
 		state3 = 1;
 
@@ -416,7 +405,7 @@ NestedProtothreadTest::testNesting()
 	TEST_ASSERT_EQUALS(thread.getTaskDepth(), -1);
 
 	// lets start the first task
-	TEST_ASSERT_TRUE(thread.startTask(Task::NestingTask1));
+	TEST_ASSERT_TRUE(thread.startTask1());
 	// should wait until the first condition
 	TEST_ASSERT_TRUE(thread.runTask1());
 	TEST_ASSERT_EQUALS(thread.state1, 1);
@@ -514,4 +503,212 @@ NestedProtothreadTest::testNesting()
 	// task1 should end now
 	TEST_ASSERT_FALSE(thread.runTask1());
 	TEST_ASSERT_FALSE(thread.isTaskRunning());
+}
+
+namespace Task
+{
+	enum
+	{
+		SpawningTask1,
+		SpawningTask2
+	};
+}
+
+uint8_t waits = 3;
+
+class TestingSpawningThread : public xpcc::pt::NestedProtothread<1>
+{
+public:
+	TestingSpawningThread()
+	:	state1(0), state2(0), state3(0)
+	{
+	}
+
+	bool
+	startParentTask1()
+	{ return startTask(Task::SpawningTask1); }
+
+	bool
+	runParentTask1()
+	{
+		NPT_BEGIN_TASK(Task::SpawningTask1);
+
+		state1 = 1;
+		NPT_YIELD();
+
+		NPT_WAIT_UNTIL(startSpawningTask(waits, 8));
+
+		state1 = 2;
+		NPT_YIELD();
+
+		NPT_WAIT_WHILE(runSpawningTask(waits, 8));
+
+		state1 = 3;
+		NPT_YIELD();
+
+		if (isSpawningTaskSuccessful(waits, 8))
+			state1 = 4;
+		else
+			state1 = 5;
+
+		NPT_END();
+	}
+
+	bool
+	isParentTaskSuccessful1()
+	{ return (state1 == 4); }
+
+
+
+	bool
+	startParentTask2()
+	{ return startTask(Task::SpawningTask2); }
+
+	bool
+	runParentTask2()
+	{
+		NPT_BEGIN_TASK(Task::SpawningTask2);
+
+		state2 = 1;
+		NPT_YIELD();
+
+		success2 = NPT_SPAWN_SUCCESS(SpawningTask, (waits, 8), (waits, 8));
+
+		state2 = 3;
+		NPT_YIELD();
+
+		if (success2)
+			state2 = 4;
+		else
+			state2 = 5;
+
+		NPT_END();
+	}
+
+	bool
+	isParentTaskSuccessful2()
+	{ return (state2 == 4); }
+
+protected:
+	xpcc::pt::State
+	startRunSpawningTask(uint8_t calls, uint8_t secondArgument)
+	{
+		NPT_BEGIN();
+
+		NPT_WAIT_WHILE_START(!startSpawningTask(calls, secondArgument));
+
+		state2 = 2;
+		NPT_YIELD();
+
+		NPT_WAIT_WHILE(runSpawningTask(calls, secondArgument));
+
+		NPT_END();
+	}
+
+	bool
+	startSpawningTask(uint8_t calls, uint8_t /*secondArgument*/)
+	{
+		// manually implemented "protothread" without any side-effects on the NPT
+		static uint8_t st_calls(0);
+
+		if (st_calls++ < calls)
+			return false;
+
+		st_calls = 0;
+		return true;
+	}
+
+	bool
+	runSpawningTask(uint8_t calls, uint8_t /*secondArgument*/)
+	{
+		// manually implemented "protothread" without any side-effects on the NPT
+		static uint8_t st_calls(0);
+
+		if (st_calls++ < calls)
+			return true;
+
+		st_calls = 0;
+		return false;
+	}
+
+	bool
+	isSpawningTaskSuccessful(uint8_t calls, uint8_t /*secondArgument*/)
+	{ return (calls == 2); }
+
+public:
+	uint8_t state1;
+	uint8_t state2;
+	uint8_t state3;
+	bool success2;
+};
+
+void
+NestedProtothreadTest::testSpawn()
+{
+	TestingSpawningThread thread;
+
+	// sanity checks
+	TEST_ASSERT_FALSE(thread.isTaskRunning());
+	TEST_ASSERT_FALSE(thread.runParentTask1());
+	TEST_ASSERT_EQUALS(thread.state1, 0);
+	TEST_ASSERT_FALSE(thread.isTaskRunning());
+	TEST_ASSERT_EQUALS(thread.getTaskDepth(), -1);
+
+	// lets start the first task
+	TEST_ASSERT_TRUE(thread.startParentTask1());
+	// should wait until the first condition
+	TEST_ASSERT_TRUE(thread.runParentTask1());
+	TEST_ASSERT_EQUALS(thread.state1, 1);
+	// task should require `waits` number of calls
+	for (uint8_t ii = 0; ii < waits; ++ii)
+	{
+		TEST_ASSERT_TRUE(thread.runParentTask1());
+		TEST_ASSERT_EQUALS(thread.state1, 1);
+	}
+	// now spawning task has started
+	TEST_ASSERT_TRUE(thread.runParentTask1());
+	TEST_ASSERT_EQUALS(thread.state1, 2);
+	// task should require `waits` number of calls again
+	for (uint8_t ii = 0; ii < waits; ++ii)
+	{
+		TEST_ASSERT_TRUE(thread.runParentTask1());
+		TEST_ASSERT_EQUALS(thread.state1, 2);
+	}
+	// now spawning task has finished
+	TEST_ASSERT_TRUE(thread.runParentTask1());
+	TEST_ASSERT_EQUALS(thread.state1, 3);
+
+	// now parent task has finished
+	TEST_ASSERT_FALSE(thread.runParentTask1());
+	TEST_ASSERT_EQUALS(thread.state1, (waits == 2) ? 4 : 5);
+
+	// lets check the same for the compound method
+
+	// sanity checks
+	TEST_ASSERT_FALSE(thread.isTaskRunning());
+	TEST_ASSERT_FALSE(thread.runParentTask2());
+	TEST_ASSERT_EQUALS(thread.state2, 0);
+	TEST_ASSERT_FALSE(thread.isTaskRunning());
+	TEST_ASSERT_EQUALS(thread.getTaskDepth(), -1);
+
+	TEST_ASSERT_TRUE(thread.startParentTask2());
+	TEST_ASSERT_TRUE(thread.runParentTask2());
+	TEST_ASSERT_EQUALS(thread.state2, 1);
+	for (uint8_t ii = 0; ii < waits; ++ii)
+	{
+		TEST_ASSERT_TRUE(thread.runParentTask2());
+		TEST_ASSERT_EQUALS(thread.state2, 1);
+	}
+	TEST_ASSERT_TRUE(thread.runParentTask2());
+	TEST_ASSERT_EQUALS(thread.state2, 2);
+	for (uint8_t ii = 0; ii < waits; ++ii)
+	{
+		TEST_ASSERT_TRUE(thread.runParentTask2());
+		TEST_ASSERT_EQUALS(thread.state2, 2);
+	}
+	TEST_ASSERT_TRUE(thread.runParentTask2());
+	TEST_ASSERT_EQUALS(thread.state2, 3);
+
+	TEST_ASSERT_FALSE(thread.runParentTask2());
+	TEST_ASSERT_EQUALS(thread.state2, (waits == 2) ? 4 : 5);
 }

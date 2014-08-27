@@ -21,6 +21,14 @@ namespace xpcc
 namespace pt
 {
 
+enum State
+{
+	Stop = 0,
+	NestingError = 2,
+	Starting = 4,
+	Running = 6,
+};
+
 /**
  * A version of `Protothread` which allows nested calling of tasks.
  *
@@ -38,7 +46,7 @@ namespace pt
  * You are responsible to choosing the right nesting depth!
  * This class will guard itself against calling another task at too
  * deep a nesting level and inform you gently of this by returning
- * `false` from `callTask(task)`.
+ * `false` from `startTask(task)`.
  * It is then up to you to recognise this in your program design
  * and increase the nesting depth or rethink your code.
  *
@@ -148,10 +156,10 @@ public:
 
 	/// Start a specific task at the current nesting level
 	/// @return	`true` if successful, `false` if the nesting is too deep
-	inline bool
+	bool ALWAYS_INLINE
 	startTask(uint8_t task)
 	{
-		if ((nptLevel < Depth + 1) && (nptStateArray[nptLevel] == NPtInvalid))
+		if (nestingOkNPt() && !isTaskRunning())
 		{
 			nptStateArray[nptLevel] = stateFromTask(task);
 			return true;
@@ -167,7 +175,7 @@ public:
 		uint8_t level = nptLevel;
 		while(level < Depth + 1)
 		{
-			nptStateArray[level++] = NPtInvalid;
+			nptStateArray[level++] = NPtStopped;
 		}
 	}
 
@@ -175,14 +183,14 @@ public:
 	bool ALWAYS_INLINE
 	isTaskRunning() const
 	{
-		return (nptStateArray[nptLevel] != NPtInvalid);
+		return (nptStateArray[nptLevel] != NPtStopped);
 	}
 
 	/// @return the nesting depth in the current task, or -1 if called outside a task
 	int8_t ALWAYS_INLINE
 	getTaskDepth()
 	{
-		return static_cast<int8_t>(nptLevel - 1);
+		return static_cast<int8_t>(nptLevel) - 1;
 	}
 
 #ifdef __DOXYGEN__
@@ -192,7 +200,7 @@ public:
 	 * This handles very much like a protothread, however you can have more than
 	 * one task in your class.
 	 * You can call and run other tasks within your tasks using the
-	 * `callTask(task)` method, depending on the nesting depth you choose.
+	 * `startTask(task)` method, depending on the nesting depth you choose.
 	 *
 	 * It is safe to call the method of a task that has not been started,
 	 * as it will simply return `false`, but not change any internal status.
@@ -228,9 +236,9 @@ protected:
 	// invalidates the parent nesting level
 	// @warning	be aware in which nesting level you call this! (before popNPt()!)
 	void ALWAYS_INLINE
-	invalidateNPt()
+	stopNPt()
 	{
-		nptStateArray[nptLevel-1] = NPtInvalid;
+		nptStateArray[nptLevel-1] = NPtStopped;
 	}
 
 	// sets the state of the parent nesting level
@@ -239,6 +247,12 @@ protected:
 	setNPt(NPtState state)
 	{
 		nptStateArray[nptLevel-1] = state;
+	}
+
+	bool ALWAYS_INLINE
+	nestingOkNPt()
+	{
+		return (nptLevel < Depth + 1);
 	}
 
 	// the task will be subtracted from the maximum of the NPtState
@@ -253,8 +267,9 @@ protected:
 	}
 	/// @}
 
+protected:
+	static constexpr NPtState NPtStopped = static_cast<NPtState>(xpcc::ArithmeticTraits<NPtState>::max);
 private:
-	static const NPtState NPtInvalid = static_cast<NPtState>(xpcc::ArithmeticTraits<NPtState>::max);
 	uint8_t nptLevel;
 	NPtState nptStateArray[Depth+1];
 };
@@ -269,30 +284,31 @@ public:
 	typedef uint16_t NPtState;
 
 	NestedProtothread() :
-		nptState(NPtInvalid)
+		nptState(NPtStopped), inNPt(false)
 	{
 	}
 
 	inline bool
 	startTask(uint8_t task)
 	{
-		if (nptState != NPtInvalid)
-			return false;
-
-		nptState = stateFromTask(task);
-		return true;
+		if ((nptState == NPtStopped) && !inNPt)
+		{
+			nptState = stateFromTask(task);
+			return true;
+		}
+		return false;
 	}
 
 	void ALWAYS_INLINE
 	stopTask()
 	{
-		nptState = NPtInvalid;
+		nptState = NPtStopped;
 	}
 
 	bool ALWAYS_INLINE
 	isTaskRunning() const
 	{
-		return (nptState != NPtInvalid);
+		return (nptState != NPtStopped);
 	}
 
 	int8_t ALWAYS_INLINE
@@ -318,9 +334,15 @@ protected:
 	}
 
 	void ALWAYS_INLINE
-	invalidateNPt()
+	stopNPt()
 	{
-		nptState = NPtInvalid;
+		nptState = NPtStopped;
+	}
+
+	bool ALWAYS_INLINE
+	nestingOkNPt()
+	{
+		return !inNPt;
 	}
 
 	void ALWAYS_INLINE
@@ -336,10 +358,11 @@ protected:
 	}
 	/// @}
 
+protected:
+	static constexpr NPtState NPtStopped = static_cast<NPtState>(xpcc::ArithmeticTraits<NPtState>::max);
 private:
-	static constexpr NPtState NPtInvalid = static_cast<NPtState>(xpcc::ArithmeticTraits<NPtState>::max);
-	bool inNPt;
 	NPtState nptState;
+	bool inNPt;
 };
 /// @endcond
 

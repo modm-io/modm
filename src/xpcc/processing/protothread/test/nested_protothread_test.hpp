@@ -19,4 +19,7 @@ public:
 
 	void
 	testNesting();
+
+	void
+	testSpawn();
 };
