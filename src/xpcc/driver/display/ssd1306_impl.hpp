@@ -11,10 +11,6 @@
 #	error	"Don't include this file directly, use 'ssd1306.hpp' instead!"
 #endif
 
-#include <xpcc/io/iostream.hpp>
-
-extern xpcc::IOStream stream;
-
 template < class I2cMaster >
 xpcc::Ssd1306<I2cMaster>::Ssd1306(uint8_t address)
 :	I2cDevice<I2cMaster>(), i2cTask(I2cTask::Idle), i2cSuccess(0), timer(100),
