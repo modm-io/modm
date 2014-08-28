@@ -12,6 +12,7 @@
 #endif
 
 #include <xpcc/io/iostream.hpp>
+
 extern xpcc::IOStream stream;
 
 template < class I2cMaster >
@@ -78,24 +79,24 @@ xpcc::Ssd1306<I2cMaster>::runInitialize()
 	NPT_BEGIN_TASK(Task::Initialize);
 
 	initSuccessful = true;
-	initSuccessful &= NPT_SPAWN_SUCCESS(WriteCommand, (Command::SetDisplayOff), (Command::SetDisplayOff));
-	initSuccessful &= NPT_SPAWN_SUCCESS(WriteCommand, (Command::SetDisplayClockDivideRatio, 0x80), (Command::SetDisplayClockDivideRatio));
-	initSuccessful &= NPT_SPAWN_SUCCESS(WriteCommand, (Command::SetMultiplexRatio, 0x3F), (Command::SetMultiplexRatio));
-	initSuccessful &= NPT_SPAWN_SUCCESS(WriteCommand, (Command::SetDisplayOffset, 0x00), (Command::SetDisplayOffset));
-	initSuccessful &= NPT_SPAWN_SUCCESS(WriteCommand, (Command::SetDisplayStartLine | 0x00), (Command::SetDisplayStartLine | 0x00));
-	initSuccessful &= NPT_SPAWN_SUCCESS(WriteCommand, (Command::SetChargePump, 0x14), (Command::SetChargePump));
-	initSuccessful &= NPT_SPAWN_SUCCESS(WriteCommand, (Command::SetMemoryMode, 0x00), (Command::SetMemoryMode));
-	initSuccessful &= NPT_SPAWN_SUCCESS(WriteCommand, (Command::SetSegmentRemap127), (Command::SetSegmentRemap127));
-	initSuccessful &= NPT_SPAWN_SUCCESS(WriteCommand, (Command::SetComOutputScanDirectionDecrement), (Command::SetComOutputScanDirectionDecrement));
-	initSuccessful &= NPT_SPAWN_SUCCESS(WriteCommand, (Command::SetComPins, 0x12), (Command::SetComPins));
-	initSuccessful &= NPT_SPAWN_SUCCESS(WriteCommand, (Command::SetContrastControl, 0xCE), (Command::SetContrastControl));
-	initSuccessful &= NPT_SPAWN_SUCCESS(WriteCommand, (Command::SetPreChargePeriod, 0xF1), (Command::SetPreChargePeriod));
-	initSuccessful &= NPT_SPAWN_SUCCESS(WriteCommand, (Command::SetV_DeselectLevel, 0x40), (Command::SetV_DeselectLevel));
-	initSuccessful &= NPT_SPAWN_SUCCESS(WriteCommand, (Command::SetEntireDisplayResumeToRam), (Command::SetEntireDisplayResumeToRam));
-	initSuccessful &= NPT_SPAWN_SUCCESS(WriteCommand, (Command::SetNormalDisplay), (Command::SetNormalDisplay));
-	initSuccessful &= NPT_SPAWN_SUCCESS(WriteCommand, (Command::SetColumnAddress, 0, 127), (Command::SetColumnAddress));
-	initSuccessful &= NPT_SPAWN_SUCCESS(WriteCommand, (Command::SetPageAddress, 0, 7), (Command::SetPageAddress));
-	initSuccessful &= NPT_SPAWN_SUCCESS(WriteCommand, (Command::SetDisplayOn), (Command::SetDisplayOn));
+	initSuccessful &= NPT_SPAWN_SUCCESS(writeCommand(Command::SetDisplayOff));
+	initSuccessful &= NPT_SPAWN_SUCCESS(writeCommand(Command::SetDisplayClockDivideRatio, 0x80));
+	initSuccessful &= NPT_SPAWN_SUCCESS(writeCommand(Command::SetMultiplexRatio, 0x3F));
+	initSuccessful &= NPT_SPAWN_SUCCESS(writeCommand(Command::SetDisplayOffset, 0x00));
+	initSuccessful &= NPT_SPAWN_SUCCESS(writeCommand(Command::SetDisplayStartLine | 0x00));
+	initSuccessful &= NPT_SPAWN_SUCCESS(writeCommand(Command::SetChargePump, 0x14));
+	initSuccessful &= NPT_SPAWN_SUCCESS(writeCommand(Command::SetMemoryMode, 0x00));
+	initSuccessful &= NPT_SPAWN_SUCCESS(writeCommand(Command::SetSegmentRemap127));
+	initSuccessful &= NPT_SPAWN_SUCCESS(writeCommand(Command::SetComOutputScanDirectionDecrement));
+	initSuccessful &= NPT_SPAWN_SUCCESS(writeCommand(Command::SetComPins, 0x12));
+	initSuccessful &= NPT_SPAWN_SUCCESS(writeCommand(Command::SetContrastControl, 0xCE));
+	initSuccessful &= NPT_SPAWN_SUCCESS(writeCommand(Command::SetPreChargePeriod, 0xF1));
+	initSuccessful &= NPT_SPAWN_SUCCESS(writeCommand(Command::SetV_DeselectLevel, 0x40));
+	initSuccessful &= NPT_SPAWN_SUCCESS(writeCommand(Command::SetEntireDisplayResumeToRam));
+	initSuccessful &= NPT_SPAWN_SUCCESS(writeCommand(Command::SetNormalDisplay));
+	initSuccessful &= NPT_SPAWN_SUCCESS(writeCommand(Command::SetColumnAddress, 0, 127));
+	initSuccessful &= NPT_SPAWN_SUCCESS(writeCommand(Command::SetPageAddress, 0, 7));
+	initSuccessful &= NPT_SPAWN_SUCCESS(writeCommand(Command::SetDisplayOn));
 
 	NPT_END();
 }
@@ -142,7 +143,7 @@ xpcc::Ssd1306<I2cMaster>::isWriteDisplaySuccessful()
 // MARK: write command
 template < class I2cMaster >
 xpcc::pt::State
-xpcc::Ssd1306<I2cMaster>::startRunWriteCommand(uint8_t command)
+xpcc::Ssd1306<I2cMaster>::writeCommand(uint8_t command)
 {
 	NPT_BEGIN();
 
@@ -155,12 +156,14 @@ xpcc::Ssd1306<I2cMaster>::startRunWriteCommand(uint8_t command)
 
 	NPT_WAIT_WHILE(i2cTask == command);
 
+	NPT_SUCCESS_IF(i2cSuccess == command);
+
 	NPT_END();
 }
 
 template < class I2cMaster >
 xpcc::pt::State
-xpcc::Ssd1306<I2cMaster>::startRunWriteCommand(uint8_t command, uint8_t data)
+xpcc::Ssd1306<I2cMaster>::writeCommand(uint8_t command, uint8_t data)
 {
 	NPT_BEGIN();
 
@@ -175,12 +178,14 @@ xpcc::Ssd1306<I2cMaster>::startRunWriteCommand(uint8_t command, uint8_t data)
 
 	NPT_WAIT_WHILE(i2cTask == command);
 
+	NPT_SUCCESS_IF(i2cSuccess == command);
+
 	NPT_END();
 }
 
 template < class I2cMaster >
 xpcc::pt::State
-xpcc::Ssd1306<I2cMaster>::startRunWriteCommand(uint8_t command, uint8_t data1, uint8_t data2)
+xpcc::Ssd1306<I2cMaster>::writeCommand(uint8_t command, uint8_t data1, uint8_t data2)
 {
 	NPT_BEGIN();
 
@@ -197,12 +202,14 @@ xpcc::Ssd1306<I2cMaster>::startRunWriteCommand(uint8_t command, uint8_t data1, u
 
 	NPT_WAIT_WHILE(i2cTask == command);
 
+	NPT_SUCCESS_IF(i2cSuccess == command);
+
 	NPT_END();
 }
 
 template < class I2cMaster >
 xpcc::pt::State
-xpcc::Ssd1306<I2cMaster>::startRunWriteCommand(uint8_t command,
+xpcc::Ssd1306<I2cMaster>::writeCommand(uint8_t command,
 		uint8_t data1, uint8_t data2, uint8_t data3, uint8_t data4, uint8_t data5)
 {
 	NPT_BEGIN();
@@ -226,12 +233,14 @@ xpcc::Ssd1306<I2cMaster>::startRunWriteCommand(uint8_t command,
 
 	NPT_WAIT_WHILE(i2cTask == command);
 
+	NPT_SUCCESS_IF(i2cSuccess == command);
+
 	NPT_END();
 }
 
 template < class I2cMaster >
 xpcc::pt::State
-xpcc::Ssd1306<I2cMaster>::startRunWriteCommand(uint8_t command,
+xpcc::Ssd1306<I2cMaster>::writeCommand(uint8_t command,
 		uint8_t data1, uint8_t data2, uint8_t data3, uint8_t data4, uint8_t data5, uint8_t data6)
 {
 	NPT_BEGIN();
@@ -257,14 +266,9 @@ xpcc::Ssd1306<I2cMaster>::startRunWriteCommand(uint8_t command,
 
 	NPT_WAIT_WHILE(i2cTask == command);
 
-	NPT_END();
-}
+	NPT_SUCCESS_IF(i2cSuccess == command);
 
-template < class I2cMaster >
-bool
-xpcc::Ssd1306<I2cMaster>::isWriteCommandSuccessful(uint8_t command)
-{
-	return (i2cSuccess == command);
+	NPT_END();
 }
 
 // ----------------------------------------------------------------------------

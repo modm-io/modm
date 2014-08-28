@@ -130,28 +130,25 @@ public:
 protected:
 	/// Write a command without data
 	xpcc::pt::State
-	startRunWriteCommand(uint8_t command);
+	writeCommand(uint8_t command);
 
 	/// Write a command with one byte data
 	xpcc::pt::State
-	startRunWriteCommand(uint8_t command, uint8_t data);
+	writeCommand(uint8_t command, uint8_t data);
 
 	/// Write a command with two bytes data
 	xpcc::pt::State
-	startRunWriteCommand(uint8_t command, uint8_t data1, uint8_t data2);
+	writeCommand(uint8_t command, uint8_t data1, uint8_t data2);
 
 	/// Write a command with 5 bytes data (for scrolling)
 	xpcc::pt::State
-	startRunWriteCommand(uint8_t command,
+	writeCommand(uint8_t command,
 			uint8_t data1, uint8_t data2, uint8_t data3, uint8_t data4, uint8_t data5);
 
 	/// Write a command with 6 bytes data (for scrolling)
 	xpcc::pt::State
-	startRunWriteCommand(uint8_t command,
+	writeCommand(uint8_t command,
 			uint8_t data1, uint8_t data2, uint8_t data3, uint8_t data4, uint8_t data5, uint8_t data6);
-
-	bool
-	isWriteCommandSuccessful(uint8_t command);
 
 private:
 	bool
