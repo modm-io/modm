@@ -21,13 +21,8 @@ namespace xpcc
 namespace pt
 {
 
-enum State
-{
-	Stop = 0,
-	NestingError = 2,
-	Starting = 4,
-	Running = 6,
-};
+/// State returned for compound tasks.
+typedef uint8_t State;
 
 /**
  * A version of `Protothread` which allows nested calling of tasks.
@@ -269,7 +264,15 @@ protected:
 
 protected:
 	static constexpr NPtState NPtStopped = static_cast<NPtState>(xpcc::ArithmeticTraits<NPtState>::max);
-private:
+	enum State
+	{
+		Stop = 0,
+		NestingError = 2,
+		Successful = 4,
+		Starting = 6,
+		Running = 8,
+	};
+
 	uint8_t nptLevel;
 	NPtState nptStateArray[Depth+1];
 };
@@ -360,7 +363,15 @@ protected:
 
 protected:
 	static constexpr NPtState NPtStopped = static_cast<NPtState>(xpcc::ArithmeticTraits<NPtState>::max);
-private:
+	enum State
+	{
+		Stop = 0,
+		NestingError = 2,
+		Successful = 4,
+		Starting = 6,
+		Running = 8,
+	};
+
 	NPtState nptState;
 	bool inNPt;
 };

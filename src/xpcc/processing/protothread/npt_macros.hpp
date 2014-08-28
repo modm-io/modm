@@ -21,8 +21,9 @@
  * @hideinitializer
  */
 #define NPT_BEGIN() \
-	if (!this->nestingOkNPt()) return ::xpcc::pt::NestingError; \
+	if (!this->nestingOkNPt()) return this->NestingError; \
 	bool nptYielded ATTRIBUTE_UNUSED = true; \
+	xpcc::pt::State nptState ATTRIBUTE_UNUSED = this->Stop; \
 	switch (this->pushNPt()) { \
 		case NPtStopped: \
 			this->setNPt(__LINE__); \
@@ -37,6 +38,7 @@
  */
 #define NPT_BEGIN_TASK(task) \
 	bool nptYielded ATTRIBUTE_UNUSED = true; \
+	xpcc::pt::State nptState ATTRIBUTE_UNUSED = this->Stop; \
 	switch (this->pushNPt()) { \
 		case stateFromTask(task): ;
 
@@ -52,7 +54,7 @@
 		default: ; \
 	} \
 	this->popNPt(); \
-	return ::xpcc::pt::Stop;
+	return this->Stop;
 
 /**
 * Yield protothread task till next call to its `runTask()`.
@@ -67,7 +69,7 @@
 		case __LINE__: \
 			if (!nptYielded) { \
 				this->popNPt(); \
-				return ::xpcc::pt::Running; \
+				return this->Running; \
 			} \
 	} while (0)
 
@@ -83,7 +85,7 @@
 		case __LINE__: \
 			if (condition) { \
 				this->popNPt(); \
-				return ::xpcc::pt::Running; \
+				return this->Running; \
 			} \
 	} while (0)
 
@@ -97,7 +99,7 @@
 	NPT_WAIT_WHILE(!(condition))
 
 /**
- * Causes Protothread to wait **while**
+ * Causes Protothread to wait **while** given `condition` is true.
  * Use this when waiting for a starting condition.
  *
  * @ingroup	protothread
@@ -109,12 +111,12 @@
 		case __LINE__: \
 			if (condition) { \
 				this->popNPt(); \
-				return ::xpcc::pt::Starting; \
+				return this->Starting; \
 			} \
 	} while (0)
 
 /**
- * Returns `xpcc::pt::Starting` **until** given `condition` is true.
+ * Causes Protothread to wait **until** given `condition` is true.
  * Use this when waiting for a starting condition.
  *
  * @ingroup	protothread
@@ -124,13 +126,28 @@
 	NPT_WAIT_WHILE_START(!(condition))
 
 /**
+ * Causes Protothread to stop successfully if given `condition` is true.
+ *
+ * @ingroup	protothread
+ * @hideinitializer
+ */
+#define NPT_SUCCESS_IF(condition) \
+	do { \
+		if (condition) { \
+			this->stopNPt(); \
+			this->popNPt(); \
+			return this->Successful; \
+		} \
+	} while (0)
+
+/**
  * Spawns a given compound task with optional arguments
  *
  * @ingroup	protothread
  * @hideinitializer
  */
-#define NPT_SPAWN(name, args) \
-	NPT_WAIT_WHILE(CONCAT(startRun, name)args > ::xpcc::pt::NestingError)
+#define NPT_SPAWN(task) \
+	NPT_WAIT_WHILE(task >= this->Starting)
 
 /**
  * Spawns a given compound task with optional arguments, and returns
@@ -139,8 +156,17 @@
  * @ingroup	protothread
  * @hideinitializer
  */
-#define NPT_SPAWN_SUCCESS(name, args, args2) \
-	({ NPT_SPAWN(name, args); CONCAT3(is, name, Successful)args2; })
+#define NPT_SPAWN_SUCCESS(task) \
+	({ \
+		this->setNPt(__LINE__); \
+		case __LINE__: \
+			nptState = task; \
+			if (nptState > this->Successful) { \
+				this->popNPt(); \
+				return this->Running; \
+			} \
+			(nptState == this->Successful); \
+	})
 
 /**
  * Stop and exit from protothread task.
@@ -152,7 +178,7 @@
 	do { \
 		this->stopNPt(); \
 		this->popNPt(); \
-		return ::xpcc::pt::Stop; \
+		return this->Stop; \
 	} while (0)
 
 #endif // XPCC_NPT_MACROS_HPP

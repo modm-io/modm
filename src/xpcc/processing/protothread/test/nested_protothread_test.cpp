@@ -572,7 +572,7 @@ public:
 		state2 = 1;
 		NPT_YIELD();
 
-		success2 = NPT_SPAWN_SUCCESS(SpawningTask, (waits, 8), (waits, 8));
+		success2 = NPT_SPAWN_SUCCESS(spawningTask(waits, 8));
 
 		state2 = 3;
 		NPT_YIELD();
@@ -591,7 +591,7 @@ public:
 
 protected:
 	xpcc::pt::State
-	startRunSpawningTask(uint8_t calls, uint8_t secondArgument)
+	spawningTask(uint8_t calls, uint8_t secondArgument)
 	{
 		NPT_BEGIN();
 
@@ -601,6 +601,8 @@ protected:
 		NPT_YIELD();
 
 		NPT_WAIT_WHILE(runSpawningTask(calls, secondArgument));
+
+		NPT_SUCCESS_IF(isSpawningTaskSuccessful(calls, secondArgument));
 
 		NPT_END();
 	}
