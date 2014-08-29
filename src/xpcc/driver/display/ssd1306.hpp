@@ -97,22 +97,16 @@ public:
 	bool
 	startPing();
 
-	bool ALWAYS_INLINE
+	xpcc::pt::Result inline
 	runPing();
-
-	bool ALWAYS_INLINE
-	isPingSuccessful();
 
 
 	/// initializes for 3V3 with charge-pump
 	bool ALWAYS_INLINE
 	startInitialize();
 
-	bool
+	xpcc::pt::Result
 	runInitialize();
-
-	bool ALWAYS_INLINE
-	isInitializeSuccessful();
 
 
 	/// Starts a frame transfer to the display
@@ -121,32 +115,29 @@ public:
 	bool ALWAYS_INLINE
 	startWriteDisplay();
 
-	bool
+	xpcc::pt::Result
 	runWriteDisplay();
-
-	bool
-	isWriteDisplaySuccessful();
 
 protected:
 	/// Write a command without data
-	xpcc::pt::State
+	xpcc::pt::Result
 	writeCommand(uint8_t command);
 
 	/// Write a command with one byte data
-	xpcc::pt::State
+	xpcc::pt::Result
 	writeCommand(uint8_t command, uint8_t data);
 
 	/// Write a command with two bytes data
-	xpcc::pt::State
+	xpcc::pt::Result
 	writeCommand(uint8_t command, uint8_t data1, uint8_t data2);
 
 	/// Write a command with 5 bytes data (for scrolling)
-	xpcc::pt::State
+	xpcc::pt::Result
 	writeCommand(uint8_t command,
 			uint8_t data1, uint8_t data2, uint8_t data3, uint8_t data4, uint8_t data5);
 
 	/// Write a command with 6 bytes data (for scrolling)
-	xpcc::pt::State
+	xpcc::pt::Result
 	writeCommand(uint8_t command,
 			uint8_t data1, uint8_t data2, uint8_t data3, uint8_t data4, uint8_t data5, uint8_t data6);
 
