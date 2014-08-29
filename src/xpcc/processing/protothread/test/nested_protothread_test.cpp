@@ -572,7 +572,7 @@ public:
 		state2 = 1;
 		NPT_YIELD();
 
-		success2 = NPT_SPAWN_SUCCESS(spawningTask(waits, 8));
+		success2 = NPT_SPAWN(spawningTask(waits, 8));
 
 		state2 = 3;
 		NPT_YIELD();
@@ -590,7 +590,7 @@ public:
 	{ return (state2 == 4); }
 
 protected:
-	xpcc::pt::State
+	xpcc::pt::Result
 	spawningTask(uint8_t calls, uint8_t secondArgument)
 	{
 		NPT_BEGIN();

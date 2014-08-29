@@ -39,7 +39,7 @@
  * \hideinitializer
  */
 #define PT_BEGIN() \
-	bool ptYielded ATTRIBUTE_UNUSED = true; \
+	xpcc::pt::Result ptResult ATTRIBUTE_UNUSED = xpcc::pt::Stop; \
 	switch (this->ptState) { \
 		case 0:
 
@@ -64,11 +64,9 @@
  */
 #define PT_YIELD() \
     do { \
-		ptYielded = false; \
 		this->ptState = __LINE__; \
-		case __LINE__: \
-			if (!ptYielded) \
-				return true; \
+		return true; \
+		case __LINE__: ; \
 	} while (0)
 
 /**
@@ -113,6 +111,25 @@
 		(child).restart(); \
 		PT_WAIT_THREAD(child); \
     } while (0)
+
+
+/**
+ * Spawns a given compound task and returns
+ * whether the task completed successfully or not.
+ *
+ * \ingroup	protothread
+ * \hideinitializer
+ */
+#define PT_RUN_TASK(task) \
+	({ \
+		this->ptState = __LINE__; \
+		case __LINE__: \
+			ptResult = task; \
+			if (ptResult > xpcc::pt::Successful) { \
+				return true; \
+			} \
+			(ptResult == xpcc::pt::Successful); \
+	})
 
 /**
  * Reset protothread to start from the beginning

@@ -22,7 +22,15 @@ namespace pt
 {
 
 /// State returned for compound tasks.
-typedef uint8_t State;
+typedef uint8_t Result;
+enum
+{
+	Stop = 0,
+	NestingError = (1 << 0),
+	Successful = (1 << 1),
+	Starting = (1 << 2),
+	Running = (1 << 3),
+};
 
 /**
  * A version of `Protothread` which allows nested calling of tasks.
@@ -264,14 +272,6 @@ protected:
 
 protected:
 	static constexpr NPtState NPtStopped = static_cast<NPtState>(xpcc::ArithmeticTraits<NPtState>::max);
-	enum State
-	{
-		Stop = 0,
-		NestingError = 2,
-		Successful = 4,
-		Starting = 6,
-		Running = 8,
-	};
 
 	uint8_t nptLevel;
 	NPtState nptStateArray[Depth+1];
@@ -363,14 +363,6 @@ protected:
 
 protected:
 	static constexpr NPtState NPtStopped = static_cast<NPtState>(xpcc::ArithmeticTraits<NPtState>::max);
-	enum State
-	{
-		Stop = 0,
-		NestingError = 2,
-		Successful = 4,
-		Starting = 6,
-		Running = 8,
-	};
 
 	NPtState nptState;
 	bool inNPt;
