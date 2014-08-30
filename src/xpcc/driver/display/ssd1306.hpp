@@ -74,7 +74,7 @@ struct ssd1306
  */
 template < class I2cMaster >
 class Ssd1306 : public ssd1306, public xpcc::I2cDevice<I2cMaster>,
-				private xpcc::pt::NestedProtothread<1>, public BufferedGraphicDisplay<128, 64>
+				public xpcc::pt::NestedProtothread<1>, public BufferedGraphicDisplay<128, 64>
 {
 public:
 	Ssd1306(uint8_t address = 0x3C);
@@ -151,16 +151,6 @@ private:
 			// insert all ssd1306::Command
 			WriteDisplay = 0xFE,
 			Ping = 0xFF
-		};
-	};
-
-	struct Task
-	{
-		enum
-		{
-			Initialize,
-			WriteDisplay,
-			InvertDisplay,
 		};
 	};
 
