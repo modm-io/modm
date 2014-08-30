@@ -43,21 +43,56 @@ public:
 	 * @param	rate
 	 *		`Standard` or `Fast`, `High` datarate is not supported
 	 */
-	template<class clockSource, uint32_t rate=Baudrate::Standard,
+	template<class clockSource, uint32_t baudrate=Baudrate::Standard,
 			uint16_t tolerance = xpcc::Tolerance::FivePercent >
 	static ALWAYS_INLINE void
 	initialize()
 	{
-		// set the prescaler rate register
-		// ccrPrescaler = peripheralFrequency / (2 * I2CFrequency)
-		constexpr uint16_t prescaler = clockSource::I2c{{ id }} / (2 * rate);
+		// calculate the expected clock ratio
+		constexpr uint8_t scalar = (baudrate <= 100000) ? 2 : ((baudrate <= 300000) ? 3 : 25);
 
+		// calculate the fractional prescaler value
+		constexpr float pre_raw  = static_cast<float>(clockSource::I2c{{ id }}) / (scalar * baudrate);
+		// respect the prescaler range of 1 or 4 to 4095
+		constexpr uint32_t pre_ceil = std::ceil(pre_raw) > 4095 ? 4095 : std::ceil(pre_raw);
+		constexpr uint32_t pre_floor = std::floor(pre_raw) < ((scalar < 3) ? 4 : 1) ?
+				((scalar < 3) ? 4 : 1) : std::floor(pre_raw);
+
+		// calculate the possible baudrates above and below the requested baudrate
+		constexpr uint32_t baud_lower = clockSource::I2c{{ id }} / ( scalar * pre_ceil  );
+		constexpr uint32_t baud_upper = clockSource::I2c{{ id }} / ( scalar * pre_floor );
+
+		// calculate the fractional prescaler value corresponding to the baudrate exactly
+		// between the upper and lower baudrate
+		constexpr float pre_middle = static_cast<float>(clockSource::I2c{{ id }}) /
+				( scalar * ((baud_upper - baud_lower) / 2.f + baud_lower) );
+		// decide which prescaler value is closer to a possible baudrate
+		constexpr uint32_t pre = (pre_raw >= pre_middle) ? pre_ceil : pre_floor;
+
+		// check if within baudrate tolerance
+		constexpr uint32_t generated_baudrate = clockSource::I2c{{ id }} / ( scalar * pre );
 		assertBaudrateInTolerance<
-				/* clostest available baudrate */ (clockSource::I2c{{ id }} / (2 * prescaler)),
-				/* desired baudrate */ rate,
+				/* clostest available baudrate */ generated_baudrate,
+				/* desired baudrate */ baudrate,
 				tolerance >();
 
-		initializeWithPrescaler(static_cast<uint8_t>(clockSource::I2c{{ id }} / 1000000), prescaler);
+		// the final prescaler value is augmented with the F/S and DUTY bit.
+		constexpr uint32_t prescaler = pre |
+				((scalar >= 3) ? (1 << 15) : 0) |
+				((scalar == 25) ? (1 << 14) : 0);
+
+		// peripheral frequency clock
+		constexpr uint8_t freq = clockSource::I2c{{ id }} / 1000000;
+
+		// maximum rise time: assuming its linear:
+		// 1000ns @ 100kHz and 300ns @ 400kHz
+		//   => y = x * m + b, with m = -2ns/kHz, b = 1200ns
+		constexpr float max_rise_time = -2.f * (static_cast<float>(baudrate) / 100.f) + 1200.f;
+		// calculate trise
+		constexpr float trise_raw = max_rise_time < 0 ? 0 : std::floor(max_rise_time / (1000.f / freq));
+		constexpr uint8_t trise = trise_raw > 62 ? 63 : (trise_raw + 1);
+
+		initializeWithPrescaler(freq, trise, prescaler);
 	}
 
 	// start documentation inherited
@@ -76,7 +111,7 @@ public:
 
 private:
 	static void
-	initializeWithPrescaler(uint8_t peripheralFrequency, uint16_t prescaler);
+	initializeWithPrescaler(uint8_t peripheralFrequency, uint8_t riseTime, uint16_t prescaler);
 };
 
 } // namespace stm32

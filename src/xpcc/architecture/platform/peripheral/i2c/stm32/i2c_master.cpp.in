@@ -551,7 +551,7 @@ I2C{{ id }}_ER_IRQHandler(void)
 // ----------------------------------------------------------------------------
 
 void
-xpcc::stm32::I2cMaster{{ id }}::initializeWithPrescaler(uint8_t peripheralFrequency, uint16_t prescaler)
+xpcc::stm32::I2cMaster{{ id }}::initializeWithPrescaler(uint8_t peripheralFrequency, uint8_t riseTime, uint16_t prescaler)
 {
 	// no reset, since we want to keep the transaction attached!
 
@@ -566,8 +566,9 @@ xpcc::stm32::I2cMaster{{ id }}::initializeWithPrescaler(uint8_t peripheralFreque
 
 	I2C{{ id }}->CR2 = peripheralFrequency;
 	I2C{{ id }}->CCR = prescaler;
-	// DEBUG_STREAM("ccrPrescaler=" << prescaler);
-	I2C{{ id }}->TRISE = 0x09;
+	I2C{{ id }}->TRISE = riseTime;
+	// analog filter on, digital filter = 2
+	I2C{{ id }}->FLTR = (1 << 4) | 4;
 
 	I2C{{ id }}->CR1 |= I2C_CR1_PE; // Enable peripheral
 }
