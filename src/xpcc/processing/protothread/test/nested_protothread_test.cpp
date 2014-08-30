@@ -12,19 +12,6 @@
 
 #include "nested_protothread_test.hpp"
 
-namespace Task
-{
-	enum
-	{
-		Empty0Task1,
-		Empty0Task2,
-		Empty1Task1,
-		Empty1Task2,
-		Empty2Task1 = Empty1Task1,
-		Empty2Task2 = Empty1Task2
-	};
-}
-
 // ----------------------------------------------------------------------------
 class TestingEmptyThread0 : public xpcc::pt::NestedProtothread<0>
 {
@@ -34,10 +21,10 @@ public:
 	{
 	}
 
-	bool
-	runTask1()
+	xpcc::pt::Result
+	task1(void *ctx)
 	{
-		NPT_BEGIN_TASK(Task::Empty0Task1);
+		NPT_BEGIN(ctx);
 
 		state = 1;
 		depth = getTaskDepth();
@@ -49,10 +36,10 @@ public:
 		NPT_END();
 	}
 
-	bool
-	runTask2()
+	xpcc::pt::Result
+	task2(void *ctx)
 	{
-		NPT_BEGIN_TASK(Task::Empty0Task2);
+		NPT_BEGIN(ctx);
 
 		state = 3;
 
@@ -67,16 +54,17 @@ class TestingEmptyThread1 : public xpcc::pt::NestedProtothread<1>
 {
 public:
 	TestingEmptyThread1()
-	:	state(0)
+	:	state(0), depth(0)
 	{
 	}
 
-	bool
-	runTask1()
+	xpcc::pt::Result
+	task1(void *ctx)
 	{
-		NPT_BEGIN_TASK(Task::Empty1Task1);
+		NPT_BEGIN(ctx);
 
 		state = 1;
+		depth = getTaskDepth();
 
 		NPT_YIELD();
 
@@ -85,10 +73,10 @@ public:
 		NPT_END();
 	}
 
-	bool
-	runTask2()
+	xpcc::pt::Result
+	task2(void *ctx)
 	{
-		NPT_BEGIN_TASK(Task::Empty1Task2);
+		NPT_BEGIN(ctx);
 
 		state = 3;
 
@@ -96,22 +84,24 @@ public:
 	}
 
 	uint8_t state;
+	int8_t depth;
 };
 
 class TestingEmptyThread2 : public xpcc::pt::NestedProtothread<2>
 {
 public:
 	TestingEmptyThread2()
-	:	state(0)
+	:	state(0), depth(0)
 	{
 	}
 
-	bool
-	runTask1()
+	xpcc::pt::Result
+	task1(void *ctx)
 	{
-		NPT_BEGIN_TASK(Task::Empty2Task1);
+		NPT_BEGIN(ctx);
 
 		state = 1;
+		depth = getTaskDepth();
 
 		NPT_YIELD();
 
@@ -120,10 +110,10 @@ public:
 		NPT_END();
 	}
 
-	bool
-	runTask2()
+	xpcc::pt::Result
+	task2(void *ctx)
 	{
-		NPT_BEGIN_TASK(Task::Empty2Task2);
+		NPT_BEGIN(ctx);
 
 		state = 3;
 
@@ -131,144 +121,113 @@ public:
 	}
 
 	uint8_t state;
+	int8_t depth;
 };
 
 void
 NestedProtothreadTest::testClassMethods()
 {
+	uint8_t ctx_helper;
+	void *ctx1 = this;
+	void *ctx2 = &ctx_helper;
+
 	// Nesting Depth of zero is specialized
 	TestingEmptyThread0 thread0;
-	// these threads don't start themselves
-	TEST_ASSERT_FALSE(thread0.isTaskRunning());
+	// outside the nesting depth should be -1
 	TEST_ASSERT_EQUALS(thread0.getTaskDepth(), -1);
-	// calling run() should return false
-	TEST_ASSERT_FALSE(thread0.runTask1());
-	TEST_ASSERT_FALSE(thread0.runTask2());
-	// calling run() should not have modified anything
+	// nothing should have been modified
 	TEST_ASSERT_EQUALS(thread0.state, 0);
 	TEST_ASSERT_EQUALS(thread0.depth, 0);
 	// still not running
 	TEST_ASSERT_FALSE(thread0.isTaskRunning());
 
-	// lets start a task
-	TEST_ASSERT_TRUE(thread0.startTask(Task::Empty0Task1));
+	// lets start a task, which will yield
+	TEST_ASSERT_EQUALS(thread0.task1(ctx1), xpcc::pt::Running);
 	// now it should be running
 	TEST_ASSERT_TRUE(thread0.isTaskRunning());
-	// while a task is running, another cannot be started
-	TEST_ASSERT_FALSE(thread0.startTask(Task::Empty0Task2));
-	// the thread should yield once
-	TEST_ASSERT_TRUE(thread0.runTask1());
 	// state should be 1
 	TEST_ASSERT_EQUALS(thread0.state, 1);
-	// running the other task should not change anything
-	TEST_ASSERT_FALSE(thread0.runTask2());
-	// state should be 1
+	// depth should be 0
+	TEST_ASSERT_EQUALS(thread0.depth, 0);
+
+	// two tasks cannot run in the same context
+	TEST_ASSERT_EQUALS(thread0.task2(ctx1), xpcc::pt::WrongState);
+	// but starting a task of the same class in another context
+	// returns WrongContext, which can make parent class wait
+	TEST_ASSERT_EQUALS(thread0.task2(ctx2), xpcc::pt::WrongContext);
+	// Similarly calling a running task1 in another context
+	// also returns WrongContext
+	TEST_ASSERT_EQUALS(thread0.task1(ctx2), xpcc::pt::WrongContext);
+
+	// state should still be 1
 	TEST_ASSERT_EQUALS(thread0.state, 1);
-	// the thread should conclude
-	TEST_ASSERT_FALSE(thread0.runTask1());
+	// but it should continue execution in the right context
+	TEST_ASSERT_EQUALS(thread0.task1(ctx1), xpcc::pt::Stop);
 	// state should be 2
 	TEST_ASSERT_EQUALS(thread0.state, 2);
-
-	// not running anymore
+	// nothing is running anymore
 	TEST_ASSERT_FALSE(thread0.isTaskRunning());
 
-	// after finishing a task should not run again
-	thread0.state = 0;
-	// the thread should end immidiately
-	TEST_ASSERT_FALSE(thread0.runTask1());
-	TEST_ASSERT_FALSE(thread0.runTask2());
-	// state should be 0
-	TEST_ASSERT_EQUALS(thread0.state, 0);
-
-	// try the same with task2
-	TEST_ASSERT_TRUE(thread0.startTask(Task::Empty0Task2));
-	// now it should be running
-	TEST_ASSERT_TRUE(thread0.isTaskRunning());
-	// again, another task cannot be started (not even the same task)
-	TEST_ASSERT_FALSE(thread0.startTask(Task::Empty0Task2));
-	// the thread should end immidiately
-	TEST_ASSERT_FALSE(thread0.runTask2());
-	TEST_ASSERT_FALSE(thread0.runTask1());
+	// try the same with task2, which will end immediately
+	TEST_ASSERT_EQUALS(thread0.task2(ctx1), xpcc::pt::Stop);
 	// state should be 3
 	TEST_ASSERT_EQUALS(thread0.state, 3);
 	// not running anymore
 	TEST_ASSERT_FALSE(thread0.isTaskRunning());
 
-	// test the same thing with the generic implementation
+
+	// generic implementation with 1 nesting levels
 	TestingEmptyThread1 thread1;
-	TEST_ASSERT_FALSE(thread1.isTaskRunning());
-	TEST_ASSERT_FALSE(thread1.runTask1());
-	TEST_ASSERT_FALSE(thread1.runTask2());
+	TEST_ASSERT_EQUALS(thread1.getTaskDepth(), -1);
 	TEST_ASSERT_EQUALS(thread1.state, 0);
+	TEST_ASSERT_EQUALS(thread1.depth, 0);
 	TEST_ASSERT_FALSE(thread1.isTaskRunning());
 
-	TEST_ASSERT_TRUE(thread1.startTask(Task::Empty1Task1));
+	TEST_ASSERT_EQUALS(thread1.task1(ctx1), xpcc::pt::Running);
 	TEST_ASSERT_TRUE(thread1.isTaskRunning());
-	TEST_ASSERT_FALSE(thread1.startTask(Task::Empty1Task2));
-	TEST_ASSERT_TRUE(thread1.runTask1());
 	TEST_ASSERT_EQUALS(thread1.state, 1);
-	TEST_ASSERT_FALSE(thread1.runTask2());
+	TEST_ASSERT_EQUALS(thread1.depth, 0);
+
+	TEST_ASSERT_EQUALS(thread1.task2(ctx1), xpcc::pt::WrongState);
+	TEST_ASSERT_EQUALS(thread1.task2(ctx2), xpcc::pt::WrongContext);
+	TEST_ASSERT_EQUALS(thread1.task1(ctx2), xpcc::pt::WrongContext);
+
 	TEST_ASSERT_EQUALS(thread1.state, 1);
-	TEST_ASSERT_FALSE(thread1.runTask1());
+	TEST_ASSERT_EQUALS(thread1.task1(ctx1), xpcc::pt::Stop);
 	TEST_ASSERT_EQUALS(thread1.state, 2);
 	TEST_ASSERT_FALSE(thread1.isTaskRunning());
 
-	thread1.state = 0;
-	TEST_ASSERT_FALSE(thread1.runTask1());
-	TEST_ASSERT_FALSE(thread1.runTask2());
-	TEST_ASSERT_EQUALS(thread1.state, 0);
-
-	TEST_ASSERT_TRUE(thread1.startTask(Task::Empty1Task2));
-	TEST_ASSERT_TRUE(thread1.isTaskRunning());
-	TEST_ASSERT_FALSE(thread1.startTask(Task::Empty1Task2));
-	TEST_ASSERT_FALSE(thread1.runTask2());
-	TEST_ASSERT_FALSE(thread1.runTask1());
+	TEST_ASSERT_EQUALS(thread1.task2(ctx1), xpcc::pt::Stop);
 	TEST_ASSERT_EQUALS(thread1.state, 3);
 	TEST_ASSERT_FALSE(thread1.isTaskRunning());
 
-	// thread 2
+
+	// generic implementation with 2 nesting levels
 	TestingEmptyThread2 thread2;
-	TEST_ASSERT_FALSE(thread2.isTaskRunning());
-	TEST_ASSERT_FALSE(thread2.runTask1());
-	TEST_ASSERT_FALSE(thread2.runTask2());
+	TEST_ASSERT_EQUALS(thread2.getTaskDepth(), -1);
 	TEST_ASSERT_EQUALS(thread2.state, 0);
+	TEST_ASSERT_EQUALS(thread2.depth, 0);
 	TEST_ASSERT_FALSE(thread2.isTaskRunning());
 
-	TEST_ASSERT_TRUE(thread2.startTask(Task::Empty2Task1));
+	TEST_ASSERT_EQUALS(thread2.task1(ctx1), xpcc::pt::Running);
 	TEST_ASSERT_TRUE(thread2.isTaskRunning());
-	TEST_ASSERT_FALSE(thread2.startTask(Task::Empty2Task2));
-	TEST_ASSERT_TRUE(thread2.runTask1());
 	TEST_ASSERT_EQUALS(thread2.state, 1);
-	TEST_ASSERT_FALSE(thread2.runTask2());
+	TEST_ASSERT_EQUALS(thread2.depth, 0);
+
+	TEST_ASSERT_EQUALS(thread2.task2(ctx1), xpcc::pt::WrongState);
+	TEST_ASSERT_EQUALS(thread2.task2(ctx2), xpcc::pt::WrongContext);
+	TEST_ASSERT_EQUALS(thread2.task1(ctx2), xpcc::pt::WrongContext);
+
 	TEST_ASSERT_EQUALS(thread2.state, 1);
-	TEST_ASSERT_FALSE(thread2.runTask1());
+	TEST_ASSERT_EQUALS(thread2.task1(ctx1), xpcc::pt::Stop);
 	TEST_ASSERT_EQUALS(thread2.state, 2);
 	TEST_ASSERT_FALSE(thread2.isTaskRunning());
 
-	thread2.state = 0;
-	TEST_ASSERT_FALSE(thread2.runTask1());
-	TEST_ASSERT_FALSE(thread2.runTask2());
-	TEST_ASSERT_EQUALS(thread2.state, 0);
-
-	TEST_ASSERT_TRUE(thread2.startTask(Task::Empty2Task2));
-	TEST_ASSERT_TRUE(thread2.isTaskRunning());
-	TEST_ASSERT_FALSE(thread2.startTask(Task::Empty2Task2));
-	TEST_ASSERT_FALSE(thread2.runTask2());
-	TEST_ASSERT_FALSE(thread2.runTask1());
+	TEST_ASSERT_EQUALS(thread2.task2(ctx1), xpcc::pt::Stop);
 	TEST_ASSERT_EQUALS(thread2.state, 3);
 	TEST_ASSERT_FALSE(thread2.isTaskRunning());
 }
 
-namespace Task
-{
-	enum
-	{
-		NestingTask1,
-		NestingTask2,
-		NestingTask3,
-		NestingTask4
-	};
-}
 
 // ----------------------------------------------------------------------------
 class TestingNestedThread : public xpcc::pt::NestedProtothread<2>
@@ -278,35 +237,26 @@ public:
 	:	depth1(0), depth2(0), depth3(0),
 		state1(0), state2(0), state3(0),
 		condition1(false), condition2(false), condition3(false),
-		callResult1(false), callResult2(false), callResult3(false),
-		callResult1Retry(false), callResult1AfterStop(false),
-		callResult3Retry(false), callResult3AfterStop(false)
+		callResult1(0), callResult2(0), callResult3(0)
 	{
 	}
 
-	bool
-	startTask1()
-	{ return startTask(Task::NestingTask1); }
-
-	bool
-	runTask1()
+	xpcc::pt::Result
+	task1(void *ctx)
 	{
-		NPT_BEGIN_TASK(Task::NestingTask1);
+		NPT_BEGIN(ctx);
 
 		state1 = 1;
 
-		NPT_WAIT_UNTIL(condition1);
+		NPT_WAIT_UNTIL_START(condition1);
 
 		state1 = 2;
-		callResult1 = startTask(Task::NestingTask2);
-		callResult1Retry = startTask(Task::NestingTask2);
-		stopTask();
-		callResult1AfterStop = startTask(Task::NestingTask2);
 		depth1 = getTaskDepth();
 
 		NPT_YIELD();
 
-		NPT_WAIT_WHILE(runTask2());
+		// manual spawn
+		NPT_WAIT_WHILE((callResult1 = task2(ctx)) > xpcc::pt::Successful);
 
 		state1 = 3;
 
@@ -318,22 +268,21 @@ public:
 	}
 
 protected:
-	bool
-	runTask2()
+	xpcc::pt::Result
+	task2(void *ctx)
 	{
-		NPT_BEGIN_TASK(Task::NestingTask2);
+		NPT_BEGIN(ctx);
 
 		state2 = 1;
 
-		NPT_WAIT_UNTIL(condition2);
+		NPT_WAIT_UNTIL_START(condition2);
 
 		state2 = 2;
-		callResult2 = startTask(Task::NestingTask3);
 		depth2 = getTaskDepth();
 
 		NPT_YIELD();
 
-		NPT_WAIT_WHILE(runTask3());
+		NPT_WAIT_WHILE((callResult2 = task3(ctx)) > xpcc::pt::Successful);
 
 		state2 = 3;
 
@@ -344,31 +293,24 @@ protected:
 		NPT_END();
 	}
 
-	bool
-	runTask3()
+	xpcc::pt::Result
+	task3(void *ctx)
 	{
-		NPT_BEGIN_TASK(Task::NestingTask3);
+		NPT_BEGIN(ctx);
 
 		state3 = 1;
 
-		NPT_WAIT_UNTIL(condition3);
+		NPT_WAIT_UNTIL_START(condition3);
 
 		state3 = 2;
-		// this must return false, since there is no more space
-		// to buffer the next nested local continuation anymore!
-		callResult3 = startTask(Task::NestingTask4);
-		callResult3Retry = startTask(Task::NestingTask4);
-		stopTask();
-		callResult3AfterStop = startTask(Task::NestingTask4);
 		depth3 = getTaskDepth();
+		// this must return NestingError, since there is no more space
+		// to buffer the next nested local continuation anymore!
+		callResult3 = task3(ctx);
 
 		NPT_YIELD();
 
 		state3 = 3;
-
-		NPT_YIELD();
-
-		state3 = 4;
 
 		NPT_END();
 	}
@@ -383,135 +325,122 @@ public:
 	bool condition1;
 	bool condition2;
 	bool condition3;
-	bool callResult1;
-	bool callResult2;
-	bool callResult3;
-	bool callResult1Retry;
-	bool callResult1AfterStop;
-	bool callResult3Retry;
-	bool callResult3AfterStop;
+	uint8_t callResult1;
+	uint8_t callResult2;
+	uint8_t callResult3;
 };
+//*/
 
 void
 NestedProtothreadTest::testNesting()
 {
-	TestingNestedThread thread;
+	uint8_t ctx_helper;
+	void *ctx1 = this;
+	void *ctx2 = &ctx_helper;
 
+	TestingNestedThread thread;
 	// sanity checks
 	TEST_ASSERT_FALSE(thread.isTaskRunning());
-	TEST_ASSERT_FALSE(thread.runTask1());
 	TEST_ASSERT_EQUALS(thread.state1, 0);
-	TEST_ASSERT_FALSE(thread.isTaskRunning());
 	TEST_ASSERT_EQUALS(thread.getTaskDepth(), -1);
 
-	// lets start the first task
-	TEST_ASSERT_TRUE(thread.startTask1());
 	// should wait until the first condition
-	TEST_ASSERT_TRUE(thread.runTask1());
+	TEST_ASSERT_EQUALS(thread.task1(ctx1), xpcc::pt::Starting);
 	TEST_ASSERT_EQUALS(thread.state1, 1);
 	// task should wait here
-	TEST_ASSERT_TRUE(thread.runTask1());
+	TEST_ASSERT_EQUALS(thread.task1(ctx1), xpcc::pt::Starting);
 	TEST_ASSERT_EQUALS(thread.state1, 1);
 
+	// it should be running
+	TEST_ASSERT_TRUE(thread.isTaskRunning());
+	// we should be able to stop this task though
+	thread.stopTask();
+	TEST_ASSERT_FALSE(thread.isTaskRunning());
+	// and restart it
+	thread.state1 = 0;
+	TEST_ASSERT_EQUALS(thread.task1(ctx1), xpcc::pt::Starting);
+	TEST_ASSERT_EQUALS(thread.state1, 1);
+
+	// lets release start condition 1
 	thread.condition1 = true;
-	// task should continue
-	TEST_ASSERT_TRUE(thread.runTask1());
-	// task should continue
+	// task should continue and yield
+	TEST_ASSERT_EQUALS(thread.task1(ctx1), xpcc::pt::Running);
+	// check the state and depth
 	TEST_ASSERT_EQUALS(thread.state1, 2);
-	TEST_ASSERT_EQUALS(thread.state2, 0);
-	// the callResult1 should be true
-	TEST_ASSERT_TRUE(thread.callResult1);
-	// retry should be false
-	TEST_ASSERT_FALSE(thread.callResult1Retry);
-	// retry after stop should be true
-	TEST_ASSERT_TRUE(thread.callResult1AfterStop);
-	// depth should be 0
 	TEST_ASSERT_EQUALS(thread.depth1, 0);
 
-	// task2 should be called internally now
-	TEST_ASSERT_TRUE(thread.runTask1());
-	TEST_ASSERT_EQUALS(thread.state1, 2);
-	TEST_ASSERT_EQUALS(thread.state2, 1);
-	// should wait until the second condition
-	TEST_ASSERT_TRUE(thread.runTask1());
-	TEST_ASSERT_EQUALS(thread.state1, 2);
-	TEST_ASSERT_EQUALS(thread.state2, 1);
-	// task should wait here
-	TEST_ASSERT_TRUE(thread.runTask1());
-	TEST_ASSERT_EQUALS(thread.state1, 2);
-	TEST_ASSERT_EQUALS(thread.state2, 1);
+	// first manual spawn
+	TEST_ASSERT_EQUALS(thread.task1(ctx1), xpcc::pt::Running);
+	// the callResult1 should be Starting
+	TEST_ASSERT_EQUALS(thread.callResult1, xpcc::pt::Starting);
+	// after another run, callResult1 should still be Starting
+	TEST_ASSERT_EQUALS(thread.task1(ctx1), xpcc::pt::Running);
+	TEST_ASSERT_EQUALS(thread.callResult1, xpcc::pt::Starting);
 
+	// task1 should reject any other contexts, even when currently spawning
+	TEST_ASSERT_EQUALS(thread.task1(ctx2), xpcc::pt::WrongContext);
+
+	// lets release start condition 2
 	thread.condition2 = true;
-	// task1 should continue and task3 started
-	TEST_ASSERT_TRUE(thread.runTask1());
+	// task2 will progress to first yield
+	TEST_ASSERT_EQUALS(thread.task1(ctx1), xpcc::pt::Running);
+	// callResult1 should be Running
+	TEST_ASSERT_EQUALS(thread.callResult1, xpcc::pt::Running);
+	// check the state and depth
 	TEST_ASSERT_EQUALS(thread.state1, 2);
 	TEST_ASSERT_EQUALS(thread.state2, 2);
-	// the callResult2 should be true
-	TEST_ASSERT_TRUE(thread.callResult2);
-	// depth should be 1
 	TEST_ASSERT_EQUALS(thread.depth2, 1);
 
-	// task3 should be called internally now
-	TEST_ASSERT_TRUE(thread.runTask1());
-	TEST_ASSERT_EQUALS(thread.state1, 2);
-	TEST_ASSERT_EQUALS(thread.state2, 2);
-	TEST_ASSERT_EQUALS(thread.state3, 1);
-	// should wait until the second condition
-	TEST_ASSERT_TRUE(thread.runTask1());
-	TEST_ASSERT_EQUALS(thread.state1, 2);
-	TEST_ASSERT_EQUALS(thread.state2, 2);
-	TEST_ASSERT_EQUALS(thread.state3, 1);
-	// task should wait here
-	TEST_ASSERT_TRUE(thread.runTask1());
-	TEST_ASSERT_EQUALS(thread.state1, 2);
-	TEST_ASSERT_EQUALS(thread.state2, 2);
-	TEST_ASSERT_EQUALS(thread.state3, 1);
+	// task2 will progress to spawning task3
+	TEST_ASSERT_EQUALS(thread.task1(ctx1), xpcc::pt::Running);
+	// callResult1 should be Running
+	TEST_ASSERT_EQUALS(thread.callResult1, xpcc::pt::Running);
+	// callResult2 should be Starting
+	TEST_ASSERT_EQUALS(thread.callResult2, xpcc::pt::Starting);
 
+	// after another run, this should not change
+	TEST_ASSERT_EQUALS(thread.task1(ctx1), xpcc::pt::Running);
+	TEST_ASSERT_EQUALS(thread.callResult1, xpcc::pt::Running);
+	TEST_ASSERT_EQUALS(thread.callResult2, xpcc::pt::Starting);
+
+	// lets release start condition 3
 	thread.condition3 = true;
-	// task1 should continue and task4 not started
-	TEST_ASSERT_TRUE(thread.runTask1());
+	// task3 will progress to first yield
+	TEST_ASSERT_EQUALS(thread.task1(ctx1), xpcc::pt::Running);
+	TEST_ASSERT_EQUALS(thread.callResult1, xpcc::pt::Running);
+	TEST_ASSERT_EQUALS(thread.callResult2, xpcc::pt::Running);
+	// check the states and depths
 	TEST_ASSERT_EQUALS(thread.state1, 2);
 	TEST_ASSERT_EQUALS(thread.state2, 2);
 	TEST_ASSERT_EQUALS(thread.state3, 2);
-	// the callResult3 should be false
-	TEST_ASSERT_FALSE(thread.callResult3);
-	// retry should be false
-	TEST_ASSERT_FALSE(thread.callResult3Retry);
-	// retry after stop should still be false
-	TEST_ASSERT_FALSE(thread.callResult3AfterStop);
-	// depth should be 2
 	TEST_ASSERT_EQUALS(thread.depth3, 2);
+	// we have exhausted the nesting capabilities
+	TEST_ASSERT_EQUALS(thread.callResult3, xpcc::pt::NestingError);
 
-	// task1 should continue
-	TEST_ASSERT_TRUE(thread.runTask1());
-	TEST_ASSERT_EQUALS(thread.state1, 2);
-	TEST_ASSERT_EQUALS(thread.state2, 2);
+	// now we will begin to strip down the nestings
+	TEST_ASSERT_EQUALS(thread.task1(ctx1), xpcc::pt::Running);
+	TEST_ASSERT_EQUALS(thread.callResult1, xpcc::pt::Running);
+	// task3 will complete
 	TEST_ASSERT_EQUALS(thread.state3, 3);
-
-	// task3 should end now
-	TEST_ASSERT_TRUE(thread.runTask1());
-	TEST_ASSERT_EQUALS(thread.state1, 2);
+	// callResult2 will return Stop
+	TEST_ASSERT_EQUALS(thread.callResult2, xpcc::pt::Stop);
+	// task2 will continue until next yield
 	TEST_ASSERT_EQUALS(thread.state2, 3);
-	TEST_ASSERT_EQUALS(thread.state3, 4);
 
-	// task2 should end now
-	TEST_ASSERT_TRUE(thread.runTask1());
-	TEST_ASSERT_EQUALS(thread.state1, 3);
+	TEST_ASSERT_EQUALS(thread.task1(ctx1), xpcc::pt::Running);
+	// task2 will complete
 	TEST_ASSERT_EQUALS(thread.state2, 4);
-	TEST_ASSERT_EQUALS(thread.state3, 4);
+	// callResult1 will return Stop
+	TEST_ASSERT_EQUALS(thread.callResult1, xpcc::pt::Stop);
+	// task1 will continure until next yield
+	TEST_ASSERT_EQUALS(thread.state1, 3);
 
 	// task1 should end now
-	TEST_ASSERT_FALSE(thread.runTask1());
-	TEST_ASSERT_FALSE(thread.isTaskRunning());
-}
+	TEST_ASSERT_EQUALS(thread.task1(ctx1), xpcc::pt::Stop);
+	TEST_ASSERT_EQUALS(thread.state1, 4);
 
-namespace Task
-{
-	enum
-	{
-		SpawningTask1,
-		SpawningTask2
-	};
+	// nothing is running
+	TEST_ASSERT_FALSE(thread.isTaskRunning());
 }
 
 uint8_t waits = 3;
@@ -520,95 +449,51 @@ class TestingSpawningThread : public xpcc::pt::NestedProtothread<1>
 {
 public:
 	TestingSpawningThread()
-	:	state1(0), state2(0), state3(0)
+	:	state(0)
 	{
 	}
 
-	bool
-	startParentTask1()
-	{ return startTask(Task::SpawningTask1); }
-
-	bool
-	runParentTask1()
+	xpcc::pt::Result
+	parentTask(void *ctx)
 	{
-		NPT_BEGIN_TASK(Task::SpawningTask1);
+		NPT_BEGIN(ctx);
 
-		state1 = 1;
+		state = 1;
 		NPT_YIELD();
 
-		NPT_WAIT_UNTIL(startSpawningTask(waits, 8));
+		success = NPT_SPAWN(spawningTask(ctx, waits));
 
-		state1 = 2;
+		state = 3;
 		NPT_YIELD();
 
-		NPT_WAIT_WHILE(runSpawningTask(waits, 8));
-
-		state1 = 3;
-		NPT_YIELD();
-
-		if (isSpawningTaskSuccessful(waits, 8))
-			state1 = 4;
+		if (success)
+			state = 4;
 		else
-			state1 = 5;
+			state = 5;
 
 		NPT_END();
 	}
-
-	bool
-	isParentTaskSuccessful1()
-	{ return (state1 == 4); }
-
-
-
-	bool
-	startParentTask2()
-	{ return startTask(Task::SpawningTask2); }
-
-	bool
-	runParentTask2()
-	{
-		NPT_BEGIN_TASK(Task::SpawningTask2);
-
-		state2 = 1;
-		NPT_YIELD();
-
-		success2 = NPT_SPAWN(spawningTask(waits, 8));
-
-		state2 = 3;
-		NPT_YIELD();
-
-		if (success2)
-			state2 = 4;
-		else
-			state2 = 5;
-
-		NPT_END();
-	}
-
-	bool
-	isParentTaskSuccessful2()
-	{ return (state2 == 4); }
 
 protected:
 	xpcc::pt::Result
-	spawningTask(uint8_t calls, uint8_t secondArgument)
+	spawningTask(void *ctx, uint8_t calls)
 	{
-		NPT_BEGIN();
+		NPT_BEGIN(ctx);
 
-		NPT_WAIT_WHILE_START(!startSpawningTask(calls, secondArgument));
+		NPT_WAIT_WHILE_START(!startSpawningTask(calls));
 
-		state2 = 2;
+		state = 2;
 		NPT_YIELD();
 
-		NPT_WAIT_WHILE(runSpawningTask(calls, secondArgument));
+		NPT_WAIT_WHILE(runSpawningTask(calls));
 
-		NPT_SUCCESS_IF(isSpawningTaskSuccessful(calls, secondArgument));
+		NPT_SUCCESS_IF(isSpawningTaskSuccessful(calls));
 
 		NPT_END();
 	}
 
 	bool
-	startSpawningTask(uint8_t calls, uint8_t /*secondArgument*/)
+	startSpawningTask(uint8_t calls)
 	{
 		// manually implemented "protothread" without any side-effects on the NPT
 		static uint8_t st_calls(0);
@@ -621,7 +506,7 @@ protected:
 	}
 
 	bool
-	runSpawningTask(uint8_t calls, uint8_t /*secondArgument*/)
+	runSpawningTask(uint8_t calls)
 	{
 		// manually implemented "protothread" without any side-effects on the NPT
 		static uint8_t st_calls(0);
@@ -634,14 +519,12 @@ protected:
 	}
 
 	bool
-	isSpawningTaskSuccessful(uint8_t calls, uint8_t /*secondArgument*/)
+	isSpawningTaskSuccessful(uint8_t calls)
 	{ return (calls == 2); }
 
 public:
-	uint8_t state1;
-	uint8_t state2;
-	uint8_t state3;
-	bool success2;
+	uint8_t state;
+	bool success;
 };
 
 void
@@ -651,66 +534,32 @@ NestedProtothreadTest::testSpawn()
 
 	// sanity checks
 	TEST_ASSERT_FALSE(thread.isTaskRunning());
-	TEST_ASSERT_FALSE(thread.runParentTask1());
-	TEST_ASSERT_EQUALS(thread.state1, 0);
-	TEST_ASSERT_FALSE(thread.isTaskRunning());
+	TEST_ASSERT_EQUALS(thread.state, 0);
 	TEST_ASSERT_EQUALS(thread.getTaskDepth(), -1);
 
-	// lets start the first task
-	TEST_ASSERT_TRUE(thread.startParentTask1());
 	// should wait until the first condition
-	TEST_ASSERT_TRUE(thread.runParentTask1());
-	TEST_ASSERT_EQUALS(thread.state1, 1);
+	TEST_ASSERT_TRUE(thread.parentTask(this));
+	TEST_ASSERT_EQUALS(thread.state, 1);
 	// task should require `waits` number of calls
 	for (uint8_t ii = 0; ii < waits; ++ii)
 	{
-		TEST_ASSERT_TRUE(thread.runParentTask1());
-		TEST_ASSERT_EQUALS(thread.state1, 1);
+		TEST_ASSERT_TRUE(thread.parentTask(this));
+		TEST_ASSERT_EQUALS(thread.state, 1);
 	}
 	// now spawning task has started
-	TEST_ASSERT_TRUE(thread.runParentTask1());
-	TEST_ASSERT_EQUALS(thread.state1, 2);
+	TEST_ASSERT_TRUE(thread.parentTask(this));
+	TEST_ASSERT_EQUALS(thread.state, 2);
 	// task should require `waits` number of calls again
 	for (uint8_t ii = 0; ii < waits; ++ii)
 	{
-		TEST_ASSERT_TRUE(thread.runParentTask1());
-		TEST_ASSERT_EQUALS(thread.state1, 2);
+		TEST_ASSERT_TRUE(thread.parentTask(this));
+		TEST_ASSERT_EQUALS(thread.state, 2);
 	}
 	// now spawning task has finished
-	TEST_ASSERT_TRUE(thread.runParentTask1());
-	TEST_ASSERT_EQUALS(thread.state1, 3);
+	TEST_ASSERT_TRUE(thread.parentTask(this));
+	TEST_ASSERT_EQUALS(thread.state, 3);
 
 	// now parent task has finished
-	TEST_ASSERT_FALSE(thread.runParentTask1());
-	TEST_ASSERT_EQUALS(thread.state1, (waits == 2) ? 4 : 5);
-
-	// lets check the same for the compound method
-
-	// sanity checks
-	TEST_ASSERT_FALSE(thread.isTaskRunning());
-	TEST_ASSERT_FALSE(thread.runParentTask2());
-	TEST_ASSERT_EQUALS(thread.state2, 0);
-	TEST_ASSERT_FALSE(thread.isTaskRunning());
-	TEST_ASSERT_EQUALS(thread.getTaskDepth(), -1);
-
-	TEST_ASSERT_TRUE(thread.startParentTask2());
-	TEST_ASSERT_TRUE(thread.runParentTask2());
-	TEST_ASSERT_EQUALS(thread.state2, 1);
-	for (uint8_t ii = 0; ii < waits; ++ii)
-	{
-		TEST_ASSERT_TRUE(thread.runParentTask2());
-		TEST_ASSERT_EQUALS(thread.state2, 1);
-	}
-	TEST_ASSERT_TRUE(thread.runParentTask2());
-	TEST_ASSERT_EQUALS(thread.state2, 2);
-	for (uint8_t ii = 0; ii < waits; ++ii)
-	{
-		TEST_ASSERT_TRUE(thread.runParentTask2());
-		TEST_ASSERT_EQUALS(thread.state2, 2);
-	}
-	TEST_ASSERT_TRUE(thread.runParentTask2());
-	TEST_ASSERT_EQUALS(thread.state2, 3);
-
-	TEST_ASSERT_FALSE(thread.runParentTask2());
-	TEST_ASSERT_EQUALS(thread.state2, (waits == 2) ? 4 : 5);
+	TEST_ASSERT_FALSE(thread.parentTask(this));
+	TEST_ASSERT_EQUALS(thread.state, (waits == 2) ? 4 : 5);
 }

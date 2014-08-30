@@ -10,10 +10,8 @@
 #ifndef XPCC_NPT_THREAD_HPP
 #define XPCC_NPT_THREAD_HPP
 
-#include <stdint.h>
 #include "npt_macros.hpp"
 #include <xpcc/utils/arithmetic_traits.hpp>
-#include <cstring>
 
 namespace xpcc
 {
@@ -25,11 +23,18 @@ namespace pt
 typedef uint8_t Result;
 enum
 {
+	// reasons to stop
 	Stop = 0,
 	NestingError = (1 << 0),
 	Successful = (1 << 1),
-	Starting = (1 << 2),
-	Running = (1 << 3),
+
+	// reasons to wait
+	WrongContext = (1 << 2),
+	WrongState = (1 << 3),
+	Starting = (1 << 4),
+
+	// reasons to keep running
+	Running = (1 << 5),
 };
 
 /**
@@ -42,21 +47,42 @@ enum
  * It also allows you to call and run tasks within your tasks, so you can
  * reuse their functionality.
  *
- * Be aware that only one of these tasks can run at the same time, even
- * if it calls other tasks in its implementation.
- * If you need to run two seperate threads, use regular Protothreads.
- *
  * You are responsible to choosing the right nesting depth!
  * This class will guard itself against calling another task at too
  * deep a nesting level and inform you gently of this by returning
- * `false` from `startTask(task)`.
+ * `xpcc::pt::NestingError` from your called `task(ctx)`.
  * It is then up to you to recognise this in your program design
  * and increase the nesting depth or rethink your code.
  *
+ * Be aware that only one of these tasks can run at the same time.
+ * Even if you call other tasks, they will not allow you to run them
+ * until the conflicting tasks finished.
+ *
+ * Each task requires a context pointer, which is used to ensure the
+ * task only executes in the context that it was originally started from.
+ * If you call a task in a different context, it will return
+ * `xpcc::pt::WrongContext`.
+ * Similarly, if you call a different task of the same class in
+ * the same context, while another task is running, it will return
+ * `xpcc::pt::WrongState`.
+ * Using the `NPT_SPAWN` macro, you can wait for these tasks to become
+ * available, so you usually do not need to worry about those cases.
+ *
+ * You may include a condition which indicates that the task completed
+ * successfully using the `NPT_SUCCESS_IF` macro.
+ * This information is returned by the `NPT_SPAWN` macro and can be used
+ * to influence your program flow.
+ * If the condition within the `NPT_SUCCESS_IF` macro is not met, the tasks
+ * continues execution after this macro, which allows you
+ * to clean up any internal states before stopping.
+ *
  * Note that nested protothreads do not replace regular protothreads
  * (not even with a nesting level of zero)!
- * However, you can use a nested protothread within a regular protohread,
- * as you can see in the following (albeit slightly senseless) example:
+ * However, you should call nested protothread tasks within a regular protothread,
+ * where it is sufficient to use the `this` pointer of the class as context
+ * when calling the tasks.
+ *
+ * Here is a (slightly over-engineered) example:
  *
  * @code
  * #include <xpcc/architecture.hpp>
@@ -80,48 +106,46 @@ enum
  *         while (true)
  *         {
  *             Led::set();
- *             this->startTask(TASK_WAIT_FOR_TIMER);
- *             PT_WAIT_UNTIL(runTaskTimer());
- *
- *             Led::reset();
- *             this->startTask(TASK_SET_TIMER);
- *             PT_WAIT_UNTIL(runTaskSetTimer(200));
- *             PT_WAIT_UNTIL(this->timer.isExpired());
+ *             if (PT_RUN_TASK(waitForTimer(this)))
+ *             {
+ *                 Led::reset();
+ *                 PT_RUN_TASK(runTaskSetTimer(200));
+ *                 PT_WAIT_UNTIL(timer.isExpired());
+ *             }
  *         }
  *
  *         PT_END();
  *     }
  *
- *     bool
- *     runTaskTimer()
+ *     xpcc::pt::Result
+ *     waitForTimer(void *ctx)
  *     {
- *         NPT_BEGIN(TASK_WAIT_FOR_TIMER);
+ *         NPT_BEGIN(ctx);
  *
- *         this->startTask(TASK_SET_TIMER);
- *         NPT_WAIT_UNTIL(runTaskSetTimer(100));
+ *         NPT_SPAWN(setTimer(ctx, 100));
  *
- *         NPT_WAIT_UNTIL(this->timer.isExpired());
+ *         NPT_WAIT_UNTIL(timer.isExpired());
+ *
+ *         NPT_SUCCESS_IF(true);
  *
  *         NPT_END();
  *     }
  *
- *     bool
- *     runTaskSetTimer(uint16_t timeout)
+ *     xpcc::pt::Result
+ *     setTimer(void *ctx, uint16_t timeout)
  *     {
- *         NPT_BEGIN(TASK_SET_TIMER);
+ *         NPT_BEGIN(ctx);
  *
- *         this->timer.restart(timeout);
+ *         timer.restart(timeout);
+ *
+ *         NPT_SUCCESS_IF(timer.isRunning());
+ *
+ *         // clean up code goes here
  *
  *         NPT_END();
  *     }
  *
  * private:
- *    enum
- *    {
- *        TASK_SET_TIMER,
- *        TASK_WAIT_FOR_TIMER
- *    };
- *
  *     xpcc::Timeout<> timer;
  * };
  *
@@ -141,7 +165,7 @@ enum
  * @author	Niklas Hauser
  * @tparam	Depth	the nesting depth: the maximum of tasks that are called within tasks (should be < 128).
  */
-template< uint8_t Depth = 0 >
+template< uint8_t Depth >
 class NestedProtothread
 {
 protected:
@@ -149,37 +173,26 @@ protected:
 	/// "local continuation").
 	typedef uint16_t NPtState;
 
-public:
 	/// Construct a new nested protothread which will be stopped
 	NestedProtothread()
-	:	nptLevel(0)
+	:	nptLevel(0), nptContext(0)
 	{
-		stopTask();
+		this->stopTask();
 	}
 
-	/// Start a specific task at the current nesting level
-	/// @return	`true` if successful, `false` if the nesting is too deep
-	bool ALWAYS_INLINE
-	startTask(uint8_t task)
-	{
-		if (nestingOkNPt() && !isTaskRunning())
-		{
-			nptStateArray[nptLevel] = stateFromTask(task);
-			return true;
-		}
-		return false;
-	}
-
+public:
 	/// Force the task to stop running at the current nesting level
 	/// @warning	This will not allow the task to clean itself up!
 	inline void
 	stopTask()
 	{
-		uint8_t level = nptLevel;
-		while(level < Depth + 1)
+		uint_fast8_t level = nptLevel;
+		while (level < Depth + 1)
 		{
 			nptStateArray[level++] = NPtStopped;
 		}
+		if (nptLevel == 0)
+			nptContext = 0;
 	}
 
 	/// @return	`true` if a task is running at the current nesting level, else `false`
@@ -210,26 +223,26 @@ public:
 	 *
 	 * You need to implement this method in you subclass yourself.
 	 *
-	 * @return	`true` if still running, `false` if it has finished.
+	 * @return	>=`Starting` if still running, <=`Successful` if it has finished.
 	 */
-	bool
-	runTask();
+	xpcc::pt::Result
+	runTask(void *ctx, ...);
 #endif
 
 protected:
 	/// @internal
 	/// @{
 
-	// call this in the switch statement!
-	// @return current state before increasing nesting level
+	/// increases nesting level, call this in the switch statement!
+	/// @return current state before increasing nesting level
 	NPtState ALWAYS_INLINE
 	pushNPt()
 	{
 		return nptStateArray[nptLevel++];
 	}
 
-	// always call this before returning from the run function!
-	// decreases nesting level
+	/// always call this before returning from the run function!
+	/// decreases nesting level
 	void ALWAYS_INLINE
 	popNPt()
 	{
@@ -242,39 +255,49 @@ protected:
 	stopNPt()
 	{
 		nptStateArray[nptLevel-1] = NPtStopped;
+		if (nptLevel == 1)
+			nptContext = 0;
 	}
 
-	// sets the state of the parent nesting level
-	// @warning	be aware in which nesting level you call this! (before popNPt()!)
+	/// sets the state of the parent nesting level
+	/// @warning	be aware in which nesting level you call this! (before popNPt()!)
 	void ALWAYS_INLINE
 	setNPt(NPtState state)
 	{
 		nptStateArray[nptLevel-1] = state;
 	}
 
+	/// @return `true` if the nesting depth allows for another level.
+	/// @warning	be aware in which nesting level you call this! (before pushNPt()!)
 	bool ALWAYS_INLINE
 	nestingOkNPt()
 	{
 		return (nptLevel < Depth + 1);
 	}
 
-	// the task will be subtracted from the maximum of the NPtState
-	// and with this being an uint16_t, you would have to have a file
-	// with more than 65.000 lines to come into trouble here.
-	// Also if you have more than 255 tasks in the same class, there
-	// is something wrong with your concept...
-	static constexpr NPtState
-	stateFromTask(uint8_t task)
+	/// @return `true` if the task is called in the same context, or the context is not set
+	///			`false` if the task is claimed by another context
+	bool inline
+	beginNPt(void *ctx)
 	{
-		return static_cast<NPtState>(xpcc::ArithmeticTraits<NPtState>::max - 1 - task);
+		if (ctx == nptContext)
+			return true;
+
+		if (nptContext == 0) {
+			nptContext = ctx;
+			return true;
+		}
+
+		return false;
 	}
 	/// @}
 
 protected:
 	static constexpr NPtState NPtStopped = static_cast<NPtState>(xpcc::ArithmeticTraits<NPtState>::max);
-
+private:
 	uint8_t nptLevel;
 	NPtState nptStateArray[Depth+1];
+	void *nptContext;
 };
 
 // ----------------------------------------------------------------------------
@@ -283,29 +306,19 @@ protected:
 template <>
 class NestedProtothread<0>
 {
-public:
+protected:
 	typedef uint16_t NPtState;
 
 	NestedProtothread() :
-		nptState(NPtStopped), inNPt(false)
+		nptState(NPtStopped), nptLevel(-1), nptContext(0)
 	{
 	}
 
-	inline bool
-	startTask(uint8_t task)
-	{
-		if ((nptState == NPtStopped) && !inNPt)
-		{
-			nptState = stateFromTask(task);
-			return true;
-		}
-		return false;
-	}
-
+public:
 	void ALWAYS_INLINE
 	stopTask()
 	{
-		nptState = NPtStopped;
+		this->stopNPt();
 	}
 
 	bool ALWAYS_INLINE
@@ -317,7 +330,7 @@ public:
 	int8_t ALWAYS_INLINE
 	getTaskDepth()
 	{
-		return inNPt ? 0 : -1;
+		return nptLevel;
 	}
 
 protected:
@@ -326,26 +339,27 @@ protected:
 	NPtState ALWAYS_INLINE
 	pushNPt()
 	{
-		inNPt = true;
+		nptLevel = 0;
 		return nptState;
 	}
 
 	void ALWAYS_INLINE
 	popNPt()
 	{
-		inNPt = false;
+		nptLevel = -1;
 	}
 
 	void ALWAYS_INLINE
 	stopNPt()
 	{
 		nptState = NPtStopped;
+		nptContext = 0;
 	}
 
 	bool ALWAYS_INLINE
 	nestingOkNPt()
 	{
-		return !inNPt;
+		return (nptLevel == -1);
 	}
 
 	void ALWAYS_INLINE
@@ -354,18 +368,27 @@ protected:
 		nptState = state;
 	}
 
-	static constexpr NPtState
-	stateFromTask(uint8_t task)
+	bool inline
+	beginNPt(void *ctx)
 	{
-		return static_cast<NPtState>(xpcc::ArithmeticTraits< NPtState >::max - 1 - task);
+		if (ctx == nptContext)
+			return true;
+
+		if (nptContext == 0) {
+			nptContext = ctx;
+			return true;
+		}
+
+		return false;
 	}
 	/// @}
 
 protected:
 	static constexpr NPtState NPtStopped = static_cast<NPtState>(xpcc::ArithmeticTraits<NPtState>::max);
-
+private:
 	NPtState nptState;
-	bool inNPt;
+	int8_t nptLevel;
+	void *nptContext;
 };
 /// @endcond
 

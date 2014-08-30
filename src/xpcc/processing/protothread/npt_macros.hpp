@@ -14,14 +14,16 @@
 
 /**
  * Declare start of a generic nested protothread task.
- * This will immidiately return if the nesting is too deep.
+ * This will immidiately return if the nesting is too deep
+ * or if it was called in a different context than it was started in.
  *
- * @warning	Use at start of the `runTask()` implementation!
+ * @warning	Use at start of the `task(ctx)` implementation!
  * @ingroup	protothread
  * @hideinitializer
  */
-#define NPT_BEGIN() \
+#define NPT_BEGIN(context) \
 	if (!this->nestingOkNPt()) return xpcc::pt::NestingError; \
+	if (!this->beginNPt(context)) return xpcc::pt::WrongContext; \
 	xpcc::pt::Result nptResult ATTRIBUTE_UNUSED = xpcc::pt::Stop; \
 	switch (this->pushNPt()) { \
 		case NPtStopped: \
@@ -29,37 +31,28 @@
 		case __LINE__: ;
 
 /**
- * Declare start of a specific nested protothread task, with the task id.
- *
- * @warning	Use at start of the `runTask()` implementation!
- * @ingroup	protothread
- * @hideinitializer
- */
-#define NPT_BEGIN_TASK(task) \
-	xpcc::pt::Result nptResult ATTRIBUTE_UNUSED = xpcc::pt::Stop; \
-	switch (this->pushNPt()) { \
-		case stateFromTask(task): ;
-
-/**
  * Stop protothread task and end it.
  *
- * @warning	Use at end of the `runTask()` implementation!
+ * @warning	Use at end of the `task(ctx)` implementation!
  * @ingroup	protothread
  * @hideinitializer
  */
 #define NPT_END() \
 			this->stopNPt(); \
-		default: ; \
+			break; \
+		default: \
+			this->popNPt(); \
+			return xpcc::pt::WrongState; \
 	} \
 	this->popNPt(); \
 	return xpcc::pt::Stop;
 
 /**
-* Yield protothread task till next call to its `runTask()`.
-*
-* \ingroup	protothread
-* \hideinitializer
-*/
+ * Yield protothread task till next call to its `runTask()`.
+ *
+ * @ingroup	protothread
+ * @hideinitializer
+ */
 #define NPT_YIELD() \
 	do { \
 			this->setNPt(__LINE__); \
@@ -111,7 +104,7 @@
 	} while (0)
 
 /**
- * Causes Protothread to wait **until** given `condition` is true.
+ * Causes protothread to wait **until** given `condition` is true.
  * Use this when waiting for a starting condition.
  *
  * @ingroup	protothread
@@ -121,7 +114,8 @@
 	NPT_WAIT_WHILE_START(!(condition))
 
 /**
- * Causes Protothread to stop successfully if given `condition` is true.
+ * Causes protothread to stop successfully if given `condition` is true.
+ * If the `condition` is not met, the program flow continues.
  *
  * @ingroup	protothread
  * @hideinitializer
@@ -136,8 +130,7 @@
 	} while (0)
 
 /**
- * Spawns a given compound task, and returns
- * whether the task completed successfully or not.
+ * Spawns a given task, and returns whether the task completed successfully or not.
  *
  * @ingroup	protothread
  * @hideinitializer
