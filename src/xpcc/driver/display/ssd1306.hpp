@@ -79,9 +79,7 @@ class Ssd1306 : public ssd1306, public xpcc::I2cDevice<I2cMaster>,
 public:
 	Ssd1306(uint8_t address = 0x3C);
 
-	/**
-	 * Automatically update the display with the content of the RAM buffer.
-	 */
+	/// Automatically update the display with the content of the RAM buffer.
 	virtual void
 	update();
 
@@ -93,52 +91,52 @@ public:
 		timer.restart(1000/framesPerSecond);
 	}
 
-
 	bool
-	startPing();
+	sync()
+	{
+		return (i2cTask == I2cTask::WriteDisplay);
+	}
 
-	xpcc::pt::Result inline
-	runPing();
-
+	// MARK: - TASKS
+	/// pings the diplay
+	xpcc::pt::Result
+	ping(void *ctx);
 
 	/// initializes for 3V3 with charge-pump
-	bool ALWAYS_INLINE
-	startInitialize();
-
 	xpcc::pt::Result
-	runInitialize();
-
+	initialize(void *ctx);
 
 	/// Starts a frame transfer to the display
 	/// You can use this to avoid tearing or to
 	/// get higher frames rates than 10Hz, if the I2C speed allows for it.
-	bool ALWAYS_INLINE
-	startWriteDisplay();
-
 	xpcc::pt::Result
-	runWriteDisplay();
+	writeDisplay(void *ctx);
 
-protected:
+	/// invert the display
+	xpcc::pt::Result ALWAYS_INLINE
+	invertDisplay(void *ctx, bool inverted = true);
+
+
 	/// Write a command without data
 	xpcc::pt::Result
-	writeCommand(uint8_t command);
+	writeCommand(void *ctx, uint8_t command);
 
 	/// Write a command with one byte data
 	xpcc::pt::Result
-	writeCommand(uint8_t command, uint8_t data);
+	writeCommand(void *ctx, uint8_t command, uint8_t data);
 
 	/// Write a command with two bytes data
 	xpcc::pt::Result
-	writeCommand(uint8_t command, uint8_t data1, uint8_t data2);
+	writeCommand(void *ctx, uint8_t command, uint8_t data1, uint8_t data2);
 
 	/// Write a command with 5 bytes data (for scrolling)
 	xpcc::pt::Result
-	writeCommand(uint8_t command,
+	writeCommand(void *ctx, uint8_t command,
 			uint8_t data1, uint8_t data2, uint8_t data3, uint8_t data4, uint8_t data5);
 
 	/// Write a command with 6 bytes data (for scrolling)
 	xpcc::pt::Result
-	writeCommand(uint8_t command,
+	writeCommand(void *ctx, uint8_t command,
 			uint8_t data1, uint8_t data2, uint8_t data3, uint8_t data4, uint8_t data5, uint8_t data6);
 
 private:
@@ -162,6 +160,7 @@ private:
 		{
 			Initialize,
 			WriteDisplay,
+			InvertDisplay,
 		};
 	};
 
@@ -223,6 +222,7 @@ private:
 	uint8_t commandBuffer[14];
 	bool initSuccessful;
 	xpcc::PeriodicTimer<> timer;
+	bool updateWrite;
 	xpcc::I2cTagAdapter<xpcc::I2cWriteReadAdapter> adapter;
 	xpcc::I2cTagAdapter<DataTransmissionAdapter> adapterData;
 
