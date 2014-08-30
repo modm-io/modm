@@ -31,6 +31,23 @@
 		case __LINE__: ;
 
 /**
+ * Declare start of a generic nested protothread task.
+ * This will not do any checking of nesting level or context.
+ * You can use this for purely internal tasks, where the checks
+ * have already been performed externally (in the parent task).
+ *
+ * @warning	Use at start of the `task(ctx)` implementation!
+ * @ingroup	protothread
+ * @hideinitializer
+ */
+#define NPT_BEGIN_INTERNAL() \
+	xpcc::pt::Result nptResult ATTRIBUTE_UNUSED = xpcc::pt::Stop; \
+	switch (this->pushNPt()) { \
+		case NPtStopped: \
+			this->setNPt(__LINE__); \
+		case __LINE__: ;
+
+/**
  * Stop protothread task and end it.
  *
  * @warning	Use at end of the `task(ctx)` implementation!

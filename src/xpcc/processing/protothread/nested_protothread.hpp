@@ -19,22 +19,22 @@ namespace xpcc
 namespace pt
 {
 
-/// State returned for compound tasks.
+/// State returned for all tasks in nested protothreads.
 typedef uint8_t Result;
 enum
 {
 	// reasons to stop
-	Stop = 0,
-	NestingError = (1 << 0),
-	Successful = (1 << 1),
+	Stop = 0,					///< Task finished unsuccessfully
+	NestingError = (1 << 0),	///< Nested protothread has run out of nesting levels to start this task
+	Successful = (1 << 1),		///< Task finished successfully
 
 	// reasons to wait
-	WrongContext = (1 << 2),
-	WrongState = (1 << 3),
-	Starting = (1 << 4),
+	WrongContext = (1 << 2),	///< Task is already running in a different context
+	WrongState = (1 << 3),		///< Another task of the same nested protothread is already running in this context
+	Starting = (1 << 4),		///< Task is starting
 
 	// reasons to keep running
-	Running = (1 << 5),
+	Running = (1 << 5),			///< Task is running
 };
 
 /**
@@ -53,6 +53,12 @@ enum
  * `xpcc::pt::NestingError` from your called `task(ctx)`.
  * It is then up to you to recognise this in your program design
  * and increase the nesting depth or rethink your code.
+ *
+ * For tasks that are used purely inside your implementation,
+ * you may use the `NPT_BEGIN_INTERNAL` macro, which omits these
+ * checks for faster execution speed.
+ * Make sure these tasks are only called inside a task secured
+ * with a regular `NPT_BEGIN` macro.
  *
  * Be aware that only one of these tasks can run at the same time.
  * Even if you call other tasks, they will not allow you to run them
@@ -106,12 +112,12 @@ enum
  *         while (true)
  *         {
  *             Led::set();
- *             if (PT_RUN_TASK(waitForTimer(this)))
- *             {
- *                 Led::reset();
- *                 PT_RUN_TASK(runTaskSetTimer(200));
- *                 PT_WAIT_UNTIL(timer.isExpired());
- *             }
+ *             PT_RUN_TASK(waitForTimer(this)))
+ *
+ *             Led::reset();
+ *             PT_RUN_TASK(setTimer(this, 200));
+ *
+ *             PT_WAIT_UNTIL(timer.isExpired());
  *         }
  *
  *         PT_END();
@@ -122,11 +128,13 @@ enum
  *     {
  *         NPT_BEGIN(ctx);
  *
- *         NPT_SPAWN(setTimer(ctx, 100));
+ *         // nested calling is allowed
+ *         if (NPT_SPAWN(setTimer(ctx, 100)))
+ *         {
+ *             NPT_WAIT_UNTIL(timer.isExpired());
+ *         }
  *
- *         NPT_WAIT_UNTIL(timer.isExpired());
- *
- *         NPT_SUCCESS_IF(true);
+ *         // NPT_SUCCESS_IF is optional
  *
  *         NPT_END();
  *     }
