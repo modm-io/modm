@@ -150,7 +150,7 @@ public:
 class I2cWriteReadAdapter : public I2cTransaction
 {
 public:
-	///	@param	address	the slave address not yet shifted right (address < 128).
+	///	@param	address	the slave address not yet shifted left (address < 128).
 	I2cWriteReadAdapter(uint8_t address)
 	:	address(address << 1), readSize(0), writeSize(0),
 		readBuffer(nullptr), writeBuffer(nullptr),
@@ -166,7 +166,7 @@ public:
 		return state;
 	}
 
-	/// @return true while adapter is busy
+	/// @return `true` while adapter is busy
 	bool inline
 	isBusy()
 	{
@@ -213,9 +213,7 @@ public:
 	}
 
 	/**
-	 * Initializes the adapter with the required information for a write operation
-	 *
-	 * The slave address is not configured, so use this method during normal operation to change buffers.
+	 * Initializes the adapter with the required information for a write operation.
 	 *
 	 * @param[in] 	buffer	buffer to be written to the slave
 	 * @param		size	number of bytes to be written, set to `0` to write nothing
@@ -230,9 +228,7 @@ public:
 	}
 
 	/**
-	 * Initializes the adapter with the required information for a read operation
-	 *
-	 * The slave address is not configured, so use this method during normal operation to change buffers.
+	 * Initializes the adapter with the required information for a read operation.
 	 *
 	 * @param[out] 	buffer	buffer to be read from the slave
 	 * @param		size	number of bytes to be read, set to `0` to read nothing
@@ -316,7 +312,7 @@ protected:
 class I2cWriteAdapter : public I2cTransaction
 {
 public:
-	///	@param	address	the slave address not yet shifted right (address < 128).
+	///	@param	address	the slave address not yet shifted left (address < 128).
 	I2cWriteAdapter(uint8_t address)
 	:	address(address << 1), size(0), buffer(nullptr), state(AdapterState::Idle)
 	{
@@ -330,7 +326,7 @@ public:
 		return state;
 	}
 
-	/// @return true while adapter is busy
+	/// @return `true` while adapter is busy
 	bool inline
 	isBusy()
 	{
@@ -350,9 +346,7 @@ public:
 	}
 
 	/**
-	 * Initializes the adapter with the required information for a write operation
-	 *
-	 * The slave address is not configured, so use this method during normal operation to change buffers.
+	 * Initializes the adapter with the required information for a write operation.
 	 *
 	 * @param[in] 	buffer	buffer to be written to the slave
 	 * @param		size	number of bytes to be written, set to `0` to write nothing
@@ -428,7 +422,7 @@ protected:
 class I2cReadAdapter : public I2cTransaction
 {
 public:
-	///	@param	address	the slave address not yet shifted right (address < 128).
+	///	@param	address	the slave address not yet shifted left (address < 128).
 	I2cReadAdapter(uint8_t address)
 	:	address(address << 1), size(0), buffer(nullptr), state(AdapterState::Idle)
 	{
@@ -442,7 +436,7 @@ public:
 		return state;
 	}
 
-	/// @return true while adapter is busy
+	/// @return `true` while adapter is busy
 	bool inline
 	isBusy()
 	{
@@ -462,9 +456,7 @@ public:
 	}
 
 	/**
-	 * Initializes the adapter with the required information for a read operation
-	 *
-	 * The slave address is not configured, so use this method during normal operation to change buffers.
+	 * Initializes the adapter with the required information for a read operation.
 	 *
 	 * @param[out] 	buffer	buffer to be read from the slave
 	 * @param		size	number of bytes to be read, set to `0` to read nothing

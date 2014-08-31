@@ -143,14 +143,14 @@ struct Gpio
 	 */
 	static constexpr bool Low = false;
 	static constexpr bool High = true;
-	/// }@
+	/// @}
 };
 
 /**
  * Input interface of an I/O pin.
  *
- * Even if the wrapped pin can only be used as input it is not configured that
- * way from the beginning. So remember to call `setInput()` after startup!
+ * The pin is not automatically set as an input after startup,
+ * so remember to call `setInput()` after startup!
  *
  * @ingroup	gpio
  */
@@ -171,8 +171,8 @@ public:
 /**
  * Output interface of an I/O pin.
  *
- * Even if the pin can only be used as output it is not configured that
- * way from the beginning. So remember to call `setOutput()` after startup!
+ * The pin is not automatically set as an output after startup,
+ * so remember to call `setOutput()` after startup!
  *
  * @ingroup	gpio
  */
