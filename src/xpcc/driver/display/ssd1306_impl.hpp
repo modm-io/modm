@@ -53,6 +53,7 @@ template < class I2cMaster >
 xpcc::pt::Result
 xpcc::Ssd1306<I2cMaster>::initialize(void *ctx)
 {
+	static bool initSuccessful;
 	NPT_BEGIN(ctx);
 
 	initSuccessful = true;

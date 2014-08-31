@@ -210,10 +210,9 @@ private:
 	volatile uint8_t i2cTask;
 	volatile uint8_t i2cSuccess;
 	uint8_t commandBuffer[14];
-	bool initSuccessful;
 	xpcc::PeriodicTimer<> timer;
 	bool updateWrite;
-	xpcc::I2cTagAdapter<xpcc::I2cWriteReadAdapter> adapter;
+	xpcc::I2cTagAdapter<xpcc::I2cWriteAdapter> adapter;
 	xpcc::I2cTagAdapter<DataTransmissionAdapter> adapterData;
 
 };
