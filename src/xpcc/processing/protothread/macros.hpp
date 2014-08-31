@@ -125,10 +125,10 @@
 		this->ptState = __LINE__; \
 		case __LINE__: \
 			ptResult = task; \
-			if (ptResult > xpcc::pt::Successful) { \
+			if (ptResult > xpcc::pt::Success) { \
 				return true; \
 			} \
-			(ptResult == xpcc::pt::Successful); \
+			(ptResult == xpcc::pt::Success); \
 	})
 
 /**

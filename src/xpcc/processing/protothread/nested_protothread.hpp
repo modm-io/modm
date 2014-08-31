@@ -20,22 +20,28 @@ namespace pt
 {
 
 /// State returned for all tasks in nested protothreads.
+/// @{
 typedef uint8_t Result;
 enum
 {
 	// reasons to stop
+	// values of Stop and Abort MUST NOT BE CHANGED!
 	Stop = 0,					///< Task finished unsuccessfully
-	NestingError = (1 << 0),	///< Nested protothread has run out of nesting levels to start this task
-	Successful = (1 << 1),		///< Task finished successfully
+	Abort = 1,					///< Task was aborted by user
+	NestingError = (1 << 1),	///< Nested protothread has run out of nesting levels to start this task
+	Success = (1 << 2),			///< Task finished successfully
 
 	// reasons to wait
-	WrongContext = (1 << 2),	///< Task is already running in a different context
-	WrongState = (1 << 3),		///< Another task of the same nested protothread is already running in this context
-	Starting = (1 << 4),		///< Task is starting
+	WrongContext = (1 << 4),	///< Task is already running in a different context
+	WrongState = (1 << 5),		///< Another task of the same nested protothread is already running in this context
+	Starting = (1 << 6),		///< Task is starting
 
 	// reasons to keep running
-	Running = (1 << 5),			///< Task is running
+	Running = (1 << 7),			///< Task is running
 };
+/// @}
+/// Passing this context will abort a tast and invoke its abortion handler code.
+static void * const ContextAbort = reinterpret_cast<void *>(1);
 
 /**
  * A version of `Protothread` which allows nested calling of tasks.
@@ -53,12 +59,6 @@ enum
  * `xpcc::pt::NestingError` from your called `task(ctx)`.
  * It is then up to you to recognise this in your program design
  * and increase the nesting depth or rethink your code.
- *
- * For tasks that are used purely inside your implementation,
- * you may use the `NPT_BEGIN_INTERNAL` macro, which omits these
- * checks for faster execution speed.
- * Make sure these tasks are only called inside a task secured
- * with a regular `NPT_BEGIN` macro.
  *
  * Be aware that only one of these tasks can run at the same time.
  * Even if you call other tasks, they will not allow you to run them
@@ -79,14 +79,32 @@ enum
  * This information is returned by the `NPT_SPAWN` macro and can be used
  * to influence your program flow.
  * If the condition within the `NPT_SUCCESS_IF` macro is not met, the tasks
- * continues execution after this macro, which allows you
- * to clean up any internal states before stopping.
+ * continues execution after this macro, which allows you to recover or try again.
+ * You may use multiple `NPT_SUCCESS_IF` macros if your task branches internally
+ * or if the task was able to recover successfully, or a "retry n-times"
+ * mechanism is desired.
+ * Since the `NPT_SUCCESS_IF` macro does not automatically yield the task
+ * if the condition is not met, it should be used with caution in a while loop.
  *
- * Note that nested protothreads do not replace regular protothreads
- * (not even with a nesting level of zero)!
- * However, you should call nested protothread tasks within a regular protothread,
- * where it is sufficient to use the `this` pointer of the class as context
- * when calling the tasks.
+ * The execution of any running task may be aborted by passing `xpcc::pt::ContextAbort`
+ * as a context pointer.
+ * This will cause the task to execute the (optional) abortion code defined in
+ * `NPT_END_ON_ABORT(code)` and then immediately return `xpcc::pt::Abort`.
+ * If the task is currently spawning another task, the abort signal will be
+ * handed down to the deepest spawning task, which will then recursively
+ * call the abortion codes of the parent tasks, before returning `xpcc::pt::Abort`.
+ * An abortion may also be triggered by a task itself by calling `NPT_ABORT()`,
+ * which will also execute abortion code before handing the signal to its parent task.
+ *
+ * Be aware that when an abort signal is received, the entire chain of tasks must
+ * return immediately. It is therefore not possible to use any asynchronous calls
+ * in the aborting code! (You *can* try, but it might cause a dead-lock!).
+ * Therefore instead of using `NPT_ABORT()` inside your tasks, consider letting
+ * your task recover its states (asynchronously) and then exit using `NPT_EXIT()`.
+ *
+ *
+ * Note that you must call nested protothread tasks within a regular protothread.
+ * It is sufficient to use the `this` pointer of the class as context when calling the tasks.
  *
  * Here is a (slightly over-engineered) example:
  *
@@ -223,18 +241,13 @@ public:
 	 *
 	 * This handles very much like a protothread, however you can have more than
 	 * one task in your class.
-	 * You can call and run other tasks within your tasks using the
-	 * `startTask(task)` method, depending on the nesting depth you choose.
-	 *
-	 * It is safe to call the method of a task that has not been started,
-	 * as it will simply return `false`, but not change any internal status.
 	 *
 	 * You need to implement this method in you subclass yourself.
 	 *
 	 * @return	>=`Starting` if still running, <=`Successful` if it has finished.
 	 */
 	xpcc::pt::Result
-	runTask(void *ctx, ...);
+	task(void *ctx, ...);
 #endif
 
 protected:
@@ -259,7 +272,7 @@ protected:
 
 	// invalidates the parent nesting level
 	// @warning	be aware in which nesting level you call this! (before popNPt()!)
-	void ALWAYS_INLINE
+	void inline
 	stopNPt()
 	{
 		nptStateArray[nptLevel-1] = NPtStopped;
@@ -283,16 +296,37 @@ protected:
 		return (nptLevel < Depth + 1);
 	}
 
+	xpcc::pt::Result inline
+	getDefaultNPt()
+	{
+		if (nptStateArray[nptLevel] > NPtAbort)
+			return xpcc::pt::WrongState;
+		return nptStateArray[nptLevel];
+	}
+
 	/// @return `true` if the task is called in the same context, or the context is not set
 	///			`false` if the task is claimed by another context
 	bool inline
 	beginNPt(void *ctx)
 	{
+		// only one comparison, if this task is called in the same context
 		if (ctx == nptContext)
 			return true;
 
-		if (nptContext == 0) {
+		// three comparisons + assignment, if this task is called for the first time
+		if (nptContext == 0 && ctx != ContextAbort) {
 			nptContext = ctx;
+			return true;
+		}
+
+		// three comparisons + two comparisons + one assignment, if this running task is aborted
+		if (ctx == ContextAbort) {
+			// only if this task is currently not spawning we abort,
+			// otherweise we forward the abort context to the spawning task
+			if (!(nptLevel < Depth && nptStateArray[nptLevel+1] != NPtStopped))
+			{
+				nptStateArray[nptLevel] = NPtAbort;
+			}
 			return true;
 		}
 
@@ -301,7 +335,8 @@ protected:
 	/// @}
 
 protected:
-	static constexpr NPtState NPtStopped = static_cast<NPtState>(xpcc::ArithmeticTraits<NPtState>::max);
+	static constexpr NPtState NPtAbort = static_cast<NPtState>(Abort);
+	static constexpr NPtState NPtStopped = static_cast<NPtState>(Stop);
 private:
 	uint8_t nptLevel;
 	NPtState nptStateArray[Depth+1];
@@ -376,14 +411,27 @@ protected:
 		nptState = state;
 	}
 
+	xpcc::pt::Result inline
+	getDefaultNPt()
+	{
+		if (nptState > NPtAbort)
+			return xpcc::pt::WrongState;
+		return nptState;
+	}
+
 	bool inline
 	beginNPt(void *ctx)
 	{
 		if (ctx == nptContext)
 			return true;
 
-		if (nptContext == 0) {
+		if (nptContext == 0 && ctx != ContextAbort) {
 			nptContext = ctx;
+			return true;
+		}
+
+		if (ctx == ContextAbort) {
+			nptState = NPtAbort;
 			return true;
 		}
 
@@ -392,7 +440,8 @@ protected:
 	/// @}
 
 protected:
-	static constexpr NPtState NPtStopped = static_cast<NPtState>(xpcc::ArithmeticTraits<NPtState>::max);
+	static constexpr NPtState NPtAbort = static_cast<NPtState>(Abort);
+	static constexpr NPtState NPtStopped = static_cast<NPtState>(Stop);
 private:
 	NPtState nptState;
 	int8_t nptLevel;

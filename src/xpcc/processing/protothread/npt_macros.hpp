@@ -25,30 +25,14 @@
 	if (!this->nestingOkNPt()) return xpcc::pt::NestingError; \
 	if (!this->beginNPt(context)) return xpcc::pt::WrongContext; \
 	xpcc::pt::Result nptResult ATTRIBUTE_UNUSED = xpcc::pt::Stop; \
+	beginning: ATTRIBUTE_UNUSED; \
 	switch (this->pushNPt()) { \
 		case NPtStopped: \
 			this->setNPt(__LINE__); \
 		case __LINE__: ;
 
 /**
- * Declare start of a generic nested protothread task.
- * This will not do any checking of nesting level or context.
- * You can use this for purely internal tasks, where the checks
- * have already been performed externally (in the parent task).
- *
- * @warning	Use at start of the `task(ctx)` implementation!
- * @ingroup	protothread
- * @hideinitializer
- */
-#define NPT_BEGIN_INTERNAL() \
-	xpcc::pt::Result nptResult ATTRIBUTE_UNUSED = xpcc::pt::Stop; \
-	switch (this->pushNPt()) { \
-		case NPtStopped: \
-			this->setNPt(__LINE__); \
-		case __LINE__: ;
-
-/**
- * Stop protothread task and end it.
+ * End the protothread task.
  *
  * @warning	Use at end of the `task(ctx)` implementation!
  * @ingroup	protothread
@@ -56,13 +40,31 @@
  */
 #define NPT_END() \
 			this->stopNPt(); \
-			break; \
 		default: \
 			this->popNPt(); \
-			return xpcc::pt::WrongState; \
-	} \
-	this->popNPt(); \
-	return xpcc::pt::Stop;
+			return this->getDefaultNPt(); \
+	}
+
+/**
+ * End protothread task.
+ * On task abortion, the specified code is executed.
+ * You may use brackets `{ code; }` to write a larger code block.
+ *
+ * @warning	Use at end of the `task(ctx)` implementation!
+ * @ingroup	protothread
+ * @hideinitializer
+ */
+#define NPT_END_ON_ABORT(code) \
+			this->stopNPt(); \
+		default: \
+			this->popNPt(); \
+			return this->getDefaultNPt(); \
+		case NPtAbort: \
+			{  code; }; \
+			this->stopNPt(); \
+			this->popNPt(); \
+			return xpcc::pt::Abort; \
+	}
 
 /**
  * Yield protothread task till next call to its `runTask()`.
@@ -71,12 +73,10 @@
  * @hideinitializer
  */
 #define NPT_YIELD() \
-	do { \
 			this->setNPt(__LINE__); \
 			this->popNPt(); \
 			return xpcc::pt::Running; \
-		case __LINE__: ; \
-	} while (0)
+		case __LINE__: ;
 
 /**
  * Cause protothread task to wait **while** given `condition` is true.
@@ -111,14 +111,12 @@
  * @hideinitializer
  */
 #define NPT_WAIT_WHILE_START(condition) \
-	do { \
 			this->setNPt(__LINE__); \
 		case __LINE__: \
 			if (condition) { \
 				this->popNPt(); \
 				return xpcc::pt::Starting; \
-			} \
-	} while (0)
+			}
 
 /**
  * Causes protothread to wait **until** given `condition` is true.
@@ -138,13 +136,23 @@
  * @hideinitializer
  */
 #define NPT_SUCCESS_IF(condition) \
-	do { \
 			if (condition) { \
 				this->stopNPt(); \
 				this->popNPt(); \
-				return xpcc::pt::Successful; \
-			} \
-	} while (0)
+				return xpcc::pt::Success; \
+			}
+
+/**
+* Causes protothread to execute the (optional) abort code declared in
+* in `NPT_END_ON_ABORT(code)` before recursively aborting its parent tasks.
+*
+* @ingroup	protothread
+* @hideinitializer
+*/
+#define NPT_ABORT() \
+			this->setNPt(NPtAbort); \
+			this->popNPt(); \
+			goto beginning;
 
 /**
  * Spawns a given task, and returns whether the task completed successfully or not.
@@ -157,11 +165,16 @@
 			this->setNPt(__LINE__); \
 		case __LINE__: \
 			nptResult = task; \
-			if (nptResult > xpcc::pt::Successful) { \
+			if (nptResult > xpcc::pt::Success) { \
 				this->popNPt(); \
 				return xpcc::pt::Running; \
 			} \
-			(nptResult == xpcc::pt::Successful); \
+			if (nptResult == xpcc::pt::Abort) { \
+				this->setNPt(NPtAbort); \
+				this->popNPt(); \
+				goto beginning; \
+			} \
+			(nptResult == xpcc::pt::Success); \
 	})
 
 /**
@@ -171,10 +184,8 @@
  * @hideinitializer
  */
 #define NPT_EXIT() \
-	do { \
 			this->stopNPt(); \
 			this->popNPt(); \
-			return xpcc::pt::Stop; \
-	} while (0)
+			return xpcc::pt::Stop;
 
 #endif // XPCC_NPT_MACROS_HPP

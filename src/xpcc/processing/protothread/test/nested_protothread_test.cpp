@@ -8,8 +8,6 @@
 // ----------------------------------------------------------------------------
 
 #include <xpcc/processing/protothread.hpp>
-#include <iostream>
-
 #include "nested_protothread_test.hpp"
 
 // ----------------------------------------------------------------------------
@@ -256,7 +254,7 @@ public:
 		NPT_YIELD();
 
 		// manual spawn
-		NPT_WAIT_WHILE((callResult1 = task2(ctx)) > xpcc::pt::Successful);
+		NPT_WAIT_WHILE((callResult1 = task2(ctx)) > xpcc::pt::Success);
 
 		state1 = 3;
 
@@ -282,7 +280,7 @@ protected:
 
 		NPT_YIELD();
 
-		NPT_WAIT_WHILE((callResult2 = task3(ctx)) > xpcc::pt::Successful);
+		NPT_WAIT_WHILE((callResult2 = task3(ctx)) > xpcc::pt::Success);
 
 		state2 = 3;
 
@@ -538,28 +536,353 @@ NestedProtothreadTest::testSpawn()
 	TEST_ASSERT_EQUALS(thread.getTaskDepth(), -1);
 
 	// should wait until the first condition
-	TEST_ASSERT_TRUE(thread.parentTask(this));
+	TEST_ASSERT_EQUALS(thread.parentTask(this), xpcc::pt::Running);
 	TEST_ASSERT_EQUALS(thread.state, 1);
 	// task should require `waits` number of calls
 	for (uint8_t ii = 0; ii < waits; ++ii)
 	{
-		TEST_ASSERT_TRUE(thread.parentTask(this));
+		TEST_ASSERT_EQUALS(thread.parentTask(this), xpcc::pt::Running);
 		TEST_ASSERT_EQUALS(thread.state, 1);
 	}
 	// now spawning task has started
-	TEST_ASSERT_TRUE(thread.parentTask(this));
+	TEST_ASSERT_EQUALS(thread.parentTask(this), xpcc::pt::Running);
 	TEST_ASSERT_EQUALS(thread.state, 2);
 	// task should require `waits` number of calls again
 	for (uint8_t ii = 0; ii < waits; ++ii)
 	{
-		TEST_ASSERT_TRUE(thread.parentTask(this));
+		TEST_ASSERT_EQUALS(thread.parentTask(this), xpcc::pt::Running);
 		TEST_ASSERT_EQUALS(thread.state, 2);
 	}
 	// now spawning task has finished
-	TEST_ASSERT_TRUE(thread.parentTask(this));
+	TEST_ASSERT_EQUALS(thread.parentTask(this), xpcc::pt::Running);
 	TEST_ASSERT_EQUALS(thread.state, 3);
 
 	// now parent task has finished
-	TEST_ASSERT_FALSE(thread.parentTask(this));
+	TEST_ASSERT_EQUALS(thread.parentTask(this), xpcc::pt::Stop);
 	TEST_ASSERT_EQUALS(thread.state, (waits == 2) ? 4 : 5);
+}
+
+
+class TestingAbortingThread : public xpcc::pt::NestedProtothread<2>
+{
+public:
+	TestingAbortingThread()
+	:	state1(0), state2(0), state3(0),
+		success1(false), success2(false), success3(false)
+	{
+	}
+
+	xpcc::pt::Result
+	task1(void *ctx)
+	{
+		static uint8_t calls = 3;
+		NPT_BEGIN(ctx);
+
+		NPT_WAIT_UNTIL_START(calls-- == 0);
+
+		state1 = 1;
+		NPT_YIELD();
+
+		state1 = 2;
+		success1 = NPT_SPAWN(task2(ctx));
+
+		state1 = 3;
+		NPT_YIELD();
+
+		NPT_SUCCESS_IF(success1);
+
+		state1 = 4;
+
+		NPT_END_ON_ABORT(state1 = -1; calls = 3);
+	}
+
+protected:
+	xpcc::pt::Result
+	task2(void *ctx)
+	{
+		static uint8_t calls = 1;
+		NPT_BEGIN(ctx);
+
+		NPT_WAIT_UNTIL_START(calls-- == 0);
+
+		state2 = 1;
+		NPT_YIELD();
+
+		state2 = 2;
+		success2 = NPT_SPAWN(task3(ctx));
+
+		state2 = 3;
+		NPT_YIELD();
+
+		NPT_SUCCESS_IF(success2);
+
+		state2 = 4;
+
+		NPT_END_ON_ABORT(
+		{
+			state2 = -1;
+			calls = 1;
+		});
+	}
+
+	xpcc::pt::Result
+	task3(void *ctx)
+	{
+		static uint8_t calls = 1;
+		NPT_BEGIN(ctx);
+
+		NPT_WAIT_UNTIL_START(calls-- == 0);
+
+		state3 = 1;
+		NPT_YIELD();
+
+		NPT_SUCCESS_IF(success3);
+
+		state3 = 2;
+		NPT_YIELD();
+
+		NPT_ABORT();
+
+		// no abort code here, but it should still work
+		NPT_END_ON_ABORT(state3 = -1; calls = 1;);
+	}
+
+public:
+	int8_t state1;
+	int8_t state2;
+	int8_t state3;
+	bool success1;
+	bool success2;
+	bool success3;
+};
+
+class TestingAbortingThread0 : public xpcc::pt::NestedProtothread<0>
+{
+public:
+	TestingAbortingThread0()
+	:	state1(0), success1(false)
+	{
+	}
+
+	xpcc::pt::Result
+	task1(void *ctx)
+	{
+		static uint8_t calls = 3;
+		NPT_BEGIN(ctx);
+
+		NPT_WAIT_UNTIL_START(calls-- == 0);
+
+		state1 = 1;
+		NPT_YIELD();
+
+		state1 = 2;
+
+		NPT_YIELD();
+
+		NPT_SUCCESS_IF(success1);
+
+		state1 = 4;
+
+		NPT_END_ON_ABORT(state1 = -1; calls = 3);
+	}
+
+
+public:
+	int8_t state1;
+	bool success1;
+};
+
+void
+NestedProtothreadTest::testAbort()
+{
+	TestingAbortingThread thread;
+	TestingAbortingThread0 thread0;
+
+	// sanity checks
+	TEST_ASSERT_FALSE(thread.isTaskRunning());
+	TEST_ASSERT_EQUALS(thread.state1, 0);
+	TEST_ASSERT_EQUALS(thread.state2, 0);
+	TEST_ASSERT_EQUALS(thread.state3, 0);
+	TEST_ASSERT_EQUALS(thread.getTaskDepth(), -1);
+	// thread 0
+	TEST_ASSERT_FALSE(thread0.isTaskRunning());
+	TEST_ASSERT_EQUALS(thread0.state1, 0);
+	TEST_ASSERT_EQUALS(thread0.getTaskDepth(), -1);
+
+	// ZERO LEVEL ABORT
+	// a non-running task may be aborted, which will only execute the abort handler
+	TEST_ASSERT_EQUALS(thread.task1(xpcc::pt::ContextAbort), xpcc::pt::Abort);
+	TEST_ASSERT_EQUALS(thread.state1, -1);
+	// same for thread0
+	TEST_ASSERT_EQUALS(thread0.task1(xpcc::pt::ContextAbort), xpcc::pt::Abort);
+	TEST_ASSERT_EQUALS(thread0.state1, -1);
+
+	// FIRST LEVEL ABORT
+	// reset states
+	thread.state1 = 0;
+	thread0.state1 = 0;
+	// wait 2 cycles out of 3
+	for (uint8_t ii = 0; ii < 2; ++ii)
+	{
+		TEST_ASSERT_EQUALS(thread.task1(this), xpcc::pt::Starting);
+		TEST_ASSERT_EQUALS(thread.state1, 0);
+		// thread0
+		TEST_ASSERT_EQUALS(thread0.task1(this), xpcc::pt::Starting);
+		TEST_ASSERT_EQUALS(thread0.state1, 0);
+	}
+	// now abort the task, which should execute the abort code
+	TEST_ASSERT_EQUALS(thread.task1(xpcc::pt::ContextAbort), xpcc::pt::Abort);
+	TEST_ASSERT_EQUALS(thread.state1, -1);
+	// same for thread0
+	TEST_ASSERT_EQUALS(thread0.task1(xpcc::pt::ContextAbort), xpcc::pt::Abort);
+	TEST_ASSERT_EQUALS(thread0.state1, -1);
+
+	// SECOND LEVEL ABORT
+	// reset states
+	thread.state1 = 0;
+	// wait all cycles out of 3
+	for (uint8_t ii = 0; ii < 3; ++ii)
+	{
+		TEST_ASSERT_EQUALS(thread.task1(this), xpcc::pt::Starting);
+		TEST_ASSERT_EQUALS(thread.state1, 0);
+	}
+	// task should progress to first yield
+	TEST_ASSERT_EQUALS(thread.task1(this), xpcc::pt::Running);
+	TEST_ASSERT_EQUALS(thread.state1, 1);
+
+	// task1 should spawn task2 now, which will "start" for one cycle
+	TEST_ASSERT_EQUALS(thread.task1(this), xpcc::pt::Running);
+	TEST_ASSERT_EQUALS(thread.state1, 2);
+	TEST_ASSERT_EQUALS(thread.state2, 0);
+
+	// task2 should run to first yield
+	TEST_ASSERT_EQUALS(thread.task1(this), xpcc::pt::Running);
+	TEST_ASSERT_EQUALS(thread.state1, 2);
+	TEST_ASSERT_EQUALS(thread.state2, 1);
+
+	// lets abort both tasks, both abort handlers should be executed immediately
+	TEST_ASSERT_EQUALS(thread.task1(xpcc::pt::ContextAbort), xpcc::pt::Abort);
+	TEST_ASSERT_EQUALS(thread.state1, -1);
+	TEST_ASSERT_EQUALS(thread.state2, -1);
+
+	// THIRD LEVEL ABORT
+	// reset states
+	thread.state1 = 0;
+	thread.state2 = 0;
+	for (uint8_t ii = 0; ii < 3; ++ii)
+	{
+		TEST_ASSERT_EQUALS(thread.task1(this), xpcc::pt::Starting);
+		TEST_ASSERT_EQUALS(thread.state1, 0);
+	}
+	TEST_ASSERT_EQUALS(thread.task1(this), xpcc::pt::Running);
+	TEST_ASSERT_EQUALS(thread.state1, 1);
+	TEST_ASSERT_EQUALS(thread.task1(this), xpcc::pt::Running);
+	TEST_ASSERT_EQUALS(thread.state1, 2);
+	TEST_ASSERT_EQUALS(thread.state2, 0);
+	TEST_ASSERT_EQUALS(thread.task1(this), xpcc::pt::Running);
+	TEST_ASSERT_EQUALS(thread.state1, 2);
+	TEST_ASSERT_EQUALS(thread.state2, 1);
+
+	// task2 should spawn task3 now, which will "start" for one cycle
+	TEST_ASSERT_EQUALS(thread.task1(this), xpcc::pt::Running);
+	TEST_ASSERT_EQUALS(thread.state1, 2);
+	TEST_ASSERT_EQUALS(thread.state2, 2);
+	TEST_ASSERT_EQUALS(thread.state3, 0);
+
+	// task3 should run to first yield
+	TEST_ASSERT_EQUALS(thread.task1(this), xpcc::pt::Running);
+	TEST_ASSERT_EQUALS(thread.state1, 2);
+	TEST_ASSERT_EQUALS(thread.state2, 2);
+	TEST_ASSERT_EQUALS(thread.state3, 1);
+
+	// lets abort all three tasks
+	TEST_ASSERT_EQUALS(thread.task1(xpcc::pt::ContextAbort), xpcc::pt::Abort);
+	TEST_ASSERT_EQUALS(thread.state1, -1);
+	TEST_ASSERT_EQUALS(thread.state2, -1);
+	TEST_ASSERT_EQUALS(thread.state3, -1);
+
+	// THIRD LEVEL INTERNAL ABORT
+	// reset states
+	thread.state1 = 0;
+	thread.state2 = 0;
+	thread.state3 = 0;
+	for (uint8_t ii = 0; ii < 3; ++ii)
+	{
+		TEST_ASSERT_EQUALS(thread.task1(this), xpcc::pt::Starting);
+		TEST_ASSERT_EQUALS(thread.state1, 0);
+	}
+	TEST_ASSERT_EQUALS(thread.task1(this), xpcc::pt::Running);
+	TEST_ASSERT_EQUALS(thread.state1, 1);
+	TEST_ASSERT_EQUALS(thread.task1(this), xpcc::pt::Running);
+	TEST_ASSERT_EQUALS(thread.state1, 2);
+	TEST_ASSERT_EQUALS(thread.state2, 0);
+	TEST_ASSERT_EQUALS(thread.task1(this), xpcc::pt::Running);
+	TEST_ASSERT_EQUALS(thread.state1, 2);
+	TEST_ASSERT_EQUALS(thread.state2, 1);
+	TEST_ASSERT_EQUALS(thread.task1(this), xpcc::pt::Running);
+	TEST_ASSERT_EQUALS(thread.state1, 2);
+	TEST_ASSERT_EQUALS(thread.state2, 2);
+	TEST_ASSERT_EQUALS(thread.state3, 0);
+	TEST_ASSERT_EQUALS(thread.task1(this), xpcc::pt::Running);
+	TEST_ASSERT_EQUALS(thread.state1, 2);
+	TEST_ASSERT_EQUALS(thread.state2, 2);
+	TEST_ASSERT_EQUALS(thread.state3, 1);
+
+	// task3 will not succeed and progress to next yield
+	TEST_ASSERT_EQUALS(thread.task1(this), xpcc::pt::Running);
+	TEST_ASSERT_EQUALS(thread.state1, 2);
+	TEST_ASSERT_EQUALS(thread.state2, 2);
+	TEST_ASSERT_EQUALS(thread.state3, 2);
+
+	// the task3 will now abort itself.
+	TEST_ASSERT_EQUALS(thread.task1(this), xpcc::pt::Abort);
+	TEST_ASSERT_EQUALS(thread.state1, -1);
+	TEST_ASSERT_EQUALS(thread.state2, -1);
+	TEST_ASSERT_EQUALS(thread.state3, -1);
+
+	// THIRD LEVEL NO ABORT
+	// reset states
+	thread.state1 = 0;
+	thread.state2 = 0;
+	thread.state3 = 0;
+	// task3 will now succeed
+	thread.success3 = true;
+	for (uint8_t ii = 0; ii < 3; ++ii)
+	{
+		TEST_ASSERT_EQUALS(thread.task1(this), xpcc::pt::Starting);
+		TEST_ASSERT_EQUALS(thread.state1, 0);
+	}
+	TEST_ASSERT_EQUALS(thread.task1(this), xpcc::pt::Running);
+	TEST_ASSERT_EQUALS(thread.state1, 1);
+	TEST_ASSERT_EQUALS(thread.task1(this), xpcc::pt::Running);
+	TEST_ASSERT_EQUALS(thread.state1, 2);
+	TEST_ASSERT_EQUALS(thread.state2, 0);
+	TEST_ASSERT_EQUALS(thread.task1(this), xpcc::pt::Running);
+	TEST_ASSERT_EQUALS(thread.state1, 2);
+	TEST_ASSERT_EQUALS(thread.state2, 1);
+	TEST_ASSERT_EQUALS(thread.task1(this), xpcc::pt::Running);
+	TEST_ASSERT_EQUALS(thread.state1, 2);
+	TEST_ASSERT_EQUALS(thread.state2, 2);
+	TEST_ASSERT_EQUALS(thread.state3, 0);
+	TEST_ASSERT_EQUALS(thread.task1(this), xpcc::pt::Running);
+	TEST_ASSERT_EQUALS(thread.state1, 2);
+	TEST_ASSERT_EQUALS(thread.state2, 2);
+	TEST_ASSERT_EQUALS(thread.state3, 1);
+
+	// the task3 should not abort itself anymore, but return successfully.
+	// task2 will continue to next yield
+	TEST_ASSERT_EQUALS(thread.task1(this), xpcc::pt::Running);
+	TEST_ASSERT_EQUALS(thread.state1, 2);
+	TEST_ASSERT_EQUALS(thread.state2, 3);
+	TEST_ASSERT_EQUALS(thread.state3, 1);
+
+	// task2 will return successfully
+	// task1 will continue to next yield
+	TEST_ASSERT_EQUALS(thread.task1(this), xpcc::pt::Running);
+	TEST_ASSERT_EQUALS(thread.state1, 3);
+	TEST_ASSERT_EQUALS(thread.state2, 3);
+
+	// task1 will return successfully
+	TEST_ASSERT_EQUALS(thread.task1(this), xpcc::pt::Success);
+	TEST_ASSERT_EQUALS(thread.state1, 3);
 }
