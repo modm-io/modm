@@ -522,8 +522,6 @@ protected:
  *
  * After a transaction successfully started, the tag will be set to a non-zero value,
  * and will be reset to zero by this wrapper upon detaching.
- * If the device driver requires to keep exclusive access for follow-up transactions,
- * it may preserve the tag, however, the preservation expires after one transaction.
  * If the transaction concluded without error, the tag's value will be copied into
  * the `success` integer, otherwise it will also be reset to zero.
  *
@@ -535,35 +533,16 @@ class I2cTagAdapter : public I2cAdapter
 {
 	volatile uint8_t &tag;
 	volatile uint8_t &success;
-	bool preserveTag;
 
 public:
 	/**
-	 * @param	address	the slave address not yet shifted right (address < 128).
-	 * @param	tag		reference of a tag integer.
-	 * @param	success	reference of a success integer.
+	 * @param	address	the slave address not yet shifted left (address < 128).
+	 * @param	tag		reference to a tag integer.
+	 * @param	success	reference to a success integer.
 	 */
 	I2cTagAdapter(uint8_t address, volatile uint8_t &tag, volatile uint8_t&success)
-	:	I2cAdapter(address), tag(tag), success(success), preserveTag(false)
+	:	I2cAdapter(address), tag(tag), success(success)
 	{
-	}
-
-	/**
-	 * Preserves the tag during detaching.
-	 * This setting is only valid for one transaction, it will reset after detaching.
-	 *
-	 * @return  `true` if adapter was not in use and accepted the information,
-	 *          `false` otherwise
-	 */
-	bool ALWAYS_INLINE
-	setPreserveTag()
-	{
-		if (!I2cAdapter::isBusy())
-		{
-			preserveTag = true;
-			return true;
-		}
-		return false;
 	}
 
 protected:
@@ -573,10 +552,8 @@ protected:
 		I2cAdapter::detaching(cause);
 		// if no error occurred, copy the tag, else set success to zero
 		success = (I2cAdapter::getState() != xpcc::I2c::AdapterState::Error) ? tag : 0;
-		// delete the tag if we don't want to preserve it
-		if (!preserveTag) tag = 0;
-		// the preserveTag expires after each transaction
-		preserveTag = false;
+		// delete the tag
+		tag = 0;
 	}
 };
 
