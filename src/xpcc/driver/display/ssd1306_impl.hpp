@@ -13,7 +13,7 @@
 
 template < class I2cMaster >
 xpcc::Ssd1306<I2cMaster>::Ssd1306(uint8_t address)
-:	I2cDevice<I2cMaster>(), i2cTask(I2cTask::Idle), i2cSuccess(0), timer(80),
+:	I2cDevice<I2cMaster>(), i2cTask(I2cTask::Idle), i2cSuccess(0), timer(80), updateWrite(false),
 	adapter(address, i2cTask, i2cSuccess), adapterData(address, i2cTask, i2cSuccess)
 {
 }
@@ -25,7 +25,7 @@ xpcc::Ssd1306<I2cMaster>::update()
 	if (timer.isExpired())
 		updateWrite = true;
 
-	if (updateWrite && writeDisplay(this) < xpcc::pt::Starting)
+	if (updateWrite && writeDisplay(this) <= xpcc::pt::Success)
 		updateWrite = false;
 }
 
@@ -37,13 +37,14 @@ xpcc::Ssd1306<I2cMaster>::ping(void *ctx)
 {
 	NPT_BEGIN(ctx);
 
-	NPT_WAIT_UNTIL_START(adapter.configurePing() && this->startTransaction(&adapter));
+	NPT_WAIT_UNTIL(adapter.configurePing() && this->startTransaction(&adapter));
 
 	i2cTask = I2cTask::Ping;
 
 	NPT_WAIT_WHILE(i2cTask == I2cTask::Ping);
 
-	NPT_SUCCESS_IF(i2cSuccess == I2cTask::Ping);
+	if (i2cSuccess == I2cTask::Ping)
+		NPT_EXIT_SUCCESS();
 
 	NPT_END();
 }
@@ -53,7 +54,6 @@ template < class I2cMaster >
 xpcc::pt::Result
 xpcc::Ssd1306<I2cMaster>::initialize(void *ctx)
 {
-	static bool initSuccessful;
 	NPT_BEGIN(ctx);
 
 	initSuccessful = true;
@@ -76,7 +76,8 @@ xpcc::Ssd1306<I2cMaster>::initialize(void *ctx)
 	initSuccessful &= NPT_SPAWN(writeCommand(ctx, Command::SetPageAddress, 0, 7));
 	initSuccessful &= NPT_SPAWN(writeCommand(ctx, Command::SetDisplayOn));
 
-	NPT_SUCCESS_IF(initSuccessful);
+	if (initSuccessful)
+		NPT_EXIT_SUCCESS();
 
 	NPT_END();
 }
@@ -88,13 +89,14 @@ xpcc::Ssd1306<I2cMaster>::writeDisplay(void *ctx)
 {
 	NPT_BEGIN(ctx);
 
-	NPT_WAIT_UNTIL_START(adapterData.configureWrite(buffer, 1024) && this->startTransaction(&adapterData));
+	NPT_WAIT_UNTIL(adapterData.configureWrite(buffer, 1024) && this->startTransaction(&adapterData));
 
 	i2cTask = I2cTask::WriteDisplay;
 
 	NPT_WAIT_WHILE(i2cTask == I2cTask::WriteDisplay);
 
-	NPT_SUCCESS_IF(i2cSuccess == I2cTask::WriteDisplay);
+	if (i2cSuccess == I2cTask::WriteDisplay)
+		NPT_EXIT_SUCCESS();
 
 	NPT_END();
 }
@@ -115,7 +117,7 @@ xpcc::Ssd1306<I2cMaster>::writeCommand(void *ctx, uint8_t command)
 {
 	NPT_BEGIN(ctx);
 
-	NPT_WAIT_UNTIL_START(
+	NPT_WAIT_UNTIL(
 			!adapter.isBusy() && (
 					commandBuffer[0] = 0x80,
 					commandBuffer[1] = command,
@@ -124,7 +126,8 @@ xpcc::Ssd1306<I2cMaster>::writeCommand(void *ctx, uint8_t command)
 
 	NPT_WAIT_WHILE(i2cTask == command);
 
-	NPT_SUCCESS_IF(i2cSuccess == command);
+	if (i2cSuccess == command)
+		NPT_EXIT_SUCCESS();
 
 	NPT_END();
 }
@@ -135,7 +138,7 @@ xpcc::Ssd1306<I2cMaster>::writeCommand(void *ctx, uint8_t command, uint8_t data)
 {
 	NPT_BEGIN(ctx);
 
-	NPT_WAIT_UNTIL_START(
+	NPT_WAIT_UNTIL(
 			!adapter.isBusy() && (
 					commandBuffer[0] = 0x80,
 					commandBuffer[1] = command,
@@ -146,7 +149,8 @@ xpcc::Ssd1306<I2cMaster>::writeCommand(void *ctx, uint8_t command, uint8_t data)
 
 	NPT_WAIT_WHILE(i2cTask == command);
 
-	NPT_SUCCESS_IF(i2cSuccess == command);
+	if (i2cSuccess == command)
+		NPT_EXIT_SUCCESS();
 
 	NPT_END();
 }
@@ -157,7 +161,7 @@ xpcc::Ssd1306<I2cMaster>::writeCommand(void *ctx, uint8_t command, uint8_t data1
 {
 	NPT_BEGIN(ctx);
 
-	NPT_WAIT_UNTIL_START(
+	NPT_WAIT_UNTIL(
 			!adapter.isBusy() && (
 					commandBuffer[0] = 0x80,
 					commandBuffer[1] = command,
@@ -170,7 +174,8 @@ xpcc::Ssd1306<I2cMaster>::writeCommand(void *ctx, uint8_t command, uint8_t data1
 
 	NPT_WAIT_WHILE(i2cTask == command);
 
-	NPT_SUCCESS_IF(i2cSuccess == command);
+	if (i2cSuccess == command)
+		NPT_EXIT_SUCCESS();
 
 	NPT_END();
 }
@@ -182,7 +187,7 @@ xpcc::Ssd1306<I2cMaster>::writeCommand(void *ctx, uint8_t command,
 {
 	NPT_BEGIN(ctx);
 
-	NPT_WAIT_UNTIL_START(
+	NPT_WAIT_UNTIL(
 			!adapter.isBusy() && (
 					commandBuffer[0] = 0x80,
 					commandBuffer[1] = command,
@@ -201,7 +206,8 @@ xpcc::Ssd1306<I2cMaster>::writeCommand(void *ctx, uint8_t command,
 
 	NPT_WAIT_WHILE(i2cTask == command);
 
-	NPT_SUCCESS_IF(i2cSuccess == command);
+	if (i2cSuccess == command)
+		NPT_EXIT_SUCCESS();
 
 	NPT_END();
 }
@@ -213,7 +219,7 @@ xpcc::Ssd1306<I2cMaster>::writeCommand(void *ctx, uint8_t command,
 {
 	NPT_BEGIN(ctx);
 
-	NPT_WAIT_UNTIL_START(
+	NPT_WAIT_UNTIL(
 			!adapter.isBusy() && (
 					commandBuffer[0] = 0x80,
 					commandBuffer[1] = command,
@@ -234,7 +240,8 @@ xpcc::Ssd1306<I2cMaster>::writeCommand(void *ctx, uint8_t command,
 
 	NPT_WAIT_WHILE(i2cTask == command);
 
-	NPT_SUCCESS_IF(i2cSuccess == command);
+	if (i2cSuccess == command)
+		NPT_EXIT_SUCCESS();
 
 	NPT_END();
 }

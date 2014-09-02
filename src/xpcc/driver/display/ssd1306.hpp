@@ -211,10 +211,11 @@ private:
 	volatile uint8_t i2cSuccess;
 	uint8_t commandBuffer[14];
 	xpcc::PeriodicTimer<> timer;
+	bool initSuccessful;
 	bool updateWrite;
+
 	xpcc::I2cTagAdapter<xpcc::I2cWriteAdapter> adapter;
 	xpcc::I2cTagAdapter<DataTransmissionAdapter> adapterData;
-
 };
 
 } // namespace xpcc
