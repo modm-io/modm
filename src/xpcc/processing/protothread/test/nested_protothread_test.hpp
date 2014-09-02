@@ -22,7 +22,4 @@ public:
 
 	void
 	testSpawn();
-
-	void
-	testAbort();
 };
