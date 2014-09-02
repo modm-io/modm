@@ -81,7 +81,8 @@ struct tmp102
  * @tparam I2cMaster Asynchronous Interface
  */
 template < class I2cMaster >
-class Tmp102 : public xpcc::I2cDevice< I2cMaster >, public tmp102
+class Tmp102 :	public tmp102, public xpcc::I2cDevice< I2cMaster >,
+				public xpcc::pt::NestedProtothread<0>
 {
 public:
 	/**
@@ -96,46 +97,22 @@ public:
 
 	// MARK: - Tasks
 	/// pings the sensor
-	bool
-	startPing();
-
-	bool ALWAYS_INLINE
-	runPing();
-
-	bool ALWAYS_INLINE
-	isPingSuccessful();
+	xpcc::pt::Result
+	ping(void *ctx);
 
 	/// sets the LSB and MSB of the sensor
-	bool
-	startConfiguration(uint8_t lsb=CONFIGURATION_CONVERSION_RATE_4HZ,
-					   uint8_t msb=CONFIGURATION_CONVERTER_RESOLUTION_12BIT);
-
-	bool ALWAYS_INLINE
-	runConfiguration();
-
-	bool ALWAYS_INLINE
-	isConfigurationSuccessful();
+	xpcc::pt::Result
+	configure(void *ctx,
+			uint8_t lsb=CONFIGURATION_CONVERSION_RATE_4HZ,
+			uint8_t msb=CONFIGURATION_CONVERTER_RESOLUTION_12BIT);
 
 	/// starts a temperature conversion right now
-	bool
-	startConversion();
-
-	/// runs the temperature conversion
-	bool ALWAYS_INLINE
-	runConversion();
-
-	bool ALWAYS_INLINE
-	isConversionSuccessful();
+	xpcc::pt::Result
+	startConversion(void *ctx);
 
 	/// read the Temperature registers and buffer the results
-	bool
-	startReadTemperature();
-
-	bool ALWAYS_INLINE
-	runReadTemperature();
-
-	bool ALWAYS_INLINE
-	isReadTemperatureSuccessful();
+	xpcc::pt::Result
+	readTemperature(void *ctx);
 
 	// MARK: - utility
 	/// @return the temperature as a signed float in Celcius
@@ -143,7 +120,7 @@ public:
 	getTemperature();
 
 private:
-	struct Task
+	struct I2cTask
 	{
 		enum
 		{
@@ -155,8 +132,8 @@ private:
 		};
 	};
 
-	volatile uint8_t task;
-	volatile uint8_t success;
+	volatile uint8_t i2cTask;
+	volatile uint8_t i2cSuccess;
 	uint8_t config;
 	uint8_t* data;
 	uint8_t buffer[3];

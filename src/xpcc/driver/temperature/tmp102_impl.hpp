@@ -14,8 +14,8 @@
 // ----------------------------------------------------------------------------
 template < typename I2cMaster >
 xpcc::Tmp102<I2cMaster>::Tmp102(uint8_t* data, uint8_t address)
-:	I2cDevice<I2cMaster>(), task(Task::Idle), success(0), config(0),
-	data(data), adapter(address, task, success)
+:	I2cDevice<I2cMaster>(), i2cTask(I2cTask::Idle), i2cSuccess(0), config(0),
+	data(data), adapter(address, i2cTask, i2cSuccess)
 {
 }
 
@@ -29,129 +29,96 @@ xpcc::Tmp102<I2cMaster>::getData()
 // MARK: - tasks
 // MARK: ping
 template < typename I2cMaster >
-bool
-xpcc::Tmp102<I2cMaster>::startPing()
+xpcc::pt::Result
+xpcc::Tmp102<I2cMaster>::ping(void *ctx)
 {
-	if (task == Task::Idle && adapter.configurePing() && this->startTransaction(&adapter))
-	{
-		task = Task::Ping;
-		return true;
-	}
-	return false;
-}
+	NPT_BEGIN(ctx);
 
-template < typename I2cMaster >
-bool
-xpcc::Tmp102<I2cMaster>::runPing()
-{
-	return (task == Task::Ping);
-}
+	NPT_WAIT_UNTIL(adapter.configurePing() && this->startTransaction(&adapter));
 
-template < typename I2cMaster >
-bool
-xpcc::Tmp102<I2cMaster>::isPingSuccessful()
-{
-	return (success == Task::Ping);
+	i2cTask = I2cTask::Ping;
+
+	NPT_WAIT_WHILE(i2cTask == I2cTask::Ping);
+
+	if (i2cSuccess == I2cTask::Ping)
+		NPT_EXIT_SUCCESS();
+
+	NPT_END();
 }
 
 // MARK: configuration
 template < typename I2cMaster >
-bool
-xpcc::Tmp102<I2cMaster>::startConfiguration(uint8_t lsb, uint8_t msb)
+xpcc::pt::Result
+xpcc::Tmp102<I2cMaster>::configure(void *ctx, uint8_t lsb, uint8_t msb)
 {
-	if (task == Task::Idle)
-	{
-		config = msb;
-		buffer[0] = static_cast<uint8_t>(Register::Configuration);
-		buffer[1] = msb;
-		buffer[2] = lsb;
+	NPT_BEGIN(ctx);
 
-		if (adapter.configureWrite(buffer, 3) && this->startTransaction(&adapter))
-		{
-			task = Task::Configuration;
-			return true;
-		}
-	}
-	return false;
-}
+	config = msb;
 
-template < typename I2cMaster >
-bool
-xpcc::Tmp102<I2cMaster>::runConfiguration()
-{
-	return (task == Task::Configuration);
-}
+	NPT_WAIT_UNTIL(
+			!adapter.isBusy() && (
+					buffer[0] = static_cast<uint8_t>(Register::Configuration),
+					buffer[1] = msb,
+					buffer[2] = lsb,
+					adapter.configureWrite(buffer, 3) && this->startTransaction(&adapter))
+	);
 
-template < typename I2cMaster >
-bool
-xpcc::Tmp102<I2cMaster>::isConfigurationSuccessful()
-{
-	return (success == Task::Configuration);
+	i2cTask = I2cTask::Configuration;
+
+	NPT_WAIT_WHILE(i2cTask == I2cTask::Configuration);
+
+	if (i2cSuccess == I2cTask::Configuration)
+		NPT_EXIT_SUCCESS();
+
+	NPT_END();
 }
 
 // MARK: conversion
 template < typename I2cMaster >
-bool inline
-xpcc::Tmp102<I2cMaster>::startConversion()
+xpcc::pt::Result
+xpcc::Tmp102<I2cMaster>::startConversion(void *ctx)
 {
-	if (task == Task::Idle)
-	{
-		buffer[0] = static_cast<uint8_t>(Register::Configuration);
-		buffer[1] = config | CONFIGURATION_ONE_SHOT;
+	NPT_BEGIN(ctx);
 
-		if (adapter.configureWrite(buffer, 2) && this->startTransaction(&adapter))
-		{
-			task = Task::StartConversion;
-			return true;
-		}
-	}
-	return false;
-}
+	NPT_WAIT_UNTIL(
+			!adapter.isBusy() && (
+					buffer[0] = static_cast<uint8_t>(Register::Configuration),
+					buffer[1] = config | CONFIGURATION_ONE_SHOT,
+					adapter.configureWrite(buffer, 2) && this->startTransaction(&adapter) )
+	);
 
-template < typename I2cMaster >
-bool
-xpcc::Tmp102<I2cMaster>::runConversion()
-{
-	return (task == Task::StartConversion);
-}
+	i2cTask = I2cTask::StartConversion;
 
-template < typename I2cMaster >
-bool
-xpcc::Tmp102<I2cMaster>::isConversionSuccessful()
-{
-	return (success == Task::StartConversion);
+	NPT_WAIT_WHILE(i2cTask == I2cTask::StartConversion);
+
+	if (i2cSuccess == I2cTask::StartConversion)
+		NPT_EXIT_SUCCESS();
+
+	NPT_END();
 }
 
 // MARK: read temperature
 template < typename I2cMaster >
-bool
-xpcc::Tmp102<I2cMaster>::startReadTemperature()
+xpcc::pt::Result
+xpcc::Tmp102<I2cMaster>::readTemperature(void *ctx)
 {
-	if (task == Task::Idle)
-	{
-		buffer[0] = static_cast<uint8_t>(Register::Temperature);
+	NPT_BEGIN(ctx);
 
-		if (adapter.configureWriteRead(buffer, 1, data, 2) && this->startTransaction(&adapter))
-		{
-			task = Task::ReadTemperature;
-			return true;
-		}
-	}
-	return false;
-}
+	NPT_WAIT_UNTIL(
+			!adapter.isBusy() && (
+					buffer[0] = static_cast<uint8_t>(Register::Temperature),
+					buffer[1] = config | CONFIGURATION_ONE_SHOT,
+					adapter.configureWriteRead(buffer, 1, data, 2) && this->startTransaction(&adapter) )
+	);
 
-template < typename I2cMaster >
-bool
-xpcc::Tmp102<I2cMaster>::runReadTemperature()
-{
-	return (task == Task::ReadTemperature);
-}
+	i2cTask = I2cTask::ReadTemperature;
 
-template < typename I2cMaster >
-bool
-xpcc::Tmp102<I2cMaster>::isReadTemperatureSuccessful()
-{
-	return (success == Task::ReadTemperature);
+	NPT_WAIT_WHILE(i2cTask == I2cTask::ReadTemperature);
+
+	if (i2cSuccess == I2cTask::ReadTemperature)
+		NPT_EXIT_SUCCESS();
+
+	NPT_END();
 }
 
 // MARK: - utility
