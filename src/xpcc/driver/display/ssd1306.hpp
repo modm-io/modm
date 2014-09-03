@@ -98,10 +98,13 @@ public:
 
 
 	/// initializes for 3V3 with charge-pump
-	void
+	bool
 	initialize()
 	{
-		while(initialize(this) > xpcc::pt::Success) ;
+		xpcc::pt::Result result
+		while((result = initialize(this)) > xpcc::pt::Success)
+			;
+		return (result == xpcc::pt::Success);
 	}
 
 	/// initializes for 3V3 with charge-pump asynchronously
