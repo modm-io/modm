@@ -61,9 +61,9 @@ xpcc::Tmp102<I2cMaster>::ping(void *ctx)
 {
 	NPT_BEGIN(ctx);
 
-	NPT_WAIT_UNTIL(adapter.configurePing() && this->startTransaction(&adapter));
-
-	i2cTask = I2cTask::Ping;
+	NPT_WAIT_UNTIL(adapter.configurePing() &&
+			(i2cTask = I2cTask::Ping, this->startTransaction(&adapter))
+	);
 
 	NPT_WAIT_WHILE(i2cTask == I2cTask::Ping);
 
@@ -183,10 +183,9 @@ xpcc::Tmp102<I2cMaster>::readTemperature(void *ctx)
 	NPT_WAIT_UNTIL(
 			!adapter.isBusy() && (
 					buffer[0] = REGISTER_TEMPERATURE,
-					adapter.configureWriteRead(buffer, 1, data, 2) && this->startTransaction(&adapter) )
+					adapter.configureWriteRead(buffer, 1, data, 2) &&
+							(i2cTask = I2cTask::ReadTemperature, this->startTransaction(&adapter)) )
 	);
-
-	i2cTask = I2cTask::ReadTemperature;
 
 	NPT_WAIT_WHILE(i2cTask == I2cTask::ReadTemperature);
 
@@ -206,10 +205,9 @@ xpcc::Tmp102<I2cMaster>::readComparatorMode(void *ctx, bool &result)
 	NPT_WAIT_UNTIL(
 			!adapter.isBusy() && (
 					buffer[0] = REGISTER_CONFIGURATION,
-					adapter.configureWriteRead(buffer, 1, buffer, 2) && this->startTransaction(&adapter) )
+					adapter.configureWriteRead(buffer, 1, buffer, 2) &&
+							(i2cTask = I2cTask::ReadAlert, this->startTransaction(&adapter)) )
 	);
-
-	i2cTask = I2cTask::ReadAlert;
 
 	NPT_WAIT_WHILE(i2cTask == I2cTask::ReadAlert);
 
@@ -238,10 +236,9 @@ xpcc::Tmp102<I2cMaster>::writeConfiguration(void *ctx, uint8_t length)
 					buffer[0] = REGISTER_CONFIGURATION,
 					buffer[1] = config_msb,
 					buffer[2] = config_lsb,
-					adapter.configureWrite(buffer, length) && this->startTransaction(&adapter))
+					adapter.configureWrite(buffer, length) &&
+							(i2cTask = I2cTask::Configuration, this->startTransaction(&adapter)) )
 	);
-
-	i2cTask = I2cTask::Configuration;
 
 	NPT_WAIT_WHILE(i2cTask == I2cTask::Configuration);
 
@@ -270,10 +267,9 @@ xpcc::Tmp102<I2cMaster>::writeLimitRegister(void *ctx, Register reg, float tempe
 	NPT_WAIT_UNTIL(
 			!adapter.isBusy() && (
 					buffer[0] = reg,
-					adapter.configureWrite(buffer, 3) && this->startTransaction(&adapter))
+					adapter.configureWrite(buffer, 3) &&
+							(i2cTask = I2cTask::LimitRegister, this->startTransaction(&adapter)) )
 	);
-
-	i2cTask = I2cTask::LimitRegister;
 
 	NPT_WAIT_WHILE(i2cTask == I2cTask::LimitRegister);
 
