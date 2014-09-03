@@ -106,7 +106,7 @@ xpcc::ui::Animation<T>::update() {
 				if (--animationTime == 0) {
 					animationTime = 0;
 					currentValue = endValue;
-                    return true;
+					return true;
 				}
 
 				currentValue = computations.step();

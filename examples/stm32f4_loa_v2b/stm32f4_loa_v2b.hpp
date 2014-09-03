@@ -21,7 +21,7 @@ using namespace xpcc::stm32;
 typedef GpioOutputE5 LedWhite;
 typedef GpioOutputE6 LedGreen;
 
-/// STM32F4 running at 168MHz (USB Clock qt 48MHz) generated from the
+/// STM32F4 running at 168MHz (USB Clock at 48MHz) generated from the
 /// external on-board 25MHz oscillator
 typedef SystemClock<Pll<ExternalClock<MHz25>, MHz168, MHz48> > defaultSystemClock;
 

@@ -101,7 +101,7 @@ public:
 	bool
 	initialize()
 	{
-		xpcc::pt::Result result
+		xpcc::pt::Result result;
 		while((result = initialize(this)) > xpcc::pt::Success)
 			;
 		return (result == xpcc::pt::Success);
