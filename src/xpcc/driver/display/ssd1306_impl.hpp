@@ -13,7 +13,7 @@
 
 template < class I2cMaster >
 xpcc::Ssd1306<I2cMaster>::Ssd1306(uint8_t address)
-:	I2cDevice<I2cMaster>(), i2cTask(I2cTask::Idle), i2cSuccess(0), timer(80), updateWrite(false),
+:	I2cDevice<I2cMaster>(), i2cTask(I2cTask::Idle), i2cSuccess(0),
 	adapter(address, i2cTask, i2cSuccess), adapterData(address, i2cTask, i2cSuccess)
 {
 }
@@ -22,11 +22,8 @@ template < class I2cMaster >
 void
 xpcc::Ssd1306<I2cMaster>::update()
 {
-	if (timer.isExpired())
-		updateWrite = true;
-
-	if (updateWrite && writeDisplay(this) <= xpcc::pt::Success)
-		updateWrite = false;
+	while (writeDisplay(this) > xpcc::pt::Success)
+		;
 }
 
 // ----------------------------------------------------------------------------

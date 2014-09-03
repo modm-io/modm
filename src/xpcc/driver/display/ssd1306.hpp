@@ -83,20 +83,6 @@ public:
 	virtual void
 	update();
 
-	/// Set a new update rate.
-	/// The maximum update rate depends on I2C baudrate!
-	void
-	setUpdateRate(uint8_t framesPerSecond)
-	{
-		timer.restart(1000/framesPerSecond);
-	}
-
-	bool
-	sync()
-	{
-		return (i2cTask == I2cTask::WriteDisplay);
-	}
-
 	// MARK: - TASKS
 	/// pings the diplay
 	xpcc::pt::Result
@@ -210,9 +196,7 @@ private:
 	volatile uint8_t i2cTask;
 	volatile uint8_t i2cSuccess;
 	uint8_t commandBuffer[14];
-	xpcc::PeriodicTimer<> timer;
 	bool initSuccessful;
-	bool updateWrite;
 
 	xpcc::I2cTagAdapter<xpcc::I2cWriteAdapter> adapter;
 	xpcc::I2cTagAdapter<DataTransmissionAdapter> adapterData;
