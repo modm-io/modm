@@ -367,18 +367,30 @@ namespace xpcc
 		{
 			this->font = xpcc::accessor::asFlash(newFont);
 		}
-		
+
+		inline void
+		setFont(const xpcc::accessor::Flash<uint8_t> *font)
+		{
+			this->font = *font;
+		}
+
 		/**
 		 * Get the height of a character.
 		 */
 		uint8_t
 		getFontHeight() const;
 		
+		static uint8_t
+		getFontHeight(const xpcc::accessor::Flash<uint8_t> *font);
+
 		/**
 		* Get the width of (null terminated) string.
 		*/
 		uint16_t
-		getStringWidth(char* s) const;
+		getStringWidth(const char* s) const;
+
+		static uint16_t
+		getStringWidth(const char* s, const xpcc::accessor::Flash<uint8_t> *font);
 
 		/**
 		 * Set the cursor for text drawing.

@@ -1,11 +1,11 @@
 // coding: utf-8
 // ----------------------------------------------------------------------------
-/* Copyright (c) 2009, Roboterclub Aachen e.V.
+/* Copyright (c) 2013, Roboterclub Aachen e.V.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -27,20 +27,75 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 // ----------------------------------------------------------------------------
-/**
- * \ingroup		lcd
- * \defgroup	font	Various fonts for graphical displays
- * 
- * The fonts are created with the "FontCreator 3.0", see \c tools/font_creator.
- */
+#ifndef XPCC__SDL_DISPLAY_HPP
+#define XPCC__SDL_DISPLAY_HPP
 
-#include "font/scripto_narrow.hpp"
-#include "font/all_caps_3x5.hpp"
-#include "font/fixed_width_5x8.hpp"
-#include "font/assertion.hpp"
-#include "font/arcade_classic.hpp"
-#include "font/ubuntu_36.hpp"
+#include <xpcc/ui/display.hpp>
+#include <xpcc/debug/logger.hpp>
+#include <SDL/SDL.h>
 
-#include "font/numbers_14x32.hpp"
-#include "font/numbers_40x56.hpp"
-#include "font/numbers_46x64.hpp"
+namespace xpcc
+{
+	class SDLDisplay: public xpcc::GraphicDisplay
+	{
+	public:
+		SDLDisplay(int16_t width, int16_t height);
+
+		~SDLDisplay();
+
+		virtual inline uint16_t
+		getWidth() const
+		{
+			return this->width;
+		}
+
+		virtual inline uint16_t
+		getHeight() const
+		{
+			return this->height;
+		}
+
+		inline virtual void clear()
+		{
+			this->clearWholeScreen();
+		}
+
+		virtual void
+		update();
+
+	protected:
+
+		virtual void
+		setPixel(int16_t x, int16_t y);
+
+		virtual void
+		clearPixel(int16_t x, int16_t y);
+
+		virtual bool
+		getPixel(int16_t x, int16_t y);
+
+ 	private:
+
+		void setPixelOnScreen(int16_t x, int16_t y);
+
+		void clearWholeScreen();
+
+		inline uint8_t
+		colorToRed(xpcc::glcd::Color& color);
+
+		inline uint8_t
+		colorToGreen(xpcc::glcd::Color& color);
+
+		inline uint8_t
+		colorToBlue(xpcc::glcd::Color& color);
+
+
+		const int16_t width;
+		const int16_t height;
+
+		uint16_t* memory;
+		SDL_Surface* screen;
+
+	};
+}
+#endif /* XPCC__SDL_DISPLAY_HPP */

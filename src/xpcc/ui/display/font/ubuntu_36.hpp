@@ -1,6 +1,6 @@
 // coding: utf-8
 // ----------------------------------------------------------------------------
-/* Copyright (c) 2009, Roboterclub Aachen e.V.
+/* Copyright (c) 2014, Roboterclub Aachen e.V.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,20 +27,33 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 // ----------------------------------------------------------------------------
-/**
- * \ingroup		lcd
- * \defgroup	font	Various fonts for graphical displays
- * 
- * The fonts are created with the "FontCreator 3.0", see \c tools/font_creator.
- */
 
-#include "font/scripto_narrow.hpp"
-#include "font/all_caps_3x5.hpp"
-#include "font/fixed_width_5x8.hpp"
-#include "font/assertion.hpp"
-#include "font/arcade_classic.hpp"
-#include "font/ubuntu_36.hpp"
+#ifndef XPCC_FONT__UBUNTU_36_HPP
+#define	XPCC_FONT__UBUNTU_36_HPP
 
-#include "font/numbers_14x32.hpp"
-#include "font/numbers_40x56.hpp"
-#include "font/numbers_46x64.hpp"
+#include <xpcc/architecture/driver/accessor.hpp>
+
+namespace xpcc
+{
+	namespace font
+	{
+		/**
+		 * \brief	Ubuntu_36
+		 * 
+		 * - preferred width : 16
+		 * - height          : 35
+		 * - hspace          : 1
+		 * - vspace          : 0
+		 * - first char      : 32
+		 * - last char       : 128
+		 * - number of chars : 96
+		 * - size in bytes   : 7389
+		 * 
+		 * \ingroup	font
+		 */
+		EXTERN_FLASH_STORAGE(uint8_t Ubuntu_36[]);
+	}
+}
+
+#endif	// XPCC_FONT__UBUNTU_36_HPP
+

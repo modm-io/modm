@@ -1,8 +1,8 @@
 // coding: utf-8
 // ----------------------------------------------------------------------------
-/* Copyright (c) 2009, Roboterclub Aachen e.V.
+/* Copyright (c) 2011, Roboterclub Aachen e.V.
  * All rights reserved.
- *
+ * 
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  * 
@@ -14,7 +14,7 @@
  *     * Neither the name of the Roboterclub Aachen e.V. nor the
  *       names of its contributors may be used to endorse or promote products
  *       derived from this software without specific prior written permission.
- *
+ * 
  * THIS SOFTWARE IS PROVIDED BY ROBOTERCLUB AACHEN E.V. ''AS IS'' AND ANY
  * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -27,20 +27,61 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 // ----------------------------------------------------------------------------
-/**
- * \ingroup		lcd
- * \defgroup	font	Various fonts for graphical displays
- * 
- * The fonts are created with the "FontCreator 3.0", see \c tools/font_creator.
- */
 
-#include "font/scripto_narrow.hpp"
-#include "font/all_caps_3x5.hpp"
-#include "font/fixed_width_5x8.hpp"
-#include "font/assertion.hpp"
-#include "font/arcade_classic.hpp"
-#include "font/ubuntu_36.hpp"
+#include "view_stack.hpp"
 
-#include "font/numbers_14x32.hpp"
-#include "font/numbers_40x56.hpp"
-#include "font/numbers_46x64.hpp"
+// ----------------------------------------------------------------------------
+xpcc::gui::GuiViewStack::GuiViewStack(xpcc::GraphicDisplay* display, xpcc::gui::inputQueue* queue) :
+	ViewStack(display),
+	input_queue(queue)
+{
+}
+
+// ----------------------------------------------------------------------------
+xpcc::gui::GuiViewStack::~GuiViewStack()
+{
+}
+
+// ----------------------------------------------------------------------------
+void
+xpcc::gui::GuiViewStack::pop()
+{
+	xpcc::gui::View *topElement = this->stack.get();
+	this->stack.pop();
+	
+	delete topElement;
+}
+
+// ----------------------------------------------------------------------------
+void
+xpcc::gui::GuiViewStack::update()
+{
+	xpcc::gui::View* top = this->get();
+
+	if(top == NULL)
+		return;
+
+	top->update();
+	if (top->isAlive())
+	{
+		if (top->hasChanged())
+		{
+			top->draw();
+			this->display->update();
+		}
+	}
+	else
+	{
+		// Remove old view
+		top->onRemove();
+		this->pop();
+		
+		// Get new screen
+		top = this->get();
+		top->markDirty();	// Only difference to xpcc::ViewStack::update()
+		top->update();
+		this->display->clear();
+		top->draw();
+		this->display->update();
+	}
+}

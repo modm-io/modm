@@ -28,29 +28,35 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__ABSTRACT_VIEW_HPP
-#define XPCC__ABSTRACT_VIEW_HPP
+#ifndef XPCC__GUI_ABSTRACT_VIEW_HPP
+#define XPCC__GUI_ABSTRACT_VIEW_HPP
 
 #include "../display/graphic_display.hpp"
 
-#include "menu_buttons.hpp"
+#include "types.hpp"
+#include "widgets/widget.hpp"
+#include "colorpalette.hpp"
+
+#include "../menu/abstract_view.hpp"
 
 namespace xpcc
 {
+namespace gui
+{
 	// forward declaration
-	class ViewStack;
+	class GuiViewStack;
 	
 	/**
-	 * @brief The AbstractView class is the base class for all screens
+	 * @brief The View class is the base class for all screens
 	 *        handled by the ViewStack class
 	 *
 	 *\author Thorsten Lajewski
 	 *\ingroup display_menu
 	 */
 
-	class AbstractView
+	class View : public xpcc::AbstractView
 	{
-		friend class ViewStack;
+		friend class GuiViewStack;
 		
 	public:
 		/**
@@ -58,45 +64,38 @@ namespace xpcc
 		 * @param identifier can be used to determine which screen is the currently
 		 *        displayed on the graphicDisplay
 		 */
-		AbstractView(xpcc::ViewStack* stack, uint8_t identifier);
+		View(xpcc::gui::GuiViewStack* stack, uint8_t identifier, xpcc::gui::Dimension dimension);
 		
-		virtual ~AbstractView() = 0;
+		virtual ~View() = 0;
 
 		/**
-		 * @brief update The update function of the top most display gets called
-		 *        as often as possible. Only the update of the top view in each
-		 *        ViewStack gets called.
+		 * @brief May be called as often as possible. Handles input events
+		 *        located in the parent GuiViewStack
 		 */
 		virtual void
 		update();
 
-		/**
-		 * @brief hasChanged indicates the current displayed view has changed.
-		 *        This function prevents unnecessary drawing of the display
-		 * @return if true the display has to be redrawn.
-		 */
-		virtual bool
-		hasChanged() = 0;
+		virtual void
+		preUpdate()
+		{
+		}
+
+		virtual void
+		postUpdate()
+		{
+		}
 		
 		/**
 		 * @brief draw determine the output on the Graphic Display
 		 */
 		virtual void
-		draw() = 0;
+		draw();
 		
-
 		/**
-		 * @brief shortButtonPress handle the action for the pressed button
-		 */
-		virtual void 
-		shortButtonPress(xpcc::MenuButtons::Button button);
-
-		/**
-		 * @brief isAlive tells the ViewStack if it should remove this screen.
-		 * @return
+		 *  @brief add widget to view
 		 */
 		bool
-		isAlive() const;
+		pack(Widget *w, const xpcc::glcd::Point &coord);
 
 		/**
 		 * @brief remove the view from the screen. The viewStack handles the deletion.
@@ -105,39 +104,36 @@ namespace xpcc
 		remove();
 
 		/**
-		 * @brief getIdentifier of the view.
+		 * @brief set color palette for every contained widget
 		 */
-		inline uint8_t getIdentifier(){
-			return this->identifier;
+		void
+		setColorPalette(ColorPalette& cp);
+
+		ColorPalette&
+		getColorPalette()
+		{
+			return this->colorpalette;
 		}
 
-	public:
+		void
+		markDirty();
 
-		xpcc::GraphicDisplay&
-		display();
+		void
+		markDrawn();
 		
-		/**
-		 * @brief onRemove will be called right before the view gets deleted,
-		 *        can be reimplemented to reset external data.
-		 */
-		virtual void
-		onRemove();
-		
-		inline xpcc::ViewStack*
+		inline xpcc::gui::GuiViewStack*
 		getViewStack()
 		{
 			return stack;
 		}
-		
-	private:
-		xpcc::ViewStack* stack;
 
-	public:
-		const uint8_t identifier;
-		bool alive;
+	protected:
+		xpcc::gui::GuiViewStack* stack;
+		Dimension dimension;
+		WidgetContainer widgets;
+		xpcc::gui::ColorPalette colorpalette;
 	};
 }
+}
 
-#include "view_stack.hpp"
-
-#endif // XPCC__ABSTRACT_VIEW_HPP
+#endif // XPCC__GUI_ABSTRACT_VIEW_HPP

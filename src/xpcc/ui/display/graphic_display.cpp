@@ -49,12 +49,18 @@ xpcc::GraphicDisplay::GraphicDisplay() :
 void
 xpcc::GraphicDisplay::setColor(const glcd::Color& newColor)
 {
-	if (newColor == glcd::Color::black()) {
-		draw = &xpcc::GraphicDisplay::clearPixel;
-	}
-	else {
-		draw = &xpcc::GraphicDisplay::setPixel;
-	}
+//	if (newColor == glcd::Color::black()) {
+//		draw = &xpcc::GraphicDisplay::clearPixel;
+//	}
+//	else {
+//		draw = &xpcc::GraphicDisplay::setPixel;
+//	}
+
+	/* When using a multicolor display we don't need clearPixel(), or at least
+	 * not the way it was implemented above. Maybe check if newColor equals
+	 * backgroundColor.
+	 * */
+	draw = &xpcc::GraphicDisplay::setPixel;
 	this->foregroundColor = newColor;
 }
 
@@ -333,7 +339,7 @@ xpcc::GraphicDisplay::drawImageRaw(glcd::Point upperLeft,
 					this->setPixel(upperLeft.getX() + i, upperLeft.getY() + k * 8 + j);
 				}
 				else {
-					this->clearPixel(upperLeft.getX() + i, upperLeft.getY() + k * 8 + j);
+//					this->clearPixel(upperLeft.getX() + i, upperLeft.getY() + k * 8 + j);
 				}
 				byte >>= 1;
 			}

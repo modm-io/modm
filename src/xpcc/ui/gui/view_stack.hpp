@@ -28,16 +28,19 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC__VIEWSTACK_HPP
-#define XPCC__VIEWSTACK_HPP
+#ifndef XPCC__GUI_VIEWSTACK_HPP
+#define XPCC__GUI_VIEWSTACK_HPP
 
 #include "../display/graphic_display.hpp"
 #include "../../container/stack.hpp"
 #include "../../container/linked_list.hpp"
-#include "menu_buttons.hpp"
-#include "abstract_view.hpp"
+#include "../menu/menu_buttons.hpp"
+#include "view.hpp"
+#include "types.hpp"
 
 namespace xpcc
+{
+namespace gui
 {
 	/**
 	* \brief Stack which handles the displaying
@@ -50,19 +53,19 @@ namespace xpcc
 	* \author	Thorsten Lajewski
 	*/
 
-	class ViewStack
+	class GuiViewStack : public xpcc::ViewStack
 	{
 	public:
-		ViewStack(xpcc::GraphicDisplay* display);
+		GuiViewStack(xpcc::GraphicDisplay* display, xpcc::gui::inputQueue* queue);
 		
-		virtual ~ViewStack();
+		virtual ~GuiViewStack();
 		
 		/**
 		 * @brief get the top view from the stack
 		 * @return pointer to view from stack
 		 */
 
-		inline xpcc::AbstractView* 
+		inline xpcc::gui::View*
 		get()
 		{
 			return this->stack.get();
@@ -76,24 +79,24 @@ namespace xpcc
 		 * @param view next displayed view
 		 */
 		inline void
-		push(xpcc::AbstractView* view)
+		push(xpcc::gui::View* view)
 		{
 			this->stack.push(view);
 			this->getDisplay().clear();
-			xpcc::AbstractView* top = this->get();
+			xpcc::gui::View* top = this->get();
 			top->draw();
 			this->display->update();
 		}
-
-		/**
-		 * @brief getDisplay access underlying GraphicDisplay
-		 */
-		inline xpcc::GraphicDisplay&
-		getDisplay()
-		{
-			return *this->display;
-		}
 		
+		/**
+		 * @brief get event input queue from GuiViewStack
+		 */
+		inline xpcc::gui::inputQueue*
+		getInputQueue()
+		{
+			return this->input_queue;
+		}
+
 		/**
 		 * @brief pop remove top view from the stack. The removed
 		 *        view is deleted
@@ -105,18 +108,11 @@ namespace xpcc
 		virtual void
 		update();
 
-		/**
-		 * @brief shortButtonPress pass the button press to the current top view
-		 * @param button the pressed button
-		 */
-		
-		void
-		shortButtonPress(xpcc::MenuButtons::Button button);
-
-	protected:
-		xpcc::GraphicDisplay* display;
-		xpcc::Stack< xpcc::AbstractView* , xpcc::LinkedList< xpcc::AbstractView* > > stack;
+	private:
+		xpcc::Stack< xpcc::gui::View* , xpcc::LinkedList< xpcc::gui::View* > > stack;
+		xpcc::gui::inputQueue *input_queue;
 	};
 }
+}
 
-#endif // XPCC__VIEWSTACK_HPP
+#endif // XPCC__GUI_VIEWSTACK_HPP
