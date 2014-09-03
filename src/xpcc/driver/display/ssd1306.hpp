@@ -65,10 +65,6 @@ struct ssd1306
 /**
  * Driver for SSD1306 based OLED-displays using I2C.
  *
- * The driver updates the display with 10Hz by default, which is the limit
- * with an I2C baudrate of 100kHz.
- * You may get higher update rates with higher bus speeds.
- *
  * @author	Niklas Hauser
  * @ingroup	lcd
  */
@@ -79,28 +75,46 @@ class Ssd1306 : public ssd1306, public xpcc::I2cDevice<I2cMaster>,
 public:
 	Ssd1306(uint8_t address = 0x3C);
 
-	/// Automatically update the display with the content of the RAM buffer.
+	/// Update the display with the content of the RAM buffer.
 	virtual void
-	update();
+	update()
+	{
+		while(startWriteDisplay(this) > xpcc::pt::Success) ;
+	}
+
+	/// Use this method to synchronize writing to the displays buffer
+	/// to avoid tearing.
+	/// @return	`true` if the frame buffer is not being copied to the display
+	bool ALWAYS_INLINE
+	isWritable()
+	{
+		return (i2cTask != I2cTask::WriteDisplay);
+	}
 
 	// MARK: - TASKS
 	/// pings the diplay
 	xpcc::pt::Result
 	ping(void *ctx);
 
+
 	/// initializes for 3V3 with charge-pump
+	void
+	initialize()
+	{
+		while(initialize(this) > xpcc::pt::Success) ;
+	}
+
+	/// initializes for 3V3 with charge-pump asynchronously
 	xpcc::pt::Result
 	initialize(void *ctx);
 
 	/// Starts a frame transfer to the display
-	/// You can use this to avoid tearing or to
-	/// get higher frames rates than 10Hz, if the I2C speed allows for it.
+	xpcc::pt::Result
+	startWriteDisplay(void *ctx);
+
+	// starts a frame transfer and waits for completion
 	xpcc::pt::Result
 	writeDisplay(void *ctx);
-
-	/// invert the display
-	xpcc::pt::Result ALWAYS_INLINE
-	invertDisplay(void *ctx, bool inverted = true);
 
 
 	/// Write a command without data

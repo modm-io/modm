@@ -18,14 +18,6 @@ xpcc::Ssd1306<I2cMaster>::Ssd1306(uint8_t address)
 {
 }
 
-template < class I2cMaster >
-void
-xpcc::Ssd1306<I2cMaster>::update()
-{
-	while (writeDisplay(this) > xpcc::pt::Success)
-		;
-}
-
 // ----------------------------------------------------------------------------
 // MARK: - Tasks
 template < class I2cMaster >
@@ -34,9 +26,9 @@ xpcc::Ssd1306<I2cMaster>::ping(void *ctx)
 {
 	NPT_BEGIN(ctx);
 
-	NPT_WAIT_UNTIL(adapter.configurePing() && this->startTransaction(&adapter));
-
-	i2cTask = I2cTask::Ping;
+	NPT_WAIT_UNTIL(adapter.configurePing() &&
+			(i2cTask = I2cTask::Ping, this->startTransaction(&adapter))
+	);
 
 	NPT_WAIT_WHILE(i2cTask == I2cTask::Ping);
 
@@ -82,13 +74,24 @@ xpcc::Ssd1306<I2cMaster>::initialize(void *ctx)
 // ----------------------------------------------------------------------------
 template < class I2cMaster >
 xpcc::pt::Result
+xpcc::Ssd1306<I2cMaster>::startWriteDisplay(void *ctx)
+{
+	NPT_BEGIN(ctx);
+
+	NPT_WAIT_UNTIL(adapterData.configureWrite(buffer, 1024) &&
+			(i2cTask = I2cTask::WriteDisplay, this->startTransaction(&adapterData)));
+
+	NPT_END();
+}
+
+
+template < class I2cMaster >
+xpcc::pt::Result
 xpcc::Ssd1306<I2cMaster>::writeDisplay(void *ctx)
 {
 	NPT_BEGIN(ctx);
 
-	NPT_WAIT_UNTIL(adapterData.configureWrite(buffer, 1024) && this->startTransaction(&adapterData));
-
-	i2cTask = I2cTask::WriteDisplay;
+	NPT_SPAWN(startWriteDisplay(ctx));
 
 	NPT_WAIT_WHILE(i2cTask == I2cTask::WriteDisplay);
 
@@ -96,14 +99,6 @@ xpcc::Ssd1306<I2cMaster>::writeDisplay(void *ctx)
 		NPT_EXIT_SUCCESS();
 
 	NPT_END();
-}
-
-// ----------------------------------------------------------------------------
-template < class I2cMaster >
-xpcc::pt::Result
-xpcc::Ssd1306<I2cMaster>::invertDisplay(void *ctx, bool inverted)
-{
-	return writeCommand(ctx, inverted ? Command::SetInvertedDisplay : Command::SetNormalDisplay);
 }
 
 // ----------------------------------------------------------------------------
@@ -249,10 +244,6 @@ template < class I2cMaster >
 bool
 xpcc::Ssd1306<I2cMaster>::startTransactionWithLength(uint8_t length)
 {
-	if (adapter.configureWrite(commandBuffer, length) && this->startTransaction(&adapter))
-	{
-		i2cTask = commandBuffer[1];
-		return true;
-	}
-	return false;
+	return (adapter.configureWrite(commandBuffer, length) &&
+			(i2cTask = commandBuffer[1], this->startTransaction(&adapter)));
 }
