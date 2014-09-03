@@ -21,10 +21,10 @@ isBigEndian()
 {
 	union
 	{
-		uint32_t i;
-		char c[4];
+		uint16_t i;
+		char c[2];
 	}
-	bint = {0x01020304};
+	bint = {0x0100};
 
 	return (bint.c[0] == 0x01);
 }
