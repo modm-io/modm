@@ -51,7 +51,7 @@ public:
 	static constexpr bool
 	isErrorInTolerance(float error, uint16_t tolerance)
 	{
-		return (error == 0) || (std::abs(error)*1000 <= tolerance);
+		return (error == 0) || (((error > 0) ? error : -error) * 1000 <= tolerance);
 	}
 
 	static constexpr bool
