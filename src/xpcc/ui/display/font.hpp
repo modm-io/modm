@@ -44,3 +44,4 @@
 #include "font/numbers_14x32.hpp"
 #include "font/numbers_40x56.hpp"
 #include "font/numbers_46x64.hpp"
+#include "font/matrix_8x8.hpp"
