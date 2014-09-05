@@ -443,6 +443,20 @@ public:
 		return payload_len;
 	}
 
+	/** @brief Enable Rx Pipe and set payload width
+	 *
+	 *	@param pipe		Pipe Number
+	 */
+	static void
+	enablePipe(uint8_t pipe);
+
+	/** @brief Disable Rx Pipe and set payload width
+	 *
+	 *	@param pipe		Pipe Number
+	 */
+	static void
+	disablePipe(uint8_t pipe);
+
 
 private:
 	static uint8_t
