@@ -40,14 +40,14 @@ namespace xpcc
 	 * \ingroup	architecture
 	 */
 	void
-	delayMicroseconds(float us);
+	delayMicroseconds(uint32_t us);
 	
 	/**
 	 * \brief	Delay ms milliseconds
 	 * \ingroup	architecture
 	 */
 	void
-	delayMilliseconds(float ms);
+	delayMilliseconds(uint32_t ms);
 }
 
 #else // !__DOXYGEN__
@@ -62,13 +62,13 @@ namespace xpcc
 	namespace xpcc
 	{
 		ALWAYS_INLINE void
-		delayMicroseconds(float us)
+		delayMicroseconds(uint32_t us)
 		{
 			_delay_us(us);
 		}
 		
 		ALWAYS_INLINE void
-		delayMilliseconds(float ms)
+		delayMilliseconds(uint32_t ms)
 		{
 			_delay_ms(ms);
 		}
@@ -81,13 +81,13 @@ namespace xpcc
 	namespace xpcc
 	{
 		ALWAYS_INLINE void
-		delayMicroseconds(int us)
+		delayMicroseconds(uint32_t us)
 		{
 			usleep(us);
 		}
 		
 		ALWAYS_INLINE void
-		delayMilliseconds(int ms)
+		delayMilliseconds(uint32_t ms)
 		{
 			usleep(ms*1000);
 		}
