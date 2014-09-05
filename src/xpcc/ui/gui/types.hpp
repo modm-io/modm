@@ -68,10 +68,10 @@ namespace gui {
 	class AsyncEvent
 	{
 	public:
-		AsyncEvent(uint16_t delay_ms, genericCallback cb, void* cb_data) :
+		AsyncEvent(uint16_t delayMilliseconds, genericCallback cb, void* cb_data) :
 			cb(cb),
 			cb_data(cb_data),
-			timeout(delay_ms),
+			timeout(delayMilliseconds),
 			already_run(false)
 		{
 

@@ -61,7 +61,7 @@ MAIN_FUNCTION
 //		//lcd::Cs::toggle();
 //		//spi::Mosi::toggle();
 //		LedStat::toggle();
-//		xpcc::delay_ms(500);
+//		xpcc::delayMilliseconds(500);
 //	}
 
 	bool dir = true;

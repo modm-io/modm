@@ -20,7 +20,7 @@
 %% endif
 %#
 
-#include <xpcc/architecture/driver/delay.hpp>	// xpcc::delay_us
+#include <xpcc/architecture/driver/delay.hpp>	// xpcc::delayMicroseconds
 
 void
 xpcc::stm32::Adc{{ id }}::initialize(const ClockMode clk, const Prescaler pre,
@@ -51,7 +51,7 @@ xpcc::stm32::Adc{{ id }}::initialize(const ClockMode clk, const Prescaler pre,
 	// enable regulator
 	ADC{{ id }}->CR &= ~ADC_CR_ADVREGEN;
 	ADC{{ id }}->CR |= static_cast<uint32_t>(VoltageRegulatorState::Enabled);
-	xpcc::delay_us(10);	// FIXME: this is ugly -> find better solution
+	xpcc::delayMicroseconds(10);	// FIXME: this is ugly -> find better solution
 
 	calibrate(cal, true);	// blocking calibration
 

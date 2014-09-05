@@ -83,7 +83,7 @@ MAIN_FUNCTION
 		xpcc::Location2D<> *location;
 		MyOdometry::getLocation(location);
 
-		xpcc::delay_ms(500);
+		xpcc::delayMilliseconds(500);
 	}
 
 	return 0;

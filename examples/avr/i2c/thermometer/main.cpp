@@ -49,7 +49,7 @@ main()
 	// Enable the 12 bit resolution
 	ds1631.configure(xpcc::ds1631::RESOLUTION_12BIT, false);
 
-	xpcc::delay_ms(1);
+	xpcc::delayMilliseconds(1);
 
 	// start a new conversion
 	ds1631.startConversion();

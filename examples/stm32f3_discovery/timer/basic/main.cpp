@@ -29,7 +29,7 @@ MAIN_FUNCTION
 	uint8_t i = 0;
 	while (1){
 		Timer1::setCompareValue(1, ++i);
-		xpcc::delay_ms(10);
+		xpcc::delayMilliseconds(10);
 	}
 
 	return 0;

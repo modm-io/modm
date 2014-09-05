@@ -44,7 +44,7 @@ xpcc::XilinxSpartan6Parallel<Cclk, DataLow, DataHigh, ProgB, InitB, Done, DataSo
 		while (InitB::read() == xpcc::Gpio::High ||
 				Done::read() == xpcc::Gpio::High)
 		{
-			xpcc::delay_us(1);
+			xpcc::delayMicroseconds(1);
 			if (counter++ > 1000) {
 				// Timeout (1ms) reached, FPGA is not responding abort configuration
 				XPCC_LOG_ERROR << XPCC_FILE_INFO;
@@ -63,7 +63,7 @@ xpcc::XilinxSpartan6Parallel<Cclk, DataLow, DataHigh, ProgB, InitB, Done, DataSo
 
 	Led0::reset();
 
-	xpcc::delay_us(1);
+	xpcc::delayMicroseconds(1);
 	// Release reset
 	ProgB::set();
 
@@ -71,7 +71,7 @@ xpcc::XilinxSpartan6Parallel<Cclk, DataLow, DataHigh, ProgB, InitB, Done, DataSo
 	uint32_t counter = 0;
 	while (InitB::read() == xpcc::Gpio::Low)
 	{
-		xpcc::delay_us(1);
+		xpcc::delayMicroseconds(1);
 		if (counter++ > 1000) {
 			// Timeout (1ms) reached, FPGA is not responding abort configuration
 			XPCC_LOG_ERROR << XPCC_FILE_INFO;

@@ -73,7 +73,7 @@ MAIN_FUNCTION
 		++ii;
 		LedOrange::toggle();
 		LedGreen::toggle();
-		xpcc::delay_ms(data[ii]);
+		xpcc::delayMilliseconds(data[ii]);
 	}
 
 	return 0;

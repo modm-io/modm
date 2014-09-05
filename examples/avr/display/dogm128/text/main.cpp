@@ -56,7 +56,7 @@ MAIN_FUNCTION
 	display << 0 << 12 << 345 << 6789 << "!\"§$%&/()=?`´,;:-<>";
 	display.update();
 
-	xpcc::delay_ms(2000);
+	xpcc::delayMilliseconds(2000);
 
 	display.clear();
 	display.setFont(xpcc::font::Assertion);
@@ -67,7 +67,7 @@ MAIN_FUNCTION
 	display << "0123456789!\"§$%&/()=?`´,;:-<>";
 	display.update();
 
-	xpcc::delay_ms(2000);
+	xpcc::delayMilliseconds(2000);
 
 	display.clear();
 	display.setFont(xpcc::font::ArcadeClassic);

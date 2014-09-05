@@ -22,13 +22,13 @@ main()
 	xpcc::IOStream output(device);
 
 	output << "Welcome" << xpcc::endl;
-	xpcc::delay_ms(100);
+	xpcc::delayMilliseconds(100);
 
 	ow.initialize();
 
 	if (!ow.touchReset()) {
 		output << "No devices found!" << xpcc::endl;
-		xpcc::delay_ms(100);
+		xpcc::delayMilliseconds(100);
 		while (1) {
 			// wait forever
 		}
@@ -44,7 +44,7 @@ main()
 			output << rom[i];
 		}
 		output << xpcc::ascii << xpcc::endl;
-		xpcc::delay_ms(100);
+		xpcc::delayMilliseconds(100);
 	}
 	output << "finished!" << xpcc::endl;
 
@@ -60,7 +60,7 @@ main()
 			int16_t temperature = ds18b20.readTemperature();
 
 			output << "Temperature: " << temperature << xpcc::endl;
-			xpcc::delay_ms(100);
+			xpcc::delayMilliseconds(100);
 
 			ds18b20.startConversion();
 		}

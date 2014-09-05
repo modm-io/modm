@@ -26,7 +26,7 @@ MAIN_FUNCTION
 		if (c == 'Z' + 1) {
 			c = 'A';
 		}
-		xpcc::delay_ms(500);
+		xpcc::delayMilliseconds(500);
 	}
 
 	return 0;

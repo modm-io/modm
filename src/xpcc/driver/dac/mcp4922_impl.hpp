@@ -73,9 +73,9 @@ template <typename Spi, typename Cs, typename Ldac>
 void
 xpcc::Mcp4922<Spi, Cs, Ldac>::update()
 {
-	xpcc::delay_us(0.04);
+	xpcc::delayMicroseconds(1); // 40 nanoseconds
 	Ldac::reset();
-	xpcc::delay_us(0.1);
+	xpcc::delayMicroseconds(1); // 100 nanoseconds
 	Ldac::set();
 }
 

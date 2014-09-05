@@ -39,7 +39,7 @@ xpcc::TLC594X<CHANNELS, Spi, Xlat, Vprog, Xerr>::latch()
 	Xlat::set();
 	// datasheet says 20ns but that is unreliable
 	// => wait for at least 900ns
-	xpcc::delay_us(0.9);
+	xpcc::delayMicroseconds(0.9);
 	Xlat::reset();
 }
 

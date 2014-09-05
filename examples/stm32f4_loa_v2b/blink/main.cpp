@@ -12,7 +12,7 @@ MAIN_FUNCTION
 	{
 		LedWhite::toggle();
 		LedGreen::toggle();
-		xpcc::delay_ms(100);
+		xpcc::delayMilliseconds(100);
 	}
 
 	return 0;

@@ -87,4 +87,3 @@ xpcc::SoftwareSpiMaster<SCK, MOSI, MISO, Baudrate>::reset(DetachCause cause)
 	if (delegate) delegate->detaching(cause);
 	delegate = 0;
 }
-//-----------------------------------------------------------------------------

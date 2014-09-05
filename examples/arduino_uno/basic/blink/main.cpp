@@ -18,8 +18,8 @@ MAIN_FUNCTION
 	while (1)
 	{
 		DigitalOutput13::set();
-		xpcc::delay_ms(1000);
+		xpcc::delayMilliseconds(1000);
 		DigitalOutput13::reset();
-		xpcc::delay_ms(1000);
+		xpcc::delayMilliseconds(1000);
 	}
 }

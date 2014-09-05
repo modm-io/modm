@@ -94,7 +94,7 @@ xpcc::St7565<SPI, CS, A0, Reset, Width, Height, TopView>::initialize(
 	// reset the controller
 	reset.setOutput();
 	reset.reset();
-	xpcc::delay_ms(50);
+	xpcc::delayMilliseconds(50);
 	reset.set();
 	
 	cs.reset();

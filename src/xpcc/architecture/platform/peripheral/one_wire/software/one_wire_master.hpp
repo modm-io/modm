@@ -166,17 +166,17 @@ namespace xpcc
 		static bool
 		performSearch();
 		
-		// standard delay times in µs
-		static const int A = 6;
-		static const int B = 64;
-		static const int C = 60;
-		static const int D = 10;
-		static const int E = 9;
-		static const int F = 55;
-		static const int G = 0;
-		static const int H = 480;
-		static const int I = 70;
-		static const int J = 410;
+		// standard delay times in microseconds
+		static constexpr unsigned int A = 6;
+		static constexpr unsigned int B = 64;
+		static constexpr unsigned int C = 60;
+		static constexpr unsigned int D = 10;
+		static constexpr unsigned int E = 9;
+		static constexpr unsigned int F = 55;
+		static constexpr unsigned int G = 0;
+		static constexpr unsigned int H = 480;
+		static constexpr unsigned int I = 70;
+		static constexpr unsigned int J = 410;
 		
 		static Pin pin;
 		

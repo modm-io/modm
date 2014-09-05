@@ -83,7 +83,7 @@ MAIN_FUNCTION
 						-cos(angle) * radius));
 		display.update();
 		
-		xpcc::delay_ms(10);
+		xpcc::delayMilliseconds(10);
 	}
 }
 

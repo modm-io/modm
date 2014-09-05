@@ -63,6 +63,6 @@ main()
 		display.drawCircle(Point(x, y), radius);
 		display.update();
 
-		xpcc::delay_ms(50);
+		xpcc::delayMilliseconds(50);
 	}
 }

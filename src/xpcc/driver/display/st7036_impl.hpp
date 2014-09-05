@@ -109,9 +109,9 @@ xpcc::St7036<SPI, CS, RS, Width, Heigth>::writeCommand(uint8_t inCommand)
 	// check if the command is 'clear display' oder 'return home', these
 	// commands take a bit longer until they are finished.
 	if ((inCommand & 0xfc) == 0) {
-		xpcc::delay_ms(1.2);
+		xpcc::delayMicroseconds(1200);
 	}
 	else {
-		xpcc::delay_us(27);
+		xpcc::delayMicroseconds(27);
 	}
 }

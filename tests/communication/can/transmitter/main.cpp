@@ -127,7 +127,7 @@ main()
 	sei();
 
 	xpcc::log::info << "########## XPCC CAN communication TEST TRANSMIT ##########" << xpcc::flush;
-	delay_ms(1000);
+	delayMilliseconds(1000);
 
 //	tipc.addReceiverId(0x20);
 
@@ -158,7 +158,7 @@ main()
 			longData.a--;
 			xpcc::SmartPointer payloadLong(&longData);
 			xpcc::log::info << "long=" << payloadLong << xpcc::flush;
-			delay_ms(10);
+			delayMilliseconds(10);
 			canConnector.sendPacket(eventHeader, payloadLong);
 			/*
 			tipc.sendPacket(eventHeader, payload);
@@ -178,7 +178,7 @@ main()
 		}
 		canConnector.update();
 		xpcc::Clock::increment();
-		delay_ms(1);
+		delayMilliseconds(1);
 	}
 
 

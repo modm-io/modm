@@ -59,7 +59,7 @@ main(void)
 
 	xpcc::lpc::Uart1::initialize(115200);
 
-	xpcc::delay_ms(100); // glitch ?
+	xpcc::delayMilliseconds(100); // glitch ?
 
 	uart.write('X');
 	uart.write('I');
@@ -100,14 +100,14 @@ testWriteSingle(void)
 			WriteInd::setOutput(false);
 		}
 
-		xpcc::delay_ms(2);
+		xpcc::delayMilliseconds(2);
 
 		// Some pause between burst otherwise USB is overloaded.
 		static uint8_t burst = 0;
 		if (burst++ > 5)
 		{
 			burst = 0;
-			xpcc::delay_ms(500);
+			xpcc::delayMilliseconds(500);
 		}
 	} // while (1)
 }
@@ -132,13 +132,13 @@ testWriteBuffer(void)
 		uart.write('\n');
 		WriteInd::setOutput(false);
 
-		xpcc::delay_ms(2);
+		xpcc::delayMilliseconds(2);
 
 		// Some pause between burst otherwise USB is overloaded.
 		static uint8_t burst = 0;
 		if (burst++ > 5) {
 			burst = 0;
-			xpcc::delay_ms(5000);
+			xpcc::delayMilliseconds(5000);
 		}
 	} // while (1)
 }

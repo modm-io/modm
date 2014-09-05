@@ -246,7 +246,7 @@ xpcc::Ad7280a<Spi, Cs, Cnvst, N>::performSelftest()
 	
 	// Allow sufficient time for the self-test conversions to be
 	// completed plus tWAIT.
-	xpcc::delay_ms(50);		// TODO
+	xpcc::delayMilliseconds(50);		// TODO
 	
 	// The register address corresponding to the self-test
 	// conversion should be written to the read register of all
@@ -307,7 +307,7 @@ xpcc::Ad7280a<Spi, Cs, Cnvst, N>::readChannel(uint8_t device,
 			AD7280A_CTRL_HB_CONV_START_CS);
 	
 	// Wait for the conversion to finish
-	xpcc::delay_ms(5);
+	xpcc::delayMilliseconds(5);
 	
 	// Read one channel
 	write(device, ad7280a::READ, false, channel);
@@ -340,7 +340,7 @@ xpcc::Ad7280a<Spi, Cs, Cnvst, N>::readAllChannels(uint16_t *values)
 			AD7280A_CTRL_HB_CONV_START_CS);
 	
 	// Allow sufficient time for all conversions to be completed plus tWAIT.
-	xpcc::delay_ms(5);
+	xpcc::delayMilliseconds(5);
 	
 	// Apply a CS low pulse that frames 32 SCLKs to read back
 	// the desired voltage. This frame should simultaneously
@@ -418,7 +418,7 @@ xpcc::Ad7280a<Spi, Cs, Cnvst, N>::write(uint8_t device, ad7280a::Register reg,
 	Cs::set();
 	
 	// TODO remove this
-	xpcc::delay_us(1);
+	xpcc::delayMicroseconds(1);
 	return true;
 }
 

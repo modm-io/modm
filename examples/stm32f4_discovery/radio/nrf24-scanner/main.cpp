@@ -125,9 +125,9 @@ MAIN_FUNCTION
 			nrf24hal::writeRegister(Register::RF_CH, i + channel_start);
 
 			Ce::set();
-			xpcc::delay_us(rx_settle);
+			xpcc::delayMicroseconds(rx_settle);
 			Ce::reset();
-			xpcc::delay_us(2);
+			xpcc::delayMicroseconds(2);
 			channel_info[i] += 5*nrf24hal::readRegister(Register::RPD);
 
 			if(channel_info[i] > max)

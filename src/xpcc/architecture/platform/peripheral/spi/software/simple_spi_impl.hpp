@@ -102,7 +102,7 @@ template <typename SCK, typename MOSI, typename MISO, uint32_t Baudrate>
 void ALWAYS_INLINE
 xpcc::SoftwareSpiSimpleMaster<SCK, MOSI, MISO, Baudrate>::delay()
 {
-	xpcc::delay_us(delayTime);
+	xpcc::delayMicroseconds(delayTime);
 }
 
 template <typename SCK, typename MOSI, typename MISO, uint32_t Baudrate>

@@ -49,7 +49,7 @@ xpcc::Mcp23s17<Spi, Cs, Int>::initialize()
 {
 	cs.set();
 	
-	xpcc::delay_us(0.1);
+	xpcc::delayMicroseconds(1);
 	
 	// Disable address pins (as they are by default) and enable the
 	// open-drain output from the interrupt line. INTA and INTB mirrored.
@@ -60,7 +60,7 @@ xpcc::Mcp23s17<Spi, Cs, Int>::initialize()
 	spi.writeReadBlocking((1 << 6) | (1 << 2));
 	cs.set();
 	
-	xpcc::delay_us(0.1);
+	xpcc::delayMicroseconds(1);
 }
 
 template <typename Spi, typename Cs, typename Int>
@@ -74,7 +74,7 @@ xpcc::Mcp23s17<Spi, Cs, Int>::configure(uint16_t inputMask, uint16_t pullupMask)
 	spi.writeReadBlocking(inputMask >> 8);
 	cs.set();
 	
-	xpcc::delay_us(0.1);
+	xpcc::delayMicroseconds(1);
 	
 	cs.reset();
 	spi.writeReadBlocking(deviceAddress | WRITE);
@@ -83,7 +83,7 @@ xpcc::Mcp23s17<Spi, Cs, Int>::configure(uint16_t inputMask, uint16_t pullupMask)
 	spi.writeReadBlocking(pullupMask >> 8);
 	cs.set();
 	
-	xpcc::delay_us(0.1);
+	xpcc::delayMicroseconds(1);
 }
 
 //void
@@ -102,7 +102,7 @@ xpcc::Mcp23s17<Spi, Cs, Int>::read()
 	value |= spi.writeReadBlocking(0x00) << 8;
 	cs.set();
 	
-	xpcc::delay_us(0.1);
+	xpcc::delayMicroseconds(0.1);
 	
 	return value;
 }
@@ -118,5 +118,5 @@ xpcc::Mcp23s17<Spi, Cs, Int>::write(uint16_t output)
 	spi.writeReadBlocking(output >> 8);
 	cs.set();
 	
-	xpcc::delay_us(0.1);
+	xpcc::delayMicroseconds(0.1);
 }
