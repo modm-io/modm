@@ -17,21 +17,21 @@ MAIN_FUNCTION
 	while (1)
 	{
 		LedNorth::toggle();
-		xpcc::delay_ms(100);
+		xpcc::delayMilliseconds(100);
 		LedNorthEast::toggle();
-		xpcc::delay_ms(100);
+		xpcc::delayMilliseconds(100);
 		LedEast::toggle();
-		xpcc::delay_ms(100);
+		xpcc::delayMilliseconds(100);
 		LedSouthEast::toggle();
-		xpcc::delay_ms(100);
+		xpcc::delayMilliseconds(100);
 		LedSouth::toggle();
-		xpcc::delay_ms(100);
+		xpcc::delayMilliseconds(100);
 		LedSouthWest::toggle();
-		xpcc::delay_ms(100);
+		xpcc::delayMilliseconds(100);
 		LedWest::toggle();
-		xpcc::delay_ms(100);
+		xpcc::delayMilliseconds(100);
 		LedNorthWest::toggle();
-		xpcc::delay_ms(100);
+		xpcc::delayMilliseconds(100);
 	}
 
 	return 0;

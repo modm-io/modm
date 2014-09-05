@@ -66,9 +66,9 @@ xpcc::CpuBoard2<Transmit, Receive>::initialize()
 	for (uint8_t i = 0; i < 4; ++i)
 	{
 		Leds::write(pattern);
-		xpcc::delay_ms(50);
+		xpcc::delayMilliseconds(50);
 		Leds::write(0x00);
-		xpcc::delay_ms(50);
+		xpcc::delayMilliseconds(50);
 	}
 	
 	return result;

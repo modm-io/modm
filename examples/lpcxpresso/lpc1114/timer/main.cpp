@@ -19,7 +19,7 @@ main(void)
 
 	while (1)
 	{
-		xpcc::delay_ms(100);
+		xpcc::delayMilliseconds(100);
 		static uint16_t pwm = 0;
 		myTimer::setMatchValue(0, pwm);
 		pwm++;

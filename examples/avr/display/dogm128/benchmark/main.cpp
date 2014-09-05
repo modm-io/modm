@@ -71,7 +71,7 @@ introScreen()
 			xpcc::accessor::asFlash(bitmap::rca_logo_128x64));
 	display.update();
 
-	xpcc::delay_ms(2000);
+	xpcc::delayMilliseconds(2000);
 
 	display.clear();
 
@@ -92,28 +92,28 @@ introScreen()
 
 	display.update();
 
-	xpcc::delay_ms(1000);
+	xpcc::delayMilliseconds(1000);
 	display.setCursor(Point(40, 55));
 
 	display << "5 ";
 	display.update();
-	xpcc::delay_ms(1000);
+	xpcc::delayMilliseconds(1000);
 
 	display << "4 ";
 	display.update();
-	xpcc::delay_ms(1000);
+	xpcc::delayMilliseconds(1000);
 
 	display << "3 ";
 	display.update();
-	xpcc::delay_ms(1000);
+	xpcc::delayMilliseconds(1000);
 
 	display << "2 ";
 	display.update();
-	xpcc::delay_ms(1000);
+	xpcc::delayMilliseconds(1000);
 
 	display << "1";
 	display.update();
-	xpcc::delay_ms(1000);
+	xpcc::delayMilliseconds(1000);
 
 	display.clear();
 }

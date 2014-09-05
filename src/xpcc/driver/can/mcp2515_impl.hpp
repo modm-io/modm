@@ -64,11 +64,11 @@ xpcc::Mcp2515<SPI, CS, INT>::initialize(Can::Bitrate bitrate)
 	// configuration mode
 	chipSelect.reset();
 	spi.write(RESET);
-	xpcc::delay_ms(1);
+	xpcc::delayMilliseconds(1);
 	chipSelect.set();
 
 	// wait a bit to give the MCP2515 some time to restart
-	xpcc::delay_ms(30);
+	xpcc::delayMilliseconds(30);
 
 	chipSelect.reset();
 	spi.write(WRITE);

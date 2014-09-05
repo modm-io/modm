@@ -27,7 +27,7 @@ main(void)
 	while (1)
 	{
 		LedStat::toggle();
-		xpcc::delay_ms(500);
+		xpcc::delayMilliseconds(500);
 	}
 }
 

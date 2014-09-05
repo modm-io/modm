@@ -47,7 +47,7 @@ namespace xpcc
 	 * \ingroup	architecture
 	 */
 	void
-	delay_ms(float ms);
+	delayMilliseconds(float ms);
 }
 
 #else // !__DOXYGEN__
@@ -68,7 +68,7 @@ namespace xpcc
 		}
 		
 		ALWAYS_INLINE void
-		delay_ms(float ms)
+		delayMilliseconds(float ms)
 		{
 			_delay_ms(ms);
 		}
@@ -87,7 +87,7 @@ namespace xpcc
 		}
 		
 		ALWAYS_INLINE void
-		delay_ms(int ms)
+		delayMilliseconds(int ms)
 		{
 			usleep(ms*1000);
 		}
@@ -120,7 +120,7 @@ namespace xpcc
 		}
 		
 		inline void
-		delay_ms(int)
+		delayMilliseconds(int)
 		{
 			// TODO
 		}
@@ -140,7 +140,7 @@ namespace xpcc
 		}
 		
 		static inline void
-		delay_ms(uint32_t ms)
+		delayMilliseconds(uint32_t ms)
 		{
 			::_delay_ms(ms);
 		}

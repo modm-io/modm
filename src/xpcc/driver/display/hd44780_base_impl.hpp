@@ -24,7 +24,7 @@ xpcc::Hd44780Base<DATA, RW, RS, E>::initialize(LineMode lineMode)
 
 	Bus<DATA, E, DATA::width>::writeHighNibble(Set8BitBus);
 
-	xpcc::delay_ms(5);
+	xpcc::delayMilliseconds(5);
 
 	Bus<DATA, E, DATA::width>::writeHighNibble(Set8BitBus);
 

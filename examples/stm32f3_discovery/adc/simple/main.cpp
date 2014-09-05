@@ -39,7 +39,7 @@ MAIN_FUNCTION
 		XPCC_LOG_INFO << "adcValue=" << adcValue;
 		float voltage = adcValue * 3.3 / 0xfff;
 		XPCC_LOG_INFO << " voltage=" << voltage << xpcc::endl;
-		xpcc::delay_ms(500);
+		xpcc::delayMilliseconds(500);
 	}
 
 	return 0;

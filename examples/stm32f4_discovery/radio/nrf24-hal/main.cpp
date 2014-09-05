@@ -84,7 +84,7 @@ MAIN_FUNCTION
 		XPCC_LOG_INFO.printf("Expected output for RF_CH: 0x2\n");
 		XPCC_LOG_INFO.printf("Reading RF_CH:             0x%x\n\n", rf_ch);
 
-		xpcc::delay_ms(1000);
+		xpcc::delayMilliseconds(1000);
 	}
 
 	return 0;

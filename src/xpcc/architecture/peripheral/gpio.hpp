@@ -74,7 +74,7 @@
  *     while (1)
  *     {
  *         Led::toggle();
- *         xpcc::delay_ms(500);
+ *         xpcc::delayMilliseconds(500);
  *     }
  * }
  * @endcode
@@ -97,7 +97,7 @@
 8e: 84 27          eor  r24, r20
 90: 85 b9          out  0x05, r24
 
-92: c9 01          movw r24, r18       ; xpcc::delay_ms(500);
+92: c9 01          movw r24, r18       ; xpcc::delayMilliseconds(500);
 94: 01 97          sbiw r24, 0x01
 96: f1 f7          brne .-4            ; 0x94 <main+0x12>
 
@@ -117,7 +117,7 @@
 
 23e: 40 93 27 06   sts  0x0627, r20    ; Led::toggle();
 
-242: c9 01         movw r24, r18       ; xpcc::delay_ms(500);
+242: c9 01         movw r24, r18       ; xpcc::delayMilliseconds(500);
 244: 01 97         sbiw r24, 0x01
 246: f1 f7         brne .-4            ; 0x244 <main+0x16>
 

@@ -49,7 +49,7 @@ main()
 			// receiving the UART output on a PC. If you want to do further
 			// calculations with the results instead of sending it
 			// you do not need this.
-			xpcc::delay_ms(300);
+			xpcc::delayMilliseconds(300);
 			
 			// restart the conversion
 			Adc::startConversion(0);

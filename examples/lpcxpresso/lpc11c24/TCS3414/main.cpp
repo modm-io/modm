@@ -68,7 +68,7 @@ main(void)
 	
 	xpcc::lpc::Uart1 uart(115200);
 
-	xpcc::delay_ms(10); // glitch ?
+	xpcc::delayMilliseconds(10); // glitch ?
 
 	i2c::initialize();
 	XPCC_LOG_DEBUG << "TCS3414" << xpcc::endl;
@@ -78,15 +78,15 @@ main(void)
 
 	if(!tcs::initialize()) {
 		XPCC_LOG_DEBUG << "ERROR WITH INTIALIZING!" << xpcc::endl; }
-	xpcc::delay_ms(100);
+	xpcc::delayMilliseconds(100);
 	tcs::setGain(xpcc::tcs3414::Gain::X16);
-	xpcc::delay_ms(100);
+	xpcc::delayMilliseconds(100);
 	tcs::setIntegrationTime(xpcc::tcs3414::IntegrationMode::DEFAULT, xpcc::tcs3414::NominalIntegrationTime::MSEC_100);
 
 	while (1)
 	{
 		gelb::toggle();
-		xpcc::delay_ms(150);
+		xpcc::delayMilliseconds(150);
 
 		const xpcc::tcs3414::Rgb colors = tcs::getNewColors();
 		xpcc::color::HsvT<xpcc::tcs3414::UnderlyingType> hsv;

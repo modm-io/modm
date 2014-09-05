@@ -24,6 +24,6 @@ MAIN_FUNCTION
 	while (1)
 	{
 		Led::toggle();
-		xpcc::delay_ms(100);
+		xpcc::delayMilliseconds(100);
 	}
 }

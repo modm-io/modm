@@ -51,7 +51,7 @@ MAIN_FUNCTION
 		Adc4::startConversion();
 		while(!Adc4::isConversionFinished);
 		printAdc();
-		xpcc::delay_ms(500);
+		xpcc::delayMilliseconds(500);
 	}
 
 	return 0;
