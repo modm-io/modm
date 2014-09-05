@@ -259,7 +259,7 @@ touchActive()
 	bool m1, m2;
 
 	m1 = !IntTouchscreen::read();
-	xpcc::delay_us(130);
+	xpcc::delayMicroseconds(130);
 	m2 = !IntTouchscreen::read();
 
 	return (m1 || m2);

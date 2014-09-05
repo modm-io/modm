@@ -28,7 +28,7 @@ xpcc::Hd44780Base<DATA, RW, RS, E>::initialize(LineMode lineMode)
 
 	Bus<DATA, E, DATA::width>::writeHighNibble(Set8BitBus);
 
-	xpcc::delay_us(100);
+	xpcc::delayMicroseconds(100);
 
 	Bus<DATA, E, DATA::width>::writeHighNibble(Set8BitBus);
 
@@ -157,7 +157,7 @@ xpcc::Hd44780Base<DATA, RW, RS, E>::isBusy()
 
 	if (read() & BusyFlagMask)
 	{
-		xpcc::delay_us(2);
+		xpcc::delayMicroseconds(2);
 		return true;
 	}
 	return false;
@@ -173,13 +173,13 @@ xpcc::Hd44780Base<DATA, RW, RS, E>::Bus<Data, Enable, 4>::write(uint8_t data)
 	DATA::write(data >> 4);
 
 	E::set();
-	xpcc::delay_us(1);
+	xpcc::delayMicroseconds(1);
 	E::reset();
 
 	DATA::write(data);
 
 	E::set();
-	xpcc::delay_us(1);
+	xpcc::delayMicroseconds(1);
 	E::reset();
 }
 
@@ -200,14 +200,14 @@ xpcc::Hd44780Base<DATA, RW, RS, E>::Bus<Data, Enable, 4>::read()
 	DATA::setInput();
 
 	E::set();
-	xpcc::delay_us(1);
+	xpcc::delayMicroseconds(1);
 	data = DATA::read();
 	E::reset();
 
 	data <<= 4;
 
 	E::set();
-	xpcc::delay_us(1);
+	xpcc::delayMicroseconds(1);
 	data |= DATA::read();
 	E::reset();
 
@@ -224,7 +224,7 @@ xpcc::Hd44780Base<DATA, RW, RS, E>::Bus<Data, Enable, 8>::write(uint8_t data)
 	DATA::write(data);
 
 	E::set();
-	xpcc::delay_us(1);
+	xpcc::delayMicroseconds(1);
 	E::reset();
 }
 
@@ -245,7 +245,7 @@ xpcc::Hd44780Base<DATA, RW, RS, E>::Bus<Data, Enable, 8>::read()
 	DATA::setInput();
 
 	E::set();
-	xpcc::delay_us(1);
+	xpcc::delayMicroseconds(1);
 	data = DATA::read();
 	E::reset();
 

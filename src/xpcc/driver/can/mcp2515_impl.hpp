@@ -281,7 +281,7 @@ xpcc::Mcp2515<SPI, CS, INT>::sendMessage(const can::Message& message)
 	}
 	chipSelect.set();
 
-	xpcc::delay_us(1);
+	xpcc::delayMicroseconds(1);
 
 	// send message via RTS command
 	chipSelect.reset();

@@ -263,11 +263,11 @@ xpcc::SoftwareI2cMaster<SCL, SDA, Frequency>::sclSetAndWait()
 	uint_fast8_t deadlockPreventer = 250;
 	while (scl.read() == xpcc::Gpio::Low && deadlockPreventer)
 	{
-		xpcc::delay_us(delayTime/2);
+		xpcc::delayMicroseconds(delayTime/2);
 		deadlockPreventer--;
 		// double the read amount
 		if (scl.read() != xpcc::Gpio::Low) return;
-		xpcc::delay_us(delayTime/2);
+		xpcc::delayMicroseconds(delayTime/2);
 	}
 	// if extreme clock stretching occurs, then there might be an external error
 	if (!deadlockPreventer)
@@ -281,5 +281,5 @@ template <typename SCL, typename SDA, int32_t Frequency>
 void
 xpcc::SoftwareI2cMaster<SCL, SDA, Frequency>::delay()
 {
-	xpcc::delay_us(delayTime);
+	xpcc::delayMicroseconds(delayTime);
 }

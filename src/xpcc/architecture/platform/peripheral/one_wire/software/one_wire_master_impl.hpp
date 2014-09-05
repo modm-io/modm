@@ -58,16 +58,16 @@ template <typename Pin>
 bool
 xpcc::SoftwareOneWireMaster<Pin>::touchReset()
 {
-	delay_us(G);
+	delayMicroseconds(G);
 	pin.setOutput();	// drives the bus low
-	delay_us(H);
+	delayMicroseconds(H);
 	pin.setInput();		// releases the bus
-	delay_us(I);
+	delayMicroseconds(I);
 	
 	// sample for presence pulse from slave
 	bool result = !pin.read();
 	
-	delay_us(J);			// complete the reset sequence recovery
+	delayMicroseconds(J);			// complete the reset sequence recovery
 	
 	return result;
 }
@@ -79,16 +79,16 @@ xpcc::SoftwareOneWireMaster<Pin>::writeBit(bool bit)
 	if (bit)
 	{
 		pin.setOutput();	// Drives bus low
-		delay_us(A);
+		delayMicroseconds(A);
 		pin.setInput();		// Releases the bus
-		delay_us(B);		// Complete the time slot and 10us recovery
+		delayMicroseconds(B);		// Complete the time slot and 10us recovery
 	}
 	else
 	{
 		pin.setOutput();
-		delay_us(C);
+		delayMicroseconds(C);
 		pin.setInput();
-		delay_us(D);
+		delayMicroseconds(D);
 	}
 }
 
@@ -97,14 +97,14 @@ bool
 xpcc::SoftwareOneWireMaster<Pin>::readBit()
 {
 	pin.setOutput();	// drives the bus low
-	delay_us(A);
+	delayMicroseconds(A);
 	pin.setInput();		// releases the bus
-	delay_us(E);
+	delayMicroseconds(E);
 	
 	// Sample the bit value from the slave
 	bool result = pin.read();
 	
-	delay_us(F);			// complete the reset sequence recovery
+	delayMicroseconds(F);			// complete the reset sequence recovery
 	
 	return result;
 }

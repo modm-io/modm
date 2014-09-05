@@ -40,7 +40,7 @@ namespace xpcc
 	 * \ingroup	architecture
 	 */
 	void
-	delay_us(float us);
+	delayMicroseconds(float us);
 	
 	/**
 	 * \brief	Delay ms milliseconds
@@ -62,7 +62,7 @@ namespace xpcc
 	namespace xpcc
 	{
 		ALWAYS_INLINE void
-		delay_us(float us)
+		delayMicroseconds(float us)
 		{
 			_delay_us(us);
 		}
@@ -81,7 +81,7 @@ namespace xpcc
 	namespace xpcc
 	{
 		ALWAYS_INLINE void
-		delay_us(int us)
+		delayMicroseconds(int us)
 		{
 			usleep(us);
 		}
@@ -98,7 +98,7 @@ namespace xpcc
 	namespace xpcc
 	{
 		/*inline void
-		delay_us(int us)
+		delayMicroseconds(int us)
 		{
 			int ms = us / 1000;
 			if (ms <= 0) {
@@ -114,7 +114,7 @@ namespace xpcc
 		}*/
 		
 		inline void
-		delay_us(int)
+		delayMicroseconds(int)
 		{
 			// TODO
 		}
@@ -134,7 +134,7 @@ namespace xpcc
 	namespace xpcc
 	{
 		static inline void
-		delay_us(uint32_t us)
+		delayMicroseconds(uint32_t us)
 		{
 			::_delay_us(us);
 		}

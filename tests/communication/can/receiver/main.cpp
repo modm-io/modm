@@ -171,7 +171,7 @@ main()
 		}
 		canConnector.update();
 		counter++;
-		delay_us(100);
+		delayMicroseconds(100);
 	}
 
 

@@ -418,7 +418,7 @@ xpcc::Ad7280a<Spi, Cs, Cnvst, N>::write(uint8_t device, ad7280a::Register reg,
 	Cs::set();
 	
 	// TODO remove this
-	xpcc::delay_us(1);
+	xpcc::delayMicroseconds(1);
 	return true;
 }
 

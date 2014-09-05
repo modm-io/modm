@@ -56,14 +56,14 @@ xpcc::SpiRam<Spi, Cs, Hold>::initialize()
 	hold.set();
 	hold.setOutput();
 	
-	xpcc::delay_us(1.0);
+	xpcc::delayMicroseconds(1);
 	
 	cs.reset();
 	spi.write(WRITE_STATUS_REGISTER);
 	spi.write(SEQUENTIAL_MODE);
 	cs.set();
 	
-	xpcc::delay_us(1.0);
+	xpcc::delayMicroseconds(1);
 	
 	// Check if the status register has the right content. This also used
 	// as a general check that the device is available.

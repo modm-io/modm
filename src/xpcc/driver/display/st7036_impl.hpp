@@ -112,6 +112,6 @@ xpcc::St7036<SPI, CS, RS, Width, Heigth>::writeCommand(uint8_t inCommand)
 		xpcc::delay_ms(1.2);
 	}
 	else {
-		xpcc::delay_us(27);
+		xpcc::delayMicroseconds(27);
 	}
 }

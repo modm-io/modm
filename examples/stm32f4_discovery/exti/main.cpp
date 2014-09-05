@@ -29,7 +29,7 @@ EXTI0_IRQHandler(void)
 {
 	Irq::acknowledgeExternalInterruptFlag();
 	LedBlue::set();
-	xpcc::delay_us(1000);
+	xpcc::delayMicroseconds(1000);
 	LedBlue::reset();
 }
 

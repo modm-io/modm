@@ -141,13 +141,13 @@ xpcc::Ks0108<E, RW, RS, PIN_CS1, PIN_CS2, PORT>::writeByte(uint8_t data)
 	port.write(data);
 	rw.reset();
 	
-	delay_us(DATA_SET_UP_TIME);
+	delayMicroseconds(DATA_SET_UP_TIME);
 	
 	e.set();
-	delay_us(MIN_E_HIGH_TIME);
+	delayMicroseconds(MIN_E_HIGH_TIME);
 	
 	e.reset();
-	delay_us(MIN_E_LOW_TIME);
+	delayMicroseconds(MIN_E_LOW_TIME);
 }
 
 // ----------------------------------------------------------------------------
@@ -159,15 +159,15 @@ xpcc::Ks0108<E, RW, RS, PIN_CS1, PIN_CS2, PORT>::readByte()
 	port.setInput();
 	rw.set();
 	
-	delay_us(DATA_SET_UP_TIME);
+	delayMicroseconds(DATA_SET_UP_TIME);
 	
 	e.set();
-	delay_us(MIN_E_HIGH_TIME);
+	delayMicroseconds(MIN_E_HIGH_TIME);
 	
 	uint8_t data = port.read();
 	
 	e.reset();
-	delay_us(MIN_E_LOW_TIME);
+	delayMicroseconds(MIN_E_LOW_TIME);
 	
 	return data;
 }
