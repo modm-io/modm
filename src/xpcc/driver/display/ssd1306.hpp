@@ -121,6 +121,10 @@ public:
 	writeDisplay(void *ctx);
 
 
+	xpcc::co::Result<bool>
+	invertDisplay(void *ctx, bool invert = true);
+
+
 	/// Write a command without data
 	xpcc::co::Result<bool>
 	writeCommand(void *ctx, uint8_t command);
@@ -215,6 +219,7 @@ private:
 	volatile uint8_t i2cSuccess;
 	uint8_t commandBuffer[14];
 	bool initSuccessful;
+	bool inverted;
 
 	xpcc::I2cTagAdapter<xpcc::I2cWriteAdapter> adapter;
 	xpcc::I2cTagAdapter<DataTransmissionAdapter> adapterData;

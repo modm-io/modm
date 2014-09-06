@@ -13,7 +13,7 @@
 
 template < class I2cMaster >
 xpcc::Ssd1306<I2cMaster>::Ssd1306(uint8_t address)
-:	I2cDevice<I2cMaster>(), i2cTask(I2cTask::Idle), i2cSuccess(0),
+:	I2cDevice<I2cMaster>(), i2cTask(I2cTask::Idle), i2cSuccess(0), inverted(false),
 	adapter(address, i2cTask, i2cSuccess), adapterData(address, i2cTask, i2cSuccess)
 {
 }
@@ -26,9 +26,9 @@ xpcc::Ssd1306<I2cMaster>::ping(void *ctx)
 {
 	CO_BEGIN(ctx);
 
-	CO_WAIT_UNTIL(adapter.configurePing() &&
-			(i2cTask = I2cTask::Ping, this->startTransaction(&adapter))
-	);
+	CO_WAIT_UNTIL(adapter.configurePing() && this->startTransaction(&adapter));
+
+	i2cTask = I2cTask::Ping;
 
 	CO_WAIT_WHILE(i2cTask == I2cTask::Ping);
 
@@ -78,8 +78,15 @@ xpcc::Ssd1306<I2cMaster>::startWriteDisplay(void *ctx)
 {
 	CO_BEGIN(ctx);
 
-	CO_WAIT_UNTIL(adapterData.configureWrite(buffer, 1024) &&
-			(i2cTask = I2cTask::WriteDisplay, this->startTransaction(&adapterData)));
+	if (inverted)
+	{
+		CO_CALL(writeCommand(ctx, Command::SetColumnAddress, 0, 127));
+		CO_CALL(writeCommand(ctx, Command::SetPageAddress, 0, 7));
+	}
+
+	CO_WAIT_UNTIL(adapterData.configureWrite(buffer, 1024) && this->startTransaction(&adapterData));
+
+	i2cTask = I2cTask::WriteDisplay;
 
 	CO_END();
 }
@@ -97,6 +104,25 @@ xpcc::Ssd1306<I2cMaster>::writeDisplay(void *ctx)
 
 	if (i2cSuccess == I2cTask::WriteDisplay)
 		CO_RETURN(true);
+
+	CO_END();
+}
+
+template < class I2cMaster >
+xpcc::co::Result<bool>
+xpcc::Ssd1306<I2cMaster>::invertDisplay(void *ctx, bool invert)
+{
+	CO_BEGIN(ctx);
+
+	CO_CALL(writeCommand(ctx, invert ? Command::SetInvertedDisplay : Command::SetNormalDisplay));
+
+	inverted = invert;
+
+	if (!inverted)
+	{
+		CO_CALL(writeCommand(ctx, Command::SetColumnAddress, 0, 127));
+		CO_CALL(writeCommand(ctx, Command::SetPageAddress, 0, 7));
+	}
 
 	CO_END();
 }
@@ -244,6 +270,10 @@ template < class I2cMaster >
 bool
 xpcc::Ssd1306<I2cMaster>::startTransactionWithLength(uint8_t length)
 {
-	return (adapter.configureWrite(commandBuffer, length) &&
-			(i2cTask = commandBuffer[1], this->startTransaction(&adapter)));
+	if (adapter.configureWrite(commandBuffer, length) && this->startTransaction(&adapter))
+	{
+		i2cTask = commandBuffer[1];
+		return true;
+	}
+	return false;
 }
