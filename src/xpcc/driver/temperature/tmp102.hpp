@@ -120,39 +120,39 @@ public:
 
 	// MARK: - Tasks
 	/// pings the sensor
-	xpcc::co::Result
+	xpcc::co::Result<bool>
 	ping(void *ctx);
 
 	// MARK: Configuration
 	// @param	rate	Update rate in Hz: 0 to 33. (Use 0 to update at 0.25Hz).
-	xpcc::co::Result
+	xpcc::co::Result<bool>
 	setUpdateRate(void *ctx, uint8_t rate);
 
 	/// Enables extended mode with 13 bit data format.
-	xpcc::co::Result
+	xpcc::co::Result<bool>
 	enableExtendedMode(void *ctx, bool enable = true);
 
-	xpcc::co::Result
+	xpcc::co::Result<bool>
 	configureAlertMode(void *ctx, ThermostatMode mode, AlertPolarity polarity, FaultQueue faults);
 
-	xpcc::co::Result ALWAYS_INLINE
+	xpcc::co::Result<bool> ALWAYS_INLINE
 	writeUpperLimit(void *ctx, float temperature)
 	{ return writeLimitRegister(ctx, REGISTER_HIGH_TEMPERATURE, temperature); }
 
-	xpcc::co::Result
+	xpcc::co::Result<bool>
 	writeLowerLimit(void *ctx, float temperature)
 	{ return writeLimitRegister(ctx, REGISTER_LOW_TEMPERATURE, temperature); }
 
 	/// param[in]	result	contains comparator mode alert in the configured polarity
-	xpcc::co::Result
+	xpcc::co::Result<bool>
 	readComparatorMode(void *ctx, bool &result);
 
 	/// starts a temperature conversion right now
-	xpcc::co::Result
+	xpcc::co::Result<bool>
 	startConversion(void *ctx);
 
 	/// reads the Temperature registers and buffers the results
-	xpcc::co::Result
+	xpcc::co::Result<bool>
 	readTemperature(void *ctx);
 
 	/// @return the temperature as a signed float in Celcius
@@ -160,10 +160,10 @@ public:
 	getTemperature();
 
 private:
-	xpcc::co::Result
+	xpcc::co::Result<bool>
 	writeConfiguration(void *ctx, uint8_t length=3);
 
-	xpcc::co::Result
+	xpcc::co::Result<bool>
 	writeLimitRegister(void *ctx, Register reg, float temperature);
 
 	struct I2cTask

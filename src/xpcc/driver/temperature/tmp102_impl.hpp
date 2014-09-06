@@ -56,7 +56,7 @@ xpcc::Tmp102<I2cMaster>::update()
 // ----------------------------------------------------------------------------
 // MARK: ping
 template < typename I2cMaster >
-xpcc::co::Result
+xpcc::co::Result<bool>
 xpcc::Tmp102<I2cMaster>::ping(void *ctx)
 {
 	CO_BEGIN(ctx);
@@ -68,14 +68,14 @@ xpcc::Tmp102<I2cMaster>::ping(void *ctx)
 	CO_WAIT_WHILE(i2cTask == I2cTask::Ping);
 
 	if (i2cSuccess == I2cTask::Ping)
-		CO_EXIT_SUCCESS();
+		CO_RETURN(true);
 
 	CO_END();
 }
 
 // MARK: - tasks
 template < typename I2cMaster >
-xpcc::co::Result
+xpcc::co::Result<bool>
 xpcc::Tmp102<I2cMaster>::setUpdateRate(void *ctx, uint8_t rate)
 {
 	CO_BEGIN(ctx);
@@ -101,13 +101,13 @@ xpcc::Tmp102<I2cMaster>::setUpdateRate(void *ctx, uint8_t rate)
 		{
 			if (rate == 0) updateTime = 4000;
 			else updateTime = 1000/rate;
-			CO_EXIT_SUCCESS();
+			CO_RETURN(true);
 		}
 	}
 	else
 	{
 		updateTime = (1000/rate - 29) | (1 << 15);
-		CO_EXIT_SUCCESS();
+		CO_RETURN(true);
 	}
 
 	this->stop();
@@ -117,7 +117,7 @@ xpcc::Tmp102<I2cMaster>::setUpdateRate(void *ctx, uint8_t rate)
 
 // MARK: Extended mode
 template < typename I2cMaster >
-xpcc::co::Result
+xpcc::co::Result<bool>
 xpcc::Tmp102<I2cMaster>::enableExtendedMode(void *ctx, bool enable)
 {
 	CO_BEGIN(ctx);
@@ -126,14 +126,14 @@ xpcc::Tmp102<I2cMaster>::enableExtendedMode(void *ctx, bool enable)
 	else		config_lsb &= ~CONFIGURATION_EXTENDED_MODE;
 
 	if ( CO_CALL(writeConfiguration(ctx, 3)) )
-		CO_EXIT_SUCCESS();
+		CO_RETURN(true);
 
 	CO_END();
 }
 
 // MARK: Alert mode
 template < typename I2cMaster >
-xpcc::co::Result
+xpcc::co::Result<bool>
 xpcc::Tmp102<I2cMaster>::configureAlertMode(void *ctx, ThermostatMode mode, AlertPolarity polarity, FaultQueue faults)
 {
 	CO_BEGIN(ctx);
@@ -150,14 +150,14 @@ xpcc::Tmp102<I2cMaster>::configureAlertMode(void *ctx, ThermostatMode mode, Aler
 	config_msb |= static_cast<uint8_t>(faults);
 
 	if ( CO_CALL(writeConfiguration(ctx, 2)) )
-		CO_EXIT_SUCCESS();
+		CO_RETURN(true);
 
 	CO_END();
 }
 
 // MARK: conversion
 template < typename I2cMaster >
-xpcc::co::Result
+xpcc::co::Result<bool>
 xpcc::Tmp102<I2cMaster>::startConversion(void *ctx)
 {
 	CO_BEGIN(ctx);
@@ -167,7 +167,7 @@ xpcc::Tmp102<I2cMaster>::startConversion(void *ctx)
 	if ( CO_CALL(writeConfiguration(ctx, 2)) )
 	{
 		config_msb &= ~CONFIGURATION_ONE_SHOT;
-		CO_EXIT_SUCCESS();
+		CO_RETURN(true);
 	}
 
 	CO_END();
@@ -175,7 +175,7 @@ xpcc::Tmp102<I2cMaster>::startConversion(void *ctx)
 
 // MARK: read temperature
 template < typename I2cMaster >
-xpcc::co::Result
+xpcc::co::Result<bool>
 xpcc::Tmp102<I2cMaster>::readTemperature(void *ctx)
 {
 	CO_BEGIN(ctx);
@@ -190,14 +190,14 @@ xpcc::Tmp102<I2cMaster>::readTemperature(void *ctx)
 	CO_WAIT_WHILE(i2cTask == I2cTask::ReadTemperature);
 
 	if (i2cSuccess == I2cTask::ReadTemperature)
-		CO_EXIT_SUCCESS();
+		CO_RETURN(true);
 
 	CO_END();
 }
 
 // MARK: read temperature
 template < typename I2cMaster >
-xpcc::co::Result
+xpcc::co::Result<bool>
 xpcc::Tmp102<I2cMaster>::readComparatorMode(void *ctx, bool &result)
 {
 	CO_BEGIN(ctx);
@@ -216,7 +216,7 @@ xpcc::Tmp102<I2cMaster>::readComparatorMode(void *ctx, bool &result)
 		config_msb = buffer[0] & ~CONFIGURATION_CONVERTER_RESOLUTION;
 		result = buffer[1] & CONFIGURATION_ALERT;
 		config_lsb = buffer[1] & ~CONFIGURATION_ALERT;
-		CO_EXIT_SUCCESS();
+		CO_RETURN(true);
 	}
 
 	result = false;
@@ -226,7 +226,7 @@ xpcc::Tmp102<I2cMaster>::readComparatorMode(void *ctx, bool &result)
 
 // MARK: configuration
 template < typename I2cMaster >
-xpcc::co::Result
+xpcc::co::Result<bool>
 xpcc::Tmp102<I2cMaster>::writeConfiguration(void *ctx, uint8_t length)
 {
 	CO_BEGIN(ctx);
@@ -243,14 +243,14 @@ xpcc::Tmp102<I2cMaster>::writeConfiguration(void *ctx, uint8_t length)
 	CO_WAIT_WHILE(i2cTask == I2cTask::Configuration);
 
 	if (i2cSuccess == I2cTask::Configuration)
-		CO_EXIT_SUCCESS();
+		CO_RETURN(true);
 
 	CO_END();
 }
 
 // MARK: configuration
 template < typename I2cMaster >
-xpcc::co::Result
+xpcc::co::Result<bool>
 xpcc::Tmp102<I2cMaster>::writeLimitRegister(void *ctx, Register reg, float temperature)
 {
 	CO_BEGIN(ctx);
@@ -274,7 +274,7 @@ xpcc::Tmp102<I2cMaster>::writeLimitRegister(void *ctx, Register reg, float tempe
 	CO_WAIT_WHILE(i2cTask == I2cTask::LimitRegister);
 
 	if (i2cSuccess == I2cTask::LimitRegister)
-		CO_EXIT_SUCCESS();
+		CO_RETURN(true);
 
 	CO_END();
 }

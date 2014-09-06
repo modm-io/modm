@@ -21,7 +21,7 @@ xpcc::Ssd1306<I2cMaster>::Ssd1306(uint8_t address)
 // ----------------------------------------------------------------------------
 // MARK: - Tasks
 template < class I2cMaster >
-xpcc::co::Result
+xpcc::co::Result<bool>
 xpcc::Ssd1306<I2cMaster>::ping(void *ctx)
 {
 	CO_BEGIN(ctx);
@@ -33,14 +33,14 @@ xpcc::Ssd1306<I2cMaster>::ping(void *ctx)
 	CO_WAIT_WHILE(i2cTask == I2cTask::Ping);
 
 	if (i2cSuccess == I2cTask::Ping)
-		CO_EXIT_SUCCESS();
+		CO_RETURN(true);
 
 	CO_END();
 }
 
 // ----------------------------------------------------------------------------
 template < class I2cMaster >
-xpcc::co::Result
+xpcc::co::Result<bool>
 xpcc::Ssd1306<I2cMaster>::initialize(void *ctx)
 {
 	CO_BEGIN(ctx);
@@ -66,14 +66,14 @@ xpcc::Ssd1306<I2cMaster>::initialize(void *ctx)
 	initSuccessful &= CO_CALL(writeCommand(ctx, Command::SetDisplayOn));
 
 	if (initSuccessful)
-		CO_EXIT_SUCCESS();
+		CO_RETURN(true);
 
 	CO_END();
 }
 
 // ----------------------------------------------------------------------------
 template < class I2cMaster >
-xpcc::co::Result
+xpcc::co::Result<bool>
 xpcc::Ssd1306<I2cMaster>::startWriteDisplay(void *ctx)
 {
 	CO_BEGIN(ctx);
@@ -86,7 +86,7 @@ xpcc::Ssd1306<I2cMaster>::startWriteDisplay(void *ctx)
 
 
 template < class I2cMaster >
-xpcc::co::Result
+xpcc::co::Result<bool>
 xpcc::Ssd1306<I2cMaster>::writeDisplay(void *ctx)
 {
 	CO_BEGIN(ctx);
@@ -96,7 +96,7 @@ xpcc::Ssd1306<I2cMaster>::writeDisplay(void *ctx)
 	CO_WAIT_WHILE(i2cTask == I2cTask::WriteDisplay);
 
 	if (i2cSuccess == I2cTask::WriteDisplay)
-		CO_EXIT_SUCCESS();
+		CO_RETURN(true);
 
 	CO_END();
 }
@@ -104,7 +104,7 @@ xpcc::Ssd1306<I2cMaster>::writeDisplay(void *ctx)
 // ----------------------------------------------------------------------------
 // MARK: write command
 template < class I2cMaster >
-xpcc::co::Result
+xpcc::co::Result<bool>
 xpcc::Ssd1306<I2cMaster>::writeCommand(void *ctx, uint8_t command)
 {
 	CO_BEGIN(ctx);
@@ -119,13 +119,13 @@ xpcc::Ssd1306<I2cMaster>::writeCommand(void *ctx, uint8_t command)
 	CO_WAIT_WHILE(i2cTask == command);
 
 	if (i2cSuccess == command)
-		CO_EXIT_SUCCESS();
+		CO_RETURN(true);
 
 	CO_END();
 }
 
 template < class I2cMaster >
-xpcc::co::Result
+xpcc::co::Result<bool>
 xpcc::Ssd1306<I2cMaster>::writeCommand(void *ctx, uint8_t command, uint8_t data)
 {
 	CO_BEGIN(ctx);
@@ -142,13 +142,13 @@ xpcc::Ssd1306<I2cMaster>::writeCommand(void *ctx, uint8_t command, uint8_t data)
 	CO_WAIT_WHILE(i2cTask == command);
 
 	if (i2cSuccess == command)
-		CO_EXIT_SUCCESS();
+		CO_RETURN(true);
 
 	CO_END();
 }
 
 template < class I2cMaster >
-xpcc::co::Result
+xpcc::co::Result<bool>
 xpcc::Ssd1306<I2cMaster>::writeCommand(void *ctx, uint8_t command, uint8_t data1, uint8_t data2)
 {
 	CO_BEGIN(ctx);
@@ -167,13 +167,13 @@ xpcc::Ssd1306<I2cMaster>::writeCommand(void *ctx, uint8_t command, uint8_t data1
 	CO_WAIT_WHILE(i2cTask == command);
 
 	if (i2cSuccess == command)
-		CO_EXIT_SUCCESS();
+		CO_RETURN(true);
 
 	CO_END();
 }
 
 template < class I2cMaster >
-xpcc::co::Result
+xpcc::co::Result<bool>
 xpcc::Ssd1306<I2cMaster>::writeCommand(void *ctx, uint8_t command,
 		uint8_t data1, uint8_t data2, uint8_t data3, uint8_t data4, uint8_t data5)
 {
@@ -199,13 +199,13 @@ xpcc::Ssd1306<I2cMaster>::writeCommand(void *ctx, uint8_t command,
 	CO_WAIT_WHILE(i2cTask == command);
 
 	if (i2cSuccess == command)
-		CO_EXIT_SUCCESS();
+		CO_RETURN(true);
 
 	CO_END();
 }
 
 template < class I2cMaster >
-xpcc::co::Result
+xpcc::co::Result<bool>
 xpcc::Ssd1306<I2cMaster>::writeCommand(void *ctx, uint8_t command,
 		uint8_t data1, uint8_t data2, uint8_t data3, uint8_t data4, uint8_t data5, uint8_t data6)
 {
@@ -233,7 +233,7 @@ xpcc::Ssd1306<I2cMaster>::writeCommand(void *ctx, uint8_t command,
 	CO_WAIT_WHILE(i2cTask == command);
 
 	if (i2cSuccess == command)
-		CO_EXIT_SUCCESS();
+		CO_RETURN(true);
 
 	CO_END();
 }

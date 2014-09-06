@@ -24,7 +24,7 @@ xpcc::Hmc6343<I2cMaster>::Hmc6343(uint8_t* data, uint8_t address)
 // MARK: - i2cTasks
 // MARK: ping
 template < class I2cMaster >
-xpcc::co::Result
+xpcc::co::Result<bool>
 xpcc::Hmc6343<I2cMaster>::ping(void *ctx)
 {
 	CO_BEGIN(ctx);
@@ -36,7 +36,7 @@ xpcc::Hmc6343<I2cMaster>::ping(void *ctx)
 	CO_WAIT_WHILE(i2cTask == I2cTask::Ping);
 
 	if (i2cSuccess == I2cTask::Ping)
-		CO_EXIT_SUCCESS();
+		CO_RETURN(true);
 
 	CO_END();
 }
@@ -45,7 +45,7 @@ xpcc::Hmc6343<I2cMaster>::ping(void *ctx)
 // MARK: - register access
 // MARK: write command
 template < class I2cMaster >
-xpcc::co::Result
+xpcc::co::Result<bool>
 xpcc::Hmc6343<I2cMaster>::writeCommand(void *ctx, Command command, uint16_t timeout)
 {
 	CO_BEGIN(ctx);
@@ -63,14 +63,14 @@ xpcc::Hmc6343<I2cMaster>::writeCommand(void *ctx, Command command, uint16_t time
 	CO_WAIT_WHILE(i2cTask == (i(command) + Task::PostCommandBase));
 
 	if (i2cSuccess == (i(command) + Task::PostCommandBase))
-		CO_EXIT_SUCCESS();
+		CO_RETURN(true);
 
 	CO_END();
 }
 
 // MARK: write register
 template < class I2cMaster >
-xpcc::co::Result
+xpcc::co::Result<bool>
 xpcc::Hmc6343<I2cMaster>::writeRegister(void *ctx, Register reg, uint8_t value)
 {
 	CO_BEGIN(ctx);
@@ -90,14 +90,14 @@ xpcc::Hmc6343<I2cMaster>::writeRegister(void *ctx, Register reg, uint8_t value)
 	CO_WAIT_WHILE(i2cTask == (i(reg) + Task::WriteEepromBase));
 
 	if (i2cSuccess == (i(reg) + Task::WriteEepromBase))
-		CO_EXIT_SUCCESS();
+		CO_RETURN(true);
 
 	CO_END();
 }
 
 // MARK: write 16bit register
 template < class I2cMaster >
-xpcc::co::Result
+xpcc::co::Result<bool>
 xpcc::Hmc6343<I2cMaster>::write16BitRegister(void *ctx, Register16 reg, uint16_t value)
 {
 	CO_BEGIN(ctx);
@@ -108,7 +108,7 @@ xpcc::Hmc6343<I2cMaster>::write16BitRegister(void *ctx, Register16 reg, uint16_t
 		// MSB
 		if ( CO_CALL(
 				writeRegister(ctx, static_cast<Register>(i(reg)+1), (value >> 8)) ) )
-			CO_EXIT_SUCCESS();
+			CO_RETURN(true);
 	}
 
 	CO_END();
@@ -116,7 +116,7 @@ xpcc::Hmc6343<I2cMaster>::write16BitRegister(void *ctx, Register16 reg, uint16_t
 
 // MARK: read register
 template < class I2cMaster >
-xpcc::co::Result
+xpcc::co::Result<bool>
 xpcc::Hmc6343<I2cMaster>::readRegister(void *ctx, Register reg, uint8_t &value)
 {
 	CO_BEGIN(ctx);
@@ -144,7 +144,7 @@ xpcc::Hmc6343<I2cMaster>::readRegister(void *ctx, Register reg, uint8_t &value)
 		CO_WAIT_WHILE(i2cTask == (i(reg) + Task::ReadEepromBase));
 
 		if (i2cSuccess == (i(reg) + Task::ReadEepromBase))
-			CO_EXIT_SUCCESS();
+			CO_RETURN(true);
 	}
 
 	CO_END();
@@ -152,10 +152,9 @@ xpcc::Hmc6343<I2cMaster>::readRegister(void *ctx, Register reg, uint8_t &value)
 
 // MARK: read 16bit register
 template < class I2cMaster >
-xpcc::co::Result
+xpcc::co::Result<bool>
 xpcc::Hmc6343<I2cMaster>::read16BitRegister(void *ctx, Register16 reg, uint16_t &value)
 {
-	bool success;
 	CO_BEGIN(ctx);
 
 	// LSB
@@ -168,7 +167,7 @@ xpcc::Hmc6343<I2cMaster>::read16BitRegister(void *ctx, Register16 reg, uint16_t 
 			// an opization would be to take the uint8_t addresses of value
 			// but then we would have to deal with endianess, and that headache is annoying.
 			value |= (registerBufferLSB << 8);
-			CO_EXIT_SUCCESS();
+			CO_RETURN(true);
 		}
 	}
 
@@ -177,7 +176,7 @@ xpcc::Hmc6343<I2cMaster>::read16BitRegister(void *ctx, Register16 reg, uint16_t 
 
 // MARK: read 6 or 1 bytes of data
 template < class I2cMaster >
-xpcc::co::Result
+xpcc::co::Result<bool>
 xpcc::Hmc6343<I2cMaster>::readPostData(void *ctx, Command command, uint8_t offset, uint8_t readSize)
 {
 	CO_BEGIN(ctx);
@@ -193,7 +192,7 @@ xpcc::Hmc6343<I2cMaster>::readPostData(void *ctx, Command command, uint8_t offse
 		CO_WAIT_WHILE(i2cTask == (i(command) + Task::ReadCommandBase));
 
 		if (i2cSuccess == (i(command) + Task::ReadCommandBase))
-			CO_EXIT_SUCCESS();
+			CO_RETURN(true);
 	}
 
 	CO_END();

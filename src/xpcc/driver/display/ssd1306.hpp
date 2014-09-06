@@ -80,7 +80,7 @@ public:
 	virtual void
 	update()
 	{
-		while(startWriteDisplay(this) > xpcc::co::Success) ;
+		while(startWriteDisplay(this).state > xpcc::co::NestingError) ;
 	}
 
 	/// Use this method to synchronize writing to the displays buffer
@@ -94,7 +94,7 @@ public:
 
 	// MARK: - TASKS
 	/// pings the diplay
-	xpcc::co::Result
+	xpcc::co::Result<bool>
 	ping(void *ctx);
 
 
@@ -102,44 +102,44 @@ public:
 	bool
 	initialize()
 	{
-		xpcc::co::Result result;
-		while((result = initialize(this)) > xpcc::co::Success)
+		xpcc::co::Result<bool> result;
+		while((result = initialize(this)).state > xpcc::co::NestingError)
 			;
-		return (result == xpcc::co::Success);
+		return result.result;
 	}
 
 	/// initializes for 3V3 with charge-pump asynchronously
-	xpcc::co::Result
+	xpcc::co::Result<bool>
 	initialize(void *ctx);
 
 	/// Starts a frame transfer to the display
-	xpcc::co::Result
+	xpcc::co::Result<bool>
 	startWriteDisplay(void *ctx);
 
 	// starts a frame transfer and waits for completion
-	xpcc::co::Result
+	xpcc::co::Result<bool>
 	writeDisplay(void *ctx);
 
 
 	/// Write a command without data
-	xpcc::co::Result
+	xpcc::co::Result<bool>
 	writeCommand(void *ctx, uint8_t command);
 
 	/// Write a command with one byte data
-	xpcc::co::Result
+	xpcc::co::Result<bool>
 	writeCommand(void *ctx, uint8_t command, uint8_t data);
 
 	/// Write a command with two bytes data
-	xpcc::co::Result
+	xpcc::co::Result<bool>
 	writeCommand(void *ctx, uint8_t command, uint8_t data1, uint8_t data2);
 
 	/// Write a command with 5 bytes data (for scrolling)
-	xpcc::co::Result
+	xpcc::co::Result<bool>
 	writeCommand(void *ctx, uint8_t command,
 			uint8_t data1, uint8_t data2, uint8_t data3, uint8_t data4, uint8_t data5);
 
 	/// Write a command with 6 bytes data (for scrolling)
-	xpcc::co::Result
+	xpcc::co::Result<bool>
 	writeCommand(void *ctx, uint8_t command,
 			uint8_t data1, uint8_t data2, uint8_t data3, uint8_t data4, uint8_t data5, uint8_t data6);
 
