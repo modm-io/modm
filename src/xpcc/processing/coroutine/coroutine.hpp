@@ -19,25 +19,28 @@ namespace xpcc
 namespace co
 {
 
-/// State returned for all tasks in nested protothreads.
-/// @{
-typedef uint8_t Result;
-
-enum
+/// State of a coroutine.
+enum State
 {
 	// reasons to stop
-	Stop = 0,					///< Task finished unsuccessfully
-	NestingError = (1 << 0),	///< Nested protothread has run out of nesting levels to start this task
-	Success = (1 << 1),			///< Task finished successfully
+	Stop = 0,					///< Coroutine finished
+	NestingError = (1 << 0),	///< Nested Coroutine has run out of nesting levels
 
 	// reasons to wait
-	WrongContext = (1 << 5),	///< Task is already running in a different context
-	WrongState = (1 << 6),		///< Another task of the same nested protothread is already running in this context
+	WrongContext = (1 << 5),	///< Coroutine already running in a different context
+	WrongState = (1 << 6),		///< Another coroutine of the same class is already running in this context
 
 	// reasons to keep running
-	Running = (1 << 7),			///< Task is running
+	Running = (1 << 7),			///< Coroutine is running
 };
-/// @}
+
+/// All Coroutines return an encapsulated result type.
+template < typename T = bool >
+struct Result
+{
+	uint8_t state;
+	T result;
+};
 
 /**
  * An implementation of Coroutines which allow for nested calling.
@@ -118,7 +121,7 @@ enum
  *         PT_END();
  *     }
  *
- *     xpcc::co::Result
+ *     xpcc::co::Result<>
  *     waitForTimer(void *ctx)
  *     {
  *         CO_BEGIN(ctx);
@@ -129,12 +132,12 @@ enum
  *             CO_WAIT_UNTIL(timer.isExpired());
  *         }
  *
- *         // CO_EXIT_SUCCESS is optional
+ *         // CO_RETURN is optional
  *
  *         CO_END();
  *     }
  *
- *     xpcc::co::Result
+ *     xpcc::co::Result<bool>
  *     setTimer(void *ctx, uint16_t timeout)
  *     {
  *         CO_BEGIN(ctx);
@@ -142,7 +145,7 @@ enum
  *         timer.restart(timeout);
  *
  *         if(timer.isRunning())
- *             CO_EXIT_SUCCESS();
+ *             CO_RETURN(true);
  *
  *         // clean up code goes here
  *
@@ -215,17 +218,14 @@ public:
 
 #ifdef __DOXYGEN__
 	/**
-	 * Run the task.
-	 *
-	 * This handles very much like a protothread, however you can have more than
-	 * one task in your class.
+	 * Run the coroutine.
 	 *
 	 * You need to implement this method in you subclass yourself.
 	 *
-	 * @return	>`Success` if still running, <=`Success` if it has finished.
+	 * @return	>`NestingError` if still running, <=`NestingError` if it has finished.
 	 */
-	xpcc::pt::Result
-	task(void *ctx, ...);
+	xpcc::co::Result< ReturnType >
+	coroutine(void *ctx, ...);
 #endif
 
 protected:

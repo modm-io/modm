@@ -22,9 +22,8 @@
  * @hideinitializer
  */
 #define CO_BEGIN(context) \
-	if (!this->nestingOkCo()) return xpcc::co::NestingError; \
-	if (!this->beginCo(context)) return xpcc::co::WrongContext; \
-	xpcc::co::Result coResult ATTRIBUTE_UNUSED = xpcc::co::Stop; \
+	if (!this->nestingOkCo()) return {xpcc::co::NestingError, 0}; \
+	if (!this->beginCo(context)) return {xpcc::co::WrongContext, 0}; \
 	switch (this->pushCo()) { \
 		case CoStopped: \
 			this->setCo(__LINE__); \
@@ -41,7 +40,7 @@
 			this->stopCo(); \
 		default: \
 			this->popCo(); \
-			return this->isStoppedCo() ? xpcc::co::Stop : xpcc::co::WrongState; \
+			if (this->isStoppedCo()) return {xpcc::co::Stop, 0}; else return {xpcc::co::WrongState, 0}; \
 	}
 
 /**
@@ -53,7 +52,7 @@
 #define CO_YIELD() \
 			this->setCo(__LINE__); \
 			this->popCo(); \
-			return xpcc::co::Running; \
+			return {xpcc::co::Running, 0}; \
 		case __LINE__: ;
 
 /**
@@ -67,7 +66,7 @@
 		case __LINE__: \
 			if (condition) { \
 				this->popCo(); \
-				return xpcc::co::Running; \
+				return {xpcc::co::Running, 0}; \
 			} \
 
 /**
@@ -88,27 +87,14 @@
 #define CO_CALL(coroutine) \
 	({ \
 			this->setCo(__LINE__); \
-		case __LINE__: \
-			coResult = coroutine; \
-			if (coResult > xpcc::co::Success) { \
+		case __LINE__:\
+			auto coResult = coroutine; \
+			if (coResult.state > xpcc::co::NestingError) { \
 				this->popCo(); \
-				return xpcc::co::Running; \
+				return {xpcc::co::Running, 0}; \
 			} \
-			(coResult == xpcc::co::Success); \
+			coResult.result; \
 	})
-
-/**
- * Stop and exit from coroutine successfully.
- *
- * @ingroup	coroutine
- * @hideinitializer
- */
-#define CO_EXIT_SUCCESS() \
-	{ \
-			this->stopCo(); \
-			this->popCo(); \
-			return xpcc::co::Success; \
-	}
 
 /**
  * Stop and exit from coroutine.
@@ -116,11 +102,11 @@
  * @ingroup	coroutine
  * @hideinitializer
  */
-#define CO_EXIT() \
+#define CO_RETURN(result) \
 	{ \
 			this->stopCo(); \
 			this->popCo(); \
-			return xpcc::co::Stop; \
+			return {xpcc::co::Stop, result}; \
 	}
 
 #endif // XPCC_CO_MACROS_HPP

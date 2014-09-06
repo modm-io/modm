@@ -41,7 +41,6 @@
  * \hideinitializer
  */
 #define PT_BEGIN() \
-	xpcc::co::Result coResult ATTRIBUTE_UNUSED = xpcc::co::Stop; \
 	switch (this->ptState) { \
 		case 0:
 
@@ -126,11 +125,11 @@
 	({ \
 		this->ptState = __LINE__; \
 		case __LINE__: \
-			coResult = coroutine; \
-			if (coResult > xpcc::co::Success) { \
+			auto coResult = coroutine; \
+			if (coResult.state > xpcc::co::NestingError) { \
 				return true; \
 			} \
-			(coResult == xpcc::co::Success); \
+			coResult.result; \
 	})
 
 /**
