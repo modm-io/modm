@@ -15,11 +15,43 @@ template<class clockSource, uint32_t baudrate, uint16_t tolerance >
 void ALWAYS_INLINE
 xpcc::stm32::UartSpiSimpleMaster{{ id }}::initialize()
 {
-	uint16_t brr = UartBaudrate::getBrr< clockSource::Usart{{ id }}, baudrate, tolerance >();
+	constexpr uint32_t clockrate = clockSource::Usart{{ id }};
+	constexpr uint32_t scalar = (baudrate * 16l > clockrate) ? 8 : 16;
+	constexpr uint32_t max = (scalar == 16) ? 65536 : 32768;
 
-	UsartHal{{ id }}::initializeWithBrr(brr,
-			UsartHal{{ id }}::Parity::Disabled,
-			UartBaudrate::getOversamplingMode(clockSource::Usart{{ id }}, baudrate));
+	// calculate the fractional prescaler value
+	constexpr float pre_raw = static_cast<float>(clockrate) / (baudrate);
+	// respect the prescaler range of 1 to 4096
+	constexpr uint32_t pre_ceil = std::ceil(pre_raw) > max ? max : std::ceil(pre_raw);
+	constexpr uint32_t pre_floor = std::floor(pre_raw) < 1 ? 1 : std::floor(pre_raw);
+
+	// calculate the possible baudrates above and below the requested baudrate
+	constexpr uint32_t baud_lower = clockrate / ( pre_ceil );
+	constexpr uint32_t baud_upper = clockrate / ( pre_floor );
+
+	// calculate the fractional prescaler value corresponding to the baudrate exactly
+	// between the upper and lower baudrate
+	constexpr float pre_middle = static_cast<float>(clockrate) /
+			( ((baud_upper - baud_lower) / 2.f + baud_lower) );
+	// decide which prescaler value is closer to a possible baudrate
+	constexpr uint32_t prescaler = (pre_raw > pre_middle) ? pre_ceil : pre_floor;
+
+	// check if within baudrate tolerance
+	constexpr uint32_t generated_baudrate = clockrate / ( prescaler );
+	assertBaudrateInTolerance<
+			/* clostest available baudrate */ generated_baudrate,
+			/* desired baudrate */ baudrate,
+			tolerance >();
+
+	// brr needs to be formatted right for scalar == 8
+	constexpr uint16_t brr = (scalar == 16) ? prescaler :
+			(((prescaler & ~0b111) << 1) | (prescaler & 0b111));
+	// get the bitmasks for the scaler
+	constexpr UartBase::OversamplingMode oversample = (scalar == 16) ?
+			UartBase::OversamplingMode::By16 : UartBase::OversamplingMode::By8;
+
+	UsartHal{{ id }}::initializeWithBrr(brr, UsartHal{{ id }}::Parity::Disabled, oversample);
+
 	UsartHal{{ id }}::setLastBitClockPulse(UsartHal{{ id }}::LastBitClockPulse::Output);
 	UsartHal{{ id }}::setSpiClock(UsartHal{{ id }}::SpiClock::Enabled);
 	UsartHal{{ id }}::setTransmitterEnable(true);
