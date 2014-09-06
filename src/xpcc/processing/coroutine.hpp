@@ -6,20 +6,12 @@
  * license. See the file `LICENSE` for the full license governing this code.
  */
 // ----------------------------------------------------------------------------
+/**
+ * @ingroup		processing
+ * @defgroup	coroutine		Coroutines
+ * @brief		Lightweight coroutines
+ *
+ *
+ */
 
-#include <unittest/testsuite.hpp>
-
-// @author Niklas Hauser
-class NestedProtothreadTest : public unittest::TestSuite
-{
-public:
-	// uses an empty protothread to test the basic methods of the class
-	void
-	testClassMethods();
-
-	void
-	testNesting();
-
-	void
-	testSpawn();
-};
+#include "coroutine/coroutine.hpp"

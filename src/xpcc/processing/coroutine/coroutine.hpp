@@ -7,16 +7,16 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef XPCC_NPT_THREAD_HPP
-#define XPCC_NPT_THREAD_HPP
+#ifndef XPCC_COROUTINE_HPP
+#define XPCC_COROUTINE_HPP
 
-#include "npt_macros.hpp"
+#include "macros.hpp"
 #include <xpcc/utils/arithmetic_traits.hpp>
 
 namespace xpcc
 {
 
-namespace pt
+namespace co
 {
 
 /// State returned for all tasks in nested protothreads.
@@ -40,55 +40,59 @@ enum
 /// @}
 
 /**
- * A version of `Protothread` which allows nested calling of tasks.
+ * An implementation of Coroutines which allow for nested calling.
  *
  * This base class and its macros allows you to implement and use several
- * protothreads tasks in one class.
- * This allows you to modularize your code by placing it into its own methods
- * instead of the placing everything into the `run()` method.
- * It also allows you to call and run tasks within your tasks, so you can
- * reuse their functionality.
+ * coroutines in one class.
+ * This allows you to modularize your code by placing it into its own coroutines
+ * instead of the placing everything into one big method.
+ * It also allows you to call and run coroutines within your coroutines,
+ * so you can reuse their functionality.
  *
  * You are responsible to choosing the right nesting depth!
- * This class will guard itself against calling another task at too
+ * This class will guard itself against calling another coroutines at too
  * deep a nesting level and inform you gently of this by returning
- * `xpcc::pt::NestingError` from your called `task(ctx)`.
+ * `xpcc::co::NestingError` from your called `coroutine(ctx)`.
  * It is then up to you to recognise this in your program design
  * and increase the nesting depth or rethink your code.
  *
- * Be aware that only one of these tasks can run at the same time.
- * Even if you call other tasks, they will not allow you to run them
- * until the conflicting tasks finished.
+ * Be aware that only one coroutines of the same object can run at the
+ * same time. Even if you call other coroutines, they will not allow you to
+ * run them until the conflicting coroutines finished.
  *
- * Each task requires a context pointer, which is used to ensure the
- * task only executes in the context that it was originally started from.
- * If you call a task in a different context, it will return
- * `xpcc::pt::WrongContext`.
- * Similarly, if you call a different task of the same class in
- * the same context, while another task is running, it will return
- * `xpcc::pt::WrongState`.
- * Using the `NPT_SPAWN` macro, you can wait for these tasks to become
- * available, so you usually do not need to worry about those cases.
+ * Each coroutine requires a context pointer, which is used to ensure the
+ * coroutine only executes in the context that it was originally started from.
+ * If you call a coroutine in a different context, it will return
+ * `xpcc::co::WrongContext`.
+ * Similarly, if you call a different coroutine of the same class in
+ * the same context, while another coroutine is running, it will return
+ * `xpcc::co::WrongState`.
+ * Using the `CO_CALL` macro, you can wait for these coroutine to become
+ * available and then run them, so you usually do not need to worry
+ * about those cases.
  *
- * You may exit the task successfully by using `NPT_EXIT_SUCCESS`.
- * This information is returned by the `NPT_SPAWN` macro and can be used
+ * You may exit the coroutine successfully by using `CO_EXIT_SUCCESS`.
+ * This information is returned by the `CO_CALL` macro and can be used
  * to influence your program flow.
- * You may exit the task unsuccessfully by using `NPT_EXIT()`.
- * If the task reaches `NPT_END()` it will exit unsuccessfully automatically.
+ * You may exit the coroutine unsuccessfully by using `CO_EXIT()`.
+ * If the coroutine reaches `CO_END()` it will exit unsuccessfully
+ * automatically.
  *
- * Note that you must call nested protothread tasks within a regular protothread.
- * It is sufficient to use the `this` pointer of the class as context when calling the tasks.
+ * Note that you should call coroutines within a protothreads.
+ * It is sufficient to use the `this` pointer of the class as context
+ * when calling the coroutines.
  *
  * Here is a (slightly over-engineered) example:
  *
  * @code
  * #include <xpcc/architecture.hpp>
  * #include <xpcc/processing/protothread.hpp>
+ * #include <xpcc/coroutine/coroutine.hpp>
  * #include <xpcc/processing/timeout.hpp>
  *
  * typedef GpioOutputB0 Led;
  *
- * class BlinkingLight : public xpcc::pt::Protothread, private xpcc::pt::NestedProtothread<1>
+ * class BlinkingLight : public xpcc::pt::Protothread, private xpcc::pt::NestedCoroutine<1>
  * {
  * public:
  *     bool
@@ -103,10 +107,10 @@ enum
  *         while (true)
  *         {
  *             Led::set();
- *             PT_RUN_TASK(waitForTimer(this)))
+ *             PT_CALL(waitForTimer(this)))
  *
  *             Led::reset();
- *             PT_RUN_TASK(setTimer(this, 200));
+ *             PT_CALL(setTimer(this, 200));
  *
  *             PT_WAIT_UNTIL(timer.isExpired());
  *         }
@@ -114,35 +118,35 @@ enum
  *         PT_END();
  *     }
  *
- *     xpcc::pt::Result
+ *     xpcc::co::Result
  *     waitForTimer(void *ctx)
  *     {
- *         NPT_BEGIN(ctx);
+ *         CO_BEGIN(ctx);
  *
  *         // nested calling is allowed
- *         if (NPT_SPAWN(setTimer(ctx, 100)))
+ *         if (CO_CALL(setTimer(ctx, 100)))
  *         {
- *             NPT_WAIT_UNTIL(timer.isExpired());
+ *             CO_WAIT_UNTIL(timer.isExpired());
  *         }
  *
- *         // NPT_EXIT_SUCCESS is optional
+ *         // CO_EXIT_SUCCESS is optional
  *
- *         NPT_END();
+ *         CO_END();
  *     }
  *
- *     xpcc::pt::Result
+ *     xpcc::co::Result
  *     setTimer(void *ctx, uint16_t timeout)
  *     {
- *         NPT_BEGIN(ctx);
+ *         CO_BEGIN(ctx);
  *
  *         timer.restart(timeout);
  *
  *         if(timer.isRunning())
- *             NPT_EXIT_SUCCESS();
+ *             CO_EXIT_SUCCESS();
  *
  *         // clean up code goes here
  *
- *         NPT_END();
+ *         CO_END();
  *     }
  *
  * private:
@@ -161,52 +165,52 @@ enum
  * For other examples take a look in the `examples` folder in the XPCC
  * root folder.
  *
- * @ingroup	protothread
+ * @ingroup	coroutine
  * @author	Niklas Hauser
  * @tparam	Depth	the nesting depth: the maximum of tasks that are called within tasks (should be < 128).
  */
 template< uint8_t Depth >
-class NestedProtothread
+class NestedCoroutine
 {
 protected:
 	/// Used to store a protothread's position (what Dunkels calls a
 	/// "local continuation").
-	typedef uint16_t NPtState;
+	typedef uint16_t CoState;
 
 	/// Construct a new nested protothread which will be stopped
-	NestedProtothread()
-	:	nptLevel(0), nptContext(0)
+	NestedCoroutine()
+	:	coLevel(0), coContext(0)
 	{
-		this->stopTask();
+		this->stopCoroutine();
 	}
 
 public:
 	/// Force the task to stop running at the current nesting level
 	/// @warning	This will not allow the task to clean itself up!
 	inline void
-	stopTask()
+	stopCoroutine()
 	{
-		uint_fast8_t level = nptLevel;
+		uint_fast8_t level = coLevel;
 		while (level < Depth + 1)
 		{
-			nptStateArray[level++] = NPtStopped;
+			coStateArray[level++] = CoStopped;
 		}
-		if (nptLevel == 0)
-			nptContext = 0;
+		if (coLevel == 0)
+			coContext = 0;
 	}
 
 	/// @return	`true` if a task is running at the current nesting level, else `false`
 	bool ALWAYS_INLINE
-	isTaskRunning() const
+	isCoroutineRunning() const
 	{
-		return !isStoppedNPt();
+		return !isStoppedCo();
 	}
 
 	/// @return the nesting depth in the current task, or -1 if called outside a task
 	int8_t ALWAYS_INLINE
-	getTaskDepth() const
+	getCoroutineDepth() const
 	{
-		return static_cast<int8_t>(nptLevel) - 1;
+		return static_cast<int8_t>(coLevel) - 1;
 	}
 
 #ifdef __DOXYGEN__
@@ -230,65 +234,65 @@ protected:
 
 	/// increases nesting level, call this in the switch statement!
 	/// @return current state before increasing nesting level
-	NPtState ALWAYS_INLINE
-	pushNPt()
+	CoState ALWAYS_INLINE
+	pushCo()
 	{
-		return nptStateArray[nptLevel++];
+		return coStateArray[coLevel++];
 	}
 
 	/// always call this before returning from the run function!
 	/// decreases nesting level
 	void ALWAYS_INLINE
-	popNPt()
+	popCo()
 	{
-		nptLevel--;
+		coLevel--;
 	}
 
 	// invalidates the parent nesting level
-	// @warning	be aware in which nesting level you call this! (before popNPt()!)
+	// @warning	be aware in which nesting level you call this! (before popCo()!)
 	void inline
-	stopNPt()
+	stopCo()
 	{
-		nptStateArray[nptLevel-1] = NPtStopped;
-		if (nptLevel == 1)
-			nptContext = 0;
+		coStateArray[coLevel-1] = CoStopped;
+		if (coLevel == 1)
+			coContext = 0;
 	}
 
 	/// sets the state of the parent nesting level
-	/// @warning	be aware in which nesting level you call this! (before popNPt()!)
+	/// @warning	be aware in which nesting level you call this! (before popCo()!)
 	void ALWAYS_INLINE
-	setNPt(NPtState state)
+	setCo(CoState state)
 	{
-		nptStateArray[nptLevel-1] = state;
+		coStateArray[coLevel-1] = state;
 	}
 
 	/// @return `true` if the nesting depth allows for another level.
-	/// @warning	be aware in which nesting level you call this! (before pushNPt()!)
+	/// @warning	be aware in which nesting level you call this! (before pushCo()!)
 	bool ALWAYS_INLINE
-	nestingOkNPt() const
+	nestingOkCo() const
 	{
-		return (nptLevel < Depth + 1);
+		return (coLevel < Depth + 1);
 	}
 
 	bool ALWAYS_INLINE
-	isStoppedNPt() const
+	isStoppedCo() const
 	{
-		return (nptStateArray[nptLevel] == NPtStopped);
+		return (coStateArray[coLevel] == CoStopped);
 	}
 
 	/// @return `true` if the task is called in the same context, or the context is not set
 	///			`false` if the task is claimed by another context
 	bool inline
-	beginNPt(void *ctx)
+	beginCo(void *ctx)
 	{
 		// only one comparison, if this task is called in the same context
-		if (ctx == nptContext)
+		if (ctx == coContext)
 			return true;
 
 		// two comparisons + assignment, if this task is called for the first time
-		if (nptContext == 0)
+		if (coContext == 0)
 		{
-			nptContext = ctx;
+			coContext = ctx;
 			return true;
 		}
 
@@ -297,96 +301,96 @@ protected:
 	/// @}
 
 protected:
-	static constexpr NPtState NPtStopped = static_cast<NPtState>(0);
+	static constexpr CoState CoStopped = static_cast<CoState>(0);
 private:
-	uint8_t nptLevel;
-	NPtState nptStateArray[Depth+1];
-	void *nptContext;
+	uint8_t coLevel;
+	CoState coStateArray[Depth+1];
+	void *coContext;
 };
 
 // ----------------------------------------------------------------------------
 // we won't document the specialisation again
 /// @cond
 template <>
-class NestedProtothread<0>
+class NestedCoroutine<0>
 {
 protected:
-	typedef uint16_t NPtState;
+	typedef uint16_t CoState;
 
-	NestedProtothread() :
-		nptState(NPtStopped), nptLevel(-1), nptContext(0)
+	NestedCoroutine() :
+		coState(CoStopped), coLevel(-1), coContext(0)
 	{
 	}
 
 public:
 	void ALWAYS_INLINE
-	stopTask()
+	stopCoroutine()
 	{
-		this->stopNPt();
+		this->stopCo();
 	}
 
 	bool ALWAYS_INLINE
-	isTaskRunning() const
+	isCoroutineRunning() const
 	{
-		return !isStoppedNPt();
+		return !isStoppedCo();
 	}
 
 	int8_t ALWAYS_INLINE
-	getTaskDepth() const
+	getCoroutineDepth() const
 	{
-		return nptLevel;
+		return coLevel;
 	}
 
 protected:
 	/// @internal
 	/// @{
-	NPtState ALWAYS_INLINE
-	pushNPt()
+	CoState ALWAYS_INLINE
+	pushCo()
 	{
-		nptLevel = 0;
-		return nptState;
+		coLevel = 0;
+		return coState;
 	}
 
 	void ALWAYS_INLINE
-	popNPt()
+	popCo()
 	{
-		nptLevel = -1;
+		coLevel = -1;
 	}
 
 	void ALWAYS_INLINE
-	stopNPt()
+	stopCo()
 	{
-		nptState = NPtStopped;
-		nptContext = 0;
+		coState = CoStopped;
+		coContext = 0;
 	}
 
 	bool ALWAYS_INLINE
-	nestingOkNPt() const
+	nestingOkCo() const
 	{
-		return (nptLevel != 0);
+		return (coLevel != 0);
 	}
 
 	void ALWAYS_INLINE
-	setNPt(NPtState state)
+	setCo(CoState state)
 	{
-		nptState = state;
+		coState = state;
 	}
 
 	bool ALWAYS_INLINE
-	isStoppedNPt() const
+	isStoppedCo() const
 	{
-		return (nptState == NPtStopped);
+		return (coState == CoStopped);
 	}
 
 	bool inline
-	beginNPt(void *ctx)
+	beginCo(void *ctx)
 	{
-		if (ctx == nptContext)
+		if (ctx == coContext)
 			return true;
 
-		if (nptContext == 0)
+		if (coContext == 0)
 		{
-			nptContext = ctx;
+			coContext = ctx;
 			return true;
 		}
 
@@ -395,16 +399,18 @@ protected:
 	/// @}
 
 protected:
-	static constexpr NPtState NPtStopped = static_cast<NPtState>(0);
+	static constexpr CoState CoStopped = static_cast<CoState>(0);
 private:
-	NPtState nptState;
-	int8_t nptLevel;
-	void *nptContext;
+	CoState coState;
+	int8_t coLevel;
+	void *coContext;
 };
 /// @endcond
 
-} // namespace pt
+typedef NestedCoroutine<0> Coroutine;
+
+} // namespace co
 
 } // namespace xpcc
 
-#endif // XPCC_NPT_THREAD_HPP
+#endif // XPCC_COROUTINE_HPP
