@@ -35,7 +35,7 @@ enum State
 };
 
 /// All Coroutines return an encapsulated result type.
-template < typename T = bool >
+template < typename T >
 struct Result
 {
 	uint8_t state;
@@ -74,12 +74,10 @@ struct Result
  * available and then run them, so you usually do not need to worry
  * about those cases.
  *
- * You may exit the coroutine successfully by using `CO_EXIT_SUCCESS`.
+ * You may exit and return a value by using `CO_RETURN(value)`.
  * This information is returned by the `CO_CALL` macro and can be used
  * to influence your program flow.
- * You may exit the coroutine unsuccessfully by using `CO_EXIT()`.
- * If the coroutine reaches `CO_END()` it will exit unsuccessfully
- * automatically.
+ * If the coroutine reaches `CO_END()` it will exit automatically.
  *
  * Note that you should call coroutines within a protothreads.
  * It is sufficient to use the `this` pointer of the class as context
@@ -170,17 +168,18 @@ struct Result
  *
  * @ingroup	coroutine
  * @author	Niklas Hauser
- * @tparam	Depth	the nesting depth: the maximum of tasks that are called within tasks (should be < 128).
+ * @tparam	Depth	maximum nesting depth: the maximum number of
+ * 					coroutines that are called within coroutines (should be <128).
  */
 template< uint8_t Depth >
 class NestedCoroutine
 {
 protected:
-	/// Used to store a protothread's position (what Dunkels calls a
+	/// Used to store a coroutines's position (what Dunkels calls a
 	/// "local continuation").
 	typedef uint16_t CoState;
 
-	/// Construct a new nested protothread which will be stopped
+	/// Construct a new class with nested coroutines
 	NestedCoroutine()
 	:	coLevel(0), coContext(0)
 	{
@@ -188,8 +187,7 @@ protected:
 	}
 
 public:
-	/// Force the task to stop running at the current nesting level
-	/// @warning	This will not allow the task to clean itself up!
+	/// Force all coroutines to stop running at the current nesting level
 	inline void
 	stopCoroutine()
 	{
@@ -202,14 +200,14 @@ public:
 			coContext = 0;
 	}
 
-	/// @return	`true` if a task is running at the current nesting level, else `false`
+	/// @return	`true` if a coroutine is running at the current nesting level, else `false`
 	bool ALWAYS_INLINE
 	isCoroutineRunning() const
 	{
 		return !isStoppedCo();
 	}
 
-	/// @return the nesting depth in the current task, or -1 if called outside a task
+	/// @return the nesting depth in the current coroutine, or -1 if called outside any coroutine
 	int8_t ALWAYS_INLINE
 	getCoroutineDepth() const
 	{
@@ -274,22 +272,23 @@ protected:
 		return (coLevel < Depth + 1);
 	}
 
+	/// @return	`true` if `stopCo()` has been called before
 	bool ALWAYS_INLINE
 	isStoppedCo() const
 	{
 		return (coStateArray[coLevel] == CoStopped);
 	}
 
-	/// @return `true` if the task is called in the same context, or the context is not set
-	///			`false` if the task is claimed by another context
+	/// @return `true` if the coroutine is called in the same context, or the context is not set
+	///			`false` if the coroutine is claimed by another context
 	bool inline
 	beginCo(void *ctx)
 	{
-		// only one comparison, if this task is called in the same context
+		// only one comparison, if this coroutine is called in the same context
 		if (ctx == coContext)
 			return true;
 
-		// two comparisons + assignment, if this task is called for the first time
+		// two comparisons + assignment, if this coroutine is called for the first time
 		if (coContext == 0)
 		{
 			coContext = ctx;

@@ -219,8 +219,6 @@ xpcc::Tmp102<I2cMaster>::readComparatorMode(void *ctx, bool &result)
 		CO_RETURN(true);
 	}
 
-	result = false;
-
 	CO_END();
 }
 
@@ -258,10 +256,10 @@ xpcc::Tmp102<I2cMaster>::writeLimitRegister(void *ctx, Register reg, float tempe
 	{
 		int16_t temp = temperature * 16.f;
 		temp <<= (config_lsb & CONFIGURATION_EXTENDED_MODE) ? 3 : 4;
-		temp = xpcc::math::bigEndianToHost(static_cast<uint16_t>(temp));
+		temp = xpcc::math::hostToBigEndian(static_cast<uint16_t>(temp));
 
-		buffer[2] = (temp >> 8);
 		buffer[1] = temp;
+		buffer[2] = (temp >> 8);
 	}
 
 	CO_WAIT_UNTIL(
