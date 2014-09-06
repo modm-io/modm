@@ -1,6 +1,6 @@
 #include <xpcc/architecture/platform.hpp>
 #include "../../stm32f4_discovery.hpp"
-#include <xpcc/driver/radio/nrf24/nrf24_hal.hpp>
+#include <xpcc/driver/radio/nrf24/nrf24_phy.hpp>
 #include <xpcc/debug/logger.hpp>
 
 /*
@@ -37,7 +37,7 @@ xpcc::log::Logger xpcc::log::error(loggerDevice);
 typedef GpioOutputE12 Csn;
 
 
-typedef xpcc::Nrf24Hal<SpiSimpleMaster2, Csn> nrf24hal;
+typedef xpcc::Nrf24Phy<SpiSimpleMaster2, Csn> nrf24phy;
 
 MAIN_FUNCTION
 {
@@ -57,10 +57,10 @@ MAIN_FUNCTION
 	Usart2::initialize<defaultSystemClock, 115200>(12);
 
 
-	// Initialize nRF24-HAL
-	nrf24hal::initialize();
+	// Initialize nRF24-Phy
+	nrf24phy::initialize();
 
-	XPCC_LOG_INFO << "Hello from nRF24-HAL example" << xpcc::endl;
+	XPCC_LOG_INFO << "Hello from nRF24-phy-test example" << xpcc::endl;
 
 
 	uint8_t rf_ch;
@@ -70,17 +70,17 @@ MAIN_FUNCTION
 	while (1)
 	{
 
-		nrf24hal::setRxAddress(0, 0xdeadb33f05);
-		addr = nrf24hal::getRxAddress(0);
+		nrf24phy::setRxAddress(0, 0xdeadb33f05);
+		addr = nrf24phy::getRxAddress(0);
 		XPCC_LOG_INFO.printf("Setting RX_P0 address to:  0xDEADB33F05\n");
 		XPCC_LOG_INFO.printf("Reading RX_P0 address:     0x%x%x\n", static_cast<uint32_t>((addr >> 32) & 0xffffffff), static_cast<uint32_t>(addr & 0xffffffff));
 
-		nrf24hal::setTxAddress(0xabcdef55ff);
-		addr = nrf24hal::getTxAddress();
+		nrf24phy::setTxAddress(0xabcdef55ff);
+		addr = nrf24phy::getTxAddress();
 		XPCC_LOG_INFO.printf("Setting TX address to:     0xABCDEF55FF\n");
 		XPCC_LOG_INFO.printf("Reading TX address:        0x%x%x\n", static_cast<uint32_t>((addr >> 32) & 0xffffffff), static_cast<uint32_t>(addr & 0xffffffff));
 
-		rf_ch = nrf24hal::readRegister(xpcc::nrf24::Register::RF_CH);
+		rf_ch = nrf24phy::readRegister(xpcc::nrf24::Register::RF_CH);
 		XPCC_LOG_INFO.printf("Expected output for RF_CH: 0x2\n");
 		XPCC_LOG_INFO.printf("Reading RF_CH:             0x%x\n\n", rf_ch);
 

@@ -1,6 +1,6 @@
 #include <xpcc/architecture/platform.hpp>
 #include "../../stm32f4_discovery.hpp"
-#include <xpcc/driver/radio/nrf24/nrf24_hal.hpp>
+#include <xpcc/driver/radio/nrf24/nrf24_phy.hpp>
 #include <xpcc/debug/logger.hpp>
 #include <xpcc/processing.hpp>
 
@@ -56,8 +56,8 @@ typedef GpioOutputE11 Ce2;
 typedef GpioOutputE12 Csn2;
 
 
-typedef xpcc::Nrf24Hal<SpiSimpleMaster1, Csn1> nrf24ptx;
-typedef xpcc::Nrf24Hal<SpiSimpleMaster2, Csn2> nrf24prx;
+typedef xpcc::Nrf24Phy<SpiSimpleMaster1, Csn1> nrf24ptx;
+typedef xpcc::Nrf24Phy<SpiSimpleMaster2, Csn2> nrf24prx;
 
 
 void
