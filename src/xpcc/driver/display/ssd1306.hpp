@@ -12,6 +12,7 @@
 
 #include <xpcc/ui/display/buffered_graphic_display.hpp>
 #include <xpcc/processing/protothread.hpp>
+#include <xpcc/processing/coroutine.hpp>
 #include <xpcc/architecture/peripheral/i2c_device.hpp>
 #include <xpcc/processing/periodic_timer.hpp>
 
@@ -70,7 +71,7 @@ struct ssd1306
  */
 template < class I2cMaster >
 class Ssd1306 : public ssd1306, public xpcc::I2cDevice<I2cMaster>,
-				public xpcc::pt::NestedProtothread<1>, public BufferedGraphicDisplay<128, 64>
+				public xpcc::co::NestedCoroutine<1>, public BufferedGraphicDisplay<128, 64>
 {
 public:
 	Ssd1306(uint8_t address = 0x3C);
@@ -79,7 +80,7 @@ public:
 	virtual void
 	update()
 	{
-		while(startWriteDisplay(this) > xpcc::pt::Success) ;
+		while(startWriteDisplay(this) > xpcc::co::Success) ;
 	}
 
 	/// Use this method to synchronize writing to the displays buffer
@@ -93,7 +94,7 @@ public:
 
 	// MARK: - TASKS
 	/// pings the diplay
-	xpcc::pt::Result
+	xpcc::co::Result
 	ping(void *ctx);
 
 
@@ -101,44 +102,44 @@ public:
 	bool
 	initialize()
 	{
-		xpcc::pt::Result result;
-		while((result = initialize(this)) > xpcc::pt::Success)
+		xpcc::co::Result result;
+		while((result = initialize(this)) > xpcc::co::Success)
 			;
-		return (result == xpcc::pt::Success);
+		return (result == xpcc::co::Success);
 	}
 
 	/// initializes for 3V3 with charge-pump asynchronously
-	xpcc::pt::Result
+	xpcc::co::Result
 	initialize(void *ctx);
 
 	/// Starts a frame transfer to the display
-	xpcc::pt::Result
+	xpcc::co::Result
 	startWriteDisplay(void *ctx);
 
 	// starts a frame transfer and waits for completion
-	xpcc::pt::Result
+	xpcc::co::Result
 	writeDisplay(void *ctx);
 
 
 	/// Write a command without data
-	xpcc::pt::Result
+	xpcc::co::Result
 	writeCommand(void *ctx, uint8_t command);
 
 	/// Write a command with one byte data
-	xpcc::pt::Result
+	xpcc::co::Result
 	writeCommand(void *ctx, uint8_t command, uint8_t data);
 
 	/// Write a command with two bytes data
-	xpcc::pt::Result
+	xpcc::co::Result
 	writeCommand(void *ctx, uint8_t command, uint8_t data1, uint8_t data2);
 
 	/// Write a command with 5 bytes data (for scrolling)
-	xpcc::pt::Result
+	xpcc::co::Result
 	writeCommand(void *ctx, uint8_t command,
 			uint8_t data1, uint8_t data2, uint8_t data3, uint8_t data4, uint8_t data5);
 
 	/// Write a command with 6 bytes data (for scrolling)
-	xpcc::pt::Result
+	xpcc::co::Result
 	writeCommand(void *ctx, uint8_t command,
 			uint8_t data1, uint8_t data2, uint8_t data3, uint8_t data4, uint8_t data5, uint8_t data6);
 

@@ -24,33 +24,33 @@ xpcc::Hmc6343<I2cMaster>::Hmc6343(uint8_t* data, uint8_t address)
 // MARK: - i2cTasks
 // MARK: ping
 template < class I2cMaster >
-xpcc::pt::Result
+xpcc::co::Result
 xpcc::Hmc6343<I2cMaster>::ping(void *ctx)
 {
-	NPT_BEGIN(ctx);
+	CO_BEGIN(ctx);
 
-	NPT_WAIT_UNTIL(adapter.configurePing() && this->startTransaction(&adapter));
+	CO_WAIT_UNTIL(adapter.configurePing() && this->startTransaction(&adapter));
 
 	i2cTask = I2cTask::Ping;
 
-	NPT_WAIT_WHILE(i2cTask == I2cTask::Ping);
+	CO_WAIT_WHILE(i2cTask == I2cTask::Ping);
 
 	if (i2cSuccess == I2cTask::Ping)
-		NPT_EXIT_SUCCESS();
+		CO_EXIT_SUCCESS();
 
-	NPT_END();
+	CO_END();
 }
 
 // ----------------------------------------------------------------------------
 // MARK: - register access
 // MARK: write command
 template < class I2cMaster >
-xpcc::pt::Result
+xpcc::co::Result
 xpcc::Hmc6343<I2cMaster>::writeCommand(void *ctx, Command command, uint16_t timeout)
 {
-	NPT_BEGIN(ctx);
+	CO_BEGIN(ctx);
 
-	NPT_WAIT_UNTIL(
+	CO_WAIT_UNTIL(
 			timeout.isExpired() &&
 			!adapter.isBusy() && (
 					buffer[0] = i(command),
@@ -60,22 +60,22 @@ xpcc::Hmc6343<I2cMaster>::writeCommand(void *ctx, Command command, uint16_t time
 	i2cTask = i(command) + Task::PostCommandBase;
 	this->timeout.restart(timeout);
 
-	NPT_WAIT_WHILE(i2cTask == (i(command) + Task::PostCommandBase));
+	CO_WAIT_WHILE(i2cTask == (i(command) + Task::PostCommandBase));
 
 	if (i2cSuccess == (i(command) + Task::PostCommandBase))
-		NPT_EXIT_SUCCESS();
+		CO_EXIT_SUCCESS();
 
-	NPT_END();
+	CO_END();
 }
 
 // MARK: write register
 template < class I2cMaster >
-xpcc::pt::Result
+xpcc::co::Result
 xpcc::Hmc6343<I2cMaster>::writeRegister(void *ctx, Register reg, uint8_t value)
 {
-	NPT_BEGIN(ctx);
+	CO_BEGIN(ctx);
 
-	NPT_WAIT_UNTIL(
+	CO_WAIT_UNTIL(
 			timeout.isExpired() &&
 			!adapter.isBusy() && (
 					buffer[0] = i(Command::WriteEeprom),
@@ -87,41 +87,41 @@ xpcc::Hmc6343<I2cMaster>::writeRegister(void *ctx, Register reg, uint8_t value)
 	i2cTask = i(reg) + Task::WriteEepromBase;
 	timeout.restart(10);
 
-	NPT_WAIT_WHILE(i2cTask == (i(reg) + Task::WriteEepromBase));
+	CO_WAIT_WHILE(i2cTask == (i(reg) + Task::WriteEepromBase));
 
 	if (i2cSuccess == (i(reg) + Task::WriteEepromBase))
-		NPT_EXIT_SUCCESS();
+		CO_EXIT_SUCCESS();
 
-	NPT_END();
+	CO_END();
 }
 
 // MARK: write 16bit register
 template < class I2cMaster >
-xpcc::pt::Result
+xpcc::co::Result
 xpcc::Hmc6343<I2cMaster>::write16BitRegister(void *ctx, Register16 reg, uint16_t value)
 {
-	NPT_BEGIN(ctx);
+	CO_BEGIN(ctx);
 
 	// LSB
-	if ( NPT_SPAWN( writeRegister(ctx, static_cast<Register>(reg), value) ) )
+	if ( CO_CALL( writeRegister(ctx, static_cast<Register>(reg), value) ) )
 	{
 		// MSB
-		if ( NPT_SPAWN(
+		if ( CO_CALL(
 				writeRegister(ctx, static_cast<Register>(i(reg)+1), (value >> 8)) ) )
-			NPT_EXIT_SUCCESS();
+			CO_EXIT_SUCCESS();
 	}
 
-	NPT_END();
+	CO_END();
 }
 
 // MARK: read register
 template < class I2cMaster >
-xpcc::pt::Result
+xpcc::co::Result
 xpcc::Hmc6343<I2cMaster>::readRegister(void *ctx, Register reg, uint8_t &value)
 {
-	NPT_BEGIN(ctx);
+	CO_BEGIN(ctx);
 
-	NPT_WAIT_UNTIL(
+	CO_WAIT_UNTIL(
 			timeout.isExpired() &&
 			!adapter.isBusy() && (
 					buffer[0] = i(Command::ReadEeprom),
@@ -132,71 +132,71 @@ xpcc::Hmc6343<I2cMaster>::readRegister(void *ctx, Register reg, uint8_t &value)
 	i2cTask = i(reg) + Task::PostEepromBase;
 	timeout.restart(10);
 
-	NPT_WAIT_WHILE(i2cTask == (i(reg) + Task::WriteEepromBase));
+	CO_WAIT_WHILE(i2cTask == (i(reg) + Task::WriteEepromBase));
 
 	if(i2cSuccess == (i(reg) + Task::WriteEepromBase))
 	{
-		NPT_WAIT_UNTIL(timeout.isExpired());
-		NPT_WAIT_UNTIL(adapter.configureRead(&value, 1) && this->startTransaction(&adapter));
+		CO_WAIT_UNTIL(timeout.isExpired());
+		CO_WAIT_UNTIL(adapter.configureRead(&value, 1) && this->startTransaction(&adapter));
 
 		i2cTask = i(reg) + Task::ReadEepromBase;
 
-		NPT_WAIT_WHILE(i2cTask == (i(reg) + Task::ReadEepromBase));
+		CO_WAIT_WHILE(i2cTask == (i(reg) + Task::ReadEepromBase));
 
 		if (i2cSuccess == (i(reg) + Task::ReadEepromBase))
-			NPT_EXIT_SUCCESS();
+			CO_EXIT_SUCCESS();
 	}
 
-	NPT_END();
+	CO_END();
 }
 
 // MARK: read 16bit register
 template < class I2cMaster >
-xpcc::pt::Result
+xpcc::co::Result
 xpcc::Hmc6343<I2cMaster>::read16BitRegister(void *ctx, Register16 reg, uint16_t &value)
 {
 	bool success;
-	NPT_BEGIN(ctx);
+	CO_BEGIN(ctx);
 
 	// LSB
-	if ( NPT_SPAWN( readRegister(ctx, static_cast<Register>(reg), registerBufferLSB) ) )
+	if ( CO_CALL( readRegister(ctx, static_cast<Register>(reg), registerBufferLSB) ) )
 	{
 		// MSB
 		value = registerBufferLSB;
-		if ( NPT_SPAWN( writeRegister(ctx, static_cast<Register>(i(reg)+1), registerBufferLSB) ) )
+		if ( CO_CALL( writeRegister(ctx, static_cast<Register>(i(reg)+1), registerBufferLSB) ) )
 		{
 			// an opization would be to take the uint8_t addresses of value
 			// but then we would have to deal with endianess, and that headache is annoying.
 			value |= (registerBufferLSB << 8);
-			NPT_EXIT_SUCCESS();
+			CO_EXIT_SUCCESS();
 		}
 	}
 
-	NPT_END();
+	CO_END();
 }
 
 // MARK: read 6 or 1 bytes of data
 template < class I2cMaster >
-xpcc::pt::Result
+xpcc::co::Result
 xpcc::Hmc6343<I2cMaster>::readPostData(void *ctx, Command command, uint8_t offset, uint8_t readSize)
 {
-	NPT_BEGIN(ctx);
+	CO_BEGIN(ctx);
 
-	if (NPT_SPAWN(writeCommand(ctx, command, 1)))
+	if (CO_CALL(writeCommand(ctx, command, 1)))
 	{
-		NPT_WAIT_UNTIL(timeout.isExpired());
+		CO_WAIT_UNTIL(timeout.isExpired());
 
-		NPT_WAIT_UNTIL(adapter.configureRead(buffer + offset, readSize) && this->startTransaction(&adapter));
+		CO_WAIT_UNTIL(adapter.configureRead(buffer + offset, readSize) && this->startTransaction(&adapter));
 
 		i2cTask = i(command) + Task::ReadCommandBase;
 
-		NPT_WAIT_WHILE(i2cTask == (i(command) + Task::ReadCommandBase));
+		CO_WAIT_WHILE(i2cTask == (i(command) + Task::ReadCommandBase));
 
 		if (i2cSuccess == (i(command) + Task::ReadCommandBase))
-			NPT_EXIT_SUCCESS();
+			CO_EXIT_SUCCESS();
 	}
 
-	NPT_END();
+	CO_END();
 }
 
 

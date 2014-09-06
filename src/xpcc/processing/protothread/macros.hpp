@@ -31,6 +31,8 @@
 #ifndef XPCC_PT__MACROS_HPP
 #define XPCC_PT__MACROS_HPP
 
+#include <xpcc/processing/coroutine.hpp>
+
 /**
  * Declare start of protothread
  *
@@ -39,7 +41,7 @@
  * \hideinitializer
  */
 #define PT_BEGIN() \
-	xpcc::pt::Result ptResult ATTRIBUTE_UNUSED = xpcc::pt::Stop; \
+	xpcc::co::Result coResult ATTRIBUTE_UNUSED = xpcc::co::Stop; \
 	switch (this->ptState) { \
 		case 0:
 
@@ -114,21 +116,21 @@
 
 
 /**
- * Spawns a given compound task and returns
- * whether the task completed successfully or not.
+ * Calls a given coroutine and returns
+ * whether it completed successfully or not.
  *
  * \ingroup	protothread
  * \hideinitializer
  */
-#define PT_RUN_TASK(task) \
+#define PT_CALL(coroutine) \
 	({ \
 		this->ptState = __LINE__; \
 		case __LINE__: \
-			ptResult = task; \
-			if (ptResult > xpcc::pt::Success) { \
+			coResult = coroutine; \
+			if (coResult > xpcc::co::Success) { \
 				return true; \
 			} \
-			(ptResult == xpcc::pt::Success); \
+			(coResult == xpcc::co::Success); \
 	})
 
 /**

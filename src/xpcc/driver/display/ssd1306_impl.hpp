@@ -21,116 +21,116 @@ xpcc::Ssd1306<I2cMaster>::Ssd1306(uint8_t address)
 // ----------------------------------------------------------------------------
 // MARK: - Tasks
 template < class I2cMaster >
-xpcc::pt::Result
+xpcc::co::Result
 xpcc::Ssd1306<I2cMaster>::ping(void *ctx)
 {
-	NPT_BEGIN(ctx);
+	CO_BEGIN(ctx);
 
-	NPT_WAIT_UNTIL(adapter.configurePing() &&
+	CO_WAIT_UNTIL(adapter.configurePing() &&
 			(i2cTask = I2cTask::Ping, this->startTransaction(&adapter))
 	);
 
-	NPT_WAIT_WHILE(i2cTask == I2cTask::Ping);
+	CO_WAIT_WHILE(i2cTask == I2cTask::Ping);
 
 	if (i2cSuccess == I2cTask::Ping)
-		NPT_EXIT_SUCCESS();
+		CO_EXIT_SUCCESS();
 
-	NPT_END();
+	CO_END();
 }
 
 // ----------------------------------------------------------------------------
 template < class I2cMaster >
-xpcc::pt::Result
+xpcc::co::Result
 xpcc::Ssd1306<I2cMaster>::initialize(void *ctx)
 {
-	NPT_BEGIN(ctx);
+	CO_BEGIN(ctx);
 
 	initSuccessful = true;
-	initSuccessful &= NPT_SPAWN(writeCommand(ctx, Command::SetDisplayOff));
-	initSuccessful &= NPT_SPAWN(writeCommand(ctx, Command::SetDisplayClockDivideRatio, 0x80));
-	initSuccessful &= NPT_SPAWN(writeCommand(ctx, Command::SetMultiplexRatio, 0x3F));
-	initSuccessful &= NPT_SPAWN(writeCommand(ctx, Command::SetDisplayOffset, 0x00));
-	initSuccessful &= NPT_SPAWN(writeCommand(ctx, Command::SetDisplayStartLine | 0x00));
-	initSuccessful &= NPT_SPAWN(writeCommand(ctx, Command::SetChargePump, 0x14));
-	initSuccessful &= NPT_SPAWN(writeCommand(ctx, Command::SetMemoryMode, 0x00));
-	initSuccessful &= NPT_SPAWN(writeCommand(ctx, Command::SetSegmentRemap127));
-	initSuccessful &= NPT_SPAWN(writeCommand(ctx, Command::SetComOutputScanDirectionDecrement));
-	initSuccessful &= NPT_SPAWN(writeCommand(ctx, Command::SetComPins, 0x12));
-	initSuccessful &= NPT_SPAWN(writeCommand(ctx, Command::SetContrastControl, 0xCE));
-	initSuccessful &= NPT_SPAWN(writeCommand(ctx, Command::SetPreChargePeriod, 0xF1));
-	initSuccessful &= NPT_SPAWN(writeCommand(ctx, Command::SetV_DeselectLevel, 0x40));
-	initSuccessful &= NPT_SPAWN(writeCommand(ctx, Command::SetEntireDisplayResumeToRam));
-	initSuccessful &= NPT_SPAWN(writeCommand(ctx, Command::SetNormalDisplay));
-	initSuccessful &= NPT_SPAWN(writeCommand(ctx, Command::SetColumnAddress, 0, 127));
-	initSuccessful &= NPT_SPAWN(writeCommand(ctx, Command::SetPageAddress, 0, 7));
-	initSuccessful &= NPT_SPAWN(writeCommand(ctx, Command::SetDisplayOn));
+	initSuccessful &= CO_CALL(writeCommand(ctx, Command::SetDisplayOff));
+	initSuccessful &= CO_CALL(writeCommand(ctx, Command::SetDisplayClockDivideRatio, 0x80));
+	initSuccessful &= CO_CALL(writeCommand(ctx, Command::SetMultiplexRatio, 0x3F));
+	initSuccessful &= CO_CALL(writeCommand(ctx, Command::SetDisplayOffset, 0x00));
+	initSuccessful &= CO_CALL(writeCommand(ctx, Command::SetDisplayStartLine | 0x00));
+	initSuccessful &= CO_CALL(writeCommand(ctx, Command::SetChargePump, 0x14));
+	initSuccessful &= CO_CALL(writeCommand(ctx, Command::SetMemoryMode, 0x00));
+	initSuccessful &= CO_CALL(writeCommand(ctx, Command::SetSegmentRemap127));
+	initSuccessful &= CO_CALL(writeCommand(ctx, Command::SetComOutputScanDirectionDecrement));
+	initSuccessful &= CO_CALL(writeCommand(ctx, Command::SetComPins, 0x12));
+	initSuccessful &= CO_CALL(writeCommand(ctx, Command::SetContrastControl, 0xCE));
+	initSuccessful &= CO_CALL(writeCommand(ctx, Command::SetPreChargePeriod, 0xF1));
+	initSuccessful &= CO_CALL(writeCommand(ctx, Command::SetV_DeselectLevel, 0x40));
+	initSuccessful &= CO_CALL(writeCommand(ctx, Command::SetEntireDisplayResumeToRam));
+	initSuccessful &= CO_CALL(writeCommand(ctx, Command::SetNormalDisplay));
+	initSuccessful &= CO_CALL(writeCommand(ctx, Command::SetColumnAddress, 0, 127));
+	initSuccessful &= CO_CALL(writeCommand(ctx, Command::SetPageAddress, 0, 7));
+	initSuccessful &= CO_CALL(writeCommand(ctx, Command::SetDisplayOn));
 
 	if (initSuccessful)
-		NPT_EXIT_SUCCESS();
+		CO_EXIT_SUCCESS();
 
-	NPT_END();
+	CO_END();
 }
 
 // ----------------------------------------------------------------------------
 template < class I2cMaster >
-xpcc::pt::Result
+xpcc::co::Result
 xpcc::Ssd1306<I2cMaster>::startWriteDisplay(void *ctx)
 {
-	NPT_BEGIN(ctx);
+	CO_BEGIN(ctx);
 
-	NPT_WAIT_UNTIL(adapterData.configureWrite(buffer, 1024) &&
+	CO_WAIT_UNTIL(adapterData.configureWrite(buffer, 1024) &&
 			(i2cTask = I2cTask::WriteDisplay, this->startTransaction(&adapterData)));
 
-	NPT_END();
+	CO_END();
 }
 
 
 template < class I2cMaster >
-xpcc::pt::Result
+xpcc::co::Result
 xpcc::Ssd1306<I2cMaster>::writeDisplay(void *ctx)
 {
-	NPT_BEGIN(ctx);
+	CO_BEGIN(ctx);
 
-	NPT_SPAWN(startWriteDisplay(ctx));
+	CO_CALL(startWriteDisplay(ctx));
 
-	NPT_WAIT_WHILE(i2cTask == I2cTask::WriteDisplay);
+	CO_WAIT_WHILE(i2cTask == I2cTask::WriteDisplay);
 
 	if (i2cSuccess == I2cTask::WriteDisplay)
-		NPT_EXIT_SUCCESS();
+		CO_EXIT_SUCCESS();
 
-	NPT_END();
+	CO_END();
 }
 
 // ----------------------------------------------------------------------------
 // MARK: write command
 template < class I2cMaster >
-xpcc::pt::Result
+xpcc::co::Result
 xpcc::Ssd1306<I2cMaster>::writeCommand(void *ctx, uint8_t command)
 {
-	NPT_BEGIN(ctx);
+	CO_BEGIN(ctx);
 
-	NPT_WAIT_UNTIL(
+	CO_WAIT_UNTIL(
 			!adapter.isBusy() && (
 					commandBuffer[0] = 0x80,
 					commandBuffer[1] = command,
 					startTransactionWithLength(2) )
 	);
 
-	NPT_WAIT_WHILE(i2cTask == command);
+	CO_WAIT_WHILE(i2cTask == command);
 
 	if (i2cSuccess == command)
-		NPT_EXIT_SUCCESS();
+		CO_EXIT_SUCCESS();
 
-	NPT_END();
+	CO_END();
 }
 
 template < class I2cMaster >
-xpcc::pt::Result
+xpcc::co::Result
 xpcc::Ssd1306<I2cMaster>::writeCommand(void *ctx, uint8_t command, uint8_t data)
 {
-	NPT_BEGIN(ctx);
+	CO_BEGIN(ctx);
 
-	NPT_WAIT_UNTIL(
+	CO_WAIT_UNTIL(
 			!adapter.isBusy() && (
 					commandBuffer[0] = 0x80,
 					commandBuffer[1] = command,
@@ -139,21 +139,21 @@ xpcc::Ssd1306<I2cMaster>::writeCommand(void *ctx, uint8_t command, uint8_t data)
 					startTransactionWithLength(4) )
 	);
 
-	NPT_WAIT_WHILE(i2cTask == command);
+	CO_WAIT_WHILE(i2cTask == command);
 
 	if (i2cSuccess == command)
-		NPT_EXIT_SUCCESS();
+		CO_EXIT_SUCCESS();
 
-	NPT_END();
+	CO_END();
 }
 
 template < class I2cMaster >
-xpcc::pt::Result
+xpcc::co::Result
 xpcc::Ssd1306<I2cMaster>::writeCommand(void *ctx, uint8_t command, uint8_t data1, uint8_t data2)
 {
-	NPT_BEGIN(ctx);
+	CO_BEGIN(ctx);
 
-	NPT_WAIT_UNTIL(
+	CO_WAIT_UNTIL(
 			!adapter.isBusy() && (
 					commandBuffer[0] = 0x80,
 					commandBuffer[1] = command,
@@ -164,22 +164,22 @@ xpcc::Ssd1306<I2cMaster>::writeCommand(void *ctx, uint8_t command, uint8_t data1
 					startTransactionWithLength(6) )
 	);
 
-	NPT_WAIT_WHILE(i2cTask == command);
+	CO_WAIT_WHILE(i2cTask == command);
 
 	if (i2cSuccess == command)
-		NPT_EXIT_SUCCESS();
+		CO_EXIT_SUCCESS();
 
-	NPT_END();
+	CO_END();
 }
 
 template < class I2cMaster >
-xpcc::pt::Result
+xpcc::co::Result
 xpcc::Ssd1306<I2cMaster>::writeCommand(void *ctx, uint8_t command,
 		uint8_t data1, uint8_t data2, uint8_t data3, uint8_t data4, uint8_t data5)
 {
-	NPT_BEGIN(ctx);
+	CO_BEGIN(ctx);
 
-	NPT_WAIT_UNTIL(
+	CO_WAIT_UNTIL(
 			!adapter.isBusy() && (
 					commandBuffer[0] = 0x80,
 					commandBuffer[1] = command,
@@ -196,22 +196,22 @@ xpcc::Ssd1306<I2cMaster>::writeCommand(void *ctx, uint8_t command,
 					startTransactionWithLength(12) )
 	);
 
-	NPT_WAIT_WHILE(i2cTask == command);
+	CO_WAIT_WHILE(i2cTask == command);
 
 	if (i2cSuccess == command)
-		NPT_EXIT_SUCCESS();
+		CO_EXIT_SUCCESS();
 
-	NPT_END();
+	CO_END();
 }
 
 template < class I2cMaster >
-xpcc::pt::Result
+xpcc::co::Result
 xpcc::Ssd1306<I2cMaster>::writeCommand(void *ctx, uint8_t command,
 		uint8_t data1, uint8_t data2, uint8_t data3, uint8_t data4, uint8_t data5, uint8_t data6)
 {
-	NPT_BEGIN(ctx);
+	CO_BEGIN(ctx);
 
-	NPT_WAIT_UNTIL(
+	CO_WAIT_UNTIL(
 			!adapter.isBusy() && (
 					commandBuffer[0] = 0x80,
 					commandBuffer[1] = command,
@@ -230,12 +230,12 @@ xpcc::Ssd1306<I2cMaster>::writeCommand(void *ctx, uint8_t command,
 					startTransactionWithLength(14) )
 	);
 
-	NPT_WAIT_WHILE(i2cTask == command);
+	CO_WAIT_WHILE(i2cTask == command);
 
 	if (i2cSuccess == command)
-		NPT_EXIT_SUCCESS();
+		CO_EXIT_SUCCESS();
 
-	NPT_END();
+	CO_END();
 }
 
 // ----------------------------------------------------------------------------

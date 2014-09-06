@@ -14,6 +14,7 @@
 #include <xpcc/architecture/peripheral/i2c_device.hpp>
 #include <xpcc/architecture/peripheral/i2c_transaction.hpp>
 #include <xpcc/processing/protothread.hpp>
+#include <xpcc/processing/coroutine.hpp>
 
 namespace xpcc
 {
@@ -66,7 +67,7 @@ struct tmp102
  */
 template < class I2cMaster >
 class Tmp102 :	public tmp102, public xpcc::I2cDevice< I2cMaster >,
-				private xpcc::pt::Protothread, public xpcc::pt::NestedProtothread<1>
+				private xpcc::pt::Protothread, public xpcc::co::NestedCoroutine<1>
 {
 private:
 	enum Register
@@ -119,39 +120,39 @@ public:
 
 	// MARK: - Tasks
 	/// pings the sensor
-	xpcc::pt::Result
+	xpcc::co::Result
 	ping(void *ctx);
 
 	// MARK: Configuration
 	// @param	rate	Update rate in Hz: 0 to 33. (Use 0 to update at 0.25Hz).
-	xpcc::pt::Result
+	xpcc::co::Result
 	setUpdateRate(void *ctx, uint8_t rate);
 
 	/// Enables extended mode with 13 bit data format.
-	xpcc::pt::Result
+	xpcc::co::Result
 	enableExtendedMode(void *ctx, bool enable = true);
 
-	xpcc::pt::Result
+	xpcc::co::Result
 	configureAlertMode(void *ctx, ThermostatMode mode, AlertPolarity polarity, FaultQueue faults);
 
-	xpcc::pt::Result ALWAYS_INLINE
+	xpcc::co::Result ALWAYS_INLINE
 	writeUpperLimit(void *ctx, float temperature)
 	{ return writeLimitRegister(ctx, REGISTER_HIGH_TEMPERATURE, temperature); }
 
-	xpcc::pt::Result
+	xpcc::co::Result
 	writeLowerLimit(void *ctx, float temperature)
 	{ return writeLimitRegister(ctx, REGISTER_LOW_TEMPERATURE, temperature); }
 
 	/// param[in]	result	contains comparator mode alert in the configured polarity
-	xpcc::pt::Result
+	xpcc::co::Result
 	readComparatorMode(void *ctx, bool &result);
 
 	/// starts a temperature conversion right now
-	xpcc::pt::Result
+	xpcc::co::Result
 	startConversion(void *ctx);
 
 	/// reads the Temperature registers and buffers the results
-	xpcc::pt::Result
+	xpcc::co::Result
 	readTemperature(void *ctx);
 
 	/// @return the temperature as a signed float in Celcius
@@ -159,10 +160,10 @@ public:
 	getTemperature();
 
 private:
-	xpcc::pt::Result
+	xpcc::co::Result
 	writeConfiguration(void *ctx, uint8_t length=3);
 
-	xpcc::pt::Result
+	xpcc::co::Result
 	writeLimitRegister(void *ctx, Register reg, float temperature);
 
 	struct I2cTask
