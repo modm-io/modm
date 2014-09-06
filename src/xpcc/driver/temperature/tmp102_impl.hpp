@@ -91,10 +91,10 @@ xpcc::Tmp102<I2cMaster>::setUpdateRate(void *ctx, uint8_t rate)
 		// clear conversion rate bits
 		config_lsb &= ~CONFIGURATION_CONVERSION_RATE;
 		// maps:
-		// 0b0000 to 0b00
-		// 0b0001 to 0b01
-		// 0b0100 to 0b10
-		// 0b1000 to 0b11
+		// 0 to 0b00
+		// 1 to 0b01
+		// 4 to 0b10
+		// 8 to 0b11
 		if (rate & 0b1001) config_lsb |= CONFIGURATION_CONVERSION_RATE_1HZ;
 		if (rate & 0b1100) config_lsb |= CONFIGURATION_CONVERSION_RATE_4HZ;
 		if ( CO_CALL(writeConfiguration(ctx, 3)) )
@@ -139,11 +139,11 @@ xpcc::Tmp102<I2cMaster>::configureAlertMode(void *ctx, ThermostatMode mode, Aler
 	CO_BEGIN(ctx);
 
 	if (static_cast<uint8_t>(mode))
-		config_msb |= CONFIGURATION_THERMOSTAT_MODE;
+			config_msb |=  CONFIGURATION_THERMOSTAT_MODE;
 	else	config_msb &= ~CONFIGURATION_THERMOSTAT_MODE;
 
 	if (static_cast<uint8_t>(polarity))
-		config_msb |= CONFIGURATION_POLARITY;
+			config_msb |=  CONFIGURATION_POLARITY;
 	else	config_msb &= ~CONFIGURATION_POLARITY;
 
 	config_msb &= ~CONFIGURATION_FAULT_QUEUE;
@@ -183,9 +183,10 @@ xpcc::Tmp102<I2cMaster>::readTemperature(void *ctx)
 	CO_WAIT_UNTIL(
 			!adapter.isBusy() && (
 					buffer[0] = REGISTER_TEMPERATURE,
-					adapter.configureWriteRead(buffer, 1, data, 2) &&
-							(i2cTask = I2cTask::ReadTemperature, this->startTransaction(&adapter)) )
+					adapter.configureWriteRead(buffer, 1, data, 2) && this->startTransaction(&adapter) )
 	);
+
+	i2cTask = I2cTask::ReadTemperature;
 
 	CO_WAIT_WHILE(i2cTask == I2cTask::ReadTemperature);
 
@@ -205,9 +206,10 @@ xpcc::Tmp102<I2cMaster>::readComparatorMode(void *ctx, bool &result)
 	CO_WAIT_UNTIL(
 			!adapter.isBusy() && (
 					buffer[0] = REGISTER_CONFIGURATION,
-					adapter.configureWriteRead(buffer, 1, buffer, 2) &&
-							(i2cTask = I2cTask::ReadAlert, this->startTransaction(&adapter)) )
+					adapter.configureWriteRead(buffer, 1, buffer, 2) && this->startTransaction(&adapter) )
 	);
+
+	i2cTask = I2cTask::ReadAlert;
 
 	CO_WAIT_WHILE(i2cTask == I2cTask::ReadAlert);
 
@@ -234,9 +236,10 @@ xpcc::Tmp102<I2cMaster>::writeConfiguration(void *ctx, uint8_t length)
 					buffer[0] = REGISTER_CONFIGURATION,
 					buffer[1] = config_msb,
 					buffer[2] = config_lsb,
-					adapter.configureWrite(buffer, length) &&
-							(i2cTask = I2cTask::Configuration, this->startTransaction(&adapter)) )
+					adapter.configureWrite(buffer, length) && this->startTransaction(&adapter) )
 	);
+
+	i2cTask = I2cTask::Configuration;
 
 	CO_WAIT_WHILE(i2cTask == I2cTask::Configuration);
 
@@ -256,18 +259,19 @@ xpcc::Tmp102<I2cMaster>::writeLimitRegister(void *ctx, Register reg, float tempe
 	{
 		int16_t temp = temperature * 16.f;
 		temp <<= (config_lsb & CONFIGURATION_EXTENDED_MODE) ? 3 : 4;
-		temp = xpcc::math::hostToBigEndian(static_cast<uint16_t>(temp));
+		temp = xpcc::math::bigEndianToHost(static_cast<uint16_t>(temp));
 
-		buffer[1] = temp;
 		buffer[2] = (temp >> 8);
+		buffer[1] = temp;
 	}
 
 	CO_WAIT_UNTIL(
 			!adapter.isBusy() && (
 					buffer[0] = reg,
-					adapter.configureWrite(buffer, 3) &&
-							(i2cTask = I2cTask::LimitRegister, this->startTransaction(&adapter)) )
+					adapter.configureWrite(buffer, 3) && this->startTransaction(&adapter) )
 	);
+
+	i2cTask = I2cTask::LimitRegister;
 
 	CO_WAIT_WHILE(i2cTask == I2cTask::LimitRegister);
 
