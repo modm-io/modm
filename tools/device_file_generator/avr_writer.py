@@ -89,6 +89,9 @@ class AVRDeviceWriter(XMLDeviceWriter):
 		self.addSpiToNode(self.root)
 		# ADC
 		self.addAdcToNode(self.root)
+		# Clock
+		clock_child = self.root.addChild('driver')
+		clock_child.setAttributes({'type': 'clock', 'name': 'avr'})
 		# DAC
 		self.addDacToNode(self.root)
 		# Timer

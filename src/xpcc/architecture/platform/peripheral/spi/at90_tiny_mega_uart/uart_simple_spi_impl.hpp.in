@@ -12,18 +12,35 @@
 #endif
 
 // ----------------------------------------------------------------------------
-template< uint32_t baudrate >
+template< class clockSource, uint32_t baudrate, uint16_t tolerance >
 void
 xpcc::{{target.family}}::UartSpiSimpleMaster{{id}}::initialize()
 {
-	constexpr uint16_t prescaler = (F_CPU / ( 2 * baudrate )) - 1;
+	// calculate the fractional prescaler value
+	constexpr float pre_raw = static_cast<float>(clockSource::UsartSpi) / ( 2 * baudrate );
+	// respect the prescaler range of 1 to 4096
+	constexpr uint32_t pre_ceil = std::ceil(pre_raw) > 4096 ? 4096 : std::ceil(pre_raw);
+	constexpr uint32_t pre_floor = std::floor(pre_raw) < 1 ? 1 : std::floor(pre_raw);
 
-	static_assert(F_CPU/2 >= baudrate,
-			"The CPU frequency must be at least 2x higher than SPI baudrate.");
-	static_assert(prescaler + 1 < (1 << 12) + 1,
-			"SPI baudrate is too slow for CPU frequency (Prescaler out of bounds).");
+	// calculate the possible baudrates above and below the requested baudrate
+	constexpr uint32_t baud_lower = clockSource::UsartSpi / ( 2 * pre_ceil );
+	constexpr uint32_t baud_upper = clockSource::UsartSpi / ( 2 * pre_floor );
 
-	initialize(prescaler);
+	// calculate the fractional prescaler value corresponding to the baudrate exactly
+	// between the upper and lower baudrate
+	constexpr float pre_middle = static_cast<float>(clockSource::UsartSpi) /
+			( 2 * ((baud_upper - baud_lower) / 2.f + baud_lower) );
+	// decide which prescaler value is closer to a possible baudrate
+	constexpr uint16_t prescaler = (pre_raw >= pre_middle) ? pre_ceil : pre_floor;
+
+	// check if within baudrate tolerance
+	constexpr uint32_t generated_baudrate = clockSource::UsartSpi / (2 * prescaler);
+	assertBaudrateInTolerance<
+		/* clostest available baudrate */ generated_baudrate,
+		/* desired baudrate */ baudrate,
+		tolerance >();
+
+	initialize(prescaler - 1);
 }
 
 void
@@ -47,50 +64,20 @@ xpcc::{{target.family}}::UartSpiSimpleMaster{{id}}::setDataOrder(DataOrder order
 }
 
 // ----------------------------------------------------------------------------
+%% if extended is defined
 uint8_t
 xpcc::{{target.family}}::UartSpiSimpleMaster{{id}}::writeReadBlocking(uint8_t data)
 {
-	writeBlocking(data);
-
-	uint8_t rData;
-	while(!getResult(rData))
+	while(!((UCSR{{id}}A & (1 << UDRE{{id}}))))
 		;
-
-	return rData;
-}
-
-%% if extended is defined
-void
-xpcc::{{target.family}}::UartSpiSimpleMaster{{id}}::writeBlocking(uint8_t data)
-{
-	while(!write(data))
-		;
-}
-
-bool
-xpcc::{{target.family}}::UartSpiSimpleMaster{{id}}::write(uint8_t data)
-{
-	if (!((UCSR{{id}}A & (1 << UDRE{{id}}))))
-		return false;
 
 	UDR{{id}} = data;
-	return true;
-}
 
-bool
-xpcc::{{target.family}}::UartSpiSimpleMaster{{id}}::getResult(uint8_t &data)
-{
-	if (!(UCSR{{id}}A & (1 << RXC{{id}})))
-		return false;
+	while (!((UCSR{{id}}A & (1 << RXC{{id}}))))
+		;
 
 	data = UDR{{id}};
-	return true;
+
+	return data;
 }
 %% endif
-
-bool
-xpcc::{{target.family}}::UartSpiSimpleMaster{{id}}::isFinished()
-{
-	return ( (UCSR{{id}}A & ((1 << UDRE{{id}}) | (1 << RXC{{id}})) ) ==
-			((1 << UDRE{{id}}) | (1 << RXC{{id}})) );
-}

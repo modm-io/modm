@@ -37,9 +37,9 @@
 // ----------------------------------------------------------------------------
 template < typename I2cMaster >
 xpcc::Bmp085<I2cMaster>::Bmp085(uint8_t* data, uint8_t address)
-:	running(NOTHING_RUNNING), status(0), calculation(0), data(data)
+:	I2cWriteReadAdapter(address), running(NOTHING_RUNNING), status(0), calculation(0), data(data)
 {
-	adapter.initialize(address << 1, buffer, 0, data, 0);
+	configureWriteRead(buffer, 0, data, 0);
 }
 
 template < typename I2cMaster >
@@ -48,10 +48,10 @@ xpcc::Bmp085<I2cMaster>::configure(bmp085::Mode mode)
 {
 	config = mode;
 	buffer[0] = bmp085::REGISTER_CAL_AC1;
-	adapter.initialize(buffer, 1, reinterpret_cast<uint8_t*>(&calibration), 22);
+	configureWriteRead(buffer, 1, reinterpret_cast<uint8_t*>(&calibration), 22);
 	status |= NEW_CALIBRATION_DATA;
 	
-	return I2cMaster::startBlocking(&adapter);
+	return I2cMaster::startBlocking(this);
 }
 
 template < typename I2cMaster >
@@ -232,7 +232,7 @@ xpcc::Bmp085<I2cMaster>::update()
 	
 	if (running != NOTHING_RUNNING)
 	{
-		switch (adapter.getState())
+		switch (getAdapterState())
 		{
 			case xpcc::I2c::AdapterState::Idle:
 				if (running == READ_TEMPERATURE_RUNNING) {
@@ -256,9 +256,9 @@ xpcc::Bmp085<I2cMaster>::update()
 		{
 			buffer[0] = bmp085::REGISTER_CONTROL;
 			buffer[1] = bmp085::CONVERSION_TEMPERATURE;
-			adapter.initialize(buffer, 2, data, 0);
+			configureWriteRead(buffer, 2, data, 0);
 			
-			if (I2cMaster::start(&adapter)) {
+			if (I2cMaster::start(this)) {
 				status &= ~START_TEMPERATURE_PENDING;
 				running = START_TEMPERATURE_RUNNING;
 			}
@@ -266,9 +266,9 @@ xpcc::Bmp085<I2cMaster>::update()
 		else if (status & READ_TEMPERATURE_PENDING)
 		{
 			buffer[0] = bmp085::REGISTER_CONVERSION_MSB;
-			adapter.initialize(buffer, 1, data, 2);
+			configureWriteRead(buffer, 1, data, 2);
 			
-			if (I2cMaster::start(&adapter)) {
+			if (I2cMaster::start(this)) {
 				status &= ~READ_TEMPERATURE_PENDING;
 				running = READ_TEMPERATURE_RUNNING;
 			}
@@ -277,9 +277,9 @@ xpcc::Bmp085<I2cMaster>::update()
 		{
 			buffer[0] = bmp085::REGISTER_CONTROL;
 			buffer[1] = bmp085::CONVERSION_PRESSURE | config;
-			adapter.initialize(buffer, 2, data, 0);
+			configureWriteRead(buffer, 2, data, 0);
 			
-			if (I2cMaster::start(&adapter)) {
+			if (I2cMaster::start(this)) {
 				status &= ~START_PRESSURE_PENDING;
 				running = START_PRESSURE_RUNNING;
 			}
@@ -287,9 +287,9 @@ xpcc::Bmp085<I2cMaster>::update()
 		else if (status & READ_PRESSURE_PENDING)
 		{
 			buffer[0] = bmp085::REGISTER_CONVERSION_MSB;
-			adapter.initialize(buffer, 1, data+2, 3);
+			configureWriteRead(buffer, 1, data+2, 3);
 			
-			if (I2cMaster::start(&adapter)) {
+			if (I2cMaster::start(this)) {
 				status &= ~READ_PRESSURE_PENDING;
 				running = READ_PRESSURE_RUNNING;
 			}

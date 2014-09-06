@@ -42,7 +42,7 @@ namespace xpcc
 	 * \author	Fabian Greif
 	 */
 	template <typename I2cMaster >
-	class Lm75
+	class Lm75 : protected xpcc::I2cWriteReadAdapter
 	{
 	public:
 		/**
@@ -50,9 +50,9 @@ namespace xpcc
 		 * \param	address		Default address is 0x90.
 		 */
 		Lm75(uint8_t *data, uint8_t address=0x90)
-		:	status(0), data(data)
+		:	I2cWriteReadAdapter(address), status(0), data(data)
 		{
-			adapter.initialize(address << 1, data, 2);
+			configureWriteRead(address << 1, data, 2);
 		}
 		
 		/**
@@ -86,12 +86,12 @@ namespace xpcc
 		update()
 		{
 			if (status & READ_TEMPERATURE_RUNNING &&
-				adapter.getState() == xpcc::I2c::AdapterState::Idle) {
+				getAdapterState() == xpcc::I2c::AdapterState::Idle) {
 				status &= ~READ_TEMPERATURE_RUNNING;
 				status |= NEW_TEMPERATURE_DATA;
 			}
 			if (status & READ_TEMPERATURE_PENDING) {
-				if (I2cMaster::start(&adapter)) {
+				if (I2cMaster::start(this)) {
 					status &= ~READ_TEMPERATURE_PENDING;
 					status |= READ_TEMPERATURE_RUNNING;
 				}
@@ -99,8 +99,6 @@ namespace xpcc
 		}
 		
 	private:
-		xpcc::i2c::ReadAdapter adapter;
-		
 		enum Status {
 			READ_TEMPERATURE_PENDING = 0x01,
 			READ_TEMPERATURE_RUNNING = 0x02,

@@ -30,7 +30,7 @@
 /**
  * \defgroup math Math
  * \brief Common mathematical operations and transformations
- * 
+ *
  */
 
 #ifndef XPCC__MATH_HPP
@@ -41,6 +41,7 @@
 #include "math/matrix.hpp"
 #include "math/lu_decomposition.hpp"
 #include "math/interpolation.hpp"
+#include "math/tolerance.hpp"
 #include "math/utils.hpp"
 
 #endif	// XPCC__MATH_HPP

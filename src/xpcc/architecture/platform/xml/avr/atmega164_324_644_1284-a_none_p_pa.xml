@@ -52,6 +52,7 @@
       <parameter device-name="644" name="ram_length">3072</parameter>
       <parameter device-name="1284" name="ram_length">15360</parameter>
     </driver>
+    <driver type="clock" name="avr"/>
     <driver type="uart" name="at90_tiny_mega" instances="0"/>
     <driver type="spi" name="at90_tiny_mega_uart" instances="0"/>
     <driver device-name="164|324|1284" type="uart" name="at90_tiny_mega" instances="1"/>

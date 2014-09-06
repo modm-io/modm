@@ -15,6 +15,7 @@
 #include <xpcc/architecture/driver/delay.hpp>
 #include "../../gpio/software/gpio.hpp"
 #include "type_ids.hpp"
+#include "../../gpio/software/gpio.hpp"
 
 namespace xpcc
 {
@@ -44,8 +45,9 @@ public:
 
 public:
 	// start documentation inherited
-	template< uint32_t baudrate >
-	static inline void
+	template< class clockSource, uint32_t baudrate,
+			uint16_t tolerance = Tolerance::FivePercent >
+	static void
 	initialize();
 
 	static void
@@ -57,27 +59,17 @@ public:
 	static uint8_t
 	writeReadBlocking(uint8_t data);
 
-	static ALWAYS_INLINE void
-	writeBlocking(uint8_t data);
-
-	static ALWAYS_INLINE bool
-	write(uint8_t data);
-
-	static ALWAYS_INLINE uint8_t
-	getResult();
-
-	static inline bool
-	transfer(uint8_t *tx, uint8_t *rx, std::size_t length);
+	static void
+	transferBlocking(uint8_t *tx, uint8_t *rx, std::size_t length);
 	// end documentation inherited
 
 private:
-	static inline void
+	static void
 	delay();
 
 	static constexpr uint32_t delayTime = (1000000.0 / Baudrate) / 2.0;
 
 	static uint8_t operationMode;
-	static uint8_t result;
 };
 
 } // namespace xpcc

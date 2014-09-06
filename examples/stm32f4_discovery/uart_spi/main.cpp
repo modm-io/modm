@@ -15,12 +15,11 @@ MAIN_FUNCTION
 	GpioOutputA2::connect(UartSpiSimpleMaster2::Mosi);
 	GpioInputA3::connect(UartSpiSimpleMaster2::Miso);
 	GpioOutputA4::connect(UartSpiSimpleMaster2::Sck);
-	UartSpiSimpleMaster2::initialize<defaultSystemClock, 10500000/2>();
-
+	UartSpiSimpleMaster2::initialize<defaultSystemClock, 5250000, xpcc::Tolerance::Exact>();
 
 	while (1)
 	{
-		UartSpiSimpleMaster2::writeBlocking(0xF0);
+		UartSpiSimpleMaster2::writeReadBlocking(0xF0);
 	}
 
 	return 0;

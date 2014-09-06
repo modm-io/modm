@@ -21,9 +21,12 @@ namespace stm32
 {
 
 /**
- * Serial peripheral interface of the Uart module
- * 
- * Simple unbuffered implementation.
+ * Serial Peripheral Interface of the Uart module.
+ *
+ * @warnind	Be aware, that the uart module can send bytes only LSB first.
+ *			Therefore the data is bit reversed in software for DataOrder::MsbFirst.
+ *
+ * @author		Niklas Hauser
  * @ingroup		stm32
  */
 class UartSpiSimpleMaster{{ id }} : public xpcc::SpiSimpleMaster, public UartBase
@@ -48,30 +51,26 @@ public:
 
 public:
 	template< 	class clockSource, uint32_t baudrate,
-				OversamplingMode oversample = OversamplingMode::By8>
-	static ALWAYS_INLINE void
+				uint16_t tolerance = xpcc::Tolerance::FivePercent >
+	static void
 	initialize();
 
-	static inline void
+	static void
 	setDataMode(DataMode mode);
 
-	static inline void
+	/// @warning 	On this target, only `DataOrder::LsbFirst` is natively
+	///				supported!
+	///				`DataOrder::MsbFirst` is reimplemented in software using
+	///				xpcc::bitReverse(), which adds some overhead.
+	/// @see	xpcc::bitReverse()
+	static void
 	setDataOrder(DataOrder order);
 
-	static inline uint8_t
+	static uint8_t
 	writeReadBlocking(uint8_t data);
 
-	static inline void
-	writeBlocking(uint8_t data);
-
-	static inline bool
-	write(uint8_t data);
-
-	static inline bool
-	getResult(uint8_t &data);
-
-	static bool
-	transfer(uint8_t * tx, uint8_t * rx, std::size_t length);
+	static void
+	transferBlocking(uint8_t * tx, uint8_t * rx, std::size_t length);
 };
 
 } // namespace stm32

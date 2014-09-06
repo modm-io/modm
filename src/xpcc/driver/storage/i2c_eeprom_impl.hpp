@@ -122,7 +122,6 @@ xpcc::I2cEeprom<I2cMaster>::initialize(const uint8_t* writeBuffer, uint8_t write
 {
 	if (state != xpcc::I2c::AdapterState::Busy)
 	{
-		this->address = address;
 		this->readBuffer = readBuffer;
 		this->readSize = readSize;
 		this->writeBuffer = writeBuffer;
@@ -165,55 +164,49 @@ xpcc::I2cEeprom<I2cMaster>::attaching()
 }
 
 template <typename I2cMaster>
-xpcc::I2cDelegate::Starting
-xpcc::I2cEeprom<I2cMaster>::starting()
+void
+xpcc::I2cEeprom<I2cMaster>::starting(Starting &starting)
 {
-	Starting s;
-	s.address = address;
+	starting.address = address;
 	if (isReading) {
-		s.next = readSize ? Operation::Read : Operation::Stop;
+		starting.next = readSize ? Operation::Read : Operation::Stop;
 	}
 	else {
-		s.next = writeSize ? Operation::Write : Operation::Stop;
+		starting.next = writeSize ? Operation::Write : Operation::Stop;
 	}
 	isReading = !isReading;
-	return s;
-}
-
-template <typename I2cMaster>
-xpcc::I2cDelegate::Writing
-xpcc::I2cEeprom<I2cMaster>::writing()
-{
-	Writing w;
-	if (twoBuffers)
-	{
-		w.buffer = auxWriteBuffer;
-		w.size = auxWriteSize;
-		w.next = OperationAfterWrite::Write;
-		twoBuffers = false;
-	}
-	else {
-		w.buffer = writeBuffer;
-		w.size = writeSize;
-		w.next = readSize ? OperationAfterWrite::Restart : OperationAfterWrite::Stop;
-	}
-	return w;
-}
-
-template <typename I2cMaster>
-xpcc::I2cDelegate::Reading
-xpcc::I2cEeprom<I2cMaster>::reading()
-{
-	Reading r;
-	r.buffer = readBuffer;
-	r.size = readSize;
-	r.next = OperationAfterRead::Stop;
-	return r;
 }
 
 template <typename I2cMaster>
 void
-xpcc::I2cEeprom<I2cMaster>::stopped(DetachCause cause)
+xpcc::I2cEeprom<I2cMaster>::writing(Writing &writing)
+{
+	if (twoBuffers)
+	{
+		writing.buffer = auxWriteBuffer;
+		writing.size = auxWriteSize;
+		writing.next = OperationAfterWrite::Write;
+		twoBuffers = false;
+	}
+	else {
+		writing.buffer = writeBuffer;
+		writing.size = writeSize;
+		writing.next = readSize ? OperationAfterWrite::Restart : OperationAfterWrite::Stop;
+	}
+}
+
+template <typename I2cMaster>
+void
+xpcc::I2cEeprom<I2cMaster>::reading(Reading &reading)
+{
+	reading.buffer = readBuffer;
+	reading.size = readSize;
+	reading.next = OperationAfterRead::Stop;
+}
+
+template <typename I2cMaster>
+void
+xpcc::I2cEeprom<I2cMaster>::detaching(DetachCause cause)
 {
 	isReading = false;
 	twoBuffers = false;

@@ -234,10 +234,6 @@ void
 xpcc::xmega::I2cMaster{{ id }}::initializeWithBaud(uint8_t baud)
 {
 	reset(xpcc::I2c::DetachCause::SoftwareReset);
-	
-//	Sda::setInput();
-//	Scl::setOutput();
-	
 	// SDA Hold Time and External Driver Interface disabled
 	TWI{{ id }}_CTRL = 0;
 	

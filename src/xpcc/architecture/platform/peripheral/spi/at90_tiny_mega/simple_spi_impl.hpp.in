@@ -15,38 +15,38 @@ bool
 xpcc::{{target.family}}::SpiSimpleMaster::transferInProgress = false;
 
 // ----------------------------------------------------------------------------
-template< uint32_t baudrate >
+template< class clockSource, uint32_t baudrate, uint16_t tolerance >
 void
 xpcc::{{target.family}}::SpiSimpleMaster::initialize()
 {
-	static_assert(F_CPU/2 >= baudrate,
-			"The CPU frequency must be at least 2x higher than SPI baudrate.");
-	static_assert(F_CPU/128 <= baudrate,
-			"The SPI baudrate must be at most 128x lower than CPU frequency.");
-	
-	constexpr uint16_t pre_raw = (F_CPU / baudrate);
-	Prescaler prescaler = Prescaler::Div128;
-	if (pre_raw >= 128) {
-		prescaler = Prescaler::Div128;
-	}
-	else if (pre_raw >= 64) {
-		prescaler = Prescaler::Div64;
-	}
-	else if (pre_raw >= 32) {
-		prescaler = Prescaler::Div32;
-	}
-	else if (pre_raw >= 16) {
-		prescaler = Prescaler::Div16;
-	}
-	else if (pre_raw >= 8) {
-		prescaler = Prescaler::Div8;
-	}
-	else if (pre_raw >= 4) {
-		prescaler = Prescaler::Div4;
-	}
-	else {
-		prescaler = Prescaler::Div2;
-	}
+	// calculate the nearest prescaler from the baudrate
+	constexpr float pre_raw = (static_cast<float>(clockSource::Spi) / baudrate);
+	constexpr uint16_t pre = (
+			(pre_raw >= ( 64 * 4.f/3)) ? 128 : (
+			(pre_raw >= ( 32 * 4.f/3)) ?  64 : (
+			(pre_raw >= ( 16 * 4.f/3)) ?  32 : (
+			(pre_raw >= (  8 * 4.f/3)) ?  16 : (
+			(pre_raw >= (  4 * 4.f/3)) ?   8 : (
+			(pre_raw >= (  2 * 4.f/3)) ?   4 :
+										   2
+			))))));
+
+	// check if we found a prescaler which generates a baudrate within the tolerance
+	assertBaudrateInTolerance<
+			clockSource::Spi / pre,
+			baudrate,
+			tolerance >();
+
+	// translate the prescaler into the bitmapping
+	constexpr Prescaler prescaler = (
+			(pre >= 128) ? Prescaler::Div128 : (
+			(pre >=  64) ? Prescaler::Div64  : (
+			(pre >=  32) ? Prescaler::Div32  : (
+			(pre >=  16) ? Prescaler::Div16  : (
+			(pre >=   8) ? Prescaler::Div8   : (
+			(pre >=   4) ? Prescaler::Div4   :
+						   Prescaler::Div2
+			))))));
 
 	initialize(prescaler);
 }
@@ -79,40 +79,30 @@ xpcc::{{target.family}}::SpiSimpleMaster::setDataOrder(DataOrder order)
 uint8_t
 xpcc::{{target.family}}::SpiSimpleMaster::writeReadBlocking(uint8_t data)
 {
-	writeBlocking(data);
-
-	uint8_t rData;
-	while(!getResult(rData))
+	while (!(SPSR & (1 << SPIF)))
 		;
+	SPDR = data;
 
-	return rData;
+	while (!(SPSR & (1 << SPIF)))
+		;
+	data = SPDR;
+
+	return data;
 }
 
 void
-xpcc::{{target.family}}::SpiSimpleMaster::writeBlocking(uint8_t data)
+xpcc::{{target.family}}::SpiSimpleMaster::transferBlocking(
+		uint8_t *tx, uint8_t *rx, std::size_t length)
 {
-	while(!write(data))
-		;
-}
+	uint8_t tx_byte = 0xff;
+	uint8_t rx_byte;
 
-bool
-xpcc::{{target.family}}::SpiSimpleMaster::write(uint8_t data)
-{
-    if (transferInProgress && !(SPSR & (1 << SPIF)))
-        return false;
+	for (std::size_t i = 0; i < length; i++)
+	{
+		if (tx) tx_byte = tx[i];
 
-    transferInProgress = true;
-	SPDR = data;
-	return true;
-}
+		rx_byte = writeReadBlocking(tx_byte);
 
-bool
-xpcc::{{target.family}}::SpiSimpleMaster::getResult(uint8_t &data)
-{
-    if (transferInProgress && !(SPSR & (1 << SPIF)))
-        return false;
-
-    transferInProgress = false;
-	data = SPDR;
-	return true;
+		if (rx) rx[i] = rx_byte;
+	}
 }

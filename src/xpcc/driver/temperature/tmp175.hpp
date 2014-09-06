@@ -80,7 +80,7 @@ namespace tmp175
  * @tparam I2cMaster Asynchronous Interface
  */
 template < typename I2cMaster >
-class Tmp175
+class Tmp175 : protected xpcc::I2cWriteReadAdapter
 {
 public:
 	/**
@@ -122,8 +122,6 @@ public:
 	update();
 
 private:
-	xpcc::I2cWriteReadAdapter adapter;
-
 	enum class
 	Running {
 		Nothing,
