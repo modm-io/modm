@@ -20,7 +20,7 @@ namespace co
 {
 
 /// State of a coroutine.
-enum State
+enum State : uint8_t
 {
 	// reasons to stop
 	Stop = 0,					///< Coroutine finished
@@ -41,6 +41,14 @@ struct Result
 	uint8_t state;
 	T result;
 };
+/// void is not an object type
+/// @internal
+template <>
+struct Result<void>
+{
+	uint8_t state;
+	uint8_t result;
+};
 
 /**
  * An implementation of Coroutines which allow for nested calling.
@@ -53,15 +61,15 @@ struct Result
  * so you can reuse their functionality.
  *
  * You are responsible to choosing the right nesting depth!
- * This class will guard itself against calling another coroutines at too
+ * This class will guard itself against calling another coroutine at too
  * deep a nesting level and inform you gently of this by returning
  * `xpcc::co::NestingError` from your called `coroutine(ctx)`.
  * It is then up to you to recognise this in your program design
  * and increase the nesting depth or rethink your code.
  *
- * Be aware that only one coroutines of the same object can run at the
- * same time. Even if you call other coroutines, they will not allow you to
- * run them until the conflicting coroutines finished.
+ * Be aware that only one coroutine of the same object can run at the
+ * same time. Even if you call another coroutine, it will simply not
+ * run until the conflicting coroutine finished.
  *
  * Each coroutine requires a context pointer, which is used to ensure the
  * coroutine only executes in the context that it was originally started from.
@@ -70,14 +78,16 @@ struct Result
  * Similarly, if you call a different coroutine of the same class in
  * the same context, while another coroutine is running, it will return
  * `xpcc::co::WrongState`.
- * Using the `CO_CALL` macro, you can wait for these coroutine to become
- * available and then run them, so you usually do not need to worry
- * about those cases.
+ * Using the `CO_CALL(coroutine(ctx))` macro, you can wait for these
+ * coroutines to become available and then run them, so you usually do
+ * not need to worry about those cases.
  *
  * You may exit and return a value by using `CO_RETURN(value)`.
- * This information is returned by the `CO_CALL` macro and can be used
+ * This information is wrapped in `xpcc::co::Result<Type>` struct
+ * and transparently returned by the `CO_CALL` macro so it can be used
  * to influence your program flow.
- * If the coroutine reaches `CO_END()` it will exit automatically.
+ * If the coroutine reaches `CO_END()` it will exit automatically,
+ * however the return type is set to `0` or equivalent.
  *
  * Note that you should call coroutines within a protothreads.
  * It is sufficient to use the `this` pointer of the class as context
@@ -119,7 +129,7 @@ struct Result
  *         PT_END();
  *     }
  *
- *     xpcc::co::Result<>
+ *     xpcc::co::Result<bool>
  *     waitForTimer(void *ctx)
  *     {
  *         CO_BEGIN(ctx);
