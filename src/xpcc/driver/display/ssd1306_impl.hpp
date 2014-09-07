@@ -52,7 +52,7 @@ xpcc::Ssd1306<I2cMaster>::initialize(void *ctx)
 	initSuccessful &= CO_CALL(writeCommand(ctx, Command::SetDisplayOffset, 0x00));
 	initSuccessful &= CO_CALL(writeCommand(ctx, Command::SetDisplayStartLine | 0x00));
 	initSuccessful &= CO_CALL(writeCommand(ctx, Command::SetChargePump, 0x14));
-	initSuccessful &= CO_CALL(writeCommand(ctx, Command::SetMemoryMode, 0x00));
+	initSuccessful &= CO_CALL(writeCommand(ctx, Command::SetMemoryMode, 0x01));
 	initSuccessful &= CO_CALL(writeCommand(ctx, Command::SetSegmentRemap127));
 	initSuccessful &= CO_CALL(writeCommand(ctx, Command::SetComOutputScanDirectionDecrement));
 	initSuccessful &= CO_CALL(writeCommand(ctx, Command::SetComPins, 0x12));

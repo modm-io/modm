@@ -166,7 +166,7 @@ private:
 	{
 	public:
 		DataTransmissionAdapter(uint8_t address)
-		:	I2cWriteAdapter(address), control(0x40)
+		:	I2cWriteAdapter(address), control(0xff)
 		{
 		}
 
@@ -176,8 +176,7 @@ private:
 			if (I2cWriteAdapter::configureWrite(&buffer[0][0], size))
 			{
 				displayBuffer = buffer;
-				page = 0xff;
-				row = 0;
+				control = 0xff;
 				return true;
 			}
 			return false;
@@ -189,28 +188,16 @@ private:
 		{
 			// the first byte is 0x40, which tells the display
 			// that (a lot of) data is coming next.
-			if (page == 0xff)
+			if (control == 0xff)
 			{
-				page = 0;
+				control = 0x40;
 				return Writing(&control, 1, OperationAfterWrite::Write);
 			}
 
-			// the display expects the frame slightly differently than in memory
-			// this is the same format as using in ks0108
-			if (row >= 128)
-			{
-				row = 0;
-				page++;
-			}
-
-			// return one byte and continue writing.
-			return Writing(&displayBuffer[row++][page], 1,
-					--size ? OperationAfterWrite::Write : OperationAfterWrite::Stop);
+			return Writing(&displayBuffer[0][0], size, OperationAfterWrite::Stop);
 		}
 
 		uint8_t control;
-		uint8_t page;
-		uint8_t row;
 		uint8_t (*displayBuffer)[8];
 	};
 
