@@ -13,7 +13,7 @@
 
 template < class I2cMaster >
 xpcc::Ssd1306<I2cMaster>::Ssd1306(uint8_t address)
-:	I2cDevice<I2cMaster>(), i2cTask(I2cTask::Idle), i2cSuccess(0), inverted(false),
+:	I2cDevice<I2cMaster>(), i2cTask(I2cTask::Idle), i2cSuccess(0),
 	adapter(address, i2cTask, i2cSuccess), adapterData(address, i2cTask, i2cSuccess)
 {
 }
@@ -47,7 +47,7 @@ xpcc::Ssd1306<I2cMaster>::initialize(void *ctx)
 
 	initSuccessful = true;
 	initSuccessful &= CO_CALL(writeCommand(ctx, Command::SetDisplayOff));
-	initSuccessful &= CO_CALL(writeCommand(ctx, Command::SetDisplayClockDivideRatio, 0x80));
+	initSuccessful &= CO_CALL(writeCommand(ctx, Command::SetDisplayClockDivideRatio, 0xF0));
 	initSuccessful &= CO_CALL(writeCommand(ctx, Command::SetMultiplexRatio, 0x3F));
 	initSuccessful &= CO_CALL(writeCommand(ctx, Command::SetDisplayOffset, 0x00));
 	initSuccessful &= CO_CALL(writeCommand(ctx, Command::SetDisplayStartLine | 0x00));
@@ -73,16 +73,10 @@ xpcc::Ssd1306<I2cMaster>::initialize(void *ctx)
 
 // ----------------------------------------------------------------------------
 template < class I2cMaster >
-xpcc::co::Result<bool>
+xpcc::co::Result<void>
 xpcc::Ssd1306<I2cMaster>::startWriteDisplay(void *ctx)
 {
 	CO_BEGIN(ctx);
-
-	if (inverted)
-	{
-		CO_CALL(writeCommand(ctx, Command::SetColumnAddress, 0, 127));
-		CO_CALL(writeCommand(ctx, Command::SetPageAddress, 0, 7));
-	}
 
 	CO_WAIT_UNTIL(adapterData.configureWrite(buffer, 1024) && this->startTransaction(&adapterData));
 
@@ -114,14 +108,45 @@ xpcc::Ssd1306<I2cMaster>::invertDisplay(void *ctx, bool invert)
 {
 	CO_BEGIN(ctx);
 
-	CO_CALL(writeCommand(ctx, invert ? Command::SetInvertedDisplay : Command::SetNormalDisplay));
+	if ( CO_CALL(writeCommand(ctx, invert ? Command::SetInvertedDisplay : Command::SetNormalDisplay)) )
+		CO_RETURN(true);
 
-	inverted = invert;
+	CO_END();
+}
 
-	if (!inverted)
+
+template < class I2cMaster >
+xpcc::co::Result<bool>
+xpcc::Ssd1306<I2cMaster>::setDisplayContrast(void *ctx, uint8_t contrast)
+{
+	CO_BEGIN(ctx);
+
+	if ( CO_CALL(writeCommand(ctx, Command::SetContrastControl, contrast)) )
+		CO_RETURN(true);
+
+	CO_END();
+}
+
+template < class I2cMaster >
+xpcc::co::Result<bool>
+xpcc::Ssd1306<I2cMaster>::setDisplayRotation(void *ctx, Rotation rotation)
+{
+	CO_BEGIN(ctx);
+
+	if (rotation == Rotation::Normal)
 	{
-		CO_CALL(writeCommand(ctx, Command::SetColumnAddress, 0, 127));
-		CO_CALL(writeCommand(ctx, Command::SetPageAddress, 0, 7));
+		if ( CO_CALL(writeCommand(ctx, Command::SetSegmentRemap127)) )
+		{
+			if ( CO_CALL(writeCommand(ctx, Command::SetComOutputScanDirectionDecrement)) )
+				CO_RETURN(true);
+		}
+	}
+	else {
+		if ( CO_CALL(writeCommand(ctx, Command::SetSegmentRemap0)) )
+		{
+			if ( CO_CALL(writeCommand(ctx, Command::SetComOutputScanDirectionIncrement)) )
+				CO_RETURN(true);
+		}
 	}
 
 	CO_END();
@@ -201,7 +226,7 @@ xpcc::Ssd1306<I2cMaster>::writeCommand(void *ctx, uint8_t command, uint8_t data1
 template < class I2cMaster >
 xpcc::co::Result<bool>
 xpcc::Ssd1306<I2cMaster>::writeCommand(void *ctx, uint8_t command,
-		uint8_t data1, uint8_t data2, uint8_t data3, uint8_t data4, uint8_t data5)
+		uint8_t data1, uint8_t data2, uint8_t data3)
 {
 	CO_BEGIN(ctx);
 
@@ -209,17 +234,19 @@ xpcc::Ssd1306<I2cMaster>::writeCommand(void *ctx, uint8_t command,
 			!adapter.isBusy() && (
 					commandBuffer[0] = 0x80,
 					commandBuffer[1] = command,
-					commandBuffer[2] = 0x00,
-					commandBuffer[3] = data1,
-					commandBuffer[4] = 0x00,
-					commandBuffer[5] = data2,
-					commandBuffer[6] = 0x00,
-					commandBuffer[7] = data3,
-					commandBuffer[8] = 0x00,
-					commandBuffer[9] = data4,
-					commandBuffer[10] = 0x00,
-					commandBuffer[11] = data5,
-					startTransactionWithLength(12) )
+					commandBuffer[2] = 0x80,
+					commandBuffer[3] = 0x00,
+					commandBuffer[4] = 0x80,
+					commandBuffer[5] = data1,
+					commandBuffer[6] = 0x80,
+					commandBuffer[7] = data2,
+					commandBuffer[8] = 0x80,
+					commandBuffer[9] = data3,
+					commandBuffer[10] = 0x80,
+					commandBuffer[11] = 0x00,
+					commandBuffer[12] = 0x80,
+					commandBuffer[13] = 0xFF,
+					startTransactionWithLength(14) )
 	);
 
 	CO_WAIT_WHILE(i2cTask == command);
@@ -233,7 +260,7 @@ xpcc::Ssd1306<I2cMaster>::writeCommand(void *ctx, uint8_t command,
 template < class I2cMaster >
 xpcc::co::Result<bool>
 xpcc::Ssd1306<I2cMaster>::writeCommand(void *ctx, uint8_t command,
-		uint8_t data1, uint8_t data2, uint8_t data3, uint8_t data4, uint8_t data5, uint8_t data6)
+		uint8_t data1, uint8_t data2, uint8_t data3, uint8_t data4)
 {
 	CO_BEGIN(ctx);
 
@@ -242,18 +269,16 @@ xpcc::Ssd1306<I2cMaster>::writeCommand(void *ctx, uint8_t command,
 					commandBuffer[0] = 0x80,
 					commandBuffer[1] = command,
 					commandBuffer[2] = 0x80,
-					commandBuffer[3] = data1,
+					commandBuffer[3] = 0x00,
 					commandBuffer[4] = 0x80,
-					commandBuffer[5] = data2,
+					commandBuffer[5] = data1,
 					commandBuffer[6] = 0x80,
-					commandBuffer[7] = data3,
+					commandBuffer[7] = data2,
 					commandBuffer[8] = 0x80,
-					commandBuffer[9] = data4,
+					commandBuffer[9] = data3,
 					commandBuffer[10] = 0x80,
-					commandBuffer[11] = data5,
-					commandBuffer[12] = 0x80,
-					commandBuffer[13] = data6,
-					startTransactionWithLength(14) )
+					commandBuffer[11] = data4,
+					startTransactionWithLength(12) )
 	);
 
 	CO_WAIT_WHILE(i2cTask == command);

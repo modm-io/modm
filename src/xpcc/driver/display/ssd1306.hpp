@@ -21,44 +21,11 @@ namespace xpcc
 
 struct ssd1306
 {
-	struct Command
+	enum class
+	Rotation : bool
 	{
-		enum
-		{
-			// fundamental commands
-			SetContrastControl = 0x81,
-			SetChargePump = 0x8D,
-			SetEntireDisplayResumeToRam = 0xA4,
-			SetEntireDisplayIgnoreRam = 0xA5,
-			SetNormalDisplay = 0xA6,
-			SetInvertedDisplay = 0xA7,
-			SetDisplayOff = 0xAE,
-			SetDisplayOn = 0xAF,
-
-			// addressing commands
-			SetLowerColumnStartAddress = 0x00,
-			SetHigherColumnStartAddress = 0x10,
-			SetMemoryMode = 0x20,
-			SetColumnAddress = 0x21,
-			SetPageAddress = 0x22,
-			SetPageStartAddress = 0xB0,
-
-			// Hardware configuration
-			SetDisplayStartLine = 0x40,
-			SetSegmentRemap0 = 0xA0,
-			SetSegmentRemap127 = 0xA1,
-			SetMultiplexRatio = 0xA8,
-			SetComOutputScanDirectionIncrement = 0xC0,
-			SetComOutputScanDirectionDecrement = 0xC8,
-			SetDisplayOffset = 0xD3,
-			SetComPins = 0xDA,
-
-			// timing configuration
-			SetDisplayClockDivideRatio = 0xD5,
-			SetPreChargePeriod = 0xD9,
-			SetV_DeselectLevel = 0xDB,
-			Nop = 0xE3,
-		};
+		Normal,
+		UpsideDown
 	};
 };
 
@@ -73,6 +40,43 @@ template < class I2cMaster >
 class Ssd1306 : public ssd1306, public xpcc::I2cDevice<I2cMaster>,
 				public xpcc::co::NestedCoroutine<1>, public BufferedGraphicDisplay<128, 64>
 {
+	enum Command : uint8_t
+	{
+		// fundamental commands
+		SetContrastControl = 0x81,
+		SetChargePump = 0x8D,
+		SetEntireDisplayResumeToRam = 0xA4,
+		SetEntireDisplayIgnoreRam = 0xA5,
+		SetNormalDisplay = 0xA6,
+		SetInvertedDisplay = 0xA7,
+		SetDisplayOff = 0xAE,
+		SetDisplayOn = 0xAF,
+
+		// addressing commands
+		SetLowerColumnStartAddress = 0x00,
+		SetHigherColumnStartAddress = 0x10,
+		SetMemoryMode = 0x20,
+		SetColumnAddress = 0x21,
+		SetPageAddress = 0x22,
+		SetPageStartAddress = 0xB0,
+
+		// Hardware configuration
+		SetDisplayStartLine = 0x40,
+		SetSegmentRemap0 = 0xA0,
+		SetSegmentRemap127 = 0xA1,
+		SetMultiplexRatio = 0xA8,
+		SetComOutputScanDirectionIncrement = 0xC0,
+		SetComOutputScanDirectionDecrement = 0xC8,
+		SetDisplayOffset = 0xD3,
+		SetComPins = 0xDA,
+
+		// timing configuration
+		SetDisplayClockDivideRatio = 0xD5,
+		SetPreChargePeriod = 0xD9,
+		SetV_DeselectLevel = 0xDB,
+		Nop = 0xE3,
+	};
+
 public:
 	Ssd1306(uint8_t address = 0x3C);
 
@@ -113,7 +117,7 @@ public:
 	initialize(void *ctx);
 
 	/// Starts a frame transfer to the display
-	xpcc::co::Result<bool>
+	xpcc::co::Result<void>
 	startWriteDisplay(void *ctx);
 
 	// starts a frame transfer and waits for completion
@@ -124,7 +128,13 @@ public:
 	xpcc::co::Result<bool>
 	invertDisplay(void *ctx, bool invert = true);
 
+	xpcc::co::Result<bool>
+	setDisplayContrast(void *ctx, uint8_t contrast = 0xCE);
 
+	xpcc::co::Result<bool>
+	setDisplayRotation(void *ctx, Rotation rotation=Rotation::Normal);
+
+protected:
 	/// Write a command without data
 	xpcc::co::Result<bool>
 	writeCommand(void *ctx, uint8_t command);
@@ -137,15 +147,15 @@ public:
 	xpcc::co::Result<bool>
 	writeCommand(void *ctx, uint8_t command, uint8_t data1, uint8_t data2);
 
-	/// Write a command with 5 bytes data (for scrolling)
+	/// Write a command with 3 bytes data (for scrolling)
 	xpcc::co::Result<bool>
 	writeCommand(void *ctx, uint8_t command,
-			uint8_t data1, uint8_t data2, uint8_t data3, uint8_t data4, uint8_t data5);
+			uint8_t data1, uint8_t data2, uint8_t data3);
 
-	/// Write a command with 6 bytes data (for scrolling)
+	/// Write a command with 4 bytes data (for scrolling)
 	xpcc::co::Result<bool>
 	writeCommand(void *ctx, uint8_t command,
-			uint8_t data1, uint8_t data2, uint8_t data3, uint8_t data4, uint8_t data5, uint8_t data6);
+			uint8_t data1, uint8_t data2, uint8_t data3, uint8_t data4);
 
 private:
 	bool
@@ -206,7 +216,6 @@ private:
 	volatile uint8_t i2cSuccess;
 	uint8_t commandBuffer[14];
 	bool initSuccessful;
-	bool inverted;
 
 	xpcc::I2cTagAdapter<xpcc::I2cWriteAdapter> adapter;
 	xpcc::I2cTagAdapter<DataTransmissionAdapter> adapterData;
