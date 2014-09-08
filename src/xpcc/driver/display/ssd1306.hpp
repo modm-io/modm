@@ -27,6 +27,27 @@ struct ssd1306
 		Normal,
 		UpsideDown
 	};
+
+	enum class
+	ScrollStep : uint8_t
+	{
+		Frames2 = 0b111,
+		Frames3 = 0b100,
+		Frames4 = 0b101,
+		Frames5 = 0b000,
+		Frames25 = 0b110,
+		Frames64 = 0b001,
+		Frames128 = 0b010,
+		Frames256 = 0b011
+	};
+
+public:
+	enum class
+	ScrollDirection : bool
+	{
+		Right,
+		Left,
+	};
 };
 
 
@@ -51,6 +72,15 @@ class Ssd1306 : public ssd1306, public xpcc::I2cDevice<I2cMaster>,
 		SetInvertedDisplay = 0xA7,
 		SetDisplayOff = 0xAE,
 		SetDisplayOn = 0xAF,
+
+		// scrolling commands
+		SetHorizontalScrollRight = 0x26,
+		SetHorizontalScrollLeft = 0x27,
+		SetVerticalAndHorizontalScrollRight = 0x29,
+		SetVerticalAndHorizontalScrollLeft = 0x2A,
+		SetDisableScroll = 0x2E,
+		SetEnableScroll = 0x2F,
+		SetVerticalScrollArea = 0xA3,
 
 		// addressing commands
 		SetLowerColumnStartAddress = 0x00,
@@ -77,8 +107,30 @@ class Ssd1306 : public ssd1306, public xpcc::I2cDevice<I2cMaster>,
 		Nop = 0xE3,
 	};
 
+	uint8_t
+	i(ScrollDirection direction)
+	{
+		return static_cast<uint8_t>(direction);
+	}
+
+	uint8_t
+	i(ScrollStep step)
+	{
+		return static_cast<uint8_t>(step);
+	}
+
 public:
 	Ssd1306(uint8_t address = 0x3C);
+
+	/// initializes for 3V3 with charge-pump
+	bool inline
+	initialize()
+	{
+		xpcc::co::Result<bool> result;
+		while((result = initialize(this)).state > xpcc::co::NestingError)
+			;
+		return result.result;
+	}
 
 	/// Update the display with the content of the RAM buffer.
 	virtual void
@@ -101,17 +153,6 @@ public:
 	xpcc::co::Result<bool>
 	ping(void *ctx);
 
-
-	/// initializes for 3V3 with charge-pump
-	bool
-	initialize()
-	{
-		xpcc::co::Result<bool> result;
-		while((result = initialize(this)).state > xpcc::co::NestingError)
-			;
-		return result.result;
-	}
-
 	/// initializes for 3V3 with charge-pump asynchronously
 	xpcc::co::Result<bool>
 	initialize(void *ctx);
@@ -129,10 +170,23 @@ public:
 	invertDisplay(void *ctx, bool invert = true);
 
 	xpcc::co::Result<bool>
-	setDisplayContrast(void *ctx, uint8_t contrast = 0xCE);
+	setContrast(void *ctx, uint8_t contrast = 0xCE);
 
 	xpcc::co::Result<bool>
-	setDisplayRotation(void *ctx, Rotation rotation=Rotation::Normal);
+	setRotation(void *ctx, Rotation rotation=Rotation::Normal);
+
+
+	xpcc::co::Result<bool>
+	configureScroll(void *ctx, uint8_t origin, uint8_t size,
+			ScrollDirection direction, ScrollStep steps);
+
+	xpcc::co::Result<bool> ALWAYS_INLINE
+	enableScroll(void *ctx)
+	{ return writeCommand(ctx, Command::SetEnableScroll); }
+
+	xpcc::co::Result<bool> ALWAYS_INLINE
+	disableScroll(void *ctx)
+	{ return writeCommand(ctx, Command::SetDisableScroll); }
 
 protected:
 	/// Write a command without data
@@ -146,16 +200,6 @@ protected:
 	/// Write a command with two bytes data
 	xpcc::co::Result<bool>
 	writeCommand(void *ctx, uint8_t command, uint8_t data1, uint8_t data2);
-
-	/// Write a command with 3 bytes data (for scrolling)
-	xpcc::co::Result<bool>
-	writeCommand(void *ctx, uint8_t command,
-			uint8_t data1, uint8_t data2, uint8_t data3);
-
-	/// Write a command with 4 bytes data (for scrolling)
-	xpcc::co::Result<bool>
-	writeCommand(void *ctx, uint8_t command,
-			uint8_t data1, uint8_t data2, uint8_t data3, uint8_t data4);
 
 private:
 	bool
